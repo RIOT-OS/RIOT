@@ -15,9 +15,7 @@
  * @file
  * @brief     Board specific configuration of direct mapped GPIOs
  *
- * @author    Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author    Alexandre Abadie <alexandre.abadie@inria.fr>
- * @author      Tom Keddie <github@bronwenandtom.com>
+ * @author    Tom Keddie <github@bronwenandtom.com>
  */
 
 #ifndef GPIO_PARAMS_H

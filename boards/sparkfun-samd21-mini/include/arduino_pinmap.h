@@ -17,7 +17,6 @@
  * You can use the defines in this file for simplified interaction with the
  * Arduino specific pin numbers.
  *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Tom Keddie <github@bronwenandtom.com>
  */
 

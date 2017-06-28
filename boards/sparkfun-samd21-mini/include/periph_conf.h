@@ -15,10 +15,6 @@
  * @file
  * @brief       Configuration of CPU peripherals for SparkFun SAMD21 Mini Breakout board
  *
- * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Tom Keddie <github@bronwenandtom.com>
  */
 

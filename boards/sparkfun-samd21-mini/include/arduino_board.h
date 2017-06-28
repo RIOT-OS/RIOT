@@ -15,8 +15,6 @@
  * @file
  * @brief       Board specific configuration for the Arduino API
  *
- * @author      Hauke Petersen  <hauke.petersen@fu-berlin.de>
- * @author      Alexandre Abadie  <alexandre.abadie@inria.fr>
  * @author      Tom Keddie <github@bronwenandtom.com>
  */
 

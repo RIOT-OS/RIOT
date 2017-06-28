@@ -17,7 +17,6 @@
  * @brief       Board specific definitions for the SparkFun SAMD21 Mini
  *              Breakout board
  *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Tom Keddie <github@bronwenandtom.com>
  */
 
