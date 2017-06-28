@@ -133,9 +133,9 @@ run_test() {
 }
 
 get_jobs() {
-    [ "$STATIC_TESTS" = "1" ] && \
+    #[ "$STATIC_TESTS" = "1" ] && \
         echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
-    get_compile_jobs
+    #get_compile_jobs
     get_test_jobs
 }
 
