@@ -100,7 +100,7 @@ int lps25h_init(lps25h_t *dev, const lps25h_params_t *params)
     tmp = (LPS25H_MASK_CTRL_REG1_PD     /* active mode     */
           | LPS25H_ODR);                /* output data rate */
 
-    if (i2c_write_reg(LPS25H_BUS, LPS25H_ADDR, LPS25H_REG_CTRL_REG1, tmp) != 1) {
+    if (i2c_write_reg(LPS25H_BUS, LPS25H_ADDR, LPS25H_REG_CTRL_REG1, tmp) < 0) {
         DEBUG("[ERROR] Cannot configure device\n");
         i2c_release(LPS25H_BUS);
         return -LPS25H_ERRI2C;
