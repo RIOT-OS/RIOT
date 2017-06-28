@@ -115,7 +115,7 @@ def json_load(filename):
             _data = deep_replace(_data, repl)
             _data = do_include(_data)
             _data["template_instance"] = repl
-            _data["template_instance_num"] = i
+            _data["template_instance_id"] = _data.get("template_instance_id", str(i))
             result.append(_data)
             i += 1
         return result
@@ -200,7 +200,7 @@ class Test(object):
             nodes.append(node)
 
         s.nodes = nodes
-        s.instance_num = data.get("template_instance_num", -1)
+        s.instance_id = data.get("template_instance_id", None)
 
     def load_all(paths):
         files = []
@@ -284,11 +284,10 @@ def check_results(results):
         return res
 
 def run_tests(tests, outfile, instance):
-    instance = instance or -1
     exit_code = 0
     results = []
     for test in tests:
-        if test.instance_num != instance:
+        if test.instance_id != instance:
             continue
         if not test.node_groups:
             print("%s: no matching group found!" % test.filename, file=sys.stderr)
@@ -297,7 +296,7 @@ def run_tests(tests, outfile, instance):
             print("- running test", test.filename, "on node group", node_group.filename, end="")
 
             try:
-                print(" (instance %s: %s)" % ( test.data["template_instance_num"], test.data.get("template_instance", {})))
+                print(" (instance %s: %s)" % ( test.instance_id, test.data.get("template_instance", {})))
             except KeyError:
                 print("")
 
@@ -348,9 +347,11 @@ def print_murdock_jobs(tests):
             continue
         for node_group in test.node_groups:
             murdock_queue = node_group.murdock_queue
-            instance_num_str = " %s" % test.instance_num if test.instance_num != -1 else ""
+
+            instance_str = " %s" % test.instance_id if test.instance_id else ""
+
             print("./.murdock run_test %s%s ### { \"queue\" : \"%s\", \"max_retries\" : 0 }" \
-                    % (test.filename, instance_num_str, murdock_queue))
+                    % (test.filename, instance_str, murdock_queue))
 
 @click.command()
 @click.option("--nodes", multiple=True, type=click.Path())
