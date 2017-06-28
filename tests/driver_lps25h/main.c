@@ -18,44 +18,36 @@
  * @}
  */
 
-#ifndef TEST_LPS25H_I2C
-#error "TEST_LPS25H_I2C not defined"
-#endif
-#ifndef TEST_LPS25H_ADDR
-#error "TEST_LPS25H_ADDR not defined"
-#endif
-
 #include <stdio.h>
 
 #include "xtimer.h"
 #include "lps25h.h"
-
-#define ODR         LPS25H_ODR_7HZ
-#define SLEEP       (850 * 1000U)
+#include "lps25h_params.h"
 
 int main(void)
 {
     lps25h_t dev;
-    int temp;
-    int pres;
+    int16_t temp;
+    uint16_t pres;
 
-    printf("LPS25H pressure sensor test application\n");
-    printf("Initializing LPS25H sensor at I2C_%i ... ", TEST_LPS25H_I2C);
-    if (lps25h_init(&dev, TEST_LPS25H_I2C, TEST_LPS25H_ADDR, ODR) == 0) {
+    puts("LPS25H pressure sensor test application");
+
+    puts("Initializing LPS25H sensor");
+    if (lps25h_init(&dev, &lps25h_params[0]) == 0) {
         printf("[ OK ]\n");
     }
     else {
-        printf("[ FAIL ]\n");
+        printf("[ FAILED ]\n");
         return 1;
     }
 
     while (1) {
-        temp = lps25h_read_temp(&dev);
-        pres = lps25h_read_pres(&dev);
+        temp = lps25h_read_temperature(&dev);
+        pres = lps25h_read_pressure(&dev);
 
         printf("Pressure: %3i hPa - Temperature: %3i °C\n", pres, temp);
 
-        xtimer_usleep(SLEEP);
+        xtimer_sleep(1);
     }
 
     return 0;
