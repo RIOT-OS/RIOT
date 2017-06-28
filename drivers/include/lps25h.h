@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_lps25h LPS25H Pressure Sensor Driver
+ * @defgroup    drivers_lps25h LPS25H Pressure Sensor Driver
  * @ingroup     drivers_sensors
  * @brief       Device driver for the LPS25H pressure sensor
  * @{
@@ -36,16 +36,15 @@ extern "C" {
 #define LPS25H_CHIP_ID        (0xBD)
 #define LPS25H_CHIP_ADDR      (0x5E)
 
-/**
- * @brief Device descriptor for LPS25H sensors
- */
-typedef struct {
-    i2c_t   i2c;               /**< I2C device the sensor is connected to */
-    uint8_t addr;              /**< I2C bus address of the sensor */
-} lps25h_t;
+enum {
+    LPS25H_OK,                 /**< All is OK */
+    LPS25H_NOI2C,              /**< An error occurred during I2C initialization */
+    LPS25H_ERRI2C,             /**< An error occurred with I2C */
+    LPS25H_NODEV,              /**< Invalid device on I2C bus */
+};
 
 /**
- * @brief Possible sampling rates for LPS25H sensors
+ * @brief Possible output data rates for LPS25H sensors
  */
 typedef enum {
     LPS25H_ODR_1HZ   = 0x10,   /**< sample with 1Hz */
@@ -55,26 +54,42 @@ typedef enum {
 } lps25h_odr_t;
 
 /**
+ * @brief Device parameters
+ */
+typedef struct {
+    i2c_t   i2c;               /**< I2C device the sensor is connected to */
+    uint8_t addr;              /**< I2C bus address of the sensor */
+    lps25h_odr_t odr;          /**< Output data rate */
+} lps25h_params_t;
+
+/**
+ * @brief Device descriptor for LPS25H sensors
+ */
+typedef struct {
+    lps25h_params_t params;   /**< Device parameters */
+} lps25h_t;
+
+/**
  * @brief Initialize a given LPS25H pressure sensor
  *
  * @param[out]  dev     device descriptor of the sensor
- * @param[in]   i2c     I2C bus the sensor is connected to
- * @param[in]   address the sensor's address on the I2C bus
- * @param[in]   odr    internal sampling rate of the sensor
+ * @param[in]   params  device parameters
  *
- * @return               0 on success
- * @return              -1 on error
+ * @return              LPS25H_OK on success
+ * @return              -LPS25H_NOI2C if no I2C is available
+ * @return              -LPS25H_NOI2C when an I2C error occured
+ * @return              -LPS25H_NODEV if no valid device is found
  */
-int lps25h_init(lps25h_t *dev, i2c_t i2c, uint8_t address, lps25h_odr_t odr);
+int lps25h_init(lps25h_t *dev, const lps25h_params_t *params);
 
 /**
- * @brief Read a temperature value from the given sensor, returnd in °C
+ * @brief Read a temperature value from the given sensor, returned in °C
  *
  * @param[in] dev       device descriptor of sensor to read from
  *
  * @return              temparature value in °C
  */
-int lps25h_read_temp(lps25h_t *dev);
+int16_t lps25h_read_temperature(const lps25h_t *dev);
 
 /**
  * @brief Read a pressure value from the given sensor, returned in mbar
@@ -83,21 +98,21 @@ int lps25h_read_temp(lps25h_t *dev);
  *
  * @return              pressure value in mbar
  */
-int lps25h_read_pres(lps25h_t *dev);
+uint16_t lps25h_read_pressure(const lps25h_t *dev);
 
 /**
  * @brief Enable the given sensor
  *
  * @param[in] dev       device descriptor of sensor to enable
  */
- void lps25h_enable(lps25h_t *dev);
+void lps25h_enable(const lps25h_t *dev);
 
 /**
  * @brief Disable the given sensor
  *
  * @param[in] dev       device descriptor of sensor enable
  */
-void lps25h_disable(lps25h_t *dev);
+void lps25h_disable(const lps25h_t *dev);
 
 #ifdef __cplusplus
 }

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_lps25h
+ * @ingroup     drivers_lps25h
  * @{
  *
  * @file
