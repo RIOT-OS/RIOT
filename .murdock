@@ -118,7 +118,8 @@ get_test_jobs() {
         --murdock \
         --all \
         --tests dist/testsuite/tests/02-tests \
-        --nodes dist/testsuite/nodes
+        --nodes dist/testsuite/nodes \
+        | grep '^./.murdock'
 }
 
 run_test() {
