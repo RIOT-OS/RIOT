@@ -53,6 +53,7 @@ extern "C" {
 #define ARDUINO_PIN_A0          GPIO_PIN(PA, 2)
 #define ARDUINO_PIN_A1          GPIO_PIN(PB, 8)
 #define ARDUINO_PIN_A2          GPIO_PIN(PB, 9)
+#define ARDUINO_PIN_A3          GPIO_PIN(PA, 4)
 /** @ */
 
 #ifdef __cplusplus
