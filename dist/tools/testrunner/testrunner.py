@@ -359,7 +359,7 @@ def print_murdock_jobs(tests):
 @click.option("--all", is_flag=True)
 @click.option("--outfile", type=click.File("w"))
 @click.option("--murdock", is_flag=True)
-@click.option("--instance", type=int)
+@click.option("--instance")
 def main(nodes, tests, all, outfile, murdock, instance):
     nodes = list(nodes)
     tests = list(tests)
