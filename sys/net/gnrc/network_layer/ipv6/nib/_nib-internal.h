@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "bitfield.h"
 #include "evtimer_msg.h"
 #include "kernel_types.h"
 #include "mutex.h"
@@ -34,6 +35,7 @@
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/pktqueue.h"
+#include "net/gnrc/sixlowpan/ctx.h"
 #include "net/ndp.h"
 #include "random.h"
 
@@ -220,6 +222,27 @@ typedef struct {
      */
     uint8_t na_sent;
 } _nib_iface_t;
+
+/**
+ * @brief   Internal NIB-representation of the authoritative border router
+ *          for multihop prefix and 6LoWPAN context dissemination
+ */
+typedef struct {
+    ipv6_addr_t addr;               /**< The address of the border router */
+    uint32_t version;               /**< last received version of the info of
+                                     *   the _nib_abr_entry_t::addr */
+    evtimer_msg_event_t timeout;    /**< timeout of the information */
+    /**
+     * @brief   Bitfield marking the prefixes in the NIB's off-link entries
+     *          disseminated by _nib_abr_entry_t::addr
+     */
+    BITFIELD(pfxs, GNRC_IPV6_NIB_OFFL_NUMOF);
+    /**
+     * @brief   Bitfield marking the contexts disseminated by
+     *          _nib_abr_entry_t::addr
+     */
+    BITFIELD(ctxs, GNRC_SIXLOWPAN_CTX_SIZE);
+} _nib_abr_entry_t;
 
 /**
  * @brief   Mutex for locking the NIB
@@ -598,11 +621,7 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
  *
  * Corresponding on-link entry is removed, too.
  */
-static inline void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
-{
-    evtimer_del(&_nib_evtimer, &nib_offl->pfx_timeout.event);
-    _nib_offl_remove(nib_offl, _PL);
-}
+void _nib_pl_remove(_nib_offl_entry_t *nib_offl);
 
 #if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
 /**
@@ -647,6 +666,65 @@ static inline void _nib_ft_remove(_nib_offl_entry_t *nib_offl)
     _nib_offl_remove(nib_offl, _FT);
 }
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
+
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
+/**
+ * @brief   Creates or gets an existing authoritative border router.
+ *
+ * @pre `addr != NULL`
+ *
+ * @param[in] addr  Address of the authoritative border router.
+ *
+ * @return  An authoritative border router entry, on success.
+ * @return  NULL, if no space is left.
+ */
+_nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr);
+
+/**
+ * @brief   Removes an authoritative border router
+ *
+ * @pre `addr != NULL`
+ *
+ * @param[in] addr  Address of the authoritative border router.
+ */
+void _nib_abr_remove(const ipv6_addr_t *addr);
+
+/**
+ * @brief   Adds a prefix to the managed prefix of the authoritative border
+ *          router
+ *
+ * @pre `(abr != NULL) && (offl != NULL) && (offl->mode & _PL)`
+ *
+ * @param[in] abr   The border router.
+ * @param[in] offl  The prefix to add.
+ */
+void _nib_abr_add_pfx(_nib_abr_entry_t *abr, const _nib_offl_entry_t *offl);
+
+/**
+ * @brief   Iterates over an authoritative border router's prefixes
+ *
+ * @pre `(abr != NULL)`
+ *
+ * @param[in] abr   The border router
+ * @param[in] last  Last prefix (NULL to start)
+ *
+ * @return  entry after @p last.
+ * @return  NULL, if @p last is the last prefix of @p abr or if @p last
+ *          wasn't in NIB (and != NULL).
+ */
+_nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
+                                     const _nib_offl_entry_t *last);
+
+/**
+ * @brief   Iterates over authoritative border router entries
+ *
+ * @param[in] last  Last entry (NULL to start).
+ *
+ * @return  entry after @p last.
+ * @return  NULL, if @p last is the last ABR in the NIB.
+ */
+_nib_abr_entry_t *_nib_abr_iter(const _nib_abr_entry_t *last);
+#endif
 
 /**
  * @brief   Gets (or creates if it not exists) interface information for
