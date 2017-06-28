@@ -106,6 +106,9 @@ extern "C" {
 /**
  * @brief   Buffer size used for emCute's transmit and receive buffers
  *
+ * @note    The buffer size MUST be less than 32768 on 16-bit and 8-bit
+ *          platforms to prevent buffer overflows.
+ *
  * The overall buffer size used by emCute is this value time two (Rx + Tx).
  */
 #define EMCUTE_BUFSIZE          (512U)
