@@ -156,6 +156,26 @@ extern "C" {
 #define ARDUINO_PIN_A15         ARDUINO_PIN_69
 #endif
 
+/* arduino ADC notation compatibility */
+#define A0                     0
+#define A1                     1
+#define A2                     2
+#define A3                     3
+#define A4                     4
+#define A5                     5
+#ifdef CPU_ATMEGA2560
+#define A6                     0
+#define A7                     1
+#define A8                     2
+#define A9                     3
+#define A10                    10
+#define A11                    11
+#define A12                    12
+#define A13                    13
+#define A14                    14
+#define A15                    15
+#endif
+
 /** @ */
 
 #ifdef __cplusplus
