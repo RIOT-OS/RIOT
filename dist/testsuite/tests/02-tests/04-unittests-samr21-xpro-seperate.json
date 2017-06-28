@@ -54,6 +54,7 @@
             "tests-vfs"
         ]
     },
+    "template_instance_id" : "%TESTS%",
     "include" : [ "../00-base/unittests.json", "../00-nodes/%NODES%.json" ],
     "node_defaults" : { "timeout" : 20, "env" : { "UNIT_TESTS" : "%TESTS%" }}
 }
