@@ -194,6 +194,15 @@ extern "C" {
 #define GNRC_IPV6_NIB_OFFL_NUMOF            (8)
 #endif
 
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
+/**
+ * @brief   Number of authoritative border router entries in NIB
+ */
+#ifndef GNRC_IPV6_NIB_ABR_NUMOF
+#define GNRC_IPV6_NIB_ABR_NUMOF             (1)
+#endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif
