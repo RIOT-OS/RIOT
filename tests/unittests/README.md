@@ -195,7 +195,7 @@ Every ``tests-<modulename>/tests-<module>*.c`` file you add to ``tests/unittests
 
 /* clib includes */
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "<header>.h"
 
@@ -253,7 +253,7 @@ Test *tests_<module>_<header>_tests(void)
         /* ... */
     };
 
-    EMB_UNIT_TESTCALLER(<module>_<header>_tests, "<module>_<header>_tests",
+    EMB_UNIT_TESTCALLER(<module>_<header>_tests,
                         tests_<module>_<header>_set_up,
                         tests_<module>_<header>_tear_down, fixtures);
     /* set up and tear down function can be NULL if omitted */
