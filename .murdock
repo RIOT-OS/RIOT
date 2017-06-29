@@ -124,12 +124,16 @@ get_test_jobs() {
 }
 
 run_test() {
+    local queue="$1"
+    local _test="$2"
+    local instance="$3"
+
     [ -z "$TESTRUNNER_NODES" ] && {
         echo "$0: TESTRUNNER_NODES not set!"
         exit 1
     }
 
-    RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py --tests $1 ${2:+--instance $2}
+    RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py --tests "$_test" ${instance:+--instance $instance}
 }
 
 get_jobs() {
