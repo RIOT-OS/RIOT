@@ -41,6 +41,15 @@ enum {
     PORT_D = 3       /**< port D */
 };
 
+/**
+ * @name   Defines for the I2C interface
+ * @{
+ */
+#define I2C_PORT_REG            PORTC
+#define I2C_PIN_MASK            (1 << PORTC4) | (1 << PORTC5)
+#define I2C_POWER_REG           PRR
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
