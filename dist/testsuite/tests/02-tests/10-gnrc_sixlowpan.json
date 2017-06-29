@@ -1,7 +1,8 @@
 {
     "test" : "expect",
     "node_defaults" : {
-        "app" : "tests/gnrc_sixlowpan"
+        "app" : "tests/gnrc_sixlowpan",
+        "tags" : [ "netdev" ]
     },
     "args" : {
         "terms" : [

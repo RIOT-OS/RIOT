@@ -1,7 +1,7 @@
 {
     "murdock_queue" : "native",
     "node_defaults" : {
-        "tags" : [ "board:native", "cpp" ],
+        "tags" : [ "board:native", "cpp", "netdev" ],
         "env" : {
             "BOARD" : "native"
         }
