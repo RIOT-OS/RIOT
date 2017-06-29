@@ -203,12 +203,6 @@ static const pwm_conf_t pwm_config[] = {
 
 #define ADC_NUMOF           (6)
 /** @} */
-/**
- * @name   DAC configuration
- * @{
- */
-#define DAC_NUMOF           (0)
-/** @} */
 
 #ifdef __cplusplus
 }

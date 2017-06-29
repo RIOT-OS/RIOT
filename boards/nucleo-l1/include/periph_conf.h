@@ -236,13 +236,14 @@ static const i2c_conf_t i2c_config[] = {
  * @name   DAC configuration
  * @{
  */
-#define DAC_CONFIG {            \
-    { GPIO_PIN(PORT_A, 4), 1},  \
-    { GPIO_PIN(PORT_A, 5), 2},  \
-}
+static const dac_conf_t dac_config[] = {
+    { .pin = GPIO_PIN(PORT_A,  4), .chan = 0 },
+    { .pin = GPIO_PIN(PORT_A,  5), .chan = 1 }
+};
 
-#define DAC_NUMOF           (2U)
+#define DAC_NUMOF           (sizeof(dac_config) / sizeof(dac_config[0]))
 /** @} */
+
 
 #ifdef __cplusplus
 }

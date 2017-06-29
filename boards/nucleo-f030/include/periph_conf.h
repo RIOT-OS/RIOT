@@ -142,13 +142,6 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @name   DAC configuration
- * @{
- */
-#define DAC_NUMOF           (0)
-/** @} */
-
-/**
  * @name RTC configuration
  * @{
  */
