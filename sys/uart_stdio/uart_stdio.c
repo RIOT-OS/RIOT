@@ -115,9 +115,9 @@ int uart_stdio_read(char* buffer, int count)
 int uart_stdio_write(const char* buffer, int len)
 {
 #ifndef USE_ETHOS_FOR_STDIO
-    uart_write(UART_STDIO_DEV, (uint8_t *)buffer, (size_t)len);
+    uart_write(UART_STDIO_DEV, (const uint8_t *)buffer, (size_t)len);
 #else
-    ethos_send_frame(&ethos, (uint8_t*)buffer, len, ETHOS_FRAME_TYPE_TEXT);
+    ethos_send_frame(&ethos, (const uint8_t *)buffer, len, ETHOS_FRAME_TYPE_TEXT);
 #endif
     return len;
 }
