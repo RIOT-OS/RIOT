@@ -161,8 +161,8 @@ void spi_release(spi_t bus)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
-    uint8_t *out_buf = (uint8_t *)out;
-    uint8_t *in_buf = (uint8_t *)in;
+    const uint8_t *out_buf = out;
+    uint8_t *in_buf = in;
     uint32_t flags = SPI_PUSHR_CONT_MASK;
 
     assert(out_buf || in_buf);
