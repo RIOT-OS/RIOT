@@ -7,7 +7,7 @@
         "python" : [
             "child = test.nodes[0].child",
             "for i in range(5):",
-            "    child.expect(\"Message received: 42\")",
+            "    child.expect(\"Message: 42\")",
             "    child.expect(\"Timeout!\")"
         ]
     }
