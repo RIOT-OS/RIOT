@@ -49,7 +49,7 @@ static int mtd_vfs_fstat(vfs_file_t *filp, struct stat *buf)
     if (buf == NULL) {
         return -EFAULT;
     }
-    mtd_dev_t *mtd = filp->private_data.ptr;
+    const mtd_dev_t *mtd = filp->private_data.ptr;
     if (mtd == NULL) {
         return -EFAULT;
     }
@@ -60,7 +60,7 @@ static int mtd_vfs_fstat(vfs_file_t *filp, struct stat *buf)
 
 static off_t mtd_vfs_lseek(vfs_file_t *filp, off_t off, int whence)
 {
-    mtd_dev_t *mtd = filp->private_data.ptr;
+    const mtd_dev_t *mtd = filp->private_data.ptr;
     if (mtd == NULL) {
         return -EFAULT;
     }

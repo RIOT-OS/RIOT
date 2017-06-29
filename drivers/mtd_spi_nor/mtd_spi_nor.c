@@ -72,7 +72,7 @@ const mtd_desc_t mtd_spi_nor_driver = {
  * @param[out] dest   read buffer
  * @param[in]  count  number of bytes to read after the address has been sent
  */
-static void mtd_spi_cmd_addr_read(mtd_spi_nor_t *dev, uint8_t opcode,
+static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
     be_uint32_t addr, void* dest, uint32_t count)
 {
     TRACE("mtd_spi_cmd_addr_read: %p, %02x, (%02x %02x %02x %02x), %p, %" PRIu32 "\n",
@@ -114,7 +114,7 @@ static void mtd_spi_cmd_addr_read(mtd_spi_nor_t *dev, uint8_t opcode,
  * @param[out] src    write buffer
  * @param[in]  count  number of bytes to write after the opcode has been sent
  */
-static void mtd_spi_cmd_addr_write(mtd_spi_nor_t *dev, uint8_t opcode,
+static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
     be_uint32_t addr, const void* src, uint32_t count)
 {
     TRACE("mtd_spi_cmd_addr_write: %p, %02x, (%02x %02x %02x %02x), %p, %" PRIu32 "\n",
@@ -157,7 +157,7 @@ static void mtd_spi_cmd_addr_write(mtd_spi_nor_t *dev, uint8_t opcode,
  * @param[out] dest   read buffer
  * @param[in]  count  number of bytes to write after the opcode has been sent
  */
-static void mtd_spi_cmd_read(mtd_spi_nor_t *dev, uint8_t opcode, void* dest, uint32_t count)
+static void mtd_spi_cmd_read(const mtd_spi_nor_t *dev, uint8_t opcode, void* dest, uint32_t count)
 {
     TRACE("mtd_spi_cmd_read: %p, %02x, %p, %" PRIu32 "\n",
         (void *)dev, (unsigned int)opcode, dest, count);
@@ -179,7 +179,7 @@ static void mtd_spi_cmd_read(mtd_spi_nor_t *dev, uint8_t opcode, void* dest, uin
  * @param[out] src    write buffer
  * @param[in]  count  number of bytes to write after the opcode has been sent
  */
-static void __attribute__((unused)) mtd_spi_cmd_write(mtd_spi_nor_t *dev, uint8_t opcode, const void* src, uint32_t count)
+static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, uint8_t opcode, const void* src, uint32_t count)
 {
     TRACE("mtd_spi_cmd_write: %p, %02x, %p, %" PRIu32 "\n",
         (void *)dev, (unsigned int)opcode, src, count);
@@ -199,7 +199,7 @@ static void __attribute__((unused)) mtd_spi_cmd_write(mtd_spi_nor_t *dev, uint8_
  * @param[in]  dev    pointer to device descriptor
  * @param[in]  opcode command opcode
  */
-static void mtd_spi_cmd(mtd_spi_nor_t *dev, uint8_t opcode)
+static void mtd_spi_cmd(const mtd_spi_nor_t *dev, uint8_t opcode)
 {
     TRACE("mtd_spi_cmd: %p, %02x\n",
         (void *)dev, (unsigned int)opcode);
@@ -229,7 +229,7 @@ static inline uint8_t parity8(uint8_t x)
  * @internal
  * @brief Read JEDEC ID
  */
-static int mtd_spi_read_jedec_id(mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
+static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
 {
     /* not using above read functions because of variable length rdid response */
     int status = 0;
@@ -283,7 +283,7 @@ static int mtd_spi_read_jedec_id(mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
     return status;
 }
 
-static inline void wait_for_write_complete(mtd_spi_nor_t *dev)
+static inline void wait_for_write_complete(const mtd_spi_nor_t *dev)
 {
     do {
         uint8_t status;
@@ -377,7 +377,7 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
 {
     DEBUG("mtd_spi_nor_read: %p, %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
         (void *)mtd, dest, addr, size);
-    mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
+    const mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
     size_t chipsize = mtd->page_size * mtd->pages_per_sector * mtd->sector_count;
     if (addr > chipsize) {
         return -EOVERFLOW;
@@ -410,7 +410,7 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
     if (size == 0) {
         return 0;
     }
-    mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
+    const mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
     if (size > mtd->page_size) {
         DEBUG("mtd_spi_nor_write: ERR: page program >1 page (%" PRIu32 ")!\n", mtd->page_size);
         return -EOVERFLOW;
