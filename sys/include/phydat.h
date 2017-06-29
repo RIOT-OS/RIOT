@@ -240,6 +240,51 @@ char phydat_prefix_from_scale(int8_t scale);
  */
 void phydat_fit(phydat_t *dat, const int32_t *values, unsigned int dim);
 
+/**
+ * @brief   Convert the given phydat_t structure into a JSON string
+ *
+ * The output string written to @p buf will be `\0` terminated. You must make
+ * sure, that the given @p buf is large enough to hold the resulting string. You
+ * can call the function with `@p buf := NULL` to simply calculate the size of
+ * the JSON string without writing anything.
+ *
+ * The formatted JSON string will have the following format:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.json}
+ * // case (dim == 1):
+ * {
+ *   "d": 21.45,
+ *   "u": "°C"
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.json}
+ * // case (dim > 1), dim := 3 in this case:
+ * {
+ *   "d": [1.02, 0.23, -0.81],
+ *   "u": "g"
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * The data will be encoded as fixed point number based on the given scale
+ * factor.
+ *
+ * For encoding the unit, this function uses the extended
+ * phydat_unit_to_str_verbose() function to also print units for non-SI types,
+ * e.g. it will produce `..."u":"date"}` for @ref UNIT_DATE or `..."u":"none"}`
+ * for @ref UNIT_NONE.
+ *
+ * @param[in]  data     data to encode
+ * @param[in]  dim      dimensions used in @p data, MUST be > 0 and < PHYDAT_DIM
+ * @param[out] buf      target buffer for the JSON string, or NULL
+ *
+ * @pre     @p dim > 0
+ * @pre     @p dim < PHYDAT_DIM
+ *
+ * @return  number of bytes (potentially) written to @p buf, including `\0`
+ *          terminator
+ */
+size_t phydat_to_json(const phydat_t *data, size_t dim, char *buf);
+
 #ifdef __cplusplus
 }
 #endif
