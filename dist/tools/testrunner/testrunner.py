@@ -350,8 +350,8 @@ def print_murdock_jobs(tests):
 
             instance_str = " %s" % test.instance_id if test.instance_id else ""
 
-            print("./.murdock run_test %s%s ### { \"queue\" : \"%s\", \"max_retries\" : 0 }" \
-                    % (test.filename, instance_str, murdock_queue))
+            print("./.murdock run_test %s %s%s ### { \"queue\" : \"%s\", \"max_retries\" : 0 }" \
+                    % (murdock_queue, test.filename, instance_str, murdock_queue))
 
 @click.command()
 @click.option("--nodes", multiple=True, type=click.Path())
