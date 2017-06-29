@@ -115,8 +115,8 @@ void spi_release(spi_t dev)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
-    uint8_t *out_buf = (uint8_t *)out;
-    uint8_t *in_buf = (uint8_t *)in;
+    const uint8_t *out_buf = out;
+    uint8_t *in_buf = in;
 
     assert(out_buf || in_buf);
 
@@ -128,7 +128,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     if (!in_buf) {
         for (size_t i = 0; i < len; i++) {
             while (!(SPI_IF & SPI_IE_TX_BIT)) {}
-            SPI_BASE->TXBUF = (uint8_t)out_buf[i];
+            SPI_BASE->TXBUF = out_buf[i];
         }
         /* finally we need to wait, until all transfers are complete */
 #ifndef SPI_USE_USCI
