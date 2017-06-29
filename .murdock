@@ -5,8 +5,24 @@ export STATIC_TESTS=${STATIC_TESTS:-1}
 export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 
-export LC_ALL=C.UTF-8
-export LANG=C.UTF-8
+check_locale() {
+    locale -a | grep -m 1 $1
+}
+
+set_locale() {
+    for i in C.UTF-8 en_US.utf8 utf8; do
+        LOCALE="$(check_locale $i)"
+        [ -n "$LOCALE" ] && break
+    done
+
+    [ -z "$LOCALE" ] && {
+        echo "# $0: error: cannot set utf-8 locale!"
+        exit 1
+    }
+
+    export LC_ALL=$LOCALE
+    export LANG=$LOCALE
+}
 
 error() {
     echo "$@"
@@ -114,13 +130,14 @@ static_tests() {
 }
 
 get_test_jobs() {
+    set_locale
     {
         RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py \
         --murdock \
         --all \
         --tests dist/testsuite/tests/02-tests \
         --nodes dist/testsuite/nodes 2>/dev/null || \
-            { echo "# get_test_jobs() error!"; }
+            { echo "# get_test_jobs() error!" 1>&2; }
     } | grep '^./.murdock'
 }
 
@@ -133,6 +150,8 @@ run_test() {
         echo "$0: TESTRUNNER_NODES not set!"
         exit 1
     }
+
+    set_locale
 
     RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py --tests "$_test" ${instance:+--instance $instance}
 }
