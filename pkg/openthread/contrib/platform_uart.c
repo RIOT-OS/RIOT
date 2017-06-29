@@ -19,7 +19,9 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "uart_stdio.h"
 #include "periph/uart.h"
 #include "openthread/types.h"
 #include "openthread/platform/uart.h"
@@ -28,8 +30,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define UART_OPENTHREAD_BAUDRATE            (115200U)
-#define UART_OPENTHREAD                     UART_DEV(0)
 #define OPENTHREAD_SPINEL_FRAME_MARKER      (0x7e)
 
 serial_msg_t * gSerialMessage[OPENTHREAD_NUMBER_OF_SERIAL_BUFFER];
@@ -54,6 +54,7 @@ int8_t getFirstEmptySerialBuffer(void) {
 /* OpenThread will call this for enabling UART (required for OpenThread's NCP)*/
 void uart_handler(void* arg, char c)  {
 
+    (void)arg;
     static int16_t currentSerialBufferNumber = 0;
     static uint8_t frameLength = 0;
     static uint8_t gOnGoingSpinelReception = 0;
@@ -115,13 +116,35 @@ void uart_handler(void* arg, char c)  {
 
 #else
 
-void uart_handler(void* arg, char c) {
-    msg_t msg;
-    msg.type = OPENTHREAD_SERIAL_MSG_TYPE_EVENT;
-    gSerialMessage[0]->buf[0] = (uint8_t) c;
-    gSerialMessage[0]->length = 1;
-    msg.content.ptr = gSerialMessage[0];
-    msg_send_int(&msg, openthread_get_pid());
+void uart_handler(void* arg, char c)
+{
+    (void)arg;
+
+    static uint16_t frameLength = 0;
+    if (frameLength == 0 && gSerialMessage != NULL) {
+        memset(gSerialMessage[0], 0, sizeof(serial_msg_t));
+    }
+    switch (c) {
+        case '\r':
+        case '\n':
+            if (frameLength > 0) {
+                gSerialMessage[0]->buf[frameLength] = c;
+                frameLength++;
+                gSerialMessage[0]->length = frameLength;
+                msg_t msg;
+                msg.type = OPENTHREAD_SERIAL_MSG_TYPE_EVENT;
+                msg.content.ptr = gSerialMessage[0];
+                msg_send_int(&msg, openthread_get_pid());
+                frameLength = 0;
+            }
+            break;
+        default:
+            if (frameLength < OPENTHREAD_SERIAL_BUFFER_SIZE) {
+                gSerialMessage[0]->buf[frameLength] = c;
+                frameLength++;
+            }
+            break;
+    }
 }
 
 #endif /* MODULE_OPENTHREAD_NCP_FTD */
@@ -134,21 +157,21 @@ otError otPlatUartEnable(void)
         gSerialMessage[i]->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
     }
 
-    uart_init(UART_OPENTHREAD, UART_OPENTHREAD_BAUDRATE, (uart_rx_cb_t) uart_handler, NULL);
+    uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, (uart_rx_cb_t) uart_handler, NULL);
     return OT_ERROR_NONE;
 }
 
 /* OpenThread will call this for disabling UART */
 otError otPlatUartDisable(void)
 {
-    uart_poweroff(UART_OPENTHREAD);
+    uart_poweroff(UART_STDIO_DEV);
     return OT_ERROR_NONE;
 }
 
 /* OpenThread will call this for sending data through UART */
 otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
 {
-    uart_write(UART_OPENTHREAD, aBuf, aBufLength);
+    uart_write(UART_STDIO_DEV, aBuf, aBufLength);
 
     /* Tell OpenThread the sending of UART is done */
     otPlatUartSendDone();

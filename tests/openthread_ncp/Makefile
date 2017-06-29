@@ -24,9 +24,6 @@ USEPKG += openthread
 USEMODULE += openthread-ftd
 USEMODULE += openthread-ncp-ftd
 
-#Define PANID and CHANNEL used by default
-#CFLAGS += -DOPENTHREAD_PANID=0xbeef -DOPENTHREAD_CHANNEL=11
-
 ifneq (,$(filter samr21-xpro,$(BOARD)))
   DRIVER := at86rf233
 endif

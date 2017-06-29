@@ -41,8 +41,6 @@
 static at86rf2xx_t at86rf2xx_dev;
 #endif
 
-#define OPENTHREAD_NETDEV_BUFLEN (ETHERNET_MAX_LEN)
-
 static uint8_t rx_buf[OPENTHREAD_NETDEV_BUFLEN];
 static uint8_t tx_buf[OPENTHREAD_NETDEV_BUFLEN];
 static char ot_thread_stack[2 * THREAD_STACKSIZE_MAIN];

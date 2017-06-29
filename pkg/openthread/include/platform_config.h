@@ -29,11 +29,11 @@ extern "C" {
  * The number of message buffers in buffer pool
  */
 #if OPENTHREAD_ENABLE_NCP_UART
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       5
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       (30U)
 #elif OPENTHREAD_MTD
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       20
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       (20U)
 #elif OPENTHREAD_FTD
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       10
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       (10U)
 #endif
 
 /**
@@ -42,7 +42,7 @@ extern "C" {
   * Define to 1 if you want use legacy transmit done.
   *
   */
-#define OPENTHREAD_CONFIG_LEGACY_TRANSMIT_DONE 1
+#define OPENTHREAD_CONFIG_LEGACY_TRANSMIT_DONE      (1U)
 
 #ifdef __cplusplus
 }
