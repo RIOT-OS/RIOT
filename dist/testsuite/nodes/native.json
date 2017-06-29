@@ -1,0 +1,15 @@
+{
+    "murdock_queue" : "native",
+    "node_defaults" : {
+        "tags" : [ "board:native", "cpp" ],
+        "env" : {
+            "BOARD" : "native"
+        }
+    },
+
+    "nodes" : [
+        {
+            "name" : "node0"
+        }
+    ]
+}
