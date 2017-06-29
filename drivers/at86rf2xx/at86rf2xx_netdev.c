@@ -359,8 +359,11 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
         return -ENODEV;
     }
 
-    /* temporarily wake up if sleeping */
-    if (old_state == AT86RF2XX_STATE_SLEEP) {
+    /* temporarily wake up if sleeping and opt != NETOPT_STATE.
+     * opt != NETOPT_STATE check prevents redundant wake-up.
+     * when opt == NETOPT_STATE, at86rf2xx_set_state() will wake up the
+     * radio if needed. */
+    if ((old_state == AT86RF2XX_STATE_SLEEP) && (opt != NETOPT_STATE)) {
         at86rf2xx_assert_awake(dev);
     }
 
