@@ -82,6 +82,9 @@
 
 #ifdef MODULE_TINYMT32
 #include "random.h"
+#endif
+
+#ifdef MODULE_RANDOM_SEED
 #include "random_seed.h"
 #endif
 
@@ -98,8 +101,19 @@ void auto_init(void)
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
 #endif
+#ifdef MODULE_RANDOM_SEED
+    DEBUG("Auto init random_seed module.\n");
+    random_prng_set_global_seed(random_prng_seed());
+#endif
 #ifdef MODULE_TINYMT32
-    random_init(random_prng_seed());
+    DEBUG("Auto init tinymt32 rng with ");
+#ifdef MODULE_RANDOM_SEED
+    DEBUG("global random_seed value\n");
+    random_init(random_prng_get_global_seed());
+#else
+    DEBUG("with 0. Consider using an external seed\n");
+    random_init(0);
+#endif
 #endif
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");

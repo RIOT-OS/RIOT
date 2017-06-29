@@ -24,30 +24,30 @@
 #include <string.h>
 #include <inttypes.h>
 
-#ifdef MODULE_XTIMER
-#include "xtimer.h"
+#ifdef MODULE_RANDOM_SEED
+#include "random_seed.h"
 #endif
 
 #include "random.h"
 
 int _random_init(int argc, char **argv)
 {
-    int initval;
+    uint32_t initval;
 
     if (argc == 1) {
-#ifdef MODULE_XTIMER
-        initval = _xtimer_now();
-        printf("PRNG initialized to current time: %d\n", initval);
+#ifdef MODULE_RANDOM_SEED
+        initval = random_prng_seed();
+        printf("PRNG initialized to: %" PRIu32 "\n", initval);
 #else
         (void)initval;
-        puts("xtimer module not compiled in, can't initialize by time.\n"
+        puts("random_seed module not compiled in, can't automatically initialize.\n"
              "Please provide a seed.\n");
         return 1;
 #endif
     }
     else {
         initval = atoi(argv[1]);
-        printf("PRNG initialized given value: %d\n", initval);
+        printf("PRNG initialized given value: %" PRIu32 "\n", initval);
     }
 
     random_init(initval);

@@ -46,6 +46,11 @@ extern "C" {
 #endif
 
 /**
+ *  Global random seed value
+ */
+extern volatile uint32_t global_random_seed;
+
+/**
  * @brief   Generate a more or less unique seed for PRNGs.
  *          The quality of the seed, respectively the uniqueness, depends
  *          on the availability of hardware ressources. Sources used for seed
@@ -62,6 +67,22 @@ extern "C" {
  * @return  the "unique" seed
  */
 uint32_t random_prng_seed(void);
+
+
+/**
+ * @brief   This function sets the global variable global_random_seed to @p seed
+
+ * @param[in] seed  The seed value to set
+ */
+void random_prng_set_global_seed(uint32_t seed);
+
+/**
+ * @brief   This function returns the value of global_random_seed
+
+ * @return The global random seed value
+ * @return -1, if seed value is not set
+ */
+uint32_t random_prng_get_global_seed(void);
 
 #ifdef __cplusplus
 }

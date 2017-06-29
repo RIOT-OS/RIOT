@@ -28,9 +28,10 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+volatile uint32_t global_random_seed = -1;
+
 uint16_t _seed_by_adc(void)
 {
-    int sample;
     uint16_t val = 0;
 
     /* init ADC */
@@ -45,7 +46,7 @@ uint16_t _seed_by_adc(void)
     for (int iter = 0; iter < 16; iter ++) {
         /* TODO check if samples are not equal, e.g.
            pulled to high or low voltage */
-        sample = adc_sample(ADC_LINE(RANDOM_SEED_ADC_LINE), RANDOM_SEED_ADC_RES);
+        int sample = adc_sample(ADC_LINE(RANDOM_SEED_ADC_LINE), RANDOM_SEED_ADC_RES);
         val |= (sample & 0x01) << (iter);
     }
 
@@ -90,4 +91,15 @@ uint32_t random_prng_seed(void)
 #endif /* FEATURE_PERIPH_HWRNG */
 
     return res;
+}
+
+void random_prng_set_global_seed(uint32_t seed)
+{
+    global_random_seed = seed;
+    DEBUG("random_prng_seed: set global seed %" PRIu32 "\n", global_random_seed);
+}
+
+uint32_t random_prng_get_global_seed(void)
+{
+    return global_random_seed;
 }

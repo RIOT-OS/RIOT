@@ -604,8 +604,9 @@ ifneq (,$(filter random,$(USEMODULE)))
   ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
     USEMODULE += tinymt32
   endif
+endif
 
-  USEMODULE += random_seed
+ifneq (,$(filter random_seed,$(USEMODULE)))
   USEMODULE += luid
   USEMODULE += xtimer
 
