@@ -1715,6 +1715,201 @@ static void test_nib_ft_remove(void)
     TEST_ASSERT_NULL(_nib_offl_iter(NULL));
 }
 
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+/*
+ * Creates GNRC_IPV6_NIB_ABR_NUMOF ABR entries with different addresses and
+ * then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_abr_add__no_space_left(void)
+{
+    ipv6_addr_t addr = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                { .u64 = TEST_UINT64 } } };
+
+    for (int i = 0; i < GNRC_IPV6_NIB_ABR_NUMOF; i++) {
+        TEST_ASSERT_NOT_NULL(_nib_abr_add(&addr));
+        addr.u64[1].u64++;
+    }
+    TEST_ASSERT_NULL(_nib_abr_add(&addr));
+}
+
+/*
+ * Creates GNRC_IPV6_NIB_ABR_NUMOF ABR entries with different addresses and then
+ * tries to add another that is equal to the last.
+ * Expected result: should return not NULL (the last)
+ */
+static void test_nib_abr_add__success_duplicate(void)
+{
+    _nib_abr_entry_t *abr;
+    ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                  { .u64 = TEST_UINT64 } } };
+
+    for (int i = 0; i < GNRC_IPV6_NIB_ABR_NUMOF; i++) {
+        addr.u64[1].u64++;
+        TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    }
+    TEST_ASSERT(abr == _nib_abr_add(&addr));
+}
+
+/*
+ * Creates an ABR entry.
+ * Expected result: new entry should contain the given address
+ */
+static void test_nib_abr_add__success(void)
+{
+    _nib_abr_entry_t *abr;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT(ipv6_addr_equal(&addr, &abr->addr));
+}
+
+/*
+ * Creates an ABR entry and then removes the entry.
+ * Expected result: the ABR list should be empty
+ */
+static void test_nib_abr_remove__success(void)
+{
+    _nib_abr_entry_t *abr = NULL;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL(_nib_abr_add(&addr));
+    _nib_abr_remove(&addr);
+    TEST_ASSERT_NULL(_nib_abr_iter(abr));
+}
+
+/*
+ * Creates an ABR entry and tries to add a prefix, that is not in the NIB.
+ * Expected result: the ABR's prefix list should be unchanged.
+ */
+static void test_nib_abr_add_pfx__pfx_not_in_nib(void)
+{
+    _nib_abr_entry_t *abr;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+    _nib_offl_entry_t offl;
+
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
+    _nib_abr_add_pfx(abr, &offl);
+    TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
+}
+
+/*
+ * Creates an ABR entry and a prefix and tries to add that prefix.
+ * Expected result: the ABR's prefix list should be changed.
+ */
+static void test_nib_abr_add_pfx__pfx_in_nib(void)
+{
+    _nib_abr_entry_t *abr;
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, &pfx, GLOBAL_PREFIX_LEN,
+                                            UINT32_MAX, UINT32_MAX)));
+    TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
+    _nib_abr_add_pfx(abr, dst);
+    TEST_ASSERT_NOT_NULL(_nib_abr_iter_pfx(abr, NULL));
+}
+
+/*
+ * Iterates over prefixes of ABR with no prefix entries
+ * Expected result: _nib_abr_pfx_iter returns NULL
+ */
+static void test_nib_abr_iter_pfx__empty(void)
+{
+    _nib_abr_entry_t *abr;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
+}
+
+/*
+ * Iterates over empty ABR entries
+ * Expected result: _nib_abr_iter returns NULL
+ */
+static void test_nib_abr_iter__empty(void)
+{
+    TEST_ASSERT_NULL(_nib_abr_iter(NULL));
+}
+
+/*
+ * Iterates over ABR entries with one element
+ * Expected result: _nib_abr_iter returns element with NULL, and with that
+ * element NULL.
+ */
+static void test_nib_abr_iter__one_elem(void)
+{
+    _nib_abr_entry_t *abr, *res;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(NULL)));
+    TEST_ASSERT(res == abr);
+    TEST_ASSERT_NULL(_nib_abr_iter(res));
+}
+
+/*
+ * Iterates over ABR entries with three element
+ * Expected result: _nib_abr_iter returns element with NULL, with that element
+ * another, with that element yet another and with the last NULL.
+ */
+static void test_nib_abr_iter__three_elem(void)
+{
+    _nib_abr_entry_t *abr1, *abr2, *abr3, *res;
+    ipv6_addr_t addr = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr1 = _nib_abr_add(&addr)));
+    addr.u64[1].u64++;
+    TEST_ASSERT_NOT_NULL((abr2 = _nib_abr_add(&addr)));
+    addr.u64[1].u64++;
+    TEST_ASSERT_NOT_NULL((abr3 = _nib_abr_add(&addr)));
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(NULL)));
+    TEST_ASSERT(res == abr1);
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(res)));
+    TEST_ASSERT(res == abr2);
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(res)));
+    TEST_ASSERT(res == abr3);
+    TEST_ASSERT_NULL(_nib_abr_iter(res));
+}
+
+/*
+ * Iterates over ABR entries with two elements, where there is a hole in the
+ * internal array
+ * Expected result: _nib_abr_iter returns element with NULL, with that element
+ * another, and with the last NULL.
+ */
+static void test_nib_abr_iter__three_elem_middle_removed(void)
+{
+    _nib_abr_entry_t *abr1, *abr2, *res;
+    ipv6_addr_t addr = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr1 = _nib_abr_add(&addr)));
+    addr.u64[1].u64++;
+    TEST_ASSERT_NOT_NULL(_nib_abr_add(&addr));
+    addr.u64[1].u64++;
+    TEST_ASSERT_NOT_NULL((abr2 = _nib_abr_add(&addr)));
+    addr.u64[1].u64--;
+    _nib_abr_remove(&addr);
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(NULL)));
+    TEST_ASSERT(res == abr1);
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(res)));
+    TEST_ASSERT(res == abr2);
+    TEST_ASSERT_NULL(_nib_abr_iter(res));
+}
+#endif
+
 /*
  * Creates GNRC_NETIF_NUMOF interfaces and then tries to add another.
  * Expected result: should return NULL
@@ -1826,6 +2021,20 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_pl_remove),
         new_TestFixture(test_nib_ft_add__success),
         new_TestFixture(test_nib_ft_remove),
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+        new_TestFixture(test_nib_abr_add__no_space_left),
+        new_TestFixture(test_nib_abr_add__success_duplicate),
+        new_TestFixture(test_nib_abr_add__success),
+        new_TestFixture(test_nib_abr_remove__success),
+        new_TestFixture(test_nib_abr_add_pfx__pfx_not_in_nib),
+        new_TestFixture(test_nib_abr_add_pfx__pfx_in_nib),
+        new_TestFixture(test_nib_abr_iter_pfx__empty),
+        /* rest of _nib_abr_iter_pfx() tested through _nib_abr_add_pfx() tests */
+        new_TestFixture(test_nib_abr_iter__empty),
+        new_TestFixture(test_nib_abr_iter__one_elem),
+        new_TestFixture(test_nib_abr_iter__three_elem),
+        new_TestFixture(test_nib_abr_iter__three_elem_middle_removed),
+#endif
         new_TestFixture(test_nib_iface_get__no_space_left),
         new_TestFixture(test_nib_iface_get__success),
     };
