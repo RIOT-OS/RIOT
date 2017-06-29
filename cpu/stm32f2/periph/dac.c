@@ -40,7 +40,7 @@ static const dac_conf_t dac_config[] = {};
 int8_t dac_init(dac_t line)
 {
     if (line >= DAC_NUMOF) {
-        return -1;
+        return DAC_NOLINE;
     }
 
     /* configure pin */
@@ -50,7 +50,7 @@ int8_t dac_init(dac_t line)
     /* reset output and enable the line's channel */
     dac_set(line, 0);
     dac_poweron(line);
-    return 0;
+    return DAC_OK;
 }
 
 void dac_set(dac_t line, uint16_t value)
