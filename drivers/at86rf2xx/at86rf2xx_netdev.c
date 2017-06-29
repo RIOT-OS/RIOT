@@ -360,7 +360,8 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
     }
 
     /* temporarily wake up if sleeping */
-    if (old_state == AT86RF2XX_STATE_SLEEP && opt != NETOPT_STATE) {
+    if ((old_state == AT86RF2XX_STATE_SLEEP) &&
+        (opt != NETOPT_STATE)) {
         at86rf2xx_assert_awake(dev);
     }
 
