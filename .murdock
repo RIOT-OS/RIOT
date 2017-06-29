@@ -114,13 +114,14 @@ static_tests() {
 }
 
 get_test_jobs() {
-    RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py \
+    {
+        RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py \
         --murdock \
         --all \
         --tests dist/testsuite/tests/02-tests \
-        --nodes dist/testsuite/nodes 2>/dev/null || \
-        { echo "# get_test_jobs() error!"; } \
-        | grep '^./.murdock'
+        --nodes dist/testsuite/nodes 2>&1 || \
+            { echo "# get_test_jobs() error!"; }
+    } | grep '^./.murdock'
 }
 
 run_test() {
