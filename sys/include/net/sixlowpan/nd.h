@@ -222,6 +222,32 @@ static inline void sixlowpan_nd_opt_6ctx_set_cid(sixlowpan_nd_opt_6ctx_t *ctx_op
     ctx_opt->resv_c_cid |= (SIXLOWPAN_ND_OPT_6CTX_FLAGS_CID_MASK & cid);
 }
 
+/**
+ * @brief   Gets the version in correct order from an Authoritative Border
+ *          Router option
+ *
+ * @param[in] abr_opt   An Authoritative Border Router option (ABRO).
+ *
+ * @return  The version of the ABRO
+ */
+static inline uint32_t sixlowpan_nd_opt_abr_get_version(const sixlowpan_nd_opt_abr_t *abr_opt)
+{
+    return ((uint32_t)byteorder_ntohs(abr_opt->vlow)) |
+           (((uint32_t)byteorder_ntohs(abr_opt->vhigh)) << 16);
+}
+
+/**
+ * @brief   Sets the version of an Authoritative Border Router option
+ *
+ * @param[in] abr_opt   An Authoritative Border Router option (ABRO).
+ * @param[in] version   Version for the ABRO.
+ */
+static inline void sixlowpan_nd_opt_abr_set_version(sixlowpan_nd_opt_abr_t *abr_opt,
+                                                    uint32_t version)
+{
+    abr_opt->vlow = byteorder_htons((uint16_t)(version & 0xffff));
+    abr_opt->vhigh = byteorder_htons((uint16_t)(version >> 16));
+}
 
 #ifdef __cplusplus
 }
