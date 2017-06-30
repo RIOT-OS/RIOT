@@ -68,6 +68,15 @@ void pm_unblock(unsigned mode);
  */
 void pm_set(unsigned mode);
 
+/**
+ * @brief   Monitor the radio state
+ *
+ * This function needs to be called by each radio driver when the radio is on/off.
+ *
+ * @param[in]   radio_on      current radio state (on/off)
+ */
+void pm_radio_on(bool radio_on);
+
 #ifdef __cplusplus
 }
 #endif
