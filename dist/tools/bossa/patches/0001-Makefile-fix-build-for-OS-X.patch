@@ -1,0 +1,27 @@
+From 804351bb5502a4c3c13e9ffdba5d4920fe63622a Mon Sep 17 00:00:00 2001
+From: kYc0o <fco.ja.ac@gmail.com>
+Date: Fri, 30 Jun 2017 16:35:10 +0200
+Subject: [PATCH] Makefile: fix build for OS X
+
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1c9f1b1..7b866a9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -79,8 +79,8 @@ endif
+ #
+ ifeq ($(OS),Darwin)
+ COMMON_SRCS+=PosixSerialPort.cpp OSXPortFactory.cpp
+-COMMON_CXXFLAGS=-arch i386 -arch x86_64 -mmacosx-version-min=10.5
+-COMMON_LDFLAGS=-arch i386 -arch x86_64 -mmacosx-version-min=10.5
++COMMON_CXXFLAGS=-arch x86_64 -mmacosx-version-min=10.9
++COMMON_LDFLAGS=-arch x86_64 -mmacosx-version-min=10.9
+ APP=BOSSA.app
+ DMG=bossa-$(VERSION).dmg
+ VOLUME=BOSSA
+-- 
+2.7.4 (Apple Git-66)
+
