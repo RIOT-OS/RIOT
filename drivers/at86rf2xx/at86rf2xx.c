@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,7 +20,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- *
+ * @author      Sebastian Meiling <s@mlng.net>
  * @}
  */
 
@@ -124,7 +125,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
 
-size_t at86rf2xx_send(at86rf2xx_t *dev, uint8_t *data, size_t len)
+size_t at86rf2xx_send(at86rf2xx_t *dev, const uint8_t *data, size_t len)
 {
     /* check data length */
     if (len > AT86RF2XX_MAX_PKT_LENGTH) {
@@ -149,7 +150,7 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
     dev->tx_frame_len = IEEE802154_FCS_LEN;
 }
 
-size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data,
+size_t at86rf2xx_tx_load(at86rf2xx_t *dev, const uint8_t *data,
                          size_t len, size_t offset)
 {
     dev->tx_frame_len += (uint8_t)len;
@@ -157,7 +158,7 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data,
     return offset + len;
 }
 
-void at86rf2xx_tx_exec(at86rf2xx_t *dev)
+void at86rf2xx_tx_exec(const at86rf2xx_t *dev)
 {
     netdev_t *netdev = (netdev_t *)dev;
 
