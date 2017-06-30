@@ -347,86 +347,58 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
     DEBUG("set option %i to %i\n", option, state);
 
     /* set option field */
-    if (state) {
-        dev->netdev.flags |= option;
-        /* trigger option specific actions */
-        switch (option) {
-            case AT86RF2XX_OPT_CSMA:
+    dev->netdev.flags = (state) ? (dev->netdev.flags |  option)
+                                : (dev->netdev.flags & ~option);
+    /* trigger option specific actions */
+    switch (option) {
+        case AT86RF2XX_OPT_CSMA:
+            if (state) {
                 DEBUG("[at86rf2xx] opt: enabling CSMA mode" \
                       "(4 retries, min BE: 3 max BE: 5)\n");
                 /* Initialize CSMA seed with hardware address */
                 at86rf2xx_set_csma_seed(dev, dev->netdev.long_addr);
                 at86rf2xx_set_csma_max_retries(dev, 4);
                 at86rf2xx_set_csma_backoff_exp(dev, 3, 5);
-                break;
-            case AT86RF2XX_OPT_PROMISCUOUS:
-                DEBUG("[at86rf2xx] opt: enabling PROMISCUOUS mode\n");
-                /* disable auto ACKs in promiscuous mode */
-                tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
-                tmp |= AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK;
-                at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
-                /* enable promiscuous mode */
-                tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_1);
-                tmp |= AT86RF2XX_XAH_CTRL_1__AACK_PROM_MODE;
-                at86rf2xx_reg_write(dev, AT86RF2XX_REG__XAH_CTRL_1, tmp);
-                break;
-            case AT86RF2XX_OPT_AUTOACK:
-                DEBUG("[at86rf2xx] opt: enabling auto ACKs\n");
-                tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
-                tmp &= ~(AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK);
-                at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
-                break;
-            case AT86RF2XX_OPT_TELL_RX_START:
-                DEBUG("[at86rf2xx] opt: enabling SFD IRQ\n");
-                tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
-                tmp |= AT86RF2XX_IRQ_STATUS_MASK__RX_START;
-                at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
-                break;
-            default:
-                /* do nothing */
-                break;
-        }
-    }
-    else {
-        dev->netdev.flags &= ~(option);
-        /* trigger option specific actions */
-        switch (option) {
-            case AT86RF2XX_OPT_CSMA:
+            }
+            else {
                 DEBUG("[at86rf2xx] opt: disabling CSMA mode\n");
                 /* setting retries to -1 means CSMA disabled */
                 at86rf2xx_set_csma_max_retries(dev, -1);
-                break;
-            case AT86RF2XX_OPT_PROMISCUOUS:
-                DEBUG("[at86rf2xx] opt: disabling PROMISCUOUS mode\n");
-                /* disable promiscuous mode */
-                tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_1);
-                tmp &= ~(AT86RF2XX_XAH_CTRL_1__AACK_PROM_MODE);
-                at86rf2xx_reg_write(dev, AT86RF2XX_REG__XAH_CTRL_1, tmp);
-                /* re-enable AUTOACK only if the option is set */
-                if (dev->netdev.flags & AT86RF2XX_OPT_AUTOACK) {
-                    tmp = at86rf2xx_reg_read(dev,
-                                             AT86RF2XX_REG__CSMA_SEED_1);
-                    tmp &= ~(AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK);
-                    at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1,
-                                        tmp);
-                }
-                break;
-            case AT86RF2XX_OPT_AUTOACK:
-                DEBUG("[at86rf2xx] opt: disabling auto ACKs\n");
-                tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
-                tmp |= AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK;
-                at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
-                break;
-            case AT86RF2XX_OPT_TELL_RX_START:
-                DEBUG("[at86rf2xx] opt: disabling SFD IRQ\n");
-                tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
-                tmp &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_START;
-                at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
-                break;
-            default:
-                /* do nothing */
-                break;
-        }
+            }
+            break;
+        case AT86RF2XX_OPT_PROMISCUOUS:
+            DEBUG("[at86rf2xx] opt: %s PROMISCUOUS mode\n",
+                  (state ? "enabling" : "disabling"));
+            /* disable/enable auto ACKs in promiscuous mode */
+            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
+            tmp = (state) ? (tmp |  AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK)
+                          : (tmp & ~AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
+            /* enable/disable promiscuous mode */
+            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_1);
+            tmp = (state) ? (tmp |  AT86RF2XX_XAH_CTRL_1__AACK_PROM_MODE)
+                          : (tmp & ~AT86RF2XX_XAH_CTRL_1__AACK_PROM_MODE);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__XAH_CTRL_1, tmp);
+            break;
+        case AT86RF2XX_OPT_AUTOACK:
+            DEBUG("[at86rf2xx] opt: %s auto ACKs\n",
+                  (state ? "enabling" : "disabling"));
+            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
+            tmp = (state) ? (tmp & ~AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK)
+                          : (tmp |  AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
+            break;
+        case AT86RF2XX_OPT_TELL_RX_START:
+            DEBUG("[at86rf2xx] opt: %s SFD IRQ\n",
+                  (state ? "enabling" : "disabling"));
+            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
+            tmp = (state) ? (tmp |  AT86RF2XX_IRQ_STATUS_MASK__RX_START)
+                          : (tmp & ~AT86RF2XX_IRQ_STATUS_MASK__RX_START);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
+            break;
+        default:
+            /* do nothing */
+            break;
     }
 }
 
@@ -476,36 +448,29 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
 
     if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {
         _set_state(dev, AT86RF2XX_STATE_TRX_OFF, state);
-        return old_state;
     }
-
-    if (state == old_state) {
-        return old_state;
-    }
-
-    /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
-    if ((old_state == AT86RF2XX_STATE_RX_AACK_ON &&
-             state == AT86RF2XX_STATE_TX_ARET_ON) ||
-        (old_state == AT86RF2XX_STATE_TX_ARET_ON &&
-             state == AT86RF2XX_STATE_RX_AACK_ON)) {
-        _set_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
-    }
-    /* check if we need to wake up from sleep mode */
-    else if (old_state == AT86RF2XX_STATE_SLEEP) {
-        DEBUG("at86rf2xx: waking up from sleep mode\n");
-        at86rf2xx_assert_awake(dev);
-    }
-
-    if (state == AT86RF2XX_STATE_SLEEP) {
-        /* First go to TRX_OFF */
-        at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
-        /* Discard all IRQ flags, framebuffer is lost anyway */
-        at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
-        /* Go to SLEEP mode from TRX_OFF */
-        gpio_set(dev->params.sleep_pin);
-        dev->state = state;
-    } else {
-        _set_state(dev, state, state);
+    else if (state != old_state) {
+        /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
+        if ((old_state | state) == (AT86RF2XX_STATE_RX_AACK_ON | AT86RF2XX_STATE_TX_ARET_ON)) {
+            _set_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
+        }
+        /* check if we need to wake up from sleep mode */
+        if (state == AT86RF2XX_STATE_SLEEP) {
+            /* First go to TRX_OFF */
+            _set_state(dev, AT86RF2XX_STATE_TRX_OFF,
+                            AT86RF2XX_STATE_FORCE_TRX_OFF);
+            /* Discard all IRQ flags, framebuffer is lost anyway */
+            at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+            /* Go to SLEEP mode from TRX_OFF */
+            gpio_set(dev->params.sleep_pin);
+            dev->state = state;
+        } else {
+            if (old_state == AT86RF2XX_STATE_SLEEP) {
+                DEBUG("at86rf2xx: waking up from sleep mode\n");
+                at86rf2xx_assert_awake(dev);
+            }
+            _set_state(dev, state, state);
+        }
     }
 
     return old_state;
