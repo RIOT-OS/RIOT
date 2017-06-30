@@ -19,18 +19,8 @@
  * @}
  */
 
-#include <stdint.h>
 #include "cpu.h"
-#include "mcg.h"
-#include "cpu_conf.h"
 #include "periph/init.h"
-
-#define SIM_CLKDIV1_60MHZ      (SIM_CLKDIV1_OUTDIV1(0) | \
-                                SIM_CLKDIV1_OUTDIV2(0) | \
-                                SIM_CLKDIV1_OUTDIV3(1) | \
-                                SIM_CLKDIV1_OUTDIV4(2))
-
-static void cpu_clock_init(void);
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
@@ -39,31 +29,6 @@ void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
-    /* initialize the clock system */
-    cpu_clock_init();
     /* trigger static peripheral initialization */
     periph_init();
-}
-
-/**
- * @brief Configure the controllers clock system
- *
- * | Clock name | Run mode frequency (max) | VLPR mode frequency (max) |
- *
- * | Core       | 120 MHz                  |   4 MHz                   |
- * | System     | 120 MHz                  |   4 MHz                   |
- * | Bus        |  60 MHz                  |   4 MHz                   |
- * | FlexBus    |  50 MHz                  | 800 kHz                   |
- * | Flash      |  25 MHz                  |   4 MHz                   |
- */
-static void cpu_clock_init(void)
-{
-    /* setup system prescalers */
-    SIM->CLKDIV1 = (uint32_t)SIM_CLKDIV1_60MHZ;
-
-    /* RMII RXCLK */
-    SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK;
-    PORTA->PCR[18] &= ~(PORT_PCR_ISF_MASK | PORT_PCR_MUX(0x07));
-
-    kinetis_mcg_set_mode(KINETIS_MCG_PEE);
 }
