@@ -111,20 +111,24 @@ extern "C" {
 /**
  * @name    SPI configuration
  *
- * The atmega2560 has only one hardware SPI with fixed pin configuration, so all
- * we can do here, is to enable or disable it...
+ * The atmega2560/atmega1281/atmega328p has only one hardware SPI with fixed pin
+ * configuration, so all we can do here, is to enable or disable it...
  *
- * The fixed pins for arduino uno and duemilanove are:
+ * The fixed pins for arduino uno and duemilanove (atmega328p) are:
  * MOSI - PB3 (Arduino pin 11)
  * MISO - PB4 (Arduino pin 12)
  * SCK  - PB5 (Arduino pin 13)
  * SS   - PB2 (Arduino pin 10) -> this pin is configured as output, but not used
  *
- * The fixed pins for arduino mega2560 are:
+ * The fixed pins for arduino-mega2560 and atmega1281 are:
  * MOSI - PB2 (Arduino pin 51)
  * MISO - PB3 (Arduino pin 50)
  * SCK  - PB1 (Arduino pin 52)
  * SS   - PB0 (Arduino pin 53) -> this pin is configured as output, but not used
+ *
+ * The SS pin must be configured as output for the SPI device to work as
+ * master correctly, though we do not use it for now (as we handle the chip
+ * select externally for now)
  *
  * @{
  */
