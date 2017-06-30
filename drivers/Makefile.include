@@ -130,3 +130,6 @@ endif
 ifneq (,$(filter adcxx1c,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/adcxx1c/include
 endif
+ifneq (,$(filter sx127%,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sx127x/include
+endif

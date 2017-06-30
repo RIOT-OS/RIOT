@@ -230,6 +230,8 @@ void cc2538_set_state(cc2538_rf_t *dev, netopt_state_t state)
             RFCORE_WAIT_UNTIL(RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE > FSM_STATE_RX_CALIBRATION);
             dev->state = NETOPT_STATE_IDLE;
             break;
+        default:
+            break;
     }
 }
 
