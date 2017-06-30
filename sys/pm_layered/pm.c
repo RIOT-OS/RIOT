@@ -46,11 +46,6 @@ typedef union {
  */
 volatile pm_blocker_t pm_blocker = PM_BLOCKER_INITIAL;
 
-/**
- * @brief Variable for keeping track of radio status
- */
-static bool radio_on = false;
-
 void pm_set_lowest(void)
 {
     pm_blocker_t blocker = (pm_blocker_t) pm_blocker;
@@ -97,18 +92,4 @@ void __attribute__((weak)) pm_off(void)
     pm_blocker.val_u32 = 0;
     pm_set_lowest();
     while(1);
-}
-
-void pm_radio_on(bool _radio_on) {
-    if (_radio_on) {
-        if(!radio_on) {
-            radio_on = true;
-            pm_block(PM_NUM_MODES-1);
-        }
-    } else {
-        if (radio_on) {
-            radio_on = false;
-            pm_unblock(PM_NUM_MODES-1);
-        }
-    }
 }

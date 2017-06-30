@@ -488,7 +488,9 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         gpio_set(dev->params.sleep_pin);
         dev->state = state;
         /* Allow MCU to go to the full sleep mode */
-        pm_radio_on(false);
+        if (old_state != AT86RF2XX_STATE_SLEEP) {
+            pm_unblock(PM_NUM_MODES-1);
+        }
     } else {
         _set_state(dev, state, state);
     }

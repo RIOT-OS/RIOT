@@ -124,7 +124,7 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 {
     if(at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
         /* Prevent MCU from going to the full sleep mode */
-        pm_radio_on(true);
+        pm_block(PM_NUM_MODES-1);        
 
         /* wake up and wait for transition to TRX_OFF */
         gpio_clear(dev->params.sleep_pin);
