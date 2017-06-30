@@ -76,5 +76,9 @@ PSEUDOMODULES += adc081c
 PSEUDOMODULES += adc101c
 PSEUDOMODULES += adc121c
 
+# include variants of SX127X drivers as pseudo modules
+PSEUDOMODULES += sx1272
+PSEUDOMODULES += sx1276
+
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
