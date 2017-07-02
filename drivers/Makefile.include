@@ -103,7 +103,7 @@ endif
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/xbee/include
 endif
-ifneq (,$(filter si70xx,$(USEMODULE)))
+ifneq (,$(filter si70%,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/si70xx/include
 endif
 ifneq (,$(filter hdc1000,$(USEMODULE)))

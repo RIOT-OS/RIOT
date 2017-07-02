@@ -86,6 +86,12 @@ PSEUDOMODULES += adc121c
 PSEUDOMODULES += sx1272
 PSEUDOMODULES += sx1276
 
+# include variants of Si70xx drivers as pseudo modules
+PSEUDOMODULES += si7006
+PSEUDOMODULES += si7013
+PSEUDOMODULES += si7020
+PSEUDOMODULES += si7021
+
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
 
