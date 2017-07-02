@@ -39,7 +39,7 @@ static lsm6dsl_t lsm6dsl_devs[LSM6DSL_NUM];
 /**
  * @brief   Memory for the SAUL registry entries
  */
-static saul_reg_t saul_entries[LSM6DSL_NUM * 2];
+static saul_reg_t saul_entries[LSM6DSL_NUM * 3];
 
 /**
  * @brief   Reference the driver structs
@@ -47,6 +47,7 @@ static saul_reg_t saul_entries[LSM6DSL_NUM * 2];
  */
 extern saul_driver_t lsm6dsl_saul_acc_driver;
 extern saul_driver_t lsm6dsl_saul_gyro_driver;
+extern saul_driver_t lsm6dsl_saul_temp_driver;
 /** @} */
 
 
@@ -61,14 +62,18 @@ void auto_init_lsm6dsl(void)
             continue;
         }
 
-        saul_entries[(i * 2)].dev = &(lsm6dsl_devs[i]);
-        saul_entries[(i * 2)].name = lsm6dsl_saul_info[i].name;
-        saul_entries[(i * 2)].driver = &lsm6dsl_saul_acc_driver;
-        saul_reg_add(&(saul_entries[(i * 2)]));
-        saul_entries[(i * 2) + 1].dev = &(lsm6dsl_devs[i]);
-        saul_entries[(i * 2) + 1].name = lsm6dsl_saul_info[i].name;
-        saul_entries[(i * 2) + 1].driver = &lsm6dsl_saul_gyro_driver;
-        saul_reg_add(&(saul_entries[(i * 2) + 1]));
+        saul_entries[(i * 3)].dev = &(lsm6dsl_devs[i]);
+        saul_entries[(i * 3)].name = lsm6dsl_saul_info[i].name;
+        saul_entries[(i * 3)].driver = &lsm6dsl_saul_acc_driver;
+        saul_reg_add(&(saul_entries[(i * 3)]));
+        saul_entries[(i * 3) + 1].dev = &(lsm6dsl_devs[i]);
+        saul_entries[(i * 3) + 1].name = lsm6dsl_saul_info[i].name;
+        saul_entries[(i * 3) + 1].driver = &lsm6dsl_saul_gyro_driver;
+        saul_reg_add(&(saul_entries[(i * 3) + 1]));
+        saul_entries[(i * 3) + 2].dev = &(lsm6dsl_devs[i]);
+        saul_entries[(i * 3) + 2].name = lsm6dsl_saul_info[i].name;
+        saul_entries[(i * 3) + 2].driver = &lsm6dsl_saul_temp_driver;
+        saul_reg_add(&(saul_entries[(i * 3) + 2]));
     }
 }
 
