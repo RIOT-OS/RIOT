@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_mpu9150 MPU-9150
+ * @defgroup    drivers_mpu9150 MPU-9150 accelerometer/magnetometer/gyroscope
  * @ingroup     drivers_sensors
  * @brief       Device driver interface for the MPU-9150
  * @{

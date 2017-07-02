@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_io1_xplained IO1_XPLAINED
- * @ingroup     drivers_sensors
+ * @ingroup     drivers_io1_xplained
  * @brief       Internal addresses, constants for the IO1 Xplained extension.
  * @{
  *

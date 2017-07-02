@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    drivers_bmp180 BMP180
+ * @defgroup    drivers_bmp180 BMP180 temperature and pressure sensor
  * @ingroup     drivers_sensors
- * @brief       Device driver interface for the BMP180 sensor
+ * @brief       Device driver interface for the BMP180 sensor.
  * @{
  *
  * @file

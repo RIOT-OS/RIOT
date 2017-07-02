@@ -10,12 +10,12 @@
  * @defgroup   drivers_adcxx1x ADCXX1C ADC device driver
  * @ingroup    drivers_sensors
  * @brief      I2C Analog-to-Digital Converter device driver
+ *
+ *             This driver works with adc081c, adc101c and adc121c versions.
  * @{
  *
  * @file
  * @brief      ADCXX1C ADC device driver
- *
- *             This driver works with adc081c, adc101c and adc121c versions.
  *
  * @author     Vincent Dupont <vincent@otakeys.com>
  */
