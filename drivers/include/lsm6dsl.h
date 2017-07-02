@@ -132,8 +132,12 @@ int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
 /**
  * @brief Read temperature data
  *
+ * @note To avoid floating point data types but still provide high resolution
+ *       for temperature readings, resulting values are scale by factor 100.
+ *
+ *
  * @param[in] dev    device to read
- * @param[out] data  temperature value
+ * @param[out] data  temperature value, in °C x 100
  *
  * @return 0 on success
  * @return < 0 on error

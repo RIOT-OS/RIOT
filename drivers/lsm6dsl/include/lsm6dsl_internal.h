@@ -149,6 +149,11 @@ extern "C" {
 #define LSM6DSL_FIFO_CTRL3_GYRO_DEC_SHIFT  (3)
 /** @} */
 
+/**
+ * @brief	Offset for temperature calculation
+ */
+#define LSM6DSL_TEMP_OFFSET					(0x1900)
+
 #ifdef __cplusplus
 }
 #endif

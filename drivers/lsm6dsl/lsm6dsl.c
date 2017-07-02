@@ -198,21 +198,24 @@ int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
 
 int lsm6dsl_read_temp(const lsm6dsl_t *dev, int16_t *data)
 {
-    int res;
     uint8_t tmp;
-
+    uint16_t traw;
+    /* read raw temperature */
     i2c_acquire(dev->params.i2c);
-    res = i2c_read_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_OUT_TEMP_L, &tmp);
-    *data = tmp;
-
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_OUT_TEMP_H, &tmp);
-    *data |= tmp << 8;
-
-    i2c_release(dev->params.i2c);
-
-    if (res < 2) {
+    if (i2c_read_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_OUT_TEMP_L, &tmp) != 1) {
+        i2c_release(dev->params.i2c);
         return -1;
     }
+    traw = tmp;
+    if (i2c_read_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_OUT_TEMP_H, &tmp) != 1) {
+        i2c_release(dev->params.i2c);
+        return -1;
+    }
+    traw |= (uint16_t)tmp << 8;
+    i2c_release(dev->params.i2c);
+    /* convert temperature */
+    traw += LSM6DSL_TEMP_OFFSET;
+    *data = (int16_t)(((int32_t)traw * 100) / 256);
 
     return 0;
 }
