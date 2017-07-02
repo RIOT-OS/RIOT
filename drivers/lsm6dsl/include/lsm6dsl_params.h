@@ -9,12 +9,13 @@
 
 /**
  * @ingroup     drivers_lsm6dsl
- *
  * @{
+ *
  * @file
  * @brief       Default configuration for LSM6DSL devices
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ *
  */
 
 #ifndef LSM6DSL_PARAMS_H

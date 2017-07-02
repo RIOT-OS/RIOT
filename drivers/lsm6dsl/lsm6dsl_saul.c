@@ -8,10 +8,16 @@
  */
 
 /**
+ * @ingroup     drivers_lsm6dsl
+ * @{
+ *
  * @file
  * @brief       SAUL implementation for the LSM6DSL 3D accelerometer/gyroscope.
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Sebastian Meiling <s@mlng.net>
+ *
+ * @}
  */
 
 #include "lsm6dsl.h"
