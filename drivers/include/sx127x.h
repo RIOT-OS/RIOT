@@ -16,13 +16,13 @@
  * series (SX1272 and SX1276).
  * Only LoRa long range modem is supported at the moment.
  *
- * SX127x modules are designed to be used in the ISM RF band. This RF band
- * depends on different regional regulatory worldwide.
+ * SX127x modules are designed to be used in the ISM radio frequency (RF) band.
+ * This RF band depends on different regional regulations worldwide.
  * Be careful to configure the device to use a RF frequency allowed in your
  * region.
- * sHere is the list of allowed frequencies for your region (see
+ * Here is the list of allowed frequencies for your region (see
  * [LoRaWAN regional parameters document available online]
- * (https://www.lora-alliance.org/Contact/RequestSpecificationForm.aspx))
+ * (https://www.lora-alliance.org/for-developers)):
  * - Europe has 2 allowed bands (ETSI):
  *   - EU863-870
  *   - EU433 (from 433.175MHZ to 434.665MHZ exactly)
@@ -261,10 +261,10 @@ typedef struct {
 typedef uint8_t sx127x_flags_t;
 
 /**
- * @brief   SX127X device.
+ * @brief   SX127X device descriptor.
  * @extends netdev_t
  */
-typedef struct sx127x_s {
+typedef struct {
     netdev_t netdev;                   /**< Netdev parent struct */
     sx127x_radio_settings_t settings;  /**< Radio settings */
     sx127x_params_t params;            /**< Device driver parameters */
@@ -421,7 +421,7 @@ void sx127x_set_channel(sx127x_t *dev, uint32_t freq);
 /**
  * @brief   Computes the packet time on air in milliseconds.
  *
- * @pre     Can only be called once sx127x_init_radio_settings have already
+ * @pre     Can only be called if sx127x_init_radio_settings has already
  *          been called.
  *
  * @param[in] dev                      The sx127x device descriptor
