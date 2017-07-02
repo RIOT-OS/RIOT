@@ -7,15 +7,13 @@
  */
 
 /**
- * @defgroup    trx_can CAN transceiver
- * @ingroup     can
- * @ingroup     drivers
- * @brief       generic transceiver interface
- *
+ * @defgroup    drivers_can_trx CAN transceiver interface
+ * @ingroup     drivers_can
+ * @brief       CAN generic transceiver interface
  * @{
  *
  * @file
- * @brief       generic transceiver interface
+ * @brief       CAN generic transceiver interface
  *
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>

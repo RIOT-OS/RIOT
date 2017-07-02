@@ -7,9 +7,8 @@
  */
 
 /**
- * @ingroup    can_dll
+ * @ingroup    sys_can_dll
  * @{
- *
  *
  * @file
  * @brief       CAN memory allocation module
@@ -148,5 +147,4 @@ void can_pkt_buf_free(void *data, size_t size);
 #endif
 
 #endif /* CAN_PKT_H */
-
 /** @} */

@@ -1,5 +1,6 @@
 /**
- * @defgroup can CAN
+ * @defgroup sys_can CAN (Controller Area Network)
+ * @ingroup net
  * @brief RIOT CAN stack
  *
  * This module is a full CAN stack integrated to RIOT.
@@ -20,4 +21,6 @@
  *
  * Finally, the connection layer is the user interface to send and receive raw
  * CAN frames or ISO-TP datagrams.
+ *
+ * @see drivers_can
  */

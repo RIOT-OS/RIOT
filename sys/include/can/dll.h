@@ -7,9 +7,8 @@
  */
 
 /**
- * @ingroup    can_dll
+ * @ingroup    sys_can_dll
  * @{
- *
  *
  * @file
  * @brief       Definitions of low-level CAN DLL interface

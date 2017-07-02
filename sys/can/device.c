@@ -7,12 +7,15 @@
  */
 
 /**
+ * @ingroup     sys_can_dll
+ * @{
  * @file
  * @brief       CAN device interface
  *
  * @author      Toon Stegen <toon.stegen@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
+ * @}
  */
 
 #include <errno.h>

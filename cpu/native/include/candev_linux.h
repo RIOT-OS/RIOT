@@ -7,9 +7,9 @@
  */
 
 /**
- * @ingroup     native_cpu
+ * @defgroup    drivers_candev_linux SocketCAN driver
  * @ingroup     drivers_can
- * @defgroup    candev_linux SocketCAN driver
+ * @brief       Implementation of simulated CAN controller driver using SocketCAN on Linux
  * @{
  *
  * @file
@@ -18,7 +18,6 @@
  * @author      Hermann Lelong <hermann@otakeys.com>
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
- * @}
  */
 
 #ifndef CANDEV_LINUX_H
@@ -102,3 +101,4 @@ extern candev_linux_conf_t candev_linux_conf[CAN_DLL_NUMOF];
 #endif
 
 #endif /* CANDEV_LINUX_H */
+/** @} */

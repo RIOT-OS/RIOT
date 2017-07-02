@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup    can_dll
+ * @ingroup    sys_can_dll
  * @{
- *
  *
  * @file
  * @brief       Definitions high-level RAW CAN interface
  *
- * This file defines the hig-level CAN interface to send and receive RAW CAN frame.
+ * This file defines the high-level CAN interface to send and receive RAW CAN
+ * frame.
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
