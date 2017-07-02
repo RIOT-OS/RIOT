@@ -1,0 +1,7 @@
+/**
+ * @defgroup pkg_tinydtls  TinyDTLS for RIOT
+ * @ingroup  pkg
+ * @ingroup  net
+ * @brief    Provides the Eclipse TinyDTLS to RIOT
+ * @see      https://projects.eclipse.org/projects/iot.tinydtls
+ */

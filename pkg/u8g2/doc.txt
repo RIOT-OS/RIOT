@@ -1,0 +1,6 @@
+/**
+ * @defgroup pkg_u8g2   U8G2 graphic library for monochome displays
+ * @ingroup  pkg
+ * @brief    Provides a monochrome graphics library for OLED and LCD displays
+ * @see      https://github.com/olikraus/u8g2
+ */
