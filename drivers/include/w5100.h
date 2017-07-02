@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_w5100 W5100
+ * @defgroup    drivers_w5100 W5100 ethernet driver
  * @ingroup     drivers_netdev
  * @brief       Driver for W5100 ethernet devices
  *

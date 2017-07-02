@@ -8,9 +8,16 @@
  */
 
 /**
- * @defgroup    drivers_bmx280 BMX280
+ * @defgroup    drivers_bmx280 BMP280/BME280 temperature, pressure and humidity sensor
  * @ingroup     drivers_sensors
- * @brief       Device driver interface for the BMX280 sensors (BMP280 and BME280).
+ * @brief       Device driver interface for the Bosch BMP280 and BME280 sensors.
+ *
+ * BMP280 and BME280 measure temperature in centi °C and pressure in Pa. BME280
+ * can also measure relative humidity in %.
+ *
+ * For more information, see the datasheets:
+ * * [BMP280](https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001-18.pdf)
+ * * [BME280](https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME280_DS001-11.pdf)
  *
  * @{
  * @file

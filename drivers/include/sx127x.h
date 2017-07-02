@@ -8,9 +8,9 @@
  */
 
 /**
- * @defgroup    drivers_sx127x SX127X
+ * @defgroup    drivers_sx127x Semtech SX1272 and SX1276 radios driver
  * @ingroup     drivers_netdev
- * @brief       Semtech SX127X driver (SX1272 and SX1276)
+ * @brief       Driver for Semtech SX1272 and SX1276 radios.
  *
  * This module contains the driver for radio devices of the Semtech SX127x
  * series (SX1272 and SX1276).

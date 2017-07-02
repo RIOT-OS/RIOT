@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_cc2420 CC2420 driver
+ * @defgroup    drivers_cc2420 CC2420 radio driver
  * @ingroup     drivers_netdev
  * @{
  *

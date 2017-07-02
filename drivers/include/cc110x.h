@@ -8,9 +8,9 @@
  */
 
 /**
- * @defgroup    drivers_cc110x CC110x
+ * @defgroup    drivers_cc110x CC1100/CC1101 radio driver
  * @ingroup     drivers_netdev
- * @brief       TI CC110x
+ * @brief       Driver for TI CC1100/CC1101 radios
  * @{
  * @file
  * @brief       Public interface for cc110x driver

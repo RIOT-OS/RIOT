@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    drivers_tsl2561 TSL2561
+ * @defgroup    drivers_tsl2561 TSL2561 illuminance sensor
  * @ingroup     drivers_sensors
- * @brief       Device driver interface for the illuminance  TSL2561 sensor
+ * @brief       Device driver interface for the illuminance TSL2561 sensor
  * @{
  *
  * @file

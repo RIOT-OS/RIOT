@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_led Control on-board LEDs
- * @ingroup     drivers
+ * @ingroup     drivers_actuators
  * @brief       Access macros to control the on-board LEDs
  *
  * This header contains a set of macros for controlling the on-board LEDs of

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_veml6070 VEML6070
+ * @defgroup    drivers_veml6070 VEML6070 UV sensor
  * @ingroup     drivers_sensors
  * @brief       Device driver interface for the VEML6070 UV sensor
  * @{
