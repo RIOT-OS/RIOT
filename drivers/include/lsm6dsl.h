@@ -13,10 +13,13 @@
  * @brief       Device driver for the LSM6DSL 3D accelerometer/gyroscope
  *
  * @{
+ *
  * @file
  * @brief       Device driver interface for the LSM6DSL 3D accelerometer/gyroscope.
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Sebastian Meiling <s@mlng.net>
+ *
  */
 
 #ifndef LSM6DSL_H
@@ -28,7 +31,9 @@ extern "C" {
 
 #include "periph/i2c.h"
 
-/** Data rate */
+/**
+ * @brief Data rate settings
+ */
 enum {
     LSM6DSL_DATA_RATE_POWER_DOWN = 0x0,
     LSM6DSL_DATA_RATE_1_6HZ      = 0xB,
@@ -44,35 +49,45 @@ enum {
     LSM6DSL_DATA_RATE_6_66KHZ    = 0xa,
 };
 
-/** Decimation */
+/**
+ * @brief Decimation settings
+ */
 enum {
     LSM6DSL_DECIMATION_NOT_IN_FIFO = 0,
-    LSM6DSL_DECIMATION_NO          = 1,
-    LSM6DSL_DECIMATION_2           = 2,
-    LSM6DSL_DECIMATION_3           = 3,
-    LSM6DSL_DECIMATION_4           = 4,
-    LSM6DSL_DECIMATION_8           = 5,
-    LSM6DSL_DECIMATION_16          = 6,
-    LSM6DSL_DECIMATION_32          = 7,
+    LSM6DSL_DECIMATION_NO,
+    LSM6DSL_DECIMATION_2,
+    LSM6DSL_DECIMATION_3,
+    LSM6DSL_DECIMATION_4,
+    LSM6DSL_DECIMATION_8,
+    LSM6DSL_DECIMATION_16,
+    LSM6DSL_DECIMATION_32,
 };
 
-/** Accelerometer full scale */
+/**
+ * @brief Accelerometer full scale
+ */
 enum {
     LSM6DSL_ACC_FS_2G  = 0,
-    LSM6DSL_ACC_FS_4G  = 2,
-    LSM6DSL_ACC_FS_8G  = 3,
-    LSM6DSL_ACC_FS_16G = 1,
+    LSM6DSL_ACC_FS_16G,
+    LSM6DSL_ACC_FS_4G,
+    LSM6DSL_ACC_FS_8G,
+    LSM6DSL_ACC_FS_MAX,
 };
 
-/** Gyroscope full scale */
+/**
+ * @brief Gyroscope full scale
+ */
 enum {
     LSM6DSL_GYRO_FS_245DPS    = 0,
-    LSM6DSL_GYRO_FS_500DPS    = 1,
-    LSM6DSL_GYRO_FS_1000DPS   = 2,
-    LSM6DSL_GYRO_FS_2000DPS   = 3,
+    LSM6DSL_GYRO_FS_500DPS,
+    LSM6DSL_GYRO_FS_1000DPS,
+    LSM6DSL_GYRO_FS_2000DPS,
+    LSM6DSL_GYRO_FS_MAX,
 };
 
-/** LSM6DSL driver parameters */
+/**
+ * @brief LSM6DSL driver parameters
+ */
 typedef struct {
     i2c_t i2c;                  /**< i2c bus */
     uint8_t addr;               /**< i2c address */
@@ -84,12 +99,16 @@ typedef struct {
     uint8_t gyro_decimation;    /**< gyroscope decimation */
 } lsm6dsl_params_t;
 
-/** LSM6DSL device descriptor */
+/**
+ * @brief LSM6DSL device descriptor
+ */
 typedef struct {
     lsm6dsl_params_t params; /**< driver parameters */
 } lsm6dsl_t;
 
-/** 3D output data */
+/**
+ * @brief 3D output data
+ */
 typedef struct {
     int16_t x;  /**< X axis */
     int16_t y;  /**< Y axis */
@@ -97,12 +116,22 @@ typedef struct {
 } lsm6dsl_3d_data_t;
 
 /**
+ * @brief Named return values
+ */
+enum {
+    LSM6DSL_OK = 0,             /**< all good */
+    LSM6DSL_ERROR_BUS,          /**< I2C bus error */
+    LSM6DSL_ERROR_CNF,          /**< Config error */
+    LSM6DSL_ERROR_DEV,          /**< device error */
+};
+
+/**
  * @brief Initialize a LSM6DSL device
  *
- * @param[in] dev     device to initialize
+ * @param[out] dev     device to initialize
  * @param[in] params  driver parameters
  *
- * @return 0 on success
+ * @return LSM6DSL_OK on success
  * @return < 0 on error
  */
 int lsm6dsl_init(lsm6dsl_t *dev, const lsm6dsl_params_t *params);
@@ -113,7 +142,7 @@ int lsm6dsl_init(lsm6dsl_t *dev, const lsm6dsl_params_t *params);
  * @param[in] dev    device to read
  * @param[out] data  accelerometer values
  *
- * @return 0 on success
+ * @return LSM6DSL_OK on success
  * @return < 0 on error
  */
 int lsm6dsl_read_acc(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
@@ -124,7 +153,7 @@ int lsm6dsl_read_acc(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
  * @param[in] dev    device to read
  * @param[out] data  gyroscope values
  *
- * @return 0 on success
+ * @return LSM6DSL_OK on success
  * @return < 0 on error
  */
 int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
@@ -132,10 +161,14 @@ int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
 /**
  * @brief Read temperature data
  *
- * @param[in] dev    device to read
- * @param[out] data  temperature value
+ * @note To avoid floating point data types but still provide high resolution
+ *       for temperature readings, resulting values are scale by factor 100.
  *
- * @return 0 on success
+ *
+ * @param[in] dev    device to read
+ * @param[out] data  temperature value, in °C x 100
+ *
+ * @return LSM6DSL_OK on success
  * @return < 0 on error
  */
 int lsm6dsl_read_temp(const lsm6dsl_t *dev, int16_t *data);
