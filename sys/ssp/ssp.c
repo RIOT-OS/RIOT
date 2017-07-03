@@ -7,9 +7,9 @@
  */
 
 /**
+ * @ingroup     sys_ssp
  * @{
  *
- * @ingroup     sys
  * @file
  * @brief       Stack Smashing Protector (SSP) helper functions
  *
