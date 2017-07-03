@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2016 Laurent Navet <laurent.navet@gmail.com>
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Laurent Navet <laurent.navet@gmail.com>
+ * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  */
 
 #ifndef BOARD_COMMON_H
@@ -49,14 +51,35 @@ extern "C" {
 #define LED0_MASK           (1 << DDB5)
 #endif
 
+#ifdef CPU_ATMEGA32U4
+#define LED0_PIN            GPIO_PIN(2, 7) /**< BUILTIN LED */
+#define LED0_MASK           (1 << DDC7)
+#define LED1_PIN            GPIO_PIN(1, 0) /**< RX LED */
+#define LED1_MASK           (1 << DDB0)
+#define LED2_PIN            GPIO_PIN(3, 5) /**< TX LED */
+#define LED2_MASK           (1 << DDD5)
+#endif
+
 #ifdef CPU_ATMEGA2560
 #define LED0_PIN            GPIO_PIN(1, 7)
 #define LED0_MASK           (1 << DDB7)
 #endif
 
-#define LED0_ON             (PORTB |=  LED0_MASK)
-#define LED0_OFF            (PORTB &= ~LED0_MASK)
-#define LED0_TOGGLE         (PORTB ^=  LED0_MASK)
+#ifdef CPU_ATMEGA32U4
+#define LED0_ON             (PORTC |=  LED0_MASK) /**< BUILTIN LED */
+#define LED0_OFF            (PORTC &= ~LED0_MASK)
+#define LED0_TOGGLE         (PORTC ^=  LED0_MASK)
+#define LED1_OFF            (PORTB |=  LED1_MASK) /**< RX LED */
+#define LED1_ON             (PORTB &= ~LED1_MASK)
+#define LED1_TOGGLE         (PORTB ^=  LED1_MASK)
+#define LED2_OFF            (PORTD |=  LED2_MASK) /**< TX LED */
+#define LED2_ON             (PORTD &= ~LED2_MASK)
+#define LED2_TOGGLE         (PORTD ^=  LED2_MASK)
+#else
+#define LED0_ON             (PORTD |=  LED0_MASK)
+#define LED0_OFF            (PORTD &= ~LED0_MASK)
+#define LED0_TOGGLE         (PORTD ^=  LED0_MASK)
+#endif
 /** @} */
 
 /**
