@@ -2,6 +2,7 @@
  * Copyright (C) 2015 Daniel Amkaer Sorensen
  *               2016 Freie Universität Berlin
  *               2017 Hamburg University of Applied Sciences
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,6 +20,7 @@
  * @author      Daniel Amkaer Sorensen <daniel.amkaer@gmail.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
+ * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * @}
  */
@@ -70,6 +72,9 @@ void spi_init_pins(spi_t bus)
      * ATmega256RFR2 data sheet p. 365
      * */
     DDRB |= ((1 << DDB2) | (1 << DDB1));
+#endif
+#ifdef CPU_ATMEGA32U4
+    DDRB |= ((1 << DDB0) | (1 << DDB1) | (1 << DDB2));
 #endif
 }
 

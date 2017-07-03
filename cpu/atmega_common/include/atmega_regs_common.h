@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
  *               2016 INRIA
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,8 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
+ * @author      Thomas Perrot <thomas.perrot@tupi.fr>
+ *
  */
 
 #ifndef ATMEGA_REGS_COMMON_H
@@ -66,7 +69,11 @@ typedef struct {
     REG8    CSRA;               /**< control and status register A */
     REG8    CSRB;               /**< control and status register B */
     REG8    CSRC;               /**< control and status register C */
+#ifdef CPU_ATMEGA32U4
+    REG8    CSRD;               /**< control and status register D */
+#else
     REG8    reserved;           /**< reserved */
+#endif
     REG16   BRR;                /**< baud rate register */
     REG8    DR;                 /**< data register */
 } mega_uart_t;

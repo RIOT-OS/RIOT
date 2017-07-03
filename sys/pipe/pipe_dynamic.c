@@ -25,7 +25,7 @@
  * @}
  */
 
-#if defined(MCU_ATMEGA2560) || defined(MCU_ATMEGA1281) || defined(MCU_ATMEGA328P)
+#if defined(MCU_ATMEGA2560) || defined(MCU_ATMEGA1281) || defined(MCU_ATMEGA328P) || defined(MCU_ATMEGA32U4)
 #include <stdlib.h>
 #else
 #include <malloc.h>
