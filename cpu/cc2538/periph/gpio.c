@@ -26,7 +26,7 @@
 #include "periph/gpio.h"
 
 #define GPIO_MASK           (0xfffff000)
-#define PORTNUM_MASK        (0x00003000)
+#define PORTNUM_MASK        (0x00007000)
 #define PORTNUM_SHIFT       (12U)
 #define PIN_MASK            (0x00000007)
 #define MODE_NOTSUP         (0xff)
@@ -46,7 +46,8 @@ static inline int port_num(gpio_t pin)
     if(((uint32_t)pin &GPIO_MASK) == 0){
         return ((pin & 0x18) >> 3);
     }
-    return (int)(((pin - (uint32_t)GPIO_A) & PORTNUM_MASK) >> PORTNUM_SHIFT);
+    //return (int)(((pin - (uint32_t)GPIO_A) & PORTNUM_MASK) >> PORTNUM_SHIFT);
+    return (int)((pin & PORTNUM_MASK) >> PORTNUM_SHIFT) - 1;
 }
 
 static inline int pin_num(gpio_t pin)
@@ -182,7 +183,7 @@ static inline void handle_isr(cc2538_gpio_t *gpio, int port_num)
 {
     uint32_t state       = gpio->MIS;
     gpio->IC             = 0x000000ff;
-    gpio->IRQ_DETECT_ACK = (0xff << (port_num * 8));
+    gpio->IRQ_DETECT_ACK = (0xff << (port_num * GPIO_BITS_PER_PORT));
 
     for (int i = 0; i < GPIO_BITS_PER_PORT; i++) {
         if (state & (1 << i)) {
