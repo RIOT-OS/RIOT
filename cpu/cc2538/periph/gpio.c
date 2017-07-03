@@ -46,7 +46,6 @@ static inline int port_num(gpio_t pin)
     if(((uint32_t)pin &GPIO_MASK) == 0){
         return ((pin & 0x18) >> 3);
     }
-    //return (int)(((pin - (uint32_t)GPIO_A) & PORTNUM_MASK) >> PORTNUM_SHIFT);
     return (int)((pin & PORTNUM_MASK) >> PORTNUM_SHIFT) - 1;
 }
 
