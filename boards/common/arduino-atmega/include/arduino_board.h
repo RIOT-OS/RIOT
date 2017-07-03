@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author      Hauke Petersen  <hauke.petersen@fu-berlin.de>
  * @author      Laurent Navet   <laurent.navet@gmail.com>
+ * @author      Thomas Perrot   <thomas.perrot@tupi.fr>
  */
 
 #ifndef ARDUINO_BOARD_H
@@ -55,18 +57,24 @@ static const gpio_t arduino_pinmap[] = {
     ARDUINO_PIN_17,
     ARDUINO_PIN_18,
     ARDUINO_PIN_19,
-#ifdef CPU_ATMEGA2560
+#if defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA32U4)
     ARDUINO_PIN_20,
     ARDUINO_PIN_21,
     ARDUINO_PIN_22,
     ARDUINO_PIN_23,
+#endif
+#ifdef CPU_ATMEGA2560
     ARDUINO_PIN_24,
     ARDUINO_PIN_25,
     ARDUINO_PIN_26,
     ARDUINO_PIN_27,
     ARDUINO_PIN_28,
     ARDUINO_PIN_29,
+#endif
+#if defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA32U4)
     ARDUINO_PIN_30,
+#endif
+#ifdef CPU_ATMEGA2560
     ARDUINO_PIN_31,
     ARDUINO_PIN_32,
     ARDUINO_PIN_33,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C)  2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup     boards_common
+ * @ingroup     boards_arduino-leonardo
  * @{
  *
  * @file
- * @brief       Common implementations for Atmega boards
+ * @brief       Board specific initialization for Arduino Leonardo
  *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  *
  * @}
  */
@@ -31,17 +31,11 @@ void led_init(void);
 
 void board_init(void)
 {
-#ifdef CPU_ATMEGA32U4
-    /* disable usb interrupt on Atmega32U4 */
+    /* disable usb interrupt */
     PRR1 |= 1<<PRUSB;
-#endif
 
     atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
-
-#ifdef MODULE_AVR_LIBC_EXTRA
     atmega_stdio_init();
-#endif
-
     cpu_init();
     led_init();
     irq_enable();
