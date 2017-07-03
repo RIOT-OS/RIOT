@@ -1,7 +1,7 @@
 /**
  * @defgroup pkg_micro_ecc   Micro-ECC for RIOT
  * @ingroup  pkg
- * @ingroup  sys
+ * @ingroup  sys_crypto
  * @brief    Micro-ECC for RIOT
  *
  * # Micro-ECC for RIOT
