@@ -7,14 +7,13 @@
  */
 
 /**
- * @ingroup     candev_linux
+ * @ingroup     drivers_candev_linux
  * @{
  *
  * @file
  * @brief       Default linux can config
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
- * @}
  */
 
 #ifndef CANDEV_LINUX_PARAMS_H

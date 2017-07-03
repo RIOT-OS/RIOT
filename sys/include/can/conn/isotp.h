@@ -7,9 +7,8 @@
  */
 
 /**
- * @ingroup    conn_can
+ * @ingroup    sys_can_conn
  * @{
- *
  *
  * @file
  * @brief       Definitions of generic CAN interface

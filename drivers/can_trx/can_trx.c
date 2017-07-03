@@ -7,16 +7,15 @@
  */
 
 /**
- * @defgroup    drivers_can transceiver
- * @ingroup     drivers
+ * @ingroup     drivers_can_trx
  * @brief       generic transceiver interface
- *
  * @{
  *
  * @file
  * @brief       generic transceiver interface
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @}
  */
 
 #include <errno.h>

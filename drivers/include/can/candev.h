@@ -7,15 +7,15 @@
  */
 
 /**
- * @ingroup     can
- * @ingroup     drivers
- * @defgroup    drivers_can CAN drivers
+ * @defgroup    drivers_candev CAN device driver interface
+ * @ingroup     drivers_can
+ * @brief       Definitions for low-level CAN driver interface
  * @{
  *
- * This is the CAN controller driver interface
+ * This is the CAN controller generic driver interface
  *
  * @file
- * @brief       Definitions low-level CAN driver interface
+ * @brief       Definitions for low-level CAN driver interface
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
@@ -37,12 +37,12 @@ extern "C" {
 
 
 /**
- * @brief   Possible event types that are send from the device driver to the
+ * @brief   Possible event types that are sent from the device driver to the
  *          upper layer
  */
 typedef enum {
     CANDEV_EVENT_NOEVENT,          /**< no event, used internally */
-    CANDEV_EVENT_ISR,              /**< driver needs it's ISR handled */
+    CANDEV_EVENT_ISR,              /**< driver needs its ISR handled */
     CANDEV_EVENT_WAKE_UP,          /**< driver has been woken up by bus */
     CANDEV_EVENT_TX_CONFIRMATION,  /**< a packet has been sent */
     CANDEV_EVENT_TIMEOUT_TX_CONF,  /**< tx conf timeout received */

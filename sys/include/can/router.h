@@ -7,9 +7,8 @@
  */
 
 /**
- * @ingroup    can_dll
+ * @ingroup    sys_can_dll
  * @{
- *
  *
  * @file
  * @brief       Functions for routing RX can frames
@@ -112,5 +111,4 @@ int can_router_dispatch_tx_error(can_pkt_t *pkt);
 #endif
 
 #endif /* CAN_ROUTER_H */
-
 /** @} */

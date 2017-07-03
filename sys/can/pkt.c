@@ -7,11 +7,14 @@
  */
 
 /**
+ * @ingroup     sys_can_dll
+ * @{
  * @file
  * @brief       CAN memory allocation module
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Toon Stegen <toon.stegen@altran.com>
+ * @}
  */
 
 #include <string.h>

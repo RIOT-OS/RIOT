@@ -7,6 +7,8 @@
  */
 
 /**
+ * @ingroup     sys_can_dll
+ * @{
  * @file
  * @brief       CAN Data Link Layer module
  *
@@ -18,6 +20,7 @@
  * @author      Toon Stegen <toon.stegen@altran.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Aurelien Gonce <aurelien.gonce@altran.com>
+ * @}
  */
 
 #include <errno.h>

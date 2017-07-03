@@ -7,10 +7,13 @@
  */
 
 /**
+ * @ingroup     sys_can_conn
+ * @{
  * @file
  * @brief       Implementation of isotp CAN connection
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @}
  */
 
 #ifdef MODULE_CAN_ISOTP

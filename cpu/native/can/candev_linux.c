@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     native_cpu
+ * @ingroup     drivers_candev_linux
  * @{
  *
  * @file
