@@ -9,9 +9,11 @@
 /**
  * @defgroup unittests Unittests
  * @ingroup  sys
+ * @brief RIOT Unittests based on the EmbUnit Framework
  *
- * @note
- * Please refer to https://github.com/RIOT-OS/RIOT/wiki/Testing-RIOT
+ * @see http://embunit.sourceforge.net/embunit/
+ *
+ * @note Please refer to https://github.com/RIOT-OS/RIOT/wiki/Testing-RIOT
  *
  * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  */

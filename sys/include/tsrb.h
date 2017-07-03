@@ -9,17 +9,16 @@
 /**
  * @defgroup    sys_tsrb Thread safe ringbuffer
  * @ingroup     sys
- * @{
- */
-
-/**
- * @file
  * @brief       Thread-safe ringbuffer implementation
+ * @{
  *
- * This ringbuffer implementation can be used without locking if
- * there's only one producer and one consumer.
+ * @file
+ * @brief       Thread-safe ringbuffer interface definition
  *
- * @note Buffer size must be a power of two!
+ * @note        This ringbuffer implementation can be used without locking if
+ *              there's only one producer and one consumer.
+ *
+ * @attention   Buffer size must be a power of two!
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
@@ -150,5 +149,5 @@ int tsrb_add(tsrb_t *rb, const char *src, size_t n);
 }
 #endif
 
-/** @} */
 #endif /* TSRB_H */
+/** @} */
