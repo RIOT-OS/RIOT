@@ -26,6 +26,7 @@
 #include "at86rf2xx.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
+#include "pm_layered.h"
 #include "periph/spi.h"
 
 #define ENABLE_DEBUG (0)
@@ -486,6 +487,11 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         /* Go to SLEEP mode from TRX_OFF */
         gpio_set(dev->params.sleep_pin);
         dev->state = state;
+
+        /* Allow MCU to go to the full sleep mode */
+        if (old_state != AT86RF2XX_STATE_SLEEP) {
+            pm_unblock(PM_NUM_MODES - 1);
+        }
     } else {
         _set_state(dev, state, state);
     }
