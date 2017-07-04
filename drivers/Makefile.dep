@@ -84,6 +84,10 @@ ifneq (,$(filter dht,$(USEMODULE)))
     FEATURES_REQUIRED += periph_gpio
 endif
 
+ifneq (,$(filter ds1307,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter dsp0401,$(USEMODULE)))
     USEMODULE += xtimer
     FEATURES_REQUIRED += periph_gpio
