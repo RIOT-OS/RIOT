@@ -1,0 +1,8 @@
+/**
+ * @defgroup pkg_jsmn  JSON parser library
+ * @ingroup  pkg
+ * @ingroup  sys
+ * @brief    Provides a JSON parser library to RIOT
+ *
+ * @see      https://github.com/zserge/jsmn
+ */

@@ -1,0 +1,7 @@
+/**
+ * @defgroup pkg_fatfs   FAT file system
+ * @ingroup  pkg
+ * @ingroup  sys_fs
+ * @brief    Provides FAT file system support
+ * @see      http://elm-chan.org/fsw/ff/00index_e.html
+ */
