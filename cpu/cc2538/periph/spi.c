@@ -17,7 +17,7 @@
  *
  * @author      Ian Martin <ian@locicontrols.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *
+ * @author      Sebastian Meiling <s@mlng.net>
  * @}
  */
 
@@ -25,34 +25,54 @@
 #include "mutex.h"
 #include "assert.h"
 #include "periph/spi.h"
+#include "periph/gpio.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
+/* guard this file in case no SPI device is defined */
+#ifdef SPI_NUMOF
+
+#define SPI_MISO    (spi_config[bus].miso_pin)
+#define SPI_MOSI    (spi_config[bus].mosi_pin)
+#define SPI_SCK     (spi_config[bus].sck_pin)
+#define SPI_CS      (spi_config[bus].cs_pin)
+#define SPI(x)      (spi_config[bus].num)
 
 /**
  * @brief   Array holding one pre-initialized mutex for each SPI device
  */
 static mutex_t locks[SPI_NUMOF];
 
+/**
+ * @brief   Return pointer to SPI device (SSI0|1)
+ *
+ * @param[in] bus   SPI bus
+ */
 static inline cc2538_ssi_t *dev(spi_t bus)
 {
-    return spi_config[bus].dev;
+    assert(bus < SPI_NUMOF);
+
+    return (SPI(bus) ? SSI1 : SSI0);
 }
 
 static inline void poweron(spi_t bus)
 {
-    SYS_CTRL_RCGCSSI |= (1 << bus);
-    SYS_CTRL_SCGCSSI |= (1 << bus);
-    SYS_CTRL_DCGCSSI |= (1 << bus);
+    SYS_CTRL_RCGCSSI |= (1 << SPI(bus));
+    SYS_CTRL_SCGCSSI |= (1 << SPI(bus));
+    SYS_CTRL_DCGCSSI |= (1 << SPI(bus));
 }
 
 static inline void poweroff(spi_t bus)
 {
-    SYS_CTRL_RCGCSSI &= ~(1 << bus);
-    SYS_CTRL_SCGCSSI &= ~(1 << bus);
-    SYS_CTRL_DCGCSSI &= ~(1 << bus);
+    SYS_CTRL_RCGCSSI &= ~(1 << SPI(bus));
+    SYS_CTRL_SCGCSSI &= ~(1 << SPI(bus));
+    SYS_CTRL_DCGCSSI &= ~(1 << SPI(bus));
 }
 
 void spi_init(spi_t bus)
 {
-    assert(bus <= SPI_NUMOF);
+    assert(bus < SPI_NUMOF);
 
     /* temporarily power on the device */
     poweron(bus);
@@ -69,33 +89,18 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
-    switch ((uintptr_t)spi_config[bus].dev) {
-        case (uintptr_t)SSI0:
-            IOC_PXX_SEL[spi_config[bus].mosi_pin] = SSI0_TXD;
-            IOC_PXX_SEL[spi_config[bus].sck_pin ] = SSI0_CLK_OUT;
-            IOC_PXX_SEL[spi_config[bus].cs_pin  ] = SSI0_FSS_OUT;
+    assert(bus < SPI_NUMOF);
 
-            IOC_SSIRXD_SSI0 = spi_config[bus].miso_pin;
-            break;
-
-        case (uintptr_t)SSI1:
-            IOC_PXX_SEL[spi_config[bus].mosi_pin] = SSI1_TXD;
-            IOC_PXX_SEL[spi_config[bus].sck_pin ] = SSI1_CLK_OUT;
-            IOC_PXX_SEL[spi_config[bus].cs_pin  ] = SSI1_FSS_OUT;
-
-            IOC_SSIRXD_SSI1 = spi_config[bus].miso_pin;
-            break;
+    if (SPI(bus) == 0) {
+        gpio_init_af(SPI_MOSI, SSI0_TXD,     GPIO_OUT);
+        gpio_init_af(SPI_SCK,  SSI0_CLK_OUT, GPIO_OUT);
+        gpio_init_af(SPI_MISO, SSI0_RXD,     GPIO_IN);
     }
-
-    IOC_PXX_OVER[spi_config[bus].mosi_pin] = IOC_OVERRIDE_OE;
-    IOC_PXX_OVER[spi_config[bus].miso_pin] = IOC_OVERRIDE_DIS;
-    IOC_PXX_OVER[spi_config[bus].sck_pin ] = IOC_OVERRIDE_OE;
-    IOC_PXX_OVER[spi_config[bus].cs_pin  ] = IOC_OVERRIDE_OE;
-
-    gpio_hardware_control(spi_config[bus].mosi_pin);
-    gpio_hardware_control(spi_config[bus].miso_pin);
-    gpio_hardware_control(spi_config[bus].sck_pin);
-    gpio_hardware_control(spi_config[bus].cs_pin);
+    else {
+        gpio_init_af(SPI_MOSI, SSI1_TXD,     GPIO_OUT);
+        gpio_init_af(SPI_SCK,  SSI1_CLK_OUT, GPIO_OUT);
+        gpio_init_af(SPI_MISO, SSI1_RXD,     GPIO_IN);
+    }
 }
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
@@ -167,11 +172,13 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
             while (!(dev(bus)->SR & SSI_SR_RNE)){}
             in_buf[i] = dev(bus)->DR;
         }
-    /* wait until no more busy */
-    while ((dev(bus)->SR & SSI_SR_BSY)) {}
+        /* wait until no more busy */
+        while ((dev(bus)->SR & SSI_SR_BSY)) {}
     }
 
     if ((!cont) && (cs != SPI_CS_UNDEF)) {
         gpio_set((gpio_t)cs);
     }
 }
+
+#endif /* SPI_NUMOF */
