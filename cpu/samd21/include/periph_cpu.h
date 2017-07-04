@@ -58,6 +58,15 @@ static const int8_t exti_config[2][32] = {
 };
 
 /**
+ * @name   Available core clock configurations
+ * @{
+ */
+#define CLOCK_USE_PLL       (0)
+#define CLOCK_USE_DFLL      (1)
+#define CLOCK_USE_8MHZ      (2)
+/** @} */
+
+/**
  * @brief   Override SPI hardware chip select macro
  *
  * As of now, we do not support HW CS, so we always set it to a fixed value

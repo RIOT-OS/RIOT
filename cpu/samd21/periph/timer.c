@@ -27,6 +27,7 @@
 
 #include "periph/timer.h"
 #include "periph_conf.h"
+#include "periph_clock_config.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -49,22 +50,18 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         return -1;
     }
 
-/* select the clock generator depending on the main clock source:
- * GCLK0 (1MHz) if we use the internal 8MHz oscillator
- * GCLK1 (8MHz) if we use the PLL */
-#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
-    /* configure GCLK1 (configured to 1MHz) to feed TC3, TC4 and TC5 */;
+    /* Run using the 1 MHZ clock source */
+    setup_gen1_1MHz();
+    /* USE GEN1_1MHZ to feed TC3, TC4 and TC5 */;
     /* configure GCLK1 to feed TC3, TC4 and TC5 */;
-    GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC3_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
+    GCLK->CLKCTRL.reg = ((GCLK_CLKCTRL_CLKEN |
+                          GCLK_CLKCTRL_GEN_GCLK1 |
+                          (TC3_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
     while (GCLK->STATUS.bit.SYNCBUSY) {}
     /* TC4 and TC5 share the same channel */
-    GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
-#else
-    /* configure GCLK0 to feed TC3, TC4 and TC5 */;
-    GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC3_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
-    /* TC4 and TC5 share the same channel */
-    GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
-#endif
+    GCLK->CLKCTRL.reg = ((GCLK_CLKCTRL_CLKEN |
+                          GCLK_CLKCTRL_GEN_GCLK1 |
+                          (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 
     switch (dev) {
@@ -79,13 +76,8 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         while (TIMER_0_DEV.CTRLA.bit.SWRST) {}
         /* choosing 16 bit mode */
         TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT16_Val;
-#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
-        /* PLL/DFLL: sourced by 1MHz and prescaler 1 to reach 1MHz */
+        /* Sourced by 1MHz, thus no divide */
         TIMER_0_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1_Val;
-#else
-        /* sourced by 8MHz with Presc 8 results in 1MHz clk */
-        TIMER_0_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV8_Val;
-#endif
         /* choose normal frequency operation */
         TIMER_0_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
         break;
@@ -98,18 +90,11 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         PM->APBCMASK.reg |= PM_APBCMASK_TC4;
         /* reset timer */
         TIMER_1_DEV.CTRLA.bit.SWRST = 1;
-
         while (TIMER_1_DEV.CTRLA.bit.SWRST) {}
-
-
+        /* choosing 32 bit mode */
         TIMER_1_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
-#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
-        /* PLL/DFLL: sourced by 1MHz and prescaler 1 to reach 1MHz */
+        /* Sourced by 1MHz, thus no divide */
         TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1_Val;
-#else
-        /* sourced by 8MHz with Presc 8 results in 1Mhz clk */
-        TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV8_Val;
-#endif
         /* choose normal frequency operation */
         TIMER_1_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
         break;

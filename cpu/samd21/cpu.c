@@ -15,42 +15,136 @@
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Dan Evans <photonthunder@gmail.com>
  * @}
  */
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph_clock_config.h"
 #include "periph/init.h"
 
-#ifndef CLOCK_8MHZ
-#define CLOCK_8MHZ          1
+/* Default Clock configurations */
+
+/* make sure we have all needed information about the clock configuration */
+#ifndef CLOCK_SRC
+#error "Please provide CLOCK_SRC in your board's perhip_conf.h"
+#endif
+#ifndef CLOCK_CORECLOCK
+#error "Please provide CLOCK_CORECLOCK in your board's periph_conf.h"
 #endif
 
-#ifndef GEN2_ULP32K
-#define GEN2_ULP32K         1
+#ifndef CLOCK_DIV
+#define CLOCK_DIV               (1U)
 #endif
 
+#if CLOCK_SRC == CLOCK_USE_PLL
+#define CLOCK_PLL_MUL           (((CLOCK_CORECLOCK * CLOCK_DIV) / 1000000U) - 1)
+#endif
+
+#if CLOCK_SRC == CLOCK_USE_DFLL
+#define CLOCK_XOSC32K           (32768U)
+#endif
+
+/* if CLOCK_XOSC32K never set then use these defaults */
+#ifndef CLOCK_XOSC32K
+#define CLOCK_XOSC32K           (0)
+#endif
+
+/* set system voltage level in mV (determines flash wait states) */
 #ifndef VDD
-/**
- * @brief   Set system voltage level in mV (determines flash wait states)
- *
- * @note    Override this value in your boards periph_conf.h file
- *          if a different system voltage is used.
- */
-#define VDD                 (3300U)
+#define VDD                     (3300U)
 #endif
 
 /* determine the needed flash wait states based on the system voltage (Vdd)
  * see SAMD21 datasheet Rev A (2017) table 37-40 , page 816 */
 #if (VDD > 2700)
-#define WAITSTATES          ((CLOCK_CORECLOCK - 1) / 24000000)
+#define WAITSTATES              ((CLOCK_CORECLOCK - 1) / 24000000)
 #else
-#define WAITSTATES          ((CLOCK_CORECLOCK - 1) / 14000000)
+#define WAITSTATES              ((CLOCK_CORECLOCK - 1) / 14000000)
 #endif
 
-/**
- * @brief   Configure clock sources and the cpu frequency
- */
+/* setup 1 MHz (8MHz clock/8) clock on Generic Clock Generator 1 */
+static bool is_enabled_gen1_1MHz = false;
+void setup_gen1_1MHz(void) {
+    if (is_enabled_gen1_1MHz) {
+        return;
+    }
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+    /* Setup GCLK1 with 1MHz */
+    GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(8) |
+                         GCLK_GENDIV_ID(1));
+    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |
+                         GCLK_GENCTRL_SRC_OSC8M |
+                         GCLK_GENCTRL_ID(1));
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+    is_enabled_gen1_1MHz = true;
+    return;
+}
+
+/* setup 32 kHz XOSC on Generic Clock Generator 2 */
+static bool gen2_enabled = false;
+bool is_enabled_gen2_xosc32(void) {
+    return gen2_enabled;
+}
+
+static bool run_standby_gen2_xosc32 = false;
+void setup_gen2_xosc32(bool standby) {
+    if ((standby == true) && (run_standby_gen2_xosc32 == false)) {
+        GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(2);
+        GCLK->GENCTRL.bit.GENEN = 0;
+        while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+        gen2_enabled = false;
+        run_standby_gen2_xosc32 = true;
+    }
+    if (gen2_enabled) {
+        return;
+    }
+
+    /* Use External 32.768KHz Oscillator */
+    SYSCTRL->XOSC32K.reg = (SYSCTRL_XOSC32K_ONDEMAND |
+                            SYSCTRL_XOSC32K_EN32K |
+                            SYSCTRL_XOSC32K_XTALEN |
+                            SYSCTRL_XOSC32K_STARTUP(6) |
+                            SYSCTRL_XOSC32K_RUNSTDBY);
+    /* Enable with Seperate Call */
+    SYSCTRL->XOSC32K.bit.ENABLE = 1;
+
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+    /* Setup GCLK2 with XOSC32 */
+    GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(1) |
+                         GCLK_GENDIV_ID(2));
+    GCLK->GENCTRL.reg = (GCLK_GENCTRL_SRC_XOSC32K |
+                         GCLK_GENCTRL_ID(2));
+    if (run_standby_gen2_xosc32) {
+        GCLK->GENCTRL.bit.RUNSTDBY = 1;
+    }
+    GCLK->GENCTRL.bit.GENEN = 1;
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+    gen2_enabled = true;
+}
+
+/* setup 32 kHz ULP internal clock on Generic Clock Generator 3 */
+static bool is_enabled_gen3_ULP32k = false;
+void setup_gen3_ULP32k(void) {
+    if (is_enabled_gen3_ULP32k) {
+        return;
+    }
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+    /* Setup Clock generator 3 with divider 32 (32.768kHz/32 = 1.024 kHz) */
+    GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(4) |
+                         GCLK_GENDIV_ID(3));
+    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |
+                         GCLK_GENCTRL_SRC_OSCULP32K |
+                         GCLK_GENCTRL_RUNSTDBY |
+                         GCLK_GENCTRL_DIVSEL |
+                         GCLK_GENCTRL_ID(3));
+
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+    is_enabled_gen3_ULP32k = true;
+}
+
+/* configure clock sources and the cpu frequency */
 static void clk_init(void)
 {
     /* enable clocks for the power, sysctrl and gclk modules */
@@ -62,80 +156,43 @@ static void clk_init(void)
     NVMCTRL->CTRLB.reg |= NVMCTRL_CTRLB_RWS(WAITSTATES);
     PM->APBBMASK.reg &= ~PM_APBBMASK_NVMCTRL;
 
-#if CLOCK_8MHZ
     /* configure internal 8MHz oscillator to run without prescaler */
     SYSCTRL->OSC8M.bit.PRESC = 0;
     SYSCTRL->OSC8M.bit.ONDEMAND = 1;
     SYSCTRL->OSC8M.bit.RUNSTDBY = 0;
     SYSCTRL->OSC8M.bit.ENABLE = 1;
     while (!(SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_OSC8MRDY)) {}
-#endif
 
-#if CLOCK_USE_PLL
     /* reset the GCLK module so it is in a known state */
     GCLK->CTRL.reg = GCLK_CTRL_SWRST;
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 
-    /* setup generic clock 1 to feed DPLL with 1MHz */
-    GCLK->GENDIV.reg = (GCLK_GENDIV_DIV(8) |
-                        GCLK_GENDIV_ID(1));
-    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |
-                         GCLK_GENCTRL_SRC_OSC8M |
-                         GCLK_GENCTRL_ID(1));
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_GEN(1) |
-                         GCLK_CLKCTRL_ID(1) |
+#if CLOCK_SRC == CLOCK_USE_PLL
+    setup_gen1_1MHz();
+    /* Set GEN1_1MHZ as source for PLL */
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_GEN_GCLK1 |
+                         GCLK_CLKCTRL_ID_FDPLL |
                          GCLK_CLKCTRL_CLKEN);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 
-    /* enable PLL */
+    /* Enable PLL */
     SYSCTRL->DPLLRATIO.reg = (SYSCTRL_DPLLRATIO_LDR(CLOCK_PLL_MUL));
     SYSCTRL->DPLLCTRLB.reg = (SYSCTRL_DPLLCTRLB_REFCLK_GCLK);
     SYSCTRL->DPLLCTRLA.reg = (SYSCTRL_DPLLCTRLA_ENABLE);
     while(!(SYSCTRL->DPLLSTATUS.reg &
-           (SYSCTRL_DPLLSTATUS_CLKRDY | SYSCTRL_DPLLSTATUS_LOCK))) {}
+           (SYSCTRL_DPLLSTATUS_CLKRDY |
+            SYSCTRL_DPLLSTATUS_LOCK))) {}
 
-    /* select the PLL as source for clock generator 0 (CPU core clock) */
-    GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(CLOCK_PLL_DIV) |
-                        GCLK_GENDIV_ID(0));
+    /* Select the PLL as source for clock generator 0 (CPU core clock) */
+    GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(CLOCK_DIV) |
+                         GCLK_GENDIV_ID(0));
     GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |
                          GCLK_GENCTRL_SRC_FDPLL |
                          GCLK_GENCTRL_ID(0));
-#elif CLOCK_USE_XOSC32_DFLL
-    /* Use External 32.768KHz Oscillator */
-    SYSCTRL->XOSC32K.reg =  SYSCTRL_XOSC32K_ONDEMAND |
-                            SYSCTRL_XOSC32K_EN32K |
-                            SYSCTRL_XOSC32K_XTALEN |
-                            SYSCTRL_XOSC32K_STARTUP(6) |
-                            SYSCTRL_XOSC32K_RUNSTDBY;
-
-    /* Enable with Seperate Call */
-    SYSCTRL->XOSC32K.bit.ENABLE = 1;
-
-    /* reset the GCLK module so it is in a known state */
-    GCLK->CTRL.reg = GCLK_CTRL_SWRST;
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-
-    /* setup generic clock 1 as 1MHz for timer.c */
-    GCLK->GENDIV.reg = (GCLK_GENDIV_DIV(8) |
-                        GCLK_GENDIV_ID(1));
-    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |
-                         GCLK_GENCTRL_SRC_OSC8M |
-                         GCLK_GENCTRL_ID(1));
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-
-    /* Setup clock GCLK3 with divider 1 */
-    GCLK->GENDIV.reg = GCLK_GENDIV_ID(3) | GCLK_GENDIV_DIV(1);
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-
-    /* Enable GCLK3 with XOSC32K as source */
-    GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(3) |
-                        GCLK_GENCTRL_GENEN |
-                        GCLK_GENCTRL_RUNSTDBY |
-                        GCLK_GENCTRL_SRC_XOSC32K;
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-
-    /* set GCLK3 as source for DFLL */
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_GEN_GCLK3 |
+#elif CLOCK_SRC == CLOCK_USE_DFLL
+    setup_gen2_xosc32(true);
+    /* Set GEN2_XOSC32 as source for DFLL */
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_GEN_GCLK2 |
                          GCLK_CLKCTRL_ID_DFLL48 |
                          GCLK_CLKCTRL_CLKEN);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
@@ -167,42 +224,41 @@ static void clk_init(void)
     while ((SYSCTRL->PCLKSR.reg & mask) != mask) { } /* Wait for DFLL lock */
 
     /* select the DFLL as source for clock generator 0 (CPU core clock) */
-    GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(1U) | GCLK_GENDIV_ID(0));
-    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_DFLL48M | GCLK_GENCTRL_ID(0));
-    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0;
+    GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(1) |
+                         GCLK_GENDIV_ID(0));
+    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |
+                         GCLK_GENCTRL_SRC_DFLL48M |
+                         GCLK_GENCTRL_ID(0));
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 
     SYSCTRL->DFLLCTRL.bit.ONDEMAND = 1;
     while ((SYSCTRL->PCLKSR.reg & SYSCTRL_PCLKSR_DFLLRDY) == 0) {
         /* Wait for DFLL sync */
     }
-#else /* do not use PLL, use internal 8MHz oscillator directly */
+#elif CLOCK_SRC == CLOCK_USE_8MHZ
+    /* use internal 8MHz oscillator directly */
     GCLK->GENDIV.reg =  (GCLK_GENDIV_DIV(CLOCK_DIV) |
-                        GCLK_GENDIV_ID(0));
+                         GCLK_GENDIV_ID(0));
     GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |
                          GCLK_GENCTRL_SRC_OSC8M |
                          GCLK_GENCTRL_ID(0));
-#endif
 
-    /* make sure we synchronize clock generator 0 before we go on */
+#else
+#error Must choose CLOCK_SRC in periph_conf.h
+#endif
+    /* Make sure GCLK0 is on */
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
+                         GCLK_CLKCTRL_GEN_GCLK0);
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-
-#if GEN2_ULP32K
-    /* Setup Clock generator 2 with divider 1 (32.768kHz) */
-    GCLK->GENDIV.reg  = (GCLK_GENDIV_ID(2)  | GCLK_GENDIV_DIV(0));
-    GCLK->GENCTRL.reg = (GCLK_GENCTRL_ID(2) | GCLK_GENCTRL_GENEN |
-            GCLK_GENCTRL_RUNSTDBY |
-            GCLK_GENCTRL_SRC_OSCULP32K);
-
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
-#endif
 
     /* redirect all peripherals to a disabled clock generator (7) by default */
     for (int i = 0x3; i <= 0x22; i++) {
-        GCLK->CLKCTRL.reg = ( GCLK_CLKCTRL_ID(i) | GCLK_CLKCTRL_GEN_GCLK7 );
-        while (GCLK->STATUS.bit.SYNCBUSY) {}
+        GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_ID(i) |
+                             GCLK_CLKCTRL_GEN_GCLK7);
+        while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
     }
 }
+
 
 void cpu_init(void)
 {

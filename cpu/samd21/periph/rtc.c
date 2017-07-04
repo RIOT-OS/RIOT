@@ -23,6 +23,8 @@
 #include "cpu.h"
 #include "periph/rtc.h"
 #include "periph_conf.h"
+#include "periph_clock_config.h"
+
 
 typedef struct {
     rtc_alarm_cb_t cb;        /**< callback called from RTC interrupt */
@@ -32,8 +34,8 @@ typedef struct {
 static rtc_state_t rtc_callback;
 
 /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
-* reference_year is set to 100 (offset) to be in our current time (2000)
-* Thanks to this, the user will be able to set time in 2000's*/
+ * reference_year is set to 100 (offset) to be in our current time (2000)
+ * Thanks to this, the user will be able to set time in 2000's*/
 static uint16_t reference_year = 100;
 
 void rtc_init(void)
@@ -43,19 +45,13 @@ void rtc_init(void)
     /* Turn on power manager for RTC */
     PM->APBAMASK.reg |= PM_APBAMASK_RTC;
 
-    /* RTC uses External 32,768KHz Oscillator (OSC32K isn't accurate enough p1075/1138)*/
-    SYSCTRL->XOSC32K.reg =  SYSCTRL_XOSC32K_ONDEMAND |
-                            SYSCTRL_XOSC32K_EN32K |
-                            SYSCTRL_XOSC32K_XTALEN |
-                            SYSCTRL_XOSC32K_STARTUP(6) |
-                            SYSCTRL_XOSC32K_ENABLE;
+    setup_gen2_xosc32(true);
 
-    /* Setup clock GCLK2 with OSC32K divided by 32 */
-    GCLK->GENDIV.reg = GCLK_GENDIV_ID(2)|GCLK_GENDIV_DIV(4);
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_XOSC32K | GCLK_GENCTRL_ID(2) | GCLK_GENCTRL_DIVSEL );
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-    GCLK->CLKCTRL.reg = (uint32_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK2 | (RTC_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
+    /* RTC uses GEN2_XOSC32 because OSC32K isn't accurate
+     * enough (p1075/1138). */
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_GEN_GCLK2 |
+                        GCLK_CLKCTRL_CLKEN |
+                        GCLK_CLKCTRL_ID(RTC_GCLK_ID);
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 
     /* DISABLE RTC MASTER */
@@ -68,7 +64,8 @@ void rtc_init(void)
     while (rtcMode2->STATUS.bit.SYNCBUSY) {}
 
     /* RTC config with RTC_MODE2_CTRL_CLKREP = 0 (24h) */
-    rtcMode2->CTRL.reg = RTC_MODE2_CTRL_PRESCALER_DIV1024|RTC_MODE2_CTRL_MODE_CLOCK;
+    rtcMode2->CTRL.reg = RTC_MODE2_CTRL_PRESCALER_DIV1024 |
+                         RTC_MODE2_CTRL_MODE_CLOCK;
     while (rtcMode2->STATUS.bit.SYNCBUSY) {}
     rtcMode2->INTENSET.reg = RTC_MODE2_INTENSET_OVF;
     while (rtcMode2->STATUS.bit.SYNCBUSY) {}
@@ -78,16 +75,18 @@ void rtc_init(void)
 int rtc_set_time(struct tm *time)
 {
     RtcMode2 *rtcMode2 = &(RTC_DEV);
-    if ((time->tm_year < reference_year) || (time->tm_year > reference_year + 63)) {
+    if ((time->tm_year < reference_year) ||
+        (time->tm_year > reference_year + 63)) {
         return -1;
     }
     else {
-        rtcMode2->CLOCK.reg = RTC_MODE2_CLOCK_YEAR(time->tm_year - reference_year)
-                | RTC_MODE2_CLOCK_MONTH(time->tm_mon + 1)
-                | RTC_MODE2_CLOCK_DAY(time->tm_mday)
-                | RTC_MODE2_CLOCK_HOUR(time->tm_hour)
-                | RTC_MODE2_CLOCK_MINUTE(time->tm_min)
-                | RTC_MODE2_CLOCK_SECOND(time->tm_sec);
+        rtcMode2->CLOCK.reg =
+            RTC_MODE2_CLOCK_YEAR(time->tm_year - reference_year) |
+            RTC_MODE2_CLOCK_MONTH(time->tm_mon + 1) |
+            RTC_MODE2_CLOCK_DAY(time->tm_mday) |
+            RTC_MODE2_CLOCK_HOUR(time->tm_hour) |
+            RTC_MODE2_CLOCK_MINUTE(time->tm_min) |
+            RTC_MODE2_CLOCK_SECOND(time->tm_sec);
     }
     while (rtcMode2->STATUS.bit.SYNCBUSY) {}
     return 0;
@@ -97,7 +96,8 @@ int rtc_get_time(struct tm *time)
 {
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     time->tm_year = rtcMode2->CLOCK.bit.YEAR + reference_year;
-    if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
+    if ((time->tm_year < reference_year) ||
+        (time->tm_year > (reference_year + 63))) {
         return -1;
     }
     time->tm_mon = rtcMode2->CLOCK.bit.MONTH - 1;
@@ -113,16 +113,18 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     rtc_clear_alarm();
-    if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
+    if ((time->tm_year < reference_year) ||
+        (time->tm_year > (reference_year + 63))) {
         return -2;
     }
     else {
-        rtcMode2->Mode2Alarm[0].ALARM.reg = RTC_MODE2_ALARM_YEAR(time->tm_year - reference_year)
-                | RTC_MODE2_ALARM_MONTH(time->tm_mon + 1)
-                | RTC_MODE2_ALARM_DAY(time->tm_mday)
-                | RTC_MODE2_ALARM_HOUR(time->tm_hour)
-                | RTC_MODE2_ALARM_MINUTE(time->tm_min)
-                | RTC_MODE2_ALARM_SECOND(time->tm_sec);
+        rtcMode2->Mode2Alarm[0].ALARM.reg =
+            RTC_MODE2_ALARM_YEAR(time->tm_year - reference_year) |
+            RTC_MODE2_ALARM_MONTH(time->tm_mon + 1) |
+            RTC_MODE2_ALARM_DAY(time->tm_mday) |
+            RTC_MODE2_ALARM_HOUR(time->tm_hour) |
+            RTC_MODE2_ALARM_MINUTE(time->tm_min) |
+            RTC_MODE2_ALARM_SECOND(time->tm_sec);
         rtcMode2->Mode2Alarm[0].MASK.reg = RTC_MODE2_MASK_SEL(6);
     }
     while (rtcMode2->STATUS.bit.SYNCBUSY) {}
@@ -145,7 +147,8 @@ int rtc_get_alarm(struct tm *time)
 {
     RtcMode2 *rtcMode2 = &(RTC_DEV);
     time->tm_year = rtcMode2->Mode2Alarm[0].ALARM.bit.YEAR + reference_year;
-    if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
+    if ((time->tm_year < reference_year) ||
+        (time->tm_year > (reference_year + 63))) {
         return -1;
     }
     time->tm_mon = rtcMode2->Mode2Alarm[0].ALARM.bit.MONTH - 1;
@@ -190,7 +193,9 @@ void isr_rtc(void)
     }
     if (status & RTC_MODE2_INTFLAG_OVF) {
         /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
-        * Start RTC again with reference_year 64 years more (Be careful with alarm set) */
+         * Start RTC again with reference_year 64 years more
+         * (Be careful with alarm set)
+         */
         reference_year += 64;
         rtcMode2->INTFLAG.reg = RTC_MODE2_INTFLAG_OVF;
     }

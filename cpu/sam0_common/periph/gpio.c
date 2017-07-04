@@ -31,6 +31,10 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#ifdef CPU_FAM_SAMD21
+#include "periph_clock_config.h"
+#endif
+
 /**
  * @brief   Number of external interrupt lines
  */
@@ -128,13 +132,22 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     gpio_init(pin, mode);
     gpio_init_mux(pin, GPIO_MUX_A);
 #ifdef CPU_FAM_SAMD21
+    uint32_t gclk_src;
+    if (is_enabled_gen2_xosc32()) {
+        /* use XOSC32 if it is enabled */
+        setup_gen2_xosc32(true);
+        gclk_src = GCLK_CLKCTRL_GEN_GCLK2;
+    }
+    else {
+        /* otherwise, use ULP 32kHZ for EIC module */
+        setup_gen3_ULP32k();
+        gclk_src = GCLK_CLKCTRL_GEN_GCLK3;
+    }
     /* enable clocks for the EIC module */
     PM->APBAMASK.reg |= PM_APBAMASK_EIC;
-    /* SAMD21 used GCLK2 which is supplied by either the ultra low power
-       internal or external 32 kHz */
     GCLK->CLKCTRL.reg = (EIC_GCLK_ID |
                          GCLK_CLKCTRL_CLKEN |
-                         GCLK_CLKCTRL_GEN_GCLK2);
+                         gclk_src);
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 #else /* CPU_FAM_SAML21 */
     /* enable clocks for the EIC module */
