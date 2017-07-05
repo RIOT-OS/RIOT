@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    boards_nucleo-l1 Nucleo-L1
- * @ingroup     boards
+ * @ingroup     boards_nucleo
  * @brief       Board specific files for the nucleo-l1 board.
  * @{
  *

@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    boards_nucleo-f030 Nucleo-F030
- * @ingroup     boards
+ * @ingroup     boards_nucleo
  * @brief       Board specific files for the nucleo-f030 board
  * @{
  *

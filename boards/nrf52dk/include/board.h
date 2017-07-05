@@ -9,10 +9,11 @@
 /**
  * @defgroup    boards_nrf52dk nRF52 DK
  * @ingroup     boards
+ * @brief       Board specific configuration for the nRF52 DK
  * @{
  *
  * @file
- * @brief       Board specific configuaration for the nRF52 DK
+ * @brief       Board specific configuration for the nRF52 DK
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Sebastian Meiling <s@mlng.net>
