@@ -1,7 +1,0 @@
-MODULE = fatfs_diskio_native
-
-FATFS_DISKIO_NATIVE_DEFAULT_FILE ?= \"riot_fatfs_disk.img\"
-
-CFLAGS += -DFATFS_DISKIO_NATIVE_DEFAULT_FILE=$(FATFS_DISKIO_NATIVE_DEFAULT_FILE)
-
-include $(RIOTBASE)/Makefile.base

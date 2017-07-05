@@ -1,10 +1,6 @@
-ifneq (,$(filter fatfs_diskio_sdcard_spi,$(USEMODULE)))
-  USEMODULE += sdcard_spi
-endif
-
-ifneq (,$(filter fatfs,$(USEPKG)))
-  USEMODULE += fatfs_diskio_common
-endif
+USEMODULE += fatfs_diskio_mtd
+USEMODULE += auto_init_storage
+USEMODULE += mtd
 
 include $(RIOTBASE)/boards/$(BOARD)/Makefile.features
 

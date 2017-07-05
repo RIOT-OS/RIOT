@@ -24,6 +24,13 @@
 
 #include "fs/fatfs.h"
 #include "vfs.h"
+#include "mtd.h"
+
+#ifdef MODULE_MTD_SDCARD
+#include "mtd_sdcard.h"
+#include "sdcard_spi.h"
+#include "sdcard_spi_params.h"
+#endif
 
 #if FATFS_FFCONF_OPT_FS_NORTC == 0
 #include "periph/rtc.h"
@@ -53,6 +60,20 @@ static vfs_mount_t _test_vfs_mount = {
     .fs = &fatfs_file_system,
     .private_data = (void *)&fatfs,
 };
+
+/* provide mtd devices for use within diskio layer of fatfs */
+mtd_dev_t *fatfs_mtd_devs[_VOLUMES];
+
+#ifdef MODULE_MTD_NATIVE
+/* mtd device for native is provided in boards/native/board_init.c */
+extern mtd_dev_t *mtd0;
+#elif MODULE_MTD_SDCARD
+#define SDCARD_SPI_NUM (sizeof(sdcard_spi_params) / sizeof(sdcard_spi_params[0]))
+extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
+mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
+/* always default to first sdcard*/
+static mtd_dev_t *mtd1 = (mtd_dev_t*)&mtd_sdcard_devs[0];
+#endif
 
 static void print_test_result(const char *test_name, int ok)
 {
@@ -116,7 +137,7 @@ static void test_rw(void)
 
     /* try to read from WO file (success if no bytes are actually read) */
     nr = vfs_read(fd, buf, sizeof(test_txt));
-    print_test_result("test_rw__read_wo", nw <= 0);
+    print_test_result("test_rw__read_wo", nr <= 0);
 
     print_test_result("test_rw__close_wo", vfs_close(fd) == 0);
 
@@ -145,7 +166,6 @@ static void test_rw(void)
                       (strncmp(&buf[sizeof(test_txt)],
                                test_txt2,
                                sizeof(test_txt2)) == 0));
-
 
     print_test_result("test_rw__close_rw", vfs_close(fd) == 0);
 
@@ -273,12 +293,27 @@ static void test_create(void)
     print_test_result("test_create__umount", vfs_umount(&_test_vfs_mount) == 0);
 }
 
-
 int main(void)
 {
-    #if FATFS_FFCONF_OPT_FS_NORTC == 0
+#if defined(BOARD_NATIVE) && (FATFS_FFCONF_OPT_FS_NORTC == 0)
     rtc_init();
-    #endif
+#endif
+
+#if MODULE_MTD_SDCARD
+    for(unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
+        mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
+        mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
+        mtd_sdcard_devs[i].params = &sdcard_spi_params[i];
+        fatfs_mtd_devs[i] = &mtd_sdcard_devs[i].base;
+        mtd_init(&mtd_sdcard_devs[i].base);
+    }
+#endif
+
+#ifdef MODULE_MTD_NATIVE
+    fatfs_mtd_devs[fatfs.vol_idx] = mtd0;
+#else
+    fatfs_mtd_devs[fatfs.vol_idx] = mtd1;
+#endif
 
     printf("Tests for FatFs over VFS - test results will be printed "
            "in the format test_name:result\n");
@@ -293,6 +328,5 @@ int main(void)
     test_create();
 
     printf("Test end.\n");
-
     return 0;
 }

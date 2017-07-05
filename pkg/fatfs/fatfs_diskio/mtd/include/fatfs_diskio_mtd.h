@@ -15,8 +15,8 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
-#ifndef FATFS_DISKIO_COMMON_H
-#define FATFS_DISKIO_COMMON_H
+#ifndef FATFS_DISKIO_MTD_H
+#define FATFS_DISKIO_MTD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,5 +41,5 @@ extern "C" {
 }
 #endif
 
-#endif /* FATFS_DISKIO_COMMON_H */
+#endif /* FATFS_DISKIO_MTD_H */
 /** @} */

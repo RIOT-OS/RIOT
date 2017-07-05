@@ -1,4 +1,4 @@
-Using FatFs on RIOT
+Using FatFs (with VFS) on RIOT
 =======================================
 
 # native
@@ -15,3 +15,6 @@ To tell RIOT where your image file is located you can use the define `MTD_NATIVE
 # Real Hardware
 
 Currently the test defaults to sdcard_spi on real hardware. But generally any device that supports the mtd-interface can be used with FatFs.
+To use the automated test in pkg_fatfs_vfs you need to copy the generated image to your storage device (e.g. your SD-card).
+To copy the image onto the card you can use something like `make image && dd if=bin/riot_fatfs_disk.img of=/dev/<your_sdcard>`.
+After that you can connect the card to your RIOT device and check the test output via terminal.
