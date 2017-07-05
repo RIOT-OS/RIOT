@@ -29,6 +29,9 @@
 #include "net/eui64.h"
 #include "net/netdev.h"
 #include "net/ieee802154.h"
+#ifdef MODULE_GNRC
+#include "net/gnrc.h"
+#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -769,6 +772,14 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
             return sizeof(uint16_t);
         case NETOPT_NID:
             return _get_panid(dev, (uint8_t *)value, max_len);
+#ifdef MODULE_GNRC
+        case NETOPT_PROTO:
+            if (max_len != sizeof(gnrc_nettype_t)) {
+                return -EOVERFLOW;
+            }
+            *((gnrc_nettype_t *)value) = XBEE_DEFAULT_PROTOCOL;
+            return sizeof(gnrc_nettype_t);
+#endif
         default:
             return -ENOTSUP;
     }
