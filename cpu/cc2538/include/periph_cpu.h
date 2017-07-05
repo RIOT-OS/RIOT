@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2016 Freie Universität Berlin
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,19 +8,21 @@
  */
 
 /**
- * @ingroup         cpu_cc2538
+ * @ingroup     cpu_cc2538
  * @{
  *
  * @file
- * @brief           CPU specific definitions for internal peripheral handling
+ * @brief       CPU specific definitions for internal peripheral handling
  *
- * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 #include "cpu.h"
 
@@ -45,12 +48,103 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
+ * @name Internal GPIO shift and masking
+ * @{
+ */
+#define PORTNUM_MASK        (0x00007000)    /**< bit mask for GPIO port [0-3] */
+#define PORTNUM_SHIFT       (12U)           /**< bit shift for GPIO port      */
+#define PIN_MASK            (0x00000007)    /**< bit mask for GPIO pin [0-7]  */
+#define GPIO_MASK           (0xfffff000)    /**< bit mask for GPIO port addr  */
+/** @} */
+
+/**
  * @brief   Define a custom GPIO_PIN macro
  *
  * For the CC2538, we use OR the gpio ports base register address with the
  * actual pin number.
  */
-#define GPIO_PIN(port, pin) (gpio_t)(((uint32_t)GPIO_A + (port << 12)) | pin)
+#define GPIO_PIN(port, pin) (gpio_t)(((uint32_t)GPIO_A + \
+                                      (port << PORTNUM_SHIFT)) | pin)
+
+/**
+ * @brief Access GPIO low-level device
+ *
+ * @param[in] pin   gpio pin
+ *
+ * @return          pointer to gpio low level device address
+ */
+static inline cc2538_gpio_t *gpio(gpio_t pin)
+{
+    return (cc2538_gpio_t *)(pin & GPIO_MASK);
+}
+
+/**
+ * @brief   Helper function to get port number for gpio pin
+ *
+ * @param[in] pin   gpio pin
+ *
+ * @return          port number of gpio pin, [0=A - 3=D]
+ */
+static inline uint8_t gpio_port_num(gpio_t pin)
+{
+    return (uint8_t)((pin & PORTNUM_MASK) >> PORTNUM_SHIFT) - 1;
+}
+
+/**
+ * @brief   Helper function to get pin number for gpio pin
+ *
+ * @param[in] pin   gpio pin
+ *
+ * @return          pin number of gpio pin, [0 - 7]
+ */
+static inline uint8_t gpio_pin_num(gpio_t pin)
+{
+    return (uint8_t)(pin & PIN_MASK);
+}
+
+/**
+ * @brief   Helper function to get bit mask for gpio pin number
+ *
+ * @param[in] pin   gpio pin
+ *
+ * @return          bit mask for gpio pin number, 2^[0 - 7]
+ */
+static inline uint32_t gpio_pin_mask(gpio_t pin)
+{
+    return (1 << (pin & PIN_MASK));
+}
+
+/**
+ * @brief   Helper function to get CC2538 gpio number from port and pin
+ *
+ * @param[in] pin   gpio pin
+ *
+ * @return          number of gpio pin, [0 - 31]
+ */
+static inline uint8_t gpio_pp_num(gpio_t pin)
+{
+    return (uint8_t)((gpio_port_num(pin) * 8) + gpio_pin_num(pin));
+}
+
+/**
+ * @brief   Helper function to enable gpio hardware control
+ *
+ * @param[in] pin   gpio pin
+ */
+static inline void gpio_hw_ctrl(gpio_t pin)
+{
+    gpio(pin)->AFSEL |= gpio_pin_mask(pin);
+}
+
+/**
+ * @brief   Helper function to enable gpio software control
+ *
+ * @param[in] pin   gpio pin
+ */
+static inline void gpio_sw_ctrl(gpio_t pin)
+{
+    gpio(pin)->AFSEL &= ~gpio_pin_mask(pin);
+}
 
 /**
  * @brief   Define a custom GPIO_UNDEF value
