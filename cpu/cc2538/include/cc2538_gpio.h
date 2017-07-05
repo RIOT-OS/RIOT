@@ -32,6 +32,7 @@
 extern "C" {
 #endif
 
+#if 0 /* USE RIOT GPIO API */
 /**
  * @name Numeric representation of the four GPIO ports
  * @{
@@ -189,6 +190,7 @@ enum {
 };
 /** @} */
 
+#endif /* USE RIOT GPIO API */
 /**
  * @brief GPIO port component registers
  */

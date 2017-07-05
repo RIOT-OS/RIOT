@@ -84,7 +84,7 @@
  *
  * @{
  */
-#define RF_SWITCH_GPIO      GPIO_PD2
+#define RF_SWITCH_GPIO      GPIO_PIN(3, 2)                  /**< GPIO_PD2 */
 #define RF_SWITCH_SUB_GHZ   gpio_set(RF_SWITCH_GPIO)
 #define RF_SWITCH_2_4_GHZ   gpio_clear(RF_SWITCH_GPIO)
 #define RF_SWITCH_TOGGLE    gpio_toggle(RF_SWITCH_GPIO)
@@ -94,8 +94,8 @@
  * @name Shutdown enable/done pins
  * @{
  */
-#define SHUTDOWN_DONE_GPIO  GPIO_PD0
-#define SHUTDOWN_EN_GPIO    GPIO_PD1
+#define SHUTDOWN_DONE_GPIO  GPIO_PIN(3, 0)                  /**< GPIO_PD0 */
+#define SHUTDOWN_EN_GPIO    GPIO_PIN(3, 1)                  /**< GPIO_PD1 */
 /** @} */
 
 /**
@@ -103,13 +103,13 @@
  * @{
  */
 #define CC1200_SPI_DEV      SSI0
-#define CC1200_MOSI_GPIO    GPIO_PB1
-#define CC1200_MISO_GPIO    GPIO_PB3
-#define CC1200_SCLK_GPIO    GPIO_PB2
-#define CC1200_CSN_GPIO     GPIO_PB5
-#define CC1200_RESET_GPIO   GPIO_PC7
-#define CC1200_GPD0_GPIO    GPIO_PB4
-#define CC1200_GPD2_GPIO    GPIO_PB0
+#define CC1200_MOSI_GPIO    GPIO_PIN(1, 1)                  /**< GPIO_PB1 */
+#define CC1200_MISO_GPIO    GPIO_PIN(1, 3)                  /**< GPIO_PB3 */
+#define CC1200_SCLK_GPIO    GPIO_PIN(1, 2)                  /**< GPIO_PB2 */
+#define CC1200_CSN_GPIO     GPIO_PIN(1, 5)                  /**< GPIO_PB5 */
+#define CC1200_RESET_GPIO   GPIO_PIN(2, 7)                  /**< GPIO_PC7 */
+#define CC1200_GPD0_GPIO    GPIO_PIN(1, 4)                  /**< GPIO_PB4 */
+#define CC1200_GPD2_GPIO    GPIO_PIN(1, 0)                  /**< GPIO_PB0 */
 /** @} */
 
 /**

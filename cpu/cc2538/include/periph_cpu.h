@@ -54,6 +54,7 @@ typedef uint32_t gpio_t;
 #define PORTNUM_SHIFT       (12U)           /**< bit shift for GPIO port      */
 #define PIN_MASK            (0x00000007)    /**< bit mask for GPIO pin [0-7]  */
 #define GPIO_MASK           (0xfffff000)    /**< bit mask for GPIO port addr  */
+#define GPIO_BITS_PER_PORT  (8U)            /**< number of GPIO pins per port */
 /** @} */
 
 /**

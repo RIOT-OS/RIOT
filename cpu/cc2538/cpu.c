@@ -21,6 +21,7 @@
 
 #include "cpu.h"
 #include "periph/init.h"
+#include "periph/gpio.h"
 
 #define BIT(n)          ( 1UL << (n) )
 
@@ -68,24 +69,27 @@ static void cpu_clock_init(void)
 
 #if SYS_CTRL_OSC32K_USE_XTAL
     /* Set the XOSC32K_Q pads to analog for the external crystal: */
-    gpio_software_control(GPIO_PD6);
-    gpio_dir_input(GPIO_PD6);
-    IOC_PXX_OVER[GPIO_PD6] = IOC_OVERRIDE_ANA;
+    gpio_t pd6 = GPIO_PIN(3, 6);
+    gpio_sw_ctrl(pd6);
+    gpio_init(pd6, GPIO_IN);
+    IOC_PXX_OVER[gpio_pp_num(pd6)] = IOC_OVERRIDE_ANA;
 
-    gpio_software_control(GPIO_PD7);
-    gpio_dir_input(GPIO_PD7);
-    IOC_PXX_OVER[GPIO_PD7] = IOC_OVERRIDE_ANA;
+    gpio_t pd7 = GPIO_PIN(3, 7);
+    gpio_sw_ctrl(pd7);
+    gpio_init(pd7, GPIO_IN);
+    IOC_PXX_OVER[gpio_pp_num(pd7)] = IOC_OVERRIDE_ANA;
 #endif
 
     /* Configure the clock settings: */
     SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRL = CLOCK_CTRL_VALUE;
 
     /* Wait for the new clock settings to take effect: */
-    while ((SYS_CTRL->cc2538_sys_ctrl_clk_sta.CLOCK_STA ^ CLOCK_CTRL_VALUE) & CLOCK_STA_MASK);
+    while ((SYS_CTRL->cc2538_sys_ctrl_clk_sta.CLOCK_STA ^ CLOCK_CTRL_VALUE) &
+           CLOCK_STA_MASK) {}
 
 #if SYS_CTRL_OSC32K_USE_XTAL
     /* Wait for the 32-kHz crystal oscillator to stabilize: */
-    while ( SYS_CTRL->cc2538_sys_ctrl_clk_sta.CLOCK_STAbits.SYNC_32K);
-    while (!SYS_CTRL->cc2538_sys_ctrl_clk_sta.CLOCK_STAbits.SYNC_32K);
+    while ( SYS_CTRL->cc2538_sys_ctrl_clk_sta.CLOCK_STAbits.SYNC_32K) {}
+    while (!SYS_CTRL->cc2538_sys_ctrl_clk_sta.CLOCK_STAbits.SYNC_32K) {}
 #endif
 }
