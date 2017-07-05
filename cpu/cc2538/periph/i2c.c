@@ -26,18 +26,20 @@
 
 #include "mutex.h"
 #include "cpu.h"
+#include "periph/gpio.h"
 #include "periph/i2c.h"
-#include "thread.h"
 #ifdef MODULE_XTIMER
 #include "xtimer.h"
-#endif
+#else
+#include "thread.h"
 #include "timex.h" /* for US_PER_SEC */
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* guard this file in case no I2C device is defined */
-#if I2C_NUMOF
+#ifdef I2C_NUMOF
 
 #ifndef I2C_0_SCL_PIN
 #define I2C_0_SCL_PIN i2c_config[I2C_0].scl_pin
@@ -87,7 +89,7 @@ static mutex_t i2c_wait_mutex = MUTEX_INIT;
 static uint32_t speed_hz;
 static uint32_t scl_delay;
 
-#define bus_quiet()            ( cc2538_gpio_read(I2C_0_SCL_PIN) && cc2538_gpio_read(I2C_0_SDA_PIN) )
+#define bus_quiet()     (gpio_read(I2C_0_SCL_PIN) && gpio_read(I2C_0_SDA_PIN))
 #define WARN_IF(cond) \
         if (cond) { \
             DEBUG("%s at %s:%u\n", #cond, RIOT_FILE_NOPATH, __LINE__); \
@@ -101,22 +103,22 @@ static void i2cm_ctrl_write(uint_fast8_t value) {
 }
 
 static void assert_scl(void) {
-    cc2538_gpio_clear(I2C_0_SCL_PIN);
-    IOC_PXX_OVER[I2C_0_SCL_PIN] |= IOC_OVERRIDE_OE;
-    gpio_dir_output(I2C_0_SCL_PIN);
-    gpio_software_control(I2C_0_SCL_PIN);
+    gpio_clear(I2C_0_SCL_PIN);
+    IOC_PXX_OVER[gpio_pp_num(I2C_0_SCL_PIN)] |= IOC_OVERRIDE_OE;
+    gpio_init(I2C_0_SCL_PIN, GPIO_OUT);
+    gpio_sw_ctrl(I2C_0_SCL_PIN);
 }
 
 static void release_scl(void) {
-    IOC_PXX_OVER[I2C_0_SCL_PIN] &= ~(IOC_OVERRIDE_OE | IOC_OVERRIDE_PDE);
-    gpio_dir_input(I2C_0_SCL_PIN);
-    gpio_software_control(I2C_0_SCL_PIN);
+    IOC_PXX_OVER[gpio_pp_num(I2C_0_SCL_PIN)] &= ~(IOC_OVERRIDE_OE | IOC_OVERRIDE_PDE);
+    gpio_init(I2C_0_SCL_PIN, GPIO_IN);
+    gpio_sw_ctrl(I2C_0_SCL_PIN);
 }
 
 static void release_sda(void) {
-    IOC_PXX_OVER[I2C_0_SDA_PIN] &= ~(IOC_OVERRIDE_OE | IOC_OVERRIDE_PDE);
-    gpio_dir_input(I2C_0_SDA_PIN);
-    gpio_software_control(I2C_0_SDA_PIN);
+    IOC_PXX_OVER[gpio_pp_num(I2C_0_SDA_PIN)] &= ~(IOC_OVERRIDE_OE | IOC_OVERRIDE_PDE);
+    gpio_init(I2C_0_SDA_PIN, GPIO_IN);
+    gpio_sw_ctrl(I2C_0_SDA_PIN);
 }
 
 static void recover_i2c_bus(void) {
@@ -156,8 +158,8 @@ static void recover_i2c_bus(void) {
     }
 
     /* Return to hardware mode for the I2C pins */
-    gpio_hardware_control(I2C_0_SCL_PIN);
-    gpio_hardware_control(I2C_0_SDA_PIN);
+    gpio_hw_ctrl(I2C_0_SCL_PIN);
+    gpio_hw_ctrl(I2C_0_SDA_PIN);
 }
 
 #ifdef MODULE_XTIMER
@@ -232,17 +234,17 @@ void cc2538_i2c_init_master(uint32_t speed_hz)
     SYS_CTRL_SRI2C &= ~1;
 
     /* Clear all pin override flags except PUE (Pull-Up Enable) */
-    IOC_PXX_OVER[I2C_0_SCL_PIN] &= IOC_OVERRIDE_PUE;
-    IOC_PXX_OVER[I2C_0_SDA_PIN] &= IOC_OVERRIDE_PUE;
+    IOC_PXX_OVER[gpio_pp_num(I2C_0_SCL_PIN)] &= IOC_OVERRIDE_PUE;
+    IOC_PXX_OVER[gpio_pp_num(I2C_0_SDA_PIN)] &= IOC_OVERRIDE_PUE;
 
-    IOC_PXX_SEL[I2C_0_SCL_PIN] = I2C_CMSSCL;
-    IOC_PXX_SEL[I2C_0_SDA_PIN] = I2C_CMSSDA;
+    IOC_PXX_SEL[gpio_pp_num(I2C_0_SCL_PIN)] = I2C_CMSSCL;
+    IOC_PXX_SEL[gpio_pp_num(I2C_0_SDA_PIN)] = I2C_CMSSDA;
 
-    IOC_I2CMSSCL = I2C_0_SCL_PIN;
-    IOC_I2CMSSDA = I2C_0_SDA_PIN;
+    IOC_I2CMSSCL = gpio_pp_num(I2C_0_SCL_PIN);
+    IOC_I2CMSSDA = gpio_pp_num(I2C_0_SDA_PIN);
 
-    gpio_hardware_control(I2C_0_SCL_PIN);
-    gpio_hardware_control(I2C_0_SDA_PIN);
+    gpio_hw_ctrl(I2C_0_SCL_PIN);
+    gpio_hw_ctrl(I2C_0_SDA_PIN);
 
     /* Initialize the I2C master by setting the Master Function Enable bit */
     I2CM_CR |= MFE;
