@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Loci Controls Inc.
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,14 +9,14 @@
 
 /**
  * @ingroup     cpu_cc2538
- * @ingroup     drivers_periph
+ * @ingroup     drivers_periph_i2c
  * @{
  *
  * @file
  * @brief       Low-level I2C driver implementation
  *
  * @author      Ian Martin <ian@locicontrols.com>
- *
+ * @author      Sebastian Meiling <s@mlng.net>
  * @}
  */
 
@@ -41,20 +42,19 @@
 /* guard this file in case no I2C device is defined */
 #ifdef I2C_NUMOF
 
-#ifndef I2C_0_SCL_PIN
+#if I2C_0_EN
 #define I2C_0_SCL_PIN i2c_config[I2C_0].scl_pin
-#endif
-
-#ifndef I2C_0_SDA_PIN
 #define I2C_0_SDA_PIN i2c_config[I2C_0].sda_pin
+#else
+#error "I2C_0_EN not set!"
 #endif
 
 #undef BIT
 #define BIT(n)     ( 1 << (n) )
 
 /* Standard I2C Parameters */
-#define DATA_BITS  8
-#define ACK_BITS   1
+#define DATA_BITS  (8U)
+#define ACK_BITS   (1U)
 
 /* I2CM_DR Bits */
 #define RS         BIT(0)
@@ -89,13 +89,17 @@ static mutex_t i2c_wait_mutex = MUTEX_INIT;
 static uint32_t speed_hz;
 static uint32_t scl_delay;
 
-#define bus_quiet()     (gpio_read(I2C_0_SCL_PIN) && gpio_read(I2C_0_SDA_PIN))
 #define WARN_IF(cond) \
         if (cond) { \
             DEBUG("%s at %s:%u\n", #cond, RIOT_FILE_NOPATH, __LINE__); \
         }
 
-void cc2538_i2c_init_master(uint32_t speed_hz);
+static void cc2538_i2c_init_master(uint32_t speed_hz);
+
+static inline bool bus_quiet(void)
+{
+    return (gpio_read(I2C_0_SCL_PIN) && gpio_read(I2C_0_SDA_PIN));
+}
 
 static void i2cm_ctrl_write(uint_fast8_t value) {
     WARN_IF(I2CM_STAT & BUSY);
@@ -153,7 +157,8 @@ static void recover_i2c_bus(void) {
         }
 
         if (n >= try_limit) {
-            DEBUG("%s(): Failed to release SDA after%4u SCL pulses.\n", __FUNCTION__, n);
+            DEBUG("%s(): Failed to release SDA after%4u SCL pulses.\n",
+                  __FUNCTION__, n);
         }
     }
 
@@ -312,32 +317,22 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     return 0;
 }
 
-int i2c_init_slave(i2c_t dev, uint8_t address)
-{
-    /* Slave mode is not (yet) supported. */
-    return -1;
-}
-
 int i2c_acquire(i2c_t dev)
 {
-    if (dev == I2C_0) {
-        mutex_lock(&mutex);
-        return 0;
-    }
-    else {
+    if (dev != I2C_0) {
         return -1;
     }
+    mutex_lock(&mutex);
+    return 0;
 }
 
 int i2c_release(i2c_t dev)
 {
-    if (dev == I2C_0) {
-        mutex_unlock(&mutex);
-        return 0;
-    }
-    else {
+    if (dev != I2C_0) {
         return -1;
     }
+    mutex_unlock(&mutex);
+    return 0;
 }
 
 static bool i2c_busy(void) {
@@ -521,7 +516,9 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
     uint_fast8_t flags = START | RUN;
 
     for (n = 0; n < length; n++) {
-        if (n >= length - 1) flags |= STOP;
+        if (n >= length - 1) {
+            flags |= STOP;
+        }
         WARN_IF(I2CM_STAT & BUSY);
         I2CM_DR = my_data[n];
         i2c_ctrl_blocking(flags);
@@ -582,7 +579,7 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
     I2CM_SA = address << 1;
     I2CM_DR = reg;
 
-    uint_fast8_t flags = (length > 0)? (START | RUN) : (STOP | START | RUN);
+    uint_fast8_t flags = (length > 0) ? (START | RUN) : (STOP | START | RUN);
     stat = i2c_ctrl_blocking(flags);
 
     if (stat & ARBLST) {
@@ -599,7 +596,10 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
         flags &= ~START;
 
         for (n = 0; n < length; n++) {
-            if (n >= length - 1) flags |= STOP;
+            if (n >= length - 1) {
+                flags |= STOP;
+            }
+
             WARN_IF(I2CM_STAT & BUSY);
             I2CM_DR = my_data[n];
 
@@ -620,17 +620,8 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
         }
 
         if (n < length) {
-            DEBUG(
-                "%s(%u, %u, %u, %p, %u): %u/%u bytes delivered.\n",
-                __FUNCTION__,
-                dev,
-                address,
-                reg,
-                data,
-                length,
-                n,
-                length
-            );
+            DEBUG("%s(%u, %u, %u, %p, %u): %u/%u bytes delivered.\n",
+                  __FUNCTION__, dev, address, reg, data, length, n, length);
         }
 
         return n;
