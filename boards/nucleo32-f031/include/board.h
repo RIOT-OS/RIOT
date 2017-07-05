@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    boards_nucleo32-f031 Nucleo32-F031
- * @ingroup     boards
+ * @ingroup     boards_nucleo
  * @brief       Board specific files for the nucleo32-f031 board
  * @{
  *

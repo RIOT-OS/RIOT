@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    boards_nucleo144-f413 Nucleo-F413
- * @ingroup     boards
+ * @ingroup     boards_nucleo
  * @brief       Board specific files for the nucleo144-f413 board
  * @{
  *
