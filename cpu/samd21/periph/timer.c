@@ -44,8 +44,8 @@ static inline void _irq_enable(tim_t dev);
  */
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    /* at the moment, the timer can only run at 1MHz */
-    if (freq != 1000000ul) {
+    /* at the moment, the timer can only run at 1MHz or 32kHz */
+    if (freq != 1000000ul && freq != 32768) {
         return -1;
     }
 
@@ -59,11 +59,25 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     while (GCLK->STATUS.bit.SYNCBUSY) {}
     /* TC4 and TC5 share the same channel */
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
+#elif CLOCK_USE_OSCULP32_DFLL
+#if CLOCK_8MHZ
+    /* configure GCLK1 (configured to 1MHz) to feed TC3, TC4 and TC5 */;
+    GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
+#endif
+#if GEN2_ULP32K
+    /* configure GCLK2 as the source (32kHz)*/
+    GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK2 | GCLK_CLKCTRL_ID(RTC_GCLK_ID));
+#endif
+#else
+#if GEN2_ULP32K
+    /* configure GCLK2 as the source (32kHz)*/
+    GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK2 | GCLK_CLKCTRL_ID(RTC_GCLK_ID));
 #else
     /* configure GCLK0 to feed TC3, TC4 and TC5 */;
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC3_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
     /* TC4 and TC5 share the same channel */
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
+#endif
 #endif
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 
@@ -79,7 +93,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         while (TIMER_0_DEV.CTRLA.bit.SWRST) {}
         /* choosing 16 bit mode */
         TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT16_Val;
-#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
+#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL || CLOCK_USE_OSCULP32_DFLL
         /* PLL/DFLL: sourced by 1MHz and prescaler 1 to reach 1MHz */
         TIMER_0_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1_Val;
 #else
@@ -103,7 +117,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
 
         TIMER_1_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
-#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
+#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL || CLOCK_USE_OSCULP32_DFLL
         /* PLL/DFLL: sourced by 1MHz and prescaler 1 to reach 1MHz */
         TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1_Val;
 #else
@@ -112,6 +126,17 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 #endif
         /* choose normal frequency operation */
         TIMER_1_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
+        break;
+#endif
+#if TIMER_2_EN
+    case TIMER_2:
+        PM->APBAMASK.reg |= PM_APBAMASK_RTC;
+        /* reset timer */
+        TIMER_2_DEV.CTRL.bit.SWRST = 1;
+        while (TIMER_2_DEV.CTRL.bit.SWRST) {}
+        /* Configure RTT as 32bit counter with no prescaler (32.768kHz) no clear on match compare */
+        TIMER_2_DEV.CTRL.reg = (RTC_MODE0_CTRL_MODE_COUNT32 | RTC_MODE0_CTRL_PRESCALER_DIV1);
+        while (GCLK->STATUS.bit.SYNCBUSY) {}
         break;
 #endif
     case TIMER_UNDEFINED:
@@ -131,11 +156,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    return timer_set_absolute(dev, channel, timer_read(dev) + timeout);
-}
-
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
     DEBUG("Setting timer %i channel %i to %i\n", dev, channel, value);
@@ -147,12 +167,12 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         /* set timeout value */
         switch (channel) {
         case 0:
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_0_DEV.CC[0].reg = value;
             TIMER_0_DEV.INTENSET.bit.MC0 = 1;
             break;
         case 1:
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_0_DEV.CC[1].reg = value;
             TIMER_0_DEV.INTENSET.bit.MC1 = 1;
             break;
@@ -166,18 +186,25 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         /* set timeout value */
         switch (channel) {
         case 0:
-            TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_1_DEV.CC[0].reg = value;
             TIMER_1_DEV.INTENSET.bit.MC0 = 1;
             break;
         case 1:
-            TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_1_DEV.CC[1].reg = value;
             TIMER_1_DEV.INTENSET.bit.MC1 = 1;
             break;
         default:
             return -1;
         }
+        break;
+#endif
+#if TIMER_2_EN
+    case TIMER_2:
+        TIMER_2_DEV.INTFLAG.reg |= RTC_MODE0_INTFLAG_CMP0;
+        TIMER_2_DEV.COMP[0].reg = value;
+        TIMER_2_DEV.INTENSET.bit.CMP0 = 1;
         break;
 #endif
     case TIMER_UNDEFINED:
@@ -196,11 +223,11 @@ int timer_clear(tim_t dev, int channel)
     case TIMER_0:
         switch (channel) {
         case 0:
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_0_DEV.INTENCLR.bit.MC0 = 1;
             break;
         case 1:
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_0_DEV.INTENCLR.bit.MC1 = 1;
             break;
         default:
@@ -212,16 +239,22 @@ int timer_clear(tim_t dev, int channel)
     case TIMER_1:
         switch (channel) {
         case 0:
-            TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_1_DEV.INTENCLR.bit.MC0 = 1;
             break;
         case 1:
-            TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_1_DEV.INTENCLR.bit.MC1 = 1;
             break;
         default:
             return -1;
         }
+        break;
+#endif
+#if TIMER_2_EN
+    case TIMER_2:
+        TIMER_2_DEV.INTFLAG.reg |= RTC_MODE0_INTFLAG_CMP0;
+        TIMER_2_DEV.INTENSET.bit.CMP0 = 1;
         break;
 #endif
     case TIMER_UNDEFINED:
@@ -249,6 +282,13 @@ unsigned int timer_read(tim_t dev)
         while (TIMER_1_DEV.STATUS.bit.SYNCBUSY) {}
         return TIMER_1_DEV.COUNT.reg;
 #endif
+#if TIMER_2_EN
+    case TIMER_2:
+        /* request syncronisation */
+        TIMER_2_DEV.READREQ.reg = RTC_READREQ_RREQ | RTC_READREQ_ADDR(0x10);
+        while (TIMER_2_DEV.STATUS.bit.SYNCBUSY) {}
+        return TIMER_2_DEV.COUNT.reg;
+#endif
     default:
         return 0;
     }
@@ -269,6 +309,12 @@ void timer_stop(tim_t dev)
             TIMER_1_DEV.CTRLA.bit.ENABLE = 0;
             break;
 #endif
+#if TIMER_2_EN
+        case TIMER_2:
+            TIMER_2_DEV.CTRL.bit.ENABLE = 0;
+            while (TIMER_2_DEV.STATUS.bit.SYNCBUSY) {}
+            break;
+#endif
         case TIMER_UNDEFINED:
             break;
     }
@@ -285,6 +331,12 @@ void timer_start(tim_t dev)
 #if TIMER_1_EN
         case TIMER_1:
             TIMER_1_DEV.CTRLA.bit.ENABLE = 1;
+            break;
+#endif
+#if TIMER_2_EN
+        case TIMER_2:
+            TIMER_2_DEV.CTRL.bit.ENABLE = 1;
+            while (TIMER_2_DEV.STATUS.bit.SYNCBUSY) {}
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -305,6 +357,11 @@ static inline void _irq_enable(tim_t dev)
             NVIC_EnableIRQ(TC4_IRQn);
             break;
 #endif
+#if TIMER_2_EN
+        case TIMER_2:
+            NVIC_EnableIRQ(RTT_IRQ);
+            break;
+#endif
         case TIMER_UNDEFINED:
             break;
     }
@@ -315,14 +372,14 @@ void TIMER_0_ISR(void)
 {
     if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
         if(config[TIMER_0].cb) {
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
             config[TIMER_0].cb(config[TIMER_0].arg, 0);
         }
     }
     else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
         if(config[TIMER_0].cb) {
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_0].cb(config[TIMER_0].arg, 1);
         }
@@ -338,14 +395,14 @@ void TIMER_1_ISR(void)
 {
     if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
         if (config[TIMER_1].cb) {
-            TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
             config[TIMER_1].cb(config[TIMER_1].arg, 0);
         }
     }
     else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
         if(config[TIMER_1].cb) {
-            TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_1].cb(config[TIMER_1].arg, 1);
         }
@@ -354,3 +411,27 @@ void TIMER_1_ISR(void)
     cortexm_isr_end();
 }
 #endif /* TIMER_1_EN */
+
+
+#if TIMER_2_EN
+void TIMER_2_ISR(void)
+{
+    if ( TIMER_2_DEV.INTFLAG.bit.CMP0 && TIMER_2_DEV.INTENSET.bit.CMP0 ) {
+        if (config[TIMER_2].cb) {
+            TIMER_2_DEV.INTFLAG.reg |= RTC_MODE0_INTFLAG_CMP0;
+            TIMER_2_DEV.INTENCLR.reg = RTC_MODE0_INTENCLR_CMP0;
+            config[TIMER_2].cb(config[TIMER_2].arg, 0);
+        }
+    }
+
+    if ( TIMER_2_DEV.INTFLAG.bit.OVF && TIMER_2_DEV.INTENSET.bit.OVF ) {
+        if (config[TIMER_2].cb) {
+            TIMER_2_DEV.INTFLAG.reg |= RTC_MODE0_INTFLAG_OVF;
+            TIMER_2_DEV.INTENCLR.reg = RTC_MODE0_INTENCLR_OVF;
+            config[TIMER_2].cb(config[TIMER_2].arg, 0);
+        }
+    }
+
+    cortexm_isr_end();
+}
+#endif /* TIMER_2_EN */
