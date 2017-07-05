@@ -1,3 +1,3 @@
-MODULE = fatfs_diskio_common
+MODULE = fatfs_diskio_mtd
 
 include $(RIOTBASE)/Makefile.base

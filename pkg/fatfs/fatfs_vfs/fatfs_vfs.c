@@ -88,46 +88,44 @@ static int _umount(vfs_mount_t *mountp)
 
 static int _unlink(vfs_mount_t *mountp, const char *name)
 {
-    char fatfs_abs_path[FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1];
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
 
-    snprintf(fatfs_abs_path, sizeof(fatfs_abs_path), "%d:/%s",
+    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
              fs_desc->vol_idx, name);
 
-    return fatfs_err_to_errno(f_unlink(fatfs_abs_path));
+    return fatfs_err_to_errno(f_unlink(fs_desc->abs_path_str_buff));
 }
 
 static int _rename(vfs_mount_t *mountp, const char *from_path,
                    const char *to_path)
 {
-    char fatfs_abs_path_f[FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1];
-    char fatfs_abs_path_t[FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1];
+    char fatfs_abs_path_to[FATFS_MAX_ABS_PATH_SIZE];
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
 
-    snprintf(fatfs_abs_path_f, sizeof(fatfs_abs_path_f), "%d:/%s",
+    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
              fs_desc->vol_idx, from_path);
 
-    snprintf(fatfs_abs_path_t, sizeof(fatfs_abs_path_t), "%d:/%s",
+    snprintf(fatfs_abs_path_to, sizeof(fatfs_abs_path_to), "%d:/%s",
              fs_desc->vol_idx, to_path);
 
-    return fatfs_err_to_errno(f_rename(fatfs_abs_path_f, fatfs_abs_path_t));
+    return fatfs_err_to_errno(f_rename(fs_desc->abs_path_str_buff,
+                                       fatfs_abs_path_to));
 }
 
 static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
                  const char *abs_path)
 {
     fatfs_file_desc_t *fd = (fatfs_file_desc_t *)&filp->private_data.buffer[0];
-    char fatfs_abs_path[FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1];
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)filp->mp->private_data;
-    snprintf(fatfs_abs_path, sizeof(fatfs_abs_path), "%d:/%s", fs_desc->vol_idx,
-             name);
+    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
+             fs_desc->vol_idx, name);
 
     (void) abs_path;
     (void) mode; /* fatfs can't use mode param with f_open*/
     DEBUG("fatfs_vfs.c: _open: private_data = %p, name = %s; flags = 0x%x\n",
           filp->mp->private_data, name, flags);
 
-    strncpy(fd->fname, fatfs_abs_path, VFS_NAME_MAX);
+    strncpy(fd->fname, fs_desc->abs_path_str_buff, VFS_NAME_MAX);
 
     uint8_t fatfs_flags = 0;
 
@@ -153,7 +151,9 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
         fatfs_flags |= FA_OPEN_EXISTING;
     }
 
-    FRESULT open_resu = f_open(&fd->file, fatfs_abs_path, fatfs_flags);
+    FRESULT open_resu = f_open(&fd->file, fs_desc->abs_path_str_buff,
+                               fatfs_flags);
+
     if (open_resu == FR_OK) {
         DEBUG("[OK]");
     }
@@ -247,17 +247,16 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
 static int _fstat(vfs_file_t *filp, struct stat *buf)
 {
     fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
-    char fatfs_abs_path[FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1];
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)filp->mp->private_data;
     FILINFO fi;
     FRESULT res;
 
-    snprintf(fatfs_abs_path, sizeof(fatfs_abs_path), "%d:/%s", fs_desc->vol_idx,
-             fd->fname);
+    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
+             fs_desc->vol_idx, fd->fname);
 
     memset(buf, 0, sizeof(*buf));
 
-    res = f_stat(fatfs_abs_path, &fi);
+    res = f_stat(fs_desc->abs_path_str_buff, &fi);
 
     if (res != FR_OK) {
         return fatfs_err_to_errno(res);
@@ -266,11 +265,11 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
     buf->st_size = fi.fsize;
 
     /* set last modification timestamp */
-    #ifdef SYS_STAT_H_
+#ifdef SYS_STAT_H
     _fatfs_time_to_timespec(fi.fdate, fi.ftime, &(buf->st_mtim.tv_sec));
-    #else
+#else
     _fatfs_time_to_timespec(fi.fdate, fi.ftime, &(buf->st_mtime));
-    #endif
+#endif
 
     if (fi.fattrib & AM_DIR) {
         buf->st_mode = S_IFDIR;  /**< it's a directory */
@@ -293,14 +292,13 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
 static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
 {
     DIR *dir = (DIR *)&dirp->private_data.buffer;
-    char fatfs_abs_path[FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1];
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)dirp->mp->private_data;
     (void) abs_path;
 
-    snprintf(fatfs_abs_path, sizeof(fatfs_abs_path), "%d:/%s", fs_desc->vol_idx,
-             dirname);
+    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
+             fs_desc->vol_idx, dirname);
 
-    return fatfs_err_to_errno(f_opendir(dir, fatfs_abs_path));
+    return fatfs_err_to_errno(f_opendir(dir, fs_desc->abs_path_str_buff));
 }
 
 static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
@@ -333,23 +331,23 @@ static int _closedir(vfs_DIR *dirp)
 
 static int _mkdir (vfs_mount_t *mountp, const char *name, mode_t mode)
 {
-    char fatfs_abs_path[FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1];
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
     (void) mode;
 
-    snprintf(fatfs_abs_path, sizeof(fatfs_abs_path), "%d:/%s", fs_desc->vol_idx,
-             name);
-    return fatfs_err_to_errno(f_mkdir(fatfs_abs_path));
+    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
+             fs_desc->vol_idx, name);
+
+    return fatfs_err_to_errno(f_mkdir(fs_desc->abs_path_str_buff));
 }
 
 static int _rmdir (vfs_mount_t *mountp, const char *name)
 {
-    char fatfs_abs_path[FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1];
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
 
-    snprintf(fatfs_abs_path, sizeof(fatfs_abs_path), "%d:/%s", fs_desc->vol_idx,
-             name);
-    return fatfs_err_to_errno(f_unlink(fatfs_abs_path));
+    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
+             fs_desc->vol_idx, name);
+
+    return fatfs_err_to_errno(f_unlink(fs_desc->abs_path_str_buff));
 }
 
 static void _fatfs_time_to_timespec(WORD fdate, WORD ftime, time_t *time)
@@ -406,11 +404,11 @@ static int fatfs_err_to_errno(int32_t err)
         case FR_EXIST:
             return -EEXIST;
         case FR_INVALID_OBJECT:
-        #ifdef EBADFD
+#ifdef EBADFD
             return -EBADFD;
-        #else
+#else
             return -EINVAL;
-        #endif
+#endif
         case FR_WRITE_PROTECTED:
             return -EACCES;
         case FR_INVALID_DRIVE:

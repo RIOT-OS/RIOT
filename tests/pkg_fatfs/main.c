@@ -21,7 +21,8 @@
 #if FATFS_FFCONF_OPT_FS_NORTC == 0
 #include "periph/rtc.h"
 #endif
-#include "fatfs_diskio_common.h"
+#include "mtd.h"
+#include "fatfs_diskio_mtd.h"
 #include "fatfs/ff.h"
 #include "shell.h"
 #include <string.h>
@@ -47,7 +48,23 @@
 #define IEC_KIBI 1024
 #define SI_KILO 1000
 
-FATFS fat_fs;        /* FatFs work area needed for each volume */
+FATFS fat_fs; /* FatFs work area needed for each volume */
+
+#ifdef MODULE_MTD_NATIVE
+/* mtd device for native is provided in boards/native/board_init.c */
+extern mtd_dev_t *mtd0;
+mtd_dev_t *fatfs_mtd_devs[1];
+#elif MODULE_MTD_SDCARD
+#include "mtd_sdcard.h"
+#include "sdcard_spi_params.h"
+#define SDCARD_SPI_NUM (sizeof(sdcard_spi_params) / sizeof(sdcard_spi_params[0]))
+/* sdcard devs are provided by sys/auto_init/storage/auto_init_sdcard_spi.c */
+extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
+mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
+mtd_dev_t *fatfs_mtd_devs[SDCARD_SPI_NUM];
+#endif
+
+#define MTD_NUM (sizeof(fatfs_mtd_devs) / sizeof(fatfs_mtd_devs[0]))
 
 static int _mount(int argc, char **argv)
 {
@@ -58,7 +75,12 @@ static int _mount(int argc, char **argv)
         return -1;
     }
 
-    vol_idx = (int)atoi(argv[1]);
+    vol_idx = atoi(argv[1]);
+
+    if (vol_idx > (int)(MTD_NUM-1)) {
+        printf("max allowed <volume_idx> is %d\n", (int)(MTD_NUM - 1));
+        return -1;
+    }
 
     char volume_str[TEST_FATFS_MAX_VOL_STR_LEN];
     sprintf(volume_str, "%d:/", vol_idx);
@@ -300,7 +322,7 @@ static int _mkfs(int argc, char **argv)
     BYTE opt;
 
     if (argc == 3) {
-        vol_idx = (int)atoi(argv[1]);
+        vol_idx = atoi(argv[1]);
 
         if (strcmp(argv[2], "fat") == 0) {
             opt = FM_FAT;
@@ -317,6 +339,11 @@ static int _mkfs(int argc, char **argv)
     }
     else {
         printf("usage: %s <volume_idx> <fat|fat32|exfat|any>\n", argv[0]);
+        return -1;
+    }
+
+    if (vol_idx > (int)(MTD_NUM - 1)) {
+        printf("max allowed <volume_idx> is %d\n", (int)(MTD_NUM - 1));
         return -1;
     }
 
@@ -371,6 +398,24 @@ int main(void)
            time.tm_min,
            time.tm_sec);
     rtc_set_time(&time);
+    #endif
+
+
+    #if MODULE_MTD_NATIVE
+    fatfs_mtd_devs[0] = mtd0;
+    #elif MODULE_MTD_SDCARD
+    for (unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
+        mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
+        mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
+        mtd_sdcard_devs[i].params = &sdcard_spi_params[i];
+        fatfs_mtd_devs[i] = &mtd_sdcard_devs[i].base;
+
+        if(mtd_init(&mtd_sdcard_devs[i].base) == 0) {
+            printf("init sdcard_mtd %u [OK]\n", i);
+        }else{
+            printf("init sdcard_mtd %u [FAILED]\n", i);
+        }
+    }
     #endif
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
