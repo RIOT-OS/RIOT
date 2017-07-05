@@ -144,6 +144,9 @@ div.toc-sm li {
 div.ingroups {
   font-size: 10pt;
 }
+div.ingroups .el::before {
+  content: " ";
+}
 div.header {
   background: none;
   border-bottom: 1px solid #eeeeee;
