@@ -73,31 +73,34 @@ void rtc_init(void)
     if (!(RCC->BDCR & RCC_BDCR_RTCEN)) {
 #endif
         rtc_poweron();
+
+        /* Unlock RTC write protection */
+        RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
+        RTC->WPR = RTC_WRITE_PROTECTION_KEY2;
+
+        /* Disable alternate function outputs */
+        RTC->TAFCR = RTC_TAFCR_TSINSEL | RTC_TAFCR_TAMPINSEL;
+
+        /* Enter RTC Init mode */
+        RTC->ISR = 0;
+        RTC->ISR |= RTC_ISR_INIT;
+        while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
+
+        /* Set 24-h clock */
+        RTC->CR &= ~RTC_CR_FMT;
+        /* Timestamps enabled */
+        RTC->CR |= RTC_CR_TSE;
+
+        /* Configure the RTC PRER */
+        RTC->PRER = RTC_SYNC_PRESCALER;
+        RTC->PRER |= (RTC_ASYNC_PRESCALER << 16);
+
+        /* Exit RTC init mode */
+        RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
+
+        /* Enable RTC write protection */
+        RTC->WPR = 0xff;
     }
-
-    /* Unlock RTC write protection */
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY2;
-
-    /* Enter RTC Init mode */
-    RTC->ISR = 0;
-    RTC->ISR |= RTC_ISR_INIT;
-    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
-
-    /* Set 24-h clock */
-    RTC->CR &= ~RTC_CR_FMT;
-    /* Timestamps enabled */
-    RTC->CR |= RTC_CR_TSE;
-
-    /* Configure the RTC PRER */
-    RTC->PRER = RTC_SYNC_PRESCALER;
-    RTC->PRER |= (RTC_ASYNC_PRESCALER << 16);
-
-    /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
-
-    /* Enable RTC write protection */
-    RTC->WPR = 0xff;
 }
 
 int rtc_set_time(struct tm *time)
