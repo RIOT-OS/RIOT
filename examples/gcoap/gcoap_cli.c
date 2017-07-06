@@ -189,7 +189,7 @@ int gcoap_cli_cmd(int argc, char **argv)
         return 0;
     }
 
-    /* find method code */
+    /* if not 'info', must be a method code */
     int code_pos = -1;
     for (size_t i = 0; i < sizeof(method_codes) / sizeof(char*); i++) {
         if (strcmp(argv[1], method_codes[i]) == 0) {
@@ -200,19 +200,31 @@ int gcoap_cli_cmd(int argc, char **argv)
         goto end;
     }
 
-    if (argc == 5 || argc == 6) {
-        if (argc == 6) {
-            gcoap_req_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, code_pos+1, argv[4]);
-            memcpy(pdu.payload, argv[5], strlen(argv[5]));
-            len = gcoap_finish(&pdu, strlen(argv[5]), COAP_FORMAT_TEXT);
+    /* parse options */
+    int apos          = 2;               /* position of address argument */
+    unsigned msg_type = COAP_TYPE_NON;
+    if (argc > apos && strcmp(argv[apos], "-c") == 0) {
+        msg_type = COAP_TYPE_CON;
+        apos++;
+    }
+
+    if (argc == apos + 3 || argc == apos + 4) {
+        gcoap_req_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, code_pos+1, argv[apos+2]);
+        if (argc == apos + 4) {
+            memcpy(pdu.payload, argv[apos+3], strlen(argv[apos+3]));
+        }
+        coap_hdr_set_type(pdu.hdr, msg_type);
+
+        if (argc == apos + 4) {
+            len = gcoap_finish(&pdu, strlen(argv[apos+3]), COAP_FORMAT_TEXT);
         }
         else {
-            len = gcoap_request(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, code_pos+1,
-                                argv[4]);
+            len = gcoap_finish(&pdu, 0, COAP_FORMAT_NONE);
         }
+
         printf("gcoap_cli: sending msg ID %u, %u bytes\n", coap_get_id(&pdu),
                (unsigned) len);
-        if (!_send(&buf[0], len, argv[2], argv[3])) {
+        if (!_send(&buf[0], len, argv[apos], argv[apos+1])) {
             puts("gcoap_cli: msg send failed");
         }
         else {
@@ -236,8 +248,10 @@ int gcoap_cli_cmd(int argc, char **argv)
         return 0;
     }
     else {
-        printf("usage: %s <get|post|put> <addr> <port> <path> [data]\n",
+        printf("usage: %s <get|post|put> [-c] <addr> <port> <path> [data]\n",
                argv[0]);
+        printf("Options\n");
+        printf("    -c  Send confirmably (defaults to non-confirmable)\n");
         return 1;
     }
 
