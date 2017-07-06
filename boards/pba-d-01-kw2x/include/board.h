@@ -32,28 +32,14 @@ extern "C"
 #endif
 
 /**
- * @name    LED pin definitions and handlers
+ * @name    LED pin definitions
  * @{
  */
 #define LED0_PIN            GPIO_PIN(PORT_D, 6)
 #define LED1_PIN            GPIO_PIN(PORT_D, 4)
 #define LED2_PIN            GPIO_PIN(PORT_A, 4)
 
-#define LED0_MASK           (1 << 6)
-#define LED1_MASK           (1 << 4)
-#define LED2_MASK           (1 << 4)
-
-#define LED0_ON            (GPIOD->PCOR = LED0_MASK)
-#define LED0_OFF           (GPIOD->PSOR = LED0_MASK)
-#define LED0_TOGGLE        (GPIOD->PTOR = LED0_MASK)
-
-#define LED1_ON            (GPIOD->PCOR = LED1_MASK)
-#define LED1_OFF           (GPIOD->PSOR = LED1_MASK)
-#define LED1_TOGGLE        (GPIOD->PTOR = LED1_MASK)
-
-#define LED2_ON            (GPIOA->PCOR = LED2_MASK)
-#define LED2_OFF           (GPIOA->PSOR = LED2_MASK)
-#define LED2_TOGGLE        (GPIOA->PTOR = LED2_MASK)
+#include "periph/led.h"
 /** @} */
 
 /**
