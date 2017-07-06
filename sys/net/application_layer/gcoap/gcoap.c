@@ -347,7 +347,7 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
 
         /* setup memo PDU from memo header */
         memo                 = &_coap_state.open_reqs[i];
-        coap_hdr_t *memo_hdr = (coap_hdr_t *) &memo->hdr_buf[0];
+        coap_hdr_t *memo_hdr = (coap_hdr_t *) &memo->msg.hdr_buf[0];
         memo_pdu.hdr         = memo_hdr;
         if (coap_get_token_len(&memo_pdu)) {
             memo_pdu.token = &memo_hdr->data[0];
@@ -379,7 +379,7 @@ static void _expire_request(gcoap_request_memo_t *memo)
         memo->state = GCOAP_MEMO_TIMEOUT;
         /* Pass response to handler */
         if (memo->resp_handler) {
-            req.hdr = (coap_hdr_t *)&memo->hdr_buf[0];   /* for reference */
+            req.hdr = (coap_hdr_t *)&memo->msg.hdr_buf[0];   /* for reference */
             memo->resp_handler(memo->state, &req, NULL);
         }
         memo->state = GCOAP_MEMO_UNUSED;
@@ -692,7 +692,8 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
     mutex_unlock(&_coap_state.lock);
 
     if (memo) {
-        memcpy(&memo->hdr_buf[0], buf, GCOAP_HEADER_MAXLEN);
+        memo->send_limit = GCOAP_SEND_LIMIT_NON;
+        memcpy(&memo->msg.hdr_buf[0], buf, GCOAP_HEADER_MAXLEN);
         memo->resp_handler = resp_handler;
 
         size_t res = sock_udp_send(&_sock, buf, len, remote);
