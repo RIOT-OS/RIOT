@@ -82,6 +82,12 @@ typedef struct {
     uint8_t ev_irqn;        /**< event IRQ */
 } i2c_conf_t;
 
+/**
+ * @brief   Override the default initial PM blocker
+ * @todo   we block all modes per default, until PM is cleanly implemented
+ */
+#define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
+
 #ifdef __cplusplus
 }
 #endif
