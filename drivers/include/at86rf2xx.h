@@ -392,17 +392,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state);
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state);
 
 /**
- * @brief   Reset the internal state machine to TRX_OFF mode.
- *
- * This will force a transition to TRX_OFF regardless of whether the transceiver
- * is currently busy sending or receiving. This function is used to get back to
- * a known state during driver initialization.
- *
- * @param[in] dev           device to operate on
- */
-void at86rf2xx_reset_state_machine(at86rf2xx_t *dev);
-
-/**
  * @brief   Convenience function for simply sending data
  *
  * @note This function ignores the PRELOADING option

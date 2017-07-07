@@ -127,9 +127,9 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
         gpio_clear(dev->params.sleep_pin);
         xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
 
-        /* update state: on some platforms, the timer behind xtimer 
-         * may be inaccurate or the radio itself may take longer 
-         * to wake up due to extra capacitance on the oscillator. 
+        /* update state: on some platforms, the timer behind xtimer
+         * may be inaccurate or the radio itself may take longer
+         * to wake up due to extra capacitance on the oscillator.
          * Spin until we are actually awake
          */
         do {
@@ -147,8 +147,8 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
     gpio_set(dev->params.reset_pin);
     xtimer_usleep(AT86RF2XX_RESET_DELAY);
 
-    /* update state: if the radio state was P_ON (initialization phase), 
-     * it remains P_ON. Otherwise, it should go to TRX_OFF 
+    /* update state: if the radio state was P_ON (initialization phase),
+     * it remains P_ON. Otherwise, it should go to TRX_OFF
      */
     do {
         dev->state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS) &
