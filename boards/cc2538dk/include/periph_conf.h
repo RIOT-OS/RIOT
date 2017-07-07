@@ -76,10 +76,10 @@ static const timer_conf_t timer_config[] = {
 #define UART_0_IRQ          UART0_IRQn
 #define UART_0_ISR          isr_uart0
 /* UART 0 pin configuration */
-#define UART_0_TX_PIN       GPIO_PA1
-#define UART_0_RX_PIN       GPIO_PA0
-#define UART_0_RTS_PIN      GPIO_PD3
-#define UART_0_CTS_PIN      GPIO_PB0
+#define UART_0_TX_PIN       GPIO_PIN(0, 1)  /**< GPIO_PA1 */
+#define UART_0_RX_PIN       GPIO_PIN(0, 0)  /**< GPIO_PA0 */
+#define UART_0_RTS_PIN      GPIO_PIN(3, 3)  /**< GPIO_PD3 */
+#define UART_0_CTS_PIN      GPIO_PIN(1, 0)  /**< GPIO_PB0 */
 
 /* UART 1 device configuration */
 #define UART_1_DEV          UART1
@@ -92,7 +92,6 @@ static const timer_conf_t timer_config[] = {
  * @name I2C configuration
  * @{
  */
-#define I2C_NUMOF               1
 #define I2C_0_EN                1
 #define I2C_IRQ_PRIO            1
 
@@ -100,15 +99,15 @@ static const timer_conf_t timer_config[] = {
 #define I2C_0_DEV               0
 #define I2C_0_IRQ               I2C_IRQn
 #define I2C_0_IRQ_HANDLER       isr_i2c
-#define I2C_0_SCL_PIN           GPIO_PA2 /* SPI_SCK on the SmartRF06 baseboard */
-#define I2C_0_SDA_PIN           GPIO_PA4 /* SPI_MOSI on the SmartRF06 baseboard */
 
-static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+static const i2c_conf_t i2c_config[] = {
     {
-        .scl_pin = GPIO_PA2, /* SPI_SCK on the SmartRF06 baseboard */
-        .sda_pin = GPIO_PA4, /* SPI_MOSI on the SmartRF06 baseboard */
+        .scl_pin = GPIO_PIN(0, 2),  /**< GPIO_PA2, SPI_SCK  on SmartRF06 */
+        .sda_pin = GPIO_PIN(0, 4)   /**< GPIO_PA4, SPI_MOSI on SmartRF06 */
     },
 };
+
+#define I2C_NUMOF               (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**
@@ -133,10 +132,10 @@ static const spi_clk_conf_t spi_clk_config[] = {
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SSI0,
-        .mosi_pin = GPIO_PA4,
-        .miso_pin = GPIO_PA5,
-        .sck_pin  = GPIO_PA2,
-        .cs_pin   = GPIO_PD0
+        .mosi_pin = GPIO_PIN(0, 4),     /**< GPIO_PA4 */
+        .miso_pin = GPIO_PIN(0, 5),     /**< GPIO_PA5 */
+        .sck_pin  = GPIO_PIN(0, 2),     /**< GPIO_PA2 */
+        .cs_pin   = GPIO_PIN(3, 0)      /**< GPIO_PD0 */
     }
 };
 

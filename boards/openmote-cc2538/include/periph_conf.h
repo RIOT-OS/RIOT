@@ -77,15 +77,14 @@ static const timer_conf_t timer_config[] = {
 #define UART_0_IRQ          UART0_IRQn
 #define UART_0_ISR          isr_uart0
 /* UART 0 pin configuration */
-#define UART_0_TX_PIN       GPIO_PA1
-#define UART_0_RX_PIN       GPIO_PA0
+#define UART_0_TX_PIN       GPIO_PIN(0, 1)  /**< GPIO_PA1 */
+#define UART_0_RX_PIN       GPIO_PIN(0, 0)  /**< GPIO_PA0 */
 /** @} */
 
 /**
  * @name    I2C configuration
  * @{
  */
-#define I2C_NUMOF               1
 #define I2C_0_EN                1
 #define I2C_IRQ_PRIO            1
 
@@ -93,15 +92,15 @@ static const timer_conf_t timer_config[] = {
 #define I2C_0_DEV               0
 #define I2C_0_IRQ               I2C_IRQn
 #define I2C_0_IRQ_HANDLER       isr_i2c
-#define I2C_0_SCL_PIN           GPIO_PB3 /* OpenBattery */
-#define I2C_0_SDA_PIN           GPIO_PB4 /* OpenBattery */
 
-static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+static const i2c_conf_t i2c_config[] = {
     {
-        .scl_pin = GPIO_PB3, /* OpenBattery */
-        .sda_pin = GPIO_PB4, /* OpenBattery */
+        .scl_pin = GPIO_PIN(1, 3),  /**< GPIO_PB3, OpenBattery */
+        .sda_pin = GPIO_PIN(1, 4)   /**< GPIO_PB4, OpenBattery */
     },
 };
+
+#define I2C_NUMOF               (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**
@@ -126,10 +125,10 @@ static const spi_clk_conf_t spi_clk_config[] = {
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SSI0,
-        .mosi_pin = GPIO_PA5,
-        .miso_pin = GPIO_PA4,
-        .sck_pin  = GPIO_PA2,
-        .cs_pin   = GPIO_PA3,
+        .mosi_pin = GPIO_PIN(0, 5),     /**< GPIO_PA5 */
+        .miso_pin = GPIO_PIN(0, 4),     /**< GPIO_PA4 */
+        .sck_pin  = GPIO_PIN(0, 2),     /**< GPIO_PA2 */
+        .cs_pin   = GPIO_PIN(0, 3)      /**< GPIO_PA3 */
     },
 };
 
