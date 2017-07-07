@@ -44,7 +44,8 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     /* initialize device descriptor */
     memcpy(&dev->params, params, sizeof(at86rf2xx_params_t));
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
-    dev->state = AT86RF2XX_STATE_SLEEP;
+    /* radio state is P_ON when first powered-on */
+    dev->state = AT86RF2XX_STATE_P_ON;
     dev->pending_tx = 0;
 }
 
