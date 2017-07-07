@@ -34,11 +34,19 @@
 
 static inline cc2538_gpio_t *gpio(gpio_t pin)
 {
-    return (cc2538_gpio_t *)(pin & GPIO_MASK);
+    if(((uint32_t)pin &GPIO_MASK) == 0){
+        uint32_t port = (pin & 0x18) >> 3;
+        return (cc2538_gpio_t*)(((uint32_t)GPIO_A)+(port << PORTNUM_SHIFT));
+    }else{
+        return (cc2538_gpio_t *)(pin & GPIO_MASK);
+    }
 }
 
 static inline int port_num(gpio_t pin)
 {
+    if(((uint32_t)pin &GPIO_MASK) == 0){
+        return ((pin & 0x18) >> 3);
+    }
     return (int)((pin & PORTNUM_MASK) >> PORTNUM_SHIFT) - 1;
 }
 
