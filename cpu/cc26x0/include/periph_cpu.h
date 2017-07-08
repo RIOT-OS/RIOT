@@ -60,12 +60,14 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
- * @brief   Timer configuration options
+ * @brief   Configuration of low-level general purpose timers
+ *
+ * @note Timers *must* be configured consecutively and in order (without gaps)
+ *       starting from GPT0, specifically if multiple timers are enabled.
  */
 typedef struct {
-    gpt_reg_t *dev; /**< the GPT base address */
-    uint8_t num; /**< number of the timer */
-    uint8_t irqn; /**< interrupt number */
+    uint8_t     cfg;    /**< timer config [16,32 Bit] */
+    uint8_t     chn;    /**< number of channels [1,2] */
 } timer_conf_t;
 
 #ifdef __cplusplus
