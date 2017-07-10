@@ -23,16 +23,16 @@ If your device is at a different I2C address than the default (0x77) you
 can build the test as follows:
 
     export CFLAGS=-DBME280_PARAM_I2C_ADDR=0x76
-    make -C tests/driver_bme280 BOARD=sodaq-autonomo
+    BOARD=sodaq-autonomo make -C tests/driver_bmx280
 
 By default, the test application is built to use the bme280 module, to build it for
-the bmp280, in the Makefile change `USEMODULE += bme280` with:
-
-    USEMODULE += bmp280
+the bmp280, add `DRIVER=bmp280` to the previous command:
 
 
+    $ DRIVER=bmp280 BOARD=sodaq-autonomo make -C tests/driver_bmx280
+
+
+For more information, see the datasheets:
 [1]: http://www.bosch-sensortec.com/en/bst/products/all_products/bme280
-
 [2]: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME280_DS001-11.pdf
-
 [3]: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001-12.pdf
