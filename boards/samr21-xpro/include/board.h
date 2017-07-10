@@ -52,6 +52,21 @@ extern "C" {
                                      .reset_pin = GPIO_PIN(PB, 15)}
 
 /**
+ * @name    SX127x configuration
+ *
+ * {spi bus, nss pin, reset pin & dioX pins}
+ */
+
+#define SX127X_PARAMS_BOARD       { .spi       = SPI_DEV(1), \
+                                    .nss_pin   = GPIO_PIN(PA, 19), \
+                                    .reset_pin = GPIO_PIN(PA, 28), \
+                                    .dio0_pin  = GPIO_PIN(PA, 13), \
+                                    .dio1_pin  = GPIO_PIN(PA, 7), \
+                                    .dio2_pin  = GPIO_PIN(PA, 6), \
+                                    .dio3_pin  = GPIO_PIN(PA, 18) }
+/**@}*/
+
+/**
  * @name    LED pin definitions and handlers
  * @{
  */
