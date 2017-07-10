@@ -1,0 +1,21 @@
+/*
+ * example
+ */
+
+#undef WOLFSSL_RIOT_OS
+#define WOLFSSL_RIOT_OS
+
+#undef NO_MAIN_DRIVER
+#define NO_MAIN_DRIVER
+
+#undef HAVE_ECC
+#define HAVE_ECC
+
+#undef TFM_TIMING_RESISTANT
+#define TFM_TIMING_RESISTANT
+
+#undef ECC_TIMING_RESISTANT
+#define ECC_TIMING_RESISTANT
+
+#undef WC_RSA_BLINDING
+#define WC_RSA_BLINDING
