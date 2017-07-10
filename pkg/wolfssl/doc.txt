@@ -1,0 +1,184 @@
+/**
+ * @defgroup pkg_wolfssl  Embedded SSL/TLS library
+ * @ingroup  pkg
+ * @ingroup  sys
+ * @brief    Provides SSL/TLS solution
+ *
+ * # Introduction
+ *
+ * This package provides an embedded SSL/TLS library specifically developed for
+ * memory-constrained devices.
+ *
+ * # License
+ *
+ * wolfSSL’s software is available under two distinct licensing models:
+ * open source and standard commercial licensing.
+ *
+ * Open Source
+ *
+ * wolfSSL (formerly CyaSSL) offers multiple products including, but not limited
+ * to:
+ *
+ * wolfSSL
+ * wolfCrypt
+ * wolfMQTT
+ * wolfSSH
+ *
+ * These software products are free software downloads and may be modified to
+ * the needs of the user as long as the user adheres to version two of the GPL
+ * License. The GPLv2 license can be found on the gnu.org website
+ * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
+ *
+ *
+ * Commercial Licensing
+ *
+ * Businesses and enterprises who wish to incorporate wolfSSL products into
+ * proprietary appliances or other commercial software products for
+ * re-distribution must license commercial versions. Commercial licenses for
+ * wolfSSL, yaSSL, and wolfCrypt are available. Licenses are generally issued
+ * for one product and include unlimited royalty-free distribution. Custom
+ * licensing terms are also available.
+ *
+ * Commercial licenses are also available for wolfMQTT and wolfSSH.
+ * Please contact licensing@wolfssl.com with inquiries.
+ *
+ * @see https://github.com/wolfssl/wolfssl.git
+ *
+ *
+ * wolfSSL is securing over 2 billion end points today and is one of the
+ * industry leading SSL/TLS/Cryptographic providers for embedded systems and the
+ * IoT space. wolfSSL is very excited to be working with the RIOT-OS team!
+ *
+ * You can easily take advantage of wolfSSL by using the following in your
+ * application Makefile:
+ *
+ * ```makefile
+ * USEPKG += wolfssl
+ * ```
+ *
+ * Don't forget to use the wolfSSL settings header in your app. This header
+ * should always be included FIRST preceding any other wolfSSL headers to
+ * ensure the correct configuration is picked up when including other wolfSSL
+ * headers:
+ *
+ * ```c
+ * #include <wolfssl/wolfcrypt/settings.h>
+ * ```
+ *
+ * FEATURES:
+ *
+ * Because wolfSSL was designed with embedded systems in mind the library is
+ * extremely modular. There are very fiew dependancies in wolfSSL Cryptographic
+ * library and we have chosen to setup the pkg makefile to allow for easy
+ * modification by developers. We chose to include the core of our library in a
+ * singular list and then seperate out the features that a developer may or may
+ * not wish to use by default. Please reference the Makefile.wolfssl in
+ * "<RIOT-root>/pkg/wolfssl" directory. wolfSSL has chosen to enable a
+ * significant portion of our wolfcrypt functionality by default and provided
+ * informative comments to explain how a feature might be enabled/disabled.
+ *
+ * Features should be controlled with the header "user_settings.h" in the root
+ * directory of the application. Since RIOT uses the "Empty Translation Unit"
+ * warning in combination with the "-Werror" flag you will need to exclude
+ * source files from your application by modifying the Makefile.wolfssl in the
+ * "<RIOT-root>/pkg/wolfssl" directory when disabling a feature or adding a
+ * feature that wolfSSL chose to leave out by default.
+ *
+ * Default ENABLED Features are:
+ * aes, arc4, asn, coding, des3, dh, dsa, hmac, md4, md5, pkcs12, pwdbased,
+ * rabbit, random, rsa, sha, sha256, signature, tfm (fast math), ecc, and memory
+ *
+ * Default DISABLED Features are:
+ * integer (normal math), misc (included inline by default), md2, pkcs7,
+ * chacha, poly1305, ripemd, sha3 (keccak), sha512, srp, hc128, idea,
+ * blake2b (sha3 runner-up IE sha3 alternative to keccak), camellia, compress,
+ * curve25519, ed25519, cmac, evp, and asm
+ *
+ * EXAMPLES:
+ *
+ * wolfSSL has provided a few examples of using this package in the RIOT
+ * examples directory. To test these do any of the following:
+ *
+ * Benchmark Example:
+ *
+ * ```makefile
+ * cd <path-to>/RIOT/examples/wolfssl_crypto_benchmark
+ * make
+ * ./bin/native/wolfssl_crypto_benchmark.elf
+ * ```
+ *
+ * Crypto Test Example:
+ *
+ * ```makefile
+ * cd <path-to>/RIOT/examples/wolfssl_crypto_test
+ * make
+ * ./bin/native/wolfssl_crypto_test.elf
+ * ```
+ *
+ * Client and Server Example(s):
+ *
+ * ```makefile
+ * cd <path-to>/RIOT/examples/wolfssl_server
+ * make
+ * ./bin/native/wolf_server.elf
+ * ```
+ *
+ * Now open a second terminal and do...
+ *
+ * ```makefile
+ * cd <path-to>/RIOT/examples/wolfssl_client
+ * make
+ * ./bin/native/wolf_client.elf
+ * ```
+ *
+ * You should see the following output:
+ *
+ * SERVER OUTPUT:
+ *
+ * ```makefile
+ * RIOT native interrupts/signals initialized.
+ * LED_RED_OFF
+ * LED_GREEN_ON
+ * RIOT native board initialized.
+ * RIOT native hardware initialization complete.
+ *
+ * main(): This is RIOT!
+ * This is the wolfSSL Server!
+ * Server is running on 127.0.0.1 and listening on port 11111
+ * Waiting for a connection...
+ * Client connected successfully
+ * Client sent a message!
+ * Client said: Hello wolfSSL Server!
+ * Sending reply to client, reply reads: I hear ya fa shizzle!
+ *
+ * Waiting for a connection...
+ * ```
+ *
+ * After the client connection the server cleans up and returns to wait for
+ * another client connection. You can kill the server with a Ctrl+C (SIG INT) or
+ * by modifying the client to send the string "shutdown" instead of
+ * "Hello wolfSSL Server!".
+ *
+ * CLIENT OUTPUT:
+ *
+ * ```makefile
+ * RIOT native interrupts/signals initialized.
+ * LED_RED_OFF
+ * LED_GREEN_ON
+ * RIOT native board initialized.
+ * RIOT native hardware initialization complete.
+ *
+ * main(): This is RIOT!
+ * Message for server: Hello wolfSSL Server!
+ * Server sent a reply!
+ * Server Response was:  I hear ya fa shizzle!
+ * ```
+ *
+ * At this point the client simply terminates and does nothing interesting.
+ *
+ * QUESTIONS / CONCERNS / FEEDBACK:
+ *
+ * For any questions, concerns, or other feedback please contact
+ * support@wolfssl.com anytime, we are always happy to help in any way we can!!
+ *
+ */
