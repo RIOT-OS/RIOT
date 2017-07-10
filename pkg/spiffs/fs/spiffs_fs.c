@@ -216,6 +216,33 @@ static int _rename(vfs_mount_t *mountp, const char *from_path, const char *to_pa
     return spiffs_err_to_errno(SPIFFS_rename(&fs_desc->fs, from_path, to_path));
 }
 
+static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statvfs *restrict buf)
+{
+    (void)path;
+    if (buf == NULL) {
+        return -EFAULT;
+    }
+    spiffs_desc_t *fs_desc = mountp->private_data;
+    memset(buf, 0, sizeof(*buf));
+
+    uint32_t total;
+    uint32_t used;
+    int32_t ret = SPIFFS_info(&fs_desc->fs, &total, &used);
+    if (ret < 0) {
+        return spiffs_err_to_errno(ret);
+    }
+
+    buf->f_bsize = sizeof(uint8_t);  /* block size */
+    buf->f_frsize = sizeof(uint8_t); /* fundamental block size */
+    buf->f_blocks = total;           /* Blocks total */
+    buf->f_bfree = total - used;     /* Blocks free */
+    buf->f_bavail = total - used;    /* Blocks available to non-privileged processes */
+    buf->f_flag = ST_NOSUID;         /* File system flags */
+    buf->f_namemax = SPIFFS_OBJ_NAME_LEN; /* Maximum file name length */
+
+    return 0;
+}
+
 static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, const char *abs_path)
 {
     spiffs_desc_t *fs_desc = filp->mp->private_data;
@@ -465,6 +492,7 @@ static const vfs_file_system_ops_t spiffs_fs_ops = {
     .umount = _umount,
     .unlink = _unlink,
     .rename = _rename,
+    .statvfs = _statvfs,
 };
 
 static const vfs_file_ops_t spiffs_file_ops = {
