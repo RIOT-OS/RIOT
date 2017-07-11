@@ -21,8 +21,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "board.h"
-#include "periph_conf.h"
+#ifdef MODULE_ONBOARD_LED
+#include "onboard_led.h"
+#endif
 
 #ifdef CLOCK_CORECLOCK
 #define DELAY_SHORT         (CLOCK_CORECLOCK / 50)
@@ -40,168 +41,33 @@ void dumb_delay(uint32_t delay)
 
 int main(void)
 {
-    int numof = 0;
-
-    /* get the number of available LED's and turn them all off*/
-#ifdef LED0_ON
-    ++numof;
-    LED0_OFF;
-#endif
-#ifdef LED1_ON
-    ++numof;
-    LED1_OFF;
-#endif
-#ifdef LED2_ON
-    ++numof;
-    LED2_OFF;
-#endif
-#ifdef LED3_ON
-    ++numof;
-    LED3_OFF;
-#endif
-#ifdef LED4_ON
-    ++numof;
-    LED4_OFF;
-#endif
-#ifdef LED5_ON
-    ++numof;
-    LED5_OFF;
-#endif
-#ifdef LED6_ON
-    ++numof;
-    LED6_OFF;
-#endif
-#ifdef LED7_ON
-    ++numof;
-    LED7_OFF;
-#endif
-
     puts("On-board LED test\n");
-    /* cppcheck-suppress knownConditionTrueFalse
-     * rationale: board-dependent ifdefs */
-    if (numof == 0) {
-        puts("NO LEDs AVAILABLE");
-    }
-    else {
-        printf("Available LEDs: %i\n\n", numof);
-        puts("Will now light up each LED once short and twice long in a loop");
+
+#ifndef MODULE_ONBOARD_LED
+
+    puts("No on-board LED(s) available");
+
+#else
+
+    printf("Available LEDs: %u\n\n", LED_NUMOF);
+    puts("Will now light up each LED once short and twice long in a loop");
+
+    for (unsigned i = 0; i < LED_NUMOF; i++) {
+        onboard_led_on(i);
+        dumb_delay(DELAY_LONG);
+        onboard_led_off(i);
+        dumb_delay(DELAY_LONG);
+        onboard_led_toggle(i);
+        dumb_delay(DELAY_SHORT);
+        onboard_led_toggle(i);
+        dumb_delay(DELAY_SHORT);
+        onboard_led_toggle(i);
+        dumb_delay(DELAY_SHORT);
+        onboard_led_toggle(i);
+        dumb_delay(DELAY_LONG);
     }
 
-
-    while (1) {
-#ifdef LED0_ON
-        LED0_ON;
-        dumb_delay(DELAY_LONG);
-        LED0_OFF;
-        dumb_delay(DELAY_LONG);
-        LED0_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED0_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED0_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED0_TOGGLE;
-        dumb_delay(DELAY_LONG);
 #endif
-#ifdef LED1_ON
-        LED1_ON;
-        dumb_delay(DELAY_LONG);
-        LED1_OFF;
-        dumb_delay(DELAY_LONG);
-        LED1_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED1_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED1_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED1_TOGGLE;
-        dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED2_ON
-        LED2_ON;
-        dumb_delay(DELAY_LONG);
-        LED2_OFF;
-        dumb_delay(DELAY_LONG);
-        LED2_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED2_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED2_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED2_TOGGLE;
-        dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED3_ON
-        LED3_ON;
-        dumb_delay(DELAY_LONG);
-        LED3_OFF;
-        dumb_delay(DELAY_LONG);
-        LED3_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED3_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED3_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED3_TOGGLE;
-        dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED4_ON
-        LED4_ON;
-        dumb_delay(DELAY_LONG);
-        LED4_OFF;
-        dumb_delay(DELAY_LONG);
-        LED4_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED4_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED4_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED4_TOGGLE;
-        dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED5_ON
-        LED5_ON;
-        dumb_delay(DELAY_LONG);
-        LED5_OFF;
-        dumb_delay(DELAY_LONG);
-        LED5_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED5_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED5_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED5_TOGGLE;
-        dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED6_ON
-        LED6_ON;
-        dumb_delay(DELAY_LONG);
-        LED6_OFF;
-        dumb_delay(DELAY_LONG);
-        LED6_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED6_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED6_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED6_TOGGLE;
-        dumb_delay(DELAY_LONG);
-#endif
-#ifdef LED7_ON
-        LED7_ON;
-        dumb_delay(DELAY_LONG);
-        LED7_OFF;
-        dumb_delay(DELAY_LONG);
-        LED7_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED7_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED7_TOGGLE;
-        dumb_delay(DELAY_SHORT);
-        LED7_TOGGLE;
-        dumb_delay(DELAY_LONG);
-#endif
-    }
 
     return 0;
 }

@@ -52,18 +52,21 @@ extern "C" {
                                      .reset_pin = GPIO_PIN(PB, 15)}
 
 /**
- * @name    LED pin definitions and handlers
+ * @name    On-board LED mapping
  * @{
  */
-#define LED0_PIN            GPIO_PIN(0, 19)
-
-#define LED_PORT            PORT->Group[0]
-#define LED0_MASK           (1 << 19)
-
-#define LED0_ON             (LED_PORT.OUTCLR.reg = LED0_MASK)
-#define LED0_OFF            (LED_PORT.OUTSET.reg = LED0_MASK)
-#define LED0_TOGGLE         (LED_PORT.OUTTGL.reg = LED0_MASK)
+#define ONBOARD_LED_ACTIVE_LOW
+static const gpio_t led_config[] = {
+    GPIO_PIN(PA, 19)        /* LED0 */
+};
 /** @} */
+
+/**
+ * @brief   Give on-board LEDs some user friendly names [optional]
+ */
+enum {
+    LED0
+};
 
 /**
  * @name    SW0 (Button) pin definitions
