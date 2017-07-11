@@ -33,10 +33,19 @@ extern "C" {
  * @name    xtimer configuration
  * @{
  */
+#if 0
 #define XTIMER_DEV          TIMER_DEV(0)
 #define XTIMER_CHAN         (0)
 #define XTIMER_OVERHEAD     (6)
 #define XTIMER_BACKOFF      (5)
+#else
+#define XTIMER_DEV          TIMER_DEV(1)
+#define XTIMER_HZ           (32768ul)
+#define XTIMER_WIDTH        (16)
+#define XTIMER_BACKOFF      (11)
+#define XTIMER_ISR_BACKOFF  (11)
+#define XTIMER_OVERHEAD     (10)
+#endif
 /** @} */
 
 #ifdef __cplusplus

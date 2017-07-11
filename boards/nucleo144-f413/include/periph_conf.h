@@ -60,10 +60,18 @@ static const timer_conf_t timer_config[] = {
         .rcc_mask = RCC_APB1ENR_TIM5EN,
         .bus      = APB1,
         .irqn     = TIM5_IRQn
+    },
+    {
+        .max      = 0xffff,
+        .rcc_mask = RCC_APB1ENR_LPTIM1EN,
+        .bus      = APB1,
+        .irqn     = LPTIM1_IRQn,
+        .type     = TIMER_TYPE_LPTIM,
     }
 };
 
 #define TIMER_0_ISR         isr_tim5
+#define TIMER_1_ISR         isr_lptim1
 
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 /** @} */
