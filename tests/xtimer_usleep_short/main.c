@@ -33,7 +33,7 @@ int main(void)
         xtimer_usleep(i);
     }
 
-    puts("Test end.");
+    puts("[SUCCESS]");
 
     return 0;
 }

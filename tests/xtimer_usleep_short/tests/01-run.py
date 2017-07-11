@@ -26,9 +26,9 @@ def testfunc(child):
             print("xtimer stuck when trying to sleep %d usecs" % (i+1));
             print("[FAILED]")
             break;
-        i = i -1
+        i = i - 1
 
-    child.expect(u"Test end.", timeout=3)
+    child.expect(u"[SUCCESS]", timeout=3)
 
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))
