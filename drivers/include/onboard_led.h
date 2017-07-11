@@ -44,18 +44,33 @@ extern "C" {
  */
 void onboard_led_init(void);
 
+/**
+ * @brief   Turn on the given on-board LED
+ *
+ * @param[in] num       LED to turn on
+ */
 static inline void onboard_led_on(unsigned num)
 {
     assert(num < LED_NUMOF);
     TURN_ON(led_config[num]);
 }
 
+/**
+ * @brief   Turn off the given on-board LED
+ *
+ * @param[in] num       LED to turn off
+ */
 static inline void onboard_led_off(unsigned num)
 {
     assert(num < LED_NUMOF);
     TURN_OFF(led_config[num]);
 }
 
+/**
+ * @brief   Toggle the given on-board LED
+ *
+ * @param[in] num       LED to toggle
+ */
 static inline void onboard_led_toggle(unsigned num)
 {
     assert(num < LED_NUMOF);
