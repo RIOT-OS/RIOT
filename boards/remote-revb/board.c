@@ -23,6 +23,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "periph/led.h"
 #include "fancy_leds.h"
 
 static inline void leds_init(void);
@@ -46,9 +47,7 @@ void board_init(void)
  */
 static inline void leds_init(void)
 {
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
+    led_init();
 
     /* Shoot rainbows */
     LED_RAINBOW();
