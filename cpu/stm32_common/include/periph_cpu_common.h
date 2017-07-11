@@ -198,15 +198,25 @@ typedef struct {
     uint8_t chan;           /**< DAC device used for this line */
 } dac_conf_t;
 
+
+/**
+ * @brief   Timer type
+ */
+typedef enum {
+    TIMER_TYPE_GPTIM, /**< General-purpose timer */
+    TIMER_TYPE_LPTIM, /**< Low-power timer */
+} timer_type_t;
+
 /**
  * @brief   Timer configuration
  */
 typedef struct {
-    TIM_TypeDef *dev;       /**< timer device */
+    TIM_TypeDef *dev;       /**< timer device, not set for LPTIM */
     uint32_t max;           /**< maximum value to count to (16/32 bit) */
     uint32_t rcc_mask;      /**< corresponding bit in the RCC register */
     uint8_t bus;            /**< APBx bus the timer is clock from */
     uint8_t irqn;           /**< global IRQ channel */
+    uint8_t type;
 } timer_conf_t;
 
 /**

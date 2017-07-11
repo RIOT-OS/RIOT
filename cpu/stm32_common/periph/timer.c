@@ -22,6 +22,7 @@
 
 #include "cpu.h"
 #include "periph/timer.h"
+#include "stmclk.h"
 
 /**
  * @brief   Timer specific additional bus clock presacler
@@ -72,16 +73,38 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     /* enable the peripheral clock */
     periph_clk_en(timer_config[tim].bus, timer_config[tim].rcc_mask);
 
-    /* configure the timer as upcounter in continuous mode */
-    dev(tim)->CR1  = 0;
-    dev(tim)->CR2  = 0;
-    dev(tim)->ARR  = timer_config[tim].max;
+    switch (timer_config[tim].type) {
+    case TIMER_TYPE_GPTIM:
+        /* configure the timer as upcounter in continuous mode */
+        dev(tim)->CR1  = 0;
+        dev(tim)->CR2  = 0;
+        dev(tim)->ARR  = timer_config[tim].max;
 
-    /* set prescaler */
-    dev(tim)->PSC = (((periph_apb_clk(timer_config[tim].bus) *
-                       apbmul[timer_config[tim].bus]) / freq) - 1);
-    /* generate an update event to apply our configuration */
-    dev(tim)->EGR = TIM_EGR_UG;
+        /* set prescaler */
+        dev(tim)->PSC = (((periph_apb_clk(timer_config[tim].bus) *
+                           apbmul[timer_config[tim].bus]) / freq) - 1);
+        /* generate an update event to apply our configuration */
+        dev(tim)->EGR = TIM_EGR_UG;
+        break;
+#if defined(LPTIM1)
+    case TIMER_TYPE_LPTIM:
+        if (freq != 32768ul) {
+            return -1;
+        }
+        stmclk_enable_lfclk();
+        EXTI->IMR |= EXTI_IMR_MR23;
+        EXTI->RTSR |= EXTI_RTSR_TR23;
+        LPTIM1->CR = 0;
+        RCC->DCKCFGR2 |= RCC_DCKCFGR2_LPTIM1SEL_1 | RCC_DCKCFGR2_LPTIM1SEL_0;
+        LPTIM1->CFGR = 0 /*LPTIM_CFGR_TIMOUT*/;
+        LPTIM1->IER = LPTIM_IER_CMPMIE;
+        LPTIM1->CR |= LPTIM_CR_ENABLE;
+        LPTIM1->ARR = timer_config[tim].max;
+        break;
+#endif
+    default:
+        return -1;
+    }
 
     /* enable the timer's interrupt */
     NVIC_EnableIRQ(timer_config[tim].irqn);
@@ -103,9 +126,18 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
         return -1;
     }
 
-    dev(tim)->CCR[channel] = (value & timer_config[tim].max);
-    dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
-    dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
+    switch (timer_config[tim].type) {
+    case TIMER_TYPE_GPTIM:
+        dev(tim)->CCR[channel] = (value & timer_config[tim].max);
+        dev(tim)->SR &= ~(TIM_SR_CC1IF << channel);
+        dev(tim)->DIER |= (TIM_DIER_CC1IE << channel);
+#if defined(LPTIM1)
+    case TIMER_TYPE_LPTIM:
+        LPTIM1->CMP = (value & timer_config[tim].max);
+        LPTIM1->CR |= LPTIM_CR_CNTSTRT;
+        break;
+#endif
+    }
 
     return 0;
 }
@@ -116,34 +148,83 @@ int timer_clear(tim_t tim, int channel)
         return -1;
     }
 
-    dev(tim)->DIER &= ~(TIM_DIER_CC1IE << channel);
+    switch (timer_config[tim].type) {
+    case TIMER_TYPE_GPTIM:
+        dev(tim)->DIER &= ~(TIM_DIER_CC1IE << channel);
+        break;
+#if defined(LPTIM1)
+    case TIMER_TYPE_LPTIM:
+        break;
+#endif
+    }
+
     return 0;
 }
 
 unsigned int timer_read(tim_t tim)
 {
-    return (unsigned int)dev(tim)->CNT;
+    switch (timer_config[tim].type) {
+    case TIMER_TYPE_GPTIM:
+        return (unsigned int)dev(tim)->CNT;
+#if defined(LPTIM1)
+    case TIMER_TYPE_LPTIM:
+        return (unsigned int)LPTIM1->CNT;
+#endif
+    }
+
+    return 0;
 }
 
 void timer_start(tim_t tim)
 {
-    dev(tim)->CR1 |= TIM_CR1_CEN;
+    switch (timer_config[tim].type) {
+    case TIMER_TYPE_GPTIM:
+        dev(tim)->CR1 |= TIM_CR1_CEN;
+        break;
+#if defined(LPTIM1)
+    case TIMER_TYPE_LPTIM:
+        LPTIM1->CR |= LPTIM_CR_ENABLE | LPTIM_CR_CNTSTRT;
+        break;
+#endif
+    }
 }
 
 void timer_stop(tim_t tim)
 {
-    dev(tim)->CR1 &= ~(TIM_CR1_CEN);
+    switch (timer_config[tim].type) {
+    case TIMER_TYPE_GPTIM:
+        dev(tim)->CR1 &= ~(TIM_CR1_CEN);
+        break;
+#if defined(LPTIM1)
+    case TIMER_TYPE_LPTIM:
+        LPTIM1->CR &= ~(LPTIM_CR_ENABLE);
+        break;
+#endif
+    }
 }
 
 static inline void irq_handler(tim_t tim)
 {
-    uint32_t status = (dev(tim)->SR & dev(tim)->DIER);
+    uint32_t status;
 
-    for (unsigned int i = 0; i < TIMER_CHAN; i++) {
-        if (status & (TIM_SR_CC1IF << i)) {
-            dev(tim)->DIER &= ~(TIM_DIER_CC1IE << i);
-            isr_ctx[tim].cb(isr_ctx[tim].arg, i);
+    switch (timer_config[tim].type) {
+    case TIMER_TYPE_GPTIM:
+        status = (dev(tim)->SR & dev(tim)->DIER);
+
+        for (unsigned int i = 0; i < TIMER_CHAN; i++) {
+            if (status & (TIM_SR_CC1IF << i)) {
+                dev(tim)->DIER &= ~(TIM_DIER_CC1IE << i);
+                isr_ctx[tim].cb(isr_ctx[tim].arg, i);
+            }
         }
+        break;
+#if defined(LPTIM1)
+    case TIMER_TYPE_LPTIM:
+        LPTIM1->ICR = (LPTIM_ICR_ARRMCF | LPTIM_ICR_CMPMCF);
+        EXTI->PR |= EXTI_PR_PR23;
+        isr_ctx[tim].cb(isr_ctx[tim].arg, 0);
+        break;
+#endif
     }
     cortexm_isr_end();
 }
