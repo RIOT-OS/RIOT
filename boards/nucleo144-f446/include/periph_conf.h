@@ -29,6 +29,7 @@ extern "C" {
  * @name    Clock system configuration
  * @{
  */
+#define P                       (4U)
 /* 0: no external high speed crystal available
  * else: actual crystal frequency [in Hz] */
 #define CLOCK_HSE           (8000000U)
@@ -37,7 +38,7 @@ extern "C" {
 #define CLOCK_LSE           (1)
 /* give the target core clock (HCLK) frequency [in Hz],
  * maximum: 100MHz */
-#define CLOCK_CORECLOCK     (168000000U)
+#define CLOCK_CORECLOCK     (180000000U)
 /* peripheral clock setup */
 #define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* min 25MHz */
 #define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
@@ -162,20 +163,21 @@ static const pwm_conf_t pwm_config[] = {
  *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
+
 static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 90000000Hz */
+    {       /* for APB1 @ 45000000Hz */
+        7,  /* -> 175781Hz */
+        6,  /* -> 351562Hz */
+        5,  /* -> 703125Hz */
+        2,  /* -> 5625000Hz */
+        1   /* -> 11250000Hz */
+    },
+    {       /* for APB2 @ 90000000Hz */
         7,  /* -> 351562Hz */
         7,  /* -> 351562Hz */
         6,  /* -> 703125Hz */
         3,  /* -> 5625000Hz */
         2   /* -> 11250000Hz */
-    },
-    {       /* for APB2 @ 180000000Hz */
-        7,  /* -> 703125Hz */
-        7,  /* -> 703125Hz */
-        7,  /* -> 703125Hz */
-        4,  /* -> 5625000Hz */
-        3   /* -> 11250000Hz */
     }
 };
 
