@@ -13,8 +13,8 @@
 cc2538_wdt_t * const WDT = (cc2538_wdt_t *)&SMWDTHROSC_WDCTL;
 
 // counter values supported by the cc2538
-const uint16_t counter_values[] = {64, 512, 8192, 32768 };
-//const uint16_t counter_values[] = {32768, 8192, 512, 64 };
+//const uint16_t counter_values[] = {64, 512, 8192, 32768 }; // values according to cc2538 user manual
+const uint16_t counter_values[] = {32, 256, 4096, 16384 }; // values according to measurements on Zolertia Firefly
 
 static uint16_t cc2538_wdt_usec_to_cnt(uint32_t t_wdt)
 {
@@ -87,8 +87,6 @@ int cc2538_wdt_enable_max(uint32_t t_wdt) {
 }
 
 void cc2538_wdt_reset(void) {
-  //printf("%s \n", __func__);
-  //puts(".\n");
 
   unsigned irq_state;
 
