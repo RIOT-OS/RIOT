@@ -24,7 +24,7 @@
 /**
  * @brief   Initialize the Watchdog Timer
  *
- * The watchdog timer (WDT) is initialized favored interval in microseconds.
+ * The watchdog timer (WDT) is initialized preferred interval in microseconds.
  * Depending on the hardware, this exact interval might be not feasible. So,
  * the initialization routine select the best suitable time (real WDT interval).
  * If possible, the real WDT interval should not be shorter than the given
@@ -34,7 +34,7 @@
  * The function initializes but does not start the WDT.
  *
  *
- * @param[in] t_wdt         favored WDT interval in microseconds
+ * @param[in] t_wdt         preferred WDT interval in microseconds
  *
  * @return                  -1 on error
  * @return                  applied WDT interval in microseconds
@@ -50,7 +50,7 @@ int cc2538_wdt_init(uint32_t t_wdt);
  * not possible, the shortest available interval is used.
  *
  *
- * @param[in] t_wdt         favored WDT interval in microseconds
+ * @param[in] t_wdt         preferred WDT interval in microseconds
  *
  * @return                  -1 on error
  * @return                  applied WDT interval in microseconds
