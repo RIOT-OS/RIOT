@@ -79,7 +79,7 @@ int cc2538_wdt_init(uint32_t t_wdt) {
     return t_wdt;
 }
 
-int cc2538_wdt_enable_max(uint32_t t_wdt) {
+int cc2538_wdt_init_max(uint32_t t_wdt) {
     uint32_t cnt;
     uint16_t sel_cnt;
     uint8_t sel_cnt_idx, i;
@@ -90,8 +90,8 @@ int cc2538_wdt_enable_max(uint32_t t_wdt) {
 
     cnt = cc2538_wdt_usec_to_cnt(t_wdt);
 
-    for (i = NUM_CNT_VALUES;
-        i > 0; i--) {
+    for (i = NUM_CNT_VALUES-1;
+        i >= 0; i--) {
 
         sel_cnt_idx = i;
         sel_cnt = counter_values[sel_cnt_idx];
