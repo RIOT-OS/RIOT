@@ -42,6 +42,11 @@
 extern "C" {
 #endif
 
+#ifndef AT_END_OF_LINE
+/** End of line character to send after the AT command */
+#define AT_END_OF_LINE "\r"
+#endif
+
 /**
  * @brief AT device structure
  */

@@ -59,13 +59,13 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
     unsigned cmdlen = strlen(command);
 
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)"\n", 1);
+    uart_write(dev->uart, (const uint8_t *)AT_END_OF_LINE, sizeof(AT_END_OF_LINE) - 1);
 
     if (at_expect_bytes(dev, command, cmdlen, timeout)) {
         return -1;
     }
 
-    if (at_expect_bytes(dev, "\r\n", 2, timeout)) {
+    if (at_expect_bytes(dev, AT_END_OF_LINE "\r\n", sizeof(AT_END_OF_LINE) + 1, timeout)) {
         return -2;
     }
 
