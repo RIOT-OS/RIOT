@@ -205,6 +205,10 @@ ifneq (,$(filter sx127%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
   USEMODULE += xtimer
   USEMODULE += sx127x
+  USEMODULE += netif
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+    USEMODULE += gnrc_netdev
+  endif
 endif
 
 ifneq (,$(filter veml6070,$(USEMODULE)))
