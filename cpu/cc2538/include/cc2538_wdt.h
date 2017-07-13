@@ -31,8 +31,13 @@ typedef union {
 
 extern cc2538_wdt_t * const WDT;       /**< WDT Instance */
 
-int cc2538_wdt_enable(uint32_t t_wdt);
-int cc2538_wdt_enable_max(uint32_t t_wdt);
+int cc2538_wdt_init(uint32_t t_wdt);
+int cc2538_wdt_init_max(uint32_t t_wdt);
+
+int cc2538_wdt_enable(void);
+int cc2538_wdt_disable(void);
+
+int cc2538_wdt_is_enabled(void);
 
 void cc2538_wdt_reset(void);
 
