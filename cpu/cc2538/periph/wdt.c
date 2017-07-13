@@ -6,117 +6,129 @@
  */
 
 #include "irq.h"
+#include "cc2538.h"
 #include "cc2538_wdt.h"
 
 #define CC2538_WDT_CLK 32768
 
-cc2538_wdt_t * const WDT = (cc2538_wdt_t *)&SMWDTHROSC_WDCTL;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef union {
+    cc2538_reg_t WDT;
+    struct {
+        cc2538_reg_t INT :2; /**< timer interval */
+        cc2538_reg_t RESERVED :1; /**< reserved */
+        cc2538_reg_t EN :1; /**< enable */
+        cc2538_reg_t CLR :4; /**< clear */
+        cc2538_reg_t RESERVED_2 :24; /**< reserved */
+    } WDTbits;
+} cc2538_wdt_t;
+
+cc2538_wdt_t * const WDT = (cc2538_wdt_t *) &SMWDTHROSC_WDCTL;
 
 // counter values supported by the cc2538
 //const uint16_t counter_values[] = {64, 512, 8192, 32768 }; // values according to cc2538 user manual
-const uint16_t counter_values[] = {32, 256, 4096, 16384 }; // values according to measurements on Zolertia Firefly
+const uint16_t counter_values[] = { 32, 256, 4096, 16384 }; // values according to measurements on Zolertia Firefly
+#define NUM_CNT_VALUES (sizeof(counter_values) / sizeof(counter_values[0]))
 
-static uint16_t cc2538_wdt_usec_to_cnt(uint32_t t_wdt)
-{
-  uint32_t cnt;
-  if(t_wdt > (1000 * 1000)){
-      // max. WDT interval of 1s
-      t_wdt = 1000 * 1000;
-  }
+static uint16_t cc2538_wdt_usec_to_cnt(uint32_t t_wdt) {
+    uint32_t cnt;
+    if (t_wdt > (1000 * 1000)) {
+        // max. WDT interval of 1s
+        t_wdt = 1000 * 1000;
+    }
 
-  // scale down (still below min. resolution)
-  t_wdt /= 10;
+    // scale down (still below min. resolution)
+    t_wdt /= 10;
 
-  cnt = (t_wdt * CC2538_WDT_CLK) / (100 * 1000);
+    cnt = (t_wdt * CC2538_WDT_CLK) / (100 * 1000);
 
-  if(cnt == 0){
-      cnt = 1;
-  }
+    if (cnt == 0) {
+        cnt = 1;
+    }
 
-  return cnt;
+    return cnt;
 }
 
 int cc2538_wdt_init(uint32_t t_wdt) {
-  uint32_t cnt;
-  uint16_t sel_cnt;
-  uint8_t sel_cnt_idx, i;
-  uint8_t num_cnt = sizeof(counter_values)/sizeof(counter_values[0]);
+    uint32_t cnt;
+    uint16_t sel_cnt;
+    uint8_t sel_cnt_idx, i;
 
-  if(WDT->WDTbits.EN == 1){
-      return -1;
-  }
+    if (WDT->WDTbits.EN == 1) {
+        return -1;
+    }
 
-  cnt = cc2538_wdt_usec_to_cnt(t_wdt);
+    cnt = cc2538_wdt_usec_to_cnt(t_wdt);
 
-  for(i=0;
-      i<num_cnt;
-      i++){
+    for (i = 0; i < NUM_CNT_VALUES; i++) {
 
-      sel_cnt_idx = i;
-      sel_cnt = counter_values[sel_cnt_idx];
-      if(sel_cnt >= cnt){
-	  break;
-      }
-  }
+        sel_cnt_idx = i;
+        sel_cnt = counter_values[sel_cnt_idx];
+        if (sel_cnt >= cnt) {
+            break;
+        }
+    }
 
-  WDT->WDTbits.INT = 3 - sel_cnt_idx; // invert index
+    WDT->WDTbits.INT = 3 - sel_cnt_idx; // invert index
 
-  t_wdt = sel_cnt * (1000 * 10) / CC2538_WDT_CLK;
-  t_wdt *= 100;
-  return t_wdt;
+    t_wdt = sel_cnt * (1000 * 10) / CC2538_WDT_CLK;
+    t_wdt *= 100;
+    return t_wdt;
 }
 
 int cc2538_wdt_enable_max(uint32_t t_wdt) {
-  uint32_t cnt;
-  uint16_t sel_cnt;
-  uint8_t sel_cnt_idx;
+    uint32_t cnt;
+    uint16_t sel_cnt;
+    uint8_t sel_cnt_idx, i;
 
-  if(WDT->WDTbits.EN == 1){
-      return -1;
-  }
+    if (WDT->WDTbits.EN == 1) {
+        return -1;
+    }
 
-  cnt = cc2538_wdt_usec_to_cnt(t_wdt);
+    cnt = cc2538_wdt_usec_to_cnt(t_wdt);
 
-  for(sel_cnt_idx=((sizeof(counter_values)/sizeof(counter_values[0]))-1);
-      sel_cnt_idx>0;
-      sel_cnt_idx--){
+    for (i = NUM_CNT_VALUES;
+        i > 0; i--) {
 
-      sel_cnt = counter_values[sel_cnt_idx];
-      if(sel_cnt <= cnt){
-	  break;
-      }
-  }
+        sel_cnt_idx = i;
+        sel_cnt = counter_values[sel_cnt_idx];
+        if (sel_cnt <= cnt) {
+            break;
+        }
+    }
 
-  WDT->WDTbits.INT = 3 - sel_cnt_idx; // invert index
+    WDT->WDTbits.INT = 3 - sel_cnt_idx; // invert index
 
-  t_wdt = sel_cnt * (1000 * 10) / CC2538_WDT_CLK;
-  t_wdt *= 100;
-  return t_wdt;
+    t_wdt = sel_cnt * (1000 * 10) / CC2538_WDT_CLK;
+    t_wdt *= 100;
+    return t_wdt;
 }
 
 int cc2538_wdt_enable(void) {
-  WDT->WDTbits.EN = 1;
-  return 0;
+    WDT->WDTbits.EN = 1;
+    return 0;
 }
 
 int cc2538_wdt_disable(void) {
-  //WDT->WDTbits.EN = 0; // has no effect, WDT can't be disabled
-  return -1;
+    //WDT->WDTbits.EN = 0; // has no effect, WDT can't be disabled
+    return -1;
 }
 
-int cc2538_wdt_is_enabled(void)
-{
-  return WDT->WDTbits.EN;
+int cc2538_wdt_is_enabled(void) {
+    return WDT->WDTbits.EN;
 }
 
 void cc2538_wdt_reset(void) {
 
-  unsigned irq_state;
+    unsigned irq_state;
 
-  irq_state = irq_disable();
+    irq_state = irq_disable();
 
-  WDT->WDTbits.CLR = 0xa;
-  WDT->WDTbits.CLR = 0x5;
+    WDT->WDTbits.CLR = 0xa;
+    WDT->WDTbits.CLR = 0x5;
 
-  irq_restore(irq_state);
+    irq_restore(irq_state);
 }
