@@ -85,6 +85,21 @@ int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout);
 
 /**
+ * @brief   send AT command, wait for a prompt
+ *
+ * This function will send the supplied @p command, then wait for the prompt (>)
+ * character and return
+ *
+ * @param[in]   dev     device to operate on
+ * @param[in]   command command string to send
+ * @param[in]   timeout timeout (in usec)
+ *
+ * @return      0 when prompt is received
+ * @return      <0 otherwise
+ */
+int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout);
+
+/**
  * @brief   send AT command, wait for response
  *
  * This function will send the supplied @p command, then wait and return one
@@ -135,6 +150,15 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
  * @returns     <0 otherwise
  */
 int at_expect_bytes(at_dev_t *dev, const char *bytes, size_t len, uint32_t timeout);
+
+/**
+ * @brief  Send raw bytes to a device
+ *
+ * @param[in]   dev     device to operate on
+ * @param[in]   bytes   buffer containing bytes to send
+ * @param[in]   len     number of bytes to send
+ */
+void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len);
 
 /**
  * @brief   send command to device

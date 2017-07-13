@@ -54,6 +54,11 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, size_t len, uint32_t timeo
     return 0;
 }
 
+void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len)
+{
+    uart_write(dev->uart, (const uint8_t *)bytes, len);
+}
+
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
 {
     unsigned cmdlen = strlen(command);
@@ -153,6 +158,30 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
 
 out:
     return res;
+}
+
+int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout)
+{
+    unsigned cmdlen = strlen(command);
+
+    at_drain(dev);
+
+    uart_write(dev->uart, (const uint8_t *)command, cmdlen);
+    uart_write(dev->uart, (const uint8_t *)AT_END_OF_LINE, sizeof(AT_END_OF_LINE) - 1);
+
+    if (at_expect_bytes(dev, command, cmdlen, timeout)) {
+        return -1;
+    }
+
+    if (at_expect_bytes(dev, AT_END_OF_LINE "\n", sizeof(AT_END_OF_LINE), timeout)) {
+        return -2;
+    }
+
+    if (at_expect_bytes(dev, ">", 1, timeout)) {
+        return -3;
+    }
+
+    return 0;
 }
 
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
