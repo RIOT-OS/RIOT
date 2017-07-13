@@ -89,7 +89,7 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
             }
 
             /* Write payload buffer */
-            for (size_t i = 0;i < count ; i++) {
+            for (size_t i = 0; i < count; i++) {
                 sx127x_write_fifo(dev, vector[i].iov_base, vector[i].iov_len);
             }
             break;
@@ -194,7 +194,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                     }
 #endif
                 }
-                packet_info->time_on_air = sx127x_get_time_on_air(dev, len);
             }
 
             size = sx127x_reg_read(dev, SX127X_REG_LR_RXNBBYTES);
