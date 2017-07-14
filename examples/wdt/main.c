@@ -35,15 +35,20 @@
 #ifdef WDT_GPIO_DEBUG
 
 #ifndef REBOOT_GPIO
-//#define REBOOT_GPIO GPIO_PIN(3,2)
+#define REBOOT_GPIO GPIO_PIN(3,2)
 #endif
 
 #ifndef WDT_RESET_GPIO
-//define WDT_RESET_GPIO GPIO_PIN(3,0)
+define WDT_RESET_GPIO GPIO_PIN(3,0)
+#endif
+
+#ifndef WDT_BLOCK_GPIO
+#define WDT_BLOCK_GPIO GPIO_PIN(0,7)
 #endif
 
 gpio_t reboot_pin = REBOOT_GPIO;
 gpio_t wdt_reset_pin = WDT_RESET_GPIO;
+gpio_t wdt_block_pin = WDT_BLOCK_GPIO;
 #endif
 
 mutex_t block_mtx;
@@ -157,8 +162,14 @@ int wdt_cmd(int argc, char** argv) {
         printf("%s: time=%d\n", __func__, time);
 
         mutex_lock(&block_mtx);
+#if WDT_GPIO_DEBUG
+        gpio_set(wdt_block_pin);
+#endif
         //xtimer_spin(xtimer_ticks_from_usec(time * 1000));
         xtimer_usleep(time * 1000);
+#if WDT_GPIO_DEBUG
+        gpio_clear(wdt_block_pin);
+#endif
         mutex_unlock(&block_mtx);
 
         printf("%s: done.\n", __func__);
@@ -190,7 +201,10 @@ int main(void) {
 #if WDT_GPIO_DEBUG
     gpio_init(reboot_pin, GPIO_OUT);
     gpio_init(wdt_reset_pin, GPIO_OUT);
+    gpio_init(wdt_block_pin, GPIO_OUT);
+
     gpio_clear(wdt_reset_pin);
+    gpio_clear(wdt_block_pin);
     gpio_set(reboot_pin);
 #endif
 
