@@ -7,7 +7,7 @@
 
 #include "irq.h"
 #include "cc2538.h"
-#include "cc2538_wdt.h"
+#include "periph/wdt.h"
 
 #define CC2538_WDT_CLK 32768
 
@@ -52,7 +52,7 @@ static uint16_t cc2538_wdt_usec_to_cnt(uint32_t t_wdt) {
     return cnt;
 }
 
-int cc2538_wdt_init(uint32_t t_wdt, wdt_mode_t mode) {
+int wdt_init(uint32_t t_wdt, wdt_mode_t mode) {
     uint32_t cnt;
     uint16_t sel_cnt = 0;
     uint8_t sel_cnt_idx = 0;
@@ -108,21 +108,21 @@ int cc2538_wdt_init(uint32_t t_wdt, wdt_mode_t mode) {
     return t_wdt;
 }
 
-int cc2538_wdt_enable(void) {
+int wdt_enable(void) {
     WDT->WDTbits.EN = 1;
     return 0;
 }
 
-int cc2538_wdt_disable(void) {
+int wdt_disable(void) {
     //WDT->WDTbits.EN = 0; // has no effect, WDT can't be disabled
     return -1;
 }
 
-int cc2538_wdt_is_enabled(void) {
+int wdt_is_enabled(void) {
     return WDT->WDTbits.EN;
 }
 
-void cc2538_wdt_reset(void) {
+void wdt_reset(void) {
 
     unsigned irq_state;
 

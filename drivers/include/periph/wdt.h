@@ -7,17 +7,17 @@
  */
 
 /**
- * @defgroup        cpu_cc2538_wdt CC2538 WDT
+ * @defgroup        driver_periph_wdt WDT
  * @{
  *
  * @file
- * @brief           CC2538 WDT interface
+ * @brief           WDT peripheral driver interface definition
  *
  * @author          Thomas Geithner <thomas.geithner@dai-labor.de>
  */
 
-#ifndef CC2538_WDT_H
-#define CC2538_WDT_H
+#ifndef PERIPH_WDT_H
+#define PERIPH_WDT_H
 
 #include <stdint.h>
 
@@ -56,43 +56,26 @@ typedef enum {
  * @return                  -1 on error
  * @return                  applied WDT interval in microseconds
  */
-int cc2538_wdt_init(uint32_t t_wdt, wdt_mode_t mode);
+int wdt_init(uint32_t t_wdt, wdt_mode_t mode);
 
-
-#if 0
-/**
- * @brief   Initialize the Watchdog Timer
- *
- * Initializes the WDT similarly to cc2538_wdt_init(), but in contrast the
- * real WDT interval should not be longer than the given argument. If this is
- * not possible, the shortest available interval is used.
- *
- *
- * @param[in] t_wdt         preferred WDT interval in microseconds
- *
- * @return                  -1 on error
- * @return                  applied WDT interval in microseconds
- */
-int cc2538_wdt_init_max(uint32_t t_wdt);
-#endif
 
 /**
  * @brief   Enables the Watchdog Timer
  *
  * Enables the WDT. From this time on, the WDT has to be reseted using
- * cc2538_wdt_reset() in intervals shorter than the real WDT interval
- * returned by cc2538_wdt_init() or cc2538_wdt_init_max() to avoid a system
+ * wdt_reset() in intervals shorter than the real WDT interval
+ * returned by wdt_init() or wdt_init_max() to avoid a system
  * reboot.
  *
  * @return                  0 on success
  * @return                  -1 on error
  */
-int cc2538_wdt_enable(void);
+int wdt_enable(void);
 
 /**
  * @brief   Disables the Watchdog Timer
  *
- * Disables the WDT. If successful, resetting the WDT with cc2538_wdt_reset()
+ * Disables the WDT. If successful, resetting the WDT with wdt_reset()
  * is not longer required.
  * Depending on the hardware, this might not be possible; some implementations
  * do not allow disabling a started WDT.
@@ -100,7 +83,7 @@ int cc2538_wdt_enable(void);
  * @return                  0 on success
  * @return                  -1 on error
  */
-int cc2538_wdt_disable(void);
+int wdt_disable(void);
 
 /**
  * @brief   Checks, if the Watchdog Timer is enabled
@@ -110,7 +93,7 @@ int cc2538_wdt_disable(void);
  * @return                  0 if the WDT is disabled
  * @return                  1 if the WDT is enabled
  */
-int cc2538_wdt_is_enabled(void);
+int wdt_is_enabled(void);
 
 /**
  * @brief   Resets the Watchdog Timer
@@ -118,10 +101,10 @@ int cc2538_wdt_is_enabled(void);
  * Resets the WDT.
  *
  */
-void cc2538_wdt_reset(void);
+void wdt_reset(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
 
-#endif /* CC2538_WDT_H */
+#endif /* PERIPH_WDT_H */
