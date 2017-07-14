@@ -25,9 +25,9 @@
  * @brief   Possible WDT timing modes
  */
 typedef enum {
-    WDT_EXACT = 0,   /**< WDT interval shall be exact as requested */
-    WDT_MIN   = 1,   /**< WDT interval shall be >= than requested */
-    WDT_MAX   = 2,   /**< WDT interval shall be <= than requested */
+    WDT_EXACT,   /**< WDT interval shall be exact as requested */
+    WDT_MIN,     /**< WDT interval shall be >= than requested */
+    WDT_MAX,     /**< WDT interval shall be <= than requested */
 } wdt_mode_t;
 
 /**
