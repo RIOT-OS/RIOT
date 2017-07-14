@@ -18,10 +18,10 @@ extern "C" {
 typedef union {
     cc2538_reg_t WDT;
     struct {
-        cc2538_reg_t INT :2; /**< timer interval */
-        cc2538_reg_t RESERVED :1; /**< reserved */
-        cc2538_reg_t EN :1; /**< enable */
-        cc2538_reg_t CLR :4; /**< clear */
+        cc2538_reg_t INT :2;         /**< timer interval */
+        cc2538_reg_t RESERVED :1;    /**< reserved */
+        cc2538_reg_t EN :1;          /**< enable */
+        cc2538_reg_t CLR :4;         /**< clear */
         cc2538_reg_t RESERVED_2 :24; /**< reserved */
     } WDTbits;
 } cc2538_wdt_t;
@@ -36,11 +36,11 @@ const uint16_t counter_values[] = { 32, 256, 4096, 16384 }; // values according 
 static uint16_t cc2538_wdt_usec_to_cnt(uint32_t t_wdt) {
     uint32_t cnt;
     if (t_wdt > (1000 * 1000)) {
-        // max. WDT interval of 1s
+        /* max. WDT interval of 1s */
         t_wdt = 1000 * 1000;
     }
 
-    // scale down (still below min. resolution)
+    /* scale down (still below min. resolution) */
     t_wdt /= 10;
 
     cnt = (t_wdt * CC2538_WDT_CLK) / (100 * 1000);
@@ -52,10 +52,11 @@ static uint16_t cc2538_wdt_usec_to_cnt(uint32_t t_wdt) {
     return cnt;
 }
 
-int cc2538_wdt_init(uint32_t t_wdt) {
+int cc2538_wdt_init(uint32_t t_wdt, wdt_mode_t mode) {
     uint32_t cnt;
-    uint16_t sel_cnt;
-    uint8_t sel_cnt_idx, i;
+    uint16_t sel_cnt = 0;
+    uint8_t sel_cnt_idx = 0;
+    uint8_t i;
 
     if (WDT->WDTbits.EN == 1) {
         return -1;
@@ -63,41 +64,41 @@ int cc2538_wdt_init(uint32_t t_wdt) {
 
     cnt = cc2538_wdt_usec_to_cnt(t_wdt);
 
-    for (i = 0; i < NUM_CNT_VALUES; i++) {
-
-        sel_cnt_idx = i;
-        sel_cnt = counter_values[sel_cnt_idx];
-        if (sel_cnt >= cnt) {
-            break;
+    switch(mode){
+    case WDT_EXACT:
+        for (i = 0; i < NUM_CNT_VALUES; i++) {
+            if(counter_values[i] == cnt){
+                sel_cnt_idx = i;
+                sel_cnt = counter_values[sel_cnt_idx];
+                break;
+            }
         }
-    }
-
-    WDT->WDTbits.INT = 3 - sel_cnt_idx; // invert index
-
-    t_wdt = sel_cnt * (1000 * 10) / CC2538_WDT_CLK;
-    t_wdt *= 100;
-    return t_wdt;
-}
-
-int cc2538_wdt_init_max(uint32_t t_wdt) {
-    uint32_t cnt;
-    uint16_t sel_cnt;
-    uint8_t sel_cnt_idx, i;
-
-    if (WDT->WDTbits.EN == 1) {
-        return -1;
-    }
-
-    cnt = cc2538_wdt_usec_to_cnt(t_wdt);
-
-    for (i = NUM_CNT_VALUES-1;
-        i >= 0; i--) {
-
-        sel_cnt_idx = i;
-        sel_cnt = counter_values[sel_cnt_idx];
-        if (sel_cnt <= cnt) {
-            break;
+        if(sel_cnt == 0) {
+            /* no exact match found -> error */
+            return -1;
         }
+        break;
+    case WDT_MIN:
+        for (i = 0; i < NUM_CNT_VALUES; i++) {
+
+            sel_cnt_idx = i;
+            sel_cnt = counter_values[sel_cnt_idx];
+            if (sel_cnt >= cnt) {
+                break;
+            }
+        }
+        break;
+    case WDT_MAX:
+        for (i = NUM_CNT_VALUES-1;
+            i >= 0; i--) {
+
+            sel_cnt_idx = i;
+            sel_cnt = counter_values[sel_cnt_idx];
+            if (sel_cnt <= cnt) {
+                break;
+            }
+        }
+        break;
     }
 
     WDT->WDTbits.INT = 3 - sel_cnt_idx; // invert index

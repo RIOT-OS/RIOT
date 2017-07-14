@@ -22,14 +22,31 @@
 #include <stdint.h>
 
 /**
+ * @brief   Possible WDT timing modes
+ */
+typedef enum {
+    WDT_EXACT = 0,   /**< WDT interval shall be exact as requested */
+    WDT_MIN   = 1,   /**< WDT interval shall be >= than requested */
+    WDT_MAX   = 2,   /**< WDT interval shall be <= than requested */
+} wdt_mode_t;
+
+/**
  * @brief   Initialize the Watchdog Timer
  *
  * The watchdog timer (WDT) is initialized preferred interval in microseconds.
  * Depending on the hardware, this exact interval might be not feasible. So,
- * the initialization routine select the best suitable time (real WDT interval).
- * If possible, the real WDT interval should not be shorter than the given
- * argument, or otherwise, the maximum possible and interval is used.
- * The real WDT interval selected by the routine is returned (in microseconds).
+ * the initialization routine select the best suitable time (real WDT interval)
+ * depending on the selected WDT mode:
+ *
+ * WDT_EXACT: the real WDT interval shall be exact as specified by the preferred
+ *            interval (within the bounds of the timer resolution)
+ *
+ * WDT_MIN:   the real WDT interval shall be >= than the preferred interval,
+ *            or the maximum possible one
+ *
+ * WDT_MAX:   the real WDT interval shall be <= than the preferred interval,
+ *            or the minimum possible one
+ *
  *
  * The function initializes but does not start the WDT.
  *
@@ -39,9 +56,10 @@
  * @return                  -1 on error
  * @return                  applied WDT interval in microseconds
  */
-int cc2538_wdt_init(uint32_t t_wdt);
+int cc2538_wdt_init(uint32_t t_wdt, wdt_mode_t mode);
 
 
+#if 0
 /**
  * @brief   Initialize the Watchdog Timer
  *
@@ -56,6 +74,7 @@ int cc2538_wdt_init(uint32_t t_wdt);
  * @return                  applied WDT interval in microseconds
  */
 int cc2538_wdt_init_max(uint32_t t_wdt);
+#endif
 
 /**
  * @brief   Enables the Watchdog Timer
