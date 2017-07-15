@@ -99,17 +99,16 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @name    ADC configuration
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    /* dev, pin, channel */
-    { ADC0, GPIO_PIN(PORT_B, 10), 14 },
-    { ADC0, GPIO_PIN(PORT_B, 11), 15 },
-    { ADC0, GPIO_PIN(PORT_C, 11), 7 },
-    { ADC0, GPIO_PIN(PORT_C, 10), 6 },
-    { ADC0, GPIO_PIN(PORT_C, 8), 4 },
-    { ADC0, GPIO_PIN(PORT_C, 9), 5 },
+    { .dev = ADC0, .pin = GPIO_PIN(PORT_B, 10), .chan = 14 },
+    { .dev = ADC0, .pin = GPIO_PIN(PORT_B, 11), .chan = 15 },
+    { .dev = ADC0, .pin = GPIO_PIN(PORT_C, 11), .chan =  7 },
+    { .dev = ADC0, .pin = GPIO_PIN(PORT_C, 10), .chan =  6 },
+    { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  8), .chan =  4 },
+    { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  9), .chan =  5 }
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
