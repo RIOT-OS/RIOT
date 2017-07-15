@@ -1,0 +1,132 @@
+From 0c967954f444044cbc5c51d25230a5ca6cfa1383 Mon Sep 17 00:00:00 2001
+From: PeterKietzmann <peter.kietzmann@haw-hamburg.de>
+Date: Thu, 8 Feb 2018 10:19:38 +0100
+Subject: [PATCH 1/6] Add Makefiles
+
+---
+ Makefile                        |  7 +++++++
+ drivers/common/Makefile         |  3 +++
+ kernel/openos/Makefile          |  3 +++
+ openstack/02a-MAClow/Makefile   |  3 +++
+ openstack/02b-MAChigh/Makefile  |  3 +++
+ openstack/03a-IPHC/Makefile     |  3 +++
+ openstack/03b-IPv6/Makefile     |  3 +++
+ openstack/04-TRAN/Makefile      |  3 +++
+ openstack/Makefile              | 10 ++++++++++
+ openstack/cross-layers/Makefile |  3 +++
+ 10 files changed, 41 insertions(+)
+ create mode 100644 Makefile
+ create mode 100644 drivers/common/Makefile
+ create mode 100644 kernel/openos/Makefile
+ create mode 100644 openstack/02a-MAClow/Makefile
+ create mode 100644 openstack/02b-MAChigh/Makefile
+ create mode 100644 openstack/03a-IPHC/Makefile
+ create mode 100644 openstack/03b-IPv6/Makefile
+ create mode 100644 openstack/04-TRAN/Makefile
+ create mode 100644 openstack/Makefile
+ create mode 100644 openstack/cross-layers/Makefile
+
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 00000000..fb6d84f4
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,7 @@
++MODULE := openwsn
++
++DIRS += $(CURDIR)/openstack \
++	$(CURDIR)/drivers/common \
++	$(CURDIR)/kernel/openos \
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/drivers/common/Makefile b/drivers/common/Makefile
+new file mode 100644
+index 00000000..1b7154c5
+--- /dev/null
++++ b/drivers/common/Makefile
+@@ -0,0 +1,3 @@
++MODULE := openwsn_drivers
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/kernel/openos/Makefile b/kernel/openos/Makefile
+new file mode 100644
+index 00000000..01719b0c
+--- /dev/null
++++ b/kernel/openos/Makefile
+@@ -0,0 +1,3 @@
++MODULE := openwsn_scheduler
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/openstack/02a-MAClow/Makefile b/openstack/02a-MAClow/Makefile
+new file mode 100644
+index 00000000..9f8053e5
+--- /dev/null
++++ b/openstack/02a-MAClow/Makefile
+@@ -0,0 +1,3 @@
++MODULE := openwsn_mac_low
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/openstack/02b-MAChigh/Makefile b/openstack/02b-MAChigh/Makefile
+new file mode 100644
+index 00000000..8bfc2e79
+--- /dev/null
++++ b/openstack/02b-MAChigh/Makefile
+@@ -0,0 +1,3 @@
++MODULE := openwsn_mac_high
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/openstack/03a-IPHC/Makefile b/openstack/03a-IPHC/Makefile
+new file mode 100644
+index 00000000..13cd664c
+--- /dev/null
++++ b/openstack/03a-IPHC/Makefile
+@@ -0,0 +1,3 @@
++MODULE := openwsn_iphc
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/openstack/03b-IPv6/Makefile b/openstack/03b-IPv6/Makefile
+new file mode 100644
+index 00000000..ee7d6368
+--- /dev/null
++++ b/openstack/03b-IPv6/Makefile
+@@ -0,0 +1,3 @@
++MODULE := openwsn_ipv6
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/openstack/04-TRAN/Makefile b/openstack/04-TRAN/Makefile
+new file mode 100644
+index 00000000..336010cb
+--- /dev/null
++++ b/openstack/04-TRAN/Makefile
+@@ -0,0 +1,3 @@
++MODULE := openwsn_transport
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/openstack/Makefile b/openstack/Makefile
+new file mode 100644
+index 00000000..aac34170
+--- /dev/null
++++ b/openstack/Makefile
+@@ -0,0 +1,10 @@
++MODULE := openwsn_openstack
++
++DIRS +=02a-MAClow
++DIRS +=02b-MAChigh
++DIRS +=03a-IPHC
++DIRS +=03b-IPv6
++DIRS +=04-TRAN
++DIRS +=cross-layers
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/openstack/cross-layers/Makefile b/openstack/cross-layers/Makefile
+new file mode 100644
+index 00000000..21a9f4ed
+--- /dev/null
++++ b/openstack/cross-layers/Makefile
+@@ -0,0 +1,3 @@
++MODULE := openwsn_crosslayers
++
++include $(RIOTBASE)/Makefile.base
+-- 
+2.14.1
+

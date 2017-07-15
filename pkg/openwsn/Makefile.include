@@ -1,0 +1,19 @@
+OPENWSN_DIR = $(RIOTBASE)/pkg/openwsn
+
+INCLUDES += -I$(PKGDIRBASE)/openwsn-fw \
+            -I$(PKGDIRBASE)/openwsn-fw/kernel \
+            -I$(PKGDIRBASE)/openwsn-fw/inc \
+            -I$(PKGDIRBASE)/openwsn-fw/drivers/common \
+            -I$(PKGDIRBASE)/openwsn-fw/bsp/boards/ \
+            -I$(PKGDIRBASE)/openwsn-fw/openstack/ \
+            -I$(PKGDIRBASE)/openwsn-fw/openstack/02a-MAClow \
+            -I$(PKGDIRBASE)/openwsn-fw/openstack/02b-MAChigh \
+            -I$(PKGDIRBASE)/openwsn-fw/openstack/03a-IPHC \
+            -I$(PKGDIRBASE)/openwsn-fw/openstack/03b-IPv6 \
+            -I$(PKGDIRBASE)/openwsn-fw/openstack/04-TRAN \
+            -I$(PKGDIRBASE)/openwsn-fw/openstack/cross-layers \
+            -I$(OPENWSN_DIR)/include \
+
+DIRS += $(OPENWSN_DIR)/contrib
+
+CFLAGS += -DISR_STACKSIZE=1024

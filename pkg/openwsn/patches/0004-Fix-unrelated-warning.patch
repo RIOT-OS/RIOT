@@ -1,0 +1,38 @@
+From f434eb788b91eb247354e95ea2ba096d290fac3e Mon Sep 17 00:00:00 2001
+From: PeterKietzmann <peter.kietzmann@haw-hamburg.de>
+Date: Thu, 8 Feb 2018 12:19:15 +0100
+Subject: [PATCH 4/6] Fix unrelated warning
+
+---
+ drivers/common/openserial.c          | 2 ++
+ openstack/02a-MAClow/adaptive_sync.c | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/drivers/common/openserial.c b/drivers/common/openserial.c
+index ccf0cf2c..ac225455 100644
+--- a/drivers/common/openserial.c
++++ b/drivers/common/openserial.c
+@@ -39,6 +39,8 @@ enum{
+ };
+ //=========================== prototypes ======================================
+ 
++void sniffer_setListeningChannel(uint8_t channel){return;}
++
+ // printing
+ owerror_t openserial_printInfoErrorCritical(
+     char             severity,
+diff --git a/openstack/02a-MAClow/adaptive_sync.c b/openstack/02a-MAClow/adaptive_sync.c
+index 8f772377..7a876e31 100644
+--- a/openstack/02a-MAClow/adaptive_sync.c
++++ b/openstack/02a-MAClow/adaptive_sync.c
+@@ -170,6 +170,7 @@ void adaptive_sync_calculateCompensatedSlots(int16_t timeCorrection) {
+ 
+ Once compensationTimeout == 0, extend or shorten current slot length for one tick.
+ */
++void radiotimer_setPeriod(PORT_RADIOTIMER_WIDTH period);
+ void adaptive_sync_countCompensationTimeout(void) {
+    uint16_t newSlotDuration;
+    
+-- 
+2.14.1
+

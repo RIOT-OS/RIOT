@@ -1,0 +1,114 @@
+/**
+ * @defgroup pkg_openwsn   OpenWSN network stack
+ * @ingroup  pkg
+ * @ingroup  net
+ * @brief    Provides a RIOT adaption of the OpenWSN network stack
+ * @see      https://github.com/openwsn-berkeley/openwsn-fw
+ *
+ *
+ * # OpenWSN RIOT Port
+ * This implementation integrates the [OpenWSN](https://github.com/openwsn-berkeley/openwsn-fw)
+ * full stack (UDP, IPv6, RPL, 6TiSCH) into RIOT. Basically, we provide a new RIOT "board" to the
+ * OpenWSN software. In this way we connect RIOT's hardware abstraction to OpenWSN's interfaces.
+ * Furthermore, we make use of the simple scheduling mechanism in OpenWSN which we run in a RIOT
+ * thread with second highest priority after the radio thread.
+ *
+ * ## Hardware abstraction implementation
+ * Following, we share some insights about the implementation of selected hardware modules.
+ *
+ * ### sctimer
+ * The `sctimer` ("single compare timer") in OpenWSN is the lowest timer abstraction which is used
+ * by the higher layer timer module `opentimers`. In the end, it is responsible for scheduling on
+ * the MAC layer. To enable low power energy modes, this timer usually incorporates the RTC (real
+ * time clock) module of micro controllers. That's why we adapt it to RIOT's `periph_rtt` module.
+ * Upper layers assume the sctimer to run at a frequency of 32768 Hz.
+ *
+ * The `sctimer` is responsible to set the next interrupt. Under circumstances, it may happen, that
+ * the next interrupt to schedule is already late, compared to the current time. In this case,
+ * timer implementations in OpenWSN directly trigger a hardware interrupt. For a generic solution
+ * in the RIOT adaptation, we set it to `now + 2`. This might not work so well on different platforms!
+ *
+ * ### radio
+ * The radio adaptation runs in an own thread with the highest priority (`THREAD_PRIORITY_MAIN - 4`).
+ * It maps to RIOT's `netdev` API. It is worth noting that hardware MAC layer features such as CSMA/
+ * CA, ACK handling and retransmissions are handled by OpenWSN which is why we disabled these
+ * parameters during driver initialization. As we use radio devices in Extended Operation Mode in RIOT (if
+ * applicable), this mode needs to be disabled. Furthermore, this might require slight adaptions to
+ * state handling of the driver which we provide for the Atmel AT86RF2XX in form of a patch file.
+ * The PAN ID used is `0xcafe` by default. This can be overwritten with a variable `PANID_DEFINED`.
+ *
+ * ### uart
+ * In RIOT, the first configured UART device is mapped to STDIO in most cases. In OpenWSN however,
+ * the `openserial` tool uses UART to feed external software running on a host computer [compare
+ * here](https://github.com/openwsn-berkeley/openwsn-sw) such as the `Openvisualizer` for example.
+ * To enable use of these tools, we also provide a UART adaptation which we map to the second UART
+ * device in RIOT. In this way we provide STDIO and `openserial` in parallel. Please note that it is
+ * not intended to provide official support for `openserial` here. It is just meant as experimental support.
+ *
+ * The UART abstraction differs from that in RIOT. More specifically, it makes use of hardware
+ * interrupts after one byte was written to the bus, to call previously registered callback
+ * functions. As we don't have a parameter to enable these interrupts in RIOT's generic hardware
+ * abstraction, we initialize a `periph_timer` which fires shortly after a byte was written. Please
+ * note that this **may** collide with the peripheral configuration for `xtimer` in RIOT. Also,
+ * timing behavior hasn't really been tested. The parameter `RIOT_PERIPH_TIMER` can be used to
+ * change the peripheral timer to use here.
+ *
+ * ## Tested Platforms and Pin configurations
+ * So far, the only tested platforms are the `iotlab-m3` and `nucleo-f103` nodes which are both
+ * equipped with an STM32F1 MCU. Currently, the `sctimer` implementation is in really hacky state
+ * and will probably not work with other MCUs.
+ *
+ * ### radio
+ * If you're using a platform that has a radio on board, the pin configuration is provided by that
+ * board. This is the default procedure. STM Nucleo boards for example, they don't provide on board
+ * radios. Here we made use of an external Atmel AT86RF233
+ * [Openlabs](http://openlabs.co/OSHW/Raspberry-Pi-802.15.4-radio) radio which we connected via jumper cables.
+ * One working configuration can be found in the Makefile of the test application. In addition to that, the
+ * Makefile needs to include that module by `USEMODULE += at86rf233`.
+ *
+ * ### ledpins & debugpins
+ * The OpenWSN software provides different hooks all over the stack to toggle different LEDs as
+ * well as debug pins to examine state and scheduling of a node. We added default configuration
+ * files for both. The LED configuration maps to RIOTs `LEDX_PIN` definitions, if available. Be
+ * aware that Nucleo boards share the LED line with SPI, which is why it shouldn't be applied here.
+ * The default configuration can be overwritten by setting `OPENWSN_LEDPINS_DEFAULT` in
+ * the form of `ledpins_config_t`. The debugpins work similarly by setting
+ * `OPENWSN_DEBUGPINS_BOARD` in the form of `debugpins_config_t`. However, the default setup is
+ * somehow practical for Nuleo pinouts.
+ *
+ *
+ * ## Testing and debugging
+ * Here, we simply list some items which are helpful to explore the functionality of OpenWSN:
+ * - LED pins and debug pins as mentioned above in combination with a logic analyzer. The expected
+ * behavior is described in the [OpenWSN wiki](https://openwsn.atlassian.net/wiki/spaces/OW/pages/688257/Schedules).
+ * - The provided test application provides a UDP client and server. If the UDP server is able to
+ * receive packets, we consider the mechanism working correctly.
+ * - With disabled channel hopping (`CFLAGS=-DOW_RIOT_SINGLE_CHANNEL=26`) it is rather simple to
+ * sniff transmitted packets by using a single channel sniffer. Either use a 802.15.4 capable
+ * board with RIOT support and follow
+ * [these instructions](https://github.com/RIOT-OS/applications/blob/master/sniffer/tools/README.md).
+ * Alternatively use a Raspberry Pi with an external radio
+ * such as Openlabs and incorporate Linux WPAN tools. In addition to that, there's also other
+ * hardware such as the ATUSB IEEE 802.15.4 USB Adapter which can directly be used on your Linux
+ * computer with WPAN tools installed. If you conduct your experiments on the IoT-LAB testbed you
+ * might want to use a [sniffer profile](https://www.iot-lab.info/tutorials/radio-sniffer).
+ * - To explore the channel hopping mechanism there are rather expensive multi-channel sniffers
+ * such as the BeamLogic 802.15.4 Site Analyzer that can sniff all channels simultaneously.
+ * Alternatively you can set up multiple separate sniffer devices locally or make use of the
+ * `sniffer_aggregator` on the IoT-LAB testbed.
+ * - There is a collection of external tools to interact with the IoT nodes from a host computer
+ * via `openserial`. Please refer to the
+ * [OpenWSN software](https://github.com/openwsn-berkeley/openwsn-sw) repository for further information.
+ *
+ * ## Open issues and ToDos
+ * - `sctimer` is a dirty hack and won't work for other platforms right now. Clean up and find a
+ * generic adaption for different MCUs with different speeds and timer widths. This goes along
+ * with cleaning the "board_ow.h" file which partly contains relevant definitions. Is it possible
+ * to find a better way to directly trigger an interrupt, rather than using the timer to fire in
+ * `now+2` ticks?
+ * - The UART wrapper uses a peripheral timer to fake an interrupt after one byte has been sent.
+ * Find another way to do this **or** find a better location for applying a RIOT timer device to
+ * it.
+ * - Modularize the build. Make `ledpins`, `debugpins` and `uart` optional.
+ * - Remove `WERROR = 0` from the application Makefile once all warnings in OpenWSN have been fixed.
+ * /

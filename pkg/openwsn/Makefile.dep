@@ -1,0 +1,19 @@
+ifneq (,$(filter openwsn,$(USEPKG)))
+  USEMODULE += openwsn_openstack
+  USEMODULE += openwsn_drivers
+  USEMODULE += openwsn_scheduler
+  USEMODULE += openwsn_mac_low
+  USEMODULE += openwsn_mac_high
+  USEMODULE += openwsn_iphc
+  USEMODULE += openwsn_ipv6
+  USEMODULE += openwsn_transport
+  USEMODULE += openwsn_crosslayers
+
+  USEMODULE += luid
+  USEMODULE += netdev_default
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_rtt
+  FEATURES_REQUIRED += periph_spi
+  FEATURES_REQUIRED += periph_timer
+  FEATURES_REQUIRED += periph_uart
+endif

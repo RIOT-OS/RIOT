@@ -1,0 +1,57 @@
+From 3923023a6bd724a2481abb9d49beb59a45da29c4 Mon Sep 17 00:00:00 2001
+From: PeterKietzmann <peter.kietzmann@haw-hamburg.de>
+Date: Thu, 15 Feb 2018 15:11:05 +0100
+Subject: [PATCH 6/6] Enable mode to disable channel hopping
+
+---
+ openstack/02a-MAClow/IEEE802154E.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/openstack/02a-MAClow/IEEE802154E.c b/openstack/02a-MAClow/IEEE802154E.c
+index e9efce0f..6c4bcf96 100644
+--- a/openstack/02a-MAClow/IEEE802154E.c
++++ b/openstack/02a-MAClow/IEEE802154E.c
+@@ -115,7 +115,11 @@ void ieee154e_init(void) {
+     memset(&ieee154e_dbg,0,sizeof(ieee154e_dbg_t));
+     
+     // set singleChannel to 0 to enable channel hopping.
+-    ieee154e_vars.singleChannel     = 0;
++#if OW_RIOT_SINGLE_CHANNEL
++    ieee154e_vars.singleChannel     = OW_RIOT_SINGLE_CHANNEL;
++#else
++    ieee154e_vars.singleChannel     = 0; // 0 means channel hopping
++#endif
+     ieee154e_vars.isAckEnabled      = TRUE;
+     ieee154e_vars.isSecurityEnabled = FALSE;
+     ieee154e_vars.slotDuration      = TsSlotDuration;
+@@ -237,13 +241,13 @@ void ieee154e_calculateExpTime(uint16_t max_delay, uint8_t* et_asn) {
+    uint8_t delay_array[5];
+    uint8_t i =0, carry = 0,slot_time = 0;
+    uint16_t sum = 0, delay_in_asn =0;
+-	
++  
+    memset(&delay_array[0],0,5);
+    
+    //Slot time = (Duration in ticks * Time equivalent ticks w.r.t 32kHz) in ms
+    slot_time = (ieee154e_getSlotDuration()*305)/10000;  
+    delay_in_asn = max_delay / slot_time; 
+-		
++    
+    delay_array[0]         = (delay_in_asn     & 0xff);
+    delay_array[1]         = (delay_in_asn/256 & 0xff);
+    
+@@ -540,7 +544,11 @@ port_INLINE void activity_synchronize_newSlot(void) {
+         radio_rfOff();
+         
+         // update record of current channel
++#if OW_RIOT_SINGLE_CHANNEL
++        ieee154e_vars.freq = OW_RIOT_SINGLE_CHANNEL;
++#else
+         ieee154e_vars.freq = (openrandom_get16b()&0x0F) + 11;
++#endif
+         
+         // configure the radio to listen to the default synchronizing channel
+         radio_setFrequency(ieee154e_vars.freq);
+-- 
+2.14.1
+
