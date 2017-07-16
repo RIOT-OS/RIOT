@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 INRIA
+ * Copyright (C) 2013, 2016 Inria
  * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -18,6 +18,7 @@
  *
  * @author          Alaeddine Weslati <alaeddine.weslati@intia.fr>
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author          Francisco Acosta <francisco.acosta@inria.fr>
  */
 
 #ifndef CPU_CONF_H
@@ -33,6 +34,38 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if defined(CPU_MODEL_STM32F103RE)
+/*
+ * @brief   Flash partitioning for FW slots
+ * @{
+ */
+
+#ifndef FW_METADATA_SPACE
+#define FW_METADATA_SPACE          (0x100)
+#endif
+
+#define MAX_FW_SLOTS               (2)
+#define FW_SLOT_PAGES              (120)
+#define FW_SLOT_1_PAGE             (8)
+#define FW_SLOT_2_PAGE             (128)
+
+/** @} */
+
+#endif /* defined(CPU_MODEL_STM32F103RE) */
+/** @} */
+
+#if FW_SLOT == 1
+#define CURRENT_FIRMWARE_ADDR       FW_SLOT_1
+#define CURRENT_FIRMWARE_PAGE       FW_SLOT_1_PAGE
+#define CURRENT_FIRMWARE_END        FW_SLOT_1_END
+#endif
+
+#if FW_SLOT == 2
+#define CURRENT_FIRMWARE_ADDR       FW_SLOT_2
+#define CURRENT_FIRMWARE_PAGE       FW_SLOT_2_PAGE
+#define CURRENT_FIRMWARE_END        FW_SLOT_2_END
 #endif
 
 /**
