@@ -15,6 +15,19 @@ export CFLAGS_OPT  ?= -Os
 export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
+
+# If the FW_SLOT flag is set, we will use a specific linker script depending
+# on the slot which we are compiling for.
+ifdef FW_SLOT
+export LINKER_SCRIPT = $(CPU_MODEL)_slot$(FW_SLOT).ld
+export CFLAGS += -DFW_SLOT=$(FW_SLOT)
+endif
+
+# If we compile a bootloader, set the correct linker script
+ifeq (1,$(BOOTLOADER))
+export LINKER_SCRIPT = $(CPU_MODEL)-bootloader.ld
+endif
+
 export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/cortexm_common/ldscripts
 export LINKER_SCRIPT ?= $(CPU_MODEL).ld
 export LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
