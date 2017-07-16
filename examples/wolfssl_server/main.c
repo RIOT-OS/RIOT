@@ -50,7 +50,7 @@
 
 
 
-int main()
+int main(void)
 {
     int                sockfd;
     int                connd;

@@ -19,3 +19,10 @@
 
 #undef WC_RSA_BLINDING
 #define WC_RSA_BLINDING
+
+#undef SINGLE_THREADED
+#define SINGLE_THREADED
+
+#undef NO_FILESYSTEM
+#define NO_FILESYSTEM
+
