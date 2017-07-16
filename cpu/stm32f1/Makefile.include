@@ -1,6 +1,13 @@
 export CPU_ARCH = cortex-m3
 export CPU_FAM  = stm32f1
 
+# Add slot offsets for CPU stm32f103re
+ifeq ($(call ifndef_any_of,FW_SLOT CPU_MODEL_STM32F103RE),)
+export FW_METADATA_SPACE   ?= 0x100        # 256 byte aligned metadata space
+export OFFSET_SLOT_1       ?= 0x08004000   # Slot 1 starts at page 8
+export OFFSET_SLOT_2       ?= 0x08040000   # Slot 2 starts at page 128
+endif
+
 USEMODULE += pm_layered
 
 include $(RIOTCPU)/stm32_common/Makefile.include
