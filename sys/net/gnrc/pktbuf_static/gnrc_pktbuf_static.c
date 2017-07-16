@@ -22,7 +22,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/types.h>
-#include <sys/uio.h>
 
 #include "mutex.h"
 #include "od.h"
@@ -270,40 +269,6 @@ gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
     return pkt;
 }
 
-gnrc_pktsnip_t *gnrc_pktbuf_get_iovec(gnrc_pktsnip_t *pkt, size_t *len)
-{
-    size_t length;
-    gnrc_pktsnip_t *head;
-    struct iovec *vec;
-
-    assert(len != NULL);
-    if (pkt == NULL) {
-        *len = 0;
-        return NULL;
-    }
-
-    /* count the number of snips in the packet and allocate the IOVEC */
-    length = gnrc_pkt_count(pkt);
-    head = gnrc_pktbuf_add(pkt, NULL, (length * sizeof(struct iovec)),
-                           GNRC_NETTYPE_IOVEC);
-    if (head == NULL) {
-        *len = 0;
-        return NULL;
-    }
-
-    assert(head->data != NULL);
-    vec = (struct iovec *)(head->data);
-    /* fill the IOVEC */
-    while (pkt != NULL) {
-        vec->iov_base = pkt->data;
-        vec->iov_len = pkt->size;
-        ++vec;
-        pkt = pkt->next;
-    }
-    *len = length;
-    return head;
-}
-
 #ifdef DEVELHELP
 #ifdef MODULE_OD
 static inline void _print_chunk(void *chunk, size_t size, int num)
@@ -523,38 +488,6 @@ static void _pktbuf_free(void *data, size_t size)
     }
 }
 
-
-gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *snip)
-{
-    LL_DELETE(pkt, snip);
-    snip->next = NULL;
-    gnrc_pktbuf_release(snip);
-
-    return pkt;
-}
-
-gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *old, gnrc_pktsnip_t *add)
-{
-    /* If add is a list we need to preserve its tail */
-    if (add->next != NULL) {
-        gnrc_pktsnip_t *tail = add->next;
-        gnrc_pktsnip_t *back;
-        LL_SEARCH_SCALAR(tail, back, next, NULL); /* find the last snip in add */
-        /* Replace old */
-        LL_REPLACE_ELEM(pkt, old, add);
-        /* and wire in the tail between */
-        back->next = add->next;
-        add->next = tail;
-    }
-    else {
-        /* add is a single element, has no tail, simply replace */
-        LL_REPLACE_ELEM(pkt, old, add);
-    }
-    old->next = NULL;
-    gnrc_pktbuf_release(old);
-
-    return pkt;
-}
 
 gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
 {

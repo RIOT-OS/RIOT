@@ -24,6 +24,8 @@ cachegrind.out*
 *.kdev4
 # Codelite (among others) project files
 *.project
+# Visual Studio Code user settings
+.vscode/
 # ctags index files
 tags
 # GDB initialization scripts

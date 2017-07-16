@@ -1,9 +1,8 @@
-APPLICATION = driver_bmx280
 include ../Makefile.tests_common
 
-DRIVER ?= bme280
-
-USEMODULE += $(DRIVER)
 USEMODULE += xtimer
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	./tests/01-run.py

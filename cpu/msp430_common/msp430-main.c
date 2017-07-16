@@ -44,6 +44,7 @@
 
 #include "cpu.h"
 #include "irq.h"
+#include "periph/init.h"
 
 /*---------------------------------------------------------------------------*/
 static void
@@ -113,6 +114,8 @@ void msp430_cpu_init(void)
     irq_disable();
     init_ports();
     irq_enable();
+
+    periph_init();
 
     if ((uintptr_t)cur_break & 1) { /* Workaround for msp430-ld bug!*/
         cur_break++;
