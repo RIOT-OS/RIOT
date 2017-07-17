@@ -1,19 +1,30 @@
 /*
- * wdt.c
+ * Copyright (C) 2017 Technische Universität Berlin
  *
- *  Created on: 12.07.2017
- *      Author: geith
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     cpu_cc2538
+ * @ingroup     drivers_periph_wdt
+ * @{
+ *
+ * @file
+ * @brief       WDT peripheral driver implementation for the cc2538
+ *
+ * @author      Thomas Geithner <thomas.geithner@dai-labor.de>
+ *
+ * @}
  */
 
 #include "irq.h"
+#include "cpu.h"
 #include "cc2538.h"
 #include "periph/wdt.h"
 
 #define CC2538_WDT_CLK 32768
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef union {
     cc2538_reg_t WDT;
@@ -28,52 +39,78 @@ typedef union {
 
 cc2538_wdt_t * const WDT = (cc2538_wdt_t *) &SMWDTHROSC_WDCTL;
 
-// counter values supported by the cc2538
-//const uint16_t counter_values[] = {64, 512, 8192, 32768 }; // values according to cc2538 user manual
-const uint16_t counter_values[] = { 32, 256, 4096, 16384 }; // values according to measurements on Zolertia Firefly
-#define NUM_CNT_VALUES (sizeof(counter_values) / sizeof(counter_values[0]))
+/*
+ * supported clock counter values by the cc2538
+ *
+ * The array index corresponds to the value in the INT field of the WDT register.
+ * According to the "CC2538 User's Guide" [1, pp. 370], the counter values and
+ * corresponding timings are:
+ * 64    -> 1.9 ms
+ * 512   -> 15.6 ms
+ * 8192  -> 250 ms
+ * 32768 -> 1000 ms
+ *
+ * Own measurements showed exactly half that times. In consequence, the counter
+ * values have been halved too:
+ * 32    -> 0.95 ms
+ * 256   -> 7.8 ms
+ * 4096  -> 125 ms
+ * 16384 -> 500 ms
+ *
+ * [1] http://www.ti.com/lit/ug/swru319c/swru319c.pdf
+ */
+const uint16_t clk_counter_values[] = { 32, 256, 4096, 16384 };
 
-static uint16_t cc2538_wdt_usec_to_cnt(uint32_t t_wdt) {
-    uint32_t cnt;
+#define NUM_CNT_VALUES (sizeof(clk_counter_values) / sizeof(clk_counter_values[0]))
+
+static uint16_t cc2538_wdt_usec_to_clk_cnt(uint32_t t_wdt) {
+    uint32_t clk_cnt;
     if (t_wdt > (1000 * 1000)) {
         /* max. WDT interval of 1s */
         t_wdt = 1000 * 1000;
     }
 
-    /* scale down (still below min. resolution) */
+    /* scale down to stay in valid value range for next calculation
+     * (still below min. resolution)
+     */
     t_wdt /= 10;
 
-    cnt = (t_wdt * CC2538_WDT_CLK) / (100 * 1000);
+    /* calculate the required clock count */
+    clk_cnt = (t_wdt * CC2538_WDT_CLK) / (100 * 1000);
 
-    if (cnt == 0) {
-        cnt = 1;
+    /* ensure minimal clock count */
+    if (clk_cnt == 0) {
+        clk_cnt = 1;
     }
 
-    return cnt;
+    return clk_cnt;
 }
 
-int wdt_init(uint32_t t_wdt, wdt_mode_t mode) {
-    uint32_t cnt;
-    uint16_t sel_cnt = 0;
-    uint8_t sel_cnt_idx = 0;
+int wdt_init(uint32_t t_wdt, wdt_timing_t timing) {
+    uint32_t clk_cnt;
+    uint16_t sel_clk_cnt = 0;
+    uint8_t sel_clk_cnt_idx = 0;
     uint8_t i;
 
+    /* check, if WDT is already enabled */
     if (WDT->WDTbits.EN == 1) {
         return -1;
     }
 
-    cnt = cc2538_wdt_usec_to_cnt(t_wdt);
+    /* get required clock count */
+    clk_cnt = cc2538_wdt_usec_to_clk_cnt(t_wdt);
 
-    switch(mode){
+    /* searching the best matching timing according to selected timing mode */
+    switch(timing){
     case WDT_EXACT:
         for (i = 0; i < NUM_CNT_VALUES; i++) {
-            if(counter_values[i] == cnt){
-                sel_cnt_idx = i;
-                sel_cnt = counter_values[sel_cnt_idx];
+            if(clk_counter_values[i] == clk_cnt){
+                sel_clk_cnt_idx = i;
+                sel_clk_cnt = clk_counter_values[sel_clk_cnt_idx];
                 break;
             }
         }
-        if(sel_cnt == 0) {
+        if(sel_clk_cnt == 0) {
             /* no exact match found -> error */
             return -1;
         }
@@ -81,9 +118,9 @@ int wdt_init(uint32_t t_wdt, wdt_mode_t mode) {
     case WDT_MIN:
         for (i = 0; i < NUM_CNT_VALUES; i++) {
 
-            sel_cnt_idx = i;
-            sel_cnt = counter_values[sel_cnt_idx];
-            if (sel_cnt >= cnt) {
+            sel_clk_cnt_idx = i;
+            sel_clk_cnt = clk_counter_values[sel_clk_cnt_idx];
+            if (sel_clk_cnt >= clk_cnt) {
                 break;
             }
         }
@@ -92,19 +129,22 @@ int wdt_init(uint32_t t_wdt, wdt_mode_t mode) {
         for (i = NUM_CNT_VALUES-1;
             i >= 0; i--) {
 
-            sel_cnt_idx = i;
-            sel_cnt = counter_values[sel_cnt_idx];
-            if (sel_cnt <= cnt) {
+            sel_clk_cnt_idx = i;
+            sel_clk_cnt = clk_counter_values[sel_clk_cnt_idx];
+            if (sel_clk_cnt <= clk_cnt) {
                 break;
             }
         }
         break;
     }
 
-    WDT->WDTbits.INT = 3 - sel_cnt_idx; // invert index
+    /* invert array index and write into register */
+    WDT->WDTbits.INT = 3 - sel_clk_cnt_idx;
 
-    t_wdt = sel_cnt * (1000 * 10) / CC2538_WDT_CLK;
+    /* calculate return value based on selected timing */
+    t_wdt = sel_clk_cnt * (1000 * 10) / CC2538_WDT_CLK;
     t_wdt *= 100;
+
     return t_wdt;
 }
 
@@ -114,22 +154,25 @@ int wdt_enable(void) {
 }
 
 int wdt_disable(void) {
-    //WDT->WDTbits.EN = 0; // has no effect, WDT can't be disabled
+    /* cc2538 doesn't allow disabling the WDT */
     return -1;
 }
 
 int wdt_is_enabled(void) {
+    /* writing WDT enable flag into register */
     return WDT->WDTbits.EN;
 }
 
 void wdt_reset(void) {
-
     unsigned irq_state;
 
+    /* disabling IRQs */
     irq_state = irq_disable();
 
+    /* writing WDT clear sequence */
     WDT->WDTbits.CLR = 0xa;
     WDT->WDTbits.CLR = 0x5;
 
+    /* restoring IRQ state */
     irq_restore(irq_state);
 }

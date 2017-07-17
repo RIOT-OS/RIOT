@@ -19,6 +19,10 @@
 #ifndef PERIPH_WDT_H
 #define PERIPH_WDT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 /**
@@ -28,7 +32,7 @@ typedef enum {
     WDT_EXACT,   /**< WDT interval shall be exact as requested */
     WDT_MIN,     /**< WDT interval shall be >= than requested */
     WDT_MAX,     /**< WDT interval shall be <= than requested */
-} wdt_mode_t;
+} wdt_timing_t;
 
 /**
  * @brief   Initialize the Watchdog Timer
@@ -36,7 +40,7 @@ typedef enum {
  * The watchdog timer (WDT) is initialized preferred interval in microseconds.
  * Depending on the hardware, this exact interval might be not feasible. So,
  * the initialization routine select the best suitable time (real WDT interval)
- * depending on the selected WDT mode:
+ * depending on the selected WDT timing mode:
  *
  * WDT_EXACT: the real WDT interval shall be exact as specified by the preferred
  *            interval (within the bounds of the timer resolution)
@@ -56,8 +60,7 @@ typedef enum {
  * @return                  -1 on error
  * @return                  applied WDT interval in microseconds
  */
-int wdt_init(uint32_t t_wdt, wdt_mode_t mode);
-
+int wdt_init(uint32_t t_wdt, wdt_timing_t timing);
 
 /**
  * @brief   Enables the Watchdog Timer

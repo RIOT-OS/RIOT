@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup        examples
+ * @defgroup        tests
  * @{
  *
  * @file
@@ -27,12 +27,12 @@
 #include "xtimer.h"
 #include "shell.h"
 #include "shell_commands.h"
-#include "periph/gpio.h"
 
 #include "periph/wdt.h"
 
 
 #ifdef WDT_GPIO_DEBUG
+#include "periph/gpio.h"
 
 #ifndef REBOOT_GPIO
 #define REBOOT_GPIO GPIO_PIN(3,2)
@@ -64,12 +64,12 @@ static const shell_command_t shell_commands[] = { { "wdt", "WDT management",
 
 int wdt_cmd(int argc, char** argv) {
     if (argc < 2) {
-        puts("WDT command required: [init|init_max|init_ex|enable|disable|block|help]");
+        puts("WDT command required: [init[_min|_max|_ex]|enable|disable|block|help]");
         return -1;
     }
 
     if (strcmp(argv[1], "help") == 0) {
-        puts("init <wdt_time in ms> [<wdt_update_interval in ms>]\n");
+        puts("init[_min|_max|_ex] <wdt_time in ms> [<wdt_update_interval in ms>]\n");
         puts("init_max <wdt_time in ms> [<wdt_update_interval in ms>]\n");
         puts("init_ex <wdt_time in ms> [<wdt_update_interval in ms>]\n");
         puts("enable\n");
@@ -98,10 +98,6 @@ int wdt_cmd(int argc, char** argv) {
     }
 
 
-    /*
-    if ((strcmp(argv[1], "init") == 0)
-        || (strcmp(argv[1], "init_max") == 0)) {
-    */
     if (strncmp(argv[1], "init", 4) == 0) {
 
         uint32_t wdt_time = 1000;
@@ -129,7 +125,10 @@ int wdt_cmd(int argc, char** argv) {
             real_wdt_time = wdt_init(wdt_time, WDT_MAX);
         } else if (strcmp(argv[1], "init_ex") == 0) {
             real_wdt_time = wdt_init(wdt_time, WDT_EXACT);
+        } else if (strcmp(argv[1], "init_min") == 0) {
+            real_wdt_time = wdt_init(wdt_time, WDT_MIN);
         } else{
+            /* default: WDT_MIN */
             real_wdt_time = wdt_init(wdt_time, WDT_MIN);
         }
 
