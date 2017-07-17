@@ -12,7 +12,7 @@ BOARD_WHITELIST := native airfy-beacon arduino-due arduino-duemilanove arduino-m
                    iotlab-m3 limifrog-v1 maple-mini msb-430 msb-430h msba2 msbiot mulle \
                    nrf52840dk nrf52dk nrf6310 nucleo-f072 nucleo-f091 nucleo-f103 \
                    nucleo-f302 nucleo-f303 nucleo-f334 nucleo-f401 nucleo-f410 nucleo-f411 \
-                   nucleo-f446 nucleo-l053 nucleo-l073 nucleo-l1 nucleo-l476 nucleo144-f207 \
+                   nucleo-f446 nucleo-l053 nucleo-l073 nucleo-l152 nucleo-l476 nucleo144-f207 \
                    nucleo144-f303 nucleo144-f413 nucleo144-f429 nucleo144-f446 nucleo32-f031 \
                    nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo32-l432 openmote-cc2538 \
                    pba-d-01-kw2x pca10005 remote-pa remote-reva remote-revb samd21-xpro \
