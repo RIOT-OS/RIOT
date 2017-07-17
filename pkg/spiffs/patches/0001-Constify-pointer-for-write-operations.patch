@@ -1,0 +1,203 @@
+From 8721846f8b03ca7aa1d592abd00a0c9a721e11c6 Mon Sep 17 00:00:00 2001
+From: Vincent Dupont <vincent@otakeys.com>
+Date: Mon, 17 Jul 2017 12:42:12 +0200
+Subject: [PATCH] Constify pointer for write operations
+
+---
+ src/spiffs.h           |  6 +++---
+ src/spiffs_cache.c     |  2 +-
+ src/spiffs_hydrogen.c  | 10 +++++-----
+ src/spiffs_nucleus.c   |  6 +++---
+ src/spiffs_nucleus.h   | 18 ++++++++----------
+ src/test/test_spiffs.c |  2 +-
+ 6 files changed, 21 insertions(+), 23 deletions(-)
+
+diff --git a/src/spiffs.h b/src/spiffs.h
+index 534c3df..991aabf 100644
+--- a/src/spiffs.h
++++ b/src/spiffs.h
+@@ -84,7 +84,7 @@ struct spiffs_t;
+ /* spi read call function type */
+ typedef s32_t (*spiffs_read)(struct spiffs_t *fs, u32_t addr, u32_t size, u8_t *dst);
+ /* spi write call function type */
+-typedef s32_t (*spiffs_write)(struct spiffs_t *fs, u32_t addr, u32_t size, u8_t *src);
++typedef s32_t (*spiffs_write)(struct spiffs_t *fs, u32_t addr, u32_t size, const u8_t *src);
+ /* spi erase call function type */
+ typedef s32_t (*spiffs_erase)(struct spiffs_t *fs, u32_t addr, u32_t size);
+ 
+@@ -93,7 +93,7 @@ typedef s32_t (*spiffs_erase)(struct spiffs_t *fs, u32_t addr, u32_t size);
+ /* spi read call function type */
+ typedef s32_t (*spiffs_read)(u32_t addr, u32_t size, u8_t *dst);
+ /* spi write call function type */
+-typedef s32_t (*spiffs_write)(u32_t addr, u32_t size, u8_t *src);
++typedef s32_t (*spiffs_write)(u32_t addr, u32_t size, const u8_t *src);
+ /* spi erase call function type */
+ typedef s32_t (*spiffs_erase)(u32_t addr, u32_t size);
+ #endif // SPIFFS_HAL_CALLBACK_EXTRA
+@@ -468,7 +468,7 @@ s32_t SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len);
+  * @param len           how much to write
+  * @returns number of bytes written, or -1 if error
+  */
+-s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len);
++s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, const void *buf, s32_t len);
+ 
+ /**
+  * Moves the read/write file offset. Resulting offset is returned or negative if error.
+diff --git a/src/spiffs_cache.c b/src/spiffs_cache.c
+index 37c9d64..e28911d 100644
+--- a/src/spiffs_cache.c
++++ b/src/spiffs_cache.c
+@@ -185,7 +185,7 @@ s32_t spiffs_phys_wr(
+     spiffs_file fh,
+     u32_t addr,
+     u32_t len,
+-    u8_t *src) {
++    const u8_t *src) {
+   (void)fh;
+   spiffs_page_ix pix = SPIFFS_PADDR_TO_PAGE(fs, addr);
+   spiffs_cache *cache = spiffs_get_cache(fs);
+diff --git a/src/spiffs_hydrogen.c b/src/spiffs_hydrogen.c
+index 69e0c22..1114f51 100644
+--- a/src/spiffs_hydrogen.c
++++ b/src/spiffs_hydrogen.c
+@@ -430,22 +430,22 @@ s32_t SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
+ 
+ 
+ #if !SPIFFS_READ_ONLY
+-static s32_t spiffs_hydro_write(spiffs *fs, spiffs_fd *fd, void *buf, u32_t offset, s32_t len) {
++static s32_t spiffs_hydro_write(spiffs *fs, spiffs_fd *fd, const void *buf, u32_t offset, s32_t len) {
+   (void)fs;
+   s32_t res = SPIFFS_OK;
+   s32_t remaining = len;
+   if (fd->size != SPIFFS_UNDEFINED_LEN && offset < fd->size) {
+     s32_t m_len = MIN((s32_t)(fd->size - offset), len);
+-    res = spiffs_object_modify(fd, offset, (u8_t *)buf, m_len);
++    res = spiffs_object_modify(fd, offset, buf, m_len);
+     SPIFFS_CHECK_RES(res);
+     remaining -= m_len;
+-    u8_t *buf_8 = (u8_t *)buf;
++    const u8_t *buf_8 = buf;
+     buf_8 += m_len;
+     buf = buf_8;
+     offset += m_len;
+   }
+   if (remaining > 0) {
+-    res = spiffs_object_append(fd, offset, (u8_t *)buf, remaining);
++    res = spiffs_object_append(fd, offset, buf, remaining);
+     SPIFFS_CHECK_RES(res);
+   }
+   return len;
+@@ -453,7 +453,7 @@ static s32_t spiffs_hydro_write(spiffs *fs, spiffs_fd *fd, void *buf, u32_t offs
+ }
+ #endif // !SPIFFS_READ_ONLY
+ 
+-s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
++s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, const void *buf, s32_t len) {
+   SPIFFS_API_DBG("%s "_SPIPRIfd " "_SPIPRIi "\n", __func__, fh, len);
+ #if SPIFFS_READ_ONLY
+   (void)fs; (void)fh; (void)buf; (void)len;
+diff --git a/src/spiffs_nucleus.c b/src/spiffs_nucleus.c
+index 12c9de8..301f179 100644
+--- a/src/spiffs_nucleus.c
++++ b/src/spiffs_nucleus.c
+@@ -754,7 +754,7 @@ s32_t spiffs_page_allocate_data(
+     spiffs *fs,
+     spiffs_obj_id obj_id,
+     spiffs_page_header *ph,
+-    u8_t *data,
++    const u8_t *data,
+     u32_t len,
+     u32_t page_offs,
+     u8_t finalize,
+@@ -1195,7 +1195,7 @@ s32_t spiffs_object_open_by_page(
+ #if !SPIFFS_READ_ONLY
+ // Append to object
+ // keep current object index (header) page in fs->work buffer
+-s32_t spiffs_object_append(spiffs_fd *fd, u32_t offset, u8_t *data, u32_t len) {
++s32_t spiffs_object_append(spiffs_fd *fd, u32_t offset, const u8_t *data, u32_t len) {
+   spiffs *fs = fd->fs;
+   s32_t res = SPIFFS_OK;
+   u32_t written = 0;
+@@ -1442,7 +1442,7 @@ s32_t spiffs_object_append(spiffs_fd *fd, u32_t offset, u8_t *data, u32_t len) {
+ #if !SPIFFS_READ_ONLY
+ // Modify object
+ // keep current object index (header) page in fs->work buffer
+-s32_t spiffs_object_modify(spiffs_fd *fd, u32_t offset, u8_t *data, u32_t len) {
++s32_t spiffs_object_modify(spiffs_fd *fd, u32_t offset, const u8_t *data, u32_t len) {
+   spiffs *fs = fd->fs;
+   s32_t res = SPIFFS_OK;
+   u32_t written = 0;
+diff --git a/src/spiffs_nucleus.h b/src/spiffs_nucleus.h
+index 3d77d50..7b89f01 100644
+--- a/src/spiffs_nucleus.h
++++ b/src/spiffs_nucleus.h
+@@ -545,7 +545,7 @@ s32_t spiffs_phys_wr(
+ #endif
+     u32_t addr,
+     u32_t len,
+-    u8_t *src);
++    const u8_t *src);
+ 
+ s32_t spiffs_phys_cpy(
+     spiffs *fs,
+@@ -619,11 +619,10 @@ s32_t spiffs_obj_lu_find_id_and_span_by_phdr(
+ 
+ // ---------------
+ 
+-s32_t spiffs_page_allocate_data(
+-    spiffs *fs,
++s32_t spiffs_page_allocate_data(spiffs *fs,
+     spiffs_obj_id obj_id,
+     spiffs_page_header *ph,
+-    u8_t *data,
++    const u8_t *data,
+     u32_t len,
+     u32_t page_offs,
+     u8_t finalize,
+@@ -696,16 +695,15 @@ s32_t spiffs_object_open_by_page(
+     spiffs_flags flags,
+     spiffs_mode mode);
+ 
+-s32_t spiffs_object_append(
+-    spiffs_fd *fd,
++s32_t spiffs_object_append(spiffs_fd *fd,
+     u32_t offset,
+-    u8_t *data,
++    const u8_t *data,
+     u32_t len);
+ 
+ s32_t spiffs_object_modify(
+     spiffs_fd *fd,
+     u32_t offset,
+-    u8_t *data,
++    const u8_t *data,
+     u32_t len);
+ 
+ s32_t spiffs_object_read(
+@@ -807,8 +805,8 @@ s32_t spiffs_object_index_consistency_check(
+ // checked in test builds, otherwise plain memcpy (unless already defined)
+ #ifdef _SPIFFS_TEST
+ #define _SPIFFS_MEMCPY(__d, __s, __l) do { \
+-    intptr_t __a1 = (intptr_t)((u8_t*)(__s)); \
+-    intptr_t __a2 = (intptr_t)((u8_t*)(__s)+(__l)); \
++    intptr_t __a1 = (intptr_t)((const u8_t*)(__s)); \
++    intptr_t __a2 = (intptr_t)((const u8_t*)(__s)+(__l)); \
+     intptr_t __b1 = (intptr_t)((u8_t*)(__d)); \
+     intptr_t __b2 = (intptr_t)((u8_t*)(__d)+(__l)); \
+     if (__a1 <= __b2 && __b1 <= __a2) { \
+diff --git a/src/test/test_spiffs.c b/src/test/test_spiffs.c
+index 374028a..e96d4de 100644
+--- a/src/test/test_spiffs.c
++++ b/src/test/test_spiffs.c
+@@ -174,7 +174,7 @@ static s32_t _write(
+ #if SPIFFS_HAL_CALLBACK_EXTRA
+     spiffs *fs,
+ #endif
+-    u32_t addr, u32_t size, u8_t *src) {
++    u32_t addr, u32_t size, const u8_t *src) {
+   int i;
+   //printf("wr %08x %i\n", addr, size);
+   if (log_flash_ops) {
+-- 
+2.11.0
+
