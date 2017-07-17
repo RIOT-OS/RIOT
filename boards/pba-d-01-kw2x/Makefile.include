@@ -1,8 +1,10 @@
 # define the cpu used by the phyWAVE-KW22 board
 export CPU = kw2xd
-export CPU_MODEL = kw21d256
-#export CPU_MODEL = kw21d512
-#export CPU_MODEL = kw22d512
+
+# the pba-d-01-kw2x board can embed either a kw21d256, kw21d512 or kw22d512 cpu.
+# The default set up is kw21d256, the variable is overrideable to use the other
+# cpu if needed.
+export CPU_MODEL ?= kw21d256
 
 export MCPU = cortex-m4
 
