@@ -69,6 +69,7 @@ static void _can_event(netdev_t *dev, netdev_event_t event)
 {
     msg_t msg;
     candev_dev_t *candev_dev = dev->context;
+    struct can_frame frame;
 
     DEBUG("_can_event: dev=%p, params=%p\n", (void*)dev, (void*)candev_dev);
     DEBUG("_can_event: params->ifnum=%d, params->pid=%" PRIkernel_pid ", params->dev=%p\n",
@@ -106,10 +107,8 @@ static void _can_event(netdev_t *dev, netdev_event_t event)
 #ifdef MODULE_CAN_PM
         pm_reset(candev_dev, candev_dev->rx_inactivity_timeout);
 #endif
-        msg.type = CAN_MSG_RX_INDICATION;
-        if (msg_send(&msg, candev_dev->pid) <= 0) {
-            DEBUG("can device: isr lost\n");
-        }
+        dev->driver->recv(dev, &frame, sizeof(frame), NULL);
+        can_dll_dispatch_rx_frame(&frame, candev_dev->pid);
         break;
     case NETDEV_EVENT_BUS_OFF:
         candev_dev->state = CAN_STATE_BUS_OFF;
@@ -135,8 +134,8 @@ static int power_up(candev_dev_t *candev_dev)
 #ifdef MODULE_CAN_TRX
     can_trx_set_mode(candev_dev->trx, TRX_NORMAL_MODE);
 #endif
-    canopt_state_t state = CANOPT_STATE_ON;
-    int res = dev->driver->set(dev, CANOPT_STATE, &state, sizeof(state));
+    netopt_state_t state = NETOPT_STATE_IDLE;
+    int res = dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
     candev_dev->state = CAN_STATE_ERROR_ACTIVE;
 
     return res;
@@ -151,8 +150,8 @@ static int power_down(candev_dev_t *candev_dev)
 #ifdef MODULE_CAN_TRX
     can_trx_set_mode(candev_dev->trx, TRX_SLEEP_MODE);
 #endif
-    canopt_state_t state = CANOPT_STATE_SLEEP;
-    int res = dev->driver->set(dev, CANOPT_STATE, &state, sizeof(state));
+    netopt_state_t state = NETOPT_STATE_SLEEP;
+    int res = dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
     candev_dev->state = CAN_STATE_SLEEPING;
 
 #ifdef MODULE_CAN_PM
@@ -221,7 +220,6 @@ static void *_can_device_thread(void *args)
 #endif
 
     int res;
-    struct can_frame frame;
     struct iovec iovec;
     can_pkt_t *pkt;
     can_opt_t *opt;
@@ -268,11 +266,6 @@ static void *_can_device_thread(void *args)
             iovec.iov_len = sizeof(struct can_frame);
             dev->driver->send(dev, &iovec, 1);
             can_dll_dispatch_tx_conf(pkt);
-            break;
-        case CAN_MSG_RX_INDICATION:
-            DEBUG("can device: CAN_MSG_RX_INDICATION received\n");
-            dev->driver->recv(dev, &frame, sizeof(frame), NULL);
-            can_dll_dispatch_rx_frame(&frame, candev_dev->pid);
             break;
         case CAN_MSG_SET:
             DEBUG("can device: CAN_MSG_SET received\n");

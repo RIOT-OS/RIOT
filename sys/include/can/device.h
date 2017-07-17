@@ -50,6 +50,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief Structure to pass a CAN option
+ */
+typedef struct {
+    netopt_t opt;               /**< the option to get/set */
+    uint16_t context;           /**< (optional) context for that option */
+    void *data;                 /**< data to set or buffer to read into */
+    uint16_t data_len;          /**< size of the data / the buffer */
+} can_opt_t;
+
+/**
  * @brief Parameters to initialize a candev
  */
 typedef struct candev_params {

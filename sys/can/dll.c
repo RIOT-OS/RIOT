@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "thread.h"
+#include "mutex.h"
 #include "can/dll.h"
 #include "can/raw.h"
 #include "can/device.h"
@@ -431,7 +432,7 @@ int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point)
     bittiming.sample_point = sample_point;
 
     can_opt_t opt;
-    opt.opt = CANOPT_CLOCK;
+    opt.opt = NETOPT_CLOCK;
     opt.data = &clock;
     opt.data_len = sizeof(clock);
     ret = raw_can_get_can_opt(ifnum, &opt);
@@ -441,7 +442,7 @@ int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point)
     }
     DEBUG("raw_can_set_bitrate: clock=%" PRIu32 " Hz\n", clock);
 
-    opt.opt = CANOPT_BITTIMING_CONST;
+    opt.opt = NETOPT_BITTIMING_CONST;
     opt.data = &btc;
     opt.data_len = sizeof(btc);
     ret = raw_can_get_can_opt(ifnum, &opt);
@@ -458,7 +459,7 @@ int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point)
 
     opt.data = &bittiming;
     opt.data_len = sizeof(bittiming);
-    opt.opt = CANOPT_BITTIMING;
+    opt.opt = NETOPT_BITTIMING;
 
     ret = raw_can_set_can_opt(ifnum, &opt);
     if (ret < 0) {
