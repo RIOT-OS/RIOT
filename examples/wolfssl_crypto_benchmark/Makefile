@@ -19,7 +19,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # gcc v 5.4.0 on 16.04 LTS
 # This is an optimized stack value based on testing, if you observe
 # a segmentation fault please increase this stack size.
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=24500
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=35000
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
