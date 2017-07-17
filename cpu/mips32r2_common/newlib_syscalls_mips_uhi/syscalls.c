@@ -68,6 +68,12 @@ __attribute__((used)) void _fini(void)
 void _exit(int n)
 {
     exit(n);
+
+    /*
+     * Disable unreachableCode cppcheck as pm_off spins indefinately after
+     * pulling the plug
+     */
+    /* cppcheck-suppress unreachableCode */
     pm_off();
 }
 
