@@ -340,6 +340,12 @@ typedef enum {
      */
     NETOPT_IQ_INVERT,
 
+    NETOPT_BITTIMING,
+    NETOPT_BITTIMING_CONST,
+    NETOPT_CLOCK,
+    NETOPT_FILTER,
+    NETOPT_ABORT,
+
     /* add more options if needed */
 
     /**
@@ -379,6 +385,7 @@ typedef enum {
                                  *   state of the network device is @ref NETOPT_STATE_IDLE */
     NETOPT_STATE_STANDBY,       /**< standby mode. The devices is awake but
                                  *   not listening to packets. */
+    NETOPT_STATE_LISTEN_ONLY,
     /* add other states if needed */
 } netopt_state_t;
 
@@ -391,6 +398,18 @@ typedef enum {
     NETOPT_RF_TESTMODE_CTX_CW,      /**< carrier wave continuous tx mode */
     NETOPT_RF_TESTMODE_CTX_PRBS9,   /**< PRBS9 continuous tx mode */
 } netopt_rf_testmode_t;
+
+typedef enum {
+    NETOPT_FILTER_SET,
+    NETOPT_FILTER_RM,
+} netopt_filter_t;
+
+#include "can/can.h"
+
+typedef struct {
+    netopt_filter_t op;
+    struct can_filter *filter;
+} netopt_set_filter_t;
 
 /**
  * @brief   Get a string ptr corresponding to opt, for debugging

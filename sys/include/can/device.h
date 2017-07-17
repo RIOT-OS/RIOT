@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-#include "can/candev.h"
+#include "net/netdev.h"
 #include "kernel_types.h"
 
 #ifdef MODULE_CAN_PM
@@ -67,10 +67,11 @@ typedef struct candev_params {
  * @brief candev descriptor to pass to the device thread
  */
 typedef struct candev_dev {
-    candev_t *dev;    /**< the device */
+    netdev_t *dev;    /**< the device */
     int ifnum;        /**< interface number */
     kernel_pid_t pid; /**< pid */
     const char *name; /**< device name */
+    enum can_state state; /**< CAN state */
 #if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
     can_trx_t *trx;   /**< transceiver attached to the device */
 #endif
