@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include "periph/gpio.h"
 #include "periph/hwrng.h"
+#include "periph/spi.h"
 #include "periph/uart.h"
 #include "bitarithm.h"
 #include "board.h"
@@ -33,6 +34,10 @@ void board_init(void)
 #endif
 
     hwrng_init();
+
+    /* Initialise all SPI modules */
+    for (unsigned i = 1; i <= SPI_NUMOF; i++)
+        spi_init(SPI_DEV(i));
 
     /* Turn off all LED's */
     gpio_init(LED1_PIN, GPIO_OUT);
