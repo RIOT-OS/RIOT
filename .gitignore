@@ -49,4 +49,5 @@ Makefile.local
 # Python compiled files
 *.pyc
 
+# Ignore download cache
 .dlcache
