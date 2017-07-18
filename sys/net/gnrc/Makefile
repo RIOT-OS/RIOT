@@ -118,9 +118,6 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_netif,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/netif
 endif
-ifneq (,$(filter gnrc_slip,$(USEMODULE)))
-  DIRS += link_layer/slip
-endif
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   DIRS += sock
 endif
