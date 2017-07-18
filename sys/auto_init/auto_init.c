@@ -200,9 +200,9 @@ void auto_init(void)
     auto_init_ethos();
 #endif
 
-#ifdef MODULE_GNRC_SLIP
-    extern void auto_init_slip(void);
-    auto_init_slip();
+#ifdef MODULE_SLIPDEV
+    extern void auto_init_slipdev(void);
+    auto_init_slipdev();
 #endif
 
 #ifdef MODULE_CC110X
