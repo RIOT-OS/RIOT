@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "periph/gpio.h"
+#include "periph/spi.h"
 #include "periph/uart.h"
 #include "bitarithm.h"
 #include "board.h"
@@ -30,6 +31,10 @@ void board_init(void)
 #ifdef DEBUG_VIA_UART
     uart_init(DEBUG_VIA_UART, DEBUG_UART_BAUD, NULL, 0);
 #endif
+
+    /* Initialise all SPI modules */
+    for (unsigned i = 1; i <= SPI_NUMOF; i++)
+        spi_init(SPI_DEV(i));
 
     /* Turn off all LED's */
     gpio_init(LED1_PIN, GPIO_OUT);
