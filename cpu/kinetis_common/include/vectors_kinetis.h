@@ -96,6 +96,7 @@ void isr_i2c2(void);         /**< I2C2 interrupt handler */
 void isr_i2s0_rx(void);      /**< I2S0 receive interrupt handler */
 void isr_i2s0_tx(void);      /**< I2S0 transmit interrupt handler */
 void isr_llwu(void);         /**< LLWU interrupt handler */
+void isr_lpuart0(void);      /**< LPUART0 interrupt handler */
 void isr_lptmr0(void);       /**< LPTMR0 interrupt handler */
 void isr_mcg(void);          /**< MCG interrupt handler */
 void isr_mcm(void);          /**< MCM interrupt handler */

@@ -44,6 +44,11 @@ extern "C"
 #endif
 
 /**
+ * @brief This CPU provides an additional ADC clock divider as CFG1[ADICLK]=1
+ */
+#define KINETIS_HAVE_ADICLK_BUS_DIV_2 1
+
+/**
  * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
