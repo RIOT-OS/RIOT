@@ -62,6 +62,11 @@ extern "C" {
  */
 #define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
 
+/**
+ * @brief  Define the config flag for stop mode
+ */
+#define PM_STOP_CONFIG  (PWR_CR_LPDS)
+
 #ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode options

@@ -25,9 +25,21 @@
 
 #include "irq.h"
 #include "periph/pm.h"
+#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
+#include "stmclk.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+
+#ifndef PM_STOP_CONFIG
+/**
+ * @brief Define config flags for stop mode
+ *
+ * Available values can be found in reference manual, PWR section, register CR.
+ */
+#define PM_STOP_CONFIG (PWR_CR_LPDS | PWR_CR_FPDS)
+#endif
 
 void pm_set(unsigned mode)
 {
@@ -49,6 +61,7 @@ void pm_set(unsigned mode)
             /* Clear PDDS and LPDS bits to enter stop mode on */
             /* deepsleep with voltage regulator on */
             PWR->CR &= ~(PWR_CR_PDDS | PWR_CR_LPDS);
+            PWR->CR |= PM_STOP_CONFIG;
             /* Set SLEEPDEEP bit of system control block */
             deep = 1;
             break;
@@ -56,6 +69,13 @@ void pm_set(unsigned mode)
 #endif
 
     cortexm_sleep(deep);
+
+#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
+    if (deep) {
+        /* Re-init clock after STOP */
+        stmclk_init_sysclk();
+    }
+#endif
 }
 
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
