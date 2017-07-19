@@ -295,7 +295,7 @@ typedef struct {
      *          @ref GNRC_MAC_NEIGHBOR_COUNT is greater than 0.
      */
     gnrc_mac_tx_t tx;
-#endif /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT == 0)) || DOXYGEN */
+#endif  /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT == 0)) || DOXYGEN */
 #endif  /* MODULE_GNRC_MAC */
 #ifdef MODULE_NETSTATS_IPV6
     /**
@@ -612,8 +612,6 @@ gnrc_netif2_t *gnrc_netif2_create(char *stack, int stacksize, char priority,
                                   const gnrc_netif2_ops_t *ops);
 
 /**
-int gnrc_netif2_get_from_netdev(gnrc_netif2_t *netif, netopt_t opt, void *data,
-                                size_t max_len);
  * @brief   Get number of network interfaces actually allocated
  *
  * @return  Number of network interfaces actually allocated

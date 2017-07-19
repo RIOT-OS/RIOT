@@ -464,6 +464,7 @@ ipv6_addr_t *gnrc_netif2_ipv6_addr_best_src(gnrc_netif2_t *netif,
                                             bool ll_only)
 {
     ipv6_addr_t *best_src = NULL;
+
     BITFIELD(candidate_set, GNRC_NETIF2_IPV6_ADDRS_NUMOF);
 
     memset(candidate_set, 0, sizeof(candidate_set));
@@ -779,6 +780,7 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif2_t *netif,
      * corresponding rules.
      */
     uint8_t winner_set[GNRC_NETIF2_IPV6_ADDRS_NUMOF];
+
     memset(winner_set, 0, GNRC_NETIF2_IPV6_ADDRS_NUMOF);
     uint8_t max_pts = 0;
     /* _create_candidate_set() assures that `dst` is not unspecified and if
@@ -922,7 +924,7 @@ static void _init_from_device(gnrc_netif2_t *netif)
             netif->ipv6_mtu = tmp;
 #endif
             break;
-#endif /* MODULE_NETDEV_IEEE802154 */
+#endif  /* MODULE_NETDEV_IEEE802154 */
 #ifdef MODULE_NETDEV_ETH
         case NETDEV_TYPE_ETHERNET:
             netif->ipv6_mtu = ETHERNET_DATA_LEN;
@@ -987,7 +989,7 @@ static void *_gnrc_netif2_thread(void *args)
             case GNRC_NETAPI_MSG_TYPE_SET:
                 opt = msg.content.ptr;
                 DEBUG("gnrc_netif2: GNRC_NETAPI_MSG_TYPE_SET received. opt=%s\n",
-                        netopt2str(opt->opt));
+                      netopt2str(opt->opt));
                 /* set option for device driver */
                 res = netif->ops->set(netif, opt);
                 DEBUG("gnrc_netif2: response of netif->ops->set(): %i\n", res);
@@ -997,7 +999,7 @@ static void *_gnrc_netif2_thread(void *args)
             case GNRC_NETAPI_MSG_TYPE_GET:
                 opt = msg.content.ptr;
                 DEBUG("gnrc_netif2: GNRC_NETAPI_MSG_TYPE_GET received. opt=%s\n",
-                        netopt2str(opt->opt));
+                      netopt2str(opt->opt));
                 /* get option from device driver */
                 res = netif->ops->get(netif, opt);
                 DEBUG("gnrc_netif2: response of netif->ops->get(): %i\n", res);
@@ -1035,7 +1037,7 @@ static void _pass_on_packet(gnrc_pktsnip_t *pkt)
 
 static void _event_cb(netdev_t *dev, netdev_event_t event)
 {
-    gnrc_netif2_t *netif = (gnrc_netif2_t*) dev->context;
+    gnrc_netif2_t *netif = (gnrc_netif2_t *) dev->context;
 
     if (event == NETDEV_EVENT_ISR) {
         msg_t msg = { .type = NETDEV_MSG_TYPE_EVENT,
@@ -1047,17 +1049,15 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     }
     else {
         DEBUG("gnrc_netif2: event triggered -> %i\n", event);
-        switch(event) {
-            case NETDEV_EVENT_RX_COMPLETE:
-                {
+        switch (event) {
+            case NETDEV_EVENT_RX_COMPLETE: {
                     gnrc_pktsnip_t *pkt = netif->ops->recv(netif);
 
                     if (pkt) {
                         _pass_on_packet(pkt);
                     }
-
-                    break;
                 }
+                break;
 #ifdef MODULE_NETSTATS_L2
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
                 /* we are the only ones supposed to touch this variable,

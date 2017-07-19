@@ -138,7 +138,7 @@ static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
     if (payload != NULL) {
         pkt = payload;      /* reassign for later release; vec_snip is prepended to pkt */
         struct iovec *vector = (struct iovec *)pkt->data;
-        vector[0].iov_base = (char*)&hdr;
+        vector[0].iov_base = (char *)&hdr;
         vector[0].iov_len = sizeof(ethernet_hdr_t);
 #ifdef MODULE_NETSTATS_L2
         if ((netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) ||
@@ -165,10 +165,10 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
 
     if (bytes_expected > 0) {
         pkt = gnrc_pktbuf_add(NULL, NULL,
-                bytes_expected,
-                GNRC_NETTYPE_UNDEF);
+                              bytes_expected,
+                              GNRC_NETTYPE_UNDEF);
 
-        if(!pkt) {
+        if (!pkt) {
             DEBUG("gnrc_netif2_ethernet: cannot allocate pktsnip.\n");
 
             /* drop the packet */
@@ -178,7 +178,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
         }
 
         int nread = dev->driver->recv(dev, pkt->data, bytes_expected, NULL);
-        if(nread <= 0) {
+        if (nread <= 0) {
             DEBUG("gnrc_netif2_ethernet: read error.\n");
             goto safe_out;
         }
@@ -213,8 +213,8 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
         /* create netif header */
         gnrc_pktsnip_t *netif_hdr;
         netif_hdr = gnrc_pktbuf_add(NULL, NULL,
-                sizeof(gnrc_netif_hdr_t) + (2 * ETHERNET_ADDR_LEN),
-                GNRC_NETTYPE_NETIF);
+                                    sizeof(gnrc_netif_hdr_t) + (2 * ETHERNET_ADDR_LEN),
+                                    GNRC_NETTYPE_NETIF);
 
         if (netif_hdr == NULL) {
             DEBUG("gnrc_netif2_ethernet: no space left in packet buffer\n");
@@ -228,9 +228,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
         ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = thread_getpid();
 
         DEBUG("gnrc_netif2_ethernet: received packet from %02x:%02x:%02x:%02x:%02x:%02x "
-                "of length %d\n",
-                hdr->src[0], hdr->src[1], hdr->src[2], hdr->src[3], hdr->src[4],
-                hdr->src[5], nread);
+              "of length %d\n",
+              hdr->src[0], hdr->src[1], hdr->src[2], hdr->src[3], hdr->src[4],
+              hdr->src[5], nread);
 #if defined(MODULE_OD) && ENABLE_DEBUG
         od_hex_dump(hdr, nread, OD_WIDTH_DEFAULT);
 #endif
