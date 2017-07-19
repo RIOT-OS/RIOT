@@ -220,9 +220,7 @@ extern "C" {
  *          packet
  */
 #define GNRC_NETIF2_FLAGS_MAC_RX_STARTED            (0x00008000U)
-/**
- * @}
- */
+/** @} */
 
 /**
  * @name    IPv6 unicast and anycast address flags
@@ -253,9 +251,7 @@ extern "C" {
  * @brief   Address is an anycast address
  */
 #define GNRC_NETIF2_IPV6_ADDRS_FLAGS_ANYCAST            (0x04U)
-/**
- * @}
- */
+/** @} */
 
 /**
  * @brief   Auto-address configuration modes
