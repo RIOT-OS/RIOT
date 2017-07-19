@@ -60,10 +60,6 @@ void mips_start(void)
 {
     board_init();
 
-#if MODULE_NEWLIB
-#error "This Port is designed to work with the (newlib) C library provided with the mips sdk toolchain"
-#endif
-
     /* kernel_init */
     kernel_init();
 }

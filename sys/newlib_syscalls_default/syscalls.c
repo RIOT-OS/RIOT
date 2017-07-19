@@ -58,6 +58,8 @@ extern char _sheap;                 /* start of the heap */
 extern char _eheap;                 /* end of the heap */
 char *heap_top = &_sheap + 4;
 
+/* MIPS newlib crt implements _init,_fini and _exit and manages the heap */
+#ifndef __mips__
 /**
  * @brief Initialize NewLib, called by __libc_init_array() from the startup script
  */
@@ -115,6 +117,8 @@ void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
     irq_restore(state);
     return res;
 }
+
+#endif /*__mips__*/
 
 /**
  * @brief Get the process-ID of the current thread
