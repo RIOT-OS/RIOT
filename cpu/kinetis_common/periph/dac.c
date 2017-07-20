@@ -27,79 +27,62 @@
 
 #include "cpu.h"
 #include "bit.h"
+#include "assert.h"
 #include "periph/dac.h"
 #include "periph_conf.h"
 
-static const dac_conf_t dac_config[] = DAC_CONFIG;
+/* only compile this file if there are DAC lines defined */
+#ifdef DAC_NUMOF
+
+static inline DAC_Type *dev(dac_t line)
+{
+    return dac_config[line].dev;
+}
 
 int8_t dac_init(dac_t line)
 {
-    DAC_Type *dac;
-    if ((unsigned int)line >= DAC_NUMOF) {
+    if (line >= DAC_NUMOF) {
         return DAC_NOLINE;
     }
 
-    dac = dac_config[line].dev;
-
     /* Enable module clock */
-    *(dac_config[line].clk_gate) = 1;
-
+    bit_set32(dac_config[line].scgc_addr, dac_config[line].scgc_bit);
     /* Select VDDA as voltage reference */
-    dac->C0 = (DAC_C0_DACRFS_MASK);
-
+    dev(line)->C0 = (DAC_C0_DACRFS_MASK);
     /* Disable DMA and buffering */
-    dac->C1 = 0;
-    dac->C2 = 0;
-
-    /* Power on */
-    dac_poweron(line);
-
+    dev(line)->C1 = 0;
+    dev(line)->C2 = 0;
+    /* Enable the device */
+    bit_set8(&dac_config[line].dev->C0, DAC_C0_DACEN_SHIFT);
     /* Set output value to zero */
     dac_set(line, 0);
+
     return DAC_OK;
 }
 
 void dac_set(dac_t line, uint16_t value)
 {
-    DAC_Type *dac;
-
-    if ((unsigned int)line >= DAC_NUMOF) {
-        return;
-    }
-
-    dac = dac_config[line].dev;
+    assert(line < DAC_NUMOF);
 
     /* Scale to 12 bit */
-    value = value >> ((sizeof(value) * 8) - 12);
+    value = (value >> 4);
 
-    dac->DAT[0].DATH = ((value >> 8) & 0xff);
-    dac->DAT[0].DATL = (value & 0xff);
-}
-
-static inline void _dac_set_power(dac_t line, uint8_t value)
-{
-    DAC_Type *dac;
-
-    if ((unsigned int)line >= DAC_NUMOF) {
-        return;
-    }
-
-    dac = dac_config[line].dev;
-
-    if (value) {
-        bit_set8(&dac->C0, DAC_C0_DACEN_SHIFT);
-    }
-    else {
-        bit_clear8(&dac->C0, DAC_C0_DACEN_SHIFT);
-    }
+    dev(line)->DAT[0].DATH = ((value >> 8) & 0xff);
+    dev(line)->DAT[0].DATL = (value & 0xff);
 }
 
 void dac_poweron(dac_t line)
 {
-    _dac_set_power(line, 1);
+    assert(line < DAC_NUMOF);
+
+    bit_set8(&dac_config[line].dev->C0, DAC_C0_DACEN_SHIFT);
 }
 
 void dac_poweroff(dac_t line)
 {
-    _dac_set_power(line, 0);
+    assert(line < DAC_NUMOF);
+
+    bit_clear8(&dac_config[line].dev->C0, DAC_C0_DACEN_SHIFT);
 }
+
+#endif /* DAC_NUMOF */
