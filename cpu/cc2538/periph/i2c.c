@@ -105,48 +105,6 @@ static void i2cm_ctrl_write(uint_fast8_t value) {
     I2CM_CTRL = value;
 }
 
-static void recover_i2c_bus(i2c_t dev) {
-    /* Switch to software GPIO mode for bus recovery */
-    gpio_release(SDA_PIN(dev));
-    gpio_release(SCL_PIN(dev));
-
-    if (!bus_quiet(dev)) {
-        const uint_fast8_t try_limit = SDA_TRY_LIMIT;
-        uint_fast8_t n;
-        for (n = 0; n < try_limit; n++) {
-            if (bus_quiet(dev)) {
-                DEBUG("%s(): SDA released after%4u SCL pulses.\n", __FUNCTION__, n);
-                break;
-            }
-
-            gpio_assert(SCL_PIN(dev));
-
-#ifdef MODULE_XTIMER
-            xtimer_usleep(scl_delay);
-#else
-            thread_yield();
-#endif
-
-            gpio_release(SCL_PIN(dev));
-
-#ifdef MODULE_XTIMER
-            xtimer_usleep(scl_delay);
-#else
-            thread_yield();
-#endif
-        }
-
-        if (n >= try_limit) {
-            DEBUG("%s(): Failed to release SDA after%4u SCL pulses.\n",
-                  __FUNCTION__, n);
-        }
-    }
-
-    /* Return to hardware mode for the I2C pins */
-    gpio_hw_ctrl(SCL_PIN(dev));
-    gpio_hw_ctrl(SDA_PIN(dev));
-}
-
 #ifdef MODULE_XTIMER
 static void _timer_cb(void *arg)
 {
@@ -215,8 +173,10 @@ void cc2538_i2c_init_master(i2c_t dev, uint32_t speed_hz)
     /* clear periph reset trigger */
     SYS_CTRL_SRI2C &= ~1;
 
-    IOC_I2CMSSCL = gpio_init_af(SCL_PIN(dev), I2C_CMSSCL, IOC_OVERRIDE_PUE);
-    IOC_I2CMSSDA = gpio_init_af(SDA_PIN(dev), I2C_CMSSDA, IOC_OVERRIDE_PUE);
+    gpio_init_af(SCL_PIN(dev), I2C_CMSSCL, IOC_OVERRIDE_PUE);
+    gpio_init_af(SDA_PIN(dev), I2C_CMSSDA, IOC_OVERRIDE_PUE);
+    IOC_I2CMSSCL = gpio_pp_num(SCL_PIN(dev));
+    IOC_I2CMSSDA = gpio_pp_num(SDA_PIN(dev));
 
     /* Initialize the I2C master by setting the Master Function Enable bit */
     I2CM_CR |= MFE;
@@ -379,21 +339,17 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
     if (dev >= I2C_NUMOF) {
         return -1;
     }
-
-    WARN_IF(I2CM_STAT & BUSY);
-
-    if ( (length <= 0) || i2c_busy(dev) ) {
+    if (length <= 0) {
+        DEBUG("i2c_read_bytes: invalid length!\n");
         return 0;
     }
-
-    WARN_IF(I2CM_STAT & BUSBSY);
-
+    if (i2c_busy(dev)) {
+        DEBUG("i2c_read_bytes: device busy!\n");
+        return 0;
+    }
     if (I2CM_STAT & BUSBSY) {
-        recover_i2c_bus(dev);
-
-        if (I2CM_STAT & BUSBSY) {
-            return 0;
-        }
+        DEBUG("i2c_read_bytes: bus busy!\n");
+        return 0;
     }
 
     return i2c_read_bytes_dumb(dev, address, data, length);
@@ -411,22 +367,16 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int lengt
     if (dev >= I2C_NUMOF) {
         return -1;
     }
-
-    /* Transmit reg byte to slave */
     if (i2c_busy(dev)) {
+        DEBUG("i2c_read_regs: device busy!\n");
+        return 0;
+    }
+    if (I2CM_STAT & BUSBSY) {
+        DEBUG("i2c_read_regs: bus busy!\n");
         return 0;
     }
 
-    WARN_IF(I2CM_STAT & BUSBSY);
-
-    if (I2CM_STAT & BUSBSY) {
-        recover_i2c_bus(dev);
-
-        if (I2CM_STAT & BUSBSY) {
-            return 0;
-        }
-    }
-
+    /* Transmit reg byte to slave */
     I2CM_SA = address << 1;
     I2CM_DR = reg;
     stat = i2c_ctrl_blocking(dev, (START | RUN));
@@ -451,25 +401,24 @@ int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
 
 int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
-    int n = 0;
     const uint8_t *my_data = data;
 
     if (dev >= I2C_NUMOF) {
         return -1;
     }
-
-    WARN_IF(I2CM_STAT & BUSBSY);
-
+    if (i2c_busy(dev)) {
+        DEBUG("i2c_read_regs: device busy!\n");
+        return 0;
+    }
     if (I2CM_STAT & BUSBSY) {
-        recover_i2c_bus(dev);
-
-        if (I2CM_STAT & BUSBSY) {
-            return 0;
-        }
+        DEBUG("i2c_read_regs: bus busy!\n");
+        return 0;
     }
 
     I2CM_SA = address << 1;
+
     uint_fast8_t flags = START | RUN;
+    int n = 0;
 
     for (n = 0; n < length; n++) {
         if (n >= length - 1) {
@@ -495,10 +444,8 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
         flags = RUN;
     }
 
-        if (n < length) {
-            DEBUG("%s(%u, %p, %u): %u/%u bytes delivered.\n",
-                  __FUNCTION__, address, (void *)my_data, length, n, length);
-        }
+    DEBUG("%s(%u, %p, %u): %u/%u bytes delivered.\n", __FUNCTION__,
+          address, (void *)my_data, length, n, length);
 
     return n;
 }
@@ -510,33 +457,26 @@ int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
 
 int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
 {
-    uint_fast8_t stat;
     const uint8_t *my_data = data;
 
     if (dev >= I2C_NUMOF) {
         return -1;
     }
-
-    /* Transmit reg byte to slave */
     if (i2c_busy(dev)) {
+        DEBUG("i2c_read_regs: device busy!\n");
+        return 0;
+    }
+    if (I2CM_STAT & BUSBSY) {
+        DEBUG("i2c_read_regs: bus busy!\n");
         return 0;
     }
 
-    WARN_IF(I2CM_STAT & BUSBSY);
-
-    if (I2CM_STAT & BUSBSY) {
-        recover_i2c_bus(dev);
-
-        if (I2CM_STAT & BUSBSY) {
-            return 0;
-        }
-    }
-
+    /* Transmit reg byte to slave */
     I2CM_SA = address << 1;
     I2CM_DR = reg;
 
     uint_fast8_t flags = (length > 0) ? (START | RUN) : (STOP | START | RUN);
-    stat = i2c_ctrl_blocking(dev, flags);
+    uint_fast8_t stat = i2c_ctrl_blocking(dev, flags);
 
     if (stat & ARBLST) {
         return 0;
@@ -545,43 +485,39 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
         i2cm_ctrl_write(STOP);
         return 0;
     }
-    else {
-        /* Transmit data to slave */
-        int n = 0;
 
-        flags &= ~START;
+    /* Transmit data to slave */
+    int n = 0;
 
-        for (n = 0; n < length; n++) {
-            if (n >= length - 1) {
-                flags |= STOP;
-            }
-
-            WARN_IF(I2CM_STAT & BUSY);
-            I2CM_DR = my_data[n];
-
-            i2c_ctrl_blocking(dev, flags);
-
-            WARN_IF(I2CM_STAT & ARBLST);
-            WARN_IF(I2CM_STAT & DATACK);
-            WARN_IF(I2CM_STAT & ADRACK);
-            WARN_IF(I2CM_STAT & ERROR);
-
-            if (I2CM_STAT & ARBLST) {
-                 break;
-            }
-            else if (I2CM_STAT & ANY_ERROR) {
-                i2cm_ctrl_write(STOP);
-                break;
-            }
+    flags &= ~START;
+    for (n = 0; n < length; n++) {
+        if (n >= length - 1) {
+            flags |= STOP;
         }
 
-        if (n < length) {
-            DEBUG("%s(%u, %u, %u, %p, %u): %u/%u bytes delivered.\n",
-                  __FUNCTION__, dev, address, reg, data, length, n, length);
-        }
+        WARN_IF(I2CM_STAT & BUSY);
+        I2CM_DR = my_data[n];
 
-        return n;
+        i2c_ctrl_blocking(dev, flags);
+
+        WARN_IF(I2CM_STAT & ARBLST);
+        WARN_IF(I2CM_STAT & DATACK);
+        WARN_IF(I2CM_STAT & ADRACK);
+        WARN_IF(I2CM_STAT & ERROR);
+
+        if (I2CM_STAT & ARBLST) {
+             break;
+        }
+        else if (I2CM_STAT & ANY_ERROR) {
+            i2cm_ctrl_write(STOP);
+            break;
+        }
     }
+
+    DEBUG("%s(%u, %u, %u, %p, %u): %u/%u bytes delivered.\n", __FUNCTION__,
+          dev, address, reg, data, length, n, length);
+
+    return n;
 }
 
 void i2c_poweron(i2c_t dev)
@@ -594,6 +530,8 @@ void i2c_poweron(i2c_t dev)
         I2CM_CR |= MFE;        /**< I2C master function enable. */
 
         /* Enable I2C master interrupts */
+        NVIC_SetPriority(I2C_IRQn, I2C_IRQ_PRIO);
+        NVIC_EnableIRQ(I2C_IRQn);
         I2CM_IMR = 1;
     }
 }
@@ -605,7 +543,7 @@ void i2c_poweroff(i2c_t dev)
         I2CM_IMR = 0;
         NVIC_DisableIRQ(I2C_IRQn);
 
-        I2CM_CR &= ~MFE;        /**< I2C master function enable. */
+        I2CM_CR &= ~MFE;        /**< I2C master function disable. */
 
         SYS_CTRL_RCGCI2C &= ~1; /**< Disable the I2C0 clock. */
         SYS_CTRL_SCGCI2C &= ~1; /**< Disable the I2C0 clock. */
