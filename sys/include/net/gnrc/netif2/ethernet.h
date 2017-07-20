@@ -38,8 +38,8 @@ extern "C" {
  * @return  The network interface on success.
  * @return  NULL, on error.
  */
-gnrc_netif2_t *gnrc_netif2_eth_create(char *stack, int stacksize, char priority,
-                                      char *name, netdev_t *dev);
+gnrc_netif2_t *gnrc_netif2_ethernet_create(char *stack, int stacksize, char priority,
+                                           char *name, netdev_t *dev);
 
 #ifdef __cplusplus
 }

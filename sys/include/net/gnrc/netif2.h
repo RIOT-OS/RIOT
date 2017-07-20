@@ -58,9 +58,11 @@ extern "C" {
 #endif
 
 /**
- * @brief   PID of the (virtual) loopback interface
+ * @brief   Default priority for network interface threads
  */
-#define GNRC_NETIF2_LOOPBACK_PID    (KERNEL_PID_LAST + 1)
+#ifndef GNRC_NETIF2_PRIO
+#define GNRC_NETIF2_PRIO            (THREAD_PRIORITY_MAIN - 5)
+#endif
 
 /**
  * @brief   Number of multicast addressed needed for @ref net_gnrc_rpl "RPL".

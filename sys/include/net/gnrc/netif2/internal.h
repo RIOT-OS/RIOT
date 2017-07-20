@@ -75,7 +75,8 @@ gnrc_netif2_t *gnrc_netif2_get_by_pid(kernel_pid_t pid);
  * @brief   Adds an IPv6 address to the interface
  *
  * @pre `(netif != NULL) && (addr != NULL)`
- * @pre @p addr is not multicast (starts with `ff00::/8`)
+ * @pre @p addr is not multicast (starts with `ff00::/8`), unspecified (`::`),
+ *      or loopback
  * @pre `(pfx_len > 0) && (pfx_len <= 128)`
  *
  * @param[in,out] netif the network interface. May not be NULL.
@@ -93,7 +94,7 @@ gnrc_netif2_t *gnrc_netif2_get_by_pid(kernel_pid_t pid);
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  *
- * @return  0, on success
+ * @return  >= 0, on success
  * @return  -ENOMEM, when no space for new addresses is left on the interface
  */
 int gnrc_netif2_ipv6_addr_add(gnrc_netif2_t *netif, const ipv6_addr_t *addr,
@@ -237,15 +238,35 @@ void gnrc_netif2_ipv6_group_leave(gnrc_netif2_t *netif,
                                   const ipv6_addr_t *addr);
 
 /**
+ * @brief   Returns the index of @p addr in gnrc_netif2_t::ipv6_groups of @p
+ *          netif
+ *
+ * @pre `(netif != NULL) && (addr != NULL)`
+ *
+ * Can be used to check if a multicast address is assigned to an interface.
+ *
+ * @param[in] netif the network interface
+ * @param[in] addr  the multicast address to check
+ *
+ * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
+ *
+ * @return  index of @p addr in gnrc_netif2_t::ipv6_groups of @p netif
+ * @return  -1, if @p netif is not in group @p addr
+ */
+int gnrc_netif2_ipv6_group_idx(gnrc_netif2_t *netif,
+                               const ipv6_addr_t *addr);
+
+/**
  * @brief   Get interface identifier (IID) of an interface's link-layer address
  *
  * @param[in] netif     the network interface
- * @param[out] eui64    the IID, set to all 0 if interface has no link-layer
- *                      address or if gnrc_netif2_t::device_type is not
- *                      supported.
+ * @param[out] eui64    the IID
+ *
+ * @return  0, on success
+ * @return  -ENOTSUP, if interface has no link-layer address or if
+ *          gnrc_netif2_t::device_type is not supported.
  */
-void gnrc_netif2_ipv6_get_iid(gnrc_netif2_t *netif,
-                              eui64_t *eui64);
+int gnrc_netif2_ipv6_get_iid(gnrc_netif2_t *netif, eui64_t *eui64);
 #endif  /* MODULE_GNRC_IPV6 */
 
 /**
