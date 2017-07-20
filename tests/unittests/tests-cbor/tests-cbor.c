@@ -272,6 +272,17 @@ static void test_byte_string(void)
         TEST_ASSERT(cbor_deserialize_byte_string(&stream, 0, buffer, sizeof(buffer)));
         CBOR_CHECK_DESERIALIZED(input, buffer, EQUAL_STRING);
     }
+
+    cbor_clear(&stream);
+
+    {
+        /* check out buffer too small */
+        const char *input = "a";
+        TEST_ASSERT(cbor_serialize_byte_string(&stream, input));
+        unsigned char data[] = {0x41, 0x61};
+        CBOR_CHECK_SERIALIZED(stream, data, sizeof(data));
+        TEST_ASSERT(cbor_deserialize_byte_string(&stream, 0, buffer, strlen(input)) == 0);
+    }
 }
 
 static void test_byte_string_no_copy(void)
