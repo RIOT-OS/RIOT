@@ -46,6 +46,7 @@ void hwrng_init(void)
 void hwrng_read(void *buf, unsigned int num)
 {
     unsigned int i = 0;
+    uint8_t *buffer = (uint8_t *)buf;
 
     RNGCON |= _RNGCON_PRNGEN_MASK;
 
@@ -55,9 +56,9 @@ void hwrng_read(void *buf, unsigned int num)
         wait_plen_cycles();
         rng1 = RNGNUMGEN1;
         rng2 = RNGNUMGEN2;
-        memcpy(buf, &rng1, sizeof(rng1));
-        memcpy(buf + 4, &rng2, sizeof(rng2));
-        buf += 8;
+        memcpy(buffer, &rng1, sizeof(rng1));
+        memcpy(buffer + 4, &rng2, sizeof(rng2));
+        buffer += 8;
     }
 
     num &= 0x7;
@@ -66,13 +67,13 @@ void hwrng_read(void *buf, unsigned int num)
 
         wait_plen_cycles();
         rng1 = RNGNUMGEN1;
-        memcpy(buf, &rng1, n);
+        memcpy(buffer, &rng1, n);
         num -= n;
-        buf += n;
+        buffer += n;
 
         if (num) {
             uint32_t rng2 = RNGNUMGEN2;
-            memcpy(buf, &rng2, num);
+            memcpy(buffer, &rng2, num);
         }
     }
 
