@@ -1,3 +1,6 @@
+# nanocoap message send/receive functions not used
+export NANOCOAP_UTIL_ONLY := 1
+
 # Specify the mandatory networking modules
 USEMODULE += gcoap
 USEMODULE += gnrc_ipv6

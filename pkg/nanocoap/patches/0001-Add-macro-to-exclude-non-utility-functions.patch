@@ -1,0 +1,66 @@
+From badd5195238bfe82bfb321dc3a38e11ca10912b1 Mon Sep 17 00:00:00 2001
+From: Ken Bannister <kb2ma@runbox.com>
+Date: Tue, 21 Mar 2017 23:13:58 -0400
+Subject: [PATCH] Add macro to exclude non-utility functions.
+
+---
+ nanocoap/nanocoap.c | 4 ++++
+ nanocoap/nanocoap.h | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/nanocoap/nanocoap.c b/nanocoap/nanocoap.c
+index 8f75cb9..9eda696 100644
+--- a/nanocoap/nanocoap.c
++++ b/nanocoap/nanocoap.c
+@@ -120,6 +120,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
+     return 0;
+ }
+ 
++#ifndef NANOCOAP_UTIL_ONLY
+ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len)
+ {
+     if (coap_get_code_class(pkt) != COAP_REQ) {
+@@ -194,6 +195,7 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
+ 
+     return len;
+ }
++#endif
+ 
+ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token, size_t token_len, unsigned code, uint16_t id)
+ {
+@@ -344,6 +346,7 @@ size_t coap_put_option_url(uint8_t *buf, uint16_t lastonum, const char *url)
+     return bufpos - buf;
+ }
+ 
++#ifndef NANOCOAP_UTIL_ONLY
+ ssize_t coap_well_known_core_default_handler(coap_pkt_t* pkt, uint8_t *buf, \
+                                              size_t len)
+ {
+@@ -369,3 +372,4 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t* pkt, uint8_t *buf, \
+ 
+     return coap_build_reply(pkt, COAP_CODE_205, buf, len, payload_len);
+ }
++#endif
+diff --git a/nanocoap/nanocoap.h b/nanocoap/nanocoap.h
+index 96f2497..7167988 100644
+--- a/nanocoap/nanocoap.h
++++ b/nanocoap/nanocoap.h
+@@ -156,6 +156,7 @@ extern const coap_resource_t coap_resources[];
+ extern const unsigned coap_resources_numof;
+ 
+ int coap_parse(coap_pkt_t* pkt, uint8_t *buf, size_t len);
++#ifndef NANOCOAP_UTIL_ONLY
+ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
+         uint8_t *rbuf, unsigned rlen, unsigned payload_len);
+ 
+@@ -166,6 +167,7 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
+         const uint8_t *payload, uint8_t payload_len);
+ 
+ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len);
++#endif
+ 
+ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token, size_t token_len, unsigned code, uint16_t id);
+ size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, uint8_t *odata, size_t olen);
+-- 
+2.7.4
+
