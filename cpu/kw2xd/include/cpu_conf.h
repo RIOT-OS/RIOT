@@ -8,11 +8,15 @@
  */
 
 /**
- * @defgroup        cpu_kw2xd KW2xD SiP
+ * @defgroup        cpu_kw2xd NXP Kinetis KW2xD
  * @ingroup         cpu
- * @brief           CPU specific implementations for the NXP/Freescale KW2xD SiP.
- *                  The SiP incorporates a low power 2.4 GHz transceiver and a
+ * @brief           CPU specific implementations for the NXP Kinetis KW2xD SiP
+ *
+ *                  The SiP incorporates a low power 2.4 GHz transceiver, and a
  *                  Kinetis Cortex-M4 MCU.
+ *
+ *                  From the register map and functional description it seems
+ *                  like the transceiver is a close relative of the NXP MCR20A.
  * @{
  *
  * @file

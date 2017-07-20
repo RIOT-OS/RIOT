@@ -7,9 +7,10 @@
  */
 
 /**
- * @defgroup        cpu_k60 Freescale Kinetis K60
+ * @defgroup        cpu_k60 NXP Kinetis K60
  * @ingroup         cpu
- * @brief           CPU specific implementations for the Freescale Kinetis K60
+ * @brief           CPU specific implementations for the NXP Kinetis K60
+ *                  Cortex-M4 MCU
  * @{
  *
  * @file
