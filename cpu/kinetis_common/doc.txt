@@ -9,7 +9,7 @@
  * @ingroup     cpu_kinetis_common
  * @brief       ADC driver
  *
- *              ### ADC Configuration Example (for periph_conf.h) ###
+ *              ### ADC configuration example (for periph_conf.h) ###
  *
  *                  static const adc_conf_t adc_config[] = {
  *                      { .dev = ADC0, .pin = GPIO_UNDEF          , .chan =  0 }, // ADC0_DP0
@@ -39,7 +39,7 @@
  *
  *              The GPIO driver uses the @ref GPIO_PIN(port, pin) macro to declare pins.
  *
- *              ### GPIO Configuration Example (for periph_conf.h) ###
+ *              ### GPIO configuration example (for periph_conf.h) ###
  *
  *                  #define GPIO_IRQ_PRIO                CPU_DEFAULT_IRQ_PRIO
  *
@@ -50,7 +50,7 @@
  * @ingroup     cpu_kinetis_common
  * @brief       I2C driver
  *
- *              ### I2C Configuration Example (for periph_conf.h) ###
+ *              ### I2C configuration example (for periph_conf.h) ###
  *
  *                  #define I2C_NUMOF               (1U)
  *                  #define I2C_CLK                 (48e6)
@@ -90,7 +90,7 @@
  * @ingroup     cpu_kinetis_common
  * @brief       PWM driver
  *
- *              ### PWM Configuration Example (for periph_conf.h) ###
+ *              ### PWM configuration example (for periph_conf.h) ###
  *
  *                  #define PWM_NUMOF           (1U)
  *                  #define PWM_0_EN            1
@@ -123,7 +123,7 @@
  *              looks random. Reference Manual recommends to use the RNGA as entropy
  *              source.
  *
- *              ### RNGA Configuration Example (for periph_conf.h) ###
+ *              ### RNGA configuration example (for periph_conf.h) ###
  *
  *                  #define RANDOM_NUMOF         (1U)
  *                  #define KINETIS_RNGA         RNG
@@ -139,7 +139,7 @@
  *              looks random. Reference Manual recommends to use the RNGB as entropy
  *              source.
  *
- *              ### RNGB Configuration Example (for periph_conf.h) ###
+ *              ### RNGB configuration example (for periph_conf.h) ###
  *
  *                  #define RANDOM_NUMOF         (1U)
  *                  #define KINETIS_RNGB         RNG
@@ -160,7 +160,7 @@
  *              The driver supports alarm, it is stored in the
  *              Time Alarm Registers (TAR) and the unit is seconds.
  *
- *              ### RTC Configuration Example (for periph_conf.h) ###
+ *              ### RTC configuration example (for periph_conf.h) ###
  *
  *                  #define RTC_NUMOF           (1U)
  *                  #define RTC_DEV             RTC
@@ -205,7 +205,7 @@
  *              extra delays in the transfer because of the additional overhead
  *              of calling gpio_set/clear at every transfer.
  *
- *              ### SPI Configuration Example (for periph_conf.h): ###
+ *              ### SPI configuration example (for periph_conf.h): ###
  *
  *                  static const uint32_t spi_clk_config[] = {
  *                      // Use cpu/kinetis_common/dist/calc_spi_scalers to
@@ -265,7 +265,7 @@
  *              caused by mixing the clock domains of the bus clock used by the
  *              CPU and the 32kHz reference clock for the LPTMR counter.
  *
- *              ### Timer configuration Example (for periph_conf.h) ###
+ *              ### Timer configuration example (for periph_conf.h) ###
  *
  *                  #define PIT_NUMOF               (2U)
  *                  #define PIT_CONFIG {                 \
@@ -304,7 +304,7 @@
  *              using the BRFA field in the UART C4 register.
  *              Currently, only the base TX/RX functionality is available.
  *
- *              ### UART configuration Example (for periph_conf.h) ###
+ *              ### UART configuration example (for periph_conf.h) ###
  *
  *                  static const uart_conf_t uart_config[] = {
  *                      {
