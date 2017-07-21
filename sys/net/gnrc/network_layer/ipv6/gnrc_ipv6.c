@@ -795,7 +795,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     /* if available, remove any padding that was added by lower layers
      * to fulfill their minimum size requirements (e.g. ethernet) */
-    if (byteorder_ntohs(hdr->len) < pkt->size) {
+    if ((ipv6 != pkt) && (byteorder_ntohs(hdr->len) < pkt->size)) {
         gnrc_pktbuf_realloc_data(pkt, byteorder_ntohs(hdr->len));
     }
     else if (byteorder_ntohs(hdr->len) >
