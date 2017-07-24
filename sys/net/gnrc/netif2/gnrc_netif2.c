@@ -100,13 +100,13 @@ int gnrc_netif2_get_from_netdev(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(uint8_t);
             break;
         case NETOPT_STATS:
-            assert(opt->data_len == sizeof(netstats_t));
+            /* XXX discussed this with Oleg, it's supposed to be a pointer */
+            assert(opt->data_len == sizeof(netstats_t *));
             switch ((int16_t)opt->context) {
 #if defined(MODULE_NETSTATS_IPV6) && defined(MODULE_GNRC_IPV6)
                 case NETSTATS_IPV6:
-                    memcpy(opt->data, &netif->ipv6_stats,
-                           sizeof(netif->ipv6_stats));
-                    res = sizeof(netif->ipv6_stats);
+                    *((netstats_t **)opt->data) = &netif->ipv6_stats;
+                    res = sizeof(&netif->ipv6_stats);
                     break;
 #endif
                 case NETSTATS_ALL:
@@ -117,6 +117,7 @@ int gnrc_netif2_get_from_netdev(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt)
                     /* take from device */
                     break;
             }
+            break;
 #ifdef MODULE_GNRC_IPV6
         case NETOPT_IPV6_ADDR: {
                 assert(opt->data_len >= sizeof(ipv6_addr_t));
@@ -973,6 +974,7 @@ static void _init_from_device(gnrc_netif2_t *netif)
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
             netif->flags |= GNRC_NETIF2_FLAGS_6LO_HC;
 #endif
+#ifdef MODULE_GNRC_IPV6
             res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
             assert(res == sizeof(tmp));
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
@@ -981,17 +983,22 @@ static void _init_from_device(gnrc_netif2_t *netif)
 #else
             netif->ipv6_mtu = tmp;
 #endif
+#endif
             break;
 #endif  /* MODULE_NETDEV_IEEE802154 */
 #ifdef MODULE_NETDEV_ETH
         case NETDEV_TYPE_ETHERNET:
+#ifdef MODULE_GNRC_IPV6
             netif->ipv6_mtu = ETHERNET_DATA_LEN;
+#endif
             break;
 #endif
         default:
             res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
             assert(res == sizeof(tmp));
+#ifdef MODULE_GNRC_IPV6
             netif->ipv6_mtu = tmp;
+#endif
     }
     _update_l2addr_from_dev(netif);
 }
