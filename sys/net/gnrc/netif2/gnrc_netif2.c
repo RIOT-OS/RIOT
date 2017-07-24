@@ -102,18 +102,19 @@ int gnrc_netif2_get_from_netdev(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt)
         case NETOPT_STATS:
             assert(opt->data_len == sizeof(netstats_t));
             switch ((int16_t)opt->context) {
-                case GNRC_NETTYPE_NETIF:
-                case GNRC_NETTYPE_UNDEF:
-                    /* take from device */
-                    break;
 #if defined(MODULE_NETSTATS_IPV6) && defined(MODULE_GNRC_IPV6)
-                case GNRC_NETTYPE_IPV6:
+                case NETSTATS_IPV6:
                     memcpy(opt->data, &netif->ipv6_stats,
                            sizeof(netif->ipv6_stats));
                     res = sizeof(netif->ipv6_stats);
                     break;
 #endif
+                case NETSTATS_ALL:
+                    /* doesn't make sense */
+                    res = -EINVAL;
+                    break;
                 default:
+                    /* take from device */
                     break;
             }
 #ifdef MODULE_GNRC_IPV6

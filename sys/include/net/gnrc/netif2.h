@@ -631,6 +631,16 @@ unsigned gnrc_netif2_numof(void);
 gnrc_netif2_t *gnrc_netif2_iter(const gnrc_netif2_t *prev);
 
 /**
+ * @brief   Get network interface by PID
+ *
+ * @param[in] pid   A PID of a network interface.
+ *
+ * @return  The network interface on success.
+ * @return  NULL, if no network interface with PID exists.
+ */
+gnrc_netif2_t *gnrc_netif2_get_by_pid(kernel_pid_t pid);
+
+/**
  * @brief   Default operation for gnrc_netif2_ops_t::get()
  *
  * @note    Can also be used to be called *after* a custom operation.

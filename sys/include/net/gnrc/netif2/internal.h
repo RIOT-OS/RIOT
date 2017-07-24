@@ -60,16 +60,6 @@ static inline void gnrc_netif2_release(gnrc_netif2_t *netif)
     }
 }
 
-/**
- * @brief   Get network interface by PID
- *
- * @param[in] pid   A PID of a network interface.
- *
- * @return  The network interface on success.
- * @return  NULL, if no network interface with PID exists.
- */
-gnrc_netif2_t *gnrc_netif2_get_by_pid(kernel_pid_t pid);
-
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
 /**
  * @brief   Adds an IPv6 address to the interface
