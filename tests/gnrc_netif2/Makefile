@@ -19,6 +19,7 @@ USEMODULE += gnrc_sixlowpan
 USEMODULE += gnrc_sixlowpan_iphc
 USEMODULE += gnrc_ipv6
 USEMODULE += netdev_eth
+USEMODULE += netdev_ieee802154
 USEMODULE += netdev_test
 USEMODULE += od
 

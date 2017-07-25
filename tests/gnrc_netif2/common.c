@@ -27,6 +27,7 @@
 static netdev_test_t _devs[GNRC_NETIF_NUMOF];
 
 netdev_t *ethernet_dev = (netdev_t *)&_devs[0];
+netdev_t *ieee802154_dev = (netdev_t *)&_devs[1];
 netdev_t *devs[DEFAULT_DEVS_NUMOF];
 
 #define MSG_QUEUE_SIZE  (8)
@@ -46,6 +47,9 @@ static int _dump_send_packet(netdev_t *netdev, const struct iovec *vector,
     printf("Sending data from ");
     if (netdev == ethernet_dev) {
         printf("Ethernet ");
+    }
+    else if (netdev == ieee802154_dev) {
+        printf("IEEE 802.15.4 ");
     }
     else {
         printf("unknown ");
@@ -114,17 +118,24 @@ static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len
     if (dev->state == 0x0) {
         *((uint16_t *)value) = NETDEV_TYPE_ETHERNET;
     }
+    else if (dev->state == (void *)0x1) {
+        *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
+    }
     else {
         *((uint16_t *)value) = NETDEV_TYPE_UNKNOWN;
     }
     return sizeof(uint16_t);
 }
+
 static int _get_netdev_max_packet_size(netdev_t *netdev, void *value, size_t max_len)
 {
     netdev_test_t *dev = (netdev_test_t *)netdev;
     assert(max_len == sizeof(uint16_t));
     if (dev->state == 0x0) {
         *((uint16_t *)value) = ETHERNET_DATA_LEN;
+    }
+    else if (dev->state == ((void *)0x1)) {
+        *((uint16_t *)value) = TEST_IEEE802154_MAX_FRAG_SIZE;
     }
     else {
         *((uint16_t *)value) = IPV6_MIN_MTU;
@@ -144,6 +155,14 @@ void _tests_init(void)
                            _get_netdev_device_type);
     netdev_test_set_get_cb((netdev_test_t *)ethernet_dev, NETOPT_MAX_PACKET_SIZE,
                            _get_netdev_max_packet_size);
+    netdev_test_setup((netdev_test_t *)ieee802154_dev, (void *)1);
+    netdev_test_set_send_cb((netdev_test_t *)ieee802154_dev, _dump_send_packet);
+    netdev_test_set_recv_cb((netdev_test_t *)ieee802154_dev, _netdev_recv);
+    netdev_test_set_isr_cb((netdev_test_t *)ieee802154_dev, _netdev_isr);
+    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_DEVICE_TYPE,
+                           _get_netdev_device_type);
+    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev,
+                           NETOPT_MAX_PACKET_SIZE, _get_netdev_max_packet_size);
     for (intptr_t i = SPECIAL_DEVS; i < GNRC_NETIF_NUMOF; i++) {
         devs[i - SPECIAL_DEVS] = (netdev_t *)&_devs[i];
         netdev_test_setup(&_devs[i], (void *)i);

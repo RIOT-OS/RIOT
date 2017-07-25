@@ -31,16 +31,20 @@
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/netif2.h"
 #include "net/gnrc/netif2/ethernet.h"
+#include "net/gnrc/netif2/ieee802154.h"
 #include "net/gnrc/netif2/internal.h"
 #include "net/netdev_test.h"
 #include "utlist.h"
 #include "xtimer.h"
 
 #define ETHERNET_STACKSIZE          (THREAD_STACKSIZE_MAIN)
+#define IEEE802154_STACKSIZE        (THREAD_STACKSIZE_MAIN)
 
 static gnrc_netif2_t *ethernet_netif = NULL;
+static gnrc_netif2_t *ieee802154_netif = NULL;
 static gnrc_netif2_t *netifs[DEFAULT_DEVS_NUMOF];
 static char ethernet_netif_stack[ETHERNET_STACKSIZE];
+static char ieee802154_netif_stack[ETHERNET_STACKSIZE];
 static char netifs_stack[DEFAULT_DEVS_NUMOF][THREAD_STACKSIZE_DEFAULT];
 static bool init_called = false;
 
@@ -48,7 +52,14 @@ static inline void _test_init(gnrc_netif2_t *netif);
 static inline int _mock_netif_send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt);
 static inline gnrc_pktsnip_t *_mock_netif_recv(gnrc_netif2_t * netif);
 static int _get_netdev_address(netdev_t *dev, void *value, size_t max_len);
-static int _set_netdev_address(netdev_t *dev, const void *value, size_t value_len);
+static int _set_netdev_address(netdev_t *dev, const void *value,
+                               size_t value_len);
+static int _get_netdev_address_long(netdev_t *dev, void *value, size_t max_len);
+static int _set_netdev_address_long(netdev_t *dev, const void *value,
+                                    size_t value_len);
+static int _get_netdev_src_len(netdev_t *dev, void *value, size_t max_len);
+static int _set_netdev_src_len(netdev_t *dev, const void *value,
+                               size_t value_len);
 
 static const gnrc_netif2_ops_t default_ops = {
     .init = _test_init,
@@ -70,6 +81,14 @@ static void _set_up(void)
                sizeof(ethernet_netif->ipv6.addrs));
         memset(ethernet_netif->ipv6.groups, 0,
                sizeof(ethernet_netif->ipv6.groups));
+    }
+    if (ieee802154_netif != NULL) {
+        memset(ieee802154_netif->ipv6.addrs_flags, 0,
+               sizeof(ieee802154_netif->ipv6.addrs_flags));
+        memset(ieee802154_netif->ipv6.addrs, 0,
+               sizeof(ieee802154_netif->ipv6.addrs));
+        memset(ieee802154_netif->ipv6.groups, 0,
+               sizeof(ieee802154_netif->ipv6.groups));
     }
     for (unsigned i = 0; i < DEFAULT_DEVS_NUMOF; i++) {
         if (netifs[i] != NULL) {
@@ -112,6 +131,29 @@ static void test_creation(void)
     TEST_ASSERT_EQUAL_STRING("eth", sched_threads[ethernet_netif->pid]->name);
 #endif
     TEST_ASSERT_NOT_NULL(sched_threads[ethernet_netif->pid]->msg_array);
+
+    TEST_ASSERT_NOT_NULL((ieee802154_netif = gnrc_netif2_ieee802154_create(
+            ieee802154_netif_stack, IEEE802154_STACKSIZE, GNRC_NETIF2_PRIO,
+            "wpan", ieee802154_dev
+        )));
+    TEST_ASSERT_EQUAL_INT(2, gnrc_netif2_numof());
+    TEST_ASSERT_NOT_NULL((ptr = gnrc_netif2_iter(ptr)));
+    TEST_ASSERT_NOT_NULL((ptr = gnrc_netif2_iter(ptr)));
+    TEST_ASSERT_NULL((ptr = gnrc_netif2_iter(ptr)));
+    TEST_ASSERT_NOT_NULL(ieee802154_netif->ops);
+    TEST_ASSERT_NOT_NULL(ieee802154_netif->dev);
+    TEST_ASSERT_EQUAL_INT(IPV6_MIN_MTU, ieee802154_netif->ipv6.mtu);
+    TEST_ASSERT_EQUAL_INT(TEST_IEEE802154_MAX_FRAG_SIZE,
+                          ieee802154_netif->sixlo.max_frag_size);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETIF2_DEFAULT_HL, ieee802154_netif->cur_hl);
+    TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_IEEE802154,
+                          ieee802154_netif->device_type);
+    TEST_ASSERT(ieee802154_netif->pid > KERNEL_PID_UNDEF);
+#ifdef DEVELHELP
+    TEST_ASSERT_EQUAL_STRING("wpan", sched_threads[ieee802154_netif->pid]->name);
+#endif
+    TEST_ASSERT_NOT_NULL(sched_threads[ieee802154_netif->pid]->msg_array);
+
     for (unsigned i = 0; i < DEFAULT_DEVS_NUMOF; i++) {
         TEST_ASSERT_NOT_NULL((netifs[i] = gnrc_netif2_create(
                 netifs_stack[i], THREAD_STACKSIZE_DEFAULT,
@@ -135,6 +177,7 @@ static void test_creation(void)
 static void test_get_by_pid(void)
 {
     TEST_ASSERT(ethernet_netif == gnrc_netif2_get_by_pid(ethernet_netif->pid));
+    TEST_ASSERT(ieee802154_netif == gnrc_netif2_get_by_pid(ieee802154_netif->pid));
     for (kernel_pid_t i = 0; i < DEFAULT_DEVS_NUMOF; i++) {
         TEST_ASSERT(netifs[i] == gnrc_netif2_get_by_pid(netifs[i]->pid));
     }
@@ -143,6 +186,8 @@ static void test_get_by_pid(void)
 static void test_addr_to_str(void)
 {
     static const uint8_t ethernet_l2addr[] = ETHERNET_SRC;
+    static const uint8_t ieee802154_l2addr_long[] = IEEE802154_LONG_SRC;
+    static const uint8_t ieee802154_l2addr_short[] = IEEE802154_SHORT_SRC;
     static const uint8_t netif0_l2addr[] = NETIF0_SRC;
     char out[sizeof(netif0_l2addr) * 3];
 
@@ -151,6 +196,14 @@ static void test_addr_to_str(void)
     TEST_ASSERT(out == gnrc_netif2_addr_to_str(ethernet_l2addr,
                                                sizeof(ethernet_l2addr), out));
     TEST_ASSERT_EQUAL_STRING("3e:e6:b5:22:fd:0a", &out[0]);
+    TEST_ASSERT(out == gnrc_netif2_addr_to_str(ieee802154_l2addr_long,
+                                               sizeof(ieee802154_l2addr_long),
+                                               out));
+    TEST_ASSERT_EQUAL_STRING("3e:e6:b5:0f:19:22:fd:0a", &out[0]);
+    TEST_ASSERT(out == gnrc_netif2_addr_to_str(ieee802154_l2addr_short,
+                                               sizeof(ieee802154_l2addr_short),
+                                               out));
+    TEST_ASSERT_EQUAL_STRING("fd:0a", &out[0]);
     TEST_ASSERT(out == gnrc_netif2_addr_to_str(netif0_l2addr,
                                                sizeof(netif0_l2addr),
                                                out));
@@ -160,6 +213,8 @@ static void test_addr_to_str(void)
 static void test_addr_from_str(void)
 {
     static const uint8_t ethernet_l2addr[] = ETHERNET_SRC;
+    static const uint8_t ieee802154_l2addr_long[] = IEEE802154_LONG_SRC;
+    static const uint8_t ieee802154_l2addr_short[] = IEEE802154_SHORT_SRC;
     uint8_t out[GNRC_NETIF2_L2ADDR_MAXLEN];
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_addr_from_str("", out));
@@ -167,6 +222,15 @@ static void test_addr_from_str(void)
                           gnrc_netif2_addr_from_str("3e:e6:b5:22:fd:0a", out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ethernet_l2addr, out,
                                     sizeof(ethernet_l2addr)));
+    TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_long),
+                          gnrc_netif2_addr_from_str("3e:e6:b5:0f:19:22:fd:0a",
+                                                    out));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_long, out,
+                                    sizeof(ieee802154_l2addr_long)));
+    TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_short),
+                          gnrc_netif2_addr_from_str("fd:0a", out));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_short, out,
+                                    sizeof(ieee802154_l2addr_short)));
 }
 
 static void test_ipv6_addr_add__ENOMEM(void)
@@ -515,11 +579,32 @@ static void test_ipv6_group_idx__success(void)
 static void test_ipv6_get_iid(void)
 {
     static const ipv6_addr_t ethernet_ipv6_ll = { .u8 = ETHERNET_IPV6_LL };
+    static const ipv6_addr_t ieee802154_ipv6_ll_long = { .u8 = IEEE802154_IPV6_LL };
+    static const uint8_t ieee802154_eui64_short[] = { 0, 0, 0, 0xff,
+                                                      0xfe, 0, LA7, LA8 };
     eui64_t res;
+    uint16_t ieee802154_l2addr_len = 2U;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_ipv6_get_iid(ethernet_netif, &res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ethernet_ipv6_ll.u64[1],
                                     sizeof(res)));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_ipv6_get_iid(ieee802154_netif, &res));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ieee802154_ipv6_ll_long.u64[1],
+                                    sizeof(res)));
+    TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
+                          gnrc_netapi_set(ieee802154_netif->pid,
+                                          NETOPT_SRC_LEN, 0,
+                                          &ieee802154_l2addr_len,
+                                          sizeof(ieee802154_l2addr_len)));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_ipv6_get_iid(ieee802154_netif, &res));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ieee802154_eui64_short, sizeof(res)));
+    /* reset to source length 8 */
+    ieee802154_l2addr_len = 8U;
+    TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
+                          gnrc_netapi_set(ieee802154_netif->pid,
+                                          NETOPT_SRC_LEN, 0,
+                                          &ieee802154_l2addr_len,
+                                          sizeof(ieee802154_l2addr_len)));
     for (unsigned i = 0; i < DEFAULT_DEVS_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(-ENOTSUP, gnrc_netif2_ipv6_get_iid(netifs[i], &res));
     }
@@ -576,13 +661,40 @@ static void test_netapi_get__IPV6_GROUP(void)
 static void test_netapi_get__IPV6_IID(void)
 {
     static const ipv6_addr_t ethernet_ipv6_ll = { .u8 = ETHERNET_IPV6_LL };
+    static const ipv6_addr_t ieee802154_ipv6_ll_long = { .u8 = IEEE802154_IPV6_LL };
+    static const uint8_t ieee802154_eui64_short[] = { 0, 0, 0, 0xff,
+                                                      0xfe, 0, LA7, LA8 };
     eui64_t value;
+    uint16_t ieee802154_l2addr_len = 2U;
 
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t), gnrc_netapi_get(ethernet_netif->pid,
                                                            NETOPT_IPV6_IID,
                                                            0, &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ethernet_ipv6_ll.u64[1],
                                     sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(eui64_t), gnrc_netapi_get(ieee802154_netif->pid,
+                                                           NETOPT_IPV6_IID,
+                                                           0, &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ieee802154_ipv6_ll_long.u64[1],
+                                    sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
+                          gnrc_netapi_set(ieee802154_netif->pid,
+                                          NETOPT_SRC_LEN, 0,
+                                          &ieee802154_l2addr_len,
+                                          sizeof(ieee802154_l2addr_len)));
+    TEST_ASSERT_EQUAL_INT(sizeof(eui64_t), gnrc_netapi_get(ieee802154_netif->pid,
+                                                           NETOPT_IPV6_IID,
+                                                           0, &value,
+                                                           sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ieee802154_eui64_short,
+                                    sizeof(value)));
+    /* reset to source length 8 */
+    ieee802154_l2addr_len = 8U;
+    TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
+                          gnrc_netapi_set(ieee802154_netif->pid,
+                                          NETOPT_SRC_LEN, 0,
+                                          &ieee802154_l2addr_len,
+                                          sizeof(ieee802154_l2addr_len)));
     TEST_ASSERT_EQUAL_INT(-ENOTSUP, gnrc_netapi_get(netifs[0]->pid,
                                                     NETOPT_IPV6_IID,
                                                     0, &value, sizeof(value)));
@@ -602,6 +714,16 @@ static void test_netapi_get__MAX_PACKET_SIZE(void)
                                                             GNRC_NETTYPE_NETIF,
                                                             &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(ETHERNET_DATA_LEN, value);
+    TEST_ASSERT_EQUAL_INT(sizeof(uint16_t), gnrc_netapi_get(ieee802154_netif->pid,
+                                                            NETOPT_MAX_PACKET_SIZE,
+                                                            GNRC_NETTYPE_IPV6,
+                                                            &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(IPV6_MIN_MTU, value);
+    TEST_ASSERT_EQUAL_INT(sizeof(uint16_t), gnrc_netapi_get(ieee802154_netif->pid,
+                                                            NETOPT_MAX_PACKET_SIZE,
+                                                            GNRC_NETTYPE_NETIF,
+                                                            &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(TEST_IEEE802154_MAX_FRAG_SIZE, value);
     TEST_ASSERT_EQUAL_INT(sizeof(uint16_t), gnrc_netapi_get(netifs[0]->pid,
                                                             NETOPT_MAX_PACKET_SIZE,
                                                             GNRC_NETTYPE_IPV6,
@@ -624,6 +746,11 @@ static void test_netapi_get__6LO_IPHC(void)
                                           &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(NETOPT_DISABLE, value);
     TEST_ASSERT_EQUAL_INT(sizeof(netopt_enable_t),
+                          gnrc_netapi_get(ieee802154_netif->pid,
+                                          NETOPT_6LO_IPHC, 0,
+                                          &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(NETOPT_ENABLE, value);
+    TEST_ASSERT_EQUAL_INT(sizeof(netopt_enable_t),
                           gnrc_netapi_get(netifs[0]->pid,
                                           NETOPT_6LO_IPHC, 0,
                                           &value, sizeof(value)));
@@ -633,6 +760,7 @@ static void test_netapi_get__6LO_IPHC(void)
 static void test_netapi_get__ADDRESS(void)
 {
     static const uint8_t exp_ethernet[] = ETHERNET_SRC;
+    static const uint8_t exp_ieee802154[] = IEEE802154_SHORT_SRC;
     uint8_t value[GNRC_NETIF2_L2ADDR_MAXLEN];
 
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
@@ -640,16 +768,29 @@ static void test_netapi_get__ADDRESS(void)
                                           NETOPT_ADDRESS, 0,
                                           &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ethernet, value, sizeof(exp_ethernet)));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ieee802154),
+                          gnrc_netapi_get(ieee802154_netif->pid,
+                                          NETOPT_ADDRESS, 0,
+                                          &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ieee802154, value,
+                                    sizeof(exp_ieee802154)));
 }
 
 static void test_netapi_get__ADDRESS_LONG(void)
 {
+    static const uint8_t exp_ieee802154[] = IEEE802154_LONG_SRC;
     uint8_t value[GNRC_NETIF2_L2ADDR_MAXLEN];
 
     TEST_ASSERT_EQUAL_INT(-ENOTSUP,
                           gnrc_netapi_get(ethernet_netif->pid,
                                           NETOPT_ADDRESS_LONG, 0,
                                           &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ieee802154),
+                          gnrc_netapi_get(ieee802154_netif->pid,
+                                          NETOPT_ADDRESS_LONG, 0,
+                                          &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ieee802154, value,
+                                    sizeof(exp_ieee802154)));
     TEST_ASSERT_EQUAL_INT(-ENOTSUP,
                           gnrc_netapi_get(netifs[0]->pid,
                                           NETOPT_ADDRESS_LONG, 0,
@@ -749,6 +890,8 @@ static void test_netapi_set__6LO_IPHC(void)
 static void test_netapi_set__ADDRESS(void)
 {
     static const uint8_t exp_ethernet[] = ETHERNET_SRC;
+    static const uint8_t exp_ieee802154[] = IEEE802154_SHORT_SRC;
+    static const uint8_t exp_ieee802154_long[] = IEEE802154_LONG_SRC;
     uint8_t value[] = { LA1 + 1, LA2 + 2, LA3 + 3, LA4 + 4, LA5 + 5, LA6 + 6 };
 
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
@@ -757,11 +900,16 @@ static void test_netapi_set__ADDRESS(void)
                                           &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(sizeof(value), ethernet_netif->l2addr_len);
     TEST_ASSERT_EQUAL_INT(0, memcmp(value, ethernet_netif->l2addr,
-                                    sizeof(value)));
-    TEST_ASSERT_EQUAL_INT(-ENOTSUP,
-                          gnrc_netapi_set(netifs[0]->pid,
-                                          NETOPT_ADDRESS_LONG, 0,
-                                          &value, sizeof(value)));
+                                    ETHERNET_ADDR_LEN));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ieee802154),
+                          gnrc_netapi_set(ieee802154_netif->pid,
+                                          NETOPT_ADDRESS, 0,
+                                          &value, sizeof(uint16_t)));
+    /* we did not change NETOPT_SRC_LEN, so this field shouldn't change */
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ieee802154_long), ieee802154_netif->l2addr_len);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ieee802154_long,
+                                    ieee802154_netif->l2addr,
+                                    sizeof(exp_ieee802154_long)));
     /* return addresses to previous state for further testing */
     memcpy(value, exp_ethernet, sizeof(exp_ethernet));
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
@@ -771,20 +919,71 @@ static void test_netapi_set__ADDRESS(void)
     TEST_ASSERT_EQUAL_INT(sizeof(value), ethernet_netif->l2addr_len);
     TEST_ASSERT_EQUAL_INT(0, memcmp(value, ethernet_netif->l2addr,
                                     sizeof(value)));
+    memcpy(value, exp_ieee802154, sizeof(exp_ieee802154));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ieee802154),
+                          gnrc_netapi_set(ieee802154_netif->pid,
+                                          NETOPT_ADDRESS, 0,
+                                          &value, sizeof(uint16_t)));
 }
 
 static void test_netapi_set__ADDRESS_LONG(void)
 {
-    uint8_t value[GNRC_NETIF2_L2ADDR_MAXLEN];
+    static const uint8_t exp_ieee802154[] = IEEE802154_LONG_SRC;
+    uint8_t value[] = { LA1 + 1, LA2 + 2, LA3 + 3, LA4 + 4, LA5 + 5, LA6 + 6,
+                        LA7 + 1, LA8 + 2 };
 
     TEST_ASSERT_EQUAL_INT(-ENOTSUP,
                           gnrc_netapi_set(ethernet_netif->pid,
                                           NETOPT_ADDRESS_LONG, 0,
                                           &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ieee802154),
+                          gnrc_netapi_set(ieee802154_netif->pid,
+                                          NETOPT_ADDRESS_LONG, 0,
+                                          &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(value), ieee802154_netif->l2addr_len);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(value, ieee802154_netif->l2addr,
+                                    sizeof(value)));
     TEST_ASSERT_EQUAL_INT(-ENOTSUP,
                           gnrc_netapi_set(netifs[0]->pid,
                                           NETOPT_ADDRESS_LONG, 0,
                                           &value, sizeof(value)));
+    /* return addresses to previous state for further testing */
+    memcpy(value, exp_ieee802154, sizeof(exp_ieee802154));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ieee802154),
+                          gnrc_netapi_set(ieee802154_netif->pid,
+                                          NETOPT_ADDRESS_LONG, 0,
+                                          &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(value), ieee802154_netif->l2addr_len);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(value, ieee802154_netif->l2addr,
+                                    sizeof(value)));
+}
+
+static void test_netapi_set__SRC_LEN(void)
+{
+    static const uint8_t exp_l2addr[] = { LA7, LA8 };
+    static const uint8_t orig_ieee802154[] = IEEE802154_LONG_SRC;
+    uint16_t value = 2U;
+
+    TEST_ASSERT_EQUAL_INT(-ENOTSUP,
+                          gnrc_netapi_set(ethernet_netif->pid, NETOPT_SRC_LEN,
+                                          0, &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(uint16_t),
+                          gnrc_netapi_set(ieee802154_netif->pid, NETOPT_SRC_LEN,
+                                          0, &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(value, ieee802154_netif->l2addr_len);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_l2addr, ieee802154_netif->l2addr,
+                                    sizeof(exp_l2addr)));
+    TEST_ASSERT_EQUAL_INT(-ENOTSUP,
+                          gnrc_netapi_set(netifs[0]->pid, NETOPT_SRC_LEN, 0,
+                                          &value, sizeof(value)));
+    /* return addresses to previous state for further testing */
+    value = 8U;
+    TEST_ASSERT_EQUAL_INT(sizeof(uint16_t),
+                          gnrc_netapi_set(ieee802154_netif->pid, NETOPT_SRC_LEN,
+                                          0, &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(value, ieee802154_netif->l2addr_len);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(orig_ieee802154, ieee802154_netif->l2addr,
+                                    sizeof(orig_ieee802154)));
 }
 
 static void test_netapi_send__raw_unicast_ethernet_packet(void)
@@ -813,6 +1012,133 @@ static void test_netapi_send__raw_broadcast_ethernet_packet(void)
     hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
     LL_PREPEND(pkt, netif);
     gnrc_netapi_send(ethernet_netif->pid, pkt);
+}
+
+static void test_netapi_send__raw_unicast_ieee802154_long_long_packet(void)
+{
+    uint8_t dst[] = { LA1, LA2, LA3, LA4, LA5, LA6, LA7, LA8 + 1 };
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, "123ABCDEFG",
+                                          sizeof("123ABCDEFG"),
+                                          GNRC_NETTYPE_UNDEF);
+    TEST_ASSERT_NOT_NULL(pkt);
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
+    TEST_ASSERT_NOT_NULL(netif);
+    LL_PREPEND(pkt, netif);
+    gnrc_netapi_send(ieee802154_netif->pid, pkt);
+}
+
+static void test_netapi_send__raw_unicast_ieee802154_long_short_packet(void)
+{
+    uint8_t dst[] = { LA7, LA8 + 1 };
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, "123ABCDEFG",
+                                          sizeof("123ABCDEFG"),
+                                          GNRC_NETTYPE_UNDEF);
+    TEST_ASSERT_NOT_NULL(pkt);
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
+    TEST_ASSERT_NOT_NULL(netif);
+    LL_PREPEND(pkt, netif);
+    gnrc_netapi_send(ieee802154_netif->pid, pkt);
+}
+
+static void test_netapi_send__raw_unicast_ieee802154_short_long_packet1(void)
+{
+    uint8_t dst[] = { LA1, LA2, LA3, LA4, LA5, LA6, LA7, LA8 + 1 };
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, "123ABCDEFG",
+                                          sizeof("123ABCDEFG"),
+                                          GNRC_NETTYPE_UNDEF);
+    uint16_t src_len = 2U;
+
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_EQUAL_INT(sizeof(src_len),
+                          gnrc_netapi_set(ieee802154_netif->pid, NETOPT_SRC_LEN,
+                                          0, &src_len, sizeof(src_len)));
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
+    TEST_ASSERT_NOT_NULL(netif);
+    LL_PREPEND(pkt, netif);
+    gnrc_netapi_send(ieee802154_netif->pid, pkt);
+    /* reset src_len */
+    src_len = 8U;
+    TEST_ASSERT_EQUAL_INT(sizeof(src_len),
+                          gnrc_netapi_set(ieee802154_netif->pid, NETOPT_SRC_LEN,
+                                          0, &src_len, sizeof(src_len)));
+}
+
+static void test_netapi_send__raw_unicast_ieee802154_short_long_packet2(void)
+{
+    uint8_t src[] = { LA7, LA8 };
+    uint8_t dst[] = { LA1, LA2, LA3, LA4, LA5, LA6, LA7, LA8 + 1 };
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, "123ABCDEFG",
+                                          sizeof("123ABCDEFG"),
+                                          GNRC_NETTYPE_UNDEF);
+    TEST_ASSERT_NOT_NULL(pkt);
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(src, sizeof(src),
+                                                 dst, sizeof(dst));
+    TEST_ASSERT_NOT_NULL(netif);
+    LL_PREPEND(pkt, netif);
+    gnrc_netapi_send(ieee802154_netif->pid, pkt);
+}
+
+static void test_netapi_send__raw_unicast_ieee802154_short_short_packet(void)
+{
+    uint8_t dst[] = { LA7, LA8 + 1 };
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, "123ABCDEFG",
+                                          sizeof("123ABCDEFG"),
+                                          GNRC_NETTYPE_UNDEF);
+    uint16_t src_len = 2U;
+
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_EQUAL_INT(sizeof(src_len),
+                          gnrc_netapi_set(ieee802154_netif->pid, NETOPT_SRC_LEN,
+                                          0, &src_len, sizeof(src_len)));
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
+    TEST_ASSERT_NOT_NULL(netif);
+    LL_PREPEND(pkt, netif);
+    gnrc_netapi_send(ieee802154_netif->pid, pkt);
+    /* reset src_len */
+    src_len = 8U;
+    TEST_ASSERT_EQUAL_INT(sizeof(src_len),
+                          gnrc_netapi_set(ieee802154_netif->pid, NETOPT_SRC_LEN,
+                                          0, &src_len, sizeof(src_len)));
+}
+
+static void test_netapi_send__raw_broadcast_ieee802154_long_packet(void)
+{
+    gnrc_netif_hdr_t *hdr;
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, "123ABCDEFG",
+                                          sizeof("123ABCDEFG"),
+                                          GNRC_NETTYPE_UNDEF);
+    TEST_ASSERT_NOT_NULL(pkt);
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    TEST_ASSERT_NOT_NULL(netif);
+    hdr = netif->data;
+    hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
+    LL_PREPEND(pkt, netif);
+    gnrc_netapi_send(ieee802154_netif->pid, pkt);
+}
+
+static void test_netapi_send__raw_broadcast_ieee802154_short_packet(void)
+{
+    gnrc_netif_hdr_t *hdr;
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, "123ABCDEFG",
+                                          sizeof("123ABCDEFG"),
+                                          GNRC_NETTYPE_UNDEF);
+    uint16_t src_len = 2U;
+
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_EQUAL_INT(sizeof(src_len),
+                          gnrc_netapi_set(ieee802154_netif->pid, NETOPT_SRC_LEN,
+                                          0, &src_len, sizeof(src_len)));
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    TEST_ASSERT_NOT_NULL(netif);
+    hdr = netif->data;
+    hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
+    LL_PREPEND(pkt, netif);
+    gnrc_netapi_send(ieee802154_netif->pid, pkt);
+    /* reset src_len */
+    src_len = 8U;
+    TEST_ASSERT_EQUAL_INT(sizeof(src_len),
+                          gnrc_netapi_set(ieee802154_netif->pid, NETOPT_SRC_LEN,
+                                          0, &src_len, sizeof(src_len)));
 }
 
 static void test_netapi_send__ipv6_unicast_ethernet_packet(void)
@@ -871,6 +1197,62 @@ static void test_netapi_send__ipv6_multicast_ethernet_packet(void)
     gnrc_netapi_send(ethernet_netif->pid, pkt);
 }
 
+static void test_netapi_send__ipv6_unicast_ieee802154_packet(void)
+{
+    ipv6_hdr_t *ipv6_hdr;
+    uint8_t dst_netif[] = { LA1, LA2, LA3, LA4, LA5, LA6, LA7, LA8 + 1 };
+    static const ipv6_addr_t dst_ipv6 = { .u8 = { LP1, LP2, LP3, LP4,
+                                                  LP5, LP6, LP7, LP8,
+                                                  LA1 ^ 0x2, LA2, LA3, 0xff,
+                                                  0xfe, LA4, LA5, LA6 + 1} };
+    static const ipv6_addr_t src_ipv6 = { .u8 = IEEE802154_IPV6_LL };
+    gnrc_pktsnip_t *payload = gnrc_pktbuf_add(NULL, "ABCDEFG",
+                                          sizeof("ABCDEFG"),
+                                          GNRC_NETTYPE_UNDEF);
+    TEST_ASSERT_NOT_NULL(payload);
+    /* we don't send through gnrc_ipv6 (because we are lazy and don't want
+     * to update the neighbor cache ;-)) so we need to set the IPv6 source
+     * address */
+    gnrc_pktsnip_t *pkt = gnrc_ipv6_hdr_build(payload, &src_ipv6, &dst_ipv6);
+    TEST_ASSERT_NOT_NULL(pkt);
+    ipv6_hdr = pkt->data;
+    ipv6_hdr->len = byteorder_htons(sizeof("ABCDEFG"));
+    ipv6_hdr->nh = PROTNUM_IPV6_NONXT;
+    ipv6_hdr->hl = ieee802154_netif->cur_hl;
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst_netif,
+                                                 sizeof(dst_netif));
+    TEST_ASSERT_NOT_NULL(netif);
+    LL_PREPEND(pkt, netif);
+    gnrc_netapi_send(ieee802154_netif->pid, pkt);
+}
+
+static void test_netapi_send__ipv6_multicast_ieee802154_packet(void)
+{
+    ipv6_hdr_t *ipv6_hdr;
+    gnrc_netif_hdr_t *netif_hdr;
+    static const ipv6_addr_t src_ipv6 = { .u8 = IEEE802154_IPV6_LL };
+    gnrc_pktsnip_t *payload = gnrc_pktbuf_add(NULL, "ABCDEFG",
+                                          sizeof("ABCDEFG"),
+                                          GNRC_NETTYPE_UNDEF);
+    TEST_ASSERT_NOT_NULL(payload);
+    /* we don't send through gnrc_ipv6 (because we are lazy and don't want
+     * to update the neighbor cache ;-)) so we need to set the IPv6 source
+     * address */
+    gnrc_pktsnip_t *pkt = gnrc_ipv6_hdr_build(payload, &src_ipv6,
+                                              &ipv6_addr_all_nodes_link_local);
+    TEST_ASSERT_NOT_NULL(pkt);
+    ipv6_hdr = pkt->data;
+    ipv6_hdr->len = byteorder_htons(sizeof("ABCDEFG"));
+    ipv6_hdr->nh = PROTNUM_IPV6_NONXT;
+    ipv6_hdr->hl = ieee802154_netif->cur_hl;
+    gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    TEST_ASSERT_NOT_NULL(netif);
+    netif_hdr = netif->data;
+    netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MULTICAST;
+    LL_PREPEND(pkt, netif);
+    gnrc_netapi_send(ieee802154_netif->pid, pkt);
+}
+
 static void test_netapi_recv__empty_ethernet_payload(void)
 {
     static const uint8_t data[] = { LA1, LA2, LA3, LA6, LA7, LA8,
@@ -881,6 +1263,19 @@ static void test_netapi_recv__empty_ethernet_payload(void)
     _test_trigger_recv(ethernet_netif, data, sizeof(data));
 }
 
+static void test_netapi_recv__empty_ieee802154_payload(void)
+{
+    static const uint8_t data[] = { 0x41, 0xdc, /* FCF */
+                                    0x03,       /* Sequence number */
+                                    0x00, 0x00, /* Destination PAN */
+                                    LA8, LA7, LA6, LA5, LA4, LA3, LA2, LA1,
+                                    LA8 + 1, LA7, LA6, LA5, LA4, LA3, LA2,
+                                    LA1 };
+
+    puts("pktdump dumping IEEE 802.15.4 packet with empty payload");
+    _test_trigger_recv(ieee802154_netif, data, sizeof(data));
+}
+
 static void test_netapi_recv__raw_ethernet_payload(void)
 {
     static const uint8_t data[] = { LA1, LA2, LA3, LA6, LA7, LA8,
@@ -889,6 +1284,19 @@ static void test_netapi_recv__raw_ethernet_payload(void)
 
     puts("pktdump dumping Ethernet packet with payload 12 34 45 56");
     _test_trigger_recv(ethernet_netif, data, sizeof(data));
+}
+
+static void test_netapi_recv__raw_ieee802154_payload(void)
+{
+    static const uint8_t data[] = { 0x41, 0xdc, /* FCF */
+                                    0x03,       /* Sequence number */
+                                    0x00, 0x00, /* Destination PAN */
+                                    LA8, LA7, LA6, LA5, LA4, LA3, LA2, LA1,
+                                    LA8 + 1, LA7, LA6, LA5, LA4, LA3, LA2,
+                                    LA1, 0x12, 0x34, 0x45, 0x56 };
+
+    puts("pktdump dumping IEEE 802.15.4 packet with payload 12 34 45 56");
+    _test_trigger_recv(ieee802154_netif, data, sizeof(data));
 }
 
 static void test_netapi_recv__ipv6_ethernet_payload(void)
@@ -971,6 +1379,7 @@ static Test *embunit_tests_gnrc_netif2(void)
         new_TestFixture(test_netapi_set__6LO_IPHC),
         new_TestFixture(test_netapi_set__ADDRESS),
         new_TestFixture(test_netapi_set__ADDRESS_LONG),
+        new_TestFixture(test_netapi_set__SRC_LEN),
         /* only add tests not involving output here */
     };
     EMB_UNIT_TESTCALLER(tests, _set_up, NULL, fixtures);
@@ -985,16 +1394,39 @@ int main(void)
                            _get_netdev_address);
     netdev_test_set_set_cb((netdev_test_t *)ethernet_dev, NETOPT_ADDRESS,
                            _set_netdev_address);
+    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_ADDRESS,
+                           _get_netdev_address);
+    netdev_test_set_set_cb((netdev_test_t *)ieee802154_dev, NETOPT_ADDRESS,
+                           _set_netdev_address);
+    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_ADDRESS_LONG,
+                           _get_netdev_address_long);
+    netdev_test_set_set_cb((netdev_test_t *)ieee802154_dev, NETOPT_ADDRESS_LONG,
+                           _set_netdev_address_long);
+    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_SRC_LEN,
+                           _get_netdev_src_len);
+    netdev_test_set_set_cb((netdev_test_t *)ieee802154_dev, NETOPT_SRC_LEN,
+                           _set_netdev_src_len);
     TESTS_START();
     TESTS_RUN(embunit_tests_gnrc_netif2());
     TESTS_END();
     /* add netapi send and receive tests here */
     test_netapi_send__raw_unicast_ethernet_packet();
     test_netapi_send__raw_broadcast_ethernet_packet();
+    test_netapi_send__raw_unicast_ieee802154_long_long_packet();
+    test_netapi_send__raw_unicast_ieee802154_long_short_packet();
+    test_netapi_send__raw_unicast_ieee802154_short_long_packet1();
+    test_netapi_send__raw_unicast_ieee802154_short_long_packet2();
+    test_netapi_send__raw_unicast_ieee802154_short_short_packet();
+    test_netapi_send__raw_broadcast_ieee802154_long_packet();
+    test_netapi_send__raw_broadcast_ieee802154_short_packet();
     test_netapi_send__ipv6_unicast_ethernet_packet();
     test_netapi_send__ipv6_multicast_ethernet_packet();
+    test_netapi_send__ipv6_unicast_ieee802154_packet();
+    test_netapi_send__ipv6_multicast_ieee802154_packet();
     test_netapi_recv__empty_ethernet_payload();
+    test_netapi_recv__empty_ieee802154_payload();
     test_netapi_recv__raw_ethernet_payload();
+    test_netapi_recv__raw_ieee802154_payload();
     test_netapi_recv__ipv6_ethernet_payload();
     return 0;
 }
@@ -1013,6 +1445,9 @@ static inline gnrc_pktsnip_t *_mock_netif_recv(gnrc_netif2_t * netif)
 }
 
 static uint8_t ethernet_l2addr[] = ETHERNET_SRC;
+static uint8_t ieee802154_l2addr_long[] = IEEE802154_LONG_SRC;
+static uint8_t ieee802154_l2addr_short[] = IEEE802154_SHORT_SRC;
+static uint16_t ieee802154_l2addr_len = 8U;
 
 static int _get_netdev_address(netdev_t *dev, void *value, size_t max_len)
 {
@@ -1021,15 +1456,68 @@ static int _get_netdev_address(netdev_t *dev, void *value, size_t max_len)
         memcpy(value, ethernet_l2addr, sizeof(ethernet_l2addr));
         return sizeof(ethernet_l2addr);
     }
+    else if (dev == ieee802154_dev) {
+        assert(max_len >= sizeof(ieee802154_l2addr_short));
+        memcpy(value, ieee802154_l2addr_short, sizeof(ieee802154_l2addr_short));
+        return sizeof(ieee802154_l2addr_short);
+    }
     return -ENOTSUP;
 }
 
-static int _set_netdev_address(netdev_t *dev, const void *value, size_t value_len)
+static int _set_netdev_address(netdev_t *dev, const void *value,
+                               size_t value_len)
 {
     if (dev == ethernet_dev) {
         assert(value_len <= sizeof(ethernet_l2addr));
         memcpy(ethernet_l2addr, value, value_len);
         return value_len;
+    }
+    else if (dev == ieee802154_dev) {
+        assert(value_len <= sizeof(ieee802154_l2addr_short));
+        memcpy(ieee802154_l2addr_short, value, value_len);
+        return value_len;
+    }
+    return -ENOTSUP;
+}
+
+static int _get_netdev_address_long(netdev_t *dev, void *value, size_t max_len)
+{
+    if (dev == ieee802154_dev) {
+        assert(max_len >= sizeof(ieee802154_l2addr_long));
+        memcpy(value, ieee802154_l2addr_long, sizeof(ieee802154_l2addr_long));
+        return sizeof(ieee802154_l2addr_long);
+    }
+    return -ENOTSUP;
+}
+
+static int _set_netdev_address_long(netdev_t *dev, const void *value,
+                                    size_t value_len)
+{
+    if (dev == ieee802154_dev) {
+        assert(value_len <= sizeof(ieee802154_l2addr_long));
+        memcpy(ieee802154_l2addr_long, value, value_len);
+        return value_len;
+    }
+    return -ENOTSUP;
+}
+
+static int _get_netdev_src_len(netdev_t *dev, void *value, size_t max_len)
+{
+    if (dev == ieee802154_dev) {
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)value) = ieee802154_l2addr_len;
+        return sizeof(uint16_t);
+    }
+    return -ENOTSUP;
+}
+
+static int _set_netdev_src_len(netdev_t *dev, const void *value,
+                               size_t value_len)
+{
+    if (dev == ieee802154_dev) {
+        assert(value_len == sizeof(uint16_t));
+        ieee802154_l2addr_len = *((uint16_t *)value);
+        return sizeof(uint16_t);
     }
     return -ENOTSUP;
 }
