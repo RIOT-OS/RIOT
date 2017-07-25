@@ -241,6 +241,7 @@ typedef struct {
     uint8_t chan;           /**< ADC channel */
 } adc_conf_t;
 
+#if defined(DAC0_BASE) && (DAC0_BASE != This_symbol_has_been_deprecated)
 /**
  * @brief   CPU specific DAC configuration
  */
@@ -249,6 +250,7 @@ typedef struct {
     volatile uint32_t *scgc_addr;   /**< Clock enable register, in SIM module */
     uint8_t scgc_bit;               /**< Clock enable bit, within the register */
 } dac_conf_t;
+#endif
 
 /**
  * @brief   CPU specific timer PIT module configuration
