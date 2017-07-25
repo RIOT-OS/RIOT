@@ -139,9 +139,12 @@ static void _listen(sock_udp_t *sock)
     if (pdu.hdr->code == COAP_CODE_EMPTY) {
         DEBUG("gcoap: empty messages not handled yet\n");
         return;
+    }
 
+    /* validate class and type for incoming */
+    switch (coap_get_code_class(&pdu)) {
     /* incoming request */
-    } else if (coap_get_code_class(&pdu) == COAP_CLASS_REQ) {
+    case COAP_CLASS_REQ:
         if (coap_get_type(&pdu) == COAP_TYPE_NON
                 || coap_get_type(&pdu) == COAP_TYPE_CON) {
             size_t pdu_len = _handle_req(&pdu, buf, sizeof(buf), &remote);
@@ -151,23 +154,41 @@ static void _listen(sock_udp_t *sock)
         }
         else {
             DEBUG("gcoap: illegal request type: %u\n", coap_get_type(&pdu));
-            return;
         }
-    }
+        break;
 
     /* incoming response */
-    else {
+    case COAP_CLASS_SUCCESS:
+    case COAP_CLASS_CLIENT_FAILURE:
+    case COAP_CLASS_SERVER_FAILURE:
         _find_req_memo(&memo, &pdu, &remote);
         if (memo) {
-            xtimer_remove(&memo->response_timer);
-            memo->state = GCOAP_MEMO_RESP;
-            memo->resp_handler(memo->state, &pdu, &remote);
+            switch (coap_get_type(&pdu)) {
+            case COAP_TYPE_NON:
+            case COAP_TYPE_ACK:
+                xtimer_remove(&memo->response_timer);
+                memo->state = GCOAP_MEMO_RESP;
+                memo->resp_handler(memo->state, &pdu, &remote);
 
-            if (memo->send_limit >= 0) {        /* if confirmable */
-                *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
+                if (memo->send_limit >= 0) {        /* if confirmable */
+                    *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
+                }
+                memo->state = GCOAP_MEMO_UNUSED;
+                break;
+            case COAP_TYPE_CON:
+                DEBUG("gcoap: separate CON response not handled yet\n");
+                break;
+            default:
+                DEBUG("gcoap: illegal response type: %u\n", coap_get_type(&pdu));
+                break;
             }
-            memo->state = GCOAP_MEMO_UNUSED;
         }
+        else {
+            DEBUG("gcoap: msg not found for ID: %u\n", coap_get_id(&pdu));
+        }
+        break;
+    default:
+        DEBUG("gcoap: illegal code class: %u\n", coap_get_code_class(&pdu));
     }
 }
 
