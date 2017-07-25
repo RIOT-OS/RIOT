@@ -707,6 +707,12 @@ ifneq (,$(filter skald,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += random
 endif
+
+ifneq (,$(filter rdcli_common,$(USEMODULE)))
+  USEMODULE += luid
+  USEMODULE += fmt
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 

@@ -127,6 +127,9 @@ endif
 ifneq (,$(filter skald,$(USEMODULE)))
   DIRS += net/skald
 endif
+ifneq (,$(filter rdcli_common,$(USEMODULE)))
+  DIRS += net/application_layer/rdcli_common
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))
 
