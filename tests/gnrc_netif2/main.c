@@ -36,50 +36,7 @@
 #include "utlist.h"
 #include "xtimer.h"
 
-#define GP1 (0x20U)
-#define GP2 (0x01U)
-#define GP3 (0x0dU)
-#define GP4 (0xb8U)
-#define GP5 (0x00U)
-#define GP6 (0x00U)
-#define GP7 (0x5aU)
-#define GP8 (0x1aU)
-
-#define LP1 (0xfeU)
-#define LP2 (0x80U)
-#define LP3 (0x00U)
-#define LP4 (0x00U)
-#define LP5 (0x00U)
-#define LP6 (0x00U)
-#define LP7 (0x00U)
-#define LP8 (0x00U)
-
-#define LA1 (0x3eU)
-#define LA2 (0xe6U)
-#define LA3 (0xb5U)
-#define LA4 (0x0fU)
-#define LA5 (0x19U)
-#define LA6 (0x22U)
-#define LA7 (0xfdU)
-#define LA8 (0x0aU)
-
-#define ETHERNET_SRC        { LA1, LA2, LA3, LA6, LA7, LA8 }
-#define ETHERNET_IPV6_LL    { LP1, LP2, LP3, LP4, LP5, LP6, LP7, LP8, \
-                              LA1 ^ 0x2, LA2, LA3, 0xff, 0xfe, LA6, LA7, LA8 }
-#define ETHERNET_IPV6_G     { GP1, GP2, GP3, GP4, GP5, GP6, GP7, GP8, \
-                              LA1 ^ 0x2, LA2, LA3, 0xff, 0xfe, LA6, LA7, LA8 }
-#define ETHERNET_STACKSIZE  (THREAD_STACKSIZE_MAIN)
-#define NETIF0_SRC          { LA1, LA2 + 1, LA3, LA4, LA5, LA6, LA7, LA8 }
-#define NETIF0_IPV6_LL      { LP1, LP2, LP3, LP4, LP5, LP6, LP7, LP8, \
-                              LA1 ^ 0x2, LA2 + 1, LA3, LA4, LA5, LA6, LA7, LA8 }
-#define NETIF0_IPV6_G       { GP1, GP2, GP3, GP4, GP5, GP6, GP7, GP8, \
-                              LA1 ^ 0x2, LA2 + 1, LA3, LA4, LA5, LA6, LA7, LA8 }
-#define GLOBAL_PFX18        { GP1, GP2, GP3 ^ 0x3f, GP4, GP5, GP6, GP7, GP8, \
-                              LA1 ^ 0x2, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
-#define GLOBAL_PFX23        { GP1, GP2, GP3 ^ 0x1, GP4, GP5, GP6, GP7, GP8, \
-                              LA1 ^ 0x2, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
-#define GLOBAL_PFX64        { GP1, GP2, GP3, GP4, GP5, GP6, GP7, GP8, \
-                              LA1 ^ 0x82, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
+#define ETHERNET_STACKSIZE          (THREAD_STACKSIZE_MAIN)
 
 static gnrc_netif2_t *ethernet_netif = NULL;
 static gnrc_netif2_t *netifs[DEFAULT_DEVS_NUMOF];
@@ -158,8 +115,8 @@ static void test_creation(void)
         TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_UNKNOWN, netifs[i]->device_type);
         TEST_ASSERT(netifs[i]->pid > KERNEL_PID_UNDEF);
         TEST_ASSERT_NOT_NULL(sched_threads[netifs[i]->pid]->msg_array);
-        TEST_ASSERT_EQUAL_INT(i + 2, gnrc_netif2_numof());
-        for (unsigned j = 0; j < (i + 2); j++) {
+        TEST_ASSERT_EQUAL_INT(i + SPECIAL_DEVS + 1, gnrc_netif2_numof());
+        for (unsigned j = 0; j < (i + SPECIAL_DEVS + 1); j++) {
             TEST_ASSERT_NOT_NULL((ptr = gnrc_netif2_iter(ptr)));
         }
         TEST_ASSERT_NULL((ptr = gnrc_netif2_iter(ptr)));
