@@ -51,13 +51,9 @@ void auto_init_netdev_tap(void)
 
         netdev_tap_setup(&netdev_tap[i], p);
 #ifdef MODULE_GNRC_NETIF2
-        if (!gnrc_netif2_ethernet_create(_netdev_eth_stack[i],
-                                         TAP_MAC_STACKSIZE,
-                                         TAP_MAC_PRIO, "gnrc_netdev_tap",
-                                         &netdev_tap[i].netdev)) {
-            LOG_ERROR("[auto_init_netif] error initializing TAP %s\n",
-                      *(p->tap_name));
-        }
+        gnrc_netif2_ethernet_create(_netdev_eth_stack[i], TAP_MAC_STACKSIZE,
+                                    TAP_MAC_PRIO, "gnrc_netdev_tap",
+                                    &netdev_tap[i].netdev);
 #else
         gnrc_netdev_eth_init(&_gnrc_netdev_tap[i], (netdev_t*)&netdev_tap[i]);
 
