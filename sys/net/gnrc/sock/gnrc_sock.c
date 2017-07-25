@@ -87,6 +87,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
                 return -ETIMEDOUT;
             }
 #endif
+            /* Falls Through. */
         default:
             return -EINTR;
     }
