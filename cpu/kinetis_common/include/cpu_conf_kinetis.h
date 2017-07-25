@@ -56,6 +56,52 @@ extern "C"
 /** @} */
 
 /**
+ * @name Compatibility definitions between vendor headers
+ * @{
+ */
+/* Different versions of vendor headers use some variations of register names.
+ * This section aims to eliminate these differences in the few places where it
+ * matters for the RIOT driver implementations.
+ */
+#if !defined(MCG_C2_RANGE0) && defined(MCG_C2_RANGE)
+#define MCG_C2_RANGE0(x) MCG_C2_RANGE(x)
+#endif
+#if !defined(MCG_C2_RANGE0_MASK) && defined(MCG_C2_RANGE_MASK)
+#define MCG_C2_RANGE0_MASK MCG_C2_RANGE_MASK
+#endif
+#if !defined(MCG_C7_OSCSEL) && defined(MCG_C7_OSCSEL_SHIFT)
+#define MCG_C7_OSCSEL(x) (((uint32_t)(x) << MCG_C7_OSCSEL_SHIFT) & MCG_C7_OSCSEL_MASK)
+#endif
+#if !defined(OSC0) && defined(OSC)
+#define OSC0 OSC
+#endif
+#if !defined(SIM_SCGC5_LPTMR_SHIFT) && defined(SIM_SCGC5_LPTIMER_SHIFT)
+#define SIM_SCGC5_LPTMR_SHIFT SIM_SCGC5_LPTIMER_SHIFT
+#endif
+#if !defined(SIM_SCGC5_LPTMR_MASK) && defined(SIM_SCGC5_LPTIMER_MASK)
+#define SIM_SCGC5_LPTMR_MASK SIM_SCGC5_LPTIMER_MASK
+#endif
+#if !defined(GPIOA_BASE) && defined(PTA_BASE)
+#define GPIOA_BASE PTA_BASE
+#define GPIOB_BASE PTB_BASE
+#define GPIOC_BASE PTC_BASE
+#define GPIOD_BASE PTD_BASE
+#define GPIOE_BASE PTE_BASE
+#define GPIOF_BASE PTF_BASE
+#define GPIOG_BASE PTG_BASE
+#endif
+#if !defined(GPIOA) && defined(PTA)
+#define GPIOA PTA
+#define GPIOB PTB
+#define GPIOC PTC
+#define GPIOD PTD
+#define GPIOE PTE
+#define GPIOF PTF
+#define GPIOG PTG
+#endif
+/** @} */
+
+/**
  * @name Timer hardware information
  * @{
  */
