@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-#define SPECIAL_DEVS        (1)
+#define SPECIAL_DEVS        (2)
 #define DEFAULT_DEVS_NUMOF  (GNRC_NETIF_NUMOF - SPECIAL_DEVS)
 
 #define GP1 (0x20U)
@@ -56,11 +56,19 @@ extern "C" {
 #define LA7 (0xfdU)
 #define LA8 (0x0aU)
 
+#define TEST_IEEE802154_MAX_FRAG_SIZE   (102)
+
 #define ETHERNET_SRC        { LA1, LA2, LA3, LA6, LA7, LA8 }
 #define ETHERNET_IPV6_LL    { LP1, LP2, LP3, LP4, LP5, LP6, LP7, LP8, \
                               LA1 ^ 0x2, LA2, LA3, 0xff, 0xfe, LA6, LA7, LA8 }
 #define ETHERNET_IPV6_G     { GP1, GP2, GP3, GP4, GP5, GP6, GP7, GP8, \
                               LA1 ^ 0x2, LA2, LA3, 0xff, 0xfe, LA6, LA7, LA8 }
+#define IEEE802154_LONG_SRC     { LA1, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
+#define IEEE802154_SHORT_SRC    { LA7, LA8 }
+#define IEEE802154_IPV6_LL  { LP1, LP2, LP3, LP4, LP5, LP6, LP7, LP8, \
+                              LA1 ^ 0x2, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
+#define IEEE802154_IPV6_G   { GP1, GP2, GP3, GP4, GP5, GP6, GP7, GP8, \
+                              LA1 ^ 0x2, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
 #define NETIF0_SRC          { LA1, LA2 + 1, LA3, LA4, LA5, LA6, LA7, LA8 }
 #define NETIF0_IPV6_LL      { LP1, LP2, LP3, LP4, LP5, LP6, LP7, LP8, \
                               LA1 ^ 0x2, LA2 + 1, LA3, LA4, LA5, LA6, LA7, LA8 }
@@ -74,6 +82,7 @@ extern "C" {
                               LA1 ^ 0x82, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
 
 extern netdev_t *ethernet_dev;
+extern netdev_t *ieee802154_dev;
 extern netdev_t *devs[DEFAULT_DEVS_NUMOF];
 
 void _tests_init(void);
