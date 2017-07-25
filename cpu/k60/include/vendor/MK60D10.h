@@ -14576,13 +14576,6 @@ typedef struct {
 #define LPTimer_IRQn                             LPTMR0_IRQn
 #define LPTimer_IRQHandler                       LPTMR0_IRQHandler
 
-/* Compatibility defines for compatibility with differing module names between
- * MK60 and MKW22 headers */
-#define SIM_SCGC5_LPTMR_MASK SIM_SCGC5_LPTIMER_MASK
-#define SIM_SCGC5_LPTMR_SHIFT SIM_SCGC5_LPTIMER_SHIFT
-#define OSC0 OSC
-#define MCG_C7_OSCSEL(x) (((uint32_t)(x) << MCG_C7_OSCSEL_SHIFT) & MCG_C7_OSCSEL_MASK)
-
 /*!
  * @}
  */ /* end of group Backward_Compatibility_Symbols */
@@ -14600,5 +14593,3 @@ typedef struct {
 #ifdef __cplusplus
 }
 #endif
-
-/* MK60D10.h, eof. */
