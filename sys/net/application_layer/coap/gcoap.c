@@ -160,7 +160,7 @@ static void _listen(sock_udp_t *sock)
         if (memo) {
             xtimer_remove(&memo->response_timer);
             memo->state = GCOAP_MEMO_RESP;
-            memo->resp_handler(memo->state, &pdu);
+            memo->resp_handler(memo->state, &pdu, &remote);
             memo->state = GCOAP_MEMO_UNUSED;
         }
     }
@@ -380,7 +380,7 @@ static void _expire_request(gcoap_request_memo_t *memo)
         /* Pass response to handler */
         if (memo->resp_handler) {
             req.hdr = (coap_hdr_t *)&memo->hdr_buf[0];   /* for reference */
-            memo->resp_handler(memo->state, &req);
+            memo->resp_handler(memo->state, &req, NULL);
         }
         memo->state = GCOAP_MEMO_UNUSED;
     }
