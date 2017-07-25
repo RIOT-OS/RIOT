@@ -17,6 +17,7 @@
 
 #include "bitfield.h"
 #include "net/ethernet.h"
+#include "net/ipv6.h"
 #include "net/gnrc.h"
 #include "log.h"
 #include "sched.h"
@@ -1024,12 +1025,15 @@ static void _update_l2addr_from_dev(gnrc_netif2_t *netif)
 
     switch (netif->device_type) {
 #ifdef MODULE_NETDEV_IEEE802154
-        case NETDEV_TYPE_IEEE802154:
-            res = dev->driver->get(dev, NETOPT_SRC_LEN, &tmp, sizeof(tmp));
-            assert(res == sizeof(tmp));
-            netif->l2addr_len = (uint8_t)tmp;
-            if (tmp == IEEE802154_LONG_ADDRESS_LEN) {
-                opt = NETOPT_ADDRESS_LONG;
+        case NETDEV_TYPE_IEEE802154: {
+                uint16_t tmp;
+
+                res = dev->driver->get(dev, NETOPT_SRC_LEN, &tmp, sizeof(tmp));
+                assert(res == sizeof(tmp));
+                netif->l2addr_len = (uint8_t)tmp;
+                if (tmp == IEEE802154_LONG_ADDRESS_LEN) {
+                    opt = NETOPT_ADDRESS_LONG;
+                }
             }
             break;
 #endif
