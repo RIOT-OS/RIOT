@@ -589,11 +589,6 @@ struct gnrc_netif2_ops {
 };
 
 /**
- * @brief   Deprecated address state (still valid, but not preferred)
- */
-#define GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_DEPRECATED   (0x02U)
-
-/**
  * @brief   Creates a network interface
  *
  * @param[in] stack     The stack for the network interface's thread.
