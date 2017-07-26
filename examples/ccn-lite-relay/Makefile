@@ -41,6 +41,5 @@ USEMODULE += prng_minstd
 USEPKG += tlsf
 
 USEPKG += ccn-lite
-USEMODULE += ccn-lite-utils
 
 include $(RIOTBASE)/Makefile.include
