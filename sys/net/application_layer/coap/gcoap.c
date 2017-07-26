@@ -159,6 +159,7 @@ static void _listen(sock_udp_t *sock)
         _find_req_memo(&memo, &pdu, buf, sizeof(buf));
         if (memo) {
             xtimer_remove(&memo->response_timer);
+            memo->state = GCOAP_MEMO_RESP;
             memo->resp_handler(memo->state, &pdu);
             memo->state = GCOAP_MEMO_UNUSED;
         }
