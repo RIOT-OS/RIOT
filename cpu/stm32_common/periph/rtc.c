@@ -29,7 +29,7 @@
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
     defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L1)
+    defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32L4)
 
 /* guard file in case no RTC device was specified */
 #if RTC_NUMOF
@@ -60,8 +60,12 @@ static uint8_t byte2bcd(uint8_t value);
 void rtc_init(void)
 {
     /* Enable write access to RTC registers */
+#if defined(CPU_FAM_STM32L4)
+    periph_clk_en(APB1, RCC_APB1ENR1_PWREN);
+#else
     periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-#if defined(CPU_FAM_STM32F7)
+#endif
+#if defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4)
     PWR->CR1 |= PWR_CR1_DBP;
 #else
     PWR->CR |= PWR_CR_DBP;
@@ -103,8 +107,13 @@ void rtc_init(void)
 int rtc_set_time(struct tm *time)
 {
     /* Enable write access to RTC registers */
+#if defined(CPU_FAM_STM32L4)
+    periph_clk_en(APB1, RCC_APB1ENR1_PWREN);
+#else
     periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-#if defined(CPU_FAM_STM32F7)
+#endif
+
+#if defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4)
     PWR->CR1 |= PWR_CR1_DBP;
 #else
     PWR->CR |= PWR_CR_DBP;
@@ -161,8 +170,13 @@ int rtc_get_time(struct tm *time)
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     /* Enable write access to RTC registers */
+#if defined(CPU_FAM_STM32L4)
+    periph_clk_en(APB1, RCC_APB1ENR1_PWREN);
+#else
     periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-#if defined(CPU_FAM_STM32F7)
+#endif
+
+#if defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4)
     PWR->CR1 |= PWR_CR1_DBP;
 #else
     PWR->CR |= PWR_CR_DBP;
@@ -196,11 +210,17 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 
 #if defined(CPU_FAM_STM32L0)
     EXTI->IMR  |= EXTI_IMR_IM17;
+#elif defined (CPU_FAM_STM32L4)
+    EXTI->IMR  |= EXTI_IMR1_IM18;
 #else
     EXTI->IMR  |= EXTI_IMR_MR17;
 #endif
 
-    EXTI->RTSR |= EXTI_RTSR_TR17;
+#if defined (CPU_FAM_STM32L4)
+    EXTI->RTSR |= EXTI_RTSR1_RT18;
+#else
+    EXTI->RTSR |= EXTI_RTSR1_TR17;
+#endif
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
     NVIC_SetPriority(RTC_IRQn, 10);
@@ -313,7 +333,13 @@ void isr_rtc_alarm(void)
         }
         RTC->ISR &= ~RTC_ISR_ALRAF;
     }
+
+#if defined(CPU_FAM_STM32L4)
+    EXTI->PR |= EXTI_PR1_PIF18;
+#else
     EXTI->PR |= EXTI_PR_PR17;
+#endif
+
     cortexm_isr_end();
 }
 
@@ -340,4 +366,4 @@ static uint8_t byte2bcd(uint8_t value)
 #endif /* defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
           defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
           defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-          defined(CPU_FAM_STM32L1) */
+          defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32L4)*/
