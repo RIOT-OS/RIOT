@@ -135,7 +135,7 @@ static void _listen(sock_udp_t *sock)
         return;
     }
 
-    if (coap_get_code(&pdu) == COAP_CODE_EMPTY) {
+    if (pdu.hdr->code == COAP_CODE_EMPTY) {
         DEBUG("gcoap: empty messages not handled yet\n");
         return;
 
