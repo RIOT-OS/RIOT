@@ -1,0 +1,34 @@
+From 89a5543c9442188d609556ca43e9e3313d79d522 Mon Sep 17 00:00:00 2001
+From: Martine Lenders <mail@martine-lenders.eu>
+Date: Thu, 27 Jul 2017 13:17:35 +0200
+Subject: [PATCH] ccn-line-riot: port to gnrc_netif2
+
+---
+ src/ccn-lite-riot.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/ccn-lite-riot.c b/src/ccn-lite-riot.c
+index 3b8db4d..04ab15a 100644
+--- a/src/ccn-lite-riot.c
++++ b/src/ccn-lite-riot.c
+@@ -34,7 +34,7 @@
+ #include "timex.h"
+ #include "xtimer.h"
+ #include "net/gnrc/netreg.h"
+-#include "net/gnrc/netif.h"
++#include "net/gnrc/netif2.h"
+ #include "net/gnrc/netif/hdr.h"
+ #include "net/gnrc/netapi.h"
+ #include "net/packet.h"
+@@ -228,7 +228,7 @@ int
+ ccnl_open_netif(kernel_pid_t if_pid, gnrc_nettype_t netreg_type)
+ {
+     assert(pid_is_valid(if_pid));
+-    if (!gnrc_netif_exist(if_pid)) {
++    if (gnrc_netif2_get_by_pid(if_pid) == NULL) {
+         return -1;
+     }
+     if (ccnl_relay.ifcount >= CCNL_MAX_INTERFACES) {
+-- 
+2.7.4
+

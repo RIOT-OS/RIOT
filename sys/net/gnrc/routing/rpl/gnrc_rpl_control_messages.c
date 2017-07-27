@@ -20,6 +20,7 @@
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/netif2/internal.h"
 #include "net/gnrc.h"
 #include "net/eui64.h"
 
@@ -53,22 +54,45 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define GNRC_RPL_PRF_MASK                   (0x7)
 #define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT    (1 << 6)
 
+static gnrc_netif2_t *_find_interface_with_rpl_mcast(void)
+{
+    gnrc_netif2_t *netif = NULL;
+
+    while ((netif = gnrc_netif2_iter(netif))) {
+        for (unsigned i = 0; i < GNRC_NETIF2_IPV6_GROUPS_NUMOF; i++) {
+            if (ipv6_addr_equal(&netif->ipv6.groups[i], &ipv6_addr_all_rpl_nodes)) {
+                return netif;
+            }
+        }
+    }
+    return NULL;
+}
+
 void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
                    ipv6_addr_t *dodag_id)
 {
+    gnrc_netif2_t *netif;
+
     (void)dodag_id;
     gnrc_pktsnip_t *hdr;
     if (iface == KERNEL_PID_UNDEF) {
-        if ((iface = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes))
-            == KERNEL_PID_UNDEF) {
+        netif = _find_interface_with_rpl_mcast();
+
+        if (netif == KERNEL_PID_UNDEF) {
             DEBUG("RPL: no suitable interface found for this destination address\n");
             gnrc_pktbuf_release(pkt);
             return;
         }
+        iface = netif->pid;
+    }
+    else {
+        netif = gnrc_netif2_get_by_pid(iface);
     }
 
     if (src == NULL) {
-        src = gnrc_ipv6_netif_match_prefix(iface, &ipv6_addr_link_local_prefix);
+        int src_idx = gnrc_netif2_ipv6_addr_match(netif, &ipv6_addr_link_local_prefix);
+
+        src = &netif->ipv6.addrs[src_idx];
 
         if (src == NULL) {
             DEBUG("RPL: no suitable src address found\n");
@@ -143,13 +167,15 @@ gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *do
     prefix_info->length = GNRC_RPL_OPT_PREFIX_INFO_LEN;
     /* auto-address configuration */
     prefix_info->LAR_flags = GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT;
-    prefix_info->valid_lifetime = dodag->netif_addr->valid;
-    prefix_info->pref_lifetime = dodag->netif_addr->preferred;
-    prefix_info->prefix_len = dodag->netif_addr->prefix_len;
+    /* TODO: Get real values from NIB_PL */
+    prefix_info->valid_lifetime = UINT32_MAX;
+    prefix_info->pref_lifetime = UINT32_MAX;
+    prefix_info->prefix_len = 64;
     prefix_info->reserved = 0;
 
     memset(&prefix_info->prefix, 0, sizeof(prefix_info->prefix));
-    ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id, dodag->netif_addr->prefix_len);
+    ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id,
+                          prefix_info->prefix_len);
     return opt_snip;
 }
 #endif
@@ -315,7 +341,6 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
     eui64_t iid;
     *included_opts = 0;
-    ipv6_addr_t *me;
 
 #ifndef GNRC_RPL_WITHOUT_VALIDATION
     if (!gnrc_rpl_validation_options(msg_type, inst, opt, len)) {
@@ -372,15 +397,17 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
 #endif
                 gnrc_rpl_opt_prefix_info_t *pi = (gnrc_rpl_opt_prefix_info_t *) opt;
                 /* check for the auto address-configuration flag */
-                if ((gnrc_netapi_get(dodag->iface, NETOPT_IPV6_IID, 0, &iid, sizeof(eui64_t)) < 0)
+                gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(dodag->iface);
+
+                assert(netif != NULL);
+                if ((gnrc_netif2_ipv6_get_iid(netif, &iid) < 0)
                      && !(pi->LAR_flags & GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
                     break;
                 }
                 ipv6_addr_set_aiid(&pi->prefix, iid.uint8);
-                me = gnrc_ipv6_netif_add_addr(dodag->iface, &pi->prefix, pi->prefix_len, 0);
-                if (me) {
-                    dodag->netif_addr = gnrc_ipv6_netif_addr_get(me);
-                }
+                gnrc_netif2_ipv6_addr_add(netif, &pi->prefix, pi->prefix_len,
+                                          GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID);
+                /* TODO: add to prefix list */
 
                 break;
 
@@ -486,11 +513,13 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
         inst->of = gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
 
         if (iface == KERNEL_PID_UNDEF) {
-            iface = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes);
+            gnrc_netif2_t *netif = _find_interface_with_rpl_mcast();
+
+            iface = netif->pid;
             assert(iface != KERNEL_PID_UNDEF);
         }
 
-        gnrc_rpl_dodag_init(inst, &dio->dodag_id, iface, NULL);
+        gnrc_rpl_dodag_init(inst, &dio->dodag_id, iface);
 
         dodag = &inst->dodag;
 
@@ -531,24 +560,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
 #endif
         }
 
-        /* if there was no netif_addr created manually or by a PIO, then leave this DODAG */
-        if (!dodag->netif_addr) {
-            ipv6_addr_t *configured_addr;
-
-            if (!(configured_addr = gnrc_ipv6_netif_match_prefix(dodag->iface, &dodag->dodag_id))) {
-                DEBUG("RPL: no IPv6 address configured to match the given dodag id: %s\n",
-                      ipv6_addr_to_str(addr_str, &(dodag->dodag_id), sizeof(addr_str)));
-                gnrc_rpl_instance_remove(inst);
-                return;
-            }
-
-            if (!(dodag->netif_addr = gnrc_ipv6_netif_addr_get(configured_addr))) {
-                DEBUG("RPL: no netif address found for %s\n",
-                       ipv6_addr_to_str(addr_str, configured_addr, sizeof(addr_str)));
-                gnrc_rpl_instance_remove(inst);
-                return;
-            }
-        }
+        /* TODO: create prefix list entry */
 
         gnrc_rpl_delay_dao(dodag);
         trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
@@ -732,11 +744,15 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
 
     /* find my address */
     ipv6_addr_t *me = NULL;
-    gnrc_ipv6_netif_find_by_prefix(&me, &dodag->dodag_id);
-    if (me == NULL) {
+    gnrc_netif2_t *netif = gnrc_netif2_get_by_ipv6_addr(&dodag->dodag_id);
+    int idx;
+
+    if (netif == NULL) {
         DEBUG("RPL: no address configured\n");
         return;
     }
+    idx = gnrc_netif2_ipv6_addr_idx(netif, &dodag->dodag_id);
+    me = &netif->ipv6.addrs[idx];
 
     mutex_lock(&(gnrc_ipv6_fib_table.mtx_access));
 

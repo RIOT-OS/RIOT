@@ -20,7 +20,6 @@
 #include <string.h>
 
 #include "net/ipv6/addr.h"
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/ndp/internal.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
@@ -28,14 +27,11 @@
 #include "xtimer.h"
 
 static xtimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
-static gnrc_sixlowpan_nd_router_abr_t *abr = NULL;
-
 void _del_cb(void *ptr)
 {
     gnrc_sixlowpan_ctx_t *ctx = ptr;
     uint8_t cid = ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK;
     ctx->prefix_len = 0;
-    gnrc_sixlowpan_nd_router_abr_rem_ctx(abr, cid);
     del_timer[cid].callback = NULL;
 }
 
@@ -64,6 +60,7 @@ int _gnrc_6ctx_list(void)
 
 static void _adv_ctx(void)
 {
+    /* TODO: update NIB */
     kernel_pid_t ifs[GNRC_NETIF_NUMOF];
     size_t ifnum = gnrc_netif_get(ifs);
     for (size_t i = 0; i < ifnum; i++) {
@@ -103,13 +100,6 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
     ipv6_addr_from_str(&prefix, addr_str);
     if (ipv6_addr_is_unspecified(&prefix)) {
         puts("ERROR: prefix may not be ::");
-        return 1;
-    }
-    if (abr == NULL) {
-        abr = gnrc_sixlowpan_nd_router_abr_get();
-    }
-    if (gnrc_sixlowpan_nd_router_abr_add_ctx(abr, ctx) < 0) {
-        puts("ERROR: can not add context");
         return 1;
     }
     ltime = atoi(ltime_str);

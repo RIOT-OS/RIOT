@@ -52,7 +52,7 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
             printf("NETTYPE_UNDEF (%i)\n", pkt->type);
             od_hex_dump(pkt->data, pkt->size, OD_WIDTH_DEFAULT);
             break;
-#ifdef MODULE_GNRC_NETIF
+#ifdef MODULE_GNRC_NETIF2
         case GNRC_NETTYPE_NETIF:
             printf("NETTYPE_NETIF (%i)\n", pkt->type);
             gnrc_netif_hdr_print(pkt->data);

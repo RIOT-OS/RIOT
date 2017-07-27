@@ -36,9 +36,8 @@ ifneq (,$(filter sntp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-  USEMODULE += gnrc_netif
-  USEMODULE += gnrc_netdev
   USEMODULE += netdev_default
+  USEMODULE += gnrc_netif2
 endif
 
 ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
@@ -58,8 +57,6 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_iphc
   USEMODULE += gnrc_ipv6_default
-  USEMODULE += gnrc_netdev
-  USEMODULE += gnrc_ipv6_netif
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
@@ -92,9 +89,6 @@ endif
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev_eth
-  ifneq (,$(filter gnrc_%,$(USEMODULE)))
-    USEMODULE += gnrc_netdev
-  endif
 endif
 
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
@@ -176,7 +170,6 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
-  USEMODULE += gnrc_sixlowpan_netif
   USEMODULE += sixlowpan
 endif
 
@@ -297,6 +290,7 @@ endif
 
 ifneq (,$(filter gnrc_ipv6_router,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_ipv6_nib_router
 endif
 
 ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
@@ -304,7 +298,7 @@ ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
   USEMODULE += ipv6_addr
   USEMODULE += gnrc_ipv6_hdr
   USEMODULE += gnrc_ipv6_nc
-  USEMODULE += gnrc_ipv6_netif
+  USEMODULE += gnrc_netif2
 endif
 
 ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
@@ -350,13 +344,6 @@ ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   USEMODULE += random
 endif
 
-ifneq (,$(filter gnrc_ipv6_netif,$(USEMODULE)))
-  USEMODULE += ipv6_addr
-  USEMODULE += gnrc_netif
-  USEMODULE += bitfield
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += udp
@@ -373,7 +360,7 @@ endif
 ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
-  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif2
   USEMODULE += gnrc_pktbuf
   USEMODULE += xtimer
 endif
@@ -534,7 +521,7 @@ endif
 ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
-  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif2
   USEMODULE += gnrc_netif_hdr
   USEMODULE += gnrc_pktbuf
 endif
