@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup      cpu_cc2538
+ * @ingroup      cpu_cc2538
  * @{
  *
  * @file
@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   ARM Cortex-M specific CPU configuration
+ * @name   ARM Cortex-M specific CPU configuration
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
