@@ -18,11 +18,15 @@
  * @}
  */
 
+rom_length = 512K;
+
+INCLUDE multislot.ld
+
 MEMORY
 {
-    rom (rx)        : ORIGIN = 0x08000000, LENGTH = 512K
-    ram (xrw)       : ORIGIN = 0x20000000, LENGTH = 64K
-    cpuid (r)       : ORIGIN = 0x1ffff7e8, LENGTH = 12
+    rom (rx)        : ORIGIN = 0x08000000 + boot_offset, LENGTH = rom_length
+    ram (xrw)       : ORIGIN = 0x20000000,               LENGTH = 64K
+    cpuid (r)       : ORIGIN = 0x1ffff7e8,               LENGTH = 12
 }
 
 _cpuid_address = ORIGIN(cpuid);
