@@ -147,12 +147,11 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, void *value,
     switch (opt) {
         case NETOPT_CHANNEL:
         {
-            assert(len == sizeof(uint16_t));
-            uint16_t chan = *((uint16_t *)value);
+            assert(len <= sizeof(uint16_t));
             /* real validity needs to be checked by device, since sub-GHz and
-             * 2.4 GHz band radios have different legal values. Here we only
-             * check that it fits in an 8-bit variabl*/
-            assert(chan <= UINT8_MAX);
+             * 2.4 GHz band radios have different legal values. Here, we just
+             * take the first eight bits. */
+            uint8_t chan = ((uint8_t *)value)[0];
             dev->chan = chan;
             res = sizeof(uint16_t);
             break;
