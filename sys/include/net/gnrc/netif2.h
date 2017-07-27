@@ -485,7 +485,7 @@ typedef struct {
      */
     uint8_t l2addr_len;
 #endif
-#if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || DOXYGEN
+#if defined(MODULE_GNRC_SIXLOWPAN) || DOXYGEN
     /**
      * @brief   Maximum fragment size for 6LoWPAN fragmentation.
      *

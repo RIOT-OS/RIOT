@@ -1068,7 +1068,7 @@ static void _init_from_device(gnrc_netif2_t *netif)
 #ifdef MODULE_GNRC_IPV6
             res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
             assert(res == sizeof(tmp));
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
+#ifdef MODULE_GNRC_SIXLOWPAN
             netif->ipv6_mtu = IPV6_MIN_MTU;
             netif->max_frag_size = tmp;
 #else
