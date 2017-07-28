@@ -20,6 +20,7 @@
 
 #include <errno.h>
 #include "net/gcoap.h"
+#include "net/gcoap_sys.h"
 #include "random.h"
 #include "thread.h"
 
@@ -84,6 +85,11 @@ static void *_event_loop(void *arg)
         DEBUG("gcoap: cannot create sock: %d\n", res);
         return 0;
     }
+
+#ifdef MODULE_GCOAP_SYSURI
+    gcoap_sys_register();
+#endif
+    
 
     while(1) {
         res = msg_try_receive(&msg_rcvd);
