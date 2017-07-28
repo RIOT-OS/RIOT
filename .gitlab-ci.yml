@@ -1,0 +1,7 @@
+buildtest:
+  tags:
+    - docker
+  image: riot/riotbuild
+  script:
+    - cd examples/hello-world/
+    - make buildtest
