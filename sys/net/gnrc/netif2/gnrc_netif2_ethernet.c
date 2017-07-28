@@ -33,7 +33,6 @@ static const gnrc_netif2_ops_t ethernet_ops = {
     .recv = _recv,
     .get = gnrc_netif2_get_from_netdev,
     .set = gnrc_netif2_set_from_netdev,
-    .msg_handler = NULL,
 };
 
 gnrc_netif2_t *gnrc_netif2_ethernet_create(char *stack, int stacksize,

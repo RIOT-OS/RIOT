@@ -30,10 +30,9 @@
 
 #include "kernel_types.h"
 #include "msg.h"
-#include "net/ieee802154.h"
-#include "net/ethernet/hdr.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/pkt.h"
+#include "net/gnrc/netif2/conf.h"
 #ifdef MODULE_GNRC_SIXLOWPAN
 #include "net/gnrc/netif2/6lo.h"
 #endif
@@ -103,6 +102,20 @@ typedef struct {
  * @see gnrc_netif2_ops_t
  */
 struct gnrc_netif2_ops {
+    /**
+     * @brief   Initializes network interface beyond the default settings
+     *
+     * @pre `netif != NULL`
+     *
+     * @param[in] netif The network interface.
+     *
+     * This is called after the default settings were set, right before the
+     * interface's thread starts receiving messages. It is not necessary lock
+     * the interface's mutex gnrc_netif_t::mutex, since the thread will already
+     * lock it. Leave NULL if you do not need any special initialization.
+     */
+    void (*init)(gnrc_netif2_t *netif);
+
     /**
      * @brief   Send a @ref net_gnrc_pkt "packet" over the network interface
      *

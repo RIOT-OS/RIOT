@@ -18,6 +18,10 @@
 #ifndef NET_GNRC_NETIF2_CONF_H
 #define NET_GNRC_NETIF2_CONF_H
 
+#include "net/ieee802154.h"
+#include "net/ethernet/hdr.h"
+#include "thread.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

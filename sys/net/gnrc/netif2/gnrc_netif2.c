@@ -19,6 +19,9 @@
 #include "net/ethernet.h"
 #include "net/ipv6.h"
 #include "net/gnrc.h"
+#ifdef MODULE_NETSTATS_IPV6
+#include "net/netstats.h"
+#endif
 #include "log.h"
 #include "sched.h"
 
@@ -103,18 +106,14 @@ int gnrc_netif2_get_from_netdev(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt)
             break;
         case NETOPT_STATS:
             /* XXX discussed this with Oleg, it's supposed to be a pointer */
-            assert(opt->data_len == sizeof(netstats_t *));
             switch ((int16_t)opt->context) {
 #if defined(MODULE_NETSTATS_IPV6) && defined(MODULE_GNRC_IPV6)
                 case NETSTATS_IPV6:
+                    assert(opt->data_len == sizeof(netstats_t *));
                     *((netstats_t **)opt->data) = &netif->ipv6.stats;
                     res = sizeof(&netif->ipv6.stats);
                     break;
 #endif
-                case NETSTATS_ALL:
-                    /* doesn't make sense */
-                    res = -EINVAL;
-                    break;
                 default:
                     /* take from device */
                     break;
@@ -1070,7 +1069,7 @@ static void _init_from_device(gnrc_netif2_t *netif)
             assert(res == sizeof(tmp));
 #ifdef MODULE_GNRC_SIXLOWPAN
             netif->ipv6.mtu = IPV6_MIN_MTU;
-            netif->max_frag_size = tmp;
+            netif->sixlo.max_frag_size = tmp;
 #else
             netif->ipv6.mtu = tmp;
 #endif
@@ -1120,6 +1119,9 @@ static void *_gnrc_netif2_thread(void *args)
 #ifdef MODULE_GNRC_IPV6_NIB
     gnrc_ipv6_nib_init_iface(netif);
 #endif
+    if (netif->ops->init) {
+        netif->ops->init(netif);
+    }
     /* now let rest of GNRC use the interface */
     gnrc_netif2_release(netif);
 

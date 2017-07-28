@@ -23,7 +23,9 @@
 #include "net/gnrc/ipv6/nib/conf.h"
 #endif
 #include "net/gnrc/netif2/conf.h"
+#ifdef MODULE_NETSTATS_IPV6
 #include "net/netstats.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
