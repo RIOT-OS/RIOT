@@ -21,12 +21,15 @@
 #include <stdlib.h>
 #include "net/gcoap.h"
 
+extern ssize_t _gcoap_reboot_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+
 #ifdef MODULE_PS
 extern ssize_t _gcoap_ps_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
 #endif
 
 /* Keep this array ordered by path to adhere to gcoap requirements */
 static const coap_resource_t _sys_resources[] = {
+  { "/sys/reboot", COAP_POST, _gcoap_reboot_handler },
 #ifdef MODULE_PS
   { "/sys/ps", COAP_GET, _gcoap_ps_handler },
 #endif
