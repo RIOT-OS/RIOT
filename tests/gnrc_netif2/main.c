@@ -42,13 +42,16 @@ static gnrc_netif2_t *ethernet_netif = NULL;
 static gnrc_netif2_t *netifs[DEFAULT_DEVS_NUMOF];
 static char ethernet_netif_stack[ETHERNET_STACKSIZE];
 static char netifs_stack[DEFAULT_DEVS_NUMOF][THREAD_STACKSIZE_DEFAULT];
+static bool init_called = false;
 
+static inline void _test_init(gnrc_netif2_t *netif);
 static inline int _mock_netif_send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt);
 static inline gnrc_pktsnip_t *_mock_netif_recv(gnrc_netif2_t * netif);
 static int _get_netdev_address(netdev_t *dev, void *value, size_t max_len);
 static int _set_netdev_address(netdev_t *dev, void *value, size_t value_len);
 
 static const gnrc_netif2_ops_t default_ops = {
+    .init = _test_init,
     .send = _mock_netif_send,
     .recv = _mock_netif_recv,
     .get = gnrc_netif2_get_from_netdev,
@@ -78,6 +81,12 @@ static void _set_up(void)
     }
     /* empty message queue */
     while (msg_try_receive(&msg) > 0) {}
+}
+
+static inline void _test_init(gnrc_netif2_t *netif)
+{
+    (void)netif;
+    init_called = true;
 }
 
 static void test_creation(void)
@@ -121,6 +130,7 @@ static void test_creation(void)
         }
         TEST_ASSERT_NULL((ptr = gnrc_netif2_iter(ptr)));
     }
+    TEST_ASSERT(init_called);
     TEST_ASSERT_NULL(gnrc_netif2_create(test_stack, 4, GNRC_NETIF2_PRIO,
                                         "netif", NULL, &default_ops));
 }

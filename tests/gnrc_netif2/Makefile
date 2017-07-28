@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY :=
 USEMODULE += embunit
 USEMODULE += gnrc_netif2
 USEMODULE += gnrc_pktdump
+USEMODULE += gnrc_sixlowpan
 USEMODULE += gnrc_sixlowpan_iphc
 USEMODULE += gnrc_ipv6
 USEMODULE += netdev_eth
