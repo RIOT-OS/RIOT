@@ -25,8 +25,6 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
 #ifdef CPU_MODEL_KW21D256
 #include "vendor/MKW22D5.h"
 #elif CPU_MODEL_KW21D512
@@ -37,40 +35,17 @@
 #error "undefined CPU_MODEL"
 #endif
 
+#include "cpu_conf_kinetis.h"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
 /**
- * @brief   ARM Cortex-M specific CPU configuration
- * @{
- */
-#define CPU_DEFAULT_IRQ_PRIO            (1U)
-#define CPU_IRQ_NUMOF                   (65U)
-#define CPU_FLASH_BASE                  (0x00000000)
-/** @} */
-
-/**
  * @brief This CPU provides an additional ADC clock divider as CFG1[ADICLK]=1
  */
 #define KINETIS_HAVE_ADICLK_BUS_DIV_2 1
-
-/**
- * @name GPIO pin mux function numbers
- */
-/** @{ */
-#define PIN_MUX_FUNCTION_ANALOG 0
-#define PIN_MUX_FUNCTION_GPIO 1
-/** @} */
-/**
- * @name GPIO interrupt flank settings
- */
-/** @{ */
-#define PIN_INTERRUPT_RISING 0b1001
-#define PIN_INTERRUPT_FALLING 0b1010
-#define PIN_INTERRUPT_EDGE 0b1011
-/** @} */
 
 /** @name PORT module clock gates */
 /** @{ */
@@ -79,14 +54,6 @@ extern "C"
 #define PORTC_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT))
 #define PORTD_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTD_SHIFT))
 #define PORTE_CLOCK_GATE (BITBAND_REG32(SIM->SCGC5, SIM_SCGC5_PORTE_SHIFT))
-/** @} */
-
-/**
- * @name Timer hardware information
- */
-/** @{ */
-#define LPTMR_CLKEN()  (bit_set32(&SIM->SCGC5, SIM_SCGC5_LPTMR_SHIFT)) /**< Enable LPTMR0 clock gate */
-#define PIT_CLKEN()    (bit_set32(&SIM->SCGC6, SIM_SCGC6_PIT_SHIFT)) /**< Enable PIT clock gate */
 /** @} */
 
 /**
