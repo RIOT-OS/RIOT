@@ -17,8 +17,8 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef GCOAP_SYS_H
-#define GCOAP_SYS_H
+#ifndef NET_GCOAP_SYSURI_H
+#define NET_GCOAP_SYSURI_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,5 +30,5 @@ void gcoap_sys_register(void);
 }
 #endif
 
-#endif /* SHELL_COMMANDS_H */
+#endif /* NET_GCOAP_SYSURI_H */
 /** @} */
