@@ -89,7 +89,6 @@ static void *_event_loop(void *arg)
 #ifdef MODULE_GCOAP_SYSURI
     gcoap_sys_register();
 #endif
-    
 
     while(1) {
         res = msg_try_receive(&msg_rcvd);
