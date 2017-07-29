@@ -8,10 +8,10 @@
  */
 
 /**
- * @defgroup        cpu_k64f Freescale K64F MCU
+ * @defgroup        cpu_k64f NXP Kinetis K64F
  * @ingroup         cpu
- * @brief           CPU specific implementations for the Freescale K64F
- *                  Kinetis Cortex-M4 MCU.
+ * @brief           CPU specific implementations for the NXP Kinetis K64F
+ *                  Cortex-M4 MCU
  * @{
  *
  * @file

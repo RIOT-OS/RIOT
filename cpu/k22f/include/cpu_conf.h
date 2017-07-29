@@ -7,10 +7,10 @@
  */
 
 /**
- * @defgroup        cpu_k22f NXP Kinetis K22F MCU
+ * @defgroup        cpu_k22f NXP Kinetis K22F
  * @ingroup         cpu
  * @brief           CPU specific implementations for the NXP Kinetis K22F
- *                  Cortex-M4 MCU.
+ *                  Cortex-M4 MCU
  * @{
  *
  * @file
