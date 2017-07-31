@@ -219,7 +219,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 #if defined (CPU_FAM_STM32L4)
     EXTI->RTSR |= EXTI_RTSR1_RT18;
 #else
-    EXTI->RTSR |= EXTI_RTSR1_TR17;
+    EXTI->RTSR |= EXTI_RTSR_TR17;
 #endif
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
