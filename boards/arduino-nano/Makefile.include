@@ -1,0 +1,17 @@
+# define the cpu used by the arduino uno board
+export CPU = atmega328p
+
+USEMODULE += arduino-atmega-common
+
+# export needed for flash rule
+export PORT_LINUX ?= /dev/ttyUSB0
+export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+export PROGRAMMER_SPEED ?= 57600
+
+export FFLAGS += -p m328p
+
+# PROGRAMMER defaults to arduino which is the internal flasher via USB. Can be
+# overridden for debugging (which requires changes that require to use an ISP)
+export PROGRAMMER ?= arduino
+
+include $(RIOTBOARD)/arduino-atmega-common/Makefile.include
