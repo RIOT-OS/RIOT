@@ -148,7 +148,7 @@ int wdt_init(uint32_t t_wdt, wdt_timing_t timing) {
     return t_wdt;
 }
 
-int wdt_init_cb(uint32_t t_wdt, wdt_timing_t timing, wdt_cb_t wdt_cb) {
+int wdt_init_cb(uint32_t t_wdt, wdt_timing_t timing, wdt_cb_t wdt_cb, void* arg) {
     /* cc2538 does not support WDT IRQ */
     return WDT_ERR_NO_IRQ;
 }

@@ -55,6 +55,10 @@ typedef enum {
  * @brief   Signature for WDT interrupt callback
  *
  * @param[in] arg           context to the callback (optional)
+ *
+ *
+ * @return                  WDT_CB_RESET system is reset after returning from callback
+ * @return                  WDT_CB_NO_RESET system does not reset after returning from callback
  */
 typedef wdt_isr_return_t(*wdt_cb_t)(void *arg);
 
@@ -96,12 +100,14 @@ int wdt_init(uint32_t t_wdt, wdt_timing_t timing);
  *
  *
  * @param[in] t_wdt         preferred WDT interval in microseconds
+ * @param[in] wdt_cb        WDT interrupt callback function
+ * @param[in] arg           optional context passed to the callback functions
  *
  * @return                  WDT_ERR_NO_IRQ if WDT interrupts are not supported
  * @return                  WDT_ERR on other errors
  * @return                  applied WDT interval in microseconds
  */
-int wdt_init_cb(uint32_t t_wdt, wdt_timing_t timing, wdt_cb_t wdt_cb);
+int wdt_init_cb(uint32_t t_wdt, wdt_timing_t timing, wdt_cb_t wdt_cb, void* arg);
 
 /**
  * @brief   Enables the Watchdog Timer
