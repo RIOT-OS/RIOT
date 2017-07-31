@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "evtimer_msg.h"
 #include "kernel_types.h"
 #include "msg.h"
 #include "net/gnrc/netapi.h"
