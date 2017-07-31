@@ -94,7 +94,7 @@ int wdt_init(uint32_t t_wdt, wdt_timing_t timing) {
 
     /* check, if WDT is already enabled */
     if (WDT->WDTbits.EN == 1) {
-        return -1;
+        return WDT_ERR;
     }
 
     /* get required clock count */
@@ -112,7 +112,7 @@ int wdt_init(uint32_t t_wdt, wdt_timing_t timing) {
         }
         if(sel_clk_cnt == 0) {
             /* no exact match found -> error */
-            return -1;
+            return WDT_ERR;
         }
         break;
     case WDT_MIN:
@@ -148,14 +148,19 @@ int wdt_init(uint32_t t_wdt, wdt_timing_t timing) {
     return t_wdt;
 }
 
+int wdt_init_cb(uint32_t t_wdt, wdt_timing_t timing, wdt_cb_t wdt_cb) {
+    /* cc2538 does not support WDT IRQ */
+    return WDT_ERR_NO_IRQ;
+}
+
 int wdt_enable(void) {
     WDT->WDTbits.EN = 1;
-    return 0;
+    return WDT_OK;
 }
 
 int wdt_disable(void) {
     /* cc2538 doesn't allow disabling the WDT */
-    return -1;
+    return WDT_ERR;
 }
 
 int wdt_is_enabled(void) {

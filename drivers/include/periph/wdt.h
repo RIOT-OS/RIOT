@@ -35,6 +35,30 @@ typedef enum {
 } wdt_timing_t;
 
 /**
+ * @brief   Possible WDT return values
+ */
+enum {
+    WDT_OK         =  0,   /**< everything in order */
+    WDT_ERR        = -1,   /**< general WDT error */
+    WDT_ERR_NO_IRQ = -2,   /**< no support for IRQ mode */
+};
+
+/**
+ * @brief   Possible WDT callback return values
+ */
+typedef enum {
+    WDT_CB_RESET    =  0,   /**< system shall reset after returning from ISR */
+    WDT_CB_NO_RESET = -1,   /**< system shall not reset after returning from ISR */
+} wdt_isr_return_t;
+
+/**
+ * @brief   Signature for WDT interrupt callback
+ *
+ * @param[in] arg           context to the callback (optional)
+ */
+typedef wdt_isr_return_t(*wdt_cb_t)(void *arg);
+
+/**
  * @brief   Initialize the Watchdog Timer
  *
  * The watchdog timer (WDT) is initialized preferred interval in microseconds.
@@ -57,10 +81,27 @@ typedef enum {
  *
  * @param[in] t_wdt         preferred WDT interval in microseconds
  *
- * @return                  -1 on error
+ * @return                  WDT_ERR on error
  * @return                  applied WDT interval in microseconds
  */
 int wdt_init(uint32_t t_wdt, wdt_timing_t timing);
+
+/**
+ * @brief   Initialize the Watchdog Timer
+ *
+ * Initialized the watchdog timer (WDT) similarly to wdt_init(), but with an
+ * additional callback function which is executed when a WDT interrupt is
+ * triggered. After returning from the callback function, a system reset is
+ * performed.
+ *
+ *
+ * @param[in] t_wdt         preferred WDT interval in microseconds
+ *
+ * @return                  WDT_ERR_NO_IRQ if WDT interrupts are not supported
+ * @return                  WDT_ERR on other errors
+ * @return                  applied WDT interval in microseconds
+ */
+int wdt_init_cb(uint32_t t_wdt, wdt_timing_t timing, wdt_cb_t wdt_cb);
 
 /**
  * @brief   Enables the Watchdog Timer
@@ -70,8 +111,8 @@ int wdt_init(uint32_t t_wdt, wdt_timing_t timing);
  * returned by wdt_init() or wdt_init_max() to avoid a system
  * reboot.
  *
- * @return                  0 on success
- * @return                  -1 on error
+ * @return                  WDT_OK on success
+ * @return                  WDT_ERR on error
  */
 int wdt_enable(void);
 
@@ -83,8 +124,8 @@ int wdt_enable(void);
  * Depending on the hardware, this might not be possible; some implementations
  * do not allow disabling a started WDT.
  *
- * @return                  0 on success
- * @return                  -1 on error
+ * @return                  WDT_OK on success
+ * @return                  WDT_ERR on error
  */
 int wdt_disable(void);
 
