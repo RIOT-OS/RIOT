@@ -4,5 +4,15 @@ export APP_START=0x80000000
 
 include $(RIOTMAKE)/arch/mips.inc.mk
 
-export LINKFLAGS += -Tuhi32.ld
 export USEMODULE += periph
+export USEMODULE += newlib
+
+ifeq ($(USE_UHI_SYSCALLS),1)
+  #Use UHI to handle syscalls
+  export LINKFLAGS += -luhi -Tuhi32.ld
+  export USEMODULE += newlib_syscalls_mips_uhi
+else
+  #Use RIOT to handle syscalls (default)
+  export LINKFLAGS += -Tuhi32.ld
+  export USEMODULE += newlib_syscalls_default
+endif

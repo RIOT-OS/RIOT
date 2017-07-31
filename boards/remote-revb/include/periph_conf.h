@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  * Copyright (C) 2015 Zolertia SL
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -15,7 +16,8 @@
  * @brief       Peripheral MCU configuration for the RE-Mote board revision B
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *              Antonio Lignan <alinan@zolertia.com>
+ * @author      Antonio Lignan <alinan@zolertia.com>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef PERIPH_CONF_H
@@ -105,8 +107,23 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = GPIO_PA7
     }
 };
-
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+/** @} */
+
+/**
+ * @name ADC configuration
+ * @{
+ */
+#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+
+static const adc_conf_t adc_config[] = {
+    GPIO_PIN(0, 5), /**< GPIO_PA5 = ADC1_PIN */
+    GPIO_PIN(0, 4), /**< GPIO_PA4 = ADC2_PIN */
+    /* voltage divider with 5/3 relationship to allow 5V sensors */
+    GPIO_PIN(0, 2), /**< GPIO_PA2 = ADC3_PIN */
+};
+
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 #ifdef __cplusplus

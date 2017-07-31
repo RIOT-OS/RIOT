@@ -160,7 +160,7 @@ typedef struct {
 } i2c_conf_t;
 
 /**
- * @brief declare needed generic SPI functions
+ * @name declare needed generic SPI functions
  * @{
  */
 #define PERIPH_SPI_NEEDS_INIT_CS
@@ -170,7 +170,7 @@ typedef struct {
 /** @} */
 
 /**
- * @brief   Override the default GPIO mode settings
+ * @name   Override the default GPIO mode settings
  * @{
  */
 #define HAVE_GPIO_MODE_T
@@ -185,7 +185,7 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Override SPI mode settings
+ * @name   Override SPI mode settings
  * @{
  */
 #define HAVE_SPI_MODE_T
@@ -198,7 +198,7 @@ typedef enum {
 /** @ */
 
 /**
- * @brief   Override SPI clock settings
+ * @name   Override SPI clock settings
  * @{
  */
 #define HAVE_SPI_CLK_T
@@ -220,7 +220,7 @@ typedef struct {
 } spi_clk_conf_t;
 
 /**
- * @brief   SPI configuration data structure
+ * @name    SPI configuration data structure
  * @{
  */
 typedef struct {
@@ -240,6 +240,71 @@ typedef struct {
     uint_fast8_t channels;  /**< number of channels */
     uint_fast8_t cfg;       /**< timer config word */
 } timer_conf_t;
+
+/**
+ * @name   Override resolution options
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  =             (0xa00),    /**< not supported by hardware */
+    ADC_RES_7BIT  =             (0 << 4),   /**< ADC resolution: 7 bit */
+    ADC_RES_8BIT  =             (0xb00),    /**< not supported by hardware */
+    ADC_RES_9BIT  =             (1 << 4),   /**< ADC resolution: 9 bit */
+    ADC_RES_10BIT =             (2 << 4),   /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT =             (3 << 4),   /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT =             (0xc00),    /**< not supported by hardware */
+    ADC_RES_16BIT =             (0xd00),    /**< not supported by hardware */
+} adc_res_t;
+/** @} */
+
+/**
+ * @brief ADC configuration wrapper
+ */
+typedef gpio_t adc_conf_t;
+
+/**
+ * @name SOC_ADC_ADCCON3 register bit masks
+ * @{
+ */
+#define SOC_ADC_ADCCON3_EREF    (0x000000C0) /**< Reference voltage for extra */
+#define SOC_ADC_ADCCON3_EDIV    (0x00000030) /**< Decimation rate for extra */
+#define SOC_ADC_ADCCON3_ECH     (0x0000000F) /**< Single channel select */
+/** @} */
+
+/**
+ * @name SOC_ADC_ADCCONx registers field values
+ * @{
+ */
+#define SOC_ADC_ADCCON_REF_INT      (0 << 6)    /**< Internal reference */
+#define SOC_ADC_ADCCON_REF_EXT      (1 << 6)    /**< External reference on AIN7 pin */
+#define SOC_ADC_ADCCON_REF_AVDD5    (2 << 6)    /**< AVDD5 pin */
+#define SOC_ADC_ADCCON_REF_DIFF     (3 << 6)    /**< External reference on AIN6-AIN7 differential input */
+#define SOC_ADC_ADCCON_CH_GND       (0xC)       /**< GND */
+/** @} */
+
+/**
+ * @brief Mask to check end-of-conversion (EOC) bit
+ */
+#define SOC_ADC_ADCCON1_EOC_MASK    (0x80)
+
+/**
+ * @name Masks for ADC raw data
+ * @{
+ */
+#define SOC_ADC_ADCL_MASK       (0x000000FC)
+#define SOC_ADC_ADCH_MASK       (0x000000FF)
+/** @} */
+
+/**
+ * @name Bit shift for data per ADC resolution
+ * @{
+ */
+#define SOCADC_7_BIT_RSHIFT     (9U) /**< Mask for getting data( 7 bits ENOB) */
+#define SOCADC_9_BIT_RSHIFT     (7U) /**< Mask for getting data( 9 bits ENOB) */
+#define SOCADC_10_BIT_RSHIFT    (6U) /**< Mask for getting data(10 bits ENOB) */
+#define SOCADC_12_BIT_RSHIFT    (4U) /**< Mask for getting data(12 bits ENOB) */
+/** @} */
 
 #ifdef __cplusplus
 }

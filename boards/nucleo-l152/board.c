@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_nucleo-l1
+ * @ingroup     boards_nucleo-l152
  * @{
  *
  * @file
- * @brief       Board specific implementations for the nucleo-l1 board
+ * @brief       Board specific implementations for the nucleo-l152 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *

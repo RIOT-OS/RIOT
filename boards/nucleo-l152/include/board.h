@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l1 Nucleo-L1
+ * @defgroup    boards_nucleo-l152 Nucleo-L152
  * @ingroup     boards_nucleo
- * @brief       Board specific files for the nucleo-l1 board.
+ * @brief       Board specific files for the nucleo-l152 board.
  * @{
  *
  * @file
- * @brief       Board specific definitions for the nucleo-l1 board.
+ * @brief       Board specific definitions for the nucleo-l152 board.
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */

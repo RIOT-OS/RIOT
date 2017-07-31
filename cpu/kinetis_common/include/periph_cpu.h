@@ -239,10 +239,9 @@ typedef struct {
  * @brief   CPU specific DAC configuration
  */
 typedef struct {
-    /** DAC device base pointer */
-    DAC_Type *dev;
-    /** Pointer to module clock gate bit in bitband region, use BITBAND_REGADDR() */
-    uint32_t volatile *clk_gate;
+    DAC_Type *dev;                  /**< DAC device base pointer */
+    volatile uint32_t *scgc_addr;   /**< Clock enable register, in SIM module */
+    uint8_t scgc_bit;               /**< Clock enable bit, within the register */
 } dac_conf_t;
 
 /**
