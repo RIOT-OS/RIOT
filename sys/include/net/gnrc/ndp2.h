@@ -24,8 +24,9 @@
 
 #include "kernel_types.h"
 #include "net/gnrc/pkt.h"
-#include "net/gnrc/ipv6/netif.h"
+#include "net/gnrc/netif2.h"
 #include "net/ipv6/addr.h"
+#include "net/ipv6/hdr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -269,7 +270,7 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
  *                      for a neighbor solicitation so be sure to check that.
  *                      **Will be released** in an error case.
  */
-void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_ipv6_netif_t *netif,
+void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
                             const ipv6_addr_t *src, const ipv6_addr_t *dst,
                             gnrc_pktsnip_t *ext_opts);
 
@@ -315,7 +316,7 @@ void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_ipv6_netif_t *netif,
  *                          check that.
  *                          **Will be released** in an error case.
  */
-void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_ipv6_netif_t *netif,
+void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
                             const ipv6_addr_t *dst, bool supply_tl2a,
                             gnrc_pktsnip_t *ext_opts);
 
@@ -328,7 +329,7 @@ void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_ipv6_netif_t *netif,
  * @param[in] netif Interface to send over. May not be NULL.
  * @param[in] dst   Destination for the router solicitation. ff02::2 if NULL.
  */
-void gnrc_ndp2_rtr_sol_send(gnrc_ipv6_netif_t *netif, const ipv6_addr_t *dst);
+void gnrc_ndp2_rtr_sol_send(gnrc_netif2_t *netif, const ipv6_addr_t *dst);
 
 /**
  * @brief   Send pre-compiled router advertisement depending on a given network
@@ -355,7 +356,7 @@ void gnrc_ndp2_rtr_sol_send(gnrc_ipv6_netif_t *netif, const ipv6_addr_t *dst);
  *                      for a neighbor advertisement so be sure to check that.
  *                      **Will be released** in an error case.
  */
-void gnrc_ndp2_rtr_adv_send(gnrc_ipv6_netif_t *netif, const ipv6_addr_t *src,
+void gnrc_ndp2_rtr_adv_send(gnrc_netif2_t *netif, const ipv6_addr_t *src,
                             const ipv6_addr_t *dst, bool fin,
                             gnrc_pktsnip_t *ext_opts);
 

@@ -15,7 +15,7 @@
 
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc/netif.h"
+#include "net/gnrc/netif2/internal.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
 #include "net/gnrc/sixlowpan/nd.h"
 #endif
@@ -167,8 +167,7 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_sl2a_build(const uint8_t *l2addr,
 {
     assert((l2addr != NULL) && (l2addr_len != 0));
     DEBUG("ndp2: building source link-layer address option (l2addr: %s)\n",
-          gnrc_netif_addr_to_str(addr_str, sizeof(addr_str), l2addr,
-                                 l2addr_len));
+          gnrc_netif2_addr_to_str(l2addr, l2addr_len, addr_str));
     return _opt_l2a_build(l2addr, l2addr_len, next, NDP_OPT_SL2A);
 }
 
@@ -178,8 +177,7 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_tl2a_build(const uint8_t *l2addr,
 {
     assert((l2addr != NULL) && (l2addr_len != 0));
     DEBUG("ndp2: building target link-layer address option (l2addr: %s)\n",
-          gnrc_netif_addr_to_str(addr_str, sizeof(addr_str), l2addr,
-                                 l2addr_len));
+          gnrc_netif2_addr_to_str(l2addr, l2addr_len, addr_str));
     return _opt_l2a_build(l2addr, l2addr_len, next, NDP_OPT_TL2A);
 }
 
@@ -223,14 +221,13 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next)
     return pkt;
 }
 
-static gnrc_pktsnip_t *_build_headers(gnrc_ipv6_netif_t *netif,
+static gnrc_pktsnip_t *_build_headers(gnrc_netif2_t *netif,
                                       const ipv6_addr_t *src,
                                       const ipv6_addr_t *dst,
                                       gnrc_pktsnip_t *payload);
-static size_t _get_l2src(gnrc_ipv6_netif_t *netif, uint8_t *l2src,
-                         size_t l2src_maxlen);
+static inline size_t _get_l2src(const gnrc_netif2_t *netif, uint8_t *l2src);
 
-void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_ipv6_netif_t *netif,
+void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
                             const ipv6_addr_t *src, const ipv6_addr_t *dst,
                             gnrc_pktsnip_t *ext_opts)
 {
@@ -250,49 +247,58 @@ void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_ipv6_netif_t *netif,
                            sizeof(addr_str)));
     DEBUG("tgt: %s, ", ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s)\n", ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
-    /* check if there is a fitting source address to target */
-    if (src == NULL) {
-        src = gnrc_ipv6_netif_find_best_src_addr(netif->pid, tgt, false);
-    }
-
-    /* add SL2AO based on interface and source address */
-    if ((src != NULL) && !ipv6_addr_is_unspecified(src)) {
-        l2src_len = _get_l2src(netif, l2src, sizeof(l2src));
-
-        if (l2src_len > 0) {
-            /* add source address link-layer address option */
-            hdr = gnrc_ndp2_opt_sl2a_build(l2src, l2src_len, pkt);
-
-            if (hdr == NULL) {
-                DEBUG("ndp2: error allocating SL2AO.\n");
-                gnrc_pktbuf_release(pkt);
-                return;
-            }
-            pkt = hdr;
+    gnrc_netif2_acquire(netif);
+    do {    /* XXX hidden goto */
+        /* check if there is a fitting source address to target */
+        if (src == NULL) {
+            src = gnrc_netif2_ipv6_addr_best_src(netif, tgt, false);
         }
-    }
-    /* add neighbor solicitation header */
-    hdr = gnrc_ndp2_nbr_sol_build(tgt, pkt);
-    if (hdr == NULL) {
-        DEBUG("ndp2: error allocating neighbor solicitation.\n");
-        gnrc_pktbuf_release(pkt);
+
+        /* add SL2AO based on interface and source address */
+        if ((src != NULL) && !ipv6_addr_is_unspecified(src)) {
+            l2src_len = _get_l2src(netif, l2src);
+
+            if (l2src_len > 0) {
+                /* add source address link-layer address option */
+                hdr = gnrc_ndp2_opt_sl2a_build(l2src, l2src_len, pkt);
+
+                if (hdr == NULL) {
+                    DEBUG("ndp2: error allocating SL2AO.\n");
+                    break;
+                }
+                pkt = hdr;
+            }
+        }
+        /* add neighbor solicitation header */
+        hdr = gnrc_ndp2_nbr_sol_build(tgt, pkt);
+        if (hdr == NULL) {
+            DEBUG("ndp2: error allocating neighbor solicitation.\n");
+            break;
+        }
+        pkt = hdr;
+        /* add remaining headers */
+        hdr = _build_headers(netif, src, dst, pkt);
+        if (hdr == NULL) {
+            DEBUG("ndp2: error adding lower-layer headers.\n");
+            break;
+        }
+        else {
+            pkt = hdr;
+            if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_NDP2,
+                                          GNRC_NETREG_DEMUX_CTX_ALL,
+                                          pkt) == 0) {
+                DEBUG("ndp2: unable to send neighbor solicitation\n");
+                break;
+            }
+        }
+        gnrc_netif2_release(netif);
         return;
-    }
-    pkt = hdr;
-    /* add remaining headers */
-    hdr = _build_headers(netif, src, dst, pkt);
-    if (hdr == NULL) {
-        DEBUG("ndp2: error adding lower-layer headers.\n");
-        gnrc_pktbuf_release(pkt);
-    }
-    else if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_NDP2,
-                                       GNRC_NETREG_DEMUX_CTX_ALL, hdr) == 0) {
-        DEBUG("ndp2: unable to send neighbor solicitation\n");
-        gnrc_pktbuf_release(hdr);
-    }
+    } while (0);
+    gnrc_pktbuf_release(pkt);
+    gnrc_netif2_release(netif);
 }
 
-void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_ipv6_netif_t *netif,
+void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
                             const ipv6_addr_t *dst, bool supply_tl2a,
                             gnrc_pktsnip_t *ext_opts)
 {
@@ -307,68 +313,83 @@ void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_ipv6_netif_t *netif,
           ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s, supply_tl2a: %d)\n",
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), supply_tl2a);
-    if ((netif->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER) &&
-        (netif->flags & GNRC_IPV6_NETIF_FLAGS_RTR_ADV)) {
-        adv_flags |= NDP_NBR_ADV_FLAGS_R;
-    }
-    if (ipv6_addr_is_unspecified(dst)) {
-        memcpy(&real_dst, &ipv6_addr_all_nodes_link_local, sizeof(ipv6_addr_t));
-        supply_tl2a = true;
-    }
-    else {
-        memcpy(&real_dst, dst, sizeof(real_dst));
-        adv_flags |= NDP_NBR_ADV_FLAGS_S;
-    }
-    /* add SL2AO based on target address */
-    if (supply_tl2a) {
-        uint8_t l2tgt[8];
-        size_t l2tgt_len;
-        /* we previously checked if we are the target, so we can take our L2tgt */
-        l2tgt_len = _get_l2src(netif, l2tgt, sizeof(l2tgt));
+    gnrc_netif2_acquire(netif);
+    do {    /* XXX: hidden goto */
+        int tgt_idx;
 
-        if (l2tgt_len > 0) {
-            /* add target address link-layer address option */
-            hdr = gnrc_ndp2_opt_tl2a_build(l2tgt, l2tgt_len, pkt);
-
-            if (hdr == NULL) {
-                DEBUG("ndp2: error allocating TL2AO.\n");
-                gnrc_pktbuf_release(ext_opts);
-                return;
-            }
-            pkt = hdr;
+        if ((tgt_idx = gnrc_netif2_ipv6_addr_idx(netif, tgt)) < 0) {
+            DEBUG("ndp2: tgt not assigned to interface. Abort sending\n");
+            break;
         }
-    }
-    /* TODO: also check if the node provides proxy services for tgt */
-    if ((pkt != NULL) &&
-        (!gnrc_ipv6_netif_addr_is_non_unicast(tgt) || supply_tl2a)) {
-        /* TL2A is not supplied and tgt is not anycast */
-        adv_flags |= NDP_NBR_ADV_FLAGS_O;
-    }
-    /* add neighbor advertisement header */
-    hdr = gnrc_ndp2_nbr_adv_build(tgt, adv_flags, pkt);
-    if (hdr == NULL) {
-        DEBUG("ndp2: error allocating neighbor advertisement.\n");
-        gnrc_pktbuf_release(pkt);
+        if (gnrc_netif2_is_rtr(netif) && gnrc_netif2_is_rtr_adv(netif)) {
+            adv_flags |= NDP_NBR_ADV_FLAGS_R;
+        }
+        if (ipv6_addr_is_unspecified(dst)) {
+            memcpy(&real_dst, &ipv6_addr_all_nodes_link_local,
+                   sizeof(ipv6_addr_t));
+            supply_tl2a = true;
+        }
+        else {
+            memcpy(&real_dst, dst, sizeof(real_dst));
+            adv_flags |= NDP_NBR_ADV_FLAGS_S;
+        }
+        /* add SL2AO based on target address */
+        if (supply_tl2a) {
+            uint8_t l2tgt[8];
+            size_t l2tgt_len;
+            /* we previously checked if we are the target, so we can take our L2tgt */
+            l2tgt_len = _get_l2src(netif, l2tgt);
+
+            if (l2tgt_len > 0) {
+                /* add target address link-layer address option */
+                hdr = gnrc_ndp2_opt_tl2a_build(l2tgt, l2tgt_len, pkt);
+
+                if (hdr == NULL) {
+                    DEBUG("ndp2: error allocating TL2AO.\n");
+                    break;
+                }
+                pkt = hdr;
+            }
+        }
+        /* TODO: also check if the node provides proxy servies for tgt */
+        if ((pkt != NULL) &&
+            (netif->ipv6.addrs_flags[tgt_idx] &
+             GNRC_NETIF2_IPV6_ADDRS_FLAGS_ANYCAST)) {
+            /* TL2A is not supplied and tgt is not anycast */
+            adv_flags |= NDP_NBR_ADV_FLAGS_O;
+        }
+        /* add neighbor advertisement header */
+        hdr = gnrc_ndp2_nbr_adv_build(tgt, adv_flags, pkt);
+        if (hdr == NULL) {
+            DEBUG("ndp2: error allocating neighbor advertisement.\n");
+            break;
+        }
+        pkt = hdr;
+        /* add remaining headers */
+        hdr = _build_headers(netif, NULL, &real_dst, pkt);
+        if (hdr == NULL) {
+            DEBUG("ndp2: error adding lower-layer headers.\n");
+            break;
+        }
+        else {
+            pkt = hdr;
+            if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_NDP2,
+                                                       GNRC_NETREG_DEMUX_CTX_ALL,
+                                                       pkt) == 0) {
+                DEBUG("ndp2: unable to send neighbor advertisement\n");
+                break;
+            }
+        }
+        gnrc_netif2_release(netif);
         return;
-    }
-    pkt = hdr;
-    /* add remaining headers */
-    hdr = _build_headers(netif, NULL, &real_dst, pkt);
-    if (hdr == NULL) {
-        DEBUG("ndp2: error adding lower-layer headers.\n");
-        gnrc_pktbuf_release(pkt);
-    }
-    else if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_NDP2,
-                                       GNRC_NETREG_DEMUX_CTX_ALL, hdr) == 0) {
-        DEBUG("ndp2: unable to send neighbor advertisement\n");
-        gnrc_pktbuf_release(hdr);
-    }
+    } while (0);
+    gnrc_pktbuf_release(pkt);
+    gnrc_netif2_release(netif);
 }
 
-void gnrc_ndp2_rtr_sol_send(gnrc_ipv6_netif_t *netif, const ipv6_addr_t *dst)
+void gnrc_ndp2_rtr_sol_send(gnrc_netif2_t *netif, const ipv6_addr_t *dst)
 {
     gnrc_pktsnip_t *hdr, *pkt = NULL;
-    ipv6_addr_t *src = NULL;
 
     assert(netif != NULL);
     if (dst == NULL) {
@@ -377,43 +398,53 @@ void gnrc_ndp2_rtr_sol_send(gnrc_ipv6_netif_t *netif, const ipv6_addr_t *dst)
     DEBUG("ndp2: send router solicitation (iface: %" PRIkernel_pid
           ", dst: %s)\n", netif->pid,
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
-    /* add SL2AO => check if there is a fitting source address to target */
-    if ((src = gnrc_ipv6_netif_find_best_src_addr(netif->pid, dst,
-                                                  false)) != NULL) {
-        uint8_t l2src[8];
-        size_t l2src_len = _get_l2src(netif, l2src, sizeof(l2src));
-        if (l2src_len > 0) {
-            /* add source address link-layer address option */
-            pkt = gnrc_ndp2_opt_sl2a_build(l2src, l2src_len, NULL);
-            if (pkt == NULL) {
-                DEBUG("ndp2: error allocating SL2AO.\n");
-                gnrc_pktbuf_release(pkt);
-                return;
+    gnrc_netif2_acquire(netif);
+    do {    /* XXX: hidden goto */
+        ipv6_addr_t *src = NULL;
+
+        /* add SL2AO => check if there is a fitting source address to target */
+        if ((src = gnrc_netif2_ipv6_addr_best_src(netif, dst, false)) != NULL) {
+            uint8_t l2src[8];
+            size_t l2src_len = _get_l2src(netif, l2src);
+            if (l2src_len > 0) {
+                /* add source address link-layer address option */
+                pkt = gnrc_ndp2_opt_sl2a_build(l2src, l2src_len, NULL);
+                if (pkt == NULL) {
+                    DEBUG("ndp2: error allocating SL2AO.\n");
+                    break;
+                }
             }
         }
-    }
-    /* add router solicitation header */
-    hdr = gnrc_ndp2_rtr_sol_build(pkt);
-    if (hdr == NULL) {
-        DEBUG("ndp2: error allocating router solicitation.\n");
-        gnrc_pktbuf_release(pkt);
+        /* add router solicitation header */
+        hdr = gnrc_ndp2_rtr_sol_build(pkt);
+        if (hdr == NULL) {
+            DEBUG("ndp2: error allocating router solicitation.\n");
+            break;
+        }
+        pkt = hdr;
+        /* add remaining headers */
+        hdr = _build_headers(netif, src, dst, pkt);
+        if (hdr == NULL) {
+            DEBUG("ndp2: error adding lower-layer headers.\n");
+            break;
+        }
+        else {
+            pkt = hdr;
+            if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_NDP2,
+                                          GNRC_NETREG_DEMUX_CTX_ALL,
+                                          pkt) == 0) {
+                DEBUG("ndp2: unable to send router advertisement\n");
+                break;
+            }
+        }
+        gnrc_netif2_release(netif);
         return;
-    }
-    pkt = hdr;
-    /* add remaining headers */
-    hdr = _build_headers(netif, src, dst, pkt);
-    if (hdr == NULL) {
-        DEBUG("ndp2: error adding lower-layer headers.\n");
-        gnrc_pktbuf_release(pkt);
-    }
-    else if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_NDP2,
-                                       GNRC_NETREG_DEMUX_CTX_ALL, hdr) == 0) {
-        DEBUG("ndp2: unable to send router advertisement\n");
-        gnrc_pktbuf_release(hdr);
-    }
+    } while (0);
+    gnrc_pktbuf_release(pkt);
+    gnrc_netif2_release(netif);
 }
 
-void gnrc_ndp2_rtr_adv_send(gnrc_ipv6_netif_t *netif, const ipv6_addr_t *src,
+void gnrc_ndp2_rtr_adv_send(gnrc_netif2_t *netif, const ipv6_addr_t *src,
                             const ipv6_addr_t *dst, bool fin,
                             gnrc_pktsnip_t *ext_opts)
 {
@@ -422,6 +453,7 @@ void gnrc_ndp2_rtr_adv_send(gnrc_ipv6_netif_t *netif, const ipv6_addr_t *src,
     uint32_t reach_time = 0, retrans_timer = 0;
     uint16_t adv_ltime = 0;
     uint8_t cur_hl = 0;
+    uint8_t flags = 0;
 
     if (dst == NULL) {
         dst = &ipv6_addr_all_nodes_link_local;
@@ -429,78 +461,91 @@ void gnrc_ndp2_rtr_adv_send(gnrc_ipv6_netif_t *netif, const ipv6_addr_t *src,
     DEBUG("ndp2: send router advertisement (iface: %" PRIkernel_pid ", dst: %s%s\n",
           netif->pid, ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
           fin ? ", final" : "");
-    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_ADV_MTU) {
-        if ((hdr = gnrc_ndp2_opt_mtu_build(netif->mtu, pkt)) == NULL) {
-            DEBUG("ndp rtr: no space left in packet buffer\n");
-            return;
-        }
-        pkt = hdr;
-    }
-    if (src == NULL) {
-        /* get address from source selection algorithm.
-         * Only link local addresses may be used (RFC 4861 section 4.1) */
-        src = gnrc_ipv6_netif_find_best_src_addr(netif->pid, dst, true);
-    }
-    /* add SL2A for source address */
-    if (src != NULL) {
-        DEBUG(" - SL2A\n");
-        uint8_t l2src[8];
-        size_t l2src_len;
-        /* optimization note: MAY also be omitted to facilitate in-bound load balancing over
-         * replicated interfaces.
-         * source: https://tools.ietf.org/html/rfc4861#section-6.2.3 */
-        l2src_len = _get_l2src(netif, l2src, sizeof(l2src));
-        if (l2src_len > 0) {
-            /* add source address link-layer address option */
-            hdr = gnrc_ndp2_opt_sl2a_build(l2src, l2src_len, pkt);
-
-            if (hdr == NULL) {
-                DEBUG("ndp2: error allocating Source Link-layer address option.\n");
-                gnrc_pktbuf_release(pkt);
-                return;
+    gnrc_netif2_acquire(netif);
+    do {    /* XXX: hidden goto */
+        if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_MTU) {
+            if ((hdr = gnrc_ndp2_opt_mtu_build(netif->ipv6.mtu, pkt)) == NULL) {
+                DEBUG("ndp rtr: no space left in packet buffer\n");
+                break;
             }
             pkt = hdr;
         }
-    }
-    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_ADV_CUR_HL) {
-        cur_hl = netif->cur_hl;
-    }
-    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_ADV_REACH_TIME) {
+        if (src == NULL) {
+            /* get address from source selection algorithm.
+             * Only link local addresses may be used (RFC 4861 section 4.1) */
+            src = gnrc_netif2_ipv6_addr_best_src(netif, dst, true);
+        }
+        /* add SL2A for source address */
+        if (src != NULL) {
+            DEBUG(" - SL2A\n");
+            uint8_t l2src[8];
+            size_t l2src_len;
+            /* optimization note: MAY also be omitted to facilitate in-bound load balancing over
+             * replicated interfaces.
+             * source: https://tools.ietf.org/html/rfc4861#section-6.2.3 */
+            l2src_len = _get_l2src(netif, l2src);
+            if (l2src_len > 0) {
+                /* add source address link-layer address option */
+                hdr = gnrc_ndp2_opt_sl2a_build(l2src, l2src_len, pkt);
 
-        if (netif->reach_time > (3600 * US_PER_SEC)) { /* reach_time > 1 hour */
-            reach_time = (3600 * MS_PER_SEC);
+                if (hdr == NULL) {
+                    DEBUG("ndp2: error allocating Source Link-layer address "
+                          "option.\n");
+                    break;
+                }
+                pkt = hdr;
+            }
+        }
+        if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_CUR_HL) {
+            cur_hl = netif->cur_hl;
+        }
+        if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_REACH_TIME) {
+            if (netif->ipv6.reach_time_base > (3600 * MS_PER_SEC)) {
+                /* reach_time > 1 hour */
+                reach_time = (3600 * MS_PER_SEC);
+            }
+            else {
+                reach_time = netif->ipv6.reach_time_base;
+            }
+        }
+        if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_RETRANS_TIMER) {
+            retrans_timer = netif->ipv6.retrans_time;
+        }
+        if (!fin) {
+            adv_ltime = netif->ipv6.rtr_ltime;
+        }
+        if (netif->ipv6.aac_mode == GNRC_NETIF2_AAC_DHCP) {
+            flags |= NDP_RTR_ADV_FLAGS_M;
+            if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_O_FLAG) {
+                flags |= NDP_RTR_ADV_FLAGS_O;
+            }
+        }
+        hdr = gnrc_ndp2_rtr_adv_build(cur_hl, flags, adv_ltime, reach_time,
+                                      retrans_timer, pkt);
+        if (hdr == NULL) {
+            DEBUG("ndp2: error allocating router advertisement.\n");
+            break;
+        }
+        pkt = hdr;
+        hdr = _build_headers(netif, src, dst, pkt);
+        if (hdr == NULL) {
+            DEBUG("ndp2: error adding lower-layer headers.\n");
+            break;
         }
         else {
-            reach_time = netif->reach_time / US_PER_MS;
+            pkt = hdr;
+            if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_NDP2,
+                                          GNRC_NETREG_DEMUX_CTX_ALL,
+                                          pkt) == 0) {
+                DEBUG("ndp2: unable to send router solicitation\n");
+                break;
+            }
         }
-    }
-    if (netif->flags & GNRC_IPV6_NETIF_FLAGS_ADV_RETRANS_TIMER) {
-        retrans_timer = netif->retrans_timer / US_PER_MS;
-    }
-    if (!fin) {
-        /* TODO set netif dependent adv_ltime */
-        adv_ltime = 1800U;
-    }
-    hdr = gnrc_ndp2_rtr_adv_build(cur_hl,
-                                  (netif->flags & (GNRC_IPV6_NETIF_FLAGS_OTHER_CONF |
-                                                        GNRC_IPV6_NETIF_FLAGS_MANAGED)) >> 8,
-                                  adv_ltime, reach_time, retrans_timer, pkt);
-    if (hdr == NULL) {
-        DEBUG("ndp2: error allocating router advertisement.\n");
-        gnrc_pktbuf_release(pkt);
+        gnrc_netif2_release(netif);
         return;
-    }
-    pkt = hdr;
-    hdr = _build_headers(netif, src, dst, pkt);
-    if (hdr == NULL) {
-        DEBUG("ndp2: error adding lower-layer headers.\n");
-        gnrc_pktbuf_release(pkt);
-    }
-    else if (gnrc_netapi_dispatch_send(GNRC_NETTYPE_NDP2,
-                                       GNRC_NETREG_DEMUX_CTX_ALL, hdr) == 0) {
-        DEBUG("ndp2: unable to send router solicitation\n");
-        gnrc_pktbuf_release(hdr);
-    }
+    } while (0);
+    gnrc_pktbuf_release(pkt);
+    gnrc_netif2_release(netif);
 #else
     (void)netif;
     (void)src;
@@ -511,7 +556,7 @@ void gnrc_ndp2_rtr_adv_send(gnrc_ipv6_netif_t *netif, const ipv6_addr_t *src,
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 }
 
-static gnrc_pktsnip_t *_build_headers(gnrc_ipv6_netif_t *netif,
+static gnrc_pktsnip_t *_build_headers(gnrc_netif2_t *netif,
                                       const ipv6_addr_t *src,
                                       const ipv6_addr_t *dst,
                                       gnrc_pktsnip_t *payload)
@@ -536,37 +581,16 @@ static gnrc_pktsnip_t *_build_headers(gnrc_ipv6_netif_t *netif,
     return l2hdr;
 }
 
-static size_t _get_l2src(gnrc_ipv6_netif_t *netif, uint8_t *l2src,
-                         size_t l2src_maxlen)
+static inline size_t _get_l2src(const gnrc_netif2_t *netif, uint8_t *l2src)
 {
-    bool try_long = false;
-    int res;
-    uint16_t l2src_len;
-    /* maximum address length that fits into a minimum length (8) S/TL2A option */
-    const uint16_t max_short_len = 6;
-
-    /* try getting source address */
-    if ((gnrc_netapi_get(netif->pid, NETOPT_SRC_LEN, 0, &l2src_len,
-                         sizeof(l2src_len)) >= 0) &&
-        (l2src_len > max_short_len)) {
-        try_long = true;
-    }
-
-    if (try_long && ((res = gnrc_netapi_get(netif->pid, NETOPT_ADDRESS_LONG, 0,
-                                            l2src,
-                                            l2src_maxlen)) > max_short_len)) {
-        l2src_len = (uint16_t)res;
-    }
-    else if ((res = gnrc_netapi_get(netif->pid, NETOPT_ADDRESS, 0, l2src,
-                                    l2src_maxlen)) >= 0) {
-        l2src_len = (uint16_t)res;
-    }
-    else {
-        DEBUG("ndp2: no link-layer address found.\n");
-        l2src_len = 0;
-    }
-
-    return l2src_len;
+#if GNRC_NETIF2_L2ADDR_MAXLEN > 0
+    memcpy(l2src, netif->l2addr, netif->l2addr_len);
+    return netif->l2addr_len;
+#else
+    (void)netif;
+    (void)l2src;
+    return 0;
+#endif
 }
 
 /** @} */
