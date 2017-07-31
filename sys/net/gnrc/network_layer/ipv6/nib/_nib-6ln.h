@@ -45,37 +45,22 @@ extern "C" {
 #define _ADDR_REG_STATUS_IGNORE         (4)
 
 /**
- * @brief   Checks if interface represents a 6LN
- *
- * @todo    Use corresponding function in `gnrc_netif2` instead.
- *
- * @param[in] netif A network interface.
- *
- * @return  true, when the @p netif represents a 6LN.
- * @return  false, when the @p netif does not represent a 6LN.
- */
-static inline bool _is_6ln(const gnrc_ipv6_netif_t *netif)
-{
-    return (netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN);
-}
-
-/**
  * @brief   Resolves address statically from destination address using reverse
  *          translation of the IID
  *
  * @param[in] dst   A destination address.
- * @param[in] iface The interface to @p dst.
+ * @param[in] netif The interface to @p dst.
  * @param[out] nce  Neighbor cache entry to resolve into
  *
  * @return  true when @p nce was set, false when not.
  */
-bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, kernel_pid_t iface,
+bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif2_t *netif,
                              gnrc_ipv6_nib_nc_t *nce);
 
 /**
  * @brief   Handles ARO
  *
- * @param[in] iface     The interface the ARO-carrying message came over.
+ * @param[in] netif     The interface the ARO-carrying message came over.
  * @param[in] ipv6      The IPv6 header of the message carrying the ARO.
  * @param[in] icmpv6    The message carrying the ARO.
  * @param[in] aro       ARO that carries the address registration information.
@@ -85,13 +70,12 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, kernel_pid_t iface,
  * @return  registration status of the address (including
  *          @ref _ADDR_REG_STATUS_TENTATIVE and @ref _ADDR_REG_STATUS_IGNORE).
  */
-uint8_t _handle_aro(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
+uint8_t _handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
                     const icmpv6_hdr_t *icmpv6,
                     const sixlowpan_nd_opt_ar_t *aro, const ndp_opt_t *sl2ao,
                     _nib_onl_entry_t *nce);
 #else   /* GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN) */
-#define _is_6ln(netif)                              (false)
-#define _resolve_addr_from_ipv6(dst, iface, nce)    (false)
+#define _resolve_addr_from_ipv6(dst, netif, nce)    (false)
 /* _handle_aro() doesn't make sense without 6LR so don't even use it
  * => throw error in case it is compiled in => don't define it here as NOP macro
  */

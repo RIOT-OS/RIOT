@@ -23,11 +23,7 @@
 #include "kernel_types.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
-#ifndef MODULE_GNRC_IPV6_NIB
-#include "net/gnrc/ndp.h"
-#else
 #include "net/gnrc/ipv6/nib.h"
-#endif
 #include "net/protnum.h"
 #include "od.h"
 #include "utlist.h"
@@ -98,40 +94,6 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
             break;
 #endif
 
-#ifndef MODULE_GNRC_IPV6_NIB
-#if (defined(MODULE_GNRC_NDP_ROUTER) || defined(MODULE_GNRC_SIXLOWPAN_ND_ROUTER))
-        case ICMPV6_RTR_SOL:
-            DEBUG("icmpv6: router solicitation received\n");
-            gnrc_ndp_rtr_sol_handle(iface, pkt, ipv6->data, (ndp_rtr_sol_t *)hdr,
-                                    icmpv6->size);
-            break;
-#endif
-
-#ifdef MODULE_GNRC_NDP
-        case ICMPV6_RTR_ADV:
-            DEBUG("icmpv6: router advertisement received\n");
-            gnrc_ndp_rtr_adv_handle(iface, pkt, ipv6->data, (ndp_rtr_adv_t *)hdr,
-                                    icmpv6->size);
-            break;
-
-        case ICMPV6_NBR_SOL:
-            DEBUG("icmpv6: neighbor solicitation received\n");
-            gnrc_ndp_nbr_sol_handle(iface, pkt, ipv6->data, (ndp_nbr_sol_t *)hdr,
-                                    icmpv6->size);
-            break;
-
-        case ICMPV6_NBR_ADV:
-            DEBUG("icmpv6: neighbor advertisement received\n");
-            gnrc_ndp_nbr_adv_handle(iface, pkt, ipv6->data, (ndp_nbr_adv_t *)hdr,
-                                    icmpv6->size);
-            break;
-#endif
-
-        case ICMPV6_REDIRECT:
-            DEBUG("icmpv6: redirect message received\n");
-            /* TODO */
-            break;
-#else   /* MODULE_GNRC_IPV6_NIB */
         case ICMPV6_RTR_SOL:
         case ICMPV6_RTR_ADV:
         case ICMPV6_NBR_SOL:
@@ -140,9 +102,9 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
         case ICMPV6_DAR:
         case ICMPV6_DAC:
             DEBUG("icmpv6: NDP message received. Handle with gnrc_ipv6_nib\n");
-            gnrc_ipv6_nib_handle_pkt(iface, ipv6->data, hdr, icmpv6->size);
+            gnrc_ipv6_nib_handle_pkt(gnrc_netif2_get_by_pid(iface),
+                                     ipv6->data, hdr, icmpv6->size);
             break;
-#endif  /* MODULE_GNRC_IPV6_NIB */
 
         default:
             DEBUG("icmpv6: unknown type field %u\n", hdr->type);

@@ -16,6 +16,10 @@
 #include "xtimer.h"
 #include "net/gnrc/ndp2.h"
 #include "net/gnrc/ipv6/nib.h"
+#include "net/gnrc/netif2/internal.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+#include "net/gnrc/sixlowpan/nd.h"
+#endif
 
 #include "_nib-arsm.h"
 #include "_nib-6lr.h"
@@ -36,26 +40,50 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
  *
  * @return  The length of the L2 address carried in @p opt.
  */
-static inline unsigned _get_l2addr_len(gnrc_ipv6_netif_t *netif,
+static inline unsigned _get_l2addr_len(gnrc_netif2_t *netif,
                                        const ndp_opt_t *opt);
 
-void _snd_ns(const ipv6_addr_t *tgt, gnrc_ipv6_netif_t *netif,
+void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
              const ipv6_addr_t *src, const ipv6_addr_t *dst)
 {
     gnrc_pktsnip_t *ext_opt = NULL;
 
+#ifdef MODULE_GNRC_SIXLOWPAN_ND
+    _nib_dr_entry_t *dr = _nib_drl_get_dr();
+
+    assert(netif != NULL);
+    /* add ARO based on interface */
+    if ((src != NULL) && gnrc_netif2_is_6ln(netif) &&
+        (_nib_onl_get_if(dr->next_hop) == (unsigned)netif->pid) &&
+        ipv6_addr_equal(&dr->next_hop->ipv6, dst)) {
+        netdev_t *dev = netif->dev;
+        uint8_t l2src[GNRC_NETIF2_L2ADDR_MAXLEN];
+        size_t l2src_len = (uint16_t)dev->driver->get(dev, NETOPT_ADDRESS_LONG,
+                                                      l2src, sizeof(l2src));
+        if (l2src_len != sizeof(eui64_t)) {
+            DEBUG("nib: can't get EUI-64 of the interface for ARO\n");
+            return;
+        }
+        ext_opt = gnrc_sixlowpan_nd_opt_ar_build(0, GNRC_SIXLOWPAN_ND_AR_LTIME,
+                                                 (eui64_t *)l2src, NULL);
+        if (ext_opt == NULL) {
+            DEBUG("nib: error allocating ARO.\n");
+            return;
+        }
+    }
+#endif  /* MODULE_GNRC_SIXLOWPAN_ND */
     gnrc_ndp2_nbr_sol_send(tgt, netif, src, dst, ext_opt);
 }
 
 void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset)
 {
-    gnrc_ipv6_netif_t *netif = gnrc_ipv6_netif_get(_nib_onl_get_if(nbr));
-    _nib_iface_t *iface = _nib_iface_get(_nib_onl_get_if(nbr));
+    gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(_nib_onl_get_if(nbr));
 
-    DEBUG("unicast to %s (retrans. timer = %ums)\n",
+    assert(netif != NULL);
+    gnrc_netif2_acquire(netif);
+    DEBUG("nib: unicast to %s (retrans. timer = %ums)\n",
           ipv6_addr_to_str(addr_str, &nbr->ipv6, sizeof(addr_str)),
-          (unsigned)iface->retrans_time);
-    assert((netif != NULL) && (iface != NULL));
+          (unsigned)netif->ipv6.retrans_time);
 #if GNRC_IPV6_NIB_CONF_ARSM
     if (reset) {
         nbr->ns_sent = 0;
@@ -65,20 +93,20 @@ void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset)
 #endif
     _snd_ns(&nbr->ipv6, netif, NULL, &nbr->ipv6);
     _evtimer_add(nbr, GNRC_IPV6_NIB_SND_UC_NS, &nbr->nud_timeout,
-                 iface->retrans_time);
+                 netif->ipv6.retrans_time);
+    gnrc_netif2_release(netif);
 #if GNRC_IPV6_NIB_CONF_ARSM
     nbr->ns_sent++;
 #endif
 }
 
-void _handle_sl2ao(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
+void _handle_sl2ao(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
                    const icmpv6_hdr_t *icmpv6, const ndp_opt_t *sl2ao)
 {
-    _nib_onl_entry_t *nce = _nib_onl_get(&ipv6->src, iface);
-    gnrc_ipv6_netif_t *netif = gnrc_ipv6_netif_get(iface);
+    assert(netif != NULL);
+    _nib_onl_entry_t *nce = _nib_onl_get(&ipv6->src, netif->pid);
     unsigned l2addr_len;
 
-    assert(netif != NULL);
     l2addr_len = _get_l2addr_len(netif, sl2ao);
     if (l2addr_len == 0U) {
         DEBUG("nib: Unexpected SL2AO length. Ignoring SL2AO\n");
@@ -93,13 +121,14 @@ void _handle_sl2ao(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
          !_rtr_sol_on_6lr(netif, icmpv6)) {
         DEBUG("nib: L2 address differs. Setting STALE\n");
         evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
-        _set_nud_state(nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
+        _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
     }
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
     if ((nce == NULL) || !(nce->mode & _NC)) {
         DEBUG("nib: Creating NCE for (ipv6 = %s, iface = %u, nud_state = STALE)\n",
-              ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)), iface);
-        nce = _nib_nc_add(&ipv6->src, iface,
+              ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)),
+              netif->pid);
+        nce = _nib_nc_add(&ipv6->src, netif->pid,
                           GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
         if (nce != NULL) {
             if (icmpv6->type == ICMPV6_NBR_SOL) {
@@ -126,13 +155,13 @@ void _handle_sl2ao(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
         if (icmpv6->type == ICMPV6_RTR_ADV) {
             DEBUG("nib: %s%%%u is a router\n",
                   ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)),
-                  iface);
+                  netif->pid);
             nce->info |= GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
         }
         else if (icmpv6->type != ICMPV6_NBR_SOL) {
             DEBUG("nib: %s%%%u is probably not a router\n",
                   ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)),
-                  iface);
+                  netif->pid);
             nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
         }
 #if GNRC_IPV6_NIB_CONF_ARSM
@@ -146,27 +175,40 @@ void _handle_sl2ao(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
     }
 }
 
-static inline unsigned _get_l2addr_len(gnrc_ipv6_netif_t *netif,
+static inline unsigned _get_l2addr_len(gnrc_netif2_t *netif,
                                        const ndp_opt_t *opt)
 {
-#if GNRC_IPV6_NIB_CONF_6LN
-    if (_is_6ln(netif)) {
-        switch (opt->len) {
-            case 1U:
-                return 2U;
-            case 2U:
-                return 8U;
-            default:
-                return 0U;
-        }
+    switch (netif->device_type) {
+#ifdef MODULE_CC110X
+        case NETDEV_TYPE_CC110X:
+            (void)opt;
+            return sizeof(uint8_t);
+#endif
+#ifdef MODULE_NETDEV_ETH
+        case NETDEV_TYPE_ETHERNET:
+            (void)opt;
+            return ETHERNET_ADDR_LEN;
+#endif
+#ifdef MODULE_NETDEV_NRFMIN
+        case NETDEV_TYPE_NRFMIN:
+            (void)opt;
+            return sizeof(uint16_t);
+#endif
+#ifdef MODULE_NETDEV_IEEE802154
+        case NETDEV_TYPE_IEEE802154:
+            switch (opt->len) {
+                case 1U:
+                    return IEEE802154_SHORT_ADDRESS_LEN;
+                case 2U:
+                    return IEEE802154_LONG_ADDRESS_LEN;
+                default:
+                    return 0U;
+            }
+#endif
+        default:
+            (void)opt;
+            return 0U;
     }
-#else
-    (void)netif;
-#endif /* GNRC_IPV6_NIB_CONF_6LN */
-    if (opt->len == 1U) {
-        return 6U;
-    }
-    return 0U;
 }
 
 #if GNRC_IPV6_NIB_CONF_ARSM
@@ -207,7 +249,7 @@ static inline bool _rflag_set(const ndp_nbr_adv_t *nbr_adv);
  *
  * @param[in] nce               A neighbor cache entry.
  * @param[in] tl2ao             The TL2AO.
- * @param[in] iface             The interface the TL2AO came over.
+ * @param[in] netif             The interface the TL2AO came over.
  * @param[in] tl2ao_addr_len    Length of the L2 address in the TL2AO.
  *
  * @return  `true`, if the TL2AO changes the NCE.
@@ -215,7 +257,7 @@ static inline bool _rflag_set(const ndp_nbr_adv_t *nbr_adv);
  */
 static inline bool _tl2ao_changes_nce(_nib_onl_entry_t *nce,
                                       const ndp_opt_t *tl2ao,
-                                      kernel_pid_t iface,
+                                      gnrc_netif2_t *netif,
                                       unsigned tl2ao_addr_len);
 
 void _handle_snd_ns(_nib_onl_entry_t *nbr)
@@ -233,7 +275,10 @@ void _handle_snd_ns(_nib_onl_entry_t *nbr)
             break;
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE:
             if (nbr->ns_sent >= NDP_MAX_UC_SOL_NUMOF) {
-                _set_nud_state(nbr, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE);
+                gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(_nib_onl_get_if(nbr));
+
+                _set_nud_state(netif, nbr,
+                               GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE);
             }
             /* falls through intentionally */
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
@@ -253,13 +298,16 @@ void _handle_state_timeout(_nib_onl_entry_t *nbr)
             DEBUG("nib: Timeout reachability\n");
             new_state = GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE;
             /* falls through intentionally */
-        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY:
-            _set_nud_state(nbr, new_state);
+        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY: {
+            gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(_nib_onl_get_if(nbr));
+
+            _set_nud_state(netif, nbr, new_state);
             if (new_state == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE) {
                 DEBUG("nib: Timeout DELAY state\n");
                 _probe_nbr(nbr, true);
             }
             break;
+        }
     }
 }
 
@@ -274,24 +322,25 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
             break;
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE:
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE: {
-                _nib_iface_t *iface = _nib_iface_get(_nib_onl_get_if(nbr));
+                gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(_nib_onl_get_if(nbr));
                 uint32_t next_ns = _evtimer_lookup(nbr,
                                                    GNRC_IPV6_NIB_SND_MC_NS);
-                if (next_ns > iface->retrans_time) {
-                    gnrc_ipv6_netif_t *netif = gnrc_ipv6_netif_get(_nib_onl_get_if(nbr));
+
+                assert(netif != NULL);
+                gnrc_netif2_acquire(netif);
+                if (next_ns > netif->ipv6.retrans_time) {
                     ipv6_addr_t sol_nodes;
-                    uint32_t retrans_time = iface->retrans_time;
+                    uint32_t retrans_time = netif->ipv6.retrans_time;
 
                     DEBUG("multicast to %s's solicited nodes ",
                           ipv6_addr_to_str(addr_str, &nbr->ipv6,
                                            sizeof(addr_str)));
-                    assert(netif != NULL);
                     if (reset) {
                         nbr->ns_sent = 0;
                     }
                     if (state == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE) {
                         /* first 3 retransmissions in PROBE, assume 1 higher to
-                         * not send after iface->retrans_timer sec again,
+                         * not send after netif->ipv6.retrans_timer sec again,
                          * but the next backoff after that => subtract 2 */
                         retrans_time = _exp_backoff_retrans_timer(nbr->ns_sent - 2,
                                                                   retrans_time);
@@ -312,9 +361,10 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
                           "a multicast NS within %ums)\n",
                           ipv6_addr_to_str(addr_str, &nbr->ipv6,
                                            sizeof(addr_str)),
-                          (unsigned)iface->retrans_time);
+                          (unsigned)netif->ipv6.retrans_time);
                 }
 #endif
+                gnrc_netif2_release(netif);
             }
             break;
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_PROBE:
@@ -324,10 +374,9 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
     }
 }
 
-void _handle_adv_l2(kernel_pid_t iface, _nib_onl_entry_t *nce,
+void _handle_adv_l2(gnrc_netif2_t *netif, _nib_onl_entry_t *nce,
                     const icmpv6_hdr_t *icmpv6, const ndp_opt_t *tl2ao)
 {
-    gnrc_ipv6_netif_t *netif = gnrc_ipv6_netif_get(iface);
     unsigned l2addr_len = 0;
 
     assert(nce != NULL);
@@ -342,7 +391,7 @@ void _handle_adv_l2(kernel_pid_t iface, _nib_onl_entry_t *nce,
     if ((_get_nud_state(nce) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE) ||
         _oflag_set((ndp_nbr_adv_t *)icmpv6) ||
         _redirect_with_tl2ao(icmpv6, tl2ao) ||
-        _tl2ao_changes_nce(nce, tl2ao, iface, l2addr_len)) {
+        _tl2ao_changes_nce(nce, tl2ao, netif, l2addr_len)) {
         bool nce_was_incomplete =
             (_get_nud_state(nce) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE);
         if (tl2ao != NULL) {
@@ -353,17 +402,17 @@ void _handle_adv_l2(kernel_pid_t iface, _nib_onl_entry_t *nce,
             nce->l2addr_len = 0;
         }
         if (_sflag_set((ndp_nbr_adv_t *)icmpv6)) {
-            _set_reachable(iface, nce);
+            _set_reachable(netif, nce);
         }
         else if ((icmpv6->type != ICMPV6_NBR_ADV) ||
                  !_sflag_set((ndp_nbr_adv_t *)icmpv6) ||
                  (!nce_was_incomplete &&
-                  _tl2ao_changes_nce(nce, tl2ao, iface, l2addr_len))) {
+                  _tl2ao_changes_nce(nce, tl2ao, netif, l2addr_len))) {
             DEBUG("nib: Set %s%%%u to STALE\n",
                   ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)),
-                  iface);
+                  (unsigned)netif->pid);
             evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
-            _set_nud_state(nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
+            _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
         }
         if (_oflag_set((ndp_nbr_adv_t *)icmpv6) ||
             ((icmpv6->type == ICMPV6_NBR_ADV) && nce_was_incomplete)) {
@@ -391,30 +440,57 @@ void _handle_adv_l2(kernel_pid_t iface, _nib_onl_entry_t *nce,
         if ((icmpv6->type == ICMPV6_NBR_ADV) &&
             !_sflag_set((ndp_nbr_adv_t *)icmpv6) &&
             (_get_nud_state(nce) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE) &&
-            _tl2ao_changes_nce(nce, tl2ao, iface, l2addr_len)) {
+            _tl2ao_changes_nce(nce, tl2ao, netif, l2addr_len)) {
             evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
-            _set_nud_state(nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
+            _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
         }
     }
     else if ((icmpv6->type == ICMPV6_NBR_ADV) &&
              (_get_nud_state(nce) != GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE) &&
              (_get_nud_state(nce) != GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED) &&
              _sflag_set((ndp_nbr_adv_t *)icmpv6) &&
-             !_tl2ao_changes_nce(nce, tl2ao, iface, l2addr_len)) {
-        _set_reachable(iface, nce);
+             !_tl2ao_changes_nce(nce, tl2ao, netif, l2addr_len)) {
+        _set_reachable(netif, nce);
     }
 }
 
-void _set_reachable(unsigned iface, _nib_onl_entry_t *nce)
+void _recalc_reach_time(gnrc_netif2_ipv6_t *netif)
 {
-    _nib_iface_t *nib_netif = _nib_iface_get(iface);
+    const uint32_t half = (netif->reach_time_base >> 1);
 
+    netif->reach_time = random_uint32_range(half,
+                                            netif->reach_time_base + half);
+    _evtimer_add(netif, GNRC_IPV6_NIB_RECALC_REACH_TIME,
+                 &netif->recalc_reach_time,
+                 GNRC_IPV6_NIB_CONF_REACH_TIME_RESET);
+}
+
+void _set_reachable(gnrc_netif2_t *netif, _nib_onl_entry_t *nce)
+{
     DEBUG("nib: Set %s%%%u to REACHABLE for %ums\n",
           ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)),
-          iface, (unsigned)nib_netif->reach_time);
-    _set_nud_state(nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE);
+          netif->pid, (unsigned)netif->ipv6.reach_time);
+    _set_nud_state(netif, nce, GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE);
     _evtimer_add(nce, GNRC_IPV6_NIB_REACH_TIMEOUT, &nce->nud_timeout,
-                 nib_netif->reach_time);
+                 netif->ipv6.reach_time);
+}
+
+void _set_nud_state(gnrc_netif2_t *netif, _nib_onl_entry_t *nce,
+                    uint16_t state)
+{
+    nce->info &= ~GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK;
+    nce->info |= state;
+
+#if GNRC_IPV6_NIB_CONF_ROUTER
+    gnrc_netif2_acquire(netif);
+    if ((netif != NULL) && (netif->ipv6.route_info_cb)) {
+        netif->ipv6.route_info_cb(GNRC_IPV6_NIB_ROUTE_INFO_TYPE_NSC,
+                                  &nce->ipv6, (void *)((intptr_t)state));
+    }
+    gnrc_netif2_release(netif);
+#else
+    (void)netif;
+#endif
 }
 
 /* internal functions */
@@ -443,13 +519,13 @@ static inline bool _redirect_with_tl2ao(icmpv6_hdr_t *icmpv6, ndp_opt_t *tl2ao)
 
 static inline bool _tl2ao_changes_nce(_nib_onl_entry_t *nce,
                                       const ndp_opt_t *tl2ao,
-                                      kernel_pid_t iface,
+                                      gnrc_netif2_t *netif,
                                       unsigned tl2ao_addr_len)
 {
     return ((tl2ao != NULL) &&
             (((nce->l2addr_len != tl2ao_addr_len) &&
               (memcmp(nce->l2addr, tl2ao + 1, tl2ao_addr_len) != 0)) ||
-             (_nib_onl_get_if(nce) != (unsigned)iface)));
+             (_nib_onl_get_if(nce) != (unsigned)netif->pid)));
 }
 
 static inline bool _oflag_set(const ndp_nbr_adv_t *nbr_adv)

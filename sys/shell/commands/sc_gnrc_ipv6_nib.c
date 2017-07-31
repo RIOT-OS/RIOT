@@ -106,8 +106,7 @@ static int _nib_neigh(int argc, char **argv)
             return 1;
         }
         if ((argc > 5) && /* TODO also check if interface supports link-layers or not */
-            (l2addr_len = gnrc_netif_addr_from_str(l2addr, sizeof(l2addr),
-                                                   argv[5])) == 0) {
+            (l2addr_len = gnrc_netif2_addr_from_str(argv[5], l2addr)) == 0) {
             _usage_nib_neigh(argv);
             return 1;
         }
@@ -150,7 +149,7 @@ static int _nib_prefix(int argc, char **argv)
         ipv6_addr_t pfx;
         unsigned iface = atoi(argv[3]);
         unsigned pfx_len = ipv6_addr_split_prefix(argv[4]);
-        unsigned valid_ltime = UINT32_MAX, pref_ltime = UINT32_MAX;
+        uint32_t valid_ltime = UINT32_MAX, pref_ltime = UINT32_MAX;
 
         if (ipv6_addr_from_str(&pfx, argv[4]) == NULL) {
             _usage_nib_prefix(argv);

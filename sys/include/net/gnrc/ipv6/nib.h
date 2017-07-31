@@ -33,6 +33,7 @@
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/ipv6/nib/nc.h"
+#include "net/gnrc/netif2.h"
 #include "net/gnrc/pkt.h"
 
 #ifdef __cplusplus
@@ -194,12 +195,66 @@ extern "C" {
  * @brief   Recalculate reachability timeout time.
  *
  * This message type is for the event of recalculating the reachability timeout
- * time. The expected message context is a valid interface.
+ * time. The expected message context is a valid
+ * [interface](@ref net_gnrc_netif2).
  *
  * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
  */
 #define GNRC_IPV6_NIB_RECALC_REACH_TIME     (0x4fceU)
 /** @} */
+
+/**
+ * @brief   Types for gnrc_netif2_ipv6_t::route_info_cb
+ * @anchor  net_gnrc_ipv6_nib_route_info_type
+ */
+enum {
+    GNRC_IPV6_NIB_ROUTE_INFO_TYPE_UNDEF = 0,    /**< undefined */
+    /**
+     * @brief   reactive routing query
+     *
+     * A reactive routing query is issued when a route is unknown to the NIB.
+     * A reactive routing protocol can use this call to search for a route in a
+     * reactive manner.
+     *
+     * The `ctx_addr` will be the destination address of the unknown route,
+     * `ctx` a pointer to the packet as `gnrc_pktsnip_t` that caused the route
+     * look-up (to possibly queue it for later sending).
+     */
+    GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RRQ,
+
+    /**
+     * @brief   route notification
+     *
+     * A route notification is issued when an already established route is
+     * taken. A routing protocol can use this call to update its information on
+     * the route.
+     *
+     * The `ctx_addr` is the prefix of the route, `ctx` is set to a value equal
+     * to the length of the prefix in bits.
+     */
+    GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RN,
+
+    /**
+     * @brief   neighbor state change
+     *
+     * A neighbor state change is issued when ever the NUD state of a neighbor
+     * changes. A routing protocol can use this call to update its information
+     * on routes via this neighbor.
+     *
+     * The `ctx_addr` is the address of the neighbor, `ctx` is a value equal
+     * to the new NUD state as defined in [the NC info flags](@ref
+     * net_gnrc_ipv6_nib_nc_info). If the entry is deleted, `ctx` will be set
+     * to @ref GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE (except if it was
+     * already in the `UNREACHABLE` state). This does not include cache-outs,
+     * since they give no information about the neighbor's reachability (you
+     * might however get an INCOMPLETE or STALE notification due to that, as
+     * soon as the neighbor enters the neighbor cache again).
+     *
+     * Be adviced to only use `ctx_addr` in the context of the callback, since
+     * it might be overwritten, after the callback was left.
+     */
+    GNRC_IPV6_NIB_ROUTE_INFO_TYPE_NSC,
+};
 
 /**
  * @brief   Initialize NIB
@@ -209,11 +264,11 @@ void gnrc_ipv6_nib_init(void);
 /**
  * @brief   Adds an interface to be managed by the NIB.
  *
- * @pre `(KERNEL_PID_UNDEF < iface)`
+ * @pre `netif != NULL`
  *
- * @param[in] iface The interface to be managed by the NIB
+ * @param[in,out] netif The interface to be managed by the NIB
  */
-void gnrc_ipv6_nib_init_iface(kernel_pid_t iface);
+void gnrc_ipv6_nib_init_iface(gnrc_netif2_t *netif);
 
 /**
  * @brief   Gets link-layer address of next hop to a destination address
@@ -221,8 +276,8 @@ void gnrc_ipv6_nib_init_iface(kernel_pid_t iface);
  * @pre `(dst != NULL) && (nce != NULL)`
  *
  * @param[in] dst       Destination address of a packet.
- * @param[in] iface     Restrict search to this interface. May be
- *                      `KERNEL_PID_UNDEF` for any interface.
+ * @param[in] netif     Restrict search to this interface. May be `NULL` for any
+ *                      interface.
  * @param[in] pkt       The IPv6 packet in sending order for which the next hop
  *                      is searched. Needed for queuing for with reactive
  *                      routing or address resolution. May be `NULL`.
@@ -237,13 +292,13 @@ void gnrc_ipv6_nib_init_iface(kernel_pid_t iface);
  *          solicitation sent).
  */
 int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
-                                      kernel_pid_t iface, gnrc_pktsnip_t *pkt,
+                                      gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt,
                                       gnrc_ipv6_nib_nc_t *nce);
 
 /**
  * @brief   Handles a received ICMPv6 packet
  *
- * @pre `iface != KERNEL_PID_UNDEF`
+ * @pre `netif != NULL`
  * @pre `ipv6 != NULL`
  * @pre `icmpv6 != NULL`
  * @pre `icmpv6_len > sizeof(icmpv6_hdr_t)`
@@ -274,13 +329,13 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
  * @see [RFC 6775, section 8.2.4](https://tools.ietf.org/html/rfc6775#section-8.2.4)
  * @see [RFC 6775, section 8.2.5](https://tools.ietf.org/html/rfc6775#section-8.2.5)
  *
- * @param[in] iface         The interface the packet came over.
+ * @param[in] netif         The interface the packet came over.
  * @param[in] ipv6          The IPv6 header of the received packet.
  * @param[in] icmpv6        The ICMPv6 header and payload of the received
  *                          packet.
  * @param[in] icmpv6_len    The number of bytes at @p icmpv6.
  */
-void gnrc_ipv6_nib_handle_pkt(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
+void gnrc_ipv6_nib_handle_pkt(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
                               const icmpv6_hdr_t *icmpv6, size_t icmpv6_len);
 
 /**
@@ -291,6 +346,25 @@ void gnrc_ipv6_nib_handle_pkt(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
  *                  types](@ref net_gnrc_ipv6_nib_msg))
  */
 void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type);
+
+#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
+/**
+ * @brief   Changes the state if an interface advertises itself as a router
+ *          or not
+ *
+ * @param[in] netif     The interface for which the state should be changed.
+ * @param[in] enable    `true`, to enable advertising the interface as a router.
+ *                      `false`, to disable advertising the interface as a
+ *                      router.
+ */
+void gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif2_t *netif, bool enable);
+#else
+/**
+ * @brief   Optimization to NOP for non-routers
+ */
+#define gnrc_ipv6_nib_change_rtr_adv_iface(netif, enable) \
+    (void)netif; (void)enable
+#endif
 
 #ifdef __cplusplus
 }
