@@ -209,9 +209,9 @@ static const spi_conf_t spi_config[] = {
         .miso_pin = GPIO_PIN(PA, 15),
         .mosi_pin = GPIO_PIN(PA, 12),
         .clk_pin  = GPIO_PIN(PA, 13),
-        .miso_mux = GPIO_MUX_D,
-        .mosi_mux = GPIO_MUX_D,
-        .clk_mux  = GPIO_MUX_D,
+        .miso_mux = GPIO_MUX_C,
+        .mosi_mux = GPIO_MUX_C,
+        .clk_mux  = GPIO_MUX_C,
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1
     }
