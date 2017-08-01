@@ -93,6 +93,11 @@ typedef uint16_t gpio_t;
 /** @} */
 
 /**
+ * @brief   Prevent shared timer functions from being used
+ */
+#define PERIPH_TIMER_PROVIDES_SET
+
+/**
  * @brief   define number of usable power modes
  */
 #define PM_NUM_MODES    (1U)
