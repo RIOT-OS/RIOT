@@ -9282,6 +9282,8 @@ typedef struct {
 #define UART_TIDT_TIDT(x)                        This_symbol_has_been_deprecated
 #define OSC0                                     ((OSC_Type *)OSC_BASE)
 
+#define MCG_C7_OSCSEL(x) (((uint32_t)(x) << MCG_C7_OSCSEL_SHIFT) & MCG_C7_OSCSEL_MASK)
+
 /*!
  * @}
  */ /* end of group Backward_Compatibility_Symbols */

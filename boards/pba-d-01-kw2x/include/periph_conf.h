@@ -33,21 +33,33 @@ extern "C"
  * @name Clock system configuration
  * @{
  */
-#define KINETIS_CPU_USE_MCG               1
-
-#define KINETIS_MCG_USE_ERC               1
-#define KINETIS_MCG_USE_PLL               1
-#define KINETIS_MCG_DCO_RANGE             (24000000U)
-#define KINETIS_MCG_ERC_OSCILLATOR        0
-#define KINETIS_MCG_ERC_FRDIV             2
-#define KINETIS_MCG_ERC_RANGE             1
-#define KINETIS_MCG_ERC_FREQ              4000000
-#define KINETIS_MCG_PLL_PRDIV             1
-#define KINETIS_MCG_PLL_VDIV0             0
-#define KINETIS_MCG_PLL_FREQ              48000000
-
-#define CLOCK_CORECLOCK                   KINETIS_MCG_PLL_FREQ
-#define CLOCK_BUSCLOCK                    CLOCK_CORECLOCK
+static const clock_config_t clock_config = {
+    /*
+     * This configuration results in the system running from the PLL output with
+     * the following clock frequencies:
+     * Core:  48 MHz
+     * Bus:   48 MHz
+     * Flash: 24 MHz
+     */
+    .clkdiv1 = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV2(0) |
+               SIM_CLKDIV1_OUTDIV4(1),
+    .default_mode = KINETIS_MCG_MODE_PEE,
+    /* The modem generates a 4 MHz clock signal */
+    .erc_range = KINETIS_MCG_ERC_RANGE_HIGH,
+    .fcrdiv = 0, /* Fast IRC divide by 1 => 4 MHz */
+    .oscsel = 0, /* Use EXTAL0 for external clock */
+    .clc = 0, /* OSC0 is unused*/
+    .fll_frdiv = 0b010, /* Divide by 128 */
+    .fll_factor_fei = KINETIS_MCG_FLL_FACTOR_1464, /* FLL freq = 48 MHz */
+    .fll_factor_fee = KINETIS_MCG_FLL_FACTOR_1280, /* FLL freq = 40 MHz */
+    .pll_prdiv = 0b00001, /* Divide by 2 */
+    .pll_vdiv = 0b00000, /* Multiply by 24 => PLL freq = 48 MHz */
+    .enable_oscillator = false, /* Use modem clock from EXTAL0 */
+    .select_fast_irc = true,
+    .enable_mcgirclk = false,
+};
+#define CLOCK_CORECLOCK              (48000000ul)
+#define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 1)
 /** @} */
 
 /**
@@ -236,12 +248,12 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define I2C_NUMOF               (1U)
-#define I2C_CLK                 (48e6)
+#define I2C_CLK                 (CLOCK_BUSCLOCK)
 #define I2C_0_EN                1
 #define I2C_IRQ_PRIO            1
-/* Low (10 kHz): MUL = 4, SCL divider = 2560, total: 10240 */
+/* Low (10 kHz): MUL = 2, SCL divider = 2560, total: 5120 */
 #define KINETIS_I2C_F_ICR_LOW        (0x3D)
-#define KINETIS_I2C_F_MULT_LOW       (2)
+#define KINETIS_I2C_F_MULT_LOW       (1)
 /* Normal (100 kHz): MUL = 2, SCL divider = 240, total: 480 */
 #define KINETIS_I2C_F_ICR_NORMAL     (0x1F)
 #define KINETIS_I2C_F_MULT_NORMAL    (1)

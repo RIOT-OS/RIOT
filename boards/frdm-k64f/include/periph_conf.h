@@ -31,21 +31,34 @@ extern "C"
  * @name Clock system configuration
  * @{
  */
-#define KINETIS_CPU_USE_MCG          1
-
-#define KINETIS_MCG_USE_ERC          1
-#define KINETIS_MCG_USE_PLL          1
-#define KINETIS_MCG_DCO_RANGE        (24000000U)
-#define KINETIS_MCG_ERC_OSCILLATOR   0
-#define KINETIS_MCG_ERC_FRDIV        6           /* ERC devider = 1280 */
-#define KINETIS_MCG_ERC_RANGE        2
-#define KINETIS_MCG_ERC_FREQ         50000000
-#define KINETIS_MCG_PLL_PRDIV        19          /* divide factor = 20 */
-#define KINETIS_MCG_PLL_VDIV0        0           /* multiply factor = 24 */
-#define KINETIS_MCG_PLL_FREQ         60000000
-
-#define CLOCK_CORECLOCK              KINETIS_MCG_PLL_FREQ
-#define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 2)
+static const clock_config_t clock_config = {
+    /*
+     * This configuration results in the system running from the PLL output with
+     * the following clock frequencies:
+     * Core:  60 MHz
+     * Bus:   60 MHz
+     * Flex:  20 MHz
+     * Flash: 20 MHz
+     */
+    .clkdiv1 = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV2(0) |
+               SIM_CLKDIV1_OUTDIV3(2) | SIM_CLKDIV1_OUTDIV4(2),
+    .default_mode = KINETIS_MCG_MODE_PEE,
+    /* The board has an external RMII (Ethernet) clock which drives the ERC at 50 MHz */
+    .erc_range = KINETIS_MCG_ERC_RANGE_VERY_HIGH,
+    .fcrdiv = 0, /* Fast IRC divide by 1 => 4 MHz */
+    .oscsel = 0, /* Use EXTAL for external clock */
+    .clc = 0, /* External load caps on board */
+    .fll_frdiv = 0b111, /* Divide by 1536 => FLL input 32252 Hz */
+    .fll_factor_fei = KINETIS_MCG_FLL_FACTOR_1464, /* FLL freq = 48 MHz  */
+    .fll_factor_fee = KINETIS_MCG_FLL_FACTOR_1920, /* FLL freq = 62.5 MHz */
+    .pll_prdiv = 0b10011, /* Divide by 20 */
+    .pll_vdiv = 0b00000, /* Multiply by 24 => PLL freq = 60 MHz */
+    .enable_oscillator = false, /* Use EXTAL directly without OSC0 */
+    .select_fast_irc = true,
+    .enable_mcgirclk = false,
+};
+#define CLOCK_CORECLOCK              (60000000ul)
+#define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 1)
 /** @} */
 
 /**
@@ -206,20 +219,20 @@ static const spi_conf_t spi_config[] = {
 * @{
 */
 #define I2C_NUMOF                    (1U)
-#define I2C_CLK                      CLOCK_CORECLOCK
+#define I2C_CLK                      CLOCK_BUSCLOCK
 #define I2C_0_EN                     1
 #define I2C_IRQ_PRIO                 1
-/* Low (10 kHz): MUL = 4, SCL divider = 2560, total: 10240 */
-#define KINETIS_I2C_F_ICR_LOW        (0x3D)
+/* Low (10 kHz): MUL = 4, SCL divider = 1536, total: 6144 */
+#define KINETIS_I2C_F_ICR_LOW        (0x36)
 #define KINETIS_I2C_F_MULT_LOW       (2)
-/* Normal (100 kHz): MUL = 2, SCL divider = 240, total: 480 */
-#define KINETIS_I2C_F_ICR_NORMAL     (0x1F)
+/* Normal (100 kHz): MUL = 2, SCL divider = 320, total: 640 */
+#define KINETIS_I2C_F_ICR_NORMAL     (0x25)
 #define KINETIS_I2C_F_MULT_NORMAL    (1)
-/* Fast (400 kHz): MUL = 1, SCL divider = 128, total: 128 */
-#define KINETIS_I2C_F_ICR_FAST       (0x17)
+/* Fast (400 kHz): MUL = 1, SCL divider = 160, total: 160 */
+#define KINETIS_I2C_F_ICR_FAST       (0x1D)
 #define KINETIS_I2C_F_MULT_FAST      (0)
-/* Fast plus (1000 kHz): MUL = 1, SCL divider = 48, total: 48 */
-#define KINETIS_I2C_F_ICR_FAST_PLUS  (0x10)
+/* Fast plus (1000 kHz): MUL = 1, SCL divider = 64, total: 64 */
+#define KINETIS_I2C_F_ICR_FAST_PLUS  (0x12)
 #define KINETIS_I2C_F_MULT_FAST_PLUS (0)
 
 /* I2C 0 device configuration */
