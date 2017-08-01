@@ -610,6 +610,9 @@ gnrc_netif2_t *gnrc_netif2_get_by_ipv6_addr(const ipv6_addr_t *addr)
         if (_addr_idx(netif, addr) >= 0) {
             break;
         }
+        if (_group_idx(netif, addr) >= 0) {
+            break;
+        }
     }
     return netif;
 }

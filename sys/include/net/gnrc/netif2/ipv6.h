@@ -182,9 +182,15 @@ typedef struct {
      *          @ref net_gnrc_ipv6_nib "NIB"
      */
     uint32_t retrans_time;
-#endif  /* MODULE_GNRC_IPV6_NIB */
-#if defined(MODULE_GNRC_IPV6_NIB) || DOXYGEN
 #if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
+    /**
+     * @brief   (Advertised) Router lifetime (default 1800).
+     *
+     * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
+     *          and @ref net_gnrc_ipv6_nib "NIB" and if
+     *          @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+     */
+    uint16_t rtr_ltime;
     /**
      * @brief   number of unsolicited router advertisements sent
      *

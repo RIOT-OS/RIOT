@@ -41,7 +41,7 @@ extern "C" {
  */
 static inline void gnrc_netif2_acquire(gnrc_netif2_t *netif)
 {
-    if (netif->ops) {
+    if (netif && (netif->ops)) {
         rmutex_lock(&netif->mutex);
     }
 }
@@ -55,7 +55,7 @@ static inline void gnrc_netif2_acquire(gnrc_netif2_t *netif)
  */
 static inline void gnrc_netif2_release(gnrc_netif2_t *netif)
 {
-    if (netif->ops) {
+    if (netif && (netif->ops)) {
         rmutex_unlock(&netif->mutex);
     }
 }
@@ -175,7 +175,8 @@ ipv6_addr_t *gnrc_netif2_ipv6_addr_best_src(gnrc_netif2_t *netif,
                                             bool ll_only);
 
 /**
- * @brief   Gets an interface by an address assigned to it.
+ * @brief   Gets an interface by an address (incl. multicast groups) assigned
+ *          to it.
  *
  * @pre `addr != NULL`
  *
