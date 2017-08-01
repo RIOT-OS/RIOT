@@ -18,6 +18,7 @@
 #ifndef NET_GNRC_NETIF2_IPV6_H
 #define NET_GNRC_NETIF2_IPV6_H
 
+#include "evtimer_msg.h"
 #include "net/ipv6/addr.h"
 #ifdef MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib/conf.h"
