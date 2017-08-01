@@ -316,10 +316,8 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define I2C_NUMOF               (1U)
-#define I2C_CLK                 CLOCK_BUSCLOCK
 #define I2C_0_EN                1
 #define I2C_1_EN                0
-#define I2C_IRQ_PRIO            CPU_DEFAULT_IRQ_PRIO
 
 /* I2C 0 device configuration */
 #define I2C_0_DEV               I2C0
@@ -353,14 +351,6 @@ static const spi_conf_t spi_config[] = {
 #define KINETIS_I2C_F_ICR_FAST_PLUS  (0x10)
 #define KINETIS_I2C_F_MULT_FAST_PLUS (0)
 /** @} */
-
-/**
- * @name GPIO configuration
- * @{
- */
-#define GPIO_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
-/** @} */
-
 
 /**
  * @name RTC configuration
