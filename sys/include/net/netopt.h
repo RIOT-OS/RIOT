@@ -400,6 +400,10 @@ typedef enum {
     NETOPT_6LO_IPHC,            /**< en/disable header compression according to
                                  *   [RFC 6282](https://tools.ietf.org/html/rfc6282)
                                  *   or read the current state */
+    /**
+     * @brief   Get the retries needed for the last transmission
+     */
+    NETOPT_TX_RETRIES_NEEDED,
 
     /* add more options if needed */
 
