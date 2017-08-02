@@ -340,6 +340,11 @@ typedef enum {
      */
     NETOPT_IQ_INVERT,
 
+    /**
+     * @brief   Get the retries needed for the last transmission
+     */
+    NETOPT_TX_RETRIES_NEEDED,
+
     /* add more options if needed */
 
     /**
