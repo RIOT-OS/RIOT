@@ -319,6 +319,15 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                 res = sizeof(int8_t);
             }
             break;
+        case NETOPT_TX_RETRIES_NEEDED:
+            if (max_len < sizeof(uint8_t)) {
+                res = -EOVERFLOW;
+            }
+            else {
+                *((uint8_t *)val) = dev->tx_retries;
+                res = sizeof(int8_t);
+            }
+            break;
 
         default:
             /* try netdev settings */
@@ -538,6 +547,7 @@ static void _isr(netdev_t *netdev)
 #ifdef MODULE_NETSTATS_L2
         if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
             uint8_t txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
+            dev->tx_retries = (txstat >> MRF24J40_TXSTAT_MAX_FRAME_RETRIES_SHIFT);
             /* transmision failed */
             if (txstat & MRF24J40_TXSTAT_TXNSTAT) {
                 /* TX_NOACK - CCAFAIL */

@@ -139,6 +139,7 @@ typedef struct {
     uint8_t header_len;                     /**< length of the header */
     uint8_t pending;                        /**< Flags for pending tasks */
     uint8_t irq_flag;                       /**< Flags for IRQs */
+    uint8_t tx_retries;                     /**< Number of retries needed for last transmission */
 } mrf24j40_t;
 
 /**
