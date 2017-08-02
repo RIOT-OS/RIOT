@@ -39,10 +39,7 @@
  *
  *              The GPIO driver uses the @ref GPIO_PIN(port, pin) macro to declare pins.
  *
- *              ### GPIO configuration example (for periph_conf.h) ###
- *
- *                  #define GPIO_IRQ_PRIO                CPU_DEFAULT_IRQ_PRIO
- *
+ *              No configuration is necessary.
  */
 
 /**
@@ -53,9 +50,7 @@
  *              ### I2C configuration example (for periph_conf.h) ###
  *
  *                  #define I2C_NUMOF               (1U)
- *                  #define I2C_CLK                 (48e6)
  *                  #define I2C_0_EN                1
- *                  #define I2C_IRQ_PRIO            1
  *
  *                  / * Low (10 kHz): MUL = 4, SCL divider = 2560, total: 10240 * /
  *                  #define KINETIS_I2C_F_ICR_LOW        (0x3D)
