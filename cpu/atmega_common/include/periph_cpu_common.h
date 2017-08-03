@@ -108,6 +108,16 @@ typedef enum {
 } spi_clk_t;
 /** @} */
 
+/**
+ * @brief  Bitmasks indicating which are the possible dividers for a timer
+ * @{
+ */
+typedef enum {
+    TIMER_DIV1_8_64_128_1024 = 0x549,           /**< 1/{1,8,64,128,1024} */
+    TIMER_DIV1_8_32_64_128_256_1024 = 0x5E9,    /**< 1/{1,8,32,64,128,256,1024} */
+} timer_div_t;
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
