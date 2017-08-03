@@ -24,6 +24,8 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -161,6 +163,46 @@ extern "C" {
 #elif defined (CPU_ATMEGA2560)
 #define ADC_NUMOF       (16U)
 #endif
+/** @} */
+
+/**
+ * @name   PWM configuration
+ *
+ * The current implementation supports only 8-bit timers for PWM generation.
+ * These timers are typically timer 0 and timer 2 in Atmega2560/1281/328p.
+ *
+ * Setting the first channel to GPIO_UNDEF allows multiple resolutions for the
+ * PWM channel. Otherwise the resolution is fixed to 256, allowing duty cycle
+ * values ranging from 0 to 255.
+ *
+ * @{
+ */
+#if defined(CPU_ATMEGA328P)
+#define PWM_PINS_CH0 { GPIO_PIN(PORT_D, 6), GPIO_PIN(PORT_D, 5) }
+#define PWM_PINS_CH1 { GPIO_PIN(PORT_B, 3), GPIO_PIN(PORT_D, 3) }
+
+#elif defined(CPU_ATMEGA2560)
+#define PWM_PINS_CH0 { GPIO_PIN(PORT_B, 7), GPIO_PIN(PORT_G, 5) }
+#define PWM_PINS_CH1 { GPIO_PIN(PORT_B, 4), GPIO_PIN(PORT_H, 6) }
+
+#elif defined(CPU_ATMEGA1281)
+#define PWM_PINS_CH0 { GPIO_PIN(PORT_B, 7), GPIO_PIN(PORT_G, 5) }
+#define PWM_PINS_CH1 { GPIO_PIN(PORT_B, 4), GPIO_UNDEF }
+#endif
+
+static const pwm_conf_t pwm_conf[] = {
+    {
+        .dev = MINI_TIMER0,
+        .pin_ch = PWM_PINS_CH0,
+        .div = MINI_TIMER0_DIV,
+    },
+    {
+        .dev = MINI_TIMER2,
+        .pin_ch = PWM_PINS_CH1,
+        .div = MINI_TIMER2_DIV,
+    }
+};
+#define PWM_NUMOF (sizeof(pwm_conf) / sizeof(pwm_conf[0]))
 /** @} */
 
 #ifdef __cplusplus
