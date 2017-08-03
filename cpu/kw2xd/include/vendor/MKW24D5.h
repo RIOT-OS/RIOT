@@ -1,6 +1,6 @@
 /*
 ** ###################################################################
-**     Processor:           MKW22D512VHA5
+**     Processor:           MKW24D512VHA5
 **     Compilers:           Keil ARM C/C++ Compiler
 **                          Freescale C/C++ for Embedded ARM
 **                          GNU C Compiler
@@ -12,7 +12,7 @@
 **     Build:               b170112
 **
 **     Abstract:
-**         CMSIS Peripheral Access Layer for MKW22D5
+**         CMSIS Peripheral Access Layer for MKW24D5
 **
 **     Copyright (c) 1997 - 2016 Freescale Semiconductor, Inc.
 **     Copyright 2016 - 2017 NXP
@@ -58,16 +58,16 @@
 */
 
 /*!
- * @file MKW22D5.h
+ * @file MKW24D5.h
  * @version 2.0
  * @date 2014-11-26
- * @brief CMSIS Peripheral Access Layer for MKW22D5
+ * @brief CMSIS Peripheral Access Layer for MKW24D5
  *
- * CMSIS Peripheral Access Layer for MKW22D5
+ * CMSIS Peripheral Access Layer for MKW24D5
  */
 
-#ifndef _MKW22D5_H_
-#define _MKW22D5_H_                              /**< Symbol preventing repeated inclusion */
+#ifndef _MKW24D5_H_
+#define _MKW24D5_H_                              /**< Symbol preventing repeated inclusion */
 
 /** Memory map major version (memory maps with equal major version number are
  * compatible) */
@@ -8579,4 +8579,4 @@ typedef struct {
  * @}
  */ /* end of group SDK_Compatibility_Symbols */
 
-#endif  /* _MKW22D5_H_ */
+#endif  /* _MKW24D5_H_ */

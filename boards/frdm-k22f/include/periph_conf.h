@@ -103,7 +103,7 @@ static const uart_conf_t uart_config[] = {
         .pcr_rx = PORT_PCR_MUX(3),
         .pcr_tx = PORT_PCR_MUX(3),
         .irqn   = UART1_RX_TX_IRQn,
-        .scgc_addr = &SIM_SCGC4,
+        .scgc_addr = &SIM->SCGC4,
         .scgc_bit = SIM_SCGC4_UART1_SHIFT,
         .mode   = UART_MODE_8N1,
     },

@@ -1,6 +1,8 @@
 /*
 ** ###################################################################
-**     Processor:           MKW22D512VHA5
+**     Processors:          MKW21D256VHA5
+**                          MKW21D512VHA5
+**
 **     Compilers:           Keil ARM C/C++ Compiler
 **                          Freescale C/C++ for Embedded ARM
 **                          GNU C Compiler
@@ -8,11 +10,11 @@
 **                          MCUXpresso Compiler
 **
 **     Reference manual:    MKW2xDRM Rev.2  July 2014
-**     Version:             rev. 2.0, 2014-11-26
+**     Version:             rev. 2.0, 2015-01-06
 **     Build:               b170112
 **
 **     Abstract:
-**         CMSIS Peripheral Access Layer for MKW22D5
+**         CMSIS Peripheral Access Layer for MKW21D5
 **
 **     Copyright (c) 1997 - 2016 Freescale Semiconductor, Inc.
 **     Copyright 2016 - 2017 NXP
@@ -47,7 +49,7 @@
 **     Revisions:
 **     - rev. 1.0 (2013-11-22)
 **         Initial version.
-**     - rev. 2.0 (2014-11-26)
+**     - rev. 2.0 (2015-01-06)
 **         update of SystemInit() imlementation
 **         Module access macro module_BASES replaced by module_BASE_PTRS.
 **         Register accessor macros added to the memory map.
@@ -58,16 +60,16 @@
 */
 
 /*!
- * @file MKW22D5.h
+ * @file MKW21D5.h
  * @version 2.0
- * @date 2014-11-26
- * @brief CMSIS Peripheral Access Layer for MKW22D5
+ * @date 2015-01-06
+ * @brief CMSIS Peripheral Access Layer for MKW21D5
  *
- * CMSIS Peripheral Access Layer for MKW22D5
+ * CMSIS Peripheral Access Layer for MKW21D5
  */
 
-#ifndef _MKW22D5_H_
-#define _MKW22D5_H_                              /**< Symbol preventing repeated inclusion */
+#ifndef _MKW21D5_H_
+#define _MKW21D5_H_                              /**< Symbol preventing repeated inclusion */
 
 /** Memory map major version (memory maps with equal major version number are
  * compatible) */
@@ -194,8 +196,8 @@ typedef enum IRQn {
   PIT2_IRQn                    = 50,               /**< Periodic interrupt timer channel 2 */
   PIT3_IRQn                    = 51,               /**< Periodic interrupt timer channel 3 */
   PDB0_IRQn                    = 52,               /**< Programmable delay block */
-  USB0_IRQn                    = 53,               /**< USB OTG interrupt */
-  USBDCD_IRQn                  = 54,               /**< USB charger detect */
+  Reserved69_IRQn              = 53,               /**< Reserved interrupt */
+  Reserved70_IRQn              = 54,               /**< Reserved interrupt */
   Reserved71_IRQn              = 55,               /**< Reserved interrupt */
   Reserved72_IRQn              = 56,               /**< Reserved interrupt */
   MCG_IRQn                     = 57,               /**< Multipurpose clock generator */
@@ -6438,26 +6440,6 @@ typedef struct {
 #define SIM_SOPT1_OSC32KSEL_MASK                 (0xC0000U)
 #define SIM_SOPT1_OSC32KSEL_SHIFT                (18U)
 #define SIM_SOPT1_OSC32KSEL(x)                   (((uint32_t)(((uint32_t)(x)) << SIM_SOPT1_OSC32KSEL_SHIFT)) & SIM_SOPT1_OSC32KSEL_MASK)
-#define SIM_SOPT1_USBVSTBY_MASK                  (0x20000000U)
-#define SIM_SOPT1_USBVSTBY_SHIFT                 (29U)
-#define SIM_SOPT1_USBVSTBY(x)                    (((uint32_t)(((uint32_t)(x)) << SIM_SOPT1_USBVSTBY_SHIFT)) & SIM_SOPT1_USBVSTBY_MASK)
-#define SIM_SOPT1_USBSSTBY_MASK                  (0x40000000U)
-#define SIM_SOPT1_USBSSTBY_SHIFT                 (30U)
-#define SIM_SOPT1_USBSSTBY(x)                    (((uint32_t)(((uint32_t)(x)) << SIM_SOPT1_USBSSTBY_SHIFT)) & SIM_SOPT1_USBSSTBY_MASK)
-#define SIM_SOPT1_USBREGEN_MASK                  (0x80000000U)
-#define SIM_SOPT1_USBREGEN_SHIFT                 (31U)
-#define SIM_SOPT1_USBREGEN(x)                    (((uint32_t)(((uint32_t)(x)) << SIM_SOPT1_USBREGEN_SHIFT)) & SIM_SOPT1_USBREGEN_MASK)
-
-/*! @name SOPT1CFG - SOPT1 Configuration Register */
-#define SIM_SOPT1CFG_URWE_MASK                   (0x1000000U)
-#define SIM_SOPT1CFG_URWE_SHIFT                  (24U)
-#define SIM_SOPT1CFG_URWE(x)                     (((uint32_t)(((uint32_t)(x)) << SIM_SOPT1CFG_URWE_SHIFT)) & SIM_SOPT1CFG_URWE_MASK)
-#define SIM_SOPT1CFG_UVSWE_MASK                  (0x2000000U)
-#define SIM_SOPT1CFG_UVSWE_SHIFT                 (25U)
-#define SIM_SOPT1CFG_UVSWE(x)                    (((uint32_t)(((uint32_t)(x)) << SIM_SOPT1CFG_UVSWE_SHIFT)) & SIM_SOPT1CFG_UVSWE_MASK)
-#define SIM_SOPT1CFG_USSWE_MASK                  (0x4000000U)
-#define SIM_SOPT1CFG_USSWE_SHIFT                 (26U)
-#define SIM_SOPT1CFG_USSWE(x)                    (((uint32_t)(((uint32_t)(x)) << SIM_SOPT1CFG_USSWE_SHIFT)) & SIM_SOPT1CFG_USSWE_MASK)
 
 /*! @name SOPT2 - System Options Register 2 */
 #define SIM_SOPT2_RTCCLKOUTSEL_MASK              (0x10U)
@@ -6475,9 +6457,6 @@ typedef struct {
 #define SIM_SOPT2_PLLFLLSEL_MASK                 (0x10000U)
 #define SIM_SOPT2_PLLFLLSEL_SHIFT                (16U)
 #define SIM_SOPT2_PLLFLLSEL(x)                   (((uint32_t)(((uint32_t)(x)) << SIM_SOPT2_PLLFLLSEL_SHIFT)) & SIM_SOPT2_PLLFLLSEL_MASK)
-#define SIM_SOPT2_USBSRC_MASK                    (0x40000U)
-#define SIM_SOPT2_USBSRC_SHIFT                   (18U)
-#define SIM_SOPT2_USBSRC(x)                      (((uint32_t)(((uint32_t)(x)) << SIM_SOPT2_USBSRC_SHIFT)) & SIM_SOPT2_USBSRC_MASK)
 
 /*! @name SOPT4 - System Options Register 4 */
 #define SIM_SOPT4_FTM0FLT0_MASK                  (0x1U)
@@ -6578,9 +6557,6 @@ typedef struct {
 #define SIM_SCGC4_UART3_MASK                     (0x2000U)
 #define SIM_SCGC4_UART3_SHIFT                    (13U)
 #define SIM_SCGC4_UART3(x)                       (((uint32_t)(((uint32_t)(x)) << SIM_SCGC4_UART3_SHIFT)) & SIM_SCGC4_UART3_MASK)
-#define SIM_SCGC4_USBOTG_MASK                    (0x40000U)
-#define SIM_SCGC4_USBOTG_SHIFT                   (18U)
-#define SIM_SCGC4_USBOTG(x)                      (((uint32_t)(((uint32_t)(x)) << SIM_SCGC4_USBOTG_SHIFT)) & SIM_SCGC4_USBOTG_MASK)
 #define SIM_SCGC4_CMP_MASK                       (0x80000U)
 #define SIM_SCGC4_CMP_SHIFT                      (19U)
 #define SIM_SCGC4_CMP(x)                         (((uint32_t)(((uint32_t)(x)) << SIM_SCGC4_CMP_SHIFT)) & SIM_SCGC4_CMP_MASK)
@@ -6630,9 +6606,6 @@ typedef struct {
 #define SIM_SCGC6_CRC_MASK                       (0x40000U)
 #define SIM_SCGC6_CRC_SHIFT                      (18U)
 #define SIM_SCGC6_CRC(x)                         (((uint32_t)(((uint32_t)(x)) << SIM_SCGC6_CRC_SHIFT)) & SIM_SCGC6_CRC_MASK)
-#define SIM_SCGC6_USBDCD_MASK                    (0x200000U)
-#define SIM_SCGC6_USBDCD_SHIFT                   (21U)
-#define SIM_SCGC6_USBDCD(x)                      (((uint32_t)(((uint32_t)(x)) << SIM_SCGC6_USBDCD_SHIFT)) & SIM_SCGC6_USBDCD_MASK)
 #define SIM_SCGC6_PDB_MASK                       (0x400000U)
 #define SIM_SCGC6_PDB_SHIFT                      (22U)
 #define SIM_SCGC6_PDB(x)                         (((uint32_t)(((uint32_t)(x)) << SIM_SCGC6_PDB_SHIFT)) & SIM_SCGC6_PDB_MASK)
@@ -6670,14 +6643,6 @@ typedef struct {
 #define SIM_CLKDIV1_OUTDIV1_MASK                 (0xF0000000U)
 #define SIM_CLKDIV1_OUTDIV1_SHIFT                (28U)
 #define SIM_CLKDIV1_OUTDIV1(x)                   (((uint32_t)(((uint32_t)(x)) << SIM_CLKDIV1_OUTDIV1_SHIFT)) & SIM_CLKDIV1_OUTDIV1_MASK)
-
-/*! @name CLKDIV2 - System Clock Divider Register 2 */
-#define SIM_CLKDIV2_USBFRAC_MASK                 (0x1U)
-#define SIM_CLKDIV2_USBFRAC_SHIFT                (0U)
-#define SIM_CLKDIV2_USBFRAC(x)                   (((uint32_t)(((uint32_t)(x)) << SIM_CLKDIV2_USBFRAC_SHIFT)) & SIM_CLKDIV2_USBFRAC_MASK)
-#define SIM_CLKDIV2_USBDIV_MASK                  (0xEU)
-#define SIM_CLKDIV2_USBDIV_SHIFT                 (1U)
-#define SIM_CLKDIV2_USBDIV(x)                    (((uint32_t)(((uint32_t)(x)) << SIM_CLKDIV2_USBDIV_SHIFT)) & SIM_CLKDIV2_USBDIV_MASK)
 
 /*! @name FCFG1 - Flash Configuration Register 1 */
 #define SIM_FCFG1_FLASHDIS_MASK                  (0x1U)
@@ -7638,573 +7603,6 @@ typedef struct {
 
 
 /* ----------------------------------------------------------------------------
-   -- USB Peripheral Access Layer
-   ---------------------------------------------------------------------------- */
-
-/*!
- * @addtogroup USB_Peripheral_Access_Layer USB Peripheral Access Layer
- * @{
- */
-
-/** USB - Register Layout Typedef */
-typedef struct {
-  __I  uint8_t PERID;                              /**< Peripheral ID register, offset: 0x0 */
-       uint8_t RESERVED_0[3];
-  __I  uint8_t IDCOMP;                             /**< Peripheral ID Complement register, offset: 0x4 */
-       uint8_t RESERVED_1[3];
-  __I  uint8_t REV;                                /**< Peripheral Revision register, offset: 0x8 */
-       uint8_t RESERVED_2[3];
-  __I  uint8_t ADDINFO;                            /**< Peripheral Additional Info register, offset: 0xC */
-       uint8_t RESERVED_3[3];
-  __IO uint8_t OTGISTAT;                           /**< OTG Interrupt Status register, offset: 0x10 */
-       uint8_t RESERVED_4[3];
-  __IO uint8_t OTGICR;                             /**< OTG Interrupt Control Register, offset: 0x14 */
-       uint8_t RESERVED_5[3];
-  __IO uint8_t OTGSTAT;                            /**< OTG Status register, offset: 0x18 */
-       uint8_t RESERVED_6[3];
-  __IO uint8_t OTGCTL;                             /**< OTG Control register, offset: 0x1C */
-       uint8_t RESERVED_7[99];
-  __IO uint8_t ISTAT;                              /**< Interrupt Status register, offset: 0x80 */
-       uint8_t RESERVED_8[3];
-  __IO uint8_t INTEN;                              /**< Interrupt Enable register, offset: 0x84 */
-       uint8_t RESERVED_9[3];
-  __IO uint8_t ERRSTAT;                            /**< Error Interrupt Status register, offset: 0x88 */
-       uint8_t RESERVED_10[3];
-  __IO uint8_t ERREN;                              /**< Error Interrupt Enable register, offset: 0x8C */
-       uint8_t RESERVED_11[3];
-  __I  uint8_t STAT;                               /**< Status register, offset: 0x90 */
-       uint8_t RESERVED_12[3];
-  __IO uint8_t CTL;                                /**< Control register, offset: 0x94 */
-       uint8_t RESERVED_13[3];
-  __IO uint8_t ADDR;                               /**< Address register, offset: 0x98 */
-       uint8_t RESERVED_14[3];
-  __IO uint8_t BDTPAGE1;                           /**< BDT Page Register 1, offset: 0x9C */
-       uint8_t RESERVED_15[3];
-  __IO uint8_t FRMNUML;                            /**< Frame Number Register Low, offset: 0xA0 */
-       uint8_t RESERVED_16[3];
-  __IO uint8_t FRMNUMH;                            /**< Frame Number Register High, offset: 0xA4 */
-       uint8_t RESERVED_17[3];
-  __IO uint8_t TOKEN;                              /**< Token register, offset: 0xA8 */
-       uint8_t RESERVED_18[3];
-  __IO uint8_t SOFTHLD;                            /**< SOF Threshold Register, offset: 0xAC */
-       uint8_t RESERVED_19[3];
-  __IO uint8_t BDTPAGE2;                           /**< BDT Page Register 2, offset: 0xB0 */
-       uint8_t RESERVED_20[3];
-  __IO uint8_t BDTPAGE3;                           /**< BDT Page Register 3, offset: 0xB4 */
-       uint8_t RESERVED_21[11];
-  struct {                                         /* offset: 0xC0, array step: 0x4 */
-    __IO uint8_t ENDPT;                              /**< Endpoint Control register, array offset: 0xC0, array step: 0x4 */
-         uint8_t RESERVED_0[3];
-  } ENDPOINT[16];
-  __IO uint8_t USBCTRL;                            /**< USB Control register, offset: 0x100 */
-       uint8_t RESERVED_22[3];
-  __I  uint8_t OBSERVE;                            /**< USB OTG Observe register, offset: 0x104 */
-       uint8_t RESERVED_23[3];
-  __IO uint8_t CONTROL;                            /**< USB OTG Control register, offset: 0x108 */
-       uint8_t RESERVED_24[3];
-  __IO uint8_t USBTRC0;                            /**< USB Transceiver Control Register 0, offset: 0x10C */
-       uint8_t RESERVED_25[7];
-  __IO uint8_t USBFRMADJUST;                       /**< Frame Adjust Register, offset: 0x114 */
-} USB_Type;
-
-/* ----------------------------------------------------------------------------
-   -- USB Register Masks
-   ---------------------------------------------------------------------------- */
-
-/*!
- * @addtogroup USB_Register_Masks USB Register Masks
- * @{
- */
-
-/*! @name PERID - Peripheral ID register */
-#define USB_PERID_ID_MASK                        (0x3FU)
-#define USB_PERID_ID_SHIFT                       (0U)
-#define USB_PERID_ID(x)                          (((uint8_t)(((uint8_t)(x)) << USB_PERID_ID_SHIFT)) & USB_PERID_ID_MASK)
-
-/*! @name IDCOMP - Peripheral ID Complement register */
-#define USB_IDCOMP_NID_MASK                      (0x3FU)
-#define USB_IDCOMP_NID_SHIFT                     (0U)
-#define USB_IDCOMP_NID(x)                        (((uint8_t)(((uint8_t)(x)) << USB_IDCOMP_NID_SHIFT)) & USB_IDCOMP_NID_MASK)
-
-/*! @name REV - Peripheral Revision register */
-#define USB_REV_REV_MASK                         (0xFFU)
-#define USB_REV_REV_SHIFT                        (0U)
-#define USB_REV_REV(x)                           (((uint8_t)(((uint8_t)(x)) << USB_REV_REV_SHIFT)) & USB_REV_REV_MASK)
-
-/*! @name ADDINFO - Peripheral Additional Info register */
-#define USB_ADDINFO_IEHOST_MASK                  (0x1U)
-#define USB_ADDINFO_IEHOST_SHIFT                 (0U)
-#define USB_ADDINFO_IEHOST(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ADDINFO_IEHOST_SHIFT)) & USB_ADDINFO_IEHOST_MASK)
-#define USB_ADDINFO_IRQNUM_MASK                  (0xF8U)
-#define USB_ADDINFO_IRQNUM_SHIFT                 (3U)
-#define USB_ADDINFO_IRQNUM(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ADDINFO_IRQNUM_SHIFT)) & USB_ADDINFO_IRQNUM_MASK)
-
-/*! @name OTGISTAT - OTG Interrupt Status register */
-#define USB_OTGISTAT_AVBUSCHG_MASK               (0x1U)
-#define USB_OTGISTAT_AVBUSCHG_SHIFT              (0U)
-#define USB_OTGISTAT_AVBUSCHG(x)                 (((uint8_t)(((uint8_t)(x)) << USB_OTGISTAT_AVBUSCHG_SHIFT)) & USB_OTGISTAT_AVBUSCHG_MASK)
-#define USB_OTGISTAT_B_SESS_CHG_MASK             (0x4U)
-#define USB_OTGISTAT_B_SESS_CHG_SHIFT            (2U)
-#define USB_OTGISTAT_B_SESS_CHG(x)               (((uint8_t)(((uint8_t)(x)) << USB_OTGISTAT_B_SESS_CHG_SHIFT)) & USB_OTGISTAT_B_SESS_CHG_MASK)
-#define USB_OTGISTAT_SESSVLDCHG_MASK             (0x8U)
-#define USB_OTGISTAT_SESSVLDCHG_SHIFT            (3U)
-#define USB_OTGISTAT_SESSVLDCHG(x)               (((uint8_t)(((uint8_t)(x)) << USB_OTGISTAT_SESSVLDCHG_SHIFT)) & USB_OTGISTAT_SESSVLDCHG_MASK)
-#define USB_OTGISTAT_LINE_STATE_CHG_MASK         (0x20U)
-#define USB_OTGISTAT_LINE_STATE_CHG_SHIFT        (5U)
-#define USB_OTGISTAT_LINE_STATE_CHG(x)           (((uint8_t)(((uint8_t)(x)) << USB_OTGISTAT_LINE_STATE_CHG_SHIFT)) & USB_OTGISTAT_LINE_STATE_CHG_MASK)
-#define USB_OTGISTAT_ONEMSEC_MASK                (0x40U)
-#define USB_OTGISTAT_ONEMSEC_SHIFT               (6U)
-#define USB_OTGISTAT_ONEMSEC(x)                  (((uint8_t)(((uint8_t)(x)) << USB_OTGISTAT_ONEMSEC_SHIFT)) & USB_OTGISTAT_ONEMSEC_MASK)
-#define USB_OTGISTAT_IDCHG_MASK                  (0x80U)
-#define USB_OTGISTAT_IDCHG_SHIFT                 (7U)
-#define USB_OTGISTAT_IDCHG(x)                    (((uint8_t)(((uint8_t)(x)) << USB_OTGISTAT_IDCHG_SHIFT)) & USB_OTGISTAT_IDCHG_MASK)
-
-/*! @name OTGICR - OTG Interrupt Control Register */
-#define USB_OTGICR_AVBUSEN_MASK                  (0x1U)
-#define USB_OTGICR_AVBUSEN_SHIFT                 (0U)
-#define USB_OTGICR_AVBUSEN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_OTGICR_AVBUSEN_SHIFT)) & USB_OTGICR_AVBUSEN_MASK)
-#define USB_OTGICR_BSESSEN_MASK                  (0x4U)
-#define USB_OTGICR_BSESSEN_SHIFT                 (2U)
-#define USB_OTGICR_BSESSEN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_OTGICR_BSESSEN_SHIFT)) & USB_OTGICR_BSESSEN_MASK)
-#define USB_OTGICR_SESSVLDEN_MASK                (0x8U)
-#define USB_OTGICR_SESSVLDEN_SHIFT               (3U)
-#define USB_OTGICR_SESSVLDEN(x)                  (((uint8_t)(((uint8_t)(x)) << USB_OTGICR_SESSVLDEN_SHIFT)) & USB_OTGICR_SESSVLDEN_MASK)
-#define USB_OTGICR_LINESTATEEN_MASK              (0x20U)
-#define USB_OTGICR_LINESTATEEN_SHIFT             (5U)
-#define USB_OTGICR_LINESTATEEN(x)                (((uint8_t)(((uint8_t)(x)) << USB_OTGICR_LINESTATEEN_SHIFT)) & USB_OTGICR_LINESTATEEN_MASK)
-#define USB_OTGICR_ONEMSECEN_MASK                (0x40U)
-#define USB_OTGICR_ONEMSECEN_SHIFT               (6U)
-#define USB_OTGICR_ONEMSECEN(x)                  (((uint8_t)(((uint8_t)(x)) << USB_OTGICR_ONEMSECEN_SHIFT)) & USB_OTGICR_ONEMSECEN_MASK)
-#define USB_OTGICR_IDEN_MASK                     (0x80U)
-#define USB_OTGICR_IDEN_SHIFT                    (7U)
-#define USB_OTGICR_IDEN(x)                       (((uint8_t)(((uint8_t)(x)) << USB_OTGICR_IDEN_SHIFT)) & USB_OTGICR_IDEN_MASK)
-
-/*! @name OTGSTAT - OTG Status register */
-#define USB_OTGSTAT_AVBUSVLD_MASK                (0x1U)
-#define USB_OTGSTAT_AVBUSVLD_SHIFT               (0U)
-#define USB_OTGSTAT_AVBUSVLD(x)                  (((uint8_t)(((uint8_t)(x)) << USB_OTGSTAT_AVBUSVLD_SHIFT)) & USB_OTGSTAT_AVBUSVLD_MASK)
-#define USB_OTGSTAT_BSESSEND_MASK                (0x4U)
-#define USB_OTGSTAT_BSESSEND_SHIFT               (2U)
-#define USB_OTGSTAT_BSESSEND(x)                  (((uint8_t)(((uint8_t)(x)) << USB_OTGSTAT_BSESSEND_SHIFT)) & USB_OTGSTAT_BSESSEND_MASK)
-#define USB_OTGSTAT_SESS_VLD_MASK                (0x8U)
-#define USB_OTGSTAT_SESS_VLD_SHIFT               (3U)
-#define USB_OTGSTAT_SESS_VLD(x)                  (((uint8_t)(((uint8_t)(x)) << USB_OTGSTAT_SESS_VLD_SHIFT)) & USB_OTGSTAT_SESS_VLD_MASK)
-#define USB_OTGSTAT_LINESTATESTABLE_MASK         (0x20U)
-#define USB_OTGSTAT_LINESTATESTABLE_SHIFT        (5U)
-#define USB_OTGSTAT_LINESTATESTABLE(x)           (((uint8_t)(((uint8_t)(x)) << USB_OTGSTAT_LINESTATESTABLE_SHIFT)) & USB_OTGSTAT_LINESTATESTABLE_MASK)
-#define USB_OTGSTAT_ONEMSECEN_MASK               (0x40U)
-#define USB_OTGSTAT_ONEMSECEN_SHIFT              (6U)
-#define USB_OTGSTAT_ONEMSECEN(x)                 (((uint8_t)(((uint8_t)(x)) << USB_OTGSTAT_ONEMSECEN_SHIFT)) & USB_OTGSTAT_ONEMSECEN_MASK)
-#define USB_OTGSTAT_ID_MASK                      (0x80U)
-#define USB_OTGSTAT_ID_SHIFT                     (7U)
-#define USB_OTGSTAT_ID(x)                        (((uint8_t)(((uint8_t)(x)) << USB_OTGSTAT_ID_SHIFT)) & USB_OTGSTAT_ID_MASK)
-
-/*! @name OTGCTL - OTG Control register */
-#define USB_OTGCTL_OTGEN_MASK                    (0x4U)
-#define USB_OTGCTL_OTGEN_SHIFT                   (2U)
-#define USB_OTGCTL_OTGEN(x)                      (((uint8_t)(((uint8_t)(x)) << USB_OTGCTL_OTGEN_SHIFT)) & USB_OTGCTL_OTGEN_MASK)
-#define USB_OTGCTL_DMLOW_MASK                    (0x10U)
-#define USB_OTGCTL_DMLOW_SHIFT                   (4U)
-#define USB_OTGCTL_DMLOW(x)                      (((uint8_t)(((uint8_t)(x)) << USB_OTGCTL_DMLOW_SHIFT)) & USB_OTGCTL_DMLOW_MASK)
-#define USB_OTGCTL_DPLOW_MASK                    (0x20U)
-#define USB_OTGCTL_DPLOW_SHIFT                   (5U)
-#define USB_OTGCTL_DPLOW(x)                      (((uint8_t)(((uint8_t)(x)) << USB_OTGCTL_DPLOW_SHIFT)) & USB_OTGCTL_DPLOW_MASK)
-#define USB_OTGCTL_DPHIGH_MASK                   (0x80U)
-#define USB_OTGCTL_DPHIGH_SHIFT                  (7U)
-#define USB_OTGCTL_DPHIGH(x)                     (((uint8_t)(((uint8_t)(x)) << USB_OTGCTL_DPHIGH_SHIFT)) & USB_OTGCTL_DPHIGH_MASK)
-
-/*! @name ISTAT - Interrupt Status register */
-#define USB_ISTAT_USBRST_MASK                    (0x1U)
-#define USB_ISTAT_USBRST_SHIFT                   (0U)
-#define USB_ISTAT_USBRST(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ISTAT_USBRST_SHIFT)) & USB_ISTAT_USBRST_MASK)
-#define USB_ISTAT_ERROR_MASK                     (0x2U)
-#define USB_ISTAT_ERROR_SHIFT                    (1U)
-#define USB_ISTAT_ERROR(x)                       (((uint8_t)(((uint8_t)(x)) << USB_ISTAT_ERROR_SHIFT)) & USB_ISTAT_ERROR_MASK)
-#define USB_ISTAT_SOFTOK_MASK                    (0x4U)
-#define USB_ISTAT_SOFTOK_SHIFT                   (2U)
-#define USB_ISTAT_SOFTOK(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ISTAT_SOFTOK_SHIFT)) & USB_ISTAT_SOFTOK_MASK)
-#define USB_ISTAT_TOKDNE_MASK                    (0x8U)
-#define USB_ISTAT_TOKDNE_SHIFT                   (3U)
-#define USB_ISTAT_TOKDNE(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ISTAT_TOKDNE_SHIFT)) & USB_ISTAT_TOKDNE_MASK)
-#define USB_ISTAT_SLEEP_MASK                     (0x10U)
-#define USB_ISTAT_SLEEP_SHIFT                    (4U)
-#define USB_ISTAT_SLEEP(x)                       (((uint8_t)(((uint8_t)(x)) << USB_ISTAT_SLEEP_SHIFT)) & USB_ISTAT_SLEEP_MASK)
-#define USB_ISTAT_RESUME_MASK                    (0x20U)
-#define USB_ISTAT_RESUME_SHIFT                   (5U)
-#define USB_ISTAT_RESUME(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ISTAT_RESUME_SHIFT)) & USB_ISTAT_RESUME_MASK)
-#define USB_ISTAT_ATTACH_MASK                    (0x40U)
-#define USB_ISTAT_ATTACH_SHIFT                   (6U)
-#define USB_ISTAT_ATTACH(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ISTAT_ATTACH_SHIFT)) & USB_ISTAT_ATTACH_MASK)
-#define USB_ISTAT_STALL_MASK                     (0x80U)
-#define USB_ISTAT_STALL_SHIFT                    (7U)
-#define USB_ISTAT_STALL(x)                       (((uint8_t)(((uint8_t)(x)) << USB_ISTAT_STALL_SHIFT)) & USB_ISTAT_STALL_MASK)
-
-/*! @name INTEN - Interrupt Enable register */
-#define USB_INTEN_USBRSTEN_MASK                  (0x1U)
-#define USB_INTEN_USBRSTEN_SHIFT                 (0U)
-#define USB_INTEN_USBRSTEN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_INTEN_USBRSTEN_SHIFT)) & USB_INTEN_USBRSTEN_MASK)
-#define USB_INTEN_ERROREN_MASK                   (0x2U)
-#define USB_INTEN_ERROREN_SHIFT                  (1U)
-#define USB_INTEN_ERROREN(x)                     (((uint8_t)(((uint8_t)(x)) << USB_INTEN_ERROREN_SHIFT)) & USB_INTEN_ERROREN_MASK)
-#define USB_INTEN_SOFTOKEN_MASK                  (0x4U)
-#define USB_INTEN_SOFTOKEN_SHIFT                 (2U)
-#define USB_INTEN_SOFTOKEN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_INTEN_SOFTOKEN_SHIFT)) & USB_INTEN_SOFTOKEN_MASK)
-#define USB_INTEN_TOKDNEEN_MASK                  (0x8U)
-#define USB_INTEN_TOKDNEEN_SHIFT                 (3U)
-#define USB_INTEN_TOKDNEEN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_INTEN_TOKDNEEN_SHIFT)) & USB_INTEN_TOKDNEEN_MASK)
-#define USB_INTEN_SLEEPEN_MASK                   (0x10U)
-#define USB_INTEN_SLEEPEN_SHIFT                  (4U)
-#define USB_INTEN_SLEEPEN(x)                     (((uint8_t)(((uint8_t)(x)) << USB_INTEN_SLEEPEN_SHIFT)) & USB_INTEN_SLEEPEN_MASK)
-#define USB_INTEN_RESUMEEN_MASK                  (0x20U)
-#define USB_INTEN_RESUMEEN_SHIFT                 (5U)
-#define USB_INTEN_RESUMEEN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_INTEN_RESUMEEN_SHIFT)) & USB_INTEN_RESUMEEN_MASK)
-#define USB_INTEN_ATTACHEN_MASK                  (0x40U)
-#define USB_INTEN_ATTACHEN_SHIFT                 (6U)
-#define USB_INTEN_ATTACHEN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_INTEN_ATTACHEN_SHIFT)) & USB_INTEN_ATTACHEN_MASK)
-#define USB_INTEN_STALLEN_MASK                   (0x80U)
-#define USB_INTEN_STALLEN_SHIFT                  (7U)
-#define USB_INTEN_STALLEN(x)                     (((uint8_t)(((uint8_t)(x)) << USB_INTEN_STALLEN_SHIFT)) & USB_INTEN_STALLEN_MASK)
-
-/*! @name ERRSTAT - Error Interrupt Status register */
-#define USB_ERRSTAT_PIDERR_MASK                  (0x1U)
-#define USB_ERRSTAT_PIDERR_SHIFT                 (0U)
-#define USB_ERRSTAT_PIDERR(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ERRSTAT_PIDERR_SHIFT)) & USB_ERRSTAT_PIDERR_MASK)
-#define USB_ERRSTAT_CRC5EOF_MASK                 (0x2U)
-#define USB_ERRSTAT_CRC5EOF_SHIFT                (1U)
-#define USB_ERRSTAT_CRC5EOF(x)                   (((uint8_t)(((uint8_t)(x)) << USB_ERRSTAT_CRC5EOF_SHIFT)) & USB_ERRSTAT_CRC5EOF_MASK)
-#define USB_ERRSTAT_CRC16_MASK                   (0x4U)
-#define USB_ERRSTAT_CRC16_SHIFT                  (2U)
-#define USB_ERRSTAT_CRC16(x)                     (((uint8_t)(((uint8_t)(x)) << USB_ERRSTAT_CRC16_SHIFT)) & USB_ERRSTAT_CRC16_MASK)
-#define USB_ERRSTAT_DFN8_MASK                    (0x8U)
-#define USB_ERRSTAT_DFN8_SHIFT                   (3U)
-#define USB_ERRSTAT_DFN8(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ERRSTAT_DFN8_SHIFT)) & USB_ERRSTAT_DFN8_MASK)
-#define USB_ERRSTAT_BTOERR_MASK                  (0x10U)
-#define USB_ERRSTAT_BTOERR_SHIFT                 (4U)
-#define USB_ERRSTAT_BTOERR(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ERRSTAT_BTOERR_SHIFT)) & USB_ERRSTAT_BTOERR_MASK)
-#define USB_ERRSTAT_DMAERR_MASK                  (0x20U)
-#define USB_ERRSTAT_DMAERR_SHIFT                 (5U)
-#define USB_ERRSTAT_DMAERR(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ERRSTAT_DMAERR_SHIFT)) & USB_ERRSTAT_DMAERR_MASK)
-#define USB_ERRSTAT_BTSERR_MASK                  (0x80U)
-#define USB_ERRSTAT_BTSERR_SHIFT                 (7U)
-#define USB_ERRSTAT_BTSERR(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ERRSTAT_BTSERR_SHIFT)) & USB_ERRSTAT_BTSERR_MASK)
-
-/*! @name ERREN - Error Interrupt Enable register */
-#define USB_ERREN_PIDERREN_MASK                  (0x1U)
-#define USB_ERREN_PIDERREN_SHIFT                 (0U)
-#define USB_ERREN_PIDERREN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ERREN_PIDERREN_SHIFT)) & USB_ERREN_PIDERREN_MASK)
-#define USB_ERREN_CRC5EOFEN_MASK                 (0x2U)
-#define USB_ERREN_CRC5EOFEN_SHIFT                (1U)
-#define USB_ERREN_CRC5EOFEN(x)                   (((uint8_t)(((uint8_t)(x)) << USB_ERREN_CRC5EOFEN_SHIFT)) & USB_ERREN_CRC5EOFEN_MASK)
-#define USB_ERREN_CRC16EN_MASK                   (0x4U)
-#define USB_ERREN_CRC16EN_SHIFT                  (2U)
-#define USB_ERREN_CRC16EN(x)                     (((uint8_t)(((uint8_t)(x)) << USB_ERREN_CRC16EN_SHIFT)) & USB_ERREN_CRC16EN_MASK)
-#define USB_ERREN_DFN8EN_MASK                    (0x8U)
-#define USB_ERREN_DFN8EN_SHIFT                   (3U)
-#define USB_ERREN_DFN8EN(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ERREN_DFN8EN_SHIFT)) & USB_ERREN_DFN8EN_MASK)
-#define USB_ERREN_BTOERREN_MASK                  (0x10U)
-#define USB_ERREN_BTOERREN_SHIFT                 (4U)
-#define USB_ERREN_BTOERREN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ERREN_BTOERREN_SHIFT)) & USB_ERREN_BTOERREN_MASK)
-#define USB_ERREN_DMAERREN_MASK                  (0x20U)
-#define USB_ERREN_DMAERREN_SHIFT                 (5U)
-#define USB_ERREN_DMAERREN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ERREN_DMAERREN_SHIFT)) & USB_ERREN_DMAERREN_MASK)
-#define USB_ERREN_BTSERREN_MASK                  (0x80U)
-#define USB_ERREN_BTSERREN_SHIFT                 (7U)
-#define USB_ERREN_BTSERREN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ERREN_BTSERREN_SHIFT)) & USB_ERREN_BTSERREN_MASK)
-
-/*! @name STAT - Status register */
-#define USB_STAT_ODD_MASK                        (0x4U)
-#define USB_STAT_ODD_SHIFT                       (2U)
-#define USB_STAT_ODD(x)                          (((uint8_t)(((uint8_t)(x)) << USB_STAT_ODD_SHIFT)) & USB_STAT_ODD_MASK)
-#define USB_STAT_TX_MASK                         (0x8U)
-#define USB_STAT_TX_SHIFT                        (3U)
-#define USB_STAT_TX(x)                           (((uint8_t)(((uint8_t)(x)) << USB_STAT_TX_SHIFT)) & USB_STAT_TX_MASK)
-#define USB_STAT_ENDP_MASK                       (0xF0U)
-#define USB_STAT_ENDP_SHIFT                      (4U)
-#define USB_STAT_ENDP(x)                         (((uint8_t)(((uint8_t)(x)) << USB_STAT_ENDP_SHIFT)) & USB_STAT_ENDP_MASK)
-
-/*! @name CTL - Control register */
-#define USB_CTL_USBENSOFEN_MASK                  (0x1U)
-#define USB_CTL_USBENSOFEN_SHIFT                 (0U)
-#define USB_CTL_USBENSOFEN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_CTL_USBENSOFEN_SHIFT)) & USB_CTL_USBENSOFEN_MASK)
-#define USB_CTL_ODDRST_MASK                      (0x2U)
-#define USB_CTL_ODDRST_SHIFT                     (1U)
-#define USB_CTL_ODDRST(x)                        (((uint8_t)(((uint8_t)(x)) << USB_CTL_ODDRST_SHIFT)) & USB_CTL_ODDRST_MASK)
-#define USB_CTL_RESUME_MASK                      (0x4U)
-#define USB_CTL_RESUME_SHIFT                     (2U)
-#define USB_CTL_RESUME(x)                        (((uint8_t)(((uint8_t)(x)) << USB_CTL_RESUME_SHIFT)) & USB_CTL_RESUME_MASK)
-#define USB_CTL_HOSTMODEEN_MASK                  (0x8U)
-#define USB_CTL_HOSTMODEEN_SHIFT                 (3U)
-#define USB_CTL_HOSTMODEEN(x)                    (((uint8_t)(((uint8_t)(x)) << USB_CTL_HOSTMODEEN_SHIFT)) & USB_CTL_HOSTMODEEN_MASK)
-#define USB_CTL_RESET_MASK                       (0x10U)
-#define USB_CTL_RESET_SHIFT                      (4U)
-#define USB_CTL_RESET(x)                         (((uint8_t)(((uint8_t)(x)) << USB_CTL_RESET_SHIFT)) & USB_CTL_RESET_MASK)
-#define USB_CTL_TXSUSPENDTOKENBUSY_MASK          (0x20U)
-#define USB_CTL_TXSUSPENDTOKENBUSY_SHIFT         (5U)
-#define USB_CTL_TXSUSPENDTOKENBUSY(x)            (((uint8_t)(((uint8_t)(x)) << USB_CTL_TXSUSPENDTOKENBUSY_SHIFT)) & USB_CTL_TXSUSPENDTOKENBUSY_MASK)
-#define USB_CTL_SE0_MASK                         (0x40U)
-#define USB_CTL_SE0_SHIFT                        (6U)
-#define USB_CTL_SE0(x)                           (((uint8_t)(((uint8_t)(x)) << USB_CTL_SE0_SHIFT)) & USB_CTL_SE0_MASK)
-#define USB_CTL_JSTATE_MASK                      (0x80U)
-#define USB_CTL_JSTATE_SHIFT                     (7U)
-#define USB_CTL_JSTATE(x)                        (((uint8_t)(((uint8_t)(x)) << USB_CTL_JSTATE_SHIFT)) & USB_CTL_JSTATE_MASK)
-
-/*! @name ADDR - Address register */
-#define USB_ADDR_ADDR_MASK                       (0x7FU)
-#define USB_ADDR_ADDR_SHIFT                      (0U)
-#define USB_ADDR_ADDR(x)                         (((uint8_t)(((uint8_t)(x)) << USB_ADDR_ADDR_SHIFT)) & USB_ADDR_ADDR_MASK)
-#define USB_ADDR_LSEN_MASK                       (0x80U)
-#define USB_ADDR_LSEN_SHIFT                      (7U)
-#define USB_ADDR_LSEN(x)                         (((uint8_t)(((uint8_t)(x)) << USB_ADDR_LSEN_SHIFT)) & USB_ADDR_LSEN_MASK)
-
-/*! @name BDTPAGE1 - BDT Page Register 1 */
-#define USB_BDTPAGE1_BDTBA_MASK                  (0xFEU)
-#define USB_BDTPAGE1_BDTBA_SHIFT                 (1U)
-#define USB_BDTPAGE1_BDTBA(x)                    (((uint8_t)(((uint8_t)(x)) << USB_BDTPAGE1_BDTBA_SHIFT)) & USB_BDTPAGE1_BDTBA_MASK)
-
-/*! @name FRMNUML - Frame Number Register Low */
-#define USB_FRMNUML_FRM_MASK                     (0xFFU)
-#define USB_FRMNUML_FRM_SHIFT                    (0U)
-#define USB_FRMNUML_FRM(x)                       (((uint8_t)(((uint8_t)(x)) << USB_FRMNUML_FRM_SHIFT)) & USB_FRMNUML_FRM_MASK)
-
-/*! @name FRMNUMH - Frame Number Register High */
-#define USB_FRMNUMH_FRM_MASK                     (0x7U)
-#define USB_FRMNUMH_FRM_SHIFT                    (0U)
-#define USB_FRMNUMH_FRM(x)                       (((uint8_t)(((uint8_t)(x)) << USB_FRMNUMH_FRM_SHIFT)) & USB_FRMNUMH_FRM_MASK)
-
-/*! @name TOKEN - Token register */
-#define USB_TOKEN_TOKENENDPT_MASK                (0xFU)
-#define USB_TOKEN_TOKENENDPT_SHIFT               (0U)
-#define USB_TOKEN_TOKENENDPT(x)                  (((uint8_t)(((uint8_t)(x)) << USB_TOKEN_TOKENENDPT_SHIFT)) & USB_TOKEN_TOKENENDPT_MASK)
-#define USB_TOKEN_TOKENPID_MASK                  (0xF0U)
-#define USB_TOKEN_TOKENPID_SHIFT                 (4U)
-#define USB_TOKEN_TOKENPID(x)                    (((uint8_t)(((uint8_t)(x)) << USB_TOKEN_TOKENPID_SHIFT)) & USB_TOKEN_TOKENPID_MASK)
-
-/*! @name SOFTHLD - SOF Threshold Register */
-#define USB_SOFTHLD_CNT_MASK                     (0xFFU)
-#define USB_SOFTHLD_CNT_SHIFT                    (0U)
-#define USB_SOFTHLD_CNT(x)                       (((uint8_t)(((uint8_t)(x)) << USB_SOFTHLD_CNT_SHIFT)) & USB_SOFTHLD_CNT_MASK)
-
-/*! @name BDTPAGE2 - BDT Page Register 2 */
-#define USB_BDTPAGE2_BDTBA_MASK                  (0xFFU)
-#define USB_BDTPAGE2_BDTBA_SHIFT                 (0U)
-#define USB_BDTPAGE2_BDTBA(x)                    (((uint8_t)(((uint8_t)(x)) << USB_BDTPAGE2_BDTBA_SHIFT)) & USB_BDTPAGE2_BDTBA_MASK)
-
-/*! @name BDTPAGE3 - BDT Page Register 3 */
-#define USB_BDTPAGE3_BDTBA_MASK                  (0xFFU)
-#define USB_BDTPAGE3_BDTBA_SHIFT                 (0U)
-#define USB_BDTPAGE3_BDTBA(x)                    (((uint8_t)(((uint8_t)(x)) << USB_BDTPAGE3_BDTBA_SHIFT)) & USB_BDTPAGE3_BDTBA_MASK)
-
-/*! @name ENDPT - Endpoint Control register */
-#define USB_ENDPT_EPHSHK_MASK                    (0x1U)
-#define USB_ENDPT_EPHSHK_SHIFT                   (0U)
-#define USB_ENDPT_EPHSHK(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ENDPT_EPHSHK_SHIFT)) & USB_ENDPT_EPHSHK_MASK)
-#define USB_ENDPT_EPSTALL_MASK                   (0x2U)
-#define USB_ENDPT_EPSTALL_SHIFT                  (1U)
-#define USB_ENDPT_EPSTALL(x)                     (((uint8_t)(((uint8_t)(x)) << USB_ENDPT_EPSTALL_SHIFT)) & USB_ENDPT_EPSTALL_MASK)
-#define USB_ENDPT_EPTXEN_MASK                    (0x4U)
-#define USB_ENDPT_EPTXEN_SHIFT                   (2U)
-#define USB_ENDPT_EPTXEN(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ENDPT_EPTXEN_SHIFT)) & USB_ENDPT_EPTXEN_MASK)
-#define USB_ENDPT_EPRXEN_MASK                    (0x8U)
-#define USB_ENDPT_EPRXEN_SHIFT                   (3U)
-#define USB_ENDPT_EPRXEN(x)                      (((uint8_t)(((uint8_t)(x)) << USB_ENDPT_EPRXEN_SHIFT)) & USB_ENDPT_EPRXEN_MASK)
-#define USB_ENDPT_EPCTLDIS_MASK                  (0x10U)
-#define USB_ENDPT_EPCTLDIS_SHIFT                 (4U)
-#define USB_ENDPT_EPCTLDIS(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ENDPT_EPCTLDIS_SHIFT)) & USB_ENDPT_EPCTLDIS_MASK)
-#define USB_ENDPT_RETRYDIS_MASK                  (0x40U)
-#define USB_ENDPT_RETRYDIS_SHIFT                 (6U)
-#define USB_ENDPT_RETRYDIS(x)                    (((uint8_t)(((uint8_t)(x)) << USB_ENDPT_RETRYDIS_SHIFT)) & USB_ENDPT_RETRYDIS_MASK)
-#define USB_ENDPT_HOSTWOHUB_MASK                 (0x80U)
-#define USB_ENDPT_HOSTWOHUB_SHIFT                (7U)
-#define USB_ENDPT_HOSTWOHUB(x)                   (((uint8_t)(((uint8_t)(x)) << USB_ENDPT_HOSTWOHUB_SHIFT)) & USB_ENDPT_HOSTWOHUB_MASK)
-
-/* The count of USB_ENDPT */
-#define USB_ENDPT_COUNT                          (16U)
-
-/*! @name USBCTRL - USB Control register */
-#define USB_USBCTRL_PDE_MASK                     (0x40U)
-#define USB_USBCTRL_PDE_SHIFT                    (6U)
-#define USB_USBCTRL_PDE(x)                       (((uint8_t)(((uint8_t)(x)) << USB_USBCTRL_PDE_SHIFT)) & USB_USBCTRL_PDE_MASK)
-#define USB_USBCTRL_SUSP_MASK                    (0x80U)
-#define USB_USBCTRL_SUSP_SHIFT                   (7U)
-#define USB_USBCTRL_SUSP(x)                      (((uint8_t)(((uint8_t)(x)) << USB_USBCTRL_SUSP_SHIFT)) & USB_USBCTRL_SUSP_MASK)
-
-/*! @name OBSERVE - USB OTG Observe register */
-#define USB_OBSERVE_DMPD_MASK                    (0x10U)
-#define USB_OBSERVE_DMPD_SHIFT                   (4U)
-#define USB_OBSERVE_DMPD(x)                      (((uint8_t)(((uint8_t)(x)) << USB_OBSERVE_DMPD_SHIFT)) & USB_OBSERVE_DMPD_MASK)
-#define USB_OBSERVE_DPPD_MASK                    (0x40U)
-#define USB_OBSERVE_DPPD_SHIFT                   (6U)
-#define USB_OBSERVE_DPPD(x)                      (((uint8_t)(((uint8_t)(x)) << USB_OBSERVE_DPPD_SHIFT)) & USB_OBSERVE_DPPD_MASK)
-#define USB_OBSERVE_DPPU_MASK                    (0x80U)
-#define USB_OBSERVE_DPPU_SHIFT                   (7U)
-#define USB_OBSERVE_DPPU(x)                      (((uint8_t)(((uint8_t)(x)) << USB_OBSERVE_DPPU_SHIFT)) & USB_OBSERVE_DPPU_MASK)
-
-/*! @name CONTROL - USB OTG Control register */
-#define USB_CONTROL_DPPULLUPNONOTG_MASK          (0x10U)
-#define USB_CONTROL_DPPULLUPNONOTG_SHIFT         (4U)
-#define USB_CONTROL_DPPULLUPNONOTG(x)            (((uint8_t)(((uint8_t)(x)) << USB_CONTROL_DPPULLUPNONOTG_SHIFT)) & USB_CONTROL_DPPULLUPNONOTG_MASK)
-
-/*! @name USBTRC0 - USB Transceiver Control Register 0 */
-#define USB_USBTRC0_USB_RESUME_INT_MASK          (0x1U)
-#define USB_USBTRC0_USB_RESUME_INT_SHIFT         (0U)
-#define USB_USBTRC0_USB_RESUME_INT(x)            (((uint8_t)(((uint8_t)(x)) << USB_USBTRC0_USB_RESUME_INT_SHIFT)) & USB_USBTRC0_USB_RESUME_INT_MASK)
-#define USB_USBTRC0_SYNC_DET_MASK                (0x2U)
-#define USB_USBTRC0_SYNC_DET_SHIFT               (1U)
-#define USB_USBTRC0_SYNC_DET(x)                  (((uint8_t)(((uint8_t)(x)) << USB_USBTRC0_SYNC_DET_SHIFT)) & USB_USBTRC0_SYNC_DET_MASK)
-#define USB_USBTRC0_USBRESMEN_MASK               (0x20U)
-#define USB_USBTRC0_USBRESMEN_SHIFT              (5U)
-#define USB_USBTRC0_USBRESMEN(x)                 (((uint8_t)(((uint8_t)(x)) << USB_USBTRC0_USBRESMEN_SHIFT)) & USB_USBTRC0_USBRESMEN_MASK)
-#define USB_USBTRC0_USBRESET_MASK                (0x80U)
-#define USB_USBTRC0_USBRESET_SHIFT               (7U)
-#define USB_USBTRC0_USBRESET(x)                  (((uint8_t)(((uint8_t)(x)) << USB_USBTRC0_USBRESET_SHIFT)) & USB_USBTRC0_USBRESET_MASK)
-
-/*! @name USBFRMADJUST - Frame Adjust Register */
-#define USB_USBFRMADJUST_ADJ_MASK                (0xFFU)
-#define USB_USBFRMADJUST_ADJ_SHIFT               (0U)
-#define USB_USBFRMADJUST_ADJ(x)                  (((uint8_t)(((uint8_t)(x)) << USB_USBFRMADJUST_ADJ_SHIFT)) & USB_USBFRMADJUST_ADJ_MASK)
-
-
-/*!
- * @}
- */ /* end of group USB_Register_Masks */
-
-
-/* USB - Peripheral instance base addresses */
-/** Peripheral USB0 base address */
-#define USB0_BASE                                (0x40072000u)
-/** Peripheral USB0 base pointer */
-#define USB0                                     ((USB_Type *)USB0_BASE)
-/** Array initializer of USB peripheral base addresses */
-#define USB_BASE_ADDRS                           { USB0_BASE }
-/** Array initializer of USB peripheral base pointers */
-#define USB_BASE_PTRS                            { USB0 }
-/** Interrupt vectors for the USB peripheral type */
-#define USB_IRQS                                 { USB0_IRQn }
-
-/*!
- * @}
- */ /* end of group USB_Peripheral_Access_Layer */
-
-
-/* ----------------------------------------------------------------------------
-   -- USBDCD Peripheral Access Layer
-   ---------------------------------------------------------------------------- */
-
-/*!
- * @addtogroup USBDCD_Peripheral_Access_Layer USBDCD Peripheral Access Layer
- * @{
- */
-
-/** USBDCD - Register Layout Typedef */
-typedef struct {
-  __IO uint32_t CONTROL;                           /**< Control register, offset: 0x0 */
-  __IO uint32_t CLOCK;                             /**< Clock register, offset: 0x4 */
-  __I  uint32_t STATUS;                            /**< Status register, offset: 0x8 */
-       uint8_t RESERVED_0[4];
-  __IO uint32_t TIMER0;                            /**< TIMER0 register, offset: 0x10 */
-  __IO uint32_t TIMER1;                            /**< TIMER1 register, offset: 0x14 */
-  __IO uint32_t TIMER2;                            /**< TIMER2 register, offset: 0x18 */
-} USBDCD_Type;
-
-/* ----------------------------------------------------------------------------
-   -- USBDCD Register Masks
-   ---------------------------------------------------------------------------- */
-
-/*!
- * @addtogroup USBDCD_Register_Masks USBDCD Register Masks
- * @{
- */
-
-/*! @name CONTROL - Control register */
-#define USBDCD_CONTROL_IACK_MASK                 (0x1U)
-#define USBDCD_CONTROL_IACK_SHIFT                (0U)
-#define USBDCD_CONTROL_IACK(x)                   (((uint32_t)(((uint32_t)(x)) << USBDCD_CONTROL_IACK_SHIFT)) & USBDCD_CONTROL_IACK_MASK)
-#define USBDCD_CONTROL_IF_MASK                   (0x100U)
-#define USBDCD_CONTROL_IF_SHIFT                  (8U)
-#define USBDCD_CONTROL_IF(x)                     (((uint32_t)(((uint32_t)(x)) << USBDCD_CONTROL_IF_SHIFT)) & USBDCD_CONTROL_IF_MASK)
-#define USBDCD_CONTROL_IE_MASK                   (0x10000U)
-#define USBDCD_CONTROL_IE_SHIFT                  (16U)
-#define USBDCD_CONTROL_IE(x)                     (((uint32_t)(((uint32_t)(x)) << USBDCD_CONTROL_IE_SHIFT)) & USBDCD_CONTROL_IE_MASK)
-#define USBDCD_CONTROL_START_MASK                (0x1000000U)
-#define USBDCD_CONTROL_START_SHIFT               (24U)
-#define USBDCD_CONTROL_START(x)                  (((uint32_t)(((uint32_t)(x)) << USBDCD_CONTROL_START_SHIFT)) & USBDCD_CONTROL_START_MASK)
-#define USBDCD_CONTROL_SR_MASK                   (0x2000000U)
-#define USBDCD_CONTROL_SR_SHIFT                  (25U)
-#define USBDCD_CONTROL_SR(x)                     (((uint32_t)(((uint32_t)(x)) << USBDCD_CONTROL_SR_SHIFT)) & USBDCD_CONTROL_SR_MASK)
-
-/*! @name CLOCK - Clock register */
-#define USBDCD_CLOCK_CLOCK_UNIT_MASK             (0x1U)
-#define USBDCD_CLOCK_CLOCK_UNIT_SHIFT            (0U)
-#define USBDCD_CLOCK_CLOCK_UNIT(x)               (((uint32_t)(((uint32_t)(x)) << USBDCD_CLOCK_CLOCK_UNIT_SHIFT)) & USBDCD_CLOCK_CLOCK_UNIT_MASK)
-#define USBDCD_CLOCK_CLOCK_SPEED_MASK            (0xFFCU)
-#define USBDCD_CLOCK_CLOCK_SPEED_SHIFT           (2U)
-#define USBDCD_CLOCK_CLOCK_SPEED(x)              (((uint32_t)(((uint32_t)(x)) << USBDCD_CLOCK_CLOCK_SPEED_SHIFT)) & USBDCD_CLOCK_CLOCK_SPEED_MASK)
-
-/*! @name STATUS - Status register */
-#define USBDCD_STATUS_SEQ_RES_MASK               (0x30000U)
-#define USBDCD_STATUS_SEQ_RES_SHIFT              (16U)
-#define USBDCD_STATUS_SEQ_RES(x)                 (((uint32_t)(((uint32_t)(x)) << USBDCD_STATUS_SEQ_RES_SHIFT)) & USBDCD_STATUS_SEQ_RES_MASK)
-#define USBDCD_STATUS_SEQ_STAT_MASK              (0xC0000U)
-#define USBDCD_STATUS_SEQ_STAT_SHIFT             (18U)
-#define USBDCD_STATUS_SEQ_STAT(x)                (((uint32_t)(((uint32_t)(x)) << USBDCD_STATUS_SEQ_STAT_SHIFT)) & USBDCD_STATUS_SEQ_STAT_MASK)
-#define USBDCD_STATUS_ERR_MASK                   (0x100000U)
-#define USBDCD_STATUS_ERR_SHIFT                  (20U)
-#define USBDCD_STATUS_ERR(x)                     (((uint32_t)(((uint32_t)(x)) << USBDCD_STATUS_ERR_SHIFT)) & USBDCD_STATUS_ERR_MASK)
-#define USBDCD_STATUS_TO_MASK                    (0x200000U)
-#define USBDCD_STATUS_TO_SHIFT                   (21U)
-#define USBDCD_STATUS_TO(x)                      (((uint32_t)(((uint32_t)(x)) << USBDCD_STATUS_TO_SHIFT)) & USBDCD_STATUS_TO_MASK)
-#define USBDCD_STATUS_ACTIVE_MASK                (0x400000U)
-#define USBDCD_STATUS_ACTIVE_SHIFT               (22U)
-#define USBDCD_STATUS_ACTIVE(x)                  (((uint32_t)(((uint32_t)(x)) << USBDCD_STATUS_ACTIVE_SHIFT)) & USBDCD_STATUS_ACTIVE_MASK)
-
-/*! @name TIMER0 - TIMER0 register */
-#define USBDCD_TIMER0_TUNITCON_MASK              (0xFFFU)
-#define USBDCD_TIMER0_TUNITCON_SHIFT             (0U)
-#define USBDCD_TIMER0_TUNITCON(x)                (((uint32_t)(((uint32_t)(x)) << USBDCD_TIMER0_TUNITCON_SHIFT)) & USBDCD_TIMER0_TUNITCON_MASK)
-#define USBDCD_TIMER0_TSEQ_INIT_MASK             (0x3FF0000U)
-#define USBDCD_TIMER0_TSEQ_INIT_SHIFT            (16U)
-#define USBDCD_TIMER0_TSEQ_INIT(x)               (((uint32_t)(((uint32_t)(x)) << USBDCD_TIMER0_TSEQ_INIT_SHIFT)) & USBDCD_TIMER0_TSEQ_INIT_MASK)
-
-/*! @name TIMER1 - TIMER1 register */
-#define USBDCD_TIMER1_TVDPSRC_ON_MASK            (0x3FFU)
-#define USBDCD_TIMER1_TVDPSRC_ON_SHIFT           (0U)
-#define USBDCD_TIMER1_TVDPSRC_ON(x)              (((uint32_t)(((uint32_t)(x)) << USBDCD_TIMER1_TVDPSRC_ON_SHIFT)) & USBDCD_TIMER1_TVDPSRC_ON_MASK)
-#define USBDCD_TIMER1_TDCD_DBNC_MASK             (0x3FF0000U)
-#define USBDCD_TIMER1_TDCD_DBNC_SHIFT            (16U)
-#define USBDCD_TIMER1_TDCD_DBNC(x)               (((uint32_t)(((uint32_t)(x)) << USBDCD_TIMER1_TDCD_DBNC_SHIFT)) & USBDCD_TIMER1_TDCD_DBNC_MASK)
-
-/*! @name TIMER2 - TIMER2 register */
-#define USBDCD_TIMER2_CHECK_DM_MASK              (0xFU)
-#define USBDCD_TIMER2_CHECK_DM_SHIFT             (0U)
-#define USBDCD_TIMER2_CHECK_DM(x)                (((uint32_t)(((uint32_t)(x)) << USBDCD_TIMER2_CHECK_DM_SHIFT)) & USBDCD_TIMER2_CHECK_DM_MASK)
-#define USBDCD_TIMER2_TVDPSRC_CON_MASK           (0x3FF0000U)
-#define USBDCD_TIMER2_TVDPSRC_CON_SHIFT          (16U)
-#define USBDCD_TIMER2_TVDPSRC_CON(x)             (((uint32_t)(((uint32_t)(x)) << USBDCD_TIMER2_TVDPSRC_CON_SHIFT)) & USBDCD_TIMER2_TVDPSRC_CON_MASK)
-
-
-/*!
- * @}
- */ /* end of group USBDCD_Register_Masks */
-
-
-/* USBDCD - Peripheral instance base addresses */
-/** Peripheral USBDCD base address */
-#define USBDCD_BASE                              (0x40035000u)
-/** Peripheral USBDCD base pointer */
-#define USBDCD                                   ((USBDCD_Type *)USBDCD_BASE)
-/** Array initializer of USBDCD peripheral base addresses */
-#define USBDCD_BASE_ADDRS                        { USBDCD_BASE }
-/** Array initializer of USBDCD peripheral base pointers */
-#define USBDCD_BASE_PTRS                         { USBDCD }
-/** Interrupt vectors for the USBDCD peripheral type */
-#define USBDCD_IRQS                              { USBDCD_IRQn }
-
-/*!
- * @}
- */ /* end of group USBDCD_Peripheral_Access_Layer */
-
-
-/* ----------------------------------------------------------------------------
    -- WDOG Peripheral Access Layer
    ---------------------------------------------------------------------------- */
 
@@ -8566,6 +7964,29 @@ typedef struct {
 #define UART_WP7816_T_TYPE1_CWI_MASK      UART_WP7816T1_CWI_MASK
 #define UART_WP7816_T_TYPE1_CWI_SHIFT     UART_WP7816T1_CWI_SHIFT
 #define UART_WP7816_T_TYPE1_CWI(X)        UART_WP7816T1_CWI(X)
+#define SIM_SOPT1_USBVSTBY_MASK           This_symbol_has_been_deprecated
+#define SIM_SOPT1_USBVSTBY_SHIFT          This_symbol_has_been_deprecated
+#define SIM_SOPT1_USBSSTBY_MASK           This_symbol_has_been_deprecated
+#define SIM_SOPT1_USBSSTBY_SHIFT          This_symbol_has_been_deprecated
+#define SIM_SOPT1_USBREGEN_MASK           This_symbol_has_been_deprecated
+#define SIM_SOPT1_USBREGEN_SHIFT          This_symbol_has_been_deprecated
+#define SIM_SOPT1CFG_URWE_MASK            This_symbol_has_been_deprecated
+#define SIM_SOPT1CFG_URWE_SHIFT           This_symbol_has_been_deprecated
+#define SIM_SOPT1CFG_UVSWE_MASK           This_symbol_has_been_deprecated
+#define SIM_SOPT1CFG_UVSWE_SHIFT          This_symbol_has_been_deprecated
+#define SIM_SOPT1CFG_USSWE_MASK           This_symbol_has_been_deprecated
+#define SIM_SOPT1CFG_USSWE_SHIFT          This_symbol_has_been_deprecated
+#define SIM_SOPT2_USBSRC_MASK             This_symbol_has_been_deprecated
+#define SIM_SOPT2_USBSRC_SHIFT            This_symbol_has_been_deprecated
+#define SIM_SCGC4_USBOTG_MASK             This_symbol_has_been_deprecated
+#define SIM_SCGC4_USBOTG_SHIFT            This_symbol_has_been_deprecated
+#define SIM_SCGC6_USBDCD_MASK             This_symbol_has_been_deprecated
+#define SIM_SCGC6_USBDCD_SHIFT            This_symbol_has_been_deprecated
+#define SIM_CLKDIV2_USBFRAC_MASK          This_symbol_has_been_deprecated
+#define SIM_CLKDIV2_USBFRAC_SHIFT         This_symbol_has_been_deprecated
+#define SIM_CLKDIV2_USBDIV_MASK           This_symbol_has_been_deprecated
+#define SIM_CLKDIV2_USBDIV_SHIFT          This_symbol_has_been_deprecated
+#define SIM_CLKDIV2_USBDIV(x)             This_symbol_has_been_deprecated
 #define SIM_SCGC6_DAC0_MASK               This_symbol_has_been_deprecated
 #define SIM_SCGC6_DAC0_SHIFT              This_symbol_has_been_deprecated
 #define Watchdog_IRQn                     WDOG_EWM_IRQn
@@ -8579,4 +8000,4 @@ typedef struct {
  * @}
  */ /* end of group SDK_Compatibility_Symbols */
 
-#endif  /* _MKW22D5_H_ */
+#endif  /* _MKW21D5_H_ */

@@ -12639,5 +12639,3 @@ typedef struct {
     #endif /* (!defined(MCU_MEM_MAP_SUPPRESS_VERSION_WARNING)) */
   #endif /* (MCU_MEM_MAP_VERSION != 0x0100u) */
 #endif  /* #if !defined(MK22F25612_H_) */
-
-/* MK22F25612.h, eof. */
