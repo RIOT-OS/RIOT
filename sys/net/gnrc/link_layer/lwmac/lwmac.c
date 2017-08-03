@@ -702,6 +702,7 @@ void rtt_handler(uint32_t event, gnrc_netif_t *netif)
             alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
                                         RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_DURATION_US));
             rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_SLEEP_PENDING);
+
             gnrc_lwmac_set_quit_tx(netif, false);
             gnrc_lwmac_set_quit_rx(netif, false);
             gnrc_lwmac_set_phase_backoff(netif, false);

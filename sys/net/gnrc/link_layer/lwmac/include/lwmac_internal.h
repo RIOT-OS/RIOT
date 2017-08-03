@@ -81,6 +81,11 @@ extern "C" {
 #define GNRC_LWMAC_QUIT_RX              (0x0040U)
 
 /**
+ * @brief   Flag to track if the device has received broadcast packet in last cycle.
+ */
+#define GNRC_NETDEV_LWMAC_GOT_BCAST            (0x0080U)
+
+/**
  * @brief Type to pass information about parsing.
  */
 typedef struct {

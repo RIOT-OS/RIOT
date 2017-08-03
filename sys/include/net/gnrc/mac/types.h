@@ -74,9 +74,11 @@ typedef struct {
 #endif /* (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0) || defined(DOXYGEN) */
 
 #ifdef MODULE_GNRC_LWMAC
-    gnrc_lwmac_l2_addr_t l2_addr; /**< Records the sender's address */
-    gnrc_lwmac_rx_state_t state;  /**< LWMAC specific internal reception state */
-    uint8_t rx_bad_exten_count;   /**< Count how many unnecessary RX extensions have been executed */
+    gnrc_lwmac_l2_addr_t l2_addr;        /**< Records the sender's address */
+    gnrc_lwmac_rx_state_t state;         /**< LWMAC specific internal reception state */
+    uint8_t rx_bad_exten_count;          /**< Count how many unnecessary RX extensions have been executed */
+    gnrc_lwmac_l2_addr_t rx_bcast_id;    /**< Records bcast node's ID in last cycle */
+    uint8_t rx_bcast_seq;                /**< Records bcast node's bcast sequence in last cycle */
 #endif
 
 #ifdef MODULE_GNRC_GOMACH
