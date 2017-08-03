@@ -53,6 +53,7 @@ PSEUDOMODULES += openthread
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += posix
 PSEUDOMODULES += printf_float
+PSEUDOMODULES += pm_common_%
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
