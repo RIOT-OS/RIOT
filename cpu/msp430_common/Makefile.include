@@ -2,6 +2,7 @@ INCLUDES += -I$(RIOTCPU)/msp430_common/include/
 
 export UNDEF += $(BINDIR)/msp430_common/startup.o
 export USEMODULE += msp430_common msp430_common_periph
+export USEMODULE += periph_common_pm_fallback
 
 DEFAULT_MODULE += oneway_malloc
 
