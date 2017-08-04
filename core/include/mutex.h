@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2013, 2014 Freie Universität Berlin
+ *               2013 - 2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +17,7 @@
  * @brief       RIOT synchronization API
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef MUTEX_H
@@ -25,6 +26,11 @@
 #include <stddef.h>
 
 #include "list.h"
+
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+#include "thread.h"
+#include "kernel_types.h"
+#endif
 
 #ifdef __cplusplus
  extern "C" {
@@ -40,18 +46,30 @@ typedef struct {
      * @internal
      */
     list_node_t queue;
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+    kernel_pid_t owner;
+    uint8_t prio_before;
+#endif
 } mutex_t;
 
 /**
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+#define MUTEX_INIT { { NULL }, KERNEL_PID_UNDEF, THREAD_PRIORITY_UNDEF }
+#else
 #define MUTEX_INIT { { NULL } }
+#endif
 
 /**
  * @brief Static initializer for mutex_t with a locked mutex
  */
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+#define MUTEX_INIT_LOCKED { { MUTEX_LOCKED }, KERNEL_PID_UNDEF, THREAD_PRIORITY_UNDEF }
+#else
 #define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
+#endif
 
 /**
  * @cond INTERNAL
