@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +15,7 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -78,6 +79,18 @@ uint8_t _tcb_name_offset = offsetof(thread_t, name);
 static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
 schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
+
+static inline void runqueue_push(thread_t *thread, uint8_t priority) {
+    clist_rpush(&sched_runqueues[priority], &(thread->rq_entry));
+    runqueue_bitcache |= 1 << priority;
+}
+
+static inline void runqueue_pop(thread_t *thread) {
+    clist_lpop(&sched_runqueues[thread->priority]);
+    if (!sched_runqueues[thread->priority].next) {
+        runqueue_bitcache &= ~(1 << thread->priority);
+    }
+}
 
 int __attribute__((used)) sched_run(void)
 {
@@ -164,19 +177,14 @@ void sched_set_status(thread_t *process, unsigned int status)
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
             DEBUG("sched_set_status: adding thread %" PRIkernel_pid " to runqueue %" PRIu8 ".\n",
                   process->pid, process->priority);
-            clist_rpush(&sched_runqueues[process->priority], &(process->rq_entry));
-            runqueue_bitcache |= 1 << process->priority;
+            runqueue_push(process, process->priority);
         }
     }
     else {
         if (process->status >= STATUS_ON_RUNQUEUE) {
             DEBUG("sched_set_status: removing thread %" PRIkernel_pid " to runqueue %" PRIu8 ".\n",
                   process->pid, process->priority);
-            clist_lpop(&sched_runqueues[process->priority]);
-
-            if (!sched_runqueues[process->priority].next) {
-                runqueue_bitcache &= ~(1 << process->priority);
-            }
+            runqueue_pop(process);
         }
     }
 
@@ -221,3 +229,21 @@ NORETURN void sched_task_exit(void)
     sched_active_thread = NULL;
     cpu_switch_context_exit();
 }
+
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+void sched_change_priority(thread_t *thread, uint8_t priority)
+{
+    assert(thread && (priority < SCHED_PRIO_LEVELS));
+
+    if (thread->priority == priority) {
+        return;
+    }
+
+    if (thread->status >= STATUS_ON_RUNQUEUE) {
+        runqueue_pop(thread);
+        runqueue_push(thread, priority);
+    }
+
+    thread->priority = priority;
+}
+#endif
