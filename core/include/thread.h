@@ -119,6 +119,8 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#include <stdint.h>
+
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
@@ -178,7 +180,6 @@ struct _thread {
     char *sp;                       /**< thread's stack pointer         */
     uint8_t status;                 /**< thread's status                */
     uint8_t priority;               /**< thread's priority              */
-
     kernel_pid_t pid;               /**< thread's process id            */
 
 #if defined(MODULE_CORE_THREAD_FLAGS) || defined(DOXYGEN)
@@ -267,6 +268,12 @@ struct _thread {
 #ifndef THREAD_STACKSIZE_MINIMUM
 #define THREAD_STACKSIZE_MINIMUM  (sizeof(thread_t))
 #endif
+
+/**
+ * @def THREAD_PRIORITY_UNDEF
+ * @brief Value for explicitly marking a priority undefined
+ */
+#define THREAD_PRIORITY_UNDEF           (UINT8_MAX)
 
 /**
  * @def THREAD_PRIORITY_MIN
