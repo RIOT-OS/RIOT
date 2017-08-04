@@ -7,7 +7,7 @@ You need to select the `core_priority_inheritance` module (using
 
 Expected result
 ===============
-When successful, you will see the three configured threads printing 15 different
+When successful, you will see the 5 configured threads printing 15 different
 events in a defined order. If the test passes, the output should look like this:
 
 ```
