@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -75,6 +75,7 @@
  * @brief       Scheduler API definition
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef SCHED_H
@@ -173,6 +174,21 @@ extern clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
  * @brief  Removes thread from scheduler and set status to #STATUS_STOPPED
  */
 NORETURN void sched_task_exit(void);
+
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+/**
+ * @brief   Change the priority of the given thread
+ *
+ * @note    This functions expects interrupts to be disabled when called!
+ *
+ * @pre     (thread != NULL)
+ * @pre     (priority < SCHED_PRIO_LEVELS)
+ *
+ * @param[in,out] thread    target thread
+ * @param[in]     priority  new priority to assign to @p thread
+ */
+void sched_change_priority(thread_t *thread, uint8_t priority);
+#endif
 
 #ifdef MODULE_SCHEDSTATISTICS
 /**
