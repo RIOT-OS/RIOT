@@ -176,32 +176,5 @@ extern mtd_dev_t *mtd0;
 #define MULLE_VBAT_ADC_LINE           ADC_LINE(6)
 #define MULLE_VCHR_ADC_LINE           ADC_LINE(7)
 /** @} */
-
-/**
- * @name K60 clock dividers
- */
-/** @{ */
-/**
- * System clock divider setting, the actual hardware register value, see reference manual for details.
- */
-#define CONFIG_CLOCK_K60_SYS_DIV 0x00
-
-/**
- * Bus clock divider setting, the actual hardware register value, see reference manual for details
- */
-#define CONFIG_CLOCK_K60_BUS_DIV 0x01
-
-/**
- * Flexbus clock divider setting, the actual hardware register value, see reference manual for details
- */
-#define CONFIG_CLOCK_K60_FB_DIV 0x01
-
-/**
- * Flash clock divider setting, the actual hardware register value, see reference manual for details
- */
-#define CONFIG_CLOCK_K60_FLASH_DIV 0x03
-
-/** @} */
-
 #endif /* BOARD_H */
 /** @} */

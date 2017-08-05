@@ -91,12 +91,6 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-int timer_set(tim_t tim, int channel, unsigned int timeout)
-{
-    int now = timer_read(tim);
-    return timer_set_absolute(tim, channel, now + timeout);
-}
-
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
     if (channel >= TIMER_CHAN) {

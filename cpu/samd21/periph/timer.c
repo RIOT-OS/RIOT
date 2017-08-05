@@ -131,11 +131,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    return timer_set_absolute(dev, channel, timer_read(dev) + timeout);
-}
-
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
     DEBUG("Setting timer %i channel %i to %i\n", dev, channel, value);
