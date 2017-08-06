@@ -1,0 +1,7 @@
+/**
+ * @defgroup pkg_libfixmath Cross platform fixed point maths library
+ * @ingroup  pkg
+ * @ingroup  sys
+ * @brief    Provides a cross platform fixed point maths library to RIOT.
+ * @see      https://github.com/PetteriAimonen/libfixmath
+ */

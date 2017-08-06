@@ -413,7 +413,8 @@ typedef struct gcoap_listener {
  *
  * If request timed out, the packet header is for the request.
  */
-typedef void (*gcoap_resp_handler_t)(unsigned req_state, coap_pkt_t* pdu);
+typedef void (*gcoap_resp_handler_t)(unsigned req_state, coap_pkt_t* pdu,
+                                     sock_udp_ep_t *remote);
 
 /**
  * @brief   Memo to handle a response for a request

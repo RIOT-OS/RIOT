@@ -211,7 +211,7 @@ static const spi_conf_t spi_config[] = {
         .miso_pin = GPIO_PIN(PORT_A, 6),
         .sclk_pin = GPIO_PIN(PORT_A, 5),
         .cs_pin   = GPIO_UNDEF,
-        .af       = GPIO_AF0,
+        .af       = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
         .apbbus   = APB2
     }
@@ -225,13 +225,6 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define ADC_NUMOF           (0)
-/** @} */
-
-/**
- * @name    DAC configuration
- * @{
- */
-#define DAC_NUMOF           (0)
 /** @} */
 
 /**

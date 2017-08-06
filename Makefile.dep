@@ -56,7 +56,7 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
   USEMODULE += gnrc_ipv6_netif
 endif
 
-ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pktbuf,$(USEMODULE))))
+ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
   USEMODULE += gnrc
 endif
 
@@ -524,6 +524,12 @@ ifneq (,$(filter netstats_%, $(USEMODULE)))
   USEMODULE += netstats
 endif
 
+ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
+  USEMODULE += gnrc_mac
+  USEMODULE += gnrc_netdev
+  FEATURES_REQUIRED += periph_rtt
+endif
+
 ifneq (,$(filter pthread,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += timex
@@ -563,6 +569,29 @@ ifneq (,$(filter phydat,$(USEMODULE)))
 endif
 
 ifneq (,$(filter evtimer,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter can_linux,$(USEMODULE)))
+    export LINKFLAGS += -lsocketcan
+endif
+
+ifneq (,$(filter can,$(USEMODULE)))
+  USEMODULE += can_raw
+  USEMODULE += auto_init_can
+  ifneq (,$(filter can_mbox,$(USEMODULE)))
+    USEMODULE += core_mbox
+  endif
+  USEMODULE += gnrc_pktbuf_static
+endif
+
+ifneq (,$(filter can_isotp,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter conn_can,$(USEMODULE)))
+  USEMODULE += can
+  USEMODULE += can_mbox
   USEMODULE += xtimer
 endif
 

@@ -33,30 +33,42 @@ extern "C"
  * @name Clock system configuration
  * @{
  */
-#define KINETIS_CPU_USE_MCG               1
-
-#define KINETIS_MCG_USE_ERC               1
-#define KINETIS_MCG_USE_PLL               0
-#define KINETIS_MCG_DCO_RANGE             (96000000U)
-#define KINETIS_MCG_ERC_OSCILLATOR        0
-#define KINETIS_MCG_ERC_FRDIV             0
-#define KINETIS_MCG_ERC_RANGE             0
-#define KINETIS_MCG_ERC_FREQ              (32768U)
-
-/** Value of the external crystal or oscillator clock frequency in Hz */
-#define CPU_XTAL_CLK_HZ                 8000000u
-/** Value of the external 32k crystal or oscillator clock frequency in Hz */
-#define CPU_XTAL32k_CLK_HZ              32768u
-/** Value of the slow internal oscillator clock frequency in Hz  */
-#define CPU_INT_SLOW_CLK_HZ             32768u
-/** Value of the fast internal oscillator clock frequency in Hz  */
-#define CPU_INT_FAST_CLK_HZ             4000000u
-/** Default System clock value */
-#define DEFAULT_SYSTEM_CLOCK            (CPU_XTAL32k_CLK_HZ * 2929u)
-
-/* bus clock for the peripherals */
-#define CLOCK_CORECLOCK                 (DEFAULT_SYSTEM_CLOCK)
-#define CLOCK_BUSCLOCK                  (CLOCK_CORECLOCK / 2)
+static const clock_config_t clock_config = {
+    /*
+     * This configuration results in the system running from the FLL output with
+     * the following clock frequencies:
+     * Core:  48 MHz
+     * Bus:   48 MHz
+     * Flex:  24 MHz
+     * Flash: 24 MHz
+     */
+    /* The board has a 16 MHz crystal, though it is not used in this configuration */
+    /* This configuration uses the RTC crystal to provide the base clock, it
+     * should have better accuracy than the internal slow clock, and lower power
+     * consumption than using the 16 MHz crystal and the OSC0 module */
+    .clkdiv1 = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV2(0) |
+               SIM_CLKDIV1_OUTDIV3(2) | SIM_CLKDIV1_OUTDIV4(2),
+    .default_mode = KINETIS_MCG_MODE_FEE,
+    .erc_range = KINETIS_MCG_ERC_RANGE_LOW, /* Input clock is 32768 Hz */
+    .fcrdiv = 0, /* Fast IRC divide by 1 => 4 MHz */
+    .oscsel = 1, /* Use RTC for external clock */
+    /* 16 pF capacitors yield ca 10 pF load capacitance as required by the
+     * onboard xtal, not used when OSC0 is disabled */
+    .clc = 0b0001,
+    .fll_frdiv = 0b000, /* Divide by 1 => FLL input 32768 Hz */
+    .fll_factor_fei = KINETIS_MCG_FLL_FACTOR_1464, /* FLL freq = 48 MHz */
+    .fll_factor_fee = KINETIS_MCG_FLL_FACTOR_1464, /* FLL freq = 48 MHz */
+    /* PLL is unavailable when using a 32768 Hz source clock, so the
+     * configuration below can only be used if the above config is modified to
+     * use the 16 MHz crystal instead of the RTC. */
+    .pll_prdiv = 0b00111, /* Divide by 8 */
+    .pll_vdiv = 0b01100, /* Multiply by 36 => PLL freq = 72 MHz */
+    .enable_oscillator = false, /* the RTC module provides the clock input signal */
+    .select_fast_irc = true, /* Only used for FBI mode */
+    .enable_mcgirclk = false,
+};
+#define CLOCK_CORECLOCK              (48000000ul)
+#define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 1)
 /** @} */
 
 /**
@@ -128,43 +140,62 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
- * @name ADC configuration
+ * @name    ADC configuration
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    /* dev, pin, channel */
-    [ 0] = { ADC1, GPIO_UNDEF, 26 },       /* internal: temperature sensor */
-    [ 1] = { ADC1, GPIO_UNDEF, 27 },       /* internal: band gap */
-    [ 2] = { ADC1, GPIO_UNDEF, 29 },       /* internal: V_REFSH */
-    [ 3] = { ADC1, GPIO_UNDEF, 30 },       /* internal: V_REFSL */
-    [ 4] = { ADC1, GPIO_UNDEF, 23 },       /* internal: DAC0 module output level */
-    [ 5] = { ADC1, GPIO_UNDEF, 18 },       /* internal: VREF module output level */
-    [ 6] = { ADC1, GPIO_UNDEF,  0 },       /* on board connection to Mulle Vbat/2 on PGA1_DP pin */
-    [ 7] = { ADC1, GPIO_UNDEF, 19 },       /* on board connection to Mulle Vchr/2 on PGA1_DM pin */
-    [ 8] = { ADC0, GPIO_UNDEF,  0 },       /* expansion port PGA0_DP pin */
-    [ 9] = { ADC0, GPIO_UNDEF, 19 },       /* expansion port PGA0_DM pin */
-    [10] = { ADC1, GPIO_PIN(PORT_A, 17), 17 }, /* expansion port PTA17 */
-    [11] = { ADC1, GPIO_PIN(PORT_B,  0),  8 }, /* expansion port PTB0  */
-    [12] = { ADC0, GPIO_PIN(PORT_C,  0), 14 }, /* expansion port PTC0  */
-    [13] = { ADC1, GPIO_PIN(PORT_C,  8),  4 }, /* expansion port PTC8  */
-    [14] = { ADC1, GPIO_PIN(PORT_C,  9),  5 }, /* expansion port PTC9  */
-    [15] = { ADC1, GPIO_PIN(PORT_C, 10),  6 }, /* expansion port PTC10 */
-    [16] = { ADC1, GPIO_PIN(PORT_C, 11),  7 }, /* expansion port PTC11 */
+    /* internal: temperature sensor */
+    [ 0] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 26 },
+    /* internal: band gap */
+    [ 1] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 27 },
+    /* internal: V_REFSH */
+    [ 2] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 29 },
+    /* internal: V_REFSL */
+    [ 3] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 30 },
+    /* internal: DAC0 module output level */
+    [ 4] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 23 },
+    /* internal: VREF module output level */
+    [ 5] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 18 },
+     /* on board connection to Mulle Vbat/2 on PGA1_DP pin */
+    [ 6] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan =  0 },
+    /* on board connection to Mulle Vchr/2 on PGA1_DM pin */
+    [ 7] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 19 },
+    /* expansion port PGA0_DP pin */
+    [ 8] = { .dev = ADC0, .pin = GPIO_UNDEF,           .chan =  0 },
+    /* expansion port PGA0_DM pin */
+    [ 9] = { .dev = ADC0, .pin = GPIO_UNDEF,           .chan = 19 },
+    /* expansion port PTA17 */
+    [10] = { .dev = ADC1, .pin = GPIO_PIN(PORT_A, 17), .chan = 17 },
+    /* expansion port PTB0  */
+    [11] = { .dev = ADC1, .pin = GPIO_PIN(PORT_B,  0), .chan =  8 },
+    /* expansion port PTC0  */
+    [12] = { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  0), .chan = 14 },
+    /* expansion port PTC8  */
+    [13] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  8), .chan =  4 },
+    /* expansion port PTC9  */
+    [14] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  9), .chan =  5 },
+    /* expansion port PTC10 */
+    [15] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 10), .chan =  6 },
+    /* expansion port PTC11 */
+    [16] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 11), .chan =  7 }
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**
- * @name DAC configuration
+ * @name    DAC configuration
  * @{
  */
+static const dac_conf_t dac_config[] = {
+    {
+        .dev       = DAC0,
+        .scgc_addr = &SIM->SCGC2,
+        .scgc_bit  = SIM_SCGC2_DAC0_SHIFT
+    }
+};
 
-#define DAC_CONFIG { \
-    { DAC0, (uint32_t volatile *)BITBAND_REGADDR(SIM->SCGC2, SIM_SCGC2_DAC0_SHIFT) }, \
-  }
-#define DAC_NUMOF 1
-
+#define DAC_NUMOF           (sizeof(dac_config) / sizeof(dac_config[0]))
 /** @} */
 
 /**
@@ -285,10 +316,8 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define I2C_NUMOF               (1U)
-#define I2C_CLK                 CLOCK_BUSCLOCK
 #define I2C_0_EN                1
 #define I2C_1_EN                0
-#define I2C_IRQ_PRIO            CPU_DEFAULT_IRQ_PRIO
 
 /* I2C 0 device configuration */
 #define I2C_0_DEV               I2C0
@@ -309,9 +338,9 @@ static const spi_conf_t spi_config[] = {
  * @name I2C baud rate configuration
  * @{
  */
-/* Low (10 kHz): MUL = 4, SCL divider = 2560, total: 10240 */
+/* Low (10 kHz): MUL = 2, SCL divider = 2560, total: 5120 */
 #define KINETIS_I2C_F_ICR_LOW        (0x3D)
-#define KINETIS_I2C_F_MULT_LOW       (2)
+#define KINETIS_I2C_F_MULT_LOW       (1)
 /* Normal (100 kHz): MUL = 2, SCL divider = 240, total: 480 */
 #define KINETIS_I2C_F_ICR_NORMAL     (0x1F)
 #define KINETIS_I2C_F_MULT_NORMAL    (1)
@@ -322,14 +351,6 @@ static const spi_conf_t spi_config[] = {
 #define KINETIS_I2C_F_ICR_FAST_PLUS  (0x10)
 #define KINETIS_I2C_F_MULT_FAST_PLUS (0)
 /** @} */
-
-/**
- * @name GPIO configuration
- * @{
- */
-#define GPIO_IRQ_PRIO       CPU_DEFAULT_IRQ_PRIO
-/** @} */
-
 
 /**
  * @name RTC configuration
@@ -359,8 +380,14 @@ static const spi_conf_t spi_config[] = {
  * to the data sheet, the K60 will have a 5 pF parasitic capacitance on the
  * XTAL32/EXTAL32 connection. The board traces might give some minor parasitic
  * capacitance as well. */
-/* enable 6pF load capacitance, might need adjusting.. */
-#define RTT_LOAD_CAP_BITS   (RTC_CR_SC4P_MASK | RTC_CR_SC2P_MASK | RTC_CR_SC1P_MASK)
+/* Use the equation
+ * CL = (C1 * C2) / (C1 + C2) + Cstray
+ * with C1 == C2:
+ * C1 = 2 * (CL - Cstray)
+ */
+/* enable 14pF load capacitor which will yield a crystal load capacitance of 12 pF */
+#define RTC_LOAD_CAP_BITS   (RTC_CR_SC8P_MASK | RTC_CR_SC4P_MASK | RTC_CR_SC2P_MASK)
+
 /** @} */
 
 

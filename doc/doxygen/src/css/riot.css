@@ -144,6 +144,9 @@ div.toc-sm li {
 div.ingroups {
   font-size: 10pt;
 }
+div.ingroups .el::before {
+  content: " ";
+}
 div.header {
   background: none;
   border-bottom: 1px solid #eeeeee;
@@ -194,6 +197,7 @@ div.fragment {
   font-size: 14px;
   line-height: 1.42857143;
   margin: 0 0 10px;
+  padding: 10px;
   overflow: visible;
   page-break-inside: avoid;
   word-break: break-all;
@@ -278,6 +282,9 @@ table.directory {
 }
 .navpath li.navelem a {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.memtitle {
+  display: none;
 }
 .memitem {
   margin-bottom: 20px;

@@ -9,6 +9,7 @@
 
 /**
  * @ingroup     cpu_nrf5x_common
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file
@@ -89,12 +90,6 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->TASKS_START = 1;
 
     return 0;
-}
-
-int timer_set(tim_t tim, int chan, unsigned int value)
-{
-    uint32_t now = timer_read(tim);
-    return timer_set_absolute(tim, chan, (now + value));
 }
 
 int timer_set_absolute(tim_t tim, int chan, unsigned int value)

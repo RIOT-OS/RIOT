@@ -212,6 +212,7 @@ enum {
     NETDEV_TYPE_ETHERNET,
     NETDEV_TYPE_IEEE802154,
     NETDEV_TYPE_CC110X,
+    NETDEV_TYPE_LORA,
     NETDEV_TYPE_NRFMIN
 };
 
@@ -230,6 +231,11 @@ typedef enum {
     NETDEV_EVENT_TX_MEDIUM_BUSY,            /**< couldn't transfer packet */
     NETDEV_EVENT_LINK_UP,                   /**< link established */
     NETDEV_EVENT_LINK_DOWN,                 /**< link gone */
+    NETDEV_EVENT_TX_TIMEOUT,                /**< timeout when sending */
+    NETDEV_EVENT_RX_TIMEOUT,                /**< timeout when receiving */
+    NETDEV_EVENT_CRC_ERROR,                 /**< wrong CRC */
+    NETDEV_EVENT_FHSS_CHANGE_CHANNEL,       /**< channel changed */
+    NETDEV_EVENT_CAD_DONE,                  /**< channel activity detection done */
     /* expand this list if needed */
 } netdev_event_t;
 

@@ -6,6 +6,17 @@
  * directory for more details.
  */
 
+ /**
+  * @ingroup     cpu_mips32r2_common
+  * @ingroup     drivers_periph_timer
+  * @{
+  *
+  * @file
+  * @brief       Implementation of the low-level timer driver
+  *
+  * @}
+  */
+
 #include <mips/cpu.h>
 #include <mips/m32c0.h>
 #include <mips/regdef.h>

@@ -9,6 +9,7 @@
 
 /**
  * @ingroup     cpu_lm4f120
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file        timer.c
@@ -122,21 +123,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     timer_start(dev);
 
     return 0;
-}
-
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    unsigned int corrected_now;
-    int retval;
-
-    if (dev >= TIMER_NUMOF){
-        return -1;
-    }
-
-    corrected_now = timer_read(dev);
-    retval = timer_set_absolute(dev, channel, corrected_now+timeout);
-
-    return retval;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)

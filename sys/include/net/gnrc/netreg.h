@@ -43,11 +43,30 @@ extern "C" {
  *          Different types are availalbe dependent on the used modules.
  */
 typedef enum {
+    /**
+     * @brief   Use [default IPC](@ref core_msg) for
+     *          [netapi](@ref net_gnrc_netapi) operations.
+     *
+     * @note    Implicitly chosen without `gnrc_netapi_mbox` and
+     *          `gnrc_netapi_callbacks` modules.
+     */
     GNRC_NETREG_TYPE_DEFAULT = 0,
 #if defined(MODULE_GNRC_NETAPI_MBOX) || defined(DOXYGEN)
+    /**
+     * @brief   Use [centralized IPC](@ref core_mbox) for
+     *          [netapi](@ref net_gnrc_netapi) operations.
+     *
+     * @note    Only available with `gnrc_netapi_mbox` module.
+     */
     GNRC_NETREG_TYPE_MBOX,
 #endif
 #if defined(MODULE_GNRC_NETAPI_CALLBACKS) || defined(DOXYGEN)
+    /**
+     * @brief   Use function callbacks for [netapi](@ref net_gnrc_netapi)
+     *          operations.
+     *
+     * @note    Only available with `gnrc_netapi_callbacks` module.
+     */
     GNRC_NETREG_TYPE_CB,
 #endif
 } gnrc_netreg_type_t;

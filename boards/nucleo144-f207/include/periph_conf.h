@@ -259,14 +259,6 @@ static const spi_conf_t spi_config[] = {
     {GPIO_PIN(PORT_C, 0), 1, 0}  \
 }
 #define ADC_NUMOF          (2)
-
-/** @} */
-
-/**
- * @name    DAC configuration
- * @{
- */
-#define DAC_NUMOF           (0)
 /** @} */
 
 /**

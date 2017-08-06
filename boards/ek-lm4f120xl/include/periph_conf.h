@@ -19,6 +19,8 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "periph_cpu.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -97,6 +99,68 @@ extern "C" {
  * @{
  */
 #define ADC_NUMOF           (12)
+/** @} */
+
+/**
+ * @name SPI configuration
+ * @{
+ */
+static const spi_conf_t spi_confs[] = {
+    {
+        .ssi_sysctl = SYSCTL_PERIPH_SSI0,
+        .ssi_base = SSI0_BASE,
+        .gpio_sysctl = SYSCTL_PERIPH_GPIOA,
+        .gpio_port = GPIO_PORTA_BASE,
+        .pins = {
+            .clk = GPIO_PA2_SSI0CLK,
+            .fss = GPIO_PA3_SSI0FSS,
+            .rx = GPIO_PA4_SSI0RX,
+            .tx = GPIO_PA5_SSI0TX,
+            .mask = GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5
+        }
+    },
+    {
+        .ssi_sysctl = SYSCTL_PERIPH_SSI1,
+        .ssi_base = SSI1_BASE,
+        .gpio_sysctl = SYSCTL_PERIPH_GPIOF,
+        .gpio_port = GPIO_PORTF_BASE,
+        .pins = {
+            .clk = GPIO_PF2_SSI1CLK,
+            .fss = GPIO_PF3_SSI1FSS,
+            .rx = GPIO_PF0_SSI1RX,
+            .tx = GPIO_PF1_SSI1TX,
+            .mask = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3
+        }
+    },
+    {
+        .ssi_sysctl = SYSCTL_PERIPH_SSI2,
+        .ssi_base = SSI2_BASE,
+        .gpio_sysctl = SYSCTL_PERIPH_GPIOB,
+        .gpio_port = GPIO_PORTB_BASE,
+        .pins = {
+            .clk = GPIO_PB4_SSI2CLK,
+            .fss = GPIO_PB5_SSI2FSS,
+            .rx = GPIO_PB6_SSI2RX,
+            .tx = GPIO_PB7_SSI2TX,
+            .mask = GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7
+        }
+    },
+    {
+        .ssi_sysctl = SYSCTL_PERIPH_SSI3,
+        .ssi_base = SSI3_BASE,
+        .gpio_sysctl = SYSCTL_PERIPH_GPIOD,
+        .gpio_port = GPIO_PORTD_BASE,
+        .pins = {
+            .clk = GPIO_PD0_SSI3CLK,
+            .fss = GPIO_PD1_SSI3FSS,
+            .rx = GPIO_PD2_SSI3RX,
+            .tx = GPIO_PD3_SSI3TX,
+            .mask = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3
+        }
+    },
+};
+
+#define SPI_NUMOF (sizeof(spi_confs) / sizeof(spi_confs[0]))
 /** @} */
 
 #ifdef __cplusplus

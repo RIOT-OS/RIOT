@@ -32,6 +32,11 @@ extern "C" {
 #define CPUID_LEN           (4U)
 #endif
 
+/**
+ * @brief   Prevent shared timer functions from being used
+ */
+#define PERIPH_TIMER_PROVIDES_SET
+
 #ifdef __cplusplus
 }
 #endif

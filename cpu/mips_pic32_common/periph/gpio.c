@@ -8,6 +8,17 @@
  *
  */
 
+ /**
+  * @ingroup     cpu_mips_pic32_common
+  * @ingroup     drivers_periph_gpio
+  * @{
+  *
+  * @file
+  * @brief       Low-level GPIO driver implementation
+  *
+  * @}
+  */
+
 #include <assert.h>
 #include <stdint.h>
 #include "periph/gpio.h"

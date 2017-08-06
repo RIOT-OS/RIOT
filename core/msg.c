@@ -32,7 +32,6 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
-#include "thread.h"
 
 static int _msg_receive(msg_t *m, int block);
 static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned state);

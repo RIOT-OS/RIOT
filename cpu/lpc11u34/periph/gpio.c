@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_lpc11u34
+ * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file

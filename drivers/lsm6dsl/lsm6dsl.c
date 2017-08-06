@@ -8,10 +8,16 @@
  */
 
 /**
+ * @ingroup     drivers_lsm6dsl
+ * @{
+ *
  * @file
  * @brief       Device driver implementation for the LSM6DSL 3D accelerometer/gyroscope.
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Sebastian Meiling <s@mlng.net>
+ *
+ * @}
  */
 
 #include "xtimer.h"
@@ -24,6 +30,22 @@
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+#define BUS         (dev->params.i2c)
+#define ADDR        (dev->params.addr)
+
+/**
+ * order in arry [0, 1, 2, 3] is
+ * LSM6DSL_ACC_FS_2G, LSM6DSL_ACC_FS_16G, LSM6DSL_ACC_FS_4G, LSM6DSL_ACC_FS_8G
+ */
+static const int16_t range_acc[] = { 2000, 16000, 4000, 8000 };
+
+/**
+ * order in arry [0, 1, 2, 3] is
+ * LSM6DSL_GYRO_FS_245DPS, LSM6DSL_GYRO_FS_500DPS,
+ * LSM6DSL_GYRO_FS_1000DPS, LSM6DSL_GYRO_FS_2000DPS
+ */
+static const int16_t range_gyro[] = { 2450, 5000, 10000, 20000 };
+
 int lsm6dsl_init(lsm6dsl_t *dev, const lsm6dsl_params_t *params)
 {
     uint8_t tmp;
@@ -33,47 +55,49 @@ int lsm6dsl_init(lsm6dsl_t *dev, const lsm6dsl_params_t *params)
 
     dev->params = *params;
 
-    i2c_acquire(dev->params.i2c);
-    i2c_init_master(dev->params.i2c, I2C_SPEED_NORMAL);
+    i2c_acquire(BUS);
+    i2c_init_master(BUS, I2C_SPEED_NORMAL);
 
     /* Reboot */
-    i2c_write_reg(dev->params.i2c, dev->params.addr,
-                  LSM6DSL_REG_CTRL3_C, LSM6DSL_CTRL3_C_BOOT);
+    i2c_write_reg(BUS, ADDR, LSM6DSL_REG_CTRL3_C, LSM6DSL_CTRL3_C_BOOT);
 
-    xtimer_usleep(5000);
+    xtimer_usleep(LSM6DSL_BOOT_WAIT);
 
-    res = i2c_read_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_WHO_AM_I, &tmp);
-    if ((res != 1) || (tmp != LSM6DSL_WHO_AM_I)) {
-        i2c_release(dev->params.i2c);
-        DEBUG("[!!failed!!] WHO_AM_I\n");
-        return -1;
+    if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_WHO_AM_I, &tmp) != 1) {
+        i2c_release(BUS);
+        DEBUG("[ERROR] lsm6dsl_init: i2c_read_reg LSM6DSL_REG_WHO_AM_I!\n");
+        return -LSM6DSL_ERROR_BUS;
+    }
+
+    if (tmp != LSM6DSL_WHO_AM_I) {
+        DEBUG("[ERROR] lsm6dsl_init: WHO_AM_I\n");
+        return -LSM6DSL_ERROR_DEV;
     }
 
     /* Set acc odr / full scale */
-    res = i2c_write_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_CTRL1_XL,
-                        ((dev->params.acc_odr << LSM6DSL_CTRL_ODR_SHIFT) |
-                         (dev->params.acc_fs << LSM6DSL_CTRL_FS_SHIFT)));
+    tmp = (dev->params.acc_odr << LSM6DSL_CTRL_ODR_SHIFT) |
+          (dev->params.acc_fs << LSM6DSL_CTRL_FS_SHIFT);
+    res = i2c_write_reg(BUS, ADDR, LSM6DSL_REG_CTRL1_XL, tmp);
     /* Set gyro odr / full scale */
-    res += i2c_write_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_CTRL2_G,
-                         ((dev->params.gyro_odr << LSM6DSL_CTRL_ODR_SHIFT) |
-                          (dev->params.gyro_fs << LSM6DSL_CTRL_FS_SHIFT)));
-
+    tmp = (dev->params.gyro_odr << LSM6DSL_CTRL_ODR_SHIFT) |
+          (dev->params.gyro_fs << LSM6DSL_CTRL_FS_SHIFT);
+    res += i2c_write_reg(BUS, ADDR, LSM6DSL_REG_CTRL2_G, tmp);
     /* Set continuous mode */
     uint8_t fifo_odr = MAX(dev->params.acc_odr, dev->params.gyro_odr);
-    res += i2c_write_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_FIFO_CTRL5,
-                         (fifo_odr << LSM6DSL_FIFO_CTRL5_FIFO_ODR_SHIFT) |
-                         LSM6DSL_FIFO_CTRL5_CONTINUOUS_MODE);
-    res += i2c_write_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_FIFO_CTRL3,
-                         (dev->params.gyro_decimation << LSM6DSL_FIFO_CTRL3_GYRO_DEC_SHIFT) |
-                         dev->params.acc_decimation);
+    tmp = (fifo_odr << LSM6DSL_FIFO_CTRL5_FIFO_ODR_SHIFT) |
+          LSM6DSL_FIFO_CTRL5_CONTINUOUS_MODE;
+    res += i2c_write_reg(BUS, ADDR, LSM6DSL_REG_FIFO_CTRL5, tmp);
+    tmp = (dev->params.gyro_decimation << LSM6DSL_FIFO_CTRL3_GYRO_DEC_SHIFT) |
+          dev->params.acc_decimation;
+    res += i2c_write_reg(BUS, ADDR, LSM6DSL_REG_FIFO_CTRL3, tmp);
 
-    i2c_release(dev->params.i2c);
+    i2c_release(BUS);
 
     if (res < 4) {
-        DEBUG("[!!failed!!] config\n");
-        return -1;
+        DEBUG("[ERROR] lsm6dsl_init: config\n");
+        return -LSM6DSL_ERROR_CNF;
     }
-    return 0;
+    return LSM6DSL_OK;
 }
 
 int lsm6dsl_read_acc(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
@@ -81,59 +105,35 @@ int lsm6dsl_read_acc(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
     int res;
     uint8_t tmp;
 
-    i2c_acquire(dev->params.i2c);
-    i2c_read_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_STATUS_REG, &tmp);
+    i2c_acquire(BUS);
+    i2c_read_reg(BUS, ADDR, LSM6DSL_REG_STATUS_REG, &tmp);
     DEBUG("lsm6dsl status: %x\n", tmp);
 
-    res = i2c_read_reg(dev->params.i2c, dev->params.addr,
-                       LSM6DSL_REG_OUTX_L_XL, &tmp);
+    res = i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTX_L_XL, &tmp);
     data->x = tmp;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTX_H_XL, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTX_H_XL, &tmp);
     data->x |= tmp << 8;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTY_L_XL, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTY_L_XL, &tmp);
     data->y = tmp;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTY_H_XL, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTY_H_XL, &tmp);
     data->y |= tmp << 8;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTZ_L_XL, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTZ_L_XL, &tmp);
     data->z = tmp;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTZ_H_XL, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTZ_H_XL, &tmp);
     data->z |= tmp << 8;
-    i2c_release(dev->params.i2c);
+    i2c_release(BUS);
 
     if (res < 6) {
-        DEBUG("[!!failed!!]\n");
-        return -1;
-    }
-    DEBUG("[done]\n");
-
-    float range;
-    switch (dev->params.acc_fs) {
-    case LSM6DSL_ACC_FS_2G:
-        range = 2000.0;
-        break;
-    case LSM6DSL_ACC_FS_4G:
-        range = 4000.0;
-        break;
-    case LSM6DSL_ACC_FS_8G:
-        range = 8000.0;
-        break;
-    case LSM6DSL_ACC_FS_16G:
-        range = 16000.0;
-        break;
-    default:
-        return -1;
+        DEBUG("[ERROR] lsm6dsl_read_acc\n");
+        return -LSM6DSL_ERROR_BUS;
     }
 
-    data->x = (data->x * range) / INT16_MAX;
-    data->y = (data->y * range) / INT16_MAX;
-    data->z = (data->z * range) / INT16_MAX;
+    assert(dev->params.acc_fs < LSM6DSL_ACC_FS_MAX);
+    data->x = ((int32_t)data->x * range_acc[dev->params.acc_fs]) / INT16_MAX;
+    data->y = ((int32_t)data->y * range_acc[dev->params.acc_fs]) / INT16_MAX;
+    data->z = ((int32_t)data->z * range_acc[dev->params.acc_fs]) / INT16_MAX;
 
-    return 0;
+    return LSM6DSL_OK;
 }
 
 int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
@@ -141,78 +141,57 @@ int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
     int res;
     uint8_t tmp;
 
-    i2c_acquire(dev->params.i2c);
-    i2c_read_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_STATUS_REG, &tmp);
+    i2c_acquire(BUS);
+    i2c_read_reg(BUS, ADDR, LSM6DSL_REG_STATUS_REG, &tmp);
     DEBUG("lsm6dsl status: %x\n", tmp);
 
-    res = i2c_read_reg(dev->params.i2c, dev->params.addr,
-                       LSM6DSL_REG_OUTX_L_G, &tmp);
+    res = i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTX_L_G, &tmp);
     data->x = tmp;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTX_H_G, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTX_H_G, &tmp);
     data->x |= tmp << 8;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTY_L_G, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTY_L_G, &tmp);
     data->y = tmp;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTY_H_G, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTY_H_G, &tmp);
     data->y |= tmp << 8;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTZ_L_G, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTZ_L_G, &tmp);
     data->z = tmp;
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr,
-                        LSM6DSL_REG_OUTZ_H_G, &tmp);
+    res += i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUTZ_H_G, &tmp);
     data->z |= tmp << 8;
-    i2c_release(dev->params.i2c);
+    i2c_release(BUS);
 
     if (res < 6) {
-        DEBUG("[!!failed!!]\n");
-        return -1;
-    }
-    DEBUG("[done]\n");
-
-    float range;
-    switch (dev->params.acc_fs) {
-    case LSM6DSL_GYRO_FS_245DPS:
-        range = 2450.0;
-        break;
-    case LSM6DSL_GYRO_FS_500DPS:
-        range = 5000.0;
-        break;
-    case LSM6DSL_GYRO_FS_1000DPS:
-        range = 10000.0;
-        break;
-    case LSM6DSL_GYRO_FS_2000DPS:
-        range = 20000.0;
-        break;
-    default:
-        return -1;
+        DEBUG("[ERROR] lsm6dsl_read_gyro\n");
+        return -LSM6DSL_ERROR_BUS;
     }
 
-    data->x = (data->x * range) / INT16_MAX;
-    data->y = (data->y * range) / INT16_MAX;
-    data->z = (data->z * range) / INT16_MAX;
+    assert(dev->params.gyro_fs < LSM6DSL_GYRO_FS_MAX);
+    data->x = ((int32_t)data->x * range_gyro[dev->params.gyro_fs]) / INT16_MAX;
+    data->y = ((int32_t)data->y * range_gyro[dev->params.gyro_fs]) / INT16_MAX;
+    data->z = ((int32_t)data->z * range_gyro[dev->params.gyro_fs]) / INT16_MAX;
 
-    return 0;
+    return LSM6DSL_OK;
 }
 
 int lsm6dsl_read_temp(const lsm6dsl_t *dev, int16_t *data)
 {
-    int res;
     uint8_t tmp;
-
-    i2c_acquire(dev->params.i2c);
-    res = i2c_read_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_OUT_TEMP_L, &tmp);
-    *data = tmp;
-
-    res += i2c_read_reg(dev->params.i2c, dev->params.addr, LSM6DSL_REG_OUT_TEMP_H, &tmp);
-    *data |= tmp << 8;
-
-    i2c_release(dev->params.i2c);
-
-    if (res < 2) {
-        return -1;
+    uint16_t traw;
+    /* read raw temperature */
+    i2c_acquire(BUS);
+    if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUT_TEMP_L, &tmp) != 1) {
+        i2c_release(BUS);
+        return -LSM6DSL_ERROR_BUS;
     }
+    traw = tmp;
+    if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUT_TEMP_H, &tmp) != 1) {
+        i2c_release(BUS);
+        return -LSM6DSL_ERROR_BUS;
+    }
+    traw |= (uint16_t)tmp << 8;
+    i2c_release(BUS);
+    /* convert temperature to degC x 100 */
+    traw += LSM6DSL_TEMP_OFFSET;
+    *data = (int16_t)(((int32_t)traw * 100) / 256);
 
-    return 0;
+    return LSM6DSL_OK;
 }

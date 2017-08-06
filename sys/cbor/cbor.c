@@ -24,11 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Automatically enable/disable ENABLE_DEBUG based on CBOR_NO_PRINT */
-#ifndef CBOR_NO_PRINT
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
-#endif
 
 #define CBOR_TYPE_MASK          0xE0    /* top 3 bits */
 #define CBOR_INFO_MASK          0x1F    /* low 5 bits */
@@ -107,7 +104,7 @@ typedef struct __attribute__((packed)) {
     } u;
 } cast_align_u8_t;
 
-#ifndef CBOR_NO_FLOAT
+#ifdef MODULE_CBOR_FLOAT
 
 /**
  * Convert float @p x to network format
@@ -224,9 +221,8 @@ static uint16_t encode_float_half(float x)
     bits += m & 1;
     return bits;
 }
-#endif /* CBOR_NO_FLOAT */
+#endif /* MODULE_CBOR_FLOAT */
 
-#ifndef CBOR_NO_PRINT
 /**
  * Print @p size bytes at @p data in hexadecimal display format
  */
@@ -236,14 +232,13 @@ void dump_memory(const unsigned char *data, size_t size)
         return;
     }
 
-    DEBUG("0x");
+    printf("0x");
 
     for (size_t i = 0; i < size; ++i) {
-        DEBUG("%02X", data[i]);
+        printf("%02X", data[i]);
     }
-    DEBUG("\n");
+    puts("");
 }
-#endif /* CBOR_NO_PRINT */
 
 void cbor_init(cbor_stream_t *stream, unsigned char *buffer, size_t size)
 {
@@ -542,7 +537,7 @@ size_t cbor_serialize_bool(cbor_stream_t *s, bool val)
     return 1;
 }
 
-#ifndef CBOR_NO_FLOAT
+#ifdef MODULE_CBOR_FLOAT
 size_t cbor_deserialize_float_half(const cbor_stream_t *stream, size_t offset, float *val)
 {
     if (CBOR_TYPE(stream, offset) != CBOR_7 || !val) {
@@ -623,7 +618,7 @@ size_t cbor_serialize_double(cbor_stream_t *s, double val)
     s->pos += 8;
     return 9;
 }
-#endif /* CBOR_NO_FLOAT */
+#endif /* MODULE_CBOR_FLOAT */
 
 size_t cbor_deserialize_byte_string(const cbor_stream_t *stream, size_t offset, char *val,
                                     size_t length)
@@ -757,8 +752,8 @@ size_t cbor_serialize_map(cbor_stream_t *s, size_t map_length)
     return encode_int(CBOR_MAP, s, map_length);
 }
 
-#ifndef CBOR_NO_SEMANTIC_TAGGING
-#ifndef CBOR_NO_CTIME
+#ifdef MODULE_CBOR_SEMANTIC_TAGGING
+#ifdef MODULE_CBOR_CTIME
 size_t cbor_deserialize_date_time(const cbor_stream_t *stream, size_t offset, struct tm *val)
 {
     if ((CBOR_TYPE(stream, offset) != CBOR_TAG)
@@ -840,7 +835,7 @@ size_t cbor_serialize_date_time_epoch(cbor_stream_t *stream, time_t val)
     size_t written_bytes = encode_int(CBOR_UINT, stream, time);
     return written_bytes + 1; /* + 1 tag byte */
 }
-#endif /* CBOR_NO_CTIME */
+#endif /* MODULE_CBOR_CTIME */
 
 
 size_t cbor_write_tag(cbor_stream_t *s, unsigned char tag)
@@ -854,7 +849,7 @@ bool cbor_at_tag(const cbor_stream_t *s, size_t offset)
 {
     return cbor_at_end(s, offset) || CBOR_TYPE(s, offset) == CBOR_TAG;
 }
-#endif /* CBOR_NO_SEMANTIC_TAGGING */
+#endif /* MODULE_CBOR_SEMANTIC_TAGGING */
 
 size_t cbor_write_break(cbor_stream_t *s)
 {
@@ -874,7 +869,6 @@ bool cbor_at_end(const cbor_stream_t *s, size_t offset)
     return s ? offset >= s->pos - 1 : true;
 }
 
-#ifndef CBOR_NO_PRINT
 /* BEGIN: Printers */
 void cbor_stream_print(const cbor_stream_t *stream)
 {
@@ -901,9 +895,9 @@ static size_t cbor_stream_decode_skip(cbor_stream_t *stream, size_t offset)
             break;
     }
 
-    DEBUG("(unsupported, ");
+    printf("(unsupported, ");
     dump_memory(stream->data + offset, consume_bytes);
-    DEBUG(")\n");
+    puts(")");
     return consume_bytes;
 }
 
@@ -917,11 +911,11 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
 #define DESERIALIZE_AND_PRINT(type, suffix, format_string) { \
         type val; \
         size_t read_bytes = cbor_deserialize_##suffix(stream, offset, &val); \
-        DEBUG("("#type", "format_string")\n", val); \
+        printf("("#type", "format_string")\n", val); \
         return read_bytes; \
     }
 
-    DEBUG("%*s", indent, "");
+    printf("%*s", indent, "");
 
     switch (CBOR_TYPE(stream, offset)) {
         case CBOR_UINT:
@@ -931,29 +925,29 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
         case CBOR_BYTES: {
             char buffer[CBOR_STREAM_PRINT_BUFFERSIZE];
             size_t read_bytes = cbor_deserialize_byte_string(stream, offset, buffer, sizeof(buffer));
-            DEBUG("(byte string, \"%s\")\n", buffer);
+            printf("(byte string, \"%s\")\n", buffer);
             return read_bytes;
         }
 
         case CBOR_TEXT: {
             char buffer[CBOR_STREAM_PRINT_BUFFERSIZE];
             size_t read_bytes = cbor_deserialize_unicode_string(stream, offset, buffer, sizeof(buffer));
-            DEBUG("(unicode string, \"%s\")\n", buffer);
+            printf("(unicode string, \"%s\")\n", buffer);
             return read_bytes;
         }
 
         case CBOR_ARRAY: {
             const bool is_indefinite = (stream->data[offset] == (CBOR_ARRAY | CBOR_VAR_FOLLOWS));
-            uint64_t array_length;
+            uint64_t array_length = 0;
             size_t read_bytes;
 
             if (is_indefinite) {
                 offset += read_bytes = cbor_deserialize_array_indefinite(stream, offset);
-                DEBUG("(array, length: [indefinite])\n");
+                puts("(array, length: [indefinite])");
             }
             else {
                 offset += read_bytes = decode_int(stream, offset, &array_length);
-                DEBUG("(array, length: %"PRIu64")\n", array_length);
+                printf("(array, length: %"PRIu64")\n", array_length);
             }
 
             size_t i = 0;
@@ -977,16 +971,16 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
 
         case CBOR_MAP: {
             const bool is_indefinite = (stream->data[offset] == (CBOR_MAP | CBOR_VAR_FOLLOWS));
-            uint64_t map_length;
+            uint64_t map_length = 0;
             size_t read_bytes;
 
             if (is_indefinite) {
                 offset += read_bytes = cbor_deserialize_map_indefinite(stream, offset);
-                DEBUG("(map, length: [indefinite])\n");
+                puts("(map, length: [indefinite])");
             }
             else {
                 offset += read_bytes = decode_int(stream, offset, &map_length);
-                DEBUG("(map, length: %"PRIu64")\n", map_length);
+                printf("(map, length: %"PRIu64")\n", map_length);
             }
 
             size_t i = 0;
@@ -1008,50 +1002,52 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
             read_bytes += cbor_at_break(stream, offset);
             return read_bytes;
         }
-
+#ifdef MODULE_CBOR_SEMANTIC_TAGGING
         case CBOR_TAG: {
             unsigned char tag = CBOR_ADDITIONAL_INFO(stream, offset);
 
             switch (tag) {
                     /* Non-native builds likely don't have support for ctime (hence disable it there)
                      * TODO: Better check for availability of ctime functions? */
-#ifndef CBOR_NO_CTIME
+#ifdef MODULE_CBOR_CTIME
                 case CBOR_DATETIME_STRING_FOLLOWS: {
                     char buf[64];
                     struct tm timeinfo;
                     size_t read_bytes = cbor_deserialize_date_time(stream, offset, &timeinfo);
                     strftime(buf, sizeof(buf), "%c", &timeinfo);
-                    DEBUG("(tag: %u, date/time string: \"%s\")\n", tag, buf);
+                    printf("(tag: %u, date/time string: \"%s\")\n", tag, buf);
                     return read_bytes;
                 }
 
                 case CBOR_DATETIME_EPOCH_FOLLOWS: {
                     time_t time;
                     size_t read_bytes = cbor_deserialize_date_time_epoch(stream, offset, &time);
-                    DEBUG("(tag: %u, date/time epoch: %d)\n", tag, (int)time);
+                    printf("(tag: %u, date/time epoch: %d)\n", tag, (int)time);
                     return read_bytes;
                 }
 
-#endif /* CBOR_NO_CTIME */
+#endif /* MODULE_CBOR_CTIME */
 
                 default:
                     break;
             }
+            break;
         }
+#endif /* MODULE_CBOR_SEMANTIC_TAGGING */
 
         case CBOR_7: {
             switch (stream->data[offset]) {
                 case CBOR_FALSE:
                 case CBOR_TRUE:
                     DESERIALIZE_AND_PRINT(bool, bool, "%d")
-#ifndef CBOR_NO_FLOAT
+#ifdef MODULE_CBOR_FLOAT
                 case CBOR_FLOAT16:
                     DESERIALIZE_AND_PRINT(float, float_half, "%f")
                 case CBOR_FLOAT32:
                     DESERIALIZE_AND_PRINT(float, float, "%f")
                 case CBOR_FLOAT64:
                     DESERIALIZE_AND_PRINT(double, double, "%lf")
-#endif /* CBOR_NO_FLOAT */
+#endif /* MODULE_CBOR_FLOAT */
                 default:
                     break;
             }
@@ -1067,7 +1063,7 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
 
 void cbor_stream_decode(cbor_stream_t *stream)
 {
-    DEBUG("Data:\n");
+    puts("Data:");
     size_t offset = 0;
 
     while (offset < stream->pos) {
@@ -1082,9 +1078,6 @@ void cbor_stream_decode(cbor_stream_t *stream)
         offset += read_bytes;
     }
 
-    DEBUG("\n");
+    puts("");
 }
-
-#endif /* CBOR_NO_PRINT */
-
 /* END: Printers */

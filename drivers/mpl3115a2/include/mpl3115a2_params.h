@@ -1,0 +1,80 @@
+/*
+ * Copyright (C) 2017   HAW Hamburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     drivers_mpl3115a2
+ * @{
+ *
+ * @file
+ * @brief       Default configuration for MPL3115A2 devices
+ *
+ * @author      Sebastian Meiling <s@mlng.net>
+ */
+
+#ifndef MPL3115A2_PARAMS_H
+#define MPL3115A2_PARAMS_H
+
+#include "board.h"
+#include "saul_reg.h"
+#include "mpl3115a2.h"
+#include "mpl3115a2_reg.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @name   Default configuration parameters for the MPL3115A2 driver
+ * @{
+ */
+#ifndef MPL3115A2_PARAM_I2C
+#define MPL3115A2_PARAM_I2C         I2C_DEV(0)
+#endif
+
+#ifndef MPL3115A2_PARAM_ADDR
+#define MPL3115A2_PARAM_ADDR        MPL3115A2_I2C_ADDRESS
+#endif
+
+#ifndef MPL3115A2_PARAM_RATIO
+#define MPL3115A2_PARAM_RATIO       MPL3115A2_OS_RATIO_DEFAULT
+#endif
+
+#ifndef MPL3115A2_PARAMS_DEFAULT
+#define MPL3115A2_PARAMS_DEFAULT    { .i2c   = MPL3115A2_PARAM_I2C, \
+                                      .addr  = MPL3115A2_PARAM_ADDR, \
+                                      .ratio = MPL3115A2_PARAM_RATIO }
+#endif
+/**@}*/
+
+/**
+ * @brief   MPL3115A2 configuration
+ */
+static const mpl3115a2_params_t mpl3115a2_params[] =
+{
+
+#ifdef MPL3115A2_PARAMS_CUSTOM
+    MPL3115A2_PARAMS_CUSTOM
+#else
+    MPL3115A2_PARAMS_DEFAULT
+#endif
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t mpl3115a2_saul_info[] =
+{
+    { .name = "mpl3115a2" },
+};
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* MPL3115A2_PARAMS_H */
+/** @} */

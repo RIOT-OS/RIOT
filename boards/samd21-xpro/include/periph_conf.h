@@ -34,8 +34,9 @@ extern "C" {
 /**
  * @name   External oscillator and clock configuration
  *
- * There are two choices for selection of CORECLOCK:
+ * There are three choices for selection of CORECLOCK:
  *
+ * - usage of the 48 MHz DFLL fed by external oscillator running at 32 kHz
  * - usage of the PLL fed by the internal 8MHz oscillator divided by 8
  * - usage of the internal 8MHz oscillator directly, divided by N if needed
  *
@@ -70,6 +71,12 @@ extern "C" {
 #define CLOCK_PLL_DIV       (1U)                /* adjust to your needs */
 /* generate the actual used core clock frequency */
 #define CLOCK_CORECLOCK     (((CLOCK_PLL_MUL + 1) * 1000000U) / CLOCK_PLL_DIV)
+#elif CLOCK_USE_XOSC32_DFLL
+/* Settings for 32 kHz external oscillator and 48 MHz DFLL */
+#define CLOCK_CORECLOCK     (48000000U)
+#define CLOCK_XOSC32K       (32768UL)
+#define CLOCK_8MHZ          (1)
+#define GEN2_ULP32K         (1)
 #else
 /* edit this value to your needs */
 #define CLOCK_DIV           (1U)

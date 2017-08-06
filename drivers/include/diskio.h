@@ -12,8 +12,6 @@
  * @ingroup     drivers_storage
  * @brief       Low level disk interface
  *
- * The connection between the MCU and the SRF08 is based on the i2c-interface.
- *
  * @{
  *
  * @file

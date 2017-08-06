@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     lpc11u34
+ * @ingroup     drivers_periph_pwm
  * @{
  *
  * @file

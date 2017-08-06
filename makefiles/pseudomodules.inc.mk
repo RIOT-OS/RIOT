@@ -1,4 +1,11 @@
 PSEUDOMODULES += auto_init_gnrc_rpl
+PSEUDOMODULES += can_mbox
+PSEUDOMODULES += can_pm
+PSEUDOMODULES += can_raw
+PSEUDOMODULES += cbor_ctime
+PSEUDOMODULES += cbor_float
+PSEUDOMODULES += cbor_semantic_tagging
+PSEUDOMODULES += conn_can_isotp_multi
 PSEUDOMODULES += core_%
 PSEUDOMODULES += emb6_router
 PSEUDOMODULES += gnrc_ipv6_default
@@ -8,7 +15,6 @@ PSEUDOMODULES += gnrc_netdev_default
 PSEUDOMODULES += gnrc_neterr
 PSEUDOMODULES += gnrc_netapi_callbacks
 PSEUDOMODULES += gnrc_netapi_mbox
-PSEUDOMODULES += gnrc_pktbuf
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
@@ -63,6 +69,15 @@ PSEUDOMODULES += at86rf21%
 # include variants of the BMX280 drivers as pseudo modules
 PSEUDOMODULES += bmp280
 PSEUDOMODULES += bme280
+
+# variants of TI ADCXX1C
+PSEUDOMODULES += adc081c
+PSEUDOMODULES += adc101c
+PSEUDOMODULES += adc121c
+
+# include variants of SX127X drivers as pseudo modules
+PSEUDOMODULES += sx1272
+PSEUDOMODULES += sx1276
 
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%

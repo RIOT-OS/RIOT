@@ -1,0 +1,7 @@
+/**
+ * @defgroup pkg_openthread   OpenThread network stack
+ * @ingroup  pkg
+ * @ingroup  net
+ * @brief    Provides a RIOT adaption of the OpenThread network stack
+ * @see      https://github.com/openthread/openthread
+ */

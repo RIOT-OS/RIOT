@@ -287,6 +287,10 @@ void auto_init(void)
     extern void auto_init_mma8x5x(void);
     auto_init_mma8x5x();
 #endif
+#ifdef MODULE_MPL3115A2
+    extern void auto_init_mpl3115a2(void);
+    auto_init_mpl3115a2();
+#endif
 #ifdef MODULE_SI70XX
     extern void auto_init_si70xx(void);
     auto_init_si70xx();
@@ -339,6 +343,10 @@ void auto_init(void)
     extern void auto_init_lsm6dsl(void);
     auto_init_lsm6dsl();
 #endif
+#ifdef MODULE_ADCXX1C
+    extern void auto_init_adcxx1c(void);
+    auto_init_adcxx1c();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
@@ -361,4 +369,12 @@ void auto_init(void)
 #endif
 
 #endif /* MODULE_AUTO_INIT_STORAGE */
+
+#ifdef MODULE_AUTO_INIT_CAN
+    DEBUG("auto_init CAN\n");
+
+    extern void auto_init_candev(void);
+    auto_init_candev();
+
+#endif /* MODULE_AUTO_INIT_CAN */
 }

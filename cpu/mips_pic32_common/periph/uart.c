@@ -7,6 +7,17 @@
  * directory for more details.
  *
  */
+
+ /**
+  * @ingroup     cpu_mips_pic32_common
+  * @ingroup     drivers_periph_uart
+  * @{
+  *
+  * @file
+  * @brief       Peripheral UART driver implementation
+  *
+  * @}
+  */
 #include <assert.h>
 #include "periph/uart.h"
 #include "board.h"

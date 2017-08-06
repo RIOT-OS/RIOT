@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    boards_nucleo144-common STM Nucleo-144 Common
- * @ingroup     boards
+ * @ingroup     boards_nucleo
  * @brief       Common files for STM Nucleo-144 boards
  * @{
  *

@@ -12,6 +12,7 @@
 /**
  * @defgroup    pkg_ccnlite CCN-Lite stack
  * @ingroup     pkg
+ * @ingroup     net
  * @brief       Provides a NDN implementation
  *
  * This package provides the CCN-Lite stack as a port of NDN for RIOT.

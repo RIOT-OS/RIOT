@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_cc2538
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file
@@ -148,38 +149,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     _irq_enable(dev);
 
     return 0;
-}
-
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    /* get timer base register address */
-    cc2538_gptimer_t *gptimer = timer_config[dev].dev;
-
-    if ( (dev >= TIMER_NUMOF) || (channel >= timer_config[dev].channels) ) {
-        return -1;
-    }
-
-    switch (channel) {
-        case 0:
-            /* clear any pending match interrupts */
-            gptimer->ICR = TAMIM;
-
-            /* set timeout value */
-            gptimer->TAMATCHR = (gptimer->CFG == GPTMCFG_32_BIT_TIMER)? (gptimer->TAV + timeout) : (gptimer->TAV - timeout);
-            gptimer->cc2538_gptimer_imr.IMR |= TAMIM; /**< Enable the Timer A Match Interrupt */
-            break;
-
-        case 1:
-            /* clear any pending match interrupts */
-            gptimer->ICR = TBMIM;
-
-            /* set timeout value */
-            gptimer->TBMATCHR = (gptimer->CFG == GPTMCFG_32_BIT_TIMER)? (gptimer->TBV + timeout) : (gptimer->TBV - timeout);
-            gptimer->cc2538_gptimer_imr.IMR |= TBMIM; /**< Enable the Timer B Match Interrupt */
-            break;
-    }
-
-    return 1;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)

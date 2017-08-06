@@ -135,7 +135,7 @@ static void _listen(sock_udp_t *sock)
         return;
     }
 
-    if (coap_get_code(&pdu) == COAP_CODE_EMPTY) {
+    if (pdu.hdr->code == COAP_CODE_EMPTY) {
         DEBUG("gcoap: empty messages not handled yet\n");
         return;
 
@@ -159,7 +159,8 @@ static void _listen(sock_udp_t *sock)
         _find_req_memo(&memo, &pdu, buf, sizeof(buf));
         if (memo) {
             xtimer_remove(&memo->response_timer);
-            memo->resp_handler(memo->state, &pdu);
+            memo->state = GCOAP_MEMO_RESP;
+            memo->resp_handler(memo->state, &pdu, &remote);
             memo->state = GCOAP_MEMO_UNUSED;
         }
     }
@@ -379,7 +380,7 @@ static void _expire_request(gcoap_request_memo_t *memo)
         /* Pass response to handler */
         if (memo->resp_handler) {
             req.hdr = (coap_hdr_t *)&memo->hdr_buf[0];   /* for reference */
-            memo->resp_handler(memo->state, &req);
+            memo->resp_handler(memo->state, &req, NULL);
         }
         memo->state = GCOAP_MEMO_UNUSED;
     }

@@ -7,13 +7,30 @@
  */
 
 /**
- * @defgroup    drivers_io1_xplained IO1_XPLAINED
+ * @defgroup    drivers_io1_xplained Atmel IO1 Xplained Extension board
  * @ingroup     drivers_sensors
- * @brief       Device driver interface for the IO1 Xplained extension.
+ * @brief       Device driver interface for the Atmel IO1 Xplained extension.
+ *
+ * This board contains several sensors and actuators:
+ * * @ref drivers_at30tse75x
+ * * TEMT6000 Light sensor (not yet supported by this driver)
+ * * microSD card connector (not yet supported by this driver)
+ * * one yellow LED
+ * * 2 GPIO pins
+ *
+ * This board can be used with the following Atmel evaluation boards:
+ * * @ref boards_samr21-xpro
+ * * @ref boards_samd21-xpro
+ * * @ref boards_saml21-xpro
+ *
+ * See the [datasheet]
+ * (http://www.atmel.com/images/atmel-42078-io1-xplained-pro_user-guide.pdf)
+ * for more information
+ *
  * @{
  *
  * @file
- * @brief       Device driver interface for the IO1 Xplained extention.
+ * @brief       Device driver interface for the Atmel IO1 Xplained extention.
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */

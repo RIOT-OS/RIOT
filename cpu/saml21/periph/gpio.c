@@ -9,7 +9,8 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_saml21
+ * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file        gpio.c

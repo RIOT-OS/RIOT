@@ -25,18 +25,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <inttypes.h>
-#ifndef CBOR_NO_CTIME
+#ifdef MODULE_CBOR_CTIME
 #include <time.h>
-#endif /* CBOR_NO_CTIME */
+#endif /* MODULE_CBOR_CTIME */
 
 static void my_cbor_print(const cbor_stream_t *stream)
 {
-#ifndef CBOR_NO_PRINT
     cbor_stream_print(stream);
-#else
-    (void)stream;
-    printf("<no print support>");
-#endif
 }
 
 #define CBOR_CHECK_SERIALIZED(stream, expected_value, expected_value_size) do { \
@@ -573,7 +568,7 @@ static void test_map_invalid(void)
     }
 }
 
-#ifndef CBOR_NO_SEMANTIC_TAGGING
+#ifdef MODULE_CBOR_SEMANTIC_TAGGING
 static void test_semantic_tagging(void)
 {
     char buffer[128];
@@ -592,7 +587,7 @@ static void test_semantic_tagging(void)
     CBOR_CHECK_DESERIALIZED(input, buffer, EQUAL_STRING);
 }
 
-#ifndef CBOR_NO_CTIME
+#ifdef MODULE_CBOR_CTIME
 static void test_date_time(void)
 {
     /* CBOR: UTF-8 string marked with a tag 0 to indicate it is a standard date/time string */
@@ -634,8 +629,8 @@ static void test_date_time_epoch(void)
     TEST_ASSERT(cbor_deserialize_date_time_epoch(&stream, 0, &val2));
     CBOR_CHECK_DESERIALIZED(val, val2, EQUAL_INT);
 }
-#endif /* CBOR_NO_CTIME */
-#endif /* CBOR_NO_SEMANTIC_TAGGING */
+#endif /* MODULE_CBOR_CTIME */
+#endif /* MODULE_CBOR_SEMANTIC_TAGGING */
 
 static void test_bool(void)
 {
@@ -652,7 +647,7 @@ static void test_bool_invalid(void)
     TEST_ASSERT_EQUAL_INT(0, cbor_deserialize_bool(&invalid_stream, 0, &val_bool));
 }
 
-#ifndef CBOR_NO_FLOAT
+#ifdef MODULE_CBOR_FLOAT
 static void test_float_half(void)
 {
     /* check border conditions */
@@ -751,68 +746,7 @@ static void test_double_invalid(void)
     double val_double = 0;
     TEST_ASSERT_EQUAL_INT(0, cbor_deserialize_double(&invalid_stream, 0, &val_double));
 }
-#endif /* CBOR_NO_FLOAT */
-
-#ifndef CBOR_NO_PRINT
-/**
- * Manual test for testing the cbor_stream_decode function
- */
-void test_stream_decode(void)
-{
-    cbor_clear(&stream);
-
-    cbor_serialize_int(&stream, 1);
-    cbor_serialize_uint64_t(&stream, 2llu);
-    cbor_serialize_int64_t(&stream, 3);
-    cbor_serialize_int64_t(&stream, -5);
-    cbor_serialize_bool(&stream, true);
-#ifndef CBOR_NO_FLOAT
-    cbor_serialize_float_half(&stream, 1.1f);
-    cbor_serialize_float(&stream, 1.5f);
-    cbor_serialize_double(&stream, 2.0);
-#endif /* CBOR_NO_FLOAT */
-    cbor_serialize_byte_string(&stream, "abc");
-    cbor_serialize_unicode_string(&stream, "def");
-
-    cbor_serialize_array(&stream, 2);
-    cbor_serialize_int(&stream, 0);
-    cbor_serialize_int(&stream, 1);
-
-    cbor_serialize_array_indefinite(&stream);
-    cbor_serialize_int(&stream, 10);
-    cbor_serialize_int(&stream, 11);
-    cbor_write_break(&stream);
-
-    cbor_serialize_map(&stream, 2);
-    cbor_serialize_int(&stream, 1);
-    cbor_serialize_byte_string(&stream, "1");
-    cbor_serialize_int(&stream, 2);
-    cbor_serialize_byte_string(&stream, "2");
-
-    cbor_serialize_map_indefinite(&stream);
-    cbor_serialize_int(&stream, 10);
-    cbor_serialize_byte_string(&stream, "10");
-    cbor_serialize_int(&stream, 11);
-    cbor_serialize_byte_string(&stream, "11");
-    cbor_write_break(&stream);
-
-#ifndef CBOR_NO_SEMANTIC_TAGGING
-#ifndef CBOR_NO_CTIME
-    time_t rawtime;
-    time(&rawtime);
-    struct tm *timeinfo = localtime(&rawtime);
-    cbor_serialize_date_time(&stream, timeinfo);
-    cbor_serialize_date_time_epoch(&stream, rawtime);
-#endif /* CBOR_NO_CTIME */
-
-    /* decoder should skip the tag and print 'unsupported' here */
-    cbor_write_tag(&stream, 2);
-    cbor_serialize_byte_string(&stream, "1");
-#endif /* CBOR_NO_SEMANTIC_TAGGING */
-
-    cbor_stream_decode(&stream);
-}
-#endif /* CBOR_NO_PRINT */
+#endif /* MODULE_CBOR_FLOAT */
 
 /**
  * See examples from CBOR RFC (cf. Appendix A. Examples)
@@ -838,23 +772,23 @@ TestRef tests_cbor_all(void)
                         new_TestFixture(test_map),
                         new_TestFixture(test_map_indefinite),
                         new_TestFixture(test_map_invalid),
-#ifndef CBOR_NO_SEMANTIC_TAGGING
+#ifdef MODULE_CBOR_SEMANTIC_TAGGING
                         new_TestFixture(test_semantic_tagging),
-#ifndef CBOR_NO_CTIME
+#ifdef MODULE_CBOR_CTIME
                         new_TestFixture(test_date_time),
                         new_TestFixture(test_date_time_epoch),
-#endif /* CBOR_NO_CTIME */
-#endif /* CBOR_NO_SEMANTIC_TAGGING */
+#endif /* MODULE_CBOR_CTIME */
+#endif /* MODULE_CBOR_SEMANTIC_TAGGING */
                         new_TestFixture(test_bool),
                         new_TestFixture(test_bool_invalid),
-#ifndef CBOR_NO_FLOAT
+#ifdef MODULE_CBOR_FLOAT
                         new_TestFixture(test_float_half),
                         new_TestFixture(test_float_half_invalid),
                         new_TestFixture(test_float),
                         new_TestFixture(test_float_invalid),
                         new_TestFixture(test_double),
                         new_TestFixture(test_double_invalid),
-#endif /* CBOR_NO_FLOAT */
+#endif /* MODULE_CBOR_FLOAT */
     };
 
     EMB_UNIT_TESTCALLER(CborTest, setUp, tearDown, fixtures);
@@ -863,9 +797,5 @@ TestRef tests_cbor_all(void)
 
 void tests_cbor(void)
 {
-#ifndef CBOR_NO_PRINT
-    test_stream_decode();
-#endif /* CBOR_NO_PRINT */
-
     TESTS_RUN(tests_cbor_all());
 }

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Rakendra Thapa <rakendrathapa@gmail.com>
+ * Copyright (C) 2017 Marc Poulhiès <dkm@kataplop.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,22 +15,16 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          Rakendra Thapa <rakendrathapa@gmail.com>
+ * @author          Marc Poulhiès <dkm@kataplop.net>
  */
 
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-#include "periph/dev_enums.h"
 #include "cpu_conf.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Length of the CPU_ID in octets
- */
-#define CPUID_LEN           (12U)
 
 /**
  * @brief   Overwrite the default gpio_t type definition
@@ -108,6 +103,70 @@ typedef enum {
     ADC_RES_16BIT = 0xd00,            /**< not supported by hardware */
 } adc_res_t;
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief   Override SPI hardware chip select macro
+ *
+ * As of now, we do not support HW CS, so we always set it to a fixed value
+ */
+#define SPI_HWCS(x)     (UINT_MAX - 1)
+
+/**
+ * @brief   SPI configuration data structure
+ * @{
+ */
+typedef struct {
+    unsigned long ssi_sysctl;          /**< SSI device in sysctl */
+    unsigned long ssi_base;            /**< SSI base address */
+    unsigned long gpio_sysctl;         /**< GPIO device in sysctl */
+    unsigned long gpio_port;           /**< GPIO port */
+    struct {
+        unsigned long clk;             /**< pin used for SCK */
+        unsigned long fss;             /**< pin used for FSS */
+        unsigned long rx;              /**< pin used for MISO */
+        unsigned long tx;              /**< pin used for MOSI */
+        unsigned long mask;            /**< Pin mask */
+    } pins;                            /**< Pin setting */
+} spi_conf_t;
+/** @} */
+
+/**
+ * @brief declare needed generic SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE 1
+#define PERIPH_SPI_NEEDS_TRANSFER_REG 1
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS 1
+#define PERIPH_SPI_NEEDS_INIT_CS 1
+/** @} */
+
+/**
+ * @brief   Override SPI clock speed values
+ * @{
+ */
+#define HAVE_SPI_CLK_T 1
+typedef enum {
+    SPI_CLK_100KHZ = 100000,        /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ = 400000,        /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ   = 1000000,       /**< drive the SPI bus with 1MHz */
+    SPI_CLK_4MHZ   = 4000000,       /**< drive the SPI bus with 4MHz */
+    SPI_CLK_5MHZ   = 5000000,       /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ  = 10000000,      /**< drive the SPI bus with 10MHz */
+} spi_clk_t;
+/** @} */
+
+/**
+ * @brief   Override SPI mode settings
+ * @{
+ */
+#define HAVE_SPI_MODE_T 1
+typedef enum {
+    SPI_MODE_0 = SSI_FRF_MOTO_MODE_0,       /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = SSI_FRF_MOTO_MODE_1,       /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = SSI_FRF_MOTO_MODE_2,       /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = SSI_FRF_MOTO_MODE_0,       /**< CPOL=1, CPHA=1 */
+} spi_mode_t;
+/** @} */
 
 #ifdef __cplusplus
 }

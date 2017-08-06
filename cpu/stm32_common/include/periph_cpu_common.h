@@ -191,6 +191,14 @@ typedef enum {
 #endif /* ndef CPU_FAM_STM32F1 */
 
 /**
+ * @brief   DAC line configuration data
+ */
+typedef struct {
+    gpio_t pin;             /**< pin connected to the line */
+    uint8_t chan;           /**< DAC device used for this line */
+} dac_conf_t;
+
+/**
  * @brief   Timer configuration
  */
 typedef struct {

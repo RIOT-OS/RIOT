@@ -12,7 +12,7 @@
 # JLINK_SERIAL:     Device serial used by JLink
 # JLINK_IF:         Interface used by JLink, default: "SWD"
 # JLINK_SPEED:      Interface clock speed to use (in kHz), default "2000"
-# JLINK_FLASH_ADDR: Starting address of the target's flash memory, default: "0"
+# FLASH_ADDR:       Starting address of the target's flash memory, default: "0"
 # JLINK_PRE_FLASH:  Additional JLink commands to execute before flashing
 # JLINK_POST_FLASH: Additional JLink commands to execute after flashing
 #
@@ -57,8 +57,6 @@ _JLINK=JLinkExe
 _JLINK_SERVER=JLinkGDBServer
 _JLINK_IF=SWD
 _JLINK_SPEED=2000
-# default starting address of the devices flash memory
-_FLASH_ADDR=0
 
 #
 # a couple of tests for certain configuration options
@@ -86,8 +84,9 @@ test_config() {
         echo "Error: No target device defined in JLINK_DEVICE env var"
         exit 1
     fi
-    if [ -z "${JLINK_FLASH_ADDR}" ]; then
-        JLINK_FLASH_ADDR=${_FLASH_ADDR}
+    if [ -z "${FLASH_ADDR}" ]; then
+        echo "Error: No flash address defined in FLASH_ADDR env var"
+        exit 1
     fi
 }
 
@@ -142,7 +141,7 @@ do_flash() {
     if [ ! -z "${JLINK_PRE_FLASH}" ]; then
         printf "${JLINK_PRE_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
-    echo "loadbin ${HEXFILE} ${JLINK_FLASH_ADDR}" >> ${BINDIR}/burn.seg
+    echo "loadbin ${HEXFILE} ${FLASH_ADDR}" >> ${BINDIR}/burn.seg
     if [ ! -z "${JLINK_POST_FLASH}" ]; then
         printf "${JLINK_POST_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
@@ -211,6 +210,7 @@ shift # pop $1 from $@
 case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
+    echo "### Flashing at address ${FLASH_ADDR} ###"
     do_flash "$@"
     ;;
   debug)

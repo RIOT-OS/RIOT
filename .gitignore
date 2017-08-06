@@ -24,6 +24,8 @@ cachegrind.out*
 *.kdev4
 # Codelite (among others) project files
 *.project
+# Visual Studio Code user settings
+.vscode/
 # ctags index files
 tags
 # GDB initialization scripts
@@ -45,6 +47,9 @@ Makefile.local
 .clang_complete
 # YouCompleteMe (https://github.com/Valloric/YouCompleteMe)
 .ycm_extra_conf.py
-.ycm_extra_conf.pyc
-__pycache__
+
+# Python compiled files
+*.pyc
+
+# Ignore download cache
 .dlcache

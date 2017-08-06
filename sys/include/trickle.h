@@ -12,9 +12,14 @@
 /**
  * @defgroup sys_trickle Trickle Timer
  * @ingroup sys
- * @{
- * @file
  * @brief   Implementation of a generic Trickle Algorithm (RFC 6206)
+ *
+ * @see https://tools.ietf.org/html/rfc6206
+ *
+ * @{
+ *
+ * @file
+ * @brief   Trickle timer interface definition
  *
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
@@ -31,29 +36,31 @@
 #include "thread.h"
 
 /**
- * @brief a generic callback function with arguments that is called by
- *        trickle periodically
+ * @brief Trickle callback function with arguments
  */
 typedef struct {
     void (*func)(void *);       /**< callback function pointer */
     void *args;                 /**< callback function arguments */
 } trickle_callback_t;
 
-/** @brief all state variables for a trickle timer */
+/**
+ * @brief all state variables of a trickle timer
+ */
 typedef struct {
     uint8_t k;                      /**< redundancy constant */
-    uint8_t Imax;                   /**< maximum interval size, described as doublings */
+    uint8_t Imax;                   /**< maximum interval size,
+                                         described as of Imin doublings */
     uint16_t c;                     /**< counter */
     uint32_t Imin;                  /**< minimum interval size */
     uint32_t I;                     /**< current interval size */
     uint32_t t;                     /**< time within the current interval */
     kernel_pid_t pid;               /**< pid of trickles target thread */
-    trickle_callback_t callback;    /**< the callback function and parameter that trickle is calling
-                                         after each interval */
+    trickle_callback_t callback;    /**< callback function and parameter that
+                                         trickle calls after each interval */
     msg_t msg;                      /**< the msg_t to use for intervals */
     uint64_t msg_time;              /**< interval in ms */
-    xtimer_t msg_timer;             /**< xtimer to send a msg_t to the target thread
-                                         for a new interval */
+    xtimer_t msg_timer;             /**< xtimer to send a msg_t to the target
+                                         thread for a new interval */
 } trickle_t;
 
 /**
@@ -106,7 +113,7 @@ void trickle_increment_counter(trickle_t *trickle);
 void trickle_interval(trickle_t *trickle);
 
 /**
- * @brief is called after the callback interval is over and calls the callback function
+ * @brief is called after the interval is over and executes callback function
  *
  * @param[in] trickle   trickle timer
  */

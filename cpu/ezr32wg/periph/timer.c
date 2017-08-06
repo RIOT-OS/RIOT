@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_ezr32wg
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file
@@ -79,13 +80,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* start both timers */
     tim->CMD = TIMER_CMD_START;
     pre->CMD = TIMER_CMD_START;
-    return 0;
-}
-
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    unsigned int now = timer_read(dev);
-    timer_set_absolute(dev, channel, now + timeout);
     return 0;
 }
 

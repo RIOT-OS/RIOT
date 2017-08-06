@@ -168,7 +168,7 @@ typedef struct {
  * @return                  ADXL345_NOI2C if initialization of I2C bus failed
  * @return                  ADXL345_NODEV if accelerometer test failed
  */
-int adxl345_init(adxl345_t *dev, adxl345_params_t* params);
+int adxl345_init(adxl345_t *dev, const adxl345_params_t* params);
 /**
  * @brief   Read accelerometer's data
  *

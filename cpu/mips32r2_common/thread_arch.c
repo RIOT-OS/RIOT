@@ -165,7 +165,11 @@ struct linkctx* exctx_find(reg_t id, struct gpctx *gp)
 }
 
 /* unaligned access helper */
-static inline uint32_t __attribute__((optimize("-O3")))
+static inline uint32_t
+#ifndef __clang__
+/* Clang does not support attribute optimize */
+__attribute__((optimize("-O3")))
+#endif
 mem_rw(const void *vaddr)
 {
     uint32_t v;

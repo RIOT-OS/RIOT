@@ -9,7 +9,8 @@
  */
 
 /**
- * @ingroup     cpu_kinetis_common_pwm
+ * @ingroup     cpu_kinetis_common
+ * @ingroup     drivers_periph_pwm
  *
  * @{
  *

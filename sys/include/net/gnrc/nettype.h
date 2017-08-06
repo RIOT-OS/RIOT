@@ -58,6 +58,17 @@ typedef enum {
 
     /**
      * @{
+     * @name Link layer
+     */
+#ifdef MODULE_GNRC_LWMAC
+    GNRC_NETTYPE_LWMAC,          /**< Protocol is lwMAC */
+#endif
+    /**
+     * @}
+     */
+
+    /**
+     * @{
      * @name Network layer
      */
 #ifdef MODULE_GNRC_IPV6

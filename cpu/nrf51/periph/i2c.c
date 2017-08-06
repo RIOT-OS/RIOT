@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_nrf51
+ * @ingroup     drivers_periph_i2c
  * @{
  *
  * @file
@@ -17,7 +18,16 @@
  *
  * @}
  */
-
+/**
+ * @ingroup     cpu_nrf51
+ * @ingroup     drivers_periph_i2c
+ * @{
+ *
+ * @file
+ * @brief       Low-level I2V driver implementation
+ *
+ * @}
+ */
 #include "cpu.h"
 #include "mutex.h"
 #include "assert.h"

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Daniel Amkaer Sorensen
  *               2016 Freie Universität Berlin
+ *               2017 Hamburg University of Applied Sciences
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,7 +9,8 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_atmega_common
+ * @ingroup     drivers_periph_spi
  * @{
  *
  * @file
@@ -16,6 +18,7 @@
  *
  * @author      Daniel Amkaer Sorensen <daniel.amkaer@gmail.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
  *
  * @}
  */
@@ -46,18 +49,13 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
-
-    /* the pin configuration for this CPU is fixed:
-     * - PB3: MISO (configure as input - done automatically)
-     * - PB2: MOSI (configure as output)
-     * - PB1: SCK  (configure as output)
-     * - PB0: SS   (configure as output, but unused)
-     *
-     * The SS pin must be configured as output for the SPI device to work as
-     * master correctly, though we do not use it for now (as we handle the chip
-     * select externally for now)
-     */
+    /* set SPI pins as output */
+#if defined (CPU_ATMEGA2560) || defined (CPU_ATMEGA1281)
     DDRB |= ((1 << DDB2) | (1 << DDB1) | (1 << DDB0));
+#endif
+#ifdef CPU_ATMEGA328P
+    DDRB |= ((1 << DDB2) | (1 << DDB3) | (1 << DDB5));
+#endif
 }
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
@@ -91,8 +89,8 @@ void spi_release(spi_t bus)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
-    uint8_t *out_buf = (uint8_t *)out;
-    uint8_t *in_buf = (uint8_t *)in;
+    const uint8_t *out_buf = out;
+    uint8_t *in_buf = in;
 
     assert(out_buf || in_buf);
 

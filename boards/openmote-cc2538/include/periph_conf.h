@@ -14,6 +14,7 @@
  * @brief       Peripheral MCU configuration for the OpenMote-cc2538 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef PERIPH_CONF_H
@@ -62,6 +63,23 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
 #define TIMER_IRQ_PRIO      1
+/** @} */
+
+/**
+ * @name ADC configuration
+ * @{
+ */
+#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+
+static const adc_conf_t adc_config[] = {
+    GPIO_PIN(0, 2), /**< GPIO_PA2 = AD4_PIN */
+    GPIO_PIN(0, 3), /**< GPIO_PA3 = CTS_DI07_PIN */
+    GPIO_PIN(0, 4), /**< GPIO_PA4 = AD5_PIN */
+    GPIO_PIN(0, 5), /**< GPIO_PA5 = AD6_PIN */
+    GPIO_PIN(0, 6), /**< GPIO_PA6 = ON_SLEEP_PIN */
+};
+
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**

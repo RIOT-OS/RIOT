@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_cc26x0
+ * @ingroup     drivers_periph_uart
  * @{
  *
  * @file

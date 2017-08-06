@@ -26,7 +26,7 @@
  * This is surely not the most beautiful implementation of a stringification
  * function, but works...
  */
-const char *saul_class_to_str(uint8_t class_id)
+const char *saul_class_to_str(const uint8_t class_id)
 {
     switch (class_id) {
         case SAUL_CLASS_UNDEF:  return "CLASS_UNDEF";

@@ -8,10 +8,14 @@
 
 /**
  * @ingroup     cpu_samd21
+ * @ingroup     drivers_periph_rtc
  * @{
+ *
  * @file
  * @brief       Low-level RTC driver implementation
+ *
  * @author      Baptiste Clenet <bapclenet@gmail.com>
+ *
  * @}
  */
 

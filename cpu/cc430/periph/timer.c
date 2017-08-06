@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     cpu_cc430
+ * @ingroup     cc430
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file
@@ -65,12 +66,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* start the timer in continuous mode */
     TIMER_BASE->CTL |= CTL_MC_CONT;
     return 0;
-}
-
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    uint16_t target = TIMER_BASE->R + (uint16_t)timeout;
-    return timer_set_absolute(dev, channel, (unsigned int)target);
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)

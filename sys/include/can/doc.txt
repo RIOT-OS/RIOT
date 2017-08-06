@@ -1,0 +1,26 @@
+/**
+ * @defgroup sys_can CAN (Controller Area Network)
+ * @ingroup net
+ * @brief RIOT CAN stack
+ *
+ * This module is a full CAN stack integrated to RIOT.
+ * It includes a low-level interface, a data link layer, an ISO-TP layer and
+ * a user interface.
+ *
+ * The low-level interface, candev, must be implemented by controler drivers.
+ * The optional transceiver support can also be activated. Transceiver drivers must
+ * then implement the trx_can interface.
+ *
+ * The data link layer is built around a device thread (one thread per CAN device),
+ * and a common part. The common part is composed of the dll interface, for low-level
+ * calls (from the device) and the raw interface for upper-level calls.
+ * Internally it also uses the pkt module to allocate frames and the router module
+ * to manage CAN filters.
+ *
+ * The ISO-TP layer uses the data link layer to send and receive CAN frames.
+ *
+ * Finally, the connection layer is the user interface to send and receive raw
+ * CAN frames or ISO-TP datagrams.
+ *
+ * @see drivers_can
+ */

@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_samd21
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file
@@ -51,8 +52,9 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 /* select the clock generator depending on the main clock source:
  * GCLK0 (1MHz) if we use the internal 8MHz oscillator
  * GCLK1 (8MHz) if we use the PLL */
-#if CLOCK_USE_PLL
+#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
     /* configure GCLK1 (configured to 1MHz) to feed TC3, TC4 and TC5 */;
+    /* configure GCLK1 to feed TC3, TC4 and TC5 */;
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC3_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
     while (GCLK->STATUS.bit.SYNCBUSY) {}
     /* TC4 and TC5 share the same channel */
@@ -77,8 +79,8 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
         while (TIMER_0_DEV.CTRLA.bit.SWRST) {}
         /* choosing 16 bit mode */
         TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT16_Val;
-#if CLOCK_USE_PLL
-        /* sourced by 1MHz with prescaler 1 results in... you know it :-) */
+#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
+        /* PLL/DFLL: sourced by 1MHz and prescaler 1 to reach 1MHz */
         TIMER_0_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1_Val;
 #else
         /* sourced by 8MHz with Presc 8 results in 1MHz clk */
@@ -101,8 +103,8 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
 
         TIMER_1_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
-#if CLOCK_USE_PLL
-        /* sourced by 1MHz and prescaler 1 to reach 1MHz */
+#if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
+        /* PLL/DFLL: sourced by 1MHz and prescaler 1 to reach 1MHz */
         TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1_Val;
 #else
         /* sourced by 8MHz with Presc 8 results in 1Mhz clk */
@@ -127,11 +129,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     timer_start(dev);
 
     return 0;
-}
-
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    return timer_set_absolute(dev, channel, timer_read(dev) + timeout);
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)

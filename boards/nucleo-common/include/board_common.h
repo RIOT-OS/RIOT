@@ -7,9 +7,15 @@
  */
 
 /**
- * @defgroup    boards_nucleo_common STM Nucleo Common
+ * @defgroup    boards_nucleo STM Nucleo boards
  * @ingroup     boards
- * @brief       Common files for STM Nucleo boards
+ * @brief       STM Nucleo boards
+ */
+
+/**
+ * @defgroup    boards_nucleo64_common STM Nucleo 64 boards common
+ * @ingroup     boards_nucleo
+ * @brief       Common files for STM Nucleo 64 boards
  * @{
  *
  * @file

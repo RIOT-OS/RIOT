@@ -25,12 +25,11 @@
 
 
 
-static int read_temperature(void *dev, phydat_t *res)
+static int read_temperature(const void *dev, phydat_t *res)
 {
     int16_t temperature;
-    jc42_t *d = (jc42_t *)dev;
 
-    jc42_get_temperature(d, &temperature);
+    jc42_get_temperature((const jc42_t *)dev, &temperature);
     res->val[0] = temperature;
     res->unit = UNIT_TEMP_C;
     res->scale = -2;

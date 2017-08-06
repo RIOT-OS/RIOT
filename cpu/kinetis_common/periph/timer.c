@@ -9,7 +9,8 @@
  */
 
 /**
- * @ingroup     cpu_kinetis_common_timer
+ * @ingroup     cpu_kinetis_common
+ * @ingroup     drivers_periph_timer
  *
  * @{
  *

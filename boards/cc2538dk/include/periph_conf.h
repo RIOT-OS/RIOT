@@ -144,6 +144,19 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
+ * @name ADC configuration
+ * @{
+ */
+#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+
+static const adc_conf_t adc_config[] = {
+    GPIO_PIN(0, 6), /**< GPIO_PA6 = ADC_ALS_PIN */
+};
+
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+/** @} */
+
+/**
  * @name Radio peripheral configuration
  * @{
  */

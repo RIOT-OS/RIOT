@@ -10,6 +10,7 @@
 
 /**
  * @ingroup     cpu_sam3
+ * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file

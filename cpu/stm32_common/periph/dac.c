@@ -8,7 +8,8 @@
  */
 
 /**
- * @ingroup     cpu_stm32_common
+ * @ingroup     cpu_cortexm_common
+ * @ingroup     drivers_periph_dac
  * @{
  *
  * @file
@@ -21,71 +22,105 @@
  */
 
 #include "cpu.h"
+#include "assert.h"
 #include "periph/dac.h"
-#include "periph_conf.h"
 
 /* only compile this, if the CPU has a DAC */
-#if (defined(DAC) || defined(DAC1)) && defined(DAC_CONFIG)
+#ifdef DAC_NUMOF
 
-#ifdef DAC2
-#define _DAC(line)          (dac_config[line].dac ? DAC2 : DAC1)
+/* DAC channel enable bits */
+#ifdef DAC_CR_EN2
+#define EN_MASK             (DAC_CR_EN1 | DAC_CR_EN2)
 #else
-#define _DAC(line)          DAC
+#define EN_MASK             (DAC_CR_EN1)
 #endif
 
-/**
- * @brief   Get the DAC configuration from the board config
- */
-static const dac_conf_t dac_config[] = DAC_CONFIG;
+/* get RCC bit */
+#ifdef RCC_APB1ENR_DAC1EN
+#define RCC_BIT             (RCC_APB1ENR_DAC1EN)
+#else
+#define RCC_BIT             (RCC_APB1ENR_DACEN)
+#endif
+
+/* deduct DAC device from given line channel */
+static inline DAC_TypeDef *dev(dac_t line)
+{
+#if defined(DAC2)
+    return (dac_config[line].chan > 1) ? DAC2 : DAC1;
+#elif defined (DAC1)
+    return DAC1;
+#else
+    return DAC;
+#endif
+}
 
 int8_t dac_init(dac_t line)
 {
     if (line >= DAC_NUMOF) {
-        return -1;
+        return DAC_NOLINE;
     }
 
     /* configure pin */
     gpio_init_analog(dac_config[line].pin);
-    /* enable the DAC's clock */
-#if defined(DAC2)
-    periph_clk_en(APB1, dac_config[line].dac ?
-                  RCC_APB1ENR_DAC2EN : RCC_APB1ENR_DAC1EN);
-#elif defined(DAC1)
-    periph_clk_en(APB1, RCC_APB1ENR_DAC1EN);
-#else
-    periph_clk_en(APB1, RCC_APB1ENR_DACEN);
-#endif
+
     /* reset output and enable the line's channel */
-    dac_set(line, 0);
     dac_poweron(line);
-    return 0;
+    dac_set(line, 0);
+
+    return DAC_OK;
 }
 
 void dac_set(dac_t line, uint16_t value)
 {
-    value = (value >> 4);       /* scale to 12-bit */
+    assert(line < DAC_NUMOF);
+
+    /* scale set value to 12-bit */
+    value = (value >> 4);
+
 #ifdef DAC_DHR12R2_DACC2DHR
-    if (dac_config[line].chan) {
-        _DAC(line)->DHR12R2 = value;
+    if (dac_config[line].chan & 0x01) {
+        dev(line)->DHR12R2 = value;
     }
     else {
-        _DAC(line)->DHR12R1 = value;
+        dev(line)->DHR12R1 = value;
     }
 #else
-    (void) line;
-
-    _DAC(line)->DHR12R1 = value;
+    dev(line)->DHR12R1 = value;
 #endif
 }
 
 void dac_poweron(dac_t line)
 {
-    DAC->CR |= (1 << (16 * dac_config[line].chan));
+    assert(line < DAC_NUMOF);
+
+    /* enable the DAC's clock */
+#if defined(DAC2)
+    periph_clk_en(APB1, (dac_config[line].chan > 1) ?
+                  RCC_APB1ENR_DAC2EN : RCC_APB1ENR_DAC1EN);
+#else
+    periph_clk_en(APB1, RCC_BIT);
+#endif
+
+    /* enable corresponding DAC channel */
+    dev(line)->CR |= (1 << (16 * (dac_config[line].chan & 0x01)));
 }
 
 void dac_poweroff(dac_t line)
 {
-    DAC->CR &= ~(1 << (16 * dac_config[line].chan));
+    assert(line < DAC_NUMOF);
+
+    /* disable corresponding channel */
+    dev(line)->CR &= ~(1 << (16 * (dac_config[line].chan & 0x01)));
+
+    /* disable the DAC's clock in case no channel is active anymore */
+    if (!(dev(line)->CR & EN_MASK)) {
+#if defined(DAC2)
+        periph_clk_dis(APB1, (dac_config[line].chan > 1) ?
+                      RCC_APB1ENR_DAC2EN : RCC_APB1ENR_DAC1EN);
+#else
+        periph_clk_dis(APB1, RCC_BIT);
+#endif
+    }
 }
 
 #else

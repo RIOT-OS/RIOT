@@ -23,12 +23,11 @@
 #include "saul.h"
 #include "tcs37727.h"
 
-static int read(void *dev, phydat_t *res)
+static int read(const void *dev, phydat_t *res)
 {
-    tcs37727_t *d = (tcs37727_t *)dev;
     tcs37727_data_t val;
 
-    tcs37727_read(d, &val);
+    tcs37727_read((const tcs37727_t *)dev, &val);
 
     res->val[0] = (int16_t)val.red;
     res->val[1] = (int16_t)val.green;
