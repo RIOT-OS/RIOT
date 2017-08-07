@@ -6,7 +6,10 @@ BOARD_INSUFFICIENT_MEMORY := chronos nucleo32-f031 nucleo32-f042
 
 USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_ipv6_nib
+USEMODULE += gnrc_netif2
 USEMODULE += embunit
+USEMODULE += netdev_eth
+USEMODULE += netdev_test
 
 CFLAGS += -DDEVELHELP
 CFLAGS += -DGNRC_NETTYPE_NDP2=GNRC_NETTYPE_TEST

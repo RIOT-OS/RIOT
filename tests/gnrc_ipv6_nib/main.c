@@ -33,12 +33,6 @@
 #include "sched.h"
 
 #define _BUFFER_SIZE    (128)
-#define _LL0            (0xce)
-#define _LL1            (0xab)
-#define _LL2            (0xfe)
-#define _LL3            (0xad)
-#define _LL4            (0xf7)
-#define _LL5            (0x26)
 
 static const uint8_t _loc_l2[] = { _LL0, _LL1, _LL2, _LL3, _LL4, _LL5 };
 static const ipv6_addr_t _loc_ll = { {
@@ -74,7 +68,7 @@ static void _set_up(void)
     }
 }
 
-static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH(kernel_pid_t iface)
+static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH(gnrc_netif2_t *netif)
 {
     msg_t msg;
     gnrc_ipv6_nib_nc_t nce;
@@ -82,9 +76,9 @@ static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH(kernel_pid_t iface
     gnrc_pktsnip_t *pkt;
 
     TEST_ASSERT_EQUAL_INT(-EHOSTUNREACH,
-                          gnrc_ipv6_nib_get_next_hop_l2addr(&_rem_ll, iface,
+                          gnrc_ipv6_nib_get_next_hop_l2addr(&_rem_ll, netif,
                                                             NULL, &nce));
-    if (iface != KERNEL_PID_UNDEF) {
+    if (netif != NULL) {
         ndp_nbr_sol_t *nbr_sol;
         bool contains_sl2ao = false;
 
@@ -96,7 +90,7 @@ static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH(kernel_pid_t iface
         TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE,
                               gnrc_ipv6_nib_nc_get_nud_state(&nce));
         TEST_ASSERT(!gnrc_ipv6_nib_nc_is_router(&nce));
-        TEST_ASSERT_EQUAL_INT(iface, gnrc_ipv6_nib_nc_get_iface(&nce));
+        TEST_ASSERT_EQUAL_INT(netif->pid, gnrc_ipv6_nib_nc_get_iface(&nce));
         TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_AR_STATE_GC,
                               gnrc_ipv6_nib_nc_get_ar_state(&nce));
         TEST_ASSERT_EQUAL_INT(1, msg_avail());
@@ -128,22 +122,22 @@ static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH(kernel_pid_t iface
 
 static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH_no_iface(void)
 {
-    test_get_next_hop_l2addr__link_local_EHOSTUNREACH(KERNEL_PID_UNDEF);
+    test_get_next_hop_l2addr__link_local_EHOSTUNREACH(NULL);
 }
 
 static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH_iface(void)
 {
-    test_get_next_hop_l2addr__link_local_EHOSTUNREACH(_mock_netif_pid);
+    test_get_next_hop_l2addr__link_local_EHOSTUNREACH(_mock_netif);
 }
 
 static void test_get_next_hop_l2addr__link_local_static_conf(void)
 {
     gnrc_ipv6_nib_nc_t nce;
 
-    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_nc_set(&_rem_ll, _mock_netif_pid,
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_nc_set(&_rem_ll, _mock_netif->pid,
                                                   _rem_l2, sizeof(_rem_l2)));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_get_next_hop_l2addr(&_rem_ll,
-                                                               _mock_netif_pid,
+                                                               _mock_netif,
                                                                NULL, &nce));
     TEST_ASSERT_MESSAGE((memcmp(&_rem_ll, &nce.ipv6, sizeof(_rem_ll)) == 0),
                         "_rem_ll != nce.ipv6");
@@ -152,7 +146,7 @@ static void test_get_next_hop_l2addr__link_local_static_conf(void)
                         "_rem_l2 != nce.l2addr");
     TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED,
                           gnrc_ipv6_nib_nc_get_nud_state(&nce));
-    TEST_ASSERT_EQUAL_INT(_mock_netif_pid, gnrc_ipv6_nib_nc_get_iface(&nce));
+    TEST_ASSERT_EQUAL_INT(_mock_netif->pid, gnrc_ipv6_nib_nc_get_iface(&nce));
     TEST_ASSERT(!gnrc_ipv6_nib_nc_is_router(&nce));
     TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_AR_STATE_MANUAL,
                           gnrc_ipv6_nib_nc_get_ar_state(&nce));
@@ -172,7 +166,7 @@ void _simulate_ndp_handshake(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     /* trigger sending of neighbor discovery */
     TEST_ASSERT_EQUAL_INT(-EHOSTUNREACH,
                           gnrc_ipv6_nib_get_next_hop_l2addr(dst,
-                                                            _mock_netif_pid,
+                                                            _mock_netif,
                                                             NULL, &nce));
     TEST_ASSERT_EQUAL_INT(1, msg_avail());
     /* clear message queue */
@@ -192,7 +186,7 @@ void _simulate_ndp_handshake(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     tl2ao->type = NDP_OPT_TL2A;
     tl2ao->len = 1;
     memcpy(tl2ao + 1, _rem_l2, sizeof(_rem_l2));
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, (icmpv6_hdr_t *)nbr_adv,
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, (icmpv6_hdr_t *)nbr_adv,
                              sizeof(ndp_nbr_adv_t) + 8U);
 }
 
@@ -202,7 +196,7 @@ static void test_get_next_hop_l2addr__link_local_after_handshake(uint8_t adv_fla
 
     _simulate_ndp_handshake(&_loc_ll, &_rem_ll, adv_flags);
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_get_next_hop_l2addr(&_rem_ll,
-                                                               _mock_netif_pid,
+                                                               _mock_netif,
                                                                NULL, &nce));
     TEST_ASSERT_MESSAGE((memcmp(&_rem_ll, &nce.ipv6, sizeof(_rem_ll)) == 0),
                         "_rem_ll != nce.ipv6");
@@ -211,7 +205,7 @@ static void test_get_next_hop_l2addr__link_local_after_handshake(uint8_t adv_fla
                         "_rem_l2 != nce.l2addr");
     TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE,
                           gnrc_ipv6_nib_nc_get_nud_state(&nce));
-    TEST_ASSERT_EQUAL_INT(_mock_netif_pid, gnrc_ipv6_nib_nc_get_iface(&nce));
+    TEST_ASSERT_EQUAL_INT(_mock_netif->pid, gnrc_ipv6_nib_nc_get_iface(&nce));
     if (adv_flags & NDP_NBR_ADV_FLAGS_R) {
         TEST_ASSERT(gnrc_ipv6_nib_nc_is_router(&nce));
     }
@@ -242,7 +236,7 @@ static void test_get_next_hop_l2addr__link_local_after_handshake_no_iface(void)
     _simulate_ndp_handshake(&_loc_ll, &_rem_ll, NDP_NBR_ADV_FLAGS_S);
     TEST_ASSERT_EQUAL_INT(-EHOSTUNREACH,
                           gnrc_ipv6_nib_get_next_hop_l2addr(&_rem_ll,
-                                                            KERNEL_PID_UNDEF,
+                                                            NULL,
                                                             NULL, &nce));
 }
 
@@ -257,7 +251,7 @@ static void test_handle_pkt__unknown_type(void)
     memcpy(&ipv6->dst, &_rem_ll, sizeof(ipv6->dst));
     icmpv6->type = ICMPV6_ECHO_REQ;
     icmpv6->code = 0;
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6,
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6,
                              sizeof(icmpv6_hdr_t));
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
@@ -301,7 +295,7 @@ static void test_handle_pkt__nbr_sol__invalid_hl(void)
     size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, 194U, 0U,
                                      &_loc_ll, _rem_l2, sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -315,7 +309,7 @@ static void test_handle_pkt__nbr_sol__invalid_code(void)
     size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, 255U, 201U,
                                      &_loc_ll, _rem_l2, sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -330,7 +324,7 @@ static void test_handle_pkt__nbr_sol__invalid_icmpv6_len(void)
     _set_nbr_sol(&_rem_ll, &_loc_sol_nodes, 255U, 0U, &_loc_ll, _rem_l2,
                  sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6,
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6,
                              sizeof(ndp_nbr_sol_t) - 1);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
@@ -346,7 +340,7 @@ static void test_handle_pkt__nbr_sol__invalid_tgt(void)
                                      &ipv6_addr_all_routers_site_local, _rem_l2,
                                      sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -364,7 +358,7 @@ static void test_handle_pkt__nbr_sol__invalid_opt_len(void)
     opt->type = NDP_OPT_SL2A;
     opt->len = 0U;
     icmpv6_len += sizeof(ndp_opt_t);
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -378,7 +372,7 @@ static void test_handle_pkt__nbr_sol__invalid_dst(void)
     size_t icmpv6_len = _set_nbr_sol(&ipv6_addr_unspecified, &_loc_ll, 255U, 0U,
                                      &_loc_ll, NULL, 0);
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -393,7 +387,7 @@ static void test_handle_pkt__nbr_sol__invalid_sl2ao(void)
                                      255U, 0U, &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -408,7 +402,7 @@ static void test_handle_pkt__nbr_sol__tgt_not_assigned(void)
                                      255U, 0U, &_rem_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -425,12 +419,12 @@ static void test_pkt_is_nbr_adv(gnrc_pktsnip_t *pkt, const ipv6_addr_t *dst,
     ndp_nbr_adv_t *nbr_adv;
     ndp_opt_t *tl2ao;
 
-    /* first snip is a netif header to _mock_netif_pid */
+    /* first snip is a netif header to _mock_netif */
     TEST_ASSERT_NOT_NULL(pkt);
     TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_NETIF, pkt->type);
     TEST_ASSERT(sizeof(gnrc_netif_hdr_t) <= pkt->size);
     netif_hdr = pkt->data;
-    TEST_ASSERT_EQUAL_INT(_mock_netif_pid, netif_hdr->if_pid);
+    TEST_ASSERT_EQUAL_INT(_mock_netif->pid, netif_hdr->if_pid);
     /* second snip is an IPv6 header to dst */
     TEST_ASSERT_NOT_NULL(pkt->next);
     TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_IPV6, pkt->next->type);
@@ -475,7 +469,7 @@ static void test_handle_pkt__nbr_sol__ll_src(unsigned exp_nud_state,
                                      255U, 0U, &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "Expected neighbor cache entry");
     TEST_ASSERT_MESSAGE(ipv6_addr_equal(&_rem_ll, &nce.ipv6),
@@ -485,7 +479,7 @@ static void test_handle_pkt__nbr_sol__ll_src(unsigned exp_nud_state,
                         "_rem_l2 != nce.l2addr");
     TEST_ASSERT_EQUAL_INT(exp_nud_state, gnrc_ipv6_nib_nc_get_nud_state(&nce));
     TEST_ASSERT(!gnrc_ipv6_nib_nc_is_router(&nce));
-    TEST_ASSERT_EQUAL_INT(_mock_netif_pid, gnrc_ipv6_nib_nc_get_iface(&nce));
+    TEST_ASSERT_EQUAL_INT(_mock_netif->pid, gnrc_ipv6_nib_nc_get_iface(&nce));
     TEST_ASSERT_EQUAL_INT(exp_ar_state, gnrc_ipv6_nib_nc_get_ar_state(&nce));
     TEST_ASSERT_EQUAL_INT(1, msg_avail());
     msg_receive(&msg);
@@ -518,7 +512,7 @@ static void test_handle_pkt__nbr_sol__ll_src_no_sl2ao(void)
     size_t icmpv6_len = _set_nbr_sol(&_rem_ll, &_loc_sol_nodes,
                                      255U, 0U, &_loc_ll, NULL, 0);
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     TEST_ASSERT_EQUAL_INT(1, msg_avail());
@@ -570,7 +564,7 @@ static void test_handle_pkt__nbr_adv__invalid_hl(void)
                                      NDP_NBR_ADV_FLAGS_S, &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -585,7 +579,7 @@ static void test_handle_pkt__nbr_adv__invalid_code(void)
                                      NDP_NBR_ADV_FLAGS_S, &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -601,7 +595,7 @@ static void test_handle_pkt__nbr_adv__invalid_icmpv6_len(void)
                  &_loc_ll, _rem_l2,
                  sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6,
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6,
                              sizeof(ndp_nbr_adv_t) - 1);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
@@ -618,7 +612,7 @@ static void test_handle_pkt__nbr_adv__invalid_tgt(void)
                                      &ipv6_addr_all_routers_site_local, _rem_l2,
                                      sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -633,7 +627,7 @@ static void test_handle_pkt__nbr_adv__invalid_flags(void)
                                      255U, 0U, NDP_NBR_ADV_FLAGS_S, &_loc_ll,
                                      NULL, 0);
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -652,7 +646,7 @@ static void test_handle_pkt__nbr_adv__invalid_opt_len(void)
     opt->type = NDP_OPT_SL2A;
     opt->len = 0U;
     icmpv6_len += sizeof(ndp_opt_t);
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -667,7 +661,7 @@ static void test_handle_pkt__nbr_adv__unspecified_src(void)
                                      NDP_NBR_ADV_FLAGS_S, &_loc_ll, _rem_l2,
                                      sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
@@ -682,7 +676,7 @@ static void test_handle_pkt__nbr_adv__unsolicited(void)
                                      NDP_NBR_ADV_FLAGS_S, &_loc_ll,
                                      _rem_l2, sizeof(_rem_l2));
 
-    gnrc_ipv6_nib_handle_pkt(_mock_netif_pid, ipv6, icmpv6, icmpv6_len);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     TEST_ASSERT_EQUAL_INT(0, msg_avail());
@@ -752,20 +746,6 @@ int _mock_netif_get(gnrc_netapi_opt_t *opt)
             }
             memcpy(opt->data, _loc_l2, sizeof(_loc_l2));
             return sizeof(_loc_l2);
-        case NETOPT_SRC_LEN: {
-                uint16_t *val = opt->data;
-                if (opt->data_len != sizeof(uint16_t)) {
-                    return -EOVERFLOW;
-                }
-                *val = sizeof(_loc_l2);
-                return sizeof(uint16_t);
-            }
-        case NETOPT_IPV6_IID:
-            if (opt->data_len < sizeof(_loc_iid)) {
-                return -EOVERFLOW;
-            }
-            memcpy(opt->data, _loc_iid, sizeof(_loc_iid));
-            return sizeof(_loc_iid);
         case NETOPT_IS_WIRED:
             return 1;
         case NETOPT_MAX_PACKET_SIZE: {
