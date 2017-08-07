@@ -192,7 +192,7 @@ uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out)
 void spi_transfer_regs(spi_t bus, spi_cs_t cs, uint8_t reg, const void *out, void *in, size_t len)
 {
     if (bus >= SPI_UNDEF) {
-       // return -1;
+       return;
     }
     //MAP_SPITransfer(GSPI_BASE, &reg, 0, 1, SPI_CS_ENABLE);
     MAP_SPITransfer(GSPI_BASE, &reg, 0, 1, 0);
