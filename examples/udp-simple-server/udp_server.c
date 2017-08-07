@@ -80,12 +80,15 @@ int main(void) {
 
     while(1) {
            msg_receive(&msg);
-           if(msg.type==SBAPP_IP_ACQUIRED) {
-                printf("IP up, starting udp server ...\n");
-	 	server_hand();
-            }
-	   else 
+           switch(msg.type) {
+            case SBAPP_IP_ACQUIRED:
+                printf("IP up, starting udp client ...\n");
+
+		server_hand();
+                break;
+            default:
                 printf("unexpected message %d\n", msg.type);
-        }
+          }
+	}
     return 0;
 }

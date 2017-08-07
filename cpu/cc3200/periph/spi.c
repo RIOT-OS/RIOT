@@ -18,7 +18,6 @@
  * @}
  */
 
-#include <stdio.h>
 #include "cpu.h"
 #include "mutex.h"
 #include "periph/spi.h"
@@ -143,7 +142,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 void spi_release(spi_t bus)
 {
     if (bus >= SPI_UNDEF) {
-        printf("\nUndefined SPI device\n");
+        return;
     }
     mutex_unlock(&lock);
 }
@@ -166,7 +165,7 @@ uint8_t spi_transfer_byte(spi_t bus, spi_cs_t cs, bool cont, uint8_t out)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont, const void *out, void *in, size_t len)
 {
     if (bus >= SPI_UNDEF) {
-       // return -1;
+        return;
     }
 
     //MAP_SPITransfer(GSPI_BASE, (unsigned char*)out, (unsigned char*)in, length, SPI_CS_ENABLE|SPI_CS_DISABLE);
