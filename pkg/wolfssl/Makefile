@@ -10,10 +10,10 @@ PKG_LICENSE=GPLv2
 export RIOT_CFLAGS = ${CFLAGS} ${INCLUDES}
 
 all: git-download
-	mkdir $(PKG_BUILDDIR)/../../../native/wolfssl/
-	mkdir $(PKG_BUILDDIR)/../../../native/wolfssl/src
-	mkdir $(PKG_BUILDDIR)/../../../native/wolfssl/wolfcrypt
-	mkdir $(PKG_BUILDDIR)/../../../native/wolfssl/wolfcrypt/src
+	mkdir $(PKG_BUILDDIR)/../../../$(BOARD)/wolfssl/
+	mkdir $(PKG_BUILDDIR)/../../../$(BOARD)/wolfssl/src
+	mkdir $(PKG_BUILDDIR)/../../../$(BOARD)/wolfssl/wolfcrypt
+	mkdir $(PKG_BUILDDIR)/../../../$(BOARD)/wolfssl/wolfcrypt/src
 	cp Makefile.wolfssl $(PKG_BUILDDIR)/Makefile
 	"$(MAKE)" -C $(PKG_BUILDDIR)/
 
