@@ -170,8 +170,6 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont, const void *out, void
 
     //MAP_SPITransfer(GSPI_BASE, (unsigned char*)out, (unsigned char*)in, length, SPI_CS_ENABLE|SPI_CS_DISABLE);
     MAP_SPITransfer(GSPI_BASE, (unsigned char*)out, (unsigned char*)in, len, 0);
-
-    //return length;
 }
 
 uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out)
@@ -198,9 +196,8 @@ void spi_transfer_regs(spi_t bus, spi_cs_t cs, uint8_t reg, const void *out, voi
     MAP_SPITransfer(GSPI_BASE, &reg, 0, 1, 0);
     //if(MAP_SPITransfer(GSPI_BASE, (unsigned char*)&out, (unsigned char*)in, length, SPI_CS_DISABLE)) {
     if(MAP_SPITransfer(GSPI_BASE, (unsigned char*)out, (unsigned char*)in, len, 0)) {
-    	//return -1;
+    	return;
     }
-    //return length+1;
 }
 
 void spi_transmission_begin(spi_t dev, char reset_val)
