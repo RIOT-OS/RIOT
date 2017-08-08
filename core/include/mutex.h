@@ -37,9 +37,14 @@
 #endif
 
 /**
+ * @brief Mutex struct forward declaration
+ */
+typedef struct mutex mutex_t;
+
+/**
  * @brief Mutex structure. Must never be modified by the user.
  */
-typedef struct {
+struct mutex {
     /**
      * @brief   The process waiting queue of the mutex. **Must never be changed
      *          by the user.**
@@ -48,16 +53,17 @@ typedef struct {
     list_node_t queue;
 #ifdef MODULE_CORE_PRIORITY_INHERITANCE
     kernel_pid_t owner;
-    uint8_t prio_before;
+    uint8_t prio_borrowed;
+    mutex_t *next;
 #endif
-} mutex_t;
+};
 
 /**
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
 #ifdef MODULE_CORE_PRIORITY_INHERITANCE
-#define MUTEX_INIT { { NULL }, KERNEL_PID_UNDEF, THREAD_PRIORITY_UNDEF }
+#define MUTEX_INIT { { NULL }, KERNEL_PID_UNDEF, THREAD_PRIORITY_UNDEF, NULL }
 #else
 #define MUTEX_INIT { { NULL } }
 #endif
@@ -66,7 +72,7 @@ typedef struct {
  * @brief Static initializer for mutex_t with a locked mutex
  */
 #ifdef MODULE_CORE_PRIORITY_INHERITANCE
-#define MUTEX_INIT_LOCKED { { MUTEX_LOCKED }, KERNEL_PID_UNDEF, THREAD_PRIORITY_UNDEF }
+#define MUTEX_INIT_LOCKED { { MUTEX_LOCKED }, KERNEL_PID_UNDEF, NULL }
 #else
 #define MUTEX_INIT_LOCKED { { MUTEX_LOCKED } }
 #endif

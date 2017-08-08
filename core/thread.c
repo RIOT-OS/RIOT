@@ -232,6 +232,11 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     cb->msg_array = NULL;
 #endif
 
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+    cb->prio_config = priority;
+    cb->mutex_locks = NULL;
+#endif
+
     sched_num_threads++;
 
     DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name, cb->pid, priority);

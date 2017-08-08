@@ -48,7 +48,9 @@ int _mutex_lock(mutex_t *mutex, int blocking)
 
 #ifdef MODULE_CORE_PRIORITY_INHERITANCE
         mutex->owner = me->pid;
-        mutex->prio_before = THREAD_PRIORITY_UNDEF;
+        mutex->prio_borrowed = me->priority;
+        mutex->next = me->mutex_locks;
+        me->mutex_locks = mutex;
 #endif
         irq_restore(irqstate);
         return 1;
@@ -67,12 +69,16 @@ int _mutex_lock(mutex_t *mutex, int blocking)
 
 #ifdef MODULE_CORE_PRIORITY_INHERITANCE
         thread_t *owner = (thread_t *)thread_get(mutex->owner);
+        /* If my priority is higher than the priority this mutex can borrow,
+         * I lend my priority to this mutex */
+        if (me->priority < mutex->prio_borrowed) {
+            mutex->prio_borrowed = me->priority;
+        }
         /* if my priority is higher than the priority of the current mutex
          * owner, I lend my priority to the current owner */
         if (me->priority < owner->priority) {
             DEBUG("PID[%" PRIkernel_pid "]: changing priority from %i -> %i\n",
                   owner->pid, owner->priority, me->priority);
-            mutex->prio_before = owner->priority;
             sched_change_priority(owner, me->priority);
         }
 #endif
@@ -105,12 +111,29 @@ void mutex_unlock(mutex_t *mutex)
 
 #ifdef MODULE_CORE_PRIORITY_INHERITANCE
     thread_t *owner = (thread_t *)thread_get(mutex->owner);
+    mutex_t **prev = &(owner->mutex_locks);
+    /* Remove the mutex from the list */
+    for (mutex_t *m = owner->mutex_locks; m != NULL; m = m->next) {
+        if (m == mutex) {
+            *prev = mutex->next;
+            mutex->next = NULL;
+            break;
+        }
+        prev = &(m->next);
+    }
+
+    uint8_t new_prio = owner->prio_config;
+    for (mutex_t *m = owner->mutex_locks; m != NULL; m = m->next) {
+        if (m->prio_borrowed < new_prio) {
+            new_prio = m->prio_borrowed;
+        }
+    }
+
     /* restore the priority of the releasing thread */
-    if (mutex->prio_before != THREAD_PRIORITY_UNDEF) {
+    if (owner->priority != new_prio) {
         DEBUG("PID[%" PRIkernel_pid "]: changing priority from %i -> %i\n",
-              owner->pid, owner->priority, mutex->prio_before);
-        sched_change_priority(owner, mutex->prio_before);
-        mutex->prio_before = THREAD_PRIORITY_UNDEF;
+               owner->pid, owner->priority, new_prio);
+        sched_change_priority(owner, new_prio);
     }
 #endif
 

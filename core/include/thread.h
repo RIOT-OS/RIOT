@@ -127,6 +127,7 @@
 #include "arch/thread_arch.h"
 #include "cpu_conf.h"
 #include "sched.h"
+#include "mutex.h"
 
 #ifdef MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
@@ -168,6 +169,11 @@
 /** @} */
 
 /**
+ * Mutex linked list forward declaration
+ */
+typedef struct mutex mutex_ll_t;
+
+/**
  * @brief @c thread_t holds thread's context data.
  */
 struct _thread {
@@ -192,7 +198,10 @@ struct _thread {
     cib_t msg_queue;                /**< message queue                  */
     msg_t *msg_array;               /**< memory holding messages        */
 #endif
-
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+    uint8_t prio_config;
+    mutex_ll_t *mutex_locks;        /**< first locked mutex             */
+#endif
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
     char *stack_start;              /**< thread's stack start address   */
 #endif
