@@ -440,7 +440,8 @@ static ssize_t _write_options(coap_pkt_t *pdu, uint8_t *buf, size_t len)
                 DEBUG("gcoap: _write_options: path does not start with '/'\n");
                 return -EINVAL;
             }
-            bufpos += coap_put_option_url(bufpos, last_optnum, (char *)&pdu->url[0]);
+            bufpos += coap_put_option_uri(bufpos, last_optnum, (char *)pdu->url,
+                                          COAP_OPT_URI_PATH);
             last_optnum = COAP_OPT_URI_PATH;
         }
     }
@@ -448,8 +449,15 @@ static ssize_t _write_options(coap_pkt_t *pdu, uint8_t *buf, size_t len)
     /* Content-Format */
     if (pdu->content_type != COAP_FORMAT_NONE) {
         bufpos += coap_put_option_ct(bufpos, last_optnum, pdu->content_type);
-        /* uncomment when add an option after Content-Format */
-        /* last_optnum = COAP_OPT_CONTENT_FORMAT; */
+        last_optnum = COAP_OPT_CONTENT_FORMAT;
+    }
+
+    /* Uri-query for requests */
+    if (coap_get_code_class(pdu) == COAP_CLASS_REQ) {
+        bufpos += coap_put_option_uri(bufpos, last_optnum, (char *)pdu->qs,
+                                      COAP_OPT_URI_QUERY);
+        /* uncomment when further options are added below ... */
+        /* last_optnum = COAP_OPT_URI_QUERY; */
     }
 
     /* write payload marker */
@@ -602,6 +610,7 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code,
 
     pdu->hdr = (coap_hdr_t *)buf;
     memset(pdu->url, 0, NANOCOAP_URL_MAX);
+    memset(pdu->qs, 0, NANOCOAP_QS_MAX);
 
     /* generate token */
 #if GCOAP_TOKENLEN
@@ -837,6 +846,30 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
     }
 
     return (int)pos;
+}
+
+int gcoap_add_qstring(coap_pkt_t *pdu, const char *key, const char *val)
+{
+    size_t qs_len = strlen((char *)pdu->qs);
+    size_t key_len = strlen(key);
+    size_t val_len = (val) ? (strlen(val) + 1) : 0;
+
+    /* make sure if url_len + the new query string fit into the url buffer */
+    if ((qs_len + key_len + val_len + 2) >= NANOCOAP_QS_MAX) {
+        return -1;
+    }
+
+    pdu->qs[qs_len++] = '&';
+    memcpy(&pdu->qs[qs_len], key, key_len);
+    qs_len += key_len;
+    if (val) {
+        pdu->qs[qs_len++] = '=';
+        memcpy(&pdu->qs[qs_len], val, val_len);
+        qs_len += val_len;
+    }
+    pdu->qs[qs_len] = '\0';
+
+    return (int)qs_len;
 }
 
 /** @} */
