@@ -101,7 +101,7 @@ ifneq (,$(filter sema,$(USEMODULE)))
     DIRS += sema
 endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
-    DIRS += net/application_layer/coap
+    DIRS += net/application_layer/gcoap
 endif
 ifneq (,$(filter emcute,$(USEMODULE)))
     DIRS += net/application_layer/emcute
