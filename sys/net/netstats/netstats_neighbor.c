@@ -76,7 +76,9 @@ netstats_nb_t *netstats_nb_get_or_create(netdev_t *dev, const uint8_t *l2_addr, 
     }
     /* if there is no matching entry,
      * create a new entry if we have an expired one */
-    netstats_nb_create(old_entry, l2_addr, len);
+    if (old_entry) {
+        netstats_nb_create(old_entry, l2_addr, len);
+    }
     return old_entry;
 }
 
