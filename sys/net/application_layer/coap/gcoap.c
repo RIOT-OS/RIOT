@@ -398,35 +398,10 @@ static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t le
 {
    /* write header */
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-
-    /* skip the first listener, gcoap itself */
-    gcoap_listener_t *listener = _coap_state.listeners->next;
-
-    /* write payload */
-    uint8_t *bufpos            = pdu->payload;
-
-    while (listener) {
-        coap_resource_t *resource = listener->resources;
-        for (size_t i = 0; i < listener->resources_len; i++) {
-            /* Don't overwrite buffer if paths are too long. */
-            if (bufpos + strlen(resource->path) + 3 > buf + len) {
-               break;
-            }
-            if (i) {
-                *bufpos++ = ',';
-                resource++;
-            }
-            *bufpos++ = '<';
-            unsigned url_len = strlen(resource->path);
-            memcpy(bufpos, resource->path, url_len);
-            bufpos   += url_len;
-            *bufpos++ = '>';
-        }
-        listener = listener->next;
-    }
-
+    int plen = gcoap_get_resource_list(pdu->payload, (size_t)pdu->payload_len,
+                                      COAP_FORMAT_LINK);
     /* response content */
-    return gcoap_finish(pdu, bufpos - pdu->payload, COAP_FORMAT_LINK);
+    return gcoap_finish(pdu, (size_t)plen, COAP_FORMAT_LINK);
 }
 
 /*
@@ -817,6 +792,51 @@ uint8_t gcoap_op_state(void)
         }
     }
     return count;
+}
+
+int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
+{
+    assert(cf == COAP_CT_LINK_FORMAT);
+#ifndef DEVELHELP
+    (void)cf;
+#endif
+
+    /* skip the first listener, gcoap itself (we skip /.well-known/core) */
+    gcoap_listener_t *listener = _coap_state.listeners->next;
+
+    char *out = (char *)buf;
+    size_t pos = 0;
+
+    /* write payload */
+    while (listener) {
+        coap_resource_t *resource = listener->resources;
+
+        for (unsigned i = 0; i < listener->resources_len; i++) {
+            size_t path_len = strlen(resource->path);
+            if (out) {
+                /* only add new resources if there is space in the buffer */
+                if ((pos + path_len + 3) > maxlen) {
+                    break;
+                }
+                if (i) {
+                    out[pos++] = ',';
+                }
+                out[pos++] = '<';
+                memcpy(&out[pos], resource->path, path_len);
+                pos += path_len;
+                out[pos++] = '>';
+            }
+            else {
+                pos += (i) ? 3 : 2;
+                pos += path_len;
+            }
+            ++resource;
+        }
+
+        listener = listener->next;
+    }
+
+    return (int)pos;
 }
 
 /** @} */

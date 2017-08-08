@@ -634,6 +634,26 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
  */
 uint8_t gcoap_op_state(void);
 
+/**
+ * @brief   Get the resource list, currently only `CoRE Link Format`
+ *          (COAP_FORMAT_LINK) supported
+ *
+ * If @p buf := NULL, nothing will be written but the size of the resulting
+ * resource list is computed and returned.
+ *
+ * @param[out] buf      output buffer to write resource list into, my be NULL
+ * @param[in]  maxlen   length of @p buf, ignored if @p buf is NULL
+ * @param[in]  cf       content format to use for the resource list, currently
+ *                      only COAP_FORMAT_LINK supported
+ *
+ * @todo    add support for `JSON CoRE Link Format`
+ * @todo    add support for 'CBOR CoRE Link Format`
+ *
+ * @return  the number of bytes written to @p buf
+ * @return  -1 on error
+ */
+int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf);
+
 #ifdef __cplusplus
 }
 #endif
