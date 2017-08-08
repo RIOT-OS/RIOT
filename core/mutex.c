@@ -30,7 +30,7 @@
 #include "irq.h"
 #include "list.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 int _mutex_lock(mutex_t *mutex, int blocking)
@@ -107,6 +107,8 @@ void mutex_unlock(mutex_t *mutex)
     thread_t *owner = (thread_t *)thread_get(mutex->owner);
     /* restore the priority of the releasing thread */
     if (mutex->prio_before != THREAD_PRIORITY_UNDEF) {
+        DEBUG("PID[%" PRIkernel_pid "]: changing priority from %i -> %i\n",
+              owner->pid, owner->priority, mutex->prio_before);
         sched_change_priority(owner, mutex->prio_before);
         mutex->prio_before = THREAD_PRIORITY_UNDEF;
     }
