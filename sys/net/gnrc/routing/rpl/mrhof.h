@@ -26,7 +26,10 @@
 extern "C" {
 #endif
 
-#define MRHOF_PARENT_SWITCH_THRESHOLD 192
+#define MRHOF_PARENT_SWITCH_THRESHOLD   192
+#define MRHOF_MAX_LINK_METRIC           512
+#define MRHOF_MAX_PATH_COST           32768
+#define MRHOF_PARENT_SET_SIZE             3
 
 /**
  * @brief   Return the address to the of0 objective function

@@ -45,8 +45,8 @@ static gnrc_rpl_of_t gnrc_rpl_mrhof = {
 static uint16_t _mrhof_get_etx(gnrc_rpl_parent_t *parent, netstats_nb_t *stats)
 {
     for (netstats_nb_t *entry = stats;
-         entry != NULL;
-         entry = netstats_nb_get_next(stats, entry)) { 
+        entry != NULL;
+        entry = netstats_nb_get_next(stats, entry)) { 
         /* TODO: Not blindly assume that the mac address is the last 8 bytes of
          * the link local ipv6-address, works for 8 byte long mac addresses */
         if(memcmp(&(parent->addr.u8[8]), entry->l2_addr, 8) == 0) {
@@ -54,6 +54,13 @@ static uint16_t _mrhof_get_etx(gnrc_rpl_parent_t *parent, netstats_nb_t *stats)
         }
     }
     return 65535;
+}
+
+static uint16_t _mrhof_get_path_cost(gnrc_rpl_parent_t *parent)
+{
+    netstats_nb_t *nb;
+    gnrc_netapi_get(parent->dodag->iface, NETOPT_STATS_NEIGHBOR, 0, &nb, sizeof(&nb)); 
+    return parent->rank + _mrhof_get_etx(parent, nb);
 }
 
 gnrc_rpl_of_t *gnrc_rpl_get_of_mrhof(void)
@@ -69,32 +76,21 @@ void reset(gnrc_rpl_dodag_t *dodag)
 
 /**
  * Calculate rank additive based on the rank of the parent and the etx to the parent
+ * computed via MAX(pref_parent->rank, 1 + floor(MAX(parents->rank)/MinHopRankIncrease), 
  */
 uint16_t calc_rank(gnrc_rpl_parent_t *parent, uint16_t base_rank)
 {
-
-    if (base_rank == 0) {
-        if (parent == NULL) {
-            return GNRC_RPL_INFINITE_RANK;
-        }
-
-        base_rank = parent->rank;
-    }
-
-    uint16_t add;
-
-    if (parent != NULL) {
-        add = parent->dodag->instance->min_hop_rank_inc;
-    }
-    else {
-        add = GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
-    }
-
-    if ((base_rank + add) < base_rank) {
+    (void) base_rank;
+    /* TODO: consider a parent set of more than 1 parent */
+    if (parent == NULL) {
         return GNRC_RPL_INFINITE_RANK;
+    } else {
+        uint16_t minhoprankincr = parent->dodag->instance->min_hop_rank_inc;
+        uint16_t cost_rank = _mrhof_get_path_cost(parent);
+        uint16_t monotonic_rank = minhoprankincr * (parent->rank/minhoprankincr + 1);
+        return (cost_rank > monotonic_rank) ? cost_rank : monotonic_rank;
     }
 
-    return base_rank + add;
 }
 
 gnrc_rpl_parent_t *which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
@@ -107,6 +103,7 @@ gnrc_rpl_parent_t *which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
     uint16_t p1_totalrank = p1->rank + _mrhof_get_etx(p1, nb);
     uint16_t p2_totalrank = p2->rank + _mrhof_get_etx(p2, nb);
 
+    /* TODO: Test if we only want to switch if p2 is fresh */
     if (p1_totalrank > p2_totalrank) {
         gnrc_rpl_parent_t *preferred = p1->dodag->parents;
         uint16_t preferred_totalrank = preferred->rank + _mrhof_get_etx(preferred, nb);
