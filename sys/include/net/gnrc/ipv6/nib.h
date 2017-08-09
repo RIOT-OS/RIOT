@@ -14,6 +14,7 @@
  * @todo    Add detailed description
  * @todo    Implement multihop DAD
  * @todo    Implement classic SLAAC
+ * @todo    Implement MLD
  * @{
  *
  * @file
@@ -87,16 +88,6 @@ extern "C" {
 #define GNRC_IPV6_NIB_SEARCH_RTR            (0x4fc3U)
 
 /**
- * @brief   Reconfirm router event.
- *
- * This message type is for the event the reconfirmation of a router (which
- * implies sending a unicast Router Solicitation). The expected message context
- * is a pointer to a valid on-link entry representing the router that is to be
- * confirmed.
- */
-#define GNRC_IPV6_NIB_RECONFIRM_RTR         (0x4fc4U)
-
-/**
  * @brief   Reply Router Solicitation event.
  *
  * This message type is for the event of the delayed reply to a Router
@@ -154,17 +145,6 @@ extern "C" {
 #define GNRC_IPV6_NIB_ADDR_REG_TIMEOUT      (0x4fc9U)
 
 /**
- * @brief   6LoWPAN context timeout event.
- *
- * This message type is for the event of a 6LoWPAN compression context timeout.
- * The expected message context is the compression context's numerical
- * identifier.
- *
- * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_6LN != 0
- */
-#define GNRC_IPV6_NIB_6LO_CTX_TIMEOUT       (0x4fcaU)
-
-/**
  * @brief   Authoritative border router timeout event.
  *
  * This message type is for the event of an Authoritative border router timeout.
@@ -201,6 +181,17 @@ extern "C" {
  * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
  */
 #define GNRC_IPV6_NIB_RECALC_REACH_TIME     (0x4fceU)
+
+/**
+ * @brief   Reregister address.
+ *
+ * This message type is for the event of reregistering an IPv6 address to the
+ * upstream router. The expected message context is an IPv6 address assigned to
+ * one of the nodes interfaces.
+ *
+ * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_6LN != 0
+ */
+#define GNRC_IPV6_NIB_REREG_ADDRESS         (0x4fcfU)
 /** @} */
 
 /**

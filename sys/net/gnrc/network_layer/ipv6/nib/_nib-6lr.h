@@ -83,6 +83,9 @@ static inline bool _rtr_sol_on_6lr(const gnrc_netif2_t *netif,
  *                      handed to the SL2AO handler function).
  * @param[in] aro       ARO that carries the address registration information.
  * @param[in] sl2ao     SL2AO associated with the ARO.
+ * @param[in] nce       The local neighbor cache entry the registration
+ *                      information is supposed to be copied into. May be NULL
+ *                      (this might create one).
  *
  * @return  registration status of the address (including
  *          @ref _ADDR_REG_STATUS_TENTATIVE and @ref _ADDR_REG_STATUS_IGNORE).
@@ -90,7 +93,7 @@ static inline bool _rtr_sol_on_6lr(const gnrc_netif2_t *netif,
 uint8_t _reg_addr_upstream(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
                            const icmpv6_hdr_t *icmpv6,
                            const sixlowpan_nd_opt_ar_t *aro,
-                           const ndp_opt_t *sl2ao);
+                           const ndp_opt_t *sl2ao, _nib_onl_entry_t *nce);
 
 
 /**
@@ -112,15 +115,23 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv
                                      const ndp_nbr_sol_t *nbr_sol,
                                      const sixlowpan_nd_opt_ar_t *aro,
                                      const ndp_opt_t *sl2ao);
+
+/**
+ * @brief   Sets the @ref GNRC_NETIF2_FLAGS_IPV6_RTR_ADV flags of an interface
+ *
+ * @param[in] netif The interface.
+ */
+void _set_rtr_adv(gnrc_netif2_t *netif);
 #else   /* GNRC_IPV6_NIB_CONF_6LR || defined(DOXYGEN) */
 #define _rtr_sol_on_6lr(netif, icmpv6)  (false)
 #define _get_ar_state(nbr)              (_ADDR_REG_STATUS_IGNORE)
 #define _set_ar_state(nbr, state)       (void)nbr; (void)state
-#define _copy_and_handle_aro(netif, ipv6, icmpv6, aro, sl2ao) \
-                                        (NULL)
 /* _reg_addr_upstream() doesn't make sense without 6LR so don't even use it
  * => throw error in case it is compiled in => don't define it here as NOP macro
  */
+#define _copy_and_handle_aro(netif, ipv6, icmpv6, aro, sl2ao) \
+                                        (NULL)
+#define _set_rtr_adv(netif)             (void)netif
 #endif  /* GNRC_IPV6_NIB_CONF_6LR || defined(DOXYGEN) */
 
 #ifdef __cplusplus
