@@ -252,7 +252,7 @@ int sdcard_spi_read_blocks(sdcard_spi_t *card, int blockaddr, char *data, int bl
  *
  * @return                number of sucessfully written blocks (0 if no block was written).
  */
-int sdcard_spi_write_blocks(sdcard_spi_t *card, int blockaddr, char *data, int blocksize,
+int sdcard_spi_write_blocks(sdcard_spi_t *card, int blockaddr, const char *data, int blocksize,
                             int nblocks, sd_rw_response_t *state);
 
 /**
