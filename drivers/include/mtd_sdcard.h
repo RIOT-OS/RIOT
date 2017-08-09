@@ -19,8 +19,8 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
-#ifndef MTD_SDCARD_H_
-#define MTD_SDCARD_H_
+#ifndef MTD_SDCARD_H
+#define MTD_SDCARD_H
 
 #include <stdint.h>
 
@@ -63,5 +63,5 @@ extern const mtd_desc_t mtd_sdcard_driver;
 }
 #endif
 
-#endif /* MTD_SDCARD_H_ */
+#endif /* MTD_SDCARD_H */
 /** @} */
