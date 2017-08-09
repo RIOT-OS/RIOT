@@ -145,7 +145,8 @@ static int _netif_stats_nb(kernel_pid_t iface)
     if (res == -ENOTSUP) {
         return res;
     }
-    char l2addr_str[3 * MAX_ADDR_LEN];
+    /* 2 chars per byte and a trailing semicolon makes 3 times l2 addr size */
+    char l2addr_str[3 * NETSTATS_NB_L2_ADDR_MAX_SIZE];
     puts("Neigbor link layer stats:");
     printf("L2 address               fresh  etx");
 #ifdef MODULE_NETSTATS_NEIGHBOR_EXT
