@@ -173,6 +173,46 @@ int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data);
  */
 int lsm6dsl_read_temp(const lsm6dsl_t *dev, int16_t *data);
 
+/**
+ * @brief Power down accelerometer
+ *
+ * @param[in] dev    device to power down
+ *
+ * @return LSM6DSL_OK on success
+ * @return < 0 on error
+ */
+int lsm6dsl_acc_power_down(const lsm6dsl_t *dev);
+
+/**
+ * @brief Power down gyroscope
+ *
+ * @param[in] dev    device to power down
+ *
+ * @return LSM6DSL_OK on success
+ * @return < 0 on error
+ */
+int lsm6dsl_gyro_power_down(const lsm6dsl_t *dev);
+
+/**
+ * @brief Power up accelerometer
+ *
+ * @param[in] dev    device to power up
+ *
+ * @return LSM6DSL_OK on success
+ * @return < 0 on error
+ */
+int lsm6dsl_acc_power_up(const lsm6dsl_t *dev);
+
+/**
+ * @brief Power up gyroscope
+ *
+ * @param[in] dev    device to power up
+ *
+ * @return LSM6DSL_OK on success
+ * @return < 0 on error
+ */
+int lsm6dsl_gyro_power_up(const lsm6dsl_t *dev);
+
 #ifdef __cplusplus
 }
 #endif
