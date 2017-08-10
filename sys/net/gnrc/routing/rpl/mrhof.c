@@ -25,6 +25,9 @@
 #include "net/netstats.h"
 #include "net/netstats/neighbor.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 static uint16_t calc_rank(gnrc_rpl_parent_t *, uint16_t);
 static int which_parent(gnrc_rpl_parent_t *, gnrc_rpl_parent_t *);
 static gnrc_rpl_dodag_t *which_dodag(gnrc_rpl_dodag_t *, gnrc_rpl_dodag_t *);
@@ -41,17 +44,34 @@ static gnrc_rpl_of_t gnrc_rpl_mrhof = {
     NULL
 };
 
+static uint8_t _mrhof_ipv6_to_mac(gnrc_rpl_parent_t *parent, uint8_t **l2addr) {
+    for (gnrc_ipv6_nc_t *entry = gnrc_ipv6_nc_get_next(NULL);
+         entry != NULL;
+         entry = gnrc_ipv6_nc_get_next(entry)) {
+        if (memcmp(&(parent->addr), &(entry->ipv6_addr), sizeof(parent->addr)) == 0) {
+           *l2addr = entry->l2_addr;
+           return entry->l2_addr_len;
+        }
+    }
+    return 0;
+}
+
 /**
  * Retrieve parent statistics from the netstats neighbor module (TODO: should be in the neighbor module)
  */
 static netstats_nb_t *_mrhof_get_stats(gnrc_rpl_parent_t *parent, netstats_nb_t *stats)
 {
+    uint8_t *l2addr;
+    uint8_t len = _mrhof_ipv6_to_mac(parent, &l2addr);
+    if (len == 0) {
+        return NULL;
+    }
     for (netstats_nb_t *entry = stats;
         entry != NULL;
         entry = netstats_nb_get_next(stats, entry)) { 
         /* TODO: Not blindly assume that the mac address is the last 8 bytes of
          * the link local ipv6-address, works for 8 byte long mac addresses */
-        if(memcmp(&(parent->addr.u8[8]), entry->l2_addr, 8) == 0) {
+        if( (entry->l2_addr_len == len) && (memcmp(l2addr, entry->l2_addr, len) == 0) ) {
             return entry;
         }
     }
@@ -165,8 +185,10 @@ uint16_t calc_rank(gnrc_rpl_parent_t *parent, uint16_t base_rank)
 {
     (void) base_rank;
     gnrc_rpl_dodag_t *dodag;
+    DEBUG("MRHOF: Calculating rank\n");
     /* TODO: consider a parent set of more than 1 parent */
     if (parent == NULL || parent->dodag == NULL) {
+        DEBUG("MRHOF: No parent or no dodag, assuming max rank\n");
         return GNRC_RPL_INFINITE_RANK;
     } else {
         dodag = parent->dodag;
@@ -204,6 +226,7 @@ uint16_t calc_rank(gnrc_rpl_parent_t *parent, uint16_t base_rank)
             cnt++;
         }
         uint16_t monotonic_rank = minhoprankincr * (max_dagrank + 1);
+        DEBUG("MRHOF: Path cost: %u, monotonic cost: %u\n", cost_rank, monotonic_rank);
         return (cost_rank > monotonic_rank) ? cost_rank : monotonic_rank;
     }
 }
