@@ -354,11 +354,11 @@ extern "C" {
 #define IPPROTO_UDP                         SL_IPPROTO_UDP
 #define IPPROTO_RAW                         SL_IPPROTO_RAW
 
-#define AF_INET                             SL_AF_INET
-#define AF_INET6                            SL_AF_INET6
+//#define AF_INET                             SL_AF_INET
+//#define AF_INET6                            SL_AF_INET6
 #define AF_INET6_EUI_48                     SL_AF_INET6_EUI_48
 #define AF_RF                               SL_AF_RF
-#define AF_PACKET                           SL_AF_PACKET
+//#define AF_PACKET                           SL_AF_PACKET
 
 #define PF_INET                             SL_PF_INET
 #define PF_INET6                            SL_PF_INET6
