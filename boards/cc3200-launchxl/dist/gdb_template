@@ -1,0 +1,24 @@
+#*****************************************************************************
+#Connect To the target using OpenOCD
+#*****************************************************************************
+python
+import os
+gdb.execute('target remote | openocd -c "gdb_port pipe; log_output openocd.log" -f {0}/boards/{1}/dist/cc3200-v9.cfg'.format(os.environ['RIOTBASE'], os.environ['BOARD']))
+end
+
+#*****************************************************************************
+# Load the binary
+#*****************************************************************************
+load
+
+#*****************************************************************************
+# Initialize the SP and PC values from the application's
+# vector table
+#*****************************************************************************
+set $sp = g_pfnVectors[0]
+set $pc = g_pfnVectors[1]
+
+#*****************************************************************************
+# Set break point at main and run to main
+#*****************************************************************************
+source TEST_SCRIPT
