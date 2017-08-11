@@ -134,14 +134,16 @@
  extern "C" {
 #endif
 
+/* Thread states */
 /**
- * @name List of thread states
+ * @name Special meaning thread states
  * @{
  */
-#define STATUS_NOT_FOUND        (-1)            /**< Describes an illegal thread status */
+#define STATUS_NOT_FOUND        (-1)    /**< Describes an illegal thread status */
+/** @} */
 
 /**
- * @name Blocked states
+ * @name Blocked thread states
  * @{
  */
 #define STATUS_STOPPED              0   /**< has terminated                     */
@@ -156,13 +158,13 @@
 /** @} */
 
 /**
- * @name Queued states
- * @{*/
+ * @name Queued thread states
+ * @{
+ */
 #define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
                                                  `st >= STATUS_ON_RUNQUEUE`             */
 #define STATUS_RUNNING          9               /**< currently running                  */
 #define STATUS_PENDING         10               /**< waiting to be scheduled to run     */
-/** @} */
 /** @} */
 
 /**
