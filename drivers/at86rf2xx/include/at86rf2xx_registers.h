@@ -36,6 +36,7 @@ extern "C" {
 #define AT86RF231_PARTNUM        (0x03)
 #define AT86RF232_PARTNUM        (0x0a)
 #define AT86RF233_PARTNUM        (0x0b)
+#define AT86RFR2_PARTNUM         (0x94) // RFR2 family
 /** @} */
 
 /**
@@ -48,140 +49,294 @@ extern "C" {
 #define AT86RF2XX_PARTNUM           AT86RF232_PARTNUM
 #elif MODULE_AT86RF233
 #define AT86RF2XX_PARTNUM           AT86RF233_PARTNUM
+#elif MODULE_AT86RFR2
+#define AT86RF2XX_PARTNUM           AT86RFR2_PARTNUM
 #else /* MODULE_AT86RF231 as default device */
 #define AT86RF2XX_PARTNUM           AT86RF231_PARTNUM
 #endif
 /** @} */
 
-/**
- * @brief   SPI access specifiers
- * @{
+/*
+ * For external transceiver SPI and all Register bits have to be defined
+ * For SOC systems we use the definition of the iomXXrfrX
  */
-#define AT86RF2XX_ACCESS_REG                                    (0x80)
-#define AT86RF2XX_ACCESS_FB                                     (0x20)
-#define AT86RF2XX_ACCESS_SRAM                                   (0x00)
-#define AT86RF2XX_ACCESS_READ                                   (0x00)
-#define AT86RF2XX_ACCESS_WRITE                                  (0x40)
-/** @} */
+#ifdef MODULE_AT86RFR2
+// Begin SOC transciever
 
-/**
- * @brief   Register addresses
- * @{
- */
-#define AT86RF2XX_REG__TRX_STATUS                               (0x01)
-#define AT86RF2XX_REG__TRX_STATE                                (0x02)
-#define AT86RF2XX_REG__TRX_CTRL_0                               (0x03)
-#define AT86RF2XX_REG__TRX_CTRL_1                               (0x04)
-#define AT86RF2XX_REG__PHY_TX_PWR                               (0x05)
-#define AT86RF2XX_REG__PHY_RSSI                                 (0x06)
-#define AT86RF2XX_REG__PHY_ED_LEVEL                             (0x07)
-#define AT86RF2XX_REG__PHY_CC_CCA                               (0x08)
-#define AT86RF2XX_REG__CCA_THRES                                (0x09)
-#define AT86RF2XX_REG__RX_CTRL                                  (0x0A)
-#define AT86RF2XX_REG__SFD_VALUE                                (0x0B)
-#define AT86RF2XX_REG__TRX_CTRL_2                               (0x0C)
-#define AT86RF2XX_REG__ANT_DIV                                  (0x0D)
-#define AT86RF2XX_REG__IRQ_MASK                                 (0x0E)
-#define AT86RF2XX_REG__IRQ_STATUS                               (0x0F)
-#define AT86RF2XX_REG__VREG_CTRL                                (0x10)
-#define AT86RF2XX_REG__BATMON                                   (0x11)
-#define AT86RF2XX_REG__XOSC_CTRL                                (0x12)
-#define AT86RF2XX_REG__CC_CTRL_1                                (0x14)
-#define AT86RF2XX_REG__RX_SYN                                   (0x15)
-#ifdef MODULE_AT86RF212B
-#define AT86RF2XX_REG__RF_CTRL_0                                (0x16)
+#include <avr/io.h>
+
+	/**
+	 * @brief Register addresses
+	 * @{
+	 */
+	#define AT86RF2XX_REG__TRX_STATUS                               (&TRX_STATUS)
+	#define AT86RF2XX_REG__TRX_STATE                                (&TRX_STATE)
+	#define AT86RF2XX_REG__TRX_CTRL_0                               (&TRX_CTRL_0)
+	#define AT86RF2XX_REG__TRX_CTRL_1                               (&TRX_CTRL_1)
+
+	#define AT86RF2XX_REG__PHY_TX_PWR                               (&PHY_TX_PWR)
+	#define AT86RF2XX_REG__PHY_RSSI                                 (&PHY_RSSI)
+	#define AT86RF2XX_REG__PHY_ED_LEVEL                             (&PHY_ED_LEVEL)
+	#define AT86RF2XX_REG__PHY_CC_CCA                               (&PHY_CC_CCA)
+
+	#define AT86RF2XX_REG__CCA_THRES                                (&CCA_THRES)
+	#define AT86RF2XX_REG__RX_CTRL                                  (&RX_CTRL)
+	#define AT86RF2XX_REG__SFD_VALUE                                (&SFD_VALUE)
+	#define AT86RF2XX_REG__TRX_CTRL_2                               (&TRX_CTRL_2)
+
+	#define AT86RF2XX_REG__ANT_DIV                                  (&ANT_DIV)
+	#define AT86RF2XX_REG__IRQ_MASK                                 (&IRQ_MASK)
+	#define AT86RF2XX_REG__IRQ_MASK1                                (&IRQ_MASK1)
+	#define AT86RF2XX_REG__IRQ_STATUS                               (&IRQ_STATUS)
+	#define AT86RF2XX_REG__IRQ_STATUS1                              (&IRQ_STATUS1)
+	#define AT86RF2XX_REG__VREG_CTRL                                (&VREG_CTRL)
+
+	#define AT86RF2XX_REG__BATMON                                   (&BATMON)
+	#define AT86RF2XX_REG__XOSC_CTRL                                (&XOSC_CTRL)
+	#define AT86RF2XX_REG__CC_CTRL_0                                (&CC_CTRL_0)
+	#define AT86RF2XX_REG__CC_CTRL_1                                (&CC_CTRL_1)
+
+	#define AT86RF2XX_REG__RX_SYN                                   (&RX_SYN)
+	// TODO not defined register  TRX_RPC _SFR_MEM8(&0x156)
+	#define AT86RF2XX_REG__XAH_CTRL_1                               (&XAH_CTRL_1)
+	#define AT86RF2XX_REG__FTN_CTRL                                 (&FTN_CTRL)
+
+	#define AT86RF2XX_REG__PLL_CF                                   (&PLL_CF)
+	#define AT86RF2XX_REG__PLL_DCU                                  (&PLL_DCU)
+	#define AT86RF2XX_REG__PART_NUM                                 (&PART_NUM)
+	#define AT86RF2XX_REG__VERSION_NUM                              (&VERSION_NUM)
+
+	#define AT86RF2XX_REG__MAN_ID_0                                 (&MAN_ID_0)
+	#define AT86RF2XX_REG__MAN_ID_1                                 (&MAN_ID_1)
+	#define AT86RF2XX_REG__SHORT_ADDR_0                             (&SHORT_ADDR_0)
+	#define AT86RF2XX_REG__SHORT_ADDR_1                             (&SHORT_ADDR_1)
+
+	#define AT86RF2XX_REG__PAN_ID_0                                 (&PAN_ID_0)
+	#define AT86RF2XX_REG__PAN_ID_1                                 (&PAN_ID_1)
+	#define AT86RF2XX_REG__IEEE_ADDR_0                              (&IEEE_ADDR_0)
+	#define AT86RF2XX_REG__IEEE_ADDR_1                              (&IEEE_ADDR_1)
+
+	#define AT86RF2XX_REG__IEEE_ADDR_2                              (&IEEE_ADDR_2)
+	#define AT86RF2XX_REG__IEEE_ADDR_3                              (&IEEE_ADDR_3)
+	#define AT86RF2XX_REG__IEEE_ADDR_4                              (&IEEE_ADDR_4)
+	#define AT86RF2XX_REG__IEEE_ADDR_5                              (&IEEE_ADDR_5)
+
+	#define AT86RF2XX_REG__IEEE_ADDR_6                              (&IEEE_ADDR_6)
+	#define AT86RF2XX_REG__IEEE_ADDR_7                              (&IEEE_ADDR_7)
+	#define AT86RF2XX_REG__XAH_CTRL_0                               (&XAH_CTRL_0)
+	#define AT86RF2XX_REG__CSMA_SEED_0                              (&CSMA_SEED_0)
+
+	#define AT86RF2XX_REG__CSMA_SEED_1                              (&CSMA_SEED_1)
+	#define AT86RF2XX_REG__CSMA_BE                                  (&CSMA_BE)
+	#define AT86RF2XX_REG__TST_CTRL_DIGI                            (&TST_CTRL_DIGI)
+	// TODO not defined register  TST_RX_LENGTH _SFR_MEM8(0x17B)
+
+	// TODO not defined register  TRXFBST _SFR_MEM8(0x180)
+	// TODO not defined register  TRXFBEND _SFR_MEM8(0x1FF)
+	#define AT86RF2XX_REG__TRXFBST                          		(&TRXFBST)
+	#define AT86RF2XX_REG__TRXFBEND                          		(&TRXFBEND)
+
+	#define AT86RF2XX_REG__TRXPR                          			(&TRXPR)
+	/** @} */
+
+	/**
+	 * @brief   Bitfield definitions for the TRX_CTRL_0 register
+	 * @{
+	 */
+	#define AT86RF2XX_TRX_CTRL_0_MASK__PMU_EN                       (0x40)
+	#define AT86RF2XX_TRX_CTRL_0_MASK__PMU_START                    (0x20)
+	#define AT86RF2XX_TRX_CTRL_0_MASK__PMU_IF_INV                   (0x10)
+	/** @} */
+
+	/**
+	 * @brief   Bitfield definitions for the TRX_CTRL_1 register
+	 * @{
+	 */
+	#define AT86RF2XX_TRX_CTRL_1_MASK__PA_EXT_EN                    (0x80)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_2_EXT_EN                 (0x40)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__TX_AUTO_CRC_ON               (0x20)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__PLL_TX_FLT                   (0x10)
+	/** @} */
+
+	/**
+	 * @brief   Bitfield definitions for the TRX_CTRL_2 register
+	 * @{
+	 */
+	#define AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE                 (0x80)
+	#define AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE              (0x03)
+	/** @} */
+
+	/**
+	 * @brief   Bitfield definitions for the IRQ_MASK register
+	 * @{
+	 */
+	#define AT86RF2XX_IRQ_STATUS_MASK__AWAKE	                (0x80)
+	#define AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN                (0x40)
+	#define AT86RF2XX_IRQ_STATUS_MASK__AMI_EN                   (0x20)
+	#define AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN           (0x10)
+	#define AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN                (0x08)
+	#define AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN 	            (0x04)
+	#define AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN            (0x02)
+	#define AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN              (0x01)
+
+	/**
+	 * @brief   Bitfield definitions for the IRQ_MASK1 register
+	 * @{
+	 */
+	#define AT86RF2XX_IRQ_STATUS_MASK1__TX_START_EN                	(0x01)
+	#define AT86RF2XX_IRQ_STATUS_MASK1__MAF_0_AMI_EN	            (0x02)
+	#define AT86RF2XX_IRQ_STATUS_MASK1__MAF_1_AMI_EN	            (0x04)
+	#define AT86RF2XX_IRQ_STATUS_MASK1__MAF_2_AMI_EN	            (0x08)
+	#define AT86RF2XX_IRQ_STATUS_MASK1__MAF_3_AMI_EN	            (0x10)
+	/** @} */
+
+// End SOC transceiver
+#else // Begin external transceiver
+	/**
+	 * @brief   SPI access specifiers
+	 * @{
+	 */
+	#define AT86RF2XX_ACCESS_REG                                    (0x80)
+	#define AT86RF2XX_ACCESS_FB                                     (0x20)
+	#define AT86RF2XX_ACCESS_SRAM                                   (0x00)
+	#define AT86RF2XX_ACCESS_READ                                   (0x00)
+	#define AT86RF2XX_ACCESS_WRITE                                  (0x40)
+	/** @} */
+	/**
+	 * @brief   Register addresses
+	 * @{
+	 */
+	#define AT86RF2XX_REG__TRX_STATUS                               (0x01)
+	#define AT86RF2XX_REG__TRX_STATE                                (0x02)
+	#define AT86RF2XX_REG__TRX_CTRL_0                               (0x03)
+	#define AT86RF2XX_REG__TRX_CTRL_1                               (0x04)
+	#define AT86RF2XX_REG__PHY_TX_PWR                               (0x05)
+	#define AT86RF2XX_REG__PHY_RSSI                                 (0x06)
+	#define AT86RF2XX_REG__PHY_ED_LEVEL                             (0x07)
+	#define AT86RF2XX_REG__PHY_CC_CCA                               (0x08)
+	#define AT86RF2XX_REG__CCA_THRES                                (0x09)
+	#define AT86RF2XX_REG__RX_CTRL                                  (0x0A)
+	#define AT86RF2XX_REG__SFD_VALUE                                (0x0B)
+	#define AT86RF2XX_REG__TRX_CTRL_2                               (0x0C)
+	#define AT86RF2XX_REG__ANT_DIV                                  (0x0D)
+	#define AT86RF2XX_REG__IRQ_MASK                                 (0x0E)
+	#define AT86RF2XX_REG__IRQ_STATUS                               (0x0F)
+	#define AT86RF2XX_REG__VREG_CTRL                                (0x10)
+	#define AT86RF2XX_REG__BATMON                                   (0x11)
+	#define AT86RF2XX_REG__XOSC_CTRL                                (0x12)
+	#define AT86RF2XX_REG__CC_CTRL_1                                (0x14)
+	#define AT86RF2XX_REG__RX_SYN                                   (0x15)
+	#ifdef MODULE_AT86RF212B
+	#define AT86RF2XX_REG__RF_CTRL_0                                (0x16)
+	#endif
+	#define AT86RF2XX_REG__XAH_CTRL_1                               (0x17)
+	#define AT86RF2XX_REG__FTN_CTRL                                 (0x18)
+	#define AT86RF2XX_REG__PLL_CF                                   (0x1A)
+	#define AT86RF2XX_REG__PLL_DCU                                  (0x1B)
+	#define AT86RF2XX_REG__PART_NUM                                 (0x1C)
+	#define AT86RF2XX_REG__VERSION_NUM                              (0x1D)
+	#define AT86RF2XX_REG__MAN_ID_0                                 (0x1E)
+	#define AT86RF2XX_REG__MAN_ID_1                                 (0x1F)
+	#define AT86RF2XX_REG__SHORT_ADDR_0                             (0x20)
+	#define AT86RF2XX_REG__SHORT_ADDR_1                             (0x21)
+	#define AT86RF2XX_REG__PAN_ID_0                                 (0x22)
+	#define AT86RF2XX_REG__PAN_ID_1                                 (0x23)
+	#define AT86RF2XX_REG__IEEE_ADDR_0                              (0x24)
+	#define AT86RF2XX_REG__IEEE_ADDR_1                              (0x25)
+	#define AT86RF2XX_REG__IEEE_ADDR_2                              (0x26)
+	#define AT86RF2XX_REG__IEEE_ADDR_3                              (0x27)
+	#define AT86RF2XX_REG__IEEE_ADDR_4                              (0x28)
+	#define AT86RF2XX_REG__IEEE_ADDR_5                              (0x29)
+	#define AT86RF2XX_REG__IEEE_ADDR_6                              (0x2A)
+	#define AT86RF2XX_REG__IEEE_ADDR_7                              (0x2B)
+	#define AT86RF2XX_REG__XAH_CTRL_0                               (0x2C)
+	#define AT86RF2XX_REG__CSMA_SEED_0                              (0x2D)
+	#define AT86RF2XX_REG__CSMA_SEED_1                              (0x2E)
+	#define AT86RF2XX_REG__CSMA_BE                                  (0x2F)
+	#define AT86RF2XX_REG__TST_CTRL_DIGI                            (0x36)
+	/** @} */
+
+	/**
+	 * @brief   Bitfield definitions for the TRX_CTRL_0 register
+	 * @{
+	 */
+	#define AT86RF2XX_TRX_CTRL_0_MASK__PAD_IO                       (0xC0)
+	#define AT86RF2XX_TRX_CTRL_0_MASK__PAD_IO_CLKM                  (0x30)
+	#define AT86RF2XX_TRX_CTRL_0_MASK__CLKM_SHA_SEL                 (0x08)
+	#define AT86RF2XX_TRX_CTRL_0_MASK__CLKM_CTRL                    (0x07)
+
+	#define AT86RF2XX_TRX_CTRL_0_DEFAULT__PAD_IO                    (0x00)
+	#define AT86RF2XX_TRX_CTRL_0_DEFAULT__PAD_IO_CLKM               (0x10)
+	#define AT86RF2XX_TRX_CTRL_0_DEFAULT__CLKM_SHA_SEL              (0x08)
+	#define AT86RF2XX_TRX_CTRL_0_DEFAULT__CLKM_CTRL                 (0x01)
+
+	#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF                     (0x00)
+	#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__1MHz                    (0x01)
+	#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__2MHz                    (0x02)
+	#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__4MHz                    (0x03)
+	#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__8MHz                    (0x04)
+	#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__16MHz                   (0x05)
+	#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__250kHz                  (0x06)
+	#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__62_5kHz                 (0x07)
+	/** @} */
+
+	/**
+	 * @brief   Bitfield definitions for the TRX_CTRL_1 register
+	 * @{
+	 */
+	#define AT86RF2XX_TRX_CTRL_1_MASK__PA_EXT_EN                    (0x80)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_2_EXT_EN                 (0x40)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__TX_AUTO_CRC_ON               (0x20)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__RX_BL_CTRL                   (0x10)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__SPI_CMD_MODE                 (0x0C)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE                (0x02)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_POLARITY                 (0x01)
+	/** @} */
+
+	/**
+	 * @brief   Bitfield definitions for the TRX_CTRL_1 register
+	 * @{
+	 */
+	#define AT86RF2XX_TRX_CTRL_1_MASK__PA_EXT_EN                    (0x80)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_2_EXT_EN                 (0x40)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__TX_AUTO_CRC_ON               (0x20)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__RX_BL_CTRL                   (0x10)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__SPI_CMD_MODE                 (0x0C)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE                (0x02)
+	#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_POLARITY                 (0x01)
+	/** @} */
+
+	/**
+	 * @brief   Bitfield definitions for the TRX_CTRL_2 register
+	 * @{
+	 */
+	#define AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE                 (0x80)
+	#define AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE                    (0x3F)
+	#define AT86RF2XX_TRX_CTRL_2_MASK__TRX_OFF_AVDD_EN              (0x40)
+	#define AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_SCRAM_EN               (0x20)
+	#define AT86RF2XX_TRX_CTRL_2_MASK__ALT_SPECTRUM                 (0x10)
+	#define AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK                   (0x08)
+	#define AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE                     (0x04)
+	#define AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE              (0x03)
+	/** @} */
+
+	/**
+	 * @brief   Bitfield definitions for the IRQ_MASK register
+	 * @{
+	 */
+	#define AT86RF2XX_IRQ_STATUS_MASK__BAT_LOW_EN                   (0x80)
+	#define AT86RF2XX_IRQ_STATUS_MASK__TRX_UR_EN                    (0x40)
+	#define AT86RF2XX_IRQ_STATUS_MASK__AMI_EN                       (0x20)
+	#define AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE_EN               (0x10)
+	#define AT86RF2XX_IRQ_STATUS_MASK__RX_END_EN                   (0x08)
+	#define AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN                  (0x04)
+	#define AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK_EN                (0x02)
+	#define AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK_EN                  (0x01)
+	/** @} */
+
+// END external transceiver
 #endif
-#define AT86RF2XX_REG__XAH_CTRL_1                               (0x17)
-#define AT86RF2XX_REG__FTN_CTRL                                 (0x18)
-#define AT86RF2XX_REG__PLL_CF                                   (0x1A)
-#define AT86RF2XX_REG__PLL_DCU                                  (0x1B)
-#define AT86RF2XX_REG__PART_NUM                                 (0x1C)
-#define AT86RF2XX_REG__VERSION_NUM                              (0x1D)
-#define AT86RF2XX_REG__MAN_ID_0                                 (0x1E)
-#define AT86RF2XX_REG__MAN_ID_1                                 (0x1F)
-#define AT86RF2XX_REG__SHORT_ADDR_0                             (0x20)
-#define AT86RF2XX_REG__SHORT_ADDR_1                             (0x21)
-#define AT86RF2XX_REG__PAN_ID_0                                 (0x22)
-#define AT86RF2XX_REG__PAN_ID_1                                 (0x23)
-#define AT86RF2XX_REG__IEEE_ADDR_0                              (0x24)
-#define AT86RF2XX_REG__IEEE_ADDR_1                              (0x25)
-#define AT86RF2XX_REG__IEEE_ADDR_2                              (0x26)
-#define AT86RF2XX_REG__IEEE_ADDR_3                              (0x27)
-#define AT86RF2XX_REG__IEEE_ADDR_4                              (0x28)
-#define AT86RF2XX_REG__IEEE_ADDR_5                              (0x29)
-#define AT86RF2XX_REG__IEEE_ADDR_6                              (0x2A)
-#define AT86RF2XX_REG__IEEE_ADDR_7                              (0x2B)
-#define AT86RF2XX_REG__XAH_CTRL_0                               (0x2C)
-#define AT86RF2XX_REG__CSMA_SEED_0                              (0x2D)
-#define AT86RF2XX_REG__CSMA_SEED_1                              (0x2E)
-#define AT86RF2XX_REG__CSMA_BE                                  (0x2F)
-#define AT86RF2XX_REG__TST_CTRL_DIGI                            (0x36)
-/** @} */
 
-/**
- * @brief   Bitfield definitions for the TRX_CTRL_0 register
- * @{
- */
-#define AT86RF2XX_TRX_CTRL_0_MASK__PAD_IO                       (0xC0)
-#define AT86RF2XX_TRX_CTRL_0_MASK__PAD_IO_CLKM                  (0x30)
-#define AT86RF2XX_TRX_CTRL_0_MASK__CLKM_SHA_SEL                 (0x08)
-#define AT86RF2XX_TRX_CTRL_0_MASK__CLKM_CTRL                    (0x07)
-
-#define AT86RF2XX_TRX_CTRL_0_DEFAULT__PAD_IO                    (0x00)
-#define AT86RF2XX_TRX_CTRL_0_DEFAULT__PAD_IO_CLKM               (0x10)
-#define AT86RF2XX_TRX_CTRL_0_DEFAULT__CLKM_SHA_SEL              (0x08)
-#define AT86RF2XX_TRX_CTRL_0_DEFAULT__CLKM_CTRL                 (0x01)
-
-#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF                     (0x00)
-#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__1MHz                    (0x01)
-#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__2MHz                    (0x02)
-#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__4MHz                    (0x03)
-#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__8MHz                    (0x04)
-#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__16MHz                   (0x05)
-#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__250kHz                  (0x06)
-#define AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__62_5kHz                 (0x07)
-/** @} */
-
-/**
- * @brief   Bitfield definitions for the TRX_CTRL_1 register
- * @{
- */
-#define AT86RF2XX_TRX_CTRL_1_MASK__PA_EXT_EN                    (0x80)
-#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_2_EXT_EN                 (0x40)
-#define AT86RF2XX_TRX_CTRL_1_MASK__TX_AUTO_CRC_ON               (0x20)
-#define AT86RF2XX_TRX_CTRL_1_MASK__RX_BL_CTRL                   (0x10)
-#define AT86RF2XX_TRX_CTRL_1_MASK__SPI_CMD_MODE                 (0x0C)
-#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE                (0x02)
-#define AT86RF2XX_TRX_CTRL_1_MASK__IRQ_POLARITY                 (0x01)
-/** @} */
-
-/**
- * @brief   Bitfield definitions for the TRX_CTRL_2 register
- * @{
- */
-#define AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE                 (0x80)
-#define AT86RF2XX_TRX_CTRL_2_MASK__FREQ_MODE                    (0x3F)
-#define AT86RF2XX_TRX_CTRL_2_MASK__TRX_OFF_AVDD_EN              (0x40)
-#define AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_SCRAM_EN               (0x20)
-#define AT86RF2XX_TRX_CTRL_2_MASK__ALT_SPECTRUM                 (0x10)
-#define AT86RF2XX_TRX_CTRL_2_MASK__BPSK_OQPSK                   (0x08)
-#define AT86RF2XX_TRX_CTRL_2_MASK__SUB_MODE                     (0x04)
-#define AT86RF2XX_TRX_CTRL_2_MASK__OQPSK_DATA_RATE              (0x03)
-/** @} */
-
-/**
- * @brief   Bitfield definitions for the IRQ_STATUS register
- * @{
- */
-#define AT86RF2XX_IRQ_STATUS_MASK__BAT_LOW                      (0x80)
-#define AT86RF2XX_IRQ_STATUS_MASK__TRX_UR                       (0x40)
-#define AT86RF2XX_IRQ_STATUS_MASK__AMI                          (0x20)
-#define AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE                  (0x10)
-#define AT86RF2XX_IRQ_STATUS_MASK__TRX_END                      (0x08)
-#define AT86RF2XX_IRQ_STATUS_MASK__RX_START                     (0x04)
-#define AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK                   (0x02)
-#define AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK                     (0x01)
-/** @} */
 
 /**
  * @brief   Bitfield definitions for the TRX_STATUS register
@@ -202,9 +357,13 @@ extern "C" {
 #define AT86RF2XX_TRX_STATUS__BUSY_TX_ARET                      (0x12)
 #define AT86RF2XX_TRX_STATUS__RX_AACK_ON                        (0x16)
 #define AT86RF2XX_TRX_STATUS__TX_ARET_ON                        (0x19)
-#define AT86RF2XX_TRX_STATUS__RX_ON_NOCLK                       (0x1C)
-#define AT86RF2XX_TRX_STATUS__RX_AACK_ON_NOCLK                  (0x1D)
-#define AT86RF2XX_TRX_STATUS__BUSY_RX_AACK_NOCLK                (0x1E)
+
+#ifndef MODULE_AT86RFR2  // these are not defined in the atmega256rfr2 datasheet
+	#define AT86RF2XX_TRX_STATUS__RX_ON_NOCLK                       (0x1C)
+	#define AT86RF2XX_TRX_STATUS__RX_AACK_ON_NOCLK                  (0x1D)
+	#define AT86RF2XX_TRX_STATUS__BUSY_RX_AACK_NOCLK                (0x1E)
+#endif
+
 #define AT86RF2XX_TRX_STATUS__STATE_TRANSITION_IN_PROGRESS      (0x1F)
 /** @} */
 
@@ -223,6 +382,7 @@ extern "C" {
 #define AT86RF2XX_TRX_STATE__PLL_ON                             (0x09)
 #define AT86RF2XX_TRX_STATE__RX_AACK_ON                         (0x16)
 #define AT86RF2XX_TRX_STATE__TX_ARET_ON                         (0x19)
+
 #define AT86RF2XX_TRX_STATE__TRAC_SUCCESS                       (0x00)
 #define AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING          (0x20)
 #define AT86RF2XX_TRX_STATE__TRAC_SUCCESS_WAIT_FOR_ACK          (0x40)
@@ -239,7 +399,7 @@ extern "C" {
 #define AT86RF2XX_PHY_CC_CCA_MASK__CCA_MODE                     (0x60)
 #define AT86RF2XX_PHY_CC_CCA_MASK__CHANNEL                      (0x1F)
 
-#define AT86RF2XX_PHY_CC_CCA_DEFAULT__CCA_MODE                  (0x20)
+#define AT86RF2XX_PHY_CC_CCA_DEFAULT__CCA_MODE                  (0x20) // Mode 2, Carrier sense only
 /** @} */
 
 /**
@@ -263,6 +423,9 @@ extern "C" {
 #define AT86RF2XX_PHY_TX_PWR_MASK__PA_BUF_LT                    (0xC0)
 #define AT86RF2XX_PHY_TX_PWR_MASK__PA_LT                        (0x30)
 #define AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR                       (0x0F)
+#elif MODULE_AT86RFR2
+#define AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR                       (0x0F)
+#define AT86RF2XX_PHY_TX_PWR_DEFAULT__TX_PWR                    (0x00)// 3.5dBm
 #else
 #define AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR                       (0x0F)
 #endif
@@ -285,15 +448,19 @@ extern "C" {
  * @{
  */
 #define AT86RF2XX_XOSC_CTRL__XTAL_MODE_CRYSTAL                  (0xF0)
-#define AT86RF2XX_XOSC_CTRL__XTAL_MODE_EXTERNAL                 (0xF0)
+#define AT86RF2XX_XOSC_CTRL__XTAL_MODE_EXTERNAL                 (0x40) // was (0xF0) // TODO check if this on purpose wrong
 /** @} */
 
 /**
  * @brief   Timing values
  * @{
  */
-#define AT86RF2XX_TIMING__VCC_TO_P_ON                           (330)
+#ifdef MODULE_AT86RFR2
+#define AT86RF2XX_TIMING__SLEEP_TO_TRX_OFF                      (240)
+#else
 #define AT86RF2XX_TIMING__SLEEP_TO_TRX_OFF                      (380)
+#endif
+#define AT86RF2XX_TIMING__VCC_TO_P_ON                           (330)
 #define AT86RF2XX_TIMING__TRX_OFF_TO_PLL_ON                     (110)
 #define AT86RF2XX_TIMING__TRX_OFF_TO_RX_ON                      (110)
 #define AT86RF2XX_TIMING__PLL_ON_TO_BUSY_TX                     (16)
@@ -330,6 +497,20 @@ extern "C" {
 #define AT86RF2XX_CSMA_SEED_1__CSMA_SEED_1                      (0x07)
 /** @} */
 
+
+
+#ifdef MODULE_AT86RFR2
+/**
+ * @brief   Bitfield definitions for the  TRXPR  Transceiver Pin Register
+ * @{
+ */
+#define AT86RF2XX_TRXPR_ATBE                      				(0x08)
+#define AT86RF2XX_TRXPR_TRXTST                     				(0x04)
+#define AT86RF2XX_TRXPR_SLPTR                      				(0x02)
+#define AT86RF2XX_TRXPR_TRXRST                     				(0x01)
+/** @} */
+
+#else
 /**
  * @brief   Bitfield definitions for the RF_CTRL_0 register
  * @{
@@ -343,6 +524,7 @@ extern "C" {
 #define AT86RF2XX_RF_CTRL_0_GC_TX_OFFS__2DB                     (0x03)
 #endif
 /** @} */
+#endif
 
 #ifdef __cplusplus
 }

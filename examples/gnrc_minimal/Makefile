@@ -38,7 +38,7 @@ USEMODULE += prng_minstd
 
 # Use ieee822154
 USEMODULE += ieee802154
-USEMODULE += netdev2_ieee802154
+USEMODULE += netdev_ieee802154
 
 # This application dumps received packets to STDIO using the pktdump module
 USEMODULE += gnrc_pktdump

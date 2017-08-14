@@ -26,7 +26,10 @@
 #include "at86rf2xx.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
-#include "periph/spi.h"
+
+#ifndef MODULE_AT86RFR2
+	#include "periph/spi.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -83,6 +86,10 @@ static const uint8_t dbm_to_tx_pow[] = {0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                         0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
                                         0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
                                         0x06, 0x05, 0x03,0x00};
+#elif MODULE_AT86RFR2
+static const int16_t tx_pow_to_dbm[] = {3.5, 3.3, 2.8, 2.3, 1.8, 1.2, 0.5,
+										-0.5, -1.5, -2.5, -3.5, -4.5, -6.5, -8.5, -11.5, 16.5};
+
 #else
 static const int16_t tx_pow_to_dbm[] = {3, 3, 2, 2, 1, 1, 0,
                                         -1, -2, -3, -4, -5, -7, -9, -12, -17};
@@ -194,6 +201,9 @@ int16_t at86rf2xx_get_txpower(at86rf2xx_t *dev)
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR);
     DEBUG("txpower value: %x\n", txpower);
     return _tx_pow_to_dbm_212b(dev->netdev.chan, dev->page, txpower);
+#elif defined(MODULE_AT86RFR2)
+    uint8_t txpower = *AT86RF2XX_REG__PHY_TX_PWR & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
+    return tx_pow_to_dbm[txpower];
 #else
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
                 & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
@@ -203,39 +213,48 @@ int16_t at86rf2xx_get_txpower(at86rf2xx_t *dev)
 
 void at86rf2xx_set_txpower(at86rf2xx_t *dev, int16_t txpower)
 {
-#ifdef MODULE_AT86RF212B
-    txpower += 25;
+
+#ifdef MODULE_AT86RFR2
+	// find the right configuration which is the nearest to the transmit power
+	// take the next value that is smaller than the requested.
+	unsigned int i=0;
+	while( tx_pow_to_dbm[i]>txpower ){i++;}
+	at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,i);
 #else
-    txpower += 17;
-#endif
-    if (txpower < 0) {
-        txpower = 0;
-#ifdef MODULE_AT86RF212B
-    }
-    else if (txpower > 36) {
-        txpower = 36;
-#elif MODULE_AT86RF233
-    }
-    else if (txpower > 21) {
-        txpower = 21;
-#else
-    }
-    else if (txpower > 20) {
-        txpower = 20;
-#endif
-    }
-#ifdef MODULE_AT86RF212B
-    if (dev->netdev.chan == 0) {
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_868[txpower]);
-    }
-    else if (dev->netdev.chan < 11) {
-        at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                            dbm_to_tx_pow_915[txpower]);
-    }
-#else
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
-                        dbm_to_tx_pow[txpower]);
+	#ifdef  MODULE_AT86RF212B
+		txpower += 25;
+	#else
+		txpower += 17;
+	#endif
+		if (txpower < 0) {
+			txpower = 0;
+	#ifdef MODULE_AT86RF212B
+		}
+		else if (txpower > 36) {
+			txpower = 36;
+	#elif MODULE_AT86RF233
+		}
+		else if (txpower > 21) {
+			txpower = 21;
+	#else
+		}
+		else if (txpower > 20) {
+			txpower = 20;
+	#endif
+		}
+	#ifdef MODULE_AT86RF212B
+		if (dev->netdev.chan == 0) {
+			at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
+								dbm_to_tx_pow_868[txpower]);
+		}
+		else if (dev->netdev.chan < 11) {
+			at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
+								dbm_to_tx_pow_915[txpower]);
+		}
+	#else
+		at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
+							dbm_to_tx_pow[txpower]);
+	#endif
 #endif
 }
 
@@ -365,11 +384,26 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                 at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
                 break;
             case AT86RF2XX_OPT_TELL_RX_START:
-                DEBUG("[at86rf2xx] opt: enabling SFD IRQ\n");
+            	DEBUG("[at86rf2xx] opt: enabling SFD IRQ\n");
+#ifdef MODULE_AT86RFR2
+				tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK1);
+				tmp |= AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
+				at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1, tmp);
+#else
                 tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
-                tmp |= AT86RF2XX_IRQ_STATUS_MASK__RX_START;
+                tmp |= AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
                 at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
+#endif
                 break;
+            case AT86RF2XX_OPT_TELL_TX_END:
+#ifdef MODULE_AT86RFR2
+            	DEBUG("[at86rf2xx] opt: enabling TX end Interrupt\n");
+				tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
+				tmp |= AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
+				at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
+#endif
+				break;
+
             default:
                 /* do nothing */
                 break;
@@ -408,9 +442,17 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
             case AT86RF2XX_OPT_TELL_RX_START:
                 DEBUG("[at86rf2xx] opt: disabling SFD IRQ\n");
                 tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
-                tmp &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_START;
+                tmp &= ~AT86RF2XX_IRQ_STATUS_MASK__RX_START_EN;
                 at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
                 break;
+            case AT86RF2XX_OPT_TELL_TX_END:
+#ifdef MODULE_AT86RFR2
+            	DEBUG("[at86rf2xx] opt: disabling TX end Interrupt\n");
+				tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
+				tmp &= ~AT86RF2XX_IRQ_STATUS_MASK__TX_END_EN;
+				at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
+#endif
+				break;
             default:
                 /* do nothing */
                 break;
@@ -430,7 +472,8 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
 
 static inline void _set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
 {
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, cmd);
+
+	at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE, cmd);
 
     /* To prevent a possible race condition when changing to
      * RX_AACK_ON state the state doesn't get read back in that
@@ -488,7 +531,11 @@ void at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         /* Discard all IRQ flags, framebuffer is lost anyway */
         at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
         /* Go to SLEEP mode from TRX_OFF */
+#if defined( MODULE_AT86RFR2 )
+        *(AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_SLPTR;
+#else
         gpio_set(dev->params.sleep_pin);
+#endif
         dev->state = state;
     } else {
         _set_state(dev, state, state);

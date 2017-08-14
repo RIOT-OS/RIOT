@@ -19,6 +19,8 @@
 
 #ifdef MODULE_AT86RF2XX
 
+#define LOG_LEVEL LOG_DEBUG
+#include "log.h"
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netdev.h"
@@ -32,12 +34,18 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+
 #ifndef AT86RF2XX_MAC_PRIO
 #define AT86RF2XX_MAC_PRIO          (GNRC_NETDEV_MAC_PRIO)
 #endif
 
-#define AT86RF2XX_NUM (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
+#ifdef MODULE_AT86RFR2
+	#define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+	#define AT86RF2XX_NUM 1
+#else
+	#define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+	#define AT86RF2XX_NUM (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
+#endif
 
 static at86rf2xx_t at86rf2xx_devs[AT86RF2XX_NUM];
 static gnrc_netdev_t gnrc_adpt[AT86RF2XX_NUM];

@@ -285,12 +285,13 @@ ISR(INT5_vect, ISR_BLOCK)
 }
 #endif
 
-#if defined(INT6_vect)
-ISR(INT6_vect, ISR_BLOCK)
-{
-    irq_handler(6); /**< predefined interrupt pin */
-}
-#endif
+/* used for AVR_CONTEXT_SWAP_INTERRUPT */
+//#if defined(INT6_vect)
+//ISR(INT6_vect, ISR_BLOCK)
+//{
+//    irq_handler(6); /**< predefined interrupt pin */
+//}
+//#endif
 
 #if defined(INT7_vect)
 ISR(INT7_vect, ISR_BLOCK)

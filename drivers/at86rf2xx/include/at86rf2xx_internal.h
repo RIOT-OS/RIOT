@@ -35,7 +35,12 @@ extern "C" {
  * @brief   Transition time from SLEEP to TRX_OFF in us, refer figure 7-4, p.42.
  *          For different environments refer figure 13-13, p.201
  */
+#ifdef MODULE_AT86RFR2
+#define AT86RF2XX_WAKEUP_DELAY          (240U)
+#else
 #define AT86RF2XX_WAKEUP_DELAY          (300U)
+#endif
+
 
 /**
  * @brief   Minimum reset pulse width, refer p.190
@@ -43,10 +48,16 @@ extern "C" {
 #define AT86RF2XX_RESET_PULSE_WIDTH     (1U)
 
 /**
- * @brief   Transition time to TRX_OFF after reset pulse in us, refer
- *          figure 7-8, p. 44.
+ * @brief   Transition time to TRX_OFF after reset pulse in us
  */
+#ifdef MODULE_AT86RFR2
+/*refer p. 46 */
+#define AT86RF2XX_RESET_DELAY           (37U)
+#else
+/*refer figure 7-8, p. 44. */
 #define AT86RF2XX_RESET_DELAY           (26U)
+#endif
+
 
 /**
  * @brief   Read from a register at address `addr` from device `dev`.
@@ -56,7 +67,11 @@ extern "C" {
  *
  * @return              the value of the specified register
  */
+#ifdef MODULE_AT86RFR2
+uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, volatile uint8_t* addr);
+#else
 uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr);
+#endif
 
 /**
  * @brief   Write to a register at address `addr` from device `dev`.
@@ -65,9 +80,13 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr);
  * @param[in] addr      address of the register to write
  * @param[in] value     value to write to the given register
  */
+#ifdef MODULE_AT86RFR2
+void at86rf2xx_reg_write(const at86rf2xx_t *dev, volatile uint8_t* addr,
+                         const uint8_t value);
+#else
 void at86rf2xx_reg_write(const at86rf2xx_t *dev, const uint8_t addr,
                          const uint8_t value);
-
+#endif
 /**
  * @brief   Read a chunk of data from the SRAM of the given device
  *
@@ -156,7 +175,7 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
  */
 void at86rf2xx_configure_phy(at86rf2xx_t *dev);
 
-#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(DOXYGEN)
+#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(MODULE_AT86RFR2) || defined(DOXYGEN)
 /**
  * @brief   Read random data from the RNG
  *

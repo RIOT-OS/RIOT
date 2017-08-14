@@ -149,13 +149,16 @@ extern "C" {
  * @brief struct holding all params needed for device initialization
  */
 typedef struct at86rf2xx_params {
-    spi_t spi;              /**< SPI bus the device is connected to */
+#ifndef MODULE_AT86RFR2  // no SPI
+	spi_t spi;              /**< SPI bus the device is connected to */
     spi_clk_t spi_clk;      /**< SPI clock speed to use */
     spi_cs_t cs_pin;        /**< GPIO pin connected to chip select */
     gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
     gpio_t sleep_pin;       /**< GPIO pin connected to the sleep pin */
     gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
+#endif
 } at86rf2xx_params_t;
+
 
 /**
  * @brief   Device descriptor for AT86RF2XX radio devices
@@ -179,6 +182,18 @@ typedef struct {
     uint8_t pending_tx;                 /**< keep track of pending TX calls
                                              this is required to know when to
                                              return to @ref at86rf2xx_t::idle_state */
+#ifdef MODULE_AT86RFR2
+    /* ATmega256rfr2 signals transceiver events with different interrupts
+     * they have to be stored to mimic the same flow as external transceiver
+     * Use irq_status to map save interrupts of SOC transceiver,
+     *  so it is not necessary to check them again.
+     *
+     *  irq_status = IRQ_STATUS
+     *  irq_status = IRQ_STATUS1
+     * */
+    uint8_t irq_status;                     /**< save irq status */
+    uint8_t irq_status1;                    /**< save irq status1*/
+#endif
     /** @} */
 } at86rf2xx_t;
 
