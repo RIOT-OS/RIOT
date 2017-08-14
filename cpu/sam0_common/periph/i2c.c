@@ -114,7 +114,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     while (I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
 
     /* Turn on power manager for sercom */
-#if CPU_FAM_SAML21
+#if defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     /* OK for SERCOM0-4 */
     MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << (sercom_gclk_id - SERCOM0_GCLK_ID_CORE));
 #else
@@ -122,7 +122,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 #endif
 
     /* I2C using CLK GEN 0 */
-#if CPU_FAM_SAML21
+#if defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     GCLK->PCHCTRL[sercom_gclk_id].reg = (GCLK_PCHCTRL_CHEN |
                          GCLK_PCHCTRL_GEN_GCLK0  );
     while (GCLK->SYNCBUSY.bit.GENCTRL) {}
@@ -162,8 +162,9 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     while (I2CSercom->SYNCBUSY.reg & SERCOM_I2CM_SYNCBUSY_MASK) {}
 
     /* Set sercom module to operate in I2C master mode. */
+#if !defined(CPU_FAM_SAMR30)
     I2CSercom->CTRLA.reg = SERCOM_I2CM_CTRLA_MODE_I2C_MASTER;
-
+#endif
     /* Enable Smart Mode (ACK is sent when DATA.DATA is read) */
     I2CSercom->CTRLB.reg = SERCOM_I2CM_CTRLB_SMEN;
 

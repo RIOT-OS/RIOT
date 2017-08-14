@@ -1,0 +1,7 @@
+# define the cpu used by the saml21 board
+export CPU = samr30
+export CPU_MODEL = samr30g18a
+
+EDBG_DEVICE_TYPE = atmel_cm0p
+
+include $(RIOTMAKE)/boards/sam0.inc.mk

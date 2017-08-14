@@ -199,6 +199,8 @@ static inline int sercom_id(void *sercom)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 #elif defined(CPU_FAM_SAML21)
     return ((((uint32_t)sercom) >> 10) & 0x7);
+#elif defined(CPU_FAM_SAMR30)
+    return ((((uint32_t)sercom) >> 10) & 0x7);
 #endif
 }
 
