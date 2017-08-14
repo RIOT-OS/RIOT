@@ -31,19 +31,8 @@
 #include "net/netdev/ieee802154.h"
 #include "nrf802154.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
-
-
-/**
- * @brief   Possible internal device states
- */
-typedef enum {
-    STATE_OFF,                  /**< device is powered off */
-    STATE_IDLE,                 /**< device is in idle mode */
-    STATE_RX,                   /**< device is in receive mode */
-} idle_state_t;
-
 
 static const netdev_driver_t nrf802154_netdev_driver;
 
@@ -70,35 +59,75 @@ netdev_ieee802154_t nrf802154_dev = {
     .flags = 0
 };
 
-static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 2]; /* length PHR + PSDU + LQI */
-static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 2]; /* length PHR + PSDU + LQI */
+static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* length PHR + PSDU + LQI */
+static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* length PHR + PSDU + LQI */
 
 static mutex_t txlock;
 
-static volatile idle_state_t idle_state = STATE_RX;
-
 /**
- * @brief   Set radio into idle (DISABLED) state
+ * @brief   Set radio into DISABLED state
  */
-static void go_idle(void)
+static void disable(void)
 {
-    /* set device into basic disabled state */
-    NRF_RADIO->EVENTS_DISABLED = 0;
-    NRF_RADIO->TASKS_DISABLE = 1;
-    while (NRF_RADIO->EVENTS_DISABLED == 0) {}
+    /* set device into DISABLED state */
+    if (NRF_RADIO->STATE != RADIO_STATE_STATE_Disabled) {
+        NRF_RADIO->EVENTS_DISABLED = 0;
+        NRF_RADIO->TASKS_DISABLE = 1;
+        while (!(NRF_RADIO->EVENTS_DISABLED)) {}
+        DEBUG("Device state: DISABLED\n");
+    }
 }
 
-static void reset_state(void)
+/**
+ * @brief   Set radio into RXIDLE state
+ */
+static void enable_rx(void)
 {
-    go_idle();
+    DEBUG("Set device state to RXIDLE\n");
+    NRF_RADIO->PACKETPTR = (uint32_t)rxbuf;
+    /* set device into RXIDLE state */
+    if (NRF_RADIO->STATE != RADIO_STATE_STATE_TxIdle) {
+        disable();
+    }
+    NRF_RADIO->EVENTS_RXREADY = 0;
+    NRF_RADIO->TASKS_RXEN = 1;
+    while (!(NRF_RADIO->EVENTS_RXREADY)) {}
+    DEBUG("Device state: RXIDLE\n");
+}
 
-    if ((idle_state == STATE_RX) && (rxbuf[0] == 0)) {
-        NRF_RADIO->PACKETPTR = (uint32_t)rxbuf;
-        NRF_RADIO->TASKS_RXEN = 1;
+/**
+ * @brief   Set radio into TXIDLE state
+ */
+static void enable_tx(void)
+{
+    DEBUG("Set device state to TXIDLE\n");
+    NRF_RADIO->PACKETPTR = (uint32_t)txbuf;
+    /* set device into TXIDLE state */
+    if (NRF_RADIO->STATE != RADIO_STATE_STATE_RxIdle) {
+        disable();
     }
-    else if (idle_state == STATE_OFF) {
-        NRF_RADIO->POWER = 0;
-    }
+    NRF_RADIO->EVENTS_TXREADY = 0;
+    NRF_RADIO->TASKS_TXEN = 1;
+    while (!(NRF_RADIO->EVENTS_TXREADY)) {}
+    DEBUG("Device state: TXIDLE\n");
+}
+
+/**
+ * @brief   Reset the RXIDLE state
+ */
+ static void reset_rx(void)
+ {
+     /* reset RX buffer and listen for new packets */
+     rxbuf[0] = 0;
+     NRF_RADIO->TASKS_START = 1;
+ }
+
+/**
+ * @brief   Switch on the radio
+ */
+static void power_on(void)
+{
+        NRF_RADIO->POWER = 1;
 }
 
 static void set_chan(uint16_t chan)
@@ -110,37 +139,37 @@ static void set_chan(uint16_t chan)
 
 static int16_t get_txpower(void)
 {
-    int8_t p = (int8_t)NRF_RADIO->TXPOWER;
-    if (p < 0) {
-        return (int16_t)(0xff00 | p);
+    int8_t txpower = (int8_t)NRF_RADIO->TXPOWER;
+    if (txpower < 0) {
+        return (int16_t)(0xff00 | txpower);
     }
-    return (int16_t)p;
+    return (int16_t)txpower;
 }
 
-static void set_txpower(int16_t power)
+static void set_txpower(int16_t txpower)
 {
-    if (power > 9) {
+    if (txpower > 9) {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Pos9dBm;
     }
-    else if (power > -2 && power < 2) {
+    if (txpower > 1) {
+        NRF_RADIO->TXPOWER = (uint32_t)txpower;
+    }
+    else if (txpower > -1) {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_0dBm;
     }
-    else if (power < 10 && power > 1) {
-        NRF_RADIO->TXPOWER = (uint8_t)power;
-    }
-    else if (power > -6) {
+    else if (txpower > -5) {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg4dBm;
     }
-    else if (power > -10) {
+    else if (txpower > -9) {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg8dBm;
     }
-    else if (power > -14) {
+    else if (txpower > -13) {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg12dBm;
     }
-    else if (power > -18) {
+    else if (txpower > -17) {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg16dBm;
     }
-    else if (power > -30) {
+    else if (txpower > -21) {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Neg20dBm;
     }
     else {
@@ -155,13 +184,14 @@ static int init(netdev_t *dev)
     /* initialize local variables */
     mutex_init(&txlock);
 
-    /* reset buffers */
+    /* reset buffer */
     rxbuf[0] = 0;
+    txbuf[0] = 0;
 
     /* power on peripheral */
-    NRF_RADIO->POWER = 1;
+    power_on();
     /* make sure the radio is disabled/stopped */
-    go_idle();
+    disable();
 
     /* we configure it to run in IEEE802.15.4 mode */
     NRF_RADIO->MODE = RADIO_MODE_MODE_Ieee802154_250Kbit;
@@ -169,14 +199,15 @@ static int init(netdev_t *dev)
     NRF_RADIO->PCNF0 = ((8 << RADIO_PCNF0_LFLEN_Pos) |
                         (RADIO_PCNF0_PLEN_32bitZero << RADIO_PCNF0_PLEN_Pos) |
                         (RADIO_PCNF0_CRCINC_Include << RADIO_PCNF0_CRCINC_Pos));
-    NRF_RADIO->PCNF1 = (IEEE802154_FRAME_LEN_MAX);
+    NRF_RADIO->PCNF1 = IEEE802154_FRAME_LEN_MAX;
     /* set start frame delimiter */
     NRF_RADIO->SFD = IEEE802154_SFD;
     /* set MHR filters */
     NRF_RADIO->MHRMATCHCONF = 0;
     NRF_RADIO->MHRMATCHMAS = 0xff0007ff;
     /* configure CRC conform to IEEE802154 */
-    NRF_RADIO->CRCCNF = 0x202;
+    NRF_RADIO->CRCCNF = ((RADIO_CRCCNF_LEN_Two << RADIO_CRCCNF_LEN_Pos) |
+                         (RADIO_CRCCNF_SKIPADDR_Ieee802154 << RADIO_CRCCNF_SKIPADDR_Pos));
     NRF_RADIO->CRCPOLY = 0x011021;
     NRF_RADIO->CRCINIT = 0;
 
@@ -188,16 +219,14 @@ static int init(netdev_t *dev)
     set_chan(nrf802154_dev.chan);
 
     /* configure some shortcuts */
-    NRF_RADIO->SHORTS = (RADIO_SHORTS_TXREADY_START_Msk |
-                         RADIO_SHORTS_RXREADY_START_Msk);// |
-                         // RADIO_SHORTS_END_DISABLE_Msk);
+    NRF_RADIO->SHORTS = RADIO_SHORTS_RXREADY_START_Msk | RADIO_SHORTS_TXREADY_START_Msk;
 
     /* enable interrupts */
     NVIC_EnableIRQ(RADIO_IRQn);
-    NRF_RADIO->INTENSET = (RADIO_INTENSET_END_Msk);
+    NRF_RADIO->INTENSET = RADIO_INTENSET_END_Msk;
 
     /* switch to RX mode */
-    reset_state();
+    enable_rx();
 
     return 0;
 }
@@ -210,15 +239,6 @@ static int send(netdev_t *dev, const struct iovec *vector, unsigned count)
 
     assert(vector && count);
 
-    /* we need to grab the TX mutex, so we don't end up with two concurrent
-     * transfers */
-    mutex_lock(&txlock);
-
-    /* wait for any ongoing transmission to finish and go into idle state */
-    while ((NRF_RADIO->STATE == RADIO_STATE_STATE_TxIdle) ||
-          (NRF_RADIO->STATE == RADIO_STATE_STATE_RxIdle)) {}
-    go_idle();
-
     /* copy packet data into the transmit buffer */
     int pos = 1;
     for (unsigned i = 0; i < count; i++) {
@@ -230,15 +250,13 @@ static int send(netdev_t *dev, const struct iovec *vector, unsigned count)
         pos += vector[i].iov_len;
     }
 
+    /* specify the length of the package. */
     txbuf[0] = pos + 1;
-    /* set packet pointer to TX buffer */
-    NRF_RADIO->PACKETPTR = (uint32_t)(txbuf);
+
+    enable_tx();
 
     /* trigger the actual transmission */
     DEBUG("[nrf802154] send: putting %i byte into the ether\n", pos);
-    NRF_RADIO->TASKS_TXEN = 1;
-    // while (NRF_RADIO->STATE == RADIO_STATE_STATE_TxIdle) {}
-    NRF_RADIO->TASKS_START = 1;
 
     /* @todo: how about CCA, retransmits, and ACKs? */
 
@@ -250,13 +268,12 @@ static int recv(netdev_t *dev, void *buf, size_t len, void *info)
     (void)dev;
     (void)info;
 
-    assert(idle_state != STATE_OFF);
-
     int pktlen = (int)rxbuf[0] - 2;
 
     /* check if packet data is readable */
-    if (pktlen == 0) {
+    if (pktlen <= 0) {
         DEBUG("recv: no packet data available\n");
+        reset_rx();
         return 0;
     }
 
@@ -264,8 +281,6 @@ static int recv(netdev_t *dev, void *buf, size_t len, void *info)
         if (len > 0) {
             /* drop packet */
             DEBUG("recv: dropping packet of length %i\n", pktlen);
-            rxbuf[0] = 0;
-            reset_state();
         }
         else if (len == 0) {
           /* return packet length */
@@ -277,9 +292,9 @@ static int recv(netdev_t *dev, void *buf, size_t len, void *info)
         DEBUG("recv: reading packet of length %i\n", pktlen);
         pktlen = (len < pktlen) ? len : pktlen;
         memcpy(buf, &rxbuf[1], pktlen);
-        rxbuf[0] = 0;
-        reset_state();
     }
+
+    reset_rx();
 
     return pktlen;
 }
@@ -340,29 +355,36 @@ void isr_radio(void)
 {
     DEBUG("radio: ISR\n");
 
-    if (NRF_RADIO->EVENTS_END == 1) {
-        NRF_RADIO->EVENTS_END = 0;
-        /* did we just send or receive something? */
-        if (NRF_RADIO->STATE == RADIO_STATE_STATE_RxIdle) {
-            /* only process packet if event callback is set and CRC is valid */
-            if ((nrf802154_dev.netdev.event_callback) &&
-                (NRF_RADIO->CRCSTATUS == 1) &&
-                netdev_ieee802154_dst_filter(&nrf802154_dev, &rxbuf[1])) {
-                DEBUG("isr-rx: packet valid -> processing\n");
-                /* TODO: send ACK */
-                nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
-            }
-            else {
-                DEBUG("isr-rx: dropping incoming packet\n");
-                /* reset RX buffer and listen for new packets */
-                rxbuf[0] = 0;
-                NRF_RADIO->TASKS_START = 1;
-            }
+    NRF_RADIO->EVENTS_END = 0;
+
+    /* did we just send or receive something? */
+    if (NRF_RADIO->STATE == RADIO_STATE_STATE_RxIdle) {
+        /* only process packet if event callback is set and CRC is valid */
+        if ((nrf802154_dev.netdev.event_callback) &&
+            (NRF_RADIO->CRCSTATUS == 1) &&
+            netdev_ieee802154_dst_filter(&nrf802154_dev, &rxbuf[1])) {
+
+            DEBUG("isr-rx: packet valid -> processing\n");
+
+            txbuf[0] = 5;
+            txbuf[1] = 2;
+            txbuf[2] = 0;
+            txbuf[3] = rxbuf[3];
+
+            DEBUG("Sequence number: %u\n", rxbuf[3]);
+
+            enable_tx();
+
+            nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
         }
-        else if (NRF_RADIO->STATE == RADIO_STATE_STATE_TxIdle) {
-            mutex_unlock(&txlock);
-            reset_state();
+        else {
+            DEBUG("isr-rx: dropping incoming packet\n");
+            reset_rx();
         }
+    }
+    else if (NRF_RADIO->STATE == RADIO_STATE_STATE_TxIdle) {
+        enable_rx();
+        DEBUG("Switch to RX mode\n");
     }
 
     cortexm_isr_end();

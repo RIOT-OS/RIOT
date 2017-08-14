@@ -38,36 +38,6 @@
 #include "net/gnrc.h"
 #endif
 
-#include "cpu.h"
-
-static int info(int argc, char **argv)
-{
-    (void)argc;
-    (void)argv;
-
-    printf("RADIO status\n");
-    printf("MODE : 0x%08x\n", (int)NRF_RADIO->MODE);
-    printf("POWER: 0x%08x\n", (int)NRF_RADIO->POWER);
-    printf("STATE: 0x%08x\n", (int)NRF_RADIO->STATE);
-
-    printf("FREQ:  0x%08x\n", (int)NRF_RADIO->FREQUENCY);
-    printf("PCNF0: 0x%08x\n", (int)NRF_RADIO->PCNF0);
-    printf("PCNF1: 0x%08x\n", (int)NRF_RADIO->PCNF1);
-    printf("SFD:   0x%08x\n", (int)NRF_RADIO->SFD);
-    printf("TXPOW: 0x%08x\n", (int)NRF_RADIO->TXPOWER);
-
-    printf("MHRMATCHCONF: 0x%08x\n", (int)NRF_RADIO->MHRMATCHCONF);
-    printf("MHRMATCHMAS:  0x%08x\n", (int)NRF_RADIO->MHRMATCHMAS);
-
-    return 0;
-}
-
-
-static const shell_command_t shell_commands[] = {
-    { "info", "starts a test", info },
-    { NULL, NULL, NULL }
-};
-
 int main(void)
 {
 #ifdef FEATURE_PERIPH_RTC
@@ -83,7 +53,7 @@ int main(void)
     (void) puts("Welcome to RIOT!");
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
