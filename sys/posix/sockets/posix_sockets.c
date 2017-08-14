@@ -442,8 +442,7 @@ int accept(int socket, struct sockaddr *restrict address,
                                                   sa_len);
 
                 }
-                int fd = fd_new(new_s - _socket_pool, socket_read, socket_write,
-                                socket_close);
+                int fd = vfs_bind(VFS_ANY_FD, 0, &socket_ops, new_s);
                 if (fd < 0) {
                     errno = ENFILE;
                     res = -1;

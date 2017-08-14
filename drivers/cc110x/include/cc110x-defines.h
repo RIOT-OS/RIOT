@@ -204,4 +204,4 @@ extern "C" {
 #endif
 
 /** @} */
-#endif
+#endif /* CC110X_DEFINES_H */

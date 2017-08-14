@@ -50,8 +50,8 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  */
 
-#ifndef MKW2XD_MODEM_REG_H
-#define MKW2XD_MODEM_REG_H
+#ifndef KW2XRF_REG_H
+#define KW2XRF_REG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -564,5 +564,5 @@ enum mkw2xdrf_iregister {
 }
 #endif
 
-#endif /* MKW2XD_MODEM_REG_H */
+#endif /* KW2XRF_REG_H */
 /** @} */

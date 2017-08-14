@@ -25,8 +25,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__REBOOT__H__
-#define CPU__X86__REBOOT__H__
+#ifndef X86_REBOOT_H
+#define X86_REBOOT_H
 
 #include <stdbool.h>
 #include "kernel_defines.h"
@@ -93,6 +93,6 @@ void x86_set_shutdown_fun(x86_shutdown_t fun);
 }
 #endif
 
-#endif
+#endif /* X86_REBOOT_H */
 
 /** @} */

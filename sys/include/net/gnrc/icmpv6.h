@@ -24,8 +24,8 @@
  * @todo build error messages
  */
 
-#ifndef GNRC_ICMPV6_H
-#define GNRC_ICMPV6_H
+#ifndef NET_GNRC_ICMPV6_H
+#define NET_GNRC_ICMPV6_H
 
 #include "kernel_types.h"
 #include "net/icmpv6.h"
@@ -79,7 +79,7 @@ int gnrc_icmpv6_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr);
 }
 #endif
 
-#endif /* GNRC_ICMPV6_H */
+#endif /* NET_GNRC_ICMPV6_H */
 /**
  * @}
  */

@@ -153,5 +153,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LSM6DS_LINTERNAL_H */
+#endif /* LSM6DSL_INTERNAL_H */
 /** @} */

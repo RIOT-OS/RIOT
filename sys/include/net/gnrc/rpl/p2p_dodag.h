@@ -18,8 +18,8 @@
  * @author      Cenk Gündoğan <mail@cgundogan.de>
  */
 
-#ifndef GNRC_RPL_P2P_DODAG_H
-#define GNRC_RPL_P2P_DODAG_H
+#ifndef NET_GNRC_RPL_P2P_DODAG_H
+#define NET_GNRC_RPL_P2P_DODAG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,7 +68,7 @@ gnrc_rpl_p2p_ext_t *gnrc_rpl_p2p_ext_get(gnrc_rpl_dodag_t *dodag);
 }
 #endif
 
-#endif /* GNRC_RPL_P2P_DODAG_H */
+#endif /* NET_GNRC_RPL_P2P_DODAG_H */
 /**
  * @}
  */

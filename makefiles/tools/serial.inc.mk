@@ -11,7 +11,7 @@ ifeq ($(PORT),)
 endif
 
 export BAUD ?= 115200
-export TERMFLAGS += -p "$(PORT)" -b "$(BAUD)"
-export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
+export TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
+export TERMPROG ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
 
 export PORT

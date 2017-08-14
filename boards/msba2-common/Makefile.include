@@ -2,7 +2,10 @@
 export CPU = lpc2387
 
 FLASHER = lpc2k_pgm
-TERMPROG ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
+
+# configure serial interface
+export TERMFLAGS += -tg -p "$(PORT)"
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 export CFLAGS_CPU   = -mcpu=arm7tdmi-s
 export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
@@ -22,7 +25,6 @@ ifeq ($(PORT),)
 	export PORT = /dev/ttyUSB0
 endif
 export FFLAGS = $(PORT) $(HEXFILE)
-export TERMFLAGS += -tg -p "$(PORT)"
 
 export INCLUDES += -I$(RIOTBOARD)/msba2-common/include -I$(RIOTBOARD)/msba2-common/drivers/include
 

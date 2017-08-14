@@ -16,8 +16,8 @@
  * @author    Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef GNRC_NETDEV_ETH_H
-#define GNRC_NETDEV_ETH_H
+#ifndef NET_GNRC_NETDEV_ETH_H
+#define NET_GNRC_NETDEV_ETH_H
 
 #include "net/gnrc/netdev.h"
 
@@ -40,5 +40,5 @@ int gnrc_netdev_eth_init(gnrc_netdev_t *gnrc_netdev, netdev_t *dev);
 }
 #endif
 
-#endif /* GNRC_NETDEV_ETH_H */
+#endif /* NET_GNRC_NETDEV_ETH_H */
 /** @} */

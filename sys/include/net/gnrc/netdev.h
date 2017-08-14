@@ -26,8 +26,8 @@
  * @author    Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef GNRC_NETDEV_H
-#define GNRC_NETDEV_H
+#ifndef NET_GNRC_NETDEV_H
+#define NET_GNRC_NETDEV_H
 
 #include <assert.h>
 #include <stdint.h>
@@ -222,5 +222,5 @@ kernel_pid_t gnrc_netdev_init(char *stack, int stacksize, char priority,
 }
 #endif
 
-#endif /* GNRC_NETDEV_H */
+#endif /* NET_GNRC_NETDEV_H */
 /** @} */

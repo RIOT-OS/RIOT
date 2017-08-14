@@ -47,8 +47,8 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
-#ifndef THREAD_FLAG_H
-#define THREAD_FLAG_H
+#ifndef THREAD_FLAGS_H
+#define THREAD_FLAGS_H
 
 #include "kernel_types.h"
 #include "sched.h"  /* for thread_t typedef */
@@ -152,4 +152,4 @@ int thread_flags_wake(thread_t *thread);
 #endif
 
 /** @} */
-#endif /* THREAD_FLAG_H */
+#endif /* THREAD_FLAGS_H */

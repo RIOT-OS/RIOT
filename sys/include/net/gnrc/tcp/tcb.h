@@ -19,8 +19,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_TCB_H
-#define GNRC_TCP_TCB_H
+#ifndef NET_GNRC_TCP_TCB_H
+#define NET_GNRC_TCP_TCB_H
 
 #include <stdint.h>
 #include "kernel_types.h"
@@ -28,6 +28,7 @@
 #include "xtimer.h"
 #include "mutex.h"
 #include "msg.h"
+#include "mbox.h"
 #include "net/gnrc/pkt.h"
 #include "config.h"
 
@@ -40,9 +41,9 @@ extern "C" {
 #endif
 
 /**
- * @brief Size of the TCB message queue
+ * @brief Size of the TCB mbox
  */
-#define GNRC_TCP_TCB_MSG_QUEUE_SIZE (8U)
+#define GNRC_TCP_TCB_MBOX_SIZE (8U)
 
 /**
  * @brief Transmission control block of GNRC TCP.
@@ -75,8 +76,8 @@ typedef struct _transmission_control_block {
     xtimer_t tim_tout;     /**< Timer struct for timeouts */
     msg_t msg_tout;        /**< Message, sent on timeouts */
     gnrc_pktsnip_t *pkt_retransmit;   /**< Pointer to packet in "retransmit queue" */
-    kernel_pid_t owner;               /**< PID of this connection handling thread */
-    msg_t msg_queue[GNRC_TCP_TCB_MSG_QUEUE_SIZE];   /**< TCB message queue */
+    msg_t mbox_raw[GNRC_TCP_TCB_MBOX_SIZE];   /**< Msg queue for mbox */
+    mbox_t mbox;             /**< TCB mbox for synchronization */
     uint8_t *rcv_buf_raw;    /**< Pointer to the receive buffer */
     ringbuffer_t rcv_buf;    /**< Receive buffer data structure */
     mutex_t fsm_lock;        /**< Mutex for FSM access synchronization */
@@ -87,5 +88,5 @@ typedef struct _transmission_control_block {
 #ifdef __cplusplus
 }
 #endif
-#endif /* GNRC_TCP_TCB_H */
+#endif /* NET_GNRC_TCP_TCB_H */
 /** @} */

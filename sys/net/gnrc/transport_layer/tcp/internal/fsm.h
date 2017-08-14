@@ -19,8 +19,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_INTERNAL_FSM_H
-#define GNRC_TCP_INTERNAL_FSM_H
+#ifndef FSM_H
+#define FSM_H
 
 #include <stdint.h>
 #include "net/gnrc/pkt.h"
@@ -83,5 +83,5 @@ int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *b
 }
 #endif
 
-#endif /* GNRC_TCP_INTERNAL_FSM_H */
+#endif /* FSM_H */
 /** @} */

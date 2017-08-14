@@ -868,10 +868,8 @@ static void test_sock_ip_send6__EHOSTUNREACH(void)
     static const sock_ip_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR6_WRONG },
                                          .family = AF_INET6 };
 
-    /* lwIP returns ENOMEM on failed neighbor cache lookup, since it "tries" to
-     * create one so we have to live with this weird behavior */
-    assert(-ENOMEM == sock_ip_send(NULL, "ABCD", sizeof("ABCD"), _TEST_PROTO,
-                                   &remote));
+    assert(-EHOSTUNREACH == sock_ip_send(NULL, "ABCD", sizeof("ABCD"), _TEST_PROTO,
+                                         &remote));
 }
 
 static void test_sock_ip_send6__ENOTCONN(void)

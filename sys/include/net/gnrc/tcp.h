@@ -19,8 +19,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef GNRC_TCP_H
-#define GNRC_TCP_H
+#ifndef NET_GNRC_TCP_H
+#define NET_GNRC_TCP_H
 
 #include <stdint.h>
 #include "net/gnrc/pkt.h"
@@ -66,7 +66,7 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
   * @param[in]     address_family   Address family of @p target_addr.
   * @param[in]     target_addr      Pointer to target address.
   * @param[in]     target_port      Target port number.
-  * @param[in]     local_port       If zero or GNRC_TCP_PORT_UNSPEC, the connections
+  * @param[in]     local_port       If zero or PORT_UNSPEC, the connections
   *                                 source port is randomly chosen. If local_port is non-zero
   *                                 the local_port is used as source port.
   *
@@ -174,10 +174,18 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
  * @pre @p tcb must not be NULL.
  *
  * @param[in,out] tcb   TCB holding the connection information.
- *
- * @returns   Zero on success.
  */
-int gnrc_tcp_close(gnrc_tcp_tcb_t *tcb);
+void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb);
+
+/**
+ * @brief Abort a TCP connection.
+ *
+ * @pre gnrc_tcp_tcb_init() must have been successfully called.
+ * @pre @p tcb must not be NULL.
+ *
+ * @param[in,out] tcb   TCB holding the connection information.
+ */
+void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb);
 
 /**
  * @brief Calculate and set checksum in TCP header.
@@ -208,5 +216,5 @@ gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16
 }
 #endif
 
-#endif /* GNRC_TCP_H */
+#endif /* NET_GNRC_TCP_H */
 /** @} */

@@ -13,8 +13,8 @@
  * @brief           CC26x0 CCFG register definitions
  */
 
-#ifndef CC26x0_CCFG_H
-#define CC26x0_CCFG_H
+#ifndef CC26X0_CCFG_H
+#define CC26X0_CCFG_H
 
 #include <cc26x0.h>
 
@@ -65,6 +65,6 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26x0_CCFG_H */
+#endif /* CC26X0_CCFG_H */
 
 /*@}*/

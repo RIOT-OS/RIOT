@@ -25,8 +25,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__PCI__H__
-#define CPU__X86__PCI__H__
+#ifndef X86_PCI_H
+#define X86_PCI_H
 
 #include "x86_pci_init.h"
 #include "x86_pic.h"
@@ -418,6 +418,6 @@ void x86_pci_set_irq(struct x86_known_pci_device *d, uint8_t irq_num);
 }
 #endif
 
-#endif
+#endif /* X86_PCI_H */
 
 /** @} */

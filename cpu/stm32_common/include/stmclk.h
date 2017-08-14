@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Configure the  high speed clock domain (main system clock)
+ * @brief   Configure the high speed clock domain (main system clock)
  *
  * This function initializes and configures the main systems clock(s). For this,
  * the following actions are carried out:

@@ -1,8 +1,4 @@
 PSEUDOMODULES += auto_init_gnrc_rpl
-PSEUDOMODULES += conn
-PSEUDOMODULES += conn_ip
-PSEUDOMODULES += conn_tcp
-PSEUDOMODULES += conn_udp
 PSEUDOMODULES += core_%
 PSEUDOMODULES += emb6_router
 PSEUDOMODULES += gnrc_ipv6_default
@@ -21,6 +17,8 @@ PSEUDOMODULES += gnrc_sixlowpan_router
 PSEUDOMODULES += gnrc_sixlowpan_router_default
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
+PSEUDOMODULES += l2filter_blacklist
+PSEUDOMODULES += l2filter_whitelist
 PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += lwip_arp
@@ -45,6 +43,7 @@ PSEUDOMODULES += netstats_ipv6
 PSEUDOMODULES += netstats_rpl
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_nano
+PSEUDOMODULES += openthread
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += posix
 PSEUDOMODULES += printf_float
@@ -61,6 +60,10 @@ PSEUDOMODULES += sock_udp
 PSEUDOMODULES += at86rf23%
 PSEUDOMODULES += at86rf21%
 PSEUDOMODULES += at86rfr2
+
+# include variants of the BMX280 drivers as pseudo modules
+PSEUDOMODULES += bmp280
+PSEUDOMODULES += bme280
 
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%

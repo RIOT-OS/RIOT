@@ -49,4 +49,4 @@ extern int TestRunnerHadErrors;
 }
 #endif
 
-#endif/* EMBUNIT_TESTRUNNER_H */
+#endif /* EMBUNIT_TESTRUNNER_H */

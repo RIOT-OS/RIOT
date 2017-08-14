@@ -100,4 +100,4 @@ void assertImplementationCStr(const char *expected,const char *actual, long line
 }
 #endif
 
-#endif/* EMBUNIT_ASSERTIMPL_H */
+#endif /* EMBUNIT_ASSERTIMPL_H */

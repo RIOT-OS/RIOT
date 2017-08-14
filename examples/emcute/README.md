@@ -56,12 +56,12 @@ When running this example under native, we must configure some global addresses,
 as the RSMB doesn't seems to be able to handle link-local addresses. So for a
 single RIOT native instance, we can do the following:
 
-1. Setup `tap` and `tabbr` devices using RIOT's `tapsetup` script:
+1. Setup `tap` and `tapbr` devices using RIOT's `tapsetup` script:
 ```
 ./RIOTDIR/dist/tools/tapsetup/tapsetup
 ```
 
-2. Assign a site-global prefix to the `tabbr0` interface (the name could be
+2. Assign a site-global prefix to the `tapbr0` interface (the name could be
    different on OSX etc):
 ```
 sudo ip a a fec0:affe::1/64 dev tapbr0

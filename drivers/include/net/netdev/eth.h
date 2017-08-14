@@ -16,8 +16,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef NETDEV_ETH_H
-#define NETDEV_ETH_H
+#ifndef NET_NETDEV_ETH_H
+#define NET_NETDEV_ETH_H
 
 #include <stdint.h>
 
@@ -62,4 +62,4 @@ int netdev_eth_set(netdev_t *dev, netopt_t opt, void *value, size_t value_len);
 }
 #endif
 /** @} */
-#endif /* NETDEV_ETH_H */
+#endif /* NET_NETDEV_ETH_H */

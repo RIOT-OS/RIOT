@@ -67,4 +67,4 @@ struct __TestListner {
 }
 #endif
 
-#endif/* EMBUNIT_TESTLISTENER_H */
+#endif /* EMBUNIT_TESTLISTENER_H */

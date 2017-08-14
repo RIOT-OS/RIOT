@@ -41,10 +41,6 @@ extern "C" {
 #ifndef THREAD_STACKSIZE_IDLE
 #   define THREAD_STACKSIZE_IDLE      (128)
 #endif
-
-#ifndef ISR_STACKSIZE
-#   define ISR_STACKSIZE              (0)
-#endif
 /** @} */
 
 #ifdef __cplusplus

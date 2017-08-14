@@ -13,8 +13,8 @@
  * @brief           CC26x0 AUX register definitions
  */
 
-#ifndef CC26x0_AUX_H
-#define CC26x0_AUX_H
+#ifndef CC26X0_AUX_H
+#define CC26X0_AUX_H
 
 #include <stdbool.h>
 
@@ -253,6 +253,6 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26x0_AUX_H */
+#endif /* CC26X0_AUX_H */
 
 /** @}*/

@@ -15,8 +15,8 @@
  * @note    Do not include this header file directly, but pthread.h.
  */
 
-#ifndef SYS__POSIX__PTHREAD_CANCELLCATION__H
-#define SYS__POSIX__PTHREAD_CANCELLCATION__H
+#ifndef PTHREAD_CANCELLATION_H
+#define PTHREAD_CANCELLATION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,7 +69,7 @@ void pthread_testcancel(void);
 }
 #endif
 
-#endif /* SYS__POSIX__PTHREAD_CANCELLCATION__H */
+#endif /* PTHREAD_CANCELLATION_H */
 
 /**
  * @}

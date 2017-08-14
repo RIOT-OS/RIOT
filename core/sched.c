@@ -101,7 +101,7 @@ int __attribute__((used)) sched_run(void)
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
-    unsigned long time = _xtimer_now();
+    uint64_t now = _xtimer_now64();
 #endif
 
     if (active_thread) {
@@ -118,17 +118,17 @@ int __attribute__((used)) sched_run(void)
 #ifdef MODULE_SCHEDSTATISTICS
         schedstat *active_stat = &sched_pidlist[active_thread->pid];
         if (active_stat->laststart) {
-            active_stat->runtime_ticks += time - active_stat->laststart;
+            active_stat->runtime_ticks += now - active_stat->laststart;
         }
 #endif
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
     schedstat *next_stat = &sched_pidlist[next_thread->pid];
-    next_stat->laststart = time;
+    next_stat->laststart = now;
     next_stat->schedules++;
     if (sched_cb) {
-        sched_cb(time, next_thread->pid);
+        sched_cb(now, next_thread->pid);
     }
 #endif
 

@@ -167,5 +167,5 @@ int dynamixel_read(dynamixel_t *device, dynamixel_addr_t reg, uint8_t *data, siz
 }
 #endif
 
-#endif
+#endif /* DYNAMIXEL_H */
 /** @} */

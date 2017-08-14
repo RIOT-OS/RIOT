@@ -290,6 +290,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
             case 0:
             case 'h':
                 usage_exit(EXIT_SUCCESS);
+                break;
             case 'i':
                 _native_id = atol(optarg);
                 break;

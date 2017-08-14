@@ -20,8 +20,8 @@
  * @author      Shuguo Zhuo <shuguo.zhuo@inria.fr>
  */
 
-#ifndef GNRC_PRIORITY_PKTQUEUE_H
-#define GNRC_PRIORITY_PKTQUEUE_H
+#ifndef NET_GNRC_PRIORITY_PKTQUEUE_H
+#define NET_GNRC_PRIORITY_PKTQUEUE_H
 
 #include <stdint.h>
 #include <priority_queue.h>
@@ -133,5 +133,5 @@ void gnrc_priority_pktqueue_push(gnrc_priority_pktqueue_t* queue,
 }
 #endif
 
-#endif /* GNRC_PRIORITY_PKTQUEUE_H */
+#endif /* NET_GNRC_PRIORITY_PKTQUEUE_H */
 /** @} */

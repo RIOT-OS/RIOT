@@ -18,8 +18,8 @@
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef GNRC_PKTQUEUE_H
-#define GNRC_PKTQUEUE_H
+#ifndef NET_GNRC_PKTQUEUE_H
+#define NET_GNRC_PKTQUEUE_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -84,7 +84,7 @@ static inline gnrc_pktqueue_t *gnrc_pktqueue_remove_head(gnrc_pktqueue_t **queue
 }
 #endif
 
-#endif /* GNRC_PKTQUEUE_H */
+#endif /* NET_GNRC_PKTQUEUE_H */
 /**
  * @}
  */

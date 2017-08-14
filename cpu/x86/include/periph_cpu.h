@@ -25,8 +25,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifndef PERIPH_CONF_
-#define PERIPH_CONF_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +36,6 @@ extern "C" {
 }
 #endif
 
-#endif /* PERIPH_CONF_ */
+#endif /* PERIPH_CPU_H */
 
 /** @} */

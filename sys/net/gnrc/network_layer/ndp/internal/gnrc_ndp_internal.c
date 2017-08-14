@@ -105,7 +105,8 @@ void gnrc_ndp_internal_set_state(gnrc_ipv6_nc_t *nc_entry, uint8_t state)
             DEBUG("REACHABLE (reachable time = %" PRIu32 " us)\n", ipv6_iface->reach_time);
             t = ipv6_iface->reach_time;
 
-            /* we intentionally fall through here to set the desired timeout t */
+            /* Falls through. */
+            /* this is intentional to set the desired timeout t */
         case GNRC_IPV6_NC_STATE_DELAY:
 #if ENABLE_DEBUG
             if (state == GNRC_IPV6_NC_STATE_DELAY) {

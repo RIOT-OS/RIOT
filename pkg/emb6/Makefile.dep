@@ -1,7 +1,3 @@
-ifneq (,$(filter emb6_conn_udp,$(USEMODULE)))
-  USEMODULE += emb6_sock
-endif
-
 ifneq (,$(filter emb6_sock_%,$(USEMODULE)))
   USEMODULE += core_mbox
   USEMODULE += emb6_sock

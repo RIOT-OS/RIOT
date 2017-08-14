@@ -25,8 +25,8 @@
  * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef CPU__X86__MEMORY__H__
-#define CPU__X86__MEMORY__H__
+#ifndef X86_MEMORY_H
+#define X86_MEMORY_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -178,6 +178,6 @@ void x86_init_gdt(void);
 }
 #endif
 
-#endif
+#endif /* X86_MEMORY_H */
 
 /** @} */

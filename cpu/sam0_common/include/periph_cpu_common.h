@@ -16,8 +16,8 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef CPU_PERIPH_COMMON_H
-#define CPU_PERIPH_COMMON_H
+#ifndef PERIPH_CPU_COMMON_H
+#define PERIPH_CPU_COMMON_H
 
 #include "cpu.h"
 
@@ -202,9 +202,18 @@ static inline int sercom_id(void *sercom)
 #endif
 }
 
+/**
+ * @brief ADC Channel Configuration
+ */
+typedef struct {
+    gpio_t pin;            /**< ADC channel pin */
+    uint32_t muxpos;       /**< ADC channel pin multiplexer value */
+} adc_conf_chan_t;
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CPU_PERIPH_COMMON_H */
+#endif /* PERIPH_CPU_COMMON_H */
 /** @} */

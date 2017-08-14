@@ -1,6 +1,12 @@
 # define the cpu used by the waspmote pro board
 export CPU = atmega1281
 
+# configure the terminal program
+PORT_LINUX  ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+BAUD        ?= 9600
+include $(RIOTMAKE)/tools/serial.inc.mk
+
 # define tools used for building the project
 export PREFIX = avr-
 export CC = $(PREFIX)gcc
@@ -10,24 +16,8 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-export TERMFLAGS = -b 9600 -p $(PORT)
 
-#define the flash-tool and default port depending on the host operating system
-OS = $(shell uname)
-ifeq ($(OS),Linux)
-  PORT ?= /dev/ttyACM0
-  FLASHER = avrdude
-else ifeq ($(OS),Darwin)
-  PORT ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
-  FLASHER = avrdude
-else
-  $(info CAUTION: No flash tool for your host system found!)
-  # TODO: fix for building under windows
-endif
-
-export FLASHER
-export PORT
+export FLASHER = avrdude
 export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
 export DEBUGSERVER_PORT = 4242
 export DEBUGSERVER = $(DIST_PATH)/debug_srv.sh

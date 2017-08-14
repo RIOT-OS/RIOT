@@ -17,8 +17,8 @@
  *          Use irq_disable() and irq_restore() for shortterm locks instead.
  */
 
-#ifndef SYS_POSIX_PTHREAD_SPIN_H
-#define SYS_POSIX_PTHREAD_SPIN_H
+#ifndef PTHREAD_SPIN_H
+#define PTHREAD_SPIN_H
 
 #include <stdatomic.h>
 
@@ -91,7 +91,7 @@ int pthread_spin_unlock(pthread_spinlock_t *lock);
 }
 #endif
 
-#endif /* SYS_POSIX_PTHREAD_SPIN_H */
+#endif /* PTHREAD_SPIN_H */
 
 /**
  * @}

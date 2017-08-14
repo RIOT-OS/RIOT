@@ -126,6 +126,13 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             res = sizeof(uintptr_t);
             break;
 #endif
+#ifdef MODULE_L2FILTER
+        case NETOPT_L2FILTER:
+            assert(max_len >= sizeof(l2filter_t **));
+            *((l2filter_t **)value) = dev->netdev.filter;
+            res = sizeof(l2filter_t **);
+            break;
+#endif
         default:
             break;
     }
@@ -206,6 +213,14 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             assert(len == sizeof(gnrc_nettype_t));
             dev->proto = *((gnrc_nettype_t *)value);
             res = sizeof(gnrc_nettype_t);
+            break;
+#endif
+#ifdef MODULE_L2FILTER
+        case NETOPT_L2FILTER:
+            res = l2filter_add(dev->netdev.filter, value, len);
+            break;
+        case NETOPT_L2FILTER_RM:
+            res = l2filter_rm(dev->netdev.filter, value, len);
             break;
 #endif
         default:

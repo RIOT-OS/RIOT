@@ -64,4 +64,4 @@ extern "C" {
 }
 #endif
 
-#endif/* EMBUNIT_HELPERMACRO_H */
+#endif /* EMBUNIT_HELPERMACRO_H */

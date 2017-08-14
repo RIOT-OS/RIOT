@@ -45,7 +45,7 @@ static void *_server_thread(void *args)
     msg_init_queue(server_msg_queue, SERVER_MSG_QUEUE_SIZE);
     server_socket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     /* parse port */
-    port = (uint16_t)atoi((char *)args);
+    port = atoi((char *)args);
     if (port == 0) {
         puts("Error: invalid port specified");
         return NULL;
@@ -99,7 +99,7 @@ static int udp_send(char *addr_str, char *port_str, char *data, unsigned int num
         return 1;
     }
     /* parse port */
-    port = (uint16_t)atoi(port_str);
+    port = atoi(port_str);
     dst.sin6_port = htons(port);
     src.sin6_port = htons(port);
     s = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
@@ -155,10 +155,10 @@ int udp_cmd(int argc, char **argv)
             return 1;
         }
         if (argc > 5) {
-            num = (uint32_t)atoi(argv[5]);
+            num = atoi(argv[5]);
         }
         if (argc > 6) {
-            delay = (uint32_t)atoi(argv[6]);
+            delay = atoi(argv[6]);
         }
         return udp_send(argv[2], argv[3], argv[4], num, delay);
     }
