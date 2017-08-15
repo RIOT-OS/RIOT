@@ -204,6 +204,34 @@ size_t fmt_s16_dec(char *out, int16_t val);
 size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits);
 
 /**
+ * @brief Convert 32-bit fixed point number to a decimal string
+ *
+ * The input for this function is a signed 32-bit integer holding the fixed
+ * point value as well as an unsigned integer defining the position of the
+ * decimal point, so this value defines the number of decimal digits after the
+ * decimal point.
+ *
+ * Will add a leading "-" if @p val is negative.
+ *
+ * The resulting string will always be patted with zeros after the decimal point.
+ *
+ * For example: if @p val is -314159 and @p fp_digits is 5, the resulting string
+ * will be "-3.14159". For @p val := 16777215 and @p fp_digits := 6 the result
+ * will be "16.777215".
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out] out          Pointer to the output buffer, or NULL
+ * @param[in]  val          Fixed point value
+ * @param[in]  fp_digits    Number of digits after the decimal point, MUST be <= 9
+ *
+ * @return      Length of the resulting string
+ * @return      0 if @p fp_digits is > 9
+ */
+size_t fmt_s32_dfp(char *out, int32_t val, unsigned fp_digits);
+
+/**
  * @brief Format float to string
  *
  * Converts float value @p f to string
