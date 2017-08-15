@@ -92,9 +92,11 @@
  *
  * Allocate a buffer and a coap_pkt_t for the request.
  *
- * If there is a payload, follow the three steps below.
+ * If there is a payload, follow the steps below.
  *
  * -# Call gcoap_req_init() to initialize the request.
+ *    -# Optionally, mark the request confirmable by calling
+ *       coap_hdr_set_type() with COAP_TYPE_CON.
  * -# Write the request payload, starting at the updated _payload_ pointer
  *    in the coap_pkt_t.
  * -# Call gcoap_finish(), which updates the packet for the payload.
