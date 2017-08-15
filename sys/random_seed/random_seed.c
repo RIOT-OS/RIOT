@@ -28,21 +28,19 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-volatile uint32_t global_random_seed = -1;
-
 uint16_t _seed_by_adc(void)
 {
     uint16_t val = 0;
 
     /* init ADC */
     if (adc_init(ADC_LINE(RANDOM_SEED_ADC_LINE)) != 0) {
-        DEBUG("random_prng_seed: unable to initialize ADC_LINE(%i)\n",
+        DEBUG("random_seed_generate: unable to initialize ADC_LINE(%i)\n",
                 RANDOM_SEED_ADC_LINE);
         return -1;
     }
 
     /* use LSB of each ADC sample and shift 16
-        of these LSBs to form an 8-bit integer */
+        of these LSBs to generate a value */
     for (int iter = 0; iter < 16; iter ++) {
         /* TODO check if samples are not equal, e.g.
            pulled to high or low voltage */
@@ -50,12 +48,10 @@ uint16_t _seed_by_adc(void)
         val |= (sample & 0x01) << (iter);
     }
 
-    /* TODO turn off ADC ??? */
     return val;
 }
 
-
-uint32_t random_prng_seed(void)
+uint32_t random_seed_generate(void)
 {
     uint32_t res = 0;
 
@@ -63,14 +59,14 @@ uint32_t random_prng_seed(void)
 
     hwrng_init();
     hwrng_read(&res, 4);
-    DEBUG("random_prng_seed: hwrng as seed for PRNG %" PRIu32 "\n", res);
+    DEBUG("random_seed_generate: hwrng as seed for PRNG %" PRIu32 "\n", res);
 
 #else
 
-    /* Get three bytes ID. Upper byte will be filled by
+    /* Get three bytes ID. Upper byte(s) will be filled by
        different source */
     luid_get(&res, 3);
-    DEBUG("random_prng_seed: combination of luid and ");
+    DEBUG("random_seed_generate: combination of luid and ");
 
 #ifdef FEATURE_PERIPH_ADC
 
@@ -86,20 +82,9 @@ uint32_t random_prng_seed(void)
     res |= (last_wakeup.ticks32 << 24);
     DEBUG("xtimer as seed for PRNG %" PRIu32 "\n", res);
 
-    puts("random_prng_seed: Attention! Seed for PRNG might be not unique");
+    puts("random_seed_generate: Attention! Seed for PRNG might be not unique");
 #endif /* FEATURE_PERIPH_ADC */
 #endif /* FEATURE_PERIPH_HWRNG */
 
     return res;
-}
-
-void random_prng_set_global_seed(uint32_t seed)
-{
-    global_random_seed = seed;
-    DEBUG("random_prng_seed: set global seed %" PRIu32 "\n", global_random_seed);
-}
-
-uint32_t random_prng_get_global_seed(void)
-{
-    return global_random_seed;
 }

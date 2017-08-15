@@ -36,7 +36,7 @@ int _random_init(int argc, char **argv)
 
     if (argc == 1) {
 #ifdef MODULE_RANDOM_SEED
-        initval = random_prng_seed();
+        initval = random_seed_generate();
         printf("PRNG initialized to: %" PRIu32 "\n", initval);
 #else
         (void)initval;

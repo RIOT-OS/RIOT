@@ -103,13 +103,13 @@ void auto_init(void)
 #endif
 #ifdef MODULE_RANDOM_SEED
     DEBUG("Auto init random_seed module.\n");
-    random_prng_set_global_seed(random_prng_seed());
+    random_seed_set_global(random_seed_generate());
 #endif
 #ifdef MODULE_TINYMT32
     DEBUG("Auto init tinymt32 rng with ");
 #ifdef MODULE_RANDOM_SEED
     DEBUG("global random_seed value\n");
-    random_init(random_prng_get_global_seed());
+    random_init(random_seed_get_global());
 #else
     DEBUG("with 0. Consider using an external seed\n");
     random_init(0);
