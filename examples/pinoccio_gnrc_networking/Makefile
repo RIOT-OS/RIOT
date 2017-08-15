@@ -45,9 +45,9 @@ USEMODULE += netstats_rpl
 # development process:
 CFLAGS += -DDEVELHELP
 
-# Debugginhg the at85rf2xx implementation
-CFLAGS += -DEBUG_AT86RF2XX
-CFLAGS += -DEBUG_AT86RF2XX_NETDEV
+# Debugginhg the at86rf2xx implementation
+CFLAGS += -DDEBUG_AT86RF2XX
+CFLAGS += -DDEBUG_AT86RF2XX_NETDEV
 
 # Uncomment the following 2 lines to specify static link lokal IPv6 address
 # this might be useful for testing, in cases where you cannot or do not want to

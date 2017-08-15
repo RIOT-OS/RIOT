@@ -486,13 +486,21 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     dev->netdev.flags = 0;
 
     /* get an 8-byte unique ID to use as hardware address */
+#ifdef MODULE_AT86RFR2
+    /* use random number genrerator to get ID */
+    at86rf2xx_get_random(dev, addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN );
+#else
+    /* Use seed 23 to build UID consisted out of 23:23... */
     luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
+#endif
+
     /* make sure we mark the address as non-multicast and not globally unique */
     addr_long.uint8[0] &= ~(0x01);
     addr_long.uint8[0] |=  (0x02);
     /* set short and long address */
     at86rf2xx_set_addr_long(dev, ntohll(addr_long.uint64.u64));
     at86rf2xx_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
+
 
     /* set default PAN id */
     at86rf2xx_set_pan(dev, AT86RF2XX_DEFAULT_PANID);

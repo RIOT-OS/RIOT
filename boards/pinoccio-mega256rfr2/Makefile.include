@@ -34,7 +34,7 @@ ifeq ($(OS),Linux)
   export PROGRAMMER ?= wiring
   #export PROGRAMMER ?= stk500v2
   #export PROGRAMMER ?= avrispv2
-  export PROGRAMMER_FLAGS =-P $(PORT) -b 115200 -vvvvv
+  export PROGRAMMER_FLAGS =-P $(PORT) -b 010005 -vv
   export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH) 
 
 else ifeq ($(OS),Darwin)
@@ -51,8 +51,10 @@ else
   $(info CAUTION: No flash tool for your host system found!)
   # TODO: fix for building under windows
 endif
+
 export FLASHER
 export PORT
+
 export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
 export DEBUGSERVER_PORT = 4242
 export DEBUGSERVER = $(DIST_PATH)/debug_srv.sh
@@ -73,6 +75,8 @@ export CFLAGS_CPU   = -mmcu=atmega256rfr2  $(CFLAGS_FPU)
 export CFLAGS_LINK  = -fno-builtin -fshort-enums
 export CFLAGS_DBG   = -ggdb -g3
 export CFLAGS_OPT  ?= -Os
+
+#export CFLAGS += -v
 
 # -Wl,--relax  -mrelax 
 export CFLAGS += -mrelax -Wl,--relax -Wl,-V $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) 

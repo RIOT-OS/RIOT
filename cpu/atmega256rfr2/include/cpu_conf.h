@@ -52,7 +52,8 @@ extern "C" {
  * @brief   Stack size used for the exception (ISR) stack
  * @{
  */
-#define ISR_STACKSIZE              (0)
+
+// #define ISR_STACKSIZE              (0)
 /** @} */
 
 #ifdef __cplusplus
