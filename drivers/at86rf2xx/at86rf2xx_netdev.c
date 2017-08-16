@@ -241,7 +241,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
 {
-	DEBUG("[at86rf2xx] set netopt_state: %d", state );
+	DEBUG("[at86rf2xx] set netopt_state: %d\n", state );
 	switch (state) {
         case NETOPT_STATE_SLEEP:
             at86rf2xx_set_state(dev, AT86RF2XX_STATE_SLEEP);
@@ -413,7 +413,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
     uint8_t old_state = at86rf2xx_get_status(dev);
     int res = -ENOTSUP;
 
-    DEBUG("[at86rf2xx] set netopt_t: %d", opt );
+    DEBUG("[at86rf2xx] set netopt_t: %d\n", opt );
 
     if (dev == NULL) {
         return -ENODEV;
