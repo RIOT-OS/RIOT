@@ -48,7 +48,7 @@ extern "C" {
 /**
  * @brief    Global random seed value
  */
-static volatile uint32_t global_random_seed = UINT32_MAX;
+static volatile uint32_t global_random_seed;
 
 /**
  * @brief   Generate a more or less unique seed for PRNGs.
@@ -75,7 +75,7 @@ uint32_t random_seed_generate(void);
 
 /**
  * @brief   This function sets the global variable global_random_seed to @p seed
-
+ *
  * @param[in] seed  The seed value to set
  */
 static inline void random_seed_set_global(uint32_t seed)
@@ -85,9 +85,10 @@ static inline void random_seed_set_global(uint32_t seed)
 
 /**
  * @brief   This function returns the value of global_random_seed
-
- * @return The global random seed value
- * @return -1, if seed value is not set
+ *
+ * @note    Only use this function after you have set a global seed value
+ *
+ * @return  The global random seed value
  */
 static inline uint32_t random_seed_get_global(void)
 {
