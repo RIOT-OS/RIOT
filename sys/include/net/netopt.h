@@ -148,7 +148,7 @@ typedef enum {
      * option will enable CSMA with a certain set of parameters to emulate the
      * desired behaviour.
      *
-     * @note Be sure not to set NETCONF_OPT_CSMA simultaneously.
+     * @note Be sure not to set NETOPT_CSMA simultaneously.
      *
      * TODO: How to get feedback?
      */
@@ -159,7 +159,7 @@ typedef enum {
      *
      * If the device supports CSMA in hardware, this option enables it with
      * default parameters. For further configuration refer to the other
-     * NETCONF_OPT_CSMA_* options.
+     * NETOPT_CSMA_* options.
      */
     NETOPT_CSMA,
     NETOPT_CSMA_RETRIES,            /**< get/set the number of retries when
