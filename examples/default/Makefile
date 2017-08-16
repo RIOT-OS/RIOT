@@ -35,10 +35,7 @@ USEMODULE += ps
 USEMODULE += saul_default
 
 USEMODULE += random
-# Using this module might print warnings about unsatisfied features such as HWRNG
-# and ADC, depending on your hardware resources. That must not necessarily mean
-# that the seed is bad. Have a look at the random_seed documentation.
-# USEMODULE += random_seed
+USEMODULE += random_seed
 
 BOARD_PROVIDES_NETIF := airfy-beacon cc2538dk fox iotlab-m3 iotlab-a8-m3 mulle \
         microbit native nrf51dongle nrf52dk nrf6310 openmote-cc2538 pba-d-01-kw2x \

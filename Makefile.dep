@@ -610,8 +610,8 @@ ifneq (,$(filter random_seed,$(USEMODULE)))
   USEMODULE += luid
   USEMODULE += xtimer
 
-  FEATURES_REQUIRED += periph_hwrng
-  FEATURES_REQUIRED += periph_adc
+  FEATURES_OPTIONAL += periph_hwrng
+  FEATURES_OPTIONAL += periph_adc
 endif
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
