@@ -95,6 +95,7 @@ extern "C" {
  * @brief   Flags for device internal states (see datasheet)
  * @{
  */
+#define AT86RF2XX_STATE_P_ON           (0x00)     /**< initial power on */
 #define AT86RF2XX_STATE_FORCE_TRX_OFF  (0x03)     /**< force transition to idle */
 #define AT86RF2XX_STATE_TRX_OFF        (0x08)     /**< idle */
 #define AT86RF2XX_STATE_PLL_ON         (0x09)     /**< ready to transmit */
@@ -389,17 +390,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state);
  * @return                  the previous state before the new state was set
  */
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state);
-
-/**
- * @brief   Reset the internal state machine to TRX_OFF mode.
- *
- * This will force a transition to TRX_OFF regardless of whether the transceiver
- * is currently busy sending or receiving. This function is used to get back to
- * a known state during driver initialization.
- *
- * @param[in] dev           device to operate on
- */
-void at86rf2xx_reset_state_machine(at86rf2xx_t *dev);
 
 /**
  * @brief   Convenience function for simply sending data

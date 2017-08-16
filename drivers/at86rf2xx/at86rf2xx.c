@@ -44,7 +44,8 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     /* initialize device descriptor */
     memcpy(&dev->params, params, sizeof(at86rf2xx_params_t));
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
-    dev->state = AT86RF2XX_STATE_SLEEP;
+    /* radio state is P_ON when first powered-on */
+    dev->state = AT86RF2XX_STATE_P_ON;
     dev->pending_tx = 0;
 }
 
@@ -55,7 +56,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_hardware_reset(dev);
 
     /* Reset state machine to ensure a known state */
-    at86rf2xx_reset_state_machine(dev);
+    if (dev->state == AT86RF2XX_STATE_P_ON) {
+        at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
+    }
 
     /* reset options and sequence number */
     dev->netdev.seq = 0;

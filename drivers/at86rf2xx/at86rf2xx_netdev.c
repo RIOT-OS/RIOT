@@ -77,8 +77,8 @@ static int _init(netdev_t *netdev)
     gpio_set(dev->params.reset_pin);
     gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, _irq_handler, dev);
 
-    /* make sure device is not sleeping, so we can query part number */
-    at86rf2xx_assert_awake(dev);
+    /* reset device to default values and put it into RX state */
+    at86rf2xx_reset(dev);
 
     /* test if the SPI is set up correctly and the device is responding */
     if (at86rf2xx_reg_read(dev, AT86RF2XX_REG__PART_NUM) !=
@@ -90,8 +90,6 @@ static int _init(netdev_t *netdev)
 #ifdef MODULE_NETSTATS_L2
     memset(&netdev->stats, 0, sizeof(netstats_t));
 #endif
-    /* reset device to default values and put it into RX state */
-    at86rf2xx_reset(dev);
 
     return 0;
 }
