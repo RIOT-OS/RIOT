@@ -223,20 +223,20 @@ ISR(TIMER_1_ISRC, ISR_BLOCK)
 #endif /* TIMER_1 */
 
 #ifdef TIMER_2
-ISR(TIMER_2_ISRA, ISR_BLOCK)
-{
-    _isr(2, 0);
-}
-
-ISR(TIMER_2_ISRB, ISR_BLOCK)
-{
-    _isr(2, 1);
-}
-
-ISR(TIMER_2_ISRC, ISR_BLOCK)
-{
-    _isr(2, 2);
-}
+//ISR(TIMER_2_ISRA, ISR_BLOCK)
+//{
+//    _isr(2, 0);
+//}
+//
+//ISR(TIMER_2_ISRB, ISR_BLOCK)
+//{
+//    _isr(2, 1);
+//}
+//
+//ISR(TIMER_2_ISRC, ISR_BLOCK)
+//{
+//    _isr(2, 2);
+//}
 #endif /* TIMER_2 */
 
 #ifdef TIMER_3

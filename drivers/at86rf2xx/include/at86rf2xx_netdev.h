@@ -30,6 +30,8 @@ extern "C" {
  */
 extern const netdev_driver_t at86rf2xx_driver;
 
+void at86rf2xx_get_random_num(uint8_t *data, const size_t len);
+
 #ifdef __cplusplus
 }
 #endif

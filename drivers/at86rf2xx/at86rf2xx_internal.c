@@ -274,9 +274,20 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     at86rf2xx_set_state(dev, state);
 }
 
-#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(MODULE_AT86RF212B )
+#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(MODULE_AT86RF212B ) || defined(MODULE_AT86RFR2 )
 void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len)
 {
+#if defined(MODULE_AT86RFR2 )
+    	/* Manual p. 119 RX_PDT_DIS (Register RX_SYN) is set to 0 */
+    	at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, *AT86RF2XX_REG__RX_SYN& ~(RX_PDT_DIS) );
+
+    	/* Manual p. 119 radio transceiver in Basic Operating Mode receive state*/
+		at86rf2xx_set_state(dev, AT86RF2XX_TRX_STATE__RX_ON );
+		while( at86rf2xx_get_status(dev) != AT86RF2XX_TRX_STATE__RX_ON);
+
+		xtimer_usleep(1);
+#endif
+
     for (size_t byteCount = 0; byteCount < len; ++byteCount) {
         uint8_t rnd = 0;
         for (uint8_t i = 0; i < 4; ++i) {
@@ -287,6 +298,9 @@ void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len)
             regVal = regVal >> 5;
             regVal = regVal << 2 * i;
             rnd |= regVal;
+#if defined(MODULE_AT86RFR2 )
+    		xtimer_usleep(1);
+#endif
         }
         data[byteCount] = rnd;
     }

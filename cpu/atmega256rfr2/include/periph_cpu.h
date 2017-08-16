@@ -29,7 +29,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (8U)
 
 /**
  * @brief   Available ports on the ATmega256rfr family
