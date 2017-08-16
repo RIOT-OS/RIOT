@@ -38,7 +38,7 @@ void flashpage_write(int page, void *data)
     uint32_t *page_addr = (uint32_t *)flashpage_addr(page);
 
     /* remove peripheral access lock for the NVMCTRL peripheral */
-#ifdef CPU_FAM_SAML21
+#if defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     PAC->WRCTRL.reg = (PAC_WRCTRL_KEY_CLR | ID_NVMCTRL);
 #else
     if (PAC1->WPSET.reg & NVMCTRL_PAC_BIT) {
