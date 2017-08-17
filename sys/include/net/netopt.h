@@ -162,8 +162,19 @@ typedef enum {
      * NETOPT_CSMA_* options.
      */
     NETOPT_CSMA,
-    NETOPT_CSMA_RETRIES,            /**< get/set the number of retries when
-                                         when channel is busy */
+
+    /**
+     * @brief get/set the maximum number of CSMA retries
+     *
+     * (uint8_t)
+     * The maximum number of backoffs the CSMA-CA algorithm will attempt before
+     * declaring a channel access failure. Named macMaxCsmaBackoffs in
+     * IEEE Std 802.15.4-2015.
+     *
+     * 802.15.4 default: 4
+     */
+    NETOPT_CSMA_RETRIES,
+
     /**
      * @brief read-only check for a wired interface.
      *
