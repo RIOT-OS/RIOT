@@ -97,6 +97,13 @@ int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
                 break;
             }
 #endif
+#ifdef MODULE_NETSTATS_NEIGHBOR
+        case NETOPT_STATS_NEIGHBOR:
+            assert(max_len == sizeof(uintptr_t));
+            *((netstats_nb_t **)value) = dev->pstats;
+            res = sizeof(uintptr_t);
+            break;
+#endif
         default:
             {
                 res = -ENOTSUP;

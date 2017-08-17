@@ -26,6 +26,10 @@
 
 #include "od.h"
 
+#ifdef MODULE_NETSTATS_NEIGHBOR
+#include "net/netstats/neighbor.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -218,9 +222,17 @@ static int _send(gnrc_netdev_t *gnrc_netdev, gnrc_pktsnip_t *pkt)
         if ((netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) ||
             (netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
             gnrc_netdev->dev->stats.tx_mcast_count++;
+#ifdef MODULE_NETSTATS_NEIGHBOR
+            DEBUG("l2 stats: Destination is multicast or unicast, NULL recorded");
+            netstats_nb_record(gnrc_netdev->dev, NULL, 0);
+#endif
         }
         else {
             gnrc_netdev->dev->stats.tx_unicast_count++;
+#ifdef MODULE_NETSTATS_NEIGHBOR
+            DEBUG("l2 stats: recording transmission\n");
+            netstats_nb_record(gnrc_netdev->dev, hdr.dst, sizeof(hdr.dst));
+#endif
         }
 #endif
         res = dev->driver->send(dev, vector, n);
