@@ -1,0 +1,11 @@
+## the cpu to build for
+export CPU = stm32l4
+export CPU_MODEL = stm32l433rc
+
+# stdio is not available over st-link but on the Arduino TX/RX pins
+# A serial to USB converter plugged to the host is required
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# load the common Makefile.include for Nucleo boards
+include $(RIOTBOARD)/common/nucleo64/Makefile.include
