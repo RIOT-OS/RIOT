@@ -176,6 +176,24 @@ typedef enum {
     NETOPT_CSMA_RETRIES,
 
     /**
+     * @brief get/set the maximum backoff exponent for the CSMA-CA algorithm
+     *
+     * (uint8_t) Named macMaxBE in IEEE Std 802.15.4-2015.
+     *
+     * 802.15.4 default: 5
+     */
+    NETOPT_CSMA_MAXBE,
+
+    /**
+     * @brief get/set the minimum backoff exponent for the CSMA-CA algorithm
+     *
+     * (uint8_t) Named macMinBE in IEEE Std 802.15.4-2015.
+     *
+     * 802.15.4 default: 3
+     */
+    NETOPT_CSMA_MINBE,
+
+    /**
      * @brief read-only check for a wired interface.
      *
      * If the interface is wireless this function will return -ENOTSUP, a
