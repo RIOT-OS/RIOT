@@ -74,6 +74,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_CHANNEL_HOP_PERIOD]    = "NETOPT_CHANNEL_HOP_PERIOD",
     [NETOPT_FIXED_HEADER]          = "NETOPT_FIXED_HEADER",
     [NETOPT_IQ_INVERT]             = "NETOPT_IQ_INVERT",
+    [NETOPT_TX_RETRIES_NEEDED]     = "NETOPT_TX_RETRIES_NEEDED",
     [NETOPT_NUMOF]                 = "NETOPT_NUMOF",
 };
 
