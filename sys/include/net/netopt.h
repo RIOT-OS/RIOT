@@ -148,7 +148,7 @@ typedef enum {
      * option will enable CSMA with a certain set of parameters to emulate the
      * desired behaviour.
      *
-     * @note Be sure not to set NETCONF_OPT_CSMA simultaneously.
+     * @note Be sure not to set NETOPT_CSMA simultaneously.
      *
      * TODO: How to get feedback?
      */
@@ -159,11 +159,40 @@ typedef enum {
      *
      * If the device supports CSMA in hardware, this option enables it with
      * default parameters. For further configuration refer to the other
-     * NETCONF_OPT_CSMA_* options.
+     * NETOPT_CSMA_* options.
      */
     NETOPT_CSMA,
-    NETOPT_CSMA_RETRIES,            /**< get/set the number of retries when
-                                         when channel is busy */
+
+    /**
+     * @brief get/set the maximum number of CSMA retries
+     *
+     * (uint8_t)
+     * The maximum number of backoffs the CSMA-CA algorithm will attempt before
+     * declaring a channel access failure. Named macMaxCsmaBackoffs in
+     * IEEE Std 802.15.4-2015.
+     *
+     * 802.15.4 default: 4
+     */
+    NETOPT_CSMA_RETRIES,
+
+    /**
+     * @brief get/set the maximum backoff exponent for the CSMA-CA algorithm
+     *
+     * (uint8_t) Named macMaxBE in IEEE Std 802.15.4-2015.
+     *
+     * 802.15.4 default: 5
+     */
+    NETOPT_CSMA_MAXBE,
+
+    /**
+     * @brief get/set the minimum backoff exponent for the CSMA-CA algorithm
+     *
+     * (uint8_t) Named macMinBE in IEEE Std 802.15.4-2015.
+     *
+     * 802.15.4 default: 3
+     */
+    NETOPT_CSMA_MINBE,
+
     /**
      * @brief read-only check for a wired interface.
      *
