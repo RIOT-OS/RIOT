@@ -41,43 +41,6 @@ extern "C" {
 #include "net/gnrc/pktbuf.h"
 
 /**
- * @brief CAN options
- */
-typedef enum {
-    CANOPT_BITTIMING,       /**< bit timing parameter */
-    CANOPT_RX_FILTERS,      /**< rx filters */
-    CANOPT_TEC,             /**< Transmit Error Counter */
-    CANOPT_REC,             /**< Receive Error Counter*/
-    CANOPT_LEC,             /**< Last Error Code */
-    CANOPT_CLOCK,           /**< controller main clock */
-    CANOPT_BITTIMING_CONST, /**< controller bittiming parameters */
-    CANOPT_STATE,           /**< set controller state @ref canopt_state_t */
-} canopt_t;
-
-/**
- * @brief CAN state options
- *
- * CAN state options to be used with @p CANOPT_STATE
- */
-typedef enum {
-    CANOPT_STATE_OFF,             /**< powered off */
-    CANOPT_STATE_SLEEP,           /**< sleep mode */
-    CANOPT_STATE_LISTEN_ONLY,     /**< listen only mode */
-    CANOPT_STATE_ON,              /**< power on, rx / tx mode */
-} canopt_state_t;
-
-
-/**
- * @brief Structure to pass a CAN option
- */
-typedef struct {
-    canopt_t opt;               /**< the option to get/set */
-    uint16_t context;           /**< (optional) context for that option */
-    void *data;                 /**< data to set or buffer to read into */
-    uint16_t data_len;          /**< size of the data / the buffer */
-} can_opt_t;
-
-/**
  * @brief Messages which can be sent through the CAN stack
  */
 enum can_msg {

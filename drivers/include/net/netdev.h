@@ -236,6 +236,12 @@ typedef enum {
     NETDEV_EVENT_CRC_ERROR,                 /**< wrong CRC */
     NETDEV_EVENT_FHSS_CHANGE_CHANNEL,       /**< channel changed */
     NETDEV_EVENT_CAD_DONE,                  /**< channel activity detection done */
+    /* CAN events */
+    NETDEV_EVENT_TX_ERROR,
+    NETDEV_EVENT_ERROR_PASSIVE,
+    NETDEV_EVENT_ERROR_WARNING,
+    NETDEV_EVENT_BUS_OFF,
+    NETDEV_EVENT_WAKE_UP,
     /* expand this list if needed */
 } netdev_event_t;
 

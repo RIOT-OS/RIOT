@@ -319,7 +319,7 @@ static int _get_filter(int argc, char **argv)
     can_opt_t opt;
     opt.data = (void *)filters;
     opt.data_len = sizeof(filters);
-    opt.opt = CANOPT_RX_FILTERS;
+    opt.opt = NETOPT_FILTER;
     res = raw_can_get_can_opt(ifnum, &opt);
     if (res < 0) {
         puts("Error when reading filters");
@@ -383,7 +383,7 @@ static int _get_bitrate(int argc, char **argv)
     can_opt_t opt;
     opt.data = &bittiming;
     opt.data_len = sizeof(bittiming);
-    opt.opt = CANOPT_BITTIMING;
+    opt.opt = NETOPT_BITTIMING;
 
     int ret = raw_can_get_can_opt(ifnum, &opt);
     if (ret < 0) {
@@ -399,6 +399,7 @@ static int _get_bitrate(int argc, char **argv)
     return 0;
 }
 
+#if 0
 static int _get_counter(int argc, char **argv)
 {
     if (argc < 3) {
@@ -417,7 +418,7 @@ static int _get_counter(int argc, char **argv)
     can_opt_t opt;
     opt.data = &cnt;
     opt.data_len = sizeof(cnt);
-    opt.opt = CANOPT_TEC;
+    opt.opt = NETOPT_TEC;
 
     int ret = raw_can_get_can_opt(ifnum, &opt);
     if (ret < 0) {
@@ -428,7 +429,7 @@ static int _get_counter(int argc, char **argv)
         printf("TEC=%" PRIu16, cnt);
     }
 
-    opt.opt = CANOPT_REC;
+    opt.opt = NETOPT_REC;
 
     ret = raw_can_get_can_opt(ifnum, &opt);
     if (ret < 0) {
@@ -441,6 +442,7 @@ static int _get_counter(int argc, char **argv)
 
     return res;
 }
+#endif
 
 static int _power_up(int argc, char **argv)
 {
@@ -529,9 +531,9 @@ static int _can_handler(int argc, char **argv)
     else if (strncmp(argv[1], "get_bitrate", 11) == 0) {
         return _get_bitrate(argc, argv);
     }
-    else if (strncmp(argv[1], "get_counter", 11) == 0) {
+    /*else if (strncmp(argv[1], "get_counter", 11) == 0) {
         return _get_counter(argc, argv);
-    }
+    }*/
     else if (strncmp(argv[1], "power_up", 9) == 0) {
         return _power_up(argc, argv);
     }

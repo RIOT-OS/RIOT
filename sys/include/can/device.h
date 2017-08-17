@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-#include "can/candev.h"
+#include "net/netdev.h"
 #include "kernel_types.h"
 
 #ifdef MODULE_CAN_PM
@@ -50,6 +50,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief Structure to pass a CAN option
+ */
+typedef struct {
+    netopt_t opt;               /**< the option to get/set */
+    uint16_t context;           /**< (optional) context for that option */
+    void *data;                 /**< data to set or buffer to read into */
+    uint16_t data_len;          /**< size of the data / the buffer */
+} can_opt_t;
+
+/**
  * @brief Parameters to initialize a candev
  */
 typedef struct candev_params {
@@ -67,10 +77,11 @@ typedef struct candev_params {
  * @brief candev descriptor to pass to the device thread
  */
 typedef struct candev_dev {
-    candev_t *dev;    /**< the device */
+    netdev_t *dev;    /**< the device */
     int ifnum;        /**< interface number */
     kernel_pid_t pid; /**< pid */
     const char *name; /**< device name */
+    enum can_state state; /**< CAN state */
 #if defined(MODULE_CAN_TRX) || defined(DOXYGEN)
     can_trx_t *trx;   /**< transceiver attached to the device */
 #endif

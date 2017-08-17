@@ -31,7 +31,9 @@ extern "C" {
 
 #include <stdbool.h>
 
-#include "can/candev.h"
+//#include "can/candev.h"
+#include "net/netdev.h"
+#include "can/can.h"
 #include "mutex.h"
 
 /**
@@ -72,11 +74,12 @@ typedef struct candev_linux_conf {
  * @brief The candev_linux struct
  */
 typedef struct candev_linux {
-    candev_t candev;                  /**< candev base structure */
+    netdev_t candev;                  /**< candev base structure */
     int sock;                         /**< local socket id */
     const candev_linux_conf_t *conf;  /**< device configuration */
     /** filter list */
     struct can_filter filters[CANDEV_LINUX_MAX_FILTERS_RX];
+    struct can_bittiming bittiming;
 } candev_linux_t;
 
 /**

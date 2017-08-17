@@ -49,82 +49,75 @@ static void pm_cb(void *arg);
 static void pm_reset(candev_dev_t *candev_dev, uint32_t value);
 #endif
 
-static inline enum can_msg _can_event_error_to_msg(candev_event_t error)
+static inline enum can_msg _can_event_error_to_msg(netdev_event_t error)
 {
     switch (error) {
-    case CANDEV_EVENT_TX_ERROR:
+    case NETDEV_EVENT_TX_ERROR:
         return CAN_MSG_TX_ERROR;
-    case CANDEV_EVENT_RX_ERROR:
-        return CAN_MSG_RX_ERROR;
-    case CANDEV_EVENT_BUS_OFF:
+    case NETDEV_EVENT_BUS_OFF:
         return CAN_MSG_BUS_OFF;
-    case CANDEV_EVENT_ERROR_PASSIVE:
+    case NETDEV_EVENT_ERROR_PASSIVE:
         return CAN_MSG_ERROR_PASSIVE;
-    case CANDEV_EVENT_ERROR_WARNING:
+    case NETDEV_EVENT_ERROR_WARNING:
         return CAN_MSG_ERROR_WARNING;
     default:
         return 0;
     }
 }
 
-static void _can_event(candev_t *dev, candev_event_t event, void *arg)
+static void _can_event(netdev_t *dev, netdev_event_t event)
 {
     msg_t msg;
-    struct can_frame *frame;
-    can_pkt_t *pkt;
-    candev_dev_t *candev_dev = dev->isr_arg;
+    candev_dev_t *candev_dev = dev->context;
+    struct can_frame frame;
 
     DEBUG("_can_event: dev=%p, params=%p\n", (void*)dev, (void*)candev_dev);
     DEBUG("_can_event: params->ifnum=%d, params->pid=%" PRIkernel_pid ", params->dev=%p\n",
           candev_dev->ifnum, candev_dev->pid, (void*)candev_dev->dev);
 
     switch (event) {
-    case CANDEV_EVENT_ISR:
+    case NETDEV_EVENT_ISR:
         DEBUG("_can_event: CANDEV_EVENT_ISR\n");
         msg.type = CAN_MSG_EVENT;
         if (msg_send(&msg, candev_dev->pid) <= 0) {
             DEBUG("can device: isr lost\n");
         }
         break;
-    case CANDEV_EVENT_WAKE_UP:
+    case NETDEV_EVENT_WAKE_UP:
         DEBUG("_can_event: CANDEV_EVENT_WAKE_UP\n");
         power_up(candev_dev);
 #ifdef MODULE_CAN_PM
         pm_reset(candev_dev, candev_dev->rx_inactivity_timeout);
 #endif
         break;
-    case CANDEV_EVENT_TX_CONFIRMATION:
+    case NETDEV_EVENT_TX_COMPLETE:
         DEBUG("_can_event: CANDEV_EVENT_TX_CONFIRMATION\n");
         /* frame pointer in arg */
-        pkt = container_of((struct can_frame *)arg, can_pkt_t, frame);
-        can_dll_dispatch_tx_conf(pkt);
+        /*pkt = container_of((struct can_frame *)arg, can_pkt_t, frame);
+        can_dll_dispatch_tx_conf(pkt);*/
         break;
-    case CANDEV_EVENT_TX_ERROR:
+    case NETDEV_EVENT_TX_ERROR:
         DEBUG("_can_event: CANDEV_EVENT_TX_ERROR\n");
         /* frame pointer in arg */
-        pkt = container_of((struct can_frame *)arg, can_pkt_t, frame);
-        can_dll_dispatch_tx_error(pkt);
+        /*pkt = container_of((struct can_frame *)arg, can_pkt_t, frame);
+        can_dll_dispatch_tx_error(pkt);*/
         break;
-    case CANDEV_EVENT_RX_INDICATION:
+    case NETDEV_EVENT_RX_COMPLETE:
         DEBUG("_can_event: CANDEV_EVENT_RX_INDICATION\n");
 #ifdef MODULE_CAN_PM
         pm_reset(candev_dev, candev_dev->rx_inactivity_timeout);
 #endif
-        /* received frame in arg */
-        frame = (struct can_frame *) arg;
-        can_dll_dispatch_rx_frame(frame, candev_dev->pid);
+        dev->driver->recv(dev, &frame, sizeof(frame), NULL);
+        can_dll_dispatch_rx_frame(&frame, candev_dev->pid);
         break;
-    case CANDEV_EVENT_RX_ERROR:
-        DEBUG("_can_event: CANDEV_EVENT_RX_ERROR\n");
+    case NETDEV_EVENT_BUS_OFF:
+        candev_dev->state = CAN_STATE_BUS_OFF;
         break;
-    case CANDEV_EVENT_BUS_OFF:
-        dev->state = CAN_STATE_BUS_OFF;
+    case NETDEV_EVENT_ERROR_PASSIVE:
+        candev_dev->state = CAN_STATE_ERROR_PASSIVE;
         break;
-    case CANDEV_EVENT_ERROR_PASSIVE:
-        dev->state = CAN_STATE_ERROR_PASSIVE;
-        break;
-    case CANDEV_EVENT_ERROR_WARNING:
-        dev->state = CAN_STATE_ERROR_WARNING;
+    case NETDEV_EVENT_ERROR_WARNING:
+        candev_dev->state = CAN_STATE_ERROR_WARNING;
         break;
     default:
         DEBUG("_can_event: unknown event\n");
@@ -134,32 +127,32 @@ static void _can_event(candev_t *dev, candev_event_t event, void *arg)
 
 static int power_up(candev_dev_t *candev_dev)
 {
-    candev_t *dev = candev_dev->dev;
+    netdev_t *dev = candev_dev->dev;
 
     DEBUG("candev: power up\n");
 
 #ifdef MODULE_CAN_TRX
     can_trx_set_mode(candev_dev->trx, TRX_NORMAL_MODE);
 #endif
-    canopt_state_t state = CANOPT_STATE_ON;
-    int res = dev->driver->set(dev, CANOPT_STATE, &state, sizeof(state));
-    dev->state = CAN_STATE_ERROR_ACTIVE;
+    netopt_state_t state = NETOPT_STATE_IDLE;
+    int res = dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
+    candev_dev->state = CAN_STATE_ERROR_ACTIVE;
 
     return res;
 }
 
 static int power_down(candev_dev_t *candev_dev)
 {
-    candev_t *dev = candev_dev->dev;
+    netdev_t *dev = candev_dev->dev;
 
     DEBUG("candev: power down\n");
 
 #ifdef MODULE_CAN_TRX
     can_trx_set_mode(candev_dev->trx, TRX_SLEEP_MODE);
 #endif
-    canopt_state_t state = CANOPT_STATE_SLEEP;
-    int res = dev->driver->set(dev, CANOPT_STATE, &state, sizeof(state));
-    dev->state = CAN_STATE_SLEEPING;
+    netopt_state_t state = NETOPT_STATE_SLEEP;
+    int res = dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
+    candev_dev->state = CAN_STATE_SLEEPING;
 
 #ifdef MODULE_CAN_PM
     xtimer_remove(&candev_dev->pm_timer);
@@ -203,7 +196,7 @@ static void pm_reset(candev_dev_t *candev_dev, uint32_t value)
 static void *_can_device_thread(void *args)
 {
     candev_dev_t *candev_dev = (candev_dev_t *) args;
-    candev_t *dev = candev_dev->dev;
+    netdev_t *dev = candev_dev->dev;
 
     DEBUG("_can_device_thread: starting thread for ifnum=%d, pid=%" PRIkernel_pid "\n",
           candev_dev->ifnum, thread_getpid());
@@ -227,20 +220,22 @@ static void *_can_device_thread(void *args)
 #endif
 
     int res;
+    struct iovec iovec;
     can_pkt_t *pkt;
     can_opt_t *opt;
+    netopt_set_filter_t opt_filter;
     msg_t msg, reply, msg_queue[CAN_DEVICE_MSG_QUEUE_SIZE];
 
     /* setup the device layers message queue */
     msg_init_queue(msg_queue, CAN_DEVICE_MSG_QUEUE_SIZE);
 
     dev->event_callback = _can_event;
-    dev->isr_arg = candev_dev;
+    dev->context = candev_dev;
 
     candev_dev->ifnum = can_dll_register_candev(candev_dev);
 
     dev->driver->init(dev);
-    dev->state = CAN_STATE_ERROR_ACTIVE;
+    candev_dev->state = CAN_STATE_ERROR_ACTIVE;
 
     while (1) {
         msg_receive(&msg);
@@ -249,30 +244,33 @@ static void *_can_device_thread(void *args)
             DEBUG("can device: CAN_MSG_EVENT received\n");
             dev->driver->isr(dev);
             break;
-        case CAN_MSG_ABORT_FRAME:
+        /*case CAN_MSG_ABORT_FRAME:
             DEBUG("can device: CAN_MSG_ABORT_FRAME received\n");
             pkt = (can_pkt_t *) msg.content.ptr;
             dev->driver->abort(dev, &pkt->frame);
             reply.type = CAN_MSG_ACK;
             reply.content.value = 0;
             msg_reply(&msg, &reply);
-            break;
+            break;*/
         case CAN_MSG_SEND_FRAME:
             DEBUG("can device: CAN_MSG_SEND_FRAME received\n");
             pkt = (can_pkt_t *) msg.content.ptr;
-            if (dev->state == CAN_STATE_BUS_OFF || dev->state == CAN_STATE_SLEEPING) {
+            if (candev_dev->state == CAN_STATE_BUS_OFF || candev_dev->state == CAN_STATE_SLEEPING) {
                 DEBUG("can device: waking up driver\n");
                 power_up(candev_dev);
             }
 #ifdef MODULE_CAN_PM
             pm_reset(candev_dev, candev_dev->tx_wakeup_timeout);
 #endif
-            dev->driver->send(dev, &pkt->frame);
+            iovec.iov_base = &pkt->frame;
+            iovec.iov_len = sizeof(struct can_frame);
+            dev->driver->send(dev, &iovec, 1);
+            can_dll_dispatch_tx_conf(pkt);
             break;
         case CAN_MSG_SET:
             DEBUG("can device: CAN_MSG_SET received\n");
             /* read incoming options */
-            opt = (can_opt_t *)msg.content.ptr;
+            opt = msg.content.ptr;
             /* set option for device driver */
             res = dev->driver->set(dev, opt->opt, opt->data, opt->data_len);
             /* send reply to calling thread */
@@ -283,7 +281,7 @@ static void *_can_device_thread(void *args)
         case CAN_MSG_GET:
             DEBUG("can device: CAN_MSG_GET received\n");
             /* read incoming options */
-            opt = (can_opt_t *)msg.content.ptr;
+            opt = msg.content.ptr;
             /* get option for device driver */
             res = dev->driver->get(dev, opt->opt, opt->data, opt->data_len);
             /* send reply to calling thread */
@@ -293,8 +291,10 @@ static void *_can_device_thread(void *args)
             break;
         case CAN_MSG_SET_FILTER:
             DEBUG("can device: CAN_MSG_SET_FILTER received\n");
+            opt_filter.op = NETOPT_FILTER_SET;
+            opt_filter.filter = msg.content.ptr;
             /* set filter for device driver */
-            res = dev->driver->set_filter(dev, msg.content.ptr);
+            res = dev->driver->set(dev, NETOPT_FILTER, &opt_filter, sizeof(opt_filter));
             /* send reply to calling thread */
             reply.type = CAN_MSG_ACK;
             reply.content.value = (uint32_t)res;
@@ -302,8 +302,10 @@ static void *_can_device_thread(void *args)
             break;
         case CAN_MSG_REMOVE_FILTER:
             DEBUG("can device: CAN_MSG_REMOVE_FILTER received\n");
+            opt_filter.op = NETOPT_FILTER_RM;
+            opt_filter.filter = msg.content.ptr;
             /* set filter for device driver */
-            res = dev->driver->remove_filter(dev, msg.content.ptr);
+            res = dev->driver->set(dev, NETOPT_FILTER, &opt_filter, sizeof(opt_filter));
             /* send reply to calling thread */
             reply.type = CAN_MSG_ACK;
             reply.content.value = (uint32_t)res;
@@ -332,7 +334,7 @@ static void *_can_device_thread(void *args)
         case CAN_MSG_SET_TRX:
             DEBUG("can device: CAN_MSG_SET_TRX received\n");
             reply.type = CAN_MSG_ACK;
-            if (dev->state != CAN_STATE_SLEEPING) {
+            if (candev_dev->state != CAN_STATE_SLEEPING) {
                 reply.content.value = -EBUSY;
             }
             else {
