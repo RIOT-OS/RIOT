@@ -36,6 +36,10 @@
 #include "debug.h"
 
 
+#define SX127X_SPI_SPEED    (SPI_CLK_1MHZ)
+#define SX127X_SPI_MODE     (SPI_MODE_0)
+
+
 bool sx127x_test(const sx127x_t *dev)
 {
     /* Read version number and compare with sx127x assigned revision */
@@ -79,7 +83,7 @@ void sx127x_reg_write_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
 {
     unsigned int cpsr;
 
-    spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_PARAM_SPI_MODE, SX127X_PARAM_SPI_SPEED);
+    spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_SPI_MODE, SX127X_SPI_SPEED);
     cpsr = irq_disable();
 
     gpio_clear(dev->params.nss_pin);
@@ -97,7 +101,7 @@ void sx127x_reg_read_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
 
     cpsr = irq_disable();
 
-    spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_PARAM_SPI_MODE, SX127X_PARAM_SPI_SPEED);
+    spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_SPI_MODE, SX127X_SPI_SPEED);
 
     gpio_clear(dev->params.nss_pin);
     spi_transfer_regs(dev->params.spi, SPI_CS_UNDEF, addr & 0x7F, NULL, (char *) buffer, size);
