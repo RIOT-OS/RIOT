@@ -26,6 +26,8 @@
 #include <inttypes.h>
 
 #include "thread.h"
+#include "net/netstats.h"
+#include "net/netstats/neighbor.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/netif.h"
@@ -136,6 +138,55 @@ static int _netif_stats(kernel_pid_t dev, unsigned module, bool reset)
     return res;
 }
 #endif // MODULE_NETSTATS
+
+#ifdef MODULE_NETSTATS_NEIGHBOR
+static int _netif_stats_nb(kernel_pid_t dev)
+{
+    netstats_nb_t *stats;
+    int res = gnrc_netapi_get(dev, NETOPT_STATS_NEIGHBOR, 0, &stats, sizeof(&stats));
+    if (res == -ENOTSUP) {
+        return res;
+    }
+    char l2addr_str[3 * MAX_ADDR_LEN];
+    puts("Neigbor link layer stats:");
+    printf("L2 address               fresh  etx");
+#ifdef MODULE_NETSTATS_NEIGHBOR_EXT
+    printf("    tx send  tx failed rx received rssi lqi");
+#endif
+    printf("\n");
+    printf("-----------------------------------");
+#ifdef MODULE_NETSTATS_NEIGHBOR_EXT
+    printf("-------------------------------------------");
+#endif
+    printf("\n");
+    for (netstats_nb_t *entry = stats;
+         entry != NULL;
+         entry = netstats_nb_get_next(stats, entry)) {
+        if (entry->l2_addr_len > 0) {
+            printf("%-24s ",
+                   gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
+                                          entry->l2_addr, entry->l2_addr_len));
+           if (netstats_nb_isfresh(entry)) {
+               printf("%5u", (unsigned)entry->freshness);
+           } else {
+               printf("STALE");
+           }
+           printf("% 1.2f", (float) entry->etx/128.0);
+#ifdef MODULE_NETSTATS_NEIGHBOR_EXT
+           printf(" %10u %10u  %10u  %3u %3u",
+                  (unsigned) entry->tx_count,
+                  (unsigned) entry->tx_failed,
+                  (unsigned) entry->rx_count,
+                  (unsigned) entry->rssi,
+                  (unsigned) entry->lqi);
+#endif
+           printf("\n");
+        }
+    }
+
+    return 0;
+}
+#endif //MODULE_NETSTATS_NEIGHBOR
 
 static void _set_usage(char *cmd_name)
 {
@@ -535,6 +586,9 @@ static void _netif_list(kernel_pid_t dev)
 #endif
 #ifdef MODULE_NETSTATS_IPV6
     _netif_stats(dev, NETSTATS_IPV6, false);
+#endif
+#ifdef MODULE_NETSTATS_NEIGHBOR
+    _netif_stats_nb(dev);
 #endif
     puts("");
 }
