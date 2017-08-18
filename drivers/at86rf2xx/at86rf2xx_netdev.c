@@ -294,6 +294,14 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                 !!(dev->netdev.flags & AT86RF2XX_OPT_CSMA);
             return sizeof(netopt_enable_t);
 
+/* Only radios with the XAH_CTRL_2 register support frame retry reporting */
+#if AT86RF2XX_HAVE_RETRIES
+        case NETOPT_TX_RETRIES_NEEDED:
+            assert(max_len >= sizeof(uint8_t));
+            *((uint8_t *)val) = dev->tx_retries;
+            return sizeof(uint8_t);
+#endif
+
         default:
             /* Can still be handled in second switch */
             break;
@@ -578,6 +586,12 @@ static void _isr(netdev_t *netdev)
                 at86rf2xx_set_state(dev, dev->idle_state);
                 DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
             }
+/* Only radios with the XAH_CTRL_2 register support frame retry reporting */
+#if AT86RF2XX_HAVE_RETRIES
+            dev->tx_retries = ( at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2) &
+                                AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK ) >>
+                              AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
+#endif
 
             DEBUG("[at86rf2xx] EVT - TX_END\n");
 
