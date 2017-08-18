@@ -86,14 +86,14 @@ void rtc_init(void)
         RTC->ISR |= RTC_ISR_INIT;
         while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
 
+        /* Configure the RTC PRER */
+        RTC->PRER = RTC_SYNC_PRESCALER;
+        RTC->PRER |= (RTC_ASYNC_PRESCALER << 16);
+
         /* Set 24-h clock */
         RTC->CR &= ~RTC_CR_FMT;
         /* Timestamps enabled */
         RTC->CR |= RTC_CR_TSE;
-
-        /* Configure the RTC PRER */
-        RTC->PRER = RTC_SYNC_PRESCALER;
-        RTC->PRER |= (RTC_ASYNC_PRESCALER << 16);
 
         /* Exit RTC init mode */
         RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
