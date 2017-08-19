@@ -40,7 +40,11 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
+#if defined(CPU_MODEL_STM32F103RE)
 #define CPU_IRQ_NUMOF                   (60U)
+#else
+#define CPU_IRQ_NUMOF                   (43U)
+#endif
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
