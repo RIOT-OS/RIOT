@@ -27,10 +27,7 @@
 #include <unistd.h>
 #include "async_read.h"
 
-#define NATIVE_GPIO_NUMOF   42
-
 char buf[128];
-
 
 static void _gpio_isr(int fd, void* arg);
 
@@ -39,9 +36,24 @@ typedef struct {
     gpio_t pin;
     gpio_cb_t cb;
     void* arg;
+    int fd;
 } native_gpio_cb_t;
 
-native_gpio_cb_t gpio_list[NATIVE_GPIO_NUMOF];
+static native_gpio_cb_t gpio_list[GPIO_NATIVE_NUMOF];
+static int gpio_num;
+
+static native_gpio_cb_t *get_new_gpio(void) {
+    return &gpio_list[gpio_num++];
+}
+
+static native_gpio_cb_t *get_by_pinid(gpio_t id) {
+    for (int i=0; i<GPIO_NATIVE_NUMOF; i++) {
+        if (gpio_list[i].pin == id) {
+            return &gpio_list[i];
+        }
+    }
+    return NULL;
+}
 
 int gpio_init(gpio_t pin, gpio_mode_t mode) {
     int fd, len;
@@ -79,10 +91,12 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg){
 
     int fd;
-
-    native_gpio_cb_t *gpio = &(gpio_list[pin]);
+    native_gpio_cb_t *gpio = get_by_pinid(pin);
+    if (gpio == NULL) {
+        gpio = get_new_gpio();
+        gpio->pin = pin;
+    }
     gpio->active = 1;
-    gpio->pin = pin;
     gpio->cb = cb;
     gpio->arg = arg;
 
@@ -114,18 +128,27 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     if (fd < 0) {
         return fd;
     }
-
+    gpio->fd = fd;
     native_async_read_setup();
-    native_async_add_int_handler(fd, gpio, _gpio_isr);
+    native_async_read_add_int_handler(fd, gpio, _gpio_isr);
     return -1;
 }
 
 void gpio_irq_enable(gpio_t pin) {
-  (void) pin;
+    native_gpio_cb_t *gpio = get_by_pinid(pin);
+    if (gpio == NULL) {
+        return;
+    }
+    gpio->active = 1;
+    native_async_read_continue(gpio->fd);
 }
 
 void gpio_irq_disable(gpio_t pin) {
-  (void) pin;
+    native_gpio_cb_t *gpio = get_by_pinid(pin);
+    if (gpio == NULL) {
+        return;
+    }
+    gpio->active = 0;
 }
 
 int gpio_read(gpio_t pin) {
@@ -186,10 +209,12 @@ void gpio_write(gpio_t pin, int value) {
 
 static void _gpio_isr(int fd, void* arg)
 {
-    (void)arg;
-    lseek(fd, 0, SEEK_SET);  // Read from the start of the file
-    read(fd, buf, 128);
-    printf("\npoll() GPIO interrupt occurred\n");
-    native_async_read_continue(fd);
+    native_gpio_cb_t *gpio = (native_gpio_cb_t *)arg;
+    if (gpio->active) {
+        lseek(fd, 0, SEEK_SET);  // Read from the start of the file
+        read(fd, buf, 128);
+        gpio->cb(gpio->arg);
+        native_async_read_continue(fd);
+    }
 }
 /** @} */

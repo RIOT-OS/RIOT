@@ -42,6 +42,20 @@
 /** @} */
 
 /**
+ * @name GPIO sysfs dir
+ * @{
+ */
+#define GPIO_SYSFS_DIR      "/sys/class/gpio"
+/** @} */
+
+/**
+ * @name Maximum number of GPIO supported (also highest GPIO number supported)
+ * @{
+ */
+#define GPIO_NATIVE_NUMOF   42
+/** @} */
+
+/**
  * @name Timer peripheral configuration
  * @{
  */
