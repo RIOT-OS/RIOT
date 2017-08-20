@@ -116,7 +116,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     }
 
     native_async_read_setup();
-    native_async_interrupt_add_handler(fd, gpio, _gpio_isr);
+    native_async_add_int_handler(fd, gpio, _gpio_isr);
     return -1;
 }
 
