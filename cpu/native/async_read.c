@@ -31,7 +31,6 @@ static int _next_index;
 static struct pollfd _fds[ASYNC_READ_NUMOF];
 static async_read_t pollers[ASYNC_READ_NUMOF];
 
-static pid_t _sigio_child_pids[ASYNC_READ_NUMOF];
 static void _sigio_child(int fd);
 
 static void _async_io_isr(void) {
@@ -55,15 +54,17 @@ void native_async_read_cleanup(void) {
     unregister_interrupt(SIGIO);
 
     for (int i = 0; i < _next_index; i++) {
-        kill(_sigio_child_pids[i], SIGKILL);
+        if (pollers[i].child_pid) {
+            kill(pollers[i].child_pid, SIGKILL);
+        }
     }
 }
 
 void native_async_read_continue(int fd) {
     (void) fd;
     for (int i = 0; i < _next_index; i++) {
-        if (_fds[i].fd == fd) {
-            kill(_sigio_child_pids[i], SIGCONT);
+        if (_fds[i].fd == fd && pollers[i].child_pid) {
+            kill(pollers[i].child_pid, SIGCONT);
         }
     }
 }
