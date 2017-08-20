@@ -29,8 +29,7 @@
 
 static int _next_index;
 static struct pollfd _fds[ASYNC_READ_NUMOF];
-static void *_args[ASYNC_READ_NUMOF];
-static native_async_read_callback_t _native_async_read_callbacks[ASYNC_READ_NUMOF];
+static async_read_t pollers[ASYNC_READ_NUMOF];
 
 static pid_t _sigio_child_pids[ASYNC_READ_NUMOF];
 static void _sigio_child(int fd);
@@ -40,8 +39,9 @@ static void _async_io_isr(void) {
 
     if (real_poll(_fds, max_fd + 1, 0) > 0) {
         for (int i = 0; i < _next_index; i++) {
-            if (_fds[i].revents & POLLIN) { 
-                _native_async_read_callbacks[i](_fds[i].fd, _args[i]);
+            /* handle if one of the events has happened */
+            if (_fds[i].revents & _fds[i].events) { 
+                pollers[i].cb(_fds[i].fd, pollers[i].arg);
             }
         }
     }
@@ -75,24 +75,43 @@ void native_async_read_add_handler(int fd, void *arg, native_async_read_callback
 
     _fds[_next_index].fd = fd;
     _fds[_next_index].events = POLLIN;
-    _args[_next_index] = arg;
-    _native_async_read_callbacks[_next_index] = handler;
+    async_read_t *poll = &pollers[_next_index];
+
+    poll->child_pid = 0;
+    poll->cb = handler;
+    poll->arg = arg;
+    poll->fd = &_fds[_next_index];
 
     /* tuntap signalled IO is not working in OSX,
-     * * check http://sourceforge.net/p/tuntaposx/bugs/17/ */
+     * * check http://sourceforge.net/p/tuntaposx/bugs/18/ */
+#ifdef __MACH__
     _sigio_child(_next_index);
+#else
+    /* configure fds to send signals on io */
+    if (real_fcntl(fd, F_SETOWN, _native_pid) == -1) {
+        err(EXIT_FAILURE, "native_async_read_add_handler(): fcntl(F_SETOWN)");
+    }
+    /* set file access mode to non-blocking */
+    if (real_fcntl(fd, F_SETFL, O_NONBLOCK | O_ASYNC) == -1) {
+        err(EXIT_FAILURE, "native_async_read_add_handler(): fcntl(F_SETFL)");
+    }
+#endif /* not OSX */
     _next_index++;
 }
 
-void native_async_interrupt_add_handler(int fd, void *arg, native_async_read_callback_t handler) {
+void native_async_read_add_int_handdler(int fd, void *arg, native_async_read_callback_t handler) {
     if (_next_index >= ASYNC_READ_NUMOF) {
         err(EXIT_FAILURE, "native_async_read_add_handler(): too many callbacks");
     }
 
     _fds[_next_index].fd = fd;
     _fds[_next_index].events = POLLPRI;
-    _args[_next_index] = arg;
-    _native_async_read_callbacks[_next_index] = handler;
+    async_read_t *poll = &pollers[_next_index];
+
+    poll->child_pid = 0;
+    poll->cb = handler;
+    poll->arg = arg;
+    poll->fd = &_fds[_next_index];
 
     _sigio_child(_next_index);
     _next_index++;
@@ -101,13 +120,14 @@ void native_async_interrupt_add_handler(int fd, void *arg, native_async_read_cal
 static void _sigio_child(int index)
 {
     struct pollfd fds = _fds[index];
+    async_read_t *poll = &pollers[_next_index];
     pid_t parent = _native_pid;
     pid_t child;
     if ((child = real_fork()) == -1) {
         err(EXIT_FAILURE, "sigio_child: fork");
     }
     if (child > 0) {
-        _sigio_child_pids[index] = child;
+        poll->child_pid = child;
 
         /* return in parent process */
         return;
