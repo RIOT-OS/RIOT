@@ -129,6 +129,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         return fd;
     }
     gpio->fd = fd;
+    lseek(fd, 0, SEEK_SET);  // Read from the start of the file
+    read(fd, buf, 128);
     native_async_read_setup();
     native_async_read_add_int_handler(fd, gpio, _gpio_isr);
     return -1;
