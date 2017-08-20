@@ -445,6 +445,10 @@ void auto_init(void)
     extern void auto_init_pulse_counter(void);
     auto_init_pulse_counter();
 #endif
+#ifdef MODULE_SHT2X
+    extern void auto_init_sht2x(void);
+    auto_init_sht2x();
+#endif
 #ifdef MODULE_SHT3X
     extern void auto_init_sht3x(void);
     auto_init_sht3x();
