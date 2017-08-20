@@ -18,6 +18,9 @@
 #ifndef ASYNC_READ_H
 #define ASYNC_READ_H
 
+#include <stdlib.h>
+#include <poll.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,6 +36,16 @@ extern "C" {
  * @brief   asynchronus read callback type
  */
 typedef void (*native_async_read_callback_t)(int fd, void *arg);
+
+/**
+ * @brief    Interrupt callback information structure
+ */
+typedef struct {
+    pid_t child_pid;                    /**< PID of the interrupt listener */
+    native_async_read_callback_t cb;    /**< Interrupt callback funtion */
+    void *arg;                          /**< Argument ptr for the callback */
+    struct pollfd *fd;                  /**< sysfs gpio fd */
+} async_read_t;
 
 /**
  * @brief   initialize asynchronus read system
