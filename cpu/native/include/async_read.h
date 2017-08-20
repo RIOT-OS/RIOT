@@ -77,6 +77,16 @@ void native_async_read_continue(int fd);
  */
 void native_async_read_add_handler(int fd, void *arg, native_async_read_callback_t handler);
 
+/**
+ * @brief   start monitoring of file descriptor as interrupt
+ *
+ * @param[in] fd       The file descriptor to monitor
+ * @param[in] arg      Pointer to be passed as arguments to the callback
+ * @param[in] handler  The callback function to be called when the file
+ *                     descriptor is ready to read.
+ */
+void native_async_read_add_int_handler(int fd, void *arg, native_async_read_callback_t handler);
+
 #ifdef __cplusplus
 }
 #endif
