@@ -31,9 +31,7 @@ static int _next_index;
 static struct pollfd _fds[ASYNC_READ_NUMOF];
 static async_read_t pollers[ASYNC_READ_NUMOF];
 
-#ifdef __MACH__
 static void _sigio_child(int fd);
-#endif
 
 static void _async_io_isr(void) {
     if (real_poll(_fds, _next_index, 0) > 0) {
@@ -104,7 +102,17 @@ void native_async_read_add_handler(int fd, void *arg, native_async_read_callback
     _next_index++;
 }
 
-#ifdef __MACH__
+void native_async_read_add_int_handler(int fd, void *arg, native_async_read_callback_t handler) {
+    if (_next_index >= ASYNC_READ_NUMOF) {
+        err(EXIT_FAILURE, "native_async_read_add_int_handler(): too many callbacks");
+    }
+
+    _add_handler(fd, arg, handler);
+
+    _sigio_child(_next_index);
+    _next_index++;
+}
+
 static void _sigio_child(int index)
 {
     struct pollfd fds = _fds[index];
@@ -148,5 +156,4 @@ static void _sigio_child(int index)
         sigwait(&sigmask, &sig);
     }
 }
-#endif
 /** @} */
