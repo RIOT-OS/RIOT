@@ -238,6 +238,13 @@ static const spi_conf_t spi_config[] = {
 #define RTT_MAX_VALUE       (0x0000ffff)        /* 16-bit timer */
 /** @} */
 
+/**
+ * @name   RTC configuration
+ * @{
+ */
+#define RTC_NUMOF           (1)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
