@@ -70,6 +70,14 @@ typedef struct {
     uint8_t     chn;    /**< number of channels [1,2] */
 } timer_conf_t;
 
+/**
+ * @brief   I2C configuration
+ */
+typedef struct {
+    uint32_t scl_pin; /** GPIO_ID of pin to use as SCL */
+    uint32_t sda_pin; /** GPIO_ID of pin to use as SDA */
+} i2c_conf_t;
+
 #ifdef __cplusplus
 }
 #endif
