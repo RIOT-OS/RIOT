@@ -164,12 +164,12 @@ void stmclk_enable_lfclk(void)
     /* configure the low speed clock domain (LSE vs LSI) */
 #if CLOCK_LSE
     /* allow write access to backup domain */
-    stmclk_bdp_unlock();
+    stmclk_dbp_unlock();
     /* enable LSE */
     RCC->BDCR |= RCC_BDCR_LSEON;
     while (!(RCC->BDCR & RCC_BDCR_LSERDY)) {}
     /* disable write access to back domain when done */
-    stmclk_bdp_lock();
+    stmclk_dbp_lock();
 #else
     RCC->CSR |= RCC_CSR_LSION;
     while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
@@ -179,22 +179,10 @@ void stmclk_enable_lfclk(void)
 void stmclk_disable_lfclk(void)
 {
 #if CLOCK_LSE
-    stmclk_bdp_unlock();
+    stmclk_dbp_unlock();
     RCC->BDCR &= ~(RCC_BDCR_LSEON);
-    stmclk_bdp_lock();
+    stmclk_dbp_lock();
 #else
     RCC->CSR &= ~(RCC_CSR_LSION);
 #endif
-}
-
-void stmclk_bdp_unlock(void)
-{
-    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-    PWR->CR |= PWR_CR_DBP;
-}
-
-void stmclk_bdp_lock(void)
-{
-    PWR->CR &= ~(PWR_CR_DBP);
-    periph_clk_dis(APB1, RCC_APB1ENR_PWREN);
 }

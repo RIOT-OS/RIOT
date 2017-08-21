@@ -175,10 +175,10 @@ void stmclk_disable_hsi(void)
 void stmclk_enable_lfclk(void)
 {
 #if CLOCK_LSE
-    stmclk_bdp_unlock();
+    stmclk_dbp_unlock();
     RCC->BDCR |= RCC_BDCR_LSEON;
     while (!(RCC->BDCR & RCC_BDCR_LSERDY)) {}
-    stmclk_bdp_lock();
+    stmclk_dbp_lock();
 #else
     RCC->CSR |= RCC_CSR_LSION;
     while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
@@ -188,22 +188,10 @@ void stmclk_enable_lfclk(void)
 void stmclk_disable_lfclk(void)
 {
 #if CLOCK_LSE
-    stmclk_bdp_unlock();
+    stmclk_dbp_unlock();
     RCC->BDCR &= ~(RCC_BDCR_LSEON);
-    stmclk_bdp_lock();
+    stmclk_dbp_lock();
 #else
     RCC->CSR &= ~(RCC_CSR_LSION);
 #endif
-}
-
-void stmclk_bdp_unlock(void)
-{
-    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-    PWR->CR |= PWR_CR_DBP;
-}
-
-void stmclk_bdp_lock(void)
-{
-    PWR->CR &= ~(PWR_CR_DBP);
-    periph_clk_dis(APB1, RCC_APB1ENR_PWREN);
 }
