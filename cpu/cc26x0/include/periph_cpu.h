@@ -57,18 +57,19 @@ typedef enum {
     GPIO_RISING = IOCFG_EDGEDET_RISING,
     GPIO_BOTH = IOCFG_EDGEDET_BOTH
 } gpio_flank_t;
-#endif /* ndef DOXYGEN */
 
 /**
  * @brief   Configuration of low-level general purpose timers
  *
- * @note Timers *must* be configured consecutively and in order (without gaps)
- *       starting from GPT0, specifically if multiple timers are enabled.
+ * General purpose timers (GPT[0-3]) are configured consecutively and in order
+ * (without gaps) starting from GPT0, i.e. if multiple timers are enabled.
  */
 typedef struct {
     uint8_t     cfg;    /**< timer config [16,32 Bit] */
     uint8_t     chn;    /**< number of channels [1,2] */
 } timer_conf_t;
+
+#endif /* ifndef DOXYGEN */
 
 #ifdef __cplusplus
 }
