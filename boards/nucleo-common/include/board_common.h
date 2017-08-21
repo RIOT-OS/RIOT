@@ -41,16 +41,18 @@ extern "C" {
  * @{
  */
 #ifdef CPU_MODEL_STM32F302R8
+#define LED0_PORT           GPIOB
 #define LED0_PIN            GPIO_PIN(PORT_B, 13)
 #define LED0_MASK           (1 << 13)
 #else
+#define LED0_PORT           GPIOA
 #define LED0_PIN            GPIO_PIN(PORT_A, 5)
 #define LED0_MASK           (1 << 5)
 #endif
 
-#define LED0_ON             (GPIOA->BSRR = LED0_MASK)
-#define LED0_OFF            (GPIOA->BSRR = (LED0_MASK << 16))
-#define LED0_TOGGLE         (GPIOA->ODR  ^= LED0_MASK)
+#define LED0_ON             (LED0_PORT->BSRR = LED0_MASK)
+#define LED0_OFF            (LED0_PORT->BSRR = (LED0_MASK << 16))
+#define LED0_TOGGLE         (LED0_PORT->ODR  ^= LED0_MASK)
 /** @} */
 
 /**
