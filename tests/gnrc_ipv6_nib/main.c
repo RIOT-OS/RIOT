@@ -29,14 +29,26 @@
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6/nib/nc.h"
+#include "net/gnrc/netif2/internal.h"
 #include "net/ndp.h"
 #include "sched.h"
 
 #define _BUFFER_SIZE    (128)
+#define _CUR_HL         (155)
+#define _RTR_LTIME      (6612U)
+#define _REACH_TIME     (1210388825UL)
+#define _RETRANS_TIMER  (3691140UL)
+#define _LOC_GB_PFX_LEN (45U)
+#define _REM_GB_PFX_LEN (37U)
+#define _PIO_PFX_LTIME  (0x8476fedf)
 
 static const uint8_t _loc_l2[] = { _LL0, _LL1, _LL2, _LL3, _LL4, _LL5 };
 static const ipv6_addr_t _loc_ll = { {
                 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            _LL0 ^ 2, _LL1, _LL2, 0xff, 0xfe, _LL3, _LL4, _LL5
+        } };
+static const ipv6_addr_t _loc_gb = { {
+                0x20, 0x01, 0x2b, 0x2e, 0x43, 0x80, 0x00, 0x00,
             _LL0 ^ 2, _LL1, _LL2, 0xff, 0xfe, _LL3, _LL4, _LL5
         } };
 static const ipv6_addr_t _loc_sol_nodes = { {
@@ -49,6 +61,10 @@ static const ipv6_addr_t _rem_ll = { {
                 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             _LL0 ^ 2, _LL1, _LL2, 0xff, 0xfe, _LL3, _LL4, _LL5 + 1
         } };
+static const ipv6_addr_t _rem_gb = { {
+                0x20, 0x01, 0x18, 0xc9, 0xf8, 0x00, 0x00, 0x00,
+            _LL0 ^ 2, _LL1, _LL2, 0xff, 0xfe, _LL3, _LL4, _LL5 + 1
+        } };
 #define _rem_iid    _rem_ll.u64[1].u8
 static uint8_t _buffer[_BUFFER_SIZE];
 static ipv6_hdr_t *ipv6 = (ipv6_hdr_t *)&_buffer[0];
@@ -59,6 +75,12 @@ static inline size_t ceil8(size_t size);
 static void _set_up(void)
 {
     _common_set_up();
+    gnrc_netif2_acquire(_mock_netif);
+    /* reset some fields not set by the nib interface initializer */
+    _mock_netif->ipv6.mtu = ETHERNET_DATA_LEN;
+    _mock_netif->cur_hl = GNRC_NETIF2_DEFAULT_HL;
+    gnrc_netif2_ipv6_addr_remove(_mock_netif, &_loc_gb);
+    gnrc_netif2_release(_mock_netif);
     memset(_buffer, 0, sizeof(_buffer));
     gnrc_pktbuf_init();
     /* remove messages */
@@ -68,24 +90,42 @@ static void _set_up(void)
     }
 }
 
-static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH(gnrc_netif2_t *netif)
+static void test_get_next_hop_l2addr__EHOSTUNREACH(const ipv6_addr_t *dst,
+                                                   gnrc_netif2_t *netif,
+                                                   bool on_link)
 {
+    ipv6_addr_t addr;
     msg_t msg;
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
     gnrc_pktsnip_t *pkt;
 
+    memcpy(&addr, &_rem_gb, sizeof(addr));
+    addr.u8[15]--;
+    if (ipv6_addr_is_link_local(dst)) {
+        on_link = true;
+    }
+    else if (on_link) {
+        /* add _rem_gb prefix as on-link prefix */
+        TEST_ASSERT(gnrc_netif2_ipv6_addr_add(_mock_netif, &addr,
+                            _REM_GB_PFX_LEN,
+                            GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID) >= 0);
+    }
+    else {
+        TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &_rem_ll,
+                                                      _mock_netif->pid));
+    }
     TEST_ASSERT_EQUAL_INT(-EHOSTUNREACH,
-                          gnrc_ipv6_nib_get_next_hop_l2addr(&_rem_ll, netif,
+                          gnrc_ipv6_nib_get_next_hop_l2addr(dst, netif,
                                                             NULL, &nce));
-    if (netif != NULL) {
+    if (on_link && (netif != NULL)) {
         ndp_nbr_sol_t *nbr_sol;
         bool contains_sl2ao = false;
 
         TEST_ASSERT_MESSAGE(gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                             "Expected neighbor cache entry");
-        TEST_ASSERT_MESSAGE(ipv6_addr_equal(&_rem_ll, &nce.ipv6),
-                            "_rem_ll != nce->ipv6");
+        TEST_ASSERT_MESSAGE(ipv6_addr_equal(dst, &nce.ipv6),
+                            "dst != nce->ipv6");
         TEST_ASSERT_EQUAL_INT(0, nce.l2addr_len);
         TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE,
                               gnrc_ipv6_nib_nc_get_nud_state(&nce));
@@ -118,16 +158,46 @@ static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH(gnrc_netif2_t *net
         gnrc_pktbuf_release(pkt);
         TEST_ASSERT(gnrc_pktbuf_is_empty());
     }
+    gnrc_netif2_ipv6_addr_remove(_mock_netif, &addr);
 }
 
 static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH_no_iface(void)
 {
-    test_get_next_hop_l2addr__link_local_EHOSTUNREACH(NULL);
+    test_get_next_hop_l2addr__EHOSTUNREACH(&_rem_ll, NULL, false);
 }
 
 static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH_iface(void)
 {
-    test_get_next_hop_l2addr__link_local_EHOSTUNREACH(_mock_netif);
+    test_get_next_hop_l2addr__EHOSTUNREACH(&_rem_ll, _mock_netif, false);
+}
+
+static void test_get_next_hop_l2addr__global_EHOSTUNREACH_no_iface_off_link(void)
+{
+    test_get_next_hop_l2addr__EHOSTUNREACH(&_rem_gb, NULL, false);
+}
+
+static void test_get_next_hop_l2addr__global_EHOSTUNREACH_iface_off_link(void)
+{
+    test_get_next_hop_l2addr__EHOSTUNREACH(&_rem_gb, _mock_netif, false);
+}
+
+static void test_get_next_hop_l2addr__global_EHOSTUNREACH_no_iface_on_link(void)
+{
+    test_get_next_hop_l2addr__EHOSTUNREACH(&_rem_gb, NULL, true);
+}
+
+static void test_get_next_hop_l2addr__global_EHOSTUNREACH_iface_on_link(void)
+{
+    test_get_next_hop_l2addr__EHOSTUNREACH(&_rem_gb, _mock_netif, true);
+}
+
+static void test_get_next_hop_l2addr__ENETUNREACH(void)
+{
+    gnrc_ipv6_nib_nc_t nce;
+
+    TEST_ASSERT_EQUAL_INT(-ENETUNREACH,
+                          gnrc_ipv6_nib_get_next_hop_l2addr(&_rem_gb, NULL,
+                                                            NULL, &nce));
 }
 
 static void test_get_next_hop_l2addr__link_local_static_conf(void)
@@ -682,6 +752,470 @@ static void test_handle_pkt__nbr_adv__unsolicited(void)
     TEST_ASSERT_EQUAL_INT(0, msg_avail());
 }
 
+static size_t _set_rtr_sol(const ipv6_addr_t *ipv6_src,
+                           const ipv6_addr_t *ipv6_dst,
+                           uint8_t ipv6_hl, uint8_t rtr_sol_code,
+                           const uint8_t *sl2ao_addr, size_t sl2ao_addr_len)
+{
+    size_t icmpv6_len = sizeof(ndp_rtr_sol_t);
+    ndp_rtr_sol_t *rtr_sol = (ndp_rtr_sol_t *)icmpv6;
+
+    ipv6_hdr_set_version(ipv6);
+    ipv6->hl = ipv6_hl;
+    memcpy(&ipv6->src, ipv6_src, sizeof(ipv6->src));
+    memcpy(&ipv6->dst, ipv6_dst, sizeof(ipv6->dst));
+    rtr_sol->type = ICMPV6_RTR_SOL;
+    rtr_sol->code = rtr_sol_code;
+
+    if ((sl2ao_addr != NULL) && (sl2ao_addr_len > 0)) {
+        ndp_opt_t *sl2ao = (ndp_opt_t *)&_buffer[sizeof(ipv6_hdr_t) +
+                                                 sizeof(ndp_rtr_sol_t)];
+
+        sl2ao->type = NDP_OPT_SL2A;
+        sl2ao->len = ceil8(sizeof(ndp_opt_t) + sl2ao_addr_len) / 8;
+        memcpy(sl2ao + 1, sl2ao_addr, sl2ao_addr_len);
+        icmpv6_len += ceil8(sizeof(ndp_opt_t) + sl2ao_addr_len);
+    }
+
+    return icmpv6_len;
+}
+
+static void test_handle_pkt__rtr_sol(void)
+{
+    gnrc_ipv6_nib_nc_t nce;
+    void *state = NULL;
+    size_t icmpv6_len = _set_rtr_sol(&_rem_ll, &_loc_ll,
+                                     255U, 0U, _rem_l2, sizeof(_rem_l2));
+
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
+                        "There is an unexpected neighbor cache entry");
+    TEST_ASSERT_EQUAL_INT(0, msg_avail());
+}
+
+static size_t _set_rtr_adv(const ipv6_addr_t *ipv6_src,
+                           uint8_t ipv6_hl, uint8_t rtr_adv_code,
+                           bool set_rtr_adv_fields,
+                           uint8_t rtr_adv_flags,
+                           const uint8_t *sl2ao_addr, size_t sl2ao_addr_len,
+                           uint16_t mtu,
+                           const ipv6_addr_t *pfx, unsigned pfx_len,
+                           uint8_t pfx_flags)
+{
+    size_t icmpv6_len = sizeof(ndp_rtr_adv_t);
+    ndp_rtr_adv_t *rtr_adv = (ndp_rtr_adv_t *)icmpv6;
+
+    ipv6_hdr_set_version(ipv6);
+    ipv6->hl = ipv6_hl;
+    memcpy(&ipv6->src, ipv6_src, sizeof(ipv6->src));
+    memcpy(&ipv6->dst, &_loc_ll, sizeof(ipv6->dst));
+    rtr_adv->type = ICMPV6_RTR_ADV;
+    rtr_adv->code = rtr_adv_code;
+    rtr_adv->flags = rtr_adv_flags;
+    if (set_rtr_adv_fields) {
+        rtr_adv->cur_hl = _CUR_HL,
+        rtr_adv->ltime = byteorder_htons(_RTR_LTIME);
+        rtr_adv->reach_time = byteorder_htonl(_REACH_TIME);
+        rtr_adv->retrans_timer = byteorder_htonl(_RETRANS_TIMER);
+    }
+
+    if (mtu > 0) {
+        ndp_opt_mtu_t *mtuo = (ndp_opt_mtu_t *)&_buffer[sizeof(ipv6_hdr_t) +
+                                                        icmpv6_len];
+
+        mtuo->type = NDP_OPT_MTU;
+        mtuo->len = NDP_OPT_MTU_LEN;
+        mtuo->mtu = byteorder_htonl(mtu);
+        icmpv6_len += sizeof(ndp_opt_mtu_t);
+    }
+    if ((pfx != NULL) && (pfx_len > 0)) {
+        ndp_opt_pi_t *pio = (ndp_opt_pi_t *)&_buffer[sizeof(ipv6_hdr_t) +
+                                                     icmpv6_len];
+
+        pio->type = NDP_OPT_PI;
+        pio->len = NDP_OPT_PI_LEN;
+        pio->prefix_len = pfx_len;
+        pio->flags = pfx_flags;
+        pio->valid_ltime = byteorder_htonl(_PIO_PFX_LTIME);
+        pio->pref_ltime = byteorder_htonl(_PIO_PFX_LTIME);
+        ipv6_addr_init_prefix(&pio->prefix, pfx, pfx_len);
+        icmpv6_len += sizeof(ndp_opt_pi_t);
+    }
+    if ((sl2ao_addr != NULL) && (sl2ao_addr_len > 0)) {
+        ndp_opt_t *sl2ao = (ndp_opt_t *)&_buffer[sizeof(ipv6_hdr_t) +
+                                                 icmpv6_len];
+
+        sl2ao->type = NDP_OPT_SL2A;
+        sl2ao->len = ceil8(sizeof(ndp_opt_t) + sl2ao_addr_len) / 8;
+        memcpy(sl2ao + 1, sl2ao_addr, sl2ao_addr_len);
+        icmpv6_len += ceil8(sizeof(ndp_opt_t) + sl2ao_addr_len);
+    }
+
+    return icmpv6_len;
+}
+
+typedef struct {
+    uint32_t reach_time_base;
+    uint32_t reach_time;
+    uint32_t retrans_timer;
+    uint16_t mtu;
+    uint8_t addr_count;
+    uint8_t cur_hl;
+} _netif_exp_t;
+
+static uint8_t _netif_addr_count(const gnrc_netif2_t *netif)
+{
+    unsigned count = 0U;
+
+    for (int i = 0; i < GNRC_NETIF2_IPV6_ADDRS_NUMOF; i++) {
+        if (netif->ipv6.addrs_flags[i] != 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
+static inline void _get_netif_exp(const gnrc_netif2_t *netif,
+                                  _netif_exp_t *exp)
+{
+    exp->reach_time_base = netif->ipv6.reach_time_base;
+    exp->reach_time = netif->ipv6.reach_time;
+    exp->retrans_timer = netif->ipv6.retrans_time;
+    exp->mtu = netif->ipv6.mtu;
+    exp->addr_count = _netif_addr_count(netif);
+    exp->cur_hl = netif->cur_hl;
+}
+
+#define TEST_ASSERT_NETIF_UNCHANGED(netif, exp) \
+    TEST_ASSERT_EQUAL_INT(exp.reach_time_base, \
+                          netif->ipv6.reach_time_base); \
+    TEST_ASSERT_EQUAL_INT(exp.reach_time, netif->ipv6.reach_time); \
+    TEST_ASSERT_EQUAL_INT(exp.retrans_timer, netif->ipv6.retrans_time); \
+    TEST_ASSERT_EQUAL_INT(exp.mtu, netif->ipv6.mtu); \
+    TEST_ASSERT_EQUAL_INT(exp.addr_count, _netif_addr_count(netif)); \
+    TEST_ASSERT_EQUAL_INT(exp.cur_hl, netif->cur_hl)
+
+static void test_handle_pkt__rtr_adv__invalid_src(void)
+{
+    gnrc_ipv6_nib_nc_t nce;
+    gnrc_ipv6_nib_ft_t route;
+    void *state = NULL;
+    size_t icmpv6_len = _set_rtr_adv(&_rem_gb,
+                                     255U, 0U, true, 0U,
+                                     _loc_l2, sizeof(_loc_l2),
+                                     32397U, &_loc_gb, _LOC_GB_PFX_LEN,
+                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+    _netif_exp_t exp_netif;
+
+    _get_netif_exp(_mock_netif, &exp_netif);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
+                        "There is an unexpected neighbor cache entry");
+    state = NULL;
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route),
+                        "There is an unexpected forwarding entry");
+    TEST_ASSERT_NETIF_UNCHANGED(_mock_netif, exp_netif);
+    TEST_ASSERT_EQUAL_INT(0, msg_avail());
+}
+
+static void test_handle_pkt__rtr_adv__invalid_hl(void)
+{
+    gnrc_ipv6_nib_nc_t nce;
+    gnrc_ipv6_nib_ft_t route;
+    void *state = NULL;
+    size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
+                                     194U, 0U, true, 0U,
+                                     _loc_l2, sizeof(_loc_l2),
+                                     32397U, &_loc_gb, _LOC_GB_PFX_LEN,
+                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+    _netif_exp_t exp_netif;
+
+    _get_netif_exp(_mock_netif, &exp_netif);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
+                        "There is an unexpected neighbor cache entry");
+    state = NULL;
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route),
+                        "There is an unexpected forwarding entry");
+    TEST_ASSERT_NETIF_UNCHANGED(_mock_netif, exp_netif);
+    TEST_ASSERT_EQUAL_INT(0, msg_avail());
+}
+
+static void test_handle_pkt__rtr_adv__invalid_code(void)
+{
+    gnrc_ipv6_nib_nc_t nce;
+    gnrc_ipv6_nib_ft_t route;
+    void *state = NULL;
+    size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
+                                     255U, 201U, true, 0U,
+                                     _loc_l2, sizeof(_loc_l2),
+                                     32397U, &_loc_gb, _LOC_GB_PFX_LEN,
+                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+    _netif_exp_t exp_netif;
+
+    _get_netif_exp(_mock_netif, &exp_netif);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
+                        "There is an unexpected neighbor cache entry");
+    state = NULL;
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route),
+                        "There is an unexpected forwarding entry");
+    TEST_ASSERT_NETIF_UNCHANGED(_mock_netif, exp_netif);
+    TEST_ASSERT_EQUAL_INT(0, msg_avail());
+}
+
+static void test_handle_pkt__rtr_adv__invalid_icmpv6_len(void)
+{
+    gnrc_ipv6_nib_nc_t nce;
+    gnrc_ipv6_nib_ft_t route;
+    void *state = NULL;
+    _netif_exp_t exp_netif;
+
+    _get_netif_exp(_mock_netif, &exp_netif);
+    _set_rtr_adv(&_rem_ll, 255U, 201U, true, 0U, _loc_l2, sizeof(_loc_l2),
+                 32397U, &_loc_gb, _LOC_GB_PFX_LEN,
+                 NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6,
+                             sizeof(ndp_rtr_adv_t) - 1);
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
+                        "There is an unexpected neighbor cache entry");
+    state = NULL;
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route),
+                        "There is an unexpected forwarding entry");
+    TEST_ASSERT_NETIF_UNCHANGED(_mock_netif, exp_netif);
+    TEST_ASSERT_EQUAL_INT(0, msg_avail());
+}
+
+static void test_handle_pkt__rtr_adv__invalid_opt_len(void)
+{
+    gnrc_ipv6_nib_nc_t nce;
+    gnrc_ipv6_nib_ft_t route;
+    void *state = NULL;
+    size_t icmpv6_len = _set_rtr_adv(&_rem_ll,
+                                     255U, 201U, true, 0U,
+                                     _loc_l2, sizeof(_loc_l2),
+                                     32397U, &_loc_gb, _LOC_GB_PFX_LEN,
+                                     NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+    ndp_opt_t *opt = (ndp_opt_t *)&_buffer[icmpv6_len];
+    _netif_exp_t exp_netif;
+
+    _get_netif_exp(_mock_netif, &exp_netif);
+    opt->type = NDP_OPT_SL2A;
+    opt->len = 0U;
+    icmpv6_len += sizeof(ndp_opt_t);
+
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
+                        "There is an unexpected neighbor cache entry");
+    state = NULL;
+    TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route),
+                        "There is an unexpected forwarding entry");
+    TEST_ASSERT_NETIF_UNCHANGED(_mock_netif, exp_netif);
+    TEST_ASSERT_EQUAL_INT(0, msg_avail());
+}
+
+static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
+                                              bool set_rtr_adv_fields,
+                                              bool sl2ao, bool mtuo,
+                                              bool pio, uint8_t pio_flags)
+{
+    gnrc_ipv6_nib_pl_t prefix;
+    gnrc_ipv6_nib_nc_t nce;
+    gnrc_ipv6_nib_ft_t route;
+    void *state = NULL;
+    size_t icmpv6_len = _set_rtr_adv(&_rem_ll, 255U, 0U,
+                                     set_rtr_adv_fields, rtr_adv_flags,
+                                     (sl2ao) ? _rem_l2 : NULL, sizeof(_rem_l2),
+                                     (mtuo) ? 32397U : 0U,
+                                     (pio) ? &_loc_gb : NULL, _LOC_GB_PFX_LEN,
+                                     pio_flags);
+    const unsigned exp_addr_count = _netif_addr_count(_mock_netif);
+    _netif_exp_t exp_netif;
+
+    _get_netif_exp(_mock_netif, &exp_netif);
+    TEST_ASSERT(gnrc_netif2_ipv6_addr_idx(_mock_netif, &_loc_gb) < 0);
+    gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
+    if (set_rtr_adv_fields) {
+        while (gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route)) {
+            /* is default route */
+            if (ipv6_addr_is_unspecified(&route.dst)) {
+                break;
+            }
+        }
+        TEST_ASSERT_MESSAGE(ipv6_addr_equal(&_rem_ll, &route.next_hop),
+                            "default route is not via RA's source");
+        TEST_ASSERT_EQUAL_INT(_mock_netif->pid, route.iface);
+        TEST_ASSERT_EQUAL_INT(_REACH_TIME, _mock_netif->ipv6.reach_time_base);
+        TEST_ASSERT_MESSAGE(((_REACH_TIME / 2) <= _mock_netif->ipv6.reach_time) &&
+                            (_mock_netif->ipv6.reach_time <=
+                             (_REACH_TIME + (_REACH_TIME / 2))),
+                    "Randomized reachable time was out of expected range.");
+        TEST_ASSERT_EQUAL_INT(_RETRANS_TIMER, _mock_netif->ipv6.retrans_time);
+        TEST_ASSERT_EQUAL_INT(_CUR_HL, _mock_netif->cur_hl);
+    }
+    else {
+        while (gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route)) {
+            TEST_ASSERT_MESSAGE(!ipv6_addr_is_unspecified(&route.dst),
+                                "There is a default route, "
+                                "though RA's router lifetime was 0.");
+        }
+        TEST_ASSERT_EQUAL_INT(exp_netif.reach_time_base,
+                              _mock_netif->ipv6.reach_time_base);
+        TEST_ASSERT_EQUAL_INT(exp_netif.reach_time,
+                              _mock_netif->ipv6.reach_time);
+        TEST_ASSERT_EQUAL_INT(exp_netif.retrans_timer,
+                              _mock_netif->ipv6.retrans_time);
+        TEST_ASSERT_EQUAL_INT(exp_netif.cur_hl,
+                              _mock_netif->cur_hl);
+    }
+    state = NULL;
+    if (sl2ao) {
+        TEST_ASSERT_MESSAGE(gnrc_ipv6_nib_nc_iter(0, &state, &nce),
+                            "No neighbor cache entry found");
+        TEST_ASSERT_MESSAGE((memcmp(&_rem_ll, &nce.ipv6, sizeof(_rem_ll)) == 0),
+                            "_rem_ll != nce.ipv6");
+        TEST_ASSERT_EQUAL_INT(sizeof(_rem_l2), nce.l2addr_len);
+        TEST_ASSERT_MESSAGE((memcmp(&_rem_l2, &nce.l2addr, nce.l2addr_len) == 0),
+                            "_rem_l2 != nce.l2addr");
+        TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE,
+                              gnrc_ipv6_nib_nc_get_nud_state(&nce));
+        TEST_ASSERT_EQUAL_INT(_mock_netif->pid, gnrc_ipv6_nib_nc_get_iface(&nce));
+        TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_AR_STATE_GC,
+                              gnrc_ipv6_nib_nc_get_ar_state(&nce));
+    }
+    else {
+        TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
+                            "There is an unexpected neighbor cache entry");
+    }
+    if (mtuo) {
+        TEST_ASSERT_EQUAL_INT(32397U, _mock_netif->ipv6.mtu);
+    }
+    else {
+        TEST_ASSERT_EQUAL_INT(exp_netif.mtu, _mock_netif->ipv6.mtu);
+    }
+    state = NULL;
+    if (pio) {
+        if (pio_flags & NDP_OPT_PI_FLAGS_A) {
+            TEST_ASSERT_MESSAGE(gnrc_netif2_ipv6_addr_idx(_mock_netif,
+                                                          &_loc_gb) >= 0,
+                                "Address was not configured by PIO");
+        }
+        else {
+            TEST_ASSERT_MESSAGE(gnrc_netif2_ipv6_addr_idx(_mock_netif,
+                                                          &_loc_gb) < 0,
+                                "Address was configured by PIO, "
+                                "but A flag was set");
+        }
+        if (pio_flags & NDP_OPT_PI_FLAGS_L) {
+            TEST_ASSERT_MESSAGE(gnrc_ipv6_nib_pl_iter(0, &state, &prefix),
+                                "No prefix list entry found");
+            TEST_ASSERT_MESSAGE(ipv6_addr_match_prefix(&_loc_gb,
+                                        &prefix.pfx) >= _LOC_GB_PFX_LEN,
+                                "Unexpected prefix configured");
+            TEST_ASSERT_EQUAL_INT(_LOC_GB_PFX_LEN, prefix.pfx_len);
+            TEST_ASSERT_EQUAL_INT(_mock_netif->pid, prefix.iface);
+            TEST_ASSERT(_PIO_PFX_LTIME < prefix.valid_until);
+            TEST_ASSERT(_PIO_PFX_LTIME < prefix.pref_until);
+        }
+    }
+    if (!pio || !(pio_flags & NDP_OPT_PI_FLAGS_L)) {
+        if (!pio) {
+            TEST_ASSERT_EQUAL_INT(exp_addr_count,
+                                  _netif_addr_count(_mock_netif));
+        }
+        TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_pl_iter(0, &state, &prefix),
+                            "There is an unexpected prefix list entry");
+    }
+    TEST_ASSERT_EQUAL_INT(0, msg_avail());
+}
+
+static void test_handle_pkt__rtr_adv__success_all_zero(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, false, false, false, false, 0U);
+}
+
+static void test_handle_pkt__rtr_adv__success_no_flags_no_opt(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, false, false, false, 0U);
+}
+
+static void test_handle_pkt__rtr_adv__success_no_opt(void)
+{
+    /* these flags only make sense with SLAAC, so don't further test them below
+     * (except for PIO ;-)) */
+    test_handle_pkt__rtr_adv__success(NDP_RTR_ADV_FLAGS_M | NDP_RTR_ADV_FLAGS_O,
+                                      true, false, false, false, 0U);
+}
+
+static void test_handle_pkt__rtr_adv__success_sl2ao(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, true, false, false, 0U);
+}
+
+static void test_handle_pkt__rtr_adv__success_mtuo(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, false, true, false, 0U);
+}
+
+static void test_handle_pkt__rtr_adv__success_pio_00(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, false, false, true, 0U);
+}
+
+static void test_handle_pkt__rtr_adv__success_pio_L0(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, false, false, true,
+                                      NDP_OPT_PI_FLAGS_L);
+}
+
+static void test_handle_pkt__rtr_adv__success_pio_0A(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, false, false, true,
+                                      NDP_OPT_PI_FLAGS_A);
+}
+
+static void test_handle_pkt__rtr_adv__success_pio_LA(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, false, false, true,
+                                      NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+}
+
+static void test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_00(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, true, true, true, 0U);
+}
+
+static void test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_L0(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, true, true, true,
+                                      NDP_OPT_PI_FLAGS_L);
+}
+
+static void test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_0A(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, true, true, true,
+                                      NDP_OPT_PI_FLAGS_A);
+}
+
+static void test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_LA(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, true, true, true, true,
+                                      NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+}
+
+static void test_change_rtr_adv_iface(void)
+{
+    TEST_ASSERT_MESSAGE(!(_mock_netif->flags & GNRC_NETIF2_FLAGS_IPV6_RTR_ADV),
+                        "RTR_ADV was unexpectedly set");
+    gnrc_ipv6_nib_change_rtr_adv_iface(_mock_netif, true);
+    TEST_ASSERT_MESSAGE(!(_mock_netif->flags & GNRC_NETIF2_FLAGS_IPV6_RTR_ADV),
+                        "RTR_ADV was unexpectedly changed");
+    gnrc_ipv6_nib_change_rtr_adv_iface(_mock_netif, false);
+    TEST_ASSERT_MESSAGE(!(_mock_netif->flags & GNRC_NETIF2_FLAGS_IPV6_RTR_ADV),
+                        "RTR_ADV was unexpectedly changed");
+    TEST_ASSERT_EQUAL_INT(0, msg_avail());
+}
+
 static Test *tests_gnrc_ipv6_nib(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -690,6 +1224,11 @@ static Test *tests_gnrc_ipv6_nib(void)
         /* TODO: ENETUNREACH when non-link-local communication is implemented */
         new_TestFixture(test_get_next_hop_l2addr__link_local_EHOSTUNREACH_no_iface),
         new_TestFixture(test_get_next_hop_l2addr__link_local_EHOSTUNREACH_iface),
+        new_TestFixture(test_get_next_hop_l2addr__global_EHOSTUNREACH_no_iface_off_link),
+        new_TestFixture(test_get_next_hop_l2addr__global_EHOSTUNREACH_iface_off_link),
+        new_TestFixture(test_get_next_hop_l2addr__global_EHOSTUNREACH_no_iface_on_link),
+        new_TestFixture(test_get_next_hop_l2addr__global_EHOSTUNREACH_iface_on_link),
+        new_TestFixture(test_get_next_hop_l2addr__ENETUNREACH),
         new_TestFixture(test_get_next_hop_l2addr__link_local_static_conf),
         new_TestFixture(test_get_next_hop_l2addr__link_local_after_handshake_iface),
         new_TestFixture(test_get_next_hop_l2addr__link_local_after_handshake_iface_router),
@@ -716,9 +1255,29 @@ static Test *tests_gnrc_ipv6_nib(void)
         new_TestFixture(test_handle_pkt__nbr_adv__unspecified_src),
         new_TestFixture(test_handle_pkt__nbr_adv__unsolicited),
         /* solicited tested in get_next_hop_l2addr */
+        new_TestFixture(test_handle_pkt__rtr_sol),
+        new_TestFixture(test_handle_pkt__rtr_adv__invalid_src),
+        new_TestFixture(test_handle_pkt__rtr_adv__invalid_hl),
+        new_TestFixture(test_handle_pkt__rtr_adv__invalid_code),
+        new_TestFixture(test_handle_pkt__rtr_adv__invalid_icmpv6_len),
+        new_TestFixture(test_handle_pkt__rtr_adv__invalid_opt_len),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_all_zero),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_no_flags_no_opt),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_no_opt),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_sl2ao),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_mtuo),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_pio_00),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_pio_L0),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_pio_0A),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_pio_LA),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_00),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_L0),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_0A),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_LA),
         /* gnrc_ipv6_nib_handle_timer_event not testable in this context since
          * we do not have access to the (internally defined) contexts required
          * for it */
+        new_TestFixture(test_change_rtr_adv_iface),
     };
 
     EMB_UNIT_TESTCALLER(tests, _set_up, NULL, fixtures);
