@@ -171,27 +171,3 @@ void stmclk_disable_hsi(void)
     }
 #endif
 }
-
-void stmclk_enable_lfclk(void)
-{
-#if CLOCK_LSE
-    stmclk_dbp_unlock();
-    RCC->BDCR |= RCC_BDCR_LSEON;
-    while (!(RCC->BDCR & RCC_BDCR_LSERDY)) {}
-    stmclk_dbp_lock();
-#else
-    RCC->CSR |= RCC_CSR_LSION;
-    while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
-#endif
-}
-
-void stmclk_disable_lfclk(void)
-{
-#if CLOCK_LSE
-    stmclk_dbp_unlock();
-    RCC->BDCR &= ~(RCC_BDCR_LSEON);
-    stmclk_dbp_lock();
-#else
-    RCC->CSR &= ~(RCC_CSR_LSION);
-#endif
-}

@@ -158,31 +158,3 @@ void stmclk_disable_hsi(void)
         RCC->CR &= ~(RCC_CR_HSION);
     }
 }
-
-void stmclk_enable_lfclk(void)
-{
-    /* configure the low speed clock domain (LSE vs LSI) */
-#if CLOCK_LSE
-    /* allow write access to backup domain */
-    stmclk_dbp_unlock();
-    /* enable LSE */
-    RCC->BDCR |= RCC_BDCR_LSEON;
-    while (!(RCC->BDCR & RCC_BDCR_LSERDY)) {}
-    /* disable write access to back domain when done */
-    stmclk_dbp_lock();
-#else
-    RCC->CSR |= RCC_CSR_LSION;
-    while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
-#endif
-}
-
-void stmclk_disable_lfclk(void)
-{
-#if CLOCK_LSE
-    stmclk_dbp_unlock();
-    RCC->BDCR &= ~(RCC_BDCR_LSEON);
-    stmclk_dbp_lock();
-#else
-    RCC->CSR &= ~(RCC_CSR_LSION);
-#endif
-}
