@@ -176,7 +176,8 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, k
 
 void gnrc_rpl_dodag_remove_all_parents(gnrc_rpl_dodag_t *dodag)
 {
-    gnrc_rpl_parent_t *elt, *tmp;
+    gnrc_rpl_parent_t *elt = NULL;
+    gnrc_rpl_parent_t *tmp = NULL;
     LL_FOREACH_SAFE(dodag->parents, elt, tmp) {
         gnrc_rpl_parent_remove(elt);
     }
@@ -306,7 +307,8 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
     gnrc_rpl_parent_t *old_best = dodag->parents;
     gnrc_rpl_parent_t *new_best = old_best;
     uint16_t old_rank = dodag->my_rank;
-    gnrc_rpl_parent_t *elt, *tmp;
+    gnrc_rpl_parent_t *elt = NULL;
+    gnrc_rpl_parent_t *tmp = NULL;
 
     if (dodag->parents == NULL) {
         return NULL;
@@ -339,7 +341,7 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
 
     }
 
-    dodag->my_rank = dodag->instance->of->calc_rank(dodag->parents, 0);
+    dodag->my_rank = dodag->instance->of->calc_rank(dodag, 0);
     if (dodag->my_rank != old_rank) {
         trickle_reset_timer(&dodag->trickle);
     }
