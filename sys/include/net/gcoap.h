@@ -236,7 +236,9 @@ extern "C" {
 /**
  * @brief   Size of the buffer used to build a CoAP request or response
  */
+#ifndef GCOAP_PDU_BUF_SIZE
 #define GCOAP_PDU_BUF_SIZE      (128)
+#endif
 
 /**
  * @brief   Size of the buffer used to write options, other than Uri-Path, in a
@@ -263,7 +265,9 @@ extern "C" {
 /**
  * @brief   Maximum number of requests awaiting a response
  */
+#ifndef GCOAP_REQ_WAITING_MAX
 #define GCOAP_REQ_WAITING_MAX   (2)
+#endif
 
 /**
  * @brief   Maximum length in bytes for a token
@@ -301,14 +305,18 @@ extern "C" {
 /**
  * @brief   Time in usec that the event loop waits for an incoming CoAP message
  */
+#ifndef GCOAP_RECV_TIMEOUT
 #define GCOAP_RECV_TIMEOUT      (1 * US_PER_SEC)
+#endif
 
 /**
  * @brief   Default time to wait for a non-confirmable response [in usec]
  *
  * Set to 0 to disable timeout.
  */
+#ifndef GCOAP_NON_TIMEOUT
 #define GCOAP_NON_TIMEOUT       (5000000U)
+#endif
 
 /**
  * @brief   Identifies waiting timed out for a response to a sent message
