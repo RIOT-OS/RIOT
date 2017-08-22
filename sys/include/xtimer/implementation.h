@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * Copyright (C) 2016 Eistec AB
+ * Copyright (C) 2016-2017 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -66,6 +66,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
 void _xtimer_set(xtimer_t *timer, uint32_t offset);
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);
+void _xtimer_periodic_msg(xtimer_t *timer, uint32_t *last_wakeup, uint32_t period, msg_t *msg, kernel_pid_t target_pid);
 void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid);
 void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid);
 void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
@@ -191,6 +192,13 @@ static inline void xtimer_tsleep64(xtimer_ticks64_t ticks)
 static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup, uint32_t period)
 {
     _xtimer_periodic_wakeup(&last_wakeup->ticks32, _xtimer_ticks_from_usec(period));
+}
+
+static inline void xtimer_periodic_msg(xtimer_t *timer,
+                                       xtimer_ticks32_t *last_wakeup, uint32_t period,
+                                       msg_t *msg, kernel_pid_t target_pid)
+{
+    _xtimer_periodic_msg(timer, &last_wakeup->ticks32, _xtimer_ticks_from_usec(period), msg, target_pid);
 }
 
 static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)

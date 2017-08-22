@@ -155,6 +155,12 @@ static inline void _setup_msg(xtimer_t *timer, msg_t *msg, kernel_pid_t target_p
     msg->sender_pid = target_pid;
 }
 
+void _xtimer_periodic_msg(xtimer_t *timer, uint32_t *last_wakeup, uint32_t period, msg_t *msg, kernel_pid_t target_pid)
+{
+    _setup_msg(timer, msg, target_pid);
+    _xtimer_periodic(timer, last_wakeup, period);
+}
+
 void _xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid)
 {
     _setup_msg(timer, msg, target_pid);
