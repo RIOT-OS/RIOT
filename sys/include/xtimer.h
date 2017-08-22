@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * Copyright (C) 2016 Eistec AB
+ * Copyright (C) 2016-2017 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -71,8 +71,7 @@ typedef struct xtimer {
     struct xtimer *next;         /**< reference to next timer in timer lists */
     uint32_t target;             /**< lower 32bit absolute target time */
     uint32_t long_target;        /**< upper 32bit absolute target time */
-    xtimer_callback_t callback;  /**< callback function to call when timer
-                                     expires */
+    xtimer_callback_t callback;  /**< callback function to call when timer expires */
     void *arg;                   /**< argument to pass to callback function */
 } xtimer_t;
 
@@ -206,6 +205,38 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks);
  * @param[in] period        time in microseconds that will be added to last_wakeup
  */
 static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup, uint32_t period);
+
+/**
+ * @brief Send a message at absolute time (@p last_wakeup + @p period)
+ *
+ * Functionally similar to xtimer_set_msg, but the target time is computed in
+ * the same way as for xtimer_periodic_wakeup.
+ *
+ * This function can be used to create periodic messages. This is especially
+ * useful if a thread has an event loop for handling asynchronous events, but
+ * some events need to occur periodically on a schedule. Using
+ * xtimer_periodic_wakeup in these kinds of applications would cause the
+ * asynchronous events to be delayed until the next wakeup, instead of processed
+ * immediately.
+ *
+ * @attention The message struct pointed to by @p msg will not be copied,
+ * i.e. it needs to point to valid memory until the message has been delivered.
+ *
+ * If the result of (@p last_wakeup + @p period) would be in the past, the function
+ * sets @p last_wakeup to @p last_wakeup + @p period and sends the message
+ * immediately.
+ *
+ * @param[in] timer         timer struct to work with.
+ *                          Its xtimer_t::target and xtimer_t::long_target
+ *                          fields need to be initialized with 0 on first use.
+ * @param[in] last_wakeup   base time stamp for the wakeup
+ * @param[in] period        time in microseconds that will be added to last_wakeup
+ * @param[in] msg           message that will be sent
+ * @param[in] target_pid    destination thread PID
+ */
+static inline void xtimer_periodic_msg(xtimer_t *timer,
+                                       xtimer_ticks32_t *last_wakeup, uint32_t period,
+                                       msg_t *msg, kernel_pid_t target_pid);
 
 /**
  * @brief Set a timer that sends a message
