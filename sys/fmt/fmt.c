@@ -46,6 +46,8 @@ static const uint32_t _tenmap[] = {
     10000000LU,
 };
 
+#define TENMAP_SIZE  (sizeof(_tenmap) / sizeof(_tenmap[0]))
+
 static inline int _is_digit(char c)
 {
     return (c >= '0' && c <= '9');
@@ -200,58 +202,17 @@ size_t fmt_s16_dec(char *out, int16_t val)
 
 size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
 {
-    int16_t absolute, divider;
-    size_t pos = 0;
-    size_t div_len, len;
-    unsigned e;
-    char tmp[4];
-
-    if (fp_digits > 4) {
-        return 0;
-    }
-    if (fp_digits == 0) {
-        return fmt_s16_dec(out, val);
-    }
-    if (val < 0) {
-        if (out) {
-            out[pos++] = '-';
-        }
-        val = -val;
-    }
-
-    e = _tenmap[fp_digits];
-    absolute = (val / (int)e);
-    divider = val - (absolute * e);
-
-    pos += fmt_s16_dec(&out[pos], absolute);
-
-    if (!out) {
-        return pos + 1 + fp_digits;     /* abs len + decimal point + divider */
-    }
-
-    out[pos++] = '.';
-    len = pos + fp_digits;
-    div_len = fmt_s16_dec(tmp, divider);
-
-    while (pos < (len - div_len)) {
-        out[pos++] = '0';
-    }
-    for (size_t i = 0; i < div_len; i++) {
-        out[pos++] = tmp[i];
-    }
-
-    return pos;
+    return fmt_s32_dfp(out, val, fp_digits);
 }
 
 size_t fmt_s32_dfp(char *out, int32_t val, unsigned fp_digits)
 {
+    assert(fp_digits < TENMAP_SIZE);
+
     int32_t absolute, divider;
     unsigned div_len, len, pos = 0;
     char tmp[9];
 
-    if (fp_digits > 9) {
-        return 0;
-    }
     if (fp_digits == 0) {
         return fmt_s32_dec(out, val);
     }
@@ -292,7 +253,7 @@ size_t fmt_s32_dfp(char *out, int32_t val, unsigned fp_digits)
  */
 size_t fmt_float(char *out, float f, unsigned precision)
 {
-    assert (precision <= 7);
+    assert(precision < TENMAP_SIZE);
 
     unsigned negative = (f < 0);
     uint32_t integer;
