@@ -309,17 +309,14 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
         return NULL;
     }
 
-    LL_FOREACH(dodag->parents, elt) {
-        new_best = dodag->instance->of->which_parent(new_best, elt);
-    }
+    LL_SORT(dodag->parents, dodag->instance->of->parent_cmp);
+    new_best = dodag->parents;
 
     if (new_best->rank == GNRC_RPL_INFINITE_RANK) {
         return NULL;
     }
 
     if (new_best != old_best) {
-        LL_DELETE(dodag->parents, new_best);
-        LL_PREPEND(dodag->parents, new_best);
         /* no-path DAOs only for the storing mode */
         if ((dodag->instance->mop == GNRC_RPL_MOP_STORING_MODE_NO_MC) ||
             (dodag->instance->mop == GNRC_RPL_MOP_STORING_MODE_MC)) {
