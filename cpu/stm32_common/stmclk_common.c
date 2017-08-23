@@ -37,6 +37,16 @@
 #define BIT_APB_PWREN       RCC_APB1ENR_PWREN
 #endif
 
+#if defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
+#define REG_LSE             CSR
+#define BIT_LSEON           RCC_CSR_LSEON
+#define BIT_LSERDY          RCC_CSR_LSERDY
+#else
+#define REG_LSE             BDCR
+#define BIT_LSEON           RCC_BDCR_LSEON
+#define BIT_LSERDY          RCC_BDCR_LSERDY
+#endif
+
 void stmclk_enable_hsi(void)
 {
     RCC->CR |= RCC_CR_HSION;
@@ -58,8 +68,8 @@ void stmclk_enable_lfclk(void)
 {
 #if CLOCK_LSE
     stmclk_dbp_unlock();
-    RCC->BDCR |= RCC_BDCR_LSEON;
-    while (!(RCC->BDCR & RCC_BDCR_LSERDY)) {}
+    RCC->REG_LSE |= BIT_LSEON;
+    while (!(RCC->REG_LSE & BIT_LSERDY)) {}
     stmclk_dbp_lock();
 #else
     RCC->CSR |= RCC_CSR_LSION;
@@ -71,7 +81,8 @@ void stmclk_disable_lfclk(void)
 {
 #if CLOCK_LSE
     stmclk_dbp_unlock();
-    RCC->BDCR &= ~(RCC_BDCR_LSEON);
+    RCC->REG_LSE &= ~(BIT_LSEON);
+    while (!(RCC->REG_LSE & BIT_LSERDY)) {}
     stmclk_dbp_lock();
 #else
     RCC->CSR &= ~(RCC_CSR_LSION);
