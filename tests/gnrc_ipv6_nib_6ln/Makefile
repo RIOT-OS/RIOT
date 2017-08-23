@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := chronos nucleo-f030 nucleo-l053 nucleo32-f031 \
 
 USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_sixlowpan
+USEMODULE += gnrc_sixlowpan_ctx
 USEMODULE += gnrc_ipv6_nib_6ln
 USEMODULE += gnrc_netif2
 USEMODULE += embunit
