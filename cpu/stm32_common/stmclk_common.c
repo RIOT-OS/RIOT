@@ -47,6 +47,13 @@
 #define BIT_LSERDY          RCC_BDCR_LSERDY
 #endif
 
+#ifndef CLOCK_HSE
+#define CLOCK_HSE   (0U)
+#endif
+#ifndef CLOCK_LSE
+#define CLOCK_LSE   (0U)
+#endif
+
 void stmclk_enable_hsi(void)
 {
     RCC->CR |= RCC_CR_HSION;
@@ -57,36 +64,38 @@ void stmclk_disable_hsi(void)
 {
     /* we only disable the HSI clock if not used as input for the PLL and if
      * not used directly as system clock */
-#if CLOCK_HSE
-    if ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI) {
-        RCC->CR &= ~(RCC_CR_HSION);
+    if (CLOCK_HSE) {
+        if ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI) {
+            RCC->CR &= ~(RCC_CR_HSION);
+        }
     }
-#endif
 }
 
 void stmclk_enable_lfclk(void)
 {
-#if CLOCK_LSE
-    stmclk_dbp_unlock();
-    RCC->REG_LSE |= BIT_LSEON;
-    while (!(RCC->REG_LSE & BIT_LSERDY)) {}
-    stmclk_dbp_lock();
-#else
-    RCC->CSR |= RCC_CSR_LSION;
-    while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
-#endif
+    if (CLOCK_LSE) {
+        stmclk_dbp_unlock();
+        RCC->REG_LSE |= BIT_LSEON;
+        while (!(RCC->REG_LSE & BIT_LSERDY)) {}
+        stmclk_dbp_lock();
+    }
+    else {
+        RCC->CSR |= RCC_CSR_LSION;
+        while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
+    }
 }
 
 void stmclk_disable_lfclk(void)
 {
-#if CLOCK_LSE
-    stmclk_dbp_unlock();
-    RCC->REG_LSE &= ~(BIT_LSEON);
-    while (!(RCC->REG_LSE & BIT_LSERDY)) {}
-    stmclk_dbp_lock();
-#else
-    RCC->CSR &= ~(RCC_CSR_LSION);
-#endif
+    if (CLOCK_LSE) {
+        stmclk_dbp_unlock();
+        RCC->REG_LSE &= ~(BIT_LSEON);
+        while (!(RCC->REG_LSE & BIT_LSERDY)) {}
+        stmclk_dbp_lock();
+    }
+    else {
+        RCC->CSR &= ~(RCC_CSR_LSION);
+    }
 }
 
 void stmclk_dbp_unlock(void)
