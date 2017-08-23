@@ -88,6 +88,11 @@ ifneq (,$(filter netdev2_tap,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter gnrc_ppp,$(USEMODULE)))
+  USEMODULE += gnrc_netdev
+  USEMODULE += gnrc_netdev_msg_handler
+endif
+
 ifneq (,$(filter gnrc_zep,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += ieee802154

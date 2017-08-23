@@ -321,6 +321,14 @@ typedef enum {
      */
     NETOPT_RF_TESTMODE,
 
+    /**
+     * @brief   Set link state of the device.
+     *
+     * Expects type @ref netopt_enable_t. @ref NETOPT_DISABLE sets the link
+     * down, @ref NETOPT_ENABLE sets the link up.
+     */
+    NETOPT_LINK_STATE,
+
     /* add more options if needed */
 
     /**

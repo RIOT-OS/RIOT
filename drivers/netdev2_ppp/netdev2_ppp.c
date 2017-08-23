@@ -51,6 +51,13 @@ int netdev2_ppp_get(netdev2_ppp_t *dev, netopt_t opt, void *value, size_t max_le
             *((uint16_t*) value) = NETDEV2_TYPE_PPP;
             res = 2;
             break;
+        case NETOPT_LINK_STATE: {
+                gnrc_ppp_protocol_t *dcp = (gnrc_ppp_protocol_t *) &dev->dcp;
+                *((netopt_enable_t *)value) = (dcp->state == PROTOCOL_DOWN) ?
+                                              NETOPT_DISABLE : NETOPT_ENABLE;
+                res = sizeof(netopt_enable_t);
+            };
+            break;
         default:
             return -ENOTSUP;
             break;
@@ -79,6 +86,16 @@ int netdev2_ppp_set(netdev2_ppp_t *dev, netopt_t opt, void *value, size_t value_
             memcpy(dev->pap.password, value, value_len);
             dev->pap.pass_size = value_len;
             res = 0;
+            break;
+        case NETOPT_LINK_STATE:
+            if (*((netopt_enable_t *)value) == NETOPT_DISABLE) {
+                /* set link down in device context
+                 * should not require dispatch_ppp_msg */
+            }
+            else {
+                /* set link up in device context
+                 * should not require dispatch_ppp_msg */
+            }
             break;
         default:
             return -ENOTSUP;
