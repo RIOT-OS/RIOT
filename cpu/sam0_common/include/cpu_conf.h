@@ -8,6 +8,7 @@
 
 /**
  * @ingroup         cpu_sam0_common
+ * @brief           Implementation specific CPU configuration options
  * @{
  *
  * @file
