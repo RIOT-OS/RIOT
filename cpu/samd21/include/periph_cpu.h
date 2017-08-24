@@ -8,6 +8,7 @@
 
 /**
  * @ingroup         cpu_samd21
+ * @brief           CPU specific definitions for internal peripheral handling
  * @{
  *
  * @file

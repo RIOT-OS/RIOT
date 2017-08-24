@@ -8,6 +8,7 @@
 
 /**
  * @ingroup         cpu_sam0_common
+ * @brief           Common CPU specific definitions for all SAMx21 based CPUs
  * @{
  *
  * @file

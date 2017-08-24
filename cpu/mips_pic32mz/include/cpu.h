@@ -11,10 +11,11 @@
 /**
  * @defgroup    cpu_mips_pic32mz MIPS PIC32MZ
  * @ingroup     cpu
+ * @brief       CPU definitions for pic32mz devices.
  * @{
  *
  * @file
- * @brief       main CPU definitions for pic32mz devices.
+ * @brief       CPU definitions for pic32mz devices.
  *
  * @author      Neil Jones <neil.jones@imgtec.com>
  */
