@@ -6,6 +6,15 @@
  * directory for more details.
  */
 
+/**
+ * @ingroup     cpu_msp430_common
+ * @{
+ *
+ * @file
+ * @brief       Common CPU definitions fpr MSP430
+ *
+ */
+
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
@@ -48,3 +57,4 @@ extern "C" {
 #endif
 
 #endif /* CPU_CONF_H */
+/** @} */

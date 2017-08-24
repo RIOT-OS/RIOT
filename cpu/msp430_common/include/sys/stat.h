@@ -7,6 +7,9 @@
  */
 
 /**
+ * @ingroup cpu_msp430_common
+ *
+ * @{
  * @file
  * @brief   POSIX compatible sys/stat.h definitions
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
