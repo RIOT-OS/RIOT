@@ -387,6 +387,10 @@ ifneq (,$(filter od,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter od_string,$(USEMODULE)))
+  USEMODULE += od
+endif
+
 ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
   USEMODULE += newlib
 endif
