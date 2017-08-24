@@ -44,10 +44,8 @@ extern "C" {
 
 /**
  * @brief   Define number of available ADC lines
- *
- * TODO: check this value
  */
-#define ADC_NUMOF           (10U)
+#define ADC_NUMOF           (8U)
 
 /**
  * @brief   Override the default GPIO type
@@ -95,12 +93,12 @@ typedef enum {
  */
 #define HAVE_ADC_RES_T
 typedef enum {
-    ADC_RES_6BIT = 0,       /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT,           /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT,          /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT,          /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT,          /**< ADC resolution: 14 bit */
-    ADC_RES_16BIT,          /**< ADC resolution: 16 bit */
+    ADC_RES_6BIT  = (0x4 << 17),    /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = (0x2 << 17),    /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = (0x0 << 17),    /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 1,              /**< ADC resolution: 12 bit, no supported */
+    ADC_RES_14BIT = 2,              /**< ADC resolution: 14 bit, no supported */
+    ADC_RES_16BIT = 3,              /**< ADC resolution: 16 bit, no supported */
 } adc_res_t;
 /** @} */
 #endif /* ndef DOXYGEN */
