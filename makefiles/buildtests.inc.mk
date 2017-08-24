@@ -114,13 +114,13 @@ info-objsize:
 	  *) echo "Usage: $(MAKE) info-objsize SORTROW=[text|data|bss|dec]" ; return ;; \
 	esac; \
 	echo -e '   text\t   data\t    bss\t    dec\t    hex\tfilename'; \
-	$(SIZE) -dB $(BASELIBS) | \
+	$(SIZE) -d -B $(BASELIBS) | \
 	  tail -n+2 | \
 	  sed -e 's#$(BINDIR)##' | \
 	  sort -rnk$${SORTROW}
 
 info-buildsize:
-	@$(SIZE) -dB $(BINDIR)/$(APPLICATION).elf || echo ''
+	@$(SIZE) -d -B $(BINDIR)/$(APPLICATION).elf || echo ''
 
 info-buildsizes: SHELL=bash
 info-buildsizes:
