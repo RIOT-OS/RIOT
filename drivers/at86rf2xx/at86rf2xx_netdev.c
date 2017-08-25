@@ -382,7 +382,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
             /* don't set res to set netdev_ieee802154_t::pan */
             break;
         case NETOPT_CHANNEL:
-            assert(len != sizeof(uint8_t));
+            assert(len <= sizeof(uint16_t));
             uint8_t chan = ((uint8_t *)val)[0];
             if (chan < AT86RF2XX_MIN_CHANNEL ||
                 chan > AT86RF2XX_MAX_CHANNEL) {
@@ -394,7 +394,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
             break;
 
         case NETOPT_CHANNEL_PAGE:
-            assert(len != sizeof(uint8_t));
+            assert(len <= sizeof(uint16_t));
             uint8_t page = ((uint8_t *)val)[0];
 #ifdef MODULE_AT86RF212B
             if ((page != 0) && (page != 2)) {
