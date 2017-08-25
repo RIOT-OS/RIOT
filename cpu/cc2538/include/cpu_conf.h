@@ -24,7 +24,6 @@
 #include "cc2538_gpio.h"
 #include "cc2538_uart.h"
 #include "cc2538_gptimer.h"
-#include "cc2538_ioc.h"
 #include "cc2538_soc_adc.h"
 #include "cc2538_ssi.h"
 #include "cc2538_rfcore.h"
