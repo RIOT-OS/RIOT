@@ -42,7 +42,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
 static void _isr(netdev_t *netdev);
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
-static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len);
+static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len);
 
 const netdev_driver_t sx127x_driver = {
     .send = _send,
@@ -344,7 +344,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     return 0;
 }
 
-static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
+static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
     sx127x_t *dev = (sx127x_t*) netdev;
     int res = -ENOTSUP;
@@ -356,21 +356,21 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
     switch(opt) {
         case NETOPT_STATE:
             assert(len <= sizeof(netopt_state_t));
-            return _set_state(dev, *((netopt_state_t*) val));
+            return _set_state(dev, *((const netopt_state_t*) val));
 
         case NETOPT_DEVICE_MODE:
             assert(len <= sizeof(uint8_t));
-            sx127x_set_modem(dev, *((uint8_t*) val));
+            sx127x_set_modem(dev, *((const uint8_t*) val));
             return sizeof(netopt_enable_t);
 
         case NETOPT_CHANNEL:
             assert(len <= sizeof(uint32_t));
-            sx127x_set_channel(dev, *((uint32_t*) val));
+            sx127x_set_channel(dev, *((const uint32_t*) val));
             return sizeof(uint32_t);
 
         case NETOPT_BANDWIDTH:
             assert(len <= sizeof(uint8_t));
-            uint8_t bw = *((uint8_t *)val);
+            uint8_t bw = *((const uint8_t *)val);
             if (bw < SX127X_BW_125_KHZ ||
                 bw > SX127X_BW_500_KHZ) {
                 res = -EINVAL;
@@ -381,7 +381,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
 
         case NETOPT_SPREADING_FACTOR:
             assert(len <= sizeof(uint8_t));
-            uint8_t sf = *((uint8_t *)val);
+            uint8_t sf = *((const uint8_t *)val);
             if (sf < SX127X_SF6 ||
                 sf > SX127X_SF12) {
                 res = -EINVAL;
@@ -392,7 +392,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
 
         case NETOPT_CODING_RATE:
             assert(len <= sizeof(uint8_t));
-            uint8_t cr = *((uint8_t *)val);
+            uint8_t cr = *((const uint8_t *)val);
             if (cr < SX127X_CR_4_5 ||
                 cr > SX127X_CR_4_8) {
                 res = -EINVAL;
@@ -403,57 +403,57 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
 
         case NETOPT_MAX_PACKET_SIZE:
             assert(len <= sizeof(uint8_t));
-            sx127x_set_max_payload_len(dev, *((uint8_t*) val));
+            sx127x_set_max_payload_len(dev, *((const uint8_t*) val));
             return sizeof(uint8_t);
 
         case NETOPT_INTEGRITY_CHECK:
             assert(len <= sizeof(netopt_enable_t));
-            sx127x_set_crc(dev, *((netopt_enable_t*) val) ? true : false);
+            sx127x_set_crc(dev, *((const netopt_enable_t*) val) ? true : false);
             return sizeof(netopt_enable_t);
 
         case NETOPT_CHANNEL_HOP:
             assert(len <= sizeof(netopt_enable_t));
-            sx127x_set_freq_hop(dev, *((netopt_enable_t*) val) ? true : false);
+            sx127x_set_freq_hop(dev, *((const netopt_enable_t*) val) ? true : false);
             return sizeof(netopt_enable_t);
 
         case NETOPT_CHANNEL_HOP_PERIOD:
             assert(len <= sizeof(uint8_t));
-            sx127x_set_hop_period(dev, *((uint8_t*) val));
+            sx127x_set_hop_period(dev, *((const uint8_t*) val));
             return sizeof(uint8_t);
 
         case NETOPT_SINGLE_RECEIVE:
             assert(len <= sizeof(uint8_t));
-            sx127x_set_rx_single(dev, *((netopt_enable_t*) val) ? true : false);
+            sx127x_set_rx_single(dev, *((const netopt_enable_t*) val) ? true : false);
             return sizeof(netopt_enable_t);
 
         case NETOPT_RX_TIMEOUT:
             assert(len <= sizeof(uint32_t));
-            sx127x_set_rx_timeout(dev, *((uint32_t*) val));
+            sx127x_set_rx_timeout(dev, *((const uint32_t*) val));
             return sizeof(uint32_t);
 
         case NETOPT_TX_TIMEOUT:
             assert(len <= sizeof(uint32_t));
-            sx127x_set_tx_timeout(dev, *((uint32_t*) val));
+            sx127x_set_tx_timeout(dev, *((const uint32_t*) val));
             return sizeof(uint32_t);
 
         case NETOPT_TX_POWER:
             assert(len <= sizeof(uint8_t));
-            sx127x_set_tx_power(dev, *((uint8_t*) val));
+            sx127x_set_tx_power(dev, *((const uint8_t*) val));
             return sizeof(uint16_t);
 
         case NETOPT_FIXED_HEADER:
             assert(len <= sizeof(netopt_enable_t));
-            sx127x_set_fixed_header_len_mode(dev, *((netopt_enable_t*) val) ? true : false);
+            sx127x_set_fixed_header_len_mode(dev, *((const netopt_enable_t*) val) ? true : false);
             return sizeof(netopt_enable_t);
 
         case NETOPT_PREAMBLE_LENGTH:
             assert(len <= sizeof(uint16_t));
-            sx127x_set_preamble_length(dev, *((uint16_t*) val));
+            sx127x_set_preamble_length(dev, *((const uint16_t*) val));
             return sizeof(uint16_t);
 
         case NETOPT_IQ_INVERT:
             assert(len <= sizeof(netopt_enable_t));
-            sx127x_set_iq_invert(dev, *((netopt_enable_t*) val) ? true : false);
+            sx127x_set_iq_invert(dev, *((const netopt_enable_t*) val) ? true : false);
             return sizeof(bool);
 
         default:
