@@ -40,6 +40,30 @@ extern "C" {
 #define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
 /** @} */
 
+/**
+ * @brief   Override ADC resolution values
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xf0,   /**< not supported by hardware */
+    ADC_RES_8BIT  = 0x00,   /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x01,   /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x02,   /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xf1,   /**< supported with oversampling */
+    ADC_RES_16BIT = 0xf2    /**< not supported by hardware */
+} adc_res_t;
+/** @} */
+
+/**
+ * @name    ADC configuration, valid for all boards using this CPU
+ *
+ * The NRF52832 has a fixed mapping of ADC pins and a fixed number of ADC channels,
+ * so this ADC configuration is valid for all boards using this CPU. No need for
+ * any board specific configuration.
+ */
+#define ADC_NUMOF           (8U)
+
 #ifdef __cplusplus
 }
 #endif
