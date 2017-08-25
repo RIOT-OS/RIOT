@@ -1,5 +1,5 @@
 /*
- * Copyright (C)  2016 Inria
+ * Copyright (C)  2016-2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-mkr1000
+ * @ingroup     boards_arduino-mkr-common
  * @{
  *
  * @file

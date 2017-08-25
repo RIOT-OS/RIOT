@@ -1,6 +1,6 @@
 /*
  * Copyright (C)  2016 Freie Universität Berlin
- *                2016 Inria
+ *                2016-2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,15 +8,13 @@
  */
 
 /**
- * @ingroup     boards_arduino-mkr1000
- * @{
+ * @ingroup     boards_arduino-mkr-common
  *
  * @file
- * @brief       Board specific implementations for the Arduino MKR1000 board
+ * @brief       Board common implementations for the Arduino MKR boards
  *
- * @author      Hauke Pertersen  <hauke.pertersen@fu-berlin.de>
+ *  @author      Hauke Pertersen  <hauke.pertersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
- *
  * @}
  */
 
@@ -28,6 +26,6 @@ void board_init(void)
 {
     /* initialize the CPU */
     cpu_init();
-    /* initialize the on-board Green "L" LED on pin PA20 */
+    /* initialize the on-board Amber "L" LED */
     gpio_init(LED0_PIN, GPIO_OUT);
 }

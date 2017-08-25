@@ -1,6 +1,6 @@
 /*
  * Copyright (C)  2016 Freie Universität Berlin
- *                2016 Inria
+ *                2016-2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -26,11 +26,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   The on-board LED is connected to pin 6 on this board
- */
-#define ARDUINO_LED         (6)
 
 /**
  * @brief   Look-up table for the Arduino's digital pins

@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-duemilanove \
                              arduino-mega2560 \
                              arduino-mkr1000 \
+                             arduino-mkrzero \
                              arduino-uno \
                              arduino-zero \
                              b-l072z-lrwan1 \
@@ -77,6 +78,7 @@ DISABLE_TEST_FOR_ARM7 := tests-relic tests-cpp_%
 ARM_CORTEX_M_BOARDS := airfy-beacon \
                        arduino-due \
                        arduino-mkr1000 \
+                       arduino-mkrzero \
                        arduino-zero \
                        b-l072z-lrwan1 \
                        cc2538dk \

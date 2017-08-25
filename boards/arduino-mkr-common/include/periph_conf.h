@@ -1,6 +1,6 @@
 /*
  * Copyright (C)  2016 Freie Universität Berlin
- *                2016 Inria
+ *                2016-2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,11 +8,11 @@
  */
 
 /**
- * @ingroup     boards_arduino-mkr1000
+ * @ingroup     boards_arduino-mkr-common
  * @{
  *
  * @file
- * @brief       Configuration of CPU peripherals for Arduino MKR1000 board
+ * @brief       Configuration of CPU peripherals for Arduino MKR boards
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -24,9 +24,6 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include <stdint.h>
-
-#include "cpu.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
@@ -34,7 +31,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   External oscillator and clock configuration
+ * @name    External oscillator and clock configuration
  *
  * For selection of the used CORECLOCK, we have implemented two choices:
  *
@@ -127,32 +124,23 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 #define PWM_0_EN            1
-#define PWM_1_EN            1
-#define PWM_MAX_CHANNELS    2
+#define PWM_MAX_CHANNELS    (2U)
 /* for compatibility with test application */
 #define PWM_0_CHANNELS      PWM_MAX_CHANNELS
-#define PWM_1_CHANNELS      PWM_MAX_CHANNELS
 
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
     {TCC0, {
         /* GPIO pin, MUX value, TCC channel */
-        { GPIO_PIN(PA, 8), GPIO_MUX_E,  0 },
-        { GPIO_PIN(PA, 9), GPIO_MUX_E,  1 },
-    }},
-#endif
-#if PWM_1_EN
-    {TCC1, {
-        /* GPIO pin, MUX value, TCC channel */
-        { GPIO_PIN(PA, 6), GPIO_MUX_E, 0 },
-        { GPIO_PIN(PA, 7), GPIO_MUX_E, 1 },
-    }},
+        { GPIO_PIN(PA, 10), GPIO_MUX_F, 2 },    /* ~2 */
+        { GPIO_PIN(PA, 11), GPIO_MUX_F, 3 },    /* ~3 */
+    }}
 #endif
 };
 
 /* number of devices that are actually defined */
-#define PWM_NUMOF           (2U)
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
 /** @} */
 
 /**
@@ -204,7 +192,7 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1
     },
-    {   /* SPI Pins connected to WINC1500 wifi module */
+    {
         .dev      = &SERCOM2->SPI,
         .miso_pin = GPIO_PIN(PA, 15),
         .mosi_pin = GPIO_PIN(PA, 12),
