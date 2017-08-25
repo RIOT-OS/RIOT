@@ -60,7 +60,7 @@ typedef uint16_t gpio_t;
  *
  * We use the following bits to encode the pin mode:
  * - bit 0: 0 for pull-down or 1 for pull-up
- * - bit 1: pull register enable (as configured in bit 0)
+ * - bit 1: pull resistor enable (as configured in bit 0)
  * - bit 5: OD enable
  * - bit 7: output or input mode
  */
