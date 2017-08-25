@@ -95,13 +95,8 @@ static uint32_t scl_delay;
 
 static void cc2538_i2c_init_master(i2c_t dev, uint32_t speed_hz);
 
-static inline bool bus_quiet(i2c_t dev)
-{
-    return (gpio_read(SCL_PIN(dev)) && gpio_read(SDA_PIN(dev)));
-}
 
-static void i2cm_ctrl_write(uint_fast8_t value) {
-    WARN_IF(I2CM_STAT & BUSY);
+static inline void i2cm_ctrl_write(uint_fast8_t value) {
     I2CM_CTRL = value;
 }
 
@@ -173,8 +168,8 @@ void cc2538_i2c_init_master(i2c_t dev, uint32_t speed_hz)
     /* clear periph reset trigger */
     SYS_CTRL_SRI2C &= ~1;
 
-    gpio_init_af(SCL_PIN(dev), I2C_CMSSCL, IOC_OVERRIDE_PUE);
-    gpio_init_af(SDA_PIN(dev), I2C_CMSSDA, IOC_OVERRIDE_PUE);
+    gpio_init_af(SCL_PIN(dev), I2C_CMSSCL, GPIO_IN_PU);
+    gpio_init_af(SDA_PIN(dev), I2C_CMSSDA, GPIO_IN_PU);
     IOC_I2CMSSCL = gpio_pp_num(SCL_PIN(dev));
     IOC_I2CMSSDA = gpio_pp_num(SDA_PIN(dev));
 
