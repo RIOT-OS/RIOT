@@ -48,15 +48,6 @@ static int _set_channel(uint16_t channel)
     return _dev->driver->set(_dev, NETOPT_CHANNEL, &channel, sizeof(uint16_t));
 }
 
-/*get transmission power from driver */
-static int16_t _get_power(void)
-{
-    int16_t power;
-
-    _dev->driver->get(_dev, NETOPT_TX_POWER, &power, sizeof(int16_t));
-    return power;
-}
-
 /* set transmission power */
 static int _set_power(int16_t power)
 {
@@ -138,8 +129,7 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
     DEBUG("Openthread: Received pkt\n");
     netdev_ieee802154_rx_info_t rx_info;
     /* Read frame length from driver */
-    int len = dev->driver->recv(dev, NULL, 0, &rx_info);
-    Rssi = rx_info.rssi;
+    int len = dev->driver->recv(dev, NULL, 0, NULL);
 
     /* very unlikely */
     if ((len > (unsigned) UINT16_MAX)) {
@@ -152,10 +142,13 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
     /* Openthread needs a packet length with FCS included,
      * OpenThread do not use the data so we don't need to calculate FCS */
     sReceiveFrame.mLength = len + RADIO_IEEE802154_FCS_LEN;
-    sReceiveFrame.mPower = _get_power();
 
     /* Read received frame */
-    int res = dev->driver->recv(dev, (char *) sReceiveFrame.mPsdu, len, NULL);
+    int res = dev->driver->recv(dev, (char *) sReceiveFrame.mPsdu, len, &rx_info);
+
+    /* Get RSSI from a radio driver. RSSI should be in [dBm] */
+    Rssi = (int8_t)rx_info.rssi;
+    sReceiveFrame.mPower = Rssi;
 
    DEBUG("Received message: len %d\n", (int) sReceiveFrame.mLength);
     for (int i = 0; i < sReceiveFrame.mLength; ++i) {
