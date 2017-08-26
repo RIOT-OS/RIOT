@@ -386,7 +386,7 @@ typedef struct netdev_driver {
      * @return              `< 0` on error, 0 on success
      */
     int (*set)(netdev_t *dev, netopt_t opt,
-               void *value, size_t value_len);
+               const void *value, size_t value_len);
 } netdev_driver_t;
 
 #ifdef __cplusplus

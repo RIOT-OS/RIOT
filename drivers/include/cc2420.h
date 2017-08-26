@@ -154,7 +154,7 @@ void cc2420_get_addr_short(cc2420_t *dev, uint8_t *addr);
  * @param[in] dev           device to write to
  * @param[in] addr          (2-byte) short address to set
  */
-void cc2420_set_addr_short(cc2420_t *dev, uint8_t *addr);
+void cc2420_set_addr_short(cc2420_t *dev, const uint8_t *addr);
 
 /**
  * @brief   Get the configured long address of the given device
@@ -172,7 +172,7 @@ void cc2420_get_addr_long(cc2420_t *dev, uint8_t *addr_long);
  * @param[in] dev           device to write to
  * @param[in] addr_long     (8-byte) long address to set
  */
-void cc2420_set_addr_long(cc2420_t *dev, uint8_t *addr_long);
+void cc2420_set_addr_long(cc2420_t *dev, const uint8_t *addr_long);
 
 /**
  * @brief   Get the configured PAN ID of the given device
