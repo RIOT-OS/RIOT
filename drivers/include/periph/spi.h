@@ -70,14 +70,14 @@ extern "C" {
  * @brief   Default SPI device access macro
  */
 #ifndef SPI_DEV
-#define SPI_DEV(x)      (x)
+#define SPI_DEV      (0)	/* change */
 #endif
 
 /**
  * @brief   Define global value for undefined SPI device
  */
 #ifndef SPI_UNDEF
-#define SPI_UNDEF       (UINT_MAX)
+#define SPI_UNDEF       (1U)	/* change */
 #endif
 
 /**

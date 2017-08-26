@@ -29,7 +29,7 @@
 /**
  * Interrupt vector base address, defined by the linker
  */
-extern const void *_isr_vectors;
+//extern const void *_isr_vectors;      /* change */
 
 void cortexm_init(void)
 {
@@ -43,7 +43,8 @@ void cortexm_init(void)
 #if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
     defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7) || \
     (defined(CPU_ARCH_CORTEX_M0PLUS) && (__VTOR_PRESENT == 1))
-    SCB->VTOR = (uint32_t)&_isr_vectors;
+   // SCB->VTOR = (uint32_t)&_isr_vectors;
+   SCB->VTOR = CPU_FLASH_BASE;        /* change */
 #endif
 
     /* initialize the interrupt priorities */
