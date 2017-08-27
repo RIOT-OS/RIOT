@@ -27,10 +27,10 @@ extern "C" {
 #endif
 
 /**
- * @name Clock settings
+ * @name    Clock settings
  *
- * @note This is auto-generated from
- *       `cpu/stm32_common/dist/clk_conf/clk_conf.c`
+ * @note    This is auto-generated from
+ *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
  * @{
  */
 /* give the target core clock (HCLK) frequency [in Hz],
