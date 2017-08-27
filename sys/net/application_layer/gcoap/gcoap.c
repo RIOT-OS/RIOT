@@ -164,7 +164,32 @@ static void _listen(sock_udp_t *sock)
     }
 
     if (pdu.hdr->code == COAP_CODE_EMPTY) {
-        DEBUG("gcoap: empty messages not handled yet\n");
+        _find_req_memo(&memo, &pdu, GCOAP_FIND_REQ_MSGID);
+        if (memo) {
+            /* empty ACK for confirmable request */
+            if (coap_get_type(&pdu) == COAP_TYPE_ACK && memo->send_limit >= 0) {
+                /* For an observe notification ACK from the client, no further
+                 * response expected. Clear the request memo. */
+                gcoap_observe_memo_t *obs_memo = NULL;
+                coap_hdr_t *req_hdr = (coap_hdr_t *)memo->msg.data.pdu_buf;
+                unsigned token_len  = req_hdr->ver_t_tkl & 0xf;
+                uint8_t *token      = token_len > 0 ? &req_hdr->data[0] : NULL;
+                _find_obs_memo(&obs_memo, &remote, token, token_len);
+                if (obs_memo) {
+                    xtimer_remove(&memo->response_timer);
+                    *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
+                    memo->state = GCOAP_MEMO_UNUSED;
+                }
+                else {
+                    /* For an immediate ACK from a server, we expect a separate
+                     * response later. Not supported yet. */
+                    DEBUG("gcoap: separate response not supported yet\n");
+                }
+            }
+        }
+        else {
+            DEBUG("gcoap: can't match empty message to request\n");
+        }
         return;
     }
 
@@ -196,7 +221,9 @@ static void _listen(sock_udp_t *sock)
             case COAP_TYPE_ACK:
                 xtimer_remove(&memo->response_timer);
                 memo->state = GCOAP_MEMO_RESP;
-                memo->resp_handler(memo->state, &pdu, &remote);
+                if (memo->resp_handler) {
+                    memo->resp_handler(memo->state, &pdu, &remote);
+                }
 
                 if (memo->send_limit >= 0) {        /* if confirmable */
                     *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
@@ -751,7 +778,6 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
 {
     gcoap_request_memo_t *memo = NULL;
     assert(remote != NULL);
-    assert(resp_handler != NULL);
 
     /* Find empty slot in list of open requests. */
     mutex_lock(&_coap_state.lock);
@@ -904,11 +930,20 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
     gcoap_observe_memo_t *memo = NULL;
 
     _find_obs_memo_resource(&memo, resource);
-
-    if (memo) {
-        return sock_udp_send(&_sock, buf, len, memo->observer);
+    if (!memo) {
+        return 0;
     }
-    else {
+
+    coap_hdr_t *hdr   = (coap_hdr_t *)buf;
+    unsigned msg_type = (hdr->ver_t_tkl & 0x30) >> 4;
+
+    switch (msg_type) {
+    case COAP_TYPE_NON:
+        return sock_udp_send(&_sock, buf, len, memo->observer);
+    case COAP_TYPE_CON:
+        return gcoap_req_send2(buf, len, memo->observer, NULL);
+    default:
+        DEBUG("gcoap: unexpected obs msg type: %u\n", msg_type);
         return 0;
     }
 }
