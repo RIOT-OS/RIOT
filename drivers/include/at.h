@@ -113,7 +113,7 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
  * @param[in]   len         len of @p buffer
  * @param[in]   timeout     timeout (in usec)
  *
- * @returns     lenght of response on success
+ * @returns     length of response on success
  * @returns     <0 on error
  */
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
@@ -133,7 +133,7 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @param[in]   len         len of @p buffer
  * @param[in]   timeout     timeout (in usec)
  *
- * @returns     lenght of response on success
+ * @returns     length of response on success
  * @returns     <0 on error
  */
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
