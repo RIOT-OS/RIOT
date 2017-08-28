@@ -67,7 +67,7 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             if (CLOCK_CORECLOCK > 20000000U || CLOCK_CORECLOCK < 1000000U) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK/10000)-16)/(2*4);  // CLK Prescaler 4
+            twibrr = ((CLOCK_CORECLOCK / 10000) - 16) / (2 * 4);  /* CLK Prescaler 4 */
             twipb = 1;
             break;
 
@@ -75,28 +75,28 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             if (CLOCK_CORECLOCK > 50000000U || CLOCK_CORECLOCK < 2000000U) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK/100000)-16)/2;
+            twibrr = ((CLOCK_CORECLOCK / 100000) - 16) / 2;
             break;
 
         case I2C_SPEED_FAST:
             if (CLOCK_CORECLOCK < 7500000U) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK/400000)-16)/2;
+            twibrr = ((CLOCK_CORECLOCK / 400000) - 16) / 2;
             break;
 
         case I2C_SPEED_FAST_PLUS:
             if (CLOCK_CORECLOCK < 18000000U) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK/1000000)-16)/2;
+            twibrr = ((CLOCK_CORECLOCK / 1000000) - 16) / 2;
             break;
 
         case I2C_SPEED_HIGH:
             if (CLOCK_CORECLOCK < 62000000U) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK/3400000)-16)/2;
+            twibrr = ((CLOCK_CORECLOCK / 3400000) - 16) / 2;
             break;
 
         default:
