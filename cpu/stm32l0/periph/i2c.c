@@ -66,8 +66,10 @@ static mutex_t locks[] =  {
 int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 {
     I2C_TypeDef *i2c;
-    gpio_t scl;
-    gpio_t sda;
+    gpio_t scl_pin;
+    gpio_t sda_pin;
+    gpio_af_t scl_af;
+    gpio_af_t sda_af;
     uint32_t presc, scll, sclh, sdadel, scldel, timing;
 
     /*
@@ -116,8 +118,10 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 #if I2C_0_EN
         case I2C_0:
             i2c = I2C_0_DEV;
-            scl = GPIO_PIN(I2C_0_SCL_PORT, I2C_0_SCL_PIN);     /* scl pin number */
-            sda = GPIO_PIN(I2C_0_SDA_PORT, I2C_0_SDA_PIN);     /* sda pin number */
+            scl_pin = GPIO_PIN(I2C_0_SCL_PORT, I2C_0_SCL_PIN);     /* scl pin number */
+            sda_pin = GPIO_PIN(I2C_0_SDA_PORT, I2C_0_SDA_PIN);     /* sda pin number */
+            scl_af = I2C_0_SCL_AF;
+            sda_af = I2C_0_SDA_AF;
             I2C_0_CLKEN();
             I2C_0_SCL_CLKEN();
             I2C_0_SDA_CLKEN();
@@ -126,11 +130,25 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 #if I2C_1_EN
         case I2C_1:
             i2c = I2C_1_DEV;
-            scl = GPIO_PIN(I2C_1_SCL_PORT, I2C_1_SCL_PIN);     /* scl pin number */
-            sda = GPIO_PIN(I2C_1_SDA_PORT, I2C_1_SDA_PIN);     /* sda pin number */
+            scl_pin = GPIO_PIN(I2C_1_SCL_PORT, I2C_1_SCL_PIN);     /* scl pin number */
+            sda_pin = GPIO_PIN(I2C_1_SDA_PORT, I2C_1_SDA_PIN);     /* sda pin number */
+            scl_af = I2C_1_SCL_AF;
+            sda_af = I2C_1_SDA_AF;
             I2C_1_CLKEN();
             I2C_1_SCL_CLKEN();
             I2C_1_SDA_CLKEN();
+            break;
+#endif
+#if I2C_2_EN
+        case I2C_2:
+            i2c = I2C_2_DEV;
+            scl_pin = GPIO_PIN(I2C_2_SCL_PORT, I2C_2_SCL_PIN);     /* scl pin number */
+            sda_pin = GPIO_PIN(I2C_2_SDA_PORT, I2C_2_SDA_PIN);     /* sda pin number */
+            scl_af = I2C_2_SCL_AF;
+            sda_af = I2C_2_SDA_AF;
+            I2C_2_CLKEN();
+            I2C_2_SCL_CLKEN();
+            I2C_2_SDA_CLKEN();
             break;
 #endif
 
@@ -139,10 +157,10 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     }
 
     /* configure pins */
-    gpio_init(scl, GPIO_OD_PU);
-    gpio_init_af(scl, GPIO_AF4);
-    gpio_init(sda, GPIO_OD_PU);
-    gpio_init_af(sda, GPIO_AF4);
+    gpio_init(scl_pin, GPIO_OD_PU);
+    gpio_init_af(scl_pin, scl_af);
+    gpio_init(sda_pin, GPIO_OD_PU);
+    gpio_init_af(sda_pin, sda_af);
 
     /* configure device */
     _i2c_init(i2c, presc, scll, sclh, sdadel, scldel, timing);
@@ -211,6 +229,11 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
             i2c = I2C_1_DEV;
             break;
 #endif
+#if I2C_2_EN
+        case I2C_2:
+            i2c = I2C_2_DEV;
+            break;
+#endif
 
         default:
             return -1;
@@ -246,6 +269,11 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int lengt
 #if I2C_1_EN
         case I2C_1:
             i2c = I2C_1_DEV;
+            break;
+#endif
+#if I2C_2_EN
+        case I2C_2:
+            i2c = I2C_2_DEV;
             break;
 #endif
 
@@ -291,6 +319,11 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
             i2c = I2C_1_DEV;
             break;
 #endif
+#if I2C_2_EN
+        case I2C_2:
+            i2c = I2C_2_DEV;
+            break;
+#endif
 
         default:
             return -1;
@@ -326,6 +359,11 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
 #if I2C_1_EN
         case I2C_1:
             i2c = I2C_1_DEV;
+            break;
+#endif
+#if I2C_2_EN
+        case I2C_2:
+            i2c = I2C_2_DEV;
             break;
 #endif
 
@@ -366,6 +404,11 @@ void i2c_poweron(i2c_t dev)
             I2C_1_CLKEN();
             break;
 #endif
+#if I2C_2_EN
+        case I2C_2:
+            I2C_2_CLKEN();
+            break;
+#endif
     }
 }
 
@@ -383,7 +426,14 @@ void i2c_poweroff(i2c_t dev)
         case I2C_1:
             while (I2C_1_DEV->ISR & I2C_ISR_BUSY) {}
 
-            I2C_0_CLKDIS();
+            I2C_1_CLKDIS();
+            break;
+#endif
+#if I2C_2_EN
+        case I2C_2:
+            while (I2C_2_DEV->ISR & I2C_ISR_BUSY) {}
+
+            I2C_2_CLKDIS();
             break;
 #endif
     }

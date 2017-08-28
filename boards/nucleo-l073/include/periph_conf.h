@@ -208,21 +208,20 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_SDA_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
 
 /* I2C 1 device configuration */
-#define I2C_1_DEV           I2C3
-#define I2C_1_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C3EN))
-#define I2C_1_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C3EN))
-#define I2C_1_EVT_IRQ       I2C3_IRQn
-#define I2C_1_EVT_ISR       isr_i2c3
+#define I2C_1_DEV           I2C2
+#define I2C_1_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C2EN))
+#define I2C_1_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C2EN))
+#define I2C_1_EVT_IRQ       I2C2_IRQn
+#define I2C_1_EVT_ISR       isr_i2c2
 /* I2C 1 pin configuration */
-#define I2C_1_SCL_PORT      PORT_A
-#define I2C_1_SCL_PIN       8
-#define I2C_1_SCL_AF        3
-#define I2C_1_SCL_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOAEN))
+#define I2C_1_SCL_PORT      PORT_B
+#define I2C_1_SCL_PIN       13
+#define I2C_1_SCL_AF        5
+#define I2C_1_SCL_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
 #define I2C_1_SDA_PORT      PORT_B
-#define I2C_1_SDA_PIN       5
-#define I2C_1_SDA_AF        8
+#define I2C_1_SDA_PIN       14
+#define I2C_1_SDA_AF        5
 #define I2C_1_SDA_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
-/** @} */
 
 /** @} */
 
