@@ -187,7 +187,7 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
 {
     int res;
-    char resp_buf[32];
+    char resp_buf[64];
 
     res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf), timeout);
     if (res > 0) {
