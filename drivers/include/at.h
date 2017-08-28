@@ -16,7 +16,7 @@
  * Most functions compare the bytes echoed by the device with what they
  * intended to send, and bail out if there's no match.
  *
- * Furthermore, the library tries to copy with difficulties regarding different
+ * Furthermore, the library tries to cope with difficulties regarding different
  * line endings. It usually sends "<command><CR>", but expects
  * "<command>\LF\CR" as echo.
  *
