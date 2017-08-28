@@ -89,6 +89,19 @@ typedef uint32_t gpio_t;
  */
 #define ADC_NUMOF           (16U)
 
+/**
+ * @brief   DAC configuration, valid for all boards using this CPU
+ *
+ * The sam3 has a fixed mapping of DAC pins and a fixed number of DAC channels,
+ * so this DAC configuration is valid for all boards using this CPU. No need for
+ * any board specific configuration.
+ *
+ * The sam3's DAC channels are mapped to the following fixed pins:
+ * - line 0 (ch0): PB15
+ * - line 1 (ch1): PB16
+ */
+#define DAC_NUMOF           (2U)
+
 #ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes
