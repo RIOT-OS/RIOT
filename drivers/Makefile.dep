@@ -22,8 +22,10 @@ ifneq (,$(filter apa102,$(USEMODULE)))
 endif
 
 ifneq (,$(filter at,$(USEMODULE)))
-    USEMODULE += fmt
-    USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_uart
+  USEMODULE += fmt
+  USEMODULE += xtimer
+  USEMODULE += isrpipe
 endif
 
 ifneq (,$(filter at30tse75x,$(USEMODULE)))

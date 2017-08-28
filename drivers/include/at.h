@@ -16,7 +16,7 @@
  * Most functions compare the bytes echoed by the device with what they
  * intended to send, and bail out if there's no match.
  *
- * Furthermore, the library tries to copy with difficulties regarding different
+ * Furthermore, the library tries to cope with difficulties regarding different
  * line endings. It usually sends "<command><CR>", but expects
  * "<command>\LF\CR" as echo.
  *
@@ -34,6 +34,7 @@
 #define AT_H
 
 #include <stdint.h>
+#include <unistd.h>
 
 #include "isrpipe.h"
 #include "periph/uart.h"
@@ -42,10 +43,18 @@
 extern "C" {
 #endif
 
-#ifndef AT_END_OF_LINE
+#ifndef AT_SEND_EOL
 /** End of line character to send after the AT command */
-#define AT_END_OF_LINE "\r"
+#define AT_SEND_EOL "\r"
 #endif
+
+#ifndef AT_SEND_ECHO
+/** Enable/disable the expected echo after an AT command is sent */
+#define AT_SEND_ECHO 1
+#endif
+
+/** Shortcut for getting send end of line length */
+#define AT_SEND_EOL_LEN  (sizeof(AT_SEND_EOL) - 1)
 
 /**
  * @brief AT device structure
@@ -54,7 +63,6 @@ typedef struct {
     isrpipe_t isrpipe;      /**< isrpipe used for getting data from uart */
     uart_t uart;            /**< UART device where the AT device is attached */
 } at_dev_t;
-
 
 /**
  * @brief   Initialize AT device struct
@@ -71,7 +79,7 @@ typedef struct {
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize);
 
 /**
- * @brief   simple command helper
+ * @brief   Simple command helper
  *
  * This function sends an AT command to the device and waits for "OK".
  *
@@ -85,10 +93,10 @@ int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout);
 
 /**
- * @brief   send AT command, wait for a prompt
+ * @brief   Send AT command, wait for a prompt
  *
- * This function will send the supplied @p command, then wait for the prompt (>)
- * character and return
+ * This function sends the supplied @p command, then waits for the prompt (>)
+ * character and returns
  *
  * @param[in]   dev     device to operate on
  * @param[in]   command command string to send
@@ -100,9 +108,9 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout);
 int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout);
 
 /**
- * @brief   send AT command, wait for response
+ * @brief   Send AT command, wait for response
  *
- * This function will send the supplied @p command, then wait and return one
+ * This function sends the supplied @p command, then waits and returns one
  * line of response.
  *
  * A possible empty line will be skipped.
@@ -113,15 +121,15 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
  * @param[in]   len         len of @p buffer
  * @param[in]   timeout     timeout (in usec)
  *
- * @returns     lenght of response on success
+ * @returns     length of response on success
  * @returns     <0 on error
  */
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
 
 /**
- * @brief   send AT command, wait for multiline response
+ * @brief   Send AT command, wait for multiline response
  *
- * This function will send the supplied @p command, then return all response
+ * This function sends the supplied @p command, then returns all response
  * lines until the device sends "OK".
  *
  * If a line starts with "ERROR" or "+CME ERROR:", or the buffer is full, the
@@ -133,7 +141,7 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @param[in]   len         len of @p buffer
  * @param[in]   timeout     timeout (in usec)
  *
- * @returns     lenght of response on success
+ * @returns     length of response on success
  * @returns     <0 on error
  */
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
@@ -142,17 +150,16 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
  * @brief   Expect bytes from device
  *
  * @param[in]   dev     device to operate on
- * @param[in]   bytes   buffer containing bytes to expect
- * @param[in]   len     number of bytes to expect
+ * @param[in]   bytes   buffer containing bytes to expect (NULL-terminated)
  * @param[in]   timeout timeout (in usec)
  *
  * @returns     0 on success
  * @returns     <0 otherwise
  */
-int at_expect_bytes(at_dev_t *dev, const char *bytes, size_t len, uint32_t timeout);
+int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 
 /**
- * @brief  Send raw bytes to a device
+ * @brief   Send raw bytes to a device
  *
  * @param[in]   dev     device to operate on
  * @param[in]   bytes   buffer containing bytes to send
@@ -161,7 +168,7 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, size_t len, uint32_t timeo
 void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len);
 
 /**
- * @brief   send command to device
+ * @brief   Send command to device
  *
  * @param[in]   dev     device to operate on
  * @param[in]   command command to send
@@ -173,7 +180,7 @@ void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len);
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout);
 
 /**
- * @brief   read a line from device
+ * @brief   Read a line from device
  *
  * @param[in]   dev         device to operate on
  * @param[in]   resp_buf    buffer to store line
@@ -186,7 +193,7 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout);
 ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout);
 
 /**
- * @brief   drain device input buffer
+ * @brief   Drain device input buffer
  *
  * This function drains any possible bytes waiting in the device's input
  * buffer.
@@ -200,3 +207,4 @@ void at_drain(at_dev_t *dev);
 #endif
 
 #endif /* AT_H */
+/** @} */

@@ -32,19 +32,18 @@ int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t
     return 0;
 }
 
-int at_expect_bytes(at_dev_t *dev, const char *bytes, size_t len, uint32_t timeout)
+int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
 {
-    while (len) {
+    while (*bytes) {
         char c;
         int res;
         if ((res = isrpipe_read_timeout(&dev->isrpipe, &c, 1, timeout)) == 1) {
             if (AT_PRINT_INCOMING) {
                 print(&c, 1);
             }
-            if (!(c == *bytes++)) {
+            if (c != *bytes++) {
                 return -1;
             }
-            len--;
         }
         else {
             return res;
@@ -61,17 +60,19 @@ void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len)
 
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
 {
-    unsigned cmdlen = strlen(command);
+    size_t cmdlen = strlen(command);
 
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)AT_END_OF_LINE, sizeof(AT_END_OF_LINE) - 1);
+    uart_write(dev->uart, (const uint8_t *)AT_SEND_EOL, AT_SEND_EOL_LEN);
 
-    if (at_expect_bytes(dev, command, cmdlen, timeout)) {
-        return -1;
-    }
+    if (AT_SEND_ECHO) {
+        if (at_expect_bytes(dev, command, timeout)) {
+            return -1;
+        }
 
-    if (at_expect_bytes(dev, AT_END_OF_LINE "\r\n", sizeof(AT_END_OF_LINE) + 1, timeout)) {
-        return -2;
+        if (at_expect_bytes(dev, AT_SEND_EOL "\r\n", timeout)) {
+            return -2;
+        }
     }
 
     return 0;
@@ -83,13 +84,15 @@ void at_drain(at_dev_t *dev)
     int res;
 
     do {
+        /* consider no character within 10ms "drained" */
         res = isrpipe_read_timeout(&dev->isrpipe, _tmp, sizeof(_tmp), 10000U);
     } while (res > 0);
 }
 
-ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout)
+ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
+                             char *resp_buf, size_t len, uint32_t timeout)
 {
-    ssize_t res = -1;
+    ssize_t res;
 
     at_drain(dev);
 
@@ -108,9 +111,10 @@ out:
     return res;
 }
 
-ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout)
+ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
+                              char *resp_buf, size_t len, uint32_t timeout)
 {
-    ssize_t res = -1;
+    ssize_t res;
     size_t bytes_left = len - 1;
     char *pos = resp_buf;
 
@@ -123,7 +127,7 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
         goto out;
     }
 
-    while(1) {
+    while (1) {
         res = at_readline(dev, pos, bytes_left, timeout);
         if (res == 0) {
             continue;
@@ -138,6 +142,9 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
                 return -1;
             }
             else if (strncmp(pos, "+CME ERROR:", 11) == 0) {
+                return -1;
+            }
+            else if (strncmp(pos, "+CMS ERROR:", 11) == 0) {
                 return -1;
             }
             else {
@@ -167,17 +174,17 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
     at_drain(dev);
 
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)AT_END_OF_LINE, sizeof(AT_END_OF_LINE) - 1);
+    uart_write(dev->uart, (const uint8_t *)AT_SEND_EOL, AT_SEND_EOL_LEN);
 
-    if (at_expect_bytes(dev, command, cmdlen, timeout)) {
+    if (at_expect_bytes(dev, command, timeout)) {
         return -1;
     }
 
-    if (at_expect_bytes(dev, AT_END_OF_LINE "\n", sizeof(AT_END_OF_LINE), timeout)) {
+    if (at_expect_bytes(dev, AT_SEND_EOL "\n", timeout)) {
         return -2;
     }
 
-    if (at_expect_bytes(dev, ">", 1, timeout)) {
+    if (at_expect_bytes(dev, ">", timeout)) {
         return -3;
     }
 
@@ -187,7 +194,7 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
 {
     int res;
-    char resp_buf[32];
+    char resp_buf[64];
 
     res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf), timeout);
     if (res > 0) {
@@ -234,5 +241,8 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout)
     }
 
 out:
+    if (res < 0) {
+        *resp_buf = '\0';
+    }
     return res;
 }
