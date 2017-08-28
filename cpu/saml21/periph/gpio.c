@@ -138,6 +138,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* enable clocks for the EIC module */
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
     GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
+    /* disable the EIC module*/
+    EIC->CTRLA.reg = 0;
+    while (EIC->SYNCBUSY.reg & EIC_SYNCBUSY_ENABLE) {}
     /* configure the active flank */
     EIC->CONFIG[exti >> 3].reg &= ~(0xf << ((exti & 0x7) * 4));
     EIC->CONFIG[exti >> 3].reg |=  (flank << ((exti & 0x7) * 4));
