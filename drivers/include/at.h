@@ -55,7 +55,6 @@ typedef struct {
     uart_t uart;            /**< UART device where the AT device is attached */
 } at_dev_t;
 
-
 /**
  * @brief   Initialize AT device struct
  *
