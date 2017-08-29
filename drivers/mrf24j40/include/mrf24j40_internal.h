@@ -104,16 +104,6 @@ void mrf24j40_tx_normal_fifo_write(mrf24j40_t *dev, const uint16_t offset, const
 void mrf24j40_rx_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_t *data, const size_t len);
 
 /**
- * @brief   Write a chunk of data into the RX_FIFO area of the given device
- *
- * @param[in] dev       device to write to
- * @param[in] offset    address in the RX FIFO to write to [valid 0x00-0x1ff]
- * @param[in] data      data to copy into FIFO
- * @param[in] len       number of bytes to write to FIFO
- */
-void mrf24j40_rx_fifo_write(mrf24j40_t *dev, const uint16_t offset, const uint8_t *data, const size_t len);
-
-/**
  * @brief   Reset the pending task list of a device
  *
  * @param[in] dev       device to reset tasks of
