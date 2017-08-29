@@ -26,6 +26,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   System core clock speed, fixed to 64MHz for all NRF52x CPUs
+ */
+#define CLOCK_CORECLOCK     (64000000U)
+
+/**
  * @brief   Redefine some peripheral names to unify them between nRF51 and 52
  * @{
  */
