@@ -113,7 +113,7 @@ WEAK_DEFAULT void isr_cryp(void);
 WEAK_DEFAULT void isr_hash_rng(void);
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_wwdg,               /* [0] Window WatchDog */
     isr_pvd,                /* [1] PVD through EXTI Line detection */
     isr_tamp_stamp,         /* [2] Tamper and TimeStamps through the EXTI line */

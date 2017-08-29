@@ -20,8 +20,6 @@
  */
 
 #include <stdint.h>
-
-#include "cpu_conf.h"
 #include "vectors_cortexm.h"
 
 /* get the start of the ISR stack as defined in the linkerscript */
@@ -64,7 +62,7 @@ WEAK_DEFAULT void isr_ptc(void);
 WEAK_DEFAULT void isr_i2c(void);
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_pm,                 /*  0 Power Manager */
     isr_sysctrl,            /*  1 System Control */
     isr_wdt,                /*  2 Watchdog Timer */

@@ -109,7 +109,7 @@ WEAK_DEFAULT void isr_fpu(void);
 WEAK_DEFAULT void isr_spi4(void);
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_wwdg,               /* [0] Window WatchDog Interrupt */
     isr_pvd,                /* [1] PVD through EXTI Line detection Interrupt */
     isr_tamp_stamp,         /* [2] Tamper and TimeStamp interrupts through the EXTI line 19 */

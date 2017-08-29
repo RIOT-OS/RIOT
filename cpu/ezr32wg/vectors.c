@@ -72,7 +72,7 @@ WEAK_DEFAULT void isr_emu(void);
 WEAK_DEFAULT void isr_fpueh(void);
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_dma,                /* 0 - DMA       */
     isr_gpio_even,          /* 1 - GPIO_EVEN       */
     isr_timer0,             /* 2 - TIMER0       */

@@ -67,7 +67,7 @@ WEAK_DEFAULT void isr_adc(void);
 WEAK_DEFAULT void isr_trng(void);
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_edge,              /* 16 AON edge detect                        */
     isr_i2c,               /* 17 I2C                                    */
     isr_rfc_cpe1,          /* 18 RF Command and Packet Engine 1         */

@@ -78,7 +78,7 @@ WEAK_DEFAULT void isr_can0(void);
 WEAK_DEFAULT void isr_can1(void);
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_supc,               /*  0 supply controller */
     isr_rstc,               /*  1 reset controller */
     isr_rtc,                /*  2 real time clock */

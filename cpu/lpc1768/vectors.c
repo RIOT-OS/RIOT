@@ -66,7 +66,7 @@ WEAK_DEFAULT void isr_qei(void);
 WEAK_DEFAULT void isr_pll1(void);
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_wdt,                /* watchdog timer */
     isr_timer0,             /* timer0 */
     isr_timer1,             /* timer1 */

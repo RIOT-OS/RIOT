@@ -23,6 +23,8 @@
 extern "C" {
 #endif
 
+#include "cpu_conf.h"
+
 /**
  * @brief   Use this macro to make interrupt functions overridable with the
  *          dummy_handler as fallback in case they are not implemented

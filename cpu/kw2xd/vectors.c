@@ -23,7 +23,7 @@
 #include "vectors_kinetis.h"
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_dma0,              /* DMA channel 0 transfer complete */
     isr_dma1,              /* DMA channel 1 transfer complete */
     isr_dma2,              /* DMA channel 2 transfer complete */
