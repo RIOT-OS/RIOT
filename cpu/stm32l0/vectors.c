@@ -65,7 +65,7 @@ WEAK_DEFAULT void isr_lcd(void);
 WEAK_DEFAULT void isr_usb(void);
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_wwdg,               /* [0] windowed watchdog */
     isr_pvd,                /* [1] power control */
     isr_rtc,                /* [2] real time clock */

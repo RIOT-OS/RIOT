@@ -30,7 +30,7 @@
 #include "vectors_kinetis.h"
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_dma0,
     isr_dma1,
     isr_dma2,

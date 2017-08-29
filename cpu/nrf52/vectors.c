@@ -100,7 +100,7 @@ extern void SWI2_EGU2_IRQHandler(void);
 #endif
 
 /* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[] = {
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_power_clock,       /* power_clock */
     isr_radio,             /* radio */
     isr_uart0,             /* uart0 */
