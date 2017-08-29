@@ -67,13 +67,6 @@ but not limited to:
 * The RIOT API itself can be built from the code using doxygen. The latest
   version is uploaded daily to http://riot-os.org/api.
 
-## KNOWN ISSUES
-* With latest GCC version (>= 6) platforms based on some ARM platforms will
-  raise some warnings, leading to a failing build
-  (see https://github.com/RIOT-OS/RIOT/issues/5519).
-  As a workaround, you can compile with warnings not being treated as errors:
-  `WERROR=0 make`
-
 ### USING THE NATIVE PORT WITH NETWORKING
 If you compile RIOT for the native cpu and include the `netdev_tap` module,
 you can specify a network interface like this: `PORT=tap0 make term`
