@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
+ * Copyright (C) 2017 Koen Zandberg <koen@bergzand.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for
@@ -12,9 +12,8 @@
  * @{
  *
  * @file
- * @brief       empty GPIO implementation
+ * @brief       native GPIO implementation using sysfs
  *
- * @author      Takuo Yonezawa <Yonezawa-T2@mail.dnp.co.jp>
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
@@ -39,7 +38,7 @@ typedef struct {
     int fd;
 } native_gpio_cb_t;
 
-static native_gpio_cb_t gpio_list[GPIO_NATIVE_NUMOF];
+static native_gpio_cb_t gpio_list[GPIO_NATIVE_NUMOF] = { 0 };
 static int gpio_num;
 
 static native_gpio_cb_t *get_new_gpio(void) {
