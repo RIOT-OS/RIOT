@@ -85,8 +85,8 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
     /* enable the timer's interrupt */
     NVIC_EnableIRQ(timer_config[tim].irqn);
-    /* reset the counter and start the timer */
-    timer_start(tim);
+    /* start the timer */
+    dev(tim)->CR1 |= TIM_CR1_CEN;
 
     return 0;
 }
@@ -119,14 +119,16 @@ unsigned int timer_read(tim_t tim)
     return (unsigned int)dev(tim)->CNT;
 }
 
-void timer_start(tim_t tim)
+void timer_poweron(tim_t tim)
 {
+    periph_clk_en(timer_config[tim].bus, timer_config[tim].rcc_mask);
     dev(tim)->CR1 |= TIM_CR1_CEN;
 }
 
-void timer_stop(tim_t tim)
+void timer_poweroff(tim_t tim)
 {
     dev(tim)->CR1 &= ~(TIM_CR1_CEN);
+    periph_clk_dis(timer_config[tim].bus, timer_config[tim].rcc_mask);
 }
 
 static inline void irq_handler(tim_t tim)

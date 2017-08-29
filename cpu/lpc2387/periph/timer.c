@@ -160,12 +160,12 @@ unsigned int timer_read(tim_t tim)
     return (unsigned int)(get_dev(tim)->TC);
 }
 
-void timer_start(tim_t tim)
+void timer_poweron(tim_t tim)
 {
     get_dev(tim)->TCR = 1;
 }
 
-void timer_stop(tim_t tim)
+void timer_poweroff(tim_t tim)
 {
     get_dev(tim)->TCR = 0;
 }

@@ -671,7 +671,7 @@ unsigned int timer_read(tim_t dev)
     }
 }
 
-void timer_start(tim_t dev)
+void timer_poweron(tim_t dev)
 {
     if ((unsigned int)dev >= TIMER_NUMOF) {
         /* invalid timer */
@@ -690,7 +690,7 @@ void timer_start(tim_t dev)
     }
 }
 
-void timer_stop(tim_t dev)
+void timer_poweroff(tim_t dev)
 {
     if ((unsigned int)dev >= TIMER_NUMOF) {
         /* invalid timer */

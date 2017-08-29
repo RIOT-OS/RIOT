@@ -160,13 +160,13 @@ int timer_clear(tim_t dev, int channel)
     return 1;
 }
 
-void timer_start(tim_t dev)
+void timer_poweron(tim_t dev)
 {
     (void)dev;
     DEBUG("%s\n", __func__);
 }
 
-void timer_stop(tim_t dev)
+void timer_poweroff(tim_t dev)
 {
     (void)dev;
     DEBUG("%s\n", __func__);

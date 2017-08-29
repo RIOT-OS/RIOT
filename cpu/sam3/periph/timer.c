@@ -40,10 +40,26 @@ static inline void clk_en(tim_t tim)
     uint8_t id = timer_config[tim].id_ch0;
 
     if (id < 32) {
-        PMC->PMC_PCER0 = ((1 << id) | (1 << (id + 1)));
-    } else {
+        PMC->PMC_PCER0 = (0x3 << id);
+    }
+    else {
         id -= 32;
-        PMC->PMC_PCER1 = ((1 << id) | (1 << (id + 1)));
+        PMC->PMC_PCER1 = (0x3 << id);
+    }
+}
+
+/**
+ * @brief   Disable the clock for the selected channels
+ */
+static inline void clk_dis(tim_t tim)
+{
+    uint8_t id = timer_config[tim].id_ch0;
+    if (id < 32) {
+        PMC->PMC_PCDR0 = (0x3 << id);
+    }
+    else {
+        id -= 32;
+        PMC->PMC_PCDR1 = (0x3 << id);
     }
 }
 
@@ -150,14 +166,16 @@ unsigned int timer_read(tim_t tim)
     return dev(tim)->TC_CHANNEL[0].TC_CV;
 }
 
-void timer_start(tim_t tim)
+void timer_poweron(tim_t tim)
 {
+    clk_en(tim);
     dev(tim)->TC_CHANNEL[1].TC_CCR = (TC_CCR_CLKEN | TC_CCR_SWTRG);
 }
 
-void timer_stop(tim_t tim)
+void timer_poweroff(tim_t tim)
 {
     dev(tim)->TC_CHANNEL[1].TC_CCR = TC_CCR_CLKDIS;
+    clk_dis(tim);
 }
 
 static inline void isr_handler(tim_t tim)

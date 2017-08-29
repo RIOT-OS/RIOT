@@ -93,12 +93,12 @@ unsigned int timer_read(tim_t dev)
     return (unsigned int)TIMER_BASE->R;
 }
 
-void timer_start(tim_t dev)
+void timer_poweron(tim_t dev)
 {
     TIMER_BASE->CTL |= TIMER_CTL_MC_CONT;
 }
 
-void timer_stop(tim_t dev)
+void timer_poweroff(tim_t dev)
 {
     TIMER_BASE->CTL &= ~(TIMER_CTL_MC_MASK);
 }

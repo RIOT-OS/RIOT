@@ -211,7 +211,7 @@ unsigned int timer_read(tim_t tim)
     return LOAD_VALUE - (dev(tim)->TAV & 0xFFFF);
 }
 
-void timer_stop(tim_t tim)
+void timer_poweroff(tim_t tim)
 {
     DEBUG("timer_stop(%u)\n", tim);
     if (tim < TIMER_NUMOF) {
@@ -219,7 +219,7 @@ void timer_stop(tim_t tim)
     }
 }
 
-void timer_start(tim_t tim)
+void timer_poweron(tim_t tim)
 {
     DEBUG("timer_start(%u)\n", tim);
 

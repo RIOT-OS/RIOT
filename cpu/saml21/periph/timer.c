@@ -80,7 +80,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* enable interrupts for given timer */
     _irq_enable(dev);
 
-    timer_start(dev);
+    timer_poweron(dev);
 
     return 0;
 }
@@ -159,11 +159,9 @@ unsigned int timer_read(tim_t dev)
     default:
         return 0;
     }
-
-
 }
 
-void timer_stop(tim_t dev)
+void timer_poweroff(tim_t dev)
 {
     switch (dev) {
 #if TIMER_0_EN
@@ -176,7 +174,7 @@ void timer_stop(tim_t dev)
     }
 }
 
-void timer_start(tim_t dev)
+void timer_poweron(tim_t dev)
 {
     switch (dev) {
 #if TIMER_0_EN

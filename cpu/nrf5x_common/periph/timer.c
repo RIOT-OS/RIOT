@@ -125,14 +125,20 @@ unsigned int timer_read(tim_t tim)
     return dev(tim)->CC[timer_config[tim].channels];
 }
 
-void timer_start(tim_t tim)
+void timer_poweron(tim_t tim)
 {
+#if CPU_FAM_NRF51
+    dev(tim)->POWER = 1;
+#endif
     dev(tim)->TASKS_START = 1;
 }
 
-void timer_stop(tim_t tim)
+void timer_poweroff(tim_t tim)
 {
     dev(tim)->TASKS_STOP = 1;
+#if CPU_FAM_NRF51
+    dev(tim)->POWER = 0;
+#endif
 }
 
 static inline void irq_handler(int num)

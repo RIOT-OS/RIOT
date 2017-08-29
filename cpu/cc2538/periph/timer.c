@@ -220,7 +220,7 @@ unsigned int timer_read(tim_t dev)
 /*
  * For stopping the counting of all channels.
  */
-void timer_stop(tim_t dev)
+void timer_poweroff(tim_t dev)
 {
     DEBUG("%s(%u)\n", __FUNCTION__, dev);
 
@@ -229,7 +229,7 @@ void timer_stop(tim_t dev)
     }
 }
 
-void timer_start(tim_t dev)
+void timer_poweron(tim_t dev)
 {
     DEBUG("%s(%u)\n", __FUNCTION__, dev);
 

@@ -112,13 +112,15 @@ unsigned int timer_read(tim_t dev)
     return (unsigned int)timer_config[dev].timer->CNT;
 }
 
-void timer_stop(tim_t dev)
+void timer_poweroff(tim_t dev)
 {
     timer_config[dev].timer->CMD = TIMER_CMD_STOP;
+    CMU->HFPERCLKEN0 &= ~(0x3 << timer_config[dev].pre_cmu);
 }
 
-void timer_start(tim_t dev)
+void timer_poweron(tim_t dev)
 {
+    CMU->HFPERCLKEN0 |= (0x3 << timer_config[dev].pre_cmu);
     timer_config[dev].timer->CMD = TIMER_CMD_START;
 }
 

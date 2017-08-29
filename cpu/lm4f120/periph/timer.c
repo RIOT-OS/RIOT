@@ -120,7 +120,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     ROM_TimerIntEnable(timer_base, timer_intbit);
 
     _irq_enable(dev);
-    timer_start(dev);
+    timer_poweron(dev);
 
     return 0;
 }
@@ -240,7 +240,7 @@ unsigned int timer_read(tim_t dev)
     return scaled_value;
 }
 
-void timer_start(tim_t dev)
+void timer_poweron(tim_t dev)
 {
     unsigned int timer_base;
     unsigned int timer_side = TIMER_A;
@@ -267,7 +267,7 @@ void timer_start(tim_t dev)
     ROM_TimerEnable(timer_base, timer_side);
 }
 
-void timer_stop(tim_t dev)
+void timer_poweroff(tim_t dev)
 {
     unsigned int timer_base;
     unsigned int timer_side = TIMER_A;
