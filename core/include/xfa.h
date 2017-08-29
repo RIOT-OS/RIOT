@@ -24,21 +24,13 @@
 #ifndef XFA_H
 #define XFA_H
 
-#if defined(__arm__)
-#define XFA_EXTRA volatile
-#else
-#define XFA_EXTRA
-#endif
-
 /**
  * @brief helper macro for other XFA_* macros
  *
  * @internal
  */
 #define _XFA(type, name, prio) __attribute__((used)) \
-    __attribute__((section(".xfa." #name "." #prio))) \
-    XFA_EXTRA \
-    __attribute__((aligned(__alignof__(type))))
+    __attribute__((section(".xfa." #name "." #prio)))
 
 /**
  * @brief Define a cross-file array
@@ -52,7 +44,7 @@
 #define XFA_INIT(type, name) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-    const _XFA(type, name, 0_) XFA_EXTRA type name [0] = {}; \
+    const _XFA(type, name, 0_) type name [0] = {}; \
     const _XFA(type, name, 9_) type name ## _end [0] = {}; \
     _Pragma("GCC diagnostic pop") \
     extern unsigned __xfa_dummy
@@ -71,7 +63,7 @@
 #define XFA_USE(type, name) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-    extern const XFA_EXTRA type name [0]; \
+    extern const type name [0]; \
     extern const type name ## _end [0]; \
     _Pragma("GCC diagnostic pop") \
     extern unsigned __xfa_dummy
