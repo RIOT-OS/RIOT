@@ -30,9 +30,13 @@ extern "C" {
 #define WEAK_DEFAULT    __attribute__((weak,alias("dummy_handler")))
 
 /**
- * @brief   Put this macro in front of the array holding the interrupt vectors
+ * @brief   Use this macro to define the parts of the vector table
+ *
+ * The entries in the vector table are sorted in ascending order defined by the
+ * (numeric) value given for `x`. The Cortex-M base vectors are always defined
+ * with `ISR_VECTOR(0)`, so the CPU specific vector(s) **must** start from 1.
  */
-#define ISR_VECTORS     __attribute__((used,section(".vectors")))
+#define ISR_VECTOR(x)   __attribute__((used,section(".vectors." # x )))
 
 /**
  * @brief   Number of Cortex-M non-ISR exceptions
@@ -42,6 +46,21 @@ extern "C" {
  */
 #define CPU_NONISR_EXCEPTIONS   (15)
 
+/**
+ * @brief   All ISR functions have this type
+ */
+typedef void (*isr_t)(void);
+
+/**
+ * @brief   Structure of Cortex-M basic vector table
+ */
+typedef struct {
+    void* _estack;                          /**< exception stack pointer */
+    isr_t vectors[CPU_NONISR_EXCEPTIONS];   /**< shared Cortex-M vectors */
+} cortexm_base_t;
+
+/* get the start of the ISR stack as defined in the linkerscript */
+extern uint32_t _estack;
 /**
  * @brief   This function is the default entry point after a system reset
  *
