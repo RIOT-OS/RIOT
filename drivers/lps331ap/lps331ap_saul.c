@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_lps331ap
+ * @ingroup     drivers_lps331ap
  * @{
  *
  * @file

@@ -43,11 +43,11 @@ extern "C" {
 struct nvram;
 
 /**
- * @brief Device descriptor for generic NVRAM devices.
+ * @brief   Device descriptor for generic NVRAM devices.
  */
 typedef struct nvram {
     /**
-     * @brief Pointer to device-specific read function
+     * @brief   Pointer to device-specific read function
      *
      * Copy data from system memory to NVRAM.
      *
@@ -62,7 +62,7 @@ typedef struct nvram {
     int (*read)(struct nvram *dev, uint8_t *dst, uint32_t src, size_t size);
 
     /**
-     * @brief Pointer to device-specific write function
+     * @brief   Pointer to device-specific write function
      *
      * Copy data from NVRAM to system memory.
      *
@@ -76,10 +76,10 @@ typedef struct nvram {
      */
     int (*write)(struct nvram *dev, const uint8_t *src, uint32_t dst, size_t size);
 
-    /** @brief Device capacity */
+    /** @brief   Device capacity */
     size_t size;
 
-    /** @brief Device-specific parameters, if any. */
+    /** @brief   Device-specific parameters, if any. */
     void *extra;
 } nvram_t;
 

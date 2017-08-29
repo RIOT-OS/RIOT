@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup drivers_ds1307
  * @{
  *
  * @file

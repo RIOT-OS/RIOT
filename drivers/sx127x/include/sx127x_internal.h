@@ -132,3 +132,4 @@ int16_t sx127x_read_rssi(const sx127x_t *dev);
 #endif
 
 #endif /* SX127X_INTERNAL_H */
+/** @} */

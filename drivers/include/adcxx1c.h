@@ -30,8 +30,10 @@ extern "C" {
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
+/**
+ * @brief  ADCxx1C default address (ADCxx1C021 address)
+ */
 #ifndef ADCXX1C_I2C_ADDRESS
-/** ADCxx1C default address (ADCxx1C021 address) */
 #define ADCXX1C_I2C_ADDRESS  (0x54)
 #endif
 
@@ -111,7 +113,7 @@ typedef struct adcxx1c {
 } adcxx1c_t;
 
 /**
- * @brief Initialize an ADCxx1C ADC device
+ * @brief   Initialize an ADCxx1C ADC device
  *
  * @param[in,out] dev  device descriptor
  * @param[in] params   device configuration
@@ -121,7 +123,7 @@ typedef struct adcxx1c {
 int adcxx1c_init(adcxx1c_t *dev, const adcxx1c_params_t *params);
 
 /**
- * @brief Read a raw ADC value
+ * @brief   Read a raw ADC value
  *
  * @param[in] dev   device descriptor
  * @param[out] raw  read value
@@ -131,7 +133,7 @@ int adcxx1c_init(adcxx1c_t *dev, const adcxx1c_params_t *params);
 int adcxx1c_read_raw(const adcxx1c_t *dev, int16_t *raw);
 
 /**
- * @brief Enable alert interrupt
+ * @brief   Enable alert interrupt
  *
  * @param[in] dev   device descriptor
  * @param[in] cb    callback called when the alert fires
@@ -142,7 +144,7 @@ int adcxx1c_read_raw(const adcxx1c_t *dev, int16_t *raw);
 int adcxx1c_enable_alert(adcxx1c_t *dev, adcxx1c_cb_t cb, void *arg);
 
 /**
- * @brief Set the alert parameters
+ * @brief   Set the alert parameters
  *
  * @param[in,out] dev      device descriptor
  * @param[in] low_limit    alert low limit

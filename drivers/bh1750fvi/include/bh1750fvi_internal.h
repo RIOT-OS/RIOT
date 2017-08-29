@@ -34,7 +34,7 @@ extern "C" {
 #define RES_DIV                 (78642)
 
 /**
- * @brief   Opcodes
+ * @name    Opcodes
  * @{
  */
 #define OP_POWER_DOWN           (0x00)
@@ -51,7 +51,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Measurement delays (in us)
+ * @name    Measurement delays (in us)
  * @{
  */
 #define DELAY_HMODE             (120000)    /**< typ. 120ms in H-mode */

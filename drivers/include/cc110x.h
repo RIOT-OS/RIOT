@@ -30,7 +30,7 @@ extern "C" {
 #include "net/gnrc/nettype.h"
 
 /**
- * @brief Struct for holding cc110x IO parameters
+ * @brief   Struct for holding cc110x IO parameters
  */
 typedef struct cc110x_params {
     spi_t spi;          /**< what */
@@ -41,12 +41,12 @@ typedef struct cc110x_params {
 } cc110x_params_t;
 
 /**
- * @brief forward declaration
+ * @brief   Forward declaration
  */
 typedef struct cc110x cc110x_t;
 
 /**
- * @brief Struct for holding cc110x device state
+ * @brief   Struct for holding cc110x device state
  */
 struct cc110x {
     cc110x_params_t params;                     /**< cc110x IO configuration */
@@ -67,7 +67,7 @@ struct cc110x {
 };
 
 /**
- * @brief Setup cc110x device parameters
+ * @brief   Setup cc110x device parameters
  *
  * @param[in] dev       device struct to set up
  * @param[in] params    struct holding parameters
@@ -77,7 +77,7 @@ struct cc110x {
 int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params);
 
 /**
- * @brief Set cc110x channel number
+ * @brief   Set cc110x channel number
  *
  * @param[in] dev       device to work on
  * @param[in] channr    guess what
@@ -89,7 +89,7 @@ int16_t cc110x_set_channel(cc110x_t *dev, uint8_t channr);
 
 
 /**
- * @brief Send raw cc110x packet
+ * @brief   Send raw cc110x packet
  *
  * @param[in] dev       Device to send on
  * @param[in] packet    ptr to packet to be sent
@@ -100,7 +100,7 @@ int16_t cc110x_set_channel(cc110x_t *dev, uint8_t channr);
 int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet);
 
 /**
- * @brief Set cc110x radio address
+ * @brief   Set cc110x radio address
  *
  * @param[in] dev   device to query
  *
@@ -109,7 +109,7 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet);
 uint8_t cc110x_get_address(cc110x_t *dev);
 
 /**
- * @brief Set cc110x radio address
+ * @brief   Set cc110x radio address
  *
  * @param[in] dev       device to work on
  * @param[in] address   new address
@@ -121,7 +121,7 @@ uint8_t cc110x_set_address(cc110x_t *dev, uint8_t address);
 
 
 /**
- * @brief Set cc110x monitor mode setting
+ * @brief   Set cc110x monitor mode setting
  *
  * @param[in] dev   device to work on
  * @param[in] mode  mode to set (0 or 1)

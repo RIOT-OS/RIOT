@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     mtd
+ * @ingroup     drivers_mtd
  * @{
  * @brief       Low level Memory Technology Device interface
  *

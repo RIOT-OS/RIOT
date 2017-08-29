@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the VEML6070
+ * @name    Set default configuration parameters for the VEML6070
  * @{
  */
 #ifndef VEML6070_PARAM_I2C_DEV

@@ -49,7 +49,7 @@ extern "C" {
 #define AT86RF2XX_MAX_PKT_LENGTH        (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   Channel configuration
+ * @name    Channel configuration
  * @{
  */
 #ifdef MODULE_AT86RF212B
@@ -92,7 +92,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Flags for device internal states (see datasheet)
+ * @name    Flags for device internal states (see datasheet)
  * @{
  */
 #define AT86RF2XX_STATE_P_ON           (0x00)     /**< initial power on */
@@ -108,7 +108,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Internal device option flags
+ * @name    Internal device option flags
  *
  * `0x00ff` is reserved for general IEEE 802.15.4 flags
  * (see @ref netdev_ieee802154_t)
@@ -134,7 +134,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief struct holding all params needed for device initialization
+ * @brief   struct holding all params needed for device initialization
  */
 typedef struct at86rf2xx_params {
     spi_t spi;              /**< SPI bus the device is connected to */
@@ -152,10 +152,7 @@ typedef struct at86rf2xx_params {
  */
 typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
-    /**
-     * @brief   device specific fields
-     * @{
-     */
+    /* device specific fields */
     at86rf2xx_params_t params;              /**< parameters for initialization */
     uint8_t state;                          /**< current state of the radio */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
@@ -167,7 +164,6 @@ typedef struct {
     uint8_t pending_tx;                 /**< keep track of pending TX calls
                                              this is required to know when to
                                              return to @ref at86rf2xx_t::idle_state */
-    /** @} */
 } at86rf2xx_t;
 
 /**

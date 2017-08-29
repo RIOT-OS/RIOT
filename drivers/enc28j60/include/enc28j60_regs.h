@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_enc28j60
+ * @ingroup     drivers_enc28j60
  * @{
  *
  * @file
@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   SPI instruction set
+ * @name    SPI instruction set
  * @{
  */
 #define CMD_RCR             0x00            /* read control register */
@@ -37,7 +37,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Available address pointers
+ * @name    Available address pointers
  * @{
  */
 #define ADDR_READ_PTR       0x00    /**< Read pointer */
@@ -51,7 +51,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Shared registers (accessible on each bank)
+ * @name  Shared registers (accessible on each bank)
  * @{
  */
 #define REG_EIE             0x1b    /**< interrupt enable */
@@ -62,7 +62,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Register in bank 0 - Ethernet registers
+ * @name    Register in bank 0 - Ethernet registers
  * @{
  */
 #define REG_B0_ERDPTL       0x00    /* read data pointer - low byte */
@@ -92,7 +92,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Registers in bank 1 - Ethernet registers
+ * @name    Registers in bank 1 - Ethernet registers
  * @{
  */
 #define REG_B1_EHT0         0x00    /* hash table - byte 0 */
@@ -120,7 +120,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Registers in bank 2 - MAC registers
+ * @name    Registers in bank 2 - MAC registers
  * @{
  */
 #define REG_B2_MACON1       0x00    /* MAC control register 1 */
@@ -142,7 +142,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Registers in bank 3 - MIXED registers
+ * @name    Registers in bank 3 - MIXED registers
  * @{
  */
 #define REG_B3_MAADR5       0x00    /* MAC address - byte 5 */
@@ -164,7 +164,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   PHY Registers
+ * @name    PHY Registers
  * @{
  */
 #define REG_PHY_PHCON1      0x00
@@ -179,7 +179,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   EIE bitfields
+ * @name    EIE bitfields
  * @{
  */
 #define EIE_INTIE           0x80
@@ -192,7 +192,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   EIR bitfields
+ * @name    EIR bitfields
  * @{
  */
 #define EIR_PKTIF           0x40
@@ -204,7 +204,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   ESTAT bitfields
+ * @name    ESTAT bitfields
  * @{
  */
 #define ESTAT_INT           0x80
@@ -216,7 +216,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   ECON1 bitfields
+ * @name    ECON1 bitfields
  * @{
  */
 #define ECON1_TXRST         0x80
@@ -231,7 +231,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   ECON2 bitfields
+ * @name    ECON2 bitfields
  * @{
  */
 #define ECON2_AUTOINC       0x80
@@ -241,7 +241,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   ERXFCON bitfields
+ * @name    ERXFCON bitfields
  * @{
  */
 #define ERXFCON_UCEN        0x80
@@ -255,7 +255,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   MACON1 bitfields
+ * @name    MACON1 bitfields
  * @{
  */
 #define MACON1_TXPAUS       0x08
@@ -265,7 +265,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   MACON3 bitfields
+ * @name    MACON3 bitfields
  * @{
  */
 #define MACON3_PADCFG2      0x80
@@ -279,7 +279,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   MACON4 bitfields
+ * @name    MACON4 bitfields
  * @{
  */
 #define MACON4_DEFER        0x40
@@ -288,7 +288,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   MABBIPG bitfields
+ * @name    MABBIPG bitfields
  * @{
  */
 #define MABBIPG_FD          0x15
@@ -296,14 +296,14 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   MAIPGL bitfields
+ * @name    MAIPGL bitfields
  * @{
  */
 #define MAIPGL_FD           0x12
 /** @} */
 
 /**
- * @brief   MICMD bitfields
+ * @name    MICMD bitfields
  * @{
  */
 #define MICMD_MIISCAN       0x02
@@ -311,7 +311,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   MISTAT bitfields
+ * @name    MISTAT bitfields
  * @{
  */
 #define MISTAT_NVALID       0x04
@@ -320,7 +320,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   EFLOCON bitfields
+ * @name    EFLOCON bitfields
  * @{
  */
 #define EFLOCON_FULDPXS     0x04
@@ -331,7 +331,7 @@ extern "C" {
 
 
 /**
- * @brief   PHCON1 bitfields
+ * @name    PHCON1 bitfields
  * @{
  */
 #define PHCON1_PRST         0x8000
@@ -341,7 +341,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   PHSTAT1 bitfields
+ * @name    PHSTAT1 bitfields
  * @{
  */
 #define PHSTAT1_PFDPX       0x1000
@@ -351,7 +351,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   PHCON2 bitfields
+ * @name    PHCON2 bitfields
  * @{
  */
 #define PHCON2_FRCLNK       0x4000
@@ -361,7 +361,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   PHSTAT2 bitfields
+ * @name    PHSTAT2 bitfields
  * @{
  */
 #define PHSTAT2_TXSTAT      0x2000
@@ -373,7 +373,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   PHIE bitfields
+ * @name    PHIE bitfields
  * @{
  */
 #define PHIE_PLNKIE         0x0010
@@ -381,7 +381,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   PHIR bitfields
+ * @name    PHIR bitfields
  * @{
  */
 #define PHIR_PLNKIF         0x0010
@@ -389,7 +389,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   PHLCON bitfields
+ * @name    PHLCON bitfields
  * @{
  */
 #define PHLCON_LACFG(x)     ((x & 0xf) << 8)
@@ -399,7 +399,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Frame status bitfields
+ * @name    Frame status bitfields
  * @{
  */
 #define FRAME_4_RECV_OK     0x80
@@ -419,7 +419,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   TX control byte bitfields
+ * @name    TX control byte bitfields
  * @{
  */
 #define TX_PHUGEEN          0x08

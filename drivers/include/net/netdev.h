@@ -392,5 +392,6 @@ typedef struct netdev_driver {
 #ifdef __cplusplus
 }
 #endif
-/** @} */
+
 #endif /* NET_NETDEV_H */
+/** @} */

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_enc28j60
+ * @ingroup     drivers_enc28j60
  * @{
  *
  * @file

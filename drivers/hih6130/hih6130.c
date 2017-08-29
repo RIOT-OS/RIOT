@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_hih6130
+ * @ingroup     drivers_hih6130
  * @{
  *
  * @file

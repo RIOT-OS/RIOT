@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 /**
- * @brief encx24j600 netdev device
+ * @brief   encx24j600 netdev device
  * @extends netdev_t
  */
 typedef struct {
@@ -53,7 +53,7 @@ typedef struct {
 } encx24j600_params_t;
 
 /**
- * @brief Setup an encx24j600 based device state.
+ * @brief   Setup an encx24j600 based device state.
  *
  * This function sets SPI pins, initializes the device state structure.
  * It does not initialize the device itself.

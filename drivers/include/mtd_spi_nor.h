@@ -37,7 +37,7 @@ extern "C"
 #endif
 
 /**
- * @brief SPI NOR flash opcode table
+ * @brief   SPI NOR flash opcode table
  */
 typedef struct {
     uint8_t rdid;            /**< Read identification (JEDEC ID) */
@@ -57,7 +57,7 @@ typedef struct {
 } mtd_spi_nor_opcode_t;
 
 /**
- * @brief Internal representation of JEDEC memory ID codes.
+ * @brief   Internal representation of JEDEC memory ID codes.
  *
  * @see http://www.jedec.org/standards-documents/results/jep106
  */
@@ -68,23 +68,23 @@ typedef struct __attribute__((packed)) {
 } mtd_jedec_id_t;
 
 /**
- * @brief Byte to signal increment bank number when reading manufacturer ID
+ * @brief   Byte to signal increment bank number when reading manufacturer ID
  *
  * @see http://www.jedec.org/standards-documents/results/jep106
  */
 #define JEDEC_NEXT_BANK (0x7f)
 
 /**
- * @brief Flag to set when the device support 4KiB sector erase (sector_erase opcode)
+ * @brief   Flag to set when the device support 4KiB sector erase (sector_erase opcode)
  */
 #define SPI_NOR_F_SECT_4K   (1)
 /**
- * @brief Flag to set when the device support 32KiB block erase (block_erase_32k opcode)
+ * @brief   Flag to set when the device support 32KiB block erase (block_erase_32k opcode)
  */
 #define SPI_NOR_F_SECT_32K  (2)
 
 /**
- * @brief Device descriptor for serial flash memory devices
+ * @brief   Device descriptor for serial flash memory devices
  *
  * This is an extension of the @c mtd_dev_t struct
  */
@@ -98,26 +98,26 @@ typedef struct {
     uint16_t flag;           /**< Config flags */
     mtd_jedec_id_t jedec_id; /**< JEDEC ID of the chip */
     /**
-     * @brief bitmask to corresponding to the page address
+     * @brief   bitmask to corresponding to the page address
      *
      * Computed by mtd_spi_nor_init, no need to touch outside the driver.
      */
     uint32_t page_addr_mask;
     /**
-     * @brief bitmask to corresponding to the sector address
+     * @brief   bitmask to corresponding to the sector address
      *
      * Computed by mtd_spi_nor_init, no need to touch outside the driver.
      */
     uint32_t sec_addr_mask;
     uint8_t addr_width;      /**< Number of bytes in addresses, usually 3 for small devices */
     /**
-     * @brief number of right shifts to get the address to the start of the page
+     * @brief   number of right shifts to get the address to the start of the page
      *
      * Computed by mtd_spi_nor_init, no need to touch outside the driver.
      */
     uint8_t page_addr_shift;
     /**
-     * @brief number of right shifts to get the address to the start of the sector
+     * @brief   number of right shifts to get the address to the start of the sector
      *
      * Computed by mtd_spi_nor_init, no need to touch outside the driver.
      */
@@ -125,14 +125,14 @@ typedef struct {
 } mtd_spi_nor_t;
 
 /**
- * @brief NOR flash SPI MTD device operations table
+ * @brief   NOR flash SPI MTD device operations table
  */
 extern const mtd_desc_t mtd_spi_nor_driver;
 
 /* Available opcode tables for known devices */
 /* Defined in mtd_spi_nor_configs.c */
 /**
- * @brief Default command opcodes
+ * @brief   Default command opcodes
  *
  * The numbers were taken from Micron M25P16, but the same opcodes can
  * be found in Macronix MX25L25735E, and multiple other data sheets for

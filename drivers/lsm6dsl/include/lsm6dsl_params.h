@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters
+ * @name    Set default configuration parameters
  * @{
  */
 #ifndef LSM6DSL_PARAM_I2C

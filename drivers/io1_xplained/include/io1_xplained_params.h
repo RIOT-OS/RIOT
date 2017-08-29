@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the IO1 Xplained extension
+ * @name    Set default configuration parameters for the IO1 Xplained extension
  * @{
  */
 #ifndef IO1_XPLAINED_PARAM_ADDR

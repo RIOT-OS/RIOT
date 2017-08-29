@@ -33,7 +33,7 @@ extern "C"
 #endif
 
 /**
- * @brief Device descriptor for mtd_sdcard device
+ * @brief   Device descriptor for mtd_sdcard device
  *
  * This is an extension of the @c mtd_dev_t struct
  */
@@ -45,17 +45,17 @@ typedef struct {
 
 
 /**
- * @brief sdcards handle sector erase internally so it's possible to directly
- *        write to the card without erasing the sector first.
- *        Attention: an erase call will therefore NOT touch the content,
- *                   so disable this feature to ensure overriding the data.
+ * @brief   sdcards handle sector erase internally so it's possible to directly
+ *          write to the card without erasing the sector first.
+ *          Attention: an erase call will therefore NOT touch the content,
+ *                     so disable this feature to ensure overriding the data.
  */
 #ifndef MTD_SDCARD_SKIP_ERASE
 #define MTD_SDCARD_SKIP_ERASE (1)
 #endif
 
 /**
- * @brief sdcard device operations table for mtd
+ * @brief   sdcard device operations table for mtd
  */
 extern const mtd_desc_t mtd_sdcard_driver;
 

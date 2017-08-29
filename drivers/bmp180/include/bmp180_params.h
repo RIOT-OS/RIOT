@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the BMP180
+ * @name    Set default configuration parameters for the BMP180
  * @{
  */
 #ifndef BMP180_PARAM_I2C_DEV
