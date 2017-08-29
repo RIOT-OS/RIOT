@@ -29,7 +29,7 @@
  *
  * @internal
  */
-#define _XFA(type, name, prio) __attribute__((used)) \
+#define _XFA(name, prio) __attribute__((used)) \
     __attribute__((section(".xfa." #name "." #prio)))
 
 /**
@@ -44,8 +44,8 @@
 #define XFA_INIT(type, name) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-    const _XFA(type, name, 0_) type name [0] = {}; \
-    const _XFA(type, name, 9_) type name ## _end [0] = {}; \
+    const _XFA(name, 0_) type name [0] = {}; \
+    const _XFA(name, 9_) type name ## _end [0] = {}; \
     _Pragma("GCC diagnostic pop") \
     extern unsigned __xfa_dummy
 
@@ -80,7 +80,7 @@
  * @param[in]   name    name of the xfa
  * @param[in]   prio    priority within the xfa
  */
-#define XFA(xfa_name, prio, type) _XFA(type, xfa_name, 5_ ##prio) const type
+#define XFA(xfa_name, prio) _XFA(xfa_name, 5_ ##prio)
 
 /**
  * @brief Add a pointer to cross-file array
@@ -93,7 +93,7 @@
  * @param[in]   entry       pointer variable to add to xfa
  */
 #define XFA_ADD_PTR(xfa_name, prio, name, entry) \
-    _XFA(typeof(entry), xfa_name, 5_ ##prio) \
+    _XFA(xfa_name, 5_ ##prio) \
     const typeof(entry) xfa_name ## _ ## prio ## _ ## name = entry
 
 /**
