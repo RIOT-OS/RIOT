@@ -188,7 +188,7 @@ struct {
     sdcard_spi_params_t params;     /**< parameters for pin and spi config */
     spi_clk_t spi_clk;              /**< active SPI clock speed */
     bool use_block_addr;            /**< true if block adressing (vs. byte adressing) is used */
-    bool init_done;                 /**< set to true once the init procedure completed sucessfully */
+    bool init_done;                 /**< set to true once the init procedure completed successfully */
     sd_version_t card_type;         /**< version of SD-card */
     int csd_structure;              /**< version of the CSD register structure */
     cid_t cid;                      /**< CID register */
@@ -228,7 +228,7 @@ int sdcard_spi_init(sdcard_spi_t *card, const sdcard_spi_params_t *params);
  * @param[out] state      Contains information about the error state if something went wrong
  *                        (if return value is lower than nblocks).
  *
- * @return                number of sucessfully read blocks (0 if no block was read).
+ * @return                number of successfully read blocks (0 if no block was read).
  */
 int sdcard_spi_read_blocks(sdcard_spi_t *card, int blockaddr, char *data, int blocksize,
                            int nblocks, sd_rw_response_t *state);
@@ -250,7 +250,7 @@ int sdcard_spi_read_blocks(sdcard_spi_t *card, int blockaddr, char *data, int bl
  * @param[out] state      Contains information about the error state if something went wrong
  *                         (if return value is lower than nblocks).
  *
- * @return                number of sucessfully written blocks (0 if no block was written).
+ * @return                number of successfully written blocks (0 if no block was written).
  */
 int sdcard_spi_write_blocks(sdcard_spi_t *card, int blockaddr, const char *data, int blocksize,
                             int nblocks, sd_rw_response_t *state);
