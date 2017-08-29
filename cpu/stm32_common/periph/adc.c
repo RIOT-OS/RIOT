@@ -25,7 +25,7 @@
 #include "assert.h"
 #include "periph/adc.h"
 
-#if defined(ADC_NUMOF) && !defined(CPU_FAM_STM32F0)
+#if !defined(CPU_FAM_STM32F0) && !defined(CPU_FAM_STM32L0)
 
 #define BASEADDR                (ADC1_BASE)
 #define DEVOFFSET               (8)
@@ -36,10 +36,16 @@
 #define WRITE_LINE(x)           (dev(line)->SQR3 = x)
 #endif
 
+#ifndef ADC_CCR_ADCPRE_Pos
+#define ADC_CCR_ADCPRE_Pos      (16U)
+#endif
+
 /**
  * @brief   Maximum allowed ADC clock speed
  */
-#define MAX_ADC_SPEED           (12000000U)
+#ifndef ADC_CLK_MAX
+#define ADC_CLK_MAX             (12000000U)
+#endif
 
 /**
  * @brief   Allocate one mutex for each ADC unit
@@ -81,11 +87,16 @@ int adc_init(adc_t line)
     }
     /* set clock prescaler to get the maximal possible ADC clock value */
     for (clk_div = 2; clk_div < 8; clk_div += 2) {
-        if ((CLOCK_CORECLOCK / clk_div) <= MAX_ADC_SPEED) {
+        if ((CLOCK_CORECLOCK / clk_div) <= ADC_CLK_MAX) {
             break;
         }
     }
-    ADC->CCR = ((clk_div / 2) - 1) << 16;
+#ifdef CPU_FAM_STM32F1
+    RCC->CFGR &= ~(RCC_CFGR_ADCPRE);
+    RCC->CFGR |= ((clk_div / 2) - 1) << 14;
+#else
+    ADC->CCR = ((clk_div / 2) - 1) << ADC_CCR_ADCPRE_Pos;
+#endif
 
     /* set sequence length to 1 conversion and enable the ADC device */
     dev(line)->SQR1 = 0;
@@ -99,7 +110,11 @@ int adc_init(adc_t line)
             return -1;
         }
 
+#ifdef CPU_FAM_STM32F1
+        ADC1->CR2 |= ADC_CR2_TSVREFE;
+#else
         ADC->CCR |= ADC_CCR_TSVREFE;
+#endif
     }
 
     /* free the device again */
@@ -142,4 +157,4 @@ int adc_sample(adc_t line, adc_res_t res)
     return sample;
 }
 
-#endif /* ADC_NUMOF */
+#endif /* !CPU_FAM_STM32F0 && !CPU_FAM_STM32L0 */
