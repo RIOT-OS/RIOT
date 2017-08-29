@@ -26,6 +26,7 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
+#ifdef UART_NUMOF
 /**
  * @brief   Allocate memory to store the callback functions
  */
@@ -184,4 +185,5 @@ void UART_5_ISR(void)
 {
     irq_handler(5);
 }
+#endif
 #endif
