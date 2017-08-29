@@ -69,59 +69,38 @@ WEAK_DEFAULT void isr_swi3(void);
 WEAK_DEFAULT void isr_swi4(void);
 WEAK_DEFAULT void isr_swi5(void);
 
-/* interrupt vector table */
-ISR_VECTORS const void *interrupt_vector[] = {
-    /* Exception stack pointer */
-    (void*) (&_estack),             /* pointer to the top of the stack */
-    /* Cortex-M0 handlers */
-    (void*) reset_handler_default,  /* entry point of the program */
-    (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) isr_svc,                /* system call interrupt, in RIOT used for
-                                     * switching into thread context on boot */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
-                                     * context switching is happening here */
-    (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* nRF51 specific peripheral handlers */
-    (void*) isr_power_clock,        /* power_clock */
-    (void*) isr_radio,              /* radio */
-    (void*) isr_uart0,              /* uart0 */
-    (void*) isr_spi0_twi0,          /* spi0_twi0 */
-    (void*) isr_spi1_twi1,          /* spi1_twi1 */
-    (void*) (0UL),                  /* reserved */
-    (void*) isr_gpiote,             /* gpiote */
-    (void*) isr_adc,                /* adc */
-    (void*) isr_timer0,             /* timer0 */
-    (void*) isr_timer1,             /* timer1 */
-    (void*) isr_timer2,             /* timer2 */
-    (void*) isr_rtc0,               /* rtc0 */
-    (void*) isr_temp,               /* temp */
-    (void*) isr_rng,                /* rng */
-    (void*) isr_ecb,                /* ecb */
-    (void*) isr_ccm_aar,            /* ccm_aar */
-    (void*) isr_wdt,                /* wdt */
-    (void*) isr_rtc1,               /* rtc1 */
-    (void*) isr_qdec,               /* qdec */
-    (void*) isr_lpcomp,             /* lpcomp */
-    (void*) isr_swi0,               /* swi0 */
-    (void*) isr_swi1,               /* swi1 */
-    (void*) isr_swi2,               /* swi2 */
-    (void*) isr_swi3,               /* swi3 */
-    (void*) isr_swi4,               /* swi4 */
-    (void*) isr_swi5,               /* swi5 */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
+/* CPU specific interrupt vector table */
+ISR_VECTOR(1) const isr_t vector_cpu[] = {
+    isr_power_clock,        /* power_clock */
+    isr_radio,              /* radio */
+    isr_uart0,              /* uart0 */
+    isr_spi0_twi0,          /* spi0_twi0 */
+    isr_spi1_twi1,          /* spi1_twi1 */
+    (0UL),                  /* reserved */
+    isr_gpiote,             /* gpiote */
+    isr_adc,                /* adc */
+    isr_timer0,             /* timer0 */
+    isr_timer1,             /* timer1 */
+    isr_timer2,             /* timer2 */
+    isr_rtc0,               /* rtc0 */
+    isr_temp,               /* temp */
+    isr_rng,                /* rng */
+    isr_ecb,                /* ecb */
+    isr_ccm_aar,            /* ccm_aar */
+    isr_wdt,                /* wdt */
+    isr_rtc1,               /* rtc1 */
+    isr_qdec,               /* qdec */
+    isr_lpcomp,             /* lpcomp */
+    isr_swi0,               /* swi0 */
+    isr_swi1,               /* swi1 */
+    isr_swi2,               /* swi2 */
+    isr_swi3,               /* swi3 */
+    isr_swi4,               /* swi4 */
+    isr_swi5,               /* swi5 */
+    (0UL),                  /* reserved */
+    (0UL),                  /* reserved */
+    (0UL),                  /* reserved */
+    (0UL),                  /* reserved */
+    (0UL),                  /* reserved */
+    (0UL),                  /* reserved */
 };

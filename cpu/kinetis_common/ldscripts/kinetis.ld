@@ -23,14 +23,14 @@
 SECTIONS
 {
     /* Interrupt vectors 0x00-0x3ff. */
-    .vectors :
+    .vector :
     {
         _isr_vectors = .;
-        KEEP(*(.vectors .vectors.*))
+        KEEP(*(SORT(.vector*)))
     } > vectors
-    ASSERT (SIZEOF(.vectors) == 0x400, "Interrupt vector table of invalid size.")
-    ASSERT (ADDR(.vectors) == 0x00000000, "Interrupt vector table at invalid location (linker-script error?)")
-    ASSERT (LOADADDR(.vectors) == 0x00000000, "Interrupt vector table at invalid location (linker-script error?)")
+    ASSERT (SIZEOF(.vector) == 0x400, "Interrupt vector table of invalid size.")
+    ASSERT (ADDR(.vector) == 0x00000000, "Interrupt vector table at invalid location (linker-script error?)")
+    ASSERT (LOADADDR(.vector) == 0x00000000, "Interrupt vector table at invalid location (linker-script error?)")
 
     /* Flash configuration field, very important in order to not accidentally lock the device */
     /* Flash configuration field 0x400-0x40f. */
