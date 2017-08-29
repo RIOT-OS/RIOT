@@ -92,7 +92,7 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
     mrf24j40_tx_prepare(dev);
 
     /* load packet data into FIFO */
-    for (int i = 0; i < count; i++, ptr++) {
+    for (unsigned i = 0; i < count; i++, ptr++) {
         /* current packet data + FCS too long */
         if ((len + ptr->iov_len + 2) > IEEE802154_FRAME_LEN_MAX) {
             DEBUG("[mrf24j40] error: packet too large (%u byte) to be send\n",
