@@ -222,12 +222,14 @@ typedef struct {
 /** @} */
 
 /**
- * @brief   Timer configuration data
+ * @brief   Timer configuration
+ *
+ * General purpose timers (GPT[0-3]) are configured consecutively and in order
+ * (without gaps) starting from GPT0, i.e. if multiple timers are enabled.
  */
 typedef struct {
-    cc2538_gptimer_t *dev;  /**< timer device */
-    uint_fast8_t channels;  /**< number of channels */
-    uint_fast8_t cfg;       /**< timer config word */
+    uint_fast8_t chn;   /**< number of channels */
+    uint_fast8_t cfg;   /**< timer config word */
 } timer_conf_t;
 
 /**
