@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     drivers_nrf52
+ * @ingroup     drivers_nrf52_802154
  * @{
  *
  * @file
@@ -127,12 +127,14 @@ static void enable_tx(void)
  */
 static void power_on(void)
 {
-        NRF_RADIO->POWER = 1;
+    NRF_RADIO->POWER = 1;
 }
 
 static void set_chan(uint16_t chan)
 {
     assert((chan >= IEEE802154_CHANNEL_MIN) && (chan <= IEEE802154_CHANNEL_MAX));
+    /* Channel map between 2400 MHZ ... 2500 MHz
+     * -> Frequency = 2400 + FREQUENCY (MHz) */
     NRF_RADIO->FREQUENCY = (chan - 10) * 5;
     nrf802154_dev.chan = chan;
 }
@@ -203,8 +205,8 @@ static int init(netdev_t *dev)
     /* set start frame delimiter */
     NRF_RADIO->SFD = IEEE802154_SFD;
     /* set MHR filters */
-    NRF_RADIO->MHRMATCHCONF = 0;
-    NRF_RADIO->MHRMATCHMAS = 0xff0007ff;
+    NRF_RADIO->MHRMATCHCONF = 0;              /* Search Pattern Configuration */
+    NRF_RADIO->MHRMATCHMAS = 0xff0007ff;      /* Pattern mask */
     /* configure CRC conform to IEEE802154 */
     NRF_RADIO->CRCCNF = ((RADIO_CRCCNF_LEN_Two << RADIO_CRCCNF_LEN_Pos) |
                          (RADIO_CRCCNF_SKIPADDR_Ieee802154 << RADIO_CRCCNF_SKIPADDR_Pos));
@@ -253,12 +255,9 @@ static int send(netdev_t *dev, const struct iovec *vector, unsigned count)
     /* specify the length of the package. */
     txbuf[0] = pos + 1;
 
-    enable_tx();
-
     /* trigger the actual transmission */
+    enable_tx();
     DEBUG("[nrf802154] send: putting %i byte into the ether\n", pos);
-
-    /* @todo: how about CCA, retransmits, and ACKs? */
 
     return pos;
 }
@@ -348,7 +347,6 @@ static int set(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
             return netdev_ieee802154_set((netdev_ieee802154_t *)dev,
                                          opt, value, value_len);
     }
-
 }
 
 void isr_radio(void)
@@ -363,18 +361,7 @@ void isr_radio(void)
         if ((nrf802154_dev.netdev.event_callback) &&
             (NRF_RADIO->CRCSTATUS == 1) &&
             netdev_ieee802154_dst_filter(&nrf802154_dev, &rxbuf[1])) {
-
             DEBUG("isr-rx: packet valid -> processing\n");
-
-            txbuf[0] = 5;
-            txbuf[1] = 2;
-            txbuf[2] = 0;
-            txbuf[3] = rxbuf[3];
-
-            DEBUG("Sequence number: %u\n", rxbuf[3]);
-
-            enable_tx();
-
             nrf802154_dev.netdev.event_callback(&nrf802154_dev.netdev, NETDEV_EVENT_ISR);
         }
         else {

@@ -10,6 +10,10 @@
  * @defgroup    drivers_nrf52_802154 IEEE802.15.4 Driver for nRF52840 SoCs
  * @ingroup     drivers_netdev
  * @brief       Driver for using the nRF52's radio in IEEE802.15.4 mode
+ *
+ * @todo        -> Implementation of Clear Channel Assessment Control (CCACTRL)
+                -> Implementation of ACKnowledgement and packet retransmission
+ *
  * @{
  *
  * @file
@@ -27,15 +31,10 @@
 extern "C" {
 #endif
 
-
 /**
  * @brief   Export the netdev device descriptor
  */
 extern netdev_ieee802154_t nrf802154_dev;
-
-/**
- * @brief   Reference to the netdev driver interface
- */
 
 #endif /* NRF802154_H */
 /** @} */

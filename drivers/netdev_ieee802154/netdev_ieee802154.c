@@ -37,8 +37,8 @@ static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
 
     if (dev->flags & NETDEV_IEEE802154_SRC_MODE_LONG) {
         addr_len = IEEE802154_LONG_ADDRESS_LEN;
-        addr = dev->long_addr
-;    }
+        addr = dev->long_addr;
+    }
     else {
         addr_len = IEEE802154_SHORT_ADDRESS_LEN;
         addr = dev->short_addr;

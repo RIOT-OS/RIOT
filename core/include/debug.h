@@ -52,7 +52,12 @@ extern "C" {
 #include "cpu_conf.h"
 #define DEBUG_PRINT(...) \
     do { \
+        if ((sched_active_thread == NULL) || (sched_active_thread->stack_size > THREAD_EXTRA_STACKSIZE_PRINTF)) { \
             printf(__VA_ARGS__); \
+        } \
+        else { \
+            puts("Cannot debug, stack too small"); \
+        } \
     } while (0)
 #else
 #define DEBUG_PRINT(...) printf(__VA_ARGS__)
