@@ -42,14 +42,15 @@ static void _ls_usage(char **argv)
 
 static void _vfs_usage(char **argv)
 {
-    printf("%s <r|w> <path> [bytes] [offset]\n", argv[0]);
+    printf("%s r <path> [bytes] [offset]\n", argv[0]);
+    printf("%s w <path> <ascii|hex> <a|o> <data>\n", argv[0]);
     printf("%s ls <path>\n", argv[0]);
     printf("%s cp <src> <dest>\n", argv[0]);
     printf("%s mv <src> <dest>\n", argv[0]);
     printf("%s rm <file>\n", argv[0]);
     printf("%s df [path]\n", argv[0]);
     puts("r: Read [bytes] bytes at [offset] in file <path>");
-    puts("w: not implemented yet");
+    puts("w: Write (<a>: append, <o> overwrite) <ascii> or <hex> string <data> in file <path>");
     puts("ls: list files in <path>");
     puts("mv: Move <src> file to <dest>");
     puts("cp: Copy <src> file to <dest>");
@@ -221,6 +222,152 @@ static int _read_handler(int argc, char **argv)
         puts("");
         offset += res;
         nbytes -= res;
+    }
+
+    vfs_close(fd);
+    return 0;
+}
+
+static inline int _dehex(char c)
+{
+    if ('0' <= c && c <= '9') {
+        return c - '0';
+    }
+    else if ('A' <= c && c <= 'F') {
+        return c - 'A' + 10;
+    }
+    else if ('a' <= c && c <= 'f') {
+        return c - 'a' + 10;
+    }
+    else {
+        return 0;
+    }
+}
+
+static int _write_handler(int argc, char **argv)
+{
+    char *w_buf;
+    char buf[16];
+    size_t nbytes = 0;
+    size_t nb_str = 0;
+    char *path = argv[1];
+    int ascii = 0;
+    int flag = O_CREAT;
+    if (argc < 2) {
+        puts("vfs write: missing file name");
+        return 1;
+    }
+
+    if (argc < 3) {
+        puts("vfs write: missing format");
+        return 1;
+    }
+    if (strcmp(argv[2], "ascii") == 0) {
+        ascii = 1;
+    }
+    else if (strcmp(argv[2], "hex") == 0) {
+        ascii = 0;
+    }
+    else {
+        printf("vfs write: unknown format: %s\n", argv[2]);
+        return 1;
+    }
+
+    if (argc < 4) {
+        puts("vfs write: missing <a|o> flag");
+        return 1;
+    }
+    if (strcmp(argv[3], "a") == 0) {
+        flag |= O_WRONLY | O_APPEND;
+    }
+    else if (strcmp(argv[3], "o") == 0) {
+        flag |= O_WRONLY;
+    }
+    else {
+        printf("vfs write: invalid flag %s\n", argv[3]);
+        return 1;
+    }
+
+    if (argc < 5) {
+        puts("vfs write: missing data");
+        return 1;
+    }
+    w_buf = argv[4];
+    nbytes = strlen(w_buf);
+    /* in hex string mode, bytes may be seperated by spaces */
+    /* in ascii mode, there could be spaces */
+    /* we need the total number of strings to go through */
+    nb_str = argc - 4;
+    if (!ascii) {
+        /* sanity check: only hex digit and hex strings length must be even */
+        for (size_t i = 0; i < nb_str; i++) {
+            char c;
+            size_t j = 0;
+            do {
+                c = argv[argc - nb_str + i][j];
+                j++;
+                if (c != '\0' && !isxdigit((int)c)) {
+                    printf("Non-hex character: %c\n", c);
+                    return 6;
+                }
+            } while (c != '\0');
+            j--;
+            if (j % 2 != 0) {
+                puts("Invalid string length");
+                return 6;
+            }
+        }
+    }
+
+    int res;
+    res = vfs_normalize_path(path, path, strlen(path) + 1);
+    if (res < 0) {
+        _errno_string(res, (char *)buf, sizeof(buf));
+        printf("Invalid path \"%s\": %s\n", path, buf);
+        return 5;
+    }
+
+    int fd = vfs_open(path, flag, 0);
+    if (fd < 0) {
+        _errno_string(fd, (char *)buf, sizeof(buf));
+        printf("Error opening file \"%s\": %s\n", path, buf);
+        return 3;
+    }
+
+    if (ascii) {
+        while (nb_str > 0) {
+            res = vfs_write(fd, w_buf, nbytes);
+            if (res < 0) {
+                _errno_string(res, (char *)buf, sizeof(buf));
+                printf("Write error: %s\n", buf);
+                vfs_close(fd);
+                return 4;
+            }
+            nb_str--;
+            if (nb_str) {
+                vfs_write(fd, " ", 1);
+                w_buf = argv[argc - nb_str];
+            }
+        }
+    }
+    else {
+        while (nb_str > 0) {
+            w_buf = argv[argc - nb_str];
+            nbytes = strlen(w_buf);
+            while (nbytes > 0) {
+                uint8_t byte = _dehex(*w_buf) << 4 | _dehex(*(w_buf + 1));
+                res = vfs_write(fd, &byte, 1);
+                if (res < 0) {
+                    _errno_string(res, (char *)buf, sizeof(buf));
+                    printf("Write error: %s\n", buf);
+                    vfs_close(fd);
+                    return 4;
+                }
+                w_buf += 2;
+                nbytes -= 2;
+            }
+            nb_str--;
+        }
     }
 
     vfs_close(fd);
@@ -411,6 +558,9 @@ int _vfs_handler(int argc, char **argv)
     if (strcmp(argv[1], "r") == 0) {
         /* pass on to read handler, shifting the arguments by one */
         return _read_handler(argc - 1, &argv[1]);
+    }
+    else if (strcmp(argv[1], "w") == 0) {
+        return _write_handler(argc - 1, &argv[1]);
     }
     else if (strcmp(argv[1], "ls") == 0) {
         return _ls_handler(argc - 1, &argv[1]);
