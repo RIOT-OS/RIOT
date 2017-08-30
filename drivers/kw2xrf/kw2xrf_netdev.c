@@ -169,7 +169,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
         radio_info->lqi = ((uint8_t*)buf)[pkt_len];
-        radio_info->rssi = (uint8_t)kw2xrf_get_rssi(radio_info->lqi);
+        radio_info->rssi = kw2xrf_get_rssi(radio_info->lqi);
     }
 
     /* skip FCS and LQI */
