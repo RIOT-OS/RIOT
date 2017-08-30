@@ -71,7 +71,7 @@ uint16_t bh1750fvi_sample(const bh1750fvi_t *dev)
     i2c_release(dev->i2c);
 
     /* and finally we calculate the actual LUX value */
-    tmp = (raw[0] << 24) | (raw[1] << 16);
+    tmp = ((uint32_t)raw[0] << 24) | ((uint32_t)raw[1] << 16);
     tmp /= RES_DIV;
     return (uint16_t)(tmp);
 }
