@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Inria
+ *               2017 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,58 +12,64 @@
  * @{
  *
  * @file
- * @brief       Showing an example of scripting (javascript) from command line
+ * @brief       Example of how to use javascript on RIOT
  *
  * @author      Emmanuel Baccelli <emmanuel.baccelli@inria.fr>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
 
 #include <stdio.h>
 #include <string.h>
-#include "shell.h"
+
 #include "jerryscript.h"
+#include "jerryscript-ext/handler.h"
 
-int shell_script(int argc, char **argv)
+/* include header generated from main.js */
+#include "main.js.h"
+
+int js_run(const jerry_char_t *script, size_t script_size)
 {
-    if (argc < 2) {
-        puts("Usage: script <your script here!> \n"
-        "For example, try: \n"
-        "script var txt = \\'\\'; txt += Math.PI; print (\\'Pi=\\'+txt); \n"
-        "Note: you need to substitute usual quotes with \\' \n");
-        return -1;
+    jerry_value_t ret_value;
+
+    /* Initialize engine */
+    jerry_init(JERRY_INIT_EMPTY);
+
+    /* Register the print function in the global object. */
+    jerryx_handler_register_global((const jerry_char_t *) "print", jerryx_handler_print);
+
+    /* Setup Global scope code */
+    ret_value = jerry_parse(script, script_size, false);
+
+    if (!jerry_value_has_error_flag(ret_value)) {
+        /* Execute the parsed source code in the Global scope */
+        ret_value = jerry_run(ret_value);
     }
 
-    jerry_char_t script[(2 * SHELL_DEFAULT_BUFSIZE + 1)];
-    *script = '\0';
-    for(int i = 1; i < argc; i++) {
-        if (i>1) {
-            strcat((char *)script, " ");
-        }
-        strcat((char *)script, argv[i]);
+    int res = 0;
+
+    if (jerry_value_has_error_flag(ret_value)) {
+        printf("js_run(): Script Error!");
+        res = -1;
     }
 
-    size_t script_size = strlen((char *) script);
-    printf("Executing script: [%s]\n\n", script);
-    bool ret_value = jerry_run_simple(script, script_size, JERRY_INIT_EMPTY);
+    jerry_release_value(ret_value);
 
-    return (ret_value != 0);
+    /* Cleanup engine */
+    jerry_cleanup();
+
+    return res;
 }
-
-const shell_command_t shell_commands[] = {
-    { "script", "Shell scripting ", shell_script },
-    { NULL, NULL, NULL }
-};
 
 int main(void)
 {
     printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
     printf("This board features a(n) %s MCU.\n", RIOT_MCU);
 
-    /* start the shell */
-    char line_buf[2 * SHELL_DEFAULT_BUFSIZE];
-    /* for longer script support shell buffer should be bigger */
-    shell_run(shell_commands, line_buf, sizeof(line_buf));
+    printf("Executing main.js:\n");
+
+    js_run(main_js, main_js_len);
 
     return 0;
 }
