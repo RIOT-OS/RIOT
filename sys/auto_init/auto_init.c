@@ -82,6 +82,9 @@
 
 #ifdef MODULE_TINYMT32
 #include "random.h"
+#if CPUID_LEN
+#include "periph/cpuid.h"
+#endif
 #endif
 
 #ifdef MODULE_GCOAP
@@ -94,7 +97,17 @@
 void auto_init(void)
 {
 #ifdef MODULE_TINYMT32
+#if CPUID_LEN
+    uint8_t cpuid[CPUID_LEN];
+    cpuid_get(cpuid);
+    uint32_t seed = cpuid[0];
+    for (unsigned int i = 1; i < CPUID_LEN; ++i) {
+        seed += cpuid[i];
+    }
+    random_init(seed);
+#else
     random_init(0);
+#endif
 #endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
