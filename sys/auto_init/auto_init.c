@@ -291,6 +291,10 @@ void auto_init(void)
     extern void auto_init_mpl3115a2(void);
     auto_init_mpl3115a2();
 #endif
+#ifdef MODULE_GROVE_LEDBAR
+    extern void auto_init_grove_ledbar(void);
+    auto_init_grove_ledbar();
+#endif
 #ifdef MODULE_SI70XX
     extern void auto_init_si70xx(void);
     auto_init_si70xx();
