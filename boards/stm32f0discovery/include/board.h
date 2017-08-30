@@ -57,6 +57,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   ADC configuration for random seed generation
+ * @{
+ */
+#define RANDOM_SEED_ADC_LINE         (1)
+#define RANDOM_SEED_ADC_RES          ADC_RES_10BIT
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);

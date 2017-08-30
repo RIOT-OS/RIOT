@@ -84,6 +84,10 @@
 #include "random.h"
 #endif
 
+#ifdef MODULE_RANDOM_SEED
+#include "random_seed.h"
+#endif
+
 #ifdef MODULE_GCOAP
 #include "net/gcoap.h"
 #endif
@@ -93,12 +97,23 @@
 
 void auto_init(void)
 {
-#ifdef MODULE_TINYMT32
-    random_init(0);
-#endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
+#endif
+#ifdef MODULE_RANDOM_SEED
+    DEBUG("Auto init random_seed module.\n");
+    random_seed_set_global(random_seed_generate());
+#endif
+#ifdef MODULE_TINYMT32
+    DEBUG("Auto init tinymt32 rng with ");
+#ifdef MODULE_RANDOM_SEED
+    DEBUG("global random_seed value\n");
+    random_init(random_seed_get_global());
+#else
+    DEBUG("with 0. Consider using an external seed\n");
+    random_init(0);
+#endif
 #endif
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
