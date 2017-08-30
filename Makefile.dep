@@ -596,6 +596,7 @@ ifneq (,$(filter conn_can,$(USEMODULE)))
 endif
 
 ifneq (,$(filter random,$(USEMODULE)))
+  USEMODULE += prng
   # select default prng
   ifeq (,$(filter prng_%,$(USEMODULE)))
     USEMODULE += prng_tinymt32
