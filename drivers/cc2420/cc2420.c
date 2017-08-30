@@ -197,8 +197,8 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
         DEBUG("cc2420: recv: reading %i byte of the packet\n", (int)len);
         cc2420_fifo_read(dev, buf, len);
 
-        uint8_t rssi;
-        cc2420_fifo_read(dev, &rssi, 1);
+        int8_t rssi;
+        cc2420_fifo_read(dev, (uint8_t*)&rssi, 1);
         DEBUG("cc2420: recv: RSSI is %i\n", (int)rssi);
 
         /* fetch and check if CRC_OK bit (MSB) is set */
@@ -207,6 +207,11 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
             DEBUG("cc2420: recv: CRC_OK bit not set, dropping packet\n");
             /* drop the corrupted frame from the RXFIFO */
             len = 0;
+        }
+        if (info != NULL) {
+            netdev_ieee802154_rx_info_t *radio_info = info;
+            radio_info->rssi = CC2420_RSSI_OFFSET + rssi;
+            radio_info->lqi = crc_corr & CC2420_CRCCOR_COR_MASK;
         }
 
         /* finally flush the FIFO */
