@@ -85,7 +85,7 @@ typedef struct {
     uint8_t dst_l2addr_len;     /**< length of l2 destination address in byte */
     kernel_pid_t if_pid;        /**< PID of network interface */
     uint8_t flags;              /**< flags as defined above */
-    uint8_t rssi;               /**< rssi of received packet (optional) */
+    int16_t rssi;               /**< rssi of received packet in dBm (optional) */
     uint8_t lqi;                /**< lqi of received packet (optional) */
 } gnrc_netif_hdr_t;
 
