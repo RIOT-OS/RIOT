@@ -656,6 +656,8 @@ ifneq (,$(filter random,$(USEMODULE)))
   ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
     USEMODULE += tinymt32
   endif
+
+  USEMODULE += luid
 endif
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
