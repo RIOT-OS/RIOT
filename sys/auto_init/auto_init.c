@@ -80,7 +80,7 @@
 #include "net/fib.h"
 #endif
 
-#ifdef MODULE_TINYMT32
+#ifdef MODULE_PRNG
 #include "random.h"
 #endif
 
@@ -93,7 +93,7 @@
 
 void auto_init(void)
 {
-#ifdef MODULE_TINYMT32
+#ifdef MODULE_PRNG
     random_init(0);
 #endif
 #ifdef MODULE_XTIMER
