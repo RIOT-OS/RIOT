@@ -8,7 +8,8 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_sam0_common
+ * @ingroup     drivers_periph_uart
  * @{
  *
  * @file
@@ -29,6 +30,9 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+
+/* do not build the file in case no UART is defined */
+#ifdef UART_NUMOF
 
 /**
  * @brief   Allocate memory to store the callback functions
@@ -64,30 +68,9 @@ static uint8_t sercom_gclk_id[] =
 
 #endif
 
-static int init_base(uart_t uart, uint32_t baudrate);
-
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
-    /* initialize basic functionality */
-    int res = init_base(uart, baudrate);
-    if (res != UART_OK) {
-        return res;
-    }
-
-    /* register callbacks */
-    uart_ctx[uart].rx_cb = rx_cb;
-    uart_ctx[uart].arg = arg;
-    /* configure interrupts and enable RX interrupt */
-    NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(_uart(uart)));
-    _uart(uart)->INTENSET.reg |= SERCOM_USART_INTENSET_RXC;
-
-    return UART_OK;
-}
-
-static int init_base(uart_t uart, uint32_t baudrate)
-{
-
-    if ((unsigned int)uart >= UART_NUMOF) {
+    if (uart >= UART_NUMOF) {
         return UART_NODEV;
     }
 
@@ -151,6 +134,19 @@ static int init_base(uart_t uart, uint32_t baudrate)
     while(_uart(uart)->SYNCBUSY.bit.CTRLB) {}
     uart_poweron(uart);
 #endif
+
+    /* finally, enable the device */
+    _uart(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
+
+    /* register callbacks */
+    if (rx_cb) {
+        uart_ctx[uart].rx_cb = rx_cb;
+        uart_ctx[uart].arg = arg;
+        /* configure interrupts and enable RX interrupt */
+        NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(_uart(uart)));
+        _uart(uart)->INTENSET.reg |= SERCOM_USART_INTENSET_RXC;
+    }
+
     return UART_OK;
 }
 
@@ -304,3 +300,5 @@ static uint64_t _long_division(uint64_t n, uint64_t d)
     return q;
 }
 #endif
+
+#endif /* UART_NUMOF */
