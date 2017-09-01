@@ -40,7 +40,7 @@ extern "C" {
 
 /**
  * @brief FIFO-Address-Map
- ****@{
+ * @{
  */
 #define MRF24J40_TX_NORMAL_FIFO         (0x000)
 #define MRF24J40_TX_BEACON_FIFO         (0x080)
@@ -183,23 +183,23 @@ extern "C" {
  * @brief   Bitfield definitions for the RXMCR register (0x00)
  * @{
  */
-#define MRF24J40_RXMCR_NOACKRSP                 (0b00100000)
-#define MRF24J40_RXMCR_PANCOORD                 (0b00001000)
-#define MRF24J40_RXMCR_COORD                    (0b00000100)
-#define MRF24J40_RXMCR_ERRPKT                   (0b00000010)
-#define MRF24J40_RXMCR_PROMI                    (0b00000001)
+#define MRF24J40_RXMCR_NOACKRSP                 (0x20)
+#define MRF24J40_RXMCR_PANCOORD                 (0x08)
+#define MRF24J40_RXMCR_COORD                    (0x04)
+#define MRF24J40_RXMCR_ERRPKT                   (0x02)
+#define MRF24J40_RXMCR_PROMI                    (0x01)
 /** @} */
 
 /**
  * @brief   Bitfield definitions for the RXFLUSH register (0x0D)
  * @{
  */
-#define MRF24J40_RXFLUSH_WAKEPOL                (0b01000000)
-#define MRF24J40_RXFLUSH_WAKEPAD                (0b00100000)
-#define MRF24J40_RXFLUSH_CMDONLY                (0b00001000)
-#define MRF24J40_RXFLUSH_DATAONLY               (0b00000100)
-#define MRF24J40_RXFLUSH_BCNONLY                (0b00000010)
-#define MRF24J40_RXFLUSH_RXFLUSH                (0b00000001)
+#define MRF24J40_RXFLUSH_WAKEPOL                (0x40)
+#define MRF24J40_RXFLUSH_WAKEPAD                (0x20)
+#define MRF24J40_RXFLUSH_CMDONLY                (0x08)
+#define MRF24J40_RXFLUSH_DATAONLY               (0x04)
+#define MRF24J40_RXFLUSH_BCNONLY                (0x02)
+#define MRF24J40_RXFLUSH_RXFLUSH                (0x01)
 /** @} */
 
 /**
@@ -208,15 +208,15 @@ extern "C" {
  */
 #define MRF24J40_TXMCR_CSMA_BACKOFF_MASK        (0x07)
 
-#define MRF24J40_TXMCR_MACMINBE                 (0b00011000)
-#define MRF24J40_TXMCR_NOCSMA                   (0b10000000)
-#define MRF24J40_TXMCR_BATLIFEXT                (0b01000000)
-#define MRF24J40_TXMCR_SLOTTED                  (0b00100000)
-#define MRF24J40_TXMCR_MACMINBE1                (0b00010000)
-#define MRF24J40_TXMCR_MACMINBE0                (0b00001000)
-#define MRF24J40_TXMCR_CSMABF2                  (0b00000100)
-#define MRF24J40_TXMCR_CSMABF1                  (0b00000010)
-#define MRF24J40_TXMCR_CSMABF0                  (0b00000001)
+#define MRF24J40_TXMCR_MACMINBE                 (0x18)
+#define MRF24J40_TXMCR_NOCSMA                   (0x80)
+#define MRF24J40_TXMCR_BATLIFEXT                (0x40)
+#define MRF24J40_TXMCR_SLOTTED                  (0x20)
+#define MRF24J40_TXMCR_MACMINBE1                (0x10)
+#define MRF24J40_TXMCR_MACMINBE0                (0x08)
+#define MRF24J40_TXMCR_CSMABF2                  (0x04)
+#define MRF24J40_TXMCR_CSMABF1                  (0x02)
+#define MRF24J40_TXMCR_CSMABF0                  (0x01)
 
 /** @} */
 
@@ -224,13 +224,13 @@ extern "C" {
  * @brief   Bitfield definitions for the PACON2 register (0x18)
  * @{
  */
-#define MRF24J40_PACON2_FIFOEN                  (0b10000000)
-#define MRF24J40_PACON2_TXONTS3                 (0b00100000)
-#define MRF24J40_PACON2_TXONTS2                 (0b00010000)
-#define MRF24J40_PACON2_TXONTS1                 (0b00001000)
-#define MRF24J40_PACON2_TXONTS0                 (0b00000100)
-#define MRF24J40_PACON2_TXONT8                  (0b00000010)
-#define MRF24J40_PACON2_TXONT7                  (0b00000001)
+#define MRF24J40_PACON2_FIFOEN                  (0x80)
+#define MRF24J40_PACON2_TXONTS3                 (0x20)
+#define MRF24J40_PACON2_TXONTS2                 (0x10)
+#define MRF24J40_PACON2_TXONTS1                 (0x08)
+#define MRF24J40_PACON2_TXONTS0                 (0x04)
+#define MRF24J40_PACON2_TXONT8                  (0x02)
+#define MRF24J40_PACON2_TXONT7                  (0x01)
 /** @} */
 
 /**
@@ -248,32 +248,32 @@ extern "C" {
  * @brief   Bitfield definitions for the WAKECON register (0x22)
  * @{
  */
-#define MRF24J40_WAKECON_IMMWAKE                (0b10000000)
-#define MRF24J40_WAKECON_REGWAKE                (0b01000000)
+#define MRF24J40_WAKECON_IMMWAKE                (0x80)
+#define MRF24J40_WAKECON_REGWAKE                (0x40)
 /** @} */
 
 /**
  * @brief   Bitfield definitions for the TXSTAT register (0x24)
  * @{
  */
-#define MRF24J40_TXSTAT_MAX_FRAME_RETRIES       (0b11000000)
-#define MRF24J40_TXSTAT_TXNRETRY1               (0b10000000)
-#define MRF24J40_TXSTAT_TXNRETRY0               (0b01000000)
-#define MRF24J40_TXSTAT_CCAFAIL                 (0b00100000)
-#define MRF24J40_TXSTAT_TXG2FNT                 (0b00010000)
-#define MRF24J40_TXSTAT_TXG1FNT                 (0b00001000)
-#define MRF24J40_TXSTAT_TXG2STAT                (0b00000100)
-#define MRF24J40_TXSTAT_TXG1STAT                (0b00000010)
-#define MRF24J40_TXSTAT_TXNSTAT                 (0b00000001)
+#define MRF24J40_TXSTAT_MAX_FRAME_RETRIES       (0xC0)
+#define MRF24J40_TXSTAT_TXNRETRY1               (0x80)
+#define MRF24J40_TXSTAT_TXNRETRY0               (0x40)
+#define MRF24J40_TXSTAT_CCAFAIL                 (0x20)
+#define MRF24J40_TXSTAT_TXG2FNT                 (0x10)
+#define MRF24J40_TXSTAT_TXG1FNT                 (0x08)
+#define MRF24J40_TXSTAT_TXG2STAT                (0x04)
+#define MRF24J40_TXSTAT_TXG1STAT                (0x02)
+#define MRF24J40_TXSTAT_TXNSTAT                 (0x01)
 /** @} */
 
 /**
  * @brief   Bitfield definitions for the SOFTRST register (0x2A)
  * @{
  */
-#define MRF24J40_SOFTRST_RSTPWR                 (0b00000100)
-#define MRF24J40_SOFTRST_RSTBB                  (0b00000010)
-#define MRF24J40_SOFTRST_RSTMAC                 (0b00000001)
+#define MRF24J40_SOFTRST_RSTPWR                 (0x04)
+#define MRF24J40_SOFTRST_RSTBB                  (0x02)
+#define MRF24J40_SOFTRST_RSTMAC                 (0x01)
 /** @} */
 
 /**
@@ -322,7 +322,7 @@ extern "C" {
  * @brief   Bitfield definitions for the SLPACK register (0x35)
  * @{
  */
-#define MRF24J40_SLPACK_SLPACK                  (0b10000000)
+#define MRF24J40_SLPACK_SLPACK                  (0x80)
 /** @} */
 
 /**
@@ -340,29 +340,29 @@ extern "C" {
  * @brief   Bitfield definitions for the BBREG1 register (0x39)
  * @{
  */
-#define MRF24J40_BBREG1_RXDECINV                (0b00000100)
+#define MRF24J40_BBREG1_RXDECINV                (0x04)
 /** @} */
 
 /**
  * @brief   Bitfield definitions for the BBREG2 register (0x3A)
  * @{
  */
-#define MRF24J40_BBREG2_CCAMODE3                (0b11000000)
-#define MRF25J40_BBREG2_CCAMODE1                (0b10000000)
-#define MRF24J40_BBREG2_CCAMODE2                (0b01000000)
+#define MRF24J40_BBREG2_CCAMODE3                (0xC0)
+#define MRF25J40_BBREG2_CCAMODE1                (0x80)
+#define MRF24J40_BBREG2_CCAMODE2                (0x40)
 
-#define MRF24J40_BBREG2_CCACSTH                 (0b00111100)
+#define MRF24J40_BBREG2_CCACSTH                 (0x3C)
 /** @} */
 
 /**
  * @brief   Bitfield definitions for the BBREG6 register (0x3E)
  * @{
  */
-#define MRF24J40_BBREG6_RSSIMODE1               (0b10000000)
-#define MRF24J40_BBREG6_RSSIMODE2               (0b01000000)
-#define MRF24J40_BBREG2_RSSIRDY                 (0b00000001)
+#define MRF24J40_BBREG6_RSSIMODE1               (0x80)
+#define MRF24J40_BBREG6_RSSIMODE2               (0x40)
+#define MRF24J40_BBREG2_RSSIRDY                 (0x01)
 
-#define MRF24J40_BBREG2_CCACSTH                 (0b00111100)
+#define MRF24J40_BBREG2_CCACSTH                 (0x3C)
 /** @} */
 
 /**
