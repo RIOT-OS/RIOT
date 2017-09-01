@@ -49,6 +49,16 @@
 #define PLL_SRC                  RCC_PLLCFGR_PLLSRC_HSI
 #endif
 
+#if defined(CPU_FAM_STM32F2)
+#define RCC_PLLCFGR_PLLP_Pos       (16U)
+#define RCC_PLLCFGR_PLLM_Pos       (0U)
+#define RCC_PLLCFGR_PLLN_Pos       (6U)
+#define RCC_PLLCFGR_PLLQ_Pos       (24U)
+
+#define RCC_PLLI2SCFGR_PLLI2SN_Pos (6U)
+#define RCC_PLLI2SCFGR_PLLI2SR_Pos (28U)
+#endif
+
 #if (CLOCK_ENABLE_PLL_I2S)
 #ifdef RCC_PLLI2SCFGR_PLLI2SM_Pos
 #define PLLI2S_M                 (CLOCK_PLL_I2S_M << RCC_PLLI2SCFGR_PLLI2SM_Pos)
@@ -61,7 +71,16 @@
 #else
 #define PLLI2S_P                 (0)
 #endif
+#ifdef RCC_PLLI2SCFGR_PLLI2SQ_Pos
 #define PLLI2S_Q                 (CLOCK_PLL_I2S_Q << RCC_PLLI2SCFGR_PLLI2SQ_Pos)
+#else
+#define PLLI2S_Q                 (0)
+#endif
+#if defined(RCC_PLLI2SCFGR_PLLI2SR_Pos) && defined(CLOCK_PLL_I2S_R)
+#define PLLI2S_R                 (CLOCK_PLL_I2S_R << RCC_PLLI2SCFGR_PLLI2SR_Pos)
+#else
+#define PLLI2S_R                 (0)
+#endif
 #endif /* CLOCK_ENABLE_PLLI_2S */
 
 #if (CLOCK_ENABLE_PLL_SAI)
@@ -77,20 +96,23 @@
 #define PLLSAI_P                 (0)
 #endif
 #define PLLSAI_Q                 (CLOCK_PLL_SAI_Q << RCC_PLLSAICFGR_PLLSAIQ_Pos)
-#endif /* CLOCK_ENABLE_PLL_SAI */
-
-#if defined(CPU_FAM_STM32F2)
-#define RCC_PLLCFGR_PLLP_Pos    (16U)
-#define RCC_PLLCFGR_PLLM_Pos    (0U)
-#define RCC_PLLCFGR_PLLN_Pos    (6U)
-#define RCC_PLLCFGR_PLLQ_Pos    (24U)
+#if defined(RCC_PLLSAICFGR_PLLSAIR_Pos) && defined(CLOCK_PLL_SAI_R)
+#define PLLSAI_R                 (CLOCK_PLL_SAI_R << RCC_PLLSAICFGR_PLLSAIR_Pos)
+#else
+#define PLLSAI_R                 (0)
 #endif
+#endif /* CLOCK_ENABLE_PLL_SAI */
 
 /* now we get the actual bitfields */
 #define PLL_P                   (((CLOCK_PLL_P / 2) - 1) << RCC_PLLCFGR_PLLP_Pos)
 #define PLL_M                   (CLOCK_PLL_M << RCC_PLLCFGR_PLLM_Pos)
 #define PLL_N                   (CLOCK_PLL_N << RCC_PLLCFGR_PLLN_Pos)
 #define PLL_Q                   (CLOCK_PLL_Q << RCC_PLLCFGR_PLLQ_Pos)
+#if defined(RCC_PLLCFGR_PLLR_Pos) && defined(CLOCK_PLL_R)
+#define PLL_R                   (CLOCK_PLL_R << RCC_PLLCFGR_PLLR_Pos)
+#else
+#define PLL_R                   (0)
+#endif
 
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
 #if (CLOCK_HSE)
@@ -118,7 +140,6 @@
 
 #define RCC_CR_HSITRIM_4        (1 << 7)
 #define RCC_CFGR_PLLMUL         RCC_CFGR_PLLMULL
-
 #endif
 /** @} */
 
@@ -188,7 +209,7 @@ void stmclk_init_sysclk(void)
 #endif
     /* now we can safely configure and start the PLL */
 #if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7)
-    RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_P | PLL_Q);
+    RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_P | PLL_Q | PLL_R);
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F3)
     /* reset PLL configuration bits */
     RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMUL);
@@ -209,14 +230,14 @@ void stmclk_init_sysclk(void)
 
     stmclk_disable_hsi();
 
-#if (CLOCK_ENABLE_PLLI2S)
-    RCC->PLLI2SCFGR = (PLLI2S_SRC | PLLI2S_M | PLLI2S_N | PLLI2s_P | PLLI2S_Q);
+#if (CLOCK_ENABLE_PLL_I2S)
+    RCC->PLLI2SCFGR = (CLOCK_PLL_I2S_SRC | PLLI2S_M | PLLI2S_N | PLLI2S_P | PLLI2S_Q | PLLI2S_R);
     RCC->CR |= (RCC_CR_PLLI2SON);
     while (!(RCC->CR & RCC_CR_PLLI2SRDY)) {}
 #endif /* CLOCK_ENABLE_PLLI2S */
 
-#if (CLOCK_ENABLE_PLLSAI)
-    RCC->PLLSAICFGR = (PLLSAI_M | PLLSAI_N | PLLSAI_P | PLLSAI_Q);
+#if (CLOCK_ENABLE_PLL_SAI)
+    RCC->PLLSAICFGR = (PLLSAI_M | PLLSAI_N | PLLSAI_P | PLLSAI_Q | PLLSAI_R);
     RCC->CR |= (RCC_CR_PLLSAION);
     while (!(RCC->CR & RCC_CR_PLLSAIRDY)) {}
 #endif
