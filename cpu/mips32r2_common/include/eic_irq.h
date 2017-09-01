@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    cpu_mips32r2_commom MIPS32R2 Common
- * @ingroup     cpu
+ * @ingroup     cpu_mips32r2_commom
  * @{
  *
  * @file

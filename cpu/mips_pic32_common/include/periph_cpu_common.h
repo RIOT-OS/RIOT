@@ -10,10 +10,11 @@
 
 /**
  * @ingroup         cpu_mips_pic32_common
+ * @brief           Shared CPU specific definitions for the MIPS family.
  * @{
  *
  * @file
- * @brief           CPU specific definitions for internal peripheral handling
+ * @brief           Shared CPU specific definitions for the MIPS family.
  *
  * @author          Francois Berder <francois.berder@imgtec.com>
  */
