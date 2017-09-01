@@ -70,9 +70,9 @@
 /**
  * @brief Define variable in cross-file array
  *
- * Variables will end up sorted by prio, then by variable name.
+ * Variables will end up sorted by prio.
  *
- * Use instead of type in variable definition, e.g.:
+ * Add this to the type in a variable definition, e.g.:
  *
  *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
  *
@@ -84,7 +84,7 @@
 /**
  * @brief Add a pointer to cross-file array
  *
- * Pointers will end up sorted by prio, then by name.
+ * Pointers will end up sorted by prio.
  *
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa
