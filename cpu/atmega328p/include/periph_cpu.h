@@ -38,7 +38,7 @@ extern "C" {
 enum {
     PORT_B = 1,       /**< port B */
     PORT_C = 2,       /**< port C */
-    PORT_D = 3       /**< port D */
+    PORT_D = 3        /**< port D */
 };
 
 /**
