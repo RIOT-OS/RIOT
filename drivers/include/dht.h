@@ -78,11 +78,6 @@ typedef struct {
 typedef dht_t dht_params_t;
 
 /**
- * @brief auto-initialize all configured DHT devices
- */
-void dht_auto_init(void);
-
-/**
  * @brief initialize a new DHT device
  *
  * @param[out] dev      device descriptor of a DHT device
