@@ -230,7 +230,7 @@ static inline void sercom_clk_en(void *sercom)
     if (sercom_id(sercom) < 5) {
         MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
     } else {
-        MCLK->ABPDMASK.reg |= (MCLK_APBCMASK_SERCOM5);
+        MCLK->APBDMASK.reg |= (MCLK_APBDMASK_SERCOM5);
     }
 #endif
 }
@@ -248,7 +248,7 @@ static inline void sercom_clk_dis(void *sercom)
     if (sercom_id(sercom) < 5) {
         MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
     } else {
-        MCLK->ABPDMASK.reg &= ~(MCLK_APBCMASK_SERCOM5);
+        MCLK->APBDMASK.reg &= ~(MCLK_APBDMASK_SERCOM5);
     }
 #endif
 }
