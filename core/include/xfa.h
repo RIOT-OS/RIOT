@@ -29,8 +29,7 @@
  *
  * @internal
  */
-#define _XFA(name, prio) __attribute__((used)) \
-    __attribute__((section(".xfa." #name "." #prio)))
+#define _XFA(name, prio) __attribute__((used, section(".xfa." #name "." #prio)))
 
 /**
  * @brief Define a cross-file array
