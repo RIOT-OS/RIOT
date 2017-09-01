@@ -74,7 +74,7 @@
  *
  * Use instead of type in variable definition, e.g.:
  *
- *     XFA(driver_params, 0, driver_params_t) _onboard = { .pin=42 };
+ *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
  *
  * @param[in]   name    name of the xfa
  * @param[in]   prio    priority within the xfa
