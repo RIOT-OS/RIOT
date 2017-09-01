@@ -96,6 +96,21 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
+/**
+ * @name    I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev     = NRF_TWIM0,
+        .pin_scl = 28,
+        .pin_sda = 29
+    }
+};
+
+#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
