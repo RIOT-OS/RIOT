@@ -57,7 +57,6 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              stm32f3discovery \
                              telosb \
                              waspmote-pro \
-                             weio \
                              wsn430-v1_3b \
                              wsn430-v1_4 \
                              yunjia-nrf51822 z1
@@ -133,7 +132,6 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        stm32f3discovery \
                        stm32f4discovery \
                        udoo \
-                       weio \
                        yunjia-nrf51822
 
 DISABLE_TEST_FOR_ARM_CORTEX_M := tests-relic

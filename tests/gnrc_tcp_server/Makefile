@@ -17,7 +17,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo-f030 \
                              nucleo-f070 nucleo-f072 nucleo-f302 nucleo-f334 nucleo-l053 \
                              pca10000 pca10005 sb-430 sb-430h stm32f0discovery telosb \
-                             weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
+                             wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..

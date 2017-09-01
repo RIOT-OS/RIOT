@@ -13,7 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 \
                              nucleo32-f031 nucleo32-f042 nucleo32-f303 nucleo32-l031 \
                              nucleo-f030 nucleo-f070 nucleo-f072 nucleo-f103 nucleo-f302 \
                              nucleo-f334 nucleo-l053 nucleo-l073 opencm904 pca10000 \
-                             pca10005 spark-core stm32f0discovery telosb weio wsn430-v1_3b \
+                             pca10005 spark-core stm32f0discovery telosb wsn430-v1_3b \
                              wsn430-v1_4 yunjia-nrf51822 z1
 
 BOARD_BLACKLIST += mips-malta pic32-wifire pic32-clicker# No full UART available.
