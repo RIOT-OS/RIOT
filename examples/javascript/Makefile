@@ -24,8 +24,7 @@ CFLAGS += -DDEVELHELP
 # Set stack size to something (conservatively) enormous
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=9092
 
-# Add the package for Jerryscript
-USEPKG += jerryscript
+USEMODULE += js
 
 include $(CURDIR)/../../Makefile.include
 
