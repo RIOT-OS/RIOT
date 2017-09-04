@@ -74,16 +74,6 @@ uint8_t mrf24j40_reg_read_long(mrf24j40_t *dev, const uint16_t addr);
 void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t value);
 
 /**
- * @brief   Read a chunk of data from the TX Normal FIFO area of the given device
- *
- * @param[in]  dev      device to read from
- * @param[in]  offset   starting address to read from [valid 0x00-0x1ff]
- * @param[out] data     buffer to read data into
- * @param[in]  len      number of bytes to read from FIFO
- */
-void mrf24j40_tx_normal_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_t *data, const size_t len);
-
-/**
  * @brief   Write a chunk of data into the TX Normal FIFO area of the given device
  *
  * @param[in] dev       device to write to
