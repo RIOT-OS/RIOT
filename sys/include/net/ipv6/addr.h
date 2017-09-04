@@ -102,7 +102,7 @@ typedef union {
                                                0x00, 0x00, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x01 }}
 /**
- * @brief   Static initalizer for the link-local prefix (fe80::/64)
+ * @brief   Static initializer for the link-local prefix (fe80::/64)
  *
  * @see <a href="http://tools.ietf.org/html/rfc4291#section-2.5.6">
  *          RFC 4291, section 2.5.6
