@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup     driver_netdev_ieee802154
  * @{
  *
  * @file

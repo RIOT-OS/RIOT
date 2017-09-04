@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_lis3mdl
+ * @ingroup     drivers_lis3mdl
  * @{
  *
  * @file

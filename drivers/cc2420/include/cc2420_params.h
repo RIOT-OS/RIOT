@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the CC2420 driver
+ * @name    Set default configuration parameters for the CC2420 driver
  * @{
  */
 #ifndef CC2420_PARAM_SPI

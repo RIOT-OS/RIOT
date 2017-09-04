@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Constant part numbers of the AT86RF2xx device family
+ * @name    Constant part numbers of the AT86RF2xx device family
  * @{
  */
 #define AT86RF212B_PARTNUM       (0x07)
@@ -39,7 +39,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Assign the part number for the device we are building the driver for
+ * @name    Assign the part number for the device we are building the driver for
  * @{
  */
 #ifdef MODULE_AT86RF212B
@@ -54,7 +54,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   SPI access specifiers
+ * @name    SPI access specifiers
  * @{
  */
 #define AT86RF2XX_ACCESS_REG                                    (0x80)
@@ -65,7 +65,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Register addresses
+ * @name    Register addresses
  * @{
  */
 #define AT86RF2XX_REG__TRX_STATUS                               (0x01)
@@ -119,7 +119,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the TRX_CTRL_0 register
+ * @name    Bitfield definitions for the TRX_CTRL_0 register
  * @{
  */
 #define AT86RF2XX_TRX_CTRL_0_MASK__PAD_IO                       (0xC0)
@@ -143,7 +143,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the TRX_CTRL_1 register
+ * @name    Bitfield definitions for the TRX_CTRL_1 register
  * @{
  */
 #define AT86RF2XX_TRX_CTRL_1_MASK__PA_EXT_EN                    (0x80)
@@ -156,7 +156,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the TRX_CTRL_2 register
+ * @name    Bitfield definitions for the TRX_CTRL_2 register
  * @{
  */
 #define AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE                 (0x80)
@@ -170,7 +170,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the IRQ_STATUS register
+ * @name    Bitfield definitions for the IRQ_STATUS register
  * @{
  */
 #define AT86RF2XX_IRQ_STATUS_MASK__BAT_LOW                      (0x80)
@@ -184,7 +184,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the TRX_STATUS register
+ * @name    Bitfield definitions for the TRX_STATUS register
  * @{
  */
 #define AT86RF2XX_TRX_STATUS_MASK__CCA_DONE                     (0x80)
@@ -209,7 +209,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the TRX_STATE register
+ * @name    Bitfield definitions for the TRX_STATE register
  * @{
  */
 #define AT86RF2XX_TRX_STATE_MASK__TRAC                          (0xe0)
@@ -232,7 +232,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the PHY_CCA register
+ * @name    Bitfield definitions for the PHY_CCA register
  * @{
  */
 #define AT86RF2XX_PHY_CC_CCA_MASK__CCA_REQUEST                  (0x80)
@@ -243,7 +243,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the CCA_THRES register
+ * @name    Bitfield definitions for the CCA_THRES register
  * @{
  */
 #define AT86RF2XX_CCA_THRES_MASK__CCA_ED_THRES                  (0x0F)
@@ -252,7 +252,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the PHY_TX_PWR register
+ * @name    Bitfield definitions for the PHY_TX_PWR register
  * @{
  */
 #ifdef MODULE_AT86RF212B
@@ -272,7 +272,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the PHY_RSSI register
+ * @name    Bitfield definitions for the PHY_RSSI register
  * @{
  */
 #define AT86RF2XX_PHY_RSSI_MASK__RX_CRC_VALID                   (0x80)
@@ -281,7 +281,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the XOSC_CTRL register
+ * @name    Bitfield definitions for the XOSC_CTRL register
  * @{
  */
 #define AT86RF2XX_XOSC_CTRL__XTAL_MODE_CRYSTAL                  (0xF0)
@@ -289,7 +289,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Timing values
+ * @name    Timing values
  * @{
  */
 #define AT86RF2XX_TIMING__VCC_TO_P_ON                           (330)
@@ -302,7 +302,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the XAH_CTRL_0 register
+ * @name    Bitfield definitions for the XAH_CTRL_0 register
  * @{
  */
 #define AT86RF2XX_XAH_CTRL_0__MAX_FRAME_RETRIES                 (0xF0)
@@ -311,7 +311,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the XAH_CTRL_1 register
+ * @name    Bitfield definitions for the XAH_CTRL_1 register
  * @{
  */
 #define AT86RF2XX_XAH_CTRL_1__AACK_FLTR_RES_FT                  (0x20)
@@ -321,7 +321,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the CSMA_SEED_1 register
+ * @name    Bitfield definitions for the CSMA_SEED_1 register
  * @{
  */
 #define AT86RF2XX_CSMA_SEED_1__AACK_SET_PD                      (0x20)
@@ -331,7 +331,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Bitfield definitions for the RF_CTRL_0 register
+ * @name    Bitfield definitions for the RF_CTRL_0 register
  * @{
  */
 #ifdef MODULE_AT86RF212B

@@ -206,5 +206,5 @@ typedef struct cc110x_statistic {
 }
 #endif
 
-/** @} */
 #endif /* CC110X_INTERNAL_H */
+/** @} */

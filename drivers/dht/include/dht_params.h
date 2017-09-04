@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the DHT devices
+ * @name    Set default configuration parameters for the DHT devices
  * @{
  */
 #ifndef DHT_PARAM_PIN

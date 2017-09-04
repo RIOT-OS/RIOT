@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   HD44780 LCD commands
+ * @name    HD44780 LCD commands
  * @{
  */
 #define HD44780_CLEARDISPLAY            (0x01)
@@ -38,7 +38,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   HD44780 LCD entry modes flags
+ * @name    HD44780 LCD entry modes flags
  * @{
  */
 #define HD44780_ENTRYRIGHT              (0x00)
@@ -48,7 +48,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   HD44780 LCD control flags
+ * @name    HD44780 LCD control flags
  * @{
  */
 #define HD44780_DISPLAYON               (0x04)
@@ -60,7 +60,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   HD44780 display and cursor shift flags
+ * @name    HD44780 display and cursor shift flags
  * @{
  */
 #define HD44780_DISPLAYMOVE             (0x08)
@@ -70,7 +70,7 @@ extern "C" {
 /**@}*/
 
 /**
- * @brief   HD44780 LCD functional flags
+ * @name    HD44780 LCD functional flags
  * @{
  */
 #define HD44780_8BITMODE                (0x10)
@@ -82,7 +82,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   HD44780 LCD timings
+ * @name    HD44780 LCD timings
  * @{
  */
 #define HD44780_CMD_WAIT                (2000U)

@@ -61,5 +61,6 @@ int netdev_eth_set(netdev_t *dev, netopt_t opt, const void *value, size_t value_
 #ifdef __cplusplus
 }
 #endif
-/** @} */
+
 #endif /* NET_NETDEV_ETH_H */
+/** @} */

@@ -47,7 +47,7 @@ extern "C" {
 #define KW2XRF_DEFAULT_PANID            (IEEE802154_DEFAULT_PANID)
 
 /**
- * @brief   Default channel used after initialization
+ * @name    Default channel used after initialization
  *
  * @{
  */
@@ -57,7 +57,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Allowed range of channels
+ * @name    Allowed range of channels
  *
  * @{
  */
@@ -109,7 +109,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief struct holding all params needed for device initialization
+ * @brief   Struct holding all params needed for device initialization
  */
 typedef struct kw2xrf_params {
     spi_t spi;                          /**< SPI bus the device is connected to */

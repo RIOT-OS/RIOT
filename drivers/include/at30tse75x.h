@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 /**
- * @name AT30TSE75x I2C addresses
+ * @name    AT30TSE75x I2C addresses
  * @{
  */
 #define AT30TSE75X_TEMP_ADDR            (0x48)
@@ -41,7 +41,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name AT30TSE75x register addresses
+ * @name    AT30TSE75x register addresses
  * @{
  */
 #define AT30TSE75X_REG__TEMPERATURE     (0x00)
@@ -54,7 +54,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name AT30TSE75x number formatting
+ * @name    AT30TSE75x number formatting
  * @{
  */
 #define AT30TSE75X_INTEGER_MASK         (0x00ff)
@@ -66,7 +66,7 @@ extern "C" {
 
 
 /**
- * @name AT30TSE75x configuration register
+ * @name    AT30TSE75x configuration register
  *
  * Only upper byte can be read/written, so treat as 8-bit register.
  * @{
@@ -82,7 +82,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name AT30TSE75x commands
+ * @name    AT30TSE75x commands
  *
  * @{
  */
@@ -93,7 +93,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name AT30TSE75x constants
+ * @name    AT30TSE75x constants
  *
  * @{
  */
@@ -102,10 +102,11 @@ extern "C" {
 
 /**
   * @name AT30TSE75x configuration types
-  *
-  * @brief   Temperature resolution
-  *
   * @{
+  */
+
+/**
+  * @brief   Temperature resolution
   */
 typedef enum {
     AT30TSE75X_RESOLUTION_9BIT = 0,
@@ -113,7 +114,6 @@ typedef enum {
     AT30TSE75X_RESOLUTION_11BIT = 2,
     AT30TSE75X_RESOLUTION_12BIT = 3
 } at30tse75x_resolution_t;
-/** @} */
 
 /**
   * @brief   Operation mode
@@ -122,18 +122,15 @@ typedef enum {
   * is effectively shutdown and only wakes up to perform a single measurement.
   * When in comparator or interrupt mode, the device samples contiously the
   * temperature and sets the ALERT pin according to the chosen mode.
-  * @{
   */
 typedef enum {
     AT30TSE75X_MODE_COMPARATOR,
     AT30TSE75X_MODE_INTERRUPT,
     AT30TSE75X_MODE_ONE_SHOT
 } at30tse75x_mode_t;
-/** @} */
 
 /**
   * @brief   After how many limit exceeding measurements the ALERT pin is set
-  * @{
   */
 typedef enum {
     AT30TSE75X_ALARM_AFTER_1 = 0,
@@ -141,27 +138,24 @@ typedef enum {
     AT30TSE75X_ALARM_AFTER_4 = 2,
     AT30TSE75X_ALARM_AFTER_6 = 3
 } at30tse75x_fault_tolerance_t;
-/** @} */
 
 /**
   * @brief   Polarity of the ALERT pin
-  * @{
   */
 typedef enum {
     AT30TSE75X_ALARM_ACTIVE_LOW,
     AT30TSE75X_ALARM_ACTIVE_HIGH
 } at30tse75x_alarm_polatity_t;
-/** @} */
+
+/** @} */ /* AT30TSE75x configuration types */
 
 /**
   * @brief   Device descriptor for a AT30TSE75x device
-  * @{
   */
 typedef struct {
     i2c_t i2c;          /**< I2C device that sensor is connected to */
     uint8_t addr;       /**< I2C address of this particular sensor */
 } at30tse75x_t;
-/** @} */
 
 /**
  * @brief   Initialize a AT30TSE75x device
@@ -308,5 +302,5 @@ int at30tse75x_get_temperature(const at30tse75x_t* dev, float* temperature);
 }
 #endif
 
-/** @} */
 #endif /* AT30TSE75X_H */
+/** @} */

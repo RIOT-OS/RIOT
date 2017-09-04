@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_ethos
+ * @ingroup     drivers_ethos
  * @{
  *
  * @file

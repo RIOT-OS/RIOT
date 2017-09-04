@@ -9,8 +9,8 @@
 /**
  * @defgroup    drivers_feetech Feetech driver
  * @ingroup     drivers_actuators
+ * @brief       Drivers for any device using feetech's servomotors communication bus.
  *
- * This module contains drivers for any device using feetech's servomotors communication bus.
  * The bus is mainly used for servomotors, but a device can be anything : sensors, other actuators.
  *
  * @{
@@ -37,7 +37,7 @@ typedef uint8_t feetech_id_t;    /**< device id type */
 typedef uint8_t feetech_addr_t;  /**< address type */
 
 /**
- * @brief Descriptor struct for a feetech device
+ * @brief   Descriptor struct for a feetech device
  */
 typedef struct {
     uart_half_duplex_t *stream; /**< the stream used */
@@ -55,7 +55,7 @@ enum {
 };
 
 /**
- * @brief Send a PING message to a device
+ * @brief   Send a PING message to a device
  *
  * @param[in] stream   the stream
  * @param[in] id       the device address
@@ -68,7 +68,7 @@ enum {
 int feetech_ping(uart_half_duplex_t *stream, feetech_id_t id);
 
 /**
- * @brief Initialize a Feetech device
+ * @brief   Initialize a Feetech device
  *
  * @param[out] device  the Feetech device
  * @param[in] stream   the stream
@@ -77,7 +77,7 @@ int feetech_ping(uart_half_duplex_t *stream, feetech_id_t id);
 void feetech_init(feetech_t *device, uart_half_duplex_t *stream, feetech_id_t id);
 
 /**
- * @brief Write to a device 8bits address
+ * @brief   Write to a device 8bits address
  *
  * @param[in] device   the Feetech device
  * @param[in] addr     the address to write
@@ -91,7 +91,7 @@ void feetech_init(feetech_t *device, uart_half_duplex_t *stream, feetech_id_t id
 int feetech_write8(const feetech_t *device, feetech_addr_t addr, uint8_t value);
 
 /**
- * @brief Write to a device 16bits address
+ * @brief   Write to a device 16bits address
  *
  * @param[in] device   the Feetech device
  * @param[in] addr     the address to write
@@ -105,7 +105,7 @@ int feetech_write8(const feetech_t *device, feetech_addr_t addr, uint8_t value);
 int feetech_write16(const feetech_t *device, feetech_addr_t addr, uint16_t value);
 
 /**
- * @brief Write to a device address
+ * @brief   Write to a device address
  *
  * @param[in] device   the Feetech device
  * @param[in] addr     the address to start write
@@ -120,7 +120,7 @@ int feetech_write16(const feetech_t *device, feetech_addr_t addr, uint16_t value
 int feetech_write(const feetech_t *device, feetech_addr_t addr, const uint8_t *data, size_t length);
 
 /**
- * @brief Read from a device 8bits address
+ * @brief   Read from a device 8bits address
  *
  * @param[in] device   the Feetech device
  * @param[in] addr     the address to read
@@ -134,7 +134,7 @@ int feetech_write(const feetech_t *device, feetech_addr_t addr, const uint8_t *d
 int feetech_read8(const feetech_t *device, feetech_addr_t addr, uint8_t *value);
 
 /**
- * @brief Read from a device 16bits address
+ * @brief   Read from a device 16bits address
  *
  * @param[in] device   the Feetech device
  * @param[in] addr     the address to read
@@ -148,7 +148,7 @@ int feetech_read8(const feetech_t *device, feetech_addr_t addr, uint8_t *value);
 int feetech_read16(const feetech_t *device, feetech_addr_t addr, uint16_t *value);
 
 /**
- * @brief Read from a device address
+ * @brief   Read from a device address
  *
  * @param[in] device   the Feetech device
  * @param[in] addr      the address to start read

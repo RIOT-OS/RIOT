@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     driver_xbee
+ * @ingroup     drivers_xbee
  * @{
  *
  * @file

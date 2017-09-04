@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup drivers
+ * @ingroup     drivers
  * @{
  *
  * @file

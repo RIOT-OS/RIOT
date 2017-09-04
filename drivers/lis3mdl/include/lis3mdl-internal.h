@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_lis3mdl
+ * @ingroup     drivers_lis3mdl
  *
  * @{
  *
@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 /**
- * @brief LIS3DML chip identification
+ * @name    LIS3DML chip identification
  * @{
  */
 #define LIS3MDL_CHIP_ID                   (0x3D)
@@ -33,14 +33,14 @@ extern "C" {
 /** @} */
 
 /**
- * @name LIS3DML device identification register
+ * @name    LIS3DML device identification register
  * @{
  */
 #define LIS3DML_WHO_AM_I_REG              (0x0F)
 /**  @} */
 
 /**
- * @name LIS3DML controll register
+ * @name    LIS3DML controll register
  * @{
  */
 #define LIS3MDL_CTRL_REG1                 (0x20)
@@ -51,14 +51,14 @@ extern "C" {
 /**  @} */
 
 /**
- * @name LIS3DML masks for CTRL_REG1
+ * @name    LIS3DML masks for CTRL_REG1
  * @{
  */
 #define LIS3MDL_MASK_REG1_TEMP_EN         (0x80)
 /**  @} */
 
 /**
- * @name LIS3DML masks for CTRL_REG2
+ * @name    LIS3DML masks for CTRL_REG2
  * @{
  */
 #define LIS3MDL_MASK_REG2_REBOOT          (0x06)
@@ -66,7 +66,7 @@ extern "C" {
 /**  @} */
 
 /**
- * @name LIS3DML masks for CTRL_REG3
+ * @name    LIS3DML masks for CTRL_REG3
  * @{
  */
 #define LIS3MDL_MASK_REG3_LOW_POWER_EN    (0x02)
@@ -76,7 +76,7 @@ extern "C" {
 /**  @} */
 
 /**
- * @name LIS3DML masks for CTRL_REG5
+ * @name    LIS3DML masks for CTRL_REG5
  * @{
  */
 #define LIS3MDL_MASK_REG5_BDU             (0x40)
@@ -84,14 +84,14 @@ extern "C" {
 /**  @} */
 
 /**
- * @name LIS3DML status register
+ * @name    LIS3DML status register
  * @{
  */
 #define LIS3MDL_STATUS_REG                (0x27)
 /**  @} */
 
 /**
- * @name LIS3DML magnometer output register
+ * @name    LIS3DML magnometer output register
  * @{
  */
 #define LIS3MDL_OUT_X_L_REG               (0x28)
@@ -103,7 +103,7 @@ extern "C" {
 /**  @} */
 
 /**
- * @name LIS3DML temperature output register
+ * @name    LIS3DML temperature output register
  * @{
  */
 #define LIS3MDL_TEMP_OUT_L_REG            (0x2E)
@@ -111,7 +111,7 @@ extern "C" {
 /**  @} */
 
 /**
- * @name LIS3DML interrupt register
+ * @name    LIS3DML interrupt register
  * @{
  */
 #define LIS3MDL_INT_CFG_REG               (0x30)
@@ -121,7 +121,7 @@ extern "C" {
 /**  @} */
 
 /**
- * @name LIS3MDL masks for interrupt cfg register
+ * @name    LIS3MDL masks for interrupt cfg register
  * @{
  */
 #define LIS3MDL_MASK_INT_CFG_XIEN         (0x80)
@@ -133,7 +133,7 @@ extern "C" {
 /** }@ */
 
 /**
- * @name LIS3MDL masks for interrupt src register
+ * @name    LIS3MDL masks for interrupt src register
  * @{
  */
 #define LIS3MDL_MASK_INT_SRC_PTH_X        (0x80)

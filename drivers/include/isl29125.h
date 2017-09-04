@@ -59,7 +59,7 @@ extern "C" {
 #endif
 
 /**
- * @brief data type for storing lux RGB sensor readings
+ * @brief   Data type for storing lux RGB sensor readings
  */
 typedef struct {
     float red;              /**< red lux value */
@@ -68,7 +68,7 @@ typedef struct {
 } isl29125_rgb_t;
 
 /**
- * @brief supported operation modes of the ISL29125 sensor's AD
+ * @brief   Supported operation modes of the ISL29125 sensor's AD
  * conversion
  */
 typedef enum {
@@ -83,7 +83,7 @@ typedef enum {
 } isl29125_mode_t;
 
 /**
- * @brief supported RGB sensing range values of the ISL29125 sensor
+ * @brief   Supported RGB sensing range values of the ISL29125 sensor
  */
 typedef enum {
     ISL29125_RANGE_375 = 0x00,      /**< range: 5.7m - 375 lux */
@@ -91,7 +91,7 @@ typedef enum {
 } isl29125_range_t;
 
 /**
- * @brief supported color resolutions of the ISL29125 sensor's AD
+ * @brief   Supported color resolutions of the ISL29125 sensor's AD
  * conversion
  */
 typedef enum {
@@ -100,7 +100,7 @@ typedef enum {
 } isl29125_resolution_t;
 
 /**
- * @brief Device descriptor for ISL29125 sensors
+ * @brief   Device descriptor for ISL29125 sensors
  */
 typedef struct {
     i2c_t i2c;                      /**< I2C device the sensor is connected to */
@@ -110,7 +110,7 @@ typedef struct {
 } isl29125_t;
 
 /**
- * @brief Configuration-3 Register 0x03 B1:0
+ * @brief   Configuration-3 Register 0x03 B1:0
  */
 typedef enum {
     ISL29125_INTERRUPT_STATUS_NONE = 0x00,      /**< No interrupt */
@@ -120,7 +120,7 @@ typedef enum {
 } isl29125_interrupt_status_t;
 
 /**
- * @brief Configuration-3 Register 0x03 B3:2
+ * @brief   Configuration-3 Register 0x03 B3:2
  */
 typedef enum {
     ISL29125_INTERRUPT_PERSIST_1 = (0x00 << 2), /**< Int. Persist: Number of integration cycle 1 */
@@ -130,7 +130,7 @@ typedef enum {
 } isl29125_interrupt_persist_t;
 
 /**
- * @brief Configuration-3 Register 0x03 B4
+ * @brief   Configuration-3 Register 0x03 B4
  */
 typedef enum {
     ISL29125_INTERRUPT_CONV_DIS = (0x0 << 4),   /**< RGB Conversion done to ~INT Control disable */
@@ -138,7 +138,7 @@ typedef enum {
 } isl29125_interrupt_conven_t;
 
 /**
- * @brief initialize a new ISL29125 device
+ * @brief   Initialize a new ISL29125 device
  *
  * @param[in] dev           device descriptor of an ISL29125 device
  * @param[in] i2c           I2C device the sensor is connected to
@@ -155,7 +155,7 @@ int isl29125_init(isl29125_t *dev, i2c_t i2c, gpio_t gpio,
                   isl29125_resolution_t resolution);
 
 /**
- * @brief initialize interrupts
+ * @brief   Initialize interrupts
  *
  * @param[in] dev                   device descriptor of an ISL29125 device
  * @param[in] interrupt_status      Interrupt status
@@ -176,7 +176,7 @@ int isl29125_init_int(isl29125_t *dev, isl29125_interrupt_status_t interrupt_sta
                       gpio_cb_t cb, void *arg);
 
 /**
- * @brief read RGB values from device
+ * @brief   Read RGB values from device
  *
  * @param[in] dev       device descriptor of an ISL29125 device
  * @param[in] dest      pointer to lux RGB color object data is written to
@@ -184,7 +184,7 @@ int isl29125_init_int(isl29125_t *dev, isl29125_interrupt_status_t interrupt_sta
 void isl29125_read_rgb_lux(const isl29125_t *dev, isl29125_rgb_t *dest);
 
  /**
- * @brief read color values from device
+ * @brief   Read color values from device
  *
  * @param[in] dev       device descriptor of an ISL29125 device
  * @param[in] dest      pointer to RGB color object data is written to
@@ -192,7 +192,7 @@ void isl29125_read_rgb_lux(const isl29125_t *dev, isl29125_rgb_t *dest);
 void isl29125_read_rgb_color(const isl29125_t *dev, color_rgb_t *dest);
 
 /**
- * @brief set the device's operation mode
+ * @brief   Set the device's operation mode
  *
  * @param[in] dev       device descriptor of an ISL29125 device
  * @param[in] mode      operation mode
@@ -200,7 +200,7 @@ void isl29125_read_rgb_color(const isl29125_t *dev, color_rgb_t *dest);
 void isl29125_set_mode(const isl29125_t *dev, isl29125_mode_t mode);
 
 /**
- * @brief read isl29125 interrupt status
+ * @brief   Read isl29125 interrupt status
  *
  * @param[in] dev       device descriptor of an ISL29125 device
  *

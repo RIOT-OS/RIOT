@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Integration times
+ * @brief   Integration times
  */
 typedef enum veml6070_integrationtime {
   VEML6070_HALF_T = 0,              /**< 1/2 T integration time */
@@ -47,7 +47,7 @@ enum {
 };
 
 /**
- * @brief Device initialization parameters
+ * @brief   Device initialization parameters
  */
 typedef struct {
      i2c_t i2c_dev;                 /**< I2C device which is used */
@@ -55,14 +55,14 @@ typedef struct {
 } veml6070_params_t;
 
 /**
- * @brief Device descriptor for the VEML6070 sensor
+ * @brief   Device descriptor for the VEML6070 sensor
  */
 typedef struct {
     veml6070_params_t params;       /**< Device parameters */
 } veml6070_t;
 
 /**
- * @brief Initialize the given VEML6070 device
+ * @brief   Initialize the given VEML6070 device
  *
  * @param[out] dev          Initialized device descriptor of VEML6070 device
  * @param[in]  params       The parameters for the VEML6070 device (integration time)
@@ -73,7 +73,7 @@ typedef struct {
 int veml6070_init(veml6070_t *dev, const veml6070_params_t * params);
 
 /**
- * @brief Read UV index from the given VEML6070 device
+ * @brief   Read UV index from the given VEML6070 device
  *
  * @param[in] dev           Device descriptor of VEML6070 device to read from
  *

@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the TSL2561
+ * @name    Set default configuration parameters for the TSL2561
  * @{
  */
 #ifndef TSL2561_PARAM_I2C_DEV

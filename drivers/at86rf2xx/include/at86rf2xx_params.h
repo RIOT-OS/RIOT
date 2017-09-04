@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the AT86RF2xx driver
+ * @name    Set default configuration parameters for the AT86RF2xx driver
  * @{
  */
 #ifndef AT86RF2XX_PARAM_SPI

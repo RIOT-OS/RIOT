@@ -61,7 +61,7 @@ extern "C"
 #endif
 
 /**
- * @brief Device descriptor for ADT7310 sensors.
+ * @brief   Device descriptor for ADT7310 sensors.
  */
 typedef struct {
     spi_t spi;              /**< SPI bus the sensor is connected to */
@@ -71,8 +71,10 @@ typedef struct {
     bool high_res;          /**< Sensor resolution, true if configured to 16 bit resolution */
 } adt7310_t;
 
-/** @name ADT7310 configuration bits */
-/** @{ */
+/**
+ * @name    ADT7310 configuration bits
+ * @{
+ */
 #define ADT7310_CONF_FAULT_QUEUE_MASK  (0x03)
 #define ADT7310_CONF_FAULT_QUEUE_SHIFT (0)
 #define ADT7310_CONF_FAULT_QUEUE(x) (((x) << ADT7310_CONF_FAULT_QUEUE_SHIFT) & ADT7310_CONF_FAULT_QUEUE_MASK)
@@ -92,18 +94,26 @@ typedef struct {
 #define ADT7310_CONF_RESOLUTION_SHIFT (7)
 #define ADT7310_CONF_RESOLUTION(x) (((x) << ADT7310_CONF_RESOLUTION_SHIFT) & ADT7310_CONF_RESOLUTION_MASK)
 
-/** @brief Continuous operation mode */
+/**
+ * @brief   Continuous operation mode
+ */
 #define ADT7310_MODE_CONTINUOUS (ADT7310_CONF_OPERATION_MODE(0))
-/** @brief One shot */
+/**
+ * @brief   One shot
+ */
 #define ADT7310_MODE_ONE_SHOT   (ADT7310_CONF_OPERATION_MODE(1))
-/** @brief 1 sample per second */
+/**
+ * @brief   1 sample per second
+ */
 #define ADT7310_MODE_1SPS       (ADT7310_CONF_OPERATION_MODE(2))
-/** @brief Shut down (powersave) */
+/**
+ * @brief   Shut down (powersave)
+ */
 #define ADT7310_MODE_SHUTDOWN   (ADT7310_CONF_OPERATION_MODE(3))
 /** @} */
 
 /**
- * @brief Set configuration register of an ADT7310 sensor
+ * @brief   Set configuration register of an ADT7310 sensor
  *
  * @param[in]  dev          pointer to sensor device descriptor
  * @param[in]  config       configuration byte, see macros in adt7310.h
@@ -114,7 +124,7 @@ typedef struct {
 int adt7310_set_config(adt7310_t *dev, uint8_t config);
 
 /**
- * @brief Initialize the ADT7310 sensor driver.
+ * @brief   Initialize the ADT7310 sensor driver.
  *
  * @note The SPI bus is expected to have been initialized when adt7310_init is called.
  *
@@ -129,7 +139,7 @@ int adt7310_set_config(adt7310_t *dev, uint8_t config);
 int adt7310_init(adt7310_t *dev, spi_t spi, spi_clk_t clk, gpio_t cs);
 
 /**
- * @brief Read raw temperature register value
+ * @brief   Read raw temperature register value
  *
  * @note The three least-significant bits of the value register are used for
  *       flags if the sensor is configured for 13 bit mode.
@@ -142,7 +152,7 @@ int adt7310_init(adt7310_t *dev, spi_t spi, spi_clk_t clk, gpio_t cs);
 int16_t adt7310_read_raw(const adt7310_t *dev);
 
 /**
- * @brief Read temperature value from sensor and convert to milli-degrees Celsius.
+ * @brief   Read temperature value from sensor and convert to milli-degrees Celsius.
  *
  * Divide the returned value by 1000 to get integer degrees.
  *
@@ -154,7 +164,7 @@ int16_t adt7310_read_raw(const adt7310_t *dev);
 int32_t adt7310_read(const adt7310_t *dev);
 
 /**
- * @brief Read temperature value from sensor and convert to degrees Celsius.
+ * @brief   Read temperature value from sensor and convert to degrees Celsius.
  *
  * @param[in]  dev          pointer to sensor device descriptor
  *
