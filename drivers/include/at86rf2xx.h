@@ -372,6 +372,15 @@ int8_t at86rf2xx_get_cca_threshold(at86rf2xx_t *dev);
 void at86rf2xx_set_cca_threshold(at86rf2xx_t *dev, int8_t value);
 
 /**
+ * @brief   Get the latest ED level measurement
+ *
+ * @param[in] dev           device to read value from
+ *
+ * @return                  the last ED level
+ */
+int8_t at86rf2xx_get_ed_level(at86rf2xx_t *dev);
+
+/**
  * @brief   Enable or disable driver specific options
  *
  * @param[in] dev           device to set/clear option flag for

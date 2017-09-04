@@ -328,6 +328,18 @@ void at86rf2xx_set_cca_threshold(at86rf2xx_t *dev, int8_t value)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__CCA_THRES, value);
 }
 
+int8_t at86rf2xx_get_ed_level(at86rf2xx_t *dev)
+{
+    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
+#if MODULE_AT86RF212B
+    /* AT86RF212B has different scale than the other variants */
+    int8_t ed = (int8_t)(((int16_t)tmp * 103) / 100) + RSSI_BASE_VAL;
+#else
+    int8_t ed = (int8_t)tmp + RSSI_BASE_VAL;
+#endif
+    return ed;
+}
+
 void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
 {
     uint8_t tmp;
