@@ -19,6 +19,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              cc2650stk \
                              chronos \
                              ek-lm4f120xl \
+                             f3-femto \
                              feather-m0 \
                              hamilton \
                              i-nucleo-lrwan1 \
@@ -106,6 +107,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        cc2650-launchpad \
                        cc2650stk \
                        ek-lm4f120xl \
+                       f3-femto \
                        f4vi1 \
                        feather-m0 \
                        firefly \
