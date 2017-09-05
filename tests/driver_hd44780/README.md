@@ -13,12 +13,12 @@ your board use the following minimal pinout for the LCD (i.e., Arduino here):
 - Pin 1 is connected directly to GND.
 - Pin 2 is connected directly to VCC +5V.
 - Pin 3 is used to set LCD contrast, for max use +5V or a 10k potentiometer.
-- Pin 4 (RS or “register select”) is connected to pin 2 on the Arduino
-- Pin 5 (RW or “read/write”) is connected directly to GND, i.e., unused.
+- Pin 4 (RS or "register select") is connected to pin 2 on the Arduino
+- Pin 5 (RW or "read/write") is connected directly to GND, i.e., unused.
   Also note: if you connect RW to your board that the LCD is driven by 5V, while
   many boards internally run at 3.3V - so this could fry the board :/
-- Pin 6 (EN or “enable”) is connected to pin 3 on the Arduino.
-- Pins 7 – 10: Not connected.
+- Pin 6 (EN or "enable") is connected to pin 3 on the Arduino.
+- Pins 7 - 10: Not connected.
 - Pin 11 on the LCD is connected to pin 4 on the Arduino.
 - Pin 12 on the LCD is connected to pin 5 on the Arduino.
 - Pin 13 on the LCD is connected to pin 6 on the Arduino.
