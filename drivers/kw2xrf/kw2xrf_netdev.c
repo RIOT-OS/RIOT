@@ -56,7 +56,7 @@ static int _init(netdev_t *netdev)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
 
-    /* initialise SPI and GPIOs */
+    /* initialize SPI and GPIOs */
     if (kw2xrf_init(dev, &_irq_handler)) {
         LOG_ERROR("[kw2xrf] unable to initialize device\n");
         return -1;

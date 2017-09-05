@@ -34,7 +34,7 @@
 	(from the 2016.05-03 version) with a couple of modifications:
 
 	#define SKIP_COPY_TO_RAM - prevents the bootloader copying the whole contents
-	of flash to ram (as we want to XIP from flash), we copy initialised data from
+	of flash to ram (as we want to XIP from flash), we copy initialized data from
 	flash to ram in 'software_init_hook'.
 
 	move .org's to before the labels to make the vector labels appear at the vector
