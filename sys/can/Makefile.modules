@@ -1,0 +1,5 @@
+# Current makefile directory
+D := $(abspath $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
+
+MODULE_DIR_can_isotp := $(D)/isotp
+MODULE_DIR_conn_can  := $(D)/conn

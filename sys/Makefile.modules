@@ -1,0 +1,50 @@
+# Current makefile directory
+D := $(abspath $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
+
+# Define for modules which are directly in a subfolder
+__SUBFOLDER_MODULES = $(patsubst $(D)/%/Makefile,%,$(wildcard $(D)/*/Makefile))
+$(foreach module, $(__SUBFOLDER_MODULES), $(eval MODULE_DIR_$(module) := $(D)/$(module)))
+
+MODULE_DIR_sys             := $(D)
+
+# Define for modules which are in subdirectories
+MODULE_DIR_csma_sender     := $(D)/net/link_layer/csma_sender
+MODULE_DIR_posix_semaphore := $(D)/posix/semaphore
+MODULE_DIR_posix_sockets   := $(D)/posix/sockets
+MODULE_DIR_pthread         := $(D)/posix/pthread
+MODULE_DIR_shell_commands  := $(D)/shell/commands
+MODULE_DIR_net_help        := $(D)/net/crosslayer/net_help
+MODULE_DIR_routing         := $(D)/net/routing
+MODULE_DIR_oneway_malloc   := $(D)/oneway-malloc
+MODULE_DIR_ieee802154      := $(D)/net/link_layer/ieee802154
+MODULE_DIR_netdev_test     := $(D)/net/netdev_test
+MODULE_DIR_icmpv6          := $(D)/net/network_layer/icmpv6
+MODULE_DIR_ipv4_addr       := $(D)/net/network_layer/ipv4/addr
+MODULE_DIR_ipv6_addr       := $(D)/net/network_layer/ipv6/addr
+MODULE_DIR_ipv6_ext_rh     := $(D)/net/network_layer/ipv6/ext/rh
+MODULE_DIR_ipv6_ext        := $(D)/net/network_layer/ipv6/ext
+MODULE_DIR_ipv6_hdr        := $(D)/net/network_layer/ipv6/hdr
+MODULE_DIR_gnrc            := $(D)/net/gnrc
+MODULE_DIR_inet_csum       := $(D)/net/crosslayer/inet_csum
+MODULE_DIR_cipher_modes    := $(D)/crypto/modes
+MODULE_DIR_nhdp            := $(D)/net/routing/nhdp
+MODULE_DIR_gnrc_netdev     := $(D)/net/gnrc/link_layer/netdev
+MODULE_DIR_fib             := $(D)/net/network_layer/fib
+MODULE_DIR_sixlowpan       := $(D)/net/network_layer/sixlowpan
+MODULE_DIR_xtimer          := $(D)/xtimer
+MODULE_DIR_cpp11           := $(D)/cpp11-compat
+MODULE_DIR_udp             := $(D)/net/transport_layer/udp
+MODULE_DIR_tcp             := $(D)/net/transport_layer/tcp
+MODULE_DIR_hamming256      := $(D)/ecc/hamming256
+MODULE_DIR_uhcpc           := $(D)/net/application_layer/uhcp
+MODULE_DIR_gnrc_uhcpc      := $(D)/net/gnrc/application_layer/uhcpc
+MODULE_DIR_sntp            := $(D)/net/application_layer/sntp
+MODULE_DIR_netopt          := $(D)/net/crosslayer/netopt
+MODULE_DIR_sema            := $(D)/sema
+MODULE_DIR_gcoap           := $(D)/net/application_layer/gcoap
+MODULE_DIR_emcute          := $(D)/net/application_layer/emcute
+MODULE_DIR_sock_util       := $(D)/net/sock
+MODULE_DIR_sock_dns        := $(D)/net/application_layer/dns
+MODULE_DIR_constfs         := $(D)/fs/constfs
+MODULE_DIR_devfs           := $(D)/fs/devfs
+MODULE_DIR_l2filter        := $(D)/net/link_layer/l2filter
