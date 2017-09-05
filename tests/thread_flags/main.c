@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include "thread.h"
+#include "xtimer.h"
 
 static char stack[THREAD_STACKSIZE_MAIN];
 
@@ -84,6 +85,14 @@ int main(void)
     _set(thread, 0x4);
 
     while(!done) {};
+
+    puts("main: setting 100ms timeout...");
+    xtimer_t t;
+    uint32_t before = xtimer_now_usec();
+    xtimer_set_timeout_flag(&t, 100000);
+    thread_flags_wait_any(THREAD_FLAG_TIMEOUT);
+    uint32_t diff = xtimer_now_usec() - before;
+    printf("main: timeout triggered. time passed: %uus\n", (unsigned)diff);
 
     puts("test finished.");
 

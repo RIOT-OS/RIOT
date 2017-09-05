@@ -440,6 +440,17 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
 
 /**
+ * @brief    Set timeout thread flag after @p timeout
+ *
+ * This function will set THREAD_FLAG_TIMEOUT on the current thread after @p
+ * timeout usec have passed.
+ *
+ * @param[in]   t       timer struct to use
+ * @param[in]   timeout timeout in usec
+ */
+void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
+
+/**
  * @brief xtimer backoff value
  *
  * All timers that are less than XTIMER_BACKOFF microseconds in the future will
