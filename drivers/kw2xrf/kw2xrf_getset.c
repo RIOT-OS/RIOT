@@ -351,8 +351,8 @@ uint32_t kw2xrf_get_rssi(uint32_t value)
     /* Get rssi (Received Signal Strength Indicator, unit is dBm)
      * from lqi (Link Quality Indicator) value.
      * There are two different equations for RSSI:
-     * RF = (LQI – 286.6) / 2.69333 (MKW2xD Reference Manual)
-     * RF = (LQI – 295.4) / 2.84 (MCR20A Reference Manual)
+     * RF = (LQI - 286.6) / 2.69333 (MKW2xD Reference Manual)
+     * RF = (LQI - 295.4) / 2.84 (MCR20A Reference Manual)
      * The last appears more to match the graphic (Figure 3-10).
      * Since RSSI value is always positive and we want to
      * avoid the floating point computation:
