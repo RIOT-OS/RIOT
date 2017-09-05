@@ -1,17 +1,5 @@
-ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
-  DIRS += netif
-endif
+include Makefile.modules
 
-ifneq (,$(filter auto_init_saul,$(USEMODULE)))
-  DIRS += saul
-endif
-
-ifneq (,$(filter auto_init_storage,$(USEMODULE)))
-  DIRS += storage
-endif
-
-ifneq (,$(filter auto_init_can,$(USEMODULE)))
-  DIRS += can
-endif
+DIRS += $(foreach module, $(USEMODULE), $(MODULE_DIR_$(module)))
 
 include $(RIOTBASE)/Makefile.base

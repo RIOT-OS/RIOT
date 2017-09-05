@@ -1,8 +1,8 @@
 BASE_MODULE := prng
 SUBMODULES := 1
 
-ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
-  DIRS += tinymt32
-endif
+include Makefile.modules
+
+DIRS += $(foreach module, $(USEMODULE), $(MODULE_DIR_$(module)))
 
 include $(RIOTBASE)/Makefile.base

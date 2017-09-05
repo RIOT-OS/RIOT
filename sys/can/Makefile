@@ -1,10 +1,5 @@
+include Makefile.modules
 
-ifneq (,$(filter can_isotp,$(USEMODULE)))
-  DIRS += isotp
-endif
-
-ifneq (,$(filter conn_can,$(USEMODULE)))
-  DIRS += conn
-endif
+DIRS += $(foreach module, $(USEMODULE), $(MODULE_DIR_$(module)))
 
 include $(RIOTBASE)/Makefile.base
