@@ -448,7 +448,14 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
  * @param[in]   t       timer struct to use
  * @param[in]   timeout timeout in usec
  */
-void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
+void xtimer_set_timeout_flag(xtimer_t *timer, uint32_t timeout);
+
+/**
+ * @brief Set timeout thread flag after @p timeout, 64bit version
+ *
+ * See @ref xtimer_set_timeout_flag()
+ */
+void xtimer_set_timeout_flag64(xtimer_t *timer, uint64_t timeout);
 
 /**
  * @brief xtimer backoff value
