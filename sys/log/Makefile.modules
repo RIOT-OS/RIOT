@@ -1,0 +1,8 @@
+# Current makefile directory
+D := $(abspath $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
+
+# Define for modules which are directly in a subfolder
+__SUBFOLDER_LOG_MODULES = $(patsubst $(D)/%/Makefile,%,$(wildcard $(D)/*/Makefile))
+$(foreach module, $(__SUBFOLDER_LOG_MODULES), $(eval MODULE_DIR_$(module) := $(D)/$(module)))
+
+undefine D
