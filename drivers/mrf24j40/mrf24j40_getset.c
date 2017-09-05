@@ -236,7 +236,7 @@ void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
 
     mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON0, channel_value);
     /*
-     * Note:Perform an RF State Machine Reset (see Section 3.1 “Reset”)
+     * Note: Perform an RF State Machine Reset (see Section 3.1 Reset)
      * after a channel frequency change. Then, delay at least 192 us after
      * the RF State Machine Reset, to allow the RF circuitry to calibrate.
      */
@@ -373,7 +373,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                 tmp |= MRF24J40_TXMCR_NOCSMA;
                 /* MACMINBE<1:0>: The minimum value of the backoff exponent
                  * in the CSMA-CA algorithm. Note that if this value is set
-                 * to ‘0’, collision avoidance is disabled. */
+                 * to 0, collision avoidance is disabled. */
                 mrf24j40_reg_write_short(dev, MRF24J40_REG_TXMCR, tmp);
                 break;
             case MRF24J40_OPT_PROMISCUOUS:
