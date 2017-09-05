@@ -67,7 +67,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Board level initialisation
+ * @brief   Board level initialization
  */
 void board_init(void);
 
