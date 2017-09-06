@@ -150,7 +150,7 @@ static const pwm_conf_t pwm_config[] = {
 };
 
 /* number of devices that are actually defined */
-#define PWM_NUMOF           (2U)
+#define PWM_NUMOF           (sizeof(pwm_config)/sizeof(pwm_config[0]))
 /** @} */
 
 /**
