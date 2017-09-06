@@ -45,7 +45,7 @@ static int print_testend(int argc, char **argv)
 static int print_echo(int argc, char **argv)
 {
     for (int i = 0; i < argc; ++i) {
-        printf("“%s” ", argv[i]);
+        printf("\"%s\"", argv[i]);
     }
     puts("");
 

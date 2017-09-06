@@ -247,7 +247,7 @@ typedef enum {
     ADC_RES_14BIT =             (0xc00),    /**< not supported by hardware */
     ADC_RES_16BIT =             (0xd00),    /**< not supported by hardware */
 } adc_res_t;
-/** @} */
+/** @} */
 
 /**
  * @brief ADC configuration wrapper
