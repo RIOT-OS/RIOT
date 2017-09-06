@@ -174,7 +174,7 @@ int cmd_read(int argc, char **argv)
     }
     if (argc < 3) {
         puts("Error: not enough arguments given");
-        printf("Usage:\n%s ADDR LENGTH]\n", argv[0]);
+        printf("Usage:\n%s ADDR LENGTH\n", argv[0]);
         return 1;
     }
 
@@ -186,11 +186,11 @@ int cmd_read(int argc, char **argv)
         return 1;
     }
     else if (length == 1) {
-        printf("i2c_read_byte(I2C_%i, 0x%02x, uint8_t *res)\n", i2c_dev, addr);
+        printf("i2c_read_byte(I2C_%i, 0x%02x)\n", i2c_dev, addr);
         res = i2c_read_byte(i2c_dev, addr, data);
     }
     else {
-        printf("i2c_read_bytes(I2C_%i, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, length);
+        printf("i2c_read_bytes(I2C_%i, 0x%02x, %i)\n", i2c_dev, addr, length);
         res = i2c_read_bytes(i2c_dev, addr, data, length);
     }
 
@@ -203,7 +203,7 @@ int cmd_read(int argc, char **argv)
         for (int i = 0; i < res; i++) {
             printf("0x%02x, ", data[i]);
         }
-        puts("])");
+        puts("]");
         return 0;
     }
 }
@@ -221,7 +221,7 @@ int cmd_read_reg(int argc, char **argv)
     }
     if (argc < 4) {
         puts("Error: not enough arguments given");
-        printf("Usage:\n%s ADDR REG LENGTH]\n", argv[0]);
+        printf("Usage:\n%s ADDR REG LENGTH\n", argv[0]);
         return 1;
     }
 
@@ -234,11 +234,11 @@ int cmd_read_reg(int argc, char **argv)
         return 1;
     }
     else if (length == 1) {
-        printf("i2c_read_reg(I2C_%i, 0x%02x, 0x%02x, uint8_t *res)\n", i2c_dev, addr, reg);
+        printf("i2c_read_reg(I2C_%i, 0x%02x, 0x%02x)\n", i2c_dev, addr, reg);
         res = i2c_read_reg(i2c_dev, addr, reg, data);
     }
     else {
-        printf("i2c_read_regs(I2C_%i, 0x%02x, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, reg, length);
+        printf("i2c_read_regs(I2C_%i, 0x%02x, 0x%02x, %i)\n", i2c_dev, addr, reg, length);
         res = i2c_read_regs(i2c_dev, addr, reg, data, length);
     }
 
@@ -251,7 +251,7 @@ int cmd_read_reg(int argc, char **argv)
         for (int i = 0; i < res; i++) {
             printf("0x%02x, ", data[i]);
         }
-        puts("])");
+        puts("]");
         return 0;
     }
 
