@@ -289,6 +289,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Bitfield definitions for the RX_SYN register
+ * @{
+ */
+#define AT86RF2XX_RX_SYN__RX_PDT_DIS                            (0x80)
+#define AT86RF2XX_RX_SYN__RX_OVERRIDE                           (0x70)
+#define AT86RF2XX_RX_SYN__RX_PDT_LEVEL                          (0x0F)
+/** @} */
+
+/**
  * @name    Timing values
  * @{
  */

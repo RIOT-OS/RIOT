@@ -334,6 +334,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = sizeof(int8_t);
             break;
 
+        case NETOPT_IS_CHANNEL_CLR:
+            assert(max_len >= sizeof(netopt_enable_t));
+            *((netopt_enable_t *)val) = at86rf2xx_cca(dev);
+            res = sizeof(netopt_enable_t);
+            break;
+
         default:
             res = -ENOTSUP;
             break;
