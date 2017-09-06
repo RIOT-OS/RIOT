@@ -536,7 +536,7 @@ ifneq (,$(filter pthread,$(USEMODULE)))
 endif
 
 ifneq (,$(filter schedstatistics,$(USEMODULE)))
-    USEMODULE += xtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
@@ -573,7 +573,7 @@ ifneq (,$(filter evtimer,$(USEMODULE)))
 endif
 
 ifneq (,$(filter can_linux,$(USEMODULE)))
-    export LINKFLAGS += -lsocketcan
+  export LINKFLAGS += -lsocketcan
 endif
 
 ifneq (,$(filter can,$(USEMODULE)))
@@ -659,5 +659,5 @@ endif
 USEMODULE := $(sort $(USEMODULE))
 USEPKG := $(sort $(USEPKG))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
-    include $(RIOTBASE)/Makefile.dep
+  include $(RIOTBASE)/Makefile.dep
 endif
