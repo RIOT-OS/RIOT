@@ -6,10 +6,10 @@ timer.setInterval = function (callback, interval) {
         callback();
         next += interval;
         next_interval = next - timer.now();
-        timer.setCallback(interval_handler, next_interval);
+        timer.setTimeout(interval_handler, next_interval);
     }
 
-    return timer.setCallback(interval_handler, interval);
+    return timer.setTimeout(interval_handler, interval);
 }
 
 var n = 0;

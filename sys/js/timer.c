@@ -48,21 +48,21 @@ static jerry_value_t js_xtimer_create(jerry_value_t callback, uint32_t timeout)
     return object;
 }
 
-static JS_EXTERNAL_HANDLER(timer_setCallback) {
+static JS_EXTERNAL_HANDLER(timer_setTimeout) {
     (void)func_value;
     (void)this_value;
 
     if (args_cnt < 2) {
-        puts("timer.setCallback(): not enough arguments");
+        puts("timer.setTimeout(): not enough arguments");
         return 0;
     }
 
     if (!jerry_value_is_function(args_p[0])) {
-        puts("timer.setCallback(): arg 0 not a function");
+        puts("timer.setTimeout(): arg 0 not a function");
         return 0;
     }
     if (!jerry_value_is_number(args_p[1])) {
-        puts("timer.setCallback(): arg 1 not a number");
+        puts("timer.setTimeout(): arg 1 not a number");
         return 0;
     }
 
@@ -79,7 +79,7 @@ static JS_EXTERNAL_HANDLER(timer_now) {
 }
 
 const js_native_method_t timer_methods[] = {
-    { "setCallback", js_external_handler_timer_setCallback },
+    { "setTimeout", js_external_handler_timer_setTimeout },
     { "now", js_external_handler_timer_now }
 };
 
