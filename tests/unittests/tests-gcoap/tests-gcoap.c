@@ -25,7 +25,7 @@
 /*
  * A test set of dummy resources. The resource handlers are set to NULL.
  */
-static const coap_resource_t ressources[] = {
+static const coap_resource_t resources[] = {
     { "/test/info/all", (COAP_GET), NULL },
     { "/sensor/temp", (COAP_GET), NULL },
     { "/act/switch", (COAP_GET | COAP_POST), NULL }
@@ -36,8 +36,8 @@ static const coap_resource_t resources_second[] = {
 };
 
 static gcoap_listener_t listener = {
-    .resources     = (coap_resource_t *)&ressources[0],
-    .resources_len = (sizeof(ressources) / sizeof(ressources[0])),
+    .resources     = (coap_resource_t *)&resources[0],
+    .resources_len = (sizeof(resources) / sizeof(resources[0])),
     .next          = NULL
 };
 
