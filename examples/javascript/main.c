@@ -25,7 +25,8 @@
 
 #include "js.h"
 
-/* include header generated from main.js */
+/* include headers generated from *.js */
+#include "lib.js.h"
 #include "main.js.h"
 
 static event_queue_t event_queue;
@@ -40,6 +41,9 @@ int main(void)
     puts("Initializing jerryscript...");
     js_event_queue = &event_queue;
     js_init();
+
+    puts("Executing lib.js...");
+    js_run(lib_js, lib_js_len);
 
     puts("Executing main.js...");
     js_run(main_js, main_js_len);
