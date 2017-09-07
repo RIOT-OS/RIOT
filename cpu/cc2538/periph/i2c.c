@@ -86,7 +86,6 @@
 static mutex_t mutex = MUTEX_INIT;
 static mutex_t i2c_wait_mutex = MUTEX_INIT;
 static uint32_t speed_hz;
-static uint32_t scl_delay;
 
 #define WARN_IF(cond) \
         if (cond) { \
@@ -223,11 +222,6 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     }
 
     cc2538_i2c_init_master(dev, speed_hz);
-
-    /* Pre-compute an SCL delay in microseconds */
-    scl_delay = US_PER_SEC;
-    scl_delay += speed_hz;
-    scl_delay /= 2 * speed_hz;
 
     return 0;
 }
