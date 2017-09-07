@@ -26,9 +26,9 @@
  * A test set of dummy resources. The resource handlers are set to NULL.
  */
 static const coap_resource_t resources[] = {
-    { "/test/info/all", (COAP_GET), NULL },
+    { "/act/switch", (COAP_GET | COAP_POST), NULL },
     { "/sensor/temp", (COAP_GET), NULL },
-    { "/act/switch", (COAP_GET | COAP_POST), NULL }
+    { "/test/info/all", (COAP_GET), NULL },
 };
 
 static const coap_resource_t resources_second[] = {
@@ -47,7 +47,7 @@ static gcoap_listener_t listener_second = {
     .next          = NULL
 };
 
-static const char *resource_list_str = "</test/info/all>,</sensor/temp>,</act/switch>,</second/part>";
+static const char *resource_list_str = "</act/switch>,</sensor/temp>,</test/info/all>,</second/part>";
 
 /*
  * Client GET request success case. Test request generation.
