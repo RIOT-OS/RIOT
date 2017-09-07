@@ -33,12 +33,15 @@ void js_add_object(jerry_value_t object, jerry_value_t other, const char *name)
 jerry_value_t js_object_native_create(size_t size, const jerry_object_native_info_t *native_obj_type_info)
 {
     jerry_value_t object = jerry_create_object();
-    void *native_obj = malloc(size);
 
-    if (!native_obj) {
-        printf("%s(): malloc failed\n", __func__);
+    if (size) {
+        void *native_obj = malloc(size);
+        if (!native_obj) {
+            printf("%s(): malloc failed\n", __func__);
+        }
+        jerry_set_object_native_pointer(object, native_obj, native_obj_type_info);
     }
-    jerry_set_object_native_pointer(object, native_obj, native_obj_type_info);
+
     return object;
 }
 

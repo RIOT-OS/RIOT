@@ -719,6 +719,8 @@ ifneq (,$(filter js,$(USEMODULE)))
   USEPKG += jerryscript
   USEMODULE += xtimer
   USEMODULE += event
+  USEMODULE += saul_reg
+  USEMODULE += saul_default
 endif
 
 # always select gpio (until explicit dependencies are sorted out)
