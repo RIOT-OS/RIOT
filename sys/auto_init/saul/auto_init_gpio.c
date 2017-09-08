@@ -66,6 +66,12 @@ void auto_init_gpio(void)
         }
         /* initialize the GPIO pin */
         gpio_init(p->pin, p->mode);
+        /* set initial pin state if configured */
+        if (p->flags & (SAUL_GPIO_INIT_CLEAR | SAUL_GPIO_INIT_SET)) {
+            phydat_t s;
+            s.val[0] = (p->flags & SAUL_GPIO_INIT_SET);
+            saul_reg_entries[i].driver->write(p, &s);
+        }
         /* add to registry */
         saul_reg_add(&(saul_reg_entries[i]));
     }

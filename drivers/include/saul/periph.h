@@ -34,8 +34,8 @@ extern "C" {
 #ifdef MODULE_SAUL_GPIO
 typedef enum {
     SAUL_GPIO_INVERTED   = (1 << 0),  /**< pin is used as inverted */
-    SAUL_GPIO_INIT_CLEAR = 1 << 1, /**< set pin inactive after initialization */
-    SAUL_GPIO_INIT_SET   = 1 << 2, /**< set pin active after initialization */
+    SAUL_GPIO_INIT_CLEAR = (1 << 1),  /**< set pin inactive after init */
+    SAUL_GPIO_INIT_SET   = (1 << 2),  /**< set pin active after init */
 } saul_gpio_flags_t;
 
 /**
