@@ -25,9 +25,9 @@ else ifeq ($(PROGRAMMER),jlink)
   export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
   export RESET_FLAGS = $(BINDIR)
 
-ifneq (,$(filter rtt_stdio,$(USEMODULE)))
-  export TERMPROG = JLinkRTTClient
-endif
+  ifneq (,$(filter rtt_stdio,$(USEMODULE)))
+    export TERMPROG = JLinkRTTClient
+  endif
 
   export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 endif
