@@ -54,6 +54,7 @@ PSEUDOMODULES += pktqueue
 PSEUDOMODULES += posix
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += saul_adc
+PSEUDOMODULES += saul_pwm
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
 PSEUDOMODULES += schedstatistics
