@@ -38,7 +38,7 @@ buildtest:
 	@ \
 	BUILDTESTOK=true; \
 	APP_RETRY=0; \
-	for BOARD in $$($(MAKE) -s info-boards-supported); do \
+	for BOARD in ${BOARDS}; do \
 	  RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_MEMORY) | grep "\<$${BOARD}\>" 2>&1 >/dev/null && echo 1); \
 	  ${COLOR_ECHO} -n "Building for $${BOARD} "; \
 	  [ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
@@ -114,18 +114,18 @@ info-objsize:
 	  *) echo "Usage: $(MAKE) info-objsize SORTROW=[text|data|bss|dec]" ; return ;; \
 	esac; \
 	echo -e '   text\t   data\t    bss\t    dec\t    hex\tfilename'; \
-	$(SIZE) -dB $(BASELIBS) | \
+	$(SIZE) -d -B $(BASELIBS) | \
 	  tail -n+2 | \
 	  sed -e 's#$(BINDIR)##' | \
 	  sort -rnk$${SORTROW}
 
 info-buildsize:
-	@$(SIZE) -dB $(BINDIR)/$(APPLICATION).elf || echo ''
+	@$(SIZE) -d -B $(BINDIR)/$(APPLICATION).elf || echo ''
 
 info-buildsizes: SHELL=bash
 info-buildsizes:
 	@echo -e "   text\t   data\t    bss\t    dec\tboard"; \
-	for BOARD in $$($(MAKE) -s info-boards-supported); do \
+	for BOARD in ${BOARDS}; do \
 	  echo "$$(env -i \
 	    HOME=$${HOME} \
 	    PATH=$${PATH} \
@@ -142,7 +142,7 @@ info-buildsizes:
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
 	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
-	for BOARD in $$($(MAKE) -s info-boards-supported); do \
+	for BOARD in ${BOARDS}; do \
 	  for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
 	    env -i \
 	      HOME=$${HOME} \
@@ -255,7 +255,7 @@ info-boards-features-missing:
 
 FEATURES_REQUIRED += $(FEATURES_OPTIONAL)
 
-ifneq (, $(filter info-boards-supported info-boards-features-missing info-build, $(MAKECMDGOALS)))
+ifneq (, $(filter buildtest info-boards-supported info-boards-features-missing info-build info-buildsizes info-buildsizes-diff, $(MAKECMDGOALS)))
   FEATURES_PROVIDED_BAK := $(FEATURES_PROVIDED)
 
   define board_missing_features
