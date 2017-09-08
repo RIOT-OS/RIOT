@@ -17,3 +17,5 @@ FEATURES_PROVIDED += cpp
 
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = cortex_m4_2
+
+-include $(RIOTCPU)/k60/Makefile.features
