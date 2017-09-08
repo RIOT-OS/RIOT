@@ -26,6 +26,11 @@
 extern "C" {
 #endif
 
+ /**
+ * @brief   Length of the CPU_ID in bytes
+ */
+#define CPUID_LEN           (4U)
+
 #define GPIO_PIN(x,y)       ((x << 4) | (y & 0xf))
 
 /**
