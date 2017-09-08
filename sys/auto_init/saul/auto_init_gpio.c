@@ -33,11 +33,6 @@
 #define SAUL_GPIO_NUMOF    (sizeof(saul_gpio_params)/sizeof(saul_gpio_params[0]))
 
 /**
- * @brief   Allocate memory for the device descriptors
- */
-static gpio_t saul_gpios[SAUL_GPIO_NUMOF];
-
-/**
  * @brief   Memory for the registry entries
  */
 static saul_reg_t saul_reg_entries[SAUL_GPIO_NUMOF];
@@ -60,8 +55,7 @@ void auto_init_gpio(void)
 
         LOG_DEBUG("[auto_init_saul] initializing GPIO #%u\n", i);
 
-        saul_gpios[i] = p->pin;
-        saul_reg_entries[i].dev = &(saul_gpios[i]);
+        saul_reg_entries[i].dev = p;
         saul_reg_entries[i].name = p->name;
         if ((p->mode == GPIO_IN) || (p->mode == GPIO_IN_PD) ||
             (p->mode == GPIO_IN_PU)) {
