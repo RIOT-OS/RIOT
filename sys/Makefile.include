@@ -43,10 +43,6 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   export UNDEF += $(BINDIR)/cpp11-compat/cppsupport.o
 endif
 
-ifneq (,$(filter gnrc_slip,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_uart
-endif
-
 ifneq (,$(filter embunit,$(USEMODULE)))
   ifeq ($(OUTPUT),XML)
     CFLAGS += -DOUTPUT=OUTPUT_XML
