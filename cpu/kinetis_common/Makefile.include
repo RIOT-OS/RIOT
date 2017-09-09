@@ -14,11 +14,12 @@ export UNDEF += $(BINDIR)/kinetis_common/fcfield.o
 export UNDEF += $(BINDIR)/kinetis_common/vectors.o
 
 # include kinetis common periph drivers
-export USEMODULE += kinetis_common_periph
-export USEMODULE += periph_common
+USEMODULE += kinetis_common_periph
+USEMODULE += periph_common
 
-#include layered power mode module
-USEMODULE += pm_layered
+# select kinetis periph drivers
+USEMODULE += periph_mcg
+USEMODULE += periph_wdog
 
 # Define a recipe to build the watchdog disable binary, used when flashing
 $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin: $(RIOTCPU)/kinetis_common/dist/wdog-disable.s
