@@ -33,6 +33,24 @@ extern "C" {
 #define GPIO_PIN(x, y)          ((x << 4) | y)
 
 /**
+ * @brief   Override the GPIO flanks
+ *
+ * This device has an additional mode in which the interrupt is triggered
+ * when the pin is low.
+ *
+ * Enumeration order is important, do not modify.
+ * @{
+ */
+#define HAVE_GPIO_FLANK_T
+typedef enum {
+    GPIO_LOW,          /**< emit interrupt when pin low */
+    GPIO_BOTH,         /**< emit interrupt on both flanks */
+    GPIO_FALLING,      /**< emit interrupt on falling flank */
+    GPIO_RISING,       /**< emit interrupt on rising flank */
+} gpio_flank_t;
+/** @} */
+
+/**
  * @brief   Use some common SPI functions
  * @{
  */

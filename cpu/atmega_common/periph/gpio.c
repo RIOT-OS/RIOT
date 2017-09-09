@@ -158,40 +158,18 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     EIMSK |= (1 << pin_num);
 
     /* configure the flank */
-    switch (flank) {
-        case GPIO_RISING:
-            if (pin_num < 4) {
-                EICRA |= (3 << pin_num * 2);
-            }
+    if (flank > GPIO_RISING) {
+        return -1;
+    }
+
+    if (pin_num < 4) {
+        EICRA |= (flank << (pin_num * 2));
+    }
 #if defined(EICRB)
-            else {
-                EICRB |= (3 << (pin_num * 2) % 4);
-            }
+    else {
+        EICRB |= (flank << (pin_num * 2) % 4);
+    }
 #endif
-            break;
-        case GPIO_FALLING:
-            if (pin_num < 4) {
-                EICRA |= (2 << pin_num * 2);
-            }
-#if defined(EICRB)
-            else {
-                EICRB |= (2 << (pin_num * 2) % 4);
-            }
-#endif
-            break;
-        case GPIO_BOTH:
-            if (pin_num < 4) {
-                EICRA |= (1 << pin_num * 2);
-            }
-#if defined(EICRB)
-            else {
-                EICRB |= (1 << (pin_num * 2) % 4);
-            }
-#endif
-            break;
-        default:
-            return -1;
-    };
 
     /* set callback */
     config[pin_num].cb = cb;
