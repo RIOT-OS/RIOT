@@ -80,6 +80,24 @@ saul.get_one = function(type) {
 
             return timer.setInterval(poller, 100000);
         }
+        res.sample = function(n) {
+            var result = {
+                min : Number.MAX_VALUE,
+                max : Number.MIN_VALUE,
+                avg : 0
+            }
+
+            var left = n
+            while (left > 0) {
+                var val = this.read();
+                result.avg += val;
+                result.max = Math.max(result.max, val);
+                result.min = Math.min(result.min, val);
+                left -= 1;
+            }
+            result.avg /= n;
+            return result;
+        }
     }
     return res;
 }
