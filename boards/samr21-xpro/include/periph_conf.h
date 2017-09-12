@@ -118,7 +118,7 @@ static const uart_conf_t uart_config[] = {
         .mux    = GPIO_MUX_D,
         .rx_pad = UART_PAD_RX_1,
         .tx_pad = UART_PAD_TX_0,
-        .runstdby = 0,
+        .flags  = UART_FLAG_NONE,
         .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
     },
     {
@@ -128,7 +128,7 @@ static const uart_conf_t uart_config[] = {
         .mux    = GPIO_MUX_D,
         .rx_pad = UART_PAD_RX_1,
         .tx_pad = UART_PAD_TX_0,
-        .runstdby = 0,
+        .flags  = UART_FLAG_NONE,
         .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
     }
 };

@@ -118,6 +118,15 @@ typedef enum {
 } uart_txpad_t;
 
 /**
+ * @brief   Available SERCOM UART flag selections
+ */
+typedef enum {
+    UART_FLAG_NONE            = 0x0,    /**< No flags set */
+    UART_FLAG_RUN_STANDBY     = 0x1,    /**< run SERCOM in standby mode */
+    UART_FLAG_WAKEUP          = 0x2,    /**< wake from sleep on receive */
+} uart_flag_t;
+
+/**
  * @brief   UART device configuration
  */
 typedef struct {
@@ -127,7 +136,7 @@ typedef struct {
     gpio_mux_t mux;         /**< alternative function for pins */
     uart_rxpad_t rx_pad;    /**< pad selection for RX line */
     uart_txpad_t tx_pad;    /**< pad selection for TX line */
-    uint8_t runstdby;       /**< allow SERCOM to run in standby mode */
+    uart_flag_t flags;      /**< set optional SERCOM flags */
     uint32_t gclk_src;      /**< GCLK source which supplys SERCOM */
 } uart_conf_t;
 
