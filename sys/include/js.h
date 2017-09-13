@@ -39,9 +39,10 @@ void js_add_object(jerry_value_t object, jerry_value_t other, const char *name);
 void *js_get_object_native_pointer(jerry_value_t object, const jerry_object_native_info_t *type);
 jerry_value_t js_object_create_with_methods(const js_native_method_t *methods, unsigned num_methods);
 jerry_value_t js_object_native_create(size_t size, const jerry_object_native_info_t *native_obj_type_info);
-void js_callback(void *arg);
-void js_event_callback(event_t *event);
-void js_run_callback(jerry_value_t callback);
+void js_callback_isr(void *arg);
+void js_call_function(jerry_value_t callback);
+void js_callback_init(js_callback_t *js_callback, jerry_value_t callback);
+void js_callback_run(js_callback_t *js_callback);
 void js_callback_cancel(js_callback_t *callback);
 void js_shutdown(void);
 

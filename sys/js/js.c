@@ -68,11 +68,11 @@ jerry_value_t js_object_create_with_methods(const js_native_method_t *methods, u
     return object;
 }
 
-void js_run_callback(jerry_value_t callback)
+void js_call_function(jerry_value_t function)
 {
-    if (jerry_value_is_function(callback)) {
+    if (jerry_value_is_function(function)) {
         jerry_value_t this_val = jerry_create_undefined();
-        jerry_value_t ret_val = jerry_call_function(callback, this_val, NULL, 0);
+        jerry_value_t ret_val = jerry_call_function(function, this_val, NULL, 0);
 
         if (!jerry_value_has_error_flag(ret_val)) {
             DEBUG("%s():l%u %s\n", __FILE__, __LINE__, __func__);
@@ -87,25 +87,6 @@ void js_run_callback(jerry_value_t callback)
     else {
         printf("%s():l%u %s\n", __FILE__, __LINE__, __func__);
     }
-    jerry_release_value(callback);
-}
-
-void js_callback(void *arg)
-{
-    js_callback_t *js_callback = (js_callback_t *)arg;
-    event_post(js_event_queue, &js_callback->event);
-}
-
-void js_event_callback(event_t *event)
-{
-    js_callback_t *js_callback = (js_callback_t *) event;
-    js_run_callback(js_callback->callback.object);
-    clist_remove(&js_native_refs, &js_callback->callback.ref);
-}
-
-void js_callback_cancel(js_callback_t *callback)
-{
-    event_cancel(js_event_queue, &callback->event);
 }
 
 int js_run(const jerry_char_t *script, size_t script_size)
@@ -151,7 +132,7 @@ static void js_shutdown_event_handler(event_t *event)
 
     unsigned state = irq_disable();
 
-    /* drain all events from queue */
+    /* drain all js callbackevents from queue */
     while (event_get(js_event_queue));
 
     /* un-reference all jerryscript objects referenced by native code */

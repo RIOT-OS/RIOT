@@ -11,6 +11,7 @@
 
 typedef struct {
     js_callback_t callback;
+    jerry_value_t object;
     xtimer_t xtimer;
 } js_xtimer_t;
 
@@ -19,9 +20,7 @@ static void _js_xtimer_freecb(void *native_p)
     DEBUG("%s:l%u:%s()\n", __FILE__, __LINE__, __func__);
 
     js_xtimer_t *js_xtimer = (js_xtimer_t *) native_p;
-    clist_remove(&js_native_refs, &js_xtimer->callback.callback.ref);
     xtimer_remove(&js_xtimer->xtimer);
-    js_callback_cancel(&js_xtimer->callback);
     free(js_xtimer);
 }
 
@@ -44,10 +43,8 @@ static jerry_value_t js_xtimer_create(jerry_value_t callback, uint32_t timeout)
     js_add_object(callback, object, "_obj");
 
     memset(js_xtimer, '\0', sizeof(*js_xtimer));
-    js_xtimer->callback.event.callback = js_event_callback;
-    js_xtimer->callback.callback.object = jerry_acquire_value(callback);
-    clist_rpush(&js_native_refs, &js_xtimer->callback.callback.ref);
-    js_xtimer->xtimer.callback = js_callback;
+    js_callback_init(&js_xtimer->callback, callback);
+    js_xtimer->xtimer.callback = js_callback_isr;
     js_xtimer->xtimer.arg = js_xtimer;
     xtimer_set(&js_xtimer->xtimer, timeout);
 
