@@ -1,6 +1,7 @@
 #ifndef JS_H
 #define JS_H
 
+#include "clist.h"
 #include "event.h"
 #include "jerryscript.h"
 #include "jerryscript-ext/handler.h"
@@ -18,10 +19,16 @@ typedef struct {
 } js_native_objects_t;
 
 typedef struct {
-    event_t event;
-    jerry_value_t callback;
+    list_node_t ref;
     jerry_value_t object;
+} js_native_ref_t;
+
+typedef struct {
+    event_t event;
+    js_native_ref_t callback;
 } js_callback_t;
+
+extern list_node_t js_native_refs;
 
 void js_init(event_queue_t *queue);
 int js_run(const jerry_char_t *script, size_t script_size);
@@ -35,6 +42,8 @@ jerry_value_t js_object_native_create(size_t size, const jerry_object_native_inf
 void js_callback(void *arg);
 void js_event_callback(event_t *event);
 void js_run_callback(jerry_value_t callback);
+void js_callback_cancel(js_callback_t *callback);
+void js_shutdown(void);
 
 #define JS_EXTERNAL_HANDLER(name) \
     jerry_value_t \

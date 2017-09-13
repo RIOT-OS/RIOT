@@ -8,6 +8,7 @@
 #include "debug.h"
 
 event_queue_t *js_event_queue;
+list_node_t js_native_refs;
 
 void js_add_external_handler(jerry_value_t object, const char *name, jerry_external_handler_t handler)
 {
@@ -98,8 +99,13 @@ void js_callback(void *arg)
 void js_event_callback(event_t *event)
 {
     js_callback_t *js_callback = (js_callback_t *) event;
-    js_run_callback(js_callback->callback);
-    jerry_release_value(js_callback->object);
+    js_run_callback(js_callback->callback.object);
+    clist_remove(&js_native_refs, &js_callback->callback.ref);
+}
+
+void js_callback_cancel(js_callback_t *callback)
+{
+    event_cancel(js_event_queue, &callback->event);
 }
 
 int js_run(const jerry_char_t *script, size_t script_size)
@@ -137,4 +143,32 @@ void js_init(event_queue_t *queue)
     jerryx_handler_register_global((const jerry_char_t *) "print", jerryx_handler_print);
 
     js_init_objects();
+}
+
+static void js_shutdown_event_handler(event_t *event)
+{
+    (void)event;
+
+    unsigned state = irq_disable();
+
+    /* drain all events from queue */
+    while (event_get(js_event_queue));
+
+    /* un-reference all jerryscript objects referenced by native code */
+    js_native_ref_t *ref;
+    while ((ref = (js_native_ref_t*) clist_lpop(&js_native_refs))) {
+        jerry_release_value(ref->object);
+    }
+
+    /* cleanup jerryscript engine */
+    jerry_cleanup();
+
+    irq_restore(state);
+}
+
+static event_t js_shutdown_event = { .handler = js_shutdown_event_handler };
+
+void js_shutdown(void)
+{
+    event_post(js_event_queue, &js_shutdown_event);
 }

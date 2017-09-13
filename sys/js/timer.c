@@ -19,7 +19,9 @@ static void _js_xtimer_freecb(void *native_p)
     DEBUG("%s:l%u:%s()\n", __FILE__, __LINE__, __func__);
 
     js_xtimer_t *js_xtimer = (js_xtimer_t *) native_p;
+    clist_remove(&js_native_refs, &js_xtimer->callback.callback.ref);
     xtimer_remove(&js_xtimer->xtimer);
+    js_callback_cancel(&js_xtimer->callback);
     free(js_xtimer);
 }
 
@@ -34,13 +36,17 @@ static jerry_value_t js_xtimer_create(jerry_value_t callback, uint32_t timeout)
     js_xtimer_t *js_xtimer = js_get_object_native_pointer(object, &js_xtimer_object_native_info);
 
     if (!js_xtimer) {
-        printf("%s():l%u\n", __FILE__, __LINE__);
+        DEBUG("%s():l%u\n", __FILE__, __LINE__);
     }
+
+    /* add the xtimer object as property to the callback so
+     * it stays referenced */
+    js_add_object(callback, object, "_obj");
 
     memset(js_xtimer, '\0', sizeof(*js_xtimer));
     js_xtimer->callback.event.callback = js_event_callback;
-    js_xtimer->callback.callback = jerry_acquire_value(callback);
-    js_xtimer->callback.object = jerry_acquire_value(object);
+    js_xtimer->callback.callback.object = jerry_acquire_value(callback);
+    clist_rpush(&js_native_refs, &js_xtimer->callback.callback.ref);
     js_xtimer->xtimer.callback = js_callback;
     js_xtimer->xtimer.arg = js_xtimer;
     xtimer_set(&js_xtimer->xtimer, timeout);
