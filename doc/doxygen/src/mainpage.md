@@ -208,7 +208,7 @@ starting point for anyone who is new to RIOT.
 For more information best browse that directory and have a look at the
 `README.md` files that ship with each example.
 
-To create your own application — here or anywhere else — see @ref creating-an-application
+To create your own application - here or anywhere else - see @ref creating-an-application
 
 tests
 -----

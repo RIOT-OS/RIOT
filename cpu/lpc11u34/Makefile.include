@@ -1,5 +1,0 @@
-export CPU_ARCH = cortex-m0
-
-USEMODULE += pm_cortexm_common
-
-include $(RIOTMAKE)/arch/cortexm.inc.mk

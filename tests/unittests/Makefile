@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-duemilanove \
                              arduino-mega2560 \
                              arduino-mkr1000 \
+                             arduino-mkrzero \
                              arduino-uno \
                              arduino-zero \
                              b-l072z-lrwan1 \
@@ -56,7 +57,6 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              stm32f3discovery \
                              telosb \
                              waspmote-pro \
-                             weio \
                              wsn430-v1_3b \
                              wsn430-v1_4 \
                              yunjia-nrf51822 z1
@@ -77,6 +77,7 @@ DISABLE_TEST_FOR_ARM7 := tests-relic tests-cpp_%
 ARM_CORTEX_M_BOARDS := airfy-beacon \
                        arduino-due \
                        arduino-mkr1000 \
+                       arduino-mkrzero \
                        arduino-zero \
                        b-l072z-lrwan1 \
                        cc2538dk \
@@ -131,7 +132,6 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        stm32f3discovery \
                        stm32f4discovery \
                        udoo \
-                       weio \
                        yunjia-nrf51822
 
 DISABLE_TEST_FOR_ARM_CORTEX_M := tests-relic

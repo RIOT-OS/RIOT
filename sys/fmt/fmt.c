@@ -35,6 +35,17 @@ ssize_t write(int fildes, const void *buf, size_t nbyte);
 
 static const char _hex_chars[16] = "0123456789ABCDEF";
 
+static const uint32_t _tenmap[] = {
+    0,
+    10LU,
+    100LU,
+    1000LU,
+    10000LU,
+    100000LU,
+    1000000LU,
+    10000000LU,
+};
+
 static inline int _is_digit(char c)
 {
     return (c >= '0' && c <= '9');
@@ -162,8 +173,8 @@ size_t fmt_u32_dec(char *out, uint32_t val)
     size_t len = 1;
 
     /* count needed characters */
-    for (uint32_t tmp = val; (tmp > 9); len++) {
-        tmp /= 10;
+    for (uint32_t tmp = 10; tmp <= val; len++) {
+        tmp *= 10;
     }
 
     if (out) {
@@ -183,12 +194,12 @@ size_t fmt_u16_dec(char *out, uint16_t val)
 
 size_t fmt_s32_dec(char *out, int32_t val)
 {
-    int negative = (val < 0);
+    unsigned negative = (val < 0);
     if (negative) {
         if (out) {
             *out++ = '-';
         }
-        val *= -1;
+        val = -val;
     }
     return fmt_u32_dec(out, val) + negative;
 }
@@ -216,10 +227,10 @@ size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
         if (out) {
             out[pos++] = '-';
         }
-        val *= -1;
+        val = -val;
     }
 
-    e = pwr(10, fp_digits);
+    e = _tenmap[fp_digits];
     absolute = (val / (int)e);
     divider = val - (absolute * e);
 
@@ -243,16 +254,48 @@ size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
     return pos;
 }
 
-static const uint32_t _tenmap[] = {
-    0,
-    10LU,
-    100LU,
-    1000LU,
-    10000LU,
-    100000LU,
-    1000000LU,
-    10000000LU,
-};
+size_t fmt_s32_dfp(char *out, int32_t val, unsigned fp_digits)
+{
+    int32_t absolute, divider;
+    unsigned div_len, len, pos = 0;
+    char tmp[9];
+
+    if (fp_digits > 9) {
+        return 0;
+    }
+    if (fp_digits == 0) {
+        return fmt_s32_dec(out, val);
+    }
+    if (val < 0) {
+        if (out) {
+            out[pos++] = '-';
+        }
+        val = -val;
+    }
+
+    uint32_t e = _tenmap[fp_digits];
+    absolute = (val / e);
+    divider = val - (absolute * e);
+
+    pos += fmt_s32_dec(&out[pos], absolute);
+
+    if (!out) {
+        return pos + 1 + fp_digits;     /* abs len + decimal point + divider */
+    }
+
+    out[pos++] = '.';
+    len = pos + fp_digits;
+    div_len = fmt_s32_dec(tmp, divider);
+
+    while (pos < (len - div_len)) {
+        out[pos++] = '0';
+    }
+    for (size_t i = 0; i < div_len; i++) {
+        out[pos++] = tmp[i];
+    }
+
+    return pos;
+}
 
 /* this is very probably not the most efficient implementation, as it at least
  * pulls in floating point math.  But it works, and it's always nice to have
@@ -266,7 +309,7 @@ size_t fmt_float(char *out, float f, unsigned precision)
     uint32_t integer;
 
     if (negative) {
-        f *= -1;
+        f = -f;
     }
 
     integer = (uint32_t) f;

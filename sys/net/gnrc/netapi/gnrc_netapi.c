@@ -45,7 +45,7 @@ static inline int _get_set(kernel_pid_t pid, uint16_t type,
     msg_t cmd;
     msg_t ack;
     gnrc_netapi_opt_t o;
-    /* set ńetapi's option struct */
+    /* set netapi's option struct */
     o.opt = opt;
     o.context = context;
     o.data = data;

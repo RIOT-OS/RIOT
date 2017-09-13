@@ -157,7 +157,7 @@ static void test_fmt_u64_dec_c(void)
     TEST_ASSERT_EQUAL_STRING("1234567890123456789", (char *) out);
 }
 
-static void test_rmt_s16_dec(void)
+static void test_fmt_s16_dec(void)
 {
     char out[7] = "-------";
     int16_t val;
@@ -182,7 +182,7 @@ static void test_rmt_s16_dec(void)
     TEST_ASSERT_EQUAL_STRING("12345", (char *)out);
 }
 
-static void test_rmt_s16_dfp(void)
+static void test_fmt_s16_dfp(void)
 {
     char out[8] = "--------";
     int16_t val;
@@ -241,6 +241,70 @@ static void test_rmt_s16_dfp(void)
     val = 31987;
     fpp = 5;
     len = fmt_s16_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(0, len);
+    TEST_ASSERT_EQUAL_STRING("", (char *)out);
+}
+
+static void test_fmt_s32_dfp(void)
+{
+    char out[13] = "-------------";
+    int32_t val;
+    unsigned fpp;
+    size_t len;
+
+    val = 0;
+    fpp = 8;
+    len = fmt_s32_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(10, len);
+    TEST_ASSERT_EQUAL_STRING("0.00000000", (char *)out);
+
+    val = 123456789;
+    fpp = 7;
+    len = fmt_s32_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(10, len);
+    TEST_ASSERT_EQUAL_STRING("12.3456789", (char *)out);
+
+    val = 120030;
+    fpp = 3;
+    len = fmt_s32_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(7, len);
+    TEST_ASSERT_EQUAL_STRING("120.030", (char *)out);
+
+    val = -314159;
+    fpp = 5;
+    len = fmt_s32_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(8, len);
+    TEST_ASSERT_EQUAL_STRING("-3.14159", (char *)out);
+
+    val = -23;
+    fpp = 9;
+    len = fmt_s32_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(12, len);
+    TEST_ASSERT_EQUAL_STRING("-0.000000023", (char *)out);
+
+    val = 50;
+    fpp = 6;
+    len = fmt_s32_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(8, len);
+    TEST_ASSERT_EQUAL_STRING("0.000050", (char *)out);
+
+    val = -123456789;
+    fpp = 0;
+    len = fmt_s32_dfp(out, val, fpp);
+    out[len] = '\0';
+    TEST_ASSERT_EQUAL_INT(10, len);
+    TEST_ASSERT_EQUAL_STRING("-123456789", (char *)out);
+
+    val = 31987;
+    fpp = 10;
+    len = fmt_s32_dfp(out, val, fpp);
     out[len] = '\0';
     TEST_ASSERT_EQUAL_INT(0, len);
     TEST_ASSERT_EQUAL_STRING("", (char *)out);
@@ -321,8 +385,9 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_u64_dec_c),
         new_TestFixture(test_fmt_u16_dec),
         new_TestFixture(test_fmt_s32_dec),
-        new_TestFixture(test_rmt_s16_dec),
-        new_TestFixture(test_rmt_s16_dfp),
+        new_TestFixture(test_fmt_s16_dec),
+        new_TestFixture(test_fmt_s16_dfp),
+        new_TestFixture(test_fmt_s32_dfp),
         new_TestFixture(test_fmt_strlen),
         new_TestFixture(test_fmt_str),
         new_TestFixture(test_scn_u32_dec),

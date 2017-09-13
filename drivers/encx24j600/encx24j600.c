@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     driver_encx24j600
+ * @ingroup     drivers_encx24j600
  * @{
  *
  * @file

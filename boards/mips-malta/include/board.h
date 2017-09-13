@@ -34,7 +34,7 @@ extern "C" {
 #define TICKS_PER_US (15)
 
 /**
- * @brief       Board level initialisation
+ * @brief       Board level initialization
  */
 void board_init(void);
 

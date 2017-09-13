@@ -44,7 +44,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
 static void _isr(netdev_t *netdev);
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
-static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len);
+static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len);
 
 const netdev_driver_t cc2420_driver = {
     .send = _send,
@@ -64,19 +64,19 @@ static void _irq_handler(void *arg)
     }
 }
 
-static inline uint16_t to_u16(void *buf)
+static inline uint16_t to_u16(const void *buf)
 {
-    return *((uint16_t *)buf);
+    return *((const uint16_t *)buf);
 }
 
-static inline int16_t to_i16(void *buf)
+static inline int16_t to_i16(const void *buf)
 {
-    return *((int16_t *)buf);
+    return *((const int16_t *)buf);
 }
 
-static inline bool to_bool(void *buf)
+static inline bool to_bool(const void *buf)
 {
-    return *((bool *)buf);
+    return *((const bool *)buf);
 }
 
 static inline int w_u16(void *buf, uint16_t val)
@@ -236,7 +236,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     }
 }
 
-static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t val_len)
+static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
 {
     if (netdev == NULL) {
         return -ENODEV;
@@ -249,12 +249,12 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t val_len)
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(val_len == 2);
-            cc2420_set_addr_short(dev, (uint8_t *)val);
+            cc2420_set_addr_short(dev, val);
             return 2;
 
         case NETOPT_ADDRESS_LONG:
             assert(val_len == 8);
-            cc2420_set_addr_long(dev, (uint8_t *)val);
+            cc2420_set_addr_long(dev, val);
             return 8;
 
         case NETOPT_NID:

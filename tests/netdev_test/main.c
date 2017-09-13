@@ -64,7 +64,7 @@ static void _dev_isr(netdev_t *dev);
 static int _dev_recv(netdev_t *dev, char *buf, int len, void *info);
 static int _dev_send(netdev_t *dev, const struct iovec *vector, int count);
 static int _dev_get_addr(netdev_t *dev, void *value, size_t max_len);
-static int _dev_set_addr(netdev_t *dev, void *value, size_t max_len);
+static int _dev_set_addr(netdev_t *dev, const void *value, size_t max_len);
 
 /* tests getter */
 static int test_get_addr(void)
@@ -347,7 +347,7 @@ static int _dev_get_addr(netdev_t *dev, void *value, size_t max_len)
     return sizeof(_dev_addr);
 }
 
-static int _dev_set_addr(netdev_t *dev, void *value, size_t value_len)
+static int _dev_set_addr(netdev_t *dev, const void *value, size_t value_len)
 {
     (void)dev;
     if (value_len != sizeof(_dev_addr)) {

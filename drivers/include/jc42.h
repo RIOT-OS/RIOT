@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 /**
- * @name jc42 status return codes
+ * @name    jc42 status return codes
  * @{
  */
 #define JC42_OK                       (0)
@@ -58,7 +58,7 @@ typedef struct {
 } jc42_t;
 
 /**
- * @brief Device initialization parameters
+ * @brief   Device initialization parameters
  */
 typedef struct {
     i2c_t i2c;	        /**< I2C device that sensor is connected to */
@@ -67,7 +67,7 @@ typedef struct {
 } jc42_params_t;
 
 /**
- * @brief export SAUL endpoint
+ * @brief   Export SAUL endpoint
  */
 extern const saul_driver_t jc42_temperature_saul_driver;
 
@@ -121,5 +121,5 @@ int jc42_get_temperature(const jc42_t* dev, int16_t* temperature);
 }
 #endif
 
-/** @} */
 #endif /* JC42_H */
+/** @} */

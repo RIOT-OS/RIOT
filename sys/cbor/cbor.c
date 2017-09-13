@@ -400,7 +400,7 @@ static size_t decode_bytes(const cbor_stream_t *s, size_t offset, char *out, siz
         return 0;
     }
 
-    if (length + 1 < bytes_length) {
+    if (length < bytes_length + 1) {
         return 0;
     }
 

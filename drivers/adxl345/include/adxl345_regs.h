@@ -23,8 +23,9 @@
  extern "C" {
 #endif
 
-/** \name Register addresses
- *  @{
+/**
+ * @name    Register addresses
+ * @{
  */
 #define ACCEL_ADXL345_CHIP_ID_REG    (0x00) /**< Device ID */
 #define ACCEL_ADXL345_THRESH_TAP     (0x1D) /**< Tap threshold */
@@ -59,14 +60,14 @@
 /** @} */
 
 /**
- * @name Device ID for ADXL345
+ * @name    Device ID for ADXL345
  * @{
  */
 #define ACCEL_ADXL345_CHIP_ID        (0xE5)
 /** @} */
 
 /**
- * @name Resolution masks for output data
+ * @name    Resolution masks for output data
  * @{
  */
 #define RES_10_BITS       (0x03FF)
@@ -76,7 +77,7 @@
 /** @} */
 
 /**
- * @name bits definitions for ACT_INACT_CTL register
+ * @name    bits definitions for ACT_INACT_CTL register
  * @{
  */
 #define INACT_Z_ENABLE    (1 << 0)
@@ -90,7 +91,7 @@
 /** @} */
 
 /**
- * @name bits definitions for TAP_AXES register
+ * @name    bits definitions for TAP_AXES register
  * @{
  */
 #define TAP_Z_ENABLE      (1 << 0)
@@ -101,7 +102,7 @@
 /** @} */
 
 /**
- * @name bits definitions for ACT_TAP_STATUS register
+ * @name    bits definitions for ACT_TAP_STATUS register
  * @{
  */
 #define TAP_Z_SRC         (1 << 0)
@@ -114,7 +115,7 @@
 /** @} */
 
 /**
- * @name bits definitions for BW_RATE register
+ * @name    bits definitions for BW_RATE register
  * @{
  */
 #define RATE_MASK         (0x0F)
@@ -122,7 +123,7 @@
 /** @} */
 
 /**
- * @name bits definitions for PWR_CTL register
+ * @name    bits definitions for PWR_CTL register
  * @{
  */
 #define WAKEUP_8HZ        (0x00)
@@ -136,7 +137,7 @@
 /** @} */
 
 /**
- * @name interrupts pins definitions for INT_ENABLE, INT_MAP and INT_SOURCE
+ * @name    interrupts pins definitions for INT_ENABLE, INT_MAP and INT_SOURCE
  * registers
  * @{
  */
@@ -151,7 +152,7 @@
 /** @} */
 
 /**
- * @name bits definitions for DATA_FORMAT register
+ * @name    bits definitions for DATA_FORMAT register
  * @{
  */
 #define RANGE_MASK        (0x03)
@@ -163,7 +164,7 @@
 /** @} */
 
 /**
- * @name bits definitions for FIFO_CTL register
+ * @name    bits definitions for FIFO_CTL register
  * @{
  */
 #define SAMPLES_MASK      (0x0F)
@@ -174,7 +175,7 @@
 /** @} */
 
 /**
- * @name bits definitions for FIFO_STATUS register
+ * @name    bits definitions for FIFO_STATUS register
  * @{
  */
 #define FIFO_ENTRIES_MASK (0x3F)

@@ -83,13 +83,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    unsigned int now = timer_read(dev);
-    timer_set_absolute(dev, channel, now + timeout);
-    return 0;
-}
-
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
     TIMER_TypeDef *tim;

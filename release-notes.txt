@@ -915,7 +915,7 @@ Core
 Network Stack
 ---
 + Introduction of netstats in several platforms.
-* RPL optional auto initialisation
+* RPL optional auto initialization
 
 
 Packages

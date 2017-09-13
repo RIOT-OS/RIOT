@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_si70xx Si7006/13/20/21 temperature and humidity sensors
+ * @defgroup    drivers_si70xx Si7006/13/20/21 temperature and humidity sensors
  * @ingroup     drivers_sensors
  * @brief       Driver for the Si7006/13/20/21 temperature and humidity sensor.
  * @{
@@ -28,16 +28,18 @@ extern "C" {
 #endif
 
 /**
- * @name Si70xx chip addresses.
+ * @name    Si70xx chip addresses.
+ * @{
  */
 #define SI70XX_ADDRESS_SI7006       (0x80)
 #define SI70XX_ADDRESS_SI7013       (0x80)
 #define SI70XX_ADDRESS_SI7013_ALT   (0x81)
 #define SI70XX_ADDRESS_SI7020       (0x80)
 #define SI70XX_ADDRESS_SI7021       (0x80)
+/** @} */
 
 /**
- * @name Si70xx device commands.
+ * @name    Si70xx device commands.
  * @{
  */
 #define SI70XX_MEASURE_RH_HOLD      (0xE5)
@@ -59,7 +61,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Si70xx register values.
+ * @name    Si70xx register values.
  * @{
  */
 #define SI70XX_ID_SI7006            (0x06)
@@ -72,7 +74,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Si70xx device descriptor.
+ * @brief   Si70xx device descriptor.
  */
 typedef struct {
     i2c_t i2c_dev;              /**< I2C bus the sensors is connected to */
@@ -80,7 +82,7 @@ typedef struct {
 } si70xx_t;
 
 /**
- * @brief Device initialization parameters.
+ * @brief   Device initialization parameters.
  */
 typedef struct {
     i2c_t i2c_dev;              /**< I2C bus the sensor is connected to */

@@ -509,31 +509,31 @@ static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
     }
 }
 
-static int nrfmin_set(netdev_t *dev, netopt_t opt, void *val, size_t len)
+static int nrfmin_set(netdev_t *dev, netopt_t opt, const void *val, size_t len)
 {
     (void)dev;
 
     switch (opt) {
         case NETOPT_CHANNEL:
             assert(len == sizeof(uint16_t));
-            return nrfmin_set_channel(*((uint16_t *)val));
+            return nrfmin_set_channel(*((const uint16_t *)val));
         case NETOPT_ADDRESS:
             assert(len == sizeof(uint16_t));
-            nrfmin_set_addr(*((uint16_t *)val));
+            nrfmin_set_addr(*((const uint16_t *)val));
             return sizeof(uint16_t);
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
             assert(len == sizeof(uint16_t));
-            if (*((uint16_t *)val) != 2) {
+            if (*((const uint16_t *)val) != 2) {
                 return -EAFNOSUPPORT;
             }
             return sizeof(uint16_t);
         case NETOPT_STATE:
             assert(len == sizeof(netopt_state_t));
-            return nrfmin_set_state(*((netopt_state_t *)val));
+            return nrfmin_set_state(*((const netopt_state_t *)val));
         case NETOPT_TX_POWER:
             assert(len == sizeof(int16_t));
-            nrfmin_set_txpower(*((int16_t *)val));
+            nrfmin_set_txpower(*((const int16_t *)val));
             return sizeof(int16_t);
         default:
             return -ENOTSUP;

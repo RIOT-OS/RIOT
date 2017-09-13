@@ -6,19 +6,18 @@
  * directory for more details.
  */
 
-#ifndef CPU_CONF_H
-#define CPU_CONF_H
-
 /**
- * @defgroup    cpu_mips32r2_commom MIPS32R2 Common
- * @ingroup     cpu
+ * @ingroup     cpu_mips32r2_commom
  * @{
  *
  * @file
- * @brief       Common CPU definitions for mip32r2 compatable devices.
+ * @brief       Common CPU definitions for MIPS32R2 compliant devices.
  *
  * @author      Neil Jones <neil.jones@imgtec.com>
  */
+
+#ifndef CPU_CONF_H
+#define CPU_CONF_H
 
 #ifdef __cplusplus
 extern "C" {

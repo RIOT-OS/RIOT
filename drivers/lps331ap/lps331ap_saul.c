@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_lps331ap
+ * @ingroup     drivers_lps331ap
  * @{
  *
  * @file
@@ -23,17 +23,31 @@
 #include "saul.h"
 #include "lps331ap.h"
 
-static int read(const void *dev, phydat_t *res)
+static int read_pres(const void *dev, phydat_t *res)
 {
     res->val[0] = (int16_t)lps331ap_read_pres((const lps331ap_t *)dev);
-    memset(&(res->val[1]), 0, 2 * sizeof(int16_t));
     res->unit = UNIT_BAR;
     res->scale = -3;
     return 1;
 }
 
-const saul_driver_t lps331ap_saul_driver = {
-    .read = read,
+static int read_temp(const void *dev, phydat_t *res)
+{
+    res->val[0] = (int16_t)(lps331ap_read_temp((const lps331ap_t *)dev) / 10);
+    res->unit = UNIT_TEMP_C;
+    /* above division by ten leads to °C * 10^-2*/
+    res->scale = -2;
+    return 1;
+}
+
+const saul_driver_t lps331ap_saul_pres_driver = {
+    .read = read_pres,
     .write = saul_notsup,
     .type = SAUL_SENSE_PRESS,
+};
+
+const saul_driver_t lps331ap_saul_temp_driver = {
+    .read = read_temp,
+    .write = saul_notsup,
+    .type = SAUL_SENSE_TEMP,
 };

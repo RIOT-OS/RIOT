@@ -27,13 +27,13 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define SPI_MODE            SPI_MODE_0
+#define SPI_MODE            SPI_MODE_3
 
-static inline int lis3dh_write_bits(const lis3dh_t *dev, const lis3dh_reg_t reg,
+static inline int lis3dh_write_bits(const lis3dh_t *dev, const uint8_t reg,
                                     const uint8_t mask,  const uint8_t values);
-static int lis3dh_write_reg(const lis3dh_t *dev, const lis3dh_reg_t reg,
+static int lis3dh_write_reg(const lis3dh_t *dev, const uint8_t reg,
                             const uint8_t value);
-static int lis3dh_read_regs(const lis3dh_t *dev, const lis3dh_reg_t reg,
+static int lis3dh_read_regs(const lis3dh_t *dev, const uint8_t reg,
                             const uint8_t len, uint8_t *buf);
 
 int lis3dh_init(lis3dh_t *dev, const lis3dh_params_t *params)
@@ -228,7 +228,7 @@ int lis3dh_get_fifo_level(const lis3dh_t *dev)
  * @return                  0 on success
  * @return                  -1 on error
  */
-static int lis3dh_read_regs(const lis3dh_t *dev, const lis3dh_reg_t reg,
+static int lis3dh_read_regs(const lis3dh_t *dev, const uint8_t reg,
                             const uint8_t len, uint8_t *buf)
 {
     /* Set READ MULTIPLE mode */
@@ -254,7 +254,7 @@ static int lis3dh_read_regs(const lis3dh_t *dev, const lis3dh_reg_t reg,
  * @return                  0 on success
  * @return                  -1 on error
  */
-static int lis3dh_write_reg(const lis3dh_t *dev, const lis3dh_reg_t reg,
+static int lis3dh_write_reg(const lis3dh_t *dev, const uint8_t reg,
                             const uint8_t value)
 {
     /* Set WRITE SINGLE mode */
@@ -281,7 +281,7 @@ static int lis3dh_write_reg(const lis3dh_t *dev, const lis3dh_reg_t reg,
  * @return                  0 on success
  * @return                  -1 on error
  */
-static inline int lis3dh_write_bits(const lis3dh_t *dev, const lis3dh_reg_t reg,
+static inline int lis3dh_write_bits(const lis3dh_t *dev, const uint8_t reg,
                                     const uint8_t mask, const uint8_t values)
 {
     uint8_t tmp;

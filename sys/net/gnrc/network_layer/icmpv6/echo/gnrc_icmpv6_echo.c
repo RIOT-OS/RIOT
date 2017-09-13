@@ -50,13 +50,8 @@ gnrc_pktsnip_t *gnrc_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
         DEBUG(", payload:\n");
         od_hex_dump(data, data_len, OD_WIDTH_DEFAULT);
 #endif
-        DEBUG("\n");
     }
-#if ENABLE_DEBUG
-    else {
-        DEBUG("\n");
-    }
-#endif
+    DEBUG("\n");
 
     return pkt;
 }

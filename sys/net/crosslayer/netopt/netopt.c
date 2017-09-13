@@ -49,6 +49,8 @@ static const char *_netopt_strmap[] = {
     [NETOPT_AUTOCCA]               = "NETOPT_AUTOCCA",
     [NETOPT_CSMA]                  = "NETOPT_CSMA",
     [NETOPT_CSMA_RETRIES]          = "NETOPT_CSMA_RETRIES",
+    [NETOPT_CSMA_MAXBE]            = "NETOPT_CSMA_MAXBE",
+    [NETOPT_CSMA_MINBE]            = "NETOPT_CSMA_MINBE",
     [NETOPT_IS_WIRED]              = "NETOPT_IS_WIRED",
     [NETOPT_DEVICE_TYPE]           = "NETOPT_DEVICE_TYPE",
     [NETOPT_CHANNEL_PAGE]          = "NETOPT_CHANNEL_PAGE",
@@ -74,6 +76,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_CHANNEL_HOP_PERIOD]    = "NETOPT_CHANNEL_HOP_PERIOD",
     [NETOPT_FIXED_HEADER]          = "NETOPT_FIXED_HEADER",
     [NETOPT_IQ_INVERT]             = "NETOPT_IQ_INVERT",
+    [NETOPT_TX_RETRIES_NEEDED]     = "NETOPT_TX_RETRIES_NEEDED",
     [NETOPT_NUMOF]                 = "NETOPT_NUMOF",
 };
 

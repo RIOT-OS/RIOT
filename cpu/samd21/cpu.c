@@ -160,7 +160,7 @@ static void clk_init(void)
         /* Wait for DFLL sync */
     }
 
-    SYSCTRL->DFLLCTRL.reg = SYSCTRL_DFLLCTRL_ENABLE;
+    SYSCTRL->DFLLCTRL.bit.ENABLE = 1;
     while ((SYSCTRL->PCLKSR.reg & (SYSCTRL_PCLKSR_DFLLRDY |
                                    SYSCTRL_PCLKSR_DFLLLCKF |
                                    SYSCTRL_PCLKSR_DFLLLCKC)) == 0) {

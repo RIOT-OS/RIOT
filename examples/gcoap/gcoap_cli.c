@@ -29,7 +29,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static void _resp_handler(unsigned req_state, coap_pkt_t* pdu);
+static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
+                          sock_udp_ep_t *remote);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
 
 /* CoAP resources */
@@ -48,8 +49,11 @@ static uint16_t req_count = 0;
 /*
  * Response callback.
  */
-static void _resp_handler(unsigned req_state, coap_pkt_t* pdu)
+static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
+                          sock_udp_ep_t *remote)
 {
+    (void)remote;       /* not interested in the source currently */
+
     if (req_state == GCOAP_MEMO_TIMEOUT) {
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
         return;

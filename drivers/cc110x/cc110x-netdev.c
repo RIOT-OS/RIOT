@@ -121,14 +121,14 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
     return -ENOTSUP;
 }
 
-static int _set(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
+static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len)
 {
     cc110x_t *cc110x = &((netdev_cc110x_t*) dev)->cc110x;
 
     switch (opt) {
         case NETOPT_CHANNEL:
             {
-                uint8_t *arg = (uint8_t*)value;
+                const uint8_t *arg = value;
                 uint8_t channel = arg[value_len-1];
                 if ((channel < CC110X_MIN_CHANNR) || (channel > CC110X_MAX_CHANNR)) {
                     return -EINVAL;
@@ -142,7 +142,7 @@ static int _set(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
             if (value_len < 1) {
                 return -EINVAL;
             }
-            if (!cc110x_set_address(cc110x, *(uint8_t*)value)) {
+            if (!cc110x_set_address(cc110x, *(const uint8_t*)value)) {
                 return -EINVAL;
             }
             return 1;

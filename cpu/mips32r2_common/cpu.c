@@ -43,7 +43,7 @@ extern char _edata __attribute__((section("data")));
 void software_init_hook(void)
 {
 #ifdef FLASH_XIP
-    /* copy initialised data from its LMA to VMA */
+    /* copy initialized data from its LMA to VMA */
     memcpy(&_fdata, &_rom_data_copy, (int)&_edata - (int)&_fdata);
 #endif
 

@@ -3,7 +3,7 @@ include $(RIOTBOARD)/arduino-atmega-common/Makefile.dep
 
 INCLUDES += -I$(RIOTBOARD)/arduino-atmega-common/include
 
-# refine serial port information
+# refine serial port information
 export BAUD ?= 9600
 include $(RIOTMAKE)/tools/serial.inc.mk
 

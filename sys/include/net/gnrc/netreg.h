@@ -80,6 +80,11 @@ typedef enum {
 #define GNRC_NETREG_DEMUX_CTX_ALL   (0xffff0000)
 
 /**
+ * @name    Static entry initialization macros
+ * @anchor  net_gnrc_netreg_init_static
+ * @{
+ */
+/**
  * @brief   Initializes a netreg entry statically with PID
  *
  * @param[in] demux_ctx The @ref gnrc_netreg_entry_t::demux_ctx "demux context"
@@ -128,6 +133,7 @@ typedef enum {
 #define GNRC_NETREG_ENTRY_INIT_CB(demux_ctx, cbd)   { NULL, demux_ctx, \
                                                       GNRC_NETREG_TYPE_CB, \
                                                       { .cbd = cbd } }
+/** @} */
 
 /**
  * @brief   Packet handler callback for netreg entries with callback.
@@ -212,6 +218,11 @@ typedef struct gnrc_netreg_entry {
 void gnrc_netreg_init(void);
 
 /**
+ * @name    Dynamic entry initialization functions
+ * @anchor  net_gnrc_netreg_init_dyn
+ * @{
+ */
+/**
  * @brief   Initializes a netreg entry dynamically with PID
  *
  * @param[out] entry    A netreg entry
@@ -275,6 +286,7 @@ static inline void gnrc_netreg_entry_init_cb(gnrc_netreg_entry_t *entry,
     entry->target.cbd = cbd;
 }
 #endif
+/** @} */
 
 /**
  * @brief   Registers a thread to the registry.
@@ -284,8 +296,11 @@ static inline void gnrc_netreg_entry_init_cb(gnrc_netreg_entry_t *entry,
  *
  * @param[in] type      Type of the protocol. Must not be < GNRC_NETTYPE_UNDEF or
  *                      >= GNRC_NETTYPE_NUMOF.
- * @param[in] entry     An entry you want to add to the registry with
- *                      gnrc_netreg_entry_t::pid and gnrc_netreg_entry_t::demux_ctx set.
+ * @param[in] entry     An entry you want to add to the registry. This needs to
+ *                      be initialized before hand using the @ref
+ *                      net_gnrc_netreg_init_static "static" or @ref
+ *                      net_gnrc_netreg_init_dyn "dynamic" initialization
+ *                      helpers.
  *
  * @warning Call gnrc_netreg_unregister() *before* you leave the context you
  *          allocated @p entry in. Otherwise it might get overwritten.

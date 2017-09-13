@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for BH1750FVI devices
+ * @name    Set default configuration parameters for BH1750FVI devices
  * @{
  */
 #ifndef BH1750FVI_PARAM_I2C

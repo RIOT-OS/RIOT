@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    cpu_mips32r2_commom MIPS32R2 Common
+ * @defgroup    cpu_mips32r2_commom Imagination Technologies MIPS32R2 Common
  * @ingroup     cpu
- * @brief       Common implementations and headers for mips32r2 compliant devices
+ * @brief       Imagination Technologies MIPS32R2 common
  * @{
  *
  * @file
- * @brief       Common implementations and headers for mips32r2 compliant devices
+ * @brief       Common implementations and headers for Imagination Technologies MIPS32R2 compliant devices
  *
  * @author      Neil Jones <neil.jones@imgtec.com>
  */

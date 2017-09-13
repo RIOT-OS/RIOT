@@ -143,6 +143,11 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief    I2C configuration
+ */
+#define I2C_NUMOF           1
+
 #ifdef __cplusplus
 }
 #endif

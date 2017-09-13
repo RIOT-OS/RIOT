@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_tcs37727
+ * @ingroup     drivers_tcs37727
  * @{
  *
  * @file

@@ -50,12 +50,10 @@ extern "C" {
 
 /**
  * @brief   Define default DAC type identifier
- * @{
  */
 #ifndef HAVE_DAC_T
 typedef unsigned int dac_t;
 #endif
-/** @} */
 
 /**
  * @brief   Return codes used by the DAC driver interface
@@ -67,21 +65,17 @@ enum {
 
 /**
  * @brief   Default DAC undefined value
- * @{
  */
 #ifndef DAC_UNDEF
 #define DAC_UNDEF           (UINT_MAX)
 #endif
-/** @} */
 
 /**
  * @brief   Default DAC access macro
- * @{
  */
 #ifndef DAC_LINE
 #define DAC_LINE(x)         (x)
 #endif
-/** @} */
 
 /**
  * @brief   Initialize the given DAC line

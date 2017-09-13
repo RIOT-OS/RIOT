@@ -8,6 +8,7 @@
 
 /**
  * @ingroup         cpu_samd21
+ * @brief           CPU specific definitions for internal peripheral handling
  * @{
  *
  * @file
@@ -86,18 +87,6 @@ typedef struct {
     Tcc *dev;                   /**< TCC device to use */
     pwm_conf_chan_t chan[3];    /**< channel configuration */
 } pwm_conf_t;
-
-/**
- * @brief   UART device configuration
- */
-typedef struct {
-    SercomUsart *dev;       /**< pointer to the used UART device */
-    gpio_t rx_pin;          /**< pin used for RX */
-    gpio_t tx_pin;          /**< pin used for TX */
-    gpio_mux_t mux;         /**< alternative function for pins */
-    uart_rxpad_t rx_pad;    /**< pad selection for RX line */
-    uart_txpad_t tx_pad;    /**< pad selection for TX line */
-} uart_conf_t;
 
 /**
  * @brief   Return the numeric id of a SERCOM device derived from its address

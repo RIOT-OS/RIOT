@@ -56,10 +56,11 @@ int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
  * @return              number of bytes used from @p value
  * @return              <0 on error
  */
-int netdev_eth_set(netdev_t *dev, netopt_t opt, void *value, size_t value_len);
+int netdev_eth_set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len);
 
 #ifdef __cplusplus
 }
 #endif
-/** @} */
+
 #endif /* NET_NETDEV_ETH_H */
+/** @} */

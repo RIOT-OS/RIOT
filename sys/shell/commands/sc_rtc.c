@@ -20,8 +20,6 @@
  * @}
  */
 
-#ifdef FEATURE_PERIPH_RTC
-
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -189,18 +187,3 @@ int _rtc_handler(int argc, char **argv)
     }
     return 0;
 }
-
-#else
-
-#include <stdio.h>
-
-int _rtc_handler(int argc, char **argv)
-{
-    (void) argc;
-    (void) argv;
-
-    puts("not implemented");
-    return 1;
-}
-
-#endif /* FEATURE_RTC */

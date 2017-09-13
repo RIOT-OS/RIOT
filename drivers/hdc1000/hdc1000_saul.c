@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_hdc1000
+ * @ingroup     drivers_hdc1000
  * @{
  *
  * @file

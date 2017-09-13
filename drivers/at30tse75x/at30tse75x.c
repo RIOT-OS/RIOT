@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup     drivers_at30tse75x
  * @file
  * @brief       Driver for the AT30TSE75x temperature sensor with serial EEPROM
  *
