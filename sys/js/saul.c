@@ -6,7 +6,7 @@
 #include "js.h"
 #include "saul_reg.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 static void _js_saul_reg_freecb(void *native_p)
@@ -121,9 +121,35 @@ static JS_EXTERNAL_HANDLER(saul_get_one) {
     }
 }
 
+static JS_EXTERNAL_HANDLER(saul_find_name) {
+    (void)func_value;
+    (void)this_value;
+
+    if (args_cnt < 1) {
+        puts("saul.get_by_name(): not enough arguments");
+        return 0;
+    }
+
+    if (!jerry_value_is_string(args_p[0])) {
+        puts("saul.get_by_name(): arg 0 not a string");
+        return 0;
+    }
+
+    char name[32];
+    memset(name, '\0', sizeof(name));
+    jerry_string_to_char_buffer(args_p[0], (jerry_char_t*)name, sizeof(name));
+    saul_reg_t *entry = saul_reg_find_name(name);
+    if (entry) {
+        DEBUG("saul_find_name(): found entry for name \"%s\"\n", name);
+        return js_saul_reg_create(entry);
+    } else {
+        DEBUG("saul_find_name(): no entry found for name \"%s\"\n", name);
+        return jerry_create_undefined();
+    }
+}
 const js_native_method_t saul_methods[] = {
     { "_get_one", js_external_handler_saul_get_one },
-//    { "get_by_name", js_external_handler_saul_get_by_name }
+    { "_find_name", js_external_handler_saul_find_name }
 };
 
 const unsigned saul_methods_len = sizeof(saul_methods) / sizeof(saul_methods[0]);

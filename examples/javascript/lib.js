@@ -45,10 +45,9 @@ saul.op = {
     GT : 4
 }
 
-saul.get_one = function(type) {
-    var res = saul._get_one(type);
-    if (typeof type !== 'undefined') {
-        res.on_threshold = function(threshold, callback, operator) {
+saul.set_methods = function(saul_object) {
+    if (typeof saul_object !== 'undefined') {
+        saul_object.on_threshold = function(threshold, callback, operator) {
             var sensor = this;
             var operator = (typeof operator !== 'undefined') ? operator : saul.op.GE;
             var poller = function() {
@@ -80,7 +79,7 @@ saul.get_one = function(type) {
 
             return timer.setInterval(poller, 100000);
         }
-        res.sample = function(n) {
+        saul_object.sample = function(n) {
             var result = {
                 min : Number.MAX_VALUE,
                 max : Number.MIN_VALUE,
@@ -99,5 +98,10 @@ saul.get_one = function(type) {
             return result;
         }
     }
+}
+
+saul.get_one = function(type) {
+    var res = saul._get_one(type);
+    saul.set_methods(res);
     return res;
 }
