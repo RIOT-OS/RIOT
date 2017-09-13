@@ -55,6 +55,8 @@ void pm_set(unsigned mode)
             deep = 1;
             break;
     }
+#elif defined(CPU_FAM_STM32L0)
+/* TODO: Implementation for other families */ 
 #endif
 
     cortexm_sleep(deep);
