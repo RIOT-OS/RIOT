@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2017 Robert Hartung <hartung@ibr.cs.tu-bs.de>
+ *               2016 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 Freie Universität Berlin
  *               2015 Engineering-Spirit
  *
@@ -19,6 +20,7 @@
  * @author      Nick v. IJzendoorn <nijzndoorn@engineering-spirit.nl>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
+ * @author      Robert Hartung <hartung@ibr.cs.tu-bs.de>
  *
  * @}
  */
@@ -58,10 +60,13 @@ void pm_set(unsigned mode)
     cortexm_sleep(deep);
 }
 
+/*
+pm_layered uses pm_set
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
 void pm_off(void)
 {
     irq_disable();
-    pm_set(0);
+    pm_set_lowest();
 }
 #endif
+*/

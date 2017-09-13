@@ -104,6 +104,10 @@ void pm_off(void)
     x86_shutdown();
 }
 
+void pm_set_lowest(void) {
+
+}
+
 void x86_set_reboot_fun(x86_reboot_t fun)
 {
     reboot_fun = fun;
