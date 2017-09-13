@@ -22,7 +22,6 @@
 #include <mips/m32c0.h>
 #include "periph/pm.h"
 
-#ifndef FEATURES_PERIPH_PM
 void pm_set_lowest(void)
 {
     /* Dont wait if interrupts are not enabled - we would never return!*/
@@ -30,7 +29,6 @@ void pm_set_lowest(void)
         __asm volatile ("wait");
     }
 }
-#endif
 
 void pm_off(void)
 {

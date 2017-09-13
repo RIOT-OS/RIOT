@@ -4,5 +4,6 @@ include $(RIOTMAKE)/arch/cortexm.inc.mk
 
 # use common periph functions
 USEMODULE += periph_common
+USEMODULE += pm_cortexm_common
 
 include $(RIOTCPU)/stellaris_common/Makefile.include

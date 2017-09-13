@@ -93,3 +93,5 @@ void __attribute__((weak)) pm_off(void)
     pm_set_lowest();
     while(1);
 }
+
+void __attribute__((weak)) pm_reboot(void) { }

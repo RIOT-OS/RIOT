@@ -23,6 +23,14 @@
 
 #include "cpu.h"
 
+void pm_set_lowest(void) {
+	cortexm_sleep(0);
+}
+
+void pm_reboot(void) {
+	NVIC_SystemReset();
+}
+
 void pm_off(void)
 {
 #ifdef CPU_FAM_NRF51
