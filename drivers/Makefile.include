@@ -10,6 +10,9 @@ endif
 ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x/include
 endif
+ifneq (,$(filter cc1200,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc1200/include
+endif
 ifneq (,$(filter ds1307,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ds1307/include
 endif

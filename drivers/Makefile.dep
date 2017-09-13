@@ -53,6 +53,18 @@ ifneq (,$(filter bm%280,$(USEMODULE)))
   USEMODULE += bmx280
 endif
 
+ifneq (,$(filter cc1200,$(USEMODULE)))
+  USEMODULE += ieee802154
+  USEMODULE += luid
+  USEMODULE += xtimer
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+    USEMODULE += gnrc_cc1200
+        # XXX: this can be modelled as a dependency for gnrc_netdev_default as soon
+        # as all drivers are ported to netdev
+        USEMODULE += gnrc_netdev
+  endif
+endif
+
 ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += luid
