@@ -133,14 +133,6 @@ extern "C" {
  * @{
  */
 #define SPI_NUMOF           1           /* set to 0 to disable SPI */
-
-#ifdef CPU_ATMEGA328P
-#define MEGA_PRR            PRR         /* Power Reduction Register is PRR */
-#endif
-
-#ifdef CPU_ATMEGA2560
-#define MEGA_PRR            PRR0        /* Power Reduction Register is PRR0 */
-#endif
 /** @} */
 
 /**

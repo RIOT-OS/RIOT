@@ -22,6 +22,7 @@
 #define ATMEGA_REGS_COMMON_H
 
 #include <avr/io.h>
+#include <avr/power.h>
 
 #ifdef __cplusplus
 extern "C" {

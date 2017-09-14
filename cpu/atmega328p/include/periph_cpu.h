@@ -47,7 +47,6 @@ enum {
  */
 #define I2C_PORT_REG            PORTC
 #define I2C_PIN_MASK            (1 << PORTC4) | (1 << PORTC5)
-#define I2C_POWER_REG           PRR
 /** @} */
 
 #ifdef __cplusplus
