@@ -16,6 +16,8 @@ export USEMODULE += periph_common
 
 #include layered power mode module
 USEMODULE += pm_layered
+USEMODULE += pm_cortexm_common_off
+USEMODULE += pm_cortexm_common_reboot
 
 # Define a recipe to build the watchdog disable binary, used when flashing
 $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin: $(RIOTCPU)/kinetis_common/dist/wdog-disable.s

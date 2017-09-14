@@ -24,18 +24,7 @@
 #include "cpu.h"
 #include "periph/pm.h"
 
-void pm_set_lowest(void)
-{
-    cortexm_sleep(0);
-}
-
 void pm_reboot(void)
 {
     NVIC_SystemReset();
-}
-
-void pm_off(void) {
-    irq_disable();
-    pm_set_lowest();
-    while(1);
 }

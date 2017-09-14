@@ -1,7 +1,9 @@
 export CPU_ARCH = cortex-m0
 export CPU_FAM  = stm32l0
 
-USEMODULE += pm_cortexm_common
+USEMODULE += pm_cortexm_common_set_lowest
+USEMODULE += pm_cortexm_common_off
+USEMODULE += pm_cortexm_common_reboot
 
 include $(RIOTCPU)/stm32_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

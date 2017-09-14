@@ -1,0 +1,4 @@
+ifneq (,$(filter pm_cortexm_common_%,$(USEMODULE)))
+  USEMODULE += pm_cortexm_common
+endif
+PSEUDOMODULES += pm_cortexm_common_%

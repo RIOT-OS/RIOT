@@ -3,5 +3,6 @@ INCLUDES += -I$(RIOTCPU)/cortexm_common/include
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include/vendor
 
 USEMODULE += cortexm_common_periph
+include $(RIOTCPU)/cortexm_common/Makefile.dep
 
 export IMAGE_HDR_SIZE ?= 512
