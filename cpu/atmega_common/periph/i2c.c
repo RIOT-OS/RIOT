@@ -251,13 +251,13 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
 void i2c_poweron(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
-    I2C_POWER_REG &= ~(1 << PRTWI);
+    power_twi_enable();
 }
 
 void i2c_poweroff(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
-    I2C_POWER_REG |= (1 << PRTWI);
+    power_twi_disable();
 }
 
 static int _start(uint8_t address, uint8_t rw_flag)

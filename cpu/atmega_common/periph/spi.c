@@ -42,7 +42,7 @@ void spi_init(spi_t bus)
 {
     assert(bus == 0);
     /* power off the SPI peripheral */
-    MEGA_PRR |= (1 << PRSPI);
+    power_spi_disable();
     /* trigger the pin configuration */
     spi_init_pins(bus);
 }
@@ -64,12 +64,11 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* lock the bus and power on the SPI peripheral */
     mutex_lock(&lock);
-    MEGA_PRR &= ~(1 << PRSPI);
+    power_spi_enable();
 
     /* configure as master, with given mode and clock */
     SPSR = (clk >> S2X_SHIFT);
     SPCR = ((1 << SPE) | (1 << MSTR) | mode | (clk & CLK_MASK));
-    SPCR |= (1 << SPE);
 
     /* clear interrupt flag by reading SPSR and data register by reading SPDR */
     (void)SPSR;
@@ -82,7 +81,7 @@ void spi_release(spi_t bus)
 {
     /* power off and release the bus */
     SPCR &= ~(1 << SPE);
-    MEGA_PRR |= (1 << PRSPI);
+    power_spi_disable();
     mutex_unlock(&lock);
 }
 
