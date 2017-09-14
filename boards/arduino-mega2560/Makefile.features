@@ -1,1 +1,3 @@
 include $(RIOTBOARD)/arduino-atmega-common/Makefile.features
+
+-include $(RIOTCPU)/atmega2560/Makefile.features
