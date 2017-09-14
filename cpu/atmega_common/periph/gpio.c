@@ -138,6 +138,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     if ((_port_num(pin) == PORT_D && pin_num > 3)
 #if defined (PORTE)
          || (_port_num(pin) == PORT_E && pin_num < 4)
+         || (_port_num(pin) != PORT_D && _port_num(pin) != PORT_E)
 #elif defined(CPU_ATMEGA328P)
          || (pin_num < 2) || (_port_num(pin) != PORT_D)
 #endif
