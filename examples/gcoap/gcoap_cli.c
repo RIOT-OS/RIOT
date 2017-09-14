@@ -32,11 +32,14 @@
 static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
                           sock_udp_ep_t *remote);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
 
 /* CoAP resources */
 static const coap_resource_t _resources[] = {
-    { "/cli/stats", COAP_GET, _stats_handler },
+    { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler },
+    { "/riot/board", COAP_GET, _riot_board_handler },
 };
+
 static gcoap_listener_t _listener = {
     (coap_resource_t *)&_resources[0],
     sizeof(_resources) / sizeof(_resources[0]),
@@ -88,16 +91,50 @@ static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
 }
 
 /*
- * Server callback for /cli/stats. Returns the count of packets sent by the
- * CLI.
+ * Server callback for /cli/stats. Accepts either a GET or a PUT.
+ *
+ * GET: Returns the count of packets sent by the CLI.
+ * PUT: Updates the count of packets. Rejects an obviously bad request, but
+ *      allows any two byte value for example purposes. Semantically, the only
+ *      valid action is to set the value to 0.
  */
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
 {
+    /* read coap method type in packet */
+    unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
+
+    switch(method_flag) {
+        case COAP_GET:
+            gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+
+            /* write the response buffer with the request count value */
+            size_t payload_len = fmt_u16_dec((char *)pdu->payload, req_count);
+
+            return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+
+        case COAP_PUT:
+            /* convert the payload to an integer and update the internal
+               value */
+            if (pdu->payload_len <= 5) {
+                char payload[6] = { 0 };
+                memcpy(payload, (char *)pdu->payload, pdu->payload_len);
+                req_count = (uint16_t)strtoul(payload, NULL, 10);
+                return gcoap_response(pdu, buf, len, COAP_CODE_CHANGED);
+            }
+            else {
+                return gcoap_response(pdu, buf, len, COAP_CODE_BAD_REQUEST);
+            }
+    }
+
+    return 0;
+}
+
+static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+{
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-
-    size_t payload_len = fmt_u16_dec((char *)pdu->payload, req_count);
-
-    return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+    /* write the RIOT board name in the response buffer */
+    memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
+    return gcoap_finish(pdu, strlen(RIOT_BOARD), COAP_FORMAT_TEXT);
 }
 
 static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
