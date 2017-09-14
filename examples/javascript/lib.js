@@ -53,6 +53,8 @@ saul.set_methods = function(saul_object) {
         saul_object.on_threshold = function(threshold, callback, operator) {
             var sensor = this;
             var operator = (typeof operator !== 'undefined') ? operator : saul.op.GE;
+            var wait_flank = true;
+
             var poller = function() {
                 var val = sensor.read();
                 var trigger = false;
@@ -73,9 +75,14 @@ saul.set_methods = function(saul_object) {
                         trigger = (val > threshold);
                         break;
                 }
-                if (trigger) {
+
+                if (trigger && wait_flank) {
+                    wait_flank = false;
                     return callback();
                 } else {
+                    if (! (trigger || wait_flank)) {
+                        wait_flank = true;
+                    }
                     return true;
                 }
             }
