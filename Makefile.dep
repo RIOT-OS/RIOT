@@ -661,3 +661,7 @@ USEPKG := $(sort $(USEPKG))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
   include $(RIOTBASE)/Makefile.dep
 endif
+
+ifneq (,$(filter pm_fallback_%,$(USEMODULE)))
+  USEMODULE += pm_fallback
+endif

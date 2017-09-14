@@ -25,11 +25,3 @@
 #include "debug.h"
 
 void pm_set_lowest(void) {}
-
-void pm_off(void)
-{
-    irq_disable();
-    while(1) {};
-}
-
-void pm_reboot(void) { }

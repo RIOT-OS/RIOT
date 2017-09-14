@@ -3,7 +3,9 @@ export CFLAGS += -DCOREIF_NG=1
 
 # tell the build system that the CPU depends on the atmega common files
 USEMODULE += atmega_common
-USEMODULE += pm_fallback
+USEMODULE += pm_fallback_off
+USEMODULE += pm_fallback_reboot
+USEMODULE += pm_fallback_set_lowest
 
 # define path to atmega common module, which is needed for this CPU
 export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/

@@ -83,3 +83,6 @@ PSEUDOMODULES += sx1276
 
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
+
+# add implementations of fallback and common CPUs as pseude modules
+PSEUDOMODULES += pm_fallback_%
