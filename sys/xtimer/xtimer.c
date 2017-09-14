@@ -79,6 +79,20 @@ void _xtimer_periodic(xtimer_t *timer, uint32_t *last_wakeup, uint32_t period)
             if (!((now < target) && (target < (*last_wakeup)))) {
                 /* target time has already passed */
                 timer->callback(timer->arg);
+                /* Try to skip ahead until we are back on schedule */
+                uint32_t catchup = period;
+                if (target < now) {
+                    while((target < (target + catchup)) && ((target + catchup) <= now)) {
+                        catchup += period;
+                    }
+                }
+                else {
+                    while(!((now < (target + catchup)) && ((target + catchup) < target))) {
+                        catchup += period;
+                    }
+                }
+                target += catchup - period;
+                DEBUG("cu: %" PRIx32 "\n", catchup);
                 break;
             }
         }
@@ -87,6 +101,13 @@ void _xtimer_periodic(xtimer_t *timer, uint32_t *last_wakeup, uint32_t period)
             if ((((*last_wakeup) <= target) && (target <= now))) {
                 /* target time has already passed */
                 timer->callback(timer->arg);
+                /* Try to skip ahead until we are back on schedule */
+                uint32_t catchup = period;
+                while((target < (target + catchup)) && ((target + catchup) <= now)) {
+                    catchup += period;
+                }
+                target += catchup - period;
+                DEBUG("CU: %" PRIx32 "\n", catchup);
                 break;
             }
         }
