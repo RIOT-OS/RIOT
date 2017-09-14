@@ -23,6 +23,8 @@
 extern "C" {
 #endif
 
+#include "periph_cpu_common.h"
+
 /**
  * @brief   Available ports on the ATmega1281 family
  */
