@@ -157,6 +157,7 @@ extern "C" {
 } while (0)
 /** @cond INTERNAL */
 #define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT0_vect
+#define AVR_CONTEXT_SWAP_INTERRUPT_VECT_NUM  PCINT0_vect_num
 #define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB5)
 /** @endcond */
 
