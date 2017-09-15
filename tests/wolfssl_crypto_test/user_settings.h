@@ -8,8 +8,8 @@
 #undef NO_MAIN_DRIVER
 #define NO_MAIN_DRIVER
 
-#undef HAVE_ECC
-#define HAVE_ECC
+//#undef HAVE_ECC
+//#define HAVE_ECC
 
 #undef TFM_TIMING_RESISTANT
 #define TFM_TIMING_RESISTANT

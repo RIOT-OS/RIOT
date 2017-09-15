@@ -1,7 +1,11 @@
-APPLICATION = wolf_crypto_benchark
+APPLICATION = wolf_crypto_test
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= native
+#BOARD ?= native
+#BOARD ?= samd21-xpro #Currently missing implementation for strncasecmp
+#BOARD ?= pic32-wifire
+#BOARD ?= frdm-k64f
+BOARD ?= stm32f4discovery
 
 # BOARD_WHITELIST := To Be Determined
 # BOARD_BLACKLIST := To Be Determined
@@ -30,5 +34,12 @@ QUIET ?= 1
 
 USEPKG += wolfssl
 
+ifneq (native, $(BOARD))
+# for TCP/IP recommend working with lwip or other third-party TCP/IP stack.
+# Also need third-party string library if attempting to use ecc that will
+# implement strncasecomp
+    USEPKG += lwip
+    export CFLAGS += "-DHAVE_LWIP_NATIVE=1"
+endif
 
 include $(RIOTBASE)/Makefile.include
