@@ -1,8 +1,8 @@
 APPLICATION = wolf_crypto_benchark
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= native
-#BOARD ?= samd21-xpro #Currently missing implementation for strncasecmp
+#BOARD ?= native
+BOARD ?= samd21-xpro #Currently missing implementation for strncasecmp
 #BOARD ?= pic32-wifire
 #BOARD ?= frdm-k64f
 #BOARD ?= stm32f4discovery
@@ -23,7 +23,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # gcc v 5.4.0 on 16.04 LTS
 # This is an optimized stack value based on testing, if you observe
 # a segmentation fault please increase this stack size.
-CFLAGS += -DTHREAD_STACKSIZE_MAIN=35000
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=20000
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
@@ -38,8 +38,8 @@ ifneq (native, $(BOARD))
 # for TCP/IP recommend working with lwip or other third-party TCP/IP stack.
 # Also need third-party string library if attempting to use ecc that will
 # implement strncasecomp
-    USEPKG += lwip
-    export CFLAGS += "-DHAVE_LWIP_NATIVE=1"
+#    USEPKG += lwip
+#    export CFLAGS += "-DHAVE_LWIP_NATIVE=1"
 endif
 
 include $(RIOTBASE)/Makefile.include

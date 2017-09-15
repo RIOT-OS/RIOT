@@ -26,3 +26,5 @@
 #undef NO_FILESYSTEM
 #define NO_FILESYSTEM
 
+#undef WOLFCRYPT_ONLY
+#define WOLFCRYPT_ONLY

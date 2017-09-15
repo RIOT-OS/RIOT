@@ -42,12 +42,9 @@
 
 /* wolfSSL */
 #include <wolfssl/ssl.h>
+#include <wolfssl/certs_test.h>
 
 #define DEFAULT_PORT 11111
-
-#define CERT_FILE "certs/ca-cert.pem"
-
-
 
 int main(void)
 {
@@ -108,10 +105,10 @@ int main(void)
     }
 
     /* Load client certificates into WOLFSSL_CTX */
-    if (wolfSSL_CTX_load_verify_locations(ctx, CERT_FILE, NULL)
-        != SSL_SUCCESS) {
-        fprintf(stderr, "ERROR: failed to load %s, please check the file.\n",
-                CERT_FILE);
+    if (wolfSSL_CTX_load_verify_buffer(ctx, ca_cert_der_2048,
+                                       sizeof_ca_cert_der_2048,
+                                       SSL_FILETYPE_ASN1) != SSL_SUCCESS) {
+        fprintf(stderr, "ERROR: failed to load ca buffer\n");
         exit(-1);
     }
 
