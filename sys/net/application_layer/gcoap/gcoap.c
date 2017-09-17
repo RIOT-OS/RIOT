@@ -827,7 +827,7 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
                 if ((pos + path_len + 3) > maxlen) {
                     break;
                 }
-                if (i) {
+                if (pos) {
                     out[pos++] = ',';
                 }
                 out[pos++] = '<';
@@ -836,7 +836,7 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
                 out[pos++] = '>';
             }
             else {
-                pos += (i) ? 3 : 2;
+                pos += (pos) ? 3 : 2;
                 pos += path_len;
             }
             ++resource;
