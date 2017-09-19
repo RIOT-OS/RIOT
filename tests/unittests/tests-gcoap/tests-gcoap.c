@@ -31,13 +31,23 @@ static const coap_resource_t ressources[] = {
     { "/act/switch", (COAP_GET | COAP_POST), NULL }
 };
 
+static const coap_resource_t resources_second[] = {
+    { "/second/part", (COAP_GET), NULL },
+};
+
 static gcoap_listener_t listener = {
     .resources     = (coap_resource_t *)&ressources[0],
     .resources_len = (sizeof(ressources) / sizeof(ressources[0])),
     .next          = NULL
 };
 
-static const char *resource_list_str = "</test/info/all>,</sensor/temp>,</act/switch>";
+static gcoap_listener_t listener_second = {
+    .resources     = (coap_resource_t *)&resources_second[0],
+    .resources_len = (sizeof(resources_second) / sizeof(resources_second[0])),
+    .next          = NULL
+};
+
+static const char *resource_list_str = "</test/info/all>,</sensor/temp>,</act/switch>,</second/part>";
 
 /*
  * Client GET request success case. Test request generation.
@@ -252,6 +262,7 @@ static void test_gcoap__server_get_resource_list(void)
     int size = 0;
 
     gcoap_register_listener(&listener);
+    gcoap_register_listener(&listener_second);
 
     size = gcoap_get_resource_list(NULL, 0, COAP_CT_LINK_FORMAT);
     TEST_ASSERT_EQUAL_INT(strlen(resource_list_str), size);
