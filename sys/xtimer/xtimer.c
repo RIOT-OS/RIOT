@@ -124,7 +124,7 @@ void _xtimer_periodic(xtimer_t *timer, uint32_t *last_wakeup, uint32_t period)
                 target = _xtimer_now() + offset;
             }
             DEBUG("xps, abs: %" PRIu32 "\n", target);
-            _xtimer_set_absolute(timer, target);
+            _xtimer_set_absolute(timer, target, now);
         }
     } while (0);
     *last_wakeup = target;

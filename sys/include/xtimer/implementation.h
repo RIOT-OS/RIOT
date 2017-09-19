@@ -62,7 +62,7 @@ static inline uint32_t _xtimer_lltimer_mask(uint32_t val)
  * @internal
  */
 uint64_t _xtimer_now64(void);
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
+void _xtimer_set_absolute(xtimer_t *timer, uint32_t target, uint32_t now);
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
 void _xtimer_set(xtimer_t *timer, uint32_t offset);
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);

@@ -142,8 +142,9 @@ void _xtimer_set(xtimer_t *timer, uint32_t offset)
         _shoot(timer);
     }
     else {
-        uint32_t target = _xtimer_now() + offset;
-        _xtimer_set_absolute(timer, target);
+        uint32_t now = _xtimer_now();
+        uint32_t target = now + offset;
+        _xtimer_set_absolute(timer, target, now);
     }
 }
 
@@ -168,11 +169,8 @@ static inline void _lltimer_set(uint32_t target)
     timer_set_absolute(XTIMER_DEV, XTIMER_CHAN, _xtimer_lltimer_mask(target));
 }
 
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
+void _xtimer_set_absolute(xtimer_t *timer, uint32_t target, uint32_t now)
 {
-    uint32_t now = _xtimer_now();
-    int res = 0;
-
     DEBUG("timer_set_absolute(): now=%" PRIu32 " target=%" PRIu32 "\n", now, target);
 
     timer->next = NULL;
@@ -182,7 +180,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
         /* backoff */
         xtimer_spin_until(target + XTIMER_BACKOFF);
         _shoot(timer);
-        return 0;
+        return;
     }
 
     unsigned state = irq_disable();
@@ -217,8 +215,6 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     }
 
     irq_restore(state);
-
-    return res;
 }
 
 static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)
