@@ -92,22 +92,22 @@ void _xtimer_periodic(xtimer_t *timer, uint32_t *last_wakeup, uint32_t period)
         }
 
         /*
-        * For large offsets, set an absolute target time.
-        * As that might cause an underflow, for small offsets, set a relative
-        * target time.
-        * For very small offsets, spin.
-        */
+         * For large offsets, set an absolute target time.
+         * As that might cause an underflow, for small offsets, set a relative
+         * target time.
+         * For very small offsets, spin.
+         */
         /*
-        * Note: last_wakeup _must never_ specify a time in the future after
-        * _xtimer_periodic_sleep returns.
-        * If this happens, last_wakeup may specify a time in the future when the
-        * next call to _xtimer_periodic_sleep is made, which in turn will trigger
-        * the overflow logic above and make the next timer fire too early, causing
-        * last_wakeup to point even further into the future, leading to a chain
-        * reaction.
-        *
-        * tl;dr Don't return too early!
-        */
+         * Note: last_wakeup _must never_ specify a time in the future after
+         * _xtimer_periodic_sleep returns.
+         * If this happens, last_wakeup may specify a time in the future when the
+         * next call to _xtimer_periodic_sleep is made, which in turn will trigger
+         * the overflow logic above and make the next timer fire too early, causing
+         * last_wakeup to point even further into the future, leading to a chain
+         * reaction.
+         *
+         * tl;dr Don't return too early!
+         */
         uint32_t offset = target - now;
         DEBUG("xps, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
         if (offset < XTIMER_PERIODIC_SPIN) {
@@ -117,10 +117,10 @@ void _xtimer_periodic(xtimer_t *timer, uint32_t *last_wakeup, uint32_t period)
         else {
             if (offset < XTIMER_PERIODIC_RELATIVE) {
                 /* NB: This will overshoot the target by the amount of time it took
-                * to get here from the beginning of xtimer_periodic_wakeup()
-                *
-                * Since interrupts are normally enabled inside this function, this time may
-                * be undeterministic. */
+                 * to get here from the beginning of xtimer_periodic_wakeup()
+                 *
+                 * Since interrupts are normally enabled inside this function, this time may
+                 * be nondeterministic. */
                 target = _xtimer_now() + offset;
             }
             DEBUG("xps, abs: %" PRIu32 "\n", target);
