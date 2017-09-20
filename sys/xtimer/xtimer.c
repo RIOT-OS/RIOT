@@ -135,21 +135,21 @@ void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     mutex_t mutex = MUTEX_INIT_LOCKED;
 
     timer.callback = _callback_unlock_mutex;
-    timer.arg = (void*) &mutex;
+    timer.arg = &mutex;
     _xtimer_periodic(&timer, last_wakeup, period);
     mutex_lock(&mutex);
 }
 
 static void _callback_msg(void* arg)
 {
-    msg_t *msg = (msg_t*)arg;
+    msg_t *msg = arg;
     msg_send_int(msg, msg->sender_pid);
 }
 
 static inline void _setup_msg(xtimer_t *timer, msg_t *msg, kernel_pid_t target_pid)
 {
     timer->callback = _callback_msg;
-    timer->arg = (void*) msg;
+    timer->arg = msg;
 
     /* use sender_pid field to get target_pid into callback function */
     msg->sender_pid = target_pid;
