@@ -176,7 +176,9 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     DEBUG("timer_set_absolute(): now=%" PRIu32 " target=%" PRIu32 "\n", now, target);
 
     timer->next = NULL;
-    if ((target >= now) && ((target - XTIMER_BACKOFF) < now)) {
+    /* The (target - now) difference works across the long tick rollover, there
+     * is no need to check for (target > now) first. */
+    if ((target - now) < XTIMER_BACKOFF) {
         /* backoff */
         xtimer_spin_until(target + XTIMER_BACKOFF);
         _shoot(timer);
