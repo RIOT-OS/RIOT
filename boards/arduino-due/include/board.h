@@ -36,7 +36,7 @@ extern "C" {
 
 #define LED0_ON             (PIOB->PIO_SODR  = PIO_PB27)
 #define LED0_OFF            (PIOB->PIO_CODR  = PIO_PB27)
-#define LED0_TOGGLE         (PIOB->PIO_ODSR ^= PIO_PB27)
+#define LED0_TOGGLE         ((PIOB->PIO_ODSR & PIO_PB27) ? LED0_OFF : LED0_ON)
 /** @} */
 
 /**
