@@ -30,7 +30,7 @@ typedef struct {
 
 extern list_node_t js_native_refs;
 
-void js_init(event_queue_t *queue);
+void js_init(void);
 int js_run(const jerry_char_t *script, size_t script_size);
 
 /* internal */

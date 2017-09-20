@@ -113,9 +113,9 @@ int js_run(const jerry_char_t *script, size_t script_size)
     return res;
 }
 
-void js_init(event_queue_t *queue)
+void js_init(void)
 {
-    js_event_queue = queue;
+    assert(js_event_queue);
 
     /* Initialize engine */
     jerry_init(JERRY_INIT_EMPTY);
