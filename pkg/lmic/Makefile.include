@@ -1,0 +1,7 @@
+INCLUDES += -I$(RIOTBASE)/pkg/lmic/include
+INCLUDES += -I$(BINDIRBASE)/pkg/$(BOARD)/lmic/src/lmic
+
+DIRS += $(BINDIRBASE)/pkg/$(BOARD)/lmic/src/lmic
+DIRS += $(RIOTBASE)/pkg/lmic/contrib
+
+USEMODULE += lmic_contrib
