@@ -17,11 +17,7 @@ ifeq (1,$(USE_NEWLIB_NANO))
   export LINKFLAGS += -specs=nano.specs
 endif
 
-ifeq ($(TARGET_ARCH),mips-mti-elf)
- export LINKFLAGS += -lc
-else
- export LINKFLAGS += -lc -lnosys
-endif
+export LINKFLAGS += -lc
 
 # Search for Newlib include directories
 
