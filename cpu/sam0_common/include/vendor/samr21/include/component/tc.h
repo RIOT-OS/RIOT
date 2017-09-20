@@ -3,7 +3,7 @@
  *
  * \brief Component description for TC
  *
- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
- /**
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMR21_TC_COMPONENT_
@@ -84,7 +81,7 @@ typedef union {
 #define TC_CTRLA_ENABLE             (0x1ul << TC_CTRLA_ENABLE_Pos)
 #define TC_CTRLA_MODE_Pos           2            /**< \brief (TC_CTRLA) TC Mode */
 #define TC_CTRLA_MODE_Msk           (0x3ul << TC_CTRLA_MODE_Pos)
-#define TC_CTRLA_MODE(value)        ((TC_CTRLA_MODE_Msk & ((value) << TC_CTRLA_MODE_Pos)))
+#define TC_CTRLA_MODE(value)        (TC_CTRLA_MODE_Msk & ((value) << TC_CTRLA_MODE_Pos))
 #define   TC_CTRLA_MODE_COUNT16_Val       0x0ul  /**< \brief (TC_CTRLA) Counter in 16-bit mode */
 #define   TC_CTRLA_MODE_COUNT8_Val        0x1ul  /**< \brief (TC_CTRLA) Counter in 8-bit mode */
 #define   TC_CTRLA_MODE_COUNT32_Val       0x2ul  /**< \brief (TC_CTRLA) Counter in 32-bit mode */
@@ -93,7 +90,7 @@ typedef union {
 #define TC_CTRLA_MODE_COUNT32       (TC_CTRLA_MODE_COUNT32_Val     << TC_CTRLA_MODE_Pos)
 #define TC_CTRLA_WAVEGEN_Pos        5            /**< \brief (TC_CTRLA) Waveform Generation Operation */
 #define TC_CTRLA_WAVEGEN_Msk        (0x3ul << TC_CTRLA_WAVEGEN_Pos)
-#define TC_CTRLA_WAVEGEN(value)     ((TC_CTRLA_WAVEGEN_Msk & ((value) << TC_CTRLA_WAVEGEN_Pos)))
+#define TC_CTRLA_WAVEGEN(value)     (TC_CTRLA_WAVEGEN_Msk & ((value) << TC_CTRLA_WAVEGEN_Pos))
 #define   TC_CTRLA_WAVEGEN_NFRQ_Val       0x0ul  /**< \brief (TC_CTRLA)  */
 #define   TC_CTRLA_WAVEGEN_MFRQ_Val       0x1ul  /**< \brief (TC_CTRLA)  */
 #define   TC_CTRLA_WAVEGEN_NPWM_Val       0x2ul  /**< \brief (TC_CTRLA)  */
@@ -104,7 +101,7 @@ typedef union {
 #define TC_CTRLA_WAVEGEN_MPWM       (TC_CTRLA_WAVEGEN_MPWM_Val     << TC_CTRLA_WAVEGEN_Pos)
 #define TC_CTRLA_PRESCALER_Pos      8            /**< \brief (TC_CTRLA) Prescaler */
 #define TC_CTRLA_PRESCALER_Msk      (0x7ul << TC_CTRLA_PRESCALER_Pos)
-#define TC_CTRLA_PRESCALER(value)   ((TC_CTRLA_PRESCALER_Msk & ((value) << TC_CTRLA_PRESCALER_Pos)))
+#define TC_CTRLA_PRESCALER(value)   (TC_CTRLA_PRESCALER_Msk & ((value) << TC_CTRLA_PRESCALER_Pos))
 #define   TC_CTRLA_PRESCALER_DIV1_Val     0x0ul  /**< \brief (TC_CTRLA) Prescaler: GCLK_TC */
 #define   TC_CTRLA_PRESCALER_DIV2_Val     0x1ul  /**< \brief (TC_CTRLA) Prescaler: GCLK_TC/2 */
 #define   TC_CTRLA_PRESCALER_DIV4_Val     0x2ul  /**< \brief (TC_CTRLA) Prescaler: GCLK_TC/4 */
@@ -125,7 +122,7 @@ typedef union {
 #define TC_CTRLA_RUNSTDBY           (0x1ul << TC_CTRLA_RUNSTDBY_Pos)
 #define TC_CTRLA_PRESCSYNC_Pos      12           /**< \brief (TC_CTRLA) Prescaler and Counter Synchronization */
 #define TC_CTRLA_PRESCSYNC_Msk      (0x3ul << TC_CTRLA_PRESCSYNC_Pos)
-#define TC_CTRLA_PRESCSYNC(value)   ((TC_CTRLA_PRESCSYNC_Msk & ((value) << TC_CTRLA_PRESCSYNC_Pos)))
+#define TC_CTRLA_PRESCSYNC(value)   (TC_CTRLA_PRESCSYNC_Msk & ((value) << TC_CTRLA_PRESCSYNC_Pos))
 #define   TC_CTRLA_PRESCSYNC_GCLK_Val     0x0ul  /**< \brief (TC_CTRLA) Reload or reset the counter on next generic clock */
 #define   TC_CTRLA_PRESCSYNC_PRESC_Val    0x1ul  /**< \brief (TC_CTRLA) Reload or reset the counter on next prescaler clock */
 #define   TC_CTRLA_PRESCSYNC_RESYNC_Val   0x2ul  /**< \brief (TC_CTRLA) Reload or reset the counter on next generic clock. Reset the prescaler counter */
@@ -152,7 +149,7 @@ typedef union {
 
 #define TC_READREQ_ADDR_Pos         0            /**< \brief (TC_READREQ) Address */
 #define TC_READREQ_ADDR_Msk         (0x1Ful << TC_READREQ_ADDR_Pos)
-#define TC_READREQ_ADDR(value)      ((TC_READREQ_ADDR_Msk & ((value) << TC_READREQ_ADDR_Pos)))
+#define TC_READREQ_ADDR(value)      (TC_READREQ_ADDR_Msk & ((value) << TC_READREQ_ADDR_Pos))
 #define TC_READREQ_RCONT_Pos        14           /**< \brief (TC_READREQ) Read Continuously */
 #define TC_READREQ_RCONT            (0x1ul << TC_READREQ_RCONT_Pos)
 #define TC_READREQ_RREQ_Pos         15           /**< \brief (TC_READREQ) Read Request */
@@ -182,7 +179,7 @@ typedef union {
 #define TC_CTRLBCLR_ONESHOT         (0x1ul << TC_CTRLBCLR_ONESHOT_Pos)
 #define TC_CTRLBCLR_CMD_Pos         6            /**< \brief (TC_CTRLBCLR) Command */
 #define TC_CTRLBCLR_CMD_Msk         (0x3ul << TC_CTRLBCLR_CMD_Pos)
-#define TC_CTRLBCLR_CMD(value)      ((TC_CTRLBCLR_CMD_Msk & ((value) << TC_CTRLBCLR_CMD_Pos)))
+#define TC_CTRLBCLR_CMD(value)      (TC_CTRLBCLR_CMD_Msk & ((value) << TC_CTRLBCLR_CMD_Pos))
 #define   TC_CTRLBCLR_CMD_NONE_Val        0x0ul  /**< \brief (TC_CTRLBCLR) No action */
 #define   TC_CTRLBCLR_CMD_RETRIGGER_Val   0x1ul  /**< \brief (TC_CTRLBCLR) Force a start, restart or retrigger */
 #define   TC_CTRLBCLR_CMD_STOP_Val        0x2ul  /**< \brief (TC_CTRLBCLR) Force a stop */
@@ -214,7 +211,7 @@ typedef union {
 #define TC_CTRLBSET_ONESHOT         (0x1ul << TC_CTRLBSET_ONESHOT_Pos)
 #define TC_CTRLBSET_CMD_Pos         6            /**< \brief (TC_CTRLBSET) Command */
 #define TC_CTRLBSET_CMD_Msk         (0x3ul << TC_CTRLBSET_CMD_Pos)
-#define TC_CTRLBSET_CMD(value)      ((TC_CTRLBSET_CMD_Msk & ((value) << TC_CTRLBSET_CMD_Pos)))
+#define TC_CTRLBSET_CMD(value)      (TC_CTRLBSET_CMD_Msk & ((value) << TC_CTRLBSET_CMD_Pos))
 #define   TC_CTRLBSET_CMD_NONE_Val        0x0ul  /**< \brief (TC_CTRLBSET) No action */
 #define   TC_CTRLBSET_CMD_RETRIGGER_Val   0x1ul  /**< \brief (TC_CTRLBSET) Force a start, restart or retrigger */
 #define   TC_CTRLBSET_CMD_STOP_Val        0x2ul  /**< \brief (TC_CTRLBSET) Force a stop */
@@ -253,14 +250,14 @@ typedef union {
 #define TC_CTRLC_INVEN1             (1 << TC_CTRLC_INVEN1_Pos)
 #define TC_CTRLC_INVEN_Pos          0            /**< \brief (TC_CTRLC) Output Waveform x Invert Enable */
 #define TC_CTRLC_INVEN_Msk          (0x3ul << TC_CTRLC_INVEN_Pos)
-#define TC_CTRLC_INVEN(value)       ((TC_CTRLC_INVEN_Msk & ((value) << TC_CTRLC_INVEN_Pos)))
+#define TC_CTRLC_INVEN(value)       (TC_CTRLC_INVEN_Msk & ((value) << TC_CTRLC_INVEN_Pos))
 #define TC_CTRLC_CPTEN0_Pos         4            /**< \brief (TC_CTRLC) Capture Channel 0 Enable */
 #define TC_CTRLC_CPTEN0             (1 << TC_CTRLC_CPTEN0_Pos)
 #define TC_CTRLC_CPTEN1_Pos         5            /**< \brief (TC_CTRLC) Capture Channel 1 Enable */
 #define TC_CTRLC_CPTEN1             (1 << TC_CTRLC_CPTEN1_Pos)
 #define TC_CTRLC_CPTEN_Pos          4            /**< \brief (TC_CTRLC) Capture Channel x Enable */
 #define TC_CTRLC_CPTEN_Msk          (0x3ul << TC_CTRLC_CPTEN_Pos)
-#define TC_CTRLC_CPTEN(value)       ((TC_CTRLC_CPTEN_Msk & ((value) << TC_CTRLC_CPTEN_Pos)))
+#define TC_CTRLC_CPTEN(value)       (TC_CTRLC_CPTEN_Msk & ((value) << TC_CTRLC_CPTEN_Pos))
 #define TC_CTRLC_MASK               0x33ul       /**< \brief (TC_CTRLC) MASK Register */
 
 /* -------- TC_DBGCTRL : (TC Offset: 0x08) (R/W  8) Debug Control -------- */
@@ -310,7 +307,7 @@ typedef union {
 
 #define TC_EVCTRL_EVACT_Pos         0            /**< \brief (TC_EVCTRL) Event Action */
 #define TC_EVCTRL_EVACT_Msk         (0x7ul << TC_EVCTRL_EVACT_Pos)
-#define TC_EVCTRL_EVACT(value)      ((TC_EVCTRL_EVACT_Msk & ((value) << TC_EVCTRL_EVACT_Pos)))
+#define TC_EVCTRL_EVACT(value)      (TC_EVCTRL_EVACT_Msk & ((value) << TC_EVCTRL_EVACT_Pos))
 #define   TC_EVCTRL_EVACT_OFF_Val         0x0ul  /**< \brief (TC_EVCTRL) Event action disabled */
 #define   TC_EVCTRL_EVACT_RETRIGGER_Val   0x1ul  /**< \brief (TC_EVCTRL) Start, restart or retrigger TC on event */
 #define   TC_EVCTRL_EVACT_COUNT_Val       0x2ul  /**< \brief (TC_EVCTRL) Count on event */
@@ -335,7 +332,7 @@ typedef union {
 #define TC_EVCTRL_MCEO1             (1 << TC_EVCTRL_MCEO1_Pos)
 #define TC_EVCTRL_MCEO_Pos          12           /**< \brief (TC_EVCTRL) Match or Capture Channel x Event Output Enable */
 #define TC_EVCTRL_MCEO_Msk          (0x3ul << TC_EVCTRL_MCEO_Pos)
-#define TC_EVCTRL_MCEO(value)       ((TC_EVCTRL_MCEO_Msk & ((value) << TC_EVCTRL_MCEO_Pos)))
+#define TC_EVCTRL_MCEO(value)       (TC_EVCTRL_MCEO_Msk & ((value) << TC_EVCTRL_MCEO_Pos))
 #define TC_EVCTRL_MASK              0x3137ul     /**< \brief (TC_EVCTRL) MASK Register */
 
 /* -------- TC_INTENCLR : (TC Offset: 0x0C) (R/W  8) Interrupt Enable Clear -------- */
@@ -374,7 +371,7 @@ typedef union {
 #define TC_INTENCLR_MC1             (1 << TC_INTENCLR_MC1_Pos)
 #define TC_INTENCLR_MC_Pos          4            /**< \brief (TC_INTENCLR) Match or Capture Channel x Interrupt Enable */
 #define TC_INTENCLR_MC_Msk          (0x3ul << TC_INTENCLR_MC_Pos)
-#define TC_INTENCLR_MC(value)       ((TC_INTENCLR_MC_Msk & ((value) << TC_INTENCLR_MC_Pos)))
+#define TC_INTENCLR_MC(value)       (TC_INTENCLR_MC_Msk & ((value) << TC_INTENCLR_MC_Pos))
 #define TC_INTENCLR_MASK            0x3Bul       /**< \brief (TC_INTENCLR) MASK Register */
 
 /* -------- TC_INTENSET : (TC Offset: 0x0D) (R/W  8) Interrupt Enable Set -------- */
@@ -413,25 +410,25 @@ typedef union {
 #define TC_INTENSET_MC1             (1 << TC_INTENSET_MC1_Pos)
 #define TC_INTENSET_MC_Pos          4            /**< \brief (TC_INTENSET) Match or Capture Channel x Interrupt Enable */
 #define TC_INTENSET_MC_Msk          (0x3ul << TC_INTENSET_MC_Pos)
-#define TC_INTENSET_MC(value)       ((TC_INTENSET_MC_Msk & ((value) << TC_INTENSET_MC_Pos)))
+#define TC_INTENSET_MC(value)       (TC_INTENSET_MC_Msk & ((value) << TC_INTENSET_MC_Pos))
 #define TC_INTENSET_MASK            0x3Bul       /**< \brief (TC_INTENSET) MASK Register */
 
 /* -------- TC_INTFLAG : (TC Offset: 0x0E) (R/W  8) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint8_t  OVF:1;            /*!< bit:      0  Overflow                           */
-    uint8_t  ERR:1;            /*!< bit:      1  Error                              */
-    uint8_t  :1;               /*!< bit:      2  Reserved                           */
-    uint8_t  SYNCRDY:1;        /*!< bit:      3  Synchronization Ready              */
-    uint8_t  MC0:1;            /*!< bit:      4  Match or Capture Channel 0         */
-    uint8_t  MC1:1;            /*!< bit:      5  Match or Capture Channel 1         */
-    uint8_t  :2;               /*!< bit:  6.. 7  Reserved                           */
+    __I uint8_t  OVF:1;            /*!< bit:      0  Overflow                           */
+    __I uint8_t  ERR:1;            /*!< bit:      1  Error                              */
+    __I uint8_t  :1;               /*!< bit:      2  Reserved                           */
+    __I uint8_t  SYNCRDY:1;        /*!< bit:      3  Synchronization Ready              */
+    __I uint8_t  MC0:1;            /*!< bit:      4  Match or Capture Channel 0         */
+    __I uint8_t  MC1:1;            /*!< bit:      5  Match or Capture Channel 1         */
+    __I uint8_t  :2;               /*!< bit:  6.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
-    uint8_t  :4;               /*!< bit:  0.. 3  Reserved                           */
-    uint8_t  MC:2;             /*!< bit:  4.. 5  Match or Capture Channel x         */
-    uint8_t  :2;               /*!< bit:  6.. 7  Reserved                           */
+    __I uint8_t  :4;               /*!< bit:  0.. 3  Reserved                           */
+    __I uint8_t  MC:2;             /*!< bit:  4.. 5  Match or Capture Channel x         */
+    __I uint8_t  :2;               /*!< bit:  6.. 7  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } TC_INTFLAG_Type;
@@ -452,7 +449,7 @@ typedef union {
 #define TC_INTFLAG_MC1              (1 << TC_INTFLAG_MC1_Pos)
 #define TC_INTFLAG_MC_Pos           4            /**< \brief (TC_INTFLAG) Match or Capture Channel x */
 #define TC_INTFLAG_MC_Msk           (0x3ul << TC_INTFLAG_MC_Pos)
-#define TC_INTFLAG_MC(value)        ((TC_INTFLAG_MC_Msk & ((value) << TC_INTFLAG_MC_Pos)))
+#define TC_INTFLAG_MC(value)        (TC_INTFLAG_MC_Msk & ((value) << TC_INTFLAG_MC_Pos))
 #define TC_INTFLAG_MASK             0x3Bul       /**< \brief (TC_INTFLAG) MASK Register */
 
 /* -------- TC_STATUS : (TC Offset: 0x0F) (R/   8) Status -------- */
@@ -495,7 +492,7 @@ typedef union {
 
 #define TC_COUNT16_COUNT_COUNT_Pos  0            /**< \brief (TC_COUNT16_COUNT) Count Value */
 #define TC_COUNT16_COUNT_COUNT_Msk  (0xFFFFul << TC_COUNT16_COUNT_COUNT_Pos)
-#define TC_COUNT16_COUNT_COUNT(value) ((TC_COUNT16_COUNT_COUNT_Msk & ((value) << TC_COUNT16_COUNT_COUNT_Pos)))
+#define TC_COUNT16_COUNT_COUNT(value) (TC_COUNT16_COUNT_COUNT_Msk & ((value) << TC_COUNT16_COUNT_COUNT_Pos))
 #define TC_COUNT16_COUNT_MASK       0xFFFFul     /**< \brief (TC_COUNT16_COUNT) MASK Register */
 
 /* -------- TC_COUNT32_COUNT : (TC Offset: 0x10) (R/W 32) COUNT32 COUNT32 Counter Value -------- */
@@ -513,7 +510,7 @@ typedef union {
 
 #define TC_COUNT32_COUNT_COUNT_Pos  0            /**< \brief (TC_COUNT32_COUNT) Count Value */
 #define TC_COUNT32_COUNT_COUNT_Msk  (0xFFFFFFFFul << TC_COUNT32_COUNT_COUNT_Pos)
-#define TC_COUNT32_COUNT_COUNT(value) ((TC_COUNT32_COUNT_COUNT_Msk & ((value) << TC_COUNT32_COUNT_COUNT_Pos)))
+#define TC_COUNT32_COUNT_COUNT(value) (TC_COUNT32_COUNT_COUNT_Msk & ((value) << TC_COUNT32_COUNT_COUNT_Pos))
 #define TC_COUNT32_COUNT_MASK       0xFFFFFFFFul /**< \brief (TC_COUNT32_COUNT) MASK Register */
 
 /* -------- TC_COUNT8_COUNT : (TC Offset: 0x10) (R/W  8) COUNT8 COUNT8 Counter Value -------- */
@@ -531,7 +528,7 @@ typedef union {
 
 #define TC_COUNT8_COUNT_COUNT_Pos   0            /**< \brief (TC_COUNT8_COUNT) Counter Value */
 #define TC_COUNT8_COUNT_COUNT_Msk   (0xFFul << TC_COUNT8_COUNT_COUNT_Pos)
-#define TC_COUNT8_COUNT_COUNT(value) ((TC_COUNT8_COUNT_COUNT_Msk & ((value) << TC_COUNT8_COUNT_COUNT_Pos)))
+#define TC_COUNT8_COUNT_COUNT(value) (TC_COUNT8_COUNT_COUNT_Msk & ((value) << TC_COUNT8_COUNT_COUNT_Pos))
 #define TC_COUNT8_COUNT_MASK        0xFFul       /**< \brief (TC_COUNT8_COUNT) MASK Register */
 
 /* -------- TC_COUNT8_PER : (TC Offset: 0x14) (R/W  8) COUNT8 COUNT8 Period Value -------- */
@@ -549,7 +546,7 @@ typedef union {
 
 #define TC_COUNT8_PER_PER_Pos       0            /**< \brief (TC_COUNT8_PER) Period Value */
 #define TC_COUNT8_PER_PER_Msk       (0xFFul << TC_COUNT8_PER_PER_Pos)
-#define TC_COUNT8_PER_PER(value)    ((TC_COUNT8_PER_PER_Msk & ((value) << TC_COUNT8_PER_PER_Pos)))
+#define TC_COUNT8_PER_PER(value)    (TC_COUNT8_PER_PER_Msk & ((value) << TC_COUNT8_PER_PER_Pos))
 #define TC_COUNT8_PER_MASK          0xFFul       /**< \brief (TC_COUNT8_PER) MASK Register */
 
 /* -------- TC_COUNT16_CC : (TC Offset: 0x18) (R/W 16) COUNT16 COUNT16 Compare/Capture -------- */
@@ -567,7 +564,7 @@ typedef union {
 
 #define TC_COUNT16_CC_CC_Pos        0            /**< \brief (TC_COUNT16_CC) Compare/Capture Value */
 #define TC_COUNT16_CC_CC_Msk        (0xFFFFul << TC_COUNT16_CC_CC_Pos)
-#define TC_COUNT16_CC_CC(value)     ((TC_COUNT16_CC_CC_Msk & ((value) << TC_COUNT16_CC_CC_Pos)))
+#define TC_COUNT16_CC_CC(value)     (TC_COUNT16_CC_CC_Msk & ((value) << TC_COUNT16_CC_CC_Pos))
 #define TC_COUNT16_CC_MASK          0xFFFFul     /**< \brief (TC_COUNT16_CC) MASK Register */
 
 /* -------- TC_COUNT32_CC : (TC Offset: 0x18) (R/W 32) COUNT32 COUNT32 Compare/Capture -------- */
@@ -585,7 +582,7 @@ typedef union {
 
 #define TC_COUNT32_CC_CC_Pos        0            /**< \brief (TC_COUNT32_CC) Compare/Capture Value */
 #define TC_COUNT32_CC_CC_Msk        (0xFFFFFFFFul << TC_COUNT32_CC_CC_Pos)
-#define TC_COUNT32_CC_CC(value)     ((TC_COUNT32_CC_CC_Msk & ((value) << TC_COUNT32_CC_CC_Pos)))
+#define TC_COUNT32_CC_CC(value)     (TC_COUNT32_CC_CC_Msk & ((value) << TC_COUNT32_CC_CC_Pos))
 #define TC_COUNT32_CC_MASK          0xFFFFFFFFul /**< \brief (TC_COUNT32_CC) MASK Register */
 
 /* -------- TC_COUNT8_CC : (TC Offset: 0x18) (R/W  8) COUNT8 COUNT8 Compare/Capture -------- */
@@ -603,7 +600,7 @@ typedef union {
 
 #define TC_COUNT8_CC_CC_Pos         0            /**< \brief (TC_COUNT8_CC) Compare/Capture Value */
 #define TC_COUNT8_CC_CC_Msk         (0xFFul << TC_COUNT8_CC_CC_Pos)
-#define TC_COUNT8_CC_CC(value)      ((TC_COUNT8_CC_CC_Msk & ((value) << TC_COUNT8_CC_CC_Pos)))
+#define TC_COUNT8_CC_CC(value)      (TC_COUNT8_CC_CC_Msk & ((value) << TC_COUNT8_CC_CC_Pos))
 #define TC_COUNT8_CC_MASK           0xFFul       /**< \brief (TC_COUNT8_CC) MASK Register */
 
 /** \brief TC_COUNT8 hardware registers */

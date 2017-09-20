@@ -108,7 +108,7 @@
 #define TCC2_OTMX                   0        // Output Matrix feature implemented
 #define TCC2_OW_NUM                 2        // Number of Output Waveforms
 #define TCC2_PG                     0        // Pattern Generation feature implemented
-#define TCC2_SIZE                   16
+#define TCC2_SIZE                   16      
 #define TCC2_SWAP                   0        // DTI outputs swap feature implemented
 #define TCC2_TYPE                   0        // TCC type 0 : NA, 1 : Master, 2 : Slave
 

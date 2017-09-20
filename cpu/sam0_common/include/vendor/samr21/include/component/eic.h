@@ -3,7 +3,7 @@
  *
  * \brief Component description for EIC
  *
- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
- /**
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMR21_EIC_COMPONENT_
@@ -112,7 +109,7 @@ typedef union {
 
 #define EIC_NMICTRL_NMISENSE_Pos    0            /**< \brief (EIC_NMICTRL) Non-Maskable Interrupt Sense */
 #define EIC_NMICTRL_NMISENSE_Msk    (0x7ul << EIC_NMICTRL_NMISENSE_Pos)
-#define EIC_NMICTRL_NMISENSE(value) ((EIC_NMICTRL_NMISENSE_Msk & ((value) << EIC_NMICTRL_NMISENSE_Pos)))
+#define EIC_NMICTRL_NMISENSE(value) (EIC_NMICTRL_NMISENSE_Msk & ((value) << EIC_NMICTRL_NMISENSE_Pos))
 #define   EIC_NMICTRL_NMISENSE_NONE_Val   0x0ul  /**< \brief (EIC_NMICTRL) No detection */
 #define   EIC_NMICTRL_NMISENSE_RISE_Val   0x1ul  /**< \brief (EIC_NMICTRL) Rising-edge detection */
 #define   EIC_NMICTRL_NMISENSE_FALL_Val   0x2ul  /**< \brief (EIC_NMICTRL) Falling-edge detection */
@@ -214,7 +211,7 @@ typedef union {
 #define EIC_EVCTRL_EXTINTEO15       (1 << EIC_EVCTRL_EXTINTEO15_Pos)
 #define EIC_EVCTRL_EXTINTEO_Pos     0            /**< \brief (EIC_EVCTRL) External Interrupt x Event Output Enable */
 #define EIC_EVCTRL_EXTINTEO_Msk     (0xFFFFul << EIC_EVCTRL_EXTINTEO_Pos)
-#define EIC_EVCTRL_EXTINTEO(value)  ((EIC_EVCTRL_EXTINTEO_Msk & ((value) << EIC_EVCTRL_EXTINTEO_Pos)))
+#define EIC_EVCTRL_EXTINTEO(value)  (EIC_EVCTRL_EXTINTEO_Msk & ((value) << EIC_EVCTRL_EXTINTEO_Pos))
 #define EIC_EVCTRL_MASK             0x0000FFFFul /**< \brief (EIC_EVCTRL) MASK Register */
 
 /* -------- EIC_INTENCLR : (EIC Offset: 0x08) (R/W 32) Interrupt Enable Clear -------- */
@@ -284,7 +281,7 @@ typedef union {
 #define EIC_INTENCLR_EXTINT15       (1 << EIC_INTENCLR_EXTINT15_Pos)
 #define EIC_INTENCLR_EXTINT_Pos     0            /**< \brief (EIC_INTENCLR) External Interrupt x Enable */
 #define EIC_INTENCLR_EXTINT_Msk     (0xFFFFul << EIC_INTENCLR_EXTINT_Pos)
-#define EIC_INTENCLR_EXTINT(value)  ((EIC_INTENCLR_EXTINT_Msk & ((value) << EIC_INTENCLR_EXTINT_Pos)))
+#define EIC_INTENCLR_EXTINT(value)  (EIC_INTENCLR_EXTINT_Msk & ((value) << EIC_INTENCLR_EXTINT_Pos))
 #define EIC_INTENCLR_MASK           0x0000FFFFul /**< \brief (EIC_INTENCLR) MASK Register */
 
 /* -------- EIC_INTENSET : (EIC Offset: 0x0C) (R/W 32) Interrupt Enable Set -------- */
@@ -354,34 +351,34 @@ typedef union {
 #define EIC_INTENSET_EXTINT15       (1 << EIC_INTENSET_EXTINT15_Pos)
 #define EIC_INTENSET_EXTINT_Pos     0            /**< \brief (EIC_INTENSET) External Interrupt x Enable */
 #define EIC_INTENSET_EXTINT_Msk     (0xFFFFul << EIC_INTENSET_EXTINT_Pos)
-#define EIC_INTENSET_EXTINT(value)  ((EIC_INTENSET_EXTINT_Msk & ((value) << EIC_INTENSET_EXTINT_Pos)))
+#define EIC_INTENSET_EXTINT(value)  (EIC_INTENSET_EXTINT_Msk & ((value) << EIC_INTENSET_EXTINT_Pos))
 #define EIC_INTENSET_MASK           0x0000FFFFul /**< \brief (EIC_INTENSET) MASK Register */
 
 /* -------- EIC_INTFLAG : (EIC Offset: 0x10) (R/W 32) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint32_t EXTINT0:1;        /*!< bit:      0  External Interrupt 0               */
-    uint32_t EXTINT1:1;        /*!< bit:      1  External Interrupt 1               */
-    uint32_t EXTINT2:1;        /*!< bit:      2  External Interrupt 2               */
-    uint32_t EXTINT3:1;        /*!< bit:      3  External Interrupt 3               */
-    uint32_t EXTINT4:1;        /*!< bit:      4  External Interrupt 4               */
-    uint32_t EXTINT5:1;        /*!< bit:      5  External Interrupt 5               */
-    uint32_t EXTINT6:1;        /*!< bit:      6  External Interrupt 6               */
-    uint32_t EXTINT7:1;        /*!< bit:      7  External Interrupt 7               */
-    uint32_t EXTINT8:1;        /*!< bit:      8  External Interrupt 8               */
-    uint32_t EXTINT9:1;        /*!< bit:      9  External Interrupt 9               */
-    uint32_t EXTINT10:1;       /*!< bit:     10  External Interrupt 10              */
-    uint32_t EXTINT11:1;       /*!< bit:     11  External Interrupt 11              */
-    uint32_t EXTINT12:1;       /*!< bit:     12  External Interrupt 12              */
-    uint32_t EXTINT13:1;       /*!< bit:     13  External Interrupt 13              */
-    uint32_t EXTINT14:1;       /*!< bit:     14  External Interrupt 14              */
-    uint32_t EXTINT15:1;       /*!< bit:     15  External Interrupt 15              */
-    uint32_t :16;              /*!< bit: 16..31  Reserved                           */
+    __I uint32_t EXTINT0:1;        /*!< bit:      0  External Interrupt 0               */
+    __I uint32_t EXTINT1:1;        /*!< bit:      1  External Interrupt 1               */
+    __I uint32_t EXTINT2:1;        /*!< bit:      2  External Interrupt 2               */
+    __I uint32_t EXTINT3:1;        /*!< bit:      3  External Interrupt 3               */
+    __I uint32_t EXTINT4:1;        /*!< bit:      4  External Interrupt 4               */
+    __I uint32_t EXTINT5:1;        /*!< bit:      5  External Interrupt 5               */
+    __I uint32_t EXTINT6:1;        /*!< bit:      6  External Interrupt 6               */
+    __I uint32_t EXTINT7:1;        /*!< bit:      7  External Interrupt 7               */
+    __I uint32_t EXTINT8:1;        /*!< bit:      8  External Interrupt 8               */
+    __I uint32_t EXTINT9:1;        /*!< bit:      9  External Interrupt 9               */
+    __I uint32_t EXTINT10:1;       /*!< bit:     10  External Interrupt 10              */
+    __I uint32_t EXTINT11:1;       /*!< bit:     11  External Interrupt 11              */
+    __I uint32_t EXTINT12:1;       /*!< bit:     12  External Interrupt 12              */
+    __I uint32_t EXTINT13:1;       /*!< bit:     13  External Interrupt 13              */
+    __I uint32_t EXTINT14:1;       /*!< bit:     14  External Interrupt 14              */
+    __I uint32_t EXTINT15:1;       /*!< bit:     15  External Interrupt 15              */
+    __I uint32_t :16;              /*!< bit: 16..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
-    uint32_t EXTINT:16;        /*!< bit:  0..15  External Interrupt x               */
-    uint32_t :16;              /*!< bit: 16..31  Reserved                           */
+    __I uint32_t EXTINT:16;        /*!< bit:  0..15  External Interrupt x               */
+    __I uint32_t :16;              /*!< bit: 16..31  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } EIC_INTFLAG_Type;
@@ -424,7 +421,7 @@ typedef union {
 #define EIC_INTFLAG_EXTINT15        (1 << EIC_INTFLAG_EXTINT15_Pos)
 #define EIC_INTFLAG_EXTINT_Pos      0            /**< \brief (EIC_INTFLAG) External Interrupt x */
 #define EIC_INTFLAG_EXTINT_Msk      (0xFFFFul << EIC_INTFLAG_EXTINT_Pos)
-#define EIC_INTFLAG_EXTINT(value)   ((EIC_INTFLAG_EXTINT_Msk & ((value) << EIC_INTFLAG_EXTINT_Pos)))
+#define EIC_INTFLAG_EXTINT(value)   (EIC_INTFLAG_EXTINT_Msk & ((value) << EIC_INTFLAG_EXTINT_Pos))
 #define EIC_INTFLAG_MASK            0x0000FFFFul /**< \brief (EIC_INTFLAG) MASK Register */
 
 /* -------- EIC_WAKEUP : (EIC Offset: 0x14) (R/W 32) Wake-Up Enable -------- */
@@ -494,7 +491,7 @@ typedef union {
 #define EIC_WAKEUP_WAKEUPEN15       (1 << EIC_WAKEUP_WAKEUPEN15_Pos)
 #define EIC_WAKEUP_WAKEUPEN_Pos     0            /**< \brief (EIC_WAKEUP) External Interrupt x Wake-up Enable */
 #define EIC_WAKEUP_WAKEUPEN_Msk     (0xFFFFul << EIC_WAKEUP_WAKEUPEN_Pos)
-#define EIC_WAKEUP_WAKEUPEN(value)  ((EIC_WAKEUP_WAKEUPEN_Msk & ((value) << EIC_WAKEUP_WAKEUPEN_Pos)))
+#define EIC_WAKEUP_WAKEUPEN(value)  (EIC_WAKEUP_WAKEUPEN_Msk & ((value) << EIC_WAKEUP_WAKEUPEN_Pos))
 #define EIC_WAKEUP_MASK             0x0000FFFFul /**< \brief (EIC_WAKEUP) MASK Register */
 
 /* -------- EIC_CONFIG : (EIC Offset: 0x18) (R/W 32) Configuration n -------- */
@@ -527,7 +524,7 @@ typedef union {
 
 #define EIC_CONFIG_SENSE0_Pos       0            /**< \brief (EIC_CONFIG) Input Sense 0 Configuration */
 #define EIC_CONFIG_SENSE0_Msk       (0x7ul << EIC_CONFIG_SENSE0_Pos)
-#define EIC_CONFIG_SENSE0(value)    ((EIC_CONFIG_SENSE0_Msk & ((value) << EIC_CONFIG_SENSE0_Pos)))
+#define EIC_CONFIG_SENSE0(value)    (EIC_CONFIG_SENSE0_Msk & ((value) << EIC_CONFIG_SENSE0_Pos))
 #define   EIC_CONFIG_SENSE0_NONE_Val      0x0ul  /**< \brief (EIC_CONFIG) No detection */
 #define   EIC_CONFIG_SENSE0_RISE_Val      0x1ul  /**< \brief (EIC_CONFIG) Rising-edge detection */
 #define   EIC_CONFIG_SENSE0_FALL_Val      0x2ul  /**< \brief (EIC_CONFIG) Falling-edge detection */
@@ -544,7 +541,7 @@ typedef union {
 #define EIC_CONFIG_FILTEN0          (0x1ul << EIC_CONFIG_FILTEN0_Pos)
 #define EIC_CONFIG_SENSE1_Pos       4            /**< \brief (EIC_CONFIG) Input Sense 1 Configuration */
 #define EIC_CONFIG_SENSE1_Msk       (0x7ul << EIC_CONFIG_SENSE1_Pos)
-#define EIC_CONFIG_SENSE1(value)    ((EIC_CONFIG_SENSE1_Msk & ((value) << EIC_CONFIG_SENSE1_Pos)))
+#define EIC_CONFIG_SENSE1(value)    (EIC_CONFIG_SENSE1_Msk & ((value) << EIC_CONFIG_SENSE1_Pos))
 #define   EIC_CONFIG_SENSE1_NONE_Val      0x0ul  /**< \brief (EIC_CONFIG) No detection */
 #define   EIC_CONFIG_SENSE1_RISE_Val      0x1ul  /**< \brief (EIC_CONFIG) Rising edge detection */
 #define   EIC_CONFIG_SENSE1_FALL_Val      0x2ul  /**< \brief (EIC_CONFIG) Falling edge detection */
@@ -561,7 +558,7 @@ typedef union {
 #define EIC_CONFIG_FILTEN1          (0x1ul << EIC_CONFIG_FILTEN1_Pos)
 #define EIC_CONFIG_SENSE2_Pos       8            /**< \brief (EIC_CONFIG) Input Sense 2 Configuration */
 #define EIC_CONFIG_SENSE2_Msk       (0x7ul << EIC_CONFIG_SENSE2_Pos)
-#define EIC_CONFIG_SENSE2(value)    ((EIC_CONFIG_SENSE2_Msk & ((value) << EIC_CONFIG_SENSE2_Pos)))
+#define EIC_CONFIG_SENSE2(value)    (EIC_CONFIG_SENSE2_Msk & ((value) << EIC_CONFIG_SENSE2_Pos))
 #define   EIC_CONFIG_SENSE2_NONE_Val      0x0ul  /**< \brief (EIC_CONFIG) No detection */
 #define   EIC_CONFIG_SENSE2_RISE_Val      0x1ul  /**< \brief (EIC_CONFIG) Rising edge detection */
 #define   EIC_CONFIG_SENSE2_FALL_Val      0x2ul  /**< \brief (EIC_CONFIG) Falling edge detection */
@@ -578,7 +575,7 @@ typedef union {
 #define EIC_CONFIG_FILTEN2          (0x1ul << EIC_CONFIG_FILTEN2_Pos)
 #define EIC_CONFIG_SENSE3_Pos       12           /**< \brief (EIC_CONFIG) Input Sense 3 Configuration */
 #define EIC_CONFIG_SENSE3_Msk       (0x7ul << EIC_CONFIG_SENSE3_Pos)
-#define EIC_CONFIG_SENSE3(value)    ((EIC_CONFIG_SENSE3_Msk & ((value) << EIC_CONFIG_SENSE3_Pos)))
+#define EIC_CONFIG_SENSE3(value)    (EIC_CONFIG_SENSE3_Msk & ((value) << EIC_CONFIG_SENSE3_Pos))
 #define   EIC_CONFIG_SENSE3_NONE_Val      0x0ul  /**< \brief (EIC_CONFIG) No detection */
 #define   EIC_CONFIG_SENSE3_RISE_Val      0x1ul  /**< \brief (EIC_CONFIG) Rising edge detection */
 #define   EIC_CONFIG_SENSE3_FALL_Val      0x2ul  /**< \brief (EIC_CONFIG) Falling edge detection */
@@ -595,7 +592,7 @@ typedef union {
 #define EIC_CONFIG_FILTEN3          (0x1ul << EIC_CONFIG_FILTEN3_Pos)
 #define EIC_CONFIG_SENSE4_Pos       16           /**< \brief (EIC_CONFIG) Input Sense 4 Configuration */
 #define EIC_CONFIG_SENSE4_Msk       (0x7ul << EIC_CONFIG_SENSE4_Pos)
-#define EIC_CONFIG_SENSE4(value)    ((EIC_CONFIG_SENSE4_Msk & ((value) << EIC_CONFIG_SENSE4_Pos)))
+#define EIC_CONFIG_SENSE4(value)    (EIC_CONFIG_SENSE4_Msk & ((value) << EIC_CONFIG_SENSE4_Pos))
 #define   EIC_CONFIG_SENSE4_NONE_Val      0x0ul  /**< \brief (EIC_CONFIG) No detection */
 #define   EIC_CONFIG_SENSE4_RISE_Val      0x1ul  /**< \brief (EIC_CONFIG) Rising edge detection */
 #define   EIC_CONFIG_SENSE4_FALL_Val      0x2ul  /**< \brief (EIC_CONFIG) Falling edge detection */
@@ -612,7 +609,7 @@ typedef union {
 #define EIC_CONFIG_FILTEN4          (0x1ul << EIC_CONFIG_FILTEN4_Pos)
 #define EIC_CONFIG_SENSE5_Pos       20           /**< \brief (EIC_CONFIG) Input Sense 5 Configuration */
 #define EIC_CONFIG_SENSE5_Msk       (0x7ul << EIC_CONFIG_SENSE5_Pos)
-#define EIC_CONFIG_SENSE5(value)    ((EIC_CONFIG_SENSE5_Msk & ((value) << EIC_CONFIG_SENSE5_Pos)))
+#define EIC_CONFIG_SENSE5(value)    (EIC_CONFIG_SENSE5_Msk & ((value) << EIC_CONFIG_SENSE5_Pos))
 #define   EIC_CONFIG_SENSE5_NONE_Val      0x0ul  /**< \brief (EIC_CONFIG) No detection */
 #define   EIC_CONFIG_SENSE5_RISE_Val      0x1ul  /**< \brief (EIC_CONFIG) Rising edge detection */
 #define   EIC_CONFIG_SENSE5_FALL_Val      0x2ul  /**< \brief (EIC_CONFIG) Falling edge detection */
@@ -629,7 +626,7 @@ typedef union {
 #define EIC_CONFIG_FILTEN5          (0x1ul << EIC_CONFIG_FILTEN5_Pos)
 #define EIC_CONFIG_SENSE6_Pos       24           /**< \brief (EIC_CONFIG) Input Sense 6 Configuration */
 #define EIC_CONFIG_SENSE6_Msk       (0x7ul << EIC_CONFIG_SENSE6_Pos)
-#define EIC_CONFIG_SENSE6(value)    ((EIC_CONFIG_SENSE6_Msk & ((value) << EIC_CONFIG_SENSE6_Pos)))
+#define EIC_CONFIG_SENSE6(value)    (EIC_CONFIG_SENSE6_Msk & ((value) << EIC_CONFIG_SENSE6_Pos))
 #define   EIC_CONFIG_SENSE6_NONE_Val      0x0ul  /**< \brief (EIC_CONFIG) No detection */
 #define   EIC_CONFIG_SENSE6_RISE_Val      0x1ul  /**< \brief (EIC_CONFIG) Rising edge detection */
 #define   EIC_CONFIG_SENSE6_FALL_Val      0x2ul  /**< \brief (EIC_CONFIG) Falling edge detection */
@@ -646,7 +643,7 @@ typedef union {
 #define EIC_CONFIG_FILTEN6          (0x1ul << EIC_CONFIG_FILTEN6_Pos)
 #define EIC_CONFIG_SENSE7_Pos       28           /**< \brief (EIC_CONFIG) Input Sense 7 Configuration */
 #define EIC_CONFIG_SENSE7_Msk       (0x7ul << EIC_CONFIG_SENSE7_Pos)
-#define EIC_CONFIG_SENSE7(value)    ((EIC_CONFIG_SENSE7_Msk & ((value) << EIC_CONFIG_SENSE7_Pos)))
+#define EIC_CONFIG_SENSE7(value)    (EIC_CONFIG_SENSE7_Msk & ((value) << EIC_CONFIG_SENSE7_Pos))
 #define   EIC_CONFIG_SENSE7_NONE_Val      0x0ul  /**< \brief (EIC_CONFIG) No detection */
 #define   EIC_CONFIG_SENSE7_RISE_Val      0x1ul  /**< \brief (EIC_CONFIG) Rising edge detection */
 #define   EIC_CONFIG_SENSE7_FALL_Val      0x2ul  /**< \brief (EIC_CONFIG) Falling edge detection */

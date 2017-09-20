@@ -1,7 +1,7 @@
 /**
  * \file
  *
- * \brief Header file for SAMD21G15A
+ * \brief Header file for SAMR21E19A
  *
  * Copyright (c) 2017 Atmel Corporation. All rights reserved.
  *
@@ -41,13 +41,13 @@
  *
  */
 
-#ifndef _SAMD21G15A_
-#define _SAMD21G15A_
+#ifndef _SAMR21E19A_
+#define _SAMR21E19A_
 
 /**
- * \ingroup SAMD21_definitions
- * \addtogroup SAMD21G15A_definitions SAMD21G15A definitions
- * This file defines all structures and symbols for SAMD21G15A:
+ * \ingroup SAMR21_definitions
+ * \addtogroup SAMR21E19A_definitions SAMR21E19A definitions
+ * This file defines all structures and symbols for SAMR21E19A:
  *   - registers and bitfields
  *   - peripheral base address
  *   - peripheral ID
@@ -84,9 +84,9 @@ typedef volatile       uint8_t  RwReg8;  /**< Read-Write  8-bit register (volati
 #endif
 
 /* ************************************************************************** */
-/**  CMSIS DEFINITIONS FOR SAMD21G15A */
+/**  CMSIS DEFINITIONS FOR SAMR21E19A */
 /* ************************************************************************** */
-/** \defgroup SAMD21G15A_cmsis CMSIS Definitions */
+/** \defgroup SAMR21E19A_cmsis CMSIS Definitions */
 /*@{*/
 
 /** Interrupt Number Definition */
@@ -98,33 +98,31 @@ typedef enum IRQn
   SVCall_IRQn              = -5, /**< 11 Cortex-M0+ SV Call Interrupt           */
   PendSV_IRQn              = -2, /**< 14 Cortex-M0+ Pend SV Interrupt           */
   SysTick_IRQn             = -1, /**< 15 Cortex-M0+ System Tick Interrupt       */
-  /******  SAMD21G15A-specific Interrupt Numbers ***********************/
-  PM_IRQn                  =  0, /**<  0 SAMD21G15A Power Manager (PM) */
-  SYSCTRL_IRQn             =  1, /**<  1 SAMD21G15A System Control (SYSCTRL) */
-  WDT_IRQn                 =  2, /**<  2 SAMD21G15A Watchdog Timer (WDT) */
-  RTC_IRQn                 =  3, /**<  3 SAMD21G15A Real-Time Counter (RTC) */
-  EIC_IRQn                 =  4, /**<  4 SAMD21G15A External Interrupt Controller (EIC) */
-  NVMCTRL_IRQn             =  5, /**<  5 SAMD21G15A Non-Volatile Memory Controller (NVMCTRL) */
-  DMAC_IRQn                =  6, /**<  6 SAMD21G15A Direct Memory Access Controller (DMAC) */
-  USB_IRQn                 =  7, /**<  7 SAMD21G15A Universal Serial Bus (USB) */
-  EVSYS_IRQn               =  8, /**<  8 SAMD21G15A Event System Interface (EVSYS) */
-  SERCOM0_IRQn             =  9, /**<  9 SAMD21G15A Serial Communication Interface 0 (SERCOM0) */
-  SERCOM1_IRQn             = 10, /**< 10 SAMD21G15A Serial Communication Interface 1 (SERCOM1) */
-  SERCOM2_IRQn             = 11, /**< 11 SAMD21G15A Serial Communication Interface 2 (SERCOM2) */
-  SERCOM3_IRQn             = 12, /**< 12 SAMD21G15A Serial Communication Interface 3 (SERCOM3) */
-  SERCOM4_IRQn             = 13, /**< 13 SAMD21G15A Serial Communication Interface 4 (SERCOM4) */
-  SERCOM5_IRQn             = 14, /**< 14 SAMD21G15A Serial Communication Interface 5 (SERCOM5) */
-  TCC0_IRQn                = 15, /**< 15 SAMD21G15A Timer Counter Control 0 (TCC0) */
-  TCC1_IRQn                = 16, /**< 16 SAMD21G15A Timer Counter Control 1 (TCC1) */
-  TCC2_IRQn                = 17, /**< 17 SAMD21G15A Timer Counter Control 2 (TCC2) */
-  TC3_IRQn                 = 18, /**< 18 SAMD21G15A Basic Timer Counter 3 (TC3) */
-  TC4_IRQn                 = 19, /**< 19 SAMD21G15A Basic Timer Counter 4 (TC4) */
-  TC5_IRQn                 = 20, /**< 20 SAMD21G15A Basic Timer Counter 5 (TC5) */
-  ADC_IRQn                 = 23, /**< 23 SAMD21G15A Analog Digital Converter (ADC) */
-  AC_IRQn                  = 24, /**< 24 SAMD21G15A Analog Comparators (AC) */
-  DAC_IRQn                 = 25, /**< 25 SAMD21G15A Digital Analog Converter (DAC) */
-  PTC_IRQn                 = 26, /**< 26 SAMD21G15A Peripheral Touch Controller (PTC) */
-  I2S_IRQn                 = 27, /**< 27 SAMD21G15A Inter-IC Sound Interface (I2S) */
+  /******  SAMR21E19A-specific Interrupt Numbers ***********************/
+  PM_IRQn                  =  0, /**<  0 SAMR21E19A Power Manager (PM) */
+  SYSCTRL_IRQn             =  1, /**<  1 SAMR21E19A System Control (SYSCTRL) */
+  WDT_IRQn                 =  2, /**<  2 SAMR21E19A Watchdog Timer (WDT) */
+  RTC_IRQn                 =  3, /**<  3 SAMR21E19A Real-Time Counter (RTC) */
+  EIC_IRQn                 =  4, /**<  4 SAMR21E19A External Interrupt Controller (EIC) */
+  NVMCTRL_IRQn             =  5, /**<  5 SAMR21E19A Non-Volatile Memory Controller (NVMCTRL) */
+  DMAC_IRQn                =  6, /**<  6 SAMR21E19A Direct Memory Access Controller (DMAC) */
+  USB_IRQn                 =  7, /**<  7 SAMR21E19A Universal Serial Bus (USB) */
+  EVSYS_IRQn               =  8, /**<  8 SAMR21E19A Event System Interface (EVSYS) */
+  SERCOM0_IRQn             =  9, /**<  9 SAMR21E19A Serial Communication Interface 0 (SERCOM0) */
+  SERCOM1_IRQn             = 10, /**< 10 SAMR21E19A Serial Communication Interface 1 (SERCOM1) */
+  SERCOM2_IRQn             = 11, /**< 11 SAMR21E19A Serial Communication Interface 2 (SERCOM2) */
+  SERCOM3_IRQn             = 12, /**< 12 SAMR21E19A Serial Communication Interface 3 (SERCOM3) */
+  SERCOM4_IRQn             = 13, /**< 13 SAMR21E19A Serial Communication Interface 4 (SERCOM4) */
+  SERCOM5_IRQn             = 14, /**< 14 SAMR21E19A Serial Communication Interface 5 (SERCOM5) */
+  TCC0_IRQn                = 15, /**< 15 SAMR21E19A Timer Counter Control 0 (TCC0) */
+  TCC1_IRQn                = 16, /**< 16 SAMR21E19A Timer Counter Control 1 (TCC1) */
+  TCC2_IRQn                = 17, /**< 17 SAMR21E19A Timer Counter Control 2 (TCC2) */
+  TC3_IRQn                 = 18, /**< 18 SAMR21E19A Basic Timer Counter 3 (TC3) */
+  TC4_IRQn                 = 19, /**< 19 SAMR21E19A Basic Timer Counter 4 (TC4) */
+  TC5_IRQn                 = 20, /**< 20 SAMR21E19A Basic Timer Counter 5 (TC5) */
+  ADC_IRQn                 = 23, /**< 23 SAMR21E19A Analog Digital Converter (ADC) */
+  AC_IRQn                  = 24, /**< 24 SAMR21E19A Analog Comparators (AC) */
+  PTC_IRQn                 = 26, /**< 26 SAMR21E19A Peripheral Touch Controller (PTC) */
 
   PERIPH_COUNT_IRQn        = 28  /**< Number of peripheral IDs */
 } IRQn_Type;
@@ -138,16 +136,16 @@ typedef struct _DeviceVectors
   void* pfnReset_Handler;
   void* pfnNMI_Handler;
   void* pfnHardFault_Handler;
-  void* pvReservedM12;
-  void* pvReservedM11;
-  void* pvReservedM10;
-  void* pvReservedM9;
-  void* pvReservedM8;
-  void* pvReservedM7;
-  void* pvReservedM6;
+  void* pfnReservedM12;
+  void* pfnReservedM11;
+  void* pfnReservedM10;
+  void* pfnReservedM9;
+  void* pfnReservedM8;
+  void* pfnReservedM7;
+  void* pfnReservedM6;
   void* pfnSVC_Handler;
-  void* pvReservedM4;
-  void* pvReservedM3;
+  void* pfnReservedM4;
+  void* pfnReservedM3;
   void* pfnPendSV_Handler;
   void* pfnSysTick_Handler;
 
@@ -173,14 +171,14 @@ typedef struct _DeviceVectors
   void* pfnTC3_Handler;                   /* 18 Basic Timer Counter 3 */
   void* pfnTC4_Handler;                   /* 19 Basic Timer Counter 4 */
   void* pfnTC5_Handler;                   /* 20 Basic Timer Counter 5 */
-  void* pvReserved21;
-  void* pvReserved22;
+  void* pfnReserved21;
+  void* pfnReserved22;
   void* pfnADC_Handler;                   /* 23 Analog Digital Converter */
   void* pfnAC_Handler;                    /* 24 Analog Comparators */
-  void* pfnDAC_Handler;                   /* 25 Digital Analog Converter */
+  void* pfnReserved25;
   void* pfnPTC_Handler;                   /* 26 Peripheral Touch Controller */
-  void* pfnI2S_Handler;                   /* 27 Inter-IC Sound Interface */
-  void* pvReserved28;
+  void* pfnReserved27;
+  void* pfnReserved28;
 } DeviceVectors;
 
 /* Cortex-M0+ processor handlers */
@@ -215,9 +213,7 @@ void TC4_Handler                 ( void );
 void TC5_Handler                 ( void );
 void ADC_Handler                 ( void );
 void AC_Handler                  ( void );
-void DAC_Handler                 ( void );
 void PTC_Handler                 ( void );
-void I2S_Handler                 ( void );
 
 /*
  * \brief Configuration of the Cortex-M0+ Processor and Core Peripherals
@@ -236,32 +232,31 @@ void I2S_Handler                 ( void );
 
 #include <core_cm0plus.h>
 #if !defined DONT_USE_CMSIS_INIT
-#include "system_samd21.h"
+#include "system_samr21.h"
 #endif /* DONT_USE_CMSIS_INIT */
 
 /*@}*/
 
 /* ************************************************************************** */
-/**  SOFTWARE PERIPHERAL API DEFINITION FOR SAMD21G15A */
+/**  SOFTWARE PERIPHERAL API DEFINITION FOR SAMR21E19A */
 /* ************************************************************************** */
-/** \defgroup SAMD21G15A_api Peripheral Software API */
+/** \defgroup SAMR21E19A_api Peripheral Software API */
 /*@{*/
 
 #include "component/ac.h"
 #include "component/adc.h"
-#include "component/dac.h"
 #include "component/dmac.h"
 #include "component/dsu.h"
 #include "component/eic.h"
 #include "component/evsys.h"
 #include "component/gclk.h"
 #include "component/hmatrixb.h"
-#include "component/i2s.h"
 #include "component/mtb.h"
 #include "component/nvmctrl.h"
 #include "component/pac.h"
 #include "component/pm.h"
 #include "component/port.h"
+#include "component/rfctrl.h"
 #include "component/rtc.h"
 #include "component/sercom.h"
 #include "component/sysctrl.h"
@@ -272,21 +267,19 @@ void I2S_Handler                 ( void );
 /*@}*/
 
 /* ************************************************************************** */
-/**  REGISTERS ACCESS DEFINITIONS FOR SAMD21G15A */
+/**  REGISTERS ACCESS DEFINITIONS FOR SAMR21E19A */
 /* ************************************************************************** */
-/** \defgroup SAMD21G15A_reg Registers Access Definitions */
+/** \defgroup SAMR21E19A_reg Registers Access Definitions */
 /*@{*/
 
 #include "instance/ac.h"
 #include "instance/adc.h"
-#include "instance/dac.h"
 #include "instance/dmac.h"
 #include "instance/dsu.h"
 #include "instance/eic.h"
 #include "instance/evsys.h"
 #include "instance/gclk.h"
 #include "instance/sbmatrix.h"
-#include "instance/i2s.h"
 #include "instance/mtb.h"
 #include "instance/nvmctrl.h"
 #include "instance/pac0.h"
@@ -294,6 +287,7 @@ void I2S_Handler                 ( void );
 #include "instance/pac2.h"
 #include "instance/pm.h"
 #include "instance/port.h"
+#include "instance/rfctrl.h"
 #include "instance/rtc.h"
 #include "instance/sercom0.h"
 #include "instance/sercom1.h"
@@ -313,9 +307,9 @@ void I2S_Handler                 ( void );
 /*@}*/
 
 /* ************************************************************************** */
-/**  PERIPHERAL ID DEFINITIONS FOR SAMD21G15A */
+/**  PERIPHERAL ID DEFINITIONS FOR SAMR21E19A */
 /* ************************************************************************** */
-/** \defgroup SAMD21G15A_id Peripheral Ids Definitions */
+/** \defgroup SAMR21E19A_id Peripheral Ids Definitions */
 /*@{*/
 
 // Peripheral instances on HPB0 bridge
@@ -354,30 +348,27 @@ void I2S_Handler                 ( void );
 #define ID_TC5           77 /**< \brief Basic Timer Counter 5 (TC5) */
 #define ID_ADC           80 /**< \brief Analog Digital Converter (ADC) */
 #define ID_AC            81 /**< \brief Analog Comparators (AC) */
-#define ID_DAC           82 /**< \brief Digital Analog Converter (DAC) */
 #define ID_PTC           83 /**< \brief Peripheral Touch Controller (PTC) */
-#define ID_I2S           84 /**< \brief Inter-IC Sound Interface (I2S) */
+#define ID_RFCTRL        85 /**< \brief RF233 control module (RFCTRL) */
 
-#define ID_PERIPH_COUNT  85 /**< \brief Max number of peripheral IDs */
+#define ID_PERIPH_COUNT  86 /**< \brief Number of peripheral IDs */
 /*@}*/
 
 /* ************************************************************************** */
-/**  BASE ADDRESS DEFINITIONS FOR SAMD21G15A */
+/**  BASE ADDRESS DEFINITIONS FOR SAMR21E19A */
 /* ************************************************************************** */
-/** \defgroup SAMD21G15A_base Peripheral Base Address Definitions */
+/** \defgroup SAMR21E19A_base Peripheral Base Address Definitions */
 /*@{*/
 
 #if defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)
 #define AC                            (0x42004400UL) /**< \brief (AC) APB Base Address */
 #define ADC                           (0x42004000UL) /**< \brief (ADC) APB Base Address */
-#define DAC                           (0x42004800UL) /**< \brief (DAC) APB Base Address */
 #define DMAC                          (0x41004800UL) /**< \brief (DMAC) APB Base Address */
 #define DSU                           (0x41002000UL) /**< \brief (DSU) APB Base Address */
 #define EIC                           (0x40001800UL) /**< \brief (EIC) APB Base Address */
 #define EVSYS                         (0x42000400UL) /**< \brief (EVSYS) APB Base Address */
 #define GCLK                          (0x40000C00UL) /**< \brief (GCLK) APB Base Address */
 #define SBMATRIX                      (0x41007000UL) /**< \brief (SBMATRIX) APB Base Address */
-#define I2S                           (0x42005000UL) /**< \brief (I2S) APB Base Address */
 #define MTB                           (0x41006000UL) /**< \brief (MTB) APB Base Address */
 #define NVMCTRL                       (0x41004000UL) /**< \brief (NVMCTRL) APB Base Address */
 #define NVMCTRL_CAL                   (0x00800000UL) /**< \brief (NVMCTRL) CAL Base Address */
@@ -393,6 +384,7 @@ void I2S_Handler                 ( void );
 #define PM                            (0x40000400UL) /**< \brief (PM) APB Base Address */
 #define PORT                          (0x41004400UL) /**< \brief (PORT) APB Base Address */
 #define PORT_IOBUS                    (0x60000000UL) /**< \brief (PORT) IOBUS Base Address */
+#define RFCTRL                        (0x42005400UL) /**< \brief (RFCTRL) APB Base Address */
 #define RTC                           (0x40001400UL) /**< \brief (RTC) APB Base Address */
 #define SERCOM0                       (0x42000800UL) /**< \brief (SERCOM0) APB Base Address */
 #define SERCOM1                       (0x42000C00UL) /**< \brief (SERCOM1) APB Base Address */
@@ -418,10 +410,6 @@ void I2S_Handler                 ( void );
 #define ADC_INST_NUM      1                          /**< \brief (ADC) Number of instances */
 #define ADC_INSTS         { ADC }                    /**< \brief (ADC) Instances List */
 
-#define DAC               ((Dac      *)0x42004800UL) /**< \brief (DAC) APB Base Address */
-#define DAC_INST_NUM      1                          /**< \brief (DAC) Number of instances */
-#define DAC_INSTS         { DAC }                    /**< \brief (DAC) Instances List */
-
 #define DMAC              ((Dmac     *)0x41004800UL) /**< \brief (DMAC) APB Base Address */
 #define DMAC_INST_NUM     1                          /**< \brief (DMAC) Number of instances */
 #define DMAC_INSTS        { DMAC }                   /**< \brief (DMAC) Instances List */
@@ -445,10 +433,6 @@ void I2S_Handler                 ( void );
 #define SBMATRIX          ((Hmatrixb *)0x41007000UL) /**< \brief (SBMATRIX) APB Base Address */
 #define HMATRIXB_INST_NUM 1                          /**< \brief (HMATRIXB) Number of instances */
 #define HMATRIXB_INSTS    { SBMATRIX }               /**< \brief (HMATRIXB) Instances List */
-
-#define I2S               ((I2s      *)0x42005000UL) /**< \brief (I2S) APB Base Address */
-#define I2S_INST_NUM      1                          /**< \brief (I2S) Number of instances */
-#define I2S_INSTS         { I2S }                    /**< \brief (I2S) Instances List */
 
 #define MTB               ((Mtb      *)0x41006000UL) /**< \brief (MTB) APB Base Address */
 #define MTB_INST_NUM      1                          /**< \brief (MTB) Number of instances */
@@ -483,6 +467,10 @@ void I2S_Handler                 ( void );
 #define PTC_GCLK_ID       34
 #define PTC_INST_NUM      1                          /**< \brief (PTC) Number of instances */
 #define PTC_INSTS         { PTC }                    /**< \brief (PTC) Instances List */
+
+#define RFCTRL            ((Rfctrl   *)0x42005400UL) /**< \brief (RFCTRL) APB Base Address */
+#define RFCTRL_INST_NUM   1                          /**< \brief (RFCTRL) Number of instances */
+#define RFCTRL_INSTS      { RFCTRL }                 /**< \brief (RFCTRL) Instances List */
 
 #define RTC               ((Rtc      *)0x40001400UL) /**< \brief (RTC) APB Base Address */
 #define RTC_INST_NUM      1                          /**< \brief (RTC) Number of instances */
@@ -525,23 +513,23 @@ void I2S_Handler                 ( void );
 /*@}*/
 
 /* ************************************************************************** */
-/**  PORT DEFINITIONS FOR SAMD21G15A */
+/**  PORT DEFINITIONS FOR SAMR21E19A */
 /* ************************************************************************** */
-/** \defgroup SAMD21G15A_port PORT Definitions */
+/** \defgroup SAMR21E19A_port PORT Definitions */
 /*@{*/
 
-#include "pio/samd21g15a.h"
+#include "pio/samr21e19a.h"
 /*@}*/
 
 /* ************************************************************************** */
-/**  MEMORY MAPPING DEFINITIONS FOR SAMD21G15A */
+/**  MEMORY MAPPING DEFINITIONS FOR SAMR21E19A */
 /* ************************************************************************** */
 
-#define FLASH_SIZE            0x8000UL /* 32 kB */
+#define FLASH_SIZE            0x40000UL /* 256 kB */
 #define FLASH_PAGE_SIZE       64
-#define FLASH_NB_OF_PAGES     512
+#define FLASH_NB_OF_PAGES     4096
 #define FLASH_USER_PAGE_SIZE  64
-#define HMCRAMC0_SIZE         0x1000UL /* 4 kB */
+#define HMCRAMC0_SIZE         0x8000UL /* 32 kB */
 
 #define FLASH_ADDR            (0x00000000u) /**< FLASH base address */
 #define FLASH_USER_PAGE_ADDR  (0x00800000u) /**< FLASH_USER_PAGE base address */
@@ -551,12 +539,13 @@ void I2S_Handler                 ( void );
 #define HPB2_ADDR             (0x42000000u) /**< HPB2 base address */
 #define PPB_ADDR              (0xE0000000u) /**< PPB base address */
 
-#define DSU_DID_RESETVALUE    0x10010008UL
+#define DSU_DID_RESETVALUE    0x10010018UL
 #define EIC_EXTINT_NUM        16
-#define PORT_GROUPS           2
+#define PORT_GROUPS           3
+#define SIP_CONFIG            RF233+FL512KB
 
 /* ************************************************************************** */
-/**  ELECTRICAL DEFINITIONS FOR SAMD21G15A */
+/**  ELECTRICAL DEFINITIONS FOR SAMR21E19A */
 /* ************************************************************************** */
 
 
@@ -566,4 +555,4 @@ void I2S_Handler                 ( void );
 
 /*@}*/
 
-#endif /* SAMD21G15A_H */
+#endif /* SAMR21E19A_H */

@@ -3,7 +3,7 @@
  *
  * \brief Component description for AC
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMD21_AC_COMPONENT_
@@ -79,7 +76,7 @@ typedef union {
 #define AC_CTRLA_ENABLE             (0x1ul << AC_CTRLA_ENABLE_Pos)
 #define AC_CTRLA_RUNSTDBY_Pos       2            /**< \brief (AC_CTRLA) Run in Standby */
 #define AC_CTRLA_RUNSTDBY_Msk       (0x1ul << AC_CTRLA_RUNSTDBY_Pos)
-#define AC_CTRLA_RUNSTDBY(value)    ((AC_CTRLA_RUNSTDBY_Msk & ((value) << AC_CTRLA_RUNSTDBY_Pos)))
+#define AC_CTRLA_RUNSTDBY(value)    (AC_CTRLA_RUNSTDBY_Msk & ((value) << AC_CTRLA_RUNSTDBY_Pos))
 #define AC_CTRLA_LPMUX_Pos          7            /**< \brief (AC_CTRLA) Low-Power Mux */
 #define AC_CTRLA_LPMUX              (0x1ul << AC_CTRLA_LPMUX_Pos)
 #define AC_CTRLA_MASK               0x87ul       /**< \brief (AC_CTRLA) MASK Register */
@@ -109,7 +106,7 @@ typedef union {
 #define AC_CTRLB_START1             (1 << AC_CTRLB_START1_Pos)
 #define AC_CTRLB_START_Pos          0            /**< \brief (AC_CTRLB) Comparator x Start Comparison */
 #define AC_CTRLB_START_Msk          (0x3ul << AC_CTRLB_START_Pos)
-#define AC_CTRLB_START(value)       ((AC_CTRLB_START_Msk & ((value) << AC_CTRLB_START_Pos)))
+#define AC_CTRLB_START(value)       (AC_CTRLB_START_Msk & ((value) << AC_CTRLB_START_Pos))
 #define AC_CTRLB_MASK               0x03ul       /**< \brief (AC_CTRLB) MASK Register */
 
 /* -------- AC_EVCTRL : (AC Offset: 0x02) (R/W 16) Event Control -------- */
@@ -146,19 +143,19 @@ typedef union {
 #define AC_EVCTRL_COMPEO1           (1 << AC_EVCTRL_COMPEO1_Pos)
 #define AC_EVCTRL_COMPEO_Pos        0            /**< \brief (AC_EVCTRL) Comparator x Event Output Enable */
 #define AC_EVCTRL_COMPEO_Msk        (0x3ul << AC_EVCTRL_COMPEO_Pos)
-#define AC_EVCTRL_COMPEO(value)     ((AC_EVCTRL_COMPEO_Msk & ((value) << AC_EVCTRL_COMPEO_Pos)))
+#define AC_EVCTRL_COMPEO(value)     (AC_EVCTRL_COMPEO_Msk & ((value) << AC_EVCTRL_COMPEO_Pos))
 #define AC_EVCTRL_WINEO0_Pos        4            /**< \brief (AC_EVCTRL) Window 0 Event Output Enable */
 #define AC_EVCTRL_WINEO0            (1 << AC_EVCTRL_WINEO0_Pos)
 #define AC_EVCTRL_WINEO_Pos         4            /**< \brief (AC_EVCTRL) Window x Event Output Enable */
 #define AC_EVCTRL_WINEO_Msk         (0x1ul << AC_EVCTRL_WINEO_Pos)
-#define AC_EVCTRL_WINEO(value)      ((AC_EVCTRL_WINEO_Msk & ((value) << AC_EVCTRL_WINEO_Pos)))
+#define AC_EVCTRL_WINEO(value)      (AC_EVCTRL_WINEO_Msk & ((value) << AC_EVCTRL_WINEO_Pos))
 #define AC_EVCTRL_COMPEI0_Pos       8            /**< \brief (AC_EVCTRL) Comparator 0 Event Input */
 #define AC_EVCTRL_COMPEI0           (1 << AC_EVCTRL_COMPEI0_Pos)
 #define AC_EVCTRL_COMPEI1_Pos       9            /**< \brief (AC_EVCTRL) Comparator 1 Event Input */
 #define AC_EVCTRL_COMPEI1           (1 << AC_EVCTRL_COMPEI1_Pos)
 #define AC_EVCTRL_COMPEI_Pos        8            /**< \brief (AC_EVCTRL) Comparator x Event Input */
 #define AC_EVCTRL_COMPEI_Msk        (0x3ul << AC_EVCTRL_COMPEI_Pos)
-#define AC_EVCTRL_COMPEI(value)     ((AC_EVCTRL_COMPEI_Msk & ((value) << AC_EVCTRL_COMPEI_Pos)))
+#define AC_EVCTRL_COMPEI(value)     (AC_EVCTRL_COMPEI_Msk & ((value) << AC_EVCTRL_COMPEI_Pos))
 #define AC_EVCTRL_MASK              0x0313ul     /**< \brief (AC_EVCTRL) MASK Register */
 
 /* -------- AC_INTENCLR : (AC Offset: 0x04) (R/W  8) Interrupt Enable Clear -------- */
@@ -190,12 +187,12 @@ typedef union {
 #define AC_INTENCLR_COMP1           (1 << AC_INTENCLR_COMP1_Pos)
 #define AC_INTENCLR_COMP_Pos        0            /**< \brief (AC_INTENCLR) Comparator x Interrupt Enable */
 #define AC_INTENCLR_COMP_Msk        (0x3ul << AC_INTENCLR_COMP_Pos)
-#define AC_INTENCLR_COMP(value)     ((AC_INTENCLR_COMP_Msk & ((value) << AC_INTENCLR_COMP_Pos)))
+#define AC_INTENCLR_COMP(value)     (AC_INTENCLR_COMP_Msk & ((value) << AC_INTENCLR_COMP_Pos))
 #define AC_INTENCLR_WIN0_Pos        4            /**< \brief (AC_INTENCLR) Window 0 Interrupt Enable */
 #define AC_INTENCLR_WIN0            (1 << AC_INTENCLR_WIN0_Pos)
 #define AC_INTENCLR_WIN_Pos         4            /**< \brief (AC_INTENCLR) Window x Interrupt Enable */
 #define AC_INTENCLR_WIN_Msk         (0x1ul << AC_INTENCLR_WIN_Pos)
-#define AC_INTENCLR_WIN(value)      ((AC_INTENCLR_WIN_Msk & ((value) << AC_INTENCLR_WIN_Pos)))
+#define AC_INTENCLR_WIN(value)      (AC_INTENCLR_WIN_Msk & ((value) << AC_INTENCLR_WIN_Pos))
 #define AC_INTENCLR_MASK            0x13ul       /**< \brief (AC_INTENCLR) MASK Register */
 
 /* -------- AC_INTENSET : (AC Offset: 0x05) (R/W  8) Interrupt Enable Set -------- */
@@ -227,29 +224,29 @@ typedef union {
 #define AC_INTENSET_COMP1           (1 << AC_INTENSET_COMP1_Pos)
 #define AC_INTENSET_COMP_Pos        0            /**< \brief (AC_INTENSET) Comparator x Interrupt Enable */
 #define AC_INTENSET_COMP_Msk        (0x3ul << AC_INTENSET_COMP_Pos)
-#define AC_INTENSET_COMP(value)     ((AC_INTENSET_COMP_Msk & ((value) << AC_INTENSET_COMP_Pos)))
+#define AC_INTENSET_COMP(value)     (AC_INTENSET_COMP_Msk & ((value) << AC_INTENSET_COMP_Pos))
 #define AC_INTENSET_WIN0_Pos        4            /**< \brief (AC_INTENSET) Window 0 Interrupt Enable */
 #define AC_INTENSET_WIN0            (1 << AC_INTENSET_WIN0_Pos)
 #define AC_INTENSET_WIN_Pos         4            /**< \brief (AC_INTENSET) Window x Interrupt Enable */
 #define AC_INTENSET_WIN_Msk         (0x1ul << AC_INTENSET_WIN_Pos)
-#define AC_INTENSET_WIN(value)      ((AC_INTENSET_WIN_Msk & ((value) << AC_INTENSET_WIN_Pos)))
+#define AC_INTENSET_WIN(value)      (AC_INTENSET_WIN_Msk & ((value) << AC_INTENSET_WIN_Pos))
 #define AC_INTENSET_MASK            0x13ul       /**< \brief (AC_INTENSET) MASK Register */
 
 /* -------- AC_INTFLAG : (AC Offset: 0x06) (R/W  8) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint8_t  COMP0:1;          /*!< bit:      0  Comparator 0                       */
-    uint8_t  COMP1:1;          /*!< bit:      1  Comparator 1                       */
-    uint8_t  :2;               /*!< bit:  2.. 3  Reserved                           */
-    uint8_t  WIN0:1;           /*!< bit:      4  Window 0                           */
-    uint8_t  :3;               /*!< bit:  5.. 7  Reserved                           */
+    __I uint8_t  COMP0:1;          /*!< bit:      0  Comparator 0                       */
+    __I uint8_t  COMP1:1;          /*!< bit:      1  Comparator 1                       */
+    __I uint8_t  :2;               /*!< bit:  2.. 3  Reserved                           */
+    __I uint8_t  WIN0:1;           /*!< bit:      4  Window 0                           */
+    __I uint8_t  :3;               /*!< bit:  5.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
-    uint8_t  COMP:2;           /*!< bit:  0.. 1  Comparator x                       */
-    uint8_t  :2;               /*!< bit:  2.. 3  Reserved                           */
-    uint8_t  WIN:1;            /*!< bit:      4  Window x                           */
-    uint8_t  :3;               /*!< bit:  5.. 7  Reserved                           */
+    __I uint8_t  COMP:2;           /*!< bit:  0.. 1  Comparator x                       */
+    __I uint8_t  :2;               /*!< bit:  2.. 3  Reserved                           */
+    __I uint8_t  WIN:1;            /*!< bit:      4  Window x                           */
+    __I uint8_t  :3;               /*!< bit:  5.. 7  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } AC_INTFLAG_Type;
@@ -264,12 +261,12 @@ typedef union {
 #define AC_INTFLAG_COMP1            (1 << AC_INTFLAG_COMP1_Pos)
 #define AC_INTFLAG_COMP_Pos         0            /**< \brief (AC_INTFLAG) Comparator x */
 #define AC_INTFLAG_COMP_Msk         (0x3ul << AC_INTFLAG_COMP_Pos)
-#define AC_INTFLAG_COMP(value)      ((AC_INTFLAG_COMP_Msk & ((value) << AC_INTFLAG_COMP_Pos)))
+#define AC_INTFLAG_COMP(value)      (AC_INTFLAG_COMP_Msk & ((value) << AC_INTFLAG_COMP_Pos))
 #define AC_INTFLAG_WIN0_Pos         4            /**< \brief (AC_INTFLAG) Window 0 */
 #define AC_INTFLAG_WIN0             (1 << AC_INTFLAG_WIN0_Pos)
 #define AC_INTFLAG_WIN_Pos          4            /**< \brief (AC_INTFLAG) Window x */
 #define AC_INTFLAG_WIN_Msk          (0x1ul << AC_INTFLAG_WIN_Pos)
-#define AC_INTFLAG_WIN(value)       ((AC_INTFLAG_WIN_Msk & ((value) << AC_INTFLAG_WIN_Pos)))
+#define AC_INTFLAG_WIN(value)       (AC_INTFLAG_WIN_Msk & ((value) << AC_INTFLAG_WIN_Pos))
 #define AC_INTFLAG_MASK             0x13ul       /**< \brief (AC_INTFLAG) MASK Register */
 
 /* -------- AC_STATUSA : (AC Offset: 0x08) (R/   8) Status A -------- */
@@ -299,10 +296,10 @@ typedef union {
 #define AC_STATUSA_STATE1           (1 << AC_STATUSA_STATE1_Pos)
 #define AC_STATUSA_STATE_Pos        0            /**< \brief (AC_STATUSA) Comparator x Current State */
 #define AC_STATUSA_STATE_Msk        (0x3ul << AC_STATUSA_STATE_Pos)
-#define AC_STATUSA_STATE(value)     ((AC_STATUSA_STATE_Msk & ((value) << AC_STATUSA_STATE_Pos)))
+#define AC_STATUSA_STATE(value)     (AC_STATUSA_STATE_Msk & ((value) << AC_STATUSA_STATE_Pos))
 #define AC_STATUSA_WSTATE0_Pos      4            /**< \brief (AC_STATUSA) Window 0 Current State */
 #define AC_STATUSA_WSTATE0_Msk      (0x3ul << AC_STATUSA_WSTATE0_Pos)
-#define AC_STATUSA_WSTATE0(value)   ((AC_STATUSA_WSTATE0_Msk & ((value) << AC_STATUSA_WSTATE0_Pos)))
+#define AC_STATUSA_WSTATE0(value)   (AC_STATUSA_WSTATE0_Msk & ((value) << AC_STATUSA_WSTATE0_Pos))
 #define   AC_STATUSA_WSTATE0_ABOVE_Val    0x0ul  /**< \brief (AC_STATUSA) Signal is above window */
 #define   AC_STATUSA_WSTATE0_INSIDE_Val   0x1ul  /**< \brief (AC_STATUSA) Signal is inside window */
 #define   AC_STATUSA_WSTATE0_BELOW_Val    0x2ul  /**< \brief (AC_STATUSA) Signal is below window */
@@ -337,7 +334,7 @@ typedef union {
 #define AC_STATUSB_READY1           (1 << AC_STATUSB_READY1_Pos)
 #define AC_STATUSB_READY_Pos        0            /**< \brief (AC_STATUSB) Comparator x Ready */
 #define AC_STATUSB_READY_Msk        (0x3ul << AC_STATUSB_READY_Pos)
-#define AC_STATUSB_READY(value)     ((AC_STATUSB_READY_Msk & ((value) << AC_STATUSB_READY_Pos)))
+#define AC_STATUSB_READY(value)     (AC_STATUSB_READY_Msk & ((value) << AC_STATUSB_READY_Pos))
 #define AC_STATUSB_SYNCBUSY_Pos     7            /**< \brief (AC_STATUSB) Synchronization Busy */
 #define AC_STATUSB_SYNCBUSY         (0x1ul << AC_STATUSB_SYNCBUSY_Pos)
 #define AC_STATUSB_MASK             0x83ul       /**< \brief (AC_STATUSB) MASK Register */
@@ -369,10 +366,10 @@ typedef union {
 #define AC_STATUSC_STATE1           (1 << AC_STATUSC_STATE1_Pos)
 #define AC_STATUSC_STATE_Pos        0            /**< \brief (AC_STATUSC) Comparator x Current State */
 #define AC_STATUSC_STATE_Msk        (0x3ul << AC_STATUSC_STATE_Pos)
-#define AC_STATUSC_STATE(value)     ((AC_STATUSC_STATE_Msk & ((value) << AC_STATUSC_STATE_Pos)))
+#define AC_STATUSC_STATE(value)     (AC_STATUSC_STATE_Msk & ((value) << AC_STATUSC_STATE_Pos))
 #define AC_STATUSC_WSTATE0_Pos      4            /**< \brief (AC_STATUSC) Window 0 Current State */
 #define AC_STATUSC_WSTATE0_Msk      (0x3ul << AC_STATUSC_WSTATE0_Pos)
-#define AC_STATUSC_WSTATE0(value)   ((AC_STATUSC_WSTATE0_Msk & ((value) << AC_STATUSC_WSTATE0_Pos)))
+#define AC_STATUSC_WSTATE0(value)   (AC_STATUSC_WSTATE0_Msk & ((value) << AC_STATUSC_WSTATE0_Pos))
 #define   AC_STATUSC_WSTATE0_ABOVE_Val    0x0ul  /**< \brief (AC_STATUSC) Signal is above window */
 #define   AC_STATUSC_WSTATE0_INSIDE_Val   0x1ul  /**< \brief (AC_STATUSC) Signal is inside window */
 #define   AC_STATUSC_WSTATE0_BELOW_Val    0x2ul  /**< \brief (AC_STATUSC) Signal is below window */
@@ -400,7 +397,7 @@ typedef union {
 #define AC_WINCTRL_WEN0             (0x1ul << AC_WINCTRL_WEN0_Pos)
 #define AC_WINCTRL_WINTSEL0_Pos     1            /**< \brief (AC_WINCTRL) Window 0 Interrupt Selection */
 #define AC_WINCTRL_WINTSEL0_Msk     (0x3ul << AC_WINCTRL_WINTSEL0_Pos)
-#define AC_WINCTRL_WINTSEL0(value)  ((AC_WINCTRL_WINTSEL0_Msk & ((value) << AC_WINCTRL_WINTSEL0_Pos)))
+#define AC_WINCTRL_WINTSEL0(value)  (AC_WINCTRL_WINTSEL0_Msk & ((value) << AC_WINCTRL_WINTSEL0_Pos))
 #define   AC_WINCTRL_WINTSEL0_ABOVE_Val   0x0ul  /**< \brief (AC_WINCTRL) Interrupt on signal above window */
 #define   AC_WINCTRL_WINTSEL0_INSIDE_Val  0x1ul  /**< \brief (AC_WINCTRL) Interrupt on signal inside window */
 #define   AC_WINCTRL_WINTSEL0_BELOW_Val   0x2ul  /**< \brief (AC_WINCTRL) Interrupt on signal below window */
@@ -446,14 +443,14 @@ typedef union {
 #define AC_COMPCTRL_SINGLE          (0x1ul << AC_COMPCTRL_SINGLE_Pos)
 #define AC_COMPCTRL_SPEED_Pos       2            /**< \brief (AC_COMPCTRL) Speed Selection */
 #define AC_COMPCTRL_SPEED_Msk       (0x3ul << AC_COMPCTRL_SPEED_Pos)
-#define AC_COMPCTRL_SPEED(value)    ((AC_COMPCTRL_SPEED_Msk & ((value) << AC_COMPCTRL_SPEED_Pos)))
+#define AC_COMPCTRL_SPEED(value)    (AC_COMPCTRL_SPEED_Msk & ((value) << AC_COMPCTRL_SPEED_Pos))
 #define   AC_COMPCTRL_SPEED_LOW_Val       0x0ul  /**< \brief (AC_COMPCTRL) Low speed */
 #define   AC_COMPCTRL_SPEED_HIGH_Val      0x1ul  /**< \brief (AC_COMPCTRL) High speed */
 #define AC_COMPCTRL_SPEED_LOW       (AC_COMPCTRL_SPEED_LOW_Val     << AC_COMPCTRL_SPEED_Pos)
 #define AC_COMPCTRL_SPEED_HIGH      (AC_COMPCTRL_SPEED_HIGH_Val    << AC_COMPCTRL_SPEED_Pos)
 #define AC_COMPCTRL_INTSEL_Pos      5            /**< \brief (AC_COMPCTRL) Interrupt Selection */
 #define AC_COMPCTRL_INTSEL_Msk      (0x3ul << AC_COMPCTRL_INTSEL_Pos)
-#define AC_COMPCTRL_INTSEL(value)   ((AC_COMPCTRL_INTSEL_Msk & ((value) << AC_COMPCTRL_INTSEL_Pos)))
+#define AC_COMPCTRL_INTSEL(value)   (AC_COMPCTRL_INTSEL_Msk & ((value) << AC_COMPCTRL_INTSEL_Pos))
 #define   AC_COMPCTRL_INTSEL_TOGGLE_Val   0x0ul  /**< \brief (AC_COMPCTRL) Interrupt on comparator output toggle */
 #define   AC_COMPCTRL_INTSEL_RISING_Val   0x1ul  /**< \brief (AC_COMPCTRL) Interrupt on comparator output rising */
 #define   AC_COMPCTRL_INTSEL_FALLING_Val  0x2ul  /**< \brief (AC_COMPCTRL) Interrupt on comparator output falling */
@@ -464,7 +461,7 @@ typedef union {
 #define AC_COMPCTRL_INTSEL_EOC      (AC_COMPCTRL_INTSEL_EOC_Val    << AC_COMPCTRL_INTSEL_Pos)
 #define AC_COMPCTRL_MUXNEG_Pos      8            /**< \brief (AC_COMPCTRL) Negative Input Mux Selection */
 #define AC_COMPCTRL_MUXNEG_Msk      (0x7ul << AC_COMPCTRL_MUXNEG_Pos)
-#define AC_COMPCTRL_MUXNEG(value)   ((AC_COMPCTRL_MUXNEG_Msk & ((value) << AC_COMPCTRL_MUXNEG_Pos)))
+#define AC_COMPCTRL_MUXNEG(value)   (AC_COMPCTRL_MUXNEG_Msk & ((value) << AC_COMPCTRL_MUXNEG_Pos))
 #define   AC_COMPCTRL_MUXNEG_PIN0_Val     0x0ul  /**< \brief (AC_COMPCTRL) I/O pin 0 */
 #define   AC_COMPCTRL_MUXNEG_PIN1_Val     0x1ul  /**< \brief (AC_COMPCTRL) I/O pin 1 */
 #define   AC_COMPCTRL_MUXNEG_PIN2_Val     0x2ul  /**< \brief (AC_COMPCTRL) I/O pin 2 */
@@ -483,7 +480,7 @@ typedef union {
 #define AC_COMPCTRL_MUXNEG_DAC      (AC_COMPCTRL_MUXNEG_DAC_Val    << AC_COMPCTRL_MUXNEG_Pos)
 #define AC_COMPCTRL_MUXPOS_Pos      12           /**< \brief (AC_COMPCTRL) Positive Input Mux Selection */
 #define AC_COMPCTRL_MUXPOS_Msk      (0x3ul << AC_COMPCTRL_MUXPOS_Pos)
-#define AC_COMPCTRL_MUXPOS(value)   ((AC_COMPCTRL_MUXPOS_Msk & ((value) << AC_COMPCTRL_MUXPOS_Pos)))
+#define AC_COMPCTRL_MUXPOS(value)   (AC_COMPCTRL_MUXPOS_Msk & ((value) << AC_COMPCTRL_MUXPOS_Pos))
 #define   AC_COMPCTRL_MUXPOS_PIN0_Val     0x0ul  /**< \brief (AC_COMPCTRL) I/O pin 0 */
 #define   AC_COMPCTRL_MUXPOS_PIN1_Val     0x1ul  /**< \brief (AC_COMPCTRL) I/O pin 1 */
 #define   AC_COMPCTRL_MUXPOS_PIN2_Val     0x2ul  /**< \brief (AC_COMPCTRL) I/O pin 2 */
@@ -496,7 +493,7 @@ typedef union {
 #define AC_COMPCTRL_SWAP            (0x1ul << AC_COMPCTRL_SWAP_Pos)
 #define AC_COMPCTRL_OUT_Pos         16           /**< \brief (AC_COMPCTRL) Output */
 #define AC_COMPCTRL_OUT_Msk         (0x3ul << AC_COMPCTRL_OUT_Pos)
-#define AC_COMPCTRL_OUT(value)      ((AC_COMPCTRL_OUT_Msk & ((value) << AC_COMPCTRL_OUT_Pos)))
+#define AC_COMPCTRL_OUT(value)      (AC_COMPCTRL_OUT_Msk & ((value) << AC_COMPCTRL_OUT_Pos))
 #define   AC_COMPCTRL_OUT_OFF_Val         0x0ul  /**< \brief (AC_COMPCTRL) The output of COMPn is not routed to the COMPn I/O port */
 #define   AC_COMPCTRL_OUT_ASYNC_Val       0x1ul  /**< \brief (AC_COMPCTRL) The asynchronous output of COMPn is routed to the COMPn I/O port */
 #define   AC_COMPCTRL_OUT_SYNC_Val        0x2ul  /**< \brief (AC_COMPCTRL) The synchronous output (including filtering) of COMPn is routed to the COMPn I/O port */
@@ -507,7 +504,7 @@ typedef union {
 #define AC_COMPCTRL_HYST            (0x1ul << AC_COMPCTRL_HYST_Pos)
 #define AC_COMPCTRL_FLEN_Pos        24           /**< \brief (AC_COMPCTRL) Filter Length */
 #define AC_COMPCTRL_FLEN_Msk        (0x7ul << AC_COMPCTRL_FLEN_Pos)
-#define AC_COMPCTRL_FLEN(value)     ((AC_COMPCTRL_FLEN_Msk & ((value) << AC_COMPCTRL_FLEN_Pos)))
+#define AC_COMPCTRL_FLEN(value)     (AC_COMPCTRL_FLEN_Msk & ((value) << AC_COMPCTRL_FLEN_Pos))
 #define   AC_COMPCTRL_FLEN_OFF_Val        0x0ul  /**< \brief (AC_COMPCTRL) No filtering */
 #define   AC_COMPCTRL_FLEN_MAJ3_Val       0x1ul  /**< \brief (AC_COMPCTRL) 3-bit majority function (2 of 3) */
 #define   AC_COMPCTRL_FLEN_MAJ5_Val       0x2ul  /**< \brief (AC_COMPCTRL) 5-bit majority function (3 of 5) */
@@ -532,7 +529,7 @@ typedef union {
 
 #define AC_SCALER_VALUE_Pos         0            /**< \brief (AC_SCALER) Scaler Value */
 #define AC_SCALER_VALUE_Msk         (0x3Ful << AC_SCALER_VALUE_Pos)
-#define AC_SCALER_VALUE(value)      ((AC_SCALER_VALUE_Msk & ((value) << AC_SCALER_VALUE_Pos)))
+#define AC_SCALER_VALUE(value)      (AC_SCALER_VALUE_Msk & ((value) << AC_SCALER_VALUE_Pos))
 #define AC_SCALER_MASK              0x3Ful       /**< \brief (AC_SCALER) MASK Register */
 
 /** \brief AC hardware registers */
