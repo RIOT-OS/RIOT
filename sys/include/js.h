@@ -44,7 +44,7 @@ void js_call_function(jerry_value_t callback);
 void js_callback_init(js_callback_t *js_callback, jerry_value_t callback);
 void js_callback_run(js_callback_t *js_callback);
 void js_callback_cancel(js_callback_t *callback);
-void js_shutdown(void);
+void js_shutdown(event_t *shutdown_done_event);
 
 #define JS_EXTERNAL_HANDLER(name) \
     jerry_value_t \

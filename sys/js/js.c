@@ -126,6 +126,8 @@ void js_init(event_queue_t *queue)
     js_init_objects();
 }
 
+static event_t *js_shutdown_done_event;
+
 static void js_shutdown_event_handler(event_t *event)
 {
     (void)event;
@@ -145,11 +147,16 @@ static void js_shutdown_event_handler(event_t *event)
     jerry_cleanup();
 
     irq_restore(state);
+
+    if (js_shutdown_done_event) {
+        event_post(js_event_queue, js_shutdown_done_event);
+    }
 }
 
 static event_t js_shutdown_event = { .handler = js_shutdown_event_handler };
 
-void js_shutdown(void)
+void js_shutdown(event_t *done_event)
 {
+    js_shutdown_done_event = done_event;
     event_post(js_event_queue, &js_shutdown_event);
 }
