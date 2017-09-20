@@ -106,14 +106,14 @@
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for PORT peripheral ========== */
-#define PORT_BITS                   84
+#define PORT_BITS                   84      
 #define PORT_DIR_DEFAULT_VAL        { 0x00000000, 0x00000000, 0x00000000 }
 #define PORT_DIR_IMPLEMENTED        { 0xDBFFFFFF, 0xC0C3FFFF, 0x000D0000 }
 #define PORT_DRVSTR                 1        // DRVSTR supported?
 #define PORT_DRVSTR_DEFAULT_VAL     { 0x00000000, 0x00000000, 0x00000000 }
 #define PORT_DRVSTR_IMPLEMENTED     { 0xD8FFFFFF, 0xC0C3FFFF, 0x000D0000 }
 #define PORT_EVENT_IMPLEMENTED      { 0xCBFFFFFF, 0xC0C3FFFF, 0x00000000 }
-#define PORT_EV_NUM                 4
+#define PORT_EV_NUM                 4       
 #define PORT_INEN_DEFAULT_VAL       { 0x00000000, 0x00000000, 0x00000000 }
 #define PORT_INEN_IMPLEMENTED       { 0xDBFFFFFF, 0xC0C3FFFF, 0x000D0000 }
 #define PORT_ODRAIN                 0        // ODRAIN supported?

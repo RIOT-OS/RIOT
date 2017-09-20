@@ -3,7 +3,7 @@
  *
  * \brief Instance description for SBMATRIX
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMD21_SBMATRIX_INSTANCE_
@@ -149,7 +146,7 @@
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for SBMATRIX peripheral ========== */
-#define SBMATRIX_DEFINED
+#define SBMATRIX_DEFINED                    
 /* ========== Instance parameters for SBMATRIX ========== */
 #define SBMATRIX_SLAVE_FLASH        0
 #define SBMATRIX_SLAVE_HPB0         1

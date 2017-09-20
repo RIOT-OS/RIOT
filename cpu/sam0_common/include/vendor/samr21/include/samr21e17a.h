@@ -3,7 +3,7 @@
  *
  * \brief Header file for SAMR21E17A
  *
- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2017 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,9 +40,6 @@
  * \asf_license_stop
  *
  */
- /**
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
 #ifndef _SAMR21E17A_
 #define _SAMR21E17A_
@@ -75,7 +72,7 @@ typedef volatile       uint8_t  RoReg8;  /**< Read only  8-bit register (volatil
 #endif
 typedef volatile       uint32_t WoReg;   /**< Write only 32-bit register (volatile unsigned int) */
 typedef volatile       uint16_t WoReg16; /**< Write only 16-bit register (volatile unsigned int) */
-typedef volatile       uint32_t WoReg8;  /**< Write only  8-bit register (volatile unsigned int) */
+typedef volatile       uint8_t  WoReg8;  /**< Write only  8-bit register (volatile unsigned int) */
 typedef volatile       uint32_t RwReg;   /**< Read-Write 32-bit register (volatile unsigned int) */
 typedef volatile       uint16_t RwReg16; /**< Read-Write 16-bit register (volatile unsigned int) */
 typedef volatile       uint8_t  RwReg8;  /**< Read-Write  8-bit register (volatile unsigned int) */
@@ -123,13 +120,9 @@ typedef enum IRQn
   TC3_IRQn                 = 18, /**< 18 SAMR21E17A Basic Timer Counter 3 (TC3) */
   TC4_IRQn                 = 19, /**< 19 SAMR21E17A Basic Timer Counter 4 (TC4) */
   TC5_IRQn                 = 20, /**< 20 SAMR21E17A Basic Timer Counter 5 (TC5) */
-  TC6_IRQn                 = 21, /**< 21 SAMR21E17A Basic Timer Counter 6 (TC6) */
-  TC7_IRQn                 = 22, /**< 22 SAMR21E17A Basic Timer Counter 7 (TC7) */
   ADC_IRQn                 = 23, /**< 23 SAMR21E17A Analog Digital Converter (ADC) */
   AC_IRQn                  = 24, /**< 24 SAMR21E17A Analog Comparators (AC) */
-  DAC_IRQn                 = 25, /**< 25 SAMR21E17A Digital Analog Converter (DAC) */
   PTC_IRQn                 = 26, /**< 26 SAMR21E17A Peripheral Touch Controller (PTC) */
-  I2S_IRQn                 = 27, /**< 27 SAMR21E17A Inter-IC Sound Interface (I2S) */
 
   PERIPH_COUNT_IRQn        = 28  /**< Number of peripheral IDs */
 } IRQn_Type;
@@ -178,13 +171,14 @@ typedef struct _DeviceVectors
   void* pfnTC3_Handler;                   /* 18 Basic Timer Counter 3 */
   void* pfnTC4_Handler;                   /* 19 Basic Timer Counter 4 */
   void* pfnTC5_Handler;                   /* 20 Basic Timer Counter 5 */
-  void* pfnTC6_Handler;                   /* 21 Basic Timer Counter 6 */
-  void* pfnTC7_Handler;                   /* 22 Basic Timer Counter 7 */
+  void* pfnReserved21;
+  void* pfnReserved22;
   void* pfnADC_Handler;                   /* 23 Analog Digital Converter */
   void* pfnAC_Handler;                    /* 24 Analog Comparators */
-  void* pfnDAC_Handler;                   /* 25 Digital Analog Converter */
+  void* pfnReserved25;
   void* pfnPTC_Handler;                   /* 26 Peripheral Touch Controller */
-  void* pfnI2S_Handler;                   /* 27 Inter-IC Sound Interface */
+  void* pfnReserved27;
+  void* pfnReserved28;
 } DeviceVectors;
 
 /* Cortex-M0+ processor handlers */
@@ -217,18 +211,15 @@ void TCC2_Handler                ( void );
 void TC3_Handler                 ( void );
 void TC4_Handler                 ( void );
 void TC5_Handler                 ( void );
-void TC6_Handler                 ( void );
-void TC7_Handler                 ( void );
 void ADC_Handler                 ( void );
 void AC_Handler                  ( void );
-void DAC_Handler                 ( void );
 void PTC_Handler                 ( void );
-void I2S_Handler                 ( void );
 
 /*
  * \brief Configuration of the Cortex-M0+ Processor and Core Peripherals
  */
 
+#define LITTLE_ENDIAN          1
 #define __CM0PLUS_REV          1         /*!< Core revision r0p1 */
 #define __MPU_PRESENT          0         /*!< MPU present or not */
 #define __NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
@@ -539,9 +530,14 @@ void I2S_Handler                 ( void );
 #define FLASH_NB_OF_PAGES     2048
 #define FLASH_USER_PAGE_SIZE  64
 #define HMCRAMC0_SIZE         0x8000UL /* 32 kB */
-#define FLASH_ADDR            (0x00000000UL) /**< FLASH base address */
-#define FLASH_USER_PAGE_ADDR  (0x00800000UL) /**< FLASH_USER_PAGE base address */
-#define HMCRAMC0_ADDR         (0x20000000UL) /**< HMCRAMC0 base address */
+
+#define FLASH_ADDR            (0x00000000u) /**< FLASH base address */
+#define FLASH_USER_PAGE_ADDR  (0x00800000u) /**< FLASH_USER_PAGE base address */
+#define HMCRAMC0_ADDR         (0x20000000u) /**< HMCRAMC0 base address */
+#define HPB0_ADDR             (0x40000000u) /**< HPB0 base address */
+#define HPB1_ADDR             (0x41000000u) /**< HPB1 base address */
+#define HPB2_ADDR             (0x42000000u) /**< HPB2 base address */
+#define PPB_ADDR              (0xE0000000u) /**< PPB base address */
 
 #define DSU_DID_RESETVALUE    0x1001001DUL
 #define EIC_EXTINT_NUM        16

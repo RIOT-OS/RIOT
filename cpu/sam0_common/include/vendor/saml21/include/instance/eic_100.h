@@ -70,8 +70,8 @@
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for EIC peripheral ========== */
-#define EIC_GCLK_ID                 3
-#define EIC_NUMBER_OF_CONFIG_REGS   2
-#define EIC_NUMBER_OF_INTERRUPTS    16
+#define EIC_GCLK_ID                 3       
+#define EIC_NUMBER_OF_CONFIG_REGS   2       
+#define EIC_NUMBER_OF_INTERRUPTS    16      
 
 #endif /* _SAML21_EIC_INSTANCE_ */

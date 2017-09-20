@@ -3,7 +3,7 @@
  *
  * \brief Instance description for AC1
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -81,7 +81,7 @@
 #define AC1_CMP_NUM                 2        // Number of comparators
 #define AC1_GCLK_ID_ANA             32       // Index of Generic Clock for analog
 #define AC1_GCLK_ID_DIG             31       // Index of Generic Clock for digital
-#define AC1_NUM_CMP                 2
+#define AC1_NUM_CMP                 2       
 #define AC1_PAIRS                   1        // Number of pairs of comparators
 
 #endif /* _SAMD21_AC1_INSTANCE_ */

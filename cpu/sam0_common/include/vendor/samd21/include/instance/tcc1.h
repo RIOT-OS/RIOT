@@ -3,7 +3,7 @@
  *
  * \brief Instance description for TCC1
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMD21_TCC1_INSTANCE_
@@ -112,11 +109,11 @@
 #define TCC1_DTI                    0        // Dead-Time-Insertion feature implemented
 #define TCC1_EXT                    24       // Coding of implemented extended features
 #define TCC1_GCLK_ID                26       // Index of Generic Clock
-#define TCC1_MASTER                 1
+#define TCC1_MASTER                 1       
 #define TCC1_OTMX                   0        // Output Matrix feature implemented
 #define TCC1_OW_NUM                 4        // Number of Output Waveforms
 #define TCC1_PG                     1        // Pattern Generation feature implemented
-#define TCC1_SIZE                   24
+#define TCC1_SIZE                   24      
 #define TCC1_SWAP                   0        // DTI outputs swap feature implemented
 #define TCC1_TYPE                   2        // TCC type 0 : NA, 1 : Master, 2 : Slave
 
