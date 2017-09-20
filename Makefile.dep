@@ -414,6 +414,8 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += bitfield
   USEMODULE += random
   USEMODULE += vfs
+  USEMODULE += posix
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter rtt_stdio,$(USEMODULE)))
@@ -429,8 +431,10 @@ ifneq (,$(filter isrpipe,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
-ifneq (,$(filter posix,$(USEMODULE)))
-  USEMODULE += xtimer
+ifneq (,$(filter shell_commands,$(USEMODULE)))
+  ifneq (,$(filter fib,$(USEMODULE)))
+    USEMODULE += posix
+  endif
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
