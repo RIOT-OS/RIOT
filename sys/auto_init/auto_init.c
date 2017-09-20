@@ -331,6 +331,11 @@ void auto_init(void)
     auto_init_nrf802154();
 #endif
 
+#ifdef MODULE_RN2XX3
+    extern void auto_init_rn2xx3(void);
+    auto_init_rn2xx3();
+#endif
+
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_UHCPC
