@@ -1,0 +1,35 @@
+{
+    "test" : "expect",
+    "node_defaults" : {
+        "app" : "tests/od"
+    },
+    "args" : {
+        "timeout" : 10,
+        "terms" : [
+            "od_hex_dump(short_str, sizeof(short_str), OD_WIDTH_DEFAULT)",
+            "00000000  41  42  00",
+            "od_hex_dump(long_str, sizeof(long_str), OD_WIDTH_DEFAULT)",
+            "00000000  FF  2C  61  FF  2E  62  63  64  65  66  67  68  69  6A  6B  6C",
+            "00000010  6D  6E  6F  70  00",
+            "od_hex_dump(long_str, sizeof(long_str), 4)",
+            "00000000  FF  2C  61  FF",
+            "00000004  2E  62  63  64",
+            "00000008  65  66  67  68",
+            "0000000C  69  6A  6B  6C",
+            "00000010  6D  6E  6F  70",
+            "00000014  00",
+            "od_hex_dump(long_str, sizeof(long_str), 3)",
+            "00000000  FF  2C  61",
+            "00000003  FF  2E  62",
+            "00000006  63  64  65",
+            "00000009  66  67  68",
+            "0000000C  69  6A  6B",
+            "0000000F  6C  6D  6E",
+            "00000012  6F  70  00",
+            "od_hex_dump(long_str, sizeof(long_str), 8)",
+            "00000000  FF  2C  61  FF  2E  62  63  64",
+            "00000008  65  66  67  68  69  6A  6B  6C",
+            "00000010  6D  6E  6F  70  00"
+        ]
+    }
+}

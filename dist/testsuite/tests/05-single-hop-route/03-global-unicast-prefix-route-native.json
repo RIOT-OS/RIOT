@@ -1,0 +1,20 @@
+{
+    "include" : [ "../00-base/icmp.json", "../00-nodes/native.json" ],
+    "args" : {
+        "count" : 10,
+        "delay" : 10,
+        "payload_len" : 1024,
+        "target" : "beef::2",
+        "network" :
+        [
+            {
+                "addrs" : "beef::1/64",
+                "routes" : { "dst" : "beef::/64", "via" : "%link_local(1)" }
+            },
+            {
+                "addrs" : "beef::2/64",
+                "routes" : { "dst" : "beef::/64", "via" : "%link_local(0)" }
+            }
+        ]
+    }
+}

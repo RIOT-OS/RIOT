@@ -1,0 +1,12 @@
+{
+    "test" : "expect",
+    "node_defaults" : {
+        "app" : "tests/thread_flood"
+    },
+    "args" : {
+        "terms" : [
+            "Start spawning\r\n",
+            "Thread creation successful aborted\r\n"
+                ]
+    }
+}

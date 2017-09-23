@@ -1,0 +1,9 @@
+{
+    "include" : [ "../00-base/icmp.json" ],
+    "args" : {
+        "count" : 100,
+        "delay" : 10,
+        "payload_len" : 1024,
+        "target" : "affe::1"
+    }
+}

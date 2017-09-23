@@ -1,7 +1,7 @@
 APPLICATION = unittests
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
+BOARD_INSUFFICIENT_MEMORY ?= airfy-beacon \
                              arduino-duemilanove \
                              arduino-mega2560 \
                              arduino-mkr1000 \
@@ -66,7 +66,7 @@ USEMODULE += embunit
 ifeq (, $(filter tests-%, $(MAKECMDGOALS)))
     # the $(dir) Makefile function leaves a trailing slash after the directory
     # name, therefore we use patsubst instead.
-    UNIT_TESTS := $(patsubst %/Makefile,%,$(wildcard tests-*/Makefile))
+    UNIT_TESTS ?= $(patsubst %/Makefile,%,$(wildcard tests-*/Makefile))
 else
     UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
 endif

@@ -219,6 +219,9 @@ static void test_sock_ip_recv__ETIMEDOUT(void)
     assert(0 == sock_ip_create(&_sock, &local, NULL, _TEST_PROTO,
                                SOCK_FLAGS_REUSE_EP));
 
+    /* add short delay so expect script can synchronize */
+    xtimer_sleep(1);
+
     puts(" * Calling sock_ip_recv()");
     assert(-ETIMEDOUT == sock_ip_recv(&_sock, _test_buffer,
                                       sizeof(_test_buffer), _TEST_TIMEOUT,

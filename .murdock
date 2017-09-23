@@ -5,6 +5,25 @@ export STATIC_TESTS=${STATIC_TESTS:-1}
 export CFLAGS_DBG=""
 export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 
+check_locale() {
+    locale -a | grep -m 1 $1
+}
+
+set_locale() {
+    for i in C.UTF-8 en_US.utf8 utf8; do
+        LOCALE="$(check_locale $i)"
+        [ -n "$LOCALE" ] && break
+    done
+
+    [ -z "$LOCALE" ] && {
+        echo "# $0: error: cannot set utf-8 locale!"
+        exit 1
+    }
+
+    export LC_ALL=$LOCALE
+    export LANG=$LOCALE
+}
+
 error() {
     echo "$@"
     exit 1
@@ -110,10 +129,38 @@ static_tests() {
     BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
 }
 
+get_test_jobs() {
+    set_locale
+    {
+        RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py \
+        --murdock \
+        --all \
+        --tests dist/testsuite/tests/02-tests \
+        --nodes dist/testsuite/nodes 2>/dev/null || \
+            { echo "# get_test_jobs() error!" 1>&2; }
+    } | grep '^./.murdock'
+}
+
+run_test() {
+    local queue="$1"
+    local _test="$2"
+    local instance="$3"
+
+    [ -z "$TESTRUNNER_NODES" ] && {
+        echo "$0: TESTRUNNER_NODES not set!"
+        exit 1
+    }
+
+    set_locale
+
+    RIOTBASE=$(pwd) dist/tools/testrunner/testrunner.py --tests "$_test" ${instance:+--instance $instance}
+}
+
 get_jobs() {
-    [ "$STATIC_TESTS" = "1" ] && \
+    #[ "$STATIC_TESTS" = "1" ] && \
         echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
-    get_compile_jobs
+    #get_compile_jobs
+    get_test_jobs
 }
 
 $*

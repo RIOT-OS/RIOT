@@ -1,0 +1,6 @@
+{
+    "ignore" : true,
+    "node_defaults" : {
+        "tags" : [ "board:samr21-xpro" ]
+    }
+}

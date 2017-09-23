@@ -1,0 +1,15 @@
+{
+    "murdock_queue" : "nucleo-f411",
+    "node_defaults" : {
+        "tags" : [ "arm", "cortex-m", "cortex-m4f", "board:nucleo-f411" ],
+        "env" : {
+            "BOARD" : "nucleo-f411",
+            "TERMINAL" : "picocom"
+        }
+    },
+
+    "nodes" : [
+        {
+            "name" : "node0"
+        }]
+}

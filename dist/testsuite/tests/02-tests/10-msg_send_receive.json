@@ -1,0 +1,9 @@
+{
+    "test" : "expect",
+    "node_defaults" : {
+        "app" : "tests/msg_send_receive"
+    },
+    "args" : {
+        "terms" : "Test successful."
+    }
+}

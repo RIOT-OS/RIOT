@@ -1,0 +1,11 @@
+{
+    "ignore" : true,
+    "nodes" : [
+        {
+            "tags" : ["board:samr21-xpro"]
+        },
+        {
+            "tags" : ["board:iotlab-m3"]
+        }
+    ]
+}

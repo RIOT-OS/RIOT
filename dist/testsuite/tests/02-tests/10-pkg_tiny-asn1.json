@@ -1,0 +1,12 @@
+{
+    "test" : "expect",
+    "node_defaults" : {
+        "app" : "tests/pkg_tiny-asn1"
+    },
+    "args" : {
+        "timeout" : 10,
+        "terms" : [
+            "Decoding finished succesfully"
+        ]
+    }
+}
