@@ -34,9 +34,9 @@ export CPU = x86
 # toolchain config
 export CC ?= $(PREFIX)gcc
 ifeq ($(LTO),1)
-export AR = $(PREFIX)gcc-ar
+  export AR = $(PREFIX)gcc-ar
 else
-export AR = $(PREFIX)ar
+  export AR = $(PREFIX)ar
 endif
 export AS ?= $(PREFIX)as
 export RANLIB ?= $(PREFIX)ranlib

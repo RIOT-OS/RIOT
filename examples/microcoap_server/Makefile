@@ -40,11 +40,11 @@ USEMODULE += shell_commands
 LOW_MEMORY_BOARDS := nucleo-f334
 
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
-$(info Using low-memory configuration for microcoap_server.)
-## low-memory tuning values
-# lower pktbuf buffer size
-CFLAGS += -DGNRC_PKTBUF_SIZE=1000
-USEMODULE += prng_minstd
+  $(info Using low-memory configuration for microcoap_server.)
+  ## low-memory tuning values
+  # lower pktbuf buffer size
+  CFLAGS += -DGNRC_PKTBUF_SIZE=1000
+  USEMODULE += prng_minstd
 endif
 
 # Change this to 0 show compiler invocation lines by default:

@@ -22,7 +22,7 @@ export LINKFLAGS += -Wl,--gc-sections
 USEMODULE += newlib_nano
 
 ifeq ($(PORT),)
-	export PORT = /dev/ttyUSB0
+  export PORT = /dev/ttyUSB0
 endif
 export FFLAGS = $(PORT) $(HEXFILE)
 

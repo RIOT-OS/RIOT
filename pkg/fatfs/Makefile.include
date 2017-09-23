@@ -13,5 +13,5 @@ ifneq (,$(filter fatfs_diskio_sdcard_spi,$(USEMODULE)))
 endif
 
 ifeq ($(shell uname -s),Darwin)
-    CFLAGS += -Wno-empty-body
+  CFLAGS += -Wno-empty-body
 endif

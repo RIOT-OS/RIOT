@@ -40,7 +40,7 @@ USEMODULE += ps
 
 #TinyDTLs (crypto.c) made use of pthread
  ifneq ($(BOARD),native)
- USEMODULE += pthread
+   USEMODULE += pthread
  endif
 
 # Comment this out to disable code in RIOT that does safety checking
