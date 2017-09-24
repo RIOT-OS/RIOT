@@ -56,6 +56,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    RN2483 configuration
+ * @{
+ */
+#define RN2XX3_PARAM_UART         UART_DEV(2)
+#define RN2XX3_PARAM_PIN_RESET    GPIO_PIN(PA, 7)
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
