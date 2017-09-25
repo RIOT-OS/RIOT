@@ -264,6 +264,9 @@ static void _print_netopt_state(netopt_state_t state)
         case NETOPT_STATE_SLEEP:
             printf("SLEEP");
             break;
+        case NETOPT_STATE_STANDBY:
+            printf("STANDBY");
+            break;
         case NETOPT_STATE_IDLE:
             printf("IDLE");
             break;
@@ -277,6 +280,7 @@ static void _print_netopt_state(netopt_state_t state)
             printf("RESET");
             break;
         default:
+            printf("%08x", (unsigned int)state);
             /* nothing to do then */
             break;
     }
