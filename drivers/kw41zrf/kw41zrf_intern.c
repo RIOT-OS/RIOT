@@ -21,6 +21,7 @@
 #include "kw41zrf.h"
 #include "kw41zrf_getset.h"
 #include "kw41zrf_intern.h"
+#include "pm_layered.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -113,6 +114,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
             /* Convert DSM ticks (32.768 kHz) to event timer ticks (1 MHz) */
             uint64_t tmp = (uint64_t)(RSIM->ZIG_WAKE - RSIM->ZIG_SLEEP) * 15625ul;
             uint32_t usec = (tmp >> 9); /* equivalent to (usec / 512) */
+            /* Add the offset */
             ZLL->EVENT_TMR = ZLL_EVENT_TMR_EVENT_TMR_ADD_MASK |
                 ZLL_EVENT_TMR_EVENT_TMR(usec);
             break;
@@ -158,6 +160,17 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
     while ((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_SEQ_IDLE_MASK) == 0) {
         kw41zrf_abort_sequence(dev);
     }
+    /* Disable some CPU power management if we need to be active, otherwise the
+     * radio will be stuck in state retention mode. */
+    if (!dev->pm_blocked && ((seq & ZLL_PHY_CTRL_XCVSEQ_MASK) != XCVSEQ_IDLE)) {
+        pm_block(KINETIS_PM_LLS);
+        dev->pm_blocked = true;
+    }
+    else if (dev->pm_blocked && ((seq & ZLL_PHY_CTRL_XCVSEQ_MASK) != XCVSEQ_IDLE)) {
+        pm_unblock(KINETIS_PM_LLS);
+        dev->pm_blocked = false;
+    }
+
     /* Clear interrupt flags, sometimes the sequence complete flag is immediately set */
     ZLL->IRQSTS = ZLL->IRQSTS;
     ZLL->PHY_CTRL = (ZLL->PHY_CTRL & ~(ZLL_PHY_CTRL_XCVSEQ_MASK | ZLL_PHY_CTRL_SEQMSK_MASK)) | seq;

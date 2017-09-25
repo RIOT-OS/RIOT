@@ -133,6 +133,7 @@ typedef struct {
     uint8_t csma_be;           /**< Counter used internally by send implementation */
     uint8_t csma_num_backoffs; /**< Counter used internally by send implementation */
     uint8_t num_retrans;       /**< Counter used internally by send implementation */
+    bool pm_blocked;           /**< true if we have blocked a low power mode in the CPU */
     /** @} */
 } kw41zrf_t;
 

@@ -70,6 +70,7 @@ void kw41zrf_setup(kw41zrf_t *dev)
     netdev->driver = &kw41zrf_driver;
     /* initialize device descriptor */
     dev->idle_seq = XCVSEQ_RECEIVE;
+    dev->pm_blocked = false;
     /* Set default parameters according to STD IEEE802.15.4-2015 */
     dev->csma_max_be = 5;
     dev->csma_min_be = 3;
