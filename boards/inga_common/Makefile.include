@@ -1,0 +1,11 @@
+## the cpu to build for
+export CPU = atmega1284p
+
+# flash tool configuration
+export OFLAGS = -j .text -j .data -O ihex
+
+# set default port depending on operating system
+PORT_LINUX ?= $(firstword $(sort $(wildcard /dev/ttyUSB*)))
+# setup serial terminal
+export BAUD ?= 19200
+include $(RIOTMAKE)/tools/serial.inc.mk

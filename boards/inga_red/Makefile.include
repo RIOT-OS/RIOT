@@ -1,0 +1,11 @@
+USEMODULE += inga_common
+
+# New flash tool
+include $(RIOTMAKE)/tools/inga_tool.inc.mk
+
+export INCLUDES += -I$(RIOTBOARD)/inga_common/include/
+
+# setup the boards dependencies
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+
+include $(RIOTBOARD)/inga_common/Makefile.include

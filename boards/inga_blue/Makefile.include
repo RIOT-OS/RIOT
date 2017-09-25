@@ -1,0 +1,12 @@
+USEMODULE += inga_common
+
+export FLASHER = avrdude
+# JTAG ICE mkII
+export FFLAGS = -c jtag2isp -p m1284p -P usb -u -U flash:w:$(HEXFILE)
+
+export INCLUDES += -I$(RIOTBOARD)/inga_common/include/
+
+# setup the boards dependencies
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+
+include $(RIOTBOARD)/inga_common/Makefile.include
