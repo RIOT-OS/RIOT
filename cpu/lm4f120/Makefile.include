@@ -2,9 +2,6 @@ export CPU_ARCH = cortex-m4f
 
 # use common periph functions
 USEMODULE += periph_common
-USEMODULE += pm_cortexm_common_set_lowest
-USEMODULE += pm_cortexm_common_off
-USEMODULE += pm_cortexm_common_reboot
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk
 include $(RIOTCPU)/stellaris_common/Makefile.include

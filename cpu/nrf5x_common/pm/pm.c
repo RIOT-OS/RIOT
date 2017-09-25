@@ -23,13 +23,9 @@
 
 #include "cpu.h"
 
-void pm_set_lowest(void) {
-	cortexm_sleep(0);
-}
+/* pm_set_lowest is used from cortexm_common */
 
-void pm_reboot(void) {
-	NVIC_SystemReset();
-}
+/* pm_reboot is used from corterx_common */
 
 void pm_off(void)
 {

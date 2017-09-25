@@ -7,6 +7,9 @@ USEMODULE += periph_common
 
 # include nrf5x common periph drivers
 USEMODULE += nrf5x_common_periph
+# pm_off is provided by nrf5x_common
+USEMODULE += pm_cortexm_common_set_lowest
+USEMODULE += pm_cortexm_common_reboot
 
 # link common cpu code
 USEMODULE += cpu_common

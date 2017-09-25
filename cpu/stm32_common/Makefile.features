@@ -1,6 +1,9 @@
 # If the cpu does not provide periph_pm, use fallbacks automatically
 ifeq (,$(filter periph_pm,$(FEATURES_PROVIDED)))
-  USEMODULE += pm_cortexm_common_set_lowest
+  # We can use the pm_layered function for pm_set_lowest, but have to provide pm_set
+  USEMODULE += pm_layered
+  USEMODULE += pm_stm32_common_layered
+  # Use other fallback functions
   USEMODULE += pm_cortexm_common_off
   USEMODULE += pm_cortexm_common_reboot
   # As Makefile.features will be included after Makefile.include, we have to add pm_cortexm_common manually here!

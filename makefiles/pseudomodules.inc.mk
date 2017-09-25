@@ -86,3 +86,4 @@ PSEUDOMODULES += prng_%
 
 # add implementations of fallback and common CPUs as pseude modules
 PSEUDOMODULES += pm_fallback_%
+PSEUDOMODULES += pm_cortexm_common_%

@@ -1,1 +1,2 @@
-FEATURES_PROVIDED += periph_pm
+include $(RIOTCPU)/stm32_common/Makefile.features
+include $(RIOTCPU)/cortexm_common/Makefile.features

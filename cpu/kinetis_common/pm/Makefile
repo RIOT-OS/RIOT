@@ -1,3 +1,3 @@
-MODULE = pm_atmega_common_reboot
+MODULE = pm_kinetis_common_layered
 
 include $(RIOTBASE)/Makefile.base

@@ -1,0 +1,11 @@
+# If the cpu does not provide periph_pm, use fallbacks automatically
+ifeq (,$(filter periph_pm,$(FEATURES_PROVIDED)))
+  USEMODULE += pm_fallback_set_lowest
+  USEMODULE += pm_fallback_off
+  USEMODULE += pm_atmega_common_reboot
+  # As Makefile.features will be included after Makefile.include, we have to add these modules manually!
+  #USEMODULE += pm_atmega_common
+  USEMODULE += pm_fallback
+  FEATURES_PROVIDED += periph_pm
+endif
+

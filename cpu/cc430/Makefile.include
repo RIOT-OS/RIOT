@@ -3,6 +3,3 @@ INCLUDES += -I$(RIOTBASE)/cpu/cc430/include/
 include $(RIOTCPU)/msp430_common/Makefile.include
 
 export USEMODULE += periph periph_common
-USEMODULE += pm_fallback_set_lowest
-USEMODULE += pm_fallback_off
-USEMODULE += pm_fallback_reboot

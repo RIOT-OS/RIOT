@@ -29,8 +29,3 @@ void pm_set_lowest(void)
         __asm volatile ("wait");
     }
 }
-
-void pm_off(void)
-{
-   /* No Generic Power off Mechanism */
-}

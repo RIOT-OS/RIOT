@@ -22,6 +22,7 @@ void board_init(void)
     /* Board initialization is done by the bootloader (u-boot) on Malta */
 }
 
+/* This shouldn't be in here! */
 void pm_reboot(void)
 {
     malta_reset();

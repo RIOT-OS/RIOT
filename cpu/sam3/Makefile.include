@@ -2,9 +2,5 @@ export CPU_ARCH = cortex-m3
 
 # include common SPI functions
 USEMODULE += periph_common
-# use fallback module for power management
-USEMODULE += pm_fallback_off
-USEMODULE += pm_fallback_set_lowest
-USEMODULE += pm_fallback_reboot
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk
