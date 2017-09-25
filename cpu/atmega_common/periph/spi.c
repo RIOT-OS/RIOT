@@ -53,9 +53,12 @@ void spi_init_pins(spi_t bus)
     /* set SPI pins as output */
 #if defined (CPU_ATMEGA2560) || defined (CPU_ATMEGA1281)
     DDRB |= ((1 << DDB2) | (1 << DDB1) | (1 << DDB0));
-#endif
-#ifdef CPU_ATMEGA328P
+#elif defined(CPU_ATMEGA328P)
     DDRB |= ((1 << DDB2) | (1 << DDB3) | (1 << DDB5));
+#elif defined(CPU_ATMEGA1284P)
+    DDRB |= ((1 << DDB5) | (1 << DDB7) | (1 << DDB4));
+#else
+#warning please add the correct SPI pin configuration for your MCU to periph/spi.c
 #endif
 }
 
