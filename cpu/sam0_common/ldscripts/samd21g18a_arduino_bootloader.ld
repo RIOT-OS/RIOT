@@ -12,7 +12,8 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the SAMD21DG18A used in Arduino MKR1000 board
+ * @brief           Memory definitions for the SAMD21DG18A when used with a
+ *                  preinstalled bootloader.
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>
