@@ -37,11 +37,14 @@ extern "C" {
  */
 typedef void (*native_async_read_callback_t)(int fd, void *arg);
 
+/**
+ * @brief    Interrupt callback information structure
+ */
 typedef struct {
-    pid_t child_pid;
-    native_async_read_callback_t cb;
-    void *arg;
-    struct pollfd *fd;
+    pid_t child_pid;                    /**< PID of the interrupt listener */
+    native_async_read_callback_t cb;    /**< Interrupt callback funtion */
+    void *arg;                          /**< Argument ptr for the callback */
+    struct pollfd *fd;                  /**< sysfs gpio fd */
 } async_read_t;
 
 /**

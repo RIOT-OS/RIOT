@@ -37,7 +37,7 @@ static void _async_io_isr(void) {
     if (real_poll(_fds, _next_index, 0) > 0) {
         for (int i = 0; i < _next_index; i++) {
             /* handle if one of the events has happened */
-            if (_fds[i].revents & _fds[i].events) { 
+            if (_fds[i].revents & _fds[i].events) {
                 pollers[i].cb(_fds[i].fd, pollers[i].arg);
             }
         }
