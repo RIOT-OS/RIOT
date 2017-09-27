@@ -13,7 +13,7 @@ export OFLAGS = -O ihex
 export PROGRAMMER ?= olimex
 export MSPDEBUGFLAGS += -j $(PROGRAMMER)
 ifeq ($(strip $(PROGRAMMER)),uif)
-    export MSPDEBUGFLAGS += -d $(PORT)
+  export MSPDEBUGFLAGS += -d $(PORT)
 endif
 export FLASHER ?= mspdebug
 export FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"

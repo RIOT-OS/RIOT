@@ -51,17 +51,6 @@ static inline int _is_digit(char c)
     return (c >= '0' && c <= '9');
 }
 
-static inline unsigned pwr(unsigned val, unsigned exp)
-{
-    unsigned res = 1;
-
-    for (unsigned i = 0; i < exp; i++) {
-        res *= val;
-    }
-
-    return res;
-}
-
 size_t fmt_byte_hex(char *out, uint8_t byte)
 {
     if (out) {

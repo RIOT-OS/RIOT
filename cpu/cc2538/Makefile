@@ -6,7 +6,7 @@ DIRS = periph $(RIOTCPU)/cortexm_common
 
 # cc2538_rf radio driver
 ifneq (,$(filter cc2538_rf,$(USEMODULE)))
-    DIRS += radio
+  DIRS += radio
 endif
 
 # (file triggers compiler bug. see #5775)

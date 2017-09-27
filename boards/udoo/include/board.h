@@ -39,7 +39,7 @@ extern "C" {
 
 #define LED0_ON             (LED_PORT->PIO_SODR =  LED0_MASK)
 #define LED0_OFF            (LED_PORT->PIO_CODR =  LED0_MASK)
-#define LED0_TOGGLE         (LED_PORT->PIO_ODSR ^= LED0_MASK)
+#define LED0_TOGGLE         ((PIOB->PIO_ODSR & LED0_MASK) ? LED0_OFF : LED0_ON)
 /** @} */
 
 /**

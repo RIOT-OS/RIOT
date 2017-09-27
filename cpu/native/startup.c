@@ -303,6 +303,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     while ((c = getopt_long(argc, argv, short_opts, long_opts, &opt_idx)) >= 0) {
         switch (c) {
             case 0:
+                /* fall through to 'h' */
             case 'h':
                 usage_exit(EXIT_SUCCESS);
                 break;
@@ -362,6 +363,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 #endif
             default:
                 usage_exit(EXIT_FAILURE);
+                break;
         }
     }
 #ifdef MODULE_NETDEV_TAP

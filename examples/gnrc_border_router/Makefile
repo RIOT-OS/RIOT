@@ -21,13 +21,13 @@ BOARD_BLACKLIST += mips-malta pic32-wifire pic32-clicker# No full UART available
 # use ethos (ethernet over serial) for network communication and stdio over
 # UART, but not on native, as native has a tap interface towards the host.
 ifeq (,$(filter native,$(BOARD)))
-GNRC_NETIF_NUMOF := 2
-USEMODULE += ethos gnrc_netdev
+  GNRC_NETIF_NUMOF := 2
+  USEMODULE += ethos gnrc_netdev
 
-# ethos baudrate can be configured from make command
-ETHOS_BAUDRATE ?= 115200
-CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
-FEATURES_REQUIRED += periph_uart
+  # ethos baudrate can be configured from make command
+  ETHOS_BAUDRATE ?= 115200
+  CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
+  FEATURES_REQUIRED += periph_uart
 endif
 
 # SLIP legacy compatibility
