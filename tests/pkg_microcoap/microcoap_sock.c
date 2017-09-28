@@ -9,11 +9,7 @@
 #include "net/af.h"
 #include "net/sock/udp.h"
 
-#ifdef MICROCOAP_DEBUG
-#define ENABLE_DEBUG (1)
-#else
 #define ENABLE_DEBUG (0)
-#endif
 #include "debug.h"
 
 #include "coap.h"
