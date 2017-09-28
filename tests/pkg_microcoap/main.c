@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     examples
+ * @ingroup     tests
  * @{
  *
  * @file
- * @brief       CoAP example server application (using microcoap)
+ * @brief       CoAP test server application (using microcoap)
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @}
@@ -28,7 +28,7 @@ extern int _netif_config(int argc, char **argv);
 
 int main(void)
 {
-    puts("RIOT microcoap example application");
+    puts("RIOT microcoap test application");
 
     puts("Waiting for address autoconfiguration...");
     xtimer_sleep(3);
