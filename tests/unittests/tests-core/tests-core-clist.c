@@ -7,6 +7,7 @@
  */
 
 #include <string.h>
+#include <stdint.h>
 
 #include "embUnit.h"
 
@@ -256,6 +257,54 @@ static void test_clist_foreach(void)
     TEST_ASSERT(_foreach_called == TEST_CLIST_LEN);
 }
 
+static int _cmp(clist_node_t *a, clist_node_t *b)
+{
+    /* this comparison function will sort by the actual memory address of the
+     * list node (descending) */
+    return (uintptr_t)a - (uintptr_t) b;
+}
+
+static void test_clist_sort_empty(void)
+{
+    clist_node_t empty = { .next=NULL };
+    clist_sort(&empty, _cmp);
+
+    TEST_ASSERT(empty.next == NULL);
+}
+
+/*
+ * This test works by first adding all list nodes of tests_clist_buf to a new
+ * list. As the array is traversed in order, the memory addresses of the list
+ * nodes are naturally sorted ascending.
+ * The list is then rotated (using clist_lpoprpush()) a couple of times in
+ * order to create a somewhat arbitrary sorting.
+ * Then clist_sort() is run with a comparison function that just returns the
+ * difference (a-b), which effectively leads to a list sorted by descending
+ * list node addresses.
+ */
+static void test_clist_sort(void)
+{
+    clist_node_t *list = &test_clist;
+
+    for (int i = 0; i < TEST_CLIST_LEN; i++) {
+        clist_rpush(list, &tests_clist_buf[i]);
+    }
+
+    /* rotate the list a couple of times in order to mess up the sorting */
+    clist_lpoprpush(list);
+    clist_lpoprpush(list);
+    clist_lpoprpush(list);
+
+    /* sort list */
+    clist_sort(list, _cmp);
+
+    uintptr_t last = (uintptr_t) list->next;
+
+    for (int i = 0; i < TEST_CLIST_LEN; i++) {
+        TEST_ASSERT((uintptr_t) clist_rpop(list) <= last);
+    }
+}
+
 Test *tests_core_clist_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -271,6 +320,8 @@ Test *tests_core_clist_tests(void)
         new_TestFixture(test_clist_remove),
         new_TestFixture(test_clist_lpoprpush),
         new_TestFixture(test_clist_foreach),
+        new_TestFixture(test_clist_sort_empty),
+        new_TestFixture(test_clist_sort),
     };
 
     EMB_UNIT_TESTCALLER(core_clist_tests, set_up, NULL,
