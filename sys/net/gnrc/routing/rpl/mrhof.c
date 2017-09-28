@@ -44,13 +44,14 @@ static gnrc_rpl_of_t gnrc_rpl_mrhof = {
     NULL
 };
 
-static uint8_t _mrhof_ipv6_to_mac(gnrc_rpl_parent_t *parent, uint8_t **l2addr) {
+static uint8_t _mrhof_ipv6_to_mac(gnrc_rpl_parent_t *parent, uint8_t **l2addr)
+{
     for (gnrc_ipv6_nc_t *entry = gnrc_ipv6_nc_get_next(NULL);
          entry != NULL;
          entry = gnrc_ipv6_nc_get_next(entry)) {
         if (memcmp(&(parent->addr), &(entry->ipv6_addr), sizeof(parent->addr)) == 0) {
-           *l2addr = entry->l2_addr;
-           return entry->l2_addr_len;
+            *l2addr = entry->l2_addr;
+            return entry->l2_addr_len;
         }
     }
     return 0;
@@ -63,15 +64,16 @@ static netstats_nb_t *_mrhof_get_stats(gnrc_rpl_parent_t *parent, netstats_nb_t 
 {
     uint8_t *l2addr;
     uint8_t len = _mrhof_ipv6_to_mac(parent, &l2addr);
+
     if (len == 0) {
         return NULL;
     }
     for (netstats_nb_t *entry = stats;
-        entry != NULL;
-        entry = netstats_nb_get_next(stats, entry)) { 
+         entry != NULL;
+         entry = netstats_nb_get_next(stats, entry)) {
         /* TODO: Not blindly assume that the mac address is the last 8 bytes of
          * the link local ipv6-address, works for 8 byte long mac addresses */
-        if( (entry->l2_addr_len == len) && (memcmp(l2addr, entry->l2_addr, len) == 0) ) {
+        if ((entry->l2_addr_len == len) && (memcmp(l2addr, entry->l2_addr, len) == 0)) {
             return entry;
         }
     }
@@ -95,6 +97,7 @@ static uint16_t _mrhof_get_etx(netstats_nb_t *stats)
 static uint16_t _mrhof_get_path_cost(gnrc_rpl_parent_t *parent, netstats_nb_t *stats)
 {
     uint16_t etx = _mrhof_get_etx(stats);
+
     if (etx == MRHOF_MAX_PATH_COST) {
         return etx;
     }
@@ -107,7 +110,8 @@ static uint16_t _mrhof_get_path_cost(gnrc_rpl_parent_t *parent, netstats_nb_t *s
 static bool _mrhof_is_acceptable(gnrc_rpl_parent_t *parent, netstats_nb_t *stats)
 {
     uint16_t etx = _mrhof_get_etx(stats);
-    if (etx < MRHOF_MAX_LINK_METRIC &&\
+
+    if (etx < MRHOF_MAX_LINK_METRIC && \
         _mrhof_get_path_cost(parent, stats) < MRHOF_MAX_PATH_COST) {
         return true;
     }
@@ -120,7 +124,7 @@ static bool _mrhof_is_acceptable(gnrc_rpl_parent_t *parent, netstats_nb_t *stats
 static bool _mrhof_isfresh(netstats_nb_t *stats)
 {
     /* No statistics is not fresh */
-    if( stats == NULL) {
+    if (stats == NULL) {
         return false;
     }
     return netstats_nb_isfresh(stats);
@@ -132,8 +136,9 @@ static int _mrhof_cmp_acceptable(gnrc_rpl_parent_t *p1, netstats_nb_t *p1_stats,
 {
     bool p1_acceptable = _mrhof_is_acceptable(p1, p1_stats);
     bool p2_acceptable = _mrhof_is_acceptable(p2, p2_stats);
+
     if (p1_acceptable != p2_acceptable) {
-    /* One of the two parents is not acceptable */
+        /* One of the two parents is not acceptable */
         if (p1_acceptable == false) {
             /* p2 is acceptable and p1 not */
             return 1;
@@ -152,8 +157,9 @@ static int _mrhof_cmp_fresh(netstats_nb_t *p1_stats,
 {
     bool p1_isfresh = _mrhof_isfresh(p1_stats);
     bool p2_isfresh = _mrhof_isfresh(p2_stats);
+
     if (p1_isfresh != p2_isfresh) {
-    /* One of the two parents is not acceptable */
+        /* One of the two parents is not acceptable */
         if (p1_isfresh == false) {
             /* p2 is acceptable and p1 not */
             return 1;
@@ -179,19 +185,19 @@ void reset(gnrc_rpl_dodag_t *dodag)
 
 /**
  * Calculate rank additive based on the rank of the parent and the etx to the parent
- * computed via MAX(pref_parent->rank, 1 + floor(MAX(parents->rank)/MinHopRankIncrease), 
+ * computed via MAX(pref_parent->rank, 1 + floor(MAX(parents->rank)/MinHopRankIncrease),
  */
 uint16_t calc_rank(gnrc_rpl_parent_t *parent, uint16_t base_rank)
 {
     (void) base_rank;
-    gnrc_rpl_dodag_t *dodag;
     DEBUG("MRHOF: Calculating rank\n");
     /* TODO: consider a parent set of more than 1 parent */
     if (parent == NULL || parent->dodag == NULL) {
         DEBUG("MRHOF: No parent or no dodag, assuming max rank\n");
         return GNRC_RPL_INFINITE_RANK;
-    } else {
-        dodag = parent->dodag;
+    }
+    else {
+        gnrc_rpl_dodag_t *dodag = parent->dodag;
         gnrc_rpl_parent_t *elt;
         netstats_nb_t *nb, *elt_stats;
         uint8_t cnt = 0;
@@ -213,13 +219,13 @@ uint16_t calc_rank(gnrc_rpl_parent_t *parent, uint16_t base_rank)
             /* Only include parent in the parent set if the statistics are acceptable
              * and the path cost is not significantly worse than the current preferred parent */
             if (_mrhof_is_acceptable(elt, elt_stats) && \
-                (_mrhof_get_path_cost(elt, elt_stats) <= cost_rank + MRHOF_PARENT_SWITCH_THRESHOLD))
-            {
+                (_mrhof_get_path_cost(elt, elt_stats) <= cost_rank + MRHOF_PARENT_SWITCH_THRESHOLD)) {
                 uint8_t new_dagrank = DAGRANK(elt->rank, minhoprankincr);
                 if (max_dagrank < new_dagrank) {
                     max_dagrank = new_dagrank;
                 }
-            } else {
+            }
+            else {
                 /* Break when parents are no longer acceptable */
                 break;
             }
@@ -243,7 +249,8 @@ int which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
      * than the preferred parent full path etx by PARENT_SWITCH_THRESHOLD */
     netstats_nb_t *nb;
     int cmp;
-    int res = gnrc_netapi_get(p1->dodag->iface, NETOPT_STATS_NEIGHBOR, 0, &nb, sizeof(&nb)); 
+    int res = gnrc_netapi_get(p1->dodag->iface, NETOPT_STATS_NEIGHBOR, 0, &nb, sizeof(&nb));
+
     assert(res != -ENOTSUP);
     netstats_nb_t *p1_stats = _mrhof_get_stats(p1, nb);
     netstats_nb_t *p2_stats = _mrhof_get_stats(p2, nb);
@@ -268,10 +275,12 @@ int which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
             /* p1 is the preferred parent */
             if (p2_path_cost + MRHOF_PARENT_SWITCH_THRESHOLD < p1_path_cost) {
                 return 1;
-            } else {
+            }
+            else {
                 return -1;
             }
-        } else {
+        }
+        else {
             return 1;
         }
     }
@@ -284,7 +293,7 @@ int which_parent(gnrc_rpl_parent_t *p1, gnrc_rpl_parent_t *p2)
 /* Prefer d2 if d2 is grounded and d1 is not */
 gnrc_rpl_dodag_t *which_dodag(gnrc_rpl_dodag_t *d1, gnrc_rpl_dodag_t *d2)
 {
-    if ( !(d1->grounded) && d2->grounded) {
+    if (!(d1->grounded) && d2->grounded) {
         return d2;
     }
     return d1;
