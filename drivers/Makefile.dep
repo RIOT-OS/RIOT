@@ -163,6 +163,10 @@ ifneq (,$(filter lpd8808,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
+ifneq (,$(filter mcp23017,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter mpu9150,$(USEMODULE)))
   USEMODULE += xtimer
 endif
