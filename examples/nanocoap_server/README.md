@@ -1,5 +1,5 @@
 nanocoap server example
-========================
+=======================
 
 This application is meant to get you started with implementing a CoAP server on RIOT.
 It uses the GNRC network stack through RIOT's
@@ -62,15 +62,34 @@ The link-layer address in this case is "fe80::e42a:1aff:feca:10ec", the only
 
 Testing
 =======
-There are multiple external CoAP clients you can use to test the server on native.
+
+The CoAP server exposes 3 different resources:
+
+* `/.well-known/core`: returns the list of available resources on the server.
+This is part of the CoAP specifications. It works only with GET requests.
+* `/riot/board`: returns the name of the board running the server. It works
+only with GET requests.
+* `/riot/value`: returns the value of an internal variable of the server. It
+works with GET requests and also with PUT and POST requests, which means that
+this value can be updated from a client.
+
+There are multiple external CoAP clients you can use to easily test the server
+running on native.
 
 libcoap CLI
 -----------
 
 (replace "fe80::e42a:1aff:feca:10ec" with your link-layer address)
 
+* Get the name of the board:
 ```
-# coap-client "coap://[fe80::e42a:1aff:feca:10ec%tap0]/riot/board"
+    # coap-client -m get coap://[fe80::e42a:1aff:feca:10ec%tap0]/riot/board
+```
+
+* Update and get the internal value:
+```
+    # coap-client -m put coap://[fe80::e42a:1aff:feca:10ec%tap0]/riot/value -e 42
+    # coap-client -m get coap://[fe80::e42a:1aff:feca:10ec%tap0]/riot/value
 ```
 
 Copper (Firefox Plugin)
