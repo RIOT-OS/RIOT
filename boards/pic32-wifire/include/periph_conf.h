@@ -66,8 +66,15 @@ extern "C" {
  */
 
 static const spi_conf_t spi_config[] = {
-    {}, /* No SPI0 on PIC32 */
-
+    {
+        /* No SPI0 on PIC32 */
+        .mosi_pin = 0,
+        .mosi_reg = (volatile uint32_t*)0,
+        .mosi_af  = 0,
+        .miso_pin = 0,
+        .miso_reg = (volatile uint32_t*)0,
+        .miso_af  = 0,
+    },
     {   /*
          * SPI 1 (J10 connector)
          *      MOSI -> RE5
@@ -76,10 +83,10 @@ static const spi_conf_t spi_config[] = {
          */
         .mosi_pin = GPIO_PIN(PORT_E, 5),
         .mosi_reg = (volatile uint32_t*)&RPE5R,
-        .mosi_af  = 0b0101,
+        .mosi_af  = 0x5, /* 0b0101 */
         .miso_pin = GPIO_PIN(PORT_D, 2),
         .miso_reg = (volatile uint32_t*)&SDI1R,
-        .miso_af  = 0b000
+        .miso_af  = 0x0 /* 0b000 */
     },
 
     {   /*
@@ -90,10 +97,10 @@ static const spi_conf_t spi_config[] = {
          */
         .mosi_pin = GPIO_PIN(PORT_F, 0),
         .mosi_reg = (volatile uint32_t*)&RPF0R,
-        .mosi_af  = 0b0110,
+        .mosi_af  = 0x6, /* 0b0110 */
         .miso_pin = GPIO_PIN(PORT_D, 11),
         .miso_reg = (volatile uint32_t*)&SDI2R,
-        .miso_af  = 0b0011,
+        .miso_af  = 0x3, /* 0b0011 */
     },
 
     {   /*
@@ -104,10 +111,10 @@ static const spi_conf_t spi_config[] = {
          */
         .mosi_pin = GPIO_PIN(PORT_C, 4),
         .mosi_reg = (volatile uint32_t*)&RPC4R,
-        .mosi_af  = 0b0111,
+        .mosi_af  = 0x7, /* 0b0111 */
         .miso_pin = GPIO_PIN(PORT_B, 10),
         .miso_reg = (volatile uint32_t*)&SDI3R,
-        .miso_af  = 0b0110,
+        .miso_af  = 0x6, /* 0b0110 */
     },
 
     {   /*
@@ -118,14 +125,14 @@ static const spi_conf_t spi_config[] = {
          */
         .mosi_pin = GPIO_PIN(PORT_G, 0),
         .mosi_reg = (volatile uint32_t*)&RPG0R,
-        .mosi_af  = 0b1000,
+        .mosi_af  = 0x8, /* 0b1000 */
         .miso_pin = GPIO_PIN(PORT_F, 5),
         .miso_reg = (volatile uint32_t*)&SDI4R,
-        .miso_af  = 0b0010,
+        .miso_af  = 0x2, /* 0b0010 */
     },
 };
 
-#define SPI_NUMOF           (2)
+#define SPI_NUMOF           (4)
 /** @} */
 
 #ifdef __cplusplus

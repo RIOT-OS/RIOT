@@ -70,7 +70,15 @@ extern "C" {
  */
 
 static const spi_conf_t spi_config[] = {
-    {}, /* No SPI0 on PIC32 */
+    {
+        /* No SPI0 on PIC32 */
+        .mosi_pin = 0,
+        .mosi_reg = (volatile uint32_t*)0,
+        .mosi_af  = 0,
+        .miso_pin = 0,
+        .miso_reg = (volatile uint32_t*)0,
+        .miso_af  = 0,
+    },
 
     {   /*
          * SPI 1 (Mikrobus)
@@ -80,10 +88,10 @@ static const spi_conf_t spi_config[] = {
          */
         .mosi_pin = GPIO_PIN(PORT_D, 4),
         .mosi_reg = (volatile uint32_t*)&RPD4R,
-        .mosi_af  = 0b1000,
+        .mosi_af  = 0x8, /* 0b1000 */
         .miso_pin = GPIO_PIN(PORT_D, 3),
         .miso_reg = (volatile uint32_t*)&SDI1R,
-        .miso_af  = 0b0000
+        .miso_af  = 0x0, /* 0b0000 */
     },
 
     {   /*
@@ -94,10 +102,10 @@ static const spi_conf_t spi_config[] = {
          */
         .mosi_pin = GPIO_PIN(PORT_G, 8),
         .mosi_reg = (volatile uint32_t*)&RPG8R,
-        .mosi_af  = 0b0110,
+        .mosi_af  = 0x6, /* 0b0110 */
         .miso_pin = GPIO_PIN(PORT_G, 7),
         .miso_reg = (volatile uint32_t*)&SDI2R,
-        .miso_af  = 0b0001
+        .miso_af  = 0x1 /* 0b0001 */
     }
 };
 

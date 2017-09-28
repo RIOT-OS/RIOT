@@ -32,10 +32,6 @@ void board_init(void)
     uart_init(DEBUG_VIA_UART, DEBUG_UART_BAUD, NULL, 0);
 #endif
 
-    /* Initialise all SPI modules */
-    for (unsigned i = 1; i <= SPI_NUMOF; i++)
-        spi_init(SPI_DEV(i));
-
     /* Turn off all LED's */
     gpio_init(LED1_PIN, GPIO_OUT);
     gpio_init(LED2_PIN, GPIO_OUT);

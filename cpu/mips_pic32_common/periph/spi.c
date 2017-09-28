@@ -35,7 +35,15 @@ static mutex_t locks[SPI_NUMOF + 1];
 
 void spi_init(spi_t bus)
 {
-    assert(bus != 0 && bus <= SPI_NUMOF);
+    /*
+     * PIC32 SPI Bus numbering starts at 1 but generic periph init will
+     * initialise from 0 to SPI_NUMOF-1
+     *
+     * Ignore during initialisation but assert on other calls
+     */
+    if (bus == 0) return;
+
+    assert(bus <= SPI_NUMOF);
 
     mutex_init(&locks[bus]);
 
@@ -45,7 +53,7 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
-    assert(bus != 0 && bus <= SPI_NUMOF);
+    assert((bus != 0 )&& (bus <= SPI_NUMOF));
 
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
     gpio_init(spi_config[bus].miso_pin, GPIO_IN);
@@ -55,11 +63,13 @@ void spi_init_pins(spi_t bus)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+    (void)cs;
     volatile int rdata __attribute__((unused));
 
-    assert(bus != 0 && bus <= SPI_NUMOF);
+    assert((bus != 0) && (bus <= SPI_NUMOF));
 
-    pic_spi[bus].regs = (volatile uint32_t *)(_SPI1_BASE_ADDRESS + (bus - 1) * SPI_REGS_SPACING);
+    pic_spi[bus].regs =
+        (volatile uint32_t *)(_SPI1_BASE_ADDRESS + (bus - 1) * SPI_REGS_SPACING);
 
     mutex_lock(&locks[bus]);
 
@@ -73,18 +83,18 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     switch (mode) {
         case SPI_MODE_0:
-            SPIxCONCLR(pic_spi[bus]) = (_SPI1CON_CKP_MASK | _SPI1CON_CKE_MASK);
-            break;
-        case SPI_MODE_1:
             SPIxCONCLR(pic_spi[bus]) = _SPI1CON_CKP_MASK;
             SPIxCONSET(pic_spi[bus]) = _SPI1CON_CKE_MASK;
             break;
+        case SPI_MODE_1:
+            SPIxCONCLR(pic_spi[bus]) = (_SPI1CON_CKP_MASK | _SPI1CON_CKE_MASK);
+            break;
         case SPI_MODE_2:
-            SPIxCONCLR(pic_spi[bus]) = _SPI1CON_CKE_MASK;
-            SPIxCONSET(pic_spi[bus]) = _SPI1CON_CKP_MASK;
+            SPIxCONSET(pic_spi[bus]) = (_SPI1CON_CKP_MASK | _SPI1CON_CKE_MASK);
             break;
         case SPI_MODE_3:
-            SPIxCONSET(pic_spi[bus]) = (_SPI1CON_CKP_MASK | _SPI1CON_CKE_MASK);
+            SPIxCONCLR(pic_spi[bus]) = _SPI1CON_CKE_MASK;
+            SPIxCONSET(pic_spi[bus]) = _SPI1CON_CKP_MASK;
             break;
         default:
             return SPI_NOMODE;
@@ -99,7 +109,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
 void spi_release(spi_t bus)
 {
-    assert(bus != 0 && bus <= SPI_NUMOF);
+    assert((bus != 0) && (bus <= SPI_NUMOF));
 
     /* SPI module must be turned off before powering it down */
     SPIxCON(pic_spi[bus]) = 0;
@@ -115,7 +125,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     const uint8_t *out_buffer = (const uint8_t*)out;
     uint8_t *in_buffer = (uint8_t*)in;
 
-    assert(bus != 0 && bus <= SPI_NUMOF);
+    assert((bus != 0) && (bus <= SPI_NUMOF));
 
     if (cs != SPI_CS_UNDEF)
         gpio_clear((gpio_t)cs);
