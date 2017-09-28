@@ -56,24 +56,28 @@
  *
  * @subsection sec_concept_build Extension of the build system
  *
- * Building Arduino sketches in RIOT is done in a two step process.
+ * Building Arduino sketches in RIOT is done in a three step process.
  *
- * First, the make system calls a dedicated
- * [Arduino build script](https://github.com/RIOT-OS/RIOT/tree/master/dist/tools/arduino/pre_build.sh),
- * which is called from the
+ * First, the make system defines a generated `arduino_sketches` module placed
+ * into `$(BINDIR)`
+ * [Arduino sketches makefile](https://github.com/RIOT-OS/RIOT/tree/master/sys/arduino/sketches.inc.mk),
+ * which is included from the
  * [Makefile.include](https://github.com/RIOT-OS/RIOT/tree/master/sys/arduino/Makefile.include)
  * of the RIOT Arduino module.
+ * The generated module is added to used modules and build directories.
  *
- * This script creates a temporary file called '_sketches.cpp' inside the
- * application folder. Into this file, the script copies some Arduino glue code (
+ * Second, as prerequisites for the `link` target, the make system will create
+ * the module into `$(BINDIR)/arduino_sketches` with an `arduino_sketches.cpp`
+ * source file.
+ * Into this file, it copies some Arduino glue code (
  * [pre.snip](https://github.com/RIOT-OS/RIOT/blob/master/sys/arduino/pre.snip)
  *  and
  * [post.snip](https://github.com/RIOT-OS/RIOT/blob/master/sys/arduino/post.snip))
  * together with the contents of all `*.sketch` files contained in the
  * application folder.
  *
- * Second, the RIOT make system is called as usual, processing the temporary
- * file containing all the Arduino code. Simple :-)
+ * Third, the RIOT make system is called as usual, building the generated
+ * library with the Arduino code and including it in the final firmware.
  *
  * @subsection sec_conecpt_api Implementation of the Arduino API
  *
