@@ -131,7 +131,7 @@ static inline void send_byte(uart_t uart, uint8_t byte)
 #endif
 }
 
-static inline void wait_for_tx_complete(uart_t uart)
+static void wait_for_tx_complete(uart_t uart)
 {
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
     || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
