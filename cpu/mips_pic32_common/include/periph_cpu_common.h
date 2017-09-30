@@ -28,6 +28,9 @@
 extern "C" {
 #endif
 
+#define HAVE_GPIO_T
+typedef uint8_t gpio_t;
+
  /**
  * @brief   Length of the CPU_ID in bytes
  */
