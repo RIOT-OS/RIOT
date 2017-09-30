@@ -125,7 +125,7 @@ static const spi_conf_t spi_config[] = {
     },
 };
 
-#define SPI_NUMOF           (2)
+#define SPI_NUMOF           (4)
 /** @} */
 
 #ifdef __cplusplus
