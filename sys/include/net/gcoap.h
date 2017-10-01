@@ -447,6 +447,15 @@ typedef void (*gcoap_resp_handler_t)(unsigned req_state, coap_pkt_t* pdu,
                                      sock_udp_ep_t *remote);
 
 /**
+ * @brief  Options for initialization of a request to be sent.
+ */
+typedef struct {
+    unsigned msg_code;                  /**< Message code, a COAP_CODE_* */
+    unsigned msg_type;                  /**< Message type, a COAP_TYPE_* */
+    char *req_path;                     /**< URL path for a request */
+} gcoap_send_opts_t;
+
+/**
  * @brief  Extends request memo for resending a confirmable request.
  */
 typedef struct {
@@ -522,6 +531,21 @@ kernel_pid_t gcoap_init(void);
  * @param[in] listener  Listener containing the resources.
  */
 void gcoap_register_listener(gcoap_listener_t *listener);
+
+/**
+ * @brief   Initializes a CoAP request PDU on a buffer, including options for
+ *          the request.
+ *
+ * @param[out] pdu      Request metadata
+ * @param[out] buf      Buffer containing the PDU
+ * @param[in] len       Length of the buffer
+ * @param[in] opts      Request options; must include msg code and resource path
+ *
+ * @return  0 on success
+ * @return  < 0 on error
+ */
+int gcoap_req_init_opts(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                        const gcoap_send_opts_t *opts);
 
 /**
  * @brief   Initializes a CoAP request PDU on a buffer.
