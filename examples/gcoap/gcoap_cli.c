@@ -201,19 +201,23 @@ int gcoap_cli_cmd(int argc, char **argv)
     }
 
     /* parse options */
-    int apos          = 2;               /* position of address argument */
-    unsigned msg_type = COAP_TYPE_NON;
+    int apos = 2;               /* position of address argument */
+    gcoap_send_opts_t opts;
     if (argc > apos && strcmp(argv[apos], "-c") == 0) {
-        msg_type = COAP_TYPE_CON;
+        opts.msg_type = COAP_TYPE_CON;
         apos++;
+    } else {
+        opts.msg_type = COAP_TYPE_NON;
     }
 
     if (argc == apos + 3 || argc == apos + 4) {
-        gcoap_req_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, code_pos+1, argv[apos+2]);
+        opts.msg_code = code_pos + 1;
+        opts.req_path = argv[apos + 2];
+
+        gcoap_req_init_opts(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, &opts);
         if (argc == apos + 4) {
             memcpy(pdu.payload, argv[apos+3], strlen(argv[apos+3]));
         }
-        coap_hdr_set_type(pdu.hdr, msg_type);
 
         if (argc == apos + 4) {
             len = gcoap_finish(&pdu, strlen(argv[apos+3]), COAP_FORMAT_TEXT);
