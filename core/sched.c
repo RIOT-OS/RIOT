@@ -101,7 +101,7 @@ int __attribute__((used)) sched_run(void)
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
-    uint64_t now = _xtimer_now64();
+    uint32_t now = xtimer_now().ticks32;
 #endif
 
     if (active_thread) {
