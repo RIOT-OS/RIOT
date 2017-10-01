@@ -137,11 +137,6 @@ void isr_usb0(void);         /**< USB OTG interrupt handler */
 void isr_usbdcd(void);       /**< USB charger detection interrupt handler */
 void isr_wdog_ewm(void);     /**< WDOG and EWM interrupt handler */
 
-/**
- * @brief Interrupt vector pointer type
- */
-typedef void (*isr_func_t)(void);
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
