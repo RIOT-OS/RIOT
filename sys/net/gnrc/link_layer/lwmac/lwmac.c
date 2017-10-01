@@ -83,6 +83,38 @@ int gnrc_netif_lwmac_create(gnrc_netif_t *netif, char *stack, int stacksize,
                              &lwmac_ops);
 }
 
+static void lwmac_reinit_radio(gnrc_netif_t *netif)
+{
+    /* Initialize low-level driver. */
+    netif->dev->driver->init(netif->dev);
+
+    /* Set MAC address length. */
+    uint16_t src_len = netif->l2addr_len;
+    netif->dev->driver->set(netif->dev, NETOPT_SRC_LEN, &src_len, sizeof(src_len));
+
+    /* Set the MAC address of the device. */
+    if (netif->l2addr_len == IEEE802154_LONG_ADDRESS_LEN) {
+        netif->dev->driver->set(netif->dev,
+                                NETOPT_ADDRESS_LONG,
+                                netif->l2addr,
+                                sizeof(netif->l2addr));
+    }
+    else {
+        netif->dev->driver->set(netif->dev,
+                                NETOPT_ADDR_LEN,
+                                netif->l2addr,
+                                sizeof(netif->l2addr));
+    }
+
+   /* Enable RX-start and TX-started and TX-END interrupts. */
+   netopt_enable_t enable = NETOPT_ENABLE;
+   netif->dev->driver->set(netif->dev, NETOPT_RX_START_IRQ, &enable, sizeof(enable));
+   netif->dev->driver->set(netif->dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
+   netif->dev->driver->set(netif->dev, NETOPT_TX_START_IRQ, &enable, sizeof(enable));
+   netif->dev->driver->set(netif->dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
+
+}
+
 static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
 {
     gnrc_pktsnip_t *snip;
@@ -328,6 +360,7 @@ void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate)
         case GNRC_LWMAC_START: {
             rtt_handler(GNRC_LWMAC_EVENT_RTT_START, netif);
             lwmac_set_state(netif, GNRC_LWMAC_LISTENING);
+            netif->mac.tx.preamble_fail_counts = 0;
             break;
         }
         case GNRC_LWMAC_STOP: {
@@ -576,6 +609,13 @@ static void _tx_management(gnrc_netif_t *netif)
             gnrc_lwmac_set_tx_continue(netif, false);
             gnrc_lwmac_set_quit_tx(netif, true);
             /* TX packet will be dropped, no automatic resending here. */
+
+            /* Re-initialize the radio when needed. */
+            if (netif->mac.tx.preamble_fail_counts >= CONFIG_GNRC_LWMAC_RADIO_REINIT_THRESHOLD) {
+                netif->mac.tx.preamble_fail_counts = 0;
+                LOG_INFO("[LWMAC] Re-initialize radio.");
+                lwmac_reinit_radio(netif);
+            }
             /* Intentionally falls through */
 
         case GNRC_LWMAC_TX_STATE_SUCCESSFUL:
