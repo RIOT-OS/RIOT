@@ -184,6 +184,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
 {
     switch (state) {
+        case NETOPT_STATE_STANDBY:
+            at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+            break;
         case NETOPT_STATE_SLEEP:
             at86rf2xx_set_state(dev, AT86RF2XX_STATE_SLEEP);
             break;
@@ -209,6 +212,8 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
     switch (at86rf2xx_get_status(dev)) {
         case AT86RF2XX_STATE_SLEEP:
             return NETOPT_STATE_SLEEP;
+        case AT86RF2XX_STATE_TRX_OFF:
+            return NETOPT_STATE_STANDBY;
         case AT86RF2XX_STATE_BUSY_RX_AACK:
             return NETOPT_STATE_RX;
         case AT86RF2XX_STATE_BUSY_TX_ARET:
