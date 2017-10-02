@@ -2,6 +2,14 @@ ifeq (, $(__RIOTBUILD_FLAG))
   $(error You cannot build a module on its own. Use "make" in your application's directory instead.)
 endif
 
+ifneq (,$(NONRECURSIVE))
+  # This makefile should be included before including other makefiles !
+  # Or you must define MODULE_DIR to the realpath of your module
+  # Including Makefile should be the penultimate included one
+  INCLUDING_MAKEFILE := $(shell echo $(MAKEFILE_LIST) | awk '{print $$(NF-1)}')
+  MODULE_DIR ?= $(realpath $(dir $(INCLUDING_MAKEFILE)))
+endif
+
 MODULE_DIR ?= $(CURDIR)
 MODULE     ?= $(shell basename $(MODULE_DIR))
 
