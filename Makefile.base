@@ -2,25 +2,12 @@ ifeq (, $(__RIOTBUILD_FLAG))
   $(error You cannot build a module on its own. Use "make" in your application's directory instead.)
 endif
 
-unexport DIRS
-DIRS := $(sort $(abspath ${DIRS}))
-
 MODULE ?= $(shell basename $(CURDIR))
 
-.PHONY: all ${DIRS:%=ALL--%} ${DIRS:%=CLEAN--%}
+.PHONY: all
 
-all: $(BINDIR)/$(MODULE).a ..nothing_$(MODULE)
+all: $(BINDIR)/$(MODULE).a
 
-..nothing_$(MODULE):
-	@:
-
-clean:: ${DIRS:%=CLEAN--%}
-
-${DIRS:%=ALL--%}:
-	$(QQ)"$(MAKE)" -C ${@:ALL--%=%}
-
-${DIRS:%=CLEAN--%}:
-	$(QQ)"$(MAKE)" -C ${@:CLEAN--%=%} clean
 
 ## submodules
 ifeq (1, $(SUBMODULES))
@@ -62,13 +49,13 @@ ASSMOBJ     := $(ASSMSRC:%.S=$(BINDIR)/$(MODULE)/%.o)
 OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
-$(BINDIR)/$(MODULE)/:
-	$(Q)mkdir -p $@
+$(BINDIR)/$(MODULE).a: $(OBJ)
+	$(Q)$(AR) $(ARFLAGS) $@ $?
 
 $(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
 
-$(BINDIR)/$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
-	$(Q)$(AR) $(ARFLAGS) $@ $?
+$(BINDIR)/$(MODULE)/:
+	$(Q)mkdir -p $@
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
@@ -94,6 +81,29 @@ $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 
 $(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(RIOTBUILD_CONFIG_HEADER_C)
 	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+
+
+# Building DIRS
+
+unexport DIRS
+DIRS := $(sort $(abspath ${DIRS}))
+.PHONY: ${DIRS:%=ALL--%} ${DIRS:%=CLEAN--%}
+
+clean:: ${DIRS:%=CLEAN--%}
+
+${DIRS:%=ALL--%}:
+	$(QQ)"$(MAKE)" -C ${@:ALL--%=%}
+
+${DIRS:%=CLEAN--%}:
+	$(QQ)"$(MAKE)" -C ${@:CLEAN--%=%} clean
+
+$(BINDIR)/$(MODULE).a $(OBJ): | ${DIRS:%=ALL--%}
+
+# No message when changing directory and nothing to do
+all:	..nothing_$(MODULE)
+..nothing_$(MODULE):
+	@:
+
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored
