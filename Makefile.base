@@ -2,12 +2,20 @@ ifeq (, $(__RIOTBUILD_FLAG))
   $(error You cannot build a module on its own. Use "make" in your application's directory instead.)
 endif
 
-MODULE ?= $(shell basename $(CURDIR))
+MODULE_DIR ?= $(CURDIR)
+MODULE     ?= $(shell basename $(MODULE_DIR))
+
+# Add MODULE_DIR to files path to work from another dir than CURDIR
+D := $(MODULE_DIR)
 
 .PHONY: all
 
 all: $(BINDIR)/$(MODULE).a
 
+# dir_wildcard: Same as 'wildcard' but for given directory
+#   call dir_wildcard,PATTERN,DIRECTORY
+#   The 'DIRECTORY' part is not included in returned paths
+dir_wildcard = $(patsubst $(2)/%,%,$(wildcard $(2)/$(1)))
 
 ## submodules
 ifeq (1, $(SUBMODULES))
@@ -22,21 +30,22 @@ ifeq (1, $(SUBMODULES))
 
   # don't fail if a selected *.c file does not exist
   ifeq (1, $(SUBMODULES_NOFORCE))
-    SRC := $(filter $(SRC), $(wildcard *.c))
+    SRC := $(filter $(SRC), $(call dir_wildcard,*.c,$(D)))
   endif
 endif
 
 ifeq ($(strip $(SRC))$(NO_AUTO_SRC),)
-  SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))
+  SRC := $(call dir_wildcard,*.c,$(D))
+  SRC := $(filter-out $(SRC_NOLTO), $(SRC))
 endif
 ifeq ($(strip $(SRCXX))$(NO_AUTO_SRC),)
-  SRCXX := $(wildcard *.cpp)
+  SRCXX := $(call dir_wildcard,*.cpp,$(D))
 endif
 ifeq ($(strip $(ASMSRC))$(NO_AUTO_SRC),)
-  ASMSRC := $(wildcard *.s)
+  ASMSRC := $(call dir_wildcard,*.s,$(D))
 endif
 ifeq ($(strip $(ASSMSRC))$(NO_AUTO_SRC),)
-  ASSMSRC := $(wildcard *.S)
+  ASSMSRC := $(call dir_wildcard,*.S,$(D))
 endif
 
 OBJC_LTO    := $(SRC:%.c=$(BINDIR)/$(MODULE)/%.o)
@@ -64,22 +73,22 @@ CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
 
 $(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
 
-$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(RIOTBUILD_CONFIG_HEADER_C)
+$(OBJC): $(BINDIR)/$(MODULE)/%.o: $(D)/%.c $(RIOTBUILD_CONFIG_HEADER_C)
 	$(Q)$(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
-$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.cpp $(RIOTBUILD_CONFIG_HEADER_C)
+$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: $(D)/%.cpp $(RIOTBUILD_CONFIG_HEADER_C)
 	$(Q)$(CCACHE) $(CXX) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
-$(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
+$(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: $(D)/%.s
 	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(RIOTBUILD_CONFIG_HEADER_C)
+$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: $(D)/%.S $(RIOTBUILD_CONFIG_HEADER_C)
 	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 
