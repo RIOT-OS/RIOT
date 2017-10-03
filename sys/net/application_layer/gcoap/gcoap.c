@@ -931,12 +931,12 @@ int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
     return 0;
 }
 
-int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
-                                                  const coap_resource_t *resource)
+int gcoap_obs_init_opts(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                        const gcoap_send_opts_t *opts)
 {
     gcoap_observe_memo_t *memo = NULL;
 
-    _find_obs_memo_resource(&memo, resource);
+    _find_obs_memo_resource(&memo, opts->obs_resource);
     if (memo == NULL) {
         /* Unique return value to specify there is not an observer */
         return GCOAP_OBS_INIT_UNUSED;
@@ -944,7 +944,7 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
     pdu->hdr       = (coap_hdr_t *)buf;
     uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t hdrlen = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &memo->token[0],
+    ssize_t hdrlen = coap_build_hdr(pdu->hdr, opts->msg_type, &memo->token[0],
                                     memo->token_len, COAP_CODE_CONTENT, msgid);
 
     if (hdrlen > 0) {
@@ -964,6 +964,16 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         /* reason for negative hdrlen is not defined, so we also are vague */
         return GCOAP_OBS_INIT_ERR;
     }
+}
+
+int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                   const coap_resource_t *resource)
+{
+    gcoap_send_opts_t opts = {
+        .obs_resource = resource,
+        .msg_type     = COAP_TYPE_NON
+    };
+    return gcoap_obs_init_opts(pdu, buf, len, &opts);
 }
 
 size_t gcoap_obs_send(const uint8_t *buf, size_t len,

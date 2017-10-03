@@ -447,12 +447,14 @@ typedef void (*gcoap_resp_handler_t)(unsigned req_state, coap_pkt_t* pdu,
                                      sock_udp_ep_t *remote);
 
 /**
- * @brief  Options for initialization of a request to be sent.
+ * @brief  Options for initialization of a request or an observe notification
+ *         to be sent.
  */
 typedef struct {
     unsigned msg_code;                  /**< Message code, a COAP_CODE_* */
     unsigned msg_type;                  /**< Message type, a COAP_TYPE_* */
     char *req_path;                     /**< URL path for a request */
+    const coap_resource_t *obs_resource; /**< Observation resource */
 } gcoap_send_opts_t;
 
 /**
@@ -663,6 +665,25 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
                 ? gcoap_finish(pdu, 0, COAP_FORMAT_NONE)
                 : -1;
 }
+
+/**
+ * @brief   Initializes a CoAP Observe notification packet on a buffer, for the
+ *          observer registered for a resource
+ *
+ * Uses options to specify details for the request. First verifies that an
+ * observer has been registered for the resource.
+ *
+ * @param[out] pdu      Notification metadata
+ * @param[out] buf      Buffer containing the PDU
+ * @param[in] len       Length of the buffer
+ * @param[in] opts      Notification options; must include resource
+ *
+ * @return  GCOAP_OBS_INIT_OK     on success
+ * @return  GCOAP_OBS_INIT_ERR    on error
+ * @return  GCOAP_OBS_INIT_UNUSED if no observer for resource
+ */
+int gcoap_obs_init_opts(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                        const gcoap_send_opts_t *opts);
 
 /**
  * @brief   Initializes a CoAP Observe notification packet on a buffer, for the
