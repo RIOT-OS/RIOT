@@ -204,10 +204,8 @@ typedef struct {
  */
 typedef struct {
     Uart *dev;              /**< U(S)ART device used */
-    Pio *rx_port;           /**< port for RX pin */
-    Pio *tx_port;           /**< port for TX pin */
-    uint8_t rx_pin;         /**< RX pin */
-    uint8_t tx_pin;         /**< TX pin */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
     gpio_mux_t mux;         /**< MUX used for pins */
     uint8_t pmc_id;         /**< bit in the PMC register of the device*/
     uint8_t irqn;           /**< interrupt number of the device */
