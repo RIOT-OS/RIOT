@@ -117,3 +117,18 @@ all:	..nothing_$(MODULE)
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored
 -include $(DEP)
+
+# Undefine local variables as they would break if in non-recursive mode
+undefine SRC
+undefine SRC_NOLTO
+undefine SRCXX
+undefine ASMSRC
+undefine ASSMSRC
+
+undefine SUBMODULES
+undefine NO_AUTO_SRC
+undefine BASE_MODULE
+undefine SUBMODULES_NOFORCE
+
+undefine MODULE
+undefine MODULE_DIR
