@@ -129,6 +129,21 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
+ * @name    Real time counter configuration
+ * @{
+ */
+#define RTT_NUMOF           (1U)
+#define RTT_IRQ_PRIO        1
+
+#define RTT_DEV             RTC
+#define RTT_IRQ             RTC_IRQn
+#define RTT_ISR             isr_rtc
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_FREQUENCY       (16384)      /* in Hz */
+#define RTT_PRESCALER       (0x1)        /* run with ~16 kHz Hz */
+/** @} */
+
+/**
  * @name I2C configuration
  * @{
  */
