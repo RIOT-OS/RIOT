@@ -11,6 +11,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              b-l072z-lrwan1 \
                              calliope-mini \
                              cc2538dk \
+                             cc2650-launchpad \
                              cc2650stk \
                              chronos \
                              ek-lm4f120xl \
