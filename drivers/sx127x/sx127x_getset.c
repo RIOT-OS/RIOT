@@ -63,6 +63,20 @@ void sx127x_set_state(sx127x_t *dev, uint8_t state)
 
 void sx127x_set_modem(sx127x_t *dev, uint8_t modem)
 {
+    if ((sx127x_reg_read(dev, SX127X_REG_OPMODE) & SX127X_RF_LORA_OPMODE_LONGRANGEMODE_ON) != 0) {
+        dev->settings.modem = SX127X_MODEM_LORA;
+    }
+    else {
+        dev->settings.modem = SX127X_MODEM_FSK;
+    }
+
+    /* Skip if unchanged to avoid resetting the transceiver below (may end up
+     * in crashes) */
+    if (dev->settings.modem == modem) {
+        DEBUG("[DEBUG] already using modem: %d\n", modem);
+        return;
+    }
+
     DEBUG("[DEBUG] set modem: %d\n", modem);
 
     dev->settings.modem = modem;
