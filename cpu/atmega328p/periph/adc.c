@@ -29,12 +29,15 @@
 
 #include "arduino_pinmap.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 typedef uint8_t atmega_reg_t;
 
 typedef union {
     atmega_reg_t admux;
     struct{
-        atmega_reg_t mux    :4; /* analog channel selection bits */
+        atmega_reg_t mux   :4; /* analog channel selection bits */
         atmega_reg_t res   :1; /* reserved */
         atmega_reg_t adlar :1; /* ADC left adjust result */
         atmega_reg_t ref   :2; /* reference selection bits */
@@ -45,12 +48,12 @@ typedef union {
 typedef union {
     atmega_reg_t adcsra;
     struct {
-        atmega_reg_t adps   :3; /* ADC prescaler selection */
-        atmega_reg_t adie   :1; /* ADC interrupt enable */
-        atmega_reg_t adif   :1; /* ADC interrupt flag */
-        atmega_reg_t adate  :1; /* ADC auto trigger enable */
-        atmega_reg_t adsc   :1; /* ADC start conversion */
-        atmega_reg_t aden   :1; /* ADC enable */
+        atmega_reg_t adps  :3; /* ADC prescaler selection */
+        atmega_reg_t adie  :1; /* ADC interrupt enable */
+        atmega_reg_t adif  :1; /* ADC interrupt flag */
+        atmega_reg_t adate :1; /* ADC auto trigger enable */
+        atmega_reg_t adsc  :1; /* ADC start conversion */
+        atmega_reg_t aden  :1; /* ADC enable */
     } bits;
 
 } atmega328p_adcsra_t;
@@ -63,51 +66,26 @@ static mutex_t adc_mtx = MUTEX_INIT;
 
 int adc_init(adc_t line)
 {
-    switch(line){
-        case ARDUINO_PIN_A0:
-        case ARDUINO_PIN_A1:
-        case ARDUINO_PIN_A2:
-        case ARDUINO_PIN_A3:
-        case ARDUINO_PIN_A4:
-        case ARDUINO_PIN_A5:
-            return 0;
-            break;
-        default:
-            return -1;
+    if (line >= ADC_NUMOF) {
+        DEBUG("adc_init: invalid ADC line (%d)!\n", line);
+        return -1;
     }
+
+    return 0;
 }
 
 int adc_sample(adc_t line, adc_res_t res)
 {
     uint16_t value;
-    uint8_t pin_mux;
 
-    switch(line){
-        case ARDUINO_PIN_A0:
-            pin_mux = 0x00;
-            break;
-        case ARDUINO_PIN_A1:
-            pin_mux = 0x01;
-            break;
-        case ARDUINO_PIN_A2:
-            pin_mux = 0x03;
-            break;
-        case ARDUINO_PIN_A3:
-            pin_mux = 0x04;
-            break;
-        case ARDUINO_PIN_A4:
-            pin_mux = 0x05;
-            break;
-        case ARDUINO_PIN_A5:
-            pin_mux = 0x06;
-            break;
-        default:
-            return -1;
+    if (line >= ADC_NUMOF) {
+        DEBUG("adc_sample: invalid ADC line (%d)!\n", line);
+        return -1;
     }
 
     mutex_lock(&adc_mtx);
 
-    atmega_admux->bits.mux = pin_mux;
+    atmega_admux->bits.mux = line;
     atmega_admux->bits.adlar = 1;    /* left adjust */
     atmega_admux->bits.ref = 1;      /* using Vcc as reference voltage */
 
@@ -138,6 +116,7 @@ int adc_sample(adc_t line, adc_res_t res)
         break;
     }
 
+    atmega_adcsra->bits.aden = 0;    /* ADC disabled */
     mutex_unlock(&adc_mtx);
     return value;
 }

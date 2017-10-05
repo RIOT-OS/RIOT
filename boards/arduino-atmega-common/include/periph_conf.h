@@ -89,6 +89,8 @@ extern "C" {
 
 #define UART_0              MEGA_UART0
 #define UART_0_ISR          USART_RX_vect
+
+#define ADC_NUMOF           (8U)
 #endif
 
 #ifdef CPU_ATMEGA2560
