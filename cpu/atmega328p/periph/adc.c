@@ -111,8 +111,7 @@ int adc_sample(adc_t line, adc_res_t res)
         value = (ADCL >> 6) | (ADCH << 2) ;
         break;
     default:
-        mutex_unlock(&adc_mtx);
-        return -1;
+        value = -1; /* error */
         break;
     }
 
