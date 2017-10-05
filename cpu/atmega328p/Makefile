@@ -1,6 +1,6 @@
 # define the module that is build
 MODULE = cpu
 # add a list of subdirectories, that should also be build
-DIRS = $(ATMEGA_COMMON)
+DIRS = $(ATMEGA_COMMON) periph
 
 include $(RIOTBASE)/Makefile.base
