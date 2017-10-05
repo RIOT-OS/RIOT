@@ -520,24 +520,6 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 #define XTIMER_PERIODIC_RELATIVE (512)
 #endif
 
-#ifndef XTIMER_SHIFT
-/**
- * @brief   xtimer prescaler value
- *
- * If the underlying hardware timer is running at a power of two multiple of
- * 15625, XTIMER_SHIFT can be used to adjust the difference.
- *
- * For a 1 MHz hardware timer, set XTIMER_SHIFT to 0.
- *
- * For a 4 MHz hardware timer, set XTIMER_SHIFT to 2.
- * For a 16 MHz hardware timer, set XTIMER_SHIFT to 4.
- * For a 250 kHz hardware timer, set XTIMER_SHIFT to 2.
- *
- * The direction of the shift is handled by the macros in tick_conversion.h
- */
-#define XTIMER_SHIFT (0)
-#endif
-
 /*
  * Default xtimer configuration
  */
@@ -551,15 +533,14 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
  */
 #define XTIMER_CHAN (0)
 
+#endif
+
+#ifndef XTIMER_WIDTH
 #if (TIMER_0_MAX_VALUE) == 0xfffffful
 #define XTIMER_WIDTH (24)
 #elif (TIMER_0_MAX_VALUE) == 0xffff
 #define XTIMER_WIDTH (16)
-#endif
-
-#endif
-
-#ifndef XTIMER_WIDTH
+#else
 /**
  * @brief xtimer timer width
  *
@@ -567,6 +548,7 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
  * Default is 32.
  */
 #define XTIMER_WIDTH (32)
+#endif
 #endif
 
 #if (XTIMER_WIDTH != 32) || DOXYGEN
@@ -584,11 +566,51 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 #define XTIMER_MASK (0)
 #endif
 
+/**
+ * @brief  Base frequency of xtimer is 1 MHz
+ */
+#define XTIMER_HZ_BASE (1000000ul)
+
 #ifndef XTIMER_HZ
 /**
  * @brief  Frequency of the underlying hardware timer
  */
-#define XTIMER_HZ 1000000ul
+#define XTIMER_HZ XTIMER_HZ_BASE
+#endif
+
+#ifndef XTIMER_SHIFT
+#if (XTIMER_HZ == XTIMER_HZ_BASE)
+/**
+ * @brief   xtimer prescaler value
+ *
+ * If the underlying hardware timer is running at a power of two multiple of
+ * 15625, XTIMER_SHIFT can be used to adjust the difference.
+ *
+ * For a 1 MHz hardware timer, set XTIMER_SHIFT to 0.
+ * For a 2 MHz or 500 kHz, set XTIMER_SHIFT to 1.
+ * For a 4 MHz or 250 kHz, set XTIMER_SHIFT to 2.
+ * For a 8 MHz or 125 kHz, set XTIMER_SHIFT to 3.
+ * For a 16 MHz or 62.5 kHz, set XTIMER_SHIFT to 4.
+ * and for 32 MHz, set XTIMER_SHIFT to 5.
+ *
+ * The direction of the shift is handled by the macros in tick_conversion.h
+ */
+#define XTIMER_SHIFT (0)
+#elif (XTIMER_HZ >> 1 == XTIMER_HZ_BASE) || (XTIMER_HZ << 1 == XTIMER_HZ_BASE)
+#define XTIMER_SHIFT (1)
+#elif (XTIMER_HZ >> 2 == XTIMER_HZ_BASE) || (XTIMER_HZ << 2 == XTIMER_HZ_BASE)
+#define XTIMER_SHIFT (2)
+#elif (XTIMER_HZ >> 3 == XTIMER_HZ_BASE) || (XTIMER_HZ << 3 == XTIMER_HZ_BASE)
+#define XTIMER_SHIFT (3)
+#elif (XTIMER_HZ >> 4 == XTIMER_HZ_BASE) || (XTIMER_HZ << 4 == XTIMER_HZ_BASE)
+#define XTIMER_SHIFT (4)
+#elif (XTIMER_HZ >> 5 == XTIMER_HZ_BASE) || (XTIMER_HZ << 5 == XTIMER_HZ_BASE)
+#define XTIMER_SHIFT (5)
+#else
+#error "XTIMER_SHIFT cannot be derived for given XTIMER_HZ, verify settings!"
+#endif
+#else
+#error "XTIMER_SHIFT is set relative to XTIMER_HZ, no manual define required!"
 #endif
 
 #include "xtimer/tick_conversion.h"
