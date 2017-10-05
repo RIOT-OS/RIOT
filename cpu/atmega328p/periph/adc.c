@@ -1,15 +1,31 @@
+/*
+ * Copyright (C) 2017 Technische Universität Berlin
 
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     cpu_atmega328p
+ * @ingroup     drivers_periph_adc
+ * @{
+ *
+ * @file
+ * @brief       Low-level ADC driver implementation
+ *
+ * @author      Thomas Geithner <thomas.geithner@dai-labor.de>
+ * @}
+ */
 
 #include <stdio.h>
-
-#include <avr/interrupt.h>
 
 #include "cpu.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
-#include "thread.h"
-#include "mutex.h"
 #include "xtimer.h"
+#include "thread.h"
 
 #include "arduino_pinmap.h"
 
@@ -44,11 +60,21 @@ atmega328p_adcsra_t * const atmega_adcsra = (atmega328p_adcsra_t*) &ADCSRA;
 
 
 static mutex_t adc_mtx = MUTEX_INIT;
-static kernel_pid_t adc_waiting_thread;
 
 int adc_init(adc_t line)
 {
-    return -1;
+    switch(line){
+        case ARDUINO_PIN_A0:
+        case ARDUINO_PIN_A1:
+        case ARDUINO_PIN_A2:
+        case ARDUINO_PIN_A3:
+        case ARDUINO_PIN_A4:
+        case ARDUINO_PIN_A5:
+            return 0;
+            break;
+        default:
+            return -1;
+    }
 }
 
 int adc_sample(adc_t line, adc_res_t res)
@@ -57,30 +83,29 @@ int adc_sample(adc_t line, adc_res_t res)
     uint8_t pin_mux;
 
     switch(line){
-    case ARDUINO_PIN_A0:
-        pin_mux = 0x00;
-        break;
-    case ARDUINO_PIN_A1:
-        pin_mux = 0x01;
-        break;
-    case ARDUINO_PIN_A2:
-        pin_mux = 0x03;
-        break;
-    case ARDUINO_PIN_A3:
-        pin_mux = 0x04;
-        break;
-    case ARDUINO_PIN_A4:
-        pin_mux = 0x05;
-        break;
-    case ARDUINO_PIN_A5:
-        pin_mux = 0x06;
-        break;
-    default:
-        return -1;
+        case ARDUINO_PIN_A0:
+            pin_mux = 0x00;
+            break;
+        case ARDUINO_PIN_A1:
+            pin_mux = 0x01;
+            break;
+        case ARDUINO_PIN_A2:
+            pin_mux = 0x03;
+            break;
+        case ARDUINO_PIN_A3:
+            pin_mux = 0x04;
+            break;
+        case ARDUINO_PIN_A4:
+            pin_mux = 0x05;
+            break;
+        case ARDUINO_PIN_A5:
+            pin_mux = 0x06;
+            break;
+        default:
+            return -1;
     }
 
     mutex_lock(&adc_mtx);
-    adc_waiting_thread = thread_getpid();
 
     atmega_admux->bits.mux = pin_mux;
     atmega_admux->bits.adlar = 1;    /* left adjust */
@@ -89,29 +114,14 @@ int adc_sample(adc_t line, adc_res_t res)
     atmega_adcsra->adcsra = 0;
     atmega_adcsra->bits.adps = 0x07; /* prescaler = 128 */
     atmega_adcsra->bits.aden = 1;    /* ADC enabled */
-    //atmega_adcsra->bits.adie = 1;    /* ADC interrupt enabled */
     atmega_adcsra->bits.adsc = 1;    /* start ADC conversion */
 
-#if 0
-    puts("waiting for ADC interrupt...");
-    while(!atmega_adcsra->bits.adif){
-        // waiting for interrupt flag (to be replaced by interrupt driven mechanism?)
-        putchar('.');
-        thread_sleep();
-        //xtimer_usleep(1000);
-    }
-    puts(" got it!");
-    // clear interrupt flag manually
-    atmega_adcsra->bits.adif = 1;
-#else
+    /* waiting for ADC... */
     while(atmega_adcsra->bits.adsc){
-        // waiting...
-        //xtimer_usleep(1000);
-        //xtimer_usleep(1);
         thread_yield();
     }
-#endif
 
+    /* reading result */
     switch(res){
     case ADC_RES_6BIT:
         value = ADCH >> 2;
@@ -131,18 +141,3 @@ int adc_sample(adc_t line, adc_res_t res)
     mutex_unlock(&adc_mtx);
     return value;
 }
-
-#if 0
-static inline void irq_handler(void)
-{
-    __enter_isr();
-    puts("got IRQ");
-    thread_wakeup(adc_waiting_thread);
-    __exit_isr();
-}
-
-ISR(ADC_vect, ISR_BLOCK)
-{
-    irq_handler();
-}
-#endif
