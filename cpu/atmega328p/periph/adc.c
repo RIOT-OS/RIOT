@@ -101,18 +101,18 @@ int adc_sample(adc_t line, adc_res_t res)
 
     /* reading result */
     switch(res){
-    case ADC_RES_6BIT:
-        value = ADCH >> 2;
-        break;
-    case ADC_RES_8BIT:
-        value = ADCH;
-        break;
-    case ADC_RES_10BIT:
-        value = (ADCL >> 6) | (ADCH << 2) ;
-        break;
-    default:
-        value = -1; /* error */
-        break;
+        case ADC_RES_6BIT:
+            value = ADCH >> 2;
+            break;
+        case ADC_RES_8BIT:
+            value = ADCH;
+            break;
+        case ADC_RES_10BIT:
+            value = (ADCL >> 6) | (ADCH << 2) ;
+            break;
+        default:
+            value = -1; /* error */
+            break;
     }
 
     atmega_adcsra->bits.aden = 0;    /* ADC disabled */
