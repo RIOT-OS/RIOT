@@ -272,6 +272,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Message type used by default when creating a request
+ */
+#ifndef GCOAP_REQ_DEFAULT_MSG_TYPE
+#define GCOAP_REQ_DEFAULT_MSG_TYPE (COAP_TYPE_NON)
+#endif
+
+/**
  * @brief   Maximum length in bytes for a token
  */
 #define GCOAP_TOKENLEN_MAX      (8)
@@ -369,6 +376,13 @@ extern "C" {
 #define GCOAP_OBS_MEMO_IDLE     (1) /**< Registration OK; no current activity */
 #define GCOAP_OBS_MEMO_PENDING  (2) /**< Resource changed; notification pending */
 /** @} */
+
+/**
+ * @brief   Message type used by default when creating a notification
+ */
+#ifndef GCOAP_OBS_DEFAULT_MSG_TYPE
+#define GCOAP_OBS_DEFAULT_MSG_TYPE (COAP_TYPE_NON)
+#endif
 
 /**
  * @brief   Width in bytes of the Observe option value for a notification

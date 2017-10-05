@@ -785,7 +785,7 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code,
     gcoap_send_opts_t opts = {
         .msg_code = code,
         .req_path = path,
-        .msg_type = COAP_TYPE_NON
+        .msg_type = GCOAP_REQ_DEFAULT_MSG_TYPE
     };
     return gcoap_req_init_opts(pdu, buf, len, &opts);
 }
@@ -971,7 +971,7 @@ int gcoap_obs_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 {
     gcoap_send_opts_t opts = {
         .obs_resource = resource,
-        .msg_type     = COAP_TYPE_NON
+        .msg_type     = GCOAP_OBS_DEFAULT_MSG_TYPE
     };
     return gcoap_obs_init_opts(pdu, buf, len, &opts);
 }
