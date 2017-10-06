@@ -66,6 +66,10 @@
 : ${OPENOCD_CONFIG:=${RIOTBOARD}/${BOARD}/dist/openocd.cfg}
 # Default OpenOCD command
 : ${OPENOCD:=openocd}
+# Extra board initialization commands to pass to OpenOCD
+: ${OPENOCD_EXTRA_INIT:=}
+# Debugger interface initialization commands to pass to OpenOCD
+: ${OPENOCD_ADAPTER_INIT:=}
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
 : ${SETSID:=setsid}
 # GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
@@ -152,7 +156,9 @@ do_flash() {
         fi
     fi
     # flash device
-    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+    sh -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
@@ -186,7 +192,9 @@ do_debug() {
     # don't trap on Ctrl+C, because GDB keeps running
     trap '' INT
     # start OpenOCD as GDB server
-    ${SETSID} sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+    ${SETSID} sh -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
@@ -211,7 +219,9 @@ do_debug() {
 do_debugserver() {
     test_config
     # start OpenOCD as GDB server
-    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+    sh -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
             -c 'tcl_port ${TCL_PORT}' \
             -c 'telnet_port ${TELNET_PORT}' \
@@ -224,7 +234,9 @@ do_debugserver() {
 do_reset() {
     test_config
     # start OpenOCD and invoke board reset
-    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+    sh -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
             -c 'tcl_port 0' \
             -c 'telnet_port 0' \
