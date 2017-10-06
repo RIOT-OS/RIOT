@@ -33,14 +33,13 @@
 
 static void set_up(void)
 {
-    /* TODO: add if #6988 gets merged */
-    /* evtimer_event_t *tmp; */
+    evtimer_event_t *tmp;
 
-    /* for (evtimer_event_t *ptr = _nib_evtimer.events; */
-    /*      (ptr != NULL) && (tmp = (ptr->next), 1); */
-    /*      ptr = tmp) { */
-    /*     evtimer_del((evtimer_t *)(&_nib_evtimer), ptr); */
-    /* } */
+    for (evtimer_event_t *ptr = _nib_evtimer.events;
+         (ptr != NULL) && (tmp = (ptr->next), 1);
+         ptr = tmp) {
+        evtimer_del((evtimer_t *)(&_nib_evtimer), ptr);
+    }
     _nib_init();
 }
 
