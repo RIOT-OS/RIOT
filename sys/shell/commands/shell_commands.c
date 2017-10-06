@@ -84,6 +84,10 @@ extern int _random_init(int argc, char **argv);
 extern int _random_get(int argc, char **argv);
 #endif
 
+#ifdef MODULE_GNRC_IPV6_NIB
+extern int _gnrc_ipv6_nib(int argc, char **argv);
+#endif
+
 #ifdef MODULE_GNRC_NETIF
 extern int _netif_config(int argc, char **argv);
 extern int _netif_send(int argc, char **argv);
@@ -181,6 +185,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef CPU_X86
     {"lspci", "Lists PCI devices", _x86_lspci},
+#endif
+#ifdef MODULE_GNRC_IPV6_NIB
+    {"nib", "Configure neighbor information base", _gnrc_ipv6_nib},
 #endif
 #ifdef MODULE_GNRC_NETIF
     {"ifconfig", "Configure network interfaces", _netif_config},
