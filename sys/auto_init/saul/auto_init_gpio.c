@@ -59,7 +59,9 @@ void auto_init_gpio(void)
         const saul_gpio_params_t *p = &saul_gpio_params[i];
 
         LOG_DEBUG("[auto_init_saul] initializing GPIO #%u\n", i);
-
+        /* initialize the GPIO pin */
+        gpio_init(p->pin, p->mode);
+        /* fill in saul registry entry */
         saul_gpios[i] = p->pin;
         saul_reg_entries[i].dev = &(saul_gpios[i]);
         saul_reg_entries[i].name = p->name;
@@ -67,11 +69,11 @@ void auto_init_gpio(void)
             (p->mode == GPIO_IN_PU)) {
             saul_reg_entries[i].driver = &gpio_in_saul_driver;
         }
-        else {
+        else { /* GPIO_OUT or GPIO_OD */
             saul_reg_entries[i].driver = &gpio_out_saul_driver;
+            /* not all low-level drivers clear pin on init */
+            gpio_clear(p->pin);
         }
-        /* initialize the GPIO pin */
-        gpio_init(p->pin, p->mode);
         /* add to registry */
         saul_reg_add(&(saul_reg_entries[i]));
     }
