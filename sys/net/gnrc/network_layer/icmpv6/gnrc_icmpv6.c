@@ -129,6 +129,7 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
 
         default:
             DEBUG("icmpv6: unknown type field %u\n", hdr->type);
+            (void)iface;
             break;
     }
 
