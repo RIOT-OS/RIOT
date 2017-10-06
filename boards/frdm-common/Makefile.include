@@ -4,8 +4,8 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 # Use the shared OpenOCD configuration
 # Using dap or jlink depends on which firmware the OpenSDA debugger is running
-export FRDM_IFACE ?= dap
-#export FRDM_IFACE ?= jlink
+export DEBUG_ADAPTER ?= dap
+#export DEBUG_ADAPTER ?= jlink
 
 # OpenOCD v0.10.0 and newer have built-in support for disabling the Kinetis
 # watchdog automatically. However, current stable releases of Ubuntu and Debian
@@ -29,11 +29,11 @@ flash: $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
 # Reset the default goal.
 .DEFAULT_GOAL :=
 
-export OPENOCD_CONFIG ?= $(RIOTBOARD)/frdm-common/dist/old-openocd-$(FRDM_IFACE)-$(CPU_FAMILY).cfg
+export OPENOCD_CONFIG ?= $(RIOTBOARD)/frdm-common/dist/old-openocd-$(CPU_FAMILY).cfg
 endif
 
 # Configuration for OpenOCD v0.10.0 and newer
-export OPENOCD_CONFIG ?= $(RIOTBOARD)/frdm-common/dist/openocd-$(FRDM_IFACE)-$(CPU_FAMILY).cfg
+export OPENOCD_CONFIG ?= $(RIOTBOARD)/frdm-common/dist/openocd-$(CPU_FAMILY).cfg
 
 # Check the flash configuration field before flashing
 export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh

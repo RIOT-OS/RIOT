@@ -28,6 +28,8 @@ export OPENOCD_PRE_VERIFY_CMDS += \
 export OPENOCD_EXTRA_INIT
 export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh
 
+export DEBUG_ADAPTER ?= dap
+
 # Add board selector (USB serial) to OpenOCD options if specified.
 # Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
 #   Usage: SERIAL="0200..." BOARD="pba-d-01-kw2x" make flash
