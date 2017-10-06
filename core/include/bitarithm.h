@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,6 +20,10 @@
 
 #ifndef BITARITHM_H
 #define BITARITHM_H
+
+#include <stdint.h>
+
+#include "cpu_conf.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -105,18 +110,43 @@ unsigned bitarithm_msb(unsigned v);
  *                  function will produce an infinite loop
  * @return          Bit Number
  *
- * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
-unsigned bitarithm_lsb(register unsigned v);
+static inline unsigned bitarithm_lsb(unsigned v);
 
 /**
  * @brief   Returns the number of bits set in a value
  * @param[in]   v   Input value
  * @return          Number of set bits
  *
- * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
 unsigned bitarithm_bits_set(unsigned v);
+
+/* implementations */
+
+static inline unsigned bitarithm_lsb(unsigned v)
+#if defined(BITARITHM_LSB_BUILTIN)
+{
+    return __builtin_ffs(v) - 1;
+}
+#elif defined(BITARITHM_LSB_LOOKUP)
+{
+/* Source: http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup */
+    extern const uint8_t MultiplyDeBruijnBitPosition[32];
+    return MultiplyDeBruijnBitPosition[((uint32_t)((v & -v) * 0x077CB531U)) >> 27];
+}
+#else
+{
+/* Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious */
+    unsigned r = 0;
+
+    while ((v & 0x01) == 0) {
+        v >>= 1;
+        r++;
+    };
+
+    return r;
+}
+#endif
 
 #ifdef __cplusplus
 }
