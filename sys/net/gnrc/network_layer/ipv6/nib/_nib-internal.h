@@ -19,6 +19,7 @@
 #ifndef PRIV_NIB_INTERNAL_H
 #define PRIV_NIB_INTERNAL_H
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -52,6 +53,8 @@ extern "C" {
 #define _DRL    (0x08)      /**< default router list */
 #define _FT     (0x10)      /**< forwarding table */
 #define _DAD    (0x20)      /**< 6LoWPAN duplicate address detection table */
+#define _DST    (0x40)      /**< there is @ref _nib_offl_entry_t pointing
+                                 to this @ref _nib_onl_entry_t */
 /** @} */
 
 /**
@@ -162,6 +165,8 @@ typedef struct {
     ipv6_addr_t pfx;            /**< prefix to the destination */
     unsigned pfx_len;           /**< prefix-length in bits of
                                  *   _nib_onl_entry_t::pfx */
+    uint8_t mode;               /**< [mode](@ref net_gnrc_ipv6_nib_mode) of the
+                                 *   off-link entry */
 } _nib_offl_entry_t;
 
 /**
@@ -251,10 +256,8 @@ static inline void _nib_onl_set_if(_nib_onl_entry_t *node, unsigned iface)
 /**
  * @brief   Creates or gets an existing on-link entry by address
  *
- * @pre     `(addr != NULL)`.
- *
- * @param[in] addr  An IPv6 address. May not be NULL.
- *                  *May also be a global address!*
+ * @param[in] addr  An IPv6 address. May be NULL (to be pointed to by a prefix
+ *                  list entry). *May also be a global address!*
  * @param[in] iface The interface to the node.
  *
  * @return  A new or existing on-link entry with _nib_onl_entry_t::ipv6 set to
@@ -305,7 +308,6 @@ _nib_onl_entry_t *_nib_onl_get(const ipv6_addr_t *addr, unsigned iface);
 /**
  * @brief   Creates or gets an existing node from the neighbor cache by address
  *
- * @pre     `(addr != NULL)`
  * @pre     `((cstate & GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK) !=
  *             GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY)`
  * @pre     `((cstate & GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK) !=
@@ -313,7 +315,8 @@ _nib_onl_entry_t *_nib_onl_get(const ipv6_addr_t *addr, unsigned iface);
  * @pre     `((cstate & GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK) !=
  *             GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE)`
  *
- * @param[in] addr      The address of a node. May not be NULL.
+ * @param[in] addr      The address of a node. May be NULL for prefix list
+ *                      entries.
  * @param[in] iface     The interface to the node.
  * @param[in] cstate    Creation state. State of the entry *if* the entry is
  *                      newly created.
@@ -362,6 +365,7 @@ void _nib_nc_set_reachable(_nib_onl_entry_t *node);
  */
 static inline _nib_onl_entry_t *_nib_dad_add(const ipv6_addr_t *addr)
 {
+    assert(addr != NULL);
     _nib_onl_entry_t *node = _nib_onl_alloc(addr, 0);
 
     if (node != NULL) {
@@ -441,11 +445,10 @@ _nib_dr_entry_t *_nib_drl_get_dr(void);
 /**
  * @brief   Creates or gets an existing off-link entry by next hop and prefix
  *
- * @pre `(next_hop != NULL)`
  * @pre `(pfx != NULL) && (pfx != "::") && (pfx_len != 0) && (pfx_len <= 128)`
  *
- * @param[in] next_hop  An IPv6 address to next hop. May not be NULL.
- *                      *May also be a global address!*
+ * @param[in] next_hop  An IPv6 address to next hop. May be NULL (for prefix
+ *                      list). *May also be a global address!*
  * @param[in] iface     The interface to @p next_hop.
  * @param[in] pfx       The IPv6 prefix or address of the destination.
  *                      May not be NULL or unspecified address. Use
@@ -456,15 +459,15 @@ _nib_dr_entry_t *_nib_drl_get_dr(void);
  *          @p pfx.
  * @return  NULL, if no space is left.
  */
-_nib_offl_entry_t *_nib_dst_alloc(const ipv6_addr_t *next_hop, unsigned iface,
-                                  const ipv6_addr_t *pfx, unsigned pfx_len);
+_nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
+                                   const ipv6_addr_t *pfx, unsigned pfx_len);
 
 /**
  * @brief   Clears out a NIB entry (off-link version)
  *
  * @param[in,out] dst  An entry.
  */
-void _nib_dst_clear(_nib_offl_entry_t *dst);
+void _nib_offl_clear(_nib_offl_entry_t *dst);
 
 /**
  * @brief   Iterates over off-link entries
@@ -473,16 +476,15 @@ void _nib_dst_clear(_nib_offl_entry_t *dst);
  *
  * @return  entry after @p last.
  */
-_nib_offl_entry_t *_nib_dst_iter(const _nib_offl_entry_t *last);
+_nib_offl_entry_t *_nib_offl_iter(const _nib_offl_entry_t *last);
 
 /**
  * @brief   Helper function for view-level add-functions below
  *
- * @pre     `(next_hop != NULL)`
  * @pre     `(pfx != NULL) && (pfx != "::") && (pfx_len != 0) && (pfx_len <= 128)`
  *
- * @param[in] next_hop  Next hop to the destination. May not be NULL.
- *                      *May also be a global address!*
+ * @param[in] next_hop  An IPv6 address to next hop. May be NULL (for prefix
+ *                      list). *May also be a global address!*
  * @param[in] iface     The interface to the destination.
  * @param[in] pfx       The IPv6 prefix or address of the destination.
  *                      May not be NULL or unspecified address. Use
@@ -490,19 +492,19 @@ _nib_offl_entry_t *_nib_dst_iter(const _nib_offl_entry_t *last);
  * @param[in] pfx_len   The length in bits of @p pfx in bits.
  * @param[in] mode      [NIB-mode](_nib_onl_entry_t::mode).
  *
- * @return  A new or existing off-link entry with _nib_dr_entry_t::pfx set to
+ * @return  A new or existing off-link entry with _nib_offl_entry_t::pfx set to
  *          @p pfx.
  * @return  NULL, if no space is left.
  */
-static inline _nib_offl_entry_t *_nib_dst_add(const ipv6_addr_t *next_hop,
-                                              unsigned iface,
-                                              const ipv6_addr_t *pfx,
-                                              unsigned pfx_len, uint8_t mode)
+static inline _nib_offl_entry_t *_nib_offl_add(const ipv6_addr_t *next_hop,
+                                               unsigned iface,
+                                               const ipv6_addr_t *pfx,
+                                               unsigned pfx_len, uint8_t mode)
 {
-    _nib_offl_entry_t *nib_offl = _nib_dst_alloc(next_hop, iface, pfx, pfx_len);
+    _nib_offl_entry_t *nib_offl = _nib_offl_alloc(next_hop, iface, pfx, pfx_len);
 
     if (nib_offl != NULL) {
-        nib_offl->next_hop->mode |= (mode);
+        nib_offl->mode |= mode;
     }
     return nib_offl;
 }
@@ -512,17 +514,13 @@ static inline _nib_offl_entry_t *_nib_dst_add(const ipv6_addr_t *next_hop,
  *
  * @param[in,out] nib_offl  An entry.
  */
-static inline void _nib_dst_remove(_nib_offl_entry_t *nib_offl, uint8_t mode)
+static inline void _nib_offl_remove(_nib_offl_entry_t *nib_offl, uint8_t mode)
 {
-    _nib_onl_entry_t *node = nib_offl->next_hop;
-
-    if (node != NULL) {
-        node->mode &= ~mode;
-    }
-    _nib_dst_clear(nib_offl);
+    nib_offl->mode &= ~mode;
+    _nib_offl_clear(nib_offl);
 }
 
-#if defined(GNRC_IPV6_NIB_CONF_DC) || DOXYGEN
+#if GNRC_IPV6_NIB_CONF_DC || DOXYGEN
 /**
  * @brief   Creates or gets an existing destination cache entry by its addresses
  *
@@ -535,16 +533,16 @@ static inline void _nib_dst_remove(_nib_offl_entry_t *nib_offl, uint8_t mode)
  *
  * @note    Only available if @ref GNRC_IPV6_NIB_CONF_DC.
  *
- * @return  A new or existing destination cache entry with
- *          _nib_onl_entry_t::ipv6 of _nib_dr_entry_t::next_hop set to
- *          @p next_hop.
+ * @return  A new or existing off-link entry with _nib_offl_entry_t::pfx set to
+ *          @p pfx.
  * @return  NULL, if no space is left.
  */
 static inline _nib_offl_entry_t *_nib_dc_add(const ipv6_addr_t *next_hop,
                                              unsigned iface,
                                              const ipv6_addr_t *dst)
 {
-    return _nib_dst_add(next_hop, iface, dst, IPV6_ADDR_BIT_LEN, _DC);
+    assert((next_hop != NULL) && (dst != NULL));
+    return _nib_offl_add(next_hop, iface, dst, IPV6_ADDR_BIT_LEN, _DC);
 }
 
 /**
@@ -558,7 +556,7 @@ static inline _nib_offl_entry_t *_nib_dc_add(const ipv6_addr_t *next_hop,
  */
 static inline void _nib_dc_remove(_nib_offl_entry_t *nib_offl)
 {
-    _nib_dst_remove(nib_offl, _DC);
+    _nib_offl_remove(nib_offl, _DC);
 }
 #endif /* GNRC_IPV6_NIB_CONF_DC */
 
@@ -574,7 +572,7 @@ static inline void _nib_dc_remove(_nib_offl_entry_t *nib_offl)
  *                      @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len   The length in bits of @p pfx in bits.
  *
- * @return  A new or existing prefix list entry with _nib_dr_entry_t::pfx set to
+ * @return  A new or existing off-link entry with _nib_offl_entry_t::pfx set to
  *          @p pfx.
  * @return  NULL, if no space is left.
  */
@@ -582,7 +580,7 @@ static inline _nib_offl_entry_t *_nib_pl_add(unsigned iface,
                                              const ipv6_addr_t *pfx,
                                              unsigned pfx_len)
 {
-    return _nib_dst_add(NULL, iface, pfx, pfx_len, _PL);
+    return _nib_offl_add(NULL, iface, pfx, pfx_len, _PL);
 }
 
 /**
@@ -594,10 +592,10 @@ static inline _nib_offl_entry_t *_nib_pl_add(unsigned iface,
  */
 static inline void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
 {
-    _nib_dst_remove(nib_offl, _PL);
+    _nib_offl_remove(nib_offl, _PL);
 }
 
-#if defined(GNRC_IPV6_NIB_CONF_ROUTER) || DOXYGEN
+#if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
 /**
  * @brief   Creates or gets an existing forwarding table entry by its prefix
  *
@@ -614,8 +612,8 @@ static inline void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
  *
  * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ROUTER.
  *
- * @return  A new or existing forwarding table entry with _nib_dr_entry_t::pfx
- *          set to @p pfx.
+ * @return  A new or existing off-link entry with _nib_offl_entry_t::pfx set to
+ *          @p pfx.
  * @return  NULL, if no space is left.
  */
 static inline _nib_offl_entry_t *_nib_ft_add(const ipv6_addr_t *next_hop,
@@ -623,7 +621,7 @@ static inline _nib_offl_entry_t *_nib_ft_add(const ipv6_addr_t *next_hop,
                                              const ipv6_addr_t *pfx,
                                              unsigned pfx_len)
 {
-    return _nib_dst_add(next_hop, iface, pfx, pfx_len, _FT);
+    return _nib_offl_add(next_hop, iface, pfx, pfx_len, _FT);
 }
 
 /**
@@ -637,7 +635,7 @@ static inline _nib_offl_entry_t *_nib_ft_add(const ipv6_addr_t *next_hop,
  */
 static inline void _nib_ft_remove(_nib_offl_entry_t *nib_offl)
 {
-    _nib_dst_remove(nib_offl, _FT);
+    _nib_offl_remove(nib_offl, _FT);
 }
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 
