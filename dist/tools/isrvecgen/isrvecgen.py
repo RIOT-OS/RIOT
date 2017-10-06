@@ -31,11 +31,9 @@ from operator import itemgetter
 cpulist = set()
 headermap = dict()
 
-alias = {
-    "isr_exti[_\d+]+": "isr_exti"
-}
+alias = {"isr_exti[_\d+]+": "isr_exti"}
 
-def parse_cpuconf( cpuconf ):
+def parse_cpuconf(cpuconf):
     buf = open(cpuconf, 'r').read()
     path = os.path.dirname(os.path.abspath(cpuconf))
 
@@ -45,7 +43,7 @@ def parse_cpuconf( cpuconf ):
     pat_cpu = re.compile("CPU_MODEL_([0-9A-Z]+)")
 
     for m in pat_line.finditer(buf):
-        header = ("%s/%s" % (path, m.group(5)))
+        header = '{}/{}'.format(path, m.group(5))
 
         if header not in headermap:
             headermap[header] = set()
@@ -56,19 +54,20 @@ def parse_cpuconf( cpuconf ):
             headermap[header].add(cpu)
 
 
-def parse_header( file, cpus ):
+def parse_header(file, cpus):
     filename = os.path.basename(file)
-    res = { "cpus": cpus, "vec": {} };
+    res = {"cpus": cpus, "vec": {}};
     vec = res["vec"]
 
     # read through file and find all lines
     with open(file, 'r', encoding = "ISO-8859-1") as f:
          for line in f:
-            m = re.match(" +([_0-9A-Za-z]+)_IRQn += (-?\d+),? +(/\*!<|/\*\*<) (.+[a-zA-Z0-9]) +\*/", line)
+            m = re.match(" +([_0-9A-Za-z]+)_IRQn += (-?\d+),? +"
+                         "(/\*!<|/\*\*<) (.+[a-zA-Z0-9]) +\*/", line)
             if m:
                 num = int(m.group(2))
-                name = ("isr_%s" % (m.group(1).lower()))
-                comment = ("/* [%2i] %s */" % (num, m.group(4)))
+                name = 'isr_{}'.format(m.group(1).lower())
+                comment = '/* [{:>2}] {} */'.format(num, m.group(4))
 
                 nm = re.match(".+reserved.+", name, re.IGNORECASE)
                 if num < 0 or nm:
@@ -76,27 +75,25 @@ def parse_header( file, cpus ):
 
                 if num in vec:
                     sys.exit("Error: vector defined twice")
-                vec[num] = { "name": name, "comment": comment }
+                vec[num] = {"name": name, "comment": comment}
 
     return res;
 
 
-def apply_alias( common, specific ):
+def apply_alias(common, specific):
     for num in common:
         for a in alias:
-            m = re.match(a, common[num]["name"])
-            if m:
+            if re.match(a, common[num]["name"]):
                 common[num]["name"] = alias[a]
 
     for cl in specific:
         for num in cl["vec"]:
             for a in alias:
-                m = re.match(a, cl["vec"][num]["name"])
-                if m:
+                if re.match(a, cl["vec"][num]["name"]):
                     cl["vec"][num]["name"] = alias[a]
 
 
-def depstr( cpus, prefix ):
+def depstr(cpus, prefix):
     res = prefix
     i = 0
 
@@ -109,13 +106,13 @@ def depstr( cpus, prefix ):
             res += " || \\\n   "
         elif i & 0x1:
             res += " ||"
-        res += (" defined(%s)" % (cpu))
+        res += ' defined({})'.format(cpu)
         i += 1
 
     return res + "\n"
 
 
-def pull_common_vectors( specific ):
+def pull_common_vectors(specific):
     res = dict()
 
     for i in range(0, 256):
@@ -141,15 +138,17 @@ def pull_common_vectors( specific ):
 
     return res
 
+def fmt_table_entry(num, name, comment):
+    return '    [{:>2}] = {:<26}{}\n'.format(num, name + ",", comment)
 
-def generate_table( common, specific ):
+def generate_table(common, specific):
     table = "/* CPU specific interrupt vector table */\n"
     table += "ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {\n"
     table += "    /* shared vectors for all family members */\n"
 
     for num in common:
         vec = common[num]
-        table += ("    [%2i] = %-26s%s\n" % (num, vec["name"] + ",", vec["comment"]))
+        table += fmt_table_entry(num, vec["name"], vec["comment"])
         last_num = num
 
     if len(specific) > 1:
@@ -160,7 +159,8 @@ def generate_table( common, specific ):
         table += depstr(cpulist["cpus"], prefix)
         for num in cpulist["vec"]:
             vec = cpulist["vec"][num]
-            table += ("    [%2i] = %-26s%s\n" % (num, vec["name"] + ",", vec["comment"]))
+            table += fmt_table_entry(num, vec["name"], vec["comment"])
+            table += ''
 
     if len(specific) > 1:
         table += "#endif\n"
