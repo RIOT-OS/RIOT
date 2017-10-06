@@ -1,8 +1,8 @@
-microcoap server example
-========================
+microcoap server test
+=====================
 
-This application is meant to get you started with implementing a CoAP server on RIOT.
-It uses the GNRC network stack through RIOT's conn socket API.
+This application is meant to get you started with implementing a CoAP server
+on RIOT. It uses the GNRC network stack through RIOT's conn socket API.
 
 Usage
 =====
