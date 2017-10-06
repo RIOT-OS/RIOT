@@ -533,14 +533,15 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
  */
 #define XTIMER_CHAN (0)
 
-#endif
-
-#ifndef XTIMER_WIDTH
 #if (TIMER_0_MAX_VALUE) == 0xfffffful
 #define XTIMER_WIDTH (24)
 #elif (TIMER_0_MAX_VALUE) == 0xffff
 #define XTIMER_WIDTH (16)
-#else
+#endif
+
+#endif
+
+#ifndef XTIMER_WIDTH
 /**
  * @brief xtimer timer width
  *
@@ -548,7 +549,6 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
  * Default is 32.
  */
 #define XTIMER_WIDTH (32)
-#endif
 #endif
 
 #if (XTIMER_WIDTH != 32) || DOXYGEN
