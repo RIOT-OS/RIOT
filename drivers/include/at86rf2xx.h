@@ -91,6 +91,20 @@ extern "C" {
 #   define RSSI_BASE_VAL                   (-91)
 #endif
 
+#if defined(DOXYGEN) || defined(MODULE_AT86RF232) || defined(MODULE_AT86RF233)
+/**
+ * @brief   Frame retry counter reporting
+ *
+ * The AT86RF2XX_HAVE_RETRIES flag enables support for NETOPT_TX_RETRIES NEEDED
+ * operation. Required for this functionality is the XAH_CTRL_2 register which
+ * contains the frame retry counter. Only the at86rf232 and the at86rf233
+ * support this register.
+ */
+#define AT86RF2XX_HAVE_RETRIES             (1)
+#else
+#define AT86RF2XX_HAVE_RETRIES             (0)
+#endif
+
 /**
  * @name    Flags for device internal states (see datasheet)
  * @{
@@ -167,6 +181,11 @@ typedef struct {
     uint8_t pending_tx;                 /**< keep track of pending TX calls
                                              this is required to know when to
                                              return to @ref at86rf2xx_t::idle_state */
+#if AT86RF2XX_HAVE_RETRIES
+    /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
+    uint8_t tx_retries;                 /**< Number of NOACK retransmissions */
+#endif
+    /** @} */
 } at86rf2xx_t;
 
 /**
