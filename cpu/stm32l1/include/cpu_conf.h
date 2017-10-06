@@ -27,7 +27,7 @@
 #include "vendor/stm32l151xba.h"
 #elif defined(CPU_MODEL_STM32L151RC)
 #include "vendor/stm32l151xc.h"
-#elif defined(CPU_MODEL_STM32L152RET6)
+#elif defined(CPU_MODEL_STM32L152RE)
 #include "vendor/stm32l152xe.h"
 #else
 #error "Error: CPU vendor header not found"
