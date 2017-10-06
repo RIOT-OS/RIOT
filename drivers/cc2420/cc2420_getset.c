@@ -64,7 +64,7 @@ void cc2420_get_addr_short(cc2420_t *dev, uint8_t *addr)
     addr[1] = tmp[0];
 }
 
-void cc2420_set_addr_short(cc2420_t *dev, uint8_t *addr)
+void cc2420_set_addr_short(cc2420_t *dev, const uint8_t *addr)
 {
     uint8_t tmp[2];
     tmp[0] = addr[1];
@@ -91,7 +91,7 @@ void cc2420_get_addr_long(cc2420_t *dev, uint8_t *addr)
     }
 }
 
-void cc2420_set_addr_long(cc2420_t *dev, uint8_t *addr)
+void cc2420_set_addr_long(cc2420_t *dev, const uint8_t *addr)
 {
     int i, j;
     uint8_t tmp[8];

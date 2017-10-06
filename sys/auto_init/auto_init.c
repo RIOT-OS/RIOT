@@ -80,7 +80,7 @@
 #include "net/fib.h"
 #endif
 
-#ifdef MODULE_TINYMT32
+#ifdef MODULE_PRNG
 #include "random.h"
 #endif
 
@@ -93,7 +93,7 @@
 
 void auto_init(void)
 {
-#ifdef MODULE_TINYMT32
+#ifdef MODULE_PRNG
     random_init(0);
 #endif
 #ifdef MODULE_XTIMER
@@ -290,6 +290,10 @@ void auto_init(void)
 #ifdef MODULE_MPL3115A2
     extern void auto_init_mpl3115a2(void);
     auto_init_mpl3115a2();
+#endif
+#ifdef MODULE_GROVE_LEDBAR
+    extern void auto_init_grove_ledbar(void);
+    auto_init_grove_ledbar();
 #endif
 #ifdef MODULE_SI70XX
     extern void auto_init_si70xx(void);

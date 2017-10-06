@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the BMX280
+ * @name    Set default configuration parameters for the BMX280
  * @{
  */
 #ifndef BMX280_PARAM_I2C_DEV

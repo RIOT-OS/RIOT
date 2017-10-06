@@ -9,13 +9,13 @@
  */
 
 /**
- * @defgroup    cpu_mips_pic32mx MIPS PIC32MX
+ * @defgroup    cpu_mips_pic32mx Microchip PIC32MX
  * @ingroup     cpu
- * @brief       main CPU definitions for pic32mx devices.
+ * @brief       CPU definitions for Microchip PIC32MX devices.
  * @{
  *
  * @file
- * @brief       main CPU definitions for pic32mx devices.
+ * @brief       CPU definitions for pic32mx devices.
  *
  * @author      Neil Jones <neil.jones@imgtec.com>
  */

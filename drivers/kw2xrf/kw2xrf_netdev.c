@@ -56,7 +56,7 @@ static int _init(netdev_t *netdev)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
 
-    /* initialise SPI and GPIOs */
+    /* initialize SPI and GPIOs */
     if (kw2xrf_init(dev, &_irq_handler)) {
         LOG_ERROR("[kw2xrf] unable to initialize device\n");
         return -1;
@@ -326,7 +326,7 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     return netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, value, len);
 }
 
-static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t len)
+static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     int res = -ENOTSUP;

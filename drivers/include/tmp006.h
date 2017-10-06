@@ -223,9 +223,9 @@ int tmp006_read(const tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy
 void tmp006_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj);
 
 /**
- * @brief Convenience function to get ambient and object temperatures in [°C]
+ * @brief   Convenience function to get ambient and object temperatures in [°C]
  *
- * @note Temperature scaled by x100 for accuracy and avoid floats
+ * @note    Temperature scaled by x100 for accuracy and avoid floats
  *
  * @param[in]  dev          device descriptor of sensor
  * @param[out] ta           converted ambient temperature

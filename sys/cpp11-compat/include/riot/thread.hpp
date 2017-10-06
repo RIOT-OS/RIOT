@@ -76,7 +76,7 @@ struct thread_data {
  */
 struct thread_data_deleter {
   /**
-   * @brief Called by the deleter of a thread object to manage the lifetime of
+   * @brief Called by the deleter of a thread object to manage the lifetime of
    *        the thread internal management data.
    */
   void operator()(thread_data* ptr) {

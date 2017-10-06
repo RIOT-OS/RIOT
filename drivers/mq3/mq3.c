@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_mq3
+ * @ingroup     drivers_mq3
  * @{
  *
  * @file

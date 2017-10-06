@@ -46,3 +46,4 @@ typedef struct netdev_radio_lora_packet_info {
 #endif
 
 #endif /* SX127X_NETDEV_H */
+/** @} */

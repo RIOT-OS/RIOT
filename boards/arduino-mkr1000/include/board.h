@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Inria
+ * Copyright (C) 2016-2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -24,7 +24,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
-#include "periph_cpu.h"
+#include "board_common.h"
 #include "arduino_pinmap.h"
 
 #ifdef __cplusplus
@@ -32,7 +32,12 @@ extern "C" {
 #endif
 
 /**
- * @name   LED pin definitions and handlers
+ * @brief   The on-board LED is connected to pin 6 on this board
+ */
+#define ARDUINO_LED         (6U)
+
+/**
+ * @brief   LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(PA, 20)
@@ -44,11 +49,6 @@ extern "C" {
 #define LED0_OFF            (LED_PORT.OUTCLR.reg = LED0_MASK)
 #define LED0_TOGGLE         (LED_PORT.OUTTGL.reg = LED0_MASK)
 /** @} */
-
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

@@ -29,7 +29,7 @@ extern "C"
 #endif
 
 /**
- * @brief   Register addresses
+ * @name    Register addresses
  * @{
  */
 #define MMA8X5X_STATUS              0x00 /**< Data or FIFO Status */

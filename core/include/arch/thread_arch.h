@@ -35,7 +35,7 @@
  */
 #ifdef COREIF_NG
 #define thread_stack_init               thread_arch_stack_init
-#define thread_print_stack              thread_arch_print_stack
+#define thread_print_stack              thread_arch_stack_print
 #define cpu_switch_context_exit         thread_arch_start_threading
 #define thread_yield_higher             thread_arch_yield
 #endif

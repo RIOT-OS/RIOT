@@ -8,6 +8,7 @@
 
 /**
  * @ingroup         cpu_samd21
+ * @brief           CPU specific definitions for internal peripheral handling
  * @{
  *
  * @file
@@ -26,6 +27,35 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
+ */
+static const int8_t exti_config[2][32] = {
+#ifdef CPU_MODEL_SAMD21J18A
+    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
+      0,  1,  2,  3,  4,  5,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
+    { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, 14, 15},
+#elif CPU_MODEL_SAMD21G18A
+    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
+      0,  1,  2,  3,  4,  5,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
+    {-1, -1,  2,  3, -1, -1, -1, -1,  8,  9, 10, 11, -1, -1, -1, -1,
+     -1, -1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, -1, -1},
+#elif CPU_MODEL_SAMR21G18A
+    {-1,  1, -1, -1,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
+     -1,  1,  2,  3, -1, -1,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
+    { 0, -1,  2,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1,  8, -1, -1, -1},
+#elif CPU_MODEL_SAMR21E18A
+    {-1, -1, -1, -1, -1, -1,  6,  7, -1,  9, 10, 11, -1, -1, 14, 15,
+     -1,  1,  2,  3, -1, -1, -1, -1, 12, 13, -1, 15,  8, -1, 10, 11},
+    { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      0,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+#else
+    #error Please define a proper CPU_MODEL.
+#endif
+};
 
 /**
  * @brief   Available ports on the SAMD21
@@ -86,18 +116,6 @@ typedef struct {
     Tcc *dev;                   /**< TCC device to use */
     pwm_conf_chan_t chan[3];    /**< channel configuration */
 } pwm_conf_t;
-
-/**
- * @brief   UART device configuration
- */
-typedef struct {
-    SercomUsart *dev;       /**< pointer to the used UART device */
-    gpio_t rx_pin;          /**< pin used for RX */
-    gpio_t tx_pin;          /**< pin used for TX */
-    gpio_mux_t mux;         /**< alternative function for pins */
-    uart_rxpad_t rx_pad;    /**< pad selection for RX line */
-    uart_txpad_t tx_pad;    /**< pad selection for TX line */
-} uart_conf_t;
 
 /**
  * @brief   Return the numeric id of a SERCOM device derived from its address

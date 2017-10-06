@@ -17,7 +17,7 @@ BOARD_WHITELIST := native airfy-beacon arduino-due arduino-duemilanove arduino-m
                    nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo32-l432 openmote-cc2538 \
                    pba-d-01-kw2x pca10005 remote-pa remote-reva remote-revb samd21-xpro \
                    saml21-xpro samr21-xpro sodaq-autonomo spark-core stm32f0discovery \
-                   stm32f3discovery stm32f4discovery telosb udoo waspmote-pro weio \
+                   stm32f3discovery stm32f4discovery telosb udoo waspmote-pro \
                    wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 ifeq ($(BOARD),native)

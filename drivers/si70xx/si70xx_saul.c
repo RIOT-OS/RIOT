@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_si70xx
+ * @ingroup     drivers_si70xx
  * @{
  *
  * @file

@@ -107,7 +107,7 @@ int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
     return res;
 }
 
-int netdev_eth_set(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
+int netdev_eth_set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len)
 {
 #ifndef MODULE_L2FILTER
     (void)dev;

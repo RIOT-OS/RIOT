@@ -27,6 +27,9 @@
 #include "msg.h"
 #include "list.h"
 #include "thread.h"
+#if MODULE_CORE_THREAD_FLAGS
+#include "thread_flags.h"
+#endif
 #include "irq.h"
 #include "cib.h"
 
@@ -47,6 +50,10 @@ static int queue_msg(thread_t *target, const msg_t *m)
     DEBUG("queue_msg(): queuing message\n");
     msg_t *dest = &target->msg_array[n];
     *dest = *m;
+#if MODULE_CORE_THREAD_FLAGS
+    target->flags |= THREAD_FLAG_MSG_WAITING;
+    thread_flags_wake(target);
+#endif
     return 1;
 }
 
@@ -136,6 +143,11 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
         sched_set_status((thread_t*) me, newstatus);
 
         thread_add_to_list(&(target->msg_waiters), me);
+
+#if MODULE_CORE_THREAD_FLAGS
+        target->flags |= THREAD_FLAG_MSG_WAITING;
+        thread_flags_wake(target);
+#endif
 
         irq_restore(state);
         thread_yield_higher();

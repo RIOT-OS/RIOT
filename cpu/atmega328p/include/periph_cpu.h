@@ -38,8 +38,16 @@ extern "C" {
 enum {
     PORT_B = 1,       /**< port B */
     PORT_C = 2,       /**< port C */
-    PORT_D = 3       /**< port D */
+    PORT_D = 3        /**< port D */
 };
+
+/**
+ * @name   Defines for the I2C interface
+ * @{
+ */
+#define I2C_PORT_REG            PORTC
+#define I2C_PIN_MASK            (1 << PORTC4) | (1 << PORTC5)
+/** @} */
 
 #ifdef __cplusplus
 }

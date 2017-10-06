@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the LPD8808 driver
+ * @name    Set default configuration parameters for the LPD8808 driver
  * @{
  */
 #ifndef LPD8808_PARAM_LED_CNT

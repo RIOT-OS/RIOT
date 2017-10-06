@@ -28,6 +28,10 @@ export BINDIR                # This is the folder where the application should b
 export APPDIR                # The base folder containing the application
 export PKGDIRBASE            # The base folder for building packages
 
+export FEATURES_REQUIRED     # List of required features by the application
+export FEATURES_PROVIDED     # List of provided features by the board
+export FEATURES_OPTIONAL     # List of nice to have features
+
 export TARGET_ARCH           # The target platform name, in GCC triple notation, e.g. "arm-none-eabi", "i686-elf", "avr"
 export PREFIX                # The prefix of the toolchain commands, usually "$(TARGET_ARCH)-", e.g. "arm-none-eabi-" or "msp430-".
 export CC                    # The C compiler to use.

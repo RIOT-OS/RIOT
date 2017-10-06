@@ -47,24 +47,19 @@
 /* LPTMR xtimer configuration */
 /* WIP, Use PIT for now */
 #define XTIMER_DEV                  (TIMER_LPTMR_DEV(0))
-#define XTIMER_CHAN                 (0)
 /* LPTMR is 16 bits wide */
 #define XTIMER_WIDTH                (16)
 #define XTIMER_BACKOFF              (4)
 #define XTIMER_ISR_BACKOFF          (4)
 #define XTIMER_OVERHEAD             (3)
 #define XTIMER_HZ                   (32768ul)
-#define XTIMER_SHIFT                (0)
 #else
 /* PIT xtimer configuration */
 #define XTIMER_DEV                  (TIMER_PIT_DEV(0))
 #define XTIMER_CHAN                 (0)
-#define XTIMER_WIDTH                (32)
 #define XTIMER_BACKOFF              (40)
 #define XTIMER_ISR_BACKOFF          (40)
 #define XTIMER_OVERHEAD             (30)
-#define XTIMER_HZ                   (1000000ul)
-#define XTIMER_SHIFT                (0)
 #endif
 /** @} */
 
@@ -128,7 +123,7 @@ void board_init(void);
  */
 #define LIS3DH_INT1                 GPIO_PIN(PORT_C, 18)
 #define LIS3DH_INT2                 GPIO_PIN(PORT_C, 17)
-#define LIS3DH_CS                   GPIO_PIN(PORT_D, 0)
+#define LIS3DH_CS                   SPI_HWCS(0)
 #define LIS3DH_CLK                  SPI_CLK_5MHZ
 #define LIS3DH_SPI                  SPI_DEV(0)
 /** @} */

@@ -46,7 +46,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     gpio(pin)->IE &= ~gpio_pin_mask(pin);
     gpio(pin)->AFSEL &= ~gpio_pin_mask(pin);
     /* configure pull configuration */
-    IOC->OVER[gpio_pp_num(pin)] = mode;
+    IOC_PXX_OVER[gpio_pp_num(pin)] = mode;
 
     /* set pin direction */
     if (mode == IOC_OVERRIDE_OE) {
@@ -55,8 +55,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     else {
         gpio(pin)->DIR &= ~gpio_pin_mask(pin);
     }
-    /* clear pin */
-    gpio(pin)->DATA &= ~gpio_pin_mask(pin);
 
     return 0;
 }
@@ -183,4 +181,20 @@ void isr_gpioc(void)
 void isr_gpiod(void)
 {
     handle_isr(GPIO_D, 3);
+}
+
+/* CC2538 specific add-on GPIO functions */
+
+void gpio_init_af(gpio_t pin, int sel, int over)
+{
+    assert(pin != GPIO_UNDEF);
+
+    if (over >= 0) {
+        IOC_PXX_OVER[gpio_pp_num(pin)] = over;
+    }
+    if(sel >= 0) {
+        IOC_PXX_SEL[gpio_pp_num(pin)] = sel;
+    }
+    /* enable alternative function mode */
+    gpio(pin)->AFSEL |= gpio_pin_mask(pin);
 }

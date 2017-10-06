@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the Si7006/13/20/21 sensor
+ * @name    Set default configuration parameters for the Si7006/13/20/21 sensor
  * @{
  */
 #ifndef SI70XX_PARAM_I2C_DEV

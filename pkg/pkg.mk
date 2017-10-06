@@ -4,7 +4,9 @@
 PKG_DIR?=$(CURDIR)
 PKG_BUILDDIR?=$(PKGDIRBASE)/$(PKG_NAME)
 
-.PHONY: git-download clean
+.PHONY: prepare git-download clean
+
+prepare: git-download
 
 ifneq (,$(wildcard $(PKG_DIR)/patches))
 git-download: $(PKG_BUILDDIR)/.git-patched

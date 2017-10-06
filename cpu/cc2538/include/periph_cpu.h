@@ -127,24 +127,13 @@ static inline uint8_t gpio_pp_num(gpio_t pin)
 }
 
 /**
- * @brief   Helper function to enable gpio hardware control
+ * @brief   Configure an alternate function for the given pin
  *
  * @param[in] pin   gpio pin
+ * @param[in] sel   Setting for IOC select register, (-1) to ignore
+ * @param[in] over  Setting for IOC override register, (-1) to ignore
  */
-static inline void gpio_hw_ctrl(gpio_t pin)
-{
-    gpio(pin)->AFSEL |= gpio_pin_mask(pin);
-}
-
-/**
- * @brief   Helper function to enable gpio software control
- *
- * @param[in] pin   gpio pin
- */
-static inline void gpio_sw_ctrl(gpio_t pin)
-{
-    gpio(pin)->AFSEL &= ~gpio_pin_mask(pin);
-}
+void gpio_init_af(gpio_t pin, int sel, int over);
 
 /**
  * @brief   Define a custom GPIO_UNDEF value
@@ -233,12 +222,14 @@ typedef struct {
 /** @} */
 
 /**
- * @brief   Timer configuration data
+ * @brief   Timer configuration
+ *
+ * General purpose timers (GPT[0-3]) are configured consecutively and in order
+ * (without gaps) starting from GPT0, i.e. if multiple timers are enabled.
  */
 typedef struct {
-    cc2538_gptimer_t *dev;  /**< timer device */
-    uint_fast8_t channels;  /**< number of channels */
-    uint_fast8_t cfg;       /**< timer config word */
+    uint_fast8_t chn;   /**< number of channels */
+    uint_fast8_t cfg;   /**< timer config word */
 } timer_conf_t;
 
 /**
@@ -256,7 +247,7 @@ typedef enum {
     ADC_RES_14BIT =             (0xc00),    /**< not supported by hardware */
     ADC_RES_16BIT =             (0xd00),    /**< not supported by hardware */
 } adc_res_t;
-/** @} */
+/** @} */
 
 /**
  * @brief ADC configuration wrapper

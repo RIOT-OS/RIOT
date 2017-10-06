@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_hih6130
+ * @ingroup     drivers_hih6130
  * @{
  *
  * @file
@@ -52,7 +52,7 @@ enum {
 };
 
 /** @brief Delay between requesting a measurement and data becoming ready */
-#define MEASUREMENT_DELAY   (50*1000)
+#define MEASUREMENT_DELAY   (50LU * US_PER_MS)
 
 /** @brief Trigger a new measurement on the sensor */
 static inline int hih6130_measurement_request(const hih6130_t *dev)

@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     driver_encx24j600
+ * @ingroup     drivers_encx24j600
  * @{
  *
  * @file
@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 /**
- * @name SPI instruction set
+ * @name    SPI instruction set
  * @{
  */
 #define ENC_RCR         0x00  /* read control register */
@@ -66,7 +66,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name 16bit Registers
+ * @name    16bit Registers
  * @{
  */
 #define ENC_ETXST       0x00
@@ -105,7 +105,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name PHY Registers
+ * @name    PHY Registers
  *
  * (access with phy_reg_* functions)
  *
@@ -122,7 +122,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name ESTAT bits
+ * @name    ESTAT bits
  * @{
  */
 #define ENC_PHYLNK  (1<<8)
@@ -130,7 +130,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name ECON1 bits
+ * @name    ECON1 bits
  * @{
  */
 #define ENC_RXEN    (1<<0)
@@ -152,7 +152,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name ECON2 bits
+ * @name    ECON2 bits
  * @{
  */
 #define ENC_ETHRST    (1<<4)
@@ -160,7 +160,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name EIR bits
+ * @name    EIR bits
  * @{
  */
 #define ENC_PCFULIE     (1<<0)
@@ -177,7 +177,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name EIR bits
+ * @name    EIR bits
  * @{
  */
 #define ENC_PCFULIF     (1<<0)
@@ -194,7 +194,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name ERXFCON bits
+ * @name    ERXFCON bits
  */
 #define ENC_MCEN        (1<<1)
 /** @} */

@@ -379,10 +379,10 @@ int pn532_fw_version(pn532_t *dev, uint32_t *fw_ver)
     buff[BUFF_CMD_START] = CMD_FIRMWARE_VERSION;
 
     if (send_rcv(dev, buff, 0, 4) == 4) {
-        *fw_ver = (buff[0] << 24);  /* ic version */
-        *fw_ver += (buff[1] << 16); /* fw ver */
-        *fw_ver += (buff[2] << 8);  /* fw rev */
-        *fw_ver += (buff[3]);       /* feature support */
+        *fw_ver =  ((uint32_t)buff[0] << 24);   /* ic version */
+        *fw_ver += ((uint32_t)buff[1] << 16);   /* fw ver */
+        *fw_ver += ((uint32_t)buff[2] << 8);    /* fw rev */
+        *fw_ver += (buff[3]);                   /* feature support */
         ret = 0;
     }
 

@@ -35,18 +35,21 @@ extern "C" {
  * @brief   Transition time from SLEEP to TRX_OFF in us, refer figure 7-4, p.42.
  *          For different environments refer figure 13-13, p.201
  */
-#define AT86RF2XX_WAKEUP_DELAY          (300U)
+#define AT86RF2XX_WAKEUP_DELAY          (306U)
 
 /**
- * @brief   Minimum reset pulse width, refer p.190
+ * @brief   Minimum reset pulse width, refer p.190. We use 62us so
+ *          that it is at least one tick on platforms with coarse xtimers
  */
-#define AT86RF2XX_RESET_PULSE_WIDTH     (1U)
+#define AT86RF2XX_RESET_PULSE_WIDTH     (62U)
 
 /**
- * @brief   Transition time to TRX_OFF after reset pulse in us, refer
- *          figure 7-8, p. 44.
+ * @brief   The typical transition time to TRX_OFF after reset pulse is 26 us,
+ *          refer to figure 7-8, p. 44. We use 62 us so that it is at least one
+ *          tick on platforms that use a 16384 Hz oscillator or have slow start
+ *          up times due to parasitic capacitance on the oscillator
  */
-#define AT86RF2XX_RESET_DELAY           (26U)
+#define AT86RF2XX_RESET_DELAY           (62U)
 
 /**
  * @brief   Read from a register at address `addr` from device `dev`.

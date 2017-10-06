@@ -65,12 +65,12 @@ extern "C" {
  */
 #ifdef CPU_ATMEGA328P
 #define AVR_CONTEXT_SWAP_INIT do { \
-            DDRC |= (1 << PC5); \
-            PCICR |= (1 << PCIE1); \
-            PCMSK1 |= (1 << PCINT13); \
+            DDRD |= (1 << PD7); \
+            PCICR |= (1 << PCIE2); \
+            PCMSK2 |= (1 << PCINT23); \
 } while (0)
-#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT1_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTC ^= (1 << PC5)
+#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT2_vect
+#define AVR_CONTEXT_SWAP_TRIGGER   PORTD ^= (1 << PD7)
 #endif
 
 #ifdef CPU_ATMEGA2560
@@ -88,7 +88,6 @@ extern "C" {
  * @{
  */
 #define XTIMER_WIDTH                (16)
-#define XTIMER_SHIFT                (2)
 #define XTIMER_HZ                   (250000UL)
 #define XTIMER_BACKOFF              (40)
 /** @} */

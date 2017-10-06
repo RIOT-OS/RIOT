@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_rgbled
+ * @ingroup     drivers_rgbled
  * @{
  *
  * @file

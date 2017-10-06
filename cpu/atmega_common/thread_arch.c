@@ -29,7 +29,7 @@
 
 
 /**
- * @brief AVR_CONTEXT_SWAP_INIT intialize the context swap trigger
+ * @brief AVR_CONTEXT_SWAP_INIT initialize the context swap trigger
  * Called when threading is first started.
  */
 #ifndef AVR_CONTEXT_SWAP_INIT

@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @name LSM6DSL registers
+ * @name    LSM6DSL registers
  * @{
  */
 #define LSM6DSL_REG_FUNC_CFG_ACCESS         (0x01)
@@ -132,7 +132,7 @@ extern "C" {
 #define LSM6DSL_WHO_AM_I                    (0b01101010)
 
 /**
- * @name CTRL_x registers
+ * @name    CTRL_x registers
  * @{
  */
 #define LSM6DSL_CTRL_ODR_SHIFT              (4)
@@ -144,7 +144,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name FIFO_CTRL_x registers
+ * @name    FIFO_CTRL_x registers
  * @{
  */
 #define LSM6DSL_FIFO_CTRL5_CONTINUOUS_MODE  (0x6)

@@ -251,6 +251,10 @@ ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter gnrc_ndp2,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+endif
+
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
 endif
@@ -316,6 +320,7 @@ ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
+  USEMODULE += evtimer
   USEMODULE += ipv6_addr
   USEMODULE += random
 endif
@@ -351,6 +356,10 @@ endif
 ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += gnrc_pktbuf
   USEMODULE += od
+endif
+
+ifneq (,$(filter gnrc_slip,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
 endif
 
 ifneq (,$(filter od,$(USEMODULE)))
@@ -536,7 +545,7 @@ ifneq (,$(filter pthread,$(USEMODULE)))
 endif
 
 ifneq (,$(filter schedstatistics,$(USEMODULE)))
-    USEMODULE += xtimer
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
@@ -573,7 +582,7 @@ ifneq (,$(filter evtimer,$(USEMODULE)))
 endif
 
 ifneq (,$(filter can_linux,$(USEMODULE)))
-    export LINKFLAGS += -lsocketcan
+  export LINKFLAGS += -lsocketcan
 endif
 
 ifneq (,$(filter can,$(USEMODULE)))
@@ -596,6 +605,7 @@ ifneq (,$(filter conn_can,$(USEMODULE)))
 endif
 
 ifneq (,$(filter random,$(USEMODULE)))
+  USEMODULE += prng
   # select default prng
   ifeq (,$(filter prng_%,$(USEMODULE)))
     USEMODULE += prng_tinymt32
@@ -658,5 +668,5 @@ endif
 USEMODULE := $(sort $(USEMODULE))
 USEPKG := $(sort $(USEPKG))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
-    include $(RIOTBASE)/Makefile.dep
+  include $(RIOTBASE)/Makefile.dep
 endif

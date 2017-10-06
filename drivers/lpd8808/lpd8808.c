@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     lpd8808
+ * @ingroup     drivers_lpd8808
  * @{
  *
  * @file

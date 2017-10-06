@@ -181,7 +181,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     /* set pin direction */
     if (mode & MODE_OUT) {
         gpio(pin)->PDDR |=  (1 << pin_num(pin));
-        gpio(pin)->PCOR = (1 << pin_num(pin));
     }
     else {
         gpio(pin)->PDDR &= ~(1 << pin_num(pin));

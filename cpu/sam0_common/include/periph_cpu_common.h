@@ -8,6 +8,7 @@
 
 /**
  * @ingroup         cpu_sam0_common
+ * @brief           Common CPU specific definitions for all SAMx21 based CPUs
  * @{
  *
  * @file
@@ -117,6 +118,29 @@ typedef enum {
 } uart_txpad_t;
 
 /**
+ * @brief   Available SERCOM UART flag selections
+ */
+typedef enum {
+    UART_FLAG_NONE            = 0x0,    /**< No flags set */
+    UART_FLAG_RUN_STANDBY     = 0x1,    /**< run SERCOM in standby mode */
+    UART_FLAG_WAKEUP          = 0x2,    /**< wake from sleep on receive */
+} uart_flag_t;
+
+/**
+ * @brief   UART device configuration
+ */
+typedef struct {
+    SercomUsart *dev;       /**< pointer to the used UART device */
+    gpio_t rx_pin;          /**< pin used for RX */
+    gpio_t tx_pin;          /**< pin used for TX */
+    gpio_mux_t mux;         /**< alternative function for pins */
+    uart_rxpad_t rx_pad;    /**< pad selection for RX line */
+    uart_txpad_t tx_pad;    /**< pad selection for TX line */
+    uart_flag_t flags;      /**< set optional SERCOM flags */
+    uint32_t gclk_src;      /**< GCLK source which supplys SERCOM */
+} uart_conf_t;
+
+/**
  * @brief   Available values for SERCOM SPI MISO pad selection
  */
 typedef enum {
@@ -199,6 +223,60 @@ static inline int sercom_id(void *sercom)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 #elif defined(CPU_FAM_SAML21)
     return ((((uint32_t)sercom) >> 10) & 0x7);
+#endif
+}
+
+/**
+ * @brief   Enable peripheral clock for given SERCOM device
+ *
+ * @param[in] sercom    SERCOM device
+ */
+static inline void sercom_clk_en(void *sercom)
+{
+#if defined(CPU_FAM_SAMD21)
+    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom_id(sercom));
+#elif defined(CPU_FAM_SAML21)
+    if (sercom_id(sercom) < 5) {
+        MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
+    } else {
+        MCLK->APBDMASK.reg |= (MCLK_APBDMASK_SERCOM5);
+    }
+#endif
+}
+
+/**
+ * @brief   Disable peripheral clock for given SERCOM device
+ *
+ * @param[in] sercom    SERCOM device
+ */
+static inline void sercom_clk_dis(void *sercom)
+{
+#if defined(CPU_FAM_SAMD21)
+    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom_id(sercom));
+#elif defined(CPU_FAM_SAML21)
+    if (sercom_id(sercom) < 5) {
+        MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
+    } else {
+        MCLK->APBDMASK.reg &= ~(MCLK_APBDMASK_SERCOM5);
+    }
+#endif
+}
+
+/**
+ * @brief   Configure generator clock for given SERCOM device
+ *
+ * @param[in] sercom    SERCOM device
+ * @param[in] gclk      Generator clock
+ */
+static inline void sercom_set_gen(void *sercom, uint32_t gclk)
+{
+#if defined(CPU_FAM_SAMD21)
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | gclk |
+                         (SERCOM0_GCLK_ID_CORE + sercom_id(sercom)));
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+#elif defined(CPU_FAM_SAML21)
+    GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom_id(sercom)].reg =
+                                                    (GCLK_PCHCTRL_CHEN | gclk);
 #endif
 }
 

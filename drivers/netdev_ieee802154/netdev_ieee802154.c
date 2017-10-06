@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup     driver_netdev_ieee802154
  * @{
  *
  * @file
@@ -139,7 +140,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
     return res;
 }
 
-int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, void *value,
+int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *value,
                            size_t len)
 {
     int res = -ENOTSUP;

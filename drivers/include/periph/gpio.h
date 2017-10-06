@@ -125,7 +125,6 @@ typedef void (*gpio_cb_t)(void *arg);
 
 /**
  * @brief   Default interrupt context for GPIO pins
- * @{
  */
 #ifndef HAVE_GPIO_ISR_CTX_T
 typedef struct {
@@ -133,7 +132,6 @@ typedef struct {
     void *arg;              /**< optional argument */
 } gpio_isr_ctx_t;
 #endif
-/** @} */
 
 /**
  * @brief   Initialize the given pin as general purpose input or output

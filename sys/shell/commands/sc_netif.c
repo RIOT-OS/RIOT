@@ -175,7 +175,7 @@ static void _hl_usage(char *cmd_name)
 
 static void _flag_usage(char *cmd_name)
 {
-    printf("usage: %s <if_id> [-]{promisc|autoack|ack_req|csma|autocca|cca_threshold|preload|iphc|rtr_adv}\n", cmd_name);
+    printf("usage: %s <if_id> [-]{promisc|autoack|ack_req|csma|autocca|cca_threshold|preload|mac_no_sleep|iphc|rtr_adv}\n", cmd_name);
 }
 
 static void _add_usage(char *cmd_name)
@@ -264,6 +264,9 @@ static void _print_netopt_state(netopt_state_t state)
         case NETOPT_STATE_SLEEP:
             printf("SLEEP");
             break;
+        case NETOPT_STATE_STANDBY:
+            printf("STANDBY");
+            break;
         case NETOPT_STATE_IDLE:
             printf("IDLE");
             break;
@@ -277,6 +280,7 @@ static void _print_netopt_state(netopt_state_t state)
             printf("RESET");
             break;
         default:
+            printf("%08x", (unsigned int)state);
             /* nothing to do then */
             break;
     }
@@ -422,6 +426,13 @@ static void _netif_list(kernel_pid_t dev)
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("AUTOCCA  ");
+        linebreak = true;
+    }
+
+    res = gnrc_netapi_get(dev, NETOPT_MAC_NO_SLEEP, 0, &enable, sizeof(enable));
+
+    if ((res >= 0) && (enable == NETOPT_ENABLE)) {
+        printf("MAC_NO_SLEEP  ");
         linebreak = true;
     }
 
@@ -911,6 +922,9 @@ static int _netif_flag(char *cmd, kernel_pid_t dev, char *flag)
     }
     else if (strcmp(flag, "autocca") == 0) {
         return _netif_set_flag(dev, NETOPT_AUTOCCA, set);
+    }
+    else if (strcmp(flag, "mac_no_sleep") == 0) {
+        return _netif_set_flag(dev, NETOPT_MAC_NO_SLEEP, set);
     }
     else if (strcmp(flag, "iphc") == 0) {
 #if defined(MODULE_GNRC_SIXLOWPAN_NETIF) && defined(MODULE_GNRC_SIXLOWPAN_IPHC)

@@ -22,6 +22,7 @@
 #include "cpu.h"
 #include "board.h"
 #include "periph/uart.h"
+#include "periph/gpio.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -50,25 +51,28 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* enable clock */
     uart_poweron(uart);
 
-    /* configure pins
-       TODO: optimize once GPIO refactoring is merged */
-    uart_config[uart].rx_port->PIO_PDR = (1 << uart_config[uart].rx_pin);
-    uart_config[uart].rx_port->PIO_ABSR &= ~(1 << uart_config[uart].rx_pin);
-    uart_config[uart].tx_port->PIO_ABSR |=  (uart_config[uart].mux <<
-                                             uart_config[uart].rx_pin);
-    uart_config[uart].tx_port->PIO_PDR = (1 << uart_config[uart].tx_pin);
-    uart_config[uart].tx_port->PIO_ABSR &= ~(1 << uart_config[uart].tx_pin);
-    uart_config[uart].tx_port->PIO_ABSR |=  (uart_config[uart].mux <<
-                                             uart_config[uart].tx_pin);
+    /* reset configuration */
+    dev->UART_CR = 0;
+    dev->UART_IDR = 0x0000ffff;
+
+    /* configure pins */
+    gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
+    if (rx_cb) {
+        gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
+    }
 
     /* configure baud rate and set mode to 8N1 */
     dev->UART_BRGR = (CLOCK_CORECLOCK / (16 * baudrate));
     dev->UART_MR = UART_MR_PAR_NO | US_MR_CHRL_8_BIT;
-    dev->UART_CR = UART_CR_RXEN | UART_CR_TXEN | UART_CR_RSTSTA;
 
-    /* enable RX interrupt */
-    NVIC_EnableIRQ(uart_config[uart].irqn);
-    dev->UART_IER = UART_IER_RXRDY;
+    if (rx_cb) {
+        dev->UART_CR = UART_CR_RXEN | UART_CR_TXEN | UART_CR_RSTSTA;
+        NVIC_EnableIRQ(uart_config[uart].irqn);
+        dev->UART_IER = UART_IER_RXRDY;
+    }
+    else {
+        dev->UART_CR = UART_CR_TXEN | UART_CR_RSTSTA;
+    }
 
     return UART_OK;
 }

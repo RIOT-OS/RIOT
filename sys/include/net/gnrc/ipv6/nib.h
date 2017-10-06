@@ -22,6 +22,8 @@
 #ifndef NET_GNRC_IPV6_NIB_H
 #define NET_GNRC_IPV6_NIB_H
 
+#include "net/gnrc/ipv6/nib/nc.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

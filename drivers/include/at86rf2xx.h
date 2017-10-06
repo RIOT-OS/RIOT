@@ -49,7 +49,7 @@ extern "C" {
 #define AT86RF2XX_MAX_PKT_LENGTH        (IEEE802154_FRAME_LEN_MAX)
 
 /**
- * @brief   Channel configuration
+ * @name    Channel configuration
  * @{
  */
 #ifdef MODULE_AT86RF212B
@@ -92,22 +92,26 @@ extern "C" {
 #endif
 
 /**
- * @brief   Flags for device internal states (see datasheet)
+ * @name    Flags for device internal states (see datasheet)
  * @{
  */
+#define AT86RF2XX_STATE_P_ON           (0x00)     /**< initial power on */
+#define AT86RF2XX_STATE_BUSY_RX        (0x01)     /**< busy receiving data (basic mode) */
+#define AT86RF2XX_STATE_BUSY_TX        (0x02)     /**< busy transmitting data (basic mode) */
 #define AT86RF2XX_STATE_FORCE_TRX_OFF  (0x03)     /**< force transition to idle */
+#define AT86RF2XX_STATE_RX_ON          (0x06)     /**< listen mode (basic mode) */
 #define AT86RF2XX_STATE_TRX_OFF        (0x08)     /**< idle */
 #define AT86RF2XX_STATE_PLL_ON         (0x09)     /**< ready to transmit */
 #define AT86RF2XX_STATE_SLEEP          (0x0f)     /**< sleep mode */
-#define AT86RF2XX_STATE_BUSY_RX_AACK   (0x11)     /**< busy receiving data */
-#define AT86RF2XX_STATE_BUSY_TX_ARET   (0x12)     /**< busy transmitting data */
+#define AT86RF2XX_STATE_BUSY_RX_AACK   (0x11)     /**< busy receiving data (extended mode) */
+#define AT86RF2XX_STATE_BUSY_TX_ARET   (0x12)     /**< busy transmitting data (extended mode) */
 #define AT86RF2XX_STATE_RX_AACK_ON     (0x16)     /**< wait for incoming data */
 #define AT86RF2XX_STATE_TX_ARET_ON     (0x19)     /**< ready for sending data */
 #define AT86RF2XX_STATE_IN_PROGRESS    (0x1f)     /**< ongoing state conversion */
 /** @} */
 
 /**
- * @brief   Internal device option flags
+ * @name    Internal device option flags
  *
  * `0x00ff` is reserved for general IEEE 802.15.4 flags
  * (see @ref netdev_ieee802154_t)
@@ -133,7 +137,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief struct holding all params needed for device initialization
+ * @brief   struct holding all params needed for device initialization
  */
 typedef struct at86rf2xx_params {
     spi_t spi;              /**< SPI bus the device is connected to */
@@ -151,10 +155,7 @@ typedef struct at86rf2xx_params {
  */
 typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
-    /**
-     * @brief   device specific fields
-     * @{
-     */
+    /* device specific fields */
     at86rf2xx_params_t params;              /**< parameters for initialization */
     uint8_t state;                          /**< current state of the radio */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
@@ -166,7 +167,6 @@ typedef struct {
     uint8_t pending_tx;                 /**< keep track of pending TX calls
                                              this is required to know when to
                                              return to @ref at86rf2xx_t::idle_state */
-    /** @} */
 } at86rf2xx_t;
 
 /**
@@ -372,6 +372,15 @@ int8_t at86rf2xx_get_cca_threshold(at86rf2xx_t *dev);
 void at86rf2xx_set_cca_threshold(at86rf2xx_t *dev, int8_t value);
 
 /**
+ * @brief   Get the latest ED level measurement
+ *
+ * @param[in] dev           device to read value from
+ *
+ * @return                  the last ED level
+ */
+int8_t at86rf2xx_get_ed_level(at86rf2xx_t *dev);
+
+/**
  * @brief   Enable or disable driver specific options
  *
  * @param[in] dev           device to set/clear option flag for
@@ -389,17 +398,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state);
  * @return                  the previous state before the new state was set
  */
 uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state);
-
-/**
- * @brief   Reset the internal state machine to TRX_OFF mode.
- *
- * This will force a transition to TRX_OFF regardless of whether the transceiver
- * is currently busy sending or receiving. This function is used to get back to
- * a known state during driver initialization.
- *
- * @param[in] dev           device to operate on
- */
-void at86rf2xx_reset_state_machine(at86rf2xx_t *dev);
 
 /**
  * @brief   Convenience function for simply sending data
@@ -444,6 +442,18 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data, size_t len,
  * @param[in] dev           device to trigger
  */
 void at86rf2xx_tx_exec(at86rf2xx_t *dev);
+
+/**
+ * @brief   Perform one manual channel clear assessment (CCA)
+ *
+ * The CCA mode and threshold level depends on the current transceiver settings.
+ *
+ * @param[in]  dev          device to use
+ *
+ * @return                  true if channel is determined clear
+ * @return                  false if channel is determined busy
+ */
+bool at86rf2xx_cca(at86rf2xx_t *dev);
 
 #ifdef __cplusplus
 }

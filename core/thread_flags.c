@@ -112,8 +112,9 @@ inline int __attribute__((always_inline)) thread_flags_wake(thread_t *thread)
     }
 
     if (wakeup) {
-        DEBUG("_thread_flags_wake(): wakeing up pid %"PRIkernel_pid"\n", thread->pid);
-        sched_set_status(thread, STATUS_RUNNING);
+        DEBUG("_thread_flags_wake(): waking up pid %"PRIkernel_pid"\n", thread->pid);
+        sched_set_status(thread, STATUS_PENDING);
+        sched_context_switch_request = 1;
     }
 
     return wakeup;

@@ -101,8 +101,12 @@ extern "C" {
  * @{
  */
 #define SPI_NUMOF           1           /* set to 0 to disable SPI */
-#define MEGA_PRR            PRR0        /* Power Reduction Register */
 /** @} */
+
+/**
+ * @brief    I2C configuration
+ */
+#define I2C_NUMOF           1
 
 #ifdef __cplusplus
 }

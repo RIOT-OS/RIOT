@@ -1,4 +1,4 @@
 ifneq (,$(filter libcoap,$(USEPKG)))
-    USEMODULE += posix_sockets
-    USEMODULE += gnrc_sock_udp
+  USEMODULE += posix_sockets
+  USEMODULE += gnrc_sock_udp
 endif

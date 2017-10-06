@@ -2,5 +2,5 @@ INCLUDES += -I$(RIOTPKG)/spiffs/include
 INCLUDES += -I$(PKGDIRBASE)/spiffs/riotbuild/
 
 ifneq (,$(filter spiffs_fs,$(USEMODULE)))
-    DIRS += $(RIOTBASE)/pkg/spiffs/fs
+  DIRS += $(RIOTBASE)/pkg/spiffs/fs
 endif

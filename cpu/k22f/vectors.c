@@ -20,29 +20,8 @@
 
 #include "vectors_kinetis.h"
 
-/* interrupt vector table */
-ISR_VECTORS const isr_func_t interrupt_vector[] = {
-    /* Stack pointer */
-    (isr_func_t)(&_estack), /* pointer to the top of the empty stack */
-    /* Cortex-M4 handlers */
-    reset_handler_default,  /* entry point of the program */
-    nmi_default,            /* non maskable interrupt handler */
-    hard_fault_default,     /* hard fault exception */
-    mem_manage_default,     /* memory manage exception */
-    bus_fault_default,      /* bus fault exception */
-    usage_fault_default,    /* usage fault exception */
-    dummy_handler,          /* Reserved */
-    dummy_handler,          /* Reserved */
-    dummy_handler,          /* Reserved */
-    dummy_handler,          /* Reserved */
-    isr_svc,                /* system call interrupt, in RIOT used for
-                             * switching into thread context on boot */
-    debug_mon_default,      /* debug monitor exception */
-    dummy_handler,          /* Reserved */
-    isr_pendsv,             /* pendSV interrupt, in RIOT the actual
-                             * context switching is happening here */
-    isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* K22F specific peripheral handlers */
+/* CPU specific interrupt vector table */
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_dma0,              /* DMA channel 0 transfer complete */
     isr_dma1,              /* DMA channel 1 transfer complete */
     isr_dma2,              /* DMA channel 2 transfer complete */

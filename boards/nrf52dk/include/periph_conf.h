@@ -33,7 +33,6 @@ extern "C" {
  *
  * @{
  */
-#define CLOCK_CORECLOCK     (64000000U)     /* fixed for all nRF52832 */
 #define CLOCK_HFCLK         (32U)           /* set to  0: internal RC oscillator
                                              *        32: 32MHz crystal */
 #define CLOCK_LFCLK         (1)             /* set to  0: internal RC oscillator

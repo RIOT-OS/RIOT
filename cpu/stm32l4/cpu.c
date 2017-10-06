@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include "cpu.h"
 #include "irq.h"
+#include "stmclk.h"
 #include "periph_conf.h"
 #include "periph/init.h"
 
@@ -125,22 +126,11 @@ static void cpu_clock_init(void)
 
     /* configure the low speed clock domain (LSE vs LSI) */
 #if CLOCK_LSE
-    /* allow write access to backup domain */
-    periph_clk_en(APB1, RCC_APB1ENR1_PWREN);
-    PWR->CR1 |= PWR_CR1_DBP;
-    /* enable LSE */
-    RCC->BDCR = RCC_BDCR_LSEON;
-    while (!(RCC->BDCR & RCC_BDCR_LSERDY)) {}
-    /* disable write access to back domain when done */
-    PWR->CR1 &= ~(PWR_CR1_DBP);
-    periph_clk_dis(APB1, RCC_APB1ENR1_PWREN);
-
+    /* we enable the LSE clock if available for calibrating the MSI clock */
+    stmclk_enable_lfclk();
     /* now we can enable the MSI PLL mode */
     RCC->CR |= RCC_CR_MSIPLLEN;
     while (!(RCC->CR & RCC_CR_MSIRDY)) {}
-#else
-    RCC->CSR = RCC_CSR_LSION;
-    while (!(RCC->CSR & RCC_CSR_LSIRDY)) {}
 #endif
 
     /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
