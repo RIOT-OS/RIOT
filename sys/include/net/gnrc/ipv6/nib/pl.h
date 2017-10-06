@@ -114,6 +114,8 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
+ * @note    The list may change during iteration.
+ *
  * @return  true, if iteration can be continued.
  * @return  false, if @p ple is the last prefix list ple in the NIB.
  */
