@@ -18,8 +18,6 @@ flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
 # Reset the default goal.
 .DEFAULT_GOAL :=
 
-export TUI = 1
-export FFLAGS = flash-elf
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
 # wdog-disable.bin is a precompiled binary which will disable the watchdog and

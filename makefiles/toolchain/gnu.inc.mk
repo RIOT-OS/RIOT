@@ -16,4 +16,4 @@ $(warning objcopy not found. Hex file will not be created.)
 export OBJCOPY    = true
 endif
 export OBJDUMP    = $(PREFIX)objdump
-export DBG        = $(GDBPREFIX)gdb
+export GDB        = $(GDBPREFIX)gdb

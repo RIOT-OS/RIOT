@@ -25,7 +25,7 @@ export OBJCOPY     = true
 endif
 export OBJDUMP     = $(LLVMPREFIX)objdump
 export SIZE        = $(LLVMPREFIX)size
-export DBG         = $(GDBPREFIX)gdb
+export GDB         = $(GDBPREFIX)gdb
 # LLVM lacks a binutils strip tool as well...
 #export STRIP      = $(LLVMPREFIX)strip
 
