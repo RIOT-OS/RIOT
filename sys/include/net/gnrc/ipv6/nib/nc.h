@@ -288,8 +288,7 @@ void gnrc_ipv6_nib_nc_mark_reachable(const ipv6_addr_t *ipv6);
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * @note    The list may change during iteration, but no duplicate of already
- *          traversed entries must be returned.
+ * @note    The list may change during iteration.
  *
  * @return  true, if iteration can be continued.
  * @return  false, if @p nce is the last neighbor cache entry in the NIB.
