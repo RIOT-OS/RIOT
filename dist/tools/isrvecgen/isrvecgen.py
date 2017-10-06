@@ -106,7 +106,7 @@ def depstr(cpus, prefix):
             res += " || \\\n   "
         elif i & 0x1:
             res += " ||"
-        res += ' defined({})'.format(cpu)
+        res += ' defined(CPU_MODEL_{})'.format(cpu.upper())
         i += 1
 
     return res + "\n"
@@ -138,6 +138,19 @@ def pull_common_vectors(specific):
 
     return res
 
+def generate_weak_defaults(common, specific):
+    funcs = set()
+    for num in common:
+        funcs.add(common[num]["name"])
+    for m in specific:
+        for i in m["vec"]:
+            funcs.add(m["vec"][i]["name"])
+
+    weaks = ""
+    for f in sorted(funcs):
+        weaks += 'WEAK_DEFAULT void {}(void);\n'.format(f)
+    return weaks
+
 def fmt_table_entry(num, name, comment):
     return '    [{:>2}] = {:<26}{}\n'.format(num, name + ",", comment)
 
@@ -146,7 +159,7 @@ def generate_table(common, specific):
     table += "ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {\n"
     table += "    /* shared vectors for all family members */\n"
 
-    for num in common:
+    for num in sorted(common):
         vec = common[num]
         table += fmt_table_entry(num, vec["name"], vec["comment"])
         last_num = num
@@ -154,17 +167,22 @@ def generate_table(common, specific):
     if len(specific) > 1:
         table += "\n"
 
-    for i, cpulist in enumerate(specific):
-        prefix = "#if" if i == 0 else "#elif"
-        table += depstr(cpulist["cpus"], prefix)
-        for num in cpulist["vec"]:
-            vec = cpulist["vec"][num]
-            table += fmt_table_entry(num, vec["name"], vec["comment"])
-            table += ''
+    started = False
+    for cpulist in specific:
+        prefix = "#if" if not started else "#elif"
+
+        # print("length is", len(cpulist["vec"]))
+        if len(cpulist["vec"]) > 1:
+            started = True
+            table += depstr(cpulist["cpus"], prefix)
+            for num in cpulist["vec"]:
+                vec = cpulist["vec"][num]
+                table += fmt_table_entry(num, vec["name"], vec["comment"])
+                table += ''
 
     if len(specific) > 1:
         table += "#endif\n"
-    table += "};\n"
+    table += "};"
     return table
 
 
@@ -181,7 +199,7 @@ if __name__ == "__main__":
     parse_cpuconf(args.cpu_conf)
 
     # parse each header file
-    specific = list();
+    specific = list()
 
     for h in headermap.keys():
         specific.append(parse_header(h, headermap[h]))
@@ -194,6 +212,10 @@ if __name__ == "__main__":
 
     # apply custom aliases
     apply_alias(common, specific)
+
+    # dump weak default definitions
+    weaks = generate_weak_defaults(common, specific)
+    print(weaks)
 
     # dump vector table
     table = generate_table(common, specific)
