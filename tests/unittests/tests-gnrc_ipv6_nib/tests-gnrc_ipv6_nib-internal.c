@@ -1647,13 +1647,16 @@ static void test_nib_pl_add__success(void)
     _nib_offl_entry_t *dst;
     static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
 
-    TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, &pfx, GLOBAL_PREFIX_LEN)));
+    TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, &pfx, GLOBAL_PREFIX_LEN,
+                                            UINT32_MAX, UINT32_MAX)));
     TEST_ASSERT(dst->mode & _PL);
     TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, dst->pfx_len);
     TEST_ASSERT(GLOBAL_PREFIX_LEN <= ipv6_addr_match_prefix(&pfx, &dst->pfx));
     TEST_ASSERT_NOT_NULL(dst->next_hop);
     TEST_ASSERT_EQUAL_INT(_DST, dst->next_hop->mode);
     TEST_ASSERT_EQUAL_INT(IFACE, _nib_onl_get_if(dst->next_hop));
+    TEST_ASSERT_EQUAL_INT(UINT32_MAX, dst->valid_until);
+    TEST_ASSERT_EQUAL_INT(UINT32_MAX, dst->pref_until);
 }
 
 /*
@@ -1666,7 +1669,8 @@ static void test_nib_pl_remove(void)
     _nib_offl_entry_t *dst;
     static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
 
-    TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, &pfx, GLOBAL_PREFIX_LEN)));
+    TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, &pfx, GLOBAL_PREFIX_LEN,
+                                            UINT32_MAX, UINT32_MAX)));
     _nib_pl_remove(dst);
     TEST_ASSERT_NULL(_nib_offl_iter(NULL));
 }

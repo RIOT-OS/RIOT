@@ -165,8 +165,16 @@ typedef struct {
     ipv6_addr_t pfx;            /**< prefix to the destination */
     unsigned pfx_len;           /**< prefix-length in bits of
                                  *   _nib_onl_entry_t::pfx */
+    /**
+     * @brief   Event for @ref GNRC_IPV6_NIB_PFX_TIMEOUT
+     */
+    evtimer_msg_event_t pfx_timeout;
     uint8_t mode;               /**< [mode](@ref net_gnrc_ipv6_nib_mode) of the
                                  *   off-link entry */
+    uint32_t valid_until;       /**< timestamp (in ms) until which the prefix
+                                     valid (UINT32_MAX means forever) */
+    uint32_t pref_until;        /**< timestamp (in ms) until which the prefix
+                                     preferred (UINT32_MAX means forever) */
 } _nib_offl_entry_t;
 
 /**
@@ -565,6 +573,7 @@ static inline void _nib_dc_remove(_nib_offl_entry_t *nib_offl)
  *
  * @pre     `(next_hop != NULL)`
  * @pre     `(pfx != NULL) && (pfx != "::") && (pfx_len != 0) && (pfx_len <= 128)`
+ * @pre     `(pref_ltime <= valid_ltime)`
  *
  * @param[in] iface     The interface to the prefix is added to.
  * @param[in] pfx       The IPv6 prefix or address of the destination.
@@ -576,12 +585,11 @@ static inline void _nib_dc_remove(_nib_offl_entry_t *nib_offl)
  *          @p pfx.
  * @return  NULL, if no space is left.
  */
-static inline _nib_offl_entry_t *_nib_pl_add(unsigned iface,
-                                             const ipv6_addr_t *pfx,
-                                             unsigned pfx_len)
-{
-    return _nib_offl_add(NULL, iface, pfx, pfx_len, _PL);
-}
+_nib_offl_entry_t *_nib_pl_add(unsigned iface,
+                               const ipv6_addr_t *pfx,
+                               unsigned pfx_len,
+                               uint32_t valid_ltime,
+                               uint32_t pref_ltime);
 
 /**
  * @brief   Removes a prefix list entry
@@ -592,6 +600,7 @@ static inline _nib_offl_entry_t *_nib_pl_add(unsigned iface,
  */
 static inline void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
 {
+    evtimer_del(&_nib_evtimer, &nib_offl->pfx_timeout.event);
     _nib_offl_remove(nib_offl, _PL);
 }
 

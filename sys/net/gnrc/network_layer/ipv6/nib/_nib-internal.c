@@ -483,6 +483,41 @@ _nib_offl_entry_t *_nib_offl_iter(const _nib_offl_entry_t *last)
     return NULL;
 }
 
+_nib_offl_entry_t *_nib_pl_add(unsigned iface,
+                               const ipv6_addr_t *pfx,
+                               unsigned pfx_len,
+                               uint32_t valid_ltime,
+                               uint32_t pref_ltime)
+{
+    _nib_offl_entry_t *dst = _nib_offl_add(NULL, iface, pfx, pfx_len, _PL);
+
+    if (dst == NULL) {
+        return NULL;
+    }
+    assert(valid_ltime >= pref_ltime);
+    if ((valid_ltime != UINT32_MAX) || (pref_ltime != UINT32_MAX)) {
+        uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+        if (pref_ltime != UINT32_MAX) {
+            _evtimer_add(dst, GNRC_IPV6_NIB_PFX_TIMEOUT, &dst->pfx_timeout,
+                         pref_ltime);
+            if (((pref_ltime + now) == UINT32_MAX) && (now != 0)) {
+                pref_ltime++;
+            }
+            pref_ltime += now;
+        }
+        if (valid_ltime != UINT32_MAX) {
+            /* prevent valid_ltime from becoming UINT32_MAX */
+            if ((valid_ltime + now) == UINT32_MAX) {
+                valid_ltime++;
+            }
+            valid_ltime += now;
+        }
+    }
+    dst->valid_until = valid_ltime;
+    dst->pref_until = pref_ltime;
+    return dst;
+}
+
 _nib_iface_t *_nib_iface_get(unsigned iface)
 {
     _nib_iface_t *ni = NULL;
