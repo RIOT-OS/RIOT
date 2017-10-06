@@ -22,6 +22,7 @@
 #ifndef NET_GNRC_IPV6_NIB_H
 #define NET_GNRC_IPV6_NIB_H
 
+#include "net/gnrc/ipv6/nib/abr.h"
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib/pl.h"
 
