@@ -31,6 +31,7 @@
 
 #include "net/gnrc/netdev.h"
 #include "net/netdev.h"
+#include "net/lora.h"
 
 #include "board.h"
 #include "periph/rtc.h"
@@ -67,17 +68,17 @@ int lora_setup_cmd(int argc, char **argv) {
     switch (bw) {
         case 125:
             puts("setup: setting 125KHz bandwidth");
-            lora_bw = SX127X_BW_125_KHZ;
+            lora_bw = LORA_BW_125_KHZ;
             break;
 
         case 250:
             puts("setup: setting 250KHz bandwidth");
-            lora_bw = SX127X_BW_250_KHZ;
+            lora_bw = LORA_BW_250_KHZ;
             break;
 
         case 500:
             puts("setup: setting 500KHz bandwidth");
-            lora_bw = SX127X_BW_500_KHZ;
+            lora_bw = LORA_BW_500_KHZ;
             break;
 
         default:

@@ -77,23 +77,8 @@ extern "C" {
 #define SX127X_CHANNEL_DEFAULT           (868300000UL)          /**< Default channel frequency, 868.3MHz (Europe) */
 #define SX127X_HF_CHANNEL_DEFAULT        (868000000UL)          /**< Use to calibrate RX chain for LF and HF bands */
 #define SX127X_RF_MID_BAND_THRESH        (525000000UL)          /**< Mid-band threshold */
-#define SX127X_FREQUENCY_RESOLUTION      (61.03515625)          /**< Frequency resolution in Hz */
 #define SX127X_XTAL_FREQ                 (32000000UL)           /**< Internal oscillator frequency, 32MHz */
 #define SX127X_RADIO_WAKEUP_TIME         (1000U)                /**< In microseconds [us] */
-
-#define SX127X_PREAMBLE_LENGTH           (8U)                   /**< Preamble length, same for Tx and Rx */
-#define SX127X_SYMBOL_TIMEOUT            (10U)                  /**< Symbols timeout (s) */
-
-#define SX127X_BW_DEFAULT                (SX127X_BW_125_KHZ)    /**< Set default bandwidth to 125kHz */
-#define SX127X_SF_DEFAULT                (SX127X_SF12)          /**< Set default spreading factor to 12 */
-#define SX127X_CR_DEFAULT                (SX127X_CR_4_8)        /**< Set default coding rate to 8 */
-#define SX127X_FIX_LENGTH_PAYLOAD_ON     (false)                /**< Set fixed payload length on */
-#define SX127X_IQ_INVERSION              (false)                /**< Set inverted IQ on */
-#define SX127X_FREQUENCY_HOPPING         (false)                /**< Frequency hopping on */
-#define SX127X_FREQUENCY_HOPPING_PERIOD  (0U)                   /**< Frequency hopping period */
-#define SX127X_FIXED_HEADER_LEN_MODE     (false)                /**< Set fixed header length mode (implicit header) */
-#define SX127X_PAYLOAD_CRC_ON            (true)                 /**< Enable payload CRC, optional */
-#define SX127X_PAYLOAD_LENGTH            (0U)                   /**< Set payload length, unused with implicit header */
 
 #define SX127X_TX_TIMEOUT_DEFAULT        (1000U * 1000U * 30UL) /**< TX timeout, 30s */
 #define SX127X_RX_SINGLE                 (false)                /**< Single byte receive mode => continuous by default */
@@ -134,38 +119,6 @@ enum {
 enum {
     SX127X_MODEM_FSK = 0,              /**< FSK modem driver */
     SX127X_MODEM_LORA,                 /**< LoRa modem driver */
-};
-
-/**
- * @brief   LoRa signal bandwidth.
- */
-enum {
-    SX127X_BW_125_KHZ = 0,             /**< 125 kHz bandwidth */
-    SX127X_BW_250_KHZ,                 /**< 250 kHz bandwidth */
-    SX127X_BW_500_KHZ                  /**< 500 kHz bandwidth */
-};
-
-/**
- * @brief   LoRa spreading factor rate
- */
-enum {
-    SX127X_SF6 = 6,                    /**< spreading factor 6 */
-    SX127X_SF7,                        /**< spreading factor 7 */
-    SX127X_SF8,                        /**< spreading factor 8 */
-    SX127X_SF9,                        /**< spreading factor 9 */
-    SX127X_SF10,                       /**< spreading factor 10 */
-    SX127X_SF11,                       /**< spreading factor 11 */
-    SX127X_SF12                        /**< spreading factor 12 */
-};
-
-/**
- * @brief   LoRa error coding rate.
- */
-enum {
-    SX127X_CR_4_5 = 1,                 /**< coding rate 4/5 */
-    SX127X_CR_4_6,                     /**< coding rate 4/6 */
-    SX127X_CR_4_7,                     /**< coding rate 4/7 */
-    SX127X_CR_4_8                      /**< coding rate 4/8 */
 };
 
 /**
@@ -321,34 +274,6 @@ void sx127x_init_radio_settings(sx127x_t *dev);
  * @return random 32 bits value
  */
 uint32_t sx127x_random(sx127x_t *dev);
-
-/**
- * @brief   sx127x DIO0 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio0(void *arg);
-
-/**
- * @brief   sx127x DIO1 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio1(void *arg);
-
-/**
- * @brief   sx127x DIO2 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio2(void *arg);
-
-/**
- * @brief   sx127x DIO3 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio3(void *arg);
 
 /**
  * @brief   Start a channel activity detection.
