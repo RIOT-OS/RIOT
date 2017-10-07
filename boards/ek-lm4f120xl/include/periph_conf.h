@@ -52,7 +52,6 @@ extern "C" {
  * We use timer_a as TIMER_0
  */
 #define TIMER_0_CHANNELS    1
-#define TIMER_0_MAX_VALUE   (0xffffffff)
 #define TIMER_0_ISR         isr_wtimer0a
 #define TIMER_0_IRQ_CHAN    Timer0A_IRQn
 
@@ -63,7 +62,6 @@ extern "C" {
  */
 
 #define TIMER_1_CHANNELS    1
-#define TIMER_1_MAX_VALUE   (0xffffffff)
 #define TIMER_1_ISR         isr_wtimer1a
 #define TIMER_1_IRQ_CHAN    Timer1A_IRQn
 /** @} */
