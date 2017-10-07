@@ -32,6 +32,7 @@
 /* guard file in case no timers are defined */
 #if TIMER_NUMOF
 
+#define TIMER_MAX_VALUE   (0xffffffff)
 /**
  * @brief Struct holding the configuration data
  * @{
@@ -91,20 +92,18 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     case TIMER_0:
         sysctl_timer = SYSCTL_PERIPH_WTIMER0;
         timer_base = WTIMER0_BASE;
-        timer_max_val = TIMER_0_MAX_VALUE;
         break;
 #endif
 #if TIMER_1_EN
     case TIMER_1:
         sysctl_timer = SYSCTL_PERIPH_WTIMER1;
         timer_base = WTIMER1_BASE;
-        timer_max_val = TIMER_1_MAX_VALUE;
         break;
 #endif
     default:
         return -1; /* unreachable */
     }
-
+    timer_max_val = TIMER_MAX_VALUE;
 
     ROM_SysCtlPeripheralEnable(sysctl_timer);
 
