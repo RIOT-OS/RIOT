@@ -36,6 +36,13 @@ extern "C" {
 #define HW_TIMER            TIMER_DEV(0)
 
 /**
+ * @name    xtimer configuration
+ * @{
+ */
+#define XTIMER_WIDTH		(16)
+/** @} */
+
+/**
  * @name    Connection to the on-board temperature/humidity sensor (Si7021)
  * @{
  */
