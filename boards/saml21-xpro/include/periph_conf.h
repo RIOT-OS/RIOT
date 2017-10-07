@@ -44,7 +44,6 @@ extern "C" {
 /* Timer 0 configuration */
 #define TIMER_0_DEV        TC0->COUNT32
 #define TIMER_0_CHANNELS   1
-#define TIMER_0_MAX_VALUE  (0xffffffff)
 #define TIMER_0_ISR        isr_tc0
 /** @} */
 
