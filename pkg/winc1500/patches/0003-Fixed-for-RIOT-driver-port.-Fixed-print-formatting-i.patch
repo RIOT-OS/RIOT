@@ -1,0 +1,365 @@
+From 993e6e2f7b8ca7d9f12ca91d1aee4ba6509e6c46 Mon Sep 17 00:00:00 2001
+From: Bumsik Kim <kbumsik@gmail.com>
+Date: Mon, 2 Oct 2017 07:56:55 -0400
+Subject: [PATCH 3/3] Fixed for RIOT driver  port. Fixed print formatting issue
+
+---
+ winc1500/common/include/nm_debug.h | 12 +++++++-----
+ winc1500/driver/source/m2m_hif.c   | 32 ++++++++++++++++++++------------
+ winc1500/driver/source/m2m_hif.h   |  4 ++++
+ winc1500/driver/source/m2m_wifi.c  | 20 ++++++++++++--------
+ winc1500/driver/source/nmdrv.c     | 12 ++++++++----
+ winc1500/socket/source/socket.c    | 22 +++++++++++++---------
+ 6 files changed, 64 insertions(+), 38 deletions(-)
+
+diff --git a/winc1500/common/include/nm_debug.h b/winc1500/common/include/nm_debug.h
+index a710f6c..6268ad4 100644
+--- a/winc1500/common/include/nm_debug.h
++++ b/winc1500/common/include/nm_debug.h
+@@ -63,6 +63,8 @@
+ #define M2M_LOG_LEVEL									M2M_LOG_REQ
+ #endif
+ 
++#undef M2M_LOG_LEVEL
++#define M2M_LOG_LEVEL   M2M_LOG_DBG
+ 
+ #define M2M_ERR(...)
+ #define M2M_INFO(...)
+@@ -72,19 +74,19 @@
+ 
+ #if (CONF_WINC_DEBUG == 1)
+ #undef M2M_PRINT
+-#define M2M_PRINT(...)							do{CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\r");}while(0)
++#define M2M_PRINT(...)							do{CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\n");}while(0)
+ #if (M2M_LOG_LEVEL >= M2M_LOG_ERROR)
+ #undef M2M_ERR
+-#define M2M_ERR(...)							do{CONF_WINC_PRINTF("(APP)(ERR)[%s][%d]",__FUNCTION__,__LINE__); CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\r");}while(0)
++#define M2M_ERR(...)							do{CONF_WINC_PRINTF("(APP)(ERR)[%s][%d]",__FUNCTION__,__LINE__); CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\n");}while(0)
+ #if (M2M_LOG_LEVEL >= M2M_LOG_INFO)
+ #undef M2M_INFO
+-#define M2M_INFO(...)							do{CONF_WINC_PRINTF("(APP)(INFO)"); CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\r");}while(0)
++#define M2M_INFO(...)							do{CONF_WINC_PRINTF("(APP)(INFO)"); CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\n");}while(0)
+ #if (M2M_LOG_LEVEL >= M2M_LOG_REQ)
+ #undef M2M_REQ
+-#define M2M_REQ(...)							do{CONF_WINC_PRINTF("(APP)(R)"); CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\r");}while(0)
++#define M2M_REQ(...)							do{CONF_WINC_PRINTF("(APP)(R)"); CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\n");}while(0)
+ #if (M2M_LOG_LEVEL >= M2M_LOG_DBG)
+ #undef M2M_DBG
+-#define M2M_DBG(...)							do{CONF_WINC_PRINTF("(APP)(DBG)[%s][%d]",__FUNCTION__,__LINE__); CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\r");}while(0)
++#define M2M_DBG(...)							do{CONF_WINC_PRINTF("(APP)(DBG)[%s][%d]",__FUNCTION__,__LINE__); CONF_WINC_PRINTF(__VA_ARGS__);CONF_WINC_PRINTF("\n");}while(0)
+ #endif /*M2M_LOG_DBG*/
+ #endif /*M2M_LOG_REQ*/
+ #endif /*M2M_LOG_INFO*/
+diff --git a/winc1500/driver/source/m2m_hif.c b/winc1500/driver/source/m2m_hif.c
+index f907964..41e2035 100644
+--- a/winc1500/driver/source/m2m_hif.c
++++ b/winc1500/driver/source/m2m_hif.c
+@@ -67,12 +67,12 @@
+ #define WIFI_HOST_RCV_CTRL_5	(0x1088)
+ 
+ typedef struct {
+- 	uint8 u8ChipMode;
+- 	uint8 u8ChipSleep;
+- 	uint8 u8HifRXDone;
+- 	uint8 u8Interrupt;
+- 	uint32 u32RxAddr;
+- 	uint32 u32RxSize;
++	uint8 u8ChipMode;
++	uint8 u8ChipSleep;
++	uint8 u8HifRXDone;
++	uint8 u8Interrupt;
++	uint32 u32RxAddr;
++	uint32 u32RxSize;
+ 	tpfHifCallBack pfWifiCb;
+ 	tpfHifCallBack pfIpCb;
+ 	tpfHifCallBack pfOtaCb;
+@@ -84,9 +84,10 @@ typedef struct {
+ 
+ volatile tstrHifContext gstrHifCxt;
+ 
+-static void isr(void)
++void m2m_hif_isr(void)
+ {
+ 	gstrHifCxt.u8Interrupt++;
++	M2M_DBG("Interrupt triggered: %d",gstrHifCxt.u8Interrupt);
+ #ifdef NM_LEVEL_INTERRUPT
+ 	nm_bsp_interrupt_ctrl(0);
+ #endif
+@@ -251,7 +252,13 @@ ERR1:
+ sint8 hif_init(void * arg)
+ {
+ 	m2m_memset((uint8*)&gstrHifCxt,0,sizeof(tstrHifContext));
+-	nm_bsp_register_isr(isr);
++#if defined(MODULE_GNRC_NETDEV)
++	/** The isr will be registered in _init() in winc1500_netdev.c
++	 * 	when you use GNRC.
++	 */
++#else
++	nm_bsp_register_isr(m2m_hif_isr);
++#endif
+ 	hif_register_cb(M2M_REQ_GROUP_HIF,m2m_hif_cb);
+ 	return M2M_SUCCESS;
+ }
+@@ -395,7 +402,7 @@ sint8 hif_send(uint8 u8Gid,uint8 u8Opcode,uint8 *pu8CtrlBuf,uint16 u16CtrlBufSiz
+ 		else
+ 		{
+ 			ret = hif_chip_sleep();
+-			M2M_DBG("Failed to alloc rx size %d\r",ret);
++			M2M_DBG("Failed to alloc rx size %d",ret);
+ 			ret = M2M_ERR_MEM_ALLOC;
+ 			goto ERR2;
+ 		}
+@@ -478,6 +485,7 @@ static sint8 hif_isr(void)
+ 					}
+ 				}
+ 
++				M2M_DBG("Message request group: %u, Opcode: %u", strHif.u8Gid, strHif.u8Opcode);
+ 				if(M2M_REQ_GROUP_WIFI == strHif.u8Gid)
+ 				{
+ 					if(gstrHifCxt.pfWifiCb)
+@@ -546,7 +554,7 @@ static sint8 hif_isr(void)
+ 		{
+ #ifndef WIN32
+ 			M2M_ERR("(hif) False interrupt %lx",reg);
+-			ret = M2M_ERR_FAIL;
++			/* Due to stability issue `ret = M2M_ERR_FAIL;` is omitted. */
+ 			goto ERR1;
+ #else
+ #endif
+@@ -629,9 +637,9 @@ sint8 hif_receive(uint32 u32Addr, uint8 *pu8Buf, uint16 u16Sz, uint8 isDone)
+ 	}
+ 	if((u32Addr < gstrHifCxt.u32RxAddr)||((u32Addr + u16Sz)>(gstrHifCxt.u32RxAddr + gstrHifCxt.u32RxSize)))
+ 	{
+-		ret = M2M_ERR_FAIL;
++		/* ret = M2M_ERR_FAIL; */
+ 		M2M_ERR("APP Requested Address beyond the recived buffer address and length\n");
+-		goto ERR1;
++		/* goto ERR1; */
+ 	}
+ 	
+ 	/* Receive the payload */
+diff --git a/winc1500/driver/source/m2m_hif.h b/winc1500/driver/source/m2m_hif.h
+index 1187183..1df0481 100644
+--- a/winc1500/driver/source/m2m_hif.h
++++ b/winc1500/driver/source/m2m_hif.h
+@@ -91,6 +91,10 @@ typedef struct
+ */
+ typedef void (*tpfHifCallBack)(uint8 u8OpCode, uint16 u16DataSize, uint32 u32Addr);
+ /**
++ * @brief	Wi-Fi module interrupt service routine.
++ */
++void m2m_hif_isr(void);
++/**
+ *   @fn			NMI_API sint8 hif_init(void * arg);
+ *   @brief
+ 				To initialize HIF layer.
+diff --git a/winc1500/driver/source/m2m_wifi.c b/winc1500/driver/source/m2m_wifi.c
+index e0157c5..a365a0e 100644
+--- a/winc1500/driver/source/m2m_wifi.c
++++ b/winc1500/driver/source/m2m_wifi.c
+@@ -44,7 +44,8 @@
+ #include "driver/source/nmasic.h"
+ 
+ static volatile uint8 gu8ChNum;
+-static volatile uint8 gu8scanInProgress = 0;
++/* This will be used globally in winc1500_callback.c */
++volatile uint8_t gu8scanInProgress = 0;
+ static tpfAppWifiCb gpfAppWifiCb = NULL;
+ 
+ 
+@@ -81,6 +82,8 @@ gstrMgmtCtrl = {NULL, 0 , 0};
+ *	@date
+ *	@version	1.0
+ */
++/* RIOT implements its own wifi callback */
++#ifndef MODULE_WINC1500
+ static void m2m_wifi_cb(uint8 u8OpCode, uint16 u16DataSize, uint32 u32Addr)
+ {
+ 	uint8 rx_buf[8];
+@@ -292,8 +295,9 @@ static void m2m_wifi_cb(uint8 u8OpCode, uint16 u16DataSize, uint32 u32Addr)
+ 		M2M_ERR("REQ Not defined %d\n",u8OpCode);
+ 	}
+ }
++#endif
+ 
+-sint8 m2m_wifi_download_mode()
++sint8 m2m_wifi_download_mode(void)
+ {
+ 	sint8 ret = M2M_SUCCESS;
+ 	/* Apply device specific initialization. */
+@@ -308,7 +312,7 @@ _EXIT0:
+ 	return ret;
+ }
+ 
+-static sint8 m2m_validate_ap_parameters(CONST tstrM2MAPConfig* pstrM2MAPConfig)
++static sint8 m2m_validate_ap_parameters(WINC1500_CONST tstrM2MAPConfig* pstrM2MAPConfig)
+ {
+ 	sint8 s8Ret = M2M_SUCCESS;
+ 	/* Check for incoming pointer */
+@@ -473,8 +477,8 @@ sint8 m2m_wifi_init(tstrWifiInitParam * param)
+ 	ret = hif_init(NULL);
+ 	if(ret != M2M_SUCCESS) 	goto _EXIT1;
+ 
+-	hif_register_cb(M2M_REQ_GROUP_WIFI,m2m_wifi_cb);
+-
++	/* This will be called in RIOT's driver */
++	/* hif_register_cb(M2M_REQ_GROUP_WIFI,m2m_wifi_cb); */
+ 	ret = nm_get_firmware_full_info(&strtmp);
+ 
+ 	M2M_INFO("Firmware ver   : %u.%u.%u Svnrev %u\n", strtmp.u8FirmwareMajor, strtmp.u8FirmwareMinor, strtmp.u8FirmwarePatch,strtmp.u16FirmwareSvnNum);
+@@ -909,7 +913,7 @@ sint8 m2m_wifi_p2p_disconnect(void)
+ 	ret = hif_send(M2M_REQ_GROUP_WIFI, M2M_WIFI_REQ_DISABLE_P2P, NULL, 0, NULL, 0, 0);
+ 	return ret;
+ }
+-sint8 m2m_wifi_enable_ap(CONST tstrM2MAPConfig* pstrM2MAPConfig)
++sint8 m2m_wifi_enable_ap(WINC1500_CONST tstrM2MAPConfig* pstrM2MAPConfig)
+ {
+ 	sint8 ret = M2M_ERR_FAIL;
+ 	if(M2M_SUCCESS == m2m_validate_ap_parameters(pstrM2MAPConfig))
+@@ -1379,7 +1383,7 @@ NMI_API sint8 m2m_wifi_enable_mac_mcast(uint8* pu8MulticastMacAddress, uint8 u8A
+ 	{
+ 		strMulticastMac.u8AddRemove = u8AddRemove;
+ 		m2m_memcpy(strMulticastMac.au8macaddress,pu8MulticastMacAddress,M2M_MAC_ADDRES_LEN);
+-		M2M_DBG("mac multicast: %x:%x:%x:%x:%x:%x\r\n",strMulticastMac.au8macaddress[0],strMulticastMac.au8macaddress[1],strMulticastMac.au8macaddress[2],strMulticastMac.au8macaddress[3],strMulticastMac.au8macaddress[4],strMulticastMac.au8macaddress[5]);
++		M2M_DBG("mac multicast: %x:%x:%x:%x:%x:%x\n",strMulticastMac.au8macaddress[0],strMulticastMac.au8macaddress[1],strMulticastMac.au8macaddress[2],strMulticastMac.au8macaddress[3],strMulticastMac.au8macaddress[4],strMulticastMac.au8macaddress[5]);
+ 		s8ret = hif_send(M2M_REQ_GROUP_WIFI, M2M_WIFI_REQ_SET_MAC_MCAST, (uint8 *)&strMulticastMac,sizeof(tstrM2MMulticastMac),NULL,0,0);
+ 	}
+ 
+@@ -1413,7 +1417,7 @@ NMI_API sint8  m2m_wifi_set_receive_buffer(void* pvBuffer,uint16 u16BufferLen)
+ 	else
+ 	{
+ 		s8ret = M2M_ERR_FAIL;
+-		M2M_ERR("Buffer NULL pointer\r\n");
++		M2M_ERR("Buffer NULL pointer\n");
+ 	}
+ 	return s8ret;
+ }
+diff --git a/winc1500/driver/source/nmdrv.c b/winc1500/driver/source/nmdrv.c
+index d0b2043..dead628 100644
+--- a/winc1500/driver/source/nmdrv.c
++++ b/winc1500/driver/source/nmdrv.c
+@@ -79,7 +79,7 @@ sint8 nm_get_firmware_info(tstrM2mRev* M2mRev)
+ 	M2mRev->u8FirmwarePatch = M2M_GET_FW_PATCH(reg);
+ 	M2mRev->u32Chipid	= nmi_get_chipid();
+ 	M2mRev->u16FirmwareSvnNum = 0;
+-	
++
+ 	curr_firm_ver   = M2M_MAKE_VERSION(M2mRev->u8FirmwareMajor, M2mRev->u8FirmwareMinor,M2mRev->u8FirmwarePatch);
+ 	curr_drv_ver    = M2M_MAKE_VERSION(M2M_RELEASE_VERSION_MAJOR_NO, M2M_RELEASE_VERSION_MINOR_NO, M2M_RELEASE_VERSION_PATCH_NO);
+ 	min_req_drv_ver = M2M_MAKE_VERSION(M2mRev->u8DriverMajor, M2mRev->u8DriverMinor,M2mRev->u8DriverPatch);
+@@ -88,7 +88,10 @@ sint8 nm_get_firmware_info(tstrM2mRev* M2mRev)
+ 		than the min driver that the current firmware support  */
+ 		ret = M2M_ERR_FW_VER_MISMATCH;
+ 	}
+-	if(curr_drv_ver >  curr_firm_ver) {
++	/* To avoid version mismatch error. */
++	/* Current driver is 19.5.2 */
++	uint16 curr_min_drv_ver = M2M_MAKE_VERSION(19, 4, 4);
++	if(curr_min_drv_ver >  curr_firm_ver) {
+ 		/*The current driver should be equal or less than the firmware version*/
+ 		ret = M2M_ERR_FW_VER_MISMATCH;
+ 	}
+@@ -138,7 +141,8 @@ sint8 nm_get_firmware_full_info(tstrM2mRev* pstrRev)
+ 								ret = M2M_ERR_FW_VER_MISMATCH;
+ 								goto EXIT;
+ 							}
+-							if(curr_drv_ver >  curr_firm_ver) {
++							uint16 curr_min_drv_ver = M2M_MAKE_VERSION(19, 4, 4);
++							if(curr_min_drv_ver >  curr_firm_ver) {
+ 								/*The current driver should be equal or less than the firmware version*/
+ 								ret = M2M_ERR_FW_VER_MISMATCH;
+ 								goto EXIT;
+@@ -233,7 +237,7 @@ EXIT:
+ *	@date	10 Oct 2014
+ *	@version	1.0
+ */
+-sint8 nm_drv_init_download_mode()
++sint8 nm_drv_init_download_mode(void)
+ {
+ 	sint8 ret = M2M_SUCCESS;
+ 
+diff --git a/winc1500/socket/source/socket.c b/winc1500/socket/source/socket.c
+index 66c7a2b..a23e418 100644
+--- a/winc1500/socket/source/socket.c
++++ b/winc1500/socket/source/socket.c
+@@ -214,7 +214,8 @@ Date
+ 		17 July 2012
+ *********************************************************************/
+ static void m2m_ip_cb(uint8 u8OpCode, uint16 u16BufferSize,uint32 u32Address)
+-{	
++{
++	M2M_DBG("m2m_ip_cb called: %u\n", u8OpCode);
+ 	if((u8OpCode == SOCKET_CMD_BIND) || (u8OpCode == SOCKET_CMD_SSL_BIND))
+ 	{
+ 		tstrBindReply		strBindReply;
+@@ -257,7 +258,7 @@ static void m2m_ip_cb(uint8 u8OpCode, uint16 u16BufferSize,uint32 u32Address)
+ 					++gu16SessionID;
+ 
+ 				gastrSockets[strAcceptReply.sConnectedSock].u16SessionID = gu16SessionID;
+-				M2M_DBG("Socket %d session ID = %d\r\n",strAcceptReply.sConnectedSock , gu16SessionID );		
++				M2M_DBG("Socket %d session ID = %d\n",strAcceptReply.sConnectedSock , gu16SessionID );		
+ 			}
+ 			strAccept.sock = strAcceptReply.sConnectedSock;
+ 			strAccept.strAddr.sin_family		= AF_INET;
+@@ -314,7 +315,7 @@ static void m2m_ip_cb(uint8 u8OpCode, uint16 u16BufferSize,uint32 u32Address)
+ 
+ 			sock			= strRecvReply.sock;
+ 			u16SessionID = strRecvReply.u16SessionID;
+-			M2M_DBG("recv callback session ID = %d\r\n",u16SessionID);
++			M2M_DBG("recv callback session ID = %d\n",u16SessionID);
+ 			
+ 			/* Reset the Socket RX Pending Flag.
+ 			*/
+@@ -350,7 +351,7 @@ static void m2m_ip_cb(uint8 u8OpCode, uint16 u16BufferSize,uint32 u32Address)
+ 			}
+ 			else
+ 			{
+-				M2M_DBG("Discard recv callback %d %d \r\n",u16SessionID , gastrSockets[sock].u16SessionID);
++				M2M_DBG("Discard recv callback %d %d \n",u16SessionID , gastrSockets[sock].u16SessionID);
+ 				if(u16ReadSize < u16BufferSize)
+ 				{
+ 					if(hif_receive(0, NULL, 0, 1) == M2M_SUCCESS)
+@@ -370,14 +371,14 @@ static void m2m_ip_cb(uint8 u8OpCode, uint16 u16BufferSize,uint32 u32Address)
+ 
+ 		if(u8OpCode == SOCKET_CMD_SENDTO)
+ 			u8CallbackMsgID = SOCKET_MSG_SENDTO;
+-
+-		if(hif_receive(u32Address, (uint8*)&strReply, sizeof(tstrSendReply), 0) == M2M_SUCCESS)
++		sint8 ret = hif_receive(u32Address, (uint8_t*)&strReply, sizeof(tstrSendReply), 0);
++		if(ret == M2M_SUCCESS)
+ 		{
+ 			uint16 u16SessionID = 0;
+ 			
+ 			sock = strReply.sock;
+ 			u16SessionID = strReply.u16SessionID;
+-			M2M_DBG("send callback session ID = %d\r\n",u16SessionID);
++			M2M_DBG("send callback session ID = %d\n",u16SessionID);
+ 			
+ 			s16Rcvd = NM_BSP_B_L_16(strReply.s16SentBytes);
+ 
+@@ -388,9 +389,12 @@ static void m2m_ip_cb(uint8 u8OpCode, uint16 u16BufferSize,uint32 u32Address)
+ 			}
+ 			else
+ 			{
+-				M2M_DBG("Discard send callback %d %d \r\n",u16SessionID , gastrSockets[sock].u16SessionID);
++				M2M_DBG("Discard send callback %d %d \n",u16SessionID , gastrSockets[sock].u16SessionID);
+ 			}
+ 		}
++		else {
++				M2M_DBG("hif_receive() failed: %d\n",ret);
++		}
+ 	}
+ 	else if(u8OpCode == SOCKET_CMD_PING)
+ 	{
+@@ -557,7 +561,7 @@ SOCKET socket(uint16 u16Domain, uint8 u8Type, uint8 u8Flags)
+ 				++gu16SessionID;
+ 				
+ 			pstrSock->u16SessionID = gu16SessionID;
+-            M2M_INFO("Socket %d session ID = %d\r\n",sock, gu16SessionID );
++            M2M_INFO("Socket %d session ID = %d\n",sock, gu16SessionID );
+ 
+ 			if(u8Flags & SOCKET_FLAGS_SSL)
+ 			{
+-- 
+2.13.4
+

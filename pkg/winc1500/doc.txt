@@ -1,0 +1,8 @@
+/**
+ * @defgroup pkg_winc1500 Atmel WINC1500 Wi-Fi module API and adapter layer
+ * @ingroup  pkg
+ * @ingroup  net
+ * @brief    This package includes original driver API from Atmel, along with
+             patches for adapter layer to @ref drivers_winc1500 . 
+ * @see      https://github.com/kbumsik/winc1500-projects
+ */
