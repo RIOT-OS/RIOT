@@ -1,6 +1,3 @@
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # Use DEBUG_ADAPTER_ID to specify the programmer serial number to use:
 # export DEBUG_ADAPTER_ID="ATML..."
 
