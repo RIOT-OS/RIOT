@@ -162,7 +162,6 @@ do_flash() {
             -c 'reset halt' \
             ${OPENOCD_PRE_FLASH_CMDS} \
             -c 'flash write_image erase \"${IMAGE_FILE}\" ${IMAGE_OFFSET} ${IMAGE_TYPE}' \
-            -c 'reset halt' \
             ${OPENOCD_PRE_VERIFY_CMDS} \
             -c 'verify_image \"${IMAGE_FILE}\"' \
             -c 'reset run' \
