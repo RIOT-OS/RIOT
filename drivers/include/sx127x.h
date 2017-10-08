@@ -323,34 +323,6 @@ void sx127x_init_radio_settings(sx127x_t *dev);
 uint32_t sx127x_random(sx127x_t *dev);
 
 /**
- * @brief   sx127x DIO0 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio0(void *arg);
-
-/**
- * @brief   sx127x DIO1 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio1(void *arg);
-
-/**
- * @brief   sx127x DIO2 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio2(void *arg);
-
-/**
- * @brief   sx127x DIO3 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio3(void *arg);
-
-/**
  * @brief   Start a channel activity detection.
  *
  * @param[in] dev                      The sx127x device descriptor
