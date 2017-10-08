@@ -30,16 +30,13 @@ export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh
 
 export DEBUG_ADAPTER ?= dap
 
-# Add board selector (USB serial) to OpenOCD options if specified.
-# Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
-#   Usage: SERIAL="0200..." BOARD="pba-d-01-kw2x" make flash
+# Use DEBUG_ADAPTER_ID to specify the programmer serial number to use:
+# export DEBUG_ADAPTER_ID="0020..."
+
+# The SERIAL setting is only available for backwards compatibility with older
+# settings.
 ifneq (,$(SERIAL))
-  export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
-  SERIAL_TTY = $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL)))
-  ifeq (,$(SERIAL_TTY))
-    $(error Did not find a device with serial $(SERIAL))
-  endif
-  PORT_LINUX := $(SERIAL_TTY)
+  export DEBUG_ADAPTER_ID ?= $(SERIAL)
 endif
 
 # setup serial terminal
