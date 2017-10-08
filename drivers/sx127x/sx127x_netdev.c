@@ -23,6 +23,8 @@
 
 #include "net/netopt.h"
 #include "net/netdev.h"
+#include "net/lora.h"
+
 #include "sx127x_registers.h"
 #include "sx127x_internal.h"
 #include "sx127x_netdev.h"
@@ -375,8 +377,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_BANDWIDTH:
             assert(len <= sizeof(uint8_t));
             uint8_t bw = *((const uint8_t *)val);
-            if (bw < SX127X_BW_125_KHZ ||
-                bw > SX127X_BW_500_KHZ) {
+            if (bw < LORA_BW_125_KHZ ||
+                bw > LORA_BW_500_KHZ) {
                 res = -EINVAL;
                 break;
             }
@@ -386,8 +388,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_SPREADING_FACTOR:
             assert(len <= sizeof(uint8_t));
             uint8_t sf = *((const uint8_t *)val);
-            if (sf < SX127X_SF6 ||
-                sf > SX127X_SF12) {
+            if (sf < LORA_SF6 ||
+                sf > LORA_SF12) {
                 res = -EINVAL;
                 break;
             }
@@ -397,8 +399,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_CODING_RATE:
             assert(len <= sizeof(uint8_t));
             uint8_t cr = *((const uint8_t *)val);
-            if (cr < SX127X_CR_4_5 ||
-                cr > SX127X_CR_4_8) {
+            if (cr < LORA_CR_4_5 ||
+                cr > LORA_CR_4_8) {
                 res = -EINVAL;
                 break;
             }
