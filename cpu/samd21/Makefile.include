@@ -2,6 +2,8 @@ export CPU_ARCH = cortex-m0plus
 export CPU_FAM  = samd21
 
 USEMODULE += pm_layered
+USEMODULE += pm_cortexm_common_off
+USEMODULE += pm_cortexm_common_reboot
 
 include $(RIOTCPU)/sam0_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

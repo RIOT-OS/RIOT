@@ -1,3 +1,6 @@
 include $(RIOTCPU)/arm7_common/Makefile.include
 
 USEMODULE += arm7_common periph periph_common bitfield newlib
+USEMODULE += pm_fallback_set_lowest
+USEMODULE += pm_fallback_off
+USEMODULE += pm_fallback_reboot

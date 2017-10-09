@@ -23,6 +23,10 @@
 
 #include "cpu.h"
 
+/* pm_set_lowest is used from cortexm_common */
+
+/* pm_reboot is used from corterx_common */
+
 void pm_off(void)
 {
 #ifdef CPU_FAM_NRF51

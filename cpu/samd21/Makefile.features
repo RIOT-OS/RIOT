@@ -1,1 +1,2 @@
+# pm_set is provided, pm_layered is used
 FEATURES_PROVIDED += periph_pm

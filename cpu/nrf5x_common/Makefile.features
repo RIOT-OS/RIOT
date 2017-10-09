@@ -1,0 +1,4 @@
+# pm_off is provded 
+FEATURES_PROVIDED += periph_pm
+# This is required for the remaining features
+#include $(RIOTCPU)/cortexm_common/Makefile.features

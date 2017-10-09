@@ -3,5 +3,10 @@ INCLUDES += -I$(RIOTCPU)/cortexm_common/include
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include/vendor
 
 USEMODULE += cortexm_common_periph
+# select pm_cortexm_common module if one of the pseudomodules is used
+ifneq (,$(filter pm_cortexm_common_%,$(USEMODULE)))
+  $(info ATTENTION: Using pm_cortexm_common)
+  USEMODULE += pm_cortexm_common
+endif
 
 export IMAGE_HDR_SIZE ?= 512

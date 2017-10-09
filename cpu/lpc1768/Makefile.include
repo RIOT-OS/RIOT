@@ -1,3 +1,7 @@
 export CPU_ARCH = cortex-m3
 
+USEMODULE += pm_cortexm_common_off
+USEMODULE += pm_cortexm_common_reboot
+USEMODULE += pm_cortexm_common_set_lowest
+
 include $(RIOTMAKE)/arch/cortexm.inc.mk

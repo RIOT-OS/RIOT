@@ -1,1 +1,7 @@
+# TODO(rh): only if periph_pm not set
+USEMODULE += pm_layered
+USEMODULE += pm_kinetis_common_layered
+USEMODULE += pm_cortexm_common_off
+USEMODULE += pm_cortexm_common_reboot
+USEMODULE += pm_cortexm_common
 FEATURES_PROVIDED += periph_pm
