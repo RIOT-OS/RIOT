@@ -402,3 +402,14 @@ ifneq (,$(filter tsl2561,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
+
+ifneq (,$(filter winc1500,$(USEMODULE)))
+  USEPKG += winc1500
+  USEMODULE += xtimer
+  USEMODULE += luid
+  USEMODULE += netif
+  USEMODULE += netdev_eth
+  USEMODULE += core_mbox
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
+endif
