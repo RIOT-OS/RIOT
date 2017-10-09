@@ -661,6 +661,22 @@ USEPKG += nanocoap
 USEMODULE += gnrc_sock_udp
 endif
 
+ifneq (,$(filter firmware,$(USEMODULE)))
+  USEPKG += tweetnacl
+  USEMODULE += checksum
+  FEATURES_REQUIRED += periph_flashpage
+endif
+
+ifneq (,$(filter ota_update_%,$(USEMODULE)))
+USEMODULE += gcoap
+USEMODULE += ota_update
+USEMODULE += firmware
+USEMODULE += sema
+  ifneq (,$(filter ota_update_tftp,$(USEMODULE)))
+    USEMODULE += gnrc_tftp
+  endif
+endif
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
