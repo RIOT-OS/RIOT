@@ -3,7 +3,7 @@
  *
  * \brief Component description for TCC
  *
- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
- /**
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMR21_TCC_COMPONENT_
@@ -94,7 +91,7 @@ typedef union {
 #define TCC_CTRLA_ENABLE            (0x1ul << TCC_CTRLA_ENABLE_Pos)
 #define TCC_CTRLA_RESOLUTION_Pos    5            /**< \brief (TCC_CTRLA) Enhanced Resolution */
 #define TCC_CTRLA_RESOLUTION_Msk    (0x3ul << TCC_CTRLA_RESOLUTION_Pos)
-#define TCC_CTRLA_RESOLUTION(value) ((TCC_CTRLA_RESOLUTION_Msk & ((value) << TCC_CTRLA_RESOLUTION_Pos)))
+#define TCC_CTRLA_RESOLUTION(value) (TCC_CTRLA_RESOLUTION_Msk & ((value) << TCC_CTRLA_RESOLUTION_Pos))
 #define   TCC_CTRLA_RESOLUTION_NONE_Val   0x0ul  /**< \brief (TCC_CTRLA) Dithering is disabled */
 #define   TCC_CTRLA_RESOLUTION_DITH4_Val  0x1ul  /**< \brief (TCC_CTRLA) Dithering is done every 16 PWM frames */
 #define   TCC_CTRLA_RESOLUTION_DITH5_Val  0x2ul  /**< \brief (TCC_CTRLA) Dithering is done every 32 PWM frames */
@@ -105,7 +102,7 @@ typedef union {
 #define TCC_CTRLA_RESOLUTION_DITH6  (TCC_CTRLA_RESOLUTION_DITH6_Val << TCC_CTRLA_RESOLUTION_Pos)
 #define TCC_CTRLA_PRESCALER_Pos     8            /**< \brief (TCC_CTRLA) Prescaler */
 #define TCC_CTRLA_PRESCALER_Msk     (0x7ul << TCC_CTRLA_PRESCALER_Pos)
-#define TCC_CTRLA_PRESCALER(value)  ((TCC_CTRLA_PRESCALER_Msk & ((value) << TCC_CTRLA_PRESCALER_Pos)))
+#define TCC_CTRLA_PRESCALER(value)  (TCC_CTRLA_PRESCALER_Msk & ((value) << TCC_CTRLA_PRESCALER_Pos))
 #define   TCC_CTRLA_PRESCALER_DIV1_Val    0x0ul  /**< \brief (TCC_CTRLA) No division */
 #define   TCC_CTRLA_PRESCALER_DIV2_Val    0x1ul  /**< \brief (TCC_CTRLA) Divide by 2 */
 #define   TCC_CTRLA_PRESCALER_DIV4_Val    0x2ul  /**< \brief (TCC_CTRLA) Divide by 4 */
@@ -126,7 +123,7 @@ typedef union {
 #define TCC_CTRLA_RUNSTDBY          (0x1ul << TCC_CTRLA_RUNSTDBY_Pos)
 #define TCC_CTRLA_PRESCSYNC_Pos     12           /**< \brief (TCC_CTRLA) Prescaler and Counter Synchronization Selection */
 #define TCC_CTRLA_PRESCSYNC_Msk     (0x3ul << TCC_CTRLA_PRESCSYNC_Pos)
-#define TCC_CTRLA_PRESCSYNC(value)  ((TCC_CTRLA_PRESCSYNC_Msk & ((value) << TCC_CTRLA_PRESCSYNC_Pos)))
+#define TCC_CTRLA_PRESCSYNC(value)  (TCC_CTRLA_PRESCSYNC_Msk & ((value) << TCC_CTRLA_PRESCSYNC_Pos))
 #define   TCC_CTRLA_PRESCSYNC_GCLK_Val    0x0ul  /**< \brief (TCC_CTRLA) Reload or reset counter on next GCLK */
 #define   TCC_CTRLA_PRESCSYNC_PRESC_Val   0x1ul  /**< \brief (TCC_CTRLA) Reload or reset counter on next prescaler clock */
 #define   TCC_CTRLA_PRESCSYNC_RESYNC_Val  0x2ul  /**< \brief (TCC_CTRLA) Reload or reset counter on next GCLK and reset prescaler counter */
@@ -145,7 +142,7 @@ typedef union {
 #define TCC_CTRLA_CPTEN3            (1 << TCC_CTRLA_CPTEN3_Pos)
 #define TCC_CTRLA_CPTEN_Pos         24           /**< \brief (TCC_CTRLA) Capture Channel x Enable */
 #define TCC_CTRLA_CPTEN_Msk         (0xFul << TCC_CTRLA_CPTEN_Pos)
-#define TCC_CTRLA_CPTEN(value)      ((TCC_CTRLA_CPTEN_Msk & ((value) << TCC_CTRLA_CPTEN_Pos)))
+#define TCC_CTRLA_CPTEN(value)      (TCC_CTRLA_CPTEN_Msk & ((value) << TCC_CTRLA_CPTEN_Pos))
 #define TCC_CTRLA_MASK              0x0F007F63ul /**< \brief (TCC_CTRLA) MASK Register */
 
 /* -------- TCC_CTRLBCLR : (TCC Offset: 0x04) (R/W  8) Control B Clear -------- */
@@ -173,7 +170,7 @@ typedef union {
 #define TCC_CTRLBCLR_ONESHOT        (0x1ul << TCC_CTRLBCLR_ONESHOT_Pos)
 #define TCC_CTRLBCLR_IDXCMD_Pos     3            /**< \brief (TCC_CTRLBCLR) Ramp Index Command */
 #define TCC_CTRLBCLR_IDXCMD_Msk     (0x3ul << TCC_CTRLBCLR_IDXCMD_Pos)
-#define TCC_CTRLBCLR_IDXCMD(value)  ((TCC_CTRLBCLR_IDXCMD_Msk & ((value) << TCC_CTRLBCLR_IDXCMD_Pos)))
+#define TCC_CTRLBCLR_IDXCMD(value)  (TCC_CTRLBCLR_IDXCMD_Msk & ((value) << TCC_CTRLBCLR_IDXCMD_Pos))
 #define   TCC_CTRLBCLR_IDXCMD_DISABLE_Val 0x0ul  /**< \brief (TCC_CTRLBCLR) Command disabled: Index toggles between cycles A and B */
 #define   TCC_CTRLBCLR_IDXCMD_SET_Val     0x1ul  /**< \brief (TCC_CTRLBCLR) Set index: cycle B will be forced in the next cycle */
 #define   TCC_CTRLBCLR_IDXCMD_CLEAR_Val   0x2ul  /**< \brief (TCC_CTRLBCLR) Clear index: cycle A will be forced in the next cycle */
@@ -184,7 +181,7 @@ typedef union {
 #define TCC_CTRLBCLR_IDXCMD_HOLD    (TCC_CTRLBCLR_IDXCMD_HOLD_Val  << TCC_CTRLBCLR_IDXCMD_Pos)
 #define TCC_CTRLBCLR_CMD_Pos        5            /**< \brief (TCC_CTRLBCLR) TCC Command */
 #define TCC_CTRLBCLR_CMD_Msk        (0x7ul << TCC_CTRLBCLR_CMD_Pos)
-#define TCC_CTRLBCLR_CMD(value)     ((TCC_CTRLBCLR_CMD_Msk & ((value) << TCC_CTRLBCLR_CMD_Pos)))
+#define TCC_CTRLBCLR_CMD(value)     (TCC_CTRLBCLR_CMD_Msk & ((value) << TCC_CTRLBCLR_CMD_Pos))
 #define   TCC_CTRLBCLR_CMD_NONE_Val       0x0ul  /**< \brief (TCC_CTRLBCLR) No action */
 #define   TCC_CTRLBCLR_CMD_RETRIGGER_Val  0x1ul  /**< \brief (TCC_CTRLBCLR) Clear start, restart or retrigger */
 #define   TCC_CTRLBCLR_CMD_STOP_Val       0x2ul  /**< \brief (TCC_CTRLBCLR) Force stop */
@@ -222,7 +219,7 @@ typedef union {
 #define TCC_CTRLBSET_ONESHOT        (0x1ul << TCC_CTRLBSET_ONESHOT_Pos)
 #define TCC_CTRLBSET_IDXCMD_Pos     3            /**< \brief (TCC_CTRLBSET) Ramp Index Command */
 #define TCC_CTRLBSET_IDXCMD_Msk     (0x3ul << TCC_CTRLBSET_IDXCMD_Pos)
-#define TCC_CTRLBSET_IDXCMD(value)  ((TCC_CTRLBSET_IDXCMD_Msk & ((value) << TCC_CTRLBSET_IDXCMD_Pos)))
+#define TCC_CTRLBSET_IDXCMD(value)  (TCC_CTRLBSET_IDXCMD_Msk & ((value) << TCC_CTRLBSET_IDXCMD_Pos))
 #define   TCC_CTRLBSET_IDXCMD_DISABLE_Val 0x0ul  /**< \brief (TCC_CTRLBSET) Command disabled: Index toggles between cycles A and B */
 #define   TCC_CTRLBSET_IDXCMD_SET_Val     0x1ul  /**< \brief (TCC_CTRLBSET) Set index: cycle B will be forced in the next cycle */
 #define   TCC_CTRLBSET_IDXCMD_CLEAR_Val   0x2ul  /**< \brief (TCC_CTRLBSET) Clear index: cycle A will be forced in the next cycle */
@@ -233,7 +230,7 @@ typedef union {
 #define TCC_CTRLBSET_IDXCMD_HOLD    (TCC_CTRLBSET_IDXCMD_HOLD_Val  << TCC_CTRLBSET_IDXCMD_Pos)
 #define TCC_CTRLBSET_CMD_Pos        5            /**< \brief (TCC_CTRLBSET) TCC Command */
 #define TCC_CTRLBSET_CMD_Msk        (0x7ul << TCC_CTRLBSET_CMD_Pos)
-#define TCC_CTRLBSET_CMD(value)     ((TCC_CTRLBSET_CMD_Msk & ((value) << TCC_CTRLBSET_CMD_Pos)))
+#define TCC_CTRLBSET_CMD(value)     (TCC_CTRLBSET_CMD_Msk & ((value) << TCC_CTRLBSET_CMD_Pos))
 #define   TCC_CTRLBSET_CMD_NONE_Val       0x0ul  /**< \brief (TCC_CTRLBSET) No action */
 #define   TCC_CTRLBSET_CMD_RETRIGGER_Val  0x1ul  /**< \brief (TCC_CTRLBSET) Clear start, restart or retrigger */
 #define   TCC_CTRLBSET_CMD_STOP_Val       0x2ul  /**< \brief (TCC_CTRLBSET) Force stop */
@@ -312,7 +309,7 @@ typedef union {
 #define TCC_SYNCBUSY_CC3            (1 << TCC_SYNCBUSY_CC3_Pos)
 #define TCC_SYNCBUSY_CC_Pos         8            /**< \brief (TCC_SYNCBUSY) Compare Channel x Busy */
 #define TCC_SYNCBUSY_CC_Msk         (0xFul << TCC_SYNCBUSY_CC_Pos)
-#define TCC_SYNCBUSY_CC(value)      ((TCC_SYNCBUSY_CC_Msk & ((value) << TCC_SYNCBUSY_CC_Pos)))
+#define TCC_SYNCBUSY_CC(value)      (TCC_SYNCBUSY_CC_Msk & ((value) << TCC_SYNCBUSY_CC_Pos))
 #define TCC_SYNCBUSY_PATTB_Pos      16           /**< \brief (TCC_SYNCBUSY) Pattern Buffer Busy */
 #define TCC_SYNCBUSY_PATTB          (0x1ul << TCC_SYNCBUSY_PATTB_Pos)
 #define TCC_SYNCBUSY_WAVEB_Pos      17           /**< \brief (TCC_SYNCBUSY) Wave Buffer Busy */
@@ -329,7 +326,7 @@ typedef union {
 #define TCC_SYNCBUSY_CCB3           (1 << TCC_SYNCBUSY_CCB3_Pos)
 #define TCC_SYNCBUSY_CCB_Pos        19           /**< \brief (TCC_SYNCBUSY) Compare Channel Buffer x Busy */
 #define TCC_SYNCBUSY_CCB_Msk        (0xFul << TCC_SYNCBUSY_CCB_Pos)
-#define TCC_SYNCBUSY_CCB(value)     ((TCC_SYNCBUSY_CCB_Msk & ((value) << TCC_SYNCBUSY_CCB_Pos)))
+#define TCC_SYNCBUSY_CCB(value)     (TCC_SYNCBUSY_CCB_Msk & ((value) << TCC_SYNCBUSY_CCB_Pos))
 #define TCC_SYNCBUSY_MASK           0x007F0FFFul /**< \brief (TCC_SYNCBUSY) MASK Register */
 
 /* -------- TCC_FCTRLA : (TCC Offset: 0x0C) (R/W 32) Recoverable Fault A Configuration -------- */
@@ -359,7 +356,7 @@ typedef union {
 
 #define TCC_FCTRLA_SRC_Pos          0            /**< \brief (TCC_FCTRLA) Fault A Source */
 #define TCC_FCTRLA_SRC_Msk          (0x3ul << TCC_FCTRLA_SRC_Pos)
-#define TCC_FCTRLA_SRC(value)       ((TCC_FCTRLA_SRC_Msk & ((value) << TCC_FCTRLA_SRC_Pos)))
+#define TCC_FCTRLA_SRC(value)       (TCC_FCTRLA_SRC_Msk & ((value) << TCC_FCTRLA_SRC_Pos))
 #define   TCC_FCTRLA_SRC_DISABLE_Val      0x0ul  /**< \brief (TCC_FCTRLA) Fault input disabled */
 #define   TCC_FCTRLA_SRC_ENABLE_Val       0x1ul  /**< \brief (TCC_FCTRLA) MCEx (x=0,1) event input */
 #define   TCC_FCTRLA_SRC_INVERT_Val       0x2ul  /**< \brief (TCC_FCTRLA) Inverted MCEx (x=0,1) event input */
@@ -374,7 +371,7 @@ typedef union {
 #define TCC_FCTRLA_QUAL             (0x1ul << TCC_FCTRLA_QUAL_Pos)
 #define TCC_FCTRLA_BLANK_Pos        5            /**< \brief (TCC_FCTRLA) Fault A Blanking Mode */
 #define TCC_FCTRLA_BLANK_Msk        (0x3ul << TCC_FCTRLA_BLANK_Pos)
-#define TCC_FCTRLA_BLANK(value)     ((TCC_FCTRLA_BLANK_Msk & ((value) << TCC_FCTRLA_BLANK_Pos)))
+#define TCC_FCTRLA_BLANK(value)     (TCC_FCTRLA_BLANK_Msk & ((value) << TCC_FCTRLA_BLANK_Pos))
 #define   TCC_FCTRLA_BLANK_NONE_Val       0x0ul  /**< \brief (TCC_FCTRLA) No blanking applied */
 #define   TCC_FCTRLA_BLANK_RISE_Val       0x1ul  /**< \brief (TCC_FCTRLA) Blanking applied from rising edge of the output waveform */
 #define   TCC_FCTRLA_BLANK_FALL_Val       0x2ul  /**< \brief (TCC_FCTRLA) Blanking applied from falling edge of the output waveform */
@@ -387,7 +384,7 @@ typedef union {
 #define TCC_FCTRLA_RESTART          (0x1ul << TCC_FCTRLA_RESTART_Pos)
 #define TCC_FCTRLA_HALT_Pos         8            /**< \brief (TCC_FCTRLA) Fault A Halt Mode */
 #define TCC_FCTRLA_HALT_Msk         (0x3ul << TCC_FCTRLA_HALT_Pos)
-#define TCC_FCTRLA_HALT(value)      ((TCC_FCTRLA_HALT_Msk & ((value) << TCC_FCTRLA_HALT_Pos)))
+#define TCC_FCTRLA_HALT(value)      (TCC_FCTRLA_HALT_Msk & ((value) << TCC_FCTRLA_HALT_Pos))
 #define   TCC_FCTRLA_HALT_DISABLE_Val     0x0ul  /**< \brief (TCC_FCTRLA) Halt action disabled */
 #define   TCC_FCTRLA_HALT_HW_Val          0x1ul  /**< \brief (TCC_FCTRLA) Hardware halt action */
 #define   TCC_FCTRLA_HALT_SW_Val          0x2ul  /**< \brief (TCC_FCTRLA) Software halt action */
@@ -398,7 +395,7 @@ typedef union {
 #define TCC_FCTRLA_HALT_NR          (TCC_FCTRLA_HALT_NR_Val        << TCC_FCTRLA_HALT_Pos)
 #define TCC_FCTRLA_CHSEL_Pos        10           /**< \brief (TCC_FCTRLA) Fault A Capture Channel */
 #define TCC_FCTRLA_CHSEL_Msk        (0x3ul << TCC_FCTRLA_CHSEL_Pos)
-#define TCC_FCTRLA_CHSEL(value)     ((TCC_FCTRLA_CHSEL_Msk & ((value) << TCC_FCTRLA_CHSEL_Pos)))
+#define TCC_FCTRLA_CHSEL(value)     (TCC_FCTRLA_CHSEL_Msk & ((value) << TCC_FCTRLA_CHSEL_Pos))
 #define   TCC_FCTRLA_CHSEL_CC0_Val        0x0ul  /**< \brief (TCC_FCTRLA) Capture value stored in channel 0 */
 #define   TCC_FCTRLA_CHSEL_CC1_Val        0x1ul  /**< \brief (TCC_FCTRLA) Capture value stored in channel 1 */
 #define   TCC_FCTRLA_CHSEL_CC2_Val        0x2ul  /**< \brief (TCC_FCTRLA) Capture value stored in channel 2 */
@@ -409,7 +406,7 @@ typedef union {
 #define TCC_FCTRLA_CHSEL_CC3        (TCC_FCTRLA_CHSEL_CC3_Val      << TCC_FCTRLA_CHSEL_Pos)
 #define TCC_FCTRLA_CAPTURE_Pos      12           /**< \brief (TCC_FCTRLA) Fault A Capture Action */
 #define TCC_FCTRLA_CAPTURE_Msk      (0x7ul << TCC_FCTRLA_CAPTURE_Pos)
-#define TCC_FCTRLA_CAPTURE(value)   ((TCC_FCTRLA_CAPTURE_Msk & ((value) << TCC_FCTRLA_CAPTURE_Pos)))
+#define TCC_FCTRLA_CAPTURE(value)   (TCC_FCTRLA_CAPTURE_Msk & ((value) << TCC_FCTRLA_CAPTURE_Pos))
 #define   TCC_FCTRLA_CAPTURE_DISABLE_Val  0x0ul  /**< \brief (TCC_FCTRLA) No capture */
 #define   TCC_FCTRLA_CAPTURE_CAPT_Val     0x1ul  /**< \brief (TCC_FCTRLA) Capture on fault */
 #define   TCC_FCTRLA_CAPTURE_CAPTMIN_Val  0x2ul  /**< \brief (TCC_FCTRLA) Minimum capture */
@@ -426,10 +423,10 @@ typedef union {
 #define TCC_FCTRLA_CAPTURE_DERIV0   (TCC_FCTRLA_CAPTURE_DERIV0_Val << TCC_FCTRLA_CAPTURE_Pos)
 #define TCC_FCTRLA_BLANKVAL_Pos     16           /**< \brief (TCC_FCTRLA) Fault A Blanking Time */
 #define TCC_FCTRLA_BLANKVAL_Msk     (0xFFul << TCC_FCTRLA_BLANKVAL_Pos)
-#define TCC_FCTRLA_BLANKVAL(value)  ((TCC_FCTRLA_BLANKVAL_Msk & ((value) << TCC_FCTRLA_BLANKVAL_Pos)))
+#define TCC_FCTRLA_BLANKVAL(value)  (TCC_FCTRLA_BLANKVAL_Msk & ((value) << TCC_FCTRLA_BLANKVAL_Pos))
 #define TCC_FCTRLA_FILTERVAL_Pos    24           /**< \brief (TCC_FCTRLA) Fault A Filter Value */
 #define TCC_FCTRLA_FILTERVAL_Msk    (0xFul << TCC_FCTRLA_FILTERVAL_Pos)
-#define TCC_FCTRLA_FILTERVAL(value) ((TCC_FCTRLA_FILTERVAL_Msk & ((value) << TCC_FCTRLA_FILTERVAL_Pos)))
+#define TCC_FCTRLA_FILTERVAL(value) (TCC_FCTRLA_FILTERVAL_Msk & ((value) << TCC_FCTRLA_FILTERVAL_Pos))
 #define TCC_FCTRLA_MASK             0x0FFF7FFBul /**< \brief (TCC_FCTRLA) MASK Register */
 
 /* -------- TCC_FCTRLB : (TCC Offset: 0x10) (R/W 32) Recoverable Fault B Configuration -------- */
@@ -459,7 +456,7 @@ typedef union {
 
 #define TCC_FCTRLB_SRC_Pos          0            /**< \brief (TCC_FCTRLB) Fault B Source */
 #define TCC_FCTRLB_SRC_Msk          (0x3ul << TCC_FCTRLB_SRC_Pos)
-#define TCC_FCTRLB_SRC(value)       ((TCC_FCTRLB_SRC_Msk & ((value) << TCC_FCTRLB_SRC_Pos)))
+#define TCC_FCTRLB_SRC(value)       (TCC_FCTRLB_SRC_Msk & ((value) << TCC_FCTRLB_SRC_Pos))
 #define   TCC_FCTRLB_SRC_DISABLE_Val      0x0ul  /**< \brief (TCC_FCTRLB) Fault input disabled */
 #define   TCC_FCTRLB_SRC_ENABLE_Val       0x1ul  /**< \brief (TCC_FCTRLB) MCEx (x=0,1) event input */
 #define   TCC_FCTRLB_SRC_INVERT_Val       0x2ul  /**< \brief (TCC_FCTRLB) Inverted MCEx (x=0,1) event input */
@@ -474,7 +471,7 @@ typedef union {
 #define TCC_FCTRLB_QUAL             (0x1ul << TCC_FCTRLB_QUAL_Pos)
 #define TCC_FCTRLB_BLANK_Pos        5            /**< \brief (TCC_FCTRLB) Fault B Blanking Mode */
 #define TCC_FCTRLB_BLANK_Msk        (0x3ul << TCC_FCTRLB_BLANK_Pos)
-#define TCC_FCTRLB_BLANK(value)     ((TCC_FCTRLB_BLANK_Msk & ((value) << TCC_FCTRLB_BLANK_Pos)))
+#define TCC_FCTRLB_BLANK(value)     (TCC_FCTRLB_BLANK_Msk & ((value) << TCC_FCTRLB_BLANK_Pos))
 #define   TCC_FCTRLB_BLANK_NONE_Val       0x0ul  /**< \brief (TCC_FCTRLB) No blanking applied */
 #define   TCC_FCTRLB_BLANK_RISE_Val       0x1ul  /**< \brief (TCC_FCTRLB) Blanking applied from rising edge of the output waveform */
 #define   TCC_FCTRLB_BLANK_FALL_Val       0x2ul  /**< \brief (TCC_FCTRLB) Blanking applied from falling edge of the output waveform */
@@ -487,7 +484,7 @@ typedef union {
 #define TCC_FCTRLB_RESTART          (0x1ul << TCC_FCTRLB_RESTART_Pos)
 #define TCC_FCTRLB_HALT_Pos         8            /**< \brief (TCC_FCTRLB) Fault B Halt Mode */
 #define TCC_FCTRLB_HALT_Msk         (0x3ul << TCC_FCTRLB_HALT_Pos)
-#define TCC_FCTRLB_HALT(value)      ((TCC_FCTRLB_HALT_Msk & ((value) << TCC_FCTRLB_HALT_Pos)))
+#define TCC_FCTRLB_HALT(value)      (TCC_FCTRLB_HALT_Msk & ((value) << TCC_FCTRLB_HALT_Pos))
 #define   TCC_FCTRLB_HALT_DISABLE_Val     0x0ul  /**< \brief (TCC_FCTRLB) Halt action disabled */
 #define   TCC_FCTRLB_HALT_HW_Val          0x1ul  /**< \brief (TCC_FCTRLB) Hardware halt action */
 #define   TCC_FCTRLB_HALT_SW_Val          0x2ul  /**< \brief (TCC_FCTRLB) Software halt action */
@@ -498,7 +495,7 @@ typedef union {
 #define TCC_FCTRLB_HALT_NR          (TCC_FCTRLB_HALT_NR_Val        << TCC_FCTRLB_HALT_Pos)
 #define TCC_FCTRLB_CHSEL_Pos        10           /**< \brief (TCC_FCTRLB) Fault B Capture Channel */
 #define TCC_FCTRLB_CHSEL_Msk        (0x3ul << TCC_FCTRLB_CHSEL_Pos)
-#define TCC_FCTRLB_CHSEL(value)     ((TCC_FCTRLB_CHSEL_Msk & ((value) << TCC_FCTRLB_CHSEL_Pos)))
+#define TCC_FCTRLB_CHSEL(value)     (TCC_FCTRLB_CHSEL_Msk & ((value) << TCC_FCTRLB_CHSEL_Pos))
 #define   TCC_FCTRLB_CHSEL_CC0_Val        0x0ul  /**< \brief (TCC_FCTRLB) Capture value stored in channel 0 */
 #define   TCC_FCTRLB_CHSEL_CC1_Val        0x1ul  /**< \brief (TCC_FCTRLB) Capture value stored in channel 1 */
 #define   TCC_FCTRLB_CHSEL_CC2_Val        0x2ul  /**< \brief (TCC_FCTRLB) Capture value stored in channel 2 */
@@ -509,7 +506,7 @@ typedef union {
 #define TCC_FCTRLB_CHSEL_CC3        (TCC_FCTRLB_CHSEL_CC3_Val      << TCC_FCTRLB_CHSEL_Pos)
 #define TCC_FCTRLB_CAPTURE_Pos      12           /**< \brief (TCC_FCTRLB) Fault B Capture Action */
 #define TCC_FCTRLB_CAPTURE_Msk      (0x7ul << TCC_FCTRLB_CAPTURE_Pos)
-#define TCC_FCTRLB_CAPTURE(value)   ((TCC_FCTRLB_CAPTURE_Msk & ((value) << TCC_FCTRLB_CAPTURE_Pos)))
+#define TCC_FCTRLB_CAPTURE(value)   (TCC_FCTRLB_CAPTURE_Msk & ((value) << TCC_FCTRLB_CAPTURE_Pos))
 #define   TCC_FCTRLB_CAPTURE_DISABLE_Val  0x0ul  /**< \brief (TCC_FCTRLB) No capture */
 #define   TCC_FCTRLB_CAPTURE_CAPT_Val     0x1ul  /**< \brief (TCC_FCTRLB) Capture on fault */
 #define   TCC_FCTRLB_CAPTURE_CAPTMIN_Val  0x2ul  /**< \brief (TCC_FCTRLB) Minimum capture */
@@ -526,10 +523,10 @@ typedef union {
 #define TCC_FCTRLB_CAPTURE_DERIV0   (TCC_FCTRLB_CAPTURE_DERIV0_Val << TCC_FCTRLB_CAPTURE_Pos)
 #define TCC_FCTRLB_BLANKVAL_Pos     16           /**< \brief (TCC_FCTRLB) Fault B Blanking Time */
 #define TCC_FCTRLB_BLANKVAL_Msk     (0xFFul << TCC_FCTRLB_BLANKVAL_Pos)
-#define TCC_FCTRLB_BLANKVAL(value)  ((TCC_FCTRLB_BLANKVAL_Msk & ((value) << TCC_FCTRLB_BLANKVAL_Pos)))
+#define TCC_FCTRLB_BLANKVAL(value)  (TCC_FCTRLB_BLANKVAL_Msk & ((value) << TCC_FCTRLB_BLANKVAL_Pos))
 #define TCC_FCTRLB_FILTERVAL_Pos    24           /**< \brief (TCC_FCTRLB) Fault B Filter Value */
 #define TCC_FCTRLB_FILTERVAL_Msk    (0xFul << TCC_FCTRLB_FILTERVAL_Pos)
-#define TCC_FCTRLB_FILTERVAL(value) ((TCC_FCTRLB_FILTERVAL_Msk & ((value) << TCC_FCTRLB_FILTERVAL_Pos)))
+#define TCC_FCTRLB_FILTERVAL(value) (TCC_FCTRLB_FILTERVAL_Msk & ((value) << TCC_FCTRLB_FILTERVAL_Pos))
 #define TCC_FCTRLB_MASK             0x0FFF7FFBul /**< \brief (TCC_FCTRLB) MASK Register */
 
 /* -------- TCC_WEXCTRL : (TCC Offset: 0x14) (R/W 32) Waveform Extension Configuration -------- */
@@ -560,7 +557,7 @@ typedef union {
 
 #define TCC_WEXCTRL_OTMX_Pos        0            /**< \brief (TCC_WEXCTRL) Output Matrix */
 #define TCC_WEXCTRL_OTMX_Msk        (0x3ul << TCC_WEXCTRL_OTMX_Pos)
-#define TCC_WEXCTRL_OTMX(value)     ((TCC_WEXCTRL_OTMX_Msk & ((value) << TCC_WEXCTRL_OTMX_Pos)))
+#define TCC_WEXCTRL_OTMX(value)     (TCC_WEXCTRL_OTMX_Msk & ((value) << TCC_WEXCTRL_OTMX_Pos))
 #define TCC_WEXCTRL_DTIEN0_Pos      8            /**< \brief (TCC_WEXCTRL) Dead-time Insertion Generator 0 Enable */
 #define TCC_WEXCTRL_DTIEN0          (1 << TCC_WEXCTRL_DTIEN0_Pos)
 #define TCC_WEXCTRL_DTIEN1_Pos      9            /**< \brief (TCC_WEXCTRL) Dead-time Insertion Generator 1 Enable */
@@ -571,13 +568,13 @@ typedef union {
 #define TCC_WEXCTRL_DTIEN3          (1 << TCC_WEXCTRL_DTIEN3_Pos)
 #define TCC_WEXCTRL_DTIEN_Pos       8            /**< \brief (TCC_WEXCTRL) Dead-time Insertion Generator x Enable */
 #define TCC_WEXCTRL_DTIEN_Msk       (0xFul << TCC_WEXCTRL_DTIEN_Pos)
-#define TCC_WEXCTRL_DTIEN(value)    ((TCC_WEXCTRL_DTIEN_Msk & ((value) << TCC_WEXCTRL_DTIEN_Pos)))
+#define TCC_WEXCTRL_DTIEN(value)    (TCC_WEXCTRL_DTIEN_Msk & ((value) << TCC_WEXCTRL_DTIEN_Pos))
 #define TCC_WEXCTRL_DTLS_Pos        16           /**< \brief (TCC_WEXCTRL) Dead-time Low Side Outputs Value */
 #define TCC_WEXCTRL_DTLS_Msk        (0xFFul << TCC_WEXCTRL_DTLS_Pos)
-#define TCC_WEXCTRL_DTLS(value)     ((TCC_WEXCTRL_DTLS_Msk & ((value) << TCC_WEXCTRL_DTLS_Pos)))
+#define TCC_WEXCTRL_DTLS(value)     (TCC_WEXCTRL_DTLS_Msk & ((value) << TCC_WEXCTRL_DTLS_Pos))
 #define TCC_WEXCTRL_DTHS_Pos        24           /**< \brief (TCC_WEXCTRL) Dead-time High Side Outputs Value */
 #define TCC_WEXCTRL_DTHS_Msk        (0xFFul << TCC_WEXCTRL_DTHS_Pos)
-#define TCC_WEXCTRL_DTHS(value)     ((TCC_WEXCTRL_DTHS_Msk & ((value) << TCC_WEXCTRL_DTHS_Pos)))
+#define TCC_WEXCTRL_DTHS(value)     (TCC_WEXCTRL_DTHS_Msk & ((value) << TCC_WEXCTRL_DTHS_Pos))
 #define TCC_WEXCTRL_MASK            0xFFFF0F03ul /**< \brief (TCC_WEXCTRL) MASK Register */
 
 /* -------- TCC_DRVCTRL : (TCC Offset: 0x18) (R/W 32) Driver Control -------- */
@@ -642,7 +639,7 @@ typedef union {
 #define TCC_DRVCTRL_NRE7            (1 << TCC_DRVCTRL_NRE7_Pos)
 #define TCC_DRVCTRL_NRE_Pos         0            /**< \brief (TCC_DRVCTRL) Non-Recoverable State x Output Enable */
 #define TCC_DRVCTRL_NRE_Msk         (0xFFul << TCC_DRVCTRL_NRE_Pos)
-#define TCC_DRVCTRL_NRE(value)      ((TCC_DRVCTRL_NRE_Msk & ((value) << TCC_DRVCTRL_NRE_Pos)))
+#define TCC_DRVCTRL_NRE(value)      (TCC_DRVCTRL_NRE_Msk & ((value) << TCC_DRVCTRL_NRE_Pos))
 #define TCC_DRVCTRL_NRV0_Pos        8            /**< \brief (TCC_DRVCTRL) Non-Recoverable State 0 Output Value */
 #define TCC_DRVCTRL_NRV0            (1 << TCC_DRVCTRL_NRV0_Pos)
 #define TCC_DRVCTRL_NRV1_Pos        9            /**< \brief (TCC_DRVCTRL) Non-Recoverable State 1 Output Value */
@@ -661,7 +658,7 @@ typedef union {
 #define TCC_DRVCTRL_NRV7            (1 << TCC_DRVCTRL_NRV7_Pos)
 #define TCC_DRVCTRL_NRV_Pos         8            /**< \brief (TCC_DRVCTRL) Non-Recoverable State x Output Value */
 #define TCC_DRVCTRL_NRV_Msk         (0xFFul << TCC_DRVCTRL_NRV_Pos)
-#define TCC_DRVCTRL_NRV(value)      ((TCC_DRVCTRL_NRV_Msk & ((value) << TCC_DRVCTRL_NRV_Pos)))
+#define TCC_DRVCTRL_NRV(value)      (TCC_DRVCTRL_NRV_Msk & ((value) << TCC_DRVCTRL_NRV_Pos))
 #define TCC_DRVCTRL_INVEN0_Pos      16           /**< \brief (TCC_DRVCTRL) Output Waveform 0 Inversion */
 #define TCC_DRVCTRL_INVEN0          (1 << TCC_DRVCTRL_INVEN0_Pos)
 #define TCC_DRVCTRL_INVEN1_Pos      17           /**< \brief (TCC_DRVCTRL) Output Waveform 1 Inversion */
@@ -680,13 +677,13 @@ typedef union {
 #define TCC_DRVCTRL_INVEN7          (1 << TCC_DRVCTRL_INVEN7_Pos)
 #define TCC_DRVCTRL_INVEN_Pos       16           /**< \brief (TCC_DRVCTRL) Output Waveform x Inversion */
 #define TCC_DRVCTRL_INVEN_Msk       (0xFFul << TCC_DRVCTRL_INVEN_Pos)
-#define TCC_DRVCTRL_INVEN(value)    ((TCC_DRVCTRL_INVEN_Msk & ((value) << TCC_DRVCTRL_INVEN_Pos)))
+#define TCC_DRVCTRL_INVEN(value)    (TCC_DRVCTRL_INVEN_Msk & ((value) << TCC_DRVCTRL_INVEN_Pos))
 #define TCC_DRVCTRL_FILTERVAL0_Pos  24           /**< \brief (TCC_DRVCTRL) Non-Recoverable Fault Input 0 Filter Value */
 #define TCC_DRVCTRL_FILTERVAL0_Msk  (0xFul << TCC_DRVCTRL_FILTERVAL0_Pos)
-#define TCC_DRVCTRL_FILTERVAL0(value) ((TCC_DRVCTRL_FILTERVAL0_Msk & ((value) << TCC_DRVCTRL_FILTERVAL0_Pos)))
+#define TCC_DRVCTRL_FILTERVAL0(value) (TCC_DRVCTRL_FILTERVAL0_Msk & ((value) << TCC_DRVCTRL_FILTERVAL0_Pos))
 #define TCC_DRVCTRL_FILTERVAL1_Pos  28           /**< \brief (TCC_DRVCTRL) Non-Recoverable Fault Input 1 Filter Value */
 #define TCC_DRVCTRL_FILTERVAL1_Msk  (0xFul << TCC_DRVCTRL_FILTERVAL1_Pos)
-#define TCC_DRVCTRL_FILTERVAL1(value) ((TCC_DRVCTRL_FILTERVAL1_Msk & ((value) << TCC_DRVCTRL_FILTERVAL1_Pos)))
+#define TCC_DRVCTRL_FILTERVAL1(value) (TCC_DRVCTRL_FILTERVAL1_Msk & ((value) << TCC_DRVCTRL_FILTERVAL1_Pos))
 #define TCC_DRVCTRL_MASK            0xFFFFFFFFul /**< \brief (TCC_DRVCTRL) MASK Register */
 
 /* -------- TCC_DBGCTRL : (TCC Offset: 0x1E) (R/W  8) Debug Control -------- */
@@ -755,7 +752,7 @@ typedef union {
 
 #define TCC_EVCTRL_EVACT0_Pos       0            /**< \brief (TCC_EVCTRL) Timer/counter Input Event0 Action */
 #define TCC_EVCTRL_EVACT0_Msk       (0x7ul << TCC_EVCTRL_EVACT0_Pos)
-#define TCC_EVCTRL_EVACT0(value)    ((TCC_EVCTRL_EVACT0_Msk & ((value) << TCC_EVCTRL_EVACT0_Pos)))
+#define TCC_EVCTRL_EVACT0(value)    (TCC_EVCTRL_EVACT0_Msk & ((value) << TCC_EVCTRL_EVACT0_Pos))
 #define   TCC_EVCTRL_EVACT0_OFF_Val       0x0ul  /**< \brief (TCC_EVCTRL) Event action disabled */
 #define   TCC_EVCTRL_EVACT0_RETRIGGER_Val 0x1ul  /**< \brief (TCC_EVCTRL) Start, restart or re-trigger counter on event */
 #define   TCC_EVCTRL_EVACT0_COUNTEV_Val   0x2ul  /**< \brief (TCC_EVCTRL) Count on event */
@@ -772,7 +769,7 @@ typedef union {
 #define TCC_EVCTRL_EVACT0_FAULT     (TCC_EVCTRL_EVACT0_FAULT_Val   << TCC_EVCTRL_EVACT0_Pos)
 #define TCC_EVCTRL_EVACT1_Pos       3            /**< \brief (TCC_EVCTRL) Timer/counter Input Event1 Action */
 #define TCC_EVCTRL_EVACT1_Msk       (0x7ul << TCC_EVCTRL_EVACT1_Pos)
-#define TCC_EVCTRL_EVACT1(value)    ((TCC_EVCTRL_EVACT1_Msk & ((value) << TCC_EVCTRL_EVACT1_Pos)))
+#define TCC_EVCTRL_EVACT1(value)    (TCC_EVCTRL_EVACT1_Msk & ((value) << TCC_EVCTRL_EVACT1_Pos))
 #define   TCC_EVCTRL_EVACT1_OFF_Val       0x0ul  /**< \brief (TCC_EVCTRL) Event action disabled */
 #define   TCC_EVCTRL_EVACT1_RETRIGGER_Val 0x1ul  /**< \brief (TCC_EVCTRL) Re-trigger counter on event */
 #define   TCC_EVCTRL_EVACT1_DIR_Val       0x2ul  /**< \brief (TCC_EVCTRL) Direction control */
@@ -791,7 +788,7 @@ typedef union {
 #define TCC_EVCTRL_EVACT1_FAULT     (TCC_EVCTRL_EVACT1_FAULT_Val   << TCC_EVCTRL_EVACT1_Pos)
 #define TCC_EVCTRL_CNTSEL_Pos       6            /**< \brief (TCC_EVCTRL) Timer/counter Output Event Mode */
 #define TCC_EVCTRL_CNTSEL_Msk       (0x3ul << TCC_EVCTRL_CNTSEL_Pos)
-#define TCC_EVCTRL_CNTSEL(value)    ((TCC_EVCTRL_CNTSEL_Msk & ((value) << TCC_EVCTRL_CNTSEL_Pos)))
+#define TCC_EVCTRL_CNTSEL(value)    (TCC_EVCTRL_CNTSEL_Msk & ((value) << TCC_EVCTRL_CNTSEL_Pos))
 #define   TCC_EVCTRL_CNTSEL_START_Val     0x0ul  /**< \brief (TCC_EVCTRL) An interrupt/event is generated when a new counter cycle starts */
 #define   TCC_EVCTRL_CNTSEL_END_Val       0x1ul  /**< \brief (TCC_EVCTRL) An interrupt/event is generated when a counter cycle ends */
 #define   TCC_EVCTRL_CNTSEL_BETWEEN_Val   0x2ul  /**< \brief (TCC_EVCTRL) An interrupt/event is generated when a counter cycle ends, except for the first and last cycles */
@@ -812,14 +809,14 @@ typedef union {
 #define TCC_EVCTRL_TCINV1           (1 << TCC_EVCTRL_TCINV1_Pos)
 #define TCC_EVCTRL_TCINV_Pos        12           /**< \brief (TCC_EVCTRL) Inverted Event x Input Enable */
 #define TCC_EVCTRL_TCINV_Msk        (0x3ul << TCC_EVCTRL_TCINV_Pos)
-#define TCC_EVCTRL_TCINV(value)     ((TCC_EVCTRL_TCINV_Msk & ((value) << TCC_EVCTRL_TCINV_Pos)))
+#define TCC_EVCTRL_TCINV(value)     (TCC_EVCTRL_TCINV_Msk & ((value) << TCC_EVCTRL_TCINV_Pos))
 #define TCC_EVCTRL_TCEI0_Pos        14           /**< \brief (TCC_EVCTRL) Timer/counter Event 0 Input Enable */
 #define TCC_EVCTRL_TCEI0            (1 << TCC_EVCTRL_TCEI0_Pos)
 #define TCC_EVCTRL_TCEI1_Pos        15           /**< \brief (TCC_EVCTRL) Timer/counter Event 1 Input Enable */
 #define TCC_EVCTRL_TCEI1            (1 << TCC_EVCTRL_TCEI1_Pos)
 #define TCC_EVCTRL_TCEI_Pos         14           /**< \brief (TCC_EVCTRL) Timer/counter Event x Input Enable */
 #define TCC_EVCTRL_TCEI_Msk         (0x3ul << TCC_EVCTRL_TCEI_Pos)
-#define TCC_EVCTRL_TCEI(value)      ((TCC_EVCTRL_TCEI_Msk & ((value) << TCC_EVCTRL_TCEI_Pos)))
+#define TCC_EVCTRL_TCEI(value)      (TCC_EVCTRL_TCEI_Msk & ((value) << TCC_EVCTRL_TCEI_Pos))
 #define TCC_EVCTRL_MCEI0_Pos        16           /**< \brief (TCC_EVCTRL) Match or Capture Channel 0 Event Input Enable */
 #define TCC_EVCTRL_MCEI0            (1 << TCC_EVCTRL_MCEI0_Pos)
 #define TCC_EVCTRL_MCEI1_Pos        17           /**< \brief (TCC_EVCTRL) Match or Capture Channel 1 Event Input Enable */
@@ -830,7 +827,7 @@ typedef union {
 #define TCC_EVCTRL_MCEI3            (1 << TCC_EVCTRL_MCEI3_Pos)
 #define TCC_EVCTRL_MCEI_Pos         16           /**< \brief (TCC_EVCTRL) Match or Capture Channel x Event Input Enable */
 #define TCC_EVCTRL_MCEI_Msk         (0xFul << TCC_EVCTRL_MCEI_Pos)
-#define TCC_EVCTRL_MCEI(value)      ((TCC_EVCTRL_MCEI_Msk & ((value) << TCC_EVCTRL_MCEI_Pos)))
+#define TCC_EVCTRL_MCEI(value)      (TCC_EVCTRL_MCEI_Msk & ((value) << TCC_EVCTRL_MCEI_Pos))
 #define TCC_EVCTRL_MCEO0_Pos        24           /**< \brief (TCC_EVCTRL) Match or Capture Channel 0 Event Output Enable */
 #define TCC_EVCTRL_MCEO0            (1 << TCC_EVCTRL_MCEO0_Pos)
 #define TCC_EVCTRL_MCEO1_Pos        25           /**< \brief (TCC_EVCTRL) Match or Capture Channel 1 Event Output Enable */
@@ -841,7 +838,7 @@ typedef union {
 #define TCC_EVCTRL_MCEO3            (1 << TCC_EVCTRL_MCEO3_Pos)
 #define TCC_EVCTRL_MCEO_Pos         24           /**< \brief (TCC_EVCTRL) Match or Capture Channel x Event Output Enable */
 #define TCC_EVCTRL_MCEO_Msk         (0xFul << TCC_EVCTRL_MCEO_Pos)
-#define TCC_EVCTRL_MCEO(value)      ((TCC_EVCTRL_MCEO_Msk & ((value) << TCC_EVCTRL_MCEO_Pos)))
+#define TCC_EVCTRL_MCEO(value)      (TCC_EVCTRL_MCEO_Msk & ((value) << TCC_EVCTRL_MCEO_Pos))
 #define TCC_EVCTRL_MASK             0x0F0FF7FFul /**< \brief (TCC_EVCTRL) MASK Register */
 
 /* -------- TCC_INTENCLR : (TCC Offset: 0x24) (R/W 32) Interrupt Enable Clear -------- */
@@ -904,7 +901,7 @@ typedef union {
 #define TCC_INTENCLR_MC3            (1 << TCC_INTENCLR_MC3_Pos)
 #define TCC_INTENCLR_MC_Pos         16           /**< \brief (TCC_INTENCLR) Match or Capture Channel x Interrupt Enable */
 #define TCC_INTENCLR_MC_Msk         (0xFul << TCC_INTENCLR_MC_Pos)
-#define TCC_INTENCLR_MC(value)      ((TCC_INTENCLR_MC_Msk & ((value) << TCC_INTENCLR_MC_Pos)))
+#define TCC_INTENCLR_MC(value)      (TCC_INTENCLR_MC_Msk & ((value) << TCC_INTENCLR_MC_Pos))
 #define TCC_INTENCLR_MASK           0x000FF80Ful /**< \brief (TCC_INTENCLR) MASK Register */
 
 /* -------- TCC_INTENSET : (TCC Offset: 0x28) (R/W 32) Interrupt Enable Set -------- */
@@ -967,33 +964,33 @@ typedef union {
 #define TCC_INTENSET_MC3            (1 << TCC_INTENSET_MC3_Pos)
 #define TCC_INTENSET_MC_Pos         16           /**< \brief (TCC_INTENSET) Match or Capture Channel x Interrupt Enable */
 #define TCC_INTENSET_MC_Msk         (0xFul << TCC_INTENSET_MC_Pos)
-#define TCC_INTENSET_MC(value)      ((TCC_INTENSET_MC_Msk & ((value) << TCC_INTENSET_MC_Pos)))
+#define TCC_INTENSET_MC(value)      (TCC_INTENSET_MC_Msk & ((value) << TCC_INTENSET_MC_Pos))
 #define TCC_INTENSET_MASK           0x000FF80Ful /**< \brief (TCC_INTENSET) MASK Register */
 
 /* -------- TCC_INTFLAG : (TCC Offset: 0x2C) (R/W 32) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint32_t OVF:1;            /*!< bit:      0  Overflow                           */
-    uint32_t TRG:1;            /*!< bit:      1  Retrigger                          */
-    uint32_t CNT:1;            /*!< bit:      2  Counter                            */
-    uint32_t ERR:1;            /*!< bit:      3  Error                              */
-    uint32_t :7;               /*!< bit:  4..10  Reserved                           */
-    uint32_t DFS:1;            /*!< bit:     11  Non-Recoverable Debug Fault        */
-    uint32_t FAULTA:1;         /*!< bit:     12  Recoverable Fault A                */
-    uint32_t FAULTB:1;         /*!< bit:     13  Recoverable Fault B                */
-    uint32_t FAULT0:1;         /*!< bit:     14  Non-Recoverable Fault 0            */
-    uint32_t FAULT1:1;         /*!< bit:     15  Non-Recoverable Fault 1            */
-    uint32_t MC0:1;            /*!< bit:     16  Match or Capture 0                 */
-    uint32_t MC1:1;            /*!< bit:     17  Match or Capture 1                 */
-    uint32_t MC2:1;            /*!< bit:     18  Match or Capture 2                 */
-    uint32_t MC3:1;            /*!< bit:     19  Match or Capture 3                 */
-    uint32_t :12;              /*!< bit: 20..31  Reserved                           */
+    __I uint32_t OVF:1;            /*!< bit:      0  Overflow                           */
+    __I uint32_t TRG:1;            /*!< bit:      1  Retrigger                          */
+    __I uint32_t CNT:1;            /*!< bit:      2  Counter                            */
+    __I uint32_t ERR:1;            /*!< bit:      3  Error                              */
+    __I uint32_t :7;               /*!< bit:  4..10  Reserved                           */
+    __I uint32_t DFS:1;            /*!< bit:     11  Non-Recoverable Debug Fault        */
+    __I uint32_t FAULTA:1;         /*!< bit:     12  Recoverable Fault A                */
+    __I uint32_t FAULTB:1;         /*!< bit:     13  Recoverable Fault B                */
+    __I uint32_t FAULT0:1;         /*!< bit:     14  Non-Recoverable Fault 0            */
+    __I uint32_t FAULT1:1;         /*!< bit:     15  Non-Recoverable Fault 1            */
+    __I uint32_t MC0:1;            /*!< bit:     16  Match or Capture 0                 */
+    __I uint32_t MC1:1;            /*!< bit:     17  Match or Capture 1                 */
+    __I uint32_t MC2:1;            /*!< bit:     18  Match or Capture 2                 */
+    __I uint32_t MC3:1;            /*!< bit:     19  Match or Capture 3                 */
+    __I uint32_t :12;              /*!< bit: 20..31  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   struct {
-    uint32_t :16;              /*!< bit:  0..15  Reserved                           */
-    uint32_t MC:4;             /*!< bit: 16..19  Match or Capture x                 */
-    uint32_t :12;              /*!< bit: 20..31  Reserved                           */
+    __I uint32_t :16;              /*!< bit:  0..15  Reserved                           */
+    __I uint32_t MC:4;             /*!< bit: 16..19  Match or Capture x                 */
+    __I uint32_t :12;              /*!< bit: 20..31  Reserved                           */
   } vec;                       /*!< Structure used for vec  access                  */
   uint32_t reg;                /*!< Type      used for register access              */
 } TCC_INTFLAG_Type;
@@ -1030,7 +1027,7 @@ typedef union {
 #define TCC_INTFLAG_MC3             (1 << TCC_INTFLAG_MC3_Pos)
 #define TCC_INTFLAG_MC_Pos          16           /**< \brief (TCC_INTFLAG) Match or Capture x */
 #define TCC_INTFLAG_MC_Msk          (0xFul << TCC_INTFLAG_MC_Pos)
-#define TCC_INTFLAG_MC(value)       ((TCC_INTFLAG_MC_Msk & ((value) << TCC_INTFLAG_MC_Pos)))
+#define TCC_INTFLAG_MC(value)       (TCC_INTFLAG_MC_Msk & ((value) << TCC_INTFLAG_MC_Pos))
 #define TCC_INTFLAG_MASK            0x000FF80Ful /**< \brief (TCC_INTFLAG) MASK Register */
 
 /* -------- TCC_STATUS : (TCC Offset: 0x30) (R/W 32) Status -------- */
@@ -1118,7 +1115,7 @@ typedef union {
 #define TCC_STATUS_CCBV3            (1 << TCC_STATUS_CCBV3_Pos)
 #define TCC_STATUS_CCBV_Pos         16           /**< \brief (TCC_STATUS) Compare Channel x Buffer Valid */
 #define TCC_STATUS_CCBV_Msk         (0xFul << TCC_STATUS_CCBV_Pos)
-#define TCC_STATUS_CCBV(value)      ((TCC_STATUS_CCBV_Msk & ((value) << TCC_STATUS_CCBV_Pos)))
+#define TCC_STATUS_CCBV(value)      (TCC_STATUS_CCBV_Msk & ((value) << TCC_STATUS_CCBV_Pos))
 #define TCC_STATUS_CMP0_Pos         24           /**< \brief (TCC_STATUS) Compare Channel 0 Value */
 #define TCC_STATUS_CMP0             (1 << TCC_STATUS_CMP0_Pos)
 #define TCC_STATUS_CMP1_Pos         25           /**< \brief (TCC_STATUS) Compare Channel 1 Value */
@@ -1129,7 +1126,7 @@ typedef union {
 #define TCC_STATUS_CMP3             (1 << TCC_STATUS_CMP3_Pos)
 #define TCC_STATUS_CMP_Pos          24           /**< \brief (TCC_STATUS) Compare Channel x Value */
 #define TCC_STATUS_CMP_Msk          (0xFul << TCC_STATUS_CMP_Pos)
-#define TCC_STATUS_CMP(value)       ((TCC_STATUS_CMP_Msk & ((value) << TCC_STATUS_CMP_Pos)))
+#define TCC_STATUS_CMP(value)       (TCC_STATUS_CMP_Msk & ((value) << TCC_STATUS_CMP_Pos))
 #define TCC_STATUS_MASK             0x0F0FFFFBul /**< \brief (TCC_STATUS) MASK Register */
 
 /* -------- TCC_COUNT : (TCC Offset: 0x34) (R/W 32) Count -------- */
@@ -1164,24 +1161,24 @@ typedef union {
 // DITH4 mode
 #define TCC_COUNT_DITH4_COUNT_Pos   4            /**< \brief (TCC_COUNT_DITH4) Counter Value */
 #define TCC_COUNT_DITH4_COUNT_Msk   (0xFFFFFul << TCC_COUNT_DITH4_COUNT_Pos)
-#define TCC_COUNT_DITH4_COUNT(value) ((TCC_COUNT_DITH4_COUNT_Msk & ((value) << TCC_COUNT_DITH4_COUNT_Pos)))
+#define TCC_COUNT_DITH4_COUNT(value) (TCC_COUNT_DITH4_COUNT_Msk & ((value) << TCC_COUNT_DITH4_COUNT_Pos))
 #define TCC_COUNT_DITH4_MASK        0x00FFFFF0ul /**< \brief (TCC_COUNT_DITH4) MASK Register */
 
 // DITH5 mode
 #define TCC_COUNT_DITH5_COUNT_Pos   5            /**< \brief (TCC_COUNT_DITH5) Counter Value */
 #define TCC_COUNT_DITH5_COUNT_Msk   (0x7FFFFul << TCC_COUNT_DITH5_COUNT_Pos)
-#define TCC_COUNT_DITH5_COUNT(value) ((TCC_COUNT_DITH5_COUNT_Msk & ((value) << TCC_COUNT_DITH5_COUNT_Pos)))
+#define TCC_COUNT_DITH5_COUNT(value) (TCC_COUNT_DITH5_COUNT_Msk & ((value) << TCC_COUNT_DITH5_COUNT_Pos))
 #define TCC_COUNT_DITH5_MASK        0x00FFFFE0ul /**< \brief (TCC_COUNT_DITH5) MASK Register */
 
 // DITH6 mode
 #define TCC_COUNT_DITH6_COUNT_Pos   6            /**< \brief (TCC_COUNT_DITH6) Counter Value */
 #define TCC_COUNT_DITH6_COUNT_Msk   (0x3FFFFul << TCC_COUNT_DITH6_COUNT_Pos)
-#define TCC_COUNT_DITH6_COUNT(value) ((TCC_COUNT_DITH6_COUNT_Msk & ((value) << TCC_COUNT_DITH6_COUNT_Pos)))
+#define TCC_COUNT_DITH6_COUNT(value) (TCC_COUNT_DITH6_COUNT_Msk & ((value) << TCC_COUNT_DITH6_COUNT_Pos))
 #define TCC_COUNT_DITH6_MASK        0x00FFFFC0ul /**< \brief (TCC_COUNT_DITH6) MASK Register */
 
 #define TCC_COUNT_COUNT_Pos         0            /**< \brief (TCC_COUNT) Counter Value */
 #define TCC_COUNT_COUNT_Msk         (0xFFFFFFul << TCC_COUNT_COUNT_Pos)
-#define TCC_COUNT_COUNT(value)      ((TCC_COUNT_COUNT_Msk & ((value) << TCC_COUNT_COUNT_Pos)))
+#define TCC_COUNT_COUNT(value)      (TCC_COUNT_COUNT_Msk & ((value) << TCC_COUNT_COUNT_Pos))
 #define TCC_COUNT_MASK              0x00FFFFFFul /**< \brief (TCC_COUNT) MASK Register */
 
 /* -------- TCC_PATT : (TCC Offset: 0x38) (R/W 16) Pattern -------- */
@@ -1234,7 +1231,7 @@ typedef union {
 #define TCC_PATT_PGE7               (1 << TCC_PATT_PGE7_Pos)
 #define TCC_PATT_PGE_Pos            0            /**< \brief (TCC_PATT) Pattern Generator x Output Enable */
 #define TCC_PATT_PGE_Msk            (0xFFul << TCC_PATT_PGE_Pos)
-#define TCC_PATT_PGE(value)         ((TCC_PATT_PGE_Msk & ((value) << TCC_PATT_PGE_Pos)))
+#define TCC_PATT_PGE(value)         (TCC_PATT_PGE_Msk & ((value) << TCC_PATT_PGE_Pos))
 #define TCC_PATT_PGV0_Pos           8            /**< \brief (TCC_PATT) Pattern Generator 0 Output Value */
 #define TCC_PATT_PGV0               (1 << TCC_PATT_PGV0_Pos)
 #define TCC_PATT_PGV1_Pos           9            /**< \brief (TCC_PATT) Pattern Generator 1 Output Value */
@@ -1253,7 +1250,7 @@ typedef union {
 #define TCC_PATT_PGV7               (1 << TCC_PATT_PGV7_Pos)
 #define TCC_PATT_PGV_Pos            8            /**< \brief (TCC_PATT) Pattern Generator x Output Value */
 #define TCC_PATT_PGV_Msk            (0xFFul << TCC_PATT_PGV_Pos)
-#define TCC_PATT_PGV(value)         ((TCC_PATT_PGV_Msk & ((value) << TCC_PATT_PGV_Pos)))
+#define TCC_PATT_PGV(value)         (TCC_PATT_PGV_Msk & ((value) << TCC_PATT_PGV_Pos))
 #define TCC_PATT_MASK               0xFFFFul     /**< \brief (TCC_PATT) MASK Register */
 
 /* -------- TCC_WAVE : (TCC Offset: 0x3C) (R/W 32) Waveform Control -------- */
@@ -1299,7 +1296,7 @@ typedef union {
 
 #define TCC_WAVE_WAVEGEN_Pos        0            /**< \brief (TCC_WAVE) Waveform Generation */
 #define TCC_WAVE_WAVEGEN_Msk        (0x7ul << TCC_WAVE_WAVEGEN_Pos)
-#define TCC_WAVE_WAVEGEN(value)     ((TCC_WAVE_WAVEGEN_Msk & ((value) << TCC_WAVE_WAVEGEN_Pos)))
+#define TCC_WAVE_WAVEGEN(value)     (TCC_WAVE_WAVEGEN_Msk & ((value) << TCC_WAVE_WAVEGEN_Pos))
 #define   TCC_WAVE_WAVEGEN_NFRQ_Val       0x0ul  /**< \brief (TCC_WAVE) Normal frequency */
 #define   TCC_WAVE_WAVEGEN_MFRQ_Val       0x1ul  /**< \brief (TCC_WAVE) Match frequency */
 #define   TCC_WAVE_WAVEGEN_NPWM_Val       0x2ul  /**< \brief (TCC_WAVE) Normal PWM */
@@ -1316,7 +1313,7 @@ typedef union {
 #define TCC_WAVE_WAVEGEN_DSTOP      (TCC_WAVE_WAVEGEN_DSTOP_Val    << TCC_WAVE_WAVEGEN_Pos)
 #define TCC_WAVE_RAMP_Pos           4            /**< \brief (TCC_WAVE) Ramp Mode */
 #define TCC_WAVE_RAMP_Msk           (0x3ul << TCC_WAVE_RAMP_Pos)
-#define TCC_WAVE_RAMP(value)        ((TCC_WAVE_RAMP_Msk & ((value) << TCC_WAVE_RAMP_Pos)))
+#define TCC_WAVE_RAMP(value)        (TCC_WAVE_RAMP_Msk & ((value) << TCC_WAVE_RAMP_Pos))
 #define   TCC_WAVE_RAMP_RAMP1_Val         0x0ul  /**< \brief (TCC_WAVE) RAMP1 operation */
 #define   TCC_WAVE_RAMP_RAMP2A_Val        0x1ul  /**< \brief (TCC_WAVE) Alternative RAMP2 operation */
 #define   TCC_WAVE_RAMP_RAMP2_Val         0x2ul  /**< \brief (TCC_WAVE) RAMP2 operation */
@@ -1335,7 +1332,7 @@ typedef union {
 #define TCC_WAVE_CICCEN3            (1 << TCC_WAVE_CICCEN3_Pos)
 #define TCC_WAVE_CICCEN_Pos         8            /**< \brief (TCC_WAVE) Circular Channel x Enable */
 #define TCC_WAVE_CICCEN_Msk         (0xFul << TCC_WAVE_CICCEN_Pos)
-#define TCC_WAVE_CICCEN(value)      ((TCC_WAVE_CICCEN_Msk & ((value) << TCC_WAVE_CICCEN_Pos)))
+#define TCC_WAVE_CICCEN(value)      (TCC_WAVE_CICCEN_Msk & ((value) << TCC_WAVE_CICCEN_Pos))
 #define TCC_WAVE_POL0_Pos           16           /**< \brief (TCC_WAVE) Channel 0 Polarity */
 #define TCC_WAVE_POL0               (1 << TCC_WAVE_POL0_Pos)
 #define TCC_WAVE_POL1_Pos           17           /**< \brief (TCC_WAVE) Channel 1 Polarity */
@@ -1346,7 +1343,7 @@ typedef union {
 #define TCC_WAVE_POL3               (1 << TCC_WAVE_POL3_Pos)
 #define TCC_WAVE_POL_Pos            16           /**< \brief (TCC_WAVE) Channel x Polarity */
 #define TCC_WAVE_POL_Msk            (0xFul << TCC_WAVE_POL_Pos)
-#define TCC_WAVE_POL(value)         ((TCC_WAVE_POL_Msk & ((value) << TCC_WAVE_POL_Pos)))
+#define TCC_WAVE_POL(value)         (TCC_WAVE_POL_Msk & ((value) << TCC_WAVE_POL_Pos))
 #define TCC_WAVE_SWAP0_Pos          24           /**< \brief (TCC_WAVE) Swap DTI Output Pair 0 */
 #define TCC_WAVE_SWAP0              (1 << TCC_WAVE_SWAP0_Pos)
 #define TCC_WAVE_SWAP1_Pos          25           /**< \brief (TCC_WAVE) Swap DTI Output Pair 1 */
@@ -1357,7 +1354,7 @@ typedef union {
 #define TCC_WAVE_SWAP3              (1 << TCC_WAVE_SWAP3_Pos)
 #define TCC_WAVE_SWAP_Pos           24           /**< \brief (TCC_WAVE) Swap DTI Output Pair x */
 #define TCC_WAVE_SWAP_Msk           (0xFul << TCC_WAVE_SWAP_Pos)
-#define TCC_WAVE_SWAP(value)        ((TCC_WAVE_SWAP_Msk & ((value) << TCC_WAVE_SWAP_Pos)))
+#define TCC_WAVE_SWAP(value)        (TCC_WAVE_SWAP_Msk & ((value) << TCC_WAVE_SWAP_Pos))
 #define TCC_WAVE_MASK               0x0F0F0FB7ul /**< \brief (TCC_WAVE) MASK Register */
 
 /* -------- TCC_PER : (TCC Offset: 0x40) (R/W 32) Period -------- */
@@ -1392,33 +1389,33 @@ typedef union {
 // DITH4 mode
 #define TCC_PER_DITH4_DITHERCY_Pos  0            /**< \brief (TCC_PER_DITH4) Dithering Cycle Number */
 #define TCC_PER_DITH4_DITHERCY_Msk  (0xFul << TCC_PER_DITH4_DITHERCY_Pos)
-#define TCC_PER_DITH4_DITHERCY(value) ((TCC_PER_DITH4_DITHERCY_Msk & ((value) << TCC_PER_DITH4_DITHERCY_Pos)))
+#define TCC_PER_DITH4_DITHERCY(value) (TCC_PER_DITH4_DITHERCY_Msk & ((value) << TCC_PER_DITH4_DITHERCY_Pos))
 #define TCC_PER_DITH4_PER_Pos       4            /**< \brief (TCC_PER_DITH4) Period Value */
 #define TCC_PER_DITH4_PER_Msk       (0xFFFFFul << TCC_PER_DITH4_PER_Pos)
-#define TCC_PER_DITH4_PER(value)    ((TCC_PER_DITH4_PER_Msk & ((value) << TCC_PER_DITH4_PER_Pos)))
+#define TCC_PER_DITH4_PER(value)    (TCC_PER_DITH4_PER_Msk & ((value) << TCC_PER_DITH4_PER_Pos))
 #define TCC_PER_DITH4_MASK          0x00FFFFFFul /**< \brief (TCC_PER_DITH4) MASK Register */
 
 // DITH5 mode
 #define TCC_PER_DITH5_DITHERCY_Pos  0            /**< \brief (TCC_PER_DITH5) Dithering Cycle Number */
 #define TCC_PER_DITH5_DITHERCY_Msk  (0x1Ful << TCC_PER_DITH5_DITHERCY_Pos)
-#define TCC_PER_DITH5_DITHERCY(value) ((TCC_PER_DITH5_DITHERCY_Msk & ((value) << TCC_PER_DITH5_DITHERCY_Pos)))
+#define TCC_PER_DITH5_DITHERCY(value) (TCC_PER_DITH5_DITHERCY_Msk & ((value) << TCC_PER_DITH5_DITHERCY_Pos))
 #define TCC_PER_DITH5_PER_Pos       5            /**< \brief (TCC_PER_DITH5) Period Value */
 #define TCC_PER_DITH5_PER_Msk       (0x7FFFFul << TCC_PER_DITH5_PER_Pos)
-#define TCC_PER_DITH5_PER(value)    ((TCC_PER_DITH5_PER_Msk & ((value) << TCC_PER_DITH5_PER_Pos)))
+#define TCC_PER_DITH5_PER(value)    (TCC_PER_DITH5_PER_Msk & ((value) << TCC_PER_DITH5_PER_Pos))
 #define TCC_PER_DITH5_MASK          0x00FFFFFFul /**< \brief (TCC_PER_DITH5) MASK Register */
 
 // DITH6 mode
 #define TCC_PER_DITH6_DITHERCY_Pos  0            /**< \brief (TCC_PER_DITH6) Dithering Cycle Number */
 #define TCC_PER_DITH6_DITHERCY_Msk  (0x3Ful << TCC_PER_DITH6_DITHERCY_Pos)
-#define TCC_PER_DITH6_DITHERCY(value) ((TCC_PER_DITH6_DITHERCY_Msk & ((value) << TCC_PER_DITH6_DITHERCY_Pos)))
+#define TCC_PER_DITH6_DITHERCY(value) (TCC_PER_DITH6_DITHERCY_Msk & ((value) << TCC_PER_DITH6_DITHERCY_Pos))
 #define TCC_PER_DITH6_PER_Pos       6            /**< \brief (TCC_PER_DITH6) Period Value */
 #define TCC_PER_DITH6_PER_Msk       (0x3FFFFul << TCC_PER_DITH6_PER_Pos)
-#define TCC_PER_DITH6_PER(value)    ((TCC_PER_DITH6_PER_Msk & ((value) << TCC_PER_DITH6_PER_Pos)))
+#define TCC_PER_DITH6_PER(value)    (TCC_PER_DITH6_PER_Msk & ((value) << TCC_PER_DITH6_PER_Pos))
 #define TCC_PER_DITH6_MASK          0x00FFFFFFul /**< \brief (TCC_PER_DITH6) MASK Register */
 
 #define TCC_PER_PER_Pos             0            /**< \brief (TCC_PER) Period Value */
 #define TCC_PER_PER_Msk             (0xFFFFFFul << TCC_PER_PER_Pos)
-#define TCC_PER_PER(value)          ((TCC_PER_PER_Msk & ((value) << TCC_PER_PER_Pos)))
+#define TCC_PER_PER(value)          (TCC_PER_PER_Msk & ((value) << TCC_PER_PER_Pos))
 #define TCC_PER_MASK                0x00FFFFFFul /**< \brief (TCC_PER) MASK Register */
 
 /* -------- TCC_CC : (TCC Offset: 0x44) (R/W 32) Compare and Capture -------- */
@@ -1453,33 +1450,33 @@ typedef union {
 // DITH4 mode
 #define TCC_CC_DITH4_DITHERCY_Pos   0            /**< \brief (TCC_CC_DITH4) Dithering Cycle Number */
 #define TCC_CC_DITH4_DITHERCY_Msk   (0xFul << TCC_CC_DITH4_DITHERCY_Pos)
-#define TCC_CC_DITH4_DITHERCY(value) ((TCC_CC_DITH4_DITHERCY_Msk & ((value) << TCC_CC_DITH4_DITHERCY_Pos)))
+#define TCC_CC_DITH4_DITHERCY(value) (TCC_CC_DITH4_DITHERCY_Msk & ((value) << TCC_CC_DITH4_DITHERCY_Pos))
 #define TCC_CC_DITH4_CC_Pos         4            /**< \brief (TCC_CC_DITH4) Channel Compare/Capture Value */
 #define TCC_CC_DITH4_CC_Msk         (0xFFFFFul << TCC_CC_DITH4_CC_Pos)
-#define TCC_CC_DITH4_CC(value)      ((TCC_CC_DITH4_CC_Msk & ((value) << TCC_CC_DITH4_CC_Pos)))
+#define TCC_CC_DITH4_CC(value)      (TCC_CC_DITH4_CC_Msk & ((value) << TCC_CC_DITH4_CC_Pos))
 #define TCC_CC_DITH4_MASK           0x00FFFFFFul /**< \brief (TCC_CC_DITH4) MASK Register */
 
 // DITH5 mode
 #define TCC_CC_DITH5_DITHERCY_Pos   0            /**< \brief (TCC_CC_DITH5) Dithering Cycle Number */
 #define TCC_CC_DITH5_DITHERCY_Msk   (0x1Ful << TCC_CC_DITH5_DITHERCY_Pos)
-#define TCC_CC_DITH5_DITHERCY(value) ((TCC_CC_DITH5_DITHERCY_Msk & ((value) << TCC_CC_DITH5_DITHERCY_Pos)))
+#define TCC_CC_DITH5_DITHERCY(value) (TCC_CC_DITH5_DITHERCY_Msk & ((value) << TCC_CC_DITH5_DITHERCY_Pos))
 #define TCC_CC_DITH5_CC_Pos         5            /**< \brief (TCC_CC_DITH5) Channel Compare/Capture Value */
 #define TCC_CC_DITH5_CC_Msk         (0x7FFFFul << TCC_CC_DITH5_CC_Pos)
-#define TCC_CC_DITH5_CC(value)      ((TCC_CC_DITH5_CC_Msk & ((value) << TCC_CC_DITH5_CC_Pos)))
+#define TCC_CC_DITH5_CC(value)      (TCC_CC_DITH5_CC_Msk & ((value) << TCC_CC_DITH5_CC_Pos))
 #define TCC_CC_DITH5_MASK           0x00FFFFFFul /**< \brief (TCC_CC_DITH5) MASK Register */
 
 // DITH6 mode
 #define TCC_CC_DITH6_DITHERCY_Pos   0            /**< \brief (TCC_CC_DITH6) Dithering Cycle Number */
 #define TCC_CC_DITH6_DITHERCY_Msk   (0x3Ful << TCC_CC_DITH6_DITHERCY_Pos)
-#define TCC_CC_DITH6_DITHERCY(value) ((TCC_CC_DITH6_DITHERCY_Msk & ((value) << TCC_CC_DITH6_DITHERCY_Pos)))
+#define TCC_CC_DITH6_DITHERCY(value) (TCC_CC_DITH6_DITHERCY_Msk & ((value) << TCC_CC_DITH6_DITHERCY_Pos))
 #define TCC_CC_DITH6_CC_Pos         6            /**< \brief (TCC_CC_DITH6) Channel Compare/Capture Value */
 #define TCC_CC_DITH6_CC_Msk         (0x3FFFFul << TCC_CC_DITH6_CC_Pos)
-#define TCC_CC_DITH6_CC(value)      ((TCC_CC_DITH6_CC_Msk & ((value) << TCC_CC_DITH6_CC_Pos)))
+#define TCC_CC_DITH6_CC(value)      (TCC_CC_DITH6_CC_Msk & ((value) << TCC_CC_DITH6_CC_Pos))
 #define TCC_CC_DITH6_MASK           0x00FFFFFFul /**< \brief (TCC_CC_DITH6) MASK Register */
 
 #define TCC_CC_CC_Pos               0            /**< \brief (TCC_CC) Channel Compare/Capture Value */
 #define TCC_CC_CC_Msk               (0xFFFFFFul << TCC_CC_CC_Pos)
-#define TCC_CC_CC(value)            ((TCC_CC_CC_Msk & ((value) << TCC_CC_CC_Pos)))
+#define TCC_CC_CC(value)            (TCC_CC_CC_Msk & ((value) << TCC_CC_CC_Pos))
 #define TCC_CC_MASK                 0x00FFFFFFul /**< \brief (TCC_CC) MASK Register */
 
 /* -------- TCC_PATTB : (TCC Offset: 0x64) (R/W 16) Pattern Buffer -------- */
@@ -1532,7 +1529,7 @@ typedef union {
 #define TCC_PATTB_PGEB7             (1 << TCC_PATTB_PGEB7_Pos)
 #define TCC_PATTB_PGEB_Pos          0            /**< \brief (TCC_PATTB) Pattern Generator x Output Enable Buffer */
 #define TCC_PATTB_PGEB_Msk          (0xFFul << TCC_PATTB_PGEB_Pos)
-#define TCC_PATTB_PGEB(value)       ((TCC_PATTB_PGEB_Msk & ((value) << TCC_PATTB_PGEB_Pos)))
+#define TCC_PATTB_PGEB(value)       (TCC_PATTB_PGEB_Msk & ((value) << TCC_PATTB_PGEB_Pos))
 #define TCC_PATTB_PGVB0_Pos         8            /**< \brief (TCC_PATTB) Pattern Generator 0 Output Enable */
 #define TCC_PATTB_PGVB0             (1 << TCC_PATTB_PGVB0_Pos)
 #define TCC_PATTB_PGVB1_Pos         9            /**< \brief (TCC_PATTB) Pattern Generator 1 Output Enable */
@@ -1551,7 +1548,7 @@ typedef union {
 #define TCC_PATTB_PGVB7             (1 << TCC_PATTB_PGVB7_Pos)
 #define TCC_PATTB_PGVB_Pos          8            /**< \brief (TCC_PATTB) Pattern Generator x Output Enable */
 #define TCC_PATTB_PGVB_Msk          (0xFFul << TCC_PATTB_PGVB_Pos)
-#define TCC_PATTB_PGVB(value)       ((TCC_PATTB_PGVB_Msk & ((value) << TCC_PATTB_PGVB_Pos)))
+#define TCC_PATTB_PGVB(value)       (TCC_PATTB_PGVB_Msk & ((value) << TCC_PATTB_PGVB_Pos))
 #define TCC_PATTB_MASK              0xFFFFul     /**< \brief (TCC_PATTB) MASK Register */
 
 /* -------- TCC_WAVEB : (TCC Offset: 0x68) (R/W 32) Waveform Control Buffer -------- */
@@ -1597,7 +1594,7 @@ typedef union {
 
 #define TCC_WAVEB_WAVEGENB_Pos      0            /**< \brief (TCC_WAVEB) Waveform Generation Buffer */
 #define TCC_WAVEB_WAVEGENB_Msk      (0x7ul << TCC_WAVEB_WAVEGENB_Pos)
-#define TCC_WAVEB_WAVEGENB(value)   ((TCC_WAVEB_WAVEGENB_Msk & ((value) << TCC_WAVEB_WAVEGENB_Pos)))
+#define TCC_WAVEB_WAVEGENB(value)   (TCC_WAVEB_WAVEGENB_Msk & ((value) << TCC_WAVEB_WAVEGENB_Pos))
 #define   TCC_WAVEB_WAVEGENB_NFRQ_Val     0x0ul  /**< \brief (TCC_WAVEB) Normal frequency */
 #define   TCC_WAVEB_WAVEGENB_MFRQ_Val     0x1ul  /**< \brief (TCC_WAVEB) Match frequency */
 #define   TCC_WAVEB_WAVEGENB_NPWM_Val     0x2ul  /**< \brief (TCC_WAVEB) Normal PWM */
@@ -1614,7 +1611,7 @@ typedef union {
 #define TCC_WAVEB_WAVEGENB_DSTOP    (TCC_WAVEB_WAVEGENB_DSTOP_Val  << TCC_WAVEB_WAVEGENB_Pos)
 #define TCC_WAVEB_RAMPB_Pos         4            /**< \brief (TCC_WAVEB) Ramp Mode Buffer */
 #define TCC_WAVEB_RAMPB_Msk         (0x3ul << TCC_WAVEB_RAMPB_Pos)
-#define TCC_WAVEB_RAMPB(value)      ((TCC_WAVEB_RAMPB_Msk & ((value) << TCC_WAVEB_RAMPB_Pos)))
+#define TCC_WAVEB_RAMPB(value)      (TCC_WAVEB_RAMPB_Msk & ((value) << TCC_WAVEB_RAMPB_Pos))
 #define   TCC_WAVEB_RAMPB_RAMP1_Val       0x0ul  /**< \brief (TCC_WAVEB) RAMP1 operation */
 #define   TCC_WAVEB_RAMPB_RAMP2A_Val      0x1ul  /**< \brief (TCC_WAVEB) Alternative RAMP2 operation */
 #define   TCC_WAVEB_RAMPB_RAMP2_Val       0x2ul  /**< \brief (TCC_WAVEB) RAMP2 operation */
@@ -1633,7 +1630,7 @@ typedef union {
 #define TCC_WAVEB_CICCENB3          (1 << TCC_WAVEB_CICCENB3_Pos)
 #define TCC_WAVEB_CICCENB_Pos       8            /**< \brief (TCC_WAVEB) Circular Channel x Enable Buffer */
 #define TCC_WAVEB_CICCENB_Msk       (0xFul << TCC_WAVEB_CICCENB_Pos)
-#define TCC_WAVEB_CICCENB(value)    ((TCC_WAVEB_CICCENB_Msk & ((value) << TCC_WAVEB_CICCENB_Pos)))
+#define TCC_WAVEB_CICCENB(value)    (TCC_WAVEB_CICCENB_Msk & ((value) << TCC_WAVEB_CICCENB_Pos))
 #define TCC_WAVEB_POLB0_Pos         16           /**< \brief (TCC_WAVEB) Channel 0 Polarity Buffer */
 #define TCC_WAVEB_POLB0             (1 << TCC_WAVEB_POLB0_Pos)
 #define TCC_WAVEB_POLB1_Pos         17           /**< \brief (TCC_WAVEB) Channel 1 Polarity Buffer */
@@ -1644,7 +1641,7 @@ typedef union {
 #define TCC_WAVEB_POLB3             (1 << TCC_WAVEB_POLB3_Pos)
 #define TCC_WAVEB_POLB_Pos          16           /**< \brief (TCC_WAVEB) Channel x Polarity Buffer */
 #define TCC_WAVEB_POLB_Msk          (0xFul << TCC_WAVEB_POLB_Pos)
-#define TCC_WAVEB_POLB(value)       ((TCC_WAVEB_POLB_Msk & ((value) << TCC_WAVEB_POLB_Pos)))
+#define TCC_WAVEB_POLB(value)       (TCC_WAVEB_POLB_Msk & ((value) << TCC_WAVEB_POLB_Pos))
 #define TCC_WAVEB_SWAPB0_Pos        24           /**< \brief (TCC_WAVEB) Swap DTI Output Pair 0 Buffer */
 #define TCC_WAVEB_SWAPB0            (1 << TCC_WAVEB_SWAPB0_Pos)
 #define TCC_WAVEB_SWAPB1_Pos        25           /**< \brief (TCC_WAVEB) Swap DTI Output Pair 1 Buffer */
@@ -1655,7 +1652,7 @@ typedef union {
 #define TCC_WAVEB_SWAPB3            (1 << TCC_WAVEB_SWAPB3_Pos)
 #define TCC_WAVEB_SWAPB_Pos         24           /**< \brief (TCC_WAVEB) Swap DTI Output Pair x Buffer */
 #define TCC_WAVEB_SWAPB_Msk         (0xFul << TCC_WAVEB_SWAPB_Pos)
-#define TCC_WAVEB_SWAPB(value)      ((TCC_WAVEB_SWAPB_Msk & ((value) << TCC_WAVEB_SWAPB_Pos)))
+#define TCC_WAVEB_SWAPB(value)      (TCC_WAVEB_SWAPB_Msk & ((value) << TCC_WAVEB_SWAPB_Pos))
 #define TCC_WAVEB_MASK              0x0F0F0FB7ul /**< \brief (TCC_WAVEB) MASK Register */
 
 /* -------- TCC_PERB : (TCC Offset: 0x6C) (R/W 32) Period Buffer -------- */
@@ -1690,33 +1687,33 @@ typedef union {
 // DITH4 mode
 #define TCC_PERB_DITH4_DITHERCYB_Pos 0            /**< \brief (TCC_PERB_DITH4) Dithering Buffer Cycle Number */
 #define TCC_PERB_DITH4_DITHERCYB_Msk (0xFul << TCC_PERB_DITH4_DITHERCYB_Pos)
-#define TCC_PERB_DITH4_DITHERCYB(value) ((TCC_PERB_DITH4_DITHERCYB_Msk & ((value) << TCC_PERB_DITH4_DITHERCYB_Pos)))
+#define TCC_PERB_DITH4_DITHERCYB(value) (TCC_PERB_DITH4_DITHERCYB_Msk & ((value) << TCC_PERB_DITH4_DITHERCYB_Pos))
 #define TCC_PERB_DITH4_PERB_Pos     4            /**< \brief (TCC_PERB_DITH4) Period Buffer Value */
 #define TCC_PERB_DITH4_PERB_Msk     (0xFFFFFul << TCC_PERB_DITH4_PERB_Pos)
-#define TCC_PERB_DITH4_PERB(value)  ((TCC_PERB_DITH4_PERB_Msk & ((value) << TCC_PERB_DITH4_PERB_Pos)))
+#define TCC_PERB_DITH4_PERB(value)  (TCC_PERB_DITH4_PERB_Msk & ((value) << TCC_PERB_DITH4_PERB_Pos))
 #define TCC_PERB_DITH4_MASK         0x00FFFFFFul /**< \brief (TCC_PERB_DITH4) MASK Register */
 
 // DITH5 mode
 #define TCC_PERB_DITH5_DITHERCYB_Pos 0            /**< \brief (TCC_PERB_DITH5) Dithering Buffer Cycle Number */
 #define TCC_PERB_DITH5_DITHERCYB_Msk (0x1Ful << TCC_PERB_DITH5_DITHERCYB_Pos)
-#define TCC_PERB_DITH5_DITHERCYB(value) ((TCC_PERB_DITH5_DITHERCYB_Msk & ((value) << TCC_PERB_DITH5_DITHERCYB_Pos)))
+#define TCC_PERB_DITH5_DITHERCYB(value) (TCC_PERB_DITH5_DITHERCYB_Msk & ((value) << TCC_PERB_DITH5_DITHERCYB_Pos))
 #define TCC_PERB_DITH5_PERB_Pos     5            /**< \brief (TCC_PERB_DITH5) Period Buffer Value */
 #define TCC_PERB_DITH5_PERB_Msk     (0x7FFFFul << TCC_PERB_DITH5_PERB_Pos)
-#define TCC_PERB_DITH5_PERB(value)  ((TCC_PERB_DITH5_PERB_Msk & ((value) << TCC_PERB_DITH5_PERB_Pos)))
+#define TCC_PERB_DITH5_PERB(value)  (TCC_PERB_DITH5_PERB_Msk & ((value) << TCC_PERB_DITH5_PERB_Pos))
 #define TCC_PERB_DITH5_MASK         0x00FFFFFFul /**< \brief (TCC_PERB_DITH5) MASK Register */
 
 // DITH6 mode
 #define TCC_PERB_DITH6_DITHERCYB_Pos 0            /**< \brief (TCC_PERB_DITH6) Dithering Buffer Cycle Number */
 #define TCC_PERB_DITH6_DITHERCYB_Msk (0x3Ful << TCC_PERB_DITH6_DITHERCYB_Pos)
-#define TCC_PERB_DITH6_DITHERCYB(value) ((TCC_PERB_DITH6_DITHERCYB_Msk & ((value) << TCC_PERB_DITH6_DITHERCYB_Pos)))
+#define TCC_PERB_DITH6_DITHERCYB(value) (TCC_PERB_DITH6_DITHERCYB_Msk & ((value) << TCC_PERB_DITH6_DITHERCYB_Pos))
 #define TCC_PERB_DITH6_PERB_Pos     6            /**< \brief (TCC_PERB_DITH6) Period Buffer Value */
 #define TCC_PERB_DITH6_PERB_Msk     (0x3FFFFul << TCC_PERB_DITH6_PERB_Pos)
-#define TCC_PERB_DITH6_PERB(value)  ((TCC_PERB_DITH6_PERB_Msk & ((value) << TCC_PERB_DITH6_PERB_Pos)))
+#define TCC_PERB_DITH6_PERB(value)  (TCC_PERB_DITH6_PERB_Msk & ((value) << TCC_PERB_DITH6_PERB_Pos))
 #define TCC_PERB_DITH6_MASK         0x00FFFFFFul /**< \brief (TCC_PERB_DITH6) MASK Register */
 
 #define TCC_PERB_PERB_Pos           0            /**< \brief (TCC_PERB) Period Buffer Value */
 #define TCC_PERB_PERB_Msk           (0xFFFFFFul << TCC_PERB_PERB_Pos)
-#define TCC_PERB_PERB(value)        ((TCC_PERB_PERB_Msk & ((value) << TCC_PERB_PERB_Pos)))
+#define TCC_PERB_PERB(value)        (TCC_PERB_PERB_Msk & ((value) << TCC_PERB_PERB_Pos))
 #define TCC_PERB_MASK               0x00FFFFFFul /**< \brief (TCC_PERB) MASK Register */
 
 /* -------- TCC_CCB : (TCC Offset: 0x70) (R/W 32) Compare and Capture Buffer -------- */
@@ -1751,33 +1748,33 @@ typedef union {
 // DITH4 mode
 #define TCC_CCB_DITH4_DITHERCYB_Pos 0            /**< \brief (TCC_CCB_DITH4) Dithering Buffer Cycle Number */
 #define TCC_CCB_DITH4_DITHERCYB_Msk (0xFul << TCC_CCB_DITH4_DITHERCYB_Pos)
-#define TCC_CCB_DITH4_DITHERCYB(value) ((TCC_CCB_DITH4_DITHERCYB_Msk & ((value) << TCC_CCB_DITH4_DITHERCYB_Pos)))
+#define TCC_CCB_DITH4_DITHERCYB(value) (TCC_CCB_DITH4_DITHERCYB_Msk & ((value) << TCC_CCB_DITH4_DITHERCYB_Pos))
 #define TCC_CCB_DITH4_CCB_Pos       4            /**< \brief (TCC_CCB_DITH4) Channel Compare/Capture Buffer Value */
 #define TCC_CCB_DITH4_CCB_Msk       (0xFFFFFul << TCC_CCB_DITH4_CCB_Pos)
-#define TCC_CCB_DITH4_CCB(value)    ((TCC_CCB_DITH4_CCB_Msk & ((value) << TCC_CCB_DITH4_CCB_Pos)))
+#define TCC_CCB_DITH4_CCB(value)    (TCC_CCB_DITH4_CCB_Msk & ((value) << TCC_CCB_DITH4_CCB_Pos))
 #define TCC_CCB_DITH4_MASK          0x00FFFFFFul /**< \brief (TCC_CCB_DITH4) MASK Register */
 
 // DITH5 mode
 #define TCC_CCB_DITH5_DITHERCYB_Pos 0            /**< \brief (TCC_CCB_DITH5) Dithering Buffer Cycle Number */
 #define TCC_CCB_DITH5_DITHERCYB_Msk (0x1Ful << TCC_CCB_DITH5_DITHERCYB_Pos)
-#define TCC_CCB_DITH5_DITHERCYB(value) ((TCC_CCB_DITH5_DITHERCYB_Msk & ((value) << TCC_CCB_DITH5_DITHERCYB_Pos)))
+#define TCC_CCB_DITH5_DITHERCYB(value) (TCC_CCB_DITH5_DITHERCYB_Msk & ((value) << TCC_CCB_DITH5_DITHERCYB_Pos))
 #define TCC_CCB_DITH5_CCB_Pos       5            /**< \brief (TCC_CCB_DITH5) Channel Compare/Capture Buffer Value */
 #define TCC_CCB_DITH5_CCB_Msk       (0x7FFFFul << TCC_CCB_DITH5_CCB_Pos)
-#define TCC_CCB_DITH5_CCB(value)    ((TCC_CCB_DITH5_CCB_Msk & ((value) << TCC_CCB_DITH5_CCB_Pos)))
+#define TCC_CCB_DITH5_CCB(value)    (TCC_CCB_DITH5_CCB_Msk & ((value) << TCC_CCB_DITH5_CCB_Pos))
 #define TCC_CCB_DITH5_MASK          0x00FFFFFFul /**< \brief (TCC_CCB_DITH5) MASK Register */
 
 // DITH6 mode
 #define TCC_CCB_DITH6_DITHERCYB_Pos 0            /**< \brief (TCC_CCB_DITH6) Dithering Buffer Cycle Number */
 #define TCC_CCB_DITH6_DITHERCYB_Msk (0x3Ful << TCC_CCB_DITH6_DITHERCYB_Pos)
-#define TCC_CCB_DITH6_DITHERCYB(value) ((TCC_CCB_DITH6_DITHERCYB_Msk & ((value) << TCC_CCB_DITH6_DITHERCYB_Pos)))
+#define TCC_CCB_DITH6_DITHERCYB(value) (TCC_CCB_DITH6_DITHERCYB_Msk & ((value) << TCC_CCB_DITH6_DITHERCYB_Pos))
 #define TCC_CCB_DITH6_CCB_Pos       6            /**< \brief (TCC_CCB_DITH6) Channel Compare/Capture Buffer Value */
 #define TCC_CCB_DITH6_CCB_Msk       (0x3FFFFul << TCC_CCB_DITH6_CCB_Pos)
-#define TCC_CCB_DITH6_CCB(value)    ((TCC_CCB_DITH6_CCB_Msk & ((value) << TCC_CCB_DITH6_CCB_Pos)))
+#define TCC_CCB_DITH6_CCB(value)    (TCC_CCB_DITH6_CCB_Msk & ((value) << TCC_CCB_DITH6_CCB_Pos))
 #define TCC_CCB_DITH6_MASK          0x00FFFFFFul /**< \brief (TCC_CCB_DITH6) MASK Register */
 
 #define TCC_CCB_CCB_Pos             0            /**< \brief (TCC_CCB) Channel Compare/Capture Buffer Value */
 #define TCC_CCB_CCB_Msk             (0xFFFFFFul << TCC_CCB_CCB_Pos)
-#define TCC_CCB_CCB(value)          ((TCC_CCB_CCB_Msk & ((value) << TCC_CCB_CCB_Pos)))
+#define TCC_CCB_CCB(value)          (TCC_CCB_CCB_Msk & ((value) << TCC_CCB_CCB_Pos))
 #define TCC_CCB_MASK                0x00FFFFFFul /**< \brief (TCC_CCB) MASK Register */
 
 /** \brief TCC hardware registers */

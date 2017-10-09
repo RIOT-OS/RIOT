@@ -3,7 +3,7 @@
  *
  * \brief Component description for PM
  *
- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
- /**
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMR21_PM_COMPONENT_
@@ -84,7 +81,7 @@ typedef union {
 
 #define PM_SLEEP_IDLE_Pos           0            /**< \brief (PM_SLEEP) Idle Mode Configuration */
 #define PM_SLEEP_IDLE_Msk           (0x3ul << PM_SLEEP_IDLE_Pos)
-#define PM_SLEEP_IDLE(value)        ((PM_SLEEP_IDLE_Msk & ((value) << PM_SLEEP_IDLE_Pos)))
+#define PM_SLEEP_IDLE(value)        (PM_SLEEP_IDLE_Msk & ((value) << PM_SLEEP_IDLE_Pos))
 #define   PM_SLEEP_IDLE_CPU_Val           0x0ul  /**< \brief (PM_SLEEP) The CPU clock domain is stopped */
 #define   PM_SLEEP_IDLE_AHB_Val           0x1ul  /**< \brief (PM_SLEEP) The CPU and AHB clock domains are stopped */
 #define   PM_SLEEP_IDLE_APB_Val           0x2ul  /**< \brief (PM_SLEEP) The CPU, AHB and APB clock domains are stopped */
@@ -109,7 +106,7 @@ typedef union {
 
 #define PM_CPUSEL_CPUDIV_Pos        0            /**< \brief (PM_CPUSEL) CPU Prescaler Selection */
 #define PM_CPUSEL_CPUDIV_Msk        (0x7ul << PM_CPUSEL_CPUDIV_Pos)
-#define PM_CPUSEL_CPUDIV(value)     ((PM_CPUSEL_CPUDIV_Msk & ((value) << PM_CPUSEL_CPUDIV_Pos)))
+#define PM_CPUSEL_CPUDIV(value)     (PM_CPUSEL_CPUDIV_Msk & ((value) << PM_CPUSEL_CPUDIV_Pos))
 #define   PM_CPUSEL_CPUDIV_DIV1_Val       0x0ul  /**< \brief (PM_CPUSEL) Divide by 1 */
 #define   PM_CPUSEL_CPUDIV_DIV2_Val       0x1ul  /**< \brief (PM_CPUSEL) Divide by 2 */
 #define   PM_CPUSEL_CPUDIV_DIV4_Val       0x2ul  /**< \brief (PM_CPUSEL) Divide by 4 */
@@ -144,7 +141,7 @@ typedef union {
 
 #define PM_APBASEL_APBADIV_Pos      0            /**< \brief (PM_APBASEL) APBA Prescaler Selection */
 #define PM_APBASEL_APBADIV_Msk      (0x7ul << PM_APBASEL_APBADIV_Pos)
-#define PM_APBASEL_APBADIV(value)   ((PM_APBASEL_APBADIV_Msk & ((value) << PM_APBASEL_APBADIV_Pos)))
+#define PM_APBASEL_APBADIV(value)   (PM_APBASEL_APBADIV_Msk & ((value) << PM_APBASEL_APBADIV_Pos))
 #define   PM_APBASEL_APBADIV_DIV1_Val     0x0ul  /**< \brief (PM_APBASEL) Divide by 1 */
 #define   PM_APBASEL_APBADIV_DIV2_Val     0x1ul  /**< \brief (PM_APBASEL) Divide by 2 */
 #define   PM_APBASEL_APBADIV_DIV4_Val     0x2ul  /**< \brief (PM_APBASEL) Divide by 4 */
@@ -179,7 +176,7 @@ typedef union {
 
 #define PM_APBBSEL_APBBDIV_Pos      0            /**< \brief (PM_APBBSEL) APBB Prescaler Selection */
 #define PM_APBBSEL_APBBDIV_Msk      (0x7ul << PM_APBBSEL_APBBDIV_Pos)
-#define PM_APBBSEL_APBBDIV(value)   ((PM_APBBSEL_APBBDIV_Msk & ((value) << PM_APBBSEL_APBBDIV_Pos)))
+#define PM_APBBSEL_APBBDIV(value)   (PM_APBBSEL_APBBDIV_Msk & ((value) << PM_APBBSEL_APBBDIV_Pos))
 #define   PM_APBBSEL_APBBDIV_DIV1_Val     0x0ul  /**< \brief (PM_APBBSEL) Divide by 1 */
 #define   PM_APBBSEL_APBBDIV_DIV2_Val     0x1ul  /**< \brief (PM_APBBSEL) Divide by 2 */
 #define   PM_APBBSEL_APBBDIV_DIV4_Val     0x2ul  /**< \brief (PM_APBBSEL) Divide by 4 */
@@ -214,7 +211,7 @@ typedef union {
 
 #define PM_APBCSEL_APBCDIV_Pos      0            /**< \brief (PM_APBCSEL) APBC Prescaler Selection */
 #define PM_APBCSEL_APBCDIV_Msk      (0x7ul << PM_APBCSEL_APBCDIV_Pos)
-#define PM_APBCSEL_APBCDIV(value)   ((PM_APBCSEL_APBCDIV_Msk & ((value) << PM_APBCSEL_APBCDIV_Pos)))
+#define PM_APBCSEL_APBCDIV(value)   (PM_APBCSEL_APBCDIV_Msk & ((value) << PM_APBCSEL_APBCDIV_Pos))
 #define   PM_APBCSEL_APBCDIV_DIV1_Val     0x0ul  /**< \brief (PM_APBCSEL) Divide by 1 */
 #define   PM_APBCSEL_APBCDIV_DIV2_Val     0x1ul  /**< \brief (PM_APBCSEL) Divide by 2 */
 #define   PM_APBCSEL_APBCDIV_DIV4_Val     0x2ul  /**< \brief (PM_APBCSEL) Divide by 4 */
@@ -451,10 +448,10 @@ typedef union {
 
 /* -------- PM_INTFLAG : (PM Offset: 0x36) (R/W  8) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint8_t  CKRDY:1;          /*!< bit:      0  Clock Ready                        */
-    uint8_t  :7;               /*!< bit:  1.. 7  Reserved                           */
+    __I uint8_t  CKRDY:1;          /*!< bit:      0  Clock Ready                        */
+    __I uint8_t  :7;               /*!< bit:  1.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } PM_INTFLAG_Type;
