@@ -30,6 +30,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief    winc1500 configuration
+ */
+#define WINC1500_PARAMS_BOARD    {.spi = SPI_DEV(1), \
+    .cs_pin =    GPIO_PIN(PA, 14), \
+    .int_pin =   GPIO_PIN(PB, 9), \
+    .reset_pin = GPIO_PIN(PA, 27), /* Internally pulled-down */ \
+    .en_pin =    GPIO_PIN(PA, 28), /* Internally pulled-down */ \
+    .wake_pin =  GPIO_PIN(PB, 8), \
+    .spi_clk =   WINC1500_SPI_CLOCK}
+
+/**
  * @brief   The on-board LED is connected to pin 6 on this board
  */
 #define ARDUINO_LED         (6U)
