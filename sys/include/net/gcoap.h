@@ -35,6 +35,7 @@
  * - Server Operation
  * - Client Operation
  * - Observe Server Operation
+ * - Detailed Message Init Options
  * - Implementation Notes
  * - Implementation Status
  *
@@ -95,16 +96,15 @@
  * If there is a payload, follow the steps below.
  *
  * -# Call gcoap_req_init() to initialize the request.
- *    -# Optionally, mark the request confirmable by calling
- *       coap_hdr_set_type() with COAP_TYPE_CON.
  * -# Write the request payload, starting at the updated _payload_ pointer
  *    in the coap_pkt_t.
  * -# Call gcoap_finish(), which updates the packet for the payload.
  *
- * If no payload, call only gcoap_request() to write the full request.
- * Alternatively, you still can use gcoap_req_init() and gcoap_finish(),
- * as described above. The gcoap_request() function is inline, and uses those
- * two functions.
+ * If no payload, you can use the single function gcoap_request() instead,
+ * which inlines gcoap_req_init() and gcoap_finish(). Also, if the default
+ * non-confirmable message type is unacceptable, change
+ * GCOAP_REQ_DEFAULT_MSG_TYPE. To select the message type for a single message,
+ * see section Detailed Message Init Options, below.
  *
  * Finally, call gcoap_req_send2() for the destination endpoint, as well as a
  * callback function for the host's response.
@@ -149,6 +149,10 @@
  *    in the coap_pkt_t.
  * -# Call gcoap_finish(), which updates the packet for the payload.
  *
+ * If the default message type for the init function is unacceptable, change
+ * GCOAP_OBS_DEFAULT_MSG_TYPE. To select the message type for a single message,
+ * see section Detailed Message Init Options, below.
+ *
  * Finally, call gcoap_obs_send() for the resource.
  *
  * ### Other considerations ###
@@ -160,6 +164,19 @@
  * To cancel a notification, the server expects to receive a GET request with
  * the Observe option value set to 1. A confirmable notification also may be
  * cancelled by a reset (RST) response from the client.
+ *
+ * ## Detailed Message Init Options ##
+ *
+ * The gcoap_xxx_init() functions accept parameters that can change from
+ * message to message, for example the message code (GET, PUT, etc). On the
+ * other hand, some parameters, like message type, expect a default value and
+ * are not included in the init functions. For control over _all_ useful
+ * parameters, use gcoap_req_init_opts() for requests and gcoap_obs_init_opts()
+ * for observe notifications.
+ *
+ * The init opts functions accept a gcoap_send_opts_t structure, which includes
+ * all of the available attributes. The documentation for each function
+ * describes which attributes are read.
  *
  * ## Implementation Notes ##
  *
@@ -555,7 +572,8 @@ void gcoap_register_listener(gcoap_listener_t *listener);
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
  * @param[in] len       Length of the buffer
- * @param[in] opts      Request options; must include msg code and resource path
+ * @param[in] opts      Request options; must include msg code, resource path,
+ *                      and msg type
  *
  * @return  0 on success
  * @return  < 0 on error
@@ -690,7 +708,7 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
  * @param[out] pdu      Notification metadata
  * @param[out] buf      Buffer containing the PDU
  * @param[in] len       Length of the buffer
- * @param[in] opts      Notification options; must include resource
+ * @param[in] opts      Notification options; must include resource and msg type
  *
  * @return  GCOAP_OBS_INIT_OK     on success
  * @return  GCOAP_OBS_INIT_ERR    on error
