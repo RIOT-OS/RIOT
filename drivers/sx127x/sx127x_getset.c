@@ -63,6 +63,20 @@ void sx127x_set_state(sx127x_t *dev, uint8_t state)
 
 void sx127x_set_modem(sx127x_t *dev, uint8_t modem)
 {
+    if ((sx127x_reg_read(dev, SX127X_REG_OPMODE) & SX127X_RF_LORA_OPMODE_LONGRANGEMODE_ON) != 0) {
+        dev->settings.modem = SX127X_MODEM_LORA;
+    }
+    else {
+        dev->settings.modem = SX127X_MODEM_FSK;
+    }
+
+    /* Skip if unchanged to avoid resetting the transceiver below (may end up
+     * in crashes) */
+    if (dev->settings.modem == modem) {
+        DEBUG("[DEBUG] already using modem: %d\n", modem);
+        return;
+    }
+
     DEBUG("[DEBUG] set modem: %d\n", modem);
 
     dev->settings.modem = modem;
@@ -215,6 +229,12 @@ void sx127x_set_rx(sx127x_t *dev)
             break;
         case SX127X_MODEM_LORA:
         {
+            sx127x_reg_write(dev, SX127X_REG_LR_INVERTIQ,
+                             ((sx127x_reg_read(dev, SX127X_REG_LR_INVERTIQ) &
+                               SX127X_RF_LORA_INVERTIQ_TX_MASK &
+                               SX127X_RF_LORA_INVERTIQ_RX_MASK) |
+                              SX127X_RF_LORA_INVERTIQ_RX_ON |
+                              SX127X_RF_LORA_INVERTIQ_TX_OFF));
             sx127x_reg_write(dev, SX127X_REG_LR_INVERTIQ2,
                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ2_ON : SX127X_RF_LORA_INVERTIQ2_OFF));
 
@@ -401,6 +421,9 @@ void sx127x_set_op_mode(const sx127x_t *dev, uint8_t op_mode)
     case SX127X_RF_OPMODE_STANDBY:
         DEBUG("[DEBUG] Set op mode: STANDBY\n");
         break;
+    case SX127X_RF_OPMODE_RECEIVER_SINGLE:
+        DEBUG("[DEBUG] Set op mode: RECEIVER SINGLE\n");
+        break;
     case SX127X_RF_OPMODE_RECEIVER:
         DEBUG("[DEBUG] Set op mode: RECEIVER\n");
         break;
@@ -408,7 +431,7 @@ void sx127x_set_op_mode(const sx127x_t *dev, uint8_t op_mode)
         DEBUG("[DEBUG] Set op mode: TRANSMITTER\n");
         break;
     default:
-        DEBUG("[DEBUG] Set op mode: UNKNOWN\n");
+        DEBUG("[DEBUG] Set op mode: UNKNOWN (%d)\n", op_mode);
         break;
     }
 #endif

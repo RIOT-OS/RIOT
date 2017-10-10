@@ -308,11 +308,13 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                        (int)packet_info.time_on_air);
                 break;
             case NETDEV_EVENT_TX_COMPLETE:
+                sx127x_set_sleep(&sx127x);
                 puts("Transmission completed");
                 break;
             case NETDEV_EVENT_CAD_DONE:
                 break;
             case NETDEV_EVENT_TX_TIMEOUT:
+                sx127x_set_sleep(&sx127x);
                 break;
             default:
                 printf("Unexpected netdev event received: %d\n", event);

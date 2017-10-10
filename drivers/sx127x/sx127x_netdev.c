@@ -35,6 +35,10 @@
 static uint8_t _get_tx_len(const struct iovec *vector, unsigned count);
 static int _set_state(sx127x_t *dev, netopt_state_t state);
 static int _get_state(sx127x_t *dev, void *val);
+void _on_dio0_irq(void *arg);
+void _on_dio1_irq(void *arg);
+void _on_dio2_irq(void *arg);
+void _on_dio3_irq(void *arg);
 
 /* Netdev driver api functions */
 static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
@@ -58,7 +62,7 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
     sx127x_t *dev = (sx127x_t*) netdev;
 
     if (sx127x_get_state(dev) == SX127X_RF_TX_RUNNING) {
-        DEBUG("[WARNING] Cannot send packet: radio alredy in transmitting "
+        DEBUG("[WARNING] Cannot send packet: radio already in transmitting "
               "state.\n");
         return -ENOTSUP;
     }
@@ -254,19 +258,19 @@ static void _isr(netdev_t *netdev)
 
     switch (irq) {
         case SX127X_IRQ_DIO0:
-            sx127x_on_dio0(dev);
+            _on_dio0_irq(dev);
             break;
 
         case SX127X_IRQ_DIO1:
-            sx127x_on_dio1(dev);
+            _on_dio1_irq(dev);
             break;
 
         case SX127X_IRQ_DIO2:
-            sx127x_on_dio2(dev);
+            _on_dio2_irq(dev);
             break;
 
         case SX127X_IRQ_DIO3:
-            sx127x_on_dio3(dev);
+            _on_dio3_irq(dev);
             break;
 
         default:
@@ -537,4 +541,157 @@ static int _get_state(sx127x_t *dev, void *val)
     }
     memcpy(val, &state, sizeof(netopt_state_t));
     return sizeof(netopt_state_t);
+}
+
+void _on_dio0_irq(void *arg)
+{
+    sx127x_t *dev = (sx127x_t *) arg;
+    netdev_t *netdev = (netdev_t*) &dev->netdev;
+
+    switch (dev->settings.state) {
+        case SX127X_RF_RX_RUNNING:
+            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+            break;
+        case SX127X_RF_TX_RUNNING:
+            xtimer_remove(&dev->_internal.tx_timeout_timer);
+            switch (dev->settings.modem) {
+                case SX127X_MODEM_LORA:
+                    /* Clear IRQ */
+                    sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
+                                     SX127X_RF_LORA_IRQFLAGS_TXDONE);
+                /* Intentional fall-through */
+                case SX127X_MODEM_FSK:
+                default:
+                    sx127x_set_state(dev, SX127X_RF_IDLE);
+                    netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+                    break;
+            }
+            break;
+        case SX127X_RF_IDLE:
+            printf("sx127x_on_dio0: IDLE state\n");
+            break;
+        default:
+            printf("sx127x_on_dio0: Unknown state [%d]\n", dev->settings.state);
+            break;
+    }
+}
+
+void _on_dio1_irq(void *arg)
+{
+    /* Get interrupt context */
+    sx127x_t *dev = (sx127x_t *) arg;
+    netdev_t *netdev = (netdev_t*) &dev->netdev;
+
+    switch (dev->settings.state) {
+        case SX127X_RF_RX_RUNNING:
+            switch (dev->settings.modem) {
+                case SX127X_MODEM_FSK:
+                    /* todo */
+                    break;
+                case SX127X_MODEM_LORA:
+                    xtimer_remove(&dev->_internal.rx_timeout_timer);
+                    /*  Clear Irq */
+                    sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS, SX127X_RF_LORA_IRQFLAGS_RXTIMEOUT);
+                    sx127x_set_state(dev, SX127X_RF_IDLE);
+                    netdev->event_callback(netdev, NETDEV_EVENT_RX_TIMEOUT);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case SX127X_RF_TX_RUNNING:
+            switch (dev->settings.modem) {
+                case SX127X_MODEM_FSK:
+                    /* todo */
+                    break;
+                case SX127X_MODEM_LORA:
+                    break;
+                default:
+                    break;
+            }
+            break;
+        default:
+            puts("sx127x_on_dio1: Unknown state");
+            break;
+    }
+}
+
+void _on_dio2_irq(void *arg)
+{
+    /* Get interrupt context */
+    sx127x_t *dev = (sx127x_t *) arg;
+    netdev_t *netdev = (netdev_t*) dev;
+
+    switch (dev->settings.state) {
+        case SX127X_RF_RX_RUNNING:
+            switch (dev->settings.modem) {
+                case SX127X_MODEM_FSK:
+                    /* todo */
+                    break;
+                case SX127X_MODEM_LORA:
+                    if (dev->settings.lora.flags & SX127X_CHANNEL_HOPPING_FLAG) {
+                        /* Clear IRQ */
+                        sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
+                                         SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL);
+
+                        dev->_internal.last_channel = (sx127x_reg_read(dev, SX127X_REG_LR_HOPCHANNEL) &
+                                                       SX127X_RF_LORA_HOPCHANNEL_CHANNEL_MASK);
+                        netdev->event_callback(netdev, NETDEV_EVENT_FHSS_CHANGE_CHANNEL);
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case SX127X_RF_TX_RUNNING:
+            switch (dev->settings.modem) {
+                case SX127X_MODEM_FSK:
+                    break;
+                case SX127X_MODEM_LORA:
+                    if (dev->settings.lora.flags & SX127X_CHANNEL_HOPPING_FLAG) {
+                        /* Clear IRQ */
+                        sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
+                                         SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL);
+
+                        dev->_internal.last_channel = (sx127x_reg_read(dev, SX127X_REG_LR_HOPCHANNEL) &
+                                                       SX127X_RF_LORA_HOPCHANNEL_CHANNEL_MASK);
+                        netdev->event_callback(netdev, NETDEV_EVENT_FHSS_CHANGE_CHANNEL);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            break;
+        default:
+            puts("sx127x_on_dio2: Unknown state");
+            break;
+    }
+}
+
+void _on_dio3_irq(void *arg)
+{
+    /* Get interrupt context */
+    sx127x_t *dev = (sx127x_t *) arg;
+    netdev_t *netdev = (netdev_t *) dev;
+
+    switch (dev->settings.modem) {
+        case SX127X_MODEM_FSK:
+            break;
+        case SX127X_MODEM_LORA:
+            /* Clear IRQ */
+            sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
+                             SX127X_RF_LORA_IRQFLAGS_CADDETECTED |
+                             SX127X_RF_LORA_IRQFLAGS_CADDONE);
+
+            /* Send event message */
+            dev->_internal.is_last_cad_success = ((sx127x_reg_read(dev, SX127X_REG_LR_IRQFLAGS) &
+                                                   SX127X_RF_LORA_IRQFLAGS_CADDETECTED) ==
+                                                  SX127X_RF_LORA_IRQFLAGS_CADDETECTED);
+            netdev->event_callback(netdev, NETDEV_EVENT_CAD_DONE);
+            break;
+        default:
+            puts("sx127x_on_dio3: Unknown modem");
+            break;
+    }
 }
