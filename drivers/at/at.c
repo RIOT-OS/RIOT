@@ -234,5 +234,8 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout)
     }
 
 out:
+    if (res < 0) {
+        *resp_buf = '\0';
+    }
     return res;
 }
