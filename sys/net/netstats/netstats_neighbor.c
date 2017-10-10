@@ -27,11 +27,10 @@
 
 static bool l2_addr_equal(const uint8_t *a, uint8_t a_len, const uint8_t *b, uint8_t b_len);
 
-void netstats_nb_init(netdev_t *dev)
+void netstats_nb_init(netstats_netdev_t *dev)
 {
     memset(dev->pstats, 0, sizeof(netstats_nb_t) * NETSTATS_NB_SIZE);
-    dev->send_index = 0;
-    dev->cb_index = 0;
+    cib_init(&dev->stats_idx, NETSTATS_NB_QUEUE_SIZE);
 }
 
 void netstats_nb_create(netstats_nb_t *entry, const uint8_t *l2_addr, uint8_t l2_len)
@@ -43,7 +42,7 @@ void netstats_nb_create(netstats_nb_t *entry, const uint8_t *l2_addr, uint8_t l2
 }
 
 /* find the oldest inactive entry to replace. Empty entries are infinity old */
-netstats_nb_t *netstats_nb_get_or_create(netdev_t *dev, const uint8_t *l2_addr, uint8_t len)
+netstats_nb_t *netstats_nb_get_or_create(netstats_netdev_t *dev, const uint8_t *l2_addr, uint8_t len)
 {
     netstats_nb_t *old_entry = NULL;
     netstats_nb_t *matching_entry = NULL;
@@ -94,33 +93,25 @@ netstats_nb_t *netstats_nb_get_next(netstats_nb_t *first, netstats_nb_t *prev)
     return NULL;
 }
 
-void netstats_nb_record(netdev_t *dev, const uint8_t *l2_addr, uint8_t len)
+void netstats_nb_record(netstats_netdev_t *dev, const uint8_t *l2_addr, uint8_t len)
 {
+    int idx = cib_put(&dev->stats_idx);
     if (!(len)) {
         /* Fill queue with a NOP */
-        dev->stats_queue[dev->send_index] = NULL;
+        dev->stats_queue[idx] = NULL;
     }
     else {
-        dev->stats_queue[dev->send_index] = netstats_nb_get_or_create(dev, l2_addr, len);
-    }
-    dev->send_index++;
-    if (dev->send_index == 4) {
-        dev->send_index = 0;
+        dev->stats_queue[idx] = netstats_nb_get_or_create(dev, l2_addr, len);
     }
 }
 
-netstats_nb_t *netstats_nb_get_recorded(netdev_t *dev)
+netstats_nb_t *netstats_nb_get_recorded(netstats_netdev_t *dev)
 {
-    netstats_nb_t *stats = dev->stats_queue[dev->cb_index];
-
-    dev->cb_index++;
-    if (dev->cb_index == 4) {
-        dev->cb_index = 0;
-    }
-    return stats;
+    int idx = cib_get(&dev->stats_idx);
+    return dev->stats_queue[idx];
 }
 
-netstats_nb_t *netstats_nb_update_tx(netdev_t *dev, netstats_nb_result_t result, uint8_t retries)
+netstats_nb_t *netstats_nb_update_tx(netstats_netdev_t *dev, netstats_nb_result_t result, uint8_t retries)
 {
     netstats_nb_t *stats = netstats_nb_get_recorded(dev);
 
@@ -139,7 +130,7 @@ netstats_nb_t *netstats_nb_update_tx(netdev_t *dev, netstats_nb_result_t result,
 }
 
 #ifdef MODULE_NETSTATS_NEIGHBOR_EXT
-netstats_nb_t *netstats_nb_update_rx(netdev_t *dev, const uint8_t *l2_addr, uint8_t l2_addr_len, uint8_t rssi, uint8_t lqi)
+netstats_nb_t *netstats_nb_update_rx(netstats_netdev_t *dev, const uint8_t *l2_addr, uint8_t l2_addr_len, uint8_t rssi, uint8_t lqi)
 {
     netstats_nb_t *stats = netstats_nb_get_or_create(
         dev, l2_addr, l2_addr_len
