@@ -215,8 +215,11 @@ struct gnrc_netif2_ops {
  * @note If @ref DEVELHELP is defined netif_params_t::name is used as the
  *       name of the network interface's thread.
  *
+ * @attention   Fails and crashes (assertion error with @ref DEVELHELP or
+ *              segmentation fault without) if `GNRC_NETIF_NUMOF` is lower than
+ *              the number of calls to this function.
+ *
  * @return  The network interface on success.
- * @return  NULL, on error.
  */
 gnrc_netif2_t *gnrc_netif2_create(char *stack, int stacksize, char priority,
                                   const char *name, netdev_t *dev,
