@@ -377,10 +377,6 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
-ifneq (,$(filter gnrc_slip,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_uart
-endif
-
 ifneq (,$(filter od,$(USEMODULE)))
   USEMODULE += fmt
 endif

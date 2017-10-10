@@ -47,7 +47,7 @@ endif
 #CFLAGS += -DSLIP_UART=$(SLIP_UART)
 #CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
 # Include SLIP package for IP over Serial communication
-#USEMODULE += gnrc_slip
+#USEMODULE += slipdev
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present

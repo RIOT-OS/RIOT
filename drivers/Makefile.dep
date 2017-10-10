@@ -246,6 +246,10 @@ ifneq (,$(filter lsm6dsl,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter slipdev,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+endif
+
 ifneq (,$(filter adc%1c,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_i2c
