@@ -141,14 +141,13 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
  * @brief   Expect bytes from device
  *
  * @param[in]   dev     device to operate on
- * @param[in]   bytes   buffer containing bytes to expect
- * @param[in]   len     number of bytes to expect
+ * @param[in]   bytes   buffer containing bytes to expect (NULL-terminated)
  * @param[in]   timeout timeout (in usec)
  *
  * @returns     0 on success
  * @returns     <0 otherwise
  */
-int at_expect_bytes(at_dev_t *dev, const char *bytes, size_t len, uint32_t timeout);
+int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 
 /**
  * @brief  Send raw bytes to a device
