@@ -91,7 +91,6 @@ static inline void _test_init(gnrc_netif2_t *netif)
 
 static void test_creation(void)
 {
-    char test_stack[4];
     gnrc_netif2_t *ptr = NULL;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_numof());
@@ -131,8 +130,6 @@ static void test_creation(void)
         TEST_ASSERT_NULL((ptr = gnrc_netif2_iter(ptr)));
     }
     TEST_ASSERT(init_called);
-    TEST_ASSERT_NULL(gnrc_netif2_create(test_stack, 4, GNRC_NETIF2_PRIO,
-                                        "netif", NULL, &default_ops));
 }
 
 static void test_get_by_pid(void)

@@ -218,11 +218,8 @@ void gnrc_nrfmin_init(void)
     /* setup the NRFMIN driver */
     nrfmin_setup();
 #ifdef MODULE_GNRC_NETIF2
-    if (!gnrc_netif2_create(stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO,
-                            "nrfmin", (netdev_t *)&nrfmin_dev,
-                            &gnrc_nrfmin_ops)) {
-        DEBUG("[nrfmin_dev] error initializing GNRC interface for nrfmin radio\n");
-    }
+    gnrc_netif2_create(stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO, "nrfmin",
+                       (netdev_t *)&nrfmin_dev, &gnrc_nrfmin_ops);
 #else
     /* initialize the GNRC plug struct */
     plug.send = gnrc_nrfmin_send;

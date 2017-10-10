@@ -51,16 +51,14 @@ gnrc_netif2_t *gnrc_netif2_create(char *stack, int stacksize, char priority,
     int res;
 
     for (int i = 0; i < GNRC_NETIF_NUMOF; i++) {
-        if (_netifs[i].ops == NULL) {
+        if (_netifs[i].dev == netdev) {
+            return &_netifs[i];
+        }
+        if ((netif == NULL) && (_netifs[i].ops == NULL)) {
             netif = &_netifs[i];
-            break;
         }
     }
-    if (netif == NULL) {
-        LOG_ERROR("gnrc_netif2: can not allocate network interface.\n"
-                  "Set GNRC_NETIF_NUMOF to a higher value\n");
-        return NULL;
-    }
+    assert(netif != NULL);
     rmutex_init(&netif->mutex);
     netif->ops = ops;
     assert(netif->dev == NULL);
