@@ -263,7 +263,7 @@ typedef struct {
     uint8_t dma_stream;     /**< DMA stream used for TX */
     uint8_t dma_chan;       /**< DMA channel used for TX */
 #endif
-#ifdef UART_USE_HW_FC
+#ifdef MODULE_STM32_PERIPH_UART_HW_FC
     gpio_t cts_pin;         /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
     gpio_t rts_pin;         /**< RTS pin */
 #ifndef CPU_FAM_STM32F1
