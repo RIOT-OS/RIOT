@@ -26,6 +26,9 @@ endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   SRC += sc_netif.c
 endif
+ifneq (,$(filter gnrc_netif2,$(USEMODULE)))
+  SRC += sc_gnrc_netif2.c
+endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c
 endif
