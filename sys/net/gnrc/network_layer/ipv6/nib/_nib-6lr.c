@@ -68,7 +68,7 @@ uint8_t _reg_addr_upstream(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
 #endif
             if (byteorder_ntohs(aro->ltime) != 0) {
                 _handle_sl2ao(iface, ipv6, icmpv6, sl2ao);
-                _update_nce_ar_state(aro, nce);
+                return _update_nce_ar_state(aro, nce);
             }
             else if (nce != NULL) {
                 _nib_nc_remove(nce);
