@@ -18,8 +18,13 @@
  * @}
  */
 
+#include "net/gnrc.h"
 #include "thread.h"
+#ifdef MODULE_GNRC_NETIF2
+#include "net/gnrc/netif2.h"
+#else
 #include "net/gnrc/netdev.h"
+#endif
 
 #include "nrfmin_gnrc.h"
 
@@ -31,7 +36,11 @@
  * @{
  */
 #ifndef NRFMIN_GNRC_THREAD_PRIO
+#ifdef MODULE_GNRC_NETIF2
+#define NRFMIN_GNRC_THREAD_PRIO     GNRC_NETIF2_PRIO
+#else
 #define NRFMIN_GNRC_THREAD_PRIO     GNRC_NETDEV_MAC_PRIO
+#endif
 #endif
 
 #ifndef NRFMIN_GNRC_STACKSIZE
@@ -49,10 +58,12 @@
  */
 static char stack[NRFMIN_GNRC_STACKSIZE];
 
+#ifndef MODULE_GNRC_NETIF2
 /**
  * @brief   Allocate the GNRC netdev data structure.
  */
 static gnrc_netdev_t plug;
+#endif
 
 
 static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
@@ -81,7 +92,11 @@ static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
     return 0;
 }
 
+#ifdef MODULE_GNRC_NETIF2
+static int gnrc_nrfmin_send(gnrc_netif2_t *dev, gnrc_pktsnip_t *pkt)
+#else
 static int gnrc_nrfmin_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
+#endif
 {
     int res;
     struct iovec *vec;
@@ -124,7 +139,11 @@ static int gnrc_nrfmin_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
     return res;
 }
 
+#ifdef MODULE_GNRC_NETIF2
+static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif2_t *dev)
+#else
 static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netdev_t *dev)
+#endif
 {
     int pktsize;
     nrfmin_hdr_t *nrfmin;
@@ -175,7 +194,7 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netdev_t *dev)
     }
     netif->lqi = 0;
     netif->rssi = 0;
-    netif->if_pid = plug.pid;
+    netif->if_pid = dev->pid;
     pkt_snip->type = nrfmin->proto;
 
     /* finally: remove the nrfmin header and append the netif header */
@@ -185,11 +204,26 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netdev_t *dev)
     return pkt_snip;
 }
 
+#ifdef MODULE_GNRC_NETIF2
+static const gnrc_netif2_ops_t gnrc_nrfmin_ops = {
+    .send = gnrc_nrfmin_send,
+    .recv = gnrc_nrfmin_recv,
+    .get = gnrc_netif2_get_from_netdev,
+    .set = gnrc_netif2_set_from_netdev,
+};
+#endif
+
 void gnrc_nrfmin_init(void)
 {
     /* setup the NRFMIN driver */
     nrfmin_setup();
-
+#ifdef MODULE_GNRC_NETIF2
+    if (!gnrc_netif2_create(stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO,
+                            "nrfmin", (netdev_t *)&nrfmin_dev,
+                            &gnrc_nrfmin_ops)) {
+        DEBUG("[nrfmin_dev] error initializing GNRC interface for nrfmin radio\n");
+    }
+#else
     /* initialize the GNRC plug struct */
     plug.send = gnrc_nrfmin_send;
     plug.recv = gnrc_nrfmin_recv;
@@ -198,4 +232,5 @@ void gnrc_nrfmin_init(void)
     gnrc_netdev_init(stack, sizeof(stack),
                       NRFMIN_GNRC_THREAD_PRIO,
                       "nrfmin", &plug);
+#endif
 }
