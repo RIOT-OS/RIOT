@@ -32,9 +32,9 @@ int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t
     return 0;
 }
 
-int at_expect_bytes(at_dev_t *dev, const char *bytes, size_t len, uint32_t timeout)
+int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
 {
-    while (len) {
+    while (*bytes) {
         char c;
         int res;
         if ((res = isrpipe_read_timeout(&dev->isrpipe, &c, 1, timeout)) == 1) {
@@ -44,7 +44,6 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, size_t len, uint32_t timeo
             if (!(c == *bytes++)) {
                 return -1;
             }
-            len--;
         }
         else {
             return res;
@@ -66,11 +65,11 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
     uart_write(dev->uart, (const uint8_t *)AT_END_OF_LINE, sizeof(AT_END_OF_LINE) - 1);
 
-    if (at_expect_bytes(dev, command, cmdlen, timeout)) {
+    if (at_expect_bytes(dev, command, timeout)) {
         return -1;
     }
 
-    if (at_expect_bytes(dev, AT_END_OF_LINE "\r\n", sizeof(AT_END_OF_LINE) + 1, timeout)) {
+    if (at_expect_bytes(dev, AT_END_OF_LINE "\r\n", timeout)) {
         return -2;
     }
 
@@ -169,15 +168,15 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
     uart_write(dev->uart, (const uint8_t *)AT_END_OF_LINE, sizeof(AT_END_OF_LINE) - 1);
 
-    if (at_expect_bytes(dev, command, cmdlen, timeout)) {
+    if (at_expect_bytes(dev, command, timeout)) {
         return -1;
     }
 
-    if (at_expect_bytes(dev, AT_END_OF_LINE "\n", sizeof(AT_END_OF_LINE), timeout)) {
+    if (at_expect_bytes(dev, AT_END_OF_LINE "\n", timeout)) {
         return -2;
     }
 
-    if (at_expect_bytes(dev, ">", 1, timeout)) {
+    if (at_expect_bytes(dev, ">", timeout)) {
         return -3;
     }
 
