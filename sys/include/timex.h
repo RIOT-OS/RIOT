@@ -89,7 +89,6 @@ typedef struct {
  *
  * @return The sum of the two timestamps
  */
-/* cppcheck-suppress passedByValue */
 timex_t timex_add(const timex_t a, const timex_t b);
 
 /**
@@ -100,7 +99,6 @@ timex_t timex_add(const timex_t a, const timex_t b);
  *
  * @return The difference a - b
  */
-/* cppcheck-suppress passedByValue */
 timex_t timex_sub(const timex_t a, const timex_t b);
 
 /**
@@ -123,7 +121,6 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds);
  * @return 0 if equal
  * @return 1 if a is bigger
  */
-/* cppcheck-suppress passedByValue */
 int timex_cmp(const timex_t a, const timex_t b);
 
 /**
@@ -157,7 +154,6 @@ static inline int timex_isnormalized(const timex_t *time)
  *
  * @return timex representation as uint64_t
  */
-/* cppcheck-suppress passedByValue */
 static inline uint64_t timex_uint64(const timex_t a)
 {
     return (uint64_t) a.seconds * US_PER_SEC + a.microseconds;

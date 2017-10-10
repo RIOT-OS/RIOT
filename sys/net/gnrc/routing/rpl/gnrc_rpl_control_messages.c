@@ -618,7 +618,6 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
         DEBUG("RPL: Could not allocate new parent.\n");
         return;
     }
-    /* cppcheck-suppress nullPointer */
     else if (parent != NULL) {
         trickle_increment_counter(&dodag->trickle);
     }
