@@ -15,8 +15,9 @@ ifeq ($(PROGRAMMER),jlink)
   export JLINK_DEVICE := ${MKR_JLINK_DEVICE}
   include $(RIOTMAKE)/tools/jlink.inc.mk
 else
-  # on default, we use BOSSA to flash this board
-  export LINKER_SCRIPT ?= $(RIOTCPU)/sam0_common/ldscripts/$(CPU_MODEL)_mkr.ld
+  # by default, we use BOSSA to flash this board and take into account the
+  # preinstalled Arduino bootloader.
+  export LINKER_SCRIPT ?= $(RIOTCPU)/sam0_common/ldscripts/$(CPU_MODEL)_arduino_bootloader.ld
   include $(RIOTMAKE)/tools/bossa.inc.mk
 endif
 
