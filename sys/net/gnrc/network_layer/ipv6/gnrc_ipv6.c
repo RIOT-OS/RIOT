@@ -29,7 +29,11 @@
 #include "thread.h"
 #include "utlist.h"
 
+#ifndef MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nc.h"
+#else
+#include "net/gnrc/ipv6/nib.h"
+#endif
 #include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/ipv6/whitelist.h"
 #include "net/gnrc/ipv6/blacklist.h"
@@ -286,6 +290,7 @@ static void *_event_loop(void *args)
                 msg_reply(&msg, &reply);
                 break;
 
+#ifndef MODULE_GNRC_IPV6_NIB
 #ifdef MODULE_GNRC_NDP
             case GNRC_NDP_MSG_RTR_TIMEOUT:
                 DEBUG("ipv6: Router timeout received\n");
@@ -361,6 +366,26 @@ static void *_event_loop(void *args)
                                                &(nc_entry->ipv6_addr), false);
                 break;
 #endif
+#else   /* MODULE_GNRC_IPV6_NIB */
+            case GNRC_IPV6_NIB_SND_UC_NS:
+            case GNRC_IPV6_NIB_SND_MC_NS:
+            case GNRC_IPV6_NIB_SND_NA:
+            case GNRC_IPV6_NIB_SEARCH_RTR:
+            case GNRC_IPV6_NIB_RECONFIRM_RTR:
+            case GNRC_IPV6_NIB_REPLY_RS:
+            case GNRC_IPV6_NIB_SND_MC_RA:
+            case GNRC_IPV6_NIB_REACH_TIMEOUT:
+            case GNRC_IPV6_NIB_DELAY_TIMEOUT:
+            case GNRC_IPV6_NIB_ADDR_REG_TIMEOUT:
+            case GNRC_IPV6_NIB_6LO_CTX_TIMEOUT:
+            case GNRC_IPV6_NIB_ABR_TIMEOUT:
+            case GNRC_IPV6_NIB_PFX_TIMEOUT:
+            case GNRC_IPV6_NIB_RTR_TIMEOUT:
+            case GNRC_IPV6_NIB_RECALC_REACH_TIME:
+                DEBUG("ipv6: NIB timer event received\n");
+                gnrc_ipv6_nib_handle_timer_event(msg.content.ptr, msg.type);
+                break;
+#endif  /* MODULE_GNRC_IPV6_NIB */
             default:
                 break;
         }
@@ -624,6 +649,7 @@ static void _send_multicast(kernel_pid_t iface, gnrc_pktsnip_t *pkt,
 #endif  /* GNRC_NETIF_NUMOF */
 }
 
+#ifndef MODULE_GNRC_IPV6_NIB
 static inline kernel_pid_t _next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len,
                                             kernel_pid_t iface, ipv6_addr_t *dst,
                                             gnrc_pktsnip_t *pkt)
@@ -653,6 +679,7 @@ static inline kernel_pid_t _next_hop_l2addr(uint8_t *l2addr, uint8_t *l2addr_len
 #endif
     return found_iface;
 }
+#endif   /* MODULE_GNRC_IPV6_NIB */
 
 static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
 {
@@ -744,6 +771,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
         }
     }
     else {
+#ifndef MODULE_GNRC_IPV6_NIB
         uint8_t l2addr_len = GNRC_IPV6_NC_L2_ADDR_MAX;
         uint8_t l2addr[l2addr_len];
 
@@ -764,6 +792,26 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
         }
 
         _send_unicast(iface, l2addr, l2addr_len, pkt);
+#else   /* MODULE_GNRC_IPV6_NIB */
+        gnrc_ipv6_nib_nc_t nce;
+
+        if (gnrc_ipv6_nib_get_next_hop_l2addr(&hdr->dst, iface, pkt,
+                                              &nce) < 0) {
+            /* packet is released by NIB */
+            return;
+        }
+
+        if (prep_hdr) {
+            if (_fill_ipv6_hdr(iface, ipv6, payload) < 0) {
+                /* error on filling up header */
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
+        }
+
+        _send_unicast(gnrc_ipv6_nib_nc_get_iface(&nce), nce.l2addr,
+                      nce.l2addr_len, pkt);
+#endif  /* MODULE_GNRC_IPV6_NIB */
     }
 }
 

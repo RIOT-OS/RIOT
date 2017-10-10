@@ -108,16 +108,31 @@ typedef struct _nib_onl_entry {
      * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ARSM != 0.
      */
     uint8_t l2addr[GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
+#endif
     /**
-     * @brief Event for @ref GNRC_IPV6_NIB_REACH_TIMEOUT and
+     * @brief Event for @ref GNRC_IPV6_NIB_SND_UC_NS,
+     *        @ref GNRC_IPV6_NIB_SND_MC_NS, @ref GNRC_IPV6_NIB_REACH_TIMEOUT and
      *        @ref GNRC_IPV6_NIB_DELAY_TIMEOUT
      *
-     * @note    Events of these types can't be in the event queue at the same
-     *          time (since they only have one NUD state at a time). Because of
-     *          this we can use one event for both of them (but need the
-     *          different types, since the events are handled differently)
+     * @note    Four event types
+     *          1. To easier distinguish multicast probes in _evtimer_lookup for
+     *             rate-limiting from unicast probes.
+     *          2. Since the types can't be in the event queue at the same time
+     *             (since they only have one NUD state at a time and probing is
+     *             one of these states). Because of this we can use one event
+     *             for all of them (but need the different types, since the
+     *             events are handled differently).
+     * @note    This is also available with @ref GNRC_IPV6_NIB_CONF_ARSM == 0,
+     *          since 6Lo address registration uses it to time the sending of
+     *          neighbor solicitations.
      */
     evtimer_msg_event_t nud_timeout;
+    /**
+     * @brief Event for @ref GNRC_IPV6_NIB_SND_NA
+     */
+    evtimer_msg_event_t snd_na;
+#if GNRC_IPV6_NIB_CONF_6LR || defined(DOXYGEN)
+    evtimer_msg_event_t addr_reg_timeout;   /**< Event for @ref GNRC_IPV6_NIB_ADDR_REG_TIMEOUT */
 #endif
 
     /**
@@ -135,14 +150,12 @@ typedef struct _nib_onl_entry {
      * @see [Mode flags for entries](@ref net_gnrc_ipv6_nib_mode).
      */
     uint8_t mode;
-#if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
     /**
      * @brief   Neighbor solicitations sent for probing
-     *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ARSM != 0.
      */
     uint8_t ns_sent;
 
+#if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
     /**
      * @brief   length in bytes of _nib_onl_entry_t::l2addr
      *
@@ -190,8 +203,8 @@ typedef struct {
      */
     uint32_t reach_time_base;
     uint32_t reach_time;                /**< reachable time (in ms) */
-    uint32_t retrans_time;              /**< retransmission time (in ms) */
 #endif
+    uint32_t retrans_time;              /**< retransmission time (in ms) */
 #if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
     /**
      * @brief   timestamp in milliseconds of last unsolicited router
@@ -200,6 +213,12 @@ typedef struct {
      * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ROUTER.
      */
     uint32_t last_ra;
+#endif
+#if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
+    /**
+     * @brief   Event for @ref GNRC_IPV6_NIB_RECALC_REACH_TIME
+     */
+    evtimer_msg_event_t recalc_reach_time;
 #endif
     kernel_pid_t pid;                   /**< identifier of the interface */
 #if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
@@ -788,6 +807,17 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
  * @return  NULL, if no space left for interface.
  */
 _nib_iface_t *_nib_iface_get(unsigned iface);
+
+/**
+ * @brief   Recalculates randomized reachable time of an interface.
+ *
+ * @param[in] iface An interface.
+ */
+#if GNRC_IPV6_NIB_CONF_ARSM
+void _nib_iface_recalc_reach_time(_nib_iface_t *iface);
+#else
+#define _nib_iface_recalc_reach_time(iface) (void)iface
+#endif
 
 /**
  * @brief   Looks up if an event is queued in the event timer

@@ -319,8 +319,27 @@ ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
   USEMODULE += ipv6_addr
 endif
 
+ifneq (,$(filter gnrc_ipv6_nib_6lbr,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6lr
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_6lr,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6ln
+  USEMODULE += gnrc_ipv6_nib_router
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_6ln,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += gnrc_sixlowpan_nd
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_router,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+endif
+
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   USEMODULE += evtimer
+  USEMODULE += gnrc_ndp2
   USEMODULE += ipv6_addr
   USEMODULE += random
 endif

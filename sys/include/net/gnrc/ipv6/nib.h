@@ -12,6 +12,8 @@
  * @brief       Neighbor Information Base (NIB) for IPv6
  *
  * @todo    Add detailed description
+ * @todo    Implement multihop DAD
+ * @todo    Implement classic SLAAC
  * @{
  *
  * @file
@@ -26,6 +28,12 @@
 #include "net/gnrc/ipv6/nib/ft.h"
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib/pl.h"
+
+#include "net/icmpv6.h"
+#include "net/ipv6/addr.h"
+#include "net/ipv6/hdr.h"
+#include "net/gnrc/ipv6/nib/nc.h"
+#include "net/gnrc/pkt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -181,7 +189,108 @@ extern "C" {
  * context is a valid default router entry representing the router.
  */
 #define GNRC_IPV6_NIB_RTR_TIMEOUT           (0x4fcdU)
+
+/**
+ * @brief   Recalculate reachability timeout time.
+ *
+ * This message type is for the event of recalculating the reachability timeout
+ * time. The expected message context is a valid interface.
+ *
+ * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
+ */
+#define GNRC_IPV6_NIB_RECALC_REACH_TIME     (0x4fceU)
 /** @} */
+
+/**
+ * @brief   Initialize NIB
+ */
+void gnrc_ipv6_nib_init(void);
+
+/**
+ * @brief   Adds an interface to be managed by the NIB.
+ *
+ * @pre `(KERNEL_PID_UNDEF < iface)`
+ *
+ * @param[in] iface The interface to be managed by the NIB
+ */
+void gnrc_ipv6_nib_init_iface(kernel_pid_t iface);
+
+/**
+ * @brief   Gets link-layer address of next hop to a destination address
+ *
+ * @pre `(dst != NULL) && (nce != NULL)`
+ *
+ * @param[in] dst       Destination address of a packet.
+ * @param[in] iface     Restrict search to this interface. May be
+ *                      `KERNEL_PID_UNDEF` for any interface.
+ * @param[in] pkt       The IPv6 packet in sending order for which the next hop
+ *                      is searched. Needed for queuing for with reactive
+ *                      routing or address resolution. May be `NULL`.
+ *                      Will be released properly on error.
+ * @param[out] nce      The neighbor cache entry of the next hop to @p dst.
+ *
+ * @return  0, on success.
+ * @return  -ENETUNREACH if there is no route to host.
+ * @return  -EHOSTUNREACH if the next hop is not reachable or if @p dst was
+ *          link-local, but @p iface was @ref KERNEL_PID_UNDEF (no neighbor
+ *          cache entry will be created in this case and no neighbor
+ *          solicitation sent).
+ */
+int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
+                                      kernel_pid_t iface, gnrc_pktsnip_t *pkt,
+                                      gnrc_ipv6_nib_nc_t *nce);
+
+/**
+ * @brief   Handles a received ICMPv6 packet
+ *
+ * @pre `iface != KERNEL_PID_UNDEF`
+ * @pre `ipv6 != NULL`
+ * @pre `icmpv6 != NULL`
+ * @pre `icmpv6_len > sizeof(icmpv6_hdr_t)`
+ *
+ * @attention   The ICMPv6 checksum is supposed to be checked externally!
+ *
+ * @note    @p ipv6 is just used for the addresses and hop limit. The next
+ *          header field will not be checked for correctness (but should be
+ *          @ref PROTNUM_ICMPV6)
+ *
+ * @see [RFC 4861, section 6.1](https://tools.ietf.org/html/rfc4861#section-6.1)
+ * @see [RFC 4861, section 6.2.6](https://tools.ietf.org/html/rfc4861#section-6.2.6)
+ * @see [RFC 4861, section 6.3.4](https://tools.ietf.org/html/rfc4861#section-6.3.4)
+ * @see [RFC 4861, section 7.1](https://tools.ietf.org/html/rfc4861#section-7.1)
+ * @see [RFC 4861, section 7.2.3](https://tools.ietf.org/html/rfc4861#section-7.2.3)
+ * @see [RFC 4861, section 7.2.5](https://tools.ietf.org/html/rfc4861#section-7.2.5)
+ * @see [RFC 4861, section 8.1](https://tools.ietf.org/html/rfc4861#section-8.1)
+ * @see [RFC 4861, section 8.3](https://tools.ietf.org/html/rfc4861#section-8.3)
+ * @see [RFC 4862, section 5.4.3](https://tools.ietf.org/html/rfc4862#section-5.4.3)
+ * @see [RFC 4862, section 5.4.4](https://tools.ietf.org/html/rfc4862#section-5.4.4)
+ * @see [RFC 4862, section 5.5.3](https://tools.ietf.org/html/rfc4862#section-5.5.3)
+ * @see [RFC 6775, section 5.5.2](https://tools.ietf.org/html/rfc6775#section-5.5.2)
+ * @see [RFC 6775, section 5.4](https://tools.ietf.org/html/rfc6775#section-5.4)
+ * @see [RFC 6775, section 6.3](https://tools.ietf.org/html/rfc6775#section-6.3)
+ * @see [RFC 6775, section 6.5](https://tools.ietf.org/html/rfc6775#section-6.5)
+ * @see [RFC 6775, section 8.1.3](https://tools.ietf.org/html/rfc6775#section-8.1.3)
+ * @see [RFC 6775, section 8.2.1](https://tools.ietf.org/html/rfc6775#section-8.2.1)
+ * @see [RFC 6775, section 8.2.4](https://tools.ietf.org/html/rfc6775#section-8.2.4)
+ * @see [RFC 6775, section 8.2.5](https://tools.ietf.org/html/rfc6775#section-8.2.5)
+ *
+ * @param[in] iface         The interface the packet came over.
+ * @param[in] ipv6          The IPv6 header of the received packet.
+ * @param[in] icmpv6        The ICMPv6 header and payload of the received
+ *                          packet.
+ * @param[in] icmpv6_len    The number of bytes at @p icmpv6.
+ */
+void gnrc_ipv6_nib_handle_pkt(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
+                              const icmpv6_hdr_t *icmpv6, size_t icmpv6_len);
+
+/**
+ * @brief   Handles a timer event
+ *
+ * @param[in] ctx   Context of the timer event.
+ * @param[in] type  Type of the timer event (see [timer event
+ *                  types](@ref net_gnrc_ipv6_nib_msg))
+ */
+void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type);
 
 #ifdef __cplusplus
 }
