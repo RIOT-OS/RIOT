@@ -63,19 +63,21 @@ extern "C" {
  * @brief   Flags for device internal states (see datasheet)
  */
 typedef enum {
-    WINC1500_EVENT_NOTHING =                   (0),
-    WINC1500_EVENT_OTHERS =                    (1<<0),
+    WINC1500_EVENT_NOTHING =                (0), /**< Reserved, nothing happend */
+    WINC1500_EVENT_OTHERS =                 (1<<0), /**< Unexpected event */
     /* From M2M_WIFI_RESP_CON_STATE_CHANGED */
-    WINC1500_EVENT_CON_STATE_CONNECTED =       (1<<1),
-    WINC1500_EVENT_CON_STATE_DISCONNECTED =    (1<<2),
+    WINC1500_EVENT_CON_STATE_CONNECTED =    (1<<1), /**< WiFi connected */
+    WINC1500_EVENT_CON_STATE_DISCONNECTED = (1<<2), /**< WiFi disconnected */
     /* From M2M_WIFI_RESP_SCAN_DONE */
-    WINC1500_EVENT_SCAN_DONE =                 (1<<3),
+    WINC1500_EVENT_SCAN_DONE =              (1<<3), /**< Scanning for APs done */
     /* From M2M_WIFI_RESP_SCAN_RESULT */
-    WINC1500_EVENT_SCAN_RESULT =               (1<<4),
+    WINC1500_EVENT_SCAN_RESULT =            (1<<4), /**< Scan result request done */
     /* From M2M_WIFI_RESP_CURRENT_RSSI */
-    WINC1500_EVENT_CURRENT_RSSI =              (1<<5),
+    WINC1500_EVENT_CURRENT_RSSI =           (1<<5), /**< Request for Current 
+                                                        connected RSSI done */
     /* From M2M_WIFI_RESP_CONN_INFO */
-    WINC1500_EVENT_CONN_INFO =                 (1<<6)
+    WINC1500_EVENT_CONN_INFO =              (1<<6) /**< Request for the Connected
+                                                        WiFi information done */
 } winc1500_cb_msg_t;
 
 /**
@@ -124,7 +126,8 @@ void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr);
 /**
  * @brief   Prevent other threads from entering the function concurrently.
  */
-static inline void _lock(winc1500_t *dev) {
+static inline void _lock(winc1500_t *dev)
+{
 #ifdef MODULE_GNRC_NETDEV
     mutex_lock(&dev->mutex);
 #else
@@ -136,7 +139,8 @@ static inline void _lock(winc1500_t *dev) {
 /**
  * @brief   Unlock concurrency lock
  */
-static inline void _unlock(winc1500_t *dev) {
+static inline void _unlock(winc1500_t *dev)
+{
 #ifdef MODULE_GNRC_NETDEV
     mutex_unlock(&dev->mutex);
 #else
@@ -148,14 +152,17 @@ static inline void _unlock(winc1500_t *dev) {
 /**
  * @brief   Lock the SPI bus
  */
-static inline void _lock_bus(winc1500_t *dev) {
+static inline void _lock_bus(winc1500_t *dev)
+{
     spi_acquire(dev->params.spi, SPI_CS_UNDEF,
         WINC1500_SPI_MODE, WINC1500_SPI_CLOCK);
 }
+
 /**
  * @brief   Unlock the SPI bus
  */
-static inline void _unlock_bus(winc1500_t *dev) {
+static inline void _unlock_bus(winc1500_t *dev)
+{
     spi_release(dev->params.spi);
 }
 #endif

@@ -198,7 +198,7 @@ int winc1500_get_mac_addr(uint8_t addr[]);
 int winc1500_scan(void);
 
 /**
- * @brief   Retrive information of an access point.
+ * @brief   Retrieve information of an access point.
  *
  * @note    `winc1500_scan()` has to be called prior to this function.
  *
@@ -236,7 +236,7 @@ int winc1500_connect(const winc1500_ap_t *ap_info);
 int winc1500_connect_list(const winc1500_ap_t ap_info[]);
 
 /**
- * @brief   Retrive information of a connected access point.
+ * @brief   Retrieve information of a connected access point.
  *
  * @note    It will return error when the Wi-Fi is not connected to an AP. So
  *          it also can be used to check whether the WINC1500 is connected or not.

@@ -60,7 +60,7 @@ extern "C" {
 /**
  * @brief   Set default configuration parameters for the WINC1500 driver
  */
-#define WINC1500_PARAMS_DEFAULT    {.spi = WINC1500_SPI, \
+#define WINC1500_PARAMS_DEFAULT    { .spi = WINC1500_SPI, \
                                      .cs_pin = WINC1500_SPI_CS_PIN, \
                                      .int_pin = WINC1500_INTN_PIN, \
                                      .reset_pin = WINC1500_RESET_PIN, \

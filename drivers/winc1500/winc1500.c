@@ -49,7 +49,6 @@ char _ssid[WINC1500_MAX_SSID_LEN + 1];
 winc1500_ap_t _ap;
 uint8_t *_mac_addr;
 
-
 static int wait_for_event(msg_t *response, uint16_t event, uint16_t error_event);
 static winc1500_sec_flags_t sec_module2driver(tenuM2mSecType module_sec);
 static tenuM2mSecType sec_driver2module(winc1500_sec_flags_t sec);
@@ -188,7 +187,6 @@ static tenuM2mSecType sec_driver2module(winc1500_sec_flags_t sec)
     return module_sec;
 }
 
-
 /* -------------------------------------------------------------------------- */
 /* Public functions                                                           */
 /* -------------------------------------------------------------------------- */
@@ -200,10 +198,11 @@ void winc1500_setup(winc1500_t *dev, const winc1500_params_t *params)
     dev->params = *params;
 }
 
-
 int winc1500_init(const winc1500_params_t *params)
 {
 #ifdef MODULE_GNRC_NETDEV
+    /* When NETDEV enabled _init() in @ref winc1500_netdev.c will actually
+     * initialize the device. So this function will be a dummy */
     return WINC1500_OK;
 #else
     winc1500_t *dev = &winc1500;
@@ -252,7 +251,6 @@ int winc1500_init(const winc1500_params_t *params)
 #endif
 }
 
-
 int winc1500_scan(void)
 {
     winc1500_t *dev = &winc1500;
@@ -279,7 +277,6 @@ done:
     }
     return result;
 }
-
 
 int winc1500_read_ap(winc1500_ap_t *ap_result, uint8_t ap_idx)
 {
@@ -310,7 +307,6 @@ done:
     return result;
 }
 
-
 int winc1500_get_mac_addr(uint8_t *addr)
 {
     winc1500_t *dev = &winc1500;
@@ -330,7 +326,6 @@ int winc1500_get_mac_addr(uint8_t *addr)
     _unlock(dev);
     return result;
 }
-
 
 int winc1500_connect(const winc1500_ap_t *ap_info)
 {
@@ -359,13 +354,11 @@ done:
     return result;
 }
 
-
 int winc1500_connect_list(const winc1500_ap_t ap_info[])
 {
     /* TODO: Implement later */
     return -1;
 }
-
 
 int winc1500_connection_info(winc1500_ap_t *ap_result, uint8_t *mac_addr)
 {
@@ -397,7 +390,6 @@ done:
     }
     return result;
 }
-
 
 int winc1500_disconnect(void)
 {
