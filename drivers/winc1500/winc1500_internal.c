@@ -33,7 +33,7 @@ static void _process_event(uint8_t msg_type, void *payload);
 
 void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr)
 {
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
     winc1500_t *dev = &winc1500;
 #endif
     /**
@@ -95,7 +95,7 @@ void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr)
         case M2M_WIFI_RESP_GET_PRNG:
             recv_size = sizeof (event_info.prng_result);
             break;
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
         case M2M_WIFI_RESP_ETHERNET_RX_PACKET: {
             _unlock_bus(dev);
             dev->rx_addr = addr;
@@ -164,7 +164,7 @@ static void _process_event(uint8_t msg_type, void *payload)
                     /* Undefined status */
                     break;
             }
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
             /* Update link state to netdev */
             netdev_event_t event_netdev =
                 (event->state_change.u8CurrState == M2M_WIFI_CONNECTED) ?

@@ -18,7 +18,7 @@
  * @}
  */
 
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
 
 #include <assert.h>
 #include <errno.h>
@@ -37,7 +37,6 @@
 #include "net/eui64.h"
 #include "net/ethernet.h"
 #include "net/netstats.h"
-
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -247,4 +246,4 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 
 #else
 typedef int dont_be_pedantic;
-#endif /* MODULE_GNRC_NETDEV */
+#endif /* MODULE_NETDEV_ETH */

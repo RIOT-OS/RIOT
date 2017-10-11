@@ -46,8 +46,8 @@ static const shell_command_t shell_commands[] = {
 
 static int _init(int argc, char **argv)
 {
-#ifdef MODULE_GNRC_NETDEV
-    puts("winc1500_init() won't have any effect if GNRC is enabled.");
+#ifdef MODULE_NETDEV_ETH
+    puts("winc1500_init() won't have any effect if GNRC(NETDEV_ETH) is enabled.");
 #endif
     if (WINC1500_OK == winc1500_init(&winc1500_params[0])) {
         uint8_t mac[6];

@@ -59,7 +59,7 @@
 #include "mbox.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
 #include "net/netdev.h"
 #endif
 
@@ -135,7 +135,7 @@ typedef struct {
  * @brief   Device descriptor for the WINC1500 WiFi module
  */
 typedef struct {
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
     netdev_t netdev;      /**< extended netdev structure */
     mutex_t  mutex;       /**< Mutex used for locking concurrent sends */
     uint32_t rx_addr;     /**< The module's base addresss of the received buffer */

@@ -98,7 +98,7 @@ typedef union {
     tstrPrng                prng_result;        /**< M2M_WIFI_RESP_GET_PRNG */
     uint8_t                 rx_buf[8];      /**< M2M_WIFI_RESP_CURRENT_RSSI and
                                                  M2M_WIFI_RESP_CLIENT_INFO */
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
     tstrM2mIpRsvdPkt        recv_pkt;   /**< M2M_WIFI_RESP_ETHERNET_RX_PACKET */
 #endif
 } winc1500_event_info_t;
@@ -128,7 +128,7 @@ void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr);
  */
 static inline void _lock(winc1500_t *dev)
 {
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
     mutex_lock(&dev->mutex);
 #else
     spi_acquire(dev->params.spi, SPI_CS_UNDEF,
@@ -141,14 +141,14 @@ static inline void _lock(winc1500_t *dev)
  */
 static inline void _unlock(winc1500_t *dev)
 {
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
     mutex_unlock(&dev->mutex);
 #else
     spi_release(dev->params.spi);
 #endif
 }
 
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
 /**
  * @brief   Lock the SPI bus
  */

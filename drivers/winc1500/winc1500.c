@@ -56,10 +56,10 @@ static tenuM2mSecType sec_driver2module(winc1500_sec_flags_t sec);
 /* -------------------------------------------------------------------------- */
 /* Private functions                                                          */
 /* -------------------------------------------------------------------------- */
-#ifdef MODULE_GNRC_NETDEV
-#else
+#ifndef MODULE_NETDEV_ETH
 /*
- * @brief Event handler thread
+ * @brief Event handler thread. 
+ *        This handler is not used when NETDEV is enabled
  */
 static void *event_handler(void *arg)
 {
@@ -89,6 +89,7 @@ static void *event_handler(void *arg)
     /* Shouldn't be reached */
     return NULL;
 }
+#else
 #endif
 
 /*
@@ -101,13 +102,13 @@ static int wait_for_event(msg_t *response, uint16_t event, uint16_t error_event)
     int result = WINC1500_ERR;
     msg_t msg_resp;
     /* Wake up handler */
-#ifdef  MODULE_GNRC_NETDEV
-    /* When GNRC enabled it doesn't need to wake it up here. */
-#else
+#ifndef  MODULE_NETDEV_ETH
     msg_t msg_req;
     msg_req.content.value = 0;
     msg_req.type = START_HANDLER;
     msg_send(&msg_req, dev->pid);
+#else
+    /* When NETDEV enabled it doesn't need to wake it up here. */
 #endif
     /* wait for event message */
     while (true) {
@@ -123,13 +124,13 @@ static int wait_for_event(msg_t *response, uint16_t event, uint16_t error_event)
         }
     }
 done:
-#ifdef  MODULE_GNRC_NETDEV
-    /* When GNRC enabled this function doesn't need to sleep handler here. */
-#else
+#ifndef  MODULE_NETDEV_ETH
     /* Sleep handler */
     msg_req.content.value = 0;
     msg_req.type = STOP_HANDLER;
     msg_send(&msg_req, dev->pid);
+#else
+    /* When NETDEV enabled this function doesn't need to sleep handler here. */
 #endif
     /* Pass response */
     *response = msg_resp;
@@ -192,7 +193,7 @@ static tenuM2mSecType sec_driver2module(winc1500_sec_flags_t sec)
 /* -------------------------------------------------------------------------- */
 void winc1500_setup(winc1500_t *dev, const winc1500_params_t *params)
 {
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
     dev->netdev.driver = &netdev_driver_winc1500;
 #endif
     dev->params = *params;
@@ -200,7 +201,7 @@ void winc1500_setup(winc1500_t *dev, const winc1500_params_t *params)
 
 int winc1500_init(const winc1500_params_t *params)
 {
-#ifdef MODULE_GNRC_NETDEV
+#ifdef MODULE_NETDEV_ETH
     /* When NETDEV enabled _init() in @ref winc1500_netdev.c will actually
      * initialize the device. So this function will be a dummy */
     return WINC1500_OK;
