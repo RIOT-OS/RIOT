@@ -4,8 +4,6 @@ export CPU = atmega328p
 USEMODULE += boards_common_arduino-atmega
 
 #export needed for flash rule
-export PORT_LINUX ?= /dev/ttyUSB0
-export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 export PROGRAMMER_SPEED ?= 57600
 
 export FFLAGS += -p m328p

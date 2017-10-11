@@ -2,10 +2,6 @@
 export CPU = stm32l1
 export CPU_MODEL = stm32l151rc
 
-# define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
-
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 

@@ -2,10 +2,6 @@
 export CPU = lm4f120
 export CPU_MODEL = LM4F120H5QR
 
-#define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 

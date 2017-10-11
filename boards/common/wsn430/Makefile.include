@@ -8,8 +8,6 @@ USEMODULE += boards_common_wsn430
 export INCLUDES += -I$(RIOTBOARD)/common/wsn430/include
 
 # configure the serial interface
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # configure the flash tool

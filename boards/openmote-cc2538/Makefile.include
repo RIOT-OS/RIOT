@@ -2,10 +2,6 @@
 export CPU = cc2538
 export CPU_MODEL = cc2538sf53
 
-# define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
-
 # Set default flash tool
 export PROGRAMMER ?= cc2538-bsl
 

@@ -2,10 +2,6 @@
 export CPU = nrf51
 export CPU_MODEL = nrf51x22xxaa
 
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
-
 # define flash and debugging environment
 export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
 export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh

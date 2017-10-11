@@ -12,10 +12,6 @@ export HEXFILE = $(ELFFILE:.elf=.bin)
 export FFLAGS =
 export DEBUGGER_FLAGS =
 
-# define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
 # Skip the space needed by the embedded bootloader
 export ROM_OFFSET ?= 0x3000
 

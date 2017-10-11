@@ -2,9 +2,6 @@
 export CPU = msp430fxyz
 export CPU_MODEL = msp430f2617
 
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
