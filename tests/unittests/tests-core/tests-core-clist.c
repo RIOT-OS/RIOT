@@ -223,8 +223,9 @@ static void _foreach_test(clist_node_t *node)
 
 /* embunit test macros only work within void returning functions, so this
  * trampoline function is needed */
-static int _foreach_test_trampoline(clist_node_t *node)
+static int _foreach_test_trampoline(clist_node_t *node, void *arg)
 {
+    (void)arg;
     _foreach_test(node);
     if (_foreach_called == _foreach_abort_after) {
         return 1;
@@ -242,7 +243,7 @@ static void test_clist_foreach(void)
         clist_rpush(list, &tests_clist_buf[i]);
     }
 
-    clist_foreach(list, _foreach_test_trampoline);
+    clist_foreach(list, _foreach_test_trampoline, NULL);
 
     TEST_ASSERT(_foreach_called == _foreach_abort_after);
 
@@ -252,7 +253,7 @@ static void test_clist_foreach(void)
     }
 
     _foreach_abort_after = (TEST_CLIST_LEN + 1);
-    clist_foreach(list, _foreach_test_trampoline);
+    clist_foreach(list, _foreach_test_trampoline, NULL);
 
     TEST_ASSERT(_foreach_called == TEST_CLIST_LEN);
 }
