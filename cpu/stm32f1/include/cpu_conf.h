@@ -25,7 +25,7 @@
 
 #include "cpu_conf_common.h"
 
-#if defined(CPU_MODEL_STM32F103CB) || defined(CPU_MODEL_STM32F103RB)
+#if defined(CPU_MODEL_STM32F103C8) || defined(CPU_MODEL_STM32F103CB) || defined(CPU_MODEL_STM32F103RB)
 #include "vendor/stm32f103xb.h"
 #elif defined(CPU_MODEL_STM32F103RE)
 #include "vendor/stm32f103xe.h"
