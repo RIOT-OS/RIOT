@@ -21,10 +21,13 @@
  */
 
 #include "arm_cpu.h"
+#include "periph/pm.h"
 
+#if defined(NEEDS_ARM7_PM_REBOOT)
 void pm_reboot(void)
 {
     while (1) {
         arm_reset();
     }
 }
+#endif

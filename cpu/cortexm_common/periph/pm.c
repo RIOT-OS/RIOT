@@ -24,14 +24,21 @@
 #include "cpu.h"
 #include "periph/pm.h"
 
-#ifndef FEATURE_PERIPH_PM
+#ifdef NEEDS_CORTEXM_PM_FALLBACK
+#define NEEDS_CORTEXM_PM_SET_LOWEST
+#define NEEDS_CORTEXM_PM_REBOOT
+#endif
+
+#if defined(NEEDS_CORTEXM_PM_SET_LOWEST)
 void pm_set_lowest(void)
 {
     cortexm_sleep(0);
 }
 #endif
 
+#if defined(NEEDS_CORTEXM_PM_REBOOT)
 void pm_reboot(void)
 {
     NVIC_SystemReset();
 }
+#endif

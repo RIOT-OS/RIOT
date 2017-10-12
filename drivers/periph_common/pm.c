@@ -14,20 +14,38 @@
  * @brief       Platform-independent power management fallback code
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Robert Hartung <hartung@ibr.cs.tu-bs.de>
  *
  * @}
  */
 
 #include "irq.h"
 #include "periph/pm.h"
+#include "pm_conf.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-void __attribute__((weak)) pm_set_lowest(void) {}
+/* make sure we do not conflict with pm_layered */
+#ifndef MODULE_PM_LAYERED
+/* specific defines, if general define is set */
+#ifdef NEEDS_PM_FALLBACK
+#define NEEDS_PM_SET_LOWEST
+#define NEEDS_PM_OFF
+#endif
 
-void __attribute__((weak)) pm_off(void)
+#if defined(NEEDS_PM_SET_LOWEST)
+void pm_set_lowest(void) {
+
+}
+#endif
+
+#if defined(NEEDS_PM_OFF)
+void pm_off(void)
 {
     irq_disable();
+    pm_set_lowest();
     while(1) {};
 }
+#endif
+#endif /* MODULE_PM_LAYERED */
