@@ -1,7 +1,6 @@
 MODULE = board
 
-DIRS = drivers
-
 include $(RIOTBASE)/Makefile.base
 
+# TODO Why here ?
 INCLUDES = $(NATIVEINCLUDES)
