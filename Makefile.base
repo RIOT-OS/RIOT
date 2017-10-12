@@ -9,9 +9,9 @@ MODULE ?= $(shell basename $(CURDIR))
 
 .PHONY: all ${DIRS:%=ALL--%} ${DIRS:%=CLEAN--%}
 
-all: $(BINDIR)/$(MODULE).a ..nothing
+all: $(BINDIR)/$(MODULE).a ..nothing_$(MODULE)
 
-..nothing:
+..nothing_$(MODULE):
 	@:
 
 clean:: ${DIRS:%=CLEAN--%}
