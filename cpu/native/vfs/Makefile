@@ -1,3 +1,3 @@
-MODULE=native_vfs
+MODULE = native_vfs
 
 include $(RIOTBASE)/Makefile.base

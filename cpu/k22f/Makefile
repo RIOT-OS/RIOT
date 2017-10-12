@@ -1,7 +1,4 @@
 # define the module that is build
 MODULE = cpu
 
-# add a list of subdirectories that should also be built
-DIRS = periph $(RIOTCPU)/cortexm_common $(KINETIS_COMMON)
-
 include $(RIOTBASE)/Makefile.base
