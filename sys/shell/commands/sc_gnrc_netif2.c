@@ -258,7 +258,7 @@ static void _print_netopt(netopt_t opt)
     }
 }
 
-const char *_netopt_state_str[] = {
+static const char *_netopt_state_str[] = {
     [NETOPT_STATE_OFF] = "OFF",
     [NETOPT_STATE_SLEEP] = "SLEEP",
     [NETOPT_STATE_IDLE] = "IDLE",
@@ -270,12 +270,13 @@ const char *_netopt_state_str[] = {
 
 /* for some lines threshold might just be 0, so we can't use _LINE_THRESHOLD
  * here */
-static void _newline(unsigned threshold, unsigned *line_thresh)
+static unsigned _newline(unsigned threshold, unsigned line_thresh)
 {
-    if (*line_thresh > threshold) {
+    if (line_thresh > threshold) {
         printf("\n          ");
-        *line_thresh = 0U;
+        line_thresh = 0U;
     }
+    return line_thresh;
 }
 
 
@@ -288,8 +289,7 @@ static unsigned _netif_list_flag(kernel_pid_t iface, netopt_t opt, char *str,
 
     if ((res >= 0) && (enable == NETOPT_ENABLE)) {
         printf("%s", str);
-        line_thresh++;
-        _newline(_LINE_THRESHOLD, &line_thresh);
+        line_thresh = _newline(_LINE_THRESHOLD, ++line_thresh);
     }
     return line_thresh;
 }
@@ -323,7 +323,7 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
             printf("  VAL");
             break;
     }
-    _newline(0U, &line_thresh);
+    line_thresh = _newline(0U, line_thresh);
 }
 #endif
 
@@ -359,7 +359,7 @@ static void _netif_list(kernel_pid_t iface)
     if (res >= 0) {
         printf(" NID: 0x%" PRIx16, u16);
     }
-    _newline(0U, &line_thresh);
+    line_thresh = _newline(0U, line_thresh);
     res = gnrc_netapi_get(iface, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
     if (res >= 0) {
         char hwaddr_str[res * 3];
@@ -367,7 +367,7 @@ static void _netif_list(kernel_pid_t iface)
         printf("%s ", gnrc_netif2_addr_to_str(hwaddr, res, hwaddr_str));
         line_thresh++;
     }
-    _newline(0U, &line_thresh);
+    line_thresh = _newline(0U, line_thresh);
     res = gnrc_netapi_get(iface, NETOPT_TX_POWER, 0, &i16, sizeof(i16));
     if (res >= 0) {
         printf(" TX-Power: %" PRIi16 "dBm ", i16);
@@ -391,7 +391,7 @@ static void _netif_list(kernel_pid_t iface)
         }
         line_thresh++;
     }
-    _newline(0U, &line_thresh);
+    line_thresh = _newline(0U, line_thresh);
     line_thresh = _netif_list_flag(iface, NETOPT_PROMISCUOUSMODE, "PROMISC  ",
                                    line_thresh);
     line_thresh = _netif_list_flag(iface, NETOPT_AUTOACK, "AUTOACK  ",
@@ -438,13 +438,12 @@ static void _netif_list(kernel_pid_t iface)
         printf("Source address length: %" PRIu16 , u16);
         line_thresh++;
     }
-    _newline(0U, &line_thresh);
+    line_thresh = _newline(0U, line_thresh);
 #ifdef MODULE_GNRC_IPV6
     printf("Link type: %s",
            (gnrc_netapi_get(iface, NETOPT_IS_WIRED, 0, &u16, sizeof(u16)) > 0) ?
             "wired" : "wireless");
-    line_thresh++;
-    _newline(0U, &line_thresh);
+    line_thresh = _newline(0U, ++line_thresh);
     res = gnrc_netapi_get(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                           sizeof(ipv6_addrs));
     if (res >= 0) {
