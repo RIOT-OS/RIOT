@@ -1,0 +1,21 @@
+# Current makefile directory
+D := $(abspath $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
+
+# $(BOARD) implements "board" module
+MODULE_DIR_board                    := $(D)/$(BOARD)
+
+MODULE_DIR_arduino-atmega-common    := $(D)/arduino-atmega-common
+MODULE_DIR_arduino-mkr-common       := $(D)/arduino-mkr-common
+MODULE_DIR_mini                     := $(D)/calliope-mini/mini
+MODULE_DIR_chronos-drivers          := $(D)/chronos/drivers
+MODULE_DIR_iotlab-common            := $(D)/iotlab-common
+MODULE_DIR_microbit                 := $(D)/microbit/microbit
+MODULE_DIR_msb-430-common           := $(D)/msb-430-common
+MODULE_DIR_msb-430-common-drivers   := $(D)/msb-430-common/drivers
+MODULE_DIR_msba2-common             := $(D)/msba2-common
+MODULE_DIR_msba2-common-drivers     := $(D)/msba2-common/drivers
+MODULE_DIR_native-drivers           := $(D)/native/drivers
+MODULE_DIR_remote-common            := $(D)/remote-common
+MODULE_DIR_wsn430-common            := $(D)/wsn430-common
+MODULE_DIR_wsn430-common-drivers    := $(D)/wsn430-common/drivers
+MODULE_DIR_x86-multiboot-common     := $(D)/x86-multiboot-common
