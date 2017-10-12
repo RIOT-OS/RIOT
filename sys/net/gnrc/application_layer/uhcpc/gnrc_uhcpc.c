@@ -31,16 +31,19 @@ static void set_interface_roles(void)
         kernel_pid_t dev = netif->pid;
         int is_wired = gnrc_netapi_get(dev, NETOPT_IS_WIRED, 0, NULL, 0);
         if ((!gnrc_border_interface) && (is_wired == 1)) {
-            ipv6_addr_t addr, defroute;
+            ipv6_addr_t addr;
             gnrc_border_interface = dev;
 
             ipv6_addr_from_str(&addr, "fe80::2");
             gnrc_netapi_set(dev, NETOPT_IPV6_ADDR, 64 << 8, &addr, sizeof(addr));
-            ipv6_addr_from_str(&defroute, "::");
+#ifdef MODULE_FIB
+            ipv6_addr_t defroute = IPV6_ADDR_UNSPECIFIED;
+
             ipv6_addr_from_str(&addr, "fe80::1");
             fib_add_entry(&gnrc_ipv6_fib_table, dev, defroute.u8, 16,
                     0x00, addr.u8, 16, 0,
                     (uint32_t)FIB_LIFETIME_NO_EXPIRE);
+#endif
         }
         else if ((!gnrc_wireless_interface) && (is_wired != 1)) {
             gnrc_wireless_interface = dev;
