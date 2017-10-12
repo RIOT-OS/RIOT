@@ -111,7 +111,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
      * channel 1 toggles this line on each timer tick, the actual frequency
      * driving channel 0 is f_ch2 / 2 --> f_ch0/1 = (MCK / 2) / 2 / freq.
      */
-    dev(tim)->TC_CHANNEL[1].TC_R[2] = (CLOCK_CORECLOCK / 4) / freq;
+    dev(tim)->TC_CHANNEL[1].TC_RC = (CLOCK_CORECLOCK / 4) / freq;
 
     /* start channel 1 */
     dev(tim)->TC_CHANNEL[1].TC_CCR = (TC_CCR_CLKEN | TC_CCR_SWTRG);
@@ -124,11 +124,10 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >=TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNELS) {
         return -1;
     }
-
-    dev(tim)->TC_CHANNEL[0].TC_R[channel] = value;
+    (&dev(tim)->TC_CHANNEL[0].TC_RA)[channel] = value;
     dev(tim)->TC_CHANNEL[0].TC_IER = (TC_IER_CPAS << channel);
 
     return 0;

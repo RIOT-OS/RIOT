@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_sam3x8e
+ * @ingroup     cpu_sam3
  * @{
  *
  * @file
