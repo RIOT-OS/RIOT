@@ -1,9 +1,5 @@
 OLD_NONRECURSIVE := $(NONRECURSIVE)
 NONRECURSIVE = 1
-# First include for current module (should be done before any 'include')
-include $(RIOTBASE)/Makefile.base
-
-# Then take care of other modules
 
 include Makefile.modules
 
