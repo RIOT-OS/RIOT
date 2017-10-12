@@ -26,6 +26,13 @@ extern "C" {
 #endif
 
 /**
+ * @name    Power management configuration
+ * @{
+ */
+#define PROVIDES_PM_OFF
+/** @} */
+
+/**
  * @brief   Starting offset of CPU_ID
  */
 #define CPUID_ADDR          (&NRF_FICR->DEVICEID[0])

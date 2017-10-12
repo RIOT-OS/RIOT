@@ -22,17 +22,10 @@
 #include <mips/m32c0.h>
 #include "periph/pm.h"
 
-#ifndef FEATURES_PERIPH_PM
 void pm_set_lowest(void)
 {
     /* Dont wait if interrupts are not enabled - we would never return!*/
     if (mips32_get_c0(C0_STATUS) & SR_IE) {
         __asm volatile ("wait");
     }
-}
-#endif
-
-void pm_off(void)
-{
-   /* No Generic Power off Mechanism */
 }

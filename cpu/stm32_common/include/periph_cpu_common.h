@@ -51,6 +51,11 @@ extern "C" {
 #define CPUID_LEN           (12U)
 
 /**
+ * @brief   We provide our own pm_off() function for all STM32-based CPUs
+ */
+#define PROVIDES_PM_LAYERED_OFF
+
+/**
  * @brief   All STM timers have 4 capture-compare channels
  */
 #define TIMER_CHAN          (4U)

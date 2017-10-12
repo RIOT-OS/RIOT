@@ -87,9 +87,11 @@ void pm_unblock(unsigned mode)
     irq_restore(state);
 }
 
-void __attribute__((weak)) pm_off(void)
+#ifndef PROVIDES_PM_LAYERED_OFF
+void  pm_off(void)
 {
     pm_blocker.val_u32 = 0;
     pm_set_lowest();
     while(1);
 }
+#endif

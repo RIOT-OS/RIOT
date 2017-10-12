@@ -5,6 +5,7 @@ export APP_START=0x80000000
 include $(RIOTMAKE)/arch/mips.inc.mk
 
 export USEMODULE += periph
+export USEMODULE += periph_common
 export USEMODULE += newlib
 
 ifeq ($(USE_UHI_SYSCALLS),1)

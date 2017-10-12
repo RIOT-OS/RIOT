@@ -32,6 +32,13 @@
 extern "C" {
 #endif
 
+/**
+ * @name    Power management configuration
+ * @{
+ */
+#define PROVIDES_PM_OFF
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
