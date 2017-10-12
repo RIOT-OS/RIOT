@@ -9,7 +9,7 @@ USEMODULE += periph_common
 USEMODULE += nrf5x_common_periph
 
 # link common cpu code
-USEMODULE += cpu_common
+USEMODULE += nrf5x_common
 
 # export the common include directory
 export INCLUDES += -I$(RIOTCPU)/nrf5x_common/include

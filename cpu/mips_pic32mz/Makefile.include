@@ -8,7 +8,7 @@ export CFLAGS += -march=m5101 -mmicromips -DSKIP_COPY_TO_RAM
 export CFLAGS += -DMIPS_MICROMIPS
 
 export USEMODULE += mips_pic32_common
-export USEMODULE += periph
+export USEMODULE += mips_pic32_common_periph
 export USEMODULE += periph_common
 export USEMODULE += newlib
 
