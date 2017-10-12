@@ -55,7 +55,7 @@ void auto_init_gpio(void)
 
         LOG_DEBUG("[auto_init_saul] initializing GPIO #%u\n", i);
 
-        saul_reg_entries[i].dev = p;
+        saul_reg_entries[i].dev = (void *)p;
         saul_reg_entries[i].name = p->name;
         if ((p->mode == GPIO_IN) || (p->mode == GPIO_IN_PD) ||
             (p->mode == GPIO_IN_PU)) {
