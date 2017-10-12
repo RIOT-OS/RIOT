@@ -60,7 +60,6 @@ const netdev_driver_t netdev_driver_winc1500 = {
     .set = netdev_eth_set,
 };
 
-
 static void winc1500_isr(void *arg)
 {
     winc1500_t *dev = (winc1500_t *) arg;
@@ -71,7 +70,6 @@ static void winc1500_isr(void *arg)
     dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_ISR);
 }
 
-
 static void _isr(netdev_t *netdev)
 {
     winc1500_t *dev = (winc1500_t *) netdev;
@@ -81,7 +79,6 @@ static void _isr(netdev_t *netdev)
     m2m_wifi_handle_events(NULL);
     _unlock_bus(dev);
 }
-
 
 static int _init(netdev_t *netdev)
 {
@@ -135,8 +132,8 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
-
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count) {
+static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
+{
     winc1500_t * dev = (winc1500_t *) netdev;
     _lock_bus(dev);
 
@@ -155,7 +152,6 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count) {
     _unlock_bus(dev);
     return len;
 }
-
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
@@ -219,7 +215,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     _unlock_bus(dev);
     return size;
 }
-
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
