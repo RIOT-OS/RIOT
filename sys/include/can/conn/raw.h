@@ -72,6 +72,8 @@ typedef struct conn_can_raw {
  * @param[in] ifnum         can device Interface
  * @param[in] flags         conn flags to set (CONN_CAN_RECVONLY)
  *
+ * @post   @p filter must remain allocated until @p conn is closed
+ *
  * @return 0 if socket was successfully connected
  * @return any other negative number in case of an error
  */
@@ -122,6 +124,10 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
  * @param[in] conn          CAN connection
  * @param[in] filter        list of filters to set
  * @param[in] count         number of filters in @p filter
+ *
+ * @pre    previously set filters must be allocated until the end of the call
+ * @post   @p filter must remain allocated until @p conn is closed or
+ * conn_can_raw_set_filter() is called
  *
  * @return 0 if can filters were successfully set
  * @return any other negative number in case of an error
