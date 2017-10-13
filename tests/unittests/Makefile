@@ -55,6 +55,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              sodaq-autonomo \
                              spark-core \
                              stm32f0discovery \
+                             stm32f103c8t6 \
                              stm32f3discovery \
                              telosb \
                              waspmote-pro \
