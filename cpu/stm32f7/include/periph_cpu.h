@@ -28,6 +28,15 @@ extern "C" {
 #endif
 
 /**
+ * @name    Starting address of the CPU ID
+ */
+#ifdef CPU_MODEL_STM32F722ZE
+#define CPUID_ADDR          (0x1ff07a10)
+#else
+#define CPUID_ADDR          (0x1ff0f420)
+#endif
+
+/**
  * @brief   Available ports
  */
 enum {
