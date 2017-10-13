@@ -298,6 +298,8 @@ DIRS += $(EXTERNAL_MODULE_DIRS)
 
 _LINK = $(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
 
+MAKETARGETS += all
+
 ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
@@ -443,8 +445,11 @@ include $(RIOTMAKE)/vars.inc.mk
 # been defined (-> so the `all` will be always the first target)
 include $(RIOTMAKE)/tools/targets.inc.mk
 
+# Include multislot support
+include $(RIOTMAKE)/multislot.mk
+
 # Warn if the selected board and drivers don't provide all needed features:
-ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
+ifneq (, $(filter $(MAKETARGETS), $(if $(MAKECMDGOALS), $(MAKECMDGOALS), $(MAKETARGETS))))
   EXPECT_ERRORS :=
   EXPECT_CONFLICT :=
 

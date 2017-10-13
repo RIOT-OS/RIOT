@@ -16,6 +16,7 @@ export USEMODULE             # Sys Module dependencies of the application. Set i
 export USEPKG                # Pkg dependencies (third party modules) of the application. Set in the application's Makefile.
 export DISABLE_MODULE        # Used in the application's Makefile to suppress DEFAULT_MODULEs.
 export APPDEPS               # Files / Makefile targets that need to be created before the application can be build. Set in the application's Makefile.
+export MAKETARGETS           # List of build targets
 
 export RIOTBASE              # The root folder of RIOT. The folder where this very file lives in.
 export RIOTCPU               # For third party CPUs this folder is the base of the CPUs.
@@ -60,7 +61,7 @@ export WERROR                # Treat all compiler warnings as errors if set to 1
 export GITCACHE              # path to git-cache executable
 export FLASHER               # The command to call on "make flash".
 export FFLAGS                # The parameters to supply to FLASHER.
-export FLASH_ADDR          # Define an offset to flash code into ROM memory.
+export FLASH_ADDR            # Define an offset to flash code into ROM memory.
 export TERMPROG              # The command to call on "make term".
 export TERMFLAGS             # Additional parameters to supply to TERMPROG.
 export PORT                  # The port to connect the TERMPROG to.
