@@ -53,6 +53,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              seeeduino_arch-pro \
                              slwstk6220a \
                              sodaq-autonomo \
+                             sodaq-explorer \
                              spark-core \
                              stm32f0discovery \
                              stm32f3discovery \
@@ -128,6 +129,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        samr21-xpro \
                        slwstk6220a \
                        sodaq-autonomo \
+                       sodaq-explorer \
                        spark-core \
                        stm32f0discovery \
                        stm32f3discovery \
