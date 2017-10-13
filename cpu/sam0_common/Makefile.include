@@ -1,11 +1,20 @@
 # Define the CPU family so we can differentiate between them in the code
 CFLAGS += -DCPU_FAM_$(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
 
+# Set ROM and RAM lengths according to CPU model
+ifneq (,$(filter samd21g18a samd21j18a saml21j18b saml21j18a samr21g18a,$(CPU_MODEL)))
+  ROM_LEN ?= 0x40000
+  RAM_LEN ?= 0x8000
+endif
+
+ROM_START_ADDR ?= 0x00000000
+RAM_START_ADDR ?= 0x20000000
+
 # this CPU implementation doesn't use CMSIS initialization
 export CFLAGS += -DDONT_USE_CMSIS_INIT
 
-# for the sam[drl] CPUs we hold all linkerscripts in the sam0 common folder
-export LINKFLAGS += -L$(RIOTCPU)/sam0_common/ldscripts
+# For Cortex-M cpu we use the common cortexm.ld linker script
+LINKER_SCRIPT ?= cortexm.ld
 
 # use common periph functions
 USEMODULE += periph_common
