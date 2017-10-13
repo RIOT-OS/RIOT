@@ -105,6 +105,20 @@ test_elffile() {
     fi
 }
 
+test_binfile() {
+    if [ ! -f "${BINFILE}" ]; then
+        echo "Error: Unable to locate BINFILE"
+        echo "       (${BINFILE})"
+        exit 1
+    fi
+    if [ -z "${FLASH_ADDR}" ]; then
+        echo "Error: FLASH_ADDR not defined"
+        exit 1
+    else
+        echo "Flashing at ${FLASH_ADDR}"
+    fi
+}
+
 test_ports() {
     if [ -z "${GDB_PORT}" ]; then
         GDB_PORT=${_GDB_PORT}
@@ -186,6 +200,36 @@ do_flash_elf() {
     echo 'Done flashing'
 }
 
+do_flash_bin() {
+    test_config
+    test_binfile
+    if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
+        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${HEXFILE}'"
+        RETVAL=$?
+        if [ $RETVAL -ne 0 ]; then
+            echo "pre-flash checks failed, status=$RETVAL"
+            exit $RETVAL
+        fi
+    fi
+    # flash device
+    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            -c 'tcl_port 0' \
+            -c 'telnet_port 0' \
+            -c 'gdb_port 0' \
+            -c 'init' \
+            -c 'targets' \
+            -c 'reset halt' \
+            ${OPENOCD_PRE_FLASH_CMDS} \
+            -c 'program \"${BINFILE}\" \"${FLASH_ADDR}\"' \
+            -c 'reset halt' \
+            ${OPENOCD_PRE_VERIFY_CMDS} \
+            -c 'verify_image \"${BINFILE}\" \"${FLASH_ADDR}\" bin' \
+            -c 'reset run' \
+            -c 'shutdown'" &&
+    echo 'Done flashing'
+}
+
 do_debug() {
     test_config
     test_elffile
@@ -262,6 +306,10 @@ case "${ACTION}" in
   flash-elf)
     echo "### Flashing Target ###"
     do_flash_elf "$@"
+    ;;
+  flash-bin)
+    echo "### Flashing Target ###"
+    do_flash_bin "$@"
     ;;
   debug)
     echo "### Starting Debugging ###"

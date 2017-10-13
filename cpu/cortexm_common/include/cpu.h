@@ -114,6 +114,92 @@ static inline void cortexm_isr_end(void)
     }
 }
 
+/**
+ * @brief   Jumps to another image in flash
+ *
+ * This function is supposed to be called by a bootloader application.
+ *
+ * @param[in]   image_address   address in flash of other image
+ */
+static inline void cpu_jump_to_image(uint32_t image_address)
+{
+    /* Disable IRQ */
+    __disable_irq();
+
+    /* set PSP */
+    __set_PSP(*(uint32_t*)image_address);
+
+    /* skip stack pointer */
+    image_address += 4;
+
+    /* load the images reset_vector address */
+    uint32_t destination_address = *(uint32_t*)image_address;
+
+    /* Make sure the Thumb State bit is set. */
+    destination_address |= 0x1;
+
+    /* Branch execution */
+    __asm("BX %0" :: "r" (destination_address));
+}
+
+/* The following register is only present for Cortex-M0+, -M3, -M4 and -M7 CPUs */
+#if defined(CPU_ARCH_CORTEX_M0PLUS) || defined(CPU_ARCH_CORTEX_M3) || \
+    defined(CPU_ARCH_CORTEX_M4) || defined(CPU_ARCH_CORTEX_M4F) || \
+    defined(CPU_ARCH_CORTEX_M7)
+static inline unsigned cpu_get_image_baseaddr(void)
+{
+    return (unsigned)SCB->VTOR;
+}
+#endif
+
+#if defined(SLOT0_SIZE) && defined(SLOT1_SIZE)
+/**
+ * @brief Get FW internal address for a given slot
+ *
+ * @param[in] slot    FW slot
+ *
+ * @return            FW slot address
+ */
+static inline uint32_t cpu_get_slot_address(uint8_t slot)
+{
+    switch (slot) {
+        case 1:
+            return SLOT0_SIZE;
+            break;
+
+        case 2:
+            return SLOT0_SIZE + SLOT1_SIZE;
+            break;
+    }
+
+    return 0;
+}
+#endif
+
+#if defined(SLOT0_SIZE) && defined(SLOT2_SIZE)
+/**
+ * @brief Get internal page for a given slot
+ *
+ * @param[in] slot    FW slot
+ *
+ * @return            FW slot page
+ */
+static inline uint32_t cpu_get_slot_page(uint8_t slot)
+{
+    switch (slot) {
+        case 1:
+            return (CPU_FLASH_BASE + SLOT0_SIZE) / FLASHPAGE_SIZE;
+            break;
+
+        case 2:
+            return (CPU_FLASH_BASE + SLOT0_SIZE + SLOT1_SIZE) / FLASHPAGE_SIZE;
+            break;
+    }
+
+    return 0;
+}
+#endif
+
 #ifdef __cplusplus
 }
 #endif
