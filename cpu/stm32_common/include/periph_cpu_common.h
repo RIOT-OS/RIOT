@@ -65,14 +65,6 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Number of usable low power modes
- */
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) \
-    || defined(CPU_FAM_STM32F4) || defined(DOXYGEN)
-#define PM_NUM_MODES    (2U)
-#endif
-
-/**
  * @brief   Available peripheral buses
  */
 typedef enum {

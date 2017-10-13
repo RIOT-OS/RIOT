@@ -22,7 +22,12 @@
 #include <mips/m32c0.h>
 #include "periph/pm.h"
 
-#ifndef FEATURES_PERIPH_PM
+#ifdef NEEDS_MIPS32R2_PM_FALLBACK
+#define NEEDS_MIPS32R2_PM_OFF
+#define NEEDS_MIPS32R2_PM_OFF
+#endif
+
+#ifdef NEEDS_MIPS32R2_PM_OFF
 void pm_set_lowest(void)
 {
     /* Dont wait if interrupts are not enabled - we would never return!*/
@@ -32,7 +37,9 @@ void pm_set_lowest(void)
 }
 #endif
 
+#ifdef NEEDS_MIPS32R2_PM_OFF
 void pm_off(void)
 {
    /* No Generic Power off Mechanism */
 }
+#endif

@@ -26,6 +26,7 @@
 
 #include "assert.h"
 #include "periph_cpu.h"
+#include "pm_conf.h"
 
 #ifdef __cplusplus
  extern "C" {
