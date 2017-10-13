@@ -30,6 +30,8 @@
 #include "periph/gpio.h"
 #include "periph/pwm.h"
 
+/* guard file in case no PWM device was specified */
+#ifdef PWM_NUMOF
 
 static inline int _num(pwm_t dev)
 {
@@ -187,3 +189,5 @@ void pwm_poweroff(pwm_t dev)
                          GCLK_CLKCTRL_ID(_clk_id(dev)));
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 }
+
+#endif /* PWM_NUMOF */
