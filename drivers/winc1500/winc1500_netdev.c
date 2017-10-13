@@ -137,13 +137,15 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
     winc1500_t * dev = (winc1500_t *) netdev;
     _lock_bus(dev);
 
-    /* Send packet */
+    /* Copy packet */
     size_t len = 0;
     for (int i = 0; i < count; i++) {
-        m2m_wifi_send_ethernet_pkt(vector[i].iov_base, vector[i].iov_len);
+        memcpy(dev->frame_buf + len, vector[i].iov_base, vector[i].iov_len);
         len += vector[i].iov_len;
         /* TODO: what if the module's buffer full? */
     }
+    /* Send Packet */
+    m2m_wifi_send_ethernet_pkt(dev->frame_buf, len);
 
 #ifdef MODULE_NETSTATS_L2
     netdev->stats.tx_bytes += len;

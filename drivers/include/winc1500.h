@@ -61,6 +61,7 @@
 #include "periph/gpio.h"
 #ifdef MODULE_NETDEV_ETH
 #include "net/netdev.h"
+#include "net/ethernet.h"
 #endif
 
 #ifdef __cplusplus
@@ -142,6 +143,8 @@ typedef struct {
     uint16_t rx_offset;   /**< The module's addresss offset to the received buffer */
     int      rx_size;     /**< The module's size of the received buffer */
     uint16_t rx_rem_size; /**< The module's remaining size of the received buffer */
+    /** TODO: Try to remove this */
+    uint8_t  frame_buf[ETHERNET_FRAME_LEN]; /**< Frame buffer to send */
 #endif
     winc1500_params_t params;   /**< Configuration parameters */
     mbox_t event_mbox;          /**< Message from the event handler */
