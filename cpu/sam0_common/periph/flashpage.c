@@ -49,7 +49,7 @@ void flashpage_write(int page, void *data)
     /* erase given page (the ADDR register uses 16-bit addresses) */
     NVMCTRL->ADDR.reg = (((uint32_t)page_addr) >> 1);
     NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER);
-    while (!(NVMCTRL->INTFLAG.reg & NVMCTRL_INTFLAG_READY)) {}
+    while (!NVMCTRL->INTFLAG.bit.READY) {}
 
     /* write data to page */
     if (data != NULL) {
