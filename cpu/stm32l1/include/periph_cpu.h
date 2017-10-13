@@ -28,6 +28,15 @@ extern "C" {
 #endif
 
 /**
+ * @name    Starting address of the CPU ID
+ */
+#ifdef CPU_MODEL_STM32L151RBA
+#define CPUID_ADDR          (0x1ff80050)
+#else
+#define CPUID_ADDR          (0x1ff800d0)
+#endif
+
+/**
  * @brief   Available ports on the STM32L1 family
  */
 enum {

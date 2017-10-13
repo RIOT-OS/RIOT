@@ -29,6 +29,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Starting address of the CPU ID
+ */
+#define CPUID_ADDR          (0x1ff80050)
+
+/**
  * @brief   Available ports on the STM32L0 family
  */
 enum {

@@ -31,6 +31,11 @@ extern "C" {
 #define ADC_DEVS            (2U)
 
 /**
+ * @brief   Starting address of the CPU ID
+ */
+#define CPUID_ADDR          (0x1ffff7e8)
+
+/**
  * @brief   All timers for the STM32F1 have 4 CC channels
  */
 #define TIMER_CHANNELS      (4U)

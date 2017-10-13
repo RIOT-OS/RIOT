@@ -44,15 +44,9 @@ extern "C" {
 #endif
 
 /**
- * @brief   Linker script provided symbol for CPUID location
- */
-extern uint32_t _cpuid_address;
-/**
- * @brief   Starting offset of CPU_ID
- */
-#define CPUID_ADDR          (&_cpuid_address)
-/**
  * @brief   Length of the CPU_ID in octets
+ *
+ * This is the same for all members of the stm32 family
  */
 #define CPUID_LEN           (12U)
 

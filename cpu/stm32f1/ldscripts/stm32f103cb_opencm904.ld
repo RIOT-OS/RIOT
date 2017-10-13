@@ -22,9 +22,6 @@ MEMORY
 {
     rom (rx)    : ORIGIN = 0x08003000, LENGTH = 128K-0x3000
     ram (xrw)   : ORIGIN = 0x20000000, LENGTH = 20K
-    cpuid (r)   : ORIGIN = 0x1ffff7e8, LENGTH = 12
 }
-
-_cpuid_address = ORIGIN(cpuid);
 
 INCLUDE cortexm_base.ld
