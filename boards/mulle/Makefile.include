@@ -87,7 +87,7 @@ export OPENOCD_PRE_VERIFY_CMDS += \
   -c 'load_image $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin 0x20000000 bin' \
   -c 'resume 0x20000000'
 export OPENOCD_EXTRA_INIT
-export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-hex.sh
+export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-elf.sh
 
 .PHONY: flash
 flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
