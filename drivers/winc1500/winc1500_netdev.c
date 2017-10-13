@@ -171,7 +171,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         if (hif_receive(dev->rx_addr, (uint8_t *) &event_info,
                     sizeof(event_info.recv_pkt), 0) == M2M_SUCCESS) {
             dev->rx_offset = event_info.recv_pkt.u16PktOffset;
-            /* TODO: Subtrack 4 byte checksum?? There is no infomation on WINC1500 */
             dev->rx_rem_size = event_info.recv_pkt.u16PktSz;
             dev->rx_size = event_info.recv_pkt.u16PktSz;
         }
@@ -182,16 +181,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         netdev->stats.rx_count++;
         netdev->stats.rx_bytes += len;
 #endif
-        /* Firstly, retrive MAC Header part */
-        data_size = 14; /* Dest MAC(6) + Source MAC(6) + EtherType(2) */
-        rx_done = 0;
-        if(hif_receive(dev->rx_addr + dev->rx_offset, buf, data_size, rx_done) == M2M_SUCCESS) {
-            dev->rx_rem_size -= data_size;
-            dev->rx_offset += data_size + 2; /** The WINC1500 module have
-                                            strange extra 2 bytes. Skip them */
-            buf += data_size;
-        }
-
         /* Then get the rest of it */
         do {
             rx_done = 1;
