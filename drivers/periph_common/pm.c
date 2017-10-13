@@ -24,6 +24,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#ifndef FEATURE_PERIPH_PM
 void __attribute__((weak)) pm_set_lowest(void) {}
 
 void __attribute__((weak)) pm_off(void)
@@ -31,3 +32,4 @@ void __attribute__((weak)) pm_off(void)
     irq_disable();
     while(1) {};
 }
+#endif
