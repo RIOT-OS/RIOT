@@ -25,6 +25,13 @@
 
 #include "board_common.h"
 
+/**
+ * @name    xtimer configuration
+ * @{
+ */
+#define XTIMER_WIDTH        (16U)
+/** @} */
+
 #ifdef __cplusplus
 extern "C" {}
 #endif
