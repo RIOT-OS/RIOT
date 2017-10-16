@@ -38,6 +38,9 @@ extern "C" {
  */
 #define CPUID_LEN           (4U)
 
+/**
+ * @brief   Override GPIO pin selection macro
+ */
 #define GPIO_PIN(x,y)       ((x << 4) | (y & 0xf))
 
 /**
