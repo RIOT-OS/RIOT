@@ -81,9 +81,9 @@ static const clock_config_t clock_config = {
 #define TIMER_NUMOF             ((PIT_NUMOF) + (LPTMR_NUMOF))
 
 #define PIT_BASECLOCK           (CLOCK_BUSCLOCK)
-#define PIT_ISR_0               isr_pit1
-#define PIT_ISR_1               isr_pit3
-#define LPTMR_ISR_0             isr_lptmr0
+#define PIT_ISR_0               isr_PIT1
+#define PIT_ISR_1               isr_PIT3
+#define LPTMR_ISR_0             isr_LPTMR0
 
 /** @} */
 
@@ -106,7 +106,7 @@ static const uart_conf_t uart_config[] = {
     },
 };
 
-#define UART_0_ISR          (isr_uart0_rx_tx)
+#define UART_0_ISR          (isr_UART0_RX_TX)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
@@ -238,7 +238,7 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_CLKEN()                (SIM->SCGC4 |= (SIM_SCGC4_I2C0_MASK))
 #define I2C_0_CLKDIS()               (SIM->SCGC4 &= ~(SIM_SCGC4_I2C0_MASK))
 #define I2C_0_IRQ                    I2C0_IRQn
-#define I2C_0_IRQ_HANDLER            isr_i2c0
+#define I2C_0_IRQ_HANDLER            isr_I2C0
 /* I2C 0 pin configuration */
 #define I2C_0_PORT                   PORTE
 #define I2C_0_PORT_CLKEN()           (SIM->SCGC5 |= (SIM_SCGC5_PORTE_MASK))
@@ -258,7 +258,7 @@ static const spi_conf_t spi_config[] = {
 #define RTT_IRQ                      RTC_IRQn
 #define RTT_IRQ_PRIO                 10
 #define RTT_UNLOCK()                 (SIM->SCGC6 |= (SIM_SCGC6_RTC_MASK))
-#define RTT_ISR                      isr_rtc
+#define RTT_ISR                      isr_RTC
 #define RTT_FREQUENCY                (1)
 #define RTT_MAX_VALUE                (0xffffffff)
 /** @} */
