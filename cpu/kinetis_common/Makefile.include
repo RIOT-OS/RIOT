@@ -10,6 +10,9 @@ export LINKER_SCRIPT ?= $(LD_$(shell echo $(CPU_MODEL) | tr a-z A-Z))
 # add the CPU specific code for the linker
 export UNDEF += $(BINDIR)/kinetis_common/fcfield.o
 
+# add the CPU specific interrupt vector table definition for the linker
+export UNDEF += $(BINDIR)/kinetis_common/vectors.o
+
 # include kinetis common periph drivers
 export USEMODULE += kinetis_common_periph
 export USEMODULE += periph_common

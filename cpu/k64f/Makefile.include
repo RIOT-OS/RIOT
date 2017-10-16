@@ -16,7 +16,4 @@ include $(KINETIS_COMMON)Makefile.include
 # this CPU implementation is using kinetis common startup
 export COMMON_STARTUP = $(KINETIS_COMMON)
 
-# add the CPU specific system calls implementations for the linker
-export UNDEF += $(BINDIR)/cpu/vectors.o
-
 include $(RIOTMAKE)/arch/cortexm.inc.mk
