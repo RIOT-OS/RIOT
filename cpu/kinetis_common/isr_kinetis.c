@@ -144,3 +144,14 @@ WEAK_DEFAULT void isr_uart5_rx_tx(void);
 WEAK_DEFAULT void isr_usb0(void);
 WEAK_DEFAULT void isr_usbdcd(void);
 WEAK_DEFAULT void isr_wdog_ewm(void);
+
+/* Empty interrupt vector padding to ensure that all sanity checks in the
+ * linking stage are fulfilled. These will be placed in the area between the
+ * used vector table starting at memory address 0 and the flash configuration
+ * field at 0x400-0x410 */
+/* By using this padding we can let the linker script checks remain in place and
+ * we will get a linking error if we accidentally link two interrupt vector
+ * tables, or link the table from a different CPU, and catch many other mistakes. */
+/* We subtract the expected number of used vectors, which are: The initial stack
+ * pointer + the Cortex-M common IRQs + the Kinetis CPU specific IRQs */
+ISR_VECTOR(99) const isr_t vector_padding[(0x400 / sizeof(isr_t)) - 1 - CPU_NONISR_EXCEPTIONS - CPU_IRQ_NUMOF];

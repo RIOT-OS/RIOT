@@ -31,10 +31,7 @@ extern "C"
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
-/* Each interrupt priority setting is 8 bits wide, for both CM4 and CM0+, but
- * they are laid out differently. CM0+ concatenates the settings into 32 bit
- * words, CM4 and CM7 uses direct 8 bit access */
-#define CPU_IRQ_NUMOF                   (sizeof(NVIC->IP))
+#define CPU_IRQ_NUMOF                   (NUMBER_OF_INT_VECTORS)
 #define CPU_FLASH_BASE                  (0x00000000)
 /** @} */
 
