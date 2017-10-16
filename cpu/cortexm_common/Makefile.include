@@ -5,3 +5,19 @@ INCLUDES += -I$(RIOTCPU)/cortexm_common/include/vendor
 USEMODULE += cortexm_common_periph
 
 export IMAGE_HDR_SIZE ?= 512
+
+ifneq(,$(ROM_OFFSET))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=rom_offset=$(ROM_OFFSET)
+endif
+
+ifneq (,$(CCMRAM_LEN))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=ccmram_addr=$(CCMRAM_ADDR)
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=ccmram_length=$(CCMRAM_LEN)
+endif
+
+ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=rom_start_addr=$(ROM_START_ADDR)
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=ram_start_addr=$(RAM_START_ADDR)
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=rom_length=$(ROM_LEN)
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=ram_length=$(RAM_LEN)
+endif
