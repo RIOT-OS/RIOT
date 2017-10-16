@@ -27,8 +27,12 @@
 #include "assert.h"
 #include "periph_cpu.h"
 
+#ifdef MODULE_PM_LAYERED
+#include "pm_layered.h"
+#endif
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

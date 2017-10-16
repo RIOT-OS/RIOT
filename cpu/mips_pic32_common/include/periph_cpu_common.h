@@ -26,11 +26,21 @@
 extern "C" {
 #endif
 
- /**
+/**
+ * @name    Power management configuration
+ * @{
+ */
+#define PROVIDES_PM_SET_LOWEST
+/** @} */
+
+/**
  * @brief   Length of the CPU_ID in bytes
  */
 #define CPUID_LEN           (4U)
 
+/**
+ * @brief   Override GPIO pin selection macro
+ */
 #define GPIO_PIN(x,y)       ((x << 4) | (y & 0xf))
 
 /**

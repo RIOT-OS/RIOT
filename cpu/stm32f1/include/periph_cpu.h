@@ -59,7 +59,7 @@ extern "C" {
 /**
  * @brief   Define the number of available PM modes
  */
-#define PM_NUM_MODES    (2U)
+#define PM_NUM_MODES        (2U)
 
 /**
  * @brief   Override the default initial PM blocker
@@ -70,7 +70,7 @@ extern "C" {
 /**
  * @brief  Define the config flag for stop mode
  */
-#define PM_STOP_CONFIG  (PWR_CR_LPDS)
+#define PM_STOP_CONFIG      (PWR_CR_LPDS)
 
 #ifndef DOXYGEN
 /**

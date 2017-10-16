@@ -35,11 +35,14 @@
 #define PM_LAYERED_H
 
 #include "assert.h"
-#include "periph/pm.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
+#endif
+
+#ifndef PROVIDES_PM_OFF
+#define PROVIDES_PM_OFF
 #endif
 
 /**

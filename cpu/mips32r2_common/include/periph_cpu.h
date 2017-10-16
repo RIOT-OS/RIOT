@@ -16,10 +16,23 @@
  * or no peripherals
  */
 
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @name    Power management configuration
+ * @{
+ */
+#define PROVIDES_PM_SET_LOWEST
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PERIPH_CPU_H */
+/** @} */

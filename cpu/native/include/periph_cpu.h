@@ -37,6 +37,13 @@ extern "C" {
  */
 #define PERIPH_TIMER_PROVIDES_SET
 
+/**
+ * @name    Power management configuration
+ * @{
+ */
+#define PROVIDES_PM_OFF
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
