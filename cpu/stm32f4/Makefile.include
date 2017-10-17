@@ -5,3 +5,28 @@ USEMODULE += pm_layered
 
 include $(RIOTCPU)/stm32_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+ifneq (,$(filter stm32f401re,$(CPU_MODEL)))
+  export ROM_LEN = 0x80000
+  export RAM_LEN = 0x18000
+else ifneq (,$(filter stm32f410rb,$(CPU_MODEL)))
+  export ROM_LEN = 0x20000
+  export RAM_LEN = 0x8000
+else ifneq (,$(filter stm32f411re stm32f446re stm32f446ze,$(CPU_MODEL)))
+  export ROM_LEN = 0x80000
+  export RAM_LEN = 0x20000
+else ifneq (,$(filter stm32f412zg,$(CPU_MODEL)))
+  export ROM_LEN = 0x100000
+  export RAM_LEN = 0x40000
+else ifneq (,$(filter stm32f413zh,$(CPU_MODEL)))
+  export ROM_LEN = 0x180000
+  export RAM_LEN = 0x50000
+else ifneq (,$(filter stm32f415rg stm32f407vg,$(CPU_MODEL)))
+  export ROM_LEN = 0x100000
+  export RAM_LEN = 0x20000
+  export CCMRAM_LEN = 0x10000
+else ifneq (,$(filter stm32f429zi,$(CPU_MODEL)))
+  export ROM_LEN = 0x200000
+  export RAM_LEN = 0x40000
+  export CCMRAM_LEN = 0x10000
+endif
