@@ -1,0 +1,10 @@
+# Current makefile directory
+D := $(abspath $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
+
+# $(CPU) implements "cpu" module
+MODULE_DIR_cpu    := $(D)/$(CPU)
+
+# $(CPU)/periph implements "periph" module if it exists
+ifneq (,$(wildcard $(D)/$(CPU)/periph/Makefile))
+MODULE_DIR_periph := $(D)/$(CPU)/periph
+endif

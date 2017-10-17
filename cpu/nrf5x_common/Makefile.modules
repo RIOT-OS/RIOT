@@ -1,0 +1,6 @@
+# Current makefile directory
+D := $(abspath $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
+
+MODULE_DIR_nrf5x_common        := $(D)
+MODULE_DIR_nrf5x_common_periph := $(D)/periph
+MODULE_DIR_nrfmin              := $(D)/radio/nrfmin
