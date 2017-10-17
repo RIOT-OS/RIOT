@@ -2,7 +2,7 @@
 APPLICATION = gnrc_ipv6_nib_6ln
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := chronos nucleo-f030 nucleo-l053 nucleo32-f031
+BOARD_INSUFFICIENT_MEMORY := chronos nucleo-f030 nucleo-l053 nucleo32-f031 \
                              nucleo32-l031 nucleo32-f042 stm32f0discovery
 
 USEMODULE += gnrc_ipv6
