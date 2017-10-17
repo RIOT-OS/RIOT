@@ -13,8 +13,10 @@ endif
 MODULE_DIR ?= $(CURDIR)
 MODULE     ?= $(shell basename $(MODULE_DIR))
 
-# Add MODULE_DIR to files path to work from another dir than CURDIR
-D := $(MODULE_DIR)
+# Use immediate variables for D and MODULE as they are undefined at the end
+MODULE := $(MODULE)
+D      := $(MODULE_DIR)
+# D is for prepending the module directory to files path when importing
 
 .PHONY: all
 
