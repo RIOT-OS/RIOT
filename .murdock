@@ -34,7 +34,14 @@ get_apps() {
 # Only print for boards in $BOARDS.
 get_supported_boards() {
     local appdir=$1
-    for board in $(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null )
+    local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
+
+    if [ "$boards" = broken ]; then
+        echo "makefile_broken"
+        return
+    fi
+
+    for board in $boards
     do
         echo $board
     done | $(_greplist $BOARDS)
@@ -62,6 +69,8 @@ get_compile_jobs() {
 compile() {
     local appdir=$1
     local board=$2
+
+    [ "$board" = "makefile_broken" ] && error "$0: Makefile in \"$appdir\" seems to be broken!"
 
     # set build directory. CI ensures only one build at a time in $(pwd).
     rm -rf build
