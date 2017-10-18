@@ -3,11 +3,3 @@
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += at86rfr2
 endif
-
-#define MODULE_RTC
-
-#ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-# use module at86rfr2 to compile RF Transciefer feature
-#	#$(error CAUTION: AT86RFR2 not implemented jet!)
-#	USEMODULE += at86rfr2
-#endif

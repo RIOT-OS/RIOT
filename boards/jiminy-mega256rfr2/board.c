@@ -9,11 +9,12 @@
  */
 
 /**
- * @ingroup     boards_pinoccio-mega256rfr2
+ * @ingroup     boards_jiminy-mega256rfr2
  * @{
  *
  * @file
- * @brief       Board specific implementations for the Pinoccio Mega 256rfr2 board
+ * @brief       Board specific implementations for the Jiminy Mega 256rfr2 board 
+ *		developed by the IAS of the RWTH Aachen University
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
@@ -45,20 +46,16 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 
-    //TODO led init
-
     /* initialize the board LED (connected to pin PB7) */
     /* Ports Pins as Output */
-    LED_PORT_DDR |= BLUE|RED|GREEN;
+    LED_PORT_DDR |= BLUE | RED | GREEN;
     /* All Pins Low so LEDs are off */
-    LED_PORT &= ~ ( BLUE|RED|GREEN );
+    LED_PORT &= ~(BLUE | RED | GREEN);
 
     irq_enable();
 }
 
-/**
- * @brief Initialize the System, initialize IO via UART_0
- */
+/*Initialize the System, initialize IO via UART_0*/
 void SystemInit(void)
 {
     /* initialize UART_0 for use as stdout */
