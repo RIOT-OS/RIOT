@@ -5,13 +5,18 @@ ifeq ($(OS),Linux)
 else ifeq ($(OS),Darwin)
   PORT ?= $(PORT_DARWIN)
 endif
-
 ifeq ($(PORT),)
   $(info Warning: no PORT set!)
 endif
+export PORT
 
 export BAUD ?= 115200
-export TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
-export TERMPROG ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
 
-export PORT
+TERMINAL ?= pyterm
+ifeq ($(TERMINAL),pyterm)
+    export TERMPROG  ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
+    export TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
+else ifeq ($(TERMINAL),picocom)
+    export TERMPROG  ?= picocom
+    export TERMFLAGS ?= --nolock --imap lfcrlf --echo --baud "$(BAUD)" "$(PORT)"
+endif
