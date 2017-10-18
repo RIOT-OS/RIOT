@@ -40,9 +40,8 @@ def testfunc(child):
             stop = datetime.now()
             diff = (stop - start)
             diff = (diff.seconds * 1000000) + diff.microseconds
-            # fail within 5% of expected
-            if diff > (exp_diff + (exp_diff1 * 0.05)) or \
-               diff < (exp_diff - (exp_diff1 * 0.05)):
+            # fail if deviation greater than 5% of expected
+            if abs(exp_diff - diff) > (exp_diff * 0.05):
                 raise InvalidTimeout("Invalid timeout %d (expected %d)" % (diff, exp_diff));
             else:
                 print("Timed out correctly: %d (expected %d)" % (diff, exp_diff))
