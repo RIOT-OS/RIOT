@@ -60,12 +60,8 @@
  * @param[in]   name    name of the cross-file array
  */
 #define XFA_USE(type, name) \
-    _Pragma("GCC diagnostic push") \
-    _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
     extern const type name [0]; \
-    extern const type name ## _end [0]; \
-    _Pragma("GCC diagnostic pop") \
-    extern unsigned __xfa_dummy
+    extern const type name ## _end [0];
 
 /**
  * @brief Define variable in cross-file array
