@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 HAW Hamburg
  *               2016 Freie Universität Berlin
+ *		 2017 RWTH Aachen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,7 +9,7 @@
  */
 
 /**
- * @ingroup         cpu_atmega2560
+ * @ingroup         cpu_atmega256rfr2
  * @{
  *
  * @file
@@ -17,6 +18,7 @@
  * @author          René Herthel <rene-herthel@outlook.de>
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author	    Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
 #ifndef PERIPH_CPU_H_
@@ -24,11 +26,10 @@
 
 #include "periph_cpu_common.h"
 #include "atmega_regs_common.h"
-#include "mutex.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 /**
  * @brief   Length of the CPU_ID in octets
  */
@@ -38,60 +39,75 @@ extern "C" {
  * @brief   Available ports on the ATmega256rfr family
  */
 enum {
-    // PORT_A = 0,       /**< port A */ /* not connected to pins for megaRF*/
-    PORT_B = 1,       /**< port B */
-    // PORT_C = 2,       /**< port C */ /* not connected to pins for megaRF*/
-    PORT_D = 3,       /**< port D */
-    PORT_E = 4,       /**< port E */
-    PORT_F = 5,       /**< port F */
-    PORT_G = 6,       /**< port G */
+    PORT_B  = 1,        /**< port B */
+    PORT_D  = 3,        /**< port D */
+    PORT_E  = 4,        /**< port E */
+    PORT_F  = 5,        /**< port F */
+    PORT_G  = 6,        /**< port G */
 };
 
 /**
  * @brief   Atmega256rfr2 timers have 3 capture-compare channels (TIMER 1/3) -> best suitable for
- * 			PWM and especially RGB Leds
+ *          PWM and especially RGB Leds
  */
 #define TIMER_CHAN          (3U)
 
 typedef unsigned int gpio_t;
-#ifndef GPIO_UNDEF
 /**
- * @brief   GPIO pin not defined
+ * @name   GPIO pin not defined
+ * @{
  */
+#ifndef GPIO_UNDEF
 #define GPIO_UNDEF          (0xFFFF)
 #endif
+/** @}*/
+
 /**
- * @brief   PWM channel
+ * @name   PWM settings struct
+ * @{
  */
 typedef struct {
     gpio_t pin;             /**< GPIO pin mapped to this channel */
     uint8_t cc_chan;        /**< capture compare channel used */
 } pwm_chan_t;
+/** @}*/
 
 
 /**
- * @brief   PWM configuration
+ * @name   UART configuration
+ *
+ * The UART devices have fixed pin mappings, so all we need to do, is to specify
+ * which devices we would like to use and their corresponding RX interrupts. See
+ * the reference manual for the fixed pin mapping.
+ *
+ * @{
+ */
+#define UART_NUMOF          (2U)
+
+// UARTo is used for stdio
+#define UART_0              MEGA_UART0
+#define UART_0_ISR          USART0_RX_vect
+
+#define UART_1              MEGA_UART1
+#define UART_1_ISR          USART1_RX_vect
+/** @} */
+
+
+/**
+ * @name   PWM configuration struct
+ * @{
  */
 
 typedef struct {
-	mega_timer_t *dev;               /**< Timer used */
+    mega_timer_t *dev;              /**< Timer used */
     pwm_chan_t chan[TIMER_CHAN];    /**< channel mapping, set to {GPIO_UNDEF, 0} */
-    REG8 *power_reg;			/**< Save Powerregister for poweron and off */
-    uint8_t power_reg_bit;		/**< Save which bit needs to be set in powerregister */
+    REG8 *power_reg;                /**< Save Powerregister for poweron and off */
+    uint8_t power_reg_bit;          /**< Save which bit needs to be set in powerregister */
     uint8_t *scale_pointer;
     uint8_t *prescaler_pointer;
     uint8_t bits;
 } pwm_conf_t;
-
-/**
- * Struct definition for I2C
- */
-typedef struct{
-	gpio_t scl_pin;
-	gpio_t sda_pin;
-	uint8_t *mask;
-	mutex_t *used;
-} i2c_conf_t;
+/** @} */
 
 /**
  * @name   Defines for the I2C interface
@@ -102,18 +118,33 @@ typedef struct{
 /** @} */
 
 /**
- * @brief setup analog comparator setting struct
+ * @name analog comparator setting struct
+ * @{
  */
 typedef struct {
-	REG8 *acsr;
-	REG8 *adcsrb;
-	gpio_t in1;
-	gpio_t in2;
+    REG8 *acsr;
+    REG8 *adcsrb;
+    gpio_t in1;
+    gpio_t in2;
 }ac_conf_t;
+/** @} */
 
-#ifdef __cplusplus
-}
-#endif
+/**
+ * @name SPI configuration
+ *
+ * The atmega256rfr has only one hardware SPI with fixed pin configuration, so all
+ * we can do here, is to enable or disable it...
+ * @{
+ */
+#define SPI_NUMOF           1           /* set to 0 to disable SPI */
+#define SPI_0_EN            1           /* remove once SPI rework is done */
+#define MEGA_PRR            PRR0        /* Power Reduction Register is PRR0 */
+/** @} */
+
+
+//#ifdef __cplusplus
+//}
+//#endif
 
 #endif /* PERIPH_CPU_H_ */
 /** @} */

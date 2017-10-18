@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin, Hinnerk van Bruinehsen
+ * Copyright (C) 2017 RWTH Aachen, Josua Arndt
+ *		 2015 Freie Universität Berlin, Hinnerk van Bruinehsen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author          Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
 #ifndef CPU_CONF_H
@@ -41,7 +43,7 @@ extern "C" {
  * THREAD_STACKSIZE_IDLE > THREAD_EXTRA_STACKSIZE_PRINTF
  * to avoid not printing of debug in interrupts
  */
-#define THREAD_EXTRA_STACKSIZE_PRINTF    (128) //128
+#define THREAD_EXTRA_STACKSIZE_PRINTF    (128)
 
 #ifndef THREAD_STACKSIZE_DEFAULT
 #define THREAD_STACKSIZE_DEFAULT   (512)
