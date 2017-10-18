@@ -698,6 +698,9 @@ endif
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 
+# always select power management if available
+FEATURES_OPTIONAL += periph_pm
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
