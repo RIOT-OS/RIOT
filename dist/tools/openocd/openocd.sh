@@ -17,34 +17,30 @@
 #
 # The script supports the following actions:
 #
-# flash:        flash a given hex file to the target.
-#               hexfile is expected in ihex format and is pointed to
-#               by HEXFILE environment variable
+# flash:        flash a given ELF file to the target.
 #
 #               options:
-#               HEXFILE: path to the hex file that is flashed
-#               PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
-#               verify the integrity of the image to be flashed. HEXFILE is
-#               passed as an argument to this command.
-#
-# flash-elf:    flash a given ELF file to the target.
-#
-#               options:
-#               ELFFILE: path to the ELF file that is flashed
+#               IMAGE_FILE: Filename of the file that will be flashed
 #               PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
 #               verify the integrity of the image to be flashed. ELFFILE is
-#               passed as an argument to this command.
+#               passed as a command line argument to this command.
+#               Even though the file name variable is named ELFFILE, flashing
+#               works with any file format recognized by OpenOCD (elf, ihex, s19, bin).
 #
 # debug:        starts OpenOCD as GDB server in the background and
 #               connects to the server with the GDB client specified by
-#               the board (DBG environment variable)
+#               the board
 #
 #               options:
 #               GDB_PORT:       port opened for GDB connections
 #               TCL_PORT:       port opened for TCL connections
 #               TELNET_PORT:    port opened for telnet connections
+#               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
-#               ELFFILE:        path to the ELF file to debug
+#               ELFFILE:        path to the file to debug, must be in a format
+#                               recognized by GDB (preferably ELF, it will not
+#                               work with .bin, .hex or .s19 because they lack
+#                               symbol information)
 #
 # debug-server: starts OpenOCD as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
@@ -57,42 +53,70 @@
 #
 # reset:        triggers a hardware reset of the target board
 #
-#
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
 
-# default GDB port
-_GDB_PORT=3333
-# default telnet port
-_TELNET_PORT=4444
-# default TCL port
-_TCL_PORT=6333
-# default path to OpenOCD configuration file
-_OPENOCD_CONFIG=${RIOTBOARD}/${BOARD}/dist/openocd.cfg
-# default OpenOCD command
-_OPENOCD=openocd
+# Default GDB port, set to 0 to disable, required != 0 for debug and debug-server targets
+: ${GDB_PORT:=3333}
+# Default telnet port, set to 0 to disable
+: ${TELNET_PORT:=4444}
+# Default TCL port, set to 0 to disable
+: ${TCL_PORT:=6333}
+# Default path to OpenOCD configuration file
+: ${OPENOCD_CONFIG:=${RIOTBOARD}/${BOARD}/dist/openocd.cfg}
+# Default OpenOCD command
+: ${OPENOCD:=openocd}
+# The setsid command is needed so that Ctrl+C in GDB doesn't kill OpenOCD
+: ${SETSID:=setsid}
+# GDB command, usually a separate command for each platform (e.g. arm-none-eabi-gdb)
+: ${GDB:=gdb}
+# Debugger client command, can be used to wrap GDB in a front-end
+: ${DBG:=${GDB}}
+# Default debugger flags,
+: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :${GDB_PORT}\"}
+# Extra debugger flags, added by the user
+: ${DBG_EXTRA_FLAGS:=}
+# Debugger flags, will be passed to sh -c, remember to escape any quotation signs.
+# Use ${DBG_DEFAULT_FLAGS} to insert the default flags anywhere in the string
+: ${DBG_FLAGS:=${DBG_DEFAULT_FLAGS} ${DBG_EXTRA_FLAGS}}
+# This is an optional offset to the base address that can be used to flash an
+# image in a different location than it is linked at. This feature can be useful
+# when flashing images for firmware swapping/remapping boot loaders.
+# Default offset is 0, meaning the image will be flashed at the address that it
+# was linked at.
+: ${IMAGE_OFFSET:=0}
+# Image file used for flashing. Must be in a format that OpenOCD can handle (ELF,
+# Intel hex, S19, or raw binary)
+# Default is to use $ELFFILE
+: ${IMAGE_FILE:=${ELFFILE}}
+# Type of image, leave empty to let OpenOCD automatically detect the type from
+# the file (default).
+# Valid values: elf, hex, s19, bin (see OpenOCD manual for more information)
+: ${IMAGE_TYPE:=}
+
+#
+# Examples of alternative debugger configurations
+#
+
+# Using the GDB text UI:
+# DBG_EXTRA_FLAGS=-tui make debug
+# or to always use TUI, put in your .profile:
+# export DBG_EXTRA_FLAGS=-tui
+
+# Wrapping GDB inside DDD (https://www.gnu.org/software/ddd/)
+# DBG=ddd DBG_FLAGS='--debugger "${GDB} ${DBG_DEFAULT_FLAGS}"' make debug
+# Alternatively, to always use DDD, put the following in your .profile or similar:
+# export DBG=ddd
+# export DBG_FLAGS='--debugger "${GDB} ${DBG_DEFAULT_FLAGS}"'
+# The single quotes are important on the line above, or it will not work.
 
 #
 # a couple of tests for certain configuration options
 #
 test_config() {
-    if [ -z "${OPENOCD}" ]; then
-        OPENOCD=${_OPENOCD}
-    fi
-    if [ -z "${OPENOCD_CONFIG}" ]; then
-        OPENOCD_CONFIG=${_OPENOCD_CONFIG}
-    fi
     if [ ! -f "${OPENOCD_CONFIG}" ]; then
         echo "Error: Unable to locate OpenOCD configuration file"
         echo "       (${OPENOCD_CONFIG})"
-        exit 1
-    fi
-}
-
-test_hexfile() {
-    if [ ! -f "${HEXFILE}" ]; then
-        echo "Error: Unable to locate HEXFILE"
-        echo "       (${HEXFILE})"
         exit 1
     fi
 }
@@ -105,21 +129,11 @@ test_elffile() {
     fi
 }
 
-test_ports() {
-    if [ -z "${GDB_PORT}" ]; then
-        GDB_PORT=${_GDB_PORT}
-    fi
-    if [ -z "${TELNET_PORT}" ]; then
-        TELNET_PORT=${_TELNET_PORT}
-    fi
-    if [ -z "${TCL_PORT}" ]; then
-        TCL_PORT=${_TCL_PORT}
-    fi
-}
-
-test_tui() {
-    if [ -n "${TUI}" ]; then
-        TUI=-tui
+test_imagefile() {
+    if [ ! -f "${IMAGE_FILE}" ]; then
+        echo "Error: Unable to locate IMAGE_FILE"
+        echo "       (${IMAGE_FILE})"
+        exit 1
     fi
 }
 
@@ -128,9 +142,9 @@ test_tui() {
 #
 do_flash() {
     test_config
-    test_hexfile
+    test_imagefile
     if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
-        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${HEXFILE}'"
+        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${IMAGE_FILE}'"
         RETVAL=$?
         if [ $RETVAL -ne 0 ]; then
             echo "pre-flash checks failed, status=$RETVAL"
@@ -147,40 +161,9 @@ do_flash() {
             -c 'targets' \
             -c 'reset halt' \
             ${OPENOCD_PRE_FLASH_CMDS} \
-            -c 'flash write_image erase \"${HEXFILE}\"' \
-            -c 'reset halt' \
+            -c 'flash write_image erase \"${IMAGE_FILE}\" ${IMAGE_OFFSET} ${IMAGE_TYPE}' \
             ${OPENOCD_PRE_VERIFY_CMDS} \
-            -c 'verify_image \"${HEXFILE}\"' \
-            -c 'reset run' \
-            -c 'shutdown'" &&
-    echo 'Done flashing'
-}
-
-do_flash_elf() {
-    test_config
-    test_elffile
-    if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
-        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${ELFFILE}'"
-        RETVAL=$?
-        if [ $RETVAL -ne 0 ]; then
-            echo "pre-flash checks failed, status=$RETVAL"
-            exit $RETVAL
-        fi
-    fi
-    # flash device
-    sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
-            ${OPENOCD_EXTRA_INIT} \
-            -c 'tcl_port 0' \
-            -c 'telnet_port 0' \
-            -c 'gdb_port 0' \
-            -c 'init' \
-            -c 'targets' \
-            -c 'reset halt' \
-            ${OPENOCD_PRE_FLASH_CMDS} \
-            -c 'flash write_image erase \"${ELFFILE}\"' \
-            -c 'reset halt' \
-            ${OPENOCD_PRE_VERIFY_CMDS} \
-            -c 'verify_image \"${ELFFILE}\"' \
+            -c 'verify_image \"${IMAGE_FILE}\"' \
             -c 'reset run' \
             -c 'shutdown'" &&
     echo 'Done flashing'
@@ -189,12 +172,15 @@ do_flash_elf() {
 do_debug() {
     test_config
     test_elffile
-    test_ports
-    test_tui
-    # setsid is needed so that Ctrl+C in GDB doesn't kill OpenOCD
-    [ -z "${SETSID}" ] && SETSID="$(which setsid)"
     # temporary file that saves OpenOCD pid
     OCD_PIDFILE=$(mktemp -t "openocd_pid.XXXXXXXXXX")
+    # will be called by trap
+    cleanup() {
+        OCD_PID="$(cat $OCD_PIDFILE)"
+        kill ${OCD_PID}
+        rm -f "$OCD_PIDFILE"
+        exit 0
+    }
     # cleanup after script terminates
     trap "cleanup ${OCD_PIDFILE}" EXIT
     # don't trap on Ctrl+C, because GDB keeps running
@@ -210,20 +196,20 @@ do_debug() {
             -c 'halt' \
             -l /dev/null & \
             echo \$! > $OCD_PIDFILE" &
-    # connect to the GDB server
-    ${DBG} -q ${TUI} -ex "tar ext :${GDB_PORT}" ${ELFFILE}
-    # will be called by trap
-    cleanup() {
-        OCD_PID="$(cat $OCD_PIDFILE)"
-        kill ${OCD_PID}
-        rm -f "$OCD_PIDFILE"
-        exit 0
-    }
+    # Export to be able to access these from the sh -c command lines, may be
+    # useful when using a frontend for GDB
+    export ELFFILE
+    export GDB
+    export GDB_PORT
+    export DBG_FLAGS
+    export DBG_DEFAULT_FLAGS
+    export DBG_EXTRA_FLAGS
+    # Start the debugger and connect to the GDB server
+    sh -c "${DBG} ${DBG_FLAGS} ${ELFFILE}"
 }
 
 do_debugserver() {
     test_config
-    test_ports
     # start OpenOCD as GDB server
     sh -c "${OPENOCD} -f '${OPENOCD_CONFIG}' \
             ${OPENOCD_EXTRA_INIT} \
@@ -232,7 +218,7 @@ do_debugserver() {
             -c 'gdb_port ${GDB_PORT}' \
             -c 'init' \
             -c 'targets' \
-            -c 'reset halt'"
+            -c 'halt'"
 }
 
 do_reset() {
@@ -252,30 +238,26 @@ do_reset() {
 # parameter dispatching
 #
 ACTION="$1"
-shift # pop $1 from $@
 
 case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
-    do_flash "$@"
-    ;;
-  flash-elf)
-    echo "### Flashing Target ###"
-    do_flash_elf "$@"
+    do_flash
     ;;
   debug)
     echo "### Starting Debugging ###"
-    do_debug "$@"
+    do_debug
     ;;
   debug-server)
     echo "### Starting GDB Server ###"
-    do_debugserver "$@"
+    do_debugserver
     ;;
   reset)
     echo "### Resetting Target ###"
-    do_reset "$@"
+    do_reset
     ;;
   *)
-    echo "Usage: $0 {flash|debug|debug-server|reset} [extra OpenOCD initialization arguments]"
+    echo "Usage: $0 {flash|debug|debug-server|reset}"
+    exit 2
     ;;
 esac
