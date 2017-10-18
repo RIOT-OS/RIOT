@@ -597,7 +597,7 @@ ifneq (,$(filter evtimer,$(USEMODULE)))
 endif
 
 ifneq (,$(filter can_linux,$(USEMODULE)))
-  export LINKFLAGS += -lsocketcan
+  LINKFLAGS += -lsocketcan
 endif
 
 ifneq (,$(filter can,$(USEMODULE)))
