@@ -48,6 +48,13 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
+ * @name    Power management configuration
+ * @{
+ */
+#define PROVIDES_PM_SET_LOWEST_CORTEXM
+/** @} */
+
+/**
  * @name Internal GPIO shift and masking
  * @{
  */
