@@ -24,3 +24,6 @@ USEMODULE += xtimer
 USEMODULE += timex
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py
