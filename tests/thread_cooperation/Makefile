@@ -8,7 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 calliope-mini \
                              nucleo32-l031 nucleo-f030 nucleo-f070 nucleo-f072 \
                              nucleo-f103 nucleo-f302 nucleo-f334 nucleo-l053 nucleo-l073 \
                              opencm904 pca10000 pca10005 spark-core stm32f0discovery \
-                             yunjia-nrf51822
+                             stm32f103c8t6 yunjia-nrf51822
 
 DISABLE_MODULE += auto_init
 

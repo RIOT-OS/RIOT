@@ -10,7 +10,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 calliope-mini \
                              nucleo-f072 nucleo-f103 nucleo-f302 nucleo-f334 nucleo-f410 \
                              nucleo-l053 nucleo-l073 nucleo32-f031 nucleo32-f042 \
                              nucleo32-f303 nucleo32-l031 opencm904 pca10000 \
-                             pca10005 spark-core stm32f0discovery yunjia-nrf51822 \
+                             pca10005 spark-core stm32f0discovery \
+                             stm32f103c8t6 yunjia-nrf51822 \
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
                    msb-430 msb-430h qemu-i386 telosb waspmote-pro wsn430-v1_3b \
