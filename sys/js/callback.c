@@ -20,18 +20,15 @@ void js_callback_init(js_callback_t *js_callback, jerry_value_t callback)
 {
     DEBUG("init %p\n", js_callback);
     js_callback->event.callback = js_event_callback;
-    js_callback->callback.object = jerry_acquire_value(callback);
+
     DEBUG("acquire obj %lu\n", js_callback->callback.object);
-    clist_rpush(&js_native_refs, &js_callback->callback.ref);
+    js_native_ref_add(&js_callback->callback, callback);
 }
 
 static void js_callback_cleanup(js_callback_t *js_callback)
 {
-    DEBUG("cleanup %p\n", js_callback);
-    jerry_value_t callback = js_callback->callback.object;
-    jerry_release_value(callback);
-    clist_remove(&js_native_refs, &js_callback->callback.ref);
     DEBUG("release %lu\n", callback);
+    js_native_ref_rem(&js_callback->callback);
 }
 
 void js_callback_run(js_callback_t *js_callback)

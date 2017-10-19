@@ -8,7 +8,7 @@
 #include "debug.h"
 
 event_queue_t *js_event_queue;
-list_node_t js_native_refs;
+static list_node_t js_native_refs;
 
 void js_add_external_handler(jerry_value_t object, const char *name, jerry_external_handler_t handler)
 {
@@ -159,4 +159,18 @@ void js_shutdown(event_t *done_event)
 {
     js_shutdown_done_event = done_event;
     event_post(js_event_queue, &js_shutdown_event);
+}
+
+void js_native_ref_add(js_native_ref_t *ref, jerry_value_t object)
+{
+    ref->object = jerry_acquire_value(object);
+    clist_rpush(&js_native_refs, &ref->ref);
+}
+
+void js_native_ref_rem(js_native_ref_t *ref)
+{
+    /* TODO: unfortunately, this is O(n) */
+    if (clist_remove(&js_native_refs, &ref->ref)) {
+        jerry_release_value(ref->object);
+    }
 }

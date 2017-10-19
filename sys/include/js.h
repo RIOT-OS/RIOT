@@ -28,12 +28,12 @@ typedef struct {
     js_native_ref_t callback;
 } js_callback_t;
 
-extern list_node_t js_native_refs;
-
 void js_init(void);
 int js_run(const jerry_char_t *script, size_t script_size);
 
 /* internal */
+void js_native_ref_add(js_native_ref_t *ref, jerry_value_t object);
+void js_native_ref_rem(js_native_ref_t *ref);
 void js_init_objects(void);
 void js_add_object(jerry_value_t object, jerry_value_t other, const char *name);
 void *js_get_object_native_pointer(jerry_value_t object, const jerry_object_native_info_t *type);
