@@ -11,11 +11,54 @@ import os, signal, sys, subprocess
 from pexpect import spawnu, TIMEOUT, EOF
 from traceback import print_tb
 
-def run(testfunc, timeout=10, echo=True, traceback=False):
+
+# Patterns to detect if 'make term' is started
+MAKE_TERM_STARTED = {
+    'pyterm': r"Type '/exit' to exit.",
+    'native': r"main\(\): This is RIOT",
+}
+
+
+def spawnu_make_term(echo=True, **kwargs):
+    """Spawn make term and try to wait until started.
+
+    :param echo: enable echo to stdout
+    :param **kwargs: additional parameters given to `spawnu`
+
+    If 'make term' start not detected, keep going anyway.
+    """
+    logfile = sys.stdout if echo else None
+    child = spawnu("make term", logfile=logfile, **kwargs)
+
+    _lazywait_term_started(child)
+
+    return child
+
+
+def _lazywait_term_started(child, start_timeout=5, error=False):
+    """Wait until `term` child is started or keep going.
+    The goal is just to be, when possible, faster than `sleep(timeout)`.
+
+    Try to recognize some started message from child output.
+    Uses 'started' patterns are taken from MAKE_TERM_STARTED dict values.
+
+    On timeout, a debug message is printed.
+    If `error`, raise the TIMEOUT exception.
+    """
+    started_patterns = list(MAKE_TERM_STARTED.values())
+    try:
+        child.expect(started_patterns, timeout=start_timeout)
+    except TIMEOUT:
+        print("Timeout waiting for 'make term' to be started")
+        if error:
+            raise
+        # Keep going anyway
+
+
+def run(testfunc, timeout=10, echo=True, traceback=True):
     env = os.environ.copy()
-    child = spawnu("make term", env=env, timeout=timeout)
-    if echo:
-        child.logfile = sys.stdout
+
+    child = spawnu_make_term(echo=echo, env=env, timeout=timeout)
 
     try:
         subprocess.check_output(('make', 'reset'), env=env,
