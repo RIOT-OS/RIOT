@@ -292,7 +292,6 @@ def test_triple_send(board_group, application, env=None):
         receiver.expect(u"00000000  DE  AD  BE  EF")
 
 if __name__ == "__main__":
-    del os.environ['TERMFLAGS']
     TestStrategy().execute([BoardGroup((Board("native", "tap0"), \
                             Board("native", "tap1")))], \
                            [test_ipv6_send, test_udpv6_send, test_tcpv6_send,
