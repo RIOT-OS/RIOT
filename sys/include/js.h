@@ -45,6 +45,12 @@ void js_callback_init(js_callback_t *js_callback, jerry_value_t callback);
 void js_callback_run(js_callback_t *js_callback);
 void js_callback_cancel(js_callback_t *callback);
 void js_shutdown(event_t *shutdown_done_event);
+char *js_strdup(jerry_value_t string);
+
+double js_object_get_number(jerry_value_t object, const char *name);
+jerry_value_t js_get_property(jerry_value_t object, const char *name);
+
+#define js_check(x) if (jerry_value_has_error_flag(x)) printf("%s:%u: js_check("#x") failed!\n", __FILE__, __LINE__)
 
 #define JS_EXTERNAL_HANDLER(name) \
     jerry_value_t \

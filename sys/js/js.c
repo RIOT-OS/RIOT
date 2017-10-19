@@ -14,11 +14,16 @@ void js_add_external_handler(jerry_value_t object, const char *name, jerry_exter
 {
     /* Create a JS function object and wrap into a jerry value */
     jerry_value_t func_obj = jerry_create_external_function(handler);
+    js_check(func_obj);
 
     /* Set the native function as a property of the empty JS object */
     jerry_value_t prop_name = jerry_create_string((const jerry_char_t *) name);
+    js_check(prop_name);
 
-    jerry_release_value(jerry_set_property(object, prop_name, func_obj));
+    jerry_value_t set_prop = jerry_set_property(object, prop_name, func_obj);
+    js_check(set_prop);
+
+    jerry_release_value(set_prop);
     jerry_release_value(prop_name);
     jerry_release_value(func_obj);
 }
@@ -26,9 +31,37 @@ void js_add_external_handler(jerry_value_t object, const char *name, jerry_exter
 void js_add_object(jerry_value_t object, jerry_value_t other, const char *name)
 {
     jerry_value_t prop_name = jerry_create_string((const jerry_char_t *) name);
+    js_check(prop_name);
 
-    jerry_release_value(jerry_set_property(object, prop_name, other));
+    jerry_value_t set_prop = jerry_set_property(object, prop_name, other);
+    js_check(set_prop);
+
+    jerry_release_value(set_prop);
     jerry_release_value(prop_name);
+}
+
+jerry_value_t js_get_property(jerry_value_t object, const char *name)
+{
+  jerry_value_t prop_name = jerry_create_string ((const jerry_char_t *) name);
+  jerry_value_t prop_value = jerry_get_property (object, prop_name);
+  jerry_release_value (prop_name);
+  return prop_value;
+}
+
+double js_object_get_number(jerry_value_t object, const char *name)
+{
+    double res;
+    jerry_value_t prop_value = js_get_property(object, name);
+    if (jerry_value_is_number(prop_value)) {
+        res = jerry_get_number_value(prop_value);
+    }
+    else {
+        res = 0;
+    }
+
+    jerry_release_value(prop_value);
+
+    return res;
 }
 
 jerry_value_t js_object_native_create(size_t size, const jerry_object_native_info_t *native_obj_type_info)
@@ -159,6 +192,20 @@ void js_shutdown(event_t *done_event)
 {
     js_shutdown_done_event = done_event;
     event_post(js_event_queue, &js_shutdown_event);
+}
+
+char *js_strdup(jerry_value_t string)
+{
+    size_t len = jerry_get_string_length(string);
+    if (!len) {
+        return NULL;
+    }
+
+    char *buf = malloc(len+1);
+    if (buf) {
+        buf[jerry_string_to_char_buffer(string, (uint8_t*)buf, len)] = '\0';
+    }
+    return buf;
 }
 
 void js_native_ref_add(js_native_ref_t *ref, jerry_value_t object)
