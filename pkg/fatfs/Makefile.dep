@@ -10,7 +10,7 @@ include $(RIOTBASE)/boards/$(BOARD)/Makefile.features
 
 #if periph_rtc is available use it. Otherwise use static timestamps
 ifneq (, $(filter periph_rtc, $(FEATURES_PROVIDED)))
-   export CFLAGS+= -DFATFS_FFCONF_OPT_FS_NORTC=0
+  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=0
 else
-	export CFLAGS+= -DFATFS_FFCONF_OPT_FS_NORTC=1
+  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=1
 endif
