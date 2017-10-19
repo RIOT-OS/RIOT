@@ -19,15 +19,46 @@
 #define NET_GNRC_NETIF2_MAC_H
 
 #include "net/gnrc/mac/types.h"
+#include "net/csma_sender.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
+ * @brief   Mask for @ref gnrc_mac_tx_feedback_t
+ */
+#define GNRC_NETIF2_MAC_INFO_TX_FEEDBACK_MASK   (0x0003U)
+
+/**
+ * @brief   Flag to track if a transmission might have corrupted a received
+ *          packet
+ */
+#define GNRC_NETIF2_MAC_INFO_RX_STARTED         (0x0004U)
+
+/**
+ * @brief   Flag to track if a device has enabled CSMA for transmissions
+ *
+ * In case the device doesn't support on-chip CSMA and this flag is set for
+ * requiring CSMA transmission, then, the device will run software CSMA
+ * using `csma_sender` APIs.
+ */
+#define GNRC_NETIF2_MAC_INFO_CSMA_ENABLED       (0x0100U)
+
+/**
  * @brief   @ref net_gnrc_mac component of @ref gnrc_netif2_mac_t
  */
 typedef struct {
+    /**
+     * @brief general information for the MAC protocol
+     */
+    uint16_t mac_info;
+
+    /**
+     * @brief device's software CSMA configuration
+     */
+    csma_sender_conf_t csma_conf;
+
 #if ((GNRC_MAC_RX_QUEUE_SIZE != 0) || (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0)) || DOXYGEN
     /**
      * @brief MAC internal object which stores reception parameters, queues, and
@@ -48,6 +79,13 @@ typedef struct {
      */
     gnrc_mac_tx_t tx;
 #endif  /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT == 0)) || DOXYGEN */
+
+#ifdef MODULE_GNRC_LWMAC
+    /**
+     * @brief LWMAC specific structure object for storing LWMAC internal states.
+     */
+    gnrc_lwmac_t lwmac;
+#endif
 } gnrc_netif2_mac_t;
 
 #ifdef __cplusplus
