@@ -27,5 +27,8 @@ endif
 
 include $(RIOTBASE)/Makefile.include
 
+# Test only implemented for native
+ifeq ($(BOARD),native)
 test:
 	./tests/01-run.py
+endif
