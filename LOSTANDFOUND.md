@@ -6,7 +6,7 @@ of this list is to have a reference point for reintegrating those features in
 the future, if new interest arises or a new maintainer is found.
 
 This list is **not** supposed to contain a change log of all the things that are
-being removed from RIOT, but it should contain only full modules that are
+being removed from RIOT, but should contain only full modules that are
 removed without any alternative being merged at the same time. For example
 things like the first `netdev` should not be put in this list, as a successor
 (former `netdev2`) has been merged.
@@ -24,7 +24,7 @@ Author(s):
 - author 2 <a.b@c.net>
 
 Reason for removal:
-- give a short and comprehensive argumentation why this feature was removed
+- give a short and comprehensive reasoning why this feature was removed
 - typical reasons are:
 - feature is not maintained anymore
 - lack of hardware so feature can not be tested (anymore)
@@ -32,10 +32,10 @@ Reason for removal:
 ~~~~~~~~~~~~~~~~~~~
 
 By putting the name of the removed feature and the commit hash in the same line,
-one can very quickly find the commit using `get grep`.
+one can very quickly find the commit using `git grep`.
 
 Listing the authors of the removed code is done for appreciation of their work.
-This way, there names are never removed from the RIOT repository.
+This way, their names are never removed from the RIOT repository.
 
 
 # Removed Features
