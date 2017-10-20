@@ -222,8 +222,8 @@ void thread_stack_print(void)
     printf("stack size: %u bytes\n", size);
 }
 
-void thread_start_threading(void) __attribute__((naked));
-void thread_start_threading(void)
+void cpu_switch_context_exit(void) __attribute__((naked));
+void cpu_switch_context_exit(void)
 {
     sched_run();
     AVR_CONTEXT_SWAP_INIT;

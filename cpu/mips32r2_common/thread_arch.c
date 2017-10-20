@@ -118,7 +118,7 @@ void thread_stack_print(void)
 }
 
 extern void __exception_restore(void);
-void thread_start_threading(void)
+void cpu_switch_context_exit(void)
 {
     unsigned int status = mips32_get_c0(C0_STATUS);
 

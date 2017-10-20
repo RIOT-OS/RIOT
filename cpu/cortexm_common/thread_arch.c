@@ -105,7 +105,7 @@ extern uint32_t _sstack;
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment
  *
- * This marker is used e.g. by *thread_start_threading* to identify the
+ * This marker is used e.g. by *cpu_switch_context_exit* to identify the
  * stacks beginning.
  */
 #define STACK_MARKER                (0x77777777)
@@ -277,7 +277,7 @@ void *thread_isr_stack_start(void)
     return (void *)&_sstack;
 }
 
-__attribute__((naked)) void NORETURN thread_start_threading(void)
+__attribute__((naked)) void NORETURN cpu_switch_context_exit(void)
 {
     __asm__ volatile (
     "bl     irq_enable               \n" /* enable IRQs to make the SVC
