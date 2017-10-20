@@ -136,7 +136,11 @@ void sched_switch(uint16_t other_prio);
 /**
  * @brief   Call context switching at thread exit
  */
-NORETURN void cpu_switch_context_exit(void);
+extern void thread_start_threading(void);
+NORETURN static inline void cpu_switch_context_exit(void)
+{
+    thread_start_threading();
+}
 
 /**
  * Flag indicating whether a context switch is necessary after handling an
