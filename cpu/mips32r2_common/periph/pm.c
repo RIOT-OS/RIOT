@@ -24,10 +24,10 @@
 
 #ifdef NEEDS_MIPS32R2_PM_FALLBACK
 #define NEEDS_MIPS32R2_PM_OFF
-#define NEEDS_MIPS32R2_PM_OFF
+#define NEEDS_MIPS32R2_PM_SET_LOWEST
 #endif
 
-#ifdef NEEDS_MIPS32R2_PM_OFF
+#ifdef NEEDS_MIPS32R2_PM_SET_LOWEST
 void pm_set_lowest(void)
 {
     /* Dont wait if interrupts are not enabled - we would never return!*/
