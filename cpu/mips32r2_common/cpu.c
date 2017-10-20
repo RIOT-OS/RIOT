@@ -15,7 +15,7 @@
 
 #include "periph/uart.h"
 #include "periph/timer.h"
-#include "arch/panic_arch.h"
+#include "panic.h"
 #include "kernel_init.h"
 #include "cpu.h"
 #include "board.h"

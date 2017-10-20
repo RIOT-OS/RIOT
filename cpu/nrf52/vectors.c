@@ -59,10 +59,10 @@ WEAK_DEFAULT void isr_swi0(void);
  * the softdevice ISRs leads to a crash. This workaround
  * uses swi0 as trampoline.
  */
-extern void thread_arch_yield(void);
+extern void thread_yield_higher(void);
 void isr_swi0(void)
 {
-    thread_arch_yield();
+    thread_yield_higher();
 }
 #endif
 
