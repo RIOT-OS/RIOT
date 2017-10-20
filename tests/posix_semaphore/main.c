@@ -236,6 +236,13 @@ void test3(void)
     sem_post(&s1);
 }
 
+#ifdef BOARD_NATIVE
+/* native can sometime take more time to respond as it is not real time */
+#define TEST4_TIMEOUT_EXCEEDED_MARGIN (300)
+#else
+#define TEST4_TIMEOUT_EXCEEDED_MARGIN (100)
+#endif /* BOARD_NATIVE */
+
 void test4(void)
 {
     char uint64_str[20];
@@ -271,7 +278,7 @@ void test4(void)
     if (elapsed < (exp - 100)) {
         printf("first: waited only %s usec => FAILED\n", uint64_str);
     }
-    else if (elapsed > (exp + 100)) {
+    else if (elapsed > (exp + TEST4_TIMEOUT_EXCEEDED_MARGIN)) {
         printf("first: waited too long %s usec => FAILED\n", uint64_str);
     }
     else {
