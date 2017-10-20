@@ -39,9 +39,7 @@
 #include "xtimer.h"
 #endif
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 #if GNRC_IPV6_NIB_CONF_QUEUE_PKT
 static gnrc_pktqueue_t _queue_pool[GNRC_IPV6_NIB_NUMOF];
@@ -418,8 +416,8 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
               netif->pid);
         DEBUG("     - IP Hop Limit: %u (should be 255)\n", ipv6->hl);
         DEBUG("     - ICMP code: %u (should be 0)\n", rtr_sol->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", icmpv6_len,
-              sizeof(ndp_rtr_sol_t));
+        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
+              (unsigned)sizeof(ndp_rtr_sol_t));
         return;
     }
     /* pre-check option length */
@@ -529,7 +527,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("     - IP Hop Limit: %u (should be 255)\n", ipv6->hl);
         DEBUG("     - ICMP code: %u (should be 0)\n", rtr_adv->code);
         DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
-              sizeof(ndp_rtr_adv_t));
+              (unsigned)sizeof(ndp_rtr_adv_t));
         DEBUG("     - Source address: %s (should be link-local)\n",
               ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
         DEBUG("     - Router lifetime: %u (should be <= 9000 on non-6LN)\n",
@@ -793,8 +791,8 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("nib: Received neighbor solicitation is invalid. Discarding silently\n");
         DEBUG("     - IP Hop Limit: %u (should be 255)\n", ipv6->hl);
         DEBUG("     - ICMP code: %u (should be 0)\n", nbr_sol->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", icmpv6_len,
-              sizeof(ndp_nbr_sol_t));
+        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
+              (unsigned)sizeof(ndp_nbr_sol_t));
         DEBUG("     - Target address: %s (should not be multicast)\n",
               ipv6_addr_to_str(addr_str, &nbr_sol->tgt, sizeof(addr_str)));
         DEBUG("     - Source address: %s\n",
@@ -905,8 +903,8 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         DEBUG("nib: Received neighbor advertisement is invalid. Discarding silently\n");
         DEBUG("     - IP Hop Limit: %u (should be 255)\n", ipv6->hl);
         DEBUG("     - ICMP code: %u (should be 0)\n", nbr_adv->code);
-        DEBUG("     - ICMP length: %u (should > %u)\n", icmpv6_len,
-              sizeof(ndp_nbr_adv_t));
+        DEBUG("     - ICMP length: %u (should > %u)\n", (unsigned)icmpv6_len,
+              (unsigned)sizeof(ndp_nbr_adv_t));
         DEBUG("     - Target address: %s (should not be multicast)\n",
               ipv6_addr_to_str(addr_str, &nbr_adv->tgt, sizeof(addr_str)));
         DEBUG("     - Destination address: %s\n",

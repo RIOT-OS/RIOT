@@ -28,9 +28,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 /**
  * @brief   Determines supposed link-layer address from interface and option

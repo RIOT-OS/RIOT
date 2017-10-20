@@ -24,9 +24,8 @@
 #include "debug.h"
 
 #if GNRC_IPV6_NIB_CONF_6LN
-#if ENABLE_DEBUG
+
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 extern void _handle_search_rtr(gnrc_netif_t *netif);
 

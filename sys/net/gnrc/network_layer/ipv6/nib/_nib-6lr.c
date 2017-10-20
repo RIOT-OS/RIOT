@@ -23,9 +23,8 @@
 #include "debug.h"
 
 #if GNRC_IPV6_NIB_CONF_6LR
-#if ENABLE_DEBUG
+
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 static uint8_t _update_nce_ar_state(const sixlowpan_nd_opt_ar_t *aro,
                                     _nib_onl_entry_t *nce)
@@ -38,12 +37,12 @@ static uint8_t _update_nce_ar_state(const sixlowpan_nd_opt_ar_t *aro,
         _set_ar_state(nce,
                       GNRC_IPV6_NIB_NC_INFO_AR_STATE_REGISTERED);
         DEBUG("nib: Successfully registered %s\n",
-              ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
+              ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)));
         return SIXLOWPAN_ND_STATUS_SUCCESS;
     }
     else {
         DEBUG("nib: Could not register %s, neighbor cache was full\n",
-              ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
+              ipv6_addr_to_str(addr_str, &nce->ipv6, sizeof(addr_str)));
         return SIXLOWPAN_ND_STATUS_NC_FULL;
     }
 }

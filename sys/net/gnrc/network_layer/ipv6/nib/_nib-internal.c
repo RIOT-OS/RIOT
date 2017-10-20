@@ -42,9 +42,7 @@ static _nib_dr_entry_t _def_routers[GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
 static _nib_abr_entry_t _abrs[GNRC_IPV6_NIB_ABR_NUMOF];
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 mutex_t _nib_mutex = MUTEX_INIT;
 evtimer_msg_t _nib_evtimer;
