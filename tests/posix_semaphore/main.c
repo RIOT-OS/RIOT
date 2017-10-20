@@ -261,16 +261,14 @@ void test4(void)
         }
     }
     stop = xtimer_now_usec64() - start;
+    fmt_u64_dec(uint64_str, stop);
     if (stop < (exp - 100)) {
-        fmt_u64_dec(uint64_str, stop);
         printf("first: waited only %s usec => FAILED\n", uint64_str);
     }
     else if (stop > (exp + 100)) {
-        fmt_u64_dec(uint64_str, stop);
         printf("first: waited too long %s usec => FAILED\n", uint64_str);
     }
     else {
-        fmt_u64_dec(uint64_str, stop);
         printf("first: waited %s usec\n", uint64_str);
     }
 }
