@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de
+ * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
  *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
