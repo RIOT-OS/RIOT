@@ -16,6 +16,7 @@ from traceback import print_tb
 MAKE_TERM_STARTED = {
     'pyterm': r"Type '/exit' to exit.",
     'native': r"main\(\): This is RIOT",
+    'native_noshell': r"RIOT .* hardware initialization complete",
 }
 
 
