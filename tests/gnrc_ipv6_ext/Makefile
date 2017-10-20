@@ -32,6 +32,4 @@ include $(RIOTBASE)/Makefile.include
 
 # This requires ENABLE_DEBUG in gnrc_ipv6.c to be 1
 test:
-# `testrunner` calls `make term` recursively, results in duplicated `TERMFLAGS`.
-# So clears `TERMFLAGS` before run.
-	TERMFLAGS= tests/01-run.py
+	tests/01-run.py
