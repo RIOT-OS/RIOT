@@ -34,10 +34,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
-static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
-
 #define _NETIF_NETAPI_MSG_QUEUE_SIZE    (8)
 
 static gnrc_netif_t _netifs[GNRC_NETIF_NUMOF];
@@ -454,6 +450,8 @@ void gnrc_netif_release(gnrc_netif_t *netif)
 static inline bool _addr_anycast(const gnrc_netif_t *netif, unsigned idx);
 static int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
 
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
+
 /**
  * @brief   Matches an address by prefix to an address on the interface
  *
@@ -568,15 +566,11 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
      * for SLAAC */
     ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
     res = gnrc_netif_ipv6_group_join_internal(netif, &sol_nodes);
-#if ENABLE_DEBUG
     if (res < 0) {
         DEBUG("nib: Can't join solicited-nodes of %s on interface %u\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               netif->pid);
     }
-#else
-    (void)res;
-#endif
 #endif /* GNRC_IPV6_NIB_CONF_ARSM */
     if (_get_state(netif, idx) == GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID) {
         void *state = NULL;
@@ -880,7 +874,6 @@ static unsigned _match(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
             best_match = match;
         }
     }
-#if ENABLE_DEBUG
     if (*idx >= 0) {
         DEBUG("gnrc_netif: Found %s on interface %" PRIkernel_pid " matching ",
               ipv6_addr_to_str(addr_str, &netif->ipv6.addrs[*idx],
@@ -898,7 +891,6 @@ static unsigned _match(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               (filter != NULL) ? "true" : "false");
     }
-#endif
     return best_match;
 }
 
@@ -1249,12 +1241,10 @@ static void *_gnrc_netif_thread(void *args)
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
                 res = netif->ops->send(netif, msg.content.ptr);
-#if ENABLE_DEBUG
                 if (res < 0) {
                     DEBUG("gnrc_netif: error sending packet %p (code: %u)\n",
                           msg.content.ptr, res);
                 }
-#endif
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 opt = msg.content.ptr;
@@ -1292,12 +1282,10 @@ static void *_gnrc_netif_thread(void *args)
                           "netif->ops->msg_handler()\n", msg.type);
                     netif->ops->msg_handler(netif, &msg);
                 }
-#if ENABLE_DEBUG
                 else {
                     DEBUG("gnrc_netif: unknown message type 0x%04x"
                           "(no message handler defined)\n", msg.type);
                 }
-#endif
                 break;
         }
     }
