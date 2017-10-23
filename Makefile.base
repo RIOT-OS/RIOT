@@ -85,7 +85,7 @@ CCASFLAGS_$(MODULE) := $(filter-out $(CCASUWFLAGS), $(CFLAGS_$(MODULE))) $(CCASE
 
 # compile and generate dependency info
 
-$(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
+$(OBJC_LTO): CFLAGS_$(MODULE)+=$(LTOFLAGS)
 
 # Return module name from object path
 module_from_obj = $(notdir $(realpath $(dir $1)))
