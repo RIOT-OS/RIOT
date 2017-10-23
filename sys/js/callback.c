@@ -19,7 +19,7 @@ static void js_event_callback(event_t *event)
 void js_callback_init(js_callback_t *js_callback, jerry_value_t callback)
 {
     DEBUG("init %p\n", js_callback);
-    js_callback->event.callback = js_event_callback;
+    js_callback->event.handler = js_event_callback;
 
     DEBUG("acquire obj %lu\n", js_callback->callback.object);
     js_native_ref_add(&js_callback->callback, callback);
