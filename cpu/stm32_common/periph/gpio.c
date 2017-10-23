@@ -243,8 +243,8 @@ void isr_exti(void)
     uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
     for (size_t i = 0; i < EXTI_NUMOF; i++) {
         if (pending_isr & (1 << i)) {
-            EXTI->PR = (1 << i);        /* clear by writing a 1 */
             isr_ctx[i].cb(isr_ctx[i].arg);
+            EXTI->PR = (1 << i);        /* clear by writing a 1 */
         }
     }
     cortexm_isr_end();
