@@ -18,25 +18,28 @@
  * @author          René Herthel <rene-herthel@outlook.de>
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Josua Arndt <jarndt@ias.rwth-aachen.de>
- * @author	    Steffen Robertz <steffen.robertz@rwth-aachen.de>
+ * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
-#ifndef PERIPH_CPU_H_
-#define PERIPH_CPU_H_
+#ifndef PERIPH_CPU_H
+#define PERIPH_CPU_H
 
 #include "periph_cpu_common.h"
 #include "atmega_regs_common.h"
 
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
- * @brief   Length of the CPU_ID in octets
+ * @name   Length of the CPU_ID in octets
+ * @{
  */
 #define CPUID_LEN           (8U)
+/** @} */
 
 /**
- * @brief   Available ports on the ATmega256rfr family
+ * @name   Available ports on the ATmega256rfr family
+ * @{
  */
 enum {
     PORT_B  = 1,        /**< port B */
@@ -45,13 +48,16 @@ enum {
     PORT_F  = 5,        /**< port F */
     PORT_G  = 6,        /**< port G */
 };
+/** @} */
 
 /**
- * @brief   Atmega256rfr2 timers have 3 capture-compare channels (TIMER 1/3) -> best suitable for
- *          PWM and especially RGB Leds
+ * @name   Atmega256rfr2 timers have up to 3 capture-compare channels (TIMER 1/3) 
+ * -> best suitable for PWM and especially RGB Leds
+ * @{
  */
 #define TIMER_CHAN          (3U)
-
+/** @} */
+/* forward declaration of struct to avoid cyclic dependency */
 typedef unsigned int gpio_t;
 /**
  * @name   GPIO pin not defined
@@ -103,9 +109,9 @@ typedef struct {
     pwm_chan_t chan[TIMER_CHAN];    /**< channel mapping, set to {GPIO_UNDEF, 0} */
     REG8 *power_reg;                /**< Save Powerregister for poweron and off */
     uint8_t power_reg_bit;          /**< Save which bit needs to be set in powerregister */
-    uint8_t *scale_pointer;
-    uint8_t *prescaler_pointer;
-    uint8_t bits;
+    uint8_t *scale_pointer;         /**< Scale variable used to map small resolution values to max 16bit */
+    uint8_t *prescaler_pointer;     /**< remember calculated prescaler, as it changes during poweroff and on */
+    uint8_t bits;                   /**< Timer Size, e.g. 8bit or 16bit */
 } pwm_conf_t;
 /** @} */
 
@@ -142,9 +148,9 @@ typedef struct {
 /** @} */
 
 
-//#ifdef __cplusplus
-//}
-//#endif
+#ifdef __cplusplus
+}
+#endif
 
-#endif /* PERIPH_CPU_H_ */
+#endif /* PERIPH_CPU_H */
 /** @} */

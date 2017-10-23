@@ -18,19 +18,15 @@
  * @}
  */
 
-#include "cpu.h"
 #include <avr/io.h>
-
-#include "avr/wdt.h"
-#include "avr/pgmspace.h"
+#include <avr/wdt.h>
+#include <avr/pgmspace.h>
+#include "cpu.h"
 #include "board.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/**
- * @brief Initialize the CPU, set IRQ priorities
- */
 void cpu_init(void)
 {
     if (MCUSR & (1 << PORF)) {
@@ -54,11 +50,9 @@ void cpu_init(void)
     wdt_reset();
     wdt_disable();
 
-    /*
-     * Set system clock Prescaler
-     */
-    CLKPR = (1 << CLKPCE);  // enable a change to CLKPR
-    CLKPR = 0;              // set the Division factor to 1, internal system clock speed to 16MHz
+    /* Set system clock Prescaler */
+    CLKPR = (1 << CLKPCE);  /* enable a change to CLKPR */
+    CLKPR = 0;              /* set the Division factor to 1, internal system clock speed to 16MHz */
 
     /* Right now we need to do nothing here */
 }
@@ -68,12 +62,12 @@ void cpu_init(void)
  * ISR handler. This may be used along with the ISR() macro to
  * create a catch-all for undefined but used ISRs for debugging
  * purposes.
+ * SCIRQS – Symbol Counter Interrupt Status Register
+ * BATMON – Battery Monitor Control and Status Register
+ * IRQ_STATUS /1 – Transceiver Interrupt Status Register
+ * EIFR – External Interrupt Flag Register
+ * PCIFR – Pin Change Interrupt Flag Register
  */
-// SCIRQS – Symbol Counter Interrupt Status Register
-// BATMON – Battery Monitor Control and Status Register
-// IRQ_STATUS /1 – Transceiver Interrupt Status Register
-// EIFR – External Interrupt Flag Register
-// PCIFR – Pin Change Interrupt Flag Register
 
 ISR(BADISR_vect){
 
