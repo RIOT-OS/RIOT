@@ -21,6 +21,7 @@
  */
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
+#include "fatfs/ffconf.h"
 #include "fatfs/diskio.h"
 #include "fatfs_diskio_common.h"
 #include "fatfs/integer.h"
@@ -29,6 +30,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 bool rtc_init_done = false;
 
@@ -210,6 +212,13 @@ DRESULT disk_ioctl(
     (void) pdrv;    /* prevent warning about unused param */
     (void) buff;    /* prevent warning about unused param */
 
+    #if (_USE_MKFS == 1)
+    dummy_volume_t *volume;
+    struct stat s;
+    #endif
+
+    DEBUG("disk_ioctl: %d\n", cmd);
+
     switch (cmd) {
         #if (_FS_READONLY == 0)
         case CTRL_SYNC:
@@ -225,20 +234,22 @@ DRESULT disk_ioctl(
 
         #if (_USE_MKFS == 1)
         case GET_SECTOR_COUNT:
-
-            dummy_volume_t *volume = get_volume_file(pdrv);
+            volume = get_volume_file(pdrv);
+            DEBUG("GET_SECTOR_COUNT: volume: %p\n", (void*)volume);
 
             if ((volume != NULL) && volume->opened) {
-                struct stat s;
                 if (stat(volume->image_path, &s) == 0) {
                     *(DWORD *)buff = s.st_size / FIXED_BLOCK_SIZE;
+                    DEBUG("GET_SECTOR_COUNT\n");
                     return RES_OK;
                 }
+                DEBUG("GET_SECTOR_COUNT: RES_ERROR\n");
             }
             return RES_ERROR;
 
         case GET_BLOCK_SIZE:
             *(DWORD *)buff = FIXED_BLOCK_SIZE;
+            DEBUG("GET_BLOCK_SIZE: %d\n", FIXED_BLOCK_SIZE);
             return RES_OK;
         #endif
 
