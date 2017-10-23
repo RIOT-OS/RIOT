@@ -56,7 +56,7 @@ info-buildsizes-diff:
 	@echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
 	for board in ${BOARDS}; do \
 	  for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
-	      BOARD=$${board} $(MAKE) info-buildsize --no-print-directory 2>/dev/null | tail -n-1 | cut -f-4; \
+	      BINDIRBASE=$${BINDIRBASE} BOARD=$${board} $(MAKE) info-buildsize --no-print-directory 2>/dev/null | tail -n-1 | cut -f-4; \
 	  done | \
 	  while read -a OLD && read -a NEW; do \
 	    for I in 0 1 2 3; do \
