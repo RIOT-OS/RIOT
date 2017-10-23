@@ -64,7 +64,7 @@ int ds1307_init(ds1307_t *dev, const ds1307_params_t *params)
     }
     /* normalize hour format */
     res = i2c_read_reg(dev->i2c, DS1307_I2C_ADDRESS, DS1307_REG_HOUR, &hour);
-    if (res < 0) {
+    if (res <= 0) { /* should be 1 if device is connected */
         i2c_release(dev->i2c);
         DEBUG("ds1307: Error reading HOUR register on init: %i\n", res);
         return -1;
@@ -73,7 +73,7 @@ int ds1307_init(ds1307_t *dev, const ds1307_params_t *params)
                         _convert_12_to_24(hour));
     i2c_release(dev->i2c);
 
-    if (res < 0) {
+    if (res <= 0) {
         DEBUG("ds1307: Error writing HOUR register on init: %i\n", res);
         return -1;
     }
