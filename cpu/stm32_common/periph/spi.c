@@ -30,6 +30,7 @@
 #include "mutex.h"
 #include "assert.h"
 #include "periph/spi.h"
+#include "pm_layered.h"
 
 /**
  * @brief   Number of bits to shift the BR value in the CR1 register
@@ -119,6 +120,10 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     /* lock bus */
     mutex_lock(&locks[bus]);
+#ifdef STM32_PM_STOP
+    /* block STOP mode */
+    pm_block(STM32_PM_STOP);
+#endif
     /* enable SPI device clock */
     periph_clk_en(spi_config[bus].apbbus, spi_config[bus].rccmask);
     /* enable device */
@@ -140,6 +145,10 @@ void spi_release(spi_t bus)
     dev(bus)->CR1 = 0;
     dev(bus)->CR2 &= ~(SPI_CR2_SSOE);
     periph_clk_dis(spi_config[bus].apbbus, spi_config[bus].rccmask);
+#ifdef STM32_PM_STOP
+    /* unblock STOP mode */
+    pm_unblock(STM32_PM_STOP);
+#endif
     mutex_unlock(&locks[bus]);
 }
 
