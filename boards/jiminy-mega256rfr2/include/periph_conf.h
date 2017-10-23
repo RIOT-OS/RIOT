@@ -14,31 +14,31 @@
  * @brief       Peripheral MCU configuration for the Jiminy Mega 256rfr2 board
  *
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
- * @author	Steffen Robertz <steffen.robertz@rwth-aachen.de>
+ * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
-#ifndef PERIPH_CONF_H_
-#define PERIPH_CONF_H_
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <stdint.h>
+#include <avr/io.h>
 #include "periph_cpu.h"
 #include "atmega_regs_common.h"
 #include "periph_cpu_common.h"
-#include <stdint.h>
-#include <avr/io.h>
 
 /**
- * @brief   Clock configuration
+ * @name   Clock configuration
  * @{
  */
 #define CLOCK_CORECLOCK     (8000000L)
 /** @} */
 
 /**
- * @brief xtimer configuration values
+ * @name xtimer configuration values
  * @{
  */
 #define XTIMER_DEV          TIMER_DEV(0)
@@ -52,7 +52,7 @@ extern "C" {
 
 
 /**
- * @brief   Timer configuration
+ * @name   Timer configuration
  *
  * ATTETION Timer 0 is used for Xtimer which is system Timer
  *
@@ -91,7 +91,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name   PWM configuration
  * @{
  */
 #define PWM_NUMOF   (1U)
@@ -119,7 +119,7 @@ static const pwm_conf_t pwm_config[] = {
 /** @} */
 
 /**
- * @brief Analog comparator configuration
+ * @name Analog comparator configuration
  */
 #define AC_NUMOF    (1U)
 #define AC_0        (0U)
@@ -131,19 +131,21 @@ static const ac_conf_t ac_config[] = {
     }
 };
 
-/**
+/*
  * since current Analog comparator ISR is to slow, we'll hardcode it into the module
  * and use the define to not include the line if the capacity_module isn't used
  */
 #define USES_CAPACITY_MODULE
 
 /**
- * @brief RTC configuartion
+ * @name RTC configuartion
+ * @{
  */
 #define RTC_NUMOF   (1U)
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PERIPH_CONF_H_ */
+#endif /* PERIPH_CONF_H */

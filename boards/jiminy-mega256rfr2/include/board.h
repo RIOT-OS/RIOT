@@ -18,11 +18,11 @@
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
- * @author	Steffen Robertz <steffen.robertz@rwth-aachen.de>
+ * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 
@@ -30,11 +30,11 @@
 extern "C" {
 #endif
 
-//Fastest Baudrate possible for board
+/*Fastest Baudrate possible for board*/
 #define UART_STDIO_BAUDRATE (250000U)
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name   LED pin definitions and handlers
  * @{
  */
 #define LED_PORT            PORTB
@@ -47,37 +47,24 @@ extern "C" {
 #define BLUE            (1 << DDB5)
 #define GREEN           (1 << DDB6)
 #define RED             (1 << DDB7)
-
-
 /** @} */
 
 /**
  * @name Define the interface to the AT86RF231 radio
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
+ * @{
  */
 #define AT86RF2XX_PARAMS_BOARD      {}
+/** @} */
 
 /**
- * Context swap defines
- * Setup to use PB7 which is pin change interrupt 7 (PCINT7)
- * This is configured by Setting  "Pin Change Interrupt Enable 0"
- * and enable PCINT7 at "Pin Change Mask Register 0"
+ * @name Context swap defines
  * This emulates a software triggered interrupt
- *
- * Be aware of the alternate Functions OC0A/OC1C/PCINT7 of Pin B7
- * and that this can't be used.
- *
- * Output Compare and PWM Output A for Timer/Counter0
- * Output Compare and PWM Output C for Timer/Counter1
- * or Pin Change Interrupt 7
- * Its D2 on the Pinoccio board.
- **/
-/*////////////////////////////////////////////////////////////
- *	ON port E0 is RX USB UART do NOT use as Context swap
- */////////////////////////////////////////////////////////////
-// TODO Check if the not implemented I/O pin interrupt could be used to not waste pin,
-// Note that the I/O ports corresponding to PCINT23:16 are not implemented. Therefore PCIE2 has no function in this device
+ */
+/*TODO Check if the not implemented I/O pin interrupt could be used to not waste pin,
+ *Note that the I/O ports corresponding to PCINT23:16 are not implemented. Therefore PCIE2 has no function in this device
+ */
 #define AVR_CONTEXT_SWAP_INIT do { \
         DDRE |= (1 << PE7); \
         EICRB |= (1 << ISC70); \
@@ -86,17 +73,18 @@ extern "C" {
 } while (0)
 #define AVR_CONTEXT_SWAP_INTERRUPT_VECT  INT7_vect
 #define AVR_CONTEXT_SWAP_TRIGGER   PORTE ^= (1 << PE7)
-
+/** @} */
 
 
 /**
- * @brief Initialize board specific hardware, including clock, LEDs and std-IO
+ * @name Initialize board specific hardware, including clock, LEDs and std-IO
+ * @{
  */
 void board_init(void);
-
+/** @} */
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BOARD_H_ */
+#endif /* BOARD_H */
 /** @} */

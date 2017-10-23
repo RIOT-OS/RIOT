@@ -13,7 +13,8 @@
  * @{
  *
  * @file
- * @brief       Board specific implementations for the Jiminy Mega 256rfr2 board developed by the IAS of the RWTH Aachen University
+ * @brief       Board specific implementations for the Jiminy Mega 256rfr2 board 
+ *		developed by the IAS of the RWTH Aachen University
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
@@ -54,9 +55,7 @@ void board_init(void)
     irq_enable();
 }
 
-/**
- * @brief Initialize the System, initialize IO via UART_0
- */
+/*Initialize the System, initialize IO via UART_0*/
 void SystemInit(void)
 {
     /* initialize UART_0 for use as stdout */
