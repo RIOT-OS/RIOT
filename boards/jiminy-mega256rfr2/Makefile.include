@@ -1,4 +1,3 @@
-# define the cpu used by the arduino mega2560 board
 export CPU = atmega256rfr2
 export CPU_MODEL = atmega256rfr2
 
@@ -12,18 +11,6 @@ ifeq ($(OS),Linux)
   FLASHER = avrdude
   export FLASHER_PATH ="/etc/avrdude.conf"
   export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH) 
-  #export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -n -v -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r:-:h  -C $(FLASHER_PATH) 
-#-U lfuse:r:-:i -U hfuse:r:-:i -U efuse:r:-:i 
-else ifeq ($(OS),Darwin)
-  PORT ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-  FLASHER = avrdude
-else ifeq ($(OS),MINGW32_NT-6.2) 
-# Windows MINGW32 Environment 
-	PORT ?= COM5
-	FLASHER = avrdude
-	export FLASHER_PATH ="C:/avrdude/avrdude.conf"
-	export FFLAGS += -p atmega256rfr2 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -D -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex:i -C $(FLASHER_PATH)
-	
 else
   $(info CAUTION: No flash tool for your host system found!)
   # TODO: fix for building under windows
@@ -42,7 +29,7 @@ export DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBU
 export PROGRAMMER ?= wiring
 
 ifeq ($(PROGRAMMER),wiring)
-    export PROGRAMMER_FLAGS =-P $(PORT) -b 0010005
+  export PROGRAMMER_FLAGS =-P $(PORT) -b 0010005
 endif
 
 # define build specific options
