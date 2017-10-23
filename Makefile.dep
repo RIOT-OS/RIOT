@@ -8,6 +8,12 @@ OLD_USEPKG := $(sort $(USEPKG))
 # pull dependencies from drivers
 include $(RIOTBASE)/drivers/Makefile.dep
 
+ifneq (,$(filter cbor_ctime,$(USEMODULE)))
+  ifneq (,$(filter newlib,$(USEMODULE)))
+    USEMODULE += newlib_gnu_source
+  endif
+endif
+
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer
@@ -379,6 +385,10 @@ endif
 
 ifneq (,$(filter od,$(USEMODULE)))
   USEMODULE += fmt
+endif
+
+ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
+  USEMODULE += newlib
 endif
 
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
