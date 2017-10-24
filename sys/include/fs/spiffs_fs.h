@@ -116,6 +116,11 @@ typedef struct spiffs_desc {
 #if (SPIFFS_HAL_CALLBACK_EXTRA == 1) || defined(DOXYGEN)
     mtd_dev_t *dev;                             /**< The underlying mtd device, must be set by user */
 #endif
+#if (SPIFFS_SINGLETON == 0) || defined(DOXYGEN)
+    uint32_t base_addr;                         /**< Base address of partition */
+    uint32_t block_count;                       /**< Number of blocks in current partition,
+                                                 *  if 0, the mtd number of sector is used */
+#endif
 } spiffs_desc_t;
 
 /** The SPIFFS vfs driver, a pointer to a spiffs_desc_t must be provided as vfs_mountp::private_data */
