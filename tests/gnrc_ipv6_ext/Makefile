@@ -30,6 +30,6 @@ CFLAGS += -DDEVELHELP
 
 include $(RIOTBASE)/Makefile.include
 
-# This requires ENABLE_DEBUG in gnrc_ipv6.c to be 1
+# The test can check more things with ENABLE_DEBUG set to 1 in gnrc_ipv6.c
 test:
 	tests/01-run.py
