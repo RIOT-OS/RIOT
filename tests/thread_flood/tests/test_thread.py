@@ -1,8 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
-import pexpect
+import os
+import sys
 
-term = pexpect.spawn("make term")
+sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+import testrunner
 
-term.expect('Start spawning\r\n')
-term.expect('Thread creation successful aborted\r\n')
+
+def testfunc(term):
+    term.expect('Start spawning\r\n')
+    term.expect('Thread creation successful aborted\r\n')
+
+
+if __name__ == "__main__":
+    sys.exit(testrunner.run(testfunc, echo=True))
