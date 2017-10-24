@@ -35,6 +35,7 @@ int js_run(const jerry_char_t *script, size_t script_size);
 void js_native_ref_add(js_native_ref_t *ref, jerry_value_t object);
 void js_native_ref_rem(js_native_ref_t *ref);
 void js_init_objects(void);
+void js_add_external_handler(jerry_value_t object, const char *name, jerry_external_handler_t handler);
 void js_add_object(jerry_value_t object, jerry_value_t other, const char *name);
 void *js_get_object_native_pointer(jerry_value_t object, const jerry_object_native_info_t *type);
 jerry_value_t js_object_create_with_methods(const js_native_method_t *methods, unsigned num_methods);
