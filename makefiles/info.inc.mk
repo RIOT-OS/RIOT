@@ -115,4 +115,4 @@ info-cpu:
 	@echo $(CPU)
 
 info-features-missing:
-	@echo $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))
+	@for i in $(sort $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))); do echo $$i; done
