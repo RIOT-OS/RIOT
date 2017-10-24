@@ -1,0 +1,10 @@
+# Define MODULE_DIR_$(module) for each auto_init module
+
+# Current makefile directory
+D := $(abspath $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
+
+MODULE_DIR_auto_init_gnrc_netif := $(D)/netif
+MODULE_DIR_auto_init_saul       := $(D)/saul
+MODULE_DIR_auto_init_storage    := $(D)/storage
+MODULE_DIR_auto_init_can        := $(D)/can
+undefine D

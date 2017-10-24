@@ -1,4 +1,4 @@
-CFLAGS += $(CFLAGS_BASIC)
+CFLAGS_arm7_common += $(CFLAGS_BASIC)
 
 DIRS = periph
 
