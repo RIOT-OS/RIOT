@@ -31,5 +31,7 @@ CFLAGS += -DDEVELHELP
 include $(RIOTBASE)/Makefile.include
 
 # This requires ENABLE_DEBUG in gnrc_ipv6.c to be 1
+GNRC_IPV6 = $(RIOTBASE)/sys/net/gnrc/network_layer/ipv6/gnrc_ipv6.c
 test:
+	grep '#define ENABLE_DEBUG *(1)' $(GNRC_IPV6)
 	tests/01-run.py
