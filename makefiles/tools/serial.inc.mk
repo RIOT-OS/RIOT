@@ -12,11 +12,11 @@ export PORT
 
 export BAUD ?= 115200
 
-TERMINAL ?= pyterm
-ifeq ($(TERMINAL),pyterm)
+RIOT_TERMINAL ?= pyterm
+ifeq ($(RIOT_TERMINAL),pyterm)
     export TERMPROG  ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
     export TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
-else ifeq ($(TERMINAL),picocom)
+else ifeq ($(RIOT_TERMINAL),picocom)
     export TERMPROG  ?= picocom
     export TERMFLAGS ?= --nolock --imap lfcrlf --echo --baud "$(BAUD)" "$(PORT)"
 endif
