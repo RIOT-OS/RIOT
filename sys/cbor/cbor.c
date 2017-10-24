@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef MODULE_CBOR_CTIME
+#include <time.h>
+#endif
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
