@@ -36,7 +36,7 @@ int main(void)
 {
     kernel_pid_t thr_id = KERNEL_PID_UNDEF;
 
-    puts("Start spawning\n");
+    puts("[START] Spawning threads");
     do {
         thr_id = thread_create(
             dummy_stack, sizeof(dummy_stack),
@@ -46,7 +46,7 @@ int main(void)
     } while (-EOVERFLOW != thr_id);
 
     if (-EOVERFLOW == thr_id) {
-        puts("Thread creation successful aborted\n");
+        puts("[SUCCESS] Thread creation successfully aborted");
     }
 
     return 0;
