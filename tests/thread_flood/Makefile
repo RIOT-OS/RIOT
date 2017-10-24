@@ -6,4 +6,4 @@ DISABLE_MODULE += auto_init
 include $(RIOTBASE)/Makefile.include
 
 test:
-	tests/test_thread.py
+	tests/01-run.py
