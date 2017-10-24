@@ -7,6 +7,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+from __future__ import unicode_literals
+
 import os, signal, sys, subprocess
 from pexpect import spawnu, TIMEOUT, EOF
 from traceback import print_tb
