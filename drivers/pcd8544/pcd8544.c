@@ -30,7 +30,7 @@
 
 #define ASCII_MIN           0x20    /**< start of ASCII table */
 #define ASCII_MAX           0x7e    /**< end of ASCII table */
-#define CHAR_WIDTH          (6U)    /**< pixel width of a single character */
+#define CHAR_WIDTH          (6)    /**< pixel width of a single character */
 
 #define SPI_CLK             (SPI_CLK_1MHZ)
 #define SPI_MODE            (SPI_MODE_0)
@@ -314,7 +314,7 @@ void pcd8544_write_img(const pcd8544_t *dev, const char img[])
     _set_x(dev, 0);
     _set_y(dev, 0);
     /* write image data to display */
-    for (int i = 0; i < (PCD8544_RES_X * PCD8544_RES_Y / 8); i++) {
+    for (unsigned int i = 0; i < (PCD8544_RES_X * PCD8544_RES_Y / 8); i++) {
         _write(dev, MODE_DTA, img[i]);
     }
     done(dev);
@@ -350,7 +350,7 @@ void pcd8544_clear(const pcd8544_t *dev)
     lock(dev);
     _set_x(dev, 0);
     _set_y(dev, 0);
-    for (int i = 0; i < PCD8544_RES_X * PCD8544_ROWS; i++) {
+    for (unsigned int i = 0; i < PCD8544_RES_X * PCD8544_ROWS; i++) {
         _write(dev, MODE_DTA, 0x00);
     }
     done(dev);
