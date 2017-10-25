@@ -25,6 +25,9 @@
 #include "assert.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
+#ifdef MODULE_PM_LAYERED
+#include "pm_layered.h"
+#endif
 
 #define ADC_MAX_CLK         (200000U)
 
@@ -33,6 +36,10 @@ static mutex_t lock = MUTEX_INIT;
 static inline void _prep(void)
 {
     mutex_lock(&lock);
+#ifdef MODULE_PM_LAYERED
+    pm_block(PM_INVALID_ADC);
+#endif
+    power_adc_enable();
     /* Enable ADC */
     ADCSRA |= (1 << ADEN);
 }
@@ -41,6 +48,10 @@ static inline void _done(void)
 {
     /* Disable ADC */
     ADCSRA &= ~(1 << ADEN);
+    power_adc_disable();
+#ifdef MODULE_PM_LAYERED
+    pm_unblock(PM_INVALID_ADC);
+#endif
     mutex_unlock(&lock);
 }
 

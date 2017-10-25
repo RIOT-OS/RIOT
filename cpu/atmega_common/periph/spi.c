@@ -27,6 +27,8 @@
 #include "mutex.h"
 #include "assert.h"
 #include "periph/spi.h"
+#include "periph/pm.h"
+#include "pm_layered.h"
 
 /**
  * @brief   Extract BR0, BR1 and SPI2X bits from speed value
@@ -38,11 +40,35 @@
 
 static mutex_t lock = MUTEX_INIT;
 
+
+static inline void spi_poweron(spi_t bus) {
+#ifdef MODULE_PM_LAYERED
+    pm_block(PM_INVALID_SPI);
+#endif
+    switch(bus) {
+        case 0 :
+            power_spi_enable();
+        break;
+    }
+}
+
+static inline void spi_poweroff(spi_t bus) {
+    switch(bus) {
+        case 0 :
+            power_spi_disable();
+        break;
+    }
+#ifdef MODULE_PM_LAYERED
+    pm_unblock(PM_INVALID_SPI);
+#endif
+}
+
 void spi_init(spi_t bus)
 {
     assert(bus == 0);
     /* power off the SPI peripheral */
-    power_spi_disable();
+    /* SPI already powered off from init? */
+    //spi_poweroff(bus);
     /* trigger the pin configuration */
     spi_init_pins(bus);
 }
@@ -66,11 +92,13 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* lock the bus and power on the SPI peripheral */
     mutex_lock(&lock);
-    power_spi_enable();
+    /* power on and block sleep level */
+    spi_poweron(bus);
 
     /* configure as master, with given mode and clock */
     SPSR = (clk >> S2X_SHIFT);
     SPCR = ((1 << SPE) | (1 << MSTR) | mode | (clk & CLK_MASK));
+    //SPCR |= (1 << SPE);
 
     /* clear interrupt flag by reading SPSR and data register by reading SPDR */
     (void)SPSR;
@@ -84,7 +112,8 @@ void spi_release(spi_t bus)
     (void)bus;
     /* power off and release the bus */
     SPCR &= ~(1 << SPE);
-    power_spi_disable();
+    /* power off spi bus and unblock level */
+    spi_poweroff(bus);
     mutex_unlock(&lock);
 }
 

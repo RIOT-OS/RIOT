@@ -35,6 +35,9 @@
 
 #include "periph/uart.h"
 
+#ifdef MODULE_PM_LAYERED
+#include "pm_layered.h"
+#endif
 
 /**
  * @brief   Maximum percentage error in calculated baud before switching to
@@ -57,27 +60,31 @@
 #endif
 
 /**
- * @brief   Configured device map
- * @{
+ * @brief   Stores context information for each uart
  */
+typedef struct {
+    mega_uart_t *dev;          /**< uart device */
+    int8_t num;                /** < hardware timer number */
+} ctx_t;
+
 #if UART_NUMOF
-static mega_uart_t *dev[] = {
+static ctx_t ctx[] = {
 #ifdef UART_0
-    UART_0,
+    {UART_0, -1},
 #endif
 #ifdef UART_1
-    UART_1,
+    {UART_1, -1},
 #endif
 #ifdef UART_2
-    UART_2,
+    {UART_2, -1},
 #endif
 #ifdef UART_3
-    UART_3
+    {UART_3, -1}
 #endif
 };
 #else
 /* fallback if no UART is defined */
-static const mega_uart_t *dev[] = { NULL };
+static const ctx_t ctx[] = { NULL };
 #endif
 
 /**
@@ -87,10 +94,23 @@ static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 
 static void _update_brr(uart_t uart, uint16_t brr, bool double_speed)
 {
-    dev[uart]->BRR = brr;
+    ctx[uart].dev->BRR = brr;
     if (double_speed) {
-        dev[uart]->CSRA |= (1 << U2X0);
+        ctx[uart].dev->CSRA |= (1 << U2X0);
     }
+}
+
+static void _flush(uart_t uart) {
+    uint8_t dummy;
+    mega_uart_t* dev = ctx[uart].dev;
+    /* Clears the RX Buffer, but nothing else! */
+    /* TODO: Do not use RXC0 for UART1, ... - is this even a problem? */
+    while ( dev->CSRA & (1<< RXC0) ) {
+        dummy = ctx[uart].dev->DR;
+    }
+    (void)dummy;
+    /* Clears the transmit buffer */
+    //while (!(ctx[uart].dev->CSRA & (1 << UDRE0))) { };
 }
 
 static void _set_brr(uart_t uart, uint32_t baudrate)
@@ -123,23 +143,42 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[uart].rx_cb = rx_cb;
     isr_ctx[uart].arg   = arg;
 
+    /* TODO: What about just UART (without any number?) */
+    #ifdef MEGA_UART0
+    if(ctx[uart].dev == MEGA_UART0) {
+        ctx[uart].num = 0;
+    } else
+    #endif
+    #ifdef MEGA_UART1
+    if(ctx[uart].dev == MEGA_UART1) {
+        ctx[uart].num = 1;
+    } else
+    #endif
+    #ifdef MEGA_UART2
+    if(ctx[uart].dev == MEGA_UART3) {
+        ctx[uart].num = 2;
+    } else
+    #endif
+    #ifdef MEGA_UART3
+    if(ctx[uart].dev == MEGA_UART3) {
+        ctx[uart].num = 3;
+    } else
+    #endif
+
+    if (ctx[uart].num == -1 ) {
+        return -1;
+    }
+
     /* disable and reset UART */
-    dev[uart]->CSRB = 0;
-    dev[uart]->CSRA = 0;
+    ctx[uart].dev->CSRB = 0;
+    ctx[uart].dev->CSRA = 0;
 
     /* configure UART to 8N1 mode */
-    dev[uart]->CSRC = (1 << UCSZ00) | (1 << UCSZ01);
+    ctx[uart].dev->CSRC = (1 << UCSZ00) | (1 << UCSZ01);
+    /* Power on uart so we can use it */
+    uart_poweron(uart);
     /* set clock divider */
     _set_brr(uart, baudrate);
-
-    /* enable RX and TX and the RX interrupt */
-    if (rx_cb) {
-        dev[uart]->CSRB = ((1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0));
-    }
-    else {
-        dev[uart]->CSRB = (1 << TXEN0);
-    }
-
 
     return UART_OK;
 }
@@ -147,17 +186,76 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
-        while (!(dev[uart]->CSRA & (1 << UDRE0))) {};
-        dev[uart]->DR = data[i];
+        while (!(ctx[uart].dev->CSRA & (1 << UDRE0))) {};
+        ctx[uart].dev->DR = data[i];
     }
 }
 
 static inline void isr_handler(int num)
 {
-    isr_ctx[num].rx_cb(isr_ctx[num].arg, dev[num]->DR);
+    isr_ctx[num].rx_cb(isr_ctx[num].arg, ctx[num].dev->DR);
 
     if (sched_context_switch_request) {
         thread_yield();
+    }
+}
+
+void uart_poweron(uart_t uart) {
+    switch(ctx[uart].num) {
+#ifdef MEGA_UART0
+    case 0 :
+    #ifdef MODULE_PM_LAYERED
+        pm_block(PM_INVALID_UART0);
+    #endif
+        power_usart0_enable();
+    break;
+#endif
+#ifdef MEGA_UART1
+    case 1 :
+    #ifdef MODULE_PM_LAYERED
+        pm_block(PM_INVALID_UART1);
+    #endif
+        power_usart1_enable();
+    break;
+#endif
+    }
+
+    /* enable RX and TX and the RX interrupt */
+    if (isr_ctx[uart].rx_cb) {
+        ctx[uart].dev->CSRB = ((1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0));
+    }
+    else {
+        ctx[uart].dev->CSRB = (1 << TXEN0);
+    }
+}
+
+void uart_poweroff(uart_t uart) {
+    _flush(uart);
+
+    if (isr_ctx[uart].rx_cb) {
+        ctx[uart].dev->CSRB &= ~((1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0));
+    }
+    else {
+        ctx[uart].dev->CSRB &= ~(1 << TXEN0);
+    }
+
+    switch(ctx[uart].num) {
+#ifdef MEGA_UART0
+    case 0 :
+        power_usart0_disable();
+    #ifdef MODULE_PM_LAYERED
+        pm_unblock(PM_INVALID_UART0);
+    #endif
+    break;
+#endif
+#ifdef MEGA_UART1
+    case 1 :
+        power_usart1_disable();
+    #ifdef MODULE_PM_LAYERED
+        pm_unblock(PM_INVALID_UART1);
+    #endif
+    break;
+#endif
     }
 }
 

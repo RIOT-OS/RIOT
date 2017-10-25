@@ -28,6 +28,10 @@
 
 #include "periph/timer.h"
 #include "periph_conf.h"
+#include "periph/pm.h"
+#ifdef MODULE_PM_LAYERED
+#include "pm_layered.h"
+#endif
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -58,6 +62,7 @@ typedef struct {
     void *arg;                  /**< interrupt callback argument */
     uint8_t mode;               /**< remember the configured mode */
     uint8_t isrs;               /**< remember the interrupt state */
+    int8_t num;                /** < hardware timer number */
 } ctx_t;
 
 /**
@@ -67,16 +72,16 @@ typedef struct {
 #ifdef TIMER_NUMOF
 static ctx_t ctx[] = {
 #ifdef TIMER_0
-    { TIMER_0, TIMER_0_MASK, TIMER_0_FLAG, NULL, NULL, 0, 0 },
+    { TIMER_0, TIMER_0_MASK, TIMER_0_FLAG, NULL, NULL, 0, 0, -1 },
 #endif
 #ifdef TIMER_1
-    { TIMER_1, TIMER_1_MASK, TIMER_1_FLAG, NULL, NULL, 0, 0 },
+    { TIMER_1, TIMER_1_MASK, TIMER_1_FLAG, NULL, NULL, 0, 0, -1 },
 #endif
 #ifdef TIMER_2
-    { TIMER_2, TIMER_2_MASK, TIMER_2_FLAG, NULL, NULL, 0, 0 },
+    { TIMER_2, TIMER_2_MASK, TIMER_2_FLAG, NULL, NULL, 0, 0, -1 },
 #endif
 #ifdef TIMER_3
-    { TIMER_3, TIMER_3_MASK, TIMER_3_FLAG, NULL, NULL, 0, 0 },
+    { TIMER_3, TIMER_3_MASK, TIMER_3_FLAG, NULL, NULL, 0, 0, -1 },
 #endif
 };
 #else
@@ -85,6 +90,113 @@ static ctx_t *ctx[] = {{ NULL }};
 #endif
 /** @} */
 
+static inline void timer_poweroff(tim_t tim) {
+    switch(ctx[tim].num) {
+    #ifdef MEGA_TIMER0
+        case 0 :
+            power_timer0_disable();
+#ifdef MODULE_PM_LAYERED
+            pm_unblock(PM_INVALID_TIMER0);
+#endif
+        break;
+    #endif
+    #ifdef MEGA_TIMER1
+        case 1 :
+            power_timer1_disable();
+#ifdef MODULE_PM_LAYERED
+            pm_unblock(PM_INVALID_TIMER1);
+#endif
+        break;
+    #endif
+    #ifdef MEGA_TIMER1
+        case 2 :
+            power_timer2_disable();
+#ifdef MODULE_PM_LAYERED
+            pm_unblock(PM_INVALID_TIMER2);
+#endif
+        break;
+    #endif
+    #ifdef MEGA_TIMER3
+        case 3 :
+            power_timer3_disable();
+#ifdef MODULE_PM_LAYERED
+            pm_unblock(PM_INVALID_TIMER3);
+#endif
+        break;
+    #endif
+    #ifdef MEGA_TIMER4
+        case 4 :
+            power_timer4_disable();
+#ifdef MODULE_PM_LAYERED
+            pm_unblock(PM_INVALID_TIMER4);
+#endif
+        break;
+    #endif
+    #ifdef MEGA_TIMER5
+        case 5 :
+            power_timer5_disable();
+#ifdef MODULE_PM_LAYERED
+            pm_unblock(PM_INVALID_TIMER5);
+#endif
+        break;
+    #endif
+    }
+}
+
+static inline void timer_poweron(tim_t tim) {
+    switch(ctx[tim].num) {
+    #ifdef MEGA_TIMER0
+        case 0 :
+#ifdef MODULE_PM_LAYERED
+            pm_block(PM_INVALID_TIMER0);
+#endif
+            power_timer0_enable();
+        break;
+    #endif
+    #ifdef MEGA_TIMER1
+        case 1 :
+#ifdef MODULE_PM_LAYERED
+            pm_block(PM_INVALID_TIMER1);
+#endif
+            power_timer1_enable();
+        break;
+    #endif
+    #ifdef MEGA_TIMER1
+        case 2 :
+#ifdef MODULE_PM_LAYERED
+            pm_block(PM_INVALID_TIMER2);
+#endif
+            power_timer2_enable();
+        break;
+    #endif
+    #ifdef MEGA_TIMER3
+        case 3 :
+#ifdef MODULE_PM_LAYERED
+            pm_block(PM_INVALID_TIMER3);
+#endif
+            power_timer3_enable();
+        break;
+    #endif
+    #ifdef MEGA_TIMER4
+        case 4 :
+#ifdef MODULE_PM_LAYERED
+            pm_block(PM_INVALID_TIMER4);
+#endif
+            power_timer4_enable();
+        break;
+    #endif
+    #ifdef MEGA_TIMER5
+        case 5 :
+#ifdef MODULE_PM_LAYERED
+            pm_block(PM_INVALID_TIMER5);
+#endif
+            power_timer5_enable();
+        break;
+    #endif
+    }
+}
+
+
 /**
  * @brief Setup the given timer
  */
@@ -92,6 +204,42 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 {
     DEBUG("timer.c: freq = %ld\n", freq);
     uint8_t pre = 0;
+
+
+    #ifdef MEGA_TIMER0
+    if(ctx[tim].dev == MEGA_TIMER0) {
+        ctx[tim].num = 0;
+    } else
+    #endif
+    #ifdef MEGA_TIMER1
+    if(ctx[tim].dev == MEGA_TIMER1) {
+        ctx[tim].num = 1;
+    } else
+    #endif
+    #ifdef MEGA_TIMER2
+    if(ctx[tim].dev == MEGA_TIMER2) {
+        ctx[tim].num = 2;
+    } else
+    #endif
+    #ifdef MEGA_TIMER3
+    if(ctx[tim].dev == MEGA_TIMER3) {
+        ctx[tim].num = 3;
+    } else
+    #endif
+    #ifdef MEGA_TIMER4
+    if(ctx[tim].dev == MEGA_TIMER4) {
+        ctx[tim].num = 4;
+    } else
+    #endif
+    #ifdef MEGA_TIMER5
+    if(ctx[tim].dev == MEGA_TIMER5) {
+        ctx[tim].num = 5;
+    } else
+    #endif
+
+    if (ctx[tim].num == -1 ) {
+        return -1;
+    }
 
     /* make sure given device is valid */
     if (tim >= TIMER_NUMOF) {
@@ -119,6 +267,8 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     ctx[tim].cb   = cb;
     ctx[tim].arg  = arg;
     ctx[tim].mode = (pre + 1);
+
+    timer_poweron(tim);
 
     /* enable timer with calculated prescaler */
     ctx[tim].dev->CRB = (pre + 1);
