@@ -99,6 +99,7 @@ static int cmd_con(int argc, char **argv)
 
     if (emcute_con(&gw, true, topic, message, len, 0) != EMCUTE_OK) {
         printf("error: unable to connect to [%s]:%i\n", argv[1], (int)gw.port);
+        return 1;
     }
     printf("Successfully connected to gateway at [%s]:%i\n",
            argv[1], (int)gw.port);
