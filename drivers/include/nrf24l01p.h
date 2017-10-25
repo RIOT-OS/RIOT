@@ -36,11 +36,11 @@ extern "C" {
  * @brief   Structure that represents the hardware setup of the nrf24l01+ transceiver.
  */
 typedef struct {
-    spi_t spi;      /**< SPI device to initialize */
-    gpio_t ce;      /**< GPIO pin to initialize as chip enable */
-    gpio_t cs;      /**< GPIO pin to initialize as chip select */
-    gpio_t irq;     /**< GPIO pin to initialize as interrupt request */
-    int listener;   /**< Place to store an ID in */
+    spi_t spi;           /**< SPI device to initialize */
+    gpio_t ce;           /**< GPIO pin to initialize as chip enable */
+    gpio_t cs;           /**< GPIO pin to initialize as chip select */
+    gpio_t irq;          /**< GPIO pin to initialize as interrupt request */
+    unsigned listener;   /**< Place to store an ID in */
 } nrf24l01p_t;
 
 /**
