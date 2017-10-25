@@ -10,10 +10,15 @@
 import os, signal, sys, subprocess
 from pexpect import spawnu, TIMEOUT, EOF
 from traceback import print_tb
+import time
 
 def run(testfunc, timeout=10, echo=True, traceback=False):
     env = os.environ.copy()
     child = spawnu("make term", env=env, timeout=timeout)
+
+    # on many platforms, the termprog needs a short while to be ready...
+    time.sleep(3)
+
     if echo:
         child.logfile = sys.stdout
 
