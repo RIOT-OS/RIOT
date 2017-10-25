@@ -49,24 +49,6 @@ static void pm_cb(void *arg);
 static void pm_reset(candev_dev_t *candev_dev, uint32_t value);
 #endif
 
-static inline enum can_msg _can_event_error_to_msg(candev_event_t error)
-{
-    switch (error) {
-    case CANDEV_EVENT_TX_ERROR:
-        return CAN_MSG_TX_ERROR;
-    case CANDEV_EVENT_RX_ERROR:
-        return CAN_MSG_RX_ERROR;
-    case CANDEV_EVENT_BUS_OFF:
-        return CAN_MSG_BUS_OFF;
-    case CANDEV_EVENT_ERROR_PASSIVE:
-        return CAN_MSG_ERROR_PASSIVE;
-    case CANDEV_EVENT_ERROR_WARNING:
-        return CAN_MSG_ERROR_WARNING;
-    default:
-        return 0;
-    }
-}
-
 static void _can_event(candev_t *dev, candev_event_t event, void *arg)
 {
     msg_t msg;
