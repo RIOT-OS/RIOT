@@ -22,4 +22,7 @@ PROBLEM ?= 12
 
 CFLAGS += -DPROBLEM=$(PROBLEM)
 
+test:
+	./tests/01-run.py
+
 include $(RIOTBASE)/Makefile.include
