@@ -41,6 +41,12 @@ extern "C" {
  */
 #define NETSTATS_NB_QUEUE_SIZE     (4)
 
+
+/**
+ * @brief Forward declaration of netdev_t struct
+ *
+ * Solves a circular include
+ */
 typedef struct netdev netstats_netdev_t;
 
 /**
