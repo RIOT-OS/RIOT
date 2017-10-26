@@ -1,3 +1,9 @@
+ifeq (,$(KINETIS_SERIES))
+  # Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
+  # directory as this Makefile.
+  include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/kinetis-info.mk
+endif
+
 # include module specific includes
 export INCLUDES += -I$(RIOTCPU)/kinetis_common/include
 
