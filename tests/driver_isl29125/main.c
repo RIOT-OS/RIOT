@@ -85,7 +85,7 @@ int main(void)
         "ISL29125_MODE_R", "ISL29125_MODE_G", "ISL29125_MODE_B",
         "ISL29125_MODE_RG", "ISL29125_MODE_GB"};
 
-    for (int i = 0; i < sizeof(modes); i++) {
+    for (size_t i = 0; i < sizeof(modes); i++) {
         printf("Setting mode %s\n", mode_names[i]);
         isl29125_set_mode(&dev, modes[i]);
         xtimer_usleep(SLEEP);
