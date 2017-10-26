@@ -1,6 +1,6 @@
 PKG_NAME = tiny-asn1
 PKG_URL = https://gitlab.com/matthegap/tiny-asn1.git
-PKG_VERSION = b09f058966c6296904487c3f8fc04c68fe83b2cc
+PKG_VERSION = 82e3a26273900b532e33e5b377f193fa08ee7d1b
 PKG_LICENSE = LGPL-3
 
 export TINYASN1_ROOT=$(CURDIR)
