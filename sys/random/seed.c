@@ -34,7 +34,7 @@ void auto_init_random(void)
     luid_get(&seed, 4);
 #else
     LOG_WARNING("random: NO SEED AVAILABLE!\n");
-    seed = 1;
+    seed = RANDOM_SEED_DEFAULT;
 #endif
     DEBUG("random: using seed value %u\n", (unsigned)seed);
     random_init(seed);

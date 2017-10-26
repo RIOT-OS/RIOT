@@ -32,6 +32,14 @@
 extern "C" {
 #endif
 
+#ifndef RANDOM_DEFAULT_SEED
+/**
+ * @brief   Seed selected when all tries to collect seeds from a random source
+ *          failed
+ */
+#define RANDOM_DEFAULT_SEED (1)
+#endif
+
 /**
  * @brief Enables support for floating point random number generation
  */
