@@ -731,7 +731,7 @@ uint8_t sx127x_get_tx_power(const sx127x_t *dev)
     return dev->settings.lora.power;
 }
 
-void sx127x_set_tx_power(sx127x_t *dev, uint8_t power)
+void sx127x_set_tx_power(sx127x_t *dev, int8_t power)
 {
     DEBUG("[DEBUG] Set power: %d\n", power);
 
