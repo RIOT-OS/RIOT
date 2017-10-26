@@ -30,8 +30,8 @@ extern "C" {
 typedef struct {
     char *buf;          /**< Buffer to operate on. */
     unsigned int size;  /**< Size of buf. */
-    unsigned int start; /**< Current read position in the ring buffer. */
-    unsigned int avail; /**< Number of elements available for reading. */
+    volatile unsigned int start; /**< Current read position in the ring buffer. */
+    volatile unsigned int avail; /**< Number of elements available for reading. */
 } ringbuffer_t;
 
 /**
