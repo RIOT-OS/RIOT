@@ -301,7 +301,7 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count) {
     /* copy packet to SRAM */
     size_t len = 0;
 
-    for (int i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
         sram_op(dev, ENC_WGPDATA, (i ? 0xFFFF : TX_BUFFER_START), vector[i].iov_base, vector[i].iov_len);
         len += vector[i].iov_len;
     }
