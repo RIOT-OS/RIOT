@@ -10,8 +10,28 @@ export INCLUDES += -I$(RIOTCPU)/kinetis_common/include
 # Add search path for linker scripts
 export LINKFLAGS += -L$(RIOTCPU)/kinetis_common/ldscripts
 
-# Use generic linkerscripts for all Kinetis based CPUs
-export LINKER_SCRIPT ?= $(LD_$(shell echo $(CPU_MODEL) | tr a-z A-Z))
+# Use generic linker script for all Kinetis based CPUs
+LINKER_SCRIPT = kinetis.ld
+
+ROM_START_ADDR = 0x00000000
+RAM_BASE_ADDR  = 0x20000000
+RAM_START_ADDR = $$(($(RAM_BASE_ADDR)-($(KINETIS_SRAM_L_SIZE) * 1024)))
+ROM_LEN = $$(($(KINETIS_ROMSIZE) * 1024))
+RAM_LEN = $$(($(KINETIS_RAMSIZE) * 1024))
+
+CFLAGS += \
+  -DKINETIS_CORE_$(KINETIS_CORE) \
+  -DKINETIS_SERIES_$(KINETIS_SERIES) \
+  -DKINETIS_FAMILY=$(KINETIS_FAMILY) \
+  -DKINETIS_SUBFAMILY=$(KINETIS_SUBFAMILY) \
+  -DKINETIS_ROMSIZE=$(KINETIS_ROMSIZE) \
+  #
+
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_start_addr=$(ROM_START_ADDR)
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_base_addr=$(RAM_BASE_ADDR)
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_start_addr=$(RAM_START_ADDR)
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_length=$(ROM_LEN)
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
 
 # add the CPU specific code for the linker
 export UNDEF += $(BINDIR)/kinetis_common/fcfield.o
