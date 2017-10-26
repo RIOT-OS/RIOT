@@ -475,6 +475,14 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
              old_state == AT86RF2XX_STATE_IN_PROGRESS);
 
     if (state == AT86RF2XX_STATE_FORCE_TRX_OFF) {
+        if (old_state == AT86RF2XX_STATE_TX_ARET_ON) {
+            /* When on TX_ARET_ON, go to idle state before going to TRX_OFF */
+            assert(dev->pending_tx != 0);
+            if ((--dev->pending_tx) == 0) {
+                at86rf2xx_set_state(dev, dev->idle_state);
+                DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
+            }
+        }
         _set_state(dev, AT86RF2XX_STATE_TRX_OFF, state);
         return old_state;
     }

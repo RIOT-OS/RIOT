@@ -34,8 +34,14 @@ extern "C" {
 /**
  * @brief   Transition time from SLEEP to TRX_OFF in us, refer figure 7-4, p.42.
  *          For different environments refer figure 13-13, p.201
+ *          For AT86RF212B, delay is longer, see page 42, tTR1a: SLEEP⇒CLKM is available
+ *          http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-42002-MCU_Wireless-AT86RF212B_Datasheet.pdf
  */
+#ifdef MODULE_AT86RF212B
+#define AT86RF2XX_WAKEUP_DELAY          (1000U)
+#else
 #define AT86RF2XX_WAKEUP_DELAY          (306U)
+#endif
 
 /**
  * @brief   Minimum reset pulse width, refer p.190. We use 62us so
