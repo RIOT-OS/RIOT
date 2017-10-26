@@ -157,9 +157,13 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
     mrf24j40_reg_write_long(dev, MRF24J40_TX_NORMAL_FIFO, dev->header_len);
 
     if (dev->netdev.flags & NETDEV_IEEE802154_ACK_REQ) {
-        mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNACKREQ | MRF24J40_TXNCON_TXNTRIG);
+        /* Explicitly set the TXNACKREQ register before sending */
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNACKREQ);
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNTRIG);
     }
     else {
+        /* Explicitly clear the TXNACKREQ register before sending */
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, 0x00);
         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNTRIG);
     }
     if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START)) {
