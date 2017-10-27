@@ -240,6 +240,14 @@ static void clk_init(void)
                          GCLK_GENCTRL_ID(1));
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 #else
+    /* setup generic clock 1 as 8MHz for timer.c */
+    GCLK->GENDIV.reg = (GCLK_GENDIV_DIV(CLOCK_CORECLOCK / 8000000ul) |
+                        GCLK_GENDIV_ID(1));
+    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN |
+                         GCLK_GENCTRL_SRC_DFLL48M |
+                         GCLK_GENCTRL_ID(1));
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+
     /* OSC8M is turned on by default and feeds GCLK0.
      * OSC8M must be disabled after another oscillator is set 
      * to feed GCLK0 

@@ -60,23 +60,20 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     /* TC4 and TC5 share the same channel */
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
 #elif CLOCK_USE_OSCULP32_DFLL
-#if CLOCK_8MHZ
     /* configure GCLK1 (configured to 1MHz) to feed TC3, TC4 and TC5 */;
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
-#endif
 #if GEN2_ULP32K
     /* configure GCLK2 as the source (32kHz)*/
     GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK2 | GCLK_CLKCTRL_ID(RTC_GCLK_ID));
 #endif
-#else
-#if GEN2_ULP32K
-    /* configure GCLK2 as the source (32kHz)*/
-    GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK2 | GCLK_CLKCTRL_ID(RTC_GCLK_ID));
 #else
     /* configure GCLK0 to feed TC3, TC4 and TC5 */;
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC3_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
     /* TC4 and TC5 share the same channel */
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
+#if GEN2_ULP32K
+    /* configure GCLK2 as the source (32kHz)*/
+    GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK2 | GCLK_CLKCTRL_ID(RTC_GCLK_ID));
 #endif
 #endif
     while (GCLK->STATUS.bit.SYNCBUSY) {}
@@ -118,8 +115,13 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
         TIMER_1_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
 #if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL || CLOCK_USE_OSCULP32_DFLL
+#if (CLOCK_USE_OSCULP32_DFLL) && (!CLOCK_8MHZ)
+        /* PLL/DFLL: sourced by 8MHz and prescaler 8 to reach 1MHz */
+        TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV8_Val;
+#else 
         /* PLL/DFLL: sourced by 1MHz and prescaler 1 to reach 1MHz */
         TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV1_Val;
+#endif
 #else
         /* sourced by 8MHz with Presc 8 results in 1Mhz clk */
         TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV8_Val;
