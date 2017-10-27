@@ -24,244 +24,64 @@
 
 /* CPU specific interrupt vector table */
 ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
-    isr_dma0,              /* DMA channel 0 transfer complete */
-    isr_dma1,              /* DMA channel 1 transfer complete */
-    isr_dma2,              /* DMA channel 2 transfer complete */
-    isr_dma3,              /* DMA channel 3 transfer complete */
-    isr_dma4,              /* DMA channel 4 transfer complete */
-    isr_dma5,              /* DMA channel 5 transfer complete */
-    isr_dma6,              /* DMA channel 6 transfer complete */
-    isr_dma7,              /* DMA channel 7 transfer complete */
-    isr_dma8,              /* DMA channel 8 transfer complete */
-    isr_dma9,              /* DMA channel 9 transfer complete */
-    isr_dma10,             /* DMA channel 10 transfer complete */
-    isr_dma11,             /* DMA channel 11 transfer complete */
-    isr_dma12,             /* DMA channel 12 transfer complete */
-    isr_dma13,             /* DMA channel 13 transfer complete */
-    isr_dma14,             /* DMA channel 14 transfer complete */
-    isr_dma15,             /* DMA channel 15 transfer complete */
-    isr_dma_error,         /* DMA channel 0 - 15 error */
-    isr_mcm,               /* MCM normal interrupt */
-    isr_ftfl,              /* FTFL command complete */
-    isr_ftfl_collision,    /* FTFL read collision */
-    isr_pmc,               /* PMC controller low-voltage detect low-voltage warning */
-    isr_llwu,              /* Low leakage wakeup */
-    isr_wdog_ewm,          /* Single interrupt vector for  WDOG and EWM */
-    isr_rng,               /* Randon number generator */
-    isr_i2c0,              /* Inter-integrated circuit 0 */
-    isr_i2c1,              /* Inter-integrated circuit 1 */
-    isr_spi0,              /* Serial peripheral Interface 0 */
-    isr_spi1,              /* Serial peripheral Interface 1 */
-    isr_i2s0_tx,           /* Integrated interchip sound 0 transmit interrupt */
-    isr_i2s0_rx,           /* Integrated interchip sound 0 receive interrupt */
-    dummy_handler,         /* Reserved interrupt */
-    isr_uart0_rx_tx,       /* UART0 receive/transmit interrupt */
-    isr_uart0_error,       /* UART0 error interrupt */
-    isr_uart1_rx_tx,       /* UART1 receive/transmit interrupt */
-    isr_uart1_error,       /* UART1 error interrupt */
-    isr_uart2_rx_tx,       /* UART2 receive/transmit interrupt */
-    isr_uart2_error,       /* UART2 error interrupt */
-    dummy_handler,         /* Reserved interrupt */
-    dummy_handler,         /* Reserved interrupt */
-    isr_adc0,              /* Analog-to-digital converter 0 */
-    isr_cmp0,              /* Comparator 0 */
-    isr_cmp1,              /* Comparator 1 */
-    isr_ftm0,              /* FlexTimer module 0 fault overflow and channels interrupt */
-    isr_ftm1,              /* FlexTimer module 1 fault overflow and channels interrupt */
-    isr_ftm2,              /* FlexTimer module 2 fault overflow and channels interrupt */
-    isr_cmt,               /* Carrier modulator transmitter */
-    isr_rtc,               /* Real time clock */
-    isr_rtc_seconds,       /* Real time clock seconds */
-    isr_pit0,              /* Periodic interrupt timer channel 0 */
-    isr_pit1,              /* Periodic interrupt timer channel 1 */
-    isr_pit2,              /* Periodic interrupt timer channel 2 */
-    isr_pit3,              /* Periodic interrupt timer channel 3 */
-    isr_pdb0,              /* Programmable delay block */
-    isr_usb0,              /* USB OTG interrupt */
-    isr_usbdcd,            /* USB charger detect */
-    dummy_handler,         /* Reserved interrupt */
-    isr_dac0,              /* Digital-to-analog converter 0 */
-    isr_mcg,               /* Multipurpose clock generator */
-    isr_lptmr0,            /* Low power timer interrupt */
-    isr_porta,             /* Port A pin detect interrupt */
-    isr_portb,             /* Port B pin detect interrupt */
-    isr_portc,             /* Port C pin detect interrupt */
-    isr_portd,             /* Port D pin detect interrupt */
-    isr_porte,             /* Port E pin detect interrupt */
-    isr_swi,               /* Software interrupt */
-    dummy_handler,         /* reserved 81 */
-    dummy_handler,         /* reserved 82 */
-    dummy_handler,         /* reserved 83 */
-    dummy_handler,         /* reserved 84 */
-    dummy_handler,         /* reserved 85 */
-    dummy_handler,         /* reserved 86 */
-    dummy_handler,         /* reserved 87 */
-    dummy_handler,         /* reserved 88 */
-    dummy_handler,         /* reserved 89 */
-    dummy_handler,         /* reserved 90 */
-    dummy_handler,         /* reserved 91 */
-    dummy_handler,         /* reserved 92 */
-    dummy_handler,         /* reserved 93 */
-    dummy_handler,         /* reserved 94 */
-    dummy_handler,         /* reserved 95 */
-    dummy_handler,         /* reserved 96 */
-    dummy_handler,         /* reserved 97 */
-    dummy_handler,         /* reserved 98 */
-    dummy_handler,         /* reserved 99 */
-    dummy_handler,         /* reserved 100 */
-    dummy_handler,         /* reserved 101 */
-    dummy_handler,         /* reserved 102 */
-    dummy_handler,         /* reserved 103 */
-    dummy_handler,         /* reserved 104 */
-    dummy_handler,         /* reserved 105 */
-    dummy_handler,         /* reserved 106 */
-    dummy_handler,         /* reserved 107 */
-    dummy_handler,         /* reserved 108 */
-    dummy_handler,         /* reserved 109 */
-    dummy_handler,         /* reserved 110 */
-    dummy_handler,         /* reserved 111 */
-    dummy_handler,         /* reserved 112 */
-    dummy_handler,         /* reserved 113 */
-    dummy_handler,         /* reserved 114 */
-    dummy_handler,         /* reserved 115 */
-    dummy_handler,         /* reserved 116 */
-    dummy_handler,         /* reserved 117 */
-    dummy_handler,         /* reserved 118 */
-    dummy_handler,         /* reserved 119 */
-    dummy_handler,         /* reserved 120 */
-    dummy_handler,         /* reserved 121 */
-    dummy_handler,         /* reserved 122 */
-    dummy_handler,         /* reserved 123 */
-    dummy_handler,         /* reserved 124 */
-    dummy_handler,         /* reserved 125 */
-    dummy_handler,         /* reserved 126 */
-    dummy_handler,         /* reserved 127 */
-    dummy_handler,         /* reserved 128 */
-    dummy_handler,         /* reserved 129 */
-    dummy_handler,         /* reserved 130 */
-    dummy_handler,         /* reserved 131 */
-    dummy_handler,         /* reserved 132 */
-    dummy_handler,         /* reserved 133 */
-    dummy_handler,         /* reserved 134 */
-    dummy_handler,         /* reserved 135 */
-    dummy_handler,         /* reserved 136 */
-    dummy_handler,         /* reserved 137 */
-    dummy_handler,         /* reserved 138 */
-    dummy_handler,         /* reserved 139 */
-    dummy_handler,         /* reserved 140 */
-    dummy_handler,         /* reserved 141 */
-    dummy_handler,         /* reserved 142 */
-    dummy_handler,         /* reserved 143 */
-    dummy_handler,         /* reserved 144 */
-    dummy_handler,         /* reserved 145 */
-    dummy_handler,         /* reserved 146 */
-    dummy_handler,         /* reserved 147 */
-    dummy_handler,         /* reserved 148 */
-    dummy_handler,         /* reserved 149 */
-    dummy_handler,         /* reserved 150 */
-    dummy_handler,         /* reserved 151 */
-    dummy_handler,         /* reserved 152 */
-    dummy_handler,         /* reserved 153 */
-    dummy_handler,         /* reserved 154 */
-    dummy_handler,         /* reserved 155 */
-    dummy_handler,         /* reserved 156 */
-    dummy_handler,         /* reserved 157 */
-    dummy_handler,         /* reserved 158 */
-    dummy_handler,         /* reserved 159 */
-    dummy_handler,         /* reserved 160 */
-    dummy_handler,         /* reserved 161 */
-    dummy_handler,         /* reserved 162 */
-    dummy_handler,         /* reserved 163 */
-    dummy_handler,         /* reserved 164 */
-    dummy_handler,         /* reserved 165 */
-    dummy_handler,         /* reserved 166 */
-    dummy_handler,         /* reserved 167 */
-    dummy_handler,         /* reserved 168 */
-    dummy_handler,         /* reserved 169 */
-    dummy_handler,         /* reserved 170 */
-    dummy_handler,         /* reserved 171 */
-    dummy_handler,         /* reserved 172 */
-    dummy_handler,         /* reserved 173 */
-    dummy_handler,         /* reserved 174 */
-    dummy_handler,         /* reserved 175 */
-    dummy_handler,         /* reserved 176 */
-    dummy_handler,         /* reserved 177 */
-    dummy_handler,         /* reserved 178 */
-    dummy_handler,         /* reserved 179 */
-    dummy_handler,         /* reserved 180 */
-    dummy_handler,         /* reserved 181 */
-    dummy_handler,         /* reserved 182 */
-    dummy_handler,         /* reserved 183 */
-    dummy_handler,         /* reserved 184 */
-    dummy_handler,         /* reserved 185 */
-    dummy_handler,         /* reserved 186 */
-    dummy_handler,         /* reserved 187 */
-    dummy_handler,         /* reserved 188 */
-    dummy_handler,         /* reserved 189 */
-    dummy_handler,         /* reserved 190 */
-    dummy_handler,         /* reserved 191 */
-    dummy_handler,         /* reserved 192 */
-    dummy_handler,         /* reserved 193 */
-    dummy_handler,         /* reserved 194 */
-    dummy_handler,         /* reserved 195 */
-    dummy_handler,         /* reserved 196 */
-    dummy_handler,         /* reserved 197 */
-    dummy_handler,         /* reserved 198 */
-    dummy_handler,         /* reserved 199 */
-    dummy_handler,         /* reserved 200 */
-    dummy_handler,         /* reserved 201 */
-    dummy_handler,         /* reserved 202 */
-    dummy_handler,         /* reserved 203 */
-    dummy_handler,         /* reserved 204 */
-    dummy_handler,         /* reserved 205 */
-    dummy_handler,         /* reserved 206 */
-    dummy_handler,         /* reserved 207 */
-    dummy_handler,         /* reserved 208 */
-    dummy_handler,         /* reserved 209 */
-    dummy_handler,         /* reserved 210 */
-    dummy_handler,         /* reserved 211 */
-    dummy_handler,         /* reserved 212 */
-    dummy_handler,         /* reserved 213 */
-    dummy_handler,         /* reserved 214 */
-    dummy_handler,         /* reserved 215 */
-    dummy_handler,         /* reserved 216 */
-    dummy_handler,         /* reserved 217 */
-    dummy_handler,         /* reserved 218 */
-    dummy_handler,         /* reserved 219 */
-    dummy_handler,         /* reserved 220 */
-    dummy_handler,         /* reserved 221 */
-    dummy_handler,         /* reserved 222 */
-    dummy_handler,         /* reserved 223 */
-    dummy_handler,         /* reserved 224 */
-    dummy_handler,         /* reserved 225 */
-    dummy_handler,         /* reserved 226 */
-    dummy_handler,         /* reserved 227 */
-    dummy_handler,         /* reserved 228 */
-    dummy_handler,         /* reserved 229 */
-    dummy_handler,         /* reserved 230 */
-    dummy_handler,         /* reserved 231 */
-    dummy_handler,         /* reserved 232 */
-    dummy_handler,         /* reserved 233 */
-    dummy_handler,         /* reserved 234 */
-    dummy_handler,         /* reserved 235 */
-    dummy_handler,         /* reserved 236 */
-    dummy_handler,         /* reserved 237 */
-    dummy_handler,         /* reserved 238 */
-    dummy_handler,         /* reserved 239 */
-    dummy_handler,         /* reserved 240 */
-    dummy_handler,         /* reserved 241 */
-    dummy_handler,         /* reserved 242 */
-    dummy_handler,         /* reserved 243 */
-    dummy_handler,         /* reserved 244 */
-    dummy_handler,         /* reserved 245 */
-    dummy_handler,         /* reserved 246 */
-    dummy_handler,         /* reserved 247 */
-    dummy_handler,         /* reserved 248 */
-    dummy_handler,         /* reserved 249 */
-    dummy_handler,         /* reserved 250 */
-    dummy_handler,         /* reserved 251 */
-    dummy_handler,         /* reserved 252 */
-    dummy_handler,         /* reserved 253 */
-    dummy_handler,         /* reserved 254 */
-    dummy_handler,         /* reserved 255 */
+    [ 0] = isr_DMA0,            /* DMA channel 0 transfer complete */
+    [ 1] = isr_DMA1,            /* DMA channel 1 transfer complete */
+    [ 2] = isr_DMA2,            /* DMA channel 2 transfer complete */
+    [ 3] = isr_DMA3,            /* DMA channel 3 transfer complete */
+    [ 4] = isr_DMA4,            /* DMA channel 4 transfer complete */
+    [ 5] = isr_DMA5,            /* DMA channel 5 transfer complete */
+    [ 6] = isr_DMA6,            /* DMA channel 6 transfer complete */
+    [ 7] = isr_DMA7,            /* DMA channel 7 transfer complete */
+    [ 8] = isr_DMA8,            /* DMA channel 8 transfer complete */
+    [ 9] = isr_DMA9,            /* DMA channel 9 transfer complete */
+    [10] = isr_DMA10,           /* DMA channel 10 transfer complete */
+    [11] = isr_DMA11,           /* DMA channel 11 transfer complete */
+    [12] = isr_DMA12,           /* DMA channel 12 transfer complete */
+    [13] = isr_DMA13,           /* DMA channel 13 transfer complete */
+    [14] = isr_DMA14,           /* DMA channel 14 transfer complete */
+    [15] = isr_DMA15,           /* DMA channel 15 transfer complete */
+    [16] = isr_DMA_Error,       /* DMA channel 0 - 15 error */
+    [17] = isr_MCM,             /* MCM normal interrupt */
+    [18] = isr_FTFL,            /* FTFL command complete */
+    [19] = isr_FTFL_Collision,  /* FTFL read collision */
+    [20] = isr_LVD_LVW,         /* PMC controller low-voltage detect, low-voltage warning */
+    [21] = isr_LLWU,            /* Low leakage wakeup */
+    [22] = isr_WDOG_EWM,        /* Single interrupt vector for WDOG and EWM */
+    [23] = isr_RNG,             /* Randon number generator */
+    [24] = isr_I2C0,            /* Inter-integrated circuit 0 */
+    [25] = isr_I2C1,            /* Inter-integrated circuit 1 */
+    [26] = isr_SPI0,            /* Serial peripheral Interface 0 */
+    [27] = isr_SPI1,            /* Serial peripheral Interface 1 */
+    [28] = isr_I2S0_Tx,         /* Integrated interchip sound 0 transmit interrupt */
+    [29] = isr_I2S0_Rx,         /* Integrated interchip sound 0 receive interrupt */
+    [31] = isr_UART0_RX_TX,     /* UART0 receive/transmit interrupt */
+    [32] = isr_UART0_ERR,       /* UART0 error interrupt */
+    [33] = isr_UART1_RX_TX,     /* UART1 receive/transmit interrupt */
+    [34] = isr_UART1_ERR,       /* UART1 error interrupt */
+    [35] = isr_UART2_RX_TX,     /* UART2 receive/transmit interrupt */
+    [36] = isr_UART2_ERR,       /* UART2 error interrupt */
+    [39] = isr_ADC0,            /* Analog-to-digital converter 0 */
+    [40] = isr_CMP0,            /* Comparator 0 */
+    [41] = isr_CMP1,            /* Comparator 1 */
+    [42] = isr_FTM0,            /* FlexTimer module 0 fault, overflow and channels interrupt */
+    [43] = isr_FTM1,            /* FlexTimer module 1 fault, overflow and channels interrupt */
+    [44] = isr_FTM2,            /* FlexTimer module 2 fault, overflow and channels interrupt */
+    [45] = isr_CMT,             /* Carrier modulator transmitter */
+    [46] = isr_RTC,             /* Real time clock */
+    [47] = isr_RTC_Seconds,     /* Real time clock seconds */
+    [48] = isr_PIT0,            /* Periodic interrupt timer channel 0 */
+    [49] = isr_PIT1,            /* Periodic interrupt timer channel 1 */
+    [50] = isr_PIT2,            /* Periodic interrupt timer channel 2 */
+    [51] = isr_PIT3,            /* Periodic interrupt timer channel 3 */
+    [52] = isr_PDB0,            /* Programmable delay block */
+    [53] = isr_USB0,            /* USB OTG interrupt */
+    [54] = isr_USBDCD,          /* USB charger detect */
+    [57] = isr_MCG,             /* Multipurpose clock generator */
+    [58] = isr_LPTMR0,          /* Low power timer interrupt */
+    [59] = isr_PORTA,           /* Port A pin detect interrupt */
+    [60] = isr_PORTB,           /* Port B pin detect interrupt */
+    [61] = isr_PORTC,           /* Port C pin detect interrupt */
+    [62] = isr_PORTD,           /* Port D pin detect interrupt */
+    [63] = isr_PORTE,           /* Port E pin detect interrupt */
+    [64] = isr_SWI,             /* Software interrupt */
 };
