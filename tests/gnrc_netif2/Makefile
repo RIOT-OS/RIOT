@@ -2,7 +2,7 @@
 APPLICATION = gnrc_ipv6_nib
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 calliope-mini \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini \
                              cc2650-launchpad cc2650stk chronos maple-mini \
                              microbit msb-430 msb-430h nrf51dongle nrf6310 \
                              nucleo-f030 nucleo-f070 nucleo-f072 nucleo-f103 \
