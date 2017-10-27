@@ -45,6 +45,10 @@ extern "C" {
 #define PROVIDES_PM_OFF
 #endif
 
+#ifndef PROVIDES_PM_SET_LOWEST
+#define PROVIDES_PM_SET_LOWEST
+#endif
+
 /**
  * @brief   Block a power mode
  *
