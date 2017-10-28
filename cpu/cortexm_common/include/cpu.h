@@ -42,6 +42,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Set this to 1 to disable all sleep (useful for debugging)
+ *
+ * Example: CFLAGS=-DCPU_NOSLEEP make flash
+ */
+#ifndef CPU_NOSLEEP
+#define CPU_NOSLEEP 0
+#endif
+
+/**
  * @brief Interrupt stack canary value
  *
  * @note 0xe7fe is the ARM Thumb machine code equivalent of asm("bl #-2\n") or
@@ -96,6 +105,9 @@ static inline void cortexm_sleep_until_event(void)
  */
 static inline void cortexm_sleep(int deep)
 {
+    if (CPU_NOSLEEP) {
+        return;
+    }
     if (deep) {
         SCB->SCR |=  (SCB_SCR_SLEEPDEEP_Msk);
     }
