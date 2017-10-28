@@ -26,6 +26,8 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+
+#define PADDING_TYPE_PKCS7 1
   
 #define PADDING_NOT_ENOUGH_SPACE_AVAILABLE -1
 #define PADDING_INVALID_BLOCKSIZE -2
@@ -44,7 +46,7 @@ extern "C" {
  * @return           The length of the padded data stored or a (negative) error code
  *
  */
-  int32_t pkcs7_padding (uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *padded_data, uint32_t padded_data_len);
+  int32_t pkcs7_padding (const uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *padded_data, uint32_t padded_data_len);
 
   /**
  * @brief Remove PKCS#7 padding from some date
