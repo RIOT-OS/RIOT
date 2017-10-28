@@ -603,6 +603,14 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += auto_init_saul
 endif
 
+ifneq (,$(filter saul_adc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
+ifneq (,$(filter saul_gpio,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 ifneq (,$(filter saul,$(USEMODULE)))
   USEMODULE += phydat
 endif
