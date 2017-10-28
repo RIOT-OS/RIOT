@@ -1,0 +1,3 @@
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += periph_rtt
+endif

@@ -1,0 +1,1 @@
+-include $(RIOTCPU)/k64f/Makefile.dep
