@@ -50,6 +50,15 @@ static void test_pad_pkcs7_op (uint8_t *data, uint32_t data_len, uint8_t blocksi
   TEST_ASSERT_MESSAGE(0 == memcmp(padded_data, expected_data, padded_length) , "Data padded incorrectly.");
 }
 
+static void test_unpad_pkcs7_op (uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *expected_data, uint32_t expected_data_len) {
+  uint8_t unpadded_data[data_len];
+  int32_t unpadded_length = pkcs7_padding_remove(data, data_len, blocksize, unpadded_data, data_len);
+
+  TEST_ASSERT_MESSAGE(unpadded_length > 0, "Remove padding failed");
+  TEST_ASSERT_MESSAGE((unsigned int)unpadded_length == expected_data_len, "Unpadded data has wrong length");
+  TEST_ASSERT_MESSAGE(0 == memcmp(unpadded_data, expected_data, unpadded_length) , "Data unpadded incorrectly.");
+}
+
 
 static void test_pkcs7_padding(void)
 {
@@ -63,10 +72,23 @@ static void test_pkcs7_padding(void)
 		    TEST_4_BLOCKSIZE, TEST_4_PADDED_DATA, sizeof(TEST_4_PADDED_DATA));
 }
 
+static void test_pkcs7_padding_remove(void)
+{
+  test_unpad_pkcs7_op(TEST_1_PADDED_DATA, sizeof(TEST_1_PADDED_DATA), TEST_1_BLOCKSIZE,
+		    TEST_DATA, sizeof(TEST_DATA));
+  test_unpad_pkcs7_op(TEST_2_PADDED_DATA, sizeof(TEST_2_PADDED_DATA), TEST_2_BLOCKSIZE,
+		      TEST_DATA, sizeof(TEST_DATA));
+  test_unpad_pkcs7_op(TEST_3_PADDED_DATA, sizeof(TEST_3_PADDED_DATA), TEST_3_BLOCKSIZE,
+		      TEST_DATA, sizeof(TEST_DATA));
+  test_unpad_pkcs7_op(TEST_4_PADDED_DATA, sizeof(TEST_4_PADDED_DATA), TEST_4_BLOCKSIZE,
+		      TEST_DATA, sizeof(TEST_DATA));
+}
+
 Test* tests_crypto_padding_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_pkcs7_padding),
+	  new_TestFixture(test_pkcs7_padding_remove),
     };
 
     EMB_UNIT_TESTCALLER(crypto_padding_tests, NULL, NULL, fixtures);
