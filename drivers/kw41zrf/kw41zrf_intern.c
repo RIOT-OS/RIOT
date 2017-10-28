@@ -101,6 +101,14 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
                 /* Already awake */
                 break;
             }
+            /* Disable some CPU power management if we need to be active, otherwise the
+             * radio will be stuck in state retention mode. */
+            if (!dev->pm_blocked) {
+                pm_block(KINETIS_PM_LLS);
+                dev->pm_blocked = true;
+            }
+            /* Wait for oscillator ready signal before attempting to recover from DSM */
+            while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
             /* Assume DSM timer has been running since we entered sleep mode */
             /* In case it was not already running, however, we still set the
              * enable flag here. */
@@ -124,6 +132,10 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
             if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
                 /* Already asleep */
                 break;
+            }
+            if (dev->pm_blocked) {
+                pm_unblock(KINETIS_PM_LLS);
+                dev->pm_blocked = false;
             }
             /* Clear IRQ flags */
             RSIM->DSM_CONTROL = RSIM->DSM_CONTROL;
@@ -159,16 +171,6 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
     assert((ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK) == XCVSEQ_IDLE);
     while ((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_SEQ_IDLE_MASK) == 0) {
         kw41zrf_abort_sequence(dev);
-    }
-    /* Disable some CPU power management if we need to be active, otherwise the
-     * radio will be stuck in state retention mode. */
-    if (!dev->pm_blocked && ((seq & ZLL_PHY_CTRL_XCVSEQ_MASK) != XCVSEQ_IDLE)) {
-        pm_block(KINETIS_PM_LLS);
-        dev->pm_blocked = true;
-    }
-    else if (dev->pm_blocked && ((seq & ZLL_PHY_CTRL_XCVSEQ_MASK) != XCVSEQ_IDLE)) {
-        pm_unblock(KINETIS_PM_LLS);
-        dev->pm_blocked = false;
     }
 
     /* Clear interrupt flags, sometimes the sequence complete flag is immediately set */

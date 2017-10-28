@@ -28,6 +28,7 @@
 #include "net/ieee802154.h"
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
+#include "pm_layered.h"
 
 #include "kw41zrf.h"
 #include "kw41zrf_netdev.h"
@@ -180,7 +181,7 @@ static void kw41zrf_tx_exec(kw41zrf_t *dev)
  */
 static void kw41zrf_wait_idle(kw41zrf_t *dev)
 {
-    /* Wait for oscillator ready signal when coming out of sleep mode */
+    /* Wait for oscillator ready signal if coming out of sleep mode */
     while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
     /* make sure any ongoing T or TR sequence is finished */
     if (kw41zrf_can_switch_to_idle(dev) == 0) {
@@ -188,6 +189,7 @@ static void kw41zrf_wait_idle(kw41zrf_t *dev)
         num_irqs_handled = num_irqs_queued;
         spinning_for_irq = 1;
         thread_flags_clear(KW41ZRF_THREAD_FLAG_ISR);
+        pm_block(KINETIS_PM_LLS);
         while (1) {
             /* TX in progress */
             /* Handle any outstanding IRQ first */
@@ -201,6 +203,7 @@ static void kw41zrf_wait_idle(kw41zrf_t *dev)
             thread_flags_wait_any(KW41ZRF_THREAD_FLAG_ISR);
             DEBUG("[kw41zrf] waited ISR\n");
         }
+        pm_unblock(KINETIS_PM_LLS);
         spinning_for_irq = 0;
         DEBUG("[kw41zrf] previous TX done\n");
     }
@@ -414,6 +417,9 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
         return -ENODEV;
     }
 
+    /* Wait for oscillator ready signal if coming out of sleep mode */
+    while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
+
     switch (opt) {
         case NETOPT_MAX_PACKET_SIZE:
             if (len < sizeof(int16_t)) {
@@ -586,6 +592,9 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
     if (dev == NULL) {
         return -ENODEV;
     }
+
+    /* Wait for oscillator ready signal if coming out of sleep mode */
+    while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
 
     switch (opt) {
         case NETOPT_ADDRESS:

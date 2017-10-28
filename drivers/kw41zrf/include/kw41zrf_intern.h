@@ -57,6 +57,7 @@ typedef enum kw41zrf_timer_timebase {
 static inline void kw41zrf_mask_irqs(void)
 {
     NVIC_DisableIRQ(Radio_1_IRQn);
+    NVIC_ClearPendingIRQ(Radio_1_IRQn);
 }
 
 /**
