@@ -180,6 +180,8 @@ static void kw41zrf_tx_exec(kw41zrf_t *dev)
  */
 static void kw41zrf_wait_idle(kw41zrf_t *dev)
 {
+    /* Wait for oscillator ready signal when coming out of sleep mode */
+    while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
     /* make sure any ongoing T or TR sequence is finished */
     if (kw41zrf_can_switch_to_idle(dev) == 0) {
         DEBUG("[kw41zrf] TX already in progress\n");
