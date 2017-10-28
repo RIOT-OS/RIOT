@@ -84,11 +84,31 @@ static void test_pkcs7_padding_remove(void)
 		      TEST_DATA, sizeof(TEST_DATA));
 }
 
+static void test_pkcs7_padding_remove_bad_data_length(void)
+{
+  uint8_t data[] = {0x01};
+  uint8_t blocksize = 8;
+  uint8_t unpadded_data[blocksize];
+  int32_t rv = pkcs7_padding_remove(data, sizeof(data), blocksize, unpadded_data, sizeof(unpadded_data));
+  TEST_ASSERT_EQUAL_INT(PADDING_INVALID_PADDING, rv);
+}
+
+static void test_pkcs7_padding_remove_bad_padding(void)
+{
+  uint8_t data[] = {0xff, 0xff, 0xff, 0x2};
+  uint8_t blocksize = 4;
+  uint8_t unpadded_data[blocksize];
+  int32_t rv = pkcs7_padding_remove(data, sizeof(data), blocksize, unpadded_data, sizeof(unpadded_data));
+  TEST_ASSERT_EQUAL_INT(PADDING_INVALID_PADDING, rv);
+}
+
 Test* tests_crypto_padding_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_pkcs7_padding),
 	  new_TestFixture(test_pkcs7_padding_remove),
+	  new_TestFixture(test_pkcs7_padding_remove_bad_data_length),
+	  	  new_TestFixture(test_pkcs7_padding_remove_bad_padding),
     };
 
     EMB_UNIT_TESTCALLER(crypto_padding_tests, NULL, NULL, fixtures);
