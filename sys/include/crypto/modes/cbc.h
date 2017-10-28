@@ -41,10 +41,10 @@ extern "C" {
  * @return           The length of the encrypted data or a (negative) error code
  *
  */
-int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
-                       size_t input_len, uint8_t* output);
+int cipher_encrypt_cbc(cipher_t * cipher, uint8_t iv[16], const uint8_t * input,
+                       size_t input_len, uint8_t * output);
 
-  /**
+/**
  * @brief Encrypt data of arbitrary length in cipher block chaining mode and pad the data.
  *
  * @param cipher        Already initialized cipher struct
@@ -59,8 +59,8 @@ int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
  * @return              The length of the encrypted data or a (negative) error code
  *
  */
-int cipher_encrypt_cbc_with_padding(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
-				    size_t input_len, uint8_t* output, uint8_t padding_type);
+int cipher_encrypt_cbc_with_padding(cipher_t * cipher, uint8_t iv[16], const uint8_t * input,
+                                    size_t input_len, uint8_t * output, uint8_t padding_type);
 
 
 /**
@@ -76,10 +76,10 @@ int cipher_encrypt_cbc_with_padding(cipher_t* cipher, uint8_t iv[16], const uint
  * @return           The length of the decrypted data or a (negative) error code
  *
  */
-int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
-                       size_t input_len, uint8_t* output);
+int cipher_decrypt_cbc(cipher_t * cipher, uint8_t iv[16], const uint8_t * input,
+                       size_t input_len, uint8_t * output);
 
-  /**
+/**
  * @brief Decrypt an unpad encrypted data in cipher block chaining mode.
  *
  * @param cipher     Already initialized cipher struct
@@ -93,8 +93,8 @@ int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
  * @return           The length of the decrypted data or a (negative) error code
  *
  */
-int cipher_decrypt_cbc_with_padding(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
-				    size_t input_len, uint8_t* output, uint8_t padding_type);
+int cipher_decrypt_cbc_with_padding(cipher_t * cipher, uint8_t iv[16], const uint8_t * input,
+                                    size_t input_len, uint8_t * output, uint8_t padding_type);
 
 #ifdef __cplusplus
 }

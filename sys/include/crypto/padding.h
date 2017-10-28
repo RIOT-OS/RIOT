@@ -28,12 +28,12 @@ extern "C" {
 #include <stdint.h>
 
 #define PADDING_TYPE_PKCS7 1
-  
+
 #define PADDING_NOT_ENOUGH_SPACE_AVAILABLE -1
 #define PADDING_INVALID_BLOCKSIZE -2
 #define PADDING_INVALID_PADDING -3
 #define PADDING_DATA_TOO_LONG -4
-  
+
 /**
  * @brief Apply PKCS#7 padding to some date
  *
@@ -46,21 +46,21 @@ extern "C" {
  * @return           The length of the padded data stored or a (negative) error code
  *
  */
-  int32_t pkcs7_padding (const uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *padded_data, uint32_t padded_data_len);
+int32_t pkcs7_padding(const uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *padded_data, uint32_t padded_data_len);
 
-  /**
+/**
  * @brief Remove PKCS#7 padding from some date
  *
  * @param data              The padded data
  * @param data_len          The length of the padded data. Must be a multiple of the blocksize.
- * @param blocksize         The length of the block. 
+ * @param blocksize         The length of the block.
  * @param unpadded_data     Place to store the unpadded data
  * @param unpadded_data_len Amount of data available for storage
  *
  * @return           The length of the unpadded data stored or a (negative) error code
  *
  */
-  int32_t pkcs7_padding_remove (uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *unpadded_data, uint32_t unpadded_data_len);
+int32_t pkcs7_padding_remove(uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *unpadded_data, uint32_t unpadded_data_len);
 
 #ifdef __cplusplus
 }

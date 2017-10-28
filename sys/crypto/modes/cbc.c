@@ -22,12 +22,12 @@
 #include <string.h>
 #include "crypto/modes/cbc.h"
 
-int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16],
-                       const uint8_t* input, size_t length, uint8_t* output)
+int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16],
+                       const uint8_t *input, size_t length, uint8_t *output)
 {
     size_t offset = 0;
-    uint8_t block_size, input_block[CIPHER_MAX_BLOCK_SIZE] = {0},
-            *output_block_last;
+    uint8_t block_size, input_block[CIPHER_MAX_BLOCK_SIZE] = { 0 },
+    *output_block_last;
 
     block_size = cipher_get_block_size(cipher);
     if (length % block_size != 0) {
@@ -53,22 +53,25 @@ int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16],
     return offset;
 }
 
-int cipher_encrypt_cbc_with_padding(cipher_t* cipher, uint8_t iv[16],
-				    const uint8_t* input, size_t length, uint8_t* output, uint8_t padding_type) {
-  if(padding_type == PADDING_TYPE_PKCS7) {
-    uint8_t padded_data[length+cipher->interface->block_size];
-    int32_t padded_length = pkcs7_padding(input, length, cipher->interface->block_size, padded_data, sizeof(padded_data));
-    if(padded_length < 0)
-      return CIPHER_ERR_PADDING_ERROR;
-    return cipher_encrypt_cbc(cipher, iv, padded_data, padded_length, output);
-  } else {
-    return CIPHER_ERR_UNKNOWN_PADDING;
-  }
+int cipher_encrypt_cbc_with_padding(cipher_t *cipher, uint8_t iv[16],
+                                    const uint8_t *input, size_t length, uint8_t *output, uint8_t padding_type)
+{
+    if (padding_type == PADDING_TYPE_PKCS7) {
+        uint8_t padded_data[length + cipher->interface->block_size];
+        int32_t padded_length = pkcs7_padding(input, length, cipher->interface->block_size, padded_data, sizeof(padded_data));
+        if (padded_length < 0) {
+            return CIPHER_ERR_PADDING_ERROR;
+        }
+        return cipher_encrypt_cbc(cipher, iv, padded_data, padded_length, output);
+    }
+    else {
+        return CIPHER_ERR_UNKNOWN_PADDING;
+    }
 }
 
 
-int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16],
-                       const uint8_t* input, size_t length, uint8_t* output)
+int cipher_decrypt_cbc(cipher_t *cipher, uint8_t iv[16],
+                       const uint8_t *input, size_t length, uint8_t *output)
 {
     size_t offset = 0;
     const uint8_t *input_block, *input_block_last;
@@ -101,19 +104,23 @@ int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16],
     return offset;
 }
 
-int cipher_decrypt_cbc_with_padding(cipher_t* cipher, uint8_t iv[16],
-				    const uint8_t* input, size_t length, uint8_t* output, uint8_t padding_type) {
-  if(padding_type == PADDING_TYPE_PKCS7) {
-    int decrypted_len = cipher_decrypt_cbc(cipher, iv, input, length, output);
-    if(decrypted_len < 0)
-      return decrypted_len;
-    /* Decryption worked. Now remove the padding. */
-    uint8_t unpadded_data[decrypted_len];
-    int32_t unpadded_length = pkcs7_padding_remove(output, length, cipher->interface->block_size, unpadded_data, sizeof(unpadded_data));    if(unpadded_length < 0)
-      return CIPHER_ERR_PADDING_ERROR;
-    memcpy(output, unpadded_data, unpadded_length);
-    return unpadded_length;
-  } else {
-    return CIPHER_ERR_UNKNOWN_PADDING;
-  }
+int cipher_decrypt_cbc_with_padding(cipher_t *cipher, uint8_t iv[16],
+                                    const uint8_t *input, size_t length, uint8_t *output, uint8_t padding_type)
+{
+    if (padding_type == PADDING_TYPE_PKCS7) {
+        int decrypted_len = cipher_decrypt_cbc(cipher, iv, input, length, output);
+        if (decrypted_len < 0) {
+            return decrypted_len;
+        }
+        /* Decryption worked. Now remove the padding. */
+        uint8_t unpadded_data[decrypted_len];
+        int32_t unpadded_length = pkcs7_padding_remove(output, length, cipher->interface->block_size, unpadded_data, sizeof(unpadded_data));    if (unpadded_length < 0) {
+            return CIPHER_ERR_PADDING_ERROR;
+        }
+        memcpy(output, unpadded_data, unpadded_length);
+        return unpadded_length;
+    }
+    else {
+        return CIPHER_ERR_UNKNOWN_PADDING;
+    }
 }

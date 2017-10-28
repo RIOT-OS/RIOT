@@ -63,15 +63,15 @@ static uint8_t TEST_1_CIPHER_LEN = 64;
 
 /* Testdata for padding created with
    echo -n "12345" |openssl enc -aes-128-cbc -K 112233445566778899aabbccddeeff00 -iv 0102030405060708090a0b0c0d0e0f00 |xxd
-00000000: 521b 490a ccb4 fade 68bb caee 885d 9f11
-*/
-static uint8_t TEST_PKCS7_PADDING_KEY[] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00};
-static uint8_t TEST_PKCS7_PADDING_IV[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x00};
-static uint8_t TEST_PKCS7_PADDING_PLAIN[] = {0x31, 0x32, 0x33, 0x34, 0x35};
-static uint8_t TEST_PKCS7_PADDING_CIPHER[] = {0x52, 0x1b, 0x49, 0x0a, 0xcc, 0xb4, 0xfa, 0xde, 0x68, 0xbb, 0xca, 0xee, 0x88, 0x5d, 0x9f, 0x11};
+   00000000: 521b 490a ccb4 fade 68bb caee 885d 9f11
+ */
+static uint8_t TEST_PKCS7_PADDING_KEY[] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00 };
+static uint8_t TEST_PKCS7_PADDING_IV[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x00 };
+static uint8_t TEST_PKCS7_PADDING_PLAIN[] = { 0x31, 0x32, 0x33, 0x34, 0x35 };
+static uint8_t TEST_PKCS7_PADDING_CIPHER[] = { 0x52, 0x1b, 0x49, 0x0a, 0xcc, 0xb4, 0xfa, 0xde, 0x68, 0xbb, 0xca, 0xee, 0x88, 0x5d, 0x9f, 0x11 };
 
-static void test_encrypt_op(uint8_t* key, uint8_t key_len, uint8_t iv[16],
-                            uint8_t* input, uint8_t input_len, uint8_t* output,
+static void test_encrypt_op(uint8_t *key, uint8_t key_len, uint8_t iv[16],
+                            uint8_t *input, uint8_t input_len, uint8_t *output,
                             uint8_t output_len)
 {
     cipher_t cipher;
@@ -86,13 +86,13 @@ static void test_encrypt_op(uint8_t* key, uint8_t key_len, uint8_t iv[16],
 
     TEST_ASSERT_EQUAL_INT(output_len, len);
     cmp = compare(output, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 
 }
 
-static void test_encrypt_op_with_padding(uint8_t* key, uint8_t key_len, uint8_t iv[16],
-                            uint8_t* input, uint8_t input_len, uint8_t* output,
-					 uint8_t output_len, uint8_t padding_type)
+static void test_encrypt_op_with_padding(uint8_t *key, uint8_t key_len, uint8_t iv[16],
+                                         uint8_t *input, uint8_t input_len, uint8_t *output,
+                                         uint8_t output_len, uint8_t padding_type)
 {
     cipher_t cipher;
     int len, err, cmp;
@@ -106,12 +106,12 @@ static void test_encrypt_op_with_padding(uint8_t* key, uint8_t key_len, uint8_t 
 
     TEST_ASSERT_EQUAL_INT(output_len, len);
     cmp = compare(output, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 
 }
 
-static void test_decrypt_op(uint8_t* key, uint8_t key_len, uint8_t iv[16],
-                            uint8_t* input, uint8_t input_len, uint8_t* output,
+static void test_decrypt_op(uint8_t *key, uint8_t key_len, uint8_t iv[16],
+                            uint8_t *input, uint8_t input_len, uint8_t *output,
                             uint8_t output_len)
 {
     cipher_t cipher;
@@ -126,12 +126,12 @@ static void test_decrypt_op(uint8_t* key, uint8_t key_len, uint8_t iv[16],
 
     TEST_ASSERT_EQUAL_INT(output_len, len);
     cmp = compare(output, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 }
 
-static void test_decrypt_op_with_padding(uint8_t* key, uint8_t key_len, uint8_t iv[16],
-                            uint8_t* input, uint8_t input_len, uint8_t* output,
-					 uint8_t output_len, uint8_t padding_type)
+static void test_decrypt_op_with_padding(uint8_t *key, uint8_t key_len, uint8_t iv[16],
+                                         uint8_t *input, uint8_t input_len, uint8_t *output,
+                                         uint8_t output_len, uint8_t padding_type)
 {
     cipher_t cipher;
     int len, err, cmp;
@@ -145,7 +145,7 @@ static void test_decrypt_op_with_padding(uint8_t* key, uint8_t key_len, uint8_t 
 
     TEST_ASSERT_EQUAL_INT(output_len, len);
     cmp = compare(output, data, len);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 
 }
 
@@ -163,26 +163,26 @@ static void test_crypto_modes_cbc_decrypt(void)
 
 static void test_crypto_modes_cbc_encrypt_with_padding(void)
 {
-  test_encrypt_op_with_padding(TEST_PKCS7_PADDING_KEY, sizeof(TEST_PKCS7_PADDING_KEY), TEST_PKCS7_PADDING_IV, TEST_PKCS7_PADDING_PLAIN,
-			       sizeof(TEST_PKCS7_PADDING_PLAIN), TEST_PKCS7_PADDING_CIPHER, sizeof(TEST_PKCS7_PADDING_CIPHER), PADDING_TYPE_PKCS7);
+    test_encrypt_op_with_padding(TEST_PKCS7_PADDING_KEY, sizeof(TEST_PKCS7_PADDING_KEY), TEST_PKCS7_PADDING_IV, TEST_PKCS7_PADDING_PLAIN,
+                                 sizeof(TEST_PKCS7_PADDING_PLAIN), TEST_PKCS7_PADDING_CIPHER, sizeof(TEST_PKCS7_PADDING_CIPHER), PADDING_TYPE_PKCS7);
 }
 
 static void test_crypto_modes_cbc_decrypt_with_padding(void)
 {
-  test_decrypt_op_with_padding(TEST_PKCS7_PADDING_KEY, sizeof(TEST_PKCS7_PADDING_KEY), TEST_PKCS7_PADDING_IV, TEST_PKCS7_PADDING_CIPHER,
-			       sizeof(TEST_PKCS7_PADDING_CIPHER), TEST_PKCS7_PADDING_PLAIN, sizeof(TEST_PKCS7_PADDING_PLAIN), PADDING_TYPE_PKCS7);
+    test_decrypt_op_with_padding(TEST_PKCS7_PADDING_KEY, sizeof(TEST_PKCS7_PADDING_KEY), TEST_PKCS7_PADDING_IV, TEST_PKCS7_PADDING_CIPHER,
+                                 sizeof(TEST_PKCS7_PADDING_CIPHER), TEST_PKCS7_PADDING_PLAIN, sizeof(TEST_PKCS7_PADDING_PLAIN), PADDING_TYPE_PKCS7);
 }
 
-Test* tests_crypto_modes_cbc_tests(void)
+Test *tests_crypto_modes_cbc_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_modes_cbc_encrypt),
-	  new_TestFixture(test_crypto_modes_cbc_decrypt),
-	  new_TestFixture(test_crypto_modes_cbc_encrypt_with_padding),
-	  new_TestFixture(test_crypto_modes_cbc_decrypt_with_padding),
+        new_TestFixture(test_crypto_modes_cbc_decrypt),
+        new_TestFixture(test_crypto_modes_cbc_encrypt_with_padding),
+        new_TestFixture(test_crypto_modes_cbc_decrypt_with_padding),
     };
 
     EMB_UNIT_TESTCALLER(crypto_modes_cbc_tests, NULL, NULL, fixtures);
 
-    return (Test*)&crypto_modes_cbc_tests;
+    return (Test *)&crypto_modes_cbc_tests;
 }
