@@ -33,7 +33,6 @@
 #include "net/netdev.h"
 
 #include "board.h"
-#include "periph/rtc.h"
 
 #include "sx127x_internal.h"
 #include "sx127x_params.h"
