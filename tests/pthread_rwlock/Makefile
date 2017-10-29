@@ -14,3 +14,6 @@ BOARD_INSUFFICIENT_MEMORY += airfy-beacon chronos mbed_lpc1768 msb-430 msb-430h 
                              spark-core stm32f0discovery yunjia-nrf51822
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py
