@@ -16,7 +16,7 @@
  * simple as possible, to allow for easy implementation and maximal portability.
  *
  * @note        The current version of this interface only supports the
- *              7-bit addressing mode.
+ *              7-bit addressing mode, right justified.
  *
  * @note        This interface is due for remodeling, hence API changes are to
  *              be expected for upcoming releases.
