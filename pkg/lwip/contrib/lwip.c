@@ -71,7 +71,7 @@ void lwip_bootstrap(void)
     /* TODO: do for every eligable netdev */
 #ifdef LWIP_NETIF_NUMOF
 #ifdef MODULE_NETDEV_TAP
-    for (int i = 0; i < LWIP_NETIF_NUMOF; i++) {
+    for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i]);
         if (netif_add(&netif[i], &netdev_taps[i], lwip_netdev_init,
                       tcpip_input) == NULL) {
@@ -80,7 +80,7 @@ void lwip_bootstrap(void)
         }
     }
 #elif defined(MODULE_MRF24J40)
-    for (int i = 0; i < LWIP_NETIF_NUMOF; i++) {
+    for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i]);
         if (netif_add(&netif[i], &mrf24j40_devs[i], lwip_netdev_init,
                       tcpip_6lowpan_input) == NULL) {
@@ -89,7 +89,7 @@ void lwip_bootstrap(void)
         }
     }
 #elif defined(MODULE_AT86RF2XX)
-    for (int i = 0; i < LWIP_NETIF_NUMOF; i++) {
+    for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i]);
         if (netif_add(&netif[i], &at86rf2xx_devs[i], lwip_netdev_init,
                       tcpip_6lowpan_input) == NULL) {

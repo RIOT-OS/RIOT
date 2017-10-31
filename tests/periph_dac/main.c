@@ -39,20 +39,20 @@ int main(void)
          "DAC line. The period of the signal should be around 100ms\n");
 
     /* initialize all DAC lines */
-    for (int i = 0; i < DAC_NUMOF; i++) {
+    for (unsigned i = 0; i < DAC_NUMOF; i++) {
         if (dac_init(DAC_LINE(i)) < 0) {
-            printf("Error initializing DAC_LINE(%i)\n", i);
+            printf("Error initializing DAC_LINE(%u)\n", i);
             return 1;
         }
         else {
-            printf("Successfully initialized DAC_LINE(%i)\n", i);
+            printf("Successfully initialized DAC_LINE(%u)\n", i);
         }
     }
     puts("");
 
     /* create saw tooth signal */
     while (1) {
-        for (int i = 0; i < DAC_NUMOF; i++) {
+        for (unsigned i = 0; i < DAC_NUMOF; i++) {
             dac_set(DAC_LINE(i), val);
         }
         val += step;

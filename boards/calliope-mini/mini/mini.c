@@ -39,8 +39,8 @@
 /**
  * @brief   The electrical number of rows and columns
  */
-#define ROWS_HW             (3)
-#define COLS_HW             (9)
+#define ROWS_HW             (3U)
+#define COLS_HW             (9U)
 
 /**
  * @brief   The refresh rate used for drawing the contents
@@ -111,8 +111,8 @@ static void char2buf(char c, uint8_t *buf)
     const uint8_t *raw = mineplex_char(c);
 
     /* set each row */
-    for (int row = 0; row < ROWS; row++) {
-        for (int col = 0; col < COLS; col++) {
+    for (unsigned row = 0; row < ROWS; row++) {
+        for (unsigned col = 0; col < COLS; col++) {
             buf[(row * COLS) + col] = (raw[row] & (1 << col));
         }
     }
@@ -127,9 +127,9 @@ static void char2buf(char c, uint8_t *buf)
  */
 static void shift_next(uint8_t *cur, const uint8_t *next, uint32_t delay)
 {
-    for (int i = 0; i < COLS; i++) {
-        for (int r = 0; r < ROWS; r++) {
-            for (int c = 0; c < (COLS - 1); c++) {
+    for (unsigned i = 0; i < COLS; i++) {
+        for (unsigned r = 0; r < ROWS; r++) {
+            for (unsigned c = 0; c < (COLS - 1); c++) {
                 cur[(r * COLS) + c] = cur[(r * COLS) + c + 1];
             }
             cur[(r * COLS) + COLS - 1] = next[(r * COLS) + i];
@@ -152,8 +152,8 @@ static void refresh(void *arg, int channel)
     /* goto next row */
     cur_row = ((++cur_row) < ROWS_HW) ? cur_row : 0;
     /* setup columns */
-    int base = (COLS_HW * cur_row);
-    for (int i = 0; i < COLS_HW; i++) {
+    unsigned base = (COLS_HW * cur_row);
+    for (unsigned i = 0; i < COLS_HW; i++) {
         gpio_write(cols[i], !(framebuf[base + i]));
     }
     /* and finally enable the new row */
@@ -163,12 +163,12 @@ static void refresh(void *arg, int channel)
 void mini_matrix_init(void)
 {
     /* initialize rows */
-    for (int i = 0; i < ROWS_HW; i++) {
+    for (unsigned i = 0; i < ROWS_HW; i++) {
         gpio_init(rows[i], GPIO_OUT);
         gpio_clear(rows[i]);
     }
     /* initialize columns */
-    for (int i = 0; i < COLS_HW; i++) {
+    for (unsigned i = 0; i < COLS_HW; i++) {
         gpio_init(cols[i], GPIO_OUT);
         gpio_set(cols[i]);
     }
@@ -195,9 +195,10 @@ void mini_matrix_off(uint8_t row, uint8_t col)
     framebuf[pixmap[row][col]] = 0x00;
 }
 
-void mini_matrix_set_raw(const uint8_t *buf) {
-    for (int row = 0; row < ROWS; row++) {
-        for (int col = 0; col < COLS; col++) {
+void mini_matrix_set_raw(const uint8_t *buf)
+{
+    for (unsigned row = 0; row < ROWS; row++) {
+        for (unsigned col = 0; col < COLS; col++) {
             framebuf[pixmap[row][col]] = buf[(row * COLS) + col];
         }
     }

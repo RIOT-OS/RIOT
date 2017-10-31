@@ -151,7 +151,7 @@ void gpio_write(gpio_t pin, int value)
  */
 void isr_gpio_even(void)
 {
-    for (int i = 0; i < NUMOF_IRQS; i++) {
+    for (unsigned i = 0; i < NUMOF_IRQS; i++) {
         if (GPIO->IF & (1 << i)) {
             isr_ctx[i].cb(isr_ctx[i].arg);
             GPIO->IFC = (1 << i);

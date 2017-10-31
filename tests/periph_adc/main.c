@@ -39,22 +39,22 @@ int main(void)
          "a 10-bit resolution and print the sampled results to STDIO\n\n");
 
     /* initialize all available ADC lines */
-    for (int i = 0; i < ADC_NUMOF; i++) {
+    for (unsigned i = 0; i < ADC_NUMOF; i++) {
         if (adc_init(ADC_LINE(i)) < 0) {
-            printf("Initialization of ADC_LINE(%i) failed\n", i);
+            printf("Initialization of ADC_LINE(%u) failed\n", i);
             return 1;
         } else {
-            printf("Successfully initialized ADC_LINE(%i)\n", i);
+            printf("Successfully initialized ADC_LINE(%u)\n", i);
         }
     }
 
     while (1) {
-        for (int i = 0; i < ADC_NUMOF; i++) {
+        for (unsigned i = 0; i < ADC_NUMOF; i++) {
             sample = adc_sample(ADC_LINE(i), RES);
             if (sample < 0) {
-                printf("ADC_LINE(%i): 10-bit resolution not applicable\n", i);
+                printf("ADC_LINE(%u): 10-bit resolution not applicable\n", i);
             } else {
-                printf("ADC_LINE(%i): %i\n", i, sample);
+                printf("ADC_LINE(%u): %i\n", i, sample);
             }
         }
         xtimer_periodic_wakeup(&last, DELAY);

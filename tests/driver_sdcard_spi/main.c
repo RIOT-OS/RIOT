@@ -278,8 +278,8 @@ static int _write(int argc, char **argv)
 
     /* copy data to a full-block-sized buffer an fill remaining block space according to -r param*/
     char buffer[SD_HC_BLOCK_SIZE];
-    for (int i = 0; i < sizeof(buffer); i++) {
-        if (repeat_data || i < size) {
+    for (unsigned i = 0; i < sizeof(buffer); i++) {
+        if (repeat_data || ((int)i < size)) {
             buffer[i] = data[i % size];
         }
         else {

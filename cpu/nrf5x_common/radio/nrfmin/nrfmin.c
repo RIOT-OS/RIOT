@@ -362,7 +362,7 @@ static int nrfmin_recv(netdev_t *dev, void *buf, size_t len, void *info)
 
     assert(state != STATE_OFF);
 
-    int pktlen = (int)rx_buf.pkt.hdr.len;
+    unsigned pktlen = rx_buf.pkt.hdr.len;
 
     /* check if packet data is readable */
     if (rx_lock || (pktlen == 0)) {
@@ -400,7 +400,7 @@ static int nrfmin_init(netdev_t *dev)
     /* initialize our own address from the CPU ID */
     my_addr = 0;
     cpuid_get(cpuid);
-    for (int i = 0; i < CPUID_LEN; i++) {
+    for (unsigned i = 0; i < CPUID_LEN; i++) {
         my_addr ^= cpuid[i] << (8 * (i & 0x01));
     }
 
