@@ -137,6 +137,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+    (void) cs;
     /* lock and power on the bus */
     mutex_lock(&locks[bus]);
     poweron(bus);

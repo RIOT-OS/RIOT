@@ -176,6 +176,12 @@ static void _i2c_init(I2C_TypeDef *i2c, uint32_t presc, uint32_t scll,
                       uint32_t sclh, uint32_t sdadel, uint32_t scldel,
                       uint32_t timing)
 {
+    (void) presc;
+    (void) scll;
+    (void) sclh;
+    (void) sdadel;
+    (void) scldel;
+
     /* disable device */
     i2c->CR1 &= ~(I2C_CR1_PE);
 

@@ -255,6 +255,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
 
 static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 {
+    (void) netdev;
+
     int pkt_len = 0;
 
     /* Flush TX FIFO once no transmission in progress */
@@ -295,6 +297,8 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
+    (void) netdev;
+
     size_t pkt_len;
 
     if (buf == NULL) {

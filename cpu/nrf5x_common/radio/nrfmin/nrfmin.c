@@ -392,6 +392,7 @@ static int nrfmin_recv(netdev_t *dev, void *buf, size_t len, void *info)
 
 static int nrfmin_init(netdev_t *dev)
 {
+    (void)dev;
     uint8_t cpuid[CPUID_LEN];
 
     /* check given device descriptor */
@@ -459,6 +460,7 @@ static void nrfmin_isr(netdev_t *dev)
 static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
 {
     (void)dev;
+    (void)max_len;
 
     switch (opt) {
         case NETOPT_CHANNEL:
@@ -512,6 +514,7 @@ static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
 static int nrfmin_set(netdev_t *dev, netopt_t opt, const void *val, size_t len)
 {
     (void)dev;
+    (void)len;
 
     switch (opt) {
         case NETOPT_CHANNEL:

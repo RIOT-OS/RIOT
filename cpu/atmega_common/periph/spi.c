@@ -49,6 +49,7 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
+    (void)bus;
     /* set SPI pins as output */
 #if defined (CPU_ATMEGA2560) || defined (CPU_ATMEGA1281)
     DDRB |= ((1 << DDB2) | (1 << DDB1) | (1 << DDB0));
@@ -60,6 +61,7 @@ void spi_init_pins(spi_t bus)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+    (void)bus;
     (void)cs;
 
     /* lock the bus and power on the SPI peripheral */
@@ -79,6 +81,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
 void spi_release(spi_t bus)
 {
+    (void)bus;
     /* power off and release the bus */
     SPCR &= ~(1 << SPE);
     power_spi_disable();
@@ -88,6 +91,8 @@ void spi_release(spi_t bus)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
+    (void)bus;
+
     const uint8_t *out_buf = out;
     uint8_t *in_buf = in;
 
