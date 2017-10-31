@@ -160,6 +160,8 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
 int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *value,
                           size_t value_len);
 
+int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr);
+
 #ifdef __cplusplus
 }
 #endif
