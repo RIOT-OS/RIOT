@@ -106,7 +106,9 @@ static const uart_conf_t uart_config[] = {
         .tx_pin = GPIO_PIN(PA, 10), /* TX pin */
         .mux    = GPIO_MUX_C,
         .rx_pad = UART_PAD_RX_3,
-        .tx_pad = UART_PAD_TX_2
+        .tx_pad = UART_PAD_TX_2,
+        .flags  = UART_FLAG_NONE,
+        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0,
     }
 };
 

@@ -132,8 +132,8 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
     int len = dev->driver->recv(dev, NULL, 0, NULL);
 
     /* very unlikely */
-    if ((len > (unsigned) UINT16_MAX)) {
-        DEBUG("Len too high: %d\n", len);
+    if ((len < 0) || ((uint32_t)len > UINT16_MAX)) {
+        DEBUG("Invalid len: %d\n", len);
         otPlatRadioReceiveDone(aInstance, NULL, kThreadError_Abort);
         return;
     }
@@ -163,6 +163,8 @@ void recv_pkt(otInstance *aInstance, netdev_t *dev)
 /* Called upon TX event */
 void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
 {
+    (void)dev;
+
     /* Tell OpenThread transmission is done depending on the NETDEV event */
     switch (event) {
         case NETDEV_EVENT_TX_COMPLETE:
@@ -189,6 +191,7 @@ void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
 /* OpenThread will call this for setting PAN ID */
 void otPlatRadioSetPanId(otInstance *aInstance, uint16_t panid)
 {
+    (void)aInstance;
     DEBUG("openthread: otPlatRadioSetPanId: setting PAN ID to %04x\n", panid);
     _set_panid(panid);
 }
@@ -196,9 +199,10 @@ void otPlatRadioSetPanId(otInstance *aInstance, uint16_t panid)
 /* OpenThread will call this for setting extended address */
 void otPlatRadioSetExtendedAddress(otInstance *aInstance, uint8_t *aExtendedAddress)
 {
+    (void)aInstance;
     DEBUG("openthread: otPlatRadioSetExtendedAddress\n");
     uint8_t reversed_addr[IEEE802154_LONG_ADDRESS_LEN];
-    for (int i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
+    for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
         reversed_addr[i] = aExtendedAddress[IEEE802154_LONG_ADDRESS_LEN - 1 - i];
     }
     _set_long_addr(reversed_addr);
@@ -207,6 +211,7 @@ void otPlatRadioSetExtendedAddress(otInstance *aInstance, uint8_t *aExtendedAddr
 /* OpenThread will call this for setting short address */
 void otPlatRadioSetShortAddress(otInstance *aInstance, uint16_t aShortAddress)
 {
+    (void) aInstance;
     DEBUG("openthread: otPlatRadioSetShortAddress: setting address to %04x\n", aShortAddress);
     _set_addr(((aShortAddress & 0xff) << 8) | ((aShortAddress >> 8) & 0xff));
 }
@@ -275,6 +280,7 @@ ThreadError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
 /* OpenThread will call this function to get the transmit buffer */
 RadioPacket *otPlatRadioGetTransmitBuffer(otInstance *aInstance)
 {
+    (void) aInstance;
     DEBUG("openthread: otPlatRadioGetTransmitBuffer\n");
     return &sTransmitFrame;
 }
@@ -318,6 +324,7 @@ ThreadError otPlatRadioTransmit(otInstance *aInstance, RadioPacket *aPacket)
 /* OpenThread will call this for getting the radio caps */
 otRadioCaps otPlatRadioGetCaps(otInstance *aInstance)
 {
+    (void) aInstance;
     DEBUG("openthread: otPlatRadioGetCaps\n");
     /* all drivers should handle ACK, including call of NETDEV_EVENT_TX_NOACK */
     return kRadioCapsNone;
@@ -326,6 +333,7 @@ otRadioCaps otPlatRadioGetCaps(otInstance *aInstance)
 /* OpenThread will call this for getting the state of promiscuous mode */
 bool otPlatRadioGetPromiscuous(otInstance *aInstance)
 {
+    (void) aInstance;
     DEBUG("openthread: otPlatRadioGetPromiscuous\n");
     return _is_promiscuous();
 }
@@ -333,6 +341,7 @@ bool otPlatRadioGetPromiscuous(otInstance *aInstance)
 /* OpenThread will call this for setting the state of promiscuous mode */
 void otPlatRadioSetPromiscuous(otInstance *aInstance, bool aEnable)
 {
+    (void) aInstance;
     DEBUG("openthread: otPlatRadioSetPromiscuous\n");
     _set_promiscuous((aEnable) ? NETOPT_ENABLE : NETOPT_DISABLE);
 }
@@ -406,10 +415,12 @@ ThreadError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, u
 
 void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeee64Eui64)
 {
+    (void) aInstance;
     _dev->driver->get(_dev, NETOPT_IPV6_IID, aIeee64Eui64, sizeof(eui64_t));
 }
 
 int8_t otPlatRadioGetReceiveSensitivity(otInstance *aInstance)
 {
+    (void) aInstance;
     return -100;
 }

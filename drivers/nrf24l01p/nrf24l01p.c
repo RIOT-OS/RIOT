@@ -320,7 +320,8 @@ int nrf24l01p_set_address_width(const nrf24l01p_t *dev, nrf24l01p_aw_t aw)
     return nrf24l01p_write_reg(dev, REG_SETUP_AW, aw_setup);
 }
 
-int nrf24l01p_set_payload_width(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width)
+int nrf24l01p_set_payload_width(const nrf24l01p_t *dev,
+                                nrf24l01p_rx_pipe_t pipe, uint8_t width)
 {
     char pipe_pw_address;
 
@@ -353,7 +354,7 @@ int nrf24l01p_set_payload_width(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe
             return -1;
     }
 
-    if (width < 0) {
+    if (width == 0) {
         return -1;
     }
 

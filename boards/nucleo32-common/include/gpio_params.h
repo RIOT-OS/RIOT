@@ -26,19 +26,21 @@
 extern "C" {
 #endif
 
+#ifndef AUTO_INIT_LED0
+#define SAUL_GPIO_NUMOF (0U)
+#else
 /**
  * @brief    GPIO pin configuration
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
-#ifdef AUTO_INIT_LED0
     {
         .name = "LD3(green)",
         .pin = LED0_PIN,
         .mode = GPIO_OUT
     }
-#endif
 };
+#endif /* AUTO_INIT_LED0 */
 
 #ifdef __cplusplus
 }

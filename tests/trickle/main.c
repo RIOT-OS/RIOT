@@ -53,13 +53,15 @@ static void callback(void *args)
     return;
 }
 
-static trickle_t trickle = { .callback.func = &callback,
-                             .callback.args = NULL };
+static trickle_t trickle;
 
 int main(void)
 {
     msg_t msg;
     unsigned counter = 0;
+
+    trickle.callback.func = &callback;
+    trickle.callback.args = NULL;
 
     trickle_start(sched_active_pid, &trickle, TRICKLE_MSG, TR_IMIN,
                   TR_IDOUBLINGS, TR_REDCONST);

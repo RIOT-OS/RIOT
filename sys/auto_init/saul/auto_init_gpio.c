@@ -30,7 +30,15 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define SAUL_GPIO_NUMOF    (sizeof(saul_gpio_params)/sizeof(saul_gpio_params[0]))
+#if defined(SAUL_GPIO_NUMOF) && !(SAUL_GPIO_NUMOF > 0)
+void auto_init_gpio(void)
+{
+    /* do nothing, no GPIO configured for SAUL */
+    LOG_DEBUG("[auto_init_saul] no SAUL GPIO configured!\n");
+}
+#else
+#define SAUL_GPIO_NUMOF (sizeof(saul_gpio_params)/sizeof(saul_gpio_params[0]))
+
 
 /**
  * @brief   Memory for the registry entries
@@ -76,7 +84,7 @@ void auto_init_gpio(void)
         saul_reg_add(&(saul_reg_entries[i]));
     }
 }
-
+#endif
 #else
 typedef int dont_be_pedantic;
 #endif /* MODULE_SAUL_GPIO */

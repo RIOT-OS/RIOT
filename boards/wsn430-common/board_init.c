@@ -14,7 +14,7 @@
 #include "debug.h"
 #include "uart_stdio.h"
 
-volatile static uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
+static volatile uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
 
 void msp430_init_dco(void);
 

@@ -39,7 +39,7 @@ extern "C" {
 /**
  * @brief   CID register see section 5.2 in SD-Spec v5.00
  */
-struct {
+typedef struct {
     uint8_t MID;              /**< Manufacturer ID */
     char OID[SD_SIZE_OF_OID]; /**< OEM/Application ID*/
     char PNM[SD_SIZE_OF_PNM]; /**< Product name */
@@ -47,13 +47,13 @@ struct {
     uint32_t PSN;             /**< Product serial number */
     uint16_t MDT;             /**< Manufacturing date */
     uint8_t CID_CRC;          /**< CRC7 checksum */
-} typedef cid_t;
+} cid_t;
 
 /**
  * @brief   CSD register with csd structure version 1.0
  *          see section 5.3.2 in SD-Spec v5.00
  */
-struct {
+typedef struct {
     uint8_t CSD_STRUCTURE : 2;        /**< see section 5.3.2 in SD-Spec v5.00 */
     uint8_t TAAC : 8;                 /**< see section 5.3.2 in SD-Spec v5.00 */
     uint8_t NSAC : 8;                 /**< see section 5.3.2 in SD-Spec v5.00 */
@@ -83,13 +83,13 @@ struct {
     uint8_t TMP_WRITE_PROTECT : 1;    /**< see section 5.3.2 in SD-Spec v5.00 */
     uint8_t FILE_FORMAT : 2;          /**< see section 5.3.2 in SD-Spec v5.00 */
     uint8_t CSD_CRC : 8;              /**< see section 5.3.2 in SD-Spec v5.00 */
-} typedef csd_v1_t;
+} csd_v1_t;
 
 /**
  * @brief   CSD register with csd structure version 2.0
  *          see section 5.3.3 in SD-Spec v5.00
  */
-struct {
+typedef struct {
     uint8_t CSD_STRUCTURE : 2;        /**< see section 5.3.3 in SD-Spec v5.00 */
     uint8_t TAAC : 8;                 /**< see section 5.3.3 in SD-Spec v5.00 */
     uint8_t NSAC : 8;                 /**< see section 5.3.3 in SD-Spec v5.00 */
@@ -114,20 +114,20 @@ struct {
     uint8_t TMP_WRITE_PROTECT : 1;    /**< see section 5.3.3 in SD-Spec v5.00 */
     uint8_t FILE_FORMAT : 2;          /**< see section 5.3.3 in SD-Spec v5.00 */
     uint8_t CSD_CRC : 8;              /**< see section 5.3.3 in SD-Spec v5.00 */
-} typedef csd_v2_t;
+} csd_v2_t;
 
 /**
  * @brief   CSD register (see section 5.3 in SD-Spec v5.00)
  */
-union {
+typedef union {
     csd_v1_t v1;   /**< see section 5.3.2 in SD-Spec v5.00 */
     csd_v2_t v2;   /**< see section 5.3.3 in SD-Spec v5.00 */
-} typedef csd_t;
+} csd_t;
 
 /**
  * @brief   SD status register (see section 4.10.2 in SD-Spec v5.00)
  */
-struct {
+typedef struct {
     uint32_t SIZE_OF_PROTECTED_AREA : 32;   /**< see section 4.10.2 in SD-Spec v5.00 */
     uint32_t SUS_ADDR : 22;                 /**< see section 4.10.2.12 in SD-Spec v5.00 */
     uint32_t VSC_AU_SIZE : 10;              /**< see section 4.10.2.11 in SD-Spec v5.00 */
@@ -143,7 +143,7 @@ struct {
     uint8_t  AU_SIZE : 4;                   /**< see section 4.10.2.4 in SD-Spec v5.00 */
     uint8_t  DAT_BUS_WIDTH : 2;             /**< see section 4.10.2 in SD-Spec v5.00 */
     uint8_t  SECURED_MODE : 1;              /**< see section 4.10.2 in SD-Spec v5.00 */
-} typedef sd_status_t;
+} sd_status_t;
 
 /**
  * @brief   version type of SD-card
@@ -184,7 +184,7 @@ typedef struct {
 /**
  * @brief   Device descriptor for sdcard_spi
  */
-struct {
+typedef struct {
     sdcard_spi_params_t params;     /**< parameters for pin and spi config */
     spi_clk_t spi_clk;              /**< active SPI clock speed */
     bool use_block_addr;            /**< true if block adressing (vs. byte adressing) is used */
@@ -193,7 +193,7 @@ struct {
     int csd_structure;              /**< version of the CSD register structure */
     cid_t cid;                      /**< CID register */
     csd_t csd;                      /**< CSD register */
-} typedef sdcard_spi_t;
+} sdcard_spi_t;
 
 /**
  * @brief              Initializes the sd-card with the given parameters in sdcard_spi_t structure.

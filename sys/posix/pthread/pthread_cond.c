@@ -122,7 +122,7 @@ int pthread_cond_wait(pthread_cond_t *cond, mutex_t *mutex)
 
 int pthread_cond_timedwait(pthread_cond_t *cond, mutex_t *mutex, const struct timespec *abstime)
 {
-    if ((cond == NULL) || (abstime->tv_sec < 0)) {
+    if (cond == NULL) {
         return EINVAL;
     }
 

@@ -39,4 +39,7 @@ DRIVER ?= at86rf231
 # include the selected driver
 USEMODULE += $(DRIVER)
 
+CFLAGS += -Wno-unused-parameter -Wno-unused-function -Wno-type-limits
+CFLAGS += -Wno-sign-compare -Wno-missing-field-initializers
+
 include $(RIOTBASE)/Makefile.include

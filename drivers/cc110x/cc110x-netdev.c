@@ -41,6 +41,8 @@ static int _send(netdev_t *dev, const struct iovec *vector, unsigned count)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
 
+    (void)count;
+
     netdev_cc110x_t *netdev_cc110x = (netdev_cc110x_t*) dev;
     cc110x_pkt_t *cc110x_pkt = vector[0].iov_base;
 
@@ -135,7 +137,12 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
             {
                 const uint8_t *arg = value;
                 uint8_t channel = arg[value_len-1];
-                if ((channel < CC110X_MIN_CHANNR) || (channel > CC110X_MAX_CHANNR)) {
+            #if CC110X_MIN_CHANNR
+                if (channel < CC110X_MIN_CHANNR) {
+                    return -EINVAL;
+                }
+            #endif /* CC110X_MIN_CHANNR */
+                if (channel > CC110X_MAX_CHANNR) {
                     return -EINVAL;
                 }
                 if (cc110x_set_channel(cc110x, channel) == -1) {

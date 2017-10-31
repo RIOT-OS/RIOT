@@ -222,11 +222,11 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                     break;
                 }
             }
-            if ((netif != NULL) && (netif->pid != route.iface)) {
+            if ((netif != NULL) && (netif->pid != (int)route.iface)) {
                 /* drop pre-assumed netif */
                 gnrc_netif_release(netif);
             }
-            if ((netif == NULL) || (netif->pid != route.iface)) {
+            if ((netif == NULL) || (netif->pid != (int)route.iface)) {
                 /* get actual netif */
                 netif = gnrc_netif_get_by_pid(route.iface);
                 gnrc_netif_acquire(netif);

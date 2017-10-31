@@ -48,7 +48,7 @@ volatile pm_blocker_t pm_blocker = PM_BLOCKER_INITIAL;
 
 void pm_set_lowest(void)
 {
-    pm_blocker_t blocker = (pm_blocker_t) pm_blocker;
+    pm_blocker_t blocker = pm_blocker;
     unsigned mode = PM_NUM_MODES;
     while (mode) {
         if (blocker.val_u8[mode-1]) {

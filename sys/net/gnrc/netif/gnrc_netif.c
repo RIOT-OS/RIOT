@@ -132,7 +132,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 
                 res = 0;
                 for (unsigned i = 0;
-                     (res < opt->data_len) && (i < GNRC_NETIF_IPV6_ADDRS_NUMOF);
+                     (res < (int)opt->data_len) && (i < GNRC_NETIF_IPV6_ADDRS_NUMOF);
                      i++) {
                     if (netif->ipv6.addrs_flags[i] != 0) {
                         memcpy(tgt, &netif->ipv6.addrs[i], sizeof(ipv6_addr_t));
@@ -148,7 +148,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 
                 res = 0;
                 for (unsigned i = 0;
-                     (res < opt->data_len) && (i < GNRC_NETIF_IPV6_ADDRS_NUMOF);
+                     (res < (int)opt->data_len) && (i < GNRC_NETIF_IPV6_ADDRS_NUMOF);
                      i++) {
                     if (netif->ipv6.addrs_flags[i] != 0) {
                         *tgt = netif->ipv6.addrs_flags[i];
@@ -164,7 +164,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 
                 res = 0;
                 for (unsigned i = 0;
-                     (res < opt->data_len) && (i < GNRC_NETIF_IPV6_GROUPS_NUMOF);
+                     (res < (int)opt->data_len) && (i < GNRC_NETIF_IPV6_GROUPS_NUMOF);
                      i++) {
                     if (!ipv6_addr_is_unspecified(&netif->ipv6.groups[i])) {
                         memcpy(tgt, &netif->ipv6.groups[i], sizeof(ipv6_addr_t));

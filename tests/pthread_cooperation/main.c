@@ -28,7 +28,7 @@
 pthread_t ths[NUM_THREADS];
 
 pthread_mutex_t mtx;
-volatile int storage = 1;
+volatile uint32_t storage = 1;
 
 void *run(void *parameter)
 {
@@ -43,7 +43,7 @@ void *run(void *parameter)
     }
 
     storage *= arg;
-    printf("val = %d\n", storage);
+    printf("val = %"PRIu32"\n", storage);
     pthread_mutex_unlock(&mtx);
 
     return NULL;
@@ -66,7 +66,7 @@ int main(void)
         pthread_join(ths[i], NULL);
     }
 
-    printf("Factorial: %d\n", storage);
+    printf("Factorial: %"PRIu32"\n", storage);
 
     pthread_mutex_destroy(&mtx);
     pthread_attr_destroy(&th_attr);
