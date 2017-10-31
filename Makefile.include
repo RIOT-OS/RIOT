@@ -123,7 +123,13 @@ endif
 WERROR ?= 1
 export WERROR
 ifeq ($(WERROR),1)
-  CFLAGS += -Werror
+  CFLAGS += -Wall -Werror -Wextra
+endif
+
+WPEDANTIC ?= 0
+export WPEDANTIC
+ifeq ($(WPEDANTIC),1)
+    CFLAGS += -Wpedantic -pedantic-errors
 endif
 
 ifneq (10,$(if ${RIOT_VERSION},1,0)$(if ${__RIOTBUILD_FLAG},1,0))

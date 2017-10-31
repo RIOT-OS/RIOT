@@ -354,10 +354,6 @@ int nrf24l01p_set_payload_width(const nrf24l01p_t *dev,
             return -1;
     }
 
-    if (width == 0) {
-        return -1;
-    }
-
     if (width > 32) {
         width = 32;
     }
