@@ -365,9 +365,9 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define RTT_NUMOF           (1U)
-#define RTT_IRQ_PRIO        CPU_DEFAULT_IRQ_PRIO
 #define RTT_IRQ             RTC_IRQn
-#define RTT_ISR             isr_rtc_alarm
+#define RTT_IRQ_PRIO        10
+#define RTT_ISR             isr_rtc
 #define RTT_DEV             RTC
 #define RTT_UNLOCK()        (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_RTC_SHIFT) = 1)
 #define RTT_MAX_VALUE       (0xffffffff)
