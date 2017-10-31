@@ -120,7 +120,8 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
     if (!(dev->netdev.flags & AT86RF2XX_OPT_PRELOADING)) {
         at86rf2xx_tx_exec(dev);
     }
-    /* return the number of bytes that were actually send out */
+    /* return the number of bytes that were actually loaded into the frame
+     * buffer/send out */
     return (int)len;
 }
 
@@ -195,6 +196,23 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
             break;
         case NETOPT_STATE_TX:
             if (dev->netdev.flags & AT86RF2XX_OPT_PRELOADING) {
+                /* The netdev driver ISR switches the transceiver back to the
+                 * previous idle state after a completed TX. If the user tries
+                 * to initiate another transmission (retransmitting the same data)
+                 * without first going to TX_ARET_ON, the command to start TX
+                 * would be ignored, leading to a deadlock in this netdev driver
+                 * thread.
+                 * Additionally, avoids driver thread deadlock when PRELOADING
+                 * is set and the user tries to initiate TX without first calling
+                 * send() to write some frame data.
+                 */
+                if (dev->pending_tx == 0) {
+                    /* retransmission of old data, at86rf2xx_tx_prepare normally
+                     * increments this and the ISR for TX_END decrements it, to
+                     * know when to switch back to the idle state. */
+                    ++dev->pending_tx;
+                }
+                at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
                 at86rf2xx_tx_exec(dev);
             }
             break;
@@ -584,7 +602,7 @@ static void _isr(netdev_t *netdev)
             assert(dev->pending_tx != 0);
             if ((--dev->pending_tx) == 0) {
                 at86rf2xx_set_state(dev, dev->idle_state);
-                DEBUG("[at86rf2xx] return to state 0x%x\n", dev->idle_state);
+                DEBUG("[at86rf2xx] return to idle state 0x%x\n", dev->idle_state);
             }
 /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
 #if AT86RF2XX_HAVE_RETRIES
