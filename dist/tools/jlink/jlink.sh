@@ -25,7 +25,7 @@
 #               options:
 #               BINFILE: path to the binary file that is flashed
 #
-# debug:        starts OpenOCD as GDB server in the background and
+# debug:        starts JLink as GDB server in the background and
 #               connects to the server with the GDB client specified by
 #               the board (DBG environment variable)
 #
@@ -35,7 +35,7 @@
 #               TUI:            if TUI!=null, the -tui option will be used
 #               ELFFILE:        path to the ELF file to debug
 #
-# debug-server: starts OpenOCD as GDB server, but does not connect to
+# debug-server: starts JLink as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
 #               IDEs.
 #
@@ -128,6 +128,13 @@ test_serial() {
     fi
 }
 
+test_dbg() {
+    if [ -z "${DBG}" ]; then
+        echo "Error: No debugger defined in DBG env var"
+        exit 1
+    fi
+}
+
 #
 # now comes the actual actions
 #
@@ -161,6 +168,7 @@ do_debug() {
     test_elffile
     test_ports
     test_tui
+    test_dbg
     # start the JLink GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
                            -device '${JLINK_DEVICE}' \
