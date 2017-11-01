@@ -377,6 +377,46 @@ static void test_nib_pl_del__success(void)
     TEST_ASSERT(!gnrc_ipv6_nib_pl_iter(0, &iter_state, &ple));
 }
 
+/**
+ * Creates three prefix list entries and removes the second one.
+ * The prefix list is then iterated.
+ * Expected result: there should be two prefix list entries returned, the first
+ * and the third one
+ */
+static void test_nib_pl_iter__empty_in_the_middle(void)
+{
+    gnrc_ipv6_nib_pl_t ple;
+    void *iter_state = NULL;
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                               { .u64 = TEST_UINT64 } } };
+    int count = 0;
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
+                                                  GLOBAL_PREFIX_LEN,
+                                                  UINT32_MAX, UINT32_MAX));
+    pfx.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
+                                                  GLOBAL_PREFIX_LEN,
+                                                  UINT32_MAX, UINT32_MAX));
+    pfx.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
+                                                  GLOBAL_PREFIX_LEN,
+                                                  UINT32_MAX, UINT32_MAX));
+    pfx.u16[0].u16--;
+    gnrc_ipv6_nib_pl_del(IFACE, &pfx, GLOBAL_PREFIX_LEN);
+    pfx.u16[0].u16--;
+    while (gnrc_ipv6_nib_pl_iter(0, &iter_state, &ple)) {
+        TEST_ASSERT(ipv6_addr_match_prefix(&ple.pfx, &pfx) >= GLOBAL_PREFIX_LEN);
+        TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, ple.pfx_len);
+        TEST_ASSERT_EQUAL_INT(IFACE, ple.iface);
+        TEST_ASSERT_EQUAL_INT(UINT32_MAX, ple.valid_until);
+        TEST_ASSERT_EQUAL_INT(UINT32_MAX, ple.pref_until);
+        count++;
+        pfx.u16[0].u16 += 2; /* we skip the second address */
+    }
+    TEST_ASSERT_EQUAL_INT(2, count);
+}
+
 Test *tests_gnrc_ipv6_nib_pl_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -396,7 +436,8 @@ Test *tests_gnrc_ipv6_nib_pl_tests(void)
         new_TestFixture(test_nib_pl_set__success),
         new_TestFixture(test_nib_pl_del__unknown),
         new_TestFixture(test_nib_pl_del__success),
-        /* gnrc_ipv6_nib_pl_iter() is tested during all the tests above */
+        /* most of gnrc_ipv6_nib_pl_iter() is tested during all the tests above */
+        new_TestFixture(test_nib_pl_iter__empty_in_the_middle),
     };
 
     EMB_UNIT_TESTCALLER(tests, set_up, NULL,

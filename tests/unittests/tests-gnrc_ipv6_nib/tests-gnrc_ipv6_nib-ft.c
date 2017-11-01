@@ -617,6 +617,79 @@ static void test_nib_ft_del__success(void)
     TEST_ASSERT(!gnrc_ipv6_nib_ft_iter(NULL ,0, &iter_state, &fte));
 }
 
+/**
+ * Creates three default routes and removes the first one.
+ * The prefix list is then iterated.
+ * Expected result: there should be two default routes returned, the last
+ * two added.
+ */
+static void test_nib_ft_iter__empty_def_route_at_beginning(void)
+{
+    gnrc_ipv6_nib_ft_t fte;
+    void *iter_state = NULL;
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                    { .u64 = TEST_UINT64 } } };
+    int count = 0;
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
+                                                  &next_hop, IFACE));
+    next_hop.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
+                                                  &next_hop, IFACE));
+    next_hop.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
+                                                  &next_hop, IFACE));
+    gnrc_ipv6_nib_ft_del(NULL, 0);
+    next_hop.u16[0].u16--;
+    while (gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte)) {
+        TEST_ASSERT(ipv6_addr_is_unspecified(&fte.dst));
+        TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
+        TEST_ASSERT_EQUAL_INT(0, fte.dst_len);
+        TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
+        count++;
+        next_hop.u16[0].u16++;
+    }
+    TEST_ASSERT_EQUAL_INT(2, count);
+}
+
+/**
+ * Creates three prefix based routes and removes the second one.
+ * The prefix list is then iterated.
+ * Expected result: there should be two prefix based routes returned, the first
+ * and the third one.
+ */
+static void test_nib_ft_iter__empty_pref_route_in_the_middle(void)
+{
+    gnrc_ipv6_nib_ft_t fte;
+    void *iter_state = NULL;
+    ipv6_addr_t route = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                 { .u64 = TEST_UINT64 } } };
+    const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                            { .u64 = TEST_UINT64 } } };
+    int count = 0;
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&route, GLOBAL_PREFIX_LEN,
+                                                  &next_hop, IFACE));
+    route.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&route, GLOBAL_PREFIX_LEN,
+                                                  &next_hop, IFACE));
+    route.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&route, GLOBAL_PREFIX_LEN,
+                                                  &next_hop, IFACE));
+    route.u16[0].u16--;
+    gnrc_ipv6_nib_ft_del(&route, GLOBAL_PREFIX_LEN);
+    route.u16[0].u16--;
+    while (gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte)) {
+        TEST_ASSERT(ipv6_addr_match_prefix(&fte.dst, &route) >= GLOBAL_PREFIX_LEN);
+        TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
+        TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, fte.dst_len);
+        TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
+        count++;
+        route.u16[0].u16 += 2;  /* we skip the second address */
+    }
+    TEST_ASSERT_EQUAL_INT(2, count);
+}
+
 Test *tests_gnrc_ipv6_nib_ft_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -646,7 +719,9 @@ Test *tests_gnrc_ipv6_nib_ft_tests(void)
         new_TestFixture(test_nib_ft_add__success),
         new_TestFixture(test_nib_ft_del__unknown),
         new_TestFixture(test_nib_ft_del__success),
-        /* gnrc_ipv6_nib_ft_iter() is tested during all the tests above */
+        /* most of gnrc_ipv6_nib_ft_iter() is tested during all the tests above */
+        new_TestFixture(test_nib_ft_iter__empty_def_route_at_beginning),
+        new_TestFixture(test_nib_ft_iter__empty_pref_route_in_the_middle),
     };
 
     EMB_UNIT_TESTCALLER(tests, set_up, NULL,
