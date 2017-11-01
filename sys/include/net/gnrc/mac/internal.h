@@ -25,10 +25,75 @@
 
 #include "net/ieee802154.h"
 #include "net/gnrc/mac/types.h"
+#include "net/gnrc/netif2.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief get the 'rx_started' state of the device
+ *
+ * This function checks whether the device has started receiving a packet.
+ *
+ * @param[in] netif the network interface
+ *
+ * @return          the rx_started state
+ */
+static inline bool gnrc_netif2_get_rx_started(gnrc_netif2_t *netif)
+{
+    return (netif->mac.mac_info & GNRC_NETIF2_MAC_INFO_RX_STARTED);
+}
+
+/**
+ * @brief set the rx_started state of the device
+ *
+ * This function is intended to be called only in netdev_t::event_callback().
+ *
+ * @param[in] netif       the network interface
+ * @param[in] rx_started  the rx_started state
+ */
+static inline void gnrc_netif2_set_rx_started(gnrc_netif2_t *netif, bool rx_started)
+{
+    if (rx_started) {
+        netif->mac.mac_info |= GNRC_NETIF2_MAC_INFO_RX_STARTED;
+    }
+    else {
+        netif->mac.mac_info &= ~GNRC_NETIF2_MAC_INFO_RX_STARTED;
+    }
+}
+
+/**
+ * @brief get the transmission feedback of the device
+ *
+ * @param[in] netif  the network interface
+ *
+ * @return           the transmission feedback
+ */
+static inline gnrc_mac_tx_feedback_t gnrc_netif2_get_tx_feedback(gnrc_netif2_t *netif)
+{
+    return (gnrc_mac_tx_feedback_t)(netif->mac.mac_info &
+                                    GNRC_NETIF2_MAC_INFO_TX_FEEDBACK_MASK);
+}
+
+/**
+ * @brief set the transmission feedback of the device
+ *
+ * This function is intended to be called only in netdev_t::event_callback().
+ *
+ * @param[in] netif  the network interface
+ * @param[in] txf    the transmission feedback
+ */
+static inline void gnrc_netif2_set_tx_feedback(gnrc_netif2_t *netif,
+                                               gnrc_mac_tx_feedback_t txf)
+{
+    /* check if gnrc_mac_tx_feedback does not collide with
+     * GNRC_NETIF2_MAC_INFO_RX_STARTED */
+    assert(!(txf & GNRC_NETIF2_MAC_INFO_RX_STARTED));
+    /* unset previous value */
+    netif->mac.mac_info &= ~GNRC_NETIF2_MAC_INFO_TX_FEEDBACK_MASK;
+    netif->mac.mac_info |= (uint16_t)(txf & GNRC_NETIF2_MAC_INFO_TX_FEEDBACK_MASK);
+}
 
 #if (GNRC_MAC_TX_QUEUE_SIZE != 0) || defined(DOXYGEN)
 /**
