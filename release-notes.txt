@@ -134,9 +134,8 @@ Networking related issues
 #5858: gnrc: 6lo: potential problem with reassembly of fragments: If one frame gets lost the reassembly
        state machine might get out of sync
 #6123: gnrc: crash with (excessive) traffic
-#6519: driver/mrf24j40: broken on stm32f4discovery
 #7035: lwIP: hangs due to sema change after a while
-#7727: pkg: libcoap is partially broken and outdated
+#7737: pkg: libcoap is partially broken and outdated
 
 NDP is not working properly
 ---------------------------
@@ -209,7 +208,6 @@ other issues
 #3366: periph/i2c: handle NACK
 #4488: Making the newlib thread-safe: When calling puts/printf after thread_create(), the CPU hangs
        for DMA enabled uart drivers.
-#4866: periph: GPIO drivers are not thread safe
 #5561: C++11 extensions in header files
 #5776: make: Predefining CFLAGS are parsed weirdly
 #5863: OSX +  SAMR21-xpro: shell cannot handle command inputs larger than 64 chars
