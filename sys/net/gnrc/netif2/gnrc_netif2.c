@@ -562,7 +562,8 @@ int gnrc_netif2_ipv6_addr_add(gnrc_netif2_t *netif, const ipv6_addr_t *addr,
             }
         }
         if (!in_pl) {
-        gnrc_ipv6_nib_pl_set(netif->pid, addr, pfx_len, UINT32_MAX, UINT32_MAX);
+            gnrc_ipv6_nib_pl_set(netif->pid, addr, pfx_len,
+                                 UINT32_MAX, UINT32_MAX);
         }
     }
 #if GNRC_IPV6_NIB_CONF_SLAAC
