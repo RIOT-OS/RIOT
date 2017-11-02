@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-mkrzero \
                              arduino-uno \
                              arduino-zero \
+                             avsextrem \
                              b-l072z-lrwan1 \
                              bluepill \
                              calliope-mini \

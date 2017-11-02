@@ -1,0 +1,1 @@
+-include $(RIOTCPU)/kinetis_common/Makefile.features
