@@ -144,7 +144,7 @@ SECTIONS
     _sheap = . ;
     _eheap = ORIGIN(ram) + LENGTH(ram);
 
-    /* Populate information abour ram size */
+    /* Populate information about ram size */
     _sram = ORIGIN(ram);
     _eram = ORIGIN(ram) + LENGTH(ram);
 }
