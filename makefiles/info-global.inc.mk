@@ -26,7 +26,7 @@ define board_missing_features
 
   include $(RIOTBASE)/Makefile.dep
 
-  FEATURES_MISSING := $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED))
+  FEATURES_MISSING := $$(sort $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED)))
   ifneq (, $${FEATURES_MISSING})
     BOARDS_FEATURES_MISSING += "${1} $${FEATURES_MISSING}"
     ifneq (, $$(filter-out $$(FEATURES_OPTIONAL), $$(FEATURES_MISSING)))
