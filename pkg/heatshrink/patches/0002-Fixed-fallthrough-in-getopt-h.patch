@@ -1,0 +1,24 @@
+From 0cdd305bdae80c9ee9a170e5a3de2853b1fb0a42 Mon Sep 17 00:00:00 2001
+From: tobhe <t.heider@campus.lmu.de>
+Date: Wed, 19 Jul 2017 13:18:54 +0200
+Subject: [PATCH 2/2] Fixed fallthrough in getopt 'h'
+
+---
+ heatshrink.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/heatshrink.c b/heatshrink.c
+index 8c3ec5b..a4b675a 100755
+--- a/heatshrink.c
++++ b/heatshrink.c
+@@ -409,6 +409,7 @@ static void proc_args(config *cfg, int argc, char **argv) {
+         switch (a) {
+         case 'h':               /* help */
+             usage();
++            break;
+         case 'e':               /* encode */
+             cfg->cmd = OP_ENC; break;
+         case 'd':               /* decode */
+-- 
+2.13.3
+
