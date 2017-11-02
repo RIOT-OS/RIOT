@@ -125,6 +125,19 @@ extern "C" {
 /** @} */
 
 /**
+ * @name TPS6274x Stepdown config
+ * @{
+ */
+#define TPS6274X_PARAMS { .vsel = { GPIO_PIN(PORT_D, 6), \
+                                    GPIO_PIN(PORT_D, 7), \
+                                    GPIO_PIN(PORT_G, 0), \
+                                    GPIO_PIN(PORT_G, 2), \
+                                   },                    \
+                         .ctrl_pin = GPIO_PIN(PORT_G, 5) \
+                        }
+/** @} */
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
