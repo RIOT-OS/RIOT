@@ -5,6 +5,8 @@ USEMODULE += shell
 
 BOARD ?= native
 
+FEATURES_OPTIONAL += periph_rtc
+
 # whitelist can be removed when the problem described in #6063 was resolved
 # this list is composed of boards that support spi + native
 BOARD_WHITELIST := native airfy-beacon arduino-due arduino-duemilanove arduino-mega2560 \
