@@ -9,7 +9,8 @@ import testrunner
 
 def testfunc(child):
     child.expect_exact(u'[START] Spawning threads')
-    child.expect_exact(u'[SUCCESS] Thread creation')
+    child.expect(r'\.+')
+    child.expect(r'\[SUCCESS\] created \d+')
 
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))
