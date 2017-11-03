@@ -1,18 +1,24 @@
-/**
- * Ringbuffer header
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  * Copyright (C) 2013 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
+ */
+
+/**
  * @ingroup  core_util
  * @{
  * @file
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * @brief A utility for storing and retrieving byte data using a ring buffer.
+ *
+ * @details The ringbuffer is useful for buffering data in the same
+ * thread context but it is not thread-safe.  For a thread-safe ring
+ * buffer, see @ref sys_tsrb in the System library.
  * @}
  */
 
