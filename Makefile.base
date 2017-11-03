@@ -92,7 +92,7 @@ $(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.cpp $(RIOTBUILD_CONFIG_HEADER_C)
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S
+$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(RIOTBUILD_CONFIG_HEADER_C)
 	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files
