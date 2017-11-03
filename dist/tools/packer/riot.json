@@ -48,7 +48,9 @@
         ["usbfilter", "add", "0", "--target", "{{.Name}}", "--name", "iotlab-m3", "--vendorid", "0x0403", "--productid",  "0x6010"],
         ["usbfilter", "add", "0", "--target", "{{.Name}}", "--name", "samr21-xpro", "--vendorid", "0x03eb", "--productid",  "0x2111"],
         ["usbfilter", "add", "0", "--target", "{{.Name}}", "--name", "Arduino Mega 2560", "--vendorid", "0x2341", "--productid",  "0x0042"],
-        ["usbfilter", "add", "0", "--target", "{{.Name}}", "--name", "Phytec phyWAVE KW22", "--vendorid", "0x0d28", "--productid",  "0x0204"]
+        ["usbfilter", "add", "0", "--target", "{{.Name}}", "--name", "Phytec phyWAVE KW22", "--vendorid", "0x0d28", "--productid",  "0x0204"],
+        ["usbfilter", "add", "0", "--target", "{{.Name}}", "--name", "Bluepill", "--vendorid", "0x1d50", "--productid",  "0x6017"],
+        ["usbfilter", "add", "0", "--target", "{{.Name}}", "--name", "Bluepill", "--vendorid", "0x1d50", "--productid",  "0x6018"]
       ],
       "virtualbox_version_file": ".vbox_version",
       "vm_name": "{{user `vm_name`}}"
