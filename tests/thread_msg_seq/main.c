@@ -51,6 +51,7 @@ void *sub_thread(void *arg)
 
 int main(void)
 {
+    puts("START");
     msg_t msg;
 
     p_main = sched_active_pid;
@@ -70,6 +71,8 @@ int main(void)
         msg_receive(&msg);
         printf("Got msg from pid %" PRIkernel_pid ": \"%s\"\n", msg.sender_pid, (char *)msg.content.ptr);
     }
+
+    puts("SUCCESS");
 
     return 0;
 }
