@@ -137,6 +137,7 @@ typedef struct {
     uint8_t idle_state;                     /**< state to return to after sending */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
     uint8_t header_len;                     /**< length of the header */
+    uint8_t fcf_low;                        /**< Low 8 FCF bits of the current TX frame. */
     uint8_t pending;                        /**< Flags for pending tasks */
     uint8_t irq_flag;                       /**< Flags for IRQs */
     uint8_t tx_retries;                     /**< Number of retries needed for last transmission */
