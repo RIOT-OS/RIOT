@@ -43,45 +43,40 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Define the interface to the AT86RF231 radio
+ * @name    Define the interface to the AT86RF231 radio
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
+ * @{
  */
-#define AT86RF2XX_PARAMS    { .spi = SPI_DEV(0),                \
-                              .spi_clk = SPI_CLK_5MHZ,          \
-                              .cs_pin = GPIO_PIN(PORT_A, 1),    \
-                              .int_pin = GPIO_PIN(PORT_C, 2),   \
-                              .sleep_pin = GPIO_PIN(PORT_A, 0), \
-                              .reset_pin = GPIO_PIN(PORT_C, 1)}
+#define AT86RF2XX_PARAM_CS         GPIO_PIN(PORT_A, 1)
+#define AT86RF2XX_PARAM_INT        GPIO_PIN(PORT_C, 2)
+#define AT86RF2XX_PARAM_SLEEP      GPIO_PIN(PORT_A, 0)
+#define AT86RF2XX_PARAM_RESET      GPIO_PIN(PORT_C, 1)
+/** @} */
 
 /**
  * @name    Define the interface to the LPS331AP pressure sensor
  * @{
  */
-#define LPS331AP_I2C        I2C_0
-#define LPS331AP_ADDR       0x5c
+#define LPS331AP_PARAM_ADDR        (0x5C)
 /** @} */
 
 /**
  * @name    Define the interface for the L3G4200D gyroscope
  * @{
  */
-#define L3G4200D_I2C        I2C_0
-#define L3G4200D_ADDR       0x68
-#define L3G4200D_DRDY       GPIO_PIN(PORT_B,8)
-#define L3G4200D_INT        GPIO_PIN(PORT_B,11)
+#define L3G4200D_PARAM_INT2        GPIO_PIN(PORT_B, 8)
+#define L3G4200D_PARAM_INT1        GPIO_PIN(PORT_B, 11)
 /** @} */
 
 /**
  * @name    Define the interface to the LSM303DLHC accelerometer and magnetometer
  * @{
  */
-#define LSM303DLHC_I2C      I2C_0
-#define LSM303DLHC_ACC_ADDR (25)
-#define LSM303DLHC_MAG_ADDR (30)
-#define LSM303DLHC_INT1     GPIO_PIN(PORT_B,9)
-#define LSM303DLHC_INT2     GPIO_PIN(PORT_B,5)
-#define LSM303DLHC_DRDY     GPIO_PIN(PORT_A,9)
+#define LSM303DLHC_PARAM_ACC_ADDR  (0x25)
+#define LSM303DLHC_PARAM_MAG_ADDR  (0x30)
+#define LSM303DLHC_PARAM_ACC_PIN   GPIO_PIN(PORT_B, 9)
+#define LSM303DLHC_PARAM_MAG_PIN   GPIO_PIN(PORT_A, 9)
 /** @} */
 
 /**
