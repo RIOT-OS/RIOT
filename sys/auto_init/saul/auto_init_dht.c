@@ -29,29 +29,36 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define DHT_NUMOF   (sizeof(dht_params) / sizeof(dht_params[0]))
+#define DHT_NUM     (sizeof(dht_params) / sizeof(dht_params[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors
  */
-static dht_t dht_devs[DHT_NUMOF];
+static dht_t dht_devs[DHT_NUM];
 
 /**
- * @brief   Import SAUL endpoints
+ * @brief   Memory for the SAUL registry entries
+ */
+static saul_reg_t saul_entries[DHT_NUM * 2];
+
+/**
+ * @brief   Define the number of saul info
+ */
+#define DHT_INFO_NUM (sizeof(dht_saul_info) / sizeof(dht_saul_info[0]))
+
+/**
+ * @name    Import SAUL endpoints
  * @{
  */
 extern const saul_driver_t dht_temp_saul_driver;
 extern const saul_driver_t dht_hum_saul_driver;
 /** @} */
 
-/**
- * @brief   Memory for the SAUL registry entries
- */
-static saul_reg_t saul_entries[DHT_NUMOF * 2];
-
 void auto_init_dht(void)
 {
-    for (unsigned int i = 0; i < DHT_NUMOF; i++) {
+    assert(DHT_INFO_NUM == DHT_NUM);
+
+    for (unsigned int i = 0; i < DHT_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing dht #%u\n", i);
 
         if (dht_init(&dht_devs[i], &dht_params[i]) != DHT_OK) {

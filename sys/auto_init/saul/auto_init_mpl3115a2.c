@@ -43,6 +43,11 @@ static mpl3115a2_t mpl3115a2_devs[MPL3115A2_NUM];
 static saul_reg_t saul_entries[MPL3115A2_NUM * 2];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define MPL3115A2_INFO_NUM    (sizeof(mpl3115a2_saul_info) / sizeof(mpl3115a2_saul_info[0]))
+
+/**
  * @name    Reference the driver struct
  * @{
  */
@@ -52,6 +57,8 @@ extern const saul_driver_t mpl3115a2_temperature_saul_driver;
 
 void auto_init_mpl3115a2(void)
 {
+    assert(MPL3115A2_NUM == MPL3115A2_INFO_NUM);
+
     for (unsigned i = 0; i < MPL3115A2_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing mpl3115a2 #%u\n", i);
 

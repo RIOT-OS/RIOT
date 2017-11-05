@@ -43,14 +43,19 @@ static mag3110_t mag3110_devs[MAG3110_NUM];
 static saul_reg_t saul_entries[MAG3110_NUM];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define MAG3110_INFO_NUM    (sizeof(mag3110_saul_info) / sizeof(mag3110_saul_info[0]))
+
+/**
  * @brief   Reference the driver struct
- * @{
  */
 extern const saul_driver_t mag3110_saul_driver;
-/** @} */
 
 void auto_init_mag3110(void)
 {
+    assert(MAG3110_NUM == MAG3110_INFO_NUM);
+
     for (unsigned i = 0; i < MAG3110_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing mag3110 #%u\n", i);
 

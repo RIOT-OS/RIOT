@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define LIS3DH_NUM    (sizeof(lis3dh_params)/sizeof(lis3dh_params[0]))
+#define LIS3DH_NUM    (sizeof(lis3dh_params) / sizeof(lis3dh_params[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -42,6 +42,11 @@ static lis3dh_t lis3dh_devs[LIS3DH_NUM];
 static saul_reg_t saul_entries[LIS3DH_NUM];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define LIS3DH_INFO_NUM    (sizeof(lis3dh_saul_info) / sizeof(lis3dh_saul_info[0]))
+
+/**
  * @brief   Reference the driver struct
  */
 extern saul_driver_t lis3dh_saul_driver;
@@ -49,18 +54,17 @@ extern saul_driver_t lis3dh_saul_driver;
 
 void auto_init_lis3dh(void)
 {
-    for (unsigned int i = 0; i < LIS3DH_NUM; i++) {
-        int res;
+    assert(LIS3DH_NUM == LIS3DH_INFO_NUM);
 
+    for (unsigned int i = 0; i < LIS3DH_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing lis3dh #%u\n", i);
 
-        res = lis3dh_init(&lis3dh_devs[i], &lis3dh_params[i]);
-        if (res < 0) {
+        if (lis3dh_init(&lis3dh_devs[i], &lis3dh_params[i]) < 0) {
             LOG_ERROR("[auto_init_saul] error initializing lis3dh #%u\n", i);
             continue;
         }
-        res = lis3dh_set_odr(&lis3dh_devs[i], lis3dh_params[i].odr);
-        if (res < 0) {
+
+        if (lis3dh_set_odr(&lis3dh_devs[i], lis3dh_params[i].odr) < 0) {
             LOG_ERROR("[auto_init_saul] error setting ODR for lis3dh #%u\n", i);
             continue;
         }
