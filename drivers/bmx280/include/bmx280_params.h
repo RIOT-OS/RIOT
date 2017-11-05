@@ -41,17 +41,23 @@ extern "C" {
 #endif
 
 /* Defaults for Weather Monitoring */
-#define BMX280_PARAMS_DEFAULT              \
-    {                                      \
-        .i2c_dev = BMX280_PARAM_I2C_DEV,   \
-        .i2c_addr = BMX280_PARAM_I2C_ADDR, \
-        .t_sb = BMX280_SB_0_5,             \
-        .filter = BMX280_FILTER_OFF,       \
-        .run_mode = BMX280_MODE_FORCED,     \
-        .temp_oversample = BMX280_OSRS_X1,  \
-        .press_oversample = BMX280_OSRS_X1, \
-        .humid_oversample = BMX280_OSRS_X1, \
-    }
+#ifndef BMX280_PARAMS
+#define BMX280_PARAMS                { .i2c_dev = BMX280_PARAM_I2C_DEV,    \
+                                       .i2c_addr = BMX280_PARAM_I2C_ADDR,  \
+                                       .t_sb = BMX280_SB_0_5,              \
+                                       .filter = BMX280_FILTER_OFF,        \
+                                       .run_mode = BMX280_MODE_FORCED,     \
+                                       .temp_oversample = BMX280_OSRS_X1,  \
+                                       .press_oversample = BMX280_OSRS_X1, \
+                                       .humid_oversample = BMX280_OSRS_X1 }
+#endif
+#ifndef BMX280_SAUL_INFO
+#if defined(MODULE_BME280)
+#define BMX280_SAUL_INFO { .name = "bme280" }
+#else
+#define BMX280_SAUL_INFO { .name = "bmp280" }
+#endif
+#endif
 /**@}*/
 
 /**
@@ -59,32 +65,19 @@ extern "C" {
  */
 static const bmx280_params_t bmx280_params[] =
 {
-#ifdef BMX280_PARAMS_BOARD
-    BMX280_PARAMS_BOARD,
-#else
-    BMX280_PARAMS_DEFAULT
-#endif
+    BMX280_PARAMS
 };
-
-/**
- * @brief   The number of configured sensors
- */
-#define BMX280_NUMOF    (sizeof(bmx280_params) / sizeof(bmx280_params[0]))
 
 /**
  * @brief   Configuration details of SAUL registry entries
  *
  * This two dimensional array contains static details of the sensors
- * for each device. Please be awar that the indexes are used in
+ * for each device. Please be aware that the indexes are used in
  * auto_init_bmx280, so make sure the indexes match.
  */
-static const saul_reg_info_t bmx280_saul_reg_info[BMX280_NUMOF] =
+static const saul_reg_info_t bmx280_saul_info[] =
 {
-#if defined(MODULE_BME280)
-        { .name = "bme280" }
-#else
-        { .name = "bmp280" }
-#endif
+    BMX280_SAUL_INFO
 };
 
 #ifdef __cplusplus

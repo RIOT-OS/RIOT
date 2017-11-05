@@ -96,19 +96,19 @@ extern "C" {
  * @name    User button configuration
  * @{
  */
-#define BTN0_PIN            P2IN
-#define BTN0_MASK           (0x20)
-#define BTN0_MODE           GPIO_IN
+#define BTN0_PIN                    P2IN
+#define BTN0_MASK                   (0x20)
+#define BTN0_MODE                   GPIO_IN
 
-#define BTN0_PRESSED        ((BTN0_PIN & BTN0_MASK) == 0)
-#define BTN0_RELEASED       ((BTN0_PIN & BTN0_MASK) != 0)
+#define BTN0_PRESSED                ((BTN0_PIN & BTN0_MASK) == 0)
+#define BTN0_RELEASED               ((BTN0_PIN & BTN0_MASK) != 0)
 /** @} */
 
 /**
  * @brief   Definition of the interface to the CC2420 radio
  */
-#define CC2420_PARAMS_BOARD         {.spi        = SPI_DEV(0), \
-                                     .spi_clk    = SPI_CLK_5MHZ, \
+#define CC2420_PARAMS               {.spi        = SPI_DEV(0),      \
+                                     .spi_clk    = SPI_CLK_5MHZ,    \
                                      .pin_cs     = GPIO_PIN(P3, 0), \
                                      .pin_fifo   = GPIO_PIN(P1, 3), \
                                      .pin_fifop  = GPIO_PIN(P1, 2), \

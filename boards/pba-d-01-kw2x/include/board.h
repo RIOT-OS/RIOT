@@ -79,10 +79,10 @@ extern "C"
  *
  * {spi bus, cs pin, int pin, spi speed,}
  */
-#define KW2XRF_PARAMS_BOARD  {.spi = SPI_DEV(1), \
-                              .spi_clk = SPI_CLK_10MHZ, \
-                              .cs_pin = GPIO_PIN(KW2XDRF_PORT, KW2XDRF_PCS0_PIN), \
-                              .int_pin = GPIO_PIN(KW2XDRF_PORT, KW2XDRF_IRQ_PIN) }
+#define KW2XRF_PARAMS       {.spi = SPI_DEV(1), \
+                             .spi_clk = SPI_CLK_10MHZ, \
+                             .cs_pin = GPIO_PIN(KW2XDRF_PORT, KW2XDRF_PCS0_PIN), \
+                             .int_pin = GPIO_PIN(KW2XDRF_PORT, KW2XDRF_IRQ_PIN) }
 #define KW2XRF_SHARED_SPI   0
 /** @}*/
 

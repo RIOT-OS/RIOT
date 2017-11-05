@@ -108,54 +108,53 @@ void board_init(void);
  * @todo Work around missing RESET pin on Mulle v0.6x
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
+ * @{
  */
-#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_DEV(0), \
-                                     .spi_clk = SPI_CLK_5MHZ, \
-                                     .cs_pin = SPI_HWCS(1), \
-                                     .int_pin = GPIO_PIN(PORT_B, 9), \
-                                     .sleep_pin = GPIO_PIN(PORT_E, 6), \
-                                     .reset_pin = GPIO_PIN(PORT_C, 12)}
-
+#define AT86RF2XX_PARAM_CS              (SPI_HWCS(1))
+#define AT86RF2XX_PARAM_INT             (GPIO_PIN(PORT_B, 9))
+#define AT86RF2XX_PARAM_SLEEP           (GPIO_PIN(PORT_E, 6))
+#define AT86RF2XX_PARAM_RESET           (GPIO_PIN(PORT_C, 12))
+/** @} */
 
 /**
  * @name LIS3DH configuration
  * @{
  */
-#define LIS3DH_INT1                 GPIO_PIN(PORT_C, 18)
-#define LIS3DH_INT2                 GPIO_PIN(PORT_C, 17)
-#define LIS3DH_CS                   SPI_HWCS(0)
-#define LIS3DH_CLK                  SPI_CLK_5MHZ
-#define LIS3DH_SPI                  SPI_DEV(0)
+#define LIS3DH_PARAM_INT1               (GPIO_PIN(PORT_C, 18))
+#define LIS3DH_PARAM_INT2               (GPIO_PIN(PORT_C, 17))
+#define LIS3DH_PARAM_CS                 (SPI_HWCS(0))
+#define LIS3DH_PARAM_CLK                (SPI_CLK_5MHZ)
 /** @} */
 
 /**
  * @name Mulle power control configuration
  */
 /** @{ */
-#define MULLE_POWER_AVDD        GPIO_PIN(PORT_B, 17) /**< AVDD enable pin */
-#define MULLE_POWER_VPERIPH     GPIO_PIN(PORT_D,  7) /**< VPERIPH enable pin */
-#define MULLE_POWER_VSEC        GPIO_PIN(PORT_B, 16) /**< VSEC enable pin */
+#define MULLE_POWER_AVDD                (GPIO_PIN(PORT_B, 17)) /**< AVDD enable pin */
+#define MULLE_POWER_VPERIPH             (GPIO_PIN(PORT_D,  7)) /**< VPERIPH enable pin */
+#define MULLE_POWER_VSEC                (GPIO_PIN(PORT_B, 16)) /**< VSEC enable pin */
 /** @} */
 
 /**
  * @name Mulle NVRAM hardware configuration
  */
 /** @{ */
-#define MULLE_NVRAM_SPI_DEV             SPI_DEV(0)
-#define MULLE_NVRAM_SPI_CLK             SPI_CLK_5MHZ
-#define MULLE_NVRAM_SPI_CS              SPI_HWCS(3) /**< FRAM CS pin */
-#define MULLE_NVRAM_CAPACITY            512     /**< FRAM size, in bytes */
-#define MULLE_NVRAM_SPI_ADDRESS_COUNT   1       /**< FRAM addressing size, in bytes */
+#define MULLE_NVRAM_SPI_DEV             (SPI_DEV(0))
+#define MULLE_NVRAM_SPI_CLK             (SPI_CLK_5MHZ)
+#define MULLE_NVRAM_SPI_CS              (SPI_HWCS(3)) /**< FRAM CS pin */
+#define MULLE_NVRAM_CAPACITY            (512U)        /**< FRAM size, in bytes */
+#define MULLE_NVRAM_SPI_ADDRESS_COUNT   (1U)          /**< FRAM addressing size, in bytes */
 /** @} */
 
 /**
  * @name Mulle NOR flash hardware configuration
  */
 /** @{ */
-#define MULLE_NOR_SPI_DEV               SPI_DEV(0)
-#define MULLE_NOR_SPI_CLK               SPI_CLK_5MHZ
-#define MULLE_NOR_SPI_CS                SPI_HWCS(2) /**< Flash CS pin */
+#define MULLE_NOR_SPI_DEV               (SPI_DEV(0))
+#define MULLE_NOR_SPI_CLK               (SPI_CLK_5MHZ)
+#define MULLE_NOR_SPI_CS                (SPI_HWCS(2)) /**< Flash CS pin */
 /** @} */
+
 /**
  * @name MTD configuration
  */
@@ -168,8 +167,8 @@ extern mtd_dev_t *mtd0;
  * @name Mulle Vchr, Vbat ADC lines
  */
 /** @{ */
-#define MULLE_VBAT_ADC_LINE           ADC_LINE(6)
-#define MULLE_VCHR_ADC_LINE           ADC_LINE(7)
+#define MULLE_VBAT_ADC_LINE             (ADC_LINE(6))
+#define MULLE_VCHR_ADC_LINE             (ADC_LINE(7))
 /** @} */
 #endif /* BOARD_H */
 /** @} */

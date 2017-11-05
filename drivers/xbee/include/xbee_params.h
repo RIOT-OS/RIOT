@@ -30,7 +30,7 @@ extern "C" {
  * @{
  */
 #ifndef XBEE_PARAM_UART
-#define XBEE_PARAM_UART         (UART_DEV(1))
+#define XBEE_PARAM_UART         UART_DEV(1)
 #endif
 #ifndef XBEE_PARAM_BR
 #define XBEE_PARAM_BR           (9600U)
@@ -43,8 +43,8 @@ extern "C" {
 #endif
 
 #ifndef XBEE_PARAMS
-#define XBEE_PARAMS             { .uart      = XBEE_PARAM_UART, \
-                                  .br        = XBEE_PARAM_BR, \
+#define XBEE_PARAMS             { .uart      = XBEE_PARAM_UART,      \
+                                  .br        = XBEE_PARAM_BR,        \
                                   .pin_sleep = XBEE_PARAM_PIN_SLEEP, \
                                   .pin_reset = XBEE_PARAM_PIN_RESET }
 #endif

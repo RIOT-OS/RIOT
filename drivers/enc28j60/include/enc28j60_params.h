@@ -30,16 +30,23 @@ extern "C" {
  * @{
  */
 #ifndef ENC28J60_PARAM_SPI
-#define ENC28J60_PARAM_SPI      (SPI_DEV(0))
+#define ENC28J60_PARAM_SPI      SPI_DEV(0)
 #endif
 #ifndef ENC28J60_PARAM_CS
-#define ENC28J60_PARAM_CS       (GPIO_PIN(0, 0))
+#define ENC28J60_PARAM_CS       GPIO_PIN(0, 0)
 #endif
 #ifndef ENC28J60_PARAM_INT
-#define ENC28J60_PARAM_INT      (GPIO_PIN(0, 1))
+#define ENC28J60_PARAM_INT      GPIO_PIN(0, 1)
 #endif
 #ifndef ENC28J60_PARAM_RESET
-#define ENC28J60_PARAM_RESET    (GPIO_PIN(0, 2))
+#define ENC28J60_PARAM_RESET    GPIO_PIN(0, 2)
+#endif
+
+#ifndef ENC28J60_PARAMS
+#define ENC28J60_PARAMS         { .spi = ENC28J60_PARAM_SPI,     \
+                                  .cs_pin = ENC28J60_PARAM_CS,   \
+                                  .int_pin = ENC28J60_PARAM_INT, \
+                                  .reset_pin = ENC28J60_PARAM_RESET }
 #endif
 /** @} */
 
@@ -47,12 +54,7 @@ extern "C" {
  * @brief   ENC28J60 configuration
  */
 static const  enc28j60_params_t enc28j60_params[] = {
-    {
-        .spi = ENC28J60_PARAM_SPI,
-        .cs_pin = ENC28J60_PARAM_CS,
-        .int_pin = ENC28J60_PARAM_INT,
-        .reset_pin = ENC28J60_PARAM_RESET,
-    },
+    ENC28J60_PARAMS
 };
 /** @} */
 

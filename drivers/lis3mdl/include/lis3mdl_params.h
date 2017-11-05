@@ -32,7 +32,7 @@ extern "C" {
  * @{
  */
 #ifndef LIS3MDL_PARAM_I2C
-#define LIS3MDL_PARAM_I2C           (I2C_DEV(0))
+#define LIS3MDL_PARAM_I2C           I2C_DEV(0)
 #endif
 #ifndef LIS3MDL_PARAM_ADDR
 #define LIS3MDL_PARAM_ADDR          (0x1E)

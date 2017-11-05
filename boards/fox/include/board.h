@@ -47,12 +47,12 @@ extern "C" {
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
-#define AT86RF2XX_PARAMS_BOARD      {.spi = SPI_DEV(0), \
-                                     .spi_clk = SPI_CLK_5MHZ, \
-                                     .cs_pin = GPIO_PIN(PORT_A, 1), \
-                                     .int_pin = GPIO_PIN(PORT_C, 2), \
-                                     .sleep_pin = GPIO_PIN(PORT_A, 0), \
-                                     .reset_pin = GPIO_PIN(PORT_C, 1)}
+#define AT86RF2XX_PARAMS    { .spi = SPI_DEV(0),                \
+                              .spi_clk = SPI_CLK_5MHZ,          \
+                              .cs_pin = GPIO_PIN(PORT_A, 1),    \
+                              .int_pin = GPIO_PIN(PORT_C, 2),   \
+                              .sleep_pin = GPIO_PIN(PORT_A, 0), \
+                              .reset_pin = GPIO_PIN(PORT_C, 1)}
 
 /**
  * @name    Define the interface to the LPS331AP pressure sensor

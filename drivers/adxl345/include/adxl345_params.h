@@ -32,7 +32,7 @@ extern "C" {
  * @{
  */
 #ifndef ADXL345_PARAM_I2C
-#define ADXL345_PARAM_I2C           (I2C_DEV(0))
+#define ADXL345_PARAM_I2C           I2C_DEV(0)
 #endif
 #ifndef ADXL345_PARAM_ADDR
 #define ADXL345_PARAM_ADDR          (ADXL345_ADDR_53)
@@ -62,6 +62,9 @@ extern "C" {
                                       .rate   = ADXL345_PARAM_RATE,      \
                                       .full_res = ADXL345_PARAM_FULL_RES }
 #endif
+#ifndef ADXL345_SAUL_INFO
+#define ADXL345_SAUL_INFO           { .name = "adxl345" }
+#endif
 /**@}*/
 
 /**
@@ -77,9 +80,7 @@ static const adxl345_params_t adxl345_params[] =
  */
 static const saul_reg_info_t adxl345_saul_info[] =
 {
-    {
-        .name = "adxl345"
-    }
+    ADXL345_SAUL_INFO
 };
 
 #ifdef __cplusplus
