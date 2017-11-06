@@ -322,13 +322,16 @@ static inline clist_node_t *clist_remove(clist_node_t *list, clist_node_t *node)
 /**
  * @brief Traverse clist, call function for each member
  *
+ * The pointer supplied by @p arg will be passed to every call to @p func.
+ *
  * If @p func returns non-zero, traversal will be aborted like when calling
  * break within a for loop.
  *
  * @param[in]       list        List to traverse.
  * @param[in]       func        Function to call for each member.
+ * @param[in]       arg         Pointer to pass to every call to @p func
  */
-static inline void clist_foreach(clist_node_t *list, int(*func)(clist_node_t *))
+static inline void clist_foreach(clist_node_t *list, int(*func)(clist_node_t *, void *), void *arg)
 {
     clist_node_t *node = list->next;
     if (! node) {
@@ -336,7 +339,7 @@ static inline void clist_foreach(clist_node_t *list, int(*func)(clist_node_t *))
     }
     do {
         node = node->next;
-        if (func(node)) {
+        if (func(node, arg)) {
             return;
         }
     } while (node != list->next);
