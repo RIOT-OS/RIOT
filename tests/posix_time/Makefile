@@ -1,6 +1,6 @@
-APPLICATION = posix_sleep
+APPLICATION = posix_time
 include ../Makefile.tests_common
 
-USEMODULE += posix
+USEMODULE += posix_time
 
 include $(RIOTBASE)/Makefile.include

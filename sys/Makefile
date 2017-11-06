@@ -7,6 +7,9 @@ endif
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
   DIRS += posix/sockets
 endif
+ifneq (,$(filter posix_time,$(USEMODULE)))
+  DIRS += posix/time
+endif
 ifneq (,$(filter pthread,$(USEMODULE)))
   DIRS += posix/pthread
 endif
