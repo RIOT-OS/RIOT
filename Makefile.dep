@@ -51,6 +51,10 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter uhcpc,$(USEMODULE)))
+  USEMODULE += posix
+endif
+
 ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
   USEMODULE += softdevice_handler
   USEMODULE += ble_common
