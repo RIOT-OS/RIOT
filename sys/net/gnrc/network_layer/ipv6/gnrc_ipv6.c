@@ -835,6 +835,12 @@ static inline bool _pkt_not_for_me(kernel_pid_t *iface, ipv6_hdr_t *hdr)
     }
 }
 
+static inline bool _pkt_not_local_mcast(ipv6_hdr_t *hdr)
+{
+    return (hdr->dst.u8[0] == 0xff) &&
+           ((hdr->dst.u8[1] & 0x0f) > IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
+}
+
 static void _receive(gnrc_pktsnip_t *pkt)
 {
     kernel_pid_t iface = KERNEL_PID_UNDEF;
@@ -949,8 +955,23 @@ static void _receive(gnrc_pktsnip_t *pkt)
           ipv6_addr_to_str(addr_str, &(hdr->dst), sizeof(addr_str)),
           hdr->nh, byteorder_ntohs(hdr->len));
 
-    if (_pkt_not_for_me(&iface, hdr)) { /* if packet is not for me */
-        DEBUG("ipv6: packet destination not this host\n");
+    /* if packet is not for me, or its a higher than link-local multicast */
+    bool not_for_me = _pkt_not_for_me(&iface, hdr);
+    if (not_for_me || _pkt_not_local_mcast(hdr)) {
+#if ENABLE_DEBUG
+        if (not_for_me) {
+            DEBUG("ipv6: packet destination not this host\n");
+        }
+        else {
+            DEBUG("ipv6: packet destination is multicast\n");
+        }
+#endif
+
+        /* if this multicast packet is also for ourselfs process it first */
+        if (!not_for_me) {
+            /* IPv6 internal demuxing (ICMPv6, Extension headers etc.) */
+            gnrc_ipv6_demux(iface, first_ext, pkt, hdr->nh);
+        }
 
 #ifdef MODULE_GNRC_IPV6_ROUTER    /* only routers redirect */
         /* redirect to next hop */
