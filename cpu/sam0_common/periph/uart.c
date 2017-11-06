@@ -61,8 +61,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
 
     /* configure pins */
-    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
-    gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
+    if (uart_config[uart].rx_pin != GPIO_UNDEF) {
+        gpio_init(uart_config[uart].rx_pin, GPIO_IN);
+        gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
+    }
     gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     gpio_set(uart_config[uart].tx_pin);
     gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
@@ -97,7 +99,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* enable transmitter, and configure 8N1 mode */
     dev(uart)->CTRLB.reg = (SERCOM_USART_CTRLB_TXEN);
     /* enable receiver and RX interrupt if configured */
-    if (rx_cb) {
+    if ((rx_cb) && (uart_config[uart].rx_pin != GPIO_UNDEF)) {
         uart_ctx[uart].rx_cb = rx_cb;
         uart_ctx[uart].arg = arg;
         NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(dev(uart)));
