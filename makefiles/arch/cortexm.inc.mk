@@ -31,6 +31,8 @@ export USEMODULE += cortexm_common
 export USEMODULE += periph
 # include common periph code
 export USEMODULE += periph_common
+export USEMODULE += cortexm_common_periph
+
 # all cortex MCU's use newlib as libc
 export USEMODULE += newlib
 
