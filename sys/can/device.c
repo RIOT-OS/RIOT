@@ -185,6 +185,18 @@ static void pm_reset(candev_dev_t *candev_dev, uint32_t value)
 }
 #endif
 
+static void wake_up(candev_dev_t *candev_dev)
+{
+    candev_t *dev = candev_dev->dev;
+    if (dev->state == CAN_STATE_BUS_OFF || dev->state == CAN_STATE_SLEEPING) {
+        DEBUG("can device: waking up driver\n");
+        power_up(candev_dev);
+    }
+#ifdef MODULE_CAN_PM
+    pm_reset(candev_dev, candev_dev->tx_wakeup_timeout);
+#endif
+}
+
 static void *_can_device_thread(void *args)
 {
     candev_dev_t *candev_dev = (candev_dev_t *) args;
@@ -244,14 +256,9 @@ static void *_can_device_thread(void *args)
             break;
         case CAN_MSG_SEND_FRAME:
             DEBUG("can device: CAN_MSG_SEND_FRAME received\n");
+            wake_up(candev_dev);
+            /* read incoming pkt */
             pkt = (can_pkt_t *) msg.content.ptr;
-            if (dev->state == CAN_STATE_BUS_OFF || dev->state == CAN_STATE_SLEEPING) {
-                DEBUG("can device: waking up driver\n");
-                power_up(candev_dev);
-            }
-#ifdef MODULE_CAN_PM
-            pm_reset(candev_dev, candev_dev->tx_wakeup_timeout);
-#endif
             dev->driver->send(dev, &pkt->frame);
             break;
         case CAN_MSG_SET:
@@ -278,6 +285,7 @@ static void *_can_device_thread(void *args)
             break;
         case CAN_MSG_SET_FILTER:
             DEBUG("can device: CAN_MSG_SET_FILTER received\n");
+            wake_up(candev_dev);
             /* set filter for device driver */
             res = dev->driver->set_filter(dev, msg.content.ptr);
             /* send reply to calling thread */
@@ -287,6 +295,7 @@ static void *_can_device_thread(void *args)
             break;
         case CAN_MSG_REMOVE_FILTER:
             DEBUG("can device: CAN_MSG_REMOVE_FILTER received\n");
+            wake_up(candev_dev);
             /* set filter for device driver */
             res = dev->driver->remove_filter(dev, msg.content.ptr);
             /* send reply to calling thread */
