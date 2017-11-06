@@ -227,6 +227,7 @@ static void _release_error_locked(gnrc_pktsnip_t *pkt, uint32_t err)
     while (pkt) {
         gnrc_pktsnip_t *tmp;
         assert(_pktbuf_contains(pkt));
+        assert(pkt->users > 0);
         tmp = pkt->next;
         if (pkt->users == 1) {
             pkt->users = 0; /* not necessary but to be on the safe side */
