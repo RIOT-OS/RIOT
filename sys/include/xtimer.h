@@ -445,7 +445,7 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
  * This function will set THREAD_FLAG_TIMEOUT on the current thread after @p
  * timeout usec have passed.
  *
- * @param[in]   t       timer struct to use
+ * @param[in]   timer   timer struct to use
  * @param[in]   timeout timeout in usec
  */
 void xtimer_set_timeout_flag(xtimer_t *timer, uint32_t timeout);
