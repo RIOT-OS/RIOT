@@ -1,2 +1,5 @@
 export INCLUDES += -I$(RIOTCPU)/mips32r2_common/include \
                    -I$(RIOTCPU)/mips_pic32_common/include
+
+USEMODULE += periph_common
+USEMODULE += periph_hwrng

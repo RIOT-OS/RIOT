@@ -11,3 +11,5 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += tcs37727
   USEMODULE += tmp006
 endif
+
+-include $(RIOTCPU)/kw2xd/Makefile.dep
