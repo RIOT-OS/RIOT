@@ -170,6 +170,7 @@ ifneq (,$(filter mpl3115a2,$(USEMODULE)))
 endif
 
 ifneq (,$(filter mpu9150,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
 
