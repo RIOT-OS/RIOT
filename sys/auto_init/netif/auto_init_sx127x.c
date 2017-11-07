@@ -21,7 +21,16 @@
 
 #include "log.h"
 #include "board.h"
+#ifdef MODULE_GNRC_NETIF2
+#include "net/gnrc/netif2/lora.h"
+#else
+#include "net/gnrc/netdev.h"
 #include "net/gnrc/netdev/lora.h"
+#endif
+
+#include "net/gnrc.h"
+
+#include "sx127x.h"
 #include "sx127x_params.h"
 
 /**
@@ -41,8 +50,8 @@
  * @brief   Allocate memory for device descriptors, stacks, and GNRC adaption
  */
 static sx127x_t sx127x_devs[SX127X_NUMOF];
-static gnrc_netdev_t gnrc_adpt[SX127X_NUMOF];
-static char stacks[SX127X_NUMOF][SX127X_STACKSIZE];
+static gnrc_netdev_t sx127x_netdevs[SX127X_NUMOF];
+static char sx127x_stacks[SX127X_NUMOF][SX127X_STACKSIZE];
 
 void auto_init_sx127x(void)
 {
@@ -54,9 +63,13 @@ void auto_init_sx127x(void)
 #endif
 
         sx127x_setup(&sx127x_devs[i], &sx127x_params[i]);
-        gnrc_netdev_lora_init(&gnrc_adpt[i], (netdev_t *)&sx127x_devs[i]);
-        gnrc_netdev_init(stacks[i], SX127X_STACKSIZE, SX127X_PRIO, "sx127x",
-                         &gnrc_adpt[i]);
+#ifdef MODULE_GNRC_NETIF2
+        gnrc_netif2_raw_create(sx127x_stacks[i], SX127X_STACKSIZE, SX127X_PRIO,
+                               "sx127x", (netdev_t *)&sx127x_devs[i]);
+#else
+        gnrc_netdev_init(sx127x_stacks[i], SX127X_STACKSIZE, SX127X_PRIO,
+                         "sx127x", &sx127x_netdevs[i]);
+#endif
     }
 }
 
