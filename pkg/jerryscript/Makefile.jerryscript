@@ -26,8 +26,9 @@ libjerry:
 	 -DEXTERNAL_COMPILE_FLAGS="$(EXT_CFLAGS)" \
 	 -DMEM_HEAP_SIZE_KB=$(JERRYHEAP)
 
-	make -C $(BUILD_DIR) jerry-core jerry-port-default-minimal
+	make -C $(BUILD_DIR) jerry-core jerry-ext jerry-port-default-minimal
 	cp $(BUILD_DIR)/lib/libjerry-core.a $(BINDIR)/jerryscript.a
+	cp $(BUILD_DIR)/lib/libjerry-ext.a $(BINDIR)/jerryscript-ext.a
 	cp $(BUILD_DIR)/lib/libjerry-port-default-minimal.a $(BINDIR)/jerryport-minimal.a
 
 include $(RIOTBASE)/Makefile.base
