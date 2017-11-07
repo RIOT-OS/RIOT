@@ -18,22 +18,14 @@
  * @}
  */
 
-#ifndef TEST_I2C
-#error "TEST_I2C not defined"
-#endif
-#ifndef TEST_HW_ADDR
-#error "TEST_HW_ADDR not defined"
-#endif
-#ifndef TEST_COMP_ADDR
-#error "TEST_COMP_ADDR not defined"
-#endif
-
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "mpu9150.h"
 #include "xtimer.h"
 #include "board.h"
+
+#include "mpu9150.h"
+#include "mpu9150_params.h"
 
 #define SLEEP   (1000 * 1000u)
 
@@ -47,7 +39,7 @@ int main(void)
     puts("MPU-9150 test application\n");
 
     printf("+------------Initializing------------+\n");
-    result = mpu9150_init(&dev, TEST_I2C, TEST_HW_ADDR, TEST_COMP_ADDR);
+    result = mpu9150_init(&dev, &mpu9150_params[0]);
 
     if (result == -1) {
         puts("[Error] The given i2c is not enabled");
@@ -91,7 +83,7 @@ int main(void)
                 measurement.x_axis, measurement.y_axis, measurement.z_axis);
         /* Get compass data in mikro Tesla */
         mpu9150_read_compass(&dev, &measurement);
-        printf("Compass data [mikro T] - X: %"PRId16"   Y: %"PRId16"   Z: %"PRId16"\n",
+        printf("Compass data [micro T] - X: %"PRId16"   Y: %"PRId16"   Z: %"PRId16"\n",
                 measurement.x_axis, measurement.y_axis, measurement.z_axis);
         /* Get temperature in milli degrees celsius */
         mpu9150_read_temperature(&dev, &temperature);
