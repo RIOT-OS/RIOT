@@ -26,7 +26,7 @@ pip3 install --user pycrypto ecdsa pyasn1
 ```
 
 This test can be called using `make mcuboot` to produce such ELF file,
-which can also be flashed using `make flash-mcuboot`.This command also flashes
+which can also be flashed using `make mcuboot-flash`.This command also flashes
 the pre-compiled bootloader.
 
 It's also possible to build and flash MCUBoot by following the instructions on
