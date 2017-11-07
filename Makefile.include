@@ -409,6 +409,13 @@ debug-server:
 		exit 1; }
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
+emulate:
+	@command -v $(EMULATOR) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED}Emulation program $(EMULATOR) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
+	$(EMULATOR) $(EMULATOR_FLAGS)
+
 reset:
 	@command -v $(RESET) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
