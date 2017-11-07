@@ -3,3 +3,23 @@ export CPU_FAM  = stm32f3
 
 include $(RIOTCPU)/stm32_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+ifneq (,$(filter stm32f302r8 stm32f303k8,$(CPU_MODEL)))
+  export ROM_LEN = 0x10000
+  export RAM_LEN = 0x4000
+else ifneq (,$(filter stm32f303re,$(CPU_MODEL)))
+  export ROM_LEN = 0x800000
+  export RAM_LEN = 0x10000
+else ifneq (,$(filter stm32f334r8,$(CPU_MODEL)))
+  export ROM_LEN = 0x10000
+  export RAM_LEN = 0x3000
+  export CCMRAM_LEN = 0x1000
+else ifneq (,$(filter stm32f303ze,$(CPU_MODEL)))
+  export ROM_LEN = 0x80000
+  export RAM_LEN = 0x10000
+  export CCMRAM_LEN = 0x4000
+else ifneq (,$(filter stm32f303vc,$(CPU_MODEL)))
+  export ROM_LEN = 0x40000
+  export RAM_LEN = 0xA000
+  export CCMRAM_LEN = 0x2000
+endif

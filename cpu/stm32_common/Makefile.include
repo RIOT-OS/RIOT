@@ -8,5 +8,12 @@ USEMODULE += periph_common
 # include stm32 common functions and stm32 common periph drivers
 USEMODULE += stm32_common stm32_common_periph
 
+ROM_START_ADDR ?= 0x08000000
+RAM_START_ADDR ?= 0x20000000
+CCMRAM_ADDR   ?= 0x10000000
+
+# For Cortex-M cpu we use the cortexm.ld linker script
+LINKER_SCRIPT ?= cortexm.ld
+
 # export the common include directory
 export INCLUDES += -I$(RIOTCPU)/stm32_common/include

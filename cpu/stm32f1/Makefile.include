@@ -5,3 +5,11 @@ USEMODULE += pm_layered
 
 include $(RIOTCPU)/stm32_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+ifneq (,$(filter stm32f103re,$(CPU_MODEL)))
+  export ROM_LEN = 0x80000
+  export RAM_LEN = 0x10000
+else ifneq (,$(filter stm32f103rb stm32f103cb,$(CPU_MODEL)))
+  export ROM_LEN = 0x20000
+  export RAM_LEN = 0x5000
+endif
