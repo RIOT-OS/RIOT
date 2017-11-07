@@ -13,7 +13,7 @@ MCUBOOT_BIN_MD5 ?= 0c71a0589bd3709fc2d90f07a0035ce7
 
 export IMAGE_HDR_SIZE ?= 512
 
-create-key: $(MCUBOOT_KEYFILE)
+mcuboot-create-key: $(MCUBOOT_KEYFILE)
 
 ifeq ($(BINDIR)/key.pem,$(MCUBOOT_KEYFILE))
 $(MCUBOOT_KEYFILE):
@@ -21,7 +21,7 @@ $(MCUBOOT_KEYFILE):
 	$(Q)$(IMGTOOL) keygen -k $@ -t rsa-2048
 endif
 
-mcuboot: create-key link
+mcuboot: mcuboot-create-key link
 	@$(COLOR_ECHO)
 	@$(COLOR_ECHO) '${COLOR_PURPLE}Re-linking for MCUBoot at $(SLOT0_SIZE)...${COLOR_RESET}'
 	@$(COLOR_ECHO)
@@ -39,14 +39,14 @@ mcuboot: create-key link
 $(MCUBOOT_BIN):
 	$(Q)$(DLCACHE) $(MCUBOOT_BIN_URL) $(MCUBOOT_BIN_MD5) $@
 
-.PHONY: flash-bootloader flash-mcuboot
+.PHONY: mcuboot-flash-bootloader mcuboot-flash
 
-flash-bootloader: HEXFILE = $(MCUBOOT_BIN)
-flash-bootloader: $(MCUBOOT_BIN) $(FLASHDEPS)
+mcuboot-flash-bootloader: HEXFILE = $(MCUBOOT_BIN)
+mcuboot-flash-bootloader: $(MCUBOOT_BIN) $(FLASHDEPS)
 	FLASH_ADDR=0x0 $(FLASHER) $(FFLAGS)
 
-flash-mcuboot: HEXFILE = $(SIGN_BINFILE)
-flash-mcuboot: mcuboot $(FLASHDEPS) flash-bootloader
+mcuboot-flash: HEXFILE = $(SIGN_BINFILE)
+mcuboot-flash: mcuboot $(FLASHDEPS) mcuboot-flash-bootloader
 	FLASH_ADDR=$(SLOT0_SIZE) $(FLASHER) $(FFLAGS)
 
 else
