@@ -540,6 +540,7 @@ static void _handle_nbr_adv(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
     }
 }
 
+#if GNRC_IPV6_NIB_CONF_ARSM
 static inline bool _is_reachable(_nib_onl_entry_t *entry)
 {
     (void)entry; /* _get_nud_state() might just resolved to UNMANAGED as macro */
@@ -551,6 +552,7 @@ static inline bool _is_reachable(_nib_onl_entry_t *entry)
             return true;
     }
 }
+#endif
 
 #if GNRC_IPV6_NIB_CONF_QUEUE_PKT
 static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
