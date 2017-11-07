@@ -290,6 +290,9 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
             return;
         }
     }
+#else
+    /* Prevent unused function error thrown by clang */
+    (void)_get_l2addr_from_ipv6;
 #endif
     nce->l2addr_len = node->l2addr_len;
     memcpy(&nce->l2addr, &node->l2addr, node->l2addr_len);
