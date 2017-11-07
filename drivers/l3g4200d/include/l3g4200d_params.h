@@ -38,10 +38,10 @@ extern "C" {
 #define L3G4200D_PARAM_ADDR         (0x68)
 #endif
 #ifndef L3G4200D_PARAM_INT1
-#define L3G4200D_PARAM_INT1         (GPIO_PIN(0, 0))
+#define L3G4200D_PARAM_INT1         GPIO_PIN(0, 0)
 #endif
 #ifndef L3G4200D_PARAM_INT2
-#define L3G4200D_PARAM_INT2         (GPIO_PIN(0, 1))
+#define L3G4200D_PARAM_INT2         GPIO_PIN(0, 1)
 #endif
 #ifndef L3G4200D_PARAM_MODE
 #define L3G4200D_PARAM_MODE         (L3G4200D_MODE_200_25)
