@@ -25,20 +25,17 @@ static kernel_pid_t gnrc_wireless_interface;
 
 static void set_interface_roles(void)
 {
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-    size_t numof = gnrc_netif_get(ifs);
+    gnrc_netif2_t *netif = NULL;
 
-    for (size_t i = 0; i < numof && i < GNRC_NETIF_NUMOF; i++) {
-        kernel_pid_t dev = ifs[i];
+    while ((netif = gnrc_netif2_iter(netif))) {
+        kernel_pid_t dev = netif->pid;
         int is_wired = gnrc_netapi_get(dev, NETOPT_IS_WIRED, 0, NULL, 0);
         if ((!gnrc_border_interface) && (is_wired == 1)) {
             ipv6_addr_t addr, defroute;
             gnrc_border_interface = dev;
 
             ipv6_addr_from_str(&addr, "fe80::2");
-            gnrc_ipv6_netif_add_addr(dev, &addr, 64,
-                                     GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST);
-
+            gnrc_netapi_set(dev, NETOPT_IPV6_ADDR, 64 << 8, &addr, sizeof(addr));
             ipv6_addr_from_str(&defroute, "::");
             ipv6_addr_from_str(&addr, "fe80::1");
             fib_add_entry(&gnrc_ipv6_fib_table, dev, defroute.u8, 16,
@@ -90,17 +87,17 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
         return;
     }
 
-    gnrc_ipv6_netif_add_addr(gnrc_wireless_interface, (ipv6_addr_t*)prefix, 64,
-                             GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST |
-                             GNRC_IPV6_NETIF_ADDR_FLAGS_NDP_AUTO);
-
-    gnrc_ipv6_netif_remove_addr(gnrc_wireless_interface, &_prefix);
+    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (64 << 8),
+                    prefix, sizeof(ipv6_addr_t));
+    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
+                    &_prefix, sizeof(_prefix));
     print_str("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix ");
     ipv6_addr_print((ipv6_addr_t*)prefix);
     puts("/64");
 
     if (!ipv6_addr_is_unspecified(&_prefix)) {
-        gnrc_ipv6_netif_remove_addr(gnrc_wireless_interface, &_prefix);
+        gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
+                        &_prefix, sizeof(_prefix));
         print_str("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix ");
         ipv6_addr_print(&_prefix);
         puts("/64");

@@ -22,6 +22,7 @@
 
 #include "net/gnrc/tftp.h"
 #include "net/gnrc/netapi.h"
+#include "net/gnrc/netif2.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/ipv6.h"
@@ -253,14 +254,13 @@ static int _tftp_server(tftp_context_t *ctxt);
 static uint16_t _tftp_get_maximum_block_size(void)
 {
     uint16_t tmp;
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-    size_t ifnum = gnrc_netif_get(ifs);
+    gnrc_netif2_t *netif = gnrc_netif2_iter(NULL);
 
-    if (ifnum > 0 && gnrc_netapi_get(ifs[0], NETOPT_MAX_PACKET_SIZE, 0, &tmp, sizeof(uint16_t)) >= 0) {
+    if ((netif != NULL) && gnrc_netapi_get(netif->pid, NETOPT_MAX_PACKET_SIZE,
+                                           0, &tmp, sizeof(uint16_t)) >= 0) {
         /* TODO calculate proper block size */
         return tmp - sizeof(udp_hdr_t) - sizeof(ipv6_hdr_t) - 10;
     }
-
     return GNRC_TFTP_MAX_TRANSFER_UNIT;
 }
 
