@@ -94,6 +94,10 @@ ifneq (,$(filter encx24j600,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter tmp006,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter ethos,$(USEMODULE)))
   USEMODULE += netdev_eth
   USEMODULE += random

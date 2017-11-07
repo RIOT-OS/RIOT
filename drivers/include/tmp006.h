@@ -101,6 +101,28 @@ extern "C"
 #endif
 
 /**
+ * @brief   Default low power mode
+ *
+ * If set to 0, the device will be always-on
+ * If set to 1, the device will be put in low power mode between measurements.
+ * This adds a @c TMP006_CONVERSION_TIME us delay to each measurement call
+ * for bringing the device out of standby.
+ */
+#ifndef TMP006_USE_LOW_POWER
+#define TMP006_USE_LOW_POWER (0)
+#endif
+
+/**
+ * @brief   Default raw value mode
+ *
+ * If set to 0, measurements will be converted to Celsius.
+ * If set to 1, raw adc readings will be returned.
+ */
+#ifndef TMP006_USE_RAW_VALUES
+#define TMP006_USE_RAW_VALUES (0)
+#endif
+
+/**
  * @name    Conversion rate and AVG sampling configuration
  * @{
  */
