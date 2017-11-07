@@ -18,6 +18,7 @@
 #ifndef NET_GNRC_NETIF2_LORA_H
 #define NET_GNRC_NETIF2_LORA_H
 
+#include "net/gnrc/netif2.h"
 #include "net/gnrc/netdev.h"
 
 
