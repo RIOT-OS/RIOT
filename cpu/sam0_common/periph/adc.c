@@ -102,8 +102,8 @@ static int _adc_configure(adc_res_t res)
     /* Power On */
     PM->APBCMASK.reg |= PM_APBCMASK_ADC;
     /* GCLK Setup */
-    GCLK->CLKCTRL.reg = (uint32_t)(GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 |
-                        (GCLK_CLKCTRL_ID(ADC_GCLK_ID)));
+    GCLK->CLKCTRL =
+        (GCLK_CLKCTRL_Type){{.CLKEN=true, .GEN=adc_config.gclk_src, .ID=(uint16_t)GCLK_CLKCTRL_ID_ADC_Val}};
     /* Configure CTRLB Register HERE IS THE RESOLUTION SET! */
     ADC_0_DEV->CTRLB.reg = ADC_0_PRESCALER | res;
     /* Load the fixed device calibration constants */
@@ -126,7 +126,7 @@ static int _adc_configure(adc_res_t res)
     /* Power on */
     MCLK->APBDMASK.reg |= MCLK_APBDMASK_ADC;
     /* GCLK Setup */
-    GCLK->PCHCTRL[ADC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0;
+    GCLK->PCHCTRL[ADC_GCLK_ID] = (GCLK_PCHCTRL_Type){{.CHEN=true, .GEN=adc_config.gclk_src}};
     /* Set Voltage Reference */
     ADC_0_DEV->REFCTRL.reg = ADC_0_REF_DEFAULT;
     /* Configure CTRLB & CTRLC Register */

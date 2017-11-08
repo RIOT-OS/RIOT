@@ -149,12 +149,15 @@ static const uart_conf_t uart_config[] = {
 #define ADC_0_IRQ                          ADC_IRQn
 
 /* ADC 0 Default values */
-#define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
 #define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
 
 #define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
 #define ADC_0_GAIN_FACTOR_DEFAULT          ADC_INPUTCTRL_GAIN_1X
 #define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
+
+static const adc_conf_t adc_config = {
+    .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
+};
 
 static const adc_conf_chan_t adc_channels[] = {
     /* port, pin, muxpos */

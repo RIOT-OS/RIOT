@@ -279,6 +279,13 @@ static inline void sercom_set_gen(void *sercom, uint32_t gclk)
 }
 
 /**
+ * @brief ADC Configuration
+ */
+typedef struct {
+    uint32_t gclk_src;      /**< GCLK source which supplys ADC */
+} adc_conf_t;
+
+/**
  * @brief ADC Channel Configuration
  */
 typedef struct {
