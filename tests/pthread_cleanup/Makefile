@@ -7,3 +7,6 @@ BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove
 USEMODULE += pthread
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py

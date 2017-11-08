@@ -10,3 +10,6 @@ USEMODULE += posix
 USEMODULE += pthread
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py
