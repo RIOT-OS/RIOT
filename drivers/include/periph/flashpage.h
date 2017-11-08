@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -28,6 +29,9 @@
  * @brief       Low-level flash page peripheral driver interface
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Francisco Acosta <francisco.acosta@inria.fr>
+ *
  */
 
 #ifndef PERIPH_FLASHPAGE_H
@@ -47,8 +51,30 @@ extern "C" {
 #ifndef CPU_FLASH_BASE
 #define CPU_FLASH_BASE      (0)
 #endif
+/**
+ * @def     FLASHPAGE_RAW_BLOCKSIZE
+ *
+ * @brief   For raw writings to the flash, this constant must define the
+ *          minimum write length allowed by the MCU.
+ */
+#ifdef DOXYGEN
+#define FLASHPAGE_RAW_BLOCKSIZE
+#endif
 
 /**
+ * @def     FLASHPAGE_RAW_ALIGNMENT
+ *
+ * @brief   The buffers to be written to the flash MUST be aligned, as well as
+ *          the address on which the buffer is written to the flash. This variable
+ *          must be defined for that purpose, according to the MCU align
+ *          requirements.
+ */
+#ifdef DOXYGEN
+#define FLASHPAGE_RAW_ALIGNMENT
+#endif
+/**
+ * @def FLASHPAGE_SIZE
+ *
  * @brief   Make sure the page size and the number of pages is defined
  */
 #ifndef FLASHPAGE_SIZE
@@ -101,16 +127,39 @@ static inline int flashpage_page(void *addr)
  * @brief   Write the given page with the given data
  *
  * @param[in] page      page to write
- * @param[in] data      data to write to the page, MUST be @p FLASHPAGE_SIZE
+ * @param[in] data      data to write to the page, MUST be FLASHPAGE_SIZE
  *                      byte. Set to NULL for page erase only.
  */
 void flashpage_write(int page, void *data);
 
 /**
+ * @brief   Write any number of data bytes to a given location in the
+ *          flash memory
+ *
+ * @warning Make sure the targeted memory area is erased before calling
+ *          this function
+ *
+ * Both target address and data address must be aligned to
+ * FLASHPAGE_RAW_ALIGN. @p len must be a multiple of FLASHPAGE_RAW_BLOCKSIZE.
+ * This function doesn't erase any area in flash, thus be sure the targeted
+ * memory area is erased before writing on it (using the flashpage_write function).
+ *
+ * @param[in] target_addr   address in flash to write to. MUST be aligned
+ *                          to FLASHPAGE_RAW_ALIGNMENT.
+ * @param[in] data          data to write to the address. MUST be aligned
+ *                          to FLASHPAGE_RAW_ALIGNMENT.
+ * @param[in] len           length of the data to be written. It MUST be
+ *                          multiple of FLASHPAGE_RAW_BLOCKSIZE. Also,
+ *                          ensure it doesn't exceed the actual flash
+ *                          memory size.
+ */
+void flashpage_write_raw(void *target_addr, void *data, size_t len);
+
+/**
  * @brief   Read the given page into the given memory location
  *
  * @param[in]  page     page to read
- * @param[out] data     memory to write the page to, MUST be @p FLASHPAGE_SIZE
+ * @param[out] data     memory to write the page to, MUST be FLASHPAGE_SIZE
  *                      byte
  */
 void flashpage_read(int page, void *data);
@@ -119,7 +168,7 @@ void flashpage_read(int page, void *data);
  * @brief   Verify the given page against the given data
  *
  * @param[in] page      page to verify
- * @param[in] data      data to compare page against, MUST be @p FLASHPAGE_SIZE
+ * @param[in] data      data to compare page against, MUST be FLASHPAGE_SIZE
  *                      byte of data
  *
  * @return              FLASHPAGE_OK if data in the page is identical to @p data
@@ -133,7 +182,7 @@ int flashpage_verify(int page, void *data);
  * This is a convenience function wrapping flashpage_write and flashpage_verify.
  *
  * @param[in] page      page to write
- * @param[in] data      data to write to the page, MUST be @p FLASHPAGE_SIZE
+ * @param[in] data      data to write to the page, MUST be FLASHPAGE_SIZE
  *                      byte.
  *
  * @return              FLASHPAGE_OK on success
