@@ -127,30 +127,43 @@ static void test_decrypt_op(uint8_t* key, uint8_t key_len,
 
 }
 
+#define do_test_encrypt_op(name) do { \
+    test_encrypt_op(TEST_##name##_KEY, TEST_##name##_KEY_LEN, \
+                    TEST_##name##_INPUT, TEST_##name##_ADATA_LEN, \
+                    TEST_##name##_NONCE, TEST_##name##_NONCE_LEN, \
+                    \
+                    TEST_##name##_INPUT + TEST_##name##_ADATA_LEN, \
+                    TEST_##name##_INPUT_LEN, \
+                    \
+                    TEST_##name##_EXPECTED + TEST_##name##_ADATA_LEN, \
+                    TEST_##name##_EXPECTED_LEN - TEST_##name##_ADATA_LEN, \
+                    ); \
+} while (0)
+
+
 static void test_crypto_modes_ccm_encrypt(void)
 {
-    test_encrypt_op(TEST_1_KEY, TEST_1_KEY_LEN, TEST_1_INPUT, TEST_1_ADATA_LEN,
-                    TEST_1_NONCE, TEST_1_NONCE_LEN, TEST_1_INPUT + TEST_1_ADATA_LEN,
-                    TEST_1_INPUT_LEN, TEST_1_EXPECTED + TEST_1_ADATA_LEN,
-                    TEST_1_EXPECTED_LEN - TEST_1_ADATA_LEN);
-
-    test_encrypt_op(TEST_2_KEY, TEST_2_KEY_LEN, TEST_2_INPUT, TEST_2_ADATA_LEN,
-                    TEST_2_NONCE, TEST_2_NONCE_LEN, TEST_2_INPUT + TEST_2_ADATA_LEN,
-                    TEST_2_INPUT_LEN, TEST_2_EXPECTED + TEST_2_ADATA_LEN,
-                    TEST_2_EXPECTED_LEN - TEST_2_ADATA_LEN);
+    do_test_encrypt_op(1);
+    do_test_encrypt_op(2);
 }
+
+#define do_test_decrypt_op(name) do { \
+    test_decrypt_op(TEST_##name##_KEY, TEST_##name##_KEY_LEN, \
+                    TEST_##name##_INPUT, TEST_##name##_ADATA_LEN, \
+                    TEST_##name##_NONCE, TEST_##name##_NONCE_LEN, \
+                    \
+                    TEST_##name##_EXPECTED + TEST_##name##_ADATA_LEN, \
+                    TEST_##name##_EXPECTED_LEN - TEST_##name##_ADATA_LEN, \
+                    \
+                    TEST_##name##_INPUT + TEST_##name##_ADATA_LEN, \
+                    TEST_##name##_INPUT_LEN, \
+                    ); \
+} while (0)
 
 static void test_crypto_modes_ccm_decrypt(void)
 {
-    test_decrypt_op(TEST_1_KEY, TEST_1_KEY_LEN, TEST_1_INPUT, TEST_1_ADATA_LEN,
-                    TEST_1_NONCE, TEST_1_NONCE_LEN, TEST_1_EXPECTED + TEST_1_ADATA_LEN,
-                    TEST_1_EXPECTED_LEN - TEST_1_ADATA_LEN, TEST_1_INPUT + TEST_1_ADATA_LEN,
-                    TEST_1_INPUT_LEN);
-
-    test_decrypt_op(TEST_2_KEY, TEST_2_KEY_LEN, TEST_2_INPUT, TEST_2_ADATA_LEN,
-                    TEST_2_NONCE, TEST_2_NONCE_LEN, TEST_2_EXPECTED + TEST_2_ADATA_LEN,
-                    TEST_2_EXPECTED_LEN - TEST_2_ADATA_LEN, TEST_2_INPUT + TEST_2_ADATA_LEN,
-                    TEST_2_INPUT_LEN);
+    do_test_decrypt_op(1);
+    do_test_decrypt_op(2);
 }
 
 
