@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_nucleo-common
+ * @ingroup     boards_nucleo32-common
  * @{
  *
  * @file

@@ -235,7 +235,7 @@ typedef enum {
 #endif /* ndef CPU_FAM_STM32F1 */
 
 /**
- * @brief   Override the ADC resolution configuration
+ * @name    Override the ADC resolution configuration
  * @{
  */
 #define HAVE_ADC_RES_T
