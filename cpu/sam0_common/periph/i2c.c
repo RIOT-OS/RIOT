@@ -103,6 +103,11 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             return -1;
     }
 
+    /* HACK: fixes cppcheck issue until #7588 is merged. */
+    if (I2CSercom == NULL) {
+        return -1;
+    }
+
     /* DISABLE I2C MASTER */
     i2c_poweroff(dev);
 
