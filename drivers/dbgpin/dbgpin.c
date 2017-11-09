@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys_pindbg
+ * @ingroup     sys_dbgpin
  * @{
  *
  * @file
@@ -18,15 +18,15 @@
  * @}
  */
 
-#include "pindbg.h"
+#include "dbgpin.h"
 #include "periph/gpio.h"
 
-void pindbg_init(void)
+void dbgpin_init(void)
 {
-#ifdef PINDBG0
-    gpio_init(PINDBG0, GPIO_OUT);
+#ifdef DBGPIN0
+    gpio_init(DBGPIN0, GPIO_OUT);
 #endif
-#ifdef PINDBG1
-    gpio_init(PINDBG1, GPIO_OUT);
+#ifdef DBGPIN1
+    gpio_init(DBGPIN1, GPIO_OUT);
 #endif
 }

@@ -32,8 +32,8 @@
 #include "panic.h"
 #include "vectors_cortexm.h"
 
-#ifdef MODULE_PINDBG
-#include "pindbg.h"
+#ifdef MODULE_DBGPIN
+#include "dbgpin.h"
 #endif
 
 #ifndef SRAM_BASE
@@ -117,9 +117,9 @@ void reset_handler_default(void)
 
     post_startup();
 
-#ifdef MODULE_PINDBG
+#ifdef MODULE_DBGPIN
     /* initialize debug pins if configured */
-    pindbg_init();
+    dbgpin_init();
 #endif
 
     /* initialize the board (which also initiates CPU initialization) */
