@@ -1,9 +1,9 @@
-ALIAS = linux phynode
+# list of known alias
+ALIAS.phynode   = pba-d-01-kw2x
+ALIAS.linux     = native
 
-# this basically implements a look-up table, is there a nicer way in make?
-ifneq (,$(filter phynode,$(BOARD)))
-  BOARD := pba-d-01-kw2x
-endif
-ifneq (,$(filter linux,$(BOARD)))
-  BOARD := native
+# this temporary variable is needed as we can not use BOARD when assigning BOARD
+ALIAS_TARGET := $(ALIAS.$(BOARD))
+ifneq (,($(ALIAS_TARGET)))
+  override BOARD = $(ALIAS_TARGET)
 endif
