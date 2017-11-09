@@ -256,15 +256,6 @@ static int _init_peripherals(sx127x_t *dev)
         return 0;
     }
 
-    res = gpio_init(dev->params.nss_pin, GPIO_OUT);
-    if (res < 0) {
-        DEBUG("sx127x: error initializing GPIO_%ld as CS line (code %i)\n",
-                  (long)dev->params.nss_pin, res);
-        return 0;
-    }
-
-    gpio_set(dev->params.nss_pin);
-
     DEBUG("sx127x: peripherals initialized with success\n");
     return 1;
 }
