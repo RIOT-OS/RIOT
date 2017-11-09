@@ -4,6 +4,9 @@
 # include Makefile.local if it exists
 -include Makefile.local
 
+# map given board name to actual board folder (resolve potential alias)
+include $(RIOTBASE)/makefiles/boards/alias.inc.mk
+
 # set undefined variables
 RIOTBASE       ?= $(dir $(lastword $(MAKEFILE_LIST)))
 CCACHE_BASEDIR ?= $(RIOTBASE)
