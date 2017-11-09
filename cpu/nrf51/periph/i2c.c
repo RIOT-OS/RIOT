@@ -37,8 +37,6 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-#ifdef I2C_NUMOF
-
 /**
  * @brief   If any of the 4 lower bits are set, the speed value is invalid
  */
@@ -230,5 +228,3 @@ int i2c_write_regs(i2c_t bus, uint8_t address, uint8_t reg,
     write(bus, address, &reg, 1, 0);
     return write(bus, address, data, length, 1);
 }
-
-#endif /* I2C_NUMOF */
