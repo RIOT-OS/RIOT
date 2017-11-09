@@ -164,13 +164,6 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name    ADC configuration
- * @{
- */
-#define ADC_NUMOF           (0)
-/** @} */
-
-/**
  * @name    RTC configuration
  * @{
  */

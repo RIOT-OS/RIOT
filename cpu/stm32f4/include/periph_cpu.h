@@ -48,37 +48,13 @@ enum {
 /**
  * @brief   Available number of ADC devices
  */
-#if defined(CPU_MODEL_STM32F401RE) || defined(CPU_MODEL_STM32F410RB) || defined(CPU_MODEL_STM32F411RE)|| defined(CPU_MODEL_STM32F413ZH)
+#if defined(CPU_MODEL_STM32F401RE) || defined(CPU_MODEL_STM32F410RB) \
+    || defined(CPU_MODEL_STM32F411RE)|| defined(CPU_MODEL_STM32F413ZH)
 #define ADC_DEVS            (1U)
-#elif defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG) || defined(CPU_MODEL_STM32F446RE) || defined(CPU_MODEL_STM32F429ZI)
+#elif defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG) \
+    || defined(CPU_MODEL_STM32F446RE) || defined(CPU_MODEL_STM32F429ZI)
 #define ADC_DEVS            (3U)
 #endif
-
-#ifndef DOXYGEN
-/**
- * @brief   Override the ADC resolution configuration
- * @{
- */
-#define HAVE_ADC_RES_T
-typedef enum {
-    ADC_RES_6BIT  = 0x03000000,     /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT  = 0x02000000,     /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = 0x01000000,     /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT = 0x00000000,     /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = 1,              /**< ADC resolution: 14 bit (not supported) */
-    ADC_RES_16BIT = 2               /**< ADC resolution: 16 bit (not supported)*/
-} adc_res_t;
-/** @} */
-#endif /* ndef DOXYGEN */
-
-/**
- * @brief   ADC channel configuration data
- */
-typedef struct {
-    gpio_t pin;             /**< pin connected to the channel */
-    uint8_t dev;            /**< ADCx - 1 device used for the channel */
-    uint8_t chan;           /**< CPU ADC channel connected to the pin */
-} adc_conf_t;
 
 /**
  * @brief   Power on the DMA device the given stream belongs to

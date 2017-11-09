@@ -19,7 +19,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "periph_cpu.h"
+#include "periph_conf_nucleo64.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -271,27 +271,6 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_SDA_PIN       9
 #define I2C_0_SDA_AF        4
 #define I2C_0_SDA_CLKEN()   (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN))
-/** @} */
-
-/**
- * @name   ADC configuration
- *
- * Note that we do not configure all ADC channels,
- * and not in the STM32F446 order.  Instead, we
- * just define 6 ADC channels, for the Nucleo
- * Arduino header pins A0-A5
- *
- * @{
- */
-#define ADC_NUMOF          (6U)
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_A, 0), 0, 0}, \
-    {GPIO_PIN(PORT_A, 1), 0, 1}, \
-    {GPIO_PIN(PORT_A, 4), 0, 4}, \
-    {GPIO_PIN(PORT_B, 0), 0, 8}, \
-    {GPIO_PIN(PORT_C, 1), 0, 11}, \
-    {GPIO_PIN(PORT_C, 0), 0, 10}, \
-}
 /** @} */
 
 #ifdef __cplusplus

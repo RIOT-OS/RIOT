@@ -19,7 +19,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "periph_cpu.h"
+#include "periph_conf_nucleo32.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -181,13 +181,6 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define RTC_NUMOF           (0U)
-/** @} */
-
-/**
- * @name   ADC configuration
- * @{
- */
-#define ADC_NUMOF (0)
 /** @} */
 
 #ifdef __cplusplus

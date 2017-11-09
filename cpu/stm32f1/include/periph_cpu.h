@@ -26,11 +26,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Available number of ADC devices
- */
-#define ADC_DEVS            (2U)
-
-/**
  * @brief   Starting address of the CPU ID
  */
 #define CPUID_ADDR          (0x1ffff7e8)
@@ -129,15 +124,6 @@ enum {
     PORT_F = 5,             /**< port F */
     PORT_G = 6,             /**< port G */
 };
-
-/**
- * @brief   ADC channel configuration data
- */
-typedef struct {
-    gpio_t pin;             /**< pin connected to the channel */
-    uint8_t dev;            /**< ADCx - 1 device used for the channel */
-    uint8_t chan;           /**< CPU ADC channel connected to the pin */
-} adc_conf_t;
 
 #ifdef __cplusplus
 }

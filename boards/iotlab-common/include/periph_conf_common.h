@@ -60,12 +60,13 @@ extern "C" {
  * @name    ADC configuration
  * @{
  */
-#define ADC_CONFIG          {       \
-    { GPIO_PIN(PORT_A,3), 0, 3  },  \
-    { GPIO_UNDEF        , 0, 16 },  \
-    { GPIO_UNDEF        , 0, 17 } }
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A, 0), .dev = ADC_1, .chan =  3 },
+    { .pin = GPIO_UNDEF,          .dev = ADC_1, .chan = 16 },
+    { .pin = GPIO_UNDEF,          .dev = ADC_1, .chan = 17 },
+};
 
-#define ADC_NUMOF           (3)
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 /**

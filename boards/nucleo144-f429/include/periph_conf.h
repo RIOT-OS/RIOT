@@ -233,24 +233,19 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name   ADC configuration
- *
- * Note that we do not configure all ADC channels,
- * and not in the STM32F429zi order. Instead, we
- * just define 6 ADC channels, for the Nucleo
- * Arduino header pins A0-A5
- *
+ * @name    ADC configuration
  * @{
  */
-#define ADC_NUMOF          (6U)
-#define ADC_CONFIG {              \
-    {GPIO_PIN(PORT_A, 3), 2, 3},  \
-    {GPIO_PIN(PORT_C, 0), 2, 10}, \
-    {GPIO_PIN(PORT_C, 3), 2, 13}, \
-    {GPIO_PIN(PORT_F, 3), 2, 9},  \
-    {GPIO_PIN(PORT_F, 5), 2, 15}, \
-    {GPIO_PIN(PORT_F, 10), 2, 8}, \
-}
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A,  3), .dev = ADC_1, .chan =  3 },
+    { .pin = GPIO_PIN(PORT_C,  0), .dev = ADC_1, .chan = 10 },
+    { .pin = GPIO_PIN(PORT_C,  3), .dev = ADC_1, .chan = 13 },
+    { .pin = GPIO_PIN(PORT_F,  3), .dev = ADC_1, .chan =  9 },
+    { .pin = GPIO_PIN(PORT_F,  5), .dev = ADC_1, .chan = 15 },
+    { .pin = GPIO_PIN(PORT_F, 10), .dev = ADC_1, .chan =  8 }
+};
+
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 #ifdef __cplusplus

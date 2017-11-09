@@ -20,7 +20,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "periph_cpu.h"
+#include "periph_conf_nucleo32.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -184,21 +184,6 @@ static const spi_conf_t spi_config[] = {
  * clock source, so disabling RTC.
  */
 #define RTC_NUMOF           (0U)
-/** @} */
-
-/**
- * @name   ADC configuration
- * @{
- */
-#define ADC_CONFIG {            \
-    { GPIO_PIN(PORT_A, 0), 0 }, \
-    { GPIO_PIN(PORT_A, 1), 1 }, \
-    { GPIO_PIN(PORT_A, 3), 3 }, \
-    { GPIO_PIN(PORT_A, 4), 4 }, \
-    { GPIO_PIN(PORT_A, 7), 7 }  \
-}
-
-#define ADC_NUMOF           (5)
 /** @} */
 
 #ifdef __cplusplus
