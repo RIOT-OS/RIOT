@@ -392,15 +392,6 @@ static const spi_conf_t spi_config[] = {
 
 /** @} */
 
-
-/**
- * @name Random Number Generator configuration
- * @{
- */
-#define HWRNG_CLKEN()       (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 1)
-#define HWRNG_CLKDIS()      (BITBAND_REG32(SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT) = 0)
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

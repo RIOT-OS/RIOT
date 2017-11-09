@@ -25,6 +25,7 @@
 #include "cpu.h"
 #include "periph/hwrng.h"
 #include "periph_conf.h"
+#include "bit.h"
 
 #ifdef KINETIS_RNGA
 
@@ -60,7 +61,7 @@ void hwrng_read(void *buf, unsigned int num)
         }
     }
 
-    /* power of the device */
+    /* power off the device */
     KINETIS_RNGA->CR = 0;
     HWRNG_CLKDIS();
 }

@@ -112,6 +112,22 @@ extern "C"
 #endif
 /** @} */
 
+/**
+ * @name Hardware random number generator module configuration
+ * @{
+ */
+#if !defined(HWRNG_CLKEN) && defined(RNG) && !defined(RNG_CMD_ST_MASK)
+#define KINETIS_RNGA RNG
+#if defined(SIM_SCGC3_RNGA_SHIFT)
+#define HWRNG_CLKEN()       (bit_set32(&SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT))
+#define HWRNG_CLKDIS()      (bit_clear32(&SIM->SCGC3, SIM_SCGC3_RNGA_SHIFT))
+#elif defined(SIM_SCGC6_RNGA_SHIFT)
+#define HWRNG_CLKEN()       (bit_set32(&SIM->SCGC6, SIM_SCGC6_RNGA_SHIFT))
+#define HWRNG_CLKDIS()      (bit_clear32(&SIM->SCGC6, SIM_SCGC6_RNGA_SHIFT))
+#endif
+#endif /* KINETIS_RNGA */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

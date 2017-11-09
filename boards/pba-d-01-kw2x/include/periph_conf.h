@@ -295,16 +295,6 @@ static const spi_conf_t spi_config[] = {
 #define RTT_MAX_VALUE        (0xffffffff)
 /** @} */
 
-/**
- * @name Random Number Generator configuration
- * @{
- */
-#define KINETIS_RNGA        RNG
-#define HWRNG_CLKEN()       (SIM->SCGC6 |= (1 << 9))
-#define HWRNG_CLKDIS()      (SIM->SCGC6 &= ~(1 << 9))
-
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
