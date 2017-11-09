@@ -386,7 +386,7 @@ int nrf24l01p_set_tx_address_long(const nrf24l01p_t *dev, uint64_t saddr, unsign
     char buf[length];
 
     if (length <= INITIAL_ADDRESS_WIDTH) {
-        for (int i = 0; i < length; i++) {
+        for (unsigned int i = 0; i < length; i++) {
 
             buf[i] = (uint8_t)(saddr >> (((length - 1) - i) * sizeof(uint64_t)));
         }
@@ -483,7 +483,7 @@ int nrf24l01p_set_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pi
     char buf[length];
 
     if (length <= INITIAL_ADDRESS_WIDTH) {
-        for (int i = 0; i < length; i++) {
+        for (unsigned int i = 0; i < length; i++) {
 
             buf[i] = (uint8_t)(saddr >> (((length - 1) - i) * 8));
         }
