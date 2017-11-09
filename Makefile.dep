@@ -652,6 +652,8 @@ ifneq (,$(filter random,$(USEMODULE)))
   ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
     USEMODULE += tinymt32
   endif
+
+  USEMODULE += luid
 endif
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
@@ -709,6 +711,10 @@ endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
 USEPKG += nanocoap
 USEMODULE += gnrc_sock_udp
+endif
+
+ifneq (,$(filter luid,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_cpuid
 endif
 
 # always select gpio (until explicit dependencies are sorted out)
