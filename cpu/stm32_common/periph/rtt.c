@@ -24,7 +24,7 @@
 #include "periph/rtt.h"
 
 /* this driver is only valid for STM CPUs that provide LPTIMERs */
-#if (defined(LPTIM1) && RTT_NUMOF)
+#if defined(LPTIM1)
 
 /* figure out the used pre-scaler */
 #if (RTT_FREQUENCY == 32768)

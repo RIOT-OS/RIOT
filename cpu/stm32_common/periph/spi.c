@@ -31,9 +31,6 @@
 #include "assert.h"
 #include "periph/spi.h"
 
-/* Remove this ugly guard once we selectively build the periph drivers */
-#ifdef SPI_NUMOF
-
 /**
  * @brief   Number of bits to shift the BR value in the CR1 register
  */
@@ -209,5 +206,3 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         }
     }
 }
-
-#endif /* SPI_NUMOF */

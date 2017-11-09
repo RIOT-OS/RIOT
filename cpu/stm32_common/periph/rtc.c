@@ -27,8 +27,8 @@
 #include "stmclk.h"
 #include "periph/rtc.h"
 
-/* guard file in case no RTC device was specified */
-#if defined(RTC) && !defined(CPU_FAM_STM32F1)
+/* this implementation does not work for the stm32f1 */
+#if !defined(CPU_FAM_STM32F1)
 
 /* map some CPU specific register names */
 #if defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
@@ -322,4 +322,4 @@ void ISR_NAME(void)
     cortexm_isr_end();
 }
 
-#endif /* RTC */
+#endif /* !CPU_FAM_STM32F1 */

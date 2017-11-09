@@ -26,11 +26,13 @@
  * @}
  */
 
-#ifndef CPU_FAM_STM32F1
 
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
+
+/* this implementation is not valid for the stm32f1 */
+#ifndef CPU_FAM_STM32F1
 
 /**
  * @brief   The STM32F0 family has 16 external interrupt lines

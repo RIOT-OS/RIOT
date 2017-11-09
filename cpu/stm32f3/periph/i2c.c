@@ -36,9 +36,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* guard file in case no I2C device is defined */
-#if I2C_NUMOF
-
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, uint32_t presc, uint32_t scll,
                       uint32_t sclh, uint32_t sdadel, uint32_t scldel,
@@ -537,5 +534,3 @@ void I2C_0_ERR_ISR(void)
     core_panic(PANIC_GENERAL_ERROR, "I2C FAULT");
 }
 #endif /* I2C_0_EN */
-
-#endif /* I2C_NUMOF */
