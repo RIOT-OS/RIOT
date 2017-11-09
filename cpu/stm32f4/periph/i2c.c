@@ -248,6 +248,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     int n = length;
     I2C_TypeDef *i2c;
+    char *in = (char *)data;
 
     switch (dev) {
 #if I2C_0_EN
@@ -282,7 +283,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
         }
 
         /* read byte */
-        *(char*)data++ = i2c->DR;
+        *in++ = i2c->DR;
     }
 
     /* set STOP */
