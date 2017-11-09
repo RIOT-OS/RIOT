@@ -1,2 +1,38 @@
-USEMODULE += msb-430-common
-include $(RIOTBOARD)/msb-430-common/Makefile.include
+# select the default board revision. Available are
+# - msb-430  (plain) -> DEFAULT
+# - msb-430h (h)
+BOARDREV ?= plain
+
+REVISIONS = plain h
+# TODO: return error an stop build process
+# TODO: do this check in a central location, maybe the global Makefile.include?
+ifeq (,$(filter $(BOARDREV), $(REVISIONS)))
+  $(info ERROR: Board revision ($(BOARDREV)) is invalid)
+endif
+CFLAGS += -DBOARDREV_$(shell echo $(BOARDREV) | tr 'a-z-' 'A-Z_')
+
+## the cpu to build for
+export CPU = msp430fxyz
+export CPU_MODEL = msp430f1612
+
+# set default port depending on operating system
+PORT_LINUX  ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup flash tool
+export OFLAGS = -O ihex
+export PROGRAMMER ?= olimex
+export MSPDEBUGFLAGS += -j $(PROGRAMMER)
+ifeq ($(strip $(PROGRAMMER)),uif)
+    export MSPDEBUGFLAGS += -d $(PORT)
+endif
+export FLASHER ?= mspdebug
+export FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
+
+# setup debugger
+export DEBUGSERVER = $(FLASHER)
+export DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
+export DEBUGGER = $(PREFIX)gdb
+export DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
