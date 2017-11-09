@@ -30,6 +30,8 @@ static uint8_t TEST_1_NONCE[] = {
 };
 static uint8_t TEST_1_NONCE_LEN = 13;
 
+static uint8_t TEST_1_MAC_LEN = 8;
+
 static uint8_t TEST_1_INPUT[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, /* additional auth data */
     0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, /* input */
@@ -61,6 +63,8 @@ static uint8_t TEST_2_NONCE[] = {
 };
 static uint8_t TEST_2_NONCE_LEN = 13;
 
+static uint8_t TEST_2_MAC_LEN = 8;
+
 static uint8_t TEST_2_INPUT[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
@@ -84,7 +88,8 @@ static void test_encrypt_op(uint8_t* key, uint8_t key_len,
                             uint8_t* nonce, uint8_t nonce_len,
                             uint8_t* plain, uint8_t plain_len,
                             uint8_t* output_expected,
-                            uint8_t output_expected_len)
+                            uint8_t output_expected_len,
+                            uint8_t mac_length)
 {
     cipher_t cipher;
     int len, err, cmp;
@@ -93,7 +98,7 @@ static void test_encrypt_op(uint8_t* key, uint8_t key_len,
     err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
-    len = cipher_encrypt_ccm(&cipher, adata, adata_len, 8, 2, nonce,
+    len = cipher_encrypt_ccm(&cipher, adata, adata_len, mac_length, 2, nonce,
                              nonce_len, plain, plain_len, data);
     TEST_ASSERT_MESSAGE(len > 0, "Encryption failed");
 
@@ -108,7 +113,8 @@ static void test_decrypt_op(uint8_t* key, uint8_t key_len,
                             uint8_t* nonce, uint8_t nonce_len,
                             uint8_t* encrypted, uint8_t encrypted_len,
                             uint8_t* output_expected,
-                            uint8_t output_expected_len)
+                            uint8_t output_expected_len,
+                            uint8_t mac_length)
 {
     cipher_t cipher;
     int len, err, cmp;
@@ -117,7 +123,7 @@ static void test_decrypt_op(uint8_t* key, uint8_t key_len,
     err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
-    len = cipher_decrypt_ccm(&cipher, adata, adata_len, 8, 2, nonce,
+    len = cipher_decrypt_ccm(&cipher, adata, adata_len, mac_length, 2, nonce,
                              nonce_len, encrypted, encrypted_len, data);
     TEST_ASSERT_MESSAGE(len > 0, "Decryption failed");
 
@@ -137,6 +143,8 @@ static void test_decrypt_op(uint8_t* key, uint8_t key_len,
                     \
                     TEST_##name##_EXPECTED + TEST_##name##_ADATA_LEN, \
                     TEST_##name##_EXPECTED_LEN - TEST_##name##_ADATA_LEN, \
+                    \
+                    TEST_##name##_MAC_LEN \
                     ); \
 } while (0)
 
@@ -157,6 +165,8 @@ static void test_crypto_modes_ccm_encrypt(void)
                     \
                     TEST_##name##_INPUT + TEST_##name##_ADATA_LEN, \
                     TEST_##name##_INPUT_LEN, \
+                    \
+                    TEST_##name##_MAC_LEN \
                     ); \
 } while (0)
 
