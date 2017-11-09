@@ -30,6 +30,8 @@ ifneq (,$(filter mrf24j40,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
 endif
 
 ifneq (,$(filter bh1750fvi,$(USEMODULE)))
