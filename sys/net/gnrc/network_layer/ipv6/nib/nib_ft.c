@@ -100,8 +100,9 @@ bool gnrc_ipv6_nib_ft_iter(const ipv6_addr_t *next_hop, unsigned iface,
         _nib_offl_entry_t *offl = *state;
 
         while ((offl = _nib_offl_iter(offl))) {
-            assert((offl->mode != 0) || (offl->next_hop != NULL));
-            if (((iface == 0) || (iface == _nib_onl_get_if(offl->next_hop))) &&
+            assert(offl->mode != 0);
+            if ((offl->next_hop != NULL) &&
+                ((iface == 0) || (iface == _nib_onl_get_if(offl->next_hop))) &&
                 ((next_hop == NULL) || ipv6_addr_equal(&offl->next_hop->ipv6,
                                                        next_hop))) {
                 _nib_ft_get(offl, fte);
@@ -113,8 +114,8 @@ bool gnrc_ipv6_nib_ft_iter(const ipv6_addr_t *next_hop, unsigned iface,
     }
     entry = *state;
     while ((entry = _nib_drl_iter(entry))) {
-        assert((entry->next_hop != NULL));
-        if (((iface == 0) || (iface == _nib_onl_get_if(entry->next_hop))) &&
+        if ((entry->next_hop != NULL) &&
+            ((iface == 0) || (iface == _nib_onl_get_if(entry->next_hop))) &&
             ((next_hop == NULL) || ipv6_addr_equal(&entry->next_hop->ipv6,
                                                    next_hop))) {
             _nib_drl_ft_get(entry, fte);

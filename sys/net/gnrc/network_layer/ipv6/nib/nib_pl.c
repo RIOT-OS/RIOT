@@ -81,8 +81,7 @@ bool gnrc_ipv6_nib_pl_iter(unsigned iface, void **state,
     mutex_lock(&_nib_mutex);
     while ((dst = _nib_offl_iter(dst)) != NULL) {
         const _nib_onl_entry_t *node = dst->next_hop;
-        assert(node != NULL);
-        if ((dst->mode & _PL) &&
+        if ((node != NULL) && (dst->mode & _PL) &&
             ((iface == 0) || (_nib_onl_get_if(node) == iface))) {
             entry->pfx_len = dst->pfx_len;
             ipv6_addr_set_unspecified(&entry->pfx);
