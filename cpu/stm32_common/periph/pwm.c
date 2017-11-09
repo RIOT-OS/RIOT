@@ -29,8 +29,6 @@
 #include "periph/pwm.h"
 #include "periph/gpio.h"
 
-#ifdef PWM_NUMOF
-
 #define CCMR_LEFT           (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | \
                              TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2)
 #define CCMR_RIGHT          (TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_1 | \
@@ -138,5 +136,3 @@ void pwm_poweroff(pwm_t pwm)
     dev(pwm)->CR1 &= ~TIM_CR1_CEN;
     periph_clk_dis(pwm_config[pwm].bus, pwm_config[pwm].rcc_mask);
 }
-
-#endif /* PWM_NUMOF */

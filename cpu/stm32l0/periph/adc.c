@@ -23,8 +23,6 @@
 #include "mutex.h"
 #include "periph/adc.h"
 
-#ifdef ADC_NUMOF
-
 /**
  * @brief   Maximum allowed ADC clock speed
  */
@@ -179,6 +177,3 @@ int adc_sample(adc_t line,  adc_res_t res)
 
     return sample;
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* ADC_CONFIG */
