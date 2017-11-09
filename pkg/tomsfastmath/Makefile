@@ -1,6 +1,6 @@
 PKG_NAME = tomsfastmath
 PKG_URL = https://github.com/libtom/tomsfastmath.git
-PKG_VERSION = 5c395e04e6617f59ec9a57ef16352ee7c43a475b # v0.13.0
+PKG_VERSION = e3b0c71363179c51d539005c2b0452e5b3ff04b6 # v0.13.1
 
 .PHONY: all
 
