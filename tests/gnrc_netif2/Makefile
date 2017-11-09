@@ -8,7 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              nucleo-f030 nucleo-f070 nucleo-f072 nucleo-f103 \
                              nucleo-f302 nucleo-f334 nucleo-l053 nucleo-l073 \
                              nucleo32-f031 nucleo32-f042 nucleo32-f303 \
-                             nucleo32-l031 opencm904 pca10000 pca10005 \
+                             nucleo32-l031 opencm904 \
                              spark-core stm32f0discovery telosb wsn430-v1_3b \
                              wsn430-v1_4 yunjia-nrf51822 z1 \
 

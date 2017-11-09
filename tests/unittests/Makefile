@@ -45,8 +45,6 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              openmote \
                              openmote-cc2538 \
                              pba-d-01-kw2x \
-                             pca10000 \
-                             pca10005 \
                              remote-pa \
                              remote-reva \
                              remote-revb \
@@ -125,8 +123,6 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        opencm904 \
                        openmote-cc2538 \
                        pba-d-01-kw2x \
-                       pca10000 \
-                       pca10005 \
                        remote \
                        samd21-xpro \
                        saml21-xpro \
