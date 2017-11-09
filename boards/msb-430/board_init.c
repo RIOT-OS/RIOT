@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup boards
+ * @ingroup     boards_msb-430
  * @{
  */
 
 /**
  * @file
- * @brief       msb-430 common board initialization
+ * @brief       msb-430 board initialization
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

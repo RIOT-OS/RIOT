@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 INRIA
- *               2015 Freie Universität Berlin
+ *               2015,2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -21,6 +21,8 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "board.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,7 +32,7 @@ extern "C" {
  * @{
  */
 /** @todo   Move all clock configuration code here from the board.h */
-#define CLOCK_CORECLOCK     (7372800U)
+#define CLOCK_CORECLOCK     F_CPU
 
 #define CLOCK_CMCLK         CLOCK_CORECLOCK     /* no divider programmed */
 /** @} */
@@ -81,9 +83,15 @@ extern "C" {
 #define SPI_IE_TX_BIT       (1 << 7)
 #define SPI_ME              (SFR->ME1)
 #define SPI_ME_BIT          (1 << 6)
+#ifdef BOARDREV_H
+#define SPI_PIN_MISO        GPIO_PIN(P3,2)
+#define SPI_PIN_MOSI        GPIO_PIN(P3,1)
+#define SPI_PIN_CLK         GPIO_PIN(P3,3)
+#else
 #define SPI_PIN_MISO        GPIO_PIN(P5,2)
 #define SPI_PIN_MOSI        GPIO_PIN(P5,1)
 #define SPI_PIN_CLK         GPIO_PIN(P5,3)
+#endif
 /** @} */
 
 #ifdef __cplusplus
