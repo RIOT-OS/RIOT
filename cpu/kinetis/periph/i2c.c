@@ -43,8 +43,6 @@
 #else
 #define TRACE(...)
 #endif
-/* guard file in case no I2C device is defined */
-#if I2C_NUMOF
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -518,5 +516,3 @@ void i2c_poweroff(i2c_t dev)
 #endif
     }
 }
-
-#endif /* I2C_NUMOF */

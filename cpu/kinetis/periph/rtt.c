@@ -35,9 +35,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#if RTT_NUMOF
-
-
 #ifndef RTC_LOAD_CAP_BITS
 #define RTC_LOAD_CAP_BITS    0
 #endif
@@ -200,5 +197,3 @@ void RTT_ISR(void)
 
     cortexm_isr_end();
 }
-
-#endif /* RTC_NUMOF */

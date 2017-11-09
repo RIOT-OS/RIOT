@@ -31,9 +31,6 @@
 #include "periph/dac.h"
 #include "periph_conf.h"
 
-/* only compile this file if there are DAC lines defined */
-#ifdef DAC_NUMOF
-
 static inline DAC_Type *dev(dac_t line)
 {
     return dac_config[line].dev;
@@ -84,5 +81,3 @@ void dac_poweroff(dac_t line)
 
     bit_clear8(&dac_config[line].dev->C0, DAC_C0_DACEN_SHIFT);
 }
-
-#endif /* DAC_NUMOF */
