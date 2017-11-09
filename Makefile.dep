@@ -416,12 +416,20 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter shell,$(USEMODULE)))
+  USEMODULE += uart_stdio_rx
+endif
+
 ifneq (,$(filter rtt_stdio,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter uart_stdio,$(USEMODULE)))
+ifneq (,$(filter uart_stdio_rx,$(USEMODULE)))
   USEMODULE += isrpipe
+  USEMODULE += uart_stdio
+endif
+
+ifneq (,$(filter uart_stdio,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
 endif
 

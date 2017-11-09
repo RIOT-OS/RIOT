@@ -25,10 +25,10 @@
  * @}
  */
 
+#include <errno.h>
 #include <stdio.h>
 #if MODULE_VFS
 #include <unistd.h>
-#include <errno.h>
 #include <fcntl.h>
 #endif
 #include "uart_stdio.h"
@@ -49,8 +49,10 @@ extern ethos_t ethos;
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#ifdef MODULE_UART_STDIO_RX
 static char _rx_buf_mem[UART_STDIO_RX_BUFSIZE];
 isrpipe_t uart_stdio_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
+#endif
 
 #if MODULE_VFS
 static ssize_t uart_stdio_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes);
@@ -85,10 +87,21 @@ static ssize_t uart_stdio_vfs_write(vfs_file_t *filp, const void *src, size_t nb
 
 void uart_stdio_init(void)
 {
-#ifndef USE_ETHOS_FOR_STDIO
-    uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &uart_stdio_isrpipe);
+    uart_rx_cb_t cb;
+    void *arg;
+
+#ifdef MODULE_UART_STDIO_RX
+    cb = (uart_rx_cb_t) isrpipe_write_one;
+    arg = &uart_stdio_isrpipe;
 #else
-    uart_init(ETHOS_UART, ETHOS_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &uart_stdio_isrpipe);
+    cb = NULL;
+    arg = NULL;
+#endif
+
+#ifndef USE_ETHOS_FOR_STDIO
+    uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, cb, arg);
+#else
+    uart_init(ETHOS_UART, ETHOS_BAUDRATE, cb, arg);
 #endif
 #if MODULE_VFS
     int fd;
@@ -109,7 +122,13 @@ void uart_stdio_init(void)
 
 int uart_stdio_read(char* buffer, int count)
 {
+#ifdef UART_STDIO_RX
     return isrpipe_read(&uart_stdio_isrpipe, buffer, count);
+#else
+    (void)buffer;
+    (void)count;
+    return -ENOTSUP;
+#endif
 }
 
 int uart_stdio_write(const char* buffer, int len)
