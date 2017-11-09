@@ -34,9 +34,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* guard file in case no I2C device is defined */
-#if I2C_NUMOF
-
 #define SAMD21_I2C_TIMEOUT  (65535)
 
 #define BUSSTATE_UNKNOWN SERCOM_I2CM_STATUS_BUSSTATE(0)
@@ -104,6 +101,11 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
         default:
             DEBUG("I2C FALSE VALUE\n");
             return -1;
+    }
+
+    /* HACK: fixes cppcheck issue until #7588 is merged. */
+    if (I2CSercom == NULL) {
+        return -1;
     }
 
     /* DISABLE I2C MASTER */
@@ -535,5 +537,3 @@ static inline int _wait_for_response(SercomI2cm *dev, uint32_t max_timeout_count
     }
     return 0;
 }
-
-#endif /* I2C_NUMOF */
