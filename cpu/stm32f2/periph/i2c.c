@@ -593,12 +593,12 @@ void i2c_poweron(i2c_t dev)
 
 void i2c_poweroff(i2c_t dev)
 {
-    int cnt = 0;
-
     switch (dev) {
 #if I2C_0_EN
     case I2C_0:
-        while ((I2C_0_DEV->SR2 & I2C_SR2_BUSY) && cnt++ < I2C_MAX_LOOP_CNT) {}
+        for (int cnt = 0;
+             ((I2C_0_DEV->SR2 & I2C_SR2_BUSY) && (cnt < I2C_MAX_LOOP_CNT));
+             cnt++) {}
 
         I2C_0_CLKDIS();
         break;
