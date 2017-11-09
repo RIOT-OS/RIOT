@@ -34,9 +34,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* guard file in case no I2C device is defined */
-#if I2C_NUMOF
-
 #define SAMD21_I2C_TIMEOUT  (65535)
 
 #define BUSSTATE_UNKNOWN SERCOM_I2CM_STATUS_BUSSTATE(0)
@@ -535,5 +532,3 @@ static inline int _wait_for_response(SercomI2cm *dev, uint32_t max_timeout_count
     }
     return 0;
 }
-
-#endif /* I2C_NUMOF */

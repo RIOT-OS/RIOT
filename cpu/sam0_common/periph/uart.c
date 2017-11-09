@@ -31,9 +31,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* do not build the file in case no UART is defined */
-#ifdef UART_NUMOF
-
 /**
  * @brief   Allocate memory to store the callback functions
  */
@@ -195,5 +192,3 @@ void UART_5_ISR(void)
     irq_handler(5);
 }
 #endif
-
-#endif /* UART_NUMOF */
