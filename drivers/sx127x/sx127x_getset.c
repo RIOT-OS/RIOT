@@ -848,6 +848,11 @@ void sx127x_set_symbol_timeout(sx127x_t *dev, uint16_t timeout)
     sx127x_reg_write(dev, SX127X_REG_LR_SYMBTIMEOUTLSB,timeout & 0xFF);
 }
 
+bool sx127x_get_iq_invert(const sx127x_t *dev)
+{
+    return dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG;
+}
+
 void sx127x_set_iq_invert(sx127x_t *dev, bool iq_invert)
 {
     DEBUG("[DEBUG] Set IQ invert: %d\n", iq_invert);

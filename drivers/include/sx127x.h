@@ -660,7 +660,16 @@ void sx127x_set_rx_timeout(sx127x_t *dev, uint32_t timeout);
 void sx127x_set_tx_timeout(sx127x_t *dev, uint32_t timeout);
 
 /**
- * @brief   Sets the SX127X LoRa IQ inverted mode
+ * @brief   Checks if the SX127X LoRa inverted IQ mode is enabled/disabled
+ *
+ * @param[in] dev                      The sx127x device descriptor
+ *
+ * @return the LoRa IQ inverted mode
+ */
+bool sx127x_get_iq_invert(const sx127x_t *dev);
+
+/**
+ * @brief   Enable/disable the SX127X LoRa IQ inverted mode
  *
  * @param[in] dev                      The sx127x device descriptor
  * @param[in] iq_invert                The LoRa IQ inverted mode
