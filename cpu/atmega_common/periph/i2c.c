@@ -123,14 +123,18 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 
 int i2c_acquire(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
     mutex_lock(&lock);
     return 0;
 }
 
 int i2c_release(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
     mutex_unlock(&lock);
     return 0;
 }
@@ -142,10 +146,13 @@ int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
 
 int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
+    assert(length > 0);
+
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
+
     uint8_t *my_data = data;
-
-    assert((dev < I2C_NUMOF) && (length > 0));
-
     /* send start condition and slave address */
     if (_start(address, I2C_FLAG_READ) != 0) {
         return 0;
@@ -180,7 +187,11 @@ int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
 
 int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
 {
-    assert((dev < I2C_NUMOF) && (length > 0));
+    assert(length > 0);
+
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
 
     /* start transmission and send slave address */
     if (_start(address, I2C_FLAG_WRITE) != 0) {
@@ -206,7 +217,11 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     int bytes = 0;
 
-    assert((dev < I2C_NUMOF) && (length > 0));
+    assert(length > 0);
+
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
 
     /* start transmission and send slave address */
     if (_start(address, I2C_FLAG_WRITE) != 0) {
@@ -231,7 +246,11 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
 {
     int bytes = 0;
 
-    assert((dev < I2C_NUMOF) && (length > 0));
+    assert(length > 0);
+
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
 
     /* start transmission and send slave address */
     if (_start(address, I2C_FLAG_WRITE) != 0) {
