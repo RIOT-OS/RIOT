@@ -29,26 +29,6 @@
 extern "C" {
 #endif
 
-#ifndef NETSTATS_NB_SIZE
-/**
- * @brief   The max number of entries in the peer stats table
- */
-#define NETSTATS_NB_SIZE           (8)
-#endif
-
-/**
- * @brief   The CIB size for tx correlation
- */
-#define NETSTATS_NB_QUEUE_SIZE     (4)
-
-
-/**
- * @brief Forward declaration of netdev_t struct
- *
- * Solves a circular include
- */
-typedef struct netdev netstats_netdev_t;
-
 /**
  * @brief Result of the transmission
  * @{
@@ -59,27 +39,6 @@ typedef enum {
     NETSTATS_NB_SUCCESS,    /**< Succesful transmission */
 } netstats_nb_result_t;
 /** @} */
-
-/**
- * @brief       Stats per peer struct
- */
-typedef struct netstats_nb {
-    uint8_t l2_addr[8];     /**< Link layer address of the neighbor */
-    uint8_t l2_addr_len;    /**< Length of netstats_nb::l2_addr */
-    uint16_t etx;           /**< ETX of this peer */
-#ifdef MODULE_NETSTATS_NEIGHBOR_EXT
-    uint8_t rssi;           /**< Average RSSI of received frames in abs([dBm]) */
-    uint8_t lqi;            /**< Average LQI of received frames */
-    uint32_t tx_count;      /**< Number of sent frames to this peer */
-    uint32_t tx_failed;     /**< Number of failed transmission tries to this peer */
-    uint32_t rx_count;      /**< Number of received frames */
-    uint32_t tx_bytes;      /**< Bytes sent */
-    uint32_t rx_bytes;      /**< Bytes received */
-#endif
-    uint8_t  freshness;     /**< Freshness counter */
-    uint32_t last_updated;  /**< seconds timestamp of last update */
-    uint32_t last_halved;   /**< seconds timestamp of last halving */
-} netstats_nb_t;
 
 /**
  * @brief Max length of a L2 address
@@ -120,7 +79,7 @@ typedef struct netstats_nb {
  * @param[in] dev  ptr to netdev device
  *
  */
-void netstats_nb_init(netstats_netdev_t *dev);
+void netstats_nb_init(netdev_t *dev);
 
 /**
  * @brief Find or create a neighbor stat by the mac address.
@@ -136,7 +95,7 @@ void netstats_nb_init(netstats_netdev_t *dev);
  *
  * @return ptr to the statistics record
  */
-netstats_nb_t *netstats_nb_get_or_create(netstats_netdev_t *dev, const uint8_t *l2_addr, uint8_t len);
+netstats_nb_t *netstats_nb_get_or_create(netdev_t *dev, const uint8_t *l2_addr, uint8_t len);
 
 /**
  * @brief Iterator over the recorded neighbors, returns the next non-zero record. NULL if none remaining
@@ -160,7 +119,7 @@ netstats_nb_t *netstats_nb_get_next(netstats_nb_t *first, netstats_nb_t *prev);
  * @param[in] len       length of the L2 address
  *
  */
-void netstats_nb_record(netstats_netdev_t *dev, const uint8_t *l2_addr, uint8_t len);
+void netstats_nb_record(netdev_t *dev, const uint8_t *l2_addr, uint8_t len);
 
 /**
  * @brief Get the first available neighbor in the transmission queue and increment pointer.
@@ -169,7 +128,7 @@ void netstats_nb_record(netstats_netdev_t *dev, const uint8_t *l2_addr, uint8_t 
  *
  * @return ptr to the record
  */
-netstats_nb_t *netstats_nb_get_recorded(netstats_netdev_t *dev);
+netstats_nb_t *netstats_nb_get_recorded(netdev_t *dev);
 
 /**
  * @brief Update the next recorded neighbor with the provided numbers
@@ -186,7 +145,7 @@ netstats_nb_t *netstats_nb_get_recorded(netstats_netdev_t *dev);
  *
  * @return ptr to the record
  */
-netstats_nb_t *netstats_nb_update_tx(netstats_netdev_t *dev, netstats_nb_result_t result, uint8_t retries);
+netstats_nb_t *netstats_nb_update_tx(netdev_t *dev, netstats_nb_result_t result, uint8_t retries);
 
 /**
  * @brief Update the ETX value of the statistic.
@@ -208,7 +167,7 @@ void netstats_nb_update_etx(netstats_nb_t *stats, netstats_nb_result_t result, u
  *
  * @return ptr to the updated record
  */
-netstats_nb_t *netstats_nb_update_rx(netstats_netdev_t *dev, const uint8_t *l2_addr, uint8_t l2_addr_len, uint8_t rssi, uint8_t lqi);
+netstats_nb_t *netstats_nb_update_rx(netdev_t *dev, const uint8_t *l2_addr, uint8_t l2_addr_len, uint8_t rssi, uint8_t lqi);
 
 /**
  * @brief Increase the freshness of the record

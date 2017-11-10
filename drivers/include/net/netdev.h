@@ -204,7 +204,7 @@ extern "C" {
 #endif
 #ifdef MODULE_NETSTATS_NEIGHBOR
 #include "cib.h"
-#include "net/netstats/neighbor.h"
+#include "net/netstats.h"
 #endif
 #ifdef MODULE_L2FILTER
 #include "net/l2filter.h"
@@ -266,13 +266,6 @@ typedef struct netdev netdev_t;
  */
 typedef void (*netdev_event_cb_t)(netdev_t *dev, netdev_event_t event);
 
-#ifdef MODULE_NETSTATS_NEIGHBOR
-/**
- * @brief   Forward declaration of netstats_nb struct
- */
-typedef struct netstats_nb netdev_netstats_nb_t;
-#endif
-
 /**
  * @brief Structure to hold driver state
  *
@@ -293,9 +286,9 @@ struct netdev {
     l2filter_t filter[L2FILTER_LISTSIZE];   /**< link layer address filters */
 #endif
 #ifdef MODULE_NETSTATS_NEIGHBOR
-    cib_t stats_idx;                                     /**< CIB for the tx correlation */
-    netdev_netstats_nb_t *stats_queue[NETSTATS_NB_QUEUE_SIZE]; /**< send/callback mac association array */
-    netdev_netstats_nb_t pstats[NETSTATS_NB_SIZE];             /**< Per neighbor statistics array */
+    cib_t stats_idx;                                        /**< CIB for the tx correlation */
+    netstats_nb_t *stats_queue[NETSTATS_NB_QUEUE_SIZE];     /**< send/callback mac association array */
+    netstats_nb_t pstats[NETSTATS_NB_SIZE];                 /**< Per neighbor statistics array */
 #endif
 };
 
