@@ -101,8 +101,11 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     port->PINCFG[pin_pos].reg = (mode & MODE_PINCFG_MASK);
 
     /* and set pull-up/pull-down if applicable */
-    if (mode == 0x7) {
+    if (mode == GPIO_IN_PU) {
         port->OUTSET.reg = pin_mask;
+    }
+    else if (mode == GPIO_IN_PD) {
+        port->OUTCLR.reg = pin_mask;
     }
 
     return 0;
