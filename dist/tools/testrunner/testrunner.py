@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
 #               2014 Martine Lenders <mlenders@inf.fu-berlin.de>
 #
@@ -7,10 +5,15 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os, signal, sys, subprocess
-from pexpect import spawnu, TIMEOUT, EOF
-from traceback import print_tb
+import os
+import signal
+import sys
+import subprocess
 import time
+from traceback import print_tb
+
+from pexpect import spawnu, TIMEOUT
+
 
 def run(testfunc, timeout=10, echo=True, traceback=False):
     env = os.environ.copy()
