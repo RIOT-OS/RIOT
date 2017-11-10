@@ -6,6 +6,6 @@ ALIAS.linux     = native
 # this temporary variable is needed as we can not use BOARD when assigning BOARD
 ALIAS_TARGET := $(ALIAS.$(BOARD))
 ifneq (,$(ALIAS_TARGET))
-  override BOARD = $(ALIAS_TARGET)
+  override BOARD := $(ALIAS_TARGET)
   MAKEOVERRIDES += BOARD=$(BOARD)
 endif
