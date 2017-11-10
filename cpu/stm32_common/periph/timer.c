@@ -24,28 +24,6 @@
 #include "periph/timer.h"
 
 /**
- * @brief   Timer specific additional bus clock presacler
- *
- * This prescale factor is dependent on the actual APBx bus clock divider, if
- * the APBx presacler is != 1, it is set to 2, if the APBx prescaler is == 1, it
- * is set to 1.
- *
- * See reference manuals section 'reset and clock control'.
- */
-static const uint8_t apbmul[] = {
-#if (CLOCK_APB1 < CLOCK_CORECLOCK)
-    [APB1] = 2,
-#else
-    [APB1] = 1,
-#endif
-#if (CLOCK_APB2 < CLOCK_CORECLOCK)
-    [APB2] = 2
-#else
-    [APB2] = 1
-#endif
-};
-
-/**
  * @brief   Interrupt context for each configured timer
  */
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
@@ -78,8 +56,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->ARR  = timer_config[tim].max;
 
     /* set prescaler */
-    dev(tim)->PSC = (((periph_apb_clk(timer_config[tim].bus) *
-                       apbmul[timer_config[tim].bus]) / freq) - 1);
+    dev(tim)->PSC = ((periph_timer_clk(timer_config[tim].bus) / freq) - 1);
     /* generate an update event to apply our configuration */
     dev(tim)->EGR = TIM_EGR_UG;
 

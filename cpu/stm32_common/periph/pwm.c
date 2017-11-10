@@ -42,10 +42,10 @@ static inline TIM_TypeDef *dev(pwm_t pwm)
 
 uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
-    uint32_t bus_clk = periph_apb_clk(pwm_config[pwm].bus);
+    uint32_t timer_clk = periph_timer_clk(pwm_config[pwm].bus);
 
     /* verify parameters */
-    assert((pwm < PWM_NUMOF) && ((freq * res) < bus_clk));
+    assert((pwm < PWM_NUMOF) && ((freq * res) < timer_clk));
 
     /* power on the used timer */
     periph_clk_en(pwm_config[pwm].bus, pwm_config[pwm].rcc_mask);
@@ -66,7 +66,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* configure the PWM frequency and resolution by setting the auto-reload
      * and prescaler registers */
-    dev(pwm)->PSC = (bus_clk / (res * freq)) - 1;
+    dev(pwm)->PSC = (timer_clk / (res * freq)) - 1;
     dev(pwm)->ARR = res - 1;
 
     /* set PWM mode */
@@ -95,7 +95,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     dev(pwm)->CR1 |= TIM_CR1_CEN;
 
     /* return the actual used PWM frequency */
-    return (bus_clk / (res * (dev(pwm)->PSC + 1)));
+    return (timer_clk / (res * (dev(pwm)->PSC + 1)));
 }
 
 uint8_t pwm_channels(pwm_t pwm)
