@@ -1,0 +1,50 @@
+ifeq (,$(KINETIS_SERIES))
+  # Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
+  # directory as this Makefile.
+  include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/kinetis-info.mk
+endif
+
+# Add search path for linker scripts
+LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
+
+# Use generic linker script for all Kinetis based CPUs
+LINKER_SCRIPT = kinetis.ld
+
+ROM_START_ADDR = 0x00000000
+RAM_BASE_ADDR  = 0x20000000
+RAM_START_ADDR = $$(($(RAM_BASE_ADDR)-($(KINETIS_SRAM_L_SIZE) * 1024)))
+ROM_LEN = $$(($(KINETIS_ROMSIZE) * 1024))
+RAM_LEN = $$(($(KINETIS_RAMSIZE) * 1024))
+
+CFLAGS += \
+  -DKINETIS_CORE_$(KINETIS_CORE) \
+  -DKINETIS_SERIES_$(KINETIS_SERIES) \
+  -DKINETIS_FAMILY=$(KINETIS_FAMILY) \
+  -DKINETIS_SUBFAMILY=$(KINETIS_SUBFAMILY) \
+  -DKINETIS_ROMSIZE=$(KINETIS_ROMSIZE) \
+  #
+
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_start_addr=$(ROM_START_ADDR)
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_base_addr=$(RAM_BASE_ADDR)
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_start_addr=$(RAM_START_ADDR)
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_length=$(ROM_LEN)
+LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
+
+# add the CPU specific flash configuration field for the linker
+export UNDEF += $(BINDIR)/cpu/fcfield.o
+
+# include common periph drivers
+USEMODULE += periph_common
+
+# select kinetis periph drivers
+USEMODULE += periph_mcg
+USEMODULE += periph_wdog
+
+# Define a recipe to build the watchdog disable binary, used when flashing
+$(RIOTCPU)/$(CPU)/dist/wdog-disable.bin: $(RIOTCPU)/$(CPU)/dist/wdog-disable.s
+	$(Q)$(MAKE) -C $(RIOTCPU)/$(CPU)/dist/ $(notdir $@)
+
+# Reset the default goal to not make wdog-disable.bin the default target.
+.DEFAULT_GOAL :=
+
+include $(RIOTMAKE)/arch/cortexm.inc.mk

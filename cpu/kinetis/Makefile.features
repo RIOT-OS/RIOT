@@ -1,0 +1,5 @@
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += periph_gpio
+
+include $(RIOTCPU)/cortexm_common/Makefile.features

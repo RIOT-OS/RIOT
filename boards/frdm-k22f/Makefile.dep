@@ -3,4 +3,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_adc
 endif
 
--include $(RIOTCPU)/k22f/Makefile.dep
+include $(RIOTCPU)/kinetis/Makefile.dep

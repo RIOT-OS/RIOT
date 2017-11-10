@@ -12,4 +12,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += tmp006
 endif
 
--include $(RIOTCPU)/kw2xd/Makefile.dep
+include $(RIOTCPU)/kinetis/Makefile.dep
