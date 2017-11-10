@@ -7,4 +7,5 @@ ALIAS.linux     = native
 ALIAS_TARGET := $(ALIAS.$(BOARD))
 ifneq (,$(ALIAS_TARGET))
   override BOARD = $(ALIAS_TARGET)
+  MAKEOVERRIDES += BOARD=$(BOARD)
 endif
