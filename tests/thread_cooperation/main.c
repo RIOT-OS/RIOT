@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Hamburg University of Applied Sciences
+ * Copyright (C) 2014-2017 Hamburg University of Applied Sciences
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +14,7 @@
  * @brief riot thread test application
  *
  * @author Raphael Hiesgen <raphael.hiesgen@haw-hamburg.de>
+ * @author Sebastian Meiling <s@mlng.net>
  *
  * @}
  */
@@ -24,36 +25,34 @@
 #include "thread.h"
 #include "mutex.h"
 
+#ifndef PROBLEM
 #define PROBLEM 12
+#endif
 
 mutex_t mtx = MUTEX_INIT;
-
 volatile uint32_t storage = 1;
-kernel_pid_t main_id = KERNEL_PID_UNDEF;
-kernel_pid_t ths[PROBLEM];
-char stacks[PROBLEM][THREAD_STACKSIZE_MAIN];
+char stacks[PROBLEM][THREAD_STACKSIZE_DEFAULT];
 
 void *run(void *arg)
 {
     (void) arg;
 
+    msg_t m, final;
     kernel_pid_t me = thread_getpid();
-    printf("I am alive (%d)\n", me);
-    msg_t m;
+
+    printf("T-%02d: alive\n", me);
+
     msg_receive(&m);
-    printf("Thread %d has arg %" PRIu32 "\n", me, m.content.value);
+    printf("T-%02d: got arg %" PRIu32 "\n", me, m.content.value);
 
     mutex_lock(&mtx);
-
     storage *= m.content.value;
     mutex_unlock(&mtx);
 
-    msg_t final;
     final.content.value = me;
-    int err = msg_send(&final, main_id);
 
-    if (err < 0) {
-        printf("[!!!] Failed to send message from %d to main\n", me);
+    if (msg_send(&final, m.sender_pid) < 0) {
+        printf("T-%02d: send reply to main failed!\n", me);
     }
 
     return NULL;
@@ -61,44 +60,47 @@ void *run(void *arg)
 
 int main(void)
 {
-    main_id = thread_getpid();
-
-    printf("Problem: %d\n", PROBLEM);
-
     msg_t args[PROBLEM];
+    kernel_pid_t ths;
+    uint32_t factorial = 1;
+
+    printf("[START] compute %d! (factorial).\n", PROBLEM);
 
     for (int i = 0; i < PROBLEM; ++i) {
-        printf("Creating thread with arg %d\n", (i + 1));
-        ths[i] = thread_create(stacks[i], sizeof(stacks[i]),
+        int arg = i + 1;
+        factorial *= arg;
+        printf("MAIN: create thread, arg: %d\n", arg);
+        ths = thread_create(stacks[i], sizeof(stacks[i]),
                                THREAD_PRIORITY_MAIN - 1,
                                THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                                run, NULL, "thread");
 
-        if (ths[i] < 0)  {
-            printf("[!!!] Creating thread failed.\n");
+        if (ths < 0)  {
+            puts("[ERROR]");
+            return 2;
         }
-        else {
-            args[i].content.value = i + 1;
 
-            int err = msg_send(&args[i], ths[i]);
-            if (err < 0) {
-                printf("[!!!] Sending message to thread %d failed\n", ths[i]);
-            }
+        printf("MAIN: msg to T-%d\n", ths);
+        args[i].content.value = arg;
+        if (msg_send(&args[i], ths) < 0) {
+            puts("[ERROR]");
+            return 3;
         }
     }
 
     for (int i = 0; i < PROBLEM; ++i) {
         msg_t msg;
         msg_receive(&msg);
-        printf("Reveiced message %d from thread %" PRIu32 "\n", i, msg.content.value);
+        printf("MAIN: reply from T-%" PRIu32 "\n", msg.content.value);
     }
 
-    printf("Factorial: %"PRIu32"\n", storage);
+    printf("MAIN: %d! = %" PRIu32 "\n", PROBLEM, storage);
 
-    if (storage != 479001600LU) {
-        puts("[!!!] Error, expected: 12!= 479001600.");
+    if (storage != factorial) {
+        printf("[ERROR] expected %" PRIu32 "\n", factorial);
+        return 1;
     }
+    puts("[SUCCESS]");
 
-    puts("finished");
     return 0;
 }
