@@ -48,6 +48,26 @@ Reason for removal:
 - hardware not available to the community for testing
 - original author and maintainer won't be able to maintain the code
 
+### boards/pca10000 [9447cb303426d7c6348bb84999f88bf929cd6263]
+Author(s):
+- Christian Kühling <kuehling@zedat.fu-berlin.de>
+- Timo Ziegler <timo.ziegler@fu-berlin.de>
+- Hauke Petersen <hauke.petersen@fu-berlin.de>
+
+Reason for removal:
+- this was an early development board by Nordic which was discontinued (successor: `nrf51dongle`)
+- no hardware available anymore for testing
+
+### boards/pca10005 [ea73cc49eacd45640b9660134c4c92b887cb2716]
+Author(s):
+- Christian Kühling <kuehling@zedat.fu-berlin.de>
+- Timo Ziegler <timo.ziegler@fu-berlin.de>
+- Hauke Petersen <hauke.petersen@fu-berlin.de>
+
+Reason for removal:
+- this was an early development board by Nordic which was discontinued (successor: `nrf51dk`)
+- no hardware available anymore for testing
+
 ### cpu/lpc11u34 [7bc271807cecbffbb01a37c56a367b98fb823573]
 Author(s):
 - Paul Rathgeb <paul.rathgeb@skynet.be>
