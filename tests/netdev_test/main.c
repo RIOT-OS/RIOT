@@ -197,15 +197,12 @@ static int test_receive(void)
         puts("=================");
         puts("expected");
         puts("=================");
-        puts(gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                    _test_src,
-                                    ETHERNET_ADDR_LEN));
+        puts(gnrc_netif2_addr_to_str(_test_src, ETHERNET_ADDR_LEN, addr_str));
         puts("=================");
         puts("received source");
         puts("=================");
-        puts(gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                    gnrc_netif_hdr_get_src_addr(hdr->data),
-                                    ETHERNET_ADDR_LEN));
+        puts(gnrc_netif2_addr_to_str(gnrc_netif_hdr_get_src_addr(hdr->data),
+                                     ETHERNET_ADDR_LEN, addr_str));
         return 0;
     }
     if (memcmp(gnrc_netif_hdr_get_dst_addr(hdr->data), _dev_addr,
@@ -215,15 +212,12 @@ static int test_receive(void)
         puts("=================");
         puts("expected");
         puts("=================");
-        puts(gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                    _dev_addr,
-                                    ETHERNET_ADDR_LEN));
+        puts(gnrc_netif2_addr_to_str(_dev_addr, ETHERNET_ADDR_LEN, addr_str));
         puts("====================");
         puts("received destination");
         puts("====================");
-        puts(gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                    gnrc_netif_hdr_get_dst_addr(hdr->data),
-                                    ETHERNET_ADDR_LEN));
+        puts(gnrc_netif2_addr_to_str(gnrc_netif_hdr_get_dst_addr(hdr->data),
+                                     ETHERNET_ADDR_LEN, addr_str));
         return 0;
     }
 
