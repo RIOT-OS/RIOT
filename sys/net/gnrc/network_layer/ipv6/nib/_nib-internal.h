@@ -194,56 +194,6 @@ typedef struct {
 } _nib_offl_entry_t;
 
 /**
- * @brief   Interface specific information for Neighbor Discovery
- */
-typedef struct {
-#if GNRC_IPV6_NIB_CONF_ARSM
-    /**
-     * @brief   base for random reachable time calculation
-     */
-    uint32_t reach_time_base;
-    uint32_t reach_time;                /**< reachable time (in ms) */
-#endif
-    uint32_t retrans_time;              /**< retransmission time (in ms) */
-#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
-    /**
-     * @brief   timestamp in milliseconds of last unsolicited router
-     *          advertisement
-     *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ROUTER.
-     */
-    uint32_t last_ra;
-#endif
-#if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
-    /**
-     * @brief   Event for @ref GNRC_IPV6_NIB_RECALC_REACH_TIME
-     */
-    evtimer_msg_event_t recalc_reach_time;
-#endif
-    kernel_pid_t pid;                   /**< identifier of the interface */
-#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
-    /**
-     * @brief   number of unsolicited router advertisements sent
-     *
-     * This only counts up to the first @ref NDP_MAX_INIT_RA_NUMOF on interface
-     * initialization. The last @ref NDP_MAX_FIN_RA_NUMOF of an advertising
-     * interface are counted from UINT8_MAX - @ref NDP_MAX_FIN_RA_NUMOF + 1.
-     *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ROUTER.
-     */
-    uint8_t ra_sent;
-#endif
-    /**
-     * @brief   number of unsolicited router solicitations scheduled
-     */
-    uint8_t rs_sent;
-    /**
-     * @brief   number of unsolicited neighbor advertisements scheduled
-     */
-    uint8_t na_sent;
-} _nib_iface_t;
-
-/**
  * @brief   Internal NIB-representation of the authoritative border router
  *          for multihop prefix and 6LoWPAN context dissemination
  */
@@ -794,30 +744,6 @@ void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
  */
 int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
                    gnrc_ipv6_nib_ft_t *entry);
-
-/**
- * @brief   Gets (or creates if it not exists) interface information for
- *          neighbor discovery
- *
- * @pre `(iface <= _NIB_IF_MAX)`
- *
- * @param[in] iface Interface identifier to get information for.
- *
- * @return  Interface information on @p iface.
- * @return  NULL, if no space left for interface.
- */
-_nib_iface_t *_nib_iface_get(unsigned iface);
-
-/**
- * @brief   Recalculates randomized reachable time of an interface.
- *
- * @param[in] iface An interface.
- */
-#if GNRC_IPV6_NIB_CONF_ARSM
-void _nib_iface_recalc_reach_time(_nib_iface_t *iface);
-#else
-#define _nib_iface_recalc_reach_time(iface) (void)iface
-#endif
 
 /**
  * @brief   Looks up if an event is queued in the event timer

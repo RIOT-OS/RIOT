@@ -25,12 +25,15 @@
 #include "embUnit.h"
 #include "embUnit/embUnit.h"
 #include "msg.h"
+#include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/netdev.h"
+#include "net/gnrc/netif/hdr.h"
+#include "net/gnrc/netif2/internal.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/icmpv6.h"
 #include "net/ndp.h"
+#include "net/netdev_test.h"
 #include "net/netopt.h"
 #include "sched.h"
 
@@ -63,7 +66,7 @@ static const ipv6_addr_t test_pfx = { { 0x47, 0x25, 0xd9, 0x3b, 0x7f, 0xcc, 0x15
                                         0x64, 0x3e, 0x76, 0x0d, 0x30, 0x10, 0x0d, 0xc8 } };
 static const uint8_t test_src_l2[] = { 0xe7, 0x43, 0xb7, 0x74, 0xd7, 0xa9, 0x30, 0x74 };
 
-static kernel_pid_t test_iface = KERNEL_PID_UNDEF;
+static gnrc_netif2_t *test_netif = NULL;
 
 static void init_pkt_handler(void);
 static inline size_t ceil8(size_t size);
@@ -405,11 +408,11 @@ static inline ipv6_addr_t *_get_ipv6_dst(ipv6_hdr_t *hdr)
     return &hdr->dst;
 }
 
-#define ASSERT_NETIF_HDR(iface, pkt) \
+#define ASSERT_NETIF_HDR(netif, pkt) \
     TEST_ASSERT_NOT_NULL(pkt); \
     TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_NETIF, pkt->type); \
     TEST_ASSERT_NOT_NULL(pkt->data); \
-    TEST_ASSERT_EQUAL_INT(iface, _get_iface(pkt->data))
+    TEST_ASSERT_EQUAL_INT(netif->pid, _get_iface(pkt->data))
 
 #define ASSERT_IPV6_HDR(src, dst, pkt) \
     TEST_ASSERT_NOT_NULL(pkt); \
@@ -428,7 +431,6 @@ static inline ipv6_addr_t *_get_ipv6_dst(ipv6_hdr_t *hdr)
 static void test_nbr_sol_send(const ipv6_addr_t *src)
 {
     msg_t msg;
-    gnrc_ipv6_netif_t *test_netif = gnrc_ipv6_netif_get(test_iface);
     gnrc_pktsnip_t *pkt;
     ndp_nbr_sol_t *nbr_sol;
 
@@ -438,7 +440,7 @@ static void test_nbr_sol_send(const ipv6_addr_t *src)
     TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
     pkt = msg.content.ptr;
     /* check packet */
-    ASSERT_NETIF_HDR(test_iface, pkt);
+    ASSERT_NETIF_HDR(test_netif, pkt);
     if ((src != NULL) && ipv6_addr_is_unspecified(src)) {
         ASSERT_IPV6_HDR(&ipv6_addr_unspecified, &test_dst, pkt->next);
     }
@@ -488,7 +490,6 @@ static void test_nbr_adv_send(const ipv6_addr_t *tgt, const ipv6_addr_t *dst,
                               bool supply_tl2a, gnrc_pktsnip_t *exp_ext_opts)
 {
     msg_t msg;
-    gnrc_ipv6_netif_t *test_netif = gnrc_ipv6_netif_get(test_iface);
     gnrc_pktsnip_t *pkt;
     ndp_nbr_adv_t *nbr_adv;
 
@@ -498,7 +499,7 @@ static void test_nbr_adv_send(const ipv6_addr_t *tgt, const ipv6_addr_t *dst,
     TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
     pkt = msg.content.ptr;
     /* check packet */
-    ASSERT_NETIF_HDR(test_iface, pkt);
+    ASSERT_NETIF_HDR(test_netif, pkt);
     if (ipv6_addr_is_unspecified(dst)) {
         ASSERT_IPV6_HDR(&ipv6_addr_unspecified, &ipv6_addr_all_nodes_link_local,
                         pkt->next);
@@ -548,46 +549,46 @@ static void test_nbr_adv_send(const ipv6_addr_t *tgt, const ipv6_addr_t *dst,
 
 static void test_nbr_adv_send__foreign_tgt_unspecified_dst_no_supply_tl2a_no_ext_opts(void)
 {
-    test_nbr_adv_send(&test_tgt, &ipv6_addr_unspecified, false, NULL);
+    test_nbr_adv_send(&test_src, &ipv6_addr_unspecified, false, NULL);
 }
 
 static void test_nbr_adv_send__foreign_tgt_unspecified_dst_no_supply_tl2a_ext_opts(void)
 {
     gnrc_pktsnip_t *ext_opts = gnrc_pktbuf_add(NULL, NULL, 8U, GNRC_NETTYPE_UNDEF);
-    test_nbr_adv_send(&test_tgt, &ipv6_addr_unspecified, false, ext_opts);
+    test_nbr_adv_send(&test_src, &ipv6_addr_unspecified, false, ext_opts);
 }
 
 static void test_nbr_adv_send__foreign_tgt_unspecified_dst_supply_tl2a_no_ext_opts(void)
 {
-    test_nbr_adv_send(&test_tgt, &ipv6_addr_unspecified, true, NULL);
+    test_nbr_adv_send(&test_src, &ipv6_addr_unspecified, true, NULL);
 }
 
 static void test_nbr_adv_send__foreign_tgt_unspecified_dst_supply_tl2a_ext_opts(void)
 {
     gnrc_pktsnip_t *ext_opts = gnrc_pktbuf_add(NULL, NULL, 8U, GNRC_NETTYPE_UNDEF);
-    test_nbr_adv_send(&test_tgt, &ipv6_addr_unspecified, true, ext_opts);
+    test_nbr_adv_send(&test_src, &ipv6_addr_unspecified, true, ext_opts);
 }
 
 static void test_nbr_adv_send__foreign_tgt_specified_dst_no_supply_tl2a_no_ext_opts(void)
 {
-    test_nbr_adv_send(&test_tgt, &test_dst, false, NULL);
+    test_nbr_adv_send(&test_src, &test_dst, false, NULL);
 }
 
 static void test_nbr_adv_send__foreign_tgt_specified_dst_no_supply_tl2a_ext_opts(void)
 {
     gnrc_pktsnip_t *ext_opts = gnrc_pktbuf_add(NULL, NULL, 8U, GNRC_NETTYPE_UNDEF);
-    test_nbr_adv_send(&test_tgt, &test_dst, false, ext_opts);
+    test_nbr_adv_send(&test_src, &test_dst, false, ext_opts);
 }
 
 static void test_nbr_adv_send__foreign_tgt_specified_dst_supply_tl2a_no_ext_opts(void)
 {
-    test_nbr_adv_send(&test_tgt, &test_dst, true, NULL);
+    test_nbr_adv_send(&test_src, &test_dst, true, NULL);
 }
 
 static void test_nbr_adv_send__foreign_tgt_specified_dst_supply_tl2a_ext_opts(void)
 {
     gnrc_pktsnip_t *ext_opts = gnrc_pktbuf_add(NULL, NULL, 8U, GNRC_NETTYPE_UNDEF);
-    test_nbr_adv_send(&test_tgt, &test_dst, true, ext_opts);
+    test_nbr_adv_send(&test_src, &test_dst, true, ext_opts);
 }
 
 static void test_nbr_adv_send__src_tgt_unspecified_dst_no_supply_tl2a_no_ext_opts(void)
@@ -637,7 +638,6 @@ static void test_nbr_adv_send__src_tgt_specified_dst_supply_tl2a_ext_opts(void)
 static void test_rtr_sol_send(const ipv6_addr_t *dst)
 {
     msg_t msg;
-    gnrc_ipv6_netif_t *test_netif = gnrc_ipv6_netif_get(test_iface);
     gnrc_pktsnip_t *pkt;
     ndp_rtr_sol_t *rtr_sol;
 
@@ -647,7 +647,7 @@ static void test_rtr_sol_send(const ipv6_addr_t *dst)
     TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
     pkt = msg.content.ptr;
     /* check packet */
-    ASSERT_NETIF_HDR(test_iface, pkt);
+    ASSERT_NETIF_HDR(test_netif, pkt);
     if (dst != NULL) {
         ASSERT_IPV6_HDR(&test_src, dst, pkt->next);
     }
@@ -701,7 +701,6 @@ static void test_rtr_adv_send(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                               bool fin, gnrc_pktsnip_t *exp_ext_opts)
 {
     msg_t msg;
-    gnrc_ipv6_netif_t *test_netif = gnrc_ipv6_netif_get(test_iface);
     gnrc_pktsnip_t *pkt;
     ndp_rtr_adv_t *rtr_adv;
 
@@ -711,7 +710,7 @@ static void test_rtr_adv_send(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
     pkt = msg.content.ptr;
     /* check packet */
-    ASSERT_NETIF_HDR(test_iface, pkt);
+    ASSERT_NETIF_HDR(test_netif, pkt);
     /* testing for unspecified source is complicated so we skip it here and
      * do it in later integration tests */
     if (dst != NULL) {
@@ -930,11 +929,25 @@ int main(void)
 
 static char test_netif_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t msg_queue_main[MSG_QUEUE_SIZE];
-static msg_t msg_queue_netif[MSG_QUEUE_SIZE];
 static gnrc_netreg_entry_t netreg_entry;
+static netdev_test_t dev;
 
-int test_iface_get(gnrc_netapi_opt_t *opt)
+static int _test_netif_send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
 {
+    (void)netif;
+    gnrc_pktbuf_release(pkt);
+    return 0;
+}
+
+static gnrc_pktsnip_t *_test_netif_recv(gnrc_netif2_t *netif)
+{
+    (void)netif;
+    return NULL;
+}
+
+static int _test_netif_get(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt)
+{
+    (void)netif;
     switch (opt->opt) {
         case NETOPT_ADDRESS_LONG:
             if (opt->data_len < sizeof(test_src_l2)) {
@@ -971,30 +984,19 @@ int test_iface_get(gnrc_netapi_opt_t *opt)
     }
 }
 
-static void *test_iface_thread(void *args)
+static int _test_netif_set(gnrc_netif2_t *netif, const gnrc_netapi_opt_t *opt)
 {
-    msg_t msg, reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
-
-    (void)args;
-    msg_init_queue(msg_queue_netif, MSG_QUEUE_SIZE);
-    while (1) {
-        msg_receive(&msg);
-        switch (msg.type) {
-            case GNRC_NETAPI_MSG_TYPE_SND:
-            case GNRC_NETAPI_MSG_TYPE_RCV:
-                gnrc_pktbuf_release(msg.content.ptr);
-                continue;
-            case GNRC_NETAPI_MSG_TYPE_GET:
-                reply.content.value = (uint32_t)test_iface_get(msg.content.ptr);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_SET:
-                reply.content.value = (uint32_t)(-ENOTSUP);
-                break;
-        }
-        msg_reply(&msg, &reply);
-    }
-    return NULL;
+    (void)netif;
+    (void)opt;
+    return -ENOTSUP;
 }
+
+static const gnrc_netif2_ops_t _test_netif_ops = {
+    .send = _test_netif_send,
+    .recv = _test_netif_recv,
+    .get = _test_netif_get,
+    .set = _test_netif_set,
+};
 
 static void init_pkt_handler(void)
 {
@@ -1002,13 +1004,17 @@ static void init_pkt_handler(void)
     gnrc_netreg_entry_init_pid(&netreg_entry, GNRC_NETREG_DEMUX_CTX_ALL,
                                sched_active_pid);
     gnrc_netreg_register(GNRC_NETTYPE_NDP2, &netreg_entry);
-    test_iface = thread_create(test_netif_stack, sizeof(test_netif_stack),
-                               GNRC_NETDEV_MAC_PRIO, THREAD_CREATE_STACKTEST,
-                               test_iface_thread, NULL, "test-iface");
-    TEST_ASSERT_MESSAGE(test_iface > KERNEL_PID_UNDEF,
+    netdev_test_setup(&dev, NULL);
+    test_netif = gnrc_netif2_create(test_netif_stack, sizeof(test_netif_stack),
+                                    GNRC_NETIF2_PRIO, "test-netif",
+                                    &dev.netdev, &_test_netif_ops);
+    TEST_ASSERT_MESSAGE(test_netif != NULL,
                         "Unable to start test interface");
-    gnrc_netif_add(test_iface);
-    gnrc_ipv6_netif_init_by_dev();
+    memcpy(&test_netif->ipv6.addrs[0], &test_src,
+           sizeof(test_netif->ipv6.addrs[0]));
+    test_netif->ipv6.addrs_flags[0] = GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID;
+    memcpy(test_netif->l2addr, test_src_l2, sizeof(test_netif->l2addr));
+    test_netif->l2addr_len = sizeof(test_src_l2);
 }
 
 static inline size_t ceil8(size_t size)

@@ -21,7 +21,7 @@
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif.h"
+#include "net/gnrc/netif2/internal.h"
 #include "random.h"
 
 #include "_nib-internal.h"
@@ -36,7 +36,6 @@ static clist_node_t _next_removable = { NULL };
 static _nib_onl_entry_t _nodes[GNRC_IPV6_NIB_NUMOF];
 static _nib_offl_entry_t _dsts[GNRC_IPV6_NIB_OFFL_NUMOF];
 static _nib_dr_entry_t _def_routers[GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
-static _nib_iface_t _nis[GNRC_NETIF_NUMOF];
 
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 static _nib_abr_entry_t _abrs[GNRC_IPV6_NIB_ABR_NUMOF];
@@ -61,7 +60,6 @@ void _nib_init(void)
     memset(_nodes, 0, sizeof(_nodes));
     memset(_def_routers, 0, sizeof(_def_routers));
     memset(_dsts, 0, sizeof(_dsts));
-    memset(_nis, 0, sizeof(_nis));
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
     memset(_abrs, 0, sizeof(_abrs));
 #endif
@@ -226,15 +224,21 @@ _nib_onl_entry_t *_nib_onl_get(const ipv6_addr_t *addr, unsigned iface)
 void _nib_nc_set_reachable(_nib_onl_entry_t *node)
 {
 #if GNRC_IPV6_NIB_CONF_ARSM
-    _nib_iface_t *iface = _nib_iface_get(_nib_onl_get_if(node));
+    gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(_nib_onl_get_if(node));
 
-    DEBUG("nib: set %s%%%u reachable (reachable time = %u)\n",
-          ipv6_addr_to_str(addr_str, &node->ipv6, sizeof(addr_str)),
-          _nib_onl_get_if(node), iface->reach_time);
     node->info &= ~GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK;
     node->info |= GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE;
+#ifdef TEST_SUITES
+    /* exit early for unittests */
+    if (netif == NULL) {
+        return;
+    }
+#endif
+    DEBUG("nib: set %s%%%u reachable (reachable time = %u)\n",
+          ipv6_addr_to_str(addr_str, &node->ipv6, sizeof(addr_str)),
+          _nib_onl_get_if(node), (unsigned)netif->ipv6.reach_time);
     _evtimer_add(node, GNRC_IPV6_NIB_REACH_TIMEOUT, &node->nud_timeout,
-                 iface->reach_time);
+                 netif->ipv6.reach_time);
 #else
     (void)node;
 #endif
@@ -281,10 +285,9 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
 #if GNRC_IPV6_NIB_CONF_ARSM
 #if GNRC_IPV6_NIB_CONF_6LN
     if (ipv6_addr_is_link_local(&nce->ipv6)) {
-        gnrc_ipv6_netif_t *netif = gnrc_ipv6_netif_get(_nib_onl_get_if(node));
+        gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(_nib_onl_get_if(node));
         assert(netif != NULL);
-        if ((netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
-            !(netif->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
+        if (gnrc_netif2_is_6ln(netif) && !gnrc_netif2_is_rtr(netif)) {
             _get_l2addr_from_ipv6(nce->l2addr, &node->ipv6);
             nce->l2addr_len = sizeof(uint64_t);
             return;
@@ -767,42 +770,6 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
     dst->pref_until = pref_ltime;
     return dst;
 }
-
-_nib_iface_t *_nib_iface_get(unsigned iface)
-{
-    _nib_iface_t *ni = NULL;
-
-    assert(iface <= _NIB_IF_MAX);
-    for (unsigned i = 0; i < GNRC_NETIF_NUMOF; i++) {
-        _nib_iface_t *tmp = &_nis[i];
-        if (((unsigned)tmp->pid) == iface) {
-            return tmp;
-        }
-        if ((ni == NULL) && (tmp->pid == KERNEL_PID_UNDEF)) {
-            ni = tmp;
-        }
-    }
-    if (ni != NULL) {
-        memset(ni, 0, sizeof(_nib_iface_t));
-        /* TODO: set random reachable time using constants from #6220 */
-        ni->pid = (kernel_pid_t)iface;
-    }
-    return ni;
-}
-
-#if GNRC_IPV6_NIB_CONF_ARSM
-void _nib_iface_recalc_reach_time(_nib_iface_t *iface)
-{
-    uint32_t factor = random_uint32_range(NDP_MIN_RANDOM_FACTOR,
-                                          NDP_MAX_RANDOM_FACTOR);
-
-    /* random factor was times 1000 so we need to divide it again */
-    iface->reach_time = (iface->reach_time_base * factor) / 1000;
-    _evtimer_add(iface, GNRC_IPV6_NIB_RECALC_REACH_TIME,
-                 &iface->recalc_reach_time,
-                 GNRC_IPV6_NIB_CONF_REACH_TIME_RESET);
-}
-#endif
 
 static void _override_node(const ipv6_addr_t *addr, unsigned iface,
                            _nib_onl_entry_t *node)

@@ -1910,33 +1910,6 @@ static void test_nib_abr_iter__three_elem_middle_removed(void)
 }
 #endif
 
-/*
- * Creates GNRC_NETIF_NUMOF interfaces and then tries to add another.
- * Expected result: should return NULL
- */
-static void test_nib_iface_get__no_space_left(void)
-{
-    unsigned iface = 1;
-
-    for (int i = 0; i < GNRC_NETIF_NUMOF; i++) {
-        TEST_ASSERT_NOT_NULL(_nib_iface_get(iface++));
-    }
-    TEST_ASSERT_NULL(_nib_iface_get(iface));
-}
-
-/*
- * Creates an interface and then gets the same interface.
- * Expected result: interface pointers should equal
- */
-static void test_nib_iface_get__success(void)
-{
-    _nib_iface_t *ni1, *ni2;
-
-    TEST_ASSERT_NOT_NULL((ni1 = _nib_iface_get(IFACE)));
-    TEST_ASSERT_NOT_NULL((ni2 = _nib_iface_get(IFACE)));
-    TEST_ASSERT(ni1 == ni2);
-}
-
 Test *tests_gnrc_ipv6_nib_internal_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -2035,8 +2008,6 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_abr_iter__three_elem),
         new_TestFixture(test_nib_abr_iter__three_elem_middle_removed),
 #endif
-        new_TestFixture(test_nib_iface_get__no_space_left),
-        new_TestFixture(test_nib_iface_get__success),
     };
 
     EMB_UNIT_TESTCALLER(tests, set_up, NULL,

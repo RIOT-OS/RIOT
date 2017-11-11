@@ -199,10 +199,8 @@ extern "C" {
 /**
  * @brief   Maximum link-layer address length (aligned)
  */
-#if (GNRC_NETIF_HDR_L2ADDR_MAX_LEN % 8)
-#define GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (((GNRC_NETIF_HDR_L2ADDR_MAX_LEN >> 3) + 1) << 3)
-#else
-#define GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (GNRC_NETIF_HDR_L2ADDR_MAX_LEN)
+#ifndef GNRC_IPV6_NIB_L2ADDR_MAX_LEN
+#define GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (8U)
 #endif
 
 /**

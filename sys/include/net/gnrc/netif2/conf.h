@@ -20,6 +20,7 @@
 
 #include "net/ieee802154.h"
 #include "net/ethernet/hdr.h"
+#include "net/gnrc/ipv6/nib/conf.h"
 #include "thread.h"
 
 #ifdef __cplusplus
@@ -60,7 +61,7 @@ extern "C" {
  *
  * @note    Used for calculation of @ref GNRC_NETIF2_IPV6_GROUPS_NUMOF
  */
-#ifdef MODULE_GNRC_IPV6_ROUTER
+#if GNRC_IPV6_NIB_CONF_ROUTER
 #define GNRC_NETIF2_IPV6_RTR_ADDR   (1)
 #else
 #define GNRC_NETIF2_IPV6_RTR_ADDR   (0)
@@ -109,7 +110,7 @@ extern "C" {
 #elif   MODULE_CC110X
 #define GNRC_NETIF2_L2ADDR_MAXLEN   (1U)
 #else
-#define GNRC_NETIF2_L2ADDR_MAXLEN   (8U)
+#define GNRC_NETIF2_L2ADDR_MAXLEN   (GNRC_IPV6_NIB_L2ADDR_MAX_LEN)
 #endif
 #endif
 

@@ -136,29 +136,30 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_default
+  USEMODULE += gnrc_ipv6_nib_6ln
   USEMODULE += gnrc_sixlowpan
-  USEMODULE += gnrc_sixlowpan_nd
   USEMODULE += gnrc_sixlowpan_frag
   USEMODULE += gnrc_sixlowpan_iphc
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_router_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_router_default
+  USEMODULE += gnrc_ipv6_nib_6lr
   USEMODULE += gnrc_sixlowpan_router
   USEMODULE += gnrc_sixlowpan_frag
   USEMODULE += gnrc_sixlowpan_iphc
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_border_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6lbr
   USEMODULE += gnrc_ipv6_router_default
-  USEMODULE += gnrc_sixlowpan_nd_border_router
   USEMODULE += gnrc_sixlowpan_router
   USEMODULE += gnrc_sixlowpan_frag
   USEMODULE += gnrc_sixlowpan_iphc
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_router,$(USEMODULE)))
-  USEMODULE += gnrc_sixlowpan_nd_router
+  USEMODULE += gnrc_ipv6_router
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
@@ -182,50 +183,14 @@ ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter gnrc_sixlowpan_nd_border_router,$(USEMODULE)))
-  USEMODULE += gnrc_sixlowpan_nd_router
-endif
-
-ifneq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
-  USEMODULE += gnrc_sixlowpan_nd
-endif
-
-ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
-  USEMODULE += gnrc_ndp
-  USEMODULE += gnrc_ndp_internal
-  USEMODULE += gnrc_sixlowpan_ctx
-  USEMODULE += random
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
   USEMODULE += gnrc_icmpv6
-  ifeq (1,$(GNRC_NETIF_NUMOF))
-    ifeq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
-      USEMODULE += gnrc_ndp_host
-    endif
-  else
-    USEMODULE += gnrc_ndp_host
-  endif
 endif
 
 ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_router
   USEMODULE += gnrc_icmpv6
-  ifeq (1,$(GNRC_NETIF_NUMOF))
-    ifeq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
-      USEMODULE += gnrc_ndp_router
-    endif
-  else
-    USEMODULE += gnrc_ndp_router
-  endif
-endif
-
-ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
-  USEMODULE += gnrc_ndp_node
-  USEMODULE += random
-  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
@@ -242,20 +207,9 @@ ifneq (,$(filter gnrc_ndp_%,$(USEMODULE)))
   USEMODULE += gnrc_ndp
 endif
 
-ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
-  ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
-    USEMODULE += gnrc_sixlowpan_nd
-  else
-    USEMODULE += gnrc_ndp_node
-  endif
-  USEMODULE += gnrc_ndp_internal
-  USEMODULE += gnrc_icmpv6
-  USEMODULE += random
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter gnrc_ndp2,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_netif2
 endif
 
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
@@ -301,7 +255,7 @@ ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += ipv6_addr
   USEMODULE += gnrc_ipv6_hdr
-  USEMODULE += gnrc_ipv6_nc
+  USEMODULE += gnrc_ipv6_nib
   USEMODULE += gnrc_netif2
 endif
 

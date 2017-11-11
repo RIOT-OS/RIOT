@@ -8,8 +8,10 @@ BOARD_INSUFFICIENT_MEMORY := chronos nucleo-f030 nucleo-l053 nucleo32-f031 \
 USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_sixlowpan
 USEMODULE += gnrc_ipv6_nib_6ln
+USEMODULE += gnrc_netif2
 USEMODULE += embunit
-USEMODULE += netopt
+USEMODULE += netdev_ieee802154
+USEMODULE += netdev_test
 
 CFLAGS += -DDEVELHELP
 CFLAGS += -DGNRC_NETTYPE_NDP2=GNRC_NETTYPE_TEST

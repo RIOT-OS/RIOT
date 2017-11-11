@@ -44,27 +44,13 @@ static bool _is_number(char *str)
     return true;
 }
 
-static bool _is_iface(kernel_pid_t dev)
-{
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-    size_t numof = gnrc_netif_get(ifs);
-
-    for (size_t i = 0; i < numof && i < GNRC_NETIF_NUMOF; i++) {
-        if (ifs[i] == dev) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 static void _set_test_mode(int argc, char **argv, uint8_t mode)
 {
     (void) argc;
     if (_is_number(argv[1])) {
         kernel_pid_t dev = atoi(argv[1]);
 
-        if (_is_iface(dev)) {
+        if (gnrc_netif2_get_by_pid(dev)) {
             gnrc_netapi_set(dev, NETOPT_RF_TESTMODE, 0, (void *)&mode, sizeof(mode));
             return;
         }
