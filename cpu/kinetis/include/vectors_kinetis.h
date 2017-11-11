@@ -29,11 +29,6 @@ extern "C" {
 #endif
 
 /**
- * @brief memory markers as defined in the linker script
- */
-extern uint32_t _estack;
-
-/**
  * @brief Dummy handler
  */
 void dummy_handler(void);
