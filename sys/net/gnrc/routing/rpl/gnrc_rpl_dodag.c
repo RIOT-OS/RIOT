@@ -216,22 +216,14 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
     gnrc_rpl_dodag_t *dodag = parent->dodag;
 
     if (parent == dodag->parents) {
-        fib_remove_entry(&gnrc_ipv6_fib_table,
-                         (uint8_t *) ipv6_addr_unspecified.u8,
-                         sizeof(ipv6_addr_t));
+        gnrc_ipv6_nib_ft_del(NULL, 0);
 
         /* set the default route to the next parent for now */
         if (parent->next) {
             uint32_t now = xtimer_now_usec() / US_PER_SEC;
-            fib_add_entry(&gnrc_ipv6_fib_table,
-                          dodag->iface,
-                          (uint8_t *) ipv6_addr_unspecified.u8,
-                          sizeof(ipv6_addr_t),
-                          0x0,
-                          parent->next->addr.u8,
-                          sizeof(ipv6_addr_t),
-                          FIB_FLAG_RPL_ROUTE,
-                          (parent->next->lifetime - now) * MS_PER_SEC);
+            gnrc_ipv6_nib_ft_add(NULL, 0,
+                                 &parent->next->addr, dodag->iface,
+                                 (parent->next->lifetime - now));
         }
     }
     LL_DELETE(dodag->parents, parent);
@@ -247,9 +239,7 @@ void gnrc_rpl_local_repair(gnrc_rpl_dodag_t *dodag)
 
     if (dodag->parents) {
         gnrc_rpl_dodag_remove_all_parents(dodag);
-        fib_remove_entry(&gnrc_ipv6_fib_table,
-                         (uint8_t *) ipv6_addr_unspecified.u8,
-                         sizeof(ipv6_addr_t));
+        gnrc_ipv6_nib_ft_del(NULL, 0);
     }
 
     if (dodag->my_rank != GNRC_RPL_INFINITE_RANK) {
@@ -268,15 +258,8 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
         if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
 #endif
         if (parent == dodag->parents) {
-            fib_add_entry(&gnrc_ipv6_fib_table,
-                          dodag->iface,
-                          (uint8_t *) ipv6_addr_unspecified.u8,
-                          sizeof(ipv6_addr_t),
-                          0x00,
-                          parent->addr.u8,
-                          sizeof(ipv6_addr_t),
-                          FIB_FLAG_RPL_ROUTE,
-                          (dodag->default_lifetime * dodag->lifetime_unit) * MS_PER_SEC);
+            gnrc_ipv6_nib_ft_add(NULL, 0, &parent->addr, dodag->iface,
+                                 dodag->default_lifetime * dodag->lifetime_unit);
         }
 #ifdef MODULE_GNRC_RPL_P2P
         }
@@ -325,15 +308,8 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
 #ifdef MODULE_GNRC_RPL_P2P
     if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
 #endif
-        fib_add_entry(&gnrc_ipv6_fib_table,
-                      dodag->iface,
-                      (uint8_t *) ipv6_addr_unspecified.u8,
-                      sizeof(ipv6_addr_t),
-                      0x00,
-                      dodag->parents->addr.u8,
-                      sizeof(ipv6_addr_t),
-                      FIB_FLAG_RPL_ROUTE,
-                      (dodag->default_lifetime * dodag->lifetime_unit) * MS_PER_SEC);
+        gnrc_ipv6_nib_ft_add(NULL, 0, &dodag->parents->addr, dodag->iface,
+                             dodag->default_lifetime * dodag->lifetime_unit);
 #ifdef MODULE_GNRC_RPL_P2P
     }
 #endif

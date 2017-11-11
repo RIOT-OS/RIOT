@@ -105,7 +105,6 @@ ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
-  USEMODULE += fib
   USEMODULE += gnrc_ipv6_router_default
   USEMODULE += trickle
   USEMODULE += xtimer
