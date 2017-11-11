@@ -14,3 +14,6 @@ USEMODULE += schedstatistics
 USEMODULE += printf_float
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py
