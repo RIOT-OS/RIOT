@@ -221,7 +221,7 @@ static int _send(gnrc_netdev_t *gnrc_netdev, gnrc_pktsnip_t *pkt)
         (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
             gnrc_netdev->dev->stats.tx_mcast_count++;
 #ifdef MODULE_NETSTATS_NEIGHBOR
-            DEBUG("l2 stats: Destination is multicast or unicast, NULL recorded");
+            DEBUG("l2 stats: Destination is multicast or unicast, NULL recorded\n");
             netstats_nb_record(netdev, NULL, 0);
 #endif
         }

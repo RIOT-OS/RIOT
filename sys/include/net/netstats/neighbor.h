@@ -111,7 +111,7 @@ netstats_nb_t *netstats_nb_get_next(netstats_nb_t *first, netstats_nb_t *prev);
 /**
  * @brief Store this neighbor as next in the transmission queue.
  *
- * Set len to zero if a nop record is needed, for example if the
+ * Set @p len to zero if a nop record is needed, for example if the
  * transmission has a multicast address as a destination.
  *
  * @param[in] dev       ptr to netdev device
@@ -134,7 +134,7 @@ netstats_nb_t *netstats_nb_get_recorded(netdev_t *dev);
  * @brief Update the next recorded neighbor with the provided numbers
  *
  * This only increments the statistics if the length of the l2-address of the retrieved record
- * is non-zero. see also @ref netstats_nb_record. The numbers indicate the number of transmissions
+ * is non-zero. See also @ref netstats_nb_record. The numbers indicate the number of transmissions
  * the radio had to perform before a successful transmission was performed. For example: in the case
  * of a single send operation needing 3 tries before an ACK was received, there are 2 failed
  * transmissions and 1 successful transmission.

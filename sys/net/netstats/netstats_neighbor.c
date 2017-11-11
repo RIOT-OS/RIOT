@@ -23,7 +23,6 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
-//static char addr_str[30];
 
 static bool l2_addr_equal(const uint8_t *a, uint8_t a_len, const uint8_t *b, uint8_t b_len);
 
