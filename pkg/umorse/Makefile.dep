@@ -1,0 +1,3 @@
+ifneq (,$(filter umorse,$(USEPKG)))
+  USEMODULE += posix_time
+endif

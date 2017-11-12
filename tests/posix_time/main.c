@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-17 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +14,7 @@
  * @brief Posix sleep test application
  *
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author Martine Lenders <m.lenders@fu-berlin.de>
  *
  * @}
  */
@@ -23,22 +24,21 @@
 
 int main(void)
 {
-    puts("usleep 1 x 1000*1000");
-    for (int i = 0; i < 10; i++) {
-        useconds_t us = i*1000u*1000u;
-        printf("calling usleep(%u)\n", (unsigned int) us);
+    puts("Please hit any key and then ENTER to continue");
+    getchar();
+    puts("5 x usleep(i++ * 500000)");
+    for (unsigned i = 0; i < 5; i++) {
+        useconds_t us = i * 500000u;
         usleep(us);
         puts("wake up");
     }
 
-    puts("sleep 1");
-    for (int i = 0; i < 10; i++) {
-        unsigned int s = i;
-        printf("calling sleep(%u)\n", s);
-        sleep(s);
+    puts("5 x sleep(i++)");
+    for (unsigned i = 0; i < 5; i++) {
+        sleep(i);
         puts("wake up");
     }
 
-    puts("done");
+    puts("DONE");
     return 0;
 }
