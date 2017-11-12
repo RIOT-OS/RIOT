@@ -1,4 +1,5 @@
-# Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+# Copyright (C) 2017 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+#               2016 Kaspar Schleiser <kaspar@schleiser.de>
 #               2014 Martine Lenders <mlenders@inf.fu-berlin.de>
 #
 # This file is subject to the terms and conditions of the GNU Lesser
@@ -54,9 +55,19 @@ def run(testfunc, timeout=10, echo=True, traceback=False):
         if traceback:
             print_tb(sys.exc_info()[2])
         return 1
+    except pexpect.EOF:
+        line, filename, lineno = find_exc_origin(sys.exc_info()[2])
+        print("Unexpected end of file in expect script at \"%s\" (%s:%d)" %
+              (line, filename, lineno))
+        if traceback:
+            print_tb(sys.exc_info()[2])
+        return 1
     finally:
         print("")
-        os.killpg(os.getpgid(child.pid), signal.SIGKILL)
-        child.close()
+        try:
+            os.killpg(os.getpgid(child.pid), signal.SIGKILL)
+        except ProcessLookupError:
+            print("Process already stopped")
 
+        child.close()
     return 0
