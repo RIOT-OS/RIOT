@@ -10,14 +10,20 @@ import signal
 import sys
 import subprocess
 import time
-from traceback import print_tb
+from traceback import extract_tb, print_tb
 
-from pexpect import spawnu, TIMEOUT
+import pexpect
 
+PEXPECT_PATH = os.path.dirname(pexpect.__file__)
+RIOTBASE = os.environ['RIOTBASE'] or \
+           os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+
+def list_until(l, cond):
+    return l[:([i for i, e in  enumerate(l) if cond(e)][0])]
 
 def run(testfunc, timeout=10, echo=True, traceback=False):
     env = os.environ.copy()
-    child = spawnu("make term", env=env, timeout=timeout)
+    child = pexpect.spawnu("make term", env=env, timeout=timeout)
 
     # on many platforms, the termprog needs a short while to be ready...
     time.sleep(3)
@@ -33,8 +39,14 @@ def run(testfunc, timeout=10, echo=True, traceback=False):
         pass
     try:
         testfunc(child)
-    except TIMEOUT:
-        print("Timeout in expect script")
+    except pexpect.TIMEOUT:
+        timeouted_at = list_until(extract_tb(sys.exc_info()[2]),
+                                  lambda frame:
+                                      frame.filename.startswith(PEXPECT_PATH))[-1]
+        print("Timeout in expect script at \"%s\" (%s:%d)" %
+                    (timeouted_at.line,
+                     os.path.relpath(os.path.abspath(timeouted_at.filename), RIOTBASE),
+                     timeouted_at.lineno))
         if traceback:
             print_tb(sys.exc_info()[2])
         return 1
