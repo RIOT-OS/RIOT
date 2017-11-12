@@ -1,4 +1,5 @@
-# Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
+# Copyright (C) 2017 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+#               2016 Kaspar Schleiser <kaspar@schleiser.de>
 #               2014 Martine Lenders <mlenders@inf.fu-berlin.de>
 #
 # This file is subject to the terms and conditions of the GNU Lesser
@@ -21,6 +22,14 @@ RIOTBASE = os.environ['RIOTBASE'] or \
 def list_until(l, cond):
     return l[:([i for i, e in  enumerate(l) if cond(e)][0])]
 
+def find_exc_origin(exc_info):
+    pos = list_until(extract_tb(exc_info),
+                     lambda frame: frame.filename.startswith(PEXPECT_PATH)
+                    )[-1]
+    return pos.line, \
+           os.path.relpath(os.path.abspath(pos.filename), RIOTBASE), \
+           pos.lineno
+
 def run(testfunc, timeout=10, echo=True, traceback=False):
     env = os.environ.copy()
     child = pexpect.spawnu("make term", env=env, timeout=timeout)
@@ -40,19 +49,25 @@ def run(testfunc, timeout=10, echo=True, traceback=False):
     try:
         testfunc(child)
     except pexpect.TIMEOUT:
-        timeouted_at = list_until(extract_tb(sys.exc_info()[2]),
-                                  lambda frame:
-                                      frame.filename.startswith(PEXPECT_PATH))[-1]
+        line, filename, lineno = find_exc_origin(sys.exc_info()[2])
         print("Timeout in expect script at \"%s\" (%s:%d)" %
-                    (timeouted_at.line,
-                     os.path.relpath(os.path.abspath(timeouted_at.filename), RIOTBASE),
-                     timeouted_at.lineno))
+              (line, filename, lineno))
+        if traceback:
+            print_tb(sys.exc_info()[2])
+        return 1
+    except pexpect.EOF:
+        line, filename, lineno = find_exc_origin(sys.exc_info()[2])
+        print("Unexpected end of file in expect script at \"%s\" (%s:%d)" %
+              (line, filename, lineno))
         if traceback:
             print_tb(sys.exc_info()[2])
         return 1
     finally:
         print("")
-        os.killpg(os.getpgid(child.pid), signal.SIGKILL)
-        child.close()
+        try:
+            os.killpg(os.getpgid(child.pid), signal.SIGKILL)
+        except ProcessLookupError:
+            print("Process already stopped")
 
+        child.close()
     return 0
