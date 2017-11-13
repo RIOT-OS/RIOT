@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    cpu_mips32r2_commom Imagination Technologies MIPS32R2 Common
+ * @defgroup    cpu_mips32r2_generic Imagination Technologies MIPS32R2 Common
  * @ingroup     cpu
  * @brief       Imagination Technologies MIPS32R2 common
  * @{
