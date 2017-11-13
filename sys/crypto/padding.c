@@ -49,7 +49,7 @@ int32_t pkcs7_padding(const uint8_t *data, uint32_t data_len, uint8_t blocksize,
     return data_len + padding_len;
 }
 
-int32_t pkcs7_padding_remove(uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *unpadded_data, uint32_t unpadded_data_len)
+int32_t pkcs7_padding_remove(uint8_t *data, uint32_t data_len, uint8_t blocksize)
 {
     /* Validate the input data */
     if (blocksize <= 1) { /* No need to check the maximum blocksize, since the max value supported by PKCS#7 is the same as that of the datatpye (255) */
@@ -73,11 +73,5 @@ int32_t pkcs7_padding_remove(uint8_t *data, uint32_t data_len, uint8_t blocksize
 
     uint32_t unpadded_length = data_len - padding_len;
 
-    if (unpadded_data_len < unpadded_length) {
-        return PADDING_NOT_ENOUGH_SPACE_AVAILABLE;
-    }
-
-    /* Remove the padding */
-    memcpy(unpadded_data, data, unpadded_length);
     return unpadded_length;
 }

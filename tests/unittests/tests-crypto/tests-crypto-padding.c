@@ -53,12 +53,11 @@ static void test_pad_pkcs7_op(uint8_t *data, uint32_t data_len, uint8_t blocksiz
 
 static void test_unpad_pkcs7_op(uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *expected_data, uint32_t expected_data_len)
 {
-    uint8_t unpadded_data[data_len];
-    int32_t unpadded_length = pkcs7_padding_remove(data, data_len, blocksize, unpadded_data, data_len);
+    int32_t unpadded_length = pkcs7_padding_remove(data, data_len, blocksize);
 
     TEST_ASSERT_MESSAGE(unpadded_length > 0, "Remove padding failed");
     TEST_ASSERT_MESSAGE((unsigned int)unpadded_length == expected_data_len, "Unpadded data has wrong length");
-    TEST_ASSERT_MESSAGE(0 == memcmp(unpadded_data, expected_data, unpadded_length), "Data unpadded incorrectly.");
+    TEST_ASSERT_MESSAGE(0 == memcmp(data, expected_data, unpadded_length), "Data unpadded incorrectly.");
 }
 
 
@@ -90,8 +89,7 @@ static void test_pkcs7_padding_remove_bad_data_length(void)
 {
     uint8_t data[] = { 0x01 };
     uint8_t blocksize = 8;
-    uint8_t unpadded_data[blocksize];
-    int32_t rv = pkcs7_padding_remove(data, sizeof(data), blocksize, unpadded_data, sizeof(unpadded_data));
+    int32_t rv = pkcs7_padding_remove(data, sizeof(data), blocksize);
 
     TEST_ASSERT_EQUAL_INT(PADDING_INVALID_PADDING, rv);
 }
@@ -100,8 +98,7 @@ static void test_pkcs7_padding_remove_bad_padding(void)
 {
     uint8_t data[] = { 0xff, 0xff, 0xff, 0x2 };
     uint8_t blocksize = 4;
-    uint8_t unpadded_data[blocksize];
-    int32_t rv = pkcs7_padding_remove(data, sizeof(data), blocksize, unpadded_data, sizeof(unpadded_data));
+    int32_t rv = pkcs7_padding_remove(data, sizeof(data), blocksize);
 
     TEST_ASSERT_EQUAL_INT(PADDING_INVALID_PADDING, rv);
 }

@@ -54,13 +54,11 @@ int32_t pkcs7_padding(const uint8_t *data, uint32_t data_len, uint8_t blocksize,
  * @param data              The padded data
  * @param data_len          The length of the padded data. Must be a multiple of the blocksize.
  * @param blocksize         The length of the block.
- * @param unpadded_data     Place to store the unpadded data
- * @param unpadded_data_len Amount of data available for storage
  *
- * @return           The length of the unpadded data stored or a (negative) error code
+ * @return           The length of the unpadded data or a (negative) error code
  *
  */
-int32_t pkcs7_padding_remove(uint8_t *data, uint32_t data_len, uint8_t blocksize, uint8_t *unpadded_data, uint32_t unpadded_data_len);
+int32_t pkcs7_padding_remove(uint8_t *data, uint32_t data_len, uint8_t blocksize);
 
 #ifdef __cplusplus
 }
