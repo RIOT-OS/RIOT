@@ -87,7 +87,6 @@ static void test_encrypt_op(uint8_t *key, uint8_t key_len, uint8_t iv[16],
     TEST_ASSERT_EQUAL_INT(output_len, len);
     cmp = compare(output, data, len);
     TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
-
 }
 
 static void test_encrypt_op_with_padding(uint8_t *key, uint8_t key_len, uint8_t iv[16],
