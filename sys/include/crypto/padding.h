@@ -19,13 +19,13 @@
 #ifndef CRYPTO_PADDING_H
 #define CRYPTO_PADDING_H
 
-#include "crypto/ciphers.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stdint.h>
+
+#include "crypto/ciphers.h"
 
 #define PADDING_TYPE_PKCS7 1
 
