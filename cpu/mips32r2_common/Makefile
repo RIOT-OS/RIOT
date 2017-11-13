@@ -1,4 +1,4 @@
-MODULE = cpu
+MODULE = mips32r2_common
 
 DIRS = periph
 
