@@ -9,8 +9,8 @@ FEATURES_REQUIRED += periph_timer # xtimer required for this application
 
 USEMODULE += gnrc
 USEMODULE += gnrc_neterr
-USEMODULE += gnrc_netif
-USEMODULE += gnrc_netdev
+USEMODULE += gnrc_netif2
+USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += od
 
