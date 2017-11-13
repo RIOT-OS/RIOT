@@ -1,0 +1,3 @@
+MODULE := cn-cbor
+
+include $(RIOTBASE)/Makefile.base
