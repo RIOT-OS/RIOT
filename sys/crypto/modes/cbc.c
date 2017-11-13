@@ -145,11 +145,10 @@ int cipher_decrypt_cbc_with_padding(cipher_t *cipher, uint8_t iv[16],
             return decrypted_len;
         }
         /* Decryption worked. Now remove the padding. */
-        uint8_t unpadded_data[decrypted_len];
-        int32_t unpadded_length = pkcs7_padding_remove(output, length, cipher->interface->block_size, unpadded_data, sizeof(unpadded_data));    if (unpadded_length < 0) {
+        int32_t unpadded_length = pkcs7_padding_remove(output, length, cipher->interface->block_size);
+        if (unpadded_length < 0) {
             return CIPHER_ERR_PADDING_ERROR;
         }
-        memcpy(output, unpadded_data, unpadded_length);
         return unpadded_length;
     }
     else {
