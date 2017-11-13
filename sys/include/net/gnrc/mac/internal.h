@@ -24,7 +24,6 @@
 #include <stdint.h>
 
 #include "net/ieee802154.h"
-#include "net/gnrc/mac/types.h"
 #include "net/gnrc/netif2.h"
 
 #ifdef __cplusplus
