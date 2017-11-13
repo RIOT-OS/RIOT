@@ -298,6 +298,15 @@ typedef struct {
 uint32_t periph_apb_clk(uint8_t bus);
 
 /**
+ * @brief   Get the actual timer clock frequency
+ *
+ * @param[in] bus       corresponding APBx bus
+ *
+ * @return              timer clock frequency in Hz
+ */
+uint32_t periph_timer_clk(uint8_t bus);
+
+/**
  * @brief   Enable the given peripheral clock
  *
  * @param[in] bus       bus the peripheral is connected to
