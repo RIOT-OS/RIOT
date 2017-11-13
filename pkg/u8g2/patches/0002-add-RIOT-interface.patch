@@ -1,7 +1,7 @@
-From 452712c6a749a2d513c366abd9e819a2f68eacbd Mon Sep 17 00:00:00 2001
+From 6a09e7bee194681f63781dd0af6c154f2f4e519c Mon Sep 17 00:00:00 2001
 From: Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
 Date: Wed, 6 Sep 2017 20:26:46 +0200
-Subject: [PATCH 2/2] add RIOT interface
+Subject: [PATCH 2/3] add RIOT interface
 
 ---
  csrc/u8g2.h        |   3 +
@@ -11,7 +11,7 @@ Subject: [PATCH 2/2] add RIOT interface
  create mode 100644 csrc/u8g2_riotos.c
 
 diff --git a/csrc/u8g2.h b/csrc/u8g2.h
-index 46dcec3..bc76480 100644
+index 6ff3f91..d284619 100644
 --- a/csrc/u8g2.h
 +++ b/csrc/u8g2.h
 @@ -387,6 +387,9 @@ void u8g2_ClearDisplay(u8g2_t *u8g2);
@@ -195,7 +195,7 @@ index 0000000..bd06ccb
 +}
 +#endif /* I2C_NUMOF */
 diff --git a/csrc/u8x8.h b/csrc/u8x8.h
-index 2c93c87..b434893 100644
+index a4a99b7..e508664 100644
 --- a/csrc/u8x8.h
 +++ b/csrc/u8x8.h
 @@ -111,6 +111,8 @@
@@ -240,7 +240,7 @@ index 2c93c87..b434893 100644
  
  /*==========================================*/
  
-@@ -939,6 +947,9 @@ extern const uint8_t u8x8_font_pxplustandynewtv_u[] U8X8_FONT_SECTION("u8x8_font
+@@ -943,6 +951,9 @@ extern const uint8_t u8x8_font_pxplustandynewtv_u[] U8X8_FONT_SECTION("u8x8_font
  
  /* end font list */
  

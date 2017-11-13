@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = posix_sockets
+APPLICATION = posix_sockets_example
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
