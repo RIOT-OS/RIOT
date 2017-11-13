@@ -60,7 +60,7 @@ extern "C" {
 #define SHA256_INTERNAL_BLOCK_SIZE (64)
 
 /**
- * @brief Context for ciper operations based on sha256
+ * @brief Context for cipher operations based on sha256
  */
 typedef struct {
     /** global state */
