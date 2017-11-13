@@ -5,7 +5,4 @@ export APP_START=0x80000000
 include $(RIOTMAKE)/arch/mips.inc.mk
 include $(RIOTCPU)/mips32r2_common/Makefile.include
 
-# mips32 needs periph_timer for its gettimeofday() implementation
-export USEMODULE += periph_timer
-
 export LINKFLAGS += -Tuhi32.ld
