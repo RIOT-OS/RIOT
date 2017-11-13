@@ -34,6 +34,10 @@ int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16],
         return CIPHER_ERR_INVALID_LENGTH;
     }
 
+    if(length == 0)
+        /* no plaintext, no operation */
+        return 0;
+
     output_block_last = iv;
     do {
         /* CBC-Mode: XOR plaintext with ciphertext of (n-1)-th block */
@@ -82,6 +86,10 @@ int cipher_decrypt_cbc(cipher_t *cipher, uint8_t iv[16],
     if (length % block_size != 0) {
         return CIPHER_ERR_INVALID_LENGTH;
     }
+
+    if(length == 0)
+    /* no plaintext, no operation */
+    return 0;
 
     input_block_last = iv;
     do {
