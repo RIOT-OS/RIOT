@@ -57,7 +57,6 @@ ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   CFLAGS += -DGNRC_PKTBUF_SIZE=512
 endif
 
-FEATURES_OPTIONAL += config
 FEATURES_OPTIONAL += periph_rtc
 
 ifneq (,$(filter msb-430,$(BOARD)))
