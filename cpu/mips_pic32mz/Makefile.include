@@ -8,8 +8,6 @@ include $(RIOTCPU)/mips32r2_common/Makefile.include
 export CFLAGS += -march=m5101 -mmicromips -DSKIP_COPY_TO_RAM
 export CFLAGS += -DMIPS_MICROMIPS
 
-export USEMODULE += mips_pic32_common
-
 export LINKFLAGS += -Wl,--defsym,__use_excpt_boot=0 $(CFLAGS)
 export LINKFLAGS += -Tpic32mz2048_uhi.ld
 
