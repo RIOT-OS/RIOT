@@ -19,16 +19,18 @@ PEXPECT_PATH = os.path.dirname(pexpect.__file__)
 RIOTBASE = os.environ['RIOTBASE'] or \
            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
+
 def list_until(l, cond):
-    return l[:([i for i, e in  enumerate(l) if cond(e)][0])]
+    return l[:([i for i, e in enumerate(l) if cond(e)][0])]
+
 
 def find_exc_origin(exc_info):
     pos = list_until(extract_tb(exc_info),
-                     lambda frame: frame.filename.startswith(PEXPECT_PATH)
-                    )[-1]
-    return pos.line, \
-           os.path.relpath(os.path.abspath(pos.filename), RIOTBASE), \
-           pos.lineno
+                     lambda frame: frame.filename.startswith(PEXPECT_PATH))[-1]
+    return (pos.line,
+            os.path.relpath(os.path.abspath(pos.filename), RIOTBASE),
+            pos.lineno)
+
 
 def run(testfunc, timeout=10, echo=True, traceback=False):
     env = os.environ.copy()
