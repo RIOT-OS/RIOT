@@ -1100,11 +1100,17 @@ static void _init_from_device(gnrc_netif2_t *netif)
             break;
 #endif
         default:
-            res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
-            assert(res == sizeof(tmp));
 #ifdef MODULE_GNRC_IPV6
-            netif->ipv6.mtu = tmp;
+            res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
+            if (res < 0) {
+                /* assume maximum possible transition unit */
+                netif->ipv6.mtu = UINT16_MAX;
+            }
+            else {
+                netif->ipv6.mtu = tmp;
+            }
 #endif
+            break;
     }
     _update_l2addr_from_dev(netif);
 }
