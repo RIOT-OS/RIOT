@@ -12,11 +12,15 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def testfunc(child):
-    child.expect_exact("od_hex_dump(short_str, sizeof(short_str), OD_WIDTH_DEFAULT)")
+    child.expect_exact("od_hex_dump(short_str, sizeof(short_str), "
+                       "OD_WIDTH_DEFAULT)")
     child.expect_exact("00000000  41  42  00")
-    child.expect_exact("od_hex_dump(long_str, sizeof(long_str), OD_WIDTH_DEFAULT)")
-    child.expect_exact("00000000  FF  2C  61  FF  2E  62  63  64  65  66  67  68  69  6A  6B  6C")
+    child.expect_exact("od_hex_dump(long_str, sizeof(long_str), "
+                       "OD_WIDTH_DEFAULT)")
+    child.expect_exact("00000000  FF  2C  61  FF  2E  62  63  64  65  66  67  "
+                       "68  69  6A  6B  6C")
     child.expect_exact("00000010  6D  6E  6F  70  00")
     child.expect_exact("od_hex_dump(long_str, sizeof(long_str), 4)")
     child.expect_exact("00000000  FF  2C  61  FF")
