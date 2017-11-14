@@ -30,15 +30,17 @@ lock_depth = {
         7:  5
         }
 
+
 def thread_prio_sort(x):
     return thread_prio.get(x)*1000 + x
+
 
 def testfunc(child):
     for k in thread_prio.keys():
         child.expect(u"T%i \(prio %i, depth 0\): trying to lock rmutex now" %
                      (k, thread_prio[k]))
 
-    pri_sorted = sorted(thread_prio, key=thread_prio_sort);
+    pri_sorted = sorted(thread_prio, key=thread_prio_sort)
     for T in pri_sorted:
         for depth in range(lock_depth[T]):
             child.expect(u"T%i \(prio %i, depth %i\): locked rmutex now" %
