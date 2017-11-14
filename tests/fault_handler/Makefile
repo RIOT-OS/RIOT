@@ -1,8 +1,6 @@
 # name of your application
 include ../Makefile.tests_common
 
-CFLAGS += -DDEVELHELP=1
-
 ifeq ($(shell uname),Darwin)
 CFLAGS += -Wno-language-extension-token
 endif
