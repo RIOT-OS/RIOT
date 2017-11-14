@@ -12,9 +12,10 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def testfunc(child):
     child.expect_exact("[START]")
-    child.expect(u"\[RESULTS\] min=\d+, avg=\d+, max=\d+")
+    child.expect("\[RESULTS\] min=\d+, avg=\d+, max=\d+")
     child.expect_exact("[SUCCESS]")
 
 if __name__ == "__main__":
