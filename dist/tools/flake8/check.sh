@@ -21,12 +21,12 @@ CHECK_PATHS="${RIOTBASE}/tests \
              ${RIOTBASE}/dist/tools/testrunner"
 
 # Skip module level import not at top of file because of testrunner import
-ERRORS=$(flake8 ${CHECK_PATHS} --max-line-length=119 --ignore=E402)
+ERRORS=$(flake8 ${CHECK_PATHS} --max-line-length=119)
 
 if [ -n "${ERRORS}" ]
 then
     echo -e "${CERROR}There are style issues in the following Python scripts:${CRESET}"
-    echo "${ERRORS}"
+    echo `sort(${ERRORS})`
     exit 2
 else
     exit 0
