@@ -19,11 +19,10 @@ def testfunc(child):
             child.expect(r'received msg "{}"'.format((j + 1)))
         print(".", end="", flush=True)
     print("")
-    print("Stopped after {} iterations, but should run forever."
-          .format(how_many))
+    print("Stopped after {} iterations, but should run forever.".format(how_many))
     print("=> All tests successful")
 
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-    import testrunner
-    sys.exit(testrunner.run(testfunc, echo=False))
+    from testrunner import run
+    sys.exit(run(testfunc, echo=False))
