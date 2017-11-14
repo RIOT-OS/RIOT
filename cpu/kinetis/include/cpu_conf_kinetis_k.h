@@ -36,26 +36,26 @@
     defined(CPU_MODEL_MK22FN1M0VMC12) || \
     defined(CPU_MODEL_MK22FX512VMD12) || \
     defined(CPU_MODEL_MK22FN1M0VMD12)
-#include "vendor/MK22F12.h"
+#include <MK22F12.h>
 #elif defined(CPU_MODEL_MK22FN128VDC10) || \
     defined(CPU_MODEL_MK22FN128VLH10) || \
     defined(CPU_MODEL_MK22FN128VLL10) || \
     defined(CPU_MODEL_MK22FN128VMP10)
-#include "vendor/MK22F12810.h"
+#include <MK22F12810.h>
 #elif defined(CPU_MODEL_MK22FN128CAH12) || \
     defined(CPU_MODEL_MK22FN256CAH12) || \
     defined(CPU_MODEL_MK22FN256VDC12) || \
     defined(CPU_MODEL_MK22FN256VLH12) || \
     defined(CPU_MODEL_MK22FN256VLL12) || \
     defined(CPU_MODEL_MK22FN256VMP12)
-#include "vendor/MK22F25612.h"
+#include <MK22F25612.h>
 #elif defined(CPU_MODEL_MK22FN512CAP12) || \
     defined(CPU_MODEL_MK22FN512VDC12) || \
     defined(CPU_MODEL_MK22FN512VFX12) || \
     defined(CPU_MODEL_MK22FN512VLH12) || \
     defined(CPU_MODEL_MK22FN512VLL12) || \
     defined(CPU_MODEL_MK22FN512VMP12)
-#include "vendor/MK22F51212.h"
+#include <MK22F51212.h>
 #elif defined(CPU_MODEL_MK22FN1M0AVLH12) || \
     defined(CPU_MODEL_MK22FN1M0AVLK12) || \
     defined(CPU_MODEL_MK22FN1M0AVLL12) || \
@@ -68,7 +68,7 @@
     defined(CPU_MODEL_MK22FX512AVLQ12) || \
     defined(CPU_MODEL_MK22FX512AVMC12) || \
     defined(CPU_MODEL_MK22FX512AVMD12)
-#include "vendor/MK22FA12.h"
+#include <MK22FA12.h>
 #endif
 #endif /* (KINETIS_SUBFAMILY == y) */
 #elif (KINETIS_FAMILY == 6)
@@ -85,7 +85,7 @@
     defined(CPU_MODEL_MK60DX256VLQ10) || \
     defined(CPU_MODEL_MK60DX256VMC10) || \
     defined(CPU_MODEL_MK60DX256VMD10)
-#include "vendor/MK60D10.h"
+#include <MK60D10.h>
 #endif
 /**
  * @brief This CPU provides an additional ADC clock divider as CFG1[ADICLK]=1
@@ -102,7 +102,7 @@
     defined(CPU_MODEL_MK64FX512VLL12) || \
     defined(CPU_MODEL_MK64FX512VLQ12) || \
     defined(CPU_MODEL_MK64FX512VMD12)
-#include "vendor/MK64F12.h"
+#include <MK64F12.h>
 #endif
 #endif /* (KINETIS_SUBFAMILY == y) */
 #endif /* (KINETIS_FAMILY == x) */

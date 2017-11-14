@@ -21,8 +21,6 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
 /**
  * @brief  STM32 L1 cpu type
  *
@@ -53,7 +51,9 @@
 #else
 #define STM32L1XX_XL (1U)
 #endif
-#include "vendor/stm32l1xx.h"
+#include <stm32l1xx.h>
+
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -23,20 +23,21 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
+/* vendor header includes */
 #ifdef CPU_MODEL_STM32L073RZ
-#include "vendor/stm32l073xx.h"
+#include <stm32l073xx.h>
 #endif
 #ifdef CPU_MODEL_STM32L072CZ
-#include "vendor/stm32l072xx.h"
+#include <stm32l072xx.h>
 #endif
 #ifdef CPU_MODEL_STM32L053R8
-#include "vendor/stm32l053xx.h"
+#include <stm32l053xx.h>
 #endif
 #ifdef CPU_MODEL_STM32L031K6
-#include "vendor/stm32l031xx.h"
+#include <stm32l031xx.h>
 #endif
+
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {

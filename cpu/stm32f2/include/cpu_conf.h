@@ -21,17 +21,18 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
+/* vendor header includes */
 #if defined(CPU_MODEL_STM32F205RG)
-#include "vendor/stm32f205xx.h"
+#include <stm32f205xx.h>
 #elif defined(CPU_MODEL_STM32F207ZG)
-#include "vendor/stm32f207xx.h"
+#include <stm32f207xx.h>
 #elif defined(CPU_MODEL_STM32F215RG) || defined(CPU_MODEL_STM32F215VG) || defined(CPU_MODEL_STM32F215VE)
-#include "vendor/stm32f215xx.h"
+#include <stm32f215xx.h>
 #elif defined(CPU_MODEL_STM32F217ZG)
-#include "vendor/stm32f217xx.h"
+#include <stm32f217xx.h>
 #endif
+
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {

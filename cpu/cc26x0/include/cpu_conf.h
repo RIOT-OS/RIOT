@@ -20,21 +20,21 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+/* vendor header includes */
+#include <cc26x0.h>
+#include <cc26x0_aux.h>
+#include <cc26x0_ccfg.h>
+#include <cc26x0_fcfg.h>
+#include <cc26x0_gpio.h>
+#include <cc26x0_gpt.h>
+#include <cc26x0_i2c.h>
+#include <cc26x0_ioc.h>
+#include <cc26x0_prcm.h>
+#include <cc26x0_uart.h>
+#include <cc26x0_vims.h>
+#include <cc26x0_wdt.h>
+
 #include "cpu_conf_common.h"
-
-#include "cc26x0.h"
-
-#include "cc26x0_aux.h"
-#include "cc26x0_ccfg.h"
-#include "cc26x0_fcfg.h"
-#include "cc26x0_gpio.h"
-#include "cc26x0_gpt.h"
-#include "cc26x0_i2c.h"
-#include "cc26x0_ioc.h"
-#include "cc26x0_prcm.h"
-#include "cc26x0_uart.h"
-#include "cc26x0_vims.h"
-#include "cc26x0_wdt.h"
 
 #ifdef __cplusplus
 extern "C" {

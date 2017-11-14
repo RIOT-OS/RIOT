@@ -21,9 +21,10 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
+/* vendor header includes */
+#include <LPC17xx.h>
 
-#include "vendor/LPC17xx.h"
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {
