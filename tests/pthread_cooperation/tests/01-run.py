@@ -8,7 +8,7 @@ import testrunner
 
 
 def testfunc(child):
-    child.expect('START')
+    child.expect_exact('START')
 
     for i in range(12):
         child.expect('Creating thread with arg {}'.format(i + 1))
@@ -16,8 +16,7 @@ def testfunc(child):
     for i in range(12):
         child.expect('join thread {}'.format(i + 1))
 
-    child.expect('SUCCESS')
-
+    child.expect_exact('SUCCESS')
 
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))
