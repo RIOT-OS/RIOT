@@ -3,3 +3,5 @@ INCLUDES += -I$(PKGDIRBASE)/oonf_api/src-api
 ifeq ($(TOOLCHAIN), llvm)
   CFLAGS += -Wno-keyword-macro -Wno-parentheses-equality
 endif
+
+EXTRA_LIBS += $(BINDIR)/oonf_api.a
