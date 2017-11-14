@@ -9,7 +9,6 @@
 from __future__ import print_function
 import os
 import sys
-import time
 
 ACCEPTED_ERROR = 20
 
@@ -22,7 +21,6 @@ def testfunc(child):
 
     for i in range(numof):
         child.expect(r'At \s*(\d+) ms received msg {}: "supposed to be (\d+)"'.format(i))
-        stop = int(time.time() * 1000)
         # check if output is correct
         exp = int(child.match.group(2)) + timer_offset
         assert(int(child.match.group(1))
