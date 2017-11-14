@@ -12,8 +12,8 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
-def testfunc(child):
 
+def testfunc(child):
     child.expect(u".... . ._.. ._.. ___ / ._. .. ___ _ ___ ...", timeout=30)
     child.expect(u"_ .... .. ... / .. ... / .._ __ ___ ._. ... .", timeout=30)
 
