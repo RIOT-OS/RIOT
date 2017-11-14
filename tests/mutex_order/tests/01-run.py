@@ -21,13 +21,15 @@ thread_prio = {
         7:  1
         }
 
+
 def testfunc(child):
-    for k in thread_prio.keys():
-        child.expect(u"T%i \(prio %i\): trying to lock mutex now" % (k, thread_prio[k]))
+    for k in thread_prio:
+        child.expect("T%i \(prio %i\): trying to lock mutex now"
+                     % (k, thread_prio[k]))
 
     last = -1
     for i in range(len(thread_prio)):
-        child.expect(u"T\d+ \(prio (\d+)\): locked mutex now")
+        child.expect("T\d+ \(prio (\d+)\): locked mutex now")
         assert(int(child.match.group(1)) > last)
         last = int(child.match.group(1))
 
