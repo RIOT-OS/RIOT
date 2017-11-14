@@ -194,11 +194,11 @@ def get_ipv6_address(spawn):
 
 def test_ipv6_send(board_group, application, env=None):
     env_sender = os.environ.copy()
-    if is not None:
+    if env is not None:
         env_sender.update(env)
     env_sender.update(board_group.boards[0].to_env())
     env_receiver = os.environ.copy()
-    if is not None:
+    if env is not None:
         env_receiver.update(env)
     env_receiver.update(board_group.boards[1].to_env())
     with pexpect.spawnu("make", ["-C", application, "term"], env=env_sender,
