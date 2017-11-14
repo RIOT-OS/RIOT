@@ -212,8 +212,8 @@ def test_ipv6_send(board_group, application, env=None):
         time.sleep(5)
         sender.sendline("ip send {} {} 01:23:45:67:89:ab:cd:ef"
                         .format(receiver_ip, ipprot))
-        sender.expect_exact("Success: send 8 byte over IPv6 to {} "
-                            "(next header: {})".format(receiver_ip, ipprot))
+        sender.expect_exact("Success: send 8 byte over IPv6 to {} (next header: {})"
+                            .format(receiver_ip, ipprot))
         receiver.expect("00000000  01  23  45  67  89  AB  CD  EF")
 
 

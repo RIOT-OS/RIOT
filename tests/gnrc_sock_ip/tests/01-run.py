@@ -9,9 +9,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 
 def testfunc(child):
     child.expect_exact("Calling test_sock_ip_create__EAFNOSUPPORT()")
@@ -37,14 +34,12 @@ def testfunc(child):
     child.expect_exact("Calling test_sock_ip_send__EINVAL_addr()")
     child.expect_exact("Calling test_sock_ip_send__EINVAL_netif()")
     child.expect_exact("Calling test_sock_ip_send__ENOTCONN()")
-    child.expect_exact("Calling "
-                       "test_sock_ip_send__socketed_no_local_no_netif()")
+    child.expect_exact("Calling test_sock_ip_send__socketed_no_local_no_netif()")
     child.expect_exact("Calling test_sock_ip_send__socketed_no_netif()")
     child.expect_exact("Calling test_sock_ip_send__socketed_no_local()")
     child.expect_exact("Calling test_sock_ip_send__socketed()")
     child.expect_exact("Calling test_sock_ip_send__socketed_other_remote()")
-    child.expect_exact("Calling "
-                       "test_sock_ip_send__unsocketed_no_local_no_netif()")
+    child.expect_exact("Calling test_sock_ip_send__unsocketed_no_local_no_netif()")
     child.expect_exact("Calling test_sock_ip_send__unsocketed_no_netif()")
     child.expect_exact("Calling test_sock_ip_send__unsocketed_no_local()")
     child.expect_exact("Calling test_sock_ip_send__unsocketed()")
@@ -53,4 +48,6 @@ def testfunc(child):
     child.expect_exact("ALL TESTS SUCCESSFUL")
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))
