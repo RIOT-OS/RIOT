@@ -17,3 +17,6 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += netstats_l2
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py
