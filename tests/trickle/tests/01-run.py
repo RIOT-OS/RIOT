@@ -12,16 +12,17 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def testfunc(child):
     child.expect_exact("[START]")
 
     for i in range(5):
-        child.expect(u"now = \d+, prev_now = \d+, diff = \d+")
+        child.expect("now = \d+, prev_now = \d+, diff = \d+")
 
     child.expect_exact("[TRICKLE_RESET]")
 
     for i in range(7):
-        child.expect(u"now = \d+, prev_now = \d+, diff = \d+")
+        child.expect("now = \d+, prev_now = \d+, diff = \d+")
 
     child.expect_exact("[SUCCESS]")
 
