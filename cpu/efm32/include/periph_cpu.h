@@ -357,6 +357,8 @@ typedef struct {
     timer_dev_t timer;      /**< the higher numbered timer */
     IRQn_Type irq;          /**< number of the higher timer IRQ channel */
 } timer_conf_t;
+
+#define PERIPH_TIMER_PROVIDES_SET
 /** @} */
 
 /**
