@@ -70,6 +70,9 @@ PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
 PSEUDOMODULES += sock_udp
 
+# print ascii representation in function od_hex_dump()
+PSEUDOMODULES += od_string
+
 # include variants of the AT86RF2xx drivers as pseudo modules
 PSEUDOMODULES += at86rf23%
 PSEUDOMODULES += at86rf21%
