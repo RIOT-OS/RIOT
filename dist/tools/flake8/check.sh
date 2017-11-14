@@ -26,7 +26,7 @@ ERRORS=$(flake8 ${CHECK_PATHS} --max-line-length=119)
 if [ -n "${ERRORS}" ]
 then
     echo -e "${CERROR}There are style issues in the following Python scripts:${CRESET}"
-    echo `sort(${ERRORS})`
+    echo $(sort(${ERRORS}))
     exit 2
 else
     exit 0
