@@ -13,9 +13,11 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def testfunc(child):
     index = child.expect_exact([
-        "ipv6: Received (src = fd01::1, dst = fd01::2, next header = 0, length = 42)",
+        "ipv6: Received (src = fd01::1, dst = fd01::2, "
+        "next header = 0, length = 42)",
         "pkt->users: 0"
     ])
 
@@ -25,16 +27,20 @@ def testfunc(child):
         return
 
     child.expect_exact("ipv6: handle extension header (nh = 0)")
-    child.expect_exact("ipv6: Received (src = fd01::1, dst = fd01::3, next header = 0, length = 42)")
+    child.expect_exact("ipv6: Received (src = fd01::1, dst = fd01::3, "
+                       "next header = 0, length = 42)")
     child.expect_exact("ipv6: handle extension header (nh = 0)")
-    child.expect_exact("ipv6: Received (src = fd01::1, dst = fd01::2, next header = 0, length = 42)")
+    child.expect_exact("ipv6: Received (src = fd01::1, dst = fd01::2, "
+                       "next header = 0, length = 42)")
     child.expect_exact("ipv6: handle extension header (nh = 0)")
     child.expect_exact("ipv6: forward nh = 17 to other threads")
     child.expect_exact("pkt->users: 0")
     child.expect_exact("ipv6: handle extension header (nh = 0)")
-    child.expect_exact("ipv6: Received (src = fd01::1, dst = fd01::3, next header = 0, length = 42)")
+    child.expect_exact("ipv6: Received (src = fd01::1, dst = fd01::3, "
+                       "next header = 0, length = 42)")
     child.expect_exact("ipv6: handle extension header (nh = 0)")
-    child.expect_exact("ipv6: Received (src = fd01::1, dst = fd01::2, next header = 0, length = 42)")
+    child.expect_exact("ipv6: Received (src = fd01::1, dst = fd01::2, "
+                       "next header = 0, length = 42)")
     child.expect_exact("ipv6: handle extension header (nh = 0)")
     child.expect_exact("ipv6: forward nh = 17 to other threads")
     child.expect_exact("pkt->users: 0")

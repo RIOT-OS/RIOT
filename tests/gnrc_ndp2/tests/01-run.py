@@ -13,6 +13,7 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def testfunc(child):
     # 1st 6LoWPAN fragment
     child.expect(r"OK \(\d+ tests\)")
