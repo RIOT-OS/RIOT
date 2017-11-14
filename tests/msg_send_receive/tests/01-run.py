@@ -12,6 +12,7 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def testfunc(child):
     child.expect(u"Test successful.")
 
