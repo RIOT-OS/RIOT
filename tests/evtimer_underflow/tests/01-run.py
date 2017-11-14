@@ -9,10 +9,6 @@
 from __future__ import print_function
 import os
 import sys
-import time
-
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
 
 how_many = 100
 
@@ -28,4 +24,6 @@ def testfunc(child):
     print("=> All tests successful")
 
 if __name__ == "__main__":
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    import testrunner
     sys.exit(testrunner.run(testfunc, echo=False))
