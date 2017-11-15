@@ -52,6 +52,9 @@ extern "C" {
 #if defined(EFR32MG1P132F256GM48)
 #include "efr32mg1p132f256gm48.h"
 
+#elif defined(EFR32MG1P132F256GM32)
+#include "efr32mg1p132f256gm32.h"
+
 #else
 #error "em_device.h: PART NUMBER undefined"
 #endif
