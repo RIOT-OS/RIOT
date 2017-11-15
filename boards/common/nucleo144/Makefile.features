@@ -1,2 +1,7 @@
-# Various common features of Nucleo-144 boards
-FEATURES_PROVIDED += arduino
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart
+
+include $(RIOTBOARD)/common/nucleo/Makefile.features
