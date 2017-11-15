@@ -20,7 +20,7 @@ RIOTBASE=$(readlink -f "$(dirname $(realpath $0))/../../..")
 CHECK_PATHS="${RIOTBASE}/tests \
              ${RIOTBASE}/dist/tools/testrunner"
 
-# Skip module level import not at top of file because of testrunner import
+# Allow 119 max line length (80 is default)
 ERRORS=$(flake8 ${CHECK_PATHS} --max-line-length=119 | sort)
 
 if [ -n "${ERRORS}" ]
