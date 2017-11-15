@@ -14,16 +14,16 @@
 #include "net/gnrc.h"
 #include "cc110x.h"
 #include "cc110x-netdev.h"
-#include "net/gnrc/netdev.h"
+#include "net/gnrc/netif2.h"
 #include "od.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static int _send(gnrc_netdev_t *gnrc_netdev, gnrc_pktsnip_t *pkt)
+static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
 {
     cc110x_pkt_t cc110x_pkt;
-    netdev_t *dev = gnrc_netdev->dev;
+    netdev_t *dev = netif->dev;
     netdev_cc110x_t *netdev_cc110x = (netdev_cc110x_t *) dev;
     cc110x_t *cc110x = &netdev_cc110x->cc110x;
 
@@ -36,7 +36,7 @@ static int _send(gnrc_netdev_t *gnrc_netdev, gnrc_pktsnip_t *pkt)
     payload = pkt->next;
 
     if (pkt->type != GNRC_NETTYPE_NETIF) {
-        DEBUG("gnrc_netdev_cc110x: First header was not generic netif header\n");
+        DEBUG("gnrc_cc110x: First header was not generic netif header\n");
         gnrc_pktbuf_release(pkt);
         return -EBADMSG;
     }
@@ -82,7 +82,7 @@ static int _send(gnrc_netdev_t *gnrc_netdev, gnrc_pktsnip_t *pkt)
         payload_len += payload->size;
 
         if (payload_len > CC110X_MAX_DATA_LENGTH) {
-            DEBUG("gnrc_netdev_cc110x: payload length exceeds maximum"
+            DEBUG("gnrc_cc110x: payload length exceeds maximum"
                     "(%u>%u)\n", payload_len, CC110X_MAX_DATA_LENGTH);
             gnrc_pktbuf_release(pkt);
             return -EBADMSG;
@@ -98,7 +98,7 @@ static int _send(gnrc_netdev_t *gnrc_netdev, gnrc_pktsnip_t *pkt)
 
     cc110x_pkt.length = (uint8_t) payload_len + CC110X_HEADER_LENGTH;
 
-    DEBUG("gnrc_netdev_cc110x: sending packet from %u to %u with payload "
+    DEBUG("gnrc_cc110x: sending packet from %u to %u with payload "
             "length %u\n",
             (unsigned)cc110x_pkt.phy_src,
             (unsigned)cc110x_pkt.address,
@@ -107,9 +107,9 @@ static int _send(gnrc_netdev_t *gnrc_netdev, gnrc_pktsnip_t *pkt)
     return dev->driver->send(dev, &vector, 1);
 }
 
-static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev)
+static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
 {
-    netdev_t *dev = gnrc_netdev->dev;
+    netdev_t *dev = netif->dev;
     cc110x_t *cc110x = &((netdev_cc110x_t*) dev)->cc110x;
 
     cc110x_pkt_t *cc110x_pkt = &cc110x->pkt_buf.packet;
@@ -182,11 +182,16 @@ static gnrc_pktsnip_t *_recv(gnrc_netdev_t *gnrc_netdev)
     return pkt;
 }
 
-int gnrc_netdev_cc110x_init(gnrc_netdev_t *gnrc_netdev, netdev_t *dev)
-{
-    gnrc_netdev->send = _send;
-    gnrc_netdev->recv = _recv;
-    gnrc_netdev->dev = dev;
+static const gnrc_netif2_ops_t _cc110x_ops = {
+    .send = _send,
+    .recv = _recv,
+    .get = gnrc_netif2_get_from_netdev,
+    .set = gnrc_netif2_set_from_netdev,
+};
 
-    return 0;
+gnrc_netif2_t *gnrc_netif2_cc110x_create(char *stack, int stacksize, char priority,
+                                         char *name, netdev_t *dev)
+{
+    return gnrc_netif2_create(stack, stacksize, priority, name, dev,
+                              &_cc110x_ops);
 }
