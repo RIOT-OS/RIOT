@@ -59,3 +59,6 @@ CFLAGS += -DTEST_PIN_RESET=$(TEST_PIN_RESET)
 CFLAGS += -DTEST_DISPLAY=$(TEST_DISPLAY)
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py
