@@ -41,6 +41,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Identifier of the loopback interface
+ */
+#define GNRC_NETIF_LOOPBACK_PID     (-1)
+
+/**
  * @brief   The add/remove operation to set network layer protocol
  *          specific options for an interface.
  *

@@ -764,6 +764,19 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
         gnrc_pktbuf_release(pkt);
 
         DEBUG("ipv6: packet is addressed to myself => loopback\n");
+        ptr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+
+        if (ptr == NULL) {
+            DEBUG("ipv6: error on interface header allocation, dropping packet\n");
+            gnrc_pktbuf_release(rcv_pkt);
+            return;
+        }
+
+        gnrc_netif_hdr_t *netif_hdr = (gnrc_netif_hdr_t*) ptr;
+        netif_hdr->if_pid = GNRC_NETIF_LOOPBACK_PID;
+
+        /* add netif to front of the pkt list */
+        rcv_pkt->next = ptr;
 
         if (gnrc_netapi_receive(gnrc_ipv6_pid, rcv_pkt) < 1) {
             DEBUG("ipv6: unable to deliver packet\n");
