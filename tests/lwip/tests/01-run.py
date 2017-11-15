@@ -303,14 +303,12 @@ def test_triple_send(board_group, application, env=None):
                             .format(receiver_ip, udp_port))
         receiver.expect("00000000  01  23")
 
-        sender.sendline("ip send {} {} 01:02:03:04"
-                        .format(receiver_ip, ipprot))
-        sender.expect_exact("Success: send 4 byte over IPv6 to {} "
-                            "(next header: {})".format(receiver_ip, ipprot))
+        sender.sendline("ip send {} {} 01:02:03:04".format(receiver_ip, ipprot))
+        sender.expect_exact("Success: send 4 byte over IPv6 to {} (next header: {})"
+                            .format(receiver_ip, ipprot))
         receiver.expect("00000000  01  02  03  04")
         sender.sendline("tcp connect {} {}".format(receiver_ip, tcp_port))
-        receiver.expect("TCP client \\[{}\\]:[0-9]+ connected"
-                        .format(sender_ip))
+        receiver.expect("TCP client \\[{}\\]:[0-9]+ connected".format(sender_ip))
         sender.sendline("tcp send dead:beef")
         sender.expect_exact("Success: send 4 byte over TCP to server")
         receiver.expect("00000000  DE  AD  BE  EF")

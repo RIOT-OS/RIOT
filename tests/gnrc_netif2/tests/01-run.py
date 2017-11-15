@@ -122,8 +122,8 @@ def testfunc(child):
     # test_netapi_recv__ipv6_ethernet_payload
     child.expect("pktdump dumping IPv6 over Ethernet packet with payload 01")
     child.expect("PKTDUMP: data received:")
-    # payload not dumped because not parsed yet, but header looks okay, so
-    # let's assume the payload is as well
+    # payload not dumped because not parsed yet, but header looks okay, so let's
+    # assume the payload is as well
     child.expect(r"~~ SNIP  0 - size:  41 byte, type: NETTYPE_IPV6 \(2\)")
     child.expect(r"traffic class: 0x00 \(ECN: 0x0, DSCP: 0x00\)")
     child.expect("flow label: 0x00000")

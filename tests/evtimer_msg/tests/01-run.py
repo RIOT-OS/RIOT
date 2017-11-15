@@ -23,8 +23,7 @@ def testfunc(child):
         child.expect(r'At \s*(\d+) ms received msg {}: "supposed to be (\d+)"'.format(i))
         # check if output is correct
         exp = int(child.match.group(2)) + timer_offset
-        assert(int(child.match.group(1))
-               in range(exp - ACCEPTED_ERROR, exp + ACCEPTED_ERROR + 1))
+        assert(int(child.match.group(1)) in range(exp - ACCEPTED_ERROR, exp + ACCEPTED_ERROR + 1))
         print(".", end="", flush=True)
     print("")
     print("All tests successful")

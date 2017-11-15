@@ -22,8 +22,7 @@ def testfunc(child):
     child.expect_exact("Wait until ...")
     child.expect_exact("Done")
     child.expect_exact("Bye, bye.")
-    child.expect_exact("****************************************************"
-                       "**")
+    child.expect_exact("******************************************************")
 
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
