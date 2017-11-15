@@ -626,6 +626,15 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif2_t *netif,
                           _nib_onl_entry_t *entry)
 {
     bool res = false;
+    if ((netif != NULL) && (netif->device_type == NETDEV_TYPE_SLIP)) {
+        /* XXX: Linux doesn't do neighbor discovery for SLIP so no use sending
+         * NS and since SLIP doesn't have link-layer addresses anyway, we can
+         * just return the interface without any link-layer addresses */
+        memcpy(&nce->ipv6, dst, sizeof(nce->ipv6));
+        nce->info = (netif->pid << _NIB_IF_POS);
+        nce->l2addr_len = 0;
+        return true;
+    }
 #if GNRC_IPV6_NIB_CONF_ARSM
     if ((entry != NULL) && (entry->mode & _NC) && _is_reachable(entry)) {
         if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE) {
