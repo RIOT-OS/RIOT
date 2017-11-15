@@ -3,24 +3,19 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 
 def _check_test_output(child):
     child.expect('show tls values:')
     for i in range(20):
         if i != 5:
-            child.expect('key\[%d\]: \d+, val: %d'
-                         % (i, i + 1 if i != 3 else 42))
+            child.expect('key\[{}\]: \d+, val: {}'.format(i, i + 1 if i != 3 else 42))
 
 
 def testfunc(child):
     child.expect('START')
     child.expect('-= TEST 1 - create 20 tls with sequencial values 0...19 =-')
     _check_test_output(child)
-    child.expect('-= TEST 2 - '
-                 'delete deliberate key \(key\[5\]:\d+\) =-')
+    child.expect('-= TEST 2 - delete deliberate key \(key\[5\]:\d+\) =-')
     _check_test_output(child)
     child.expect('-= TEST 3 - create new tls =-')
     _check_test_output(child)
@@ -38,4 +33,6 @@ def testfunc(child):
     child.expect('SUCCESS')
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

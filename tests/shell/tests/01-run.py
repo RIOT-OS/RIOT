@@ -9,9 +9,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 EXPECTED_HELP = (
     'Command              Description',
     '---------------------------------------',
@@ -33,8 +30,7 @@ CMDS = {
     'end_test': ('[TEST_END]'),
     '\n': ('>'),
     '123456789012345678901234567890123456789012345678901234567890':
-        ('shell: command not found: '
-         '123456789012345678901234567890123456789012345678901234567890'),
+        'shell: command not found: 123456789012345678901234567890123456789012345678901234567890',
     'unknown_command': ('shell: command not found: unknown_command'),
     'help': EXPECTED_HELP,
     'echo a string': ('\"echo\"\"a\"\"string\"'),
@@ -58,4 +54,6 @@ def testfunc(child):
         check_cmd(child, cmd, expected)
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

@@ -11,22 +11,15 @@ import sys
 import calendar
 import datetime
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 
 def _check_help(child):
     child.sendline('help')
     child.expect_exact('Command              Description')
     child.expect_exact('---------------------------------------')
-    child.expect_exact('days_in              '
-                       'Tells you the number of days in a month.')
-    child.expect_exact('leap_year            '
-                       'Tells you if a supplied year is a leap year.')
-    child.expect_exact('doomsday             '
-                       'Tells you the wday Doomsday of the supplied year.')
-    child.expect_exact('day                  '
-                       'Tells you the day of the supplied date.')
+    child.expect_exact('days_in              Tells you the number of days in a month.')
+    child.expect_exact('leap_year            Tells you if a supplied year is a leap year.')
+    child.expect_exact('doomsday             Tells you the wday Doomsday of the supplied year.')
+    child.expect_exact('day                  Tells you the day of the supplied date.')
 
 
 def _check_days_in(child):
@@ -93,19 +86,16 @@ def _check_day(child):
                 count = dt.timetuple().tm_yday
                 day_str = dt.strftime('%a').upper()
                 child.sendline('day {} {} {}'.format(year, month, day))
-                child.expect_exact('What weekday was {}-{:02}-{:02}? '
-                                   'The {}(th) day of the year was a {}.'
+                child.expect_exact('What weekday was {}-{:02}-{:02}? The {}(th) day of the year was a {}.'
                                    .format(year, month, day, count, day_str))
 
     # 2016 is a leap year
     child.sendline('day 2016 2 29')
-    child.expect_exact('What weekday was 2016-02-29? '
-                       'The 60(th) day of the year was a MON.')
+    child.expect_exact('What weekday was 2016-02-29? The 60(th) day of the year was a MON.')
 
     # 2017 is a leap year
     child.sendline('day 2017 2 29')
-    child.expect_exact('The supplied date is invalid, '
-                       'but no error should occur.')
+    child.expect_exact('The supplied date is invalid, but no error should occur.')
 
 
 def testfunc(child):
@@ -116,4 +106,6 @@ def testfunc(child):
     _check_day(child)
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

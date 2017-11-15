@@ -9,8 +9,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
 
 def testfunc(child):
     child.expect_exact("[START]")
@@ -18,9 +16,11 @@ def testfunc(child):
     # due to timer inaccuracies, boards might not display exactly 100 steps, so
     # we accept 10% deviation
     for i in range(90):
-        child.expect(u"Testing \( +\d+%\)")
+        child.expect("Testing \( +\d+%\)")
 
     child.expect_exact("[SUCCESS]")
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

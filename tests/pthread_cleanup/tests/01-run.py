@@ -3,15 +3,11 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 
 def testfunc(child):
     child.expect('START')
     for i in range(5):
-        child.expect_exact('<SCOPE {}{}>'
-                           .format(i + 1, ' /' if i == 4 else ''))
+        child.expect_exact('<SCOPE {}{}>'.format(i + 1, ' /' if i == 4 else ''))
 
     child.expect_exact('Cleanup: <5>')
     child.expect_exact('</SCOPE 4>')
@@ -23,4 +19,6 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

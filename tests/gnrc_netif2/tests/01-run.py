@@ -10,8 +10,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
 
 def testfunc(child):
     # embUnit tests
@@ -19,49 +17,39 @@ def testfunc(child):
     # output cross-checked hex data with WireShark -> "Import from Hex Dump..."
     # test_netapi_send__raw_unicast_ethernet_packet
     child.expect("Sending data from Ethernet device:")
-    child.expect("00000000  3E  E6  B5  0F  19  23  3E  E6  B5  22  FD  0A  " +
-                           "FF  FF  41  42")
+    child.expect("00000000  3E  E6  B5  0F  19  23  3E  E6  B5  22  FD  0A  FF  FF  41  42")
     child.expect("00000010  43  44  45  46  47  00")
     # test_netapi_send__raw_broadcast_ethernet_packet
     child.expect("Sending data from Ethernet device:")
-    child.expect("00000000  FF  FF  FF  FF  FF  FF  3E  E6  B5  22  FD  0A  " +
-                           "FF  FF  41  42")
+    child.expect("00000000  FF  FF  FF  FF  FF  FF  3E  E6  B5  22  FD  0A  FF  FF  41  42")
     child.expect("00000010  43  44  45  46  47  00")
     # test_netapi_send__raw_unicast_ieee802154_long_long_packet
     child.expect(r"Sending data from IEEE 802\.15\.4 device:")
-    child.expect("00000000  41  DC  00  00  00  0B  FD  22  19  0F  B5  E6  " +
-                           "3E  0A  FD  22")
-    child.expect("00000010  19  0F  B5  E6  3E  31  32  33  41  42  43  44  " +
-                           "45  46  47  00")
+    child.expect("00000000  41  DC  00  00  00  0B  FD  22  19  0F  B5  E6  3E  0A  FD  22")
+    child.expect("00000010  19  0F  B5  E6  3E  31  32  33  41  42  43  44  45  46  47  00")
     # test_netapi_send__raw_unicast_ieee802154_long_short_packet
     child.expect(r"Sending data from IEEE 802\.15\.4 device:")
-    child.expect("00000000  41  D8  01  00  00  0B  FD  0A  FD  22  19  0F  " +
-                           "B5  E6  3E  31")
+    child.expect("00000000  41  D8  01  00  00  0B  FD  0A  FD  22  19  0F  B5  E6  3E  31")
     child.expect("00000010  32  33  41  42  43  44  45  46  47  00")
     # test_netapi_send__raw_unicast_ieee802154_short_long_packet1
     child.expect(r"Sending data from IEEE 802\.15\.4 device:")
-    child.expect("00000000  41  9C  02  00  00  0B  FD  22  19  0F  B5  E6  " +
-                           "3E  0A  FD  31")
+    child.expect("00000000  41  9C  02  00  00  0B  FD  22  19  0F  B5  E6  3E  0A  FD  31")
     child.expect("00000010  32  33  41  42  43  44  45  46  47  00")
     # test_netapi_send__raw_unicast_ieee802154_short_long_packet2
     child.expect(r"Sending data from IEEE 802\.15\.4 device:")
-    child.expect("00000000  41  9C  03  00  00  0B  FD  22  19  0F  B5  E6  " +
-                           "3E  0A  FD  31")
+    child.expect("00000000  41  9C  03  00  00  0B  FD  22  19  0F  B5  E6  3E  0A  FD  31")
     child.expect("00000010  32  33  41  42  43  44  45  46  47  00")
     # test_netapi_send__raw_unicast_ieee802154_short_short_packet
     child.expect(r"Sending data from IEEE 802\.15\.4 device:")
-    child.expect("00000000  41  98  04  00  00  0B  FD  0A  FD  31  32  33  " +
-                           "41  42  43  44")
+    child.expect("00000000  41  98  04  00  00  0B  FD  0A  FD  31  32  33  41  42  43  44")
     child.expect("00000010  45  46  47  00")
     # test_netapi_send__raw_broadcast_ieee802154_long_packet
     child.expect(r"Sending data from IEEE 802\.15\.4 device:")
-    child.expect("00000000  41  D8  05  00  00  FF  FF  0A  FD  22  19  0F  " +
-                              "B5  E6  3E  31")
+    child.expect("00000000  41  D8  05  00  00  FF  FF  0A  FD  22  19  0F  B5  E6  3E  31")
     child.expect("00000010  32  33  41  42  43  44  45  46  47  00")
     # test_netapi_send__raw_broadcast_ieee802154_short_packet
     child.expect(r"Sending data from IEEE 802\.15\.4 device:")
-    child.expect("00000000  41  98  06  00  00  FF  FF  0A  FD  31  32  33  " +
-                           "41  42  43  44")
+    child.expect("00000000  41  98  06  00  00  FF  FF  0A  FD  31  32  33  41  42  43  44")
     child.expect("00000010  45  46  47  00")
     # test_netapi_send__ipv6_unicast_ethernet_packet
     child.expect("Sending data from Ethernet device:")
@@ -92,7 +80,8 @@ def testfunc(child):
     child.expect("pktdump dumping Ethernet packet with empty payload")
     child.expect("PKTDUMP: data received:")
     child.expect(r"~~ SNIP  0 - size:   0 byte, type: NETTYPE_UNDEF \(0\)")
-    child.expect(r"00000000~~ SNIP  1 - size:  20 byte, type: NETTYPE_NETIF \(-1\)")
+    child.expect(r"00000000~~ SNIP  1 - size:  20 byte, type: NETTYPE_NETIF "
+                 "\(-1\)")
     child.expect(r"if_pid: \d+  rssi: \d+  lqi: \d+")
     child.expect("flags: 0x0")
     child.expect("src_l2addr: 3e:e6:b5:22:fd:0b")
@@ -149,4 +138,6 @@ def testfunc(child):
     child.expect("~~ PKT    -  2 snips, total size:  61 byte")
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc, timeout=1, traceback=True))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

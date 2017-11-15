@@ -10,26 +10,27 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
+THREAD_PRIO = {
+    3: 6,
+    4: 4,
+    5: 0,
+    6: 2,
+    7: 1
+}
 
-thread_prio = {
-        3:  6,
-        4:  4,
-        5:  0,
-        6:  2,
-        7:  1
-        }
 
 def testfunc(child):
-    for k in thread_prio.keys():
-        child.expect(u"T%i \(prio %i\): trying to lock mutex now" % (k, thread_prio[k]))
+    for k in THREAD_PRIO:
+        child.expect("T%i \(prio %i\): trying to lock mutex now"
+                     % (k, THREAD_PRIO[k]))
 
     last = -1
-    for i in range(len(thread_prio)):
-        child.expect(u"T\d+ \(prio (\d+)\): locked mutex now")
+    for i in range(len(THREAD_PRIO)):
+        child.expect("T\d+ \(prio (\d+)\): locked mutex now")
         assert(int(child.match.group(1)) > last)
         last = int(child.match.group(1))
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

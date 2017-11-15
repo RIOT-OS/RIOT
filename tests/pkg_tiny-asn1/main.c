@@ -203,6 +203,6 @@ int main(void)
     free(asn1_objects);
 
     /* Everything worked fine */
-    printf("Decoding finished succesfully\n");
+    printf("Decoding finished successfully\n");
     return 0;
 }

@@ -10,11 +10,8 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
 
 def testfunc(child):
-
     child.expect_exact("************ C++ thread test ***********")
     child.expect_exact("Creating one thread and passing an argument ...")
     child.expect_exact("Done")
@@ -36,4 +33,6 @@ def testfunc(child):
     child.expect_exact("******************************************")
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

@@ -11,38 +11,39 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
+THREAD_PRIO = {
+    3: 6,
+    4: 4,
+    5: 5,
+    6: 2,
+    7: 4
+}
 
-thread_prio = {
-        3:  6,
-        4:  4,
-        5:  5,
-        6:  2,
-        7:  4
-        }
+LOCK_DEPTH = {
+    3: 5,
+    4: 3,
+    5: 3,
+    6: 4,
+    7: 5
+}
 
-lock_depth = {
-        3:  5,
-        4:  3,
-        5:  3,
-        6:  4,
-        7:  5
-        }
 
 def thread_prio_sort(x):
-    return thread_prio.get(x)*1000 + x
+    return THREAD_PRIO.get(x) * 1000 + x
+
 
 def testfunc(child):
-    for k in thread_prio.keys():
-        child.expect(u"T%i \(prio %i, depth 0\): trying to lock rmutex now" %
-                     (k, thread_prio[k]))
+    for k in THREAD_PRIO:
+        child.expect("T{} \(prio {}, depth 0\): trying to lock rmutex now"
+                     .format(k, THREAD_PRIO[k]))
 
-    pri_sorted = sorted(thread_prio, key=thread_prio_sort);
+    pri_sorted = sorted(THREAD_PRIO, key=thread_prio_sort)
     for T in pri_sorted:
-        for depth in range(lock_depth[T]):
-            child.expect(u"T%i \(prio %i, depth %i\): locked rmutex now" %
-                         (T, thread_prio[T], depth))
+        for depth in range(LOCK_DEPTH[T]):
+            child.expect("T{} \(prio {}, depth {}\): locked rmutex now"
+                         .format(T, THREAD_PRIO[T], depth))
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))
