@@ -30,6 +30,8 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 
+#include "net/lora.h"
+
 #include "sx127x.h"
 #include "sx127x_internal.h"
 #include "sx127x_registers.h"
@@ -113,23 +115,22 @@ int sx127x_init(sx127x_t *dev)
 
 void sx127x_init_radio_settings(sx127x_t *dev)
 {
-    sx127x_set_freq_hop(dev, SX127X_FREQUENCY_HOPPING);
-    sx127x_set_iq_invert(dev, SX127X_IQ_INVERSION);
+    sx127x_set_freq_hop(dev, LORA_FREQUENCY_HOPPING_DEFAULT);
+    sx127x_set_iq_invert(dev, LORA_IQ_INVERTED_DEFAULT);
+    sx127x_set_bandwidth(dev, LORA_BW_DEFAULT);
+    sx127x_set_spreading_factor(dev, LORA_SF_DEFAULT);
+    sx127x_set_coding_rate(dev, LORA_CR_DEFAULT);
+    sx127x_set_fixed_header_len_mode(dev, LORA_FIXED_HEADER_LEN_MODE_DEFAULT);
+    sx127x_set_crc(dev, LORA_PAYLOAD_CRC_ON_DEFAULT);
+    sx127x_set_symbol_timeout(dev, LORA_SYMBOL_TIMEOUT_DEFAULT);
+    sx127x_set_preamble_length(dev, LORA_PREAMBLE_LENGTH_DEFAULT);
+    sx127x_set_payload_length(dev, LORA_PAYLOAD_LENGTH_DEFAULT);
+    sx127x_set_hop_period(dev, LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT);
+
     sx127x_set_rx_single(dev, SX127X_RX_SINGLE);
     sx127x_set_tx_timeout(dev, SX127X_TX_TIMEOUT_DEFAULT);
     sx127x_set_modem(dev, SX127X_MODEM_DEFAULT);
     sx127x_set_channel(dev, SX127X_CHANNEL_DEFAULT);
-    sx127x_set_bandwidth(dev, SX127X_BW_DEFAULT);
-    sx127x_set_spreading_factor(dev, SX127X_SF_DEFAULT);
-    sx127x_set_coding_rate(dev, SX127X_CR_DEFAULT);
-
-    sx127x_set_fixed_header_len_mode(dev, SX127X_FIXED_HEADER_LEN_MODE);
-    sx127x_set_crc(dev, SX127X_PAYLOAD_CRC_ON);
-    sx127x_set_symbol_timeout(dev, SX127X_SYMBOL_TIMEOUT);
-    sx127x_set_preamble_length(dev, SX127X_PREAMBLE_LENGTH);
-    sx127x_set_payload_length(dev, SX127X_PAYLOAD_LENGTH);
-    sx127x_set_hop_period(dev, SX127X_FREQUENCY_HOPPING_PERIOD);
-
     sx127x_set_tx_power(dev, SX127X_RADIO_TX_POWER);
 }
 
