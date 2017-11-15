@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014,2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Manual test application for GPIO peripheral drivers
+ * @brief       Test application for GPIO peripheral drivers
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -21,8 +21,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "irq.h"
 #include "shell.h"
+#include "benchmark.h"
 #include "periph/gpio.h"
+
+#define BENCH_RUNS_DEFAULT      (1000UL * 1000)
 
 static void cb(void *arg)
 {
@@ -203,6 +207,31 @@ static int toggle(int argc, char **argv)
     return 0;
 }
 
+static int bench(int argc, char **argv)
+{
+    if (argc < 3) {
+        printf("usage: %s <port> <pin> [# of runs]\n", argv[0]);
+        return 1;
+    }
+
+    gpio_t pin = GPIO_PIN(atoi(argv[1]), atoi(argv[2]));
+    unsigned long runs = BENCH_RUNS_DEFAULT;
+    if (argc > 3) {
+        runs = (unsigned long)atol(argv[3]);
+    }
+
+    puts("\nGPIO driver run-time performance benchmark\n");
+    BENCHMARK_SETUP();
+    BENCHMARK_FUNC("nop loop", runs, __asm__ volatile("nop"));
+    BENCHMARK_FUNC("gpio_set", runs, gpio_set(pin));
+    BENCHMARK_FUNC("gpio_clear", runs, gpio_clear(pin));
+    BENCHMARK_FUNC("gpio_toggle", runs, gpio_toggle(pin));
+    BENCHMARK_FUNC("gpio_read", runs, (void)gpio_read(pin));
+    BENCHMARK_FUNC("gpio_write", runs, gpio_write(pin, 1));
+    puts("\n --- DONE ---");
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "init_out", "init as output (push-pull mode)", init_out },
     { "init_in", "init as input w/o pull resistor", init_in },
@@ -215,6 +244,7 @@ static const shell_command_t shell_commands[] = {
     { "set", "set pin to HIGH", set },
     { "clear", "set pin to LOW", clear },
     { "toggle", "toggle pin", toggle },
+    { "bench", "run a set of predefined benchmarks", bench },
     { NULL, NULL, NULL }
 };
 
