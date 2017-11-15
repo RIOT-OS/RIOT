@@ -13,7 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              spark-core stm32f0discovery yunjia-nrf51822 \
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
-                   msb-430 msb-430h qemu-i386 telosb waspmote-pro wsn430-v1_3b \
+                   msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
                    wsn430-v1_4 z1 pic32-wifire pic32-clicker
 
 # Comment this out to disable code in RIOT that does safety checking
