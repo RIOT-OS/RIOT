@@ -23,8 +23,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -86,5 +86,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
+#endif /* BOARD_H */
 /** @} */
