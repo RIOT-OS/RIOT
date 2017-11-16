@@ -40,14 +40,6 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
-### boards/weio [cfa9580f319508f858c8fe30ecce8b2b59b6caa3]
-Author(s):
-- Paul Rathgeb <paul.rathgeb@skynet.be>
-
-Reason for removal:
-- hardware not available to the community for testing
-- original author and maintainer won't be able to maintain the code
-
 ### boards/pca10000 [9447cb303426d7c6348bb84999f88bf929cd6263]
 Author(s):
 - Christian Kühling <kuehling@zedat.fu-berlin.de>
@@ -68,6 +60,31 @@ Reason for removal:
 - this was an early development board by Nordic which was discontinued (successor: `nrf51dk`)
 - no hardware available anymore for testing
 
+### boards/qemu-i368 [99009af25e201bbc182d376e99df34133417be6c]
+Author(s):
+- René Kijewski <rene.kijewski@fu-berlin.de>
+
+Reason for removal:
+- code broken and excluded from all tests for a long time
+- no maintainer available
+
+### boards/weio [cfa9580f319508f858c8fe30ecce8b2b59b6caa3]
+Author(s):
+- Paul Rathgeb <paul.rathgeb@skynet.be>
+
+Reason for removal:
+- hardware not available to the community for testing
+- original author and maintainer won't be able to maintain the code
+
+### boards/x86-multiboot-common [b3eb9b8cf23f0702fa725d536df6ad6528f84189]
+Author(s):
+- René Kijewski <rene.kijewski@fu-berlin.de>
+
+Reason for removal:
+- code broken and excluded from all tests for a long time
+- no maintainer available
+
+
 ### cpu/lpc11u34 [7bc271807cecbffbb01a37c56a367b98fb823573]
 Author(s):
 - Paul Rathgeb <paul.rathgeb@skynet.be>
@@ -75,3 +92,11 @@ Author(s):
 Reason for removal:
 - hardware not available to the community for testing
 - original author and maintainer won't be able to maintain the code
+
+### cpu/x86 [fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836]
+Author(s):
+- René Kijewski <rene.kijewski@fu-berlin.de>
+
+Reason for removal:
+- code broken and excluded from all tests for a long time
+- no maintainer available
