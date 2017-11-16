@@ -524,8 +524,6 @@ static void _rx_management(gnrc_netif2_t *netif)
 
 static void _tx_management_stopped(gnrc_netif2_t *netif)
 {
-    gnrc_pktsnip_t *pkt;
-
     /* If there is packet remaining for retransmission,
      * retransmit it (i.e., the retransmission scheme of LWMAC). */
     if (netif->mac.tx.packet != NULL) {
@@ -536,6 +534,8 @@ static void _tx_management_stopped(gnrc_netif2_t *netif)
         gnrc_lwmac_tx_update(netif);
     }
     else {
+        gnrc_pktsnip_t *pkt;
+
         if ((pkt = gnrc_priority_pktqueue_pop(
                  &netif->mac.tx.current_neighbor->queue))) {
             netif->mac.tx.tx_retry_count = 0;
