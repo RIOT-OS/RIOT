@@ -34,45 +34,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set @p iface to router mode.
- *
- * @details This sets/unsets the GNRC_IPV6_NETIF_FLAGS_ROUTER and
- *          GNRC_IPV6_NETIF_FLAGS_RTR_ADV and initializes or ceases router
- *          behavior for neighbor discovery.
- *
- * @param[in] iface     An IPv6 interface. Must not be NULL.
- * @param[in] enable    Status for the GNRC_IPV6_NETIF_FLAGS_ROUTER and
- *                      GNRC_IPV6_NETIF_FLAGS_RTR_ADV flags.
- */
-void gnrc_ndp_router_set_router(gnrc_ipv6_netif_t *iface, bool enable);
-
-/**
- * @brief   Set/Unset GNRC_IPV6_NETIF_FLAGS_RTR_ADV flag for @p iface.
- *
- * @see <a href="https://tools.ietf.org/html/rfc4861#section-6.2.2">
- *          RFC 4861, section 6.2.2
- *      </a>
- * @see <a href="https://tools.ietf.org/html/rfc4861#section-6.2.5">
- *          RFC 4861, section 6.2.5
- *      </a>
- *
- * @details GNRC_IPV6_NETIF_FLAGS_RTR_ADV and initializes or ceases
- *          periodic router advertising behavior for neighbor discovery.
- *
- * @param[in] iface     An IPv6 interface. Must not be NULL.
- * @param[in] enable    Status for the GNRC_IPV6_NETIF_FLAGS_RTR_ADV flags.
- */
-void gnrc_ndp_router_set_rtr_adv(gnrc_ipv6_netif_t *iface, bool enable);
-
-/**
- * @brief   Send an unsolicited router advertisement over @p iface
- *          and reset the timer for the next one if necessary.
- *
- * @param[in] iface An IPv6 interface.
- */
-void gnrc_ndp_router_retrans_rtr_adv(gnrc_ipv6_netif_t *iface);
-
-/**
  * @brief   Send an solicited router advertisement to IPv6 address of
  *          @p neighbor.
  *

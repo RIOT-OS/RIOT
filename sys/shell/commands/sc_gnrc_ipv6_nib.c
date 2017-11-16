@@ -16,7 +16,7 @@
 #include <stdio.h>
 
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif.h"
+#include "net/gnrc/netif2.h"
 #include "net/ipv6/addr.h"
 
 static void _usage(char **argv);

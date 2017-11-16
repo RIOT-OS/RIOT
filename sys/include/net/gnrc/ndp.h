@@ -30,7 +30,6 @@
 #include "net/gnrc/icmpv6.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/nc.h"
-#include "net/gnrc/ipv6/netif.h"
 
 #include "net/gnrc/ndp/host.h"
 #include "net/gnrc/ndp/internal.h"
@@ -270,20 +269,6 @@ void gnrc_ndp_retrans_nbr_sol(gnrc_ipv6_nc_t *nc_entry);
  * @param[in]   nc_entry    A neighbor cache entry.
  */
 void gnrc_ndp_state_timeout(gnrc_ipv6_nc_t *nc_entry);
-
-/**
- * @brief   NDP interface initialization.
- *
- * @param[in] iface     An IPv6 interface descriptor. Must not be NULL.
- */
-void gnrc_ndp_netif_add(gnrc_ipv6_netif_t *iface);
-
-/**
- * @brief   NDP interface removal.
- *
- * @param[in] iface     An IPv6 interface descriptor. Must not be NULL.
- */
-void gnrc_ndp_netif_remove(gnrc_ipv6_netif_t *iface);
 
 /**
  * @brief   Get link-layer address and interface for next hop to destination

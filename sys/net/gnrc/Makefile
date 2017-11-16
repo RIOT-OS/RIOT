@@ -19,9 +19,6 @@ endif
 ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
   DIRS += network_layer/ipv6/nc
 endif
-ifneq (,$(filter gnrc_ipv6_netif,$(USEMODULE)))
-  DIRS += network_layer/ipv6/netif
-endif
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   DIRS += network_layer/ipv6/nib
 endif
@@ -54,9 +51,6 @@ ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_netif2,$(USEMODULE)))
     DIRS += netif2
-endif
-ifneq (,$(filter gnrc_netif,$(USEMODULE)))
-  DIRS += netif
 endif
 ifneq (,$(filter gnrc_netif_hdr,$(USEMODULE)))
   DIRS += netif/hdr
@@ -114,9 +108,6 @@ ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/nd/router
-endif
-ifneq (,$(filter gnrc_sixlowpan_netif,$(USEMODULE)))
-  DIRS += network_layer/sixlowpan/netif
 endif
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   DIRS += sock

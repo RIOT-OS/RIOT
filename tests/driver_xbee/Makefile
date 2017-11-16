@@ -7,7 +7,6 @@ BOARD_INSUFFICIENT_MEMORY := nucleo32-f031 nucleo32-f042 nucleo-f030 nucleo-f334
                              stm32f0discovery
 
 USEMODULE += xbee
-USEMODULE += gnrc_netif
 USEMODULE += gnrc_txtsnd
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_pktdump

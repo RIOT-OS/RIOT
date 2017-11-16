@@ -27,7 +27,6 @@
 extern "C" {
 #endif
 
-#include "net/gnrc/ipv6/netif.h"
 #include "net/ipv6/addr.h"
 #include "xtimer.h"
 #include "trickle.h"

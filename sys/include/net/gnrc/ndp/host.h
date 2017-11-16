@@ -21,30 +21,9 @@
 #ifndef NET_GNRC_NDP_HOST_H
 #define NET_GNRC_NDP_HOST_H
 
-#include "net/gnrc/ipv6/netif.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Initializes interface @p iface as host.
- *
- * @pre iface != NULL
- *
- * @param[in] iface An IPv6 interface
- */
-void gnrc_ndp_host_init(gnrc_ipv6_netif_t *iface);
-
-/**
- * @brief   Sends a router solicitation over interface @p iface
- *          and reset the timer for the next one.
- *
- * @pre iface != NULL
- *
- * @param[in] iface An IPv6 interface
- */
-void gnrc_ndp_host_retrans_rtr_sol(gnrc_ipv6_netif_t *iface);
 
 #ifdef __cplusplus
 }

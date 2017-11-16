@@ -16,7 +16,6 @@
 #include "net/icmpv6.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ndp2.h"
-#include "net/gnrc/netif.h"
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "random.h"

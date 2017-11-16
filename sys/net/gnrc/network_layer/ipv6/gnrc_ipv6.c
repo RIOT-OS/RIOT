@@ -414,7 +414,7 @@ static int _fill_ipv6_hdr(gnrc_netif2_t *netif, gnrc_pktsnip_t *ipv6,
 
     if (hdr->hl == 0) {
         if (netif == NULL) {
-            hdr->hl = GNRC_IPV6_NETIF_DEFAULT_HL;
+            hdr->hl = GNRC_NETIF2_DEFAULT_HL;
         }
         else {
             hdr->hl = netif->cur_hl;

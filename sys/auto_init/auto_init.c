@@ -44,10 +44,6 @@
 #include "net/gnrc/ipv6.h"
 #endif
 
-#ifdef MODULE_GNRC_IPV6_NETIF
-#include "net/gnrc/ipv6/netif.h"
-#endif
-
 #ifdef MODULE_L2_PING
 #include "l2_ping.h"
 #endif

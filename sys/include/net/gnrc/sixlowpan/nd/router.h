@@ -24,7 +24,6 @@
 
 #include "bitfield.h"
 #include "net/gnrc/sixlowpan/ctx.h"
-#include "net/gnrc/ipv6/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,8 +55,6 @@ extern "C" {
  */
 typedef struct gnrc_sixlowpan_nd_router_prf {
     struct gnrc_sixlowpan_nd_router_prf *next;  /**< next prefix */
-    gnrc_ipv6_netif_t *iface;                   /**< interface the prefix is registered too */
-    gnrc_ipv6_netif_addr_t *prefix;             /**< prefix on the interface/in the prefix list */
 } gnrc_sixlowpan_nd_router_prf_t;
 
 /**

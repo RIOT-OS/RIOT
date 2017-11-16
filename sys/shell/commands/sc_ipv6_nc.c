@@ -21,7 +21,6 @@
 #include "kernel_types.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/ipv6/nc.h"
-#include "net/gnrc/netif.h"
 #include "thread.h"
 
 /* maximum length of L2 address */
@@ -87,20 +86,7 @@ static void _print_nc_type(gnrc_ipv6_nc_t *entry)
 
 static bool _is_iface(kernel_pid_t iface)
 {
-#ifdef MODULE_GNRC_NETIF
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-    size_t numof = gnrc_netif_get(ifs);
-
-    for (size_t i = 0; i < numof && i < GNRC_NETIF_NUMOF; i++) {
-        if (ifs[i] == iface) {
-            return true;
-        }
-    }
-
-    return false;
-#else
     return (thread_get(iface) != NULL);
-#endif
 }
 
 static int _ipv6_nc_list(void)

@@ -29,7 +29,6 @@
 #include "kernel_types.h"
 #include "net/eui64.h"
 #include "net/ipv6/addr.h"
-#include "net/gnrc/netif.h"
 #include "net/gnrc/pktqueue.h"
 #include "xtimer.h"
 
