@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "arch/irq_arch.h"
+#include "irq.h"
 #include "cpu.h"
 
 /**
@@ -58,7 +58,7 @@ __attribute__((always_inline)) inline void __set_interrupt_state(uint8_t state)
 /**
  * @brief Disable all maskable interrupts
  */
-unsigned int irq_arch_disable(void)
+unsigned int irq_disable(void)
 {
     uint8_t mask = __get_interrupt_state();
     cli();
@@ -68,7 +68,7 @@ unsigned int irq_arch_disable(void)
 /**
  * @brief Enable all maskable interrupts
  */
-unsigned int irq_arch_enable(void)
+unsigned int irq_enable(void)
 {
     sei();
     return __get_interrupt_state();
@@ -77,7 +77,7 @@ unsigned int irq_arch_enable(void)
 /**
  * @brief Restore the state of the IRQ flags
  */
-void irq_arch_restore(unsigned int state)
+void irq_restore(unsigned int state)
 {
     __set_interrupt_state(state);
 }
@@ -85,7 +85,7 @@ void irq_arch_restore(unsigned int state)
 /**
  * @brief See if the current context is inside an ISR
  */
-int irq_arch_in(void)
+int irq_is_in(void)
 {
     return __in_isr;
 }

@@ -122,7 +122,6 @@
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
-#include "arch/thread_arch.h"
 #include "cpu_conf.h"
 #include "sched.h"
 
@@ -166,6 +165,11 @@
 #define STATUS_RUNNING          9               /**< currently running                  */
 #define STATUS_PENDING         10               /**< waiting to be scheduled to run     */
 /** @} */
+
+/**
+ * @brief Prototype for a thread entry function
+ */
+typedef void *(*thread_task_func_t)(void *arg);
 
 /**
  * @brief @c thread_t holds thread's context data.
@@ -461,6 +465,26 @@ const char *thread_getname(kernel_pid_t pid);
  */
 uintptr_t thread_measure_stack_free(char *stack);
 #endif /* DEVELHELP */
+
+/**
+ * @brief   Get the number of bytes used on the ISR stack
+ */
+int thread_isr_stack_usage(void);
+
+/**
+ * @brief   Get the current ISR stack pointer
+ */
+void *thread_isr_stack_pointer(void);
+
+/**
+ * @brief   Get the start of the ISR stack
+ */
+void *thread_isr_stack_start(void);
+
+/**
+ * @brief Print the current stack to stdout
+ */
+void thread_stack_print(void);
 
 /**
  * @brief   Prints human readable, ps-like thread information for debugging purposes
