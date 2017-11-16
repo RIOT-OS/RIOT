@@ -378,6 +378,7 @@ static bool _send_data(gnrc_netif2_t *netif)
     gnrc_pktsnip_t *pkt = netif->mac.tx.packet;
     gnrc_pktsnip_t *pkt_payload;
 
+    assert(pkt != NULL);
     /* Enable Auto ACK again */
     netopt_enable_t autoack = NETOPT_ENABLE;
     netif->dev->driver->set(netif->dev, NETOPT_AUTOACK,
@@ -451,9 +452,7 @@ static bool _send_data(gnrc_netif2_t *netif)
     int res = _gnrc_lwmac_transmit(netif, pkt);
     if (res < 0) {
         LOG_ERROR("ERROR: [LWMAC-tx] Send data failed.");
-        if (pkt != NULL) {
-            gnrc_pktbuf_release(pkt);
-        }
+        gnrc_pktbuf_release(pkt);
         /* clear packet point to avoid TX retry */
         netif->mac.tx.packet = NULL;
         return false;
