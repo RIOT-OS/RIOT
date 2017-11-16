@@ -15,7 +15,7 @@
  * @brief       WSN430 peripheral configuration
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- *              Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CONF_H
@@ -29,9 +29,9 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
-#define CLOCK_CORECLOCK     (8000000U)
-
-#define CLOCK_CMCLK         CLOCK_CORECLOCK     /* no divider programmed */
+#define CLOCK_CORECLOCK     (8000000UL)
+#define CLOCK_MODE          (MCLK_8MHZ_SCLK_8MHZ)
+#define CLOCK_CMCLK         (CLOCK_CORECLOCK)       /* no divider programmed */
 /** @} */
 
 /**
@@ -91,3 +91,4 @@ extern "C" {
 #endif
 
 #endif /* PERIPH_CONF_H */
+/** @} */
