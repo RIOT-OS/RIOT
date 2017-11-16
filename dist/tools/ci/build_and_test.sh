@@ -103,10 +103,6 @@ then
     then
         make -C ./tests/unittests all-debug test BOARD=native TERMPROG='gdb -batch -ex r -ex bt $(ELF)' || exit
         set_result $?
-        # TODO:
-        #   Reenable once https://github.com/RIOT-OS/RIOT/issues/2300 is
-        #   resolved:
-        #   - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
     fi
 
 

@@ -7,7 +7,6 @@ BOARD_BLACKLIST += mips-malta
 BOARD_BLACKLIST += msb-430 msb-430h
 BOARD_BLACKLIST += nucleo32-f031
 BOARD_BLACKLIST += pic32-clicker pic32-wifire
-BOARD_BLACKLIST += qemu-i386
 BOARD_BLACKLIST += telosb
 BOARD_BLACKLIST += waspmote-pro
 BOARD_BLACKLIST += wsn430-v1_3b wsn430-v1_4
