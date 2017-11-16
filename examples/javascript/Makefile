@@ -12,9 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              nucleo32-f303 nucleo32-l031 opencm904 \
                              spark-core stm32f0discovery yunjia-nrf51822 \
 
-BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
-                   msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
-                   wsn430-v1_4 z1 pic32-wifire pic32-clicker
+BOARD_BLACKLIST = $(MCUGROUP.8bit) $(MCUGROUP.16bit) $(MCUGROUP.mips)
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
