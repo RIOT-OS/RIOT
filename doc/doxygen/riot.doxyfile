@@ -821,7 +821,6 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */board/*/tools/* \
                          *_params.h \
-                         */boards/x86-multiboot-common/include/multiboot.h \
                          */cpu/atmega_common/include/sys/*.h \
                          */cpu/msp430_common/include/stdatomic.h \
                          */cpu/msp430_common/include/sys/*.h \
