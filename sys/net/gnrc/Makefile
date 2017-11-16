@@ -16,9 +16,6 @@ endif
 ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
   DIRS += network_layer/ipv6/hdr
 endif
-ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
-  DIRS += network_layer/ipv6/nc
-endif
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   DIRS += network_layer/ipv6/nib
 endif
@@ -27,21 +24,6 @@ ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
   DIRS += network_layer/ipv6/blacklist
-endif
-ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
-  DIRS += network_layer/ndp
-endif
-ifneq (,$(filter gnrc_ndp_internal,$(USEMODULE)))
-  DIRS += network_layer/ndp/internal
-endif
-ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
-  DIRS += network_layer/ndp/host
-endif
-ifneq (,$(filter gnrc_ndp_node,$(USEMODULE)))
-  DIRS += network_layer/ndp/node
-endif
-ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
-  DIRS += network_layer/ndp/router
 endif
 ifneq (,$(filter gnrc_ndp2,$(USEMODULE)))
     DIRS += network_layer/ndp2
@@ -105,9 +87,6 @@ ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/nd
-endif
-ifneq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
-  DIRS += network_layer/sixlowpan/nd/router
 endif
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   DIRS += sock

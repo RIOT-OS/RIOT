@@ -193,20 +193,6 @@ ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
 endif
 
-ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
-  USEMODULE += gnrc_ndp_node
-  USEMODULE += random
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter gnrc_ndp_node,$(USEMODULE)))
-  USEMODULE += gnrc_ndp_internal
-endif
-
-ifneq (,$(filter gnrc_ndp_%,$(USEMODULE)))
-  USEMODULE += gnrc_ndp
-endif
-
 ifneq (,$(filter gnrc_ndp2,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
   USEMODULE += gnrc_netif2
@@ -270,10 +256,6 @@ endif
 
 ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
   USEMODULE += inet_csum
-  USEMODULE += ipv6_addr
-endif
-
-ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
   USEMODULE += ipv6_addr
 endif
 

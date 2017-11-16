@@ -20,7 +20,6 @@
 #include <string.h>
 
 #include "net/ipv6/addr.h"
-#include "net/gnrc/ndp/internal.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
 #include "timex.h"

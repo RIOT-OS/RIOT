@@ -20,7 +20,6 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the minimum networking modules for IPv6
 USEMODULE += gnrc_ipv6
-USEMODULE += gnrc_ndp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
 # Use minimal standard PRNG

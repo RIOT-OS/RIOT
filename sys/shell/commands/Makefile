@@ -29,9 +29,6 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c
 endif
-ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
-  SRC += sc_ipv6_nc.c
-endif
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   SRC += sc_gnrc_ipv6_nib.c
 endif

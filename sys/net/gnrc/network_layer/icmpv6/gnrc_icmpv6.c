@@ -73,8 +73,7 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
         return;
     }
 
-    /* Note: size will be checked again in gnrc_icmpv6_echo_req_handle,
-             gnrc_ndp_rtr_sol_handle, and others */
+    /* Note: size will be checked again in packet handlers */
 
     hdr = (icmpv6_hdr_t *)icmpv6->data;
 

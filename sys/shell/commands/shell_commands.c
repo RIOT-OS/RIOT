@@ -200,10 +200,6 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
 #endif
-#ifdef MODULE_GNRC_IPV6_NC
-    {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
-    {"routers", "IPv6 default router list", _ipv6_nc_routers },
-#endif
 #ifdef MODULE_GNRC_IPV6_WHITELIST
     {"whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist },
 #endif
