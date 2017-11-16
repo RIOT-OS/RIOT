@@ -61,6 +61,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Off-link entry flags
+ * @anchor  net_gnrc_ipv6_nib_offl_flags
+ * @{
+ */
+#define _PFX_ON_LINK    (0x0001)
+#define _PFX_SLAAC      (0x0002)
+/** @} */
+
+/**
  * @brief   Shorter name for convenience ;-)
  */
 #define _NIB_IF_MASK        (GNRC_IPV6_NIB_NC_INFO_IFACE_MASK)
@@ -131,6 +140,9 @@ typedef struct _nib_onl_entry {
      * @brief Event for @ref GNRC_IPV6_NIB_SND_NA
      */
     evtimer_msg_event_t snd_na;
+#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
+    evtimer_msg_event_t reply_rs;           /**< Event for @ref GNRC_IPV6_NIB_REPLY_RS */
+#endif
 #if GNRC_IPV6_NIB_CONF_6LR || defined(DOXYGEN)
     evtimer_msg_event_t addr_reg_timeout;   /**< Event for @ref GNRC_IPV6_NIB_ADDR_REG_TIMEOUT */
 #endif
@@ -150,12 +162,14 @@ typedef struct _nib_onl_entry {
      * @see [Mode flags for entries](@ref net_gnrc_ipv6_nib_mode).
      */
     uint8_t mode;
+#if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
     /**
      * @brief   Neighbor solicitations sent for probing
+     *
+     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ARSM != 0.
      */
     uint8_t ns_sent;
 
-#if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
     /**
      * @brief   length in bytes of _nib_onl_entry_t::l2addr
      *
@@ -187,6 +201,7 @@ typedef struct {
     evtimer_msg_event_t pfx_timeout;
     uint8_t mode;               /**< [mode](@ref net_gnrc_ipv6_nib_mode) of the
                                  *   off-link entry */
+    uint16_t flags;             /**< [flags](@ref net_gnrc_ipv6_nib_offl_flags */
     uint32_t valid_until;       /**< timestamp (in ms) until which the prefix
                                      valid (UINT32_MAX means forever) */
     uint32_t pref_until;        /**< timestamp (in ms) until which the prefix
@@ -201,6 +216,8 @@ typedef struct {
     ipv6_addr_t addr;               /**< The address of the border router */
     uint32_t version;               /**< last received version of the info of
                                      *   the _nib_abr_entry_t::addr */
+    uint32_t valid_until;           /**< timestamp (in minutes) until which
+                                     *   information is valid */
     evtimer_msg_event_t timeout;    /**< timeout of the information */
     /**
      * @brief   Bitfield marking the prefixes in the NIB's off-link entries
@@ -589,11 +606,15 @@ static inline void _nib_dc_remove(_nib_offl_entry_t *nib_offl)
  * @pre     `(pfx != NULL) && (pfx != "::") && (pfx_len != 0) && (pfx_len <= 128)`
  * @pre     `(pref_ltime <= valid_ltime)`
  *
- * @param[in] iface     The interface to the prefix is added to.
- * @param[in] pfx       The IPv6 prefix or address of the destination.
- *                      May not be NULL or unspecified address. Use
- *                      @ref _nib_drl_add() for default route destinations.
- * @param[in] pfx_len   The length in bits of @p pfx in bits.
+ * @param[in] iface         The interface to the prefix is added to.
+ * @param[in] pfx           The IPv6 prefix or address of the destination.
+ *                          May not be NULL or unspecified address. Use
+ *                          @ref _nib_drl_add() for default route destinations.
+ * @param[in] pfx_len       The length in bits of @p pfx in bits.
+ * @param[in] valid_ltime   Valid lifetime in microseconds. `UINT32_MAX` for
+ *                          infinite.
+ * @param[in] pref_ltime    Preferred lifetime in microseconds. `UINT32_MAX` for
+ *                          infinite.
  *
  * @return  A new or existing off-link entry with _nib_offl_entry_t::pfx set to
  *          @p pfx.

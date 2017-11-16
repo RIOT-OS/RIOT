@@ -83,6 +83,11 @@ void _tests_init(void)
             "mockup_eth", &_mock_netdev.netdev
         );
     assert(_mock_netif != NULL);
+    /* we do not want to test for SLAAC here so just assure the configured
+     * address is valid */
+    assert(!ipv6_addr_is_unspecified(&_mock_netif->ipv6.addrs[0]));
+    _mock_netif->ipv6.addrs_flags[0] &= ~GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_MASK;
+    _mock_netif->ipv6.addrs_flags[0] |= GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID;
     gnrc_netreg_entry_init_pid(&dumper, GNRC_NETREG_DEMUX_CTX_ALL,
                                sched_active_pid);
     gnrc_netreg_register(GNRC_NETTYPE_NDP2, &dumper);

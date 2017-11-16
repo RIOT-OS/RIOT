@@ -51,11 +51,9 @@ static uint8_t _update_nce_ar_state(const sixlowpan_nd_opt_ar_t *aro,
 uint8_t _reg_addr_upstream(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
                            const icmpv6_hdr_t *icmpv6,
                            const sixlowpan_nd_opt_ar_t *aro,
-                           const ndp_opt_t *sl2ao)
+                           const ndp_opt_t *sl2ao, _nib_onl_entry_t *nce)
 {
     if (!ipv6_addr_is_unspecified(&ipv6->src) && (sl2ao != NULL)) {
-        _nib_onl_entry_t *nce = _nib_onl_get(&ipv6->src, netif->pid);
-
         DEBUG("nib: Trying to register %s with EUI-64 "
               "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
               ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)),
@@ -66,9 +64,11 @@ uint8_t _reg_addr_upstream(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
             (memcmp(&nce->eui64, &aro->eui64, sizeof(aro->eui64)) == 0)) {
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_DAD
             /* TODO */
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_DAD */
             if (aro->ltime.u16 != 0) {
                 _handle_sl2ao(netif, ipv6, icmpv6, sl2ao);
+                /* re-get NCE in case it was updated */
+                nce = _nib_onl_get(&ipv6->src, netif->pid);
                 return _update_nce_ar_state(aro, nce);
             }
             else if (nce != NULL) {
@@ -76,7 +76,8 @@ uint8_t _reg_addr_upstream(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
                 return SIXLOWPAN_ND_STATUS_SUCCESS;
             }
         }
-        else {
+        else if (_get_ar_state(nce) != GNRC_IPV6_NIB_NC_INFO_AR_STATE_GC) {
+            /* ignore address registration requests from upstream */
             DEBUG("nib: Could not register %s, duplicate entry with EUI-64 "
                   "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
                   ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)),
@@ -116,7 +117,7 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif2_t *netif,
             DEBUG("nib: Address was marked TENTATIVE => not replying NS, "
                   "waiting for DAC\n");
         }
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_DAD */
     }
     return reply_aro;
 }

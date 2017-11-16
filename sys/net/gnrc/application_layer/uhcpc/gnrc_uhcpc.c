@@ -6,12 +6,10 @@
  * directory for more details.
  */
 
-#include "net/fib.h"
+#include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc/ipv6/nc.h"
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/netif.h"
+#include "net/gnrc/netif2.h"
 #include "net/ipv6/addr.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
@@ -31,19 +29,13 @@ static void set_interface_roles(void)
         kernel_pid_t dev = netif->pid;
         int is_wired = gnrc_netapi_get(dev, NETOPT_IS_WIRED, 0, NULL, 0);
         if ((!gnrc_border_interface) && (is_wired == 1)) {
-            ipv6_addr_t addr;
+            ipv6_addr_t addr, defroute = IPV6_ADDR_UNSPECIFIED;
             gnrc_border_interface = dev;
 
             ipv6_addr_from_str(&addr, "fe80::2");
             gnrc_netapi_set(dev, NETOPT_IPV6_ADDR, 64 << 8, &addr, sizeof(addr));
-#ifdef MODULE_FIB
-            ipv6_addr_t defroute = IPV6_ADDR_UNSPECIFIED;
-
             ipv6_addr_from_str(&addr, "fe80::1");
-            fib_add_entry(&gnrc_ipv6_fib_table, dev, defroute.u8, 16,
-                    0x00, addr.u8, 16, 0,
-                    (uint32_t)FIB_LIFETIME_NO_EXPIRE);
-#endif
+            gnrc_ipv6_nib_ft_add(&defroute, IPV6_ADDR_BIT_LEN, &addr, dev);
         }
         else if ((!gnrc_wireless_interface) && (is_wired != 1)) {
             gnrc_wireless_interface = dev;
@@ -92,6 +84,10 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
 
     gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (64 << 8),
                     prefix, sizeof(ipv6_addr_t));
+#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
+    GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+    gnrc_ipv6_nib_abr_add((ipv6_addr_t *)prefix);
+#endif
     gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
                     &_prefix, sizeof(_prefix));
     print_str("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix ");
@@ -101,6 +97,10 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
     if (!ipv6_addr_is_unspecified(&_prefix)) {
         gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
                         &_prefix, sizeof(_prefix));
+#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
+    GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+        gnrc_ipv6_nib_abr_del(&_prefix);
+#endif
         print_str("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix ");
         ipv6_addr_print(&_prefix);
         puts("/64");

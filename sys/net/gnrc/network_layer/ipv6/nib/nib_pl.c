@@ -18,10 +18,12 @@
 #include <stdio.h>
 
 #include "net/gnrc/ipv6/nib/pl.h"
+#include "net/gnrc/netif2/internal.h"
 #include "timex.h"
 #include "xtimer.h"
 
 #include "_nib-internal.h"
+#include "_nib-router.h"
 
 int gnrc_ipv6_nib_pl_set(unsigned iface,
                          const ipv6_addr_t *pfx, unsigned pfx_len,
@@ -47,8 +49,40 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     if (dst == NULL) {
         res = -ENOMEM;
     }
+#ifdef MODULE_GNRC_NETIF2
+    gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(iface);
+    int idx;
+
+    if (netif == NULL) {
+        mutex_unlock(&_nib_mutex);
+        return res;
+    }
+    gnrc_netif2_acquire(netif);
+    if (!gnrc_netif2_is_6ln(netif) &&
+        ((idx = gnrc_netif2_ipv6_addr_match(netif, pfx)) >= 0) &&
+        (ipv6_addr_match_prefix(&netif->ipv6.addrs[idx], pfx) >= pfx_len)) {
+        dst->flags |= _PFX_ON_LINK;
+    }
+    if (netif->ipv6.aac_mode == GNRC_NETIF2_AAC_AUTO) {
+        dst->flags |= _PFX_SLAAC;
+    }
+#if GNRC_IPV6_NIB_CONF_6LBR && GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+    if (gnrc_netif2_is_6lbr(netif)) {
+        _nib_abr_entry_t *abr = NULL;
+
+        while ((abr = _nib_abr_iter(abr))) {
+            abr->version++;
+            _nib_abr_add_pfx(abr, dst);
+        }
+    }
+#endif
+    gnrc_netif2_release(netif);
+#endif  /* MODULE_GNRC_NETIF2 */
     mutex_unlock(&_nib_mutex);
-    /* TODO: send RA with PIO, if iface is allowed to send RAs */
+#if defined(MODULE_GNRC_NETIF2) && GNRC_IPV6_NIB_CONF_ROUTER
+    /* update prefixes down-stream */
+    _handle_snd_mc_ra(netif);
+#endif
     return res;
 }
 
@@ -66,7 +100,14 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
             (ipv6_addr_match_prefix(pfx, &dst->pfx) >= pfx_len)) {
             _nib_pl_remove(dst);
             mutex_unlock(&_nib_mutex);
-            /* TODO: send RA with PIO, if iface is allowed to send RAs */
+#if GNRC_IPV6_NIB_CONF_ROUTER
+            gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(iface);
+
+            if (netif) {
+                /* update prefixes down-stream */
+                _handle_snd_mc_ra(netif);
+            }
+#endif
             return;
         }
     }
