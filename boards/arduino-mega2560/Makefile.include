@@ -1,7 +1,7 @@
 # define the cpu used by the arduino mega2560 board
 export CPU = atmega2560
 
-USEMODULE += arduino-atmega-common
+USEMODULE += boards_common_arduino-atmega
 
 #export needed for flash rule
 export PORT_LINUX ?= /dev/ttyACM0
@@ -14,4 +14,4 @@ export FFLAGS += -p m2560
 # overridden for debugging (which requires changes that require to use an ISP)
 export PROGRAMMER ?= stk500v2
 
-include $(RIOTBOARD)/arduino-atmega-common/Makefile.include
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

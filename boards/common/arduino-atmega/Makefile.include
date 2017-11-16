@@ -1,7 +1,7 @@
 # include optional dependencies
-include $(RIOTBOARD)/arduino-atmega-common/Makefile.dep
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.dep
 
-INCLUDES += -I$(RIOTBOARD)/arduino-atmega-common/include
+INCLUDES += -I$(RIOTBOARD)/common/arduino-atmega/include
 
 # refine serial port information
 export BAUD ?= 9600
