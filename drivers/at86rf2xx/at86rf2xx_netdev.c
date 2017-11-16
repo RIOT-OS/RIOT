@@ -424,8 +424,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             /* don't set res to set netdev_ieee802154_t::pan */
             break;
         case NETOPT_CHANNEL:
-            assert(len != sizeof(uint8_t));
-            uint8_t chan = ((const uint8_t *)val)[0];
+            assert(len == sizeof(uint16_t));
+            uint8_t chan = (((const uint16_t *)val)[0]) & UINT8_MAX;
             if ((chan < AT86RF2XX_MIN_CHANNEL)
                 || (chan > AT86RF2XX_MAX_CHANNEL)) {
                 res = -EINVAL;
@@ -436,15 +436,15 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             break;
 
         case NETOPT_CHANNEL_PAGE:
-            assert(len != sizeof(uint8_t));
-            uint8_t page = ((const uint8_t *)val)[0];
+            assert(len == sizeof(uint16_t));
+            uint8_t page = (((const uint16_t *)val)[0]) & UINT8_MAX;
 #ifdef MODULE_AT86RF212B
             if ((page != 0) && (page != 2)) {
                 res = -EINVAL;
             }
             else {
                 at86rf2xx_set_page(dev, page);
-                res = sizeof(uint8_t);
+                res = sizeof(uint16_t);
             }
 #else
             /* rf23x only supports page 0, no need to configure anything in the driver. */
@@ -452,7 +452,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = -EINVAL;
             }
             else {
-                res = sizeof(uint8_t);
+                res = sizeof(uint16_t);
             }
 #endif
             break;
