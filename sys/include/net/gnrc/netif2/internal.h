@@ -39,12 +39,7 @@ extern "C" {
  *
  * @internal
  */
-static inline void gnrc_netif2_acquire(gnrc_netif2_t *netif)
-{
-    if (netif && (netif->ops)) {
-        rmutex_lock(&netif->mutex);
-    }
-}
+void gnrc_netif2_acquire(gnrc_netif2_t *netif);
 
 /**
  * @brief   Releases exclusive access to the interface
@@ -53,12 +48,7 @@ static inline void gnrc_netif2_acquire(gnrc_netif2_t *netif)
  *
  * @internal
  */
-static inline void gnrc_netif2_release(gnrc_netif2_t *netif)
-{
-    if (netif && (netif->ops)) {
-        rmutex_unlock(&netif->mutex);
-    }
-}
+void gnrc_netif2_release(gnrc_netif2_t *netif);
 
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
 /**
@@ -344,17 +334,7 @@ static inline bool gnrc_netif2_is_rtr_adv(const gnrc_netif2_t *netif)
  * @return  true, if the interface represents a 6LN
  * @return  false, if the interface does not represent a 6LN
  */
-static inline bool gnrc_netif2_is_6ln(const gnrc_netif2_t *netif)
-{
-    switch (netif->device_type) {
-        case NETDEV_TYPE_IEEE802154:
-        case NETDEV_TYPE_CC110X:
-        case NETDEV_TYPE_NRFMIN:
-            return true;
-        default:
-            return false;
-    }
-}
+bool gnrc_netif2_is_6ln(const gnrc_netif2_t *netif);
 
 /**
  * @brief   Checks if the interface represents a 6Lo router (6LR) according to
