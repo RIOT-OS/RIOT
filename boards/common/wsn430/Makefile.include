@@ -13,5 +13,5 @@ export OFLAGS = -O ihex
 export FLASHER = mspdebug
 export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
 
-# include wsn430-common includes
-export INCLUDES += -I$(RIOTBOARD)/wsn430-common/include
+# include common wsn430 includes
+export INCLUDES += -I$(RIOTBOARD)/common/wsn430/include
