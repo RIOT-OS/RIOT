@@ -61,10 +61,6 @@ extern int _saul(int argc, char **argv);
 extern int _rtc_handler(int argc, char **argv);
 #endif
 
-#ifdef CPU_X86
-extern int _x86_lspci(int argc, char **argv);
-#endif
-
 #ifdef MODULE_MCI
 extern int _get_sectorsize(int argc, char **argv);
 extern int _get_blocksize(int argc, char **argv);
@@ -189,9 +185,6 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_PERIPH_RTC
     {"rtc", "control RTC peripheral interface",  _rtc_handler},
-#endif
-#ifdef CPU_X86
-    {"lspci", "Lists PCI devices", _x86_lspci},
 #endif
 #ifdef MODULE_GNRC_IPV6_NIB
     {"nib", "Configure neighbor information base", _gnrc_ipv6_nib},
