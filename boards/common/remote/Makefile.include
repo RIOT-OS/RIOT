@@ -28,8 +28,8 @@ export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
-# include remote-common includes
-export INCLUDES += -I$(RIOTBOARD)/remote-common/include
+# include common remote includes
+export INCLUDES += -I$(RIOTBOARD)/common/remote/include
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
