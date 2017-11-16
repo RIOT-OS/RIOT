@@ -28,7 +28,7 @@
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/hdr.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/icmpv6.h"
@@ -66,7 +66,7 @@ static const ipv6_addr_t test_pfx = { { 0x47, 0x25, 0xd9, 0x3b, 0x7f, 0xcc, 0x15
                                         0x64, 0x3e, 0x76, 0x0d, 0x30, 0x10, 0x0d, 0xc8 } };
 static const uint8_t test_src_l2[] = { 0xe7, 0x43, 0xb7, 0x74, 0xd7, 0xa9, 0x30, 0x74 };
 
-static gnrc_netif2_t *test_netif = NULL;
+static gnrc_netif_t *test_netif = NULL;
 
 static void init_pkt_handler(void);
 static inline size_t ceil8(size_t size);
@@ -932,20 +932,20 @@ static msg_t msg_queue_main[MSG_QUEUE_SIZE];
 static gnrc_netreg_entry_t netreg_entry;
 static netdev_test_t dev;
 
-static int _test_netif_send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static int _test_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     (void)netif;
     gnrc_pktbuf_release(pkt);
     return 0;
 }
 
-static gnrc_pktsnip_t *_test_netif_recv(gnrc_netif2_t *netif)
+static gnrc_pktsnip_t *_test_netif_recv(gnrc_netif_t *netif)
 {
     (void)netif;
     return NULL;
 }
 
-static int _test_netif_get(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt)
+static int _test_netif_get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
     (void)netif;
     switch (opt->opt) {
@@ -984,14 +984,14 @@ static int _test_netif_get(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt)
     }
 }
 
-static int _test_netif_set(gnrc_netif2_t *netif, const gnrc_netapi_opt_t *opt)
+static int _test_netif_set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 {
     (void)netif;
     (void)opt;
     return -ENOTSUP;
 }
 
-static const gnrc_netif2_ops_t _test_netif_ops = {
+static const gnrc_netif_ops_t _test_netif_ops = {
     .send = _test_netif_send,
     .recv = _test_netif_recv,
     .get = _test_netif_get,
@@ -1005,14 +1005,14 @@ static void init_pkt_handler(void)
                                sched_active_pid);
     gnrc_netreg_register(GNRC_NETTYPE_NDP2, &netreg_entry);
     netdev_test_setup(&dev, NULL);
-    test_netif = gnrc_netif2_create(test_netif_stack, sizeof(test_netif_stack),
-                                    GNRC_NETIF2_PRIO, "test-netif",
-                                    &dev.netdev, &_test_netif_ops);
+    test_netif = gnrc_netif_create(test_netif_stack, sizeof(test_netif_stack),
+                                   GNRC_NETIF_PRIO, "test-netif",
+                                   &dev.netdev, &_test_netif_ops);
     TEST_ASSERT_MESSAGE(test_netif != NULL,
                         "Unable to start test interface");
     memcpy(&test_netif->ipv6.addrs[0], &test_src,
            sizeof(test_netif->ipv6.addrs[0]));
-    test_netif->ipv6.addrs_flags[0] = GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID;
+    test_netif->ipv6.addrs_flags[0] = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
     memcpy(test_netif->l2addr, test_src_l2, sizeof(test_netif->l2addr));
     test_netif->l2addr_len = sizeof(test_src_l2);
 }

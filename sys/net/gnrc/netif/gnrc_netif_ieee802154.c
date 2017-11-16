@@ -14,7 +14,7 @@
  */
 
 #include "net/gnrc.h"
-#include "net/gnrc/netif2/ieee802154.h"
+#include "net/gnrc/netif/ieee802154.h"
 #include "net/netdev/ieee802154.h"
 
 #ifdef MODULE_GNRC_IPV6
@@ -25,22 +25,22 @@
 #include "debug.h"
 
 #ifdef MODULE_NETDEV_IEEE802154
-static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt);
-static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif);
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
+static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
-static const gnrc_netif2_ops_t ieee802154_ops = {
+static const gnrc_netif_ops_t ieee802154_ops = {
     .send = _send,
     .recv = _recv,
-    .get = gnrc_netif2_get_from_netdev,
-    .set = gnrc_netif2_set_from_netdev,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif2_t *gnrc_netif2_ieee802154_create(char *stack, int stacksize,
-                                             char priority, char *name,
-                                             netdev_t *dev)
+gnrc_netif_t *gnrc_netif_ieee802154_create(char *stack, int stacksize,
+                                           char priority, char *name,
+                                           netdev_t *dev)
 {
-    return gnrc_netif2_create(stack, stacksize, priority, name, dev,
-                              &ieee802154_ops);
+    return gnrc_netif_create(stack, stacksize, priority, name, dev,
+                             &ieee802154_ops);
 }
 
 static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
@@ -70,7 +70,7 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     return snip;
 }
 
-static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
+static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     netdev_ieee802154_rx_info_t rx_info;
@@ -156,7 +156,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
     return pkt;
 }
 
-static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     netdev_t *dev = netif->dev;
     netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
@@ -214,8 +214,8 @@ static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
         vector[0].iov_base = mhr;
         vector[0].iov_len = (size_t)res;
 #ifdef MODULE_NETSTATS_L2
-    if (netif_hdr->flags &
-        (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
+        if (netif_hdr->flags &
+            (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
             netif->dev->stats.tx_mcast_count++;
         }
         else {
@@ -223,7 +223,7 @@ static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
         }
 #endif
 #ifdef MODULE_GNRC_MAC
-        if (netif->mac.mac_info & GNRC_NETIF2_MAC_INFO_CSMA_ENABLED) {
+        if (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_CSMA_ENABLED) {
             res = csma_sender_csma_ca_send(dev, vector, n, &netif->mac.csma_conf);
         }
         else {

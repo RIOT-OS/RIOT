@@ -13,7 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 calliope-mini \
                              wsn430-v1_4 yunjia-nrf51822 z1 \
 
 USEMODULE += embunit
-USEMODULE += gnrc_netif2
+USEMODULE += gnrc_netif
 USEMODULE += gnrc_pktdump
 USEMODULE += gnrc_sixlowpan
 USEMODULE += gnrc_sixlowpan_iphc
@@ -25,8 +25,8 @@ USEMODULE += od
 
 CFLAGS += -DDEVELHELP
 CFLAGS += -DGNRC_NETIF_NUMOF=4
-CFLAGS += -DGNRC_NETIF2_ADDRS_NUMOF=16
-CFLAGS += -DGNRC_NETIF2_GROUPS_NUMOF=8
+CFLAGS += -DGNRC_NETIF_ADDRS_NUMOF=16
+CFLAGS += -DGNRC_NETIF_GROUPS_NUMOF=8
 CFLAGS += -DLOG_LEVEL=LOG_NONE
 CFLAGS += -DTEST_SUITES
 

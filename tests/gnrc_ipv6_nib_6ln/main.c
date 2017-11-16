@@ -29,7 +29,7 @@
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6/nib/nc.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
 #include "net/ndp.h"
@@ -84,13 +84,13 @@ static inline size_t ceil8(size_t size);
 static void _set_up(void)
 {
     _common_set_up();
-    gnrc_netif2_acquire(_mock_netif);
+    gnrc_netif_acquire(_mock_netif);
     /* reset some fields not set by the nib interface initializer */
     _mock_netif->ipv6.mtu = IPV6_MIN_MTU;
-    _mock_netif->cur_hl = GNRC_NETIF2_DEFAULT_HL;
-    gnrc_netif2_ipv6_addr_remove(_mock_netif, &_loc_gb);
-    _mock_netif->flags &= ~GNRC_NETIF2_FLAGS_6LO_ADDRS_REG;
-    gnrc_netif2_release(_mock_netif);
+    _mock_netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
+    gnrc_netif_ipv6_addr_remove(_mock_netif, &_loc_gb);
+    _mock_netif->flags &= ~GNRC_NETIF_FLAGS_6LO_ADDRS_REG;
+    gnrc_netif_release(_mock_netif);
     memset(_buffer, 0, sizeof(_buffer));
     gnrc_pktbuf_init();
     /* remove messages */
@@ -630,13 +630,13 @@ static void test_handle_pkt__nbr_adv__aro_not_my_eui64(void)
                                      SIXLOWPAN_ND_STATUS_SUCCESS);
     int idx;
 
-    idx = gnrc_netif2_ipv6_addr_add(_mock_netif, &_loc_gb, _LOC_GB_PFX_LEN,
-                                    GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
+    idx = gnrc_netif_ipv6_addr_add(_mock_netif, &_loc_gb, _LOC_GB_PFX_LEN,
+                                   GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
     TEST_ASSERT(idx >= 0);
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     TEST_ASSERT(ipv6_addr_equal(&_loc_gb, &_mock_netif->ipv6.addrs[idx]));
     TEST_ASSERT(_mock_netif->ipv6.addrs_flags[idx] &
-                GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
+                GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
 }
 
 static void test_handle_pkt__nbr_adv__aro_duplicate(void)
@@ -648,11 +648,11 @@ static void test_handle_pkt__nbr_adv__aro_duplicate(void)
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_nc_set(&_rem_ll, _mock_netif->pid,
                                                   _rem_l2, sizeof(_rem_l2)));
-    idx = gnrc_netif2_ipv6_addr_add(_mock_netif, &_loc_gb, _LOC_GB_PFX_LEN,
-                                    GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
+    idx = gnrc_netif_ipv6_addr_add(_mock_netif, &_loc_gb, _LOC_GB_PFX_LEN,
+                                   GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
     TEST_ASSERT(idx >= 0);
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
-    TEST_ASSERT(gnrc_netif2_ipv6_addr_idx(_mock_netif, &_loc_gb) < 0);
+    TEST_ASSERT(gnrc_netif_ipv6_addr_idx(_mock_netif, &_loc_gb) < 0);
 }
 
 static size_t _set_rtr_sol(const ipv6_addr_t *ipv6_src,
@@ -792,11 +792,11 @@ typedef struct {
     uint8_t cur_hl;
 } _netif_exp_t;
 
-static uint8_t _netif_addr_count(const gnrc_netif2_t *netif)
+static uint8_t _netif_addr_count(const gnrc_netif_t *netif)
 {
     unsigned count = 0U;
 
-    for (int i = 0; i < GNRC_NETIF2_IPV6_ADDRS_NUMOF; i++) {
+    for (int i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
         if (netif->ipv6.addrs_flags[i] != 0) {
             count++;
         }
@@ -804,7 +804,7 @@ static uint8_t _netif_addr_count(const gnrc_netif2_t *netif)
     return count;
 }
 
-static inline void _get_netif_exp(const gnrc_netif2_t *netif,
+static inline void _get_netif_exp(const gnrc_netif_t *netif,
                                   _netif_exp_t *exp)
 {
     exp->retrans_timer = netif->ipv6.retrans_time;
@@ -987,7 +987,7 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
     _netif_exp_t exp_netif;
 
     _get_netif_exp(_mock_netif, &exp_netif);
-    TEST_ASSERT(gnrc_netif2_ipv6_addr_idx(_mock_netif, &_loc_gb) < 0);
+    TEST_ASSERT(gnrc_netif_ipv6_addr_idx(_mock_netif, &_loc_gb) < 0);
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
     if (set_rtr_adv_fields) {
         while (gnrc_ipv6_nib_ft_iter(NULL, 0, &state, &route)) {
@@ -1054,13 +1054,13 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
     state = NULL;
     if (pio) {
         if (pio_flags & NDP_OPT_PI_FLAGS_A) {
-            TEST_ASSERT_MESSAGE(gnrc_netif2_ipv6_addr_idx(_mock_netif,
-                                                          &_loc_gb) >= 0,
+            TEST_ASSERT_MESSAGE(gnrc_netif_ipv6_addr_idx(_mock_netif,
+                                                         &_loc_gb) >= 0,
                                 "Address was not configured by PIO");
         }
         else {
-            TEST_ASSERT_MESSAGE(gnrc_netif2_ipv6_addr_idx(_mock_netif,
-                                                          &_loc_gb) < 0,
+            TEST_ASSERT_MESSAGE(gnrc_netif_ipv6_addr_idx(_mock_netif,
+                                                         &_loc_gb) < 0,
                                 "Address was configured by PIO, "
                                 "but A flag was set");
         }
@@ -1218,13 +1218,13 @@ static void test_handle_pkt__rtr_adv__success_6co_sl2ao_mtuo_pio_LA(void)
 
 static void test_change_rtr_adv_iface(void)
 {
-    TEST_ASSERT_MESSAGE(!(_mock_netif->flags & GNRC_NETIF2_FLAGS_IPV6_RTR_ADV),
+    TEST_ASSERT_MESSAGE(!(_mock_netif->flags & GNRC_NETIF_FLAGS_IPV6_RTR_ADV),
                         "RTR_ADV was unexpectedly set");
     gnrc_ipv6_nib_change_rtr_adv_iface(_mock_netif, true);
-    TEST_ASSERT_MESSAGE(!(_mock_netif->flags & GNRC_NETIF2_FLAGS_IPV6_RTR_ADV),
+    TEST_ASSERT_MESSAGE(!(_mock_netif->flags & GNRC_NETIF_FLAGS_IPV6_RTR_ADV),
                         "RTR_ADV was unexpectedly changed");
     gnrc_ipv6_nib_change_rtr_adv_iface(_mock_netif, false);
-    TEST_ASSERT_MESSAGE(!(_mock_netif->flags & GNRC_NETIF2_FLAGS_IPV6_RTR_ADV),
+    TEST_ASSERT_MESSAGE(!(_mock_netif->flags & GNRC_NETIF_FLAGS_IPV6_RTR_ADV),
                         "RTR_ADV was unexpectedly changed");
     TEST_ASSERT_EQUAL_INT(0, msg_avail());
 }

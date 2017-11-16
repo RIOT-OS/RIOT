@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_netif2 New network interface API
+ * @defgroup    net_gnrc_netif  Network interface API
  * @ingroup     net_gnrc
  * @brief       Abstraction layer for GNRC's network interfaces
  *
@@ -21,8 +21,8 @@
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF2_H
-#define NET_GNRC_NETIF2_H
+#ifndef NET_GNRC_NETIF_H
+#define NET_GNRC_NETIF_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -32,16 +32,16 @@
 #include "msg.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/pkt.h"
-#include "net/gnrc/netif2/conf.h"
+#include "net/gnrc/netif/conf.h"
 #ifdef MODULE_GNRC_SIXLOWPAN
-#include "net/gnrc/netif2/6lo.h"
+#include "net/gnrc/netif/6lo.h"
 #endif
-#include "net/gnrc/netif2/flags.h"
+#include "net/gnrc/netif/flags.h"
 #ifdef MODULE_GNRC_IPV6
-#include "net/gnrc/netif2/ipv6.h"
+#include "net/gnrc/netif/ipv6.h"
 #endif
 #ifdef MODULE_GNRC_MAC
-#include "net/gnrc/netif2/mac.h"
+#include "net/gnrc/netif/mac.h"
 #endif
 #include "net/netdev.h"
 #include "rmutex.h"
@@ -53,55 +53,55 @@ extern "C" {
 /**
  * @brief   Operations to an interface
  */
-typedef struct gnrc_netif2_ops gnrc_netif2_ops_t;
+typedef struct gnrc_netif_ops gnrc_netif_ops_t;
 
 /**
  * @brief   Representation of a network interface
  */
 typedef struct {
-    const gnrc_netif2_ops_t *ops;           /**< Operations of the network interface */
+    const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
     netdev_t *dev;                          /**< Network device of the network interface */
     rmutex_t mutex;                         /**< Mutex of the interface */
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
-    gnrc_netif2_ipv6_t ipv6;                /**< IPv6 component */
+    gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
 #endif
 #if defined(MODULE_GNRC_MAC) || DOXYGEN
-    gnrc_netif2_mac_t mac;                  /**< @ref net_gnrc_mac component */
+    gnrc_netif_mac_t mac;                   /**< @ref net_gnrc_mac component */
 #endif  /* MODULE_GNRC_MAC */
     /**
      * @brief   Flags for the interface
      *
-     * @see net_gnrc_netif2_flags
+     * @see net_gnrc_netif_flags
      */
     uint32_t flags;
-#if (GNRC_NETIF2_L2ADDR_MAXLEN > 0)
+#if (GNRC_NETIF_L2ADDR_MAXLEN > 0)
     /**
      * @brief   The link-layer address currently used as the source address
      *          on this interface.
      *
-     * @note    Only available if @ref GNRC_NETIF2_L2ADDR_MAXLEN > 0
+     * @note    Only available if @ref GNRC_NETIF_L2ADDR_MAXLEN > 0
      */
-    uint8_t l2addr[GNRC_NETIF2_L2ADDR_MAXLEN];
+    uint8_t l2addr[GNRC_NETIF_L2ADDR_MAXLEN];
 
     /**
-     * @brief   Length in bytes of gnrc_netif2_t::l2addr
+     * @brief   Length in bytes of gnrc_netif_t::l2addr
      *
-     * @note    Only available if @ref GNRC_NETIF2_L2ADDR_MAXLEN > 0
+     * @note    Only available if @ref GNRC_NETIF_L2ADDR_MAXLEN > 0
      */
     uint8_t l2addr_len;
 #endif
 #if defined(MODULE_GNRC_SIXLOWPAN) || DOXYGEN
-    gnrc_netif2_6lo_t sixlo;                /**< 6Lo component */
+    gnrc_netif_6lo_t sixlo;                 /**< 6Lo component */
 #endif
     uint8_t cur_hl;                         /**< Current hop-limit for out-going packets */
     uint8_t device_type;                    /**< Device type */
     kernel_pid_t pid;                       /**< PID of the network interface's thread */
-} gnrc_netif2_t;
+} gnrc_netif_t;
 
 /**
- * @see gnrc_netif2_ops_t
+ * @see gnrc_netif_ops_t
  */
-struct gnrc_netif2_ops {
+struct gnrc_netif_ops {
     /**
      * @brief   Initializes network interface beyond the default settings
      *
@@ -114,7 +114,7 @@ struct gnrc_netif2_ops {
      * the interface's mutex gnrc_netif_t::mutex, since the thread will already
      * lock it. Leave NULL if you do not need any special initialization.
      */
-    void (*init)(gnrc_netif2_t *netif);
+    void (*init)(gnrc_netif_t *netif);
 
     /**
      * @brief   Send a @ref net_gnrc_pkt "packet" over the network interface
@@ -134,9 +134,9 @@ struct gnrc_netif2_ops {
      *          or is in an unexpected format.
      * @return  -ENOTSUP, if sending @p pkt in the given format isn't supported
      *          (e.g. empty payload with Ethernet).
-     * @return  Any negative error code reported by gnrc_netif2_t::dev.
+     * @return  Any negative error code reported by gnrc_netif_t::dev.
      */
-    int (*send)(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt);
+    int (*send)(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 
     /**
      * @brief   Receives a @ref net_gnrc_pkt "packet" from the network interface
@@ -154,13 +154,13 @@ struct gnrc_netif2_ops {
      *          accordingly) and a @ref net_gnrc_netif_hdr in receive order.
      * @return  NULL, if @ref net_gnrc_pktbuf was full.
      */
-    gnrc_pktsnip_t *(*recv)(gnrc_netif2_t *netif);
+    gnrc_pktsnip_t *(*recv)(gnrc_netif_t *netif);
 
     /**
      * @brief   Gets an option from the network interface
      *
-     * Use gnrc_netif2_get_from_netdev() to just get options from
-     * gnrc_netif2_t::dev.
+     * Use gnrc_netif_get_from_netdev() to just get options from
+     * gnrc_netif_t::dev.
      *
      * @param[in] netif     The network interface.
      * @param[in] opt       The option parameters.
@@ -168,26 +168,26 @@ struct gnrc_netif2_ops {
      * @return  Number of bytes in @p data.
      * @return  -EOVERFLOW, if @p max_len is lesser than the required space.
      * @return  -ENOTSUP, if @p opt is not supported to be set.
-     * @return  Any negative error code reported by gnrc_netif2_t::dev.
+     * @return  Any negative error code reported by gnrc_netif_t::dev.
      */
-    int (*get)(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt);
+    int (*get)(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt);
 
     /**
      * @brief  Sets an option from the network interface
      *
-     * Use gnrc_netif2_set_from_netdev() to just set options from
-     * gnrc_netif2_t::dev.
+     * Use gnrc_netif_set_from_netdev() to just set options from
+     * gnrc_netif_t::dev.
      *
      * @param[in] netif     The network interface.
      * @param[in] opt       The option parameters.
      *
-     * @return  Number of bytes written to gnrc_netif2_t::dev.
+     * @return  Number of bytes written to gnrc_netif_t::dev.
      * @return  -EOVERFLOW, if @p data_len is greater than the allotted space in
-     *          gnrc_netif2_t::dev or gnrc_netif_t.
+     *          gnrc_netif_t::dev or gnrc_netif_t.
      * @return  -ENOTSUP, if @p opt is not supported to be set.
-     * @return  Any negative error code reported by gnrc_netif2_t::dev.
+     * @return  Any negative error code reported by gnrc_netif_t::dev.
      */
-    int (*set)(gnrc_netif2_t *netif, const gnrc_netapi_opt_t *opt);
+    int (*set)(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt);
 
     /**
      * @brief   Message handler for network interface
@@ -199,7 +199,7 @@ struct gnrc_netif2_ops {
      * @param[in] netif The network interface.
      * @param[in] msg   Message to be handled.
      */
-    void (*msg_handler)(gnrc_netif2_t *netif, msg_t *msg);
+    void (*msg_handler)(gnrc_netif_t *netif, msg_t *msg);
 };
 
 /**
@@ -221,16 +221,16 @@ struct gnrc_netif2_ops {
  *
  * @return  The network interface on success.
  */
-gnrc_netif2_t *gnrc_netif2_create(char *stack, int stacksize, char priority,
-                                  const char *name, netdev_t *dev,
-                                  const gnrc_netif2_ops_t *ops);
+gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
+                                const char *name, netdev_t *dev,
+                                const gnrc_netif_ops_t *ops);
 
 /**
  * @brief   Get number of network interfaces actually allocated
  *
  * @return  Number of network interfaces actually allocated
  */
-unsigned gnrc_netif2_numof(void);
+unsigned gnrc_netif_numof(void);
 
 /**
  * @brief   Iterate over all network interfaces.
@@ -240,7 +240,7 @@ unsigned gnrc_netif2_numof(void);
  * @return  The next network interface after @p prev.
  * @return  NULL, if @p prev was the last network interface.
  */
-gnrc_netif2_t *gnrc_netif2_iter(const gnrc_netif2_t *prev);
+gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev);
 
 /**
  * @brief   Get network interface by PID
@@ -250,34 +250,34 @@ gnrc_netif2_t *gnrc_netif2_iter(const gnrc_netif2_t *prev);
  * @return  The network interface on success.
  * @return  NULL, if no network interface with PID exists.
  */
-gnrc_netif2_t *gnrc_netif2_get_by_pid(kernel_pid_t pid);
+gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
 
 /**
- * @brief   Default operation for gnrc_netif2_ops_t::get()
+ * @brief   Default operation for gnrc_netif_ops_t::get()
  *
  * @note    Can also be used to be called *after* a custom operation.
  *
  * @param[in] netif     The network interface.
  * @param[out] opt      The option parameters.
  *
- * @return  Return value of netdev_driver_t::get() of gnrc_netif2_t::dev of
+ * @return  Return value of netdev_driver_t::get() of gnrc_netif_t::dev of
  *          @p netif.
  */
-int gnrc_netif2_get_from_netdev(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt);
+int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt);
 
 /**
- * @brief   Default operation for gnrc_netif2_ops_t::set()
+ * @brief   Default operation for gnrc_netif_ops_t::set()
  *
  * @note    Can also be used to be called *after* a custom operation.
  *
  * @param[in] netif     The network interface.
  * @param[in] opt       The option parameters.
  *
- * @return  Return value of netdev_driver_t::set() of gnrc_netif2_t::dev of
+ * @return  Return value of netdev_driver_t::set() of gnrc_netif_t::dev of
  *          @p netif.
  */
-int gnrc_netif2_set_from_netdev(gnrc_netif2_t *netif,
-                                const gnrc_netapi_opt_t *opt);
+int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
+                               const gnrc_netapi_opt_t *opt);
 
 /**
  * @brief   Converts a hardware address to a human readable string.
@@ -295,7 +295,7 @@ int gnrc_netif2_set_from_netdev(gnrc_netif2_t *netif,
  *
  * @return  @p out.
  */
-char *gnrc_netif2_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
+char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
 
 /**
  * @brief   Parses a string of colon-separated hexadecimals to a hardware
@@ -306,20 +306,20 @@ char *gnrc_netif2_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
  *
  * @pre `(out != NULL)`
  * @pre @p out **MUST** have allocated at least
- *      @ref GNRC_NETIF2_L2ADDR_MAXLEN bytes.
+ *      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes.
  *
  * @param[in] str       A string of colon-separated hexadecimals.
  * @param[out] out      The resulting hardware address. Must at least have
- *                      @ref GNRC_NETIF2_L2ADDR_MAXLEN bytes allocated.
+ *                      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes allocated.
  *
  * @return  Actual length of @p out on success.
  * @return  0, on failure.
  */
-size_t gnrc_netif2_addr_from_str(const char *str, uint8_t *out);
+size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_NETIF2_H */
+#endif /* NET_GNRC_NETIF_H */
 /** @} */

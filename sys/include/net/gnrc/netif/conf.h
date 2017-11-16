@@ -7,16 +7,16 @@
  */
 
 /**
- * @ingroup net_gnrc_netif2
+ * @ingroup net_gnrc_netif
  * @{
  *
  * @file
- * @brief   Configuration macros for @ref net_gnrc_netif2
+ * @brief   Configuration macros for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF2_CONF_H
-#define NET_GNRC_NETIF2_CONF_H
+#ifndef NET_GNRC_NETIF_CONF_H
+#define NET_GNRC_NETIF_CONF_H
 
 #include "net/ieee802154.h"
 #include "net/ethernet/hdr.h"
@@ -30,7 +30,7 @@ extern "C" {
 /**
  * @brief   Maximum number of network interfaces
  *
- * @note    Intentionally not calling it `GNRC_NETIF2_NUMOF` to not require
+ * @note    Intentionally not calling it `GNRC_NETIF_NUMOF` to not require
  *          rewrites throughout the stack.
  */
 #ifndef GNRC_NETIF_NUMOF
@@ -40,31 +40,31 @@ extern "C" {
 /**
  * @brief   Default priority for network interface threads
  */
-#ifndef GNRC_NETIF2_PRIO
-#define GNRC_NETIF2_PRIO            (THREAD_PRIORITY_MAIN - 5)
+#ifndef GNRC_NETIF_PRIO
+#define GNRC_NETIF_PRIO            (THREAD_PRIORITY_MAIN - 5)
 #endif
 
 /**
  * @brief   Number of multicast addresses needed for @ref net_gnrc_rpl "RPL".
  *
- * @note    Used for calculation of @ref GNRC_NETIF2_IPV6_GROUPS_NUMOF
+ * @note    Used for calculation of @ref GNRC_NETIF_IPV6_GROUPS_NUMOF
  */
 #ifdef MODULE_GNRC_RPL
-#define GNRC_NETIF2_RPL_ADDR        (1)
+#define GNRC_NETIF_RPL_ADDR        (1)
 #else
-#define GNRC_NETIF2_RPL_ADDR        (0)
+#define GNRC_NETIF_RPL_ADDR        (0)
 #endif
 
 /**
  * @brief   Number of multicast addresses needed for a @ref net_gnrc_ipv6 "IPv6"
  *          router
  *
- * @note    Used for calculation of @ref GNRC_NETIF2_IPV6_GROUPS_NUMOF
+ * @note    Used for calculation of @ref GNRC_NETIF_IPV6_GROUPS_NUMOF
  */
 #if GNRC_IPV6_NIB_CONF_ROUTER
-#define GNRC_NETIF2_IPV6_RTR_ADDR   (1)
+#define GNRC_NETIF_IPV6_RTR_ADDR   (1)
 #else
-#define GNRC_NETIF2_IPV6_RTR_ADDR   (0)
+#define GNRC_NETIF_IPV6_RTR_ADDR   (0)
 #endif
 
 /**
@@ -72,18 +72,18 @@ extern "C" {
  *
  * Default: 2 (link-local + corresponding global address)
  */
-#ifndef GNRC_NETIF2_IPV6_ADDRS_NUMOF
-#define GNRC_NETIF2_IPV6_ADDRS_NUMOF    (2)
+#ifndef GNRC_NETIF_IPV6_ADDRS_NUMOF
+#define GNRC_NETIF_IPV6_ADDRS_NUMOF    (2)
 #endif
 
 /**
  * @brief   Maximum number of multicast groups per interface
  *
  * Default: 2 (all-nodes + solicited-nodes of link-local and global unicast
- * address) + @ref GNRC_NETIF2_RPL_ADDR + @ref GNRC_NETIF2_IPV6_RTR_ADDR
+ * address) + @ref GNRC_NETIF_RPL_ADDR + @ref GNRC_NETIF_IPV6_RTR_ADDR
  */
-#ifndef GNRC_NETIF2_IPV6_GROUPS_NUMOF
-#define GNRC_NETIF2_IPV6_GROUPS_NUMOF   (2 + GNRC_NETIF2_RPL_ADDR + GNRC_NETIF2_IPV6_RTR_ADDR)
+#ifndef GNRC_NETIF_IPV6_GROUPS_NUMOF
+#define GNRC_NETIF_IPV6_GROUPS_NUMOF   (2 + GNRC_NETIF_RPL_ADDR + GNRC_NETIF_IPV6_RTR_ADDR)
 #endif
 
 /**
@@ -102,25 +102,25 @@ extern "C" {
  * @note Implementers note: From longest to shortest extend, if new link-layer
  *       address types are included
  */
-#ifndef GNRC_NETIF2_L2ADDR_MAXLEN
+#ifndef GNRC_NETIF_L2ADDR_MAXLEN
 #if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
-#define GNRC_NETIF2_L2ADDR_MAXLEN   (IEEE802154_LONG_ADDRESS_LEN)
+#define GNRC_NETIF_L2ADDR_MAXLEN   (IEEE802154_LONG_ADDRESS_LEN)
 #elif   MODULE_NETDEV_ETH
-#define GNRC_NETIF2_L2ADDR_MAXLEN   (ETHERNET_ADDR_LEN)
+#define GNRC_NETIF_L2ADDR_MAXLEN   (ETHERNET_ADDR_LEN)
 #elif   MODULE_CC110X
-#define GNRC_NETIF2_L2ADDR_MAXLEN   (1U)
+#define GNRC_NETIF_L2ADDR_MAXLEN   (1U)
 #else
-#define GNRC_NETIF2_L2ADDR_MAXLEN   (GNRC_IPV6_NIB_L2ADDR_MAX_LEN)
+#define GNRC_NETIF_L2ADDR_MAXLEN   (GNRC_IPV6_NIB_L2ADDR_MAX_LEN)
 #endif
 #endif
 
-#ifndef GNRC_NETIF2_DEFAULT_HL
-#define GNRC_NETIF2_DEFAULT_HL      (64U)   /**< default hop limit */
+#ifndef GNRC_NETIF_DEFAULT_HL
+#define GNRC_NETIF_DEFAULT_HL      (64U)   /**< default hop limit */
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_NETIF2_CONF_H */
+#endif /* NET_GNRC_NETIF_CONF_H */
 /** @} */

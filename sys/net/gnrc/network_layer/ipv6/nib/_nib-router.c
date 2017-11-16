@@ -15,7 +15,7 @@
 
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ndp2.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan/nd.h"
 
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
@@ -31,33 +31,33 @@
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
-static void _snd_ra(gnrc_netif2_t *netif, const ipv6_addr_t *dst,
+static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                     bool final, _nib_abr_entry_t *abr);
 
 void _handle_reply_rs(_nib_onl_entry_t *host)
 {
-    gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(_nib_onl_get_if(host));
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(host));
 
     assert(netif != NULL);
-    gnrc_netif2_acquire(netif);
-    if (gnrc_netif2_is_rtr_adv(netif)) {
+    gnrc_netif_acquire(netif);
+    if (gnrc_netif_is_rtr_adv(netif)) {
         _snd_rtr_advs(netif, &host->ipv6, false);
     }
-    gnrc_netif2_release(netif);
+    gnrc_netif_release(netif);
 }
 
-void _handle_snd_mc_ra(gnrc_netif2_t *netif)
+void _handle_snd_mc_ra(gnrc_netif_t *netif)
 {
-    gnrc_netif2_acquire(netif);
+    gnrc_netif_acquire(netif);
     assert(netif != NULL);
-    if (!gnrc_netif2_is_6ln(netif)) {
+    if (!gnrc_netif_is_6ln(netif)) {
         bool final_ra = (netif->ipv6.ra_sent > (UINT8_MAX - NDP_MAX_FIN_RA_NUMOF));
         uint32_t next_ra_time = random_uint32_range(NDP_MIN_RA_INTERVAL_MS,
                                                     NDP_MAX_RA_INTERVAL_MS);
 
         /* router has router advertising interface or the RA is one of the
          * (now deactivated) routers final one */
-        if (final_ra || gnrc_netif2_is_rtr_adv(netif)) {
+        if (final_ra || gnrc_netif_is_rtr_adv(netif)) {
             _snd_rtr_advs(netif, NULL, final_ra);
             netif->ipv6.last_ra = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
             if ((netif->ipv6.ra_sent < NDP_MAX_INIT_RA_NUMOF) || final_ra) {
@@ -74,10 +74,10 @@ void _handle_snd_mc_ra(gnrc_netif2_t *netif)
             }
         }
     }
-    gnrc_netif2_release(netif);
+    gnrc_netif_release(netif);
 }
 
-void _snd_rtr_advs(gnrc_netif2_t *netif, const ipv6_addr_t *dst, bool final)
+void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst, bool final)
 {
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
     _nib_abr_entry_t *abr = NULL;
@@ -123,7 +123,7 @@ static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
     return pio;
 }
 
-static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif2_t *netif,
+static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
                                        _nib_abr_entry_t *abr)
 {
     gnrc_pktsnip_t *ext_opts = NULL;
@@ -157,7 +157,7 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif2_t *netif,
             }
         }
     }
-    ltime = (gnrc_netif2_is_6lbr(netif)) ?
+    ltime = (gnrc_netif_is_6lbr(netif)) ?
             (SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT) :
             (abr->valid_until - _now_min());
     (void)ltime;    /* gnrc_sixlowpan_nd_opt_abr_build might evaluate to NOP */
@@ -181,15 +181,15 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif2_t *netif,
     return ext_opts;
 }
 
-void _set_rtr_adv(gnrc_netif2_t *netif)
+void _set_rtr_adv(gnrc_netif_t *netif)
 {
     DEBUG("nib: set RTR_ADV flag for interface %i\n", netif->pid);
     netif->ipv6.ra_sent = 0;
-    netif->flags |= GNRC_NETIF2_FLAGS_IPV6_RTR_ADV;
+    netif->flags |= GNRC_NETIF_FLAGS_IPV6_RTR_ADV;
     _handle_snd_mc_ra(netif);
 }
 
-static void _snd_ra(gnrc_netif2_t *netif, const ipv6_addr_t *dst,
+static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                     bool final, _nib_abr_entry_t *abr)
 {
     gnrc_pktsnip_t *ext_opts = _build_ext_opts(netif, abr);

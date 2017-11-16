@@ -66,10 +66,10 @@ static inline void _set_ar_state(_nib_onl_entry_t *entry, uint16_t state)
  * @param[in] netif     A network interface.
  * @param[in] icmpv6    An ICMPv6 message.
  */
-static inline bool _rtr_sol_on_6lr(const gnrc_netif2_t *netif,
+static inline bool _rtr_sol_on_6lr(const gnrc_netif_t *netif,
                                    const icmpv6_hdr_t *icmpv6)
 {
-    return gnrc_netif2_is_6lr(netif) && (icmpv6->type == ICMPV6_RTR_SOL);
+    return gnrc_netif_is_6lr(netif) && (icmpv6->type == ICMPV6_RTR_SOL);
 }
 
 /**
@@ -90,7 +90,7 @@ static inline bool _rtr_sol_on_6lr(const gnrc_netif2_t *netif,
  * @return  registration status of the address (including
  *          @ref _ADDR_REG_STATUS_TENTATIVE and @ref _ADDR_REG_STATUS_IGNORE).
  */
-uint8_t _reg_addr_upstream(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
+uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                            const icmpv6_hdr_t *icmpv6,
                            const sixlowpan_nd_opt_ar_t *aro,
                            const ndp_opt_t *sl2ao, _nib_onl_entry_t *nce);
@@ -111,17 +111,17 @@ uint8_t _reg_addr_upstream(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
  * @return  registration status of the address (including
  *          @ref _ADDR_REG_STATUS_TENTATIVE and @ref _ADDR_REG_STATUS_IGNORE).
  */
-gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
+gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                                      const ndp_nbr_sol_t *nbr_sol,
                                      const sixlowpan_nd_opt_ar_t *aro,
                                      const ndp_opt_t *sl2ao);
 
 /**
- * @brief   Sets the @ref GNRC_NETIF2_FLAGS_IPV6_RTR_ADV flags of an interface
+ * @brief   Sets the @ref GNRC_NETIF_FLAGS_IPV6_RTR_ADV flags of an interface
  *
  * @param[in] netif The interface.
  */
-void _set_rtr_adv(gnrc_netif2_t *netif);
+void _set_rtr_adv(gnrc_netif_t *netif);
 #else   /* GNRC_IPV6_NIB_CONF_6LR || defined(DOXYGEN) */
 #define _rtr_sol_on_6lr(netif, icmpv6)  (false)
 #define _get_ar_state(nbr)              (_ADDR_REG_STATUS_IGNORE)

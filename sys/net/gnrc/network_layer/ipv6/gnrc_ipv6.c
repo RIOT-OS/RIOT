@@ -28,7 +28,7 @@
 #include "utlist.h"
 
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/whitelist.h"
 #include "net/gnrc/ipv6/blacklist.h"
 
@@ -309,7 +309,7 @@ static void *_event_loop(void *args)
     return NULL;
 }
 
-static void _send_to_iface(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     assert(netif != NULL);
     ((gnrc_netif_hdr_t *)pkt->data)->if_pid = netif->pid;
@@ -324,7 +324,7 @@ static void _send_to_iface(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
 #endif
 
 #ifdef MODULE_GNRC_SIXLOWPAN
-    if (gnrc_netif2_is_6ln(netif)) {
+    if (gnrc_netif_is_6ln(netif)) {
         DEBUG("ipv6: send to 6LoWPAN instead\n");
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_SIXLOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
             DEBUG("ipv6: no 6LoWPAN thread found\n");
@@ -373,7 +373,7 @@ static gnrc_pktsnip_t *_create_netif_hdr(uint8_t *dst_l2addr,
 }
 
 /* functions for sending */
-static void _send_unicast(gnrc_netif2_t *netif, uint8_t *dst_l2addr,
+static void _send_unicast(gnrc_netif_t *netif, uint8_t *dst_l2addr,
                           uint16_t dst_l2addr_len, gnrc_pktsnip_t *pkt)
 {
     DEBUG("ipv6: add interface header to packet\n");
@@ -388,7 +388,7 @@ static void _send_unicast(gnrc_netif2_t *netif, uint8_t *dst_l2addr,
     _send_to_iface(netif, pkt);
 }
 
-static int _fill_ipv6_hdr(gnrc_netif2_t *netif, gnrc_pktsnip_t *ipv6,
+static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6,
                           gnrc_pktsnip_t *payload)
 {
     int res;
@@ -412,7 +412,7 @@ static int _fill_ipv6_hdr(gnrc_netif2_t *netif, gnrc_pktsnip_t *ipv6,
 
     if (hdr->hl == 0) {
         if (netif == NULL) {
-            hdr->hl = GNRC_NETIF2_DEFAULT_HL;
+            hdr->hl = GNRC_NETIF_DEFAULT_HL;
         }
         else {
             hdr->hl = netif->cur_hl;
@@ -424,8 +424,8 @@ static int _fill_ipv6_hdr(gnrc_netif2_t *netif, gnrc_pktsnip_t *ipv6,
             ipv6_addr_set_loopback(&hdr->src);
         }
         else {
-            ipv6_addr_t *src = gnrc_netif2_ipv6_addr_best_src(netif, &hdr->dst,
-                                                              false);
+            ipv6_addr_t *src = gnrc_netif_ipv6_addr_best_src(netif, &hdr->dst,
+                                                             false);
 
             if (src != NULL) {
                 DEBUG("ipv6: set packet source to %s\n",
@@ -448,7 +448,7 @@ static int _fill_ipv6_hdr(gnrc_netif2_t *netif, gnrc_pktsnip_t *ipv6,
     return 0;
 }
 
-static inline void _send_multicast_over_iface(gnrc_netif2_t *netif,
+static inline void _send_multicast_over_iface(gnrc_netif_t *netif,
                                               gnrc_pktsnip_t *pkt)
 {
     DEBUG("ipv6: send multicast over interface %" PRIkernel_pid "\n", netif->pid);
@@ -461,14 +461,14 @@ static inline void _send_multicast_over_iface(gnrc_netif2_t *netif,
     _send_to_iface(netif, pkt);
 }
 
-static void _send_multicast(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt,
+static void _send_multicast(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
                             gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *payload,
                             bool prep_hdr)
 {
     size_t ifnum = 0;
 
     if (netif == NULL) {
-        ifnum = gnrc_netif2_numof();
+        ifnum = gnrc_netif_numof();
         /* throw away packet if no one is interested */
         if (ifnum == 0) {
             DEBUG("ipv6: no interfaces registered, dropping packet\n");
@@ -484,7 +484,7 @@ static void _send_multicast(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt,
         /* send packet to link layer */
         gnrc_pktbuf_hold(pkt, ifnum - 1);
 
-        while ((netif = gnrc_netif2_iter(netif))) {
+        while ((netif = gnrc_netif_iter(netif))) {
             if (prep_hdr) {
                 /* need to get second write access (duplication) to fill IPv6
                  * header interface-local */
@@ -541,7 +541,7 @@ static void _send_multicast(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt,
 #else   /* GNRC_NETIF_NUMOF */
     (void)ifnum; /* not used in this build branch */
     if (netif == NULL) {
-        netif = gnrc_netif2_iter(NULL);
+        netif = gnrc_netif_iter(NULL);
 
         /* allocate interface header */
         if ((pkt = _create_netif_hdr(NULL, 0, pkt)) == NULL) {
@@ -604,17 +604,17 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     hdr = ipv6->data;
     payload = ipv6->next;
 
-    gnrc_netif2_t *netif = (iface == KERNEL_PID_UNDEF) ?
+    gnrc_netif_t *netif = (iface == KERNEL_PID_UNDEF) ?
                             NULL :
-                            gnrc_netif2_get_by_pid(iface);
+                            gnrc_netif_get_by_pid(iface);
     if (ipv6_addr_is_multicast(&hdr->dst)) {
         _send_multicast(netif, pkt, ipv6, payload, prep_hdr);
     }
     else if ((ipv6_addr_is_loopback(&hdr->dst)) ||      /* dst is loopback address */
              ((iface == KERNEL_PID_UNDEF) && /* or dst registered to any local interface */
-              ((netif = gnrc_netif2_get_by_ipv6_addr(&hdr->dst)) != NULL)
+              ((netif = gnrc_netif_get_by_ipv6_addr(&hdr->dst)) != NULL)
              ) || ((iface != KERNEL_PID_UNDEF) && /* or dst registered to given interface */
-              (gnrc_netif2_ipv6_addr_idx(netif, &hdr->dst) > 0)
+              (gnrc_netif_ipv6_addr_idx(netif, &hdr->dst) > 0)
              )) {
         uint8_t *rcv_data;
         gnrc_pktsnip_t *ptr = ipv6, *rcv_pkt;
@@ -655,7 +655,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
     }
     else {
         gnrc_ipv6_nib_nc_t nce;
-        gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(iface);
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
 
         if (gnrc_ipv6_nib_get_next_hop_l2addr(&hdr->dst, netif, pkt,
                                               &nce) < 0) {
@@ -663,7 +663,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
             return;
         }
         iface = gnrc_ipv6_nib_nc_get_iface(&nce);
-        netif = gnrc_netif2_get_by_pid(iface);
+        netif = gnrc_netif_get_by_pid(iface);
         assert(netif != NULL);
         if (prep_hdr) {
             if (_fill_ipv6_hdr(netif, ipv6, payload) < 0) {
@@ -686,7 +686,7 @@ static inline bool _pkt_not_for_me(kernel_pid_t *iface, ipv6_hdr_t *hdr)
     }
     else if ((!ipv6_addr_is_link_local(&hdr->dst)) ||
              (*iface == KERNEL_PID_UNDEF)) {
-        gnrc_netif2_t *netif = gnrc_netif2_get_by_ipv6_addr(&hdr->dst);
+        gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(&hdr->dst);
         if (*iface == KERNEL_PID_UNDEF) {
             /* Use original interface for reply if existent */
             *iface = (netif != NULL) ? netif->pid : KERNEL_PID_UNDEF;
@@ -694,7 +694,7 @@ static inline bool _pkt_not_for_me(kernel_pid_t *iface, ipv6_hdr_t *hdr)
         return (netif == NULL);
     }
     else {
-        return (gnrc_netif2_get_by_ipv6_addr(&hdr->dst) == NULL);
+        return (gnrc_netif_get_by_ipv6_addr(&hdr->dst) == NULL);
     }
 }
 
@@ -713,7 +713,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
 #ifdef MODULE_NETSTATS_IPV6
         assert(iface);
-        netstats_t *stats = &(gnrc_netif2_get_by_pid(iface)->ipv6.stats);
+        netstats_t *stats = &(gnrc_netif_get_by_pid(iface)->ipv6.stats);
         stats->rx_count++;
         stats->rx_bytes += (gnrc_pkt_len(pkt) - netif->size);
 #endif

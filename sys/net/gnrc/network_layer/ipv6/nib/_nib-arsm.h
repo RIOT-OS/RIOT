@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 #include "net/gnrc/ipv6/nib/conf.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/ndp.h"
 #include "net/icmpv6.h"
 
@@ -48,7 +48,7 @@ extern "C" {
  * @param[in] dst       Destination address for neighbor solicitation. May not
  *                      be NULL.
  */
-void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
+void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
              const ipv6_addr_t *src, const ipv6_addr_t *dst);
 
 /**
@@ -78,7 +78,7 @@ void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset);
  * @param[in] icmpv6    ICMPv6 header of the message carrying the SL2AO.
  * @param[in] sl2ao     The SL2AO
  */
-void _handle_sl2ao(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
+void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                    const icmpv6_hdr_t *icmpv6, const ndp_opt_t *sl2ao);
 
 #if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
@@ -121,7 +121,7 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset);
  * @param[in] tl2ao     The TL2AO carrying the link-layer information. May be
  *                      NULL for link-layers without addresses.
  */
-void _handle_adv_l2(gnrc_netif2_t *netif, _nib_onl_entry_t *nce,
+void _handle_adv_l2(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
                     const icmpv6_hdr_t *icmpv6, const ndp_opt_t *tl2ao);
 
 
@@ -133,7 +133,7 @@ void _handle_adv_l2(gnrc_netif2_t *netif, _nib_onl_entry_t *nce,
  *
  * @param[in] netif Interface to set reachable time for.
  */
-void _recalc_reach_time(gnrc_netif2_ipv6_t *netif);
+void _recalc_reach_time(gnrc_netif_ipv6_t *netif);
 
 /**
  * @brief   Sets a neighbor cache entry reachable and starts the required
@@ -142,14 +142,14 @@ void _recalc_reach_time(gnrc_netif2_ipv6_t *netif);
  * @param[in] netif Interface to the NCE
  * @param[in] nce   The neighbor cache entry to set reachable
  */
-void _set_reachable(gnrc_netif2_t *netif, _nib_onl_entry_t *nce);
+void _set_reachable(gnrc_netif_t *netif, _nib_onl_entry_t *nce);
 
 /**
  * @brief   Initializes interface for address registration state machine
  *
  * @param[in] netif An interface
  */
-static inline void _init_iface_arsm(gnrc_netif2_t *netif)
+static inline void _init_iface_arsm(gnrc_netif_t *netif)
 {
     netif->ipv6.reach_time_base = NDP_REACH_MS;
     _recalc_reach_time(&netif->ipv6);
@@ -175,7 +175,7 @@ static inline uint16_t _get_nud_state(_nib_onl_entry_t *nbr)
  * @param[in] nbr   Neighbor cache entry representing the neighbor.
  * @param[in] state Neighbor unreachability state for the neighbor.
  */
-void _set_nud_state(gnrc_netif2_t *netif, _nib_onl_entry_t *nbr,
+void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nbr,
                     uint16_t state);
 
 #else   /* GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN) */

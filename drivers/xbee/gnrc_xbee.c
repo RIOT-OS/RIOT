@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_gnrc_netif2
+ * @ingroup     net_gnrc_netif
  * @{
  *
  * @file
@@ -21,14 +21,14 @@
 #include "assert.h"
 #include "xbee.h"
 #include "net/gnrc.h"
-#include "gnrc_netif2_xbee.h"
+#include "gnrc_netif_xbee.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define BCAST   (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)
 
-static gnrc_pktsnip_t *xbee_adpt_recv(gnrc_netif2_t *netif)
+static gnrc_pktsnip_t *xbee_adpt_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     int pktlen;
@@ -100,7 +100,7 @@ static gnrc_pktsnip_t *xbee_adpt_recv(gnrc_netif2_t *netif)
     return payload;
 }
 
-static int xbee_adpt_send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     int res;
     size_t size;
@@ -173,17 +173,17 @@ static int xbee_adpt_send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
     return res;
 }
 
-static const gnrc_netif2_ops_t _xbee_ops = {
+static const gnrc_netif_ops_t _xbee_ops = {
     .send = xbee_adpt_send,
     .recv = xbee_adpt_recv,
-    .get = gnrc_netif2_get_from_netdev,
-    .set = gnrc_netif2_set_from_netdev,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif2_t *gnrc_netif2_xbee_create(char *stack, int stacksize,
-                                       char priority, char *name,
-                                       netdev_t *dev)
+gnrc_netif_t *gnrc_netif_xbee_create(char *stack, int stacksize,
+                                     char priority, char *name,
+                                     netdev_t *dev)
 {
-    return gnrc_netif2_create(stack, stacksize, priority, name,
-                              dev, &_xbee_ops);
+    return gnrc_netif_create(stack, stacksize, priority, name,
+                             dev, &_xbee_ops);
 }

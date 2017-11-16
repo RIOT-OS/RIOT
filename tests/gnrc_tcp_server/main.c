@@ -11,7 +11,7 @@
 #include "thread.h"
 #include "net/af.h"
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/tcp.h"
 
 #define ENABLE_DEBUG (0)
@@ -41,16 +41,16 @@ uint8_t bufs[CONNS][NBYTE];
 uint8_t stacks[CONNS][THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF];
 
 /* "ifconfig" shell command */
-extern int _gnrc_netif2_config(int argc, char **argv);
+extern int _gnrc_netif_config(int argc, char **argv);
 
 /* Server thread */
 void *srv_thread(void *arg);
 
 int main(void)
 {
-    gnrc_netif2_t *netif;
+    gnrc_netif_t *netif;
 
-    if (!(netif = gnrc_netif2_iter(NULL))) {
+    if (!(netif = gnrc_netif_iter(NULL))) {
         printf("No valid network interface found\n");
         return -1;
     }
@@ -58,7 +58,7 @@ int main(void)
     /* Set pre-configured IP address */
     char if_pid[] = {netif->pid + '0', '\0'};
     char *cmd[] = {"ifconfig", if_pid, "add", "unicast", LOCAL_ADDR};
-    _gnrc_netif2_config(5, cmd);
+    _gnrc_netif_config(5, cmd);
 
     /* Test configuration */
     printf("\nStarting server: LOCAL_ADDR=%s, LOCAL_PORT=%d, ", LOCAL_ADDR, LOCAL_PORT);

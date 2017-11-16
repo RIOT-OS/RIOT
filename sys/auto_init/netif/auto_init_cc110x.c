@@ -22,7 +22,7 @@
 #include "log.h"
 #include "debug.h"
 #include "board.h"
-#include "gnrc_netif2_cc110x.h"
+#include "gnrc_netif_cc110x.h"
 #include "cc110x-netdev.h"
 #include "net/gnrc.h"
 
@@ -35,7 +35,7 @@
  */
 #define CC110X_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #ifndef CC110X_MAC_PRIO
-#define CC110X_MAC_PRIO          (GNRC_NETIF2_PRIO)
+#define CC110X_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
 #define CC110X_NUM (sizeof(cc110x_params)/sizeof(cc110x_params[0]))
@@ -55,9 +55,9 @@ void auto_init_cc110x(void)
             LOG_ERROR("[auto_init_netif] error initializing cc110x #%u\n", i);
         }
         else {
-            gnrc_netif2_cc110x_create(_stacks[i], CC110X_MAC_STACKSIZE,
-                                      CC110X_MAC_PRIO, "cc110x",
-                                      (netdev_t *)&cc110x_devs[i]);
+            gnrc_netif_cc110x_create(_stacks[i], CC110X_MAC_STACKSIZE,
+                                     CC110X_MAC_PRIO, "cc110x",
+                                     (netdev_t *)&cc110x_devs[i]);
         }
     }
 }

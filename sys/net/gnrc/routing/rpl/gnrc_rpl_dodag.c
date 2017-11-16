@@ -18,7 +18,7 @@
 #include <stdbool.h>
 #include "net/af.h"
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/rpl/dodag.h"
 #include "net/gnrc/rpl/structs.h"
 #include "utlist.h"
@@ -363,7 +363,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
         return NULL;
     }
 
-    gnrc_netif2_t *netif;
+    gnrc_netif_t *netif;
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
     kernel_pid_t iface;
@@ -374,7 +374,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
         return NULL;
     }
 
-    if ((netif = gnrc_netif2_get_by_ipv6_addr(dodag_id)) == NULL) {
+    if ((netif = gnrc_netif_get_by_ipv6_addr(dodag_id)) == NULL) {
         DEBUG("RPL: no IPv6 address configured to match the given dodag id: %s\n",
               ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
         return NULL;

@@ -7,29 +7,29 @@
  */
 
 /**
- * @ingroup net_gnrc_netif2
+ * @ingroup net_gnrc_netif
  * @{
  *
  * @file
- * @brief   CC110x adaption for @ref net_gnrc_netif2
+ * @brief   CC110x adaption for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef GNRC_NETIF2_CC110X_H
-#define GNRC_NETIF2_CC110X_H
+#ifndef GNRC_NETIF_CC110X_H
+#define GNRC_NETIF_CC110X_H
 
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-gnrc_netif2_t *gnrc_netif2_cc110x_create(char *stack, int stacksize, char priority,
-                                         char *name, netdev_t *dev);
+gnrc_netif_t *gnrc_netif_cc110x_create(char *stack, int stacksize, char priority,
+                                       char *name, netdev_t *dev);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_NETIF2_CC110X_H */
+#endif /* GNRC_NETIF_CC110X_H */
 /** @} */

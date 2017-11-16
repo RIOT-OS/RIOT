@@ -24,7 +24,7 @@
 #include "msg.h"
 #include "shell.h"
 #include "ccn-lite-riot.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 /* main thread's message queue */
 #define MAIN_QUEUE_SIZE     (8)
@@ -46,10 +46,10 @@ int main(void)
     ccnl_start();
 
     /* get the default interface */
-    gnrc_netif2_t *netif;
+    gnrc_netif_t *netif;
 
     /* set the relay's PID, configure the interface to use CCN nettype */
-    if (((netif = gnrc_netif2_iter(NULL)) == NULL) ||
+    if (((netif = gnrc_netif_iter(NULL)) == NULL) ||
         (ccnl_open_netif(netif->pid, GNRC_NETTYPE_CCN) < 0)) {
         puts("Error registering at network interface!");
         return -1;

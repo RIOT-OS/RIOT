@@ -22,7 +22,7 @@
 #include "log.h"
 #include "debug.h"
 #include "encx24j600.h"
-#include "net/gnrc/netif2/ethernet.h"
+#include "net/gnrc/netif/ethernet.h"
 
 static encx24j600_t encx24j600;
 
@@ -32,7 +32,7 @@ static encx24j600_t encx24j600;
  */
 #define ENCX24J600_MAC_STACKSIZE    (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #ifndef ENCX24J600_MAC_PRIO
-#define ENCX24J600_MAC_PRIO         (GNRC_NETIF2_PRIO)
+#define ENCX24J600_MAC_PRIO         (GNRC_NETIF_PRIO)
 #endif
 
 /**
@@ -52,9 +52,9 @@ void auto_init_encx24j600(void)
     encx24j600_setup(&encx24j600, &p);
 
     /* initialize netdev<->gnrc adapter state */
-    gnrc_netif2_ethernet_create(_netdev_eth_stack, ENCX24J600_MAC_STACKSIZE,
-                                ENCX24J600_MAC_PRIO, "encx24j600",
-                                (netdev_t *)&encx24j600);
+    gnrc_netif_ethernet_create(_netdev_eth_stack, ENCX24J600_MAC_STACKSIZE,
+                               ENCX24J600_MAC_PRIO, "encx24j600",
+                               (netdev_t *)&encx24j600);
 }
 
 #else

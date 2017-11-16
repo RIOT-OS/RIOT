@@ -7,23 +7,23 @@
  */
 
 /**
- * @ingroup net_gnrc_netif2
+ * @ingroup net_gnrc_netif
  * @{
  *
  * @file
- * @brief   IPv6 defintions for @ref net_gnrc_netif2
+ * @brief   IPv6 defintions for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF2_IPV6_H
-#define NET_GNRC_NETIF2_IPV6_H
+#ifndef NET_GNRC_NETIF_IPV6_H
+#define NET_GNRC_NETIF_IPV6_H
 
 #include "evtimer_msg.h"
 #include "net/ipv6/addr.h"
 #ifdef MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib/conf.h"
 #endif
-#include "net/gnrc/netif2/conf.h"
+#include "net/gnrc/netif/conf.h"
 #ifdef MODULE_NETSTATS_IPV6
 #include "net/netstats.h"
 #endif
@@ -34,67 +34,67 @@ extern "C" {
 
 /**
  * @name    IPv6 unicast and anycast address flags
- * @anchor  net_gnrc_netif2_ipv6_addrs_flags
+ * @anchor  net_gnrc_netif_ipv6_addrs_flags
  * @{
  */
 /**
  * @brief   Mask for the address' state
  */
-#define GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_MASK             (0x1fU)
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK             (0x1fU)
 
 /**
  * @brief   Tentative states (with encoded DAD retransmissions)
  *
  * The retransmissions of DAD transmits can be decoded from this state by
- * applying it as a mask to the [flags](gnrc_netif2_ipv6_t::addrs_flags) of the
+ * applying it as a mask to the [flags](gnrc_netif_ipv6_t::addrs_flags) of the
  * address.
  */
-#define GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_TENTATIVE        (0x07U)
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE        (0x07U)
 
 /**
  * @brief   Deprecated address state (still valid, but not preferred)
  */
-#define GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_DEPRECATED       (0x08U)
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED       (0x08U)
 
 /**
  * @brief   Valid address state
  */
-#define GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID            (0x10U)
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID            (0x10U)
 
 /**
  * @brief   Address is an anycast address
  */
-#define GNRC_NETIF2_IPV6_ADDRS_FLAGS_ANYCAST                (0x20U)
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST                (0x20U)
 /** @} */
 
 /**
- * @brief   IPv6 component for @ref gnrc_netif2_t
+ * @brief   IPv6 component for @ref gnrc_netif_t
  *
  * @note only available with @ref net_gnrc_ipv6.
  */
 typedef struct {
     /**
-     * @brief   Flags for gnrc_netif2_t::ipv6_addrs
+     * @brief   Flags for gnrc_netif_t::ipv6_addrs
      *
-     * @see net_gnrc_netif2_ipv6_addrs_flags
+     * @see net_gnrc_netif_ipv6_addrs_flags
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      */
-    uint8_t addrs_flags[GNRC_NETIF2_IPV6_ADDRS_NUMOF];
+    uint8_t addrs_flags[GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
     /**
      * @brief   IPv6 unicast and anycast addresses of the interface
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      */
-    ipv6_addr_t addrs[GNRC_NETIF2_IPV6_ADDRS_NUMOF];
+    ipv6_addr_t addrs[GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
     /**
      * @brief   IPv6 multicast groups of the interface
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      */
-    ipv6_addr_t groups[GNRC_NETIF2_IPV6_GROUPS_NUMOF];
+    ipv6_addr_t groups[GNRC_NETIF_IPV6_GROUPS_NUMOF];
 #ifdef MODULE_NETSTATS_IPV6
     /**
      * @brief IPv6 packet statistics
@@ -158,7 +158,7 @@ typedef struct {
      * @note    Might also be usable in the later default SLAAC implementation
      *          for NS retransmission timers.
      */
-    evtimer_msg_event_t addrs_timers[GNRC_NETIF2_IPV6_ADDRS_NUMOF];
+    evtimer_msg_event_t addrs_timers[GNRC_NETIF_IPV6_ADDRS_NUMOF];
 #endif
 
 #if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
@@ -175,7 +175,7 @@ typedef struct {
 #if GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN)
     /**
      * @brief   Base for random reachable time calculation and advertised
-     *          reachable time in ms (if @ref GNRC_NETIF2_FLAGS_IPV6_RTR_ADV is
+     *          reachable time in ms (if @ref GNRC_NETIF_FLAGS_IPV6_RTR_ADV is
      *          set)
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
@@ -251,11 +251,11 @@ typedef struct {
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6".
      */
     uint16_t mtu;
-} gnrc_netif2_ipv6_t;
+} gnrc_netif_ipv6_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_NETIF2_IPV6_H */
+#endif /* NET_GNRC_NETIF_IPV6_H */
 /** @} */

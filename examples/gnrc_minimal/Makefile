@@ -25,8 +25,8 @@ USEMODULE += gnrc_icmpv6_echo
 # Use minimal standard PRNG
 USEMODULE += prng_minstd
 
-CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_NETIF2_IPV6_ADDRS_NUMOF=2 \
-          -DGNRC_NETIF2_IPV6_GROUPS_NUMOF=2 -DGNRC_IPV6_NC_SIZE=1
+CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_NETIF_IPV6_ADDRS_NUMOF=2 \
+          -DGNRC_NETIF_IPV6_GROUPS_NUMOF=2 -DGNRC_IPV6_NC_SIZE=1
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

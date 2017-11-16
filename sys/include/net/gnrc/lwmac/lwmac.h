@@ -74,7 +74,7 @@
 #define NET_GNRC_LWMAC_LWMAC_H
 
 #include "kernel_types.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -306,14 +306,14 @@ extern "C" {
  * @param[in] name      Name for the LWMAC network interface. May be NULL.
  * @param[in] dev       Device for the interface
  *
- * @see @ref gnrc_netif2_create()
+ * @see @ref gnrc_netif_create()
  *
  * @return  The network interface on success.
  * @return  NULL, on error.
  */
-gnrc_netif2_t *gnrc_netif2_lwmac_create(char *stack, int stacksize,
-                                        char priority, char *name,
-                                        netdev_t *dev);
+gnrc_netif_t *gnrc_netif_lwmac_create(char *stack, int stacksize,
+                                      char priority, char *name,
+                                      netdev_t *dev);
 #ifdef __cplusplus
 }
 #endif

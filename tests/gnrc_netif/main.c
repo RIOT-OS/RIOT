@@ -29,10 +29,10 @@
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6/hdr.h"
 #include "net/gnrc/netif/hdr.h"
-#include "net/gnrc/netif2.h"
-#include "net/gnrc/netif2/ethernet.h"
-#include "net/gnrc/netif2/ieee802154.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif.h"
+#include "net/gnrc/netif/ethernet.h"
+#include "net/gnrc/netif/ieee802154.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/netdev_test.h"
 #include "utlist.h"
 #include "xtimer.h"
@@ -40,17 +40,17 @@
 #define ETHERNET_STACKSIZE          (THREAD_STACKSIZE_MAIN)
 #define IEEE802154_STACKSIZE        (THREAD_STACKSIZE_MAIN)
 
-static gnrc_netif2_t *ethernet_netif = NULL;
-static gnrc_netif2_t *ieee802154_netif = NULL;
-static gnrc_netif2_t *netifs[DEFAULT_DEVS_NUMOF];
+static gnrc_netif_t *ethernet_netif = NULL;
+static gnrc_netif_t *ieee802154_netif = NULL;
+static gnrc_netif_t *netifs[DEFAULT_DEVS_NUMOF];
 static char ethernet_netif_stack[ETHERNET_STACKSIZE];
 static char ieee802154_netif_stack[ETHERNET_STACKSIZE];
 static char netifs_stack[DEFAULT_DEVS_NUMOF][THREAD_STACKSIZE_DEFAULT];
 static bool init_called = false;
 
-static inline void _test_init(gnrc_netif2_t *netif);
-static inline int _mock_netif_send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt);
-static inline gnrc_pktsnip_t *_mock_netif_recv(gnrc_netif2_t * netif);
+static inline void _test_init(gnrc_netif_t *netif);
+static inline int _mock_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
+static inline gnrc_pktsnip_t *_mock_netif_recv(gnrc_netif_t * netif);
 static int _get_netdev_address(netdev_t *dev, void *value, size_t max_len);
 static int _set_netdev_address(netdev_t *dev, const void *value,
                                size_t value_len);
@@ -61,12 +61,12 @@ static int _get_netdev_src_len(netdev_t *dev, void *value, size_t max_len);
 static int _set_netdev_src_len(netdev_t *dev, const void *value,
                                size_t value_len);
 
-static const gnrc_netif2_ops_t default_ops = {
+static const gnrc_netif_ops_t default_ops = {
     .init = _test_init,
     .send = _mock_netif_send,
     .recv = _mock_netif_recv,
-    .get = gnrc_netif2_get_from_netdev,
-    .set = gnrc_netif2_set_from_netdev,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
     .msg_handler = NULL,
 };
 
@@ -102,7 +102,7 @@ static void _set_up(void)
     while (msg_try_receive(&msg) > 0) {}
 }
 
-static inline void _test_init(gnrc_netif2_t *netif)
+static inline void _test_init(gnrc_netif_t *netif)
 {
     (void)netif;
     init_called = true;
@@ -110,21 +110,21 @@ static inline void _test_init(gnrc_netif2_t *netif)
 
 static void test_creation(void)
 {
-    gnrc_netif2_t *ptr = NULL;
+    gnrc_netif_t *ptr = NULL;
 
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_numof());
-    TEST_ASSERT_NULL(gnrc_netif2_iter(ptr));
-    TEST_ASSERT_NOT_NULL((ethernet_netif = gnrc_netif2_ethernet_create(
-            ethernet_netif_stack, ETHERNET_STACKSIZE, GNRC_NETIF2_PRIO,
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_numof());
+    TEST_ASSERT_NULL(gnrc_netif_iter(ptr));
+    TEST_ASSERT_NOT_NULL((ethernet_netif = gnrc_netif_ethernet_create(
+            ethernet_netif_stack, ETHERNET_STACKSIZE, GNRC_NETIF_PRIO,
             "eth", ethernet_dev
         )));
-    TEST_ASSERT_EQUAL_INT(1, gnrc_netif2_numof());
-    TEST_ASSERT_NOT_NULL((ptr = gnrc_netif2_iter(ptr)));
-    TEST_ASSERT_NULL((ptr = gnrc_netif2_iter(ptr)));
+    TEST_ASSERT_EQUAL_INT(1, gnrc_netif_numof());
+    TEST_ASSERT_NOT_NULL((ptr = gnrc_netif_iter(ptr)));
+    TEST_ASSERT_NULL((ptr = gnrc_netif_iter(ptr)));
     TEST_ASSERT_NOT_NULL(ethernet_netif->ops);
     TEST_ASSERT_NOT_NULL(ethernet_netif->dev);
     TEST_ASSERT_EQUAL_INT(ETHERNET_DATA_LEN, ethernet_netif->ipv6.mtu);
-    TEST_ASSERT_EQUAL_INT(GNRC_NETIF2_DEFAULT_HL, ethernet_netif->cur_hl);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETIF_DEFAULT_HL, ethernet_netif->cur_hl);
     TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_ETHERNET, ethernet_netif->device_type);
     TEST_ASSERT(ethernet_netif->pid > KERNEL_PID_UNDEF);
 #ifdef DEVELHELP
@@ -132,20 +132,20 @@ static void test_creation(void)
 #endif
     TEST_ASSERT_NOT_NULL(sched_threads[ethernet_netif->pid]->msg_array);
 
-    TEST_ASSERT_NOT_NULL((ieee802154_netif = gnrc_netif2_ieee802154_create(
-            ieee802154_netif_stack, IEEE802154_STACKSIZE, GNRC_NETIF2_PRIO,
+    TEST_ASSERT_NOT_NULL((ieee802154_netif = gnrc_netif_ieee802154_create(
+            ieee802154_netif_stack, IEEE802154_STACKSIZE, GNRC_NETIF_PRIO,
             "wpan", ieee802154_dev
         )));
-    TEST_ASSERT_EQUAL_INT(2, gnrc_netif2_numof());
-    TEST_ASSERT_NOT_NULL((ptr = gnrc_netif2_iter(ptr)));
-    TEST_ASSERT_NOT_NULL((ptr = gnrc_netif2_iter(ptr)));
-    TEST_ASSERT_NULL((ptr = gnrc_netif2_iter(ptr)));
+    TEST_ASSERT_EQUAL_INT(2, gnrc_netif_numof());
+    TEST_ASSERT_NOT_NULL((ptr = gnrc_netif_iter(ptr)));
+    TEST_ASSERT_NOT_NULL((ptr = gnrc_netif_iter(ptr)));
+    TEST_ASSERT_NULL((ptr = gnrc_netif_iter(ptr)));
     TEST_ASSERT_NOT_NULL(ieee802154_netif->ops);
     TEST_ASSERT_NOT_NULL(ieee802154_netif->dev);
     TEST_ASSERT_EQUAL_INT(IPV6_MIN_MTU, ieee802154_netif->ipv6.mtu);
     TEST_ASSERT_EQUAL_INT(TEST_IEEE802154_MAX_FRAG_SIZE,
                           ieee802154_netif->sixlo.max_frag_size);
-    TEST_ASSERT_EQUAL_INT(GNRC_NETIF2_DEFAULT_HL, ieee802154_netif->cur_hl);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETIF_DEFAULT_HL, ieee802154_netif->cur_hl);
     TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_IEEE802154,
                           ieee802154_netif->device_type);
     TEST_ASSERT(ieee802154_netif->pid > KERNEL_PID_UNDEF);
@@ -155,31 +155,31 @@ static void test_creation(void)
     TEST_ASSERT_NOT_NULL(sched_threads[ieee802154_netif->pid]->msg_array);
 
     for (unsigned i = 0; i < DEFAULT_DEVS_NUMOF; i++) {
-        TEST_ASSERT_NOT_NULL((netifs[i] = gnrc_netif2_create(
+        TEST_ASSERT_NOT_NULL((netifs[i] = gnrc_netif_create(
                 netifs_stack[i], THREAD_STACKSIZE_DEFAULT,
-                GNRC_NETIF2_PRIO, "netif", devs[i], &default_ops
+                GNRC_NETIF_PRIO, "netif", devs[i], &default_ops
             )));
         TEST_ASSERT_NOT_NULL(netifs[i]->ops);
         TEST_ASSERT_NOT_NULL(netifs[i]->dev);
-        TEST_ASSERT_EQUAL_INT(GNRC_NETIF2_DEFAULT_HL, netifs[i]->cur_hl);
+        TEST_ASSERT_EQUAL_INT(GNRC_NETIF_DEFAULT_HL, netifs[i]->cur_hl);
         TEST_ASSERT_EQUAL_INT(NETDEV_TYPE_UNKNOWN, netifs[i]->device_type);
         TEST_ASSERT(netifs[i]->pid > KERNEL_PID_UNDEF);
         TEST_ASSERT_NOT_NULL(sched_threads[netifs[i]->pid]->msg_array);
-        TEST_ASSERT_EQUAL_INT(i + SPECIAL_DEVS + 1, gnrc_netif2_numof());
+        TEST_ASSERT_EQUAL_INT(i + SPECIAL_DEVS + 1, gnrc_netif_numof());
         for (unsigned j = 0; j < (i + SPECIAL_DEVS + 1); j++) {
-            TEST_ASSERT_NOT_NULL((ptr = gnrc_netif2_iter(ptr)));
+            TEST_ASSERT_NOT_NULL((ptr = gnrc_netif_iter(ptr)));
         }
-        TEST_ASSERT_NULL((ptr = gnrc_netif2_iter(ptr)));
+        TEST_ASSERT_NULL((ptr = gnrc_netif_iter(ptr)));
     }
     TEST_ASSERT(init_called);
 }
 
 static void test_get_by_pid(void)
 {
-    TEST_ASSERT(ethernet_netif == gnrc_netif2_get_by_pid(ethernet_netif->pid));
-    TEST_ASSERT(ieee802154_netif == gnrc_netif2_get_by_pid(ieee802154_netif->pid));
+    TEST_ASSERT(ethernet_netif == gnrc_netif_get_by_pid(ethernet_netif->pid));
+    TEST_ASSERT(ieee802154_netif == gnrc_netif_get_by_pid(ieee802154_netif->pid));
     for (kernel_pid_t i = 0; i < DEFAULT_DEVS_NUMOF; i++) {
-        TEST_ASSERT(netifs[i] == gnrc_netif2_get_by_pid(netifs[i]->pid));
+        TEST_ASSERT(netifs[i] == gnrc_netif_get_by_pid(netifs[i]->pid));
     }
 }
 
@@ -191,22 +191,22 @@ static void test_addr_to_str(void)
     static const uint8_t netif0_l2addr[] = NETIF0_SRC;
     char out[sizeof(netif0_l2addr) * 3];
 
-    TEST_ASSERT(out == gnrc_netif2_addr_to_str(NULL, 0, out));
+    TEST_ASSERT(out == gnrc_netif_addr_to_str(NULL, 0, out));
     TEST_ASSERT_EQUAL_STRING("", &out[0]);
-    TEST_ASSERT(out == gnrc_netif2_addr_to_str(ethernet_l2addr,
-                                               sizeof(ethernet_l2addr), out));
+    TEST_ASSERT(out == gnrc_netif_addr_to_str(ethernet_l2addr,
+                                              sizeof(ethernet_l2addr), out));
     TEST_ASSERT_EQUAL_STRING("3e:e6:b5:22:fd:0a", &out[0]);
-    TEST_ASSERT(out == gnrc_netif2_addr_to_str(ieee802154_l2addr_long,
-                                               sizeof(ieee802154_l2addr_long),
-                                               out));
+    TEST_ASSERT(out == gnrc_netif_addr_to_str(ieee802154_l2addr_long,
+                                              sizeof(ieee802154_l2addr_long),
+                                              out));
     TEST_ASSERT_EQUAL_STRING("3e:e6:b5:0f:19:22:fd:0a", &out[0]);
-    TEST_ASSERT(out == gnrc_netif2_addr_to_str(ieee802154_l2addr_short,
-                                               sizeof(ieee802154_l2addr_short),
-                                               out));
+    TEST_ASSERT(out == gnrc_netif_addr_to_str(ieee802154_l2addr_short,
+                                              sizeof(ieee802154_l2addr_short),
+                                              out));
     TEST_ASSERT_EQUAL_STRING("fd:0a", &out[0]);
-    TEST_ASSERT(out == gnrc_netif2_addr_to_str(netif0_l2addr,
-                                               sizeof(netif0_l2addr),
-                                               out));
+    TEST_ASSERT(out == gnrc_netif_addr_to_str(netif0_l2addr,
+                                              sizeof(netif0_l2addr),
+                                              out));
     TEST_ASSERT_EQUAL_STRING("3e:e7:b5:0f:19:22:fd:0a", &out[0]);
 }
 
@@ -215,20 +215,20 @@ static void test_addr_from_str(void)
     static const uint8_t ethernet_l2addr[] = ETHERNET_SRC;
     static const uint8_t ieee802154_l2addr_long[] = IEEE802154_LONG_SRC;
     static const uint8_t ieee802154_l2addr_short[] = IEEE802154_SHORT_SRC;
-    uint8_t out[GNRC_NETIF2_L2ADDR_MAXLEN];
+    uint8_t out[GNRC_NETIF_L2ADDR_MAXLEN];
 
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_addr_from_str("", out));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_addr_from_str("", out));
     TEST_ASSERT_EQUAL_INT(sizeof(ethernet_l2addr),
-                          gnrc_netif2_addr_from_str("3e:e6:b5:22:fd:0a", out));
+                          gnrc_netif_addr_from_str("3e:e6:b5:22:fd:0a", out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ethernet_l2addr, out,
                                     sizeof(ethernet_l2addr)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_long),
-                          gnrc_netif2_addr_from_str("3e:e6:b5:0f:19:22:fd:0a",
-                                                    out));
+                          gnrc_netif_addr_from_str("3e:e6:b5:0f:19:22:fd:0a",
+                                                   out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_long, out,
                                     sizeof(ieee802154_l2addr_long)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_short),
-                          gnrc_netif2_addr_from_str("fd:0a", out));
+                          gnrc_netif_addr_from_str("fd:0a", out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_short, out,
                                     sizeof(ieee802154_l2addr_short)));
 }
@@ -237,14 +237,14 @@ static void test_ipv6_addr_add__ENOMEM(void)
 {
     ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
 
-    for (unsigned i = 0; i < GNRC_NETIF2_IPV6_ADDRS_NUMOF;
+    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF;
          i++, addr.u16[3].u16++) {
-        TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                                   GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
+        TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                                  GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM,
-                          gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                                    GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
+                          gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                                   GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
 }
 
 static void test_ipv6_addr_add__success(void)
@@ -252,13 +252,13 @@ static void test_ipv6_addr_add__success(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_LL };
     int idx;
 
-    TEST_ASSERT(0 <= (idx = gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                                      GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID)));
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                                     GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)));
     /* check duplicate addition */
     TEST_ASSERT_EQUAL_INT(idx,
-                          gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                                    GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
-    TEST_ASSERT_EQUAL_INT(GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID,
+                          gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                                   GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
+    TEST_ASSERT_EQUAL_INT(GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID,
                           netifs[0]->ipv6.addrs_flags[idx]);
     TEST_ASSERT(ipv6_addr_equal(&addr, &netifs[0]->ipv6.addrs[idx]));
 }
@@ -270,14 +270,14 @@ static void test_ipv6_addr_add__readd_with_free_entry(void)
     static const ipv6_addr_t addr2 = { .u8 = NETIF0_IPV6_G };
     int idx;
 
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_add(netifs[0], &addr1, 64U,
-                                               GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
-    TEST_ASSERT(0 <= (idx = gnrc_netif2_ipv6_addr_add(netifs[0], &addr2, 64U,
-                                                      GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID)));
-    gnrc_netif2_ipv6_addr_remove(netifs[0], &addr1);
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_add(netifs[0], &addr1, 64U,
+                                              GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_addr_add(netifs[0], &addr2, 64U,
+                                                     GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)));
+    gnrc_netif_ipv6_addr_remove(netifs[0], &addr1);
     TEST_ASSERT_EQUAL_INT(idx,
-                          gnrc_netif2_ipv6_addr_add(netifs[0], &addr2, 64U,
-                                                    GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
+                          gnrc_netif_ipv6_addr_add(netifs[0], &addr2, 64U,
+                                                   GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
 }
 
 static void test_ipv6_addr_remove__not_allocated(void)
@@ -286,11 +286,11 @@ static void test_ipv6_addr_remove__not_allocated(void)
     static const ipv6_addr_t addr2 = { .u8 = NETIF0_IPV6_G };
 
     test_ipv6_addr_add__success();
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_idx(netifs[0], &addr1));
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_add(netifs[0], &addr2, 64U,
-                                               GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
-    gnrc_netif2_ipv6_addr_remove(netifs[0], &addr2);
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_idx(netifs[0], &addr1));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_idx(netifs[0], &addr1));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_add(netifs[0], &addr2, 64U,
+                                              GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
+    gnrc_netif_ipv6_addr_remove(netifs[0], &addr2);
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_idx(netifs[0], &addr1));
 }
 
 static void test_ipv6_addr_remove__success(void)
@@ -298,15 +298,15 @@ static void test_ipv6_addr_remove__success(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_LL };
 
     test_ipv6_addr_add__success();
-    gnrc_netif2_ipv6_addr_remove(netifs[0], &addr);
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_addr_idx(netifs[0], &addr));
+    gnrc_netif_ipv6_addr_remove(netifs[0], &addr);
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_idx(netifs[0], &addr));
 }
 
 static void test_ipv6_addr_idx__empty(void)
 {
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_LL };
 
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_addr_idx(netifs[0], &addr));
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_idx(netifs[0], &addr));
 }
 
 static void test_ipv6_addr_idx__wrong_netif(void)
@@ -314,7 +314,7 @@ static void test_ipv6_addr_idx__wrong_netif(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_LL };
 
     test_ipv6_addr_add__success();
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_addr_idx(netifs[1], &addr));
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_idx(netifs[1], &addr));
 }
 
 static void test_ipv6_addr_idx__wrong_addr(void)
@@ -322,7 +322,7 @@ static void test_ipv6_addr_idx__wrong_addr(void)
     static const ipv6_addr_t addr2 = { .u8 = NETIF0_IPV6_G };
 
     test_ipv6_addr_add__success();
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_addr_idx(netifs[0], &addr2));
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_idx(netifs[0], &addr2));
 }
 
 static void test_ipv6_addr_idx__success(void)
@@ -330,14 +330,14 @@ static void test_ipv6_addr_idx__success(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_LL };
 
     test_ipv6_addr_add__success();
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_idx(netifs[0], &addr));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_idx(netifs[0], &addr));
 }
 
 static void test_ipv6_addr_match__empty(void)
 {
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
 
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_addr_match(netifs[0], &addr));
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_match(netifs[0], &addr));
 }
 
 static void test_ipv6_addr_match__wrong_netif(void)
@@ -345,7 +345,7 @@ static void test_ipv6_addr_match__wrong_netif(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
 
     test_ipv6_addr_add__success();
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_addr_match(netifs[1], &addr));
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_match(netifs[1], &addr));
 }
 
 static void test_ipv6_addr_match__wrong_addr(void)
@@ -353,7 +353,7 @@ static void test_ipv6_addr_match__wrong_addr(void)
     static const ipv6_addr_t addr2 = { .u8 = NETIF0_IPV6_G };
 
     test_ipv6_addr_add__success();
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_addr_match(netifs[0], &addr2));
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_match(netifs[0], &addr2));
 }
 
 static void test_ipv6_addr_match__success18(void)
@@ -363,9 +363,9 @@ static void test_ipv6_addr_match__success18(void)
     static const ipv6_addr_t pfx = { .u8 = GLOBAL_PFX18 };
     int idx;
 
-    TEST_ASSERT(0 <= (idx = gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                                      GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID)));
-    TEST_ASSERT_EQUAL_INT(idx, gnrc_netif2_ipv6_addr_match(netifs[0], &pfx));
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                                     GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)));
+    TEST_ASSERT_EQUAL_INT(idx, gnrc_netif_ipv6_addr_match(netifs[0], &pfx));
     TEST_ASSERT_EQUAL_INT(18, ipv6_addr_match_prefix(&netifs[0]->ipv6.addrs[idx],
                                                      &pfx));
 }
@@ -377,9 +377,9 @@ static void test_ipv6_addr_match__success23(void)
     static const ipv6_addr_t pfx = { .u8 = GLOBAL_PFX23 };
     int idx;
 
-    TEST_ASSERT(0 <= (idx = gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                                      GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID)));
-    TEST_ASSERT_EQUAL_INT(idx, gnrc_netif2_ipv6_addr_match(netifs[0], &pfx));
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                                     GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)));
+    TEST_ASSERT_EQUAL_INT(idx, gnrc_netif_ipv6_addr_match(netifs[0], &pfx));
     TEST_ASSERT_EQUAL_INT(23, ipv6_addr_match_prefix(&netifs[0]->ipv6.addrs[idx],
                                                      &pfx));
 }
@@ -391,9 +391,9 @@ static void test_ipv6_addr_match__success64(void)
     static const ipv6_addr_t pfx = { .u8 = GLOBAL_PFX64 };
     int idx;
 
-    TEST_ASSERT(0 <= (idx = gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                                      GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID)));
-    TEST_ASSERT_EQUAL_INT(idx, gnrc_netif2_ipv6_addr_match(netifs[0], &pfx));
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                                     GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)));
+    TEST_ASSERT_EQUAL_INT(idx, gnrc_netif_ipv6_addr_match(netifs[0], &pfx));
     TEST_ASSERT_EQUAL_INT(64, ipv6_addr_match_prefix(&netifs[0]->ipv6.addrs[idx],
                                                      &pfx));
 }
@@ -407,11 +407,11 @@ static void test_ipv6_addr_best_src__multicast_input(void)
 
     /* adds a link-local address */
     test_ipv6_addr_add__success();
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_add(netifs[0], &addr1, 64U,
-                                               GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
-    TEST_ASSERT_NOT_NULL((out = gnrc_netif2_ipv6_addr_best_src(netifs[0],
-                                                               &addr2,
-                                                               false)));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_add(netifs[0], &addr1, 64U,
+                                              GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
+    TEST_ASSERT_NOT_NULL((out = gnrc_netif_ipv6_addr_best_src(netifs[0],
+                                                              &addr2,
+                                                              false)));
     TEST_ASSERT(!ipv6_addr_equal(&addr2, out));
     TEST_ASSERT(ipv6_addr_equal(&addr1, out));
 }
@@ -422,9 +422,9 @@ static void test_ipv6_addr_best_src__other_subnet(void)
     ipv6_addr_t *out = NULL;
 
     test_ipv6_addr_add__success();
-    TEST_ASSERT_NOT_NULL((out = gnrc_netif2_ipv6_addr_best_src(netifs[0],
-                                                               &mc_addr,
-                                                               false)));
+    TEST_ASSERT_NOT_NULL((out = gnrc_netif_ipv6_addr_best_src(netifs[0],
+                                                              &mc_addr,
+                                                              false)));
     TEST_ASSERT(!ipv6_addr_equal(&mc_addr, out));
     TEST_ASSERT(!ipv6_addr_is_multicast(out));
     TEST_ASSERT(!ipv6_addr_is_unspecified(out));
@@ -434,7 +434,7 @@ static void test_get_by_ipv6_addr__empty(void)
 {
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_LL };
 
-    TEST_ASSERT_NULL(gnrc_netif2_get_by_ipv6_addr(&addr));
+    TEST_ASSERT_NULL(gnrc_netif_get_by_ipv6_addr(&addr));
 }
 
 static void test_get_by_ipv6_addr__success(void)
@@ -443,14 +443,14 @@ static void test_get_by_ipv6_addr__success(void)
 
     test_ipv6_addr_add__success();
     TEST_ASSERT_NOT_NULL(netifs[0]);
-    TEST_ASSERT(netifs[0] == gnrc_netif2_get_by_ipv6_addr(&addr));
+    TEST_ASSERT(netifs[0] == gnrc_netif_get_by_ipv6_addr(&addr));
 }
 
 static void test_get_by_prefix__empty(void)
 {
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
 
-    TEST_ASSERT_NULL(gnrc_netif2_get_by_prefix(&addr));
+    TEST_ASSERT_NULL(gnrc_netif_get_by_prefix(&addr));
 }
 
 static void test_get_by_prefix__success18(void)
@@ -458,10 +458,10 @@ static void test_get_by_prefix__success18(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
     static const ipv6_addr_t pfx = { .u8 = GLOBAL_PFX18 };
 
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                               GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                              GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
     TEST_ASSERT_NOT_NULL(netifs[0]);
-    TEST_ASSERT(netifs[0] == gnrc_netif2_get_by_prefix(&pfx));
+    TEST_ASSERT(netifs[0] == gnrc_netif_get_by_prefix(&pfx));
     test_ipv6_addr_match__success18();
 }
 
@@ -470,10 +470,10 @@ static void test_get_by_prefix__success23(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
     static const ipv6_addr_t pfx = { .u8 = GLOBAL_PFX23 };
 
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                               GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                              GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
     TEST_ASSERT_NOT_NULL(netifs[0]);
-    TEST_ASSERT(netifs[0] == gnrc_netif2_get_by_prefix(&pfx));
+    TEST_ASSERT(netifs[0] == gnrc_netif_get_by_prefix(&pfx));
     test_ipv6_addr_match__success23();
 }
 
@@ -482,10 +482,10 @@ static void test_get_by_prefix__success64(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
     static const ipv6_addr_t pfx = { .u8 = GLOBAL_PFX64 };
 
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_add(netifs[0], &addr, 64U,
-                                               GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_add(netifs[0], &addr, 64U,
+                                              GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
     TEST_ASSERT_NOT_NULL(netifs[0]);
-    TEST_ASSERT(netifs[0] == gnrc_netif2_get_by_prefix(&pfx));
+    TEST_ASSERT(netifs[0] == gnrc_netif_get_by_prefix(&pfx));
     test_ipv6_addr_match__success64();
 }
 
@@ -493,24 +493,24 @@ static void test_ipv6_group_join__ENOMEM(void)
 {
     ipv6_addr_t addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
 
-    for (unsigned i = 0; i < GNRC_NETIF2_IPV6_ADDRS_NUMOF;
+    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF;
          i++, addr.u16[7].u16++) {
-        TEST_ASSERT(0 <= gnrc_netif2_ipv6_group_join(netifs[0], &addr));
+        TEST_ASSERT(0 <= gnrc_netif_ipv6_group_join(netifs[0], &addr));
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM,
-                          gnrc_netif2_ipv6_group_join(netifs[0], &addr));
+                          gnrc_netif_ipv6_group_join(netifs[0], &addr));
 }
 
 static void test_ipv6_group_join__success(void)
 {
     int idx;
 
-    TEST_ASSERT(0 <= (idx = gnrc_netif2_ipv6_group_join(netifs[0],
-                                                        &ipv6_addr_all_nodes_link_local)));
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_group_join(netifs[0],
+                                                       &ipv6_addr_all_nodes_link_local)));
     /* check duplicate addition */
     TEST_ASSERT_EQUAL_INT(idx,
-                          gnrc_netif2_ipv6_group_join(netifs[0],
-                                                      &ipv6_addr_all_nodes_link_local));
+                          gnrc_netif_ipv6_group_join(netifs[0],
+                                                     &ipv6_addr_all_nodes_link_local));
     TEST_ASSERT(ipv6_addr_equal(&ipv6_addr_all_nodes_link_local,
                                 &netifs[0]->ipv6.groups[idx]));
 }
@@ -520,60 +520,60 @@ static void test_ipv6_group_join__readd_with_free_entry(void)
     /* Tests for possible duplicates (see #2965) */
     int idx;
 
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_group_join(netifs[0],
-                                                 &ipv6_addr_all_nodes_link_local));
-    TEST_ASSERT(0 <= (idx = gnrc_netif2_ipv6_group_join(netifs[0],
-                                                        &ipv6_addr_all_routers_link_local)));
-    gnrc_netif2_ipv6_group_leave(netifs[0], &ipv6_addr_all_nodes_link_local);
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_join(netifs[0],
+                                                &ipv6_addr_all_nodes_link_local));
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_group_join(netifs[0],
+                                                       &ipv6_addr_all_routers_link_local)));
+    gnrc_netif_ipv6_group_leave(netifs[0], &ipv6_addr_all_nodes_link_local);
     TEST_ASSERT_EQUAL_INT(idx,
-                          gnrc_netif2_ipv6_group_join(netifs[0],
-                                                      &ipv6_addr_all_routers_link_local));
+                          gnrc_netif_ipv6_group_join(netifs[0],
+                                                     &ipv6_addr_all_routers_link_local));
 }
 
 static void test_ipv6_group_leave__not_allocated(void)
 {
     test_ipv6_group_join__success();
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_group_idx(netifs[0],
-                                                &ipv6_addr_all_nodes_link_local));
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_group_join(netifs[0],
-                                                 &ipv6_addr_all_routers_link_local));
-    gnrc_netif2_ipv6_group_leave(netifs[0], &ipv6_addr_all_routers_link_local);
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_group_idx(netifs[0],
-                                                &ipv6_addr_all_nodes_link_local));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(netifs[0],
+                                               &ipv6_addr_all_nodes_link_local));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_join(netifs[0],
+                                                &ipv6_addr_all_routers_link_local));
+    gnrc_netif_ipv6_group_leave(netifs[0], &ipv6_addr_all_routers_link_local);
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(netifs[0],
+                                               &ipv6_addr_all_nodes_link_local));
 }
 
 static void test_ipv6_group_leave__success(void)
 {
     test_ipv6_group_join__success();
-    gnrc_netif2_ipv6_group_leave(netifs[0], &ipv6_addr_all_nodes_link_local);
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_group_idx(netifs[0],
-                                                         &ipv6_addr_all_nodes_link_local));
+    gnrc_netif_ipv6_group_leave(netifs[0], &ipv6_addr_all_nodes_link_local);
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_group_idx(netifs[0],
+                                                        &ipv6_addr_all_nodes_link_local));
 }
 
 static void test_ipv6_group_idx__empty(void)
 {
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_group_idx(netifs[0],
-                                                         &ipv6_addr_all_nodes_link_local));
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_group_idx(netifs[0],
+                                                        &ipv6_addr_all_nodes_link_local));
 }
 
 static void test_ipv6_group_idx__wrong_netif(void)
 {
     test_ipv6_group_join__success();
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_group_idx(netifs[1],
-                                                         &ipv6_addr_all_nodes_link_local));
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_group_idx(netifs[1],
+                                                        &ipv6_addr_all_nodes_link_local));
 }
 
 static void test_ipv6_group_idx__wrong_addr(void)
 {
     test_ipv6_group_join__success();
-    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif2_ipv6_group_idx(netifs[0],
-                                                         &ipv6_addr_all_routers_link_local));
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_group_idx(netifs[0],
+                                                        &ipv6_addr_all_routers_link_local));
 }
 
 static void test_ipv6_group_idx__success(void)
 {
     test_ipv6_group_join__success();
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_group_idx(netifs[0], &ipv6_addr_all_nodes_link_local));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(netifs[0], &ipv6_addr_all_nodes_link_local));
 }
 
 static void test_ipv6_get_iid(void)
@@ -585,10 +585,10 @@ static void test_ipv6_get_iid(void)
     eui64_t res;
     uint16_t ieee802154_l2addr_len = 2U;
 
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_ipv6_get_iid(ethernet_netif, &res));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_ipv6_get_iid(ethernet_netif, &res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ethernet_ipv6_ll.u64[1],
                                     sizeof(res)));
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_ipv6_get_iid(ieee802154_netif, &res));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_ipv6_get_iid(ieee802154_netif, &res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ieee802154_ipv6_ll_long.u64[1],
                                     sizeof(res)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
@@ -596,7 +596,7 @@ static void test_ipv6_get_iid(void)
                                           NETOPT_SRC_LEN, 0,
                                           &ieee802154_l2addr_len,
                                           sizeof(ieee802154_l2addr_len)));
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netif2_ipv6_get_iid(ieee802154_netif, &res));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_ipv6_get_iid(ieee802154_netif, &res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ieee802154_eui64_short, sizeof(res)));
     /* reset to source length 8 */
     ieee802154_l2addr_len = 8U;
@@ -606,7 +606,7 @@ static void test_ipv6_get_iid(void)
                                           &ieee802154_l2addr_len,
                                           sizeof(ieee802154_l2addr_len)));
     for (unsigned i = 0; i < DEFAULT_DEVS_NUMOF; i++) {
-        TEST_ASSERT_EQUAL_INT(-ENOTSUP, gnrc_netif2_ipv6_get_iid(netifs[i], &res));
+        TEST_ASSERT_EQUAL_INT(-ENOTSUP, gnrc_netif_ipv6_get_iid(netifs[i], &res));
     }
 }
 
@@ -623,7 +623,7 @@ static void test_netapi_get__HOP_LIMIT(void)
 static void test_netapi_get__IPV6_ADDR(void)
 {
     static const ipv6_addr_t exp = { NETIF0_IPV6_LL };
-    ipv6_addr_t value[GNRC_NETIF2_IPV6_ADDRS_NUMOF];
+    ipv6_addr_t value[GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
     test_ipv6_addr_add__success();
     TEST_ASSERT_EQUAL_INT(sizeof(ipv6_addr_t), gnrc_netapi_get(netifs[0]->pid,
@@ -635,20 +635,20 @@ static void test_netapi_get__IPV6_ADDR(void)
 
 static void test_netapi_get__IPV6_ADDR_FLAGS(void)
 {
-    uint8_t value[GNRC_NETIF2_IPV6_ADDRS_NUMOF];
+    uint8_t value[GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
     test_ipv6_addr_add__success();
     TEST_ASSERT_EQUAL_INT(sizeof(uint8_t), gnrc_netapi_get(netifs[0]->pid,
                                                            NETOPT_IPV6_ADDR_FLAGS,
                                                            0, &value,
                                                            sizeof(value)));
-    TEST_ASSERT_EQUAL_INT(GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID,
+    TEST_ASSERT_EQUAL_INT(GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID,
                           value[0]);
 }
 
 static void test_netapi_get__IPV6_GROUP(void)
 {
-    ipv6_addr_t value[GNRC_NETIF2_IPV6_GROUPS_NUMOF];
+    ipv6_addr_t value[GNRC_NETIF_IPV6_GROUPS_NUMOF];
 
     test_ipv6_group_join__success();
     TEST_ASSERT_EQUAL_INT(sizeof(ipv6_addr_t), gnrc_netapi_get(netifs[0]->pid,
@@ -761,7 +761,7 @@ static void test_netapi_get__ADDRESS(void)
 {
     static const uint8_t exp_ethernet[] = ETHERNET_SRC;
     static const uint8_t exp_ieee802154[] = IEEE802154_SHORT_SRC;
-    uint8_t value[GNRC_NETIF2_L2ADDR_MAXLEN];
+    uint8_t value[GNRC_NETIF_L2ADDR_MAXLEN];
 
     TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
                           gnrc_netapi_get(ethernet_netif->pid,
@@ -779,7 +779,7 @@ static void test_netapi_get__ADDRESS(void)
 static void test_netapi_get__ADDRESS_LONG(void)
 {
     static const uint8_t exp_ieee802154[] = IEEE802154_LONG_SRC;
-    uint8_t value[GNRC_NETIF2_L2ADDR_MAXLEN];
+    uint8_t value[GNRC_NETIF_L2ADDR_MAXLEN];
 
     TEST_ASSERT_EQUAL_INT(-ENOTSUP,
                           gnrc_netapi_get(ethernet_netif->pid,
@@ -812,14 +812,14 @@ static void test_netapi_set__IPV6_ADDR(void)
 {
     ipv6_addr_t value = { .u8 = NETIF0_IPV6_LL };
     static const uint16_t context = (64U << 8) |
-                                    (GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID);
+                                    (GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
 
-    TEST_ASSERT(0 > gnrc_netif2_ipv6_addr_idx(netifs[0], &value));
+    TEST_ASSERT(0 > gnrc_netif_ipv6_addr_idx(netifs[0], &value));
     TEST_ASSERT_EQUAL_INT(sizeof(value),
                           gnrc_netapi_set(netifs[0]->pid,
                                           NETOPT_IPV6_ADDR, context,
                                           &value, sizeof(value)));
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_idx(netifs[0], &value));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_idx(netifs[0], &value));
 }
 
 static void test_netapi_set__IPV6_ADDR_REMOVE(void)
@@ -827,24 +827,24 @@ static void test_netapi_set__IPV6_ADDR_REMOVE(void)
     ipv6_addr_t value = { .u8 = NETIF0_IPV6_LL };
 
     test_ipv6_addr_add__success();
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_addr_idx(netifs[0], &value));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_idx(netifs[0], &value));
     TEST_ASSERT_EQUAL_INT(sizeof(value),
                           gnrc_netapi_set(netifs[0]->pid,
                                           NETOPT_IPV6_ADDR_REMOVE, 0,
                                           &value, sizeof(value)));
-    TEST_ASSERT(0 > gnrc_netif2_ipv6_addr_idx(netifs[0], &value));
+    TEST_ASSERT(0 > gnrc_netif_ipv6_addr_idx(netifs[0], &value));
 }
 
 static void test_netapi_set__IPV6_GROUP(void)
 {
     ipv6_addr_t value = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
 
-    TEST_ASSERT(0 > gnrc_netif2_ipv6_group_idx(netifs[0], &value));
+    TEST_ASSERT(0 > gnrc_netif_ipv6_group_idx(netifs[0], &value));
     TEST_ASSERT_EQUAL_INT(sizeof(value),
                           gnrc_netapi_set(netifs[0]->pid,
                                           NETOPT_IPV6_GROUP, 0,
                                           &value, sizeof(value)));
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_group_idx(netifs[0], &value));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(netifs[0], &value));
 }
 
 static void test_netapi_set__IPV6_GROUP_LEAVE(void)
@@ -852,12 +852,12 @@ static void test_netapi_set__IPV6_GROUP_LEAVE(void)
     ipv6_addr_t value = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
 
     test_ipv6_group_join__success();
-    TEST_ASSERT(0 <= gnrc_netif2_ipv6_group_idx(netifs[0], &value));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(netifs[0], &value));
     TEST_ASSERT_EQUAL_INT(sizeof(value),
                           gnrc_netapi_set(netifs[0]->pid,
                                           NETOPT_IPV6_GROUP_LEAVE, 0,
                                           &value, sizeof(value)));
-    TEST_ASSERT(0 > gnrc_netif2_ipv6_group_idx(netifs[0], &value));
+    TEST_ASSERT(0 > gnrc_netif_ipv6_group_idx(netifs[0], &value));
 }
 
 static void test_netapi_set__MAX_PACKET_SIZE(void)
@@ -884,7 +884,7 @@ static void test_netapi_set__6LO_IPHC(void)
                           gnrc_netapi_set(netifs[0]->pid,
                                           NETOPT_6LO_IPHC, 0,
                                           &value, sizeof(value)));
-    TEST_ASSERT(netifs[0]->flags & GNRC_NETIF2_FLAGS_6LO_HC);
+    TEST_ASSERT(netifs[0]->flags & GNRC_NETIF_FLAGS_6LO_HC);
 }
 
 static void test_netapi_set__ADDRESS(void)
@@ -1321,7 +1321,7 @@ static void test_netapi_recv__ipv6_ethernet_payload(void)
     _test_trigger_recv(ethernet_netif, data, sizeof(data));
 }
 
-static Test *embunit_tests_gnrc_netif2(void)
+static Test *embunit_tests_gnrc_netif(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_creation),
@@ -1407,7 +1407,7 @@ int main(void)
     netdev_test_set_set_cb((netdev_test_t *)ieee802154_dev, NETOPT_SRC_LEN,
                            _set_netdev_src_len);
     TESTS_START();
-    TESTS_RUN(embunit_tests_gnrc_netif2());
+    TESTS_RUN(embunit_tests_gnrc_netif());
     TESTS_END();
     /* add netapi send and receive tests here */
     test_netapi_send__raw_unicast_ethernet_packet();
@@ -1431,14 +1431,14 @@ int main(void)
     return 0;
 }
 
-static inline int _mock_netif_send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static inline int _mock_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     (void)netif;
     (void)pkt;
     return -1;
 }
 
-static inline gnrc_pktsnip_t *_mock_netif_recv(gnrc_netif2_t * netif)
+static inline gnrc_pktsnip_t *_mock_netif_recv(gnrc_netif_t * netif)
 {
     (void)netif;
     return NULL;

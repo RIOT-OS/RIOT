@@ -23,7 +23,7 @@
 #include "msg.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 int main(void)
 {
@@ -31,9 +31,9 @@ int main(void)
     puts("RIOT network stack example application");
 
     /* get interfaces and print their addresses */
-    gnrc_netif2_t *netif = NULL;
-    while ((netif = gnrc_netif2_iter(netif))) {
-        ipv6_addr_t ipv6_addrs[GNRC_NETIF2_IPV6_ADDRS_NUMOF];
+    gnrc_netif_t *netif = NULL;
+    while ((netif = gnrc_netif_iter(netif))) {
+        ipv6_addr_t ipv6_addrs[GNRC_NETIF_IPV6_ADDRS_NUMOF];
         int res = gnrc_netapi_get(netif->pid, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                                   sizeof(ipv6_addrs));
 

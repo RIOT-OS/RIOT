@@ -22,7 +22,7 @@
 
 #include "net/ipv6/addr.h"
 #include "net/gnrc.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
 
 #ifdef MODULE_NETSTATS
@@ -84,7 +84,7 @@ static bool _is_number(char *str)
 
 static inline bool _is_iface(kernel_pid_t iface)
 {
-    return (gnrc_netif2_get_by_pid(iface) != NULL);
+    return (gnrc_netif_get_by_pid(iface) != NULL);
 }
 
 #ifdef MODULE_NETSTATS
@@ -309,17 +309,17 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
     else {
         printf("global");
     }
-    if (flags & GNRC_NETIF2_IPV6_ADDRS_FLAGS_ANYCAST) {
+    if (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST) {
         printf(" [anycast]");
     }
-    switch (flags & GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_MASK) {
-        case GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_TENTATIVE:
+    switch (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK) {
+        case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE:
             printf("  TNT");
             break;
-        case GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_DEPRECATED:
+        case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_DEPRECATED:
             printf("  DPR");
             break;
-        case GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID:
+        case GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID:
             printf("  VAL");
             break;
     }
@@ -330,9 +330,9 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
 static void _netif_list(kernel_pid_t iface)
 {
 #ifdef MODULE_GNRC_IPV6
-    ipv6_addr_t ipv6_addrs[GNRC_NETIF2_IPV6_ADDRS_NUMOF];
+    ipv6_addr_t ipv6_addrs[GNRC_NETIF_IPV6_ADDRS_NUMOF];
 #endif
-    uint8_t hwaddr[GNRC_NETIF2_L2ADDR_MAXLEN];
+    uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
     uint16_t u16;
     int16_t i16;
     uint8_t u8;
@@ -345,7 +345,7 @@ static void _netif_list(kernel_pid_t iface)
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf(" HWaddr: %s ",
-               gnrc_netif2_addr_to_str(hwaddr, res, hwaddr_str));
+               gnrc_netif_addr_to_str(hwaddr, res, hwaddr_str));
     }
     res = gnrc_netapi_get(iface, NETOPT_CHANNEL, 0, &u16, sizeof(u16));
     if (res >= 0) {
@@ -364,7 +364,7 @@ static void _netif_list(kernel_pid_t iface)
     if (res >= 0) {
         char hwaddr_str[res * 3];
         printf("Long HWaddr: ");
-        printf("%s ", gnrc_netif2_addr_to_str(hwaddr, res, hwaddr_str));
+        printf("%s ", gnrc_netif_addr_to_str(hwaddr, res, hwaddr_str));
         line_thresh++;
     }
     line_thresh = _newline(0U, line_thresh);
@@ -447,7 +447,7 @@ static void _netif_list(kernel_pid_t iface)
     res = gnrc_netapi_get(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                           sizeof(ipv6_addrs));
     if (res >= 0) {
-        uint8_t ipv6_addrs_flags[GNRC_NETIF2_IPV6_ADDRS_NUMOF];
+        uint8_t ipv6_addrs_flags[GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
         memset(ipv6_addrs_flags, 0, sizeof(ipv6_addrs_flags));
         /* assume it to succeed (otherwise array will stay 0) */
@@ -473,8 +473,8 @@ static void _netif_list(kernel_pid_t iface)
         for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
             if (filter[i].addr_len > 0) {
                 char hwaddr_str[filter[i].addr_len * 3];
-                gnrc_netif2_addr_to_str(filter[i].addr, filter[i].addr_len,
-                                        hwaddr_str);
+                gnrc_netif_addr_to_str(filter[i].addr, filter[i].addr_len,
+                                       hwaddr_str);
                 printf("            %2i: %s\n", count++, hwaddr_str);
             }
         }
@@ -596,8 +596,8 @@ static int _netif_set_flag(kernel_pid_t iface, netopt_t opt,
 
 static int _netif_set_addr(kernel_pid_t iface, netopt_t opt, char *addr_str)
 {
-    uint8_t addr[GNRC_NETIF2_L2ADDR_MAXLEN];
-    size_t addr_len = gnrc_netif2_addr_from_str(addr_str, addr);
+    uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
+    size_t addr_len = gnrc_netif_addr_from_str(addr_str, addr);
 
     if (addr_len == 0) {
         puts("error: unable to parse address.\n"
@@ -728,8 +728,8 @@ static int _netif_set_encrypt_key(kernel_pid_t iface, netopt_t opt, char *key_st
 #ifdef MODULE_L2FILTER
 static int _netif_addrm_l2filter(kernel_pid_t iface, char *val, bool add)
 {
-    uint8_t addr[GNRC_NETIF2_L2ADDR_MAXLEN];
-    size_t addr_len = gnrc_netif2_addr_from_str(val, addr);
+    uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
+    size_t addr_len = gnrc_netif_addr_from_str(val, addr);
 
     if ((addr_len == 0) || (addr_len > L2FILTER_ADDR_MAXLEN)) {
         puts("error: given address is invalid");
@@ -866,7 +866,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t iface, int argc, char **argv)
     } type = _UNICAST;
     char *addr_str = argv[0];
     ipv6_addr_t addr;
-    uint16_t flags = GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID;
+    uint16_t flags = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
     uint8_t prefix_len;
 
     if (argc > 1) {
@@ -900,7 +900,7 @@ static int _netif_add(char *cmd_name, kernel_pid_t iface, int argc, char **argv)
     }
     else {
         if (type == _ANYCAST) {
-            flags |= GNRC_NETIF2_IPV6_ADDRS_FLAGS_ANYCAST;
+            flags |= GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST;
         }
         flags |= (prefix_len << 8U);
         if (gnrc_netapi_set(iface, NETOPT_IPV6_ADDR, flags, &addr,
@@ -964,10 +964,10 @@ static int _netif_del(kernel_pid_t iface, char *addr_str)
 
 /* shell commands */
 #ifdef MODULE_GNRC_TXTSND
-int _gnrc_netif2_send(int argc, char **argv)
+int _gnrc_netif_send(int argc, char **argv)
 {
     kernel_pid_t iface;
-    uint8_t addr[GNRC_NETIF2_L2ADDR_MAXLEN];
+    uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
     size_t addr_len;
     gnrc_pktsnip_t *pkt, *hdr;
     gnrc_netif_hdr_t *nethdr;
@@ -987,7 +987,7 @@ int _gnrc_netif2_send(int argc, char **argv)
     }
 
     /* parse address */
-    addr_len = gnrc_netif2_addr_from_str(argv[2], addr);
+    addr_len = gnrc_netif_addr_from_str(argv[2], addr);
 
     if (addr_len == 0) {
         if (strcmp(argv[2], "bcast") == 0) {
@@ -1025,12 +1025,12 @@ int _gnrc_netif2_send(int argc, char **argv)
 }
 #endif
 
-int _gnrc_netif2_config(int argc, char **argv)
+int _gnrc_netif_config(int argc, char **argv)
 {
     if (argc < 2) {
-        gnrc_netif2_t *netif = NULL;
+        gnrc_netif_t *netif = NULL;
 
-        while ((netif = gnrc_netif2_iter(netif))) {
+        while ((netif = gnrc_netif_iter(netif))) {
             _netif_list(netif->pid);
         }
 

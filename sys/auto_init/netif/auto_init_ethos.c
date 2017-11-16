@@ -23,7 +23,7 @@
 #include "debug.h"
 #include "ethos.h"
 #include "periph/uart.h"
-#include "net/gnrc/netif2/ethernet.h"
+#include "net/gnrc/netif/ethernet.h"
 
 /**
  * @brief global ethos object, used by uart_stdio
@@ -36,7 +36,7 @@ ethos_t ethos;
  */
 #define ETHOS_MAC_STACKSIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #ifndef ETHOS_MAC_PRIO
-#define ETHOS_MAC_PRIO      (GNRC_NETIF2_PRIO)
+#define ETHOS_MAC_PRIO      (GNRC_NETIF_PRIO)
 #endif
 
 /**
@@ -59,8 +59,8 @@ void auto_init_ethos(void)
     ethos_setup(&ethos, &p);
 
     /* initialize netdev<->gnrc adapter state */
-    gnrc_netif2_ethernet_create(_netdev_eth_stack, ETHOS_MAC_STACKSIZE,
-                                ETHOS_MAC_PRIO, "ethos", (netdev_t *)&ethos);
+    gnrc_netif_ethernet_create(_netdev_eth_stack, ETHOS_MAC_STACKSIZE,
+                               ETHOS_MAC_PRIO, "ethos", (netdev_t *)&ethos);
 }
 
 #else

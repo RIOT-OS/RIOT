@@ -7,16 +7,16 @@
  */
 
 /**
- * @ingroup net_gnrc_netif2
+ * @ingroup net_gnrc_netif
  * @{
  *
  * @file
- * @brief   @ref net_gnrc_mac definitions for @ref net_gnrc_netif2
+ * @brief   @ref net_gnrc_mac definitions for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF2_MAC_H
-#define NET_GNRC_NETIF2_MAC_H
+#ifndef NET_GNRC_NETIF_MAC_H
+#define NET_GNRC_NETIF_MAC_H
 
 #include "net/gnrc/mac/types.h"
 #include "net/csma_sender.h"
@@ -28,13 +28,13 @@ extern "C" {
 /**
  * @brief   Mask for @ref gnrc_mac_tx_feedback_t
  */
-#define GNRC_NETIF2_MAC_INFO_TX_FEEDBACK_MASK   (0x0003U)
+#define GNRC_NETIF_MAC_INFO_TX_FEEDBACK_MASK   (0x0003U)
 
 /**
  * @brief   Flag to track if a transmission might have corrupted a received
  *          packet
  */
-#define GNRC_NETIF2_MAC_INFO_RX_STARTED         (0x0004U)
+#define GNRC_NETIF_MAC_INFO_RX_STARTED         (0x0004U)
 
 /**
  * @brief   Flag to track if a device has enabled CSMA for transmissions
@@ -43,10 +43,10 @@ extern "C" {
  * requiring CSMA transmission, then, the device will run software CSMA
  * using `csma_sender` APIs.
  */
-#define GNRC_NETIF2_MAC_INFO_CSMA_ENABLED       (0x0100U)
+#define GNRC_NETIF_MAC_INFO_CSMA_ENABLED       (0x0100U)
 
 /**
- * @brief   @ref net_gnrc_mac component of @ref gnrc_netif2_mac_t
+ * @brief   @ref net_gnrc_mac component of @ref gnrc_netif_mac_t
  */
 typedef struct {
     /**
@@ -86,11 +86,11 @@ typedef struct {
      */
     gnrc_lwmac_t lwmac;
 #endif
-} gnrc_netif2_mac_t;
+} gnrc_netif_mac_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_NETIF2_MAC_H */
+#endif /* NET_GNRC_NETIF_MAC_H */
 /** @} */

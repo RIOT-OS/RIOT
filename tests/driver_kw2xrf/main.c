@@ -49,7 +49,7 @@ static void _set_test_mode(int argc, char **argv, uint8_t mode)
     if (_is_number(argv[1])) {
         kernel_pid_t dev = atoi(argv[1]);
 
-        if (gnrc_netif2_get_by_pid(dev)) {
+        if (gnrc_netif_get_by_pid(dev)) {
             gnrc_netapi_set(dev, NETOPT_RF_TESTMODE, 0, (void *)&mode, sizeof(mode));
             return;
         }

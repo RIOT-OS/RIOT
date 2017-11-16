@@ -7,18 +7,18 @@
  */
 
 /**
- * @ingroup net_gnrc_netif2
+ * @ingroup net_gnrc_netif
  * @{
  *
  * @file
- * @brief   Ethernet adaption for @ref net_gnrc_netif2
+ * @brief   Ethernet adaption for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF2_ETHERNET_H
-#define NET_GNRC_NETIF2_ETHERNET_H
+#ifndef NET_GNRC_NETIF_ETHERNET_H
+#define NET_GNRC_NETIF_ETHERNET_H
 
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +33,7 @@ extern "C" {
  * @param[in] name      Name for the network interface. May be NULL.
  * @param[in] dev       Device for the interface.
  *
- * @see @ref gnrc_netif2_create()
+ * @see @ref gnrc_netif_create()
  *
  * @attention   Fails and crashes (assertion error with @ref DEVELHELP or
  *              segmentation fault without) if `GNRC_NETIF_NUMOF` is lower than
@@ -41,12 +41,12 @@ extern "C" {
  *
  * @return  The network interface on success.
  */
-gnrc_netif2_t *gnrc_netif2_ethernet_create(char *stack, int stacksize, char priority,
-                                           char *name, netdev_t *dev);
+gnrc_netif_t *gnrc_netif_ethernet_create(char *stack, int stacksize, char priority,
+                                         char *name, netdev_t *dev);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_NETIF2_ETHERNET_H */
+#endif /* NET_GNRC_NETIF_ETHERNET_H */
 /** @} */

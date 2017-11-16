@@ -101,7 +101,7 @@ void gnrc_icmpv6_demux(kernel_pid_t iface, gnrc_pktsnip_t *pkt)
         case ICMPV6_DAR:
         case ICMPV6_DAC:
             DEBUG("icmpv6: NDP message received. Handle with gnrc_ipv6_nib\n");
-            gnrc_ipv6_nib_handle_pkt(gnrc_netif2_get_by_pid(iface),
+            gnrc_ipv6_nib_handle_pkt(gnrc_netif_get_by_pid(iface),
                                      ipv6->data, hdr, icmpv6->size);
             break;
 

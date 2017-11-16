@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 #include "net/ieee802154.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,9 +39,9 @@ extern "C" {
  *
  * @return          the rx_started state
  */
-static inline bool gnrc_netif2_get_rx_started(gnrc_netif2_t *netif)
+static inline bool gnrc_netif_get_rx_started(gnrc_netif_t *netif)
 {
-    return (netif->mac.mac_info & GNRC_NETIF2_MAC_INFO_RX_STARTED);
+    return (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_RX_STARTED);
 }
 
 /**
@@ -52,13 +52,13 @@ static inline bool gnrc_netif2_get_rx_started(gnrc_netif2_t *netif)
  * @param[in] netif       the network interface
  * @param[in] rx_started  the rx_started state
  */
-static inline void gnrc_netif2_set_rx_started(gnrc_netif2_t *netif, bool rx_started)
+static inline void gnrc_netif_set_rx_started(gnrc_netif_t *netif, bool rx_started)
 {
     if (rx_started) {
-        netif->mac.mac_info |= GNRC_NETIF2_MAC_INFO_RX_STARTED;
+        netif->mac.mac_info |= GNRC_NETIF_MAC_INFO_RX_STARTED;
     }
     else {
-        netif->mac.mac_info &= ~GNRC_NETIF2_MAC_INFO_RX_STARTED;
+        netif->mac.mac_info &= ~GNRC_NETIF_MAC_INFO_RX_STARTED;
     }
 }
 
@@ -69,10 +69,10 @@ static inline void gnrc_netif2_set_rx_started(gnrc_netif2_t *netif, bool rx_star
  *
  * @return           the transmission feedback
  */
-static inline gnrc_mac_tx_feedback_t gnrc_netif2_get_tx_feedback(gnrc_netif2_t *netif)
+static inline gnrc_mac_tx_feedback_t gnrc_netif_get_tx_feedback(gnrc_netif_t *netif)
 {
     return (gnrc_mac_tx_feedback_t)(netif->mac.mac_info &
-                                    GNRC_NETIF2_MAC_INFO_TX_FEEDBACK_MASK);
+                                    GNRC_NETIF_MAC_INFO_TX_FEEDBACK_MASK);
 }
 
 /**
@@ -83,15 +83,15 @@ static inline gnrc_mac_tx_feedback_t gnrc_netif2_get_tx_feedback(gnrc_netif2_t *
  * @param[in] netif  the network interface
  * @param[in] txf    the transmission feedback
  */
-static inline void gnrc_netif2_set_tx_feedback(gnrc_netif2_t *netif,
-                                               gnrc_mac_tx_feedback_t txf)
+static inline void gnrc_netif_set_tx_feedback(gnrc_netif_t *netif,
+                                              gnrc_mac_tx_feedback_t txf)
 {
     /* check if gnrc_mac_tx_feedback does not collide with
-     * GNRC_NETIF2_MAC_INFO_RX_STARTED */
-    assert(!(txf & GNRC_NETIF2_MAC_INFO_RX_STARTED));
+     * GNRC_NETIF_MAC_INFO_RX_STARTED */
+    assert(!(txf & GNRC_NETIF_MAC_INFO_RX_STARTED));
     /* unset previous value */
-    netif->mac.mac_info &= ~GNRC_NETIF2_MAC_INFO_TX_FEEDBACK_MASK;
-    netif->mac.mac_info |= (uint16_t)(txf & GNRC_NETIF2_MAC_INFO_TX_FEEDBACK_MASK);
+    netif->mac.mac_info &= ~GNRC_NETIF_MAC_INFO_TX_FEEDBACK_MASK;
+    netif->mac.mac_info |= (uint16_t)(txf & GNRC_NETIF_MAC_INFO_TX_FEEDBACK_MASK);
 }
 
 #if (GNRC_MAC_TX_QUEUE_SIZE != 0) || defined(DOXYGEN)

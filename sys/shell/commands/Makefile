@@ -23,8 +23,8 @@ endif
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
     SRC += sc_at30tse75x.c
 endif
-ifneq (,$(filter gnrc_netif2,$(USEMODULE)))
-  SRC += sc_gnrc_netif2.c
+ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+  SRC += sc_gnrc_netif.c
 endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c

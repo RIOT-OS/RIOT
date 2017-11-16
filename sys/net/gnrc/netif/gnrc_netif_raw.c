@@ -14,7 +14,7 @@
  */
 
 #include "net/gnrc/pktbuf.h"
-#include "net/gnrc/netif2/raw.h"
+#include "net/gnrc/netif/raw.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -24,22 +24,22 @@
 #define IP_VERSION6     (0x60U)
 
 
-static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt);
-static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif);
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
+static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
-static const gnrc_netif2_ops_t raw_ops = {
+static const gnrc_netif_ops_t raw_ops = {
     .send = _send,
     .recv = _recv,
-    .get = gnrc_netif2_get_from_netdev,
-    .set = gnrc_netif2_set_from_netdev,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif2_t *gnrc_netif2_raw_create(char *stack, int stacksize,
-                                      char priority, char *name,
-                                      netdev_t *dev)
+gnrc_netif_t *gnrc_netif_raw_create(char *stack, int stacksize,
+                                    char priority, char *name,
+                                    netdev_t *dev)
 {
-    return gnrc_netif2_create(stack, stacksize, priority, name, dev,
-                              &raw_ops);
+    return gnrc_netif_create(stack, stacksize, priority, name, dev,
+                             &raw_ops);
 }
 
 static inline uint8_t _get_version(uint8_t *data)
@@ -47,7 +47,7 @@ static inline uint8_t _get_version(uint8_t *data)
     return (data[0] & IP_VERSION_MASK);
 }
 
-static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
+static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
@@ -90,7 +90,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
     return pkt;
 }
 
-static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *vector;
     int res = -ENOBUFS;

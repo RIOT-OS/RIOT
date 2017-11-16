@@ -15,7 +15,7 @@
 
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
 #include "net/gnrc/sixlowpan/nd.h"
 #endif
@@ -167,7 +167,7 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_sl2a_build(const uint8_t *l2addr,
 {
     assert((l2addr != NULL) && (l2addr_len != 0));
     DEBUG("ndp2: building source link-layer address option (l2addr: %s)\n",
-          gnrc_netif2_addr_to_str(l2addr, l2addr_len, addr_str));
+          gnrc_netif_addr_to_str(l2addr, l2addr_len, addr_str));
     return _opt_l2a_build(l2addr, l2addr_len, next, NDP_OPT_SL2A);
 }
 
@@ -177,7 +177,7 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_tl2a_build(const uint8_t *l2addr,
 {
     assert((l2addr != NULL) && (l2addr_len != 0));
     DEBUG("ndp2: building target link-layer address option (l2addr: %s)\n",
-          gnrc_netif2_addr_to_str(l2addr, l2addr_len, addr_str));
+          gnrc_netif_addr_to_str(l2addr, l2addr_len, addr_str));
     return _opt_l2a_build(l2addr, l2addr_len, next, NDP_OPT_TL2A);
 }
 
@@ -221,13 +221,13 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next)
     return pkt;
 }
 
-static gnrc_pktsnip_t *_build_headers(gnrc_netif2_t *netif,
+static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,
                                       const ipv6_addr_t *src,
                                       const ipv6_addr_t *dst,
                                       gnrc_pktsnip_t *payload);
-static inline size_t _get_l2src(const gnrc_netif2_t *netif, uint8_t *l2src);
+static inline size_t _get_l2src(const gnrc_netif_t *netif, uint8_t *l2src);
 
-void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
+void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
                             const ipv6_addr_t *src, const ipv6_addr_t *dst,
                             gnrc_pktsnip_t *ext_opts)
 {
@@ -247,11 +247,11 @@ void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
                            sizeof(addr_str)));
     DEBUG("tgt: %s, ", ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s)\n", ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
-    gnrc_netif2_acquire(netif);
+    gnrc_netif_acquire(netif);
     do {    /* XXX hidden goto */
         /* check if there is a fitting source address to target */
         if (src == NULL) {
-            src = gnrc_netif2_ipv6_addr_best_src(netif, tgt, false);
+            src = gnrc_netif_ipv6_addr_best_src(netif, tgt, false);
         }
 
         /* add SL2AO based on interface and source address */
@@ -291,14 +291,14 @@ void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
                 break;
             }
         }
-        gnrc_netif2_release(netif);
+        gnrc_netif_release(netif);
         return;
     } while (0);
     gnrc_pktbuf_release(pkt);
-    gnrc_netif2_release(netif);
+    gnrc_netif_release(netif);
 }
 
-void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
+void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
                             const ipv6_addr_t *dst, bool supply_tl2a,
                             gnrc_pktsnip_t *ext_opts)
 {
@@ -313,15 +313,15 @@ void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
           ipv6_addr_to_str(addr_str, tgt, sizeof(addr_str)));
     DEBUG("dst: %s, supply_tl2a: %d)\n",
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)), supply_tl2a);
-    gnrc_netif2_acquire(netif);
+    gnrc_netif_acquire(netif);
     do {    /* XXX: hidden goto */
         int tgt_idx;
 
-        if ((tgt_idx = gnrc_netif2_ipv6_addr_idx(netif, tgt)) < 0) {
+        if ((tgt_idx = gnrc_netif_ipv6_addr_idx(netif, tgt)) < 0) {
             DEBUG("ndp2: tgt not assigned to interface. Abort sending\n");
             break;
         }
-        if (gnrc_netif2_is_rtr(netif) && gnrc_netif2_is_rtr_adv(netif)) {
+        if (gnrc_netif_is_rtr(netif) && gnrc_netif_is_rtr_adv(netif)) {
             adv_flags |= NDP_NBR_ADV_FLAGS_R;
         }
         if (ipv6_addr_is_unspecified(dst)) {
@@ -354,7 +354,7 @@ void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
         /* TODO: also check if the node provides proxy servies for tgt */
         if ((pkt != NULL) &&
             (netif->ipv6.addrs_flags[tgt_idx] &
-             GNRC_NETIF2_IPV6_ADDRS_FLAGS_ANYCAST)) {
+             GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST)) {
             /* TL2A is not supplied and tgt is not anycast */
             adv_flags |= NDP_NBR_ADV_FLAGS_O;
         }
@@ -380,14 +380,14 @@ void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif2_t *netif,
                 break;
             }
         }
-        gnrc_netif2_release(netif);
+        gnrc_netif_release(netif);
         return;
     } while (0);
     gnrc_pktbuf_release(pkt);
-    gnrc_netif2_release(netif);
+    gnrc_netif_release(netif);
 }
 
-void gnrc_ndp2_rtr_sol_send(gnrc_netif2_t *netif, const ipv6_addr_t *dst)
+void gnrc_ndp2_rtr_sol_send(gnrc_netif_t *netif, const ipv6_addr_t *dst)
 {
     gnrc_pktsnip_t *hdr, *pkt = NULL;
 
@@ -398,12 +398,12 @@ void gnrc_ndp2_rtr_sol_send(gnrc_netif2_t *netif, const ipv6_addr_t *dst)
     DEBUG("ndp2: send router solicitation (iface: %" PRIkernel_pid
           ", dst: %s)\n", netif->pid,
           ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
-    gnrc_netif2_acquire(netif);
+    gnrc_netif_acquire(netif);
     do {    /* XXX: hidden goto */
         ipv6_addr_t *src = NULL;
 
         /* add SL2AO => check if there is a fitting source address to target */
-        if ((src = gnrc_netif2_ipv6_addr_best_src(netif, dst, false)) != NULL) {
+        if ((src = gnrc_netif_ipv6_addr_best_src(netif, dst, false)) != NULL) {
             uint8_t l2src[8];
             size_t l2src_len = _get_l2src(netif, l2src);
             if (l2src_len > 0) {
@@ -437,14 +437,14 @@ void gnrc_ndp2_rtr_sol_send(gnrc_netif2_t *netif, const ipv6_addr_t *dst)
                 break;
             }
         }
-        gnrc_netif2_release(netif);
+        gnrc_netif_release(netif);
         return;
     } while (0);
     gnrc_pktbuf_release(pkt);
-    gnrc_netif2_release(netif);
+    gnrc_netif_release(netif);
 }
 
-void gnrc_ndp2_rtr_adv_send(gnrc_netif2_t *netif, const ipv6_addr_t *src,
+void gnrc_ndp2_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
                             const ipv6_addr_t *dst, bool fin,
                             gnrc_pktsnip_t *ext_opts)
 {
@@ -461,9 +461,9 @@ void gnrc_ndp2_rtr_adv_send(gnrc_netif2_t *netif, const ipv6_addr_t *src,
     DEBUG("ndp2: send router advertisement (iface: %" PRIkernel_pid ", dst: %s%s\n",
           netif->pid, ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
           fin ? ", final" : "");
-    gnrc_netif2_acquire(netif);
+    gnrc_netif_acquire(netif);
     do {    /* XXX: hidden goto */
-        if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_MTU) {
+        if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_MTU) {
             if ((hdr = gnrc_ndp2_opt_mtu_build(netif->ipv6.mtu, pkt)) == NULL) {
                 DEBUG("ndp rtr: no space left in packet buffer\n");
                 break;
@@ -473,7 +473,7 @@ void gnrc_ndp2_rtr_adv_send(gnrc_netif2_t *netif, const ipv6_addr_t *src,
         if (src == NULL) {
             /* get address from source selection algorithm.
              * Only link local addresses may be used (RFC 4861 section 4.1) */
-            src = gnrc_netif2_ipv6_addr_best_src(netif, dst, true);
+            src = gnrc_netif_ipv6_addr_best_src(netif, dst, true);
         }
         /* add SL2A for source address */
         if (src != NULL) {
@@ -496,10 +496,10 @@ void gnrc_ndp2_rtr_adv_send(gnrc_netif2_t *netif, const ipv6_addr_t *src,
                 pkt = hdr;
             }
         }
-        if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_CUR_HL) {
+        if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_CUR_HL) {
             cur_hl = netif->cur_hl;
         }
-        if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_REACH_TIME) {
+        if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_REACH_TIME) {
             if (netif->ipv6.reach_time_base > (3600 * MS_PER_SEC)) {
                 /* reach_time > 1 hour */
                 reach_time = (3600 * MS_PER_SEC);
@@ -508,15 +508,15 @@ void gnrc_ndp2_rtr_adv_send(gnrc_netif2_t *netif, const ipv6_addr_t *src,
                 reach_time = netif->ipv6.reach_time_base;
             }
         }
-        if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_RETRANS_TIMER) {
+        if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_RETRANS_TIMER) {
             retrans_timer = netif->ipv6.retrans_time;
         }
         if (!fin) {
             adv_ltime = netif->ipv6.rtr_ltime;
         }
-        if (netif->ipv6.aac_mode == GNRC_NETIF2_AAC_DHCP) {
+        if (netif->ipv6.aac_mode == GNRC_NETIF_AAC_DHCP) {
             flags |= NDP_RTR_ADV_FLAGS_M;
-            if (netif->flags & GNRC_NETIF2_FLAGS_IPV6_ADV_O_FLAG) {
+            if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_O_FLAG) {
                 flags |= NDP_RTR_ADV_FLAGS_O;
             }
         }
@@ -541,11 +541,11 @@ void gnrc_ndp2_rtr_adv_send(gnrc_netif2_t *netif, const ipv6_addr_t *src,
                 break;
             }
         }
-        gnrc_netif2_release(netif);
+        gnrc_netif_release(netif);
         return;
     } while (0);
     gnrc_pktbuf_release(pkt);
-    gnrc_netif2_release(netif);
+    gnrc_netif_release(netif);
 #else
     (void)netif;
     (void)src;
@@ -556,7 +556,7 @@ void gnrc_ndp2_rtr_adv_send(gnrc_netif2_t *netif, const ipv6_addr_t *src,
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 }
 
-static gnrc_pktsnip_t *_build_headers(gnrc_netif2_t *netif,
+static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,
                                       const ipv6_addr_t *src,
                                       const ipv6_addr_t *dst,
                                       gnrc_pktsnip_t *payload)
@@ -581,9 +581,9 @@ static gnrc_pktsnip_t *_build_headers(gnrc_netif2_t *netif,
     return l2hdr;
 }
 
-static inline size_t _get_l2src(const gnrc_netif2_t *netif, uint8_t *l2src)
+static inline size_t _get_l2src(const gnrc_netif_t *netif, uint8_t *l2src)
 {
-#if GNRC_NETIF2_L2ADDR_MAXLEN > 0
+#if GNRC_NETIF_L2ADDR_MAXLEN > 0
     memcpy(l2src, netif->l2addr, netif->l2addr_len);
     return netif->l2addr_len;
 #else

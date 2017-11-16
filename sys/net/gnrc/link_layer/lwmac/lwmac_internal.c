@@ -26,13 +26,13 @@
 #include "net/gnrc/mac/mac.h"
 #include "net/gnrc/lwmac/lwmac.h"
 #include "include/lwmac_internal.h"
-#include "net/gnrc/netif2/ieee802154.h"
+#include "net/gnrc/netif/ieee802154.h"
 #include "net/netdev/ieee802154.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-int _gnrc_lwmac_transmit(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     netdev_t *dev = netif->dev;
     netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
@@ -99,7 +99,7 @@ int _gnrc_lwmac_transmit(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
         }
 #endif
 #ifdef MODULE_GNRC_MAC
-        if (netif->mac.mac_info & GNRC_NETIF2_MAC_INFO_CSMA_ENABLED) {
+        if (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_CSMA_ENABLED) {
             res = csma_sender_csma_ca_send(dev, vector, n, &netif->mac.csma_conf);
         }
         else {
@@ -189,7 +189,7 @@ int _gnrc_lwmac_parse_packet(gnrc_pktsnip_t *pkt, gnrc_lwmac_packet_info_t *info
     return 0;
 }
 
-void _gnrc_lwmac_set_netdev_state(gnrc_netif2_t *netif, netopt_state_t devstate)
+void _gnrc_lwmac_set_netdev_state(gnrc_netif_t *netif, netopt_state_t devstate)
 {
     netif->dev->driver->set(netif->dev,
                             NETOPT_STATE,
@@ -217,7 +217,7 @@ void _gnrc_lwmac_set_netdev_state(gnrc_netif2_t *netif, netopt_state_t devstate)
 #endif
 }
 
-netopt_state_t _gnrc_lwmac_get_netdev_state(gnrc_netif2_t *netif)
+netopt_state_t _gnrc_lwmac_get_netdev_state(gnrc_netif_t *netif)
 {
     netopt_state_t state;
 

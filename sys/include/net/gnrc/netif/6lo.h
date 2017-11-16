@@ -7,16 +7,16 @@
  */
 
 /**
- * @ingroup net_gnrc_netif2
+ * @ingroup net_gnrc_netif
  * @{
  *
  * @file
- * @brief   6LoWPAN definitions for @ref net_gnrc_netif2
+ * @brief   6LoWPAN definitions for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF2_6LO_H
-#define NET_GNRC_NETIF2_6LO_H
+#ifndef NET_GNRC_NETIF_6LO_H
+#define NET_GNRC_NETIF_6LO_H
 
 #include <stdint.h>
 
@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   6Lo component of @ref gnrc_netif2_t
+ * @brief   6Lo component of @ref gnrc_netif_t
  */
 typedef struct {
     /**
@@ -35,11 +35,11 @@ typedef struct {
      *          @ref net_gnrc_sixlowpan_frag "gnrc_sixlowpan_frag".
      */
     uint8_t max_frag_size;
-} gnrc_netif2_6lo_t;
+} gnrc_netif_6lo_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_NETIF2_6LO_H */
+#endif /* NET_GNRC_NETIF_6LO_H */
 /** @} */

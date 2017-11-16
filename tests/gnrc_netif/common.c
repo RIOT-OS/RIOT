@@ -68,7 +68,7 @@ static int _dump_send_packet(netdev_t *netdev, const struct iovec *vector,
     return res;
 }
 
-void _test_trigger_recv(gnrc_netif2_t *netif, const uint8_t *data,
+void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
                         size_t data_len)
 {
     netdev_t *dev = netif->dev;

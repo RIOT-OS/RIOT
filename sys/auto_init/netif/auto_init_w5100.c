@@ -22,14 +22,14 @@
 #include "log.h"
 #include "w5100.h"
 #include "w5100_params.h"
-#include "net/gnrc/netif2/ethernet.h"
+#include "net/gnrc/netif/ethernet.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
 #define MAC_STACKSIZE   (THREAD_STACKSIZE_DEFAULT)
-#define MAC_PRIO        (GNRC_NETIF2_PRIO)
+#define MAC_PRIO        (GNRC_NETIF_PRIO)
 /*** @} */
 
 /**
@@ -58,8 +58,8 @@ void auto_init_w5100(void)
         /* setup netdev device */
         w5100_setup(&dev[i], &w5100_params[i]);
         /* initialize netdev <-> gnrc adapter state */
-        gnrc_netif2_ethernet_create(stack[i], MAC_STACKSIZE, MAC_PRIO, "w5100",
-                                    (netdev_t *)&dev[i]);
+        gnrc_netif_ethernet_create(stack[i], MAC_STACKSIZE, MAC_PRIO, "w5100",
+                                   (netdev_t *)&dev[i]);
     }
 }
 

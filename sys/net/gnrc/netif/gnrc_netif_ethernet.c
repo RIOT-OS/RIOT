@@ -18,7 +18,7 @@
 #ifdef MODULE_NETDEV_ETH
 #include "net/ethernet/hdr.h"
 #include "net/gnrc.h"
-#include "net/gnrc/netif2/ethernet.h"
+#include "net/gnrc/netif/ethernet.h"
 #ifdef MODULE_GNRC_IPV6
 #include "net/ipv6/hdr.h"
 #endif
@@ -26,22 +26,22 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt);
-static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif);
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
+static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
-static const gnrc_netif2_ops_t ethernet_ops = {
+static const gnrc_netif_ops_t ethernet_ops = {
     .send = _send,
     .recv = _recv,
-    .get = gnrc_netif2_get_from_netdev,
-    .set = gnrc_netif2_set_from_netdev,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif2_t *gnrc_netif2_ethernet_create(char *stack, int stacksize,
-                                           char priority, char *name,
-                                           netdev_t *dev)
+gnrc_netif_t *gnrc_netif_ethernet_create(char *stack, int stacksize,
+                                         char priority, char *name,
+                                         netdev_t *dev)
 {
-    return gnrc_netif2_create(stack, stacksize, priority, name, dev,
-                              &ethernet_ops);
+    return gnrc_netif_create(stack, stacksize, priority, name, dev,
+                             &ethernet_ops);
 }
 
 static inline void _addr_set_broadcast(uint8_t *dst)
@@ -67,7 +67,7 @@ static inline void _addr_set_multicast(uint8_t *dst, gnrc_pktsnip_t *payload)
     }
 }
 
-static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     ethernet_hdr_t hdr;
     gnrc_netif_hdr_t *netif_hdr;
@@ -77,14 +77,14 @@ static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
     netdev_t *dev = netif->dev;
 
     if (pkt == NULL) {
-        DEBUG("gnrc_netif2_ethernet: pkt was NULL\n");
+        DEBUG("gnrc_netif_ethernet: pkt was NULL\n");
         return -EINVAL;
     }
 
     payload = pkt->next;
 
     if (pkt->type != GNRC_NETTYPE_NETIF) {
-        DEBUG("gnrc_netif2_ethernet: First header was not generic netif header\n");
+        DEBUG("gnrc_netif_ethernet: First header was not generic netif header\n");
         return -EBADMSG;
     }
 
@@ -111,7 +111,7 @@ static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
     }
     else if (netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST) {
         if (payload == NULL) {
-            DEBUG("gnrc_netif2_ethernet: empty multicast packets over Ethernet "
+            DEBUG("gnrc_netif_ethernet: empty multicast packets over Ethernet "
                   "are not yet supported\n");
             return -ENOTSUP;
         }
@@ -122,12 +122,12 @@ static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
                ETHERNET_ADDR_LEN);
     }
     else {
-        DEBUG("gnrc_netif2_ethernet: destination address had unexpected "
+        DEBUG("gnrc_netif_ethernet: destination address had unexpected "
               "format\n");
         return -EBADMSG;
     }
 
-    DEBUG("gnrc_netif2_ethernet: send to %02x:%02x:%02x:%02x:%02x:%02x\n",
+    DEBUG("gnrc_netif_ethernet: send to %02x:%02x:%02x:%02x:%02x:%02x\n",
           hdr.dst[0], hdr.dst[1], hdr.dst[2],
           hdr.dst[3], hdr.dst[4], hdr.dst[5]);
 
@@ -157,7 +157,7 @@ static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
     return res;
 }
 
-static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
+static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
@@ -169,7 +169,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
                               GNRC_NETTYPE_UNDEF);
 
         if (!pkt) {
-            DEBUG("gnrc_netif2_ethernet: cannot allocate pktsnip.\n");
+            DEBUG("gnrc_netif_ethernet: cannot allocate pktsnip.\n");
 
             /* drop the packet */
             dev->driver->recv(dev, NULL, bytes_expected, NULL);
@@ -179,7 +179,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
 
         int nread = dev->driver->recv(dev, pkt->data, bytes_expected, NULL);
         if (nread <= 0) {
-            DEBUG("gnrc_netif2_ethernet: read error.\n");
+            DEBUG("gnrc_netif_ethernet: read error.\n");
             goto safe_out;
         }
 
@@ -187,14 +187,14 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
             /* we've got less than the expected packet size,
              * so free the unused space.*/
 
-            DEBUG("gnrc_netif2_ethernet: reallocating.\n");
+            DEBUG("gnrc_netif_ethernet: reallocating.\n");
             gnrc_pktbuf_realloc_data(pkt, nread);
         }
 
         /* mark ethernet header */
         gnrc_pktsnip_t *eth_hdr = gnrc_pktbuf_mark(pkt, sizeof(ethernet_hdr_t), GNRC_NETTYPE_UNDEF);
         if (!eth_hdr) {
-            DEBUG("gnrc_netif2_ethernet: no space left in packet buffer\n");
+            DEBUG("gnrc_netif_ethernet: no space left in packet buffer\n");
             goto safe_out;
         }
 
@@ -202,7 +202,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
 
 #ifdef MODULE_L2FILTER
         if (!l2filter_pass(dev->filter, hdr->src, ETHERNET_ADDR_LEN)) {
-            DEBUG("gnrc_netif2_ethernet: incoming packet filtered by l2filter\n");
+            DEBUG("gnrc_netif_ethernet: incoming packet filtered by l2filter\n");
             goto safe_out;
         }
 #endif
@@ -217,7 +217,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
                                     GNRC_NETTYPE_NETIF);
 
         if (netif_hdr == NULL) {
-            DEBUG("gnrc_netif2_ethernet: no space left in packet buffer\n");
+            DEBUG("gnrc_netif_ethernet: no space left in packet buffer\n");
             pkt = eth_hdr;
             goto safe_out;
         }
@@ -227,7 +227,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
         gnrc_netif_hdr_set_dst_addr(netif_hdr->data, hdr->dst, ETHERNET_ADDR_LEN);
         ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = thread_getpid();
 
-        DEBUG("gnrc_netif2_ethernet: received packet from %02x:%02x:%02x:%02x:%02x:%02x "
+        DEBUG("gnrc_netif_ethernet: received packet from %02x:%02x:%02x:%02x:%02x:%02x "
               "of length %d\n",
               hdr->src[0], hdr->src[1], hdr->src[2], hdr->src[3], hdr->src[4],
               hdr->src[5], nread);

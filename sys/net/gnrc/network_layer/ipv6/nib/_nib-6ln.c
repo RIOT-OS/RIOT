@@ -13,7 +13,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ndp2.h"
 
@@ -28,9 +28,9 @@
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
-extern void _handle_search_rtr(gnrc_netif2_t *netif);
+extern void _handle_search_rtr(gnrc_netif_t *netif);
 
-static inline bool _is_iface_eui64(gnrc_netif2_t *netif, const eui64_t *eui64)
+static inline bool _is_iface_eui64(gnrc_netif_t *netif, const eui64_t *eui64)
 {
     /* TODO: adapt for short addresses */
     return (netif->l2addr_len == sizeof(eui64_t)) &&
@@ -38,7 +38,7 @@ static inline bool _is_iface_eui64(gnrc_netif2_t *netif, const eui64_t *eui64)
 }
 
 static inline uint8_t _reverse_iid(const ipv6_addr_t *dst,
-                                   const gnrc_netif2_t *netif, uint8_t *l2addr)
+                                   const gnrc_netif_t *netif, uint8_t *l2addr)
 {
     switch (netif->device_type) {
 #ifdef MODULE_NETDEV_ETH
@@ -71,10 +71,10 @@ static inline uint8_t _reverse_iid(const ipv6_addr_t *dst,
     }
 }
 
-bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif2_t *netif,
+bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                              gnrc_ipv6_nib_nc_t *nce)
 {
-    bool res = (netif != NULL) && gnrc_netif2_is_6ln(netif) &&
+    bool res = (netif != NULL) && gnrc_netif_is_6ln(netif) &&
                ipv6_addr_is_link_local(dst);
 
     if (res) {
@@ -86,8 +86,8 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif2_t *netif,
                   (unsigned)netif->pid);
             nce->l2addr_len = l2addr_len;
             DEBUG("%s\n",
-                  gnrc_netif2_addr_to_str(nce->l2addr, nce->l2addr_len,
-                                          addr_str));
+                  gnrc_netif_addr_to_str(nce->l2addr, nce->l2addr_len,
+                                         addr_str));
             memcpy(&nce->ipv6, dst, sizeof(nce->ipv6));
             nce->info = 0;
             nce->info |= (netif->pid << GNRC_IPV6_NIB_NC_INFO_IFACE_POS) &
@@ -102,13 +102,13 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif2_t *netif,
     return res;
 }
 
-uint8_t _handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
+uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     const icmpv6_hdr_t *icmpv6,
                     const sixlowpan_nd_opt_ar_t *aro, const ndp_opt_t *sl2ao,
                     _nib_onl_entry_t *nce)
 {
     assert(netif != NULL);
-    if (gnrc_netif2_is_6ln(netif) && (aro->len == SIXLOWPAN_ND_OPT_AR_LEN)) {
+    if (gnrc_netif_is_6ln(netif) && (aro->len == SIXLOWPAN_ND_OPT_AR_LEN)) {
         DEBUG("nib: valid ARO received\n");
         DEBUG(" - length: %u\n", aro->len);
         DEBUG(" - status: %u\n", aro->status);
@@ -126,7 +126,7 @@ uint8_t _handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
                 case SIXLOWPAN_ND_STATUS_SUCCESS: {
                     uint16_t ltime = byteorder_ntohs(aro->ltime);
                     uint32_t rereg_time;
-                    int idx = gnrc_netif2_ipv6_addr_idx(netif, &ipv6->dst);
+                    int idx = gnrc_netif_ipv6_addr_idx(netif, &ipv6->dst);
                     /* if ltime 1min, reschedule NS in 30sec, otherwise 1min
                      * before timeout */
                     rereg_time = (ltime == 1U) ? (30 * MS_PER_SEC) :
@@ -135,8 +135,8 @@ uint8_t _handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
                           "Scheduling re-registration in %" PRIu32 "ms\n",
                           ipv6_addr_to_str(addr_str, &ipv6->dst,
                                            sizeof(addr_str)), rereg_time);
-                    netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_MASK;
-                    netif->ipv6.addrs_flags[idx] |= GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID;
+                    netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
+                    netif->ipv6.addrs_flags[idx] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
                     _evtimer_add(&netif->ipv6.addrs[idx],
                                  GNRC_IPV6_NIB_REREG_ADDRESS,
                                  &netif->ipv6.addrs_timers[idx],
@@ -149,7 +149,7 @@ uint8_t _handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
                           ipv6_addr_to_str(addr_str,
                                            &ipv6->dst,
                                            sizeof(addr_str)), netif->pid);
-                    gnrc_netif2_ipv6_addr_remove(netif, &ipv6->dst);
+                    gnrc_netif_ipv6_addr_remove(netif, &ipv6->dst);
                     /* TODO: generate new address */
                     break;
                 case SIXLOWPAN_ND_STATUS_NC_FULL: {
@@ -173,7 +173,7 @@ uint8_t _handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
             return aro->status;
         }
 #if GNRC_IPV6_NIB_CONF_6LR
-        else if (gnrc_netif2_is_6lr(netif) &&
+        else if (gnrc_netif_is_6lr(netif) &&
                  (icmpv6->type == ICMPV6_NBR_SOL)) {
             assert(nce != NULL);
             return _reg_addr_upstream(netif, ipv6, icmpv6, aro, sl2ao, nce);
@@ -191,21 +191,21 @@ uint8_t _handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
     return _ADDR_REG_STATUS_IGNORE;
 }
 
-static inline bool _is_tentative(const gnrc_netif2_t *netif, int idx)
+static inline bool _is_tentative(const gnrc_netif_t *netif, int idx)
 {
-    return (gnrc_netif2_ipv6_addr_get_state(netif, idx) &
-            GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
+    return (gnrc_netif_ipv6_addr_get_state(netif, idx) &
+            GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
 }
 
-static inline bool _is_valid(const gnrc_netif2_t *netif, int idx)
+static inline bool _is_valid(const gnrc_netif_t *netif, int idx)
 {
-    return (gnrc_netif2_ipv6_addr_get_state(netif, idx) ==
-            GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID);
+    return (gnrc_netif_ipv6_addr_get_state(netif, idx) ==
+            GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
 }
 
 void _handle_rereg_address(const ipv6_addr_t *addr)
 {
-    gnrc_netif2_t *netif = gnrc_netif2_get_by_ipv6_addr(addr);
+    gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(addr);
     _nib_dr_entry_t *router = _nib_drl_get_dr();
 
     if ((netif != NULL) && (router != NULL)) {
@@ -223,10 +223,10 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
     }
     if (netif != NULL) {
-        int idx = gnrc_netif2_ipv6_addr_idx(netif, addr);
+        int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
 
         if (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
-             (gnrc_netif2_ipv6_addr_dad_trans(netif, idx) <
+             (gnrc_netif_ipv6_addr_dad_trans(netif, idx) <
               SIXLOWPAN_ND_REG_TRANSMIT_NUMOF))) {
             uint32_t retrans_time;
 

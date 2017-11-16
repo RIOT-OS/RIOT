@@ -18,10 +18,10 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF2_INTERNAL_H
-#define NET_GNRC_NETIF2_INTERNAL_H
+#ifndef NET_GNRC_NETIF_INTERNAL_H
+#define NET_GNRC_NETIF_INTERNAL_H
 
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +39,7 @@ extern "C" {
  *
  * @internal
  */
-void gnrc_netif2_acquire(gnrc_netif2_t *netif);
+void gnrc_netif_acquire(gnrc_netif_t *netif);
 
 /**
  * @brief   Releases exclusive access to the interface
@@ -48,7 +48,7 @@ void gnrc_netif2_acquire(gnrc_netif2_t *netif);
  *
  * @internal
  */
-void gnrc_netif2_release(gnrc_netif2_t *netif);
+void gnrc_netif_release(gnrc_netif_t *netif);
 
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
 /**
@@ -67,12 +67,12 @@ void gnrc_netif2_release(gnrc_netif2_t *netif);
  * @param[in] pfx_len   length in bits of the prefix of @p addr
  * @param[in] flags     initial flags for the address.
  *                      - Setting the address' state to
- *                        @ref GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_TENTATIVE
+ *                        @ref GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE
  *                        means that this address is assumed to be added due to
  *                        stateless auto-address configuration and actions
  *                        related to that may be performed in the background.
  *                      - Setting the address' state to
- *                        @ref GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID means
+ *                        @ref GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID means
  *                        that the address is assumed to be manually configured
  *                        and its prefix will be added to the node's prefix
  *                        list (valid and preferred lifetime will be set to
@@ -85,8 +85,8 @@ void gnrc_netif2_release(gnrc_netif2_t *netif);
  * @return  >= 0, on success
  * @return  -ENOMEM, when no space for new addresses is left on the interface
  */
-int gnrc_netif2_ipv6_addr_add(gnrc_netif2_t *netif, const ipv6_addr_t *addr,
-                              unsigned pfx_len, uint8_t flags);
+int gnrc_netif_ipv6_addr_add(gnrc_netif_t *netif, const ipv6_addr_t *addr,
+                             unsigned pfx_len, uint8_t flags);
 
 /**
  * @brief   Removes an IPv6 address from the interface
@@ -98,12 +98,12 @@ int gnrc_netif2_ipv6_addr_add(gnrc_netif2_t *netif, const ipv6_addr_t *addr,
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  */
-void gnrc_netif2_ipv6_addr_remove(gnrc_netif2_t *netif,
-                                  const ipv6_addr_t *addr);
+void gnrc_netif_ipv6_addr_remove(gnrc_netif_t *netif,
+                                 const ipv6_addr_t *addr);
 
 
 /**
- * @brief   Returns the index of @p addr in gnrc_netif2_t::ipv6_addrs of @p
+ * @brief   Returns the index of @p addr in gnrc_netif_t::ipv6_addrs of @p
  *          netif
  *
  * @pre `(netif != NULL) && (addr != NULL)`
@@ -115,11 +115,11 @@ void gnrc_netif2_ipv6_addr_remove(gnrc_netif2_t *netif,
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  *
- * @return  index of @p addr in gnrc_netif2_t::ipv6_addrs of @p netif
+ * @return  index of @p addr in gnrc_netif_t::ipv6_addrs of @p netif
  * @return  -1, if @p addr isn't assigned to @p netif
  */
-int gnrc_netif2_ipv6_addr_idx(gnrc_netif2_t *netif,
-                              const ipv6_addr_t *addr);
+int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
+                             const ipv6_addr_t *addr);
 
 /**
  * @brief   Gets state from address flags
@@ -129,10 +129,10 @@ int gnrc_netif2_ipv6_addr_idx(gnrc_netif2_t *netif,
  *
  * @return  the state of the address at @p idx
  */
-static inline uint8_t gnrc_netif2_ipv6_addr_get_state(const gnrc_netif2_t *netif,
-                                                      int idx)
+static inline uint8_t gnrc_netif_ipv6_addr_get_state(const gnrc_netif_t *netif,
+                                                     int idx)
 {
-    return netif->ipv6.addrs_flags[idx] & GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_MASK;
+    return netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
 }
 
 /**
@@ -145,14 +145,14 @@ static inline uint8_t gnrc_netif2_ipv6_addr_get_state(const gnrc_netif2_t *netif
  * @return  the number of duplicate address detection transmissions already
  *          performed
  */
-static inline uint8_t gnrc_netif2_ipv6_addr_dad_trans(const gnrc_netif2_t *netif,
-                                                      int idx)
+static inline uint8_t gnrc_netif_ipv6_addr_dad_trans(const gnrc_netif_t *netif,
+                                                     int idx)
 {
-    return netif->ipv6.addrs_flags[idx] & GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
+    return netif->ipv6.addrs_flags[idx] & GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
 }
 
 /**
- * @brief   Returns the index of an address in gnrc_netif2_t::ipv6_addrs of @p
+ * @brief   Returns the index of an address in gnrc_netif_t::ipv6_addrs of @p
  *          netif that matches @p addr best
  *
  * @pre `(netif != NULL) && (addr != NULL)`
@@ -165,12 +165,12 @@ static inline uint8_t gnrc_netif2_ipv6_addr_dad_trans(const gnrc_netif2_t *netif
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  *
- * @return  index of an address in gnrc_netif2_t::ipv6_addrs of @p netif that
+ * @return  index of an address in gnrc_netif_t::ipv6_addrs of @p netif that
  *          best matches @p addr.
  * @return  -1, if no address on @p netif matches @p addr
  */
-int gnrc_netif2_ipv6_addr_match(gnrc_netif2_t *netif,
-                                const ipv6_addr_t *addr);
+int gnrc_netif_ipv6_addr_match(gnrc_netif_t *netif,
+                               const ipv6_addr_t *addr);
 
 /**
  * @brief   Searches for the best address on an interface usable as a source
@@ -198,9 +198,9 @@ int gnrc_netif2_ipv6_addr_match(gnrc_netif2_t *netif,
  * @return  The best source address for a packet addressed to @p dst
  * @return  NULL, if no matching address can be found on the interface.
  */
-ipv6_addr_t *gnrc_netif2_ipv6_addr_best_src(gnrc_netif2_t *netif,
-                                            const ipv6_addr_t *dst,
-                                            bool ll_only);
+ipv6_addr_t *gnrc_netif_ipv6_addr_best_src(gnrc_netif_t *netif,
+                                           const ipv6_addr_t *dst,
+                                           bool ll_only);
 
 /**
  * @brief   Gets an interface by an address (incl. multicast groups) assigned
@@ -213,7 +213,7 @@ ipv6_addr_t *gnrc_netif2_ipv6_addr_best_src(gnrc_netif2_t *netif,
  * @return  The network interface that has @p addr assigned
  * @return  NULL, if no interface has @p addr assigned
  */
-gnrc_netif2_t *gnrc_netif2_get_by_ipv6_addr(const ipv6_addr_t *addr);
+gnrc_netif_t *gnrc_netif_get_by_ipv6_addr(const ipv6_addr_t *addr);
 
 /**
  * @brief   Gets an interface by an address matching a given prefix best
@@ -224,7 +224,7 @@ gnrc_netif2_t *gnrc_netif2_get_by_ipv6_addr(const ipv6_addr_t *addr);
  *          @p prefix best
  * @return  NULL, if there is no address on any interface that matches @prefix
  */
-gnrc_netif2_t *gnrc_netif2_get_by_prefix(const ipv6_addr_t *prefix);
+gnrc_netif_t *gnrc_netif_get_by_prefix(const ipv6_addr_t *prefix);
 
 /**
  * @brief   Joins interface to an IPv6 multicast group
@@ -240,8 +240,8 @@ gnrc_netif2_t *gnrc_netif2_get_by_prefix(const ipv6_addr_t *prefix);
  * @return  0, on success
  * @return  -ENOMEM, when no space for new addresses is left on the interface
  */
-int gnrc_netif2_ipv6_group_join(gnrc_netif2_t *netif,
-                                const ipv6_addr_t *addr);
+int gnrc_netif_ipv6_group_join(gnrc_netif_t *netif,
+                               const ipv6_addr_t *addr);
 
 /**
  * @brief   Let interface leave from an IPv6 multicast group
@@ -253,11 +253,11 @@ int gnrc_netif2_ipv6_group_join(gnrc_netif2_t *netif,
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  */
-void gnrc_netif2_ipv6_group_leave(gnrc_netif2_t *netif,
-                                  const ipv6_addr_t *addr);
+void gnrc_netif_ipv6_group_leave(gnrc_netif_t *netif,
+                                 const ipv6_addr_t *addr);
 
 /**
- * @brief   Returns the index of @p addr in gnrc_netif2_t::ipv6_groups of @p
+ * @brief   Returns the index of @p addr in gnrc_netif_t::ipv6_groups of @p
  *          netif
  *
  * @pre `(netif != NULL) && (addr != NULL)`
@@ -269,11 +269,11 @@ void gnrc_netif2_ipv6_group_leave(gnrc_netif2_t *netif,
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  *
- * @return  index of @p addr in gnrc_netif2_t::ipv6_groups of @p netif
+ * @return  index of @p addr in gnrc_netif_t::ipv6_groups of @p netif
  * @return  -1, if @p netif is not in group @p addr
  */
-int gnrc_netif2_ipv6_group_idx(gnrc_netif2_t *netif,
-                               const ipv6_addr_t *addr);
+int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif,
+                              const ipv6_addr_t *addr);
 
 /**
  * @brief   Gets interface identifier (IID) of an interface's link-layer address
@@ -283,9 +283,9 @@ int gnrc_netif2_ipv6_group_idx(gnrc_netif2_t *netif,
  *
  * @return  0, on success
  * @return  -ENOTSUP, if interface has no link-layer address or if
- *          gnrc_netif2_t::device_type is not supported.
+ *          gnrc_netif_t::device_type is not supported.
  */
-int gnrc_netif2_ipv6_get_iid(gnrc_netif2_t *netif, eui64_t *eui64);
+int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64);
 #endif  /* MODULE_GNRC_IPV6 */
 
 /**
@@ -300,9 +300,9 @@ int gnrc_netif2_ipv6_get_iid(gnrc_netif2_t *netif, eui64_t *eui64);
  * @return  true, if the interface represents a router
  * @return  false, if the interface does not represent a router
  */
-static inline bool gnrc_netif2_is_rtr(const gnrc_netif2_t *netif)
+static inline bool gnrc_netif_is_rtr(const gnrc_netif_t *netif)
 {
-    return (netif->flags & GNRC_NETIF2_FLAGS_IPV6_FORWARDING);
+    return (netif->flags & GNRC_NETIF_FLAGS_IPV6_FORWARDING);
 }
 
 /**
@@ -316,9 +316,9 @@ static inline bool gnrc_netif2_is_rtr(const gnrc_netif2_t *netif)
  * @return  false, if the interface is not allowed to send out router
  *          advertisements
  */
-static inline bool gnrc_netif2_is_rtr_adv(const gnrc_netif2_t *netif)
+static inline bool gnrc_netif_is_rtr_adv(const gnrc_netif_t *netif)
 {
-    return (netif->flags & GNRC_NETIF2_FLAGS_IPV6_RTR_ADV);
+    return (netif->flags & GNRC_NETIF_FLAGS_IPV6_RTR_ADV);
 }
 
 /**
@@ -334,7 +334,7 @@ static inline bool gnrc_netif2_is_rtr_adv(const gnrc_netif2_t *netif)
  * @return  true, if the interface represents a 6LN
  * @return  false, if the interface does not represent a 6LN
  */
-bool gnrc_netif2_is_6ln(const gnrc_netif2_t *netif);
+bool gnrc_netif_is_6ln(const gnrc_netif_t *netif);
 
 /**
  * @brief   Checks if the interface represents a 6Lo router (6LR) according to
@@ -349,9 +349,9 @@ bool gnrc_netif2_is_6ln(const gnrc_netif2_t *netif);
  * @return  true, if the interface represents a 6LR
  * @return  false, if the interface does not represent a 6LR
  */
-static inline bool gnrc_netif2_is_6lr(const gnrc_netif2_t *netif)
+static inline bool gnrc_netif_is_6lr(const gnrc_netif_t *netif)
 {
-    return gnrc_netif2_is_rtr(netif) && gnrc_netif2_is_6ln(netif);
+    return gnrc_netif_is_rtr(netif) && gnrc_netif_is_6ln(netif);
 }
 
 /**
@@ -367,15 +367,15 @@ static inline bool gnrc_netif2_is_6lr(const gnrc_netif2_t *netif)
  * @return  true, if the interface represents a 6LBR
  * @return  false, if the interface does not represent a 6LBR
  */
-static inline bool gnrc_netif2_is_6lbr(const gnrc_netif2_t *netif)
+static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
 {
-    return (netif->flags & GNRC_NETIF2_FLAGS_6LO_ABR) &&
-           gnrc_netif2_is_6lr(netif);
+    return (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR) &&
+           gnrc_netif_is_6lr(netif);
 }
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_NETIF2_INTERNAL_H */
+#endif /* NET_GNRC_NETIF_INTERNAL_H */
 /** @} */

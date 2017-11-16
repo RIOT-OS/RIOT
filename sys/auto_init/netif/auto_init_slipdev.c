@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "board.h"
-#include "net/gnrc/netif2/raw.h"
+#include "net/gnrc/netif/raw.h"
 #include "net/gnrc.h"
 
 #include "slipdev.h"
@@ -35,7 +35,7 @@
  */
 #define SLIPDEV_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
 #ifndef SLIPDEV_PRIO
-#define SLIPDEV_PRIO            (GNRC_NETIF2_PRIO)
+#define SLIPDEV_PRIO            (GNRC_NETIF_PRIO)
 #endif
 
 static slipdev_t slipdevs[SLIPDEV_NUM];
@@ -49,9 +49,9 @@ void auto_init_slipdev(void)
         LOG_DEBUG("[auto_init_netif] initializing slip #%u\n", i);
 
         slipdev_setup(&slipdevs[i], p);
-        gnrc_netif2_raw_create(_slipdev_stacks[i], SLIPDEV_STACKSIZE,
-                                SLIPDEV_PRIO, "slipdev",
-                                (netdev_t *)&slipdevs[i]);
+        gnrc_netif_raw_create(_slipdev_stacks[i], SLIPDEV_STACKSIZE,
+                              SLIPDEV_PRIO, "slipdev",
+                              (netdev_t *)&slipdevs[i]);
     }
 }
 #else

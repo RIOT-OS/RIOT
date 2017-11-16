@@ -237,11 +237,11 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
     new->end = end;
 
     DEBUG("6lo rfrag: add interval (%" PRIu16 ", %" PRIu16 ") to entry (%s, ",
-          new->start, new->end, gnrc_netif2_addr_to_str(entry->src,
-                                                        entry->src_len,
-                                                        l2addr_str));
-    DEBUG("%s, %u, %u)\n", gnrc_netif2_addr_to_str(entry->dst, entry->dst_len,
-                                                   l2addr_str),
+          new->start, new->end, gnrc_netif_addr_to_str(entry->src,
+                                                       entry->src_len,
+                                                       l2addr_str));
+    DEBUG("%s, %u, %u)\n", gnrc_netif_addr_to_str(entry->dst, entry->dst_len,
+                                                  l2addr_str),
           (unsigned)entry->pkt->size, entry->tag);
 
     LL_PREPEND(entry->ints, new);
@@ -259,11 +259,11 @@ static void _rbuf_gc(void)
         if ((rbuf[i].pkt != NULL) &&
               ((now_usec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
             DEBUG("6lo rfrag: entry (%s, ",
-                  gnrc_netif2_addr_to_str(rbuf[i].src, rbuf[i].src_len,
-                                          l2addr_str));
+                  gnrc_netif_addr_to_str(rbuf[i].src, rbuf[i].src_len,
+                                         l2addr_str));
             DEBUG("%s, %u, %u) timed out\n",
-                  gnrc_netif2_addr_to_str(rbuf[i].dst, rbuf[i].dst_len,
-                                          l2addr_str),
+                  gnrc_netif_addr_to_str(rbuf[i].dst, rbuf[i].dst_len,
+                                         l2addr_str),
                   (unsigned)rbuf[i].pkt->size, rbuf[i].tag);
 
             gnrc_pktbuf_release(rbuf[i].pkt);
@@ -287,11 +287,11 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
             (memcmp(rbuf[i].src, src, src_len) == 0) &&
             (memcmp(rbuf[i].dst, dst, dst_len) == 0)) {
             DEBUG("6lo rfrag: entry %p (%s, ", (void *)(&rbuf[i]),
-                  gnrc_netif2_addr_to_str(rbuf[i].src, rbuf[i].src_len,
-                                          l2addr_str));
+                  gnrc_netif_addr_to_str(rbuf[i].src, rbuf[i].src_len,
+                                         l2addr_str));
             DEBUG("%s, %u, %u) found\n",
-                  gnrc_netif2_addr_to_str(rbuf[i].dst, rbuf[i].dst_len,
-                                          l2addr_str),
+                  gnrc_netif_addr_to_str(rbuf[i].dst, rbuf[i].dst_len,
+                                         l2addr_str),
                   (unsigned)rbuf[i].pkt->size, rbuf[i].tag);
             rbuf[i].arrival = now_usec;
             return &(rbuf[i]);
@@ -338,9 +338,9 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     res->cur_size = 0;
 
     DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
-          gnrc_netif2_addr_to_str(res->src, res->src_len, l2addr_str));
+          gnrc_netif_addr_to_str(res->src, res->src_len, l2addr_str));
     DEBUG("%s, %u, %u) created\n",
-          gnrc_netif2_addr_to_str(res->dst, res->dst_len, l2addr_str), (unsigned)res->pkt->size,
+          gnrc_netif_addr_to_str(res->dst, res->dst_len, l2addr_str), (unsigned)res->pkt->size,
           res->tag);
 
     return res;

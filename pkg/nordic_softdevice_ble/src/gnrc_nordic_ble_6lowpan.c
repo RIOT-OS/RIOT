@@ -46,7 +46,7 @@
 #include "thread.h"
 
 #include "net/gnrc.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/nettype.h"
 
 #include "ble-core.h"
@@ -61,11 +61,11 @@
 #include "od.h"
 #endif
 
-#define BLE_PRIO                    (GNRC_NETIF2_PRIO)
+#define BLE_PRIO                    (GNRC_NETIF_PRIO)
 
 static char _stack[(THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)];
 
-static gnrc_netif2_t *_ble_netif = NULL;
+static gnrc_netif_t *_ble_netif = NULL;
 
 static uint8_t _sendbuf[BLE_SIXLOWPAN_MTU];
 
@@ -221,7 +221,7 @@ static int _handle_get(gnrc_netapi_opt_t *_opt)
     return res;
 }
 
-static void _netif_init(gnrc_netif2_t *netif)
+static void _netif_init(gnrc_netif_t *netif)
 {
     ble_stack_init();
     ble_mac_init(_ble_mac_callback);
@@ -231,28 +231,28 @@ static void _netif_init(gnrc_netif2_t *netif)
     ble_advertising_start();
 }
 
-static int _netif_send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static int _netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     (void)netif;
     assert(netif != _ble_netif);
     return _send(pkt);
 }
 
-static gnrc_pktsnip_t *_netif_recv(gnrc_netif2_t *netif)
+static gnrc_pktsnip_t *_netif_recv(gnrc_netif_t *netif)
 {
     (void)netif;
     /* not supported */
     return NULL;
 }
 
-static int _netif_get(gnrc_netif2_t *netif, gnrc_netapi_opt_t *opt)
+static int _netif_get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
     (void)netif;
     assert(netif != _ble_netif);
     return _handle_get(opt);
 }
 
-static int _netif_set(gnrc_netif2_t *netif, const gnrc_netapi_opt_t *opt)
+static int _netif_set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 {
     (void)netif;
     (void)opt;
@@ -260,7 +260,7 @@ static int _netif_set(gnrc_netif2_t *netif, const gnrc_netapi_opt_t *opt)
     return -ENOTSUP;
 }
 
-static void _netif_msg_handler(gnrc_netif2_t *netif, msg_t *msg)
+static void _netif_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 {
     switch (msg->type) {
         case BLE_EVENT_RX_DONE:
@@ -273,7 +273,7 @@ static void _netif_msg_handler(gnrc_netif2_t *netif, msg_t *msg)
     }
 }
 
-static const gnrc_netif2_ops_t _ble_ops = {
+static const gnrc_netif_ops_t _ble_ops = {
     .init = _netif_init,
     .send = _netif_send,
     .recv = _netif_recv,
@@ -284,6 +284,6 @@ static const gnrc_netif2_ops_t _ble_ops = {
 
 void gnrc_nordic_ble_6lowpan_init(void)
 {
-    _ble_netif = gnrc_netif2_create(_stack, sizeof(_stack), BLE_PRIO,
-                                    "ble", NULL, &_ble_ops);
+    _ble_netif = gnrc_netif_create(_stack, sizeof(_stack), BLE_PRIO,
+                                   "ble", NULL, &_ble_ops);
 }

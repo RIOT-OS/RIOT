@@ -7,30 +7,30 @@
  */
 
 /**
- * @ingroup net_gnrc_netif2
+ * @ingroup net_gnrc_netif
  * @{
  *
  * @file
- * @brief   XBee adaption for @ref net_gnrc_netif2
+ * @brief   XBee adaption for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef GNRC_NETIF2_XBEE_H
-#define GNRC_NETIF2_XBEE_H
+#ifndef GNRC_NETIF_XBEE_H
+#define GNRC_NETIF_XBEE_H
 
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-gnrc_netif2_t *gnrc_netif2_xbee_create(char *stack, int stacksize,
-                                       char priority, char *name,
-                                       netdev_t *dev);
+gnrc_netif_t *gnrc_netif_xbee_create(char *stack, int stacksize,
+                                     char priority, char *name,
+                                     netdev_t *dev);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GNRC_NETIF2_XBEE_H */
+#endif /* GNRC_NETIF_XBEE_H */
 /** @} */

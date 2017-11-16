@@ -7,44 +7,44 @@
  */
 
 /**
- * @ingroup net_gnrc_netif2
+ * @ingroup net_gnrc_netif
  * @{
  *
  * @file
- * @brief   Raw (i.e. raw IP packets without link-layer information) adaptation
- *          for @ref net_gnrc_netif2
+ * @brief   IEEE 802.15.4 adaption for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NETIF2_RAW_H
-#define NET_GNRC_NETIF2_RAW_H
+#ifndef NET_GNRC_NETIF_IEEE802154_H
+#define NET_GNRC_NETIF_IEEE802154_H
 
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief   Creates a raw network interface
+ * @brief   Creates an IEEE 802.15.4 network interface
  *
  * @param[in] stack     The stack for the network interface's thread.
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the network interface's thread.
  * @param[in] name      Name for the network interface. May be NULL.
- * @param[in] dev       Device for the interface.
+ * @param[in] dev       Device for the interface
  *
- * @see @ref gnrc_netif2_create()
+ * @see @ref gnrc_netif_create()
  *
  * @return  The network interface on success.
  * @return  NULL, on error.
  */
-gnrc_netif2_t *gnrc_netif2_raw_create(char *stack, int stacksize, char priority,
-                                      char *name, netdev_t *dev);
+gnrc_netif_t *gnrc_netif_ieee802154_create(char *stack, int stacksize,
+                                           char priority, char *name,
+                                           netdev_t *dev);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_NETIF2_RAW_H */
+#endif /* NET_GNRC_NETIF_IEEE802154_H */
 /** @} */
