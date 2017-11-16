@@ -1,1 +1,1 @@
-include $(RIOTBOARD)/nucleo-common/Makefile.dep
+include $(RIOTBOARD)/common/nucleo/Makefile.dep
