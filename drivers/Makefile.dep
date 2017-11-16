@@ -115,6 +115,10 @@ ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter hts221,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter io1_xplained,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += at30tse75x
