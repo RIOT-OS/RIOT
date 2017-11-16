@@ -22,7 +22,7 @@ else
   include $(RIOTMAKE)/tools/bossa.inc.mk
 endif
 
-INCLUDES += -I$(RIOTBOARD)/arduino-mkr-common/include
+INCLUDES += -I$(RIOTBOARD)/common/arduino-mkr/include
 
 # setup the boards dependencies
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
