@@ -58,6 +58,6 @@ int main(void)
     P(stack_size);
 #endif
 
-    puts("Done.");
+    puts("SUCCESS");
     return 0;
 }

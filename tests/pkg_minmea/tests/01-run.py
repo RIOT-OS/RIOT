@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import math
+
+sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+import testrunner
+
+
+def testfunc(child):
+    child.expect_exact('START')
+    child.expect_exact('SUCCESS')
+
+if __name__ == "__main__":
+    sys.exit(testrunner.run(testfunc))

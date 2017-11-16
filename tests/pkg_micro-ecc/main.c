@@ -164,10 +164,12 @@ int main(void)
 
     printf(" done with %d error(s)\n", errorc);
 
-    if (errorc == 0) {
-        return 0;
+    if (errorc) {
+        puts("FAILURE");
+        return 1;
     }
     else {
-        return 1;
+        puts("SUCCESS");
+        return 0;
     }
 }
