@@ -80,6 +80,8 @@ ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
   BOARD=none
 endif
 
+include $(RIOTMAKE)/boards/groups.inc.mk
+
 ifeq (none,$(BOARD))
   include $(RIOTMAKE)/info-global.inc.mk
   include $(RIOTMAKE)/buildtests.inc.mk
