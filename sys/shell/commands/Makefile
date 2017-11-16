@@ -17,9 +17,6 @@ endif
 ifneq (,$(filter random,$(USEMODULE)))
   SRC += sc_random.c
 endif
-ifeq ($(CPU),x86)
-  SRC += sc_x86_lspci.c
-endif
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
     SRC += sc_at30tse75x.c
 endif
