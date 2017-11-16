@@ -292,6 +292,11 @@ ifeq ($(origin RIOT_VERSION), undefined)
   endif
 endif
 
+# make the configured baudrate available to the programm 
+ifdef BAUD
+  CFLAGS += -DUART_STDIO_BAUDRATE=$(BAUD)
+endif
+
 # the binaries to link
 BASELIBS += $(BINDIR)/${APPLICATION}.a
 BASELIBS += $(APPDEPS)
