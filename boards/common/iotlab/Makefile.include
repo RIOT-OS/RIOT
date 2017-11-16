@@ -14,4 +14,4 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
 # add the common header files to the include path
-INCLUDES += -I$(RIOTBOARD)/iotlab-common/include
+INCLUDES += -I$(RIOTBOARD)/common/iotlab/include
