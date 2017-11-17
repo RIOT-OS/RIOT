@@ -35,7 +35,7 @@ static void set_interface_roles(void)
             ipv6_addr_from_str(&addr, "fe80::2");
             gnrc_netapi_set(dev, NETOPT_IPV6_ADDR, 64 << 8, &addr, sizeof(addr));
             ipv6_addr_from_str(&addr, "fe80::1");
-            gnrc_ipv6_nib_ft_add(&defroute, IPV6_ADDR_BIT_LEN, &addr, dev);
+            gnrc_ipv6_nib_ft_add(&defroute, IPV6_ADDR_BIT_LEN, &addr, dev, 0);
         }
         else if ((!gnrc_wireless_interface) && (is_wired != 1)) {
             gnrc_wireless_interface = dev;
