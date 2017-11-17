@@ -35,9 +35,16 @@ define board_missing_features
   endif
 endef
 
-BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name "common" -exec basename {} \;)
+BOARDS ?= $(ALL_BOARDS)
+
+# expand boards groups, e.g., msp430 -> "msb-430 msb-430h ..."
+BOARDS := $(foreach group,$(filter $(BOARD_GROUPS),$(BOARDS)),$(BOARD_GROUP.$(group)))
+BOARDS := $(filter-out $(BOARD_GROUPS),$(BOARDS))
+
 BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
 BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
+
+BOARDS := $(sort $(BOARDS))
 
 BOARDS_WITH_MISSING_FEATURES :=
 BOARDS_FEATURES_MISSING :=
