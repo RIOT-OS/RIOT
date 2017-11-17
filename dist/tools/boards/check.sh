@@ -5,19 +5,6 @@
 # This script checks whether the board groups defined in boards/groups.mk
 # contain and only contai boards that actually exist in the tree.
 
-_greplist() {
-    if [ $# -eq 0 ]; then
-        echo cat
-    else
-        echo -n "grep -vE ($1"
-        shift
-        for i in $*; do
-            echo -n "|$i"
-        done
-        echo ")"
-    fi
-}
-
 : ${RIOTBASE:=$(pwd)}
 
 export RIOTBASE
@@ -28,8 +15,8 @@ BOARD_FOLDERS="$(find ${RIOTBASE}/boards/* -maxdepth 0 -type d \! -name "*-commo
 if [ "$(echo ${BOARD_LIST} | sort)" != "$(echo ${BOARD_FOLDERS} | sort)" ]; then
     echo "$0: board list mismatch!"
 
-    LIST_MISSING="$(echo "$BOARD_FOLDERS" | $(_greplist $BOARD_LIST))"
-    FOLDER_MISSING="$(echo "$BOARD_LIST" | $(_greplist $BOARD_FOLDERS))"
+    LIST_MISSING="$(echo "$BOARD_FOLDERS" | grep -vwF "${BOARD_LIST}")"
+    FOLDER_MISSING="$(echo "$BOARD_LIST" | grep -vwF "${BOARD_FOLDERS}")"
 
     [ -n "$LIST_MISSING" ] && {
         echo "Boards missing in boards/group.mk: $LIST_MISSING"
