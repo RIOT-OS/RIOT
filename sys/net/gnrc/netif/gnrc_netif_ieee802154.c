@@ -214,8 +214,8 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         vector[0].iov_base = mhr;
         vector[0].iov_len = (size_t)res;
 #ifdef MODULE_NETSTATS_L2
-        if (netif_hdr->flags &
-            (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
+    if (netif_hdr->flags &
+        (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
             netif->dev->stats.tx_mcast_count++;
         }
         else {

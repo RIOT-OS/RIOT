@@ -37,7 +37,7 @@
 #include "net/netopt.h"
 #include "sched.h"
 
-#include "net/gnrc/ndp2.h"
+#include "net/gnrc/ndp.h"
 
 #define TEST_CUR_HL             (194U)
 #define TEST_LTIME              (894U)
@@ -88,7 +88,7 @@ static void fill_pktbuf(void)
 static void test_nbr_sol_build__pktbuf_full(void)
 {
     fill_pktbuf();
-    TEST_ASSERT_NULL(gnrc_ndp2_nbr_sol_build(&test_tgt, NULL));
+    TEST_ASSERT_NULL(gnrc_ndp_nbr_sol_build(&test_tgt, NULL));
 }
 
 static void test_nbr_sol_build__success(void)
@@ -97,7 +97,7 @@ static void test_nbr_sol_build__success(void)
     ndp_nbr_sol_t *nbr_sol;
 
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp2_nbr_sol_build(&test_tgt, NULL)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp_nbr_sol_build(&test_tgt, NULL)));
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     /* check packet meta-data */
     TEST_ASSERT_ALLOCATION(pkt, sizeof(ndp_nbr_sol_t), GNRC_NETTYPE_ICMPV6);
@@ -115,7 +115,7 @@ static void test_nbr_sol_build__success(void)
 static void test_nbr_adv_build__pktbuf_full(void)
 {
     fill_pktbuf();
-    TEST_ASSERT_NULL(gnrc_ndp2_nbr_adv_build(&test_tgt, 0, NULL));
+    TEST_ASSERT_NULL(gnrc_ndp_nbr_adv_build(&test_tgt, 0, NULL));
 }
 
 static void test_nbr_adv_build__success(uint8_t flags)
@@ -124,8 +124,8 @@ static void test_nbr_adv_build__success(uint8_t flags)
     ndp_nbr_adv_t *nbr_adv;
 
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp2_nbr_adv_build(&test_tgt, flags,
-                                                        NULL)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp_nbr_adv_build(&test_tgt, flags,
+                                                       NULL)));
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     /* check packet meta-data */
     TEST_ASSERT_ALLOCATION(pkt, sizeof(ndp_nbr_adv_t), GNRC_NETTYPE_ICMPV6);
@@ -156,7 +156,7 @@ static void test_nbr_adv_build__success_with_flags(void)
 static void test_rtr_sol_build__pktbuf_full(void)
 {
     fill_pktbuf();
-    TEST_ASSERT_NULL(gnrc_ndp2_rtr_sol_build(NULL));
+    TEST_ASSERT_NULL(gnrc_ndp_rtr_sol_build(NULL));
 }
 
 static void test_rtr_sol_build__success(void)
@@ -165,7 +165,7 @@ static void test_rtr_sol_build__success(void)
     ndp_rtr_sol_t *rtr_sol;
 
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp2_rtr_sol_build(NULL)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp_rtr_sol_build(NULL)));
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     /* check packet meta-data */
     TEST_ASSERT_ALLOCATION(pkt, sizeof(ndp_rtr_sol_t), GNRC_NETTYPE_ICMPV6);
@@ -181,9 +181,9 @@ static void test_rtr_sol_build__success(void)
 static void test_rtr_adv_build__pktbuf_full(void)
 {
     fill_pktbuf();
-    TEST_ASSERT_NULL(gnrc_ndp2_rtr_adv_build(TEST_CUR_HL, 0, TEST_LTIME,
-                                             TEST_REACH_TIME,
-                                             TEST_RETRANS_TIMER, NULL));
+    TEST_ASSERT_NULL(gnrc_ndp_rtr_adv_build(TEST_CUR_HL, 0, TEST_LTIME,
+                                            TEST_REACH_TIME,
+                                            TEST_RETRANS_TIMER, NULL));
 }
 
 static void test_rtr_adv_build__success(uint8_t flags)
@@ -192,11 +192,11 @@ static void test_rtr_adv_build__success(uint8_t flags)
     ndp_rtr_adv_t *rtr_adv;
 
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp2_rtr_adv_build(TEST_CUR_HL, flags,
-                                                        TEST_LTIME,
-                                                        TEST_REACH_TIME,
-                                                        TEST_RETRANS_TIMER,
-                                                        NULL)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp_rtr_adv_build(TEST_CUR_HL, flags,
+                                                       TEST_LTIME,
+                                                       TEST_REACH_TIME,
+                                                       TEST_RETRANS_TIMER,
+                                                       NULL)));
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     /* check packet meta-data */
     TEST_ASSERT_ALLOCATION(pkt, sizeof(ndp_rtr_adv_t), GNRC_NETTYPE_ICMPV6);
@@ -228,8 +228,8 @@ static void test_rtr_adv_build__success_with_flags(void)
 static void test_opt_build__pktbuf_full(void)
 {
     fill_pktbuf();
-    TEST_ASSERT_NULL(gnrc_ndp2_opt_build(TEST_NDP_OPT_TYPE, TEST_NDP_OPT_SIZE,
-                                         NULL));
+    TEST_ASSERT_NULL(gnrc_ndp_opt_build(TEST_NDP_OPT_TYPE, TEST_NDP_OPT_SIZE,
+                                        NULL));
 }
 
 static void test_opt_build__success(void)
@@ -238,9 +238,9 @@ static void test_opt_build__success(void)
     ndp_opt_t *opt;
 
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp2_opt_build(TEST_NDP_OPT_TYPE,
-                                                    TEST_NDP_OPT_SIZE,
-                                                    NULL)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp_opt_build(TEST_NDP_OPT_TYPE,
+                                                   TEST_NDP_OPT_SIZE,
+                                                   NULL)));
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     /* check packet meta-data */
     TEST_ASSERT_ALLOCATION(pkt, ceil8(TEST_NDP_OPT_SIZE), GNRC_NETTYPE_UNDEF);
@@ -255,8 +255,8 @@ static void test_opt_build__success(void)
 static void test_opt_sl2a_build__pktbuf_full(void)
 {
     fill_pktbuf();
-    TEST_ASSERT_NULL(gnrc_ndp2_opt_sl2a_build(test_src_l2, sizeof(test_src_l2),
-                                              NULL));
+    TEST_ASSERT_NULL(gnrc_ndp_opt_sl2a_build(test_src_l2, sizeof(test_src_l2),
+                                             NULL));
 }
 
 static void test_opt_sl2a_build__success(void)
@@ -265,9 +265,9 @@ static void test_opt_sl2a_build__success(void)
     ndp_opt_t *opt;
 
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp2_opt_sl2a_build(test_src_l2,
-                                                         sizeof(test_src_l2),
-                                                         NULL)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp_opt_sl2a_build(test_src_l2,
+                                                        sizeof(test_src_l2),
+                                                        NULL)));
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     /* check packet meta-data */
     TEST_ASSERT_ALLOCATION(pkt, ceil8(sizeof(ndp_opt_t) + sizeof(test_src_l2)),
@@ -286,8 +286,8 @@ static void test_opt_sl2a_build__success(void)
 static void test_opt_tl2a_build__pktbuf_full(void)
 {
     fill_pktbuf();
-    TEST_ASSERT_NULL(gnrc_ndp2_opt_tl2a_build(test_src_l2, sizeof(test_src_l2),
-                                              NULL));
+    TEST_ASSERT_NULL(gnrc_ndp_opt_tl2a_build(test_src_l2, sizeof(test_src_l2),
+                                             NULL));
 }
 
 static void test_opt_tl2a_build__success(void)
@@ -296,9 +296,9 @@ static void test_opt_tl2a_build__success(void)
     ndp_opt_t *opt;
 
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp2_opt_tl2a_build(test_src_l2,
-                                                         sizeof(test_src_l2),
-                                                         NULL)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp_opt_tl2a_build(test_src_l2,
+                                                        sizeof(test_src_l2),
+                                                        NULL)));
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     /* check packet meta-data */
     TEST_ASSERT_ALLOCATION(pkt, ceil8(sizeof(ndp_opt_t) + sizeof(test_src_l2)),
@@ -317,9 +317,9 @@ static void test_opt_tl2a_build__success(void)
 static void test_opt_pi_build__pktbuf_full(void)
 {
     fill_pktbuf();
-    TEST_ASSERT_NULL(gnrc_ndp2_opt_pi_build(&test_pfx, TEST_PFX_LEN,
-                                            TEST_VALID_LTIME, TEST_PREF_LTIME,
-                                            0, NULL));
+    TEST_ASSERT_NULL(gnrc_ndp_opt_pi_build(&test_pfx, TEST_PFX_LEN,
+                                           TEST_VALID_LTIME, TEST_PREF_LTIME,
+                                           0, NULL));
 }
 
 static void test_opt_pi_build__success(uint8_t flags)
@@ -329,10 +329,10 @@ static void test_opt_pi_build__success(uint8_t flags)
     ipv6_addr_t exp_pfx = IPV6_ADDR_UNSPECIFIED;
 
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp2_opt_pi_build(&test_pfx, TEST_PFX_LEN,
-                                                       TEST_VALID_LTIME,
-                                                       TEST_PREF_LTIME, flags,
-                                                       NULL)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp_opt_pi_build(&test_pfx, TEST_PFX_LEN,
+                                                      TEST_VALID_LTIME,
+                                                      TEST_PREF_LTIME, flags,
+                                                      NULL)));
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     /* check packet meta-data */
     TEST_ASSERT_ALLOCATION(pkt, ceil8(sizeof(ndp_opt_pi_t)),
@@ -370,7 +370,7 @@ static void test_opt_pi_build__success_with_flags(void)
 static void test_opt_mtu_build__pktbuf_full(void)
 {
     fill_pktbuf();
-    TEST_ASSERT_NULL(gnrc_ndp2_opt_mtu_build(TEST_MTU, NULL));
+    TEST_ASSERT_NULL(gnrc_ndp_opt_mtu_build(TEST_MTU, NULL));
 }
 
 static void test_opt_mtu_build__success(void)
@@ -379,7 +379,7 @@ static void test_opt_mtu_build__success(void)
     ndp_opt_mtu_t *opt;
 
     TEST_ASSERT(gnrc_pktbuf_is_empty());
-    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp2_opt_mtu_build(TEST_MTU, NULL)));
+    TEST_ASSERT_NOT_NULL((pkt = gnrc_ndp_opt_mtu_build(TEST_MTU, NULL)));
     TEST_ASSERT(gnrc_pktbuf_is_sane());
     /* check packet meta-data */
     TEST_ASSERT_ALLOCATION(pkt, ceil8(sizeof(ndp_opt_mtu_t)), GNRC_NETTYPE_UNDEF);
@@ -435,7 +435,7 @@ static void test_nbr_sol_send(const ipv6_addr_t *src)
     ndp_nbr_sol_t *nbr_sol;
 
     TEST_ASSERT_NOT_NULL(test_netif);
-    gnrc_ndp2_nbr_sol_send(&test_tgt, test_netif, src, &test_dst, NULL);
+    gnrc_ndp_nbr_sol_send(&test_tgt, test_netif, src, &test_dst, NULL);
     msg_receive(&msg);
     TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
     pkt = msg.content.ptr;
@@ -494,7 +494,7 @@ static void test_nbr_adv_send(const ipv6_addr_t *tgt, const ipv6_addr_t *dst,
     ndp_nbr_adv_t *nbr_adv;
 
     TEST_ASSERT_NOT_NULL(test_netif);
-    gnrc_ndp2_nbr_adv_send(tgt, test_netif, dst, supply_tl2a, exp_ext_opts);
+    gnrc_ndp_nbr_adv_send(tgt, test_netif, dst, supply_tl2a, exp_ext_opts);
     msg_receive(&msg);
     TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
     pkt = msg.content.ptr;
@@ -642,7 +642,7 @@ static void test_rtr_sol_send(const ipv6_addr_t *dst)
     ndp_rtr_sol_t *rtr_sol;
 
     TEST_ASSERT_NOT_NULL(test_netif);
-    gnrc_ndp2_rtr_sol_send(test_netif, dst);
+    gnrc_ndp_rtr_sol_send(test_netif, dst);
     msg_receive(&msg);
     TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
     pkt = msg.content.ptr;
@@ -705,7 +705,7 @@ static void test_rtr_adv_send(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     ndp_rtr_adv_t *rtr_adv;
 
     TEST_ASSERT_NOT_NULL(test_netif);
-    gnrc_ndp2_rtr_adv_send(test_netif, src, dst, fin, exp_ext_opts);
+    gnrc_ndp_rtr_adv_send(test_netif, src, dst, fin, exp_ext_opts);
     msg_receive(&msg);
     TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
     pkt = msg.content.ptr;
@@ -834,7 +834,7 @@ static void test_rtr_adv_send__src_dst_fin_ext_opts(void)
 }
 #endif
 
-static Test *tests_gnrc_ndp2_build(void)
+static Test *tests_gnrc_ndp_build(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_nbr_sol_build__pktbuf_full),
@@ -865,7 +865,7 @@ static Test *tests_gnrc_ndp2_build(void)
     return (Test *)&tests;
 }
 
-static Test *tests_gnrc_ndp2_send(void)
+static Test *tests_gnrc_ndp_send(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_nbr_sol_send__src_NULL),
@@ -917,9 +917,9 @@ static Test *tests_gnrc_ndp2_send(void)
 int main(void)
 {
     TESTS_START();
-    TESTS_RUN(tests_gnrc_ndp2_build());
+    TESTS_RUN(tests_gnrc_ndp_build());
     init_pkt_handler();
-    TESTS_RUN(tests_gnrc_ndp2_send());
+    TESTS_RUN(tests_gnrc_ndp_send());
     TESTS_END();
 
     return 0;
@@ -1003,7 +1003,7 @@ static void init_pkt_handler(void)
     msg_init_queue(msg_queue_main, MSG_QUEUE_SIZE);
     gnrc_netreg_entry_init_pid(&netreg_entry, GNRC_NETREG_DEMUX_CTX_ALL,
                                sched_active_pid);
-    gnrc_netreg_register(GNRC_NETTYPE_NDP2, &netreg_entry);
+    gnrc_netreg_register(GNRC_NETTYPE_NDP, &netreg_entry);
     netdev_test_setup(&dev, NULL);
     test_netif = gnrc_netif_create(test_netif_stack, sizeof(test_netif_stack),
                                    GNRC_NETIF_PRIO, "test-netif",

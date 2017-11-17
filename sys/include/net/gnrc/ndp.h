@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_ndp2   IPv6 neighbor discovery (v2)
+ * @defgroup    net_gnrc_ndp   IPv6 neighbor discovery (v2)
  * @ingroup     net_gnrc_ipv6
  * @brief       Provides build and send functions for neighbor discovery packets
  * @{
@@ -17,8 +17,8 @@
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_NDP2_H
-#define NET_GNRC_NDP2_H
+#ifndef NET_GNRC_NDP_H
+#define NET_GNRC_NDP_H
 
 #include <stdint.h>
 
@@ -35,13 +35,13 @@ extern "C" {
 /**
  * @brief   @ref net_gnrc_nettype to send NDP packets to
  */
-#ifndef GNRC_NETTYPE_NDP2
+#ifndef GNRC_NETTYPE_NDP
 # if    defined(MODULE_GNRC_IPV6) || DOXYGEN
-#  define GNRC_NETTYPE_NDP2 (GNRC_NETTYPE_IPV6)     /* usual configuration */
+#  define GNRC_NETTYPE_NDP (GNRC_NETTYPE_IPV6)      /* usual configuration */
 # else
-#  define GNRC_NETTYPE_NDP2 (GNRC_NETTYPE_UNDEF)    /* for testing */
+#  define GNRC_NETTYPE_NDP (GNRC_NETTYPE_UNDEF)     /* for testing */
 # endif
-#endif  /* GNRC_NETTYPE_NDP2 */
+#endif  /* GNRC_NETTYPE_NDP */
 
 /**
  * @brief   Builds a neighbor solicitation message for sending.
@@ -58,8 +58,8 @@ extern "C" {
  * @return  The resulting ICMPv6 packet on success.
  * @return  NULL, if packet buffer is full.
  */
-gnrc_pktsnip_t *gnrc_ndp2_nbr_sol_build(const ipv6_addr_t *tgt,
-                                        gnrc_pktsnip_t *options);
+gnrc_pktsnip_t *gnrc_ndp_nbr_sol_build(const ipv6_addr_t *tgt,
+                                       gnrc_pktsnip_t *options);
 
 /**
  * @brief   Builds a neighbor advertisement message for sending.
@@ -88,8 +88,8 @@ gnrc_pktsnip_t *gnrc_ndp2_nbr_sol_build(const ipv6_addr_t *tgt,
  * @return  The resulting ICMPv6 packet on success.
  * @return  NULL, if packet buffer is full.
  */
-gnrc_pktsnip_t *gnrc_ndp2_nbr_adv_build(const ipv6_addr_t *tgt, uint8_t flags,
-                                        gnrc_pktsnip_t *options);
+gnrc_pktsnip_t *gnrc_ndp_nbr_adv_build(const ipv6_addr_t *tgt, uint8_t flags,
+                                       gnrc_pktsnip_t *options);
 
 /**
  * @brief   Builds a router solicitation message for sending.
@@ -102,7 +102,7 @@ gnrc_pktsnip_t *gnrc_ndp2_nbr_adv_build(const ipv6_addr_t *tgt, uint8_t flags,
  * @return  The resulting ICMPv6 packet on success.
  * @return  NULL, if packet buffer is full.
  */
-gnrc_pktsnip_t *gnrc_ndp2_rtr_sol_build(gnrc_pktsnip_t *options);
+gnrc_pktsnip_t *gnrc_ndp_rtr_sol_build(gnrc_pktsnip_t *options);
 
 /**
  * @brief   Builds a router advertisement message for sending.
@@ -131,10 +131,10 @@ gnrc_pktsnip_t *gnrc_ndp2_rtr_sol_build(gnrc_pktsnip_t *options);
  * @return  The resulting ICMPv6 packet on success.
  * @return  NULL, if packet buffer is full.
  */
-gnrc_pktsnip_t *gnrc_ndp2_rtr_adv_build(uint8_t cur_hl, uint8_t flags,
-                                        uint16_t ltime, uint32_t reach_time,
-                                        uint32_t retrans_timer,
-                                        gnrc_pktsnip_t *options);
+gnrc_pktsnip_t *gnrc_ndp_rtr_adv_build(uint8_t cur_hl, uint8_t flags,
+                                       uint16_t ltime, uint32_t reach_time,
+                                       uint32_t retrans_timer,
+                                       gnrc_pktsnip_t *options);
 
 /**
  * @brief   Builds a generic NDP option.
@@ -147,8 +147,8 @@ gnrc_pktsnip_t *gnrc_ndp2_rtr_adv_build(uint8_t cur_hl, uint8_t flags,
  * @return  The packet snip list of options, on success
  * @return  NULL, if packet buffer is full
  */
-gnrc_pktsnip_t *gnrc_ndp2_opt_build(uint8_t type, size_t size,
-                                    gnrc_pktsnip_t *next);
+gnrc_pktsnip_t *gnrc_ndp_opt_build(uint8_t type, size_t size,
+                                   gnrc_pktsnip_t *next);
 
 /**
  * @brief   Builds the source link-layer address option.
@@ -169,9 +169,9 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_build(uint8_t type, size_t size,
  * @return  The packet snip list of options, on success
  * @return  NULL, if packet buffer is full
  */
-gnrc_pktsnip_t *gnrc_ndp2_opt_sl2a_build(const uint8_t *l2addr,
-                                         uint8_t l2addr_len,
-                                         gnrc_pktsnip_t *next);
+gnrc_pktsnip_t *gnrc_ndp_opt_sl2a_build(const uint8_t *l2addr,
+                                        uint8_t l2addr_len,
+                                        gnrc_pktsnip_t *next);
 
 /**
  * @brief   Builds the target link-layer address option.
@@ -192,9 +192,9 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_sl2a_build(const uint8_t *l2addr,
  * @return  The pkt snip list of options, on success
  * @return  NULL, if packet buffer is full
  */
-gnrc_pktsnip_t *gnrc_ndp2_opt_tl2a_build(const uint8_t *l2addr,
-                                         uint8_t l2addr_len,
-                                         gnrc_pktsnip_t *next);
+gnrc_pktsnip_t *gnrc_ndp_opt_tl2a_build(const uint8_t *l2addr,
+                                        uint8_t l2addr_len,
+                                        gnrc_pktsnip_t *next);
 
 /**
  * @brief   Builds the prefix information option.
@@ -229,10 +229,10 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_tl2a_build(const uint8_t *l2addr,
  * @return  The packet snip list of options, on success
  * @return  NULL, if packet buffer is full
  */
-gnrc_pktsnip_t *gnrc_ndp2_opt_pi_build(const ipv6_addr_t *prefix,
-                                       uint8_t prefix_len,
-                                       uint32_t valid_ltime, uint32_t pref_ltime,
-                                       uint8_t flags, gnrc_pktsnip_t *next);
+gnrc_pktsnip_t *gnrc_ndp_opt_pi_build(const ipv6_addr_t *prefix,
+                                      uint8_t prefix_len,
+                                      uint32_t valid_ltime, uint32_t pref_ltime,
+                                      uint8_t flags, gnrc_pktsnip_t *next);
 
 /**
  * @brief   Builds the MTU option.
@@ -248,7 +248,7 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_pi_build(const ipv6_addr_t *prefix,
  * @return  The packet snip list of options, on success
  * @return  NULL, if packet buffer is full
  */
-gnrc_pktsnip_t *gnrc_ndp2_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
+gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
 
 /**
  * @brief   Send pre-compiled neighbor solicitation depending on a given network
@@ -270,9 +270,9 @@ gnrc_pktsnip_t *gnrc_ndp2_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
  *                      for a neighbor solicitation so be sure to check that.
  *                      **Will be released** in an error case.
  */
-void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
-                            const ipv6_addr_t *src, const ipv6_addr_t *dst,
-                            gnrc_pktsnip_t *ext_opts);
+void gnrc_ndp_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
+                           const ipv6_addr_t *src, const ipv6_addr_t *dst,
+                           gnrc_pktsnip_t *ext_opts);
 
 /**
  * @brief   Send pre-compiled neighbor advertisement depending on a given
@@ -316,9 +316,9 @@ void gnrc_ndp2_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
  *                          check that.
  *                          **Will be released** in an error case.
  */
-void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
-                            const ipv6_addr_t *dst, bool supply_tl2a,
-                            gnrc_pktsnip_t *ext_opts);
+void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
+                           const ipv6_addr_t *dst, bool supply_tl2a,
+                           gnrc_pktsnip_t *ext_opts);
 
 /**
  * @brief   Send pre-compiled router solicitation depending on a given
@@ -329,7 +329,7 @@ void gnrc_ndp2_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
  * @param[in] netif Interface to send over. May not be NULL.
  * @param[in] dst   Destination for the router solicitation. ff02::2 if NULL.
  */
-void gnrc_ndp2_rtr_sol_send(gnrc_netif_t *netif, const ipv6_addr_t *dst);
+void gnrc_ndp_rtr_sol_send(gnrc_netif_t *netif, const ipv6_addr_t *dst);
 
 /**
  * @brief   Send pre-compiled router advertisement depending on a given network
@@ -356,13 +356,13 @@ void gnrc_ndp2_rtr_sol_send(gnrc_netif_t *netif, const ipv6_addr_t *dst);
  *                      for a neighbor advertisement so be sure to check that.
  *                      **Will be released** in an error case.
  */
-void gnrc_ndp2_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
-                            const ipv6_addr_t *dst, bool fin,
-                            gnrc_pktsnip_t *ext_opts);
+void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
+                           const ipv6_addr_t *dst, bool fin,
+                           gnrc_pktsnip_t *ext_opts);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_NDP2_H */
+#endif /* NET_GNRC_NDP_H */
 /** @} */

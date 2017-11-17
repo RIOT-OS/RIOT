@@ -13,7 +13,7 @@
  */
 
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc/ndp2.h"
+#include "net/gnrc/ndp.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
 #include "net/icmpv6.h"

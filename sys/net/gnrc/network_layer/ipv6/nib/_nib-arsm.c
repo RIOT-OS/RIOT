@@ -14,7 +14,7 @@
  */
 
 #include "xtimer.h"
-#include "net/gnrc/ndp2.h"
+#include "net/gnrc/ndp.h"
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
@@ -73,7 +73,7 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
         }
     }
 #endif  /* MODULE_GNRC_SIXLOWPAN_ND */
-    gnrc_ndp2_nbr_sol_send(tgt, netif, src, dst, ext_opt);
+    gnrc_ndp_nbr_sol_send(tgt, netif, src, dst, ext_opt);
 }
 
 void _snd_uc_ns(_nib_onl_entry_t *nbr, bool reset)

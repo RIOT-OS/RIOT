@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_netif  Network interface API
+ * @defgroup    net_gnrc_netif New network interface API
  * @ingroup     net_gnrc
  * @brief       Abstraction layer for GNRC's network interfaces
  *
@@ -66,7 +66,7 @@ typedef struct {
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
 #endif
 #if defined(MODULE_GNRC_MAC) || DOXYGEN
-    gnrc_netif_mac_t mac;                   /**< @ref net_gnrc_mac component */
+    gnrc_netif_mac_t mac;                  /**< @ref net_gnrc_mac component */
 #endif  /* MODULE_GNRC_MAC */
     /**
      * @brief   Flags for the interface

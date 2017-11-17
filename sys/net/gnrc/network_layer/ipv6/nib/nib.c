@@ -21,7 +21,7 @@
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/ndp2.h"
+#include "net/gnrc/ndp.h"
 #include "net/gnrc/pktqueue.h"
 #include "net/gnrc/sixlowpan/nd.h"
 #include "net/ndp.h"
@@ -735,8 +735,8 @@ static void _send_delayed_nbr_adv(const gnrc_netif_t *netif,
         size_t l2addr_len = _get_l2src(netif, l2addr);
 
         if (l2addr_len > 0) {
-            extra_opts = gnrc_ndp2_opt_tl2a_build(l2addr, l2addr_len,
-                                                  extra_opts);
+            extra_opts = gnrc_ndp_opt_tl2a_build(l2addr, l2addr_len,
+                                                 extra_opts);
             if (extra_opts == NULL) {
                 DEBUG("nib: No space left in packet buffer. Not replying NS");
                 gnrc_pktbuf_release(reply_aro);
@@ -754,7 +754,7 @@ static void _send_delayed_nbr_adv(const gnrc_netif_t *netif,
     reply_flags |= NDP_NBR_ADV_FLAGS_O;
 #endif  /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
     /* discard const qualifier */
-    nbr_adv = gnrc_ndp2_nbr_adv_build(tgt, reply_flags, extra_opts);
+    nbr_adv = gnrc_ndp_nbr_adv_build(tgt, reply_flags, extra_opts);
     if (nbr_adv == NULL) {
         DEBUG("nib: No space left in packet buffer. Not replying NS");
         gnrc_pktbuf_release(extra_opts);
@@ -875,9 +875,9 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             _send_delayed_nbr_adv(netif, &nbr_sol->tgt, &ipv6->dst, reply_aro);
         }
         else {
-            gnrc_ndp2_nbr_adv_send(&nbr_sol->tgt, netif, &ipv6->src,
-                                   ipv6_addr_is_multicast(&ipv6->dst),
-                                   reply_aro);
+            gnrc_ndp_nbr_adv_send(&nbr_sol->tgt, netif, &ipv6->src,
+                                  ipv6_addr_is_multicast(&ipv6->dst),
+                                  reply_aro);
         }
     }
 }
@@ -1168,7 +1168,7 @@ void _handle_search_rtr(gnrc_netif_t *netif)
         uint32_t interval = _get_next_rs_interval(netif);
 
         if (next_rs > interval) {
-            gnrc_ndp2_rtr_sol_send(netif, &ipv6_addr_all_routers_link_local);
+            gnrc_ndp_rtr_sol_send(netif, &ipv6_addr_all_routers_link_local);
             if (netif->ipv6.rs_sent < 10U) {
                 /* with more the backoff (required in RFC 6775) is truncated
                  * anyway and this way we prevent overflows. 10 is arbitrary, so

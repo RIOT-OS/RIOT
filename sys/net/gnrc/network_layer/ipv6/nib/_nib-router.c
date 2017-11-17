@@ -14,7 +14,7 @@
  */
 
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/ndp2.h"
+#include "net/gnrc/ndp.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan/nd.h"
 
@@ -113,8 +113,8 @@ static gnrc_pktsnip_t *_offl_to_pio(_nib_offl_entry_t *offl,
     if (offl->flags & _PFX_SLAAC) {
         flags |= NDP_OPT_PI_FLAGS_A;
     }
-    pio = gnrc_ndp2_opt_pi_build(&offl->pfx, offl->pfx_len, valid_ltime,
-                                 pref_ltime, flags, ext_opts);
+    pio = gnrc_ndp_opt_pi_build(&offl->pfx, offl->pfx_len, valid_ltime,
+                                pref_ltime, flags, ext_opts);
 
     if ((pio == NULL) && (ext_opts != NULL)) {
         DEBUG("nib: No space left in packet buffer. Not adding PIO\n");
@@ -194,7 +194,7 @@ static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
 {
     gnrc_pktsnip_t *ext_opts = _build_ext_opts(netif, abr);
 
-    gnrc_ndp2_rtr_adv_send(netif, NULL, dst, final, ext_opts);
+    gnrc_ndp_rtr_adv_send(netif, NULL, dst, final, ext_opts);
 }
 #else  /* GNRC_IPV6_NIB_CONF_ROUTER */
 typedef int dont_be_pedantic;

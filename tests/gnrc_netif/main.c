@@ -992,6 +992,7 @@ static void test_netapi_send__raw_unicast_ethernet_packet(void)
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, "ABCDEFG",
                                           sizeof("ABCDEFG"),
                                           GNRC_NETTYPE_UNDEF);
+
     TEST_ASSERT_NOT_NULL(pkt);
     gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
     TEST_ASSERT_NOT_NULL(netif);

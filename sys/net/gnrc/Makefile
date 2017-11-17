@@ -25,8 +25,8 @@ endif
 ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
   DIRS += network_layer/ipv6/blacklist
 endif
-ifneq (,$(filter gnrc_ndp2,$(USEMODULE)))
-    DIRS += network_layer/ndp2
+ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
+    DIRS += network_layer/ndp
 endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
   DIRS += netapi

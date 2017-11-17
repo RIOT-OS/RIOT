@@ -1,3 +1,3 @@
-MODULE = gnrc_ndp2
+MODULE = gnrc_ndp
 
 include $(RIOTBASE)/Makefile.base

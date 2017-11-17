@@ -15,7 +15,7 @@
 
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/ndp2.h"
+#include "net/gnrc/ndp.h"
 
 #include "_nib-6ln.h"
 #include "_nib-6lr.h"
