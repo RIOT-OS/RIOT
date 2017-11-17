@@ -1,10 +1,10 @@
 include $(RIOTBOARD)/groups.inc.mk
 
-BOARD_GROUP.8bit := $(BOARD_GROUP.avr8)
-BOARD_GROUP.16bit := $(BOARD_GROUP.msp430)
-BOARD_GROUP.32bit := $(sort $(BOARD_GROUP.arm7) $(BOARD_GROUP.cortexm) $(BOARD_GROUP.mips) $(BOARD_GROUP.native))
+BOARD_GROUP.8bit += $(BOARD_GROUP.avr8)
+BOARD_GROUP.16bit += $(BOARD_GROUP.msp430)
+BOARD_GROUP.32bit += $(sort $(BOARD_GROUP.arm7) $(BOARD_GROUP.cortexm) $(BOARD_GROUP.mips) $(BOARD_GROUP.native))
 
-BOARD_GROUPS.arch := \
+BOARD_GROUPS.arch += \
   arm7 \
   avr8 \
   cortexm \
