@@ -15,9 +15,8 @@ index 0000000..7f37ccc
 +++ b/Makefile
 @@ -0,0 +1,4 @@
 +MODULE:=$(shell basename $(CURDIR))
-+CFLAGS += -DWITH_POSIX
++CFLAGS += -DWITH_POSIX -D_GNU_SOURCE=1
 +
 +include $(RIOTBASE)/Makefile.base
--- 
+--
 1.9.1
-
