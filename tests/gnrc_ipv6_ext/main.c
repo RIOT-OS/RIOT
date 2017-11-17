@@ -24,7 +24,6 @@
 #include "shell.h"
 #include "msg.h"
 #include "net/ipv6/addr.h"
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netreg.h"

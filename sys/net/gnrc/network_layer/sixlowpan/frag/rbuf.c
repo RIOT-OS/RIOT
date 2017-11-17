@@ -16,9 +16,9 @@
 #include <stdbool.h>
 
 #include "rbuf.h"
+#include "net/ipv6.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/frag.h"
 #include "net/sixlowpan.h"
@@ -39,7 +39,7 @@
 #ifndef RBUF_INT_SIZE
 /* same as ((int) ceil((double) N / D)) */
 #define DIV_CEIL(N, D) (((N) + (D) - 1) / (D))
-#define RBUF_INT_SIZE (DIV_CEIL(GNRC_IPV6_NETIF_DEFAULT_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * RBUF_SIZE)
+#define RBUF_INT_SIZE (DIV_CEIL(IPV6_MIN_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * RBUF_SIZE)
 #endif
 
 static rbuf_int_t rbuf_int[RBUF_INT_SIZE];

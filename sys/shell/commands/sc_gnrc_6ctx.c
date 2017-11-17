@@ -20,7 +20,6 @@
 #include <string.h>
 
 #include "net/ipv6/addr.h"
-#include "net/gnrc/ndp/internal.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
 #include "timex.h"
@@ -60,15 +59,7 @@ int _gnrc_6ctx_list(void)
 
 static void _adv_ctx(void)
 {
-    /* TODO: update NIB */
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-    size_t ifnum = gnrc_netif_get(ifs);
-    for (size_t i = 0; i < ifnum; i++) {
-        gnrc_ipv6_netif_t *iface = gnrc_ipv6_netif_get(ifs[i]);
-        if ((iface != NULL) && (iface->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN)) {
-            gnrc_ndp_internal_send_rtr_adv(ifs[i], NULL, NULL, false);
-        }
-    }
+    /* TODO: update NIB, send router advertisement */
 }
 
 int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_str)

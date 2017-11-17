@@ -23,7 +23,6 @@
 #include "kw2xrf.h"
 #include "shell_commands.h"
 #include "net/gnrc.h"
-#include "net/gnrc/netif.h"
 #include "net/gnrc/netapi.h"
 #include "net/netopt.h"
 

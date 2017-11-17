@@ -21,10 +21,8 @@
 #include "kernel_types.h"
 #include "net/gnrc.h"
 #include "net/gnrc/icmpv6.h"
-#include "net/gnrc/ndp.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/nd.h"
-#include "net/gnrc/sixlowpan/nd/router.h"
 #include "net/protnum.h"
 #include "thread.h"
 #include "utlist.h"
@@ -414,7 +412,7 @@ static int _fill_ipv6_hdr(gnrc_netif2_t *netif, gnrc_pktsnip_t *ipv6,
 
     if (hdr->hl == 0) {
         if (netif == NULL) {
-            hdr->hl = GNRC_IPV6_NETIF_DEFAULT_HL;
+            hdr->hl = GNRC_NETIF2_DEFAULT_HL;
         }
         else {
             hdr->hl = netif->cur_hl;
