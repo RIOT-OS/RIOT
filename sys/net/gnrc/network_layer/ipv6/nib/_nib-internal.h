@@ -184,7 +184,10 @@ typedef struct _nib_onl_entry {
  */
 typedef struct {
     _nib_onl_entry_t *next_hop; /**< next hop to destination */
-    uint16_t ltime;             /**< lifetime in seconds */
+    /**
+     * @brief   Event for @ref GNRC_IPV6_NIB_RTR_TIMEOUT
+     */
+    evtimer_msg_event_t rtr_timeout;
 } _nib_dr_entry_t;
 
 /**

@@ -592,9 +592,12 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #endif  /* !GNRC_IPV6_NIB_CONF_6LBR */
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
     if (rtr_adv->ltime.u16 != 0) {
+        uint16_t rtr_ltime = byteorder_ntohs(rtr_adv->ltime);
+
         dr = _nib_drl_add(&ipv6->src, netif->pid);
         if (dr != NULL) {
-            dr->ltime = byteorder_ntohs(rtr_adv->ltime);
+            _evtimer_add(netif, GNRC_IPV6_NIB_RTR_TIMEOUT, &dr->rtr_timeout,
+                         rtr_ltime * MS_PER_SEC);
         }
         else {
             DEBUG("nib: default router list is full. Ignoring RA from %s\n",
@@ -602,7 +605,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             return;
         }
         /* UINT16_MAX * 1000 < UINT32_MAX so there are no overflows */
-        next_timeout = _min(next_timeout, dr->ltime * MS_PER_SEC);
+        next_timeout = _min(next_timeout, rtr_ltime * MS_PER_SEC);
     }
     else {
         dr = _nib_drl_get(&ipv6->src, netif->pid);
