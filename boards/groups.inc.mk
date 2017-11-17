@@ -113,4 +113,3 @@ BOARD_GROUP.msp430 := \
   wsn430-v1_4 \
   z1 \
   #
-
