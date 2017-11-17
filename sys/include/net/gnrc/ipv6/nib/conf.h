@@ -29,6 +29,9 @@ extern "C" {
 #ifndef GNRC_IPV6_NIB_CONF_6LBR
 #define GNRC_IPV6_NIB_CONF_6LBR         (1)
 #endif
+#ifndef GNRC_IPV6_NIB_NUMOF
+#define GNRC_IPV6_NIB_NUMOF             (16)
+#endif
 #endif
 
 #ifdef MODULE_GNRC_IPV6_NIB_6LR
@@ -174,7 +177,11 @@ extern "C" {
  * @see [RFC 6775, section 8.1](https://tools.ietf.org/html/rfc6775#section-8.1)
  */
 #ifndef GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if GNRC_IPV6_NIB_CONF_6LN
+#define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C (1)
+#else
 #define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C (0)
+#endif
 #endif
 
 /**
@@ -199,10 +206,8 @@ extern "C" {
 /**
  * @brief   Maximum link-layer address length (aligned)
  */
-#if (GNRC_NETIF_HDR_L2ADDR_MAX_LEN % 8)
-#define GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (((GNRC_NETIF_HDR_L2ADDR_MAX_LEN >> 3) + 1) << 3)
-#else
-#define GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (GNRC_NETIF_HDR_L2ADDR_MAX_LEN)
+#ifndef GNRC_IPV6_NIB_L2ADDR_MAX_LEN
+#define GNRC_IPV6_NIB_L2ADDR_MAX_LEN        (8U)
 #endif
 
 /**

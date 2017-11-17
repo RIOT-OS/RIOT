@@ -18,7 +18,6 @@
 #include "net/af.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/ipv6/hdr.h"
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/netreg.h"
 #include "net/udp.h"
 #include "utlist.h"

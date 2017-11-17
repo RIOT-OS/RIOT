@@ -109,32 +109,32 @@ extern "C" {
  * @brief   Internal states of LWMAC
  */
 typedef enum {
-    GNRC_LWMAC_UNDEF = -1,     /**< Undefined state of LWMAC */
-    GNRC_LWMAC_STOPPED,        /**< LWMAC's main state machine has been stopped */
-    GNRC_LWMAC_START,          /**< Start LWMAC's main state machine */
-    GNRC_LWMAC_STOP,           /**< Stop LWMAC's main state machine */
-    GNRC_LWMAC_RESET,          /**< Reset LWMAC's main state machine */
-    GNRC_LWMAC_LISTENING,      /**< Listen the channel for receiving packets */
-    GNRC_LWMAC_RECEIVING,      /**< RX is handled in own state machine */
-    GNRC_LWMAC_TRANSMITTING,   /**< TX is handled in own state machine */
-    GNRC_LWMAC_SLEEPING,       /**< Turn off radio to conserve power */
-    GNRC_LWMAC_STATE_COUNT     /**< Count of LWMAC's states */
+    GNRC_LWMAC_UNDEF = -1,      /**< Undefined state of LWMAC */
+    GNRC_LWMAC_STOPPED,         /**< LWMAC's main state machine has been stopped */
+    GNRC_LWMAC_START,           /**< Start LWMAC's main state machine */
+    GNRC_LWMAC_STOP,            /**< Stop LWMAC's main state machine */
+    GNRC_LWMAC_RESET,           /**< Reset LWMAC's main state machine */
+    GNRC_LWMAC_LISTENING,       /**< Listen the channel for receiving packets */
+    GNRC_LWMAC_RECEIVING,       /**< RX is handled in own state machine */
+    GNRC_LWMAC_TRANSMITTING,    /**< TX is handled in own state machine */
+    GNRC_LWMAC_SLEEPING,        /**< Turn off radio to conserve power */
+    GNRC_LWMAC_STATE_COUNT      /**< Count of LWMAC's states */
 } gnrc_lwmac_state_t;
 
 /**
  * @brief   TX states of LWMAC
  */
 typedef enum {
-    GNRC_LWMAC_TX_STATE_STOPPED,           /**< Tx schedule stopped, stop sending packet */
-    GNRC_LWMAC_TX_STATE_INIT,              /**< Initiate transmission */
-    GNRC_LWMAC_TX_STATE_SEND_BROADCAST,    /**< directly goes to SUCCESSFUL or FAILED when finished */
-    GNRC_LWMAC_TX_STATE_SEND_WR,           /**< Send a wakeup request */
-    GNRC_LWMAC_TX_STATE_WAIT_WR_SENT,      /**< Wait until WR sent to set timeout */
-    GNRC_LWMAC_TX_STATE_WAIT_FOR_WA,       /**< Wait for dest node's wakeup ackknowledge */
-    GNRC_LWMAC_TX_STATE_SEND_DATA,         /**< Send the actual payload data */
-    GNRC_LWMAC_TX_STATE_WAIT_FEEDBACK,     /**< Wait if packet was ACKed */
-    GNRC_LWMAC_TX_STATE_SUCCESSFUL,        /**< Transmission has finished successfully */
-    GNRC_LWMAC_TX_STATE_FAILED             /**< Payload data couldn't be delivered to dest */
+    GNRC_LWMAC_TX_STATE_STOPPED,            /**< Tx schedule stopped, stop sending packet */
+    GNRC_LWMAC_TX_STATE_INIT,               /**< Initiate transmission */
+    GNRC_LWMAC_TX_STATE_SEND_BROADCAST,     /**< directly goes to SUCCESSFUL or FAILED when finished */
+    GNRC_LWMAC_TX_STATE_SEND_WR,            /**< Send a wakeup request */
+    GNRC_LWMAC_TX_STATE_WAIT_WR_SENT,       /**< Wait until WR sent to set timeout */
+    GNRC_LWMAC_TX_STATE_WAIT_FOR_WA,        /**< Wait for dest node's wakeup ackknowledge */
+    GNRC_LWMAC_TX_STATE_SEND_DATA,          /**< Send the actual payload data */
+    GNRC_LWMAC_TX_STATE_WAIT_FEEDBACK,      /**< Wait if packet was ACKed */
+    GNRC_LWMAC_TX_STATE_SUCCESSFUL,         /**< Transmission has finished successfully */
+    GNRC_LWMAC_TX_STATE_FAILED              /**< Payload data couldn't be delivered to dest */
 } gnrc_lwmac_tx_state_t;
 
 /**
@@ -146,14 +146,14 @@ typedef enum {
  * @brief   RX states of LWMAC
  */
 typedef enum {
-    GNRC_LWMAC_RX_STATE_STOPPED,       /**< Rx schedule stopped */
-    GNRC_LWMAC_RX_STATE_INIT,          /**< Initiate reception */
-    GNRC_LWMAC_RX_STATE_WAIT_FOR_WR,   /**< Wait for a wakeup request */
-    GNRC_LWMAC_RX_STATE_SEND_WA,       /**< Send wakeup ackknowledge to requesting node */
-    GNRC_LWMAC_RX_STATE_WAIT_WA_SENT,  /**< Wait until WA sent to set timeout */
-    GNRC_LWMAC_RX_STATE_WAIT_FOR_DATA, /**< Wait for actual payload data */
-    GNRC_LWMAC_RX_STATE_SUCCESSFUL,    /**< Recption has finished successfully */
-    GNRC_LWMAC_RX_STATE_FAILED         /**< Reception over, but nothing received */
+    GNRC_LWMAC_RX_STATE_STOPPED,        /**< Rx schedule stopped */
+    GNRC_LWMAC_RX_STATE_INIT,           /**< Initiate reception */
+    GNRC_LWMAC_RX_STATE_WAIT_FOR_WR,    /**< Wait for a wakeup request */
+    GNRC_LWMAC_RX_STATE_SEND_WA,        /**< Send wakeup ackknowledge to requesting node */
+    GNRC_LWMAC_RX_STATE_WAIT_WA_SENT,   /**< Wait until WA sent to set timeout */
+    GNRC_LWMAC_RX_STATE_WAIT_FOR_DATA,  /**< Wait for actual payload data */
+    GNRC_LWMAC_RX_STATE_SUCCESSFUL,     /**< Recption has finished successfully */
+    GNRC_LWMAC_RX_STATE_FAILED          /**< Reception over, but nothing received */
 } gnrc_lwmac_rx_state_t;
 
 /**
@@ -175,14 +175,14 @@ typedef enum {
  * @brief   LWMAC timeout types
  */
 typedef enum {
-    GNRC_LWMAC_TIMEOUT_DISABLED,              /**< Timeout is diabled */
-    GNRC_LWMAC_TIMEOUT_WR,                    /**< WR timeout, waiting WA */
-    GNRC_LWMAC_TIMEOUT_NO_RESPONSE,           /**< Maximum WR duration timeout awaiting WA */
-    GNRC_LWMAC_TIMEOUT_DATA,                  /**< Timeout awaiting data packet from receiver */
-    GNRC_LWMAC_TIMEOUT_WAIT_DEST_WAKEUP,      /**< Timeout for waiting receiver's wake-up phase */
-    GNRC_LWMAC_TIMEOUT_WAKEUP_PERIOD,         /**< Wake up period timeout for going to sleep */
-    GNRC_LWMAC_TIMEOUT_NEXT_BROADCAST,        /**< Timeout for waiting to send the next broadcast packet */
-    GNRC_LWMAC_TIMEOUT_BROADCAST_END,         /**< Timeout awaiting the end of the whole broadcast period */
+    GNRC_LWMAC_TIMEOUT_DISABLED,                /**< Timeout is diabled */
+    GNRC_LWMAC_TIMEOUT_WR,                      /**< WR timeout, waiting WA */
+    GNRC_LWMAC_TIMEOUT_NO_RESPONSE,             /**< Maximum WR duration timeout awaiting WA */
+    GNRC_LWMAC_TIMEOUT_DATA,                    /**< Timeout awaiting data packet from receiver */
+    GNRC_LWMAC_TIMEOUT_WAIT_DEST_WAKEUP,        /**< Timeout for waiting receiver's wake-up phase */
+    GNRC_LWMAC_TIMEOUT_WAKEUP_PERIOD,           /**< Wake up period timeout for going to sleep */
+    GNRC_LWMAC_TIMEOUT_NEXT_BROADCAST,          /**< Timeout for waiting to send the next broadcast packet */
+    GNRC_LWMAC_TIMEOUT_BROADCAST_END,           /**< Timeout awaiting the end of the whole broadcast period */
 } gnrc_lwmac_timeout_type_t;
 
 /**
@@ -199,19 +199,19 @@ typedef struct {
  * @brief   LWMAC specific structure for storing internal states.
  */
 typedef struct lwmac {
-    gnrc_lwmac_state_t state;                                /**< Internal state of MAC layer */
-    uint32_t last_wakeup;                                    /**< Used to calculate wakeup times */
-    uint8_t lwmac_info;                                      /**< LWMAC's internal informations (flags) */
-    gnrc_lwmac_timeout_t timeouts[GNRC_LWMAC_TIMEOUT_COUNT]; /**< Store timeouts used for protocol */
+    gnrc_lwmac_state_t state;                                   /**< Internal state of MAC layer */
+    uint32_t last_wakeup;                                       /**< Used to calculate wakeup times */
+    uint8_t lwmac_info;                                         /**< LWMAC's internal informations (flags) */
+    gnrc_lwmac_timeout_t timeouts[GNRC_LWMAC_TIMEOUT_COUNT];    /**< Store timeouts used for protocol */
 
 #if (GNRC_LWMAC_ENABLE_DUTYCYLE_RECORD == 1)
     /* Parameters for recording duty-cycle */
-    uint32_t last_radio_on_time_ticks;                       /**< The last time in ticks when radio is on */
-    uint32_t radio_off_time_ticks;                           /**< The time in ticks when radio is off */
-    uint32_t system_start_time_ticks;                        /**< The time in ticks when chip is started */
-    uint32_t awake_duration_sum_ticks;                       /**< The sum of time in ticks when radio is on */
-    uint32_t pkt_start_sending_time_ticks;                   /**< The time in ticks when the packet is started
-                                                                  to be sent */
+    uint32_t last_radio_on_time_ticks;                          /**< The last time in ticks when radio is on */
+    uint32_t radio_off_time_ticks;                              /**< The time in ticks when radio is off */
+    uint32_t system_start_time_ticks;                           /**< The time in ticks when chip is started */
+    uint32_t awake_duration_sum_ticks;                          /**< The sum of time in ticks when radio is on */
+    uint32_t pkt_start_sending_time_ticks;                      /**< The time in ticks when the packet is started
+                                                                     to be sent */
 #endif
 } gnrc_lwmac_t;
 

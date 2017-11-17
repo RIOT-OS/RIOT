@@ -16,66 +16,81 @@
 #include "common.h"
 #include "msg.h"
 #include "net/gnrc.h"
+#include "net/ethernet.h"
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/ipv6/netif.h"
-#include "net/gnrc/netdev.h"
+#include "net/gnrc/netif/ethernet.h"
+#include "net/gnrc/netif/internal.h"
+#include "net/netdev_test.h"
 #include "sched.h"
 #include "thread.h"
 
 #define _MSG_QUEUE_SIZE  (2)
 
-kernel_pid_t _mock_netif_pid = KERNEL_PID_UNDEF;
+gnrc_netif_t *_mock_netif = NULL;
 
+static netdev_test_t _mock_netdev;
 static char _mock_netif_stack[THREAD_STACKSIZE_DEFAULT];
 static gnrc_netreg_entry_t dumper;
 static msg_t _main_msg_queue[_MSG_QUEUE_SIZE];
-static msg_t _mock_netif_msg_queue[_MSG_QUEUE_SIZE];
-
-static void *_mock_netif_thread(void *args)
-{
-    msg_t msg, reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
-
-    (void)args;
-    msg_init_queue(_mock_netif_msg_queue, _MSG_QUEUE_SIZE);
-    while (1) {
-        msg_receive(&msg);
-        switch (msg.type) {
-            case GNRC_NETAPI_MSG_TYPE_GET:
-                reply.content.value = (uint32_t)_mock_netif_get(msg.content.ptr);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_SET:
-                reply.content.value = (uint32_t)(-ENOTSUP);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_SND:
-            case GNRC_NETAPI_MSG_TYPE_RCV:
-                gnrc_pktbuf_release(msg.content.ptr);
-        }
-        msg_reply(&msg, &reply);
-    }
-    return NULL;
-}
 
 void _common_set_up(void)
 {
+    assert(_mock_netif != NULL);
     gnrc_ipv6_nib_init();
-    gnrc_ipv6_nib_init_iface(_mock_netif_pid);
+    gnrc_netif_acquire(_mock_netif);
+    gnrc_ipv6_nib_init_iface(_mock_netif);
+    gnrc_netif_release(_mock_netif);
+}
+
+int _get_device_type(netdev_t *dev, void *value, size_t max_len)
+{
+    (void)dev;
+    assert(max_len == sizeof(uint16_t));
+    *((uint16_t *)value) = NETDEV_TYPE_ETHERNET;
+    return sizeof(uint16_t);
+}
+
+int _get_max_packet_size(netdev_t *dev, void *value, size_t max_len)
+{
+    (void)dev;
+    assert(max_len == sizeof(uint16_t));
+    *((uint16_t *)value) = ETHERNET_DATA_LEN;
+    return sizeof(uint16_t);
+}
+
+int _get_address(netdev_t *dev, void *value, size_t max_len)
+{
+    static const uint8_t addr[] = { _LL0, _LL1, _LL2, _LL3, _LL4, _LL5 };
+
+    (void)dev;
+    assert(max_len >= sizeof(addr));
+    memcpy(value, addr, sizeof(addr));
+    return sizeof(addr);
 }
 
 void _tests_init(void)
 {
     msg_init_queue(_main_msg_queue, _MSG_QUEUE_SIZE);
-    _mock_netif_pid = thread_create(_mock_netif_stack,
-                                    sizeof(_mock_netif_stack),
-                                    GNRC_NETDEV_MAC_PRIO,
-                                    THREAD_CREATE_STACKTEST,
-                                    _mock_netif_thread, NULL, "mock_netif");
-    assert(_mock_netif_pid > KERNEL_PID_UNDEF);
-    gnrc_netif_add(_mock_netif_pid);
-    gnrc_ipv6_netif_init_by_dev();
-    thread_yield();
+    netdev_test_setup(&_mock_netdev, 0);
+    netdev_test_set_get_cb(&_mock_netdev, NETOPT_DEVICE_TYPE,
+                           _get_device_type);
+    netdev_test_set_get_cb(&_mock_netdev, NETOPT_MAX_PACKET_SIZE,
+                           _get_max_packet_size);
+    netdev_test_set_get_cb(&_mock_netdev, NETOPT_ADDRESS,
+                           _get_address);
+    _mock_netif = gnrc_netif_ethernet_create(
+           _mock_netif_stack, THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO,
+            "mockup_eth", &_mock_netdev.netdev
+        );
+    assert(_mock_netif != NULL);
+    /* we do not want to test for SLAAC here so just assure the configured
+     * address is valid */
+    assert(!ipv6_addr_is_unspecified(&_mock_netif->ipv6.addrs[0]));
+    _mock_netif->ipv6.addrs_flags[0] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
+    _mock_netif->ipv6.addrs_flags[0] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
     gnrc_netreg_entry_init_pid(&dumper, GNRC_NETREG_DEMUX_CTX_ALL,
                                sched_active_pid);
-    gnrc_netreg_register(GNRC_NETTYPE_NDP2, &dumper);
+    gnrc_netreg_register(GNRC_NETTYPE_NDP, &dumper);
 }
 
 /** @} */

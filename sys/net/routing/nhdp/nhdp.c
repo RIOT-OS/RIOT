@@ -21,7 +21,6 @@
 #include "net/sock/udp.h"
 #include "msg.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/netif.h"
 #include "thread.h"
 #include "utlist.h"
 #include "mutex.h"

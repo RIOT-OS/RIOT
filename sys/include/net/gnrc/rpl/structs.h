@@ -27,7 +27,6 @@
 extern "C" {
 #endif
 
-#include "net/gnrc/ipv6/netif.h"
 #include "net/ipv6/addr.h"
 #include "xtimer.h"
 #include "trickle.h"
@@ -268,7 +267,6 @@ typedef struct {
  */
 struct gnrc_rpl_dodag {
     ipv6_addr_t dodag_id;           /**< id of the DODAG */
-    gnrc_ipv6_netif_addr_t *netif_addr; /**< netif address for this DODAG */
     gnrc_rpl_parent_t *parents;     /**< pointer to the parents list of this DODAG */
     gnrc_rpl_instance_t *instance;  /**< pointer to the instance that this dodag is part of */
     uint8_t dtsn;                   /**< DAO Trigger Sequence Number */

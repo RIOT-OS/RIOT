@@ -241,11 +241,10 @@
  *   USEMODULE += gnrc_ipv6_router
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *   respectively. Those modules provide the bare minimum of IPv6
- *   functionalities (no @ref net_gnrc_icmpv6, no @ref net_gnrc_ndp). Because
- *   of that, the @ref net_gnrc_ipv6_nc needs to be configured manually. If an
- *   IEEE 802.15.4 device is present @ref net_gnrc_sixlowpan will be included
- *   automatically, but no fragmentation or header compression support will be
- *   provided.
+ *   functionalities (no @ref net_gnrc_icmpv6). Because of that, the
+ *   @ref net_gnrc_ipv6_nib needs to be configured manually. If an IEEE 802.15.4
+ *   device is present @ref net_gnrc_sixlowpan will be included automatically,
+ *   but no fragmentation or header compression support will be provided.
  *
  * - For @ref net_gnrc_icmpv6_echo "ICMPv6 echo request/reply (ping)"
  *   functionality:

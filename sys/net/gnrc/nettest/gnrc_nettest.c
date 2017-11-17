@@ -18,7 +18,6 @@
 #include "msg.h"
 #include "mutex.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/netif.h"
 #include "net/netopt.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/pktbuf.h"
@@ -132,12 +131,8 @@ gnrc_nettest_res_t gnrc_nettest_send_iface(kernel_pid_t pid, gnrc_pktsnip_t *in,
 {
     gnrc_nettest_res_t res;
 
-    gnrc_netif_add(thread_getpid());
-
     res = _pkt_test(GNRC_NETAPI_MSG_TYPE_SND, pid, in, exp_pkts, exp_senders,
                     exp_out);
-
-    gnrc_netif_remove(thread_getpid());
 
     return res;
 }
