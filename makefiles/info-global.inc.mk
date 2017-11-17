@@ -38,7 +38,7 @@ endef
 BOARDS ?= $(ALL_BOARDS)
 
 # expand boards groups, e.g., msp430 -> "msb-430 msb-430h ..."
-BOARDS := $(foreach group,$(filter $(BOARD_GROUPS),$(BOARDS)),$(BOARD_GROUP.$(group)))
+BOARDS := $(foreach group,$(filter $(BOARD_GROUPS),$(BOARDS)),$(BOARD_GROUP.$(group))) $(BOARDS)
 BOARDS := $(filter-out $(BOARD_GROUPS),$(BOARDS))
 
 BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
