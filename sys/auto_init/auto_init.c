@@ -230,6 +230,11 @@ void auto_init(void)
     auto_init_w5100();
 #endif
 
+#ifdef MODULE_SX127X
+    extern void auto_init_sx127x(void);
+    auto_init_sx127x();
+#endif
+
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
 
 #ifdef MODULE_GNRC_UHCPC

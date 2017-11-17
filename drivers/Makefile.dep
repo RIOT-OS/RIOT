@@ -247,6 +247,7 @@ ifneq (,$(filter sx127%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
   USEMODULE += xtimer
   USEMODULE += sx127x
+  USEMODULE += netif
 endif
 
 ifneq (,$(filter tcs37727,$(USEMODULE)))
