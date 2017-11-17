@@ -57,11 +57,6 @@ int _gnrc_6ctx_list(void)
     return 0;
 }
 
-static void _adv_ctx(void)
-{
-    /* TODO: update NIB, send router advertisement */
-}
-
 int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_str)
 {
     ipv6_addr_t prefix;
@@ -99,8 +94,6 @@ int _gnrc_6ctx_add(char *cmd_str, char *ctx_str, char *prefix_str, char *ltime_s
         puts("ERROR: can not add context");
         return 1;
     }
-    /* advertise new/updated context */
-    _adv_ctx();
     return 0;
 }
 
