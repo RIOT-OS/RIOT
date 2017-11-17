@@ -176,7 +176,7 @@ static void test_get_next_hop_l2addr__global_with_default_route(void)
 
     /* add _rem_ll as default router */
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &_rem_ll,
-                                                  _mock_netif->pid));
+                                                  _mock_netif->pid, 0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_get_next_hop_l2addr(&_rem_gb,
                                                                NULL, NULL,
                                                                &nce));
