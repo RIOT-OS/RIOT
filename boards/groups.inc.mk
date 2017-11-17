@@ -1,16 +1,16 @@
-MCUGROUP.arm7 := \
+BOARD_GROUP.arm7 := \
   avsextrem \
   msba2 \
   #
 
-MCUGROUP.avr8 := \
+BOARD_GROUP.avr8 := \
   arduino-duemilanove \
   arduino-mega2560 \
   arduino-uno \
   waspmote-pro \
   #
 
-MCUGROUP.cortexm := \
+BOARD_GROUP.cortexm := \
   airfy-beacon \
   arduino-due \
   arduino-mkr1000 \
@@ -94,17 +94,17 @@ MCUGROUP.cortexm := \
   yunjia-nrf51822 \
   #
 
-MCUGROUP.native := \
+BOARD_GROUP.native := \
   native \
   #
 
-MCUGROUP.mips := \
+BOARD_GROUP.mips := \
   mips-malta \
   pic32-clicker \
   pic32-wifire \
   #
 
-MCUGROUP.msp430 := \
+BOARD_GROUP.msp430 := \
   chronos \
   msb-430 \
   msb-430h \

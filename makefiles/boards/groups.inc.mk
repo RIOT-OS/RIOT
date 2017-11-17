@@ -1,10 +1,10 @@
 include $(RIOTBOARD)/groups.inc.mk
 
-MCUGROUP.8bit := $(MCUGROUP.avr8)
-MCUGROUP.16bit := $(MCUGROUP.msp430)
-MCUGROUP.32bit := $(sort $(MCUGROUP.arm7) $(MCUGROUP.cortexm) $(MCUGROUP.mips) $(MCUGROUP.native))
+BOARD_GROUP.8bit := $(BOARD_GROUP.avr8)
+BOARD_GROUP.16bit := $(BOARD_GROUP.msp430)
+BOARD_GROUP.32bit := $(sort $(BOARD_GROUP.arm7) $(BOARD_GROUP.cortexm) $(BOARD_GROUP.mips) $(BOARD_GROUP.native))
 
-MCUGROUPS.arch := \
+BOARD_GROUPS.arch := \
   arm7 \
   avr8 \
   cortexm \
@@ -13,4 +13,6 @@ MCUGROUPS.arch := \
   msp430 \
   #
 
-ALL_BOARDS := $(foreach group,$(MCUGROUPS.arch),$(MCUGROUP.$(group)))
+BOARD_GROUPS += $(BOARD_GROUPS.arch) 8bit 16bit 32bit
+
+ALL_BOARDS := $(foreach group,$(BOARD_GROUPS.arch),$(BOARD_GROUP.$(group)))
