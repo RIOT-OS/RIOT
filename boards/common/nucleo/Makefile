@@ -1,2 +1,2 @@
-DIRS = $(RIOBOARD)/common/nucleo
+MODULE = board
 include $(RIOTBASE)/Makefile.base

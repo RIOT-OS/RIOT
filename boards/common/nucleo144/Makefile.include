@@ -1,0 +1,5 @@
+# add the common header files to the include path
+INCLUDES += -I$(RIOTBOARD)/common/nucleo144/include
+
+# include nucleo common configuration
+include $(RIOTBOARD)/common/nucleo/Makefile.include

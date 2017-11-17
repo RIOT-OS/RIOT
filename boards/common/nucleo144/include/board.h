@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2017 Inria
  *               2017 OTAKeys
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,7 +9,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-common STM Nucleo-144 Common
+ * @defgroup    boards_common_nucleo144 STM Nucleo-144 Common
  * @ingroup     boards_nucleo
  * @brief       Common files for STM Nucleo-144 boards
  * @{
@@ -19,10 +20,11 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -31,6 +33,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    xtimer configuration
+ * @{
+ */
+#if defined(BOARD_NUCLEO144_F303) || defined(BOARD_NUCLEO144_F412) || \
+    defined(BOARD_NUCLEO144_F413) || defined(BOARD_NUCLEO144_F429) || \
+    defined(BOARD_NUCLEO144_F446)
+#define XTIMER_OVERHEAD     (6)
+#define XTIMER_BACKOFF      (5)
+#endif
+/** @} */
 
 /**
  * @name    LED pin definitions and handlers
@@ -72,5 +86,5 @@ void board_init(void);
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
+#endif /* BOARD_H */
 /** @} */

@@ -1,2 +1,0 @@
-# Various common features of Nucleo-144 boards
-FEATURES_PROVIDED += arduino
