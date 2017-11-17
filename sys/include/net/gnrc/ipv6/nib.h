@@ -192,6 +192,16 @@ extern "C" {
  * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_6LN != 0
  */
 #define GNRC_IPV6_NIB_REREG_ADDRESS         (0x4fcfU)
+
+/**
+ * @brief   Route timeout event.
+ *
+ * This message type is for the event of a route timeout. The expected message
+ * context is a valid off-link entry representing the route.
+ *
+ * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
+ */
+#define GNRC_IPV6_NIB_ROUTE_TIMEOUT         (0x4fd0U)
 /** @} */
 
 /**

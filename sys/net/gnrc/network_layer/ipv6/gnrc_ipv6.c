@@ -298,6 +298,7 @@ static void *_event_loop(void *args)
             case GNRC_IPV6_NIB_RTR_TIMEOUT:
             case GNRC_IPV6_NIB_RECALC_REACH_TIME:
             case GNRC_IPV6_NIB_REREG_ADDRESS:
+            case GNRC_IPV6_NIB_ROUTE_TIMEOUT:
                 DEBUG("ipv6: NIB timer event received\n");
                 gnrc_ipv6_nib_handle_timer_event(msg.content.ptr, msg.type);
                 break;

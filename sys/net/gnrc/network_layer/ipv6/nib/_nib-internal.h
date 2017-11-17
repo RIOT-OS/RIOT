@@ -196,14 +196,20 @@ typedef struct {
 typedef struct {
     _nib_onl_entry_t *next_hop; /**< next hop to destination */
     ipv6_addr_t pfx;            /**< prefix to the destination */
-    unsigned pfx_len;           /**< prefix-length in bits of
-                                 *   _nib_onl_entry_t::pfx */
     /**
      * @brief   Event for @ref GNRC_IPV6_NIB_PFX_TIMEOUT
      */
     evtimer_msg_event_t pfx_timeout;
+#ifdef GNRC_IPV6_NIB_CONF_ROUTER
+    /**
+     * @brief   Event for @ref GNRC_IPV6_NIB_ROUTE_TIMEOUT
+     */
+    evtimer_msg_event_t route_timeout;
+#endif
     uint8_t mode;               /**< [mode](@ref net_gnrc_ipv6_nib_mode) of the
                                  *   off-link entry */
+    uint8_t pfx_len;            /**< prefix-length in bits of
+                                 *   _nib_onl_entry_t::pfx */
     uint16_t flags;             /**< [flags](@ref net_gnrc_ipv6_nib_offl_flags */
     uint32_t valid_until;       /**< timestamp (in ms) until which the prefix
                                      valid (UINT32_MAX means forever) */
