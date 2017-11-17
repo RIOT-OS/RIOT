@@ -20,7 +20,7 @@
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc.h"
 #include "net/eui64.h"
 
@@ -54,12 +54,12 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define GNRC_RPL_PRF_MASK                   (0x7)
 #define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT    (1 << 6)
 
-static gnrc_netif2_t *_find_interface_with_rpl_mcast(void)
+static gnrc_netif_t *_find_interface_with_rpl_mcast(void)
 {
-    gnrc_netif2_t *netif = NULL;
+    gnrc_netif_t *netif = NULL;
 
-    while ((netif = gnrc_netif2_iter(netif))) {
-        for (unsigned i = 0; i < GNRC_NETIF2_IPV6_GROUPS_NUMOF; i++) {
+    while ((netif = gnrc_netif_iter(netif))) {
+        for (unsigned i = 0; i < GNRC_NETIF_IPV6_GROUPS_NUMOF; i++) {
             if (ipv6_addr_equal(&netif->ipv6.groups[i], &ipv6_addr_all_rpl_nodes)) {
                 return netif;
             }
@@ -71,7 +71,7 @@ static gnrc_netif2_t *_find_interface_with_rpl_mcast(void)
 void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
                    ipv6_addr_t *dodag_id)
 {
-    gnrc_netif2_t *netif;
+    gnrc_netif_t *netif;
 
     (void)dodag_id;
     gnrc_pktsnip_t *hdr;
@@ -86,11 +86,11 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
         iface = netif->pid;
     }
     else {
-        netif = gnrc_netif2_get_by_pid(iface);
+        netif = gnrc_netif_get_by_pid(iface);
     }
 
     if (src == NULL) {
-        int src_idx = gnrc_netif2_ipv6_addr_match(netif, &ipv6_addr_link_local_prefix);
+        int src_idx = gnrc_netif_ipv6_addr_match(netif, &ipv6_addr_link_local_prefix);
 
         src = &netif->ipv6.addrs[src_idx];
 
@@ -397,16 +397,16 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
 #endif
                 gnrc_rpl_opt_prefix_info_t *pi = (gnrc_rpl_opt_prefix_info_t *) opt;
                 /* check for the auto address-configuration flag */
-                gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(dodag->iface);
+                gnrc_netif_t *netif = gnrc_netif_get_by_pid(dodag->iface);
 
                 assert(netif != NULL);
-                if ((gnrc_netif2_ipv6_get_iid(netif, &iid) < 0)
-                     && !(pi->LAR_flags & GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
+                if ((gnrc_netif_ipv6_get_iid(netif, &iid) < 0)
+                    && !(pi->LAR_flags & GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
                     break;
                 }
                 ipv6_addr_set_aiid(&pi->prefix, iid.uint8);
-                gnrc_netif2_ipv6_addr_add(netif, &pi->prefix, pi->prefix_len,
-                                          GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID);
+                gnrc_netif_ipv6_addr_add(netif, &pi->prefix, pi->prefix_len,
+                                         GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
                 /* TODO: add to prefix list */
 
                 break;
@@ -513,7 +513,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
         inst->of = gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
 
         if (iface == KERNEL_PID_UNDEF) {
-            gnrc_netif2_t *netif = _find_interface_with_rpl_mcast();
+            gnrc_netif_t *netif = _find_interface_with_rpl_mcast();
 
             iface = netif->pid;
             assert(iface != KERNEL_PID_UNDEF);
@@ -744,14 +744,14 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
 
     /* find my address */
     ipv6_addr_t *me = NULL;
-    gnrc_netif2_t *netif = gnrc_netif2_get_by_ipv6_addr(&dodag->dodag_id);
+    gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(&dodag->dodag_id);
     int idx;
 
     if (netif == NULL) {
         DEBUG("RPL: no address configured\n");
         return;
     }
-    idx = gnrc_netif2_ipv6_addr_idx(netif, &dodag->dodag_id);
+    idx = gnrc_netif_ipv6_addr_idx(netif, &dodag->dodag_id);
     me = &netif->ipv6.addrs[idx];
 
     mutex_lock(&(gnrc_ipv6_fib_table.mtx_access));

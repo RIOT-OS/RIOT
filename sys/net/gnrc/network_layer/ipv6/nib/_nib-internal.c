@@ -21,7 +21,7 @@
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "random.h"
 
 #include "_nib-internal.h"
@@ -225,7 +225,7 @@ _nib_onl_entry_t *_nib_onl_get(const ipv6_addr_t *addr, unsigned iface)
 void _nib_nc_set_reachable(_nib_onl_entry_t *node)
 {
 #if GNRC_IPV6_NIB_CONF_ARSM
-    gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(_nib_onl_get_if(node));
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
 
     node->info &= ~GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK;
     node->info |= GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE;
@@ -289,9 +289,9 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
 #if GNRC_IPV6_NIB_CONF_ARSM
 #if GNRC_IPV6_NIB_CONF_6LN
     if (ipv6_addr_is_link_local(&nce->ipv6)) {
-        gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(_nib_onl_get_if(node));
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
         assert(netif != NULL);
-        if (gnrc_netif2_is_6ln(netif) && !gnrc_netif2_is_rtr(netif)) {
+        if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_rtr(netif)) {
             _get_l2addr_from_ipv6(nce->l2addr, &node->ipv6);
             nce->l2addr_len = sizeof(uint64_t);
             return;
@@ -598,9 +598,9 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 
         if ((router == NULL) && (offl == NULL)) {
 #if GNRC_IPV6_NIB_CONF_ROUTER
-            gnrc_netif2_t *ptr = NULL;
+            gnrc_netif_t *ptr = NULL;
 
-            while ((ptr = gnrc_netif2_iter(ptr))) {
+            while ((ptr = gnrc_netif_iter(ptr))) {
                 _call_route_info_cb(ptr,
                                     GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RRQ,
                                     dst, pkt);

@@ -88,10 +88,10 @@ extern int _random_get(int argc, char **argv);
 extern int _gnrc_ipv6_nib(int argc, char **argv);
 #endif
 
-#ifdef MODULE_GNRC_NETIF2
-extern int _gnrc_netif2_config(int argc, char **argv);
+#ifdef MODULE_GNRC_NETIF
+extern int _gnrc_netif_config(int argc, char **argv);
 #ifdef MODULE_GNRC_TXTSND
-extern int _gnrc_netif2_send(int argc, char **argv);
+extern int _gnrc_netif_send(int argc, char **argv);
 #endif
 #endif
 
@@ -191,10 +191,10 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_IPV6_NIB
     {"nib", "Configure neighbor information base", _gnrc_ipv6_nib},
 #endif
-#ifdef MODULE_GNRC_NETIF2
-    {"ifconfig", "Configure network interfaces", _gnrc_netif2_config},
+#ifdef MODULE_GNRC_NETIF
+    {"ifconfig", "Configure network interfaces", _gnrc_netif_config},
 #ifdef MODULE_GNRC_TXTSND
-    {"txtsnd", "Sends a custom string as is over the link layer", _gnrc_netif2_send },
+    {"txtsnd", "Sends a custom string as is over the link layer", _gnrc_netif_send },
 #endif
 #endif
 #ifdef MODULE_FIB

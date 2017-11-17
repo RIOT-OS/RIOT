@@ -28,7 +28,7 @@
 #include "net/gnrc/ipv6/nib/nc.h"
 #endif
 #include "net/gnrc/ipv6/hdr.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc.h"
 #include "thread.h"
 #include "utlist.h"
@@ -203,11 +203,11 @@ int _icmpv6_ping(int argc, char **argv)
     }
 
     if (ipv6_addr_is_link_local(&addr) || (src_iface != KERNEL_PID_UNDEF)) {
-        size_t ifnum = gnrc_netif2_numof();
+        size_t ifnum = gnrc_netif_numof();
 
         if (src_iface == KERNEL_PID_UNDEF) {
             if (ifnum == 1) {
-                src_iface = gnrc_netif2_iter(NULL)->pid;
+                src_iface = gnrc_netif_iter(NULL)->pid;
             }
             else {
                 puts("error: link local target needs interface parameter (use \"<address>%<ifnum>\")\n");
@@ -215,7 +215,7 @@ int _icmpv6_ping(int argc, char **argv)
             }
         }
         else {
-            if (gnrc_netif2_get_by_pid(src_iface) == NULL) {
+            if (gnrc_netif_get_by_pid(src_iface) == NULL) {
                 printf("error: %"PRIkernel_pid" is not a valid interface.\n", src_iface);
                 return 1;
             }

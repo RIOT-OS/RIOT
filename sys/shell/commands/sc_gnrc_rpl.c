@@ -17,7 +17,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/rpl.h"
 #include "net/gnrc/rpl/structs.h"
 #include "net/gnrc/rpl/dodag.h"
@@ -32,7 +32,7 @@
 int _gnrc_rpl_init(char *arg)
 {
     kernel_pid_t iface_pid = atoi(arg);
-    if (gnrc_netif2_get_by_pid(iface_pid) == NULL) {
+    if (gnrc_netif_get_by_pid(iface_pid) == NULL) {
         puts("unknown interface specified");
         return 1;
     }

@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "board.h"
-#include "net/gnrc/netif2/ieee802154.h"
+#include "net/gnrc/netif/ieee802154.h"
 #include "net/gnrc/lwmac/lwmac.h"
 #include "net/gnrc.h"
 
@@ -34,7 +34,7 @@
  */
 #define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
 #ifndef AT86RF2XX_MAC_PRIO
-#define AT86RF2XX_MAC_PRIO          (GNRC_NETIF2_PRIO)
+#define AT86RF2XX_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
 #define AT86RF2XX_NUM (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
@@ -49,15 +49,15 @@ void auto_init_at86rf2xx(void)
 
         at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i]);
 #ifdef MODULE_GNRC_LWMAC
-        gnrc_netif2_lwmac_create(_at86rf2xx_stacks[i],
-                                 AT86RF2XX_MAC_STACKSIZE,
-                                 AT86RF2XX_MAC_PRIO, "at86rf2xx-lwmac",
-                                 (netdev_t *)&at86rf2xx_devs[i]);
+        gnrc_netif_lwmac_create(_at86rf2xx_stacks[i],
+                                AT86RF2XX_MAC_STACKSIZE,
+                                AT86RF2XX_MAC_PRIO, "at86rf2xx-lwmac",
+                                (netdev_t *)&at86rf2xx_devs[i]);
 #else
-        gnrc_netif2_ieee802154_create(_at86rf2xx_stacks[i],
-                                      AT86RF2XX_MAC_STACKSIZE,
-                                      AT86RF2XX_MAC_PRIO, "at86rf2xx",
-                                      (netdev_t *)&at86rf2xx_devs[i]);
+        gnrc_netif_ieee802154_create(_at86rf2xx_stacks[i],
+                                     AT86RF2XX_MAC_STACKSIZE,
+                                     AT86RF2XX_MAC_PRIO, "at86rf2xx",
+                                     (netdev_t *)&at86rf2xx_devs[i]);
 #endif
     }
 }

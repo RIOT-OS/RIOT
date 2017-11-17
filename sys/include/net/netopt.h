@@ -86,7 +86,7 @@ typedef enum {
      * When adding an IPv6 address to a GNRC interface using
      * @ref GNRC_NETAPI_MSG_TYPE_SET, the gnrc_netapi_opt_t::context field can
      * be used to pass the prefix length (8 MSB) and some flags (8 LSB)
-     * according to @ref net_gnrc_netif2_ipv6_addrs_flags. The address is however always
+     * according to @ref net_gnrc_netif_ipv6_addrs_flags. The address is however always
      * considered to be manually added.
      * When getting the option you can pass an array of @ref ipv6_addr_t of any
      * length greater than 0 to the getter. The array will be filled up to to
@@ -103,7 +103,7 @@ typedef enum {
      *
      * The information contained in the array is very specific to the
      * interface's API. For GNRC e.g. the values are according to
-     * @ref net_gnrc_netif2_ipv6_addrs_flags.
+     * @ref net_gnrc_netif_ipv6_addrs_flags.
      */
     NETOPT_IPV6_ADDR_FLAGS,
     /**
@@ -114,7 +114,7 @@ typedef enum {
      * When adding an IPv6 address to a GNRC interface using
      * @ref GNRC_NETAPI_MSG_TYPE_SET, the gnrc_netapi_opt_t::context field can
      * be used to pass the prefix length (8 MSB) and some flags (8 LSB)
-     * according to @ref net_gnrc_netif2_ipv6_addrs_flags. The address is however always
+     * according to @ref net_gnrc_netif_ipv6_addrs_flags. The address is however always
      * considered to be manually added.
      * When getting the option you can pass an array of @ref ipv6_addr_t of any
      * length greater than 0 to the getter. The array will be filled up to to

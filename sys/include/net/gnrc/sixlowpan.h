@@ -75,7 +75,7 @@
  * The false case also applies if @ref net_gnrc_sixlowpan_iphc is not included.
  *
  * If the packet without @ref GNRC_NETTYPE_NETIF header is shorter than
- * gnrc_netif2_t::sixlo::max_frag_size of `netif` the packet will be send to the `netif`'s
+ * gnrc_netif_t::sixlo::max_frag_size of `netif` the packet will be send to the `netif`'s
  * thread. Otherwise if @ref net_gnrc_sixlowpan_frag is included the packet will be fragmented
  * according to <a href="https://tools.ietf.org/html/rfc4944">RFC 4944</a> if the packet is without
  * @ref GNRC_NETTYPE_NETIF header shorter than @ref SIXLOWPAN_FRAG_MAX_LEN. If none of these cases

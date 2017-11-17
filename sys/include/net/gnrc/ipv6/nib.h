@@ -34,7 +34,7 @@
 #include "net/ipv6/addr.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/ipv6/nib/nc.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/pkt.h"
 
 #ifdef __cplusplus
@@ -176,7 +176,7 @@ extern "C" {
  *
  * This message type is for the event of recalculating the reachability timeout
  * time. The expected message context is a valid
- * [interface](@ref net_gnrc_netif2).
+ * [interface](@ref net_gnrc_netif).
  *
  * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ARSM != 0
  */
@@ -195,7 +195,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Types for gnrc_netif2_ipv6_t::route_info_cb
+ * @brief   Types for gnrc_netif_ipv6_t::route_info_cb
  * @anchor  net_gnrc_ipv6_nib_route_info_type
  */
 enum {
@@ -259,7 +259,7 @@ void gnrc_ipv6_nib_init(void);
  *
  * @param[in,out] netif The interface to be managed by the NIB
  */
-void gnrc_ipv6_nib_init_iface(gnrc_netif2_t *netif);
+void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif);
 
 /**
  * @brief   Gets link-layer address of next hop to a destination address
@@ -283,7 +283,7 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif2_t *netif);
  *          solicitation sent).
  */
 int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
-                                      gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt,
+                                      gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
                                       gnrc_ipv6_nib_nc_t *nce);
 
 /**
@@ -326,7 +326,7 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
  *                          packet.
  * @param[in] icmpv6_len    The number of bytes at @p icmpv6.
  */
-void gnrc_ipv6_nib_handle_pkt(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
+void gnrc_ipv6_nib_handle_pkt(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                               const icmpv6_hdr_t *icmpv6, size_t icmpv6_len);
 
 /**
@@ -348,7 +348,7 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type);
  *                      `false`, to disable advertising the interface as a
  *                      router.
  */
-void gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif2_t *netif, bool enable);
+void gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif_t *netif, bool enable);
 #else
 /**
  * @brief   Optimization to NOP for non-routers

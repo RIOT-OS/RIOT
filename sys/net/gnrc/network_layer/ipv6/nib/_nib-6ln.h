@@ -62,7 +62,7 @@ static inline uint32_t _now_min(void)
  *
  * @return  true when @p nce was set, false when not.
  */
-bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif2_t *netif,
+bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                              gnrc_ipv6_nib_nc_t *nce);
 
 /**
@@ -74,9 +74,9 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif2_t *netif,
  *
  * @return  The interval in ms to the next RS
  */
-static inline uint32_t _get_next_rs_interval(const gnrc_netif2_t *netif)
+static inline uint32_t _get_next_rs_interval(const gnrc_netif_t *netif)
 {
-    if (gnrc_netif2_is_6ln(netif)) {
+    if (gnrc_netif_is_6ln(netif)) {
         if (netif->ipv6.rs_sent < SIXLOWPAN_ND_MAX_RS_NUMOF) {
             return SIXLOWPAN_ND_RS_MSEC_INTERVAL;
         }
@@ -109,7 +109,7 @@ static inline uint32_t _get_next_rs_interval(const gnrc_netif2_t *netif)
  * @return  registration status of the address (including
  *          @ref _ADDR_REG_STATUS_TENTATIVE and @ref _ADDR_REG_STATUS_IGNORE).
  */
-uint8_t _handle_aro(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
+uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     const icmpv6_hdr_t *icmpv6,
                     const sixlowpan_nd_opt_ar_t *aro, const ndp_opt_t *sl2ao,
                     _nib_onl_entry_t *nce);

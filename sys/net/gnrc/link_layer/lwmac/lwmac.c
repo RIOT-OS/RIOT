@@ -28,9 +28,9 @@
 #include "timex.h"
 #include "random.h"
 #include "periph/rtt.h"
-#include "net/gnrc/netif2.h"
-#include "net/gnrc/netif2/internal.h"
-#include "net/gnrc/netif2/ieee802154.h"
+#include "net/gnrc/netif.h"
+#include "net/gnrc/netif/internal.h"
+#include "net/gnrc/netif/ieee802154.h"
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/lwmac/types.h"
 #include "net/gnrc/lwmac/lwmac.h"
@@ -58,29 +58,29 @@
 kernel_pid_t lwmac_pid;
 
 static void rtt_cb(void *arg);
-static void lwmac_set_state(gnrc_netif2_t *netif, gnrc_lwmac_state_t newstate);
-static void lwmac_schedule_update(gnrc_netif2_t *netif);
-static void rtt_handler(uint32_t event, gnrc_netif2_t *netif);
-static void _lwmac_init(gnrc_netif2_t *netif);
-static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt);
-static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif);
-static void _lwmac_msg_handler(gnrc_netif2_t *netif, msg_t *msg);
+static void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate);
+static void lwmac_schedule_update(gnrc_netif_t *netif);
+static void rtt_handler(uint32_t event, gnrc_netif_t *netif);
+static void _lwmac_init(gnrc_netif_t *netif);
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
+static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
+static void _lwmac_msg_handler(gnrc_netif_t *netif, msg_t *msg);
 
-static const gnrc_netif2_ops_t lwmac_ops = {
+static const gnrc_netif_ops_t lwmac_ops = {
     .init = _lwmac_init,
     .send = _send,
     .recv = _recv,
-    .get = gnrc_netif2_get_from_netdev,
-    .set = gnrc_netif2_set_from_netdev,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
     .msg_handler = _lwmac_msg_handler,
 };
 
-gnrc_netif2_t *gnrc_netif2_lwmac_create(char *stack, int stacksize,
-                                        char priority, char *name,
-                                        netdev_t *dev)
+gnrc_netif_t *gnrc_netif_lwmac_create(char *stack, int stacksize,
+                                      char priority, char *name,
+                                      netdev_t *dev)
 {
-    return gnrc_netif2_create(stack, stacksize, priority, name, dev,
-                              &lwmac_ops);
+    return gnrc_netif_create(stack, stacksize, priority, name, dev,
+                             &lwmac_ops);
 }
 
 static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
@@ -110,7 +110,7 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
     return snip;
 }
 
-static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
+static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     netdev_ieee802154_rx_info_t rx_info;
@@ -196,7 +196,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
     return pkt;
 }
 
-static gnrc_mac_tx_neighbor_t *_next_tx_neighbor(gnrc_netif2_t *netif)
+static gnrc_mac_tx_neighbor_t *_next_tx_neighbor(gnrc_netif_t *netif)
 {
     int next = -1;
 
@@ -239,12 +239,12 @@ static uint32_t _next_inphase_event(uint32_t last, uint32_t interval)
     return last;
 }
 
-inline void lwmac_schedule_update(gnrc_netif2_t *netif)
+inline void lwmac_schedule_update(gnrc_netif_t *netif)
 {
     gnrc_lwmac_set_reschedule(netif, true);
 }
 
-void lwmac_set_state(gnrc_netif2_t *netif, gnrc_lwmac_state_t newstate)
+void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate)
 {
     gnrc_lwmac_state_t oldstate = netif->mac.lwmac.state;
 
@@ -358,7 +358,7 @@ void lwmac_set_state(gnrc_netif2_t *netif, gnrc_lwmac_state_t newstate)
     lwmac_schedule_update(netif);
 }
 
-static void _sleep_management(gnrc_netif2_t *netif)
+static void _sleep_management(gnrc_netif_t *netif)
 {
     /* If a packet is scheduled, no other (possible earlier) packet can be
      * sent before the first one is handled, even no broadcast
@@ -428,7 +428,7 @@ static void _sleep_management(gnrc_netif2_t *netif)
     }
 }
 
-static void _rx_management_failed(gnrc_netif2_t *netif)
+static void _rx_management_failed(gnrc_netif_t *netif)
 {
     /* This may happen frequently because we'll receive WA from
      * every node in range. */
@@ -463,7 +463,7 @@ static void _rx_management_failed(gnrc_netif2_t *netif)
     }
 }
 
-static void _rx_management_success(gnrc_netif2_t *netif)
+static void _rx_management_success(gnrc_netif_t *netif)
 {
     LOG_DEBUG("[LWMAC] Reception was successful\n");
     gnrc_lwmac_rx_stop(netif);
@@ -494,7 +494,7 @@ static void _rx_management_success(gnrc_netif2_t *netif)
     }
 }
 
-static void _rx_management(gnrc_netif2_t *netif)
+static void _rx_management(gnrc_netif_t *netif)
 {
     gnrc_lwmac_rx_state_t state_rx = netif->mac.rx.state;
 
@@ -522,7 +522,7 @@ static void _rx_management(gnrc_netif2_t *netif)
     }
 }
 
-static void _tx_management_stopped(gnrc_netif2_t *netif)
+static void _tx_management_stopped(gnrc_netif_t *netif)
 {
     /* If there is packet remaining for retransmission,
      * retransmit it (i.e., the retransmission scheme of LWMAC). */
@@ -549,7 +549,7 @@ static void _tx_management_stopped(gnrc_netif2_t *netif)
     }
 }
 
-static void _tx_management_success(gnrc_netif2_t *netif)
+static void _tx_management_success(gnrc_netif_t *netif)
 {
     if (netif->mac.tx.current_neighbor == &(netif->mac.tx.neighbors[0])) {
         LOG_INFO("[LWMAC] Broadcast transmission done\n");
@@ -568,7 +568,7 @@ static void _tx_management_success(gnrc_netif2_t *netif)
     }
 }
 
-static void _tx_management(gnrc_netif2_t *netif)
+static void _tx_management(gnrc_netif_t *netif)
 {
     gnrc_lwmac_tx_state_t state_tx = netif->mac.tx.state;
 
@@ -601,7 +601,7 @@ static void _tx_management(gnrc_netif2_t *netif)
     }
 }
 
-static void _lwmac_update_listening(gnrc_netif2_t *netif)
+static void _lwmac_update_listening(gnrc_netif_t *netif)
 {
     /* In case has pending packet to send, clear rtt alarm thus to goto
      * transmission initialization (in SLEEPING management) right after the
@@ -645,7 +645,7 @@ static void _lwmac_update_listening(gnrc_netif2_t *netif)
 }
 
 /* Main state machine. Call whenever something happens */
-static bool lwmac_update(gnrc_netif2_t *netif)
+static bool lwmac_update(gnrc_netif_t *netif)
 {
     gnrc_lwmac_set_reschedule(netif, false);
 
@@ -693,7 +693,7 @@ static void rtt_cb(void *arg)
     }
 }
 
-void rtt_handler(uint32_t event, gnrc_netif2_t *netif)
+void rtt_handler(uint32_t event, gnrc_netif_t *netif)
 {
     uint32_t alarm;
 
@@ -757,7 +757,7 @@ void rtt_handler(uint32_t event, gnrc_netif2_t *netif)
  */
 static void _lwmac_event_cb(netdev_t *dev, netdev_event_t event)
 {
-    gnrc_netif2_t *netif = (gnrc_netif2_t *) dev->context;
+    gnrc_netif_t *netif = (gnrc_netif_t *) dev->context;
 
     if (event == NETDEV_EVENT_ISR) {
         msg_t msg;
@@ -774,7 +774,7 @@ static void _lwmac_event_cb(netdev_t *dev, netdev_event_t event)
         switch (event) {
             case NETDEV_EVENT_RX_STARTED: {
                 LOG_DEBUG("[LWMAC] NETDEV_EVENT_RX_STARTED\n");
-                gnrc_netif2_set_rx_started(netif, true);
+                gnrc_netif_set_rx_started(netif, true);
                 break;
             }
             case NETDEV_EVENT_RX_COMPLETE: {
@@ -793,11 +793,11 @@ static void _lwmac_event_cb(netdev_t *dev, netdev_event_t event)
                  * TODO: transceivers might have 2 frame buffers, so make this optional
                  */
                 if (pkt == NULL) {
-                    gnrc_netif2_set_rx_started(netif, false);
+                    gnrc_netif_set_rx_started(netif, false);
                     break;
                 }
 
-                gnrc_netif2_set_rx_started(netif, false);
+                gnrc_netif_set_rx_started(netif, false);
 
                 if (!gnrc_mac_queue_rx_packet(&netif->mac.rx, 0, pkt)) {
                     LOG_ERROR("ERROR: [LWMAC] Can't push RX packet @ %p, memory full?\n", pkt);
@@ -808,25 +808,25 @@ static void _lwmac_event_cb(netdev_t *dev, netdev_event_t event)
                 break;
             }
             case NETDEV_EVENT_TX_STARTED: {
-                gnrc_netif2_set_tx_feedback(netif, TX_FEEDBACK_UNDEF);
-                gnrc_netif2_set_rx_started(netif, false);
+                gnrc_netif_set_tx_feedback(netif, TX_FEEDBACK_UNDEF);
+                gnrc_netif_set_rx_started(netif, false);
                 break;
             }
             case NETDEV_EVENT_TX_COMPLETE: {
-                gnrc_netif2_set_tx_feedback(netif, TX_FEEDBACK_SUCCESS);
-                gnrc_netif2_set_rx_started(netif, false);
+                gnrc_netif_set_tx_feedback(netif, TX_FEEDBACK_SUCCESS);
+                gnrc_netif_set_rx_started(netif, false);
                 lwmac_schedule_update(netif);
                 break;
             }
             case NETDEV_EVENT_TX_NOACK: {
-                gnrc_netif2_set_tx_feedback(netif, TX_FEEDBACK_NOACK);
-                gnrc_netif2_set_rx_started(netif, false);
+                gnrc_netif_set_tx_feedback(netif, TX_FEEDBACK_NOACK);
+                gnrc_netif_set_rx_started(netif, false);
                 lwmac_schedule_update(netif);
                 break;
             }
             case NETDEV_EVENT_TX_MEDIUM_BUSY: {
-                gnrc_netif2_set_tx_feedback(netif, TX_FEEDBACK_BUSY);
-                gnrc_netif2_set_rx_started(netif, false);
+                gnrc_netif_set_tx_feedback(netif, TX_FEEDBACK_BUSY);
+                gnrc_netif_set_rx_started(netif, false);
                 lwmac_schedule_update(netif);
                 break;
             }
@@ -841,7 +841,7 @@ static void _lwmac_event_cb(netdev_t *dev, netdev_event_t event)
     }
 }
 
-static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     if (!gnrc_mac_queue_tx_packet(&netif->mac.tx, 0, pkt)) {
         gnrc_pktbuf_release(pkt);
@@ -859,7 +859,7 @@ static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
     return 0;
 }
 
-static void _lwmac_msg_handler(gnrc_netif2_t *netif, msg_t *msg)
+static void _lwmac_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 {
     switch (msg->type) {
         /* RTT raised an interrupt */
@@ -896,7 +896,7 @@ static void _lwmac_msg_handler(gnrc_netif2_t *netif, msg_t *msg)
     }
 }
 
-static void _lwmac_init(gnrc_netif2_t *netif)
+static void _lwmac_init(gnrc_netif_t *netif)
 {
     netdev_t *dev;
 

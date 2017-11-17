@@ -20,8 +20,8 @@
 #define PRIV_NIB_ROUTER_H
 
 #include "net/gnrc/ipv6/nib/conf.h"
-#include "net/gnrc/netif2/internal.h"
-#include "net/gnrc/netif2/ipv6.h"
+#include "net/gnrc/netif/internal.h"
+#include "net/gnrc/netif/ipv6.h"
 #include "net/ipv6/addr.h"
 #include "net/ndp.h"
 
@@ -37,24 +37,24 @@ extern "C" {
  *
  * @param[in] netif An interface.
  */
-static inline void _init_iface_router(gnrc_netif2_t *netif)
+static inline void _init_iface_router(gnrc_netif_t *netif)
 {
     netif->ipv6.rtr_ltime = NDP_RTR_LTIME_SEC;
     netif->ipv6.last_ra = UINT32_MAX;
     netif->ipv6.ra_sent = 0;
-    netif->flags |= GNRC_NETIF2_FLAGS_IPV6_FORWARDING;
+    netif->flags |= GNRC_NETIF_FLAGS_IPV6_FORWARDING;
 #if !GNRC_IPV6_NIB_CONF_6LR || GNRC_IPV6_NIB_CONF_6LBR
-    netif->flags |= GNRC_NETIF2_FLAGS_IPV6_RTR_ADV;
+    netif->flags |= GNRC_NETIF_FLAGS_IPV6_RTR_ADV;
 #endif  /* !GNRC_IPV6_NIB_CONF_6LR || GNRC_IPV6_NIB_CONF_6LBR */
 #if GNRC_IPV6_NIB_CONF_6LBR
-    netif->flags |= GNRC_NETIF2_FLAGS_6LO_ABR;
+    netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
 #endif  /* GNRC_IPV6_NIB_CONF_6LBR */
-    gnrc_netif2_ipv6_group_join(netif, &ipv6_addr_all_routers_link_local);
+    gnrc_netif_ipv6_group_join(netif, &ipv6_addr_all_routers_link_local);
 }
 
 /**
  * @brief   Helper function to safely call the
- *          [route info callback](@ref gnrc_netif2_ipv6_t::route_info_cb) of an
+ *          [route info callback](@ref gnrc_netif_ipv6_t::route_info_cb) of an
  *          interface
  *
  * @param[in] netif     An interface.
@@ -63,7 +63,7 @@ static inline void _init_iface_router(gnrc_netif2_t *netif)
  * @param[in] ctx_addr  Context address of the route info.
  * @param[in] ctx       Further context of the route info.
  */
-static inline void _call_route_info_cb(gnrc_netif2_t *netif, unsigned type,
+static inline void _call_route_info_cb(gnrc_netif_t *netif, unsigned type,
                                        const ipv6_addr_t *ctx_addr,
                                        const void *ctx)
 {
@@ -85,16 +85,16 @@ void _handle_reply_rs(_nib_onl_entry_t *host);
  * @param[in] netif Network interface to send multicast router advertisement
  *                  over.
  */
-void _handle_snd_mc_ra(gnrc_netif2_t *netif);
+void _handle_snd_mc_ra(gnrc_netif_t *netif);
 
 /**
- * @brief   Set the @ref GNRC_NETIF2_FLAGS_IPV6_RTR_ADV flag for an interface
+ * @brief   Set the @ref GNRC_NETIF_FLAGS_IPV6_RTR_ADV flag for an interface
  *          and starts advertising that interface as a router
  *
- * @param[in] netif Interface to set the @ref GNRC_NETIF2_FLAGS_IPV6_RTR_ADV
+ * @param[in] netif Interface to set the @ref GNRC_NETIF_FLAGS_IPV6_RTR_ADV
  *                  for.
  */
-void _set_rtr_adv(gnrc_netif2_t *netif);
+void _set_rtr_adv(gnrc_netif_t *netif);
 
 /**
  * @brief   Send router advertisements
@@ -108,7 +108,7 @@ void _set_rtr_adv(gnrc_netif2_t *netif);
  * @param[in] final The router advertisement are the final ones of the @p netif
  *                  (because it was set to be a non-forwarding interface e.g.).
  */
-void _snd_rtr_advs(gnrc_netif2_t *netif, const ipv6_addr_t *dst,
+void _snd_rtr_advs(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                   bool final);
 #else  /* GNRC_IPV6_NIB_CONF_ROUTER */
 #define _init_iface_router(netif)                       (void)netif

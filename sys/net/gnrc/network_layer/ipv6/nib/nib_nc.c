@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #include "net/gnrc/ipv6/nib/nc.h"
 
@@ -134,9 +134,9 @@ void gnrc_ipv6_nib_nc_print(gnrc_ipv6_nib_nc_t *entry)
     if (gnrc_ipv6_nib_nc_get_iface(entry) != KERNEL_PID_UNDEF) {
         printf("dev #%u ", gnrc_ipv6_nib_nc_get_iface(entry));
     }
-    printf("lladdr %s ", gnrc_netif2_addr_to_str(entry->l2addr,
-                                                 entry->l2addr_len,
-                                                 addr_str));
+    printf("lladdr %s ", gnrc_netif_addr_to_str(entry->l2addr,
+                                                entry->l2addr_len,
+                                                addr_str));
     if (gnrc_ipv6_nib_nc_is_router(entry)) {
         printf("router");
     }

@@ -58,14 +58,14 @@ static int _lwmac_find_timeout(gnrc_lwmac_t *lwmac, gnrc_lwmac_timeout_type_t ty
     return -ENOENT;
 }
 
-inline bool gnrc_lwmac_timeout_is_running(gnrc_netif2_t *netif,
+inline bool gnrc_lwmac_timeout_is_running(gnrc_netif_t *netif,
                                           gnrc_lwmac_timeout_type_t type)
 {
     assert(netif);
     return (_lwmac_find_timeout(&netif->mac.lwmac, type) >= 0);
 }
 
-bool gnrc_lwmac_timeout_is_expired(gnrc_netif2_t *netif, gnrc_lwmac_timeout_type_t type)
+bool gnrc_lwmac_timeout_is_expired(gnrc_netif_t *netif, gnrc_lwmac_timeout_type_t type)
 {
     assert(netif);
 
@@ -79,7 +79,7 @@ bool gnrc_lwmac_timeout_is_expired(gnrc_netif2_t *netif, gnrc_lwmac_timeout_type
     return false;
 }
 
-gnrc_lwmac_timeout_t *_lwmac_acquire_timeout(gnrc_netif2_t *netif,
+gnrc_lwmac_timeout_t *_lwmac_acquire_timeout(gnrc_netif_t *netif,
                                              gnrc_lwmac_timeout_type_t type)
 {
     assert(netif);
@@ -104,7 +104,7 @@ void gnrc_lwmac_timeout_make_expire(gnrc_lwmac_timeout_t *timeout)
     timeout->expired = true;
 }
 
-void gnrc_lwmac_clear_timeout(gnrc_netif2_t *netif, gnrc_lwmac_timeout_type_t type)
+void gnrc_lwmac_clear_timeout(gnrc_netif_t *netif, gnrc_lwmac_timeout_type_t type)
 {
     assert(netif);
 
@@ -114,7 +114,7 @@ void gnrc_lwmac_clear_timeout(gnrc_netif2_t *netif, gnrc_lwmac_timeout_type_t ty
     }
 }
 
-void gnrc_lwmac_set_timeout(gnrc_netif2_t *netif,
+void gnrc_lwmac_set_timeout(gnrc_netif_t *netif,
                             gnrc_lwmac_timeout_type_t type,
                             uint32_t offset)
 {
@@ -136,7 +136,7 @@ void gnrc_lwmac_set_timeout(gnrc_netif2_t *netif,
     }
 }
 
-void gnrc_lwmac_reset_timeouts(gnrc_netif2_t *netif)
+void gnrc_lwmac_reset_timeouts(gnrc_netif_t *netif)
 {
     assert(netif);
 

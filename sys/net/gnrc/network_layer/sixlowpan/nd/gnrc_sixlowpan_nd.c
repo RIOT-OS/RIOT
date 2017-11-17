@@ -15,7 +15,7 @@
 #include "net/eui64.h"
 #include "net/icmpv6.h"
 #include "net/gnrc/ipv6.h"
-#include "net/gnrc/ndp2.h"
+#include "net/gnrc/ndp.h"
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "random.h"
@@ -28,7 +28,7 @@
 gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_ar_build(uint8_t status, uint16_t ltime, eui64_t *eui64,
                                                gnrc_pktsnip_t *next)
 {
-    gnrc_pktsnip_t *pkt = gnrc_ndp2_opt_build(NDP_OPT_AR, sizeof(sixlowpan_nd_opt_ar_t), next);
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_AR, sizeof(sixlowpan_nd_opt_ar_t), next);
 
     if (pkt != NULL) {
         sixlowpan_nd_opt_ar_t *ar_opt = pkt->data;
@@ -44,7 +44,7 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_ar_build(uint8_t status, uint16_t ltime, e
 gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_6ctx_build(uint8_t prefix_len, uint8_t flags, uint16_t ltime,
                                                  ipv6_addr_t *prefix, gnrc_pktsnip_t *next)
 {
-    gnrc_pktsnip_t *pkt = gnrc_ndp2_opt_build(NDP_OPT_6CTX,
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_6CTX,
                                              sizeof(sixlowpan_nd_opt_6ctx_t) + (prefix_len / 8),
                                              next);
 
@@ -65,7 +65,7 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_6ctx_build(uint8_t prefix_len, uint8_t fla
 gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_abr_build(uint32_t version, uint16_t ltime,
                                                 ipv6_addr_t *braddr, gnrc_pktsnip_t *next)
 {
-    gnrc_pktsnip_t *pkt = gnrc_ndp2_opt_build(NDP_OPT_ABR, sizeof(sixlowpan_nd_opt_abr_t), next);
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_ABR, sizeof(sixlowpan_nd_opt_abr_t), next);
 
     if (pkt != NULL) {
         sixlowpan_nd_opt_abr_t *abr_opt = pkt->data;

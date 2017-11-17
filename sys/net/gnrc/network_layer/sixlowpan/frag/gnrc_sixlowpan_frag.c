@@ -21,7 +21,7 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/sixlowpan/frag.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
 #include "utlist.h"
 
@@ -81,7 +81,7 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt, size_t payload_len,
     return frag;
 }
 
-static uint16_t _send_1st_fragment(gnrc_netif2_t *iface, gnrc_pktsnip_t *pkt,
+static uint16_t _send_1st_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
                                    size_t payload_len, size_t datagram_size)
 {
     gnrc_pktsnip_t *frag;
@@ -138,7 +138,7 @@ static uint16_t _send_1st_fragment(gnrc_netif2_t *iface, gnrc_pktsnip_t *pkt,
     return local_offset;
 }
 
-static uint16_t _send_nth_fragment(gnrc_netif2_t *iface, gnrc_pktsnip_t *pkt,
+static uint16_t _send_nth_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
                                    size_t payload_len, size_t datagram_size,
                                    uint16_t offset)
 {
@@ -218,7 +218,7 @@ static uint16_t _send_nth_fragment(gnrc_netif2_t *iface, gnrc_pktsnip_t *pkt,
 
 void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
 {
-    gnrc_netif2_t *iface = gnrc_netif2_get_by_pid(fragment_msg->pid);
+    gnrc_netif_t *iface = gnrc_netif_get_by_pid(fragment_msg->pid);
     uint16_t res;
     /* payload_len: actual size of the packet vs
      * datagram_size: size of the uncompressed IPv6 packet */

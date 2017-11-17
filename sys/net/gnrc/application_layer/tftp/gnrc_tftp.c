@@ -22,7 +22,7 @@
 
 #include "net/gnrc/tftp.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/ipv6.h"
@@ -254,7 +254,7 @@ static int _tftp_server(tftp_context_t *ctxt);
 static uint16_t _tftp_get_maximum_block_size(void)
 {
     uint16_t tmp;
-    gnrc_netif2_t *netif = gnrc_netif2_iter(NULL);
+    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
 
     if ((netif != NULL) && gnrc_netapi_get(netif->pid, NETOPT_MAX_PACKET_SIZE,
                                            0, &tmp, sizeof(uint16_t)) >= 0) {

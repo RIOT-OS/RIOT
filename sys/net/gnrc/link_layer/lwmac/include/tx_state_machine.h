@@ -23,7 +23,7 @@
 #define TX_STATE_MACHINE_H
 
 #include "net/gnrc/pkt.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/mac/types.h"
 
 #ifdef __cplusplus
@@ -38,7 +38,7 @@ extern "C" {
  * @param[in]       neighbor      Tx neighbor
  *
  */
-void gnrc_lwmac_tx_start(gnrc_netif2_t *netif,
+void gnrc_lwmac_tx_start(gnrc_netif_t *netif,
                          gnrc_pktsnip_t *pkt,
                          gnrc_mac_tx_neighbor_t *neighbor);
 
@@ -48,7 +48,7 @@ void gnrc_lwmac_tx_start(gnrc_netif2_t *netif,
  * @param[in,out]   netif    ptr to the network interface
  *
  */
-void gnrc_lwmac_tx_stop(gnrc_netif2_t *netif);
+void gnrc_lwmac_tx_stop(gnrc_netif_t *netif);
 
 /**
  * @brief Update LWMAC TX procedure for transmission
@@ -56,7 +56,7 @@ void gnrc_lwmac_tx_stop(gnrc_netif2_t *netif);
  * @param[in,out]   netif    ptr to the network interface
  *
  */
-void gnrc_lwmac_tx_update(gnrc_netif2_t *netif);
+void gnrc_lwmac_tx_update(gnrc_netif_t *netif);
 
 #ifdef __cplusplus
 }

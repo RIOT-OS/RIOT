@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #include "net/gnrc.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +35,7 @@ extern "C" {
 #define _LL4            (0xf7)
 #define _LL5            (0x26)
 
-extern gnrc_netif2_t *_mock_netif;
+extern gnrc_netif_t *_mock_netif;
 
 void _tests_init(void);
 int _mock_netif_get(gnrc_netapi_opt_t *opt);

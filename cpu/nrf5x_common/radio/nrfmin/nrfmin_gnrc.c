@@ -20,7 +20,7 @@
 
 #include "net/gnrc.h"
 #include "thread.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 
 #include "nrfmin_gnrc.h"
 
@@ -32,7 +32,7 @@
  * @{
  */
 #ifndef NRFMIN_GNRC_THREAD_PRIO
-#define NRFMIN_GNRC_THREAD_PRIO     GNRC_NETIF2_PRIO
+#define NRFMIN_GNRC_THREAD_PRIO     GNRC_NETIF_PRIO
 #endif
 
 #ifndef NRFMIN_GNRC_STACKSIZE
@@ -76,7 +76,7 @@ static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
     return 0;
 }
 
-static int gnrc_nrfmin_send(gnrc_netif2_t *dev, gnrc_pktsnip_t *pkt)
+static int gnrc_nrfmin_send(gnrc_netif_t *dev, gnrc_pktsnip_t *pkt)
 {
     int res;
     struct iovec *vec;
@@ -119,7 +119,7 @@ static int gnrc_nrfmin_send(gnrc_netif2_t *dev, gnrc_pktsnip_t *pkt)
     return res;
 }
 
-static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif2_t *dev)
+static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif_t *dev)
 {
     int pktsize;
     nrfmin_hdr_t *nrfmin;
@@ -180,17 +180,17 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif2_t *dev)
     return pkt_snip;
 }
 
-static const gnrc_netif2_ops_t gnrc_nrfmin_ops = {
+static const gnrc_netif_ops_t gnrc_nrfmin_ops = {
     .send = gnrc_nrfmin_send,
     .recv = gnrc_nrfmin_recv,
-    .get = gnrc_netif2_get_from_netdev,
-    .set = gnrc_netif2_set_from_netdev,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
 };
 
 void gnrc_nrfmin_init(void)
 {
     /* setup the NRFMIN driver */
     nrfmin_setup();
-    gnrc_netif2_create(stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO, "nrfmin",
-                       (netdev_t *)&nrfmin_dev, &gnrc_nrfmin_ops);
+    gnrc_netif_create(stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO, "nrfmin",
+                      (netdev_t *)&nrfmin_dev, &gnrc_nrfmin_ops);
 }

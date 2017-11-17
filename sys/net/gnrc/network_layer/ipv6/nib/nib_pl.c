@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 #include "net/gnrc/ipv6/nib/pl.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "timex.h"
 #include "xtimer.h"
 
@@ -49,25 +49,25 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     if (dst == NULL) {
         res = -ENOMEM;
     }
-#ifdef MODULE_GNRC_NETIF2
-    gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(iface);
+#ifdef MODULE_GNRC_NETIF
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
     int idx;
 
     if (netif == NULL) {
         mutex_unlock(&_nib_mutex);
         return res;
     }
-    gnrc_netif2_acquire(netif);
-    if (!gnrc_netif2_is_6ln(netif) &&
-        ((idx = gnrc_netif2_ipv6_addr_match(netif, pfx)) >= 0) &&
+    gnrc_netif_acquire(netif);
+    if (!gnrc_netif_is_6ln(netif) &&
+        ((idx = gnrc_netif_ipv6_addr_match(netif, pfx)) >= 0) &&
         (ipv6_addr_match_prefix(&netif->ipv6.addrs[idx], pfx) >= pfx_len)) {
         dst->flags |= _PFX_ON_LINK;
     }
-    if (netif->ipv6.aac_mode == GNRC_NETIF2_AAC_AUTO) {
+    if (netif->ipv6.aac_mode == GNRC_NETIF_AAC_AUTO) {
         dst->flags |= _PFX_SLAAC;
     }
 #if GNRC_IPV6_NIB_CONF_6LBR && GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-    if (gnrc_netif2_is_6lbr(netif)) {
+    if (gnrc_netif_is_6lbr(netif)) {
         _nib_abr_entry_t *abr = NULL;
 
         while ((abr = _nib_abr_iter(abr))) {
@@ -76,10 +76,10 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
         }
     }
 #endif
-    gnrc_netif2_release(netif);
-#endif  /* MODULE_GNRC_NETIF2 */
+    gnrc_netif_release(netif);
+#endif  /* MODULE_GNRC_NETIF */
     mutex_unlock(&_nib_mutex);
-#if defined(MODULE_GNRC_NETIF2) && GNRC_IPV6_NIB_CONF_ROUTER
+#if defined(MODULE_GNRC_NETIF) && GNRC_IPV6_NIB_CONF_ROUTER
     /* update prefixes down-stream */
     _handle_snd_mc_ra(netif);
 #endif
@@ -101,7 +101,7 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
             _nib_pl_remove(dst);
             mutex_unlock(&_nib_mutex);
 #if GNRC_IPV6_NIB_CONF_ROUTER
-            gnrc_netif2_t *netif = gnrc_netif2_get_by_pid(iface);
+            gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
 
             if (netif) {
                 /* update prefixes down-stream */

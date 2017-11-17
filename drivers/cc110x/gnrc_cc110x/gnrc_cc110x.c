@@ -14,13 +14,13 @@
 #include "net/gnrc.h"
 #include "cc110x.h"
 #include "cc110x-netdev.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "od.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     cc110x_pkt_t cc110x_pkt;
     netdev_t *dev = netif->dev;
@@ -107,7 +107,7 @@ static int _send(gnrc_netif2_t *netif, gnrc_pktsnip_t *pkt)
     return dev->driver->send(dev, &vector, 1);
 }
 
-static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
+static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     cc110x_t *cc110x = &((netdev_cc110x_t*) dev)->cc110x;
@@ -182,16 +182,16 @@ static gnrc_pktsnip_t *_recv(gnrc_netif2_t *netif)
     return pkt;
 }
 
-static const gnrc_netif2_ops_t _cc110x_ops = {
+static const gnrc_netif_ops_t _cc110x_ops = {
     .send = _send,
     .recv = _recv,
-    .get = gnrc_netif2_get_from_netdev,
-    .set = gnrc_netif2_set_from_netdev,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif2_t *gnrc_netif2_cc110x_create(char *stack, int stacksize, char priority,
-                                         char *name, netdev_t *dev)
+gnrc_netif_t *gnrc_netif_cc110x_create(char *stack, int stacksize, char priority,
+                                       char *name, netdev_t *dev)
 {
-    return gnrc_netif2_create(stack, stacksize, priority, name, dev,
-                              &_cc110x_ops);
+    return gnrc_netif_create(stack, stacksize, priority, name, dev,
+                             &_cc110x_ops);
 }

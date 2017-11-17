@@ -23,7 +23,7 @@
 
 #include "log.h"
 #include "board.h"
-#include "net/gnrc/netif2/ieee802154.h"
+#include "net/gnrc/netif/ieee802154.h"
 #include "net/gnrc.h"
 
 #include "cc2420.h"
@@ -35,7 +35,7 @@
  */
 #define CC2420_MAC_STACKSIZE           (THREAD_STACKSIZE_MAIN)
 #ifndef CC2420_MAC_PRIO
-#define CC2420_MAC_PRIO                (GNRC_NETIF2_PRIO)
+#define CC2420_MAC_PRIO                (GNRC_NETIF_PRIO)
 #endif
 /** @} */
 
@@ -58,9 +58,9 @@ void auto_init_cc2420(void)
         LOG_DEBUG("[auto_init_netif] initializing cc2420 #%u\n", i);
 
         cc2420_setup(&cc2420_devs[i], &cc2420_params[i]);
-        gnrc_netif2_ieee802154_create(_cc2420_stacks[i], CC2420_MAC_STACKSIZE,
-                                      CC2420_MAC_PRIO, "cc2420",
-                                      (netdev_t *)&cc2420_devs[i]);
+        gnrc_netif_ieee802154_create(_cc2420_stacks[i], CC2420_MAC_STACKSIZE,
+                                     CC2420_MAC_PRIO, "cc2420",
+                                     (netdev_t *)&cc2420_devs[i]);
     }
 }
 

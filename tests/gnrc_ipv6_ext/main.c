@@ -28,15 +28,15 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
 
 static void _init_interface(void)
 {
-    gnrc_netif2_t *iface;
+    gnrc_netif_t *iface;
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
 
-    iface = gnrc_netif2_iter(NULL);
+    iface = gnrc_netif_iter(NULL);
 
     addr.u8[0] = 0xfd;
     addr.u8[1] = 0x01;
@@ -54,7 +54,7 @@ static void _init_interface(void)
 
 static void _send_packet_raw(void)
 {
-    gnrc_netif2_t *iface = gnrc_netif2_iter(NULL);
+    gnrc_netif_t *iface = gnrc_netif_iter(NULL);
 
     gnrc_netif_hdr_t netif_hdr;
 
@@ -128,7 +128,7 @@ static void _send_packet_raw(void)
 
 static void _send_packet_parsed(void)
 {
-    gnrc_netif2_t *iface = gnrc_netif2_iter(NULL);
+    gnrc_netif_t *iface = gnrc_netif_iter(NULL);
 
     gnrc_netif_hdr_t netif_hdr;
 

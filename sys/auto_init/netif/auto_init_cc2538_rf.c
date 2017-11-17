@@ -20,7 +20,7 @@
 #ifdef MODULE_CC2538_RF
 
 #include "log.h"
-#include "net/gnrc/netif2/ieee802154.h"
+#include "net/gnrc/netif/ieee802154.h"
 
 #include "cc2538_rf.h"
 
@@ -30,7 +30,7 @@
  */
 #define CC2538_MAC_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
 #ifndef CC2538_MAC_PRIO
-#define CC2538_MAC_PRIO            (GNRC_NETIF2_PRIO)
+#define CC2538_MAC_PRIO            (GNRC_NETIF_PRIO)
 #endif
 
 static cc2538_rf_t cc2538_rf_dev;
@@ -41,10 +41,10 @@ void auto_init_cc2538_rf(void)
     LOG_DEBUG("[auto_init_netif] initializing cc2538 radio\n");
 
     cc2538_setup(&cc2538_rf_dev);
-    gnrc_netif2_ieee802154_create(_cc2538_rf_stack,
-                                  CC2538_MAC_STACKSIZE,
-                                  CC2538_MAC_PRIO, "cc2538_rf",
-                                  (netdev_t *)&cc2538_rf_dev);
+    gnrc_netif_ieee802154_create(_cc2538_rf_stack,
+                                 CC2538_MAC_STACKSIZE,
+                                 CC2538_MAC_PRIO, "cc2538_rf",
+                                 (netdev_t *)&cc2538_rf_dev);
 }
 
 #else

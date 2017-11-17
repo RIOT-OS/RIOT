@@ -22,7 +22,7 @@
 #include "msg.h"
 #include "net/ethernet.h"
 #include "net/gnrc.h"
-#include "net/gnrc/netif2/ethernet.h"
+#include "net/gnrc/netif/ethernet.h"
 #include "net/netdev_test.h"
 #include "od.h"
 #include "thread.h"
@@ -196,12 +196,12 @@ static int test_receive(void)
         puts("=================");
         puts("expected");
         puts("=================");
-        puts(gnrc_netif2_addr_to_str(_test_src, ETHERNET_ADDR_LEN, addr_str));
+        puts(gnrc_netif_addr_to_str(_test_src, ETHERNET_ADDR_LEN, addr_str));
         puts("=================");
         puts("received source");
         puts("=================");
-        puts(gnrc_netif2_addr_to_str(gnrc_netif_hdr_get_src_addr(hdr->data),
-                                     ETHERNET_ADDR_LEN, addr_str));
+        puts(gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(hdr->data),
+                                    ETHERNET_ADDR_LEN, addr_str));
         return 0;
     }
     if (memcmp(gnrc_netif_hdr_get_dst_addr(hdr->data), _dev_addr,
@@ -211,12 +211,12 @@ static int test_receive(void)
         puts("=================");
         puts("expected");
         puts("=================");
-        puts(gnrc_netif2_addr_to_str(_dev_addr, ETHERNET_ADDR_LEN, addr_str));
+        puts(gnrc_netif_addr_to_str(_dev_addr, ETHERNET_ADDR_LEN, addr_str));
         puts("====================");
         puts("received destination");
         puts("====================");
-        puts(gnrc_netif2_addr_to_str(gnrc_netif_hdr_get_dst_addr(hdr->data),
-                                     ETHERNET_ADDR_LEN, addr_str));
+        puts(gnrc_netif_addr_to_str(gnrc_netif_hdr_get_dst_addr(hdr->data),
+                                    ETHERNET_ADDR_LEN, addr_str));
         return 0;
     }
 
@@ -258,8 +258,8 @@ int main(void)
     netdev_test_set_send_cb(&_dev, _dev_send);
     netdev_test_set_get_cb(&_dev, NETOPT_ADDRESS, _dev_get_addr);
     netdev_test_set_set_cb(&_dev, NETOPT_ADDRESS, _dev_set_addr);
-    _mac_pid = gnrc_netif2_ethernet_create(_mac_stack, _MAC_STACKSIZE, _MAC_PRIO,
-                                           "netdev_test", (netdev_t *)&_dev)->pid;
+    _mac_pid = gnrc_netif_ethernet_create(_mac_stack, _MAC_STACKSIZE, _MAC_PRIO,
+                                          "netdev_test", (netdev_t *)&_dev)->pid;
 
     /* test execution */
     EXECUTE(test_get_addr);

@@ -14,7 +14,7 @@
  */
 
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan/nd.h"
 
 #include "_nib-6lr.h"
@@ -48,7 +48,7 @@ static uint8_t _update_nce_ar_state(const sixlowpan_nd_opt_ar_t *aro,
     }
 }
 
-uint8_t _reg_addr_upstream(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
+uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                            const icmpv6_hdr_t *icmpv6,
                            const sixlowpan_nd_opt_ar_t *aro,
                            const ndp_opt_t *sl2ao, _nib_onl_entry_t *nce)
@@ -90,7 +90,7 @@ uint8_t _reg_addr_upstream(gnrc_netif2_t *netif, const ipv6_hdr_t *ipv6,
     return _ADDR_REG_STATUS_IGNORE;
 }
 
-gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif2_t *netif,
+gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif,
                                      const ipv6_hdr_t *ipv6,
                                      const ndp_nbr_sol_t *nbr_sol,
                                      const sixlowpan_nd_opt_ar_t *aro,

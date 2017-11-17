@@ -18,15 +18,15 @@
 #include "net/gnrc.h"
 #include "net/ethernet.h"
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif2/ethernet.h"
-#include "net/gnrc/netif2/internal.h"
+#include "net/gnrc/netif/ethernet.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/netdev_test.h"
 #include "sched.h"
 #include "thread.h"
 
 #define _MSG_QUEUE_SIZE  (2)
 
-gnrc_netif2_t *_mock_netif = NULL;
+gnrc_netif_t *_mock_netif = NULL;
 
 static netdev_test_t _mock_netdev;
 static char _mock_netif_stack[THREAD_STACKSIZE_DEFAULT];
@@ -37,9 +37,9 @@ void _common_set_up(void)
 {
     assert(_mock_netif != NULL);
     gnrc_ipv6_nib_init();
-    gnrc_netif2_acquire(_mock_netif);
+    gnrc_netif_acquire(_mock_netif);
     gnrc_ipv6_nib_init_iface(_mock_netif);
-    gnrc_netif2_release(_mock_netif);
+    gnrc_netif_release(_mock_netif);
 }
 
 int _get_device_type(netdev_t *dev, void *value, size_t max_len)
@@ -78,19 +78,19 @@ void _tests_init(void)
                            _get_max_packet_size);
     netdev_test_set_get_cb(&_mock_netdev, NETOPT_ADDRESS,
                            _get_address);
-    _mock_netif = gnrc_netif2_ethernet_create(
-           _mock_netif_stack, THREAD_STACKSIZE_DEFAULT, GNRC_NETIF2_PRIO,
+    _mock_netif = gnrc_netif_ethernet_create(
+           _mock_netif_stack, THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO,
             "mockup_eth", &_mock_netdev.netdev
         );
     assert(_mock_netif != NULL);
     /* we do not want to test for SLAAC here so just assure the configured
      * address is valid */
     assert(!ipv6_addr_is_unspecified(&_mock_netif->ipv6.addrs[0]));
-    _mock_netif->ipv6.addrs_flags[0] &= ~GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_MASK;
-    _mock_netif->ipv6.addrs_flags[0] |= GNRC_NETIF2_IPV6_ADDRS_FLAGS_STATE_VALID;
+    _mock_netif->ipv6.addrs_flags[0] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
+    _mock_netif->ipv6.addrs_flags[0] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
     gnrc_netreg_entry_init_pid(&dumper, GNRC_NETREG_DEMUX_CTX_ALL,
                                sched_active_pid);
-    gnrc_netreg_register(GNRC_NETTYPE_NDP2, &dumper);
+    gnrc_netreg_register(GNRC_NETTYPE_NDP, &dumper);
 }
 
 /** @} */

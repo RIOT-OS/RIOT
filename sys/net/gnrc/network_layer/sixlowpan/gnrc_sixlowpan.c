@@ -21,7 +21,7 @@
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/frag.h"
 #include "net/gnrc/sixlowpan/iphc.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
 
 #define ENABLE_DEBUG    (0)
@@ -192,7 +192,7 @@ static void _send(gnrc_pktsnip_t *pkt)
 {
     gnrc_netif_hdr_t *hdr;
     gnrc_pktsnip_t *pkt2;
-    gnrc_netif2_t *iface;
+    gnrc_netif_t *iface;
     /* datagram_size: pure IPv6 packet without 6LoWPAN dispatches or compression */
     size_t datagram_size;
 
@@ -217,7 +217,7 @@ static void _send(gnrc_pktsnip_t *pkt)
     }
 
     hdr = pkt2->data;
-    iface = gnrc_netif2_get_by_pid(hdr->if_pid);
+    iface = gnrc_netif_get_by_pid(hdr->if_pid);
     datagram_size = gnrc_pkt_len(pkt2->next);
 
     if (iface == NULL) {
@@ -227,7 +227,7 @@ static void _send(gnrc_pktsnip_t *pkt)
     }
 
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-    if (iface->flags & GNRC_NETIF2_FLAGS_6LO_HC) {
+    if (iface->flags & GNRC_NETIF_FLAGS_6LO_HC) {
         if (!gnrc_sixlowpan_iphc_encode(pkt2)) {
             DEBUG("6lo: error on IPHC encoding\n");
             gnrc_pktbuf_release(pkt2);

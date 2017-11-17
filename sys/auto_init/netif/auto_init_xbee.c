@@ -23,7 +23,7 @@
 
 #include "log.h"
 #include "board.h"
-#include "gnrc_netif2_xbee.h"
+#include "gnrc_netif_xbee.h"
 #include "xbee.h"
 #include "xbee_params.h"
 
@@ -37,7 +37,7 @@
  */
 #define XBEE_MAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
 #ifndef XBEE_MAC_PRIO
-#define XBEE_MAC_PRIO                (GNRC_NETIF2_PRIO)
+#define XBEE_MAC_PRIO                (GNRC_NETIF_PRIO)
 #endif
 
 /**
@@ -52,8 +52,8 @@ void auto_init_xbee(void)
         LOG_DEBUG("[auto_init_netif] initializing xbee #%u\n", i);
 
         xbee_setup(&xbee_devs[i], &xbee_params[i]);
-        gnrc_netif2_xbee_create(stacks[i], XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO,
-                                "xbee", (netdev_t *)&xbee_devs[i]);
+        gnrc_netif_xbee_create(stacks[i], XBEE_MAC_STACKSIZE, XBEE_MAC_PRIO,
+                               "xbee", (netdev_t *)&xbee_devs[i]);
     }
 }
 

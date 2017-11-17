@@ -28,13 +28,13 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pktdump.h"
 
 static void _init_interface(void)
 {
-    gnrc_netif2_t *netif = gnrc_netif2_iter(NULL);
+    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
 
     /* fd01::01 */
@@ -51,7 +51,7 @@ static void _init_interface(void)
 
 static void _send_packet(void)
 {
-    gnrc_netif2_t *netif = gnrc_netif2_iter(NULL);
+    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
 
     struct {
         gnrc_netif_hdr_t netif_hdr;

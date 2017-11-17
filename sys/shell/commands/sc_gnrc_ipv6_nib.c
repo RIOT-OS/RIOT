@@ -16,7 +16,7 @@
 #include <stdio.h>
 
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
 
 static void _usage(char **argv);
@@ -106,7 +106,7 @@ static int _nib_neigh(int argc, char **argv)
             return 1;
         }
         if ((argc > 5) && /* TODO also check if interface supports link-layers or not */
-            (l2addr_len = gnrc_netif2_addr_from_str(argv[5], l2addr)) == 0) {
+            (l2addr_len = gnrc_netif_addr_from_str(argv[5], l2addr)) == 0) {
             _usage_nib_neigh(argv);
             return 1;
         }

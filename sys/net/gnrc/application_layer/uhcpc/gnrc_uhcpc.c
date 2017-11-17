@@ -9,7 +9,7 @@
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netapi.h"
-#include "net/gnrc/netif2.h"
+#include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
@@ -23,9 +23,9 @@ static kernel_pid_t gnrc_wireless_interface;
 
 static void set_interface_roles(void)
 {
-    gnrc_netif2_t *netif = NULL;
+    gnrc_netif_t *netif = NULL;
 
-    while ((netif = gnrc_netif2_iter(netif))) {
+    while ((netif = gnrc_netif_iter(netif))) {
         kernel_pid_t dev = netif->pid;
         int is_wired = gnrc_netapi_get(dev, NETOPT_IS_WIRED, 0, NULL, 0);
         if ((!gnrc_border_interface) && (is_wired == 1)) {
