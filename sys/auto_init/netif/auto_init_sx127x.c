@@ -37,7 +37,7 @@
  */
 #define SX127X_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
 #ifndef SX127X_PRIO
-#define SX127X_PRIO                (GNRC_NETDEV_MAC_PRIO)
+#define SX127X_PRIO                (GNRC_NETIF2_MAC_PRIO)
 #endif
 
 /**
