@@ -20,8 +20,10 @@ US_PER_SEC = 1000000
 INTERNAL_JITTER = 0.05
 EXTERNAL_JITTER = 0.15
 
+
 class InvalidTimeout(Exception):
     pass
+
 
 def testfunc(child):
     child.expect(u"Running test (\\d+) times with (\\d+) distinct sleep times")

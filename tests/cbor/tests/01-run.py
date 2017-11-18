@@ -14,6 +14,7 @@ import testrunner
 
 ACCEPTED_ERROR = 20
 
+
 def testfunc(child):
     child.expect_exact('Data:')
     child.expect_exact('(uint64_t, 1)')

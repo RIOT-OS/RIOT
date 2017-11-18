@@ -13,8 +13,8 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
-def testfunc(child):
 
+def testfunc(child):
     child.expect_exact("************ C++ thread test ***********")
     child.expect_exact("Creating one thread and passing an argument ...")
     child.expect_exact("Done")

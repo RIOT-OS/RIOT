@@ -12,6 +12,7 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def testfunc(child):
     child.expect_exact("xtimer_remove test application.")
     child.expect_exact("Setting 3 timers, removing timer 0/3")

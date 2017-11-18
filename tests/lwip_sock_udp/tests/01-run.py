@@ -12,14 +12,18 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def _reuse_tests(code):
     return code & 1
+
 
 def _ipv6_tests(code):
     return code & (1 << 6)
 
+
 def _ipv4_tests(code):
     return code & (1 << 4)
+
 
 def testfunc(child):
     child.expect(u"code (0x[0-9a-f]{2})")

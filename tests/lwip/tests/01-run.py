@@ -17,6 +17,7 @@ import pexpect
 
 DEFAULT_TIMEOUT = 5
 
+
 class Strategy(object):
     def __init__(self, func=None):
         if func != None:
@@ -28,10 +29,12 @@ class Strategy(object):
     def execute(self, *args, **kwargs):
         raise NotImplementedError()
 
+
 class ApplicationStrategy(Strategy):
     def __init__(self, app_dir=os.getcwd(), func=None):
         super(ApplicationStrategy, self).__init__(func)
         self.app_dir = app_dir
+
 
 class BoardStrategy(Strategy):
     def __init__(self, board, func=None):
@@ -50,21 +53,26 @@ class BoardStrategy(Strategy):
     def execute(self, application):
         super(BoardStrategy, self).execute(application)
 
+
 class CleanStrategy(BoardStrategy):
     def execute(self, application, env=None):
         super(CleanStrategy, self).__run_make(application, ("-B", "clean"), env)
+
 
 class BuildStrategy(BoardStrategy):
     def execute(self, application, env=None):
         super(BuildStrategy, self).__run_make(application, ("all",), env)
 
+
 class FlashStrategy(BoardStrategy):
     def execute(self, application, env=None):
         super(FlashStrategy, self).__run_make(application, ("all",), env)
 
+
 class ResetStrategy(BoardStrategy):
     def execute(self, application, env=None):
         super(ResetStrategy, self).__run_make(application, ("reset",), env)
+
 
 class Board(object):
     def __init__(self, name, port=None, serial=None, clean=None,
@@ -119,6 +127,7 @@ class Board(object):
     def reset(self, application=os.getcwd(), env=None):
         self.reset_strategy.execute(application, env)
 
+
 class BoardGroup(object):
     def __init__(self, boards):
         self.boards = boards
@@ -148,6 +157,7 @@ class BoardGroup(object):
         for board in self.boards:
             board.reset(application, env)
 
+
 def default_test_case(board_group, application, env=None):
     for board in board_group:
         env = os.environ.copy()
@@ -158,6 +168,7 @@ def default_test_case(board_group, application, env=None):
                             timeout=DEFAULT_TIMEOUT,
                            logfile=sys.stdout) as spawn:
             spawn.expect("TEST: SUCCESS")
+
 
 class TestStrategy(ApplicationStrategy):
     def execute(self, board_groups, test_cases=[default_test_case],
@@ -171,10 +182,12 @@ class TestStrategy(ApplicationStrategy):
                 sys.stdout.flush()
             print()
 
+
 def get_ipv6_address(spawn):
     spawn.sendline(u"ifconfig")
     spawn.expect(u"[A-Za-z0-9]{2}_[0-9]+:  inet6 (fe80::[0-9a-f:]+)")
     return spawn.match.group(1)
+
 
 def test_ipv6_send(board_group, application, env=None):
     env_sender = os.environ.copy()
@@ -199,6 +212,7 @@ def test_ipv6_send(board_group, application, env=None):
                             (receiver_ip, ipprot))
         receiver.expect(u"00000000  01  23  45  67  89  AB  CD  EF")
 
+
 def test_udpv6_send(board_group, application, env=None):
     env_sender = os.environ.copy()
     if env != None:
@@ -222,6 +236,7 @@ def test_udpv6_send(board_group, application, env=None):
         sender.expect_exact(u"Success: send 3 byte over UDP to [%s]:%d" %
                             (receiver_ip, port))
         receiver.expect(u"00000000  AB  CD  EF")
+
 
 def test_tcpv6_send(board_group, application, env=None):
     env_client = os.environ.copy()
@@ -251,6 +266,7 @@ def test_tcpv6_send(board_group, application, env=None):
         client.sendline(u"tcp disconnect")
         client.sendline(u"tcp send affe:abe")
         client.expect_exact(u"could not send")
+
 
 def test_triple_send(board_group, application, env=None):
     env_sender = os.environ.copy()

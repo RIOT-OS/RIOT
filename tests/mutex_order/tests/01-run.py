@@ -21,6 +21,7 @@ thread_prio = {
         7:  1
         }
 
+
 def testfunc(child):
     for k in thread_prio.keys():
         child.expect(u"T%i \(prio %i\): trying to lock mutex now" % (k, thread_prio[k]))
