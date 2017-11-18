@@ -38,7 +38,7 @@ def testfunc(child):
         child.expect(u"T%i \(prio %i, depth 0\): trying to lock rmutex now" %
                      (k, thread_prio[k]))
 
-    pri_sorted = sorted(thread_prio, key=thread_prio_sort);
+    pri_sorted = sorted(thread_prio, key=thread_prio_sort)
     for T in pri_sorted:
         for depth in range(lock_depth[T]):
             child.expect(u"T%i \(prio %i, depth %i\): locked rmutex now" %
