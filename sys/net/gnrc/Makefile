@@ -46,8 +46,14 @@ endif
 ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
   DIRS += network_layer/ndp/router
 endif
+ifneq (,$(filter gnrc_ndp2,$(USEMODULE)))
+    DIRS += network_layer/ndp2
+endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
   DIRS += netapi
+endif
+ifneq (,$(filter gnrc_netif2,$(USEMODULE)))
+    DIRS += netif2
 endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   DIRS += netif
@@ -111,9 +117,6 @@ ifneq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_sixlowpan_netif,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/netif
-endif
-ifneq (,$(filter gnrc_slip,$(USEMODULE)))
-  DIRS += link_layer/slip
 endif
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   DIRS += sock

@@ -1,8 +1,5 @@
 # define the cpu used by the Mulle board
-export CPU = k60
-
-# Default GDB port
-export GDBPORT ?= 3333
+export CPU = kinetis
 
 # MULLE_SERIAL is used to select which specific Mulle board we are compiling for.
 ifdef MULLE_SERIAL
@@ -22,53 +19,26 @@ endif
 
 export CPU_MODEL
 
-# OpenOCD settings for Mulle board.
-# Try to determine which version of the OpenOCD config file we should use.
-# Specify PROGRAMMER_VERSION or PROGRAMMER_SERIAL to choose a specific programmer board.
-ifeq ($(PROGRAMMER_VERSION),)
-  ifneq ($(PROGRAMMER_SERIAL),)
-    # Makefile-way of comparing numbers, using lexicographical sorting since we don't have any arithmetic comparisons.
-    # Programmers with serial 100 -- 148 are version 0.60
-    # Programmers with serial 301 -- 330 are version 0.70
-    ifeq "100" "$(word 1, $(sort 100 $(PROGRAMMER_SERIAL)))"
-      # >= 100
-      ifneq "149" "$(word 1, $(sort 149 $(PROGRAMMER_SERIAL)))"
-        # < 149
-        PROGRAMMER_VERSION = 0.60
-      else
-        # >= 149
-        PROGRAMMER_VERSION = 0.70
-      endif
-    endif
-  endif
-  # Default to version 0.70 programmer
-  PROGRAMMER_VERSION ?= 0.70
-endif
-
-export OPENOCD_CONFIG = $(RIOTBOARD)/$(BOARD)/dist/openocd/mulle-programmer-$(PROGRAMMER_VERSION).conf
-
-# Add serial matching command
-ifneq ($(PROGRAMMER_SERIAL),)
-  OPENOCD_EXTRA_INIT += -c 'ftdi_serial $(PROGRAMMER_SERIAL)'
-endif
-
-OPENOCD_EXTRA_INIT += $(CPU_OOCD_FLAGS)
-
+# Default debug adapter choice is to use the Mulle programmer board
+export DEBUG_ADAPTER ?= mulle
 # Host OS name
 OS := $(shell uname)
+
+# Fall back to PROGRAMMER_SERIAL for backwards compatibility
+export DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
 
 ifeq ($(PORT),)
   # try to find tty name by serial number, only works on Linux currently.
   ifeq ($(OS),Linux)
-    ifneq ($(PROGRAMMER_SERIAL),)
-      PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh '^$(PROGRAMMER_SERIAL)$$'))
+    ifneq ($(DEBUG_ADAPTER_ID),)
+      PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh '^$(DEBUG_ADAPTER_ID)$$'))
     else
       # find-tty.sh will return the first USB tty if no serial is given.
       PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh))
   endif
   else ifeq ($(OS),Darwin)
-    ifneq ($(PROGRAMMER_SERIAL),)
-      PORT := /dev/tty.usbserial-$(PROGRAMMER_SERIAL)B
+    ifneq ($(DEBUG_ADAPTER_ID),)
+      PORT := /dev/tty.usbserial-$(DEBUG_ADAPTER_ID)B
     else
       PORT := $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
     endif
@@ -84,13 +54,12 @@ endif
 # wdog-disable.bin is a precompiled binary which will disable the watchdog and
 # return control to the debugger (OpenOCD)
 export OPENOCD_PRE_VERIFY_CMDS += \
-  -c 'load_image $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin 0x20000000 bin' \
+  -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
   -c 'resume 0x20000000'
-export OPENOCD_EXTRA_INIT
-export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-hex.sh
+export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh
 
 .PHONY: flash
-flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
+flash: $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
 
 # Reset the default goal.
 .DEFAULT_GOAL :=

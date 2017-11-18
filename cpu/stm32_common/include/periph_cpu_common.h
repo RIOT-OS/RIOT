@@ -44,17 +44,16 @@ extern "C" {
 #endif
 
 /**
- * @brief   Linker script provided symbol for CPUID location
- */
-extern uint32_t _cpuid_address;
-/**
- * @brief   Starting offset of CPU_ID
- */
-#define CPUID_ADDR          (&_cpuid_address)
-/**
  * @brief   Length of the CPU_ID in octets
+ *
+ * This is the same for all members of the stm32 family
  */
 #define CPUID_LEN           (12U)
+
+/**
+ * @brief   We provide our own pm_off() function for all STM32-based CPUs
+ */
+#define PROVIDES_PM_LAYERED_OFF
 
 /**
  * @brief   All STM timers have 4 capture-compare channels
@@ -263,7 +262,7 @@ typedef struct {
     uint8_t dma_stream;     /**< DMA stream used for TX */
     uint8_t dma_chan;       /**< DMA channel used for TX */
 #endif
-#ifdef UART_USE_HW_FC
+#ifdef MODULE_STM32_PERIPH_UART_HW_FC
     gpio_t cts_pin;         /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
     gpio_t rts_pin;         /**< RTS pin */
 #ifndef CPU_FAM_STM32F1
@@ -297,6 +296,15 @@ typedef struct {
  * @return              bus clock frequency in Hz
  */
 uint32_t periph_apb_clk(uint8_t bus);
+
+/**
+ * @brief   Get the actual timer clock frequency
+ *
+ * @param[in] bus       corresponding APBx bus
+ *
+ * @return              timer clock frequency in Hz
+ */
+uint32_t periph_timer_clk(uint8_t bus);
 
 /**
  * @brief   Enable the given peripheral clock

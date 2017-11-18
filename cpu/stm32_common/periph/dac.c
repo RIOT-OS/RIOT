@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     cpu_stm32_common
  * @ingroup     drivers_periph_dac
  * @{
  *
@@ -24,9 +24,6 @@
 #include "cpu.h"
 #include "assert.h"
 #include "periph/dac.h"
-
-/* only compile this, if the CPU has a DAC */
-#ifdef DAC_NUMOF
 
 /* DAC channel enable bits */
 #ifdef DAC_CR_EN2
@@ -122,7 +119,3 @@ void dac_poweroff(dac_t line)
 #endif
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* DAC */

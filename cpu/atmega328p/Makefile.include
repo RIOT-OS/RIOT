@@ -1,6 +1,3 @@
-# this CPU implementation is using the new core/CPU interface
-export CFLAGS += -DCOREIF_NG=1
-
 # tell the build system that the CPU depends on the atmega common files
 USEMODULE += atmega_common
 

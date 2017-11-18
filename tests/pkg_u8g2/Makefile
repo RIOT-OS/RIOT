@@ -13,7 +13,7 @@ TEST_OUTPUT ?= 1
 TEST_I2C ?= 0
 TEST_SPI ?= 0
 
-TEST_ADDR ?= 0x78
+TEST_ADDR ?= 0x3c
 
 TEST_PIN_CS ?= GPIO_PIN\(0,0\)
 TEST_PIN_DC ?= GPIO_PIN\(0,0\)
@@ -59,3 +59,6 @@ CFLAGS += -DTEST_PIN_RESET=$(TEST_PIN_RESET)
 CFLAGS += -DTEST_DISPLAY=$(TEST_DISPLAY)
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py

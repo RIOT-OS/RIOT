@@ -110,7 +110,7 @@
 #define TCC1_OTMX                   0        // Output Matrix feature implemented
 #define TCC1_OW_NUM                 4        // Number of Output Waveforms
 #define TCC1_PG                     1        // Pattern Generation feature implemented
-#define TCC1_SIZE                   24
+#define TCC1_SIZE                   24      
 #define TCC1_SWAP                   0        // DTI outputs swap feature implemented
 #define TCC1_TYPE                   2        // TCC type 0 : NA, 1 : Master, 2 : Slave
 

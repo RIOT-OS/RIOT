@@ -32,10 +32,6 @@
 #include "xtimer.h"
 #endif
 
-#ifdef MODULE_RTC
-#include "periph/rtc.h"
-#endif
-
 #ifdef MODULE_GNRC_SIXLOWPAN
 #include "net/gnrc/sixlowpan.h"
 #endif
@@ -80,13 +76,14 @@
 #include "net/fib.h"
 #endif
 
-#ifdef MODULE_PRNG
-#include "random.h"
-#endif
-
 #ifdef MODULE_GCOAP
 #include "net/gcoap.h"
 #endif
+
+#ifdef MODULE_GNRC_IPV6_NIB
+#include "net/gnrc/ipv6/nib.h"
+#endif
+
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -94,15 +91,12 @@
 void auto_init(void)
 {
 #ifdef MODULE_PRNG
-    random_init(0);
+    void auto_init_random(void);
+    auto_init_random();
 #endif
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
-#endif
-#ifdef MODULE_RTC
-    DEBUG("Auto init rtc module.\n");
-    rtc_init();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
@@ -157,6 +151,10 @@ void auto_init(void)
     extern void auto_init_devfs(void);
     auto_init_devfs();
 #endif
+#ifdef MODULE_GNRC_IPV6_NIB
+    DEBUG("Auto init gnrc_ipv6_nib module.\n");
+    gnrc_ipv6_nib_init();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
@@ -191,9 +189,9 @@ void auto_init(void)
     auto_init_ethos();
 #endif
 
-#ifdef MODULE_GNRC_SLIP
-    extern void auto_init_slip(void);
-    auto_init_slip();
+#ifdef MODULE_SLIPDEV
+    extern void auto_init_slipdev(void);
+    auto_init_slipdev();
 #endif
 
 #ifdef MODULE_CC110X

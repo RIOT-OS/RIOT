@@ -30,6 +30,8 @@
 #include "periph/gpio.h"
 #include "periph/spi.h"
 
+#include "net/lora.h"
+
 #include "sx127x.h"
 #include "sx127x_internal.h"
 #include "sx127x_registers.h"
@@ -113,23 +115,22 @@ int sx127x_init(sx127x_t *dev)
 
 void sx127x_init_radio_settings(sx127x_t *dev)
 {
-    sx127x_set_freq_hop(dev, SX127X_FREQUENCY_HOPPING);
-    sx127x_set_iq_invert(dev, SX127X_IQ_INVERSION);
+    sx127x_set_freq_hop(dev, LORA_FREQUENCY_HOPPING_DEFAULT);
+    sx127x_set_iq_invert(dev, LORA_IQ_INVERTED_DEFAULT);
+    sx127x_set_bandwidth(dev, LORA_BW_DEFAULT);
+    sx127x_set_spreading_factor(dev, LORA_SF_DEFAULT);
+    sx127x_set_coding_rate(dev, LORA_CR_DEFAULT);
+    sx127x_set_fixed_header_len_mode(dev, LORA_FIXED_HEADER_LEN_MODE_DEFAULT);
+    sx127x_set_crc(dev, LORA_PAYLOAD_CRC_ON_DEFAULT);
+    sx127x_set_symbol_timeout(dev, LORA_SYMBOL_TIMEOUT_DEFAULT);
+    sx127x_set_preamble_length(dev, LORA_PREAMBLE_LENGTH_DEFAULT);
+    sx127x_set_payload_length(dev, LORA_PAYLOAD_LENGTH_DEFAULT);
+    sx127x_set_hop_period(dev, LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT);
+
     sx127x_set_rx_single(dev, SX127X_RX_SINGLE);
     sx127x_set_tx_timeout(dev, SX127X_TX_TIMEOUT_DEFAULT);
     sx127x_set_modem(dev, SX127X_MODEM_DEFAULT);
     sx127x_set_channel(dev, SX127X_CHANNEL_DEFAULT);
-    sx127x_set_bandwidth(dev, SX127X_BW_DEFAULT);
-    sx127x_set_spreading_factor(dev, SX127X_SF_DEFAULT);
-    sx127x_set_coding_rate(dev, SX127X_CR_DEFAULT);
-
-    sx127x_set_fixed_header_len_mode(dev, SX127X_FIXED_HEADER_LEN_MODE);
-    sx127x_set_crc(dev, SX127X_PAYLOAD_CRC_ON);
-    sx127x_set_symbol_timeout(dev, SX127X_SYMBOL_TIMEOUT);
-    sx127x_set_preamble_length(dev, SX127X_PREAMBLE_LENGTH);
-    sx127x_set_payload_length(dev, SX127X_PAYLOAD_LENGTH);
-    sx127x_set_hop_period(dev, SX127X_FREQUENCY_HOPPING_PERIOD);
-
     sx127x_set_tx_power(dev, SX127X_RADIO_TX_POWER);
 }
 
@@ -201,158 +202,6 @@ static void sx127x_on_dio3_isr(void *arg)
 }
 
 /* Internal event handlers */
-void sx127x_on_dio0(void *arg)
-{
-    sx127x_t *dev = (sx127x_t *) arg;
-    netdev_t *netdev = (netdev_t*) &dev->netdev;
-
-    switch (dev->settings.state) {
-        case SX127X_RF_RX_RUNNING:
-            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-            break;
-        case SX127X_RF_TX_RUNNING:
-            xtimer_remove(&dev->_internal.tx_timeout_timer);
-            switch (dev->settings.modem) {
-                case SX127X_MODEM_LORA:
-                    /* Clear IRQ */
-                    sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
-                                     SX127X_RF_LORA_IRQFLAGS_TXDONE);
-                /* Intentional fall-through */
-                case SX127X_MODEM_FSK:
-                default:
-                    sx127x_set_state(dev, SX127X_RF_IDLE);
-                    netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-                    break;
-            }
-            break;
-        case SX127X_RF_IDLE:
-            printf("sx127x_on_dio0: IDLE state\n");
-            break;
-        default:
-            printf("sx127x_on_dio0: Unknown state [%d]\n", dev->settings.state);
-            break;
-    }
-}
-
-void sx127x_on_dio1(void *arg)
-{
-    /* Get interrupt context */
-    sx127x_t *dev = (sx127x_t *) arg;
-    netdev_t *netdev = (netdev_t*) &dev->netdev;
-
-    switch (dev->settings.state) {
-        case SX127X_RF_RX_RUNNING:
-            switch (dev->settings.modem) {
-                case SX127X_MODEM_FSK:
-                    /* todo */
-                    break;
-                case SX127X_MODEM_LORA:
-                    xtimer_remove(&dev->_internal.rx_timeout_timer);
-                    /*  Clear Irq */
-                    sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS, SX127X_RF_LORA_IRQFLAGS_RXTIMEOUT);
-                    sx127x_set_state(dev, SX127X_RF_IDLE);
-                    netdev->event_callback(netdev, NETDEV_EVENT_RX_TIMEOUT);
-                    break;
-                default:
-                    break;
-            }
-            break;
-        case SX127X_RF_TX_RUNNING:
-            switch (dev->settings.modem) {
-                case SX127X_MODEM_FSK:
-                    /* todo */
-                    break;
-                case SX127X_MODEM_LORA:
-                    break;
-                default:
-                    break;
-            }
-            break;
-        default:
-            puts("sx127x_on_dio1: Unknown state");
-            break;
-    }
-}
-
-void sx127x_on_dio2(void *arg)
-{
-    /* Get interrupt context */
-    sx127x_t *dev = (sx127x_t *) arg;
-    netdev_t *netdev = (netdev_t*) dev;
-
-    switch (dev->settings.state) {
-        case SX127X_RF_RX_RUNNING:
-            switch (dev->settings.modem) {
-                case SX127X_MODEM_FSK:
-                    /* todo */
-                    break;
-                case SX127X_MODEM_LORA:
-                    if (dev->settings.lora.flags & SX127X_CHANNEL_HOPPING_FLAG) {
-                        /* Clear IRQ */
-                        sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
-                                         SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL);
-
-                        dev->_internal.last_channel = (sx127x_reg_read(dev, SX127X_REG_LR_HOPCHANNEL) &
-                                                       SX127X_RF_LORA_HOPCHANNEL_CHANNEL_MASK);
-                        netdev->event_callback(netdev, NETDEV_EVENT_FHSS_CHANGE_CHANNEL);
-                    }
-
-                    break;
-                default:
-                    break;
-            }
-            break;
-        case SX127X_RF_TX_RUNNING:
-            switch (dev->settings.modem) {
-                case SX127X_MODEM_FSK:
-                    break;
-                case SX127X_MODEM_LORA:
-                    if (dev->settings.lora.flags & SX127X_CHANNEL_HOPPING_FLAG) {
-                        /* Clear IRQ */
-                        sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
-                                         SX127X_RF_LORA_IRQFLAGS_FHSSCHANGEDCHANNEL);
-
-                        dev->_internal.last_channel = (sx127x_reg_read(dev, SX127X_REG_LR_HOPCHANNEL) &
-                                                       SX127X_RF_LORA_HOPCHANNEL_CHANNEL_MASK);
-                        netdev->event_callback(netdev, NETDEV_EVENT_FHSS_CHANGE_CHANNEL);
-                    }
-                    break;
-                default:
-                    break;
-            }
-            break;
-        default:
-            puts("sx127x_on_dio2: Unknown state");
-            break;
-    }
-}
-
-void sx127x_on_dio3(void *arg)
-{
-    /* Get interrupt context */
-    sx127x_t *dev = (sx127x_t *) arg;
-    netdev_t *netdev = (netdev_t *) dev;
-
-    switch (dev->settings.modem) {
-        case SX127X_MODEM_FSK:
-            break;
-        case SX127X_MODEM_LORA:
-            /* Clear IRQ */
-            sx127x_reg_write(dev, SX127X_REG_LR_IRQFLAGS,
-                             SX127X_RF_LORA_IRQFLAGS_CADDETECTED |
-                             SX127X_RF_LORA_IRQFLAGS_CADDONE);
-
-            /* Send event message */
-            dev->_internal.is_last_cad_success = (sx127x_reg_read(dev, SX127X_REG_LR_IRQFLAGS) &
-                                                  SX127X_RF_LORA_IRQFLAGS_CADDETECTED) == SX127X_RF_LORA_IRQFLAGS_CADDETECTED;
-            netdev->event_callback(netdev, NETDEV_EVENT_CAD_DONE);
-            break;
-        default:
-            puts("sx127x_on_dio3: Unknown modem");
-            break;
-    }
-}
-
 static void _init_isrs(sx127x_t *dev)
 {
     if (gpio_init_int(dev->params.dio0_pin, GPIO_IN, GPIO_RISING, sx127x_on_dio0_isr, dev) < 0) {
@@ -407,15 +256,6 @@ static int _init_peripherals(sx127x_t *dev)
                   dev->params.spi, res);
         return 0;
     }
-
-    res = gpio_init(dev->params.nss_pin, GPIO_OUT);
-    if (res < 0) {
-        DEBUG("sx127x: error initializing GPIO_%ld as CS line (code %i)\n",
-                  (long)dev->params.nss_pin, res);
-        return 0;
-    }
-
-    gpio_set(dev->params.nss_pin);
 
     DEBUG("sx127x: peripherals initialized with success\n");
     return 1;

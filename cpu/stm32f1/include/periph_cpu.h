@@ -31,6 +31,11 @@ extern "C" {
 #define ADC_DEVS            (2U)
 
 /**
+ * @brief   Starting address of the CPU ID
+ */
+#define CPUID_ADDR          (0x1ffff7e8)
+
+/**
  * @brief   All timers for the STM32F1 have 4 CC channels
  */
 #define TIMER_CHANNELS      (4U)
@@ -54,13 +59,18 @@ extern "C" {
 /**
  * @brief   Define the number of available PM modes
  */
-#define PM_NUM_MODES    (2U)
+#define PM_NUM_MODES        (2U)
 
 /**
  * @brief   Override the default initial PM blocker
  * @todo   we block all modes per default, until PM is cleanly implemented
  */
 #define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
+
+/**
+ * @brief  Define the config flag for stop mode
+ */
+#define PM_STOP_CONFIG      (PWR_CR_LPDS)
 
 #ifndef DOXYGEN
 /**

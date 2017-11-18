@@ -73,9 +73,9 @@ void ps(void)
            "state");
 
 #if defined(DEVELHELP) && defined(ISR_STACKSIZE)
-    int isr_usage = thread_arch_isr_stack_usage();
-    void *isr_start = thread_arch_isr_stack_start();
-    void *isr_sp = thread_arch_isr_stack_pointer();
+    int isr_usage = thread_isr_stack_usage();
+    void *isr_start = thread_isr_stack_start();
+    void *isr_sp = thread_isr_stack_pointer();
     printf("\t  - | isr_stack            | -        - |"
            "   - | %6i (%5i) | %10p | %10p\n", ISR_STACKSIZE, isr_usage, isr_start, isr_sp);
     overall_stacksz += ISR_STACKSIZE;

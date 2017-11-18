@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de
+ * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
  *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -24,7 +24,7 @@
 #include "cpu.h"
 #include "periph/pm.h"
 
-#ifndef FEATURE_PERIPH_PM
+#if !defined(MODULE_PM_LAYERED) && !defined(PROVIDES_PM_SET_LOWEST_CORTEXM)
 void pm_set_lowest(void)
 {
     cortexm_sleep(0);

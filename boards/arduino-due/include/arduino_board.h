@@ -115,6 +115,24 @@ static const gpio_t arduino_pinmap[] = {
     ARDUINO_PIN_78,
 };
 
+/**
+ * @brief   Look-up table for the Arduino's analog pins
+ */
+static const adc_t arduino_analog_map[] = {
+    ARDUINO_A0,
+    ARDUINO_A1,
+    ARDUINO_A2,
+    ARDUINO_A3,
+    ARDUINO_A4,
+    ARDUINO_A5,
+    ARDUINO_A6,
+    ARDUINO_A7,
+    ARDUINO_A8,
+    ARDUINO_A9,
+    ARDUINO_A10,
+    ARDUINO_A11,
+};
+
 #ifdef __cplusplus
 }
 #endif

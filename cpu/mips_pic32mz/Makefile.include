@@ -9,6 +9,7 @@ export CFLAGS += -DMIPS_MICROMIPS
 
 export USEMODULE += mips_pic32_common
 export USEMODULE += periph
+export USEMODULE += periph_common
 export USEMODULE += newlib
 
 ifeq ($(USE_UHI_SYSCALLS),1)

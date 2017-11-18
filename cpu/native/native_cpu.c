@@ -97,7 +97,7 @@ void thread_print_stack(void)
 }
 
 /* This function calculates the ISR_usage */
-int thread_arch_isr_stack_usage(void)
+int thread_isr_stack_usage(void)
 {
     /* TODO */
     return -1;

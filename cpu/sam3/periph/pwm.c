@@ -32,9 +32,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* guard file in case no PWM device is defined */
-#if defined(PWM_NUMOF) && defined(PWM_CHAN_NUMOF)
-
 #define PREA_MAX            (10U)
 
 static uint16_t pwm_period;
@@ -128,5 +125,3 @@ void pwm_poweroff(pwm_t pwm)
     PWM->PWM_ENA = 0;
     PMC->PMC_PCDR1 = PMC_PCDR1_PID36;
 }
-
-#endif /* PWM_NUMOF && PWM_CHAN_NUMOF */

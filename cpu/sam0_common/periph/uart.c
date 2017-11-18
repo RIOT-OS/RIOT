@@ -31,9 +31,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* do not build the file in case no UART is defined */
-#ifdef UART_NUMOF
-
 /**
  * @brief   Allocate memory to store the callback functions
  */
@@ -57,9 +54,14 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         return UART_NODEV;
     }
 
+    /* must disable here first to ensure idempotency */
+    dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
+
     /* configure pins */
-    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
-    gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
+    if (uart_config[uart].rx_pin != GPIO_UNDEF) {
+        gpio_init(uart_config[uart].rx_pin, GPIO_IN);
+        gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
+    }
     gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     gpio_set(uart_config[uart].tx_pin);
     gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
@@ -94,7 +96,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* enable transmitter, and configure 8N1 mode */
     dev(uart)->CTRLB.reg = (SERCOM_USART_CTRLB_TXEN);
     /* enable receiver and RX interrupt if configured */
-    if (rx_cb) {
+    if ((rx_cb) && (uart_config[uart].rx_pin != GPIO_UNDEF)) {
         uart_ctx[uart].rx_cb = rx_cb;
         uart_ctx[uart].arg = arg;
         NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(dev(uart)));
@@ -118,8 +120,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     for (size_t i = 0; i < len; i++) {
         while (!(dev(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_DRE)) {}
         dev(uart)->DATA.reg = data[i];
-        while (dev(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_TXC) {}
     }
+    while (!(dev(uart)->INTFLAG.reg & SERCOM_USART_INTFLAG_TXC)) {}
 }
 
 void uart_poweron(uart_t uart)
@@ -190,5 +192,3 @@ void UART_5_ISR(void)
     irq_handler(5);
 }
 #endif
-
-#endif /* UART_NUMOF */

@@ -21,19 +21,12 @@
 #include <stdint.h>
 #include "vectors_cortexm.h"
 
-/* get the start of the ISR stack as defined in the linkerscript */
-extern uint32_t _estack;
-
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
 void dummy_handler(void) {
     dummy_handler_default();
 }
 
-/* Cortex-M common interrupt vectors */
-WEAK_DEFAULT void isr_svc(void);
-WEAK_DEFAULT void isr_pendsv(void);
-WEAK_DEFAULT void isr_systick(void);
 /* LPC1768 specific interrupt vector */
 WEAK_DEFAULT void isr_wdt(void);
 WEAK_DEFAULT void isr_timer0(void);
@@ -69,61 +62,39 @@ WEAK_DEFAULT void isr_mcpwm(void);
 WEAK_DEFAULT void isr_qei(void);
 WEAK_DEFAULT void isr_pll1(void);
 
-/* interrupt vector table */
-__attribute__ ((used,section(".vectors")))
-const void *interrupt_vector[] = {
-    /* Exception stack pointer */
-    (void*) (&_estack),             /* pointer to the top of the stack */
-    /* Cortex-M3 handlers */
-    (void*) reset_handler_default,  /* entry point of the program */
-    (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
-    (void*) mem_manage_default,     /* memory manage exception */
-    (void*) bus_fault_default,      /* bus fault exception */
-    (void*) usage_fault_default,    /* usage fault exception */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) isr_svc,                /* system call interrupt, in RIOT used for
-                                     * switching into thread context on boot */
-    (void*) debug_mon_default,      /* debug monitor exception */
-    (void*) (0UL),                  /* Reserved */
-    (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
-                                     * context switching is happening here */
-    (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* LPC specific peripheral handlers */
-    (void*) isr_wdt,                /* watchdog timer */
-    (void*) isr_timer0,             /* timer0 */
-    (void*) isr_timer1,             /* timer1 */
-    (void*) isr_timer2,             /* timer2 */
-    (void*) isr_timer3,             /* timer3 */
-    (void*) isr_uart0,              /* uart0 */
-    (void*) isr_uart1,              /* uart1 */
-    (void*) isr_uart2,              /* uart2 */
-    (void*) isr_uart3,              /* uart3 */
-    (void*) isr_pwm1,               /* pwm1 */
-    (void*) isr_i2c0,               /* i2c0 */
-    (void*) isr_i2c1,               /* i2c1 */
-    (void*) isr_i2c2,               /* i2c2 */
-    (void*) isr_spi,                /* spi */
-    (void*) isr_ssp0,               /* ssp0 */
-    (void*) isr_ssp1,               /* ssp1 */
-    (void*) isr_pll0,               /* pll0 (main pll) */
-    (void*) isr_rtc,                /* real time clock */
-    (void*) isr_eint0,              /* external interrupt 0 */
-    (void*) isr_eint1,              /* external interrupt 1 */
-    (void*) isr_eint2,              /* external interrupt 2 */
-    (void*) isr_eint3,              /* external interrupt 3 */
-    (void*) isr_adc,                /* a/d converter */
-    (void*) isr_bod,                /* brown out detect */
-    (void*) isr_usb,                /* usb */
-    (void*) isr_can,                /* can */
-    (void*) isr_dma,                /* gp dma */
-    (void*) isr_i2s,                /* i2s */
-    (void*) isr_enet,               /* ethernet */
-    (void*) isr_rit,                /* repetitive interrupt timer */
-    (void*) isr_mcpwm,              /* motor control pwm */
-    (void*) isr_qei,                /* quadrature encoder interface */
-    (void*) isr_pll1,               /* pll1 (usb pll) */
+/* CPU specific interrupt vector table */
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
+    isr_wdt,                /* watchdog timer */
+    isr_timer0,             /* timer0 */
+    isr_timer1,             /* timer1 */
+    isr_timer2,             /* timer2 */
+    isr_timer3,             /* timer3 */
+    isr_uart0,              /* uart0 */
+    isr_uart1,              /* uart1 */
+    isr_uart2,              /* uart2 */
+    isr_uart3,              /* uart3 */
+    isr_pwm1,               /* pwm1 */
+    isr_i2c0,               /* i2c0 */
+    isr_i2c1,               /* i2c1 */
+    isr_i2c2,               /* i2c2 */
+    isr_spi,                /* spi */
+    isr_ssp0,               /* ssp0 */
+    isr_ssp1,               /* ssp1 */
+    isr_pll0,               /* pll0 (main pll) */
+    isr_rtc,                /* real time clock */
+    isr_eint0,              /* external interrupt 0 */
+    isr_eint1,              /* external interrupt 1 */
+    isr_eint2,              /* external interrupt 2 */
+    isr_eint3,              /* external interrupt 3 */
+    isr_adc,                /* a/d converter */
+    isr_bod,                /* brown out detect */
+    isr_usb,                /* usb */
+    isr_can,                /* can */
+    isr_dma,                /* gp dma */
+    isr_i2s,                /* i2s */
+    isr_enet,               /* ethernet */
+    isr_rit,                /* repetitive interrupt timer */
+    isr_mcpwm,              /* motor control pwm */
+    isr_qei,                /* quadrature encoder interface */
+    isr_pll1,               /* pll1 (usb pll) */
 };

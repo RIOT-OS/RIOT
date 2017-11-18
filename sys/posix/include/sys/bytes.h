@@ -20,6 +20,8 @@
 #ifndef SYS_BYTES_H
 #define SYS_BYTES_H
 
+#include <stddef.h>
+
 #include "byteorder.h"
 
 #ifdef __cplusplus

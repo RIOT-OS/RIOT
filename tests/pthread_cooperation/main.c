@@ -23,6 +23,8 @@
 
 #define NUM_THREADS 12
 
+#define FACTORIAL_EXPECTED (479001600UL)
+
 pthread_t ths[NUM_THREADS];
 
 pthread_mutex_t mtx;
@@ -49,6 +51,7 @@ void *run(void *parameter)
 
 int main(void)
 {
+    puts("START");
     pthread_attr_t th_attr;
     pthread_attr_init(&th_attr);
     pthread_mutex_init(&mtx, NULL);
@@ -59,19 +62,21 @@ int main(void)
     }
 
     for (int i = 0; i < NUM_THREADS; ++i) {
-        printf("join\n");
+        printf("join thread %d\n", (i + 1));
         pthread_join(ths[i], NULL);
     }
 
     printf("Factorial: %d\n", storage);
 
-    if (storage != 479001600) {
-        puts("[!!!] Error, expected: 12!= 479001600.");
-    }
-
     pthread_mutex_destroy(&mtx);
     pthread_attr_destroy(&th_attr);
 
-    puts("finished");
+    if (storage == FACTORIAL_EXPECTED) {
+        puts("SUCCESS");
+    }
+    else {
+        puts("FAILURE: Error, expected: 12!= 479001600.");
+    }
+
     return 0;
 }

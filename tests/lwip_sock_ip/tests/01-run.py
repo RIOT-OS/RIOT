@@ -14,9 +14,6 @@ from datetime import datetime
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
-class InvalidTimeout(Exception):
-    pass
-
 def _ipv6_tests(code):
     return code & (1 << 6)
 
@@ -39,20 +36,8 @@ def testfunc(child):
         child.expect_exact(u"Calling test_sock_ip_recv4__EAGAIN()")
         child.expect_exact(u"Calling test_sock_ip_recv4__ENOBUFS()")
         child.expect_exact(u"Calling test_sock_ip_recv4__ETIMEDOUT()")
-        child.match         # get to ensure program reached that point
-        start = datetime.now()
         child.expect_exact(u" * Calling sock_ip_recv()")
-        child.expect(u" \\* \\(timed out with timeout (\\d+)\\)")
-        exp_diff = int(child.match.group(1))
-        stop = datetime.now()
-        diff = (stop - start)
-        diff = (diff.seconds * 1000000) + diff.microseconds
-        # fail within 5% of expected
-        if diff > (exp_diff + (exp_diff * 0.05)) or \
-           diff < (exp_diff - (exp_diff * 0.05)):
-            raise InvalidTimeout("Invalid timeout %d (expected %d)" % (diff, exp_diff));
-        else:
-            print("Timed out correctly: %d (expected %d)" % (diff, exp_diff))
+        child.expect(r" \* \(timed out with timeout \d+\)")
         child.expect_exact(u"Calling test_sock_ip_recv4__socketed()")
         child.expect_exact(u"Calling test_sock_ip_recv4__socketed_with_remote()")
         child.expect_exact(u"Calling test_sock_ip_recv4__unsocketed()")
@@ -87,20 +72,8 @@ def testfunc(child):
         child.expect_exact(u"Calling test_sock_ip_recv6__EAGAIN()")
         child.expect_exact(u"Calling test_sock_ip_recv6__ENOBUFS()")
         child.expect_exact(u"Calling test_sock_ip_recv6__ETIMEDOUT()")
-        child.match         # get to ensure program reached that point
-        start = datetime.now()
         child.expect_exact(u" * Calling sock_ip_recv()")
-        child.expect(u" \\* \\(timed out with timeout (\\d+)\\)")
-        exp_diff = int(child.match.group(1))
-        stop = datetime.now()
-        diff = (stop - start)
-        diff = (diff.seconds * 1000000) + diff.microseconds
-        # fail within 5% of expected
-        if diff > (exp_diff + (exp_diff * 0.05)) or \
-           diff < (exp_diff - (exp_diff * 0.05)):
-            raise InvalidTimeout("Invalid timeout %d (expected %d)" % (diff, exp_diff));
-        else:
-            print("Timed out correctly: %d (expected %d)" % (diff, exp_diff))
+        child.expect(r" \* \(timed out with timeout \d+\)")
         child.expect_exact(u"Calling test_sock_ip_recv6__socketed()")
         child.expect_exact(u"Calling test_sock_ip_recv6__socketed_with_remote()")
         child.expect_exact(u"Calling test_sock_ip_recv6__unsocketed()")

@@ -64,8 +64,8 @@ void dac_poweron(dac_t line)
 {
     assert(line < DAC_NUMOF);
 
-    PMC->PMC_PCER1 = (1 << (ID_DACC - 32));
-    DACC->DACC_CHER = PMC_BIT;
+    PMC->PMC_PCER1 = PMC_BIT;
+    DACC->DACC_CHER = (1 << line);
 }
 
 void dac_poweroff(dac_t line)

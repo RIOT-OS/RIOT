@@ -109,6 +109,30 @@ static const gpio_t arduino_pinmap[] = {
 #endif
 };
 
+/**
+ * @brief   Look-up table for the Arduino's analog pins
+ */
+static const adc_t arduino_analog_map[] = {
+    ARDUINO_A0,
+    ARDUINO_A1,
+    ARDUINO_A2,
+    ARDUINO_A3,
+    ARDUINO_A4,
+    ARDUINO_A5,
+    ARDUINO_A6,
+    ARDUINO_A7,
+#ifdef CPU_ATMEGA2560
+    ARDUINO_A8,
+    ARDUINO_A9,
+    ARDUINO_A10,
+    ARDUINO_A11,
+    ARDUINO_A12,
+    ARDUINO_A13,
+    ARDUINO_A14,
+    ARDUINO_A15,
+#endif
+};
+
 #ifdef __cplusplus
 }
 #endif

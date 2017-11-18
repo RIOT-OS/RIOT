@@ -104,9 +104,18 @@ extern "C" {
 /** @} */
 
 /**
- * @brief    I2C configuration
+ * @name    I2C configuration
+ * @{
  */
 #define I2C_NUMOF           1
+/** @} */
+
+/**
+ * @name     ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (8U)
+/** @} */
 
 #ifdef __cplusplus
 }

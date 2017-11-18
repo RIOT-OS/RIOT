@@ -126,9 +126,9 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
     timeout >>= TIMER_ACCURACY_SHIFT;
     timeout <<= TIMER_ACCURACY_SHIFT;
 
-    uint32_t status = irq_arch_disable();
+    uint32_t status = irq_disable();
     compares[channel] = counter + timeout;
-    irq_arch_restore(status);
+    irq_restore(status);
 
     return channel;
 }
@@ -141,9 +141,9 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     value >>= TIMER_ACCURACY_SHIFT;
     value <<= TIMER_ACCURACY_SHIFT;
 
-    uint32_t status = irq_arch_disable();
+    uint32_t status = irq_disable();
     compares[channel] = value;
-    irq_arch_restore(status);
+    irq_restore(status);
 
     return channel;
 }
@@ -153,9 +153,9 @@ int timer_clear(tim_t dev, int channel)
     assert(dev == 0);
     assert(channel < CHANNELS);
 
-    uint32_t status = irq_arch_disable();
+    uint32_t status = irq_disable();
     compares[channel] = 0;
-    irq_arch_restore(status);
+    irq_restore(status);
 
     return channel;
 }
@@ -225,9 +225,9 @@ void __attribute__ ((interrupt("vector=hw5"))) _mips_isr_hw5(void)
 #ifdef EIC_IRQ
         eic_irq_ack(EIC_IRQ_TIMER);
 #endif
-        uint32_t status = irq_arch_disable();
+        uint32_t status = irq_disable();
         counter += TIMER_ACCURACY;
-        irq_arch_restore(status);
+        irq_restore(status);
 
         if (counter == compares[0]) {
             /*

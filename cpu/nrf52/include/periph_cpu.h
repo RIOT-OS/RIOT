@@ -40,6 +40,41 @@ extern "C" {
 #define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
 /** @} */
 
+/**
+ * @brief   The nRF52 family of CPUs provides a fixed number of 9 ADC lines
+ */
+#define ADC_NUMOF           (9U)
+
+/**
+ * @brief   nRF52 specific naming of ADC lines (for convenience)
+ */
+enum {
+    NRF52_AIN0 = 0,         /**< Analog Input 0 */
+    NRF52_AIN1 = 1,         /**< Analog Input 1 */
+    NRF52_AIN2 = 2,         /**< Analog Input 2 */
+    NRF52_AIN3 = 3,         /**< Analog Input 3 */
+    NRF52_AIN4 = 4,         /**< Analog Input 4 */
+    NRF52_AIN5 = 5,         /**< Analog Input 5 */
+    NRF52_AIN6 = 6,         /**< Analog Input 6 */
+    NRF52_AIN7 = 7,         /**< Analog Input 7 */
+    NRF52_VDD  = 8,         /**< VDD, not useful if VDD is reference... */
+};
+
+/**
+ * @brief   Override ADC resolution values
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0xf0,   /**< not supported by hardware */
+    ADC_RES_8BIT  = 0x00,   /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x01,   /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x02,   /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xf1,   /**< supported with oversampling, not implemented */
+    ADC_RES_16BIT = 0xf2    /**< not supported by hardware */
+} adc_res_t;
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

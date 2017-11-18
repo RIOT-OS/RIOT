@@ -17,20 +17,23 @@ endif
 ifneq (,$(filter random,$(USEMODULE)))
   SRC += sc_random.c
 endif
-ifeq ($(CPU),x86)
-  SRC += sc_x86_lspci.c
-endif
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
     SRC += sc_at30tse75x.c
 endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   SRC += sc_netif.c
 endif
+ifneq (,$(filter gnrc_netif2,$(USEMODULE)))
+  SRC += sc_gnrc_netif2.c
+endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c
 endif
 ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
   SRC += sc_ipv6_nc.c
+endif
+ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
+  SRC += sc_gnrc_ipv6_nib.c
 endif
 ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
   SRC += sc_whitelist.c

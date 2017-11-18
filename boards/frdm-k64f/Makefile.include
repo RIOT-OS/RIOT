@@ -1,5 +1,5 @@
 # define the cpu used by the FRDM-K64F board
-export CPU = k64f
+export CPU = kinetis
 export CPU_MODEL = mk64fn1m0vll12
 
 # Include default FRDM board config

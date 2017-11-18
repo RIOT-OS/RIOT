@@ -207,6 +207,9 @@ INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBAS
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 
+# process provided features
+-include $(RIOTBOARD)/$(BOARD)/Makefile.features
+
 # mandatory includes!
 include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
@@ -222,9 +225,6 @@ GNRC_NETIF_NUMOF ?= 1
 ifneq ($(GNRC_NETIF_NUMOF),1)
   CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
 endif
-
-# process provided features
-include $(RIOTMAKE)/features.inc.mk
 
 # process dependencies
 include $(RIOTBASE)/Makefile.dep
@@ -567,6 +567,6 @@ CFLAGS := $(patsubst -D%,,$(CFLAGS))
 CFLAGS := $(patsubst -U%,,$(CFLAGS))
 CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
 
-# include multislot support
-include $(RIOTMAKE)/multislot.mk
+# include mcuboot support
+include $(RIOTMAKE)/mcuboot.mk
 endif # BOARD=none

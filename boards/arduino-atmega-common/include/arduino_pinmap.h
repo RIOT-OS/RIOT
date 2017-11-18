@@ -25,6 +25,9 @@
 #ifndef ARDUINO_PINMAP_H
 #define ARDUINO_PINMAP_H
 
+#include "periph/gpio.h"
+#include "periph/adc.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -155,8 +158,26 @@ extern "C" {
 #define ARDUINO_PIN_A14         ARDUINO_PIN_68
 #define ARDUINO_PIN_A15         ARDUINO_PIN_69
 #endif
-
 /** @ */
+
+#define ARDUINO_A0              ADC_LINE(0)
+#define ARDUINO_A1              ADC_LINE(1)
+#define ARDUINO_A2              ADC_LINE(2)
+#define ARDUINO_A3              ADC_LINE(3)
+#define ARDUINO_A4              ADC_LINE(4)
+#define ARDUINO_A5              ADC_LINE(5)
+#define ARDUINO_A6              ADC_LINE(6)
+#define ARDUINO_A7              ADC_LINE(7)
+#ifdef CPU_ATMEGA2560
+#define ARDUINO_A8              ADC_LINE(8)
+#define ARDUINO_A9              ADC_LINE(9)
+#define ARDUINO_A10             ADC_LINE(10)
+#define ARDUINO_A11             ADC_LINE(11)
+#define ARDUINO_A12             ADC_LINE(12)
+#define ARDUINO_A13             ADC_LINE(13)
+#define ARDUINO_A14             ADC_LINE(14)
+#define ARDUINO_A15             ADC_LINE(15)
+#endif
 
 #ifdef __cplusplus
 }

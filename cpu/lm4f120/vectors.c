@@ -19,9 +19,6 @@
 #include <stdint.h>
 #include "vectors_cortexm.h"
 
-/* get the start of the ISR stack as defined in the linkerscript */
-extern uint32_t _estack;
-
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
 void dummy_handler(void) {
@@ -99,167 +96,146 @@ WEAK_DEFAULT void isr_wtimer5a(void);
 WEAK_DEFAULT void isr_wtimer5b(void);
 WEAK_DEFAULT void isr_sysex(void);
 
-/* interrupt vector table */
-ISR_VECTORS const void *interrupt_vector[] = {
-    /* Exception stack pointer */
-    (void*) (&_estack),             /* pointer to the top of the stack */
-    /* Cortex-M4 handlers */
-    (void*) reset_handler_default,  /* entry point of the program */
-    (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
-    (void*) mem_manage_default,     /* memory manage exception */
-    (void*) bus_fault_default,      /* bus fault exception */
-    (void*) usage_fault_default,    /* usage fault exception */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) (0UL),                  /* Reserved */
-    (void*) isr_svc,                /* system call interrupt, in RIOT used for
-                                     * switching into thread context on boot */
-    (void*) debug_mon_default,      /* debug monitor exception */
-    (void*) (0UL),                  /* Reserved */
-    (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
-                                     * context switching is happening here */
-    (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* Peripherial interrupts start here.*/
-    (void *) isr_gpio_porta,        /* GPIO Port A                      16 */
-    (void *) isr_gpio_portb,        /* GPIO Port B                      17 */
-    (void *) isr_gpio_portc,        /* GPIO Port C                      18 */
-    (void *) isr_gpio_portd,        /* GPIO Port D                      19 */
-    (void *) isr_gpio_porte,        /* GPIO Port E                      20 */
-    (void *) isr_uart0,             /* UART 0                           21 */
-    (void *) isr_uart1,             /* UART 1                           22 */
-    (void *) isr_ssi0,              /* SSI 0                            23 */
-    (void *) isr_i2c0,              /* I2C 0                            24 */
-    (void *) (0UL),                 /* Reserved                         25 */
-    (void *) (0UL),                 /* Reserved                         26 */
-    (void *) (0UL),                 /* Reserved                         27 */
-    (void *) (0UL),                 /* Reserved                         28 */
-    (void *) (0UL),                 /* Reserved                         29 */
-    (void *) isr_adc0_seq0,         /* ADC 0 Seq 0                      30 */
-    (void *) isr_adc0_seq1,         /* ADC 0 Seq 1                      31 */
-    (void *) isr_adc0_seq2,         /* ADC 0 Seq 2                      32 */
-    (void *) isr_adc0_seq3,         /* ADC 0 Seq 3                      33 */
-    (void *) isr_wdt,               /* WDT 0 and 1                      34 */
-    (void *) isr_timer0a,           /* 16/32 bit timer 0 A              35 */
-    (void *) isr_timer0b,           /* 16/32 bit timer 0 B              36 */
-    (void *) isr_timer1a,           /* 16/32 bit timer 1 A              37 */
-    (void *) isr_timer1b,           /* 16/32 bit timer 1 B              38 */
-    (void *) isr_timer2a,           /* 16/32 bit timer 2 A              39 */
-    (void *) isr_timer2b,           /* 16/32 bit timer 2 B              40 */
-    (void *) isr_comp0,             /* Analog comparator 0              41 */
-    (void *) isr_comp1,             /* Analog comparator 1              42 */
-    (void *) (0UL),                 /* Reserved                         43 */
-    (void *) isr_sysctl,            /* System control                   44 */
-    (void *) isr_flashctl,          /* Flash + EEPROM control           45 */
-    (void *) isr_gpio_portf,        /* GPIO Port F                      46 */
-    (void *) (0UL),                 /* Reserved                         47 */
-    (void *) (0UL),                 /* Reserved                         48 */
-    (void *) isr_uart2,             /* UART 2                           49 */
-    (void *) isr_ssi1,              /* SSI 1                            50 */
-    (void *) isr_timer3a,           /* 16/32 bit timer 3 A              51 */
-    (void *) isr_timer3b,           /* 16/32 bit timer 3 B              52 */
-    (void *) isr_i2c1,              /* I2C 1                            53 */
-    (void *) (0UL),                 /* Reserved                         54 */
-    (void *) isr_can0,              /* CAN 0                            55 */
-    (void *) (0UL),                 /* Reserved                         56 */
-    (void *) (0UL),                 /* Reserved                         57 */
-    (void *) (0UL),                 /* Reserved                         58 */
-    (void *) isr_hibernate,         /* Hibernation module               59 */
-    (void *) isr_usb,               /* USB                              60 */
-    (void *) (0UL),                 /* Reserved                         61 */
-    (void *) isr_udma_sw,           /* UDMA SW                          62 */
-    (void *) isr_udma_error,        /* UDMA Error                       63 */
-    (void *) isr_adc1_seq0,         /* ADC 1 Seq 0                      64 */
-    (void *) isr_adc1_seq1,         /* ADC 1 Seq 1                      65 */
-    (void *) isr_adc1_seq2,         /* ADC 1 Seq 2                      66 */
-    (void *) isr_adc1_seq3,         /* ADC 1 Seq 3                      67 */
-    (void *) (0UL),                 /* Reserved                         68 */
-    (void *) (0UL),                 /* Reserved                         69 */
-    (void *) (0UL),                 /* Reserved                         70 */
-    (void *) (0UL),                 /* Reserved                         71 */
-    (void *) (0UL),                 /* Reserved                         72 */
-    (void *) isr_ssi2,              /* SSI 2                            73 */
-    (void *) isr_ssi3,              /* SSI 3                            74 */
-    (void *) isr_uart3,             /* UART 3                           75 */
-    (void *) isr_uart4,             /* UART 4                           76 */
-    (void *) isr_uart5,             /* UART 5                           77 */
-    (void *) isr_uart6,             /* UART 6                           78 */
-    (void *) isr_uart7,             /* UART 7                           79 */
-    (void *) (0UL),                 /* Reserved                         80 */
-    (void *) (0UL),                 /* Reserved                         81 */
-    (void *) (0UL),                 /* Reserved                         82 */
-    (void *) (0UL),                 /* Reserved                         83 */
-    (void *) isr_i2c2,              /* I2C 2                            84 */
-    (void *) isr_i2c4,              /* I2C 4                            85 */
-    (void *) isr_timer4a,           /* 16/32 bit timer 4 A              86 */
-    (void *) isr_timer4b,           /* 16/32 bit timer 4 B              87 */
-    (void *) (0UL),                 /* Reserved                         88 */
-    (void *) (0UL),                 /* Reserved                         89 */
-    (void *) (0UL),                 /* Reserved                         90 */
-    (void *) (0UL),                 /* Reserved                         91 */
-    (void *) (0UL),                 /* Reserved                         92 */
-    (void *) (0UL),                 /* Reserved                         93 */
-    (void *) (0UL),                 /* Reserved                         94 */
-    (void *) (0UL),                 /* Reserved                         95 */
-    (void *) (0UL),                 /* Reserved                         96 */
-    (void *) (0UL),                 /* Reserved                         97 */
-    (void *) (0UL),                 /* Reserved                         98 */
-    (void *) (0UL),                 /* Reserved                         99 */
-    (void *) (0UL),                 /* Reserved                         100 */
-    (void *) (0UL),                 /* Reserved                         101 */
-    (void *) (0UL),                 /* Reserved                         102 */
-    (void *) (0UL),                 /* Reserved                         103 */
-    (void *) (0UL),                 /* Reserved                         104 */
-    (void *) (0UL),                 /* Reserved                         105 */
-    (void *) (0UL),                 /* Reserved                         106 */
-    (void *) (0UL),                 /* Reserved                         107 */
-    (void *) isr_timer5a,           /* 16/32 bit timer 5 A              108 */
-    (void *) isr_timer5b,           /* 16/32 bit timer 5 B              109 */
-    (void *) isr_wtimer0a,          /* 32/64 bit timer 0 A              110 */
-    (void *) isr_wtimer0b,          /* 32/64 bit timer 0 B              111 */
-    (void *) isr_wtimer1a,          /* 32/64 bit timer 1 A              112 */
-    (void *) isr_wtimer1b,          /* 32/64 bit timer 1 B              113 */
-    (void *) isr_wtimer2a,          /* 32/64 bit timer 2 A              114 */
-    (void *) isr_wtimer2b,          /* 32/64 bit timer 2 B              115 */
-    (void *) isr_wtimer3a,          /* 32/64 bit timer 3 A              116 */
-    (void *) isr_wtimer3b,          /* 32/64 bit timer 3 B              117 */
-    (void *) isr_wtimer4a,          /* 32/64 bit timer 4 A              118 */
-    (void *) isr_wtimer4b,          /* 32/64 bit timer 4 B              119 */
-    (void *) isr_wtimer5a,          /* 32/64 bit timer 5 A              120 */
-    (void *) isr_wtimer5b,          /* 32/64 bit timer 5 B              121 */
-    (void *) isr_sysex,             /* System Exception                 122 */
-    (void *) (0UL),                 /* Reserved                         123 */
-    (void *) (0UL),                 /* Reserved                         124 */
-    (void *) (0UL),                 /* Reserved                         125 */
-    (void *) (0UL),                 /* Reserved                         126 */
-    (void *) (0UL),                 /* Reserved                         127 */
-    (void *) (0UL),                 /* Reserved                         128 */
-    (void *) (0UL),                 /* Reserved                         129 */
-    (void *) (0UL),                 /* Reserved                         130 */
-    (void *) (0UL),                 /* Reserved                         131 */
-    (void *) (0UL),                 /* Reserved                         132 */
-    (void *) (0UL),                 /* Reserved                         133 */
-    (void *) (0UL),                 /* Reserved                         134 */
-    (void *) (0UL),                 /* Reserved                         135 */
-    (void *) (0UL),                 /* Reserved                         136 */
-    (void *) (0UL),                 /* Reserved                         137 */
-    (void *) (0UL),                 /* Reserved                         138 */
-    (void *) (0UL),                 /* Reserved                         139 */
-    (void *) (0UL),                 /* Reserved                         140 */
-    (void *) (0UL),                 /* Reserved                         141 */
-    (void *) (0UL),                 /* Reserved                         142 */
-    (void *) (0UL),                 /* Reserved                         143 */
-    (void *) (0UL),                 /* Reserved                         144 */
-    (void *) (0UL),                 /* Reserved                         145 */
-    (void *) (0UL),                 /* Reserved                         146 */
-    (void *) (0UL),                 /* Reserved                         147 */
-    (void *) (0UL),                 /* Reserved                         148 */
-    (void *) (0UL),                 /* Reserved                         149 */
-    (void *) (0UL),                 /* Reserved                         150 */
-    (void *) (0UL),                 /* Reserved                         151 */
-    (void *) (0UL),                 /* Reserved                         152 */
-    (void *) (0UL),                 /* Reserved                         153 */
-    (void *) (0UL)                  /* Reserved                         154 */
+/* CPU specific interrupt vector table */
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
+    isr_gpio_porta,        /* GPIO Port A                      16 */
+    isr_gpio_portb,        /* GPIO Port B                      17 */
+    isr_gpio_portc,        /* GPIO Port C                      18 */
+    isr_gpio_portd,        /* GPIO Port D                      19 */
+    isr_gpio_porte,        /* GPIO Port E                      20 */
+    isr_uart0,             /* UART 0                           21 */
+    isr_uart1,             /* UART 1                           22 */
+    isr_ssi0,              /* SSI 0                            23 */
+    isr_i2c0,              /* I2C 0                            24 */
+    (0UL),                 /* Reserved                         25 */
+    (0UL),                 /* Reserved                         26 */
+    (0UL),                 /* Reserved                         27 */
+    (0UL),                 /* Reserved                         28 */
+    (0UL),                 /* Reserved                         29 */
+    isr_adc0_seq0,         /* ADC 0 Seq 0                      30 */
+    isr_adc0_seq1,         /* ADC 0 Seq 1                      31 */
+    isr_adc0_seq2,         /* ADC 0 Seq 2                      32 */
+    isr_adc0_seq3,         /* ADC 0 Seq 3                      33 */
+    isr_wdt,               /* WDT 0 and 1                      34 */
+    isr_timer0a,           /* 16/32 bit timer 0 A              35 */
+    isr_timer0b,           /* 16/32 bit timer 0 B              36 */
+    isr_timer1a,           /* 16/32 bit timer 1 A              37 */
+    isr_timer1b,           /* 16/32 bit timer 1 B              38 */
+    isr_timer2a,           /* 16/32 bit timer 2 A              39 */
+    isr_timer2b,           /* 16/32 bit timer 2 B              40 */
+    isr_comp0,             /* Analog comparator 0              41 */
+    isr_comp1,             /* Analog comparator 1              42 */
+    (0UL),                 /* Reserved                         43 */
+    isr_sysctl,            /* System control                   44 */
+    isr_flashctl,          /* Flash + EEPROM control           45 */
+    isr_gpio_portf,        /* GPIO Port F                      46 */
+    (0UL),                 /* Reserved                         47 */
+    (0UL),                 /* Reserved                         48 */
+    isr_uart2,             /* UART 2                           49 */
+    isr_ssi1,              /* SSI 1                            50 */
+    isr_timer3a,           /* 16/32 bit timer 3 A              51 */
+    isr_timer3b,           /* 16/32 bit timer 3 B              52 */
+    isr_i2c1,              /* I2C 1                            53 */
+    (0UL),                 /* Reserved                         54 */
+    isr_can0,              /* CAN 0                            55 */
+    (0UL),                 /* Reserved                         56 */
+    (0UL),                 /* Reserved                         57 */
+    (0UL),                 /* Reserved                         58 */
+    isr_hibernate,         /* Hibernation module               59 */
+    isr_usb,               /* USB                              60 */
+    (0UL),                 /* Reserved                         61 */
+    isr_udma_sw,           /* UDMA SW                          62 */
+    isr_udma_error,        /* UDMA Error                       63 */
+    isr_adc1_seq0,         /* ADC 1 Seq 0                      64 */
+    isr_adc1_seq1,         /* ADC 1 Seq 1                      65 */
+    isr_adc1_seq2,         /* ADC 1 Seq 2                      66 */
+    isr_adc1_seq3,         /* ADC 1 Seq 3                      67 */
+    (0UL),                 /* Reserved                         68 */
+    (0UL),                 /* Reserved                         69 */
+    (0UL),                 /* Reserved                         70 */
+    (0UL),                 /* Reserved                         71 */
+    (0UL),                 /* Reserved                         72 */
+    isr_ssi2,              /* SSI 2                            73 */
+    isr_ssi3,              /* SSI 3                            74 */
+    isr_uart3,             /* UART 3                           75 */
+    isr_uart4,             /* UART 4                           76 */
+    isr_uart5,             /* UART 5                           77 */
+    isr_uart6,             /* UART 6                           78 */
+    isr_uart7,             /* UART 7                           79 */
+    (0UL),                 /* Reserved                         80 */
+    (0UL),                 /* Reserved                         81 */
+    (0UL),                 /* Reserved                         82 */
+    (0UL),                 /* Reserved                         83 */
+    isr_i2c2,              /* I2C 2                            84 */
+    isr_i2c4,              /* I2C 4                            85 */
+    isr_timer4a,           /* 16/32 bit timer 4 A              86 */
+    isr_timer4b,           /* 16/32 bit timer 4 B              87 */
+    (0UL),                 /* Reserved                         88 */
+    (0UL),                 /* Reserved                         89 */
+    (0UL),                 /* Reserved                         90 */
+    (0UL),                 /* Reserved                         91 */
+    (0UL),                 /* Reserved                         92 */
+    (0UL),                 /* Reserved                         93 */
+    (0UL),                 /* Reserved                         94 */
+    (0UL),                 /* Reserved                         95 */
+    (0UL),                 /* Reserved                         96 */
+    (0UL),                 /* Reserved                         97 */
+    (0UL),                 /* Reserved                         98 */
+    (0UL),                 /* Reserved                         99 */
+    (0UL),                 /* Reserved                         100 */
+    (0UL),                 /* Reserved                         101 */
+    (0UL),                 /* Reserved                         102 */
+    (0UL),                 /* Reserved                         103 */
+    (0UL),                 /* Reserved                         104 */
+    (0UL),                 /* Reserved                         105 */
+    (0UL),                 /* Reserved                         106 */
+    (0UL),                 /* Reserved                         107 */
+    isr_timer5a,           /* 16/32 bit timer 5 A              108 */
+    isr_timer5b,           /* 16/32 bit timer 5 B              109 */
+    isr_wtimer0a,          /* 32/64 bit timer 0 A              110 */
+    isr_wtimer0b,          /* 32/64 bit timer 0 B              111 */
+    isr_wtimer1a,          /* 32/64 bit timer 1 A              112 */
+    isr_wtimer1b,          /* 32/64 bit timer 1 B              113 */
+    isr_wtimer2a,          /* 32/64 bit timer 2 A              114 */
+    isr_wtimer2b,          /* 32/64 bit timer 2 B              115 */
+    isr_wtimer3a,          /* 32/64 bit timer 3 A              116 */
+    isr_wtimer3b,          /* 32/64 bit timer 3 B              117 */
+    isr_wtimer4a,          /* 32/64 bit timer 4 A              118 */
+    isr_wtimer4b,          /* 32/64 bit timer 4 B              119 */
+    isr_wtimer5a,          /* 32/64 bit timer 5 A              120 */
+    isr_wtimer5b,          /* 32/64 bit timer 5 B              121 */
+    isr_sysex,             /* System Exception                 122 */
+    (0UL),                 /* Reserved                         123 */
+    (0UL),                 /* Reserved                         124 */
+    (0UL),                 /* Reserved                         125 */
+    (0UL),                 /* Reserved                         126 */
+    (0UL),                 /* Reserved                         127 */
+    (0UL),                 /* Reserved                         128 */
+    (0UL),                 /* Reserved                         129 */
+    (0UL),                 /* Reserved                         130 */
+    (0UL),                 /* Reserved                         131 */
+    (0UL),                 /* Reserved                         132 */
+    (0UL),                 /* Reserved                         133 */
+    (0UL),                 /* Reserved                         134 */
+    (0UL),                 /* Reserved                         135 */
+    (0UL),                 /* Reserved                         136 */
+    (0UL),                 /* Reserved                         137 */
+    (0UL),                 /* Reserved                         138 */
+    (0UL),                 /* Reserved                         139 */
+    (0UL),                 /* Reserved                         140 */
+    (0UL),                 /* Reserved                         141 */
+    (0UL),                 /* Reserved                         142 */
+    (0UL),                 /* Reserved                         143 */
+    (0UL),                 /* Reserved                         144 */
+    (0UL),                 /* Reserved                         145 */
+    (0UL),                 /* Reserved                         146 */
+    (0UL),                 /* Reserved                         147 */
+    (0UL),                 /* Reserved                         148 */
+    (0UL),                 /* Reserved                         149 */
+    (0UL),                 /* Reserved                         150 */
+    (0UL),                 /* Reserved                         151 */
+    (0UL),                 /* Reserved                         152 */
+    (0UL),                 /* Reserved                         153 */
+    (0UL)                  /* Reserved                         154 */
 };
 /** @} */

@@ -691,8 +691,12 @@ static int _netif_set_state(kernel_pid_t dev, char *state_str)
              (strcmp("RESET", state_str) == 0)) {
         state = NETOPT_STATE_RESET;
     }
+    else if ((strcmp("standby", state_str) == 0) ||
+             (strcmp("STANDBY", state_str) == 0)) {
+        state = NETOPT_STATE_STANDBY;
+    }
     else {
-        puts("usage: ifconfig <if_id> set state [off|sleep|idle|reset]");
+        puts("usage: ifconfig <if_id> set state [off|sleep|idle|reset|standby]");
         return 1;
     }
     if (gnrc_netapi_set(dev, NETOPT_STATE, 0,

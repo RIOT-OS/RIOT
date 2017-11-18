@@ -49,8 +49,8 @@ extern uint32_t _szero;
 extern uint32_t _ezero;
 extern uint32_t _sstack;
 extern uint32_t _estack;
-extern uint32_t _sram;
-extern uint32_t _eram;
+extern uint8_t _sram;
+extern uint8_t _eram;
 /** @} */
 
 /**
@@ -368,3 +368,40 @@ void dummy_handler_default(void)
 {
     core_panic(PANIC_DUMMY_HANDLER, "DUMMY HANDLER");
 }
+
+/* Cortex-M common interrupt vectors */
+__attribute__((weak,alias("dummy_handler_default"))) void isr_svc(void);
+__attribute__((weak,alias("dummy_handler_default"))) void isr_pendsv(void);
+__attribute__((weak,alias("dummy_handler_default"))) void isr_systick(void);
+
+/* define Cortex-M base interrupt vectors */
+ISR_VECTOR(0) cortexm_base_t cortex_vector_base = {
+    &_estack,
+    {
+        /* entry point of the program */
+        [ 0]         = reset_handler_default,
+        /* [-14] non maskable interrupt handler */
+        [ 1] = nmi_default,
+        /* [-13] hard fault exception */
+        [ 2] = hard_fault_default,
+        /* [-5] SW interrupt, in RIOT used for triggering context switches */
+        [10] = isr_svc,
+        /* [-2] pendSV interrupt, in RIOT use to do the actual context switch */
+        [13] = isr_pendsv,
+        /* [-1] SysTick interrupt, not used in RIOT */
+        [14] = isr_systick,
+
+        /* additional vectors used by M3, M4(F), and M7 */
+#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
+    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
+        /* [-12] memory manage exception */
+        [ 3] = mem_manage_default,
+        /* [-11] bus fault exception */
+        [ 4] = bus_fault_default,
+        /* [-10] usage fault exception */
+        [ 5] = usage_fault_default,
+        /* [-4] debug monitor exception */
+        [11] = debug_mon_default,
+#endif
+    }
+};

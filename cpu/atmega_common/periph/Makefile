@@ -1,3 +1,2 @@
-MODULE = periph
-
-include $(RIOTBASE)/Makefile.base
+MODULE = atmega_common_periph
+include $(RIOTMAKE)/periph.mk

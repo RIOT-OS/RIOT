@@ -12,8 +12,11 @@ BOARD_INSUFFICIENT_MEMORY := nucleo32-f031 nucleo32-f042 nucleo32-l031
 
 USEMODULE += libfixmath-unittests
 
-ifneq (,$(filter native qemu-i386,$(BOARD)))
+ifneq (,$(filter native,$(BOARD)))
   export LINKFLAGS += -lm
 endif
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py

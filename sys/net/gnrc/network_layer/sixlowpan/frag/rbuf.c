@@ -72,8 +72,8 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
               size_t frag_size, size_t offset)
 {
     rbuf_t *entry;
-    /* cppcheck is clearly wrong here */
-    /* cppcheck-suppress variableScope */
+    /* cppcheck-suppress variableScope
+     * (reason: cppcheck is clearly wrong here) */
     unsigned int data_offset = 0;
     size_t original_size = frag_size;
     sixlowpan_frag_t *frag = pkt->data;

@@ -1,0 +1,2 @@
+
+include $(RIOTCPU)/efm32_common/Makefile.features

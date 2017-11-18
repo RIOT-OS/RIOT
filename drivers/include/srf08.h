@@ -62,7 +62,7 @@ extern "C" {
 #define SRF08_MAX_RANGE_6M              0x8C
 
 /** @brief   Maximum gain of the sensor (1025)*/
-#define SRF08_MAX_GAIN                  0x25
+#define SRF08_MAX_GAIN                  0x1F
 
 /**
  * @brief   Device descriptor for SRF08 sensors

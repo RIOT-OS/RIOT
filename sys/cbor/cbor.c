@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef MODULE_CBOR_CTIME
+#include <time.h>
+#endif
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -400,7 +403,7 @@ static size_t decode_bytes(const cbor_stream_t *s, size_t offset, char *out, siz
         return 0;
     }
 
-    if (length < bytes_length + 1) {
+    if (bytes_length == SIZE_MAX || length < bytes_length + 1) {
         return 0;
     }
 

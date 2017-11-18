@@ -1,5 +1,5 @@
 ifeq (, $(__RIOTBUILD_FLAG))
-    $(error You cannot build a module on its own. Use "make" in your application's directory instead.)
+  $(error You cannot build a module on its own. Use "make" in your application's directory instead.)
 endif
 
 unexport DIRS
@@ -24,32 +24,32 @@ ${DIRS:%=CLEAN--%}:
 
 ## submodules
 ifeq (1, $(SUBMODULES))
-    # don't use *.c as SRC if SRC is empty (e.g., no module selected)
-    NO_AUTO_SRC := 1
+  # don't use *.c as SRC if SRC is empty (e.g., no module selected)
+  NO_AUTO_SRC := 1
 
-    # allow different submodule basename (e.g., MODULE=cpu_periph_common, but match just periph_%)
-    BASE_MODULE ?= $(MODULE)
+  # allow different submodule basename (e.g., MODULE=cpu_periph_common, but match just periph_%)
+  BASE_MODULE ?= $(MODULE)
 
-    # for each $(BASE_MODULE)_<name> in USEMODULE, add <name>.c to SRC
-    SRC += $(patsubst $(BASE_MODULE)_%,%.c,$(filter $(BASE_MODULE)_%,$(USEMODULE)))
+  # for each $(BASE_MODULE)_<name> in USEMODULE, add <name>.c to SRC
+  SRC += $(patsubst $(BASE_MODULE)_%,%.c,$(filter $(BASE_MODULE)_%,$(USEMODULE)))
 
-    # don't fail if a selected *.c file does not exist
-    ifeq (1, $(SUBMODULES_NOFORCE))
-        SRC := $(filter $(SRC), $(wildcard *.c))
-    endif
+  # don't fail if a selected *.c file does not exist
+  ifeq (1, $(SUBMODULES_NOFORCE))
+    SRC := $(filter $(SRC), $(wildcard *.c))
+  endif
 endif
 
 ifeq ($(strip $(SRC))$(NO_AUTO_SRC),)
-    SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))
+  SRC := $(filter-out $(SRC_NOLTO), $(wildcard *.c))
 endif
 ifeq ($(strip $(SRCXX))$(NO_AUTO_SRC),)
-    SRCXX := $(wildcard *.cpp)
+  SRCXX := $(wildcard *.cpp)
 endif
 ifeq ($(strip $(ASMSRC))$(NO_AUTO_SRC),)
-    ASMSRC := $(wildcard *.s)
+  ASMSRC := $(wildcard *.s)
 endif
 ifeq ($(strip $(ASSMSRC))$(NO_AUTO_SRC),)
-    ASSMSRC := $(wildcard *.S)
+  ASSMSRC := $(wildcard *.S)
 endif
 
 OBJC_LTO    := $(SRC:%.c=$(BINDIR)/$(MODULE)/%.o)
@@ -92,7 +92,7 @@ $(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.cpp $(RIOTBUILD_CONFIG_HEADER_C)
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S
+$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(RIOTBUILD_CONFIG_HEADER_C)
 	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files

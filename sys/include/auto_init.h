@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2010,2015 Freie Universität Berlin
- * Copyright (C) 2010 Kaspar Schleiser
+ * Copyright (C) 2010 Kaspar Schleiser <kaspar@schleiser.de>
  * Copyright (C) 2013 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser

@@ -354,7 +354,6 @@ int main(void)
     /* the rtc is used in diskio.c for timestamps of files */
     puts("Initializing the RTC driver");
     rtc_poweron();
-    rtc_init();
 
     struct tm time;
     time.tm_year = TEST_FATFS_RTC_YEAR - RTC_YEAR_OFFSET;  /* years are counted from 1900 */

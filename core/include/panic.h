@@ -74,6 +74,14 @@ typedef enum {
  * */
 NORETURN void core_panic(core_panic_t crash_code, const char *message);
 
+/**
+ * @brief architecture dependent handling of a panic case
+ *
+ * This function gives the CPU the possibility to execute architecture
+ * dependent code in case of a severe error.
+ */
+void panic_arch(void);
+
 #ifdef __cplusplus
 }
 #endif

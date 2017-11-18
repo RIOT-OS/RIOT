@@ -25,19 +25,12 @@
 #include <stdint.h>
 #include "vectors_cortexm.h"
 
-/* get the start of the ISR stack as defined in the linkerscript */
-extern uint32_t _estack;
-
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
 void dummy_handler(void) {
     dummy_handler_default();
 }
 
-/* Cortex-M common interrupt vectors */
-WEAK_DEFAULT void isr_svc(void);
-WEAK_DEFAULT void isr_pendsv(void);
-WEAK_DEFAULT void isr_systick(void);
 /* SAML21 specific interrupt vector */
 WEAK_DEFAULT void isr_pm(void);
 WEAK_DEFAULT void isr_wdt(void);
@@ -68,29 +61,8 @@ WEAK_DEFAULT void isr_ptc(void);
 WEAK_DEFAULT void isr_aes(void);
 WEAK_DEFAULT void isr_trng(void);
 
-/* interrupt vector table */
-ISR_VECTORS const void *interrupt_vector[] = {
-    /* Exception stack pointer */
-    (void*) (&_estack),             /* pointer to the top of the stack */
-    /* Cortex-M0+ handlers */
-    (void*) reset_handler_default,  /* entry point of the program */
-    (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) isr_svc,                /* system call interrupt, in RIOT used for
-                                     * switching into thread context on boot */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
-                                     * context switching is happening here */
-    (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* Atmel SAML21 specific peripheral handlers */
+/* CPU specific interrupt vector table */
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     (void*) isr_pm,                 /*  0 Power Manager */
     (void*) isr_wdt,                /*  1 Watchdog Timer */
     (void*) isr_rtc,                /*  2 Real-Time Counter */

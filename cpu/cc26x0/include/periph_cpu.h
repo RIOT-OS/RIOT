@@ -34,6 +34,13 @@ extern "C" {
  */
 #define CPUID_LEN           (16U)
 
+/**
+ * @name    Power management configuration
+ * @{
+ */
+#define PROVIDES_PM_SET_LOWEST_CORTEXM
+/** @} */
+
 #ifndef DOXYGEN
 /**
  * @brief   Override GPIO mode values

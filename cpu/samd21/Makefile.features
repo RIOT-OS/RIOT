@@ -1,1 +1,1 @@
-FEATURES_PROVIDED += periph_pm
+-include $(RIOTCPU)/sam0_common/Makefile.features

@@ -17,3 +17,6 @@ USEMODULE += od
 CFLAGS += -DGNRC_PKTBUF_SIZE=200
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py

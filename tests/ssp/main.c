@@ -28,9 +28,13 @@ void test_func(void)
 {
     char buf[16];
 
+    /* clang will detect the buffer overflow
+     * and throw an error if we use `buf` directly */
+    void *buffer_to_confuse_compiler = buf;
+
     /* cppcheck-suppress bufferAccessOutOfBounds
      * (reason: deliberately overflowing stack) */
-    memset(buf, 0, 32);
+    memset(buffer_to_confuse_compiler, 0, 32);
 }
 
 int main(void)

@@ -30,7 +30,6 @@
 #include "periph/gpio.h"
 #include "periph/pwm.h"
 
-
 static inline int _num(pwm_t dev)
 {
     return ((int)(pwm_config[dev].dev) & 0xc00) >> 10;

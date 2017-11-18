@@ -210,7 +210,7 @@ INCLUDES += -I$(CURDIR)
 CFLAGS += -DSLIP_UART=$(SLIP_UART)
 CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
 # Include SLIP package for IP over Serial communication
-USEMODULE += gnrc_slip
+USEMODULE += slipdev
 ```
 
 

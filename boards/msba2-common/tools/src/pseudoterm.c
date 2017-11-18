@@ -1,6 +1,6 @@
 /*
 
-    Author: Kaspar Schleiser
+    Author: Kaspar Schleiser <kaspar@schleiser.de>
 
 This is free and unencumbered software released into the public domain.
 

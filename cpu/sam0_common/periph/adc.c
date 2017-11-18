@@ -28,9 +28,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* Only if we actually have any ADCs */
-#if ADC_NUMOF
-
 /* ADC 0 device configuration */
 #define ADC_0_DEV                          ADC
 #define ADC_0_IRQ                          ADC_IRQn
@@ -190,5 +187,3 @@ int adc_sample(adc_t line, adc_res_t res)
     _done();
     return result;
 }
-
-#endif /* #if ADC_NUMOF */

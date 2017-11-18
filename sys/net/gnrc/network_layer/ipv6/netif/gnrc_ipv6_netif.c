@@ -25,6 +25,9 @@
 
 #include "net/eui64.h"
 #include "net/ipv6/addr.h"
+#ifdef MODULE_GNRC_IPV6_NIB
+#include "net/gnrc/ipv6/nib.h"
+#endif
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
@@ -173,9 +176,11 @@ static void _ipv6_netif_remove(gnrc_ipv6_netif_t *entry)
         return;
     }
 
+#ifndef MODULE_GNRC_IPV6_NIB
 #ifdef MODULE_GNRC_NDP
     gnrc_ndp_netif_remove(entry);
 #endif
+#endif  /* MODULE_GNRC_IPV6_NIB */
 
     mutex_lock(&entry->mutex);
     xtimer_remove(&entry->rtr_sol_timer);
@@ -235,9 +240,13 @@ void gnrc_ipv6_netif_add(kernel_pid_t pid)
 
     mutex_unlock(&free_entry->mutex);
 
+#ifndef MODULE_GNRC_IPV6_NIB
 #ifdef MODULE_GNRC_NDP
     gnrc_ndp_netif_add(free_entry);
 #endif
+#else   /* MODULE_GNRC_IPV6_NIB */
+    gnrc_ipv6_nib_init_iface(pid);
+#endif  /* MODULE_GNRC_IPV6_NIB */
 
     DEBUG(" * pid = %" PRIkernel_pid "  ", free_entry->pid);
     DEBUG("cur_hl = %d  ", free_entry->cur_hl);
