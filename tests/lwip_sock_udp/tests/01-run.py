@@ -9,8 +9,6 @@
 import os
 import sys
 
-from datetime import datetime
-
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
