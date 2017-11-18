@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import subprocess, os
+import subprocess
+import os
 
 cross_gcc = "arm-none-eabi-gcc"
 
