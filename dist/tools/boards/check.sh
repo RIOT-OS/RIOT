@@ -3,7 +3,7 @@
 # Copyright (c) 2017 Kaspar Schleiser <kaspar@schleiser.de>
 #
 # This script checks whether the board groups defined in boards/groups.mk
-# contain and only contai boards that actually exist in the tree.
+# contain and only contain boards that actually exist in the tree.
 
 : ${RIOTBASE:=$(pwd)}
 
