@@ -29,6 +29,7 @@ extern "C" {
 #endif
 
 #define CC110X_RXBUF_SIZE           (2)
+#define CC110X_FIFO_LENGTH          (64)
 #define CC110X_MAX_DATA_LENGTH      (58+64)
 
 #define CC110X_HEADER_LENGTH        (3)     /**< Header covers SRC, DST and
