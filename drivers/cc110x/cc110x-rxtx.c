@@ -43,6 +43,25 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+const char *cc110x_state_to_text(uint8_t state)
+{
+    switch (state){
+    case RADIO_IDLE:
+        return "idle";
+    case RADIO_TX_BUSY:
+        return "tx busy";
+    case RADIO_RX:
+        return "rx";
+    case RADIO_RX_BUSY:
+        return "rx busy";
+    case RADIO_PWD:
+        return "pwd";
+    case RADIO_UNKNOWN:
+        return "unknown";
+    }
+    return "invalid";
+}
+
 static void _rx_abort(cc110x_t *dev)
 {
     gpio_irq_disable(dev->params.gdo2);
