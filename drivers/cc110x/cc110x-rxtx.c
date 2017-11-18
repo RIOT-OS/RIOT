@@ -190,7 +190,7 @@ static void _tx_abort(cc110x_t *dev)
  */
 static void _tx_continue(cc110x_t *dev, uint8_t fifo)
 {
-    DEBUG("_tx_continue with fifo = " PRIu8 "\n", fifo);
+    DEBUG("_tx_continue with fifo = %" PRIu8 "\n", fifo);
     gpio_irq_disable(dev->params.gdo2);
 
     cc110x_pkt_t *pkt = &dev->pkt_buf.packet;
