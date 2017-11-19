@@ -281,7 +281,7 @@ void _handle_snd_ns(_nib_onl_entry_t *nbr)
                 _set_nud_state(netif, nbr,
                                GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE);
             }
-            /* falls through intentionally */
+            /* intentionally falls through */
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
             _probe_nbr(nbr, false);
             break;
@@ -298,7 +298,7 @@ void _handle_state_timeout(_nib_onl_entry_t *nbr)
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE:
             DEBUG("nib: Timeout reachability\n");
             new_state = GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE;
-            /* falls through intentionally */
+            /* intentionally falls through */
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_DELAY: {
             gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(nbr));
 
