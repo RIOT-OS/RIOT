@@ -325,12 +325,25 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
     }
     line_thresh = _newline(0U, line_thresh);
 }
+
+static void _netif_list_groups(ipv6_addr_t *addr)
+{
+    unsigned line_thresh = _LINE_THRESHOLD;
+
+    if ((ipv6_addr_is_multicast(addr))) {
+        char addr_str[IPV6_ADDR_MAX_STR_LEN];
+        ipv6_addr_to_str(addr_str, addr, sizeof(addr_str));
+        printf("inet6 group: %s", addr_str);
+    }
+    line_thresh = _newline(0U, line_thresh);
+}
 #endif
 
 static void _netif_list(kernel_pid_t iface)
 {
 #ifdef MODULE_GNRC_IPV6
     ipv6_addr_t ipv6_addrs[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+    ipv6_addr_t ipv6_groups[GNRC_NETIF_IPV6_GROUPS_NUMOF];
 #endif
     uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
     uint16_t u16;
@@ -456,6 +469,13 @@ static void _netif_list(kernel_pid_t iface)
         /* yes, the res of NETOPT_IPV6_ADDR is meant to be here ;-) */
         for (unsigned i = 0; i < (res / sizeof(ipv6_addr_t)); i++) {
             _netif_list_ipv6(&ipv6_addrs[i], ipv6_addrs_flags[i]);
+        }
+    }
+    res = gnrc_netapi_get(iface, NETOPT_IPV6_GROUP, 0, ipv6_groups,
+                          sizeof(ipv6_groups));
+    if (res >= 0) {
+        for (unsigned i = 0; i < (res / sizeof(ipv6_addr_t)); i++) {
+            _netif_list_groups(&ipv6_groups[i]);
         }
     }
 #endif
