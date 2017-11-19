@@ -9,7 +9,11 @@ BOARD_WHITELIST := fox iotlab-m3 msba2 mulle native pba-d-01-kw2x samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-CFLAGS += -DDEVELHELP
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 1
+
 CFLAGS += -DUSE_LINKLAYER
 CFLAGS += -DUSE_RONR
 CFLAGS += -DCCNL_UAPI_H_

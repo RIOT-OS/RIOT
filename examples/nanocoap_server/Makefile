@@ -32,10 +32,10 @@ USEMODULE += fmt
 # include this for printing IP addresses
 USEMODULE += shell_commands
 
-# Comment this out to disable code in RIOT that does safety checking
+# Comment this out to enable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-#CFLAGS += -DDEVELHELP
+#DEVELHELP = 1
 
 # Use different settings when compiling for one of the following (low-memory)
 # boards
