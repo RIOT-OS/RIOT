@@ -31,7 +31,7 @@
 #include "debug.h"
 
 /* pointers for default router selection */
-static _nib_dr_entry_t *_prime_def_router = NULL;
+_nib_dr_entry_t *_prime_def_router = NULL;
 static clist_node_t _next_removable = { NULL };
 
 static _nib_onl_entry_t _nodes[GNRC_IPV6_NIB_NUMOF];
