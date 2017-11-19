@@ -40,8 +40,11 @@
 
 #include "log.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
+#if ENABLE_DEBUG
+#include <inttypes.h>
+#endif
 
 const char *cc110x_state_to_text(uint8_t state)
 {
@@ -190,7 +193,13 @@ static void _tx_abort(cc110x_t *dev)
  */
 static void _tx_continue(cc110x_t *dev, uint8_t fifo)
 {
-    DEBUG("_tx_continue with fifo = %" PRIu8 "\n", fifo);
+    DEBUG("_tx_continue with fifo = %i\n", (int)fifo);
+#if ENABLE_DEBUG
+    cc110x_status_t status = cc110x_get_status(dev);
+    DEBUG("Status: State = %s, FIFO available = %i, Power and crystal: %i\n",
+          cc110x_state_t_to_text(status.state), (int)status.fifo_available,
+          (int)status.power_or_crystal_unstable);
+#endif
     gpio_irq_disable(dev->params.gdo2);
 
     cc110x_pkt_t *pkt = &dev->pkt_buf.packet;
@@ -211,7 +220,7 @@ static void _tx_continue(cc110x_t *dev, uint8_t fifo)
         fifo = CC110X_FIFO_LENGTH - cc110x_get_reg_robust(dev, 0xfa);
 
         if (fifo & 0x80) {
-            DEBUG("%s:%s:%u tx underflow!\n", RIOT_FILE_RELATIVE, 
+            DEBUG("%s:%s:%u tx underflow!\n", RIOT_FILE_RELATIVE,
                                               __func__, __LINE__);
             _tx_abort(dev);
             return;
@@ -225,7 +234,6 @@ static void _tx_continue(cc110x_t *dev, uint8_t fifo)
         }
     }
 
-
     int to_send = left > fifo ? fifo : left;
 
     /* Write packet into TX FIFO */
@@ -234,7 +242,17 @@ static void _tx_continue(cc110x_t *dev, uint8_t fifo)
 
     if (left == size) {
         /* Switch to TX mode */
+        DEBUG("cc110x: Switch to TX\n");
         cc110x_strobe(dev, CC110X_STX);
+#if ENABLE_DEBUG
+        status = cc110x_get_status(dev);
+        DEBUG("Status: State = %s, FIFO available = %i, Power and crystal: %i\n",
+              cc110x_state_t_to_text(status.state), (int)status.fifo_available,
+              (int)status.power_or_crystal_unstable);
+        if (status.state != cc110x_state_tx){
+            DEBUG("Switching to TX FAILED!!!11eleven\n");
+        }
+#endif
     }
 
     if (to_send < left) {
@@ -283,6 +301,12 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
 {
     DEBUG("cc110x: snd pkt to %u payload_length=%u\n",
             (unsigned)packet->address, (unsigned)packet->length-3);
+#if ENABLE_DEBUG
+    cc110x_status_t status = cc110x_get_status(dev);
+    DEBUG("Status: State = %s, FIFO available = %i, Power and crystal: %i\n",
+          cc110x_state_t_to_text(status.state), (int)status.fifo_available,
+          (int)status.power_or_crystal_unstable);
+#endif
     uint8_t size;
 
     switch (dev->radio_state) {

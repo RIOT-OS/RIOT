@@ -30,6 +30,20 @@ extern "C" {
 #include "net/gnrc/nettype.h"
 
 /**
+ * @brief   Enum over the states indicated by the status byte
+ */
+typedef enum cc110x_state {
+    cc110x_state_idle         = 0, ///< Idle
+    cc110x_state_rx           = 1, ///< Receive mode
+    cc110x_state_tx           = 2, ///< Transmit mode
+    cc110x_state_fstxon       = 3, ///< Fast TX ready
+    cc110x_state_calibrate    = 4, ///< Frequency synthesizer is calibrating
+    cc110x_state_settling     = 5, ///< PLL is settling
+    cc110x_state_rx_overflow  = 6, ///< RX FIFO overflown
+    cc110x_state_tx_underflow = 7, ///< TX FIFO underflown
+} cc110x_state_t;
+
+/**
  * @brief   Struct for holding cc110x IO parameters
  */
 typedef struct cc110x_params {
@@ -39,6 +53,15 @@ typedef struct cc110x_params {
     gpio_t gdo1;        /**< look */
     gpio_t gdo2;        /**< like */
 } cc110x_params_t;
+
+/**
+ * @brief   Struct for the CC110X status
+ */
+typedef struct cc110x_status {
+    cc110x_state_t state;              ///< State of the CC110X
+    uint8_t power_or_crystal_unstable; ///< true, if power or crystal unstable
+    uint8_t fifo_available;            ///< Number of availabe/free bytes in RX/TX fifo
+} cc110x_status_t;
 
 /**
  * @brief   Forward declaration
@@ -127,6 +150,20 @@ uint8_t cc110x_set_address(cc110x_t *dev, uint8_t address);
  * @param[in] mode  mode to set (0 or 1)
  */
 void cc110x_set_monitor(cc110x_t *dev, uint8_t mode);
+
+/**
+ * @brief   Get the cc110x current status
+ * @param[in] dev   device to get the status from
+ * @return  The current status of the device
+ */
+cc110x_status_t cc110x_get_status(cc110x_t *dev);
+
+/**
+ * @brief   Get a name of the state in `state`
+ * @param[in] state state to get the name of
+ * @return Name of the state or `"invalid"`
+ */
+const char * cc110x_state_t_to_text(cc110x_state_t state);
 
 #ifdef __cplusplus
 }

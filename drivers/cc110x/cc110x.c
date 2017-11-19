@@ -35,7 +35,7 @@
 #include "cc110x-internal.h"
 #include "cc110x-spi.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 /* Internal function prototypes */
@@ -88,6 +88,13 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     LOG_INFO("cc110x: initialized with address=%u and channel=%i\n",
             (unsigned)dev->radio_address,
             dev->radio_channel);
+
+#if ENABLE_DEBUG
+    cc110x_status_t status = cc110x_get_status(dev);
+    DEBUG("Status: State = %s, FIFO available = %i, Power and crystal: %i\n",
+          cc110x_state_t_to_text(status.state), (int)status.fifo_available,
+          (int)status.power_or_crystal_unstable);
+#endif
 
     return 0;
 }
@@ -268,4 +275,37 @@ int cc110x_rd_set_mode(cc110x_t *dev, int mode)
 
     /* Return previous mode */
     return result;
+}
+
+cc110x_status_t cc110x_get_status(cc110x_t *dev)
+{
+    cc110x_status_t status;
+    uint8_t status_byte = cc110x_strobe(dev, CC110X_SNOP);
+    status.power_or_crystal_unstable = (status_byte & 0x80) ? 1 : 0;
+    status.fifo_available = 0x0f & status_byte;
+    status.state = (status_byte>>4) & 0x07;
+    return status;
+}
+
+const char * cc110x_state_t_to_text(cc110x_state_t state)
+{
+    switch (state){
+    case cc110x_state_idle:
+        return "idle";
+    case cc110x_state_rx:
+        return "RX mode";
+    case cc110x_state_tx:
+        return "TX mode";
+    case cc110x_state_fstxon:
+        return "Fast TX ready";
+    case cc110x_state_calibrate:
+        return "Frequancy synthesizer is calibrating";
+    case cc110x_state_settling:
+        return "PLL is settling";
+    case cc110x_state_rx_overflow:
+        return "RX FIFO overflown";
+    case cc110x_state_tx_underflow:
+        return "TX FIFO underflown";
+    };
+    return "invalid";
 }

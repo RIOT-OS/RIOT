@@ -19,6 +19,8 @@
 
 #ifdef MODULE_CC110X
 
+#define ENABLE_DEBUG (1)
+
 #include "log.h"
 #include "debug.h"
 #include "board.h"

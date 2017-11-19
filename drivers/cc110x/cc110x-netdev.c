@@ -33,7 +33,7 @@
 #include "net/netdev.h"
 #include "net/gnrc/nettype.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 static int _send(netdev_t *dev, const struct iovec *vector, unsigned count)
@@ -166,6 +166,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
 
 static void _netdev_cc110x_isr(void *arg)
 {
+    DEBUG("_netdev_cc110x_isr\n");
     netdev_t *netdev = (netdev_t*) arg;
     netdev->event_callback(netdev, NETDEV_EVENT_ISR);
 }
@@ -180,6 +181,7 @@ static void _netdev_cc110x_rx_callback(void *arg)
 
 static void _isr(netdev_t *dev)
 {
+    DEBUG("_isr\n");
     cc110x_t *cc110x = &((netdev_cc110x_t*) dev)->cc110x;
     cc110x_isr_handler(cc110x, _netdev_cc110x_rx_callback, (void*)dev);
 }
@@ -189,6 +191,10 @@ static int _init(netdev_t *dev)
     DEBUG("%s:%u\n", __func__, __LINE__);
 
     cc110x_t *cc110x = &((netdev_cc110x_t*) dev)->cc110x;
+    DEBUG("gdo0 = %i, gdo1 = %i, gdo2 = %i\n",
+          (int)cc110x->params.gdo0,
+          (int)cc110x->params.gdo1,
+          (int)cc110x->params.gdo2);
 
     gpio_init_int(cc110x->params.gdo2, GPIO_IN, GPIO_BOTH,
             &_netdev_cc110x_isr, (void*)dev);
