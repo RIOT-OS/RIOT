@@ -25,7 +25,7 @@ RIOTBASE ?= $(CURDIR)/../../RIOT
 # Uncomment this to enable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-#CFLAGS += -DDEVELHELP
+#DEVELHELP = 1
 
 # Change this to 0 to show compiler invocation lines by default:
 QUIET ?= 1
