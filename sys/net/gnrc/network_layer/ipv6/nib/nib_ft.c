@@ -51,9 +51,12 @@ int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
         if (ptr == NULL) {
             res = -ENOMEM;
         }
-        else if (ltime > 0) {
-            _evtimer_add(ptr, GNRC_IPV6_NIB_RTR_TIMEOUT,
-                         &ptr->rtr_timeout, ltime * MS_PER_SEC);
+        else {
+            _prime_def_router = ptr;
+            if (ltime > 0) {
+                _evtimer_add(ptr, GNRC_IPV6_NIB_RTR_TIMEOUT,
+                             &ptr->rtr_timeout, ltime * MS_PER_SEC);
+            }
         }
     }
 #if GNRC_IPV6_NIB_CONF_ROUTER

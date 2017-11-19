@@ -569,6 +569,28 @@ static void test_nib_ft_add__success(void)
 }
 
 /*
+ * Creates a default route
+ * Expected result: a new entry should exist and contain the given prefix,
+ * interface, and lifetimes and it should be the primary default route
+ */
+static void test_nib_ft_add__success_dr(void)
+{
+    gnrc_ipv6_nib_ft_t fte;
+    void *iter_state = NULL;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &next_hop, IFACE, 0));
+    TEST_ASSERT(gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
+    TEST_ASSERT(ipv6_addr_is_unspecified(&fte.dst));
+    TEST_ASSERT_EQUAL_INT(0, fte.dst_len);
+    TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
+    TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
+    TEST_ASSERT_EQUAL_INT(1, fte.primary);
+    TEST_ASSERT(!gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
+}
+
+/*
  * Creates MAX_NUMOF routes with different destinations of to the different
  * next hops and interfaces and then tries to delete one with yet another
  * destination, next hop and interface.
@@ -639,13 +661,19 @@ static void test_nib_ft_iter__empty_def_route_at_beginning(void)
     next_hop.u16[0].u16++;
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
                                                   &next_hop, IFACE, 0));
+    /* make first added route the primary default route again */
+    next_hop.u16[0].u16 -= 2;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
+                                                  &next_hop, IFACE, 0));
+    /* remove primary default route */
     gnrc_ipv6_nib_ft_del(NULL, 0);
-    next_hop.u16[0].u16--;
+    next_hop.u16[0].u16++;
     while (gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte)) {
         TEST_ASSERT(ipv6_addr_is_unspecified(&fte.dst));
         TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
         TEST_ASSERT_EQUAL_INT(0, fte.dst_len);
         TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
+        TEST_ASSERT(!fte.primary);
         count++;
         next_hop.u16[0].u16++;
     }
@@ -717,6 +745,7 @@ Test *tests_gnrc_ipv6_nib_ft_tests(void)
         new_TestFixture(test_nib_ft_add__success_duplicate),
         new_TestFixture(test_nib_ft_add__success_overwrite_unspecified),
         new_TestFixture(test_nib_ft_add__success),
+        new_TestFixture(test_nib_ft_add__success_dr),
         new_TestFixture(test_nib_ft_del__unknown),
         new_TestFixture(test_nib_ft_del__success),
         /* most of gnrc_ipv6_nib_ft_iter() is tested during all the tests above */
