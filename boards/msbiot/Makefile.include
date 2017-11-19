@@ -14,3 +14,9 @@ export STLINK_VERSION ?= 2
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk
+
+# add driver for CC1101 sub-gigahertz transceiver as default netdev
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+	USEMODULE += cc110x
+endif
+

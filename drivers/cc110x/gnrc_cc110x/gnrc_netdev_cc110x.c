@@ -17,7 +17,7 @@
 #include "net/gnrc/netdev.h"
 #include "od.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 static int _send(gnrc_netdev_t *gnrc_netdev, gnrc_pktsnip_t *pkt)
