@@ -72,7 +72,7 @@ static void _usage_nib_prefix(char **argv)
 static void _usage_nib_route(char **argv)
 {
     printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
-    printf("       %s %s add <iface> <prefix>[/<prefix_len>] <next_hop>\n",
+    printf("       %s %s add <iface> <prefix>[/<prefix_len>] <next_hop> [<ltime in sec>]\n",
            argv[0], argv[1]);
     printf("       %s %s del <iface> <prefix>[/<prefix_len>]\n", argv[0], argv[1]);
     printf("       %s %s show <iface>\n", argv[0], argv[1]);
@@ -202,6 +202,7 @@ static int _nib_route(int argc, char **argv)
         ipv6_addr_t pfx = IPV6_ADDR_UNSPECIFIED, next_hop;
         unsigned iface = atoi(argv[3]);
         unsigned pfx_len = ipv6_addr_split_prefix(argv[4]);
+        uint16_t ltime = 0;
 
         if (ipv6_addr_from_str(&pfx, argv[4]) == NULL) {
             /* check if string equals "default"
@@ -215,7 +216,10 @@ static int _nib_route(int argc, char **argv)
             _usage_nib_route(argv);
             return 1;
         }
-        gnrc_ipv6_nib_ft_add(&pfx, pfx_len, &next_hop, iface);
+        if (argc > 6) {
+            ltime = (uint16_t)atoi(argv[6]);
+        }
+        gnrc_ipv6_nib_ft_add(&pfx, pfx_len, &next_hop, iface, ltime);
     }
     else if ((argc > 4) && (strcmp(argv[2], "del") == 0)) {
         ipv6_addr_t pfx;

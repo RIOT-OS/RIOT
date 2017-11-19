@@ -113,7 +113,7 @@ static void test_get_next_hop_l2addr__EHOSTUNREACH(const ipv6_addr_t *dst,
     }
     else {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &_rem_ll,
-                                                      _mock_netif->pid));
+                                                      _mock_netif->pid, 0));
     }
     TEST_ASSERT_EQUAL_INT(-EHOSTUNREACH,
                           gnrc_ipv6_nib_get_next_hop_l2addr(dst, netif,

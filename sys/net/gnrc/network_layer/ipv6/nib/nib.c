@@ -324,6 +324,9 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
         case GNRC_IPV6_NIB_SND_MC_RA:
             _handle_snd_mc_ra(ctx);
             break;
+        case GNRC_IPV6_NIB_ROUTE_TIMEOUT:
+            _nib_ft_remove(ctx);
+            break;
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 #if GNRC_IPV6_NIB_CONF_6LR
         case GNRC_IPV6_NIB_ADDR_REG_TIMEOUT:
