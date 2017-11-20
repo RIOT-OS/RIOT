@@ -132,8 +132,11 @@ int ccm_compute_adata_mac(cipher_t* cipher, uint8_t* auth_data,
 /* Check if 'value' can be stored in 'num_bytes' */
 static inline int _fits_in_nbytes(size_t value, uint8_t num_bytes)
 {
-    uint32_t length_max = 1 << (8 * num_bytes);
-    return value < length_max;
+    /* Not allowed to shift more or equal than left operand width
+     * So we shift by maximum num bits of size_t -1 and compare to 1
+     */
+    unsigned shift = (8 * min(sizeof(size_t), num_bytes)) - 1;
+    return (value >> shift) <= 1;
 }
 
 
