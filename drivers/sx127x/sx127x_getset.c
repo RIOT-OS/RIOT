@@ -479,13 +479,13 @@ inline void _update_bandwidth(const sx127x_t *dev)
 #if defined(MODULE_SX1272)
     config1_reg &= SX1272_RF_LORA_MODEMCONFIG1_BW_MASK;
     switch (dev->settings.lora.bandwidth) {
-    case SX127X_BW_125_KHZ:
+    case LORA_BW_125_KHZ:
         config1_reg |=  SX1272_RF_LORA_MODEMCONFIG1_BW_125_KHZ;
         break;
-    case SX127X_BW_250_KHZ:
+    case LORA_BW_250_KHZ:
         config1_reg |=  SX1272_RF_LORA_MODEMCONFIG1_BW_250_KHZ;
         break;
-    case SX127X_BW_500_KHZ:
+    case LORA_BW_500_KHZ:
         config1_reg |=  SX1272_RF_LORA_MODEMCONFIG1_BW_500_KHZ;
         break;
     default:
