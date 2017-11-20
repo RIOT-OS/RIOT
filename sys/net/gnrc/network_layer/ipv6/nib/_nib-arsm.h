@@ -178,6 +178,17 @@ static inline uint16_t _get_nud_state(_nib_onl_entry_t *nbr)
 void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nbr,
                     uint16_t state);
 
+/**
+ * @brief   Checks if a node is in a reachable state
+ *
+ * A node is reachable if it is not in NUD state UNREACHABLE or INCOMPLETE
+ *
+ * @param[in] entry A node.
+ *
+ * @return  true, if @p entry is in a reachable state.
+ * @return  false, if @p entry is not in a reachable state.
+ */
+bool _is_reachable(_nib_onl_entry_t *entry);
 #else   /* GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN) */
 #define _handle_snd_ns(ctx)                         (void)ctx
 #define _handle_state_timeout(ctx)                  (void)ctx
@@ -191,6 +202,7 @@ void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nbr,
 
 #define _get_nud_state(nbr)                 (GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED)
 #define _set_nud_state(netif, nce, state)   (void)netif; (void)nbr; (void)state
+#define _is_reachable(entry)                (true)
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM || defined(DOXYGEN) */
 
 #ifdef __cplusplus
