@@ -17,6 +17,8 @@
 #include "crypto/modes/ccm.h"
 #include "tests-crypto.h"
 
+static const size_t nonce_and_len_encoding_size = 15;
+
 /* PACKET VECTOR #1 (RFC 3610 - Page 10) */
 static uint8_t TEST_1_KEY[] = {
     0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,
@@ -94,12 +96,14 @@ static void test_encrypt_op(uint8_t* key, uint8_t key_len,
     cipher_t cipher;
     int len, err, cmp;
     uint8_t data[60];
+    size_t len_encoding = nonce_and_len_encoding_size - nonce_len;
 
     err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
-    len = cipher_encrypt_ccm(&cipher, adata, adata_len, mac_length, 2, nonce,
-                             nonce_len, plain, plain_len, data);
+    len = cipher_encrypt_ccm(&cipher, adata, adata_len,
+                             mac_length, len_encoding,
+                             nonce, nonce_len, plain, plain_len, data);
     TEST_ASSERT_MESSAGE(len > 0, "Encryption failed");
 
     TEST_ASSERT_EQUAL_INT(output_expected_len, len);
@@ -119,12 +123,14 @@ static void test_decrypt_op(uint8_t* key, uint8_t key_len,
     cipher_t cipher;
     int len, err, cmp;
     uint8_t data[60];
+    size_t len_encoding = nonce_and_len_encoding_size - nonce_len;
 
     err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
-    len = cipher_decrypt_ccm(&cipher, adata, adata_len, mac_length, 2, nonce,
-                             nonce_len, encrypted, encrypted_len, data);
+    len = cipher_decrypt_ccm(&cipher, adata, adata_len,
+                             mac_length, len_encoding,
+                             nonce, nonce_len, encrypted, encrypted_len, data);
     TEST_ASSERT_MESSAGE(len > 0, "Decryption failed");
 
     TEST_ASSERT_EQUAL_INT(output_expected_len, len);
