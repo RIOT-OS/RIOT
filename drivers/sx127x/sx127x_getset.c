@@ -235,7 +235,7 @@ void sx127x_set_rx(sx127x_t *dev)
                              ((sx127x_reg_read(dev, SX127X_REG_LR_INVERTIQ) &
                                SX127X_RF_LORA_INVERTIQ_TX_MASK &
                                SX127X_RF_LORA_INVERTIQ_RX_MASK) |
-                              SX127X_RF_LORA_INVERTIQ_RX_ON |
+                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ_RX_ON :SX127X_RF_LORA_INVERTIQ_RX_OFF) |
                               SX127X_RF_LORA_INVERTIQ_TX_OFF));
             sx127x_reg_write(dev, SX127X_REG_LR_INVERTIQ2,
                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ2_ON : SX127X_RF_LORA_INVERTIQ2_OFF));
