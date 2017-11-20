@@ -109,7 +109,7 @@ uint8_t sx127x_get_syncword(const sx127x_t *dev)
 
 void sx127x_set_syncword(sx127x_t *dev, uint8_t syncword)
 {
-    DEBUG("[DEBUG] Set syncword: %d\n", syncword);
+    DEBUG("[DEBUG] Set syncword: %02x\n", syncword);
 
     sx127x_reg_write(dev, SX127X_REG_LR_SYNCWORD, syncword);
 }

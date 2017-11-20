@@ -282,6 +282,26 @@ uint32_t sx127x_random(sx127x_t *dev);
 void sx127x_start_cad(sx127x_t *dev);
 
 /**
+ * @brief   Checks that channel is free with specified RSSI threshold.
+ *
+ * @param[in] dev                      The sx127x device structure pointer
+ * @param[in] freq                     channel RF frequency
+ * @param[in] rssi_threshold           RSSI threshold
+ *
+ * @return true if channel is free, false otherwise
+ */
+bool sx127x_is_channel_free(sx127x_t *dev, uint32_t freq, int16_t rssi_threshold);
+
+/**
+ * @brief   Reads the current RSSI value.
+ *
+ * @param[in] dev                      The sx127x device structure pointer
+ *
+ * @return the current value of RSSI (in dBm)
+ */
+int16_t sx127x_read_rssi(const sx127x_t *dev);
+
+/**
  * @brief   Gets current state of transceiver.
  *
  * @param[in] dev                      The sx127x device descriptor
