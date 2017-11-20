@@ -175,7 +175,6 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #if GNRC_IPV6_NIB_CONF_6LR
         else if (gnrc_netif_is_6lr(netif) &&
                  (icmpv6->type == ICMPV6_NBR_SOL)) {
-            assert(nce != NULL);
             return _reg_addr_upstream(netif, ipv6, icmpv6, aro, sl2ao, nce);
         }
 #else   /* GNRC_IPV6_NIB_CONF_6LR */
