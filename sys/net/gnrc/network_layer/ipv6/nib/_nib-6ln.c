@@ -230,7 +230,7 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
             uint32_t retrans_time;
 
             if (_is_valid(netif, idx)) {
-                retrans_time = SIXLOWPAN_ND_MAX_RS_SEC_INTERVAL;
+                retrans_time = SIXLOWPAN_ND_MAX_RS_SEC_INTERVAL * MS_PER_SEC;
             }
             else {
                 retrans_time = netif->ipv6.retrans_time;
