@@ -196,7 +196,7 @@ bool _is_reachable(_nib_onl_entry_t *entry);
 #define _init_iface_arsm(netif)                     (void)netif
 #define _handle_adv_l2(netif, nce, icmpv6, tl2ao)   (void)netif; (void)nce; \
                                                     (void)icmpv6; (void)tl2ao
-#define _recalc_reach_time(netif)                   (void)netif;
+#define _recalc_reach_time(netif)                   (void)netif
 #define _set_reachable(netif, nce)                  (void)netif; (void)nce
 #define _init_iface_arsm(netif)                     (void)netif
 
