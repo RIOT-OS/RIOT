@@ -1334,16 +1334,6 @@ static void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     (void)idx;
     /* TODO: make this line conditional on 6LN when there is a SLAAC
      * implementation */
-#if GNRC_IPV6_NIB_CONF_ARSM
-    /* TODO: SHOULD delay join between 0 and MAX_RTR_SOLICITATION_DELAY
-     * for SLAAC */
-    ipv6_addr_set_solicited_nodes(&addr, &addr);
-    if (gnrc_netif_ipv6_group_join(netif, &addr) < 0) {
-        DEBUG("nib: Can't join solicited-nodes of link-local address on "
-              "interface %u\n", netif->pid);
-        return;
-    }
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
 #if GNRC_IPV6_NIB_CONF_6LN
     if (new_address && gnrc_netif_is_6ln(netif) &&
         !gnrc_netif_is_6lbr(netif)) {
