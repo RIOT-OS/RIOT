@@ -352,8 +352,9 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
                     _snd_ns(&nbr->ipv6, netif, NULL, &sol_nodes);
                     _evtimer_add(nbr, GNRC_IPV6_NIB_SND_MC_NS, &nbr->nud_timeout,
                                  retrans_time);
-                    if (nbr->ns_sent < UINT8_MAX) {
-                        /* cap ns_sent at UINT8_MAX to prevent backoff reset */
+                    if (nbr->ns_sent < (NDP_MAX_NS_NUMOF + 2)) {
+                        /* cap ns_sent at NDP_MAX_NS_NUMOF to prevent backoff
+                         * overflow */
                         nbr->ns_sent++;
                     }
                 }

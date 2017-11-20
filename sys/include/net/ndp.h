@@ -170,6 +170,15 @@ extern "C" {
  * @see     [RFC 7048](https://tools.ietf.org/html/rfc7048)
  */
 #define NDP_MAX_RETRANS_TIMER_MS    (60000U)
+
+/**
+ * @brief   Maximum retransmission of neighbor solicitations when UNREACHABLE
+ *
+ * With more than this number the backoff will always be larger than
+ * @ref NDP_MAX_RETRANS_TIMER_MS, even if the random factor is 0.5 and the
+ * retransmission time is 1ms.
+ */
+#define NDP_MAX_NS_NUMOF            (17U)
 #define NDP_DELAY_FIRST_PROBE_MS    (5000U)     /**< DELAY_FIRST_PROBE_TIME (in ms) */
 #define NDP_MIN_RANDOM_FACTOR       (500U)      /**< MIN_RANDOM_FACTOR (x 1000) */
 #define NDP_MAX_RANDOM_FACTOR       (1500U)     /**< MAX_RANDOM_FACTOR (x 1000) */
