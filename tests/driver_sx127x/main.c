@@ -221,7 +221,7 @@ int send_cmd(int argc, char **argv)
         return -1;
     }
 
-    printf("sending \"%s\" payload (%zd bytes)\n",
+    printf("sending \"%s\" payload (%d bytes)\n",
            argv[1], strlen(argv[1]) + 1);
 
     struct iovec vec[1];
