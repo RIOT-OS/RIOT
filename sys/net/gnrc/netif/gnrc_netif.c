@@ -551,6 +551,24 @@ int gnrc_netif_ipv6_addr_add(gnrc_netif_t *netif, const ipv6_addr_t *addr,
     netif->ipv6.addrs_flags[idx] = flags;
     memcpy(&netif->ipv6.addrs[idx], addr, sizeof(netif->ipv6.addrs[idx]));
 #ifdef MODULE_GNRC_IPV6_NIB
+#if GNRC_IPV6_NIB_CONF_ARSM
+    ipv6_addr_t sol_nodes;
+    int res;
+
+    /* TODO: SHOULD delay join between 0 and MAX_RTR_SOLICITATION_DELAY
+     * for SLAAC */
+    ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
+    res = gnrc_netif_ipv6_group_join(netif, &sol_nodes);
+#if ENABLE_DEBUG
+    if (res < 0) {
+        DEBUG("nib: Can't join solicited-nodes of %s on interface %u\n",
+              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+              netif->pid);
+    }
+#else
+    (void)res;
+#endif
+#endif /* GNRC_IPV6_NIB_CONF_ARSM */
     if (_get_state(netif, idx) == GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID) {
         void *state = NULL;
         gnrc_ipv6_nib_pl_t ple;
@@ -581,14 +599,30 @@ int gnrc_netif_ipv6_addr_add(gnrc_netif_t *netif, const ipv6_addr_t *addr,
 void gnrc_netif_ipv6_addr_remove(gnrc_netif_t *netif,
                                  const ipv6_addr_t *addr)
 {
-    int idx;
+    bool remove_sol_nodes = true;
+    ipv6_addr_t sol_nodes;
 
     assert((netif != NULL) && (addr != NULL));
+    ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
     gnrc_netif_acquire(netif);
-    idx = _addr_idx(netif, addr);
-    if (idx >= 0) {
-        netif->ipv6.addrs_flags[idx] = 0;
-        ipv6_addr_set_unspecified(&netif->ipv6.addrs[idx]);
+    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+        if (ipv6_addr_equal(&netif->ipv6.addrs[i], addr)) {
+            netif->ipv6.addrs_flags[i] = 0;
+            ipv6_addr_set_unspecified(&netif->ipv6.addrs[i]);
+        }
+        else {
+            ipv6_addr_t tmp;
+
+            ipv6_addr_set_solicited_nodes(&tmp, &netif->ipv6.addrs[i]);
+            /* there is still an address on the interface with the same
+             * solicited nodes address */
+            if (ipv6_addr_equal(&tmp, &sol_nodes)) {
+                remove_sol_nodes = false;
+            }
+        }
+    }
+    if (remove_sol_nodes) {
+        gnrc_netif_ipv6_group_leave(netif, &sol_nodes);
     }
     gnrc_netif_release(netif);
 }
