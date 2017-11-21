@@ -12,10 +12,13 @@ Packages for macOS, deb-based and rpm-based systems, for Windows and for Arch Li
 ### From source
 Follow the installation instructions on Renode's [GitHub](https://github.com/renode/renode#installation) page.
 
-After compilation is successful, ensure that `renode` is available on your `PATH`. One way to do so, is via symlink: `sudo ln -s path/to/renode/repository/run.sh /usr/local/bin/renode`.
+After compilation is successful, ensure that `renode` is available on your `PATH`. One way to do so, is via symlink: `sudo ln -s path/to/renode/repository/renode /usr/local/bin/renode`.
 
 ### Testing
 After installation, verify if Renode is working using `renode --help`. You should be presented with a help screen.
+
+## Documentation
+Documentation for Renode can be found on [Read The Docs](https://renode.readthedocs.io).
 
 ## Usage
 From within RIOT-OS, you can use `make emulate` to start emulation. It expects a board definition file in `boards/<BOARD>/dist/board.resc`.
