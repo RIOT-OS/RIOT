@@ -1,0 +1,18 @@
+# define the cpu used by the arduino due based boards
+export CPU = sam3
+export CPU_MODEL = sam3x8e
+
+# export this module and its includes
+USEMODULE += boards_common_arduino_due
+INCLUDES  += -I$(RIOTBOARD)/common/arduino-due/include
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup flasher (using BOSSA)
+export BOSSA_ARDUINO_PREFLASH = yes
+include $(RIOTMAKE)/tools/bossa.inc.mk
