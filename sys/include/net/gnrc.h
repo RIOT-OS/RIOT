@@ -203,6 +203,11 @@
  *       please refer to @ref gnrc_udp_hdr_build(), @ref gnrc_ipv6_hdr_build()
  *       etc. for more information.
  *
+ * @note GNRC is implemented according to the respective standards. So please
+ *       note, that sending to a IPv6 link-local address always requires you
+ *       by definition to also provide the interface you want to send to,
+ *       otherwise address resolution might fail.
+ *
  * How To Use
  * ==========
  * @ref net_gnrc is highly modular and can be adjusted to include only the
