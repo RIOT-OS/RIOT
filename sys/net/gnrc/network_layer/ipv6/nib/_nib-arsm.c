@@ -352,8 +352,9 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
                     _snd_ns(&nbr->ipv6, netif, NULL, &sol_nodes);
                     _evtimer_add(nbr, GNRC_IPV6_NIB_SND_MC_NS, &nbr->nud_timeout,
                                  retrans_time);
-                    if (nbr->ns_sent < UINT8_MAX) {
-                        /* cap ns_sent at UINT8_MAX to prevent backoff reset */
+                    if (nbr->ns_sent < (NDP_MAX_NS_NUMOF + 2)) {
+                        /* cap ns_sent at NDP_MAX_NS_NUMOF to prevent backoff
+                         * overflow */
                         nbr->ns_sent++;
                     }
                 }
@@ -495,6 +496,17 @@ void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 }
 
+bool _is_reachable(_nib_onl_entry_t *entry)
+{
+    switch (_get_nud_state(entry)) {
+        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
+        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE:
+            return false;
+        default:
+            return true;
+    }
+}
+
 /* internal functions */
 static inline uint32_t _exp_backoff_retrans_timer(uint8_t ns_sent,
                                                   uint32_t retrans_timer)
@@ -547,7 +559,6 @@ static inline bool _rflag_set(const ndp_nbr_adv_t *nbr_adv)
     return (nbr_adv->type == ICMPV6_NBR_ADV) &&
            (nbr_adv->flags & NDP_NBR_ADV_FLAGS_R);
 }
-
 #endif /* GNRC_IPV6_NIB_CONF_ARSM */
 
 /** @} */

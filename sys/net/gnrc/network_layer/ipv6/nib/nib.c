@@ -983,20 +983,6 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     }
 }
 
-#if GNRC_IPV6_NIB_CONF_ARSM
-static inline bool _is_reachable(_nib_onl_entry_t *entry)
-{
-    (void)entry; /* _get_nud_state() might just resolved to UNMANAGED as macro */
-    switch (_get_nud_state(entry)) {
-        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
-        case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE:
-            return false;
-        default:
-            return true;
-    }
-}
-#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
-
 #if GNRC_IPV6_NIB_CONF_QUEUE_PKT
 static gnrc_pktqueue_t *_alloc_queue_entry(gnrc_pktsnip_t *pkt)
 {

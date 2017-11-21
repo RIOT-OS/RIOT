@@ -206,8 +206,10 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(addr);
     _nib_dr_entry_t *router = _nib_drl_get_dr();
+    const bool router_reachable = (router != NULL) &&
+                                  _is_reachable(router->next_hop);
 
-    if ((netif != NULL) && (router != NULL)) {
+    if (router_reachable && (netif != NULL)) {
         assert((unsigned)netif->pid == _nib_onl_get_if(router->next_hop));
         DEBUG("nib: Re-registering %s",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
@@ -224,9 +226,10 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
     if (netif != NULL) {
         int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
 
-        if (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
+        if (router_reachable &&
+            (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
              (gnrc_netif_ipv6_addr_dad_trans(netif, idx) <
-              SIXLOWPAN_ND_REG_TRANSMIT_NUMOF))) {
+              SIXLOWPAN_ND_REG_TRANSMIT_NUMOF)))) {
             uint32_t retrans_time;
 
             if (_is_valid(netif, idx)) {
