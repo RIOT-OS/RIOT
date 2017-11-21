@@ -22,9 +22,12 @@
 #include "msg.h"
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/netif.h"
+#include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/pktdump.h"
 #include "timex.h"
+#include "utlist.h"
 #include "xtimer.h"
 
 #define SERVER_MSG_QUEUE_SIZE   (8U)
@@ -78,10 +81,16 @@ static void *_eventloop(void *arg)
 static void send(char *addr_str, char *port_str, char *data_len_str, unsigned int num,
                  unsigned int delay)
 {
+    int iface;
     uint16_t port;
     ipv6_addr_t addr;
     size_t data_len;
 
+    /* get interface, if available */
+    iface = ipv6_addr_split_iface(addr_str);
+    if ((iface < 0) && (gnrc_netif_numof() == 1)) {
+        iface = gnrc_netif_iter(NULL)->pid;
+    }
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("Error: unable to parse destination address");
@@ -122,6 +131,13 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
             puts("Error: unable to allocate IPv6 header");
             gnrc_pktbuf_release(udp);
             return;
+        }
+        /* add netif header, if interface was given */
+        if (iface > 0) {
+            gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+
+            ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
+            LL_PREPEND(ip, netif);
         }
         /* send packet */
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
