@@ -51,6 +51,10 @@ extern "C" {
                               .avgx = HTS221_PARAM_AVGX, \
                               .rate = HTS221_PARAM_RATE }
 #endif /* HTS221_PARAMS */
+
+#ifndef HTS221_SAULINFO
+#define HTS221_SAULINFO     { .name = "hts221" }
+#endif
 /**@}*/
 
 /**
@@ -59,6 +63,14 @@ extern "C" {
 static const hts221_params_t hts221_params[] =
 {
     HTS221_PARAMS,
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t hts221_saul_info[] =
+{
+    HTS221_SAULINFO
 };
 
 #ifdef __cplusplus
