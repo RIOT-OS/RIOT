@@ -570,6 +570,37 @@ static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
 }
 
 /*
+ * Check listener structure
+ *
+ *  - resources should be sorted alphabetically
+ *
+ * returns 0 if check successful
+ */
+#ifdef DEVELHELP
+static int _check_listener(gcoap_listener_t *listener)
+{
+    const char *prev_path = "";
+    const char *path = NULL;
+    int ret = 0;
+
+    for (size_t i = 0; i < listener->resources_len; i++) {
+        coap_resource_t *resource = &listener->resources[i];
+        path = resource->path;
+
+        if (strcmp(prev_path, path) > 0) {
+            DEBUG_PRINT("WARN: [gcoap] resources not sorted %s > %s\n",
+                        prev_path, path);
+            ret = 1;
+        }
+        prev_path = path;
+    }
+    return ret;
+}
+#else
+static int _check_listener(gcoap_listener_t *listener) {(void) listener; return 0;}
+#endif
+
+/*
  * gcoap interface functions
  */
 
@@ -594,6 +625,8 @@ kernel_pid_t gcoap_init(void)
 
 void gcoap_register_listener(gcoap_listener_t *listener)
 {
+    _check_listener(listener);
+
     /* Add the listener to the end of the linked list. */
     gcoap_listener_t *_last = _coap_state.listeners;
     while (_last->next) {

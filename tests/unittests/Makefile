@@ -229,6 +229,7 @@ ifeq (, $(UNIT_TESTS))
 else
   CFLAGS += -DTEST_SUITES='$(subst $() $(),$(charCOMMA),$(UNIT_TESTS:tests-%=%))'
 endif
+CFLAGS += -DDEVELHELP
 
 test:
 	./tests/01-run.py
