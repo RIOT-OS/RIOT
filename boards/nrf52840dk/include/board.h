@@ -22,7 +22,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "cpu.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,11 +73,6 @@ extern "C" {
 #define BTN3_PIN            GPIO_PIN(0, 25)
 #define BTN3_MODE           GPIO_IN_PU
 /** @} */
-
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }
