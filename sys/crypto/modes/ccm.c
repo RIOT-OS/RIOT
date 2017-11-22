@@ -167,7 +167,10 @@ int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data, uint32_t auth_data_
     }
 
     /* MAC calulation (T) with additional data and plaintext */
-    ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
+    len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
+    if (len < 0) {
+        return len;
+    }
     len = ccm_compute_cbc_mac(cipher, mac_iv, input, input_len, mac);
     if (len < 0) {
         return len;
@@ -245,7 +248,10 @@ int cipher_decrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
     }
 
     /* MAC calulation (T) with additional data and plaintext */
-    ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
+    len = ccm_compute_adata_mac(cipher, auth_data, auth_data_len, mac_iv);
+    if (len < 0) {
+        return len;
+    }
     len = ccm_compute_cbc_mac(cipher, mac_iv, plain, plain_len, mac);
     if (len < 0) {
         return len;
