@@ -24,15 +24,15 @@ static uint8_t TEST_1_KEY[] = {
     0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,
     0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF
 };
-static uint8_t TEST_1_KEY_LEN = 16;
+static size_t TEST_1_KEY_LEN = 16;
 
 static uint8_t TEST_1_NONCE[] = {
     0x00, 0x00, 0x00, 0x03, 0x02, 0x01, 0x00, 0xA0,
     0xA1, 0xA2, 0xA3, 0xA4, 0xA5
 };
-static uint8_t TEST_1_NONCE_LEN = 13;
+static size_t TEST_1_NONCE_LEN = 13;
 
-static uint8_t TEST_1_MAC_LEN = 8;
+static size_t TEST_1_MAC_LEN = 8;
 
 static uint8_t TEST_1_INPUT[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, /* additional auth data */
@@ -40,8 +40,8 @@ static uint8_t TEST_1_INPUT[] = {
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, /* input */
     0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E        /* input */
 };
-static uint8_t TEST_1_INPUT_LEN = 23;
-static uint8_t TEST_1_ADATA_LEN = 8;
+static size_t TEST_1_INPUT_LEN = 23;
+static size_t TEST_1_ADATA_LEN = 8;
 
 static uint8_t TEST_1_EXPECTED[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
@@ -50,22 +50,22 @@ static uint8_t TEST_1_EXPECTED[] = {
     0x6D, 0x5F, 0x6B, 0x61, 0xDA, 0xC3, 0x84, 0x17,
     0xE8, 0xD1, 0x2C, 0xFD, 0xF9, 0x26, 0xE0
 };
-static uint8_t TEST_1_EXPECTED_LEN = 39;
+static size_t TEST_1_EXPECTED_LEN = 39;
 
 /* PACKET VECTOR #2 (RFC 3610 - Page 10) */
 static uint8_t TEST_2_KEY[] = {
     0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,
     0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF
 };
-static uint8_t TEST_2_KEY_LEN = 16;
+static size_t TEST_2_KEY_LEN = 16;
 
 static uint8_t TEST_2_NONCE[] = {
     0x00, 0x00, 0x00, 0x04, 0x03, 0x02, 0x01, 0xA0,
     0xA1, 0xA2, 0xA3, 0xA4, 0xA5
 };
-static uint8_t TEST_2_NONCE_LEN = 13;
+static size_t TEST_2_NONCE_LEN = 13;
 
-static uint8_t TEST_2_MAC_LEN = 8;
+static size_t TEST_2_MAC_LEN = 8;
 
 static uint8_t TEST_2_INPUT[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
@@ -73,8 +73,8 @@ static uint8_t TEST_2_INPUT[] = {
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
     0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F
 };
-static uint8_t TEST_2_INPUT_LEN = 24;
-static uint8_t TEST_2_ADATA_LEN = 8;
+static size_t TEST_2_INPUT_LEN = 24;
+static size_t TEST_2_ADATA_LEN = 8;
 
 static uint8_t TEST_2_EXPECTED[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
@@ -83,19 +83,21 @@ static uint8_t TEST_2_EXPECTED[] = {
     0xCC, 0x15, 0xC4, 0x39, 0xC9, 0xE4, 0x3A, 0x3B,
     0xA0, 0x91, 0xD5, 0x6E, 0x10, 0x40, 0x09, 0x16
 };
-static uint8_t TEST_2_EXPECTED_LEN = 40;
+static size_t TEST_2_EXPECTED_LEN = 40;
+
+/* Share test buffer output */
+static uint8_t data[60];
 
 static void test_encrypt_op(uint8_t* key, uint8_t key_len,
-                            uint8_t* adata, uint8_t adata_len,
+                            uint8_t* adata, size_t adata_len,
                             uint8_t* nonce, uint8_t nonce_len,
-                            uint8_t* plain, uint8_t plain_len,
+                            uint8_t* plain, size_t plain_len,
                             uint8_t* output_expected,
-                            uint8_t output_expected_len,
+                            size_t output_expected_len,
                             uint8_t mac_length)
 {
     cipher_t cipher;
     int len, err, cmp;
-    uint8_t data[60];
     size_t len_encoding = nonce_and_len_encoding_size - nonce_len;
 
     err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
@@ -113,16 +115,15 @@ static void test_encrypt_op(uint8_t* key, uint8_t key_len,
 }
 
 static void test_decrypt_op(uint8_t* key, uint8_t key_len,
-                            uint8_t* adata, uint8_t adata_len,
+                            uint8_t* adata, size_t adata_len,
                             uint8_t* nonce, uint8_t nonce_len,
-                            uint8_t* encrypted, uint8_t encrypted_len,
+                            uint8_t* encrypted, size_t encrypted_len,
                             uint8_t* output_expected,
-                            uint8_t output_expected_len,
+                            size_t output_expected_len,
                             uint8_t mac_length)
 {
     cipher_t cipher;
     int len, err, cmp;
-    uint8_t data[60];
     size_t len_encoding = nonce_and_len_encoding_size - nonce_len;
 
     err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
