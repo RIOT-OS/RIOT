@@ -20,13 +20,18 @@
 #define CPU_CONF_H
 
 #include "cpu_conf_common.h"
+
 #include "cc2538.h"
 #include "cc2538_gpio.h"
 #include "cc2538_uart.h"
 #include "cc2538_gptimer.h"
 #include "cc2538_soc_adc.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #include "cc2538_ssi.h"
 #include "cc2538_rfcore.h"
+#pragma GCC diagnostic pop
+
 #include "cc2538_sys_ctrl.h"
 
 #ifdef __cplusplus
