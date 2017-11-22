@@ -317,6 +317,10 @@ void auto_init(void)
     extern void auto_init_hdc1000(void);
     auto_init_hdc1000();
 #endif
+#ifdef MODULE_HTS221
+    extern void auto_init_hts221(void);
+    auto_init_hts221();
+#endif
 #ifdef MODULE_DHT
     extern void auto_init_dht(void);
     auto_init_dht();
