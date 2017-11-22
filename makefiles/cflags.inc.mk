@@ -60,6 +60,9 @@ CFLAGS += -fno-common
 # Enable all default warnings
 CFLAGS += -Wall
 
+#
+CFLAGS += -pedantic
+
 ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
   ifneq (1,$(FORCE_ASSERTS))
     CFLAGS += -DNDEBUG
