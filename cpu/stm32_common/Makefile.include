@@ -16,3 +16,7 @@ LINKER_SCRIPT ?= stm32_common.ld
 export INCLUDES += -I$(RIOTCPU)/stm32_common/include
 
 include $(RIOTCPU)/stm32_common/stm32_mem_lengths.mk
+
+ifneq (,$(CCMRAM_LEN))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
+endif
