@@ -12,7 +12,7 @@
 
 #include "tests-core.h"
 
-#define TEST_CIB_SIZE  2
+#define TEST_CIB_SIZE  (4)
 
 static cib_t cib;
 
@@ -23,8 +23,9 @@ static void set_up(void)
 
 static void test_cib_put(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, cib_put(&cib));
-    TEST_ASSERT_EQUAL_INT(1, cib_put(&cib));
+    for (unsigned i = 0; i < TEST_CIB_SIZE; i++) {
+        TEST_ASSERT_EQUAL_INT(i, cib_put(&cib));
+    }
     TEST_ASSERT_EQUAL_INT(-1, cib_put(&cib));
 }
 
@@ -59,16 +60,6 @@ static void test_cib_avail(void)
     TEST_ASSERT_EQUAL_INT(2, cib_avail(&cib));
 }
 
-static void test_cib_put_and_get(void)
-{
-    TEST_ASSERT_EQUAL_INT(0, cib_put(&cib));
-    TEST_ASSERT_EQUAL_INT(0, cib_get(&cib));
-    TEST_ASSERT_EQUAL_INT(-1, cib_get(&cib));
-    TEST_ASSERT_EQUAL_INT(1, cib_put(&cib));
-    TEST_ASSERT_EQUAL_INT(0, cib_put(&cib));
-    TEST_ASSERT_EQUAL_INT(-1, cib_put(&cib));
-}
-
 static void test_empty_cib(void)
 {
     cib_init(&cib, 0);
@@ -94,7 +85,6 @@ Test *tests_core_cib_tests(void)
         new_TestFixture(test_cib_put),
         new_TestFixture(test_cib_get),
         new_TestFixture(test_cib_avail),
-        new_TestFixture(test_cib_put_and_get),
         new_TestFixture(test_empty_cib),
         new_TestFixture(test_singleton_cib),
         new_TestFixture(test_cib_peek),
