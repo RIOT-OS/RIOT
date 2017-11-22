@@ -79,9 +79,12 @@ static uint8_t TEST_2_EXPECTED[] = {
 };
 static uint8_t TEST_2_EXPECTED_LEN = 40;
 
-static void test_encrypt_op(uint8_t* key, uint8_t key_len, uint8_t* adata,
-                            uint8_t adata_len, uint8_t* nonce, uint8_t nonce_len, uint8_t* plain,
-                            uint8_t plain_len, uint8_t* output_expected, uint8_t output_expected_len)
+static void test_encrypt_op(uint8_t* key, uint8_t key_len,
+                            uint8_t* adata, uint8_t adata_len,
+                            uint8_t* nonce, uint8_t nonce_len,
+                            uint8_t* plain, uint8_t plain_len,
+                            uint8_t* output_expected,
+                            uint8_t output_expected_len)
 {
     cipher_t cipher;
     int len, err, cmp;
@@ -100,9 +103,12 @@ static void test_encrypt_op(uint8_t* key, uint8_t key_len, uint8_t* adata,
 
 }
 
-static void test_decrypt_op(uint8_t* key, uint8_t key_len, uint8_t* adata,
-                            uint8_t adata_len, uint8_t* nonce, uint8_t nonce_len, uint8_t* encrypted,
-                            uint8_t encrypted_len, uint8_t* output_expected, uint8_t output_expected_len)
+static void test_decrypt_op(uint8_t* key, uint8_t key_len,
+                            uint8_t* adata, uint8_t adata_len,
+                            uint8_t* nonce, uint8_t nonce_len,
+                            uint8_t* encrypted, uint8_t encrypted_len,
+                            uint8_t* output_expected,
+                            uint8_t output_expected_len)
 {
     cipher_t cipher;
     int len, err, cmp;
@@ -152,7 +158,7 @@ Test* tests_crypto_modes_ccm_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_modes_ccm_encrypt),
-                        new_TestFixture(test_crypto_modes_ccm_decrypt)
+        new_TestFixture(test_crypto_modes_ccm_decrypt),
     };
 
     EMB_UNIT_TESTCALLER(crypto_modes_ccm_tests, NULL, NULL, fixtures);
