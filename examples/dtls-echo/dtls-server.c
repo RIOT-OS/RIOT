@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2018 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +12,9 @@
  * @{
  *
  * @file
- * @brief       The server side of TinyDTLS (Simple echo)
+ * @brief       Demonstrating the server side of TinyDTLS (Simple echo)
  *
- * @author      Raul A. Fuentes Samaniego  <ra.fuentes.sam+RIOT@gmail.com>
+ * @author      Raul A. Fuentes Samaniego <ra.fuentes.sam+RIOT@gmail.com>
  * @author      Olaf Bergmann <bergmann@tzi.org>
  * @author      Hauke Mehrtens <hauke@hauke-m.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
@@ -24,16 +25,9 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "net/gnrc.h"
-#include "net/gnrc/ipv6.h"
-#include "net/gnrc/netif.h"
-#include "net/gnrc/netif/hdr.h"
-#include "net/gnrc/udp.h"
-#include "timex.h"
-#include "utlist.h"
-#include "xtimer.h"
+#include "net/sock/udp.h"
 #include "msg.h"
-
+#include "tinydtls_keys.h"
 
 /* TinyDTLS */
 #include "dtls.h"
@@ -43,210 +37,167 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-//#define DEFAULT_PORT 20220    /* DTLS default port  */
-#define DEFAULT_PORT 61618      /* First valid FEBx address  */
+#ifndef DTLS_DEFAULT_PORT
+#define DTLS_DEFAULT_PORT 20220 /* DTLS default port */
+#endif
 
-/* TODO: MAke this local! */
-static dtls_context_t *dtls_context = NULL;
+#define DTLS_STOP_SERVER_MSG 0x4001 /* Custom IPC type msg. */
 
-static const unsigned char ecdsa_priv_key[] = {
-    0xD9, 0xE2, 0x70, 0x7A, 0x72, 0xDA, 0x6A, 0x05,
-    0x04, 0x99, 0x5C, 0x86, 0xED, 0xDB, 0xE3, 0xEF,
-    0xC7, 0xF1, 0xCD, 0x74, 0x83, 0x8F, 0x75, 0x70,
-    0xC8, 0x07, 0x2D, 0x0A, 0x76, 0x26, 0x1B, 0xD4
-};
+/*
+ * This structure will be used for storing the sock and the remote into the
+ * dtls_context_t variable.
+ *
+ * This is because remote must not have port set to zero on sock_udp_create()
+ * making impossible to recover the remote with sock_udp_get_remote()
+ *
+ * An alternative is to modify dtls_handle_message () to receive the remote
+ * from sock_udp_recv(). Also, it's required to modify _send_to_peer_handler()  for
+ * parsing an auxiliary sock_udp_ep_t variable from the dls session.
+ */
+typedef struct {
+    sock_udp_t *sock;
+    sock_udp_ep_t *remote;
+} dtls_remote_peer_t;
 
-static const unsigned char ecdsa_pub_key_x[] = {
-    0xD0, 0x55, 0xEE, 0x14, 0x08, 0x4D, 0x6E, 0x06,
-    0x15, 0x59, 0x9D, 0xB5, 0x83, 0x91, 0x3E, 0x4A,
-    0x3E, 0x45, 0x26, 0xA2, 0x70, 0x4D, 0x61, 0xF2,
-    0x7A, 0x4C, 0xCF, 0xBA, 0x97, 0x58, 0xEF, 0x9A
-};
-
-static const unsigned char ecdsa_pub_key_y[] = {
-    0xB4, 0x18, 0xB6, 0x4A, 0xFE, 0x80, 0x30, 0xDA,
-    0x1D, 0xDC, 0xF4, 0xF4, 0x2E, 0x2F, 0x26, 0x31,
-    0xD0, 0x43, 0xB1, 0xFB, 0x03, 0xE2, 0x2F, 0x4D,
-    0x17, 0xDE, 0x43, 0xF9, 0xF9, 0xAD, 0xEE, 0x70
-};
-
-
-static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(
-                                                     GNRC_NETREG_DEMUX_CTX_ALL,
-                                                     KERNEL_PID_UNDEF);
+static kernel_pid_t _dtls_server_pid = KERNEL_PID_UNDEF;
 
 #define READER_QUEUE_SIZE (8U)
-char _server_stack[THREAD_STACKSIZE_MAIN + THREAD_EXTRA_STACKSIZE_PRINTF];
 
-static kernel_pid_t _dtls_kernel_pid;
-
-/**
- * @brief This care about getting messages and continue with the DTLS flights
- */
-static void dtls_handle_read(dtls_context_t *ctx, gnrc_pktsnip_t *pkt)
-{
-
-    static session_t session;
-
-    /*
-     * NOTE: GNRC (Non-socket) issue: we need to modify the current
-     * DTLS Context for the IPv6 src (and in a future the port src).
-     */
-
-    /* Taken from the tftp server example */
-    char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    gnrc_pktsnip_t *tmp2;
-
-    tmp2 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
-    ipv6_hdr_t *hdr = (ipv6_hdr_t *)tmp2->data;
-
-    ipv6_addr_to_str(addr_str, &hdr->src, sizeof(addr_str));
-    /* This is unique to the server (Non-socket) */
-    ctx->app = addr_str;
-
-    /*
-     * TODO: More testings with TinyDTLS is neccesary, but seem this is safe.
-     */
-    tmp2 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);
-    udp_hdr_t *udp = (udp_hdr_t *)tmp2->data;
-
-    session.size = sizeof(ipv6_addr_t) + sizeof(unsigned short);
-    session.port = byteorder_ntohs(udp->src_port);
-
-    ipv6_addr_from_str(&session.addr, addr_str);
-
-    dtls_handle_message(ctx, &session, pkt->data, (unsigned int)pkt->size);
-
-}
-
-
-/**
- * @brief We got the TinyDTLS App Data message and answer with the same
- */
-static int read_from_peer(struct dtls_context_t *ctx,
-                          session_t *session, uint8 *data, size_t len)
-{
-
-
-#if ENABLE_DEBUG == 1
-  size_t i;
-  DEBUG("\nDBG-Server: Data from Client: ---");
-    for (i = 0; i < len; i++)
-        DEBUG("%c", data[i]);
-    DEBUG("--- \t Sending echo..\n");
+/*  NOTE: Temporary patch for tinyDTLS 0.8.6 */
+#ifndef TINYDTLS_EXTRA_BUFF
+#define TINYDTLS_EXTRA_BUFF (0U)
 #endif
-    /* echo incoming application data */
-    dtls_write(ctx, session, data, len);
-    return 0;
+
+char _dtls_server_stack[THREAD_STACKSIZE_MAIN +
+                        THREAD_EXTRA_STACKSIZE_PRINTF +
+                        TINYDTLS_EXTRA_BUFF];
+
+/*
+ * Handles all the packets arriving at the node and identifies those that are
+ * DTLS records. Also, it determines if said DTLS record is coming from a new
+ * peer or a currently established peer.
+ */
+static void dtls_handle_read(dtls_context_t *ctx)
+{
+    static session_t session;
+    static uint8_t packet_rcvd[DTLS_MAX_BUF];
+
+    assert(ctx);
+    assert(dtls_get_app_data(ctx));
+
+    if (!ctx) {
+        DEBUG("No DTLS context!\n");
+        return;
+    }
+
+    if (!dtls_get_app_data(ctx)) {
+        DEBUG("No app_data stored!\n");
+        return;
+    }
+
+    dtls_remote_peer_t *remote_peer;
+    remote_peer = (dtls_remote_peer_t *)dtls_get_app_data(ctx);
+
+    ssize_t res = sock_udp_recv(remote_peer->sock, packet_rcvd, DTLS_MAX_BUF,
+                                1 * US_PER_SEC, remote_peer->remote);
+
+    if (res <= 0) {
+        if ((ENABLE_DEBUG) && (res != -EAGAIN) && (res != -ETIMEDOUT)) {
+            DEBUG("sock_udp_recv unexepcted code error: %i\n", (int)res);
+        }
+        return;
+    }
+
+    DEBUG("DBG-Server: Record Rcvd\n");
+
+    /* (DTLS) session requires the remote peer address (IPv6:Port) and netif */
+    session.size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
+    session.port = remote_peer->remote->port;
+    if (remote_peer->remote->netif ==  SOCK_ADDR_ANY_NETIF) {
+        session.ifindex = SOCK_ADDR_ANY_NETIF;
+    }
+    else {
+        session.ifindex = remote_peer->remote->netif;
+    }
+
+    if (memcpy(&session.addr, &remote_peer->remote->addr.ipv6, 16) == NULL) {
+        puts("ERROR: memcpy failed!");
+        return;
+    }
+
+    dtls_handle_message(ctx, &session, packet_rcvd, (int)DTLS_MAX_BUF);
+
+    return;
 }
 
-/**
- * @brief This will try to transmit using only GNRC stack (non-socket).
- */
-static int gnrc_sending(char *addr_str, char *data, size_t data_len, unsigned short rem_port )
+/* Reception of a DTLS Application data record. */
+static int _read_from_peer_handler(struct dtls_context_t *ctx,
+                                   session_t *session, uint8 *data, size_t len)
 {
-    int iface;
-    ipv6_addr_t addr;
-    gnrc_pktsnip_t *payload, *udp, *ip;
+    size_t i;
 
-    /* get interface, if available */
-    iface = ipv6_addr_split_iface(addr_str);
-    if ((iface < 0) && (gnrc_netif_numof() == 1)) {
-        iface = gnrc_netif_iter(NULL)->pid;
+    printf("\nServer: got DTLS Data App: --- ");
+    for (i = 0; i < len; i++) {
+        printf("%c", data[i]);
     }
-    /* parse destination address */
-    if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
-        puts("Error: unable to parse destination address");
-        return -1;
-    }
+    puts(" ---\t(echo!)");
 
-    payload = gnrc_pktbuf_add(NULL, data, data_len, GNRC_NETTYPE_UNDEF);
+    /* echo back the application data rcvd. */
+    return dtls_write(ctx, session, data, len);
+}
 
-    if (payload == NULL) {
-        puts("Error: unable to copy data to packet buffer");
-        return -1;
-    }
-
-    /* allocate UDP header */
-    udp = gnrc_udp_hdr_build(payload, DEFAULT_PORT, rem_port);
-    if (udp == NULL) {
-        puts("Error: unable to allocate UDP header");
-        gnrc_pktbuf_release(payload);
-        return -1;
-    }
-
-    /* allocate IPv6 header */
-    ip = gnrc_ipv6_hdr_build(udp, NULL, &addr);
-    if (ip == NULL) {
-        puts("Error: unable to allocate IPv6 header");
-        gnrc_pktbuf_release(udp);
-        return -1;
-    }
-    /* add netif header, if interface was given */
-    if (iface > 0) {
-        gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-
-        ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
-        LL_PREPEND(ip, netif);
-    }
-    /* send packet */
-
-    DEBUG("DBG-Server: Sending record to peer\n");
+/* Handles the DTLS communication with the other peer. */
+static int _send_to_peer_handler(struct dtls_context_t *ctx,
+                                 session_t *session, uint8 *buf, size_t len)
+{
 
     /*
-     * WARNING: Too fast and the nodes dies in middle of retransmissions.
-     *         This issue appears in the FIT-Lab (m3 motes).
+     * It's possible to create a sock_udp_ep_t variable. But, it's required
+     * to copy memory from the session variable to it.
      */
-    xtimer_usleep(500000);
-
-    /* Probably this part will be removed.  **/
-    if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
-        puts("Error: unable to locate UDP thread");
-        gnrc_pktbuf_release(ip);
-        return -1;
-    }
-
-    return 1;
-}
-
-/**
- * @brief We communicate with the other peer.
- */
-static int send_to_peer(struct dtls_context_t *ctx,
-                        session_t *session, uint8 *buf, size_t len)
-{
-
     (void) session;
 
-    /*FIXME TODO: dtls_get_app_data(ctx) should have the remote port! */
-    char *addr_str;
-    addr_str = (char *)dtls_get_app_data(ctx);
+    assert(ctx);
+    assert(dtls_get_app_data(ctx));
 
-    gnrc_sending(addr_str, (char *)buf, len, session->port);
+    if (!dtls_get_app_data(ctx)) {
+        return -1;
+    }
 
-    return len;
+    dtls_remote_peer_t *remote_peer;
+    remote_peer = (dtls_remote_peer_t *)dtls_get_app_data(ctx);
+
+    DEBUG("DBG-Server: Sending record\n");
+
+    return sock_udp_send(remote_peer->sock, buf, len, remote_peer->remote);
 }
 
 #ifdef DTLS_PSK
-/* This function is the "key store" for tinyDTLS. It is called to
- * retrieve a key for the given identity within this particular
- * session. */
-static int peer_get_psk_info(struct dtls_context_t *ctx, const session_t *session,
-             dtls_credentials_type_t type,
-             const unsigned char *id, size_t id_len,
-             unsigned char *result, size_t result_length)
-{
+static unsigned char psk_id[PSK_ID_MAXLEN] = PSK_DEFAULT_IDENTITY;
+static size_t psk_id_length = sizeof(PSK_DEFAULT_IDENTITY) - 1;
+static unsigned char psk_key[PSK_MAXLEN] = PSK_DEFAULT_KEY;
+static size_t psk_key_length = sizeof(PSK_DEFAULT_KEY) - 1;
 
+/*
+ * This function is the "key store" for tinyDTLS. It is called to retrieve a
+ * key for the given identity within this particular session.
+ */
+static int _peer_get_psk_info_handler(struct dtls_context_t *ctx, const session_t *session,
+                                      dtls_credentials_type_t type,
+                                      const unsigned char *id, size_t id_len,
+                                      unsigned char *result, size_t result_length)
+{
     (void) ctx;
     (void) session;
+
     struct keymap_t {
         unsigned char *id;
         size_t id_length;
         unsigned char *key;
         size_t key_length;
     } psk[3] = {
-        { (unsigned char *)"Client_identity", 15,
-          (unsigned char *)"secretPSK", 9 },
+        { (unsigned char *)psk_id, psk_id_length,
+          (unsigned char *)psk_key, psk_key_length },
         { (unsigned char *)"default identity", 16,
           (unsigned char *)"\x11\x22\x33", 3 },
         { (unsigned char *)"\0", 2,
@@ -258,7 +209,7 @@ static int peer_get_psk_info(struct dtls_context_t *ctx, const session_t *sessio
     }
 
     if (id) {
-        unsigned int i;
+        uint8_t i;
         for (i = 0; i < sizeof(psk) / sizeof(struct keymap_t); i++) {
             if (id_len == psk[i].id_length && memcmp(id, psk[i].id, id_len) == 0) {
                 if (result_length < psk[i].key_length) {
@@ -277,9 +228,9 @@ static int peer_get_psk_info(struct dtls_context_t *ctx, const session_t *sessio
 #endif /* DTLS_PSK */
 
 #ifdef DTLS_ECC
-static int peer_get_ecdsa_key(struct dtls_context_t *ctx,
-              const session_t *session,
-              const dtls_ecdsa_key_t **result)
+static int _peer_get_ecdsa_key_handler(struct dtls_context_t *ctx,
+                                       const session_t *session,
+                                       const dtls_ecdsa_key_t **result)
 {
     (void) ctx;
     (void) session;
@@ -290,162 +241,184 @@ static int peer_get_ecdsa_key(struct dtls_context_t *ctx,
         .pub_key_y = ecdsa_pub_key_y
     };
 
+    /* TODO: Load the key from external source */
+
     *result = &ecdsa_key;
     return 0;
 }
 
-static int peer_verify_ecdsa_key(struct dtls_context_t *ctx,
-                 const session_t *session,
-                 const unsigned char *other_pub_x,
-                 const unsigned char *other_pub_y,
-                 size_t key_size)
+static int _peer_verify_ecdsa_key_handler(struct dtls_context_t *ctx,
+                                          const session_t *session,
+                                          const unsigned char *other_pub_x,
+                                          const unsigned char *other_pub_y,
+                                          size_t key_size)
 {
     (void) ctx;
     (void) session;
     (void) other_pub_x;
     (void) other_pub_y;
     (void) key_size;
+
+    /* TODO: As far for tinyDTLS 0.8.2 this is not used */
+
     return 0;
 }
 #endif /* DTLS_ECC */
 
-/**
- * @brief We prepare the DTLS for this node.
- */
-static void init_dtls(void)
+/* DTLS variables and register are initialized. */
+dtls_context_t *_server_init_dtls(dtls_remote_peer_t *remote_peer)
 {
+    dtls_context_t *new_context = NULL;
+
     static dtls_handler_t cb = {
-        .write = send_to_peer,
-        .read  = read_from_peer,
+        .write = _send_to_peer_handler,
+        .read = _read_from_peer_handler,
         .event = NULL,
 #ifdef DTLS_PSK
-        .get_psk_info = peer_get_psk_info,
+        .get_psk_info = _peer_get_psk_info_handler,
 #endif  /* DTLS_PSK */
 #ifdef DTLS_ECC
-        .get_ecdsa_key = peer_get_ecdsa_key,
-        .verify_ecdsa_key = peer_verify_ecdsa_key
+        .get_ecdsa_key = _peer_get_ecdsa_key_handler,
+        .verify_ecdsa_key = _peer_verify_ecdsa_key_handler
 #endif  /* DTLS_ECC */
     };
 
-
 #ifdef DTLS_PSK
-    puts("Server support PSK");
+    DEBUG("Server support PSK\n");
 #endif
 #ifdef DTLS_ECC
-    puts("Server support ECC");
+    DEBUG("Server support ECC\n");
 #endif
 
-    DEBUG("DBG-Server On\n");
+#ifdef TINYDTLS_LOG_LVL
+    dtls_set_log_level(TINYDTLS_LOG_LVL);
+#endif
 
     /*
-     * The context for the server is a little different from the client.
-     * The simplicity of GNRC do not mix transparently with
-     * the DTLS Context. At this point, the server need a fresh context
-     * however dtls_context->app must be populated with an unknown
-     * IPv6 address.
-     *
-     * The non-valid Ipv6 address ( :: ) is discarded due the chaos.
-     * For now, the first value will be the loopback.
+     * The context for the server is different from the client.
+     * This is because sock_udp_create() cannot work with a remote endpoint
+     * with port set to 0. And even after sock_udp_recv(), sock_udp_get_remote()
+     * cannot retrieve the remote.
      */
-    char *addr_str = "::1";
+    new_context = dtls_new_context(remote_peer);
 
-    /*akin to syslog: EMERG, ALERT, CRITC, NOTICE, INFO, DEBUG */
-    dtls_set_log_level(DTLS_LOG_DEBUG);
-
-
-    dtls_context = dtls_new_context(addr_str);
-    if (dtls_context) {
-        dtls_set_handler(dtls_context, &cb);
+    if (new_context) {
+        dtls_set_handler(new_context, &cb);
     }
     else {
-        puts("Server was unable to generate DTLS Context!");
-        exit(-1);
+        return NULL;
     }
 
-
-
+    return new_context;
 }
 
-/* NOTE: wrapper or trampoline ? (Syntax question) */
-
-void *dtls_server_wrapper(void *arg)
+void *_dtls_server_wrapper(void *arg)
 {
-    (void) arg; /* TODO: Remove? We don't have args at all (NULL) */
+    (void) arg;
 
+    bool active = true;
     msg_t _reader_queue[READER_QUEUE_SIZE];
     msg_t msg;
 
-    /* The GNRC examples uses packet dump but we want a custom one */
+    sock_udp_t udp_socket;
+    sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
+    sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
+
+    dtls_context_t *dtls_context = NULL;
+    dtls_remote_peer_t remote_peer;
+
+    remote_peer.sock = &udp_socket;
+    remote_peer.remote = &remote;
+
+    /* Prepare (thread) messages reception */
     msg_init_queue(_reader_queue, READER_QUEUE_SIZE);
 
-    init_dtls();
+    /* NOTE: dtls_init() must be called previous to this (see main.c) */
 
-    /*
-     * FIXME: After mutliple retransmissions, and canceled client's sessions
-     * the server become unable to sent NDP NA messages. Still, the TinyDTLS
-     * debugs seems to be fine.
-     */
+    local.port = DTLS_DEFAULT_PORT;
+    ssize_t res = sock_udp_create(&udp_socket, &local, NULL, 0);
+    if (res == -1) {
+        puts("ERROR: Unable create sock.");
+        return (void *) NULL;
+    }
 
-    while (1) {
+    dtls_context = _server_init_dtls(&remote_peer);
 
-        /* wait for a message */
-        msg_receive(&msg);
+    if (!dtls_context) {
+        puts("ERROR: Server unable to load context!");
+        return (void *) NULL;
+    }
 
-        DEBUG("DBG-Server: Record Rcvd!\n");
-        dtls_handle_read(dtls_context, (gnrc_pktsnip_t *)(msg.content.ptr));
+    while (active) {
 
-        /*TODO: What happens with other clients connecting at the same time? */
+        msg_try_receive(&msg); /* Check if we got an (thread) message */
+        if (msg.type == DTLS_STOP_SERVER_MSG) {
+            active = false;
+        }
+        else {
+            /* Listening for any DTLS recodrd */
+            dtls_handle_read(dtls_context);
+        }
+    }
 
-    } /*While */
+    /* Release resources (strict order) */
+    dtls_free_context(dtls_context);    /* This also sends a DTLS Alert record */
+    sock_udp_close(&udp_socket);
+    msg_reply(&msg, &msg);              /* Basic answer to the main thread */
 
-    dtls_free_context(dtls_context);
+    return (void *) NULL;
 }
 
 static void start_server(void)
 {
-    uint16_t port;
-
-    port = (uint16_t)DEFAULT_PORT;
-
-    (void) _dtls_kernel_pid;
-
     /* Only one instance of the server */
-    if (server.target.pid != KERNEL_PID_UNDEF) {
-        printf("Error: server already running\n");
+    if (_dtls_server_pid != KERNEL_PID_UNDEF) {
+        puts("Error: server already running");
         return;
     }
 
-    /*TESTING tinydtls*/
-    dtls_init();
+    /* The server is initialized */
+    _dtls_server_pid = thread_create(_dtls_server_stack,
+                                     sizeof(_dtls_server_stack),
+                                     THREAD_PRIORITY_MAIN - 1,
+                                     THREAD_CREATE_STACKTEST,
+                                     _dtls_server_wrapper, NULL, "DTLS_Server");
 
-    /* The server is initialized  */
-    server.target.pid = thread_create(_server_stack, sizeof(_server_stack),
-                               THREAD_PRIORITY_MAIN - 1,
-                               THREAD_CREATE_STACKTEST,
-                               dtls_server_wrapper, NULL, "DTLS Server");
+    /* Uncommon but better be sure */
+    if (_dtls_server_pid == EINVAL) {
+        puts("ERROR: Thread invalid");
+        _dtls_server_pid = KERNEL_PID_UNDEF;
+        return;
+    }
 
-    server.demux_ctx = (uint32_t)port;
+    if (_dtls_server_pid == EOVERFLOW) {
+        puts("ERROR: Thread overflow!");
+        _dtls_server_pid = KERNEL_PID_UNDEF;
+        return;
+    }
 
-    if (gnrc_netreg_register(GNRC_NETTYPE_UDP, &server) == 0)
-      printf("Success: started DTLS server on port %" PRIu16 "\n", port);
-   else
-      printf("FAILURE: The UDP port is not registered!\n");
+    return;
 }
 
 static void stop_server(void)
 {
     /* check if server is running at all */
-    if (server.target.pid == KERNEL_PID_UNDEF) {
-        printf("Error: server was not running\n");
+    if (_dtls_server_pid == KERNEL_PID_UNDEF) {
+        puts("Error: DTLS server is not running");
         return;
     }
 
-    dtls_free_context(dtls_context);
+    /* prepare the stop message */
+    msg_t m;
+    m.type = DTLS_STOP_SERVER_MSG;
 
-    /* stop server */
-    gnrc_netreg_unregister(GNRC_NETTYPE_UDP, &server);
-    server.target.pid = KERNEL_PID_UNDEF;
-    puts("Success: stopped DTLS server");
+    DEBUG("Stopping server...\n");
+
+    /* send the stop message to thread AND wait for (any) answer */
+    msg_send_receive(&m, &m, _dtls_server_pid);
+
+    _dtls_server_pid = KERNEL_PID_UNDEF;
+    puts("Success: DTLS server stopped");
 }
 
 int udp_server_cmd(int argc, char **argv)
@@ -461,7 +434,7 @@ int udp_server_cmd(int argc, char **argv)
         stop_server();
     }
     else {
-        puts("error: invalid command");
+        printf("Error: invalid command. Usage: %s start|stop\n", argv[0]);
     }
     return 0;
 }

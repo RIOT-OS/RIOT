@@ -1,16 +1,12 @@
-# dtls_echo
+# dtls_echo example
 
-This example  shows you how to use TinyDTLS with the non-socket approach.
+This example shows how to use TinyDTLS with sock_udp.
 
-This code  is based on  ../gnrc_networking and ../gnrc_tftp.
-Is a good idea to read their README.md's for any doubt of how making the
-testings.
+## SOCK vs. Socket
 
-## SOCKET vs. Non-socket (GNRC)
-
-This example is configured to use the GNRC instead of  sockets (over GNRC).
-At the moment, the configuration must be done manually in the Makefile of
-this project.
+This example is configured to use socks instead of sockets (over GNRC).
+It's possible to use sockets, which give a more similar approach to the original
+Linux version of TinyDTLS. However, this is not tested yet.
 
 ## Fast configuration (Between RIOT instances):
 
@@ -29,49 +25,37 @@ Do not forget to copy the IPv6 addresses!
 For the client:
 
     PORT=tap0 make term
-    dtlsc <IPv6's server address> "DATA TO DATA TO DATA!"
+    dtlsc <IPv6's server address[%netif]> "DATA to send under encrypted channel!"
 
 # Testings
 ## Boards
 
-Those boards that do not support  the `../gnrc_networking` example are included
-in the `BOARD_INSUFFICIENT_MEMORY`, plus the  board `cc2650stk`.
+Boards that do not support the `../gnrc_networking` example are included
+in the `BOARD_INSUFFICIENT_MEMORY`, plus the board `cc2650stk`.
 
-There are certain boards that are having issues with `crypto.c` and
-`dtls_time.h` Which for now are in the the `BOARD_BLACKLIST`.
+The code has been tested in the FIT IOT-LAB tesbed with the remote
+`iotlab-m3` and `iotlab-a8-m3` boards and with local `samr21-xpro` boards.
 
-The boards that requires `periph_conf.h` are not tested.
+## Handling the static memory allocation
 
-Boards with problem type 1 (`crypto.c`):
-    z1
-    wsn430-v1_4
-    wsn430-v1_3b
-    waspmote-pro
-    msb-430h
-    msb-430
-    chronos
-    arduino-mega2560
+TinyDTLS for RIOT is using the `sys/memarray` module and therefore there
+are certain limits. Said resources are defined in
+`tinydtls/platform-specific/riot_boards.h`, but can be overwritten at
+compile time. Their default values are considered for having two DTLS
+contexts (for purpose of DTLS renegotiation).
 
-Boards with problem type 2 (`dtls_time.h`):
-    cc2538dk
-    msbiot
-    telosb
+The resources handled by memarray are:
+* `DTLS_CONTEXT_MAX` (default 2) The maximum number of DTLS context at the
+   same time.
+* `DTLS_PEER_MAX` (default 1) The maximum number DTLS peers (i.e. sessions).
+* `DTLS_HANDSHAKE_MAX` (default 1) The maximum number of concurrent DTLS handshakes.
+* `DTLS_SECURITY_MAX` (the sum of the previous two) The maximum number of
+   concurrently used cipher keys.
+* `DTLS_HASH_MAX` (Default: `3 * DTLS_PEER_MAX`) The maximum number of hash
+  functions that can be used in parallel.
 
-Boards with problem type 3 (Redifinition):
-    saml21-xpro
-    samr21-xpro
-    arduino-uno
-    arduino-duemilanove
+## Handling retransmissions
 
-NOTE: Those on type 1 can be benefit of the following PR:
-https://github.com/RIOT-OS/RIOT/issues/2360
-However, there are still issues to fix.
-
-NOTE: Those on type 2 can be fixed with the patch at
-https://github.com/RIOT-OS/RIOT/pull/5974
-
-## FIT-LAB
-
-The code has been tested in the FIT-LAB with M3 motes.
-However, erros can occurrs. Enabling the line `CFLAGS += -DNDEBUG` in
-the `Makefile` reduces the risk.
+By default, the number of transmissions of any DTLS record is settled to just
+one. This can be handled by `DTLS_DEFAULT_MAX_RETRANSMIT` (defined in
+`tinydtls/platform-specific/riot_boards.h`).
