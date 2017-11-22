@@ -106,6 +106,8 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
         len = mrf24j40_tx_load(dev, ptr->iov_base, ptr->iov_len, len);
         if (i == 0) {
             dev->header_len = len;
+            /* Grab the FCF bits from the frame header */
+            dev->fcf_low = *(uint8_t*)(ptr->iov_base);
         }
 
     }
