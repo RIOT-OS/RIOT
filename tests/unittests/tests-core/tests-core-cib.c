@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#include <limits.h>
+
 #include "embUnit.h"
 
 #include "cib.h"
@@ -37,6 +39,16 @@ static void test_cib_get(void)
     TEST_ASSERT_EQUAL_INT(-1, cib_get(&cib));
 }
 
+static void test_cib_get__overflow(void)
+{
+    /* XXX this is hacky, but bare with me ;-) */
+    cib.read_count = UINT_MAX;
+    cib.write_count = UINT_MAX;
+
+    TEST_ASSERT_EQUAL_INT(3, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT(3, cib_get(&cib));
+}
+
 static void test_cib_peek(void)
 {
     cib_init(&cib, TEST_CIB_SIZE);
@@ -49,6 +61,16 @@ static void test_cib_peek(void)
     TEST_ASSERT_EQUAL_INT(1, cib_peek(&cib));
     TEST_ASSERT_EQUAL_INT(1, cib_get(&cib));
     TEST_ASSERT_EQUAL_INT(-1, cib_peek(&cib));
+}
+
+static void test_cib_peek__overflow(void)
+{
+    /* XXX this is hacky, but bare with me ;-) */
+    cib.read_count = UINT_MAX;
+    cib.write_count = UINT_MAX;
+
+    TEST_ASSERT_EQUAL_INT(3, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT(3, cib_peek(&cib));
 }
 
 static void test_cib_avail(void)
@@ -84,10 +106,12 @@ Test *tests_core_cib_tests(void)
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_cib_put),
         new_TestFixture(test_cib_get),
+        new_TestFixture(test_cib_get__overflow),
         new_TestFixture(test_cib_avail),
         new_TestFixture(test_empty_cib),
         new_TestFixture(test_singleton_cib),
         new_TestFixture(test_cib_peek),
+        new_TestFixture(test_cib_peek__overflow),
     };
 
     EMB_UNIT_TESTCALLER(core_cib_tests, set_up, NULL, fixtures);
