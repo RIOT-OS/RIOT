@@ -114,6 +114,10 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
             return 1;
         case NETOPT_IPV6_IID:
             return _get_iid(dev, value, value_len);
+        case NETOPT_ADDR_LEN:
+        case NETOPT_SRC_LEN:
+            *((uint16_t *)value) = sizeof(cc110x->radio_address);
+            return sizeof(uint16_t);
         default:
             break;
     }
