@@ -13,7 +13,3 @@ endif
 ifneq (,$(filter tinydtls_ecc,$(USEMODULE)))
   DIRS += $(PKG_BUILDDIR)/ecc
 endif
-
-ifneq (,$(filter tinydtls_sha2,$(USEMODULE)))
-  DIRS += $(PKG_BUILDDIR)/sha2
-endif
