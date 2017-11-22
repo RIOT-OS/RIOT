@@ -652,7 +652,7 @@ ifneq (,$(filter l2filter_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gcoap,$(USEMODULE)))
-USEPKG += nanocoap
+USEMODULE += nanocoap
 USEMODULE += gnrc_sock_udp
 endif
 
