@@ -19,8 +19,8 @@
 
 #include <stdio.h>
 
-#include "nanocoap.h"
-#include "nanocoap_sock.h"
+#include "net/nanocoap.h"
+#include "net/nanocoap_sock.h"
 
 #include "xtimer.h"
 
