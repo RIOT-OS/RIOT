@@ -70,11 +70,11 @@ extern "C" {
 #define CC2538_RSSI_OFFSET          (-73)  /**< Signal strength offset value */
 #define CC2538_RF_SENSITIVITY       (-97)  /**< dBm typical, normal conditions */
 
-#define RFCORE_ASSERT(expr) (void)( (expr) || RFCORE_ASSERT_failure(#expr, __FUNCTION__, __LINE__) )
+#define RFCORE_ASSERT(expr) (void)( (expr) || RFCORE_ASSERT_failure(#expr, __func__, __LINE__) )
 
 #if DEVELHELP
 #define RFCORE_WAIT_UNTIL(expr) while (!(expr)) {                                        \
-    DEBUG("RFCORE_WAIT_UNTIL(%s) at line %u in %s()\n", #expr, __LINE__, __FUNCTION__);  \
+    DEBUG("RFCORE_WAIT_UNTIL(%s) at line %u in %s()\n", #expr, __LINE__, __func__);  \
     thread_yield();                                                                      \
 }
 #else

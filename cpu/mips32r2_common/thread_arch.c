@@ -112,7 +112,7 @@ void thread_stack_print(void)
 
     printf("Stack trace:\n");
     while (*sp != STACK_END_PAINT) {
-        printf(" 0x%p: 0x%08lx\n", sp, *sp);
+        printf(" 0x%p: 0x%08lx\n", (void*)sp, *sp);
         sp++;
     }
 }

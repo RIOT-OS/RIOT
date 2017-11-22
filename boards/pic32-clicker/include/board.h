@@ -34,7 +34,10 @@
 extern "C" {
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #include "vendor/p32mx470f512h.h"
+#pragma GCC diagnostic pop
 
 /**
  * @brief   Set how many increments of the count register per uS

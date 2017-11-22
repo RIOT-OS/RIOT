@@ -9,7 +9,11 @@
  */
 
 #include <stdint.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #include "vendor/p32mz2048efg100.h"
+#pragma GCC diagnostic pop
 
 /*
  * Note banked access only applies to MZ part MX only has 1 set of registers
