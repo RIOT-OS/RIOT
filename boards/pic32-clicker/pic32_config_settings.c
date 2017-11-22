@@ -9,7 +9,12 @@
  */
 
 #include <stdint.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #include "vendor/p32mx470f512h.h"
+#pragma GCC diagnostic pop
+
 /*
  *  DEVCFG3  @ 0x1FC02FF0
  *
