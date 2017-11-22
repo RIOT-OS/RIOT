@@ -68,7 +68,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 #endif
     /* configure bus */
     dev(bus)->CONFIG = mode;
-    dev(bus)->FREQUENCY = clk;
+    dev(bus)->FREQUENCY = clk << 1;
     /* enable the bus */
     dev(bus)->ENABLE = 1;
 
