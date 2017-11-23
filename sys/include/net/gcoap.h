@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Ken Bannister. All rights reserved.
+ * Copyright (c) 2015-2017 Ken Bannister. All rights reserved.
  *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -35,6 +35,7 @@
  * - Server Operation
  * - Client Operation
  * - Observe Server Operation
+ * - Detailed Message Init Options
  * - Implementation Notes
  * - Implementation Status
  *
@@ -92,17 +93,18 @@
  *
  * Allocate a buffer and a coap_pkt_t for the request.
  *
- * If there is a payload, follow the three steps below.
+ * If there is a payload, follow the steps below.
  *
  * -# Call gcoap_req_init() to initialize the request.
  * -# Write the request payload, starting at the updated _payload_ pointer
  *    in the coap_pkt_t.
  * -# Call gcoap_finish(), which updates the packet for the payload.
  *
- * If no payload, call only gcoap_request() to write the full request.
- * Alternatively, you still can use gcoap_req_init() and gcoap_finish(),
- * as described above. The gcoap_request() function is inline, and uses those
- * two functions.
+ * If no payload, you can use the single function gcoap_request() instead,
+ * which inlines gcoap_req_init() and gcoap_finish(). Also, if the default
+ * non-confirmable message type is unacceptable, change
+ * GCOAP_REQ_DEFAULT_MSG_TYPE. To select the message type for a single message,
+ * see section Detailed Message Init Options, below.
  *
  * Finally, call gcoap_req_send2() for the destination endpoint, as well as a
  * callback function for the host's response.
@@ -147,6 +149,10 @@
  *    in the coap_pkt_t.
  * -# Call gcoap_finish(), which updates the packet for the payload.
  *
+ * If the default message type for the init function is unacceptable, change
+ * GCOAP_OBS_DEFAULT_MSG_TYPE. To select the message type for a single message,
+ * see section Detailed Message Init Options, below.
+ *
  * Finally, call gcoap_obs_send() for the resource.
  *
  * ### Other considerations ###
@@ -156,8 +162,21 @@
  * GCOAP_OBS_VALUE_WIDTH.
  *
  * To cancel a notification, the server expects to receive a GET request with
- * the Observe option value set to 1. The server does not support cancellation
- * via a reset (RST) response to a non-confirmable notification.
+ * the Observe option value set to 1. A confirmable notification also may be
+ * cancelled by a reset (RST) response from the client.
+ *
+ * ## Detailed Message Init Options ##
+ *
+ * The gcoap_xxx_init() functions accept parameters that can change from
+ * message to message, for example the message code (GET, PUT, etc). On the
+ * other hand, some parameters, like message type, expect a default value and
+ * are not included in the init functions. For control over _all_ useful
+ * parameters, use gcoap_req_init_opts() for requests and gcoap_obs_init_opts()
+ * for observe notifications.
+ *
+ * The init opts functions accept a gcoap_send_opts_t structure, which includes
+ * all of the available attributes. The documentation for each function
+ * describes which attributes are read.
  *
  * ## Implementation Notes ##
  *
@@ -270,6 +289,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Message type used by default when creating a request
+ */
+#ifndef GCOAP_REQ_DEFAULT_MSG_TYPE
+#define GCOAP_REQ_DEFAULT_MSG_TYPE (COAP_TYPE_NON)
+#endif
+
+/**
  * @brief   Maximum length in bytes for a token
  */
 #define GCOAP_TOKENLEN_MAX      (8)
@@ -303,6 +329,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Value for send_limit in request memo when non-confirmable type
+ */
+#define GCOAP_SEND_LIMIT_NON    (-1)
+
+/**
  * @brief   Time in usec that the event loop waits for an incoming CoAP message
  */
 #ifndef GCOAP_RECV_TIMEOUT
@@ -332,6 +363,14 @@ extern "C" {
 #define GCOAP_MSG_TYPE_INTR     (0x1502)
 
 /**
+ * @name    Options for _find_req_memo() -- search on token or message ID
+ * @{
+ */
+#define GCOAP_FIND_REQ_TOKEN    (1)
+#define GCOAP_FIND_REQ_MSGID    (2)
+/** @} */
+
+/**
  * @brief   Maximum number of Observe clients; use 2 if not defined
  */
 #ifndef GCOAP_OBS_CLIENTS_MAX
@@ -354,6 +393,13 @@ extern "C" {
 #define GCOAP_OBS_MEMO_IDLE     (1) /**< Registration OK; no current activity */
 #define GCOAP_OBS_MEMO_PENDING  (2) /**< Resource changed; notification pending */
 /** @} */
+
+/**
+ * @brief   Message type used by default when creating a notification
+ */
+#ifndef GCOAP_OBS_DEFAULT_MSG_TYPE
+#define GCOAP_OBS_DEFAULT_MSG_TYPE (COAP_TYPE_NON)
+#endif
 
 /**
  * @brief   Width in bytes of the Observe option value for a notification
@@ -406,6 +452,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Count of PDU buffers available for resending confirmable messages
+ */
+#ifndef GCOAP_RESEND_BUFS_MAX
+#define GCOAP_RESEND_BUFS_MAX      (1)
+#endif
+
+/**
  * @brief   A modular collection of resources for a server
  */
 typedef struct gcoap_listener {
@@ -425,12 +478,38 @@ typedef void (*gcoap_resp_handler_t)(unsigned req_state, coap_pkt_t* pdu,
                                      sock_udp_ep_t *remote);
 
 /**
+ * @brief  Options for initialization of a request or an observe notification
+ *         to be sent.
+ */
+typedef struct {
+    unsigned msg_code;                  /**< Message code, a COAP_CODE_* */
+    unsigned msg_type;                  /**< Message type, a COAP_TYPE_* */
+    char *req_path;                     /**< URL path for a request */
+    const coap_resource_t *obs_resource; /**< Observation resource */
+} gcoap_send_opts_t;
+
+/**
+ * @brief  Extends request memo for resending a confirmable request.
+ */
+typedef struct {
+    sock_udp_ep_t remote_ep;            /**< Remote endpoint */
+    uint8_t *pdu_buf;                   /**< Buffer containing the PDU */
+    size_t pdu_len;                     /**< Length of pdu_buf */
+} gcoap_resend_t;
+
+/**
  * @brief   Memo to handle a response for a request
  */
 typedef struct {
     unsigned state;                     /**< State of this memo, a GCOAP_MEMO... */
-    uint8_t hdr_buf[GCOAP_HEADER_MAXLEN];
-                                        /**< Stores a copy of the request header */
+    int send_limit;                     /**< Remaining resends, 0 if none;
+                                             GCOAP_SEND_LIMIT_NON if non-confirmable */
+    union {
+        uint8_t hdr_buf[GCOAP_HEADER_MAXLEN];
+                                        /**< Copy of PDU header, if no resends */
+        gcoap_resend_t data;            /**< Endpoint and PDU buffer, for resend */
+    } msg;                              /**< Request message data; if confirmable,
+                                             supports resending message */
     gcoap_resp_handler_t resp_handler;  /**< Callback for the response */
     xtimer_t response_timer;            /**< Limits wait for response */
     msg_t timeout_msg;                  /**< For response timer */
@@ -462,6 +541,10 @@ typedef struct {
                                              observe memos */
     gcoap_observe_memo_t observe_memos[GCOAP_OBS_REGISTRATIONS_MAX];
                                         /**< Observed resource registrations */
+    uint8_t resend_bufs[GCOAP_RESEND_BUFS_MAX * GCOAP_PDU_BUF_SIZE];
+                                        /**< Buffers for PDU for request resends;
+                                             if first byte of an entry is zero,
+                                             the entry is available */
 } gcoap_state_t;
 
 /**
@@ -481,6 +564,22 @@ kernel_pid_t gcoap_init(void);
  * @param[in] listener  Listener containing the resources.
  */
 void gcoap_register_listener(gcoap_listener_t *listener);
+
+/**
+ * @brief   Initializes a CoAP request PDU on a buffer, including options for
+ *          the request.
+ *
+ * @param[out] pdu      Request metadata
+ * @param[out] buf      Buffer containing the PDU
+ * @param[in] len       Length of the buffer
+ * @param[in] opts      Request options; must include msg code, resource path,
+ *                      and msg type
+ *
+ * @return  0 on success
+ * @return  < 0 on error
+ */
+int gcoap_req_init_opts(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                        const gcoap_send_opts_t *opts);
 
 /**
  * @brief   Initializes a CoAP request PDU on a buffer.
@@ -598,6 +697,25 @@ static inline ssize_t gcoap_response(coap_pkt_t *pdu, uint8_t *buf,
                 ? gcoap_finish(pdu, 0, COAP_FORMAT_NONE)
                 : -1;
 }
+
+/**
+ * @brief   Initializes a CoAP Observe notification packet on a buffer, for the
+ *          observer registered for a resource
+ *
+ * Uses options to specify details for the request. First verifies that an
+ * observer has been registered for the resource.
+ *
+ * @param[out] pdu      Notification metadata
+ * @param[out] buf      Buffer containing the PDU
+ * @param[in] len       Length of the buffer
+ * @param[in] opts      Notification options; must include resource and msg type
+ *
+ * @return  GCOAP_OBS_INIT_OK     on success
+ * @return  GCOAP_OBS_INIT_ERR    on error
+ * @return  GCOAP_OBS_INIT_UNUSED if no observer for resource
+ */
+int gcoap_obs_init_opts(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                        const gcoap_send_opts_t *opts);
 
 /**
  * @brief   Initializes a CoAP Observe notification packet on a buffer, for the
