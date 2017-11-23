@@ -340,7 +340,6 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
     gnrc_netif_t *netif;
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
-    kernel_pid_t iface;
 
     if (!(ipv6_addr_is_global(dodag_id) || ipv6_addr_is_unique_local_unicast(dodag_id))) {
         DEBUG("RPL: dodag id (%s) must be a global or unique local IPv6 address\n",
@@ -353,7 +352,6 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
               ipv6_addr_to_str(addr_str, dodag_id, sizeof(addr_str)));
         return NULL;
     }
-    iface = netif->pid;
 
     if (gnrc_rpl_instance_add(instance_id, &inst)) {
         inst->of = (gnrc_rpl_of_t *) gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
@@ -370,7 +368,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
         return NULL;
     }
 
-    if (!gnrc_rpl_dodag_init(inst, dodag_id, iface)) {
+    if (!gnrc_rpl_dodag_init(inst, dodag_id, netif->pid)) {
         DEBUG("RPL: could not initialize DODAG\n");
         gnrc_rpl_instance_remove(inst);
         return NULL;
