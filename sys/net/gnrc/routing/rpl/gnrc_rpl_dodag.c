@@ -131,8 +131,6 @@ gnrc_rpl_instance_t *gnrc_rpl_instance_get(uint8_t instance_id)
 
 bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, kernel_pid_t iface)
 {
-    /* TODO: check if netif_addr belongs to iface */
-
     assert(instance && (instance->state > 0));
 
     gnrc_rpl_dodag_t *dodag = &instance->dodag;
