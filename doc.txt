@@ -9,8 +9,11 @@
 
 /**
  * @def DEVELHELP
- * @brief   This global macro activates some behavior that helps you while
- *          developing but is otherwise optimized out.
+ * @brief   This global macro activates functionality to help developers.
+ *
+ *          Additional code parts such as (extensive) debug output and sanity
+ *          checks using assertions. To activate it set environment variable
+ *          `DEVELHELP=1`, or disable explicitly with `DEVELHELP=0`.
  */
 #if DOXYGEN
 #   define DEVELHELP
