@@ -100,18 +100,6 @@ static void kinetis_mcg_enable_osc(void)
     /* Enable RF oscillator circuit */
     /* Current setting is that the OSC only runs in RUN and WAIT modes, see ref.man. */
     RSIM->CONTROL = (RSIM->CONTROL & ~RSIM_CONTROL_RF_OSC_EN_MASK) | RSIM_CONTROL_RF_OSC_EN(1);
-    /* Chip errata
-     * e10224: RSIM: XTAL_OUT_EN signal from the pin is enabled by default
-     *
-     * Description: The XTAL_OUT_EN signal from the default XTAL_OUT_EN pin,
-     * PTB0, is enabled out of reset. This will result in the reference
-     * oscillator being enabled when this pin is asserted high regardless of the
-     * port control multiplexor setting.
-     *
-     * Workaround: To prevent the pin from enabling the XTAL out feature
-     * unintentionally, set RSIM_RF_OSC_CTRL[RADIO_EXT_OSC_OVRD_EN]=1.
-     */
-    bit_set32(&RSIM->RF_OSC_CTRL, RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_EN_SHIFT);
 
     if (clock_config.enable_oscillator) {
         /* Disable RF oscillator bypass, if it was enabled before */
