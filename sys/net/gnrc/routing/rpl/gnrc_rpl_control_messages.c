@@ -746,11 +746,10 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
     while(gnrc_ipv6_nib_ft_iter(NULL, dodag->iface, &ft_state, &fte)) {
         DEBUG("RPL: Send DAO - building transit option\n");
 
-        if ((pkt = _dao_transit_build(NULL, lifetime, false)) == NULL) {
+        if ((pkt = _dao_transit_build(pkt, lifetime, false)) == NULL) {
             DEBUG("RPL: Send DAO - no space left in packet buffer\n");
             return;
         }
-
         if (ipv6_addr_is_global(&fte.dst)) {
             DEBUG("RPL: Send DAO - building target %s/%d\n",
                   ipv6_addr_to_str(addr_str, &fte.dst, sizeof(addr_str)), fte.dst_len);
@@ -759,7 +758,6 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
                 DEBUG("RPL: Send DAO - no space left in packet buffer\n");
                 return;
             }
-
         }
     }
 
