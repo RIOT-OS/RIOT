@@ -750,7 +750,8 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
             DEBUG("RPL: Send DAO - no space left in packet buffer\n");
             return;
         }
-        if (ipv6_addr_is_global(&fte.dst)) {
+        if (ipv6_addr_is_global(&fte.dst) &&
+            !ipv6_addr_is_unspecified(&fte.next_hop)) {
             DEBUG("RPL: Send DAO - building target %s/%d\n",
                   ipv6_addr_to_str(addr_str, &fte.dst, sizeof(addr_str)), fte.dst_len);
 
