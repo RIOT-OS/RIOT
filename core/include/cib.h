@@ -92,7 +92,7 @@ static inline unsigned int cib_full(const cib_t *cib)
  */
 static inline int cib_get(cib_t *__restrict cib)
 {
-    if (cib->write_count > cib->read_count) {
+    if (cib_avail(cib)) {
         return (int) (cib->read_count++ & cib->mask);
     }
 
@@ -108,7 +108,7 @@ static inline int cib_get(cib_t *__restrict cib)
  */
 static inline int cib_peek(cib_t *__restrict cib)
 {
-    if (cib->write_count > cib->read_count) {
+    if (cib_avail(cib)) {
         return (int) (cib->read_count & cib->mask);
     }
 
