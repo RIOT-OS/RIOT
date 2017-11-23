@@ -78,7 +78,7 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
     if (iface == KERNEL_PID_UNDEF) {
         netif = _find_interface_with_rpl_mcast();
 
-        if (netif == KERNEL_PID_UNDEF) {
+        if (netif == NULL) {
             DEBUG("RPL: no suitable interface found for this destination address\n");
             gnrc_pktbuf_release(pkt);
             return;
@@ -150,10 +150,25 @@ gnrc_pktsnip_t *_dio_dodag_conf_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *dod
 }
 
 #ifndef GNRC_RPL_WITHOUT_PIO
+static bool _get_pl_entry(unsigned iface, ipv6_addr_t *pfx,
+                          unsigned pfx_len, gnrc_ipv6_nib_pl_t *ple)
+{
+    void *state = NULL;
+
+    while (gnrc_ipv6_nib_pl_iter(iface, &state, ple)) {
+        if (ipv6_addr_match_prefix(&ple->pfx, pfx) >= pfx_len) {
+            return true;
+        }
+    }
+    return false;
+}
+
 gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *dodag)
 {
+    gnrc_ipv6_nib_pl_t ple;
     gnrc_rpl_opt_prefix_info_t *prefix_info;
     gnrc_pktsnip_t *opt_snip;
+
     if ((opt_snip = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_rpl_opt_prefix_info_t),
                                     GNRC_NETTYPE_UNDEF)) == NULL) {
         DEBUG("RPL: BUILD PREFIX INFO - no space left in packet buffer\n");
@@ -165,10 +180,17 @@ gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *do
     prefix_info->length = GNRC_RPL_OPT_PREFIX_INFO_LEN;
     /* auto-address configuration */
     prefix_info->LAR_flags = GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT;
-    /* TODO: Get real values from NIB_PL */
-    prefix_info->valid_lifetime = UINT32_MAX;
-    prefix_info->pref_lifetime = UINT32_MAX;
     prefix_info->prefix_len = 64;
+    if (_get_pl_entry(dodag->iface, &dodag->dodag_id, prefix_info->prefix_len,
+                      &ple)) {
+        prefix_info->valid_lifetime = byteorder_htonl(ple.valid_until);
+        prefix_info->pref_lifetime = byteorder_htonl(ple.pref_until);
+    }
+    else {
+        DEBUG("RPL: Prefix of DODAG-ID not in prefix list\n");
+        gnrc_pktbuf_release(pkt);
+        return NULL;
+    }
     prefix_info->reserved = 0;
 
     memset(&prefix_info->prefix, 0, sizeof(prefix_info->prefix));
@@ -403,9 +425,10 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                     break;
                 }
                 ipv6_addr_set_aiid(&pi->prefix, iid.uint8);
-                gnrc_netif_ipv6_addr_add(netif, &pi->prefix, pi->prefix_len,
-                                         GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
-                /* TODO: add to prefix list */
+                gnrc_netif_ipv6_addr_add(netif, &pi->prefix, pi->prefix_len, 0);
+                gnrc_ipv6_nib_pl_set(netif->pid, &pi->prefix, pi->prefix_len,
+                                     byteorder_ntohl(pi->valid_lifetime),
+                                     byteorder_ntohl(pi->pref_lifetime));
 
                 break;
 

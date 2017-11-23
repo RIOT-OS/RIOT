@@ -27,6 +27,7 @@
 extern "C" {
 #endif
 
+#include "byteorder.h"
 #include "net/ipv6/addr.h"
 #include "xtimer.h"
 #include "trickle.h"
@@ -189,14 +190,16 @@ typedef struct __attribute__((packed)) {
  *      </a>
  */
 typedef struct __attribute__((packed)) {
-    uint8_t type;               /**< option type */
-    uint8_t length;             /**< option length without the first two bytes */
-    uint8_t prefix_len;         /**< prefix length */
-    uint8_t LAR_flags;          /**< flags and resereved */
-    uint32_t valid_lifetime;    /**< valid lifetime */
-    uint32_t pref_lifetime;     /**< preferred lifetime */
-    uint32_t reserved;          /**< reserved */
-    ipv6_addr_t prefix;         /**< prefix used for Stateless Address Autoconfiguration */
+    uint8_t type;                       /**< option type */
+    uint8_t length;                     /**< option length without the first
+                                         *   two bytes */
+    uint8_t prefix_len;                 /**< prefix length */
+    uint8_t LAR_flags;                  /**< flags and resereved */
+    network_uint32_t valid_lifetime;    /**< valid lifetime */
+    network_uint32_t pref_lifetime;     /**< preferred lifetime */
+    uint32_t reserved;                  /**< reserved */
+    ipv6_addr_t prefix;                 /**< prefix used for Stateless Address
+                                         *   Autoconfiguration */
 } gnrc_rpl_opt_prefix_info_t;
 
 /**
