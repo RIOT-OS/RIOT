@@ -90,6 +90,16 @@ static void test_empty_cib(void)
     TEST_ASSERT_EQUAL_INT(-1, cib_put(&cib));
 }
 
+static void test_overflow_cib(void)
+{
+    cib_init(&cib, 4);
+    cib.read_count = 0xffffffff;
+    cib.write_count = 0xffffffff;
+    TEST_ASSERT_EQUAL_INT(0, cib_avail(&cib));
+    TEST_ASSERT_EQUAL_INT(3, cib_put(&cib));
+    TEST_ASSERT_EQUAL_INT(3, cib_get(&cib));
+}
+
 static void test_singleton_cib(void)
 {
     cib_init(&cib, 1);
@@ -109,6 +119,7 @@ Test *tests_core_cib_tests(void)
         new_TestFixture(test_cib_get__overflow),
         new_TestFixture(test_cib_avail),
         new_TestFixture(test_empty_cib),
+        new_TestFixture(test_overflow_cib),
         new_TestFixture(test_singleton_cib),
         new_TestFixture(test_cib_peek),
         new_TestFixture(test_cib_peek__overflow),
