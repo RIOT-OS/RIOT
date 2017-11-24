@@ -48,7 +48,7 @@ int8_t hal_init(void)
 
 uint8_t hal_getrand(void)
 {
-#if RANDOM_NUMOF
+#if defined(MODULE_PERIPH_HWRNG)
     uint8_t res;
     hwnrg_read((char *)&res, sizeof(res));
     return res;
