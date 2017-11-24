@@ -184,8 +184,13 @@ gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *do
     if (_get_pl_entry(dodag->iface, &dodag->dodag_id, prefix_info->prefix_len,
                       &ple)) {
         uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
-        prefix_info->valid_lifetime = byteorder_htonl((ple.valid_until - now) / MS_PER_SEC);
-        prefix_info->pref_lifetime = byteorder_htonl((ple.pref_until - now) / MS_PER_SEC);
+        uint32_t valid_ltime = (ple.valid_until < UINT32_MAX) ?
+                               (ple.valid_until - now) / MS_PER_SEC : UINT32_MAX;
+        uint32_t pref_ltime = (ple.pref_until < UINT32_MAX) ?
+                              (ple.pref_until - now) / MS_PER_SEC : UINT32_MAX;
+
+        prefix_info->valid_lifetime = byteorder_htonl(valid_ltime);
+        prefix_info->pref_lifetime = byteorder_htonl(pref_ltime);
     }
     else {
         DEBUG("RPL: Prefix of DODAG-ID not in prefix list\n");
@@ -353,6 +358,21 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
     }
 }
 
+static inline uint32_t _sec_to_ms(uint32_t sec)
+{
+    if (sec == UINT32_MAX) {
+        /* infinite stays infinite */
+        return UINT32_MAX;
+    }
+    else if (sec > ((UINT32_MAX - 1) / MS_PER_SEC)) {
+        /* truncate long intervals to largest possible value */
+        return UINT32_MAX - 1;
+    }
+    else {
+        return sec * MS_PER_SEC;
+    }
+}
+
 /** @todo allow target prefixes in target options to be of variable length */
 bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt, uint16_t len,
                     ipv6_addr_t *src, uint32_t *included_opts)
@@ -431,8 +451,8 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                                          GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
                 /* set lifetimes */
                 gnrc_ipv6_nib_pl_set(netif->pid, &pi->prefix, pi->prefix_len,
-                                     byteorder_ntohl(pi->valid_lifetime) * MS_PER_SEC,
-                                     byteorder_ntohl(pi->pref_lifetime) * MS_PER_SEC);
+                                     _sec_to_ms(byteorder_ntohl(pi->valid_lifetime)),
+                                     _sec_to_ms(byteorder_ntohl(pi->pref_lifetime)));
 
                 break;
 
