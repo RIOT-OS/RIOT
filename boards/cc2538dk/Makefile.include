@@ -11,6 +11,9 @@ PORT_LINUX ?= $(word 2,$(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh '^$
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
+# setup emulator
+include $(RIOTMAKE)/tools/renode.inc.mk
+
 # debugger config
 export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
