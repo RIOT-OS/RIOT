@@ -1,6 +1,0 @@
-/**
- * @defgroup pkg_emlib   Vendor library for EFM/EFR/EZR32 MCUs by Silicon Labs
- * @ingroup  pkg
- * @brief    Vendor library for EFM/EFR/EZR32 targets by Silicon Labs
- * @see      https://github.com/SiliconLabs/Gecko_SDK
- */
