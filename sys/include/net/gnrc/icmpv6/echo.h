@@ -23,7 +23,7 @@
 #include <inttypes.h>
 
 #include "byteorder.h"
-#include "kernel_types.h"
+#include "net/gnrc/netif.h"
 #include "net/ipv6/hdr.h"
 
 #ifdef __cplusplus
@@ -49,13 +49,13 @@ gnrc_pktsnip_t *gnrc_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
 /**
  * @brief   ICMPv6 echo request handler
  *
- * @param[in] iface     The interface the echo requuest was received on.
+ * @param[in] netif     The interface the echo request was received on.
  * @param[in] ipv6_hdr  The IPv6 header of the echo request.
  * @param[in] echo      The Echo Request message.
  * @param[in] len       Length of the echo request message (ipv6_hdr_t::len
  *                      of @p ipv6_hdr minus length of extension headers).
  */
-void gnrc_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
+void gnrc_icmpv6_echo_req_handle(gnrc_netif_t *netif, ipv6_hdr_t *ipv6_hdr,
                                  icmpv6_echo_t *echo, uint16_t len);
 
 #ifdef __cplusplus
