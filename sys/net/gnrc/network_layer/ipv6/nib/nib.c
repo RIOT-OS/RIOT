@@ -1058,6 +1058,12 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
             reset = true;
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
         }
+#if GNRC_IPV6_NIB_CONF_ARSM
+        else if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE) {
+            /* reduce back-off to possibly resolve neighbor sooner again */
+            entry->ns_sent = 3;
+        }
+#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
         if (pkt != NULL) {
 #if GNRC_IPV6_NIB_CONF_QUEUE_PKT
             if (_get_nud_state(entry) == GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE) {
