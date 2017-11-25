@@ -71,8 +71,16 @@ int main(void)
             puts("[Failed]");
             return 1;
         }
+
+        bool negative = (temperature < 0);
+        if (negative) {
+            temperature = -temperature;
+        }
+
         /* display results */
-        printf("temperature: %d.%02d C\n", temperature / 100, temperature % 100);
+        printf("temperature: %c%d.%02d C\n",
+                (negative) ? '-' : ' ',
+                temperature / 100, temperature % 100);
 
         /* sleep between measurements */
         xtimer_usleep(1000 * US_PER_MS);
