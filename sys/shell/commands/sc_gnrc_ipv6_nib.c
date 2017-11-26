@@ -63,7 +63,7 @@ static void _usage_nib_neigh(char **argv)
 static void _usage_nib_prefix(char **argv)
 {
     printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
-    printf("       %s %s add <iface> <prefix>[/<prefix_len>] [<valid in ms>] [<pref in ms>]\n",
+    printf("       %s %s add <iface> <prefix>[/<prefix_len>] [<valid in sec>] [<pref in sec>]\n",
            argv[0], argv[1]);
     printf("       %s %s del <iface> <prefix>[/<prefix_len>]\n", argv[0], argv[1]);
     printf("       %s %s show [iface]\n", argv[0], argv[1]);
@@ -156,10 +156,16 @@ static int _nib_prefix(int argc, char **argv)
             return 1;
         }
         if (argc > 5) {
-            valid_ltime = atoi(argv[5]);
+            uint32_t ltime_ms = atoi(argv[5]);
+            valid_ltime = (ltime_ms > UINT32_MAX / MS_PER_SEC) ?
+                          UINT32_MAX - 1 :
+                          ltime_ms * MS_PER_SEC;
         }
         if (argc > 6) {
-            pref_ltime = atoi(argv[6]);
+            uint32_t ltime_ms = atoi(argv[6]);
+            pref_ltime = (ltime_ms > UINT32_MAX / MS_PER_SEC) ?
+                         UINT32_MAX - 1 :
+                         ltime_ms * MS_PER_SEC;
         }
         gnrc_ipv6_nib_pl_set(iface, &pfx, pfx_len, valid_ltime, pref_ltime);
     }
