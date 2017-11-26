@@ -57,7 +57,7 @@ static void _usage_nib_neigh(char **argv)
     printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
     printf("       %s %s add <iface> <ipv6 addr> [<l2 addr>]\n", argv[0], argv[1]);
     printf("       %s %s del <ipv6 addr>\n", argv[0], argv[1]);
-    printf("       %s %s show <ipv6 addr>\n", argv[0], argv[1]);
+    printf("       %s %s show [iface]\n", argv[0], argv[1]);
 }
 
 static void _usage_nib_prefix(char **argv)
@@ -66,7 +66,7 @@ static void _usage_nib_prefix(char **argv)
     printf("       %s %s add <iface> <prefix>[/<prefix_len>] [<valid in ms>] [<pref in ms>]\n",
            argv[0], argv[1]);
     printf("       %s %s del <iface> <prefix>[/<prefix_len>]\n", argv[0], argv[1]);
-    printf("       %s %s show <iface>\n", argv[0], argv[1]);
+    printf("       %s %s show [iface]\n", argv[0], argv[1]);
 }
 
 static void _usage_nib_route(char **argv)
@@ -75,7 +75,7 @@ static void _usage_nib_route(char **argv)
     printf("       %s %s add <iface> <prefix>[/<prefix_len>] <next_hop> [<ltime in sec>]\n",
            argv[0], argv[1]);
     printf("       %s %s del <iface> <prefix>[/<prefix_len>]\n", argv[0], argv[1]);
-    printf("       %s %s show <iface>\n", argv[0], argv[1]);
+    printf("       %s %s show [iface]\n", argv[0], argv[1]);
 }
 
 static int _nib_neigh(int argc, char **argv)
