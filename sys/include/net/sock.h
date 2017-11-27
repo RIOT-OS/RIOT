@@ -103,6 +103,15 @@
 
 #include <stdint.h>
 
+#if defined(MODULE_SOCK_ASYNC) && !defined(DOXYGEN)
+#define SOCK_HAS_ASYNC      /**< allow sock_async to be defined as a provided
+                             *   feature of a stack */
+#endif
+
+#if defined(SOCK_HAS_ASYNC) && defined(RIOT_VERSION)
+#include "event.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -114,6 +123,7 @@ extern "C" {
  * @{
  */
 #define SOCK_HAS_IPV6       /**< activate IPv6 support */
+#define SOCK_HAS_ASYNC      /**< activate asynchronous event functionality */
 /** @} */
 #endif
 
@@ -151,6 +161,26 @@ extern "C" {
  * @brief   Special value meaning "wait forever" (don't timeout)
  */
 #define SOCK_NO_TIMEOUT     (UINT32_MAX)
+
+#if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
+/**
+ * @brief   Event types for asynchronous event functionality
+ * @note    Only available with @ref SOCK_HAS_ASYNC defined.
+ * @anchor  net_sock_event_type
+ * @{
+ */
+#define SOCK_EVENT_RECV     (0x00000001)    /**< Receive event */
+/** @} */
+
+/**
+ * @brief   Sock event
+ */
+typedef struct {
+    event_t super;          /**< event_callback_t structure that gets extended */
+    void *sock;             /**< sock that emitted the event */
+    uint32_t type;          /**< [Event type](@ref net_sock_event_type) flags */
+} sock_event_t;
+#endif
 
 /**
  * @brief   Abstract IP end point and end point for a raw IP sock object

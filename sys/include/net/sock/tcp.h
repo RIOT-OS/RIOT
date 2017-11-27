@@ -387,6 +387,26 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
                     sock_tcp_t *queue_array, unsigned queue_len,
                     uint16_t flags);
 
+#if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
+/**
+ * @brief   Set the event queue for asynchronous events for a TCP sock
+ *          object
+ *
+ * @pre     `sock != NULL`
+ *
+ * @note    Only one event queue per sock can be set. Since
+ *          event_queue_t::waiter only allows for one thread to own the queue.
+ *          This also implies, that **only one thread can execute the
+ *          @p handler**!
+ *
+ * @param[in] sock      The sock to set the event queue for. May not be `NULL`.
+ * @param[in] queue     The queue to set. May be `NULL` to unset the queue.
+ * @param[in] handler   The event handler. May be `NULL` to unset.
+ */
+void sock_tcp_set_event_handler(sock_tcp_t *sock, event_queue_t *queue,
+                                event_handler_t handler);
+#endif
+
 /**
  * @brief   Disconnects a TCP connection
  *
