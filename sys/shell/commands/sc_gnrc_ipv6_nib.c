@@ -56,7 +56,7 @@ static void _usage_nib_neigh(char **argv)
 {
     printf("usage: %s %s [show|add|del|help]\n", argv[0], argv[1]);
     printf("       %s %s add <iface> <ipv6 addr> [<l2 addr>]\n", argv[0], argv[1]);
-    printf("       %s %s del <ipv6 addr>\n", argv[0], argv[1]);
+    printf("       %s %s del <iface> <ipv6 addr>\n", argv[0], argv[1]);
     printf("       %s %s show [iface]\n", argv[0], argv[1]);
 }
 
@@ -114,11 +114,13 @@ static int _nib_neigh(int argc, char **argv)
     }
     else if ((argc > 3) && (strcmp(argv[2], "del") == 0)) {
         ipv6_addr_t ipv6_addr;
+        unsigned iface = atoi(argv[3]);
 
-        if (ipv6_addr_from_str(&ipv6_addr, argv[3]) == NULL) {
+        if (ipv6_addr_from_str(&ipv6_addr, argv[4]) == NULL) {
             _usage_nib_neigh(argv);
             return 1;
         }
+        (void)iface;
         gnrc_ipv6_nib_nc_del(&ipv6_addr);
     }
     else {
