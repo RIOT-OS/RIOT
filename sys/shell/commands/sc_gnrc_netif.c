@@ -430,7 +430,7 @@ static void _netif_list(kernel_pid_t iface)
     }
     res = gnrc_netapi_get(iface, NETOPT_HOP_LIMIT, 0, &u8, sizeof(u8));
     if (res > 0) {
-        printf("HL:%" PRIu16 "  ", u8);
+        printf("HL:%u  ", u8);
         line_thresh++;
     }
     line_thresh = _netif_list_flag(iface, NETOPT_IPV6_FORWARDING, "RTR  ",
