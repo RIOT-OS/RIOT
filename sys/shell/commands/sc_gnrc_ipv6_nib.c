@@ -115,7 +115,7 @@ static int _nib_neigh(int argc, char **argv)
     else if ((argc > 3) && (strcmp(argv[2], "del") == 0)) {
         ipv6_addr_t ipv6_addr;
 
-        if (ipv6_addr_from_str(&ipv6_addr, argv[4]) == NULL) {
+        if (ipv6_addr_from_str(&ipv6_addr, argv[3]) == NULL) {
             _usage_nib_neigh(argv);
             return 1;
         }
