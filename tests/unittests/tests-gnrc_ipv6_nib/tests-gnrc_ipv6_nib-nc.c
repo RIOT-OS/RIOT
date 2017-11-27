@@ -172,7 +172,7 @@ static void test_nib_nc_del__unknown(void)
         iface++;
         l2addr[7]++;
     }
-    gnrc_ipv6_nib_nc_del(&addr);
+    gnrc_ipv6_nib_nc_del(&addr, iface);
     while (gnrc_ipv6_nib_nc_iter(0, &iter_state, &nce)) {
         count++;
     }
@@ -193,7 +193,7 @@ static void test_nib_nc_del__success(void)
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_nc_set(&addr, IFACE, l2addr,
                                                   sizeof(l2addr)));
-    gnrc_ipv6_nib_nc_del(&addr);
+    gnrc_ipv6_nib_nc_del(&addr, IFACE);
     TEST_ASSERT(!gnrc_ipv6_nib_nc_iter(0, &iter_state, &nce));
 }
 
