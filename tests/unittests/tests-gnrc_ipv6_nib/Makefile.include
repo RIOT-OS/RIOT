@@ -1,5 +1,5 @@
 USEMODULE += gnrc_ipv6_nib
-USEMODULE += gnrc_ipv6_netif
+USEMODULE += gnrc_sixlowpan_nd  # required for GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 
 CFLAGS += -DGNRC_IPV6_NIB_CONF_ROUTER=1
 CFLAGS += -DGNRC_IPV6_NIB_NUMOF=16

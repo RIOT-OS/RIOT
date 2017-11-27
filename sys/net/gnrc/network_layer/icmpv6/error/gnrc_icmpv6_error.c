@@ -15,7 +15,6 @@
 #include "net/gnrc/pktbuf.h"
 
 #include "net/ipv6.h"
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/icmpv6.h"
 

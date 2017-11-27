@@ -23,6 +23,8 @@
 
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/sixlowpan/nd.h"
+#include "timex.h"
+#include "xtimer.h"
 
 #include "_nib-arsm.h"
 #include "_nib-internal.h"
@@ -30,6 +32,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+static inline uint32_t _now_min(void)
+{
+    return (uint32_t)((xtimer_now_usec64() / (US_PER_SEC * SEC_PER_MIN)) &
+                      UINT32_MAX);
+}
 
 #if GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN)
 /**
@@ -45,37 +53,53 @@ extern "C" {
 #define _ADDR_REG_STATUS_IGNORE         (4)
 
 /**
- * @brief   Checks if interface represents a 6LN
- *
- * @todo    Use corresponding function in `gnrc_netif2` instead.
- *
- * @param[in] netif A network interface.
- *
- * @return  true, when the @p netif represents a 6LN.
- * @return  false, when the @p netif does not represent a 6LN.
- */
-static inline bool _is_6ln(const gnrc_ipv6_netif_t *netif)
-{
-    return (netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN);
-}
-
-/**
  * @brief   Resolves address statically from destination address using reverse
  *          translation of the IID
  *
  * @param[in] dst   A destination address.
- * @param[in] iface The interface to @p dst.
+ * @param[in] netif The interface to @p dst.
  * @param[out] nce  Neighbor cache entry to resolve into
  *
  * @return  true when @p nce was set, false when not.
  */
-bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, kernel_pid_t iface,
+bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                              gnrc_ipv6_nib_nc_t *nce);
+
+/**
+ * @brief   Calculates exponential backoff for RS retransmissions
+ *
+ * @see [RFC 6775, section 5.3](https://tools.ietf.org/html/rfc6775#section-5.3)
+ *
+ * @param[in] netif The network interface that the RS will be sent over.
+ *
+ * @return  The interval in ms to the next RS
+ */
+static inline uint32_t _get_next_rs_interval(const gnrc_netif_t *netif)
+{
+    if (gnrc_netif_is_6ln(netif)) {
+        if (netif->ipv6.rs_sent < SIXLOWPAN_ND_MAX_RS_NUMOF) {
+            return SIXLOWPAN_ND_RS_MSEC_INTERVAL;
+        }
+        else {
+            unsigned exp = netif->ipv6.rs_sent - SIXLOWPAN_ND_MAX_RS_NUMOF;
+            uint32_t tmp = SIXLOWPAN_ND_RS_MSEC_INTERVAL +
+                           ((1 << exp) * (NDP_RS_MS_INTERVAL));
+
+            if (tmp > (SIXLOWPAN_ND_MAX_RS_SEC_INTERVAL * MS_PER_SEC)) {
+                tmp = SIXLOWPAN_ND_MAX_RS_SEC_INTERVAL * MS_PER_SEC;
+            }
+            return tmp;
+        }
+    }
+    else {
+        return NDP_RS_MS_INTERVAL;
+    }
+}
 
 /**
  * @brief   Handles ARO
  *
- * @param[in] iface     The interface the ARO-carrying message came over.
+ * @param[in] netif     The interface the ARO-carrying message came over.
  * @param[in] ipv6      The IPv6 header of the message carrying the ARO.
  * @param[in] icmpv6    The message carrying the ARO.
  * @param[in] aro       ARO that carries the address registration information.
@@ -85,16 +109,40 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, kernel_pid_t iface,
  * @return  registration status of the address (including
  *          @ref _ADDR_REG_STATUS_TENTATIVE and @ref _ADDR_REG_STATUS_IGNORE).
  */
-uint8_t _handle_aro(kernel_pid_t iface, const ipv6_hdr_t *ipv6,
+uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     const icmpv6_hdr_t *icmpv6,
                     const sixlowpan_nd_opt_ar_t *aro, const ndp_opt_t *sl2ao,
                     _nib_onl_entry_t *nce);
+
+/**
+ * @brief   Handler for @ref GNRC_IPV6_NIB_REREG_ADDRESS event handler
+ *
+ * @param[in] addr  An IPv6 address.
+ */
+void _handle_rereg_address(const ipv6_addr_t *addr);
+
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
+_nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro);
+uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
+                     const sixlowpan_nd_opt_6ctx_t *sixco,
+                     _nib_abr_entry_t *abr);
+#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
+uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
+                     const sixlowpan_nd_opt_6ctx_t *sixco);
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
 #else   /* GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN) */
-#define _is_6ln(netif)                              (false)
-#define _resolve_addr_from_ipv6(dst, iface, nce)    (false)
+#define _resolve_addr_from_ipv6(dst, netif, nce)    (false)
 /* _handle_aro() doesn't make sense without 6LR so don't even use it
  * => throw error in case it is compiled in => don't define it here as NOP macro
  */
+#define _get_next_rs_interval(netif)                (NDP_RS_MS_INTERVAL)
+#define _handle_rereg_address(netif)                (void)netif
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
+#define _handle_abro(abro)                          (NULL)
+#define _handle_6co(icmpv6, sixco, abr)             (UINT32_MAX)
+#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
+#define _handle_6co(icmpv6, sixco)                  (UINT32_MAX)
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN) */
 #endif  /* GNRC_IPV6_NIB_CONF_6LN || defined(DOXYGEN) */
 
 

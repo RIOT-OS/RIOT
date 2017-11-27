@@ -40,10 +40,6 @@
 #include "net/gnrc/ipv6.h"
 #endif
 
-#ifdef MODULE_GNRC_IPV6_NETIF
-#include "net/gnrc/ipv6/netif.h"
-#endif
-
 #ifdef MODULE_L2_PING
 #include "l2_ping.h"
 #endif
@@ -235,10 +231,6 @@ void auto_init(void)
 #endif
 
 #endif /* MODULE_AUTO_INIT_GNRC_NETIF */
-
-#ifdef MODULE_GNRC_IPV6_NETIF
-    gnrc_ipv6_netif_init_by_dev();
-#endif
 
 #ifdef MODULE_GNRC_UHCPC
     extern void auto_init_gnrc_uhcpc(void);

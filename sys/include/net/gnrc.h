@@ -203,6 +203,11 @@
  *       please refer to @ref gnrc_udp_hdr_build(), @ref gnrc_ipv6_hdr_build()
  *       etc. for more information.
  *
+ * @note GNRC is implemented according to the respective standards. So please
+ *       note, that sending to a IPv6 link-local address always requires you
+ *       by definition to also provide the interface you want to send to,
+ *       otherwise address resolution might fail.
+ *
  * How To Use
  * ==========
  * @ref net_gnrc is highly modular and can be adjusted to include only the
@@ -241,11 +246,10 @@
  *   USEMODULE += gnrc_ipv6_router
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *   respectively. Those modules provide the bare minimum of IPv6
- *   functionalities (no @ref net_gnrc_icmpv6, no @ref net_gnrc_ndp). Because
- *   of that, the @ref net_gnrc_ipv6_nc needs to be configured manually. If an
- *   IEEE 802.15.4 device is present @ref net_gnrc_sixlowpan will be included
- *   automatically, but no fragmentation or header compression support will be
- *   provided.
+ *   functionalities (no @ref net_gnrc_icmpv6). Because of that, the
+ *   @ref net_gnrc_ipv6_nib needs to be configured manually. If an IEEE 802.15.4
+ *   device is present @ref net_gnrc_sixlowpan will be included automatically,
+ *   but no fragmentation or header compression support will be provided.
  *
  * - For @ref net_gnrc_icmpv6_echo "ICMPv6 echo request/reply (ping)"
  *   functionality:

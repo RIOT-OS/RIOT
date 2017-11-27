@@ -62,6 +62,9 @@ int gnrc_ipv6_nib_ft_get(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 /**
  * @brief   Adds a new route to the forwarding table
  *
+ * If @p dst is the default route, the route will be configured to be the
+ * default route.
+ *
  * @param[in] dst       The destination to the route. May be NULL or `::` for
  *                      default route.
  * @param[in] dst_len   The prefix length of @p dst in bits. May be 0 for
@@ -69,16 +72,22 @@ int gnrc_ipv6_nib_ft_get(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
  * @param[in] next_hop  The next hop to @p dst/@p dst_len. May be NULL, if
  *                      @p dst/@p dst_len is no the default route.
  * @param[in] iface     The interface to @p next_hop. May not be 0.
+ * @param[in] lifetime  Lifetime of the route in seconds. 0 for infinite
+ *                      lifetime.
  *
  * @return  0, on success.
  * @return  -EINVAL, if a parameter was of invalid value.
  * @return  -ENOMEM, if there was no space left in forwarding table.
  */
 int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
-                         const ipv6_addr_t *next_hop, unsigned iface);
+                         const ipv6_addr_t *next_hop, unsigned iface,
+                         uint16_t lifetime);
 
 /**
  * @brief   Deletes a route from forwarding table.
+ *
+ * If @p dst is the default route, the function assures, that the current
+ * primary default route is removed first.
  *
  * @param[in] dst       The destination of the route. May be NULL or `::` for
  *                      default route.
