@@ -7,13 +7,13 @@
 # Distributed under terms of the MIT license.
 
 from __future__ import print_function
-import argparse
-import os, sys
+import os
+import sys
 import random
-import pexpect
 import subprocess
 import time
 import types
+import pexpect
 
 DEFAULT_TIMEOUT = 5
 
