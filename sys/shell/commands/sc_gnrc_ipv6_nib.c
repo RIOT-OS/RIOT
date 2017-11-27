@@ -120,8 +120,7 @@ static int _nib_neigh(int argc, char **argv)
             _usage_nib_neigh(argv);
             return 1;
         }
-        (void)iface;
-        gnrc_ipv6_nib_nc_del(&ipv6_addr);
+        gnrc_ipv6_nib_nc_del(&ipv6_addr, iface);
     }
     else {
         _usage_nib_neigh(argv);
