@@ -369,6 +369,14 @@ void mrf24j40_reset_state_machine(mrf24j40_t *dev);
 void mrf24j40_software_reset(mrf24j40_t *dev);
 
 /**
+ * @brief   Convert scalar from mrf24j40 RSSI to dBm
+ *
+ * @param[in] value         value to convert to dBm
+ * @return                  converted value in dBm
+ */
+int8_t mrf24j40_dbm_from_reg(uint8_t value);
+
+/**
  * @brief   Prepare for sending of data
  *
  * This function puts the given device into the TX state, so no receiving of

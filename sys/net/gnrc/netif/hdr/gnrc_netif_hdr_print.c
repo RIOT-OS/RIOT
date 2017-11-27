@@ -23,7 +23,7 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
     char addr_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 
     printf("if_pid: %u  ", (unsigned) hdr->if_pid);
-    printf("rssi: %u  ", (unsigned) hdr->rssi);
+    printf("rssi: %d  ", (signed) hdr->rssi);
     printf("lqi: %u\n", (unsigned) hdr->lqi);
     printf("flags: ");
 

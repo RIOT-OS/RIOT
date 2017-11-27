@@ -164,15 +164,17 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     (void)tmp;
 
     if (info != NULL) {
+        uint8_t rssi = 0;
         netdev_ieee802154_rx_info_t *radio_info = info;
         at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
 #ifndef MODULE_AT86RF231
-        at86rf2xx_fb_read(dev, &(radio_info->rssi), 1);
+        at86rf2xx_fb_read(dev, &(rssi), 1);
         at86rf2xx_fb_stop(dev);
 #else
         at86rf2xx_fb_stop(dev);
-        radio_info->rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
+        rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
 #endif
+        radio_info->rssi = RSSI_BASE_VAL + rssi;
     }
     else {
         at86rf2xx_fb_stop(dev);
