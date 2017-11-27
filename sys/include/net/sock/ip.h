@@ -332,6 +332,12 @@ typedef struct sock_ip sock_ip_t;
 int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
                    const sock_ip_ep_t *remote, uint8_t proto, uint16_t flags);
 
+#if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
+void sock_p_set_event_queue(sock_ip_t *sock, event_queue_t *queue);
+void sock_ip_set_event_handler(sock_ip_t *sock, sock_event_type_t *type,
+                               event_handler_t handler);
+#endif
+
 /**
  * @brief   Closes a raw IPv4/IPv6 sock object
  *

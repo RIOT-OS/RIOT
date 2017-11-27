@@ -387,6 +387,12 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
                     sock_tcp_t *queue_array, unsigned queue_len,
                     uint16_t flags);
 
+#if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
+void sock_tcp_set_event_queue(sock_tcp_t *sock, event_queue_t *queue);
+void sock_tcp_set_event_handler(sock_tcp_t *sock, sock_event_type_t *type,
+                                event_handler_t handler);
+#endif
+
 /**
  * @brief   Disconnects a TCP connection
  *

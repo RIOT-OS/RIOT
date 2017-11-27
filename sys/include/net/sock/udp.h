@@ -333,6 +333,12 @@ typedef struct sock_udp sock_udp_t;
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                     const sock_udp_ep_t *remote, uint16_t flags);
 
+#if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
+void sock_udp_set_event_queue(sock_udp_t *sock, event_queue_t *queue);
+void sock_udp_set_event_handler(sock_udp_t *sock, sock_event_type_t *type,
+                                event_handler_t handler);
+#endif
+
 /**
  * @brief   Closes a UDP sock object
  *
