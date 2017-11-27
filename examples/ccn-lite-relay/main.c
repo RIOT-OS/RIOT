@@ -25,6 +25,7 @@
 #include "shell.h"
 #include "ccn-lite-riot.h"
 #include "net/gnrc/netif.h"
+#include "net/gnrc/pktdump.h"
 
 /* main thread's message queue */
 #define MAIN_QUEUE_SIZE     (8)
@@ -54,6 +55,12 @@ int main(void)
         puts("Error registering at network interface!");
         return -1;
     }
+
+#ifdef MODULE_NETIF
+    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                          gnrc_pktdump_pid);
+    gnrc_netreg_register(GNRC_NETTYPE_CCN_CHUNK, &dump);
+#endif
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);

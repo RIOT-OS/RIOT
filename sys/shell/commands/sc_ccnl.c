@@ -29,7 +29,6 @@
 #define MAX_ADDR_LEN            (GNRC_NETIF_L2ADDR_MAXLEN)
 
 static unsigned char _int_buf[BUF_SIZE];
-static unsigned char _cont_buf[BUF_SIZE];
 
 static const char *_default_content = "Start the RIOT!";
 static unsigned char _out[CCNL_MAX_PACKET_SIZE];
@@ -206,26 +205,10 @@ int _ccnl_interest(int argc, char **argv)
     }
 
     memset(_int_buf, '\0', BUF_SIZE);
-    memset(_cont_buf, '\0', BUF_SIZE);
-
-    gnrc_netreg_entry_t _ne =
-        GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                   sched_active_pid);
-    /* register for content chunks */
-    gnrc_netreg_register(GNRC_NETTYPE_CCN_CHUNK, &_ne);
 
     struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, 0);
-    ccnl_send_interest(prefix, _int_buf, BUF_SIZE);
-    int res = 0;
-    if (ccnl_wait_for_chunk(_cont_buf, BUF_SIZE, 0) > 0) {
-        printf("Content received: %s\n", _cont_buf);
-    }
-    else {
-        printf("Timeout! No content received in response to the Interest for %s.\n", argv[1]);
-        res = -1;
-    }
+    int res = ccnl_send_interest(prefix, _int_buf, BUF_SIZE);
     free_prefix(prefix);
-    gnrc_netreg_unregister(GNRC_NETTYPE_CCN_CHUNK, &_ne);
 
     return res;
 }
