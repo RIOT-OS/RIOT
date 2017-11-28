@@ -1,6 +1,6 @@
 # include module specific includes
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include
-INCLUDES += -I$(RIOTCPU)/cortexm_common/include/vendor
+INCLUDES += -isystem$(RIOTCPU)/cortexm_common/include/vendor
 
 ifneq (,$(ROM_OFFSET))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFSET)

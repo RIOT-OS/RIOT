@@ -23,13 +23,14 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
+/* vendor header includes */
 #if defined(CPU_MODEL_STM32F103C8) || defined(CPU_MODEL_STM32F103CB) || defined(CPU_MODEL_STM32F103RB)
-#include "vendor/stm32f103xb.h"
+#include <stm32f103xb.h>
 #elif defined(CPU_MODEL_STM32F103RE)
-#include "vendor/stm32f103xe.h"
+#include <stm32f103xe.h>
 #endif
+
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {

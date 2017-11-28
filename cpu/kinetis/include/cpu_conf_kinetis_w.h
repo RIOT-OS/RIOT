@@ -25,11 +25,11 @@
 /* Kinetis KW2xD */
 #if defined(CPU_MODEL_MKW21D256VHA5) || \
     defined(CPU_MODEL_MKW21D512VHA5)
-#include "vendor/MKW21D5.h"
+#include <MKW21D5.h>
 #elif defined(CPU_MODEL_MKW22D512VHA5)
-#include "vendor/MKW22D5.h"
+#include <MKW22D5.h>
 #elif defined(CPU_MODEL_MKW24D512VHA5)
-#include "vendor/MKW24D5.h"
+#include <MKW24D5.h>
 #endif
 
 /**

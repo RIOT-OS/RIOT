@@ -21,27 +21,28 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
+/* vendor header includes */
 #if defined(CPU_MODEL_STM32F401RE)
-#include "vendor/stm32f401xe.h"
+#include <stm32f401xe.h>
 #elif defined(CPU_MODEL_STM32F407VG)
-#include "vendor/stm32f407xx.h"
+#include <stm32f407xx.h>
 #elif defined(CPU_MODEL_STM32F410RB)
-#include "vendor/stm32f410rx.h"
+#include <stm32f410rx.h>
 #elif defined(CPU_MODEL_STM32F411RE)
-#include "vendor/stm32f411xe.h"
+#include <stm32f411xe.h>
 #elif defined(CPU_MODEL_STM32F412ZG)
-#include "vendor/stm32f412zx.h"
+#include <stm32f412zx.h>
 #elif defined(CPU_MODEL_STM32F413ZH) || defined(CPU_MODEL_STM32F413VG)
-#include "vendor/stm32f413xx.h"
+#include <stm32f413xx.h>
 #elif defined(CPU_MODEL_STM32F415RG)
-#include "vendor/stm32f415xx.h"
+#include <stm32f415xx.h>
 #elif defined(CPU_MODEL_STM32F446RE) || defined(CPU_MODEL_STM32F446ZE)
-#include "vendor/stm32f446xx.h"
+#include <stm32f446xx.h>
 #elif defined(CPU_MODEL_STM32F429ZI)
-#include "vendor/stm32f429xx.h"
+#include <stm32f429xx.h>
 #endif
+
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {

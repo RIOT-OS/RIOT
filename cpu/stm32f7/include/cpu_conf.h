@@ -23,17 +23,18 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
+/* vendor header includes */
 #if defined(CPU_MODEL_STM32F746ZG)
-#include "vendor/stm32f746xx.h"
+#include <stm32f746xx.h>
 #elif defined(CPU_MODEL_STM32F767ZI)
-#include "vendor/stm32f767xx.h"
+#include <stm32f767xx.h>
 #elif defined(CPU_MODEL_STM32F769NI)
-#include "vendor/stm32f769xx.h"
+#include <stm32f769xx.h>
 #elif defined(CPU_MODEL_STM32F722ZE)
-#include "vendor/stm32f722xx.h"
+#include <stm32f722xx.h>
 #endif
+
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {

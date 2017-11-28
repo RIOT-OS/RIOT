@@ -22,9 +22,10 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
+/* vendor header includes */
+#include <em_device.h>
 
-#include "em_device.h"
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {

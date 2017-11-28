@@ -21,8 +21,10 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+/* vendor header includes */
+#include <sam0.h>
+
 #include "cpu_conf_common.h"
-#include "vendor/sam0.h"
 
 #ifdef __cplusplus
 extern "C" {

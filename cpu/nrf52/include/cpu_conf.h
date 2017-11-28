@@ -20,17 +20,18 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
+/* vendor header includes */
 #ifdef CPU_MODEL_NRF52832XXAA
-#include "vendor/nrf52.h"
-#include "vendor/nrf52_bitfields.h"
+#include <nrf52.h>
+#include <nrf52_bitfields.h>
 #elif defined(CPU_MODEL_NRF52840XXAA)
-#include "vendor/nrf52840.h"
-#include "vendor/nrf52840_bitfields.h"
+#include <nrf52840.h>
+#include <nrf52840_bitfields.h>
 #else
 #error "The CPU_MODEL of your board is currently not supported"
 #endif
+
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {

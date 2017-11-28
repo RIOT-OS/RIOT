@@ -20,8 +20,9 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include <sam.h>
+
 #include "cpu_conf_common.h"
-#include "vendor/sam.h"
 
 #ifdef __cplusplus
 extern "C" {

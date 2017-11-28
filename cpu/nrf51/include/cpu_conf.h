@@ -19,9 +19,11 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+/* vendor header includes */
+#include <nrf51.h>
+#include <nrf51_bitfields.h>
+
 #include "cpu_conf_common.h"
-#include "vendor/nrf51.h"
-#include "vendor/nrf51_bitfields.h"
 
 #ifdef __cplusplus
 extern "C" {

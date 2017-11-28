@@ -29,26 +29,27 @@
 extern "C" {
 #endif
 
-#include "hw_ints.h"
-#include "hw_memmap.h"
-#include "hw_nvic.h"
-#include "hw_sysctl.h"
-#include "hw_types.h"
-#include "cortex-m4-def.h"
-#include "stellaris_periph/cpu.h"
-#include "stellaris_periph/interrupt.h"
-#include "stellaris_periph/sysctl.h"
-#include "stellaris_periph/adc.h"
-#include "stellaris_periph/gpio.h"
-#include "stellaris_periph/timer.h"
-#include "stellaris_periph/pin_map.h"
-#include "stellaris_periph/uart.h"
-#include "stellaris_periph/ssi.h"
-#include "stellaris_periph/fpu.h"
-#include "stellaris_periph/rom.h"
+/* vendor header includes */
+#include <hw_ints.h>
+#include <hw_memmap.h>
+#include <hw_nvic.h>
+#include <hw_sysctl.h>
+#include <hw_types.h>
+#include <cortex-m4-def.h>
+#include <stellaris_periph/cpu.h>
+#include <stellaris_periph/interrupt.h>
+#include <stellaris_periph/sysctl.h>
+#include <stellaris_periph/adc.h>
+#include <stellaris_periph/gpio.h>
+#include <stellaris_periph/timer.h>
+#include <stellaris_periph/pin_map.h>
+#include <stellaris_periph/uart.h>
+#include <stellaris_periph/ssi.h>
+#include <stellaris_periph/fpu.h>
+#include <stellaris_periph/rom.h>
 
 #ifdef CPU_MODEL_LM4F120H5QR
-#include "vendor/lm4f120h5qr.h"
+#include <lm4f120h5qr.h>
 #endif
 
 /**

@@ -224,6 +224,14 @@ include $(RIOTMAKE)/defaultmodules.inc.mk
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
+# Add vendor header includes if present
+CPUVENDOR := $(wildcard $(RIOTCPU)/$(CPU)/include/vendor)
+ifneq (,$(CPUVENDOR))
+INCLUDES += -isystem$(CPUVENDOR)
+else
+$(info No CPU specific vendor headers found.)
+endif
+
 # Import all toolchain settings
 include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 

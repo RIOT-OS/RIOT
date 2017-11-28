@@ -23,13 +23,14 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#include "cpu_conf_common.h"
-
+/* vendor header includes */
 #if defined(CPU_MODEL_STM32L476RG)
-#include "vendor/stm32l476xx.h"
+#include <stm32l476xx.h>
 #elif defined(CPU_MODEL_STM32L432KC)
-#include "vendor/stm32l432xx.h"
+#include <stm32l432xx.h>
 #endif
+
+#include "cpu_conf_common.h"
 
 #ifdef __cplusplus
 extern "C" {
