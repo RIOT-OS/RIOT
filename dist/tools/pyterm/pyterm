@@ -24,9 +24,19 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
-
 import cmd, serial, socket, sys, threading, readline, time, logging, \
     os, argparse, re, codecs, signal
+
+try:
+    serial.Serial
+except AttributeError:
+    print("\033[1;37;41m\n")
+    print("Something went terribly wrong when loading the pyserial package.")
+    print("There is a good chance that you installed the 'serial' package instead")
+    print("of 'pyserial'. Try running 'pip uninstall serial && pip install pyserial'")
+    print("\033[0m")
+    sys.exit(1)
+
 
 # import twisted if available, define dummy classes otherwise
 try:
