@@ -9,7 +9,6 @@
 from __future__ import print_function
 import os
 import sys
-import time
 
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
