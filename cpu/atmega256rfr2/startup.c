@@ -13,9 +13,9 @@
  * @file
  * @brief       Startup code and interrupt vector definition
  *
- * @author     Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
- * @author     Josua Arndt <jarndt@ias.rwth-aachen.de>
- * @author     Steffen Robertz <steffen.robertz@rwth-aachen.de>
+ * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @}
  */
 

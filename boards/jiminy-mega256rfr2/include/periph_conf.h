@@ -94,7 +94,6 @@ extern "C" {
  * @name   PWM configuration
  * @{
  */
-#define PWM_NUMOF   (1U)
 
 /* To reduce confusion by steadily renaming hardware modules with different numbered drivers
  * namingconvention is not to start with 0 but to name driver with the number fitting the underlying timer module*/
@@ -116,12 +115,13 @@ static const pwm_conf_t pwm_config[] = {
         .bits = 16
     }
 };
+#define PWM_NUMOF   (sizeof(pwm_config)/sizeof(pwm_conf_t))
 /** @} */
 
 /**
  * @name Analog comparator configuration
+ * @{
  */
-#define AC_NUMOF    (1U)
 #define AC_0        (0U)
 
 static const ac_conf_t ac_config[] = {
@@ -131,11 +131,13 @@ static const ac_conf_t ac_config[] = {
     }
 };
 
+#define AC_NUMOF    (sizeof(ac_config)/sizeof(ac_conf_t))
 /*
  * since current Analog comparator ISR is to slow, we'll hardcode it into the module
  * and use the define to not include the line if the capacity_module isn't used
  */
 #define USES_CAPACITY_MODULE
+/** @} */
 
 /**
  * @name RTC configuartion
@@ -148,4 +150,5 @@ static const ac_conf_t ac_config[] = {
 }
 #endif
 
+/** @} */
 #endif /* PERIPH_CONF_H */
