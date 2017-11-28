@@ -50,6 +50,11 @@ int isrpipe_read(isrpipe_t *isrpipe, char *buffer, size_t count)
     return res;
 }
 
+int isrpipe_try_read(isrpipe_t *isrpipe, char *buf, size_t count)
+{
+    return tsrb_get(&isrpipe->tsrb, buf, count);
+}
+
 typedef struct {
     mutex_t *mutex;
     int flag;
