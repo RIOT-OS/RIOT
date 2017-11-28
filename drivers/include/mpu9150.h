@@ -160,12 +160,20 @@ typedef struct {
 } mpu9150_status_t;
 
 /**
+ * @brief   Device initialization parameters
+ */
+typedef struct {
+    i2c_t i2c;                  /**< I2C device which is used */
+    uint8_t addr;               /**< Hardware address of the MPU-9150 */
+    uint8_t comp_addr;          /**< Address of the MPU-9150s compass */
+    uint16_t sample_rate;       /**< Sample rate */
+} mpu9150_params_t;
+
+/**
  * @brief   Device descriptor for the MPU-9150 sensor
  */
 typedef struct {
-    i2c_t i2c_dev;              /**< I2C device which is used */
-    uint8_t hw_addr;            /**< Hardware address of the MPU-9150 */
-    uint8_t comp_addr;          /**< Address of the MPU-9150s compass */
+    mpu9150_params_t params;    /**< Device initialization parameters */
     mpu9150_status_t conf;      /**< Device configuration */
 } mpu9150_t;
 
@@ -173,15 +181,12 @@ typedef struct {
  * @brief   Initialize the given MPU9150 device
  *
  * @param[out] dev          Initialized device descriptor of MPU9150 device
- * @param[in]  i2c          I2C bus the sensor is connected to
- * @param[in]  hw_addr      The device's address on the I2C bus
- * @param[in]  comp_addr    The compass address on the I2C bus
+ * @param[in]  params       Initialization parameters
  *
  * @return                  0 on success
  * @return                  -1 if given I2C is not enabled in board config
  */
-int mpu9150_init(mpu9150_t *dev, i2c_t i2c, mpu9150_hw_addr_t hw_addr,
-        mpu9150_comp_addr_t comp_addr);
+int mpu9150_init(mpu9150_t *dev, const mpu9150_params_t *params);
 
 /**
  * @brief   Enable or disable accelerometer power
