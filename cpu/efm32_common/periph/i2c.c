@@ -254,3 +254,11 @@ void I2C_1_ISR(void)
     cortexm_isr_end();
 }
 #endif
+
+#ifdef I2C_2_ISR
+void I2C_2_ISR(void)
+{
+    i2c_progress[2] = I2C_Transfer(i2c_config[2].dev);
+    cortexm_isr_end();
+}
+#endif
