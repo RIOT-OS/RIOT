@@ -288,7 +288,7 @@ static int read_command(const pn532_t *dev, char *buff, unsigned len, int expect
      *
      * Note that all offsets are shifted by one since the first byte is always
      * 0x01. */
-    if ((r < len) || (buff[1] != 0x00) || (buff[2] != 0x00) || (buff[3] != 0xFF)) {
+    if ((r < (int)len) || (buff[1] != 0x00) || (buff[2] != 0x00) || (buff[3] != 0xFF)) {
         return -r;
     }
 
@@ -423,7 +423,7 @@ static int _rf_configure(pn532_t *dev, char *buff, unsigned cfg_item, char *conf
 {
     buff[BUFF_CMD_START ] = CMD_RF_CONFIG;
     buff[BUFF_DATA_START] = cfg_item;
-    for (int i = 1; i <= cfg_len; i++) {
+    for (unsigned i = 1; i <= cfg_len; i++) {
         buff[BUFF_DATA_START + i] = *config++;
     }
 
@@ -587,7 +587,7 @@ static int pn532_mifare_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card,
     buff[BUFF_DATA_START + 1] = MIFARE_CMD_READ;
     buff[BUFF_DATA_START + 2] = block; /* current block */
 
-    if (send_rcv(dev, buff, 3, len + 1) == len + 1) {
+    if (send_rcv(dev, buff, 3, len + 1) == (int)(len + 1)) {
         memcpy(odata, &buff[1], len);
         ret = 0;
     }
@@ -617,18 +617,14 @@ static int send_rcv_apdu(pn532_t *dev, char *buff, unsigned slen, unsigned rlen)
     int ret;
 
     rlen += 3;
-    if (rlen >= RAPDU_MAX_DATA_LEN) {
-        return -1;
-
-    }
-    else if (slen >= CAPDU_MAX_DATA_LEN) {
+    if ((rlen >= RAPDU_MAX_DATA_LEN) || (slen >= CAPDU_MAX_DATA_LEN)) {
         return -1;
     }
 
     ret = send_rcv(dev, buff, slen, rlen);
-    if (ret == rlen && buff[0] == 0x00) {
+    if ((ret == (int)rlen) && (buff[0] == 0x00)) {
         ret = (buff[rlen - 2] << 8) | buff[rlen - 1];
-        if (ret == 0x9000) {
+        if (ret == (int)0x9000) {
             ret = 0;
         }
     }

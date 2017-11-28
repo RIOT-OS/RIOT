@@ -722,7 +722,7 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
             _tftp_send_dack(ctxt, outbuf, TO_ACK);
 
             /* check if the data transfer has finished */
-            if (proc < ctxt->block_size) {
+            if (proc < (int)ctxt->block_size) {
                 DEBUG("tftp: transfer finished\n");
 
                 if (ctxt->stop_cb) {

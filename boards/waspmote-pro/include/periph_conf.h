@@ -29,7 +29,7 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
-#define CLOCK_CORECLOCK     (14745600L)
+#define CLOCK_CORECLOCK     (14745600UL)
 /** @} */
 
 /**

@@ -133,7 +133,7 @@ void msp430_init_dco(void)
 
     BCSCTL2 = SELM_2 + SELS;        /* MCLK und SMCLK = XT2 (safe) */
 #else
-    int delta = __msp430_cpu_speed >> 12;
+    unsigned int delta = __msp430_cpu_speed >> 12;
     unsigned int oldcapture = 0;
     unsigned int i;
 

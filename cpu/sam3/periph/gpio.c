@@ -106,7 +106,7 @@ static inline int _pin_num(gpio_t pin)
 /**
  * @brief Get context for a specific pin
  */
-static inline int _ctx(int port, int pin)
+static inline unsigned _ctx(int port, int pin)
 {
     return (exti_map[(port * 4) + (pin >> 3)] >> ((pin & 0x7) * 4)) & 0xf;
 }
@@ -125,7 +125,7 @@ static void _write_map(int port, int pin, int ctx)
  */
 static int _get_free_ctx(void)
 {
-    for (int i = 0; i < CTX_NUMOF; i++) {
+    for (unsigned i = 0; i < CTX_NUMOF; i++) {
         if (exti_ctx[i].cb == NULL) {
             return i;
         }
@@ -138,7 +138,7 @@ static int _get_free_ctx(void)
  */
 static void _ctx_clear(int port, int pin)
 {
-    int ctx = _ctx(port, pin);
+    unsigned ctx = _ctx(port, pin);
     if (ctx < CTX_NUMOF) {
         exti_ctx[ctx].cb = NULL;
         _write_map(port, pin, CTX_NUMOF);

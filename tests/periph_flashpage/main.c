@@ -35,7 +35,7 @@ static uint8_t page_mem[FLASHPAGE_SIZE];
 static int getpage(const char *str)
 {
     int page = atoi(str);
-    if ((page >= FLASHPAGE_NUMOF) || (page < 0)) {
+    if ((page >= (int)FLASHPAGE_NUMOF) || (page < 0)) {
         printf("error: page %i is invalid\n", page);
         return -1;
     }
@@ -195,7 +195,7 @@ static int cmd_edit(int argc, char **argv)
     }
 
     offset = atoi(argv[1]);
-    if (offset >= FLASHPAGE_SIZE) {
+    if (offset >= (int)FLASHPAGE_SIZE) {
         printf("error: given offset is out of bounce\n");
         return -1;
     }
@@ -225,7 +225,7 @@ static int cmd_test(int argc, char **argv)
         return 1;
     }
 
-    for (int i = 0; i < sizeof(page_mem); i++) {
+    for (unsigned i = 0; i < sizeof(page_mem); i++) {
         page_mem[i] = (uint8_t)fill++;
         if (fill > 'z') {
             fill = 'a';

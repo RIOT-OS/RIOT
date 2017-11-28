@@ -52,7 +52,8 @@ int main(void)
         msg_t msg;
         msg_receive(&msg);
         LOG_INFO("- got msg: %d\n", (MSG_QUEUE_LENGTH - idx));
-        if (msg.type != (MSG_QUEUE_LENGTH - idx) || msg_avail() != idx - 1) {
+        if ((int)msg.type != (MSG_QUEUE_LENGTH - idx)
+            || msg_avail() != idx - 1) {
             puts("[FAILED]");
             return 1;
         }

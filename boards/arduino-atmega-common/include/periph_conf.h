@@ -32,7 +32,7 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
-#define CLOCK_CORECLOCK     (16000000L)
+#define CLOCK_CORECLOCK     (16000000UL)
 /** @} */
 
 /**

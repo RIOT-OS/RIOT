@@ -44,7 +44,7 @@ uint16_t inet_csum_slice(uint16_t sum, const uint8_t *buf, uint16_t len, size_t 
         accum_len++;
     }
 
-    for (int i = 0; i < (len >> 1); buf += 2, i++) {
+    for (unsigned i = 0; i < (len >> 1); buf += 2, i++) {
         csum += (uint16_t)(*buf << 8) + *(buf + 1); /* group bytes by 16-byte words */
                                                     /* and add them */
     }

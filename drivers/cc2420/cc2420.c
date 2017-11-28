@@ -147,7 +147,7 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const struct iovec *data, unsigned count
     /* push packet length to TX FIFO */
     cc2420_fifo_write(dev, (uint8_t *)&pkt_len, 1);
     /* push packet to TX FIFO */
-    for (int i = 0; i < count; i++) {
+    for (unsigned i = 0; i < count; i++) {
         cc2420_fifo_write(dev, (uint8_t *)data[i].iov_base, data[i].iov_len);
     }
     DEBUG("cc2420: tx_prep: loaded %i byte into the TX FIFO\n", (int)pkt_len);
