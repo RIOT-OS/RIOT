@@ -262,6 +262,7 @@ ifneq (,$(filter veml6070,$(USEMODULE)))
 endif
 
 ifneq (,$(filter w5100,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += luid
 endif
