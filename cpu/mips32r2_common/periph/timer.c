@@ -35,7 +35,7 @@
 #include <sys/time.h>
 
 #ifdef EIC_IRQ
-#include "../include/eic_irq.h"
+#include "eic_irq.h"
 #endif
 
 /*

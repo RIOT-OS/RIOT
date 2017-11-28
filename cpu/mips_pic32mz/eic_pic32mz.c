@@ -10,7 +10,7 @@
 #include <assert.h>
 
 #include "board.h"
-#include "../mips32r2_common/include/eic_irq.h"
+#include "eic_irq.h"
 
 void eic_irq_configure(int irq_num)
 {
