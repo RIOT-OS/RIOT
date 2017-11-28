@@ -15,11 +15,11 @@
 #include "periph/uart.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #ifndef AT_PRINT_INCOMING
-#define AT_PRINT_INCOMING (0)
+#define AT_PRINT_INCOMING (1)
 #endif
 
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize)
@@ -239,4 +239,61 @@ out:
         *resp_buf = '\0';
     }
     return res;
+}
+
+void at_add_oob(at_dev_t *dev, at_oob_t *oob)
+{
+    assert(oob);
+    assert(oob->urc);
+    assert(oob->cb);
+
+    clist_rpush(&dev->oob_list, &oob->list_node);
+}
+
+void at_remove_oob(at_dev_t *dev, at_oob_t *oob)
+{
+    clist_remove(&dev->oob_list, &oob->list_node);
+}
+
+static int _check_oob(clist_node_t *node, void *arg)
+{
+    const char *buf = arg;
+    at_oob_t *oob = container_of(node, at_oob_t, list_node);
+
+    DEBUG("Trying to match with %s\n", oob->urc);
+
+    if (strncmp(buf, oob->urc, strlen(oob->urc)) == 0) {
+        oob->cb(oob->arg, buf);
+        return 1;
+    }
+
+    return 0;
+}
+
+void at_process_oob(at_dev_t *dev)
+{
+    char buf[AT_BUF_SIZE];
+    char *p;
+    size_t read = 0;
+
+    while (1) {
+        int res = isrpipe_try_read(&dev->isrpipe, buf + read, sizeof(buf) - read);
+        if (!res) {
+            return;
+        }
+        if (AT_PRINT_INCOMING) {
+            print(buf, res);
+        }
+        read += res;
+        if (buf[read - 1] != '\n') {
+            DEBUG("Not a full line\n");
+            continue;
+        }
+        p = buf;
+        while ((*p == '\r' || *p == '\n' || *p == ' ') && (p - buf < read)) {
+            p++;
+        }
+        clist_foreach(&dev->oob_list, _check_oob, p);
+        return;
+    }
 }
