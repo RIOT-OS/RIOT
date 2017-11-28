@@ -117,8 +117,6 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    assert((clk >= SPI_CLK_100KHZ) && (clk <= SPI_CLK_10MHZ));
-
     /* lock bus */
     mutex_lock(&locks[bus]);
     /* enable SPI device clock */

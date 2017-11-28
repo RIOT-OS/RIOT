@@ -39,19 +39,19 @@ extern "C" {
 #endif
 /* XTIMER_HZ is a power-of-two multiple of 1 MHz */
 /* e.g. cc2538 uses a 16 MHz timer */
-inline static uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
+static inline uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
     return (usec << XTIMER_SHIFT); /* multiply by power of two */
 }
 
-inline static uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
+static inline uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
     return (usec << XTIMER_SHIFT); /* multiply by power of two */
 }
 
-inline static uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
+static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
     return (ticks >> XTIMER_SHIFT); /* divide by power of two */
 }
 
-inline static uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
+static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
     return (ticks >> XTIMER_SHIFT); /* divide by power of two */
 }
 
@@ -61,38 +61,38 @@ inline static uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
 #endif
 /* 1 MHz is a power-of-two multiple of XTIMER_HZ */
 /* e.g. ATmega2560 uses a 250 kHz timer */
-inline static uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
+static inline uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
     return (usec >> XTIMER_SHIFT); /* divide by power of two */
 }
 
-inline static uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
+static inline uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
     return (usec >> XTIMER_SHIFT); /* divide by power of two */
 }
 
-inline static uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
+static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
     return (ticks << XTIMER_SHIFT); /* multiply by power of two */
 }
 
-inline static uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
+static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
     return (ticks << XTIMER_SHIFT); /* multiply by power of two */
 }
 #endif /* defined(XTIMER_SHIFT) && (XTIMER_SHIFT != 0) */
 #elif XTIMER_HZ == (1000000ul)
 /* This is the most straightforward as the xtimer API is based around
  * microseconds for representing time values. */
-inline static uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
+static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
     return ticks; /* no-op */
 }
 
-inline static uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
+static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
     return ticks; /* no-op */
 }
 
-inline static uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
+static inline uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
     return usec; /* no-op */
 }
 
-inline static uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
+static inline uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
     return usec; /* no-op */
 }
 
@@ -101,22 +101,22 @@ inline static uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
  * greatest common divisor between 32768 and 1000000 is 64, so instead of
  * multiplying by the fraction (32768 / 1000000), we will instead use
  * (512 / 15625), which reduces the truncation caused by the integer widths */
-inline static uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
+static inline uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
     return div_u32_by_15625div512(usec);
 }
 
-inline static uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
+static inline uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
     return div_u64_by_15625div512(usec);
 }
 
-inline static uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
+static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
     /* return (usec * 15625) / 512; */
     /* Using 64 bit multiplication to avoid truncating the top 9 bits */
     uint64_t usec = (uint64_t)ticks * 15625ul;
     return (usec >> 9); /* equivalent to (usec / 512) */
 }
 
-inline static uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
+static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
     /* return (usec * 15625) / 512; */
     uint64_t usec = (uint64_t)ticks * 15625ul;
     return (usec >> 9); /* equivalent to (usec / 512) */

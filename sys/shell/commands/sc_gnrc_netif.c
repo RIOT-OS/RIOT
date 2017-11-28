@@ -517,7 +517,7 @@ static void _netif_list(kernel_pid_t iface)
 static int _netif_set_u16(kernel_pid_t iface, netopt_t opt, uint16_t context,
                           char *u16_str)
 {
-    unsigned int res;
+    unsigned long int res;
     bool hex = false;
 
     if (_is_number(u16_str)) {
@@ -556,10 +556,10 @@ static int _netif_set_u16(kernel_pid_t iface, netopt_t opt, uint16_t context,
     printf(" on interface %" PRIkernel_pid " to ", iface);
 
     if (hex) {
-        printf("0x%04x\n", res);
+        printf("0x%04lx\n", res);
     }
     else {
-        printf("%u\n", res);
+        printf("%lu\n", res);
     }
 
     return 0;

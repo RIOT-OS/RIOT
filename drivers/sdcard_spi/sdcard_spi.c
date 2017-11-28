@@ -207,7 +207,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
                     return SD_INIT_SEND_CMD58;
                 }
                 acmd41_hcs_retries++;
-            } while (INIT_CMD_RETRY_CNT < 0 || acmd41_hcs_retries <= INIT_CMD_RETRY_CNT);;
+            } while ((INIT_CMD_RETRY_CNT < 0) || (acmd41_hcs_retries <= (int)INIT_CMD_RETRY_CNT));
             _unselect_card_spi(card);
             return SD_INIT_CARD_UNKNOWN;
 
@@ -223,7 +223,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
                     return SD_INIT_SEND_CMD16;
                 }
                 acmd41_retries++;
-            } while (INIT_CMD_RETRY_CNT < 0 || acmd41_retries <= INIT_CMD_RETRY_CNT);
+            } while ((INIT_CMD_RETRY_CNT < 0) || (acmd41_retries <= (int)INIT_CMD_RETRY_CNT));
 
             DEBUG("ACMD41: [ERROR]\n");
             return SD_INIT_SEND_CMD1;
@@ -373,7 +373,7 @@ static inline bool _wait_for_not_busy(sdcard_spi_t *card, int32_t max_retries)
 
     do {
         if (_dyn_spi_rxtx_byte(card, SD_CARD_DUMMY_BYTE, &read_byte) == 1) {
-            if (read_byte == 0xFF) {
+            if ((uint8_t)read_byte == 0xFF) {
                 DEBUG("_wait_for_not_busy: [OK]\n");
                 return true;
             }

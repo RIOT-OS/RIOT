@@ -322,7 +322,8 @@ int nrf24l01p_set_address_width(const nrf24l01p_t *dev, nrf24l01p_aw_t aw);
 * @return           0 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_payload_width(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width);
+int nrf24l01p_set_payload_width(const nrf24l01p_t *dev,
+                                nrf24l01p_rx_pipe_t pipe, uint8_t width);
 
 /**
 * @brief   Set the TX address for the nrf24l01+ transceiver (byte array).

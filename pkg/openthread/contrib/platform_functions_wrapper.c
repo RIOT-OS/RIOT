@@ -98,11 +98,17 @@ uint8_t ot_exec_command(otInstance *ot_instance, const char* command, void *arg,
 
 void output_bytes(const char* name, const uint8_t *aBytes, uint8_t aLength)
 {
+#if ENABLE_DEBUG
     DEBUG("%s: ", name);
     for (int i = 0; i < aLength; i++) {
         DEBUG("%02x", aBytes[i]);
     }
     DEBUG("\n");
+#else
+    (void)name;
+    (void)aBytes;
+    (void)aLength;
+#endif
 }
 
 OT_COMMAND ot_channel(otInstance* ot_instance, void* arg, void* answer) {
@@ -119,6 +125,8 @@ OT_COMMAND ot_channel(otInstance* ot_instance, void* arg, void* answer) {
 }
 
 OT_COMMAND ot_eui64(otInstance* ot_instance, void* arg, void* answer) {
+    (void)arg;
+
     if (answer != NULL) {
         otExtAddress address;
         otLinkGetFactoryAssignedIeeeEui64(ot_instance, &address);
@@ -132,6 +140,8 @@ OT_COMMAND ot_eui64(otInstance* ot_instance, void* arg, void* answer) {
 
 
 OT_COMMAND ot_extaddr(otInstance* ot_instance, void* arg, void* answer) {
+    (void)arg;
+
     if (answer != NULL) {
         answer = (void*)otLinkGetExtendedAddress(ot_instance);
         output_bytes("extaddr", (const uint8_t *)answer, OT_EXT_ADDRESS_SIZE);
@@ -172,6 +182,8 @@ OT_COMMAND ot_masterkey(otInstance* ot_instance, void* arg, void* answer) {
 }
 
 OT_COMMAND ot_mode(otInstance* ot_instance, void* arg, void* answer) {
+    (void)answer;
+
     if (arg != NULL) {
         otLinkModeConfig link_mode;
         memset(&link_mode, 0, sizeof(otLinkModeConfig));
@@ -233,6 +245,8 @@ OT_COMMAND ot_panid(otInstance* ot_instance, void* arg, void* answer) {
 }
 
 OT_COMMAND ot_parent(otInstance* ot_instance, void* arg, void* answer) {
+    (void)arg;
+
     if (answer != NULL) {
         otRouterInfo parentInfo;
         otThreadGetParentInfo(ot_instance, &parentInfo);
@@ -246,6 +260,8 @@ OT_COMMAND ot_parent(otInstance* ot_instance, void* arg, void* answer) {
 }
 
 OT_COMMAND ot_state(otInstance* ot_instance, void* arg, void* answer) {
+    (void)arg;
+
     if (answer != NULL) {
         uint8_t state = otThreadGetDeviceRole(ot_instance);
         *((uint8_t *) answer) = state;
@@ -280,6 +296,8 @@ OT_COMMAND ot_state(otInstance* ot_instance, void* arg, void* answer) {
 }
 
 OT_COMMAND ot_thread(otInstance* ot_instance, void* arg, void* answer) {
+    (void)answer;
+
     if (arg != NULL) {
         if (strcmp((char*)arg, "start") == 0) {
             otThreadSetEnabled(ot_instance, true);
