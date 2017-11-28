@@ -198,8 +198,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
 static gnrc_mac_tx_neighbor_t *_next_tx_neighbor(gnrc_netif_t *netif)
 {
-    int next = -1;
-
+    gnrc_mac_tx_neighbor_t *next = NULL;
     uint32_t phase_nearest = GNRC_LWMAC_PHASE_MAX;
 
     for (unsigned i = 0; i < GNRC_MAC_NEIGHBOR_COUNT; i++) {
@@ -210,14 +209,14 @@ static gnrc_mac_tx_neighbor_t *_next_tx_neighbor(gnrc_netif_t *netif)
             uint32_t phase_check = _gnrc_lwmac_ticks_until_phase(netif->mac.tx.neighbors[i].phase);
 
             if (phase_check <= phase_nearest) {
-                next = (int)i;
+                next = &(netif->mac.tx.neighbors[i]);
                 phase_nearest = phase_check;
                 DEBUG("[LWMAC-int] Advancing queue #%u\n", i);
             }
         }
     }
 
-    return (next < 0) ? NULL : &(netif->mac.tx.neighbors[next]);
+    return next;
 }
 
 static uint32_t _next_inphase_event(uint32_t last, uint32_t interval)
