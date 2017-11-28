@@ -167,8 +167,8 @@ void cc2538_i2c_init_master(i2c_t dev, uint32_t speed_hz)
     /* clear periph reset trigger */
     SYS_CTRL_SRI2C &= ~1;
 
-    gpio_init_af(SCL_PIN(dev), I2C_CMSSCL, GPIO_IN_PU);
-    gpio_init_af(SDA_PIN(dev), I2C_CMSSDA, GPIO_IN_PU);
+    gpio_init_af(SCL_PIN(dev), I2C_SCL_OUT, GPIO_IN_PU);
+    gpio_init_af(SDA_PIN(dev), I2C_SDA_OUT, GPIO_IN_PU);
 
     /* Initialize the I2C master by setting the Master Function Enable bit */
     I2CM_CR |= MFE;
