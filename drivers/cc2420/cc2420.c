@@ -175,6 +175,8 @@ void cc2420_tx_exec(cc2420_t *dev)
 
 int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 {
+    (void)info;
+
     uint8_t len;
     uint8_t crc_corr;
 

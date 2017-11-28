@@ -93,6 +93,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
+    (void) uart;
+
     for (size_t i = 0; i < len; i++) {
         while (UART->FR & UART_FR_TXFF) {}
         UART->DR = data[i];
@@ -101,6 +103,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 void uart_poweron(uart_t uart)
 {
+    (void) uart;
+
     PRCM->UARTCLKGR = 1;
     PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
     while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) {}
@@ -110,6 +114,8 @@ void uart_poweron(uart_t uart)
 
 void uart_poweroff(uart_t uart)
 {
+    (void) uart;
+
     UART->CTL = 0;
 
     PRCM->UARTCLKGR = 0;

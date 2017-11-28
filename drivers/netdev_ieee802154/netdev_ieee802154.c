@@ -30,6 +30,8 @@
 
 static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
 {
+    (void)max_len;
+
     uint8_t *addr;
     uint16_t addr_len;
 

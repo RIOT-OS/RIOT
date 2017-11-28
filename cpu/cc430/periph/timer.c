@@ -90,16 +90,19 @@ int timer_clear(tim_t dev, int channel)
 
 unsigned int timer_read(tim_t dev)
 {
+    (void)dev;
     return (unsigned int)TIMER_BASE->R;
 }
 
 void timer_start(tim_t dev)
 {
+    (void)dev;
     TIMER_BASE->CTL |= CTL_MC_CONT;
 }
 
 void timer_stop(tim_t dev)
 {
+    (void)dev;
     TIMER_BASE->CTL &= ~(CTL_MC_MASK);
 }
 

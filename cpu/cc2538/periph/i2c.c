@@ -163,6 +163,7 @@ static void recover_i2c_bus(void) {
 #ifdef MODULE_XTIMER
 static void _timer_cb(void *arg)
 {
+    (void)arg;
     mutex_unlock(&i2c_wait_mutex);
 }
 #endif
@@ -312,6 +313,8 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 
 int i2c_init_slave(i2c_t dev, uint8_t address)
 {
+    (void) dev;
+    (void) address;
     /* Slave mode is not (yet) supported. */
     return -1;
 }
