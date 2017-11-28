@@ -136,7 +136,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             payload_length, nettype);
 
     if(!pkt) {
-        DEBUG("cc110x: _recv: cannot allocate pktsnip.\n");
+        DEBUG("gnrc_cc110x: _recv: cannot allocate pktsnip.\n");
         return NULL;
     }
 
@@ -147,7 +147,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             GNRC_NETTYPE_NETIF);
 
     if (netif_hdr == NULL) {
-        DEBUG("gnrc_netdev_cc110x: no space left in packet buffer\n");
+        DEBUG("gnrc_cc110x: no space left in packet buffer\n");
         gnrc_pktbuf_release(pkt);
         return NULL;
     }
@@ -168,8 +168,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     ((gnrc_netif_hdr_t *)netif_hdr->data)->lqi = cc110x->pkt_buf.lqi;
     ((gnrc_netif_hdr_t *)netif_hdr->data)->rssi = cc110x->pkt_buf.rssi;
 
-    DEBUG("gnrc_netdev_cc110x: received packet from %02x"
-            " of length %u\n",
+    DEBUG("gnrc_cc110x: received packet from %02x of length %u\n",
             (unsigned)cc110x_pkt->phy_src,
             (unsigned)cc110x_pkt->length-CC110X_HEADER_LENGTH);
 #if defined(MODULE_OD) && ENABLE_DEBUG
