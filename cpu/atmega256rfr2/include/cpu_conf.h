@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017 RWTH Aachen, Josua Arndt
- *		 2015 Freie Universität Berlin, Hinnerk van Bruinehsen
+ *               2015 Freie Universität Berlin, Hinnerk van Bruinehsen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -36,8 +36,6 @@ extern "C" {
  * size tested sucessfully even with pretty small stacks.k
  * @{
  */
-// core/include/debug.h prints if(sched_active_thread->stack_size > THREAD_EXTRA_STACKSIZE_PRINTF)
-// so small THREAD_EXTRA_STACKSIZE_PRINTF prints more than a big one
 
 /* keep
  * THREAD_STACKSIZE_IDLE > THREAD_EXTRA_STACKSIZE_PRINTF
@@ -50,16 +48,6 @@ extern "C" {
 #endif
 
 #define THREAD_STACKSIZE_IDLE      (129)
-/**
- * @brief   Stack size used for the exception (ISR) stack
- * @{
- */
-//#define ISR_STACKSIZE              (0)
-/** @} */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* CPU_CONF_H */
 /** @} */

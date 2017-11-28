@@ -50,17 +50,9 @@ extern "C" {
 /** @} */
 
 /**
- * @name Define the interface to the AT86RF231 radio
- *
- * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
- * @{
- */
-#define AT86RF2XX_PARAMS_BOARD      {}
-/** @} */
-
-/**
  * @name Context swap defines
  * This emulates a software triggered interrupt
+ * @{
  */
 /*TODO Check if the not implemented I/O pin interrupt could be used to not waste pin,
  *Note that the I/O ports corresponding to PCINT23:16 are not implemented. Therefore PCIE2 has no function in this device
