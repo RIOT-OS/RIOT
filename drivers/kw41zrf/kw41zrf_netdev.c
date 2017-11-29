@@ -344,6 +344,7 @@ static int kw41zrf_netdev_set_state(kw41zrf_t *dev, netopt_state_t state)
         case NETOPT_STATE_SLEEP:
             kw41zrf_abort_sequence(dev);
             kw41zrf_set_power_mode(dev, KW41ZRF_POWER_DSM);
+            dev->idle_seq = XCVSEQ_IDLE;
             break;
         case NETOPT_STATE_STANDBY:
             kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
