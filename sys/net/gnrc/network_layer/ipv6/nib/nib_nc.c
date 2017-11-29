@@ -29,7 +29,7 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
 {
     _nib_onl_entry_t *node;
 
-    assert((ipv6 != NULL) && (l2addr != NULL));
+    assert(ipv6 != NULL);
     assert(l2addr_len <= GNRC_IPV6_NIB_L2ADDR_MAX_LEN);
     assert((iface > KERNEL_PID_UNDEF) && (iface <= KERNEL_PID_LAST));
     mutex_lock(&_nib_mutex);
@@ -39,7 +39,9 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
         return -ENOMEM;
     }
 #if GNRC_IPV6_NIB_CONF_ARSM
-    memcpy(node->l2addr, l2addr, l2addr_len);
+    if ((l2addr != NULL) && (l2addr_len > 0)) {
+        memcpy(node->l2addr, l2addr, l2addr_len);
+    }
     node->l2addr_len = l2addr_len;
 #else
     (void)l2addr;
