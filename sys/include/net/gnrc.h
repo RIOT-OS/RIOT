@@ -18,7 +18,7 @@
  * =====
  *
  * This module is currently the default network stack for RIOT and includes
- * many components ranging from a @ref net_gnrc_netdev through a fully-featured
+ * many components ranging from a @ref net_gnrc_netif through a fully-featured
  * @ref net_gnrc_ipv6 implementation with @ref net_gnrc_sixlowpan "6LowPAN"
  * extensions to an @ref net_gnrc_udp "UDP" implementation and
  * @ref net_gnrc_rpl.
@@ -31,7 +31,7 @@
  *
  * From the application layer the @ref net_gnrc can be accessed through the
  * @ref net_sock, while the interface to the @ref drivers_netdev_api is
- * defined by the @ref net_gnrc_netdev.
+ * defined by the @ref net_gnrc_netif.
  *
  * Architecture
  * ============
