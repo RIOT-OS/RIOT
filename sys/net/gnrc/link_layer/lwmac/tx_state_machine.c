@@ -74,7 +74,7 @@ static uint8_t _send_bcast(gnrc_netif_t *netif)
         gnrc_pktsnip_t *pkt_payload;
 
         /* Prepare packet with LWMAC header*/
-        gnrc_lwmac_frame_broadcast_t hdr = {};
+        gnrc_lwmac_frame_broadcast_t hdr;
         hdr.header.type = GNRC_LWMAC_FRAMETYPE_BROADCAST;
         hdr.seq_nr = netif->mac.tx.bcast_seqnr++;
 
@@ -165,7 +165,7 @@ static uint8_t _send_wr(gnrc_netif_t *netif)
     }
 
     /* Assemble WR */
-    gnrc_lwmac_frame_wr_t wr_hdr = {};
+    gnrc_lwmac_frame_wr_t wr_hdr;
     wr_hdr.header.type = GNRC_LWMAC_FRAMETYPE_WR;
     memcpy(&(wr_hdr.dst_addr.addr), netif->mac.tx.current_neighbor->l2_addr,
            netif->mac.tx.current_neighbor->l2_addr_len);

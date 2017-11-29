@@ -18,6 +18,7 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author      Shuguo Zhuo <shuguo.zhuo@inria.fr>
  *
  * @}
  */
