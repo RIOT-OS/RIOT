@@ -70,7 +70,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    if (dev != 0 || channel > TIMER_CHAN) {
+    if (dev != 0 || channel >= TIMER_CHAN) {
         return -1;
     }
     TIMER_BASE->CCR[channel] = value;
@@ -81,7 +81,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    if (dev != 0 || channel > TIMER_CHAN) {
+    if (dev != 0 || channel >= TIMER_CHAN) {
         return -1;
     }
     TIMER_BASE->CCTL[channel] &= ~(CCTL_CCIE);
