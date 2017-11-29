@@ -22,7 +22,9 @@
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
+#ifdef MODULE_GNRC_LWMAC
 #include "net/gnrc/lwmac/lwmac.h"
+#endif
 #include "net/gnrc.h"
 
 #include "at86rf2xx.h"

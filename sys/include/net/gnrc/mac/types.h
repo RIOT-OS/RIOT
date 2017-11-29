@@ -29,7 +29,9 @@
 #include "net/gnrc/priority_pktqueue.h"
 #include "net/ieee802154.h"
 #include "net/gnrc/mac/mac.h"
+#ifdef MODULE_GNRC_LWMAC
 #include "net/gnrc/lwmac/types.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
