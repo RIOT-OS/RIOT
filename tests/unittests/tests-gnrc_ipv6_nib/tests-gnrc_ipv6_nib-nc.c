@@ -107,9 +107,9 @@ static void test_nib_nc_set__ENOMEM_diff_addr_iface(void)
 static void test_nib_nc_set__success(void)
 {
     void *iter_state = NULL;
-    ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                  { .u64 = TEST_UINT64 } } };
-    uint8_t l2addr[] = L2ADDR;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+    static const uint8_t l2addr[] = L2ADDR;
     gnrc_ipv6_nib_nc_t nce;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_nc_set(&addr, IFACE, l2addr,
@@ -188,7 +188,7 @@ static void test_nib_nc_del__success(void)
     void *iter_state = NULL;
     static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                              { .u64 = TEST_UINT64 } } };
-    uint8_t l2addr[] = L2ADDR;
+    static const uint8_t l2addr[] = L2ADDR;
     gnrc_ipv6_nib_nc_t nce;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_nc_set(&addr, IFACE, l2addr,

@@ -483,7 +483,7 @@ static void test_nib_nc_add__success_full_but_garbage_collectible(void)
 
     for (int i = 0; i < (3 * GNRC_IPV6_NIB_NUMOF); i++) {
         TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, IFACE,
-                                                 GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE)));
+                                                 GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE)));
         TEST_ASSERT(last != node);
         TEST_ASSERT(ipv6_addr_equal(&addr, &node->ipv6));
         TEST_ASSERT_EQUAL_INT(IFACE, _nib_onl_get_if(node));
@@ -1789,7 +1789,7 @@ static void test_nib_abr_add_pfx__pfx_not_in_nib(void)
     static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                              { .u64 = TEST_UINT64 } } };
     _nib_offl_entry_t offl;
-
+    offl.mode = _PL;
     TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
     TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
     _nib_abr_add_pfx(abr, &offl);
