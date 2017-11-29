@@ -1,5 +1,0 @@
-/**
- * @defgroup    cpu_efm32_common Silicon Labs Exx32 MCU
- * @ingroup     cpu
- * @brief       Common implementations for the Exx32 family of CPUs
- */
