@@ -207,7 +207,7 @@ static inline unsigned gnrc_ipv6_nib_nc_get_ar_state(const gnrc_ipv6_nib_nc_t *e
 /**
  * @brief   Adds an unmanaged neighbor entry to NIB
  *
- * @pre `(ipv6 != NULL) && (l2addr != NULL)`
+ * @pre `ipv6 != NULL`
  * @pre `l2addr_len <= GNRC_IPV6_NIB_L2ADDR_MAX_LEN`
  * @pre `(iface > KERNEL_PID_UNDEF) && (iface <= KERNEL_PID_LAST)`
  *
