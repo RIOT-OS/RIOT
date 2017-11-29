@@ -13,8 +13,8 @@ import pexpect
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
-def testfunc(child):
 
+def testfunc(child):
     child.expect(u"This test will call xtimer_usleep for values from \\d+ down to \\d+\r\n")
 
     i = 500

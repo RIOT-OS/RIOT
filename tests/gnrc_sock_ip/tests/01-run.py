@@ -12,6 +12,7 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def testfunc(child):
     child.expect_exact(u"Calling test_sock_ip_create__EAFNOSUPPORT()")
     child.expect_exact(u"Calling test_sock_ip_create__EINVAL_addr()")

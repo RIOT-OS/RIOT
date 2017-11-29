@@ -15,6 +15,7 @@ import testrunner
 
 ACCEPTED_ERROR = 20
 
+
 def testfunc(child):
     child.expect(r"Testing generic evtimer \(start time = (\d+) ms\)")
     timer_offset = int(child.match.group(1))

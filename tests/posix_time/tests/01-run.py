@@ -18,8 +18,10 @@ import testrunner
 US_PER_SEC = 1000000
 EXTERNAL_JITTER = 0.15
 
+
 class InvalidTimeout(Exception):
     pass
+
 
 def testfunc(child):
     try:

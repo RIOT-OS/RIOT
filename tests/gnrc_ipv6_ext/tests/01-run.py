@@ -13,6 +13,7 @@ import sys
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
+
 def testfunc(child):
     index = child.expect_exact([
         "ipv6: Received (src = fd01::1, dst = fd01::2, next header = 0, length = 42)",

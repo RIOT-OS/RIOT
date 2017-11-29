@@ -30,8 +30,10 @@ lock_depth = {
         7:  5
         }
 
+
 def thread_prio_sort(x):
     return thread_prio.get(x)*1000 + x
+
 
 def testfunc(child):
     for k in thread_prio.keys():
