@@ -652,12 +652,16 @@ ifneq (,$(filter l2filter_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gcoap,$(USEMODULE)))
-USEMODULE += nanocoap
-USEMODULE += gnrc_sock_udp
+  USEMODULE += nanocoap
+  USEMODULE += gnrc_sock_udp
 endif
 
 ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
+endif
+
+ifneq (,$(filter nanocoap_%,$(USEMODULE)))
+  USEMODULE += nanocoap
 endif
 
 # always select gpio (until explicit dependencies are sorted out)
