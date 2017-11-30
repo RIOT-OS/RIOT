@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-atmega-common
+ * @ingroup     boards_common_arduino-atmega
  * @{
  *
  * @file
