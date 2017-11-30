@@ -8,8 +8,9 @@
  */
 
 /**
- * @ingroup     boards_remote
- * @brief       Support for the RE-Mote boards
+ * @defgroup    boards_common_remote Zolertia Re-Mote common
+ * @ingroup     boards_common
+ * @brief       Shared files and configuration for all Zolertia Re-Mote boards.
  * @{
  *
  * @file
