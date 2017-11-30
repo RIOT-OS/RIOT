@@ -10,6 +10,9 @@
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
+#ifdef MODULE_GNRC_RPL
+#include "net/gnrc/rpl.h"
+#endif
 #include "net/ipv6/addr.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
@@ -87,6 +90,14 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
 #if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
     GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
     gnrc_ipv6_nib_abr_add((ipv6_addr_t *)prefix);
+#endif
+#ifdef MODULE_GNRC_RPL
+    gnrc_rpl_init(gnrc_wireless_interface);
+    gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(GNRC_RPL_DEFAULT_INSTANCE);
+    if (inst) {
+        gnrc_rpl_instance_remove(inst);
+    }
+    gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, (ipv6_addr_t*)prefix, false, false);
 #endif
     gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
                     &_prefix, sizeof(_prefix));
