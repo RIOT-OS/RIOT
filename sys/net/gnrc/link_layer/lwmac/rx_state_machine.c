@@ -138,13 +138,13 @@ static bool _send_wa(gnrc_netif_t *netif)
     /* Embed the current 'relative phase timing' (counted from the start of this cycle)
      * of the receiver into its WA packet, thus to allow the sender to infer the
      * receiver's exact wake-up timing */
-    if (phase_now > _gnrc_lwmac_ticks_to_phase(netif->mac.lwmac.last_wakeup)) {
+    if (phase_now > _gnrc_lwmac_ticks_to_phase(netif->mac.prot.lwmac.last_wakeup)) {
         lwmac_hdr.current_phase = (phase_now -
-                                   _gnrc_lwmac_ticks_to_phase(netif->mac.lwmac.last_wakeup));
+                                   _gnrc_lwmac_ticks_to_phase(netif->mac.prot.lwmac.last_wakeup));
     }
     else {
         lwmac_hdr.current_phase = (phase_now + RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US)) -
-                                  _gnrc_lwmac_ticks_to_phase(netif->mac.lwmac.last_wakeup);
+                                  _gnrc_lwmac_ticks_to_phase(netif->mac.prot.lwmac.last_wakeup);
     }
 
     pkt = gnrc_pktbuf_add(NULL, &lwmac_hdr, sizeof(lwmac_hdr), GNRC_NETTYPE_LWMAC);

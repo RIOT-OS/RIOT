@@ -1,8 +1,8 @@
 # gnrc_networking_mac example
 
-This example shows you how to try out communications between RIOT instances with LWMAC as the MAC layer ptotocol for IEEE 802.15.4 devices.
-This example is generally based on `gnrc_networking` but embeds LWMAC to support low duty-cycle operation to conserve power. Also, it intends to show that the duty-cycled LWMAC can support popular upper layer protocols like UDP and RPL.
-Currently, it seems that you can only use the samr21-xpro board to test this MAC, since some certain features of the protocol are only available on that platform. Also, the current implementation of LWMAC uses RTT as the underlying timer source. So, currently, LWMAC cannot run on nodes that don't have RTT. But, as a long-term plan, we will replace RTT by a general timer API as the underlying timer to make LWMAC available for more devices, when the related implementations are ready.
+This example shows you how to try out communications between RIOT instances with duty-cycled MAC layer protocols (GoMacH and LWMAC) for IEEE 802.15.4 devices.
+This example is generally based on `gnrc_networking` but embeds GoMacH (or LWMAC) to support low duty-cycle operation to conserve power. Also, it intends to show that the duty-cycled MAC protocol can support popular upper layer protocols like UDP and RPL.
+Currently, it seems that you can only use samr21-xpro and iotlab-m3 boards (in case of using LWMAC, then only samr21-xpro board) to test with this example, since some certain features of the MAC protocol are only available on that platform. Also, the current implementations of GoMacH and LWMAC use RTT as the underlying timer source. So, currently, GoMacH and LWMAC cannot run on nodes that don't have RTT. But, as a long-term plan, we will replace RTT by a general timer API as the underlying timer to make GoMacH and LWMAC available for more devices, when the related implementations are ready.
 
 
 ## Usage
@@ -15,13 +15,16 @@ make flash
 make term
 ```
 
+## Print out the achieved duty-cyle of GoMacH
+
+You can print out the radio duty-cyle (a roughly one) of GoMacH by setting the `GNRC_GOMACH_ENABLE_DUTYCYLE_RECORD` flag in `sys/include/net/gnrc/gomach/types.h` to "1". By doing so, each time when a device sends or receives a packet, it will print out its achieved radio duty-cycle value.
+
 ## Print out the achieved duty-cyle of LWMAC
 
-You can print out the radio duty-cyle (a roughly one) of LWMAC by setting the `LWMAC_ENABLE_DUTYCYLE_RECORD` flag in `sys/include/net/gnrc/lwmac/types.h` to "1". By doing so, each time when a device sends or receives a packet, it will print out its radio duty-cycle value.
+You can print out the radio duty-cyle (a roughly one) of LWMAC by setting the `LWMAC_ENABLE_DUTYCYLE_RECORD` flag in `sys/include/net/gnrc/lwmac/types.h` to "1". By doing so, each time when a device sends or receives a packet, it will print out its achieved radio duty-cycle value.
 Also, by further enabling the debug flag in `sys/net/gnrc/link_layer/lwmac/tx_state_machine.c`, you will get the printout of how many preamble (WR) and time (sending delay) cost for sending this packet in the TX procedure of LWMAC.
 
-
-## Try UDP transmissions with LWMAC
+## Try UDP transmissions with LWMAC (or GoMacH)
 
 In the RIOT shell, get to know the IP address of one node:
 

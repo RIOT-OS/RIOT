@@ -198,21 +198,21 @@ void _gnrc_lwmac_set_netdev_state(gnrc_netif_t *netif, netopt_state_t devstate)
 
 #if (GNRC_LWMAC_ENABLE_DUTYCYLE_RECORD == 1)
     if (devstate == NETOPT_STATE_IDLE) {
-        if (!(netif->mac.lwmac.lwmac_info & GNRC_LWMAC_RADIO_IS_ON)) {
-            netif->mac.lwmac.last_radio_on_time_ticks = rtt_get_counter();
-            netif->mac.lwmac.lwmac_info |= GNRC_LWMAC_RADIO_IS_ON;
+        if (!(netif->mac.prot.lwmac.lwmac_info & GNRC_LWMAC_RADIO_IS_ON)) {
+            netif->mac.prot.lwmac.last_radio_on_time_ticks = rtt_get_counter();
+            netif->mac.prot.lwmac.lwmac_info |= GNRC_LWMAC_RADIO_IS_ON;
         }
         return;
     }
     else if ((devstate == NETOPT_STATE_SLEEP) &&
-             (netif->mac.lwmac.lwmac_info & GNRC_LWMAC_RADIO_IS_ON)) {
-        netif->mac.lwmac.radio_off_time_ticks = rtt_get_counter();
+             (netif->mac.prot.lwmac.lwmac_info & GNRC_LWMAC_RADIO_IS_ON)) {
+        netif->mac.prot.lwmac.radio_off_time_ticks = rtt_get_counter();
 
-        netif->mac.lwmac.awake_duration_sum_ticks +=
-            (netif->mac.lwmac.radio_off_time_ticks -
-             netif->mac.lwmac.last_radio_on_time_ticks);
+        netif->mac.prot.lwmac.awake_duration_sum_ticks +=
+            (netif->mac.prot.lwmac.radio_off_time_ticks -
+             netif->mac.prot.lwmac.last_radio_on_time_ticks);
 
-        netif->mac.lwmac.lwmac_info &= ~GNRC_LWMAC_RADIO_IS_ON;
+        netif->mac.prot.lwmac.lwmac_info &= ~GNRC_LWMAC_RADIO_IS_ON;
     }
 #endif
 }
