@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   boards_common_arduino_due
+ * @ingroup     boards_common_arduino_due
  * @{
  *
  * @file
- * @brief     Board specific configuration of direct mapped GPIOs
+ * @brief       Board specific configuration of direct mapped GPIOs
  *
- * @author    Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef GPIO_PARAMS_H
