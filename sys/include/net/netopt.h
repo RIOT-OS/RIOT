@@ -11,7 +11,7 @@
  * @defgroup    net_netopt   Configuration options for network APIs
  * @ingroup     net
  * @brief       List of available configuration options for the
- *              @ref net_gnrc_netdev and the @ref net_gnrc_netapi
+ *              @ref drivers_netdev_api and the @ref net_gnrc_netapi
  * @{
  *
  * @file
