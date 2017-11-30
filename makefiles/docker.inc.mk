@@ -1,6 +1,10 @@
 export DOCKER_IMAGE ?= riot/riotbuild:latest
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
 export DOCKER_FLAGS ?= --rm
+ifdef BAUD
+export DOCKER_FLAGS += -e BAUD=$(BAUD)
+endif
+
 # List of Docker-enabled make goals
 export DOCKER_MAKECMDGOALS_POSSIBLE = \
   all \
