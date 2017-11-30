@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    boards_arduino-mkr-common Arduino MKR Common
- * @ingroup     boards
- * @brief       Support for the Arduino MKR boards type.
+ * @defgroup    boards_common_arduino-mkr Arduino MKR Common
+ * @ingroup     boards_common
+ * @brief       Shared files and configuration for the Arduino MKR boards type.
  * @{
  *
  * @file
