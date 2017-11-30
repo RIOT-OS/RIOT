@@ -30,7 +30,7 @@ extern "C" {
 #include "net/netopt.h"
 #include "net/ieee802154.h"
 #include "net/ethernet.h"
-#include "net/gnrc/netdev.h"
+#include "net/netdev.h"
 #include "thread.h"
 #include "openthread/types.h"
 

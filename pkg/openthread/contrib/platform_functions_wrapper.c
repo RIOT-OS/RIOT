@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 #include "thread.h"
 #include "openthread/ip6.h"
 #include "openthread/thread.h"
