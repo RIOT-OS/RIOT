@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_wsn430-common
+ * @ingroup     boards_common_wsn430
  * @{
  *
  * @file
