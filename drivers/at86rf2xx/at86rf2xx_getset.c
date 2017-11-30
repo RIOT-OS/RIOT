@@ -435,7 +435,10 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
     }
     else if (state != old_state) {
         /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
-        if ((old_state | state) == (AT86RF2XX_STATE_RX_AACK_ON | AT86RF2XX_STATE_TX_ARET_ON)) {
+        if ((old_state == AT86RF2XX_STATE_RX_AACK_ON &&
+             state == AT86RF2XX_STATE_TX_ARET_ON) ||
+            (old_state == AT86RF2XX_STATE_TX_ARET_ON &&
+             state == AT86RF2XX_STATE_RX_AACK_ON)) {
             _set_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
         }
         /* check if we need to wake up from sleep mode */
