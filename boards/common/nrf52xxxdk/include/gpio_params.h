@@ -33,44 +33,52 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
-        .name = "LED 1",
-        .pin = LED0_PIN,
-        .mode = GPIO_OUT
+        .name  = "LED 1",
+        .pin   = LED0_PIN,
+        .mode  = GPIO_OUT,
+        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
     {
-        .name = "LED 2",
-        .pin = LED1_PIN,
-        .mode = GPIO_OUT
+        .name  = "LED 2",
+        .pin   = LED1_PIN,
+        .mode  = GPIO_OUT,
+        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
     {
-        .name = "LED 3",
-        .pin = LED2_PIN,
-        .mode = GPIO_OUT
+        .name  = "LED 3",
+        .pin   = LED2_PIN,
+        .mode  = GPIO_OUT,
+        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
     {
-        .name = "LED 4",
-        .pin = LED3_PIN,
-        .mode = GPIO_OUT
+        .name  = "LED 4",
+        .pin   = LED3_PIN,
+        .mode  = GPIO_OUT,
+        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
     {
-        .name = "Button 1",
-        .pin  = BTN0_PIN,
-        .mode = BTN0_MODE
+        .name  = "Button 1",
+        .pin   = BTN0_PIN,
+        .mode  = BTN0_MODE,
+        .flags = SAUL_GPIO_INVERTED,
     },
     {
-        .name = "Button 2",
-        .pin  = BTN1_PIN,
-        .mode = BTN1_MODE
+        .name  = "Button 2",
+        .pin   = BTN1_PIN,
+        .mode  = BTN1_MODE,
+        .flags = SAUL_GPIO_INVERTED,
     },
     {
-        .name = "Button 3",
-        .pin  = BTN2_PIN,
-        .mode = BTN2_MODE
+        .name  = "Button 3",
+        .pin   = BTN2_PIN,
+        .mode  = BTN2_MODE,
+        .flags = SAUL_GPIO_INVERTED,
     },
     {
-        .name = "Button 4",
-        .pin  = BTN3_PIN,
-        .mode = BTN3_MODE
+        .name  = "Button 4",
+        .pin   = BTN3_PIN,
+        .mode  = BTN3_MODE,
+        .flags = SAUL_GPIO_INVERTED,
     }
 };
 
