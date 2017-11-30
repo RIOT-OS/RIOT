@@ -7,7 +7,7 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo32-f031
+BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -26,7 +26,8 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += prng_minstd
 
 CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_NETIF_IPV6_ADDRS_NUMOF=2 \
-          -DGNRC_NETIF_IPV6_GROUPS_NUMOF=2 -DGNRC_IPV6_NC_SIZE=1
+          -DGNRC_NETIF_IPV6_GROUPS_NUMOF=2 -DGNRC_IPV6_NIB_NUMOF=1 \
+          -DGNRC_IPV6_NIB_OFFL_NUMOF=1 # be able to configure at least one route
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
