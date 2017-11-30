@@ -172,7 +172,6 @@ DISABLE_TEST_FOR_AVR := tests-relic tests-cpp_%
 
 MSP430_BOARDS := chronos \
                  msb-430 \
-                 msb-430-common \
                  msb-430h \
                  telosb \
                  wsn430-v1_3b \

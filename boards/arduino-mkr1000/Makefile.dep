@@ -1,1 +1,1 @@
-include $(RIOTBOARD)/arduino-mkr-common/Makefile.dep
+include $(RIOTBOARD)/common/arduino-mkr/Makefile.dep
