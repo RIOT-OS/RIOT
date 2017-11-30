@@ -7,11 +7,8 @@
  */
 
 /**
- * @ingroup msba2
+ * @ingroup     boards_common_msba2
  * @{
- */
-
-/**
  * @file
  * @brief       MSB-A2 board initialization
  *
@@ -20,6 +17,8 @@
  * @author      Michael Baar <baar@inf.fu-berlin.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @note        $Id$
+ *
+ * @}
  */
 #include <string.h>
 #include "board.h"
