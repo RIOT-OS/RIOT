@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   boards_nucleo32-common
+ * @ingroup     boards_common_nucleo32
  * @{
  *
  * @file
- * @brief     Board specific configuration of direct mapped GPIOs
+ * @brief       Board specific configuration of direct mapped GPIOs
  *
- * @author    Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #ifndef GPIO_PARAMS_H
