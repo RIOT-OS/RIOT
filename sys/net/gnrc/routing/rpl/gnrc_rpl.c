@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
+ * Copyright (C) 2017       HAW Hamburg
+ * Copyright (C) 2015–2017  Cenk Gündoğan <mail-github@cgundogan.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,7 +12,7 @@
  *
  * @file
  *
- * @author  Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author  Cenk Gündoğan <mail-github@cgundogan.de>
  */
 
 #include "net/icmpv6.h"

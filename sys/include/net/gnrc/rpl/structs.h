@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2013  INRIA.
- * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
+ * Copyright (C) 2017       HAW Hamburg
+ * Copyright (C) 2015–2017  Cenk Gündoğan <mail-github@cgundogan.de>
+ * Copyright (C) 2013       INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,7 +18,7 @@
  * Header file, which defines all structs used by RPL.
  *
  * @author      Eric Engel <eric.engel@fu-berlin.de>
- * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
 #ifndef NET_GNRC_RPL_STRUCTS_H
