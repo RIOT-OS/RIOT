@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015,2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-due
+ * @ingroup     boards_common_arduino_due
  * @{
  *
  * @file
@@ -43,7 +43,7 @@ extern "C" {
 #define ARDUINO_PIN_7           GPIO_PIN(PC, 23)
 #define ARDUINO_PIN_8           GPIO_PIN(PC, 22)
 #define ARDUINO_PIN_9           GPIO_PIN(PC, 21)
-#define ARDUINO_PIN_10          GPIO_PIN(PA, 2)
+#define ARDUINO_PIN_10          GPIO_PIN(PC, 29)
 #define ARDUINO_PIN_11          GPIO_PIN(PD, 7)
 #define ARDUINO_PIN_12          GPIO_PIN(PD, 8)
 #define ARDUINO_PIN_13          GPIO_PIN(PB, 27)

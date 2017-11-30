@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2016-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_arduino-due
+ * @ingroup     boards_common_arduino_due
  * @{
  *
  * @file
@@ -18,6 +18,8 @@
 
 #ifndef W5100_PARAMS_H
 #define W5100_PARAMS_H
+
+#include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,10 +36,10 @@ extern "C" {
 #define W5100_PARAM_SPI_CLK     (SPI_CLK_5MHZ)
 #endif
 #ifndef W5100_PARAM_CS
-#define W5100_PARAM_CS          (GPIO_PIN(2, 29))
+#define W5100_PARAM_CS          (ARDUINO_PIN_10)
 #endif
 #ifndef W5100_PARAM_EVT
-#define W5100_PARAM_EVT         (GPIO_PIN(1, 25))
+#define W5100_PARAM_EVT         (ARDUINO_PIN_2)
 #endif
 /** @} */
 

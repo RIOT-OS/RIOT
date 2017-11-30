@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014,2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_arduino-due Arduino Due
+ * @defgroup    boards_common_arduino_due Shared Arduino Due Code
  * @ingroup     boards
- * @brief       Support for the Arduino Due board.
+ * @brief       Shared code for Arduino Due based boards
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Arduino Due board.
+ * @brief       Board specific definitions for the Arduino Due based boards
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

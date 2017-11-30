@@ -1,5 +1,5 @@
  /*
- * Copyright (C) 2014-2015 Freie Universität Berlin
+ * Copyright (C) 2014-2015,2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +7,15 @@
  */
 
 /**
- * @ingroup     boards_udoo
+ * @ingroup     boards_common_arduino_due
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the UDOO board
+ * @brief       Peripheral MCU configuration for Arduino Due based boards
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Andreas "Paul" Pauli <andreas.pauli@haw-hamburg.de>
  */
 
 #ifndef PERIPH_CONF_H
@@ -50,9 +52,8 @@ extern "C" {
  * @{
  */
 static const timer_conf_t timer_config[] = {
-    /* dev, channel 0 ID */
-    { TC0, ID_TC0 },
-    { TC1, ID_TC3 },
+    { .dev = TC0, .id_ch0 = ID_TC0 },
+    { .dev = TC1, .id_ch0 = ID_TC3 }
 };
 
 #define TIMER_0_ISR         isr_tc0
@@ -110,21 +111,36 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
-* @name    SPI configuration
+* @name     SPI configuration
 * @{
 */
 static const spi_conf_t spi_config[] = {
     {
         .dev   = SPI0,
         .id    = ID_SPI0,
-        .clk   = GPIO_PIN(PA, 25),
+        .clk   = GPIO_PIN(PA, 27),
         .mosi  = GPIO_PIN(PA, 26),
-        .miso  = GPIO_PIN(PA, 27),
+        .miso  = GPIO_PIN(PA, 25),
         .mux   = GPIO_MUX_A
     }
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+/** @} */
+
+/**
+ * @name    PWM configuration
+ * @{
+ */
+static const pwm_chan_conf_t pwm_chan[] = {
+    { .pin = GPIO_PIN(PC, 21), .hwchan = 4 },
+    { .pin = GPIO_PIN(PC, 22), .hwchan = 5 },
+    { .pin = GPIO_PIN(PC, 23), .hwchan = 6 },
+    { .pin = GPIO_PIN(PC, 24), .hwchan = 7 }
+};
+
+#define PWM_NUMOF           (1U)
+#define PWM_CHAN_NUMOF      (sizeof(pwm_chan) / sizeof(pwm_chan[0]))
 /** @} */
 
 #ifdef __cplusplus

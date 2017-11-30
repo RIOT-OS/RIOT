@@ -8,11 +8,11 @@
  */
 
 /**
- * @ingroup     boards_arduino-due
+ * @ingroup     boards_common_arduino_due
  * @{
  *
  * @file
- * @brief       SD card configuration for the Arduino due
+ * @brief       SD card configuration for the Arduino SD card shields
  *
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -21,7 +21,7 @@
 #ifndef SDCARD_SPI_PARAMS_H
 #define SDCARD_SPI_PARAMS_H
 
-#include "board.h"
+#include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,16 +35,16 @@ extern "C" {
 #define SDCARD_SPI_PARAM_SPI         (SPI_DEV(0))
 #endif
 #ifndef SDCARD_SPI_PARAM_CS
-#define SDCARD_SPI_PARAM_CS          (GPIO_PIN(PA, 29))
+#define SDCARD_SPI_PARAM_CS          (ARDUINO_PIN_4)
 #endif
 #ifndef SDCARD_SPI_PARAM_CLK
-#define SDCARD_SPI_PARAM_CLK         (GPIO_PIN(PA, 27))
+#define SDCARD_SPI_PARAM_CLK         (ARDUINO_PIN_76)
 #endif
 #ifndef SDCARD_SPI_PARAM_MOSI
-#define SDCARD_SPI_PARAM_MOSI        (GPIO_PIN(PA, 26))
+#define SDCARD_SPI_PARAM_MOSI        (ARDUINO_PIN_75)
 #endif
 #ifndef SDCARD_SPI_PARAM_MISO
-#define SDCARD_SPI_PARAM_MISO        (GPIO_PIN(PA, 25))
+#define SDCARD_SPI_PARAM_MISO        (ARDUINO_PIN_74)
 #endif
 #ifndef SDCARD_SPI_PARAM_POWER
 #define SDCARD_SPI_PARAM_POWER       (GPIO_UNDEF)

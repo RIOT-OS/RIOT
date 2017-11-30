@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_arduino-due
+ * @ingroup     boards_common_arduino_due
  * @{
  *
  * @file
- * @brief       Board specific implementations for the Arduino Due board
+ * @brief       Board specific for Arduino-due-based boards
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
