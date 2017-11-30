@@ -90,9 +90,12 @@ index 0000000..2d8bb4d
 +
 +#endif
 diff --git tlsf.c tlsf.c
-index 3fb5ebd..99c84b2 100644
+index 3fb5ebd..2fe7028 100644
 --- tlsf.c
 +++ tlsf.c
+@@ -19 +19 @@ enum tlsf_public
+-	SL_INDEX_COUNT_LOG2 = 5,
++	SL_INDEX_COUNT_LOG2 = 2,
 @@ -25,4 +24,0 @@ enum tlsf_private
 -#if defined (TLSF_64BIT)
 -	/* All allocation sizes and addresses are aligned to 8 bytes. */
