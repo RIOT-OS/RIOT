@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Cenk Gündoğan <mail@cgundogan.de>
+ * Copyright (C) 2016 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,7 +14,7 @@
  * @file
  * @brief   Auto initialization for gnrc_rpl
  *
- * @author  Cenk Gündoğan <mail@cgundogan.de>
+ * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
 #ifdef MODULE_AUTO_INIT_GNRC_RPL

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2017       HAW Hamburg
- * Copyright (C) 2015–2017  Cenk Gündoğan <mail-github@cgundogan.de>
+ * Copyright (C) 2018       HAW Hamburg
+ * Copyright (C) 2015–2017  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  * Copyright (C) 2013–2014  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -13,7 +13,7 @@
  *
  * @file
  * @author      Eric Engel <eric.engel@fu-berlin.de>
- * @author      Cenk Gündoğan <mail-github@cgundogan.de>
+ * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
 #include <stdbool.h>

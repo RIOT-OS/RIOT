@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017       HAW Hamburg
- * Copyright (C) 2015–2017  Cenk Gündoğan <mail-github@cgundogan.de>
+ * Copyright (C) 2015–2018  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  * Copyright (C) 2013       INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser

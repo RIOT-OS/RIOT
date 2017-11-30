@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 HAW Hamburg
+ * Copyright (C) 2018 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Internal globals for RPL
  *
- * @author      Cenk Gündoğan <mail-github@cgundogan.de>
+ * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
 #ifndef GLOBALS_H

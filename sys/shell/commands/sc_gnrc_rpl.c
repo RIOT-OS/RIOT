@@ -256,7 +256,6 @@ int _gnrc_rpl_dodag_show(void)
 
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    int8_t cleanup;
     uint64_t tc, xnow = xtimer_now_usec64();
 
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
@@ -275,14 +274,12 @@ int _gnrc_rpl_dodag_show(void)
                 | dodag->trickle.msg_timer.target) - xnow;
         tc = (int64_t) tc < 0 ? 0 : tc / US_PER_SEC;
 
-        cleanup = dodag->instance->cleanup < 0 ? 0 : dodag->instance->cleanup;
-
-        printf("\tdodag [%s | R: %d | OP: %s | PIO: %s | CL: %ds | "
+        printf("\tdodag [%s | R: %d | OP: %s | PIO: %s | "
                "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu32 "s)]\n",
                ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)),
                dodag->my_rank, (dodag->node_status == GNRC_RPL_LEAF_NODE ? "Leaf" : "Router"),
                ((dodag->dio_opts & GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) ? "on" : "off"),
-               (int) cleanup, (1 << dodag->dio_min), dodag->dio_interval_doubl, dodag->trickle.k,
+               (1 << dodag->dio_min), dodag->dio_interval_doubl, dodag->trickle.k,
                dodag->trickle.c, (uint32_t) (tc & 0xFFFFFFFF));
 
 #ifdef MODULE_GNRC_RPL_P2P
@@ -297,9 +294,9 @@ int _gnrc_rpl_dodag_show(void)
 
         gnrc_rpl_parent_t *parent;
         LL_FOREACH(gnrc_rpl_instances[i].dodag.parents, parent) {
-            printf("\t\tparent [addr: %s | rank: %d | lifetime: %" PRIu32 "s]\n",
+            printf("\t\tparent [addr: %s | rank: %d]\n",
                     ipv6_addr_to_str(addr_str, &parent->addr, sizeof(addr_str)),
-                    parent->rank, parent->lifetime);
+                    parent->rank);
         }
     }
     return 0;
