@@ -1,0 +1,25 @@
+From e3242ed0be22664d0c34f9fb5a1f363df24701f9 Mon Sep 17 00:00:00 2001
+From: Christian Manal <moenoel@informatik.uni-bremen.de>
+Date: Wed, 29 Nov 2017 16:31:40 +0100
+Subject: [PATCH 11/12] fixed warnings in objects.c
+
+---
+ core/objects.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/objects.c b/core/objects.c
+index f9b8962..e5a0edc 100644
+--- a/core/objects.c
++++ b/core/objects.c
+@@ -528,7 +528,7 @@ int object_getRegisterPayloadBufferLength(lwm2m_context_t * contextP)
+     size_t index;
+     int result;
+     lwm2m_object_t * objectP;
+-    char buffer[REG_OBJECT_MIN_LEN + 5];
++    uint8_t buffer[REG_OBJECT_MIN_LEN + 5];
+ 
+     LOG("Entering");
+     index = strlen(REG_START);
+-- 
+2.1.4
+
