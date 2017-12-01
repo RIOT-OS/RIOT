@@ -333,8 +333,37 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
                    const sock_ip_ep_t *remote, uint8_t proto, uint16_t flags);
 
 #if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
+/**
+ * @brief   Set the event queue for asynchronous events for a raw IPv4/IPv6 sock
+ *          object
+ *
+ * @pre     `sock == NULL`
+ *
+ * @note    Only one event queue per sock can be set. Since
+ *          event_queue_t::waiter only allows for one thread to own the queue.
+ *          This also implies, that **only one thread can execute the event
+ *          handlers** added via @ref sock_ip_set_event_handler()!
+ *
+ * @param[in] sock  The sock to set the event queue for. May not be `NULL`.
+ * @param[in] queue The queue to set. May be `NULL` to unset the queue.
+ */
 void sock_ip_set_event_queue(sock_ip_t *sock, event_queue_t *queue);
-void sock_ip_set_event_handler(sock_ip_t *sock, sock_event_type_t *type,
+
+/**
+ * @brief   Sets an event handler for asynchronous events of [a certain
+ *          type](@ref sock_event_type_t) for a raw IPv4/IPv6 sock object
+ *
+ * @pre `sock != NULL`
+ * @pre `type < SOCK_EVENT_NUMOF`
+ *
+ * @param[in] sock      The sock to set the event handler for. May not be
+ *                      `NULL`
+ * @param[in] type      The [event type](@ref sock_event_type_t), @p handler
+ *                      should handle. Must be < @ref SOCK_EVENT_NUMOF.
+ * @param[in] handler   The event handler for @p type. May be `NULL` to unset
+ *                      the event handler for @p type.
+ */
+void sock_ip_set_event_handler(sock_ip_t *sock, sock_event_type_t type,
                                event_handler_t handler);
 #endif
 

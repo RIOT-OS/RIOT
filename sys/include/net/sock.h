@@ -103,6 +103,11 @@
 
 #include <stdint.h>
 
+#ifdef MODULE_SOCK_ASYNC && !defined(DOXYGEN)
+#define SOCK_HAS_ASYNC      /**< allow sock_async to be defined as a provided
+                             *   feature of a stack */
+#endif
+
 #if defined(SOCK_HAS_ASYNC) && defined(RIOT_VERSION)
 #include "event.h"
 #endif
