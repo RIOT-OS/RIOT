@@ -1,7 +1,0 @@
-/**
- * @defgroup pkg_nanocoap   CoAP lightweight implementation
- * @ingroup  pkg
- * @ingroup  net
- * @brief    Provides a low-level and lightweight implementation of CoAP
- * @see      https://github.com/kaspar030/sock/tree/master/nanocoap
- */

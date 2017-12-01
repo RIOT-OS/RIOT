@@ -11,7 +11,7 @@
 #include <string.h>
 
 #include "fmt.h"
-#include "nanocoap.h"
+#include "net/nanocoap.h"
 
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;

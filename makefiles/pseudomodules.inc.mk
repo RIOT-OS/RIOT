@@ -46,6 +46,7 @@ PSEUDOMODULES += lwip_tcp
 PSEUDOMODULES += lwip_udp
 PSEUDOMODULES += lwip_udplite
 PSEUDOMODULES += mpu_stack_guard
+PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
 PSEUDOMODULES += netif
 PSEUDOMODULES += netstats

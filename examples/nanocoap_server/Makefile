@@ -22,9 +22,7 @@ USEMODULE += gnrc_sock_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
 
-USEPKG += nanocoap
-# optionally enable nanocoap's debug output
-#CFLAGS += -DNANOCOAP_DEBUG
+USEMODULE += nanocoap_sock
 
 # include this for nicely formatting the returned internal value
 USEMODULE += fmt

@@ -212,9 +212,11 @@
 
 #include <stdint.h>
 #include <stdatomic.h>
+
+#include "net/ipv6/addr.h"
 #include "net/sock/udp.h"
 #include "mutex.h"
-#include "nanocoap.h"
+#include "net/nanocoap.h"
 #include "xtimer.h"
 
 #ifdef __cplusplus
