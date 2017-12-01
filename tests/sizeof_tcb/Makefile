@@ -1,4 +1,3 @@
-APPLICATION = sizeof_tcb
 include ../Makefile.tests_common
 
 # othread_t modifying modules:

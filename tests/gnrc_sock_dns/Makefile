@@ -1,4 +1,3 @@
-APPLICATION = gnrc_sock_dns
 include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..

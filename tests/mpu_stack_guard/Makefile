@@ -1,4 +1,3 @@
-APPLICATION = mpu_stack_guard
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 

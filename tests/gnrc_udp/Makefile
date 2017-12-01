@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = gnrc_udp
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := calliope-mini chronos microbit msb-430 msb-430h \

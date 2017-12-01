@@ -1,4 +1,3 @@
-APPLICATION = driver_sdcard_spi
 include ../Makefile.tests_common
 
 # exclude boards with insufficient memory

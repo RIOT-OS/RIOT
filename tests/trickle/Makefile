@@ -1,4 +1,3 @@
-APPLICATION = trickle
 include ../Makefile.tests_common
 
 USEMODULE += trickle

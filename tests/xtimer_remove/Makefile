@@ -1,4 +1,3 @@
-APPLICATION = xtimer_remove
 include ../Makefile.tests_common
 
 USEMODULE += xtimer

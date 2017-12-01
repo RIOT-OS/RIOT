@@ -1,4 +1,3 @@
-APPLICATION = saul
 include ../Makefile.tests_common
 
 # include and auto-initialize all available sensors

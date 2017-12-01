@@ -1,4 +1,3 @@
-APPLICATION = xtimer_msg_receive_timeout
 include ../Makefile.tests_common
 
 USEMODULE += xtimer

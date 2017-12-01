@@ -1,4 +1,3 @@
-APPLICATION = driver_kw2xrf
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_spi periph_gpio

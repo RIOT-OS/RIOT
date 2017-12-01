@@ -1,4 +1,3 @@
-APPLICATION = thread_cooperation
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY :=    chronos \

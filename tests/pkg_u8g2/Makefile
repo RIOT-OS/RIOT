@@ -1,4 +1,3 @@
-APPLICATION = pkg_u8g2
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := nucleo32-f031

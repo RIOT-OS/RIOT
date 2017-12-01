@@ -1,4 +1,3 @@
-APPLICATION = driver_xbee
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_uart periph_gpio

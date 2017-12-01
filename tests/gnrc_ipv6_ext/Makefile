@@ -1,5 +1,4 @@
 # name of your application
-APPLICATION = gnrc_ipv6_ext
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos maple-mini msb-430 msb-430h \

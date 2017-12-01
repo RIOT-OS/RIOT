@@ -1,4 +1,3 @@
-APPLICATION = ps_schedstatistics
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f030 nucleo-l053 \

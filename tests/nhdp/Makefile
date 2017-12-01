@@ -1,4 +1,3 @@
-APPLICATION = nhdp
 include ../Makefile.tests_common
 
 BOARD_BLACKLIST := arduino-mega2560 chronos msb-430 msb-430h telosb \

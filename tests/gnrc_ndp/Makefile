@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = gnrc_ndp
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := chronos nucleo32-f031 nucleo32-f042 nucleo32-l031 \

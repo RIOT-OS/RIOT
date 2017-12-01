@@ -1,4 +1,3 @@
-APPLICATION = driver_my9221
 include ../Makefile.tests_common
 
 USEMODULE += my9221

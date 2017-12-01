@@ -1,4 +1,3 @@
-APPLICATION = driver_isl29020
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c

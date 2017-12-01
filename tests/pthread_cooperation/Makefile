@@ -1,4 +1,3 @@
-APPLICATION = pthread_cooperation
 include ../Makefile.tests_common
 
 BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove

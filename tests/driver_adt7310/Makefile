@@ -1,4 +1,3 @@
-APPLICATION = driver_adt7310
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-mega2560 waspmote-pro

@@ -1,4 +1,3 @@
-APPLICATION = ssp
 include ../Makefile.tests_common
 
 # avr8, msp430 and mips don't support ssp (yet)

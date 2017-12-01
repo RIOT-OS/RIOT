@@ -1,4 +1,3 @@
-APPLICATION = driver_at86rf2xx
 include ../Makefile.tests_common
 
 # exclude boards with insufficient memory

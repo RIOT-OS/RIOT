@@ -1,4 +1,3 @@
-APPLICATION = driver_feetech
 include ../Makefile.tests_common
 
 # chronos : USART_1 undeclared

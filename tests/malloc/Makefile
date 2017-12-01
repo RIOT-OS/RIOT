@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = malloc
 include ../Makefile.tests_common
 
 # Comment this out to disable code in RIOT that does safety checking

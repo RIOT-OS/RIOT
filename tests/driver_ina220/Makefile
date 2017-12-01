@@ -1,4 +1,3 @@
-APPLICATION = driver_ina220
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c
