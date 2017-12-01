@@ -197,6 +197,7 @@ static int _set_state(kw2xrf_t *dev, netopt_state_t state)
         case NETOPT_STATE_OFF:
             /* TODO: Replace with powerdown (set reset input low) */
             kw2xrf_set_power_mode(dev, KW2XRF_HIBERNATE);
+            break;
         default:
             return -ENOTSUP;
     }
