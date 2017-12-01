@@ -4,10 +4,12 @@ APPLICATION = gnrc_networking_mac
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
 
-# Currently, LWMAC is only tested and evaluated through on samr21-xpro.
-# Once LWMAC has also been tested through on other boards, the whitelist should be
+# Currently, GoMacH has only been tested and evaluated through on samr21-xpro and iotlab-m3.
+# Once GoMacH has also been tested through on other boards, the whitelist should be
 # then accordingly extended.
-BOARD_WHITELIST := samr21-xpro
+# Notably, for LWMAC, we have only evaluated it on samr21-xpro nodes. To this end, if
+# you are going to include LWMAC for testing, you should only run the example on samr21-xpro.
+BOARD_WHITELIST := samr21-xpro iotlab-m3
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -33,13 +35,15 @@ USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 USEMODULE += netstats_rpl
-# Use LWMAC as the MAC layer protocol
-USEMODULE += gnrc_lwmac
+# Use GoMacH as the MAC layer protocol
+USEMODULE += gnrc_gomach
+# In case of using LWMAC MAC protocol instead of GoMacH, uncomment the following line and comment the above line
+# USEMODULE += gnrc_lwmac
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP
+DEVELHELP ?= 1
 
 # Uncomment the following 2 lines to specify static link lokal IPv6 address
 # this might be useful for testing, in cases where you cannot or do not want to

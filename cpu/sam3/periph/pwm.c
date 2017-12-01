@@ -95,6 +95,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
 uint8_t pwm_channels(pwm_t pwm)
 {
+    (void)pwm;
     assert(pwm == PWM_DEV(0));
     return (uint8_t)PWM_CHAN_NUMOF;
 }
@@ -105,6 +106,7 @@ uint8_t pwm_channels(pwm_t pwm)
  */
 void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
 {
+    (void)pwm;
     assert((pwm == PWM_DEV(0)) && (channel < PWM_CHAN_NUMOF));
 
     /* clip and set new value */
@@ -114,6 +116,7 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
 
 void pwm_poweron(pwm_t pwm)
 {
+    (void)pwm;
     assert(pwm == PWM_DEV(0));
     PMC->PMC_PCER1 = PMC_PCDR1_PID36;
     PWM->PWM_ENA = pwm_chan_mask;
@@ -121,6 +124,7 @@ void pwm_poweron(pwm_t pwm)
 
 void pwm_poweroff(pwm_t pwm)
 {
+    (void)pwm;
     assert(pwm == PWM_DEV(0));
     PWM->PWM_ENA = 0;
     PMC->PMC_PCDR1 = PMC_PCDR1_PID36;

@@ -462,7 +462,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
     mtd_spi_cmd(dev, dev->opcode->wren);
 
     if (size == total_size) {
-        mtd_spi_cmd_addr_write(dev, dev->opcode->chip_erase, addr_be, NULL, 0);
+        mtd_spi_cmd(dev, dev->opcode->chip_erase);
     }
     else if ((dev->flag & SPI_NOR_F_SECT_4K) && size == 4096) {
         /* 4 KiO sectors can be erased with sector erase command */

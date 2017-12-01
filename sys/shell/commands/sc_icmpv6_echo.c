@@ -24,8 +24,11 @@
 #include "byteorder.h"
 #include "net/gnrc/icmpv6.h"
 #include "net/ipv6/addr.h"
-#include "net/gnrc/ipv6/nc.h"
+#ifdef MODULE_GNRC_IPV6_NIB
+#include "net/gnrc/ipv6/nib/nc.h"
+#endif
 #include "net/gnrc/ipv6/hdr.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc.h"
 #include "thread.h"
 #include "utlist.h"
@@ -108,8 +111,8 @@ int _handle_reply(gnrc_pktsnip_t *pkt, uint32_t time)
                ipv6_addr_to_str(ipv6_str, &(ipv6_hdr->src), sizeof(ipv6_str)),
                byteorder_ntohs(icmpv6_hdr->id), seq, (unsigned)ipv6_hdr->hl,
                time / US_PER_MS, time % US_PER_MS);
-#ifdef MODULE_GNRC_IPV6_NC
-        gnrc_ipv6_nc_still_reachable(&ipv6_hdr->src);
+#ifdef MODULE_GNRC_IPV6_NIB
+        gnrc_ipv6_nib_nc_mark_reachable(&ipv6_hdr->src);
 #endif
     }
     else {
@@ -200,11 +203,11 @@ int _icmpv6_ping(int argc, char **argv)
     }
 
     if (ipv6_addr_is_link_local(&addr) || (src_iface != KERNEL_PID_UNDEF)) {
-        kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-        size_t ifnum = gnrc_netif_get(ifs);
+        size_t ifnum = gnrc_netif_numof();
+
         if (src_iface == KERNEL_PID_UNDEF) {
             if (ifnum == 1) {
-                src_iface = ifs[0];
+                src_iface = gnrc_netif_iter(NULL)->pid;
             }
             else {
                 puts("error: link local target needs interface parameter (use \"<address>%<ifnum>\")\n");
@@ -212,14 +215,7 @@ int _icmpv6_ping(int argc, char **argv)
             }
         }
         else {
-            int valid = 0;
-            for (size_t i = 0; i < ifnum && i < GNRC_NETIF_NUMOF; i++) {
-                if (ifs[i] == src_iface) {
-                    valid = 1;
-                    break;
-                }
-            }
-            if (!valid) {
+            if (gnrc_netif_get_by_pid(src_iface) == NULL) {
                 printf("error: %"PRIkernel_pid" is not a valid interface.\n", src_iface);
                 return 1;
             }

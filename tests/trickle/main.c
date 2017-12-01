@@ -53,8 +53,8 @@ static void callback(void *args)
     return;
 }
 
-static trickle_t trickle = { .callback.func = &callback,
-                             .callback.args = NULL };
+static trickle_t trickle = { .callback = { .func = &callback,
+                                           .args = NULL } };
 
 int main(void)
 {

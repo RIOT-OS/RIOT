@@ -59,6 +59,8 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
+    (void)bus;
+
     gpio_periph_mode(SPI_PIN_MISO, true);
     gpio_periph_mode(SPI_PIN_MOSI, true);
     gpio_periph_mode(SPI_PIN_CLK, true);
@@ -66,6 +68,9 @@ void spi_init_pins(spi_t bus)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+    (void)bus;
+    (void)cs;
+
     if (clk == SPI_CLK_10MHZ) {
         return SPI_NOCLK;
     }
@@ -99,8 +104,9 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     return SPI_OK;
 }
 
-void spi_release(spi_t dev)
+void spi_release(spi_t bus)
 {
+    (void)bus;
     /* put SPI device back in reset state */
 #ifndef SPI_USE_USCI
     SPI_BASE->CTL |= (USART_CTL_SWRST);
@@ -115,6 +121,8 @@ void spi_release(spi_t dev)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
+    (void)bus;
+
     const uint8_t *out_buf = out;
     uint8_t *in_buf = in;
 

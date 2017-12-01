@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 #include "periph/rtt.h"
-#include "net/gnrc/netdev.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/mac/types.h"
 #include "net/gnrc/lwmac/types.h"
 
@@ -41,7 +41,7 @@ extern "C" {
  * successively transmit its packets back to back with this flag set up,
  * with the awareness that the receiver will also keep awake for receptions.
  */
-#define GNRC_NETDEV_LWMAC_TX_CONTINUE          (0x0008U)
+#define GNRC_LWMAC_TX_CONTINUE          (0x0008U)
 
 /**
  * @brief   Flag to track if the sender should quit Tx in current cycle.
@@ -53,7 +53,7 @@ extern "C" {
  * cycle (started by the wake-up period), thus not to collide with other
  * (neighbor) nodes' transmissions.
  */
-#define GNRC_NETDEV_LWMAC_QUIT_TX              (0x0010U)
+#define GNRC_LWMAC_QUIT_TX              (0x0010U)
 
 /**
  * @brief   Flag to track if the device need to reselect a new wake-up phase.
@@ -65,7 +65,7 @@ extern "C" {
  * sender finds its phase close to its receiver's, it sets up this flag and then
  * randomly reselects a new wake-up phase.
  */
-#define GNRC_NETDEV_LWMAC_PHASE_BACKOFF        (0x0020U)
+#define GNRC_LWMAC_PHASE_BACKOFF        (0x0020U)
 
 /**
  * @brief   Flag to track if the device needs to quit the wake-up (listening) procedure.
@@ -78,15 +78,15 @@ extern "C" {
  * should immediately goto sleep (by setting up this flag) after one reception, thus not
  * to receive duplicate broadcast packets.
  */
-#define GNRC_NETDEV_LWMAC_QUIT_RX              (0x0040U)
+#define GNRC_LWMAC_QUIT_RX              (0x0040U)
 
 /**
  * @brief Type to pass information about parsing.
  */
 typedef struct {
-    gnrc_lwmac_hdr_t *header;      /**< LWMAC header of packet */
-    gnrc_lwmac_l2_addr_t src_addr; /**< copied source address of packet  */
-    gnrc_lwmac_l2_addr_t dst_addr; /**< copied destination address of packet */
+    gnrc_lwmac_hdr_t *header;       /**< LWMAC header of packet */
+    gnrc_lwmac_l2_addr_t src_addr;  /**< copied source address of packet  */
+    gnrc_lwmac_l2_addr_t dst_addr;  /**< copied destination address of packet */
 } gnrc_lwmac_packet_info_t;
 
 /**
@@ -98,184 +98,208 @@ typedef struct {
 #define GNRC_LWMAC_RTT_EVENT_MARGIN_TICKS    (RTT_MS_TO_TICKS(2))
 
 /**
- * @brief set the TX-continue flag of the device
+ * @brief set the @ref GNRC_LWMAC_TX_CONTINUE flag of the device
  *
- * @param[in] dev          ptr to netdev device
+ * @param[in] netif        ptr to the network interface
  * @param[in] tx_continue  value for LWMAC tx-continue flag
  *
  */
-static inline void gnrc_netdev_lwmac_set_tx_continue(gnrc_netdev_t *dev, bool tx_continue)
+static inline void gnrc_lwmac_set_tx_continue(gnrc_netif_t *netif, bool tx_continue)
 {
     if (tx_continue) {
-        dev->mac_info |= GNRC_NETDEV_LWMAC_TX_CONTINUE;
+        netif->mac.mac_info |= GNRC_LWMAC_TX_CONTINUE;
     }
     else {
-        dev->mac_info &= ~GNRC_NETDEV_LWMAC_TX_CONTINUE;
+        netif->mac.mac_info &= ~GNRC_LWMAC_TX_CONTINUE;
     }
 }
 
 /**
- * @brief get the TX-continue flag of the device
+ * @brief get the @ref GNRC_LWMAC_TX_CONTINUE flag of the device
  *
- * @param[in] dev          ptr to netdev device
+ * @param[in] netif        ptr to the network interface
  *
  * @return                 true if tx continue
- * @return                 false if tx will continue
+ * @return                 false if tx will not continue
  */
-static inline bool gnrc_netdev_lwmac_get_tx_continue(gnrc_netdev_t *dev)
+static inline bool gnrc_lwmac_get_tx_continue(gnrc_netif_t *netif)
 {
-    return (dev->mac_info & GNRC_NETDEV_LWMAC_TX_CONTINUE);
+    return (netif->mac.mac_info & GNRC_LWMAC_TX_CONTINUE);
 }
 
 /**
- * @brief set the quit-TX flag of the device
+ * @brief set the @ref GNRC_LWMAC_QUIT_TX flag of the device
  *
- * @param[in] dev          ptr to netdev device
- * @param[in] quit_tx      value for LWMAC quit-TX flag
+ * @param[in] netif        ptr to the network interface
+ * @param[in] quit_tx      value for @ref GNRC_LWMAC_QUIT_TX flag
  *
  */
-static inline void gnrc_netdev_lwmac_set_quit_tx(gnrc_netdev_t *dev, bool quit_tx)
+static inline void gnrc_lwmac_set_quit_tx(gnrc_netif_t *netif, bool quit_tx)
 {
     if (quit_tx) {
-        dev->mac_info |= GNRC_NETDEV_LWMAC_QUIT_TX;
+        netif->mac.mac_info |= GNRC_LWMAC_QUIT_TX;
     }
     else {
-        dev->mac_info &= ~GNRC_NETDEV_LWMAC_QUIT_TX;
+        netif->mac.mac_info &= ~GNRC_LWMAC_QUIT_TX;
     }
 }
 
 /**
- * @brief get the quit-TX flag of the device
+ * @brief get the @ref GNRC_LWMAC_QUIT_TX flag of the device
  *
- * @param[in] dev          ptr to netdev device
+ * @param[in] netif        ptr to the network interface
  *
  * @return                 true if quit tx
  * @return                 false if will not quit tx
  */
-static inline bool gnrc_netdev_lwmac_get_quit_tx(gnrc_netdev_t *dev)
+static inline bool gnrc_lwmac_get_quit_tx(gnrc_netif_t *netif)
 {
-    return (dev->mac_info & GNRC_NETDEV_LWMAC_QUIT_TX);
+    return (netif->mac.mac_info & GNRC_LWMAC_QUIT_TX);
 }
 
 /**
- * @brief set the phase-backoff flag of the device
+ * @brief set the @ref GNRC_LWMAC_PHASE_BACKOFF flag of the device
  *
- * @param[in] dev          ptr to netdev device
- * @param[in] backoff      value for LWMAC phase-backoff flag
+ * @param[in] netif        ptr to the network interface
+ * @param[in] backoff      value for LWMAC @ref GNRC_LWMAC_PHASE_BACKOFF flag
  *
  */
-static inline void gnrc_netdev_lwmac_set_phase_backoff(gnrc_netdev_t *dev, bool backoff)
+static inline void gnrc_lwmac_set_phase_backoff(gnrc_netif_t *netif, bool backoff)
 {
     if (backoff) {
-        dev->mac_info |= GNRC_NETDEV_LWMAC_PHASE_BACKOFF;
+        netif->mac.mac_info |= GNRC_LWMAC_PHASE_BACKOFF;
     }
     else {
-        dev->mac_info &= ~GNRC_NETDEV_LWMAC_PHASE_BACKOFF;
+        netif->mac.mac_info &= ~GNRC_LWMAC_PHASE_BACKOFF;
     }
 }
 
 /**
- * @brief get the phase-backoff of the device
+ * @brief get the @ref GNRC_LWMAC_PHASE_BACKOFF flag of the device
  *
- * @param[in] dev          ptr to netdev device
+ * @param[in] netif        ptr to the network interface
  *
  * @return                 true if will run phase-backoff
  * @return                 false if will not run phase-backoff
  */
-static inline bool gnrc_netdev_lwmac_get_phase_backoff(gnrc_netdev_t *dev)
+static inline bool gnrc_lwmac_get_phase_backoff(gnrc_netif_t *netif)
 {
-    return (dev->mac_info & GNRC_NETDEV_LWMAC_PHASE_BACKOFF);
+    return (netif->mac.mac_info & GNRC_LWMAC_PHASE_BACKOFF);
 }
 
 /**
- * @brief set the quit-RX flag of the device
+ * @brief set the @ref GNRC_LWMAC_QUIT_RX flag of the device
  *
- * @param[in] dev          ptr to netdev device
- * @param[in] quit_rx      value for LWMAC quit-Rx flag
+ * @param[in] netif        ptr to the network interface
+ * @param[in] quit_rx      value for LWMAC @ref GNRC_LWMAC_QUIT_RX flag
  *
  */
-static inline void gnrc_netdev_lwmac_set_quit_rx(gnrc_netdev_t *dev, bool quit_rx)
+static inline void gnrc_lwmac_set_quit_rx(gnrc_netif_t *netif, bool quit_rx)
 {
     if (quit_rx) {
-        dev->mac_info |= GNRC_NETDEV_LWMAC_QUIT_RX;
+        netif->mac.mac_info |= GNRC_LWMAC_QUIT_RX;
     }
     else {
-        dev->mac_info &= ~GNRC_NETDEV_LWMAC_QUIT_RX;
+        netif->mac.mac_info &= ~GNRC_LWMAC_QUIT_RX;
     }
 }
 
 /**
- * @brief get the quit-RX flag of the device
+ * @brief get the @ref GNRC_LWMAC_QUIT_RX flag of the device
  *
- * @param[in] dev          ptr to netdev device
+ * @param[in] netif        ptr to the network interface
  *
  * @return                 true if will quit rx
  * @return                 false if will not quit rx
  */
-static inline bool gnrc_netdev_lwmac_get_quit_rx(gnrc_netdev_t *dev)
+static inline bool gnrc_lwmac_get_quit_rx(gnrc_netif_t *netif)
 {
-    return (dev->mac_info & GNRC_NETDEV_LWMAC_QUIT_RX);
+    return (netif->mac.mac_info & GNRC_LWMAC_QUIT_RX);
 }
 
 /**
- * @brief set the duty-cycle-active flag of LWMAC
+ * @brief set the @ref GNRC_LWMAC_DUTYCYCLE_ACTIVE flag of LWMAC
  *
- * @param[in] dev          ptr to netdev device
- * @param[in] active       value for LWMAC duty-cycle-active flag
+ * @param[in] netif        ptr to the network interface
+ * @param[in] active       value for LWMAC @ref GNRC_LWMAC_DUTYCYCLE_ACTIVE flag
  *
  */
-static inline void gnrc_netdev_lwmac_set_dutycycle_active(gnrc_netdev_t *dev, bool active)
+static inline void gnrc_lwmac_set_dutycycle_active(gnrc_netif_t *netif, bool active)
 {
     if (active) {
-        dev->lwmac.lwmac_info |= GNRC_LWMAC_DUTYCYCLE_ACTIVE;
+        netif->mac.prot.lwmac.lwmac_info |= GNRC_LWMAC_DUTYCYCLE_ACTIVE;
     }
     else {
-        dev->lwmac.lwmac_info &= ~GNRC_LWMAC_DUTYCYCLE_ACTIVE;
+        netif->mac.prot.lwmac.lwmac_info &= ~GNRC_LWMAC_DUTYCYCLE_ACTIVE;
     }
 }
 
 /**
- * @brief get the duty-cycle-active flag of LWMAC
+ * @brief get the @ref GNRC_LWMAC_DUTYCYCLE_ACTIVE flag of LWMAC
  *
- * @param[in] dev          ptr to netdev device
+ * @param[in] netif        ptr to the network interface
  *
  * @return                 true if active
  * @return                 false if not active
  */
-static inline bool gnrc_netdev_lwmac_get_dutycycle_active(gnrc_netdev_t *dev)
+static inline bool gnrc_lwmac_get_dutycycle_active(gnrc_netif_t *netif)
 {
-    return (dev->lwmac.lwmac_info & GNRC_LWMAC_DUTYCYCLE_ACTIVE);
+    return (netif->mac.prot.lwmac.lwmac_info & GNRC_LWMAC_DUTYCYCLE_ACTIVE);
 }
 
 /**
- * @brief set the needs-rescheduling flag of LWMAC
+ * @brief set the @ref GNRC_LWMAC_NEEDS_RESCHEDULE flag of LWMAC
  *
- * @param[in] dev          ptr to netdev device
- * @param[in] reschedule   value for LWMAC needs-rescheduling flag
+ * @param[in] netif        ptr to the network interface
+ * @param[in] reschedule   value for @ref GNRC_LWMAC_NEEDS_RESCHEDULE flag
  *
  */
-static inline void gnrc_netdev_lwmac_set_reschedule(gnrc_netdev_t *dev, bool reschedule)
+static inline void gnrc_lwmac_set_reschedule(gnrc_netif_t *netif, bool reschedule)
 {
     if (reschedule) {
-        dev->lwmac.lwmac_info |= GNRC_LWMAC_NEEDS_RESCHEDULE;
+        netif->mac.prot.lwmac.lwmac_info |= GNRC_LWMAC_NEEDS_RESCHEDULE;
     }
     else {
-        dev->lwmac.lwmac_info &= ~GNRC_LWMAC_NEEDS_RESCHEDULE;
+        netif->mac.prot.lwmac.lwmac_info &= ~GNRC_LWMAC_NEEDS_RESCHEDULE;
     }
 }
 
 /**
- * @brief get the needs-rescheduling flag of LWMAC
+ * @brief get the @ref GNRC_LWMAC_NEEDS_RESCHEDULE flag of LWMAC
  *
- * @param[in] dev          ptr to netdev device
+ * @param[in] netif        ptr to the network interface
  *
  * @return                 true if needs rescheduling
  * @return                 false if no need for rescheduling
  */
-static inline bool gnrc_netdev_lwmac_get_reschedule(gnrc_netdev_t *dev)
+static inline bool gnrc_lwmac_get_reschedule(gnrc_netif_t *netif)
 {
-    return (dev->lwmac.lwmac_info & GNRC_LWMAC_NEEDS_RESCHEDULE);
+    return (netif->mac.prot.lwmac.lwmac_info & GNRC_LWMAC_NEEDS_RESCHEDULE);
 }
+
+/**
+ * @brief send a @ref net_gnrc_pkt "packet" over the network interface in LWMAC
+ *
+ * @internal
+ *
+ * @pre `netif != NULL && pkt != NULL`
+ *
+ * @note The function re-formats the content of @p pkt to a format expected
+ *       by the netdev_driver_t::send() method of gnrc_netif_t::dev and
+ *       releases the packet before returning (so no additional release
+ *       should be required after calling this method).
+ *
+ * @param[in] netif The network interface.
+ * @param[in] pkt   A packet to send.
+ *
+ * @return  The number of bytes actually sent on success
+ * @return  -EBADMSG, if the @ref net_gnrc_netif_hdr in @p pkt is missing
+ *          or is in an unexpected format.
+ * @return  -ENOTSUP, if sending @p pkt in the given format isn't supported
+ *          (e.g. empty payload with Ethernet).
+ * @return  Any negative error code reported by gnrc_netif_t::dev.
+ */
+int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 
 /**
  * @brief Parse an incoming packet and extract important information.
@@ -293,19 +317,19 @@ int _gnrc_lwmac_parse_packet(gnrc_pktsnip_t *pkt, gnrc_lwmac_packet_info_t *info
 /**
  * @brief Shortcut to get the state of netdev.
  *
- * @param[in]   gnrc_netdev    gnrc_netdev structure
+ * @param[in]   netif    ptr to the network interface
  *
- * @return                     state of netdev
+ * @return               state of netdev
  */
-netopt_state_t _gnrc_lwmac_get_netdev_state(gnrc_netdev_t *gnrc_netdev);
+netopt_state_t _gnrc_lwmac_get_netdev_state(gnrc_netif_t *netif);
 
 /**
  * @brief Shortcut to set the state of netdev
  *
- * @param[in]   gnrc_netdev    gnrc_netdev structure
- * @param[in]   devstate       new state for netdev
+ * @param[in]   netif       ptr to the network interface
+ * @param[in]   devstate    new state for netdev
  */
-void _gnrc_lwmac_set_netdev_state(gnrc_netdev_t *gnrc_netdev, netopt_state_t devstate);
+void _gnrc_lwmac_set_netdev_state(gnrc_netif_t *netif, netopt_state_t devstate);
 
 /**
  * @brief Convert RTT ticks to device phase

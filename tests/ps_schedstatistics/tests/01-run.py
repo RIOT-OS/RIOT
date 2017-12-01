@@ -35,6 +35,7 @@ PS_EXPECTED = (
     ('\t    | SUM                  |            |     | \d+  (\d+)')
 )
 
+
 def _check_startup(child):
     for i in range(5):
         child.expect_exact('Creating thread #{}, next={}'

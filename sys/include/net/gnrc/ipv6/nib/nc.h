@@ -207,7 +207,7 @@ static inline unsigned gnrc_ipv6_nib_nc_get_ar_state(const gnrc_ipv6_nib_nc_t *e
 /**
  * @brief   Adds an unmanaged neighbor entry to NIB
  *
- * @pre `(ipv6 != NULL) && (l2addr != NULL)`
+ * @pre `ipv6 != NULL`
  * @pre `l2addr_len <= GNRC_IPV6_NIB_L2ADDR_MAX_LEN`
  * @pre `(iface > KERNEL_PID_UNDEF) && (iface <= KERNEL_PID_LAST)`
  *
@@ -235,11 +235,12 @@ int gnrc_ipv6_nib_nc_set(const ipv6_addr_t *ipv6, unsigned iface,
  *
  * @pre `ipv6 != NULL`
  *
- * @param[in] ipv6 The neighbor's IPv6 address.
+ * @param[in] ipv6  The neighbor's IPv6 address.
+ * @param[in] iface The interface to the neighbor.
  *
  * If the @p ipv6 can't be found for a neighbor in the NIB nothing happens.
  */
-void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6);
+void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface);
 
 /**
  * @brief   Mark neighbor with address @p ipv6 as reachable

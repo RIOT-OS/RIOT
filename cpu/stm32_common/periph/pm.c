@@ -66,6 +66,8 @@ void pm_set(unsigned mode)
             deep = 1;
             break;
     }
+#else
+    (void) mode;
 #endif
 
     cortexm_sleep(deep);

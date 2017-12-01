@@ -246,7 +246,7 @@ typedef enum {
  * May be different for certain radios.
  */
 struct netdev_radio_rx_info {
-    uint8_t rssi;       /**< RSSI of a received packet */
+    int16_t rssi;       /**< RSSI of a received packet in dBm */
     uint8_t lqi;        /**< LQI of a received packet */
 };
 

@@ -61,9 +61,6 @@ endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
   DIRS += net/routing/nhdp
 endif
-ifneq (,$(filter gnrc_netdev,$(USEMODULE)))
-  DIRS += net/gnrc/link_layer/netdev
-endif
 ifneq (,$(filter fib,$(USEMODULE)))
   DIRS += net/network_layer/fib
 endif

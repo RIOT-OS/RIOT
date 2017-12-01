@@ -11,7 +11,7 @@
  * @ingroup     net_gnrc
  * @brief       Protocol type definitions and helper functions
  *
- * The protocol types are used with the @ref net_gnrc_netapi, the @ref net_gnrc_netdev,
+ * The protocol types are used with the @ref net_gnrc_netapi, the @ref net_gnrc_netif,
  * the @ref net_gnrc_netreg, and the @ref net_gnrc_pkt to identify network protocols
  * throughout the network stack.
  *
@@ -55,6 +55,17 @@ typedef enum {
 #ifdef MODULE_GNRC_SIXLOWPAN
     GNRC_NETTYPE_SIXLOWPAN,     /**< Protocol is 6LoWPAN */
 #endif
+
+    /**
+     * @{
+     * @name Link layer
+     */
+#ifdef MODULE_GNRC_GOMACH
+    GNRC_NETTYPE_GOMACH,         /**< Protocol is GoMacH */
+#endif
+    /**
+     * @}
+     */
 
     /**
      * @{

@@ -26,9 +26,7 @@ def find_exc_origin(exc_info):
     pos = list_until(extract_tb(exc_info),
                      lambda frame: frame[0].startswith(PEXPECT_PATH)
                     )[-1]
-    return pos[3], \
-           os.path.relpath(os.path.abspath(pos[0]), RIOTBASE), \
-           pos[1]
+    return (pos[3], os.path.relpath(os.path.abspath(pos[0]), RIOTBASE), pos[1])
 
 def run(testfunc, timeout=10, echo=True, traceback=False):
     env = os.environ.copy()
@@ -49,16 +47,14 @@ def run(testfunc, timeout=10, echo=True, traceback=False):
     try:
         testfunc(child)
     except pexpect.TIMEOUT:
-        line, filename, lineno = find_exc_origin(sys.exc_info()[2])
-        print("Timeout in expect script at \"%s\" (%s:%d)" %
-              (line, filename, lineno))
+        trace = find_exc_origin(sys.exc_info()[2])
+        print("Timeout in expect script at \"%s\" (%s:%d)" % trace)
         if traceback:
             print_tb(sys.exc_info()[2])
         return 1
     except pexpect.EOF:
-        line, filename, lineno = find_exc_origin(sys.exc_info()[2])
-        print("Unexpected end of file in expect script at \"%s\" (%s:%d)" %
-              (line, filename, lineno))
+        trace = find_exc_origin(sys.exc_info()[2])
+        print("Unexpected end of file in expect script at \"%s\" (%s:%d)" % trace)
         if traceback:
             print_tb(sys.exc_info()[2])
         return 1

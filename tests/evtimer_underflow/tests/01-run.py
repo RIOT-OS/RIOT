@@ -9,12 +9,12 @@
 from __future__ import print_function
 import os
 import sys
-import time
 
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
 how_many = 100
+
 
 def testfunc(child):
     for i in range(how_many):

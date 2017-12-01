@@ -19,7 +19,6 @@
 #include "net/ndp.h"
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif.h"
 
 #include "_nib-internal.h"
 
@@ -484,7 +483,7 @@ static void test_nib_nc_add__success_full_but_garbage_collectible(void)
 
     for (int i = 0; i < (3 * GNRC_IPV6_NIB_NUMOF); i++) {
         TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, IFACE,
-                                                 GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE)));
+                                                 GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE)));
         TEST_ASSERT(last != node);
         TEST_ASSERT(ipv6_addr_equal(&addr, &node->ipv6));
         TEST_ASSERT_EQUAL_INT(IFACE, _nib_onl_get_if(node));
@@ -1790,7 +1789,7 @@ static void test_nib_abr_add_pfx__pfx_not_in_nib(void)
     static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                              { .u64 = TEST_UINT64 } } };
     _nib_offl_entry_t offl;
-
+    offl.mode = _PL;
     TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
     TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
     _nib_abr_add_pfx(abr, &offl);
@@ -1910,33 +1909,6 @@ static void test_nib_abr_iter__three_elem_middle_removed(void)
 }
 #endif
 
-/*
- * Creates GNRC_NETIF_NUMOF interfaces and then tries to add another.
- * Expected result: should return NULL
- */
-static void test_nib_iface_get__no_space_left(void)
-{
-    unsigned iface = 1;
-
-    for (int i = 0; i < GNRC_NETIF_NUMOF; i++) {
-        TEST_ASSERT_NOT_NULL(_nib_iface_get(iface++));
-    }
-    TEST_ASSERT_NULL(_nib_iface_get(iface));
-}
-
-/*
- * Creates an interface and then gets the same interface.
- * Expected result: interface pointers should equal
- */
-static void test_nib_iface_get__success(void)
-{
-    _nib_iface_t *ni1, *ni2;
-
-    TEST_ASSERT_NOT_NULL((ni1 = _nib_iface_get(IFACE)));
-    TEST_ASSERT_NOT_NULL((ni2 = _nib_iface_get(IFACE)));
-    TEST_ASSERT(ni1 == ni2);
-}
-
 Test *tests_gnrc_ipv6_nib_internal_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -2035,8 +2007,6 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_abr_iter__three_elem),
         new_TestFixture(test_nib_abr_iter__three_elem_middle_removed),
 #endif
-        new_TestFixture(test_nib_iface_get__no_space_left),
-        new_TestFixture(test_nib_iface_get__success),
     };
 
     EMB_UNIT_TESTCALLER(tests, set_up, NULL,

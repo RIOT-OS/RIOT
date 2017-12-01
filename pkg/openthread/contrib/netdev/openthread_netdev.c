@@ -71,6 +71,7 @@ void otTaskletsSignalPending(otInstance *aInstance) {
 }
 
 static void *_openthread_event_loop(void *arg) {
+    (void)arg;
     _pid = thread_getpid();
 
     /* enable OpenThread UART */

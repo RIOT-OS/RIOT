@@ -1,0 +1,29 @@
+From 8497756fbb1bfdc283f98430e101cd89ab84c18d Mon Sep 17 00:00:00 2001
+From: Christian Manal <moenoel@informatik.uni-bremen.de>
+Date: Thu, 23 Nov 2017 10:55:57 +0100
+Subject: [PATCH 02/12] define endianness
+
+---
+ core/internals.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/core/internals.h b/core/internals.h
+index 79c6c4c..f6490d1 100644
+--- a/core/internals.h
++++ b/core/internals.h
+@@ -63,6 +63,12 @@
+ 
+ #include "er-coap-13.h"
+ 
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++#define LWM2M_LITTLE_ENDIAN
++#else
++#define LWM2M_BIG_ENDIAN
++#endif
++
+ #ifdef LWM2M_WITH_LOGS
+ #include <inttypes.h>
+ #define LOG(STR) lwm2m_printf("[%s:%d] " STR "\r\n", __func__ , __LINE__)
+-- 
+2.1.4
+

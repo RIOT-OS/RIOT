@@ -115,6 +115,10 @@ ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter hts221,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter io1_xplained,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += at30tse75x
@@ -172,6 +176,7 @@ ifneq (,$(filter mpl3115a2,$(USEMODULE)))
 endif
 
 ifneq (,$(filter mpu9150,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
 
@@ -257,6 +262,7 @@ ifneq (,$(filter veml6070,$(USEMODULE)))
 endif
 
 ifneq (,$(filter w5100,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += luid
 endif

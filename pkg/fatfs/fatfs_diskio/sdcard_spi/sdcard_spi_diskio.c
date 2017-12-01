@@ -38,7 +38,7 @@ extern sdcard_spi_t sdcard_spi_devs[NUM_OF_SD_CARDS];
 
 static inline sdcard_spi_t *get_sd_card(int idx)
 {
-    if (idx < NUM_OF_SD_CARDS) {
+    if (idx < (int)NUM_OF_SD_CARDS) {
         return &(sdcard_spi_devs[idx]);
     }
 
@@ -108,8 +108,10 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
 
     if ((card != NULL) && card->init_done) {
         sd_rw_response_t state;
-        if (count != sdcard_spi_read_blocks(card, sector, (char *)buff,
-                                            SD_HC_BLOCK_SIZE, count, &state)) {
+        if ((int)count != sdcard_spi_read_blocks(card, sector,
+                                                 (char *)buff,
+                                                 SD_HC_BLOCK_SIZE,
+                                                 count, &state)) {
             printf("[ERROR] disk_read: sdcard_spi_read_blocks: %d\n", state);
             return RES_NOTRDY;
         }
@@ -136,8 +138,10 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
 
     if ((card != NULL) && card->init_done) {
         sd_rw_response_t state;
-        if (count != sdcard_spi_write_blocks(card, sector, (char *)buff,
-                                             SD_HC_BLOCK_SIZE, count, &state)) {
+        if ((int)count != sdcard_spi_write_blocks(card, sector,
+                                                  (char *)buff,
+                                                  SD_HC_BLOCK_SIZE,
+                                                  count, &state)) {
             printf("[ERROR] disk_write: sdcard_spi_write_blocks: %d\n", state);
             return RES_NOTRDY;
         }

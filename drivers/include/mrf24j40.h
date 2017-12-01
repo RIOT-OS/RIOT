@@ -137,6 +137,7 @@ typedef struct {
     uint8_t idle_state;                     /**< state to return to after sending */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
     uint8_t header_len;                     /**< length of the header */
+    uint8_t fcf_low;                        /**< Low 8 FCF bits of the current TX frame. */
     uint8_t pending;                        /**< Flags for pending tasks */
     uint8_t irq_flag;                       /**< Flags for IRQs */
     uint8_t tx_retries;                     /**< Number of retries needed for last transmission */
@@ -366,6 +367,14 @@ void mrf24j40_reset_state_machine(mrf24j40_t *dev);
  * @param[in] dev           device to operate on
  */
 void mrf24j40_software_reset(mrf24j40_t *dev);
+
+/**
+ * @brief   Convert scalar from mrf24j40 RSSI to dBm
+ *
+ * @param[in] value         value to convert to dBm
+ * @return                  converted value in dBm
+ */
+int8_t mrf24j40_dbm_from_reg(uint8_t value);
 
 /**
  * @brief   Prepare for sending of data

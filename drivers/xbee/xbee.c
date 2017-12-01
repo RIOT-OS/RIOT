@@ -749,6 +749,10 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
                 *((uint16_t *)value) = IEEE802154_SHORT_ADDRESS_LEN;
             }
             return sizeof(uint16_t);
+        case NETOPT_DEVICE_TYPE:
+            assert(max_len == sizeof(uint16_t));
+            *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
+            return sizeof(uint16_t);
         case NETOPT_IPV6_IID:
             if (max_len < sizeof(eui64_t)) {
                 return -EOVERFLOW;

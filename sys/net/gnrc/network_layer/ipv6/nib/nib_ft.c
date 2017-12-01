@@ -33,9 +33,9 @@ int gnrc_ipv6_nib_ft_get(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
 }
 
 int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
-                         const ipv6_addr_t *next_hop, unsigned iface)
+                         const ipv6_addr_t *next_hop, unsigned iface,
+                         uint16_t ltime)
 {
-    void *ptr = NULL;
     int res = 0;
     bool is_default_route = ((dst == NULL) || (dst_len == 0) ||
                              ipv6_addr_is_unspecified(dst));
@@ -45,12 +45,33 @@ int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
     }
     mutex_lock(&_nib_mutex);
     if (is_default_route) {
+        _nib_dr_entry_t *ptr;
+
         ptr = _nib_drl_add(next_hop, iface);
+        if (ptr == NULL) {
+            res = -ENOMEM;
+        }
+        else {
+            _prime_def_router = ptr;
+            if (ltime > 0) {
+                _evtimer_add(ptr, GNRC_IPV6_NIB_RTR_TIMEOUT,
+                             &ptr->rtr_timeout, ltime * MS_PER_SEC);
+            }
+        }
     }
 #if GNRC_IPV6_NIB_CONF_ROUTER
     else {
+        _nib_offl_entry_t *ptr;
+
         dst_len = (dst_len > 128) ? 128 : dst_len;
         ptr = _nib_ft_add(next_hop, iface, dst, dst_len);
+        if (ptr == NULL) {
+            res = -ENOMEM;
+        }
+        else if (ltime > 0) {
+            _evtimer_add(ptr, GNRC_IPV6_NIB_ROUTE_TIMEOUT,
+                         &ptr->route_timeout, ltime * MS_PER_SEC);
+        }
     }
 #else /* GNRC_IPV6_NIB_CONF_ROUTER */
     else {
@@ -58,9 +79,6 @@ int gnrc_ipv6_nib_ft_add(const ipv6_addr_t *dst, unsigned dst_len,
     }
 #endif
     mutex_unlock(&_nib_mutex);
-    if (ptr == NULL) {
-        res = -ENOMEM;
-    }
     return res;
 }
 
@@ -100,8 +118,9 @@ bool gnrc_ipv6_nib_ft_iter(const ipv6_addr_t *next_hop, unsigned iface,
         _nib_offl_entry_t *offl = *state;
 
         while ((offl = _nib_offl_iter(offl))) {
-            assert((offl->mode != 0) || (offl->next_hop != NULL));
-            if (((iface == 0) || (iface == _nib_onl_get_if(offl->next_hop))) &&
+            assert(offl->mode != 0);
+            if ((offl->next_hop != NULL) &&
+                ((iface == 0) || (iface == _nib_onl_get_if(offl->next_hop))) &&
                 ((next_hop == NULL) || ipv6_addr_equal(&offl->next_hop->ipv6,
                                                        next_hop))) {
                 _nib_ft_get(offl, fte);
@@ -113,8 +132,8 @@ bool gnrc_ipv6_nib_ft_iter(const ipv6_addr_t *next_hop, unsigned iface,
     }
     entry = *state;
     while ((entry = _nib_drl_iter(entry))) {
-        assert((entry->next_hop != NULL));
-        if (((iface == 0) || (iface == _nib_onl_get_if(entry->next_hop))) &&
+        if ((entry->next_hop != NULL) &&
+            ((iface == 0) || (iface == _nib_onl_get_if(entry->next_hop))) &&
             ((next_hop == NULL) || ipv6_addr_equal(&entry->next_hop->ipv6,
                                                    next_hop))) {
             _nib_drl_ft_get(entry, fte);

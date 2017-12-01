@@ -283,7 +283,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
         }
 
         /* read byte */
-        *in++ = i2c->DR;
+        *(in++) = i2c->DR;
     }
 
     /* set STOP */

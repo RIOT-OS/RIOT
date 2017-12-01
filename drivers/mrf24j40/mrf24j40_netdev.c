@@ -106,6 +106,8 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
         len = mrf24j40_tx_load(dev, ptr->iov_base, ptr->iov_len, len);
         if (i == 0) {
             dev->header_len = len;
+            /* Grab the FCF bits from the frame header */
+            dev->fcf_low = *(uint8_t*)(ptr->iov_base);
         }
 
     }
@@ -154,9 +156,11 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
+        uint8_t rssi_scalar = 0;
         /* Read LQI and RSSI values from the RX fifo */
         mrf24j40_rx_fifo_read(dev, phr + 1, &(radio_info->lqi), 1);
-        mrf24j40_rx_fifo_read(dev, phr + 2, &(radio_info->rssi), 1);
+        mrf24j40_rx_fifo_read(dev, phr + 2, &(rssi_scalar), 1);
+        radio_info->rssi = mrf24j40_dbm_from_reg(rssi_scalar);
     }
 
     /* Turn on reception of packets off the air */

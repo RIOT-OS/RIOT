@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2017 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Example application for demonstrating the RIOT network stack
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Shuguo Zhuo <shuguo.zhuo@inria.fr>
  *
  * @}
  */

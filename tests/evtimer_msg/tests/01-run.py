@@ -9,12 +9,12 @@
 from __future__ import print_function
 import os
 import sys
-import time
 
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner
 
 ACCEPTED_ERROR = 20
+
 
 def testfunc(child):
     child.expect(r"Testing generic evtimer \(start time = (\d+) ms\)")

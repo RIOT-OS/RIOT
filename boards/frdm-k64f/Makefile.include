@@ -3,4 +3,4 @@ export CPU = kinetis
 export CPU_MODEL = mk64fn1m0vll12
 
 # Include default FRDM board config
-include $(RIOTBOARD)/frdm-common/Makefile.include
+include $(RIOTBOARD)/common/frdm/Makefile.include

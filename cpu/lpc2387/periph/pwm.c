@@ -85,12 +85,14 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
 uint8_t pwm_channels(pwm_t dev)
 {
+    (void)dev;
     assert(dev == PWM_DEV(0));
     return PWM_CHANNELS;
 }
 
 void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
+    (void)dev;
     assert((dev == PWM_DEV(0)) && (channel < 3));
 
     switch (channel) {
@@ -111,6 +113,7 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 
 void pwm_poweron(pwm_t dev)
 {
+    (void)dev;
     assert(dev == PWM_DEV(0));
     PCONP |= PCPWM1;
     PWM1TCR |= BIT0;
@@ -118,6 +121,7 @@ void pwm_poweron(pwm_t dev)
 
 void pwm_poweroff(pwm_t dev)
 {
+    (void)dev;
     assert(dev == PWM_DEV(0));
     PWM1TCR &= ~(BIT0);
     PCONP &= ~(PCPWM1);

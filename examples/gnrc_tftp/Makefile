@@ -7,8 +7,8 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon calliope-mini chronos microbit msb-430 \
-                             msb-430h nrf51dongle nrf6310 nucleo32-f031 \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon bluepill calliope-mini chronos \
+                             microbit msb-430 msb-430h nrf51dongle nrf6310 nucleo32-f031 \
                              nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo-f030 \
                              nucleo-f070 nucleo-f072 nucleo-f103 nucleo-f302 nucleo-f334 \
                              nucleo-l053 spark-core stm32f0discovery \
@@ -36,7 +36,7 @@ USEMODULE += ps
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP
+DEVELHELP ?= 1
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

@@ -2,7 +2,6 @@
 
 import os
 import sys
-import math
 
 sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
 import testrunner

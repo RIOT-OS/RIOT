@@ -81,7 +81,4 @@ iotlab-term: iotlab-check-exp
 	RIOT_LOG-$(IOTLAB_EXP_NAME)-$(IOTLAB_EXP_ID), \
 	serial_aggregator -i $(IOTLAB_EXP_ID) $(NODES_PARAM_BASE))'"
 
-iotlab-check-exp:
-ifndef IOTLAB_SITE
-	$(eval IOTLAB_SITE := $(shell experiment-cli get -ri -i $(IOTLAB_EXP_ID) | sed -n 4p | cut -d\" -f2))
-endif
+iotlab-check-exp: IOTLAB_SITE ?= $(shell experiment-cli get -ri -i $(IOTLAB_EXP_ID) | sed -n 4p | cut -d\" -f2)

@@ -21,26 +21,26 @@
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif.h"
+#include "net/gnrc/netif/internal.h"
 #include "random.h"
 
 #include "_nib-internal.h"
+#include "_nib-router.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /* pointers for default router selection */
-static _nib_dr_entry_t *_prime_def_router = NULL;
+_nib_dr_entry_t *_prime_def_router = NULL;
 static clist_node_t _next_removable = { NULL };
 
 static _nib_onl_entry_t _nodes[GNRC_IPV6_NIB_NUMOF];
 static _nib_offl_entry_t _dsts[GNRC_IPV6_NIB_OFFL_NUMOF];
 static _nib_dr_entry_t _def_routers[GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
-static _nib_iface_t _nis[GNRC_NETIF_NUMOF];
 
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 static _nib_abr_entry_t _abrs[GNRC_IPV6_NIB_ABR_NUMOF];
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
 
 #if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -61,11 +61,10 @@ void _nib_init(void)
     memset(_nodes, 0, sizeof(_nodes));
     memset(_def_routers, 0, sizeof(_def_routers));
     memset(_dsts, 0, sizeof(_dsts));
-    memset(_nis, 0, sizeof(_nis));
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
     memset(_abrs, 0, sizeof(_abrs));
-#endif
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* TEST_SUITES */
     evtimer_init_msg(&_nib_evtimer);
     /* TODO: load ABR information from persistent memory */
 }
@@ -105,7 +104,7 @@ _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
     else {
         DEBUG("  NIB full\n");
     }
-#endif
+#endif  /* ENABLE_DEBUG */
     return node;
 }
 
@@ -226,18 +225,24 @@ _nib_onl_entry_t *_nib_onl_get(const ipv6_addr_t *addr, unsigned iface)
 void _nib_nc_set_reachable(_nib_onl_entry_t *node)
 {
 #if GNRC_IPV6_NIB_CONF_ARSM
-    _nib_iface_t *iface = _nib_iface_get(_nib_onl_get_if(node));
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
 
-    DEBUG("nib: set %s%%%u reachable (reachable time = %u)\n",
-          ipv6_addr_to_str(addr_str, &node->ipv6, sizeof(addr_str)),
-          _nib_onl_get_if(node), iface->reach_time);
     node->info &= ~GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK;
     node->info |= GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE;
+#ifdef TEST_SUITES
+    /* exit early for unittests */
+    if (netif == NULL) {
+        return;
+    }
+#endif  /* TEST_SUITES */
+    DEBUG("nib: set %s%%%u reachable (reachable time = %u)\n",
+          ipv6_addr_to_str(addr_str, &node->ipv6, sizeof(addr_str)),
+          _nib_onl_get_if(node), (unsigned)netif->ipv6.reach_time);
     _evtimer_add(node, GNRC_IPV6_NIB_REACH_TIMEOUT, &node->nud_timeout,
-                 iface->reach_time);
-#else
+                 netif->ipv6.reach_time);
+#else   /* GNRC_IPV6_NIB_CONF_ARSM */
     (void)node;
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
 }
 
 void _nib_nc_remove(_nib_onl_entry_t *node)
@@ -249,10 +254,13 @@ void _nib_nc_remove(_nib_onl_entry_t *node)
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->snd_na.event);
 #if GNRC_IPV6_NIB_CONF_ARSM
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->nud_timeout.event);
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#if GNRC_IPV6_NIB_CONF_ROUTER
+    evtimer_del((evtimer_t *)&_nib_evtimer, &node->reply_rs.event);
+#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 #if GNRC_IPV6_NIB_CONF_6LR
     evtimer_del((evtimer_t *)&_nib_evtimer, &node->addr_reg_timeout.event);
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_6LR */
 #if GNRC_IPV6_NIB_CONF_QUEUE_PKT
     gnrc_pktqueue_t *tmp;
     for (gnrc_pktqueue_t *ptr = node->pktqueue;
@@ -281,23 +289,25 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
 #if GNRC_IPV6_NIB_CONF_ARSM
 #if GNRC_IPV6_NIB_CONF_6LN
     if (ipv6_addr_is_link_local(&nce->ipv6)) {
-        gnrc_ipv6_netif_t *netif = gnrc_ipv6_netif_get(_nib_onl_get_if(node));
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
         assert(netif != NULL);
-        if ((netif->flags & GNRC_IPV6_NETIF_FLAGS_SIXLOWPAN) &&
-            !(netif->flags & GNRC_IPV6_NETIF_FLAGS_ROUTER)) {
+        if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_rtr(netif)) {
             _get_l2addr_from_ipv6(nce->l2addr, &node->ipv6);
             nce->l2addr_len = sizeof(uint64_t);
             return;
         }
     }
-#endif
+#else   /* GNRC_IPV6_NIB_CONF_6LN */
+    /* Prevent unused function error thrown by clang */
+    (void)_get_l2addr_from_ipv6;
+#endif  /* GNRC_IPV6_NIB_CONF_6LN */
     nce->l2addr_len = node->l2addr_len;
     memcpy(&nce->l2addr, &node->l2addr, node->l2addr_len);
-#else
+#else   /* GNRC_IPV6_NIB_CONF_ARSM */
     assert(ipv6_addr_is_link_local(&nce->ipv6));
     _get_l2addr_from_ipv6(nce->l2addr, &node->ipv6);
     nce->l2addr_len = sizeof(uint64_t);
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_ARSM */
 }
 
 _nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface)
@@ -489,7 +499,7 @@ static inline bool _in_abrs(const _nib_abr_entry_t *abr)
 {
     return (abr < (_abrs + GNRC_IPV6_NIB_ABR_NUMOF));
 }
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
 
 void _nib_offl_clear(_nib_offl_entry_t *dst)
 {
@@ -582,14 +592,22 @@ int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
           (void *)pkt);
     _nib_offl_entry_t *offl = _nib_offl_get_match(dst);
 
-    assert((dst != NULL) && (fte != NULL));
     if ((offl == NULL) || (offl->mode == _PL)) {
         /* give default router precedence over PLE */
         _nib_dr_entry_t *router = _nib_drl_get_dr();
 
         if ((router == NULL) && (offl == NULL)) {
+#if GNRC_IPV6_NIB_CONF_ROUTER
+            gnrc_netif_t *ptr = NULL;
+
+            while ((ptr = gnrc_netif_iter(ptr))) {
+                _call_route_info_cb(ptr,
+                                    GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RRQ,
+                                    dst, pkt);
+            }
+#else   /* GNRC_IPV6_NIB_CONF_ROUTER */
             (void)pkt;
-            /* TODO: ask RRP to search for route (using pkt) */
+#endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
             return -ENETUNREACH;
         }
         else if (router != NULL) {
@@ -623,7 +641,7 @@ void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
             }
         }
     }
-#endif
+#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
 }
 
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
@@ -654,7 +672,7 @@ _nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr)
     else {
         DEBUG("  NIB full\n");
     }
-#endif
+#endif  /* ENABLE_DEBUG */
     return abr;
 }
 
@@ -676,7 +694,7 @@ void _nib_abr_remove(const ipv6_addr_t *addr)
                     gnrc_sixlowpan_ctx_remove(i);
                 }
             }
-#endif
+#endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
             memset(abr, 0, sizeof(_nib_abr_entry_t));
         }
     }
@@ -764,42 +782,6 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
     dst->pref_until = pref_ltime;
     return dst;
 }
-
-_nib_iface_t *_nib_iface_get(unsigned iface)
-{
-    _nib_iface_t *ni = NULL;
-
-    assert(iface <= _NIB_IF_MAX);
-    for (unsigned i = 0; i < GNRC_NETIF_NUMOF; i++) {
-        _nib_iface_t *tmp = &_nis[i];
-        if (((unsigned)tmp->pid) == iface) {
-            return tmp;
-        }
-        if ((ni == NULL) && (tmp->pid == KERNEL_PID_UNDEF)) {
-            ni = tmp;
-        }
-    }
-    if (ni != NULL) {
-        memset(ni, 0, sizeof(_nib_iface_t));
-        /* TODO: set random reachable time using constants from #6220 */
-        ni->pid = (kernel_pid_t)iface;
-    }
-    return ni;
-}
-
-#if GNRC_IPV6_NIB_CONF_ARSM
-void _nib_iface_recalc_reach_time(_nib_iface_t *iface)
-{
-    uint32_t factor = random_uint32_range(NDP_MIN_RANDOM_FACTOR,
-                                          NDP_MAX_RANDOM_FACTOR);
-
-    /* random factor was times 1000 so we need to divide it again */
-    iface->reach_time = (iface->reach_time_base * factor) / 1000;
-    _evtimer_add(iface, GNRC_IPV6_NIB_RECALC_REACH_TIME,
-                 &iface->recalc_reach_time,
-                 GNRC_IPV6_NIB_CONF_REACH_TIME_RESET);
-}
-#endif
 
 static void _override_node(const ipv6_addr_t *addr, unsigned iface,
                            _nib_onl_entry_t *node)

@@ -70,7 +70,7 @@ static void test_nib_ft_get__ENETUNREACH_no_def_route(void)
     ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                  &next_hop, IFACE));
+                                                  &next_hop, IFACE, 0));
     dst.u16[0].u16--;
     TEST_ASSERT_EQUAL_INT(-ENETUNREACH, gnrc_ipv6_nib_ft_get(&dst, NULL, &fte));
 }
@@ -88,7 +88,7 @@ static void test_nib_ft_get__success1(void)
     static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
                                                  { .u64 = TEST_UINT64 } } };
 
-    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &next_hop, IFACE));
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &next_hop, IFACE, 0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_get(&dst, NULL, &fte));
     TEST_ASSERT(ipv6_addr_is_unspecified(&fte.dst));
     TEST_ASSERT(ipv6_addr_equal(&next_hop, &fte.next_hop));
@@ -111,7 +111,7 @@ static void test_nib_ft_get__success2(void)
                                                  { .u64 = TEST_UINT64 } } };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                  &next_hop, IFACE));
+                                                  &next_hop, IFACE, 0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_get(&dst, NULL, &fte));
     TEST_ASSERT(ipv6_addr_match_prefix(&dst, &fte.dst) >= GLOBAL_PREFIX_LEN);
     TEST_ASSERT(ipv6_addr_equal(&next_hop, &fte.next_hop));
@@ -139,9 +139,9 @@ static void test_nib_ft_get__success3(void)
 
     bf_toggle(dst2.u8, GLOBAL_PREFIX_LEN);
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst1, GLOBAL_PREFIX_LEN,
-                                                  &next_hop1, IFACE));
+                                                  &next_hop1, IFACE, 0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst2, GLOBAL_PREFIX_LEN,
-                                                  &next_hop2, IFACE));
+                                                  &next_hop2, IFACE, 0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_get(&dst1, NULL, &fte));
     TEST_ASSERT(ipv6_addr_match_prefix(&dst1, &fte.dst) >= GLOBAL_PREFIX_LEN);
     TEST_ASSERT(ipv6_addr_equal(&next_hop1, &fte.next_hop));
@@ -167,9 +167,9 @@ static void test_nib_ft_get__success4(void)
                                                   { .u64 = TEST_UINT64 + 1 } } };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                  &next_hop1, IFACE));
+                                                  &next_hop1, IFACE, 0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN - 1,
-                                                  &next_hop2, IFACE));
+                                                  &next_hop2, IFACE, 0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_get(&dst, NULL, &fte));
     TEST_ASSERT(ipv6_addr_match_prefix(&dst, &fte.dst) >= GLOBAL_PREFIX_LEN);
     TEST_ASSERT(ipv6_addr_equal(&next_hop1, &fte.next_hop));
@@ -190,11 +190,11 @@ static void test_nib_ft_add__EINVAL_def_route_next_hop_NULL(void)
 
     TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_ft_add(&ipv6_addr_unspecified,
                                                         GLOBAL_PREFIX_LEN,
-                                                        NULL, IFACE));
+                                                        NULL, IFACE, 0));
     TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_ft_add(NULL, GLOBAL_PREFIX_LEN,
-                                                        NULL, IFACE));
-    TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_ft_add(&dst, 0, NULL, IFACE));
-    TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_ft_add(NULL, 0, NULL, IFACE));
+                                                        NULL, IFACE, 0));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_ft_add(&dst, 0, NULL, IFACE, 0));
+    TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_ft_add(NULL, 0, NULL, IFACE, 0));
 }
 
 /*
@@ -209,7 +209,7 @@ static void test_nib_ft_add__EINVAL_iface0(void)
                                                  { .u64 = TEST_UINT64 } } };
 
     TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                        &next_hop, 0));
+                                                        &next_hop, 0, 0));
 }
 
 #if GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
@@ -230,11 +230,11 @@ static void test_nib_ft_add__ENOMEM_diff_def_router(void)
 
     for (unsigned i = 0; i < GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &next_hop,
-                                                      IFACE));
+                                                      IFACE, 0));
         next_hop.u64[1].u64++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(NULL, GLOBAL_PREFIX_LEN,
-                                                        &next_hop, IFACE));
+                                                        &next_hop, IFACE, 0));
 }
 
 /*
@@ -248,11 +248,11 @@ static void test_nib_ft_add__ENOMEM_diff_dst(void)
 
     for (unsigned i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                      NULL, IFACE));
+                                                      NULL, IFACE, 0));
         dst.u16[0].u16--;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                        NULL, IFACE));
+                                                        NULL, IFACE, 0));
 }
 
 /*
@@ -267,11 +267,11 @@ static void test_nib_ft_add__ENOMEM_diff_dst_len(void)
 
     for (unsigned i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                      NULL, IFACE));
+                                                      NULL, IFACE, 0));
         dst_len--;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                        NULL, IFACE));
+                                                        NULL, IFACE, 0));
 }
 
 /*
@@ -287,12 +287,12 @@ static void test_nib_ft_add__ENOMEM_diff_dst_dst_len(void)
 
     for (unsigned i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                      NULL, IFACE));
+                                                      NULL, IFACE, 0));
         dst.u16[0].u16--;
         dst_len--;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                        NULL, IFACE));
+                                                        NULL, IFACE, 0));
 }
 
 /*
@@ -308,11 +308,11 @@ static void test_nib_ft_add__ENOMEM_diff_next_hop(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                      &next_hop, IFACE));
+                                                      &next_hop, IFACE, 0));
         next_hop.u64[1].u64++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                        &next_hop, IFACE));
+                                                        &next_hop, IFACE, 0));
 }
 
 /*
@@ -328,12 +328,12 @@ static void test_nib_ft_add__ENOMEM_diff_dst_next_hop(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                      &next_hop, IFACE));
+                                                      &next_hop, IFACE, 0));
         dst.u16[0].u16--;
         next_hop.u64[1].u64++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                        &next_hop, IFACE));
+                                                        &next_hop, IFACE, 0));
 }
 
 /*
@@ -350,13 +350,13 @@ static void test_nib_ft_add__ENOMEM_diff_dst_dst_len_next_hop(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len, &next_hop,
-                                                      IFACE));
+                                                      IFACE, 0));
         dst.u16[0].u16--;
         dst_len--;
         next_hop.u64[1].u64++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                        &next_hop, IFACE));
+                                                        &next_hop, IFACE, 0));
 }
 
 /*
@@ -372,12 +372,12 @@ static void test_nib_ft_add__ENOMEM_diff_dst_iface(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                      NULL, iface));
+                                                      NULL, iface, 0));
         dst.u16[0].u16--;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                        NULL, iface));
+                                                        NULL, iface, 0));
 }
 
 /*
@@ -394,12 +394,12 @@ static void test_nib_ft_add__ENOMEM_diff_dst_len_iface(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                      NULL, iface));
+                                                      NULL, iface, 0));
         dst_len--;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                        NULL, iface));
+                                                        NULL, iface, 0));
 }
 
 /*
@@ -416,13 +416,13 @@ static void test_nib_ft_add__ENOMEM_diff_dst_dst_len_iface(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                      NULL, iface));
+                                                      NULL, iface, 0));
         dst.u16[0].u16--;
         dst_len--;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                        NULL, iface));
+                                                        NULL, iface, 0));
 }
 
 /*
@@ -439,12 +439,12 @@ static void test_nib_ft_add__ENOMEM_diff_next_hop_iface(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                      &next_hop, iface));
+                                                      &next_hop, iface, 0));
         next_hop.u64[1].u64++;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                        &next_hop, iface));
+                                                        &next_hop, iface, 0));
 }
 
 /*
@@ -461,13 +461,13 @@ static void test_nib_ft_add__ENOMEM_diff_dst_next_hop_iface(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                      &next_hop, iface));
+                                                      &next_hop, iface, 0));
         dst.u16[0].u16--;
         next_hop.u64[1].u64++;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                        &next_hop, iface));
+                                                        &next_hop, iface, 0));
 }
 
 /*
@@ -486,14 +486,14 @@ static void test_nib_ft_add__ENOMEM_diff_dst_dst_len_next_hop_iface(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len, &next_hop,
-                                                      iface));
+                                                      iface, 0));
         dst.u16[0].u16--;
         dst_len--;
         next_hop.u64[1].u64++;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                        &next_hop, iface));
+                                                        &next_hop, iface, 0));
 }
 
 /*
@@ -515,10 +515,10 @@ static void test_nib_ft_add__success_duplicate(void)
         next_hop.u64[1].u64++;
         iface++;
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len, &next_hop,
-                                                      iface));
+                                                      iface, 0));
     }
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len,
-                                                  &next_hop, iface));
+                                                  &next_hop, iface, 0));
 }
 
 /*
@@ -536,9 +536,9 @@ static void test_nib_ft_add__success_overwrite_unspecified(void)
                                                  { .u64 = TEST_UINT64 } } };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN, NULL,
-                                                  IFACE));
+                                                  IFACE, 0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                  &next_hop, IFACE));
+                                                  &next_hop, IFACE, 0));
     TEST_ASSERT(gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
     TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
     TEST_ASSERT(!gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
@@ -558,13 +558,35 @@ static void test_nib_ft_add__success(void)
                                                  { .u64 = TEST_UINT64 } } };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                  &next_hop, IFACE));
+                                                  &next_hop, IFACE, 0));
     TEST_ASSERT(gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
     TEST_ASSERT(ipv6_addr_match_prefix(&fte.dst, &dst) >= GLOBAL_PREFIX_LEN);
     TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, fte.dst_len);
     TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
     TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
     TEST_ASSERT_EQUAL_INT(0, fte.primary);
+    TEST_ASSERT(!gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
+}
+
+/*
+ * Creates a default route
+ * Expected result: a new entry should exist and contain the given prefix,
+ * interface, and lifetimes and it should be the primary default route
+ */
+static void test_nib_ft_add__success_dr(void)
+{
+    gnrc_ipv6_nib_ft_t fte;
+    void *iter_state = NULL;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &next_hop, IFACE, 0));
+    TEST_ASSERT(gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
+    TEST_ASSERT(ipv6_addr_is_unspecified(&fte.dst));
+    TEST_ASSERT_EQUAL_INT(0, fte.dst_len);
+    TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
+    TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
+    TEST_ASSERT_EQUAL_INT(1, fte.primary);
     TEST_ASSERT(!gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
 }
 
@@ -586,7 +608,7 @@ static void test_nib_ft_del__unknown(void)
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len, &next_hop,
-                                                      iface));
+                                                      iface, 0));
         dst.u16[0].u16--;
         dst_len--;
         next_hop.u64[1].u64++;
@@ -612,9 +634,88 @@ static void test_nib_ft_del__success(void)
     gnrc_ipv6_nib_ft_t fte;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
-                                                  &next_hop, IFACE));
+                                                  &next_hop, IFACE, 0));
     gnrc_ipv6_nib_ft_del(&dst, GLOBAL_PREFIX_LEN);
     TEST_ASSERT(!gnrc_ipv6_nib_ft_iter(NULL ,0, &iter_state, &fte));
+}
+
+/**
+ * Creates three default routes and removes the first one.
+ * The prefix list is then iterated.
+ * Expected result: there should be two default routes returned, the last
+ * two added.
+ */
+static void test_nib_ft_iter__empty_def_route_at_beginning(void)
+{
+    gnrc_ipv6_nib_ft_t fte;
+    void *iter_state = NULL;
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                    { .u64 = TEST_UINT64 } } };
+    int count = 0;
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
+                                                  &next_hop, IFACE, 0));
+    next_hop.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
+                                                  &next_hop, IFACE, 0));
+    next_hop.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
+                                                  &next_hop, IFACE, 0));
+    /* make first added route the primary default route again */
+    next_hop.u16[0].u16 -= 2;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
+                                                  &next_hop, IFACE, 0));
+    /* remove primary default route */
+    gnrc_ipv6_nib_ft_del(NULL, 0);
+    next_hop.u16[0].u16++;
+    while (gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte)) {
+        TEST_ASSERT(ipv6_addr_is_unspecified(&fte.dst));
+        TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
+        TEST_ASSERT_EQUAL_INT(0, fte.dst_len);
+        TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
+        TEST_ASSERT(!fte.primary);
+        count++;
+        next_hop.u16[0].u16++;
+    }
+    TEST_ASSERT_EQUAL_INT(2, count);
+}
+
+/**
+ * Creates three prefix based routes and removes the second one.
+ * The prefix list is then iterated.
+ * Expected result: there should be two prefix based routes returned, the first
+ * and the third one.
+ */
+static void test_nib_ft_iter__empty_pref_route_in_the_middle(void)
+{
+    gnrc_ipv6_nib_ft_t fte;
+    void *iter_state = NULL;
+    ipv6_addr_t route = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                 { .u64 = TEST_UINT64 } } };
+    const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                            { .u64 = TEST_UINT64 } } };
+    int count = 0;
+
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&route, GLOBAL_PREFIX_LEN,
+                                                  &next_hop, IFACE, 0));
+    route.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&route, GLOBAL_PREFIX_LEN,
+                                                  &next_hop, IFACE, 0));
+    route.u16[0].u16++;
+    TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&route, GLOBAL_PREFIX_LEN,
+                                                  &next_hop, IFACE, 0));
+    route.u16[0].u16--;
+    gnrc_ipv6_nib_ft_del(&route, GLOBAL_PREFIX_LEN);
+    route.u16[0].u16--;
+    while (gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte)) {
+        TEST_ASSERT(ipv6_addr_match_prefix(&fte.dst, &route) >= GLOBAL_PREFIX_LEN);
+        TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
+        TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, fte.dst_len);
+        TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
+        count++;
+        route.u16[0].u16 += 2;  /* we skip the second address */
+    }
+    TEST_ASSERT_EQUAL_INT(2, count);
 }
 
 Test *tests_gnrc_ipv6_nib_ft_tests(void)
@@ -644,9 +745,12 @@ Test *tests_gnrc_ipv6_nib_ft_tests(void)
         new_TestFixture(test_nib_ft_add__success_duplicate),
         new_TestFixture(test_nib_ft_add__success_overwrite_unspecified),
         new_TestFixture(test_nib_ft_add__success),
+        new_TestFixture(test_nib_ft_add__success_dr),
         new_TestFixture(test_nib_ft_del__unknown),
         new_TestFixture(test_nib_ft_del__success),
-        /* gnrc_ipv6_nib_ft_iter() is tested during all the tests above */
+        /* most of gnrc_ipv6_nib_ft_iter() is tested during all the tests above */
+        new_TestFixture(test_nib_ft_iter__empty_def_route_at_beginning),
+        new_TestFixture(test_nib_ft_iter__empty_pref_route_in_the_middle),
     };
 
     EMB_UNIT_TESTCALLER(tests, set_up, NULL,

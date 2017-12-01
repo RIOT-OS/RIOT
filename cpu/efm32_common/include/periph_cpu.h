@@ -147,14 +147,39 @@ typedef uint32_t gpio_t;
  * @brief   Available ports on the EFM32.
  */
 enum {
+#if (_GPIO_PORT_A_PIN_COUNT > 0)
     PA = gpioPortA,         /**< port A */
+#endif
+#if (_GPIO_PORT_B_PIN_COUNT > 0)
     PB = gpioPortB,         /**< port B */
+#endif
+#if (_GPIO_PORT_C_PIN_COUNT > 0)
     PC = gpioPortC,         /**< port C */
+#endif
+#if (_GPIO_PORT_D_PIN_COUNT > 0)
     PD = gpioPortD,         /**< port D */
-#if _GPIO_PORT_E_PIN_COUNT
+#endif
+#if (_GPIO_PORT_E_PIN_COUNT > 0)
     PE = gpioPortE,         /**< port E */
 #endif
-    PF = gpioPortF          /**< port F */
+#if (_GPIO_PORT_F_PIN_COUNT > 0)
+    PF = gpioPortF,         /**< port F */
+#endif
+#if (_GPIO_PORT_G_PIN_COUNT > 0)
+    PG = gpioPortG,         /**< port G */
+#endif
+#if (_GPIO_PORT_H_PIN_COUNT > 0)
+    PH = gpioPortH,         /**< port H */
+#endif
+#if (_GPIO_PORT_I_PIN_COUNT > 0)
+    PI = gpioPortI,         /**< port I */
+#endif
+#if (_GPIO_PORT_J_PIN_COUNT > 0)
+    PJ = gpioPortJ,         /**< port J */
+#endif
+#if (_GPIO_PORT_K_PIN_COUNT > 0)
+    PK = gpioPortK          /**< port K */
+#endif
 };
 
 #ifndef DOXYGEN

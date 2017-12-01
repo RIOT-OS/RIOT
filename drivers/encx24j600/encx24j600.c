@@ -70,7 +70,7 @@ static int _init(netdev_t *dev);
 static void _isr(netdev_t *dev);
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
 
-const static netdev_driver_t netdev_driver_encx24j600 = {
+static const netdev_driver_t netdev_driver_encx24j600 = {
     .send = _send,
     .recv = _recv,
     .init = _init,

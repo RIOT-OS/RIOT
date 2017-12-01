@@ -106,6 +106,8 @@ static int init_base(uart_t uart, uint32_t baudrate)
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
+    (void) uart;
+
     for (size_t i = 0; i < len; i++) {
         ROM_UARTCharPut(UART0_BASE, (char)data[i]);
     }
@@ -113,11 +115,15 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 void uart_poweron(uart_t uart)
 {
+    (void) uart;
+
     ROM_UARTEnable(UART0_BASE);
 }
 
 void uart_poweroff(uart_t uart)
 {
+    (void) uart;
+
     ROM_UARTDisable(UART0_BASE);
 }
 

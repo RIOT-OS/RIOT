@@ -235,7 +235,7 @@ void sx127x_set_rx(sx127x_t *dev)
                              ((sx127x_reg_read(dev, SX127X_REG_LR_INVERTIQ) &
                                SX127X_RF_LORA_INVERTIQ_TX_MASK &
                                SX127X_RF_LORA_INVERTIQ_RX_MASK) |
-                              SX127X_RF_LORA_INVERTIQ_RX_ON |
+                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ_RX_ON :SX127X_RF_LORA_INVERTIQ_RX_OFF) |
                               SX127X_RF_LORA_INVERTIQ_TX_OFF));
             sx127x_reg_write(dev, SX127X_REG_LR_INVERTIQ2,
                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ2_ON : SX127X_RF_LORA_INVERTIQ2_OFF));
@@ -479,13 +479,13 @@ inline void _update_bandwidth(const sx127x_t *dev)
 #if defined(MODULE_SX1272)
     config1_reg &= SX1272_RF_LORA_MODEMCONFIG1_BW_MASK;
     switch (dev->settings.lora.bandwidth) {
-    case SX127X_BW_125_KHZ:
+    case LORA_BW_125_KHZ:
         config1_reg |=  SX1272_RF_LORA_MODEMCONFIG1_BW_125_KHZ;
         break;
-    case SX127X_BW_250_KHZ:
+    case LORA_BW_250_KHZ:
         config1_reg |=  SX1272_RF_LORA_MODEMCONFIG1_BW_250_KHZ;
         break;
-    case SX127X_BW_500_KHZ:
+    case LORA_BW_500_KHZ:
         config1_reg |=  SX1272_RF_LORA_MODEMCONFIG1_BW_500_KHZ;
         break;
     default:
@@ -848,6 +848,11 @@ void sx127x_set_symbol_timeout(sx127x_t *dev, uint16_t timeout)
     config2_reg |= (timeout >> 8) & ~SX127X_RF_LORA_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK;
     sx127x_reg_write(dev, SX127X_REG_LR_MODEMCONFIG2, config2_reg);
     sx127x_reg_write(dev, SX127X_REG_LR_SYMBTIMEOUTLSB,timeout & 0xFF);
+}
+
+bool sx127x_get_iq_invert(const sx127x_t *dev)
+{
+    return dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG;
 }
 
 void sx127x_set_iq_invert(sx127x_t *dev, bool iq_invert)

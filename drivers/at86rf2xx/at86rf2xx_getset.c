@@ -139,8 +139,10 @@ uint8_t at86rf2xx_get_chan(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_chan(at86rf2xx_t *dev, uint8_t channel)
 {
-    if ((channel < AT86RF2XX_MIN_CHANNEL) ||
-        (channel > AT86RF2XX_MAX_CHANNEL) ||
+    if ((channel > AT86RF2XX_MAX_CHANNEL) ||
+#if AT86RF2XX_MIN_CHANNEL /* is zero for sub-GHz */
+        (channel < AT86RF2XX_MIN_CHANNEL) ||
+#endif
         (dev->netdev.chan == channel)) {
         return;
     }
@@ -433,7 +435,10 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
     }
     else if (state != old_state) {
         /* we need to go via PLL_ON if we are moving between RX_AACK_ON <-> TX_ARET_ON */
-        if ((old_state | state) == (AT86RF2XX_STATE_RX_AACK_ON | AT86RF2XX_STATE_TX_ARET_ON)) {
+        if ((old_state == AT86RF2XX_STATE_RX_AACK_ON &&
+             state == AT86RF2XX_STATE_TX_ARET_ON) ||
+            (old_state == AT86RF2XX_STATE_TX_ARET_ON &&
+             state == AT86RF2XX_STATE_RX_AACK_ON)) {
             _set_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
         }
         /* check if we need to wake up from sleep mode */

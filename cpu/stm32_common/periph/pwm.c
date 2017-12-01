@@ -52,7 +52,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* reset configuration and CC channels */
     dev(pwm)->CR1 = 0;
     dev(pwm)->CR2 = 0;
-    for (int i = 0; i < TIMER_CHAN; i++) {
+    for (unsigned i = 0; i < TIMER_CHAN; ++i) {
         dev(pwm)->CCR[i] = 0;
     }
 

@@ -314,7 +314,7 @@ void pcd8544_write_img(const pcd8544_t *dev, const char img[])
     _set_x(dev, 0);
     _set_y(dev, 0);
     /* write image data to display */
-    for (int i = 0; i < (PCD8544_RES_X * PCD8544_RES_Y / 8); i++) {
+    for (unsigned i = 0; i < (PCD8544_RES_X * PCD8544_RES_Y / 8); i++) {
         _write(dev, MODE_DTA, img[i]);
     }
     done(dev);
@@ -331,7 +331,7 @@ void pcd8544_write_c(const pcd8544_t *dev, uint8_t x, uint8_t y, char c)
     _set_x(dev, x * CHAR_WIDTH);
     _set_y(dev, y);
     /* write char */
-    for (int i = 0; i < CHAR_WIDTH - 1; i++) {
+    for (unsigned i = 0; i < CHAR_WIDTH - 1; i++) {
         _write(dev, MODE_DTA, _ascii[c - ASCII_MIN][i]);
     }
     _write(dev, MODE_DTA, 0x00);
@@ -350,7 +350,7 @@ void pcd8544_clear(const pcd8544_t *dev)
     lock(dev);
     _set_x(dev, 0);
     _set_y(dev, 0);
-    for (int i = 0; i < PCD8544_RES_X * PCD8544_ROWS; i++) {
+    for (unsigned i = 0; i < PCD8544_RES_X * PCD8544_ROWS; i++) {
         _write(dev, MODE_DTA, 0x00);
     }
     done(dev);

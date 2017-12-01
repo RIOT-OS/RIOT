@@ -24,9 +24,19 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
-
 import cmd, serial, socket, sys, threading, readline, time, logging, \
     os, argparse, re, codecs, signal
+
+try:
+    serial.Serial
+except AttributeError:
+    print("\033[1;37;41m\n")
+    print("Something went terribly wrong when loading the pyserial package.")
+    print("There is a good chance that you installed the 'serial' package instead")
+    print("of 'pyserial'. Try running 'pip uninstall serial && pip install pyserial'")
+    print("\033[0m")
+    sys.exit(1)
+
 
 # import twisted if available, define dummy classes otherwise
 try:
@@ -675,10 +685,6 @@ class PytermClientFactory(ReconnectingClientFactory):
                                                          reason)
 
 
-def __stop_reactor(signum, stackframe):
-    sys.stderr.write("Ctrl-C is disabled, type '/exit' instead\n")
-
-
 class fdsocket(socket.socket):
     def read(self, bufsize):
         return self.recv(bufsize)
@@ -758,13 +764,15 @@ if __name__ == "__main__":
                      args.log_dir_name, args.newline, args.format, args.prompt)
     myshell.prompt = ''
 
-    if args.server and args.tcp_port:
-        myfactory = PytermClientFactory(myshell)
-        reactor.connectTCP(args.server, args.tcp_port, myfactory)
-        myshell.factory = myfactory
-        reactor.callInThread(myshell.cmdloop, "Welcome to pyterm!\n"
-                                              "Type '/exit' to exit.")
-        signal.signal(signal.SIGINT, __stop_reactor)
-        reactor.run()
-    else:
-        myshell.cmdloop("Welcome to pyterm!\nType '/exit' to exit.")
+    try:
+        if args.server and args.tcp_port:
+            myfactory = PytermClientFactory(myshell)
+            reactor.connectTCP(args.server, args.tcp_port, myfactory)
+            myshell.factory = myfactory
+            reactor.callInThread(myshell.cmdloop, "Welcome to pyterm!\n"
+                                                  "Type '/exit' to exit.")
+            reactor.run()
+        else:
+            myshell.cmdloop("Welcome to pyterm!\nType '/exit' to exit.")
+    except KeyboardInterrupt:
+        myshell.do_PYTERM_exit(None)

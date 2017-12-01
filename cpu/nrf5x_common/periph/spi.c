@@ -61,6 +61,8 @@ void spi_init_pins(spi_t bus)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+    (void) cs;
+
     mutex_lock(&locks[bus]);
 #ifdef CPU_FAM_NRF51
     /* power on the bus (NRF51 only) */

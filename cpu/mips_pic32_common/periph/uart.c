@@ -45,6 +45,9 @@ static PIC32_UART_T pic_uart[UART_NUMOF + 1];
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
+    (void)rx_cb;
+    (void)arg;
+
     assert(uart <= UART_NUMOF && uart != 0); /*No uart 0 on pic32*/
 
     /* Pin Mux should be setup in board file */
