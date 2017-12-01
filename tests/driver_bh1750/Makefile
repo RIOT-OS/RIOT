@@ -1,4 +1,3 @@
-APPLICATION = driver_bh1750
 include ../Makefile.tests_common
 
 USEMODULE += xtimer

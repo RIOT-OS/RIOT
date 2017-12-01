@@ -1,4 +1,3 @@
-APPLICATION = driver_l3g4200d
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c periph_gpio

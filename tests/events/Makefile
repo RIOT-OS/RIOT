@@ -1,4 +1,3 @@
-APPLICATION = event
 include ../Makefile.tests_common
 
 FORCE_ASSERTS = 1

@@ -1,4 +1,3 @@
-APPLICATION = driver_soft_spi
 include ../Makefile.tests_common
 
 BOARD ?= native

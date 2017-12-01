@@ -1,4 +1,3 @@
-APPLICATION = unittests
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon \

@@ -1,4 +1,3 @@
-APPLICATION = pkg_fatfs
 include ../Makefile.tests_common
 
 USEMODULE += shell

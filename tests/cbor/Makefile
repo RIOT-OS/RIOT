@@ -1,4 +1,3 @@
-APPLICATION = cbor
 include ../Makefile.tests_common
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno

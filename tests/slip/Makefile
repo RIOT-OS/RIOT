@@ -1,4 +1,3 @@
-APPLICATION = driver_slip
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo32-f031 nucleo32-f042 \

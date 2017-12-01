@@ -1,4 +1,3 @@
-APPLICATION = libfixmath
 include ../Makefile.tests_common
 
 USEPKG += libfixmath

@@ -1,5 +1,4 @@
 # name of your application
-APPLICATION = fault_handler
 include ../Makefile.tests_common
 
 CFLAGS += -DDEVELHELP=1

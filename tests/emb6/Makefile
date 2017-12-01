@@ -1,4 +1,3 @@
-APPLICATION = emb6
 # overwrite board, do not set native as default
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common

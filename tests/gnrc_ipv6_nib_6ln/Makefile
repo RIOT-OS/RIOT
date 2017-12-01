@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = gnrc_ipv6_nib_6ln
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := chronos nucleo-f030 nucleo-l053 nucleo32-f031 \

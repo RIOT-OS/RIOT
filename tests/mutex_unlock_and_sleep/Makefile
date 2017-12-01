@@ -1,4 +1,3 @@
-APPLICATION = mutex_unlock_and_sleep
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := nucleo32-f031

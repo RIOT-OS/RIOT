@@ -1,4 +1,3 @@
-APPLICATION = driver_at30tse75x
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c

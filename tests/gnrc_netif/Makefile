@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = gnrc_ipv6_nib
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini \

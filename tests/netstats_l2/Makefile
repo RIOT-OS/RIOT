@@ -1,4 +1,3 @@
-APPLICATION = netstats
 include ../Makefile.tests_common
 
 BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \

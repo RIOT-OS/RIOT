@@ -1,4 +1,3 @@
-APPLICATION = driver_apa102
 include ../Makefile.tests_common
 
 USEMODULE += apa102

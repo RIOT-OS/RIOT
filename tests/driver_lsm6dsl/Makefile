@@ -1,4 +1,3 @@
-APPLICATION = driver_lsm6dsl
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c

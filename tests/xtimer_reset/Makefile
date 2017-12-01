@@ -1,4 +1,3 @@
-APPLICATION = xtimer_reset
 include ../Makefile.tests_common
 
 USEMODULE += xtimer

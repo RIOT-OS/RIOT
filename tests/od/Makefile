@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = od
 include ../Makefile.tests_common
 
 USEMODULE += od

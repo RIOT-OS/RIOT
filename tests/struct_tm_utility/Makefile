@@ -1,4 +1,3 @@
-APPLICATION = struct_tm_utility
 include ../Makefile.tests_common
 
 DISABLE_MODULE += auto_init

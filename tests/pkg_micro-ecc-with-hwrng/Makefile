@@ -1,4 +1,3 @@
-APPLICATION = pkg_micro-ecc-with-hwrng
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_hwrng

@@ -1,4 +1,3 @@
-APPLICATION = pkg_tiny-asn1
 include ../Makefile.tests_common
 
 USEPKG += tiny-asn1

@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = cpp11_mutex
 include ../Makefile.tests_common
 
 # ROM is overflowing for these boards when using

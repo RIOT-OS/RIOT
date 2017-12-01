@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = pthread_barrier
 include ../Makefile.tests_common
 
 BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove

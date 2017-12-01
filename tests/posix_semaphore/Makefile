@@ -1,4 +1,3 @@
-APPLICATION = posix_semaphore
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := chronos mbed_lpc1768 msb-430 msb-430h nrf6310 \

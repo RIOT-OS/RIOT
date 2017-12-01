@@ -1,4 +1,3 @@
-APPLICATION = pkg_umorse
 include ../Makefile.tests_common
 
 USEMODULE += xtimer

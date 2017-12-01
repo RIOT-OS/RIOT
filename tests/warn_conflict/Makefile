@@ -1,4 +1,3 @@
-APPLICATION = warn_conflict
 BOARD ?= stm32f4discovery
 include ../Makefile.tests_common
 

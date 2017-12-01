@@ -1,4 +1,3 @@
-APPLICATION = driver_nrf24l01p_lowlevel
 include ../Makefile.tests_common
 
 # exclude boards with insufficient memory

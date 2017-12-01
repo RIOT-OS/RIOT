@@ -1,4 +1,3 @@
-APPLICATION = periph_i2c
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
