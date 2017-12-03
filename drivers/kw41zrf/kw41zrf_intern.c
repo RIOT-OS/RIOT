@@ -97,23 +97,33 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
     switch (pm) {
         case KW41ZRF_POWER_IDLE:
         {
-            if (!(RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK)) {
-                /* Already awake */
-                break;
-            }
             /* Disable some CPU power management if we need to be active, otherwise the
              * radio will be stuck in state retention mode. */
             if (!dev->pm_blocked) {
                 pm_block(KINETIS_PM_LLS);
                 dev->pm_blocked = true;
             }
-            /* Wait for oscillator ready signal before attempting to recover from DSM */
-            while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
+            /* Restore saved RF oscillator settings, enable oscillator in RUN mode
+             * to allow register access */
+            /* This is also where the oscillator is enabled during kw41zrf_init:
+             * kw41zrf_init -> kw41zrf_reset_phy -> kw41zrf_set_power_mode
+             * => Do not return before this line during init */
+            RSIM->CONTROL |= RSIM_CONTROL_RF_OSC_EN(1);
             /* Assume DSM timer has been running since we entered sleep mode */
             /* In case it was not already running, however, we still set the
              * enable flag here. */
+            /* RSIM_DSM_CONTROL_ZIG_SYSCLK_REQUEST_EN lets the link layer
+             * request the RF oscillator to remain on during STOP and VLPS, to
+             * allow stopping the CPU core without affecting TX or RX operations */
             RSIM->DSM_CONTROL = (RSIM_DSM_CONTROL_DSM_TIMER_EN_MASK |
                                 RSIM_DSM_CONTROL_ZIG_SYSCLK_REQUEST_EN_MASK);
+            /* Wait for oscillator ready signal before attempting to recover from DSM */
+            while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
+            /* If we are already awake we can just return now. */
+            if (!(RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK)) {
+                /* Already awake */
+                break;
+            }
             /* The wake target must be at least (4 + RSIM_DSM_OSC_OFFSET) ticks
              * into the future, to let the oscillator stabilize before switching
              * on the clocks */
@@ -154,6 +164,13 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
             RSIM->DSM_CONTROL = (RSIM_DSM_CONTROL_DSM_TIMER_EN_MASK |
                                 RSIM_DSM_CONTROL_ZIG_SYSCLK_REQUEST_EN_MASK);
             while (!(RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK)) {}
+            /* Restore saved RF_OSC_EN bits (from kw41zrf_init)
+             * This will disable the RF oscillator unless the system was
+             * configured to use the RF oscillator before kw41zrf_init() was
+             * called, for example when using the RF oscillator for the CPU core
+             * clock. */
+            RSIM->CONTROL = (RSIM->CONTROL & ~RSIM_CONTROL_RF_OSC_EN_MASK) |
+                dev->rf_osc_en_idle;
             /* Let the DSM timer run until we exit deep sleep mode */
             break;
         }

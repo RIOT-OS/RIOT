@@ -87,14 +87,9 @@ int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
         return -ENODEV;
     }
 
-    /* Enable RSIM oscillator in all power modes >LLS, in order to be able to
-     * access the XCVR and ZLL registers when using the internal reference clock
-     * for the CPU core */
-    RSIM->CONTROL |= RSIM_CONTROL_RF_OSC_EN_MASK;
-
-
-    /* Wait for oscillator ready signal */
-    while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
+    /* Save a copy of the RF_OSC_EN setting, the vendor XCVR_Init function
+     * modifies these bits */
+    dev->rf_osc_en_idle = RSIM->CONTROL & RSIM_CONTROL_RF_OSC_EN_MASK;
 
     xcvrStatus_t xcvrStatus = XCVR_Init(ZIGBEE_MODE, DR_500KBPS);
     if (xcvrStatus != gXcvrSuccess_c) {

@@ -134,6 +134,7 @@ typedef struct {
     uint8_t csma_num_backoffs; /**< Counter used internally by send implementation */
     uint8_t num_retrans;       /**< Counter used internally by send implementation */
     bool pm_blocked;           /**< true if we have blocked a low power mode in the CPU */
+    uint32_t rf_osc_en_idle;   /**< RF_OSC_EN bits setting when RF module is in standby */
     /** @} */
 } kw41zrf_t;
 
