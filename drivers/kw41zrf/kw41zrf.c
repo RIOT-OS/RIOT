@@ -87,12 +87,23 @@ int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
         return -ENODEV;
     }
 
-    /* Save a copy of the RF_OSC_EN setting, the vendor XCVR_Init function
-     * modifies these bits */
+    /* Save a copy of the RF_OSC_EN setting to use when the radio is in deep sleep */
     dev->rf_osc_en_idle = RSIM->CONTROL & RSIM_CONTROL_RF_OSC_EN_MASK;
 
+    /* Enable RSIM oscillator in RUN and WAIT modes, in order to be able to
+     * access the XCVR and ZLL registers when using the internal reference clock
+     * for the CPU core */
+    RSIM->CONTROL |= RSIM_CONTROL_RF_OSC_EN(1);
+
+    /* Wait for oscillator ready signal */
+    while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
+
     xcvrStatus_t xcvrStatus = XCVR_Init(ZIGBEE_MODE, DR_500KBPS);
+
     if (xcvrStatus != gXcvrSuccess_c) {
+        /* initialization error signaled from vendor driver */
+        /* Restore saved RF_OSC_EN setting */
+        RSIM->CONTROL = (RSIM->CONTROL & ~RSIM_CONTROL_RF_OSC_EN_MASK) | dev->rf_osc_en_idle;
         return -EIO;
     }
 
