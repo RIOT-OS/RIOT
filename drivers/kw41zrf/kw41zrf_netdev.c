@@ -1045,6 +1045,13 @@ static void kw41zrf_netdev_isr(netdev_t *netdev)
     if (!spinning_for_irq) {
         num_irqs_handled = num_irqs_queued;
     }
+
+    /* ZLL register access requires that the transceiver is not in deep sleep mode */
+    if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+        /* Transceiver is sleeping, the IRQ must have occurred before entering
+         * sleep, discard the call */
+        return;
+    }
     uint32_t irqsts = ZLL->IRQSTS;
 
     /* Clear all IRQ flags now */
