@@ -447,13 +447,16 @@ static void nd_isr(netdev_t *netdev)
 
 static int nd_get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
+    (void)max_len;
     enc28j60_t *dev = (enc28j60_t *)netdev;
+    int res = -ENOTSUP;
 
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(max_len >= ETHERNET_ADDR_LEN);
             mac_get(dev, (uint8_t *)value);
-            return ETHERNET_ADDR_LEN;
+            res = ETHERNET_ADDR_LEN;
+            break;
         case NETOPT_LINK_CONNECTED:
             if (cmd_r_phy(dev, REG_PHY_PHSTAT2) & PHSTAT2_LSTAT) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
@@ -461,24 +464,29 @@ static int nd_get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             else {
                 *((netopt_enable_t *)value) = NETOPT_DISABLE;
             }
-            return sizeof(netopt_enable_t);
+            res = sizeof(netopt_enable_t);
         default:
-            return netdev_eth_get(netdev, opt, value, max_len);
+            break;
     }
+    return res;
 }
 
 static int nd_set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_len)
 {
+    (void)value_len;
     enc28j60_t *dev = (enc28j60_t *)netdev;
+    int res = -ENOTSUP;
 
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(value_len == ETHERNET_ADDR_LEN);
             mac_set(dev, (uint8_t *)value);
-            return ETHERNET_ADDR_LEN;
+            res = ETHERNET_ADDR_LEN;
+            break;
         default:
-            return netdev_eth_set(netdev, opt, value, value_len);
+            break;
     }
+    return res;
 }
 
 static const netdev_driver_t netdev_driver_enc28j60 = {
