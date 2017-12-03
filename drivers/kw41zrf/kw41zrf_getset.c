@@ -187,6 +187,24 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
 {
     DEBUG("[kw41zrf] set option 0x%04x to %x\n", option, state);
 
+    if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+        /* Transceiver is sleeping */
+        switch (option) {
+            /* Modifying these options require that the transceiver is not in
+             * deep sleep mode */
+            case KW41ZRF_OPT_CSMA:
+            case KW41ZRF_OPT_PROMISCUOUS:
+            case KW41ZRF_OPT_AUTOACK:
+            case KW41ZRF_OPT_ACK_REQ:
+            case KW41ZRF_OPT_TELL_RX_START:
+                LOG_ERROR("[kw41zrf] Attempt to modify option %04x while radio is sleeping\n", (unsigned) option);
+                return;
+
+            default:
+                break;
+        }
+    }
+
     /* set option field */
     if (state) {
         dev->netdev.flags |= option;
@@ -230,6 +248,7 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
 
             case KW41ZRF_OPT_TELL_TX_START:
                 LOG_DEBUG("[kw41zrf] enable: TELL_TX_START (ignored)\n");
+
             default:
                 /* do nothing */
                 break;
