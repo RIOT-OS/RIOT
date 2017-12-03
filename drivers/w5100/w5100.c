@@ -298,8 +298,9 @@ static void isr(netdev_t *netdev)
 
 static int get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
+    (void)max_len;
     w5100_t *dev = (w5100_t *)netdev;
-    int res = 0;
+    int res = -ENOTSUP;
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -310,11 +311,19 @@ static int get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             res = ETHERNET_ADDR_LEN;
             break;
         default:
-            res = netdev_eth_get(netdev, opt, value, max_len);
             break;
     }
 
     return res;
+}
+
+static int set(netdev *dev, netopt_t opt, const void *value, size_t value_len)
+{
+    (void)dev;
+    (void)opt;
+    (void)value;
+    (void)value_len;
+    return -ENOTSUP;
 }
 
 static const netdev_driver_t netdev_driver_w5100 = {
@@ -323,5 +332,5 @@ static const netdev_driver_t netdev_driver_w5100 = {
     .init = init,
     .isr = isr,
     .get = get,
-    .set = netdev_eth_set,
+    .set = set,
 };
