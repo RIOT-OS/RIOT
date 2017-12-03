@@ -108,7 +108,7 @@ static inline void _isr(netdev_t *netdev)
 
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 {
-    int res = 0;
+    int res = -ENOTSUP;
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -125,7 +125,6 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             res = sizeof(bool);
             break;
         default:
-            res = netdev_eth_get(dev, opt, value, max_len);
             break;
     }
 
@@ -135,7 +134,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len)
 {
     (void)value_len;
-    int res = 0;
+    int res = -ENOTSUP;
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -148,7 +147,6 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
             res = sizeof(netopt_enable_t);
             break;
         default:
-            res = netdev_eth_set(dev, opt, value, value_len);
             break;
     }
 
