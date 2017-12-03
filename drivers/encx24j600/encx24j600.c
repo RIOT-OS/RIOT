@@ -69,6 +69,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *dev);
 static void _isr(netdev_t *dev);
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
+static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len);
 
 static const netdev_driver_t netdev_driver_encx24j600 = {
     .send = _send,
@@ -76,7 +77,7 @@ static const netdev_driver_t netdev_driver_encx24j600 = {
     .init = _init,
     .isr = _isr,
     .get = _get,
-    .set = netdev_eth_set,
+    .set = _set,
 };
 
 static inline void lock(encx24j600_t *dev) {
@@ -389,7 +390,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 {
-    int res = 0;
+    int res = -ENOTSUP;
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -408,11 +409,20 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             else {
                 *((netopt_enable_t *)value) = NETOPT_DISABLE;
             }
-            return sizeof(netopt_enable_t);
+            res = sizeof(netopt_enable_t);
+            break;
         default:
-            res = netdev_eth_get(dev, opt, value, max_len);
             break;
     }
 
     return res;
+}
+
+static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len)
+{
+    (void)dev;
+    (void)opt;
+    (void)value;
+    (void)value_len;
+    return -ENOTSUP;
 }
