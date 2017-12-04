@@ -24,7 +24,6 @@ def testfunc(child):
 
     for i in range(numof):
         child.expect(r'At \s*(\d+) ms received msg %i: "supposed to be (\d+)"' % i)
-        stop = int(time.time() * 1000)
         # check if output is correct
         exp = int(child.match.group(2)) + timer_offset
         assert(int(child.match.group(1)) in range(exp - ACCEPTED_ERROR, exp + ACCEPTED_ERROR + 1))
