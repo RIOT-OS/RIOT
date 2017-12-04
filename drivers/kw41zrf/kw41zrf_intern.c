@@ -128,13 +128,19 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
              * into the future, to let the oscillator stabilize before switching
              * on the clocks */
             RSIM->ZIG_WAKE = KW41ZRF_DSM_EXIT_DELAY + RSIM->DSM_TIMER + RSIM->DSM_OSC_OFFSET;
+            /* Wait to come out of DSM */
             while (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {}
+
             /* Convert DSM ticks (32.768 kHz) to event timer ticks (1 MHz) */
             uint64_t tmp = (uint64_t)(RSIM->ZIG_WAKE - RSIM->ZIG_SLEEP) * 15625ul;
             uint32_t usec = (tmp >> 9); /* equivalent to (usec / 512) */
             /* Add the offset */
             ZLL->EVENT_TMR = ZLL_EVENT_TMR_EVENT_TMR_ADD_MASK |
                 ZLL_EVENT_TMR_EVENT_TMR(usec);
+
+            /* Disable DSM timer triggered sleep */
+            ZLL->DSM_CTRL &= ~ZLL_DSM_CTRL_ZIGBEE_SLEEP_EN_MASK;
+
             break;
         }
         case KW41ZRF_POWER_DSM:
@@ -147,17 +153,23 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
                 pm_unblock(KINETIS_PM_LLS);
                 dev->pm_blocked = false;
             }
+            /* Race condition: if sleep is re-triggered after wake before the
+             * DSM_ZIG_FINISHED flag has been switched off, then the RSIM
+             * becomes stuck and never enters DSM.
+             * The time from ZIG_WAKE until DSM_ZIG_FINISHED is turned off seem
+             * to be constant at 2 DSM ticks */
+            while (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_DSM_ZIG_FINISHED_MASK) {}
             /* Clear IRQ flags */
             RSIM->DSM_CONTROL = RSIM->DSM_CONTROL;
             /* Enable timer triggered sleep */
-            ZLL->DSM_CTRL = ZLL_DSM_CTRL_ZIGBEE_SLEEP_EN_MASK;
-            /* Set sleep start time */
-            /* The target time must be at least 4 DSM_TIMER ticks into the future */
-            RSIM->ZIG_SLEEP = RSIM->DSM_TIMER + KW41ZRF_DSM_ENTER_DELAY;
+            ZLL->DSM_CTRL |= ZLL_DSM_CTRL_ZIGBEE_SLEEP_EN_MASK;
             /* The device will automatically wake up 8.5 minutes from now if not
              * awoken sooner by software */
             /* TODO handle automatic wake in the ISR if it becomes an issue */
-            RSIM->ZIG_WAKE = RSIM->DSM_TIMER - 1;
+            RSIM->ZIG_WAKE = RSIM->DSM_TIMER - KW41ZRF_DSM_EXIT_DELAY - RSIM->DSM_OSC_OFFSET;
+            /* Set sleep start time */
+            /* The target time must be at least 4 DSM_TIMER ticks into the future */
+            RSIM->ZIG_SLEEP = RSIM->DSM_TIMER + KW41ZRF_DSM_ENTER_DELAY;
             /* Start the 32.768 kHz DSM timer in case it was not already running */
             /* If ZIG_SYSCLK_REQUEST_EN is not set then the hardware will not
              * enter DSM and we get stuck in the while() below */
