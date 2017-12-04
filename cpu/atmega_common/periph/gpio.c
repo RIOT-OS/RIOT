@@ -158,7 +158,6 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     uint8_t pin_num = _pin_num(pin);
-    uint8_t port_num = _port_num(pin);
 
     if ((_port_num(pin) == PORT_D && pin_num > 3)
 #if defined (PORTE)
