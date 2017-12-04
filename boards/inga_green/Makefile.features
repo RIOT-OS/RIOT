@@ -1,1 +1,1 @@
-include $(RIOTBOARD)/inga_common/Makefile.features
+include $(RIOTBOARD)/common/inga/Makefile.features

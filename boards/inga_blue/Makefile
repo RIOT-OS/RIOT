@@ -1,3 +1,3 @@
 MODULE = board
-DIRS = $(RIOTBOARD)/inga_common
+DIRS = $(RIOTBOARD)/common/inga
 include $(RIOTBASE)/Makefile.base
