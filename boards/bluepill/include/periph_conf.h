@@ -153,6 +153,41 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_NUMOF           (2U)
+#define I2C_0_EN            1
+#define I2C_1_EN            0 /* Disabled by default since pins collide with USART3. */
+#define I2C_IRQ_PRIO        1
+#define I2C_APBCLK          (CLOCK_APB1)
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV           I2C1
+#define I2C_0_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C1EN))
+#define I2C_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C1EN))
+#define I2C_0_EVT_IRQ       I2C1_EV_IRQn
+#define I2C_0_EVT_ISR       isr_i2c1_ev
+#define I2C_0_ERR_IRQ       I2C1_ER_IRQn
+#define I2C_0_ERR_ISR       isr_i2c1_er
+/* I2C 0 pin configuration */
+#define I2C_0_SCL_PIN       GPIO_PIN(PORT_B, 6)
+#define I2C_0_SDA_PIN       GPIO_PIN(PORT_B, 7)
+
+/* I2C 1 device configuration */
+#define I2C_1_DEV           I2C2
+#define I2C_1_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C2EN))
+#define I2C_1_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C2EN))
+#define I2C_1_EVT_IRQ       I2C2_EV_IRQn
+#define I2C_1_EVT_ISR       isr_i2c2_ev
+#define I2C_1_ERR_IRQ       I2C2_ER_IRQn
+#define I2C_1_ERR_ISR       isr_i2c2_er
+/* I2C 1 pin configuration */
+#define I2C_1_SCL_PIN       GPIO_PIN(PORT_B, 10)
+#define I2C_1_SDA_PIN       GPIO_PIN(PORT_B, 11)
+/** @} */
+
+/**
  * @name   PWM configuration
  * @{
  */
