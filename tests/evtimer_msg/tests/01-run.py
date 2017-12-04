@@ -19,14 +19,22 @@ ACCEPTED_ERROR = 20
 def testfunc(child):
     child.expect(r"Testing generic evtimer \(start time = (\d+) ms\)")
     timer_offset = int(child.match.group(1))
+    child.expect(r"Last evtimer event expected at (\d+) ms")
+    remaining = int(child.match.group(1))
     child.expect(r"Are the reception times of all (\d+) msgs close to the supposed values?")
     numof = int(child.match.group(1))
 
     for i in range(numof):
-        child.expect(r'At \s*(\d+) ms received msg %i: "supposed to be (\d+)"' % i)
+        child.expect(r'At \s*(\d+) ms received msg %i: "supposed to be (\d+)",'
+                     r' time until last event: (\d+) ms' % i)
         # check if output is correct
+        cur_time = int(child.match.group(1))
         exp = int(child.match.group(2)) + timer_offset
-        assert(int(child.match.group(1)) in range(exp - ACCEPTED_ERROR, exp + ACCEPTED_ERROR + 1))
+        recv_rem = int(child.match.group(3))
+        exp_rem = remaining - cur_time
+        assert(cur_time in range(exp - ACCEPTED_ERROR, exp + ACCEPTED_ERROR + 1))
+        assert(recv_rem in range(exp_rem - ACCEPTED_ERROR,
+                                 exp_rem + ACCEPTED_ERROR + 1))
         print(".", end="", flush=True)
     print("")
     print("All tests successful")

@@ -46,11 +46,13 @@ void *worker_thread(void *arg)
         char *ctx;
         msg_t m;
         uint32_t now;
+        uint32_t remaining;
 
         msg_receive(&m);
         now = xtimer_now_usec() / US_PER_MS;
         ctx = m.content.ptr;
-        printf("At %6" PRIu32 " ms received msg %i: \"%s\"\n", now, count++, ctx);
+        remaining = evtimer_get_offset(&evtimer,(evtimer_event_t*)&events[NEVENTS - 1]);
+        printf("At %6" PRIu32 " ms received msg %i: \"%s\", time until last event: %" PRIu32 " ms\n", now, count++, ctx, remaining);
     }
 }
 
@@ -66,6 +68,8 @@ int main(void)
                                      THREAD_CREATE_STACKTEST,
                                      worker_thread, NULL, "worker");
     printf("Testing generic evtimer (start time = %" PRIu32 " ms)\n", now);
+    uint32_t last_event = events[NEVENTS - 1].event.offset;
+    printf("Last evtimer event expected at %" PRIu32 " ms\n", last_event);
     for (unsigned i = 0; i < NEVENTS; i++) {
         evtimer_add_msg(&evtimer, &events[i], pid);
     }
