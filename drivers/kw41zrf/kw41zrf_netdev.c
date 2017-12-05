@@ -342,6 +342,10 @@ static int kw41zrf_netdev_set_state(kw41zrf_t *dev, netopt_state_t state)
             /* There is no deeper 'off' mode than deep sleep mode */
             /* fall through */
         case NETOPT_STATE_SLEEP:
+            if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+                /* Transceiver is already in deep sleep mode */
+                break;;
+            }
             kw41zrf_abort_sequence(dev);
             kw41zrf_set_power_mode(dev, KW41ZRF_POWER_DSM);
             dev->idle_seq = XCVSEQ_IDLE;
