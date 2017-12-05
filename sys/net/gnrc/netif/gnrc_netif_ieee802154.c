@@ -24,6 +24,10 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#if defined(MODULE_OD) && ENABLE_DEBUG
+#include "od.h"
+#endif
+
 #ifdef MODULE_NETDEV_IEEE802154
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
