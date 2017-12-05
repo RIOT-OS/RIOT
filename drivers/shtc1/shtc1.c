@@ -6,6 +6,18 @@
  * directory for more details.
  */
 
+/**
+ * @ingroup     drivers_shtc1
+ * @{
+ *
+ * @file
+ * @brief       Sensirion SHTC1 temperature and humidity sensor device driver
+ *
+ * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @}
+ */
+
 #include "shtc1.h"
 
 #define ENABLE_DEBUG	(0)
@@ -15,7 +27,7 @@
 /*
  * does a crc check and returns 0 for passed and -1 for failed
  */
-int8_t _check_crc(uint8_t *rec_values, uint8_t right_crc)
+static int8_t _check_crc(uint8_t *rec_values, uint8_t right_crc)
 {
 	uint8_t crc = 0xFF;
 	uint8_t current_byte;
@@ -27,7 +39,7 @@ int8_t _check_crc(uint8_t *rec_values, uint8_t right_crc)
 		for (bit = 8; bit > 0; bit--)
 		{
 			if (crc & 0x80)
-				crc = (crc << 1) ^ 0x31;
+				crc = (crc << 1) ^ SHTC1_CRC;
 			else
 				crc = (crc << 1);
 		}
@@ -35,61 +47,63 @@ int8_t _check_crc(uint8_t *rec_values, uint8_t right_crc)
 	return !(crc == right_crc);
 }
 
-int8_t shtc1_init(i2c_t dev)
+int8_t shtc1_init(const shtc1_t* dev, const shtc1_params_t params)
 {
+    dev->bus = params.bus;
+    dev->addr = params.addr;
+    dev->params = params;
 	int8_t error = i2c_init_master(dev, I2C_SPEED_FAST);
 	if(!error) {
-		 return 0;
-	}else {
-		return error;
+		 return SHTC1_OK;
 	}
+	return SHTC1_ERROR;
 }
 
-int8_t shtc1_measure(i2c_t dev, crc_type_t crc, shtc1_values_t* received_values)
+int8_t shtc1_measure(const shtc1_t* dev)
 {
-	uint8_t data[] = { 0x7C, 0xA2 };
-	i2c_write_bytes(dev, 0x70, data, 2);
+	uint8_t data[] = { SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_HIGH, SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_LOW };
+	i2c_write_bytes(dev->bus, dev->addr, data, 2);
 	uint8_t received[6];
-	i2c_read_bytes(dev, 0x70, received, 6);
+	i2c_read_bytes(dev->bus, dev->addr, received, 6);
 	uint16_t temp_f = ((received[0]<<8)|received[1]);
 	uint16_t abs_humidity = ((received[3]<<8)|received[4]);
-	if(crc){
+	if(dev->params.crc){
 		if(!((_check_crc(&received[0], received[2]) == 0) && (_check_crc(&received[3], received[5]) == 0))){
 			/* crc check failed */
 			DEBUG("CRC Error");
-			return -1;
+			return SHTC1_ERROR;
 		}
 		DEBUG("CRC Passed! \n");
 	}
-	received_values->temp = (175.0*temp_f/65536)-45;
-	received_values->rel_humidity = 100*(abs_humidity/65536.0);
+	dev->received_values.temp = (175.0*temp_f/65536)-45;
+	dev->received_values.rel_humidity = 100*(abs_humidity/65536.0);
 
-	return 0;
+	return SHTC1_OK;
 }
 
-int8_t shtc1_id(i2c_t dev, uint16_t *id)
+int8_t shtc1_id(const shtc1_t* dev)
 {
-	uint8_t data[] = { 0xEF, 0xC8 };
+	uint8_t data[] = { SHTC1_COMMAND_ID_HIGH, SHTC1_COMMAND_ID_LOW };
 	int8_t check = 0;
-	check = i2c_write_bytes(dev, 0x70, data, 2);
+	check = i2c_write_bytes(dev->bus, dev->addr, data, 2);
 	uint8_t received[2];
-	check += i2c_read_bytes(dev, 0x70, received, 2);
+	check += i2c_read_bytes(dev->bus, dev->addr, received, 2);
 	if(check != 4){
 		/* error occured return -1 */
-		return -1;
+		return SHTC1_ERROR;
 	}
-	*id = (received[0]<<8)|received[1];
-	return 0;
+	dev->id = (received[0]<<8)|received[1];
+	return SHTC1_OK;
 }
 
-int8_t shtc1_reset(i2c_t dev)
+int8_t shtc1_reset(const shtc1_t* dev)
 {
-	uint8_t data[] = { 0x80, 0x5D };
+	uint8_t data[] = { SHTC1_COMMAND_RESET_HIGH, SHTC1_COMMAND_RESET_LOW };
 	int8_t check = 0;
-	check = i2c_write_bytes(dev, 0x70, data, 2);
+	check = i2c_write_bytes(dev->bus, dev->addr, data, 2);
 	if(check != 2){
 		/* error occured return -1 */
-		return -1;
+		return SHTC1_ERROR;
 	}
-	return 0;
+	return SHTC1_OK;
 }

@@ -7,16 +7,16 @@
  */
 
 /**
- * @defgroup	drivers_shtc1
- * @ingroup	drivers_sensors
- * @name	Device driver interface for the SHTC1 Temperature and humidity sensor
+ * @defgroup    drivers_shtc1
+ * @ingroup     drivers_sensors
+ * @name        Device driver interface for the SHTC1 Temperature and humidity sensor
  * @{
  *
  * @file
- * @brief	Device driver interface for the SHTC1 Temperature and humidity sensor
+ * @brief       Device driver interface for the SHTC1 Temperature and humidity sensor
  *
- * @author	Steffen Robertz <steffen.robertz@rwth-aachen.de>
- * @author	Josua Arndt <steffen.robertz@rwth-aachen.de>
+ * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
 
 #ifndef SHTC1_H
@@ -32,61 +32,86 @@ extern "C" {
 typedef enum {
     CRC_DISABLED = 0,
     CRC_ENABLED
-}crc_type_t;
+} shtc1_crc_type_t;
 
 typedef struct {
     float temp;
     float rel_humidity;
-}shtc1_values_t;
+} shtc1_values_t;
 
+typedef struct {
+    i2c_t bus;
+    uint8_t addr;
+    shtc1_crc_type_t crc;
+} shtc1_params_t;
+
+typedef struct {
+    i2c_t bus;
+    uint8_t addr;
+    shtc1_params_t params;
+    unsigned int id;
+    shtc1_values_t values;
+} shtc1_t;
+
+enum {
+    SHTC1_OK = 0,
+    SHTC1_ERROR = -1
+}
+
+/*define section*/
+#define SHTC1_CRC                                   0x31
+#define SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_HIGH    0x7C
+#define SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_LOW     0xA2
+#define SHTC1_COMMAND_RESET_HIGH                    0x80
+#define SHTC1_COMMAND_RESET_LOW                     0x5D
+#define SHTC1_COMMAND_ID_HIGH                       0xEF
+#define SHTC1_COMMAND_ID_LOW                        0xC8
 
 /**
- * @brief initializes the sensor and i2c
+ * @brief initializes the sensor and I2C
  *
- * @param[in] dev		i2c device to be used
+ * @param[in] dev       I2C device descriptor
+ * @param[in] params    SHTC1 parameters to be used
  *
- * @return			0 on a working initialization
- * @return			-1 on undefined i2c device given in periph_conf
- * @return			-2 on unsupported speed value
+ * @return              SHTC1_OK on a working initialization
+ * @return              SHTC1_ERROR on undefined I2C device given
  */
-int8_t shtc1_init(i2c_t dev);
+int8_t shtc1_init(const shtc1_t* dev, const shtc1_params_t params);
 
 /**
- * @brief reads temperature and humidity values
+ * @brief reads temperature and humidity values and saves them in the device descriptor. The temperature is in °C and the humidity in %
  *
- * @param[in] dev		The I2C Device
- * @param[out] received_values	the received values are going to be saved here
+ * @param[in] dev               The I2C device descriptor
  *
- * @return			0 on a verified and working measurement
- * @return			-1 on a checksum error
+ * @return                      SHTC1_OK on a verified and working measurement
+ * @return                      SHTC1_ERROR on a checksum error
  */
-int8_t shtc1_measure(i2c_t dev, crc_type_t crc, shtc1_values_t *received_values);
+int8_t shtc1_measure(const shtc1_t* dev);
 
 /**
- * @brief reads out id
+ * @brief reads out id and saves it in the device descriptor
  *
- * When working correctly id should equal xxxx'xxxx'xx00'0111
- * Where x is unspecified
+ * @details             When working correctly ID should equal xxxx'xxxx'xx00'0111. 
+ *                      Where x is unspecified
  *
- * @param[in] dev		The I2C Device
- * @param[out] id		contains the id read from i2c
+ * @param[in] dev       The I2C device descriptor
  *
- * @return			0 on everything done
- * @return			-1 on error occured
+ * @return              SHTC1_OK on everything done
+ * @return              SHTC1_ERROR on error occured
  */
-int8_t shtc1_id(i2c_t dev, uint16_t *id);
+int8_t shtc1_id(const shtc1_t* dev);
 
 /**
  * @brief resets sensor
  *
  * This will reset all internal state machines and reload calibration data from the memory
  *
- * @param[in] dev		The I2C Device
+ * @param[in] dev       The I2C device descriptor
  *
- * @return			0 on everything done
- * @return			-1 on error occured
+ * @return              SHTC1_OK on everything done
+ * @return              SHTC1_ERROR on error occured
  */
-int8_t shtc1_reset(i2c_t dev);
+int8_t shtc1_reset(const shtc1_t* const dev);
 
 #ifdef __cplusplus
 }
