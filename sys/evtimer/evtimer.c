@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <stdbool.h>
 #include "div.h"
 #include "irq.h"
 #include "xtimer.h"
@@ -156,20 +157,21 @@ void evtimer_del(evtimer_t *evtimer, evtimer_event_t *event)
 uint32_t evtimer_get_offset(evtimer_t *evtimer, evtimer_event_t *event)
 {
     uint32_t offset = 0;
+    bool res = false;
+
     unsigned state = irq_disable();
-    if (evtimer->events) {
-        evtimer_event_t *list = evtimer->events;
-        /* Get current offset to first event */
-        offset = _get_offset(&evtimer->timer);
-        while ((list = list->next)) {
-            offset += list->offset;
-            if (list == event) {
-                break;
-            }
+
+    evtimer_event_t *list = (evtimer_event_t *)&evtimer->events;
+    _update_head_offset(evtimer);
+    while ((list = list->next)) {
+        offset += list->offset;
+        if (list == event) {
+            res = true;
+            break;
         }
     }
     irq_restore(state);
-    return offset;
+    return (res) ? offset : 0;
 }
 
 static evtimer_event_t *_get_next(evtimer_t *evtimer)
