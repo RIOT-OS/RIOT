@@ -141,9 +141,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             pkt->type = state->proto;
 #if ENABLE_DEBUG
             DEBUG("_recv_ieee802154: received packet from %s of length %u\n",
-                  gnrc_netif_addr_to_str(src_str, sizeof(src_str),
-                                         gnrc_netif_hdr_get_src_addr(hdr),
-                                         hdr->src_l2addr_len),
+                  gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(hdr),
+                                         hdr->src_l2addr_len,
+                                         src_str),
                   nread);
 #if defined(MODULE_OD)
             od_hex_dump(pkt->data, nread, OD_WIDTH_DEFAULT);
