@@ -1,4 +1,4 @@
-include $(RIOTBOARD)/arduino-atmega-common/Makefile.include
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.include
 
 # define the cpu used by the arduino uno board
 export CPU = atmega256rfr2
