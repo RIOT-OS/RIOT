@@ -568,13 +568,17 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
         while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
     }
 
+    int res = -ENOTSUP;
+
     switch (opt) {
         case NETOPT_TX_POWER:
             if (len < sizeof(int16_t)) {
-                return -EOVERFLOW;
+                res = -EOVERFLOW;
+                break;
             }
             *((uint16_t *)value) = kw41zrf_get_txpower(dev);
-            return sizeof(uint16_t);
+            res = sizeof(uint16_t);
+            break;
 
         case NETOPT_IS_CHANNEL_CLR:
             if (kw41zrf_cca(dev) == 0) {
@@ -583,43 +587,44 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             else {
                 *((netopt_enable_t *)value) = NETOPT_DISABLE;
             }
-            return sizeof(netopt_enable_t);
+            res = sizeof(netopt_enable_t);
+            break;
 
         case NETOPT_CCA_THRESHOLD:
             if (len < sizeof(uint8_t)) {
-                return -EOVERFLOW;
+                res = -EOVERFLOW;
+                break;
             }
-            else {
-                *(int8_t *)value = kw41zrf_get_cca_threshold(dev);
-            }
-            return sizeof(int8_t);
+            *(int8_t *)value = kw41zrf_get_cca_threshold(dev);
+            res = sizeof(int8_t);
+            break;
 
         case NETOPT_CCA_MODE:
             if (len < sizeof(uint8_t)) {
-                return -EOVERFLOW;
+                res = -EOVERFLOW;
+                break;
             }
-            else {
-                *(uint8_t *)value = kw41zrf_get_cca_mode(dev);
-                switch (*((int8_t *)value)) {
-                    case NETDEV_IEEE802154_CCA_MODE_1:
-                    case NETDEV_IEEE802154_CCA_MODE_2:
-                    case NETDEV_IEEE802154_CCA_MODE_3:
-                        return sizeof(uint8_t);
-                    default:
-                        break;
-                }
-                return -EOVERFLOW;
+            *(uint8_t *)value = kw41zrf_get_cca_mode(dev);
+            switch (*((int8_t *)value)) {
+                case NETDEV_IEEE802154_CCA_MODE_1:
+                case NETDEV_IEEE802154_CCA_MODE_2:
+                case NETDEV_IEEE802154_CCA_MODE_3:
+                    res = sizeof(uint8_t);
+                    break;
+                default:
+                    res = -EINVAL;
+                    break;
             }
             break;
 
         case NETOPT_LAST_ED_LEVEL:
             if (len < sizeof(int8_t)) {
-                return -EOVERFLOW;
+                res = -EOVERFLOW;
+                break;
             }
-            else {
-                *(int8_t *)value = kw41zrf_get_ed_level(dev);
-            }
-            return sizeof(int8_t);
+            *(int8_t *)value = kw41zrf_get_ed_level(dev);
+            res = sizeof(int8_t);
+            break;
 
         default:
             break;
@@ -630,7 +635,10 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
         kw41zrf_set_power_mode(dev, KW41ZRF_POWER_DSM);
     }
 
-    return netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, value, len);
+    if (res == -ENOTSUP) {
+        res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, value, len);
+    }
+    return res;
 }
 
 static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
