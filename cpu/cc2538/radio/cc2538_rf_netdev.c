@@ -396,8 +396,8 @@ static int _init(netdev_t *netdev)
     cc2538_set_state(dev, NETOPT_STATE_IDLE);
 
     /* set default protocol */
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
+#ifdef MODULE_GNRC_LOWPAN
+    dev->netdev.proto = GNRC_NETTYPE_LOWPAN;
 #elif MODULE_GNRC
     dev->netdev.proto = GNRC_NETTYPE_UNDEF;
 #endif

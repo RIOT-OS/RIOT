@@ -62,8 +62,8 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     }
 
     switch (payload->type) {
-#ifdef MODULE_GNRC_SIXLOWPAN
-        case GNRC_NETTYPE_SIXLOWPAN:
+#ifdef MODULE_GNRC_LOWPAN
+        case GNRC_NETTYPE_LOWPAN:
             cc110x_pkt.flags = 1;
             break;
 #endif
@@ -120,10 +120,10 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
     int addr_len;
     switch (cc110x_pkt->flags) {
-#ifdef MODULE_GNRC_SIXLOWPAN
+#ifdef MODULE_GNRC_LOWPAN
         case 1:
             addr_len = 8;
-            nettype = GNRC_NETTYPE_SIXLOWPAN;
+            nettype = GNRC_NETTYPE_LOWPAN;
             break;
 #endif
         default:

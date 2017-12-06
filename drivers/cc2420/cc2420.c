@@ -74,8 +74,8 @@ int cc2420_init(cc2420_t *dev)
     cc2420_set_option(dev, CC2420_OPT_TELL_RX_END, true);
 #endif
     /* set default protocol*/
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
+#ifdef MODULE_GNRC_LOWPAN
+    dev->netdev.proto = GNRC_NETTYPE_LOWPAN;
 #elif MODULE_GNRC
     dev->netdev.proto = GNRC_NETTYPE_UNDEF;
 #endif

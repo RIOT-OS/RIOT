@@ -64,8 +64,8 @@ extern "C" {
 /**
  * @brief   Default protocol for data that is coming in
  */
-#ifdef MODULE_GNRC_SIXLOWPAN
-#define XBEE_DEFAULT_PROTOCOL       (GNRC_NETTYPE_SIXLOWPAN)
+#ifdef MODULE_GNRC_LOWPAN
+#define XBEE_DEFAULT_PROTOCOL       (GNRC_NETTYPE_LOWPAN)
 #else
 #define XBEE_DEFAULT_PROTOCOL       (GNRC_NETTYPE_UNDEF)
 #endif

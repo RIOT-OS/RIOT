@@ -95,8 +95,8 @@ void kw2xrf_reset_phy(kw2xrf_t *dev)
     dev->netdev.flags = 0;
 
     /* set default protocol */
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
+#ifdef MODULE_GNRC_LOWPAN
+    dev->netdev.proto = GNRC_NETTYPE_LOWPAN;
 #elif MODULE_GNRC
     dev->netdev.proto = GNRC_NETTYPE_UNDEF;
 #endif

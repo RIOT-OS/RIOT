@@ -77,8 +77,8 @@ void mrf24j40_reset(mrf24j40_t *dev)
 #endif
 
     /* set default protocol */
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
+#ifdef MODULE_GNRC_LOWPAN
+    dev->netdev.proto = GNRC_NETTYPE_LOWPAN;
 #elif MODULE_GNRC
     dev->netdev.proto = GNRC_NETTYPE_UNDEF;
 #endif

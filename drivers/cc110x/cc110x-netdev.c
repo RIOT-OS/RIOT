@@ -230,8 +230,8 @@ int netdev_cc110x_setup(netdev_cc110x_t *netdev_cc110x, const cc110x_params_t *p
 
     /* set default protocol */
 #ifdef MODULE_GNRC_NETIF
-# ifdef MODULE_GNRC_SIXLOWPAN
-    netdev_cc110x->cc110x.proto = GNRC_NETTYPE_SIXLOWPAN;
+# ifdef MODULE_GNRC_LOWPAN
+    netdev_cc110x->cc110x.proto = GNRC_NETTYPE_LOWPAN;
 # else
     netdev_cc110x->cc110x.proto = GNRC_NETTYPE_UNDEF;
 # endif
