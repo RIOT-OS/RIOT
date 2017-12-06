@@ -1,3 +1,3 @@
-MODULE = gnrc_sixlowpan_frag
+MODULE = gnrc_lowpan_frag
 
 include $(RIOTBASE)/Makefile.base

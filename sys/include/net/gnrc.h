@@ -234,7 +234,7 @@
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *   An IPv6 Router can forward packets, while an IPv6 Node will simply drop
  *   packets not targeted to it. If an IEEE 802.15.4 network device is present
- *   @ref net_gnrc_sixlowpan (with @ref net_gnrc_sixlowpan_frag and @ref
+ *   @ref net_gnrc_sixlowpan (with @ref net_gnrc_lowpan_frag and @ref
  *   net_gnrc_sixlowpan_iphc) will be included automatically.
 
  * - For basic IPv6 (and 6LoWPAN) functionalities choose instead

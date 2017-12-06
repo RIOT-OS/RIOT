@@ -24,7 +24,7 @@
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
 
-#include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/lowpan/frag.h"
 #ifdef __cplusplus
 
 extern "C" {

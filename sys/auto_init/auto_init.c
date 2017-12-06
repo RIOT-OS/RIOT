@@ -32,8 +32,8 @@
 #include "xtimer.h"
 #endif
 
-#ifdef MODULE_GNRC_SIXLOWPAN
-#include "net/gnrc/sixlowpan.h"
+#ifdef MODULE_GNRC_LOWPAN
+#include "net/gnrc/lowpan.h"
 #endif
 
 #ifdef MODULE_GNRC_IPV6
@@ -114,9 +114,9 @@ void auto_init(void)
     DEBUG("Auto init gnrc_pktdump module.\n");
     gnrc_pktdump_init();
 #endif
-#ifdef MODULE_GNRC_SIXLOWPAN
-    DEBUG("Auto init gnrc_sixlowpan module.\n");
-    gnrc_sixlowpan_init();
+#ifdef MODULE_GNRC_LOWPAN
+    DEBUG("Auto init gnrc_lowpan module.\n");
+    gnrc_lowpan_init();
 #endif
 #ifdef MODULE_GNRC_IPV6
     DEBUG("Auto init gnrc_ipv6 module.\n");

@@ -79,14 +79,17 @@ endif
 ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
   DIRS += routing/rpl/p2p
 endif
+ifneq (,$(filter gnrc_lowpan,$(USEMODULE)))
+  DIRS += network_layer/lowpan
+endif
+ifneq (,$(filter gnrc_lowpan_frag,$(USEMODULE)))
+  DIRS += network_layer/lowpan/frag
+endif
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
   DIRS += network_layer/sixlowpan
 endif
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/ctx
-endif
-ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
-  DIRS += network_layer/sixlowpan/frag
 endif
 ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/iphc

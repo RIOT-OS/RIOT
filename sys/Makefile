@@ -64,8 +64,8 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
   DIRS += net/network_layer/fib
 endif
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
-  DIRS += net/network_layer/sixlowpan
+ifneq (,$(filter lowpan,$(USEMODULE)))
+  DIRS += net/network_layer/lowpan
 endif
 ifneq (,$(filter log_%,$(USEMODULE)))
   DIRS += log

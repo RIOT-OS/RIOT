@@ -203,14 +203,14 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             break;
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 #endif  /* MODULE_GNRC_IPV6 */
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-        case NETOPT_6LO_IPHC:
+#ifdef MODULE_GNRC_LOWPAN_IPHC
+        case NETOPT_LOWPAN_IPHC:
             assert(opt->data_len == sizeof(netopt_enable_t));
-            *((netopt_enable_t *)opt->data) = (netif->flags & GNRC_NETIF_FLAGS_6LO_HC) ?
+            *((netopt_enable_t *)opt->data) = (netif->flags & GNRC_NETIF_FLAGS_LOWPAN_IPHC) ?
                                               NETOPT_ENABLE : NETOPT_DISABLE;
             res = sizeof(netopt_enable_t);
             break;
-#endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#endif  /* MODULE_GNRC_LOWPAN_IPHC */
         default:
             break;
     }
@@ -298,18 +298,18 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             break;
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 #endif  /* MODULE_GNRC_IPV6 */
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-        case NETOPT_6LO_IPHC:
+#ifdef MODULE_GNRC_LOWPAN_IPHC
+        case NETOPT_LOWPAN_IPHC:
             assert(opt->data_len == sizeof(netopt_enable_t));
             if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
-                netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
+                netif->flags |= GNRC_NETIF_FLAGS_LOWPAN_IPHC;
             }
             else {
-                netif->flags &= ~GNRC_NETIF_FLAGS_6LO_HC;
+                netif->flags &= ~GNRC_NETIF_FLAGS_LOWPAN_IPHC;
             }
             res = sizeof(netopt_enable_t);
             break;
-#endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#endif  /* MODULE_GNRC_LOWPAN_IPHC */
         default:
             break;
     }
@@ -1158,15 +1158,15 @@ static void _init_from_device(gnrc_netif_t *netif)
     switch (netif->device_type) {
 #ifdef MODULE_NETDEV_IEEE802154
         case NETDEV_TYPE_IEEE802154:
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
+#ifdef MODULE_GNRC_LOWPAN_IPHC
+            netif->flags |= GNRC_NETIF_FLAGS_LOWPAN_IPHC;
 #endif
 #ifdef MODULE_GNRC_IPV6
             res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
             assert(res == sizeof(tmp));
-#ifdef MODULE_GNRC_SIXLOWPAN
+#ifdef MODULE_GNRC_LOWPAN
             netif->ipv6.mtu = IPV6_MIN_MTU;
-            netif->sixlo.max_frag_size = tmp;
+            netif->lowpan.max_frag_size = tmp;
 #else
             netif->ipv6.mtu = tmp;
 #endif

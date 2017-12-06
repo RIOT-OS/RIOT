@@ -19,8 +19,9 @@
 #include "net/ipv6.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
-#include "net/gnrc/sixlowpan.h"
-#include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/lowpan/frag.h"
+#include "net/gnrc/sixlowpan/iphc.h"
+#include "net/lowpan.h"
 #include "net/sixlowpan.h"
 #include "thread.h"
 #include "xtimer.h"
@@ -31,15 +32,15 @@
 
 /* estimated fragment payload size to determinate RBUF_INT_SIZE, default to
  * MAC payload size - fragment header. */
-#ifndef GNRC_SIXLOWPAN_FRAG_SIZE
+#ifndef GNRC_LOWPAN_FRAG_SIZE
 /* assuming 64-bit source/destination address, source PAN ID omitted */
-#define GNRC_SIXLOWPAN_FRAG_SIZE (104 - 5)
+#define GNRC_LOWPAN_FRAG_SIZE (104 - 5)
 #endif
 
 #ifndef RBUF_INT_SIZE
 /* same as ((int) ceil((double) N / D)) */
 #define DIV_CEIL(N, D) (((N) + (D) - 1) / (D))
-#define RBUF_INT_SIZE (DIV_CEIL(IPV6_MIN_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * RBUF_SIZE)
+#define RBUF_INT_SIZE (DIV_CEIL(IPV6_MIN_MTU, GNRC_LOWPAN_FRAG_SIZE) * RBUF_SIZE)
 #endif
 
 static rbuf_int_t rbuf_int[RBUF_INT_SIZE];
@@ -76,18 +77,18 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
      * (reason: cppcheck is clearly wrong here) */
     unsigned int data_offset = 0;
     size_t original_size = frag_size;
-    sixlowpan_frag_t *frag = pkt->data;
+    lowpan_frag_t *frag = pkt->data;
     rbuf_int_t *ptr;
-    uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
+    uint8_t *data = ((uint8_t *)pkt->data) + sizeof(lowpan_frag_t);
 
     _rbuf_gc();
     entry = _rbuf_get(gnrc_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
                       gnrc_netif_hdr_get_dst_addr(netif_hdr), netif_hdr->dst_l2addr_len,
-                      byteorder_ntohs(frag->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK,
+                      byteorder_ntohs(frag->disp_size) & LOWPAN_FRAG_SIZE_MASK,
                       byteorder_ntohs(frag->tag));
 
     if (entry == NULL) {
-        DEBUG("6lo rbuf: reassembly buffer full.\n");
+        DEBUG("lowpan rbuf: reassembly buffer full.\n");
         return;
     }
 
@@ -95,17 +96,17 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 
     /* dispatches in the first fragment are ignored */
     if (offset == 0) {
-        if (data[0] == SIXLOWPAN_UNCOMP) {
-            data++;             /* skip 6LoWPAN dispatch */
+        if (data[0] == LOWPAN_UNCOMP_IPV6) {
+            data++;             /* skip lowpan dispatch */
             frag_size--;
         }
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-        else if (sixlowpan_iphc_is(data)) {
+        else if (lowpan_iphc_is(data)) {
             size_t iphc_len, nh_len = 0;
             iphc_len = gnrc_sixlowpan_iphc_decode(&entry->pkt, pkt, entry->pkt->size,
-                                                  sizeof(sixlowpan_frag_t), &nh_len);
+                                                  sizeof(lowpan_frag_t), &nh_len);
             if (iphc_len == 0) {
-                DEBUG("6lo rfrag: could not decode IPHC dispatch\n");
+                DEBUG("lowpan rfrag: could not decode IPHC dispatch\n");
                 gnrc_pktbuf_release(entry->pkt);
                 _rbuf_rem(entry);
                 return;
@@ -124,7 +125,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
 
     if ((offset + frag_size) > entry->pkt->size) {
-        DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
+        DEBUG("lowpan rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry->pkt);
         _rbuf_rem(entry);
         return;
@@ -135,7 +136,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
      * https://tools.ietf.org/html/rfc4944#section-5.3 */
     while (ptr != NULL) {
         if (_rbuf_int_overlap_partially(ptr, offset, offset + frag_size - 1)) {
-            DEBUG("6lo rfrag: overlapping intervals, discarding datagram\n");
+            DEBUG("lowpan rfrag: overlapping intervals, discarding datagram\n");
             gnrc_pktbuf_release(entry->pkt);
             _rbuf_rem(entry);
 
@@ -151,7 +152,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     }
 
     if (_rbuf_update_ints(entry, offset, frag_size)) {
-        DEBUG("6lo rbuf: add fragment data\n");
+        DEBUG("lowpan rbuf: add fragment data\n");
         entry->cur_size += (uint16_t)frag_size;
         memcpy(((uint8_t *)entry->pkt->data) + offset + data_offset, data,
                frag_size - data_offset);
@@ -162,7 +163,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                                                      entry->dst, entry->dst_len);
 
         if (netif == NULL) {
-            DEBUG("6lo rbuf: error allocating netif header\n");
+            DEBUG("lowpan rbuf: error allocating netif header\n");
             gnrc_pktbuf_release(entry->pkt);
             _rbuf_rem(entry);
             return;
@@ -181,7 +182,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 
         if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
                                           entry->pkt)) {
-            DEBUG("6lo rbuf: No receivers for this packet found\n");
+            DEBUG("lowpan rbuf: No receivers for this packet found\n");
             gnrc_pktbuf_release(entry->pkt);
         }
 
@@ -229,14 +230,14 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
     new = _rbuf_int_get_free();
 
     if (new == NULL) {
-        DEBUG("6lo rfrag: no space left in rbuf interval buffer.\n");
+        DEBUG("lowpan rfrag: no space left in rbuf interval buffer.\n");
         return false;
     }
 
     new->start = offset;
     new->end = end;
 
-    DEBUG("6lo rfrag: add interval (%" PRIu16 ", %" PRIu16 ") to entry (%s, ",
+    DEBUG("lowpan rfrag: add interval (%" PRIu16 ", %" PRIu16 ") to entry (%s, ",
           new->start, new->end, gnrc_netif_addr_to_str(entry->src,
                                                        entry->src_len,
                                                        l2addr_str));
@@ -258,7 +259,7 @@ static void _rbuf_gc(void)
         /* since pkt occupies pktbuf, aggressivly collect garbage */
         if ((rbuf[i].pkt != NULL) &&
               ((now_usec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
-            DEBUG("6lo rfrag: entry (%s, ",
+            DEBUG("lowpan rfrag: entry (%s, ",
                   gnrc_netif_addr_to_str(rbuf[i].src, rbuf[i].src_len,
                                          l2addr_str));
             DEBUG("%s, %u, %u) timed out\n",
@@ -286,7 +287,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
             (rbuf[i].dst_len == dst_len) &&
             (memcmp(rbuf[i].src, src, src_len) == 0) &&
             (memcmp(rbuf[i].dst, dst, dst_len) == 0)) {
-            DEBUG("6lo rfrag: entry %p (%s, ", (void *)(&rbuf[i]),
+            DEBUG("lowpan rfrag: entry %p (%s, ", (void *)(&rbuf[i]),
                   gnrc_netif_addr_to_str(rbuf[i].src, rbuf[i].src_len,
                                          l2addr_str));
             DEBUG("%s, %u, %u) found\n",
@@ -313,7 +314,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     if (res == NULL) {
         assert(oldest != NULL);
         assert(oldest->pkt != NULL); /* if oldest->pkt == NULL, res must not be NULL */
-        DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
+        DEBUG("lowpan rfrag: reassembly buffer full, remove oldest entry\n");
         gnrc_pktbuf_release(oldest->pkt);
         _rbuf_rem(oldest);
         res = oldest;
@@ -323,7 +324,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
 
     res->pkt = gnrc_pktbuf_add(NULL, NULL, size, GNRC_NETTYPE_IPV6);
     if (res->pkt == NULL) {
-        DEBUG("6lo rfrag: can not allocate reassembly buffer space.\n");
+        DEBUG("lowpan rfrag: can not allocate reassembly buffer space.\n");
         return NULL;
     }
 
@@ -337,7 +338,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     res->tag = tag;
     res->cur_size = 0;
 
-    DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
+    DEBUG("lowpan rfrag: entry %p (%s, ", (void *)res,
           gnrc_netif_addr_to_str(res->src, res->src_len, l2addr_str));
     DEBUG("%s, %u, %u) created\n",
           gnrc_netif_addr_to_str(res->dst, res->dst_len, l2addr_str), (unsigned)res->pkt->size,

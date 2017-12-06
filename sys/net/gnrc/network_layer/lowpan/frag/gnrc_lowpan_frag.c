@@ -20,9 +20,8 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/hdr.h"
-#include "net/gnrc/sixlowpan/frag.h"
 #include "net/gnrc/netif.h"
-#include "net/sixlowpan.h"
+#include "net/lowpan.h"
 #include "utlist.h"
 
 #include "rbuf.h"
@@ -57,7 +56,7 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt, size_t payload_len,
                                  gnrc_netif_hdr_get_dst_addr(hdr), hdr->dst_l2addr_len);
 
     if (netif == NULL) {
-        DEBUG("6lo frag: error allocating new link-layer header\n");
+        DEBUG("lowpan frag: error allocating new link-layer header\n");
         return NULL;
     }
 
@@ -68,10 +67,10 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt, size_t payload_len,
     new_hdr->lqi = hdr->lqi;
 
     frag = gnrc_pktbuf_add(NULL, NULL, _min(size, payload_len),
-                           GNRC_NETTYPE_SIXLOWPAN);
+                           GNRC_NETTYPE_LOWPAN);
 
     if (frag == NULL) {
-        DEBUG("6lo frag: error allocating first fragment\n");
+        DEBUG("lowpan frag: error allocating first fragment\n");
         gnrc_pktbuf_release(netif);
         return NULL;
     }
@@ -91,15 +90,15 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
     int payload_diff = (datagram_size - payload_len);
     /* virtually add payload_diff to flooring to account for offset (must be divisable by 8)
      * in uncompressed datagram */
-    uint16_t max_frag_size = _floor8(iface->sixlo.max_frag_size + payload_diff -
-                                     sizeof(sixlowpan_frag_t)) - payload_diff;
-    sixlowpan_frag_t *hdr;
+    uint16_t max_frag_size = _floor8(iface->lowpan.max_frag_size + payload_diff -
+                                     sizeof(lowpan_frag_t)) - payload_diff;
+    lowpan_frag_t *hdr;
     uint8_t *data;
 
-    DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
+    DEBUG("lowpan frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
 
     frag = _build_frag_pkt(pkt, payload_len,
-                           max_frag_size + sizeof(sixlowpan_frag_t));
+                           max_frag_size + sizeof(lowpan_frag_t));
 
     if (frag == NULL) {
         return 0;
@@ -109,7 +108,7 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
     data = (uint8_t *)(hdr + 1);
 
     hdr->disp_size = byteorder_htons((uint16_t)datagram_size);
-    hdr->disp_size.u8[0] |= SIXLOWPAN_FRAG_1_DISP;
+    hdr->disp_size.u8[0] |= LOWPAN_FRAG_1_DISP;
     hdr->tag = byteorder_htons(_tag);
 
     pkt = pkt->next;    /* don't copy netif header */
@@ -127,11 +126,11 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
         pkt = pkt->next;
     }
 
-    DEBUG("6lo frag: send first fragment (datagram size: %u, "
+    DEBUG("lowpan frag: send first fragment (datagram size: %u, "
           "datagram tag: %" PRIu16 ", fragment size: %" PRIu16 ")\n",
           (unsigned int)datagram_size, _tag, local_offset);
     if (gnrc_netapi_send(iface->pid, frag) < 1) {
-        DEBUG("6lo frag: unable to send first fragment\n");
+        DEBUG("lowpan frag: unable to send first fragment\n");
         gnrc_pktbuf_release(frag);
     }
 
@@ -145,16 +144,16 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
     gnrc_pktsnip_t *frag;
     /* since dispatches aren't supposed to go into subsequent fragments, we need not account
      * for payload difference as for the first fragment */
-    uint16_t max_frag_size = _floor8(iface->sixlo.max_frag_size - sizeof(sixlowpan_frag_n_t));
+    uint16_t max_frag_size = _floor8(iface->lowpan.max_frag_size - sizeof(lowpan_frag_n_t));
     uint16_t local_offset = 0, offset_count = 0;
-    sixlowpan_frag_n_t *hdr;
+    lowpan_frag_n_t *hdr;
     uint8_t *data;
 
-    DEBUG("6lo frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
+    DEBUG("lowpan frag: determined max_frag_size = %" PRIu16 "\n", max_frag_size);
 
     frag = _build_frag_pkt(pkt,
-                           payload_len - offset + sizeof(sixlowpan_frag_n_t),
-                           max_frag_size + sizeof(sixlowpan_frag_n_t));
+                           payload_len - offset + sizeof(lowpan_frag_n_t),
+                           max_frag_size + sizeof(lowpan_frag_n_t));
 
     if (frag == NULL) {
         return 0;
@@ -165,7 +164,7 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
 
     /* XXX: truncation of datagram_size > 4095 may happen here */
     hdr->disp_size = byteorder_htons((uint16_t)datagram_size);
-    hdr->disp_size.u8[0] |= SIXLOWPAN_FRAG_N_DISP;
+    hdr->disp_size.u8[0] |= LOWPAN_FRAG_N_DISP;
     hdr->tag = byteorder_htons(_tag);
     /* don't mention payload diff in offset */
     hdr->offset = (uint8_t)((offset + (datagram_size - payload_len)) >> 3);
@@ -203,20 +202,20 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
         }
     }
 
-    DEBUG("6lo frag: send subsequent fragment (datagram size: %u, "
+    DEBUG("lowpan frag: send subsequent fragment (datagram size: %u, "
           "datagram tag: %" PRIu16 ", offset: %" PRIu8 " (%u bytes), "
           "fragment size: %" PRIu16 ")\n",
           (unsigned int)datagram_size, _tag, hdr->offset, hdr->offset << 3,
           local_offset);
     if (gnrc_netapi_send(iface->pid, frag) < 1) {
-        DEBUG("6lo frag: unable to send subsequent fragment\n");
+        DEBUG("lowpan frag: unable to send subsequent fragment\n");
         gnrc_pktbuf_release(frag);
     }
 
     return local_offset;
 }
 
-void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
+void gnrc_lowpan_frag_send(gnrc_lowpan_msg_frag_t *fragment_msg)
 {
     gnrc_netif_t *iface = gnrc_netif_get_by_pid(fragment_msg->pid);
     uint16_t res;
@@ -227,10 +226,10 @@ void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
 
 #if defined(DEVELHELP) && defined(ENABLE_DEBUG)
     if (iface == NULL) {
-        DEBUG("6lo frag: iface == NULL, expect segmentation fault.\n");
+        DEBUG("lowpan frag: iface == NULL, expect segmentation fault.\n");
         /* remove original packet from packet buffer */
         gnrc_pktbuf_release(fragment_msg->pkt);
-        /* 6LoWPAN free for next fragmentation */
+        /* LoWPAN free for next fragmentation */
         fragment_msg->pkt = NULL;
         return;
     }
@@ -242,7 +241,7 @@ void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
         _tag++;
         if ((res = _send_1st_fragment(iface, fragment_msg->pkt, payload_len, fragment_msg->datagram_size)) == 0) {
             /* error sending first fragment */
-            DEBUG("6lo frag: error sending 1st fragment\n");
+            DEBUG("lowpan frag: error sending 1st fragment\n");
             gnrc_pktbuf_release(fragment_msg->pkt);
             fragment_msg->pkt = NULL;
             return;
@@ -250,7 +249,7 @@ void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
         fragment_msg->offset += res;
 
         /* send message to self*/
-        msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
+        msg.type = GNRC_LOWPAN_MSG_FRAG_SND;
         msg.content.ptr = (void *)fragment_msg;
         msg_send_to_self(&msg);
         thread_yield();
@@ -261,7 +260,7 @@ void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
             if ((res = _send_nth_fragment(iface, fragment_msg->pkt, payload_len, fragment_msg->datagram_size,
                                           fragment_msg->offset)) == 0) {
                 /* error sending subsequent fragment */
-                DEBUG("6lo frag: error sending subsequent fragment (offset = %" PRIu16
+                DEBUG("lowpan frag: error sending subsequent fragment (offset = %" PRIu16
                       ")\n", fragment_msg->offset);
                 gnrc_pktbuf_release(fragment_msg->pkt);
                 fragment_msg->pkt = NULL;
@@ -270,7 +269,7 @@ void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
             fragment_msg->offset += res;
 
             /* send message to self*/
-            msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
+            msg.type = GNRC_LOWPAN_MSG_FRAG_SND;
             msg.content.ptr = (void *)fragment_msg;
             msg_send_to_self(&msg);
             thread_yield();
@@ -282,25 +281,25 @@ void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
     }
 }
 
-void gnrc_sixlowpan_frag_handle_pkt(gnrc_pktsnip_t *pkt)
+void gnrc_lowpan_frag_handle_pkt(gnrc_pktsnip_t *pkt)
 {
     gnrc_netif_hdr_t *hdr = pkt->next->data;
-    sixlowpan_frag_t *frag = pkt->data;
+    lowpan_frag_t *frag = pkt->data;
     uint16_t offset = 0;
     size_t frag_size;
 
-    switch (frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) {
-        case SIXLOWPAN_FRAG_1_DISP:
-            frag_size = (pkt->size - sizeof(sixlowpan_frag_t));
+    switch (frag->disp_size.u8[0] & LOWPAN_FRAG_DISP_MASK) {
+        case LOWPAN_FRAG_1_DISP:
+            frag_size = (pkt->size - sizeof(lowpan_frag_t));
             break;
 
-        case SIXLOWPAN_FRAG_N_DISP:
-            offset = (((sixlowpan_frag_n_t *)frag)->offset * 8);
-            frag_size = (pkt->size - sizeof(sixlowpan_frag_n_t));
+        case LOWPAN_FRAG_N_DISP:
+            offset = (((lowpan_frag_n_t *)frag)->offset * 8);
+            frag_size = (pkt->size - sizeof(lowpan_frag_n_t));
             break;
 
         default:
-            DEBUG("6lo rbuf: Not a fragment header.\n");
+            DEBUG("lowpan rbuf: Not a fragment header.\n");
             gnrc_pktbuf_release(pkt);
 
             return;

@@ -327,7 +327,7 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #ifdef MODULE_GNRC_SIXLOWPAN
     if (gnrc_netif_is_6ln(netif)) {
         DEBUG("ipv6: send to 6LoWPAN instead\n");
-        if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_SIXLOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+        if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_LOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
             DEBUG("ipv6: no 6LoWPAN thread found\n");
             gnrc_pktbuf_release(pkt);
         }
