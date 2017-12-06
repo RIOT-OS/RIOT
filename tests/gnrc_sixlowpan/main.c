@@ -128,7 +128,7 @@ static void _send_packet(void)
     gnrc_netreg_entry_t dump_udp = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL, gnrc_pktdump_pid);
     gnrc_netreg_entry_t dump_udp_61616 = GNRC_NETREG_ENTRY_INIT_PID(61616, gnrc_pktdump_pid);
 
-    gnrc_netreg_register(GNRC_NETTYPE_SIXLOWPAN, &dump_6lowpan);
+    gnrc_netreg_register(GNRC_NETTYPE_LOWPAN, &dump_6lowpan);
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &dump_ipv6);
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &dump_udp);
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &dump_udp_61616);
@@ -140,9 +140,9 @@ static void _send_packet(void)
     gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(netif1,
                                            data1,
                                            sizeof(data1),
-                                           GNRC_NETTYPE_SIXLOWPAN);
+                                           GNRC_NETTYPE_LOWPAN);
 
-    gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt1);
+    gnrc_netapi_dispatch_receive(GNRC_NETTYPE_LOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt1);
 
     gnrc_pktsnip_t *netif2 = gnrc_pktbuf_add(NULL,
                                              &netif_hdr,
@@ -151,9 +151,9 @@ static void _send_packet(void)
     gnrc_pktsnip_t *pkt2 = gnrc_pktbuf_add(netif2,
                                            data2,
                                            sizeof(data2),
-                                           GNRC_NETTYPE_SIXLOWPAN);
+                                           GNRC_NETTYPE_LOWPAN);
 
-    gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt2);
+    gnrc_netapi_dispatch_receive(GNRC_NETTYPE_LOWPAN, GNRC_NETREG_DEMUX_CTX_ALL, pkt2);
 }
 
 int main(void)

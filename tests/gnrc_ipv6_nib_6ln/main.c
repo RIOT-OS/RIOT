@@ -1345,7 +1345,7 @@ int _mock_netif_get(gnrc_netapi_opt_t *opt)
                 if (opt->data_len != sizeof(gnrc_nettype_t)) {
                     return -EOVERFLOW;
                 }
-                *val = GNRC_NETTYPE_SIXLOWPAN;
+                *val = GNRC_NETTYPE_LOWPAN;
                 return sizeof(gnrc_nettype_t);
             }
         default:
