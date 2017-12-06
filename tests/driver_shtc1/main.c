@@ -13,12 +13,11 @@
  * @brief       Test application for the SHTC1 temperature and humidity sensor
  *
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
- * @author	Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
  * @}
  */
 #include <stdio.h>
-#include "shtc1.h"
 #include "shell.h"
 
 extern int shtc1_cmd(int argc, char **argv);

@@ -37,6 +37,7 @@ typedef enum {
 typedef struct {
     float temp;
     float rel_humidity;
+    unsigned int id;
 } shtc1_values_t;
 
 typedef struct {
@@ -48,15 +49,14 @@ typedef struct {
 typedef struct {
     i2c_t bus;
     uint8_t addr;
-    shtc1_params_t params;
-    unsigned int id;
     shtc1_values_t values;
+    shtc1_crc_type_t crc;
 } shtc1_t;
 
 enum {
     SHTC1_OK = 0,
     SHTC1_ERROR = -1
-}
+};
 
 /*define section*/
 #define SHTC1_CRC                                   0x31
@@ -66,6 +66,7 @@ enum {
 #define SHTC1_COMMAND_RESET_LOW                     0x5D
 #define SHTC1_COMMAND_ID_HIGH                       0xEF
 #define SHTC1_COMMAND_ID_LOW                        0xC8
+#define SHTC1_ID                                    0x0007
 
 /**
  * @brief initializes the sensor and I2C
@@ -76,7 +77,7 @@ enum {
  * @return              SHTC1_OK on a working initialization
  * @return              SHTC1_ERROR on undefined I2C device given
  */
-int8_t shtc1_init(const shtc1_t* dev, const shtc1_params_t params);
+int8_t shtc1_init(shtc1_t* const dev, const shtc1_params_t* params);
 
 /**
  * @brief reads temperature and humidity values and saves them in the device descriptor. The temperature is in °C and the humidity in %
@@ -86,7 +87,7 @@ int8_t shtc1_init(const shtc1_t* dev, const shtc1_params_t params);
  * @return                      SHTC1_OK on a verified and working measurement
  * @return                      SHTC1_ERROR on a checksum error
  */
-int8_t shtc1_measure(const shtc1_t* dev);
+int8_t shtc1_measure(shtc1_t* const dev);
 
 /**
  * @brief reads out id and saves it in the device descriptor
@@ -99,7 +100,7 @@ int8_t shtc1_measure(const shtc1_t* dev);
  * @return              SHTC1_OK on everything done
  * @return              SHTC1_ERROR on error occured
  */
-int8_t shtc1_id(const shtc1_t* dev);
+int8_t shtc1_id(shtc1_t* const dev);
 
 /**
  * @brief resets sensor
