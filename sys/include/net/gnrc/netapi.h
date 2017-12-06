@@ -117,7 +117,7 @@ int gnrc_netapi_send(kernel_pid_t pid, gnrc_pktsnip_t *pkt);
 /**
  * @brief   Sends @p cmd to all subscribers to (@p type, @p demux_ctx).
  *
- * @param[in] type      type of the targeted network module.
+ * @param[in] type      protocol type of the targeted network module.
  * @param[in] demux_ctx demultiplexing context for @p type.
  * @param[in] cmd       command for all subscribers
  * @param[in] pkt       pointer into the packet buffer holding the data to send
@@ -131,7 +131,7 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx, uint16_t cmd,
  * @brief   Sends a @ref GNRC_NETAPI_MSG_TYPE_SND command to all subscribers to
  *          (@p type, @p demux_ctx).
  *
- * @param[in] type      type of the targeted network module.
+ * @param[in] type      protocol type of the targeted network module.
  * @param[in] demux_ctx demultiplexing context for @p type.
  * @param[in] pkt       pointer into the packet buffer holding the data to send
  *
@@ -158,7 +158,7 @@ int gnrc_netapi_receive(kernel_pid_t pid, gnrc_pktsnip_t *pkt);
  * @brief   Sends a @ref GNRC_NETAPI_MSG_TYPE_RCV command to all subscribers to
  *          (@p type, @p demux_ctx).
  *
- * @param[in] type      type of the targeted network module.
+ * @param[in] type      protocol type of the targeted network module.
  * @param[in] demux_ctx demultiplexing context for @p type.
  * @param[in] pkt       pointer into the packet buffer holding the data to send
  *
