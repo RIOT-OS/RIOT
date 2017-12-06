@@ -33,8 +33,8 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/conf.h"
-#ifdef MODULE_GNRC_SIXLOWPAN
-#include "net/gnrc/netif/6lo.h"
+#ifdef MODULE_GNRC_LOWPAN
+#include "net/gnrc/netif/lowpan.h"
 #endif
 #include "net/gnrc/netif/flags.h"
 #ifdef MODULE_GNRC_IPV6
@@ -90,8 +90,8 @@ typedef struct {
      */
     uint8_t l2addr_len;
 #endif
-#if defined(MODULE_GNRC_SIXLOWPAN) || DOXYGEN
-    gnrc_netif_6lo_t sixlo;                 /**< 6Lo component */
+#if defined(MODULE_GNRC_LOWPAN) || DOXYGEN
+    gnrc_netif_lowpan_t lowpan;             /**< lowpan component */
 #endif
     uint8_t cur_hl;                         /**< Current hop-limit for out-going packets */
     uint8_t device_type;                    /**< Device type */
