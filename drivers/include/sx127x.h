@@ -176,7 +176,6 @@ typedef struct {
  */
 typedef struct {
     uint32_t channel;                  /**< Radio channel */
-    uint32_t window_timeout;           /**< Timeout window */
     uint8_t state;                     /**< Radio state */
     uint8_t modem;                     /**< Driver model (FSK or LoRa) */
     sx127x_lora_settings_t lora;       /**< LoRa settings */

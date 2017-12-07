@@ -309,9 +309,8 @@ void sx127x_set_rx(sx127x_t *dev)
     }
 
     sx127x_set_state(dev, SX127X_RF_RX_RUNNING);
-    if (dev->settings.window_timeout != 0) {
-        xtimer_set(&(dev->_internal.rx_timeout_timer),
-                   dev->settings.window_timeout);
+    if (dev->settings.lora.rx_timeout != 0) {
+        xtimer_set(&(dev->_internal.rx_timeout_timer), dev->settings.lora.rx_timeout);
     }
 
     if (dev->settings.lora.flags & SX127X_RX_CONTINUOUS_FLAG) {
@@ -372,9 +371,8 @@ void sx127x_set_tx(sx127x_t *dev)
     }
 
     sx127x_set_state(dev, SX127X_RF_RX_RUNNING);
-    if (dev->settings.window_timeout != 0) {
-        xtimer_set(&(dev->_internal.tx_timeout_timer),
-                   dev->settings.window_timeout);
+    if (dev->settings.lora.tx_timeout != 0) {
+        xtimer_set(&(dev->_internal.tx_timeout_timer), dev->settings.lora.tx_timeout);
     }
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_TRANSMITTER );
 }

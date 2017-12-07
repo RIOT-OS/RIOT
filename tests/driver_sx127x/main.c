@@ -241,6 +241,7 @@ int listen_cmd(int argc, char **argv)
 
     /* Switch to continuous listen mode */
     netdev->driver->set(netdev, NETOPT_SINGLE_RECEIVE, false, sizeof(uint8_t));
+    netdev->driver->set(netdev, NETOPT_RX_TIMEOUT, 0, sizeof(uint8_t));
 
     /* Switch to RX state */
     uint8_t state = NETOPT_STATE_RX;

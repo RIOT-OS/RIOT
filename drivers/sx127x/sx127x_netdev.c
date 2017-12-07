@@ -500,8 +500,8 @@ static int _set_state(sx127x_t *dev, netopt_state_t state)
             break;
 
         case NETOPT_STATE_IDLE:
-            dev->settings.window_timeout = 0;
             /* set permanent listening */
+            sx127x_set_rx_timeout(dev, 0);
             sx127x_set_rx(dev);
             break;
 
