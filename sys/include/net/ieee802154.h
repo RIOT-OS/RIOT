@@ -124,6 +124,10 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 #define IEEE802154_DEFAULT_CHANNEL          (26U)
 #endif
 
+#ifndef IEEE802154_DEFAULT_SUBGHZ_PAGE
+#define IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
+#endif
+
 #ifndef IEEE802154_DEFAULT_PANID
 #define IEEE802154_DEFAULT_PANID            (0x0023U)
 #endif
