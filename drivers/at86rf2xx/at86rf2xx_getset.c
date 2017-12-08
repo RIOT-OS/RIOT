@@ -441,13 +441,18 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
              state == AT86RF2XX_STATE_RX_AACK_ON)) {
             _set_state(dev, AT86RF2XX_STATE_PLL_ON, AT86RF2XX_STATE_PLL_ON);
         }
-        /* check if we need to wake up from sleep mode */
         if (state == AT86RF2XX_STATE_SLEEP) {
+            /* Putting the transceiver to sleep requires first going to TRX_OFF,
+             * then driving the SLP_TR pin high */
             /* First go to TRX_OFF */
             _set_state(dev, AT86RF2XX_STATE_TRX_OFF,
                             AT86RF2XX_STATE_FORCE_TRX_OFF);
+            /* Save a copy of the IRQ mask, then disable all IRQs except AWAKE_END */
+            dev->irq_mask = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE);
             /* Discard all IRQ flags, framebuffer is lost anyway */
             at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+
             /* Go to SLEEP mode from TRX_OFF */
             gpio_set(dev->params.sleep_pin);
             dev->state = state;

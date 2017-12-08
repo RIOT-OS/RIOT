@@ -27,6 +27,7 @@
 
 #include "luid.h"
 #include "byteorder.h"
+#include "mutex.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
 #include "at86rf2xx_registers.h"
@@ -48,6 +49,8 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     /* radio state is P_ON when first powered-on */
     dev->state = AT86RF2XX_STATE_P_ON;
     dev->pending_tx = 0;
+    mutex_init(&dev->mutex_sleep);
+    mutex_lock(&dev->mutex_sleep);
 }
 
 void at86rf2xx_reset(at86rf2xx_t *dev)

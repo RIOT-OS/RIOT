@@ -58,10 +58,18 @@ const netdev_driver_t at86rf2xx_driver = {
 
 static void _irq_handler(void *arg)
 {
-    netdev_t *dev = (netdev_t *) arg;
+    at86rf2xx_t *dev = arg;
+    if (dev->state == AT86RF2XX_STATE_SLEEP) {
+        /* The only IRQ possible during sleep is AWAKE_END, unlock the sleep mutex */
+        mutex_unlock(&dev->mutex_sleep);
+        /* no need to signal the ISR event here, nothing to do until
+         * at86rf2xx_assert_awake has unmasked some IRQs after sleeping */
+        return;
+    }
 
-    if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV_EVENT_ISR);
+    netdev_t *netdev = arg;
+    if (netdev->event_callback) {
+        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
     }
 }
 

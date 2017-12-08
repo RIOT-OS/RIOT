@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "mutex.h"
 #include "board.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
@@ -168,22 +169,24 @@ typedef struct at86rf2xx_params {
  * @extends netdev_ieee802154_t
  */
 typedef struct {
-    netdev_ieee802154_t netdev;             /**< netdev parent struct */
+    netdev_ieee802154_t netdev;  /**< netdev parent struct */
     /* device specific fields */
-    at86rf2xx_params_t params;              /**< parameters for initialization */
-    uint8_t state;                          /**< current state of the radio */
-    uint8_t tx_frame_len;                   /**< length of the current TX frame */
+    at86rf2xx_params_t params;   /**< parameters for initialization */
+    mutex_t mutex_sleep;         /**< used when waiting for the AWAKE_END IRQ */
+    uint8_t irq_mask;            /**< IRQ_MASK register backup during sleep */
+    uint8_t state;               /**< current state of the radio */
+    uint8_t tx_frame_len;        /**< length of the current TX frame */
 #ifdef MODULE_AT86RF212B
     /* Only AT86RF212B supports multiple pages (PHY modes) */
-    uint8_t page;                       /**< currently used channel page */
+    uint8_t page;                /**< currently used channel page */
 #endif
-    uint8_t idle_state;                 /**< state to return to after sending */
-    uint8_t pending_tx;                 /**< keep track of pending TX calls
-                                             this is required to know when to
-                                             return to @ref at86rf2xx_t::idle_state */
+    uint8_t idle_state;          /**< state to return to after sending */
+    uint8_t pending_tx;          /**< keep track of pending TX calls
+                                      this is required to know when to
+                                      return to @ref at86rf2xx_t::idle_state */
 #if AT86RF2XX_HAVE_RETRIES
     /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
-    uint8_t tx_retries;                 /**< Number of NOACK retransmissions */
+    uint8_t tx_retries;          /**< Number of NOACK retransmissions */
 #endif
     /** @} */
 } at86rf2xx_t;

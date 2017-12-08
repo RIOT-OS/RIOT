@@ -117,8 +117,21 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
     if (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
         /* wake up and wait for transition to TRX_OFF */
         gpio_clear(dev->params.sleep_pin);
-        xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
-
+        if (irq_is_in()) {
+            /* We can't wait for an IRQ if interrupts are disabled, fall back to
+             * timed wait */
+            xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
+        }
+        else {
+            /* This will block until we receive the AWAKE_END interrupt.
+             * _irq_handler (at86rf2xx_netdev.c) will call mutex_unlock from ISR
+             * context */
+            mutex_lock(&dev->mutex_sleep);
+            /* Discard the IRQ flag from the AWAKE_END interrupt */
+            at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+            /* Restore the IRQ mask from before the sleep */
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, dev->irq_mask);
+        }
         /* update state: on some platforms, the timer behind xtimer
          * may be inaccurate or the radio itself may take longer
          * to wake up due to extra capacitance on the oscillator.
