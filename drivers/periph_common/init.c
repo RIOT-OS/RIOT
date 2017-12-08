@@ -26,6 +26,9 @@
 #ifdef MODULE_PERIPH_RTC
 #include "periph/rtc.h"
 #endif
+#ifdef MODULE_PERIPH_HWRNG
+#include "periph/hwrng.h"
+#endif
 
 void periph_init(void)
 {
@@ -39,5 +42,9 @@ void periph_init(void)
     /* Initialize RTC */
 #ifdef MODULE_PERIPH_RTC
     rtc_init();
+#endif
+
+#ifdef MODULE_PERIPH_HWRNG
+    hwrng_init();
 #endif
 }
