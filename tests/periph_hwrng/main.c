@@ -34,9 +34,6 @@ int main(void)
     printf("This test will print from 1 to %u random bytes about every "
            "second\n\n", LIMIT);
 
-    puts("Initializing the HWRNG driver.\n");
-    hwrng_init();
-
     while (1) {
         /* zero out buffer */
         memset(buf, 0, sizeof(buf));
