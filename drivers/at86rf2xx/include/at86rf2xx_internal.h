@@ -57,7 +57,7 @@ extern "C" {
  * @brief   Transition time from SLEEP to TRX_OFF in us, refer figure 7-4, p.42.
  *          For different environments refer figure 13-13, p.201
  */
-#define AT86RF2XX_WAKEUP_DELAY          (306U)
+#define AT86RF2XX_WAKEUP_DELAY          (1000U)
 
 /**
  * @brief   Minimum reset pulse width, refer p.190. We use 62us so
