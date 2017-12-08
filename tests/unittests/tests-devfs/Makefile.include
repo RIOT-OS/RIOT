@@ -1,2 +1,4 @@
 USEMODULE += vfs
 USEMODULE += devfs
+USEMODULE += devfs_random
+USEMODULE += devfs_hwrng
