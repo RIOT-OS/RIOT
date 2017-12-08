@@ -81,7 +81,7 @@ static void test_fmt_u64_hex(void)
 
 static void test_fmt_u32_dec(void)
 {
-    char out[9] = "--------";
+    char out[11] = "----------";
     uint32_t val = 12345678;
     uint8_t chars = 0;
 
@@ -89,6 +89,13 @@ static void test_fmt_u32_dec(void)
     TEST_ASSERT_EQUAL_INT(8, chars);
     out[chars] = '\0';
     TEST_ASSERT_EQUAL_STRING("12345678", (char *) out);
+
+    memset(out, '-', sizeof(out));
+    val = 1234567890;
+    chars = fmt_u32_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(10, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("1234567890", (char *) out);
 }
 
 static void test_fmt_u16_dec(void)

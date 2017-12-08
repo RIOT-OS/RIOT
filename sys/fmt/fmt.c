@@ -164,8 +164,14 @@ size_t fmt_u32_dec(char *out, uint32_t val)
     size_t len = 1;
 
     /* count needed characters */
-    for (uint32_t tmp = 10; tmp <= val; len++) {
-        tmp *= 10;
+    /* avoid multiply overflow: uint32_t max len = 10 digits */
+    if (val >= 1000000000ul) {
+        len = 10;
+    }
+    else {
+        for (uint32_t tmp = 10; tmp <= val; len++) {
+            tmp *= 10;
+        }
     }
 
     if (out) {
