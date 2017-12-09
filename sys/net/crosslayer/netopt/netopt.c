@@ -72,7 +72,6 @@ static const char *_netopt_strmap[] = {
     [NETOPT_L2FILTER]              = "NETOPT_L2FILTER",
     [NETOPT_L2FILTER_RM]           = "NETOPT_L2FILTER_RM",
     [NETOPT_LAST_ED_LEVEL]         = "NETOPT_LAST_ED_LEVEL",
-    [NETOPT_DEVICE_MODE]           = "NETOPT_DEVICE_MODE",
     [NETOPT_BANDWIDTH]             = "NETOPT_BANDWIDTH",
     [NETOPT_SPREADING_FACTOR]      = "NETOPT_SPREADING_FACTOR",
     [NETOPT_CODING_RATE]           = "NETOPT_CODING_RATE",

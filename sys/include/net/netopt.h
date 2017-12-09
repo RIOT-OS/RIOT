@@ -407,11 +407,6 @@ typedef enum {
     NETOPT_TX_TIMEOUT,
 
     /**
-     * @brief   Get/Set the radio modem type as uint8_t.
-     */
-    NETOPT_DEVICE_MODE,
-
-    /**
      * @brief   Get/Set the radio modulation bandwidth as uint8_t.
      */
     NETOPT_BANDWIDTH,
