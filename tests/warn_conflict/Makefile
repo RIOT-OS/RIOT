@@ -11,3 +11,6 @@ BOARD_WHITELIST := stm32f4discovery
 FEATURES_REQUIRED = periph_dac periph_spi
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-make.py
