@@ -292,10 +292,10 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             assert(max_len >= sizeof(netopt_state_t));
             return _get_state(dev, val);
 
-        case NETOPT_DEVICE_MODE:
-            assert(max_len >= sizeof(uint8_t));
-            *((uint8_t*) val) = dev->settings.modem;
-            return sizeof(uint8_t);
+        case NETOPT_DEVICE_TYPE:
+            assert(max_len >= sizeof(uint16_t));
+            *((uint16_t*) val) = NETDEV_TYPE_LORA;
+            return sizeof(uint16_t);
 
         case NETOPT_CHANNEL:
             assert(max_len >= sizeof(uint32_t));
@@ -325,12 +325,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         case NETOPT_INTEGRITY_CHECK:
             assert(max_len >= sizeof(netopt_enable_t));
             *((netopt_enable_t*) val) = sx127x_get_crc(dev) ? NETOPT_ENABLE : NETOPT_DISABLE;
-            break;
+            return sizeof(netopt_enable_t);
 
         case NETOPT_CHANNEL_HOP:
             assert(max_len >= sizeof(netopt_enable_t));
             *((netopt_enable_t*) val) = (dev->settings.lora.flags & SX127X_CHANNEL_HOPPING_FLAG) ? NETOPT_ENABLE : NETOPT_DISABLE;
-            break;
+            return sizeof(netopt_enable_t);
 
         case NETOPT_CHANNEL_HOP_PERIOD:
             assert(max_len >= sizeof(uint8_t));
@@ -340,7 +340,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         case NETOPT_SINGLE_RECEIVE:
             assert(max_len >= sizeof(uint8_t));
             *((netopt_enable_t*) val) = sx127x_get_rx_single(dev) ? NETOPT_ENABLE : NETOPT_DISABLE;
-            break;
+            return sizeof(netopt_enable_t);
 
         case NETOPT_TX_POWER:
             assert(max_len >= sizeof(int8_t));
@@ -350,13 +350,13 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         case NETOPT_IQ_INVERT:
             assert(max_len >= sizeof(uint8_t));
             *((netopt_enable_t*) val) = sx127x_get_iq_invert(dev) ? NETOPT_ENABLE : NETOPT_DISABLE;
-            break;
+            return sizeof(netopt_enable_t);
 
         default:
             break;
     }
 
-    return 0;
+    return -ENOTSUP;
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
@@ -375,10 +375,16 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             assert(len <= sizeof(netopt_state_t));
             return _set_state(dev, *((const netopt_state_t*) val));
 
-        case NETOPT_DEVICE_MODE:
-            assert(len <= sizeof(uint8_t));
-            sx127x_set_modem(dev, *((const uint8_t*) val));
-            return sizeof(netopt_enable_t);
+        case NETOPT_DEVICE_TYPE:
+            assert(len <= sizeof(uint16_t));
+            /* Only LoRa modem is supported for the moment */
+            if (*(const uint16_t*) val == NETDEV_TYPE_LORA) {
+                sx127x_set_modem(dev, SX127X_MODEM_LORA);
+                return sizeof(uint16_t);
+            }
+            else {
+                return -EINVAL;
+            }
 
         case NETOPT_CHANNEL:
             assert(len <= sizeof(uint32_t));
