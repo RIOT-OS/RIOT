@@ -298,7 +298,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             *((uint16_t*) val) = NETDEV_TYPE_LORA;
             return sizeof(uint16_t);
 
-        case NETOPT_CHANNEL:
+        case NETOPT_CHANNEL_FREQUENCY:
             assert(max_len >= sizeof(uint32_t));
             *((uint32_t*) val) = sx127x_get_channel(dev);
             return sizeof(uint32_t);
@@ -387,7 +387,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 return -EINVAL;
             }
 
-        case NETOPT_CHANNEL:
+        case NETOPT_CHANNEL_FREQUENCY:
             assert(len <= sizeof(uint32_t));
             sx127x_set_channel(dev, *((const uint32_t*) val));
             return sizeof(uint32_t);
