@@ -281,6 +281,7 @@ static void _isr(netdev_t *netdev)
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
+    (void) max_len;  /* unused when compiled without debug, assert empty */
     sx127x_t *dev = (sx127x_t*) netdev;
 
     if (dev == NULL) {
