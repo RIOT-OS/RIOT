@@ -376,6 +376,17 @@ typedef enum {
     NETOPT_INTEGRITY_CHECK,
 
     /**
+     * @brief   Get/Set the channel center frequency.
+     *
+     * Values are retrieved/passed as uint32_t in host byte order.
+     *
+     * For example, with LoRa, this corresponds to the center frequency of
+     * each channel (867300000, etc) for a given frequency band
+     * (868, 915, etc).
+     */
+    NETOPT_CHANNEL_FREQUENCY,
+
+    /**
      * @brief   Enable/disable channel hopping.
      */
     NETOPT_CHANNEL_HOP,
