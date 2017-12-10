@@ -344,9 +344,9 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return sizeof(netopt_enable_t);
 
         case NETOPT_TX_POWER:
-            assert(max_len >= sizeof(int8_t));
-            *((int8_t*) val) = sx127x_get_tx_power(dev);
-            return sizeof(int8_t);
+            assert(max_len >= sizeof(int16_t));
+            *((int16_t*) val) = (int16_t)sx127x_get_tx_power(dev);
+            return sizeof(int16_t);
 
         case NETOPT_IQ_INVERT:
             assert(max_len >= sizeof(uint8_t));
@@ -458,9 +458,14 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             return sizeof(uint32_t);
 
         case NETOPT_TX_POWER:
-            assert(len <= sizeof(int8_t));
-            sx127x_set_tx_power(dev, *((const int8_t*) val));
-            return sizeof(int8_t);
+            assert(len <= sizeof(int16_t));
+            int16_t power = *((const int16_t *)val);
+            if ((power < INT8_MIN) || (power > INT8_MAX)) {
+                res = -EINVAL;
+                break;
+            }
+            sx127x_set_tx_power(dev, (int8_t)power);
+            return sizeof(int16_t);
 
         case NETOPT_FIXED_HEADER:
             assert(len <= sizeof(netopt_enable_t));
