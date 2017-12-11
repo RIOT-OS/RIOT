@@ -59,10 +59,19 @@ int sock_ip_create(sock_ip_t *sock, const sock_ip_ep_t *local,
     return 0;
 }
 
+#ifdef SOCK_HAS_ASYNC
+void sock_ip_set_event_queue(sock_ip_t *sock, event_queue_t *queue,
+                             event_handler_t handler)
+{
+    gnrc_sock_set_event_queue(&sock->reg, queue, handler);
+}
+#endif /* SOCK_HAS_ASYNC */
+
 void sock_ip_close(sock_ip_t *sock)
 {
     assert(sock != NULL);
     gnrc_netreg_unregister(GNRC_NETTYPE_IPV6, &sock->reg.entry);
+    gnrc_sock_close(&sock->reg);
 }
 
 int sock_ip_get_local(sock_ip_t *sock, sock_ip_ep_t *local)

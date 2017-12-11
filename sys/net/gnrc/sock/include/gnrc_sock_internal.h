@@ -102,6 +102,29 @@ static inline bool gnrc_ep_addr_any(const sock_ip_ep_t *ep)
  */
 void gnrc_sock_create(gnrc_sock_reg_t *reg, gnrc_nettype_t type, uint32_t demux_ctx);
 
+#if defined(SOCK_HAS_ASYNC) || defined(DOXYGEN)
+/**
+ * @brief   Close a sock internally
+ * @internal
+ */
+static inline void gnrc_sock_close(gnrc_sock_reg_t *reg)
+{
+    event_cancel(reg->event_queue, &reg->event.super);
+}
+
+static inline void gnrc_sock_set_event_queue(gnrc_sock_reg_t *reg,
+                                             event_queue_t *queue,
+                                             event_handler_t handler)
+{
+    assert(reg != NULL);
+    assert((queue == NULL) || (handler != NULL)) ;
+    reg->event_queue = queue;
+    reg->event_handler = handler;
+}
+#else   /* defined(SOCK_HAS_ASYNC) || defined(DOXYGEN) */
+#define gnrc_sock_close(reg)    (void)reg
+#endif  /* defined(SOCK_HAS_ASYNC) || defined(DOXYGEN) */
+
 /**
  * @brief   Receive a packet internally
  * @internal

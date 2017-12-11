@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "event.h"
 #include "mbox.h"
 #include "net/af.h"
 #include "net/gnrc.h"
@@ -51,6 +52,12 @@ typedef struct gnrc_sock_reg {
     gnrc_netreg_entry_t entry;          /**< @ref net_gnrc_netreg entry for mbox */
     mbox_t mbox;                        /**< @ref core_mbox target for the sock */
     msg_t mbox_queue[SOCK_MBOX_SIZE];   /**< queue for gnrc_sock_reg_t::mbox */
+#ifdef SOCK_HAS_ASYNC
+    gnrc_netreg_entry_cbd_t netreg_cb;  /**< netreg callback */
+    event_queue_t *event_queue;         /**< event queue for the sock */
+    event_handler_t event_handler;      /**< event handler for the sock */
+    sock_event_t event;                 /**< event for the sock */
+#endif
 } gnrc_sock_reg_t;
 
 /**

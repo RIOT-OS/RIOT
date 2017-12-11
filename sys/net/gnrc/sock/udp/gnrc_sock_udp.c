@@ -62,6 +62,14 @@ static bool _dyn_port_used(uint16_t port)
     return false;
 }
 
+#ifdef SOCK_HAS_ASYNC
+void sock_udp_set_event_queue(sock_udp_t *sock, event_queue_t *queue,
+                             event_handler_t handler)
+{
+    gnrc_sock_set_event_queue(&sock->reg, queue, handler);
+}
+#endif /* SOCK_HAS_ASYNC */
+
 /**
  * @brief   returns a UDP port, and checks for reuse if required
  *
