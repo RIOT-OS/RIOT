@@ -103,7 +103,7 @@
 
 #include <stdint.h>
 
-#ifdef MODULE_SOCK_ASYNC && !defined(DOXYGEN)
+#if defined(MODULE_SOCK_ASYNC) && !defined(DOXYGEN)
 #define SOCK_HAS_ASYNC      /**< allow sock_async to be defined as a provided
                              *   feature of a stack */
 #endif
@@ -179,7 +179,7 @@ typedef struct {
     event_t super;          /**< event_callback_t structure that gets extended */
     void *sock;             /**< sock that emitted the event */
     uint32_t type;          /**< [Event type](@ref net_sock_event_type) flags */
-} sock_event_t
+} sock_event_t;
 #endif
 
 /**
