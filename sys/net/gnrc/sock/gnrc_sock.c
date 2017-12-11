@@ -26,6 +26,9 @@
 #include "sock_types.h"
 #include "gnrc_sock_internal.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 #ifdef MODULE_XTIMER
 #define _TIMEOUT_MAGIC      (0xF38A0B63U)
 #define _TIMEOUT_MSG_TYPE   (0x8474)
@@ -43,21 +46,52 @@ static void _callback_put(void *arg)
 }
 #endif
 
+#ifdef SOCK_HAS_ASYNC
+void _netapi_cb(uint16_t cmd, gnrc_pktsnip_t *pkt, void *ctx)
+{
+    if (cmd == GNRC_NETAPI_MSG_TYPE_RCV) {
+        msg_t msg = { .type = GNRC_NETAPI_MSG_TYPE_RCV,
+                      .content = { .ptr = pkt } };
+        gnrc_sock_reg_t *reg = ctx;
+
+        if (mbox_try_put(&reg->mbox, &msg) < 1) {
+            DEBUG("gnrc_sock: dropped message to %p (was full)\n",
+                  (void *)&reg->mbox);
+        }
+        if (!(reg->event.type & SOCK_EVENT_RECV) && (reg->event_queue != NULL)) {
+            reg->event.super.handler = reg->event_handler;
+            reg->event.sock = ctx;
+            reg->event.type |= SOCK_EVENT_RECV;
+            event_post(reg->event_queue, &reg->event.super);
+        }
+    }
+}
+#endif /* SOCK_HAS_ASYNC */
+
 void gnrc_sock_create(gnrc_sock_reg_t *reg, gnrc_nettype_t type, uint32_t demux_ctx)
 {
     mbox_init(&reg->mbox, reg->mbox_queue, SOCK_MBOX_SIZE);
+#ifdef SOCK_HAS_ASYNC
+    reg->netreg_cb.cb = _netapi_cb;
+    reg->netreg_cb.ctx = reg;
+    gnrc_netreg_entry_init_cb(&reg->entry, demux_ctx, &reg->netreg_cb);
+#else
     gnrc_netreg_entry_init_mbox(&reg->entry, demux_ctx, &reg->mbox);
+#endif
     gnrc_netreg_register(type, &reg->entry);
 }
+
 
 ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
                        uint32_t timeout, sock_ip_ep_t *remote)
 {
     gnrc_pktsnip_t *pkt, *ip, *netif;
     msg_t msg;
+    int res = 0;
 
     if (reg->mbox.cib.mask != (SOCK_MBOX_SIZE - 1)) {
-        return -EINVAL;
+        res = -EINVAL;
+        goto out;
     }
 #ifdef MODULE_XTIMER
     xtimer_t timeout_timer;
@@ -73,7 +107,8 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     }
     else {
         if (!mbox_try_get(&reg->mbox, &msg)) {
-            return -EAGAIN;
+            res = -EAGAIN;
+            goto out;
         }
     }
 #ifdef MODULE_XTIMER
@@ -86,12 +121,14 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
 #ifdef MODULE_XTIMER
         case _TIMEOUT_MSG_TYPE:
             if (msg.content.value == _TIMEOUT_MAGIC) {
-                return -ETIMEDOUT;
+                res = -ETIMEDOUT;
+                goto out;
             }
 #endif
             /* Falls Through. */
         default:
-            return -EINVAL;
+            res = -EINVAL;
+            goto out;
     }
     /* TODO: discern NETTYPE from remote->family (set in caller), when IPv4
      * was implemented */
@@ -111,7 +148,17 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         remote->netif = (uint16_t)netif_hdr->if_pid;
     }
     *pkt_out = pkt; /* set out parameter */
-    return 0;
+out:
+#ifdef SOCK_HAS_ASYNC
+    if ((cib_avail(&reg->mbox.cib) > 0) && (reg->event_queue != NULL)) {
+        reg->event.type |= SOCK_EVENT_RECV;
+        event_post(reg->event_queue, &reg->event.super);
+    }
+    else {
+        reg->event.type &= ~SOCK_EVENT_RECV;
+    }
+#endif /* SOCK_HAS_ASYNC */
+    return res;
 }
 
 ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,

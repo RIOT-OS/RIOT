@@ -97,6 +97,12 @@ ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
   USEMODULE += gnrc_sock
 endif
 
+ifneq (,$(filter gnrc_sock_async,$(USEMODULE)))
+  USEMODULE += sock_async
+  USEMODULE += event
+  USEMODULE += gnrc_netapi_callbacks
+endif
+
 ifneq (,$(filter gnrc_sock_ip,$(USEMODULE)))
   USEMODULE += sock_ip
 endif
