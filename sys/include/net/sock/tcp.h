@@ -399,13 +399,10 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
  *          This also implies, that **only one thread can execute the event
  *          handlers** added via @ref sock_tcp_set_event_handler()!
  *
- * @param[in] sock              The sock to set the event queue for. May not be `NULL`.
- * @param[in] queue             The queue to set. May be `NULL` to unset the queue.
- * @param[in] event_pool        Pool of event to allocate in case an event is fired.
- * @param[in] event_pool_size   Size of @p event_pool.
+ * @param[in] sock  The sock to set the event queue for. May not be `NULL`.
+ * @param[in] queue The queue to set. May be `NULL` to unset the queue.
  */
-void sock_tcp_set_event_queue(sock_tcp_t *sock, event_queue_t *queuei,
-                              event_t *event_pool, size_t event_pool_size);
+void sock_tcp_set_event_queue(sock_tcp_t *sock, event_queue_t *queue);
 
 /**
  * @brief   Sets an event handler for asynchronous events of [a certain
