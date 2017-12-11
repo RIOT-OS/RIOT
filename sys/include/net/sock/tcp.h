@@ -392,33 +392,18 @@ int sock_tcp_listen(sock_tcp_queue_t *queue, const sock_tcp_ep_t *local,
  * @brief   Set the event queue for asynchronous events for a TCP sock
  *          object
  *
- * @pre     `sock == NULL`
+ * @pre     `sock != NULL`
  *
  * @note    Only one event queue per sock can be set. Since
  *          event_queue_t::waiter only allows for one thread to own the queue.
- *          This also implies, that **only one thread can execute the event
- *          handlers** added via @ref sock_tcp_set_event_handler()!
+ *          This also implies, that **only one thread can execute the
+ *          @p handler**!
  *
- * @param[in] sock  The sock to set the event queue for. May not be `NULL`.
- * @param[in] queue The queue to set. May be `NULL` to unset the queue.
+ * @param[in] sock      The sock to set the event queue for. May not be `NULL`.
+ * @param[in] queue     The queue to set. May be `NULL` to unset the queue.
+ * @param[in] handler   The event handler. May be `NULL` to unset.
  */
-void sock_tcp_set_event_queue(sock_tcp_t *sock, event_queue_t *queue);
-
-/**
- * @brief   Sets an event handler for asynchronous events of [a certain
- *          type](@ref sock_event_type_t) for a raw TCP sock object
- *
- * @pre `sock != NULL`
- * @pre `type < SOCK_EVENT_NUMOF`
- *
- * @param[in] sock      The sock to set the event handler for. May not be
- *                      `NULL`
- * @param[in] type      The [event type](@ref sock_event_type_t), @p handler
- *                      should handle. Must be < @ref SOCK_EVENT_NUMOF.
- * @param[in] handler   The event handler for @p type. May be `NULL` to unset
- *                      the event handler for @p type.
- */
-void sock_tcp_set_event_handler(sock_tcp_t *sock, sock_event_type_t *type,
+void sock_tcp_set_event_handler(sock_tcp_t *sock, event_queue_t *queue,
                                 event_handler_t handler);
 #endif
 

@@ -166,16 +166,20 @@ extern "C" {
 /**
  * @brief   Event types for asynchronous event functionality
  * @note    Only available with @ref SOCK_HAS_ASYNC defined.
+ * @anchor  net_sock_event_type
+ * @{
  */
-typedef enum {
-    SOCK_EVENT_RECEIVE = 0, /**< receive event */
-    /**
-     * @brief   number of event types (for internal arrays)
-     *
-     * @note    Please keep this last.
-     */
-    SOCK_EVENT_NUMOF,
-} sock_event_t;
+#define SOCK_EVENT_RECV     (0x00000001)    /**< Receive event */
+/** @} */
+
+/**
+ * @brief   Sock event
+ */
+typedef struct {
+    event_t super;          /**< event_callback_t structure that gets extended */
+    void *sock;             /**< sock that emitted the event */
+    uint32_t type;          /**< [Event type](@ref net_sock_event_type) flags */
+} sock_event_t
 #endif
 
 /**
