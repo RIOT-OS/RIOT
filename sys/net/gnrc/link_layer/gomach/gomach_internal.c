@@ -488,7 +488,13 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
                 total_tdma_slot_num -= redueced_slots_num;
                 break;
             }
+
             j++;
+
+            /* If reach the maximum sender ID number limit, stop. */
+            if (total_tdma_node_num >= GNRC_GOMACH_MAX_ALLOC_SENDER_NUM) {
+                break;
+            }
         }
     }
 
