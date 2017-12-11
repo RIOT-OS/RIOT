@@ -277,6 +277,19 @@ extern "C" {
 #endif
 
 /**
+ * @brief Maximum number of senders allowed to be allocated slots in one cycle.
+ *
+ * Exclude the static GoMacH MAC header payload in the beacon, which is 20 bytes,
+ * we have 107 bytes left for constructing the sender-ID list and the related slots-number
+ * list. A combined slots allocation information pair (sender ID with its corresponded
+ * allocate slots number) will cost 9 (8+1) bytes, thus we can hold a maximum of 11
+ * i.e., ((127 - 20) / 9), sender IDs in the beacon.
+ */
+#ifndef GNRC_GOMACH_MAX_ALLOC_SENDER_NUM
+#define GNRC_GOMACH_MAX_ALLOC_SENDER_NUM          (11U)
+#endif
+
+/**
  * @brief Maximum t2k attempts before going to t2u in GoMacH.
  *
  * After phase-locked with the receiver, a sender runs a t2k (transmit-to-known)
