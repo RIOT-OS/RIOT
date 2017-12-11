@@ -25,15 +25,16 @@
 int main(void)
 {
     shtc1_t shtc;
-    if (shtc1_init(&shtc, &shtc1_params[0])!= SHTC1_OK){
+
+    if (shtc1_init(&shtc, &shtc1_params[0]) != SHTC1_OK) {
         printf("can't initialize the sensor");
         return -1;
     }
-    while(1) {
+    while (1) {
         if (shtc1_measure(&shtc) == SHTC1_OK) {
             /*print temp value*/
             printf("Temperature: %.2f C \n Humidity: %.2f%%\n", shtc.values.temp, \
-            shtc.values.rel_humidity);
+                   shtc.values.rel_humidity);
             return 0;
         }
         xtimer_sleep(2);
