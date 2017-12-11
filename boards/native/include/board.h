@@ -53,7 +53,26 @@ void _native_LED_RED_TOGGLE(void);
 #define LED1_TOGGLE         (_native_LED_GREEN_TOGGLE())
 /** @} */
 
-#ifdef MODULE_MTD
+#if defined(MODULE_MTD) || DOXYGEN
+/**
+ * @name    MTD emulation configuration
+ * @{
+ */
+#ifndef MTD_PAGE_SIZE
+#define MTD_PAGE_SIZE           (256)
+#endif
+#ifndef MTD_SECTOR_SIZE
+#define MTD_SECTOR_SIZE         (4096)
+#endif
+#ifndef MTD_SECTOR_NUM
+#define MTD_SECTOR_NUM          (2048)
+#endif
+#ifndef MTD_NATIVE_FILENAME
+#define MTD_NATIVE_FILENAME     "MEMORY.bin"
+#endif
+/** @} */
+
+/** Default MTD device */
 #define MTD_0 mtd0
 
 /** mtd flash emulation device */
