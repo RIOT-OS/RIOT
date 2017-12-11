@@ -18,23 +18,25 @@
  * @}
  */
 #include <stdio.h>
-#include "shell.h"
-
-extern int shtc1_cmd(int argc, char **argv);
-
-static const shell_command_t shell_commands[] = {
-    { "shtc", "read values from a shtc1 sensor", shtc1_cmd },
-    { NULL, NULL, NULL }
-};
+#include "shtc1.h"
+#include "shtc1_params.h"
+#include "xtimer.h"
 
 int main(void)
 {
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-
-    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
-
-    puts("Error: END of main().");
-    /* should be never reached */
+    shtc1_t shtc;
+    if (shtc1_init(&shtc, &shtc1_params[0])!= SHTC1_OK){
+        printf("can't initialize the sensor");
+        return -1;
+    }
+    while(1) {
+        if (shtc1_measure(&shtc) == SHTC1_OK) {
+            /*print temp value*/
+            printf("Temperature: %.2f C \n Humidity: %.2f%%\n", shtc.values.temp, \
+            shtc.values.rel_humidity);
+            return 0;
+        }
+        xtimer_sleep(2);
+    }
     return 0;
 }

@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_shtc1
- * @ingroup     drivers_sensors
+ * @ingroup     drivers_shtc1
  * @name        Default parameters for the SHTC1 Temperature and humidity sensor
  * @{
  *

@@ -58,59 +58,49 @@ enum {
     SHTC1_ERROR = -1
 };
 
-/*define section*/
-#define SHTC1_CRC                                   0x31
-#define SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_HIGH    0x7C
-#define SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_LOW     0xA2
-#define SHTC1_COMMAND_RESET_HIGH                    0x80
-#define SHTC1_COMMAND_RESET_LOW                     0x5D
-#define SHTC1_COMMAND_ID_HIGH                       0xEF
-#define SHTC1_COMMAND_ID_LOW                        0xC8
-#define SHTC1_ID                                    0x0007
-
 /**
- * @brief initializes the sensor and I2C
+ * @brief Initializes the sensor and I2C
  *
  * @param[in] dev       I2C device descriptor
  * @param[in] params    SHTC1 parameters to be used
  *
  * @return              SHTC1_OK on a working initialization
- * @return              SHTC1_ERROR on undefined I2C device given
+ * @return              SHTC1_ERROR on error
  */
 int8_t shtc1_init(shtc1_t* const dev, const shtc1_params_t* params);
 
 /**
- * @brief reads temperature and humidity values and saves them in the device descriptor. The temperature is in °C and the humidity in %
+ * @brief Reads temperature and humidity values
+ * @details The values wil be saved in the device descriptor (values struct). The temperature is in °C and the humidity in %
  *
- * @param[in] dev               The I2C device descriptor
+ * @param[in] dev       The I2C device descriptor
  *
- * @return                      SHTC1_OK on a verified and working measurement
- * @return                      SHTC1_ERROR on a checksum error
+ * @return              SHTC1_OK if a measurement completed. The values will be stored in the values struct. Temperature in °C and humidity in %
+ * @return              SHTC1_ERROR on checksum error
  */
 int8_t shtc1_measure(shtc1_t* const dev);
 
 /**
- * @brief reads out id and saves it in the device descriptor
+ * @brief Reads the ID and saves it in the device descriptor
  *
- * @details             When working correctly ID should equal xxxx'xxxx'xx00'0111. 
- *                      Where x is unspecified
+ * @details             When working correctly ID should equal xxxx'xxxx'xx00'0111 where x is unspecified
  *
  * @param[in] dev       The I2C device descriptor
  *
  * @return              SHTC1_OK on everything done
- * @return              SHTC1_ERROR on error occured
+ * @return              SHTC1_ERROR on error
  */
 int8_t shtc1_id(shtc1_t* const dev);
 
 /**
- * @brief resets sensor
+ * @brief Resets sensor
  *
  * This will reset all internal state machines and reload calibration data from the memory
  *
  * @param[in] dev       The I2C device descriptor
  *
  * @return              SHTC1_OK on everything done
- * @return              SHTC1_ERROR on error occured
+ * @return              SHTC1_ERROR on error
  */
 int8_t shtc1_reset(const shtc1_t* const dev);
 
