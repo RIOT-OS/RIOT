@@ -664,6 +664,10 @@ ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
 endif
 
+ifneq (,$(filter ccn-lite,$(USEPKG)))
+  USEMODULE += ccn-lite-utils
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 

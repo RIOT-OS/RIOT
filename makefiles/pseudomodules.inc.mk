@@ -2,6 +2,7 @@ PSEUDOMODULES += auto_init_gnrc_rpl
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
+PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += cbor_ctime
 PSEUDOMODULES += cbor_float
 PSEUDOMODULES += cbor_semantic_tagging

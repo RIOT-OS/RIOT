@@ -114,7 +114,7 @@ int _ccnl_content(int argc, char **argv)
     int offs = CCNL_MAX_PACKET_SIZE;
     arg_len = ccnl_ndntlv_prependContent(prefix, (unsigned char*) body, arg_len, NULL, NULL, &offs, _out);
 
-    free_prefix(prefix);
+    ccnl_prefix_free(prefix);
 
     unsigned char *olddata;
     unsigned char *data = olddata = _out + offs;
@@ -129,7 +129,7 @@ int _ccnl_content(int argc, char **argv)
 
     struct ccnl_content_s *c = 0;
     struct ccnl_pkt_s *pk = ccnl_ndntlv_bytes2pkt(typ, olddata, &data, &arg_len);
-    c = ccnl_content_new(&ccnl_relay, &pk);
+    c = ccnl_content_new(&pk);
     ccnl_content_add2cache(&ccnl_relay, c);
     c->flags |= CCNL_CONTENT_FLAGS_STATIC;
 
@@ -208,7 +208,7 @@ int _ccnl_interest(int argc, char **argv)
 
     struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, 0);
     int res = ccnl_send_interest(prefix, _int_buf, BUF_SIZE);
-    free_prefix(prefix);
+    ccnl_prefix_free(prefix);
 
     return res;
 }
@@ -241,7 +241,7 @@ int _ccnl_fib(int argc, char **argv)
                 return -1;
             }
             int res = ccnl_fib_rem_entry(&ccnl_relay, prefix, NULL);
-            free_prefix(prefix);
+            ccnl_prefix_free(prefix);
             return res;
         }
         else {
