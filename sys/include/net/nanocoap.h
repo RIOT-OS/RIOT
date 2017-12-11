@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    sys_net_nanocoap nanocoap small CoAP library
- * @ingroup     sys_net
+ * @defgroup    net_nanocoap nanocoap small CoAP library
+ * @ingroup     net
  * @brief       Provides CoAP functionality optimized for minimal resource usage
  *
  * @{
