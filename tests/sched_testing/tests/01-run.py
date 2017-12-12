@@ -17,5 +17,6 @@ def testfunc(child):
     child.expect_exact('yield 2')
     child.expect_exact('done')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

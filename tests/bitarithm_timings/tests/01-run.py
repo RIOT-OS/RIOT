@@ -20,5 +20,6 @@ def testfunc(child):
     child.expect('\+ bitarithm_bits_set: \d+ iterations per second')
     child.expect_exact("Done.")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc, timeout=30))

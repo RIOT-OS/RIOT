@@ -69,6 +69,7 @@ def testfunc(child):
     for line in EXPECTED_STDOUT:
         child.expect_exact(line)
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

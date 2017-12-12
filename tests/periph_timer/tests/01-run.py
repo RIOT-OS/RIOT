@@ -23,5 +23,6 @@ def testfunc(child):
         child.expect_exact('TIMER_{}: starting'.format(timer))
     child.expect('TEST SUCCEEDED')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

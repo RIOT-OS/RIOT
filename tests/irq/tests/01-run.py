@@ -11,5 +11,6 @@ def testfunc(child):
     child.expect('START')
     child.expect('SUCCESS')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

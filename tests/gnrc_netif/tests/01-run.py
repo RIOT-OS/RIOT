@@ -139,5 +139,6 @@ def testfunc(child):
     child.expect("dst_l2addr: 3e:e6:b5:22:fd:0a")
     child.expect("~~ PKT    -  2 snips, total size:  61 byte")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc, timeout=1, traceback=True))

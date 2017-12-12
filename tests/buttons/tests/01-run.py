@@ -23,5 +23,6 @@ def testfunc(child):
     if index == 1:
         child.expect_exact("[SUCCESS]")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

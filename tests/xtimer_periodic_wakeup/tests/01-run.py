@@ -24,5 +24,6 @@ def testfunc(child):
     child.expect(u"Min/max error: \d+/\d+")
     child.expect_exact("Test complete.")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

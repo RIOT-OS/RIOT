@@ -17,5 +17,6 @@ def testfunc(child):
     child.expect('first thread\r\n')
     child.expect('second thread\r\n')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

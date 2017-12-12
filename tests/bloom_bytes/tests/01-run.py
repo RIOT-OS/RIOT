@@ -23,5 +23,6 @@ def testfunc(child):
     child.expect(".+ false positive rate.")
     child.expect_exact("All done!")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

@@ -17,5 +17,6 @@ import testrunner
 def testfunc(child):
     child.expect_exact(u"[SUCCESS]", timeout=60)
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

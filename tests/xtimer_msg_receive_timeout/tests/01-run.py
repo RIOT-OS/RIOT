@@ -20,5 +20,6 @@ def testfunc(child):
         child.expect("Timeout!")
     child.expect("[SUCCESS]")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

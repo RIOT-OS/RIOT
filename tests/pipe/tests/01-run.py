@@ -31,5 +31,6 @@ def testfunc(child):
     child.expect_exact('End read: <YZ> [24:26]')
     child.expect_exact('End done.')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

@@ -57,5 +57,6 @@ def testfunc(child):
     for cmd, expected in CMDS.items():
         check_cmd(child, cmd, expected)
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

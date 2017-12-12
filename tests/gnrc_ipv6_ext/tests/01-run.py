@@ -40,5 +40,6 @@ def testfunc(child):
     child.expect_exact("ipv6: forward nh = 17 to other threads")
     child.expect_exact("pkt->users: 0")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

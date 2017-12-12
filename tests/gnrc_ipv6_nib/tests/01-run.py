@@ -17,5 +17,6 @@ import testrunner
 def testfunc(child):
     child.expect(r"OK \(\d+ tests\)")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc, timeout=1))

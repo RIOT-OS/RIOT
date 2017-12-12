@@ -14,5 +14,6 @@ def testfunc(child):
     child.expect_exact('................ done with 0 error(s)')
     child.expect_exact('SUCCESS')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc, timeout=60))

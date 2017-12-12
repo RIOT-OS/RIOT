@@ -77,5 +77,6 @@ def testfunc(child):
     child.expect_exact("source address: fe80::ff:fe00:2")
     child.expect_exact("destination address: fd01::1")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

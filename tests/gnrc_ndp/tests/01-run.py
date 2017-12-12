@@ -18,5 +18,6 @@ def testfunc(child):
     # 1st 6LoWPAN fragment
     child.expect(r"OK \(\d+ tests\)")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

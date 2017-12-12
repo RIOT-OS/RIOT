@@ -17,5 +17,6 @@ import testrunner
 def testfunc(child):
     child.expect('Decoding finished succesfully')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

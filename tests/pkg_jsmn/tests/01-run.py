@@ -17,5 +17,6 @@ def testfunc(child):
     child.expect_exact('  * audio')
     child.expect_exact('  * video')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

@@ -115,5 +115,6 @@ def testfunc(child):
     _check_doomsday(child)
     _check_day(child)
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

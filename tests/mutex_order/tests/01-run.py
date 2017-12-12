@@ -32,5 +32,6 @@ def testfunc(child):
         assert(int(child.match.group(1)) > last)
         last = int(child.match.group(1))
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

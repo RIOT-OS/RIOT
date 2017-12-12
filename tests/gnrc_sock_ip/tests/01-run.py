@@ -50,5 +50,6 @@ def testfunc(child):
     child.expect_exact(u"Calling test_sock_ip_send__no_sock()")
     child.expect_exact(u"ALL TESTS SUCCESSFUL")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

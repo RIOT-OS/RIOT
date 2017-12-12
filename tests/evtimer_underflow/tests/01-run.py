@@ -25,5 +25,6 @@ def testfunc(child):
     print("Stopped after %i iterations, but should run forever." % how_many)
     print("=> All tests successful")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc, echo=False))

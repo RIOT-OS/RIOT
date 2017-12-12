@@ -46,5 +46,6 @@ def testfunc(child):
             child.expect(u"T%i \(prio %i, depth %i\): locked rmutex now" %
                          (T, thread_prio[T], depth))
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

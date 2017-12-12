@@ -22,5 +22,6 @@ def testfunc(child):
     child.expect(u"now=\d+")
     child.expect_exact("Test completed!")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

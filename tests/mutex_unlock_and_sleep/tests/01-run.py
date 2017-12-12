@@ -17,5 +17,6 @@ def testfunc(child):
     for i in range(20):
         child.expect(r"\[ALIVE\] alternated \d+k times.")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

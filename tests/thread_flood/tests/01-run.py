@@ -12,5 +12,6 @@ def testfunc(child):
     child.expect(r'\.+')
     child.expect(r'\[SUCCESS\] created \d+')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

@@ -24,5 +24,6 @@ def testfunc(child):
     child.expect_exact(' + succeeded.')
     child.expect_exact('ALL TESTS SUCCESSFUL')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

@@ -51,5 +51,6 @@ def testfunc(child):
 
     print("All tests successful")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc, echo=False))

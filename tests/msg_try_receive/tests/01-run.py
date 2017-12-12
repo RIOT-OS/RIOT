@@ -11,5 +11,6 @@ def testfunc(child):
     child.expect('main starting')
     child.expect('msg available: 1 \(should be 1\!\)')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

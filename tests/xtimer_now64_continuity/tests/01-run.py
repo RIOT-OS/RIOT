@@ -18,5 +18,6 @@ def testfunc(child):
     child.expect(u"\[RESULTS\] min=\d+, avg=\d+, max=\d+")
     child.expect_exact("[SUCCESS]")
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))

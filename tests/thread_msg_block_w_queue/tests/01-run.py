@@ -17,5 +17,6 @@ def testfunc(child):
     child.expect('sender_thread start\r\n')
     child.expect('main thread alive\r\n')
 
+
 if __name__ == "__main__":
     sys.exit(testrunner.run(testfunc))
