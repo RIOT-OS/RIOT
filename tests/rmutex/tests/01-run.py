@@ -11,9 +11,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 thread_prio = {
         3:  6,
         4:  4,
@@ -47,4 +44,6 @@ def testfunc(child):
                          (T, thread_prio[T], depth))
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))
