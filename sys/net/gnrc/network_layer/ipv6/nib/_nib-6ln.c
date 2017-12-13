@@ -149,7 +149,7 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                           ipv6_addr_to_str(addr_str,
                                            &ipv6->dst,
                                            sizeof(addr_str)), netif->pid);
-                    gnrc_netif_ipv6_addr_remove(netif, &ipv6->dst);
+                    gnrc_netif_ipv6_addr_remove_internal(netif, &ipv6->dst);
                     /* TODO: generate new address */
                     break;
                 case SIXLOWPAN_ND_STATUS_NC_FULL: {

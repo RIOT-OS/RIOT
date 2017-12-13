@@ -85,8 +85,9 @@ void gnrc_netif_release(gnrc_netif_t *netif);
  * @return  >= 0, on success
  * @return  -ENOMEM, when no space for new addresses is left on the interface
  */
-int gnrc_netif_ipv6_addr_add(gnrc_netif_t *netif, const ipv6_addr_t *addr,
-                             unsigned pfx_len, uint8_t flags);
+int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
+                                      const ipv6_addr_t *addr,
+                                      unsigned pfx_len, uint8_t flags);
 
 /**
  * @brief   Removes an IPv6 address from the interface
@@ -98,8 +99,8 @@ int gnrc_netif_ipv6_addr_add(gnrc_netif_t *netif, const ipv6_addr_t *addr,
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  */
-void gnrc_netif_ipv6_addr_remove(gnrc_netif_t *netif,
-                                 const ipv6_addr_t *addr);
+void gnrc_netif_ipv6_addr_remove_internal(gnrc_netif_t *netif,
+                                          const ipv6_addr_t *addr);
 
 
 /**
@@ -240,8 +241,8 @@ gnrc_netif_t *gnrc_netif_get_by_prefix(const ipv6_addr_t *prefix);
  * @return  0, on success
  * @return  -ENOMEM, when no space for new addresses is left on the interface
  */
-int gnrc_netif_ipv6_group_join(gnrc_netif_t *netif,
-                               const ipv6_addr_t *addr);
+int gnrc_netif_ipv6_group_join_internal(gnrc_netif_t *netif,
+                                        const ipv6_addr_t *addr);
 
 /**
  * @brief   Let interface leave from an IPv6 multicast group
@@ -253,8 +254,8 @@ int gnrc_netif_ipv6_group_join(gnrc_netif_t *netif,
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  */
-void gnrc_netif_ipv6_group_leave(gnrc_netif_t *netif,
-                                 const ipv6_addr_t *addr);
+void gnrc_netif_ipv6_group_leave_internal(gnrc_netif_t *netif,
+                                          const ipv6_addr_t *addr);
 
 /**
  * @brief   Returns the index of @p addr in gnrc_netif_t::ipv6_groups of @p

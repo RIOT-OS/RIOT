@@ -124,8 +124,8 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
     }
 #endif  /* GNRC_IPV6_NIB_CONF_6LN */
     netif->ipv6.na_sent = 0;
-    if (gnrc_netif_ipv6_group_join(netif,
-                                   &ipv6_addr_all_nodes_link_local) < 0) {
+    if (gnrc_netif_ipv6_group_join_internal(netif,
+                                            &ipv6_addr_all_nodes_link_local) < 0) {
         DEBUG("nib: Can't join link-local all-nodes on interface %u\n",
               netif->pid);
         gnrc_netif_release(netif);
@@ -1113,7 +1113,8 @@ static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
         for (int i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
             if (ipv6_addr_match_prefix(&netif->ipv6.addrs[i],
                                        &pfx->pfx) >= pfx->pfx_len) {
-                gnrc_netif_ipv6_addr_remove(netif, &netif->ipv6.addrs[i]);
+                gnrc_netif_ipv6_addr_remove_internal(netif,
+                                                     &netif->ipv6.addrs[i]);
             }
         }
         pfx->mode &= ~_PL;
@@ -1303,7 +1304,8 @@ static void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
     gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]);
     ipv6_addr_init_prefix(&addr, pfx, pfx_len);
     if ((idx = gnrc_netif_ipv6_addr_idx(netif, &addr)) < 0) {
-        if ((idx = gnrc_netif_ipv6_addr_add(netif, &addr, pfx_len, flags)) < 0) {
+        if ((idx = gnrc_netif_ipv6_addr_add_internal(netif, &addr, pfx_len,
+                                                     flags)) < 0) {
             DEBUG("nib: Can't add link-local address on interface %u\n",
                   netif->pid);
             return;
@@ -1316,7 +1318,7 @@ static void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #if GNRC_IPV6_NIB_CONF_6LN
     if (gnrc_netif_is_6ln(netif)) {
         /* don't do this beforehand or risk a deadlock:
-         *  * gnrc_netif_ipv6_addr_add() adds VALID (i.e. manually configured
+         *  * gnrc_netif_ipv6_addr_add_internal() adds VALID (i.e. manually configured
          *    addresses to the prefix list locking the NIB's mutex which is already
          *    locked here) */
         netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;

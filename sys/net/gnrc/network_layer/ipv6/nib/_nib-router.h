@@ -49,7 +49,7 @@ static inline void _init_iface_router(gnrc_netif_t *netif)
 #if GNRC_IPV6_NIB_CONF_6LBR
     netif->flags |= GNRC_NETIF_FLAGS_6LO_ABR;
 #endif  /* GNRC_IPV6_NIB_CONF_6LBR */
-    gnrc_netif_ipv6_group_join(netif, &ipv6_addr_all_routers_link_local);
+    gnrc_netif_ipv6_group_join_internal(netif, &ipv6_addr_all_routers_link_local);
 }
 
 /**
