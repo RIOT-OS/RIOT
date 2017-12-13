@@ -246,6 +246,7 @@ ifneq (,$(filter si70%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter slipdev,$(USEMODULE)))
+  USEMODULE += tsrb
   FEATURES_REQUIRED += periph_uart
 endif
 
