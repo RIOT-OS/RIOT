@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief   Lowpan definitions for @ref net_gnrc_netif
+ * @brief   LoWPAN definitions for @ref net_gnrc_netif
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  * @author  Cenk Gündoğan <mail-github@cgundogan.de>
@@ -27,11 +27,11 @@ extern "C" {
 #endif
 
 /**
- * @brief   Lowpan component of @ref gnrc_netif_t
+ * @brief   LoWPAN component of @ref gnrc_netif_t
  */
 typedef struct {
     /**
-     * @brief   Maximum fragment size for lowpan fragmentation.
+     * @brief   Maximum fragment size for LoWPAN fragmentation.
      *
      * @note    Only available with module
      *          @ref net_gnrc_lowpan_frag "gnrc_lowpan_frag".

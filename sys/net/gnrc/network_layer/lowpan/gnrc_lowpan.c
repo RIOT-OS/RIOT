@@ -21,6 +21,7 @@
 #include "net/gnrc/ipv6/hdr.h"
 #include "net/gnrc/lowpan.h"
 #include "net/gnrc/lowpan/frag.h"
+#include "net/gnrc/sixlowpan/iphc.h"
 #include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
 
@@ -230,9 +231,9 @@ static void _send(gnrc_pktsnip_t *pkt)
         return;
     }
 
-#ifdef MODULE_GNRC_LOWPAN_IPHC
-    if (iface->flags & GNRC_NETIF_FLAGS_LOWPAN_IPHC) {
-        if (!gnrc_lowpan_iphc_encode(pkt2)) {
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
+    if (iface->flags & GNRC_NETIF_FLAGS_6LO_HC) {
+        if (!gnrc_sixlowpan_iphc_encode(pkt2)) {
             DEBUG("lowpan: error on IPHC encoding\n");
             gnrc_pktbuf_release(pkt2);
             return;

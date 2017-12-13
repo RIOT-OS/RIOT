@@ -64,11 +64,11 @@ void lowpan_print(uint8_t *data, size_t size)
                     size - sizeof(lowpan_frag_n_t),
                     OD_WIDTH_DEFAULT);
     }
-    else if ((data[0] & LOWPAN_IPHC1_DISP_MASK) == LOWPAN_IPHC1_DISP) {
-        uint8_t offset = LOWPAN_IPHC_HDR_LEN;
+    else if ((data[0] & SIXLOWPAN_IPHC1_DISP_MASK) == SIXLOWPAN_IPHC1_DISP) {
+        uint8_t offset = SIXLOWPAN_IPHC_HDR_LEN;
         puts("IPHC dispatch");
 
-        switch (data[0] & LOWPAN_IPHC1_TF) {
+        switch (data[0] & SIXLOWPAN_IPHC1_TF) {
             case 0x00:
                 puts("TF: ECN + DSCP + Flow Label (4 bytes)");
                 break;
@@ -86,7 +86,7 @@ void lowpan_print(uint8_t *data, size_t size)
                 break;
         }
 
-        switch (data[0] & LOWPAN_IPHC1_NH) {
+        switch (data[0] & SIXLOWPAN_IPHC1_NH) {
             case 0x00:
                 puts("NH: inline");
                 break;
@@ -96,7 +96,7 @@ void lowpan_print(uint8_t *data, size_t size)
                 break;
         }
 
-        switch (data[0] & LOWPAN_IPHC1_HL) {
+        switch (data[0] & SIXLOWPAN_IPHC1_HL) {
             case 0x00:
                 puts("HLIM: inline");
                 break;
@@ -114,10 +114,10 @@ void lowpan_print(uint8_t *data, size_t size)
                 break;
         }
 
-        if (data[1] & LOWPAN_IPHC2_SAC) {
+        if (data[1] & SIXLOWPAN_IPHC2_SAC) {
             printf("Stateful source address compression: ");
 
-            switch (data[1] & LOWPAN_IPHC2_SAM) {
+            switch (data[1] & SIXLOWPAN_IPHC2_SAM) {
                 case 0x00:
                     puts("unspecified address (::)");
                     break;
@@ -138,7 +138,7 @@ void lowpan_print(uint8_t *data, size_t size)
         else {
             printf("Stateless source address compression: ");
 
-            switch (data[1] & LOWPAN_IPHC2_SAM) {
+            switch (data[1] & SIXLOWPAN_IPHC2_SAM) {
                 case 0x00:
                     puts("128 bits inline");
                     break;
@@ -157,11 +157,11 @@ void lowpan_print(uint8_t *data, size_t size)
             }
         }
 
-        if (data[1] & LOWPAN_IPHC2_M) {
-            if (data[1] & LOWPAN_IPHC2_DAC) {
+        if (data[1] & SIXLOWPAN_IPHC2_M) {
+            if (data[1] & SIXLOWPAN_IPHC2_DAC) {
                 puts("Stateful destinaton multicast address compression:");
 
-                switch (data[1] & LOWPAN_IPHC2_DAM) {
+                switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
                         puts("    48 bits carried inline (Unicast-Prefix-based)");
                         break;
@@ -176,7 +176,7 @@ void lowpan_print(uint8_t *data, size_t size)
             else {
                 puts("Stateless destinaton multicast address compression:");
 
-                switch (data[1] & LOWPAN_IPHC2_DAM) {
+                switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
                         puts("    128 bits carried inline");
                         break;
@@ -196,10 +196,10 @@ void lowpan_print(uint8_t *data, size_t size)
             }
         }
         else {
-            if (data[1] & LOWPAN_IPHC2_DAC) {
+            if (data[1] & SIXLOWPAN_IPHC2_DAC) {
                 printf("Stateful destinaton address compression: ");
 
-                switch (data[1] & LOWPAN_IPHC2_DAM) {
+                switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
                         puts("reserved");
                         break;
@@ -220,7 +220,7 @@ void lowpan_print(uint8_t *data, size_t size)
             else {
                 printf("Stateless destinaton address compression: ");
 
-                switch (data[1] & LOWPAN_IPHC2_DAM) {
+                switch (data[1] & SIXLOWPAN_IPHC2_DAM) {
                     case 0x00:
                         puts("128 bits inline");
                         break;
@@ -240,8 +240,8 @@ void lowpan_print(uint8_t *data, size_t size)
             }
         }
 
-        if (data[1] & LOWPAN_IPHC2_CID_EXT) {
-            offset += LOWPAN_IPHC_CID_EXT_LEN;
+        if (data[1] & SIXLOWPAN_IPHC2_CID_EXT) {
+            offset += SIXLOWPAN_IPHC_CID_EXT_LEN;
             printf("SCI: 0x%x, DCI: 0x%x\n", (unsigned)(data[2] >> 4),
                    (unsigned)(data[2] & 0xf));
         }
