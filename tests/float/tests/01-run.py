@@ -14,6 +14,7 @@ def testfunc(child):
     child.expect_exact("Testing floating point arithmetics...")
     child.expect_exact("[SUCCESS]")
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

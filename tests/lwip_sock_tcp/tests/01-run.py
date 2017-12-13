@@ -89,6 +89,7 @@ def testfunc(child):
         child.expect_exact("Calling test_tcp_write6__success()")
     child.expect_exact(u"ALL TESTS SUCCESSFUL")
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

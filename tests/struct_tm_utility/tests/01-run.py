@@ -112,6 +112,7 @@ def testfunc(child):
     _check_doomsday(child)
     _check_day(child)
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

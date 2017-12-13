@@ -29,6 +29,7 @@ def testfunc(child):
         assert(int(child.match.group(1)) > last)
         last = int(child.match.group(1))
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

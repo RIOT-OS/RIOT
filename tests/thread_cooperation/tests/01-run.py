@@ -16,6 +16,7 @@ def testfunc(child):
     child.expect(r"MAIN: \d+! = \d+")
     child.expect_exact("[SUCCESS]")
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

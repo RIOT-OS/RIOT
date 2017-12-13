@@ -32,6 +32,7 @@ def testfunc(child):
     child.expect_exact("Bye, bye.")
     child.expect_exact("******************************************")
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

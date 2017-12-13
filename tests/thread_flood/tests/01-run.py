@@ -9,6 +9,7 @@ def testfunc(child):
     child.expect(r'\.+')
     child.expect(r'\[SUCCESS\] created \d+')
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

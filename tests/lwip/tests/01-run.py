@@ -307,6 +307,7 @@ def test_triple_send(board_group, application, env=None):
         sender.expect_exact(u"Success: send 4 byte over TCP to server")
         receiver.expect(u"00000000  DE  AD  BE  EF")
 
+
 if __name__ == "__main__":
     TestStrategy().execute([BoardGroup((Board("native", "tap0"),
                             Board("native", "tap1")))],

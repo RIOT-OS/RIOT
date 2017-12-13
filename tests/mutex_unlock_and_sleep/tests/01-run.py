@@ -14,6 +14,7 @@ def testfunc(child):
     for i in range(20):
         child.expect(r"\[ALIVE\] alternated \d+k times.")
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

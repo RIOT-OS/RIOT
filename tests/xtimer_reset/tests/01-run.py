@@ -19,6 +19,7 @@ def testfunc(child):
     child.expect(u"now=\d+")
     child.expect_exact("Test completed!")
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

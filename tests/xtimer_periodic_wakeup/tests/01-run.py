@@ -21,6 +21,7 @@ def testfunc(child):
     child.expect(u"Min/max error: \d+/\d+")
     child.expect_exact("Test complete.")
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

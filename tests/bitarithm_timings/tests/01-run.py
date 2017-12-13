@@ -17,6 +17,7 @@ def testfunc(child):
     child.expect('\+ bitarithm_bits_set: \d+ iterations per second')
     child.expect_exact("Done.")
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run
