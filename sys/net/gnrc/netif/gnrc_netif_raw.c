@@ -110,6 +110,8 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #endif
         res = dev->driver->send(dev, v, n);
     }
+    /* release old data */
+    gnrc_pktbuf_release(pkt);
     return res;
 }
 
