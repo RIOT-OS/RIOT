@@ -655,12 +655,24 @@ static int _netif_set_state(kernel_pid_t iface, char *state_str)
              (strcmp("IDLE", state_str) == 0)) {
         state = NETOPT_STATE_IDLE;
     }
+    else if ((strcmp("rx", state_str) == 0) ||
+             (strcmp("RX", state_str) == 0)) {
+        state = NETOPT_STATE_RX;
+    }
+    else if ((strcmp("tx", state_str) == 0) ||
+             (strcmp("TX", state_str) == 0)) {
+        state = NETOPT_STATE_TX;
+    }
     else if ((strcmp("reset", state_str) == 0) ||
              (strcmp("RESET", state_str) == 0)) {
         state = NETOPT_STATE_RESET;
     }
+    else if ((strcmp("standby", state_str) == 0) ||
+             (strcmp("STANDBY", state_str) == 0)) {
+        state = NETOPT_STATE_STANDBY;
+    }
     else {
-        puts("usage: ifconfig <if_id> set state [off|sleep|idle|reset]");
+        puts("usage: ifconfig <if_id> set state [off|sleep|idle|rx|tx|reset|standby]");
         return 1;
     }
     if (gnrc_netapi_set(iface, NETOPT_STATE, 0,
