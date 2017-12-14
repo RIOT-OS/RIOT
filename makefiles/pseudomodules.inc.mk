@@ -33,6 +33,7 @@ PSEUDOMODULES += l2filter_blacklist
 PSEUDOMODULES += l2filter_whitelist
 PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
+PSEUDOMODULES += lora
 PSEUDOMODULES += lwip_arp
 PSEUDOMODULES += lwip_autoip
 PSEUDOMODULES += lwip_dhcp
