@@ -58,6 +58,9 @@ endif
 ifneq (,$(filter my9221,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/my9221/include
 endif
+ifneq (,$(filter pulse_counter,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/pulse_counter/include
+endif
 ifneq (,$(filter ina220,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ina220/include
 endif
