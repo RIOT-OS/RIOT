@@ -152,6 +152,12 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
     return bytes;
 }
 
+static void wait(void) {
+    /* waits a few instructions */
+    static volatile int i = 0;
+    (void)i;
+}
+
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     slipdev_t *dev = (slipdev_t *)netdev;
@@ -177,6 +183,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     }
     else {
         size_t bytes = dev->pktfifo[cib_get(&dev->pktfifo_idx)];
+        wait(); /* wait a very little while to prevent race-condition */
         bytes = ringbuffer_get(&dev->inbuf, buf, bytes);
         res = bytes;
     }
