@@ -6,8 +6,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-RIOTBASE=$(readlink -f "$(dirname $(realpath $0))/../../..")
-
 ERRORS=$(make doc 2>&1 | grep '.*warning' | sed "s#${PWD}/\([^:]*\)#\1#g")
 
 if [ -n "${ERRORS}" ]
