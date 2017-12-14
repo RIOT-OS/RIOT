@@ -1,5 +1,5 @@
 PKG_NAME = tiny-asn1
-PKG_URL = https://gitlab.com/matthegap/tiny-asn1.git
+PKG_URL = https://gitlab.com/mtausig/tiny-asn1.git
 PKG_VERSION = 82e3a26273900b532e33e5b377f193fa08ee7d1b
 PKG_LICENSE = LGPL-3
 
