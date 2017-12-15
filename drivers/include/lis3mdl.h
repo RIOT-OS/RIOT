@@ -39,14 +39,6 @@ typedef struct {
 } lis3mdl_3d_data_t;
 
 /**
- * @brief   Device descriptor for LIS3MDL sensor
- */
-typedef struct {
-    i2c_t i2c;                       /**< I2C device */
-    uint8_t addr;                    /**< Magnometer I2C address */
-} lis3mdl_t;
-
-/**
  * @brief   Operating mode of x- and y-axis for LIS3MDL
  */
 typedef enum {
@@ -99,24 +91,36 @@ typedef enum {
 } lis3mdl_op_t;
 
 /**
+ * @brief   Device initialization parameters
+ */
+typedef struct {
+    i2c_t i2c;                       /**< I2C device */
+    uint8_t addr;                    /**< Magnometer I2C address */
+    lis3mdl_xy_mode_t xy_mode;       /**< Power mode of x- and y-axis */
+    lis3mdl_z_mode_t z_mode;         /**< Power mode of z-axis */
+    lis3mdl_odr_t odr;               /**< Output data rate */
+    lis3mdl_scale_t scale;           /**< Scale factor */
+    lis3mdl_op_t op_mode;            /**< Operation mode */
+} lis3mdl_params_t;
+
+
+/**
+ * @brief   Device descriptor for LIS3MDL sensor
+ */
+typedef struct {
+    lis3mdl_params_t params;         /**< Initialization parameters */
+} lis3mdl_t;
+
+/**
  * @brief   Initialize a new LIS3DML device.
  *
  * @param[in] dev          device descriptor of LIS3MDL
- * @param[in] i2c          I2C device connected to
- * @param[in] address      I2C address of the magnometer
- * @param[in] xy_mode      power mode of x- and y-axis
- * @param[in] z_mode       power mode of z-axis
- * @param[in] odr          output data rate of magnometer
- * @param[in] scale        scale configuration of magnometer
- * @param[in] op_mode      operation mode of the device
+ * @param[in] params       initialization parameters
  *
  * @return                   0 on success
  * @return                  -1 on error
  */
-int lis3mdl_init(lis3mdl_t *dev, i2c_t i2c, uint8_t address,
-                 lis3mdl_xy_mode_t xy_mode, lis3mdl_z_mode_t z_mode,
-                 lis3mdl_odr_t odr, lis3mdl_scale_t scale,
-                 lis3mdl_op_t op_mode);
+int lis3mdl_init(lis3mdl_t *dev, const lis3mdl_params_t *params);
 
 /**
  * @brief   Reads the magnometer value of LIS3MDL.

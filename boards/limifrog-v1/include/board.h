@@ -51,6 +51,14 @@ extern "C" {
  #define XTIMER_WIDTH        (16U)
  /** @} */
 
+ /**
+ * @name Define the interface to the LIS3MDL 3-axis magnetometer
+ * @{
+ */
+#define LIS3MDL_PARAM_I2C        (I2C_DEV(1))
+#define LIS3MDL_PARAM_ADDR       (0x28)
+/** @} */
+
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */

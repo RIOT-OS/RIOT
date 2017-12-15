@@ -301,3 +301,8 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += netif
 endif
+
+ifneq (,$(filter lis3mdl,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+endif

@@ -274,6 +274,10 @@ void auto_init(void)
     extern void auto_init_lis3dh(void);
     auto_init_lis3dh();
 #endif
+#ifdef MODULE_LIS3MDL
+extern void auto_init_lis3mdl(void);
+auto_init_lis3mdl();
+#endif
 #ifdef MODULE_MAG3110
     extern void auto_init_mag3110(void);
     auto_init_mag3110();

@@ -1,0 +1,3 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += lis3mdl
+endif
