@@ -13,9 +13,4 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += shell
 USEMODULE += shell_commands
 
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-CFLAGS += -DDEVELHELP
-
 include $(RIOTBASE)/Makefile.include

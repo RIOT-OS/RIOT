@@ -20,8 +20,6 @@ USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 
-CFLAGS += -DDEVELHELP
-
 include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed

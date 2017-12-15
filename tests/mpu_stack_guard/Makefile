@@ -39,8 +39,6 @@ BOARD_WHITELIST += stm32f3discovery # cortex-m4f
 BOARD_WHITELIST += stm32f4discovery # cortex-m4f
 BOARD_WHITELIST += udoo             # cortex-m3
 
-CFLAGS += -DDEVELHELP
-
 USEMODULE += mpu_stack_guard
 
 include $(RIOTBASE)/Makefile.include

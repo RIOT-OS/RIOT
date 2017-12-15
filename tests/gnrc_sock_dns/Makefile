@@ -16,8 +16,6 @@ USEMODULE += shell_commands
 
 USEMODULE += posix
 
-CFLAGS += -DDEVELHELP
-
 LOW_MEMORY_BOARDS := nucleo-f334 msb-430 msb-430h
 
 ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
