@@ -169,7 +169,7 @@ static int mulle_nvram_init(void)
     }
 
     if (rec.u32 != MULLE_NVRAM_MAGIC_EXPECTED) {
-        int i;
+        uint16_t i;
         union {
             uint64_t u64;
             uint8_t  u8[sizeof(uint64_t)];
