@@ -5,3 +5,6 @@ BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
 USEMODULE += xtimer
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py
