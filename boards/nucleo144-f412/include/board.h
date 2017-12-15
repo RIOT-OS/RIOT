@@ -8,9 +8,9 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f412 Nucleo-F412
- * @ingroup     boards_nucleo
- * @brief       Board specific files for the nucleo144-f412 board
+ * @defgroup    boards_nucleo144-f412 Nucleo144-F412
+ * @ingroup     boards_nucleo144
+ * @brief       Board specific files for the STM Nucleo144-f412 board
  * @{
  *
  * @file

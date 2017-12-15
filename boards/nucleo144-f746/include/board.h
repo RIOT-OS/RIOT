@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    boards_nucleo144-f746 Nucleo144-F746
- * @ingroup     boards_nucleo
+ * @ingroup     boards_nucleo144
  * @brief       Board specific files for the nucleo144-f746 board
  * @{
  *
