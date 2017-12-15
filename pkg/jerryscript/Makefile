@@ -9,6 +9,6 @@ CFLAGS += -Wno-implicit-fallthrough
 
 all: git-download
 	@cp Makefile.jerryscript $(PKG_BUILDDIR)/Makefile
-	$(MAKE) -C $(PKG_BUILDDIR)
+	"$(MAKE)" -C $(PKG_BUILDDIR)
 
 include $(RIOTBASE)/pkg/pkg.mk
