@@ -38,3 +38,4 @@ extern "C" {
 }
 #endif
 #endif /* SHTC1_REGS_H */
+/** @} */

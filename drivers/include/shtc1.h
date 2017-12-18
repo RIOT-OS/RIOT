@@ -47,10 +47,8 @@ typedef struct {
 } shtc1_params_t;
 
 typedef struct {
-    i2c_t bus;
-    uint8_t addr;
     shtc1_values_t values;
-    shtc1_crc_type_t crc;
+    shtc1_params_t params;
 } shtc1_t;
 
 enum {

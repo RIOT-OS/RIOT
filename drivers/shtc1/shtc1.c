@@ -53,14 +53,12 @@ int8_t shtc1_init(shtc1_t *const dev, const shtc1_params_t *params)
     /* check for a valid device descriptor and parameters */
     assert(dev && params);
     /* copy settings into the device descriptor */
-    dev->bus = params->bus;
-    dev->addr = params->addr;
-    dev->crc = params->crc;
-    i2c_acquire(dev->bus);
-    if (i2c_init_master(dev->bus, I2C_SPEED_FAST)) {
+    dev->params = *params;
+    i2c_acquire(dev->params.bus);
+    if (i2c_init_master(dev->params.bus, I2C_SPEED_FAST)) {
         return SHTC1_ERROR;
     }
-    i2c_release(dev->bus);
+    i2c_release(dev->params.bus);
     /* Verify the connection by reading the SHTC1's ID and checking its value */
     if (shtc1_id(dev) != SHTC1_OK || ((dev->values.id & 0x3F) !=  SHTC1_ID)) {
         return SHTC1_ERROR;
@@ -73,16 +71,16 @@ int8_t shtc1_measure(shtc1_t *const dev)
     /* Build and issue the measurement command */
     uint8_t cmd[] = { SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_HIGH, SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_LOW };
 
-    i2c_acquire(dev->bus);
-    i2c_write_bytes(dev->bus, dev->addr, cmd, 2);
+    i2c_acquire(dev->params.bus);
+    i2c_write_bytes(dev->params.bus, dev->params.addr, cmd, 2);
     /* Receive the measurement */
     uint8_t received[6];
-    i2c_read_bytes(dev->bus, dev->addr, received, 6);
-    i2c_release(dev->bus);
+    i2c_read_bytes(dev->params.bus, dev->params.addr, received, 6);
+    i2c_release(dev->params.bus);
     /* get 16bit values and check crc */
     uint16_t temp_f = ((received[0] << 8) | received[1]);
     uint16_t abs_humidity = ((received[3] << 8) | received[4]);
-    if (dev->crc) {
+    if (dev->params.crc) {
         if (!((_check_crc(&received[0], received[2]) == 0) && (_check_crc(&received[3], received[5]) == 0))) {
             /* crc check failed */
             DEBUG("CRC Error");
@@ -103,11 +101,11 @@ int8_t shtc1_id(shtc1_t *const dev)
     uint8_t data[] = { SHTC1_COMMAND_ID_HIGH, SHTC1_COMMAND_ID_LOW };
     int8_t check = 0;
 
-    i2c_acquire(dev->bus);
-    check = i2c_write_bytes(dev->bus, dev->addr, data, 2);
+    i2c_acquire(dev->params.bus);
+    check = i2c_write_bytes(dev->params.bus, dev->params.addr, data, 2);
     /* receive ID and check if the send and receive commands were successfull */
-    check += i2c_read_bytes(dev->bus, dev->addr, data, 2);
-    i2c_release(dev->bus);
+    check += i2c_read_bytes(dev->params.bus, dev->params.addr, data, 2);
+    i2c_release(dev->params.bus);
     if (check != 4) {
         /* error occured */
         return SHTC1_ERROR;
@@ -123,9 +121,9 @@ int8_t shtc1_reset(const shtc1_t *const dev)
     uint8_t data[] = { SHTC1_COMMAND_RESET_HIGH, SHTC1_COMMAND_RESET_LOW };
     int8_t check = 0;
 
-    i2c_acquire(dev->bus);
-    check = i2c_write_bytes(dev->bus, dev->addr, data, 2);
-    i2c_release(dev->bus);
+    i2c_acquire(dev->params.bus);
+    check = i2c_write_bytes(dev->params.bus, dev->params.addr, data, 2);
+    i2c_release(dev->params.bus);
     if (check != 2) {
         /* error occured */
         return SHTC1_ERROR;

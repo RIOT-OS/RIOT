@@ -63,3 +63,4 @@ static const shtc1_params_t shtc1_params[] = {
 }
 #endif
 #endif /*SHTC1_PARAMS_C*/
+/** @} */
