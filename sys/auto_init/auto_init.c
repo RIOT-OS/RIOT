@@ -388,4 +388,9 @@ auto_init_mpu9150();
     auto_init_candev();
 
 #endif /* MODULE_AUTO_INIT_CAN */
+
+    extern void auto_init_app(void);
+    auto_init_app();
 }
+
+void __attribute__((weak)) auto_init_app(void) {}
