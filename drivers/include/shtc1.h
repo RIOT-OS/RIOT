@@ -34,22 +34,37 @@ typedef enum {
     CRC_ENABLED
 } shtc1_crc_type_t;
 
+/**
+ * @brief   value struct, where all results obtained from the sensor will be saved
+ * @{
+ */
 typedef struct {
-    float temp;
-    float rel_humidity;
-    unsigned int id;
+    float temp;         /**< Temperature after an according call to the measurement function */
+    float rel_humidity; /**< Relative humidity after an according call to the measuerment funtion*/
+    unsigned int id;    /**< ID read from the sensor, only available after shtc1_id() was called */
 } shtc1_values_t;
+/** @} */
 
+/**
+ * @brief   settings struct with all relevant parameters
+ * @{
+ */
 typedef struct {
-    i2c_t bus;
-    uint8_t addr;
-    shtc1_crc_type_t crc;
+    i2c_t bus;  /**< I2C bus descriptor */
+    uint8_t addr;   /**< I2C address of the sensor */
+    shtc1_crc_type_t crc;   /**< crc check enabled or disabled (CRC_ENABLED/CRC_DISABLED) */
 } shtc1_params_t;
+/** @} */
 
+/**
+ * @brief   device descriptor for the SHTC1
+ * @{
+ */
 typedef struct {
-    shtc1_values_t values;
-    shtc1_params_t params;
+    shtc1_values_t values;  /**< Values struct, where all read data will be stored */
+    shtc1_params_t params;  /**< Paramteres struct with all settings set */
 } shtc1_t;
+/** @} */
 
 enum {
     SHTC1_OK = 0,
