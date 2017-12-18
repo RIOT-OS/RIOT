@@ -243,8 +243,11 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                 uint8_t pfx_len = (uint8_t)(opt->context >> 8U);
                 /* acquire locks a recursive mutex so we are safe calling this
                  * public function */
-                gnrc_netif_ipv6_addr_add_internal(netif, opt->data, pfx_len, flags);
-                res = sizeof(ipv6_addr_t);
+                res = gnrc_netif_ipv6_addr_add_internal(netif, opt->data,
+                                                        pfx_len, flags);
+                if (res >= 0) {
+                    res = sizeof(ipv6_addr_t);
+                }
             }
             break;
         case NETOPT_IPV6_ADDR_REMOVE:
@@ -258,8 +261,10 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             assert(opt->data_len == sizeof(ipv6_addr_t));
             /* acquire locks a recursive mutex so we are safe calling this
              * public function */
-            gnrc_netif_ipv6_group_join_internal(netif, opt->data);
-            res = sizeof(ipv6_addr_t);
+            res = gnrc_netif_ipv6_group_join_internal(netif, opt->data);
+            if (res >= 0) {
+                res = sizeof(ipv6_addr_t);
+            }
             break;
         case NETOPT_IPV6_GROUP_LEAVE:
             assert(opt->data_len == sizeof(ipv6_addr_t));

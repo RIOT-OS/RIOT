@@ -18,11 +18,14 @@
 #ifndef NET_GNRC_NETIF_IPV6_H
 #define NET_GNRC_NETIF_IPV6_H
 
+#include <assert.h>
+
 #include "evtimer_msg.h"
 #include "net/ipv6/addr.h"
 #ifdef MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib/conf.h"
 #endif
+#include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/conf.h"
 #ifdef MODULE_NETSTATS_IPV6
 #include "net/netstats.h"
