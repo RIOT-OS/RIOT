@@ -21,7 +21,7 @@
 #ifndef SHTC1_REGS_H
 #define SHTC1_REGS_H
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 

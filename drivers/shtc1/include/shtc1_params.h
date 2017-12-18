@@ -24,7 +24,7 @@
 #include "board.h"
 #include "shtc1.h"
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 

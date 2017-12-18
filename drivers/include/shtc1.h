@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include "periph/i2c.h"
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
