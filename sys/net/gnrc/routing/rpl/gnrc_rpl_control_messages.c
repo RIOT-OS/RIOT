@@ -447,8 +447,8 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 }
                 ipv6_addr_set_aiid(&pi->prefix, iid.uint8);
                 /* TODO: find a way to do this with DAD (i.e. state != VALID) */
-                gnrc_netif_ipv6_addr_add(netif, &pi->prefix, pi->prefix_len,
-                                         GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+                gnrc_netif_ipv6_addr_add_internal(netif, &pi->prefix, pi->prefix_len,
+                                                  GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
                 /* set lifetimes */
                 gnrc_ipv6_nib_pl_set(netif->pid, &pi->prefix, pi->prefix_len,
                                      _sec_to_ms(byteorder_ntohl(pi->valid_lifetime)),
