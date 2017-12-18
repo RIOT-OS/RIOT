@@ -9,6 +9,6 @@ INCLUDES+=-I$(TINYASN1_ROOT)/src
 .PHONY: all
 
 all: git-download
-	$(MAKE) -C $(PKG_BUILDDIR)/src
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src
 
 include $(RIOTBASE)/pkg/pkg.mk

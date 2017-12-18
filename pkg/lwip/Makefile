@@ -6,6 +6,6 @@ PKG_LICENSE=BSD-3-Clause
 .PHONY: all
 
 all: git-download
-	$(MAKE) -C $(PKG_BUILDDIR)
+	"$(MAKE)" -C $(PKG_BUILDDIR)
 
 include $(RIOTBASE)/pkg/pkg.mk

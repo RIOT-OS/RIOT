@@ -11,6 +11,6 @@ all: git-download
 	@cp $(PKG_BUILDDIR)/aes/Makefile.riot $(PKG_BUILDDIR)/aes/Makefile
 	@cp $(PKG_BUILDDIR)/ecc/Makefile.riot $(PKG_BUILDDIR)/ecc/Makefile
 	@cp $(PKG_BUILDDIR)/sha2/Makefile.riot $(PKG_BUILDDIR)/sha2/Makefile
-	$(MAKE) -C $(PKG_BUILDDIR)
+	"$(MAKE)" -C $(PKG_BUILDDIR)
 
 include $(RIOTBASE)/pkg/pkg.mk
