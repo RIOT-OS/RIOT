@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    boards_msb430-common MSB-430 common
- * @ingroup     boards
- * @brief       Common files for all MSB-430 boards
+ * @defgroup    boards_common_msb-430 MSB-430 common
+ * @ingroup     boards_common
+ * @brief       Shared files and configuration for all MSB-430 boards.
  * @{
  *
  * @file

@@ -9,15 +9,13 @@
 /**
  * @ingroup boards
  * @{
- */
-
-/**
  * @file
  * @brief       msb-430 common board initialization
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
+ * @}
  */
 
 #include "cpu.h"

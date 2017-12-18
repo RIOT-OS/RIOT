@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    boards_nucleo32-f042 Nucleo-F042
- * @ingroup     boards_nucleo
- * @brief       Board specific files for the nucleo32-f042 board
+ * @defgroup    boards_nucleo32-f042 Nucleo32-F042
+ * @ingroup     boards_nucleo32
+ * @brief       Board specific files for the STM Nucleo32-f042 board
  * @{
  *
  * @file

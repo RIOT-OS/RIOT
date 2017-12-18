@@ -10,7 +10,7 @@
 #define SHT11_BOARD_H
 
 /**
- * @ingroup     msb_430h
+ * @ingroup     boards_common_msb-430
  * @{
  */
 

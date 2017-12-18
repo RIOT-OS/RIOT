@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    boards_arduino-atmega-common Arduino Atmega Common
- * @ingroup     boards
- * @brief       Common configuration and settings for Arduino Atmega boards
+ * @defgroup    boards_common_frdm NXP FRDM Common
+ * @ingroup     boards_common
+ * @brief       Shared files and configuration for the NXP Freedom Boards.
  */

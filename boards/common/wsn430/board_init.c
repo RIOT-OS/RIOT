@@ -7,6 +7,18 @@
  * directory for more details.
  */
 
+ /**
+  * @ingroup     boards_common_wsn430
+  * @{
+  *
+  * @file
+  * @brief       Board initialization for WSN430
+  *
+  * @author      Milan Babel <babel@inf.fu-berlin.de>
+  *
+  * @}
+  */
+
 #include "cpu.h"
 #include "irq.h"
 #include "board.h"

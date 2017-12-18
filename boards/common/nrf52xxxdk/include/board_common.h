@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    boards_common_nrf52 Shared nRF52 code
+ * @defgroup    boards_common_nrf52 NRF52 common
  * @ingroup     boards_common
- * @brief       Shared configuration for all nRF52-based boards
+ * @brief       Shared files and configuration for all nRF52 boards.
  * @{
  *
  * @file
