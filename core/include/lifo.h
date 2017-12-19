@@ -40,7 +40,9 @@ int lifo_empty(int *array);
 /**
  * @brief               Initialize a lifo array.
  *
- * @param[in,out] array An array of size *n* + 1, may not be NULL.
+ * @pre `array != NULL`
+ *
+ * @param[in,out] array An array of size *n* + 1. Must not be `NULL`.
  * @param[in] n         Maximum integer value the lifo is able to store.
  */
 void lifo_init(int *array, int n);
@@ -48,8 +50,10 @@ void lifo_init(int *array, int n);
 /**
  * @brief               Insert an element into the lifo
  *
+ * @pre `array != NULL`
+ *
  * @param[in,out] array An integer array of least *i* + 1 size that **does not
- *                      already contain *i***, may not be NULL.
+ *                      already contain *i***. Must not be `NULL`.
  * @param[in] i         The integer value to store, between 0 and the size of
  *                      the array - 1, must not be stored already.
  *
@@ -59,7 +63,9 @@ void lifo_insert(int *array, int i);
 /**
  * @brief           Extract the least recently inserted element from the lifo.
  *
- * @param[in] array An integer array, may not be NULL.
+ * @pre `array != NULL`
+ *
+ * @param[in] array An integer array. Must not be NULL.
  *
  * @return          -1, if the lifo is empty.
  * @return          the least recently inserted element, otherwise.

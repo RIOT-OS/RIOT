@@ -115,7 +115,7 @@ extern "C" {
 /**
  * @brief   Number of address registration retries
  *
- * @note    May not be greater than 7.
+ * @note    Must not be greater than 7.
  */
 #define SIXLOWPAN_ND_REG_TRANSMIT_NUMOF         (3U)
 /**

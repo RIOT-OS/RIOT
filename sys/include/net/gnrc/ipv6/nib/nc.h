@@ -247,7 +247,7 @@ void gnrc_ipv6_nib_nc_del(const ipv6_addr_t *ipv6, unsigned iface);
  *
  * @pre `ipv6 != NULL`
  *
- * @param[in] ipv6 A neighbor's IPv6 address. May not be NULL.
+ * @param[in] ipv6 A neighbor's IPv6 address. Must not be NULL.
  *
  * This function shall be called if an upper layer gets reachability
  * confirmation via its own means (e.g. a TCP connection build-up or

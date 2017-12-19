@@ -157,7 +157,7 @@ extern "C" {
 /**
  * @brief   Default for DupAddrDetectTransmits
  * @see     [RFC 4862, section 5.1](https://tools.ietf.org/html/rfc4862#section-5.1)
- * @note    May not be greater than 7.
+ * @note    Must not be greater than 7.
  */
 #define NDP_DAD_TRANSMIT_NUMOF      (1U)
 #define NDP_MAX_ANYCAST_MS_DELAY    (1000U)     /**< MAX_ANYCAST_DELAY_TIME (in ms) */

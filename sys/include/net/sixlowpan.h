@@ -238,7 +238,7 @@ static inline bool sixlowpan_frag_is(sixlowpan_frag_t *hdr)
 /**
  * @brief   Checks if datagram is an IPHC datagram.
  *
- * @param[in] data  Data of a datagram, may not be NULL.
+ * @param[in] data  Data of a datagram. Must not be NULL.
  *
  * @return  true, if datagram is an IPHC datagram.
  * @return  false, if datagram is not an IPHC datagram.
