@@ -7,6 +7,11 @@ PKG_LICENSE=Apache-2.0
 
 CFLAGS += -Wno-implicit-fallthrough
 
+# disable warnings when compiling with LLVM for board native
+ifeq ($(TOOLCHAIN)_$(BOARD),llvm_native)
+export CFLAGS += -Wno-macro-redefined -Wno-gnu-folding-constant
+endif
+
 all: git-download
 	@cp Makefile.jerryscript $(PKG_BUILDDIR)/Makefile
 	"$(MAKE)" -C $(PKG_BUILDDIR)
