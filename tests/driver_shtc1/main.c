@@ -35,7 +35,6 @@ int main(void)
             /*print temp value*/
             printf("Temperature: %.2f C \n Humidity: %.2f%%\n", shtc.values.temp, \
                    shtc.values.rel_humidity);
-            return 0;
         }
         xtimer_sleep(2);
     }
