@@ -467,7 +467,7 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
     gnrc_gomach_l2_id_t id_list[GNRC_GOMACH_SLOSCH_UNIT_COUNT];
     uint8_t slots_list[GNRC_GOMACH_SLOSCH_UNIT_COUNT];
 
-    /* Calculate how many slots left can be allocated to senders. */
+    /* Check the maximum number of slots that can be allocated to senders. */
     uint16_t max_slot_num = (GNRC_GOMACH_SUPERFRAME_DURATION_US - gnrc_gomach_phase_now(netif)) /
                             GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
 
