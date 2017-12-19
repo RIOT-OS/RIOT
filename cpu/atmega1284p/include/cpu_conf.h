@@ -34,10 +34,10 @@ extern "C" {
 #define THREAD_EXTRA_STACKSIZE_PRINTF    (256)
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#define THREAD_STACKSIZE_DEFAULT   (256)
+#define THREAD_STACKSIZE_DEFAULT   (512)
 #endif
 
-#define THREAD_STACKSIZE_IDLE      (128)
+#define THREAD_STACKSIZE_IDLE      (512 + THREAD_EXTRA_STACKSIZE_PRINTF)
 /** @} */
 
 #ifdef __cplusplus
