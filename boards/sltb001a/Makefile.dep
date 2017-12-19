@@ -7,4 +7,4 @@ endif
 # i2c is required for environmental sensors
 USEMODULE += periph_i2c
 
-include $(RIOTCPU)/efr32mg1p/Makefile.dep
+include $(RIOTCPU)/efm32/Makefile.dep

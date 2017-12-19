@@ -1,5 +1,5 @@
 # define the cpu used by ikea-tradfri
-export CPU = efr32mg1p
+export CPU = efm32
 export CPU_MODEL = efr32mg1p132f256gm32
 
 # set default port depending on operating system

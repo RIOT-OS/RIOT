@@ -1,1 +1,0 @@
-INCLUDES += -I$(PKGDIRBASE)/emlib/emlib/inc -I$(PKGDIRBASE)/emlib/emlib-extra/inc

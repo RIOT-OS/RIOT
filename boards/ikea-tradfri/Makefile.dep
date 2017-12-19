@@ -2,4 +2,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
     USEMODULE += saul_gpio
 endif
 
-include $(RIOTCPU)/efr32mg1p/Makefile.dep
+include $(RIOTCPU)/efm32/Makefile.dep
