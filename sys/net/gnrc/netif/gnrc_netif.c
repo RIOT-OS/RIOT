@@ -1106,6 +1106,7 @@ static int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
 }
 #endif  /* MODULE_GNRC_IPV6 */
 
+#if (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN)
 bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
 {
     switch (netif->device_type) {
@@ -1117,6 +1118,7 @@ bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
             return false;
     }
 }
+#endif  /* (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN) */
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {
