@@ -266,17 +266,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Maximum number of slots allowed to be allocated in one cycle.
- *
- * GoMacH dynamically allocates transmission slots to senders that have
- * pending packets.This macro defines the maximum number of slots allowed
- * to be allocated in one cycle.
- */
-#ifndef GNRC_GOMACH_MAX_ALLOC_SLOTS_NUM
-#define GNRC_GOMACH_MAX_ALLOC_SLOTS_NUM           (25U)
-#endif
-
-/**
  * @brief Maximum number of senders allowed to be allocated slots in one cycle.
  *
  * Exclude the static GoMacH MAC header payload in the beacon, which is 20 bytes,
