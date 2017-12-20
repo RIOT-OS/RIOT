@@ -19,7 +19,7 @@ DIST_TOOLS=${RIOTBASE:-.}/dist/tools
 
 . ${DIST_TOOLS}/ci/changed_files.sh
 
-FILES=$(FILEREGEX='*.py$' changed_files)
+FILES=$(FILEREGEX='(?=*.py$|pyterm$)' changed_files)
 
 if [ -z "${FILES}" ]
 then
