@@ -10,8 +10,8 @@
 /**
  * @defgroup    net_gnrc_lwmac LWMAC
  * @ingroup     net_gnrc
- * @brief       LWMAC is a Lightweight 802.15.4 MAC protocol that allows for duty cycling
- *              to save energy.
+ * @brief       A Lightweight duty-cycling 802.15.4 MAC protocol
+ *
  *
  * ## LWMAC implementation
  *
