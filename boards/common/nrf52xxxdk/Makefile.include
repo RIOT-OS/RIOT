@@ -2,8 +2,10 @@
 export CPU = nrf52
 
 # include this module into the build
-INCLUDES += -I$(RIOTBOARD)/common/nrf52xxxdk/include
-USEMODULE += boards_common_nrf52
+ifeq (,$(filter acd52832,$(BOARD)))
+  INCLUDES += -I$(RIOTBOARD)/common/nrf52xxxdk/include
+  USEMODULE += boards_common_nrf52
+endif
 
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
