@@ -1,4 +1,3 @@
-APPLICATION = rng
 include ../Makefile.tests_common
 
 # some boards have not enough rom and/or ram
