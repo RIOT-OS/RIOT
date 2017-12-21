@@ -21,19 +21,20 @@
 #include <sys/stat.h> /* for struct stat */
 #include <sys/statvfs.h> /* for struct statvfs */
 #include <fcntl.h> /* for O_ACCMODE, ..., fcntl */
+#include <unistd.h> /* for STDOUT_FILENO */
 
 #include "vfs.h"
 #include "mutex.h"
 #include "thread.h"
 #include "kernel_types.h"
 #include "clist.h"
+#include "uart_stdio.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 #if ENABLE_DEBUG
 /* Since some of these functions are called by printf, we can't really call
  * printf from our functions or we end up in an infinite recursion. */
-#include <unistd.h> /* for STDOUT_FILENO */
 #define DEBUG_NOT_STDOUT(fd, ...) if (fd != STDOUT_FILENO) { DEBUG(__VA_ARGS__); }
 #else
 #define DEBUG_NOT_STDOUT(...)
@@ -130,6 +131,48 @@ static inline int _fd_is_valid(int fd);
 
 static mutex_t _mount_mutex = MUTEX_INIT;
 static mutex_t _open_mutex = MUTEX_INIT;
+
+static ssize_t uart_stdio_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes);
+static ssize_t uart_stdio_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes);
+
+/**
+ * @brief VFS file operation table for stdin/stdout/stderr
+ */
+static vfs_file_ops_t uart_stdio_vfs_ops = {
+    .read = uart_stdio_vfs_read,
+    .write = uart_stdio_vfs_write,
+};
+
+static ssize_t uart_stdio_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
+{
+    int fd = filp->private_data.value;
+    if (fd != STDIN_FILENO) {
+        return -EBADF;
+    }
+    return uart_stdio_read(dest, nbytes);
+}
+
+static ssize_t uart_stdio_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes)
+{
+    int fd = filp->private_data.value;
+    if (fd == STDIN_FILENO) {
+        return -EBADF;
+    }
+    return uart_stdio_write(src, nbytes);
+}
+
+void vfs_init(void) {
+    memset(_vfs_open_files, 0x00, sizeof(_vfs_open_files));
+
+    int fd;
+    fd = vfs_bind(STDIN_FILENO, O_RDONLY, &uart_stdio_vfs_ops, (void*) STDIN_FILENO);
+    assert(fd == STDIN_FILENO);
+    fd = vfs_bind(STDOUT_FILENO, O_WRONLY, &uart_stdio_vfs_ops, (void*) STDOUT_FILENO);
+    assert(fd == STDOUT_FILENO);
+    fd = vfs_bind(STDERR_FILENO, O_WRONLY, &uart_stdio_vfs_ops, (void*) STDERR_FILENO);
+    assert(fd == STDERR_FILENO);
+    (void) fd;
+}
 
 int vfs_close(int fd)
 {
