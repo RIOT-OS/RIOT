@@ -82,8 +82,8 @@ extern "C" {
  *
  *          16 bytes key, only required for ABP join procedure type.
  */
-#ifndef LORAMAC_NWKS_KEY_DEFAULT
-#define LORAMAC_NWKS_KEY_DEFAULT       { 0x00, 0x00, 0x00, 0x00, \
+#ifndef LORAMAC_NWK_SKEY_DEFAULT
+#define LORAMAC_NWK_SKEY_DEFAULT       { 0x00, 0x00, 0x00, 0x00, \
                                          0x00, 0x00, 0x00, 0x00, \
                                          0x00, 0x00, 0x00, 0x00, \
                                          0x00, 0x00, 0x00, 0x00 }
