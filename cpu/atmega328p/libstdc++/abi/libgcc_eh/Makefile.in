@@ -1,0 +1,24 @@
+LIBGCC_EH_OUT := $(top_builddir)src/abi/libgcc_eh/
+
+OBJS = $(call list-archive-members,$(LIBGCC_EH))
+libgcc_eh-$(IMPORT_LIBGCC_EH) := $(OBJS)
+
+LIBGCC_EH_VAR := $(call variablify,$(LIBGCC_EH))
+LIBGCC_EH_DEP := $(LIBGCC_EH_OUT).$(LIBGCC_EH_VAR).dep
+
+ifeq ($(filter $(noconfig_targets),$(MAKECMDGOALS)),)
+-include $(LIBGCC_EH_DEP)
+endif
+
+
+ifneq ($(libgcc_eh-y),)
+$(libgcc_eh-y): $(LIBGCC_EH)
+endif
+$(LIBGCC_EH_DEP): $(LIBGCC_EH)
+	$(Q)$(RM) $(LIBGCC_EH_OUT).*dep $(LIBGCC_EH_OUT)*.o
+	$(Q)$(if $(LIBGCC_EH),(cd $(LIBGCC_EH_OUT) && $(AR) x $(LIBGCC_EH)))
+	$(Q)echo "libgcc_eh-y := \$$(addprefix \$$(LIBGCC_EH_OUT),$(libgcc_eh-y))" > $@
+
+CLEAN_src/abi/libgcc_eh: ;
+DISTCLEAN_src/abi/libgcc_eh:
+	$(do_rm) $(addprefix $(LIBGCC_EH_OUT),.*dep *.o)

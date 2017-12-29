@@ -6,3 +6,6 @@ export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
 
 # CPU depends on the atmega common module, so include it
 include $(ATMEGA_COMMON)Makefile.include
+
+# include module specific includes
+export INCLUDES += -I$(RIOTCPU)/atmega328p/libstdc++

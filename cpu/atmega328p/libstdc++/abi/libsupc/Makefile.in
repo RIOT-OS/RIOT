@@ -1,0 +1,24 @@
+LIBSUPC_OUT := $(top_builddir)src/abi/libsupc/
+
+OBJS = $(call list-archive-members,$(LIBSUP))
+OBJS-OMIT = $(filter new_op%.o del_op%.o pure.o new_handler.o eh_alloc.o eh_globals.o,$(OBJS))
+libsupc-$(IMPORT_LIBSUP) := $(filter-out $(OBJS-OMIT),$(OBJS))
+
+LIBSUP_VAR := $(call variablify,$(LIBSUP))
+LIBSUP_DEP :=$(LIBSUPC_OUT).$(LIBSUP_VAR).dep
+
+ifeq ($(filter $(noconfig_targets),$(MAKECMDGOALS)),)
+-include $(LIBSUP_DEP)
+endif
+
+ifneq ($(libsupc-y),)
+$(libsupc-y): $(LIBSUP)
+endif
+$(LIBSUP_DEP): $(LIBSUP) $(LIBSUPC_OUT)Makefile.in
+	$(Q)$(RM) $(LIBSUPC_OUT).*dep $(LIBSUPC_OUT)*.o
+	$(Q)$(if $(LIBSUP),(cd $(LIBSUPC_OUT) && $(AR) x $(LIBSUP) && $(RM) $(OBJS-OMIT)))
+	$(Q)echo "libsupc-y := \$$(addprefix \$$(LIBSUPC_OUT),$(libsupc-y))" > $@
+
+CLEAN_src/abi/libsupc: ;
+DISTCLEAN_src/abi/libsupc:
+	$(do_rm) $(addprefix $(LIBSUPC_OUT), .*dep *.o)

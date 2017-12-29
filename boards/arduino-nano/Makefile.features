@@ -1,1 +1,2 @@
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.features
+-include $(RIOTCPU)/atmega328p/Makefile.features
