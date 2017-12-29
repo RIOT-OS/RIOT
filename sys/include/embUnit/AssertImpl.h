@@ -46,8 +46,8 @@ void assertImplementationCStr(const char *expected,const char *actual, long line
 
 #define TEST_ASSERT_EQUAL_STRING(expected_, actual_) \
     do { \
-        __typeof__(expected_) ____expected__ = expected_; \
-        __typeof__(actual_) ____actual__ = actual_; \
+        const char *____expected__ = expected_; \
+        const char *____actual__ = actual_; \
         if (stdimpl_strcmp(____expected__, ____actual__) != 0) { \
             assertImplementationCStr(____expected__, ____actual__, __LINE__, RIOT_FILE_RELATIVE); \
             return; \
