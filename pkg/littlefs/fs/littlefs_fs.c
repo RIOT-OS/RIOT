@@ -123,14 +123,12 @@ static int _dev_sync(const struct lfs_config *c)
     return 0;
 }
 
-static int _mount(vfs_mount_t *mountp)
+static int prepare(littlefs_desc_t *fs)
 {
-    littlefs_desc_t *fs = mountp->private_data;
-
     mutex_init(&fs->lock);
     mutex_lock(&fs->lock);
 
-    DEBUG("littlefs: mount: mountp=%p\n", (void *)mountp);
+    memset(&fs->fs, 0, sizeof(fs->fs));
 
     if (!fs->config.block_count) {
         fs->config.block_count = fs->dev->sector_count - fs->base_addr;
@@ -161,18 +159,36 @@ static int _mount(vfs_mount_t *mountp)
     fs->config.prog_buffer = fs->prog_buf;
 #endif
 
-    mtd_init(fs->dev);
+    return mtd_init(fs->dev);
+}
 
-    int ret = lfs_mount(&fs->fs, &fs->config);
-    if (ret < 0) {
-        DEBUG("littlefs: formatting\n");
-        ret = lfs_format(&fs->fs, &fs->config);
-        if (ret >= 0) {
-            DEBUG("littlefs: mounting\n");
-            ret = lfs_mount(&fs->fs, &fs->config);
-        }
+static int _format(vfs_mount_t *mountp)
+{
+    littlefs_desc_t *fs = mountp->private_data;
+
+    DEBUG("littlefs: format: mountp=%p\n", (void *)mountp);
+    int ret = prepare(fs);
+    if (ret) {
+        return -ENODEV;
     }
 
+    ret = lfs_format(&fs->fs, &fs->config);
+    mutex_unlock(&fs->lock);
+
+    return littlefs_err_to_errno(ret);
+}
+
+static int _mount(vfs_mount_t *mountp)
+{
+    littlefs_desc_t *fs = mountp->private_data;
+
+    DEBUG("littlefs: mount: mountp=%p\n", (void *)mountp);
+    int ret = prepare(fs);
+    if (ret) {
+        return -ENODEV;
+    }
+
+    ret = lfs_mount(&fs->fs, &fs->config);
     mutex_unlock(&fs->lock);
 
     return littlefs_err_to_errno(ret);
@@ -474,6 +490,7 @@ static int _closedir(vfs_DIR *dirp)
 }
 
 static const vfs_file_system_ops_t littlefs_fs_ops = {
+    .format = _format,
     .mount = _mount,
     .umount = _umount,
     .unlink = _unlink,
