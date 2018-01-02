@@ -121,7 +121,7 @@ static mtd_dev_t dev = {
 static mtd_dev_t *_dev = (mtd_dev_t*) &dev;
 #endif /* MTD_0 */
 
-#ifdef MODULE_SPIFFS
+#if defined(MODULE_SPIFFS)
 #include "fs/spiffs_fs.h"
 static char fs_name[] = "spiffs";
 
@@ -143,9 +143,7 @@ static void init_fs(void)
     mtd_init(_dev);
     mtd_erase(_dev, 0, _dev->page_size * _dev->pages_per_sector * _dev->sector_count);
 }
-#endif
-
-#ifdef MODULE_LITTLEFS
+#elif defined(MODULE_LITTLEFS)
 #include "fs/littlefs_fs.h"
 static char fs_name[] = "littlefs";
 
@@ -163,6 +161,8 @@ static void init_fs(void)
     mtd_init(_dev);
     mtd_erase(_dev, 0, _dev->page_size * _dev->pages_per_sector * _dev->sector_count);
 }
+#else
+#define "No or unsupported file system module used"
 #endif
 
 #define FILE_LOOP_SIZE  (20)
