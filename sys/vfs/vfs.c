@@ -407,9 +407,18 @@ int vfs_closedir(vfs_DIR *dirp)
     return res;
 }
 
-int vfs_mount(vfs_mount_t *mountp)
+/**
+ * @brief Check if the given mount point is mounted
+ *
+ * If the mount point is not mounted, _mount_mutex will be locked by this function
+ *
+ * @param mountp    mount point to check
+ * @return 0 on success (mount point is valid and not mounted)
+ * @return -EINVAL if mountp is invalid
+ * @return -EBUSY if mountp is already mounted
+ */
+static int check_mount(vfs_mount_t *mountp)
 {
-    DEBUG("vfs_mount: %p\n", (void *)mountp);
     if ((mountp == NULL) || (mountp->fs == NULL) || (mountp->mount_point == NULL)) {
         return -EINVAL;
     }
@@ -429,11 +438,43 @@ int vfs_mount(vfs_mount_t *mountp)
         DEBUG("vfs_mount: Already mounted\n");
         return -EBUSY;
     }
+
+    return 0;
+}
+
+int vfs_format(vfs_mount_t *mountp)
+{
+    DEBUG("vfs_format: %p\n", (void *)mountp);
+    int ret = check_mount(mountp);
+    if (ret < 0) {
+        return ret;
+    }
+    mutex_unlock(&_mount_mutex);
+
+    if (mountp->fs->fs_op != NULL) {
+        if (mountp->fs->fs_op->format != NULL) {
+            return mountp->fs->fs_op->format(mountp);
+        }
+    }
+
+    /* Format operation not supported */
+    return -ENOTSUP;
+}
+
+int vfs_mount(vfs_mount_t *mountp)
+{
+    DEBUG("vfs_mount: %p\n", (void *)mountp);
+    int ret = check_mount(mountp);
+    if (ret < 0) {
+        return ret;
+    }
+
     if (mountp->fs->fs_op != NULL) {
         if (mountp->fs->fs_op->mount != NULL) {
             /* yes, a file system driver does not need to implement mount/umount */
             int res = mountp->fs->fs_op->mount(mountp);
             if (res < 0) {
+                DEBUG("vfs_mount: error %d\n", res);
                 mutex_unlock(&_mount_mutex);
                 return res;
             }

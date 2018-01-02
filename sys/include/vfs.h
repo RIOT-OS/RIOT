@@ -427,6 +427,16 @@ struct vfs_dir_ops {
  */
 struct vfs_file_system_ops {
     /**
+     * @brief Format the file system on the given mount point
+     *
+     * @param[in]   mountp  file system to format
+     *
+     * @return 0 on success
+     * @return <0 on error
+     */
+    int (*format) (vfs_mount_t *mountp);
+
+    /**
      * @brief Perform any extra processing needed after mounting a file system
      *
      * If this call returns an error, the whole vfs_mount call will signal a
@@ -694,6 +704,21 @@ int vfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry);
  * @return <0 on error, the directory stream dirp should be considered invalid
  */
 int vfs_closedir(vfs_DIR *dirp);
+
+/**
+ * @brief Format a file system
+ *
+ * @p mountp should have been populated in advance with a file system driver,
+ * a mount point, and private_data (if the file system driver uses one).
+ *
+ * @pre @p mountp must not be mounted
+ *
+ * @param[in]  mountp   pointer to the mount structure of the filesystem to format
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_format(vfs_mount_t *mountp);
 
 /**
  * @brief Mount a file system
