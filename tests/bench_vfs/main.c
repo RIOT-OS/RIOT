@@ -18,6 +18,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
 #include <fcntl.h>
 
 #include "board.h"
@@ -210,8 +212,8 @@ int main(void)
         vfs_close(fd);
         end = xtimer_now();
         diff = xtimer_diff(end, begin);
-        printf("File #%d, %d bytes written in: %" PRIu32 "us\n", f,
-               LOOP_SIZE * sizeof(buf - 1), xtimer_usec_from_ticks(diff));
+        printf("File #%d, %u bytes written in: %" PRIu32 "us\n", f,
+               (unsigned)(LOOP_SIZE * (sizeof(buf) - 1)), xtimer_usec_from_ticks(diff));
         total_time += xtimer_usec_from_ticks(diff);
     }
     printf("Mean time: %" PRIu32 "us\n", total_time / (uint32_t)FILE_LOOP_SIZE);
