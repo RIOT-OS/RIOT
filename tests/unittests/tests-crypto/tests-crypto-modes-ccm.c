@@ -100,6 +100,9 @@ static void test_encrypt_op(uint8_t* key, uint8_t key_len,
     int len, err, cmp;
     size_t len_encoding = nonce_and_len_encoding_size - nonce_len;
 
+    TEST_ASSERT_MESSAGE(sizeof(data) >= output_expected_len,
+                        "Output buffer too small");
+
     err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
@@ -125,6 +128,9 @@ static void test_decrypt_op(uint8_t* key, uint8_t key_len,
     cipher_t cipher;
     int len, err, cmp;
     size_t len_encoding = nonce_and_len_encoding_size - nonce_len;
+
+    TEST_ASSERT_MESSAGE(sizeof(data) >= output_expected_len,
+                        "Output buffer too small");
 
     err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
