@@ -446,7 +446,7 @@ uint8_t sx127x_get_bandwidth(const sx127x_t *dev)
     return dev->settings.lora.bandwidth;
 }
 
-inline void _low_datarate_optimize(sx127x_t *dev)
+static void _low_datarate_optimize(sx127x_t *dev)
 {
     if ( ((dev->settings.lora.bandwidth == LORA_BW_125_KHZ) &&
           ((dev->settings.lora.datarate == LORA_SF11) ||
@@ -471,7 +471,7 @@ inline void _low_datarate_optimize(sx127x_t *dev)
 #endif
 }
 
-inline void _update_bandwidth(const sx127x_t *dev)
+static void _update_bandwidth(const sx127x_t *dev)
 {
     uint8_t config1_reg = sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG1);
 #if defined(MODULE_SX1272)
