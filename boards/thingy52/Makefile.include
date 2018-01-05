@@ -1,0 +1,9 @@
+# CPU configuration for the Thingy:52
+CPU_MODEL = nrf52832xxaa
+
+# override default PORT
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# use shared Makefile.include
+include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include

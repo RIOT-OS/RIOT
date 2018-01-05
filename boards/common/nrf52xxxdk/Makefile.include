@@ -2,7 +2,7 @@
 export CPU = nrf52
 
 # include this module into the build
-ifeq (,$(filter acd52832,$(BOARD)))
+ifeq (,$(filter thingy52 acd52832,$(BOARD)))
   INCLUDES += -I$(RIOTBOARD)/common/nrf52xxxdk/include
   USEMODULE += boards_common_nrf52
 endif
