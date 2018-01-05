@@ -775,7 +775,8 @@ int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif, const ipv6_addr_t *addr)
     return idx;
 }
 
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_CC110X)
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_CC110X) || \
+    defined(MODULE_NRFMIN)
 static void _create_iid_from_short(const gnrc_netif_t *netif, eui64_t *eui64)
 {
     const unsigned offset = sizeof(eui64_t) - netif->l2addr_len;
@@ -786,7 +787,8 @@ static void _create_iid_from_short(const gnrc_netif_t *netif, eui64_t *eui64)
     eui64->uint8[4] = 0xfe;
     memcpy(&eui64->uint8[offset], netif->l2addr, netif->l2addr_len);
 }
-#endif /* define(MODULE_NETDEV_IEEE802154) || defined(MODULE_CC110X) */
+#endif /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_CC110X) ||
+        * defined(MODULE_NRFMIN) */
 
 int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
 {
@@ -823,8 +825,9 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
                 }
                 break;
 #endif
-#ifdef MODULE_CC110X
+#if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
             case NETDEV_TYPE_CC110X:
+            case NETDEV_TYPE_NRFMIN:
                 _create_iid_from_short(netif, eui64);
                 return 0;
 #endif
