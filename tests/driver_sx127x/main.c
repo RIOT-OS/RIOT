@@ -104,11 +104,11 @@ int lora_setup_cmd(int argc, char **argv) {
     /* Configure radio device */
     netdev_t *netdev = (netdev_t*) &sx127x;
     netdev->driver->set(netdev, NETOPT_BANDWIDTH,
-                        &lora_bw, sizeof(uint8_t));
+                        &lora_bw, sizeof(lora_bw));
     netdev->driver->set(netdev, NETOPT_SPREADING_FACTOR,
-                        &lora_sf, 1);
+                        &lora_sf, lora_sf);
     netdev->driver->set(netdev, NETOPT_CODING_RATE,
-                        &lora_cr, sizeof(uint8_t));
+                        &lora_cr, sizeof(lora_cr));
 
     puts("[Info] setup: configuration set with success");
 
@@ -247,7 +247,7 @@ int listen_cmd(int argc, char **argv)
 
     /* Switch to RX state */
     uint8_t state = NETOPT_STATE_RX;
-    netdev->driver->set(netdev, NETOPT_STATE, &state, sizeof(uint8_t));
+    netdev->driver->set(netdev, NETOPT_STATE, &state, sizeof(state));
 
     printf("Listen mode set\n");
 
@@ -263,7 +263,7 @@ int channel_cmd(int argc, char **argv)
 
     uint32_t chan;
     if (strstr(argv[1], "get") != NULL) {
-        netdev->driver->get(netdev, NETOPT_CHANNEL_FREQUENCY, &chan, sizeof(uint32_t));
+        netdev->driver->get(netdev, NETOPT_CHANNEL_FREQUENCY, &chan, sizeof(chan));
         printf("Channel: %i\n", (int) chan);
         return 0;
     }
@@ -274,7 +274,7 @@ int channel_cmd(int argc, char **argv)
             return -1;
         }
         chan = atoi(argv[2]);
-        netdev->driver->set(netdev, NETOPT_CHANNEL_FREQUENCY, &chan, sizeof(uint32_t));
+        netdev->driver->set(netdev, NETOPT_CHANNEL_FREQUENCY, &chan, sizeof(chan));
         printf("New channel set\n");
     }
     else {
