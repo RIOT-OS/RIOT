@@ -1,12 +1,9 @@
 # CPU configuration for the Thingy:52
-export CPU = nrf52
 CPU_MODEL = nrf52832xxaa
 
-# set default port depending on operating system
+# override default PORT
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
-include $(RIOTMAKE)/tools/serial.inc.mk
 
-# setup JLink for flashing
-export JLINK_DEVICE := nrf52
-include $(RIOTMAKE)/tools/jlink.inc.mk
+# use shared Makefile.include
+include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include
