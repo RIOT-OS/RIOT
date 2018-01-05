@@ -17,29 +17,22 @@
  * @}
  */
 
-#include "openthread/config.h"
-#include "openthread/platform/logging.h"
-#if OPENTHREAD_ENABLE_CLI_LOGGING
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "utils/code_utils.h"
-#include "cli/cli-uart.h"
-#endif
+#include "openthread/config.h"
+#include "openthread/platform/logging.h"
 
 void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat, ...)
 {
-#if OPENTHREAD_ENABLE_CLI_LOGGING
+    (void) aLogLevel;
+    (void) aLogRegion;
     va_list args;
     va_start(args, aFormat);
-    otCliLog(aLogLevel, aLogRegion, aFormat, args);
+    vfprintf(stderr, aFormat, args);
+    fprintf(stderr, "\n");
     va_end(args);
-#else
-    (void)aLogLevel;
-    (void)aLogRegion;
-    (void)aFormat;
-#endif /* OPENTHREAD_ENABLE_CLI_LOGGING */
 }
