@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Mapping of MCU pins to Arduino pins
+ * @name    Mapping of MCU pins to Arduino pins
  * @{
  */
 #define ARDUINO_PIN_0           GPIO_PIN(PORT_A, 10)

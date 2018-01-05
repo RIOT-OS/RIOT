@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Mapping of MCU pins to Arduino pins
+ * @name    Mapping of MCU pins to Arduino pins
  * @{
  */
 #if defined(CPU_MODEL_STM32F303ZE)
