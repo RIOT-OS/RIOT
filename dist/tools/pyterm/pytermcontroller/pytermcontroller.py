@@ -33,11 +33,9 @@ class PubProtocol(Protocol):
         print("new connection made")
 
     def connectionLost(self, reason):
-        self.factory.numProtocols = self.factory.numProtocols - 1
-
-    def connectionLost(self, reason):
-        self.factory.clients = {key: value for key, value in self.factory.clients.items()
-             if value is not self.transport}
+        self.factory.clients = {
+            key: value for key, value in self.factory.clients.items()
+            if value is not self.transport}
 
     def dataReceived(self, data):
         if data.startswith("hostname: "):
