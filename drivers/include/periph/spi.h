@@ -162,7 +162,10 @@ typedef enum {
     SPI_CLK_400KHZ,         /**< drive the SPI bus with 400KHz */
     SPI_CLK_1MHZ,           /**< drive the SPI bus with 1MHz */
     SPI_CLK_5MHZ,           /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ           /**< drive the SPI bus with 10MHz */
+    SPI_CLK_10MHZ,          /**< drive the SPI bus with 10MHz */
+    SPI_CLK_20MHZ,          /**< drive the SPI bus with 20MHz */
+    SPI_CLK_40MHZ,          /**< drive the SPI bus with 40MHz */
+    SPI_CLK_80MHZ           /**< drive the SPI bus with 80MHz */
 } spi_clk_t;
 #endif
 
