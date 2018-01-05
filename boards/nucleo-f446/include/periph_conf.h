@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-f446
+ * @defgroup    boards_nucleo-f446 STM Nucleo-F446
+ * @ingroup     boards_nucleo64
+ * @brief       Board configuration for the STM Nucleo-F446
  * @{
  *
  * @file

@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo32-f303
+ * @defgroup    boards_nucleo32-f303 STM Nucleo32-F303
+ * @ingroup     boards_nucleo32
+ * @brief       Board configuration for the STM Nucleo32-F303
  * @{
  *
  * @file

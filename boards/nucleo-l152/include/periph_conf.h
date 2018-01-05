@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-l152
+ * @defgroup    boards_nucleo-l152 STM Nucleo-L152
+ * @ingroup     boards_nucleo64
+ * @brief       Board configuration for the STM Nucleo-L152
  * @{
  *
  * @file

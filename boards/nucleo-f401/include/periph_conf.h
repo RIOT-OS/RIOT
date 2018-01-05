@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-f401
+ * @defgroup    boards_nucleo-f401 STM Nucleo-F401
+ * @ingroup     boards_nucleo64
+ * @brief       Board configuration for the STM Nucleo-F401
  * @{
  *
  * @file

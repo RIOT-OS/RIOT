@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo144-f207
+ * @defgroup    boards_nucleo144-f207 STM Nucleo144-F207
+ * @ingroup     boards_nucleo144
+ * @brief       Board configuration for the STM Nucleo144-F207
  * @{
  *
  * @file

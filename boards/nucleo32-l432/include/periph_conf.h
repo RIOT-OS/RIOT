@@ -1,13 +1,16 @@
 /*
  * Copyright (C) 2017  Inria
  *               2017  OTA keys
+ *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
 /**
- * @ingroup     boards_nucleo32-l432
+ * @defgroup    boards_nucleo32-l432 STM Nucleo32-L432
+ * @ingroup     boards_nucleo32
+ * @brief       Board configuration for the STM Nucleo32-L432
  * @{
  *
  * @file
