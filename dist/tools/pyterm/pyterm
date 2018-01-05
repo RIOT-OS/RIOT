@@ -24,8 +24,19 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
-import cmd, serial, socket, sys, threading, readline, time, logging, \
-    os, argparse, re, codecs, signal
+import cmd
+import serial
+import socket
+import sys
+import threading
+import readline
+import time
+import logging
+import os
+import argparse
+import re
+import codecs
+import platform
 
 try:
     serial.Serial
@@ -57,23 +68,22 @@ except ImportError:
             pass
 
 # set some default options
-import platform
 defaulthostname = platform.node()
 
 # default serial port
-defaultport    = "/dev/ttyUSB0"
+defaultport = "/dev/ttyUSB0"
 
 # default baudrate for serial connection
-defaultbaud     = 115200
+defaultbaud = 115200
 
 # directory to store configuration and log files
-defaultdir      = os.environ['HOME'] + os.path.sep + '.pyterm'
+defaultdir = os.environ['HOME'] + os.path.sep + '.pyterm'
 
 # configuration file name
-defaultfile     = "pyterm-" + defaulthostname + ".conf"
+defaultfile = "pyterm-" + defaulthostname + ".conf"
 
 # logging subfolder
-defaultrunname  = "default-run"
+defaultrunname = "default-run"
 
 # default logging prefix format string
 default_fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
@@ -82,7 +92,7 @@ default_fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
 defaultnewline = "LF"
 
 # default prompt character
-defaultprompt  = '>'
+defaultprompt = '>'
 
 
 class SerCmd(cmd.Cmd):
@@ -122,7 +132,7 @@ class SerCmd(cmd.Cmd):
         self.log_dir_name = log_dir_name
         self.newline = newline
         self.serprompt = serprompt
-        if not formatter is None:
+        if formatter is not None:
             self.fmt_str = formatter
 
         if not self.host:
@@ -239,9 +249,9 @@ class SerCmd(cmd.Cmd):
         # wait until connection is established and fire startup
         # commands to the node
         time.sleep(1)
-        for cmd in self.init_cmd:
-            self.logger.debug("WRITE ----->>>>>> '" + cmd + "'\n")
-            self.onecmd(self.precmd(cmd))
+        for command in self.init_cmd:
+            self.logger.debug("WRITE ----->>>>>> '" + command + "'\n")
+            self.onecmd(self.precmd(command))
 
         # start serial->console thread
         receiver_thread = threading.Thread(target=self.reader)
@@ -480,7 +490,7 @@ class SerCmd(cmd.Cmd):
         self.config = configparser.SafeConfigParser()
         cf = os.path.join(self.configdir, self.configfile)
         self.config.read(cf)
-        logging.getLogger("").info("Reading file: %s" %  cf)
+        logging.getLogger("").info("Reading file: %s" % cf)
 
         for sec in self.config.sections():
             if sec == "filters":
@@ -609,7 +619,7 @@ class SerCmd(cmd.Cmd):
                                                errors='replace')
                 c = sr.read(1)
             # try to re-open it with a timeout of 1s otherwise
-            except (serial.SerialException, ValueError) as se:
+            except (serial.SerialException, ValueError):
                 self.logger.warn("Serial port disconnected, waiting to "
                                  "get reconnected...")
                 self.ser.close()
@@ -620,7 +630,7 @@ class SerCmd(cmd.Cmd):
                     try:
                         self.serial_connect()
                         self.logger.info("Reconnected to serial port %s" % self.port)
-                    except serial.SerialException as se:
+                    except serial.SerialException:
                         pass
                 continue
             if c == '\r':
@@ -698,6 +708,7 @@ class fdsocket(socket.socket):
             self.close()
             sys.exit(0)
 
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Pyterm - The Python "
@@ -757,7 +768,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if (args.noprefix):
+    if args.noprefix:
         args.format = ""
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
                      args.directory, args.config, args.host, args.run_name,
