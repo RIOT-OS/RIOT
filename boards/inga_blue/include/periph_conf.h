@@ -25,6 +25,10 @@
 extern "C" {
 #endif
 
+#define RTT_NUMOF        1
+#define RTT_FREQUENCY    (32)
+#define RTT_MAX_VALUE    (0xFF)
+
 #ifdef __cplusplus
 }
 #endif
