@@ -775,6 +775,19 @@ int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif, const ipv6_addr_t *addr)
     return idx;
 }
 
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_CC110X)
+static void _create_iid_from_short(const gnrc_netif_t *netif, eui64_t *eui64)
+{
+    const unsigned offset = sizeof(eui64_t) - netif->l2addr_len;
+
+    assert(netif->l2addr_len <= 3);
+    memset(eui64->uint8, 0, sizeof(eui64->uint8));
+    eui64->uint8[3] = 0xff;
+    eui64->uint8[4] = 0xfe;
+    memcpy(&eui64->uint8[offset], netif->l2addr, netif->l2addr_len);
+}
+#endif /* define(MODULE_NETDEV_IEEE802154) || defined(MODULE_CC110X) */
+
 int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
 {
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
@@ -797,14 +810,7 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
             case NETDEV_TYPE_IEEE802154:
                 switch (netif->l2addr_len) {
                     case IEEE802154_SHORT_ADDRESS_LEN:
-                        eui64->uint8[0] = 0x0;
-                        eui64->uint8[1] = 0x0;
-                        eui64->uint8[2] = 0x0;
-                        eui64->uint8[3] = 0xff;
-                        eui64->uint8[4] = 0xfe;
-                        eui64->uint8[5] = 0x0;
-                        eui64->uint8[6] = netif->l2addr[0];
-                        eui64->uint8[7] = netif->l2addr[1];
+                        _create_iid_from_short(netif, eui64);
                         return 0;
                     case IEEE802154_LONG_ADDRESS_LEN:
                         memcpy(eui64, netif->l2addr, sizeof(eui64_t));
@@ -819,15 +825,7 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
 #endif
 #ifdef MODULE_CC110X
             case NETDEV_TYPE_CC110X:
-                assert(netif->l2addr_len == 1U);
-                eui64->uint8[0] = 0x0;
-                eui64->uint8[1] = 0x0;
-                eui64->uint8[2] = 0x0;
-                eui64->uint8[3] = 0xff;
-                eui64->uint8[4] = 0xfe;
-                eui64->uint8[5] = 0x0;
-                eui64->uint8[6] = 0x0;
-                eui64->uint8[7] = netif->l2addr[0];
+                _create_iid_from_short(netif, eui64);
                 return 0;
 #endif
             default:
