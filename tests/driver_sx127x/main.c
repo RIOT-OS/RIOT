@@ -261,7 +261,7 @@ int channel_cmd(int argc, char **argv)
 
     uint32_t chan;
     if (strstr(argv[1], "get") != NULL) {
-        netdev->driver->get(netdev, NETOPT_CHANNEL, &chan, sizeof(uint32_t));
+        netdev->driver->get(netdev, NETOPT_CHANNEL_FREQUENCY, &chan, sizeof(uint32_t));
         printf("Channel: %i\n", (int) chan);
         return 0;
     }
@@ -272,7 +272,7 @@ int channel_cmd(int argc, char **argv)
             return -1;
         }
         chan = atoi(argv[2]);
-        netdev->driver->set(netdev, NETOPT_CHANNEL, &chan, sizeof(uint32_t));
+        netdev->driver->set(netdev, NETOPT_CHANNEL_FREQUENCY, &chan, sizeof(uint32_t));
         printf("New channel set\n");
     }
     else {
