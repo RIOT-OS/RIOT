@@ -240,8 +240,10 @@ int listen_cmd(int argc, char **argv)
     (void)argv;
 
     /* Switch to continuous listen mode */
-    netdev->driver->set(netdev, NETOPT_SINGLE_RECEIVE, false, sizeof(uint8_t));
-    netdev->driver->set(netdev, NETOPT_RX_TIMEOUT, 0, sizeof(uint8_t));
+    const netopt_enable_t single = false;
+    netdev->driver->set(netdev, NETOPT_SINGLE_RECEIVE, &single, sizeof(single));
+    const uint32_t timeout = 0;
+    netdev->driver->set(netdev, NETOPT_RX_TIMEOUT, &timeout, sizeof(timeout));
 
     /* Switch to RX state */
     uint8_t state = NETOPT_STATE_RX;
