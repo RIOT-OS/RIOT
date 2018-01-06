@@ -26,15 +26,12 @@ void *t_prio_1_handler(void *arg)
 
     printf("prio_1: L(B)\n");
     mutex_lock(&res_mtx_B);
-    //xtimer_sleep(1);
 
     printf("prio_1: U(B)\n");
     mutex_unlock(&res_mtx_B);
-    //xtimer_sleep(1);
 
     printf("prio_1: U(A)\n");
     mutex_unlock(&res_mtx_A);
-    //xtimer_sleep(1);
   }
   return NULL;
 }
@@ -44,7 +41,6 @@ void *t_prio_2_handler(void *arg)
 {
   (void) arg;
   xtimer_sleep(1);
-  /* starting working loop immediately */
   while(1){
     printf("prio_2: L(B)\n");
     mutex_lock(&res_mtx_B);
@@ -52,15 +48,12 @@ void *t_prio_2_handler(void *arg)
 
     printf("prio_2: L(A)\n");
     mutex_lock(&res_mtx_A);
-    //xtimer_sleep(1);
 
     printf("prio_2: U(A)\n");
     mutex_unlock(&res_mtx_A);
-    //xtimer_sleep(1);
 
     printf("prio_2: U(B)\n");
     mutex_unlock(&res_mtx_B);
-    //xtimer_sleep(1);
   }
   return NULL;
 }
@@ -71,23 +64,15 @@ void *t_prio_3_handler(void *arg)
 {
   (void) arg;
   xtimer_sleep(2);
-  /* starting working loop immediately */
   while(1){
     printf("prio_3: L(A)\n");
     mutex_lock(&res_mtx_A);
-    //xtimer_sleep(1);
 
     printf("prio_3: U(A)\n");
     mutex_unlock(&res_mtx_A);
-    //xtimer_sleep(1);
   }
   return NULL;
 }
-
-
-
-
-
 
 kernel_pid_t pid_prio_1;
 kernel_pid_t pid_prio_2;
