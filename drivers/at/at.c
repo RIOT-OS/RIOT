@@ -41,7 +41,7 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
             if (AT_PRINT_INCOMING) {
                 print(&c, 1);
             }
-            if (!(c == *bytes++)) {
+            if (c != *bytes++) {
                 return -1;
             }
         }
@@ -86,7 +86,8 @@ void at_drain(at_dev_t *dev)
     } while (res > 0);
 }
 
-ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout)
+ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
+                             char *resp_buf, size_t len, uint32_t timeout)
 {
     ssize_t res = -1;
 
@@ -107,7 +108,8 @@ out:
     return res;
 }
 
-ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout)
+ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
+                              char *resp_buf, size_t len, uint32_t timeout)
 {
     ssize_t res = -1;
     size_t bytes_left = len - 1;
@@ -122,7 +124,7 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
         goto out;
     }
 
-    while(1) {
+    while (1) {
         res = at_readline(dev, pos, bytes_left, timeout);
         if (res == 0) {
             continue;
