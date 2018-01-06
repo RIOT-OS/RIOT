@@ -15,8 +15,8 @@ ifneq (,$(filter apa102,$(USEMODULE)))
 endif
 
 ifneq (,$(filter at,$(USEMODULE)))
-    USEMODULE += fmt
-    USEMODULE += xtimer
+  USEMODULE += fmt
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
