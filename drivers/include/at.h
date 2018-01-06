@@ -73,7 +73,7 @@ typedef struct {
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize);
 
 /**
- * @brief   simple command helper
+ * @brief   Simple command helper
  *
  * This function sends an AT command to the device and waits for "OK".
  *
@@ -87,10 +87,10 @@ int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t
 int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout);
 
 /**
- * @brief   send AT command, wait for a prompt
+ * @brief   Send AT command, wait for a prompt
  *
- * This function will send the supplied @p command, then wait for the prompt (>)
- * character and return
+ * This function sends the supplied @p command, then waits for the prompt (>)
+ * character and returns
  *
  * @param[in]   dev     device to operate on
  * @param[in]   command command string to send
@@ -102,9 +102,9 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout);
 int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout);
 
 /**
- * @brief   send AT command, wait for response
+ * @brief   Send AT command, wait for response
  *
- * This function will send the supplied @p command, then wait and return one
+ * This function sends the supplied @p command, then waits and returns one
  * line of response.
  *
  * A possible empty line will be skipped.
@@ -121,9 +121,9 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
 
 /**
- * @brief   send AT command, wait for multiline response
+ * @brief   Send AT command, wait for multiline response
  *
- * This function will send the supplied @p command, then return all response
+ * This function sends the supplied @p command, then returns all response
  * lines until the device sends "OK".
  *
  * If a line starts with "ERROR" or "+CME ERROR:", or the buffer is full, the
@@ -153,7 +153,7 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 
 /**
- * @brief  Send raw bytes to a device
+ * @brief   Send raw bytes to a device
  *
  * @param[in]   dev     device to operate on
  * @param[in]   bytes   buffer containing bytes to send
@@ -162,7 +162,7 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len);
 
 /**
- * @brief   send command to device
+ * @brief   Send command to device
  *
  * @param[in]   dev     device to operate on
  * @param[in]   command command to send
@@ -174,7 +174,7 @@ void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len);
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout);
 
 /**
- * @brief   read a line from device
+ * @brief   Read a line from device
  *
  * @param[in]   dev         device to operate on
  * @param[in]   resp_buf    buffer to store line
@@ -187,7 +187,7 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout);
 ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout);
 
 /**
- * @brief   drain device input buffer
+ * @brief   Drain device input buffer
  *
  * This function drains any possible bytes waiting in the device's input
  * buffer.
