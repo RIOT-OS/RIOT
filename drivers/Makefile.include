@@ -186,6 +186,15 @@ ifneq (,$(filter mag3110,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mag3110/include
 endif
 
+ifneq (,$(filter mkrwan,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mkrwan/include
+  # The AT reply of this module end with \r and no echo is sent
+  CFLAGS += -DAT_RECV_EOL_2=\"\"
+  CFLAGS += -DAT_SEND_ECHO=0
+  CFLAGS += -DAT_RECV_OK=\"+OK\"
+  CFLAGS += -DAT_RECV_ERROR=\"+ERR\"
+endif
+
 ifneq (,$(filter mma7660,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mma7660/include
 endif
