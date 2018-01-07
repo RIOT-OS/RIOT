@@ -31,6 +31,7 @@
 #include "net/netdev/ieee802154.h"
 
 #include "at86rf2xx.h"
+#include "at86rf2xx_csma.h"
 #include "at86rf2xx_netdev.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
@@ -58,10 +59,18 @@ const netdev_driver_t at86rf2xx_driver = {
 
 static void _irq_handler(void *arg)
 {
-    netdev_t *dev = (netdev_t *) arg;
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+    at86rf2xx_t* dev = (at86rf2xx_t*) arg;
 
-    if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV_EVENT_ISR);
+    int state = irq_disable();
+    dev->pending_irq++;
+    irq_restore(state);
+#endif
+
+    netdev_t *netdev = (netdev_t *) arg;
+
+    if (netdev->event_callback) {
+        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
     }
 }
 
@@ -91,6 +100,10 @@ static int _init(netdev_t *netdev)
     memset(&netdev->stats, 0, sizeof(netstats_t));
 #endif
 
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+    at86rf2xx_csma_init(dev);
+#endif
+
     return 0;
 }
 
@@ -100,7 +113,9 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
     const struct iovec *ptr = vector;
     size_t len = 0;
 
+#ifndef AT86RF2XX_SOFTWARE_CSMA
     at86rf2xx_tx_prepare(dev);
+#endif
 
     /* load packet data into FIFO */
     for (unsigned i = 0; i < count; i++, ptr++) {
@@ -113,13 +128,22 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.tx_bytes += len;
 #endif
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+        at86rf2xx_csma_load(dev, ptr->iov_base, ptr->iov_len, len);
+        len += ptr->iov_len;
+#else
         len = at86rf2xx_tx_load(dev, ptr->iov_base, ptr->iov_len, len);
+#endif
     }
 
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+    at86rf2xx_csma_send(dev, 0);
+#else
     /* send data out directly if pre-loading id disabled */
     if (!(dev->netdev.flags & AT86RF2XX_OPT_PRELOADING)) {
         at86rf2xx_tx_exec(dev);
     }
+#endif
     /* return the number of bytes that were actually send out */
     return (int)len;
 }
@@ -549,12 +573,18 @@ static void _isr(netdev_t *netdev)
     uint8_t state;
     uint8_t trac_status;
 
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+    int irq_state = irq_disable();
+    dev->pending_irq--;
+    irq_restore(irq_state);
+#endif
+
     /* If transceiver is sleeping register access is impossible and frames are
      * lost anyway, so return immediately.
      */
     state = at86rf2xx_get_status(dev);
     if (state == AT86RF2XX_STATE_SLEEP) {
-        return;
+        goto end;
     }
 
     /* read (consume) device status */
@@ -573,7 +603,7 @@ static void _isr(netdev_t *netdev)
             state == AT86RF2XX_STATE_BUSY_RX_AACK) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");
             if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
-                return;
+                goto end;
             }
             netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         }
@@ -596,6 +626,14 @@ static void _isr(netdev_t *netdev)
             DEBUG("[at86rf2xx] EVT - TX_END\n");
 
             if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+                bool csma_will_retry;
+                if (trac_status == AT86RF2XX_TRX_STATE__TRAC_SUCCESS
+                    || trac_status == AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING) {
+                    at86rf2xx_csma_csma_try_succeeded(dev);
+                    at86rf2xx_csma_link_tx_try_succeeded(dev);
+                }
+#endif
                 switch (trac_status) {
 #ifdef MODULE_OPENTHREAD
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
@@ -614,10 +652,31 @@ static void _isr(netdev_t *netdev)
                         break;
 #endif
                     case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+                        at86rf2xx_csma_csma_try_succeeded(dev);
+                        csma_will_retry = at86rf2xx_csma_link_tx_try_failed(dev);
+                        if (csma_will_retry) {
+                            break;
+                        }
+#endif
                         netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
                         DEBUG("[at86rf2xx] TX NO_ACK\n");
                         break;
                     case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+                        csma_will_retry = at86rf2xx_csma_csma_try_failed(dev);
+                        if (csma_will_retry) {
+                            break;
+                        }
+
+                        /*
+                         * If all CSMA attempts failed for a try, then just
+                         * give up and cancel all remaining link retries. This
+                         * is consistent with the behavior of the radio when
+                         * hardware CSMA and link retries are used.
+                         */
+                        at86rf2xx_csma_link_tx_try_succeeded(dev);
+#endif
                         netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
                         DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
                         break;
@@ -628,4 +687,31 @@ static void _isr(netdev_t *netdev)
             }
         }
     }
+
+end:
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+    if (!at86rf2xx_csma_probe_and_send_if_pending(dev)) {
+        bool was_pending = at86rf2xx_csma_clear_pending(dev);
+
+        /*
+         * at86rf2xx_csma_probe_and_send_if_pending returned false, so
+         * was_pending MUST be true.
+         */
+        assert(was_pending);
+        (void) was_pending;
+
+        DEBUG("[at86rf2xx] CSMA timeout while receiving packet; failing attempt.\n");
+        bool csma_will_retry = at86rf2xx_csma_csma_try_failed(dev);
+        if (!csma_will_retry) {
+            /*
+             * As described in the comment above, if all CSMA attempts
+             * fail for a link try, then cancel all remaining link
+             * retries and give up.
+             */
+            at86rf2xx_csma_link_tx_try_succeeded(dev);
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
+        }
+    }
+#endif
+    return;
 }

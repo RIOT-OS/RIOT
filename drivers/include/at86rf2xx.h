@@ -38,6 +38,7 @@
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
+#include "xtimer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -184,6 +185,21 @@ typedef struct {
 #if AT86RF2XX_HAVE_RETRIES
     /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
     uint8_t tx_retries;                 /**< Number of NOACK retransmissions */
+#endif
+
+#ifdef AT86RF2XX_SOFTWARE_CSMA
+    xtimer_t csma_backoff_timer;
+    uint8_t csma_num_tries_left;
+    bool csma_in_progress;
+    bool csma_should_probe_and_send;
+
+    uint8_t csma_buf[AT86RF2XX_MAX_PKT_LENGTH];
+    uint8_t csma_buf_len;
+
+    uint8_t link_tx_num_tries_left;
+    bool link_tx_in_progress;
+
+    uint8_t pending_irq;
 #endif
     /** @} */
 } at86rf2xx_t;
@@ -439,8 +455,10 @@ size_t at86rf2xx_send(at86rf2xx_t *dev, uint8_t *data, size_t len);
  * data is possible after it was called.
  *
  * @param[in] dev            device to prepare for sending
+ *
+ * @return                   boolean indicating whether the operation succeeded
  */
-void at86rf2xx_tx_prepare(at86rf2xx_t *dev);
+bool at86rf2xx_tx_prepare(at86rf2xx_t *dev);
 
 /**
  * @brief   Load chunks of data into the transmit buffer of the given device
