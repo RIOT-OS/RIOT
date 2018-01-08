@@ -73,14 +73,29 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 
                     break;
                 }
-#ifdef MODULE_NETSTATS_L2
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
-                dev->stats.tx_failed++;
-                break;
+                /* fallthrough intentional */
             case NETDEV_EVENT_TX_COMPLETE:
-                dev->stats.tx_success++;
-                break;
+                /* fallthrough intentional */
+            case NETDEV_EVENT_TX_NOACK:
+#ifdef MODULE_NETSTATS_L2
+                if (event == NETDEV_EVENT_TX_MEDIUM_BUSY) {
+                    dev->stats.tx_failed++;
+                } else if (event == NETDEV_EVENT_TX_COMPLETE) {
+                    dev->stats.tx_success++;
+                }
 #endif
+                {
+                    int send_queue_idx = cib_get(&gnrc_netdev->send_queue);
+                    if (send_queue_idx == -1) {
+                        gnrc_netdev->sending = false;
+                        break;
+                    }
+                    gnrc_pktsnip_t* pkt = gnrc_netdev->send_queue_arr[send_queue_idx];
+                    gnrc_netdev->send_queue_arr[send_queue_idx] = NULL;
+                    gnrc_netdev->send(gnrc_netdev, pkt);
+                }
+                break;
             default:
                 DEBUG("gnrc_netdev: warning: unhandled event %u.\n", event);
         }
@@ -130,6 +145,9 @@ static void *_gnrc_netdev_thread(void *args)
     /* initialize low-level driver */
     dev->driver->init(dev);
 
+    /* initialize send queue */
+    cib_init(&gnrc_netdev->send_queue, GNRC_NETDEV_SEND_QUEUE_SIZE);
+
     /* start the event loop */
     while (1) {
         DEBUG("gnrc_netdev: waiting for incoming messages\n");
@@ -143,7 +161,18 @@ static void *_gnrc_netdev_thread(void *args)
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netdev: GNRC_NETAPI_MSG_TYPE_SND received\n");
                 gnrc_pktsnip_t *pkt = msg.content.ptr;
+                if (gnrc_netdev->sending) {
+                    int send_queue_idx = cib_put(&gnrc_netdev->send_queue);
+                    if (send_queue_idx == -1) {
+                        DEBUG("gnrc_netdev: GNRC_NETAPI_MSG_SEND dropping packet\n");
+                        gnrc_pktbuf_release(pkt);
+                        break;
+                    }
+                    gnrc_netdev->send_queue_arr[send_queue_idx] = pkt;
+                    break;
+                }
                 gnrc_netdev->send(gnrc_netdev, pkt);
+                gnrc_netdev->sending = true;
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 /* read incoming options */

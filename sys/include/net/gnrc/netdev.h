@@ -81,6 +81,13 @@ extern "C" {
 #define GNRC_NETDEV_MAC_INFO_CSMA_ENABLED       (0x0100U)
 
 /**
+ * @brief   Determines the size of the netdev send queue.
+ */
+#ifndef GNRC_NETDEV_SEND_QUEUE_SIZE
+#define GNRC_NETDEV_SEND_QUEUE_SIZE 32
+#endif
+
+/**
  * @brief Structure holding GNRC netdev adapter state
  *
  * This structure is supposed to hold any state parameters needed
@@ -115,6 +122,19 @@ typedef struct gnrc_netdev {
      * @brief PID of this adapter for netapi messages
      */
     kernel_pid_t pid;
+
+    /**
+     * @brief send queue for outgoing frames, used to allow split-phase tx
+     * operations in the radio driver.
+     */
+    gnrc_pktsnip_t* send_queue_arr[GNRC_NETDEV_SEND_QUEUE_SIZE];
+    cib_t send_queue;
+
+    /**
+     * @brief keeps track of whether a (possibly) split-phase tx operation is
+     * in progress
+     */
+    bool sending;
 
 #ifdef MODULE_GNRC_MAC
     /**
