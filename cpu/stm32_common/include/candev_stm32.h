@@ -45,6 +45,10 @@ extern "C" {
 #error "CAN STM32: CPU not supported"
 #endif
 
+/**
+ * @name    ISR functions
+ * @{
+ */
 #if defined(CPU_FAM_STM32F1)
 #define ISR_CAN1_TX     isr_usb_hp_can1_tx
 #define ISR_CAN1_RX0    isr_usb_lp_can1_rx0
@@ -64,6 +68,7 @@ extern "C" {
 #define ISR_CAN3_RX1    isr_can3_rx1
 #define ISR_CAN3_SCE    isr_can3_sce
 #endif
+/** @} */
 
 #if CANDEV_STM32_CHAN_NUMOF > 1 || DOXYGEN
 /** The maximum number of filters: 28 for dual channel, 14 for single channel */
@@ -119,6 +124,7 @@ typedef struct {
     uint8_t lbkm : 1;                   /**< Loopback mode */
     uint8_t silm : 1;                   /**< Silent mode */
 } can_conf_t;
+/** can_conf_t is re-defined */
 #define HAVE_CAN_CONF_T
 
 /** The number of transmit mailboxes */
@@ -134,6 +140,7 @@ typedef struct {
 
 /** bxCAN candev descriptor */
 typedef struct can can_t;
+/** can_t is re-defined */
 #define HAVE_CAN_T
 
 /** This structure holds anything related to the receive part */
