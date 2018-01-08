@@ -154,6 +154,7 @@
 #define STATUS_FLAG_BLOCKED_ANY     6   /**< waiting for any flag from flag_mask*/
 #define STATUS_FLAG_BLOCKED_ALL     7   /**< waiting for all flags in flag_mask */
 #define STATUS_MBOX_BLOCKED         8   /**< waiting for get/put on mbox        */
+#define STATUS_COND_BLOCKED         9   /**< waiting for a condition variable   */
 /** @} */
 
 /**
@@ -162,8 +163,8 @@
  */
 #define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
                                                  `st >= STATUS_ON_RUNQUEUE`             */
-#define STATUS_RUNNING          9               /**< currently running                  */
-#define STATUS_PENDING         10               /**< waiting to be scheduled to run     */
+#define STATUS_RUNNING         10               /**< currently running                  */
+#define STATUS_PENDING         11               /**< waiting to be scheduled to run     */
 /** @} */
 
 /**
