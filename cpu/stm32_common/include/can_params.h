@@ -17,8 +17,8 @@
  * @}
  */
 
-#ifndef CANDEV_STM32_PARAMS_H
-#define CANDEV_STM32_PARAMS_H
+#ifndef CAN_PARAMS_H
+#define CAN_PARAMS_H
 
 #include "can/device.h"
 #include "periph/can.h"
@@ -135,4 +135,4 @@ static const candev_params_t candev_params[] = {
 }
 #endif
 
-#endif /* CANDEV_STM32_PARAMS_H */
+#endif /* CAN_PARAMS_H */

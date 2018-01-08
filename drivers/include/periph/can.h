@@ -32,6 +32,10 @@
 #include "periph_cpu.h"
 #include "can/candev.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef HAVE_CAN_T
 /**
  * @brief   CAN device descriptor identifier
@@ -43,7 +47,7 @@ typedef candev_t can_t;
 /**
  * @brief   CAN configuration identifier
  */
-typedef void can_conf_t;
+typedef int can_conf_t;
 #endif
 
 /**
@@ -54,4 +58,9 @@ typedef void can_conf_t;
  */
 void can_init(can_t *dev, const can_conf_t *conf);
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* PERIPH_CAN_H */
+/** @} */
