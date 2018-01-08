@@ -278,6 +278,7 @@ otError otPlatRadioReceive(otInstance *aInstance, uint8_t aChannel)
 
     _set_idle();
     _set_channel(aChannel);
+    sReceiveFrame.mChannel = aChannel;
     return OT_ERROR_NONE;
 }
 
