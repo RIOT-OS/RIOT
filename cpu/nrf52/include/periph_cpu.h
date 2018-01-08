@@ -75,6 +75,29 @@ typedef enum {
 } adc_res_t;
 /** @} */
 
+/**
+ * @brief   Override I2C speed settings
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       = 0xff,                         /**< not supported */
+    I2C_SPEED_NORMAL    = TWI_FREQUENCY_FREQUENCY_K100, /**< 100kbit/s */
+    I2C_SPEED_FAST      = TWI_FREQUENCY_FREQUENCY_K400, /**< 400kbit/s */
+    I2C_SPEED_FAST_PLUS = 0xfe,                         /**< not supported */
+    I2C_SPEED_HIGH      = 0xfd,                         /**< not supported */
+} i2c_speed_t;
+/** @} */
+
+/**
+ * @brief   I2C (TWI) configuration options
+ */
+typedef struct {
+    NRF_TWIM_Type *dev;         /**< hardware device */
+    uint8_t pin_scl;            /**< SCL pin */
+    uint8_t pin_sda;            /**< SDA pin */
+} i2c_conf_t;
+
 #ifdef __cplusplus
 }
 #endif
