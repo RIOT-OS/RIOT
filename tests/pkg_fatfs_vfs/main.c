@@ -295,10 +295,6 @@ static void test_create(void)
 
 int main(void)
 {
-#if defined(BOARD_NATIVE) && (FATFS_FFCONF_OPT_FS_NORTC == 0)
-    rtc_init();
-#endif
-
 #if MODULE_MTD_SDCARD
     for(unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
         mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
