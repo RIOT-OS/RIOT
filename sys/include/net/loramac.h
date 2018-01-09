@@ -102,6 +102,13 @@ extern "C" {
  * @{
  */
 /**
+ * @brief   Default device class (A, B or C)
+ */
+#ifndef LORAMAC_DEVICE_CLASS
+#define LORAMAC_DEVICE_CLASS            (LORAMAC_CLASS_A)
+#endif
+
+/**
  * @brief   Default NetID (only valid with ABP join procedure)
  */
 #ifndef LORAMAC_DEFAULT_NETID
@@ -316,18 +323,18 @@ typedef enum {
 /**
  * @brief   LoRaMAC network join procedure type
  */
-enum {
+typedef enum {
     LORAMAC_JOIN_OTAA,                 /**< Other-the-air activation */
     LORAMAC_JOIN_ABP,                  /**< Activation by personnalization */
-};
+} loramac_join_mode_t;
 
 /**
  * @brief   LoRaMAC transmission mode
  */
-enum {
+typedef enum {
     LORAMAC_TX_CNF,                    /**< Confirmable transmission mode */
     LORAMAC_TX_UNCNF,                  /**< Unconfirmable transmission mode */
-};
+} loramac_tx_mode_t;
 
 /**
  * @brief   LoRaMAC datarate indexes
@@ -335,7 +342,7 @@ enum {
  *          Each index corresponds to a different modulation, spreading factor
  *          and bandwidth depending on the regions.
  */
-enum {
+typedef enum {
     /**
      * - ISM EU863-870: LoRa modulation, SF12, BW125 (250bit/s)
      * - ISM US902-928: LoRa modulation, SF10, BW125 (980bit/s)
@@ -514,7 +521,7 @@ enum {
      * - ISM KR920-923: reserved for future use
      */
     LORAMAC_DR_15,
-};
+} loramac_dr_idx_t;
 
 /**
  * @brief   LoRaMAC transmission power indexes
@@ -522,7 +529,7 @@ enum {
  *          Each index corresponds to a different modulation, spreading factor
  *          and bandwidth depending on the regions.
  */
-enum {
+typedef enum {
     /**
      * - EU863-870: 20dBm (if supported)
      * - US902-928: 30dBm (if supported)
@@ -701,7 +708,7 @@ enum {
      * - ISM KR920-923: Reserved for future use
      */
     LORAMAC_TX_PWR_15,
-};
+} loramac_tx_pwr_idx_t;
 /** @} */
 
 /**
