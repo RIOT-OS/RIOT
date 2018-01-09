@@ -21,8 +21,10 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
 # development process:
 DEVELHELP ?= 1
 
+ifneq ($(BOARD),native)
 # Set stack size to something (conservatively) enormous
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=9092
+endif
 
 # Add the package for Jerryscript
 USEPKG += jerryscript
