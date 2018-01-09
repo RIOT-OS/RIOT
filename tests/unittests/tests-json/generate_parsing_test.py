@@ -95,14 +95,22 @@ def main(dest_path='./generated-parsing-tests.c',
         dest_file.write(b'const json_parsing_test_t '
                         b'tests_json_parsing_tests[] = {\n')
         for esc_test_name in test_names:
-            dest_file.write(b'\t{\n\t\t')
+            dest_file.write(b'    ')        # single tab
+            dest_file.write(b'{\n')
+            dest_file.write(b'        ')    # double tab
             dest_file.write(esc_test_name)
-            dest_file.write(b',\n\t\t')
+            dest_file.write(b',\n')
+            dest_file.write(b'        ')    # double tab
             dest_file.write(esc_test_name)
-            dest_file.write(b'_name,\n\t\tsizeof(')
+            dest_file.write(b'_name,\n')
+            dest_file.write(b'        ')    # double tab
+            dest_file.write(b'sizeof(')
             dest_file.write(esc_test_name)
-            dest_file.write(b') - 1\n\t},\n')
-        dest_file.write(b'\t{ NULL, NULL, 0 }\n')
+            dest_file.write(b') - 1\n')
+            dest_file.write(b'    ')        # single tab
+            dest_file.write(b'},\n')
+        dest_file.write(b'    ')        # single tab
+        dest_file.write(b'{ NULL, NULL, 0 }\n')
         dest_file.write(b'};\n')
         dest_file.write(b'\n')
 

@@ -40,8 +40,8 @@ extern "C" {
 #endif
 
 typedef const struct {
-    const const char *content;
-    const const char *name;
+    const char *content;
+    const char *name;
     const size_t size;
 } json_parsing_test_t;
 
