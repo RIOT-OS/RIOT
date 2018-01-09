@@ -3,6 +3,8 @@ include $(RIOTBOARD)/common/arduino-atmega/Makefile.include
 # define the cpu used by the arduino uno board
 export CPU = atmega256rfr2
 
+USEMODLUE += periph
+
 # export needed for flash rule
 export PORT_LINUX ?= /dev/ttyACM0
 export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
