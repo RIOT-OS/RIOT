@@ -74,6 +74,18 @@ void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue, ev
  */
 void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout);
 
+/**
+ * @brief   Clear a timeout event
+ *
+ * Calling this function will cancel the timeout by removing its underlying
+ * timer. If the timer has already fired before calling this function, the
+ * connected event will be put already into the given event queue and this
+ * function does not have any effect.
+ *
+ * @param[in]   event_timeout   event_timeout context object to use
+ */
+void event_timeout_clear(event_timeout_t *event_timeout);
+
 #ifdef __cplusplus
 }
 #endif

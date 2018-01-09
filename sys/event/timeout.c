@@ -26,3 +26,8 @@ void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout)
 {
     xtimer_set(&event_timeout->timer, timeout);
 }
+
+void event_timeout_clear(event_timeout_t *event_timeout)
+{
+    xtimer_remove(&event_timeout->timer);
+}
