@@ -1,0 +1,5 @@
+INCLUDES += -I$(PKGDIRBASE)/littlefs/riotbuild/
+
+ifneq (,$(filter littlefs_fs,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/littlefs/fs
+endif

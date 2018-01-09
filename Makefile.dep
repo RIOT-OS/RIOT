@@ -646,6 +646,12 @@ ifneq (,$(filter spiffs,$(USEMODULE)))
   USEMODULE += spiffs_fs
   USEMODULE += mtd
 endif
+ifneq (,$(filter littlefs,$(USEMODULE)))
+  USEPKG += littlefs
+  USEMODULE += vfs
+  USEMODULE += littlefs_fs
+  USEMODULE += mtd
+endif
 
 ifneq (,$(filter l2filter_%,$(USEMODULE)))
   USEMODULE += l2filter
