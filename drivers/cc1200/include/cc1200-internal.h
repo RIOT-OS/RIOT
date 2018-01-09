@@ -40,6 +40,9 @@ extern "C" {
 #define MIN_CHANNR                  (0)     /**< Minimum channel number */
 #define MAX_CHANNR                  (33)    /**< Maximum channel number */
 
+#define CC1200_TX_FIFO_SIZE			(128)
+#define CC1200_RX_FIFO_SIZE			(128)
+
 #define CC1200_PACKET_LENGTH        (0x7F)  /**< max packet length = 127b */
 #define CC1200_SYNC_WORD_TX_TIME    (90000) /**< loop count (max. timeout ~15ms)
                                                  to wait for sync word to be
@@ -58,6 +61,10 @@ extern "C" {
 #endif
 #define CC1200_MIN_CHANNR           (0)     /**< lowest possible channel number */
 #define CC1200_MAX_CHANNR           (33)     /**< highest possible channel number */
+
+#define CC1200_CFG_RXFIFO_THR		(0x01)	/* RX FIFO threshold = FIFO_CFG.FIFO_THR */
+#define CC1200_CFG_TXFIFO_THR		(0x02)	/* TX FIFO threshold = 127-FIFO_CFG.FIFO_THR */
+#define CC1200_CFG_PKT_SYNC_RXTX	(0x06)
 
 /**
  * @name    State values for state machine
@@ -107,7 +114,7 @@ typedef struct __attribute__((packed))
     uint8_t address;                        /**< Destination address */
     uint8_t phy_src;                        /**< Source address (physical source) */
     uint8_t flags;                          /**< Flags */
-    uint8_t data[CC1200_MAX_DATA_LENGTH];   /**< Data (high layer protocol) */
+    uint8_t data[CC1200_PACKET_LENGTH];   /**< Data (high layer protocol) */
 } cc1200_pkt_t;
 
 /**
@@ -129,7 +136,7 @@ enum cc1200_radio_mode {
 };
 
 /**
- * @brief   CC110x register configuration
+ * @brief   CC1200 register configuration
  */
 typedef struct {
     uint8_t _IOCFG2;      /**< GDO2 output pin configuration */
@@ -174,7 +181,7 @@ typedef struct {
 } cc1200_reg_t;
 
 /**
- * @brief   CC110x radio configuration
+ * @brief   CC1200 radio configuration
  */
 typedef struct {
     cc1200_reg_t reg_cfg;       /**< CC1200 register configuration */

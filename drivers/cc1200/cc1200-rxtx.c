@@ -93,10 +93,24 @@ static void _rx_read_data(cc1200_t *dev, void(*callback)(void*), void*arg)
         to_read = left;
     }
 
+    DEBUG("%s: fifo=%d, left=%d, to_read=%d, pos=%d\n",
+    		__func__, fifo, left, to_read, pkt_buf->pos);
+
     if (to_read) {
         cc1200_readburst_reg(dev, CC1200_RXFIFO,
                 ((char*)&(pkt_buf->packet))+(pkt_buf->pos), to_read);
+#if ENABLE_DEBUG
+        uint8_t i;
+        DEBUG("%s: received: ", __func__);
+        uint8_t* b = (uint8_t*)&pkt_buf->packet;
+		for(i=pkt_buf->pos; i<pkt_buf->pos + to_read; i++){
+			DEBUG("0x%02x ", b[i]);
+		}
+		DEBUG("\n");
+#endif
+
         pkt_buf->pos += to_read;
+        DEBUG("%s: pos=%d\n", __func__, pkt_buf->pos);
     }
 
     if (to_read == left) {
@@ -157,7 +171,7 @@ static void _rx_continue(cc1200_t *dev, void(*callback)(void*), void*arg)
     }
 
     gpio_irq_disable(dev->params.gdo2);
-    cc1200_write_reg(dev, CC1200_IOCFG2, 0x01);
+    cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_RXFIFO_THR);
     do {
         _rx_read_data(dev, callback, arg);
     }
@@ -172,12 +186,13 @@ static void _rx_start(cc1200_t *dev)
     pkt_buf->pos = 0;
 
     gpio_irq_disable(dev->params.gdo2);
-    cc1200_write_reg(dev, CC1200_IOCFG2, 0x01);
+    cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_RXFIFO_THR);
 
     /* If we are late, go into resceive immediatly */
     if(gpio_read(dev->params.gdo2)){
-        DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
+        //DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
         _rx_continue(dev, dev->isr_cb, dev->isr_cb_arg);
+        return;
     }
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     gpio_irq_enable(dev->params.gdo2);
@@ -194,12 +209,14 @@ static void _tx_continue(cc1200_t *dev)
     gpio_irq_disable(dev->params.gdo2);
 
     cc1200_pkt_t *pkt = &dev->pkt_buf.packet;
+#if 0
     DEBUG("%s:%s:%u printing package:\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     for (int i = 0; i < pkt->length + 1; i++)
     {
         DEBUG("0x%x ", *(((char *)pkt) + i));
     }
     DEBUG("\n");
+#endif
 
     int size = pkt->length + 1;
 
@@ -210,12 +227,21 @@ static void _tx_continue(cc1200_t *dev)
         dev->cc1200_statistic.raw_packets_out++;
 
         LOG_DEBUG("cc1200: packet successfully sent.\n");
+        int tx_bytes = cc1200_get_reg_robust(dev, CC1200_NUM_TXBYTES);
 
+        while(tx_bytes > 0){
+            DEBUG("%s: %d bytes to send...\n", __func__, tx_bytes);
+            xtimer_usleep(50);
+            tx_bytes = cc1200_get_reg_robust(dev, CC1200_NUM_TXBYTES);
+        }
+
+        //xtimer_spin(xtimer_ticks_from_usec(300));
         cc1200_switch_to_rx(dev);
         return;
     }
 
-    int fifo = CC1200_PACKET_LENGTH - cc1200_get_reg_robust(dev, CC1200_NUM_TXBYTES);
+    //int fifo = CC1200_PACKET_LENGTH - cc1200_get_reg_robust(dev, CC1200_NUM_TXBYTES);
+    int fifo = CC1200_TX_FIFO_SIZE - cc1200_get_reg_robust(dev, CC1200_NUM_TXBYTES);
 
     int status = cc1200_strobe(dev, CC1200_SNOP);
     if((status & 0x70) == 0x70){
@@ -223,8 +249,12 @@ static void _tx_continue(cc1200_t *dev)
         _tx_abort(dev);
         return;
     }
+
     int to_send = left > fifo ? fifo : left;
 
+
+    DEBUG("%s: left=%d, to_send=%d, fifo=%d, pos=%d\n",
+        __func__, left, to_send, fifo, dev->pkt_buf.pos);
 
     /* Flush TX  and calibrate Crystal */
     cc1200_strobe(dev, CC1200_SFTX);
@@ -238,35 +268,45 @@ static void _tx_continue(cc1200_t *dev)
     {
         /* Switch to TX mode */
         cc1200_strobe(dev, CC1200_STX);
-        xtimer_usleep(200);
+        //xtimer_usleep(200);
     }
 
     if (to_send < left)
     {
         /* set GDO2 to 0x2 -> will deassert at TX FIFO below threshold */
-        cc1200_write_reg(dev, CC1200_IOCFG2, 0x02);
+        cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_TXFIFO_THR);
         gpio_irq_enable(dev->params.gdo2);
     }
     else
-        {
-            /* set GDO2 to 0x6 -> will deassert at packet end */
-        cc1200_write_reg(dev, CC1200_IOCFG2, 0x06);
+	{
+        /* set GDO2 to 0x6 -> will deassert at packet end */
+        cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_PKT_SYNC_RXTX);
         gpio_irq_enable(dev->params.gdo2);
     }
 }
 
 void cc1200_isr_handler(cc1200_t *dev, void(*callback)(void*), void*arg)
 {
-uint8_t rxbytes = cc1200_read_reg(dev, CC1200_NUM_RXBYTES);
+    uint8_t rxbytes;
 
     switch (dev->radio_state) {
         case RADIO_RX:
-            DEBUG("radio rx\n");
+            rxbytes = cc1200_read_reg(dev, CC1200_NUM_RXBYTES);
+            //DEBUG("radio rx\n");
             if (gpio_read(dev->params.gdo2) | (rxbytes > 0)) {
-                DEBUG("cc1200_isr_handler((): starting RX\n");
+                //DEBUG("cc1200_isr_handler((): starting RX\n");
                 dev->isr_cb = callback;
                 dev->isr_cb_arg = arg; 
                 _rx_start(dev);
+
+                /*
+                 * Don't know, why this waiting is necessary, but the driver
+                 * blocks without this. Alternatively, the delay can also be
+                 * located in  _netdev_cc1200_isr() or _isr(), but this here
+                 * is more specific. Also, the delay can be placed before or
+                 * after, but not in _rx_start()...
+                 */
+                xtimer_spin(xtimer_ticks_from_usec(800));
             }
             else {
                 DEBUG("cc1200_isr_handler((): isr handled too slow or falling edge trigger\n");
@@ -274,16 +314,16 @@ uint8_t rxbytes = cc1200_read_reg(dev, CC1200_NUM_RXBYTES);
             }
             break;
         case RADIO_RX_BUSY:
-            DEBUG("radio rx busy\n");
+            //DEBUG("radio rx busy\n");
             _rx_continue(dev, callback, arg);
             break;
         case RADIO_TX_BUSY:
-            DEBUG("radio tx busy\n");
+            //DEBUG("radio tx busy\n");
             if (!gpio_read(dev->params.gdo2)) {
                 _tx_continue(dev);
             }
             else {
-                DEBUG("cc1200_isr_handler() RADIO_TX_BUSY + GDO2\n");
+                //DEBUG("cc1200_isr_handler() RADIO_TX_BUSY + GDO2\n");
             }
             break;
         default:
@@ -293,56 +333,111 @@ uint8_t rxbytes = cc1200_read_reg(dev, CC1200_NUM_RXBYTES);
     }
 }
 
-int cc1200_send(cc1200_t *dev, cc1200_pkt_t *packet)
+int cc1200_send(cc1200_t *dev, const struct iovec *vector, unsigned count)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
-    DEBUG("cc1200: snd pkt to %u payload_length=%u\n",
-            (unsigned)packet->address, (unsigned)packet->length);
-    for(int i = 0; i< packet->length+1; i++)DEBUG("0x%x ", *(((char* )packet)+i));
-    DEBUG("\n");
 
-    uint8_t size;
     switch (dev->radio_state) {
         case RADIO_RX_BUSY:
-            DEBUG("%s:%u\n", __func__, __LINE__);
-        case RADIO_TX_BUSY:
-            DEBUG("%s:%u\n", __func__, __LINE__);
+            DEBUG("%s: rx busy...\n", __func__);
             return -EAGAIN;
+        case RADIO_TX_BUSY:
+            DEBUG("%s: tx busy...\n", __func__);
+            //return -EAGAIN;
+            {
+                int tx_bytes = cc1200_get_reg_robust(dev, CC1200_NUM_TXBYTES);
+
+                while(tx_bytes > 0){
+                    DEBUG("%s: waiting for transmission to be finished, %d bytes left\n",
+                        __func__, tx_bytes);
+                    thread_yield();
+                    xtimer_spin(xtimer_ticks_from_usec(50));
+                    tx_bytes = cc1200_get_reg_robust(dev, CC1200_NUM_TXBYTES);
+                }
+
+                /*
+                 * need to wait a little before sending next frame;
+                 * don't know why...
+                 *
+                 * TODO: check in detail...
+                 */
+                xtimer_usleep(500);
+            }
     }
+
+    gpio_irq_disable(dev->params.gdo2);
+    dev->radio_state = RADIO_TX_BUSY;
 
     /*
      * Number of bytes to send is:
      * length of phy payload (packet->length)
      * + size of length field (1 byte)
      */
-    size = packet->length + 1;
+    //size = packet->length + 1;
+    uint8_t size = 0;
+    for(unsigned i = 0; i<count; i++) size += vector[i].iov_len;
 
-    if (size > CC1200_PACKET_LENGTH) {
+    DEBUG("%s: size=%d\n", __func__, size);
+
+    if (size > (CC1200_PACKET_LENGTH+1) ) {
         DEBUG("%s:%s:%u trying to send oversized packet\n",
                 RIOT_FILE_RELATIVE, __func__, __LINE__);
         return -ENOSPC;
     }
 
+    //size++; //for the length byte
+
     /* Disable RX interrupt */
-    gpio_irq_disable(dev->params.gdo2);
-    dev->radio_state = RADIO_TX_BUSY;
 
 #ifdef MODULE_CC1200_HOOKS
     cc1200_hook_tx();
 #endif
 
-    cc1200_write_reg(dev, CC1200_IOCFG2, 0x02);
+    cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_TXFIFO_THR);
 
-    /* Put CC110x in IDLE mode to flush the FIFO */
+    /* Put CC1200 in IDLE mode to flush the FIFO */
     cc1200_strobe(dev, CC1200_SIDLE);
     /* Flush TX FIFO to be sure it is empty */
     cc1200_strobe(dev, CC1200_SFTX);
+    
+    /* Flush device pkt_buf */
+    memset(&dev->pkt_buf, 0, sizeof(dev->pkt_buf));
 
-    memcpy((char*)&dev->pkt_buf.packet, packet, size);
+    /* Set packet length field */
+    dev->pkt_buf.packet.length = size;
+
+    DEBUG("%s:%u SIZE: %u\n", __func__, __LINE__, size);
+    int pos = 1; // length field has been set by hand
+    for(unsigned i = 0; i< count; i++){
+        unsigned int pkt_len = vector[i].iov_len;
+
+#if ENABLE_DEBUG
+        DEBUG("%s:%u Package to send: \n", __func__, __LINE__);
+        for(unsigned j = 0; j < pkt_len; j++){
+            DEBUG("0x%x ", *(((char*) vector[i].iov_base)+j));
+        }
+        DEBUG("\n");
+#endif
+
+        memcpy((char*)&dev->pkt_buf.packet+pos, vector[i].iov_base, pkt_len);
+        pos += pkt_len;
+    }
+    //memcpy((char*)&dev->pkt_buf.packet, packet, size);
     dev->pkt_buf.pos = 0;
+
+    DEBUG("cc1200: snd pkt to %u payload_length=%u\n",
+            (unsigned)dev->pkt_buf.packet.address, 
+            (unsigned)dev->pkt_buf.packet.length);
+    DEBUG("\n");
 
     _tx_continue(dev);
 
-
+    /*
+     * need to wait a little before returning;
+     * don't know why...
+     *
+     * TODO: check in detail...
+     */
+    xtimer_usleep(5000);
     return size;
 }

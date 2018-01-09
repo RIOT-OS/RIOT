@@ -69,7 +69,12 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
     dev->radio_state = RADIO_IDLE;
 
     /* Write configuration to configuration registers */
-    cc1200_writeburst_reg(dev, 0x00, cc1200_default_conf, cc1200_default_conf_size);
+    cc1200_writeburst_reg(dev, 0x00, cc1200_default_conf,
+    		cc1200_default_conf_size);
+
+    // FIFO_CFG: CRC_AUTOFLUSH, 32 bytes as threshold
+    //cc1200_write_reg(dev, CC1200_FIFO_CFG, 0xa0);
+    cc1200_write_reg(dev, CC1200_FIFO_CFG, 0x84); // 4 bytes
 
     /* Write extended config for CC1200 */
     cc1200_write_reg(dev, CC1200_IF_MIX_CFG, 0x18);
@@ -104,10 +109,8 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
     uint64_t addr;
     luid_get(&addr, 8);
     cc1200_set_address_long(dev, addr);
-    cc1200_set_address_short(dev, (uint16_t)addr & 0xFFFF);
-    cc1200_set_address(dev, (uint8_t) addr & 0xFF);
-
-
+    cc1200_set_address_short(dev, (uint16_t)htonll(addr) & 0xFFFF);
+    cc1200_set_address(dev, (uint8_t)htonll(addr) & 0xFF);
 
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     LOG_INFO("cc1200: initialized with address=%u and channel=%i\n",
@@ -121,7 +124,9 @@ uint8_t cc1200_set_address(cc1200_t *dev, uint8_t address)
 {
     DEBUG("%s:%s:%u setting address %u\n", RIOT_FILE_RELATIVE, __func__,
             __LINE__, (unsigned)address);
-    if (!(address < MIN_UID) || (address > MAX_UID)) {
+    //if (!(address < MIN_UID) || (address > MAX_UID)) {
+		//if ((address >= MIN_UID) && (address <= MAX_UID)) {	
+		if (address >= MIN_UID) {	
         if (dev->radio_state != RADIO_UNKNOWN) {
 
             cc1200_write_register(dev, CC1200_DEV_ADDR, address);
@@ -152,7 +157,9 @@ uint16_t cc1200_set_address_short(cc1200_t *dev, uint16_t address)
 {
     DEBUG("%s:%s:%u setting address short 0x%x\n", RIOT_FILE_RELATIVE, __func__,
             __LINE__, (unsigned)address);
-    if (!(address < MIN_UID) || (address > 0xFFFF)) {
+    //if (!(address < MIN_UID) || (address > 0xFFFF)) {
+    //if ((address >= MIN_UID) && (address <= 0xFFFF)) {
+    if (address >= MIN_UID) {
         if (dev->radio_state != RADIO_UNKNOWN) {
       
             dev->radio_address_short = address;
@@ -234,7 +241,7 @@ void cc1200_switch_to_rx(cc1200_t *dev)
 
     dev->radio_state = RADIO_RX;
 
-    cc1200_write_reg(dev, CC1200_IOCFG2, 0x6);
+    cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_PKT_SYNC_RXTX);
     cc1200_strobe(dev, CC1200_SRX);
 
     gpio_irq_enable(dev->params.gdo2);

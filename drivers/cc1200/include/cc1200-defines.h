@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Driver internal constants for CC110x chip configuration
+ * @brief       Driver internal constants for CC1200 chip configuration
  *
  * @author      Anon Mall <anon.mall@gt-arc.com>
  */

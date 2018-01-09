@@ -35,6 +35,8 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#define _MAX_MHR_OVERHEAD   (25)
+
 static int _send(netdev_t *dev, const struct iovec *vector, unsigned count)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
@@ -42,39 +44,28 @@ static int _send(netdev_t *dev, const struct iovec *vector, unsigned count)
     int result = 0;
     netdev_cc1200_t *netdev_cc1200 = (netdev_cc1200_t*) dev;
     int size = 0;
-    for(int i = 0; i<count; i++) size += vector[i].iov_len;
-    if(size > CC1200_PACKET_LENGTH-1){
+    for(unsigned i = 0; i<count; i++) size += vector[i].iov_len;
+
+    DEBUG("%s:%u size=%d\n", __func__, __LINE__, size);
+    //if(size > CC1200_PACKET_LENGTH-1){
+    if(size > CC1200_PACKET_LENGTH){
+        DEBUG("%s: packet too large (%u > %u)\n",
+            __func__, size, CC1200_PACKET_LENGTH);
+
         return -EOVERFLOW;
     }
 
-    char package[size+1];
-    package[0] = size;
-    uint pos = 1;
+    //cc1200_pkt_t *cc1200_pkt = (cc1200_pkt_t*) package;
 
-
-    DEBUG("%s:%u SIZE: %u\n", __func__, __LINE__, size);
-    for(int i = 0; i< count; i++){
-        uint pkt_len = vector[i].iov_len;
-
-        DEBUG("%s:%u Package to send: \n", __func__, __LINE__);
-        for(int j = 0; j < pkt_len; j++){
-            DEBUG("0x%x ", *(((char*) vector[i].iov_base)+j));
-        }
-        DEBUG("\n");
-
-        memcpy(package+pos, vector[i].iov_base, pkt_len);
-        pos += pkt_len;
-    }
-    cc1200_pkt_t *cc1200_pkt = (cc1200_pkt_t*) package;
-
-    result = cc1200_send(&netdev_cc1200->cc1200, cc1200_pkt );
+    //result = cc1200_send(&netdev_cc1200->cc1200, cc1200_pkt );
+    result = cc1200_send(&netdev_cc1200->cc1200, vector, count);
     LED_OFF(0);
     return result;
 }
 
 static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 {
-    DEBUG("%s:%u\n", __func__, __LINE__);
+    DEBUG("%s:%u, len=%d\n", __func__, __LINE__, len);
 
     cc1200_t *cc1200 = &((netdev_cc1200_t*) dev)->cc1200;
     cc1200_pkt_t *cc1200_pkt = &cc1200->pkt_buf.packet;
@@ -107,6 +98,11 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
     dev->stats.rx_count++;
     dev->stats.rx_bytes += cc1200_pkt->length;
 #endif
+
+    for(int i = 0; i< cc1200_pkt->length+1; i++)
+    	DEBUG("0x%x ", *(((char* )cc1200_pkt)+i));
+    DEBUG("\n");
+
     return cc1200_pkt->length;
 }
 
@@ -118,9 +114,11 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
     switch (opt) {
 
         case NETOPT_MAX_PACKET_SIZE:
-            assert(value_len > 0);
-            *((uint8_t *)value) = CC1200_PACKET_LENGTH;
-            return 1;
+            if (value_len < sizeof(int16_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint16_t *)value) = CC1200_MAX_DATA_LENGTH - _MAX_MHR_OVERHEAD;
+            return sizeof(uint16_t);
         default:
             break;
     }
@@ -145,7 +143,8 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
                 }
                 uint8_t *arg = (uint8_t*)value;
                 uint8_t channel = arg[value_len-1];
-                if ((channel < CC1200_MIN_CHANNR) || (channel > CC1200_MAX_CHANNR)) {
+                //if ((channel < CC1200_MIN_CHANNR) || (channel > CC1200_MAX_CHANNR)) {
+                if (channel > CC1200_MAX_CHANNR) {
                     return -EINVAL;
                 }
                 if (cc1200_set_channel(cc1200, channel) == -1) {
@@ -252,18 +251,21 @@ static int _init(netdev_t *dev)
 }
 
 const netdev_driver_t netdev_cc1200_driver = {
-    .send=_send,
-    .recv=_recv,
-    .init=_init,
     .get=_get,
     .set=_set,
-    .isr=_isr
+    .send=_send,
+    .recv=_recv,
+    .isr=_isr,
+    .init=_init
 };
 
 int netdev_cc1200_setup(netdev_cc1200_t *netdev_cc1200, const cc1200_params_t *params)
 {
     DEBUG("netdev_cc1200_setup()\n");
-    netdev_cc1200->netdev.netdev.driver = &netdev_cc1200_driver;
+    //netdev_cc1200->netdev.netdev.driver = &netdev_cc1200_driver;
+    netdev_t *netdev = (netdev_t *)netdev_cc1200;
+
+    netdev->driver = &netdev_cc1200_driver;
 #ifdef MODULE_GNRC_NETIF
 # ifdef MODULE_GNRC_SIXLOWPAN
     netdev_cc1200->cc1200.proto = GNRC_NETTYPE_SIXLOWPAN;

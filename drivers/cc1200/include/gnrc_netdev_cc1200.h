@@ -16,7 +16,7 @@
  * @author      Anon Mall <anon.mall@gt-arc.com>
  */
 
-#include "net/gnrc/netdev.h"
+//#include "net/gnrc/netdev.h"
 #include "cc1200-netdev.h"
 
 #ifndef GNRC_CC1200_H
@@ -35,7 +35,7 @@ extern "C" {
  * @return 1    on sucess
  * @return <=0  on error
  */
-int gnrc_netdev_cc1200_init(gnrc_netdev_t *gnrc_netdev, netdev_cc1200_t *dev);
+//int gnrc_netdev_cc1200_init(gnrc_netdev_t *gnrc_netdev, netdev_cc1200_t *dev);
 
 #ifdef __cplusplus
 }

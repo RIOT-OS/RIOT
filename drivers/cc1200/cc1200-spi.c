@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       TI Chipcon CC110x spi driver
+ * @brief       TI Chipcon CC1200 spi driver
  *
  * @author    Anon Mall <anon.mall@gt-arc.com>
  * @}
