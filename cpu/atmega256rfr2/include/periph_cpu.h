@@ -51,7 +51,7 @@ enum {
 /** @} */
 
 /**
- * @name   Atmega256rfr2 timers have up to 3 capture-compare channels (TIMER 1/3) 
+ * @name   Atmega256rfr2 timers have up to 3 capture-compare channels (TIMER 1/3)
  * -> best suitable for PWM and especially RGB Leds
  * @{
  */

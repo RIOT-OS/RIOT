@@ -49,5 +49,8 @@ extern "C" {
 
 #define THREAD_STACKSIZE_IDLE      (129)
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* CPU_CONF_H */
 /** @} */

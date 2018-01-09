@@ -13,8 +13,8 @@
  * @{
  *
  * @file
- * @brief       Board specific implementations for the Jiminy Mega 256rfr2 board 
- *		developed by the IAS of the RWTH Aachen University
+ * @brief       Board specific implementations for the Jiminy Mega 256rfr2 board
+ *              developed by the IAS of the RWTH Aachen University
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
