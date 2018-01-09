@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
+ * Copyright (C) 2014-2016  René Kijewski  <rene.kijewski@fu-berlin.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,15 +36,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
-
-#include "kernel_macros.h"
-
-#if defined(MODULE_MSP430_COMMON)
-#   include "msp430_types.h"
-#elif !defined(CPU_NATIVE)
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -707,6 +699,21 @@ json_result_t json_read_false(json_read_cookie_t *cookie);
 json_result_t json_read_null(json_read_cookie_t *cookie);
 
 /**
+ * @brief   Strip a range of of whitespace characters between values.
+ * @details This function is only useful when you need to make sure that all remaining
+ *          data is only spaces/padding. For this usecase @ref JSON_PREMATURELY_ENDED
+ *          is the **good** outcome, and @ref JSON_INVALID_DATA would indicate an error.
+ *
+ *          This function does not return @ref JSON_OKAY in any case.
+ *
+ * @param[in] cookie            The cookie, initialized with json_read_init().
+ *
+ * @returns @ref JSON_PREMATURELY_ENDED The input was exhausted.
+ * @returns @ref JSON_INVALID_DATA Non-whitespace characters were encountered.
+ */
+json_result_t json_read_read_spaces(json_read_cookie_t *cookie);
+
+/**
  * @}
  */
 
@@ -815,7 +822,7 @@ json_result_t json_codepoint_to_utf8(uint32_t codepoint, char *output, size_t *l
 } /*extern "C"*/
 #endif
 
-#endif /*ifndef JSON_H*/
+#endif /* JSON_H */
 
 /**
  * @}
