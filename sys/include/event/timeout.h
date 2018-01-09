@@ -54,11 +54,12 @@ typedef struct {
 /**
  * @brief   Initialize timeout event object
  *
- * @param[in]   event_timeout   event_timeout object to initilalize
+ * @param[in]   event_timeout   event_timeout object to initialize
  * @param[in]   queue           queue that the timed-out event will be added to
  * @param[in]   event           event to add to queue after timeout
  */
-void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue, event_t *event);
+void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue,
+                        event_t *event);
 
 /**
  * @brief   Set a timeout
@@ -69,7 +70,7 @@ void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue, ev
  * @note: the used event_timeout struct must stay valid until after the timeout
  *        event has been processed!
  *
- * @param[in]   event_timeout   event_timout context onject to use
+ * @param[in]   event_timeout   event_timout context object to use
  * @param[in]   timeout         timeout in miliseconds
  */
 void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout);
