@@ -488,6 +488,7 @@ ifneq (,$(filter rn2%3,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += rn2xx3
   USEMODULE += fmt
+  USEMODULE += netif
 endif
 
 ifneq (,$(filter sdcard_spi,$(USEMODULE)))
