@@ -7,4 +7,3 @@ USEMODULE += shtc1
 USEMODULE += xtimer
 
 include $(RIOTBASE)/Makefile.include
-

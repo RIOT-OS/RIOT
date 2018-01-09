@@ -62,5 +62,5 @@ static const shtc1_params_t shtc1_params[] = {
 #ifdef __cplusplus
 }
 #endif
-#endif /*SHTC1_PARAMS_C*/
+#endif /* SHTC1_PARAMS_H */
 /** @} */

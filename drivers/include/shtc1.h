@@ -121,5 +121,5 @@ int8_t shtc1_reset(const shtc1_t* const dev);
 }
 #endif
 
-#endif /*SHTC1_H*/
-/**@}*/
+#endif /* SHTC1_H */
+/** @} */
