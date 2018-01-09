@@ -106,7 +106,7 @@ int main(void)
     puts("posting timed callback with timeout 1sec");
     event_timeout_init(&event_timeout, &queue, (event_t *)&event_callback);
     before = xtimer_now_usec();
-    event_timeout_set(&event_timeout, 100000LU);
+    event_timeout_set(&event_timeout, (1 * US_PER_SEC));
 
     event_timeout_t event_timeout_canceled;
 
