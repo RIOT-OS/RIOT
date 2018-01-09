@@ -609,6 +609,7 @@ static void _isotp_rx_timeout_task(struct isotp *isotp)
     case ISOTP_SENDING_FC:
         DEBUG("_isotp_rx_timeout_task: FC tx conf timeout\n");
         raw_can_abort(isotp->entry.ifnum, isotp->rx.tx_handle);
+        /* Fall through */
     case ISOTP_WAIT_CF:
         DEBUG("_isotp_rx_timeout_task: free rx buf\n");
         gnrc_pktbuf_release(isotp->rx.snip);
