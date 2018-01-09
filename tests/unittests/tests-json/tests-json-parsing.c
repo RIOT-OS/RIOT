@@ -316,7 +316,7 @@ void tests_json_parsing(void) {
                 return;
             }
         }
-        
+
         switch (current_test[0]) {
             case 'y': {
                 if (was_accepted) {
