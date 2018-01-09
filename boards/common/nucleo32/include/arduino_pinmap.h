@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Mapping of MCU pins to Arduino pins
+ * @name    Mapping of MCU pins to Arduino pins
  * @{
  */
 #define ARDUINO_PIN_0           GPIO_PIN(PORT_A, 10)
@@ -64,7 +64,7 @@ extern "C" {
 /** @ */
 
 /**
- * @name    Mapping of Ardunino analog pins to RIOT ADC lines
+ * @name    Mapping of Arduino analog pins to RIOT ADC lines
  * @{
  */
 #define ARDUINO_A0              ADC_LINE(0)
