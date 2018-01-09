@@ -26,8 +26,8 @@
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
-#ifndef TESTS__JSON_H__
-#define TESTS__JSON_H__
+#ifndef TESTS_JSON_H
+#define TESTS_JSON_H
 
 #include "embUnit.h"
 #include "../map.h"
@@ -204,5 +204,5 @@ MAP(TESTS_JSON_PROTOTYPE, TESTS_JSON_ALL)
 }
 #endif
 
-#endif /* ifndef TESTS__JSON_H__ */
+#endif /* TESTS_JSON_H */
 /** @} */
