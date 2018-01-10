@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_common_nrf52
+ * @ingroup     boards_common_nrf52xxxdk
  * @{
  *
  * @file
- * @brief       Board initialization for the nRF52840 DK
+ * @brief       Board initialization for the nRF52xxx DK
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
