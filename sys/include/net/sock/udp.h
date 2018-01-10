@@ -299,16 +299,16 @@ typedef struct sock_udp sock_udp_t;
  * @param[out] sock     The resulting sock object.
  * @param[in] local     Local end point for the sock object.
  *                      May be NULL.
- *                      sock_udp_ep_t::port may not be 0 if `local != NULL`.
+ *                      sock_udp_ep_t::port must not be 0 if `local != NULL`.
  *                      sock_udp_ep_t::netif must either be
  *                      @ref SOCK_ADDR_ANY_NETIF or equal to
  *                      sock_udp_ep_t::netif of @p remote if `remote != NULL`.
  *                      If NULL @ref sock_udp_send() may bind implicitly.
  * @param[in] remote    Remote end point for the sock object.
  *                      May be `NULL` but then the `remote` parameter of
- *                      @ref sock_udp_send() may not be `NULL` and or it will
+ *                      @ref sock_udp_send() may not be `NULL` or it will
  *                      always error with return value -ENOTCONN.
- *                      sock_udp_ep_t::port may not be 0 if `remote != NULL`.
+ *                      sock_udp_ep_t::port must not be 0 if `remote != NULL`.
  *                      sock_udp_ep_t::netif must either be
  *                      @ref SOCK_ADDR_ANY_NETIF or equal to sock_udp_ep_t::netif
  *                      of @p local if `local != NULL`.

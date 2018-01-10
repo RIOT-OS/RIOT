@@ -50,7 +50,7 @@ typedef struct {
  * @param[in] iface         Interface @p pfx is valid on.
  * @param[in] pfx           The prefix. May not be a link-local prefix or a
  *                          multicast address and its first @p pfx_len bits
- *                          may not be 0.
+ *                          may not be 0. Must not be `NULL`.
  * @param[in] pfx_len       Length of @p pfx in bits.
  *                          Condition @p pfx_len > 0 must hold.
  * @param[in] valid_ltime   Lifetime (in ms) until prefix expires from now.

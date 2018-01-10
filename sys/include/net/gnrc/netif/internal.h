@@ -63,11 +63,11 @@ void gnrc_netif_release(gnrc_netif_t *netif);
  *      or loopback
  * @pre `(pfx_len > 0) && (pfx_len <= 128)`
  *
- * @param[in,out] netif the network interface. May not be NULL.
+ * @param[in,out] netif the network interface. Must not be NULL.
  * @param[in] addr      the address to add. If the address is already on the
  *                      interface the function will return 0, but @p flags
- *                      will be ignored. May not be NULL and may not be
- *                      link-local or multicast
+ *                      will be ignored. Must not be NULL or be a link-local or
+ *                      multicast address.
  * @param[in] pfx_len   length in bits of the prefix of @p addr
  * @param[in] flags     initial flags for the address.
  *                      - Setting the address' state to
