@@ -62,6 +62,18 @@ size_t fmt_byte_hex(char *out, uint8_t byte)
     return 2;
 }
 
+size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n)
+{
+    size_t len = n * 2;
+    if (out) {
+        while (n--) {
+            out += fmt_byte_hex(out, *ptr++);
+        }
+    }
+
+    return len;
+}
+
 size_t fmt_strlen(const char *str)
 {
     const char *tmp = str;
@@ -93,6 +105,39 @@ size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n)
         out += fmt_byte_hex(out, ptr[i]);
     }
     return (n<<1);
+}
+
+static uint8_t _byte_mod25(uint8_t x)
+{
+    for (unsigned divisor = 200; divisor >= 25; divisor >>= 1) {
+        if (x >= divisor) {
+            x -= divisor;
+        }
+    }
+
+    return x;
+}
+
+static uint8_t _hex_nib(uint8_t nib)
+{
+    return _byte_mod25((nib & 0x1f) + 9);
+}
+
+size_t fmt_hex_bytes(uint8_t *out, const char *hex)
+{
+    size_t len = fmt_strlen(hex);
+
+    if (len & 1) {
+        out = NULL;
+        return 0;
+    }
+
+    size_t final_len = len >> 1;
+    for (size_t i = 0, j = 0; j < final_len; i += 2, j++) {
+        out[j] = (_hex_nib(hex[i]) << 4) | _hex_nib(hex[i+1]);
+    }
+
+    return final_len;
 }
 
 size_t fmt_u32_hex(char *out, uint32_t val)
