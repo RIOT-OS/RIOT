@@ -37,8 +37,7 @@ static msg_t _main_msg_queue[MSG_QUEUE_SIZE];
 static uint8_t tmp_buffer[ETHERNET_DATA_LEN];
 static size_t tmp_buffer_bytes = 0;
 
-static int _dump_send_packet(netdev_t *netdev, const struct iovec *vector,
-                             int count)
+static int _dump_send_packet(netdev_t *netdev, const iolist_t *iolist)
 {
     int res;
 
@@ -55,13 +54,13 @@ static int _dump_send_packet(netdev_t *netdev, const struct iovec *vector,
         printf("unknown ");
     }
     puts("device:");
-    for (int i = 0; i < count; i++) {
-        if ((tmp_buffer_bytes + vector[i].iov_len) > ETHERNET_DATA_LEN) {
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+        size_t len = iol->iol_len;
+        if ((tmp_buffer_bytes + len) > ETHERNET_DATA_LEN) {
             return -ENOBUFS;
         }
-        memcpy(&tmp_buffer[tmp_buffer_bytes], vector[i].iov_base,
-               vector[i].iov_len);
-        tmp_buffer_bytes += vector[i].iov_len;
+        memcpy(&tmp_buffer[tmp_buffer_bytes], iol->iol_base, len);
+        tmp_buffer_bytes += len;
     }
     od_hex_dump(tmp_buffer, tmp_buffer_bytes, OD_WIDTH_DEFAULT);
     res = (int)tmp_buffer_bytes;

@@ -92,27 +92,20 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
-    gnrc_pktsnip_t *vector;
     int res = -ENOBUFS;
-    size_t n;
 
     if (pkt->type == GNRC_NETTYPE_NETIF) {
         /* we don't need the netif snip: remove it */
         pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
     }
-    /* prepare packet for sending */
-    vector = gnrc_pktbuf_get_iovec(pkt, &n);
-    if (vector != NULL) {
-        /* reassign for later release; vector is prepended to pkt */
-        pkt = vector;
-        struct iovec *v = (struct iovec *)vector->data;
-        netdev_t *dev = netif->dev;
+
+    netdev_t *dev = netif->dev;
 
 #ifdef MODULE_NETSTATS_L2
-        dev->stats.tx_unicast_count++;
+    dev->stats.tx_unicast_count++;
 #endif
-        res = dev->driver->send(dev, v, n);
-    }
+
+    res = dev->driver->send(dev, (iolist_t *)pkt);
     /* release old data */
     gnrc_pktbuf_release(pkt);
     return res;
