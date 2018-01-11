@@ -25,6 +25,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "periph/spi.h"
 #include "board_common.h"
 
 #ifdef __cplusplus
@@ -109,6 +110,17 @@
 #define CC1200_RESET_GPIO   GPIO_PC7
 #define CC1200_GPD0_GPIO    GPIO_PB4
 #define CC1200_GPD2_GPIO    GPIO_PB0
+/** @} */
+
+/**
+ * @name CC1200 device parameters
+ * 
+ */
+#define CC1200_PARAMS_BOARD     {.spi = SPI_DEV(0), \
+                                 .spi_clk = SPI_CLK_5MHZ, \
+                                 .cs_pin = GPIO_PIN(PORT_B, 5), \
+                                 .int_pin = GPIO_PIN(PORT_B, 4), \
+                                 .reset_pin = GPIO_PIN(PORT_C, 7)}
 /** @} */
 
 /**

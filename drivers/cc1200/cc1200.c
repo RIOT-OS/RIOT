@@ -53,7 +53,7 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
 
     /* Configure chip-select */
     spi_init(dev->params.spi);
-    int spi_return = spi_init_cs(dev->params.spi, dev->params.cs);
+    int spi_return = spi_init_cs(dev->params.spi, dev->params.cs_pin);
     if(spi_return != SPI_OK){
         DEBUG("%s:%s:%u spi not ok\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     }
@@ -233,7 +233,8 @@ void cc1200_switch_to_rx(cc1200_t *dev)
     cc1200_hook_rx();
 #endif
 
-    gpio_irq_disable(dev->params.gdo2);
+    gpio_irq_disable(dev->params.int_pin);
+    //gpio_irq_disable(dev->params.gdo2);
 
     /* flush RX fifo */
     cc1200_strobe(dev, CC1200_SIDLE);
@@ -244,7 +245,8 @@ void cc1200_switch_to_rx(cc1200_t *dev)
     cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_PKT_SYNC_RXTX);
     cc1200_strobe(dev, CC1200_SRX);
 
-    gpio_irq_enable(dev->params.gdo2);
+    gpio_irq_enable(dev->params.int_pin);
+    //gpio_irq_enable(dev->params.gdo2);
 }
 
 void cc1200_wakeup_from_rx(cc1200_t *dev)
@@ -305,9 +307,9 @@ static void _reset(cc1200_t *dev)
 static void _power_up_reset(cc1200_t *dev)
 {
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-    gpio_set(dev->params.cs);
-    gpio_clear(dev->params.cs);
-    gpio_set(dev->params.cs);
+    gpio_set(dev->params.cs_pin);
+    gpio_clear(dev->params.cs_pin);
+    gpio_set(dev->params.cs_pin);
     xtimer_usleep(RESET_WAIT_TIME);
     _reset(dev);
 }
@@ -351,7 +353,7 @@ int cc1200_rd_set_mode(cc1200_t *dev, int mode)
             break;
 
         case RADIO_MODE_OFF:
-            gpio_irq_disable(dev->params.gdo2); /* Disable interrupts */
+            gpio_irq_disable(dev->params.int_pin); /* Disable interrupts */
             cc1200_switch_to_pwd(dev);          /* Set chip to power down mode */
             break;
 

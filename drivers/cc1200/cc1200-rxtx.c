@@ -44,7 +44,7 @@
 
 static void _rx_abort(cc1200_t *dev)
 {
-    gpio_irq_disable(dev->params.gdo2);
+    gpio_irq_disable(dev->params.int_pin);
 
     cc1200_strobe(dev, CC1200_SIDLE);    /* Switch to IDLE (should already be)... */
     cc1200_strobe(dev, CC1200_SFRX);     /* ...for flushing the RX FIFO */
@@ -70,7 +70,7 @@ static void _rx_read_data(cc1200_t *dev, void(*callback)(void*), void*arg)
 
     if (!fifo) {
         DEBUG("%s:%s:%u rx fifo is empty\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-        gpio_irq_enable(dev->params.gdo2);
+        gpio_irq_enable(dev->params.int_pin);
         return;
     }
 
@@ -170,12 +170,12 @@ static void _rx_continue(cc1200_t *dev, void(*callback)(void*), void*arg)
         return;
     }
 
-    gpio_irq_disable(dev->params.gdo2);
+    gpio_irq_disable(dev->params.int_pin);
     cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_RXFIFO_THR);
     do {
         _rx_read_data(dev, callback, arg);
     }
-    while (gpio_read(dev->params.gdo2));
+    while (gpio_read(dev->params.int_pin));
 }
 
 static void _rx_start(cc1200_t *dev)
@@ -185,17 +185,17 @@ static void _rx_start(cc1200_t *dev)
     cc1200_pkt_buf_t *pkt_buf = &dev->pkt_buf;
     pkt_buf->pos = 0;
 
-    gpio_irq_disable(dev->params.gdo2);
+    gpio_irq_disable(dev->params.int_pin);
     cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_RXFIFO_THR);
 
     /* If we are late, go into resceive immediatly */
-    if(gpio_read(dev->params.gdo2)){
+    if(gpio_read(dev->params.int_pin)){
         //DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
         _rx_continue(dev, dev->isr_cb, dev->isr_cb_arg);
         return;
     }
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-    gpio_irq_enable(dev->params.gdo2);
+    gpio_irq_enable(dev->params.int_pin);
 }
 
 static void _tx_abort(cc1200_t *dev)
@@ -206,7 +206,7 @@ static void _tx_abort(cc1200_t *dev)
 static void _tx_continue(cc1200_t *dev)
 {
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-    gpio_irq_disable(dev->params.gdo2);
+    gpio_irq_disable(dev->params.int_pin);
 
     cc1200_pkt_t *pkt = &dev->pkt_buf.packet;
 #if 0
@@ -275,13 +275,13 @@ static void _tx_continue(cc1200_t *dev)
     {
         /* set GDO2 to 0x2 -> will deassert at TX FIFO below threshold */
         cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_TXFIFO_THR);
-        gpio_irq_enable(dev->params.gdo2);
+        gpio_irq_enable(dev->params.int_pin);
     }
     else
 	{
         /* set GDO2 to 0x6 -> will deassert at packet end */
         cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_PKT_SYNC_RXTX);
-        gpio_irq_enable(dev->params.gdo2);
+        gpio_irq_enable(dev->params.int_pin);
     }
 }
 
@@ -293,7 +293,7 @@ void cc1200_isr_handler(cc1200_t *dev, void(*callback)(void*), void*arg)
         case RADIO_RX:
             rxbytes = cc1200_read_reg(dev, CC1200_NUM_RXBYTES);
             //DEBUG("radio rx\n");
-            if (gpio_read(dev->params.gdo2) | (rxbytes > 0)) {
+            if (gpio_read(dev->params.int_pin) | (rxbytes > 0)) {
                 //DEBUG("cc1200_isr_handler((): starting RX\n");
                 dev->isr_cb = callback;
                 dev->isr_cb_arg = arg; 
@@ -319,7 +319,7 @@ void cc1200_isr_handler(cc1200_t *dev, void(*callback)(void*), void*arg)
             break;
         case RADIO_TX_BUSY:
             //DEBUG("radio tx busy\n");
-            if (!gpio_read(dev->params.gdo2)) {
+            if (!gpio_read(dev->params.int_pin)) {
                 _tx_continue(dev);
             }
             else {
@@ -365,7 +365,7 @@ int cc1200_send(cc1200_t *dev, const struct iovec *vector, unsigned count)
             }
     }
 
-    gpio_irq_disable(dev->params.gdo2);
+    gpio_irq_disable(dev->params.int_pin);
     dev->radio_state = RADIO_TX_BUSY;
 
     /*

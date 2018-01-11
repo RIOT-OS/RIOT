@@ -42,7 +42,7 @@
 
 static inline void lock(cc1200_t *dev)
 {
-    spi_acquire(dev->params.spi, dev->params.cs, SPI_MODE, SPI_CLK);
+    spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE, SPI_CLK);
 }
 
 
@@ -52,9 +52,9 @@ void cc1200_writeburst_reg(cc1200_t *dev, uint16_t addr, const char *src, uint8_
     lock(dev);
     cpsr = irq_disable();
     if((addr >> 8) == 0x2F){
-        spi_transfer_byte(dev->params.spi, dev->params.cs, true, 0x2F | CC1200_WRITE_BURST);
+        spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, 0x2F | CC1200_WRITE_BURST);
     }
-    spi_transfer_regs(dev->params.spi, dev->params.cs,
+    spi_transfer_regs(dev->params.spi, dev->params.cs_pin,
                       (addr | CC1200_WRITE_BURST), src, NULL, count);
     irq_restore(cpsr);
     spi_release(dev->params.spi);
@@ -66,18 +66,18 @@ void cc1200_readburst_reg(cc1200_t *dev, uint16_t addr, char *buffer, uint8_t co
     lock(dev);
     cpsr = irq_disable();
     if((addr >> 8) == 0x2F){
-        spi_transfer_byte(dev->params.spi, dev->params.cs, true, 0x2F | CC1200_READ_BURST);
+        spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, 0x2F | CC1200_READ_BURST);
     }
     int i = 0;
-    spi_transfer_byte(dev->params.spi, dev->params.cs, true,
+    spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true,
                       (addr | CC1200_READ_BURST));
     while (i < count) {
-        buffer[i] = (char)spi_transfer_byte(dev->params.spi, dev->params.cs,
+        buffer[i] = (char)spi_transfer_byte(dev->params.spi, dev->params.cs_pin,
                                             true, CC1200_NOBYTE);
         i++;
     }
-    gpio_set(dev->params.cs);
-    //spi_transfer_regs(dev->params.spi, dev->params.cs, (addr|CC1200_READ_BURST), NULL, buffer, count);
+    gpio_set(dev->params.cs_pin);
+    //spi_transfer_regs(dev->params.spi, dev->params.cs_pin, (addr|CC1200_READ_BURST), NULL, buffer, count);
     irq_restore(cpsr);
     spi_release(dev->params.spi);
 }
@@ -88,10 +88,10 @@ void cc1200_write_reg(cc1200_t *dev, uint16_t addr, uint8_t value)
     lock(dev);
     cpsr = irq_disable();
     if((addr >> 8) == 0x2F){
-        spi_transfer_byte(dev->params.spi, dev->params.cs, true, 0x2F);
+        spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, 0x2F);
     }
 
-    spi_transfer_reg(dev->params.spi, dev->params.cs, addr, value);
+    spi_transfer_reg(dev->params.spi, dev->params.cs_pin, addr, value);
     irq_restore(cpsr);
     spi_release(dev->params.spi);
 }
@@ -103,10 +103,10 @@ uint8_t cc1200_read_reg(cc1200_t *dev, uint16_t addr)
     lock(dev);
     cpsr = irq_disable();
     if((addr >> 8) == 0x2F){
-        spi_transfer_byte(dev->params.spi, dev->params.cs, true, 0x2F | CC1200_READ_SINGLE);
+        spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, 0x2F | CC1200_READ_SINGLE);
     }
 
-    result = spi_transfer_reg(dev->params.spi, dev->params.cs,
+    result = spi_transfer_reg(dev->params.spi, dev->params.cs_pin,
                               (addr | CC1200_READ_SINGLE), CC1200_NOBYTE);
     irq_restore(cpsr);
     spi_release(dev->params.spi);
@@ -120,10 +120,10 @@ uint8_t cc1200_read_status(cc1200_t *dev, uint16_t addr)
     lock(dev);
     cpsr = irq_disable();
     if((addr >> 8) == 0x2F){
-        spi_transfer_byte(dev->params.spi, dev->params.cs, true, 0x2F | CC1200_READ_BURST);
+        spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, 0x2F | CC1200_READ_BURST);
     }
 
-    result = spi_transfer_reg(dev->params.spi, dev->params.cs,
+    result = spi_transfer_reg(dev->params.spi, dev->params.cs_pin,
                               (addr | CC1200_READ_BURST), CC1200_NOBYTE);
     irq_restore(cpsr);
     spi_release(dev->params.spi);
@@ -141,15 +141,15 @@ uint8_t cc1200_get_reg_robust(cc1200_t *dev, uint16_t addr)
     {
         if ((addr >> 8) == 0x2F)
         {
-            spi_transfer_byte(dev->params.spi, dev->params.cs, true, 0x2F | CC1200_READ_BURST);
+            spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, 0x2F | CC1200_READ_BURST);
         }
-        res1 = spi_transfer_reg(dev->params.spi, dev->params.cs,
+        res1 = spi_transfer_reg(dev->params.spi, dev->params.cs_pin,
                                 (addr | CC1200_READ_BURST), CC1200_NOBYTE);
         if ((addr >> 8) == 0x2F)
         {
-            spi_transfer_byte(dev->params.spi, dev->params.cs, true, 0x2F | CC1200_READ_BURST);
+            spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, 0x2F | CC1200_READ_BURST);
         }
-        res2 = spi_transfer_reg(dev->params.spi, dev->params.cs,
+        res2 = spi_transfer_reg(dev->params.spi, dev->params.cs_pin,
                                 (addr | CC1200_READ_BURST), CC1200_NOBYTE);
     } while (res1 != res2);
     irq_restore(cpsr);
@@ -169,13 +169,13 @@ uint8_t cc1200_strobe(cc1200_t *dev, uint8_t c)
     unsigned int cpsr;
     lock(dev);
     cpsr = irq_disable();
-    result = spi_transfer_byte(dev->params.spi, dev->params.cs, false,  c);
+    result = spi_transfer_byte(dev->params.spi, dev->params.cs_pin, false,  c);
     if(c == CC1200_SRES){
-        result = spi_transfer_byte(dev->params.spi, dev->params.cs, true,  c);
+        result = spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true,  c);
         xtimer_spin(xtimer_ticks_from_usec(RESET_WAIT_TIME));
-        gpio_set(dev->params.cs);
+        gpio_set(dev->params.cs_pin);
     }else{
-        result = spi_transfer_byte(dev->params.spi, dev->params.cs, false,  c);
+        result = spi_transfer_byte(dev->params.spi, dev->params.cs_pin, false,  c);
     }
     irq_restore(cpsr);
     spi_release(dev->params.spi);

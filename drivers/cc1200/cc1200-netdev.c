@@ -217,7 +217,7 @@ static void _netdev_cc1200_rx_callback(void *arg)
     DEBUG("%s:%u\n", __func__, __LINE__);
     netdev_t *netdev = (netdev_t*) arg;
     cc1200_t *cc1200 = &((netdev_cc1200_t*) arg)->cc1200;
-    gpio_irq_disable(cc1200->params.gdo2);
+    gpio_irq_disable(cc1200->params.int_pin);
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
@@ -235,12 +235,12 @@ static int _init(netdev_t *dev)
     DEBUG("%s:%u\n", __func__, __LINE__);
     cc1200_t *cc1200 = &((netdev_cc1200_t*) dev)->cc1200;
 
-    gpio_init_int(cc1200->params.gdo2, GPIO_IN_PD, GPIO_BOTH,
+    gpio_init_int(cc1200->params.int_pin, GPIO_IN_PD, GPIO_BOTH,
             &_netdev_cc1200_isr, (void*)dev);
-    gpio_init(cc1200->params.gdo0, GPIO_IN_PD);
+    //gpio_init(cc1200->params.gdo0, GPIO_IN_PD);
 
-    gpio_set(cc1200->params.gdo2);
-    gpio_irq_disable(cc1200->params.gdo2);
+    gpio_set(cc1200->params.int_pin);
+    gpio_irq_disable(cc1200->params.int_pin);
 
     /* Switch to RX mode */
     cc1200_rd_set_mode(cc1200, RADIO_MODE_OFF);

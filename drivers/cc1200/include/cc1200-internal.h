@@ -54,8 +54,6 @@ extern "C" {
 #define IDLE_TO_RX_TIME             (122)   /**< Time chip needs to go to RX */
 #define CS_SO_WAIT_TIME             (488)   /**< Time to wait for SO to go low
                                                  after CS */
-#define CC1200_GDO1_LOW_RETRY       (100)   /**< Max. retries for SO to go low
-                                                 after CS */
 #ifndef CC1200_DEFAULT_CHANNEL
 #define CC1200_DEFAULT_CHANNEL      (26)     /**< The default channel number */
 #endif

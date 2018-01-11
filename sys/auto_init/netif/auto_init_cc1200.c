@@ -14,7 +14,7 @@
  * @file
  * @brief   Auto initialization for cc1200 network interfaces
  *
- * @author  Anon Malll <anon.mall@mail.gt-arc.com>
+ * @author  Anon Mall <anon.mall@mail.gt-arc.com>
  */
 
 #ifdef MODULE_CC1200
@@ -23,10 +23,12 @@
 #include "log.h"
 #include "debug.h"
 #include "board.h"
-#include "net/gnrc/netdev.h"
-#include "gnrc_netdev_cc1200.h"
-#include "net/gnrc/netdev/ieee802154.h"
+//#include "net/gnrc/netdev.h"
+//#include "gnrc_netdev_cc1200.h"
+#include "cc1200-netdev.h"
+//#include "net/gnrc/netdev/ieee802154.h"
 #include "net/gnrc.h"
+#include "net/gnrc/netif/ieee802154.h"
 
 #include "cc1200.h"
 #include "cc1200_params.h"
@@ -38,7 +40,7 @@
  */
 #define CC1200_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #ifndef CC1200_MAC_PRIO
-#define CC1200_MAC_PRIO          (GNRC_NETDEV_MAC_PRIO)
+#define CC1200_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
 #define CC1200_NUM (sizeof(cc1200_params)/sizeof(cc1200_params[0]))
@@ -46,7 +48,7 @@
 static netdev_cc1200_t cc1200_devs[CC1200_NUM];
 static char _stacks[CC1200_NUM][CC1200_MAC_STACKSIZE];
 
-static gnrc_netdev_t _gnrc_netdev_devs[CC1200_NUM];
+//static gnrc_netdev_t _gnrc_netdev_devs[CC1200_NUM];
 
 void auto_init_cc1200(void)
 {
@@ -56,7 +58,10 @@ void auto_init_cc1200(void)
         LOG_DEBUG("[auto_init_netif] initializing cc1200 #%u\n", i);
         DEBUG("[auto_init_netif] initializing cc1200 #%u\n", i);
 
-        int res = netdev_cc1200_setup(&cc1200_devs[i], p);
+        netdev_cc1200_setup(&cc1200_devs[i], p);
+        gnrc_netif_ieee802154_create(_stacks[i], CC1200_MAC_STACKSIZE,
+                               CC1200_MAC_PRIO, "cc1200", (netdev_t*)&cc1200_devs[i]);
+        /*
         res = gnrc_netdev_ieee802154_init(&_gnrc_netdev_devs[i],
                                       (netdev_ieee802154_t *)&(cc1200_devs[i]));
         DEBUG("[auto_init_netif] finished: res=%i\n", res);
@@ -70,6 +75,7 @@ void auto_init_cc1200(void)
                 LOG_ERROR("[auto_init_netif] error starting gnrc_cc1200 thread\n");
             }
         }
+        */
     }
 }
 #else

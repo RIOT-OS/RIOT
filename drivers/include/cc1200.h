@@ -28,16 +28,17 @@ extern "C" {
 #include "cc1200-internal.h"
 #include "net/gnrc/nettype.h"
 #include "net/ieee802154.h"
+#include "net/netdev.h"
 
 /**
  * @brief Struct for holding cc1200 IO parameters
  */
 typedef struct cc1200_params {
-    spi_t spi;          /**< what */
-    gpio_t cs;          /**< does */
-    gpio_t gdo0;        /**< this */
-    gpio_t gdo1;        /**< look */
-    gpio_t gdo2;        /**< like */
+    spi_t spi;              /**< SPI device */
+    spi_clk_t spi_clk;      /**< SPI clock speed to use */
+    spi_cs_t cs_pin;        /**< GPIO pin connected to chip select */
+    gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
+    gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
 } cc1200_params_t;
 
 /**
@@ -95,12 +96,14 @@ int16_t cc1200_set_channel(cc1200_t *dev, uint8_t channr);
  * @brief Send raw cc1200 packet
  *
  * @param[in] dev       Device to send on
- * @param[in] packet    ptr to packet to be sent
+ * @param[in] vector    ptr to iovector to be sent
+ * @param[in] count     ptr to iovector to be sent
  *
  * @return size of packet on success
  * @return <0 on error
  */
-int cc1200_send(cc1200_t *dev, cc1200_pkt_t *packet);
+//int cc1200_send(cc1200_t *dev, cc1200_pkt_t *packet);
+int cc1200_send(cc1200_t *dev, const struct iovec *vector, unsigned count);
 
 /**
  * @brief Set cc1200 radio address
