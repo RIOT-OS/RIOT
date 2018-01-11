@@ -14,6 +14,7 @@ ifneq (,$(filter can,$(USEMODULE)))
 endif
 
 ifneq (,$(filter socket_zep,$(USEMODULE)))
+  USEMODULE += iolist
   USEMODULE += netdev_ieee802154
   USEMODULE += checksum
   USEMODULE += random

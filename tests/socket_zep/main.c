@@ -56,29 +56,29 @@ static void test_init(void)
     _print_info(netdev);
 }
 
-static void test_send__vector_NULL__count_0(void)
+static void test_send__iolist_NULL(void)
 {
     netdev_t *netdev = (netdev_t *)(&_dev);
-    int res;
 
     puts("Send zero-length packet");
-    res = netdev->driver->send(netdev, NULL, 0);
+    int res = netdev->driver->send(netdev, NULL);
     assert((res < 0) || (res == 0));
     if ((res < 0) && (errno == ECONNREFUSED)) {
         puts("No remote socket exists (use scripts in `tests/` to have proper tests)");
     }
 }
 
-static void test_send__vector_not_NULL__count_2(void)
+static void test_send__iolist_not_NULL(void)
 {
-    struct iovec vector[] = { { .iov_base = "Hello", .iov_len = sizeof("Hello") },
-                              { .iov_base = "World", .iov_len = sizeof("World") } };
+    iolist_t iolist[] = { { .iol_base = "Hello", .iol_len = sizeof("Hello") },
+                          { .iol_base = "World", .iol_len = sizeof("World") } };
+
+    iolist[0].iol_next = &iolist[1];
+
     netdev_t *netdev = (netdev_t *)(&_dev);
-    int res;
 
     puts("Send 'Hello\\0World\\0'");
-    res =  netdev->driver->send(netdev, vector,
-                                sizeof(vector) / sizeof(struct iovec));
+    int res =  netdev->driver->send(netdev, iolist);
     assert((res < 0) || (res == (sizeof("Hello")) + sizeof("World")));
     if ((res < 0) && (errno == ECONNREFUSED)) {
         puts("No remote socket exists (use scripts in `tests/` to have proper tests)");
@@ -109,8 +109,8 @@ int main(void)
     _main_pid = sched_active_pid;
 
     test_init();
-    test_send__vector_NULL__count_0();
-    test_send__vector_not_NULL__count_2();
+    test_send__iolist_NULL();
+    test_send__iolist_not_NULL();
     test_recv();    /* does not return */
     puts("ALL TESTS SUCCESSFUL");
     return 0;

@@ -37,14 +37,12 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static int _send(netdev_t *dev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *dev, const iolist_t *iolist)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
 
-    (void)count;
-
-    netdev_cc110x_t *netdev_cc110x = (netdev_cc110x_t*) dev;
-    cc110x_pkt_t *cc110x_pkt = vector[0].iov_base;
+    netdev_cc110x_t *netdev_cc110x = (netdev_cc110x_t *)dev;
+    cc110x_pkt_t *cc110x_pkt = iolist->iol_base;
 
     return cc110x_send(&netdev_cc110x->cc110x, cc110x_pkt);
 }

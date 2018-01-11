@@ -112,6 +112,7 @@ ifneq (,$(filter encx24j600,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ethos,$(USEMODULE)))
+  USEMODULE += iolist
   USEMODULE += netdev_eth
   USEMODULE += random
   USEMODULE += tsrb
@@ -306,6 +307,7 @@ endif
 ifneq (,$(filter sx127%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
+  USEMODULE += iolist
   USEMODULE += xtimer
   USEMODULE += sx127x
   USEMODULE += netif

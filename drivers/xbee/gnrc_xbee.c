@@ -104,8 +104,6 @@ static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     int res;
     size_t size;
-    size_t count;
-    gnrc_pktsnip_t *vec;
     gnrc_netif_hdr_t *hdr;
     uint8_t xhdr[XBEE_MAX_TXHDR_LENGTH];
 
@@ -146,27 +144,23 @@ static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         }
     }
 
-    /* now let's extract the iovector and send out the stuff */
-    vec = gnrc_pktbuf_get_iovec(pkt, &count);
-    if (vec != NULL) {
-        pkt = vec;
-        struct iovec *vector = (struct iovec *)pkt->data;
-        vector[0].iov_base = xhdr;
-        vector[0].iov_len = res;
+    /* now let's send out the stuff */
+    iolist_t iolist = {
+        .iol_next = (iolist_t *)pkt->next,
+        .iol_base = xhdr,
+        .iol_len = res
+    };
+
 #ifdef MODULE_NETSTATS_L2
-        if (hdr->flags & BCAST) {
-            netif->dev->stats.tx_mcast_count++;
-        }
-        else {
-            netif->dev->stats.tx_unicast_count++;
-        }
-#endif
-        DEBUG("[xbee-gnrc] send: triggering the drivers send function\n");
-        res = netif->dev->driver->send(netif->dev, vector, count);
+    if (hdr->flags & BCAST) {
+        netif->dev->stats.tx_mcast_count++;
     }
     else {
-        DEBUG("[xbee-gnrc] send: unable to create iovec\n");
+        netif->dev->stats.tx_unicast_count++;
     }
+#endif
+    DEBUG("[xbee-gnrc] send: triggering the drivers send function\n");
+    res = netif->dev->driver->send(netif->dev, &iolist);
 
     gnrc_pktbuf_release(pkt);
 
