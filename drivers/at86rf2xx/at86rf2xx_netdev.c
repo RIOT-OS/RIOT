@@ -190,13 +190,13 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
 {
     switch (state) {
         case NETOPT_STATE_STANDBY:
-            at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+            at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
             break;
         case NETOPT_STATE_SLEEP:
             at86rf2xx_set_state(dev, AT86RF2XX_STATE_SLEEP);
             break;
         case NETOPT_STATE_IDLE:
-            at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
+            at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_ON);
             break;
         case NETOPT_STATE_TX:
             if (dev->netdev.flags & AT86RF2XX_OPT_PRELOADING) {
@@ -216,7 +216,7 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
                      * know when to switch back to the idle state. */
                     ++dev->pending_tx;
                 }
-                at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
+                at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
                 at86rf2xx_tx_exec(dev);
             }
             break;
@@ -607,7 +607,8 @@ static void _isr(netdev_t *netdev)
 
     if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__TRX_END) {
         if ((state == AT86RF2XX_STATE_RX_AACK_ON)
-            || (state == AT86RF2XX_STATE_BUSY_RX_AACK)) {
+            || (state == AT86RF2XX_STATE_BUSY_RX_AACK)
+            || (state == AT86RF2XX_STATE_RX_ON)) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");
             if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
                 return;
@@ -661,6 +662,21 @@ static void _isr(netdev_t *netdev)
                     default:
                         DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
                               trac_status >> 5);
+                }
+            }
+        } else if (state == AT86RF2XX_STATE_PLL_ON) {
+            at86rf2xx_set_state(dev, dev->idle_state);
+            DEBUG("[at86rf2xx] return to state 0x%x\n",dev->idle_state);
+
+            DEBUG("[at86rf2xx] EVT - TX_END\n");
+            if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+                if ((trac_status>>5)==7 || trac_status==AT86RF2XX_TRX_STATE__TRAC_SUCCESS) {
+                    /* Even though the reset value for register bits TRAC_STATUS is 0, the RX_AACK and
+                     * TX_ARET procedures set the register bits to TRAC_STATUS = 7 (INVALID) when it is started. */
+                    netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+                    DEBUG("[at86rf2xx] TX SUCCESS\n");
+                }  else {
+                    DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",trac_status >> 5);
                 }
             }
         }
