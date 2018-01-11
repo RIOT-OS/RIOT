@@ -141,7 +141,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_dma2_ch5,           /* [54] DMA2 Channel 5 global Interrupt */
     isr_aes,                /* [55] AES global Interrupt */
     isr_comp_acq            /* [56] Comparator Channel Acquisition global Interrupt */
-#elif defined(CPU_MODEL_STM32L152RET6)
+#elif defined(CPU_MODEL_STM32L152RE)
     (0UL),                  /* [45] Reserved */
     isr_tim5,               /* [46] TIM5 global Interrupt */
     isr_spi3,               /* [47] SPI3 global Interrupt */
