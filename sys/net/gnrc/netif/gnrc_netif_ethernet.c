@@ -135,26 +135,22 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
           hdr.dst[0], hdr.dst[1], hdr.dst[2],
           hdr.dst[3], hdr.dst[4], hdr.dst[5]);
 
-    size_t n;
-    payload = gnrc_pktbuf_get_iovec(pkt, &n);   /* use payload as temporary
-                                                 * variable */
-    res = -ENOBUFS;
-    if (payload != NULL) {
-        pkt = payload;      /* reassign for later release; vec_snip is prepended to pkt */
-        struct iovec *vector = (struct iovec *)pkt->data;
-        vector[0].iov_base = (char *)&hdr;
-        vector[0].iov_len = sizeof(ethernet_hdr_t);
+    iolist_t iolist = {
+        .iol_next = (iolist_t *)payload,
+        .iol_base = &hdr,
+        .iol_len = sizeof(ethernet_hdr_t)
+    };
+
 #ifdef MODULE_NETSTATS_L2
-        if ((netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) ||
-            (netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-            dev->stats.tx_mcast_count++;
-        }
-        else {
-            dev->stats.tx_unicast_count++;
-        }
-#endif
-        res = dev->driver->send(dev, vector, n);
+    if ((netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_BROADCAST) ||
+        (netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
+        dev->stats.tx_mcast_count++;
     }
+    else {
+        dev->stats.tx_unicast_count++;
+    }
+#endif
+    res = dev->driver->send(dev, &iolist);
 
     gnrc_pktbuf_release(pkt);
 
