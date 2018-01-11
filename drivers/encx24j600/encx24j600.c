@@ -64,7 +64,7 @@ static inline int _packets_available(encx24j600_t *dev);
 static void _get_mac_addr(netdev_t *dev, uint8_t* buf);
 
 /* netdev interface */
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
+static int _send(netdev_t *netdev, const iolist_t *iolist);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *dev);
 static void _isr(netdev_t *dev);
@@ -291,7 +291,7 @@ static int _init(netdev_t *encdev)
     return 0;
 }
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count) {
+static int _send(netdev_t *netdev, const iolist_t *iolist) {
     encx24j600_t * dev = (encx24j600_t *) netdev;
     lock(dev);
 
@@ -301,9 +301,9 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count) {
     /* copy packet to SRAM */
     size_t len = 0;
 
-    for (unsigned i = 0; i < count; i++) {
-        sram_op(dev, ENC_WGPDATA, (i ? 0xFFFF : TX_BUFFER_START), vector[i].iov_base, vector[i].iov_len);
-        len += vector[i].iov_len;
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+        sram_op(dev, ENC_WGPDATA, ((iol == iolist) ? TX_BUFFER_START : 0xFFFF), iol->iol_base, iol->iol_len);
+        len += iol->iol_len;
     }
 
     /* set start of TX packet and length */

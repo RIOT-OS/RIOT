@@ -39,7 +39,7 @@
 #include "debug.h"
 
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
+static int _send(netdev_t *netdev, const iolist_t *iolist);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
 static void _isr(netdev_t *netdev);
@@ -150,10 +150,10 @@ static void _isr(netdev_t *netdev)
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     cc2420_t *dev = (cc2420_t *)netdev;
-    return (int)cc2420_send(dev, vector, count);
+    return (int)cc2420_send(dev, iolist);
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)

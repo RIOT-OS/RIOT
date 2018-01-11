@@ -138,10 +138,9 @@ static void kw2xrf_wait_idle(kw2xrf_t *dev)
     }
 }
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
-    const struct iovec *ptr = vector;
     uint8_t *pkt_buf = &(dev->buf[1]);
     size_t len = 0;
 
@@ -149,14 +148,14 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
     kw2xrf_wait_idle(dev);
 
     /* load packet data into buffer */
-    for (unsigned i = 0; i < count; i++, ptr++) {
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         /* current packet data + FCS too long */
-        if ((len + ptr->iov_len + IEEE802154_FCS_LEN) > KW2XRF_MAX_PKT_LENGTH) {
+        if ((len + iol->iol_len + IEEE802154_FCS_LEN) > KW2XRF_MAX_PKT_LENGTH) {
             LOG_ERROR("[kw2xrf] packet too large (%u byte) to be send\n",
                   (unsigned)len + IEEE802154_FCS_LEN);
             return -EOVERFLOW;
         }
-        len = kw2xrf_tx_load(pkt_buf, ptr->iov_base, ptr->iov_len, len);
+        len = kw2xrf_tx_load(pkt_buf, iol->iol_base, iol->iol_len, len);
     }
 
     kw2xrf_set_sequence(dev, XCVSEQ_IDLE);
