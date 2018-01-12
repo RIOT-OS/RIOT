@@ -45,6 +45,13 @@ int _ntpdate(int argc, char **argv)
     }
     sock_udp_ep_t server = { .port = NTP_PORT, .family = AF_INET6 };
     ipv6_addr_from_str((ipv6_addr_t *)&server.addr, argv[1]);
+
+    if (ipv6_addr_is_link_local((ipv6_addr_t *)&server.addr)) {
+        /* choose first interface when address is link local */
+        gnrc_netif_t *netif = gnrc_netif_iter(NULL);
+        server.netif = (uint16_t)netif->pid;
+    }
+
     if (argc > 2) {
         timeout = atoi(argv[2]);
     }
