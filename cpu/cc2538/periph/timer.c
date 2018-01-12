@@ -132,7 +132,8 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
         }
 
         if (freq != sys_clock_freq()) {
-            DEBUG("In 32-bit mode, the GPTimer frequency must equal the system clock frequency (%u).", sys_clock_freq());
+            DEBUG("In 32-bit mode, the GPTimer frequency must equal the system clock frequency (%u).\n",
+                  (unsigned)sys_clock_freq());
             return -1;
         }
     }
