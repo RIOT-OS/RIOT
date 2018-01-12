@@ -150,6 +150,16 @@ ifneq (,$(filter l3g4200d,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter lis2dh12%,$(USEMODULE)))
+  ifneq (,$(filter lis2dh12_spi,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_gpio
+    FEATURES_REQUIRED += periph_spi
+  else
+    FEATURES_REQUIRED += periph_i2c
+  endif
+  USEMODULE += lis2dh12
+endif
+
 ifneq (,$(filter lis3dh,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
