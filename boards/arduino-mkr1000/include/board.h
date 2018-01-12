@@ -46,6 +46,8 @@ extern "C" {
 #define LED0_ON             (LED_PORT.OUTSET.reg = LED0_MASK)
 #define LED0_OFF            (LED_PORT.OUTCLR.reg = LED0_MASK)
 #define LED0_TOGGLE         (LED_PORT.OUTTGL.reg = LED0_MASK)
+
+#define LED0_NAME           "LED(Green)"
 /** @} */
 
 #ifdef __cplusplus
