@@ -86,17 +86,22 @@ static const adc_conf_t adc_config[] = {
  * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
+static const uart_conf_t uart_config[] = {
+    {
+        .dev      = UART0_BASEADDR,
+        .rx_pin   = GPIO_PIN(0, 0),
+        .tx_pin   = GPIO_PIN(0, 1),
+        .cts_pin  = GPIO_UNDEF,
+        .rts_pin  = GPIO_UNDEF
+    }
+};
 
-/* UART 0 device configuration */
-#define UART_0_DEV          UART0
-#define UART_0_IRQ          UART0_IRQn
+/* interrupt function name mapping */
 #define UART_0_ISR          isr_uart0
-/* UART 0 pin configuration */
-#define UART_0_TX_PIN       GPIO_PIN(0, 1)  /**< GPIO_PA1 */
-#define UART_0_RX_PIN       GPIO_PIN(0, 0)  /**< GPIO_PA0 */
+
+/* macros common across all UARTs */
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+
 /** @} */
 
 /**
