@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Kees Bakker, SODAQ
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,50 +8,51 @@
  */
 
 /**
- * @ingroup tests
+ * @ingroup     tests
  * @{
  *
  * @file
- * @brief       Test application for the BME280 temperature, pressure
- *              and humidity sensor.
+ * @brief       Test application for the BMX280 temperature, pressure, and
+ *              humidity sensor driver
  *
  * @author      Kees Bakker <kees@sodaq.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <inttypes.h>
 
 #include "bmx280_params.h"
 #include "bmx280.h"
 #include "xtimer.h"
+#include "fmt.h"
 
-#define MAINLOOP_DELAY  (2 * 1000 * 1000u)      /* 2 seconds delay between printf's */
+#define MAINLOOP_DELAY  (2)         /* read sensor every 2 seconds */
 
 int main(void)
 {
     bmx280_t dev;
-    int result;
 
     puts("BMX280 test application\n");
 
-    printf("+------------Initializing------------+\n");
-    result = bmx280_init(&dev, &bmx280_params[0]);
-    if (result == -1) {
-        puts("[Error] The given i2c is not enabled");
-        return 1;
+    puts("+------------Initializing------------+");
+    switch (bmx280_init(&dev, &bmx280_params[0])) {
+        case BMX280_ERR_BUS:
+            puts("[Error] Something went wrong when using the I2C bus");
+            return 1;
+        case BMX280_ERR_NODEV:
+            puts("[Error] Unable to communicate with any BMX280 device");
+            return 1;
+        default:
+            /* all good -> do nothing */
+            break;
     }
 
-    if (result == -2) {
-        printf("[Error] The sensor did not answer correctly at address 0x%02X\n", bmx280_params[0].i2c_addr);
-        return 1;
-    }
+    puts("Initialization successful\n");
 
-    printf("Initialization successful\n\n");
-
-    printf("+------------Calibration Data------------+\n");
+    puts("+------------Calibration Data------------+");
     printf("dig_T1: %u\n", dev.calibration.dig_T1);
     printf("dig_T2: %i\n", dev.calibration.dig_T2);
     printf("dig_T3: %i\n", dev.calibration.dig_T3);
@@ -65,7 +67,7 @@ int main(void)
     printf("dig_P8: %i\n", dev.calibration.dig_P8);
     printf("dig_P9: %i\n", dev.calibration.dig_P9);
 
-#if defined(MODULE_BME280)
+#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
     printf("dig_H1: %u\n", dev.calibration.dig_H1);
     printf("dig_H2: %i\n", dev.calibration.dig_H2);
     printf("dig_H3: %i\n", dev.calibration.dig_H3);
@@ -74,41 +76,34 @@ int main(void)
     printf("dig_H6: %i\n", dev.calibration.dig_H6);
 #endif
 
-    printf("\n+--------Starting Measurements--------+\n");
+    puts("\n+--------Starting Measurements--------+");
     while (1) {
-        int16_t temperature;
-        uint32_t pressure;
-#if defined(MODULE_BME280)
-        uint16_t humidity;
+        /* read temperature, pressure [and humidity] values */
+        int16_t temperature = bmx280_read_temperature(&dev);
+        uint32_t pressure = bmx280_read_pressure(&dev);
+#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+        uint16_t humidity = bme280_read_humidity(&dev);
 #endif
 
-        /* Get temperature in centi degrees Celsius */
-        temperature = bmx280_read_temperature(&dev);
-
-        /* Get pressure in Pa */
-        pressure = bmx280_read_pressure(&dev);
-
-#if defined(MODULE_BME280)
-        /* Get pressure in %rH */
-        humidity = bme280_read_humidity(&dev);
+        /* format values for printing */
+        char str_temp[8];
+        size_t len = fmt_s16_dfp(str_temp, temperature, -2);
+        str_temp[len] = '\0';
+#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+        char str_hum[8];
+        len = fmt_s16_dfp(str_hum, humidity, -2);
+        str_hum[len] = '\0';
 #endif
 
-        printf("Temperature [°C]: %d.%d\n"
-               "Pressure [Pa]: %lu\n"
-#if defined(MODULE_BME280)
-               "Humidity [%%rH]: %u.%02u\n"
+        /* print values to STDIO */
+        printf("Temperature [°C]: %s\n", str_temp);
+        printf("   Pressure [Pa]: %" PRIu32 "\n", pressure);
+#if defined(MODULE_BME280_SPI) || defined(MODULE_BME280_I2C)
+        printf("  Humidity [%%rH]: %s\n", str_hum);
 #endif
-               "\n+-------------------------------------+\n",
-               temperature / 100, abs(temperature % 100) / 10,
-#if defined(MODULE_BME280)
-               (unsigned long)pressure,
-               (unsigned int)(humidity / 100), (unsigned int)(humidity % 100)
-#else
-               (unsigned long)pressure
-#endif
-               );
+        puts("\n+-------------------------------------+\n");
 
-        xtimer_usleep(MAINLOOP_DELAY);
+        xtimer_sleep(MAINLOOP_DELAY);
     }
 
     return 0;
