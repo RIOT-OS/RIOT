@@ -1,0 +1,799 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="page_005.svg"
+   height="640"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.92.0 r"
+   viewBox="0 0 800 600.00001"
+   width="853.33331"
+   inkscape:export-filename="/Users/yonezawa/Documents/native_workspace/RIOT/examples/gnrc_xbee_border_router/img/page_005.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     inkscape:bbox-nodes="true"
+     inkscape:bbox-paths="true"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:current-layer="layer5"
+     inkscape:cx="309.5"
+     inkscape:cy="273.5"
+     inkscape:document-units="px"
+     id="base"
+     inkscape:object-nodes="false"
+     inkscape:object-paths="false"
+     pagecolor="#ffffff"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     showgrid="true"
+     inkscape:snap-bbox="true"
+     inkscape:snap-bbox-edge-midpoints="true"
+     inkscape:snap-bbox-midpoints="false"
+     inkscape:snap-grids="true"
+     inkscape:snap-intersection-paths="false"
+     inkscape:snap-nodes="true"
+     inkscape:snap-smooth-nodes="false"
+     units="px"
+     inkscape:window-height="1080"
+     inkscape:window-maximized="0"
+     inkscape:window-width="1920"
+     inkscape:window-x="0"
+     inkscape:window-y="23"
+     inkscape:zoom="1">
+    <inkscape:grid
+       color="#0000ff"
+       empcolor="#0000ff"
+       empopacity="0.1254902"
+       empspacing="8"
+       id="grid4138"
+       opacity="0.0627451"
+       type="xygrid"
+       visible="false"
+       originx="0"
+       originy="0"
+       spacingx="1"
+       spacingy="1" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="レイヤー 5"
+     style="display:inline">
+    <ellipse
+       cx="312"
+       cy="180"
+       id="path4852"
+       rx="63.999996"
+       ry="123.99999"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <ellipse
+       cx="312"
+       cy="324"
+       id="ellipse4854"
+       rx="63.999996"
+       ry="132"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <rect
+       height="95.349571"
+       id="rect5088"
+       rx="7.9952903"
+       ry="10.594384"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1.15044379;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="255.84956"
+       x="11.082718"
+       y="432.07523" />
+    <rect
+       height="94.723633"
+       id="rect5084"
+       rx="7.9999914"
+       ry="7.9999905"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="256"
+       x="11.007496"
+       y="305.27637" />
+    <rect
+       height="74.638687"
+       id="rect5076"
+       rx="7.9999914"
+       ry="7.9999909"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="208"
+       x="11.007496"
+       y="189.36131" />
+    <path
+       inkscape:connector-curvature="0"
+       d="M 216.82182,240 285.57878,263.67503 215.639,220.08495"
+       id="path5078"
+       sodipodi:nodetypes="ccc"
+       style="display:inline;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#c0c0c0;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <rect
+       height="56"
+       id="rect4397-8-8"
+       rx="7.9999914"
+       ry="7.9999914"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="207.99998"
+       x="11.007496"
+       y="96" />
+    <path
+       inkscape:connector-curvature="0"
+       d="M 216.82182,138.63868 286.99299,127.77817 215.639,118.72363"
+       id="path4409-3-5"
+       sodipodi:nodetypes="ccc"
+       style="display:inline;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#c0c0c0;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <rect
+       height="120.71336"
+       id="rect4637-5"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="226.24252"
+       x="352.00006"
+       y="39.286636" />
+    <rect
+       height="27.999992"
+       id="rect4639-6"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#c0c0c0;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.99999976;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="2"
+       x="311.00012"
+       y="88.286667" />
+    <rect
+       height="21"
+       id="rect4641-2"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="51"
+       x="295.00012"
+       y="116.28669" />
+    <rect
+       height="61.713356"
+       id="rect4643-1"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="144"
+       x="360.00006"
+       y="87.286667" />
+    <text
+       id="text4645-4"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="478.72305"
+       y="63.162949"><tspan
+         id="tspan4647-4"
+         sodipodi:role="line"
+         x="478.72305"
+         y="63.162949">OS X 1</tspan></text>
+    <text
+       id="text4649-9"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="538.94019"
+       y="122.6555"><tspan
+         id="tspan4651-5"
+         sodipodi:role="line"
+         x="538.94019"
+         y="122.6555">tap</tspan></text>
+    <text
+       id="text4653-6"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="320.66449"
+       y="130.97803"><tspan
+         id="tspan4655-4"
+         sodipodi:role="line"
+         x="320.66449"
+         y="130.97803">XBee</tspan></text>
+    <text
+       id="text4657-2"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="431.55624"
+       y="108.59422"><tspan
+         id="tspan4659-4"
+         sodipodi:role="line"
+         x="431.55624"
+         y="108.59422">RIOT</tspan></text>
+    <ellipse
+       cx="312.00012"
+       cy="86.286667"
+       id="ellipse4661-4"
+       rx="4"
+       ry="8"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1.99999964;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <g
+       id="g4663-5"
+       style="display:inline;stroke:#c0c0c0;stroke-opacity:1"
+       transform="matrix(0.33461307,0,0,0.33035714,817.93506,-73.489864)">
+      <path
+         inkscape:connector-curvature="0"
+         d="m -1478.0589,445.16626 c 18.7452,18.74517 18.7452,49.13709 0,67.88226 m -67.8822,0 c -18.7452,-18.74517 -18.7452,-49.13709 0,-67.88226"
+         id="path4665-4"
+         sodipodi:nodetypes="cccc"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:6.01543045;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+      <path
+         inkscape:connector-curvature="0"
+         d="m -1466.7452,433.85257 c 24.9936,24.99355 24.9936,65.51608 0,90.50963 m -90.5095,0 c -24.9936,-24.99355 -24.9936,-65.51608 0,-90.50963"
+         id="path4667-6"
+         sodipodi:nodetypes="cccc"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:6.01543045;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+      <path
+         inkscape:connector-curvature="0"
+         d="m -1456.0001,423.1074 c 30.928,30.92795 30.928,81.07204 0,112 m -111.9999,0 c -30.928,-30.92796 -30.928,-81.07205 0,-112"
+         id="path4669-5"
+         sodipodi:nodetypes="cccc"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:6.01543045;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    </g>
+    <rect
+       height="1.0000068"
+       id="rect4671-4"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="25"
+       x="342.50006"
+       y="129.00003" />
+    <rect
+       height="1.0000068"
+       id="rect4673-0"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="30"
+       x="497.00009"
+       y="128.00012" />
+    <text
+       id="text4675-2"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="392.33868"
+       y="133.16296"><tspan
+         id="tspan4677-8"
+         sodipodi:role="line"
+         x="392.33868"
+         y="133.16296">fd00::2</tspan></text>
+    <text
+       id="text4679-1"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="472.33871"
+       y="133.16296"><tspan
+         id="tspan4681-4"
+         sodipodi:role="line"
+         x="472.33871"
+         y="133.16296">fd01::2</tspan></text>
+    <text
+       id="text4683-7"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="552.00525"
+       y="139.52051"><tspan
+         id="tspan4685-0"
+         sodipodi:role="line"
+         x="552.00525"
+         y="139.52051">fd01::1</tspan></text>
+    <rect
+       height="120.71336"
+       id="rect4740"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="226.24252"
+       x="352.00006"
+       y="183.28664" />
+    <rect
+       height="27.999992"
+       id="rect4742"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#c0c0c0;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.99999976;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="2"
+       x="311.00012"
+       y="232.28667" />
+    <rect
+       height="21"
+       id="rect4744"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="51"
+       x="295.00012"
+       y="260.28668" />
+    <rect
+       height="61.713356"
+       id="rect4746"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="144"
+       x="360.00006"
+       y="231.28667" />
+    <text
+       id="text4748"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="477.30679"
+       y="207.16295"><tspan
+         id="tspan4750"
+         sodipodi:role="line"
+         x="477.30679"
+         y="207.16295">OS X 2</tspan></text>
+    <text
+       id="text4756"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="320.66449"
+       y="274.978"><tspan
+         id="tspan4758"
+         sodipodi:role="line"
+         x="320.66449"
+         y="274.978">XBee</tspan></text>
+    <text
+       id="text4760"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="431.55624"
+       y="252.59422"><tspan
+         id="tspan4762"
+         sodipodi:role="line"
+         x="431.55624"
+         y="252.59422">RIOT</tspan></text>
+    <ellipse
+       cx="312.00012"
+       cy="230.28667"
+       id="ellipse4764"
+       rx="4"
+       ry="8"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1.99999964;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <g
+       id="g4766"
+       style="display:inline;stroke:#c0c0c0;stroke-opacity:1"
+       transform="matrix(0.33461307,0,0,0.33035714,817.93506,70.510136)">
+      <path
+         inkscape:connector-curvature="0"
+         d="m -1478.0589,445.16626 c 18.7452,18.74517 18.7452,49.13709 0,67.88226 m -67.8822,0 c -18.7452,-18.74517 -18.7452,-49.13709 0,-67.88226"
+         id="path4768"
+         sodipodi:nodetypes="cccc"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:6.01543045;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+      <path
+         inkscape:connector-curvature="0"
+         d="m -1466.7452,433.85257 c 24.9936,24.99355 24.9936,65.51608 0,90.50963 m -90.5095,0 c -24.9936,-24.99355 -24.9936,-65.51608 0,-90.50963"
+         id="path4770"
+         sodipodi:nodetypes="cccc"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:6.01543045;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+      <path
+         inkscape:connector-curvature="0"
+         d="m -1456.0001,423.1074 c 30.928,30.92795 30.928,81.07204 0,112 m -111.9999,0 c -30.928,-30.92796 -30.928,-81.07205 0,-112"
+         id="path4772"
+         sodipodi:nodetypes="cccc"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:6.01543045;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    </g>
+    <rect
+       height="1.0000068"
+       id="rect4774"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="25"
+       x="342.50006"
+       y="273" />
+    <text
+       id="text4778"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="392.33868"
+       y="277.16293"><tspan
+         id="tspan4780"
+         sodipodi:role="line"
+         x="392.33868"
+         y="277.16293">fd00::3</tspan></text>
+    <rect
+       height="120.71336"
+       id="rect4796"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="226.24252"
+       x="352.00006"
+       y="327.28662" />
+    <rect
+       height="27.999992"
+       id="rect4798"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#c0c0c0;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.99999976;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="2"
+       x="311.00012"
+       y="376.28665" />
+    <rect
+       height="21"
+       id="rect4800"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="51"
+       x="295.00012"
+       y="404.28668" />
+    <rect
+       height="61.713356"
+       id="rect4802"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="144"
+       x="360.00006"
+       y="375.28665" />
+    <text
+       id="text4804"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="477.34116"
+       y="351.16293"><tspan
+         id="tspan4806"
+         sodipodi:role="line"
+         x="477.34116"
+         y="351.16293">OS X 3</tspan></text>
+    <text
+       id="text4812"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="320.66449"
+       y="418.978"><tspan
+         id="tspan4814"
+         sodipodi:role="line"
+         x="320.66449"
+         y="418.978">XBee</tspan></text>
+    <text
+       id="text4816"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="431.55624"
+       y="396.59421"><tspan
+         id="tspan4818"
+         sodipodi:role="line"
+         x="431.55624"
+         y="396.59421">RIOT</tspan></text>
+    <ellipse
+       cx="312.00012"
+       cy="374.28665"
+       id="ellipse4820"
+       rx="4"
+       ry="8"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:1.99999964;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <g
+       id="g4822"
+       style="display:inline;stroke:#c0c0c0;stroke-opacity:1"
+       transform="matrix(0.33461307,0,0,0.33035714,817.93506,214.51014)">
+      <path
+         inkscape:connector-curvature="0"
+         d="m -1478.0589,445.16626 c 18.7452,18.74517 18.7452,49.13709 0,67.88226 m -67.8822,0 c -18.7452,-18.74517 -18.7452,-49.13709 0,-67.88226"
+         id="path4824"
+         sodipodi:nodetypes="cccc"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:6.01543045;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+      <path
+         inkscape:connector-curvature="0"
+         d="m -1466.7452,433.85257 c 24.9936,24.99355 24.9936,65.51608 0,90.50963 m -90.5095,0 c -24.9936,-24.99355 -24.9936,-65.51608 0,-90.50963"
+         id="path4826"
+         sodipodi:nodetypes="cccc"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:6.01543045;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+      <path
+         inkscape:connector-curvature="0"
+         d="m -1456.0001,423.1074 c 30.928,30.92795 30.928,81.07204 0,112 m -111.9999,0 c -30.928,-30.92796 -30.928,-81.07205 0,-112"
+         id="path4828"
+         sodipodi:nodetypes="cccc"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:6.01543045;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       d="M 266.31225,439.6717 306.01649,289.75486 258.05836,433.54523"
+       id="path5090"
+       sodipodi:nodetypes="ccc"
+       style="display:inline;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#c0c0c0;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <rect
+       height="1.0000068"
+       id="rect4830"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="25"
+       x="342.50006"
+       y="417" />
+    <text
+       id="text4834"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:147.00000286%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="392.33868"
+       y="421.16293"><tspan
+         id="tspan4836"
+         sodipodi:role="line"
+         x="392.33868"
+         y="421.16293">fd00::4</tspan></text>
+    <text
+       id="text5026"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="20.137966"
+       y="122.5325"><tspan
+         id="tspan5028"
+         sodipodi:role="line"
+         x="20.137966"
+         y="122.5325">Hello, I'm a (root) router.</tspan><tspan
+         id="tspan5050"
+         sodipodi:role="line"
+         x="20.137966"
+         y="143.1575">(DODAG Information Object)</tspan></text>
+    <text
+       id="text5030"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="20.137966"
+       y="211.84875"><tspan
+         id="tspan5032"
+         sodipodi:role="line"
+         x="20.137966"
+         y="211.84875">(Setting fd02::2 as a parent).</tspan><tspan
+         id="tspan5034"
+         sodipodi:role="line"
+         x="20.137966"
+         y="232.47375">Hello, I'm a router.</tspan><tspan
+         id="tspan5052"
+         sodipodi:role="line"
+         x="20.137966"
+         y="253.09875">(DODAG Information Object)</tspan></text>
+    <text
+       id="text5036"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="21.059216"
+       y="322.7525"><tspan
+         id="tspan5038"
+         sodipodi:role="line"
+         x="21.059216"
+         y="322.7525">(Setting fd02::3 as a parent).</tspan><tspan
+         id="tspan5040"
+         sodipodi:role="line"
+         x="21.059216"
+         y="343.3775">Hello fd00::3, </tspan><tspan
+         id="tspan5048"
+         sodipodi:role="line"
+         x="21.059216"
+         y="364.0025">fd00::04 is your descendant.</tspan><tspan
+         id="tspan5054"
+         sodipodi:role="line"
+         x="21.059216"
+         y="384.6275">(Destination Advertisement Object)</tspan></text>
+    <text
+       id="text5042"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="20.45422"
+       y="450.7525"><tspan
+         id="tspan5046"
+         sodipodi:role="line"
+         x="20.45422"
+         y="450.7525">Hello fd00::2, </tspan><tspan
+         id="tspan5082"
+         sodipodi:role="line"
+         x="20.45422"
+         y="471.3775">fd00::3 and fd00::04 are your</tspan><tspan
+         sodipodi:role="line"
+         x="20.45422"
+         y="492.0025"
+         id="tspan5435">descendants.</tspan><tspan
+         id="tspan5056"
+         sodipodi:role="line"
+         x="20.45422"
+         y="512.6275">(Destination Advertisement Object)</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       d="m 266.31225,394.12132 24.7237,11.38287 -25.90652,-31.29792"
+       id="path5086"
+       sodipodi:nodetypes="ccc"
+       style="display:inline;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#c0c0c0;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <text
+       id="text5092"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:13.75px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="295.75876"
+       y="474.73874"><tspan
+         id="tspan5094"
+         sodipodi:role="line"
+         x="295.75876"
+         y="474.73874">Suppose fd00::2 and fd00::4 cannot communicate directly.</tspan></text>
+    <rect
+       height="96"
+       id="rect5376-5"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="208.94153"
+       x="583.52924"
+       y="64" />
+    <text
+       id="text5378-4"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="687.83679"
+       y="80"><tspan
+         id="tspan5380-7"
+         sodipodi:role="line"
+         x="687.83679"
+         y="80">routing table</tspan></text>
+    <text
+       id="text5382-2"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="589.60242"
+       y="106.57376"><tspan
+         id="tspan5384-0"
+         sodipodi:role="line"
+         x="589.60242"
+         y="106.57376">Destination</tspan><tspan
+         id="tspan5386-4"
+         sodipodi:role="line"
+         x="589.60242"
+         y="125.32376">fd00::3</tspan><tspan
+         id="tspan5388-0"
+         sodipodi:role="line"
+         x="589.60242"
+         y="144.07376">fd00::4</tspan></text>
+    <text
+       id="text5390-2"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="665.37616"
+       y="106.57376"><tspan
+         id="tspan5392-2"
+         sodipodi:role="line"
+         x="665.37616"
+         y="106.57376">Next Hop</tspan><tspan
+         id="tspan5394-9"
+         sodipodi:role="line"
+         x="665.37616"
+         y="125.32376">fd00::3</tspan><tspan
+         id="tspan5396-8"
+         sodipodi:role="line"
+         x="665.37616"
+         y="144.07376">fd00::3</tspan></text>
+    <text
+       id="text5398-7"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="733.45056"
+       y="106.57376"><tspan
+         id="tspan5400-4"
+         sodipodi:role="line"
+         x="733.45056"
+         y="106.57376">Interface</tspan><tspan
+         id="tspan5402-9"
+         sodipodi:role="line"
+         x="733.45056"
+         y="125.32376">XBee</tspan><tspan
+         id="tspan5404-7"
+         sodipodi:role="line"
+         x="733.45056"
+         y="144.07376">XBee</tspan></text>
+    <rect
+       height="96"
+       id="rect5406-6"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="208.94153"
+       x="584"
+       y="208" />
+    <text
+       id="text5408-8"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="688.30756"
+       y="224"><tspan
+         id="tspan5410-6"
+         sodipodi:role="line"
+         x="688.30756"
+         y="224">routing table</tspan></text>
+    <text
+       id="text5412-1"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="590.07318"
+       y="250.57376"><tspan
+         id="tspan5414-5"
+         sodipodi:role="line"
+         x="590.07318"
+         y="250.57376">Destination</tspan><tspan
+         id="tspan5416-4"
+         sodipodi:role="line"
+         x="590.07318"
+         y="269.32376">::</tspan><tspan
+         id="tspan5418-2"
+         sodipodi:role="line"
+         x="590.07318"
+         y="288.07376">fd00::4</tspan></text>
+    <text
+       id="text5420-6"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="665.84692"
+       y="250.57376"><tspan
+         id="tspan5422-0"
+         sodipodi:role="line"
+         x="665.84692"
+         y="250.57376">Next Hop</tspan><tspan
+         id="tspan5424-0"
+         sodipodi:role="line"
+         x="665.84692"
+         y="269.32376">fd00::2</tspan><tspan
+         id="tspan5426-0"
+         sodipodi:role="line"
+         x="665.84692"
+         y="288.07376">fd00::4</tspan></text>
+    <text
+       id="text5428-4"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="733.92133"
+       y="250.57376"><tspan
+         id="tspan5430-8"
+         sodipodi:role="line"
+         x="733.92133"
+         y="250.57376">Interface</tspan><tspan
+         id="tspan5432-9"
+         sodipodi:role="line"
+         x="733.92133"
+         y="269.32376">XBee</tspan><tspan
+         id="tspan5434-6"
+         sodipodi:role="line"
+         x="733.92133"
+         y="288.07376">XBee</tspan></text>
+    <rect
+       height="75.933746"
+       id="rect5436-7"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c0c0c0;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       width="208.94153"
+       x="583.52924"
+       y="372.06622" />
+    <text
+       id="text5438-3"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="687.83679"
+       y="388.06622"><tspan
+         id="tspan5440-5"
+         sodipodi:role="line"
+         x="687.83679"
+         y="388.06622">routing table</tspan></text>
+    <text
+       id="text5442-8"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="589.60242"
+       y="414.63998"><tspan
+         id="tspan5444-1"
+         sodipodi:role="line"
+         x="589.60242"
+         y="414.63998">Destination</tspan><tspan
+         id="tspan5448-7"
+         sodipodi:role="line"
+         x="589.60242"
+         y="433.38998">::</tspan></text>
+    <text
+       id="text5450-6"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="665.37616"
+       y="414.63998"><tspan
+         id="tspan5452-5"
+         sodipodi:role="line"
+         x="665.37616"
+         y="414.63998">Next Hop</tspan><tspan
+         id="tspan5456-9"
+         sodipodi:role="line"
+         x="665.37616"
+         y="433.38998">fd00::3</tspan></text>
+    <text
+       id="text5458-9"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:12.5px;line-height:150%;font-family:'ヒラギノ角ゴ ProN';-inkscape-font-specification:'ヒラギノ角ゴ ProN, Light';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="733.45056"
+       y="414.63998"><tspan
+         id="tspan5460-7"
+         sodipodi:role="line"
+         x="733.45056"
+         y="414.63998">Interface</tspan><tspan
+         id="tspan5464-9"
+         sodipodi:role="line"
+         x="733.45056"
+         y="433.38998">XBee</tspan></text>
+  </g>
+</svg>
