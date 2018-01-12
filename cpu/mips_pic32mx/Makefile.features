@@ -1,2 +1,1 @@
 -include $(RIOTCPU)/mips_pic32_common/Makefile.features
--include $(RIOTCPU)/mips32r2_common/Makefile.features
