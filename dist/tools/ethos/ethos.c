@@ -540,10 +540,13 @@ int main(int argc, char *argv[])
 
     fprintf(stderr, "----> ethos: activating serial pass through.\n");
     _send_hello(serial_fd, &serial, LINE_FRAME_TYPE_HELLO);
+    int stdin_open = 1;
     while(1) {
         int activity;
         FD_ZERO(&readfds);
-        FD_SET(STDIN_FILENO, &readfds);
+        if (stdin_open) {
+            FD_SET(STDIN_FILENO, &readfds);
+        }
         FD_SET(tap_fd, &readfds);
         FD_SET(serial_fd, &readfds);
         activity = select( max_fd + 1 , &readfds , NULL , NULL , NULL);
@@ -605,7 +608,21 @@ int main(int argc, char *argv[])
 
         if (FD_ISSET(STDIN_FILENO, &readfds)) {
             ssize_t res = read(STDIN_FILENO, inbuf, sizeof(inbuf));
-            if (res <= 0) {
+            if (res == 0) {
+                fprintf(stderr, "EOF from stdin\n");
+                if (isatty(STDIN_FILENO)) {
+                    /* EOF from the terminal means good bye! */
+                    fprintf(stderr, "Bye!\n");
+                    break;
+                }
+                else {
+                    /* Ignore EOF when stdin is not a terminal */
+                    close(STDIN_FILENO);
+                    stdin_open = 0;
+                }
+                continue;
+            }
+            if (res < 0) {
                 fprintf(stderr, "error reading from stdio. res=%zi\n", res);
                 continue;
             }
