@@ -3,13 +3,13 @@
 ETHOS_DIR="$(dirname $(readlink -f $0))"
 
 create_tap() {
-    ip tuntap add ${TAP} mode tap user ${USER}
-    sysctl -w net.ipv6.conf.${TAP}.forwarding=1
-    sysctl -w net.ipv6.conf.${TAP}.accept_ra=0
-    ip link set ${TAP} up
-    ip a a fe80::1/64 dev ${TAP}
+    ip tuntap add "${TAP}" mode tap user "${USER}"
+    sysctl -w "net.ipv6.conf.${TAP}.forwarding=1"
+    sysctl -w "net.ipv6.conf.${TAP}.accept_ra=0"
+    ip link set "${TAP}" up
+    ip a a fe80::1/64 dev "${TAP}"
     ip a a fd00:dead:beef::1/128 dev lo
-    ip route add ${PREFIX} via fe80::2 dev ${TAP}
+    ip route add "${PREFIX}" via fe80::2 dev "${TAP}"
 }
 
 remove_tap() {
@@ -20,12 +20,12 @@ cleanup() {
     echo "Cleaning up..."
     remove_tap
     ip a d fd00:dead:beef::1/128 dev lo
-    kill ${UHCPD_PID}
+    kill "${UHCPD_PID}"
     trap "" INT QUIT TERM EXIT
 }
 
 start_uhcpd() {
-    ${UHCPD} ${TAP} ${PREFIX} > /dev/null &
+    "${UHCPD}" "${TAP}" "${PREFIX}" > /dev/null &
     UHCPD_PID=$!
 }
 
