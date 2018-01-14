@@ -192,6 +192,15 @@ extern "C" {
  */
 #define COAP_ACK_TIMEOUT        (2U)
 #define COAP_RANDOM_FACTOR      (1.5)
+
+/**
+ * @brief Maximum variation for confirmable timeout.
+ *
+ * Must be an integer, defined as:
+ *
+ *     (COAP_ACK_TIMEOUT * COAP_RANDOM_FACTOR) - COAP_ACK_TIMEOUT
+ */
+#define COAP_ACK_VARIANCE       (1U)
 #define COAP_MAX_RETRANSMIT     (4)
 #define COAP_NSTART             (1)
 #define COAP_DEFAULT_LEISURE    (5)
