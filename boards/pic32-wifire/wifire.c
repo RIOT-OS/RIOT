@@ -15,6 +15,7 @@
 #include "periph/uart.h"
 #include "bitarithm.h"
 #include "board.h"
+#include "cpu.h"
 
 extern void dummy(void);
 
@@ -32,8 +33,6 @@ void board_init(void)
     uart_init(DEBUG_VIA_UART, DEBUG_UART_BAUD, NULL, 0);
 #endif
 
-    hwrng_init();
-
     /* Turn off all LED's */
     gpio_init(LED1_PIN, GPIO_OUT);
     gpio_init(LED2_PIN, GPIO_OUT);
@@ -43,6 +42,9 @@ void board_init(void)
     LED2_OFF;
     LED3_OFF;
     LED4_OFF;
+
+    /* initialize the CPU */
+    cpu_init();
 
     /* Stop the linker from throwing away the PIC32 config register settings */
     dummy();
