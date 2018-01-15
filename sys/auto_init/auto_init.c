@@ -363,6 +363,10 @@ auto_init_mpu9150();
     extern void auto_init_adcxx1c(void);
     auto_init_adcxx1c();
 #endif
+#ifdef MODULE_LIS2DH12
+    extern void auto_init_lis2dh12(void);
+    auto_init_lis2dh12();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
