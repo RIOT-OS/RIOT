@@ -26,8 +26,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
-char *lwmac_timeout_names[] = {
+static const char *lwmac_timeout_names[] = {
     [GNRC_LWMAC_TIMEOUT_DISABLED]              = "DISABLED",
     [GNRC_LWMAC_TIMEOUT_WR]                    = "WR",
     [GNRC_LWMAC_TIMEOUT_NO_RESPONSE]           = "NO_RESPONSE",
@@ -35,7 +34,6 @@ char *lwmac_timeout_names[] = {
     [GNRC_LWMAC_TIMEOUT_WAIT_DEST_WAKEUP]      = "WAIT_FOR_DEST_WAKEUP",
     [GNRC_LWMAC_TIMEOUT_WAKEUP_PERIOD]         = "WAKEUP_PERIOD",
 };
-#endif
 
 static inline void _lwmac_clear_timeout(gnrc_lwmac_timeout_t *timeout)
 {

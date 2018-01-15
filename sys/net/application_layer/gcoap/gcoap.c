@@ -131,7 +131,7 @@ static void _listen(sock_udp_t *sock)
 
     res = coap_parse(&pdu, buf, res);
     if (res < 0) {
-        DEBUG("gcoap: parse failure: %d\n", res);
+        DEBUG("gcoap: parse failure: %d\n", (int)res);
         /* If a response, can't clear memo, but it will timeout later. */
         return;
     }
@@ -723,7 +723,7 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
         }
         else if (!res) {
             memo->state = GCOAP_MEMO_UNUSED;
-            DEBUG("gcoap: sock send failed: %d\n", res);
+            DEBUG("gcoap: sock send failed: %d\n", (int)res);
         }
         return res;
     } else {

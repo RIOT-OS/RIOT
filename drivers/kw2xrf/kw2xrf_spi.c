@@ -70,8 +70,8 @@ int kw2xrf_spi_init(kw2xrf_t *dev)
 #endif
 
     if (res != SPI_OK) {
-        LOG_ERROR("[kw2xrf_spi] failed to init SPI_%i device (code %i)\n",
-                  SPIDEV, res);
+        LOG_ERROR("[kw2xrf_spi] failed to init SPI_%u device (code %i)\n",
+                  (unsigned)SPIDEV, res);
         return 1;
     }
     /* verify SPI params */
@@ -90,8 +90,8 @@ int kw2xrf_spi_init(kw2xrf_t *dev)
     }
     spi_release(SPIDEV);
 
-    DEBUG("[kw2xrf_spi] SPI_DEV(%i) initialized: mode: %i, clk: %i, cs_pin: %i\n",
-          SPIDEV, SPIMODE, SPICLK, CSPIN);
+    DEBUG("[kw2xrf_spi] SPI_DEV(%u) initialized: mode: %u, clk: %u, cs_pin: %u\n",
+          (unsigned)SPIDEV, (unsigned)SPIMODE, (unsigned)SPICLK, (unsigned)CSPIN);
     return 0;
 }
 

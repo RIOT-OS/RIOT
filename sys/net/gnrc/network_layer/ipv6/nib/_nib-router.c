@@ -27,9 +27,7 @@
 #include "debug.h"
 
 #if GNRC_IPV6_NIB_CONF_ROUTER
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                     bool final, _nib_abr_entry_t *abr);

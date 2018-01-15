@@ -689,16 +689,16 @@ static int xbee_recv(netdev_t *dev, void *buf, size_t len, void *info)
     size = (size_t)(xbee->rx_limit - 1);
     if (buf == NULL) {
         if (len > 0) {
-            DEBUG("[xbee] recv: reading size and dropping: %i\n", size);
+            DEBUG("[xbee] recv: reading size and dropping: %u\n", (unsigned)size);
             xbee->rx_count = 0;
         }
         else {
-            DEBUG("[xbee] recv: reading size without dropping: %i\n", size);
+            DEBUG("[xbee] recv: reading size without dropping: %u\n", (unsigned)size);
         }
     }
     else {
         size = (size > len) ? len : size;
-        DEBUG("[xbee] recv: consuming packet: reading %i byte\n", size);
+        DEBUG("[xbee] recv: consuming packet: reading %u byte\n", (unsigned)size);
         memcpy(buf, xbee->rx_buf, size);
         xbee->rx_count = 0;
     }

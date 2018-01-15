@@ -67,7 +67,9 @@ extern "C" {
  * @name Debugging defines
  * @{
  */
-#if ENABLE_DEBUG
+#ifndef ENABLE_DEBUG
+#define ENABLE_DEBUG (0)
+#endif
 
 /**
  * @def DEBUG_FUNC
@@ -92,10 +94,7 @@ extern "C" {
  *
  * @note Another name for ::DEBUG_PRINT
  */
-#define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
-#else
-#define DEBUG(...)
-#endif
+#define DEBUG(...) if (ENABLE_DEBUG) DEBUG_PRINT(__VA_ARGS__)
 /** @} */
 
 /**

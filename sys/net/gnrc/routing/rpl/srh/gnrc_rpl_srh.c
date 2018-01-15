@@ -20,9 +20,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 #define GNRC_RPL_SRH_PADDING(X)     ((X & 0xF0) >> 4)
 #define GNRC_RPL_SRH_COMPRE(X)      (X & 0x0F)

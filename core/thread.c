@@ -44,13 +44,16 @@ int thread_getstatus(kernel_pid_t pid)
     return t ? (int) t->status : STATUS_NOT_FOUND;
 }
 
-#ifdef DEVELHELP
 const char *thread_getname(kernel_pid_t pid)
 {
+#ifdef DEVELHELP
     volatile thread_t *t = thread_get(pid);
     return t ? t->name : NULL;
-}
+#else
+    (void)pid;
+    return NULL;
 #endif
+}
 
 void thread_sleep(void)
 {

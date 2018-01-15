@@ -59,9 +59,7 @@ static fib_entry_t _fib_entries[GNRC_IPV6_FIB_TABLE_SIZE];
 fib_table_t gnrc_ipv6_fib_table;
 #endif
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 kernel_pid_t gnrc_ipv6_pid = KERNEL_PID_UNDEF;
 

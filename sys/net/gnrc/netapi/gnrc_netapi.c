@@ -85,7 +85,7 @@ static inline int _snd_rcv_mbox(mbox_t *mbox, uint16_t type, gnrc_pktsnip_t *pkt
     /* send message */
     int ret = mbox_try_put(mbox, &msg);
     if (ret < 1) {
-        DEBUG("gnrc_netapi: dropped message to %p (was full)\n", mbox);
+        DEBUG("gnrc_netapi: dropped message to %p (was full)\n", (void*)mbox);
     }
     return ret;
 }

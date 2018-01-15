@@ -222,7 +222,7 @@ static int _mkdir(vfs_mount_t *mountp, const char *name, mode_t mode)
     mutex_lock(&fs->lock);
 
     DEBUG("littlefs: mkdir: mountp=%p, name=%s, mode=%" PRIu32 "\n",
-          (void *)mountp, name, mode);
+          (void *)mountp, name, (uint32_t)mode);
 
     int ret = lfs_mkdir(&fs->fs, name);
     mutex_unlock(&fs->lock);
