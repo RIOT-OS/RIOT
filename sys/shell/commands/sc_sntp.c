@@ -46,7 +46,7 @@ int _ntpdate(int argc, char **argv)
     sock_udp_ep_t server = { .port = NTP_PORT, .family = AF_INET6 };
     ipv6_addr_t *addr = (ipv6_addr_t *)&server.addr;
 
-    int src_iface = ipv6_addr_split_iface(argv[1]);
+    kernel_pid_t src_iface = ipv6_addr_split_iface(argv[1]);
     if (src_iface == -1) {
         src_iface = KERNEL_PID_UNDEF;
     }
