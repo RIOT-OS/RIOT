@@ -137,13 +137,13 @@ void stmclk_init_sysclk(void)
     while (!(RCC->CR & RCC_CR_MSIRDY)) {}
     /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
     RCC->CCIPR = (RCC_CCIPR_CLK48SEL_0 | RCC_CCIPR_CLK48SEL_1);
-#if CLOCK_MSI_LSE_PLL
+#if (CLOCK_MSI_LSE_PLL && CLOCK_LSE)
     /* configure the low speed clock domain */
     stmclk_enable_lfclk();
     /* now we can enable the MSI PLL mode to enhance accuracy of the MSI*/
     RCC->CR |= RCC_CR_MSIPLLEN;
     while (!(RCC->CR & RCC_CR_MSIRDY)) {}
-#endif /* CLOCK_MSI_LSE_PLL */
+#endif /* (CLOCK_MSI_LSE_PLL && CLOCK_LSE) */
 #endif /* ((CLOCK_HSE == 0) || CLOCK_MSI_ENABLE) */
 
     /* now we can safely configure and start the PLL */
