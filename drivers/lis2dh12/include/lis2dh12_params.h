@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "lis2dh12.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,10 +44,16 @@ extern "C" {
 #define LIS2DH12_PARAM_RATE         LIS2DH12_RATE_100HZ
 #endif
 
-#define LIS2DH12_PARAMS_DEFAULT     { .spi = LIS2DH12_PARAM_SPI,     \
+#ifndef LIS2DH12_PARAMS
+#define LIS2DH12_PARAMS             { .spi = LIS2DH12_PARAM_SPI,     \
                                       .cs = LIS2DH12_PARAM_CS,       \
                                       .scale = LIS2DH12_PARAM_SCALE, \
                                       .rate  = LIS2DH12_PARAM_RATE }
+#endif
+
+#ifndef LIS2DH12_SAULINFO
+#define LIS2DH12_SAULINFO           { .name = "lis2dh12" }
+#endif
 /**@}*/
 
 /**
@@ -54,11 +61,15 @@ extern "C" {
  */
 static const lis2dh12_params_t lis2dh12_params[] =
 {
-#ifdef LIS2DH12_PARAMS_BOARD
-    LIS2DH12_PARAMS_BOARD,
-#else
-    LIS2DH12_PARAMS_DEFAULT,
-#endif
+    LIS2DH12_PARAMS
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t lis2dh12_saul_info[] =
+{
+    LIS2DH12_SAULINFO
 };
 
 #ifdef __cplusplus
