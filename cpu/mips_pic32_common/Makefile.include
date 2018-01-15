@@ -6,4 +6,3 @@ USEMODULE += mips_pic32_common
 USEMODULE += mips_pic32_common_periph
 
 USEMODULE += periph_common
-USEMODULE += periph_hwrng
