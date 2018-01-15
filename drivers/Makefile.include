@@ -49,6 +49,9 @@ endif
 ifneq (,$(filter mma8x5x,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mma8x5x/include
 endif
+ifneq (,$(filter mma7660,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mma7660/include
+endif
 ifneq (,$(filter mag3110,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mag3110/include
 endif
