@@ -31,7 +31,7 @@
 #include "cc1200-internal.h"
 #include "cc1200-spi.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 /* Internal function prototypes */
@@ -72,11 +72,12 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
     cc1200_writeburst_reg(dev, 0x00, cc1200_default_conf,
     		cc1200_default_conf_size);
 
-    // FIFO_CFG: CRC_AUTOFLUSH, 32 bytes as threshold
-    //cc1200_write_reg(dev, CC1200_FIFO_CFG, 0xa0);
-    cc1200_write_reg(dev, CC1200_FIFO_CFG, 0x84); // 4 bytes
-
-    /* Write extended config for CC1200 */
+    /* Write configuration for extended register */
+    for(unsigned i = 0; i<cc1200_ext_default_conf_size; i++){
+        DEBUG("cc1200 setup extended register: Address: 0x%x, Value: 0x%x\n", cc1200_ext_default_conf[i].address, cc1200_ext_default_conf[i].value);
+        cc1200_write_reg(dev, cc1200_ext_default_conf[i].address, cc1200_ext_default_conf[i].value);
+    }
+    /* Write extended config for CC1200 
     cc1200_write_reg(dev, CC1200_IF_MIX_CFG, 0x18);
     cc1200_write_reg(dev, CC1200_TOC_CFG, 0x03);
     cc1200_write_reg(dev, CC1200_MDMCFG2, 0x02);
@@ -103,6 +104,7 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
     cc1200_write_reg(dev, CC1200_XOSC1, 0x03);
     cc1200_write_reg(dev, CC1200_AGC_CS_THR, (uint8_t) -91);
     cc1200_write_reg(dev, CC1200_AGC_GAIN_ADJUST, (int8_t)CC1200_RF_CFG_RSSI_OFFSET);
+    */
     cc1200_set_channel(dev, CC1200_DEFAULT_CHANNEL);
 
     /* set default node id */

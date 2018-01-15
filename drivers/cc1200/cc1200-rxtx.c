@@ -39,7 +39,7 @@
 #include "log.h"
 #include "led.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 static void _rx_abort(cc1200_t *dev)
@@ -151,7 +151,7 @@ static void _rx_read_data(cc1200_t *dev, void(*callback)(void*), void*arg)
         }
         else
         {
-            //DEBUG("%s:%s:%u crc-error\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
+            DEBUG("%s:%s:%u crc-error\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
             dev->cc1200_statistic.packets_in_crc_fail++;
             _rx_abort(dev);
         }
@@ -209,7 +209,7 @@ static void _tx_continue(cc1200_t *dev)
     gpio_irq_disable(dev->params.int_pin);
 
     cc1200_pkt_t *pkt = &dev->pkt_buf.packet;
-#if 0
+#if ENABLE_DEBUG
     DEBUG("%s:%s:%u printing package:\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     for (int i = 0; i < pkt->length + 1; i++)
     {
@@ -240,7 +240,6 @@ static void _tx_continue(cc1200_t *dev)
         return;
     }
 
-    //int fifo = CC1200_PACKET_LENGTH - cc1200_get_reg_robust(dev, CC1200_NUM_TXBYTES);
     int fifo = CC1200_TX_FIFO_SIZE - cc1200_get_reg_robust(dev, CC1200_NUM_TXBYTES);
 
     int status = cc1200_strobe(dev, CC1200_SNOP);
@@ -279,7 +278,7 @@ static void _tx_continue(cc1200_t *dev)
     }
     else
 	{
-        /* set GDO2 to 0x6 -> will deassert at packet end */
+        /* set GDO2 to 0x6 -> pin 2 will deassert at end of TX packet */
         cc1200_write_reg(dev, CC1200_IOCFG2, CC1200_CFG_PKT_SYNC_RXTX);
         gpio_irq_enable(dev->params.int_pin);
     }
@@ -375,7 +374,7 @@ int cc1200_send(cc1200_t *dev, const struct iovec *vector, unsigned count)
      */
     //size = packet->length + 1;
     uint8_t size = 0;
-    for(unsigned i = 0; i<count; i++) size += vector[i].iov_len;
+    for(uint8_t i = 0; i<count; i++) size += vector[i].iov_len;
 
     DEBUG("%s: size=%d\n", __func__, size);
 
@@ -384,10 +383,6 @@ int cc1200_send(cc1200_t *dev, const struct iovec *vector, unsigned count)
                 RIOT_FILE_RELATIVE, __func__, __LINE__);
         return -ENOSPC;
     }
-
-    //size++; //for the length byte
-
-    /* Disable RX interrupt */
 
 #ifdef MODULE_CC1200_HOOKS
     cc1200_hook_tx();
@@ -408,21 +403,21 @@ int cc1200_send(cc1200_t *dev, const struct iovec *vector, unsigned count)
 
     DEBUG("%s:%u SIZE: %u\n", __func__, __LINE__, size);
     int pos = 1; // length field has been set by hand
-    for(unsigned i = 0; i< count; i++){
+    for(uint8_t i = 0; i< count; i++){
         unsigned int pkt_len = vector[i].iov_len;
 
 #if ENABLE_DEBUG
         DEBUG("%s:%u Package to send: \n", __func__, __LINE__);
-        for(unsigned j = 0; j < pkt_len; j++){
+        for(uint8_t j = 0; j < pkt_len; j++){
             DEBUG("0x%x ", *(((char*) vector[i].iov_base)+j));
         }
         DEBUG("\n");
 #endif
 
+        /* Copying contents from the iovector into CC1200 own framebuffer */
         memcpy((char*)&dev->pkt_buf.packet+pos, vector[i].iov_base, pkt_len);
         pos += pkt_len;
     }
-    //memcpy((char*)&dev->pkt_buf.packet, packet, size);
     dev->pkt_buf.pos = 0;
 
     DEBUG("cc1200: snd pkt to %u payload_length=%u\n",

@@ -32,7 +32,7 @@
 #include "net/gnrc/nettype.h"
 #include "led.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 #define _MAX_MHR_OVERHEAD   (25)
@@ -40,14 +40,15 @@
 static int _send(netdev_t *dev, const struct iovec *vector, unsigned count)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
+#if ENABLE_DEBUG
     LED_ON(0);
+#endif
     int result = 0;
     netdev_cc1200_t *netdev_cc1200 = (netdev_cc1200_t*) dev;
     int size = 0;
-    for(unsigned i = 0; i<count; i++) size += vector[i].iov_len;
+    for(uint8_t i = 0; i<count; i++) size += vector[i].iov_len;
 
     DEBUG("%s:%u size=%d\n", __func__, __LINE__, size);
-    //if(size > CC1200_PACKET_LENGTH-1){
     if(size > CC1200_PACKET_LENGTH){
         DEBUG("%s: packet too large (%u > %u)\n",
             __func__, size, CC1200_PACKET_LENGTH);
@@ -55,11 +56,10 @@ static int _send(netdev_t *dev, const struct iovec *vector, unsigned count)
         return -EOVERFLOW;
     }
 
-    //cc1200_pkt_t *cc1200_pkt = (cc1200_pkt_t*) package;
-
-    //result = cc1200_send(&netdev_cc1200->cc1200, cc1200_pkt );
     result = cc1200_send(&netdev_cc1200->cc1200, vector, count);
+#if ENABLE_DEBUG
     LED_OFF(0);
+#endif
     return result;
 }
 
@@ -99,7 +99,7 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
     dev->stats.rx_bytes += cc1200_pkt->length;
 #endif
 
-    for(int i = 0; i< cc1200_pkt->length+1; i++)
+    for(uint8_t i = 0; i< cc1200_pkt->length+1; i++)
     	DEBUG("0x%x ", *(((char* )cc1200_pkt)+i));
     DEBUG("\n");
 
@@ -114,11 +114,10 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
     switch (opt) {
 
         case NETOPT_MAX_PACKET_SIZE:
-            if (value_len < sizeof(int16_t)) {
-                return -EOVERFLOW;
-            }
+            assert(value_len >= sizeof(int16_t));
             *((uint16_t *)value) = CC1200_MAX_DATA_LENGTH - _MAX_MHR_OVERHEAD;
             return sizeof(uint16_t);
+
         default:
             break;
     }
@@ -141,9 +140,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
                 if(value_len != sizeof(uint16_t)){
                     return -EINVAL;
                 }
-                uint8_t *arg = (uint8_t*)value;
-                uint8_t channel = arg[value_len-1];
-                //if ((channel < CC1200_MIN_CHANNR) || (channel > CC1200_MAX_CHANNR)) {
+                uint8_t channel = (((const uint16_t *)value)[0]) & UINT8_MAX;
                 if (channel > CC1200_MAX_CHANNR) {
                     return -EINVAL;
                 }
@@ -266,7 +263,6 @@ int netdev_cc1200_setup(netdev_cc1200_t *netdev_cc1200, const cc1200_params_t *p
     netdev_t *netdev = (netdev_t *)netdev_cc1200;
 
     netdev->driver = &netdev_cc1200_driver;
-#ifdef MODULE_GNRC_NETIF
 # ifdef MODULE_GNRC_SIXLOWPAN
     netdev_cc1200->cc1200.proto = GNRC_NETTYPE_SIXLOWPAN;
     netdev_cc1200->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
@@ -274,11 +270,8 @@ int netdev_cc1200_setup(netdev_cc1200_t *netdev_cc1200, const cc1200_params_t *p
     netdev_cc1200->cc1200.proto = GNRC_NETTYPE_UNDEF;
     netdev_cc1200->netdev.proto = GNRC_NETTYPE_UNDEF;
 # endif
-#endif
-
 
     cc1200_setup(&netdev_cc1200->cc1200, params);
-
 
     /* Initialise netdev_ieee802154_t struct */
     cc1200_t *cc1200 = &netdev_cc1200->cc1200; 

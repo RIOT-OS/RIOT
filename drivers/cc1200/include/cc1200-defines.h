@@ -342,6 +342,7 @@ extern "C" {
 #define CC1200_SFTX         (0x3B)      /**< Flush the TX FIFO buffer (CC1200 should be in IDLE state). */
 #define CC1200_SWORRST      (0x3C)      /**< Reset real time clock. */
 #define CC1200_SNOP         (0x3D)      /**< No operation. May be used to pad strobe commands to two bytes for simpler software. */
+#define CC1200_EXT_REG_ACC  (0x2F)      /**< When accessing the extended register space, 0x2F has to be sent first */
 /** @} */
 
 /**
