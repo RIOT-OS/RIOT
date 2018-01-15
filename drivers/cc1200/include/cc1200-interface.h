@@ -43,10 +43,6 @@ void cc1200_switch_to_rx(cc1200_t *dev);
 void cc1200_wakeup_from_rx(cc1200_t *dev);
 void cc1200_write_register(cc1200_t *dev, uint16_t r, uint8_t value);
 
-extern const char cc1200_default_conf[];
-extern const uint8_t cc1200_default_conf_size;
-extern const uint8_t cc1200_pa_table[];
-
 #ifdef MODULE_CC1200_HOOKS
 void cc1200_hooks_init(void);
 void cc1200_hook_rx(void);
