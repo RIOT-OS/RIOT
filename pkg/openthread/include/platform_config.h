@@ -36,13 +36,15 @@ extern "C" {
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS       (10U)
 #endif
 
+
 /**
-  * @def OPENTHREAD_CONFIG_LEGACY_TRANSMIT_DONE
-  *
-  * Define to 1 if you want use legacy transmit done.
-  *
-  */
-#define OPENTHREAD_CONFIG_LEGACY_TRANSMIT_DONE      (1U)
+ * @def OPENTHREAD_CONFIG_LOG_LEVEL
+ *
+ * Set OpenThread log level
+ *
+ * @see https://openthread.io/releases/thread-reference-20170716/group/plat-logging
+ */
+#define OPENTHREAD_CONFIG_LOG_LEVEL OT_LOG_LEVEL_NONE
 
 #ifdef __cplusplus
 }
