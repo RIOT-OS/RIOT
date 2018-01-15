@@ -36,15 +36,28 @@ extern "C" {
 /* 0: no external high speed crystal available
  * else: actual crystal frequency [in Hz] */
 #define CLOCK_HSE           (0)
+
+#ifndef CLOCK_LSE
 /* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
+ * 1: external crystal available (always 32.768kHz)
+ * This defaults to 0 because hardware revision 'MB1136 C-01' of the nucleo-64
+ * board disconnects LSE by default. You may safely set this to 1 on revisions
+ * newer than 'MB1136 C-01' */
+#define CLOCK_LSE           (0)
+#endif
+
 /* 0: enable MSI only if HSE isn't available
  * 1: always enable MSI (e.g. if USB or RNG is used)*/
 #define CLOCK_MSI_ENABLE    (1)
+
+#ifndef CLOCK_MSI_LSE_PLL
 /* 0: disable Hardware auto calibration with LSE
- * 1: enable Hardware auto calibration with LSE (PLL-mode)*/
-#define CLOCK_MSI_LSE_PLL   (1)
+ * 1: enable Hardware auto calibration with LSE (PLL-mode)
+ * Same as with CLOCK_LSE above this defaults to 0 because LSE is
+ * mandatory for MSI/LSE-trimming to work */
+#define CLOCK_MSI_LSE_PLL   (0)
+#endif
+
 /* give the target core clock (HCLK) frequency [in Hz], maximum: 80MHz */
 #define CLOCK_CORECLOCK     (80000000U)
 /* PLL configuration: make sure your values are legit!
