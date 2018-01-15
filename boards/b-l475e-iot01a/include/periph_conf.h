@@ -35,6 +35,12 @@ extern "C" {
 /* 0: no external low speed crystal available,
  * 1: external crystal available (always 32.768kHz) */
 #define CLOCK_LSE           (1)
+/* 0: enable MSI only if HSE isn't available
+ * 1: always enable MSI (e.g. if USB or RNG is used)*/
+#define CLOCK_MSI_ENABLE    (1)
+/* 0: disable Hardware auto calibration with LSE
+ * 1: enable Hardware auto calibration with LSE (PLL-mode)*/
+#define CLOCK_MSI_LSE_PLL   (1)
 /* give the target core clock (HCLK) frequency [in Hz], maximum: 80MHz */
 #define CLOCK_CORECLOCK     (80000000U)
 /* PLL configuration: make sure your values are legit!
