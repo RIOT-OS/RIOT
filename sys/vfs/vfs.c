@@ -413,7 +413,8 @@ int vfs_mount(vfs_mount_t *mountp)
     if ((mountp == NULL) || (mountp->fs == NULL) || (mountp->mount_point == NULL)) {
         return -EINVAL;
     }
-    DEBUG("vfs_mount: -> \"%s\" (%p), %p\n", mountp->mount_point, (void *)mountp->mount_point, mountp->private_data);
+    DEBUG("vfs_mount: -> \"%s\" (%p), %p\n",
+          mountp->mount_point, (void *)mountp->mount_point, mountp->private_data);
     if (mountp->mount_point[0] != '/') {
         DEBUG("vfs_mount: not absolute mount_point path\n");
         return -EINVAL;
@@ -727,7 +728,8 @@ int vfs_bind(int fd, int flags, const vfs_file_ops_t *f_op, void *private_data)
 
 int vfs_normalize_path(char *buf, const char *path, size_t buflen)
 {
-    DEBUG("vfs_normalize_path: %p, \"%s\" (%p), %lu\n", buf, path, path, (unsigned long)buflen);
+    DEBUG("vfs_normalize_path: %p, \"%s\" (%p), %lu\n",
+          (void *)buf, path, (void *)path, (unsigned long)buflen);
     size_t len = 0;
     int npathcomp = 0;
     const char *path_end = path + strlen(path); /* Find the terminating null byte */
@@ -736,7 +738,8 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen)
     }
 
     while(path <= path_end) {
-        DEBUG("vfs_normalize_path: + %d \"%.*s\" <- \"%s\" (%p)\n", npathcomp, (int)len, buf, path, path);
+        DEBUG("vfs_normalize_path: + %d \"%.*s\" <- \"%s\" (%p)\n",
+              npathcomp, (int)len, buf, path, (void *)path);
         if (path[0] == '\0') {
             break;
         }
