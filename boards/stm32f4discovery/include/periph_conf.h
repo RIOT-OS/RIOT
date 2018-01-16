@@ -41,7 +41,7 @@ extern "C" {
 #define CLOCK_HSE           (8000000U)
 /* 0: no external low speed crystal available,
  * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
+#define CLOCK_LSE           (0)
 /* peripheral clock setup */
 #define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
 #define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
