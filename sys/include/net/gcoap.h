@@ -92,9 +92,11 @@
  *
  * Allocate a buffer and a coap_pkt_t for the request.
  *
- * If there is a payload, follow the three steps below.
+ * If there is a payload, follow the steps below.
  *
  * -# Call gcoap_req_init() to initialize the request.
+ *    -# Optionally, mark the request confirmable by calling
+ *       coap_hdr_set_type() with COAP_TYPE_CON.
  * -# Write the request payload, starting at the updated _payload_ pointer
  *    in the coap_pkt_t.
  * -# Call gcoap_finish(), which updates the packet for the payload.
@@ -413,6 +415,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Count of PDU buffers available for resending confirmable messages
+ */
+#ifndef GCOAP_RESEND_BUFS_MAX
+#define GCOAP_RESEND_BUFS_MAX      (1)
+#endif
+
+/**
  * @brief   A modular collection of resources for a server
  */
 typedef struct gcoap_listener {
@@ -484,6 +493,10 @@ typedef struct {
                                              observe memos */
     gcoap_observe_memo_t observe_memos[GCOAP_OBS_REGISTRATIONS_MAX];
                                         /**< Observed resource registrations */
+    uint8_t resend_bufs[GCOAP_RESEND_BUFS_MAX][GCOAP_PDU_BUF_SIZE];
+                                        /**< Buffers for PDU for request resends;
+                                             if first byte of an entry is zero,
+                                             the entry is available */
 } gcoap_state_t;
 
 /**
