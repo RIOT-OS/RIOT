@@ -380,6 +380,13 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                           : (tmp & ~AT86RF2XX_IRQ_STATUS_MASK__RX_START);
             at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
             break;
+        case AT86RF2XX_OPT_ACK_PENDING:
+            DEBUG("[at86rf2xx] opt: enabling pending ACKs\n");
+            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
+            tmp = (state) ? (tmp |  AT86RF2XX_CSMA_SEED_1__AACK_SET_PD)
+                          : (tmp & ~AT86RF2XX_CSMA_SEED_1__AACK_SET_PD);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
+            break;
         default:
             /* do nothing */
             break;
