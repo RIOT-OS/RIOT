@@ -68,7 +68,11 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
   USEMODULE += ble_6lowpan
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_iphc
+  USEMODULE += gnrc_ipv6_nib_6ln
   USEMODULE += gnrc_ipv6_default
+  # prevent application from being a router
+  # TODO: maybe find a nicer solution in future build system update
+  USEMODULE := $(filter-out gnrc_ipv6_router% gnrc_rpl netstats_rpl auto_init_gnrc_rpl,$(USEMODULE))
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
