@@ -57,6 +57,9 @@ _JLINK=JLinkExe
 _JLINK_SERVER=JLinkGDBServer
 _JLINK_IF=SWD
 _JLINK_SPEED=2000
+# default terminal frontend
+_JLINK_TERMPROG=${RIOTBASE}/dist/tools/pyterm/pyterm
+_JLINK_TERMFLAGS="-ts 19021"
 
 #
 # a couple of tests for certain configuration options
@@ -135,6 +138,15 @@ test_dbg() {
     fi
 }
 
+test_term() {
+    if [ -z "${JLINK_TERMPROG}" ]; then
+        JLINK_TERMPROG="${_JLINK_TERMPROG}"
+    fi
+    if [ -z "${JLINK_TERMFLAGS}" ]; then
+        JLINK_TERMFLAGS="${_JLINK_TERMFLAGS}"
+    fi
+}
+
 #
 # now comes the actual actions
 #
@@ -209,6 +221,36 @@ do_reset() {
                     -commandfile '${RIOTBASE}/dist/tools/jlink/reset.seg'"
 }
 
+do_term() {
+    test_config
+    test_serial
+    test_term
+
+    # temporary file that save the JLink pid
+    JLINK_PIDFILE=$(mktemp -t "jilnk_pid.XXXXXXXXXX")
+    # will be called by trap
+    cleanup() {
+        JLINK_PID="$(cat ${JLINK_PIDFILE})"
+        kill ${JLINK_PID}
+        rm -r "${JLINK_PIDFILE}"
+        exit 0
+    }
+    # cleanup after script terminates
+    trap "cleanup ${JLINK_PIDFILE}" EXIT
+    # don't trapon Ctrl+C, because JLink keeps running
+    trap '' INT
+    # start Jlink as RTT server
+    setsid sh -c "${JLINK} ${JLINK_SERIAL} \
+            -device '${JLINK_DEVICE}' \
+            -speed '${JLINK_SPEED}' \
+            -if '${JLINK_IF}' \
+            -jtagconf -1,-1 \
+            -commandfile '${RIOTBASE}/dist/tools/jlink/term.seg' & \
+            echo  \$! > $JLINK_PIDFILE" &
+
+    sh -c "${JLINK_TERMPROG} ${JLINK_TERMFLAGS}"
+}
+
 #
 # parameter dispatching
 #
@@ -232,6 +274,10 @@ case "${ACTION}" in
   reset)
     echo "### Resetting Target ###"
     do_reset "$@"
+    ;;
+  term_rtt)
+    echo "### Starting RTT terminal ###"
+    do_term
     ;;
   *)
     echo "Usage: $0 {flash|debug|debug-server|reset}"

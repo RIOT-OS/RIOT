@@ -42,6 +42,7 @@ extern "C" {
 #define LED1_MASK           (1 << 18)
 #define LED2_MASK           (1 << 19)
 #define LED3_MASK           (1 << 20)
+#define LED_MASK            (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK)
 
 #define LED0_ON             (LED_PORT->OUTCLR = LED0_MASK)
 #define LED0_OFF            (LED_PORT->OUTSET = LED0_MASK)
