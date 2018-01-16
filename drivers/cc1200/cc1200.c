@@ -77,34 +77,8 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
         DEBUG("cc1200 setup extended register: Address: 0x%x, Value: 0x%x\n", cc1200_ext_default_conf[i].address, cc1200_ext_default_conf[i].value);
         cc1200_write_reg(dev, cc1200_ext_default_conf[i].address, cc1200_ext_default_conf[i].value);
     }
-    /* Write extended config for CC1200 
-    cc1200_write_reg(dev, CC1200_IF_MIX_CFG, 0x18);
-    cc1200_write_reg(dev, CC1200_TOC_CFG, 0x03);
-    cc1200_write_reg(dev, CC1200_MDMCFG2, 0x02);
-    cc1200_write_reg(dev, CC1200_FREQ2, 0x56);
-    cc1200_write_reg(dev, CC1200_FREQ1, 0xCC);
-    cc1200_write_reg(dev, CC1200_FREQ0, 0xCC);
-    cc1200_write_reg(dev, CC1200_IF_ADC1, 0xEE);
-    cc1200_write_reg(dev, CC1200_IF_ADC0, 0x10);
-    cc1200_write_reg(dev, CC1200_FS_DIG1, 0x04);
-    cc1200_write_reg(dev, CC1200_FS_DIG0, 0x50);
-    cc1200_write_reg(dev, CC1200_FS_CAL1, 0x40);
-    cc1200_write_reg(dev, CC1200_FS_CAL0, 0x0E);
-    cc1200_write_reg(dev, CC1200_FS_DIVTWO, 0x03);
-    cc1200_write_reg(dev, CC1200_FS_DSM0, 0x33);
-    cc1200_write_reg(dev, CC1200_FS_DVC1, 0xF7);
-    cc1200_write_reg(dev, CC1200_FS_DVC0, 0x0F);
-    cc1200_write_reg(dev, CC1200_FS_PFD, 0x00);
-    cc1200_write_reg(dev, CC1200_FS_PRE, 0x6E);
-    cc1200_write_reg(dev, CC1200_FS_REG_DIV_CML, 0x1C);
-    cc1200_write_reg(dev, CC1200_FS_SPARE, 0xAC);
-    cc1200_write_reg(dev, CC1200_FS_VCO0, 0xB5);
-    cc1200_write_reg(dev, CC1200_IFAMP, 0x05);
-    cc1200_write_reg(dev, CC1200_XOSC5, 0x0E);
-    cc1200_write_reg(dev, CC1200_XOSC1, 0x03);
-    cc1200_write_reg(dev, CC1200_AGC_CS_THR, (uint8_t) -91);
-    cc1200_write_reg(dev, CC1200_AGC_GAIN_ADJUST, (int8_t)CC1200_RF_CFG_RSSI_OFFSET);
-    */
+
+    /* Set CC1200 channel to default 26 */
     cc1200_set_channel(dev, CC1200_DEFAULT_CHANNEL);
 
     /* set default node id */

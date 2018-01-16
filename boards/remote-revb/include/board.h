@@ -119,7 +119,7 @@
 #define CC1200_PARAMS_BOARD     {.spi = SPI_DEV(0), \
                                  .spi_clk = SPI_CLK_5MHZ, \
                                  .cs_pin = GPIO_PIN(PORT_B, 5), \
-                                 .int_pin = GPIO_PIN(PORT_B, 4), \
+                                 .int_pin = GPIO_PIN(PORT_B, 0), \
                                  .reset_pin = GPIO_PIN(PORT_C, 7)}
 /** @} */
 
