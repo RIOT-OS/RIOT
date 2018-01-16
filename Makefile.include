@@ -296,7 +296,7 @@ endif
 BASELIBS += $(BINDIR)/${APPLICATION}.a
 BASELIBS += $(APPDEPS)
 
-.PHONY: all link clean flash term doc debug debug-server reset objdump help info-modules
+.PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
 .PHONY: ..in-docker-container
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
@@ -386,14 +386,21 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-flash: all $(FLASHDEPS)
+# if make target != 'flash-only', add target 'all' to ensure build before flash
+ifeq (,$(filter flash-only, $(MAKECMDGOALS)))
+  BUILD_BEFORE_FLASH = all
+endif
+
+flash: $(BUILD_BEFORE_FLASH) $(FLASHDEPS)
 	@command -v $(FLASHER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED}Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(FLASHER) $(FFLAGS)
 
-preflash: all
+flash-only: flash
+
+preflash: $(BUILD_BEFORE_FLASH)
 	$(PREFLASHER) $(PREFFLAGS)
 
 term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
