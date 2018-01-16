@@ -812,10 +812,8 @@ uint8_t gcoap_op_state(void)
 
 int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
 {
+    (void)cf; /* only used in the assert below. */
     assert(cf == COAP_CT_LINK_FORMAT);
-#ifndef DEVELHELP
-    (void)cf;
-#endif
 
     /* skip the first listener, gcoap itself (we skip /.well-known/core) */
     gcoap_listener_t *listener = _coap_state.listeners->next;
