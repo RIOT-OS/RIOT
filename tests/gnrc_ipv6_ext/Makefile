@@ -22,6 +22,8 @@ USEMODULE += gnrc_udp
 # Add also the shell, some shell commands
 USEMODULE += ps
 
+CFLAGS += -DGNRC_NETIF_IPV6_ADDRS_NUMOF=3
+
 include $(RIOTBASE)/Makefile.include
 
 # The test can check more things with ENABLE_DEBUG set to 1 in gnrc_ipv6.c
