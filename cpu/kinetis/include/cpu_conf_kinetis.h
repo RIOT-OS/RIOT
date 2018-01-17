@@ -128,6 +128,19 @@ extern "C"
 #endif /* KINETIS_RNGA */
 /** @} */
 
+/**
+ * @name MK20D7 Compatibility layer
+ * @{
+ */
+#if defined(MK20D7_H_)
+#define LLWU_IRQn LLW_IRQn
+#define LPTMR0_IRQn LPTimer_IRQn
+#define PIT_TCTRL_CHN_MASK   (0x4u)
+#define PIT_TCTRL_CHN_SHIFT  (2)
+#endif /* MK20D7_H_ */
+/** @} */
+
+
 #ifdef __cplusplus
 }
 #endif
