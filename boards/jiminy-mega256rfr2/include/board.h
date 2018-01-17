@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 /*Fastest Baudrate possible for board*/
-#define UART_STDIO_BAUDRATE (250000U)
+#define UART_STDIO_BAUDRATE (250000U)       /**< Sets Baudrate for e.g. Shell */
 
 /**
  * @name   LED pin definitions and handlers
@@ -43,6 +43,7 @@ extern "C" {
 #define LED_BLUE_PIN        GPIO_PIN(1, 5)
 #define LED_GREEN_PIN       GPIO_PIN(1, 6)
 #define LED_RED_PIN         GPIO_PIN(1, 7)
+#define LED0_PIN            GPIO_PIN(1, 5)
 
 #define BLUE            (1 << DDB5)
 #define GREEN           (1 << DDB6)

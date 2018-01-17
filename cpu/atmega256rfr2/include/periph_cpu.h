@@ -15,8 +15,6 @@
  * @file
  * @brief           CPU specific definitions for internal peripheral handling
  *
- * @author          René Herthel <rene-herthel@outlook.de>
- * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
@@ -49,16 +47,8 @@ enum {
     PORT_G  = 6,        /**< port G */
 };
 /** @} */
+#define TIMER_CHAN          (3U) /**< Atmega256rfr2 timers have up to 3 capture-compare channels (TIMER 1/3) */
 
-/**
- * @name   Atmega256rfr2 timers have up to 3 capture-compare channels (TIMER 1/3)
- * -> best suitable for PWM and especially RGB Leds
- * @{
- */
-#define TIMER_CHAN          (3U)
-/** @} */
-/* forward declaration of struct to avoid cyclic dependency */
-typedef unsigned int gpio_t;
 /**
  * @name   GPIO pin not defined
  * @{
@@ -73,7 +63,7 @@ typedef unsigned int gpio_t;
  * @{
  */
 typedef struct {
-    gpio_t pin;             /**< GPIO pin mapped to this channel */
+    unsigned int pin;             /**< GPIO pin mapped to this channel */
     uint8_t cc_chan;        /**< capture compare channel used */
 } pwm_chan_t;
 /** @}*/
@@ -103,7 +93,6 @@ typedef struct {
  * @name   PWM configuration struct
  * @{
  */
-
 typedef struct {
     mega_timer_t *dev;              /**< Timer used */
     pwm_chan_t chan[TIMER_CHAN];    /**< channel mapping, set to {GPIO_UNDEF, 0} */
@@ -128,10 +117,8 @@ typedef struct {
  * @{
  */
 typedef struct {
-    REG8 *acsr;
-    REG8 *adcsrb;
-    gpio_t in1;
-    gpio_t in2;
+    unsigned int in1;       /**< Comparator Input Pin 1 */
+    unsigned int in2;       /**< Comparator Input Pin 2 */
 }ac_conf_t;
 /** @} */
 

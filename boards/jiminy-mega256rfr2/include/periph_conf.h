@@ -34,7 +34,7 @@ extern "C" {
  * @name   Clock configuration
  * @{
  */
-#define CLOCK_CORECLOCK     (8000000L)
+#define CLOCK_CORECLOCK     (8000000UL)
 /** @} */
 
 /**
@@ -126,8 +126,8 @@ static const pwm_conf_t pwm_config[] = {
 
 static const ac_conf_t ac_config[] = {
     {
-        .acsr = &ACSR,
-        .adcsrb = &ADCSRB
+        .in1 = GPIO_PIN(PORT_E, 2),
+        .in2 = GPIO_PIN(PORT_E, 1)
     }
 };
 
