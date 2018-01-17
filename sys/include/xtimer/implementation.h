@@ -33,6 +33,13 @@ extern "C" {
 extern volatile uint32_t _xtimer_high_cnt;
 #endif
 
+#if (XTIMER_HZ < 1000000ul) && (STIMER_HZ >= 1000000ul)
+extern volatile uint32_t prev_s;
+extern volatile uint32_t prev_x;
+extern volatile bool     xtimer_sync;
+#endif
+
+
 /**
  * @brief IPC message type for xtimer msg callback
  */
@@ -45,6 +52,16 @@ static inline uint32_t _xtimer_lltimer_now(void)
 {
     return timer_read(XTIMER_DEV);
 }
+
+#if (XTIMER_HZ < 1000000ul) && (STIMER_HZ >= 1000000ul)
+/**
+ * @brief returns the (masked) low-level timer counter value for STIMER
+ */
+static inline uint32_t _stimer_lltimer_now(void)
+{
+    return timer_read(STIMER_DEV);
+}
+#endif
 
 /**
  * @brief drop bits of a value that don't fit into the low-level timer.
@@ -62,7 +79,7 @@ static inline uint32_t _xtimer_lltimer_mask(uint32_t val)
  * @internal
  */
 uint64_t _xtimer_now64(void);
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
+int _xtimer_set_absolute(xtimer_t *timer, uint32_t target, uint32_t now);
 void _xtimer_set(xtimer_t *timer, uint32_t offset);
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);
@@ -105,7 +122,26 @@ static inline uint32_t _xtimer_now(void)
 
     return latched_high_cnt | now;
 #else
+#if (XTIMER_HZ < 1000000ul) && (STIMER_HZ >= 1000000ul)
+    if (!xtimer_sync) {
+        prev_x = _xtimer_lltimer_now();
+        prev_s = _stimer_lltimer_now();
+        xtimer_sync = true;
+        return prev_x;
+    } else {
+        uint64_t diff_s;
+        uint32_t now_s;
+    
+        do {
+            now_s  = _stimer_lltimer_now();
+            diff_s = now_s - prev_s;
+        } while (diff_s < STIMER_HZ/XTIMER_HZ); 
+
+        return _xtimer_lltimer_mask(prev_x + (uint32_t)(diff_s*XTIMER_HZ/STIMER_HZ));
+    }
+#else
     return _xtimer_lltimer_now();
+#endif
 #endif
 }
 
@@ -140,6 +176,11 @@ static inline void _xtimer_spin(uint32_t offset) {
     while (_xtimer_lltimer_mask(_xtimer_lltimer_now() - start) < offset);
 #else
     while ((_xtimer_lltimer_now() - start) < offset);
+#endif
+#if (XTIMER_HZ < 1000000ul) && (STIMER_HZ >= 1000000ul)
+    prev_x = _xtimer_lltimer_now();
+    prev_s = _stimer_lltimer_now();
+    xtimer_sync = true;
 #endif
 }
 
