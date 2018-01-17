@@ -12,7 +12,7 @@ export PROGRAMMER ?= cc2538-bsl
 ifeq ($(PROGRAMMER),jlink)
   # setup JLink for flashing
   export JLINK_DEVICE := cc2538sf53
-  export JLINK_FLASH_ADDR := 200000
+  export FLASH_ADDR := 200000
   export JLINK_IF := JTAG
   export TUI := 1
   include $(RIOTMAKE)/tools/jlink.inc.mk
