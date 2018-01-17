@@ -57,6 +57,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              spark-core \
                              stm32f0discovery \
                              stm32f3discovery \
+                             teensy31 \
                              telosb \
                              waspmote-pro \
                              wsn430-v1_3b \
