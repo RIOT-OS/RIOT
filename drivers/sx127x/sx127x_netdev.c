@@ -555,7 +555,15 @@ static int _get_state(sx127x_t *dev, void *val)
 
         case SX127X_RF_OPMODE_RECEIVER:
         case SX127X_RF_LORA_OPMODE_RECEIVER_SINGLE:
-            state = NETOPT_STATE_IDLE;
+            /* Sx127x is in receive mode:
+             * -> need to check if the device is currently receiving a packet */
+            if (sx127x_reg_read(dev, SX127X_REG_LR_MODEMSTAT) &
+                SX127X_RF_LORA_MODEMSTAT_MODEM_STATUS_SIGNAL_DETECTED) {
+                state = NETOPT_STATE_RX;
+            }
+            else {
+                state = NETOPT_STATE_IDLE;
+            }
             break;
 
         default:
