@@ -113,13 +113,13 @@ typedef struct {
 /** @} */
 
 /**
- * @name analog comparator setting struct
+ * @brief    analog comparator setting struct
  * @{
  */
 typedef struct {
     unsigned int in1;       /**< Comparator Input Pin 1 */
     unsigned int in2;       /**< Comparator Input Pin 2 */
-}ac_conf_t;
+} ac_conf_t;
 /** @} */
 
 /**
