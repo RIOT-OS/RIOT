@@ -104,8 +104,8 @@ extern "C" {
 /**
  * @brief   Default device class (A, B or C)
  */
-#ifndef LORAMAC_DEVICE_CLASS
-#define LORAMAC_DEVICE_CLASS            (LORAMAC_CLASS_A)
+#ifndef LORAMAC_DEFAULT_DEVICE_CLASS
+#define LORAMAC_DEFAULT_DEVICE_CLASS    (LORAMAC_CLASS_A)
 #endif
 
 /**

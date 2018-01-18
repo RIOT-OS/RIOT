@@ -1,0 +1,3 @@
+INCLUDES += -I$(RIOTBASE)/pkg/semtech-loramac/include
+
+DIRS += $(RIOTBASE)/pkg/semtech-loramac/contrib
