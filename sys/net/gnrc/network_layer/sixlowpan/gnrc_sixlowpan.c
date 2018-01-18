@@ -257,11 +257,10 @@ static void _send(gnrc_pktsnip_t *pkt)
     DEBUG("6lo: iface->sixlo.max_frag_size = %" PRIu8 " for interface %"
           PRIkernel_pid "\n", iface->sixlo.max_frag_size, hdr->if_pid);
 
-    /* IP should not send anything here if it is not a 6LoWPAN interface,
-     * so we don't need to check for NULL pointers.
-     * Note, that datagram_size cannot be used here, because the header size
+    /* Note, that datagram_size cannot be used here, because the header size
      * might be changed by IPHC. */
-    if (gnrc_pkt_len(pkt2->next) <= iface->sixlo.max_frag_size) {
+    if ((iface->sixlo.max_frag_size == 0) ||
+        (gnrc_pkt_len(pkt2->next) <= iface->sixlo.max_frag_size)) {
         DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
               (void *)pkt2, hdr->if_pid);
         if (gnrc_netapi_send(hdr->if_pid, pkt2) < 1) {
