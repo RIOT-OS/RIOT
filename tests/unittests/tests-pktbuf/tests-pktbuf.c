@@ -321,7 +321,7 @@ static void test_pktbuf_mark__pkt_NOT_NULL__size_greater_than_pkt_size(void)
 
 static void test_pktbuf_mark__pkt_NOT_NULL__pkt_data_NULL(void)
 {
-    gnrc_pktsnip_t pkt = { 1, NULL, NULL, sizeof(TEST_STRING16), GNRC_NETTYPE_TEST };
+    gnrc_pktsnip_t pkt = { NULL, NULL, sizeof(TEST_STRING16), 1, GNRC_NETTYPE_TEST };
 
     TEST_ASSERT_NULL(gnrc_pktbuf_mark(&pkt, sizeof(TEST_STRING16) - 1,
                                       GNRC_NETTYPE_TEST));
@@ -661,7 +661,7 @@ static void test_pktbuf_hold__pkt_null(void)
 
 static void test_pktbuf_hold__pkt_external(void)
 {
-    gnrc_pktsnip_t pkt = { 1, NULL, TEST_STRING8, sizeof(TEST_STRING8), GNRC_NETTYPE_TEST };
+    gnrc_pktsnip_t pkt = { NULL, TEST_STRING8, sizeof(TEST_STRING8), 1, GNRC_NETTYPE_TEST };
 
     gnrc_pktbuf_hold(&pkt, 1);
     TEST_ASSERT(gnrc_pktbuf_is_empty());

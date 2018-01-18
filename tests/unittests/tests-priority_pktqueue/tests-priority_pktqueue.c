@@ -23,7 +23,7 @@
 #include "tests-priority_pktqueue.h"
 
 #define PKT_INIT_ELEM(len, data, next) \
-    { 1, (next), (data), (len), GNRC_NETTYPE_UNDEF }
+    { (next), (data), (len), 1, GNRC_NETTYPE_UNDEF }
 #define PKT_INIT_ELEM_STATIC_DATA(data, next) PKT_INIT_ELEM(sizeof(data), data, next)
 #define PKTQUEUE_INIT_ELEM(pkt) { NULL, pkt }
 
