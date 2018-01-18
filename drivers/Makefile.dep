@@ -308,3 +308,8 @@ ifneq (,$(filter lis3mdl,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
+
+ifneq (,$(filter tja1042,$(USEMODULE)))
+  USEMODULE += can_trx
+  FEATURES_REQUIRED += periph_gpio
+endif
