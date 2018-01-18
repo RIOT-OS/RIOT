@@ -180,12 +180,12 @@ int tftp_server_cmd(int argc, char * *argv)
                 tftp_server_stop();
                 return 0;
             }
-        /* no break */
+        /* falls through */
 
         default:
             printf("usage: %s [start|stop]\n", argv[0]);
-            return 0;
+            break;
     }
 
-    return 0;
+    return 1;
 }
