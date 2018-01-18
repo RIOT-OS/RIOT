@@ -1195,6 +1195,9 @@ static void _init_from_device(gnrc_netif_t *netif)
 #ifdef MODULE_NORDIC_SOFTDEVICE_BLE
         case NETDEV_TYPE_BLE:
             netif->ipv6.mtu = IPV6_MIN_MTU;
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
+            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
+#endif
             break;
 #endif
         default:
