@@ -230,6 +230,14 @@ ifneq (,$(filter rgbled,$(USEMODULE)))
   USEMODULE += color
 endif
 
+ifneq (,$(filter rn2%3,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_uart
+  USEMODULE += xtimer
+  USEMODULE += rn2xx3
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter sdcard_spi,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
