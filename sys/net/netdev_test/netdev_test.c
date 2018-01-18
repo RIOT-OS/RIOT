@@ -19,32 +19,6 @@
 
 #include "net/netdev_test.h"
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
-static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
-static int _init(netdev_t *dev);
-static void _isr(netdev_t *dev);
-static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
-static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len);
-
-static const netdev_driver_t _driver = {
-    .send   = _send,
-    .recv   = _recv,
-    .init   = _init,
-    .isr    = _isr,
-    .get    = _get,
-    .set    = _set,
-};
-
-void netdev_test_setup(netdev_test_t *dev, void *state)
-{
-    netdev_t *netdev = (netdev_t *)dev;
-
-    netdev->driver = &_driver;
-    dev->state = state;
-    mutex_init(&dev->mutex);
-    netdev_test_reset(dev);
-}
-
 void netdev_test_reset(netdev_test_t *dev)
 {
     mutex_lock(&dev->mutex);
@@ -57,14 +31,14 @@ void netdev_test_reset(netdev_test_t *dev)
     mutex_unlock(&dev->mutex);
 }
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     netdev_test_t *dev = (netdev_test_t *)netdev;
-    int res = (int)count;   /* assume everything would be fine */
+    int res = -EINVAL;
 
     mutex_lock(&dev->mutex);
     if (dev->send_cb != NULL) {
-        res = dev->send_cb(netdev, vector, count);
+        res = dev->send_cb(netdev, iolist);
     }
     mutex_unlock(&dev->mutex);
     return res;
@@ -140,5 +114,23 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
     return res;
 }
 
+static const netdev_driver_t _driver = {
+    .send   = _send,
+    .recv   = _recv,
+    .init   = _init,
+    .isr    = _isr,
+    .get    = _get,
+    .set    = _set,
+};
+
+void netdev_test_setup(netdev_test_t *dev, void *state)
+{
+    netdev_t *netdev = (netdev_t *)dev;
+
+    netdev->driver = &_driver;
+    dev->state = state;
+    mutex_init(&dev->mutex);
+    netdev_test_reset(dev);
+}
 
 /** @} */

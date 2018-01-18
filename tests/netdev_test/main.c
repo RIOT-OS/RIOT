@@ -61,7 +61,7 @@ static uint8_t _tmp_len = 0;
 
 static void _dev_isr(netdev_t *dev);
 static int _dev_recv(netdev_t *dev, char *buf, int len, void *info);
-static int _dev_send(netdev_t *dev, const struct iovec *vector, int count);
+static int _dev_send(netdev_t *dev, const iolist_t *iolist);
 static int _dev_get_addr(netdev_t *dev, void *value, size_t max_len);
 static int _dev_set_addr(netdev_t *dev, const void *value, size_t max_len);
 
@@ -296,26 +296,26 @@ static int _dev_recv(netdev_t *dev, char *buf, int len, void *info)
     }
 }
 
-static int _dev_send(netdev_t *dev, const struct iovec *vector, int count)
+static int _dev_send(netdev_t *dev, const iolist_t *iolist)
 {
     int idx = 0;
 
     (void)dev;
     /* check packet content with expected data */
-    for (int i = 0; i < count; i++) {
-        if (memcmp(&(_tmp[idx]), vector[i].iov_base, vector[i].iov_len) != 0) {
-            printf("Unexpected send data (vector index = %d)\n", i);
+    for (; iolist; iolist = iolist->iol_next) {
+        if (memcmp(&(_tmp[idx]), iolist->iol_base, iolist->iol_len) != 0) {
+            puts("Unexpected send data:");
             puts("===========================================================");
             puts("expected");
             puts("===========================================================");
-            od_hex_dump(&_tmp[idx], vector[i].iov_len, OD_WIDTH_DEFAULT);
+            od_hex_dump(&_tmp[idx], iolist->iol_len, OD_WIDTH_DEFAULT);
             puts("===========================================================");
             puts("send data");
             puts("===========================================================");
-            od_hex_dump(vector[i].iov_base, vector[i].iov_len, OD_WIDTH_DEFAULT);
+            od_hex_dump(iolist->iol_base, iolist->iol_len, OD_WIDTH_DEFAULT);
             return -EINVAL;
         }
-        idx += vector[i].iov_len;
+        idx += iolist->iol_len;
     }
     if (idx != _tmp_len) {
         printf("Unexpected send length: %d (expected: %d)\n", idx, _tmp_len);
