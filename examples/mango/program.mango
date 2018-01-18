@@ -1,0 +1,22 @@
+module Main
+{
+	declare i32 @sysgetsensorvalue() 100
+
+	declare void @syssetlight(i32 %arg0) 101
+
+	define void @main()
+	{
+		local	i32	%loc0
+l2:		syscall	i32	@sysgetsensorvalue()
+		stloc	%loc0
+		ldloc	%loc0
+		ldc	i32	150
+		ble	l0
+		ldc	i32	0
+		syscall	void	@syssetlight(i32)
+		br	l1
+l0:		ldc	i32	1
+		syscall	void	@syssetlight(i32)
+l1:		br	l2
+	}
+}
