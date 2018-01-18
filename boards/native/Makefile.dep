@@ -12,3 +12,9 @@ ifneq (,$(filter can,$(USEMODULE)))
     CFLAGS += -DCAN_DLL_NUMOF=2
   endif
 endif
+
+ifneq (,$(filter socket_zep,$(USEMODULE)))
+  USEMODULE += netdev_ieee802154
+  USEMODULE += checksum
+  USEMODULE += random
+endif
