@@ -50,10 +50,9 @@ int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     netdev_t *dev = netif->dev;
     netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
     gnrc_netif_hdr_t *netif_hdr;
-    gnrc_pktsnip_t *vec_snip;
     const uint8_t *src, *dst = NULL;
     int res = 0;
-    size_t n, src_len, dst_len;
+    size_t src_len, dst_len;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     uint8_t flags = (uint8_t)(state->flags & NETDEV_IEEE802154_SEND_MASK);
     le_uint16_t dev_pan = byteorder_btols(byteorder_htons(state->pan));
@@ -93,38 +92,34 @@ int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         DEBUG("_send_ieee802154: Error preperaring frame\n");
         return -EINVAL;
     }
-    /* prepare packet for sending */
-    vec_snip = gnrc_pktbuf_get_iovec(pkt, &n);
-    if (vec_snip != NULL) {
-        struct iovec *vector;
 
-        pkt = vec_snip;     /* reassign for later release; vec_snip is prepended to pkt */
-        vector = (struct iovec *)pkt->data;
-        vector[0].iov_base = mhr;
-        vector[0].iov_len = (size_t)res;
+    /* prepare packet for sending */
+    iolist_t iolist = {
+        .iol_next = (iolist_t *)pkt->next,
+        .iol_base = mhr,
+        .iol_len = (size_t)res
+    };
+
 #ifdef MODULE_NETSTATS_L2
-        if (netif_hdr->flags &
+    if (netif_hdr->flags &
             (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-            netif->dev->stats.tx_mcast_count++;
-        }
-        else {
-            netif->dev->stats.tx_unicast_count++;
-        }
-#endif
-#ifdef MODULE_GNRC_MAC
-        if (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_CSMA_ENABLED) {
-            res = csma_sender_csma_ca_send(dev, vector, n, &netif->mac.csma_conf);
-        }
-        else {
-            res = dev->driver->send(dev, vector, n);
-        }
-#else
-        res = dev->driver->send(dev, vector, n);
-#endif
+        netif->dev->stats.tx_mcast_count++;
     }
     else {
-        return -ENOBUFS;
+        netif->dev->stats.tx_unicast_count++;
     }
+#endif
+#ifdef MODULE_GNRC_MAC
+    if (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_CSMA_ENABLED) {
+        res = csma_sender_csma_ca_send(dev, &iolist, &netif->mac.csma_conf);
+    }
+    else {
+        res = dev->driver->send(dev, &iolist);
+    }
+#else
+    res = dev->driver->send(dev, &iolist);
+#endif
+
     /* release old data */
     gnrc_pktbuf_release(pkt);
     return res;
