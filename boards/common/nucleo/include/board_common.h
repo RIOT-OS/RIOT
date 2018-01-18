@@ -9,6 +9,7 @@
 /**
  * @defgroup    boards_nucleo STM Nucleo Boards
  * @ingroup     boards
+ * @brief       Support for STM Nucleo boards
  *
  * @defgroup    boards_common_nucleo STM Nucleo common
  * @ingroup     boards_common

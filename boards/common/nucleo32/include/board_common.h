@@ -9,6 +9,7 @@
 /**
  * @defgroup    boards_nucleo32 STM Nucleo32 Boards
  * @ingroup     boards
+ * @brief       Support for STM Nucleo 32 boards
  *
  * @defgroup    boards_common_nucleo32 STM Nucleo32 common
  * @ingroup     boards_common
