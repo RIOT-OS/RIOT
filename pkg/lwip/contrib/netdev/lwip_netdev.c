@@ -185,15 +185,24 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p)
     pbuf_header(p, -ETH_PAD_SIZE); /* drop the padding word */
 #endif
     LL_COUNT(p, q, count);
-    struct iovec pkt[count];
+    iolist_t iolist[count];
+
+    /* make last point to the last entry of iolist[] */
+    iolist_t *last = &iolist[count];
+    last--;
+
     for (q = p, count = 0; q != NULL; q = q->next, count++) {
-        pkt[count].iov_base = q->payload;
-        pkt[count].iov_len = (size_t)q->len;
+        iolist_t *iol = &iolist[count];
+
+        iol->iol_next = (iol == last) ? NULL : &iolist[count + 1];
+
+        iol->iol_base = q->payload;
+        iol->iol_len = (size_t)q->len;
     }
 #if ETH_PAD_SIZE
     pbuf_header(p, ETH_PAD_SIZE); /* reclaim the padding word */
 #endif
-    return (netdev->driver->send(netdev, pkt, count) > 0) ? ERR_OK : ERR_BUF;
+    return (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
 }
 #endif
 
@@ -202,12 +211,12 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
 {
     LWIP_ASSERT("p->next == NULL", p->next == NULL);
     netdev_t *netdev = (netdev_t *)netif->state;
-    struct iovec pkt = {
-        .iov_base = p->payload,
-        .iov_len = (p->len - IEEE802154_FCS_LEN),   /* FCS is written by driver */
+    iolist_t pkt = {
+        .iol_base = p->payload,
+        .iol_len = (p->len - IEEE802154_FCS_LEN),   /* FCS is written by driver */
     };
 
-    return (netdev->driver->send(netdev, &pkt, 1) > 0) ? ERR_OK : ERR_BUF;
+    return (netdev->driver->send(netdev, &pkt) > 0) ? ERR_OK : ERR_BUF;
 }
 #endif
 
