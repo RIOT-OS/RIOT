@@ -10,6 +10,7 @@
 /**
  * @defgroup    boards_nucleo144 STM Nucleo144 Boards
  * @ingroup     boards
+ * @brief       Support for STM Nucleo 144 boards
  *
  * @defgroup    boards_common_nucleo144 STM Nucleo144 common
  * @ingroup     boards_common

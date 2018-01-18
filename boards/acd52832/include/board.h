@@ -9,10 +9,14 @@
 /**
  * @defgroup    boards_acd52832 ACD52832
  * @ingroup     boards
+ * @brief       Support for the aconno™ ACD52832
+ *
+ * For more information: http://aconno.de/acd52832/
+ *
  * @{
  *
  * @file
- * @brief       Board specific configuaration for the ACD52832
+ * @brief       Board specific configuration for the ACD52832
  *
  * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
  */
