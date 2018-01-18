@@ -70,6 +70,22 @@
     defined(CPU_MODEL_MK22FX512AVMD12)
 #include "vendor/MK22FA12.h"
 #endif
+#elif (KINETIS_SUBFAMILY == 0)
+#if defined(CPU_MODEL_MK20DX64VLH7) || \
+    defined(CPU_MODEL_MK20DX128VLH7) || \
+    defined(CPU_MODEL_MK20DX256VLH7) || \
+    defined(CPU_MODEL_MK20DX64VLK7) || \
+    defined(CPU_MODEL_MK20DX128VLK7) || \
+    defined(CPU_MODEL_MK20DX256VLK7) || \
+    defined(CPU_MODEL_MK20DX128VLL7) || \
+    defined(CPU_MODEL_MK20DX256VLL7) || \
+    defined(CPU_MODEL_MK20DX64VMB7) || \
+    defined(CPU_MODEL_MK20DX128VMB7) || \
+    defined(CPU_MODEL_MK20DX256VMB7) || \
+    defined(CPU_MODEL_MK20DX128VML7) || \
+    defined(CPU_MODEL_MK20DX256VML7)
+#include "vendor/MK20D7.h"
+#endif
 #endif /* (KINETIS_SUBFAMILY == y) */
 #elif (KINETIS_FAMILY == 6)
 #if (KINETIS_SUBFAMILY == 0)
