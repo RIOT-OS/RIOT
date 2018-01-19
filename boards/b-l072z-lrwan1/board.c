@@ -27,7 +27,7 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 
-#if defined(MODULE_SX1276)
+#if defined(MODULE_SX1276) || defined(MODULE_LMIC)
     /* Enable TCXO */
     gpio_init(RADIO_TCXO_VCC_PIN, GPIO_OUT);
     gpio_set(RADIO_TCXO_VCC_PIN);

@@ -1,0 +1,7 @@
+/**
+ * @defgroup pkg_lmic   LoRaMAC-in-C stack
+ * @ingroup  pkg
+ * @ingroup  net
+ * @brief    Provides support for LoRaWAN using LMIC implementation
+ * @see      https://github.com/matthijskooijman/arduino-lmic
+ */

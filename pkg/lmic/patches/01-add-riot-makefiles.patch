@@ -1,0 +1,29 @@
+From da2cf36c6c22c5f885f68b22eac95a5958f93dba Mon Sep 17 00:00:00 2001
+From: Alexandre Abadie <alexandre.abadie@inria.fr>
+Date: Wed, 20 Sep 2017 17:00:08 +0200
+Subject: [PATCH] adding RIOT compatible makefiles
+
+---
+ Makefile          | 1 +
+ src/lmic/Makefile | 1 +
+ 2 files changed, 2 insertions(+)
+ create mode 100644 Makefile
+ create mode 100644 src/lmic/Makefile
+
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 0000000..48422e9
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1 @@
++include $(RIOTBASE)/Makefile.base
+diff --git a/src/lmic/Makefile b/src/lmic/Makefile
+new file mode 100644
+index 0000000..48422e9
+--- /dev/null
++++ b/src/lmic/Makefile
+@@ -0,0 +1 @@
++include $(RIOTBASE)/Makefile.base
+-- 
+2.11.0
+
