@@ -85,12 +85,20 @@ static int _dev_write(const struct lfs_config *c, lfs_block_t block,
     DEBUG("lfs_write: c=%p, block=%" PRIu32 ", off=%" PRIu32 ", buf=%p, size=%" PRIu32 "\n",
           (void *)c, block, off, buffer, size);
 
-    int ret = mtd_write(mtd, buffer, ((fs->base_addr + block) * c->block_size) + off, size);
-    if (ret >= 0) {
-        return 0;
+    const uint8_t *buf = buffer;
+    uint32_t addr = ((fs->base_addr + block) * c->block_size) + off;
+    for (const uint8_t *part = buf; part < buf + size; part += c->prog_size,
+         addr += c->prog_size) {
+        int ret = mtd_write(mtd, part, addr, c->prog_size);
+        if (ret < 0) {
+            return ret;
+        }
+        else if ((unsigned)ret != c->prog_size) {
+            return -EIO;
+        }
     }
 
-    return ret;
+    return 0;
 }
 
 static int _dev_erase(const struct lfs_config *c, lfs_block_t block)
