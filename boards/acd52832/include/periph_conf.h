@@ -102,9 +102,9 @@ static const spi_conf_t spi_config[] = {
  */
 static const i2c_conf_t i2c_config[] = {
     {
-        .dev     = NRF_TWIM0,
-        .pin_scl = 28,
-        .pin_sda = 29
+        .dev = NRF_TWIM1,
+        .scl = 28,
+        .sda = 29
     }
 };
 
