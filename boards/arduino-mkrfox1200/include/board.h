@@ -30,6 +30,17 @@ extern "C" {
 #endif
 
 /**
+ * @name    The on-board ATA8520E configuration
+ * @{
+ */
+#define ATA8520E_PARAM_SPI         SPI_DEV(1)
+#define ATA8520E_PARAM_CS_PIN      GPIO_PIN(PA, 14)
+#define ATA8520E_PARAM_INT_PIN     GPIO_PIN(PB, 9)
+#define ATA8520E_PARAM_POWER_PIN   GPIO_PIN(PA, 28)
+#define ATA8520E_PARAM_RESET_PIN   GPIO_PIN(PA, 27)
+/** @} */
+
+/**
  * @brief   The on-board LED is connected to pin 6 on this board
  */
 #define ARDUINO_LED         (6U)
