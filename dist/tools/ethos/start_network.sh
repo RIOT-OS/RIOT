@@ -45,7 +45,7 @@ start_uhcpd() {
     exit 1
 }
 
-[ ! -z $4 ] && {
+[ -n "$4" ] && {
     BAUDRATE=$4
 }
 
