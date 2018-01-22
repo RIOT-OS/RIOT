@@ -43,19 +43,57 @@ static inline USART_TypeDef *dev(uart_t uart)
     return uart_config[uart].dev;
 }
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
-{
+int uart_set_baudrate(uart_t uart, uint32_t baudrate) {
     uint16_t mantissa;
     uint8_t fraction;
-    uint32_t clk;
+    uint32_t uart_clk;
 
+    uart_clk = periph_apb_clk(uart_config[uart].bus)/baudrate;
+
+    if (uart_clk < 8) {
+        /* clock is too slow for using UART with specified baudrate */
+        periph_clk_dis(uart_config[uart].bus, uart_config[uart].rcc_mask);
+        return UART_NOBAUD;
+    } else {
+        /* Disable UART. Setting BRR on enabled USART1 sometimes somehow results in Hard Fault */
+        dev(uart)->CR1 &= ~USART_CR1_UE;
+
+        /* choose between 8x and 16x oversampling */
+        /* 16x is preferred, but is not possible on low clock frequency */
+#ifdef USART_CR1_OVER8
+        if (uart_clk < 16) {
+            dev(uart)->CR1 |= USART_CR1_OVER8;
+            mantissa = (uint16_t)(uart_clk / 8);
+            fraction = (uint8_t)(uart_clk - (mantissa * 8));
+            dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x07);
+        } else {
+            dev(uart)->CR1 &= ~USART_CR1_OVER8;
+            mantissa = (uint16_t)(uart_clk / 16);
+            fraction = (uint8_t)(uart_clk - (mantissa * 16));
+            dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x0f);
+        }
+#else
+        mantissa = (uint16_t)(uart_clk / 16);
+        fraction = (uint8_t)(uart_clk - (mantissa * 16));
+        dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x0f);
+#endif
+
+        /* Enable UART */
+        dev(uart)->CR1 |= USART_CR1_UE;
+
+        return UART_OK;
+    }
+}
+
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg) {
     assert(uart < UART_NUMOF);
 
     /* save ISR context */
     isr_ctx[uart].rx_cb = rx_cb;
     isr_ctx[uart].arg   = arg;
 
-    /* configure TX pin */
+    /* configure RX and TX pin */
+    gpio_init(uart_config[uart].rx_pin, GPIO_IN);
     gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     /* set TX pin high to avoid garbage during further initialization */
     gpio_set(uart_config[uart].tx_pin);
@@ -93,18 +131,15 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->CR3 = 0;
 
     /* calculate and apply baudrate */
-    clk = periph_apb_clk(uart_config[uart].bus) / baudrate;
-    mantissa = (uint16_t)(clk / 16);
-    fraction = (uint8_t)(clk - (mantissa * 16));
-    dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x0f);
+    if (uart_set_baudrate(uart, baudrate) != UART_OK) {
+        return UART_NOBAUD;
+    }
 
+    dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE);
     /* enable RX interrupt if applicable */
     if (rx_cb) {
         NVIC_EnableIRQ(uart_config[uart].irqn);
-        dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE | RXENABLE);
-    }
-    else {
-        dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE);
+        dev(uart)->CR1 |= RXENABLE;
     }
 
 #ifdef MODULE_STM32_PERIPH_UART_HW_FC
