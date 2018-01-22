@@ -92,6 +92,8 @@ ifneq (,$(filter enc28j60,$(USEMODULE)))
 endif
 
 ifneq (,$(filter encx24j600,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += xtimer
 endif
