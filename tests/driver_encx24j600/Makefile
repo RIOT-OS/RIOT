@@ -1,7 +1,5 @@
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED = periph_spi periph_gpio
-
 BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h \
                              nucleo-l053 nucleo32-f031 nucleo32-f042 \
                              nucleo32-l031 stm32f0discovery telosb \
