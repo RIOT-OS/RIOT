@@ -24,11 +24,13 @@
  */
 
 #include "cpu.h" // For numbers of ports
+#include "stmclk.h"
 #include "periph/pm.h"
-
 #include "periph/spi.h"
 #include "periph_conf.h"
 #include "periph/init.h"
+#include "periph/uart.h"
+
 #ifdef MODULE_XTIMER
 #include "xtimer.h"
 #endif
@@ -40,16 +42,13 @@
  * @name Available power modes
  */
 enum pm_mode {
+    PM_UNKNOWN = -1,    /**< status unknown/unavailable */
     PM_OFF,            /**< MCU is off */
     PM_POWERDOWN,      /**< MCU is powered down */
     PM_SLEEP,          /**< MCU in sleep mode */
     PM_IDLE,           /**< MCU is idle */
     PM_ON,             /**< MCU is active */
-    PM_UNKNOWN = -1    /**< status unknown/unavailable */
 };
-
-// make clk_init available, could be added to cpu.h as an alternative
-extern void clk_init(void);
 
 #ifndef PM_STOP_CONFIG
 /**
@@ -61,14 +60,16 @@ extern void clk_init(void);
 #endif
 
 /* Variables definitions to LPM */
+static uint32_t pm_gpio_moder[8];
+static uint32_t pm_gpio_pupdr[8];
+static uint16_t pm_gpio_otyper[8];
+static uint16_t pm_gpio_odr[8];
+static uint8_t  pm_usart[UART_NUMOF];
 static uint32_t ahb_gpio_clocks;
 static uint32_t tmpreg;
-static uint32_t pm_gpio_moder[CPU_NUMBER_OF_PORTS];
-static uint32_t pm_gpio_pupdr[CPU_NUMBER_OF_PORTS];
-static uint16_t pm_gpio_otyper[CPU_NUMBER_OF_PORTS];
-static uint16_t pm_gpio_odr[CPU_NUMBER_OF_PORTS];
-static uint16_t pm_portmask_system[CPU_NUMBER_OF_PORTS] = { 0 };
-static uint16_t pm_portmask_user[CPU_NUMBER_OF_PORTS] = { 0 };
+
+static uint16_t pm_portmask_system[8] = { 0 };
+static uint16_t pm_portmask_user[8] = { 0 };
 
 static inline GPIO_TypeDef *_port(gpio_t pin)
 {
@@ -112,22 +113,21 @@ static void pin_set(gpio_t pin, uint8_t value) {
         port->ODR &= ~(1 << pin_num);
     }
 
-    // pm_portmask_system[((uint32_t)&port>> 10) & 0x0f] |= 1 << pin;
     pm_portmask_system[_port_num(pin)] |= 1 << pin_num;
 }
 
 /* Do not change GPIO state in sleep mode */
 void pm_arch_add_gpio_exclusion(gpio_t gpio) {
-    uint8_t port = ((uint32_t)gpio >> 10) & 0x0f;
-    uint8_t pin = ((uint32_t)gpio & 0x0f);
+    uint8_t port = _port_num(gpio);
+    uint8_t pin = _pin_num(gpio);
 
     pm_portmask_user[port] |= (uint16_t)(1<<pin);
 }
 
 /* Change GPIO state to AIN in sleep mode */
 void pm_arch_del_gpio_exclusion(gpio_t gpio) {
-    uint8_t port = ((uint32_t)gpio >> 10) & 0x0f;
-    uint8_t pin = ((uint32_t)gpio & 0x0f);
+    uint8_t port = _port_num(gpio);
+    uint8_t pin = _pin_num(gpio);
 
     pm_portmask_user[port] &= ~(uint16_t)(1<<pin);
 }
@@ -148,6 +148,19 @@ void pm_before_i_go_to_sleep(void){
         pm_gpio_otyper[i] = (uint16_t)(port->OTYPER & 0xFFFF);
         pm_gpio_odr[i] = (uint16_t)(port->ODR & 0xFFFF);
     }
+
+    /* Disable all USART interfaces in use */
+        /* without it, RX will receive some garbage when MODER is changed */
+
+        for (i = 0; i < UART_NUMOF; i++) {
+            if (uart_config[i].dev->CR1 & USART_CR1_UE) {
+                uart_config[i].dev->CR1 &= ~USART_CR1_UE;
+                pin_set(uart_config[i].tx_pin, 1);
+                pm_usart[i] = 1;
+            } else {
+                pm_usart[i] = 0;
+            }
+        }
 
     /* specifically set GPIOs used for external SPI devices */
     /* NSS = 1, MOSI = 0, SCK = 0, MISO doesn't matter */
@@ -236,19 +249,19 @@ static void pm_select_run_mode(uint8_t pm_mode) {
     switch(pm_mode) {
     case PM_ON:
         DEBUG("Switching to PM_ON");
-        clk_init();
-    break;
+        stmclk_init_sysclk();
+        break;
     case PM_IDLE:
         DEBUG("Switching to PM_IDLE");
         /* 115200 bps stdio UART with default 16x oversamplig needs 2 MHz or 4 MHz MSI clock */
         /* at 1 MHz, it will be switched to 8x oversampling with 3.55 % baudrate error */
         /* if you need stdio UART at lower frequencies, change its settings to lower baudrate */
-        // switch_to_msi(RCC_ICSCR_MSIRANGE_5, RCC_CFGR_HPRE_DIV1);
-    break;
+        stmclk_switch_msi(RCC_ICSCR_MSIRANGE_5, RCC_CFGR_HPRE_DIV1);
+        break;
     default:
         DEBUG("Switching to PM_IDLE");
-        clk_init();
-    break;
+        stmclk_init_sysclk();
+        break;
     }
 
 #ifdef MODULE_XTIMER
@@ -256,6 +269,9 @@ static void pm_select_run_mode(uint8_t pm_mode) {
     /* NB: default XTIMER_HZ clock is 1 MHz, so CPU clock must be at least 1 MHz for xtimer to work properly */
     xtimer_init();
 #endif
+
+    // /* Recalculate stdio UART baudrate */
+    // uart_set_baudrate(UART_STDIO_DEV, UART_STDIO_BAUDRATE);
 }
 
 void pm_set(unsigned mode)
@@ -333,7 +349,7 @@ void pm_set(unsigned mode)
             pm_before_i_go_to_sleep();
 
             /* Switch to 65kHz clock */
-            // switch_to_msi(RCC_ICSCR_MSIRANGE_0, RCC_CFGR_HPRE_DIV1);
+            stmclk_switch_msi(RCC_ICSCR_MSIRANGE_0, RCC_CFGR_HPRE_DIV1);
 
             /* Request Wait For Interrupt */
             __DSB();

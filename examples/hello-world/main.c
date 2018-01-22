@@ -41,7 +41,7 @@ int main(void)
 
     gpio_init_int(WAKE_PIN, GPIO_IN, GPIO_FALLING, (gpio_cb_t)wake_cb, NULL);
 
-    pm_set(0);
+    pm_set(1);
 
     while(1){
 

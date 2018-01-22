@@ -49,6 +49,13 @@ void stmclk_init_sysclk(void);
 void stmclk_enable_hsi(void);
 
 /**
+ * @brief       Switch to multispeed internal clock (MSI)
+ * @param[in]   msi_range MSI frequency range
+ * @param[in]   ahb_divider AHB bus divider
+ */
+void stmclk_switch_msi(uint32_t msi_range, uint32_t ahb_divider);
+
+/**
  * @brief   Disable the internal high speed clock (HSI)
  *
  * @note    The HSI is only disabled, if it is at that point not used to drive
