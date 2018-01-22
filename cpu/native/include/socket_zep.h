@@ -20,7 +20,6 @@
 #ifndef SOCKET_ZEP_H
 #define SOCKET_ZEP_H
 
-#include <netdb.h>
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
 #include "net/zep.h"
