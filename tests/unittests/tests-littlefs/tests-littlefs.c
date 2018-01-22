@@ -31,16 +31,16 @@
 #else
 /* Test mock object implementing a simple RAM-based mtd */
 #ifndef SECTOR_COUNT
-#define SECTOR_COUNT 16
+#define SECTOR_COUNT    16
 #endif
-#ifndef PAGE_PER_SECTOR
-#define PAGE_PER_SECTOR 4
+#ifndef SECTOR_SIZE
+#define SECTOR_SIZE     128
 #endif
 #ifndef PAGE_SIZE
-#define PAGE_SIZE 64
+#define PAGE_SIZE       64
 #endif
 
-static uint8_t dummy_memory[PAGE_PER_SECTOR * PAGE_SIZE * SECTOR_COUNT];
+static uint8_t dummy_memory[SECTOR_SIZE * SECTOR_COUNT];
 
 static int _init(mtd_dev_t *dev)
 {
@@ -68,10 +68,13 @@ static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size
     if (addr + size > sizeof(dummy_memory)) {
         return -EOVERFLOW;
     }
-    if (size > PAGE_SIZE) {
+    if (((addr % PAGE_SIZE) + size) > PAGE_SIZE) {
         return -EOVERFLOW;
     }
-    memcpy(dummy_memory + addr, buff, size);
+    const uint8_t *p = buff;
+    for (size_t i = 0; i < size; i++) {
+        dummy_memory[addr + i] &= p[i];
+    }
 
     return size;
 }
@@ -80,10 +83,10 @@ static int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 {
     (void)dev;
 
-    if (size % (PAGE_PER_SECTOR * PAGE_SIZE) != 0) {
+    if (size % SECTOR_SIZE != 0) {
         return -EOVERFLOW;
     }
-    if (addr % (PAGE_PER_SECTOR * PAGE_SIZE) != 0) {
+    if (addr % SECTOR_SIZE != 0) {
         return -EOVERFLOW;
     }
     if (addr + size > sizeof(dummy_memory)) {
@@ -112,7 +115,8 @@ static const mtd_desc_t driver = {
 static mtd_dev_t dev = {
     .driver = &driver,
     .sector_count = SECTOR_COUNT,
-    .pages_per_sector = PAGE_PER_SECTOR,
+    .sector_size  = SECTOR_SIZE,
+    .min_erase_size = SECTOR_SIZE,
     .page_size = PAGE_SIZE,
 };
 
@@ -147,7 +151,7 @@ static void tests_littlefs_format(void)
 {
     int res;
     vfs_umount(&_test_littlefs_mount);
-    res = mtd_erase(_dev, 0, _dev->page_size * _dev->pages_per_sector * _dev->sector_count);
+    res = mtd_erase(_dev, 0, _dev->sector_size * _dev->sector_count);
     TEST_ASSERT_EQUAL_INT(0, res);
 
     res = vfs_mount(&_test_littlefs_mount);
@@ -381,10 +385,9 @@ static void tests_littlefs_statvfs(void)
 
     int res = vfs_statvfs("/test-littlefs/", &stat1);
     TEST_ASSERT_EQUAL_INT(0, res);
-    TEST_ASSERT_EQUAL_INT(_dev->page_size * _dev->pages_per_sector, stat1.f_bsize);
-    TEST_ASSERT_EQUAL_INT(_dev->page_size * _dev->pages_per_sector, stat1.f_frsize);
-    TEST_ASSERT((_dev->pages_per_sector * _dev->page_size * _dev->sector_count) >=
-                          stat1.f_blocks);
+    TEST_ASSERT_EQUAL_INT(_dev->min_erase_size, stat1.f_bsize);
+    TEST_ASSERT_EQUAL_INT(_dev->min_erase_size, stat1.f_frsize);
+    TEST_ASSERT((_dev->sector_size * _dev->sector_count) >= stat1.f_blocks);
 
     int fd = vfs_open("/test-littlefs/test.txt", O_CREAT | O_RDWR, 0);
     TEST_ASSERT(fd >= 0);
@@ -398,8 +401,8 @@ static void tests_littlefs_statvfs(void)
     res = vfs_statvfs("/test-littlefs/", &stat2);
     TEST_ASSERT_EQUAL_INT(0, res);
 
-    TEST_ASSERT_EQUAL_INT(_dev->page_size * _dev->pages_per_sector, stat2.f_bsize);
-    TEST_ASSERT_EQUAL_INT(_dev->page_size * _dev->pages_per_sector, stat2.f_frsize);
+    TEST_ASSERT_EQUAL_INT(_dev->min_erase_size, stat2.f_bsize);
+    TEST_ASSERT_EQUAL_INT(_dev->min_erase_size, stat2.f_frsize);
     TEST_ASSERT(stat1.f_bfree > stat2.f_bfree);
     TEST_ASSERT(stat1.f_bavail > stat2.f_bavail);
 }
@@ -409,7 +412,6 @@ Test *tests_littlefs_tests(void)
 #ifndef MTD_0
     memset(dummy_memory, 0xff, sizeof(dummy_memory));
 #endif
-
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(tests_littlefs_format),
         new_TestFixture(tests_littlefs_mount_umount),

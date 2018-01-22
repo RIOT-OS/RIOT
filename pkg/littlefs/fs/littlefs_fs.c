@@ -135,10 +135,11 @@ static int prepare(littlefs_desc_t *fs)
     memset(&fs->fs, 0, sizeof(fs->fs));
 
     if (!fs->config.block_count) {
-        fs->config.block_count = fs->dev->sector_count - fs->base_addr;
+        fs->config.block_count = ((fs->dev->sector_count * fs->dev->sector_size) /
+                                  fs->dev->min_erase_size) - fs->base_addr;
     }
     if (!fs->config.block_size) {
-        fs->config.block_size = fs->dev->page_size * fs->dev->pages_per_sector;
+        fs->config.block_size = fs->dev->min_erase_size;
     }
     if (!fs->config.prog_size) {
         fs->config.prog_size = fs->dev->page_size;
