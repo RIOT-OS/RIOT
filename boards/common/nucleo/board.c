@@ -11,7 +11,7 @@
  */
 
 /**
- * @ingroup     boards_nucleo
+ * @ingroup     boards_common_nucleo
  * @{
  *
  * @file
