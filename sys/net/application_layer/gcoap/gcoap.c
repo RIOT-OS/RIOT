@@ -41,7 +41,7 @@ static ssize_t _finish_pdu(coap_pkt_t *pdu, uint8_t *buf, size_t len);
 static void _expire_request(gcoap_request_memo_t *memo);
 static bool _endpoints_equal(const sock_udp_ep_t *ep1, const sock_udp_ep_t *ep2);
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
-                           const sock_udp_ep_t *remote);
+                           const sock_udp_ep_t *remote, int match_type);
 static void _find_resource(coap_pkt_t *pdu, coap_resource_t **resource_ptr,
                                             gcoap_listener_t **listener_ptr);
 static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote);
@@ -217,7 +217,7 @@ static void _listen(sock_udp_t *sock)
     case COAP_CLASS_SUCCESS:
     case COAP_CLASS_CLIENT_FAILURE:
     case COAP_CLASS_SERVER_FAILURE:
-        _find_req_memo(&memo, &pdu, &remote);
+        _find_req_memo(&memo, &pdu, &remote, GCOAP_FIND_REQ_TOKEN);
         if (memo) {
             switch (coap_get_type(&pdu)) {
             case COAP_TYPE_NON:
@@ -413,14 +413,16 @@ static ssize_t _finish_pdu(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 
 /*
  * Finds the memo for an outstanding request within the _coap_state.open_reqs
- * array. Matches on remote endpoint and token.
+ * array. Matches on token or message ID based on match_type parameter, plus
+ * remote endpoint.
  *
  * memo_ptr[out] -- Registered request memo, or NULL if not found
  * src_pdu[in] -- PDU for token to match
  * remote[in] -- Remote endpoint to match
+ * match_type[in] -- GCOAP_FIND_REQ_TOKEN or GCOAP_FIND_REQ_MSGID
  */
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
-                           const sock_udp_ep_t *remote)
+                           const sock_udp_ep_t *remote, int match_type)
 {
     *memo_ptr = NULL;
     /* no need to initialize struct; we only care about buffer contents below */
@@ -440,9 +442,18 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
             memo_pdu->hdr = (coap_hdr_t *) memo->msg.data.pdu_buf;
         }
 
-        if (coap_get_token_len(memo_pdu) == cmplen) {
-            memo_pdu->token = &memo_pdu->hdr->data[0];
-            if ((memcmp(src_pdu->token, memo_pdu->token, cmplen) == 0)
+        if (match_type == GCOAP_FIND_REQ_TOKEN) {
+            if (coap_get_token_len(memo_pdu) == cmplen) {
+                memo_pdu->token = &memo_pdu->hdr->data[0];
+                if ((memcmp(src_pdu->token, memo_pdu->token, cmplen) == 0)
+                        && _endpoints_equal(&memo->remote_ep, remote)) {
+                    *memo_ptr = memo;
+                    break;
+                }
+            }
+        }
+        else if (match_type == GCOAP_FIND_REQ_MSGID) {
+            if ((src_pdu->hdr->id == memo_pdu->hdr->id)
                     && _endpoints_equal(&memo->remote_ep, remote)) {
                 *memo_ptr = memo;
                 break;

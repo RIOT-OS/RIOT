@@ -340,6 +340,14 @@ extern "C" {
 #define GCOAP_MSG_TYPE_INTR     (0x1502)
 
 /**
+ * @name    Options for _find_req_memo() -- search on token or message ID
+ * @{
+ */
+#define GCOAP_FIND_REQ_TOKEN    (1)
+#define GCOAP_FIND_REQ_MSGID    (2)
+/** @} */
+
+/**
  * @brief   Maximum number of Observe clients; use 2 if not defined
  */
 #ifndef GCOAP_OBS_CLIENTS_MAX
