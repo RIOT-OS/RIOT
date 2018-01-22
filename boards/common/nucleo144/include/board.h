@@ -54,6 +54,9 @@ extern "C" {
 #define LED2_ON             (GPIOB->BSRR = LED2_MASK)
 #define LED2_OFF            (GPIOB->BSRR = (LED2_MASK << 16))
 #define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
+
+/* the Nucleo144 boards always use LED0, as there is no dual use of its pin */
+#define AUTO_INIT_LED0
 /** @} */
 
 /**
