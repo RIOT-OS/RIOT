@@ -17,7 +17,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              wsn430-v1_4 yunjia-nrf51822 z1
 
 # The following boards do not have an available UART
-BOARD_BLACKLIST += mips-malta pic32-wifire pic32-clicker ruuvitag
+BOARD_BLACKLIST += mips-malta pic32-wifire pic32-clicker ruuvitag thingy52
 
 # use ethos (ethernet over serial) for network communication and stdio over
 # UART, but not on native, as native has a tap interface towards the host.

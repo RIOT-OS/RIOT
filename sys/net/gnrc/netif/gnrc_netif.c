@@ -879,7 +879,7 @@ static unsigned _match(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
               ipv6_addr_to_str(addr_str, &netif->ipv6.addrs[*idx],
                                sizeof(addr_str)),
               netif->pid);
-        DEBUG("%s by %" PRIu8 " bits (used as source address = %s)\n",
+        DEBUG("%s by %u bits (used as source address = %s)\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               best_match,
               (filter != NULL) ? "true" : "false");

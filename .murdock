@@ -65,6 +65,11 @@ get_compile_jobs() {
         | xargs '-d\n' -n 1 echo $0 compile
 }
 
+print_worker() {
+    [ -n "$DWQ_WORKER" ] && \
+        echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
+}
+
 # compile one app for one board. delete intermediates.
 compile() {
     local appdir=$1
@@ -79,8 +84,7 @@ compile() {
     # Pre-build cleanup
     rm -rf ${BINDIR}
 
-    [ -n "$DWQ_WORKER" ] && \
-        echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
+    print_worker
 
     # sanity checks
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board)"
@@ -113,6 +117,8 @@ compile() {
 static_tests() {
     local repo=${CI_BASE_REPO:-https://github.com/RIOT-OS/RIOT}
     local branch=${CI_BASE_BRANCH:-master}
+
+    print_worker
 
     OUT="$(git remote add upstream $repo 2>&1 && git fetch upstream ${branch}:${branch} 2>&1)"
     RES=$?
