@@ -26,8 +26,6 @@
 extern "C" {
 #endif
 
-#define SPI_0_ISON()		(RCC->APB2ENR & RCC_APB2ENR_SPI1EN)
-
 /**
  * @name Clock system configuration
  * @{
