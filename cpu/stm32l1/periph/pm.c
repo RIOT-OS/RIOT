@@ -30,6 +30,7 @@
 #include "periph_conf.h"
 #include "periph/init.h"
 #include "periph/uart.h"
+#include "uart_stdio.h"
 
 #ifdef MODULE_XTIMER
 #include "xtimer.h"
@@ -150,17 +151,17 @@ void pm_before_i_go_to_sleep(void){
     }
 
     /* Disable all USART interfaces in use */
-        /* without it, RX will receive some garbage when MODER is changed */
+    /* without it, RX will receive some garbage when MODER is changed */
 
-        for (i = 0; i < UART_NUMOF; i++) {
-            if (uart_config[i].dev->CR1 & USART_CR1_UE) {
-                uart_config[i].dev->CR1 &= ~USART_CR1_UE;
-                pin_set(uart_config[i].tx_pin, 1);
-                pm_usart[i] = 1;
-            } else {
-                pm_usart[i] = 0;
-            }
+    for (i = 0; i < UART_NUMOF; i++) {
+        if (uart_config[i].dev->CR1 & USART_CR1_UE) {
+            uart_config[i].dev->CR1 &= ~USART_CR1_UE;
+            pin_set(uart_config[i].tx_pin, 1);
+            pm_usart[i] = 1;
+        } else {
+            pm_usart[i] = 0;
         }
+    }
 
     /* specifically set GPIOs used for external SPI devices */
     /* NSS = 1, MOSI = 0, SCK = 0, MISO doesn't matter */
@@ -271,7 +272,7 @@ static void pm_select_run_mode(uint8_t pm_mode) {
 #endif
 
     // /* Recalculate stdio UART baudrate */
-    // uart_set_baudrate(UART_STDIO_DEV, UART_STDIO_BAUDRATE);
+    uart_set_baudrate(UART_STDIO_DEV, UART_STDIO_BAUDRATE);
 }
 
 void pm_set(unsigned mode)

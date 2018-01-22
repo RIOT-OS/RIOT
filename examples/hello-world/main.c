@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  *
@@ -20,17 +21,6 @@
  */
 
 #include <stdio.h>
-#include "periph/pm.h"
-#include "periph/gpio.h"
-
-#define WAKE_PIN                  GPIO_PIN(PORT_C, 13)
-extern void pm_set(unsigned mode);
-/* First callback, set_ups another isr */
-void wake_cb(void)
-{
-    puts("Wakeup");
-}
-
 
 int main(void)
 {
@@ -38,14 +28,6 @@ int main(void)
 
     printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
     printf("This board features a(n) %s MCU.\n", RIOT_MCU);
-
-    gpio_init_int(WAKE_PIN, GPIO_IN, GPIO_FALLING, (gpio_cb_t)wake_cb, NULL);
-
-    pm_set(1);
-
-    while(1){
-
-    }
 
     return 0;
 }
