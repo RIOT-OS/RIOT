@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_soft_spi
+ * @ingroup     drivers_soft_spi
  * @{
  *
  * @file

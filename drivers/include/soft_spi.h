@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_soft_spi Soft SPI
+ * @defgroup    drivers_soft_spi Soft SPI
  * @ingroup     drivers
  * @brief       Software implemented Serial Peripheral Interface bus
  * This module provides a software implemented Serial Peripheral Interface bus.
