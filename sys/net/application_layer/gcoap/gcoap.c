@@ -46,7 +46,7 @@ static void _find_resource(coap_pkt_t *pdu, coap_resource_t **resource_ptr,
                                             gcoap_listener_t **listener_ptr);
 static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote);
 static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
-                                                       coap_pkt_t *pdu);
+                          uint8_t *token, int token_len);
 static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
                                    const coap_resource_t *resource);
 
@@ -276,7 +276,8 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     }
 
     if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
-        int empty_slot = _find_obs_memo(&memo, remote, pdu);
+        int empty_slot = _find_obs_memo(&memo, remote, pdu->token,
+                                        coap_get_token_len(pdu));
         /* record observe memo */
         if (memo == NULL) {
             if (empty_slot >= 0 && resource_memo == NULL) {
@@ -314,13 +315,13 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         }
 
     } else if (coap_get_observe(pdu) == COAP_OBS_DEREGISTER) {
-        _find_obs_memo(&memo, remote, pdu);
+        _find_obs_memo(&memo, remote, pdu->token, coap_get_token_len(pdu));
         /* clear memo, and clear observer if no other memos */
         if (memo != NULL) {
             DEBUG("gcoap: Deregistering observer for: %s\n", memo->resource->path);
             memo->observer = NULL;
             memo           = NULL;
-            _find_obs_memo(&memo, remote, NULL);
+            _find_obs_memo(&memo, remote, NULL, -1);
             if (memo == NULL) {
                 _find_observer(&observer, remote);
                 if (observer != NULL) {
@@ -617,16 +618,18 @@ static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote)
  *
  * memo[out] -- Registered observe memo, or NULL if not found
  * remote[in] -- Endpoint for address to match
- * pdu[in] -- PDU for token to match, or NULL to match only on remote address
+ * token[in] -- Token to match; NULL if zero-length
+ * token_len[in] -- Length of token, or -1 to match only on remote address
  *
  * return Index of empty slot, suitable for registering new memo; or -1 if no
  *        empty slots. Undefined if memo found.
  */
 static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
-                                                       coap_pkt_t *pdu)
+                          uint8_t *token, int token_len)
 {
     int empty_slot = -1;
     *memo          = NULL;
+    assert(token_len >= -1);
 
     sock_udp_ep_t *remote_observer = NULL;
     _find_observer(&remote_observer, remote);
@@ -638,16 +641,14 @@ static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
         }
 
         if (_coap_state.observe_memos[i].observer == remote_observer) {
-            if (pdu == NULL) {
+            if (token_len == -1) {
                 *memo = &_coap_state.observe_memos[i];
                 break;
             }
 
-            if (_coap_state.observe_memos[i].token_len == coap_get_token_len(pdu)) {
-                unsigned cmplen = _coap_state.observe_memos[i].token_len;
-                if (cmplen &&
-                        memcmp(&_coap_state.observe_memos[i].token[0], &pdu->token[0],
-                                                                       cmplen) == 0) {
+            if ((int)_coap_state.observe_memos[i].token_len == token_len) {
+                if (memcmp(&_coap_state.observe_memos[i].token[0], token,
+                           token_len) == 0) {
                     *memo = &_coap_state.observe_memos[i];
                     break;
                 }
