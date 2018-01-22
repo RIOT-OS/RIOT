@@ -43,12 +43,9 @@
  * @name Available power modes
  */
 enum pm_mode {
-    PM_UNKNOWN = -1,    /**< status unknown/unavailable */
-    PM_OFF,            /**< MCU is off */
+    PM_OFF = 0,            /**< MCU is off */
     PM_POWERDOWN,      /**< MCU is powered down */
     PM_SLEEP,          /**< MCU in sleep mode */
-    PM_IDLE,           /**< MCU is idle */
-    PM_ON,             /**< MCU is active */
 };
 
 #ifndef PM_STOP_CONFIG
@@ -246,24 +243,9 @@ static void pm_when_i_wake_up (void) {
 }
 
 /* Select CPU clocking between default (PM_ON) and medium-speed (PM_IDLE) */
-static void pm_select_run_mode(uint8_t pm_mode) {
-    switch(pm_mode) {
-    case PM_ON:
-        DEBUG("Switching to PM_ON");
-        stmclk_init_sysclk();
-        break;
-    case PM_IDLE:
-        DEBUG("Switching to PM_IDLE");
-        /* 115200 bps stdio UART with default 16x oversamplig needs 2 MHz or 4 MHz MSI clock */
-        /* at 1 MHz, it will be switched to 8x oversampling with 3.55 % baudrate error */
-        /* if you need stdio UART at lower frequencies, change its settings to lower baudrate */
-        stmclk_switch_msi(RCC_ICSCR_MSIRANGE_5, RCC_CFGR_HPRE_DIV1);
-        break;
-    default:
-        DEBUG("Switching to PM_IDLE");
-        stmclk_init_sysclk();
-        break;
-    }
+static void pm_run_mode(void) {
+    DEBUG("Switching to PM_ON");
+    stmclk_init_sysclk();
 
 #ifdef MODULE_XTIMER
     /* Recalculate xtimer frequency */
@@ -329,7 +311,7 @@ void pm_set(unsigned mode)
             SCB->SCR &= (uint32_t) ~((uint32_t)SCB_SCR_SLEEPDEEP);
 
             /* Restore clocks and PLL */
-            pm_select_run_mode(PM_ON);
+            pm_run_mode();
 
             pm_when_i_wake_up();
 
@@ -357,28 +339,12 @@ void pm_set(unsigned mode)
             __WFI();
 
             /* Switch back to default speed */
-			pm_select_run_mode(PM_ON);
+			pm_run_mode();
 
             pm_when_i_wake_up();
 
             irq_restore(state);
             break;
-        case PM_IDLE:
-            DEBUG("Switching to PM_IDLE");
-            state = irq_disable();
-            pm_select_run_mode(PM_IDLE);
-            irq_restore(state);
-        break;
-
-        case PM_ON:
-             DEBUG("Switching to PM_ON");
-             state = irq_disable();
-             pm_select_run_mode(PM_ON);
-             irq_restore(state);
-             break;
-
-        case PM_UNKNOWN:
-             break;
 
         default:
             break;
