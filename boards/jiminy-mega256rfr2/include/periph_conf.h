@@ -146,6 +146,13 @@ static const ac_conf_t ac_config[] = {
 #define RTC_NUMOF   (1U)
 /** @} */
 
+/**
+ * @name    I2C configuration
+ * @{
+ */
+#define I2C_NUMOF           1
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
