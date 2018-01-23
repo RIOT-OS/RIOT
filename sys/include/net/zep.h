@@ -7,12 +7,14 @@
  */
 
 /**
- * @defgroup    net_zep  ZEP header definitions
+ * @defgroup    net_zep  ZigBee Encapsulation Protocol
  * @ingroup     net
+ * @brief       Provides definitions for the ZigBee Encapsulation Protocol (ZEP)
+ *
  * @{
  *
  * @file
- * @brief
+ * @brief       Definitions for the ZigBee Encapsulation Protocol
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
