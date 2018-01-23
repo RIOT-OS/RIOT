@@ -23,7 +23,7 @@
  * @}
  */
 
-#include "cpu.h" // For numbers of ports
+#include "cpu.h"
 #include "stmclk.h"
 #include "periph/pm.h"
 #include "periph/spi.h"
@@ -43,7 +43,7 @@
  * @name Available power modes
  */
 enum pm_mode {
-    PM_OFF = 0,            /**< MCU is off */
+    PM_OFF = 0,        /**< MCU is off */
     PM_POWERDOWN,      /**< MCU is powered down */
     PM_SLEEP,          /**< MCU in sleep mode */
 };
@@ -107,7 +107,8 @@ static void pin_set(gpio_t pin, uint8_t value) {
     port->OTYPER &= ~(1 << pin_num);
     if (value) {
         port->ODR |= (1 << pin_num);
-    } else {
+    }
+    else {
         port->ODR &= ~(1 << pin_num);
     }
 
@@ -253,7 +254,7 @@ static void pm_run_mode(void) {
     xtimer_init();
 #endif
 
-    // /* Recalculate stdio UART baudrate */
+    /* Recalculate stdio UART baudrate */
     uart_set_baudrate(UART_STDIO_DEV, UART_STDIO_BAUDRATE);
 }
 

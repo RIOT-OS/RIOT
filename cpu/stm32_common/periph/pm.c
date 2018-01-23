@@ -29,8 +29,6 @@
 #include "stmclk.h"
 #endif
 
-extern void clk_init(void);
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 

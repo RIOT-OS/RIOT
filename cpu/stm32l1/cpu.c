@@ -20,9 +20,7 @@
  */
 
 #include "cpu.h"
-#include "board.h"
 #include "stmclk.h"
-#include "periph_conf.h"
 #include "periph/init.h"
 
 void cpu_init(void)
