@@ -25,21 +25,29 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
+/* the following block contains the SPI mode specific adaption */
+#ifdef MODULE_LIS2DH12_SPI
+
 /* SPI bus speed and mode */
 #define BUS_CLK             SPI_CLK_5MHZ
 #define MODE                SPI_MODE_0
-
 #define BUS_OK              SPI_OK
-
 /* shortcuts for SPI bus parameters */
 #define BUS                 (dev->p->spi)
 #define CS                  (dev->p->cs)
-
 /* flag to set when reading from the device */
 #define FLAG_READ           (0x80)
-
 /* flag to enable address auto incrementation on read or write */
 #define FLAG_AINC           (0x40)
+
+static int _init_bus(const lis2dh12_t *dev)
+{
+    /* for SPI, we only need to initialize the chip select pin */
+    if (spi_init_cs(BUS, CS) != SPI_OK) {
+        return LIS2DH12_NOBUS;
+    }
+    return LIS2DH12_OK;
+}
 
 static int _acquire(const lis2dh12_t *dev)
 {
@@ -68,6 +76,59 @@ static void _write(const lis2dh12_t *dev, uint8_t reg, uint8_t data)
     spi_transfer_reg(BUS, CS, reg, data);
 }
 
+/* and now the I2C specific part of the driver */
+#else
+
+/* I2C config */
+#define BUS_CLK             I2C_SPEED_FAST
+#define BUS_OK              (0)
+/* I2C shortcuts */
+#define BUS                 (dev->p->i2c)
+#define ADDR                (dev->p->addr)
+/* flag for enabling address auto-incrementation */
+#define FLAG_AINC           (0x80)
+
+static int _init_bus(const lis2dh12_t *dev)
+{
+    /* for I2C, we initialize the bus in master mode */
+    if (i2c_init_master(BUS, BUS_CLK) != BUS_OK) {
+        return LIS2DH12_NOBUS;
+    }
+    return LIS2DH12_OK;
+}
+
+static int _acquire(const lis2dh12_t *dev)
+{
+    return i2c_acquire(BUS);
+}
+
+static void _release(const lis2dh12_t *dev)
+{
+    i2c_release(BUS);
+}
+
+static uint8_t _read(const lis2dh12_t *dev, uint8_t reg)
+{
+    uint8_t tmp;
+    i2c_read_reg(BUS, ADDR, reg, &tmp);
+    return tmp;
+}
+
+static void _read_burst(const lis2dh12_t *dev, uint8_t reg,
+                              void *data, size_t len)
+{
+    i2c_read_regs(BUS, ADDR, (FLAG_AINC | reg), data, (int)len);
+}
+
+static void _write(const lis2dh12_t *dev, uint8_t reg, uint8_t data)
+{
+    DEBUG("[lis2dh12] write: reg 0x%02x, val 0x%02x\n", (int)reg, (int)data);
+    i2c_write_reg(BUS, ADDR, reg, data);
+}
+
+#endif  /* MODULE_LIS2DH12_SPI */
+
+
 int lis2dh12_init(lis2dh12_t *dev, const lis2dh12_params_t *params)
 {
     assert(dev && params);
@@ -75,13 +136,13 @@ int lis2dh12_init(lis2dh12_t *dev, const lis2dh12_params_t *params)
     dev->p = params;
     dev->comp = (1000UL * (0x02 << (dev->p->scale >> 4)));
 
-    /* start by setting up the chip select pin */
-    if (spi_init_cs(BUS, CS) != SPI_OK) {
-        DEBUG("[lis2dh12] error: unable to initialize CS pin\n");
+    /* initialize the bus */
+    if (_init_bus(dev) != LIS2DH12_OK) {
+        DEBUG("[lis2dh12] error: unable to initialize bus\n");
         return LIS2DH12_NOBUS;
     }
 
-    /* acquire the SPI bus and verify that our parameters are valid */
+    /* acquire the bus and verify that our parameters are valid */
     if (_acquire(dev) != BUS_OK) {
         DEBUG("[lis2dh12] error: unable to acquire SPI bus\n");
         return LIS2DH12_NOBUS;
@@ -100,6 +161,7 @@ int lis2dh12_init(lis2dh12_t *dev, const lis2dh12_params_t *params)
     _write(dev, REG_CTRL_REG1, dev->p->rate);
 
     _release(dev);
+    DEBUG("[lis2dh12] initialization successful\n");
     return LIS2DH12_OK;
 }
 
