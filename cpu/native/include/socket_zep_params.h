@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup netdev_socket_zep
+ * @ingroup drivers_socket_zep
  * @{
  *
  * @file
- * @brief   Configuration parameters for the @ref netdev_socket_zep driver
+ * @brief   Configuration parameters for the @ref drivers_socket_zep driver
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
