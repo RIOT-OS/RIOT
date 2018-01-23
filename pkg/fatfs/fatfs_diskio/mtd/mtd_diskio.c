@@ -179,7 +179,7 @@ DRESULT disk_ioctl(BYTE pdrv, BYTE cmd, void *buff)
         /*Erase block size in number of sectors (1 to 32768 in power of 2).
           Return 1 if the erase block size is unknown. */
         case GET_BLOCK_SIZE:
-            *(DWORD *)buff = fatfs_mtd_devs[pdrv]->pages_per_sector;
+            *(DWORD *)buff = fatfs_mtd_devs[pdrv]->min_erase_size / fatfs_mtd_devs[pdrv]->page_size;
             return RES_OK;
 #endif
 
