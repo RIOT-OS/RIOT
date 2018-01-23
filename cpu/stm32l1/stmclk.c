@@ -28,71 +28,71 @@
 
 /* See if we want to use the PLL */
 #if defined(CLOCK_PLL_DIV) || defined(CLOCK_PLL_MUL) || \
-    defined(CLOCK_PLL_DIV_HSE) || defined(CLOCK_PLL_MUL_HSE) || \
-    defined(CLOCK_PLL_DIV_HSI) || defined(CLOCK_PLL_MUL_HSI)
+defined(CLOCK_PLL_DIV_HSE) || defined(CLOCK_PLL_MUL_HSE) || \
+defined(CLOCK_PLL_DIV_HSI) || defined(CLOCK_PLL_MUL_HSI)
 
-    #define CLOCK_USE_PLL              1
+#define CLOCK_USE_PLL              1
 #else
-    #define CLOCK_USE_PLL              0
+#define CLOCK_USE_PLL              0
 #endif
 
 #if !defined(CLOCK_HSI) && !defined(CLOCK_HSE) && !defined(CLOCK_MSI)
-    #error "Please provide clock source in board.h or periph_conf.h file"
+#error "Please provide clock source in board.h or periph_conf.h file"
 #endif
 
 /* Check the source to be used for the PLL */
 #if defined(CLOCK_HSI) && defined(CLOCK_HSE)
-    #define CLOCK_HS_MULTI
+#define CLOCK_HS_MULTI
 #endif
 
 #if !defined(CLOCK_HS_MULTI)
-    #if defined(CLOCK_HSI)
-        #define CLOCK_CR_SOURCE            RCC_CR_HSION
-        #define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
-        #define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSI
-        #define CLOCK_DISABLE_OTHERS       (RCC_CR_HSEON | RCC_CR_MSION)
+#if defined(CLOCK_HSI)
+#define CLOCK_CR_SOURCE            RCC_CR_HSION
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
+#define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSI
+#define CLOCK_DISABLE_OTHERS       (RCC_CR_HSEON | RCC_CR_MSION)
 
-        #if (CLOCK_USE_PLL == 0)
-            #define CLOCK_CFGR_SW              RCC_CFGR_SW_HSI
-            #define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_HSI
-        #endif
-    #elif defined(CLOCK_HSE)
-        #define CLOCK_CR_SOURCE            RCC_CR_HSEON
-        #define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
-        #define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSE
-        #define CLOCK_DISABLE_OTHERS       (RCC_CR_HSION | RCC_CR_MSION)
+#if (CLOCK_USE_PLL == 0)
+#define CLOCK_CFGR_SW              RCC_CFGR_SW_HSI
+#define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_HSI
+#endif
+#elif defined(CLOCK_HSE)
+#define CLOCK_CR_SOURCE            RCC_CR_HSEON
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
+#define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSE
+#define CLOCK_DISABLE_OTHERS       (RCC_CR_HSION | RCC_CR_MSION)
 
-        #if (CLOCK_USE_PLL == 0)
-            #define CLOCK_CFGR_SW              RCC_CFGR_SW_HSE
-            #define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_HSE
-        #endif
-    #endif
+#if (CLOCK_USE_PLL == 0)
+#define CLOCK_CFGR_SW              RCC_CFGR_SW_HSE
+#define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_HSE
+#endif
+#endif
 #endif
 
 #if defined(CLOCK_MSI)
-    #define CLOCK_CR_SOURCE            RCC_CR_MSION
-    #define CLOCK_CR_SOURCE_RDY        RCC_CR_MSIRDY
-    #define CLOCK_CFGR_SW              RCC_CFGR_SW_MSI
-    #define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_MSI
-    #define CLOCK_DISABLE_OTHERS       (RCC_CR_HSEON | RCC_CR_HSION)
-    #define CLOCK_MSIRANGE             RCC_ICSCR_MSIRANGE_6
+#define CLOCK_CR_SOURCE            RCC_CR_MSION
+#define CLOCK_CR_SOURCE_RDY        RCC_CR_MSIRDY
+#define CLOCK_CFGR_SW              RCC_CFGR_SW_MSI
+#define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_MSI
+#define CLOCK_DISABLE_OTHERS       (RCC_CR_HSEON | RCC_CR_HSION)
+#define CLOCK_MSIRANGE             RCC_ICSCR_MSIRANGE_6
 
-    #if (CLOCK_USE_PLL == 1)
-        #error "PLL can't be used with MSI"
-    #endif
+#if (CLOCK_USE_PLL == 1)
+#error "PLL can't be used with MSI"
+#endif
 #endif
 
 #if (CLOCK_USE_PLL == 1)
-    #define CLOCK_CFGR_SW              RCC_CFGR_SW_PLL
-    #define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_PLL
+#define CLOCK_CFGR_SW              RCC_CFGR_SW_PLL
+#define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_PLL
 #endif
 
 #if (CLOCK_CORECLOCK > 16000000U)
-    #define CORE_VOLTAGE PWR_CR_VOS_0
+#define CORE_VOLTAGE PWR_CR_VOS_0
 #elif (CLOCK_CORECLOCK > 8000000U)
-    #define CORE_VOLTAGE PWR_CR_VOS_1
+#define CORE_VOLTAGE PWR_CR_VOS_1
 #else
-    #define CORE_VOLTAGE (PWR_CR_VOS_1 | PWR_CR_VOS_0)
+#define CORE_VOLTAGE (PWR_CR_VOS_1 | PWR_CR_VOS_0)
 #endif
 
 static uint32_t tmpreg;
@@ -194,15 +194,15 @@ void stmclk_init_sysclk(void)
 
 #if CLOCK_USE_PLL
     /*  PLL configuration: PLLCLK = CLOCK_SOURCE / PLL_DIV * PLL_MUL */
-    #if defined(CLOCK_HS_MULTI)
-        if (clock_source_rdy == RCC_CR_HSERDY) {
-            RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | CLOCK_PLL_DIV_HSE | CLOCK_PLL_MUL_HSE);
-        } else {
-            RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSI | CLOCK_PLL_DIV_HSI | CLOCK_PLL_MUL_HSI);
-        }
-    #else
-        RCC->CFGR |= (uint32_t)(CLOCK_PLL_SOURCE | CLOCK_PLL_DIV | CLOCK_PLL_MUL);
-    #endif
+#if defined(CLOCK_HS_MULTI)
+    if (clock_source_rdy == RCC_CR_HSERDY) {
+        RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | CLOCK_PLL_DIV_HSE | CLOCK_PLL_MUL_HSE);
+    } else {
+        RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSI | CLOCK_PLL_DIV_HSI | CLOCK_PLL_MUL_HSI);
+    }
+#else
+    RCC->CFGR |= (uint32_t)(CLOCK_PLL_SOURCE | CLOCK_PLL_DIV | CLOCK_PLL_MUL);
+#endif
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */
@@ -269,17 +269,17 @@ void stmclk_init_sysclk(void)
         memcpy(cpu_clock_source + n, "/HSI", 4);
     }
 #elif defined(CLOCK_HSI)
-    #if CLOCK_USE_PLL
-        memcpy(cpu_clock_source, "PLL/HSI", 7);
-    #elif
-        memcpy(cpu_clock_source, "HSI", 3);
-    #endif
+#if CLOCK_USE_PLL
+    memcpy(cpu_clock_source, "PLL/HSI", 7);
+#elif
+    memcpy(cpu_clock_source, "HSI", 3);
+#endif
 #elif defined(CLOCK_HSE)
-    #if CLOCK_USE_PLL
-        memcpy(cpu_clock_source, "PLL/HSE", 7);
-    #elif
-        memcpy(cpu_clock_source, "HSE", 3);
-    #endif
+#if CLOCK_USE_PLL
+    memcpy(cpu_clock_source, "PLL/HSE", 7);
+#elif
+    memcpy(cpu_clock_source, "HSE", 3);
+#endif
 #endif
 }
 
