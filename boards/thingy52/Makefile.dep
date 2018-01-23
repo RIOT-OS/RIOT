@@ -2,4 +2,8 @@ ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += nrfmin
 endif
 
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += lis2dh12
+endif
+
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
