@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_spark-core Spark-Core
  * @ingroup     boards
- * @brief       Board specific files for the spark-core board.
+ * @brief       Support for the spark-core board
  * @{
  *
  * @file

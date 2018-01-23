@@ -8,7 +8,7 @@
 
 /**
  * @ingroup     boards_sodaq-explorer
- * @brief       Board specific definitions for the SODAQ ExpLoRer board
+ * @brief       Support for the SODAQ ExpLoRer board
  * @{
  *
  * @file

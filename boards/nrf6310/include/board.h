@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_nrf6310 NRF6310 (Nordic NRF Hardware Development Kit)
  * @ingroup     boards
- * @brief       Board specific files for the nRF51 boards nrf6310 or MOMMOSOFT BLE DEVKIT.N
+ * @brief       Support for the nRF51 boards: nrf6310 or MOMMOSOFT BLE DEVKIT.N
  * @{
  *
  * @file

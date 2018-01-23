@@ -9,11 +9,11 @@
 /**
  * @defgroup    boards_limifrog-v1 LimiFrog Version 1
  * @ingroup     boards
- * @brief       Board specific files for the limifrog-v1 board.
+ * @brief       Support for the limifrog-v1 board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the limifrog-v1  board.
+ * @brief       Board specific definitions for the limifrog-v1 board
  *
  * @author      Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */

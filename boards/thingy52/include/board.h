@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_thingy52 Nordic Thingy:52
  * @ingroup     boards
- * @brief       Board specific configuration for the Nordic Thingy:52 board
+ * @brief       Support for the Nordic Thingy:52 board
  * @{
  *
  * @file

@@ -10,7 +10,7 @@
 /**
  * @defgroup    boards_nucleo32-l432 Nucleo32-L432
  * @ingroup     boards_nucleo32
- * @brief       Board specific files for the nucleo32-l432 board
+ * @brief       Support for the nucleo32-l432 board
  * @{
  *
  * @file

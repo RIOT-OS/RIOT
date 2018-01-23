@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_nucleo-f091 Nucleo-F091
  * @ingroup     boards_nucleo
- * @brief       Board specific files for the nucleo-f091 board
+ * @brief       Support for the nucleo-f091 board
  * @{
  *
  * @file

@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_ruuvitag RuuviTag
  * @ingroup     boards
- * @brief       Board specific configuration for the RuuviTag board
+ * @brief       Support for the RuuviTag board
  * @{
  *
  * @file

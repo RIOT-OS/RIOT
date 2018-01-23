@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_nrf51dongle nRF51 Dongle
  * @ingroup     boards
- * @brief       Board specific files for the Nordic nRF51 Dongle
+ * @brief       Support for the Nordic nRF51 Dongle
  * @{
  *
  * @file

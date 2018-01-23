@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_mulle Eistec Mulle
  * @ingroup     boards
- * @brief       Board specific files for Eistec Mulle IoT boards
+ * @brief       Support for Eistec Mulle IoT boards
  * @{
  *
  * @file

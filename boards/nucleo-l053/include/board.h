@@ -10,7 +10,7 @@
 /**
  * @defgroup    boards_nucleo-l053 Nucleo-L053
  * @ingroup     boards_nucleo
- * @brief       Board specific files for the nucleo-l053 board
+ * @brief       Support for the nucleo-l053 board
  * @{
  *
  * @file

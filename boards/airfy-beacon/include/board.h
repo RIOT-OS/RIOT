@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_airfy-beacon Airfy Beacon
  * @ingroup     boards
- * @brief       Board specific files for the Airfy Beacon board
+ * @brief       Support for the Airfy Beacon board
  * @{
  *
  * @file
