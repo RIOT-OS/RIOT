@@ -58,7 +58,8 @@ typedef struct mtd_desc mtd_desc_t;
 typedef struct {
     const mtd_desc_t *driver;  /**< MTD driver */
     uint32_t sector_count;     /**< Number of sector in the MTD */
-    uint32_t pages_per_sector; /**< Number of pages by sector in the MTD */
+    uint32_t sector_size;      /**< Size of the sectors in the MTD */
+    uint32_t min_erase_size;   /**< Minimum size which can be erased */
     uint32_t page_size;        /**< Size of the pages in the MTD */
 } mtd_dev_t;
 
