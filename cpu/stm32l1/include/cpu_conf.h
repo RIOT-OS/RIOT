@@ -55,8 +55,6 @@
 #endif
 #include "vendor/stm32l1xx.h"
 
-#define CPU_NUMBER_OF_PORTS 8
-
 #ifdef __cplusplus
 extern "C" {
 #endif
