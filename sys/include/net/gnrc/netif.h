@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_netif New network interface API
+ * @defgroup    net_gnrc_netif Network interface API
  * @ingroup     net_gnrc
  * @brief       Abstraction layer for GNRC's network interfaces
  *
