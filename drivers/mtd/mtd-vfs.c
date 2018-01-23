@@ -54,7 +54,7 @@ static int mtd_vfs_fstat(vfs_file_t *filp, struct stat *buf)
         return -EFAULT;
     }
     buf->st_nlink = 1;
-    buf->st_size = mtd->page_size * mtd->sector_count * mtd->pages_per_sector;
+    buf->st_size = mtd->sector_count * mtd->sector_size;
     return 0;
 }
 
@@ -71,7 +71,7 @@ static off_t mtd_vfs_lseek(vfs_file_t *filp, off_t off, int whence)
             off += filp->pos;
             break;
         case SEEK_END:
-            off += mtd->page_size * mtd->sector_count * mtd->pages_per_sector;
+            off += mtd->sector_count * mtd->sector_size;
             break;
         default:
             return -EINVAL;
@@ -91,7 +91,7 @@ static ssize_t mtd_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
     if (mtd == NULL) {
         return -EFAULT;
     }
-    uint32_t size = mtd->page_size * mtd->sector_count * mtd->pages_per_sector;
+    uint32_t size = mtd->sector_count * mtd->sector_size;
     uint32_t src = filp->pos;
     if (src >= size) {
         return 0;
@@ -114,7 +114,7 @@ static ssize_t mtd_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes)
     if (mtd == NULL) {
         return -EFAULT;
     }
-    uint32_t size = mtd->page_size * mtd->sector_count * mtd->pages_per_sector;
+    uint32_t size = mtd->sector_count * mtd->sector_size;
     uint32_t dest = filp->pos;
     if (dest >= size) {
         /* attempt to write outside the device memory */
