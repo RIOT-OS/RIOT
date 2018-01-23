@@ -97,9 +97,6 @@ defined(CLOCK_PLL_DIV_HSI) || defined(CLOCK_PLL_MUL_HSI)
 
 static uint32_t tmpreg;
 static volatile uint32_t clock_source_rdy = 0;
-volatile uint32_t cpu_clock_global;
-volatile uint32_t cpu_ports_number;
-char cpu_clock_source[10] = { 0 };
 
 /**
  * @brief Configure the clock system of the stm32l1
@@ -252,35 +249,6 @@ void stmclk_init_sysclk(void)
     /* Disable other clock sources */
     RCC->CR &= ~(CLOCK_DISABLE_OTHERS);
 #endif
-
-    cpu_clock_global = CLOCK_CORECLOCK;
-
-#if CLOCK_MSI
-    memcpy(cpu_clock_source, "MSI", 3);
-#elif defined(CLOCK_HS_MULTI)
-    uint32_t n = 0;
-    if (CLOCK_USE_PLL) {
-        memcpy(cpu_clock_source, "PLL", 3);
-        n += 3;
-    }
-    if (clock_source_rdy == RCC_CR_HSERDY) {
-        memcpy(cpu_clock_source + n, "/HSE", 4);
-    } else {
-        memcpy(cpu_clock_source + n, "/HSI", 4);
-    }
-#elif defined(CLOCK_HSI)
-#if CLOCK_USE_PLL
-    memcpy(cpu_clock_source, "PLL/HSI", 7);
-#elif
-    memcpy(cpu_clock_source, "HSI", 3);
-#endif
-#elif defined(CLOCK_HSE)
-#if CLOCK_USE_PLL
-    memcpy(cpu_clock_source, "PLL/HSE", 7);
-#elif
-    memcpy(cpu_clock_source, "HSE", 3);
-#endif
-#endif
 }
 
 void stmclk_switch_msi(uint32_t msi_range, uint32_t ahb_divider)
@@ -322,6 +290,4 @@ void stmclk_switch_msi(uint32_t msi_range, uint32_t ahb_divider)
     tmpreg &= ~(RCC_CR_HSION | RCC_CR_HSEON);
     tmpreg &= ~(RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON);
     RCC->CR = tmpreg;
-
-    cpu_clock_global = 65536 * (1 << (msi_range >> 13));
 }
