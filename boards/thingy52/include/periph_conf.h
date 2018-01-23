@@ -77,6 +77,28 @@ static const timer_conf_t timer_config[] = {
 #define UART_PIN_TX         GPIO_PIN(0, 3)
 /** @} */
 
+/**
+ * @name    I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        /* main I2C bus */
+        .dev = NRF_TWIM0,
+        .sda = 7,
+        .scl = 8,
+    },
+    {
+        /* EXT I2C bus */
+        .dev = NRF_TWIM1,
+        .sda = 14,
+        .scl = 15,
+    },
+};
+
+#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
