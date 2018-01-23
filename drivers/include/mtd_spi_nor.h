@@ -42,6 +42,7 @@ extern "C"
 typedef struct {
     uint8_t rdid;            /**< Read identification (JEDEC ID) */
     uint8_t wren;            /**< Write enable */
+    uint8_t wrdi;            /**< Write disable */
     uint8_t rdsr;            /**< Read status register */
     uint8_t wrsr;            /**< Write status register */
     uint8_t read;            /**< Read data bytes, 3 byte address */
@@ -109,6 +110,12 @@ typedef struct {
      * Computed by mtd_spi_nor_init, no need to touch outside the driver.
      */
     uint32_t sec_addr_mask;
+    /**
+     * @brief   bitmask corresponding to the minimum erasable sector address
+     *
+     * Computed by mtd_spi_nor_init, no need to touch outside the driver.
+     */
+    uint32_t min_erase_addr_mask;
     uint8_t addr_width;      /**< Number of bytes in addresses, usually 3 for small devices */
     /**
      * @brief   number of right shifts to get the address to the start of the page
@@ -122,6 +129,12 @@ typedef struct {
      * Computed by mtd_spi_nor_init, no need to touch outside the driver.
      */
     uint8_t sec_addr_shift;
+    /**
+     * @brief   number of right shifts to get the address to the start of the erasable sector
+     *
+     * Computed by mtd_spi_nor_init, no need to touch outside the driver.
+     */
+    uint8_t min_erase_addr_shift;
 } mtd_spi_nor_t;
 
 /**

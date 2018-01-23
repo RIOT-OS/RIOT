@@ -29,6 +29,7 @@
 const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default = {
     .rdid            = 0x9f,
     .wren            = 0x06,
+    .wrdi            = 0x04,
     .rdsr            = 0x05,
     .wrsr            = 0x01,
     .read            = 0x03,
