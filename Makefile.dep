@@ -123,7 +123,7 @@ ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter ieee802154,$(USEMODULE)))
+ifneq (,$(filter ieee802154 nrfmin,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
   endif
