@@ -62,7 +62,7 @@ static vfs_mount_t _test_vfs_mount = {
 };
 
 /* provide mtd devices for use within diskio layer of fatfs */
-mtd_dev_t *fatfs_mtd_devs[_VOLUMES];
+mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
 
 #ifdef MODULE_MTD_NATIVE
 /* mtd device for native is provided in boards/native/board_init.c */

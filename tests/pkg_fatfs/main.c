@@ -106,7 +106,7 @@ static int _mount(int argc, char **argv)
         }
         else {
 
-            #if _MAX_SS == _MIN_SS
+            #if FF_MAX_SS == FF_MIN_SS
             uint16_t sector_size = TEST_FATFS_FIXED_SECTOR_SIZE;
             #else
             uint16_t sector_size = fs->ssize;
@@ -349,7 +349,7 @@ static int _mkfs(int argc, char **argv)
 
     char volume_str[TEST_FATFS_MAX_VOL_STR_LEN];
     sprintf(volume_str, "%d:/", vol_idx);
-    BYTE work[_MAX_SS];
+    BYTE work[FF_MAX_SS];
 
     puts("formatting media...");
 

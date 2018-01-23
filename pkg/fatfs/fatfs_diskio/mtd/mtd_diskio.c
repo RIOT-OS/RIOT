@@ -31,7 +31,7 @@
 #endif
 
 /* mtd devices for use by FatFs should be provided by the application */
-extern mtd_dev_t *fatfs_mtd_devs[_VOLUMES];
+extern mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
 
 /**
  * @brief           returns the status of the disk
@@ -45,7 +45,7 @@ extern mtd_dev_t *fatfs_mtd_devs[_VOLUMES];
 DSTATUS disk_status(BYTE pdrv)
 {
     DEBUG("disk_status %d\n", pdrv);
-    if (pdrv >= _VOLUMES) {
+    if (pdrv >= FF_VOLUMES) {
         return STA_NODISK;
     } else if (fatfs_mtd_devs[pdrv]->driver == NULL){
         return STA_NOINIT;
@@ -66,7 +66,7 @@ DSTATUS disk_status(BYTE pdrv)
 DSTATUS disk_initialize(BYTE pdrv)
 {
     DEBUG("disk_initialize %d\n", pdrv);
-    if (pdrv >= _VOLUMES) {
+    if (pdrv >= FF_VOLUMES) {
         return STA_NODISK;
     } else if (fatfs_mtd_devs[pdrv]->driver == NULL){
         return STA_NOINIT;
@@ -91,7 +91,7 @@ DSTATUS disk_initialize(BYTE pdrv)
 DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
 {
     DEBUG("disk_read: %d, %lu, %d\n", pdrv, sector, count);
-    if ((pdrv >= _VOLUMES) || (fatfs_mtd_devs[pdrv]->driver == NULL)) {
+    if ((pdrv >= FF_VOLUMES) || (fatfs_mtd_devs[pdrv]->driver == NULL)) {
         return RES_PARERR;
     }
 
@@ -122,7 +122,7 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
 DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
 {
     DEBUG("disk_write: %d, %lu, %d\n", pdrv, sector, count);
-    if ((pdrv >= _VOLUMES) || (fatfs_mtd_devs[pdrv]->driver == NULL)) {
+    if ((pdrv >= FF_VOLUMES) || (fatfs_mtd_devs[pdrv]->driver == NULL)) {
         return RES_PARERR;
     }
 
@@ -150,7 +150,7 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
 /**
  * @brief                  perform miscellaneous low-level control functions
  *
- * @param[in]      pdrv    Physical drive nmuber (0.._VOLUMES-1)
+ * @param[in]      pdrv    Physical drive nmuber (0..FF_VOLUMES-1)
  * @param[in out]  cmd     Control code
  * @param[in]      sector  Buffer to send/receive control data
  *
@@ -160,18 +160,18 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
  */
 DRESULT disk_ioctl(BYTE pdrv, BYTE cmd, void *buff)
 {
-    if ((pdrv >= _VOLUMES) || (fatfs_mtd_devs[pdrv]->driver == NULL)) {
+    if ((pdrv >= FF_VOLUMES) || (fatfs_mtd_devs[pdrv]->driver == NULL)) {
         return RES_PARERR;
     }
 
     switch (cmd) {
-#if (_FS_READONLY == 0)
+#if (FF_FS_READONLY == 0)
         case CTRL_SYNC:
             /* r/w is always finished within r/w-functions of mtd */
             return RES_OK;
 #endif
 
-#if (_USE_MKFS == 1)
+#if (FF_USE_MKFS == 1)
         case GET_SECTOR_COUNT:
             *(DWORD *)buff = fatfs_mtd_devs[pdrv]->sector_count;
             return RES_OK;
@@ -183,13 +183,13 @@ DRESULT disk_ioctl(BYTE pdrv, BYTE cmd, void *buff)
             return RES_OK;
 #endif
 
-#if (_MAX_SS != _MIN_SS)
+#if (FF_MAX_SS != FF_MIN_SS)
         case GET_SECTOR_SIZE:
             *(DWORD *)buff = fatfs_mtd_devs[pdrv]->page_size;
             return RES_OK;
 #endif
 
-#if (_USE_TRIM == 1)
+#if (FF_USE_TRIM == 1)
         case CTRL_TRIM:
             return RES_OK;
 #endif
