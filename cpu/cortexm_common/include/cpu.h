@@ -111,6 +111,16 @@ static inline void cortexm_sleep(int deep)
 }
 
 /**
+ * @brief   Checks is memory address valid or not
+ *
+ * This function can be used to check for memory size,
+ * peripherals availability, etc.
+ *
+ * @param[in]	address     Address to check
+ */
+bool cpu_check_address(volatile const char *address);
+
+/**
  * @brief   Trigger a conditional context scheduler run / context switch
  *
  * This function is supposed to be called in the end of each ISR.
