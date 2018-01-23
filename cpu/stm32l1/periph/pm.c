@@ -26,9 +26,6 @@
 #include "cpu.h"
 #include "stmclk.h"
 #include "periph/pm.h"
-#include "periph/spi.h"
-#include "periph_conf.h"
-#include "periph/init.h"
 #include "periph/uart.h"
 #include "uart_stdio.h"
 
@@ -62,74 +59,11 @@ static uint32_t pm_gpio_moder[8];
 static uint32_t pm_gpio_pupdr[8];
 static uint16_t pm_gpio_otyper[8];
 static uint16_t pm_gpio_odr[8];
-static uint8_t  pm_usart[UART_NUMOF];
 static uint32_t ahb_gpio_clocks;
 static uint32_t tmpreg;
 
 static uint16_t pm_portmask_system[8] = { 0 };
 static uint16_t pm_portmask_user[8] = { 0 };
-
-static inline GPIO_TypeDef *_port(gpio_t pin)
-{
-    return (GPIO_TypeDef *)(pin & ~(0x0f));
-}
-
-/**
- * @brief   Extract the port number form the given identifier
- *
- * The port number is extracted by looking at bits 10, 11, 12, 13 of the base
- * register addresses.
- */
-static inline int _port_num(gpio_t pin)
-{
-    return ((pin >> 10) & 0x0f);
-}
-
-/**
- * @brief   Extract the pin number from the last 4 bit of the pin identifier
- */
-static inline int _pin_num(gpio_t pin)
-{
-    return (pin & 0x0f);
-}
-
-/* We are not using gpio_init as it sets GPIO clock speed to maximum */
-/* We add GPIOs we touched to exclusion mask pm_portmask_system */
-static void pin_set(gpio_t pin, uint8_t value) {
-    GPIO_TypeDef *port = _port(pin);
-    int pin_num = _pin_num(pin);
-    tmpreg = port->MODER;
-    tmpreg &= ~(3 << (2*pin_num));
-    tmpreg |= (1 << (2*pin_num));
-    port->MODER = tmpreg;
-
-    port->PUPDR &= ~(3 << (2*pin_num));
-    port->OTYPER &= ~(1 << pin_num);
-    if (value) {
-        port->ODR |= (1 << pin_num);
-    }
-    else {
-        port->ODR &= ~(1 << pin_num);
-    }
-
-    pm_portmask_system[_port_num(pin)] |= 1 << pin_num;
-}
-
-/* Do not change GPIO state in sleep mode */
-void pm_arch_add_gpio_exclusion(gpio_t gpio) {
-    uint8_t port = _port_num(gpio);
-    uint8_t pin = _pin_num(gpio);
-
-    pm_portmask_user[port] |= (uint16_t)(1<<pin);
-}
-
-/* Change GPIO state to AIN in sleep mode */
-void pm_arch_del_gpio_exclusion(gpio_t gpio) {
-    uint8_t port = _port_num(gpio);
-    uint8_t pin = _pin_num(gpio);
-
-    pm_portmask_user[port] &= ~(uint16_t)(1<<pin);
-}
 
 void pm_before_i_go_to_sleep(void){
     uint8_t i;
@@ -146,36 +80,6 @@ void pm_before_i_go_to_sleep(void){
         pm_gpio_pupdr[i] = port->PUPDR;
         pm_gpio_otyper[i] = (uint16_t)(port->OTYPER & 0xFFFF);
         pm_gpio_odr[i] = (uint16_t)(port->ODR & 0xFFFF);
-    }
-
-    /* Disable all USART interfaces in use */
-    /* without it, RX will receive some garbage when MODER is changed */
-
-    for (i = 0; i < UART_NUMOF; i++) {
-        if (uart_config[i].dev->CR1 & USART_CR1_UE) {
-            uart_config[i].dev->CR1 &= ~USART_CR1_UE;
-            pin_set(uart_config[i].tx_pin, 1);
-            pm_usart[i] = 1;
-        } else {
-            pm_usart[i] = 0;
-        }
-    }
-
-    /* specifically set GPIOs used for external SPI devices */
-    /* NSS = 1, MOSI = 0, SCK = 0, MISO doesn't matter */
-    for (i = 0; i < SPI_NUMOF; i++) {
-        /* port and pin numbers */
-        GPIO_TypeDef *port = _port(spi_config[i].sclk_pin);
-        int pin_num = _pin_num(spi_config[i].sclk_pin);
-
-        /* check if alternate functions are enabled for that device*/
-        if (((port->AFR[(pin_num > 7) ? 1 : 0] >> (pin_num * 4)) & 0x0f)  == spi_config[i].af) {
-            if (spi_config[i].cs_pin != GPIO_UNDEF) {
-                pin_set(spi_config[i].cs_pin, 1);
-            }
-            pin_set(spi_config[i].mosi_pin, 0);
-            pin_set(spi_config[i].sclk_pin, 0);
-        }
     }
 
     /* save GPIO clock configuration */

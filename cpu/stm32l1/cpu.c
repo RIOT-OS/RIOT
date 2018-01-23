@@ -29,6 +29,7 @@ void cpu_init(void)
     cortexm_init();
     /* initialize system clocks */
     stmclk_init_sysclk();
+
     /* trigger static peripheral initialization */
     periph_init();
 }
