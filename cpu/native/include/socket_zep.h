@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    netdev_socket_zep  Socket-based ZEP
- * @ingroup     netdev
+ * @defgroup    drivers_socket_zep  Socket-based ZEP
+ * @ingroup     drivers_netdev
  * @brief       UDP socket-based IEEE 802.15.4 device over ZEP
  * @{
  *
