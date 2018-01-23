@@ -135,23 +135,6 @@ enum {
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
 
 /**
- * @brief   Recalculate Baudrate for UART device
- *
- * The UART device will be initialized with the following configuration:
- * - 8 data bits
- * - no parity
- * - 1 stop bit
- * - baudrate as given
- *
- * @param[in] uart          UART device to initialize
- * @param[in] baudrate      desired baudrate in baud/s
- *
- * @return                  UART_OK on success
- * @return                  UART_NOBAUD on inapplicable baudrate
- */
-int uart_set_baudrate(uart_t uart, uint32_t baudrate);
-
-/**
  * @brief   Write data from the given buffer to the specified UART device
  *
  * This function is blocking, as it will only return after @p len bytes from the

@@ -31,8 +31,10 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
-#define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
+#define RXENABLE                (USART_CR1_RE | USART_CR1_RXNEIE)
 
+#define UART_8X_OVERSAMPLING    8
+#define UART_16X_OVERSAMPLING   16
 /**
  * @brief   Allocate memory to store the callback functions
  */
@@ -63,18 +65,18 @@ int uart_set_baudrate(uart_t uart, uint32_t baudrate) {
 #ifdef USART_CR1_OVER8
         if (uart_clk < 16) {
             dev(uart)->CR1 |= USART_CR1_OVER8;
-            mantissa = (uint16_t)(uart_clk / 8);
-            fraction = (uint8_t)(uart_clk - (mantissa * 8));
+            mantissa = (uint16_t)(uart_clk / UART_8X_OVERSAMPLING);
+            fraction = (uint8_t)(uart_clk - (mantissa * UART_8X_OVERSAMPLING));
             dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x07);
         } else {
             dev(uart)->CR1 &= ~USART_CR1_OVER8;
-            mantissa = (uint16_t)(uart_clk / 16);
-            fraction = (uint8_t)(uart_clk - (mantissa * 16));
+            mantissa = (uint16_t)(uart_clk / UART_16X_OVERSAMPLING);
+            fraction = (uint8_t)(uart_clk - (mantissa * UART_16X_OVERSAMPLING));
             dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x0f);
         }
 #else
-        mantissa = (uint16_t)(uart_clk / 16);
-        fraction = (uint8_t)(uart_clk - (mantissa * 16));
+        mantissa = (uint16_t)(uart_clk / UART_16X_OVERSAMPLING);
+        fraction = (uint8_t)(uart_clk - (mantissa * UART_16X_OVERSAMPLING));
         dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x0f);
 #endif
 

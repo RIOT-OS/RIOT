@@ -307,6 +307,23 @@ uint32_t periph_apb_clk(uint8_t bus);
 uint32_t periph_timer_clk(uint8_t bus);
 
 /**
+ * @brief   Recalculate Baudrate for UART device
+ *
+ * The UART device will be initialized with the following configuration:
+ * - 8 data bits
+ * - no parity
+ * - 1 stop bit
+ * - baudrate as given
+ *
+ * @param[in] uart          UART device to initialize
+ * @param[in] baudrate      desired baudrate in baud/s
+ *
+ * @return                  UART_OK on success
+ * @return                  UART_NOBAUD on inapplicable baudrate
+ */
+int uart_set_baudrate(unsigned int uart, uint32_t baudrate);
+
+/**
  * @brief   Enable the given peripheral clock
  *
  * @param[in] bus       bus the peripheral is connected to
