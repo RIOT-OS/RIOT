@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_tja1042 TJA1042
- * @ingroup     drivers
+ * @ingroup     drivers_can
  * @ingroup     trx_can
  * @brief       tja1042 High Speed CAN transceiver driver
  *
