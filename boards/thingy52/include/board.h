@@ -36,6 +36,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    LIS2DH12 low power accelerometer configuration
+ * @{
+ */
+#define LIS2DH12_PARAM_I2C  I2C_DEV(1)
+/** @} */
+
+
+/**
  * @brief   Initialize board specific hardware
  */
 void board_init(void);
