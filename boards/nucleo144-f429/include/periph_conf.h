@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_nucleo144-f429 STM Nucleo144-F429
  * @ingroup     boards_nucleo144
- * @brief       Board configuration for the STM Nucleo144-F429
+ * @brief       Support for the STM Nucleo144-F429
  * @{
  *
  * @file

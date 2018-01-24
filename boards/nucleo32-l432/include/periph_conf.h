@@ -10,7 +10,7 @@
 /**
  * @defgroup    boards_nucleo32-l432 STM Nucleo32-L432
  * @ingroup     boards_nucleo32
- * @brief       Board configuration for the STM Nucleo32-L432
+ * @brief       Support for the STM Nucleo32-L432
  * @{
  *
  * @file

@@ -11,7 +11,7 @@
 /**
  * @defgroup    boards_nucleo-f302 STM Nucleo-F302
  * @ingroup     boards_nucleo64
- * @brief       Board configuration for the STM Nucleo-F302
+ * @brief       Support for the STM Nucleo-F302
  * @{
  *
  * @file

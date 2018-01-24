@@ -11,7 +11,7 @@
 /**
  * @defgroup    boards_nucleo-l476 STM Nucleo-L476
  * @ingroup     boards_nucleo64
- * @brief       Board configuration for the STM Nucleo-L476
+ * @brief       Support for the STM Nucleo-L476
  * @{
  *
  * @file

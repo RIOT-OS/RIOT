@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_nucleo-f103 STM Nucleo-F103
  * @ingroup     boards_nucleo64
- * @brief       Board configuration for the STM Nucleo-F103
+ * @brief       Support for the STM Nucleo-F103
  * @{
  *
  * @file

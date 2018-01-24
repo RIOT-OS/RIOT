@@ -10,7 +10,7 @@
 /**
  * @defgroup    boards_nucleo-f070 STM Nucleo-F070
  * @ingroup     boards_nucleo64
- * @brief       Board configuration for the STM Nucleo-F070
+ * @brief       Support for the STM Nucleo-F070
  * @{
  *
  * @file
