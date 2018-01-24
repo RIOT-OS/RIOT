@@ -63,7 +63,7 @@ void cpu_init(void)
             printf( ("Software reset!\n"));
         }else {
             printf( ("Watchdog reset!\n"));
-        }   
+        }
     }
     if (mcusr_mirror & (1 << JTRF)) {
         printf(("JTAG reset!\n"));

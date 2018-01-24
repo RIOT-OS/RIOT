@@ -24,7 +24,7 @@
 #include "adcxx1c.h"
 #include "adcxx1c_params.h"
 
-#define SLEEP       (100 * US_PER_MS)
+#define SLEEP_ADC       (100 * US_PER_MS)
 
 static adcxx1c_t dev;
 
@@ -62,7 +62,7 @@ int main(void)
     while (1) {
         adcxx1c_read_raw(&dev, &data);
         printf("Raw analog value: %d\n", data);
-        xtimer_usleep(SLEEP);
+        xtimer_usleep(SLEEP_ADC);
     }
 
     return 0;
