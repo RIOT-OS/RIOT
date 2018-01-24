@@ -32,6 +32,31 @@ ifeq ($(PORT),)
   ifeq ($(OS),Linux)
     ifneq ($(DEBUG_ADAPTER_ID),)
       PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh '^$(DEBUG_ADAPTER_ID)$$'))
+
+      # OpenOCD settings for Mulle programmer board.
+      # Try to determine which OpenOCD config file we should use based on the
+      # programmer board serial number.
+
+      # Makefile-way of comparing numbers, using lexicographical sorting since we
+      # don't have any arithmetic comparisons.
+      # Programmers with serial 100 -- 148 are version 0.60
+      # Programmers with serial 301 -- 330 are version 0.70
+      ifeq "100" "$(word 1, $(sort 100 $(DEBUG_ADAPTER_ID)))"
+        # >= 100
+        ifneq "149" "$(word 1, $(sort 149 $(DEBUG_ADAPTER_ID)))"
+          # < 149
+          PROGRAMMER_VERSION = 0.60
+        else
+          # >= 149
+          PROGRAMMER_VERSION = 0.70
+        endif
+      endif
+
+      # Default to version 0.70 programmer
+      # NOTE: Some boards (e.g. mulle) could define their own version.
+      PROGRAMMER_VERSION ?= 0.70
+      OPENOCD_ADAPTER_INIT ?= -f '$(RIOTBASE)/boards/mulle/dist/openocd/mulle-programmer-$(PROGRAMMER_VERSION).cfg'
+
     else
       # find-tty.sh will return the first USB tty if no serial is given.
       PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh))
