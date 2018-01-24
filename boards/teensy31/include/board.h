@@ -8,7 +8,6 @@
 
 /**
  * @ingroup     boards_teensy31
- * @brief       Board specific files for Teensy3.1 & 3.2
  * @{
  *
  * @file

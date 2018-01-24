@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_b-l072z-lrwan1 ST b-l072z-lrwan1 discovery
  * @ingroup     boards
- * @brief       Board specific files for the ST b-l072z-lrwan1 board
+ * @brief       Support for the ST b-l072z-lrwan1 board
  * @{
  *
  * @file

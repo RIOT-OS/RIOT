@@ -10,7 +10,7 @@
 /**
  * @defgroup    boards_nucleo144-f413 Nucleo144-F413
  * @ingroup     boards_nucleo144
- * @brief       Board specific files for the STM Nucleo144-f413 board
+ * @brief       Support for the Nucleo144-f413 board
  * @{
  *
  * @file

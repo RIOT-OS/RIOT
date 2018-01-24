@@ -8,7 +8,7 @@
 
 /**
  * @ingroup     boards_feather-m0
- * @brief       Board specific configuration of the Adafruit Feather M0.
+ * @brief       Support for the Adafruit Feather M0
  *
  * @{
  *

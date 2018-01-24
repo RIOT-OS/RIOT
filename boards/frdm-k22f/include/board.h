@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_frdm-k22f NXP FRDM-K22F Board
  * @ingroup     boards
- * @brief       Board specific implementations for the FRDM-K22F
+ * @brief       Support for the NXP FRDM-K22F
  * @{
  *
  * @file

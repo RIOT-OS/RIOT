@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_b-l475e-iot01a ST B-L475E-IOT01A
  * @ingroup     boards
- * @brief       Board specific files for the ST b-l475e-iot01a board
+ * @brief       Support for the ST b-l475e-iot01a board
  * @{
  *
  * @file

@@ -10,7 +10,7 @@
 /**
  * @defgroup    boards_nucleo-l476 Nucleo-L476
  * @ingroup     boards_nucleo
- * @brief       Board specific files for the nucleo-l476 board
+ * @brief       Support for the nucleo-l476 board
  * @{
  *
  * @file

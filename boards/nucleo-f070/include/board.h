@@ -10,7 +10,7 @@
 /**
  * @defgroup    boards_nucleo-f072 Nucleo-F072
  * @ingroup     boards_nucleo
- * @brief       Board specific files for the nucleo-f072 board
+ * @brief       Support for the nucleo-f072 board
  * @{
  *
  * @file

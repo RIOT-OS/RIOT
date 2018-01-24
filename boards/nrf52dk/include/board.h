@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_nrf52dk nRF52 DK
  * @ingroup     boards
- * @brief       Board specific configuration for the nRF52 DK
+ * @brief       Support for the nRF52 DK
  * @{
  *
  * @file

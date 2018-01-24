@@ -9,11 +9,11 @@
 /**
  * @defgroup    boards_fox fox
  * @ingroup     boards
- * @brief       Board specific files for the fox board.
+ * @brief       Support for the fox board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the fox board.
+ * @brief       Board specific definitions for the fox board
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
