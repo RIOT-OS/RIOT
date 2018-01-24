@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ *               2017 Fundacion Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -11,12 +12,13 @@
  * @{
  *
  * @file
- * @brief       Implementation of the kernel cpu functions
+ * @brief       Implementation of the cpu clock functions
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  * @author      Víctor Ariño <victor.arino@zii.aero>
  * @author      Oleg Artamonov <info@unwds.com>
+ * @author      Francisco Molina <francisco.molinas@inria.cl>
  *
  * @}
  */
@@ -28,8 +30,8 @@
 
 /* See if we want to use the PLL */
 #if defined(CLOCK_PLL_DIV) || defined(CLOCK_PLL_MUL) || \
-defined(CLOCK_PLL_DIV_HSE) || defined(CLOCK_PLL_MUL_HSE) || \
-defined(CLOCK_PLL_DIV_HSI) || defined(CLOCK_PLL_MUL_HSI)
+    defined(CLOCK_PLL_DIV_HSE) || defined(CLOCK_PLL_MUL_HSE) || \
+    defined(CLOCK_PLL_DIV_HSI) || defined(CLOCK_PLL_MUL_HSI)
 
 #define CLOCK_USE_PLL              1
 #else
