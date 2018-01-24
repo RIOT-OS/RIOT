@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo144-f446
+ * @defgroup    boards_nucleo144-f446 STM Nucleo144-F446
+ * @ingroup     boards_nucleo144
+ * @brief       Support for the STM Nucleo144-F446
  * @{
  *
  * @file

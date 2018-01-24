@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2017 Inria
  *               2017 OTAKeys
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,13 +9,9 @@
  */
 
 /**
- * @defgroup    boards_nucleo144 STM Nucleo144 Boards
- * @ingroup     boards
- * @brief       Support for STM Nucleo 144 boards
- *
  * @defgroup    boards_common_nucleo144 STM Nucleo144 common
  * @ingroup     boards_common
- * @brief       Shared files and configuration for all STM Nucleo144 boards.
+ * @brief       Common files and configuration for STM Nucleo144 boards
  * @{
  *
  * @file
@@ -23,13 +20,13 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef BOARD_COMMON_H
-#define BOARD_COMMON_H
+#ifndef BOARD_H
+#define BOARD_H
 
-#include "cpu.h"
-#include "periph_conf.h"
+#include "board_nucleo.h"
 #include "arduino_pinmap.h"
 
 #ifdef __cplusplus
@@ -57,6 +54,9 @@ extern "C" {
 #define LED2_ON             (GPIOB->BSRR = LED2_MASK)
 #define LED2_OFF            (GPIOB->BSRR = (LED2_MASK << 16))
 #define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
+
+/* the Nucleo144 boards always use LED0, as there is no dual use of its pin */
+#define AUTO_INIT_LED0
 /** @} */
 
 /**
@@ -67,14 +67,9 @@ extern "C" {
 #define BTN0_MODE           GPIO_IN_PD
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BOARD_COMMON_H */
+#endif /* BOARD_H */
 /** @} */

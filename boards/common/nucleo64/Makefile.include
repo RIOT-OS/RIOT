@@ -2,4 +2,4 @@
 include $(RIOTBOARD)/common/nucleo/Makefile.include
 
 # add the common header files to the include path
-INCLUDES += -I$(RIOTBOARD)/common/nucleo144/include
+INCLUDES += -I$(RIOTBOARD)/common/nucleo64/include

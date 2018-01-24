@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-f103
+ * @defgroup    boards_nucleo-f103 STM Nucleo-F103
+ * @ingroup     boards_nucleo64
+ * @brief       Support for the STM Nucleo-F103
  * @{
  *
  * @file
@@ -214,3 +216,4 @@ static const spi_conf_t spi_config[] = {
 #endif
 
 #endif /* PERIPH_CONF_H */
+/** @} */
