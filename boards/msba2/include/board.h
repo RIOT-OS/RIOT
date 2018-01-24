@@ -56,6 +56,16 @@ extern "C" {
 /** @} */
 
 /**
+ * @name   Define the interface to the CC1100 radio
+ * @{
+ */
+#define CC110X_PARAMS_CS        (GPIO_PIN(1, 21))
+#define CC110X_PARAMS_GDO0      (GPIO_PIN(0, 27))
+#define CC110X_PARAMS_GDO1      (GPIO_PIN(1, 23))
+#define CC110X_PARAMS_GDO2      (GPIO_PIN(0, 28))
+/** @} */
+
+/**
  * @brief   initialize the board's clock system
  */
 void init_clks1(void);
