@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 INRIA
- *               2015 Freie Universität Berlin
+ *               2015,2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -12,10 +12,10 @@
  * @{
  *
  * @file
- * @brief       WSN30 peripheral configuration
+ * @brief       WSN430 peripheral configuration
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- *              Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef PERIPH_CONF_H
@@ -29,10 +29,9 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
-/** @todo   Move all clock configuration code here from the board.h */
-#define CLOCK_CORECLOCK     (8000000U)
-
-#define CLOCK_CMCLK         CLOCK_CORECLOCK     /* no divider programmed */
+#define CLOCK_CORECLOCK     (8000000UL)
+#define CLOCK_MODE          (MCLK_8MHZ_SCLK_8MHZ)
+#define CLOCK_CMCLK         (CLOCK_CORECLOCK)       /* no divider programmed */
 /** @} */
 
 /**
@@ -92,3 +91,4 @@ extern "C" {
 #endif
 
 #endif /* PERIPH_CONF_H */
+/** @} */
