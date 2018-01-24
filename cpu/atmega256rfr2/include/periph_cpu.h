@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2015 HAW Hamburg
- *               2016 Freie Universität Berlin
- *               2017 RWTH Aachen
+ * Copyright (C) Josua Arndt, Steffen Robertz 2017 RWTH Aachen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -28,11 +26,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /**
  * @name   Length of the CPU_ID in octets
  * @{
  */
-#define CPUID_LEN           (8U)
+#define CPUID_LEN           (10U)
+
+/** @} */
+
+/**
+ * @name   Add 16 bit randome ending instead off 0000 to CPUID
+ *
+ *         To use this feature the Module AT86RFR2 is needed.
+ * @{
+ */
+#define CPU_ID_ADD_RANDOME  (0)
 /** @} */
 
 /**
@@ -134,6 +143,12 @@ typedef struct {
 #define MEGA_PRR            PRR0        /* Power Reduction Register is PRR0 */
 /** @} */
 
+/**
+ * @name ADC Configuration
+ * @{
+ */
+#define ADC_NUMOF           (8U)
+/** @} */
 
 #ifdef __cplusplus
 }
