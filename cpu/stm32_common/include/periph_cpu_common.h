@@ -321,7 +321,7 @@ uint32_t periph_timer_clk(uint8_t bus);
  * @return                  UART_OK on success
  * @return                  UART_NOBAUD on inapplicable baudrate
  */
-int uart_set_baudrate(unsigned int uart, uint32_t baudrate);
+int periph_uart_set_baudrate(unsigned int uart, uint32_t baudrate);
 
 /**
  * @brief   Enable the given peripheral clock

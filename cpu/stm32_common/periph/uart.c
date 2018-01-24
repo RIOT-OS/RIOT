@@ -45,7 +45,7 @@ static inline USART_TypeDef *dev(uart_t uart)
     return uart_config[uart].dev;
 }
 
-int uart_set_baudrate(uart_t uart, uint32_t baudrate) {
+int periph_uart_set_baudrate(uart_t uart, uint32_t baudrate) {
     uint16_t mantissa;
     uint8_t fraction;
     uint32_t uart_clk;
