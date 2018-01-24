@@ -159,7 +159,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                         dev->inesc = 0;
                         break;
                     }
-                    /* falls through intentionally to default when !dev->inesc */
+                    /* Intentionally falls through */
+                    /* to default when !dev->inesc */
                 case SLIP_ESC_ESC:
                     if (dev->inesc) {
                         *(ptr++) = SLIP_ESC;
@@ -167,7 +168,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                         dev->inesc = 0;
                         break;
                     }
-                    /* falls through intentionally to default when !dev->inesc */
+                    /* Intentionally falls through */
+                    /* to default when !dev->inesc */
                 default:
                     *(ptr++) = (uint8_t)byte;
                     res++;
