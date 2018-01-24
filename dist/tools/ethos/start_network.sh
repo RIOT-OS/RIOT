@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ETHOS_DIR="$(dirname $(readlink -f "$0"))"
+ETHOS_DIR="$(dirname "$(readlink -f "$0")")"
 ETHOS="${ETHOS_DIR}/ethos"
 UHCPD="$(readlink -f "${ETHOS_DIR}/../uhcpd/bin")/uhcpd"
 PORT=$1
