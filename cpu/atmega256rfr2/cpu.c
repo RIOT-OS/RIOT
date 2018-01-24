@@ -27,14 +27,24 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+/*
+* Since this MCU does not feature a software reset, the watchdog timer
+* is being used. It will be set to the shortest time and then force a
+* reset. Therefore the MCUSR register needs to be resetted as fast as
+* possible. In this case in the bootloader already. In order to regain
+* information about the reset cause, the MCUSR is copied to r2 beforehand.
+* When a software reset was triggered, r3 will contain 0xAA. In order to
+* prevent changes to the values from the .init section, r2 and r3 are saved
+* in the .init0 section
+*/
 uint8_t mcusr_mirror __attribute__((section(".noinit")));
-uint8_t sof_rst __attribute__((section(".noinit")));
+uint8_t soft_rst __attribute__((section(".noinit")));
 void get_mcusr(void) __attribute__((naked)) __attribute__((section(".init0")));
 void get_mcusr(void)
 {
     /* save the reset flags passed from the bootloader */
     __asm__ __volatile__("mov %0, r2\n" : "=r" (mcusr_mirror) :);
-    __asm__ __volatile__("mov %0, r3\n" : "=r" (sof_rst) :);
+    __asm__ __volatile__("mov %0, r3\n" : "=r" (soft_rst) :);
 }
 
 void cpu_init(void)
@@ -49,13 +59,14 @@ void cpu_init(void)
         printf(("Brownout reset!\n"));
     }
     if (mcusr_mirror & (1 << WDRF)) {
-        printf(("Watchdog reset!\n"));
+        if (soft_rst &  0xAA) {
+            printf( ("Software reset!\n"));
+        }else {
+            printf( ("Watchdog reset!\n"));
+        }   
     }
     if (mcusr_mirror & (1 << JTRF)) {
         printf(("JTAG reset!\n"));
-    }
-    if (sof_rst &  0xAA) {
-        printf(("Software reset!\n"));
     }
 
     wdt_reset();
@@ -63,7 +74,7 @@ void cpu_init(void)
 
     /* Set system clock Prescaler */
     CLKPR = (1 << CLKPCE);  /* enable a change to CLKPR */
-    /* set the Division factor to 1/ for internal Oscillator to 2. Therefore F_CPU=8MHz */
+    /* set the Division factor to 1 / for internal Oscillator to 2 */
     CLKPR = 0;
     /* Right now we need to do nothing here */
 }
@@ -106,9 +117,7 @@ ISR(BADISR_vect){
     /* White LED light is used to signal ERROR. */
     LED_PORT |= (BLUE | GREEN | RED);
 
-    while (1) {
-    }
-    ;
+    while (1) {}
 }
 ISR(BAT_LOW_vect, ISR_BLOCK){
     __enter_isr();

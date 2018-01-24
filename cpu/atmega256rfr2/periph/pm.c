@@ -34,8 +34,8 @@ void pm_reboot(void)
     #if defined(MODULE_AT86RFR2)
     /* clear MCU Status Register Interrupt flags */
     MCUSR = 0x00;
-    _asm_ _volatile_("mov r3, %0\n" :: "r" (0xAA));
-    #endif
+    __asm__ __volatile__("mov r3, %0\n" :: "r" (0xAA));
+    #endif /* MODULE_AT86RFR2 */
 
     /*
      * Since the AVR doesn't support a real software reset, we set the Watchdog

@@ -295,5 +295,5 @@ ISR(INT7_vect, ISR_BLOCK)
 {
     irq_handler(7); /**< predefined interrupt pin */
 }
-#endif
-#endif
+#endif  /* END BOARD_JIMINY_MEGA256RFR2 */
+#endif  /* INT7_vect */

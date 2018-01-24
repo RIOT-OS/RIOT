@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2017 RWTH Aachen, Josua Arndt
- *               2015 Freie Universität Berlin, Hinnerk van Bruinehsen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,8 +13,6 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author          Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author          Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
