@@ -689,6 +689,7 @@ static void gomach_t2k_wait_cp_txfeedback(gnrc_netif_t *netif)
                 if (!_cp_tx_busy(netif)) {
                     return;
                 }
+                /* Intentionally falls through */
             case TX_FEEDBACK_NOACK:
             default: {
                 _cp_tx_default(netif);
