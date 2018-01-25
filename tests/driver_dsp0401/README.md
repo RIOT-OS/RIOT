@@ -12,7 +12,7 @@ The display can be controlled from the JP1 connection jumper as follows:
 * Connect `PWM` to the board `DSP0401_PARAM_PWM_DEV` pwm device. See the board periph_conf.h
 to find a valid pin and configuration.
 * Connect `VCC` to one of the board VCC pin (3.3V or 5V depending on your board.
-  Example: use 3.3V with ST Nucleo)
+  Example: use 3.3V with STM32 Nucleo-64)
 * Connect `GND` to one of the board GND.
 
 Since there are potentially a lot of LEDs to poweron, it's preferable to use an
