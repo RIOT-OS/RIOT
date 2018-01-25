@@ -61,6 +61,7 @@ PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
 PSEUDOMODULES += openthread
 PSEUDOMODULES += pktqueue
+PSEUDOMODULES += pm_custom
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%

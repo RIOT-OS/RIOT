@@ -8,6 +8,10 @@ OLD_USEPKG := $(sort $(USEPKG))
 # pull dependencies from drivers
 include $(RIOTBASE)/drivers/Makefile.dep
 
+ifneq (,$(filter pm_custom,$(USEMODULE)))
+  USEMODULE := $(filter-out pm_layered,$(USEMODULE))
+endif
+
 ifneq (,$(filter cbor_ctime,$(USEMODULE)))
   ifneq (,$(filter newlib,$(USEMODULE)))
     USEMODULE += newlib_gnu_source

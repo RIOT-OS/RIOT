@@ -86,3 +86,7 @@ endif
 ifneq (native,$(BOARD))
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
 endif
+
+ifneq (,$(filter pm_custom,$(USEMODULE)))
+  CFLAGS += -DPROVIDES_PM_SET_LOWEST
+endif
