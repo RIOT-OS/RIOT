@@ -24,7 +24,8 @@
 #include "cpu.h"
 #include "periph/pm.h"
 
-#if !defined(MODULE_PM_LAYERED) && !defined(PROVIDES_PM_SET_LOWEST_CORTEXM)
+#if !defined(MODULE_PM_LAYERED) && !defined(PROVIDES_PM_SET_LOWEST_CORTEXM) \
+    && !defined(MODULE_PM_CUSTOM)
 void pm_set_lowest(void)
 {
     cortexm_sleep(0);
