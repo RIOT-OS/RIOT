@@ -159,8 +159,9 @@
  * GCOAP_OBS_VALUE_WIDTH.
  *
  * To cancel a notification, the server expects to receive a GET request with
- * the Observe option value set to 1. The server does not support cancellation
- * via a reset (RST) response to a non-confirmable notification.
+ * the Observe option value set to 1. A confirmable notification also is
+ * cancelled by a reset (RST) response from the client or by the absence of an
+ * ACK response.
  *
  * ## Implementation Notes ##
  *

@@ -44,11 +44,13 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
                            const sock_udp_ep_t *remote, int match_type);
 static void _find_resource(coap_pkt_t *pdu, coap_resource_t **resource_ptr,
                                             gcoap_listener_t **listener_ptr);
-static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote);
-static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
+static int _find_observer(sock_udp_ep_t **observer, const sock_udp_ep_t *remote);
+static int _find_obs_memo(gcoap_observe_memo_t **memo, const sock_udp_ep_t *remote,
                           uint8_t *token, int token_len);
 static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
                                    const coap_resource_t *resource);
+static void _clear_obs_memo(gcoap_observe_memo_t *memo,
+                            const sock_udp_ep_t *remote);
 
 /* Internal variables */
 const coap_resource_t _default_resources[] = {
@@ -192,8 +194,10 @@ static void _listen(sock_udp_t *sock)
     if (pdu.hdr->code == COAP_CODE_EMPTY) {
         _find_req_memo(&memo, &pdu, &remote, GCOAP_FIND_REQ_MSGID);
         if (memo) {
-            /* empty ACK for confirmable request */
-            if (coap_get_type(&pdu) == COAP_TYPE_ACK && memo->send_limit >= 0) {
+            /* empty ACK/reset for confirmable request */
+            if (((coap_get_type(&pdu) == COAP_TYPE_ACK)
+                    || (coap_get_type(&pdu) == COAP_TYPE_RST))
+                    && memo->send_limit >= 0) {
                 /* For an observe notification ACK from the client, no further
                  * response expected. Clear the request memo. */
                 gcoap_observe_memo_t *obs_memo = NULL;
@@ -203,6 +207,9 @@ static void _listen(sock_udp_t *sock)
                 _find_obs_memo(&obs_memo, &remote, token, token_len);
                 if (obs_memo) {
                     xtimer_remove(&memo->response_timer);
+                    if (coap_get_type(&pdu) == COAP_TYPE_RST) {
+                        _clear_obs_memo(obs_memo, &memo->remote_ep);
+                    }
                     *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
                     memo->state = GCOAP_MEMO_UNUSED;
                 }
@@ -343,16 +350,7 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         _find_obs_memo(&memo, remote, pdu->token, coap_get_token_len(pdu));
         /* clear memo, and clear observer if no other memos */
         if (memo != NULL) {
-            DEBUG("gcoap: Deregistering observer for: %s\n", memo->resource->path);
-            memo->observer = NULL;
-            memo           = NULL;
-            _find_obs_memo(&memo, remote, NULL, -1);
-            if (memo == NULL) {
-                _find_observer(&observer, remote);
-                if (observer != NULL) {
-                    observer->family = AF_UNSPEC;
-                }
-            }
+            _clear_obs_memo(memo, remote);
         }
         coap_clear_observe(pdu);
 
@@ -488,7 +486,10 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
     }
 }
 
-/* Calls handler callback on receipt of a timeout message. */
+/*
+ * Calls handler callback on receipt of a timeout message. Also clears observe
+ * memo, if any, if the request was confirmable.
+ */
 static void _expire_request(gcoap_request_memo_t *memo)
 {
     DEBUG("coap: received timeout message\n");
@@ -506,6 +507,15 @@ static void _expire_request(gcoap_request_memo_t *memo)
             memo->resp_handler(memo->state, &req, NULL);
         }
         if (memo->send_limit != GCOAP_SEND_LIMIT_NON) {
+            gcoap_observe_memo_t *obs_memo = NULL;
+            coap_hdr_t *req_hdr = (coap_hdr_t *)memo->msg.data.pdu_buf;
+            unsigned token_len  = req_hdr->ver_t_tkl & 0xf;
+            uint8_t *token      = token_len > 0 ? &req_hdr->data[0] : NULL;
+
+            _find_obs_memo(&obs_memo, &memo->remote_ep, token, token_len);
+            if (obs_memo != NULL) {
+                _clear_obs_memo(obs_memo, &memo->remote_ep);
+            }
             *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
         }
         memo->state = GCOAP_MEMO_UNUSED;
@@ -621,7 +631,7 @@ static bool _endpoints_equal(const sock_udp_ep_t *ep1, const sock_udp_ep_t *ep2)
  * return Index of empty slot, suitable for registering new observer; or -1
  *        if no empty slots. Undefined if observer found.
  */
-static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote)
+static int _find_observer(sock_udp_ep_t **observer, const sock_udp_ep_t *remote)
 {
     int empty_slot = -1;
     *observer      = NULL;
@@ -649,7 +659,7 @@ static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote)
  * return Index of empty slot, suitable for registering new memo; or -1 if no
  *        empty slots. Undefined if memo found.
  */
-static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
+static int _find_obs_memo(gcoap_observe_memo_t **memo, const sock_udp_ep_t *remote,
                           uint8_t *token, int token_len)
 {
     int empty_slot = -1;
@@ -698,6 +708,26 @@ static void _find_obs_memo_resource(gcoap_observe_memo_t **memo,
                 && _coap_state.observe_memos[i].resource == resource) {
             *memo = &_coap_state.observe_memos[i];
             break;
+        }
+    }
+}
+
+/* Clear memo, and clear observer if no other memos. */
+static void _clear_obs_memo(gcoap_observe_memo_t *memo,
+                            const sock_udp_ep_t *remote)
+{
+    assert(memo != NULL);
+    sock_udp_ep_t *observer = NULL;
+
+    memo->observer = NULL;
+    DEBUG("gcoap: Deregistered observer for: %s\n", memo->resource->path);
+
+    memo = NULL;
+    _find_obs_memo(&memo, remote, NULL, -1);
+    if (memo == NULL) {
+        _find_observer(&observer, remote);
+        if (observer != NULL) {
+            observer->family = AF_UNSPEC;
         }
     }
 }
