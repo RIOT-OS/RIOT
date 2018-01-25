@@ -60,6 +60,9 @@ CFLAGS += -fno-common
 # Enable all default warnings
 CFLAGS += -Wall
 
+# Warn if a user-supplied include directory does not exist.
+CFLAGS += -Wmissing-include-dirs
+
 ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
   ifneq (1,$(FORCE_ASSERTS))
     CFLAGS += -DNDEBUG
