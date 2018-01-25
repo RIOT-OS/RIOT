@@ -2,6 +2,8 @@
  * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 Freie Universität Berlin
  *               2015 Engineering-Spirit
+ *               2017 Unwireddevices
+ *               2018 Inria Chile
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,7 +11,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32_common
+ * @ingroup     cpu_stm32l1
  * @ingroup     drivers_periph_pm
  * @{
  *
@@ -19,6 +21,8 @@
  * @author      Nick v. IJzendoorn <nijzndoorn@engineering-spirit.nl>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Fabian Nack <nack@inf.fu-berlin.de>
+ * @author      Oleg Artamonov <info@unwds.com>
+ * @author      Francisco Molina <francisco.molina@inria.cl>
  *
  * @}
  */
@@ -26,12 +30,6 @@
 #include "cpu.h"
 #include "stmclk.h"
 #include "periph/pm.h"
-#include "periph/uart.h"
-#include "uart_stdio.h"
-
-#ifdef MODULE_XTIMER
-#include "xtimer.h"
-#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -54,23 +52,10 @@ enum pm_mode {
 #define PM_STOP_CONFIG (PWR_CR_LPDS | PWR_CR_FPDS)
 #endif
 
-/* Select CPU clocking between default (PM_ON) and medium-speed (PM_IDLE) */
-static void pm_run_mode(void) {
-    stmclk_init_sysclk();
-
-#ifdef MODULE_XTIMER
-    /* Recalculate xtimer frequency */
-    /* NB: default XTIMER_HZ clock is 1 MHz, so CPU clock must be at least 1 MHz for xtimer to work properly */
-    xtimer_init();
-#endif
-
-    /* Recalculate stdio UART baudrate */
-    uart_set_baudrate(UART_STDIO_DEV, UART_STDIO_BAUDRATE);
-}
-
 void pm_set(unsigned mode)
 {
-    unsigned state;
+    unsigned state = 0;
+    int deep = 0;
 
     switch (mode) {
         case PM_OFF:             /* Stand by mode */
@@ -80,9 +65,6 @@ void pm_set(unsigned mode)
             /* Select STANDBY mode */
             PWR->CR |= PWR_CR_PDDS;
 
-            /* Set SLEEPDEEP bit of Cortex System Control Register */
-            SCB->SCR |= (uint32_t)SCB_SCR_SLEEPDEEP;
-
             /* Enable Ultra Low Power mode */
             PWR->CR |= PWR_CR_ULP;
 
@@ -91,11 +73,10 @@ void pm_set(unsigned mode)
             __force_stores();
             #endif
 
-            irq_disable();
+            state = irq_disable();
 
-            /* Request Wait For Interrupt */
-            __DSB();
-            __WFI();
+            /* Deep sleep cortexm_sleep */
+            deep = 1;
             break;
 
         case PM_POWERDOWN:             /* Stop mode */
@@ -111,17 +92,8 @@ void pm_set(unsigned mode)
 
             state = irq_disable();
 
-            /* Request Wait For Interrupt */
-            __DSB();
-            __WFI();
-
-            /* Clear SLEEPDEEP bit */
-            SCB->SCR &= (uint32_t) ~((uint32_t)SCB_SCR_SLEEPDEEP);
-
-            /* Restore clocks and PLL */
-            pm_run_mode();
-
-            irq_restore(state);
+            /* Deep sleep cortexm_sleep */
+            deep = 1;
             break;
 
         case PM_SLEEP:              /* Low-power sleep mode */
@@ -137,24 +109,28 @@ void pm_set(unsigned mode)
             /* Switch to 65kHz clock */
             stmclk_switch_msi(RCC_ICSCR_MSIRANGE_0, RCC_CFGR_HPRE_DIV1);
 
-            /* Request Wait For Interrupt */
-            __DSB();
-            __WFI();
-
-            /* Switch back to default speed */
-            pm_run_mode();
-
-            irq_restore(state);
+            /* Sleep cortexm_sleep */
+            deep = 0;
             break;
 
         default:
+            state = irq_disable();
             break;
     }
 
+    cortexm_sleep(deep);
+
+    /* Clear SLEEPDEEP bit */
+    SCB->SCR &= (uint32_t) ~((uint32_t)SCB_SCR_SLEEPDEEP);
+
+    /* Switch back to default speed */
+    stmclk_init_sysclk();
+
+    /* Restore irq state */
+    irq_restore(state);
 }
 
 void pm_off(void)
 {
-    irq_disable();
     pm_set(0);
 }
