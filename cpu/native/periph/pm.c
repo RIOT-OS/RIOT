@@ -29,6 +29,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#ifndef MODULE_PM_CUSTOM
 void pm_set_lowest(void)
 {
     _native_in_syscall++; // no switching here
@@ -40,6 +41,7 @@ void pm_set_lowest(void)
         _native_syscall_leave();
     }
 }
+#endif
 
 void pm_off(void)
 {
