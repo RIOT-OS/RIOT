@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f207 STM32 Nucleo144-F207
+ * @defgroup    boards_nucleo-f207zg STM32 Nucleo-F207ZG
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F207
+ * @brief       Support for the STM32 Nucleo-F207ZG
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo144-f207 board
+ * @name        Peripheral MCU configuration for the nucleo-f207zg board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Aurelien Gonce <aurelien.gonce@altran.fr>
