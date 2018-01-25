@@ -20,7 +20,7 @@ endif
 export CPU_MODEL
 
 # Default debug adapter choice is to use the Mulle programmer board
-export DEBUG_ADAPTER ?= mulle
+export DEBUG_ADAPTER ?= ftdi
 # Host OS name
 OS := $(shell uname)
 

@@ -11,6 +11,7 @@ export BAUD = 500000
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # this board uses openocd
+export DEBUG_ADAPTER ?= ftdi
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
 # add the common header files to the include path
