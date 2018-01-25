@@ -11,12 +11,15 @@ BOARD_GROUP.avr8 += \
   #
 
 BOARD_GROUP.cortexm += \
+  acd52832 \
   airfy-beacon \
   arduino-due \
   arduino-mkr1000 \
+  arduino-mkrfox1200 \
   arduino-mkrzero \
   arduino-zero \
   b-l072z-lrwan1 \
+  b-l475e-iot01a \
   bluepill \
   calliope-mini \
   cc2538dk \
@@ -28,6 +31,7 @@ BOARD_GROUP.cortexm += \
   fox \
   frdm-k22f \
   frdm-k64f \
+  ikea-tradfri \
   iotlab-a8-m3 \
   iotlab-m3 \
   limifrog-v1 \
@@ -77,6 +81,7 @@ BOARD_GROUP.cortexm += \
   remote-pa \
   remote-reva \
   remote-revb \
+  ruuvitag \
   samd21-xpro \
   saml21-xpro \
   samr21-xpro \
@@ -90,6 +95,8 @@ BOARD_GROUP.cortexm += \
   stm32f3discovery \
   stm32f4discovery \
   stm32f7discovery \
+  teensy31 \
+  thingy52 \
   udoo \
   yunjia-nrf51822 \
   #
