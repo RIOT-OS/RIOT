@@ -73,6 +73,10 @@ static inline int _pin_num(gpio_t pin)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
+    if (pin == GPIO_UNDEF) {
+        return -1;
+    }
+    
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);
 
@@ -105,6 +109,10 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
+    if (pin == GPIO_UNDEF) {
+        return -1;
+    }
+    
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
 
@@ -163,6 +171,10 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_init_af(gpio_t pin, gpio_af_t af)
 {
+    if (pin == GPIO_UNDEF) {
+        return;
+    }
+    
     GPIO_TypeDef *port = _port(pin);
     uint32_t pin_num = _pin_num(pin);
 
@@ -176,6 +188,10 @@ void gpio_init_af(gpio_t pin, gpio_af_t af)
 
 void gpio_init_analog(gpio_t pin)
 {
+    if (pin == GPIO_UNDEF) {
+        return;
+    }
+    
     /* enable clock, needed as this function can be used without calling
      * gpio_init first */
 #if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
@@ -193,16 +209,42 @@ void gpio_init_analog(gpio_t pin)
 
 void gpio_irq_enable(gpio_t pin)
 {
-    EXTI->IMR |= (1 << _pin_num(pin));
+    if (pin == GPIO_UNDEF) {
+        return;
+    }
+    
+    int pin_num = _pin_num(pin);
+    int port_num = _port_num(pin);
+    
+    /* check if IRQ is actually configured for this pin and port */
+    if (!((SYSCFG->EXTICR[pin_num >> 2] & (0xf << ((pin_num & 0x03) * 4))) ^
+       (port_num << ((pin_num & 0x03) * 4)))) {
+        EXTI->IMR &= ~(1 << pin_num);
+    }
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    EXTI->IMR &= ~(1 << _pin_num(pin));
+    if (pin == GPIO_UNDEF) {
+        return;
+    }
+    
+    int pin_num = _pin_num(pin);
+    int port_num = _port_num(pin);
+    
+    /* check if IRQ is actually configured for this pin and port */
+    if (!((SYSCFG->EXTICR[pin_num >> 2] & (0xf << ((pin_num & 0x03) * 4))) ^
+       (port_num << ((pin_num & 0x03) * 4)))) {
+        EXTI->IMR |= (1 << _pin_num(pin));
+    }
 }
 
 int gpio_read(gpio_t pin)
 {
+    if (pin == GPIO_UNDEF) {
+        return -1;
+    }
+    
     if (_port(pin)->MODER & (0x3 << (_pin_num(pin) * 2))) {
         return _port(pin)->ODR & (1 << _pin_num(pin));
     }
@@ -213,11 +255,19 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
+    if (pin == GPIO_UNDEF) {
+        return;
+    }
+    
     _port(pin)->BSRR = (1 << _pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
+    if (pin == GPIO_UNDEF) {
+        return;
+    }
+    
     _port(pin)->BSRR = (1 << (_pin_num(pin) + 16));
 }
 
