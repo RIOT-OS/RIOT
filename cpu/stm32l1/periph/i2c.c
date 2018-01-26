@@ -31,6 +31,7 @@
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
+#include "xtimer.h"
 
 
 #define ENABLE_DEBUG    (0)
@@ -38,10 +39,13 @@
 
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, int ccr);
-static void _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag);
+static int _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag);
 static inline void _clear_addr(I2C_TypeDef *i2c);
 static inline void _write(I2C_TypeDef *i2c, const uint8_t *data, int length);
 static inline void _stop(I2C_TypeDef *i2c);
+
+/* variable to store bus status */
+static volatile int i2c_bus_error = 0;
 
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
@@ -146,6 +150,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     unsigned int state;
     int i = 0;
+    int error = 0;
     uint8_t *my_data = data;
 
     if ((unsigned int)dev >= I2C_NUMOF) {
@@ -156,7 +161,10 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
     switch (length) {
         case 1:
             DEBUG("Send Slave address and wait for ADDR == 1\n");
-            _start(i2c, address, I2C_FLAG_READ);
+            error = _start(i2c, address, I2C_FLAG_READ);
+            if (error < 0) {
+                return error;
+            }
 
             DEBUG("Set ACK = 0\n");
             i2c->CR1 &= ~(I2C_CR1_ACK);
@@ -183,7 +191,10 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 
         case 2:
             DEBUG("Send Slave address and wait for ADDR == 1\n");
-            _start(i2c, address, I2C_FLAG_READ);
+            error = _start(i2c, address, I2C_FLAG_READ);
+            if (error < 0) {
+                return error;
+            }
             DEBUG("Set POS bit\n");
             i2c->CR1 |= (I2C_CR1_POS | I2C_CR1_ACK);
             DEBUG("Crit block: Clear ADDR bit and clear ACK flag\n");
@@ -216,7 +227,10 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 
         default:
             DEBUG("Send Slave address and wait for ADDR == 1\n");
-            _start(i2c, address, I2C_FLAG_READ);
+            error = _start(i2c, address, I2C_FLAG_READ);
+            if (error < 0) {
+                return error;
+            }
             _clear_addr(i2c);
 
             while (i < (length - 3)) {
@@ -277,7 +291,10 @@ int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int lengt
 
     /* send start condition and slave address */
     DEBUG("Send slave address and clear ADDR flag\n");
-    _start(i2c, address, I2C_FLAG_WRITE);
+    int error = _start(i2c, address, I2C_FLAG_WRITE);
+    if (error < 0) {
+        return error;
+    }
     _clear_addr(i2c);
     DEBUG("Write reg into DR\n");
     i2c->DR = reg;
@@ -301,7 +318,10 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 
     /* start transmission and send slave address */
     DEBUG("sending start sequence\n");
-    _start(i2c, address, I2C_FLAG_WRITE);
+    int error = _start(i2c, address, I2C_FLAG_WRITE);
+    if (error < 0) {
+        return error;
+    }
     _clear_addr(i2c);
     /* send out data bytes */
     _write(i2c, data, length);
@@ -326,7 +346,10 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
     I2C_TypeDef *i2c = i2c_config[dev].dev;
 
     /* start transmission and send slave address */
-    _start(i2c, address, I2C_FLAG_WRITE);
+    int error = _start(i2c, address, I2C_FLAG_WRITE);
+    if (error < 0) {
+        return error;
+    }
     _clear_addr(i2c);
     /* send register address and wait for complete transfer to be finished*/
     _write(i2c, &reg, 1);
@@ -353,12 +376,30 @@ void i2c_poweroff(i2c_t dev)
     }
 }
 
-static void _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag)
+static void _i2c_reset(I2C_TypeDef *i2c) {
+    DEBUG("I2C: Resetting the bus\n");           
+    
+    uint16_t ccr = i2c->CCR;
+
+    i2c->CR1 |= I2C_CR1_SWRST;
+    i2c->CR1 &= ~I2C_CR1_SWRST;           
+    
+    _i2c_init(i2c, ccr);
+}
+
+static int _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag)
 {
     /* wait for device to be ready */
     DEBUG("Wait for device to be ready\n");
 
-    while (i2c->SR2 & I2C_SR2_BUSY) {}
+    uint32_t time_now = xtimer_now_usec();
+    while (i2c->SR2 & I2C_SR2_BUSY) {
+        /* 100 ms timeout */
+        if (xtimer_now_usec() - time_now > 100000) {
+            DEBUG("Timeout waiting for device, resetting the bus\n");
+            _i2c_reset(i2c);
+        }
+    }
 
     /* generate start condition */
     DEBUG("Generate start condition\n");
@@ -373,7 +414,17 @@ static void _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag)
     /* clear ADDR flag by reading first SR1 and then SR2 */
     DEBUG("Wait for ADDR flag to be set\n");
 
-    while (!(i2c->SR1 & I2C_SR1_ADDR)) {}
+    i2c_bus_error = 0;
+    while (!(i2c->SR1 & I2C_SR1_ADDR)) {
+        /* i2c_bus_error set by I2C IRQ handler */
+        if (i2c_bus_error) {
+            /* reset I2C bus */
+            _i2c_reset(i2c);
+            return -1;
+        }
+    }
+    
+    return 0;
 }
 
 static inline void _clear_addr(I2C_TypeDef *i2c)
@@ -417,27 +468,33 @@ void I2C_0_ERR_ISR(void)
     DEBUG("\n\n### I2C1 ERROR OCCURED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
+        i2c_bus_error = -1;
         DEBUG("OVR\n");
     }
     if (state & I2C_SR1_AF) {
-        DEBUG("AF\n");
+        i2c_bus_error = -2;
+        DEBUG("AF (NACK)\n");
     }
     if (state & I2C_SR1_ARLO) {
+        i2c_bus_error = -3;
         DEBUG("ARLO\n");
     }
     if (state & I2C_SR1_BERR) {
+        i2c_bus_error = -4;
         DEBUG("BERR\n");
     }
     if (state & I2C_SR1_PECERR) {
+        i2c_bus_error = -5;
         DEBUG("PECERR\n");
     }
     if (state & I2C_SR1_TIMEOUT) {
+        i2c_bus_error = -6;
         DEBUG("TIMEOUT\n");
     }
     if (state & I2C_SR1_SMBALERT) {
+        i2c_bus_error = -7;
         DEBUG("SMBALERT\n");
     }
-    while (1) {}
 }
 #endif /* I2C_0_EN */
 
@@ -448,26 +505,32 @@ void I2C_1_ERR_ISR(void)
     DEBUG("\n\n### I2C2 ERROR OCCURED ###\n");
     DEBUG("status: %08x\n", state);
     if (state & I2C_SR1_OVR) {
+        i2c_bus_error = -1;
         DEBUG("OVR\n");
     }
     if (state & I2C_SR1_AF) {
-        DEBUG("AF\n");
+        i2c_bus_error = -2;
+        DEBUG("AF (NACK)\n");
     }
     if (state & I2C_SR1_ARLO) {
+        i2c_bus_error = -3;
         DEBUG("ARLO\n");
     }
     if (state & I2C_SR1_BERR) {
+        i2c_bus_error = -4;
         DEBUG("BERR\n");
     }
     if (state & I2C_SR1_PECERR) {
+        i2c_bus_error = -5;
         DEBUG("PECERR\n");
     }
     if (state & I2C_SR1_TIMEOUT) {
+        i2c_bus_error = -6;
         DEBUG("TIMEOUT\n");
     }
     if (state & I2C_SR1_SMBALERT) {
+        i2c_bus_error = -7;
         DEBUG("SMBALERT\n");
     }
-    while (1) {}
 }
 #endif /* I2C_1_EN */
