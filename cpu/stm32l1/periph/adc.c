@@ -31,6 +31,28 @@
 #define MAX_ADC_SPEED           (12000000U)
 
 /**
+ * @brief   ADC clock settings
+ *
+ * NB: with ADC_CLOCK_HIGH, Vdda should be 2.4V min
+ *
+ */
+#define ADC_CLOCK_HIGH      (0)
+#define ADC_CLOCK_MEDIUM    (ADC_CCR_ADCPRE_0)
+#define ADC_CLOCK_LOW       (ADC_CCR_ADCPRE_1)
+
+/**
+ * @brief   ADC sample time, cycles
+ */
+#define ADC_SAMPLE_TIME_4C    (0)
+#define ADC_SAMPLE_TIME_9C    (1)
+#define ADC_SAMPLE_TIME_16C   (2)
+#define ADC_SAMPLE_TIME_24C   (3)
+#define ADC_SAMPLE_TIME_48C   (4)
+#define ADC_SAMPLE_TIME_96C   (5)
+#define ADC_SAMPLE_TIME_192C  (6)
+#define ADC_SAMPLE_TIME_384C  (7)
+
+/**
  * @brief   Load the ADC configuration
  */
 static const adc_conf_t adc_config[] = ADC_CONFIG;
@@ -45,6 +67,14 @@ static mutex_t lock = MUTEX_INIT;
 static inline void prep(void)
 {
     mutex_lock(&lock);
+
+    /* ADC clock is always HSI clock */
+    if (!(RCC->CR & RCC_CR_HSION)) {
+        RCC->CR |= RCC_CR_HSION;
+        /* Wait for HSI to become ready */
+        while (!(RCC->CR & RCC_CR_HSION)) {}
+    }
+
     RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
 }
 
@@ -54,10 +84,25 @@ static inline void done(void)
     mutex_unlock(&lock);
 }
 
+static void adc_set_sample_time(uint8_t time)
+{
+    uint8_t i;
+    uint32_t reg32 = 0;
+
+    for (i = 0; i <= 9; i++) {
+        reg32 |= (time << (i * 3));
+    }
+
+#if !defined STM32L1XX_MD
+    ADC1->SMPR0 = reg32;
+#endif
+    ADC1->SMPR1 = reg32;
+    ADC1->SMPR2 = reg32;
+    ADC1->SMPR3 = reg32;
+}
+
 int adc_init(adc_t line)
 {
-    uint32_t clk_div = 2;
-
     /* check if the line is valid */
     if (line >= ADC_NUMOF) {
         return -1;
@@ -70,14 +115,25 @@ int adc_init(adc_t line)
     if ((adc_config[line].pin != GPIO_UNDEF))
         gpio_init_analog(adc_config[line].pin);
 
-    /* set clock prescaler to get the maximal possible ADC clock value */
-    for (clk_div = 2; clk_div < 8; clk_div += 2) {
-        if ((CLOCK_CORECLOCK / clk_div) <= MAX_ADC_SPEED) {
-            break;
-        }
-    }
+    /* set ADC clock prescaler */
+    ADC->CCR &= ~ADC_CCR_ADCPRE;
+    ADC->CCR |= ADC_CLOCK_MEDIUM;
 
-    ADC->CCR = ((clk_div / 2) - 1) << 16;
+    /* Set sample time */
+    /* Min 4us needed for temperature sensor measurements */
+    switch (ADC->CCR & ADC_CCR_ADCPRE) {
+        case ADC_CLOCK_LOW:
+            /* 4 MHz ADC clock -> 16 cycles */
+            adc_set_sample_time(ADC_SAMPLE_TIME_16C);
+            break;
+        case ADC_CLOCK_MEDIUM:
+            /* 8 MHz ADC clock -> 48 cycles */
+            adc_set_sample_time(ADC_SAMPLE_TIME_48C);
+            break;
+        default:
+            /* 16 MHz ADC clock -> 96 cycles */
+            adc_set_sample_time(ADC_SAMPLE_TIME_96C);
+    }
 
     /* check if this channel is an internal ADC channel, if so
      * enable the internal temperature and Vref */
