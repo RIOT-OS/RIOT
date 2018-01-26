@@ -39,10 +39,10 @@ extern "C" {
  * @name SIGFOX constants
  * @{
  */
-#define SIGFOX_PAC_LENGTH    (16U) /**< Length of Sigfox PAC */
-#define SIGFOX_ID_LENGTH     (8U)  /**< Length of Sigfox ID */
-#define SIGFOX_MAX_TX_LENGTH (12U) /**< Maximum length of a TX payload */
-#define SIGFOX_RX_LENGTH     (8U)  /**< RX payload length is always 8 */
+#define SIGFOX_PAC_LENGTH    (16U)  /**< Length of Sigfox PAC */
+#define SIGFOX_ID_LENGTH     (8U)   /**< Length of Sigfox ID */
+#define SIGFOX_MAX_TX_LENGTH (12U)  /**< Maximum length of a TX payload */
+#define SIGFOX_RX_LENGTH     (8U)   /**< RX payload length is always 8 */
 /** @} */
 
 /**
@@ -82,14 +82,14 @@ typedef enum {
  * See ATA8520E datasheet, section 2.1.2.10, page 12
  */
 typedef enum {
-    ATA8520E_ATMEL_OK,                       /**< No error */
-    ATA8520E_ATMEL_COMMAND_ERROR,            /**< Command error / not supported */
-    ATA8520E_ATMEL_GENERIC_ERROR,            /**< Generic error */
-    ATA8520E_ATMEL_FREQUENCY_ERROR,          /**< Frequency error */
-    ATA8520E_ATMEL_USAGE_ERROR,              /**< Usage error */
-    ATA8520E_ATMEL_OPENING_ERROR,            /**< Opening error */
-    ATA8520E_ATMEL_CLOSING_ERROR,            /**< Closing error */
-    ATA8520E_ATMEL_SEND_ERROR                /**< Send error */
+    ATA8520E_ATMEL_OK,                      /**< No error */
+    ATA8520E_ATMEL_COMMAND_ERROR,           /**< Command error / not supported */
+    ATA8520E_ATMEL_GENERIC_ERROR,           /**< Generic error */
+    ATA8520E_ATMEL_FREQUENCY_ERROR,         /**< Frequency error */
+    ATA8520E_ATMEL_USAGE_ERROR,             /**< Usage error */
+    ATA8520E_ATMEL_OPENING_ERROR,           /**< Opening error */
+    ATA8520E_ATMEL_CLOSING_ERROR,           /**< Closing error */
+    ATA8520E_ATMEL_SEND_ERROR               /**< Send error */
 } ata8520e_atmel_status_t;
 
 /**
@@ -144,8 +144,8 @@ typedef struct {
  * This will also initialize the CS pin as a GPIO output, without pull resistors
  * and the interrupt pin handler to manage events.
  *
- * @param[out] dev                Pointer to device descriptor
- * @param[in]  params             Pointer to SPI settings
+ * @param[out] dev          Pointer to device descriptor
+ * @param[in]  params       Pointer to SPI settings
  *
  * @return  ATA8520E_OK on success
  * @return -ATA8520E_ERR_SPI on SPI initialization error
@@ -158,43 +158,43 @@ int ata8520e_init(ata8520e_t *dev, const ata8520e_params_t *params);
 /**
  * @brief Perform a complete reset of the device
  *
- * @param[in] dev                 Pointer to device descriptor
+ * @param[in] dev           Pointer to device descriptor
  */
 void ata8520e_system_reset(const ata8520e_t *dev);
 
 /**
  * @brief Return the Atmel version of the device
  *
- * @param[in] dev                 Pointer to device descriptor
- * @param[out] version            Pointer to the string containing the version,
- *                                must be able to hold 2 characters
+ * @param[in]  dev          Pointer to device descriptor
+ * @param[out] version      Pointer to the string containing the version, must
+ *                          be able to hold 2 characters
  */
 void ata8520e_read_atmel_version(const ata8520e_t *dev, uint8_t *version);
 
 /**
  * @brief Return the Atmel version of the device
  *
- * @param[in] dev                 Pointer to device descriptor
- * @param[out] version            String containing the version, must be able to
- *                                hold 11 characters
+ * @param[in]  dev          Pointer to device descriptor
+ * @param[out] version      String containing the version, must be able to hold
+ *                          11 characters
  */
 void ata8520e_read_sigfox_version(const ata8520e_t *dev, char *version);
 
 /**
  * @brief Return the porting authorization code (PAC) available in the device
  *
- * @param[in] dev                 Pointer to device descriptor
- * @param[out] pac                String containing the pac, must be able to
- *                                hold 17 characters
+ * @param[in]  dev          Pointer to device descriptor
+ * @param[out] pac          String containing the pac, must be able to hold 17
+ *                          characters
  */
 void ata8520e_read_pac(const ata8520e_t *dev, char *pac);
 
 /**
  * @brief Return the ID of the device
  *
- * @param[in] dev                 Pointer to device descriptor
- * @param[out] id                 String containing the ID, must be able to hold
- *                                9 characters
+ * @param[in]  dev          Pointer to device descriptor
+ * @param[out] id           String containing the ID, must be able to hold 9
+ *                          characters
  */
 void ata8520e_read_id(const ata8520e_t *dev, char *id);
 
@@ -203,16 +203,16 @@ void ata8520e_read_id(const ata8520e_t *dev, char *id);
  *
  * Calling this function clears the system event line.
  *
- * @param[in] dev                 Pointer to device descriptor
+ * @param[in] dev           Pointer to device descriptor
  */
 void ata8520e_status(const ata8520e_t *dev);
 
 /**
  * @brief Send a frame
  *
- * @param[in] dev                 Pointer to device descriptor
- * @param[in] payload             The payload to send
- * @param[in] payload_len         The length of the payload to send
+ * @param[in] dev           Pointer to device descriptor
+ * @param[in] payload       The payload to send
+ * @param[in] payload_len   The length of the payload to send
  *
  * @return  ATA8520E_OK if the send was successful
  * @return -ATA8520E_ERR_EVENT_TIMEOUT if the send failed
@@ -222,10 +222,10 @@ int ata8520e_send_frame(ata8520e_t *dev, uint8_t *payload, uint8_t payload_len);
 /**
  * @brief Send a frame and wait for a RX packet
  *
- * @param[in] dev                 Pointer to device descriptor
- * @param[in] payload             The payload to send
- * @param[in] payload_len         The length of the payload to send
- * @param[out] rx_payload         The payload received
+ * @param[in]  dev          Pointer to device descriptor
+ * @param[in]  payload      The payload to send
+ * @param[in]  payload_len  The length of the payload to send
+ * @param[out] rx_payload   The payload received
  *
  * @return  ATA8520E_OK if the send was successful
  * @return -ATA8520E_ERR_EVENT_TIMEOUT if the send failed
@@ -236,8 +236,8 @@ int ata8520e_send_receive_frame(ata8520e_t *dev, uint8_t *payload,
 /**
  * @brief Send a bit
  *
- * @param[in] dev                 Pointer to device descriptor
- * @param[in] bit                 The bit to send
+ * @param[in] dev           Pointer to device descriptor
+ * @param[in] bit           The bit to send
  *
  * @return  ATA8520E_OK if the send was successful
  * @return -ATA8520E_ERR_EVENT_TIMEOUT if the send failed
