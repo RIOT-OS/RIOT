@@ -29,12 +29,15 @@
 #include "ringbuffer.h"
 #include "periph/uart.h"
 #include "uart_stdio.h"
+#include "xtimer.h"
 
 #define SHELL_BUFSIZE       (128U)
 #define UART_BUFSIZE        (128U)
 
 #define PRINTER_PRIO        (THREAD_PRIORITY_MAIN - 1)
 #define PRINTER_TYPE        (0xabcd)
+
+#define POWEROFF_DELAY      (250U * US_PER_MS)      /* quarter of a second */
 
 #ifndef UART_STDIO_DEV
 #define UART_STDIO_DEV      (UART_UNDEF)
@@ -107,6 +110,15 @@ static void *printer(void *arg)
     return NULL;
 }
 
+static void sleep_test(int num, uart_t uart)
+{
+    printf("UARD_DEV(%i): test uart_poweron() and uart_poweroff()  ->  ", num);
+    uart_poweroff(uart);
+    xtimer_usleep(POWEROFF_DELAY);
+    uart_poweron(uart);
+    puts("[OK]");
+}
+
 static int cmd_init(int argc, char **argv)
 {
     int dev, res;
@@ -134,6 +146,11 @@ static int cmd_init(int argc, char **argv)
         return 1;
     }
     printf("Successfully initialized UART_DEV(%i)\n", dev);
+
+    /* also test if poweron() and poweroff() work (or at least don't break
+     * anything) */
+    sleep_test(dev, UART_DEV(dev));
+
     return 0;
 }
 
@@ -178,7 +195,13 @@ int main(void)
          "being printed to STDOUT\n\n"
          "NOTE: all strings need to be '\\n' terminated!\n");
 
-    puts("UART INFO:");
+    /* do sleep test for UART used as STDIO. There is a possibility that the
+     * value given in UART_STDIO_DEV is not a numeral (depends on the CPU
+     * implementation), so we rather break the output by printing a
+     * non-numerical value instead of breaking the UART device descriptor */
+    sleep_test(UART_STDIO_DEV, UART_STDIO_DEV);
+
+    puts("\nUART INFO:");
     printf("Available devices:               %i\n", UART_NUMOF);
     printf("UART used for STDIO (the shell): UART_DEV(%i)\n\n", UART_STDIO_DEV);
 
