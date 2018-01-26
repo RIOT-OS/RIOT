@@ -196,6 +196,12 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
             if ((netif == NULL) ||
                 !_resolve_addr(dst, netif, pkt, nce, node)) {
                 DEBUG("nib: host unreachable\n");
+                /* _resolve_addr releases pkt only if not queued (in which case
+                 * we also shouldn't release), but if netif is not defined we
+                 * should release in any case. */
+                if (netif == NULL) {
+                    gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
+                }
                 res = -EHOSTUNREACH;
                 break;
             }
@@ -217,6 +223,7 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                 }
                 else {
                     res = -ENETUNREACH;
+                    gnrc_pktbuf_release_error(pkt, ENETUNREACH);
                     break;
                 }
             }
@@ -241,6 +248,8 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
 #endif  /* GNRC_IPV6_NIB_CONF_DC */
             }
             else {
+                /* _resolve_addr releases pkt if not queued (in which case
+                 * we also shouldn't release */
                 res = -EHOSTUNREACH;
             }
         }
