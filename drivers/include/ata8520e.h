@@ -166,7 +166,8 @@ void ata8520e_system_reset(const ata8520e_t *dev);
  * @brief Return the Atmel version of the device
  *
  * @param[in] dev                 Pointer to device descriptor
- * @param[out] version            Pointer to the string containing the version
+ * @param[out] version            Pointer to the string containing the version,
+ *                                must be able to hold 2 characters
  */
 void ata8520e_read_atmel_version(const ata8520e_t *dev, uint8_t *version);
 
@@ -174,8 +175,8 @@ void ata8520e_read_atmel_version(const ata8520e_t *dev, uint8_t *version);
  * @brief Return the Atmel version of the device
  *
  * @param[in] dev                 Pointer to device descriptor
- * @param[out] version            String containing the version.
- *                                The version contains 11 characters.
+ * @param[out] version            String containing the version, must be able to
+ *                                hold 11 characters
  */
 void ata8520e_read_sigfox_version(const ata8520e_t *dev, char *version);
 
@@ -183,7 +184,8 @@ void ata8520e_read_sigfox_version(const ata8520e_t *dev, char *version);
  * @brief Return the porting authorization code (PAC) available in the device
  *
  * @param[in] dev                 Pointer to device descriptor
- * @param[out] pac                String containing the pac
+ * @param[out] pac                String containing the pac, must be able to
+ *                                hold 17 characters
  */
 void ata8520e_read_pac(const ata8520e_t *dev, char *pac);
 
@@ -191,7 +193,8 @@ void ata8520e_read_pac(const ata8520e_t *dev, char *pac);
  * @brief Return the ID of the device
  *
  * @param[in] dev                 Pointer to device descriptor
- * @param[out] id                 String containing the ID
+ * @param[out] id                 String containing the ID, must be able to hold
+ *                                9 characters
  */
 void ata8520e_read_id(const ata8520e_t *dev, char *id);
 
