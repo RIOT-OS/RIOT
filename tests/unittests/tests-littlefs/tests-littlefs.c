@@ -31,13 +31,13 @@
 #else
 /* Test mock object implementing a simple RAM-based mtd */
 #ifndef SECTOR_COUNT
-#define SECTOR_COUNT 4
+#define SECTOR_COUNT 16
 #endif
 #ifndef PAGE_PER_SECTOR
-#define PAGE_PER_SECTOR 8
+#define PAGE_PER_SECTOR 4
 #endif
 #ifndef PAGE_SIZE
-#define PAGE_SIZE 128
+#define PAGE_SIZE 64
 #endif
 
 static uint8_t dummy_memory[PAGE_PER_SECTOR * PAGE_SIZE * SECTOR_COUNT];
