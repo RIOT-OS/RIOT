@@ -8,8 +8,8 @@
 #undef NO_MAIN_DRIVER
 #define NO_MAIN_DRIVER
 
-#undef HAVE_ECC
-#define HAVE_ECC
+//#undef HAVE_ECC
+//#define HAVE_ECC
 
 #undef TFM_TIMING_RESISTANT
 #define TFM_TIMING_RESISTANT
@@ -20,5 +20,11 @@
 #undef WC_RSA_BLINDING
 #define WC_RSA_BLINDING
 
-#undef BENCH_EMBEDDED
-#define BENCH_EMBEDDED
+#undef SINGLE_THREADED
+#define SINGLE_THREADED
+
+#undef NO_FILESYSTEM
+#define NO_FILESYSTEM
+
+#undef WOLFCRYPT_ONLY
+#define WOLFCRYPT_ONLY

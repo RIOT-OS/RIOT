@@ -42,15 +42,11 @@
 
 /* wolfSSL */
 #include <wolfssl/ssl.h>
+#include <wolfssl/certs_test.h>
 
 #define DEFAULT_PORT 11111
 
-#define CERT_FILE "certs/server-cert.pem"
-#define KEY_FILE  "certs/server-key.pem"
-
-
-
-int main()
+int main(void)
 {
     int                sockfd;
     int                connd;
@@ -113,18 +109,18 @@ int main()
     }
 
     /* Load server certificates into WOLFSSL_CTX */
-    if (wolfSSL_CTX_use_certificate_file(ctx, CERT_FILE, SSL_FILETYPE_PEM)
-        != SSL_SUCCESS) {
-        fprintf(stderr, "ERROR: failed to load %s, please check the file.\n",
-                CERT_FILE);
+    if (wolfSSL_CTX_use_certificate_buffer(ctx, server_cert_der_2048,
+                                         sizeof_server_cert_der_2048,
+                                         SSL_FILETYPE_ASN1) != SSL_SUCCESS) {
+        fprintf(stderr, "ERROR: failed to load server_cert_der_2048\n");
         return -1;
     }
 
     /* Load server key into WOLFSSL_CTX */
-    if (wolfSSL_CTX_use_PrivateKey_file(ctx, KEY_FILE, SSL_FILETYPE_PEM)
-        != SSL_SUCCESS) {
-        fprintf(stderr, "ERROR: failed to load %s, please check the file.\n",
-                KEY_FILE);
+    if (wolfSSL_CTX_use_PrivateKey_buffer(ctx, server_key_der_2048,
+                                        sizeof_server_key_der_2048,
+                                        SSL_FILETYPE_ASN1) != SSL_SUCCESS) {
+        fprintf(stderr, "ERROR: failed to load server_key_der_2048\n");
         return -1;
     }
 

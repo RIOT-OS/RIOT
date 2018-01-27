@@ -1,5 +1,5 @@
 /**
- * @defgroup pkg "wolfssl"   Embedded SSL/TLS library
+ * @defgroup pkg_wolfssl  Embedded SSL/TLS library
  * @ingroup  pkg
  * @ingroup  sys
  * @brief    Provides SSL/TLS solution
