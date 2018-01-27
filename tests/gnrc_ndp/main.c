@@ -998,6 +998,14 @@ static const gnrc_netif_ops_t _test_netif_ops = {
     .set = _test_netif_set,
 };
 
+int _netdev_test_device_type_get(netdev_t *dev, void *value, size_t max_len)
+{
+    (void)dev;
+     assert(max_len == sizeof(uint16_t));
+     *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
+     return sizeof(uint16_t);
+}
+
 static void init_pkt_handler(void)
 {
     msg_init_queue(msg_queue_main, MSG_QUEUE_SIZE);
@@ -1005,6 +1013,7 @@ static void init_pkt_handler(void)
                                sched_active_pid);
     gnrc_netreg_register(GNRC_NETTYPE_NDP, &netreg_entry);
     netdev_test_setup(&dev, NULL);
+    netdev_test_set_get_cb(&dev, NETOPT_DEVICE_TYPE, _netdev_test_device_type_get);
     test_netif = gnrc_netif_create(test_netif_stack, sizeof(test_netif_stack),
                                    GNRC_NETIF_PRIO, "test-netif",
                                    &dev.netdev, &_test_netif_ops);
