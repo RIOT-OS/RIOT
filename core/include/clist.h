@@ -27,6 +27,7 @@
  * clist_find()         | O(n)    | find and return node
  * clist_find_before()  | O(n)    | find node return node pointing to node
  * clist_remove()       | O(n)    | remove and return node
+ * clist_sort()         | O(NlogN)| sort list (stable)
  *
  * clist can be used as a traditional list, a queue (FIFO) and a stack (LIFO) using
  * fast O(1) operations.
@@ -116,7 +117,6 @@ static inline void clist_rpush(clist_node_t *list, clist_node_t *new_node)
     }
     list->next = new_node;
 }
-
 
 /**
  * @brief Inserts *new_node* at the beginning of *list
@@ -322,13 +322,16 @@ static inline clist_node_t *clist_remove(clist_node_t *list, clist_node_t *node)
 /**
  * @brief Traverse clist, call function for each member
  *
+ * The pointer supplied by @p arg will be passed to every call to @p func.
+ *
  * If @p func returns non-zero, traversal will be aborted like when calling
  * break within a for loop.
  *
  * @param[in]       list        List to traverse.
  * @param[in]       func        Function to call for each member.
+ * @param[in]       arg         Pointer to pass to every call to @p func
  */
-static inline void clist_foreach(clist_node_t *list, int(*func)(clist_node_t *))
+static inline void clist_foreach(clist_node_t *list, int(*func)(clist_node_t *, void *), void *arg)
 {
     clist_node_t *node = list->next;
     if (! node) {
@@ -336,10 +339,77 @@ static inline void clist_foreach(clist_node_t *list, int(*func)(clist_node_t *))
     }
     do {
         node = node->next;
-        if (func(node)) {
+        if (func(node, arg)) {
             return;
         }
     } while (node != list->next);
+}
+
+/**
+ * @brief Typedef for comparison function used by @ref clist_sort()
+ *
+ */
+typedef int (*clist_cmp_func_t)(clist_node_t *a, clist_node_t *b);
+
+/**
+ * @brief   List sorting helper function
+ *
+ * @internal
+ *
+ * @param[in]   list    ptr to first element of list
+ * @param[in]   cmp     comparison function
+ *
+ * @returns     ptr to *last* element in list
+ */
+clist_node_t *_clist_sort(clist_node_t *list_head, clist_cmp_func_t cmp);
+
+/**
+ * @brief   Sort a list
+ *
+ * This function will sort @p list using merge sort.
+ * The sorting algorithm runs in O(N log N) time. It is also stable.
+ *
+ * Apart from the to-be-sorted list, the function needs a comparison function.
+ * That function will be called by the sorting implementation for every
+ * comparison.  It gets two pointers a, b of type "clist_node_t" as parameters
+ * and must return
+ * <0, 0 or >0 if a is lesser, equal or larger than b.
+ *
+ * Example:
+ *
+ *     typedef struct {
+ *         clist_node_t next;
+ *         uint32_t value;
+ *     } mylist_node_t;
+ *
+ *     int _cmp(clist_node_t *a, clist_node_t *b)
+ *     {
+ *         uint32_t a_val = ((mylist_node_t *)a)->value;
+ *         uint32_t b_val = ((mylist_node_t *)b)->value;
+ *
+ *         if (a_val < b_val) {
+ *             return -1;
+ *         }
+ *         else if (a_val > b_val) {
+ *             return 1;
+ *         }
+ *         else {
+ *             return 0;
+ *         }
+ *     }
+ *
+ *     ...
+ *
+ *     clist_sort(list, _cmp);
+ *
+ * @param[in,out]   list    List to sort
+ * @param[in]       cmp     Comparison function
+ */
+static inline void clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
+{
+    if (list->next) {
+        list->next = _clist_sort(list->next->next, cmp);
+    }
 }
 
 #ifdef __cplusplus

@@ -61,3 +61,8 @@ your host system and use the VM for compiling, flashing devices and running the 
    ```
    config.vm.network "forwarded_port", guest: <port_1>, host: <port_2>
    ```
+
+## Quirks
+* Windows
+  * For some Git Bash and Vagrant versions the prompt is not displayed on `vagrant ssh`.
+    In this case, the Windows command line should be used to invoke `vagrant ssh`.

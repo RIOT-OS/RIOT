@@ -11,7 +11,7 @@
 /**
  * @defgroup    boards_mips-malta MIPS MALTA
  * @ingroup     boards
- * @brief       Board specific files for the MIPS Malta FPGA system
+ * @brief       Support for the MIPS Malta FPGA system
  * @{
  *
  * @file
@@ -34,7 +34,7 @@ extern "C" {
 #define TICKS_PER_US (15)
 
 /**
- * @brief       Board level initialisation
+ * @brief       Board level initialization
  */
 void board_init(void);
 

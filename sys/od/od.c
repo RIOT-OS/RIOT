@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <ctype.h>
 
 #include "fmt.h"
 
@@ -26,13 +27,32 @@ void od_hex_dump(const void *data, size_t data_len, uint8_t width)
     if (width == 0) {
         width = OD_WIDTH_DEFAULT;
     }
-
+#if MODULE_OD_STRING
+    uint8_t str_pos = 0;
+#endif
     for (unsigned int i = 0; i < data_len; i++) {
         print_str("  ");
         print_byte_hex(((uint8_t *)data)[i]);
 
         if ((((i + 1) % width) == 0) || i == (data_len - 1)) {
-            puts("");
+#if MODULE_OD_STRING
+            /* fill in whitespace for incomplete hex lines */
+            for (unsigned j = i; ((j + 1) % width) != 0; ++j) {
+                print_str("    ");
+            }
+            print_str("  ");
+            for(unsigned k = 0; k < (i % width) + 1; k++){
+                if(isprint(((char *)data)[str_pos+k])){
+                    putchar(((char *)data)[str_pos+k]);
+                }
+                else{
+                    putchar('.');
+                }
+            }
+            /* safe position for next iteration */
+            str_pos = i + 1;
+#endif
+            putchar('\n');
 
             if (i != (data_len - 1)) {
                 print_u32_hex((uint32_t)(i + 1));

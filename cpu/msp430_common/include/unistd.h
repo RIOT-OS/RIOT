@@ -7,6 +7,14 @@
  * directory for more details.
  */
 
+/**
+ * @ingroup     cpu_msp430_common
+ * @{
+ *
+ * @file
+ * @brief       unistd.h wrapper for MSP430
+ */
+
 #ifndef UNISTD_H
 #define UNISTD_H
 
@@ -108,3 +116,4 @@ ssize_t      write(int, const void *, size_t);
 #endif
 
 #endif /* UNISTD_H */
+/** @} */

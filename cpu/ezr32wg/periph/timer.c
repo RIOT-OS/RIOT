@@ -83,18 +83,11 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    unsigned int now = timer_read(dev);
-    timer_set_absolute(dev, channel, now + timeout);
-    return 0;
-}
-
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
     TIMER_TypeDef *tim;
 
-    if (channel < 0 || channel >= CC_CHANNELS) {
+    if ((channel < 0) || (channel >= (int)CC_CHANNELS)) {
         return -1;
     }
 
@@ -106,7 +99,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    if (channel < 0 || channel >= CC_CHANNELS) {
+    if ((channel < 0) || (channel >= (int)CC_CHANNELS)) {
         return -1;
     }
 
@@ -138,7 +131,7 @@ void timer_reset(tim_t dev)
 void TIMER_0_ISR(void)
 {
     TIMER_TypeDef *tim = timer_config[0].timer;
-    for (int i = 0; i < CC_CHANNELS; i++) {
+    for (unsigned i = 0; i < CC_CHANNELS; i++) {
         if (tim->IF & (TIMER_IF_CC0 << i)) {
             tim->CC[i].CTRL = _TIMER_CC_CTRL_MODE_OFF;
             tim->IFC = (TIMER_IFC_CC0 << i);

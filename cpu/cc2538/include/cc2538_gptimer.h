@@ -162,6 +162,11 @@ typedef struct {
     cc2538_reg_t RESERVED4[15];             /**< Reserved */
 } cc2538_gptimer_t;
 
+/**
+ * @brief   Base address of general-purpose timers (GPT)
+ */
+#define GPTIMER_BASE    (0x40030000)
+
 #define GPTIMER0 ( (cc2538_gptimer_t*)0x40030000 )       /**< GPTIMER0 Instance */
 #define GPTIMER1 ( (cc2538_gptimer_t*)0x40031000 )       /**< GPTIMER1 Instance */
 #define GPTIMER2 ( (cc2538_gptimer_t*)0x40032000 )       /**< GPTIMER2 Instance */

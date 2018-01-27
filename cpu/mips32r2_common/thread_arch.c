@@ -60,7 +60,7 @@ static struct fp64ctx *oldfpctx;       /* fpu context of last task that executed
  *     ---------------   <--- sched_active_thread->sp
  */
 
-char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
+char *thread_stack_init(thread_task_func_t task_func, void *arg,
                              void *stack_start, int stack_size)
 {
     /* make sure it is aligned to 8 bytes this is a requirement of the O32 ABI */
@@ -106,7 +106,7 @@ char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
     return (void *)p;
 }
 
-void thread_arch_stack_print(void)
+void thread_stack_print(void)
 {
     uintptr_t *sp = (void *)sched_active_thread->sp;
 
@@ -118,7 +118,7 @@ void thread_arch_stack_print(void)
 }
 
 extern void __exception_restore(void);
-void thread_arch_start_threading(void)
+void cpu_switch_context_exit(void)
 {
     unsigned int status = mips32_get_c0(C0_STATUS);
 
@@ -140,7 +140,7 @@ void thread_arch_start_threading(void)
     UNREACHABLE();
 }
 
-void thread_arch_yield(void)
+void thread_yield_higher(void)
 {
     /*
      * throw a syscall exception to get into exception level
@@ -165,7 +165,11 @@ struct linkctx* exctx_find(reg_t id, struct gpctx *gp)
 }
 
 /* unaligned access helper */
-static inline uint32_t __attribute__((optimize("-O3")))
+static inline uint32_t
+#ifndef __clang__
+/* Clang does not support attribute optimize */
+__attribute__((optimize("-O3")))
+#endif
 mem_rw(const void *vaddr)
 {
     uint32_t v;
@@ -213,11 +217,11 @@ _mips_handle_exception(struct gpctx *ctx, int exception)
             if (syscall_num == __MIPS_UHI_SYSCALL_NUM) {
                 if (ctx->t2[1] == __MIPS_UHI_WRITE &&
                     (ctx->a[0] == STDOUT_FILENO || ctx->a[0] == STDERR_FILENO)) {
-                    uint32_t status = irq_arch_disable();
+                    uint32_t status = irq_disable();
                     uart_write(DEBUG_VIA_UART, (uint8_t *)ctx->a[1], ctx->a[2]);
                     ctx->v[0] = ctx->a[2];
                     ctx->epc += 4; /* move PC past the syscall */
-                    irq_arch_restore(status);
+                    irq_restore(status);
                     return;
                 }
                 else if (ctx->t2[1] == __MIPS_UHI_FSTAT &&

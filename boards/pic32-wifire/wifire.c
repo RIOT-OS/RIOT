@@ -11,9 +11,11 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "periph/gpio.h"
+#include "periph/hwrng.h"
 #include "periph/uart.h"
 #include "bitarithm.h"
 #include "board.h"
+#include "cpu.h"
 
 extern void dummy(void);
 
@@ -40,6 +42,9 @@ void board_init(void)
     LED2_OFF;
     LED3_OFF;
     LED4_OFF;
+
+    /* initialize the CPU */
+    cpu_init();
 
     /* Stop the linker from throwing away the PIC32 config register settings */
     dummy();

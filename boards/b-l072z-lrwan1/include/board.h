@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_b-l072z-lrwan1 ST b-l072z-lrwan1 discovery
  * @ingroup     boards
- * @brief       Board specific files for the ST b-l072z-lrwan1 board
+ * @brief       Support for the ST b-l072z-lrwan1 board
  * @{
  *
  * @file
@@ -33,8 +33,6 @@ extern "C" {
  * @name    xtimer configuration
  * @{
  */
-#define XTIMER_DEV          TIMER_DEV(0)
-#define XTIMER_CHAN         (0)
 #define XTIMER_WIDTH        (16)
 /** @} */
 

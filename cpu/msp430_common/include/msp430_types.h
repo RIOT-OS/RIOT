@@ -6,6 +6,14 @@
  * directory for more details.
  */
 
+/**
+ * @ingroup     cpu_msp430_common
+ * @{
+ *
+ * @file
+ * @brief       basic types for MSP430
+ */
+
 #ifndef MSP430_TYPES_H
 #define MSP430_TYPES_H
 
@@ -89,3 +97,4 @@ typedef     uint32_t useconds_t;  /**< Used for time in microseconds */
 #endif
 
 #endif /* MSP430_TYPES_H */
+/** @} */

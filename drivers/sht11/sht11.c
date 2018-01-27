@@ -7,19 +7,17 @@
  */
 
 /**
- * @defgroup    sht11 SHT11
- * @ingroup     drivers
+ * @ingroup     drivers_sht11
  * @brief       Driver for the Sensirion SHT11 humidity and temperature sensor
  * @{
- */
-
-/**
+ *
  * @file
  * @brief       SHT11 Device Driver
  *
  * @version     $Revision: 2396 $
  *
  * @note        $Id: sht11.c 2396 2010-07-06 15:12:35Z ziegert $
+ * @}
  */
 
 #include <stdio.h>
@@ -350,5 +348,3 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode)
     mutex_unlock(&sht11_mutex);
     return 1;
 }
-
-/** @} */

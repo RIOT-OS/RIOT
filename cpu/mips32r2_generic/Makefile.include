@@ -1,0 +1,8 @@
+export MEMORY_BASE=0x80000000
+export MEMORY_SIZE=1M
+export APP_START=0x80000000
+
+include $(RIOTMAKE)/arch/mips.inc.mk
+include $(RIOTCPU)/mips32r2_common/Makefile.include
+
+export LINKFLAGS += -Tuhi32.ld

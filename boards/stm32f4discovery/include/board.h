@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_stm32f4discovery STM32F4Discovery
  * @ingroup     boards
- * @brief       Board specific files for the STM32F4Discovery board
+ * @brief       Support for the STM32F4Discovery board
  * @{
  *
  * @file
@@ -33,8 +33,6 @@ extern "C" {
  * @name xtimer configuration
  * @{
  */
-#define XTIMER_DEV          TIMER_DEV(0)
-#define XTIMER_CHAN         (0)
 #define XTIMER_OVERHEAD     (6)
 #define XTIMER_BACKOFF      (10)
 /** @} */

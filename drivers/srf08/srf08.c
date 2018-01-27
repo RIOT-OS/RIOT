@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_srf08
+ * @ingroup     drivers_srf08
  * @{
  *
  * @file

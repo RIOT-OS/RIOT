@@ -1,0 +1,10 @@
+# CPU configuration for the Thingy:52
+CPU_MODEL = nrf52832xxaa
+
+# for this board, we are using Segger's RTT as default terminal interface
+USEMODULE += rtt_stdio
+TERMPROG = $(RIOTBASE)/dist/tools/jlink/jlink.sh
+TERMFLAGS = term_rtt
+
+# use shared Makefile.include
+include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include

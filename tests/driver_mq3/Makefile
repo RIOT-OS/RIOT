@@ -1,4 +1,3 @@
-APPLICATION = driver_mq3
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_adc

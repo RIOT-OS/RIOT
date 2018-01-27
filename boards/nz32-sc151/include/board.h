@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_nz32-sc151 NZ32-SC151
  * @ingroup     boards
- * @brief       Board specific files for the nz32-sc151 board.
+ * @brief       Support for the Modtronix nz32-sc151 board.
  * @{
  *
  * @file

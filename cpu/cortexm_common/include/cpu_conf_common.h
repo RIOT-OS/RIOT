@@ -57,6 +57,17 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   Select fastest bitarithm_lsb implementation
+ * @{
+ */
+#ifdef __ARM_FEATURE_CLZ
+#define BITARITHM_LSB_BUILTIN
+#else
+#define BITARITHM_LSB_LOOKUP
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

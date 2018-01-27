@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-17 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +14,7 @@
  * @brief       Demonstrating the sending and receiving of UDP data
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Martine Lenders <m.lenders@fu-berlin.de>
  *
  * @}
  */
@@ -23,9 +24,12 @@
 
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/netif.h"
+#include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/pktdump.h"
 #include "timex.h"
+#include "utlist.h"
 #include "xtimer.h"
 
 static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
@@ -35,9 +39,15 @@ static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX
 static void send(char *addr_str, char *port_str, char *data, unsigned int num,
                  unsigned int delay)
 {
+    int iface;
     uint16_t port;
     ipv6_addr_t addr;
 
+    /* get interface, if available */
+    iface = ipv6_addr_split_iface(addr_str);
+    if ((iface < 0) && (gnrc_netif_numof() == 1)) {
+        iface = gnrc_netif_iter(NULL)->pid;
+    }
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("Error: unable to parse destination address");
@@ -74,6 +84,13 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             puts("Error: unable to allocate IPv6 header");
             gnrc_pktbuf_release(udp);
             return;
+        }
+        /* add netif header, if interface was given */
+        if (iface > 0) {
+            gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+
+            ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
+            LL_PREPEND(ip, netif);
         }
         /* send packet */
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {

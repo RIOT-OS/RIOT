@@ -247,7 +247,7 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
 {
     DEBUG("cc110x: snd pkt to %u payload_length=%u\n",
             (unsigned)packet->address, (unsigned)packet->length-3);
-    uint8_t size;
+    unsigned size;
 
     switch (dev->radio_state) {
         case RADIO_RX_BUSY:
@@ -293,5 +293,5 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
 
     _tx_continue(dev);
 
-    return size;
+    return (int)size;
 }

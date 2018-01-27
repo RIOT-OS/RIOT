@@ -88,14 +88,13 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
         return -1;
     }
 
-    /* reset pin and output value */
+    /* set pin direction */
     if (mode == GPIO_OUT) {
         port->DIR |= _pin(pin);
     }
     else {
         port->DIR &= ~(_pin(pin));
     }
-    port->OD &= ~(_pin(pin));
 
     return 0;
 }
@@ -206,7 +205,7 @@ void gpio_write(gpio_t pin, int value)
 
 static inline void isr_handler(msp_port_isr_t *port, int ctx)
 {
-    for (int i = 0; i < PINS_PER_PORT; i++) {
+    for (unsigned i = 0; i < PINS_PER_PORT; i++) {
         if ((port->IE & (1 << i)) && (port->IFG & (1 << i))) {
             port->IFG &= ~(1 << i);
             isr_ctx[i + ctx].cb(isr_ctx[i + ctx].arg);

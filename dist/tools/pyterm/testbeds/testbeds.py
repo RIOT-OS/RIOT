@@ -19,7 +19,9 @@
 # 02110-1301 USA
 
 
-import os, re, datetime
+import os
+import re
+import datetime
 from subprocess import call, Popen, PIPE
 
 
@@ -45,7 +47,7 @@ class Testbed():
     def cleanLogs(self):
         raise NotImplementedError("Inherit from Testbed and implement flashNodes")
 
-    def archiveLogs(self, experiment = None):
+    def archiveLogs(self, experiment=None):
         raise NotImplementedError("Inherit from Testbed and implement flashNodes")
 
     def start(self):
@@ -54,11 +56,11 @@ class Testbed():
     def stop(self):
         raise NotImplementedError("Inherit from Testbed and implement flashNodes")
 
-    def defaultArchivePostfix(self, experimentName = None):
+    def defaultArchivePostfix(self, experimentName=None):
         if not experimentName:
             experimentName = "unknown"
         time = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
-        postfix = "-" + experimentName +"_" + time
+        postfix = "-" + experimentName + "_" + time
         return postfix
 
     def printAndCall(self, cmdString):
@@ -67,8 +69,8 @@ class Testbed():
 
 
 class DESTestbed(Testbed):
-    def __init__(self, serverHost = None, serverPort=None, userName = None, flasher = None,
-                 hexfilePath = None, pyterm = None, logFilePath = None, hostFile = None):
+    def __init__(self, serverHost=None, serverPort=None, userName=None, flasher=None,
+                 hexfilePath=None, pyterm=None, logFilePath=None, hostFile=None):
         self.serverHost = serverHost
         self.serverPort = str(serverPort)
         self.userName = userName
@@ -84,19 +86,22 @@ class DESTestbed(Testbed):
     def cleanLogs(self):
         self.printAndCall("rm -rf %s/*.log" % (self.logFilePath))
 
-    def archiveLogs(self, postfix = None):
+    def archiveLogs(self, postfix=None):
         postfix = self.defaultArchivePostfix(postfix)
         logDir = self.logFilePath.split("/")[-1]
         self.printAndCall("cd %s/..; tar -cjf archived_logs%s.tar.bz2 %s/*.log" % (self.logFilePath, postfix, logDir))
 
     def start(self):
-        self.printAndCall("parallel-ssh -h %s -l %s 'screen -S pyterm -d -m python %s -ln %s'" % (self.hostFile, self.userName, self.pyterm, self.log_dir_name))
+        self.printAndCall("parallel-ssh -h %s -l %s 'screen -S pyterm -d -m python %s -ln %s'"
+                          % (self.hostFile, self.userName, self.pyterm, self.log_dir_name))
 
     def stop(self):
         self.printAndCall("parallel-ssh -h %s -l %s 'screen -X -S pyterm quit'" % (self.hostFile, self.userName))
 
+
 class LocalTestbed(Testbed):
-    def __init__(self, serverHost = None, serverPort=None, flasher = None, hexfilePath = None, pyterm = None, logFilePath = None):
+    def __init__(self, serverHost=None, serverPort=None, flasher=None,
+                 hexfilePath=None, pyterm=None, logFilePath=None):
         self.serverHost = serverHost
         self.serverPort = str(serverPort)
         self.flasher = flasher
@@ -115,7 +120,7 @@ class LocalTestbed(Testbed):
     def cleanLogs(self):
         self.printAndCall("rm -rf %s/*.log" % (self.logFilePath))
 
-    def archiveLogs(self, postfix = None):
+    def archiveLogs(self, postfix=None):
         postfix = self.defaultArchivePostfix(postfix)
         logDir = self.logFilePath.split("/")[-1]
         self.printAndCall("cd %s/..; tar -cjf archived_logs%s.tar.bz2 %s/*.log" % (self.logFilePath, postfix, logDir))
@@ -123,15 +128,18 @@ class LocalTestbed(Testbed):
     def start(self):
         portList = self.findPorts()
         for port in portList:
-            self.printAndCall("screen -S pyterm-%s -d -m python %s -H %s -rn %s -p /dev/%s -ln %s" % (port, self.pyterm, port, port, port, self.log_dir_name))
+            self.printAndCall("screen -S pyterm-%s -d -m python %s -H %s -rn %s -p /dev/%s -ln %s"
+                              % (port, self.pyterm, port, port, port, self.log_dir_name))
 
     def stop(self):
         portList = self.findPorts()
         for port in portList:
             self.printAndCall("screen -X -S pyterm-%s quit" % (port))
 
+
 class DesVirtTestbed(Testbed):
-    def __init__(self, serverHost = None, serverPort=None, desvirtPath = None, topologyName = None, pyterm = None, logFilePath = None):
+    def __init__(self, serverHost=None, serverPort=None, desvirtPath=None,
+                 topologyName=None, pyterm=None, logFilePath=None):
         self.serverHost = serverHost
         self.serverPort = str(serverPort)
         self.desvirtPath = desvirtPath
@@ -144,9 +152,10 @@ class DesVirtTestbed(Testbed):
         return self.namePortList
 
     def startDesVirtNetwork(self):
-        print "executing: " + "./vnet --start --name " + self.topologyName + " in: " + self.desvirtPath
+        print("executing: " + "./vnet --start --name " + self.topologyName + " in: " + self.desvirtPath)
         call("sh -c \"./vnet --define --name " + self.topologyName + "\"", cwd=self.desvirtPath, shell=True)
-        stream = Popen("sh -c \"./vnet --start --name " + self.topologyName + "\"", cwd=self.desvirtPath, shell=True, stderr=PIPE).stderr
+        stream = Popen("sh -c \"./vnet --start --name " + self.topologyName + "\"",
+                       cwd=self.desvirtPath, shell=True, stderr=PIPE).stderr
         pats = r'.*riotnative.*\.elf (\S+) -t (\S+)'
         pattern = re.compile(pats)
         for line in stream:
@@ -156,7 +165,7 @@ class DesVirtTestbed(Testbed):
                 self.namePortList.append((tuple[0], int(tuple[1])))
         self.namePortList = sorted(self.namePortList)
         for tuple in self.namePortList:
-            print "name: " + tuple[0] + " port: " + str(tuple[1])
+            print("name: " + tuple[0] + " port: " + str(tuple[1]))
 
     def stopDesVirtNetwork(self):
         call("sh -c \"./vnet --stop --name " + self.topologyName + "\"", cwd=self.desvirtPath, shell=True)
@@ -167,17 +176,18 @@ class DesVirtTestbed(Testbed):
     def cleanLogs(self):
         self.printAndCall("rm -rf %s/*.log" % (self.logFilePath))
 
-    def archiveLogs(self, postfix = None):
+    def archiveLogs(self, postfix=None):
         postfix = self.defaultArchivePostfix(postfix)
         logDir = self.logFilePath.split("/")[-1]
         self.printAndCall("cd %s/..; tar -cjf archived_logs%s.tar.bz2 %s/*.log" % (self.logFilePath, postfix, logDir))
 
     def start(self):
         for node in self.namePortList:
-            self.printAndCall("screen -S pyterm-%s -d -m python %s -H %s -rn %s -ts %s -ln %s" % (node[0], self.pyterm, node[0], node[0], node[1], self.log_dir_name))
+            self.printAndCall("screen -S pyterm-%s -d -m python %s -H %s -rn %s -ts %s -ln %s"
+                              % (node[0], self.pyterm, node[0], node[0], node[1], self.log_dir_name))
 
     def stop(self):
-        print "stop called"
+        print("stop called")
         for node in self.namePortList:
             self.printAndCall("screen -X -S pyterm-%s quit" % (node[0]))
         self.stopDesVirtNetwork()

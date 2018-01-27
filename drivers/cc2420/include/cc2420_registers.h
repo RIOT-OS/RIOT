@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Internal device option flags
+ * @name    Internal device option flags
  * @{
  */
 #define CC2420_OPT_AUTOACK          (0x0001)    /**< auto ACKs active */
@@ -45,7 +45,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Possible device state change commands
+ * @name    Possible device state change commands
  * @{
  */
 enum {
@@ -57,7 +57,7 @@ enum {
 };
 
 /**
- * @brief   (Selected) device states
+ * @name    (Selected) device states
  */
 enum {
     CC2420_STATE_PD          = 0,   /**< power down */
@@ -68,7 +68,7 @@ enum {
 };
 
 /**
- * @brief   CC2420 SPI commands
+ * @name    CC2420 SPI commands
  * @{
  */
 #define CC2420_REG_WRITE            (0x00)  /**< read register value */
@@ -82,7 +82,7 @@ enum {
 
 
 /**
- * @brief   CC2420 strobe commands
+ * @name    CC2420 strobe commands
  * @see     Datasheet section 37, pages 61--62
  * @{
  */
@@ -104,7 +104,7 @@ enum {
 /** @} */
 
 /**
- * @brief   CC2420 configuration registers
+ * @name    CC2420 configuration registers
  * @see     Datasheet section 37, pages 61 to 80
  * @{
  */
@@ -145,7 +145,7 @@ enum {
 /** @} */
 
 /**
- * @brief   CC2420 section address in RAM
+ * @name    CC2420 section address in RAM
  * @see     Datasheet section 13.5 page 31.
  * @{
  */
@@ -165,7 +165,7 @@ enum {
 /** @} */
 
 /**
- * @brief   Status byte bit fields
+ * @name    Status byte bit fields
  * @see     Datasheet section 13.3, page 29
  * @{
  */
@@ -178,7 +178,7 @@ enum {
 /** @} */
 
 /**
- * @brief   Modem control 0 register bitfields
+ * @name    Modem control 0 register bitfields
  * @{
  */
 #define CC2420_MDMCTRL0_RES_FRM     (0x2000
@@ -191,21 +191,29 @@ enum {
 /** @} */
 
 /**
- * @brief   Transmit control register bitfields
+ * @brief  CRC/Correlation bit masks
+ * @{
+ */
+#define CC2420_CRCCOR_CRC_MASK      (0x80)
+#define CC2420_CRCCOR_COR_MASK      (0x7F)
+/** @} */
+
+/**
+ * @name    Transmit control register bitfields
  * @{
  */
 #define CC2420_TXCTRL_PA_MASK       (0x001f)
 /** @} */
 
 /**
- * @brief   Receive control register 1 bitfields
+ * @name    Receive control register 1 bitfields
  * @{
  */
 #define CC2420_RXCTRL1_RXBPF_LOCUR  (0x2000)
 /** @} */
 
 /**
- * @brief   Frequency synthesizer control and status register bitfields
+ * @name    Frequency synthesizer control and status register bitfields
  * @{
  */
 #define CC2420_FSCTRL_LOCK_THR_MASK (0xc000)
@@ -217,21 +225,25 @@ enum {
 /** @} */
 
 /**
- * @brief   Security control register 0 bitfields
+ * @name    Security control register 0 bitfields
  * @{
  */
 #define CC2420_SECCTRL0_RXFIFO_PROT (0x0200)
 /** @} */
 
 /**
- * @brief   Manufacturer ID low register value
+ * @name    Manufacturer ID low register value
+ * @{
  */
 #define CC2420_MANFIDL_VAL          (0x233d)
+/** @} */
 
 /**
- * @brief  Manufacturer ID high register value
+ * @name   Manufacturer ID high register value
+ * @{
  */
 #define CC2420_MANFIDH_VAL          (0x3000)
+/** @} */
 
 
 #ifdef __cplusplus
@@ -239,3 +251,4 @@ enum {
 #endif
 
 #endif /* CC2420_REGISTERS_H */
+/** @} */

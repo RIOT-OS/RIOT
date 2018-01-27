@@ -163,6 +163,7 @@ static void recover_i2c_bus(void) {
 #ifdef MODULE_XTIMER
 static void _timer_cb(void *arg)
 {
+    (void)arg;
     mutex_unlock(&i2c_wait_mutex);
 }
 #endif
@@ -235,8 +236,8 @@ void cc2538_i2c_init_master(uint32_t speed_hz)
     IOC_PXX_OVER[I2C_0_SCL_PIN] &= IOC_OVERRIDE_PUE;
     IOC_PXX_OVER[I2C_0_SDA_PIN] &= IOC_OVERRIDE_PUE;
 
-    IOC_PXX_SEL[I2C_0_SCL_PIN] = I2C_CMSSCL;
-    IOC_PXX_SEL[I2C_0_SDA_PIN] = I2C_CMSSDA;
+    IOC_PXX_SEL[I2C_0_SCL_PIN] = I2C_SCL_OUT;
+    IOC_PXX_SEL[I2C_0_SDA_PIN] = I2C_SDA_OUT;
 
     IOC_I2CMSSCL = I2C_0_SCL_PIN;
     IOC_I2CMSSDA = I2C_0_SDA_PIN;
@@ -312,6 +313,8 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 
 int i2c_init_slave(i2c_t dev, uint8_t address)
 {
+    (void) dev;
+    (void) address;
     /* Slave mode is not (yet) supported. */
     return -1;
 }

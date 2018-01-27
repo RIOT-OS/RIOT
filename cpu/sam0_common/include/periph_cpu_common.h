@@ -8,6 +8,7 @@
 
 /**
  * @ingroup         cpu_sam0_common
+ * @brief           Common CPU specific definitions for all SAMx21 based CPUs
  * @{
  *
  * @file
@@ -60,15 +61,45 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
 
 /**
+ * @brief   Available ports on the SAMD21 & SAML21
+ */
+enum {
+    PA = 0,                 /**< port A */
+    PB = 1,                 /**< port B */
+    PC = 2,                 /**< port C */
+};
+
+/**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 3 bit to determine the pin functions:
+ * - bit 0: PD(0) or PU(1)
+ * - bit 1: input enable
+ * - bit 2: pull enable
+ */
+#define GPIO_MODE(pr, ie, pe)   (pr | (ie << 1) | (pe << 2))
+
+/**
  * @name    Power mode configuration
  * @{
  */
 #define PM_NUM_MODES        (3)
-/** @todo   we block all modes per default, until PM is cleanly implemented */
-#define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
 /** @} */
 
 #ifndef DOXYGEN
+/**
+ * @brief   Override GPIO modes
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 1, 0),    /**< IN */
+    GPIO_IN_PD = GPIO_MODE(0, 1, 1),    /**< IN with pull-down */
+    GPIO_IN_PU = GPIO_MODE(1, 1, 1),    /**< IN with pull-up */
+    GPIO_OUT   = GPIO_MODE(0, 0, 0),    /**< OUT (push-pull) */
+    GPIO_OD    = 0xfe,                  /**< not supported by HW */
+    GPIO_OD_PU = 0xff                   /**< not supported by HW */
+} gpio_mode_t;
+
 /**
  * @brief   Override active flank configuration values
  * @{
@@ -115,6 +146,29 @@ typedef enum {
     UART_PAD_TX_0_RTS_2_CTS_3 = 0x2,    /**< TX is pad 0, on top RTS on pad 2
                                          *   and CTS on pad 3 */
 } uart_txpad_t;
+
+/**
+ * @brief   Available SERCOM UART flag selections
+ */
+typedef enum {
+    UART_FLAG_NONE            = 0x0,    /**< No flags set */
+    UART_FLAG_RUN_STANDBY     = 0x1,    /**< run SERCOM in standby mode */
+    UART_FLAG_WAKEUP          = 0x2,    /**< wake from sleep on receive */
+} uart_flag_t;
+
+/**
+ * @brief   UART device configuration
+ */
+typedef struct {
+    SercomUsart *dev;       /**< pointer to the used UART device */
+    gpio_t rx_pin;          /**< pin used for RX */
+    gpio_t tx_pin;          /**< pin used for TX */
+    gpio_mux_t mux;         /**< alternative function for pins */
+    uart_rxpad_t rx_pad;    /**< pad selection for RX line */
+    uart_txpad_t tx_pad;    /**< pad selection for TX line */
+    uart_flag_t flags;      /**< set optional SERCOM flags */
+    uint32_t gclk_src;      /**< GCLK source which supplys SERCOM */
+} uart_conf_t;
 
 /**
  * @brief   Available values for SERCOM SPI MISO pad selection
@@ -199,6 +253,60 @@ static inline int sercom_id(void *sercom)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 #elif defined(CPU_FAM_SAML21)
     return ((((uint32_t)sercom) >> 10) & 0x7);
+#endif
+}
+
+/**
+ * @brief   Enable peripheral clock for given SERCOM device
+ *
+ * @param[in] sercom    SERCOM device
+ */
+static inline void sercom_clk_en(void *sercom)
+{
+#if defined(CPU_FAM_SAMD21)
+    PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom_id(sercom));
+#elif defined(CPU_FAM_SAML21)
+    if (sercom_id(sercom) < 5) {
+        MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
+    } else {
+        MCLK->APBDMASK.reg |= (MCLK_APBDMASK_SERCOM5);
+    }
+#endif
+}
+
+/**
+ * @brief   Disable peripheral clock for given SERCOM device
+ *
+ * @param[in] sercom    SERCOM device
+ */
+static inline void sercom_clk_dis(void *sercom)
+{
+#if defined(CPU_FAM_SAMD21)
+    PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom_id(sercom));
+#elif defined(CPU_FAM_SAML21)
+    if (sercom_id(sercom) < 5) {
+        MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
+    } else {
+        MCLK->APBDMASK.reg &= ~(MCLK_APBDMASK_SERCOM5);
+    }
+#endif
+}
+
+/**
+ * @brief   Configure generator clock for given SERCOM device
+ *
+ * @param[in] sercom    SERCOM device
+ * @param[in] gclk      Generator clock
+ */
+static inline void sercom_set_gen(void *sercom, uint32_t gclk)
+{
+#if defined(CPU_FAM_SAMD21)
+    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | gclk |
+                         (SERCOM0_GCLK_ID_CORE + sercom_id(sercom)));
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
+#elif defined(CPU_FAM_SAML21)
+    GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom_id(sercom)].reg =
+                                                    (GCLK_PCHCTRL_CHEN | gclk);
 #endif
 }
 

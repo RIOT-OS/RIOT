@@ -77,23 +77,8 @@ extern "C" {
 #define SX127X_CHANNEL_DEFAULT           (868300000UL)          /**< Default channel frequency, 868.3MHz (Europe) */
 #define SX127X_HF_CHANNEL_DEFAULT        (868000000UL)          /**< Use to calibrate RX chain for LF and HF bands */
 #define SX127X_RF_MID_BAND_THRESH        (525000000UL)          /**< Mid-band threshold */
-#define SX127X_FREQUENCY_RESOLUTION      (61.03515625)          /**< Frequency resolution in Hz */
 #define SX127X_XTAL_FREQ                 (32000000UL)           /**< Internal oscillator frequency, 32MHz */
 #define SX127X_RADIO_WAKEUP_TIME         (1000U)                /**< In microseconds [us] */
-
-#define SX127X_PREAMBLE_LENGTH           (8U)                   /**< Preamble length, same for Tx and Rx */
-#define SX127X_SYMBOL_TIMEOUT            (10U)                  /**< Symbols timeout (s) */
-
-#define SX127X_BW_DEFAULT                (SX127X_BW_125_KHZ)    /**< Set default bandwidth to 125kHz */
-#define SX127X_SF_DEFAULT                (SX127X_SF12)          /**< Set default spreading factor to 12 */
-#define SX127X_CR_DEFAULT                (SX127X_CR_4_8)        /**< Set default coding rate to 8 */
-#define SX127X_FIX_LENGTH_PAYLOAD_ON     (false)                /**< Set fixed payload length on */
-#define SX127X_IQ_INVERSION              (false)                /**< Set inverted IQ on */
-#define SX127X_FREQUENCY_HOPPING         (false)                /**< Frequency hopping on */
-#define SX127X_FREQUENCY_HOPPING_PERIOD  (0U)                   /**< Frequency hopping period */
-#define SX127X_FIXED_HEADER_LEN_MODE     (false)                /**< Set fixed header length mode (implicit header) */
-#define SX127X_PAYLOAD_CRC_ON            (true)                 /**< Enable payload CRC, optional */
-#define SX127X_PAYLOAD_LENGTH            (0U)                   /**< Set payload length, unused with implicit header */
 
 #define SX127X_TX_TIMEOUT_DEFAULT        (1000U * 1000U * 30UL) /**< TX timeout, 30s */
 #define SX127X_RX_SINGLE                 (false)                /**< Single byte receive mode => continuous by default */
@@ -137,38 +122,6 @@ enum {
 };
 
 /**
- * @brief   LoRa signal bandwidth.
- */
-enum {
-    SX127X_BW_125_KHZ = 0,             /**< 125 kHz bandwidth */
-    SX127X_BW_250_KHZ,                 /**< 250 kHz bandwidth */
-    SX127X_BW_500_KHZ                  /**< 500 kHz bandwidth */
-};
-
-/**
- * @brief   LoRa spreading factor rate
- */
-enum {
-    SX127X_SF6 = 6,                    /**< spreading factor 6 */
-    SX127X_SF7,                        /**< spreading factor 7 */
-    SX127X_SF8,                        /**< spreading factor 8 */
-    SX127X_SF9,                        /**< spreading factor 9 */
-    SX127X_SF10,                       /**< spreading factor 10 */
-    SX127X_SF11,                       /**< spreading factor 11 */
-    SX127X_SF12                        /**< spreading factor 12 */
-};
-
-/**
- * @brief   LoRa error coding rate.
- */
-enum {
-    SX127X_CR_4_5 = 1,                 /**< coding rate 4/5 */
-    SX127X_CR_4_6,                     /**< coding rate 4/6 */
-    SX127X_CR_4_7,                     /**< coding rate 4/7 */
-    SX127X_CR_4_8                      /**< coding rate 4/8 */
-};
-
-/**
  * @brief   Radio driver internal state machine states definition.
  */
 enum {
@@ -208,7 +161,7 @@ enum {
  */
 typedef struct {
     uint16_t preamble_len;             /**< Length of preamble header */
-    uint8_t power;                     /**< Signal power */
+    int8_t power;                      /**< Signal power */
     uint8_t bandwidth;                 /**< Signal bandwidth */
     uint8_t datarate;                  /**< Spreading factor rate, e.g datarate */
     uint8_t coderate;                  /**< Error coding rate */
@@ -223,7 +176,6 @@ typedef struct {
  */
 typedef struct {
     uint32_t channel;                  /**< Radio channel */
-    uint32_t window_timeout;           /**< Timeout window */
     uint8_t state;                     /**< Radio state */
     uint8_t modem;                     /**< Driver model (FSK or LoRa) */
     sx127x_lora_settings_t lora;       /**< LoRa settings */
@@ -323,39 +275,31 @@ void sx127x_init_radio_settings(sx127x_t *dev);
 uint32_t sx127x_random(sx127x_t *dev);
 
 /**
- * @brief   sx127x DIO0 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio0(void *arg);
-
-/**
- * @brief   sx127x DIO1 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio1(void *arg);
-
-/**
- * @brief   sx127x DIO2 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio2(void *arg);
-
-/**
- * @brief   sx127x DIO3 IRQ handler.
- *
- * @param[in] arg                      An sx127x device instance
- */
-void sx127x_on_dio3(void *arg);
-
-/**
  * @brief   Start a channel activity detection.
  *
  * @param[in] dev                      The sx127x device descriptor
  */
 void sx127x_start_cad(sx127x_t *dev);
+
+/**
+ * @brief   Checks that channel is free with specified RSSI threshold.
+ *
+ * @param[in] dev                      The sx127x device structure pointer
+ * @param[in] freq                     channel RF frequency
+ * @param[in] rssi_threshold           RSSI threshold
+ *
+ * @return true if channel is free, false otherwise
+ */
+bool sx127x_is_channel_free(sx127x_t *dev, uint32_t freq, int16_t rssi_threshold);
+
+/**
+ * @brief   Reads the current RSSI value.
+ *
+ * @param[in] dev                      The sx127x device structure pointer
+ *
+ * @return the current value of RSSI (in dBm)
+ */
+int16_t sx127x_read_rssi(const sx127x_t *dev);
 
 /**
  * @brief   Gets current state of transceiver.
@@ -644,7 +588,7 @@ uint8_t sx127x_get_tx_power(const sx127x_t *dev);
  * @param[in] dev                      The sx127x device descriptor
  * @param[in] power                    The TX power
  */
-void sx127x_set_tx_power(sx127x_t *dev, uint8_t power);
+void sx127x_set_tx_power(sx127x_t *dev, int8_t power);
 
 /**
  * @brief   Gets the SX127X preamble length
@@ -688,7 +632,16 @@ void sx127x_set_rx_timeout(sx127x_t *dev, uint32_t timeout);
 void sx127x_set_tx_timeout(sx127x_t *dev, uint32_t timeout);
 
 /**
- * @brief   Sets the SX127X LoRa IQ inverted mode
+ * @brief   Checks if the SX127X LoRa inverted IQ mode is enabled/disabled
+ *
+ * @param[in] dev                      The sx127x device descriptor
+ *
+ * @return the LoRa IQ inverted mode
+ */
+bool sx127x_get_iq_invert(const sx127x_t *dev);
+
+/**
+ * @brief   Enable/disable the SX127X LoRa IQ inverted mode
  *
  * @param[in] dev                      The sx127x device descriptor
  * @param[in] iq_invert                The LoRa IQ inverted mode

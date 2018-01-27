@@ -31,7 +31,7 @@
 
 static void _usage(char *cmd)
 {
-    printf("Usage: %s <server addr> [<timeout>]\n", cmd);
+    printf("Usage: %s <server addr>[%%<interface>] [<timeout>]\n", cmd);
     puts("default: timeout = 5000");
 }
 
@@ -44,7 +44,39 @@ int _ntpdate(int argc, char **argv)
         return 1;
     }
     sock_udp_ep_t server = { .port = NTP_PORT, .family = AF_INET6 };
-    ipv6_addr_from_str((ipv6_addr_t *)&server.addr, argv[1]);
+    ipv6_addr_t *addr = (ipv6_addr_t *)&server.addr;
+
+    kernel_pid_t src_iface = ipv6_addr_split_iface(argv[1]);
+    if (src_iface == -1) {
+        src_iface = KERNEL_PID_UNDEF;
+    }
+
+    if (ipv6_addr_from_str(addr, argv[1]) == NULL) {
+        puts("error: malformed address");
+        return 1;
+    }
+
+    if (ipv6_addr_is_link_local(addr) || (src_iface != KERNEL_PID_UNDEF)) {
+        size_t ifnum = gnrc_netif_numof();
+
+        if (src_iface == KERNEL_PID_UNDEF) {
+            if (ifnum == 1) {
+                src_iface = gnrc_netif_iter(NULL)->pid;
+            }
+            else {
+                puts("error: link local target needs interface parameter (use \"<address>%<ifnum>\")\n");
+                return 1;
+            }
+        }
+        else {
+            if (gnrc_netif_get_by_pid(src_iface) == NULL) {
+                printf("error: %"PRIkernel_pid" is not a valid interface.\n", src_iface);
+                return 1;
+            }
+        }
+        server.netif = src_iface;
+    }
+
     if (argc > 2) {
         timeout = atoi(argv[2]);
     }

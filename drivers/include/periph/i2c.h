@@ -16,7 +16,7 @@
  * simple as possible, to allow for easy implementation and maximal portability.
  *
  * @note        The current version of this interface only supports the
- *              7-bit addressing mode.
+ *              7-bit addressing mode, right justified.
  *
  * @note        This interface is due for remodeling, hence API changes are to
  *              be expected for upcoming releases.
@@ -89,34 +89,27 @@ extern "C" {
 
 /**
  * @brief   Default I2C device access macro
- * @{
  */
 #ifndef I2C_DEV
 #define I2C_DEV(x)          (x)
 #endif
-/** @} */
 
 /**
  * @brief   Default I2C undefined value
- * @{
  */
 #ifndef I2C_UNDEF
 #define I2C_UNDEF           (UINT_MAX)
 #endif
-/** @} */
 
 /**
  * @brief   Default i2c_t type definition
- * @{
  */
 #ifndef HAVE_I2C_T
 typedef unsigned int i2c_t;
 #endif
-/**  @} */
 
 /**
  * @brief   Default mapping of I2C bus speed values
- * @{
  */
 #ifndef HAVE_I2C_SPEED_T
 typedef enum {
@@ -127,7 +120,6 @@ typedef enum {
     I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
 #endif
-/** @} */
 
 /**
  * @brief   Initialize an I2C device to run as bus master

@@ -24,7 +24,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *dev);
 static void _isr(netdev_t *dev);
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
-static int _set(netdev_t *dev, netopt_t opt, void *value, size_t value_len);
+static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len);
 
 static const netdev_driver_t _driver = {
     .send   = _send,
@@ -127,7 +127,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     return res;
 }
 
-static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
+static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_len)
 {
     netdev_test_t *dev = (netdev_test_t *)netdev;
     int res = -ENOTSUP;     /* option assumed to be not supported */

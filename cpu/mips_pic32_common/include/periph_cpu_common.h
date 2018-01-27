@@ -10,10 +10,11 @@
 
 /**
  * @ingroup         cpu_mips_pic32_common
+ * @brief           Shared CPU specific definitions for the MIPS family.
  * @{
  *
  * @file
- * @brief           CPU specific definitions for internal peripheral handling
+ * @brief           Shared CPU specific definitions for the MIPS family.
  *
  * @author          Francois Berder <francois.berder@imgtec.com>
  */
@@ -25,6 +26,21 @@
 extern "C" {
 #endif
 
+/**
+ * @name    Power management configuration
+ * @{
+ */
+#define PROVIDES_PM_SET_LOWEST
+/** @} */
+
+/**
+ * @brief   Length of the CPU_ID in bytes
+ */
+#define CPUID_LEN           (4U)
+
+/**
+ * @brief   Override GPIO pin selection macro
+ */
 #define GPIO_PIN(x,y)       ((x << 4) | (y & 0xf))
 
 /**
@@ -39,6 +55,11 @@ enum {
     PORT_F = 5,             /**< port F */
     PORT_G = 6,             /**< port G */
 };
+
+/**
+ * @brief   Prevent shared timer functions from being used
+ */
+#define PERIPH_TIMER_PROVIDES_SET
 
 #ifdef __cplusplus
 }

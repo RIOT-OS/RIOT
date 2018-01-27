@@ -108,16 +108,16 @@
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for TC4 peripheral ========== */
-#define TC4_CC_NUM                  2
+#define TC4_CC_NUM                  2       
 #define TC4_DMAC_ID_MC_0            35
 #define TC4_DMAC_ID_MC_1            36
 #define TC4_DMAC_ID_MC_LSB          35
 #define TC4_DMAC_ID_MC_MSB          36
 #define TC4_DMAC_ID_MC_SIZE         2
 #define TC4_DMAC_ID_OVF             34       // Indexes of DMA Overflow trigger
-#define TC4_EXT                     0
-#define TC4_GCLK_ID                 29
-#define TC4_MASTER                  0
-#define TC4_OW_NUM                  2
+#define TC4_EXT                     0       
+#define TC4_GCLK_ID                 29      
+#define TC4_MASTER                  0       
+#define TC4_OW_NUM                  2       
 
 #endif /* _SAML21_TC4_INSTANCE_ */

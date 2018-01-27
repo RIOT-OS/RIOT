@@ -27,6 +27,8 @@
 
 #include "irq.h"
 
+#include "net/lora.h"
+
 #include "sx127x.h"
 #include "sx127x_registers.h"
 #include "sx127x_internal.h"
@@ -34,6 +36,10 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+
+
+#define SX127X_SPI_SPEED    (SPI_CLK_1MHZ)
+#define SX127X_SPI_MODE     (SPI_MODE_0)
 
 
 bool sx127x_test(const sx127x_t *dev)
@@ -79,7 +85,7 @@ void sx127x_reg_write_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
 {
     unsigned int cpsr;
 
-    spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_PARAM_SPI_MODE, SX127X_PARAM_SPI_SPEED);
+    spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_SPI_MODE, SX127X_SPI_SPEED);
     cpsr = irq_disable();
 
     gpio_clear(dev->params.nss_pin);
@@ -97,7 +103,7 @@ void sx127x_reg_read_burst(const sx127x_t *dev, uint8_t addr, uint8_t *buffer,
 
     cpsr = irq_disable();
 
-    spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_PARAM_SPI_MODE, SX127X_PARAM_SPI_SPEED);
+    spi_acquire(dev->params.spi, SPI_CS_UNDEF, SX127X_SPI_MODE, SX127X_SPI_SPEED);
 
     gpio_clear(dev->params.nss_pin);
     spi_transfer_regs(dev->params.spi, SPI_CS_UNDEF, addr & 0x7F, NULL, (char *) buffer, size);
@@ -127,7 +133,7 @@ void sx127x_rx_chain_calibration(sx127x_t *dev)
     reg_pa_config_init_val = sx127x_reg_read(dev, SX127X_REG_PACONFIG);
     initial_freq = (double) (((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16)
                              | ((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8)
-                             | ((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * (double) SX127X_FREQUENCY_RESOLUTION;
+                             | ((uint32_t) sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * (double)LORA_FREQUENCY_RESOLUTION_DEFAULT;
 
     /* Cut the PA just in case, RFO output, power = -1 dBm */
     sx127x_reg_write(dev, SX127X_REG_PACONFIG, 0x00);
@@ -217,4 +223,19 @@ void sx127x_start_cad(sx127x_t *dev)
         default:
             break;
     }
+}
+
+bool sx127x_is_channel_free(sx127x_t *dev, uint32_t freq, int16_t rssi_threshold)
+{
+    int16_t rssi = 0;
+
+    sx127x_set_channel(dev, freq);
+    sx127x_set_op_mode(dev, SX127X_RF_OPMODE_RECEIVER);
+
+    xtimer_usleep(1000); /* wait 1 millisecond */
+
+    rssi = sx127x_read_rssi(dev);
+    sx127x_set_sleep(dev);
+
+    return (rssi <= rssi_threshold);
 }

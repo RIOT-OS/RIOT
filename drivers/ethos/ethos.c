@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_ethos
+ * @ingroup     drivers_ethos
  * @{
  *
  * @file
@@ -300,7 +300,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void* info)
     ethos_t * dev = (ethos_t *) netdev;
 
     if (buf) {
-        if (len < (int)dev->last_framesize) {
+        if (len < dev->last_framesize) {
             DEBUG("ethos _recv(): receive buffer too small.\n");
             return -1;
         }
@@ -308,7 +308,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void* info)
         len = dev->last_framesize;
         dev->last_framesize = 0;
 
-        if ((tsrb_get(&dev->inbuf, buf, len) != len)) {
+        if ((tsrb_get(&dev->inbuf, buf, len) != (int)len)) {
             DEBUG("ethos _recv(): inbuf doesn't contain enough bytes.\n");
             return -1;
         }

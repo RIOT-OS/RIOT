@@ -10,7 +10,7 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     cpu_stm32_common
  * @ingroup     drivers_periph_gpio
  * @{
  *
@@ -26,11 +26,13 @@
  * @}
  */
 
-#ifndef CPU_FAM_STM32F1
 
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
+
+/* this implementation is not valid for the stm32f1 */
+#ifndef CPU_FAM_STM32F1
 
 /**
  * @brief   The STM32F0 family has 16 external interrupt lines
@@ -94,9 +96,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     /* set output mode */
     port->OTYPER &= ~(1 << pin_num);
     port->OTYPER |=  (((mode >> 4) & 0x1) << pin_num);
-    /* finally set pin speed to maximum and reset output */
+    /* set pin speed to maximum */
     port->OSPEEDR |= (3 << (2 * pin_num));
-    port->BSRR = (1 << (pin_num + 16));
 
     return 0;
 }

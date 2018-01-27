@@ -69,6 +69,17 @@ spatch_version() {
     printf "%s" "$ver"
 }
 
+git_version() {
+    local cmd="git"
+    if command -v "$cmd" 2>&1 >/dev/null; then
+        ver=$("$cmd" --version | head -n 1)
+    else
+        ver="missing"
+    fi
+
+    printf "%s" "$ver"
+}
+
 printf "%s\n" "Installed toolchain versions"
 printf "%s\n" "----------------------------"
 VER=$(gcc --version | head -n 1)
@@ -91,4 +102,5 @@ for p in avr; do
 done
 printf "%20s: %s\n" "cppcheck" "$(cppcheck_version)"
 printf "%20s: %s\n" "coccinelle" "$(spatch_version)"
+printf "%20s: %s\n" "git" "$(git_version)"
 exit 0

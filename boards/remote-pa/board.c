@@ -53,15 +53,7 @@ void board_init(void)
  */
 static void rf_switch_init(void)
 {
-    /* set pins to be controlled by software */
-    RF_SWITCH_PORT->AFSEL &= ~(1 << RF_SWITCH_PIN);
-
-    /* configure pins as output */
-    RF_SWITCH_PORT->DIR |= (1 << RF_SWITCH_PIN);
-
-    /* configure io-mux for used pins */
-    IOC->OVER[RF_SWITCH_PIN] = IOC_OVERRIDE_OE;
-
-    /* Set to default */
-    RF_SWITCH_INTERNAL;
+    /* Set RF 2.4GHz as default */
+    gpio_init(RF_SWITCH_GPIO, GPIO_OUT);
+    RF_SWITCH_2_4_GHZ;
 }

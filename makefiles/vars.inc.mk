@@ -1,3 +1,6 @@
+# set default values for selected global variables
+FLASH_ADDR ?= 0x0
+
 export Q                     # Used in front of Makefile lines to suppress the printing of the command if user did not opt-in to see them.
 export QQ                    # as Q, but be more quiet
 export QUIET                 # The parameter to use whether to show verbose makefile commands or not.
@@ -24,6 +27,10 @@ export BINDIRBASE            # This is the folder where the application should b
 export BINDIR                # This is the folder where the application should be built in.
 export APPDIR                # The base folder containing the application
 export PKGDIRBASE            # The base folder for building packages
+
+export FEATURES_REQUIRED     # List of required features by the application
+export FEATURES_PROVIDED     # List of provided features by the board
+export FEATURES_OPTIONAL     # List of nice to have features
 
 export TARGET_ARCH           # The target platform name, in GCC triple notation, e.g. "arm-none-eabi", "i686-elf", "avr"
 export PREFIX                # The prefix of the toolchain commands, usually "$(TARGET_ARCH)-", e.g. "arm-none-eabi-" or "msp430-".
@@ -53,6 +60,7 @@ export WERROR                # Treat all compiler warnings as errors if set to 1
 export GITCACHE              # path to git-cache executable
 export FLASHER               # The command to call on "make flash".
 export FFLAGS                # The parameters to supply to FLASHER.
+export FLASH_ADDR          # Define an offset to flash code into ROM memory.
 export TERMPROG              # The command to call on "make term".
 export TERMFLAGS             # Additional parameters to supply to TERMPROG.
 export PORT                  # The port to connect the TERMPROG to.

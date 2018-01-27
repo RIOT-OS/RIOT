@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_sam3x8e
+ * @ingroup     cpu_sam3
  * @{
  *
  * @file
@@ -88,6 +88,19 @@ typedef uint32_t gpio_t;
  * any board specific configuration.
  */
 #define ADC_NUMOF           (16U)
+
+/**
+ * @brief   DAC configuration, valid for all boards using this CPU
+ *
+ * The sam3 has a fixed mapping of DAC pins and a fixed number of DAC channels,
+ * so this DAC configuration is valid for all boards using this CPU. No need for
+ * any board specific configuration.
+ *
+ * The sam3's DAC channels are mapped to the following fixed pins:
+ * - line 0 (ch0): PB15
+ * - line 1 (ch1): PB16
+ */
+#define DAC_NUMOF           (2U)
 
 #ifndef DOXYGEN
 /**
@@ -191,10 +204,8 @@ typedef struct {
  */
 typedef struct {
     Uart *dev;              /**< U(S)ART device used */
-    Pio *rx_port;           /**< port for RX pin */
-    Pio *tx_port;           /**< port for TX pin */
-    uint8_t rx_pin;         /**< RX pin */
-    uint8_t tx_pin;         /**< TX pin */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
     gpio_mux_t mux;         /**< MUX used for pins */
     uint8_t pmc_id;         /**< bit in the PMC register of the device*/
     uint8_t irqn;           /**< interrupt number of the device */

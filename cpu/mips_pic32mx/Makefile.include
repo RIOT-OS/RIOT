@@ -1,18 +1,13 @@
-export MEMORY_BASE=0x80000000
-export MEMORY_SIZE=128K
-export APP_START=0x80000000
 export ROMABLE = 1
 
-include $(RIOTMAKE)/arch/mips.inc.mk
 include $(RIOTCPU)/mips_pic32_common/Makefile.include
+include $(RIOTMAKE)/arch/mips.inc.mk
 
 # define build specific options
 export CFLAGS += -march=m4k -DSKIP_COPY_TO_RAM
 
-export USEMODULE += periph
-
 export LINKFLAGS += -Wl,--defsym,__use_excpt_boot=0 $(CFLAGS)
-export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/pic32mx512_12_128_uhi.ld
+export LINKFLAGS += -Tpic32mx512_12_128_uhi.ld
 
 # the pickit programmer (MPLAB-IPE) wants physical addresses in the hex file!!
 export OBJCOPY = objcopy #use system objcopy as toolchain one is broken.

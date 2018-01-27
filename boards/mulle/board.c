@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Eistec AB
+ * Copyright (C) 2014-2017 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -74,17 +74,6 @@ static devfs_t mulle_nor_devfs = {
 /** @brief Initialize the GPIO pins controlling the power switches. */
 static inline void power_pins_init(void);
 
-/**
- * @brief Set clock prescalers to safe values
- *
- * This should be done before switching to FLL/PLL as clock source to ensure
- * that all clocks remain within the specified limits.
- */
-static inline void set_safe_clock_dividers(void);
-
-/** @brief Set the FLL source clock to RTC32k */
-static inline void set_fll_source(void);
-
 static void increase_boot_count(void);
 static int mulle_nvram_init(void);
 
@@ -123,12 +112,8 @@ void board_init(void)
      * for debug prints as well */
     rtt_init();
 
-    /* Set up clocks */
-    set_safe_clock_dividers();
-
-    set_fll_source();
-
-    kinetis_mcg_set_mode(KINETIS_MCG_FEE);
+    /* Set 32 kHz clock source */
+    SIM->SOPT1 = (SIM->SOPT1 & ~(SIM_SOPT1_OSC32KSEL_MASK)) | SIM_SOPT1_OSC32KSEL(2);
 
     /* At this point we need to wait for 1 ms until the clock is stable.
      * Since the clock is not yet stable we can only guess how long we must
@@ -165,36 +150,6 @@ static inline void power_pins_init(void)
     gpio_clear(MULLE_POWER_AVDD);
     gpio_clear(MULLE_POWER_VPERIPH);
     gpio_clear(MULLE_POWER_VSEC);
-}
-
-static inline void set_safe_clock_dividers(void)
-{
-    /*
-     * We want to achieve the following clocks:
-     * Core/system: <100MHz
-     * Bus: <50MHz
-     * FlexBus: <50MHz
-     * Flash: <25MHz
-     *
-     * using dividers 1-2-2-4 will obey the above limits when using a 96MHz FLL source.
-     */
-    SIM->CLKDIV1 = (
-                       SIM_CLKDIV1_OUTDIV1(CONFIG_CLOCK_K60_SYS_DIV) | /* Core/System clock divider */
-                       SIM_CLKDIV1_OUTDIV2(CONFIG_CLOCK_K60_BUS_DIV) | /* Bus clock divider */
-                       SIM_CLKDIV1_OUTDIV3(CONFIG_CLOCK_K60_FB_DIV) | /* FlexBus divider, not used in Mulle */
-                       SIM_CLKDIV1_OUTDIV4(CONFIG_CLOCK_K60_FLASH_DIV)); /* Flash clock divider */
-
-}
-
-static inline void set_fll_source(void)
-{
-    /* Select FLL as source (as opposed to PLL) */
-    SIM->SOPT2 &= ~(SIM_SOPT2_PLLFLLSEL_MASK);
-    /* Use external 32kHz RTC clock as source for OSC32K */
-    SIM->SOPT1 = (SIM->SOPT1 & ~(SIM_SOPT1_OSC32KSEL_MASK)) | SIM_SOPT1_OSC32KSEL(2);
-
-    /* Select RTC 32kHz clock as reference clock for the FLL */
-    MCG->C7 = (MCG_C7_OSCSEL_MASK);
 }
 
 static int mulle_nvram_init(void)

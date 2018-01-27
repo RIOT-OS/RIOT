@@ -65,8 +65,8 @@ int nrf24l01p_write_reg(const nrf24l01p_t *dev, char reg, char write)
 int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
 {
     int status;
-    char INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
-    char INITIAL_RX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
+    static const char INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
+    static const char INITIAL_RX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
 
     dev->spi = spi;
     dev->ce = ce;
@@ -320,7 +320,8 @@ int nrf24l01p_set_address_width(const nrf24l01p_t *dev, nrf24l01p_aw_t aw)
     return nrf24l01p_write_reg(dev, REG_SETUP_AW, aw_setup);
 }
 
-int nrf24l01p_set_payload_width(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char width)
+int nrf24l01p_set_payload_width(const nrf24l01p_t *dev,
+                                nrf24l01p_rx_pipe_t pipe, uint8_t width)
 {
     char pipe_pw_address;
 
@@ -353,10 +354,6 @@ int nrf24l01p_set_payload_width(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe
             return -1;
     }
 
-    if (width < 0) {
-        return -1;
-    }
-
     if (width > 32) {
         width = 32;
     }
@@ -366,7 +363,7 @@ int nrf24l01p_set_payload_width(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe
 
 
 
-int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, char *saddr, unsigned int length)
+int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, const char *saddr, unsigned int length)
 {
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
@@ -386,7 +383,7 @@ int nrf24l01p_set_tx_address_long(const nrf24l01p_t *dev, uint64_t saddr, unsign
     char buf[length];
 
     if (length <= INITIAL_ADDRESS_WIDTH) {
-        for (int i = 0; i < length; i++) {
+        for (unsigned int i = 0; i < length; i++) {
 
             buf[i] = (uint8_t)(saddr >> (((length - 1) - i) * sizeof(uint64_t)));
         }
@@ -430,7 +427,7 @@ uint64_t nrf24l01p_get_tx_address_long(const nrf24l01p_t *dev)
 }
 
 
-int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *saddr, unsigned int length)
+int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, const char *saddr, unsigned int length)
 {
     char pipe_addr;
 
@@ -483,7 +480,7 @@ int nrf24l01p_set_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pi
     char buf[length];
 
     if (length <= INITIAL_ADDRESS_WIDTH) {
-        for (int i = 0; i < length; i++) {
+        for (unsigned int i = 0; i < length; i++) {
 
             buf[i] = (uint8_t)(saddr >> (((length - 1) - i) * 8));
         }

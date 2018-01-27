@@ -35,6 +35,15 @@ extern "C" {
 #define VARIABLE_PKTLEN     (0x01)
 
 /**
+ * @brief   RSSI calculation offset.
+ *
+ * The cc1101 has 74 as a RSSI offset. The CC1100E has a
+ * slightly larger offset of 75 to 79 (not implemented here).
+ * With those devices we thus get a slightly optimistic result.
+ */
+#define CC110X_RSSI_OFFSET  (74)
+
+/**
  * @name    Bitmasks for reading out status register values
  * @{
  */
@@ -203,5 +212,5 @@ extern "C" {
 }
 #endif
 
-/** @} */
 #endif /* CC110X_DEFINES_H */
+/** @} */

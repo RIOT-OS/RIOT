@@ -1,5 +1,5 @@
-From e6d36f466b2c1568cb4cfc3a3f1f9348e71db037 Mon Sep 17 00:00:00 2001
-From: Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+From 1fcbd0139432691f7cf1b2c26e543323097d14ca Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ludwig=20Kn=C3=BCpfer?= <ludwig.knuepfer@fu-berlin.de>
 Date: Tue, 15 Jul 2014 17:06:51 +0200
 Subject: [PATCH 5/9] fix old-style function declarations
 
@@ -112,5 +112,5 @@ index a891086..5bf2164 100644
  void coap_delete_pdu(coap_pdu_t *);
  
 -- 
-2.0.1
+2.15.1
 

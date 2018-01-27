@@ -25,6 +25,9 @@ void otPlatDiagProcess(int argc, char *argv[], char *aOutput, size_t aOutputMaxL
 {
     /* add more plarform specific diagnostics features here */
     (void)argc;
+    (void)argv;
+    (void)aOutput;
+    (void)aOutputMaxLen;
 }
 
 void otPlatDiagModeSet(bool aMode)

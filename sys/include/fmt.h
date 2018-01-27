@@ -62,6 +62,21 @@ extern "C" {
 size_t fmt_byte_hex(char *out, uint8_t byte);
 
 /**
+ * @brief Formats a sequence of bytes as hex bytes
+ *
+ * Will write 2*n bytes to @p out.
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out] out  Pointer to output buffer, or NULL
+ * @param[in]  ptr  Pointer to bytes to convert
+ * @param[in]  n    Number of bytes to convert
+ *
+ * @return     2*n
+ */
+size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n);
+
+/**
  * @brief Formats a sequence of bytes as hex bytes, starting with the last byte
  *
  * Will write 2*n bytes to @p out.
@@ -75,6 +90,23 @@ size_t fmt_byte_hex(char *out, uint8_t byte);
  * @return     2*n
  */
 size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n);
+
+/**
+ * @brief Converts a sequence of hex bytes to an array of bytes
+ *
+ * The sequence of hex characters must have an even length:
+ * 2 hex character => 1 byte. If the sequence of hex has an odd length, this
+ * function returns 0 and an empty @p out.
+ *
+ * The hex characters sequence must contain valid hexadecimal characters
+ * otherwise the result in @p out is undefined.
+ *
+ * @param[out] out  Pointer to converted bytes, or NULL
+ * @param[in]  hex  Pointer to input buffer
+ * @returns    strlen(hex) / 2 when length of @p hex was even
+ * @returns    0 otherwise
+ */
+size_t fmt_hex_bytes(uint8_t *out, const char *hex);
 
 /**
  * @brief Convert a uint32 value to hex string.
@@ -194,28 +226,62 @@ size_t fmt_s16_dec(char *out, int16_t val);
  * If @p out is NULL, will only return the number of bytes that would have
  * been written.
  *
+ * @pre fp_digits < 8 (TENMAP_SIZE)
+ *
  * @param[out] out          Pointer to the output buffer, or NULL
- * @param[in]  val          Fixed point value, MUST be <= 4
+ * @param[in]  val          Fixed point value
  * @param[in]  fp_digits    Number of digits after the decimal point
  *
  * @return      Length of the resulting string
- * @return      0 if @p fp_digits is > 4
  */
 size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits);
+
+/**
+ * @brief Convert 32-bit fixed point number to a decimal string
+ *
+ * The input for this function is a signed 32-bit integer holding the fixed
+ * point value as well as an unsigned integer defining the position of the
+ * decimal point, so this value defines the number of decimal digits after the
+ * decimal point.
+ *
+ * Will add a leading "-" if @p val is negative.
+ *
+ * The resulting string will always be patted with zeros after the decimal point.
+ *
+ * For example: if @p val is -314159 and @p fp_digits is 5, the resulting string
+ * will be "-3.14159". For @p val := 16777215 and @p fp_digits := 6 the result
+ * will be "16.777215".
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @pre fp_digits < 8 (TENMAP_SIZE)
+ *
+ * @param[out] out          Pointer to the output buffer, or NULL
+ * @param[in]  val          Fixed point value
+ * @param[in]  fp_digits    Number of digits after the decimal point
+ *
+ * @return      Length of the resulting string
+ */
+size_t fmt_s32_dfp(char *out, int32_t val, unsigned fp_digits);
 
 /**
  * @brief Format float to string
  *
  * Converts float value @p f to string
  *
- * @pre -2^32 < f < 2^32
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
  *
- * @note This function is using floating point math. It pulls in about 2.4k
- *       bytes of code on ARM Cortex-M platforms.
+ * @attention This function is using floating point math.
+ *            It pulls in about 2.4k bytes of code on ARM Cortex-M platforms.
+ *
+ * @pre -2^32 < f < 2^32
+ * @pre precision < 8 (TENMAP_SIZE)
  *
  * @param[out]  out         string to write to (or NULL)
  * @param[in]   f           float value to convert
- * @param[in]   precision   number of digits after decimal point (<=7)
+ * @param[in]   precision   number of digits after decimal point
  *
  * @returns     nr of bytes the function did or would write to out
  */
@@ -312,17 +378,18 @@ void print_u64_dec(uint64_t val);
 /**
  * @brief Print float value
  *
+ * @note See fmt_float for code size warning!
+ *
  * @pre -2^32 < f < 2^32
+ * @pre precision < TENMAP_SIZE (== 8)
  *
  * @param[in]   f           float value to print
- * @param[in]   precision   number of digits after decimal point (<=7)
+ * @param[in]   precision   number of digits after decimal point
  */
 void print_float(float f, unsigned precision);
 
 /**
  * @brief Print null-terminated string to stdout
- *
- * @note See fmt_float for code size warning!
  *
  * @param[in]   str  Pointer to string to print
  */

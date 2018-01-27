@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import os, sys
+import os
+import sys
 import difflib
-#from string import maketrans
 from io import BytesIO, TextIOWrapper
 
 _in = "/-."
@@ -10,11 +10,13 @@ _out = "___"
 
 transtab = str.maketrans(_in, _out)
 
+
 def path_to_guardname(filepath):
     res = filepath.upper().translate(transtab)
     if res.startswith("_"):
         res = "PRIV" + res
     return res
+
 
 def get_guard_name(filepath):
     parts = filepath.split(os.sep)
@@ -23,17 +25,18 @@ def get_guard_name(filepath):
     for i, part in enumerate(parts):
         if part == "include":
             found = True
-            start = i+1
+            start = i + 1
             break
 
     if not found:
-        start = len(parts) -1
+        start = len(parts) - 1
 
     return path_to_guardname(os.path.join(*parts[start:]))
 
+
 def fix_headerguard(filename):
     supposed = get_guard_name(filename)
-    with open(filename, "r",encoding='utf-8', errors='ignore') as f:
+    with open(filename, "r", encoding='utf-8', errors='ignore') as f:
         inlines = f.readlines()
 
     tmp = TextIOWrapper(BytesIO(), encoding="utf-8", errors="ignore")
@@ -42,7 +45,7 @@ def fix_headerguard(filename):
     guard_found = 0
     guard_name = ""
     ifstack = 0
-    for n, line in enumerate(inlines):
+    for line in inlines:
         if guard_found == 0:
             if line.startswith("#ifndef"):
                 guard_found += 1
@@ -68,16 +71,18 @@ def fix_headerguard(filename):
 
     tmp.seek(0)
     if guard_found == 3:
-        for line in difflib.unified_diff(inlines, tmp.readlines(), "%s" % filename, "%s" % filename):
+        for line in difflib.unified_diff(inlines, tmp.readlines(),
+                                         "%s" % filename, "%s" % filename):
             sys.stdout.write(line)
     else:
         print("%s: no / broken header guard" % filename, file=sys.stderr)
         return False
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     error = False
     for filename in sys.argv[1:]:
-        if fix_headerguard(filename) == False:
+        if fix_headerguard(filename) is False:
             error = True
 
     if error:

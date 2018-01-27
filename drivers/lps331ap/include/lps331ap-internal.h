@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_lps331ap
+ * @ingroup     drivers_lps331ap
  * @{
  *
  * @file
@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
- * @name LPS331AP registers
+ * @name    LPS331AP registers
  * @{
  */
 #define LPS331AP_AUTO_INC               0x80
@@ -50,7 +50,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name LPS331AP CTRL_REG1 bitfields
+ * @name    LPS331AP CTRL_REG1 bitfields
  * @{
  */
 #define LPS331AP_CTRL_REG1_PD           0x80

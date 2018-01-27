@@ -19,6 +19,7 @@
 #ifndef TSL2561_PARAMS_H
 #define TSL2561_PARAMS_H
 
+#include "board.h"
 #include "saul_reg.h"
 #include "tsl2561.h"
 
@@ -27,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the TSL2561
+ * @name    Set default configuration parameters for the TSL2561
  * @{
  */
 #ifndef TSL2561_PARAM_I2C_DEV

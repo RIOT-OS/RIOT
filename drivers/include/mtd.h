@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 /**
- * @brief MTD power states
+ * @brief   MTD power states
  */
 enum mtd_power_state {
     MTD_POWER_UP,    /**< Power up */
@@ -41,7 +41,7 @@ enum mtd_power_state {
 };
 
 /**
- * @brief MTD driver interface
+ * @brief   MTD driver interface
  *
  * This define the functions to access a MTD.
  *
@@ -53,7 +53,7 @@ enum mtd_power_state {
 typedef struct mtd_desc mtd_desc_t;
 
 /**
- * @brief MTD device descriptor
+ * @brief   MTD device descriptor
  */
 typedef struct {
     const mtd_desc_t *driver;  /**< MTD driver */
@@ -63,7 +63,7 @@ typedef struct {
 } mtd_dev_t;
 
 /**
- * @brief MTD driver interface
+ * @brief   MTD driver interface
  *
  * This define the functions to access a MTD.
  *
@@ -74,7 +74,7 @@ typedef struct {
  */
 struct mtd_desc {
     /**
-     * @brief Initialize Memory Technology Device (MTD)
+     * @brief   Initialize Memory Technology Device (MTD)
      *
      * @param[in] dev  Pointer to the selected driver
      *
@@ -84,7 +84,7 @@ struct mtd_desc {
     int (*init)(mtd_dev_t *dev);
 
     /**
-     * @brief Read from the Memory Technology Device (MTD)
+     * @brief   Read from the Memory Technology Device (MTD)
      *
      * No alignment is required on @p addr and @p size.
      *
@@ -102,7 +102,7 @@ struct mtd_desc {
                 uint32_t size);
 
     /**
-     * @brief Write to the Memory Technology Device (MTD)
+     * @brief   Write to the Memory Technology Device (MTD)
      *
      * @p addr + @p size must be inside a page boundary. @p addr can be anywhere
      * but the buffer cannot overlap two pages.
@@ -121,7 +121,7 @@ struct mtd_desc {
                  uint32_t size);
 
     /**
-     * @brief Erase sector(s) over the Memory Technology Device (MTD)
+     * @brief   Erase sector(s) over the Memory Technology Device (MTD)
      *
      * @p addr must be aligned on a sector boundary. @p size must be a multiple of a sector size.
      *
@@ -137,7 +137,7 @@ struct mtd_desc {
                  uint32_t size);
 
     /**
-     * @brief Control power of Memory Technology Device (MTD)
+     * @brief   Control power of Memory Technology Device (MTD)
      *
      * @param[in] dev       Pointer to the selected driver
      * @param[in] power     Power state to apply (from @ref mtd_power_state)
@@ -149,7 +149,7 @@ struct mtd_desc {
 };
 
 /**
- * @brief mtd_init Initialize a MTD device
+ * @brief   mtd_init Initialize a MTD device
  *
  * @param mtd the device to initialize
  *
@@ -158,7 +158,7 @@ struct mtd_desc {
 int mtd_init(mtd_dev_t *mtd);
 
 /**
- * @brief mtd_read Read data from a MTD device
+ * @brief   mtd_read Read data from a MTD device
  *
  * No alignment is required on @p addr and @p count.
  *
@@ -177,7 +177,7 @@ int mtd_init(mtd_dev_t *mtd);
 int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
 
 /**
- * @brief mtd_read write data to a MTD device
+ * @brief   mtd_read write data to a MTD device
  *
  * @p addr + @p count must be inside a page boundary. @p addr can be anywhere
  * but the buffer cannot overlap two pages.
@@ -198,7 +198,7 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
 int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
 
 /**
- * @brief mtd_erase Erase sectors of a MTD device
+ * @brief   mtd_erase Erase sectors of a MTD device
  *
  * @p addr must be aligned on a sector boundary. @p count must be a multiple of a sector size.
  *
@@ -216,7 +216,7 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
 int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count);
 
 /**
- * @brief mtd_power Set power mode on a MTD device
+ * @brief   mtd_power Set power mode on a MTD device
  *
  * @param      mtd   the device to access
  * @param[in]  power the power mode to set
@@ -231,7 +231,7 @@ int mtd_power(mtd_dev_t *mtd, enum mtd_power_state power);
 
 #if defined(MODULE_VFS) || defined(DOXYGEN)
 /**
- * @brief MTD driver for VFS
+ * @brief   MTD driver for VFS
  */
 extern const vfs_file_ops_t mtd_vfs_ops;
 #endif
@@ -240,5 +240,5 @@ extern const vfs_file_ops_t mtd_vfs_ops;
 }
 #endif
 
-/** @} */
 #endif /* MTD_H */
+/** @} */

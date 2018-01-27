@@ -73,34 +73,27 @@ extern "C" {
 
 /**
  * @brief   Default PWM access macro
- * @{
  */
 #ifndef PWM_DEV
 #define PWM_DEV(x)          (x)
 #endif
-/** @} */
 
 /**
  * @brief  Default PWM undefined value
- * @{
  */
 #ifndef PWM_UNDEF
 #define PWM_UNDEF           (UINT_MAX)
 #endif
-/** @} */
 
 /**
  * @brief   Default PWM type definition
- * @{
  */
 #ifndef HAVE_PWM_T
 typedef unsigned int pwm_t;
 #endif
-/** @} */
 
 /**
  * @brief   Default PWM mode definition
- * @{
  */
 #ifndef HAVE_PWM_MODE_T
 typedef enum {
@@ -109,7 +102,6 @@ typedef enum {
     PWM_CENTER          /*< use center aligned PWM */
 } pwm_mode_t;
 #endif
-/** @} */
 
 /**
  * @brief   Initialize a PWM device

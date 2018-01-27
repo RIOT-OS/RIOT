@@ -3,7 +3,7 @@
  *
  * \brief Top header file for SAMR21
  *
- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,9 +40,6 @@
  * \asf_license_stop
  *
  */
- /**
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
 #ifndef _SAMR21_
 #define _SAMR21_
@@ -52,18 +49,20 @@
  * \brief SAMR21 CMSIS Definitions.
  */
 
-#if defined(__SAMR21E16A__) || defined(__ATSAMR21E16A__)
-#include "samr21e16a.h"
+#if   defined(__SAMR21E16A__) || defined(__ATSAMR21E16A__)
+  #include "samr21e16a.h"
 #elif defined(__SAMR21E17A__) || defined(__ATSAMR21E17A__)
-#include "samr21e17a.h"
+  #include "samr21e17a.h"
 #elif defined(__SAMR21E18A__) || defined(__ATSAMR21E18A__)
-#include "samr21e18a.h"
+  #include "samr21e18a.h"
+#elif defined(__SAMR21E19A__) || defined(__ATSAMR21E19A__)
+  #include "samr21e19a.h"
 #elif defined(__SAMR21G16A__) || defined(__ATSAMR21G16A__)
-#include "samr21g16a.h"
+  #include "samr21g16a.h"
 #elif defined(__SAMR21G17A__) || defined(__ATSAMR21G17A__)
-#include "samr21g17a.h"
+  #include "samr21g17a.h"
 #elif defined(__SAMR21G18A__) || defined(__ATSAMR21G18A__)
-#include "samr21g18a.h"
+  #include "samr21g18a.h"
 #else
   #error Library does not support the specified device.
 #endif

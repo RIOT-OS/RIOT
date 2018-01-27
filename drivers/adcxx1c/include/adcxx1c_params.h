@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the ADCXX1C driver
+ * @name    Set default configuration parameters for the ADCXX1C driver
  * @{
  */
 #ifndef ADCXX1C_PARAM_I2C

@@ -44,6 +44,30 @@ int main(void)
     }
     puts("[SUCCESS]\n");
 
+    puts("Powering down LSM6DSL sensor...");
+    if (lsm6dsl_acc_power_down(&dev) != LSM6DSL_OK) {
+        puts("[ERROR]");
+        return 1;
+    }
+    if (lsm6dsl_gyro_power_down(&dev) != LSM6DSL_OK) {
+        puts("[ERROR]");
+        return 1;
+    }
+    puts("[SUCCESS]\n");
+
+    xtimer_sleep(1);
+
+    puts("Powering up LSM6DSL sensor...");
+    if (lsm6dsl_acc_power_up(&dev) != LSM6DSL_OK) {
+        puts("[ERROR]");
+        return 1;
+    }
+    if (lsm6dsl_gyro_power_up(&dev) != LSM6DSL_OK) {
+        puts("[ERROR]");
+        return 1;
+    }
+    puts("[SUCCESS]\n");
+
     while (1) {
         if (lsm6dsl_read_acc(&dev, &acc_value) == LSM6DSL_OK) {
             printf("Accelerometer x: %i y: %i z: %i\n", acc_value.x,

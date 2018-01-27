@@ -48,7 +48,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Calibration struct for the BMX280 sensor
+ * @brief   Calibration struct for the BMX280 sensor
  *
  * This must be read from the device at startup.
  */
@@ -76,7 +76,7 @@ typedef struct {
 } bmx280_calibration_t;
 
 /**
- * @brief Values for t_sb field of the BMX280 config register
+ * @brief   Values for t_sb field of the BMX280 config register
  */
 typedef enum {
     BMX280_SB_0_5 = 0,
@@ -90,7 +90,7 @@ typedef enum {
 } bmx280_t_sb_t;
 
 /**
- * @brief Values for filter field of the BMX280 config register
+ * @brief   Values for filter field of the BMX280 config register
  */
 typedef enum {
     BMX280_FILTER_OFF = 0,
@@ -101,7 +101,7 @@ typedef enum {
 } bmx280_filter_t;
 
 /**
- * @brief Values for mode field of the BMX280 ctrl_meas register
+ * @brief   Values for mode field of the BMX280 ctrl_meas register
  */
 typedef enum {
     BMX280_MODE_SLEEP = 0,
@@ -111,7 +111,7 @@ typedef enum {
 } bmx280_mode_t;
 
 /**
- * @brief Values for oversampling settings
+ * @brief   Values for oversampling settings
  *
  * These values are used for:
  *  - osrs_h field of the BME280 ctrl_hum register
@@ -128,7 +128,7 @@ typedef enum {
 } bmx280_osrs_t;
 
 /**
- * @brief Parameters for the BMX280 sensor
+ * @brief   Parameters for the BMX280 sensor
  *
  * These parameters are needed to configure the device at startup.
  */
@@ -152,7 +152,7 @@ typedef struct {
 } bmx280_params_t;
 
 /**
- * @brief Device descriptor for the BMX280 sensor
+ * @brief   Device descriptor for the BMX280 sensor
  */
 typedef struct {
     bmx280_params_t params;             /**< Device Parameters */
@@ -170,7 +170,7 @@ enum {
 };
 
 /**
- * @brief Initialize the given BMX280 device
+ * @brief   Initialize the given BMX280 device
  *
  * @param[out] dev          Initialized device descriptor of BMX280 device
  * @param[in]  params       The parameters for the BMX280 device (sampling rate, etc)
@@ -183,7 +183,7 @@ enum {
 int bmx280_init(bmx280_t* dev, const bmx280_params_t* params);
 
 /**
- * @brief Read temperature value from the given BMX280 device, returned in centi °C
+ * @brief   Read temperature value from the given BMX280 device, returned in centi °C
  *
  * @param[in] dev           Device descriptor of BMX280 device to read from
  *
@@ -193,7 +193,7 @@ int bmx280_init(bmx280_t* dev, const bmx280_params_t* params);
 int16_t bmx280_read_temperature(const bmx280_t* dev);
 
 /**
- * @brief Read air pressure value from the given BMX280 device, returned in PA
+ * @brief   Read air pressure value from the given BMX280 device, returned in PA
  *
  * @details This function should only be called after doing bmx280_read_temperature
  *          first.
@@ -206,7 +206,7 @@ uint32_t bmx280_read_pressure(const bmx280_t *dev);
 
 #if defined(MODULE_BME280)
 /**
- * @brief Read humidity value from the given BME280 device, returned in centi %RH
+ * @brief   Read humidity value from the given BME280 device, returned in centi %RH
  *
  * @details This function should only be called after doing bmx280_read_temperature
  *          first. It's only available with BME280 sensor.

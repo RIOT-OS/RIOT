@@ -1,5 +1,5 @@
 MODULE = board
 
-DIRS = $(RIOTBOARD)/iotlab-common
+DIRS = $(RIOTBOARD)/common/iotlab
 
 include $(RIOTBASE)/Makefile.base

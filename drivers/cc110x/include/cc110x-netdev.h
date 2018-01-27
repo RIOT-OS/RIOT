@@ -64,3 +64,4 @@ int netdev_cc110x_setup(netdev_cc110x_t *netdev_cc110x, const cc110x_params_t *p
 #endif
 
 #endif /* CC110X_NETDEV_H */
+/** @} */

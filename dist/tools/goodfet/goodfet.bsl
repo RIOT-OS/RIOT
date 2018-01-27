@@ -296,7 +296,7 @@ class LowLevel:
 
     def comInit(self, port):
         """Tries to open the serial port given and
-        initialises the port and variables.
+        initializes the port and variables.
         The timeout and the number of allowed errors is multiplied by
         'aProlongFactor' after transmission of a command to give
         plenty of time to the micro controller to finish the command.

@@ -85,9 +85,8 @@
 /*  Tip: To avoid modifying this file each time you need to switch between these
         devices, you can define the device in your toolchain compiler preprocessor.
   */
-#define STM32L1XX_XL (1U)
 #if !defined (STM32L1XX_MD) && !defined (STM32L1XX_MDP) && !defined (STM32L1XX_HD) && !defined (STM32L1XX_XL)
- #error "Please select first the target STM32L1xx device used in your application (in stm32l1xx.h file)"
+#error "Please select first the target STM32L1xx device used in your application (in stm32l1xx.h file)"
 #endif
 
 #if !defined  USE_STDPERIPH_DRIVER

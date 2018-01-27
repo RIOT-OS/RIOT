@@ -1,8 +1,18 @@
-export MEMORY_BASE=0x80000000
-export MEMORY_SIZE=1M
-export APP_START=0x80000000
+export INCLUDES += -I$(RIOTCPU)/mips32r2_common/include
 
-include $(RIOTMAKE)/arch/mips.inc.mk
+export USEMODULE += mips32r2_common
+export USEMODULE += mips32r2_common_periph
+export USEMODULE += periph_common
+export USEMODULE += newlib
 
-export LINKFLAGS += -Tuhi32.ld
-export USEMODULE += periph
+# mips32 needs periph_timer for its gettimeofday() implementation
+export USEMODULE += periph_timer
+
+ifeq ($(USE_UHI_SYSCALLS),1)
+  #Use UHI to handle syscalls
+  export LINKFLAGS += -luhi
+  export USEMODULE += newlib_syscalls_mips_uhi
+else
+  #Use RIOT to handle syscalls (default)
+  export USEMODULE += newlib_syscalls_default
+endif

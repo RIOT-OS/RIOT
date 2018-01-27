@@ -19,7 +19,7 @@ priorities - is the first thread that runs and calls the `main()` function.
 This function needs to be defined in the source code of the application
 (typically located in `main.c`).
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
 #include <stdio.h>
 
 int main(void)

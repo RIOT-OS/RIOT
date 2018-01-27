@@ -6,7 +6,7 @@ BOARD ?= native
 
 # stm32f0discovery objects are too big with ARM Embedded Toolchain v4.9.3 20141119
 # (used currently by travis)
-BOARD_INSUFFICIENT_MEMORY= nucleo32-f031 nucleo32-f042 stm32f0discovery weio
+BOARD_INSUFFICIENT_MEMORY= nucleo32-f031 nucleo32-f042 stm32f0discovery
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -26,7 +26,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP
+DEVELHELP ?= 1
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

@@ -1,7 +1,5 @@
 # Put defined MCU peripherals here (in alphabetical order)
-FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio
-FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_rtc
@@ -10,7 +8,9 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
 # load the common Makefile.features for Nucleo-144 boards
-include $(RIOTBOARD)/nucleo144-common/Makefile.features
+include $(RIOTBOARD)/common/nucleo144/Makefile.features
 
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = cortex_m3_2
+
+-include $(RIOTCPU)/stm32f2/Makefile.features

@@ -35,22 +35,6 @@ extern "C" {
 #define TIMER_0_CHANNELS    (3)
 /** @} */
 
-/**
- * @brief   No UART driver for this board currently
- *          Note this value must be set though (to 0)
- */
-#define UART_NUMOF          (0)
-
-/**
- * @brief   Enable DSP context save + restore.
- */
-#define MIPS_DSP            (1)
-
-/**
- * @brief   Enable FPU context save + restore.
- */
-#define MIPS_HARD_FLOAT     (1)
-
 #ifdef __cplusplus
 }
 #endif

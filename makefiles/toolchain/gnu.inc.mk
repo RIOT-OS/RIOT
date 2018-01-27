@@ -1,4 +1,3 @@
-export GDBPREFIX ?= $(PREFIX)
 export CC         = $(PREFIX)gcc
 export CXX        = $(PREFIX)g++
 export CCAS      ?= $(CC)
@@ -16,4 +15,5 @@ $(warning objcopy not found. Hex file will not be created.)
 export OBJCOPY    = true
 endif
 export OBJDUMP    = $(PREFIX)objdump
-export DBG        = $(GDBPREFIX)gdb
+# We use GDB for debugging
+include $(RIOTMAKE)/tools/gdb.inc.mk

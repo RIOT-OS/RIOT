@@ -1,125 +1,128 @@
 ifneq (,$(filter csma_sender,$(USEMODULE)))
-    DIRS += net/link_layer/csma_sender
+  DIRS += net/link_layer/csma_sender
 endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
-    DIRS += posix/semaphore
+  DIRS += posix/semaphore
 endif
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
-    DIRS += posix/sockets
+  DIRS += posix/sockets
+endif
+ifneq (,$(filter posix_time,$(USEMODULE)))
+  DIRS += posix/time
 endif
 ifneq (,$(filter pthread,$(USEMODULE)))
-    DIRS += posix/pthread
+  DIRS += posix/pthread
 endif
 ifneq (,$(filter shell_commands,$(USEMODULE)))
-    DIRS += shell/commands
+  DIRS += shell/commands
 endif
 ifneq (,$(filter net_help,$(USEMODULE)))
-    DIRS += net/crosslayer/net_help
+  DIRS += net/crosslayer/net_help
 endif
 ifneq (,$(filter routing,$(USEMODULE)))
-    DIRS += net/routing
+  DIRS += net/routing
 endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
-    DIRS += oneway-malloc
+  DIRS += oneway-malloc
 endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
-    DIRS += net/link_layer/ieee802154
+  DIRS += net/link_layer/ieee802154
 endif
 ifneq (,$(filter netdev_test,$(USEMODULE)))
-    DIRS += net/netdev_test
+  DIRS += net/netdev_test
 endif
 ifneq (,$(filter icmpv6,$(USEMODULE)))
-    DIRS += net/network_layer/icmpv6
+  DIRS += net/network_layer/icmpv6
 endif
 ifneq (,$(filter ipv4_addr,$(USEMODULE)))
-    DIRS += net/network_layer/ipv4/addr
+  DIRS += net/network_layer/ipv4/addr
 endif
 ifneq (,$(filter ipv6_addr,$(USEMODULE)))
-    DIRS += net/network_layer/ipv6/addr
+  DIRS += net/network_layer/ipv6/addr
 endif
 ifneq (,$(filter ipv6_ext_rh,$(USEMODULE)))
-    DIRS += net/network_layer/ipv6/ext/rh
+  DIRS += net/network_layer/ipv6/ext/rh
 endif
 ifneq (,$(filter ipv6_ext,$(USEMODULE)))
-    DIRS += net/network_layer/ipv6/ext
+  DIRS += net/network_layer/ipv6/ext
 endif
 ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
-    DIRS += net/network_layer/ipv6/hdr
+  DIRS += net/network_layer/ipv6/hdr
 endif
 ifneq (,$(filter gnrc gnrc_%,$(USEMODULE)))
-    DIRS += net/gnrc
+  DIRS += net/gnrc
 endif
 ifneq (,$(filter inet_csum,$(USEMODULE)))
-    DIRS += net/crosslayer/inet_csum
+  DIRS += net/crosslayer/inet_csum
 endif
 ifneq (,$(filter cipher_modes,$(USEMODULE)))
-    DIRS += crypto/modes
+  DIRS += crypto/modes
 endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
-    DIRS += net/routing/nhdp
-endif
-ifneq (,$(filter gnrc_netdev,$(USEMODULE)))
-    DIRS += net/gnrc/link_layer/netdev
+  DIRS += net/routing/nhdp
 endif
 ifneq (,$(filter fib,$(USEMODULE)))
-    DIRS += net/network_layer/fib
+  DIRS += net/network_layer/fib
 endif
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
-    DIRS += net/network_layer/sixlowpan
+  DIRS += net/network_layer/sixlowpan
 endif
 ifneq (,$(filter log_%,$(USEMODULE)))
-    DIRS += log
+  DIRS += log
 endif
 ifneq (,$(filter xtimer,$(USEMODULE)))
-    DIRS += xtimer
+  DIRS += xtimer
 endif
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
-    DIRS += cpp11-compat
+  DIRS += cpp11-compat
 endif
 ifneq (,$(filter udp,$(USEMODULE)))
-    DIRS += net/transport_layer/udp
+  DIRS += net/transport_layer/udp
 endif
 ifneq (,$(filter tcp,$(USEMODULE)))
-    DIRS += net/transport_layer/tcp
+  DIRS += net/transport_layer/tcp
 endif
 ifneq (,$(filter hamming256,$(USEMODULE)))
-    DIRS += ecc/hamming256
+  DIRS += ecc/hamming256
 endif
 ifneq (,$(filter uhcpc,$(USEMODULE)))
-    DIRS += net/application_layer/uhcp
+  DIRS += net/application_layer/uhcp
 endif
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
-    DIRS += net/gnrc/application_layer/uhcpc
+  DIRS += net/gnrc/application_layer/uhcpc
 endif
 ifneq (,$(filter sntp,$(USEMODULE)))
-    DIRS += net/application_layer/sntp
+  DIRS += net/application_layer/sntp
 endif
 ifneq (,$(filter netopt,$(USEMODULE)))
-    DIRS += net/crosslayer/netopt
+  DIRS += net/crosslayer/netopt
 endif
 ifneq (,$(filter sema,$(USEMODULE)))
-    DIRS += sema
+  DIRS += sema
 endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
-    DIRS += net/application_layer/coap
+  DIRS += net/application_layer/gcoap
 endif
 ifneq (,$(filter emcute,$(USEMODULE)))
-    DIRS += net/application_layer/emcute
+  DIRS += net/application_layer/emcute
 endif
 ifneq (,$(filter sock_util,$(USEMODULE)))
-    DIRS += net/sock
+  DIRS += net/sock
 endif
 ifneq (,$(filter sock_dns,$(USEMODULE)))
-    DIRS += net/application_layer/dns
+  DIRS += net/application_layer/dns
 endif
 ifneq (,$(filter constfs,$(USEMODULE)))
-    DIRS += fs/constfs
+  DIRS += fs/constfs
 endif
 ifneq (,$(filter devfs,$(USEMODULE)))
-    DIRS += fs/devfs
+  DIRS += fs/devfs
 endif
 ifneq (,$(filter l2filter,$(USEMODULE)))
-    DIRS += net/link_layer/l2filter
+  DIRS += net/link_layer/l2filter
+endif
+ifneq (,$(filter nanocoap,$(USEMODULE)))
+  DIRS += net/application_layer/nanocoap
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

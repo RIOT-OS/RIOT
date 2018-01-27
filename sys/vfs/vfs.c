@@ -75,7 +75,7 @@ static clist_node_t _vfs_mounts_list;
  * @return fd on success
  * @return <0 on error
  */
-inline static int _allocate_fd(int fd);
+static inline int _allocate_fd(int fd);
 
 /**
  * @internal
@@ -83,7 +83,7 @@ inline static int _allocate_fd(int fd);
  *
  * @param[in]  fd     fd to free
  */
-inline static void _free_fd(int fd);
+static inline void _free_fd(int fd);
 
 /**
  * @internal
@@ -98,7 +98,7 @@ inline static void _free_fd(int fd);
  * @return fd on success
  * @return <0 on error
  */
-inline static int _init_fd(int fd, const vfs_file_ops_t *f_op, vfs_mount_t *mountp, int flags, void *private_data);
+static inline int _init_fd(int fd, const vfs_file_ops_t *f_op, vfs_mount_t *mountp, int flags, void *private_data);
 
 /**
  * @internal
@@ -115,7 +115,7 @@ inline static int _init_fd(int fd, const vfs_file_ops_t *f_op, vfs_mount_t *moun
  * @return mount index on success
  * @return <0 on error
  */
-inline static int _find_mount(vfs_mount_t **mountpp, const char *name, const char **rel_path);
+static inline int _find_mount(vfs_mount_t **mountpp, const char *name, const char **rel_path);
 
 /**
  * @internal
@@ -126,7 +126,7 @@ inline static int _find_mount(vfs_mount_t **mountpp, const char *name, const cha
  * @return 0 if the fd is valid
  * @return <0 if the fd is not valid
  */
-inline static int _fd_is_valid(int fd);
+static inline int _fd_is_valid(int fd);
 
 static mutex_t _mount_mutex = MUTEX_INIT;
 static mutex_t _open_mutex = MUTEX_INIT;
@@ -413,7 +413,8 @@ int vfs_mount(vfs_mount_t *mountp)
     if ((mountp == NULL) || (mountp->fs == NULL) || (mountp->mount_point == NULL)) {
         return -EINVAL;
     }
-    DEBUG("vfs_mount: -> \"%s\" (%p), %p\n", mountp->mount_point, (void *)mountp->mount_point, mountp->private_data);
+    DEBUG("vfs_mount: -> \"%s\" (%p), %p\n",
+          mountp->mount_point, (void *)mountp->mount_point, mountp->private_data);
     if (mountp->mount_point[0] != '/') {
         DEBUG("vfs_mount: not absolute mount_point path\n");
         return -EINVAL;
@@ -727,7 +728,8 @@ int vfs_bind(int fd, int flags, const vfs_file_ops_t *f_op, void *private_data)
 
 int vfs_normalize_path(char *buf, const char *path, size_t buflen)
 {
-    DEBUG("vfs_normalize_path: %p, \"%s\" (%p), %lu\n", buf, path, path, (unsigned long)buflen);
+    DEBUG("vfs_normalize_path: %p, \"%s\" (%p), %lu\n",
+          (void *)buf, path, (void *)path, (unsigned long)buflen);
     size_t len = 0;
     int npathcomp = 0;
     const char *path_end = path + strlen(path); /* Find the terminating null byte */
@@ -736,7 +738,8 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen)
     }
 
     while(path <= path_end) {
-        DEBUG("vfs_normalize_path: + %d \"%.*s\" <- \"%s\" (%p)\n", npathcomp, len, buf, path, path);
+        DEBUG("vfs_normalize_path: + %d \"%.*s\" <- \"%s\" (%p)\n",
+              npathcomp, (int)len, buf, path, (void *)path);
         if (path[0] == '\0') {
             break;
         }
@@ -810,7 +813,7 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur)
     return container_of(node, vfs_mount_t, list_entry);
 }
 
-inline static int _allocate_fd(int fd)
+static inline int _allocate_fd(int fd)
 {
     if (fd < 0) {
         for (fd = 0; fd < VFS_MAX_OPEN_FILES; ++fd) {
@@ -837,7 +840,7 @@ inline static int _allocate_fd(int fd)
     return fd;
 }
 
-inline static void _free_fd(int fd)
+static inline void _free_fd(int fd)
 {
     DEBUG("_free_fd: %d, pid=%d\n", fd, _vfs_open_files[fd].pid);
     if (_vfs_open_files[fd].mp != NULL) {
@@ -846,7 +849,7 @@ inline static void _free_fd(int fd)
     _vfs_open_files[fd].pid = KERNEL_PID_UNDEF;
 }
 
-inline static int _init_fd(int fd, const vfs_file_ops_t *f_op, vfs_mount_t *mountp, int flags, void *private_data)
+static inline int _init_fd(int fd, const vfs_file_ops_t *f_op, vfs_mount_t *mountp, int flags, void *private_data)
 {
     fd = _allocate_fd(fd);
     if (fd < 0) {
@@ -861,7 +864,7 @@ inline static int _init_fd(int fd, const vfs_file_ops_t *f_op, vfs_mount_t *moun
     return fd;
 }
 
-inline static int _find_mount(vfs_mount_t **mountpp, const char *name, const char **rel_path)
+static inline int _find_mount(vfs_mount_t **mountpp, const char *name, const char **rel_path)
 {
     size_t longest_match = 0;
     size_t name_len = strlen(name);
@@ -914,7 +917,7 @@ inline static int _find_mount(vfs_mount_t **mountpp, const char *name, const cha
     return 0;
 }
 
-inline static int _fd_is_valid(int fd)
+static inline int _fd_is_valid(int fd)
 {
     if ((unsigned int)fd >= VFS_MAX_OPEN_FILES) {
         return -EBADF;

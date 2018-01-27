@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     cpu_stm32_common
  * @ingroup     drivers_periph_spi
  * @{
  *
@@ -30,9 +30,6 @@
 #include "mutex.h"
 #include "assert.h"
 #include "periph/spi.h"
-
-/* Remove this ugly guard once we selectively build the periph drivers */
-#ifdef SPI_NUMOF
 
 /**
  * @brief   Number of bits to shift the BR value in the CR1 register
@@ -120,8 +117,6 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    assert((clk >= SPI_CLK_100KHZ) && (clk <= SPI_CLK_10MHZ));
-
     /* lock bus */
     mutex_lock(&locks[bus]);
     /* enable SPI device clock */
@@ -209,5 +204,3 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         }
     }
 }
-
-#endif /* SPI_NUMOF */

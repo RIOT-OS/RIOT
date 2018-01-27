@@ -113,6 +113,7 @@ char rx_handler_stack[THREAD_STACKSIZE_MAIN];
 /* RX handler that waits for a message from the ISR */
 void *nrf24l01p_rx_handler(void *arg)
 {
+    (void)arg;
     msg_t msg_q[1];
     msg_init_queue(msg_q, 1);
     unsigned int pid = thread_getpid();
@@ -209,7 +210,7 @@ int cmd_send(int argc, char **argv)
     char tx_buf[NRF24L01P_MAX_DATA_LENGTH];
 
     /* fill TX buffer with numbers 32..1 */
-    for (int i = 0; i < sizeof(tx_buf); i++) {
+    for (size_t i = 0; i < sizeof(tx_buf); i++) {
         tx_buf[i] = NRF24L01P_MAX_DATA_LENGTH - i;
     }
     /* power on the device */

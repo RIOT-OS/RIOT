@@ -108,16 +108,16 @@
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for TC1 peripheral ========== */
-#define TC1_CC_NUM                  2
+#define TC1_CC_NUM                  2       
 #define TC1_DMAC_ID_MC_0            26
 #define TC1_DMAC_ID_MC_1            27
 #define TC1_DMAC_ID_MC_LSB          26
 #define TC1_DMAC_ID_MC_MSB          27
 #define TC1_DMAC_ID_MC_SIZE         2
 #define TC1_DMAC_ID_OVF             25       // Indexes of DMA Overflow trigger
-#define TC1_EXT                     0
-#define TC1_GCLK_ID                 27
-#define TC1_MASTER                  0
-#define TC1_OW_NUM                  2
+#define TC1_EXT                     0       
+#define TC1_GCLK_ID                 27      
+#define TC1_MASTER                  0       
+#define TC1_OW_NUM                  2       
 
 #endif /* _SAML21_TC1_INSTANCE_ */

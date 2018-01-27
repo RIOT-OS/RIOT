@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters
+ * @name    Set default configuration parameters
  * @{
  */
 #ifndef L3G4200D_PARAM_I2C

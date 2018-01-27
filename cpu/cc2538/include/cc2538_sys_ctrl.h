@@ -151,9 +151,10 @@ typedef struct {
 /**
  * @brief Compute the current system clock frequency based on the SYS_CTRL register states
  */
-#define sys_clock_freq() ((SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC ? \
-                           RCOSC16M_FREQ : XOSC32M_FREQ) >> \
-                                SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.SYS_DIV )
+#define sys_clock_freq() ((uint32_t)\
+    (SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.OSC ? \
+               RCOSC16M_FREQ : XOSC32M_FREQ) >> \
+    SYS_CTRL->cc2538_sys_ctrl_clk_ctrl.CLOCK_CTRLbits.SYS_DIV)
 
 #ifdef __cplusplus
 } /* end extern "C" */

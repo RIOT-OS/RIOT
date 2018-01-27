@@ -101,6 +101,28 @@ extern "C"
 #endif
 
 /**
+ * @brief   Default low power mode
+ *
+ * If set to 0, the device will be always-on
+ * If set to 1, the device will be put in low power mode between measurements.
+ * This adds a @c TMP006_CONVERSION_TIME us delay to each measurement call
+ * for bringing the device out of standby.
+ */
+#ifndef TMP006_USE_LOW_POWER
+#define TMP006_USE_LOW_POWER (0)
+#endif
+
+/**
+ * @brief   Default raw value mode
+ *
+ * If set to 0, measurements will be converted to Celsius.
+ * If set to 1, raw adc readings will be returned.
+ */
+#ifndef TMP006_USE_RAW_VALUES
+#define TMP006_USE_RAW_VALUES (0)
+#endif
+
+/**
  * @name    Conversion rate and AVG sampling configuration
  * @{
  */
@@ -223,9 +245,9 @@ int tmp006_read(const tmp006_t *dev, int16_t *rawv, int16_t *rawt, uint8_t *drdy
 void tmp006_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj);
 
 /**
- * @brief Convenience function to get ambient and object temperatures in [°C]
+ * @brief   Convenience function to get ambient and object temperatures in [°C]
  *
- * @note Temperature scaled by x100 for accuracy and avoid floats
+ * @note    Temperature scaled by x100 for accuracy and avoid floats
  *
  * @param[in]  dev          device descriptor of sensor
  * @param[out] ta           converted ambient temperature

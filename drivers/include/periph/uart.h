@@ -60,30 +60,24 @@ extern "C" {
 
 /**
  * @brief   Define default UART type identifier
- * @{
  */
 #ifndef HAVE_UART_T
 typedef unsigned int uart_t;
 #endif
-/** @} */
 
 /**
  * @brief   Default UART undefined value
- * @{
  */
 #ifndef UART_UNDEF
 #define UART_UNDEF          (UINT_MAX)
 #endif
-/** @} */
 
 /**
  * @brief   Default UART device access macro
- * @{
  */
 #ifndef UART_DEV
 #define UART_DEV(x)         (x)
 #endif
-/** @} */
 
 /**
  * @brief   Signature for receive interrupt callback
@@ -95,7 +89,6 @@ typedef void(*uart_rx_cb_t)(void *arg, uint8_t data);
 
 /**
  * @brief   Interrupt context for a UART device
- * @{
  */
 #ifndef HAVE_UART_ISR_CTX_T
 typedef struct {
@@ -103,7 +96,6 @@ typedef struct {
     void *arg;              /**< argument to both callback routines */
 } uart_isr_ctx_t;
 #endif
-/** @} */
 
 /**
  * @brief   Possible UART return values

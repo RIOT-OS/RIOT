@@ -1,0 +1,1 @@
+-include $(RIOTCPU)/nrf5x_common/Makefile.features

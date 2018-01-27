@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @name TSL2561 I2C addresses
+ * @name    TSL2561 I2C addresses
  * @{
  */
 #define TSL2561_ADDR_LOW                  (0x29)
@@ -38,7 +38,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name TSL2561 integration times
+ * @name    TSL2561 integration times
  * @{
  */
 #define TSL2561_INTEGRATIONTIME_13MS      (0x00)    /* 13.7ms */
@@ -48,7 +48,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name TSL2561 gains
+ * @name    TSL2561 gains
  * @{
  */
 #define TSL2561_GAIN_1X                   (0x00)
@@ -56,7 +56,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name tsl2561 driver initialization return codes
+ * @name    TSL2561 driver initialization return codes
  * @{
  */
 #define TSL2561_OK                        (0)
@@ -65,7 +65,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Device descriptor for the TSL2561 sensor
+ * @brief   Device descriptor for the TSL2561 sensor
  */
 typedef struct {
     i2c_t i2c_dev;                     /**< I2C device which is used */
@@ -74,14 +74,13 @@ typedef struct {
     uint8_t integration;               /**< integration time */
 } tsl2561_t;
 
-
 /**
- * @brief Device initialization parameters
+ * @brief   Device initialization parameters
  */
 typedef tsl2561_t tsl2561_params_t;
 
 /**
- * @brief Initialize the given TSL2561 device
+ * @brief   Initialize the given TSL2561 device
  *
  * @param[out] dev          Initialized device descriptor of BMP180 device
  * @param[in]  i2c          I2C bus the sensor is connected to
@@ -97,7 +96,7 @@ int tsl2561_init(tsl2561_t *dev, i2c_t i2c, uint8_t addr,
                  uint8_t gain, uint8_t integration);
 
 /**
- * @brief Read illuminance value from the given TSL2561 device, returned in lx.
+ * @brief   Read illuminance value from the given TSL2561 device, returned in lx.
  *
  * @param[in]  dev          Device descriptor of TSL2561 device to read from
  *

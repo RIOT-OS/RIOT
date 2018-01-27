@@ -346,13 +346,13 @@ uint8_t kw2xrf_get_cca_mode(kw2xrf_t *dev)
     return (tmp & MKW2XDM_PHY_CTRL4_CCATYPE_MASK) >> MKW2XDM_PHY_CTRL4_CCATYPE_SHIFT;
 }
 
-uint32_t kw2xrf_get_rssi(uint32_t value)
+int16_t kw2xrf_get_rssi(uint32_t value)
 {
     /* Get rssi (Received Signal Strength Indicator, unit is dBm)
      * from lqi (Link Quality Indicator) value.
      * There are two different equations for RSSI:
-     * RF = (LQI – 286.6) / 2.69333 (MKW2xD Reference Manual)
-     * RF = (LQI – 295.4) / 2.84 (MCR20A Reference Manual)
+     * RF = (LQI - 286.6) / 2.69333 (MKW2xD Reference Manual)
+     * RF = (LQI - 295.4) / 2.84 (MCR20A Reference Manual)
      * The last appears more to match the graphic (Figure 3-10).
      * Since RSSI value is always positive and we want to
      * avoid the floating point computation:
@@ -361,7 +361,7 @@ uint32_t kw2xrf_get_rssi(uint32_t value)
      */
     uint32_t a = (uint32_t)(295.4 * 65536 / 2.84);
     uint32_t b = (uint32_t)(65536 / 2.84);
-    return (a - (b * value)) >> 16;
+    return ((b * value) - a) >> 16;
 }
 
 void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)

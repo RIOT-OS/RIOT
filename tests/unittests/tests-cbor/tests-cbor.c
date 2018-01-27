@@ -272,6 +272,17 @@ static void test_byte_string(void)
         TEST_ASSERT(cbor_deserialize_byte_string(&stream, 0, buffer, sizeof(buffer)));
         CBOR_CHECK_DESERIALIZED(input, buffer, EQUAL_STRING);
     }
+
+    cbor_clear(&stream);
+
+    {
+        /* check out buffer too small */
+        const char *input = "a";
+        TEST_ASSERT(cbor_serialize_byte_string(&stream, input));
+        unsigned char data[] = {0x41, 0x61};
+        CBOR_CHECK_SERIALIZED(stream, data, sizeof(data));
+        TEST_ASSERT(cbor_deserialize_byte_string(&stream, 0, buffer, strlen(input)) == 0);
+    }
 }
 
 static void test_byte_string_no_copy(void)
@@ -653,7 +664,8 @@ static void test_float_half(void)
     /* check border conditions */
     CBOR_CHECK(float, float_half, stream, -.0f, HEX_LITERAL(0xf9, 0x80, 0x00), EQUAL_FLOAT);
     CBOR_CHECK(float, float_half, stream, .0f, HEX_LITERAL(0xf9, 0x00, 0x00), EQUAL_FLOAT);
-    /* cppcheck-suppress nanInArithmeticExpression */
+    /* cppcheck-suppress nanInArithmeticExpression
+     * (reason: we're actively trying to check against 'INFINITY') */
     CBOR_CHECK(float, float_half, stream, INFINITY, HEX_LITERAL(0xf9, 0x7c, 0x00), EQUAL_FLOAT);
     /* TODO: Broken: encode_float_half issue? */
     /*CBOR_CHECK(float, float_half, stream, NAN, HEX_LITERAL(0xf9, 0x7e, 0x00), EQUAL_FLOAT);*/
@@ -683,14 +695,11 @@ static void test_float(void)
     /* check border conditions */
     CBOR_CHECK(float, float, stream, .0f,
                HEX_LITERAL(0xfa, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
-    /* cppcheck-suppress nanInArithmeticExpression */
-    CBOR_CHECK(float, float, stream, INFINITY,
-    /* cppcheck-suppress nanInArithmeticExpression */
-               HEX_LITERAL(0xfa, 0x7f, 0x80, 0x00, 0x00), EQUAL_FLOAT);
-    /* cppcheck-suppress nanInArithmeticExpression */
+    /* cppcheck-suppress nanInArithmeticExpression
+     * (reason: we're actively trying to check against 'INFINITY') */
+    CBOR_CHECK(float, float, stream, INFINITY, HEX_LITERAL(0xfa, 0x7f, 0x80, 0x00, 0x00), EQUAL_FLOAT);
     CBOR_CHECK(float, float, stream, NAN,
                HEX_LITERAL(0xfa, 0x7f, 0xc0, 0x00, 0x00), EQUAL_FLOAT);
-    /* cppcheck-suppress nanInArithmeticExpression */
     CBOR_CHECK(float, float, stream, -INFINITY,
                HEX_LITERAL(0xfa, 0xff, 0x80, 0x00, 0x00), EQUAL_FLOAT);
 
@@ -715,14 +724,13 @@ static void test_double(void)
     /* check border conditions */
     CBOR_CHECK(double, double, stream, .0f,
                HEX_LITERAL(0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
-    /* cppcheck-suppress nanInArithmeticExpression */
-    CBOR_CHECK(double, double, stream, INFINITY,
-    /* cppcheck-suppress nanInArithmeticExpression */
-               HEX_LITERAL(0xfb, 0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
-    /* cppcheck-suppress nanInArithmeticExpression */
+    /* cppcheck-suppress nanInArithmeticExpression
+     * (reason: we're actively trying to check against 'INFINITY') */
+    CBOR_CHECK(double, double, stream, INFINITY, HEX_LITERAL(0xfb, 0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
+
     CBOR_CHECK(double, double, stream, NAN,
                HEX_LITERAL(0xfb, 0x7f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
-    /* cppcheck-suppress nanInArithmeticExpression */
+
     CBOR_CHECK(double, double, stream, -INFINITY,
                HEX_LITERAL(0xfb, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
 

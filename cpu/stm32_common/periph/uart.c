@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     cpu_stm32_common
  * @ingroup     drivers_periph_uart
  * @{
  *
@@ -30,8 +30,6 @@
 #include "assert.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
-
-#ifdef UART_NUMOF
 
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
 
@@ -73,7 +71,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_init_af(uart_config[uart].rx_pin, uart_config[uart].rx_af);
 #endif
     }
-#ifdef UART_USE_HW_FC
+#ifdef MODULE_STM32_PERIPH_UART_HW_FC
     if (uart_config[uart].cts_pin != GPIO_UNDEF) {
         gpio_init(uart_config[uart].cts_pin, GPIO_IN);
         gpio_init(uart_config[uart].rts_pin, GPIO_OUT);
@@ -109,7 +107,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE);
     }
 
-#ifdef UART_USE_HW_FC
+#ifdef MODULE_STM32_PERIPH_UART_HW_FC
     if (uart_config[uart].cts_pin != GPIO_UNDEF) {
         /* configure hardware flow control */
         dev(uart)->CR3 = (USART_CR3_RTSE | USART_CR3_CTSE);
@@ -231,5 +229,3 @@ void UART_5_ISR(void)
     irq_handler(UART_DEV(5));
 }
 #endif
-
-#endif /* UART_NUMOF */

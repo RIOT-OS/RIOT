@@ -9,7 +9,9 @@
 /**
  * @defgroup    boards_calliope-mini Calliope mini
  * @ingroup     boards
- * @brief       Board specific files for the Calliope mini
+ * @brief       Support for the Calliope mini
+ *
+ * This board is for calliope-mini revision 1.0.
  * @{
  *
  * @file
@@ -33,8 +35,6 @@ extern "C" {
  * @name    Xtimer configuration
  * @{
  */
-#define XTIMER_DEV                  (0)
-#define XTIMER_CHAN                 (0)
 #define XTIMER_WIDTH                (24)
 #define XTIMER_BACKOFF              (40)
 /** @} */
@@ -63,7 +63,7 @@ extern "C" {
  */
 #define BTN0_PIN                    GPIO_PIN(0, 17)
 #define BTN0_MODE                   GPIO_IN
-#define BTN1_PIN                    GPIO_PIN(0, 26)
+#define BTN1_PIN                    GPIO_PIN(0, 16)
 #define BTN1_MODE                   GPIO_IN
 /** @} */
 

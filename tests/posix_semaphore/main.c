@@ -236,22 +236,35 @@ void test3(void)
     sem_post(&s1);
 }
 
+#ifdef BOARD_NATIVE
+/* native can sometime take more time to respond as it is not real time */
+#define TEST4_TIMEOUT_EXCEEDED_MARGIN (300)
+#else
+#define TEST4_TIMEOUT_EXCEEDED_MARGIN (100)
+#endif /* BOARD_NATIVE */
+
 void test4(void)
 {
     char uint64_str[20];
     struct timespec abs;
-    uint64_t now, start, stop;
+    uint64_t start, elapsed;
     const uint64_t exp = 1000000;
-    now = xtimer_now_usec64();
-    abs.tv_sec = (time_t)((now / US_PER_SEC) + 1);
-    abs.tv_nsec = (long)((now % US_PER_SEC) * 1000);
+
     puts("first: sem_init s1");
     if (sem_init(&s1, 0, 0) < 0) {
         puts("first: sem_init FAILED");
     }
-    start = xtimer_now_usec64();
+
     puts("first: wait 1 sec for s1");
-    if (sem_timedwait(&s1, &abs) != 0) {
+
+    start = xtimer_now_usec64();
+    abs.tv_sec = (time_t)((start / US_PER_SEC) + 1);
+    abs.tv_nsec = (long)((start % US_PER_SEC) * 1000);
+
+    int ret = sem_timedwait(&s1, &abs);
+    elapsed = xtimer_now_usec64() - start;
+
+    if (ret != 0) {
         if (errno != ETIMEDOUT) {
             printf("error waiting: %d\n", errno);
             return;
@@ -260,13 +273,15 @@ void test4(void)
             puts("first: timed out");
         }
     }
-    stop = xtimer_now_usec64() - start;
-    if ((stop < (exp - 100)) || (stop > (exp + 100))) {
-        fmt_u64_dec(uint64_str, stop);
+
+    uint64_str[fmt_u64_dec(uint64_str, elapsed)] = '\0';
+    if (elapsed < (exp - 100)) {
         printf("first: waited only %s usec => FAILED\n", uint64_str);
     }
+    else if (elapsed > (exp + TEST4_TIMEOUT_EXCEEDED_MARGIN)) {
+        printf("first: waited too long %s usec => FAILED\n", uint64_str);
+    }
     else {
-        fmt_u64_dec(uint64_str, stop);
         printf("first: waited %s usec\n", uint64_str);
     }
 }

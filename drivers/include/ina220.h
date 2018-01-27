@@ -33,14 +33,16 @@ extern "C" {
 #endif
 
 /**
- * @brief Device descriptor for INA220 sensors
+ * @brief   Device descriptor for INA220 sensors
  */
 typedef struct {
     i2c_t i2c;              /**< I2C device the sensor is connected to */
     uint8_t addr;           /**< the slave address of the sensor on the I2C bus */
 } ina220_t;
 
-/** @brief INA220 possible mode settings */
+/**
+ * @brief   INA220 possible mode settings
+ */
 typedef enum ina220_mode {
     INA220_MODE_POWERDOWN             = 0x0000, /**< Power down */
     INA220_MODE_TRIGGER_SHUNT_ONLY    = 0x0001, /**< Shunt Voltage, Triggered */
@@ -52,7 +54,9 @@ typedef enum ina220_mode {
     INA220_MODE_CONTINUOUS_SHUNT_BUS  = 0x0007, /**< Shunt and Bus, Continuous, default */
 } ina220_mode_t;
 
-/** @brief Shunt voltage measurement range (PGA settings) */
+/**
+ * @brief   Shunt voltage measurement range (PGA settings)
+ */
 typedef enum ina220_range {
     INA220_RANGE_40MV  = 0x0000, /**< +/- 40 mV range */
     INA220_RANGE_80MV  = 0x0800, /**< +/- 80 mV range */
@@ -60,14 +64,16 @@ typedef enum ina220_range {
     INA220_RANGE_320MV = 0x1800, /**< +/- 320 mV range, default */
 } ina220_range_t;
 
-/** @brief Bus voltage measurement range */
+/**
+ * @brief   Bus voltage measurement range
+ */
 typedef enum ina220_brng {
     INA220_BRNG_16V_FSR = 0x0000, /**< 16 V bus voltage full scale range */
     INA220_BRNG_32V_FSR = 0x0200, /**< 32 V bus voltage full scale range, default. */
 } ina220_brng_t;
 
 /**
- * @brief Shunt ADC settings
+ * @brief   Shunt ADC settings
  *
  * @see Table 5 in INA220 data sheet
  */
@@ -99,7 +105,7 @@ typedef enum ina220_sadc {
 } ina220_sadc_t;
 
 /**
- * @brief Bus ADC settings
+ * @brief   Bus ADC settings
  *
  * @see Table 5 in INA220 data sheet
  */
@@ -137,7 +143,7 @@ typedef enum ina220_badc {
 #define INA220_BUS_VOLTAGE_SHIFT (3)
 
 /**
- * @brief Initialize a current sensor
+ * @brief   Initialize a current sensor
  *
  * @param[out] dev          device descriptor of sensor to initialize
  * @param[in]  i2c          I2C bus the sensor is connected to
@@ -149,7 +155,7 @@ typedef enum ina220_badc {
 int ina220_init(ina220_t *dev, i2c_t i2c, uint8_t address);
 
 /**
- * @brief Write to calibration register
+ * @brief   Write to calibration register
  *
  * @param[in]  dev          device descriptor of sensor to configure
  * @param[in]  calibration  calibration register settings, see data sheet
@@ -160,7 +166,7 @@ int ina220_init(ina220_t *dev, i2c_t i2c, uint8_t address);
 int ina220_set_calibration(const ina220_t *dev, uint16_t calibration);
 
 /**
- * @brief Write to configuration register
+ * @brief   Write to configuration register
  *
  * @param[in]  dev          device descriptor of sensor to configure
  * @param[in]  config       configuration register settings, see data sheet
@@ -171,7 +177,7 @@ int ina220_set_calibration(const ina220_t *dev, uint16_t calibration);
 int ina220_set_config(const ina220_t *dev, uint16_t config);
 
 /**
- * @brief Read shunt voltage
+ * @brief   Read shunt voltage
  *
  * @param[in]  dev          device descriptor of sensor
  * @param[out] voltage      measured voltage across shunt resistor
@@ -182,7 +188,7 @@ int ina220_set_config(const ina220_t *dev, uint16_t config);
 int ina220_read_shunt(const ina220_t *dev, int16_t *voltage);
 
 /**
- * @brief Read bus voltage register
+ * @brief   Read bus voltage register
  *
  * The bus voltage can be found in the most significant bits of the bus voltage
  * register, the lower three bits are flags/reserved.
@@ -198,7 +204,7 @@ int ina220_read_shunt(const ina220_t *dev, int16_t *voltage);
 int ina220_read_bus(const ina220_t *dev, int16_t *voltage);
 
 /**
- * @brief Read shunt current
+ * @brief   Read shunt current
  *
  * @param[in]  dev          device descriptor of sensor
  * @param[out] current      measured current through shunt resistor
@@ -209,7 +215,7 @@ int ina220_read_bus(const ina220_t *dev, int16_t *voltage);
 int ina220_read_current(const ina220_t *dev, int16_t *current);
 
 /**
- * @brief Read power consumption
+ * @brief   Read power consumption
  *
  * @param[in]  dev          device descriptor of sensor
  * @param[out] power        measured power consumption

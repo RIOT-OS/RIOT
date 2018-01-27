@@ -34,7 +34,7 @@
 #define _MAX_MHR_OVERHEAD   (25)
 
 static int  _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
-static int  _set(netdev_t *dev, netopt_t opt, void *value, size_t value_len);
+static int  _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len);
 static int  _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
 static int  _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static void _isr(netdev_t *netdev);
@@ -148,7 +148,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     return -ENOTSUP;
 }
 
-static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
+static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_len)
 {
     cc2538_rf_t *dev = (cc2538_rf_t *)netdev;
     int res = -ENOTSUP;
@@ -163,7 +163,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
                 res = -EOVERFLOW;
             }
             else {
-                cc2538_set_addr_short(*((uint16_t*)value));
+                cc2538_set_addr_short(*((const uint16_t*)value));
             }
             break;
 
@@ -172,12 +172,12 @@ static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
                 res = -EOVERFLOW;
             }
             else {
-                cc2538_set_addr_long(*((uint64_t*)value));
+                cc2538_set_addr_long(*((const uint64_t*)value));
             }
             break;
 
         case NETOPT_AUTOACK:
-            RFCORE->XREG_FRMCTRL0bits.AUTOACK = ((bool *)value)[0];
+            RFCORE->XREG_FRMCTRL0bits.AUTOACK = ((const bool *)value)[0];
             res = sizeof(netopt_enable_t);
             break;
 
@@ -186,7 +186,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
                 res = -EINVAL;
             }
             else {
-                uint8_t chan = ((uint8_t *)value)[0];
+                uint8_t chan = ((const uint8_t *)value)[0];
                 if (chan < IEEE802154_CHANNEL_MIN ||
                     chan > IEEE802154_CHANNEL_MAX) {
                     res = -EINVAL;
@@ -200,7 +200,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
         case NETOPT_CHANNEL_PAGE:
             /* This tranceiver only supports page 0 */
             if (value_len != sizeof(uint16_t) ||
-                *((uint16_t *)value) != 0 ) {
+                *((const uint16_t *)value) != 0 ) {
                 res = -EINVAL;
             }
             else {
@@ -216,12 +216,12 @@ static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
                 res = -EOVERFLOW;
             }
             else {
-                cc2538_set_pan(*((uint16_t *)value));
+                cc2538_set_pan(*((const uint16_t *)value));
             }
             break;
 
         case NETOPT_PROMISCUOUSMODE:
-            cc2538_set_monitor(((bool *)value)[0]);
+            cc2538_set_monitor(((const bool *)value)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
@@ -229,7 +229,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
             if (value_len > sizeof(netopt_state_t)) {
                 return -EOVERFLOW;
             }
-            cc2538_set_state(dev, *((netopt_state_t *)value));
+            cc2538_set_state(dev, *((const netopt_state_t *)value));
             res = sizeof(netopt_state_t);
             break;
 
@@ -237,7 +237,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
             if (value_len > sizeof(int16_t)) {
                 return -EOVERFLOW;
             }
-            cc2538_set_tx_power(*((int16_t *)value));
+            cc2538_set_tx_power(*((const int16_t *)value));
             res = sizeof(uint16_t);
             break;
 
@@ -255,6 +255,8 @@ static int _set(netdev_t *netdev, netopt_t opt, void *value, size_t value_len)
 
 static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 {
+    (void) netdev;
+
     int pkt_len = 0;
 
     /* Flush TX FIFO once no transmission in progress */
@@ -295,6 +297,8 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
+    (void) netdev;
+
     size_t pkt_len;
 
     if (buf == NULL) {

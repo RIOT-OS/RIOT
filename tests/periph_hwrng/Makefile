@@ -1,4 +1,3 @@
-APPLICATION = periph_hwrng
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_hwrng

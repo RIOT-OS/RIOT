@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -19,7 +20,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- *
+ * @author      Sebastian Meiling <s@mlng.net>
  * @}
  */
 
@@ -44,7 +45,8 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     /* initialize device descriptor */
     memcpy(&dev->params, params, sizeof(at86rf2xx_params_t));
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
-    dev->state = AT86RF2XX_STATE_SLEEP;
+    /* radio state is P_ON when first powered-on */
+    dev->state = AT86RF2XX_STATE_P_ON;
     dev->pending_tx = 0;
 }
 
@@ -55,7 +57,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_hardware_reset(dev);
 
     /* Reset state machine to ensure a known state */
-    at86rf2xx_reset_state_machine(dev);
+    if (dev->state == AT86RF2XX_STATE_P_ON) {
+        at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
+    }
 
     /* reset options and sequence number */
     dev->netdev.seq = 0;
@@ -121,7 +125,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
 
-size_t at86rf2xx_send(at86rf2xx_t *dev, uint8_t *data, size_t len)
+size_t at86rf2xx_send(at86rf2xx_t *dev, const uint8_t *data, size_t len)
 {
     /* check data length */
     if (len > AT86RF2XX_MAX_PKT_LENGTH) {
@@ -139,23 +143,14 @@ void at86rf2xx_tx_prepare(at86rf2xx_t *dev)
     uint8_t state;
 
     dev->pending_tx++;
-
-    /* make sure ongoing transmissions are finished */
-    do {
-        state = at86rf2xx_get_status(dev);
-    } while (state == AT86RF2XX_STATE_BUSY_RX_AACK ||
-             state == AT86RF2XX_STATE_BUSY_TX_ARET);
-
+    state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
     if (state != AT86RF2XX_STATE_TX_ARET_ON) {
         dev->idle_state = state;
     }
-
-    at86rf2xx_set_state(dev, AT86RF2XX_STATE_TX_ARET_ON);
-
     dev->tx_frame_len = IEEE802154_FCS_LEN;
 }
 
-size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data,
+size_t at86rf2xx_tx_load(at86rf2xx_t *dev, const uint8_t *data,
                          size_t len, size_t offset)
 {
     dev->tx_frame_len += (uint8_t)len;
@@ -163,7 +158,7 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, uint8_t *data,
     return offset + len;
 }
 
-void at86rf2xx_tx_exec(at86rf2xx_t *dev)
+void at86rf2xx_tx_exec(const at86rf2xx_t *dev)
 {
     netdev_t *netdev = (netdev_t *)dev;
 
@@ -176,4 +171,32 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
         (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
+}
+
+bool at86rf2xx_cca(at86rf2xx_t *dev)
+{
+    uint8_t reg;
+    uint8_t old_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    /* Disable RX path */
+    uint8_t rx_syn = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
+    reg = rx_syn | AT86RF2XX_RX_SYN__RX_PDT_DIS;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, reg);
+    /* Manually triggered CCA is only possible in RX_ON (basic operating mode) */
+    at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_ON);
+    /* Perform CCA */
+    reg = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_CC_CCA);
+    reg |= AT86RF2XX_PHY_CC_CCA_MASK__CCA_REQUEST;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_CC_CCA, reg);
+    /* Spin until done (8 symbols + 12 µs = 128 µs + 12 µs for O-QPSK)*/
+    do {
+        reg = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS);
+    } while ((reg & AT86RF2XX_TRX_STATUS_MASK__CCA_DONE) == 0);
+    /* return true if channel is clear */
+    bool ret = !!(reg & AT86RF2XX_TRX_STATUS_MASK__CCA_STATUS);
+    /* re-enable RX */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, rx_syn);
+    /* Step back to the old state */
+    at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
+    at86rf2xx_set_state(dev, old_state);
+    return ret;
 }

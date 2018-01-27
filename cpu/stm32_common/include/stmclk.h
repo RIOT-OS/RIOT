@@ -77,12 +77,12 @@ void stmclk_disable_lfclk(void);
 /**
  * @brief   Unlock write access to the backup domain control
  */
-void stmclk_bdp_unlock(void);
+void stmclk_dbp_unlock(void);
 
 /**
  * @brief   Lock write access to backup control domain
  */
-void stmclk_bdp_lock(void);
+void stmclk_dbp_lock(void);
 
 #ifdef __cplusplus
 }

@@ -46,7 +46,7 @@ extern "C" {
 #endif
 
 /**
- * @brief IO1 Xplained driver return codes
+ * @brief   IO1 Xplained driver return codes
  */
 enum {
     IO1_XPLAINED_OK = 0,           /**< Initialization successful */
@@ -59,14 +59,14 @@ enum {
 };
 
 /**
- * @brief Device initialization parameters
+ * @brief   Device initialization parameters
  */
 typedef struct {
     uint8_t addr;                  /**< extension custom address */
 } io1_xplained_params_t;
 
 /**
- * @brief Device descriptor for the IO1 Xplained extension.
+ * @brief   Device descriptor for the IO1 Xplained extension.
  */
 typedef struct {
     io1_xplained_params_t params;  /**< Initialization parameters */
@@ -74,7 +74,7 @@ typedef struct {
 } io1_xplained_t;
 
 /**
- * @brief Initialize the given IO1 Xplained extension
+ * @brief   Initialize the given IO1 Xplained extension
  *
  * @param[out] dev          Initialized device descriptor of IO1 Xplained extension
  * @param[in]  params       Device initialization parameters
@@ -88,7 +88,7 @@ typedef struct {
 int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params);
 
 /**
- * @brief Read temperature value from the given IO1 Xplained extension, returned in °C
+ * @brief   Read temperature value from the given IO1 Xplained extension, returned in °C
  *
  * @param[in] dev           Device descriptor of IO1 Xplained to read from
  * @param[out] temperature  Temperature in °C
@@ -99,17 +99,17 @@ int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params);
 int io1_xplained_read_temperature(const io1_xplained_t *dev, float *temperature);
 
 /**
- * @brief Set the on-board led of the IO1 Xplained extension
+ * @brief   Set the on-board led of the IO1 Xplained extension
  */
 void io1_xplained_set_led(void);
 
 /**
- * @brief Clear the on-board led of the IO1 Xplained extension
+ * @brief   Clear the on-board led of the IO1 Xplained extension
  */
 void io1_xplained_clear_led(void);
 
 /**
- * @brief Toggle the on-board led of the IO1 Xplained extension
+ * @brief   Toggle the on-board led of the IO1 Xplained extension
  */
 void io1_xplained_toggle_led(void);
 

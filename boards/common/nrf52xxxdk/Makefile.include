@@ -1,0 +1,24 @@
+# this module contains shared code for all boards using the nrf52 CPU
+export CPU = nrf52
+
+# include this module into the build
+ifeq (,$(filter thingy52 acd52832,$(BOARD)))
+  INCLUDES += -I$(RIOTBOARD)/common/nrf52xxxdk/include
+  USEMODULE += boards_common_nrf52
+endif
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup JLink for flashing
+export JLINK_DEVICE := nrf52
+
+# special options when using SoftDevice
+ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
+  export JLINK_PRE_FLASH := erase\nloadfile $(BINDIR)/softdevice.hex
+  export FLASH_ADDR := 0x1f000
+  export LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
+endif
+include $(RIOTMAKE)/tools/jlink.inc.mk

@@ -22,9 +22,6 @@
 #include "cpu.h"
 #include "vectors_cortexm.h"
 
-/* get the start of the ISR stack as defined in the linkerscript */
-extern uint32_t _estack;
-
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
 void dummy_handler(void) {
@@ -69,59 +66,31 @@ WEAK_DEFAULT void isr_swi3(void);
 WEAK_DEFAULT void isr_swi4(void);
 WEAK_DEFAULT void isr_swi5(void);
 
-/* interrupt vector table */
-ISR_VECTORS const void *interrupt_vector[] = {
-    /* Exception stack pointer */
-    (void*) (&_estack),             /* pointer to the top of the stack */
-    /* Cortex-M0 handlers */
-    (void*) reset_handler_default,  /* entry point of the program */
-    (void*) nmi_default,            /* non maskable interrupt handler */
-    (void*) hard_fault_default,     /* hard fault exception */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) isr_svc,                /* system call interrupt, in RIOT used for
-                                     * switching into thread context on boot */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) isr_pendsv,             /* pendSV interrupt, in RIOT the actual
-                                     * context switching is happening here */
-    (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* nRF51 specific peripheral handlers */
-    (void*) isr_power_clock,        /* power_clock */
-    (void*) isr_radio,              /* radio */
-    (void*) isr_uart0,              /* uart0 */
-    (void*) isr_spi0_twi0,          /* spi0_twi0 */
-    (void*) isr_spi1_twi1,          /* spi1_twi1 */
-    (void*) (0UL),                  /* reserved */
-    (void*) isr_gpiote,             /* gpiote */
-    (void*) isr_adc,                /* adc */
-    (void*) isr_timer0,             /* timer0 */
-    (void*) isr_timer1,             /* timer1 */
-    (void*) isr_timer2,             /* timer2 */
-    (void*) isr_rtc0,               /* rtc0 */
-    (void*) isr_temp,               /* temp */
-    (void*) isr_rng,                /* rng */
-    (void*) isr_ecb,                /* ecb */
-    (void*) isr_ccm_aar,            /* ccm_aar */
-    (void*) isr_wdt,                /* wdt */
-    (void*) isr_rtc1,               /* rtc1 */
-    (void*) isr_qdec,               /* qdec */
-    (void*) isr_lpcomp,             /* lpcomp */
-    (void*) isr_swi0,               /* swi0 */
-    (void*) isr_swi1,               /* swi1 */
-    (void*) isr_swi2,               /* swi2 */
-    (void*) isr_swi3,               /* swi3 */
-    (void*) isr_swi4,               /* swi4 */
-    (void*) isr_swi5,               /* swi5 */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
-    (void*) (0UL),                  /* reserved */
+/* CPU specific interrupt vector table */
+ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
+    [ 0] = isr_power_clock,        /* power_clock */
+    [ 1] = isr_radio,              /* radio */
+    [ 2] = isr_uart0,              /* uart0 */
+    [ 3] = isr_spi0_twi0,          /* spi0_twi0 */
+    [ 4] = isr_spi1_twi1,          /* spi1_twi1 */
+    [ 6] = isr_gpiote,             /* gpiote */
+    [ 7] = isr_adc,                /* adc */
+    [ 8] = isr_timer0,             /* timer0 */
+    [ 9] = isr_timer1,             /* timer1 */
+    [10] = isr_timer2,             /* timer2 */
+    [11] = isr_rtc0,               /* rtc0 */
+    [12] = isr_temp,               /* temp */
+    [13] = isr_rng,                /* rng */
+    [14] = isr_ecb,                /* ecb */
+    [15] = isr_ccm_aar,            /* ccm_aar */
+    [16] = isr_wdt,                /* wdt */
+    [17] = isr_rtc1,               /* rtc1 */
+    [18] = isr_qdec,               /* qdec */
+    [19] = isr_lpcomp,             /* lpcomp */
+    [20] = isr_swi0,               /* swi0 */
+    [21] = isr_swi1,               /* swi1 */
+    [22] = isr_swi2,               /* swi2 */
+    [23] = isr_swi3,               /* swi3 */
+    [24] = isr_swi4,               /* swi4 */
+    [25] = isr_swi5,               /* swi5 */
 };

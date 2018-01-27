@@ -23,7 +23,6 @@
 #include <stdbool.h>
 #include <errno.h>
 #include "kernel_init.h"
-#include "sched.h"
 #include "thread.h"
 #include "irq.h"
 #include "log.h"

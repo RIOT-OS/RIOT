@@ -1,7 +1,11 @@
 INCLUDES += -I$(RIOTCPU)/msp430_common/include/
 
+# export the CPU model
+MODEL = $(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
+export CFLAGS += -DCPU_MODEL_$(MODEL)
+
 export UNDEF += $(BINDIR)/msp430_common/startup.o
-export USEMODULE += msp430_common msp430_common_periph
+export USEMODULE += msp430_common msp430_common_periph periph_common
 
 DEFAULT_MODULE += oneway_malloc
 

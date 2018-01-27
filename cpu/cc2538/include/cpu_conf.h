@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup      cpu_cc2538
+ * @ingroup      cpu_cc2538
  * @{
  *
  * @file
@@ -24,7 +24,6 @@
 #include "cc2538_gpio.h"
 #include "cc2538_uart.h"
 #include "cc2538_gptimer.h"
-#include "cc2538_ioc.h"
 #include "cc2538_soc_adc.h"
 #include "cc2538_ssi.h"
 #include "cc2538_rfcore.h"
@@ -35,7 +34,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   ARM Cortex-M specific CPU configuration
+ * @name   ARM Cortex-M specific CPU configuration
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)

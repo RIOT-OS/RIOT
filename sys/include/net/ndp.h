@@ -123,6 +123,7 @@ extern "C" {
 /**
  * @{
  * @name    Router constants
+ * @see     [RFC 4861, section 6.2.1](https://tools.ietf.org/html/rfc4861#section-6.2.1)
  * @see     [RFC 4861, section 10](https://tools.ietf.org/html/rfc4861#section-10)
  */
 #define NDP_MAX_INIT_RA_INTERVAL        (16000U)   /**< MAX_INITIAL_RTR_ADVERT_INTERVAL (in ms) */
@@ -130,6 +131,9 @@ extern "C" {
 #define NDP_MAX_FIN_RA_NUMOF            (3U)       /**< MAX_FINAL_RTR_ADVERTISEMENT */
 #define NDP_MIN_MS_DELAY_BETWEEN_RAS    (3000U)    /**< MIN_DELAY_BETWEEN_RAS (in ms) */
 #define NDP_MAX_RA_DELAY                (500U)     /**< MAX_RA_DELAY_TIME (in ms) */
+#define NDP_MAX_RA_INTERVAL_MS          (600000U)  /**< default of MaxRtrAdvInterval (in ms) */
+#define NDP_MIN_RA_INTERVAL_MS          (198000U)  /**< default of MinRtrAdvInterval (in ms) */
+#define NDP_RTR_LTIME_SEC               (1800U)    /**< default of AdvDefaultLifetime (in sec) */
 /** @} */
 
 /**
@@ -149,6 +153,15 @@ extern "C" {
  */
 #define NDP_MAX_MC_SOL_NUMOF        (3U)        /**< MAX_MULTICAST_SOLICIT */
 #define NDP_MAX_UC_SOL_NUMOF        (3U)        /**< MAX_UNICAST_SOLICIT */
+
+/**
+ * @brief   Default for DupAddrDetectTransmits
+ * @see     [RFC 4862, section 5.1](https://tools.ietf.org/html/rfc4862#section-5.1)
+ * @note    Must not be greater than 7 for @ref net_gnrc since
+ *          @ref GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE restricts it to
+ *          that number.
+ */
+#define NDP_DAD_TRANSMIT_NUMOF      (1U)
 #define NDP_MAX_ANYCAST_MS_DELAY    (1000U)     /**< MAX_ANYCAST_DELAY_TIME (in ms) */
 #define NDP_MAX_NA_NUMOF            (3U)        /**< MAX_NEIGHBOR_ADVERTISEMENT */
 #define NDP_REACH_MS                (30000U)    /**< REACHABLE_TIME (in ms) */
@@ -159,6 +172,15 @@ extern "C" {
  * @see     [RFC 7048](https://tools.ietf.org/html/rfc7048)
  */
 #define NDP_MAX_RETRANS_TIMER_MS    (60000U)
+
+/**
+ * @brief   Maximum retransmission of neighbor solicitations when UNREACHABLE
+ *
+ * With more than this number the backoff will always be larger than
+ * @ref NDP_MAX_RETRANS_TIMER_MS, even if the random factor is 0.5 and the
+ * retransmission time is 1ms.
+ */
+#define NDP_MAX_NS_NUMOF            (17U)
 #define NDP_DELAY_FIRST_PROBE_MS    (5000U)     /**< DELAY_FIRST_PROBE_TIME (in ms) */
 #define NDP_MIN_RANDOM_FACTOR       (500U)      /**< MIN_RANDOM_FACTOR (x 1000) */
 #define NDP_MAX_RANDOM_FACTOR       (1500U)     /**< MAX_RANDOM_FACTOR (x 1000) */

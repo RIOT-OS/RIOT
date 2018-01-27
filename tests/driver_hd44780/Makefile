@@ -1,4 +1,3 @@
-APPLICATION = driver_hd44780
 include ../Makefile.tests_common
 
 # the stm32f4discovery does not have the arduino pinout

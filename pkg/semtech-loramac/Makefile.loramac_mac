@@ -1,0 +1,5 @@
+MODULE := semtech_loramac_mac
+
+CFLAGS += -Wno-sign-compare
+
+include $(RIOTBASE)/Makefile.base

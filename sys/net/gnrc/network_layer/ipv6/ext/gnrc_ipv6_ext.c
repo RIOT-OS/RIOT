@@ -15,6 +15,7 @@
 #include <errno.h>
 
 #include "utlist.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/ipv6.h"
 
@@ -170,7 +171,7 @@ static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t nh)
  *         v                       v
  * IPv6 <- IPv6_EXT <- IPv6_EXT <- UNDEF
  */
-void gnrc_ipv6_ext_demux(kernel_pid_t iface,
+void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                          gnrc_pktsnip_t *current,
                          gnrc_pktsnip_t *pkt,
                          uint8_t nh)
@@ -200,7 +201,7 @@ void gnrc_ipv6_ext_demux(kernel_pid_t iface,
                             return;
                         }
 
-                        gnrc_ipv6_demux(iface, current, pkt, nh); /* demultiplex next header */
+                        gnrc_ipv6_demux(netif, current, pkt, nh); /* demultiplex next header */
 
                         return;
 
@@ -246,7 +247,7 @@ void gnrc_ipv6_ext_demux(kernel_pid_t iface,
                 break;
 
             default:
-                gnrc_ipv6_demux(iface, current, pkt, nh); /* demultiplex next header */
+                gnrc_ipv6_demux(netif, current, pkt, nh); /* demultiplex next header */
                 return;
         }
     }

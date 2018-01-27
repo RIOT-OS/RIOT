@@ -10,10 +10,11 @@
 #include <assert.h>
 
 #include "board.h"
-#include "../mips32r2_common/include/eic_irq.h"
+#include "eic_irq.h"
 
 void eic_irq_configure(int irq_num)
 {
+    (void)irq_num;
     /* Only timer interrupt supported currently */
     assert(irq_num == EIC_IRQ_TIMER);
 
@@ -26,6 +27,7 @@ void eic_irq_configure(int irq_num)
 
 void eic_irq_enable(int irq_num)
 {
+    (void)irq_num;
     /* Only timer interrupt supported currently */
     assert(irq_num == EIC_IRQ_TIMER);
 
@@ -35,6 +37,7 @@ void eic_irq_enable(int irq_num)
 
 void eic_irq_disable(int irq_num)
 {
+    (void)irq_num;
     /* Only timer interrupt supported currently */
     assert(irq_num == EIC_IRQ_TIMER);
 
@@ -44,6 +47,7 @@ void eic_irq_disable(int irq_num)
 
 void eic_irq_ack(int irq_num)
 {
+    (void)irq_num;
     /* Only timer interrupt supported currently */
     assert(irq_num == EIC_IRQ_TIMER);
 

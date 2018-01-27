@@ -1,14 +1,10 @@
 # Put defined MCU peripherals here (in alphabetical order)
-FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio
-FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
-# Various other features (if any)
-#FEATURES_PROVIDED += cpp
-#FEATURES_PROVIDED += arduino
-
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = cortex_m7
+
+-include $(RIOTCPU)/stm32f7/Makefile.features

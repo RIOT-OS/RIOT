@@ -111,7 +111,7 @@ static inline bool _context_overlaps_iid(gnrc_sixlowpan_ctx_t *ctx,
 }
 
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
-inline static size_t iphc_nhc_udp_decode(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t **dec_hdr,
+static inline size_t iphc_nhc_udp_decode(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t **dec_hdr,
                                          size_t datagram_size, size_t offset)
 {
     uint8_t *payload = pkt->data;
@@ -520,7 +520,7 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
 }
 
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
-inline static size_t iphc_nhc_udp_encode(gnrc_pktsnip_t *udp, ipv6_hdr_t *ipv6_hdr)
+static inline size_t iphc_nhc_udp_encode(gnrc_pktsnip_t *udp, ipv6_hdr_t *ipv6_hdr)
 {
     udp_hdr_t *udp_hdr = udp->data;
     network_uint16_t *src_port = &(udp_hdr->src_port);

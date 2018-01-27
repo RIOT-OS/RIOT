@@ -1,4 +1,3 @@
-APPLICATION = sizeof_tcb
 include ../Makefile.tests_common
 
 # othread_t modifying modules:
@@ -10,3 +9,6 @@ include ../Makefile.tests_common
 # DISABLE_MODULE += core_msg
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py

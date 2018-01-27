@@ -1,7 +1,7 @@
-From 341e82f96ca2cf6d1cedba8d3610c108ba5153dd Mon Sep 17 00:00:00 2001
+From bf974ff27fd48b8964bbe4813511adbe4c673a98 Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mail@martine-lenders.eu>
 Date: Thu, 12 May 2016 15:08:39 +0200
-Subject: [PATCH 3/3] Adapt unittests for RIOT
+Subject: [PATCH 3/4] Adapt unittests for RIOT
 
 ---
  unittests/fix16_exp_unittests.c    | 12 ++++++------

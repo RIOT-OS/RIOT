@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Hamburg University of Applied Siences (HAW)
+ * Copyright (C) 2014-2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,7 +14,7 @@
  * @brief   simple test application for atomic mutex unlocking and sleeping
  *
  * @author  Martin Landsmann <martin.landsmann@haw-hamburg.de>
- *
+ * @author  Sebastian Meiling <s@mlng.net>
  * @}
  */
 
@@ -23,10 +23,10 @@
 #include "mutex.h"
 
 static mutex_t mutex = MUTEX_INIT;
-static volatile int indicator, count;
+static volatile int indicator;
 static kernel_pid_t main_pid;
+static char stack[THREAD_STACKSIZE_DEFAULT];
 
-static char stack[THREAD_STACKSIZE_MAIN];
 static void *second_thread(void *arg)
 {
     (void) arg;
@@ -41,9 +41,9 @@ static void *second_thread(void *arg)
 
 int main(void)
 {
-    indicator = 0;
-    count = 0;
+    uint32_t count = 0;
 
+    indicator = 0;
     main_pid = thread_getpid();
 
     kernel_pid_t second_pid = thread_create(stack,
@@ -60,15 +60,13 @@ int main(void)
         indicator++;
         count++;
 
-        if (indicator > 1 || indicator < -1) {
-            printf("Error, threads did not sleep properly. [indicator: %d]\n", indicator);
-            return -1;
+        if ((indicator > 1) || (indicator < -1)) {
+            printf("[ERROR] threads did not sleep properly (%d).\n", indicator);
+            return 1;
         }
-
         if ((count % 100000) == 0) {
-            printf("Still alive alternated [count: %dk] times.\n", count / 1000);
+            printf("[ALIVE] alternated %"PRIu32"k times.\n", (count / 1000));
         }
-
         mutex_unlock_and_sleep(&mutex);
     }
 }

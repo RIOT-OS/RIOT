@@ -47,7 +47,8 @@
 typedef union {
     /* is not supposed to be used, this is only for the case that no
      * sock module was added (maybe useful for UNIX sockets?) */
-    /* cppcheck-suppress unusedStructMember */
+    /* cppcheck-suppress unusedStructMember
+     * (reason: is not supposed to be used) */
     int undef;
 #ifdef MODULE_SOCK_IP
     sock_ip_t raw;              /**< raw IP sock */

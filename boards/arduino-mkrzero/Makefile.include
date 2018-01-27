@@ -1,0 +1,10 @@
+USEMODULE += boards_common_arduino-mkr
+
+ifeq ($(PROGRAMMER),jlink)
+  export MKR_JLINK_DEVICE = atsamd21
+endif
+
+include $(RIOTBOARD)/common/arduino-mkr/Makefile.include
+
+# add arduino-mkrzero include path
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

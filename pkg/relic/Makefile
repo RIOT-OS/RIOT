@@ -15,7 +15,7 @@ $(PKG_BUILDDIR)/comp-options.cmake: fix_source
 $(PKG_BUILDDIR)/Makefile: $(PKG_BUILDDIR)/comp-options.cmake
 	cd "$(PKG_BUILDDIR)" && COMP="$(filter-out -Werror=old-style-definition -Werror=strict-prototypes, $(CFLAGS) ) " cmake -DCMAKE_TOOLCHAIN_FILE=comp-options.cmake -DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off -Wno-dev $(RELIC_CONFIG_FLAGS) .
 
-CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
+CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function -Wno-newline-eof
 
 fix_source: git-download
 	./fix-util_print_wo_args.sh $(PKG_BUILDDIR)

@@ -103,37 +103,45 @@ extern "C" {
  */
 static const uart_conf_t uart_config[] = {
     {
-        .dev    = &SERCOM0->USART,
-        .rx_pin = GPIO_PIN(PA,9),
-        .tx_pin = GPIO_PIN(PA,10),
-        .mux    = GPIO_MUX_C,
-        .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_2,
+        .dev      = &SERCOM0->USART,
+        .rx_pin   = GPIO_PIN(PA,9),
+        .tx_pin   = GPIO_PIN(PA,10),
+        .mux      = GPIO_MUX_C,
+        .rx_pad   = UART_PAD_RX_1,
+        .tx_pad   = UART_PAD_TX_2,
+        .flags    = UART_FLAG_NONE,
+        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
     },
     {
-        .dev    = &SERCOM5->USART,
-        .rx_pin = GPIO_PIN(PB,31),
-        .tx_pin = GPIO_PIN(PB,30),
-        .mux    = GPIO_MUX_D,
-        .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_0_RTS_2_CTS_3,
+        .dev      = &SERCOM5->USART,
+        .rx_pin   = GPIO_PIN(PB,31),
+        .tx_pin   = GPIO_PIN(PB,30),
+        .mux      = GPIO_MUX_D,
+        .rx_pad   = UART_PAD_RX_1,
+        .tx_pad   = UART_PAD_TX_0_RTS_2_CTS_3,
+        .flags    = UART_FLAG_NONE,
+        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
     },
     {
-        .dev    = &SERCOM4->USART,
-        .rx_pin = GPIO_PIN(PB,13),
-        .tx_pin = GPIO_PIN(PA,14),
-        .mux    = GPIO_MUX_C,
-        .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_2,
+        .dev      = &SERCOM4->USART,
+        .rx_pin   = GPIO_PIN(PB,13),
+        .tx_pin   = GPIO_PIN(PB,14),
+        .mux      = GPIO_MUX_C,
+        .rx_pad   = UART_PAD_RX_1,
+        .tx_pad   = UART_PAD_TX_2,
+        .flags    = UART_FLAG_NONE,
+        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
     },
     {
-        .dev    = &SERCOM1->USART,
-        .rx_pin = GPIO_PIN(PA,17),
-        .tx_pin = GPIO_PIN(PA,18),
-        .mux    = GPIO_MUX_C,
-        .rx_pad = UART_PAD_RX_1,
-        .tx_pad = UART_PAD_TX_2,
-    }
+        .dev      = &SERCOM1->USART,
+        .rx_pin   = GPIO_PIN(PA,17),
+        .tx_pin   = GPIO_PIN(PA,18),
+        .mux      = GPIO_MUX_C,
+        .rx_pad   = UART_PAD_RX_1,
+        .tx_pad   = UART_PAD_TX_2,
+        .flags    = UART_FLAG_NONE,
+        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
+    },
 };
 
 /* interrupt function name mapping */

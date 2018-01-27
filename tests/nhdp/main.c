@@ -18,6 +18,6 @@
 
 int main(void)
 {
-    puts("NHDP compiled!");
+    puts("SUCCESS: NHDP compiled!");
     return 0;
 }

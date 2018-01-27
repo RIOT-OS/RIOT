@@ -1,6 +1,0 @@
-USEMODULE += ipv6_addr
-USEMODULE += gnrc_ipv6_netif
-USEMODULE += gnrc_netif
-USEMODULE += gnrc_ndp_node
-
-CFLAGS += -DGNRC_NETIF_NUMOF=3

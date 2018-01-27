@@ -1,4 +1,3 @@
-APPLICATION = xtimer_usleep
 include ../Makefile.tests_common
 
 USEMODULE += xtimer

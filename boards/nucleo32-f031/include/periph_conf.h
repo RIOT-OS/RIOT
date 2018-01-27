@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo32-f031
+ * @defgroup    boards_nucleo32-f031 STM Nucleo32-F031
+ * @ingroup     boards_nucleo32
+ * @brief       Support for the STM Nucleo32-F031
  * @{
  *
  * @file
@@ -27,19 +29,31 @@ extern "C" {
 #endif
 
 /**
- * @name Clock system configuration
+ * @name    Clock settings
+ *
+ * @note    This is auto-generated from
+ *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
  * @{
  */
-#define CLOCK_HSI           (8000000U)          /* internal oscillator */
-#define CLOCK_CORECLOCK     (48000000U)         /* desired core clock frequency */
+/* give the target core clock (HCLK) frequency [in Hz],
+ * maximum: 48MHz */
+#define CLOCK_CORECLOCK      (48000000U)
+/* 0: no external high speed crystal available
+ * else: actual crystal frequency [in Hz] */
+#define CLOCK_HSE            (0U)
+/* 0: no external low speed crystal available,
+ * 1: external crystal available (always 32.768kHz) */
+#define CLOCK_LSE            (0)
+/* peripheral clock setup */
+#define CLOCK_AHB_DIV        RCC_CFGR_HPRE_DIV1
+#define CLOCK_AHB            (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1_DIV       RCC_CFGR_PPRE_DIV1      /* max 48MHz */
+#define CLOCK_APB1           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2           (CLOCK_APB1)
 
-/* the actual PLL values are automatically generated */
-#define CLOCK_PLL_MUL       (CLOCK_CORECLOCK / CLOCK_HSI)
-
-/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
+/* PLL factors */
+#define CLOCK_PLL_PREDIV     (2)
+#define CLOCK_PLL_MUL        (12)
 /** @} */
 
 /**

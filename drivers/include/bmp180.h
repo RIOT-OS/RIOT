@@ -29,8 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @name Oversampling modes
- * @{
+ * @brief   Oversampling modes
  */
 typedef enum {
     BMP180_ULTRALOWPOWER = 0,
@@ -38,10 +37,9 @@ typedef enum {
     BMP180_HIGHRES,
     BMP180_ULTRAHIGHRES
 } bmp180_oversampling_mode_t;
-/** @} */
 
 /**
- * @brief Calibration struct for the BMP180 sensor
+ * @brief   Calibration struct for the BMP180 sensor
  */
 typedef struct {
     int16_t ac1;                                /**< ac1 coefficient */
@@ -58,7 +56,7 @@ typedef struct {
 } bmp180_calibration_t;
 
 /**
- * @brief Device initialization parameters
+ * @brief   Device initialization parameters
  */
 typedef struct {
     i2c_t i2c_dev;                              /**< I2C device which is used */
@@ -67,7 +65,7 @@ typedef struct {
 } bmp180_params_t;
 
 /**
- * @brief Device descriptor for the BMP180 sensor
+ * @brief   Device descriptor for the BMP180 sensor
  */
 typedef struct {
     bmp180_params_t      params;                /**< Device initialization parameters */
@@ -85,7 +83,7 @@ enum {
 };
 
 /**
- * @brief Initialize the given BMP180 device
+ * @brief   Initialize the given BMP180 device
  *
  * @param[out] dev          Initialized device descriptor of BMP180 device
  * @param[in]  params       Initialization parameters
@@ -98,7 +96,7 @@ enum {
 int bmp180_init(bmp180_t *dev, const bmp180_params_t *params);
 
 /**
- * @brief Read temperature value from the given BMP180 device, returned in d°C
+ * @brief   Read temperature value from the given BMP180 device, returned in d°C
  *
  * @param[in] dev           Device descriptor of BMP180 device to read from
  *
@@ -107,7 +105,7 @@ int bmp180_init(bmp180_t *dev, const bmp180_params_t *params);
 int16_t bmp180_read_temperature(const bmp180_t *dev);
 
 /**
- * @brief Read pressure value from the given BMP180 device, returned in Pa
+ * @brief   Read pressure value from the given BMP180 device, returned in Pa
  *
  * @param[in]  dev          Device descriptor of BMP180 device to read from
  *
@@ -116,7 +114,7 @@ int16_t bmp180_read_temperature(const bmp180_t *dev);
 uint32_t bmp180_read_pressure(const bmp180_t *dev);
 
 /**
- * @brief Compute altitude, returned in m.
+ * @brief   Compute altitude, returned in m.
  *
  * @param[in]  dev          Device descriptor of BMP180 device to read from
  * @param[in]  pressure_0   The pressure at sea level in Pa
@@ -126,7 +124,7 @@ uint32_t bmp180_read_pressure(const bmp180_t *dev);
 int16_t bmp180_altitude(const bmp180_t *dev, uint32_t pressure_0);
 
 /**
- * @brief Compute pressure at sea level, returned in Pa.
+ * @brief   Compute pressure at sea level, returned in Pa.
  *
  * @param[in]  dev          Device descriptor of BMP180 device to read from
  * @param[in]  altitude     Altitude in m

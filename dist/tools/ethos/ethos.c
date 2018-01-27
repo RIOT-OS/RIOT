@@ -41,6 +41,9 @@
 #define TCP_DEV "tcp:"
 #define IOTLAB_TCP_PORT "20000"
 
+/* Size of serial write buffer */
+#define SERIAL_BUFFER_SIZE 64
+
 static void usage(void)
 {
     fprintf(stderr, "Usage: ethos <tap> <serial> [baudrate]\n");
@@ -49,12 +52,17 @@ static void usage(void)
 
 static void checked_write(int handle, void *buffer, int nbyte)
 {
-    if (write(handle, buffer, nbyte) != nbyte) {
-        fprintf(stderr, "write to fd %i failed: %s\n", handle, strerror(errno));
+    while (nbyte > 0) {
+        ssize_t res = write(handle, buffer, nbyte);
+        if (res <= 0) {
+            fprintf(stderr, "write to fd %i failed: %s\n", handle, strerror(errno));
+            return;
+        }
+        nbyte -= res;
     }
 }
 
-int set_serial_attribs (int fd, int speed, int parity)
+int set_serial_attribs(int fd, int speed, int parity)
 {
     struct termios tty;
     memset (&tty, 0, sizeof tty);
@@ -97,7 +105,7 @@ int set_serial_attribs (int fd, int speed, int parity)
     return 0;
 }
 
-void set_blocking (int fd, int should_block)
+void set_blocking(int fd, int should_block)
 {
     struct termios tty;
     memset (&tty, 0, sizeof tty);
@@ -241,27 +249,40 @@ static int _serial_handle_byte(serial_t *serial, char c)
 
 static void _write_escaped(int fd, char* buf, ssize_t n)
 {
-    uint8_t out[2];
+    /*
+     * Certain USB-to-UART adapters/drivers will immediately send a USB packet
+     * with a single byte instead of buffering internally when the application
+     * does writes one byte at a time. Since USB Full Speed can only send 1
+     * packet per 1 ms, this causes huge latencies for the network, because each
+     * byte of data will then add at least 1 ms on the latency.
+     * Observed on NXP OpenSDAv2 (Kinetis FRDM boards), both CMSIS/mbed DAPlink
+     * and Segger Jlink firmware are affected.
+     */
+    /* Our workaround is to prepare the data to send in a local buffer and then
+     * call write() on the buffer instead of one char at a time */
+    uint8_t out[SERIAL_BUFFER_SIZE];
     size_t escaped = 0;
+    size_t buffered = 0;
 
     while(n--) {
-        char c = *buf++;
-        switch(c) {
-            case LINE_FRAME_DELIMITER:
-                out[0] = LINE_ESC_CHAR;
-                out[1] = (LINE_FRAME_DELIMITER ^ 0x20);
-                checked_write(fd, out, 2);
-                escaped++;
-                break;
-            case LINE_ESC_CHAR:
-                out[0] = LINE_ESC_CHAR;
-                out[1] = (LINE_ESC_CHAR ^ 0x20);
-                checked_write(fd, out, 2);
-                escaped++;
-                break;
-            default:
-                checked_write(fd, &c, 1);
+        unsigned char c = *buf++;
+        if (c == LINE_FRAME_DELIMITER || c == LINE_ESC_CHAR) {
+            out[buffered++] = LINE_ESC_CHAR;
+            c ^= 0x20;
+            ++escaped;
+            if (buffered >= SERIAL_BUFFER_SIZE) {
+                checked_write(fd, out, buffered);
+                buffered = 0;
+            }
         }
+        out[buffered++] = c;
+        if (buffered >= SERIAL_BUFFER_SIZE) {
+            checked_write(fd, out, buffered);
+            buffered = 0;
+        }
+    }
+    if (buffered) {
+        checked_write(fd, out, buffered);
     }
 }
 
@@ -519,10 +540,13 @@ int main(int argc, char *argv[])
 
     fprintf(stderr, "----> ethos: activating serial pass through.\n");
     _send_hello(serial_fd, &serial, LINE_FRAME_TYPE_HELLO);
+    int stdin_open = 1;
     while(1) {
         int activity;
         FD_ZERO(&readfds);
-        FD_SET(STDIN_FILENO, &readfds);
+        if (stdin_open) {
+            FD_SET(STDIN_FILENO, &readfds);
+        }
         FD_SET(tap_fd, &readfds);
         FD_SET(serial_fd, &readfds);
         activity = select( max_fd + 1 , &readfds , NULL , NULL , NULL);
@@ -584,7 +608,21 @@ int main(int argc, char *argv[])
 
         if (FD_ISSET(STDIN_FILENO, &readfds)) {
             ssize_t res = read(STDIN_FILENO, inbuf, sizeof(inbuf));
-            if (res <= 0) {
+            if (res == 0) {
+                fprintf(stderr, "EOF from stdin\n");
+                if (isatty(STDIN_FILENO)) {
+                    /* EOF from the terminal means good bye! */
+                    fprintf(stderr, "Bye!\n");
+                    break;
+                }
+                else {
+                    /* Ignore EOF when stdin is not a terminal */
+                    close(STDIN_FILENO);
+                    stdin_open = 0;
+                }
+                continue;
+            }
+            if (res < 0) {
                 fprintf(stderr, "error reading from stdio. res=%zi\n", res);
                 continue;
             }

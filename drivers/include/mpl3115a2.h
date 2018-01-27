@@ -74,9 +74,9 @@ enum {
 
 #ifndef MPL3115A2_CONVERSION_TIME
 /**
- * @brief Maximum Conversion Time in microseconds [us]
+ * @brief   Maximum Conversion Time in microseconds [us]
  *
- * @note Conversion time is: ((oversampling ratio * 4) + 2) * 1000 us
+ * @note    Conversion time is: ((oversampling ratio * 4) + 2) * 1000 us
  */
 #define MPL3115A2_CONVERSION_TIME   (514000UL)
 #endif
@@ -91,14 +91,14 @@ typedef struct {
 } mpl3115a2_params_t;
 
 /**
- * @brief Device descriptor for MPL3115A2 sensors.
+ * @brief   Device descriptor for MPL3115A2 sensors.
  */
 typedef struct {
     mpl3115a2_params_t params;  /**< device configuration parameters */
 } mpl3115a2_t;
 
 /**
- * @brief Initialize the MPL3115A2 sensor driver.
+ * @brief   Initialize the MPL3115A2 sensor driver.
  *
  * @param[out] dev          device descriptor of sensor to initialize
  * @param[in]  params       configuration parameters
@@ -111,7 +111,7 @@ typedef struct {
 int mpl3115a2_init(mpl3115a2_t *dev, const mpl3115a2_params_t *params);
 
 /**
- * @brief Reset the MPL3115A2 sensor. After that, the sensor should be reinitialized.
+ * @brief   Reset the MPL3115A2 sensor. After that, the sensor should be reinitialized.
  *
  * @param[in] dev           device descriptor of sensor
  *
@@ -121,7 +121,7 @@ int mpl3115a2_init(mpl3115a2_t *dev, const mpl3115a2_params_t *params);
 int mpl3115a2_reset(const mpl3115a2_t *dev);
 
 /**
- * @brief Set active mode, this enables periodic measurements.
+ * @brief   Set active mode, this enables periodic measurements.
  *
  * @param[in] dev           device descriptor of sensor
  *
@@ -131,7 +131,7 @@ int mpl3115a2_reset(const mpl3115a2_t *dev);
 int mpl3115a2_set_active(const mpl3115a2_t *dev);
 
 /**
- * @brief Set standby mode.
+ * @brief   Set standby mode.
  *
  * @param[in]  dev          device descriptor of sensor
  *
@@ -141,7 +141,7 @@ int mpl3115a2_set_active(const mpl3115a2_t *dev);
 int mpl3115a2_set_standby(const mpl3115a2_t *dev);
 
 /**
- * @brief Check for new set of measurement data.
+ * @brief   Check for new set of measurement data.
  *
  * @param[in]  dev          device descriptor of sensor
  *
@@ -152,7 +152,7 @@ int mpl3115a2_set_standby(const mpl3115a2_t *dev);
 int mpl3115a2_is_ready(const mpl3115a2_t *dev);
 
 /**
- * @brief Read sensor's data in pressure mode.
+ * @brief   Read sensor's data in pressure mode.
  *
  * @param[in]  dev          device descriptor of sensor
  * @param[out] pres         pressure in Pascals
@@ -164,7 +164,7 @@ int mpl3115a2_is_ready(const mpl3115a2_t *dev);
 int mpl3115a2_read_pressure(const mpl3115a2_t *dev, uint32_t *pres, uint8_t *status);
 
 /**
- * @brief Read sensor's temperature.
+ * @brief   Read sensor's temperature.
  *
  * @param[in]  dev          device descriptor of sensor
  * @param[out] temp         temperature in \f$^\circ C \cdot 10\f$

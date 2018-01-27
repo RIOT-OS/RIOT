@@ -7,12 +7,9 @@
  */
 
 /**
- * @ingroup     core_thread
+ * @defgroup    core_thread_flags Thread Flags
+ * @ingroup     core
  * @brief       Thread flags
- * @{
- *
- * @file
- * @brief       Thread flags API
  *
  * This API can be used to notify threads of conditions in a race-free
  * and allocation-less way.
@@ -45,10 +42,21 @@
  * Note that some flags (currently the three most significant bits) are used by
  * core functions and should not be set by the user. They can be waited for.
  *
+ * This API is optional and must be enabled by adding "core_thread_flags" to USEMODULE.
+ *
+ * @{
+ *
+ * @file
+ * @brief       Thread Flags API
+ *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 #ifndef THREAD_FLAGS_H
 #define THREAD_FLAGS_H
+
+#ifndef MODULE_CORE_THREAD_FLAGS
+#error Missing USEMODULE += core_thread_flags
+#endif
 
 #include "kernel_types.h"
 #include "sched.h"  /* for thread_t typedef */
@@ -61,13 +69,44 @@
  * @name reserved thread flags
  * @{
  */
+
+/**
+ * @brief Set when a message becomes available
+ *
+ * This flag is set for a thread if a message becomes available either by being
+ * queued in the thread's message queue or by another thread becoming
+ * send-blocked.
+ *
+ * It is only reset through thread_flags_wait_*(), not by msg_receive().
+ *
+ * One thread flag event might point to one, many or no messages ready to be
+ * received.  It is advisable to use the non-blocking @ref msg_try_receive() in
+ * a loop to retrieve the messages.
+ * Use e.g., the following pattern when waiting for both thread flags and
+ * messages:
+ *
+ *      while(1) {
+ *          thread_flags_t flags = thread_flags_wait_any(0xFFFF);
+ *          if (flags & THREAD_FLAG_MSG_WAITING) {
+ *              msg_t msg;
+ *              while (msg_try_receive(&msg) == 1) {
+ *                  [ handle msg ]
+ *              }
+ *          }
+ *          ...
+ *      }
+ */
 #define THREAD_FLAG_MSG_WAITING      (0x1<<15)
-#define THREAD_FLAG_MUTEX_UNLOCKED   (0x1<<14)
-#define THREAD_FLAG_TIMEOUT          (0x1<<13)
+/**
+ * @brief Set by @ref xtimer_set_timeout_flag() when the timer expires
+ *
+ * @see xtimer_set_timeout_flag
+ */
+#define THREAD_FLAG_TIMEOUT          (0x1<<14)
 /** @} */
 
 /**
- * @name Define type of thread_flags_t
+ * @brief Type definition of thread_flags_t
  */
 typedef uint16_t thread_flags_t;
 
@@ -151,5 +190,5 @@ int thread_flags_wake(thread_t *thread);
 }
 #endif
 
-/** @} */
 #endif /* THREAD_FLAGS_H */
+/** @} */

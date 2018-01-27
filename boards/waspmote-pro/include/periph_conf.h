@@ -29,7 +29,7 @@ extern "C" {
  * @name    Clock configuration
  * @{
  */
-#define CLOCK_CORECLOCK     (14745600L)
+#define CLOCK_CORECLOCK     (14745600UL)
 /** @} */
 
 /**
@@ -101,7 +101,20 @@ extern "C" {
  * @{
  */
 #define SPI_NUMOF           1           /* set to 0 to disable SPI */
-#define MEGA_PRR            PRR0        /* Power Reduction Register */
+/** @} */
+
+/**
+ * @name    I2C configuration
+ * @{
+ */
+#define I2C_NUMOF           1
+/** @} */
+
+/**
+ * @name     ADC configuration
+ * @{
+ */
+#define ADC_NUMOF           (8U)
 /** @} */
 
 #ifdef __cplusplus

@@ -18,7 +18,6 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *
  * @}
  */
 
@@ -36,9 +35,7 @@ static inline void getbus(const at86rf2xx_t *dev)
     spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk);
 }
 
-void at86rf2xx_reg_write(const at86rf2xx_t *dev,
-                         const uint8_t addr,
-                         const uint8_t value)
+void at86rf2xx_reg_write(const at86rf2xx_t *dev, uint8_t addr, uint8_t value)
 {
     uint8_t reg = (AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_WRITE | addr);
 
@@ -47,7 +44,7 @@ void at86rf2xx_reg_write(const at86rf2xx_t *dev,
     spi_release(SPIDEV);
 }
 
-uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr)
+uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr)
 {
     uint8_t reg = (AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_READ | addr);
     uint8_t value;
@@ -59,10 +56,8 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr)
     return value;
 }
 
-void at86rf2xx_sram_read(const at86rf2xx_t *dev,
-                         const uint8_t offset,
-                         uint8_t *data,
-                         const size_t len)
+void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
+                         uint8_t *data, size_t len)
 {
     uint8_t reg = (AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_READ);
 
@@ -73,10 +68,8 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev,
     spi_release(SPIDEV);
 }
 
-void at86rf2xx_sram_write(const at86rf2xx_t *dev,
-                          const uint8_t offset,
-                          const uint8_t *data,
-                          const size_t len)
+void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
+                          const uint8_t *data, size_t len)
 {
     uint8_t reg = (AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_WRITE);
 
@@ -96,8 +89,7 @@ void at86rf2xx_fb_start(const at86rf2xx_t *dev)
 }
 
 void at86rf2xx_fb_read(const at86rf2xx_t *dev,
-                       uint8_t *data,
-                       const size_t len)
+                       uint8_t *data, size_t len)
 {
     spi_transfer_bytes(SPIDEV, CSPIN, true, NULL, data, len);
 }
@@ -112,37 +104,49 @@ void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
 {
     /* if sleeping immediately return state */
-    if(dev->state == AT86RF2XX_STATE_SLEEP)
+    if (dev->state == AT86RF2XX_STATE_SLEEP) {
         return dev->state;
+    }
 
-    return at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
-                & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+    return (at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+            & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
 }
 
 void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 {
-    if(at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
-
+    if (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
         /* wake up and wait for transition to TRX_OFF */
         gpio_clear(dev->params.sleep_pin);
         xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
 
-        /* update state */
-        dev->state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+        /* update state: on some platforms, the timer behind xtimer
+         * may be inaccurate or the radio itself may take longer
+         * to wake up due to extra capacitance on the oscillator.
+         * Spin until we are actually awake
+         */
+        do {
+            dev->state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
                          & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+        } while (dev->state != AT86RF2XX_TRX_STATUS__TRX_OFF);
     }
 }
 
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
 {
-    /* wake up from sleep in case radio is sleeping */
-    at86rf2xx_assert_awake(dev);
-
     /* trigger hardware reset */
     gpio_clear(dev->params.reset_pin);
     xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
     gpio_set(dev->params.reset_pin);
     xtimer_usleep(AT86RF2XX_RESET_DELAY);
+
+    /* update state: if the radio state was P_ON (initialization phase),
+     * it remains P_ON. Otherwise, it should go to TRX_OFF
+     */
+    do {
+        dev->state = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATUS)
+                     & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+    } while ((dev->state != AT86RF2XX_STATE_TRX_OFF)
+             && (dev->state != AT86RF2XX_STATE_P_ON));
 }
 
 void at86rf2xx_configure_phy(at86rf2xx_t *dev)
@@ -202,7 +206,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
 }
 
 #if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231)
-void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len)
+void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len)
 {
     for (size_t byteCount = 0; byteCount < len; ++byteCount) {
         uint8_t rnd = 0;
@@ -219,10 +223,3 @@ void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len)
     }
 }
 #endif
-
-void at86rf2xx_force_trx_off(const at86rf2xx_t *dev)
-{
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
-                        AT86RF2XX_TRX_STATE__FORCE_TRX_OFF);
-    while (at86rf2xx_get_status(dev) != AT86RF2XX_STATE_TRX_OFF) {}
-}

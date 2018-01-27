@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_pcd8544 PCD8544 LCD driver
+ * @defgroup    drivers_pcd8544 PCD8544 LCD driver
  * @ingroup     drivers_actuators
  * @brief       Driver for PCD8544 LCD displays
  *
@@ -32,7 +32,7 @@
 #endif
 
 /**
- * @brief   Definition of display dimensions
+ * @name    Definition of display dimensions
  * @{
  */
 #define PCD8544_RES_X                   (84U)   /**< pixels per row */
@@ -42,7 +42,7 @@
 /** @} */
 
 /**
- * @brief   Default values for temperature compensation and contrast
+ * @name    Default values for temperature compensation and contrast
  * @{
  */
 #define PCD8544_DEFAULT_CONTRAST        (45U)

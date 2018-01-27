@@ -47,6 +47,12 @@ Makefile.local
 .clang_complete
 # YouCompleteMe (https://github.com/Valloric/YouCompleteMe)
 .ycm_extra_conf.py
-.ycm_extra_conf.pyc
-__pycache__
+
+# Python compiled files
+*.pyc
+
+# Ignore download cache
 .dlcache
+
+# scan-build artifacts
+scan-build/

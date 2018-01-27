@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo144-f207
+ * @defgroup    boards_nucleo144-f207 STM Nucleo144-F207
+ * @ingroup     boards_nucleo144
+ * @brief       Support for the STM Nucleo144-F207
  * @{
  *
  * @file
@@ -28,25 +30,34 @@ extern "C" {
 #endif
 
 /**
- * @name    Clock system configuration
+ * @name    Clock settings
+ *
+ * @note    This is auto-generated from
+ *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
  * @{
  */
+/* give the target core clock (HCLK) frequency [in Hz],
+ * maximum: 120MHz */
+#define CLOCK_CORECLOCK     (120000000U)
 /* 0: no external high speed crystal available
  * else: actual crystal frequency [in Hz] */
 #define CLOCK_HSE           (8000000U)
 /* 0: no external low speed crystal available,
  * 1: external crystal available (always 32.768kHz) */
 #define CLOCK_LSE           (1)
-/* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 120MHz */
-#define CLOCK_CORECLOCK     (120000000U)
 /* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* min 25MHz */
+#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
 #define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
 #define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4     /* max 30MHz */
 #define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
 #define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2     /* max 60MHz */
 #define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
+
+/* Main PLL factors */
+#define CLOCK_PLL_M          (4)
+#define CLOCK_PLL_N          (120)
+#define CLOCK_PLL_P          (2)
+#define CLOCK_PLL_Q          (5)
 /** @} */
 
 /**

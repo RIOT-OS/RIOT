@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup     driver_netdev_ieee802154
  * @{
  *
  * @file
@@ -29,6 +30,8 @@
 
 static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
 {
+    (void)max_len;
+
     uint8_t *addr;
     uint16_t addr_len;
 
@@ -139,7 +142,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
     return res;
 }
 
-int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, void *value,
+int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *value,
                            size_t len)
 {
     int res = -ENOTSUP;

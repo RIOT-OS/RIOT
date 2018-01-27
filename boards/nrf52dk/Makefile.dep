@@ -1,13 +1,7 @@
-ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += saul_gpio
-endif
+include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.dep
 
 ifeq (,$(filter nrfmin,$(USEMODULE)))
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
     USEPKG += nordic_softdevice_ble
-  endif
-else
-  ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
-    USEMODULE += nrfmin
   endif
 endif

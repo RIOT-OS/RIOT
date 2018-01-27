@@ -2,6 +2,7 @@
  * Copyright (C) 2015 Lari Lehtomäki
  *               2016 Laksh Bhatia
  *               2016-2017 OTA keys S.A.
+ *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,8 +10,7 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
- * @ingroup     drivers_periph_rtc
+ * @ingroup     cpu_stm32_common
  * @{
  * @file
  * @brief       Low-level RTC driver implementation
@@ -18,326 +18,308 @@
  * @author      Lari Lehtomäki <lari@lehtomaki.fi>
  * @author      Laksh Bhatia <bhatialaksh3@gmail.com>
  * @author      Vincent Dupont <vincent@otakeys.com>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @}
  */
 
 #include <time.h>
 #include "cpu.h"
+#include "stmclk.h"
 #include "periph/rtc.h"
-#include "periph_conf.h"
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L1)
+/* this implementation does not work for the stm32f1 */
+#if !defined(CPU_FAM_STM32F1)
 
-/* guard file in case no RTC device was specified */
-#if RTC_NUMOF
+/* map some CPU specific register names */
+#if defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
+#define EN_REG              (RCC->CSR)
+#define EN_BIT              (RCC_CSR_RTCEN)
+#define CLKSEL_MASK         (RCC_CSR_RTCSEL)
+#define CLKSEL_LSE          (RCC_CSR_RTCSEL_LSE)
+#define CLKSEL_LSI          (RCC_CSR_RTCSEL_LSI)
+#else
+#define EN_REG              (RCC->BDCR)
+#define EN_BIT              (RCC_BDCR_RTCEN)
+#define CLKSEL_MASK         (RCC_BDCR_RTCSEL_0 | RCC_BDCR_RTCSEL_1)
+#define CLKSEL_LSE          (RCC_BDCR_RTCSEL_0)
+#define CLKSEL_LSI          (RCC_BDCR_RTCSEL_1)
+#endif
 
-#define RTC_WRITE_PROTECTION_KEY1   (0xCA)
-#define RTC_WRITE_PROTECTION_KEY2   (0x53)
-#define RTC_SYNC_PRESCALER          (0xff)  /**< prescaler for 32.768 kHz oscillator */
-#define RTC_ASYNC_PRESCALER         (0x7f)  /**< prescaler for 32.768 kHz oscillator */
+/* interrupt line name mapping */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
+#define IRQN                (RTC_IRQn)
+#define ISR_NAME            isr_rtc
+#else
+#define IRQN                (RTC_Alarm_IRQn)
+#define ISR_NAME            isr_rtc_alarm
+#endif
 
-#define MCU_YEAR_OFFSET              (100)  /**< struct tm counts years since 1900
-                                                but RTC has only two-digit year
-                                                hence the offset of 100 years. */
+/* EXTI bitfield mapping */
+#if defined(CPU_FAM_STM32L4)
+#define EXTI_IMR_BIT        (EXTI_IMR1_IM18)
+#define EXTI_FTSR_BIT       (EXTI_FTSR1_FT18)
+#define EXTI_RTSR_BIT       (EXTI_RTSR1_RT18)
+#define EXTI_PR_BIT         (EXTI_PR1_PIF18)
+#else
+#if defined(CPU_FAM_STM32L0)
+#define EXTI_IMR_BIT        (EXTI_IMR_IM17)
+#else
+#define EXTI_IMR_BIT        (EXTI_IMR_MR17)
+#endif
+#define EXTI_FTSR_BIT       (EXTI_FTSR_TR17)
+#define EXTI_RTSR_BIT       (EXTI_RTSR_TR17)
+#define EXTI_PR_BIT         (EXTI_PR_PR17)
+#endif
 
-typedef struct {
+/* write protection values */
+#define WPK1                (0xCA)
+#define WPK2                (0x53)
+
+/* define TR, DR, and ALRMAR position and masks */
+#define TR_H_MASK           (RTC_TR_HU | RTC_TR_HT)
+#define TR_M_MASK           (RTC_TR_MNU | RTC_TR_MNT)
+#define TR_S_MASK           (RTC_TR_SU | RTC_TR_ST)
+#define DR_Y_MASK           (RTC_DR_YU | RTC_DR_YT)
+#define DR_M_MASK           (RTC_DR_MU | RTC_DR_MT)
+#define DR_D_MASK           (RTC_DR_DU | RTC_DR_DT)
+#define ALRM_D_MASK         (RTC_ALRMAR_DU | RTC_ALRMAR_DT)
+#define ALRM_H_MASK         (RTC_ALRMAR_HU | RTC_ALRMAR_HT)
+#define ALRM_M_MASK         (RTC_ALRMAR_MNU | RTC_ALRMAR_MNT)
+#define ALRM_S_MASK         (RTC_ALRMAR_SU | RTC_ALRMAR_ST)
+#ifndef RTC_DR_YU_Pos
+#define RTC_DR_YU_Pos       (16U)
+#endif
+#ifndef RTC_DR_MU_Pos
+#define RTC_DR_MU_Pos       (8U)
+#endif
+#ifndef RTC_DR_DU_Pos
+#define RTC_DR_DU_Pos       (0U)
+#endif
+#ifndef RTC_TR_HU_Pos
+#define RTC_TR_HU_Pos       (16U)
+#endif
+#ifndef RTC_TR_MNU_Pos
+#define RTC_TR_MNU_Pos      (8U)
+#endif
+#ifndef RTC_TR_SU_Pos
+#define RTC_TR_SU_Pos       (0U)
+#endif
+#ifndef RTC_ALRMAR_DU_Pos
+#define RTC_ALRMAR_DU_Pos   (24U)
+#endif
+#ifndef RTC_ALRMAR_HU_Pos
+#define RTC_ALRMAR_HU_Pos   (16U)
+#endif
+#ifndef RTC_ALRMAR_MNU_Pos
+#define RTC_ALRMAR_MNU_Pos  (8U)
+#endif
+#ifndef RTC_ALRMAR_SU_Pos
+#define RTC_ALRMAR_SU_Pos   (0U)
+#endif
+
+/* figure out sync and async prescaler */
+#if CLOCK_LSE
+#define PRE_SYNC            (255)
+#define PRE_ASYNC           (127)
+#elif (CLOCK_LSI == 40000)
+#define PRE_SYNC            (319)
+#define PRE_ASYNC           (124)
+#elif (CLOCK_LSI == 37000)
+#define PRE_SYNC            (295)
+#define PRE_ASYNC           (124)
+#elif (CLOCK_LSI == 32000)
+#define PRE_SYNC            (249)
+#define PRE_ASYNC           (127)
+#else
+#error "rtc: unable to determine RTC SYNC and ASYNC prescalers from LSI value"
+#endif
+
+/* struct tm counts years since 1900 but RTC has only two-digit year hence the
+ * offset of 100 years. */
+#define YEAR_OFFSET         (100)
+
+static struct {
     rtc_alarm_cb_t cb;          /**< callback called from RTC interrupt */
     void *arg;                  /**< argument passed to the callback */
-} rtc_state_t;
+} isr_ctx;
 
-static rtc_state_t rtc_callback;
-
-static uint8_t byte2bcd(uint8_t value);
-
-/**
- * @brief Initializes the RTC to use LSE (external 32.768 kHz oscillator) as a
- * clocl source. Verify that your board has this oscillator. If other clock
- * source is used, then also the prescaler constants should be changed.
- */
-void rtc_init(void)
+static uint32_t val2bcd(int val, int shift, uint32_t mask)
 {
-    /* Enable write access to RTC registers */
-    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-#if defined(CPU_FAM_STM32F7)
-    PWR->CR1 |= PWR_CR1_DBP;
-#else
-    PWR->CR |= PWR_CR_DBP;
-#endif
+    uint32_t bcdhigh = 0;
 
-#if defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32L0)
-    if (!(RCC->CSR & RCC_CSR_RTCEN)) {
-#else
-    if (!(RCC->BDCR & RCC_BDCR_RTCEN)) {
-#endif
-        rtc_poweron();
+    while (val >= 10) {
+        bcdhigh++;
+        val -= 10;
     }
 
-    /* Unlock RTC write protection */
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY2;
+    return ((((bcdhigh << 4) | val) << shift) & mask);
+}
 
-    /* Enter RTC Init mode */
-    RTC->ISR = 0;
+static int bcd2val(uint32_t val, int shift, uint32_t mask)
+{
+    int tmp = (int)((val & mask) >> shift);
+    return (((tmp >> 4) * 10) + (tmp & 0x0f));
+}
+
+static inline void rtc_unlock(void)
+{
+    /* enable backup clock domain */
+    stmclk_dbp_unlock();
+    /* unlock RTC */
+    RTC->WPR = WPK1;
+    RTC->WPR = WPK2;
+    /* enter RTC init mode */
     RTC->ISR |= RTC_ISR_INIT;
-    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
+    while (!(RTC->ISR & RTC_ISR_INITF)) {}
+}
 
-    /* Set 24-h clock */
-    RTC->CR &= ~RTC_CR_FMT;
-    /* Timestamps enabled */
-    RTC->CR |= RTC_CR_TSE;
-
-    /* Configure the RTC PRER */
-    RTC->PRER = RTC_SYNC_PRESCALER;
-    RTC->PRER |= (RTC_ASYNC_PRESCALER << 16);
-
-    /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
-
-    /* Enable RTC write protection */
+static inline void rtc_lock(void)
+{
+    /* exit RTC init mode */
+    RTC->ISR &= ~RTC_ISR_INIT;
+    while (RTC->ISR & RTC_ISR_INITF) {}
+    /* lock RTC device */
     RTC->WPR = 0xff;
+    /* disable backup clock domain */
+    stmclk_dbp_lock();
+}
+
+void rtc_init(void)
+{
+    /* enable low frequency clock */
+    stmclk_enable_lfclk();
+
+    /* select input clock and enable the RTC */
+    stmclk_dbp_unlock();
+    EN_REG &= ~(CLKSEL_MASK);
+#if CLOCK_LSE
+    EN_REG |= (CLKSEL_LSE | EN_BIT);
+#else
+    EN_REG |= (CLKSEL_LSI | EN_BIT);
+#endif
+
+    rtc_unlock();
+    /* reset configuration */
+    RTC->CR = 0;
+    RTC->ISR = RTC_ISR_INIT;
+    /* configure prescaler (RTC PRER) */
+    RTC->PRER = (PRE_SYNC | (PRE_ASYNC << 16));
+    rtc_lock();
+
+    /* configure the EXTI channel, as RTC interrupts are routed through it.
+     * Needs to be configured to trigger on rising edges. */
+    EXTI->FTSR &= ~(EXTI_FTSR_BIT);
+    EXTI->RTSR |= EXTI_RTSR_BIT;
+    EXTI->IMR  |= EXTI_IMR_BIT;
+    EXTI->PR   |= EXTI_PR_BIT;
+    /* enable global RTC interrupt */
+    NVIC_EnableIRQ(IRQN);
 }
 
 int rtc_set_time(struct tm *time)
 {
-    /* Enable write access to RTC registers */
-    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-#if defined(CPU_FAM_STM32F7)
-    PWR->CR1 |= PWR_CR1_DBP;
-#else
-    PWR->CR |= PWR_CR_DBP;
-#endif
+    rtc_unlock();
+    RTC->DR = (val2bcd((time->tm_year % 100), RTC_DR_YU_Pos, DR_Y_MASK) |
+               val2bcd(time->tm_mon,  RTC_DR_MU_Pos, DR_M_MASK) |
+               val2bcd(time->tm_mday, RTC_DR_DU_Pos, DR_D_MASK));
+    RTC->TR = (val2bcd(time->tm_hour, RTC_TR_HU_Pos, TR_H_MASK) |
+               val2bcd(time->tm_min,  RTC_TR_MNU_Pos, TR_M_MASK) |
+               val2bcd(time->tm_sec,  RTC_TR_SU_Pos, TR_S_MASK));
+    rtc_lock();
+    while (!(RTC->ISR & RTC_ISR_RSF)) {}
 
-    /* Unlock RTC write protection */
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY2;
-
-    /* Enter RTC Init mode */
-    RTC->ISR |= RTC_ISR_INIT;
-    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
-
-    /* Set 24-h clock */
-    RTC->CR &= ~RTC_CR_FMT;
-
-    RTC->DR = ((((uint32_t)byte2bcd(time->tm_year - MCU_YEAR_OFFSET) << 16) & (RTC_DR_YT | RTC_DR_YU)) |
-               (((uint32_t)byte2bcd(time->tm_mon + 1) <<  8) & (RTC_DR_MT | RTC_DR_MU)) |
-               (((uint32_t)byte2bcd(time->tm_mday) <<  0) & (RTC_DR_DT | RTC_DR_DU)));
-
-    RTC->TR = ((((uint32_t)byte2bcd(time->tm_hour) << 16) & (RTC_TR_HT | RTC_TR_HU)) |
-               (((uint32_t)byte2bcd(time->tm_min) <<  8) & (RTC_TR_MNT | RTC_TR_MNU)) |
-               (((uint32_t)byte2bcd(time->tm_sec) <<  0) & (RTC_TR_ST | RTC_TR_SU)));
-
-    /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
-    /* Enable RTC write protection */
-    RTC->WPR = 0xFF;
     return 0;
 }
 
 int rtc_get_time(struct tm *time)
 {
-    time->tm_year = MCU_YEAR_OFFSET;
-    time->tm_year += (((RTC->DR & RTC_DR_YT)  >> 20) * 10) + ((RTC->DR & RTC_DR_YU)  >> 16);
-    time->tm_mon  = (((RTC->DR & RTC_DR_MT)  >> 12) * 10) + ((RTC->DR & RTC_DR_MU)  >>  8) - 1;
-    time->tm_mday = (((RTC->DR & RTC_DR_DT)  >>  4) * 10) + ((RTC->DR & RTC_DR_DU)  >>  0);
-    time->tm_hour = (((RTC->TR & RTC_TR_HT)  >> 20) * 10) + ((RTC->TR & RTC_TR_HU)  >> 16);
-    if (RTC->TR & RTC_TR_PM) {
-        /* 12PM is noon */
-        if (time->tm_hour != 12) {
-            time->tm_hour += 12;
-        }
-    }
-    else if ((RTC->CR & RTC_CR_FMT) && time->tm_hour == 12) {
-        /* 12AM is midnight */
-        time->tm_hour -= 12;
-    }
-    time->tm_min  = (((RTC->TR & RTC_TR_MNT) >> 12) * 10) + ((RTC->TR & RTC_TR_MNU) >>  8);
-    time->tm_sec  = (((RTC->TR & RTC_TR_ST)  >>  4) * 10) + ((RTC->TR & RTC_TR_SU)  >>  0);
+    /* save current time */
+    uint32_t tr = RTC->TR;
+    uint32_t dr = RTC->DR;
+    time->tm_year = bcd2val(dr, RTC_DR_YU_Pos, DR_Y_MASK) + YEAR_OFFSET;
+    time->tm_mon  = bcd2val(dr, RTC_DR_MU_Pos, DR_M_MASK);
+    time->tm_mday = bcd2val(dr, RTC_DR_DU_Pos, DR_D_MASK);
+    time->tm_hour = bcd2val(tr, RTC_TR_HU_Pos, TR_H_MASK);
+    time->tm_min  = bcd2val(tr, RTC_TR_MNU_Pos, TR_M_MASK);
+    time->tm_sec  = bcd2val(tr, RTC_TR_SU_Pos, TR_S_MASK);
+
     return 0;
 }
 
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
-    /* Enable write access to RTC registers */
-    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
-#if defined(CPU_FAM_STM32F7)
-    PWR->CR1 |= PWR_CR1_DBP;
-#else
-    PWR->CR |= PWR_CR_DBP;
-#endif
+    rtc_unlock();
 
-    /* Unlock RTC write protection */
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY1;
-    RTC->WPR = RTC_WRITE_PROTECTION_KEY2;
+    /* disable existing alarm (if enabled) */
+    rtc_clear_alarm();
 
-    /* Enter RTC Init mode */
-    RTC->ISR |= RTC_ISR_INIT;
-    while ((RTC->ISR & RTC_ISR_INITF) == 0) {}
+    /* save callback and argument */
+    isr_ctx.cb = cb;
+    isr_ctx.arg = arg;
 
-    RTC->CR &= ~(RTC_CR_ALRAE);
-    while ((RTC->ISR & RTC_ISR_ALRAWF) == 0) {}
+    /* set wakeup time */
+    RTC->ALRMAR = (val2bcd(time->tm_mday, RTC_ALRMAR_DU_Pos, ALRM_D_MASK) |
+                   val2bcd(time->tm_hour, RTC_ALRMAR_HU_Pos, ALRM_H_MASK) |
+                   val2bcd(time->tm_min, RTC_ALRMAR_MNU_Pos, ALRM_M_MASK) |
+                   val2bcd(time->tm_sec,  RTC_ALRMAR_SU_Pos, ALRM_S_MASK));
 
-    RTC->ALRMAR &= ~(RTC_ALRMAR_MSK1 | RTC_ALRMAR_MSK2 | RTC_ALRMAR_MSK3 | RTC_ALRMAR_MSK4);
-    RTC->ALRMAR = ((((uint32_t)byte2bcd(time->tm_mday) << 24) & (RTC_ALRMAR_DT | RTC_ALRMAR_DU)) |
-                   (((uint32_t)byte2bcd(time->tm_hour) << 16) & (RTC_ALRMAR_HT | RTC_ALRMAR_HU)) |
-                   (((uint32_t)byte2bcd(time->tm_min) <<  8) & (RTC_ALRMAR_MNT | RTC_ALRMAR_MNU)) |
-                   (((uint32_t)byte2bcd(time->tm_sec) <<  0) & (RTC_ALRMAR_ST | RTC_ALRMAR_SU)));
     /* Enable Alarm A */
-    RTC->CR |= RTC_CR_ALRAE;
-    RTC->CR |= RTC_CR_ALRAIE;
     RTC->ISR &= ~(RTC_ISR_ALRAF);
+    RTC->CR |= (RTC_CR_ALRAE | RTC_CR_ALRAIE);
 
-    /* Exit RTC init mode */
-    RTC->ISR &= (uint32_t) ~RTC_ISR_INIT;
-    /* Enable RTC write protection */
-    RTC->WPR = 0xFF;
-
-#if defined(CPU_FAM_STM32L0)
-    EXTI->IMR  |= EXTI_IMR_IM17;
-#else
-    EXTI->IMR  |= EXTI_IMR_MR17;
-#endif
-
-    EXTI->RTSR |= EXTI_RTSR_TR17;
-
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
-    NVIC_SetPriority(RTC_IRQn, 10);
-    NVIC_EnableIRQ(RTC_IRQn);
-#else
-    NVIC_SetPriority(RTC_Alarm_IRQn, 10);
-    NVIC_EnableIRQ(RTC_Alarm_IRQn);
-#endif
-
-    rtc_callback.cb = cb;
-    rtc_callback.arg = arg;
+    rtc_lock();
 
     return 0;
 }
 
 int rtc_get_alarm(struct tm *time)
 {
-    time->tm_year = MCU_YEAR_OFFSET;
-    time->tm_year += (((RTC->DR     & RTC_DR_YT)      >> 20) * 10) + ((RTC->DR & RTC_DR_YU)          >> 16);
-    time->tm_mon  = (((RTC->DR     & RTC_DR_MT)      >> 12) * 10) + ((RTC->DR & RTC_DR_MU)          >>  8) - 1;
-    time->tm_mday = (((RTC->ALRMAR & RTC_ALRMAR_DT)  >> 28) * 10) + ((RTC->ALRMAR & RTC_ALRMAR_DU)  >> 24);
-    time->tm_hour = (((RTC->ALRMAR & RTC_ALRMAR_HT)  >> 20) * 10) + ((RTC->ALRMAR & RTC_ALRMAR_HU)  >> 16);
-    if ((RTC->ALRMAR & RTC_ALRMAR_PM) && (RTC->CR & RTC_CR_FMT)) {
-        time->tm_hour += 12;
-    }
-    time->tm_min  = (((RTC->ALRMAR & RTC_ALRMAR_MNT) >> 12) * 10) + ((RTC->ALRMAR & RTC_ALRMAR_MNU) >>  8);
-    time->tm_sec  = (((RTC->ALRMAR & RTC_ALRMAR_ST)  >>  4) * 10) + ((RTC->ALRMAR & RTC_ALRMAR_SU)  >>  0);
+    uint32_t dr = RTC->DR;
+    uint32_t alrm = RTC->ALRMAR;
+
+    time->tm_year = bcd2val(dr, RTC_DR_YU_Pos, DR_Y_MASK) + YEAR_OFFSET;
+    time->tm_mon  = bcd2val(dr, RTC_DR_MU_Pos, DR_M_MASK);
+    time->tm_mday = bcd2val(alrm, RTC_ALRMAR_DU_Pos, ALRM_D_MASK);
+    time->tm_hour = bcd2val(alrm, RTC_ALRMAR_HU_Pos, ALRM_H_MASK);
+    time->tm_min  = bcd2val(alrm, RTC_ALRMAR_MNU_Pos, ALRM_M_MASK);
+    time->tm_sec  = bcd2val(alrm, RTC_ALRMAR_SU_Pos, ALRM_S_MASK);
+
     return 0;
 }
 
 void rtc_clear_alarm(void)
 {
-    /* Disable Alarm A */
-    RTC->CR &= RTC_CR_ALRAE;
-    RTC->CR &= RTC_CR_ALRAIE;
+    RTC->CR &= ~(RTC_CR_ALRAE | RTC_CR_ALRAIE);
+    while (!(RTC->ISR & RTC_ISR_ALRAWF)) {}
 
-    rtc_callback.cb = NULL;
-    rtc_callback.arg = NULL;
+    isr_ctx.cb = NULL;
+    isr_ctx.arg = NULL;
 }
 
 void rtc_poweron(void)
 {
-#if defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32L0)
-    /* Reset RTC domain */
-    RCC->CSR |= RCC_CSR_RTCRST;
-    RCC->CSR &= ~(RCC_CSR_RTCRST);
-
-    /* Enable the LSE clock (external 32.768 kHz oscillator) */
-    RCC->CSR &= ~(RCC_CSR_LSEON);
-    RCC->CSR &= ~(RCC_CSR_LSEBYP);
-    RCC->CSR |= RCC_CSR_LSEON;
-    while ( (RCC->CSR & RCC_CSR_LSERDY) == 0 ) {}
-
-    /* Switch RTC to LSE clock source */
-    RCC->CSR &= ~(RCC_CSR_RTCSEL);
-    RCC->CSR |= RCC_CSR_RTCSEL_LSE;
-
-    /* Enable the RTC */
-    RCC->CSR |= RCC_CSR_RTCEN;
-#else
-    /* Reset RTC domain */
-    RCC->BDCR |= RCC_BDCR_BDRST;
-    RCC->BDCR &= ~(RCC_BDCR_BDRST);
-
-    /* Enable the LSE clock (external 32.768 kHz oscillator) */
-    RCC->BDCR &= ~(RCC_BDCR_LSEON);
-    RCC->BDCR &= ~(RCC_BDCR_LSEBYP);
-    RCC->BDCR |= RCC_BDCR_LSEON;
-    while ((RCC->BDCR & RCC_BDCR_LSERDY) == 0) {}
-
-    /* Switch RTC to LSE clock source */
-    RCC->BDCR &= ~(RCC_BDCR_RTCSEL);
-    RCC->BDCR |= RCC_BDCR_RTCSEL_0;
-
-    /* Enable the RTC */
-    RCC->BDCR |= RCC_BDCR_RTCEN;
-#endif
+    stmclk_dbp_unlock();
+    EN_REG |= EN_BIT;
+    stmclk_dbp_lock();
 }
 
 void rtc_poweroff(void)
 {
-#if defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32L0)
-    /* Reset RTC domain */
-    RCC->CSR |= RCC_CSR_RTCRST;
-    RCC->CSR &= ~(RCC_CSR_RTCRST);
-    /* Disable the RTC */
-    RCC->CSR &= ~RCC_CSR_RTCEN;
-    /* Disable LSE clock */
-    RCC->CSR &= ~(RCC_CSR_LSEON);
-#else
-    /* Reset RTC domain */
-    RCC->BDCR |= RCC_BDCR_BDRST;
-    RCC->BDCR &= ~(RCC_BDCR_BDRST);
-    /* Disable the RTC */
-    RCC->BDCR &= ~RCC_BDCR_RTCEN;
-    /* Disable LSE clock */
-    RCC->BDCR &= ~(RCC_BDCR_LSEON);
-#endif
+    stmclk_dbp_unlock();
+    EN_REG &= ~EN_BIT;
+    stmclk_dbp_lock();
 }
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
-void isr_rtc(void)
-#else
-void isr_rtc_alarm(void)
-#endif
+void ISR_NAME(void)
 {
     if (RTC->ISR & RTC_ISR_ALRAF) {
-        if (rtc_callback.cb != NULL) {
-            rtc_callback.cb(rtc_callback.arg);
+        if (isr_ctx.cb != NULL) {
+            isr_ctx.cb(isr_ctx.arg);
         }
         RTC->ISR &= ~RTC_ISR_ALRAF;
     }
-    EXTI->PR |= EXTI_PR_PR17;
+    EXTI->PR |= EXTI_PR_BIT;
     cortexm_isr_end();
 }
 
-/**
- * Convert a number from unsigned to BCD
- *
- * @param[in] value to be converted
- * @return BCD representation of the value
- */
-static uint8_t byte2bcd(uint8_t value)
-{
-    uint8_t bcdhigh = 0;
-
-    while (value >= 10) {
-        bcdhigh++;
-        value -= 10;
-    }
-
-    return  ((uint8_t)(bcdhigh << 4) | value);
-}
-
-#endif /* RTC_NUMOF */
-
-#endif /* defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F2) || \
-          defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
-          defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-          defined(CPU_FAM_STM32L1) */
+#endif /* !CPU_FAM_STM32F1 */

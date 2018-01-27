@@ -22,9 +22,7 @@
 #define SYS_STATVFS_H
 
 #include <sys/types.h> /* for fsblkcnt_t, fsfilcnt_t */
-/** @todo Remove ifdef __mips__ special case after
- * [#6639](https://github.com/RIOT-OS/RIOT/pull/6639) is merged */
-#if MODULE_NEWLIB || defined(__mips__)
+#if MODULE_NEWLIB
 /* newlib support for fsblkcnt_t was only recently added to the newlib git
  * repository, commit f3e587d30a9f65d0c6551ad14095300f6e81672e, 15 apr 2016.
  * Will be included in release 2.5.0, around new year 2016/2017.

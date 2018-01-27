@@ -1,7 +1,7 @@
-From be24fc7113549d4f7d8b6fa2df298dfd36fb1dd4 Mon Sep 17 00:00:00 2001
+From 14eaa181746c7fe54b554a9dd98c2c37fd41b5bd Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mail@martine-lenders.eu>
 Date: Thu, 12 May 2016 16:07:35 +0200
-Subject: [PATCH 2/3] Fix warnings
+Subject: [PATCH 2/4] Fix warnings
 
 ---
  libfixmath/fix16_str.c           |  8 ++++----
@@ -53,7 +53,7 @@ index eff906f..2c02c21 100644
          
          buf++;
 diff --git a/libfixmath/uint32.c b/libfixmath/uint32.c
-index 2980ab9..c1adc4f 100644
+index 2980ab9..855774d 100644
 --- a/libfixmath/uint32.c
 +++ b/libfixmath/uint32.c
 @@ -6,10 +6,10 @@ uint32_t uint32_log2(uint32_t inVal) {

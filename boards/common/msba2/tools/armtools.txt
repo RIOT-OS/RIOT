@@ -1,0 +1,15 @@
+This directory contains flash & terminal-utilities for use with
+the msb_av2 platform used by the FeuerWhere-Project.
+
+Usage:
+Running "./pseudoterm /dev/ttyUSB1" will start the terminal-emulator,
+open the specified port and reset the connected msb_av2-board.
+If it receives a SIGUSR2, the terminal closes the port an waits.
+On reception of a SIGUSR1, it reopens the port and resets the ARM.
+
+"./lpc2k_pgm /dev/ttyUSB1 /path/to/firmware.ihex" will do what you
+expect, but it will additionally run "killall -SIGUSR2 pseudoterm" before
+and "killall -SIGUSR1 pseudoterm" after flashing.
+
+Together, the tools enable you to have a terminal connected to the board
+at all times, but let you flash whenever you feel like.

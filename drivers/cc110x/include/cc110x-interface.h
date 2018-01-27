@@ -62,5 +62,5 @@ void cc110x_hook_off(void);
 }
 #endif
 
-/** @} */
 #endif /* CC110X_INTERFACE_H */
+/** @} */

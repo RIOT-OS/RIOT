@@ -3,7 +3,7 @@ PKG_BUILDDIR ?= $(PKGDIRBASE)/tinydtls
 INCLUDES += -I$(PKG_BUILDDIR)
 
 ifeq ($(TOOLCHAIN), llvm)
-    CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
+  CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
 endif
 
 ifneq (,$(filter tinydtls_aes,$(USEMODULE)))

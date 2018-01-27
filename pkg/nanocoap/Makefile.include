@@ -1,2 +1,0 @@
-INCLUDES += -I$(PKGDIRBASE)/nanocoap/nanocoap
-INCLUDES += -I$(RIOTBASE)/sys/posix/include

@@ -174,7 +174,7 @@ int conn_can_isotp_send(conn_can_isotp_t *conn, const void *buf, size_t size, in
                 if (msg.content.ptr == conn) {
                     ret = -EIO;
                 }
-                /* No break */
+                /* Fall through */
             case CAN_MSG_TX_CONFIRMATION:
 #ifdef MODULE_CONN_CAN_ISOTP_MULTI
                 if (msg.content.ptr != conn) {

@@ -9,8 +9,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
 
 def testfunc(child):
     child.expect_exact("od_hex_dump(short_str, sizeof(short_str), OD_WIDTH_DEFAULT)")
@@ -40,5 +38,8 @@ def testfunc(child):
 
     print("All tests successful")
 
+
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc, timeout=1, echo=False))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc, timeout=1, echo=False))

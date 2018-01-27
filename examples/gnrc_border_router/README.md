@@ -85,12 +85,6 @@ On this example, such address can be pinged from 6lo motes:
 
 Thus far, IPv6 communication with between your PC and your motes is enabled.
 
-## Issues
-A known issue [#5122](https://github.com/RIOT-OS/RIOT/issues/5122) 
-is that after ~15min global addresses on the BR Neighbour Cache dissappear.
-We are investigating why it happens and we'll propose a solution soon.
-If you experience it, just reboot your nodes and they will come again on-line.
-
 # gnrc_border_router with manual config
 You can use `ethos` as a standalone driver, if you want to setup the BR manually.
 
@@ -101,7 +95,7 @@ has the following:
 ```make
 ifeq (,$(filter native,$(BOARD)))
 GNRC_NETIF_NUMOF := 2
-USEMODULE += ethos gnrc_netdev
+USEMODULE += ethos
 CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200 -DUSE_ETHOS_FOR_STDIO
 FEATURES_REQUIRED += periph_uart
 endif
@@ -181,7 +175,7 @@ example on any RIOT supported platform that offers either more than one UART or
 be equipped with an IPv6 capable network device. In this case only the Makefile
 of this application has to be slightly modified, e.g. by replacing the line
 ```
-USEMODULE += ethos gnrc_netdev
+USEMODULE += ethos
 ```
 with something like
 ```
@@ -210,7 +204,7 @@ INCLUDES += -I$(CURDIR)
 CFLAGS += -DSLIP_UART=$(SLIP_UART)
 CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
 # Include SLIP package for IP over Serial communication
-USEMODULE += gnrc_slip
+USEMODULE += slipdev
 ```
 
 

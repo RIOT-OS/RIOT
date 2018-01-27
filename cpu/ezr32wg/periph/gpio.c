@@ -60,17 +60,21 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     GPIO_P_TypeDef *port = _port(pin);
     uint32_t pin_pos = _pin_pos(pin);
 
+    if (mode == GPIO_IN_PD) {
+        return -1;
+    }
+
     /* enable power for the GPIO module */
     CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO;
 
     /* configure the mode */
     port->MODE[pin_pos >> 3] &= ~(0xf << ((pin_pos & 0x7) * 4));
     port->MODE[pin_pos >> 3] |= (mode << ((pin_pos & 0x7) * 4));
-    /* reset output register */
-    port->DOUTCLR = (1 << pin_pos);
     /* if input with pull-up, set the data out register */
     if (mode == GPIO_IN_PU) {
         port->DOUTSET = (1 << pin_pos);
+    } else if (mode == GPIO_IN) {
+        port->DOUTCLR = (1 << pin_pos);
     }
 
     return 0;
@@ -147,7 +151,7 @@ void gpio_write(gpio_t pin, int value)
  */
 void isr_gpio_even(void)
 {
-    for (int i = 0; i < NUMOF_IRQS; i++) {
+    for (unsigned i = 0; i < NUMOF_IRQS; i++) {
         if (GPIO->IF & (1 << i)) {
             isr_ctx[i].cb(isr_ctx[i].arg);
             GPIO->IFC = (1 << i);

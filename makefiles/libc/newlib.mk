@@ -9,11 +9,19 @@ ifneq (,$(filter newlib_nano,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
+  CFLAGS += -D_GNU_SOURCE=1
+endif
+
 ifeq (1,$(USE_NEWLIB_NANO))
   export LINKFLAGS += -specs=nano.specs
 endif
 
-export LINKFLAGS += -lc -lnosys
+ifeq ($(TARGET_ARCH),mips-mti-elf)
+ export LINKFLAGS += -lc
+else
+ export LINKFLAGS += -lc -lnosys
+endif
 
 # Search for Newlib include directories
 

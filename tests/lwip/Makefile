@@ -1,4 +1,3 @@
-APPLICATION = lwip
 include ../Makefile.tests_common
 
 # lwIP's memory management doesn't seem to work on non 32-bit platforms at the
@@ -8,7 +7,7 @@ BOARD_BLACKLIST := arduino-uno arduino-duemilanove arduino-mega2560 chronos \
                    wsn430-v1_4 z1
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon nrf6310 nucleo32-f031 nucleo32-f042 \
                              nucleo32-l031 nucleo-f030 nucleo-f334 nucleo-l053 \
-                             pca10005 stm32f0discovery weio yunjia-nrf51822
+                             stm32f0discovery yunjia-nrf51822
 
 # including lwip_ipv6_mld would currently break this test on at86rf2xx radios
 USEMODULE += lwip lwip_ipv6_autoconfig lwip_sock_ip lwip_netdev
@@ -27,5 +26,8 @@ endif
 
 include $(RIOTBASE)/Makefile.include
 
+# Test only implemented for native
+ifeq ($(BOARD),native)
 test:
 	./tests/01-run.py
+endif

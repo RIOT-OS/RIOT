@@ -37,6 +37,8 @@ extern "C" {
  * @name    Lengths for fixed length options
  * @note    Options don't use bytes as their length unit, but 8 bytes.
  */
+#define SIXLOWPAN_ND_OPT_6CTX_LEN_MIN           (2U)
+#define SIXLOWPAN_ND_OPT_6CTX_LEN_MAX           (3U)
 #define SIXLOWPAN_ND_OPT_AR_LEN                 (2U)
 #define SIXLOWPAN_ND_OPT_ABR_LEN                (3U)
 /**
@@ -110,6 +112,14 @@ extern "C" {
  * @see     [RFC 6775, section 9](https://tools.ietf.org/html/rfc6775#section-9)
  * @{
  */
+/**
+ * @brief   Number of address registration retries
+ *
+ * @note    Must not be greater than 7 for @ref net_gnrc since
+ *          @ref GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE restricts it to
+ *          that number.
+ */
+#define SIXLOWPAN_ND_REG_TRANSMIT_NUMOF         (3U)
 /**
  * @brief   RTR_SOLICITATION_INTERVAL (in msec)
  */

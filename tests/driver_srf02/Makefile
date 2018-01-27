@@ -1,4 +1,3 @@
-APPLICATION = driver_srf02
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_i2c

@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Device descriptor for HIH6130/HIH6131 sensors
+ * @brief   Device descriptor for HIH6130/HIH6131 sensors
  */
 typedef struct {
     i2c_t i2c;              /**< I2C device the sensor is connected to */
@@ -40,7 +40,7 @@ typedef struct {
 } hih6130_t;
 
 /**
- * @brief Initialize a sensor
+ * @brief   Initialize a sensor
  *
  * @param[out] dev          device descriptor of sensor to initialize
  * @param[in]  i2c          I2C bus the sensor is connected to
@@ -49,7 +49,7 @@ typedef struct {
 void hih6130_init(hih6130_t *dev, i2c_t i2c, uint8_t address);
 
 /**
- * @brief Read humidity and temperature from sensor and convert to floating-point
+ * @brief   Read humidity and temperature from sensor and convert to floating-point
  *
  * @param[in]  dev                       Sensor device descriptor
  * @param[out] relative_humidity_percent Measured relative humidity in percent

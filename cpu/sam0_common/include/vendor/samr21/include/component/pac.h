@@ -3,7 +3,7 @@
  *
  * \brief Component description for PAC
  *
- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,9 +40,6 @@
  * \asf_license_stop
  *
  */
- /**
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
 #ifndef _SAMR21_PAC_COMPONENT_
 #define _SAMR21_PAC_COMPONENT_
@@ -72,7 +69,7 @@ typedef union {
 
 #define PAC_WPCLR_WP_Pos            1            /**< \brief (PAC_WPCLR) Write Protection Clear */
 #define PAC_WPCLR_WP_Msk            (0x7FFFFFFFul << PAC_WPCLR_WP_Pos)
-#define PAC_WPCLR_WP(value)         ((PAC_WPCLR_WP_Msk & ((value) << PAC_WPCLR_WP_Pos)))
+#define PAC_WPCLR_WP(value)         (PAC_WPCLR_WP_Msk & ((value) << PAC_WPCLR_WP_Pos))
 #define PAC_WPCLR_MASK              0xFFFFFFFEul /**< \brief (PAC_WPCLR) MASK Register */
 
 /* -------- PAC_WPSET : (PAC Offset: 0x4) (R/W 32) Write Protection Set -------- */
@@ -91,7 +88,7 @@ typedef union {
 
 #define PAC_WPSET_WP_Pos            1            /**< \brief (PAC_WPSET) Write Protection Set */
 #define PAC_WPSET_WP_Msk            (0x7FFFFFFFul << PAC_WPSET_WP_Pos)
-#define PAC_WPSET_WP(value)         ((PAC_WPSET_WP_Msk & ((value) << PAC_WPSET_WP_Pos)))
+#define PAC_WPSET_WP(value)         (PAC_WPSET_WP_Msk & ((value) << PAC_WPSET_WP_Pos))
 #define PAC_WPSET_MASK              0xFFFFFFFEul /**< \brief (PAC_WPSET) MASK Register */
 
 /** \brief PAC hardware registers */

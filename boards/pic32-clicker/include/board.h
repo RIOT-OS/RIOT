@@ -11,7 +11,7 @@
 /**
  * @defgroup    boards_pic32-clicker MikroE PIC32 Clicker
  * @ingroup     boards
- * @brief       board configuration for the MikroE PIC32 Clicker
+ * @brief       Support for the MikroE PIC32 Clicker
  * @details
  * see:
  * http://www.mikroe.com/pic32/pic32mx-clicker/
@@ -67,7 +67,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Board level initialisation
+ * @brief   Board level initialization
  */
 void board_init(void);
 

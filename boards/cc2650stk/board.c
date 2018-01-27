@@ -21,7 +21,7 @@
 #include "board.h"
 
 /**
- * @brief           initialise the board
+ * @brief           initialize the board
  */
 void board_init(void)
 {

@@ -157,7 +157,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
  * @return              number of bytes used from @p value
  * @return              <0 on error
  */
-int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, void *value,
+int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *value,
                           size_t value_len);
 
 #ifdef __cplusplus

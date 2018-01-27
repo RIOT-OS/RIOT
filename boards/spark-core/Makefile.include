@@ -2,9 +2,6 @@
 export CPU = stm32f1
 export CPU_MODEL = stm32f103cb
 
-# the spark-core uses its own custom linkerscript...
-export LINKER_SCRIPT = stm32f103cb_sparkcore.ld
-
 # configure the serial interface
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
@@ -20,6 +17,9 @@ export OFLAGS = -O binary
 export FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D "$(HEXFILE)"
 
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
+
+# Skip the space needed by the embedded bootloader
+export ROM_OFFSET ?= 0x5000
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

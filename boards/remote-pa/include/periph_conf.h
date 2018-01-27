@@ -16,6 +16,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Antonio Lignan <alinan@zolertia.com>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef PERIPH_CONF_H
@@ -26,23 +27,6 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-/**
- * @name    UART configuration
- * @{
- */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_IRQ_PRIO       1
-
-/* UART 0 device configuration */
-#define UART_0_DEV          UART0
-#define UART_0_IRQ          UART0_IRQn
-#define UART_0_ISR          isr_uart0
-/* UART 0 pin configuration */
-#define UART_0_TX_PIN       GPIO_PA1
-#define UART_0_RX_PIN       GPIO_PA0
-/** @} */
 
 /**
  * @name    I2C configuration
@@ -104,6 +88,20 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+/** @} */
+
+/**
+ * @name ADC configuration
+ * @{
+ */
+#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+
+static const adc_conf_t adc_config[] = {
+    GPIO_PIN(0, 6), /**< GPIO_PA6 = ADC2_PIN */
+    GPIO_PIN(0, 7), /**< GPIO_PA7 = ADC3_PIN */
+};
+
+#define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /** @} */
 
 #ifdef __cplusplus

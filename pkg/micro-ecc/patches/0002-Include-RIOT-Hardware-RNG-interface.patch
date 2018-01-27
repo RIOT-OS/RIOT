@@ -17,7 +17,7 @@ index 1bb595a..b13fdbe 100644
  
  #include "types.h"
  
-+#ifdef FEATURE_PERIPH_HWRNG
++#ifdef MODULE_PERIPH_HWRNG
 +
  #if (defined(_WIN32) || defined(_WIN64))
  /* Windows */
@@ -26,7 +26,7 @@ index 1bb595a..b13fdbe 100644
  
  #endif /* platform */
  
-+#endif /* FEATURE_PERIPH_HWRNG */
++#endif /* MODULE_PERIPH_HWRNG */
 +
  #endif /* _UECC_PLATFORM_SPECIFIC_H_ */
 diff --git a/uECC.c b/uECC.c
@@ -37,7 +37,7 @@ index daa144a..3691fc4 100644
  
  #include "uECC.h"
  #include "uECC_vli.h"
-+#ifdef FEATURE_PERIPH_HWRNG
++#ifdef MODULE_PERIPH_HWRNG
 +#include "periph/hwrng.h"
 +#endif
  
@@ -47,14 +47,14 @@ index daa144a..3691fc4 100644
      #include "asm_avr.inc"
  #endif
  
-+#ifdef FEATURE_PERIPH_HWRNG
++#ifdef MODULE_PERIPH_HWRNG
 +int riot_hwrng(uint8_t *dest, unsigned size) {
 +    hwrng_read(dest, size);
 +    return 1;
 +}
 +#endif
 +
-+#ifdef FEATURE_PERIPH_HWRNG
++#ifdef MODULE_PERIPH_HWRNG
  #if default_RNG_defined
  static uECC_RNG_Function g_rng_function = &default_RNG;
  #else
@@ -68,7 +68,7 @@ index daa144a..3691fc4 100644
      return 0;
  }
  
-+#ifdef FEATURE_PERIPH_HWRNG
++#ifdef MODULE_PERIPH_HWRNG
 +
  int uECC_make_key(uint8_t *public_key,
                    uint8_t *private_key,
@@ -77,7 +77,7 @@ index daa144a..3691fc4 100644
      return 0;
  }
  
-+#endif /* FEATURE_PERIPH_HWRNG */
++#endif /* MODULE_PERIPH_HWRNG */
 +
  int uECC_shared_secret(const uint8_t *public_key,
                         const uint8_t *private_key,
@@ -86,7 +86,7 @@ index daa144a..3691fc4 100644
      return 1;
  }
  
-+#ifdef FEATURE_PERIPH_HWRNG
++#ifdef MODULE_PERIPH_HWRNG
 +
  int uECC_sign(const uint8_t *private_key,
                const uint8_t *message_hash,
@@ -95,7 +95,7 @@ index daa144a..3691fc4 100644
      return 0;
  }
  
-+#endif /* FEATURE_PERIPH_HWRNG */
++#endif /* MODULE_PERIPH_HWRNG */
 +
  /* Compute an HMAC using K as a key (as in RFC 6979). Note that K is always
     the same size as the hash result size. */
@@ -108,7 +108,7 @@ index 9911763..6433143 100644
  */
  int uECC_curve_public_key_size(uECC_Curve curve);
  
-+#ifdef FEATURE_PERIPH_HWRNG
++#ifdef MODULE_PERIPH_HWRNG
 +
  /* uECC_make_key() function.
  Create a public/private key pair.
@@ -117,7 +117,7 @@ index 9911763..6433143 100644
  */
  int uECC_make_key(uint8_t *public_key, uint8_t *private_key, uECC_Curve curve);
  
-+#endif /* FEATURE_PERIPH_HWRNG */
++#endif /* MODULE_PERIPH_HWRNG */
 +
  /* uECC_shared_secret() function.
  Compute a shared secret given your secret key and someone else's public key.
@@ -126,7 +126,7 @@ index 9911763..6433143 100644
  */
  int uECC_compute_public_key(const uint8_t *private_key, uint8_t *public_key, uECC_Curve curve);
  
-+#ifdef FEATURE_PERIPH_HWRNG
++#ifdef MODULE_PERIPH_HWRNG
 +
  /* uECC_sign() function.
  Generate an ECDSA signature for a given hash value.
@@ -135,11 +135,10 @@ index 9911763..6433143 100644
                uint8_t *signature,
                uECC_Curve curve);
  
-+#endif /* FEATURE_PERIPH_HWRNG */
++#endif /* MODULE_PERIPH_HWRNG */
 +
  /* uECC_HashContext structure.
  This is used to pass in an arbitrary hash function to uECC_sign_deterministic().
  The structure will be used for multiple hash computations; each time a new hash
 -- 
 2.7.4
-

@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_si70xx Si7006/13/20/21 temperature and humidity sensors
+ * @defgroup    drivers_si70xx Si7006/13/20/21 temperature and humidity sensors
  * @ingroup     drivers_sensors
  * @brief       Driver for the Si7006/13/20/21 temperature and humidity sensor.
  * @{
@@ -28,56 +28,14 @@ extern "C" {
 #endif
 
 /**
- * @name Si70xx chip addresses.
+ * @brief Driver return codes
  */
-#define SI70XX_ADDRESS_SI7006       (0x80)
-#define SI70XX_ADDRESS_SI7013       (0x80)
-#define SI70XX_ADDRESS_SI7013_ALT   (0x81)
-#define SI70XX_ADDRESS_SI7020       (0x80)
-#define SI70XX_ADDRESS_SI7021       (0x80)
-
-/**
- * @name Si70xx device commands.
- * @{
- */
-#define SI70XX_MEASURE_RH_HOLD      (0xE5)
-#define SI70XX_MEASURE_RH           (0xF5)
-#define SI70XX_MEASURE_TEMP_HOLD    (0xE3)
-#define SI70XX_MEASURE_TEMP         (0xF3)
-#define SI70XX_MEASURE_TEMP_PREV    (0xE0)
-#define SI70XX_RESET                (0xFE)
-#define SI70XX_WRITE_USER_REG       (0xE6)
-#define SI70XX_READ_USER_REG        (0xE7)
-#define SI70XX_WRITE_HEATER_REG     (0x51)
-#define SI70XX_READ_HEATER_REG      (0x11)
-#define SI70XX_READ_ID_FIRST_A      (0xFA)
-#define SI70XX_READ_ID_FIRST_B      (0x0F)
-#define SI70XX_READ_ID_SECOND_A     (0xFC)
-#define SI70XX_READ_ID_SECOND_B     (0xC9)
-#define SI70XX_READ_REVISION_A      (0x84)
-#define SI70XX_READ_REVISION_B      (0xB8)
-/** @} */
-
-/**
- * @name Si70xx register values.
- * @{
- */
-#define SI70XX_ID_SI7006            (0x06)
-#define SI70XX_ID_SI7013            (0x0D)
-#define SI70XX_ID_SI7020            (0x14)
-#define SI70XX_ID_SI7021            (0x15)
-
-#define SI70XX_REVISION_1           (0xFF)
-#define SI70XX_REVISION_2           (0x20)
-/** @} */
-
-/**
- * @brief Si70xx device descriptor.
- */
-typedef struct {
-    i2c_t i2c_dev;              /**< I2C bus the sensors is connected to */
-    uint8_t address;            /**< sensor address */
-} si70xx_t;
+enum {
+    SI70XX_OK,                 /**< All OK */
+    SI70XX_ERR_NOI2C,          /**< An error occurred when initializing I2C bus */
+    SI70XX_ERR_NODEV,          /**< No valid device found on I2C bus */
+    SI70XX_ERR_I2C,            /**< An error occured when reading/writing on I2C bus */
+};
 
 /**
  * @brief Device initialization parameters.
@@ -88,24 +46,24 @@ typedef struct {
 } si70xx_params_t;
 
 /**
- * @brief   Test if the device id and revision number are as expected.
- *
- * @param[in] dev           device descriptor
- * @return                  zero on succesful test
- * @return                  non-zero on unsuccesfull test.
+ * @brief Si70xx device descriptor.
  */
-int si70xx_test(const si70xx_t *dev);
+typedef struct {
+    si70xx_params_t params;     /**< Device parameters */
+} si70xx_t;
 
 /**
  * @brief   Initialize and reset the sensor.
  *
  * @param[in] dev           device descriptor
- * @param[in] i2c_dev       i2c device to use
- * @param[in] address       device address (depends on the chip)
- * @return                  zero on succesful initialization.
- * @return                  non-zero on error
+ * @param[in] params        initialization parameters
+ *
+ * @return                  SI70XX_OK on successful initialization
+ * @return                  -SI70XX_ERR_NOI2C on I2C initialization error
+ * @return                  -SI70XX_ERR_NODEV on device test error
+ * @return                  -SI70XX_ERR_I2C on I2C bus error
  */
-int si70xx_init(si70xx_t *dev, i2c_t i2c_dev, uint8_t address);
+int si70xx_init(si70xx_t *dev, const si70xx_params_t *params);
 
 /**
  * @brief   Read the relative humidity from the sensor. Uses clock streching.

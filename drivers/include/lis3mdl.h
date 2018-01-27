@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    driver_LIS3MDL LIS3MDL 3-axis magnetometer
+ * @defgroup    drivers_lis3mdl LIS3MDL 3-axis magnetometer
  * @ingroup     drivers_sensors
  * @brief       Device driver for the LIS3MDL 3-axis magnetometer
  * @{
@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief 3d data container of the LIS3MDL sensor
+ * @brief   3d data container of the LIS3MDL sensor
  */
 typedef struct {
     int16_t x_axis;                  /**< Magnometer data from x-axis */
@@ -39,15 +39,7 @@ typedef struct {
 } lis3mdl_3d_data_t;
 
 /**
- * @brief Device descriptor for LIS3MDL sensor
- */
-typedef struct {
-    i2c_t i2c;                       /**< I2C device */
-    uint8_t addr;                    /**< Magnometer I2C address */
-} lis3mdl_t;
-
-/**
- * @brief Operating mode of x- and y-axis for LIS3MDL
+ * @brief   Operating mode of x- and y-axis for LIS3MDL
  */
 typedef enum {
     LIS3MDL_XY_MODE_LOW    = 0x00,   /**< Low-power mode */
@@ -57,7 +49,7 @@ typedef enum {
 } lis3mdl_xy_mode_t;
 
 /**
- * @brief Operating mode of z-axis for LIS3MDL
+ * @brief   Operating mode of z-axis for LIS3MDL
  */
 typedef enum {
     LIS3MDL_Z_MODE_LOW    = 0x00,    /**< Low-power mode */
@@ -67,7 +59,7 @@ typedef enum {
 } lis3mdl_z_mode_t;
 
 /**
- * @brief Output data rate [Hz] for LIS3MDL
+ * @brief   Output data rate [Hz] for LIS3MDL
  */
 typedef enum {
     LIS3MDL_ODR_0_625Hz = 0x00,      /**<  0.625Hz */
@@ -80,7 +72,7 @@ typedef enum {
 } lis3mdl_odr_t;
 
 /**
- * @brief Scale [gauss] for LIS3MDL
+ * @brief   Scale [gauss] for LIS3MDL
  */
 typedef enum {
     LIS3MDL_SCALE_4G  = 0x00,        /**< +-  4 gauss */
@@ -90,7 +82,7 @@ typedef enum {
 } lis3mdl_scale_t;
 
 /**
- * @brief Operating modes
+ * @brief   Operating modes
  */
 typedef enum {
     LIS3MDL_OP_CONT_CONV = 0x00,     /**< Continous-conversion mode */
@@ -99,27 +91,39 @@ typedef enum {
 } lis3mdl_op_t;
 
 /**
- * @brief Initialize a new LIS3DML device.
+ * @brief   Device initialization parameters
+ */
+typedef struct {
+    i2c_t i2c;                       /**< I2C device */
+    uint8_t addr;                    /**< Magnometer I2C address */
+    lis3mdl_xy_mode_t xy_mode;       /**< Power mode of x- and y-axis */
+    lis3mdl_z_mode_t z_mode;         /**< Power mode of z-axis */
+    lis3mdl_odr_t odr;               /**< Output data rate */
+    lis3mdl_scale_t scale;           /**< Scale factor */
+    lis3mdl_op_t op_mode;            /**< Operation mode */
+} lis3mdl_params_t;
+
+
+/**
+ * @brief   Device descriptor for LIS3MDL sensor
+ */
+typedef struct {
+    lis3mdl_params_t params;         /**< Initialization parameters */
+} lis3mdl_t;
+
+/**
+ * @brief   Initialize a new LIS3DML device.
  *
  * @param[in] dev          device descriptor of LIS3MDL
- * @param[in] i2c          I2C device connected to
- * @param[in] address      I2C address of the magnometer
- * @param[in] xy_mode      power mode of x- and y-axis
- * @param[in] z_mode       power mode of z-axis
- * @param[in] odr          output data rate of magnometer
- * @param[in] scale        scale configuration of magnometer
- * @param[in] op_mode      operation mode of the device
+ * @param[in] params       initialization parameters
  *
  * @return                   0 on success
  * @return                  -1 on error
  */
-int lis3mdl_init(lis3mdl_t *dev, i2c_t i2c, uint8_t address,
-                 lis3mdl_xy_mode_t xy_mode, lis3mdl_z_mode_t z_mode,
-                 lis3mdl_odr_t odr, lis3mdl_scale_t scale,
-                 lis3mdl_op_t op_mode);
+int lis3mdl_init(lis3mdl_t *dev, const lis3mdl_params_t *params);
 
 /**
- * @brief Reads the magnometer value of LIS3MDL.
+ * @brief   Reads the magnometer value of LIS3MDL.
  *
  * @param[in] dev          device descriptor of LIS3MDL
  * @param[in] data         measured magnetometer data
@@ -127,7 +131,7 @@ int lis3mdl_init(lis3mdl_t *dev, i2c_t i2c, uint8_t address,
 void lis3mdl_read_mag(const lis3mdl_t *dev, lis3mdl_3d_data_t *data);
 
 /**
- * @brief Reads the temperature value of LIS3MDL.
+ * @brief   Reads the temperature value of LIS3MDL.
  *
  * @param[in] dev          device descriptor of LIS3MDL
  * @param[in] value        measured temperature in degree celsius
@@ -135,14 +139,14 @@ void lis3mdl_read_mag(const lis3mdl_t *dev, lis3mdl_3d_data_t *data);
 void lis3mdl_read_temp(const lis3mdl_t *dev, int16_t *value);
 
 /**
- * @brief Enable the LIS3MDL device.
+ * @brief   Enable the LIS3MDL device.
  *
  * @param[in] dev          device descriptor of LIS3MDL
  */
 void lis3mdl_enable(const lis3mdl_t *dev);
 
 /**
- * @brief Disable the LIS3MDL device.
+ * @brief   Disable the LIS3MDL device.
  *
  * @param[in] dev          device descriptor of LIS3MDL
  */

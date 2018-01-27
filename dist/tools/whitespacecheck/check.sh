@@ -6,6 +6,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+NOVENDOR=":!*/include/vendor/*"
+
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.
 BRANCH="${1}"
@@ -28,14 +30,14 @@ if [ -z "${BRANCH}" ]; then
 fi
 
 git -c core.whitespace="tab-in-indent,tabwidth=4" \
-    diff --check $(git merge-base ${BRANCH} HEAD) -- *.[ch]
+    diff --check $(git merge-base ${BRANCH} HEAD) -- *.[ch] ${NOVENDOR}
 
 RESULT=$?
 
 # Git regards any trailing white space except `\n` as an error so `\r` is
 # checked here, too
 git -c core.whitespace="trailing-space" \
-    diff --check $(git merge-base ${BRANCH} HEAD)
+    diff --check $(git merge-base ${BRANCH} HEAD) -- . ${NOVENDOR}
 if [ $? -ne 0 ] || [ $RESULT -ne 0 ]
 then
     echo "ERROR: This change introduces new whitespace errors"

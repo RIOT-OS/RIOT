@@ -1,4 +1,4 @@
-From bc86f013bbfc1eca7151d4faa2bb9ca33987115c Mon Sep 17 00:00:00 2001
+From e25f8860e73f9097ba613268644382d95902850c Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mlenders@inf.fu-berlin.de>
 Date: Thu, 31 Oct 2013 13:36:10 +0100
 Subject: [PATCH 1/9] Add RIOT Makefile
@@ -10,14 +10,14 @@ Subject: [PATCH 1/9] Add RIOT Makefile
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..7f37ccc
+index 0000000..f424cf1
 --- /dev/null
 +++ b/Makefile
 @@ -0,0 +1,4 @@
 +MODULE:=$(shell basename $(CURDIR))
-+CFLAGS += -DWITH_POSIX
++CFLAGS += -DWITH_POSIX -D_GNU_SOURCE=1
 +
 +include $(RIOTBASE)/Makefile.base
 -- 
-1.9.1
+2.15.1
 

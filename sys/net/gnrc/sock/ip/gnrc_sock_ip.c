@@ -147,10 +147,9 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
     else if ((remote != NULL) && (gnrc_ep_addr_any(remote))) {
         return -EINVAL;
     }
-    /* compiler evaluates lazily so this isn't a redundundant check and cppcheck
-     * is being weird here anyways */
-    /* cppcheck-suppress nullPointerRedundantCheck */
-    /* cppcheck-suppress nullPointer */
+    /* cppcheck-suppress nullPointerRedundantCheck
+     * (reason: compiler evaluates lazily so this isn't a redundundant check and
+     * cppcheck is being weird here anyways) */
     if ((sock == NULL) || (sock->local.family == AF_UNSPEC)) {
         /* no sock or sock currently unbound */
         memset(&local, 0, sizeof(local));

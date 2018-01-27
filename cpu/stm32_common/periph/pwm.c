@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     cpu_stm32_common
  * @ingroup     drivers_periph_pwm
  * @{
  *
@@ -29,8 +29,6 @@
 #include "periph/pwm.h"
 #include "periph/gpio.h"
 
-#ifdef PWM_NUMOF
-
 #define CCMR_LEFT           (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | \
                              TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2)
 #define CCMR_RIGHT          (TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_1 | \
@@ -44,17 +42,17 @@ static inline TIM_TypeDef *dev(pwm_t pwm)
 
 uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
-    uint32_t bus_clk = periph_apb_clk(pwm_config[pwm].bus);
+    uint32_t timer_clk = periph_timer_clk(pwm_config[pwm].bus);
 
     /* verify parameters */
-    assert((pwm < PWM_NUMOF) && ((freq * res) < bus_clk));
+    assert((pwm < PWM_NUMOF) && ((freq * res) < timer_clk));
 
     /* power on the used timer */
     periph_clk_en(pwm_config[pwm].bus, pwm_config[pwm].rcc_mask);
     /* reset configuration and CC channels */
     dev(pwm)->CR1 = 0;
     dev(pwm)->CR2 = 0;
-    for (int i = 0; i < TIMER_CHAN; i++) {
+    for (unsigned i = 0; i < TIMER_CHAN; ++i) {
         dev(pwm)->CCR[i] = 0;
     }
 
@@ -68,7 +66,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* configure the PWM frequency and resolution by setting the auto-reload
      * and prescaler registers */
-    dev(pwm)->PSC = (bus_clk / (res * freq)) - 1;
+    dev(pwm)->PSC = (timer_clk / (res * freq)) - 1;
     dev(pwm)->ARR = res - 1;
 
     /* set PWM mode */
@@ -97,7 +95,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     dev(pwm)->CR1 |= TIM_CR1_CEN;
 
     /* return the actual used PWM frequency */
-    return (bus_clk / (res * (dev(pwm)->PSC + 1)));
+    return (timer_clk / (res * (dev(pwm)->PSC + 1)));
 }
 
 uint8_t pwm_channels(pwm_t pwm)
@@ -138,5 +136,3 @@ void pwm_poweroff(pwm_t pwm)
     dev(pwm)->CR1 &= ~TIM_CR1_CEN;
     periph_clk_dis(pwm_config[pwm].bus, pwm_config[pwm].rcc_mask);
 }
-
-#endif /* PWM_NUMOF */

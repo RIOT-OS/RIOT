@@ -8,6 +8,7 @@
 
 /**
  * @ingroup         cpu_sam0_common
+ * @brief           Implementation specific CPU configuration options
  * @{
  *
  * @file
@@ -41,9 +42,15 @@ extern "C" {
  * @{
  */
 /* a flashpage in RIOT is mapped to a flash row on the SAM0s */
-#define FLASHPAGE_SIZE      (256U)
+#define FLASHPAGE_SIZE             (256U)
 /* one SAM0 row contains 4 SAM0 pages -> 4x the amount of RIOT flashpages */
-#define FLASHPAGE_NUMOF     (FLASH_NB_OF_PAGES / 4)
+#define FLASHPAGE_NUMOF            (FLASH_NB_OF_PAGES / 4)
+/* The minimum block size which can be written is 16B. However, the erase
+ * block is always FLASHPAGE_SIZE (SAM0 row).
+ */
+#define FLASHPAGE_RAW_BLOCKSIZE    (16)
+/* Writing should be always 4 byte aligned */
+#define FLASHPAGE_RAW_ALIGNMENT    (4)
 /** @} */
 
 #ifdef __cplusplus

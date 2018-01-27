@@ -17,7 +17,7 @@
  *
  * @file
  *
- * @author  José Ignacio Alamos <jialamos@uc.cl>
+ * @author  JosÃ© Ignacio Alamos <jialamos@uc.cl>
  */
 
 #ifndef OT_H
@@ -30,7 +30,7 @@ extern "C" {
 #include "net/netopt.h"
 #include "net/ieee802154.h"
 #include "net/ethernet.h"
-#include "net/gnrc/netdev.h"
+#include "net/netdev.h"
 #include "thread.h"
 #include "openthread/types.h"
 

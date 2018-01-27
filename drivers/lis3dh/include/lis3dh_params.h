@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters
+ * @name    Set default configuration parameters
  * @{
  */
 #ifndef LIS3DH_PARAM_SPI

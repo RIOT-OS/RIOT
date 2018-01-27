@@ -1,0 +1,34 @@
+include $(RIOTCPU)/efm32/efm32-info.mk
+
+export CPU_ARCH = $(EFM32_ARCHITECTURE)
+export CPU_FAM = $(EFM32_FAMILY)
+
+# the em_device.h header requires a global define with the cpu model
+export CFLAGS += -D$(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
+
+# include Gecko SDK package
+USEPKG += gecko_sdk
+
+# CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
+ifeq ($(CPU_ARCH),cortex-m0plus)
+  USEPKG += cmsis-dsp
+endif
+
+# include common periph module
+USEMODULE += periph_common
+
+# include layered power management
+USEMODULE += pm_layered
+
+# include vendor device headers
+INCLUDES += -I$(RIOTCPU)/efm32/families/$(EFM32_FAMILY)/include/vendor
+
+# include cortexm_common
+LINKER_SCRIPT = cortexm.ld
+
+ROM_START_ADDR = $(EFM32_FLASH_START)
+ROM_LEN = $(EFM32_FLASH_SIZE)
+RAM_START_ADDR = $(EFM32_SRAM_START)
+RAM_LEN = $(EFM32_SRAM_SIZE)
+
+include $(RIOTMAKE)/arch/cortexm.inc.mk

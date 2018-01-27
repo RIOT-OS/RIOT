@@ -61,7 +61,7 @@ void trickle_reset_timer(trickle_t *trickle)
     assert(trickle->I > trickle->Imin);
 
     trickle_stop(trickle);
-    trickle->I = trickle->Imin;
+    trickle->I = trickle->t = trickle->Imin;
     trickle_interval(trickle);
 }
 

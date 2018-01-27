@@ -23,14 +23,7 @@
 #ifndef ARPA_INET_H
 #define ARPA_INET_H
 
-#include <errno.h>
-#include <inttypes.h>
-#include <stdio.h>
-
-#include "byteorder.h"
 #include "net/af.h"
-#include "net/ipv4/addr.h"
-#include "net/ipv6/addr.h"
 #include "sys/bytes.h"
 #include "netinet/in.h"
 
@@ -42,14 +35,14 @@ extern "C" {
  * @brief   Size in byte of an IPv4 address
  */
 #ifndef INADDRSZ
-#define INADDRSZ            (sizeof(ipv4_addr_t))
+#define INADDRSZ            (4)
 #endif
 
 /**
  * @brief   Size in byte of an IPv6 address
  */
 #ifndef IN6ADDRSZ
-#define IN6ADDRSZ           (sizeof(ipv6_addr_t))
+#define IN6ADDRSZ           (16)
 #endif
 
 /**
@@ -66,35 +59,8 @@ extern "C" {
  * @return  NULL, if @p size was smaller than needed
  * @return  NULL, if @p src or @p dst was NULL
  */
-static inline const char *inet_ntop(int af, const void *restrict src, char *restrict dst,
-                                    socklen_t size)
-{
-    switch (af) {
-#ifdef MODULE_IPV4_ADDR
-        case AF_INET:
-            if (ipv4_addr_to_str(dst, src, (size_t)size) == NULL) {
-                errno = ENOSPC;
-                return NULL;
-            }
-            break;
-#endif
-#ifdef MODULE_IPV6_ADDR
-        case AF_INET6:
-            if (ipv6_addr_to_str(dst, src, (size_t)size) == NULL) {
-                errno = ENOSPC;
-                return NULL;
-            }
-            break;
-#endif
-        default:
-            (void)src;
-            (void)dst;
-            (void)size;
-            errno = EAFNOSUPPORT;
-            return NULL;
-    }
-    return dst;
-}
+const char *inet_ntop(int af, const void *restrict src, char *restrict dst,
+                      socklen_t size);
 
 /**
  * @brief   Converts an IP address string representation to a byte-represented
@@ -110,31 +76,7 @@ static inline const char *inet_ntop(int af, const void *restrict src, char *rest
  * @return  0, if @p src was malformed or input pointers were NULL.
  * @return  -1, if @p af is not supported.
  */
-static inline int inet_pton(int af, const char *src, void *dst)
-{
-    switch (af) {
-#ifdef MODULE_IPV4_ADDR
-        case AF_INET:
-            if (ipv4_addr_from_str(dst, src) == NULL) {
-                return 0;
-            }
-            break;
-#endif
-#ifdef MODULE_IPV6_ADDR
-        case AF_INET6:
-            if (ipv6_addr_from_str(dst, src) == NULL) {
-                return 0;
-            }
-            break;
-#endif
-        default:
-            (void)src;
-            (void)dst;
-            errno = EAFNOSUPPORT;
-            return -1;
-    }
-    return 1;
-}
+int inet_pton(int af, const char *src, void *dst);
 
 #ifdef __cplusplus
 }

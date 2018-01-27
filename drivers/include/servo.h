@@ -8,7 +8,7 @@
  */
 
 /**
- * @defgroup    driver_servo Servo Motor Driver
+ * @defgroup    drivers_servo Servo Motor Driver
  * @ingroup     drivers_actuators
  * @brief       High-level driver for servo motors
  * @{
@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Descriptor struct for a servo
+ * @brief   Descriptor struct for a servo
  */
 typedef struct {
     pwm_t device;           /**< the PWM device driving the servo */
@@ -42,7 +42,7 @@ typedef struct {
 } servo_t;
 
 /**
- * @brief Initialize a servo motor by assigning it a PWM device and channel
+ * @brief   Initialize a servo motor by assigning it a PWM device and channel
  *
  * Digital servos are controlled by regular pulses sent to them. The width
  * of a pulse determines the position of the servo. A pulse width of 1.5ms
@@ -73,7 +73,7 @@ typedef struct {
 int servo_init(servo_t *dev, pwm_t pwm, int pwm_channel, unsigned int min, unsigned int max);
 
 /**
- * @brief Set the servo motor to a specified position
+ * @brief   Set the servo motor to a specified position
  *
  * The position of the servo is specified in the pulse width that
  * controls the servo. With default configurations, a value of 1500

@@ -1,4 +1,3 @@
-APPLICATION = driver_jc42
 include ../Makefile.tests_common
 
 USEMODULE += jc42

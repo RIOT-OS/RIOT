@@ -12,7 +12,7 @@
 # JLINK_SERIAL:     Device serial used by JLink
 # JLINK_IF:         Interface used by JLink, default: "SWD"
 # JLINK_SPEED:      Interface clock speed to use (in kHz), default "2000"
-# JLINK_FLASH_ADDR: Starting address of the target's flash memory, default: "0"
+# FLASH_ADDR:       Starting address of the target's flash memory, default: "0"
 # JLINK_PRE_FLASH:  Additional JLink commands to execute before flashing
 # JLINK_POST_FLASH: Additional JLink commands to execute after flashing
 #
@@ -25,7 +25,7 @@
 #               options:
 #               BINFILE: path to the binary file that is flashed
 #
-# debug:        starts OpenOCD as GDB server in the background and
+# debug:        starts JLink as GDB server in the background and
 #               connects to the server with the GDB client specified by
 #               the board (DBG environment variable)
 #
@@ -35,7 +35,7 @@
 #               TUI:            if TUI!=null, the -tui option will be used
 #               ELFFILE:        path to the ELF file to debug
 #
-# debug-server: starts OpenOCD as GDB server, but does not connect to
+# debug-server: starts JLink as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
 #               IDEs.
 #
@@ -57,8 +57,9 @@ _JLINK=JLinkExe
 _JLINK_SERVER=JLinkGDBServer
 _JLINK_IF=SWD
 _JLINK_SPEED=2000
-# default starting address of the devices flash memory
-_FLASH_ADDR=0
+# default terminal frontend
+_JLINK_TERMPROG=${RIOTBASE}/dist/tools/pyterm/pyterm
+_JLINK_TERMFLAGS="-ts 19021"
 
 #
 # a couple of tests for certain configuration options
@@ -86,8 +87,9 @@ test_config() {
         echo "Error: No target device defined in JLINK_DEVICE env var"
         exit 1
     fi
-    if [ -z "${JLINK_FLASH_ADDR}" ]; then
-        JLINK_FLASH_ADDR=${_FLASH_ADDR}
+    if [ -z "${FLASH_ADDR}" ]; then
+        echo "Error: No flash address defined in FLASH_ADDR env var"
+        exit 1
     fi
 }
 
@@ -129,6 +131,22 @@ test_serial() {
     fi
 }
 
+test_dbg() {
+    if [ -z "${DBG}" ]; then
+        echo "Error: No debugger defined in DBG env var"
+        exit 1
+    fi
+}
+
+test_term() {
+    if [ -z "${JLINK_TERMPROG}" ]; then
+        JLINK_TERMPROG="${_JLINK_TERMPROG}"
+    fi
+    if [ -z "${JLINK_TERMFLAGS}" ]; then
+        JLINK_TERMFLAGS="${_JLINK_TERMFLAGS}"
+    fi
+}
+
 #
 # now comes the actual actions
 #
@@ -142,7 +160,7 @@ do_flash() {
     if [ ! -z "${JLINK_PRE_FLASH}" ]; then
         printf "${JLINK_PRE_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
-    echo "loadbin ${HEXFILE} ${JLINK_FLASH_ADDR}" >> ${BINDIR}/burn.seg
+    echo "loadbin ${HEXFILE} ${FLASH_ADDR}" >> ${BINDIR}/burn.seg
     if [ ! -z "${JLINK_POST_FLASH}" ]; then
         printf "${JLINK_POST_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
@@ -162,6 +180,7 @@ do_debug() {
     test_elffile
     test_ports
     test_tui
+    test_dbg
     # start the JLink GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
                            -device '${JLINK_DEVICE}' \
@@ -202,6 +221,36 @@ do_reset() {
                     -commandfile '${RIOTBASE}/dist/tools/jlink/reset.seg'"
 }
 
+do_term() {
+    test_config
+    test_serial
+    test_term
+
+    # temporary file that save the JLink pid
+    JLINK_PIDFILE=$(mktemp -t "jilnk_pid.XXXXXXXXXX")
+    # will be called by trap
+    cleanup() {
+        JLINK_PID="$(cat ${JLINK_PIDFILE})"
+        kill ${JLINK_PID}
+        rm -r "${JLINK_PIDFILE}"
+        exit 0
+    }
+    # cleanup after script terminates
+    trap "cleanup ${JLINK_PIDFILE}" EXIT
+    # don't trapon Ctrl+C, because JLink keeps running
+    trap '' INT
+    # start Jlink as RTT server
+    setsid sh -c "${JLINK} ${JLINK_SERIAL} \
+            -device '${JLINK_DEVICE}' \
+            -speed '${JLINK_SPEED}' \
+            -if '${JLINK_IF}' \
+            -jtagconf -1,-1 \
+            -commandfile '${RIOTBASE}/dist/tools/jlink/term.seg' & \
+            echo  \$! > $JLINK_PIDFILE" &
+
+    sh -c "${JLINK_TERMPROG} ${JLINK_TERMFLAGS}"
+}
+
 #
 # parameter dispatching
 #
@@ -211,6 +260,7 @@ shift # pop $1 from $@
 case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
+    echo "### Flashing at address ${FLASH_ADDR} ###"
     do_flash "$@"
     ;;
   debug)
@@ -224,6 +274,10 @@ case "${ACTION}" in
   reset)
     echo "### Resetting Target ###"
     do_reset "$@"
+    ;;
+  term_rtt)
+    echo "### Starting RTT terminal ###"
+    do_term
     ;;
   *)
     echo "Usage: $0 {flash|debug|debug-server|reset}"

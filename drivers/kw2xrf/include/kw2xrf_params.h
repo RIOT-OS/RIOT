@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the KW2XRF driver
+ * @name    Set default configuration parameters for the KW2XRF driver
  * @{
  */
 #ifndef KW2XRF_PARAM_SPI

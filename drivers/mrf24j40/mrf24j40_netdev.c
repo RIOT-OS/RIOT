@@ -44,7 +44,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
 static void _isr(netdev_t *netdev);
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
-static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len);
+static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len);
 
 const netdev_driver_t mrf24j40_driver = {
     .send = _send,
@@ -69,7 +69,7 @@ static int _init(netdev_t *netdev)
 {
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
 
-    /* initialise GPIOs */
+    /* initialize GPIOs */
     spi_init_cs(dev->params.spi, dev->params.cs_pin);
     gpio_init(dev->params.reset_pin, GPIO_OUT);
     gpio_set(dev->params.reset_pin);
@@ -92,7 +92,7 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
     mrf24j40_tx_prepare(dev);
 
     /* load packet data into FIFO */
-    for (int i = 0; i < count; i++, ptr++) {
+    for (unsigned i = 0; i < count; i++, ptr++) {
         /* current packet data + FCS too long */
         if ((len + ptr->iov_len + 2) > IEEE802154_FRAME_LEN_MAX) {
             DEBUG("[mrf24j40] error: packet too large (%u byte) to be send\n",
@@ -106,6 +106,8 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
         len = mrf24j40_tx_load(dev, ptr->iov_base, ptr->iov_len, len);
         if (i == 0) {
             dev->header_len = len;
+            /* Grab the FCF bits from the frame header */
+            dev->fcf_low = *(uint8_t*)(ptr->iov_base);
         }
 
     }
@@ -154,9 +156,11 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
+        uint8_t rssi_scalar = 0;
         /* Read LQI and RSSI values from the RX fifo */
         mrf24j40_rx_fifo_read(dev, phr + 1, &(radio_info->lqi), 1);
-        mrf24j40_rx_fifo_read(dev, phr + 2, &(radio_info->rssi), 1);
+        mrf24j40_rx_fifo_read(dev, phr + 2, &(rssi_scalar), 1);
+        radio_info->rssi = mrf24j40_dbm_from_reg(rssi_scalar);
     }
 
     /* Turn on reception of packets off the air */
@@ -319,6 +323,15 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                 res = sizeof(int8_t);
             }
             break;
+        case NETOPT_TX_RETRIES_NEEDED:
+            if (max_len < sizeof(uint8_t)) {
+                res = -EOVERFLOW;
+            }
+            else {
+                *((uint8_t *)val) = dev->tx_retries;
+                res = sizeof(int8_t);
+            }
+            break;
 
         default:
             /* try netdev settings */
@@ -351,7 +364,7 @@ static int _set_state(mrf24j40_t *dev, netopt_state_t state)
     return sizeof(netopt_state_t);
 }
 
-static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
+static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
     mrf24j40_t *dev = (mrf24j40_t *) netdev;
     int res = -ENOTSUP;
@@ -366,7 +379,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
                 res = -EOVERFLOW;
             }
             else {
-                mrf24j40_set_addr_short(dev, *((uint16_t *)val));
+                mrf24j40_set_addr_short(dev, *((const uint16_t *)val));
                 /* don't set res to set netdev_ieee802154_t::short_addr */
             }
             break;
@@ -376,7 +389,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
                 res = -EOVERFLOW;
             }
             else {
-                mrf24j40_set_addr_long(dev, *((uint64_t *)val));
+                mrf24j40_set_addr_long(dev, *((const uint64_t *)val));
                 /* don't set res to set netdev_ieee802154_t::long_addr */
             }
             break;
@@ -386,7 +399,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
                 res = -EOVERFLOW;
             }
             else {
-                mrf24j40_set_pan(dev, *((uint16_t *)val));
+                mrf24j40_set_pan(dev, *((const uint16_t *)val));
                 /* don't set res to set netdev_ieee802154_t::pan */
             }
             break;
@@ -396,7 +409,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
                 res = -EINVAL;
             }
             else {
-                uint8_t chan = ((uint8_t *)val)[0];
+                uint8_t chan = ((const uint8_t *)val)[0];
                 if (chan < IEEE802154_CHANNEL_MIN ||
                     chan > IEEE802154_CHANNEL_MAX ||
                     dev->netdev.chan == chan) {
@@ -413,7 +426,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
                 res = -EINVAL;
             }
             else {
-                uint8_t page = ((uint8_t *)val)[0];
+                uint8_t page = ((const uint8_t *)val)[0];
 
                 /* mrf24j40 only supports page 0, no need to configure anything in the driver. */
                 if (page != 0) {
@@ -430,7 +443,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
                 res = -EOVERFLOW;
             }
             else {
-                mrf24j40_set_txpower(dev, *((int16_t *)val));
+                mrf24j40_set_txpower(dev, *((const int16_t *)val));
                 res = sizeof(uint16_t);
             }
             break;
@@ -440,66 +453,66 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
                 res = -EOVERFLOW;
             }
             else {
-                res = _set_state(dev, *((netopt_state_t *)val));
+                res = _set_state(dev, *((const netopt_state_t *)val));
             }
             break;
 
         case NETOPT_AUTOACK:
             mrf24j40_set_option(dev, NETDEV_IEEE802154_ACK_REQ,
-                                ((bool *)val)[0]);
+                                ((const bool *)val)[0]);
             /* don't set res to set netdev_ieee802154_t::flags */
             break;
 
         case NETOPT_PRELOADING:
             mrf24j40_set_option(dev, MRF24J40_OPT_PRELOADING,
-                                ((bool *)val)[0]);
+                                ((const bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_PROMISCUOUSMODE:
             mrf24j40_set_option(dev, MRF24J40_OPT_PROMISCUOUS,
-                                ((bool *)val)[0]);
+                                ((const bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_RX_START_IRQ:
             mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_START,
-                                ((bool *)val)[0]);
+                                ((const bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_RX_END_IRQ:
             mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_END,
-                                ((bool *)val)[0]);
+                                ((const bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_TX_START_IRQ:
             mrf24j40_set_option(dev, MRF24J40_OPT_TELL_TX_START,
-                                ((bool *)val)[0]);
+                                ((const bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_TX_END_IRQ:
             mrf24j40_set_option(dev, MRF24J40_OPT_TELL_TX_END,
-                                ((bool *)val)[0]);
+                                ((const bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_CSMA:
             mrf24j40_set_option(dev, MRF24J40_OPT_CSMA,
-                                ((bool *)val)[0]);
+                                ((const bool *)val)[0]);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_CSMA_RETRIES:
             if ((len > sizeof(uint8_t)) ||
-                (*((uint8_t *)val) > 5)) {
+                (*((const uint8_t *)val) > 5)) {
                 res = -EOVERFLOW;
             }
             else if (dev->netdev.flags & MRF24J40_OPT_CSMA) {
                 /* only set if CSMA is enabled */
-                mrf24j40_set_csma_max_retries(dev, *((uint8_t *)val));
+                mrf24j40_set_csma_max_retries(dev, *((const uint8_t *)val));
                 res = sizeof(uint8_t);
             }
             break;
@@ -509,7 +522,7 @@ static int _set(netdev_t *netdev, netopt_t opt, void *val, size_t len)
                 res = -EOVERFLOW;
             }
             else {
-                mrf24j40_set_cca_threshold(dev, *((int8_t *)val));
+                mrf24j40_set_cca_threshold(dev, *((const int8_t *)val));
                 res = sizeof(int8_t);
             }
             break;
@@ -538,6 +551,7 @@ static void _isr(netdev_t *netdev)
 #ifdef MODULE_NETSTATS_L2
         if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
             uint8_t txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
+            dev->tx_retries = (txstat >> MRF24J40_TXSTAT_MAX_FRAME_RETRIES_SHIFT);
             /* transmision failed */
             if (txstat & MRF24J40_TXSTAT_TXNSTAT) {
                 /* TX_NOACK - CCAFAIL */

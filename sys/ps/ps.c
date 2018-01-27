@@ -61,10 +61,10 @@ void ps(void)
 #endif
             "%-9sQ | pri "
 #ifdef DEVELHELP
-           "| stack ( used) | base       | current     "
+           "| stack  ( used) | base addr  | current     "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
-           "| runtime | switches"
+           "| runtime  | switches"
 #endif
            "\n",
 #ifdef DEVELHELP
@@ -73,16 +73,26 @@ void ps(void)
            "state");
 
 #if defined(DEVELHELP) && defined(ISR_STACKSIZE)
-    int isr_usage = thread_arch_isr_stack_usage();
-    void *isr_start = thread_arch_isr_stack_start();
-    void *isr_sp = thread_arch_isr_stack_pointer();
+    int isr_usage = thread_isr_stack_usage();
+    void *isr_start = thread_isr_stack_start();
+    void *isr_sp = thread_isr_stack_pointer();
     printf("\t  - | isr_stack            | -        - |"
-           "   - | %5i (%5i) | %10p | %10p\n", ISR_STACKSIZE, isr_usage, isr_start, isr_sp);
+           "   - | %6i (%5i) | %10p | %10p\n", ISR_STACKSIZE, isr_usage, isr_start, isr_sp);
     overall_stacksz += ISR_STACKSIZE;
     if (isr_usage > 0) {
         overall_used += isr_usage;
     }
 #endif
+
+#ifdef MODULE_SCHEDSTATISTICS
+    uint64_t rt_sum = 0;
+    for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
+        thread_t *p = (thread_t *)sched_threads[i];
+        if (p != NULL) {
+            rt_sum += sched_pidlist[i].runtime_ticks;
+        }
+    }
+#endif /* MODULE_SCHEDSTATISTICS */
 
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
         thread_t *p = (thread_t *)sched_threads[i];
@@ -98,9 +108,11 @@ void ps(void)
             overall_used += stacksz;
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
-            double runtime_ticks = sched_pidlist[i].runtime_ticks /
-                                   (double) _xtimer_now64() * 100;
-            int switches = sched_pidlist[i].schedules;
+            /* multiply with 100 for percentage and to avoid floats/doubles */
+            uint64_t runtime_ticks = sched_pidlist[i].runtime_ticks * 100;
+            unsigned runtime_major = runtime_ticks / rt_sum;
+            unsigned runtime_minor = ((runtime_ticks % rt_sum) * 1000) / rt_sum;
+            unsigned switches = sched_pidlist[i].schedules;
 #endif
             printf("\t%3" PRIkernel_pid
 #ifdef DEVELHELP
@@ -108,10 +120,10 @@ void ps(void)
 #endif
                    " | %-8s %.1s | %3i"
 #ifdef DEVELHELP
-                   " | %5i (%5i) | %10p | %10p "
+                   " | %6i (%5i) | %10p | %10p "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
-                   " | %6.3f%% |  %8d"
+                   " | %2d.%03d%% |  %8u"
 #endif
                    "\n",
                    p->pid,
@@ -123,14 +135,14 @@ void ps(void)
                    , p->stack_size, stacksz, (void *)p->stack_start, (void *)p->sp
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
-                   , runtime_ticks, switches
+                   , runtime_major, runtime_minor, switches
 #endif
                   );
         }
     }
 
 #ifdef DEVELHELP
-    printf("\t%5s %-21s|%13s%6s %5i (%5i)\n", "|", "SUM", "|", "|",
+    printf("\t%5s %-21s|%13s%6s %6i (%5i)\n", "|", "SUM", "|", "|",
            overall_stacksz, overall_used);
 #   ifdef MODULE_TLSF
     puts("\nHeap usage:");

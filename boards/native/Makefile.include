@@ -12,33 +12,37 @@ USEMODULE += native-drivers
 export PREFIX =
 export CC ?= $(PREFIX)gcc
 export CXX ?= $(PREFIX)g++
+
 ifeq ($(LTO),1)
-export AR = $(PREFIX)gcc-ar
+  export AR = $(PREFIX)gcc-ar
 else
-export AR = $(PREFIX)ar
+  export AR = $(PREFIX)ar
 endif
+
 export AS ?= $(PREFIX)as
 export LINK ?= $(PREFIX)gcc
 export SIZE ?= $(PREFIX)size
+
 ifneq ($(shell uname -s),Darwin)
-export OBJCOPY ?= $(PREFIX)objcopy
+  export OBJCOPY ?= $(PREFIX)objcopy
 else
-ifeq (0,$(shell which gobjcopy 2>&1 > /dev/null ; echo $$?))
-export OBJCOPY ?= gobjcopy
-export OFLAGS ?= -O ihex
-else
-# If gobjcopy is not available, just create an empty file. The hexfile
-# is not used for native anyways.
-export OBJCOPY ?= touch
-export OFLAGS =
-endif
+  ifeq (0,$(shell which gobjcopy 2>&1 > /dev/null ; echo $$?))
+    export OBJCOPY ?= gobjcopy
+    export OFLAGS ?= -O ihex
+  else
+    # If gobjcopy is not available, just create an empty file. The hexfile
+    # is not used for native anyways.
+    export OBJCOPY ?= touch
+    export OFLAGS =
+  endif
 endif
 
 ifeq ($(shell uname -s),Darwin)
-export DEBUGGER ?= lldb
+  export DEBUGGER ?= lldb
 else
-export DEBUGGER ?= gdb
+  export DEBUGGER ?= gdb
 endif
+
 export TERMPROG ?= $(ELF)
 export FLASHER = true
 export VALGRIND ?= valgrind
@@ -47,19 +51,20 @@ export GPROF ?= gprof
 
 # basic cflags:
 export CFLAGS += -Wall -Wextra -pedantic -std=gnu99
+
 ifeq ($(shell uname -m),x86_64)
-export CFLAGS += -m32
+  export CFLAGS += -m32
 endif
 ifneq (,$(filter -DDEVELHELP,$(CFLAGS)))
-export CFLAGS += -fstack-protector-all
+  export CFLAGS += -fstack-protector-all
 endif
 ifeq ($(shell uname -s),FreeBSD)
-ifeq ($(shell uname -m),amd64)
-export CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
-endif
+  ifeq ($(shell uname -m),amd64)
+    export CFLAGS += -m32 -DCOMPAT_32BIT -B/usr/lib32
+  endif
 endif
 ifeq ($(shell uname -s),Darwin)
-export CFLAGS += -Wno-deprecated-declarations
+  export CFLAGS += -Wno-deprecated-declarations
 endif
 
 # unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
@@ -67,40 +72,40 @@ export CXXUWFLAGS +=
 export CXXEXFLAGS +=
 
 ifeq ($(shell uname -m),x86_64)
-export LINKFLAGS += -m32
+  export LINKFLAGS += -m32
 endif
 ifeq ($(shell uname -s),FreeBSD)
-ifeq ($(shell uname -m),amd64)
-export LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
-endif
-export LINKFLAGS += -L $(BINDIR)
+  ifeq ($(shell uname -m),amd64)
+    export LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
+  endif
+  export LINKFLAGS += -L $(BINDIR)
 else
-export LINKFLAGS += -ldl
+  export LINKFLAGS += -ldl
 endif
 
 # clean up unused functions
 export CFLAGS += -ffunction-sections -fdata-sections
 ifeq ($(shell uname -s),Darwin)
-export LINKFLAGS += -Wl,-dead_strip
+  export LINKFLAGS += -Wl,-dead_strip
 else
-export LINKFLAGS += -Wl,--gc-sections
+  export LINKFLAGS += -Wl,--gc-sections
 endif
 export LINKFLAGS += -ffunction-sections
 
 # set the tap interface for term/valgrind
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
-	export PORT ?= tap0
+  export PORT ?= tap0
 else
-	export PORT =
+  export PORT =
 endif
 
 export TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
-export DEBUGGER_FLAGS = -- $(ELF) $(TERMFLAGS)
+  export DEBUGGER_FLAGS = -- $(ELF) $(TERMFLAGS)
 else
-export DEBUGGER_FLAGS = -q --args $(ELF) $(TERMFLAGS)
+  export DEBUGGER_FLAGS = -q --args $(ELF) $(TERMFLAGS)
 endif
 term-valgrind: export VALGRIND_FLAGS ?= \
 	--leak-check=full \
@@ -128,24 +133,24 @@ export CFLAGS += -DDEBUG_ASSERT_VERBOSE
 
 # workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52624
 ifneq ($(shell gcc --version | head -1 | grep -E ' (4.6|4.7)'),)
-	export CFLAGS += -DHAVE_NO_BUILTIN_BSWAP16
+  export CFLAGS += -DHAVE_NO_BUILTIN_BSWAP16
 endif
 
 # backward compatability with glibc <= 2.17 for native
 ifeq ($(CPU),native)
-ifeq ($(shell uname -s),Linux)
-ifeq ($(shell ldd --version |  awk '/^ldd/{if ($$NF < 2.17) {print "yes"} else {print "no"} }'),yes)
-	LINKFLAGS += -lrt
-endif
-endif
+  ifeq ($(shell uname -s),Linux)
+    ifeq ($(shell ldd --version |  awk '/^ldd/{if ($$NF < 2.17) {print "yes"} else {print "no"} }'),yes)
+	  LINKFLAGS += -lrt
+    endif
+  endif
 endif
 
 # clumsy way to enable building native on osx:
 BUILDOSXNATIVE = 0
 ifeq ($(CPU),native)
-ifeq ($(shell uname -s),Darwin)
-	BUILDOSXNATIVE = 1
-endif
+  ifeq ($(shell uname -s),Darwin)
+    BUILDOSXNATIVE = 1
+  endif
 endif
 
 all: # do not override first target

@@ -108,16 +108,16 @@
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for TC2 peripheral ========== */
-#define TC2_CC_NUM                  2
+#define TC2_CC_NUM                  2       
 #define TC2_DMAC_ID_MC_0            29
 #define TC2_DMAC_ID_MC_1            30
 #define TC2_DMAC_ID_MC_LSB          29
 #define TC2_DMAC_ID_MC_MSB          30
 #define TC2_DMAC_ID_MC_SIZE         2
 #define TC2_DMAC_ID_OVF             28       // Indexes of DMA Overflow trigger
-#define TC2_EXT                     0
-#define TC2_GCLK_ID                 28
-#define TC2_MASTER                  1
-#define TC2_OW_NUM                  2
+#define TC2_EXT                     0       
+#define TC2_GCLK_ID                 28      
+#define TC2_MASTER                  1       
+#define TC2_OW_NUM                  2       
 
 #endif /* _SAML21_TC2_INSTANCE_ */

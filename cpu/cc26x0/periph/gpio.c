@@ -47,7 +47,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     IOC->CFG[pin] = mode;
     GPIO->DOE &= ~(1 << pin);
     GPIO->DOE |= ((~(mode >> DOE_SHIFT) & 0x1) << pin);
-    GPIO->DOUTCLR = (1 << pin);
 
     return 0;
 }

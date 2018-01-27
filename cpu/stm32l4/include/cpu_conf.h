@@ -27,6 +27,8 @@
 
 #if defined(CPU_MODEL_STM32L476RG)
 #include "vendor/stm32l476xx.h"
+#elif defined(CPU_MODEL_STM32L475VG)
+#include "vendor/stm32l475xx.h"
 #elif defined(CPU_MODEL_STM32L432KC)
 #include "vendor/stm32l432xx.h"
 #endif
@@ -40,10 +42,10 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
-#if defined(STM32L432KC)
-#define CPU_IRQ_NUMOF                   (82U)
+#if defined(CPU_MODEL_STM32L432KC)
+#define CPU_IRQ_NUMOF                   (83U)
 #else
-#define CPU_IRQ_NUMOF                   (81U)
+#define CPU_IRQ_NUMOF                   (82U)
 #endif
 /** @} */
 

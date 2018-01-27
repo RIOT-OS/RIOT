@@ -1,8 +1,6 @@
 # include Makefile.local if it exists
 -include Makefile.local
 
-all:
-
 # set undefined variables
 RIOTBASE       ?= $(dir $(lastword $(MAKEFILE_LIST)))
 CCACHE_BASEDIR ?= $(RIOTBASE)
@@ -63,37 +61,38 @@ MAKEOVERRIDES += $(foreach v,${__DIRECTORY_VARIABLES},${v}=${${v}})
 # Path to the current directory relative to RIOTPROJECT
 BUILDRELPATH ?= ${PWD:${RIOTPROJECT}/%=%}/
 
+# get host operating system
+OS := $(shell uname)
+
 # Include Docker settings near the top because we need to build the environment
 # command line before some of the variable origins are overwritten below when
 # using abspath, strip etc.
 include $(RIOTMAKE)/docker.inc.mk
 
+# include color echo macros
+include $(RIOTMAKE)/color.inc.mk
+
+# include concurrency helpers
+include $(RIOTMAKE)/info-nproc.inc.mk
+
+GLOBAL_GOALS := buildtest info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
+ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
+  BOARD=none
+endif
+
+ifeq (none,$(BOARD))
+  include $(RIOTMAKE)/info-global.inc.mk
+  include $(RIOTMAKE)/buildtests.inc.mk
+else
+
+all: link
+
+include $(RIOTMAKE)/info.inc.mk
+
 # Static code analysis tools provided by LLVM
 include $(RIOTMAKE)/scan-build.inc.mk
 
 export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
-
-COLOR_GREEN  :=
-COLOR_RED    :=
-COLOR_PURPLE :=
-COLOR_RESET  :=
-COLOR_ECHO   := /bin/echo
-
-OS := $(shell uname)
-
-ifeq (0,  $(shell tput colors 2>&1 > /dev/null; echo $$?))
-  COLOR_GREEN  := \033[1;32m
-  COLOR_RED    := \033[1;31m
-  COLOR_YELLOW := \033[1;33m
-  COLOR_PURPLE := \033[1;35m
-  COLOR_RESET  := \033[0m
-  ifeq ($(OS),Darwin)
-    COLOR_ECHO   := echo -e
-    SHELL=bash
-  else
-    COLOR_ECHO   := /bin/echo -e
-  endif
-endif
 
 ifeq ($(OS),Darwin)
   OPEN   := open
@@ -112,11 +111,25 @@ endif
 
 QQ=
 
+# Set this to 1 to enable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 0
+ifeq ($(DEVELHELP),1)
+  CFLAGS += -DDEVELHELP
+endif
+
 # Fail on warnings. Can be overridden by `make WERROR=0`.
 WERROR ?= 1
 export WERROR
 ifeq ($(WERROR),1)
-  CFLAGS += -Werror
+  CFLAGS += -Wall -Werror -Wextra
+endif
+
+WPEDANTIC ?= 0
+export WPEDANTIC
+ifeq ($(WPEDANTIC),1)
+    CFLAGS += -Wpedantic -pedantic-errors
 endif
 
 ifneq (10,$(if ${RIOT_VERSION},1,0)$(if ${__RIOTBUILD_FLAG},1,0))
@@ -208,6 +221,9 @@ INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBAS
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 
+# process provided features
+-include $(RIOTBOARD)/$(BOARD)/Makefile.features
+
 # mandatory includes!
 include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
@@ -224,6 +240,7 @@ ifneq ($(GNRC_NETIF_NUMOF),1)
   CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
 endif
 
+# process dependencies
 include $(RIOTBASE)/Makefile.dep
 
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
@@ -279,7 +296,7 @@ endif
 BASELIBS += $(BINDIR)/${APPLICATION}.a
 BASELIBS += $(APPDEPS)
 
-.PHONY: all clean flash term doc debug debug-server reset objdump help info-modules
+.PHONY: all link clean flash term doc debug debug-server reset objdump help info-modules
 .PHONY: ..in-docker-container
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
@@ -293,17 +310,19 @@ LINKFLAGPREFIX ?= -Wl,
 
 DIRS += $(EXTERNAL_MODULE_DIRS)
 
+_LINK = $(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGS)
+
 ifeq ($(BUILD_IN_DOCKER),1)
-all: ..in-docker-container
+link: ..in-docker-container
 else
 ## make script for your application. Build RIOT-base here!
-all: ..compiler-check ..build-message $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=${BINDIR}/%.a) $(APPDEPS)
+link: ..compiler-check ..build-message $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=${BINDIR}/%.a) $(APPDEPS)
 	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(Q)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
-	$(Q)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
+	$(Q)$(_LINK) -o $(ELFFILE)
 endif
 	$(Q)$(SIZE) $(ELFFILE)
 	$(Q)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
@@ -328,7 +347,7 @@ include $(RIOTBASE)/drivers/Makefile.include
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(RIOTBUILD_CONFIG_HEADER_C): clean
+    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(RIOTBUILD_CONFIG_HEADER_C) pkg-prepare: clean
 endif
 
 # include Makefile.includes for packages in $(USEPKG)
@@ -342,8 +361,11 @@ USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a
 
 INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
-.PHONY: $(USEPKG:%=${BINDIR}/%.a)
-$(USEPKG:%=${BINDIR}/%.a): $(RIOTBUILD_CONFIG_HEADER_C)
+.PHONY: pkg-prepare $(USEPKG:%=${BINDIR}/%.a)
+pkg-prepare:
+	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i prepare ; done
+
+$(USEPKG:%=${BINDIR}/%.a): $(RIOTBUILD_CONFIG_HEADER_C) pkg-prepare
 	@mkdir -p ${BINDIR}
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst ${BINDIR}/%.a,%,$@)
 
@@ -401,6 +423,13 @@ debug-server:
 		exit 1; }
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
+emulate:
+	@command -v $(EMULATOR) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED}Emulation program $(EMULATOR) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
+	$(EMULATOR) $(EMULATOR_FLAGS)
+
 reset:
 	@command -v $(RESET) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
@@ -427,12 +456,6 @@ eclipsesym.xml: $(CURDIR)/eclipsesym.xml
 $(CURDIR)/eclipsesym.xml:
 	$(Q)printf "%s\n" $(CC) $(CFLAGS_WITH_MACROS) $(INCLUDES) | \
 		$(RIOTBASE)/dist/tools/eclipsesym/cmdline2xml.sh > $@
-
-# Extra make goals for testing and comparing changes.
-include $(RIOTMAKE)/buildtests.inc.mk
-
-# process provided features
-include $(RIOTMAKE)/features.inc.mk
 
 # Export variables used throughout the whole make system:
 include $(RIOTMAKE)/vars.inc.mk
@@ -530,9 +553,6 @@ endif
 help:
 	@$(MAKE) -qp | sed -ne 's/\(^[a-z][a-z_-]*\):.*/\1/p' | sort | uniq
 
-info-modules:
-	@for i in $(sort $(USEMODULE)); do echo $$i; done
-
 ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
   ifneq (,$(filter iotlab-%,$(MAKECMDGOALS)))
     include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
@@ -567,3 +587,7 @@ endif
 CFLAGS := $(patsubst -D%,,$(CFLAGS))
 CFLAGS := $(patsubst -U%,,$(CFLAGS))
 CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
+
+# include mcuboot support
+include $(RIOTMAKE)/mcuboot.mk
+endif # BOARD=none

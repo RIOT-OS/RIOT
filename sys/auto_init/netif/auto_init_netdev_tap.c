@@ -22,14 +22,13 @@
 #include "log.h"
 #include "debug.h"
 #include "netdev_tap_params.h"
-#include "net/gnrc/netdev/eth.h"
+#include "net/gnrc/netif/ethernet.h"
 
 #define TAP_MAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
-#define TAP_MAC_PRIO                (THREAD_PRIORITY_MAIN - 3)
+#define TAP_MAC_PRIO                (GNRC_NETIF_PRIO)
 
 static netdev_tap_t netdev_tap[NETDEV_TAP_MAX];
 static char _netdev_eth_stack[NETDEV_TAP_MAX][TAP_MAC_STACKSIZE + DEBUG_EXTRA_STACKSIZE];
-static gnrc_netdev_t _gnrc_netdev_tap[NETDEV_TAP_MAX];
 
 void auto_init_netdev_tap(void)
 {
@@ -40,11 +39,9 @@ void auto_init_netdev_tap(void)
                   i, *(p->tap_name));
 
         netdev_tap_setup(&netdev_tap[i], p);
-        gnrc_netdev_eth_init(&_gnrc_netdev_tap[i], (netdev_t*)&netdev_tap[i]);
-
-        gnrc_netdev_init(_netdev_eth_stack[i], TAP_MAC_STACKSIZE,
-                         TAP_MAC_PRIO, "gnrc_netdev_tap",
-                         &_gnrc_netdev_tap[i]);
+        gnrc_netif_ethernet_create(_netdev_eth_stack[i], TAP_MAC_STACKSIZE,
+                                   TAP_MAC_PRIO, "gnrc_netdev_tap",
+                                   &netdev_tap[i].netdev);
     }
 }
 

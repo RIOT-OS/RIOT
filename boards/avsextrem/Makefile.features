@@ -9,3 +9,5 @@ FEATURES_PROVIDED += periph_uart
 
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = arm7
+
+-include $(RIOTCPU)/lpc2387/Makefile.features
