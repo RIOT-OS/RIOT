@@ -60,6 +60,26 @@ extern "C" {
 #define ATA8520E_ATMEL_PA_MASK               (0x01)
 /** @} */
 
+/**
+ * @name Sigfox errors codes
+ * @{
+ */
+#define ATA8520E_SIGFOX_NO_ERROR             (0x00)
+#define ATA8520E_SIGFOX_TX_LEN_TOO_LONG      (0x30)
+#define ATA8520E_SIGFOX_RX_TIMEOUT           (0x3E)
+#define ATA8520E_SIGFOX_RX_BIT_TIMEOUT       (0x4E)
+/** @} */
+
+/**
+ * @name Sigfox2 errors codes
+ * @{
+ */
+#define ATA8520E_SIGFOX2_INIT_ERROR          (0x10)
+#define ATA8520E_SIGFOX2_TX_ERROR            (0x18)
+#define ATA8520E_SIGFOX2_RF_ERROR            (0x40)
+#define ATA8520E_SIGFOX2_DF_WAIT_ERROR       (0x68)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
