@@ -9,11 +9,11 @@
 /**
  * @defgroup    boards_b-l475e-iot01a ST B-L475E-IOT01A
  * @ingroup     boards
- * @brief       Support for the ST b-l475e-iot01a board
+ * @brief       Support for the ST B-L475E-IOT01A board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the ST b-l475e-iot01a board
+ * @brief       Board specific definitions for the ST B-L475E-IOT01A board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */

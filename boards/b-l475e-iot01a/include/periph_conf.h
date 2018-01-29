@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the b-l475e-iot01a board
+ * @brief       Peripheral MCU configuration for the B-L475E-IOT01A board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
