@@ -72,7 +72,12 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
   USEMODULE += gnrc_ipv6_default
   # prevent application from being a router
   # TODO: maybe find a nicer solution in future build system update
-  USEMODULE := $(filter-out gnrc_ipv6_router% gnrc_rpl netstats_rpl auto_init_gnrc_rpl,$(USEMODULE))
+  _ROUTER_MODULES = gnrc_ipv6_router% gnrc_rpl netstats_rpl auto_init_gnrc_rpl
+  ifneq (,$(filter $(_ROUTER_MODULES),$(USEMODULE)))
+    $(warning nordic_softdevice_ble: Disabling router modules:\
+      $(filter $(_ROUTER_MODULES),$(USEMODULE)))
+  endif
+  USEMODULE := $(filter-out $(_ROUTER_MODULES),$(USEMODULE))
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
