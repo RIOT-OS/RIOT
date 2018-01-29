@@ -22,8 +22,8 @@ QUIET ?= 1
 # to flag that the directory should only be included when doing a normal build,
 # and that the resulting .a should be saved when doing "make bindist"
 BIN_DIRS += abc
-BIN_USEMODULE += abc        # include "abc" module
-BIN_USEMODULE += bindist    # include application module (named $APPLICATION)
+BIN_USEMODULE += abc                    # include "abc" module
+BIN_USEMODULE += $(APPLICATION_MODULE)  # include application module
 
 # list of extra files to include in binary distribution
 DIST_FILES += Makefile
