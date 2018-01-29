@@ -37,6 +37,10 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#if !defined(I2C_TIMEOUT_USECS)
+    #define I2C_TIMEOUT_USECS   (100000U)
+#endif
+
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, int ccr);
 static int _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag);
@@ -394,8 +398,7 @@ static int _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag)
 
     uint32_t time_now = xtimer_now_usec();
     while (i2c->SR2 & I2C_SR2_BUSY) {
-        /* 100 ms timeout */
-        if (xtimer_now_usec() - time_now > 100000) {
+        if (xtimer_now_usec() - time_now > I2C_TIMEOUT_USECS) {
             DEBUG("Timeout waiting for device, resetting the bus\n");
             _i2c_reset(i2c);
         }
