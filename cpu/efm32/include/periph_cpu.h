@@ -28,6 +28,7 @@
 #include "em_cmu.h"
 #include "em_device.h"
 #include "em_gpio.h"
+#include "em_timer.h"
 #include "em_usart.h"
 #ifdef _SILICON_LABS_32B_SERIES_0
 #include "em_dac.h"
@@ -252,6 +253,20 @@ typedef struct {
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
     IRQn_Type irq;          /**< the devices base IRQ channel */
 } i2c_conf_t;
+
+#ifndef DOXYGEN
+/**
+ * @brief   Override PWM mode values.
+ * @{
+ */
+#define HAVE_PWM_MODE_T
+typedef enum {
+    PWM_LEFT = timerModeUp,           /*< use left aligned PWM */
+    PWM_RIGHT = timerModeDown,        /*< use right aligned PWM */
+    PWM_CENTER = timerModeUp          /*< not supported, use left aligned */
+} pwm_mode_t;
+/** @} */
+#endif /* ndef DOXYGEN */
 
 /**
  * @brief   PWM channel configuration.
