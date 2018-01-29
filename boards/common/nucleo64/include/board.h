@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    boards_common_nucleo64 STM Nucleo64 Common
- * @ingroup     boards_common
- * @brief       Common files and configuration for STM Nucleo64 boards
+ * @defgroup    boards_common_nucleo64 STM32 Nucleo-64
+ * @ingroup     boards
+ * @brief       Support for STM32 Nucleo-64 boards
  * @{
  *
  * @file

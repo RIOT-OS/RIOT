@@ -3,7 +3,7 @@
 This is a manual test application for the SX127X radio driver.
 
 This test application uses the default pin configuration provided by the
-driver implementation and that matches the ST Nucleo 64 pins layout.
+driver implementation and that matches the STM32 Nucleo-64 layout.
 It is best to use [SX1272](https://developer.mbed.org/components/SX1272MB2xAS/)
 or [SX1276](https://developer.mbed.org/components/SX1276MB1xAS/) mbed modules
 with nucleo boards or the all-in-one
