@@ -31,7 +31,7 @@
 
 static void _usage(char *cmd)
 {
-    printf("Usage: %s <server addr>[%%<interface>] [<timeout>]\n", cmd);
+    printf("Usage: %s <server addr>[%%<interface>] [<timeout in us>]\n", cmd);
     puts("default: timeout = 5000");
 }
 
