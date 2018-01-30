@@ -100,15 +100,13 @@ uint8_t cc1200_set_address(cc1200_t *dev, uint8_t address)
 {
     DEBUG("%s:%s:%u setting address %u\n", RIOT_FILE_RELATIVE, __func__,
             __LINE__, (unsigned)address);
-    //if (!(address < MIN_UID) || (address > MAX_UID)) {
-		//if ((address >= MIN_UID) && (address <= MAX_UID)) {	
 		if (address >= MIN_UID) {	
-        if (dev->radio_state != RADIO_UNKNOWN) {
+            if (dev->radio_state != RADIO_UNKNOWN) {
 
             cc1200_write_register(dev, CC1200_DEV_ADDR, address);
             dev->radio_address = address;
             return address;
-        }
+            }
     }
 
     return 0;
@@ -118,7 +116,7 @@ uint64_t cc1200_set_address_long(cc1200_t *dev, uint64_t address)
 {
     DEBUG("%s:%s:%u setting address long 0x%x\n", RIOT_FILE_RELATIVE, __func__,
             __LINE__, (unsigned)address);
-    if (!(address < MIN_UID) || (address > 0xFFFFFFFFFFFFFFFF)) {
+    if (!(address < MIN_UID) || (address > sizeof(uint64_t))) {
         if (dev->radio_state != RADIO_UNKNOWN) {
       
             dev->radio_address_long = address;
@@ -133,8 +131,6 @@ uint16_t cc1200_set_address_short(cc1200_t *dev, uint16_t address)
 {
     DEBUG("%s:%s:%u setting address short 0x%x\n", RIOT_FILE_RELATIVE, __func__,
             __LINE__, (unsigned)address);
-    //if (!(address < MIN_UID) || (address > 0xFFFF)) {
-    //if ((address >= MIN_UID) && (address <= 0xFFFF)) {
     if (address >= MIN_UID) {
         if (dev->radio_state != RADIO_UNKNOWN) {
       
@@ -150,7 +146,7 @@ uint16_t cc1200_set_pan_id(cc1200_t *dev, uint16_t pan_id)
 {
     DEBUG("%s:%s:%u setting pan id 0x%x\n", RIOT_FILE_RELATIVE, __func__,
             __LINE__, (unsigned)pan_id);
-    if (!(pan_id < MIN_UID) || (pan_id > 0xFF)) {
+    if (!(pan_id < MIN_UID) || (pan_id > MAX_UID)) {
         if (dev->radio_state != RADIO_UNKNOWN) {
       
             dev->pan_id = pan_id;
@@ -196,8 +192,8 @@ void cc1200_setup_rx_mode(cc1200_t *dev)
     /* Stay in RX mode until end of packet */
     uint8_t stat = cc1200_read_reg(dev, CC1200_RFEND_CFG1);
     DEBUG("%s:%s:%u CC1200_RFEND_CFG1: %u\n", RIOT_FILE_RELATIVE, __func__, __LINE__, stat);
-    stat |= 0xE;
-    cc1200_write_reg(dev, CC1200_RFEND_CFG1, 0xE);
+    stat |= CC1200_RX_TIMEOUT;
+    cc1200_write_reg(dev, CC1200_RFEND_CFG1, CC1200_RX_TIMEOUT);
     cc1200_switch_to_rx(dev);
 }
 

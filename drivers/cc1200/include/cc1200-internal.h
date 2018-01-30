@@ -49,6 +49,7 @@ extern "C" {
                                                  transmitted (GDO2 from low to
                                                  high) */
 
+#define CC1200_RX_TIMEOUT           (0xE)   /**< Disabled timeout setting for RX RFEND_CFG1*/
 #define RESET_WAIT_TIME             (610)   /**< Reset wait time (in reset
                                                  procedure) */
 #define IDLE_TO_RX_TIME             (122)   /**< Time chip needs to go to RX */
