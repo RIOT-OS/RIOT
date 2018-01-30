@@ -75,7 +75,7 @@ typedef enum ina220_brng {
 /**
  * @brief   Shunt ADC settings
  *
- * @see Table 5 in INA220 data sheet
+ * @see Table 4 in INA220 data sheet
  */
 typedef enum ina220_sadc {
     /** 9 bit resolution, 84 us conversion time */
@@ -107,7 +107,7 @@ typedef enum ina220_sadc {
 /**
  * @brief   Bus ADC settings
  *
- * @see Table 5 in INA220 data sheet
+ * @see Table 4 in INA220 data sheet
  */
 typedef enum ina220_badc {
     /** 9 bit resolution, 84 us conversion time */
