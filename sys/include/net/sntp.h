@@ -38,7 +38,7 @@ extern "C" {
  * @brief Synchronize with time server
  *
  * @param[in] server    The time server
- * @param[in] timeout   Timeout for the server response
+ * @param[in] timeout   Timeout for the server response in microseconds
  *
  * @return 0 on success
  * @return Negative number on error
