@@ -23,7 +23,7 @@ def expect_unary(child):
 
 
 def expect_binary(child):
-    for _ in range(20):
+    for _ in range(1500):
         for op_name in ('add', 'sub', 'mul', 'div', 'mod', 'sadd', 'ssub',
                         'smul', 'sdiv', 'min', 'max'):
             child.expect('{}\(-?\d+.\d+\, -?\d+.\d+\) = -?\d+.\d+'
