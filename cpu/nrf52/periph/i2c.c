@@ -32,7 +32,13 @@
  */
 #define INVALID_SPEED_MASK  (0x0f)
 
-static mutex_t locks[I2C_NUMOF];
+/**
+ * @brief   Initialized bus locks (we have a maximum of two devices...)
+ */
+static mutex_t locks[] = {
+    MUTEX_INIT,
+    MUTEX_INIT
+};
 
 static inline NRF_TWIM_Type *dev(i2c_t bus)
 {
@@ -97,9 +103,6 @@ int i2c_init_master(i2c_t bus, i2c_speed_t speed)
     if (speed & INVALID_SPEED_MASK) {
         return -2;
     }
-
-    /* initialize lock */
-    mutex_init(&locks[bus]);
 
     /* pin configuration */
     NRF_P0->PIN_CNF[i2c_config[bus].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
