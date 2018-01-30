@@ -106,7 +106,7 @@ const char cc1200_default_conf[] = {
     0x84, /* FIFO CFG */
     0x00, /* DEV ADDR */
     0x0B, /* SETTLING CFG */
-    0x12, /* FS CFG */
+    0x02, /* FS CFG */
     0x08, /* WOR CFG1 */
     0x21, /* WOR CFG0 */
     0x00, /* WOR EVENT0 MSB */

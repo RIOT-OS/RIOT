@@ -48,8 +48,6 @@
 static netdev_cc1200_t cc1200_devs[CC1200_NUM];
 static char _stacks[CC1200_NUM][CC1200_MAC_STACKSIZE];
 
-//static gnrc_netdev_t _gnrc_netdev_devs[CC1200_NUM];
-
 void auto_init_cc1200(void)
 {
     for (unsigned i = 0; i < CC1200_NUM; i++) {
@@ -60,22 +58,8 @@ void auto_init_cc1200(void)
 
         netdev_cc1200_setup(&cc1200_devs[i], p);
         gnrc_netif_ieee802154_create(_stacks[i], CC1200_MAC_STACKSIZE,
-                               CC1200_MAC_PRIO, "cc1200", (netdev_t*)&cc1200_devs[i]);
-        /*
-        res = gnrc_netdev_ieee802154_init(&_gnrc_netdev_devs[i],
-                                      (netdev_ieee802154_t *)&(cc1200_devs[i]));
-        DEBUG("[auto_init_netif] finished: res=%i\n", res);
-        if (res < 0) {
-            LOG_ERROR("[auto_init_netif] error initializing cc1200 #%u\n", i);
-        }
-        else {
-            res = gnrc_netdev_init(_stacks[i], CC1200_MAC_STACKSIZE,
-                    CC1200_MAC_PRIO, "cc1200", &_gnrc_netdev_devs[i]);
-            if (res < 0) {
-                LOG_ERROR("[auto_init_netif] error starting gnrc_cc1200 thread\n");
-            }
-        }
-        */
+                               CC1200_MAC_PRIO, "cc1200", 
+                               (netdev_t*)&cc1200_devs[i]);
     }
 }
 #else

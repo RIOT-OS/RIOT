@@ -31,7 +31,7 @@
 #include "cc1200-internal.h"
 #include "cc1200-spi.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /* Internal function prototypes */
@@ -168,7 +168,7 @@ void cc1200_set_base_freq_raw(cc1200_t *dev, const char* freq_array)
     uint32_t *FREQ = (uint32_t*) _tmp;
 
     DEBUG("cc1200_set_base_freq_raw(): setting base frequency to %uHz\n",
-            (26000000>>16) * (unsigned)(*FREQ));
+            (396) * (unsigned)(*FREQ));
 #endif
     cc1200_writeburst_reg(dev, CC1200_FREQ2, freq_array, 3);
 }
@@ -258,7 +258,10 @@ int16_t cc1200_set_channel(cc1200_t *dev, uint8_t channr)
         return -1;
     }
     uint32_t freq;
-    freq = CC1200_RF_CFG_CHAN_CENTER_F0 + (channr * CC1200_RF_CFG_CHAN_SPACING) / 1000 /* /1000 because chan_spacing is in Hz */;
+
+    /* divided by 1000 because chan_spacing is in Hz */
+    freq = CC1200_RF_CFG_CHAN_CENTER_F0 + (channr *
+         CC1200_RF_CFG_CHAN_SPACING) / 1000;
     freq *= 4096; //Frequency Multiplier
     freq /= 625; //Frequency Divider
     cc1200_write_reg(dev, CC1200_FREQ2, ((uint8_t *)&freq)[2]);

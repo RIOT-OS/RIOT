@@ -39,7 +39,7 @@
 #include "log.h"
 #include "led.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static void _rx_abort(cc1200_t *dev)
