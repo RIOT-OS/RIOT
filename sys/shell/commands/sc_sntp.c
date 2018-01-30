@@ -27,12 +27,12 @@
 #include "net/ipv6/addr.h"
 #include "timex.h"
 
-#define _DEFAULT_TIMEOUT (5000U);
+#define _DEFAULT_TIMEOUT (500000LU)
 
 static void _usage(char *cmd)
 {
     printf("Usage: %s <server addr>[%%<interface>] [<timeout in us>]\n", cmd);
-    puts("default: timeout = 5000");
+    printf("default: timeout = %lu\n", _DEFAULT_TIMEOUT);
 }
 
 int _ntpdate(int argc, char **argv)
