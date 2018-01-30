@@ -25,7 +25,6 @@ export DEBUG_ADAPTER ?= ftdi
 OS := $(shell uname)
 
 # Fall back to PROGRAMMER_SERIAL for backwards compatibility
-export DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
 
 ifeq ($(PORT),)
   # try to find tty name by serial number, only works on Linux currently.
@@ -51,12 +50,6 @@ ifeq ($(PORT),)
           PROGRAMMER_VERSION = 0.70
         endif
       endif
-
-      # Default to version 0.70 programmer
-      # NOTE: Some boards (e.g. mulle) could define their own version.
-      PROGRAMMER_VERSION ?= 0.70
-      OPENOCD_ADAPTER_INIT ?= -f '$(RIOTBASE)/boards/mulle/dist/openocd/mulle-programmer-$(PROGRAMMER_VERSION).cfg'
-
     else
       # find-tty.sh will return the first USB tty if no serial is given.
       PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh))
@@ -73,6 +66,12 @@ ifeq ($(PORT),)
   # fall back to a sensible default
   PORT := /dev/ttyUSB0
 endif
+
+# Default to version 0.70 programmer
+# NOTE: Some boards (e.g. mulle) could define their own version.
+PROGRAMMER_VERSION ?= 0.70
+OPENOCD_ADAPTER_INIT ?= -f '$(RIOTBASE)/boards/mulle/dist/openocd/mulle-programmer-$(PROGRAMMER_VERSION).cfg'
+
 
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
