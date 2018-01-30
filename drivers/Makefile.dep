@@ -60,11 +60,7 @@ ifneq (,$(filter cc1200,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_spi
   FEATURES_REQUIRED += periph_gpio
-#ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-#  USEMODULE += gnrc_cc1200
-#endif
 endif
-
 
 ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE += ieee802154
