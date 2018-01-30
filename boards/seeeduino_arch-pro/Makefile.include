@@ -1,12 +1,8 @@
 # define the used CPU
 export CPU = lpc1768
 
-# define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
-
 # setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
+include $(RIOTMAKE)/tools/serial.ttyusb0.inc.mk
 
 DEBUG_ADAPTER ?= dap
 
