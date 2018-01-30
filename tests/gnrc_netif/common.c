@@ -113,8 +113,11 @@ static void _netdev_isr(netdev_t *dev)
 
 static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len)
 {
-    netdev_test_t *dev = (netdev_test_t *)netdev;
     assert(max_len == sizeof(uint16_t));
+    (void)max_len;
+
+    netdev_test_t *dev = (netdev_test_t *)netdev;
+
     if (dev->state == 0x0) {
         *((uint16_t *)value) = NETDEV_TYPE_ETHERNET;
     }
@@ -129,8 +132,11 @@ static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len
 
 static int _get_netdev_max_packet_size(netdev_t *netdev, void *value, size_t max_len)
 {
-    netdev_test_t *dev = (netdev_test_t *)netdev;
     assert(max_len == sizeof(uint16_t));
+    (void)max_len;
+
+    netdev_test_t *dev = (netdev_test_t *)netdev;
+
     if (dev->state == 0x0) {
         *((uint16_t *)value) = ETHERNET_DATA_LEN;
     }

@@ -1452,6 +1452,8 @@ static uint16_t ieee802154_l2addr_len = 8U;
 
 static int _get_netdev_address(netdev_t *dev, void *value, size_t max_len)
 {
+    (void)max_len;
+
     if (dev == ethernet_dev) {
         assert(max_len >= sizeof(ethernet_l2addr));
         memcpy(value, ethernet_l2addr, sizeof(ethernet_l2addr));
@@ -1483,6 +1485,8 @@ static int _set_netdev_address(netdev_t *dev, const void *value,
 
 static int _get_netdev_address_long(netdev_t *dev, void *value, size_t max_len)
 {
+    (void)max_len;
+
     if (dev == ieee802154_dev) {
         assert(max_len >= sizeof(ieee802154_l2addr_long));
         memcpy(value, ieee802154_l2addr_long, sizeof(ieee802154_l2addr_long));
@@ -1504,6 +1508,8 @@ static int _set_netdev_address_long(netdev_t *dev, const void *value,
 
 static int _get_netdev_src_len(netdev_t *dev, void *value, size_t max_len)
 {
+    (void)max_len;
+
     if (dev == ieee802154_dev) {
         assert(max_len == sizeof(uint16_t));
         *((uint16_t *)value) = ieee802154_l2addr_len;
@@ -1515,6 +1521,8 @@ static int _get_netdev_src_len(netdev_t *dev, void *value, size_t max_len)
 static int _set_netdev_src_len(netdev_t *dev, const void *value,
                                size_t value_len)
 {
+    (void)value_len;
+
     if (dev == ieee802154_dev) {
         assert(value_len == sizeof(uint16_t));
         ieee802154_l2addr_len = *((uint16_t *)value);
