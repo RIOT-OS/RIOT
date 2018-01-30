@@ -764,12 +764,17 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
         if (pref_ltime != UINT32_MAX) {
             _evtimer_add(dst, GNRC_IPV6_NIB_PFX_TIMEOUT, &dst->pfx_timeout,
                          pref_ltime);
-            if (((pref_ltime + now) == UINT32_MAX) && (now != 0)) {
-                pref_ltime++;
+            /* ignore capped of preferred lifetimes from sec to ms conversion */
+            if (pref_ltime < (UINT32_MAX - 1)) {
+                /* prevent pref_ltime from becoming UINT32_MAX */
+                if (((pref_ltime + now) == UINT32_MAX) && (now != 0)) {
+                    pref_ltime++;
+                }
+                pref_ltime += now;
             }
-            pref_ltime += now;
         }
-        if (valid_ltime != UINT32_MAX) {
+        /* ignore capped of valid lifetimes from sec to ms conversion */
+        if (valid_ltime < (UINT32_MAX - 1)) {
             /* prevent valid_ltime from becoming UINT32_MAX */
             if ((valid_ltime + now) == UINT32_MAX) {
                 valid_ltime++;
