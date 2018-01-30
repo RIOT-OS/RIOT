@@ -131,6 +131,11 @@ ifneq (,$(filter hdc1000,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter pulse_counter,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += xtimer
 endif

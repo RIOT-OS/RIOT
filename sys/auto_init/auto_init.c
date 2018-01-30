@@ -323,6 +323,10 @@ auto_init_mpu9150();
     extern void auto_init_tsl2561(void);
     auto_init_tsl2561();
 #endif
+#ifdef MODULE_PULSE_COUNTER
+    extern void auto_init_pulse_counter(void);
+    auto_init_pulse_counter();
+#endif
 #ifdef MODULE_HDC1000
     extern void auto_init_hdc1000(void);
     auto_init_hdc1000();
