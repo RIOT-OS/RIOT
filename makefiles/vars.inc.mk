@@ -54,7 +54,7 @@ export OFLAGS                # The parameter for OBJCOPY, e.g. to strip the debu
 export OBJDUMP               # The command used to create the assembly listing.
 export OBJDUMPFLAGS          # The parameter for OBJDUMP.
 export SIZE                  # The command to read to size of the ELF sections.
-export UNDEF                 # Set by the BOARD's and CPU's Makefile.include, this contains object files with must not be used in the ELFFILE even if the if no call to the functions.
+export UNDEF                 # Object files that the linker must include in the ELFFILE even if no call to the functions or symbols (ex: interrupt vectors).
 export WERROR                # Treat all compiler warnings as errors if set to 1 (see -Werror flag in GCC manual)
 
 export GITCACHE              # path to git-cache executable
