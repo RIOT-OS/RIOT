@@ -1114,8 +1114,8 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
                                 "Unexpected prefix configured");
             TEST_ASSERT_EQUAL_INT(_LOC_GB_PFX_LEN, prefix.pfx_len);
             TEST_ASSERT_EQUAL_INT(_mock_netif->pid, prefix.iface);
-            TEST_ASSERT(_PIO_PFX_LTIME < prefix.valid_until);
-            TEST_ASSERT(_PIO_PFX_LTIME < prefix.pref_until);
+            TEST_ASSERT((_PIO_PFX_LTIME / MS_PER_SEC) < prefix.valid_until);
+            TEST_ASSERT((_PIO_PFX_LTIME / MS_PER_SEC) < prefix.pref_until);
         }
     }
     if (!pio || !(pio_flags & NDP_OPT_PI_FLAGS_L)) {
