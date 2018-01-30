@@ -7,6 +7,8 @@ ifneq ($(CPU),efm32)
   $(error This package can only be used with EFM32 CPUs)
 endif
 
+CFLAGS += -Wno-error=implicit-fallthrough
+
 .PHONY: all
 
 all: git-download
