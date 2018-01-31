@@ -64,9 +64,6 @@ extern "C" {
  * This emulates a software triggered interrupt
  * @{
  */
-/*TODO Check if the not implemented I/O pin interrupt could be used to not waste pin,
- *Note that the I/O ports corresponding to PCINT23:16 are not implemented. Therefore PCIE2 has no function in this device
- */
 #define AVR_CONTEXT_SWAP_INIT do { \
         DDRE |= (1 << PE7); \
         EICRB |= (1 << ISC70); \

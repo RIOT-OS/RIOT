@@ -47,36 +47,43 @@ void get_mcusr(void)
     __asm__ __volatile__("mov %0, r3\n" : "=r" (soft_rst) :);
 }
 
+
+void _reset_cause(void){
+
+	if (mcusr_mirror & (1 << PORF)) {
+		DEBUG("Power-on reset.\n");
+	}
+	if (mcusr_mirror & (1 << EXTRF)) {
+	    DEBUG("External reset!\n");
+	}
+	if (mcusr_mirror & (1 << BORF)) {
+	    DEBUG("Brownout reset!\n");
+	}
+	if (mcusr_mirror & (1 << WDRF)) {
+		if (soft_rst &  0xAA) {
+		    DEBUG("Software reset!\n");
+		}else {
+		    DEBUG("Watchdog reset!\n");
+		}
+	}
+	if (mcusr_mirror & (1 << JTRF)) {
+	    DEBUG("JTAG reset!\n");
+	}
+}
+
 void cpu_init(void)
 {
-    if (mcusr_mirror & (1 << PORF)) {
-        printf(("Power-on reset.\n"));
-    }
-    if (mcusr_mirror & (1 << EXTRF)) {
-        printf(("External reset!\n"));
-    }
-    if (mcusr_mirror & (1 << BORF)) {
-        printf(("Brownout reset!\n"));
-    }
-    if (mcusr_mirror & (1 << WDRF)) {
-        if (soft_rst &  0xAA) {
-            printf( ("Software reset!\n"));
-        }else {
-            printf( ("Watchdog reset!\n"));
-        }
-    }
-    if (mcusr_mirror & (1 << JTRF)) {
-        printf(("JTAG reset!\n"));
-    }
+    _reset_cause();
 
-    wdt_reset();
-    wdt_disable();
+    wdt_reset();   /* should not be nececessary as done in bootloader */
+    wdt_disable(); /* but when used without bootloader this is needed */
 
     /* Set system clock Prescaler */
     CLKPR = (1 << CLKPCE);  /* enable a change to CLKPR */
-    /* set the Division factor to 1 / for internal Oscillator to 2 */
+    /* set the Division factor to 1 results in divisor 2 for internal Oscillator
+     * So FCPU = 8MHz
+     * */
     CLKPR = 0;
-    /* Right now we need to do nothing here */
 }
 
 /* This is a vector which is aliased to __vector_default,
@@ -92,26 +99,17 @@ void cpu_init(void)
  */
 
 ISR(BADISR_vect){
-    if (MCUSR & (1 << PORF)) {
-        printf(("Power-on reset.\n"));
-    }
-    if (MCUSR & (1 << EXTRF)) {
-        printf(("External reset!\n"));
-    }
-    if (MCUSR & (1 << BORF)) {
-        printf(("Brownout reset!\n"));
-    }
-    if (MCUSR & (1 << WDRF)) {
-        printf(("Watchdog reset!\n"));
-    }
-    if (MCUSR & (1 << JTRF)) {
-        printf(("JTAG reset!\n"));
-    }
 
-    printf_P(PSTR("FATAL ERROR: BADISR_vect called, unprocessed Interrupt.\nSTOP Execution.\n"));
+    _reset_cause();
 
-    printf("IRQ_STATUS %#02x\nIRQ_STATUS1 %#02x\n", (unsigned int)IRQ_STATUS, (unsigned int)IRQ_STATUS1 );
+    printf_P(PSTR("FATAL ERROR: BADISR_vect called, unprocessed Interrupt.\n"
+                  "STOP Execution.\n"));
+
+    printf("IRQ_STATUS %#02x\nIRQ_STATUS1 %#02x\n",
+            (unsigned int)IRQ_STATUS, (unsigned int)IRQ_STATUS1 );
+
     printf("SCIRQS %#02x\nBATMON %#02x\n", (unsigned int)SCIRQS, (unsigned int)BATMON );
+
     printf("EIFR %#02x\nPCIFR %#02x\n", (unsigned int)EIFR, (unsigned int)PCIFR );
 
     /* White LED light is used to signal ERROR. */
@@ -119,6 +117,7 @@ ISR(BADISR_vect){
 
     while (1) {}
 }
+
 ISR(BAT_LOW_vect, ISR_BLOCK){
     __enter_isr();
     DEBUG("BAT_LOW \n");
