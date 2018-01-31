@@ -43,7 +43,7 @@
 #define CC1200_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
-#define CC1200_NUM (sizeof(cc1200_params)/sizeof(cc1200_params[0]))
+#define CC1200_NUM (sizeof(cc1200_params) / sizeof(cc1200_params[0]))
 
 static netdev_cc1200_t cc1200_devs[CC1200_NUM];
 static char _stacks[CC1200_NUM][CC1200_MAC_STACKSIZE];
@@ -58,8 +58,8 @@ void auto_init_cc1200(void)
 
         netdev_cc1200_setup(&cc1200_devs[i], p);
         gnrc_netif_ieee802154_create(_stacks[i], CC1200_MAC_STACKSIZE,
-                               CC1200_MAC_PRIO, "cc1200", 
-                               (netdev_t*)&cc1200_devs[i]);
+                                     CC1200_MAC_PRIO, "cc1200",
+                                     (netdev_t *)&cc1200_devs[i]);
     }
 }
 #else

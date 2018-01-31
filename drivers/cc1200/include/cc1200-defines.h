@@ -76,27 +76,27 @@ extern "C" {
  * @name    Definitions to support burst/single access
  * @{
  */
-#define CC1200_WRITE_BURST  (0x40) /**< Offset for burst write. */
-#define CC1200_READ_SINGLE  (0x80) /**< Offset for read single byte. */
-#define CC1200_READ_BURST   (0xC0) /**< Offset for read burst. */
-#define CC1200_NOBYTE       (0xFF) /**< No command (for reading). */
+#define CC1200_WRITE_BURST  (0x40)  /**< Offset for burst write. */
+#define CC1200_READ_SINGLE  (0x80)  /**< Offset for read single byte. */
+#define CC1200_READ_BURST   (0xC0)  /**< Offset for read burst. */
+#define CC1200_NOBYTE       (0xFF)  /**< No command (for reading). */
 /** @} */
 
 
 /**
  * @name CC1200 Defines
  */
-#define CC1200_CONST_TX_POWER_MAX       14 /**< Max output power */
-#define CC1200_RF_CFG_CHAN_CENTER_F0           863125 /**< Base frequency in kHz */
-#define CC1200_RF_CFG_CHAN_SPACING             200000 /**< Channel spacing in Hz */
-#define CC1200_RF_CFG_MIN_CHANNEL              0 /**< The minimum channel */
-#define CC1200_RF_CFG_MAX_CHANNEL              33 /**< The maximum channel */
-#define CC1200_RF_CFG_MAX_TXPOWER              CC1200_CONST_TX_POWER_MAX /**< The maximum output power in dBm */
-#define CC1200_RF_CFG_CCA_THRESHOLD            (-91) /**< The carrier sense level used for CCA in dBm */
-#define CC1200_RF_CFG_RSSI_OFFSET              (-81) /**< The RSSI offset in dBm */
+#define CC1200_CONST_TX_POWER_MAX       14                                  /**< Max output power */
+#define CC1200_RF_CFG_CHAN_CENTER_F0           863125                       /**< Base frequency in kHz */
+#define CC1200_RF_CFG_CHAN_SPACING             200000                       /**< Channel spacing in Hz */
+#define CC1200_RF_CFG_MIN_CHANNEL              0                            /**< The minimum channel */
+#define CC1200_RF_CFG_MAX_CHANNEL              33                           /**< The maximum channel */
+#define CC1200_RF_CFG_MAX_TXPOWER              CC1200_CONST_TX_POWER_MAX    /**< The maximum output power in dBm */
+#define CC1200_RF_CFG_CCA_THRESHOLD            (-91)                        /**< The carrier sense level used for CCA in dBm */
+#define CC1200_RF_CFG_RSSI_OFFSET              (-81)                        /**< The RSSI offset in dBm */
 
 /**
- * @name   CC1200 Register 
+ * @name   CC1200 Register
  * @{
  */
 #define CC1200_IOCFG3                  (0x0000) /**< GPIO3 IO Pin Configuration */
@@ -354,7 +354,7 @@ extern "C" {
 #define CC1200_FREQEST      (0x32)      /**< Frequency Offset Estimate. */
 #define CC1200_LQI          (0x33)      /**< Demodulator estimate for Link Quality. */
 #define CC1200_RSSI         (0x34)      /**< Received signal strength indication. */
-#define CC1200_MARCSTATE    (0x2F73) /**< MARC State */
+#define CC1200_MARCSTATE    (0x2F73)    /**< MARC State */
 #define CC1200_WORTIME1     (0x36)      /**< High byte of WOR timer. */
 #define CC1200_WORTIME0     (0x37)      /**< Low byte of WOR timer. */
 #define CC1200_PKTSTATUS    (0x38)      /**< Current GDOx status and packet status. */

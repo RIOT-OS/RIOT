@@ -36,8 +36,8 @@
 #define SPI_MODE        SPI_MODE_0
 
 /**********************************************************************
- *                      CC1200 spi access
- **********************************************************************/
+*                      CC1200 spi access
+**********************************************************************/
 
 static inline void lock(cc1200_t *dev)
 {
@@ -48,10 +48,11 @@ static inline void lock(cc1200_t *dev)
 void cc1200_writeburst_reg(cc1200_t *dev, uint16_t addr, const char *src, uint8_t count)
 {
     unsigned int cpsr;
+
     lock(dev);
     cpsr = irq_disable();
     /* check wether the address is in the extended register space (address over 0x2F00) */
-    if((addr >> 8) == CC1200_EXT_REG_ACC){
+    if ((addr >> 8) == CC1200_EXT_REG_ACC) {
         spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, CC1200_EXT_REG_ACC | CC1200_WRITE_BURST);
     }
     spi_transfer_regs(dev->params.spi, dev->params.cs_pin,
@@ -63,10 +64,11 @@ void cc1200_writeburst_reg(cc1200_t *dev, uint16_t addr, const char *src, uint8_
 void cc1200_readburst_reg(cc1200_t *dev, uint16_t addr, char *buffer, uint8_t count)
 {
     unsigned int cpsr;
+
     lock(dev);
     cpsr = irq_disable();
     /* check wether the address is in the extended register space (address over 0x2F00) */
-    if((addr >> 8) == CC1200_EXT_REG_ACC){
+    if ((addr >> 8) == CC1200_EXT_REG_ACC) {
         spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, CC1200_EXT_REG_ACC | CC1200_READ_BURST);
     }
     int i = 0;
@@ -85,10 +87,11 @@ void cc1200_readburst_reg(cc1200_t *dev, uint16_t addr, char *buffer, uint8_t co
 void cc1200_write_reg(cc1200_t *dev, uint16_t addr, uint8_t value)
 {
     unsigned int cpsr;
+
     lock(dev);
     cpsr = irq_disable();
     /* check wether the address is in the extended register space (address over 0x2F00) */
-    if((addr >> 8) == CC1200_EXT_REG_ACC){
+    if ((addr >> 8) == CC1200_EXT_REG_ACC) {
         spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, CC1200_EXT_REG_ACC);
     }
 
@@ -101,10 +104,11 @@ uint8_t cc1200_read_reg(cc1200_t *dev, uint16_t addr)
 {
     uint8_t result;
     unsigned int cpsr;
+
     lock(dev);
     cpsr = irq_disable();
     /* check wether the address is in the extended register space (address over 0x2F00) */
-    if((addr >> 8) == CC1200_EXT_REG_ACC){
+    if ((addr >> 8) == CC1200_EXT_REG_ACC) {
         spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, CC1200_EXT_REG_ACC | CC1200_READ_SINGLE);
     }
 
@@ -119,10 +123,11 @@ uint8_t cc1200_read_status(cc1200_t *dev, uint16_t addr)
 {
     uint8_t result;
     unsigned int cpsr;
+
     lock(dev);
     cpsr = irq_disable();
     /* check wether the address is in the extended register space (address over 0x2F00) */
-    if((addr >> 8) == CC1200_EXT_REG_ACC){
+    if ((addr >> 8) == CC1200_EXT_REG_ACC) {
         spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, CC1200_EXT_REG_ACC | CC1200_READ_BURST);
     }
 
@@ -137,21 +142,19 @@ uint8_t cc1200_get_reg_robust(cc1200_t *dev, uint16_t addr)
 {
     uint8_t res1, res2;
     unsigned int cpsr;
+
     lock(dev);
     cpsr = irq_disable();
 
-    do
-    {
+    do {
         /* check wether the address is in the extended register space (address over 0x2F00) */
-        if ((addr >> 8) == CC1200_EXT_REG_ACC)
-        {
+        if ((addr >> 8) == CC1200_EXT_REG_ACC) {
             spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, CC1200_EXT_REG_ACC | CC1200_READ_BURST);
         }
         res1 = spi_transfer_reg(dev->params.spi, dev->params.cs_pin,
                                 (addr | CC1200_READ_BURST), CC1200_NOBYTE);
         /* check wether the address is in the extended register space (address over 0x2F00) */
-        if ((addr >> 8) == CC1200_EXT_REG_ACC)
-        {
+        if ((addr >> 8) == CC1200_EXT_REG_ACC) {
             spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true, CC1200_EXT_REG_ACC | CC1200_READ_BURST);
         }
         res2 = spi_transfer_reg(dev->params.spi, dev->params.cs_pin,
@@ -175,11 +178,12 @@ uint8_t cc1200_strobe(cc1200_t *dev, uint8_t c)
     lock(dev);
     cpsr = irq_disable();
     result = spi_transfer_byte(dev->params.spi, dev->params.cs_pin, false,  c);
-    if(c == CC1200_SRES){
+    if (c == CC1200_SRES) {
         result = spi_transfer_byte(dev->params.spi, dev->params.cs_pin, true,  c);
         xtimer_spin(xtimer_ticks_from_usec(RESET_WAIT_TIME));
         gpio_set(dev->params.cs_pin);
-    }else{
+    }
+    else {
         result = spi_transfer_byte(dev->params.spi, dev->params.cs_pin, false,  c);
     }
     irq_restore(cpsr);

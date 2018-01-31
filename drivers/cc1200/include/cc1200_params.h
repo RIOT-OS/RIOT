@@ -45,16 +45,16 @@ extern "C" {
 #define CC1200_PARAM_RESET       (GPIO_PIN(2, 7))
 #endif
 
-#define CC1200_PARAMS_DEFAULT       {.spi = CC1200_PARAM_SPI, \
-                                     .spi_clk = CC1200_PARAM_SPI_CLK, \
-                                     .cs_pin = CC1200_PARAM_CS, \
-                                     .int_pin = CC1200_PARAM_INT, \
-                                     .reset_pin = CC1200_PARAM_RESET}
+#define CC1200_PARAMS_DEFAULT       { .spi = CC1200_PARAM_SPI, \
+                                      .spi_clk = CC1200_PARAM_SPI_CLK, \
+                                      .cs_pin = CC1200_PARAM_CS, \
+                                      .int_pin = CC1200_PARAM_INT, \
+                                      .reset_pin = CC1200_PARAM_RESET }
 
 /**
  * @name CC1200 default configuration
  */
-static const cc1200_params_t cc1200_params[] = 
+static const cc1200_params_t cc1200_params[] =
 {
 #ifdef CC1200_PARAMS_BOARD
     CC1200_PARAMS_BOARD,

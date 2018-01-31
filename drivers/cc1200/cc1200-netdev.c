@@ -44,14 +44,14 @@ static int _send(netdev_t *dev, const struct iovec *vector, unsigned count)
     LED_ON(0);
 #endif
     int result = 0;
-    netdev_cc1200_t *netdev_cc1200 = (netdev_cc1200_t*) dev;
+    netdev_cc1200_t *netdev_cc1200 = (netdev_cc1200_t *) dev;
     int size = 0;
-    for(uint8_t i = 0; i<count; i++) size += vector[i].iov_len;
+    for (uint8_t i = 0; i < count; i++) size += vector[i].iov_len;
 
     DEBUG("%s:%u size=%d\n", __func__, __LINE__, size);
-    if(size > CC1200_PACKET_LENGTH){
+    if (size > CC1200_PACKET_LENGTH) {
         DEBUG("%s: packet too large (%u > %u)\n",
-            __func__, size, CC1200_PACKET_LENGTH);
+              __func__, size, CC1200_PACKET_LENGTH);
 
         return -EOVERFLOW;
     }
@@ -67,11 +67,11 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 {
     DEBUG("%s:%u, len=%d\n", __func__, __LINE__, len);
 
-    cc1200_t *cc1200 = &((netdev_cc1200_t*) dev)->cc1200;
+    cc1200_t *cc1200 = &((netdev_cc1200_t *) dev)->cc1200;
     cc1200_pkt_t *cc1200_pkt = &cc1200->pkt_buf.packet;
-    if(buf == NULL){
+    if (buf == NULL) {
         /* GNRC wants to know how many bytes we got */
-        
+
         /* Make sure pkt_len is sane */
         if (cc1200_pkt->length > CC1200_PACKET_LENGTH) {
             return -EOVERFLOW;
@@ -86,7 +86,7 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
         return -ENOSPC;
     }
 
-    memcpy(buf, (void*)cc1200_pkt+1, cc1200_pkt->length);
+    memcpy(buf, (void *)cc1200_pkt + 1, cc1200_pkt->length);
     if (info != NULL) {
         netdev_cc1200_rx_info_t *cc1200_info = info;
 
@@ -99,8 +99,8 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
     dev->stats.rx_bytes += cc1200_pkt->length;
 #endif
 
-    for(uint8_t i = 0; i< cc1200_pkt->length+1; i++)
-    	DEBUG("0x%x ", *(((char* )cc1200_pkt)+i));
+    for (uint8_t i = 0; i < cc1200_pkt->length + 1; i++)
+        DEBUG("0x%x ", *(((char * )cc1200_pkt) + i));
     DEBUG("\n");
 
     return cc1200_pkt->length;
@@ -111,6 +111,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
 {
 
     int res = -ENOTSUP;
+
     switch (opt) {
 
         case NETOPT_MAX_PACKET_SIZE:
@@ -131,32 +132,32 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
 
 static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len)
 {
-    cc1200_t *cc1200 = &((netdev_cc1200_t*) dev)->cc1200;
+    cc1200_t *cc1200 = &((netdev_cc1200_t *) dev)->cc1200;
     int res = -ENOTSUP;
 
     switch (opt) {
         case NETOPT_CHANNEL:
-            {
-                if(value_len != sizeof(uint16_t)){
-                    return -EINVAL;
-                }
-                uint8_t channel = (((const uint16_t *)value)[0]) & UINT8_MAX;
-                if (channel > CC1200_MAX_CHANNR) {
-                    return -EINVAL;
-                }
-                if (cc1200_set_channel(cc1200, channel) == -1) {
-                    return -EINVAL;
-                }
-                break;
+        {
+            if (value_len != sizeof(uint16_t)) {
+                return -EINVAL;
             }
+            uint8_t channel = (((const uint16_t *)value)[0]) & UINT8_MAX;
+            if (channel > CC1200_MAX_CHANNR) {
+                return -EINVAL;
+            }
+            if (cc1200_set_channel(cc1200, channel) == -1) {
+                return -EINVAL;
+            }
+            break;
+        }
         case NETOPT_ADDRESS:
             if (value_len < 1) {
                 return -EINVAL;
             }
-            if (!cc1200_set_address(cc1200, *(uint8_t*)value)) {
+            if (!cc1200_set_address(cc1200, *(uint8_t *)value)) {
                 return -EINVAL;
             }
-            if (!cc1200_set_address_short(cc1200, *(uint16_t*)value)) {
+            if (!cc1200_set_address_short(cc1200, *(uint16_t *)value)) {
                 return -EINVAL;
             }
             break;
@@ -167,14 +168,14 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
             if (value_len < 1) {
                 return -EINVAL;
             }
-            cc1200->pan_id = *(uint16_t*) value;
+            cc1200->pan_id = *(uint16_t *) value;
             break;
         case NETOPT_ADDRESS_LONG:
             if (value_len > sizeof(uint64_t)) {
                 res = -EOVERFLOW;
             }
             else {
-                res = cc1200_set_address_long(cc1200, *((uint64_t*)value));
+                res = cc1200_set_address_long(cc1200, *((uint64_t *)value));
             }
             break;
 #ifdef MODULE_GNRC_NETIF
@@ -202,7 +203,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
 static void _netdev_cc1200_isr(void *arg)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
-    netdev_t *netdev = (netdev_t*) arg;
+    netdev_t *netdev = (netdev_t *) arg;
     unsigned state = irq_disable();
     netdev->event_callback(netdev, NETDEV_EVENT_ISR);
     irq_restore(state);
@@ -212,8 +213,8 @@ static void _netdev_cc1200_isr(void *arg)
 static void _netdev_cc1200_rx_callback(void *arg)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
-    netdev_t *netdev = (netdev_t*) arg;
-    cc1200_t *cc1200 = &((netdev_cc1200_t*) arg)->cc1200;
+    netdev_t *netdev = (netdev_t *) arg;
+    cc1200_t *cc1200 = &((netdev_cc1200_t *) arg)->cc1200;
     gpio_irq_disable(cc1200->params.int_pin);
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
@@ -221,19 +222,19 @@ static void _netdev_cc1200_rx_callback(void *arg)
 static void _isr(netdev_t *dev)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
-    cc1200_t *cc1200 = &((netdev_cc1200_t*) dev)->cc1200;
+    cc1200_t *cc1200 = &((netdev_cc1200_t *) dev)->cc1200;
     unsigned state = irq_disable();
-    cc1200_isr_handler(cc1200, _netdev_cc1200_rx_callback, (void*)dev);
+    cc1200_isr_handler(cc1200, _netdev_cc1200_rx_callback, (void *)dev);
     irq_restore(state);
 }
 
 static int _init(netdev_t *dev)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
-    cc1200_t *cc1200 = &((netdev_cc1200_t*) dev)->cc1200;
+    cc1200_t *cc1200 = &((netdev_cc1200_t *) dev)->cc1200;
 
     gpio_init_int(cc1200->params.int_pin, GPIO_IN_PD, GPIO_BOTH,
-            &_netdev_cc1200_isr, (void*)dev);
+                  &_netdev_cc1200_isr, (void *)dev);
     //gpio_init(cc1200->params.gdo0, GPIO_IN_PD);
 
     gpio_set(cc1200->params.int_pin);
@@ -248,12 +249,12 @@ static int _init(netdev_t *dev)
 }
 
 const netdev_driver_t netdev_cc1200_driver = {
-    .get=_get,
-    .set=_set,
-    .send=_send,
-    .recv=_recv,
-    .isr=_isr,
-    .init=_init
+    .get = _get,
+    .set = _set,
+    .send = _send,
+    .recv = _recv,
+    .isr = _isr,
+    .init = _init
 };
 
 int netdev_cc1200_setup(netdev_cc1200_t *netdev_cc1200, const cc1200_params_t *params)
@@ -274,7 +275,7 @@ int netdev_cc1200_setup(netdev_cc1200_t *netdev_cc1200, const cc1200_params_t *p
     cc1200_setup(&netdev_cc1200->cc1200, params);
 
     /* Initialise netdev_ieee802154_t struct */
-    cc1200_t *cc1200 = &netdev_cc1200->cc1200; 
+    cc1200_t *cc1200 = &netdev_cc1200->cc1200;
     netdev_ieee802154_set((netdev_ieee802154_t *)netdev_cc1200, NETOPT_NID, &cc1200->pan_id,
                           sizeof(uint16_t));
     uint16_t channel = cc1200->radio_channel;

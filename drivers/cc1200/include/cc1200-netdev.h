@@ -38,8 +38,8 @@ extern const netdev_driver_t netdev_cc1200_driver;
  * @brief cc1200 netdev struct
  */
 typedef struct netdev_cc1200 {
-    netdev_ieee802154_t netdev;   /**< netdev parent struct */
-    cc1200_t cc1200;        /**< documentation here */
+    netdev_ieee802154_t netdev; /**< netdev parent struct */
+    cc1200_t cc1200;            /**< documentation here */
 } netdev_cc1200_t;
 
 /**

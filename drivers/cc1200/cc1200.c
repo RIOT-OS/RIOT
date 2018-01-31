@@ -54,7 +54,7 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
     /* Configure chip-select */
     spi_init(dev->params.spi);
     int spi_return = spi_init_cs(dev->params.spi, dev->params.cs_pin);
-    if(spi_return != SPI_OK){
+    if (spi_return != SPI_OK) {
         DEBUG("%s:%s:%u spi not ok\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     }
 
@@ -70,10 +70,10 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
 
     /* Write configuration to configuration registers */
     cc1200_writeburst_reg(dev, 0x00, cc1200_default_conf,
-    		cc1200_default_conf_size);
+                          cc1200_default_conf_size);
 
     /* Write configuration for extended register */
-    for(unsigned i = 0; i<cc1200_ext_default_conf_size; i++){
+    for (unsigned i = 0; i < cc1200_ext_default_conf_size; i++) {
         DEBUG("cc1200 setup extended register: Address: 0x%x, Value: 0x%x\n", cc1200_ext_default_conf[i].address, cc1200_ext_default_conf[i].value);
         cc1200_write_reg(dev, cc1200_ext_default_conf[i].address, cc1200_ext_default_conf[i].value);
     }
@@ -90,8 +90,8 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
 
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     LOG_INFO("cc1200: initialized with address=%u and channel=%i\n",
-            (unsigned)dev->radio_address,
-            dev->radio_channel);
+             (unsigned)dev->radio_address,
+             dev->radio_channel);
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
     return 0;
 }
@@ -99,14 +99,14 @@ int cc1200_setup(cc1200_t *dev, const cc1200_params_t *params)
 uint8_t cc1200_set_address(cc1200_t *dev, uint8_t address)
 {
     DEBUG("%s:%s:%u setting address %u\n", RIOT_FILE_RELATIVE, __func__,
-            __LINE__, (unsigned)address);
-		if (address >= MIN_UID) {	
-            if (dev->radio_state != RADIO_UNKNOWN) {
+          __LINE__, (unsigned)address);
+    if (address >= MIN_UID) {
+        if (dev->radio_state != RADIO_UNKNOWN) {
 
             cc1200_write_register(dev, CC1200_DEV_ADDR, address);
             dev->radio_address = address;
             return address;
-            }
+        }
     }
 
     return 0;
@@ -115,10 +115,10 @@ uint8_t cc1200_set_address(cc1200_t *dev, uint8_t address)
 uint64_t cc1200_set_address_long(cc1200_t *dev, uint64_t address)
 {
     DEBUG("%s:%s:%u setting address long 0x%x\n", RIOT_FILE_RELATIVE, __func__,
-            __LINE__, (unsigned)address);
+          __LINE__, (unsigned)address);
     if (!(address < MIN_UID) || (address > sizeof(uint64_t))) {
         if (dev->radio_state != RADIO_UNKNOWN) {
-      
+
             dev->radio_address_long = address;
             return address;
         }
@@ -130,10 +130,10 @@ uint64_t cc1200_set_address_long(cc1200_t *dev, uint64_t address)
 uint16_t cc1200_set_address_short(cc1200_t *dev, uint16_t address)
 {
     DEBUG("%s:%s:%u setting address short 0x%x\n", RIOT_FILE_RELATIVE, __func__,
-            __LINE__, (unsigned)address);
+          __LINE__, (unsigned)address);
     if (address >= MIN_UID) {
         if (dev->radio_state != RADIO_UNKNOWN) {
-      
+
             dev->radio_address_short = address;
             return address;
         }
@@ -145,10 +145,10 @@ uint16_t cc1200_set_address_short(cc1200_t *dev, uint16_t address)
 uint16_t cc1200_set_pan_id(cc1200_t *dev, uint16_t pan_id)
 {
     DEBUG("%s:%s:%u setting pan id 0x%x\n", RIOT_FILE_RELATIVE, __func__,
-            __LINE__, (unsigned)pan_id);
+          __LINE__, (unsigned)pan_id);
     if (!(pan_id < MIN_UID) || (pan_id > MAX_UID)) {
         if (dev->radio_state != RADIO_UNKNOWN) {
-      
+
             dev->pan_id = pan_id;
             return pan_id;
         }
@@ -157,14 +157,14 @@ uint16_t cc1200_set_pan_id(cc1200_t *dev, uint16_t pan_id)
     return 0;
 }
 
-void cc1200_set_base_freq_raw(cc1200_t *dev, const char* freq_array)
+void cc1200_set_base_freq_raw(cc1200_t *dev, const char *freq_array)
 {
 #if ENABLE_DEBUG == 1
-    uint8_t _tmp[] = { freq_array[2], freq_array[1], freq_array[0], 0x00};
-    uint32_t *FREQ = (uint32_t*) _tmp;
+    uint8_t _tmp[] = { freq_array[2], freq_array[1], freq_array[0], 0x00 };
+    uint32_t *FREQ = (uint32_t *) _tmp;
 
     DEBUG("cc1200_set_base_freq_raw(): setting base frequency to %uHz\n",
-            (396) * (unsigned)(*FREQ));
+          (396) * (unsigned)(*FREQ));
 #endif
     cc1200_writeburst_reg(dev, CC1200_FREQ2, freq_array, 3);
 }
@@ -175,9 +175,10 @@ void cc1200_set_monitor(cc1200_t *dev, uint8_t mode)
 
     uint8_t stat = cc1200_read_reg(dev, CC1200_PKT_CFG1);
     stat &= 0xE6;
-    if(mode){
+    if (mode) {
         stat |= 0x1;
-    }else{
+    }
+    else {
         stat |= 0x11;
     }
     cc1200_write_register(dev, CC1200_PKT_CFG1, stat);
@@ -241,7 +242,7 @@ void cc1200_switch_to_pwd(cc1200_t *dev)
     dev->radio_state = RADIO_PWD;
 
 #ifdef MODULE_CC1200_HOOKS
-     cc1200_hook_off();
+    cc1200_hook_off();
 #endif
 }
 
@@ -257,9 +258,9 @@ int16_t cc1200_set_channel(cc1200_t *dev, uint8_t channr)
 
     /* divided by 1000 because chan_spacing is in Hz */
     freq = CC1200_RF_CFG_CHAN_CENTER_F0 + (channr *
-         CC1200_RF_CFG_CHAN_SPACING) / 1000;
-    freq *= 4096; //Frequency Multiplier
-    freq /= 625; //Frequency Divider
+                                           CC1200_RF_CFG_CHAN_SPACING) / 1000;
+    freq *= 4096;   //Frequency Multiplier
+    freq /= 625;    //Frequency Divider
     cc1200_write_reg(dev, CC1200_FREQ2, ((uint8_t *)&freq)[2]);
     cc1200_write_reg(dev, CC1200_FREQ1, ((uint8_t *)&freq)[1]);
     cc1200_write_reg(dev, CC1200_FREQ0, ((uint8_t *)&freq)[0]);
@@ -320,20 +321,20 @@ int cc1200_rd_set_mode(cc1200_t *dev, int mode)
         result = RADIO_MODE_ON;
     }
 
-    switch(mode) {
+    switch (mode) {
         case RADIO_MODE_ON:
             LOG_DEBUG("cc1200: switching to RX mode\n");
             cc1200_setup_rx_mode(dev);          /* Set chip to desired mode */
-    DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
+            DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
             break;
 
         case RADIO_MODE_OFF:
-            gpio_irq_disable(dev->params.int_pin); /* Disable interrupts */
-            cc1200_switch_to_pwd(dev);          /* Set chip to power down mode */
+            gpio_irq_disable(dev->params.int_pin);  /* Disable interrupts */
+            cc1200_switch_to_pwd(dev);              /* Set chip to power down mode */
             break;
 
         case RADIO_MODE_GET:
-            /* do nothing, just return current mode */
+        /* do nothing, just return current mode */
         default:
             /* do nothing */
             break;

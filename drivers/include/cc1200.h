@@ -59,14 +59,14 @@ struct cc1200 {
     uint8_t radio_channel;                      /**< current Radio channel */
     uint8_t radio_address;                      /**< current Radio address */
     uint16_t radio_address_short;               /**< current Radio address */
-    uint64_t radio_address_long;               /**< current Radio address */
-    uint16_t pan_id;                             /**< current pan id */
+    uint64_t radio_address_long;                /**< current Radio address */
+    uint16_t pan_id;                            /**< current pan id */
 
     cc1200_pkt_buf_t pkt_buf;                   /**< RX/TX buffer */
 #ifdef MODULE_GNRC_NETIF
     gnrc_nettype_t proto;                       /**< protocol the radio expects */
 #endif
-    void (*isr_cb)(void* arg);                  /**< isr callback */
+    void (*isr_cb)(void *arg);                  /**< isr callback */
     void *isr_cb_arg;                           /**< isr callback argument */
 };
 
