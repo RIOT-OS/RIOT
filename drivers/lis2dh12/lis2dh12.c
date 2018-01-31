@@ -136,17 +136,30 @@ int lis2dh12_init(lis2dh12_t *dev, const lis2dh12_params_t *params)
     dev->p = params;
     dev->comp = (1000UL * (0x02 << (dev->p->scale >> 4)));
 
+#ifdef MODULE_LIS2DH12_SPI
     /* initialize the bus */
     if (_init_bus(dev) != LIS2DH12_OK) {
         DEBUG("[lis2dh12] error: unable to initialize bus\n");
         return LIS2DH12_NOBUS;
     }
-
     /* acquire the bus and verify that our parameters are valid */
     if (_acquire(dev) != BUS_OK) {
         DEBUG("[lis2dh12] error: unable to acquire SPI bus\n");
         return LIS2DH12_NOBUS;
     }
+#else
+    /* in the current state, the I2C driver expects the bus to be acquired
+     * before the init function is called, so we have to switch order */
+    if (_acquire(dev) != BUS_OK) {
+        DEBUG("[lis2dh12] error: unable to acquire SPI bus\n");
+        return LIS2DH12_NOBUS;
+    }
+    if (_init_bus(dev) != LIS2DH12_OK) {
+        _release(dev);
+        DEBUG("[lis2dh12] error: unable to initialize bus\n");
+        return LIS2DH12_NOBUS;
+    }
+#endif
 
     /* read the WHO_IM_I register to verify the connections to the device */
     if (_read(dev, REG_WHO_AM_I) != WHO_AM_I_VAL) {
