@@ -31,7 +31,7 @@ ifeq (,$(PORT))
       endif
       ifeq (,$(PORT_DARWIN))
         # Look for any USB to serial adapter by default
-        PORT_DARWIN := $(firstword $(sort $(wildcard /dev/tty.usbmodem* /dev/tty.usbserial-*)))
+        PORT_DARWIN := $(firstword $(sort $(wildcard /dev/tty.usbmodem* /dev/tty.usbserial-* /dev/tty.SLAB_USBtoUART*)))
       endif
     endif
     PORT := $(PORT_DARWIN)
