@@ -364,6 +364,7 @@ endif
 
 ifneq (,$(filter isrpipe,$(USEMODULE)))
   USEMODULE += tsrb
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter shell_commands,$(USEMODULE)))
