@@ -193,7 +193,7 @@ static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
             (void)opt;
             return sizeof(uint16_t);
 #endif  /* MODULE_NRFMIN */
-#ifdef MODULE_NETDEV_IEEE802154
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154:
             switch (opt->len) {
                 case 1U:
@@ -203,7 +203,7 @@ static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
                 default:
                     return 0U;
             }
-#endif  /* MODULE_NETDEV_IEEE802154 */
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
         default:
             (void)opt;
             return 0U;

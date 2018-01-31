@@ -50,14 +50,14 @@ static inline uint8_t _reverse_iid(const ipv6_addr_t *dst,
             l2addr[5] = dst->u8[15];
             return ETHERNET_ADDR_LEN;
 #endif  /* MODULE_NETDEV_ETH */
-#ifdef MODULE_NETDEV_IEEE802154
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154:
             /* assume address was based on EUI-64
              * (see https://tools.ietf.org/html/rfc6775#section-5.2) */
             memcpy(l2addr, &dst->u64[1], sizeof(dst->u64[1]));
             l2addr[0] ^= 0x02;
             return sizeof(dst->u64[1]);
-#endif  /* MODULE_NETDEV_IEEE802154 */
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
 #ifdef MODULE_NRFMIN
         case NETDEV_TYPE_NRFMIN:
             l2addr[0] = dst->u8[14];

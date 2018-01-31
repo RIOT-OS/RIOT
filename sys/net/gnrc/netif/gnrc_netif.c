@@ -770,7 +770,7 @@ int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif, const ipv6_addr_t *addr)
 }
 
 #if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_CC110X) || \
-    defined(MODULE_NRFMIN)
+    defined(MODULE_NRFMIN) || defined(MODULE_XBEE)
 static void _create_iid_from_short(const gnrc_netif_t *netif, eui64_t *eui64)
 {
     const unsigned offset = sizeof(eui64_t) - netif->l2addr_len;
@@ -782,7 +782,7 @@ static void _create_iid_from_short(const gnrc_netif_t *netif, eui64_t *eui64)
     memcpy(&eui64->uint8[offset], netif->l2addr, netif->l2addr_len);
 }
 #endif /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_CC110X) ||
-        * defined(MODULE_NRFMIN) */
+        * defined(MODULE_NRFMIN) || defined(MODULE_XBEE) */
 
 int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
 {
@@ -802,7 +802,7 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
                 eui64->uint8[7] = netif->l2addr[5];
                 return 0;
 #endif
-#ifdef MODULE_NETDEV_IEEE802154
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
             case NETDEV_TYPE_IEEE802154:
                 switch (netif->l2addr_len) {
                     case IEEE802154_SHORT_ADDRESS_LEN:
@@ -1120,7 +1120,7 @@ static void _update_l2addr_from_dev(gnrc_netif_t *netif)
     netopt_t opt = NETOPT_ADDRESS;
 
     switch (netif->device_type) {
-#ifdef MODULE_NETDEV_IEEE802154
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154: {
                 uint16_t tmp;
 
@@ -1157,7 +1157,7 @@ static void _init_from_device(gnrc_netif_t *netif)
     assert(res == sizeof(tmp));
     netif->device_type = (uint8_t)tmp;
     switch (netif->device_type) {
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN)
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_NRFMIN:
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
