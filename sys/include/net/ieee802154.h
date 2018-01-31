@@ -46,6 +46,8 @@ extern "C" {
  * @{
  */
 #define IEEE802154_MAX_HDR_LEN              (23U)
+#define IEEE802154_MIN_FRAME_LEN            (IEEE802154_FCF_LEN + sizeof(uint8_t))
+
 #define IEEE802154_FCF_LEN                  (2U)
 #define IEEE802154_FCS_LEN                  (2U)
 
