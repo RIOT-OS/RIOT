@@ -28,8 +28,17 @@
 extern "C" {
 #endif
 
-/*Fastest Baudrate possible for board*/
-#define UART_STDIO_BAUDRATE (38400)       /**< Sets Baudrate for e.g. Shell */
+/**
+ * @name   Baudrate for STDIO terminal
+ * possible Baudrate for board with good error rates
+ * 250000
+ * 38400
+ *
+ * Matche this with BAUD in Board/Makefile.include
+ * @{
+ */
+#define UART_STDIO_BAUDRATE (250000)       /**< Sets Baudrate for e.g. Shell */
+/** @} */
 
 /**
  * @name   LED pin definitions and handlers
