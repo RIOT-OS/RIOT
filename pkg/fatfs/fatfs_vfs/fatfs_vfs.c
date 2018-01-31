@@ -73,7 +73,7 @@ static int _umount(vfs_mount_t *mountp)
     snprintf(volume_str, sizeof(volume_str), "%d:/", fs_desc->vol_idx);
 
     DEBUG("unmounting file system of volume '%s'\n", volume_str);
-    FRESULT res = f_mount(NULL, volume_str, 1);
+    FRESULT res = f_unmount(volume_str);
 
     if (res == FR_OK) {
         DEBUG("[OK]");
