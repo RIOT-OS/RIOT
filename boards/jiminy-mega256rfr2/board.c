@@ -48,9 +48,9 @@ void board_init(void)
 
     /* initialize the board LED (connected to pin PB7) */
     /* Ports Pins as Output */
-    LED_PORT_DDR |= BLUE | RED | GREEN;
+    LED_PORT_DDR |= LED2_MASK | LED1_MASK | LED0_MASK;
     /* All Pins Low so LEDs are off */
-    LED_PORT &= ~(BLUE | RED | GREEN);
+    LED_PORT &= ~(LED2_MASK | LED1_MASK | LED0_MASK);
 
     irq_enable();
 }

@@ -104,7 +104,7 @@ ISR(BADISR_vect){
     printf("EIFR %#02x\nPCIFR %#02x\n", (unsigned int)EIFR, (unsigned int)PCIFR );
 
     /* White LED light is used to signal ERROR. */
-    LED_PORT |= (BLUE | GREEN | RED);
+    LED_PORT |= (LED2_MASK | LED1_MASK | LED0_MASK);
 
     while (1) {
     }

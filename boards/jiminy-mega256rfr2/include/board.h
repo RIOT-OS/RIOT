@@ -40,14 +40,26 @@ extern "C" {
 #define LED_PORT            PORTB
 #define LED_PORT_DDR        DDRB
 
-#define LED_BLUE_PIN        GPIO_PIN(1, 5)
-#define LED_GREEN_PIN       GPIO_PIN(1, 6)
-#define LED_RED_PIN         GPIO_PIN(1, 7)
 #define LED0_PIN            GPIO_PIN(1, 5)
+#define LED1_PIN            GPIO_PIN(1, 6)
+#define LED2_PIN            GPIO_PIN(1, 7)
 
-#define BLUE            (1 << DDB5)
-#define GREEN           (1 << DDB6)
-#define RED             (1 << DDB7)
+#define LED0_MASK           (1 << DDB5)
+#define LED1_MASK           (1 << DDB6)
+#define LED2_MASK           (1 << DDB7)
+
+#define LED0_ON             (LED_PORT |=  LED0_MASK)
+#define LED0_OFF            (LED_PORT &= ~LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT ^=  LED0_MASK)
+
+#define LED1_ON             (LED_PORT |=  LED1_MASK)
+#define LED1_OFF            (LED_PORT &= ~LED1_MASK)
+#define LED1_TOGGLE         (LED_PORT ^=  LED1_MASK)
+
+#define LED2_ON             (LED_PORT |=  LED2_MASK)
+#define LED2_OFF            (LED_PORT &= ~LED2_MASK)
+#define LED2_TOGGLE         (LED_PORT ^=  LED2_MASK)
+
 /** @} */
 
 /**
