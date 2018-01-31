@@ -14,8 +14,6 @@
  * @file
  * @brief           Implementation specific CPU configuration options
  *
- * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author          Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author          Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author          Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */

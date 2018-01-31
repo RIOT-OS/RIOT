@@ -28,11 +28,18 @@
 
 void pm_reboot(void)
 {
+    #if defined(CPU_ATMEGA256RFR2)
+    /* set a variable to stack to signalizes soft reset */
+    /* clear MCU Status Register Interrupt flags */
+    MCUSR = 0x00;
+    __asm__ __volatile__("mov r3, %0\n" :: "r" (0xAA));
+    #endif /* CPU_ATMEGA256RFR2 */
+
     /*
      * Since the AVR doesn't support a real software reset, we set the Watchdog
      * Timer on a 250ms timeout. Consider this a kludge.
      */
     irq_disable();
     wdt_enable(WDTO_250MS);
-    while(1);
+    while(1){}
 }

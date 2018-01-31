@@ -54,7 +54,7 @@ extern "C" {
 /**
  * @name   Timer configuration
  *
- * ATTETION Timer 0 is used for Xtimer which is system Timer
+ * ATTENTION RIOT Timer 0 is used for Xtimer which is system Timer
  *
  * The timer driver only supports the four 16-bit timers
  * (Timer1, TST, Timer3, Timer4, Timer5), so those are the Timer we can use here.
@@ -63,7 +63,11 @@ extern "C" {
  * Timer 4, TST, It can not be connected to any I/O Pin,
  * Timer 5, TST, It can not be connected to any I/O Pin,
  *
- * Using Timer 4 and 5 seems to be the best choice
+ * Using Atmel Timer 4 and 5 seems to be the best choice
+ * Using Atmel Timer 4 as Xtimer
+ * and Atmel Timer 5 as timer available for the the application seems to be the best choice,
+ * as the special functions of the other timer are not lost.
+ * Atmel Timer1 to be used as PWM timer for RGB LED
  * @{
  */
 #define TIMER_NUMOF         (3U)

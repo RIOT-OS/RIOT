@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2016 RWTH Aachen, Josua Arndt
- * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,7 +15,6 @@
  * @file
  * @brief       Board specific definitions for the Jiminy Mega 256rfr2 board.
  *
- * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  */
@@ -59,7 +57,6 @@ extern "C" {
 #define LED2_ON             (LED_PORT |=  LED2_MASK)
 #define LED2_OFF            (LED_PORT &= ~LED2_MASK)
 #define LED2_TOGGLE         (LED_PORT ^=  LED2_MASK)
-
 /** @} */
 
 /**
