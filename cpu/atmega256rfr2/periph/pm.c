@@ -28,6 +28,9 @@
 
 #include "irq.h"
 #include "periph/pm.h"
+
+#include "stdio.h"
+
 void pm_reboot(void)
 {
     /* set a variable to stack to signalizes soft reset */
@@ -47,3 +50,10 @@ void pm_reboot(void)
     while (1) {
     }
 }
+
+
+void pm_set_lowest(void)
+{
+    /* don't do anything here */
+}
+

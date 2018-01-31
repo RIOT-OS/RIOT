@@ -45,10 +45,11 @@ extern "C" {
 #define XTIMER_CHAN         (0)
 #define XTIMER_WIDTH        (16)
 #define XTIMER_HZ           (125000UL)
-#define XTIMER_BACKOFF      (5000)
-#define XTIMER_ISR_BACKOFF  (5000)
-#define XTIMER_OVERHEAD     (1000)
+//#define XTIMER_BACKOFF      (40)
+//#define XTIMER_ISR_BACKOFF  (5000)
+//#define XTIMER_OVERHEAD     (1000)
 /** @} */
+
 
 
 /**
