@@ -2,12 +2,8 @@
 export CPU = stm32l4
 export CPU_MODEL = stm32l475vg
 
-# define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
 # setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
+include $(RIOTMAKE)/tools/serial.ttyacm0.inc.mk
 
 export DEBUG_ADAPTER ?= stlink
 export STLINK_VERSION ?= 2-1

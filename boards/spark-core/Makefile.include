@@ -3,9 +3,7 @@ export CPU = stm32f1
 export CPU_MODEL = stm32f103cb
 
 # configure the serial interface
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
-include $(RIOTMAKE)/tools/serial.inc.mk
+include $(RIOTMAKE)/tools/serial.ttyusb0.inc.mk
 
 export BINFILE = $(patsubst %.elf,%.bin,$(ELFFILE))
 
