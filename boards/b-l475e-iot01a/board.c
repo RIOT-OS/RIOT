@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Board specific implementations for the b-l475e-iot01a board
+ * @brief       Board specific implementations for the ST B-L475E-IOT01A board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *

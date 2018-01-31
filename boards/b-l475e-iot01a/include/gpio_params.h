@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup   boards_b-l475e-iot01a-common
+ * @ingroup   boards_b-l475e-iot01a
  * @{
  *
  * @file

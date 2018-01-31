@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the ST b-l072z-lrwan1 board
+ * @brief       Peripheral MCU configuration for the ST B-L072Z-LRWAN1 board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
