@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /*Fastest Baudrate possible for board*/
-#define UART_STDIO_BAUDRATE (250000U)       /**< Sets Baudrate for e.g. Shell */
+#define UART_STDIO_BAUDRATE (38400)       /**< Sets Baudrate for e.g. Shell */
 
 /**
  * @name   LED pin definitions and handlers
