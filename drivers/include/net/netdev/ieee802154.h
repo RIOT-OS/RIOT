@@ -53,6 +53,11 @@ extern "C" {
  * @brief   request ACK from receiver
  */
 #define NETDEV_IEEE802154_ACK_REQ           (IEEE802154_FCF_ACK_REQ)
+
+/**
+ * @brief   set frame pending bit
+ */
+#define NETDEV_IEEE802154_FRAME_PEND        (IEEE802154_FCF_FRAME_PEND)
 /**
  * @}
  */
