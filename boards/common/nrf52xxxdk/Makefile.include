@@ -8,8 +8,6 @@ ifeq (,$(filter thingy52 acd52832,$(BOARD)))
 endif
 
 # set default port depending on operating system
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup JLink for flashing

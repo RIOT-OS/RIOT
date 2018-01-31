@@ -8,10 +8,6 @@ export CPU_MODEL ?= mkw21d256vha5
 
 export MCPU = cortex-m4
 
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
 .PHONY: flash
 flash: $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
 
