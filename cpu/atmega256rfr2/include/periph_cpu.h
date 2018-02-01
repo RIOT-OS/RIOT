@@ -31,17 +31,8 @@ extern "C" {
  * @name   Length of the CPU_ID in octets
  * @{
  */
-#define CPUID_LEN           (10U)
+#define CPUID_LEN           (8U)
 
-/** @} */
-
-/**
- * @name   Add 16 bit randome ending instead off 0000 to CPUID
- *
- *         To use this feature the Module AT86RFR2 is needed.
- * @{
- */
-#define CPU_ID_ADD_RANDOME  (0)
 /** @} */
 
 /**
