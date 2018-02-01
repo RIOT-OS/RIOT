@@ -30,14 +30,22 @@ extern "C" {
 
 /**
  * @name   Baudrate for STDIO terminal
- * possible Baudrate for board with good error rates
- * 250000
- * 38400
  *
- * Matche this with BAUD in Board/Makefile.include
+ * The standard configuration for STDIO in spu/atmega_comman/periph/uart.c
+ * is to use double speed.
+ *
+ * For 8MHz F_CPU following Baudrate have good error rates
+ * 250000
+ *  76923
+ *  38400
+ *
+ * Matches this with BAUD in Board/Makefile.include
+ *
  * @{
  */
+#ifndef UART_STDIO_BAUDRATE
 #define UART_STDIO_BAUDRATE (250000)       /**< Sets Baudrate for e.g. Shell */
+#endif
 /** @} */
 
 /**
