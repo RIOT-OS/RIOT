@@ -56,3 +56,6 @@ Makefile.local
 
 # scan-build artifacts
 scan-build/
+
+# Ignore auto-generated supported boards doxygen md file
+doc/doxygen/src/autogen/*
