@@ -31,7 +31,7 @@ extern "C" {
  * @name   Length of the CPU_ID in octets
  * @{
  */
-#define CPUID_LEN           (8U)
+#define CPUID_LEN           (11U)
 
 /** @} */
 

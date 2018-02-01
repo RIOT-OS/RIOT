@@ -31,15 +31,17 @@
 #endif
 
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 /**
  * @brief CPU_ID build from MCU register
  *
  *  CPIUD is taken from MCU Control Register and Signature bytes.
- *  CPUID:  1e  a8  02  ff  ff  1f  94  03 XX XX
+ *  CPUID:  1e a8 02 1f 94 03 00 00 00 ff ff
+ *  CPUID:  1e a8 02 1f 94 92 1f 94 03 XX XX
+ *  MEGA62/128/256_RFR2 [MANUAL] p.505
  *  MEGA62/128/256_RFR2 [MANUAL] p.138
- *  MEGA62/128/256_RFR2 [MANUAL] p.507
+ *  MEGA62/128/256_RFR2 [MANUAL] p.492
  *
  *  usr_sign_0/1 are configurable values on flash page 1.
  */
@@ -53,12 +55,14 @@ void cpuid_get(void *id)
     uint8_t  usr_sign_0 = boot_signature_byte_get(0x0100);
     uint8_t  usr_sign_1 = boot_signature_byte_get(0x0102);
 
-#if CPU_ID_ADD_RANDOME
 
     uint8_t addr[CPUID_LEN] = {
-            signature_0,        /* 0x1E Atmel JEDEC manufacturer ID */
+            signature_0,        /* 0x1E Atmel manufacturer ID */
             signature_1,        /* 0xA8 Part Number high byte */
             signature_2,        /* 0x02 Part Number low byte */
+            MAN_ID_0,            /* 0x1F Atmel JEDEC manufacturer ID */
+            PART_NUM,           /* 0x94 PART_NUM  Identification */
+            VERSION_NUM,        /* 0x02 VERSION_NUM  Identification */
 /* only append if transceiver module is also added */
 #ifdef MODULE_AT86RF2XX
             MAN_ID_0,           /* 0x1F Atmel JEDEC manufacturer ID */
