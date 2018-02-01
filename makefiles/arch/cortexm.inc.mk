@@ -85,8 +85,9 @@ endif
 
 # Explicitly tell the linker to link the startup code.
 #   Without this the interrupt vectors will not be linked correctly!
+VECTORS_O ?= $(BINDIR)/cpu/vectors.o
 ifeq ($(COMMON_STARTUP),)
-export UNDEF += $(BINDIR)/cpu/vectors.o
+export UNDEF += $(VECTORS_O)
 endif
 
 # CPU depends on the cortex-m common module, so include it:
