@@ -48,27 +48,28 @@ void get_mcusr(void)
 }
 
 
-void _reset_cause(void){
+void _reset_cause(void)
+{
 
-	if (mcusr_mirror & (1 << PORF)) {
-		DEBUG("Power-on reset.\n");
-	}
-	if (mcusr_mirror & (1 << EXTRF)) {
-	    DEBUG("External reset!\n");
-	}
-	if (mcusr_mirror & (1 << BORF)) {
-	    DEBUG("Brownout reset!\n");
-	}
-	if (mcusr_mirror & (1 << WDRF)) {
-		if (soft_rst &  0xAA) {
-		    DEBUG("Software reset!\n");
-		}else {
-		    DEBUG("Watchdog reset!\n");
-		}
-	}
-	if (mcusr_mirror & (1 << JTRF)) {
-	    DEBUG("JTAG reset!\n");
-	}
+    if(mcusr_mirror & (1 << PORF)) {
+        DEBUG("Power-on reset.\n");
+    }
+    if(mcusr_mirror & (1 << EXTRF)) {
+        DEBUG("External reset!\n");
+    }
+    if(mcusr_mirror & (1 << BORF)) {
+        DEBUG("Brownout reset!\n");
+    }
+    if(mcusr_mirror & (1 << WDRF)) {
+        if(soft_rst & 0xAA) {
+            DEBUG("Software reset!\n");
+        } else {
+            DEBUG("Watchdog reset!\n");
+        }
+    }
+    if(mcusr_mirror & (1 << JTRF)) {
+        DEBUG("JTAG reset!\n");
+    }
 }
 
 void cpu_init(void)
