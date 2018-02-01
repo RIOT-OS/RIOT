@@ -209,7 +209,7 @@ extern "C" {
 /**
  * @brief   Raw CoAP PDU header structure
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     uint8_t ver_t_tkl;          /**< version, token, token length           */
     uint8_t code;               /**< CoAP code (e.g.m 205)                  */
     uint16_t id;                /**< Req/resp ID                            */
