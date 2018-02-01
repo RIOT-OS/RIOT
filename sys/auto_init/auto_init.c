@@ -392,6 +392,11 @@ void auto_init(void)
         extern void auto_init_random(void);
         auto_init_random();
     }
+    if (IS_USED(MODULE_ZTIMER)) {
+        LOG_DEBUG("Auto init ztimer.\n");
+        void ztimer_init(void);
+        ztimer_init();
+    }
     if (IS_USED(MODULE_AUTO_INIT_XTIMER)) {
         LOG_DEBUG("Auto init xtimer.\n");
         extern void xtimer_init(void);
