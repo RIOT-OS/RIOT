@@ -56,7 +56,14 @@ static inline int _wait_for_response(SercomI2cm *dev, uint32_t max_timeout_cnt);
 /**
  * @brief Array holding one pre-initialized mutex for each I2C device
  */
-static mutex_t locks[I2C_NUMOF];
+static mutex_t locks[] = {
+    MUTEX_INIT,
+    MUTEX_INIT,
+    MUTEX_INIT,
+    MUTEX_INIT,
+    MUTEX_INIT,
+    MUTEX_INIT
+};
 
 /**
  * @brief   Shortcut for accessing the used I2C SERCOM device
