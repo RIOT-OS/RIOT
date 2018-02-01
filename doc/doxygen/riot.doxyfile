@@ -762,6 +762,9 @@ INPUT                  = ../../doc.txt \
                          ../../sys \
                          src/ \
                          src/mainpage.md \
+                         src/autogen/supported-boards.md \
+                         src/autogen/boards.md \
+                         src/autogen/families.md \
                          src/creating-modules.md \
                          src/creating-an-application.md \
                          src/getting-started.md \
