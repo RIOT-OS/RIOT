@@ -92,6 +92,7 @@ compile() {
     [ ! -d "boards/$board" ] && error "$0: compile: error: board directory \"boards/$board\" doesn't exist"
 
     CCACHE_BASEDIR="$(pwd)" BOARD=$board RIOT_CI_BUILD=1 \
+        PORT=/dev/null \
         make -C${appdir} clean all -j${JOBS:-4}
     RES=$?
 
