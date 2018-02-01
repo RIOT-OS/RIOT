@@ -94,6 +94,10 @@ PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += suit_%
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += zptr
+PSEUDOMODULES += ztimer%
+
+# ztimer's main module is called "ztimer_core"
+NO_PSEUDOMODULES += ztimer_core
 
 # handle suit_v4 being a distinct module
 NO_PSEUDOMODULES += suit_v4
