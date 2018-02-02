@@ -35,7 +35,6 @@ extern "C" {
  * is to use double speed.
  *
  * For 8MHz F_CPU following Baudrate have good error rates
- * 250000
  *  76923
  *  38400
  *
@@ -44,7 +43,7 @@ extern "C" {
  * @{
  */
 #ifndef UART_STDIO_BAUDRATE
-#define UART_STDIO_BAUDRATE (250000)       /**< Sets Baudrate for e.g. Shell */
+#define UART_STDIO_BAUDRATE (38400)       /**< Sets Baudrate for e.g. Shell */
 #endif
 /** @} */
 
@@ -91,6 +90,16 @@ extern "C" {
 #define AVR_CONTEXT_SWAP_TRIGGER   PORTE ^= (1 << PE7)
 /** @} */
 
+
+/**
+ * @name xtimer configuration values
+ * @{
+ */
+#define XTIMER_DEV          TIMER_DEV(0)
+#define XTIMER_CHAN         (0)
+#define XTIMER_WIDTH        (16)
+#define XTIMER_HZ           (125000UL)
+/** @} */
 
 /**
  * @name Initialize board specific hardware, including clock, LEDs and std-IO

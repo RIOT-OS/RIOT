@@ -37,17 +37,6 @@ extern "C" {
 #define CLOCK_CORECLOCK     (8000000UL)
 /** @} */
 
-/**
- * @name xtimer configuration values
- * @{
- */
-#define XTIMER_DEV          TIMER_DEV(0)
-#define XTIMER_CHAN         (0)
-#define XTIMER_WIDTH        (16)
-#define XTIMER_HZ           (125000UL)
-/** @} */
-
-
 
 /**
  * @name   Timer configuration
@@ -93,59 +82,32 @@ extern "C" {
 /** @} */
 
 /**
- * @name   PWM configuration
+ * @name   UART configuration
+ *
+ * The UART devices have fixed pin mappings, so all we need to do, is to specify
+ * which devices we would like to use and their corresponding RX interrupts. See
+ * the reference manual for the fixed pin mapping.
+ *
  * @{
  */
+#define UART_NUMOF          (2U)
 
-/* To reduce confusion by steadily renaming hardware modules with different numbered drivers
- * namingconvention is not to start with 0 but to name driver with the number fitting the underlying timer module*/
-#define PWM_1       (0U)
+/* UART0 is used for stdio */
+#define UART_0              MEGA_UART0
+#define UART_0_ISR          USART0_RX_vect
 
-static uint8_t scale[] = { 1 };     /** used to archieve better pwm frequency */
-static uint8_t prescaler[] = { 1 }; /** used to start and stop timer by setting clock */
-
-static const pwm_conf_t pwm_config[] = {
-    {
-        .dev = MEGA_TIMER1,
-        .power_reg = &PRR0,
-        .power_reg_bit = PRTIM1,
-        .chan = { { .pin = GPIO_PIN(PORT_B, 5), .cc_chan = 0 },
-                  { .pin = GPIO_PIN(PORT_B, 6), .cc_chan = 1 },
-                  { .pin = GPIO_PIN(PORT_B, 7), .cc_chan = 2 } },
-        .scale_pointer = &(scale[0]),
-        .prescaler_pointer = &(prescaler[0]),
-        .bits = 16
-    }
-};
-#define PWM_NUMOF   (sizeof(pwm_config)/sizeof(pwm_conf_t))
+#define UART_1              MEGA_UART1
+#define UART_1_ISR          USART1_RX_vect
 /** @} */
 
 /**
- * @name Analog comparator configuration
+ * @name SPI configuration
+ *
+ * The atmega256rfr has only one hardware SPI with fixed pin configuration, so all
+ * we can do here, is to enable or disable it.
  * @{
  */
-#define AC_0        (0U)
-
-static const ac_conf_t ac_config[] = {
-    {
-        .in1 = GPIO_PIN(PORT_E, 2),
-        .in2 = GPIO_PIN(PORT_E, 1)
-    }
-};
-
-#define AC_NUMOF    (sizeof(ac_config)/sizeof(ac_conf_t))
-/*
- * since current Analog comparator ISR is to slow, we'll hardcode it into the module
- * and use the define to not include the line if the capacity_module isn't used
- */
-#define USES_CAPACITY_MODULE
-/** @} */
-
-/**
- * @name RTC configuartion
- * @{
- */
-#define RTC_NUMOF   (1U)
+#define SPI_NUMOF           1           /* set to 0 to disable SPI */
 /** @} */
 
 /**
@@ -153,6 +115,13 @@ static const ac_conf_t ac_config[] = {
  * @{
  */
 #define I2C_NUMOF           1
+/** @} */
+
+/**
+ * @name ADC Configuration
+ * @{
+ */
+#define ADC_NUMOF           (8U)
 /** @} */
 
 #ifdef __cplusplus
