@@ -46,7 +46,7 @@
 #error "Please provide CLOCK_CORECLOCK in your board's periph_conf.h"
 #endif
 
-/* Check the source to be used for the PLL */
+/* Check the source to be used for the PLL, can be HSE, HSI or both*/
 #if defined(CLOCK_PLL_DIV_HSE) && defined(CLOCK_PLL_MUL_HSE) && \
     defined(CLOCK_PLL_DIV_HSI) && defined(CLOCK_PLL_MUL_HSI)
 #define CLOCK_PLL_MULTI
@@ -107,10 +107,7 @@ void stmclk_init_sysclk(void)
     }
 #else
     /* If HSE is not defined then run directly HSI*/
-    RCC->CR |= RCC_CR_HSION;
-    /* Wait till the clock source is ready
-     * NOTE: no timeout for HSI, should allways be available*/
-    while (!(RCC->CR & RCC_CR_HSIRDY)) {}
+    stmclk_enable_hsi();
 #endif
 
     /* Choose the most efficient flash configuration */
