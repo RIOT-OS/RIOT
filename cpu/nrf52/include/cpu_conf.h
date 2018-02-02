@@ -75,6 +75,16 @@ extern "C" {
 #endif /* SOFTDEVICE_PRESENT */
 /** @} */
 
+/**
+ * @brief   Put the CPU in the low-power 'wait for event' state
+ */
+static inline void nrf52_sleep(void)
+{
+    __SEV();
+    __WFE();
+    __asm("nop");
+}
+
 #ifdef __cplusplus
 }
 #endif

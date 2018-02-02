@@ -78,6 +78,9 @@ void cpu_init(void)
     NVIC_SetPriority(SWI0_EGU0_IRQn, 6);
 #endif
 
+    /* enable wake up on events for __WFE CPU sleep */
+    SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
+
     /* trigger static peripheral initialization */
     periph_init();
 }

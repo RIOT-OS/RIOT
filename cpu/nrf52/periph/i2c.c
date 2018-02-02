@@ -1,9 +1,10 @@
 /*
  * Copyright (C) 2017 HAW Hamburg
+ *               2018 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -11,26 +12,29 @@
  * @{
  *
  * @file
- * @brief       Low-level I2C driver implementation
+ * @brief       Low-level I2C (TWI) peripheral driver implementation
  *
  * @author      Dimitri Nahm <dimitri.nahm@haw-hamburg.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
+
+#include <string.h>
 
 #include "cpu.h"
 #include "mutex.h"
 #include "assert.h"
 #include "periph/i2c.h"
-#include "periph_conf.h"
+#include "periph/gpio.h"
 
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
 /**
- * @brief   If any of the 4 lower bits are set, the speed value is invalid
+ * @brief   If any of the 8 lower bits are set, the speed value is invalid
  */
-#define INVALID_SPEED_MASK  (0x0f)
+#define INVALID_SPEED_MASK  (0xff)
 
 /**
  * @brief   Initialized bus locks (we have a maximum of two devices...)
@@ -45,54 +49,34 @@ static inline NRF_TWIM_Type *dev(i2c_t bus)
     return i2c_config[bus].dev;
 }
 
-static int error(i2c_t bus)
+static int finish(i2c_t bus, int len)
 {
-    DEBUG("[i2c] error 0x%02x\n", (int)dev(bus)->ERRORSRC);
-    dev(bus)->ERRORSRC = 0;
-    dev(bus)->EVENTS_ERROR = 0;
-    return -1;
-}
+    DEBUG("[i2c] waiting for STOPPED or ERROR event\n");
 
-static int write(i2c_t bus, uint8_t address, const void *data, int length, int stop)
-{
-    uint8_t *out_buf = (uint8_t *)data;
-    assert((bus <= I2C_NUMOF) && (length > 0));
-
-    DEBUG("[i2c]: writing %i bytes to the bus\n", length);
-
-    /* disable shortcuts */
-    if (stop == 0) {
-        dev(bus)->SHORTS = 0;
+    while ((!(dev(bus)->EVENTS_STOPPED)) && (!(dev(bus)->EVENTS_ERROR))) {
+        nrf52_sleep();
     }
 
-    /* set the client address and the data pointer */
-    dev(bus)->ADDRESS = (address & 0x7f);
-    dev(bus)->TXD.PTR = (uint32_t)out_buf;
-    dev(bus)->TXD.MAXCNT = (length << TWIM_TXD_MAXCNT_MAXCNT_Pos);
+    if ((dev(bus)->EVENTS_STOPPED)) {
+        dev(bus)->EVENTS_STOPPED = 0;
+        DEBUG("[i2c] finish: stop event occurred\n");
+    }
 
-    /* start write sequence */
-    dev(bus)->EVENTS_LASTTX = 0;
-    dev(bus)->TASKS_STARTTX = 1;
-
-    /* wait for the device to finish up */
-    while ((dev(bus)->EVENTS_LASTTX == 0) && (dev(bus)->EVENTS_ERROR == 0)) {}
     if (dev(bus)->EVENTS_ERROR) {
-        return error(bus);
+        dev(bus)->EVENTS_ERROR = 0;
+        if (dev(bus)->ERRORSRC & TWIM_ERRORSRC_ANACK_Msk) {
+            dev(bus)->ERRORSRC = TWIM_ERRORSRC_ANACK_Msk;
+            DEBUG("[i2c] check_error: NACK on address byte\n");
+            return -1;
+        }
+        if (dev(bus)->ERRORSRC & TWIM_ERRORSRC_DNACK_Msk) {
+            dev(bus)->ERRORSRC = TWIM_ERRORSRC_DNACK_Msk;
+            DEBUG("[i2c] check_error: NACK on data byte\n");
+            return -1;
+        }
     }
 
-    /* wait for the device to finish up */
-    while ((dev(bus)->TXD.AMOUNT != (unsigned)length) && (dev(bus)->EVENTS_ERROR == 0)) {}
-    if (dev(bus)->EVENTS_ERROR) {
-        return error(bus);
-    }
-
-    /* enable shortcuts */
-    if (stop == 0) {
-        dev(bus)->SHORTS = (TWIM_SHORTS_LASTTX_STOP_Enabled << TWIM_SHORTS_LASTTX_STOP_Pos) |
-                           (TWIM_SHORTS_LASTRX_STOP_Enabled << TWIM_SHORTS_LASTRX_STOP_Pos);
-    }
-
-    return dev(bus)->TXD.AMOUNT;
+    return len;
 }
 
 int i2c_init_master(i2c_t bus, i2c_speed_t speed)
@@ -104,109 +88,132 @@ int i2c_init_master(i2c_t bus, i2c_speed_t speed)
         return -2;
     }
 
-    /* pin configuration */
-    NRF_P0->PIN_CNF[i2c_config[bus].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
-    NRF_P0->PIN_CNF[i2c_config[bus].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
-    dev(bus)->PSEL.SCL = i2c_config[bus].pin_scl;
-    dev(bus)->PSEL.SDA = i2c_config[bus].pin_sda;
+    /* disable device during initialization, will be enabled when acquire is
+     * called */
+    dev(bus)->ENABLE = TWIM_ENABLE_ENABLE_Disabled;
 
-    /* shortcuts configuration */
-    dev(bus)->SHORTS = (TWIM_SHORTS_LASTTX_STOP_Enabled << TWIM_SHORTS_LASTTX_STOP_Pos) |
-                       (TWIM_SHORTS_LASTRX_STOP_Enabled << TWIM_SHORTS_LASTRX_STOP_Pos);
+    /* configure pins */
+    gpio_init(i2c_config[bus].scl, GPIO_IN_PU);
+    gpio_init(i2c_config[bus].sda, GPIO_IN_PU);
+    dev(bus)->PSEL.SCL = i2c_config[bus].scl;
+    dev(bus)->PSEL.SDA = i2c_config[bus].sda;
 
-    /* bus clock speed configuration */
-    dev(bus)->FREQUENCY = (speed << TWIM_FREQUENCY_FREQUENCY_Pos);
+    /* configure bus clock speed */
+    dev(bus)->FREQUENCY = speed;
 
-    /* enable the device */
-    dev(bus)->ENABLE = (TWIM_ENABLE_ENABLE_Enabled << TWIM_ENABLE_ENABLE_Pos);
+    /* re-enable the device. We expect that the device was being acquired before
+     * the i2c_init_master() function is called, so it should be enabled when
+     * exiting this function. */
+    dev(bus)->ENABLE = TWIM_ENABLE_ENABLE_Enabled;
 
     return 0;
 }
 
 int i2c_acquire(i2c_t bus)
 {
-    assert(bus <= I2C_NUMOF);
+    assert(bus < I2C_NUMOF);
+
     mutex_lock(&locks[bus]);
+    dev(bus)->ENABLE = TWIM_ENABLE_ENABLE_Enabled;
+
+    DEBUG("[i2c] acquired bus %i\n", (int)bus);
     return 0;
 }
 
 int i2c_release(i2c_t bus)
 {
-    assert(bus <= I2C_NUMOF);
+    assert(bus < I2C_NUMOF);
+
+    dev(bus)->ENABLE = TWIM_ENABLE_ENABLE_Disabled;
     mutex_unlock(&locks[bus]);
+
+    DEBUG("[i2c] released bus %i\n", (int)bus);
     return 0;
 }
 
-int i2c_read_byte(i2c_t bus, uint8_t address, void *data)
+int i2c_read_byte(i2c_t bus, uint8_t addr, void *data)
 {
-    return i2c_read_bytes(bus, address, data, 1);
+    return i2c_read_bytes(bus, addr, data, 1);
 }
 
-int i2c_read_bytes(i2c_t bus, uint8_t address, void *data, int length)
+int i2c_read_bytes(i2c_t bus, uint8_t addr, void *data, int len)
 {
-    uint8_t *in_buf = (uint8_t *)data;
-    assert((bus <= I2C_NUMOF) && (length > 0));
+    assert((bus < I2C_NUMOF) && data && (len > 0) && (len < 256));
 
-    DEBUG("[i2c] reading %i bytes from the bus\n", length);
+    DEBUG("[i2c] read_bytes: %i bytes from addr 0x%02x\n", (int)len, (int)addr);
 
-    /* set the client address and the data pointer */
-    dev(bus)->ADDRESS = (address & 0x7f);
-    dev(bus)->RXD.PTR = (uint32_t)in_buf;
-    dev(bus)->RXD.MAXCNT = (length << TWIM_RXD_MAXCNT_MAXCNT_Pos);
-
-    /* start read sequence */
-    dev(bus)->EVENTS_STOPPED = 0;
+    dev(bus)->ADDRESS = addr;
+    dev(bus)->RXD.PTR = (uint32_t)data;
+    dev(bus)->RXD.MAXCNT = (uint8_t)len;
+    dev(bus)->SHORTS =  TWIM_SHORTS_LASTRX_STOP_Msk;
     dev(bus)->TASKS_STARTRX = 1;
 
-    /* wait for the device to finish up */
-    while ((dev(bus)->EVENTS_STOPPED == 0) && (dev(bus)->EVENTS_ERROR == 0)) {}
-    if (dev(bus)->EVENTS_ERROR) {
-        return error(bus);
-    }
-
-    return dev(bus)->RXD.AMOUNT;
+    return finish(bus, len);
 }
 
-int i2c_read_reg(i2c_t bus, uint8_t address, uint8_t reg, void *data)
+int i2c_read_reg(i2c_t bus, uint8_t addr, uint8_t reg, void *data)
 {
-    write(bus, address, &reg, 1, 0);
-    return i2c_read_bytes(bus, address, data, 1);
+    return i2c_read_regs(bus, addr, reg, data, 1);
 }
 
-int i2c_read_regs(i2c_t bus, uint8_t address, uint8_t reg,
-                  void *data, int length)
+int i2c_read_regs(i2c_t bus, uint8_t addr, uint8_t reg,
+                  void *data, int len)
 {
-    write(bus, address, &reg, 1, 0);
-    return i2c_read_bytes(bus, address, data, length);
+    assert((bus < I2C_NUMOF) && data && (len > 0) && (len < 256));
+
+    DEBUG("[i2c] read_regs: %i byte(s) from reg 0x%02x at addr 0x%02x\n",
+           (int)len, (int)reg, (int)addr);
+
+    dev(bus)->ADDRESS = addr;
+    dev(bus)->TXD.PTR = (uint32_t)&reg;
+    dev(bus)->TXD.MAXCNT = 1;
+    dev(bus)->RXD.PTR = (uint32_t)data;
+    dev(bus)->RXD.MAXCNT = (uint8_t)len;
+    dev(bus)->SHORTS = (TWIM_SHORTS_LASTTX_STARTRX_Msk |
+                        TWIM_SHORTS_LASTRX_STOP_Msk);
+    dev(bus)->TASKS_STARTTX = 1;
+
+    return finish(bus, len);
 }
 
-int i2c_write_byte(i2c_t bus, uint8_t address, uint8_t data)
+int i2c_write_byte(i2c_t bus, uint8_t addr, uint8_t data)
 {
-    return write(bus, address, &data, 1, 1);
+    return i2c_write_bytes(bus, addr, &data, 1);
 }
 
-int i2c_write_bytes(i2c_t bus, uint8_t address, const void *data, int length)
+int i2c_write_bytes(i2c_t bus, uint8_t addr, const void *data, int len)
 {
-    return write(bus, address, data, length, 1);
+    assert((bus < I2C_NUMOF) && data && (len > 0) && (len < 256));
+
+    DEBUG("[i2c] write_bytes: %i byte(s) to addr 0x%02x\n", (int)len, (int)addr);
+
+    dev(bus)->ADDRESS = addr;
+    dev(bus)->TXD.PTR = (uint32_t)data;
+    dev(bus)->TXD.MAXCNT = (uint8_t)len;
+    dev(bus)->SHORTS = TWIM_SHORTS_LASTTX_STOP_Msk;
+    dev(bus)->TASKS_STARTTX = 1;
+
+    return finish(bus, len);
 }
 
-int i2c_write_reg(i2c_t bus, uint8_t address, uint8_t reg, uint8_t data)
+int i2c_write_reg(i2c_t bus, uint8_t addr, uint8_t reg, uint8_t data)
 {
-    /* send reg and data in one function call */
-    uint8_t out_buf[2];
-    out_buf[0] = reg;
-    out_buf[1] = data;
-    return write(bus, address, &out_buf, 2, 1) - 1;
+    return i2c_write_regs(bus, addr, reg, &data, 1);
 }
 
-int i2c_write_regs(i2c_t bus, uint8_t address, uint8_t reg, const void *data, int length)
+int i2c_write_regs(i2c_t bus, uint8_t addr, uint8_t reg,
+                   const void *data, int len)
 {
-    /* send reg and data in one function call */
-    uint8_t *buf = (uint8_t *)data;
-    uint8_t out_buf[length + 1];
-    out_buf[0] = reg;
-    for (int i = 0; i < length ; i++) {
-        out_buf[i + 1] = buf[i];
-    }
-    return write(bus, address, &out_buf, (length + 1), 1) - 1;
+    assert((bus < I2C_NUMOF) && data && (len > 0) && (len < 255));
+
+    /* the nrf52's TWI device does not support to do two consecutive transfers
+     * without a repeated start condition in between. So we have to put all data
+     * to be transfered into a temporary buffer
+     *
+     * CAUTION: this might become critical when transferring large blocks of
+     *          data as the temporary buffer is allocated on the stack... */
+    uint8_t buf_tmp[len + 1];
+    buf_tmp[0] = reg;
+    memcpy(&buf_tmp[1], data, len);
+    return i2c_write_bytes(bus, addr, buf_tmp, (len + 1)) - 1;
 }
