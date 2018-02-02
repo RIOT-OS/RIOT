@@ -233,7 +233,7 @@ typedef struct {
 /**
  * @brief   Resource handler type
  */
-typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len);
+typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context);
 
 /**
  * @brief   Type for CoAP resource entry
@@ -242,6 +242,7 @@ typedef struct {
     const char *path;               /**< URI path of resource               */
     unsigned methods;               /**< OR'ed methods this resource allows */
     coap_handler_t handler;         /**< ptr to resource handler            */
+    void *context;                  /**< ptr to user defined context data   */
 } coap_resource_t;
 
 /**
@@ -595,13 +596,18 @@ static inline uint32_t coap_get_observe(coap_pkt_t *pkt)
  *          application
  */
 extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
-                                                    uint8_t *buf, size_t len);
+                                                    uint8_t *buf, size_t len,
+                                                    void *context);
 
 /**
  * @brief   Resource definition for the default .well-known/core handler
  */
 #define COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER \
-    { "/.well-known/core", COAP_GET, coap_well_known_core_default_handler }
+    { \
+        .path = "/.well-known/core", \
+        .methods = COAP_GET, \
+        .handler = coap_well_known_core_default_handler \
+    }
 
 #ifdef __cplusplus
 }
