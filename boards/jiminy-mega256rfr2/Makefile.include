@@ -1,5 +1,3 @@
-include $(RIOTBOARD)/common/arduino-atmega/Makefile.include
-
 # define the cpu used by the jiminy board
 export CPU = atmega256rfr2
 
@@ -17,12 +15,12 @@ export FFLAGS += -p atmega256rfr2
 
 # refine serial port information for pyterm
 # For 8MHz F_CPU following Baudrate have good error rates
-# 250000 seems to be too fast
 #  76923
 #  38400
 export BAUD = 38400
-CFLAGS += -DUART_STDIO_BAUDRATE=$(BAUD)
 
 # PROGRAMMER defaults to arduino which is the internal flasher via USB. Can be
 # overridden for debugging (which requires changes that require to use an ISP)
 export PROGRAMMER ?= wiring
+
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

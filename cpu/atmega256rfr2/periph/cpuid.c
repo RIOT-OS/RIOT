@@ -26,12 +26,9 @@
 
 #include "atmega_regs_common.h"
 #include "avr/boot.h"
-#ifdef MODULE_AT86RF2XX
-    #include "at86rf2xx_registers.h"
-#endif
 
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 /**
  * @brief CPU_ID build from MCU register
@@ -63,14 +60,6 @@ void cpuid_get(void *id)
             MAN_ID_0,            /* 0x1F Atmel JEDEC manufacturer ID */
             PART_NUM,           /* 0x94 PART_NUM  Identification */
             VERSION_NUM,        /* 0x02 VERSION_NUM  Identification */
-/* only append if transceiver module is also added */
-#ifdef MODULE_AT86RF2XX
-            MAN_ID_0,           /* 0x1F Atmel JEDEC manufacturer ID */
-            AT86RF2XX_PARTNUM,  /* transceiver part number */
-            VERSION_NUM,        /* transceiver revision */
-#else
-            0,0,0,
-#endif
 /* last two bytes can be set to flash page 1. for differentiation of different boards */
             usr_sign_0,         /* user signature 0 */
             usr_sign_1,         /* user signature 1 */

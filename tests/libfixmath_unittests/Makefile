@@ -5,10 +5,8 @@ BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove
 # differences in the toolchain)
 
 # The MSP boards don't feature round(), exp(), and log(), which are used in the unittests
-BOARD_BLACKLIST += chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
-
-# Jiminy Board reports left shift count >= width of type, possibly due to 8bit width
-BOARD_BLACKLIST += jiminy-mega256rfr2
+BOARD_BLACKLIST += chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1 \
+                   jiminy-mega256rfr2
 
 BOARD_INSUFFICIENT_MEMORY := nucleo32-f031 nucleo32-f042 nucleo32-l031
 
@@ -21,4 +19,4 @@ endif
 include $(RIOTBASE)/Makefile.include
 
 test:
-	tests/01-run.py
+    tests/01-run.py

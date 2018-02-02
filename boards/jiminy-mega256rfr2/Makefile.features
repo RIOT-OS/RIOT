@@ -1,5 +1,6 @@
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.features
 FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_spi
