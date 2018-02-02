@@ -64,14 +64,6 @@ enum {
 #endif
 /** @}*/
 
-/**
- * @name   PM define paltform dependend lowest power state.
- * @{
- */
-#define PROVIDES_PM_SET_LOWEST
-/** @}*/
-
-
 #ifdef __cplusplus
 }
 #endif
