@@ -17,7 +17,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  * @author      Víctor Ariño <victor.arino@zii.aero>
- * @author      Oleg Artamonov <info@unwds.com>
+ * @author      Oleg Artamonov <oleg@unwds.com>
  * @author      Francisco Molina <francisco.molinas@inria.cl>
  *
  * @}
@@ -29,66 +29,34 @@
 #include "periph_conf.h"
 
 /* See if we want to use the PLL */
+/* If HSE and HSI are both defined, then different defines for HSx DIV and MUL*/
 #if defined(CLOCK_PLL_DIV) || defined(CLOCK_PLL_MUL) || \
     defined(CLOCK_PLL_DIV_HSE) || defined(CLOCK_PLL_MUL_HSE) || \
     defined(CLOCK_PLL_DIV_HSI) || defined(CLOCK_PLL_MUL_HSI)
-
 #define CLOCK_USE_PLL              1
 #else
 #define CLOCK_USE_PLL              0
 #endif
 
-#if !defined(CLOCK_HSI) && !defined(CLOCK_HSE) && !defined(CLOCK_MSI)
-#error "Please provide clock source in board.h or periph_conf.h file"
+/* Make sure we have all needed information about the clock configuration */
+#if !defined(CLOCK_HSI) && !defined(CLOCK_HSE)
+#error "Please provide CLOCK_HSE or CLOCK_HSI in your board's perhip_conf.h"
+#endif
+#ifndef CLOCK_CORECLOCK
+#error "Please provide CLOCK_CORECLOCK in your board's periph_conf.h"
 #endif
 
 /* Check the source to be used for the PLL */
-#if defined(CLOCK_HSI) && defined(CLOCK_HSE)
-#define CLOCK_HS_MULTI
-#endif
-
-#if !defined(CLOCK_HS_MULTI)
-#if defined(CLOCK_HSI)
-#define CLOCK_CR_SOURCE            RCC_CR_HSION
-#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSIRDY
+#if defined(CLOCK_PLL_DIV_HSE) && defined(CLOCK_PLL_MUL_HSE) && \
+    defined(CLOCK_PLL_DIV_HSI) && defined(CLOCK_PLL_MUL_HSI)
+#define CLOCK_PLL_MULTI
+#elif defined(CLOCK_HSI)
 #define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSI
-#define CLOCK_DISABLE_OTHERS       (RCC_CR_HSEON | RCC_CR_MSION)
-
-#if (CLOCK_USE_PLL == 0)
-#define CLOCK_CFGR_SW              RCC_CFGR_SW_HSI
-#define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_HSI
-#endif
 #elif defined(CLOCK_HSE)
-#define CLOCK_CR_SOURCE            RCC_CR_HSEON
-#define CLOCK_CR_SOURCE_RDY        RCC_CR_HSERDY
 #define CLOCK_PLL_SOURCE           RCC_CFGR_PLLSRC_HSE
-#define CLOCK_DISABLE_OTHERS       (RCC_CR_HSION | RCC_CR_MSION)
-
-#if (CLOCK_USE_PLL == 0)
-#define CLOCK_CFGR_SW              RCC_CFGR_SW_HSE
-#define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_HSE
-#endif
-#endif
 #endif
 
-#if defined(CLOCK_MSI)
-#define CLOCK_CR_SOURCE            RCC_CR_MSION
-#define CLOCK_CR_SOURCE_RDY        RCC_CR_MSIRDY
-#define CLOCK_CFGR_SW              RCC_CFGR_SW_MSI
-#define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_MSI
-#define CLOCK_DISABLE_OTHERS       (RCC_CR_HSEON | RCC_CR_HSION)
-#define CLOCK_MSIRANGE             RCC_ICSCR_MSIRANGE_6
-
-#if (CLOCK_USE_PLL == 1)
-#error "PLL can't be used with MSI"
-#endif
-#endif
-
-#if (CLOCK_USE_PLL == 1)
-#define CLOCK_CFGR_SW              RCC_CFGR_SW_PLL
-#define CLOCK_CFGR_SW_RDY          RCC_CFGR_SWS_PLL
-#endif
-
+/* Set core voltage according to core clock*/
 #if (CLOCK_CORECLOCK > 16000000U)
 #define CORE_VOLTAGE PWR_CR_VOS_0
 #elif (CLOCK_CORECLOCK > 8000000U)
@@ -120,7 +88,7 @@ void stmclk_init_sysclk(void)
     RCC->CIR = 0x0;
 
     /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration */
-#if defined(CLOCK_HS_MULTI)
+#if defined(CLOCK_HSE)
     RCC->CR |= (RCC_CR_HSION | RCC_CR_HSEON);
 
     /* MCU after reboot or poweron */
@@ -128,6 +96,7 @@ void stmclk_init_sysclk(void)
         clock_source_rdy = RCC_CR_HSERDY;
     }
 
+    /* Timeout for HSE configuration, fall back to HSI*/
     volatile int timeout = 0;
     while (!(RCC->CR & clock_source_rdy)) {
         timeout++;
@@ -137,11 +106,11 @@ void stmclk_init_sysclk(void)
         }
     }
 #else
-    /* Enable high speed clock source */
-    RCC->CR |= CLOCK_CR_SOURCE;
+    /* If HSE is not defined then run directly HSI*/
+    RCC->CR |= RCC_CR_HSION;
     /* Wait till the clock source is ready
-     * NOTE: the MCU will stay here forever if you use an external clock source and it's not connected */
-    while (!(RCC->CR & CLOCK_CR_SOURCE_RDY)) {}
+     * NOTE: no timeout for HSI, should allways be available*/
+    while (!(RCC->CR & RCC_CR_HSIRDY)) {}
 #endif
 
     /* Choose the most efficient flash configuration */
@@ -174,13 +143,6 @@ void stmclk_init_sysclk(void)
     /* Wait until the Voltage Regulator is ready */
     while((PWR->CSR & PWR_CSR_VOSF) != 0) {}
 
-    /* Enable low-power run if permitted */
-#if CLOCK_MSI
-    if ((CLOCK_MSIRANGE == RCC_ICSCR_MSIRANGE_1) || (msi_range == RCC_ICSCR_MSIRANGE_0)) {
-        PWR->CR |= PWR_CR_LPSDSR | PWR_CR_LPRUN;
-    }
-#endif
-
     /* set AHB, APB1 and APB2 clock dividers */
     tmpreg = RCC->CFGR;
     tmpreg &= ~RCC_CFGR_HPRE;
@@ -193,7 +155,7 @@ void stmclk_init_sysclk(void)
 
 #if CLOCK_USE_PLL
     /*  PLL configuration: PLLCLK = CLOCK_SOURCE / PLL_DIV * PLL_MUL */
-#if defined(CLOCK_HS_MULTI)
+#if defined(CLOCK_PLL_MULTI)
     if (clock_source_rdy == RCC_CR_HSERDY) {
         RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | CLOCK_PLL_DIV_HSE | CLOCK_PLL_MUL_HSE);
     } else {
@@ -206,18 +168,12 @@ void stmclk_init_sysclk(void)
     RCC->CR |= RCC_CR_PLLON;
     /* Wait till PLL is ready */
     while ((RCC->CR & RCC_CR_PLLRDY) == 0) {}
-#elif CLOCK_MSI
-    tmpreg = RCC->ICSCR;
-    tmpreg &= ~(RCC_ICSCR_MSIRANGE);
-    tmpreg |= CLOCK_MSIRANGE;
-    RCC->ICSCR = tmpreg;
 #endif
 
-    /* Select system clock source */
+    /* Select system clock source and turn of other clock sources*/
     tmpreg = RCC->CFGR;
     tmpreg &= ~RCC_CFGR_SW;
 
-#if defined(CLOCK_HS_MULTI)
     uint32_t clock_cfgr_sw;
     uint32_t clock_cfgr_sw_rdy;
     uint32_t clock_disable_clocks;
@@ -231,7 +187,6 @@ void stmclk_init_sysclk(void)
         clock_cfgr_sw_rdy = RCC_CFGR_SWS_HSI;
         clock_disable_clocks = RCC_CR_HSEON | RCC_CR_MSION;
     }
-
     if (CLOCK_USE_PLL) {
         clock_cfgr_sw = RCC_CFGR_SW_PLL;
         clock_cfgr_sw_rdy = RCC_CFGR_SWS_PLL;
@@ -239,18 +194,10 @@ void stmclk_init_sysclk(void)
 
     tmpreg |= (uint32_t)clock_cfgr_sw;
     RCC->CFGR = tmpreg;
+
+    /* Wait for sysyem clock to be ready before desabling other clocks*/
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != clock_cfgr_sw_rdy) {}
     RCC->CR &= ~(clock_disable_clocks);
-#else
-    tmpreg |= (uint32_t)CLOCK_CFGR_SW;
-
-    RCC->CFGR = tmpreg;
-    /* Wait till clock is used as system clock source */
-    while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != CLOCK_CFGR_SW_RDY) {}
-
-    /* Disable other clock sources */
-    RCC->CR &= ~(CLOCK_DISABLE_OTHERS);
-#endif
 }
 
 void stmclk_switch_msi(uint32_t msi_range, uint32_t ahb_divider)
@@ -273,10 +220,10 @@ void stmclk_switch_msi(uint32_t msi_range, uint32_t ahb_divider)
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_MSI) {}
 
     if ((msi_range == RCC_ICSCR_MSIRANGE_1) || (msi_range == RCC_ICSCR_MSIRANGE_0)) {
-        /* Low-power run is only allowed at MSI Range 0 and 1 */
+        /* Low-power run is only allowed only at MSI Range 0 and 1 */
         PWR->CR |= PWR_CR_LPSDSR | PWR_CR_LPRUN;
     } else {
-        /* set Voltage Range 3 (1.2V) */
+        /* Set Voltage Range 3 (1.2V) */
         PWR->CR |= (PWR_CR_VOS_1 | PWR_CR_VOS_0);
         while((PWR->CSR & PWR_CSR_VOSF) != 0) {}
     }
