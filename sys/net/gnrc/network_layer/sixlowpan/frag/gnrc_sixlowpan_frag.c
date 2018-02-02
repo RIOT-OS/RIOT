@@ -21,6 +21,7 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/sixlowpan/internal.h"
 #include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
 #include "utlist.h"
@@ -130,11 +131,7 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
     DEBUG("6lo frag: send first fragment (datagram size: %u, "
           "datagram tag: %" PRIu16 ", fragment size: %" PRIu16 ")\n",
           (unsigned int)datagram_size, _tag, local_offset);
-    if (gnrc_netapi_send(iface->pid, frag) < 1) {
-        DEBUG("6lo frag: unable to send first fragment\n");
-        gnrc_pktbuf_release(frag);
-    }
-
+    gnrc_sixlowpan_dispatch_send(frag, NULL, 0);
     return local_offset;
 }
 
@@ -208,11 +205,7 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
           "fragment size: %" PRIu16 ")\n",
           (unsigned int)datagram_size, _tag, hdr->offset, hdr->offset << 3,
           local_offset);
-    if (gnrc_netapi_send(iface->pid, frag) < 1) {
-        DEBUG("6lo frag: unable to send subsequent fragment\n");
-        gnrc_pktbuf_release(frag);
-    }
-
+    gnrc_sixlowpan_dispatch_send(frag, NULL, 0);
     return local_offset;
 }
 

@@ -104,6 +104,7 @@
 #include "kernel_types.h"
 
 #include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/sixlowpan/internal.h"
 #include "net/gnrc/sixlowpan/iphc.h"
 #include "net/sixlowpan.h"
 
