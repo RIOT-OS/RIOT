@@ -1,4 +1,11 @@
 RIOTBASE=$(shell git rev-parse --show-toplevel)
+
+SUPPORTED_BOARD_MD=supported-boards.md
+BOARDS_MD=boards.md
+FAMILIES_MD=families.md
+AUTOGEN_DIR=src/autogen
+
+#
 # Generate list of quoted absolute include paths. Evaluated in riot.doxyfile.
 export STRIP_FROM_INC_PATH_LIST=$(shell \
     git ls-tree -dr --full-tree --name-only HEAD core drivers sys |\
@@ -18,13 +25,21 @@ endif
 .PHONY: doc
 doc: html
 
+$(AUTOGEN_DIR):
+	mkdir -p $(AUTOGEN_DIR)
+
+bootstrap:
+	sh $(RIOTBASE)/dist/tools/docgen/gen-board-docs.sh > $(AUTOGEN_DIR)/${BOARDS_MD}
+	sh $(RIOTBASE)/dist/tools/docgen/gen-family-docs.sh > $(AUTOGEN_DIR)/${FAMILIES_MD}
+	sh $(RIOTBASE)/dist/tools/docgen/gen-supported-boards.sh > $(AUTOGEN_DIR)/${SUPPORTED_BOARD_MD}
+
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
-html: src/css/riot.css src/changelog.md
+html: $(AUTOGEN_DIR) bootstrap src/css/riot.css src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
 
 .PHONY: man
-man: src/changelog.md
+man: $(AUTOGEN_DIR) bootstrap src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
 
 ifneq (,$(LESSC))
@@ -40,8 +55,8 @@ src/changelog.md: src/changelog.md.tmp ../../release-notes.txt
 	@./generate-changelog.py $+ $@
 
 .PHONY:
-latex: src/changelog.md
+latex: $(AUTOGEN_DIR) bootstrap src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
 
 clean:
-	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md
+	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md $(AUTOGEN_DIR)
