@@ -204,9 +204,9 @@ static void test_fmt_u16_dec(void)
     TEST_ASSERT_EQUAL_STRING("6556", (char *) out);
 }
 
-static void test_fmt_s32_dec(void)
+static void test_fmt_s32_dec_a(void)
 {
-    char out[6] = "-----";
+    char out[16] = "zzzzzzzzzzzzzzz";
     int32_t val = 9876;
     uint8_t chars = 0;
 
@@ -220,6 +220,24 @@ static void test_fmt_s32_dec(void)
     TEST_ASSERT_EQUAL_INT(5, chars);
     out[chars] = '\0';
     TEST_ASSERT_EQUAL_STRING("-9876", (char *) out);
+}
+
+static void test_fmt_s32_dec_b(void)
+{
+    char out[16] = "zzzzzzzzzzzzzzz";
+    int32_t val = 2147483647;
+    uint8_t chars = 0;
+
+    chars = fmt_s32_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(10, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("2147483647", (char *) out);
+
+    val = -2147483648;
+    chars = fmt_s32_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(11, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("-2147483648", (char *) out);
 }
 
 static void test_fmt_u64_dec_a(void)
@@ -480,7 +498,8 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_u64_dec_b),
         new_TestFixture(test_fmt_u64_dec_c),
         new_TestFixture(test_fmt_u16_dec),
-        new_TestFixture(test_fmt_s32_dec),
+        new_TestFixture(test_fmt_s32_dec_a),
+        new_TestFixture(test_fmt_s32_dec_b),
         new_TestFixture(test_fmt_s16_dec),
         new_TestFixture(test_fmt_s16_dfp),
         new_TestFixture(test_fmt_s32_dfp),
