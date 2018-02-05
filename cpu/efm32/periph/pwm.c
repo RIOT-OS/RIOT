@@ -52,6 +52,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     init.enable = false;
     init.prescale = prescaler;
+    init.mode = (TIMER_Mode_TypeDef) mode;
 
     TIMER_Reset(pwm_config[dev].dev);
     TIMER_Init(pwm_config[dev].dev, &init);
