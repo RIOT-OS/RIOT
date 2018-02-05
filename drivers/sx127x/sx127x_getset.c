@@ -26,6 +26,8 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
+#include "net/lora.h"
+
 #include "sx127x.h"
 #include "sx127x_registers.h"
 #include "sx127x_internal.h"
@@ -63,6 +65,20 @@ void sx127x_set_state(sx127x_t *dev, uint8_t state)
 
 void sx127x_set_modem(sx127x_t *dev, uint8_t modem)
 {
+    if ((sx127x_reg_read(dev, SX127X_REG_OPMODE) & SX127X_RF_LORA_OPMODE_LONGRANGEMODE_ON) != 0) {
+        dev->settings.modem = SX127X_MODEM_LORA;
+    }
+    else {
+        dev->settings.modem = SX127X_MODEM_FSK;
+    }
+
+    /* Skip if unchanged to avoid resetting the transceiver below (may end up
+     * in crashes) */
+    if (dev->settings.modem == modem) {
+        DEBUG("[DEBUG] already using modem: %d\n", modem);
+        return;
+    }
+
     DEBUG("[DEBUG] set modem: %d\n", modem);
 
     dev->settings.modem = modem;
@@ -93,7 +109,7 @@ uint8_t sx127x_get_syncword(const sx127x_t *dev)
 
 void sx127x_set_syncword(sx127x_t *dev, uint8_t syncword)
 {
-    DEBUG("[DEBUG] Set syncword: %d\n", syncword);
+    DEBUG("[DEBUG] Set syncword: %02x\n", syncword);
 
     sx127x_reg_write(dev, SX127X_REG_LR_SYNCWORD, syncword);
 }
@@ -102,7 +118,7 @@ uint32_t sx127x_get_channel(const sx127x_t *dev)
 {
     return (((uint32_t)sx127x_reg_read(dev, SX127X_REG_FRFMSB) << 16) |
             (sx127x_reg_read(dev, SX127X_REG_FRFMID) << 8) |
-            (sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * SX127X_FREQUENCY_RESOLUTION;
+            (sx127x_reg_read(dev, SX127X_REG_FRFLSB))) * LORA_FREQUENCY_RESOLUTION_DEFAULT;
 }
 
 void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
@@ -112,7 +128,7 @@ void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
     /* Save current operating mode */
     dev->settings.channel = channel;
 
-    channel = (uint32_t)((double) channel / (double) SX127X_FREQUENCY_RESOLUTION);
+    channel = (uint32_t)((double) channel / (double)LORA_FREQUENCY_RESOLUTION_DEFAULT);
 
     /* Write frequency settings into chip */
     sx127x_reg_write(dev, SX127X_REG_FRFMSB, (uint8_t)((channel >> 16) & 0xFF));
@@ -134,13 +150,13 @@ uint32_t sx127x_get_time_on_air(const sx127x_t *dev, uint8_t pkt_len)
 
             /* Note: When using LoRa modem only bandwidths 125, 250 and 500 kHz are supported. */
             switch (dev->settings.lora.bandwidth) {
-                case SX127X_BW_125_KHZ:
+                case LORA_BW_125_KHZ:
                     bw = 125e3;
                     break;
-                case SX127X_BW_250_KHZ:
+                case LORA_BW_250_KHZ:
                     bw = 250e3;
                     break;
-                case SX127X_BW_500_KHZ:
+                case LORA_BW_500_KHZ:
                     bw = 500e3;
                     break;
                 default:
@@ -215,6 +231,12 @@ void sx127x_set_rx(sx127x_t *dev)
             break;
         case SX127X_MODEM_LORA:
         {
+            sx127x_reg_write(dev, SX127X_REG_LR_INVERTIQ,
+                             ((sx127x_reg_read(dev, SX127X_REG_LR_INVERTIQ) &
+                               SX127X_RF_LORA_INVERTIQ_TX_MASK &
+                               SX127X_RF_LORA_INVERTIQ_RX_MASK) |
+                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ_RX_ON :SX127X_RF_LORA_INVERTIQ_RX_OFF) |
+                              SX127X_RF_LORA_INVERTIQ_TX_OFF));
             sx127x_reg_write(dev, SX127X_REG_LR_INVERTIQ2,
                              ((dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG) ? SX127X_RF_LORA_INVERTIQ2_ON : SX127X_RF_LORA_INVERTIQ2_OFF));
 
@@ -225,10 +247,10 @@ void sx127x_set_rx(sx127x_t *dev)
                                  sx127x_reg_read(dev, SX127X_REG_LR_DETECTOPTIMIZE) & 0x7F);
                 sx127x_reg_write(dev, SX127X_REG_LR_TEST30, 0x00);
                 switch (dev->settings.lora.bandwidth) {
-                    case SX127X_BW_125_KHZ: /* 125 kHz */
+                    case LORA_BW_125_KHZ: /* 125 kHz */
                         sx127x_reg_write(dev, SX127X_REG_LR_TEST2F, 0x40);
                         break;
-                    case SX127X_BW_250_KHZ: /* 250 kHz */
+                    case LORA_BW_250_KHZ: /* 250 kHz */
                         sx127x_reg_write(dev, SX127X_REG_LR_TEST2F, 0x40);
                         break;
 
@@ -287,9 +309,8 @@ void sx127x_set_rx(sx127x_t *dev)
     }
 
     sx127x_set_state(dev, SX127X_RF_RX_RUNNING);
-    if (dev->settings.window_timeout != 0) {
-        xtimer_set(&(dev->_internal.rx_timeout_timer),
-                   dev->settings.window_timeout);
+    if (dev->settings.lora.rx_timeout != 0) {
+        xtimer_set(&(dev->_internal.rx_timeout_timer), dev->settings.lora.rx_timeout);
     }
 
     if (dev->settings.lora.flags & SX127X_RX_CONTINUOUS_FLAG) {
@@ -350,9 +371,8 @@ void sx127x_set_tx(sx127x_t *dev)
     }
 
     sx127x_set_state(dev, SX127X_RF_RX_RUNNING);
-    if (dev->settings.window_timeout != 0) {
-        xtimer_set(&(dev->_internal.tx_timeout_timer),
-                   dev->settings.window_timeout);
+    if (dev->settings.lora.tx_timeout != 0) {
+        xtimer_set(&(dev->_internal.tx_timeout_timer), dev->settings.lora.tx_timeout);
     }
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_TRANSMITTER );
 }
@@ -401,6 +421,9 @@ void sx127x_set_op_mode(const sx127x_t *dev, uint8_t op_mode)
     case SX127X_RF_OPMODE_STANDBY:
         DEBUG("[DEBUG] Set op mode: STANDBY\n");
         break;
+    case SX127X_RF_OPMODE_RECEIVER_SINGLE:
+        DEBUG("[DEBUG] Set op mode: RECEIVER SINGLE\n");
+        break;
     case SX127X_RF_OPMODE_RECEIVER:
         DEBUG("[DEBUG] Set op mode: RECEIVER\n");
         break;
@@ -408,7 +431,7 @@ void sx127x_set_op_mode(const sx127x_t *dev, uint8_t op_mode)
         DEBUG("[DEBUG] Set op mode: TRANSMITTER\n");
         break;
     default:
-        DEBUG("[DEBUG] Set op mode: UNKNOWN\n");
+        DEBUG("[DEBUG] Set op mode: UNKNOWN (%d)\n", op_mode);
         break;
     }
 #endif
@@ -423,13 +446,13 @@ uint8_t sx127x_get_bandwidth(const sx127x_t *dev)
     return dev->settings.lora.bandwidth;
 }
 
-inline void _low_datarate_optimize(sx127x_t *dev)
+static void _low_datarate_optimize(sx127x_t *dev)
 {
-    if ( ((dev->settings.lora.bandwidth == SX127X_BW_125_KHZ) &&
-          ((dev->settings.lora.datarate == SX127X_SF11) ||
-           (dev->settings.lora.datarate == SX127X_SF12))) ||
-         ((dev->settings.lora.bandwidth == SX127X_BW_250_KHZ) &&
-          (dev->settings.lora.datarate == SX127X_SF12))) {
+    if ( ((dev->settings.lora.bandwidth == LORA_BW_125_KHZ) &&
+          ((dev->settings.lora.datarate == LORA_SF11) ||
+           (dev->settings.lora.datarate == LORA_SF12))) ||
+         ((dev->settings.lora.bandwidth == LORA_BW_250_KHZ) &&
+          (dev->settings.lora.datarate == LORA_SF12))) {
         dev->settings.lora.flags |= SX127X_LOW_DATARATE_OPTIMIZE_FLAG;
     } else {
         dev->settings.lora.flags &= ~SX127X_LOW_DATARATE_OPTIMIZE_FLAG;
@@ -448,19 +471,19 @@ inline void _low_datarate_optimize(sx127x_t *dev)
 #endif
 }
 
-inline void _update_bandwidth(const sx127x_t *dev)
+static void _update_bandwidth(const sx127x_t *dev)
 {
     uint8_t config1_reg = sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG1);
 #if defined(MODULE_SX1272)
     config1_reg &= SX1272_RF_LORA_MODEMCONFIG1_BW_MASK;
     switch (dev->settings.lora.bandwidth) {
-    case SX127X_BW_125_KHZ:
+    case LORA_BW_125_KHZ:
         config1_reg |=  SX1272_RF_LORA_MODEMCONFIG1_BW_125_KHZ;
         break;
-    case SX127X_BW_250_KHZ:
+    case LORA_BW_250_KHZ:
         config1_reg |=  SX1272_RF_LORA_MODEMCONFIG1_BW_250_KHZ;
         break;
-    case SX127X_BW_500_KHZ:
+    case LORA_BW_500_KHZ:
         config1_reg |=  SX1272_RF_LORA_MODEMCONFIG1_BW_500_KHZ;
         break;
     default:
@@ -470,13 +493,13 @@ inline void _update_bandwidth(const sx127x_t *dev)
 #else /* MODULE_SX1276 */
     config1_reg &= SX1276_RF_LORA_MODEMCONFIG1_BW_MASK;
     switch (dev->settings.lora.bandwidth) {
-    case SX127X_BW_125_KHZ:
+    case LORA_BW_125_KHZ:
         config1_reg |= SX1276_RF_LORA_MODEMCONFIG1_BW_125_KHZ;
         break;
-    case SX127X_BW_250_KHZ:
+    case LORA_BW_250_KHZ:
         config1_reg |=  SX1276_RF_LORA_MODEMCONFIG1_BW_250_KHZ;
         break;
-    case SX127X_BW_500_KHZ:
+    case LORA_BW_500_KHZ:
         config1_reg |=  SX1276_RF_LORA_MODEMCONFIG1_BW_500_KHZ;
         break;
     default:
@@ -498,13 +521,13 @@ void sx127x_set_bandwidth(sx127x_t *dev, uint8_t bandwidth)
     _low_datarate_optimize(dev);
 
     /* ERRATA sensitivity tweaks */
-    if ((dev->settings.lora.bandwidth == SX127X_BW_500_KHZ) &&
+    if ((dev->settings.lora.bandwidth == LORA_BW_500_KHZ) &&
         (dev->settings.channel > SX127X_RF_MID_BAND_THRESH)) {
         /* ERRATA 2.1 - Sensitivity Optimization with a 500 kHz Bandwidth */
         sx127x_reg_write(dev, SX127X_REG_LR_TEST36, 0x02);
         sx127x_reg_write(dev, SX127X_REG_LR_TEST3A, 0x64);
     }
-    else if (dev->settings.lora.bandwidth == SX127X_BW_500_KHZ) {
+    else if (dev->settings.lora.bandwidth == LORA_BW_500_KHZ) {
         /* ERRATA 2.1 - Sensitivity Optimization with a 500 kHz Bandwidth */
         sx127x_reg_write(dev, SX127X_REG_LR_TEST36, 0x02);
         sx127x_reg_write(dev, SX127X_REG_LR_TEST3A, 0x7F);
@@ -524,7 +547,7 @@ void sx127x_set_spreading_factor(sx127x_t *dev, uint8_t datarate)
 {
     DEBUG("[DEBUG] Set spreading factor: %d\n", datarate);
 
-    if (datarate == SX127X_SF6 &&
+    if (datarate == LORA_SF6 &&
         !(dev->settings.lora.flags & SX127X_ENABLE_FIXED_HEADER_LENGTH_FLAG)) {
         /* SF 6 is only valid when using explicit header mode */
         DEBUG("Spreading Factor 6 can only be used when explicit header "
@@ -543,7 +566,7 @@ void sx127x_set_spreading_factor(sx127x_t *dev, uint8_t datarate)
     _low_datarate_optimize(dev);
 
     switch(dev->settings.lora.datarate) {
-    case SX127X_SF6:
+    case LORA_SF6:
         sx127x_reg_write(dev, SX127X_REG_LR_DETECTOPTIMIZE,
                          SX127X_RF_LORA_DETECTIONOPTIMIZE_SF6);
         sx127x_reg_write(dev, SX127X_REG_LR_DETECTIONTHRESHOLD,
@@ -708,7 +731,7 @@ uint8_t sx127x_get_tx_power(const sx127x_t *dev)
     return dev->settings.lora.power;
 }
 
-void sx127x_set_tx_power(sx127x_t *dev, uint8_t power)
+void sx127x_set_tx_power(sx127x_t *dev, int8_t power)
 {
     DEBUG("[DEBUG] Set power: %d\n", power);
 
@@ -823,6 +846,11 @@ void sx127x_set_symbol_timeout(sx127x_t *dev, uint16_t timeout)
     config2_reg |= (timeout >> 8) & ~SX127X_RF_LORA_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK;
     sx127x_reg_write(dev, SX127X_REG_LR_MODEMCONFIG2, config2_reg);
     sx127x_reg_write(dev, SX127X_REG_LR_SYMBTIMEOUTLSB,timeout & 0xFF);
+}
+
+bool sx127x_get_iq_invert(const sx127x_t *dev)
+{
+    return dev->settings.lora.flags & SX127X_IQ_INVERTED_FLAG;
 }
 
 void sx127x_set_iq_invert(sx127x_t *dev, bool iq_invert)

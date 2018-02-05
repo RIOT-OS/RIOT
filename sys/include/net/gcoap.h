@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Ken Bannister. All rights reserved.
+ * Copyright (c) 2015-2017 Ken Bannister. All rights reserved.
  *               2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -92,9 +92,11 @@
  *
  * Allocate a buffer and a coap_pkt_t for the request.
  *
- * If there is a payload, follow the three steps below.
+ * If there is a payload, follow the steps below.
  *
  * -# Call gcoap_req_init() to initialize the request.
+ *    -# Optionally, mark the request confirmable by calling
+ *       coap_hdr_set_type() with COAP_TYPE_CON.
  * -# Write the request payload, starting at the updated _payload_ pointer
  *    in the coap_pkt_t.
  * -# Call gcoap_finish(), which updates the packet for the payload.
@@ -212,9 +214,11 @@
 
 #include <stdint.h>
 #include <stdatomic.h>
+
+#include "net/ipv6/addr.h"
 #include "net/sock/udp.h"
 #include "mutex.h"
-#include "nanocoap.h"
+#include "net/nanocoap.h"
 #include "xtimer.h"
 
 #ifdef __cplusplus
@@ -236,15 +240,17 @@ extern "C" {
 /**
  * @brief   Size of the buffer used to build a CoAP request or response
  */
+#ifndef GCOAP_PDU_BUF_SIZE
 #define GCOAP_PDU_BUF_SIZE      (128)
+#endif
 
 /**
  * @brief   Size of the buffer used to write options, other than Uri-Path, in a
  *          request
  *
- * Accommodates Content-Format.
+ * Accommodates Content-Format and Uri-Queries
  */
-#define GCOAP_REQ_OPTIONS_BUF   (8)
+#define GCOAP_REQ_OPTIONS_BUF   (40)
 
 /**
  * @brief   Size of the buffer used to write options in a response
@@ -263,7 +269,9 @@ extern "C" {
 /**
  * @brief   Maximum number of requests awaiting a response
  */
+#ifndef GCOAP_REQ_WAITING_MAX
 #define GCOAP_REQ_WAITING_MAX   (2)
+#endif
 
 /**
  * @brief   Maximum length in bytes for a token
@@ -299,16 +307,25 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   Value for send_limit in request memo when non-confirmable type
+ */
+#define GCOAP_SEND_LIMIT_NON    (-1)
+
+/**
  * @brief   Time in usec that the event loop waits for an incoming CoAP message
  */
+#ifndef GCOAP_RECV_TIMEOUT
 #define GCOAP_RECV_TIMEOUT      (1 * US_PER_SEC)
+#endif
 
 /**
  * @brief   Default time to wait for a non-confirmable response [in usec]
  *
  * Set to 0 to disable timeout.
  */
+#ifndef GCOAP_NON_TIMEOUT
 #define GCOAP_NON_TIMEOUT       (5000000U)
+#endif
 
 /**
  * @brief   Identifies waiting timed out for a response to a sent message
@@ -398,6 +415,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Count of PDU buffers available for resending confirmable messages
+ */
+#ifndef GCOAP_RESEND_BUFS_MAX
+#define GCOAP_RESEND_BUFS_MAX      (1)
+#endif
+
+/**
  * @brief   A modular collection of resources for a server
  */
 typedef struct gcoap_listener {
@@ -413,15 +437,31 @@ typedef struct gcoap_listener {
  *
  * If request timed out, the packet header is for the request.
  */
-typedef void (*gcoap_resp_handler_t)(unsigned req_state, coap_pkt_t* pdu);
+typedef void (*gcoap_resp_handler_t)(unsigned req_state, coap_pkt_t* pdu,
+                                     sock_udp_ep_t *remote);
+
+/**
+ * @brief  Extends request memo for resending a confirmable request.
+ */
+typedef struct {
+    uint8_t *pdu_buf;                   /**< Buffer containing the PDU */
+    size_t pdu_len;                     /**< Length of pdu_buf */
+} gcoap_resend_t;
 
 /**
  * @brief   Memo to handle a response for a request
  */
 typedef struct {
     unsigned state;                     /**< State of this memo, a GCOAP_MEMO... */
-    uint8_t hdr_buf[GCOAP_HEADER_MAXLEN];
-                                        /**< Stores a copy of the request header */
+    int send_limit;                     /**< Remaining resends, 0 if none;
+                                             GCOAP_SEND_LIMIT_NON if non-confirmable */
+    union {
+        uint8_t hdr_buf[GCOAP_HEADER_MAXLEN];
+                                        /**< Copy of PDU header, if no resends */
+        gcoap_resend_t data;            /**< Endpoint and PDU buffer, for resend */
+    } msg;                              /**< Request message data; if confirmable,
+                                             supports resending message */
+    sock_udp_ep_t remote_ep;            /**< Remote endpoint */
     gcoap_resp_handler_t resp_handler;  /**< Callback for the response */
     xtimer_t response_timer;            /**< Limits wait for response */
     msg_t timeout_msg;                  /**< For response timer */
@@ -453,6 +493,10 @@ typedef struct {
                                              observe memos */
     gcoap_observe_memo_t observe_memos[GCOAP_OBS_REGISTRATIONS_MAX];
                                         /**< Observed resource registrations */
+    uint8_t resend_bufs[GCOAP_RESEND_BUFS_MAX][GCOAP_PDU_BUF_SIZE];
+                                        /**< Buffers for PDU for request resends;
+                                             if first byte of an entry is zero,
+                                             the entry is available */
 } gcoap_state_t;
 
 /**
@@ -632,6 +676,43 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
  * @return  count of unanswered requests
  */
 uint8_t gcoap_op_state(void);
+
+/**
+ * @brief   Get the resource list, currently only `CoRE Link Format`
+ *          (COAP_FORMAT_LINK) supported
+ *
+ * If @p buf := NULL, nothing will be written but the size of the resulting
+ * resource list is computed and returned.
+ *
+ * @param[out] buf      output buffer to write resource list into, my be NULL
+ * @param[in]  maxlen   length of @p buf, ignored if @p buf is NULL
+ * @param[in]  cf       content format to use for the resource list, currently
+ *                      only COAP_FORMAT_LINK supported
+ *
+ * @todo    add support for `JSON CoRE Link Format`
+ * @todo    add support for 'CBOR CoRE Link Format`
+ *
+ * @return  the number of bytes written to @p buf
+ * @return  -1 on error
+ */
+int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf);
+
+/**
+ * @brief   Adds a single Uri-Query option to a CoAP request
+ *
+ * To add multiple Uri-Query options, simply call this function multiple times.
+ * The Uri-Query options will be added in the order those calls.
+ *
+ * @param[out] pdu      The package that is being build
+ * @param[in]  key      Key to add to the query string
+ * @param[in]  val      Value to assign to @p key (may be NULL)
+ *
+ * @pre     ((pdu != NULL) && (key != NULL))
+ *
+ * @return  overall length of new query string
+ * @return  -1 on error
+ */
+int gcoap_add_qstring(coap_pkt_t *pdu, const char *key, const char *val);
 
 #ifdef __cplusplus
 }

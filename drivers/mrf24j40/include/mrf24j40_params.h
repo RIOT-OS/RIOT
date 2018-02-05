@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the MRF24J40 driver
+ * @name    Set default configuration parameters for the MRF24J40 driver
  * @{
  */
 #ifndef MRF24J40_PARAM_SPI

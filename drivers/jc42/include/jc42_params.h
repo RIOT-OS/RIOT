@@ -21,6 +21,7 @@
 #ifndef JC42_PARAMS_H
 #define JC42_PARAMS_H
 
+#include "board.h"
 #include "jc42.h"
 #include "periph/i2c.h"
 
@@ -29,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the JC42
+ * @name    Set default configuration parameters for the JC42
  * @{
  */
 #ifndef JC42_PARAM_I2C_DEV

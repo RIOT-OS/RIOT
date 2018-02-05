@@ -12,9 +12,11 @@ SOFTDEVICE := components/softdevice/s1xx_iot/s1xx-iot-prototype3_nrf52_softdevic
 BLE_6LOWPAN_LIB := components/iot/ble_6lowpan/lib/ble_6lowpan.a
 MODULE_MAKEFILE := $(PKG_DIR)/Makefile.module
 
-.PHONY: all clean distclean
+.PHONY: all prepare clean distclean
 
 all: $(BINDIR)/ble_6lowpan.a $(BINDIR)/softdevice.hex
+
+prepare: $(PKG_SRCDIR)/.extracted
 
 $(BINDIR)/ble_6lowpan.a: $(PKG_SRCDIR)/.extracted
 	cp $(PKG_SRCDIR)/$(BLE_6LOWPAN_LIB) $@

@@ -1,16 +1,12 @@
-ifneq (,$(filter fatfs_diskio_sdcard_spi,$(USEMODULE)))
-  USEMODULE += sdcard_spi
-endif
-
-ifneq (,$(filter fatfs,$(USEPKG)))
-  USEMODULE += fatfs_diskio_common
-endif
+USEMODULE += fatfs_diskio_mtd
+USEMODULE += auto_init_storage
+USEMODULE += mtd
 
 include $(RIOTBASE)/boards/$(BOARD)/Makefile.features
 
 #if periph_rtc is available use it. Otherwise use static timestamps
 ifneq (, $(filter periph_rtc, $(FEATURES_PROVIDED)))
-   export CFLAGS+= -DFATFS_FFCONF_OPT_FS_NORTC=0
+  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=0
 else
-	export CFLAGS+= -DFATFS_FFCONF_OPT_FS_NORTC=1
+  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=1
 endif

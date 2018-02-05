@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-#include "net/gnrc/ipv6/netif.h"
+#include "byteorder.h"
 #include "net/ipv6/addr.h"
 #include "xtimer.h"
 #include "trickle.h"
@@ -190,14 +190,16 @@ typedef struct __attribute__((packed)) {
  *      </a>
  */
 typedef struct __attribute__((packed)) {
-    uint8_t type;               /**< option type */
-    uint8_t length;             /**< option length without the first two bytes */
-    uint8_t prefix_len;         /**< prefix length */
-    uint8_t LAR_flags;          /**< flags and resereved */
-    uint32_t valid_lifetime;    /**< valid lifetime */
-    uint32_t pref_lifetime;     /**< preferred lifetime */
-    uint32_t reserved;          /**< reserved */
-    ipv6_addr_t prefix;         /**< prefix used for Stateless Address Autoconfiguration */
+    uint8_t type;                       /**< option type */
+    uint8_t length;                     /**< option length without the first
+                                         *   two bytes */
+    uint8_t prefix_len;                 /**< prefix length */
+    uint8_t LAR_flags;                  /**< flags and resereved */
+    network_uint32_t valid_lifetime;    /**< valid lifetime */
+    network_uint32_t pref_lifetime;     /**< preferred lifetime */
+    uint32_t reserved;                  /**< reserved */
+    ipv6_addr_t prefix;                 /**< prefix used for Stateless Address
+                                         *   Autoconfiguration */
 } gnrc_rpl_opt_prefix_info_t;
 
 /**
@@ -238,7 +240,24 @@ struct gnrc_rpl_parent {
 typedef struct {
     uint16_t ocp;   /**< objective code point */
     uint16_t (*calc_rank)(gnrc_rpl_parent_t *parent, uint16_t base_rank); /**< calculate the rank */
-    gnrc_rpl_parent_t *(*which_parent)(gnrc_rpl_parent_t *, gnrc_rpl_parent_t *); /**< compare for parents */
+    gnrc_rpl_parent_t *(*which_parent)(gnrc_rpl_parent_t *, gnrc_rpl_parent_t *); /**< retrieve the better parent */
+
+    /**
+     * @brief   Compare two @ref gnrc_rpl_parent_t.
+     *
+     * Compares two parents based on the rank calculated by the objective
+     * function. This function is used to determine the parent list order. The
+     * parents are ordered from the preferred parent to the least preferred
+     * parent.
+     *
+     * @param[in] parent1 First parent to compare.
+     * @param[in] parent2 Second parent to compare.
+     *
+     * @return      Zero if the parents are of equal preference.
+     * @return      Positive, if the second parent is preferred.
+     * @return      Negative, if the first parent is preferred.
+     */
+    int (*parent_cmp)(gnrc_rpl_parent_t *parent1, gnrc_rpl_parent_t *parent2);
     gnrc_rpl_dodag_t *(*which_dodag)(gnrc_rpl_dodag_t *, gnrc_rpl_dodag_t *); /**< compare for dodags */
     void (*reset)(gnrc_rpl_dodag_t *);    /**< resets the OF */
     void (*parent_state_callback)(gnrc_rpl_parent_t *, int, int); /**< retrieves the state of a parent*/
@@ -251,7 +270,6 @@ typedef struct {
  */
 struct gnrc_rpl_dodag {
     ipv6_addr_t dodag_id;           /**< id of the DODAG */
-    gnrc_ipv6_netif_addr_t *netif_addr; /**< netif address for this DODAG */
     gnrc_rpl_parent_t *parents;     /**< pointer to the parents list of this DODAG */
     gnrc_rpl_instance_t *instance;  /**< pointer to the instance that this dodag is part of */
     uint8_t dtsn;                   /**< DAO Trigger Sequence Number */

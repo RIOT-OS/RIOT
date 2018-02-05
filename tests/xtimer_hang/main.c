@@ -29,9 +29,8 @@
 #include "thread.h"
 #include "log.h"
 
-#define TEST_SECONDS            (10LU)
-#define TEST_TIME               (TEST_SECONDS * US_PER_SEC)
-#define TEST_INTERVAL           (100LU)
+#define TEST_TIME_S             (10LU)
+#define TEST_INTERVAL_MS        (100LU)
 #define TEST_TIMER_STACKSIZE    (THREAD_STACKSIZE_DEFAULT)
 
 char stack_timer1[TEST_TIMER_STACKSIZE];
@@ -58,16 +57,16 @@ int main(void)
                   3, THREAD_CREATE_STACKTEST,
                   timer_func, &sleep_timer2, "timer2");
 
-    uint32_t ticks_now = 0;
-    uint32_t ticks_start = _xtimer_now();
-    uint32_t ticks_until = ticks_start + _xtimer_ticks_from_usec(TEST_TIME);
-
+    uint32_t now = 0;
+    uint32_t start = xtimer_now_usec();
+    uint32_t until = start + (TEST_TIME_S * US_PER_SEC);
     puts("[START]");
-    while((ticks_now = _xtimer_now()) < ticks_until) {
-        uint8_t percent = 100*(ticks_now - ticks_start)/(ticks_until - ticks_start);
-        xtimer_usleep(TEST_INTERVAL * US_PER_MS);
-        printf("Testing... (%u%%)\n", percent);
+    while((now = xtimer_now_usec()) < until) {
+        unsigned percent = (100 * (now - start)) / (until - start);
+        xtimer_usleep(TEST_INTERVAL_MS * US_PER_MS);
+        printf("Testing (%3u%%)\n", percent);
     }
+    puts("Testing (100%)");
     puts("[SUCCESS]");
     return 0;
 }

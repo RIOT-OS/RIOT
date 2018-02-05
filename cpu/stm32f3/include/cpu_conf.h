@@ -32,8 +32,7 @@
 #include "vendor/stm32f303xe.h"
 #elif defined(CPU_MODEL_STM32F303K8)
 #include "vendor/stm32f303x8.h"
-#endif
-#ifdef CPU_MODEL_STM32F302R8
+#elif defined(CPU_MODEL_STM32F302R8)
 #include "vendor/stm32f302x8.h"
 #endif
 #ifdef __cplusplus
@@ -45,7 +44,11 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
+#if defined(CPU_MODEL_STM32F303RE) || defined (CPU_MODEL_STM32F303ZE)
+#define CPU_IRQ_NUMOF                   (85U)
+#else
 #define CPU_IRQ_NUMOF                   (82U)
+#endif
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 

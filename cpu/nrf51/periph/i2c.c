@@ -37,8 +37,6 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-#ifdef I2C_NUMOF
-
 /**
  * @brief   If any of the 4 lower bits are set, the speed value is invalid
  */
@@ -69,9 +67,13 @@ static int error(i2c_t bus)
 
 static int write(i2c_t bus, uint8_t addr, const void *data, int len, int stop)
 {
+    assert(len > 0);
+    if (!(bus < I2C_NUMOF)) {
+        return -1;
+    }
+
     uint8_t *buf = (uint8_t *)data;
 
-    assert((bus <= I2C_NUMOF) && (len > 0));
     DEBUG("i2c: writing %i byte to the bus\n", len);
 
     dev(bus)->ADDRESS = (addr & 0x7f);
@@ -100,7 +102,7 @@ static int write(i2c_t bus, uint8_t addr, const void *data, int len, int stop)
 
 int i2c_init_master(i2c_t bus, i2c_speed_t speed)
 {
-    if (bus >= I2C_NUMOF) {
+    if (!(bus < I2C_NUMOF)) {
         return -1;
     }
     if (speed & INVALID_SPEED_MASK) {
@@ -130,14 +132,18 @@ int i2c_init_master(i2c_t bus, i2c_speed_t speed)
 
 int i2c_acquire(i2c_t bus)
 {
-    assert(bus <= I2C_NUMOF);
+    if (!(bus < I2C_NUMOF)) {
+        return -1;
+    }
     mutex_lock(&locks[bus]);
     return 0;
 }
 
 int i2c_release(i2c_t bus)
 {
-    assert(bus <= I2C_NUMOF);
+    if (!(bus < I2C_NUMOF)) {
+        return -1;
+    }
     mutex_unlock(&locks[bus]);
     return 0;
 }
@@ -149,9 +155,12 @@ int i2c_read_byte(i2c_t bus, uint8_t address, void *data)
 
 int i2c_read_bytes(i2c_t bus, uint8_t address, void *data, int length)
 {
+    assert(length > 0);
+    if (!(bus < I2C_NUMOF)) {
+        return -1;
+    }
     uint8_t *in_buf = (uint8_t *)data;
 
-    assert((bus <= I2C_NUMOF) && (length > 0));
     DEBUG("[i2c] reading %i byte from the bus\n", length);
 
     /* set the client address */
@@ -230,5 +239,3 @@ int i2c_write_regs(i2c_t bus, uint8_t address, uint8_t reg,
     write(bus, address, &reg, 1, 0);
     return write(bus, address, data, length, 1);
 }
-
-#endif /* I2C_NUMOF */

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_mag3110
+ * @ingroup     drivers_mag3110
  * @{
  *
  * @file

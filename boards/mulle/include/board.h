@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_mulle Eistec Mulle
  * @ingroup     boards
- * @brief       Board specific files for Eistec Mulle IoT boards
+ * @brief       Support for Eistec Mulle IoT boards
  * @{
  *
  * @file
@@ -40,36 +40,31 @@
 #define UART_STDIO_DEV      UART_DEV(1)
 
 /**
- * @brief   xtimer configuration
+ * @name    xtimer configuration
  * @{
  */
 #if 0
 /* LPTMR xtimer configuration */
 /* WIP, Use PIT for now */
 #define XTIMER_DEV                  (TIMER_LPTMR_DEV(0))
-#define XTIMER_CHAN                 (0)
 /* LPTMR is 16 bits wide */
 #define XTIMER_WIDTH                (16)
 #define XTIMER_BACKOFF              (4)
 #define XTIMER_ISR_BACKOFF          (4)
 #define XTIMER_OVERHEAD             (3)
 #define XTIMER_HZ                   (32768ul)
-#define XTIMER_SHIFT                (0)
 #else
 /* PIT xtimer configuration */
 #define XTIMER_DEV                  (TIMER_PIT_DEV(0))
 #define XTIMER_CHAN                 (0)
-#define XTIMER_WIDTH                (32)
 #define XTIMER_BACKOFF              (40)
 #define XTIMER_ISR_BACKOFF          (40)
 #define XTIMER_OVERHEAD             (30)
-#define XTIMER_HZ                   (1000000ul)
-#define XTIMER_SHIFT                (0)
 #endif
 /** @} */
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED_PORT            PTC
@@ -128,7 +123,7 @@ void board_init(void);
  */
 #define LIS3DH_INT1                 GPIO_PIN(PORT_C, 18)
 #define LIS3DH_INT2                 GPIO_PIN(PORT_C, 17)
-#define LIS3DH_CS                   GPIO_PIN(PORT_D, 0)
+#define LIS3DH_CS                   SPI_HWCS(0)
 #define LIS3DH_CLK                  SPI_CLK_5MHZ
 #define LIS3DH_SPI                  SPI_DEV(0)
 /** @} */
@@ -176,32 +171,5 @@ extern mtd_dev_t *mtd0;
 #define MULLE_VBAT_ADC_LINE           ADC_LINE(6)
 #define MULLE_VCHR_ADC_LINE           ADC_LINE(7)
 /** @} */
-
-/**
- * @name K60 clock dividers
- */
-/** @{ */
-/**
- * System clock divider setting, the actual hardware register value, see reference manual for details.
- */
-#define CONFIG_CLOCK_K60_SYS_DIV 0x00
-
-/**
- * Bus clock divider setting, the actual hardware register value, see reference manual for details
- */
-#define CONFIG_CLOCK_K60_BUS_DIV 0x01
-
-/**
- * Flexbus clock divider setting, the actual hardware register value, see reference manual for details
- */
-#define CONFIG_CLOCK_K60_FB_DIV 0x01
-
-/**
- * Flash clock divider setting, the actual hardware register value, see reference manual for details
- */
-#define CONFIG_CLOCK_K60_FLASH_DIV 0x03
-
-/** @} */
-
 #endif /* BOARD_H */
 /** @} */

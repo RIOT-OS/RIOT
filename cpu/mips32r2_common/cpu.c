@@ -15,10 +15,12 @@
 
 #include "periph/uart.h"
 #include "periph/timer.h"
-#include "arch/panic_arch.h"
+#include "periph/init.h"
+#include "panic.h"
 #include "kernel_init.h"
 #include "cpu.h"
 #include "board.h"
+
 
 void mips_start(void);
 
@@ -43,7 +45,7 @@ extern char _edata __attribute__((section("data")));
 void software_init_hook(void)
 {
 #ifdef FLASH_XIP
-    /* copy initialised data from its LMA to VMA */
+    /* copy initialized data from its LMA to VMA */
     memcpy(&_fdata, &_rom_data_copy, (int)&_edata - (int)&_fdata);
 #endif
 
@@ -70,4 +72,10 @@ void panic_arch(void)
     assert(0);
     while (1) {
     }
+}
+
+void cpu_init(void)
+{
+    /* trigger static peripheral initialization */
+    periph_init();
 }

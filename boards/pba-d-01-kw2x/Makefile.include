@@ -1,10 +1,10 @@
 # define the cpu used by the phyWAVE-KW22 board
-export CPU = kw2xd
+export CPU = kinetis
 
 # the pba-d-01-kw2x board can embed either a kw21d256, kw21d512 or kw22d512 cpu.
 # The default set up is kw21d256, the variable is overrideable to use the other
 # cpu if needed.
-export CPU_MODEL ?= kw21d256
+export CPU_MODEL ?= mkw21d256vha5
 
 export MCPU = cortex-m4
 
@@ -13,33 +13,33 @@ PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 .PHONY: flash
-flash: $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin
+flash: $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
 
 # Reset the default goal.
 .DEFAULT_GOAL :=
 
-export TUI = 1
-export FFLAGS = flash-elf
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
 # wdog-disable.bin is a precompiled binary which will disable the watchdog and
 # return control to the debugger (OpenOCD)
 export OPENOCD_PRE_VERIFY_CMDS += \
-  -c 'load_image $(RIOTCPU)/kinetis_common/dist/wdog-disable.bin 0x20000000 bin' \
+  -c 'load_image $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin 0x20000000 bin' \
   -c 'resume 0x20000000'
 export OPENOCD_EXTRA_INIT
-export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/kinetis_common/dist/check-fcfield-elf.sh
+export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh
+
+export DEBUG_ADAPTER ?= dap
 
 # Add board selector (USB serial) to OpenOCD options if specified.
 # Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
 #   Usage: SERIAL="0200..." BOARD="pba-d-01-kw2x" make flash
 ifneq (,$(SERIAL))
-    export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
-    SERIAL_TTY = $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL)))
-    ifeq (,$(SERIAL_TTY))
-        $(error Did not find a device with serial $(SERIAL))
-    endif
-    PORT_LINUX := $(SERIAL_TTY)
+  export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
+  SERIAL_TTY = $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL)))
+  ifeq (,$(SERIAL_TTY))
+    $(error Did not find a device with serial $(SERIAL))
+  endif
+  PORT_LINUX := $(SERIAL_TTY)
 endif
 
 # setup serial terminal

@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
- * @name JC42 register addresses
+ * @name    JC42 register addresses
  * @{
  */
 #define JC42_REG_CAP                    (0x00)
@@ -38,18 +38,15 @@ extern "C" {
 /** @} */
 
 /**
- * @name JC42 constants
+ * @name    JC42 constants
  * @{
  */
 #define JC42_BUS_FREE_TIME_US           (1U)
 /** @} */
 
-
 #ifdef __cplusplus
 }
 #endif
 
-/** @} */
-
-
 #endif /* JC42_INTERNAL_H */
+/** @} */

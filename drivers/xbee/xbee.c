@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     driver_xbee
+ * @ingroup     drivers_xbee
  * @{
  *
  * @file
@@ -277,7 +277,7 @@ static int _get_addr_long(xbee_t *dev, uint8_t *val, size_t len)
     return -ECANCELED;
 }
 
-static int _set_short_addr(xbee_t *dev, uint8_t *address)
+static int _set_short_addr(xbee_t *dev, const uint8_t *address)
 {
     uint8_t cmd[4];
     resp_t resp;
@@ -291,7 +291,7 @@ static int _set_short_addr(xbee_t *dev, uint8_t *address)
     return resp.status;
 }
 
-static int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
+static int _set_addr(xbee_t *dev, const uint8_t *val, size_t len)
 {
     uint8_t addr[2];
 
@@ -320,7 +320,7 @@ static int _set_addr(xbee_t *dev, uint8_t *val, size_t len)
     return -ECANCELED;
 }
 
-static int _set_addr_len(xbee_t *dev, uint16_t *val, size_t len)
+static int _set_addr_len(xbee_t *dev, const uint16_t *val, size_t len)
 {
     if (len != sizeof(uint16_t)) {
         return -EOVERFLOW;
@@ -369,7 +369,7 @@ static int _get_channel(xbee_t *dev, uint8_t *val, size_t max)
     return -ECANCELED;
 }
 
-static int _set_channel(xbee_t *dev, uint8_t *val, size_t len)
+static int _set_channel(xbee_t *dev, const uint8_t *val, size_t len)
 {
     uint8_t cmd[3];
     resp_t resp;
@@ -406,7 +406,7 @@ static int _get_panid(xbee_t *dev, uint8_t *val, size_t max)
     return -ECANCELED;
 }
 
-static int _set_panid(xbee_t *dev, uint8_t *val, size_t len)
+static int _set_panid(xbee_t *dev, const uint8_t *val, size_t len)
 {
     uint8_t cmd[4];
     resp_t resp;
@@ -426,7 +426,7 @@ static int _set_panid(xbee_t *dev, uint8_t *val, size_t len)
 }
 
 #ifdef MODULE_XBEE_ENCRYPTION
-static int _set_encryption(xbee_t *dev, uint8_t *val)
+static int _set_encryption(xbee_t *dev, const uint8_t *val)
 {
     uint8_t cmd[3];
     resp_t resp;
@@ -448,7 +448,7 @@ static int _set_encryption(xbee_t *dev, uint8_t *val)
     return -ECANCELED;
 }
 
-static int _set_encryption_key(xbee_t *dev, uint8_t *val, size_t len)
+static int _set_encryption_key(xbee_t *dev, const uint8_t *val, size_t len)
 {
         uint8_t cmd[18];
         resp_t resp;
@@ -689,16 +689,16 @@ static int xbee_recv(netdev_t *dev, void *buf, size_t len, void *info)
     size = (size_t)(xbee->rx_limit - 1);
     if (buf == NULL) {
         if (len > 0) {
-            DEBUG("[xbee] recv: reading size and dropping: %i\n", size);
+            DEBUG("[xbee] recv: reading size and dropping: %u\n", (unsigned)size);
             xbee->rx_count = 0;
         }
         else {
-            DEBUG("[xbee] recv: reading size without dropping: %i\n", size);
+            DEBUG("[xbee] recv: reading size without dropping: %u\n", (unsigned)size);
         }
     }
     else {
         size = (size > len) ? len : size;
-        DEBUG("[xbee] recv: consuming packet: reading %i byte\n", size);
+        DEBUG("[xbee] recv: consuming packet: reading %u byte\n", (unsigned)size);
         memcpy(buf, xbee->rx_buf, size);
         xbee->rx_count = 0;
     }
@@ -749,6 +749,10 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
                 *((uint16_t *)value) = IEEE802154_SHORT_ADDRESS_LEN;
             }
             return sizeof(uint16_t);
+        case NETOPT_DEVICE_TYPE:
+            assert(max_len == sizeof(uint16_t));
+            *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
+            return sizeof(uint16_t);
         case NETOPT_IPV6_IID:
             if (max_len < sizeof(eui64_t)) {
                 return -EOVERFLOW;
@@ -785,26 +789,26 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
     }
 }
 
-static int xbee_set(netdev_t *ndev, netopt_t opt, void *value, size_t len)
+static int xbee_set(netdev_t *ndev, netopt_t opt, const void *value, size_t len)
 {
     xbee_t *dev = (xbee_t *)ndev;
     assert(dev);
 
     switch (opt) {
         case NETOPT_ADDRESS:
-            return _set_addr(dev, (uint8_t *)value, len);
+            return _set_addr(dev, value, len);
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
             return _set_addr_len(dev, value, len);
         case NETOPT_CHANNEL:
-            return _set_channel(dev, (uint8_t *)value, len);
+            return _set_channel(dev, value, len);
         case NETOPT_NID:
-            return _set_panid(dev, (uint8_t *)value, len);
+            return _set_panid(dev, value, len);
 #ifdef MODULE_XBEE_ENCRYPTION
         case NETOPT_ENCRYPTION:
-            return _set_encryption(dev, (uint8_t *)value);
+            return _set_encryption(dev, value);
         case NETOPT_ENCRYPTION_KEY:
-            return _set_encryption_key(dev, (uint8_t *)value, len);
+            return _set_encryption_key(dev, value, len);
 #endif
         default:
             return -ENOTSUP;

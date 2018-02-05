@@ -9,7 +9,11 @@ BOARD_WHITELIST := fox iotlab-m3 msba2 mulle native pba-d-01-kw2x samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-CFLAGS += -DDEVELHELP
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 1
+
 CFLAGS += -DUSE_LINKLAYER
 CFLAGS += -DUSE_RONR
 CFLAGS += -DCCNL_UAPI_H_
@@ -27,6 +31,8 @@ USEMODULE += shell_commands
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
+# This application dumps received packets to STDIO using the pktdump module
+USEMODULE += gnrc_pktdump
 USEMODULE += timex
 USEMODULE += xtimer
 USEMODULE += random
@@ -35,6 +41,5 @@ USEMODULE += prng_minstd
 USEPKG += tlsf
 
 USEPKG += ccn-lite
-USEMODULE += ccn-lite-utils
 
 include $(RIOTBASE)/Makefile.include

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup   driver_lis3dh
+ * @ingroup   drivers_lis3dh
  * @{
  *
  * @file

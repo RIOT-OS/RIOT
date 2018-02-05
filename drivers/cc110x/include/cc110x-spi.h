@@ -112,5 +112,5 @@ void cc110x_cs(cc110x_t *dev);
 }
 #endif
 
-/** @} */
 #endif /* CC110X_SPI_H */
+/** @} */

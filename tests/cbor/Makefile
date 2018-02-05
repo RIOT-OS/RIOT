@@ -1,4 +1,3 @@
-APPLICATION = cbor
 include ../Makefile.tests_common
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno
@@ -7,7 +6,6 @@ BOARD_BLACKLIST += mips-malta
 BOARD_BLACKLIST += msb-430 msb-430h
 BOARD_BLACKLIST += nucleo32-f031
 BOARD_BLACKLIST += pic32-clicker pic32-wifire
-BOARD_BLACKLIST += qemu-i386
 BOARD_BLACKLIST += telosb
 BOARD_BLACKLIST += waspmote-pro
 BOARD_BLACKLIST += wsn430-v1_3b wsn430-v1_4
@@ -21,6 +19,4 @@ USEMODULE += cbor_semantic_tagging
 include $(RIOTBASE)/Makefile.include
 
 test:
-# `testrunner` calls `make term` recursively, results in duplicated `TERMFLAGS`.
-# So clears `TERMFLAGS` before run.
-	TERMFLAGS= tests/01-run.py
+	tests/01-run.py

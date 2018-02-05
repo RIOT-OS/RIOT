@@ -597,6 +597,7 @@ extern "C" {
 #define SX127X_RF_OPMODE_TRANSMITTER                                 (0x03)
 #define SX127X_RF_OPMODE_SYNTHESIZER_RX                              (0x04)
 #define SX127X_RF_OPMODE_RECEIVER                                    (0x05)
+#define SX127X_RF_OPMODE_RECEIVER_SINGLE                             (0x06)
 
 /* RegBitRate (bits/sec) */
 #define SX127X_RF_BITRATEMSB_1200_BPS                                (0x68)
@@ -1424,3 +1425,4 @@ extern "C" {
 #endif
 
 #endif /* SX127X_REGISTERS_H */
+/** @} */

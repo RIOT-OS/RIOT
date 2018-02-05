@@ -42,7 +42,7 @@ int adc_init(adc_t line)
     /* disable any DMA, continous ADC settings */
     adca->ADCCON2 = 0x0;
     /* configure ADC GPIO as analog input */
-    gpio_init(adc_config[line], IOC_OVERRIDE_ANA);
+    gpio_init(adc_config[line], GPIO_IN_ANALOG);
 
     return 0;
 }
@@ -89,7 +89,7 @@ int adc_sample(adc_t line, adc_res_t res)
                                        SOC_ADC_ADCCON3_EDIV |
                                        SOC_ADC_ADCCON3_ECH);
     adca->ADCCON3 = reg | res | SOC_ADC_ADCCON_REF |
-                    gpio_pp_num(adc_config[line]);
+                    (adc_config[line] & GPIO_PIN_MASK);
 
     DEBUG("ADCCON1: %"PRIu32" ADCCON2: %"PRIu32" ADCCON3: %"PRIu32"\n",
           adca->cc2538_adc_adccon1.ADCCON1, adca->ADCCON2, adca->ADCCON3);

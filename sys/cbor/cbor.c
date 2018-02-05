@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef MODULE_CBOR_CTIME
+#include <time.h>
+#endif
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -400,7 +403,7 @@ static size_t decode_bytes(const cbor_stream_t *s, size_t offset, char *out, siz
         return 0;
     }
 
-    if (length + 1 < bytes_length) {
+    if (bytes_length == SIZE_MAX || length < bytes_length + 1) {
         return 0;
     }
 
@@ -957,7 +960,7 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
                 offset += inner_read_bytes = cbor_stream_decode_at(stream, offset, indent + 2);
 
                 if (inner_read_bytes == 0) {
-                    DEBUG("Failed to read array item at position %d\n", i);
+                    DEBUG("Failed to read array item at position %u\n", (unsigned)i);
                     break;
                 }
 
@@ -991,7 +994,7 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
                 offset += value_read_bytes = cbor_stream_decode_at(stream, offset, indent + 2); /* value */
 
                 if (key_read_bytes == 0 || value_read_bytes == 0) {
-                    DEBUG("Failed to read key-value pair at position %d\n", i);
+                    DEBUG("Failed to read key-value pair at position %u\n", (unsigned)i);
                     break;
                 }
 
@@ -1070,7 +1073,7 @@ void cbor_stream_decode(cbor_stream_t *stream)
         size_t read_bytes = cbor_stream_decode_at(stream, offset, 0);
 
         if (read_bytes == 0) {
-            DEBUG("Failed to read from stream at offset %d, start byte 0x%02X\n", offset, stream->data[offset]);
+            DEBUG("Failed to read from stream at offset %u, start byte 0x%02X\n", (unsigned)offset, stream->data[offset]);
             cbor_stream_print(stream);
             return;
         }

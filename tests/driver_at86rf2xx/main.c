@@ -71,6 +71,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 
 void *_recv_thread(void *arg)
 {
+    (void)arg;
     while (1) {
         msg_t msg;
         msg_receive(&msg);

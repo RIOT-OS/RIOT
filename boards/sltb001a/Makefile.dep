@@ -1,0 +1,10 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+    USEMODULE += saul_gpio
+    USEMODULE += bmp280
+    USEMODULE += si7021
+endif
+
+# i2c is required for environmental sensors
+USEMODULE += periph_i2c
+
+include $(RIOTCPU)/efm32/Makefile.dep

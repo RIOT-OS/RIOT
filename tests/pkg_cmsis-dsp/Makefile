@@ -1,4 +1,3 @@
-APPLICATION = cmsis-dsp
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
@@ -23,8 +22,6 @@ BOARD_WHITELIST := \
   nucleo-l152 \
   openmote-cc2538 \
   pba-d-01-kw2x \
-  pca10000 \
-  pca10005 \
   samd21-xpro \
   saml21-xpro \
   samr21-xpro \

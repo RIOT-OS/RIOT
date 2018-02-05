@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @name Sample rate macro definitions
+ * @name    Sample rate macro definitions
  * @{
  */
 #define MPU9150_MIN_SAMPLE_RATE     (4)
@@ -39,7 +39,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Power Management 1 register macros
+ * @name    Power Management 1 register macros
  * @{
  */
 #define MPU9150_PWR_WAKEUP          (0x00)
@@ -48,7 +48,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Power Management 2 register macros
+ * @name    Power Management 2 register macros
  * @{
  */
 #define MPU9150_PWR_GYRO            (0x07)
@@ -56,7 +56,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Sleep times in microseconds
+ * @name    Sleep times in microseconds
  * @{
  */
 #define MPU9150_COMP_MODE_SLEEP_US  (1000)
@@ -66,7 +66,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name MPU-9150 compass operating modes and reg values
+ * @name    MPU-9150 compass operating modes and reg values
  * @{
  */
 #define MPU9150_COMP_POWER_DOWN     (0x00)
@@ -77,7 +77,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Power enum values
+ * @brief   Power enum values
  */
 typedef enum {
     MPU9150_SENSOR_PWR_OFF = 0x00,
@@ -85,7 +85,7 @@ typedef enum {
 } mpu9150_pwr_t;
 
 /**
- * @brief Possible MPU-9150 hardware addresses (wiring specific)
+ * @brief   Possible MPU-9150 hardware addresses (wiring specific)
  */
 typedef enum {
     MPU9150_HW_ADDR_HEX_68 = 0x68,
@@ -93,7 +93,7 @@ typedef enum {
 } mpu9150_hw_addr_t;
 
 /**
- * @brief Possible compass addresses (wiring specific)
+ * @brief   Possible compass addresses (wiring specific)
  */
 typedef enum {
     MPU9150_COMP_ADDR_HEX_0C = 0x0C,
@@ -103,7 +103,7 @@ typedef enum {
 } mpu9150_comp_addr_t;
 
 /**
- * @brief Possible full scale ranges for the gyroscope
+ * @brief   Possible full scale ranges for the gyroscope
  */
 typedef enum {
     MPU9150_GYRO_FSR_250DPS = 0x00,
@@ -113,7 +113,7 @@ typedef enum {
 } mpu9150_gyro_ranges_t;
 
 /**
- * @brief Possible full scale ranges for the accelerometer
+ * @brief   Possible full scale ranges for the accelerometer
  */
 typedef enum {
     MPU9150_ACCEL_FSR_2G = 0x00,
@@ -123,7 +123,7 @@ typedef enum {
 } mpu9150_accel_ranges_t;
 
 /**
- * @brief Possible low pass filter values
+ * @brief   Possible low pass filter values
  */
 typedef enum {
     MPU9150_FILTER_188HZ = 0x01,
@@ -135,7 +135,7 @@ typedef enum {
 } mpu9150_lpf_t;
 
 /**
- * @brief MPU-9150 result vector struct
+ * @brief   MPU-9150 result vector struct
  */
 typedef struct {
     int16_t x_axis;             /**< X-Axis measurement result */
@@ -144,7 +144,7 @@ typedef struct {
 } mpu9150_results_t;
 
 /**
- * @brief Configuration struct for the MPU-9150 sensor
+ * @brief   Configuration struct for the MPU-9150 sensor
  */
 typedef struct {
     mpu9150_pwr_t accel_pwr;            /**< Accel power status (on/off) */
@@ -160,31 +160,36 @@ typedef struct {
 } mpu9150_status_t;
 
 /**
- * @brief Device descriptor for the MPU-9150 sensor
+ * @brief   Device initialization parameters
  */
 typedef struct {
-    i2c_t i2c_dev;              /**< I2C device which is used */
-    uint8_t hw_addr;            /**< Hardware address of the MPU-9150 */
+    i2c_t i2c;                  /**< I2C device which is used */
+    uint8_t addr;               /**< Hardware address of the MPU-9150 */
     uint8_t comp_addr;          /**< Address of the MPU-9150s compass */
+    uint16_t sample_rate;       /**< Sample rate */
+} mpu9150_params_t;
+
+/**
+ * @brief   Device descriptor for the MPU-9150 sensor
+ */
+typedef struct {
+    mpu9150_params_t params;    /**< Device initialization parameters */
     mpu9150_status_t conf;      /**< Device configuration */
 } mpu9150_t;
 
 /**
- * @brief Initialize the given MPU9150 device
+ * @brief   Initialize the given MPU9150 device
  *
  * @param[out] dev          Initialized device descriptor of MPU9150 device
- * @param[in]  i2c          I2C bus the sensor is connected to
- * @param[in]  hw_addr      The device's address on the I2C bus
- * @param[in]  comp_addr    The compass address on the I2C bus
+ * @param[in]  params       Initialization parameters
  *
  * @return                  0 on success
  * @return                  -1 if given I2C is not enabled in board config
  */
-int mpu9150_init(mpu9150_t *dev, i2c_t i2c, mpu9150_hw_addr_t hw_addr,
-        mpu9150_comp_addr_t comp_addr);
+int mpu9150_init(mpu9150_t *dev, const mpu9150_params_t *params);
 
 /**
- * @brief Enable or disable accelerometer power
+ * @brief   Enable or disable accelerometer power
  *
  * @param[in] dev           Device descriptor of MPU9150 device
  * @param[in] pwr_conf      Target power setting: PWR_ON or PWR_OFF
@@ -195,7 +200,7 @@ int mpu9150_init(mpu9150_t *dev, i2c_t i2c, mpu9150_hw_addr_t hw_addr,
 int mpu9150_set_accel_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf);
 
 /**
- * @brief Enable or disable gyroscope power
+ * @brief   Enable or disable gyroscope power
  *
  * @param[in] dev           Device descriptor of MPU9150 device
  * @param[in] pwr_conf      Target power setting: PWR_ON or PWR_OFF
@@ -206,7 +211,7 @@ int mpu9150_set_accel_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf);
 int mpu9150_set_gyro_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf);
 
 /**
- * @brief Enable or disable compass power
+ * @brief   Enable or disable compass power
  *
  * @param[in] dev           Device descriptor of MPU9150 device
  * @param[in] pwr_conf      Target power setting: PWR_ON or PWR_OFF
@@ -217,7 +222,7 @@ int mpu9150_set_gyro_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf);
 int mpu9150_set_compass_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf);
 
 /**
- * @brief Read angular speed values from the given MPU9150 device, returned in dps
+ * @brief   Read angular speed values from the given MPU9150 device, returned in dps
  *
  * The raw gyroscope data is read from the sensor and normalized with respect to
  * the configured gyroscope full-scale range.
@@ -232,7 +237,7 @@ int mpu9150_set_compass_power(mpu9150_t *dev, mpu9150_pwr_t pwr_conf);
 int mpu9150_read_gyro(const mpu9150_t *dev, mpu9150_results_t *output);
 
 /**
- * @brief Read acceleration values from the given MPU9150 device, returned in mG
+ * @brief   Read acceleration values from the given MPU9150 device, returned in mG
  *
  * The raw acceleration data is read from the sensor and normalized with respect to
  * the configured accelerometer full-scale range.
@@ -247,7 +252,7 @@ int mpu9150_read_gyro(const mpu9150_t *dev, mpu9150_results_t *output);
 int mpu9150_read_accel(const mpu9150_t *dev, mpu9150_results_t *output);
 
 /**
- * @brief Read magnetic field values from the given MPU9150 device, returned in mikroT
+ * @brief   Read magnetic field values from the given MPU9150 device, returned in mikroT
  *
  * The raw compass data is read from the sensor and normalized with respect to
  * the compass full-scale range (which can not be configured).
@@ -261,7 +266,7 @@ int mpu9150_read_accel(const mpu9150_t *dev, mpu9150_results_t *output);
 int mpu9150_read_compass(const mpu9150_t *dev, mpu9150_results_t *output);
 
 /**
- * @brief Read temperature value from the given MPU9150 device, returned in m°C
+ * @brief   Read temperature value from the given MPU9150 device, returned in m°C
  *
  * @note
  * The measured temperature is slightly higher than the real room temperature.
@@ -276,7 +281,7 @@ int mpu9150_read_compass(const mpu9150_t *dev, mpu9150_results_t *output);
 int mpu9150_read_temperature(const mpu9150_t *dev, int32_t *output);
 
 /**
- * @brief Set the full-scale range for raw gyroscope data
+ * @brief   Set the full-scale range for raw gyroscope data
  *
  * @param[in] dev           Device descriptor of MPU9150 device
  * @param[in] fsr           Target full-scale range
@@ -288,7 +293,7 @@ int mpu9150_read_temperature(const mpu9150_t *dev, int32_t *output);
 int mpu9150_set_gyro_fsr(mpu9150_t *dev, mpu9150_gyro_ranges_t fsr);
 
 /**
- * @brief Set the full-scale range for raw accelerometer data
+ * @brief   Set the full-scale range for raw accelerometer data
  *
  * @param[in] dev           Device descriptor of MPU9150 device
  * @param[in] fsr           Target full-scale range
@@ -300,7 +305,7 @@ int mpu9150_set_gyro_fsr(mpu9150_t *dev, mpu9150_gyro_ranges_t fsr);
 int mpu9150_set_accel_fsr(mpu9150_t *dev, mpu9150_accel_ranges_t fsr);
 
 /**
- * @brief Set the rate at which the gyroscope and accelerometer data is sampled
+ * @brief   Set the rate at which the gyroscope and accelerometer data is sampled
  *
  * Sample rate can be chosen between 4 Hz and 1kHz. The actual set value might
  * slightly differ. If necessary, check the actual set value in the device's
@@ -316,7 +321,7 @@ int mpu9150_set_accel_fsr(mpu9150_t *dev, mpu9150_accel_ranges_t fsr);
 int mpu9150_set_sample_rate(mpu9150_t *dev, uint16_t rate);
 
 /**
- * @brief Set the rate at which the compass data is sampled
+ * @brief   Set the rate at which the compass data is sampled
  *
  * Sample rate can be chosen between 1 Hz and 100 Hz but has to be a fraction
  * of the configured accel/gyro sample rate. The actual set value might

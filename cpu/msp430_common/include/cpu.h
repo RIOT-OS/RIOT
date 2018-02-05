@@ -7,19 +7,19 @@
  * directory for more details.
  */
 
-#ifndef CPU_H
-#define CPU_H
-
 /**
  * @defgroup    cpu_msp430_common TI MSP430
  * @ingroup     cpu
  * @brief       Texas Instruments MSP430 specific code
-
-<h2>First steps</h2>
-\li See the <a href="../manual/index.html">manual</a> for toolchain and ide setup
-
+ *
  * @{
+ * @file
+ * @brief       Texas Instruments MSP430 specific code
+ *
  */
+
+#ifndef CPU_H
+#define CPU_H
 
 #include <stdio.h>
 
@@ -163,5 +163,5 @@ static inline void cpu_print_last_instruction(void)
 }
 #endif
 
-/** @} */
 #endif /* CPU_H */
+/** @} */

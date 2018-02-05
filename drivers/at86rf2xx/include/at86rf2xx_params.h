@@ -9,7 +9,6 @@
 
 /**
  * @ingroup     drivers_at86rf2xx
- *
  * @{
  * @file
  * @brief       Default configuration for the AT86RF2xx driver
@@ -28,7 +27,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the AT86RF2xx driver
+ * @name    Set default configuration parameters for the AT86RF2xx driver
  * @{
  */
 #ifndef AT86RF2XX_PARAM_SPI

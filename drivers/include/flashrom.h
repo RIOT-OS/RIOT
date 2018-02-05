@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Erase sector
+ * @brief   Erase sector
  *
  * @param[out] addr Address within a flash sector to erase
  *
@@ -43,7 +43,7 @@ extern "C" {
 uint8_t             flashrom_erase(uint8_t *addr);
 
 /**
- * @brief Write buffer from ram to flash
+ * @brief   Write buffer from ram to flash
  *
  * @param[out] dst  Address within a flash sector to write, must be a 256 byte boundary
  * @param[in] src   Address within ram, must be a word boundary

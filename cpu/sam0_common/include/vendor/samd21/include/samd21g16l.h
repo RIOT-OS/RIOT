@@ -3,7 +3,7 @@
  *
  * \brief Header file for SAMD21G16L
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2017 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -72,7 +72,7 @@ typedef volatile       uint8_t  RoReg8;  /**< Read only  8-bit register (volatil
 #endif
 typedef volatile       uint32_t WoReg;   /**< Write only 32-bit register (volatile unsigned int) */
 typedef volatile       uint16_t WoReg16; /**< Write only 16-bit register (volatile unsigned int) */
-typedef volatile       uint32_t WoReg8;  /**< Write only  8-bit register (volatile unsigned int) */
+typedef volatile       uint8_t  WoReg8;  /**< Write only  8-bit register (volatile unsigned int) */
 typedef volatile       uint32_t RwReg;   /**< Read-Write 32-bit register (volatile unsigned int) */
 typedef volatile       uint16_t RwReg16; /**< Read-Write 16-bit register (volatile unsigned int) */
 typedef volatile       uint8_t  RwReg8;  /**< Read-Write  8-bit register (volatile unsigned int) */
@@ -138,16 +138,16 @@ typedef struct _DeviceVectors
   void* pfnReset_Handler;
   void* pfnNMI_Handler;
   void* pfnHardFault_Handler;
-  void* pfnReservedM12;
-  void* pfnReservedM11;
-  void* pfnReservedM10;
-  void* pfnReservedM9;
-  void* pfnReservedM8;
-  void* pfnReservedM7;
-  void* pfnReservedM6;
+  void* pvReservedM12;
+  void* pvReservedM11;
+  void* pvReservedM10;
+  void* pvReservedM9;
+  void* pvReservedM8;
+  void* pvReservedM7;
+  void* pvReservedM6;
   void* pfnSVC_Handler;
-  void* pfnReservedM4;
-  void* pfnReservedM3;
+  void* pvReservedM4;
+  void* pvReservedM3;
   void* pfnPendSV_Handler;
   void* pfnSysTick_Handler;
 
@@ -159,7 +159,7 @@ typedef struct _DeviceVectors
   void* pfnEIC_Handler;                   /*  4 External Interrupt Controller */
   void* pfnNVMCTRL_Handler;               /*  5 Non-Volatile Memory Controller */
   void* pfnDMAC_Handler;                  /*  6 Direct Memory Access Controller */
-  void* pfnReserved7;
+  void* pvReserved7;
   void* pfnEVSYS_Handler;                 /*  8 Event System Interface */
   void* pfnSERCOM0_Handler;               /*  9 Serial Communication Interface 0 */
   void* pfnSERCOM1_Handler;               /* 10 Serial Communication Interface 1 */
@@ -178,8 +178,8 @@ typedef struct _DeviceVectors
   void* pfnADC_Handler;                   /* 23 Analog Digital Converter */
   void* pfnAC_Handler;                    /* 24 Analog Comparators  */
   void* pfnDAC_Handler;                   /* 25 Digital Analog Converter */
-  void* pfnReserved26;
-  void* pfnReserved27;
+  void* pvReserved26;
+  void* pvReserved27;
   void* pfnAC1_Handler;                   /* 28 Analog Comparators 1 */
 } DeviceVectors;
 
@@ -223,6 +223,7 @@ void AC1_Handler                 ( void );
  * \brief Configuration of the Cortex-M0+ Processor and Core Peripherals
  */
 
+#define LITTLE_ENDIAN          1
 #define __CM0PLUS_REV          1         /*!< Core revision r0p1 */
 #define __MPU_PRESENT          0         /*!< MPU present or not */
 #define __NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
@@ -356,7 +357,7 @@ void AC1_Handler                 ( void );
 #define ID_DAC           82 /**< \brief Digital Analog Converter (DAC) */
 #define ID_AC1           85 /**< \brief Analog Comparators 1 (AC1) */
 
-#define ID_PERIPH_COUNT  86 /**< \brief Number of peripheral IDs */
+#define ID_PERIPH_COUNT  86 /**< \brief Max number of peripheral IDs */
 /*@}*/
 
 /* ************************************************************************** */

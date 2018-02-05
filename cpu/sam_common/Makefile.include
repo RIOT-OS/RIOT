@@ -1,0 +1,11 @@
+# Define the CPU family so we can differentiate between them in the code
+CFLAGS += -DCPU_FAM_$(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
+
+# this CPU implementation doesn't use CMSIS initialization
+export CFLAGS += -DDONT_USE_CMSIS_INIT
+
+# for the sam[drl] CPUs we hold all linkerscripts in the sam0 common folder
+export LINKFLAGS += -L$(RIOTCPU)/sam_common/ldscripts
+
+# export the common include directory
+export INCLUDES += -I$(RIOTCPU)/sam_common/include

@@ -21,7 +21,7 @@
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/frag.h"
 #include "net/gnrc/sixlowpan/iphc.h"
-#include "net/gnrc/sixlowpan/netif.h"
+#include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
 
 #define ENABLE_DEBUG    (0)
@@ -192,7 +192,7 @@ static void _send(gnrc_pktsnip_t *pkt)
 {
     gnrc_netif_hdr_t *hdr;
     gnrc_pktsnip_t *pkt2;
-    gnrc_sixlowpan_netif_t *iface;
+    gnrc_netif_t *iface;
     /* datagram_size: pure IPv6 packet without 6LoWPAN dispatches or compression */
     size_t datagram_size;
 
@@ -217,7 +217,7 @@ static void _send(gnrc_pktsnip_t *pkt)
     }
 
     hdr = pkt2->data;
-    iface = gnrc_sixlowpan_netif_get(hdr->if_pid);
+    iface = gnrc_netif_get_by_pid(hdr->if_pid);
     datagram_size = gnrc_pkt_len(pkt2->next);
 
     if (iface == NULL) {
@@ -227,7 +227,7 @@ static void _send(gnrc_pktsnip_t *pkt)
     }
 
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-    if (iface->iphc_enabled) {
+    if (iface->flags & GNRC_NETIF_FLAGS_6LO_HC) {
         if (!gnrc_sixlowpan_iphc_encode(pkt2)) {
             DEBUG("6lo: error on IPHC encoding\n");
             gnrc_pktbuf_release(pkt2);
@@ -254,14 +254,14 @@ static void _send(gnrc_pktsnip_t *pkt)
         return;
     }
 #endif
-    DEBUG("6lo: iface->max_frag_size = %" PRIu16 " for interface %"
-          PRIkernel_pid "\n", iface->max_frag_size, hdr->if_pid);
+    DEBUG("6lo: iface->sixlo.max_frag_size = %" PRIu8 " for interface %"
+          PRIkernel_pid "\n", iface->sixlo.max_frag_size, hdr->if_pid);
 
     /* IP should not send anything here if it is not a 6LoWPAN interface,
      * so we don't need to check for NULL pointers.
      * Note, that datagram_size cannot be used here, because the header size
      * might be changed by IPHC. */
-    if (gnrc_pkt_len(pkt2->next) <= iface->max_frag_size) {
+    if (gnrc_pkt_len(pkt2->next) <= iface->sixlo.max_frag_size) {
         DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
               (void *)pkt2, hdr->if_pid);
         if (gnrc_netapi_send(hdr->if_pid, pkt2) < 1) {
@@ -278,8 +278,8 @@ static void _send(gnrc_pktsnip_t *pkt)
         return;
     }
     else if (datagram_size <= SIXLOWPAN_FRAG_MAX_LEN) {
-        DEBUG("6lo: Send fragmented (%u > %" PRIu16 ")\n",
-              (unsigned int)datagram_size, iface->max_frag_size);
+        DEBUG("6lo: Send fragmented (%u > %" PRIu8 ")\n",
+              (unsigned int)datagram_size, iface->sixlo.max_frag_size);
         msg_t msg;
 
         fragment_msg.pid = hdr->if_pid;
@@ -301,8 +301,8 @@ static void _send(gnrc_pktsnip_t *pkt)
     }
 #else
     (void) datagram_size;
-    DEBUG("6lo: packet too big (%u > %" PRIu16 ")\n",
-          (unsigned int)datagram_size, iface->max_frag_size);
+    DEBUG("6lo: packet too big (%u > %" PRIu8 ")\n",
+          (unsigned int)datagram_size, iface->sixlo.max_frag_size);
     gnrc_pktbuf_release(pkt2);
 #endif
 }

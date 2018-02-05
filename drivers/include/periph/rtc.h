@@ -33,9 +33,6 @@
 extern "C" {
 #endif
 
-/* guard file in case no RTC device was specified */
-#if RTC_NUMOF
-
 /**
  * @brief Signature for alarm Callback
  *
@@ -107,8 +104,6 @@ void rtc_poweron(void);
  * @brief Turns the RTC hardware module off
  */
 void rtc_poweroff(void);
-
-#endif /* RTC_NUMOF */
 
 #ifdef __cplusplus
 }

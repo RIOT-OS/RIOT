@@ -37,8 +37,8 @@ int cmd_init_master(int argc, char **argv)
         puts("Error: Init: Invalid number of arguments!");
         printf("Usage:\n%s: [DEVICE] [SPEED]\n", argv[0]);
         puts("    with DEVICE:");
-        for (int i = 0; i < I2C_NUMOF; i++) {
-            printf("          %i -> I2C_%i\n", i, i);
+        for (unsigned i = 0; i < I2C_NUMOF; i++) {
+            printf("          %u -> I2C_%u\n", i, i);
         }
         puts("         SPEED:");
         puts("          0 -> SPEED_LOW (10kbit/s)");
@@ -174,23 +174,23 @@ int cmd_read(int argc, char **argv)
     }
     if (argc < 3) {
         puts("Error: not enough arguments given");
-        printf("Usage:\n%s ADDR LENGTH]\n", argv[0]);
+        printf("Usage:\n%s ADDR LENGTH\n", argv[0]);
         return 1;
     }
 
     addr = atoi(argv[1]);
     length = atoi(argv[2]);
 
-    if (length < 1 || length > BUFSIZE) {
+    if (length < 1 || length > (int)BUFSIZE) {
         puts("Error: invalid LENGTH parameter given\n");
         return 1;
     }
     else if (length == 1) {
-        printf("i2c_read_byte(I2C_%i, 0x%02x, uint8_t *res)\n", i2c_dev, addr);
+        printf("i2c_read_byte(I2C_%i, 0x%02x)\n", i2c_dev, addr);
         res = i2c_read_byte(i2c_dev, addr, data);
     }
     else {
-        printf("i2c_read_bytes(I2C_%i, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, length);
+        printf("i2c_read_bytes(I2C_%i, 0x%02x, %i)\n", i2c_dev, addr, length);
         res = i2c_read_bytes(i2c_dev, addr, data, length);
     }
 
@@ -203,7 +203,7 @@ int cmd_read(int argc, char **argv)
         for (int i = 0; i < res; i++) {
             printf("0x%02x, ", data[i]);
         }
-        puts("])");
+        puts("]");
         return 0;
     }
 }
@@ -221,7 +221,7 @@ int cmd_read_reg(int argc, char **argv)
     }
     if (argc < 4) {
         puts("Error: not enough arguments given");
-        printf("Usage:\n%s ADDR REG LENGTH]\n", argv[0]);
+        printf("Usage:\n%s ADDR REG LENGTH\n", argv[0]);
         return 1;
     }
 
@@ -229,16 +229,16 @@ int cmd_read_reg(int argc, char **argv)
     reg = atoi(argv[2]);
     length = atoi(argv[3]);
 
-    if (length < 1 || length > BUFSIZE) {
+    if (length < 1 || length > (int)BUFSIZE) {
         puts("Error: invalid LENGTH parameter given");
         return 1;
     }
     else if (length == 1) {
-        printf("i2c_read_reg(I2C_%i, 0x%02x, 0x%02x, uint8_t *res)\n", i2c_dev, addr, reg);
+        printf("i2c_read_reg(I2C_%i, 0x%02x, 0x%02x)\n", i2c_dev, addr, reg);
         res = i2c_read_reg(i2c_dev, addr, reg, data);
     }
     else {
-        printf("i2c_read_regs(I2C_%i, 0x%02x, 0x%02x, uint8_t *res, %i)\n", i2c_dev, addr, reg, length);
+        printf("i2c_read_regs(I2C_%i, 0x%02x, 0x%02x, %i)\n", i2c_dev, addr, reg, length);
         res = i2c_read_regs(i2c_dev, addr, reg, data, length);
     }
 
@@ -251,7 +251,7 @@ int cmd_read_reg(int argc, char **argv)
         for (int i = 0; i < res; i++) {
             printf("0x%02x, ", data[i]);
         }
-        puts("])");
+        puts("]");
         return 0;
     }
 

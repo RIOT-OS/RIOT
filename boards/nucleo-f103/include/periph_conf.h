@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-f103
+ * @defgroup    boards_nucleo-f103 STM32 Nucleo-F103
+ * @ingroup     boards_common_nucleo64
+ * @brief       Support for the STM32 Nucleo-F103
  * @{
  *
  * @file
@@ -26,37 +28,32 @@ extern "C" {
 #endif
 
 /**
- * @name    Clock system configuration
+ * @name    Clock settings
+ *
+ * @note    This is auto-generated from
+ *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
  * @{
- **/
-/* high speed clock configuration:
- * 0 := use internal HSI oscillator (always 8MHz)
- * HSE frequency value := use external HSE oscillator with given freq [in Hz]
- *                        must be 4000000 <= value <= 16000000 */
-#define CLOCK_HSE           (8000000U)
-/* low speed clock configuration:
- * 0 := use internal LSI oscillator (~40kHz)
- * 1 := use extern LSE oscillator, always 32.768kHz */
-#define CLOCK_LSE           (1)
-/* targeted system clock speed [in Hz], must be <= 72MHz */
-#define CLOCK_CORECLOCK     (72000000U)
-/* PLL configuration, set both values to zero to disable PLL usage. The values
- * must be set to satisfy the following equation:
- * CORECLOCK := CLOCK_SOURCE / PLL_DIV * PLL_MUL
- * with
- * 1 <= CLOCK_PLL_DIV <= 2
- * 2 <= CLOCK_PLL_MUL <= 17 */
-#define CLOCK_PLL_DIV       (1)
-#define CLOCK_PLL_MUL       (9)
-/* AHB and APBx bus clock configuration, keep in mind the following constraints:
- * ABP1 <= 36MHz
  */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
+/* give the target core clock (HCLK) frequency [in Hz],
+ * maximum: 72MHz */
+#define CLOCK_CORECLOCK      (72000000U)
+/* 0: no external high speed crystal available
+ * else: actual crystal frequency [in Hz] */
+#define CLOCK_HSE            (8000000U)
+/* 0: no external low speed crystal available,
+ * 1: external crystal available (always 32.768kHz) */
+#define CLOCK_LSE            (1)
+/* peripheral clock setup */
+#define CLOCK_AHB_DIV        RCC_CFGR_HPRE_DIV1
+#define CLOCK_AHB            (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1_DIV       RCC_CFGR_PPRE1_DIV2     /* max 36MHz */
+#define CLOCK_APB1           (CLOCK_CORECLOCK / 2)
+#define CLOCK_APB2_DIV       RCC_CFGR_PPRE2_DIV1     /* max 72MHz */
+#define CLOCK_APB2           (CLOCK_CORECLOCK / 1)
+
+/* PLL factors */
+#define CLOCK_PLL_PREDIV     (1)
+#define CLOCK_PLL_MUL        (9)
 /** @} */
 
 /**
@@ -219,3 +216,4 @@ static const spi_conf_t spi_config[] = {
 #endif
 
 #endif /* PERIPH_CONF_H */
+/** @} */

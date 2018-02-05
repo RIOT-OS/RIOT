@@ -1,0 +1,42 @@
+From 9c30634e5458827e8e398ca56a4f5294a61b1b92 Mon Sep 17 00:00:00 2001
+From: Christian Manal <moenoel@informatik.uni-bremen.de>
+Date: Wed, 29 Nov 2017 15:33:46 +0100
+Subject: [PATCH 09/12] fixed warnings in observe.c
+
+---
+ core/observe.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/core/observe.c b/core/observe.c
+index 711c1d1..87c42b9 100644
+--- a/core/observe.c
++++ b/core/observe.c
+@@ -163,6 +163,7 @@ uint8_t observe_handleRequest(lwm2m_context_t * contextP,
+ {
+     lwm2m_watcher_t * watcherP;
+     uint32_t count;
++    (void)size;
+ 
+     LOG_ARG("Code: %02X, server status: %s", message->code, STR_STATUS(serverP->status));
+     LOG_URI(uriP);
+@@ -649,7 +650,7 @@ void observe_step(lwm2m_context_t * contextP,
+                     {
+                         LOG_ARG("Checking minimal period (%d s)", watcherP->parameters->minPeriod);
+ 
+-                        if (watcherP->lastTime + watcherP->parameters->minPeriod > currentTime)
++                        if (watcherP->lastTime + (time_t)watcherP->parameters->minPeriod > currentTime)
+                         {
+                             // Minimum Period did not elapse yet
+                             interval = watcherP->lastTime + watcherP->parameters->minPeriod - currentTime;
+@@ -671,7 +672,7 @@ void observe_step(lwm2m_context_t * contextP,
+                 {
+                     LOG_ARG("Checking maximal period (%d s)", watcherP->parameters->maxPeriod);
+ 
+-                    if (watcherP->lastTime + watcherP->parameters->maxPeriod <= currentTime)
++                    if (watcherP->lastTime + (time_t)watcherP->parameters->maxPeriod <= currentTime)
+                     {
+                         LOG("Notify on maximal period");
+                         notify = true;
+-- 
+2.1.4
+

@@ -28,6 +28,10 @@ export BINDIR                # This is the folder where the application should b
 export APPDIR                # The base folder containing the application
 export PKGDIRBASE            # The base folder for building packages
 
+export FEATURES_REQUIRED     # List of required features by the application
+export FEATURES_PROVIDED     # List of provided features by the board
+export FEATURES_OPTIONAL     # List of nice to have features
+
 export TARGET_ARCH           # The target platform name, in GCC triple notation, e.g. "arm-none-eabi", "i686-elf", "avr"
 export PREFIX                # The prefix of the toolchain commands, usually "$(TARGET_ARCH)-", e.g. "arm-none-eabi-" or "msp430-".
 export CC                    # The C compiler to use.
@@ -50,7 +54,7 @@ export OFLAGS                # The parameter for OBJCOPY, e.g. to strip the debu
 export OBJDUMP               # The command used to create the assembly listing.
 export OBJDUMPFLAGS          # The parameter for OBJDUMP.
 export SIZE                  # The command to read to size of the ELF sections.
-export UNDEF                 # Set by the BOARD's and CPU's Makefile.include, this contains object files with must not be used in the ELFFILE even if the if no call to the functions.
+export UNDEF                 # Object files that the linker must include in the ELFFILE even if no call to the functions or symbols (ex: interrupt vectors).
 export WERROR                # Treat all compiler warnings as errors if set to 1 (see -Werror flag in GCC manual)
 
 export GITCACHE              # path to git-cache executable

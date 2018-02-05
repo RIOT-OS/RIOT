@@ -72,10 +72,10 @@ int conn_can_raw_set_filter(conn_can_raw_t *conn, struct can_filter *filter, siz
     assert(conn != NULL);
     assert(filter != NULL || count == 0);
 
-    DEBUG("conn_can_raw_set_filter: conn=%p, filter=%p, count=%d\n",
-          (void *)conn, (void *)filter, count);
-    DEBUG("conn_can_raw_set_filter: conn->filter=%p, conn->count=%d\n",
-          (void *)conn->filter, conn->count);
+    DEBUG("conn_can_raw_set_filter: conn=%p, filter=%p, count=%u\n",
+          (void *)conn, (void *)filter, (unsigned)count);
+    DEBUG("conn_can_raw_set_filter: conn->filter=%p, conn->count=%u\n",
+          (void *)conn->filter, (unsigned)conn->count);
 
     /* unset previous filters */
     if (conn->count) {
@@ -153,12 +153,11 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
         int timeout = 5;
         while (1) {
             mbox_get(&conn->mbox, &msg);
+            xtimer_remove(&timer);
             switch (msg.type) {
             case CAN_MSG_TX_ERROR:
-                xtimer_remove(&timer);
                 return -EIO;
             case CAN_MSG_TX_CONFIRMATION:
-                xtimer_remove(&timer);
                 if ((int)msg.content.value == handle) {
                     DEBUG("conn_can_raw_send: frame sent correctly\n");
                     return 0;
@@ -170,6 +169,7 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
                 break;
             case _TIMEOUT_TX_MSG_TYPE:
                 DEBUG("conn_can_raw_send: timeout\n");
+                raw_can_abort(conn->ifnum, handle);
                 return -ETIMEDOUT;
                 break;
             default:
@@ -178,6 +178,7 @@ int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int f
                 if (!timeout--) {
                     return -EINTR;
                 }
+                xtimer_set(&timer, CONN_CAN_RAW_TIMEOUT_TX_CONF);
                 break;
             }
         }

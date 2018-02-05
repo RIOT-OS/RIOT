@@ -34,19 +34,19 @@ __attribute__((naked)) void thread_yield_higher(void)
 }
 
 /* This function calculates the ISR_usage */
-int thread_arch_isr_stack_usage(void)
+int thread_isr_stack_usage(void)
 {
     /* TODO */
     return -1;
 }
 
-void *thread_arch_isr_stack_pointer(void)
+void *thread_isr_stack_pointer(void)
 {
     /* TODO */
     return (void *)-1;
 }
 
-void *thread_arch_isr_stack_start(void)
+void *thread_isr_stack_start(void)
 {
     /* TODO */
     return (void *)-1;

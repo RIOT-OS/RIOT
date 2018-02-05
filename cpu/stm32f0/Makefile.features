@@ -1,0 +1,5 @@
+ifeq (,$(filter nucleo32-f031,$(BOARD)))
+  FEATURES_PROVIDED += periph_flashpage
+endif
+
+-include $(RIOTCPU)/stm32_common/Makefile.features

@@ -60,7 +60,12 @@ void auto_init_tmp006(void)
             LOG_ERROR("[auto_init_saul] error set active tmp006 #%u\n", i);
             continue;
         }
-
+#if TMP006_USE_LOW_POWER
+        if (tmp006_set_standby(&tmp006_devs[i]) != TMP006_OK) {
+            LOG_ERROR("[auto_init_saul] error set standby tmp006 #%u\n", i);
+            continue;
+        }
+#endif
         saul_entries[i].dev = &(tmp006_devs[i]);
         saul_entries[i].name = tmp006_saul_info[i].name;
         saul_entries[i].driver = &tmp006_saul_driver;

@@ -7,4 +7,8 @@ ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE="660", GROUP="plugdev", 
 # Arduino Due
 ATTRS{idVendor}=="2341", ATTRS{idProduct}=="003d", MODE="660", GROUP="plugdev", TAG+="uaccess"
 
+# bluepill
+ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="6017", MODE="660", GROUP="plugdev", TAG+="uaccess"
+ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="6018", MODE="660", GROUP="plugdev", TAG+="uaccess"
+
 LABEL="custom_rules_end"

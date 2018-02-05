@@ -1,4 +1,3 @@
-export GDBPREFIX  ?= $(PREFIX)
 export LLVMPREFIX ?= llvm-
 # Apple XCode doesn't prefix its tools with llvm-, but manually installed LLVM
 # on OSX might have the llvm- prefix, we can't simply test against uname -s.
@@ -25,9 +24,10 @@ export OBJCOPY     = true
 endif
 export OBJDUMP     = $(LLVMPREFIX)objdump
 export SIZE        = $(LLVMPREFIX)size
-export DBG         = $(GDBPREFIX)gdb
 # LLVM lacks a binutils strip tool as well...
 #export STRIP      = $(LLVMPREFIX)strip
+# We use GDB for debugging for now, maybe LLDB will be supported in the future.
+include $(RIOTMAKE)/tools/gdb.inc.mk
 
 ifneq (,$(TARGET_ARCH))
   # Clang on Linux uses GCC's C++ headers and libstdc++ (installed with GCC)

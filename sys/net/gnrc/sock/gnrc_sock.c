@@ -18,7 +18,6 @@
 #include "net/af.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/ipv6/hdr.h"
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/netreg.h"
 #include "net/udp.h"
 #include "utlist.h"
@@ -57,6 +56,9 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     gnrc_pktsnip_t *pkt, *ip, *netif;
     msg_t msg;
 
+    if (reg->mbox.cib.mask != (SOCK_MBOX_SIZE - 1)) {
+        return -EINVAL;
+    }
 #ifdef MODULE_XTIMER
     xtimer_t timeout_timer;
 
@@ -89,7 +91,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
 #endif
             /* Falls Through. */
         default:
-            return -EINTR;
+            return -EINVAL;
     }
     /* TODO: discern NETTYPE from remote->family (set in caller), when IPv4
      * was implemented */

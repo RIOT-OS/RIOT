@@ -92,7 +92,7 @@ int __attribute__((used)) sched_run(void)
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next, thread_t, rq_entry);
 
     DEBUG("sched_run: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
-          (active_thread == NULL) ? KERNEL_PID_UNDEF : active_thread->pid,
+          (kernel_pid_t)((active_thread == NULL) ? KERNEL_PID_UNDEF : active_thread->pid),
           next_thread->pid);
 
     if (active_thread == next_thread) {
@@ -101,7 +101,7 @@ int __attribute__((used)) sched_run(void)
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
-    uint64_t now = _xtimer_now64();
+    uint32_t now = xtimer_now().ticks32;
 #endif
 
     if (active_thread) {
@@ -162,7 +162,7 @@ void sched_set_status(thread_t *process, unsigned int status)
 {
     if (status >= STATUS_ON_RUNQUEUE) {
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
-            DEBUG("sched_set_status: adding thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
+            DEBUG("sched_set_status: adding thread %" PRIkernel_pid " to runqueue %" PRIu8 ".\n",
                   process->pid, process->priority);
             clist_rpush(&sched_runqueues[process->priority], &(process->rq_entry));
             runqueue_bitcache |= 1 << process->priority;
@@ -170,7 +170,7 @@ void sched_set_status(thread_t *process, unsigned int status)
     }
     else {
         if (process->status >= STATUS_ON_RUNQUEUE) {
-            DEBUG("sched_set_status: removing thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
+            DEBUG("sched_set_status: removing thread %" PRIkernel_pid " to runqueue %" PRIu8 ".\n",
                   process->pid, process->priority);
             clist_lpop(&sched_runqueues[process->priority]);
 

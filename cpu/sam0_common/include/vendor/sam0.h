@@ -26,6 +26,12 @@
 extern "C" {
 #endif
 
+/* Workaround redefinition of LITTLE_ENDIAN macro (part1) */
+#ifdef LITTLE_ENDIAN
+#define __TMP_LITTLE_ENDIAN     LITTLE_ENDIAN
+#undef LITTLE_ENDIAN
+#endif
+
 #if   defined(CPU_MODEL_SAML21E18A)
   #include "vendor/saml21/include/saml21e18a.h"
 #elif defined(CPU_MODEL_SAML21G18A)
@@ -121,6 +127,15 @@ extern "C" {
 
 #else
   #error "Unsupported SAM0 variant."
+#endif
+
+/* Workaround redefinition of LITTLE_ENDIAN macro (part2) */
+#ifdef LITTLE_ENDIAN
+#undef LITTLE_ENDIAN
+#endif
+
+#ifdef __TMP_LITTLE_ENDIAN
+#define LITTLE_ENDIAN       __TMP_LITTLE_ENDIAN
 #endif
 
 #ifdef __cplusplus

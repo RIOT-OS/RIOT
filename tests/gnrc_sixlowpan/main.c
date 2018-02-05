@@ -24,7 +24,6 @@
 #include "shell.h"
 #include "msg.h"
 #include "net/ipv6/addr.h"
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netreg.h"
@@ -35,23 +34,24 @@
 
 static void _init_interface(void)
 {
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
+    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
-
-    gnrc_netif_get(ifs);
 
     /* fd01::01 */
     addr.u8[0] = 0xfd;
     addr.u8[1] = 0x01;
     addr.u8[15] = 0x01;
-    gnrc_ipv6_netif_add_addr(ifs[0], &addr, 64, GNRC_IPV6_NETIF_ADDR_FLAGS_UNICAST);
+
+    if (gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR, 64U << 8U, &addr,
+                        sizeof(addr)) < 0) {
+        printf("error: unable to add IPv6 address fd01::1/64 to interface %u\n",
+               netif->pid);
+    }
 }
 
 static void _send_packet(void)
 {
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-
-    gnrc_netif_get(ifs);
+    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
 
     struct {
         gnrc_netif_hdr_t netif_hdr;
@@ -64,7 +64,7 @@ static void _send_packet(void)
 
     gnrc_netif_hdr_init(&(netif_hdr.netif_hdr), 8, 8);
 
-    netif_hdr.netif_hdr.if_pid = ifs[0];
+    netif_hdr.netif_hdr.if_pid = netif->pid;
 
     uint8_t data1[] = {
         /* 6LoWPAN Header */

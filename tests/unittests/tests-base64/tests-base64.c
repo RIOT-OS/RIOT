@@ -208,9 +208,9 @@ static void test_base64_06_stream_encode(void)
 
     /* required output size +2 extra bytes */
     size_t encoded_size = 264 + 2;
-    /* cppcheck-suppress unassignedVariable */
+    /* cppcheck-suppress unassignedVariable
+     * (reason: the above array is used/assigned in base64_encode() using its pointer) */
     unsigned char encode_result[encoded_size];
-    /* the above array is used/assigned in base64_encode() using its pointer. */
 
     int remain = strlen((char *)stream_encode);
     int out_iter = 0;
@@ -264,9 +264,9 @@ static void test_base64_07_stream_decode(void)
     /* required output size +2 extra bytes */
     size_t decoded_size = 196 + 2;
 
-    /* cppcheck-suppress unassignedVariable */
+    /* cppcheck-suppress unassignedVariable
+     * (reason: the above array is used/assigned in base64_decode() using its pointer) */
     unsigned char stream_decoded[decoded_size];
-    /* the above array is used/assigned in base64_decode() using its pointer. */
 
     size_t encoded_size = strlen((char *)encoded);
     int remain = encoded_size;

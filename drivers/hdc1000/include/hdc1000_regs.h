@@ -27,7 +27,7 @@ extern "C"
 #endif
 
 /**
- * @brief   Manufacturer and Device IDs
+ * @name    Manufacturer and Device IDs
  * @{
  */
 #define HDC1000_MID_VALUE          0x5449
@@ -35,7 +35,7 @@ extern "C"
 /** @} */
 
 /**
- * @brief   Register Map
+ * @name    Register Map
  * @{
  */
 #define HDC1000_TEMPERATURE         (0x00)
@@ -49,7 +49,7 @@ extern "C"
 /** @} */
 
 /**
- * @brief   Configuration register bitmap
+ * @name    Configuration register bitmap
  * @{
  */
 #define HDC1000_RST                 (1 << 15)

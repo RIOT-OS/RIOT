@@ -31,6 +31,7 @@
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/nettype.h"
+#include "thread.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,7 +48,7 @@ extern "C" {
 #define KW2XRF_DEFAULT_PANID            (IEEE802154_DEFAULT_PANID)
 
 /**
- * @brief   Default channel used after initialization
+ * @name    Default channel used after initialization
  *
  * @{
  */
@@ -57,7 +58,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Allowed range of channels
+ * @name    Allowed range of channels
  *
  * @{
  */
@@ -109,7 +110,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief struct holding all params needed for device initialization
+ * @brief   Struct holding all params needed for device initialization
  */
 typedef struct kw2xrf_params {
     spi_t spi;                          /**< SPI bus the device is connected to */
@@ -129,6 +130,7 @@ typedef struct {
      * @brief   device specific fields
      * @{
      */
+    thread_t *thread;                   /**< Network driver thread, for providing feedback from IRQ handler */
     kw2xrf_params_t params;             /**< parameters for initialization */
     uint8_t buf[KW2XRF_MAX_PKT_LENGTH]; /**< Buffer for incoming or outgoing packets */
     uint8_t state;                      /**< current state of the radio */

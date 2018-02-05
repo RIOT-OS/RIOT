@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the XBee driver
+ * @name    Set default configuration parameters for the XBee driver
  * @{
  */
 #ifndef XBEE_PARAM_UART

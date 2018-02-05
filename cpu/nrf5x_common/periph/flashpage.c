@@ -25,7 +25,7 @@
 
 void flashpage_write(int page, void *data)
 {
-    assert(page < FLASHPAGE_NUMOF);
+    assert(page < (int)FLASHPAGE_NUMOF);
 
     uint32_t *page_addr = (uint32_t *)flashpage_addr(page);
     uint32_t *data_addr = (uint32_t *)data;

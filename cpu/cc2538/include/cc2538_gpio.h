@@ -55,7 +55,7 @@ enum {
  *
  * @return A bit mask in which bit n is high.
 */
-#define GPIO_PIN_MASK(n) ( 1 << (n) )
+#define PIN_MASK(n) ( 1 << (n) )
 
 /**
  * @brief Extract the GPIO port number (0-3) from a GPIO number (0-31)
@@ -99,28 +99,28 @@ enum {
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define gpio_hardware_control(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->AFSEL |= GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define gpio_hardware_control(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->AFSEL |= PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
 
 /**
  * @brief Enable software control for a given GPIO pin number
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define gpio_software_control(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->AFSEL &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define gpio_software_control(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->AFSEL &= ~PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
 
 /**
  * @brief Configure the given GPIO as an output
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define gpio_dir_output(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DIR |= GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define gpio_dir_output(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DIR |= PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
 
 /**
  * @brief Configure the given GPIO as an input
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define gpio_dir_input(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DIR &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define gpio_dir_input(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DIR &= ~PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
 
 /**
  * @brief Read the value of the given pin
@@ -130,27 +130,16 @@ enum {
 #define cc2538_gpio_read(gpio_num) ( (GPIO_NUM_TO_DEV(gpio_num)->DATA >> GPIO_BIT_NUM(gpio_num)) & 1 )
 
 /**
- * @brief Set a specific GPIO output pin high
- *
- * @param[in] gpio_num GPIO number (0-31)
-*/
-#define cc2538_gpio_set(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DATA |= GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
-
-/**
  * @brief Set a specific GPIO output pin low
  *
  * @param[in] gpio_num GPIO number (0-31)
 */
-#define cc2538_gpio_clear(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DATA &= ~GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
+#define cc2538_gpio_clear(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DATA &= ~PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
 
 /**
- * @brief Toggle the output state of a specific GPIO pin
- *
- * @param[in] gpio_num GPIO number (0-31)
-*/
-#define cc2538_gpio_toggle(gpio_num) ( GPIO_NUM_TO_DEV(gpio_num)->DATA ^= GPIO_PIN_MASK(GPIO_BIT_NUM(gpio_num)) )
-
-/** @name Unique names for each GPIO port/pin combination
+ * @name Unique names for each GPIO port/pin combination
+ * @deprecated will be removed after adaption of periph drivers,
+ *             use GPIO_PIN macro instead
  * @{
  */
 enum {
@@ -220,42 +209,113 @@ typedef struct {
 } cc2538_gpio_t;
 
 /**
- * @brief IOC port component registers
+ * @brief   GPIO port instance base address
  */
-typedef struct {
-    cc2538_reg_t SEL[32];               /**< Port A to D SEL registers */
-    cc2538_reg_t OVER[32];              /**< Port A OVER register */
-} cc2538_ioc_t;
+#define GPIO_BASE           (0x400d9000)
 
 /**
- * @name Values for IOC_PXX_SEL
+ * @name    GPIO shift and masking
  * @{
  */
-#define IOC_SEL_UART0_TXD       (0)     /**< UART0 TXD */
-#define IOC_SEL_UART1_RTS       (1)     /**< UART1 RTS */
-#define IOC_SEL_UART1_TXD       (2)     /**< UART1 TXD */
-#define IOC_SEL_SSI0_TXD        (3)     /**< SSI0 TXD */
-#define IOC_SEL_SSI0_CLKOUT     (4)     /**< SSI0 CLKOUT */
-#define IOC_SEL_SSI0_FSSOUT     (5)     /**< SSI0 FSSOUT */
-#define IOC_SEL_SSI0_STXSER_EN  (6)     /**< SSI0 STXSER EN */
-#define IOC_SEL_SSI1_TXD        (7)     /**< SSI1 TXD */
-#define IOC_SEL_SSI1_CLKOUT     (8)     /**< SSI1 CLKOUT */
-#define IOC_SEL_SSI1_FSSOUT     (9)     /**< SSI1 FSSOUT */
-#define IOC_SEL_SSI1_STXSER_EN  (10)    /**< SSI1 STXSER EN */
-#define IOC_SEL_I2C_CMSSDA      (11)    /**< I2C CMSSDA */
-#define IOC_SEL_I2C_CMSSCL      (12)    /**< I2C CMSSCL */
-#define IOC_SEL_GPT0_ICP1       (13)    /**< GPT0 ICP1 */
-#define IOC_SEL_GPT0_ICP2       (14)    /**< GPT0 ICP2 */
-#define IOC_SEL_GPT1_ICP1       (15)    /**< GPT1 ICP1 */
-#define IOC_SEL_GPT1_ICP2       (16)    /**< GPT1 ICP2 */
-#define IOC_SEL_GPT2_ICP1       (17)    /**< GPT2 ICP1 */
-#define IOC_SEL_GPT2_ICP2       (18)    /**< GPT2 ICP2 */
-#define IOC_SEL_GPT3_ICP1       (19)    /**< GPT3 ICP1 */
-#define IOC_SEL_GPT3_ICP2       (20)    /**< GPT3 ICP2 */
+#define GPIO_PORTNUM_SHIFT  (12U)           /**< bit shift for GPIO port      */
+#define GPIO_PORTNUM_MASK   (0x00007000)    /**< bit mask for GPIO port [0-3] */
+#define GPIO_PIN_MASK       (0x00000007)    /**< bit mask for GPIO pin [0-7]  */
+#define GPIO_PORT_MASK      (0xfffff000)    /**< bit mask for GPIO port addr  */
 /** @} */
 
 /**
+ * @name    GPIO instance definitions
+ * @deprecated will be removed after adaption of periph drivers
+ * @{
+ */
+#define GPIO_A ((cc2538_gpio_t *)0x400d9000)    /**< GPIO Port A instance */
+#define GPIO_B ((cc2538_gpio_t *)0x400da000)    /**< GPIO Port B instance */
+#define GPIO_C ((cc2538_gpio_t *)0x400db000)    /**< GPIO Port C instance */
+#define GPIO_D ((cc2538_gpio_t *)0x400dc000)    /**< GPIO Port D instance */
+/** @} */
+
+/**
+ * @brief IOC port component registers
+ */
+ typedef struct {
+     cc2538_reg_t SEL[32];      /**< select special function for output pin*/
+     cc2538_reg_t OVER[32];     /**< override pin mode, enable alternate mode */
+     cc2538_reg_t PINS[21];     /**< select input pin for special functions */
+ } cc2538_ioc_t;
+
+ /**
+  * @name Peripheral Signal Select Values (for IOC_Pxx_SEL registers)
+  * @{
+  */
+ typedef enum {
+     UART0_TXD = 0,      /**< UART0 TXD */
+     UART1_RTS,          /**< UART1 RTS */
+     UART1_TXD,          /**< UART1 TXD */
+     SSI0_TXD,           /**< SSI0 TXD */
+     SSI0_CLK_OUT,       /**< SSI0 CLKOUT */
+     SSI0_FSS_OUT,       /**< SSI0 FSSOUT */
+     SSI0_TX_SER,        /**< SSI0 STXSER EN */
+     SSI1_TXD,           /**< SSI1 TXD */
+     SSI1_CLK_OUT,       /**< SSI1 CLKOUT */
+     SSI1_FSS_OUT,       /**< SSI1 FSSOUT */
+     SSI1_TX_SER,        /**< SSI1 STXSER EN */
+     I2C_SDA_OUT,        /**< I2C CMSSDA */
+     I2C_SCL_OUT,        /**< I2C CMSSCL */
+     GPT0_ICP1,          /**< GPT0 ICP1 */
+     GPT0_ICP2,          /**< GPT0 ICP2 */
+     GPT1_ICP1,          /**< GPT1 ICP1 */
+     GPT1_ICP2,          /**< GPT1 ICP2 */
+     GPT2_ICP1,          /**< GPT2 ICP1 */
+     GPT2_ICP2,          /**< GPT2 ICP2 */
+     GPT3_ICP1,          /**< GPT3 ICP1 */
+     GPT3_ICP2 ,         /**< GPT3 ICP2 */
+ } cc2538_ioc_sel_t;
+ /** @} */
+
+ /**
+  * @name Pin select for periphical functions
+  * @{
+  */
+ typedef enum {
+     UART0_RXD = 0,      /**< UART0 RXD */
+     UART1_CTS,          /**< UART1 CTS */
+     UART1_RXD,          /**< UART1 RXD */
+     SSI0_CLK,           /**< SSI0 CLK */
+     SSI0_RXD,           /**< SSI0 RXD */
+     SSI0_FSS_IN,        /**< SSI0 FSS IN */
+     SSI0_CLK_IN,        /**< SSI0 CLK IN */
+     SSI1_CLK,           /**< SSI1 CLK */
+     SSI1_RXD,           /**< SSI1 RXD */
+     SSI1_FSS_IN,        /**< SSI1 FSS IN */
+     SSI1_CLK_IN,        /**< SSI1 CLK IN */
+     I2C_SDA_IN,         /**< I2C SDA IN */
+     I2C_SCL_IN,         /**< I2C SCL IN */
+     GPT0_OCP1,          /**< GPT0 OCP1 */
+     GPT0_OCP2,          /**< GPT0 OCP2 */
+     GPT1_OCP1,          /**< GPT1 OCP1 */
+     GPT1_OCP2,          /**< GPT1 OCP2 */
+     GPT2_OCP1,          /**< GPT2 OCP1 */
+     GPT2_OCP2,          /**< GPT2 OCP2 */
+     GPT3_OCP1,          /**< GPT3 OCP1 */
+     GPT3_OCP2,          /**< GPT3 OCP2 */
+ } cc2538_ioc_pin_t;
+ /** @} */
+
+ /**
+  * @brief Values to override pin configuration
+  */
+ typedef enum {
+     OVERRIDE_DISABLE    = 0x0,
+     OVERRIDE_ANALOG     = 0x1,
+     OVERRIDE_PULLDOWN   = 0x2,
+     OVERRIDE_PULLUP     = 0x4,
+     OVERRIDE_ENABLE     = 0x8,
+ } cc2538_ioc_over_t;
+
+/**
  * @name Values for IOC_PXX_OVER
+ * @deprecated will be removed after adaption of periph drivers,
+ *             use cc2538_ioc_over_t instead
  * @{
  */
 #define IOC_OVERRIDE_OE   0x00000008    /**< Output Enable */
@@ -266,20 +326,18 @@ typedef struct {
 /** @} */
 
 /**
- * @name GPIO instance definitions
- * @{
+ * @brief   IOC instance definition
  */
-#define GPIO_A ((cc2538_gpio_t *)0x400d9000)    /**< GPIO Port A instance */
-#define GPIO_B ((cc2538_gpio_t *)0x400da000)    /**< GPIO Port B instance */
-#define GPIO_C ((cc2538_gpio_t *)0x400db000)    /**< GPIO Port C instance */
-#define GPIO_D ((cc2538_gpio_t *)0x400dc000)    /**< GPIO Port D instance */
-/** @} */
+#define IOC    ((cc2538_ioc_t *)0x400d4000)
 
 /**
- * @name IOC instance definition
+ * @name Port control register addresses
+ * @deprecated will be removed after adaption of periph drivers,
+ *             use IOC->OVER and IOC->SEL instead
  * @{
  */
-#define IOC    ((cc2538_ioc_t *)0x400d4000)     /**< IOC instance */
+#define IOC_PXX_OVER    (IOC->OVER)
+#define IOC_PXX_SEL     (IOC->SEL)
 /** @} */
 
 #ifdef __cplusplus

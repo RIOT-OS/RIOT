@@ -31,7 +31,7 @@ extern "C" {
 /* These functions are defined in asmfunc.S */
 
 /**
- * @brief Copy aligned to unaligned
+ * @brief   Copy aligned to unaligned
  *
  * @param[out] dst   Pointer to unaligned destination address
  * @param[in]  src   Pointer to aligned source address
@@ -40,7 +40,7 @@ extern "C" {
 void copy_al2un(unsigned char *dst, const unsigned long *src, int count);
 
 /**
- * @brief Copy unaligned to aligned
+ * @brief   Copy unaligned to aligned
  *
  * @param[out] dst   Pointer to unaligned destination address
  * @param[in]  src   Pointer to aligned source address
@@ -59,18 +59,16 @@ typedef enum {
 } diskio_result_t;
 
 /**
- * @name Disk Status Bits
- * @{
+ * @brief   Disk Status Bits
  */
 typedef enum {
     DISKIO_STA_NOINIT  = 0x01, /**< Drive not initialized */
     DISKIO_STA_NODISK  = 0x02, /**< No medium in the drive */
     DISKIO_STA_PROTECT = 0x04  /**< Write protected */
 } diskio_sta_t;
-/** @} */
 
 /**
- * @name Command code for disk_ioctrl fucntion
+ * @name    Command code for disk_ioctrl fucntion
  * @{
  */
 
@@ -86,7 +84,7 @@ typedef enum {
 /** @} */
 
 /**
- * @name Generic ioctl command
+ * @name    Generic ioctl command
  * @{
  */
 #define CTRL_POWER          5   /**< Get/Set power status */
@@ -95,7 +93,7 @@ typedef enum {
 /** @} */
 
 /**
- * @name MMC/SDC specific ioctl command
+ * @name    MMC/SDC specific ioctl command
  * @{
  */
 #define MMC_GET_TYPE        10  /**< Get card type */
@@ -109,7 +107,7 @@ typedef enum {
 
 
 /**
- * @brief Initialize media control interface (MCI)
+ * @brief   Initialize media control interface (MCI)
  *
  * @returns 0 on success
  * @returns a @ref diskio_sta_t value on error
@@ -117,7 +115,7 @@ typedef enum {
 diskio_sta_t mci_initialize(void);
 
 /**
- * @brief Get the status of the media control interface (MCI)
+ * @brief   Get the status of the media control interface (MCI)
  *
  * @returns 0 on success
  * @returns a @ref diskio_sta_t value on error
@@ -125,7 +123,7 @@ diskio_sta_t mci_initialize(void);
 diskio_sta_t mci_status(void);
 
 /**
- * @brief Read sectors over the media control interface (MCI)
+ * @brief   Read sectors over the media control interface (MCI)
  *
  * @param[out] buff      Pointer to the data buffer to store read data
  * @param[in]  sector    Start sector number (LBA)
@@ -137,7 +135,7 @@ diskio_sta_t mci_status(void);
 diskio_result_t mci_read(unsigned char *buff, unsigned long sector, unsigned char count);
 
 /**
- * @brief Write sectors over the media control interface (MCI)
+ * @brief   Write sectors over the media control interface (MCI)
  * @param[in] buff     Pointer to the data to be written
  * @param[in] sector   Start sector number (LBA)
  * @param[in] count    Sector count (1..127)
@@ -148,7 +146,7 @@ diskio_result_t mci_read(unsigned char *buff, unsigned long sector, unsigned cha
 diskio_result_t mci_write(const unsigned char *buff, unsigned long sector, unsigned char count);
 
 /**
- * @brief IOCTL functions for the media control interface (MCI)
+ * @brief   IOCTL functions for the media control interface (MCI)
  *
  * @param[in]       ctrl  Control code
  * @param[in,out]   buff  Buffer to send/receive data block
@@ -162,5 +160,5 @@ diskio_result_t mci_ioctl(unsigned char ctrl, void *buff);
 }
 #endif
 
-/** @} */
 #endif /* DISKIO_H */
+/** @} */

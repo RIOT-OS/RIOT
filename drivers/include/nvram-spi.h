@@ -33,21 +33,21 @@ extern "C" {
 #endif
 
 /**
- * @brief Bus parameters for SPI NVRAM.
+ * @brief   Bus parameters for SPI NVRAM.
  */
 typedef struct nvram_spi_params {
-    /** @brief RIOT SPI device */
+    /** @brief   RIOT SPI device */
     spi_t spi;
-    /** @brief SPI clock speed */
+    /** @brief   SPI clock speed */
     spi_clk_t clk;
-    /** @brief Chip select pin */
+    /** @brief   Chip select pin */
     gpio_t cs;
-    /** @brief Number of address bytes following each read/write command. */
+    /** @brief   Number of address bytes following each read/write command. */
     uint8_t address_count;
 } nvram_spi_params_t;
 
 /**
- * @brief Initialize an nvram_t structure with SPI settings.
+ * @brief   Initialize an nvram_t structure with SPI settings.
  *
  * This will also initialize the CS pin as a GPIO output, without pull resistors.
  *

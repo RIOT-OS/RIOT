@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_pcd8544
+ * @ingroup     drivers_pcd8544
  *
  * @{
  *
@@ -30,7 +30,7 @@
 #define RESET_DELAY         (5000)  /* keep reset low for 5ms */
 
 /**
- * @brief   Communication modes: command or data
+ * @name    Communication modes: command or data
  * @{
  */
 #define MODE_CMD            (0)     /**< we are sending a command */
@@ -38,7 +38,7 @@
 /** @} */
 
 /**
- * @brief   Maximum parameter values
+ * @name    Maximum parameter values
  * @{
  */
 #define CONTRAST_MAX        (127U)  /**< maximum possible contrast value */
@@ -47,7 +47,7 @@
 /** @} */
 
 /**
- * @brief   Display commands
+ * @name    Display commands
  * @{
  */
 #define CMD_DISABLE         (0x24)  /**< set LCD into power down mode */

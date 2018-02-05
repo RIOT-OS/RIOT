@@ -1,0 +1,5 @@
+MODULE := semtech_loramac_mac_region
+
+CFLAGS += -Wno-missing-field-initializers -Wno-unused-parameter -Wno-sign-compare
+
+include $(RIOTBASE)/Makefile.base

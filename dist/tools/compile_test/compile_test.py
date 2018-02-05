@@ -100,9 +100,10 @@ def build_all():
             stdout.write('\tBuilding application: {} ({}/{}) '.format(colorize_str(application, Termcolor.blue), nth, len(applications)))
             stdout.flush()
             try:
+                app_dir = join(riotbase, folder, application)
                 subprocess = Popen(('make', 'buildtest'),
                                    bufsize=1, stdin=null, stdout=PIPE, stderr=null,
-                                   cwd=join(riotbase, folder, application),
+                                   cwd=app_dir,
                                    env=subprocess_env)
 
                 results, results_with_output = tee(get_results_and_output_from(subprocess.stdout))
@@ -110,6 +111,10 @@ def build_all():
                 results_with_output = list(filter(lambda res: res[2].getvalue(), results_with_output))
                 failed_with_output = list(filter(lambda res: 'failed' in res[0], results_with_output))
                 success_with_output = list(filter(lambda res: 'success' in res[0], results_with_output))
+                # check if bin-directory isn't in system's PATH to not accidentally
+                # delete some valuable system executable ;-)
+                if join(app_dir, "bin") not in environ.get("PATH", "/bin:/usr/bin:/usr/local/bin:"):
+                    check_call(["rm", "-rf", join(app_dir, "bin")])
                 print()
                 for group, result in results:
                     print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board, output in result))))

@@ -9,7 +9,8 @@
 /**
  * @defgroup sys_od Object dump
  * @ingroup  sys
- * @brief   Allows to print out data dumps of memory regions
+ * @brief    Allows to print out data dumps of memory regions in hexadecimal or/and
+             ASCII representation.
  *
  * @{
  *
@@ -34,7 +35,9 @@ extern "C" {
 
 /**
  * @brief Dumps memory stored at *data* byte-wise up to *data_len* in
- *        hexadecimal representation to stdout with
+ *        hexadecimal representation to stdout. If the pseudomodlue `od_string`
+          is used (`USEMODULE += od_string`) the ASCII representation of *data* is
+          also displayed.
  *
  * @param[in] data      Data to dump.
  * @param[in] data_len  Length in bytes of *data* to output.

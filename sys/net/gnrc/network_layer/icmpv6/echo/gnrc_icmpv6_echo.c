@@ -50,18 +50,13 @@ gnrc_pktsnip_t *gnrc_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
         DEBUG(", payload:\n");
         od_hex_dump(data, data_len, OD_WIDTH_DEFAULT);
 #endif
-        DEBUG("\n");
     }
-#if ENABLE_DEBUG
-    else {
-        DEBUG("\n");
-    }
-#endif
+    DEBUG("\n");
 
     return pkt;
 }
 
-void gnrc_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
+void gnrc_icmpv6_echo_req_handle(gnrc_netif_t *netif, ipv6_hdr_t *ipv6_hdr,
                                  icmpv6_echo_t *echo, uint16_t len)
 {
     uint8_t *payload = ((uint8_t *)echo) + sizeof(icmpv6_echo_t);
@@ -98,7 +93,13 @@ void gnrc_icmpv6_echo_req_handle(kernel_pid_t iface, ipv6_hdr_t *ipv6_hdr,
     pkt = hdr;
     hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
 
-    ((gnrc_netif_hdr_t *)hdr->data)->if_pid = iface;
+    if (netif != NULL) {
+        ((gnrc_netif_hdr_t *)hdr->data)->if_pid = netif->pid;
+    }
+    else {
+        /* ipv6_hdr->dst is loopback address */
+        ((gnrc_netif_hdr_t *)hdr->data)->if_pid = KERNEL_PID_UNDEF;
+    }
 
     LL_PREPEND(pkt, hdr);
 

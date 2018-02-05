@@ -6,9 +6,6 @@
  * directory for more details.
  */
 
-#ifndef SHT11_H
-#define SHT11_H
-
 /**
  * @defgroup    drivers_sht11 SHT11 Humidity and Temperature Sensor
  * @ingroup     drivers_sensors
@@ -20,6 +17,9 @@
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  */
+
+#ifndef SHT11_H
+#define SHT11_H
 
 #include <stdint.h>
 
@@ -104,5 +104,5 @@ uint8_t sht11_read_status(uint8_t *p_value, uint8_t *p_checksum);
 }
 #endif
 
-/** @} */
 #endif /* SHT11_H */
+/** @} */

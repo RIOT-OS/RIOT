@@ -106,7 +106,7 @@ void tcs37727_set_rgbc_standby(const tcs37727_t *dev)
     i2c_release(BUS);
 }
 
-static uint8_t tcs37727_trim_gain(tcs37727_t *dev, int rawc)
+static uint8_t tcs37727_trim_gain(tcs37727_t *dev, int32_t rawc)
 {
     uint8_t reg_again = 0;
     int val_again = dev->again;

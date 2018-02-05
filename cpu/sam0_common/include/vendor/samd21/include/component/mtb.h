@@ -3,7 +3,7 @@
  *
  * \brief Component description for MTB
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -40,9 +40,6 @@
  * \asf_license_stop
  *
  */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 
 #ifndef _SAMD21_MTB_COMPONENT_
 #define _SAMD21_MTB_COMPONENT_
@@ -74,7 +71,7 @@ typedef union {
 #define MTB_POSITION_WRAP           (0x1ul << MTB_POSITION_WRAP_Pos)
 #define MTB_POSITION_POINTER_Pos    3            /**< \brief (MTB_POSITION) Trace Packet Location Pointer */
 #define MTB_POSITION_POINTER_Msk    (0x1FFFFFFFul << MTB_POSITION_POINTER_Pos)
-#define MTB_POSITION_POINTER(value) ((MTB_POSITION_POINTER_Msk & ((value) << MTB_POSITION_POINTER_Pos)))
+#define MTB_POSITION_POINTER(value) (MTB_POSITION_POINTER_Msk & ((value) << MTB_POSITION_POINTER_Pos))
 #define MTB_POSITION_MASK           0xFFFFFFFCul /**< \brief (MTB_POSITION) MASK Register */
 
 /* -------- MTB_MASTER : (MTB Offset: 0x004) (R/W 32) MTB Master -------- */
@@ -99,7 +96,7 @@ typedef union {
 
 #define MTB_MASTER_MASK_Pos         0            /**< \brief (MTB_MASTER) Maximum Value of the Trace Buffer in SRAM */
 #define MTB_MASTER_MASK_Msk         (0x1Ful << MTB_MASTER_MASK_Pos)
-#define MTB_MASTER_MASK(value)      ((MTB_MASTER_MASK_Msk & ((value) << MTB_MASTER_MASK_Pos)))
+#define MTB_MASTER_MASK(value)      (MTB_MASTER_MASK_Msk & ((value) << MTB_MASTER_MASK_Pos))
 #define MTB_MASTER_TSTARTEN_Pos     5            /**< \brief (MTB_MASTER) Trace Start Input Enable */
 #define MTB_MASTER_TSTARTEN         (0x1ul << MTB_MASTER_TSTARTEN_Pos)
 #define MTB_MASTER_TSTOPEN_Pos      6            /**< \brief (MTB_MASTER) Trace Stop Input Enable */
@@ -136,7 +133,7 @@ typedef union {
 #define MTB_FLOW_AUTOHALT           (0x1ul << MTB_FLOW_AUTOHALT_Pos)
 #define MTB_FLOW_WATERMARK_Pos      3            /**< \brief (MTB_FLOW) Watermark value */
 #define MTB_FLOW_WATERMARK_Msk      (0x1FFFFFFFul << MTB_FLOW_WATERMARK_Pos)
-#define MTB_FLOW_WATERMARK(value)   ((MTB_FLOW_WATERMARK_Msk & ((value) << MTB_FLOW_WATERMARK_Pos)))
+#define MTB_FLOW_WATERMARK(value)   (MTB_FLOW_WATERMARK_Msk & ((value) << MTB_FLOW_WATERMARK_Pos))
 #define MTB_FLOW_MASK               0xFFFFFFFBul /**< \brief (MTB_FLOW) MASK Register */
 
 /* -------- MTB_BASE : (MTB Offset: 0x00C) (R/  32) MTB Base -------- */

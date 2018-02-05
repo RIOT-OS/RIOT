@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   SPI commands
+ * @name    SPI commands
  * @{
  */
 #define CMD_READ            (0x0f)
@@ -32,7 +32,8 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Common registers
+ * @name    Common registers
+ * @{
  */
 #define REG_MODE            (0x0000)    /**< mode */
 #define REG_GAR0            (0x0001)    /**< gateway address 0 */
@@ -73,9 +74,10 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Socket 0 registers
+ * @name    Socket 0 registers
  *
  * As we are using the device in MACRAW mode, we only need socket 0.
+ * @{
  */
 #define S0_MR               (0x0400)    /**< mode */
 #define S0_CR               (0x0401)    /**< control */
@@ -111,7 +113,8 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Some selected bitfield definitions
+ * @name    Some selected bitfield definitions
+ * @{
  */
 #define MODE_RESET          (0x80)      /**< device mode: reset */
 

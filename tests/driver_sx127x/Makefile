@@ -1,4 +1,3 @@
-APPLICATION = driver_sx127x
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
@@ -18,7 +17,5 @@ USEMODULE += ${DRIVER}
 
 FEATURES_REQUIRED ?= periph_spi
 FEATURES_REQUIRED ?= periph_gpio
-
-CFLAGS += -DDEVELHELP
 
 include $(RIOTBASE)/Makefile.include

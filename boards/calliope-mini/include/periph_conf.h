@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Freie Universität Berlin
+ * Copyright (C) 2016-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +14,7 @@
  * @brief       Peripheral configuration for the Calliope mini
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Semjon Kerner <semjon.kerner@fu-berlin.de>
  */
 
 #ifndef PERIPH_CONF_H
@@ -32,7 +33,6 @@ extern "C" {
  *
  * @{
  */
-#define CLOCK_CORECLOCK     (16000000U)     /* fixed for all nRF51822 */
 #define CLOCK_HFCLK         (16U)           /* set to  0: internal RC oscillator
                                                       16: 16MHz crystal
                                                       32: 32MHz crystal */
@@ -101,8 +101,8 @@ static const timer_conf_t timer_config[] = {
 static const i2c_conf_t i2c_config[] = {
     {
         .dev     = NRF_TWI0,
-        .pin_scl = 0,
-        .pin_sda = 30,
+        .pin_scl = 19,
+        .pin_sda = 20,
         .ppi     = 0
     }
 };

@@ -14,6 +14,42 @@
  * This module contains drivers for radio devices in Microchip MRF24J40 series.
  * The driver is aimed to work with all devices of this series.
  *
+ * Default TX power is 0dBm.
+ *
+ * TX power mapping:
+ * * 0 -> -36dB
+ * * 1 -> -35dB
+ * * 2 -> -34dB
+ * * 3 -> -33dB
+ * * 4 -> -32dB
+ * * 5 -> -31dB
+ * * 6 -> -30dB
+ * * 7 -> -30dB
+ * * 8 -> -26dB
+ * * 9 -> -25dB
+ * * 10 -> -24dB
+ * * 11 -> -23dB
+ * * 12 -> -22dB
+ * * 13 -> -21dB
+ * * 14 -> -20dB
+ * * 15 -> -20dB
+ * * 16 -> -16dB
+ * * 17 -> -15dB
+ * * 18 -> -14dB
+ * * 19 -> -13dB
+ * * 20 -> -12dB
+ * * 21 -> -11dB
+ * * 22 -> -10dB
+ * * 23 -> -10dB
+ * * 24 -> -6dB
+ * * 25 -> -5dB
+ * * 26 -> -4dB
+ * * 27 -> -3dB
+ * * 28 -> -2dB
+ * * 29 -> -1dB
+ * * 30 -> -0dB
+ * * 31 -> -0dB
+ *
  * @{
  *
  * @file
@@ -40,43 +76,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default TX power (0dBm)
- *  0 -> -36dB
- *  1 -> -35dB
- *  2 -> -34dB
- *  3 -> -33dB
- *  4 -> -32dB
- *  5 -> -31dB
- *  6 -> -30dB
- *  7 -> -30dB
- *  8 -> -26dB
- *  9 -> -25dB
- *  10 -> -24dB
- *  11 -> -23dB
- *  12 -> -22dB
- *  13 -> -21dB
- *  14 -> -20dB
- *  15 -> -20dB
- *  16 -> -16dB
- *  17 -> -15dB
- *  18 -> -14dB
- *  19 -> -13dB
- *  20 -> -12dB
- *  21 -> -11dB
- *  22 -> -10dB
- *  23 -> -10dB
- *  24 -> -6dB
- *  25 -> -5dB
- *  26 -> -4dB
- *  27 -> -3dB
- *  28 -> -2dB
- *  29 -> -1dB
- *  30 -> -0dB
- *  31 -> -0dB
- */
-
-/**
- * @brief   Flags for PSEUDO DEVICE INTERNAL STATES
+ * @name    Flags for pseudo device internal states
  * @{
  */
 #define MRF24J40_PSEUDO_STATE_IDLE      (0x01)      /**< Idle, ready to transmit or receive */
@@ -85,7 +85,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Internal device option flags
+ * @name    Internal device option flags
  *
  * `0x00ff` is reserved for general IEEE 802.15.4 flags
  * (see @ref netdev_ieee802154_t)
@@ -116,12 +116,12 @@ extern "C" {
 #define MRF24J40_MAX_FRAME_RETRIES      (3U)        /**< Number of frame retries (fixed) */
 
 /**
- * @brief struct holding all params needed for device initialization
+ * @brief   struct holding all params needed for device initialization
  */
 typedef struct mrf24j40_params {
     spi_t spi;              /**< SPI bus the device is connected to */
-    spi_clk_t spi_clk;  /**< SPI speed to use */
-    spi_cs_t cs_pin;          /**< GPIO pin connected to chip select */
+    spi_clk_t spi_clk;      /**< SPI speed to use */
+    spi_cs_t cs_pin;        /**< GPIO pin connected to chip select */
     gpio_t int_pin;         /**< GPIO pin connected to the interrupt pin */
     gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
 } mrf24j40_params_t;
@@ -131,17 +131,16 @@ typedef struct mrf24j40_params {
  */
 typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
-    /**
-     * @brief   device specific fields
-     * @{
-     */
+    /*  device specific fields  */
     mrf24j40_params_t params;               /**< parameters for initialization */
     uint8_t state;                          /**< current state of the radio */
     uint8_t idle_state;                     /**< state to return to after sending */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
-    uint8_t header_len;
+    uint8_t header_len;                     /**< length of the header */
+    uint8_t fcf_low;                        /**< Low 8 FCF bits of the current TX frame. */
     uint8_t pending;                        /**< Flags for pending tasks */
-    uint8_t irq_flag;
+    uint8_t irq_flag;                       /**< Flags for IRQs */
+    uint8_t tx_retries;                     /**< Number of retries needed for last transmission */
 } mrf24j40_t;
 
 /**
@@ -368,6 +367,14 @@ void mrf24j40_reset_state_machine(mrf24j40_t *dev);
  * @param[in] dev           device to operate on
  */
 void mrf24j40_software_reset(mrf24j40_t *dev);
+
+/**
+ * @brief   Convert scalar from mrf24j40 RSSI to dBm
+ *
+ * @param[in] value         value to convert to dBm
+ * @return                  converted value in dBm
+ */
+int8_t mrf24j40_dbm_from_reg(uint8_t value);
 
 /**
  * @brief   Prepare for sending of data

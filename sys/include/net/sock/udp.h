@@ -299,16 +299,16 @@ typedef struct sock_udp sock_udp_t;
  * @param[out] sock     The resulting sock object.
  * @param[in] local     Local end point for the sock object.
  *                      May be NULL.
- *                      sock_udp_ep_t::port may not be 0 if `local != NULL`.
+ *                      sock_udp_ep_t::port must not be 0 if `local != NULL`.
  *                      sock_udp_ep_t::netif must either be
  *                      @ref SOCK_ADDR_ANY_NETIF or equal to
  *                      sock_udp_ep_t::netif of @p remote if `remote != NULL`.
  *                      If NULL @ref sock_udp_send() may bind implicitly.
  * @param[in] remote    Remote end point for the sock object.
  *                      May be `NULL` but then the `remote` parameter of
- *                      @ref sock_udp_send() may not be `NULL` and or it will
+ *                      @ref sock_udp_send() may not be `NULL` or it will
  *                      always error with return value -ENOTCONN.
- *                      sock_udp_ep_t::port may not be 0 if `remote != NULL`.
+ *                      sock_udp_ep_t::port must not be 0 if `remote != NULL`.
  *                      sock_udp_ep_t::netif must either be
  *                      @ref SOCK_ADDR_ANY_NETIF or equal to sock_udp_ep_t::netif
  *                      of @p local if `local != NULL`.
@@ -389,6 +389,8 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  * @return  0, if no received data is available, but everything is in order.
  * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
  * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_udp_recv() blocks).
  * @return  -ENOBUFS, if buffer space is not large enough to store received
  *          data.
  * @return  -ENOMEM, if no memory was available to receive @p data.

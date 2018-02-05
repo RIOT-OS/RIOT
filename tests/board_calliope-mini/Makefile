@@ -1,4 +1,3 @@
-APPLICATION = board_calliope-mini
 BOARD ?= calliope-mini
 include ../Makefile.tests_common
 

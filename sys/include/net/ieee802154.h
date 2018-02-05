@@ -46,6 +46,8 @@ extern "C" {
  * @{
  */
 #define IEEE802154_MAX_HDR_LEN              (23U)
+#define IEEE802154_MIN_FRAME_LEN            (IEEE802154_FCF_LEN + sizeof(uint8_t))
+
 #define IEEE802154_FCF_LEN                  (2U)
 #define IEEE802154_FCS_LEN                  (2U)
 
@@ -275,6 +277,7 @@ static inline eui64_t *ieee802154_get_iid(eui64_t *eui64, const uint8_t *addr,
             eui64->uint8[0] = addr[i++] ^ 0x02;
             eui64->uint8[1] = addr[i++];
 
+            /* Falls through. */
         case 2:
             eui64->uint8[2] = 0;
             eui64->uint8[3] = 0xff;

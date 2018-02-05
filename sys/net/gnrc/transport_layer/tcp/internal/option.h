@@ -38,7 +38,7 @@ extern "C" {
  *
  * @returns   MSS option value.
  */
-inline static uint32_t _option_build_mss(uint16_t mss)
+static inline uint32_t _option_build_mss(uint16_t mss)
 {
     return (((uint32_t) TCP_OPTION_KIND_MSS << 24) |
             ((uint32_t) TCP_OPTION_LENGTH_MSS << 16) | mss);
@@ -52,7 +52,7 @@ inline static uint32_t _option_build_mss(uint16_t mss)
  *
  * @returns   Bitfield with encoded control bits and number of options.
  */
-inline static uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl)
+static inline uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl)
 {
     assert(TCP_HDR_OFFSET_MIN <= nopts && nopts <= TCP_HDR_OFFSET_MAX);
     return (nopts << 12) | ctl;

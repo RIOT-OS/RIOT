@@ -25,9 +25,12 @@ ifeq ($(shell $(CC) -fno-delete-null-pointer-checks -E - 2>/dev/null >/dev/null 
   endif
 endif
 
-# Use colored gcc output if the compiler supports this
-ifeq ($(shell $(CC) -fdiagnostics-color -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
-  CFLAGS += -fdiagnostics-color
+# Use colored compiler output if the compiler supports this and if this is not
+# disabled by the user
+ifeq ($(CC_NOCOLOR),0)
+  ifeq ($(shell $(CC) -fdiagnostics-color -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+    CFLAGS += -fdiagnostics-color
+  endif
 endif
 
 # Fast-out on old style function definitions.

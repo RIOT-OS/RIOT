@@ -30,6 +30,10 @@
 
 #include "timex.h"
 
+#ifdef MODULE_CORE_THREAD_FLAGS
+#include "thread_flags.h"
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -257,3 +261,18 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
     xtimer_remove(&t);
     return -mt.timeout;
 }
+
+#ifdef MODULE_CORE_THREAD_FLAGS
+static void _set_timeout_flag_callback(void* arg)
+{
+    thread_flags_set(arg, THREAD_FLAG_TIMEOUT);
+}
+
+void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
+{
+    t->callback = _set_timeout_flag_callback;
+    t->arg = (thread_t *)sched_active_thread;
+    thread_flags_clear(THREAD_FLAG_TIMEOUT);
+    xtimer_set(t, timeout);
+}
+#endif

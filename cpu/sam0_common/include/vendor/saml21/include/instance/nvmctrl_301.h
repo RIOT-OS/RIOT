@@ -75,20 +75,20 @@
 #define NVMCTRL_CLK_AHB_ID          8        // Index of AHB Clock in PM.AHBMASK register
 #define NVMCTRL_CLK_AHB_ID_PICACHU  15       // Index of PICACHU AHB Clock
 #define NVMCTRL_FACTORY_WORD_IMPLEMENTED_MASK 0XC0000007FFFFFFFF
-#define NVMCTRL_FLASH_SIZE          262144
+#define NVMCTRL_FLASH_SIZE          262144  
 #define NVMCTRL_GCLK_ID             35       // Index of Generic Clock for test
 #define NVMCTRL_LOCKBIT_ADDRESS     0x00802000
-#define NVMCTRL_PAGE_HW             32
-#define NVMCTRL_PAGE_SIZE           64
-#define NVMCTRL_PAGE_W              16
-#define NVMCTRL_PMSB                3
-#define NVMCTRL_PSZ_BITS            6
-#define NVMCTRL_ROW_PAGES           4
-#define NVMCTRL_ROW_SIZE            256
+#define NVMCTRL_PAGE_HW             32      
+#define NVMCTRL_PAGE_SIZE           64      
+#define NVMCTRL_PAGE_W              16      
+#define NVMCTRL_PMSB                3       
+#define NVMCTRL_PSZ_BITS            6       
+#define NVMCTRL_ROW_PAGES           4       
+#define NVMCTRL_ROW_SIZE            256     
 #define NVMCTRL_USER_PAGE_ADDRESS   0x00800000
 #define NVMCTRL_USER_PAGE_OFFSET    0x00800000
 #define NVMCTRL_USER_WORD_IMPLEMENTED_MASK 0XC01FFFFFFFFFFFFF
-#define NVMCTRL_RWWEE_PAGES         128
+#define NVMCTRL_RWWEE_PAGES         128     
 #define NVMCTRL_RWW_EEPROM_ADDR     0x00400000 // Start address of the RWW EEPROM area
 
 #endif /* _SAML21_NVMCTRL_INSTANCE_ */

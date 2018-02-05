@@ -44,7 +44,7 @@ extern "C" {
  *                         (2^(8*length_enc)).
  * @param nonce            Nounce for ctr mode encryption
  * @param nonce_len        Length of the nonce in octets
- *                         (maximum: 16-length_encoding)
+ *                         (maximum: 15-length_encoding)
  * @param input            pointer to input data to encrypt
  * @param input_len        length of the input data
  * @param output           pointer to allocated memory for encrypted data. It
@@ -69,7 +69,7 @@ int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
  *                         (2^(8*length_enc)).
  * @param nonce            Nounce for ctr mode encryption
  * @param nonce_len        Length of the nonce in octets
- *                         (maximum: 16-length_encoding)
+ *                         (maximum: 15-length_encoding)
  * @param input            pointer to input data to decrypt
  * @param input_len        length of the input data
  * @param output           pointer to allocated memory for decrypted data. It

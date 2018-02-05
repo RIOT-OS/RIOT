@@ -22,15 +22,14 @@ export LINKFLAGS += -T$(LINKER_SCRIPT) -Wl,--fatal-warnings
 export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
 export LINKFLAGS += -Wl,--gc-sections
 
-# This CPU implementation is using the new core/CPU interface:
-export CFLAGS += -DCOREIF_NG=1
-
 # Tell the build system that the CPU depends on the Cortex-M common files:
 export USEMODULE += cortexm_common
 # Export the peripheral drivers to be linked into the final binary:
 export USEMODULE += periph
 # include common periph code
 export USEMODULE += periph_common
+export USEMODULE += cortexm_common_periph
+
 # all cortex MCU's use newlib as libc
 export USEMODULE += newlib
 
@@ -86,8 +85,9 @@ endif
 
 # Explicitly tell the linker to link the startup code.
 #   Without this the interrupt vectors will not be linked correctly!
+VECTORS_O ?= $(BINDIR)/cpu/vectors.o
 ifeq ($(COMMON_STARTUP),)
-export UNDEF += $(BINDIR)/cpu/vectors.o
+export UNDEF += $(VECTORS_O)
 endif
 
 # CPU depends on the cortex-m common module, so include it:

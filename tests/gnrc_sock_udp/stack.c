@@ -141,7 +141,7 @@ bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
             return _res(pkt, false);
         }
         netif_hdr = pkt->data;
-        if (netif_hdr->if_pid != iface) {
+        if (netif_hdr->if_pid != (int)iface) {
             return _res(pkt, false);
         }
         ipv6 = pkt->next;

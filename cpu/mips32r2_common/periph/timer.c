@@ -35,7 +35,7 @@
 #include <sys/time.h>
 
 #ifdef EIC_IRQ
-#include "../include/eic_irq.h"
+#include "eic_irq.h"
 #endif
 
 /*
@@ -80,6 +80,8 @@ static volatile int spurious_int;
  */
 int gettimeofday(struct timeval *__restrict __p, void *__restrict __tz)
 {
+    (void)__tz;
+
     uint64_t now = counter * US_PER_MS;
     __p->tv_sec = div_u64_by_1000000(now);
     __p->tv_usec = now - (__p->tv_sec * US_PER_SEC);
@@ -91,6 +93,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     assert(dev == 0);
 
+    (void)dev;
     (void)freq; /* Cannot adjust Frequency */
 
     timer_isr_ctx.cb = cb;
@@ -123,12 +126,14 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
     assert(dev == 0);
     assert(channel < CHANNELS);
 
+    (void)dev;
+
     timeout >>= TIMER_ACCURACY_SHIFT;
     timeout <<= TIMER_ACCURACY_SHIFT;
 
-    uint32_t status = irq_arch_disable();
+    uint32_t status = irq_disable();
     compares[channel] = counter + timeout;
-    irq_arch_restore(status);
+    irq_restore(status);
 
     return channel;
 }
@@ -138,12 +143,14 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     assert(dev == 0);
     assert(channel < CHANNELS);
 
+    (void)dev;
+
     value >>= TIMER_ACCURACY_SHIFT;
     value <<= TIMER_ACCURACY_SHIFT;
 
-    uint32_t status = irq_arch_disable();
+    uint32_t status = irq_disable();
     compares[channel] = value;
-    irq_arch_restore(status);
+    irq_restore(status);
 
     return channel;
 }
@@ -153,9 +160,11 @@ int timer_clear(tim_t dev, int channel)
     assert(dev == 0);
     assert(channel < CHANNELS);
 
-    uint32_t status = irq_arch_disable();
+    (void)dev;
+
+    uint32_t status = irq_disable();
     compares[channel] = 0;
-    irq_arch_restore(status);
+    irq_restore(status);
 
     return channel;
 }
@@ -164,21 +173,26 @@ unsigned int timer_read(tim_t dev)
 {
     assert(dev == 0);
 
+    (void)dev;
+
     return counter;
 }
 
 void timer_start(tim_t dev)
 {
+    (void)dev;
     mips32_bc_c0(C0_CAUSE, CR_DC);
 }
 
 void timer_stop(tim_t dev)
 {
+    (void)dev;
     mips32_bs_c0(C0_CAUSE, CR_DC);
 }
 
 void timer_irq_enable(tim_t dev)
 {
+    (void)dev;
 #ifdef EIC_IRQ
     eic_irq_enable(EIC_IRQ_TIMER);
 #else
@@ -189,6 +203,7 @@ void timer_irq_enable(tim_t dev)
 
 void timer_irq_disable(tim_t dev)
 {
+    (void)dev;
 #ifdef EIC_IRQ
     eic_irq_disable(EIC_IRQ_TIMER);
 #else
@@ -225,9 +240,9 @@ void __attribute__ ((interrupt("vector=hw5"))) _mips_isr_hw5(void)
 #ifdef EIC_IRQ
         eic_irq_ack(EIC_IRQ_TIMER);
 #endif
-        uint32_t status = irq_arch_disable();
+        uint32_t status = irq_disable();
         counter += TIMER_ACCURACY;
-        irq_arch_restore(status);
+        irq_restore(status);
 
         if (counter == compares[0]) {
             /*

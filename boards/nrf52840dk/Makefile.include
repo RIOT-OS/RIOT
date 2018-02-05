@@ -1,21 +1,3 @@
-# define the cpu used by the nRF52 DK
-export CPU = nrf52
 export CPU_MODEL = nrf52840xxaa
 
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
-# setup JLink for flashing
-export JLINK_DEVICE := nrf52
-
-# special options when using SoftDevice
-ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
-export JLINK_PRE_FLASH := erase\nloadfile $(BINDIR)/softdevice.hex
-export FLASH_ADDR := 0x1f000
-export LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
-endif
-include $(RIOTMAKE)/tools/jlink.inc.mk
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
+include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include

@@ -9,8 +9,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
 
 def test1(term):
     term.expect_exact("######################### TEST1:")
@@ -33,6 +31,7 @@ def test1(term):
     term.expect_exact("first: sem_post done")
     term.expect_exact("first: sem_destroy")
     term.expect_exact("first: end")
+
 
 def test2(term):
     term.expect_exact("######################### TEST2:")
@@ -64,6 +63,7 @@ def test2(term):
     term.expect_exact("Thread 'priority 5' woke up.")
     term.expect_exact("Back in main thread.")
 
+
 def test3(term):
     term.expect_exact("######################### TEST3:")
     term.expect_exact("first: sem_init s1")
@@ -80,12 +80,14 @@ def test3(term):
     term.expect_exact("post s1")
     term.expect_exact("Thread 2 woke up after waiting for s1.")
 
+
 def test4(term):
     term.expect_exact("######################### TEST4:")
     term.expect_exact("first: sem_init s1")
     term.expect_exact("first: wait 1 sec for s1")
     term.expect_exact("first: timed out")
     term.expect(r"first: waited 1\d{6} usec")
+
 
 def testfunc(child):
     test1(child)
@@ -94,5 +96,8 @@ def testfunc(child):
     test4(child)
     child.expect("######################### DONE")
 
+
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

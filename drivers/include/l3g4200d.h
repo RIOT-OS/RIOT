@@ -33,12 +33,12 @@
 #endif
 
 /**
- * @brief The sensors default I2C address
+ * @brief   The sensors default I2C address
  */
 #define L3G4200D_DEFAULT_ADDRESS        0x68
 
 /**
- * @brief Result vector for gyro measurement
+ * @brief   Result vector for gyro measurement
  */
 typedef struct {
     int16_t acc_x;          /**< roll rate in dgs (degree per second) */
@@ -47,7 +47,7 @@ typedef struct {
 } l3g4200d_data_t;
 
 /**
- * @brief Measurement scale for the gyro
+ * @brief   Measurement scale for the gyro
  */
 typedef enum {
     L3G4200D_SCALE_250DPS  = 0x0,       /**< scale: 250 degree per second */
@@ -56,7 +56,7 @@ typedef enum {
 } l3g4200d_scale_t;
 
 /**
- * @brief Sampling frequency and bandwidth settings for the gyro
+ * @brief   Sampling frequency and bandwidth settings for the gyro
  */
 typedef enum {
     L3G4200D_MODE_100_12  = 0x0,        /**< data rate: 100Hz, cut-off: 12.5Hz */
@@ -76,7 +76,7 @@ typedef enum {
 } l3g4200d_mode_t;
 
 /**
- * @brief Device descriptor for L3G4200D sensors
+ * @brief   Device descriptor for L3G4200D sensors
  */
 typedef struct {
     i2c_t i2c;              /**< I2C device the sensor is connected to */
@@ -87,7 +87,7 @@ typedef struct {
 } l3g4200d_t;
 
 /**
- * @brief Data structure holding the device parameters needed for initialization
+ * @brief   Data structure holding the device parameters needed for initialization
  */
 typedef struct {
     i2c_t i2c;              /**< I2C bus the device is connected to */
@@ -99,7 +99,7 @@ typedef struct {
 } l3g4200d_params_t;
 
 /**
- * @brief Initialize a gyro
+ * @brief   Initialize a gyro
  *
  * @param[out] dev          device descriptor of sensor to initialize
  * @param[in]  i2c          I2C bus the gyro is connected to
@@ -117,7 +117,7 @@ int l3g4200d_init(l3g4200d_t *dev, i2c_t i2c, uint8_t address,
                   l3g4200d_mode_t mode, l3g4200d_scale_t scale);
 
 /**
- * @brief Read angular speed value in degree per second from gyro
+ * @brief   Read angular speed value in degree per second from gyro
  *
  * @param[in]  dev          device descriptor of gyro
  * @param[out] acc_data     result vector in dps per axis
@@ -128,7 +128,7 @@ int l3g4200d_init(l3g4200d_t *dev, i2c_t i2c, uint8_t address,
 int l3g4200d_read(const l3g4200d_t *dev, l3g4200d_data_t *acc_data);
 
 /**
- * @brief Power-up the given device
+ * @brief   Power-up the given device
  *
  * @param[in]  dev          device to enable
  *
@@ -138,7 +138,7 @@ int l3g4200d_read(const l3g4200d_t *dev, l3g4200d_data_t *acc_data);
 int l3g4200d_enable(const l3g4200d_t *dev);
 
 /**
- * @brief Power-down the given device
+ * @brief   Power-down the given device
  *
  * @param[in]  dev          device to power-down
  *

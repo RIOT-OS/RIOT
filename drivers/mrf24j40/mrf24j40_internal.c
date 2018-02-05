@@ -153,19 +153,6 @@ void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t
     spi_release(SPIDEV);
 }
 
-void mrf24j40_tx_normal_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_t *data, const size_t len)
-{
-    uint8_t reg1, reg2;
-
-    reg1 = MRF24J40_LONG_ADDR_TRANS | (offset >> 3);
-    reg2 = (offset << 5) | MRF24J40_ACCESS_READ;
-    getbus(dev);
-    spi_transfer_byte(SPIDEV, CSPIN, true, reg1);
-    spi_transfer_byte(SPIDEV, CSPIN, true, reg2);
-    spi_transfer_bytes(SPIDEV, CSPIN, false, NULL, (char *)data, len);
-    spi_release(SPIDEV);
-}
-
 void mrf24j40_tx_normal_fifo_write(mrf24j40_t *dev,
                                    const uint16_t offset,
                                    const uint8_t *data,
@@ -201,15 +188,6 @@ void mrf24j40_rx_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_t *data
     spi_transfer_byte(SPIDEV, CSPIN, true, reg2);
     spi_transfer_bytes(SPIDEV, CSPIN, false, NULL, (char *)data, len);
     spi_release(SPIDEV);
-}
-
-void mrf24j40_rx_fifo_write(mrf24j40_t *dev, const uint16_t offset, const uint8_t *data, const size_t len)
-{
-    uint16_t i;
-
-    for (i = 0; i < len; i++) {
-        mrf24j40_reg_write_long(dev, i, data[i]);
-    }
 }
 
 void mrf24j40_reset_tasks(mrf24j40_t *dev)

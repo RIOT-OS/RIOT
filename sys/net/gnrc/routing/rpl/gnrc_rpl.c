@@ -16,7 +16,7 @@
 
 #include "net/icmpv6.h"
 #include "net/ipv6.h"
-#include "net/gnrc/ipv6/netif.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc.h"
 #include "mutex.h"
 
@@ -81,7 +81,8 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     }
 
     /* register all_RPL_nodes multicast address */
-    gnrc_ipv6_netif_add_addr(if_pid, &ipv6_addr_all_rpl_nodes, IPV6_ADDR_BIT_LEN, 0);
+    gnrc_netif_ipv6_group_join_internal(gnrc_netif_get_by_pid(if_pid),
+                                        &ipv6_addr_all_rpl_nodes);
 
     gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes);
     return gnrc_rpl_pid;

@@ -47,7 +47,11 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
-#define CPU_IRQ_NUMOF                   (31U)
+#if defined(CPU_MODEL_STM32L031K6)
+#define CPU_IRQ_NUMOF                   (30U)
+#else
+#define CPU_IRQ_NUMOF                   (32U)
+#endif
 /** @} */
 
 #ifdef __cplusplus

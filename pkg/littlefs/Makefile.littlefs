@@ -1,0 +1,8 @@
+MODULE := littlefs
+
+CFLAGS += -Wno-unused-parameter -Wno-format
+# GCC 4.9 bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64480)
+# used by MIPS
+CFLAGS += -Wno-missing-field-initializers
+
+include $(RIOTBASE)/Makefile.base

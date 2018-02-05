@@ -25,9 +25,12 @@
 
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/netif.h"
+#include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/pktdump.h"
 #include "timex.h"
+#include "utlist.h"
 #include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
@@ -228,9 +231,15 @@ static int peer_verify_ecdsa_key(struct dtls_context_t *ctx,
  */
 static int gnrc_sending(char *addr_str, char *data, size_t data_len )
 {
+    int iface;
     ipv6_addr_t addr;
     gnrc_pktsnip_t *payload, *udp, *ip;
 
+    /* get interface, if available */
+    iface = ipv6_addr_split_iface(addr_str);
+    if ((iface < 0) && (gnrc_netif_numof() == 1)) {
+        iface = gnrc_netif_iter(NULL)->pid;
+    }
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
         puts("Error: unable to parse destination address");
@@ -259,6 +268,13 @@ static int gnrc_sending(char *addr_str, char *data, size_t data_len )
         puts("Error: unable to allocate IPv6 header");
         gnrc_pktbuf_release(udp);
         return -1;
+    }
+    /* add netif header, if interface was given */
+    if (iface > 0) {
+        gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+
+        ((gnrc_netif_hdr_t *)netif->data)->if_pid = (kernel_pid_t)iface;
+        LL_PREPEND(ip, netif);
     }
 
     /*

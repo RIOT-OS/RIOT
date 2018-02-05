@@ -89,9 +89,7 @@ extern "C" {
  *          addresses when unset.
  */
 #define XBEE_ADDR_FLAGS_LONG              (0x80)
-/**
- * @}
- */
+/** @} */
 
 /**
  * @brief   States of the internal FSM for handling incoming UART frames

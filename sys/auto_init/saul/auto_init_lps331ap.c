@@ -39,12 +39,13 @@ static lps331ap_t lps331ap_devs[LPS331AP_NUM];
 /**
  * @brief   Memory for the SAUL registry entries
  */
-static saul_reg_t saul_entries[LPS331AP_NUM];
+static saul_reg_t saul_entries[LPS331AP_NUM * 2];
 
 /**
  * @brief   Reference the driver struct
  */
-extern saul_driver_t lps331ap_saul_driver;
+extern saul_driver_t lps331ap_saul_pres_driver;
+extern saul_driver_t lps331ap_saul_temp_driver;
 
 
 void auto_init_lps331ap(void)
@@ -62,8 +63,12 @@ void auto_init_lps331ap(void)
 
         saul_entries[i].dev = &(lps331ap_devs[i]);
         saul_entries[i].name = lps331ap_saul_info[i].name;
-        saul_entries[i].driver = &lps331ap_saul_driver;
+        saul_entries[i].driver = &lps331ap_saul_pres_driver;
         saul_reg_add(&(saul_entries[i]));
+        saul_entries[(i * 2) + 1].dev = &(lps331ap_devs[i]);
+        saul_entries[(i * 2) + 1].name = lps331ap_saul_info[i].name;
+        saul_entries[(i * 2) + 1].driver = &lps331ap_saul_temp_driver;
+        saul_reg_add(&(saul_entries[(i * 2) + 1]));
     }
 }
 

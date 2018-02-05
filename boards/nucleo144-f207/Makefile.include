@@ -1,6 +1,0 @@
-# define the cpu used by the nucleo-f207 board
-export CPU = stm32f2
-export CPU_MODEL = stm32f207zg
-
-# load the common Makefile.include for Nucleo-144 boards
-include $(RIOTBOARD)/nucleo144-common/Makefile.include

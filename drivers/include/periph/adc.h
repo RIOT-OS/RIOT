@@ -54,34 +54,27 @@ extern "C" {
 
 /**
  * @brief   Define default ADC type identifier
- * @{
  */
 #ifndef HAVE_ADC_T
 typedef unsigned int adc_t;
 #endif
-/** @} */
 
 /**
  * @brief   Default ADC undefined value
- * @{
  */
 #ifndef ADC_UNDEF
 #define ADC_UNDEF           (UINT_MAX)
 #endif
-/** @} */
 
 /**
  * @brief   Default ADC line access macro
- * @{
  */
 #ifndef ADC_LINE
 #define ADC_LINE(x)          (x)
 #endif
-/** @} */
 
 /**
  * @brief   Possible ADC resolution settings
- * @{
  */
 #ifndef HAVE_ADC_RES_T
 typedef enum {
@@ -93,7 +86,6 @@ typedef enum {
     ADC_RES_16BIT,          /**< ADC resolution: 16 bit */
 } adc_res_t;
 #endif
-/** @} */
 
 /**
  * @brief   Initialize the given ADC line

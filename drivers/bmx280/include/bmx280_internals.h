@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @name BME280 registers
+ * @name    BME280 registers
  * @{
  */
 #define BME280_CHIP_ID                          0x60    /* The identifier of the BME280 */

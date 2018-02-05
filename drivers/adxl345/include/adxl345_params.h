@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the ADXL345 driver
+ * @name    Set default configuration parameters for the ADXL345 driver
  * @{
  */
 #ifndef ADXL345_PARAM_I2C

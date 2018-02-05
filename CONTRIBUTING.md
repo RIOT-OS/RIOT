@@ -12,3 +12,5 @@ This is a short version of the [Development Procedures](https://github.com/RIOT-
 5. Describe the technical detail of the change(s) as specific as possible.
 
 6. Use [Labels](https://github.com/RIOT-OS/RIOT/wiki/Labels) to help classify pull requests and issues.
+
+7. Please adhere to our [code of conduct](https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md)

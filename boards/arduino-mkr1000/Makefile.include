@@ -1,24 +1,10 @@
-# define the cpu used by Arduino/Genuino MKR1000 board
-export CPU = samd21
-export CPU_MODEL = samd21g18a
+USEMODULE += boards_common_arduino-mkr
 
-#export needed for flash rule
-export PORT_LINUX ?= /dev/ttyACM0
-export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
-# setup the flash tool used
 ifeq ($(PROGRAMMER),jlink)
-    # in case J-Link is attached to SWD pins, use a plain CPU memory model
-    export JLINK_DEVICE := atsamw25
-    include $(RIOTMAKE)/tools/jlink.inc.mk
-else
-    # on default, we use BOSSA to flash this board
-    export LINKER_SCRIPT ?= $(RIOTCPU)/sam0_common/ldscripts/$(CPU_MODEL)_mkr1000.ld
-    include $(RIOTMAKE)/tools/bossa.inc.mk
+  export MKR_JLINK_DEVICE = atsamw25
 endif
 
-# setup the boards dependencies
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+include $(RIOTBOARD)/common/arduino-mkr/Makefile.include
+
+# add arduino-mkr1000 include path
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

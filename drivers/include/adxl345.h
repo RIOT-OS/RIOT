@@ -29,7 +29,7 @@ extern "C" {
 #include "periph/gpio.h"
 
 /**
- * @brief Possible ADXL345 hardware addresses (wiring specific)
+ * @brief   Possible ADXL345 hardware addresses (wiring specific)
  */
 enum {
     ADXL345_ADDR_1D = 0x1D, /**< I2C device address if Alt addr pin is high */
@@ -37,7 +37,7 @@ enum {
 };
 
 /**
- * @brief List ADXL345 power mode
+ * @brief   List ADXL345 power mode
  */
 enum {
     ADXL345_MEASURE_MODE,
@@ -47,7 +47,7 @@ enum {
 };
 
 /**
- * @brief Define ADXL345 sensitivity
+ * @brief   Define ADXL345 sensitivity
  */
 enum {
     ADXL345_RANGE_2G    = 1,     /**< +/- 2 g Full Scale Rang */
@@ -57,7 +57,7 @@ enum {
 };
 
 /**
- * @brief List bandwidth rate
+ * @brief   List bandwidth rate
  */
 enum {
     ADXL345_RATE_0HZ1   = 0,   /**< 0.1 Hz Output Data Rate */
@@ -79,7 +79,7 @@ enum {
 };
 
 /**
- * @brief List fifo mode
+ * @brief   List fifo mode
  */
 enum {
     BYPASS  = 0,          /**< FIFO bypass mode */
@@ -87,8 +87,9 @@ enum {
     STREAM  = 2,          /**< FIFO stream mode */
     TRIGGER = 3           /**< FIFO trigger mode */
 };
+
 /**
- * @brief Output Interrupt selection
+ * @brief   Output Interrupt selection
  */
 enum {
     INT1,  /**< Output interrupt on INT1 pin */
@@ -107,7 +108,7 @@ enum {
 };
 
 /**
- * @brief ADXL345 result vector struct
+ * @brief   ADXL345 result vector struct
  */
 typedef struct {
     int16_t x;             /**< X-Axis measurement result */
@@ -116,7 +117,7 @@ typedef struct {
 } adxl345_data_t;
 
 /**
- * @brief Interrupt configuration struct for the ADXL345 sensor
+ * @brief   Interrupt configuration struct for the ADXL345 sensor
  */
 typedef struct {
     uint8_t source;       /**< Source of interrupts */
@@ -136,7 +137,7 @@ typedef struct {
 } adxl345_interrupt_t;
 
 /**
- * @brief Configuration struct for the ADXL345 sensor
+ * @brief   Configuration struct for the ADXL345 sensor
  */
 typedef struct {
     gpio_t int1;              /**< accelerometer int1 pin */
@@ -148,7 +149,7 @@ typedef struct {
 } adxl345_params_t;
 
 /**
- * @brief Device descriptor for the ADXL345 sensor
+ * @brief   Device descriptor for the ADXL345 sensor
  */
 typedef struct {
     i2c_t i2c;                      /**< I2C device which is used */

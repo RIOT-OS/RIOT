@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Loci Controls Inc.
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,7 +16,7 @@
  * @brief       Low-level UART driver implementation
  *
  * @author      Ian Martin <ian@locicontrols.com>
- *
+ * @author      Sebastian Meiling <s@mlng.net>
  * @}
  */
 
@@ -192,45 +193,15 @@ static int init_base(uart_t uart, uint32_t baudrate)
 #if UART_0_EN
         case UART_0:
             u = UART_0_DEV;
-
-            /*
-             * Select the UARTx RX pin by writing to the IOC_UARTRXD_UARTn register
-             */
-            IOC_UARTRXD_UART0 = UART_0_RX_PIN;
-
-            /*
-             * Pad Control for the TX pin:
-             * - Set function to UARTn TX
-             * - Output Enable
-             */
-            IOC_PXX_SEL[UART_0_TX_PIN] = UART0_TXD;
-            IOC_PXX_OVER[UART_0_TX_PIN] = IOC_OVERRIDE_OE;
-
-            /* Set RX and TX pins to peripheral mode */
-            gpio_hardware_control(UART_0_TX_PIN);
-            gpio_hardware_control(UART_0_RX_PIN);
+            gpio_init_af(UART_0_RX_PIN, UART0_RXD, GPIO_IN);
+            gpio_init_af(UART_0_TX_PIN, UART0_TXD, GPIO_OUT);
             break;
 #endif
 #if UART_1_EN
         case UART_1:
             u = UART_1_DEV;
-
-            /*
-             * Select the UARTx RX pin by writing to the IOC_UARTRXD_UARTn register
-             */
-            IOC_UARTRXD_UART1 = UART_1_RX_PIN;
-
-            /*
-             * Pad Control for the TX pin:
-             * - Set function to UARTn TX
-             * - Output Enable
-             */
-            IOC_PXX_SEL[UART_1_TX_PIN] = UART1_TXD;
-            IOC_PXX_OVER[UART_1_TX_PIN] = IOC_OVERRIDE_OE;
-
-            /* Set RX and TX pins to peripheral mode */
-            gpio_hardware_control(UART_1_TX_PIN);
-            gpio_hardware_control(UART_1_RX_PIN);
+            gpio_init_af(UART_1_RX_PIN, UART1_RXD, GPIO_IN);
+            gpio_init_af(UART_1_TX_PIN, UART1_TXD, GPIO_OUT);
             break;
 #endif
 
@@ -255,16 +226,12 @@ static int init_base(uart_t uart, uint32_t baudrate)
     /* On the CC2538, hardware flow control is supported only on UART1 */
     if (u == UART1) {
 #ifdef UART_1_RTS_PIN
-        IOC_PXX_SEL[UART_1_RTS_PIN] = UART1_RTS;
-        gpio_hardware_control(UART_1_RTS_PIN);
-        IOC_PXX_OVER[UART_1_RTS_PIN] = IOC_OVERRIDE_OE;
+        gpio_init_af(UART_1_RTS_PIN, UART1_RTS, GPIO_OUT);
         u->cc2538_uart_ctl.CTLbits.RTSEN = 1;
 #endif
 
 #ifdef UART_1_CTS_PIN
-        IOC_UARTCTS_UART1 = UART_1_CTS_PIN;
-        gpio_hardware_control(UART_1_CTS_PIN);
-        IOC_PXX_OVER[UART_1_CTS_PIN] = IOC_OVERRIDE_DIS;
+        gpio_init_af(UART_1_CTS_PIN, UART1_CTS, GPIO_IN);
         u->cc2538_uart_ctl.CTLbits.CTSEN = 1;
 #endif
     }
@@ -334,7 +301,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
     /* Block if the TX FIFO is full */
     for (size_t i = 0; i < len; i++) {
-        while (u->cc2538_uart_fr.FRbits.TXFF);
+        while (u->cc2538_uart_fr.FRbits.TXFF) {}
         u->DR = data[i];
     }
 }

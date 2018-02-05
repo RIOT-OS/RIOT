@@ -16,7 +16,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  *
- * @}
  */
 
 #ifndef NRF24L01P_SETTINGS_H
@@ -185,3 +184,4 @@ extern "C" {
 #endif
 
 #endif /* NRF24L01P_SETTINGS_H */
+/** @} */

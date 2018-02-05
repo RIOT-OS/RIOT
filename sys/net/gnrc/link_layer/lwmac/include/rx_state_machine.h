@@ -23,7 +23,7 @@
 #define RX_STATE_MACHINE_H
 
 #include "net/gnrc/pkt.h"
-#include "net/gnrc/netdev.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,26 +32,26 @@ extern "C" {
 /**
  * @brief Start LWMAC RX procedure to receive packet
  *
- * @param[in,out]   gnrc_netdev   gnrc_netdev structure
+ * @param[in,out]   netif    ptr to the network interface
  *
  */
-void gnrc_lwmac_rx_start(gnrc_netdev_t *gnrc_netdev);
+void gnrc_lwmac_rx_start(gnrc_netif_t *netif);
 
 /**
  * @brief Stop LWMAC RX procedure
  *
- * @param[in,out]   gnrc_netdev   gnrc_netdev structure
+ * @param[in,out]   netif    ptr to the network interface
  *
  */
-void gnrc_lwmac_rx_stop(gnrc_netdev_t *gnrc_netdev);
+void gnrc_lwmac_rx_stop(gnrc_netif_t *netif);
 
 /**
  * @brief Update LWMAC RX procedure for packet reception
  *
- * @param[in,out]   gnrc_netdev   gnrc_netdev structure
+ * @param[in,out]   netif    ptr to the network interface
  *
  */
-void gnrc_lwmac_rx_update(gnrc_netdev_t *gnrc_netdev);
+void gnrc_lwmac_rx_update(gnrc_netif_t *netif);
 
 #ifdef __cplusplus
 }

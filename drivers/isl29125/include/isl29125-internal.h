@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_isl29125
+ * @ingroup     drivers_isl29125
  * @{
  *
  * @file
@@ -24,19 +24,19 @@ extern "C" {
 #endif
 
 /**
- * @brief The sensors hard coded I2C address
+ * @brief   The sensors hard coded I2C address
  */
 #define ISL29125_I2C_ADDRESS 0x44
 
 /**
- * @name ISL29125 constants
+ * @name    ISL29125 constants
  * @{
  */
 #define ISL29125_ID             0x7D
 /** @} */
 
 /**
- * @name ISL29125 register map
+ * @name    ISL29125 register map
  * @{
  */
 /* main register */
@@ -63,14 +63,14 @@ extern "C" {
 /** @} */
 
 /**
- * @name ISL29125 commands
+ * @name    ISL29125 commands
  * @{
  */
 #define ISL29125_CMD_RESET      0x46
 /** @} */
 
 /**
- * @name ISL29125 configuration masks and bits
+ * @name    ISL29125 configuration masks and bits
  * @{
  */
 /* ISL29125_REG_CONF1 B2:B0 */

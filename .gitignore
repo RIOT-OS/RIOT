@@ -53,3 +53,6 @@ Makefile.local
 
 # Ignore download cache
 .dlcache
+
+# scan-build artifacts
+scan-build/

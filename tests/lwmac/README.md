@@ -1,5 +1,5 @@
-examples/default
-================
+LWMAC test application
+======================
 This application is a showcase for testing LWMAC communications. Using it
 for your board, you should be able to interactively use any hardware
 that is supported for communications among devices based on LWMAC.
@@ -22,7 +22,7 @@ that is `/dev/ttyUSB0`. If your port is named differently, the
 
 
 Example output
-==========
+==============
 
 The `ifconfig` command will help you to configure all available network
 interfaces. On an samr21 board it will print something like:

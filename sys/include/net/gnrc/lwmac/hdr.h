@@ -59,8 +59,8 @@ extern "C" {
  * @brief   LWMAC internal L2 address structure
  */
 typedef struct {
-    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN]; /**< address of node */
-    uint8_t len;                               /**< address */
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];  /**< address of node */
+    uint8_t len;                                /**< address */
 } gnrc_lwmac_l2_addr_t;
 
 /**
@@ -79,25 +79,25 @@ typedef struct {
  * @brief   LWMAC WR (wake-up request packet, i.e., preamble packet) frame
  */
 typedef struct __attribute__((packed)) {
-    gnrc_lwmac_hdr_t header;       /**< WR packet header type */
-    gnrc_lwmac_l2_addr_t dst_addr; /**< WR is broadcast, so destination address needed */
+    gnrc_lwmac_hdr_t header;        /**< WR packet header type */
+    gnrc_lwmac_l2_addr_t dst_addr;  /**< WR is broadcast, so destination address needed */
 } gnrc_lwmac_frame_wr_t;
 
 /**
  * @brief   LWMAC WA (wake-up answer packet, i.e., preamble-ACK packet) frame
  */
 typedef struct __attribute__((packed)) {
-    gnrc_lwmac_hdr_t header;       /**< WA packet header type */
-    gnrc_lwmac_l2_addr_t dst_addr; /**< WA is broadcast, so destination address needed */
-    uint32_t current_phase;        /**< Node's current phase value */
+    gnrc_lwmac_hdr_t header;        /**< WA packet header type */
+    gnrc_lwmac_l2_addr_t dst_addr;  /**< WA is broadcast, so destination address needed */
+    uint32_t current_phase;         /**< Node's current phase value */
 } gnrc_lwmac_frame_wa_t;
 
 /**
  * @brief   LWMAC broadcast data frame
  */
 typedef struct __attribute__((packed)) {
-    gnrc_lwmac_hdr_t header; /**< Broadcast packet header type */
-    uint8_t seq_nr;          /**< Broadcast sequence */
+    gnrc_lwmac_hdr_t header;    /**< Broadcast packet header type */
+    uint8_t seq_nr;             /**< Broadcast sequence */
 } gnrc_lwmac_frame_broadcast_t;
 
 /**

@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the MMA8x5x driver
+ * @name    Set default configuration parameters for the MMA8x5x driver
  * @{
  */
 #ifndef MMA8X5X_PARAM_I2C

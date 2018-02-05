@@ -19,7 +19,6 @@
 #include "net/ndp.h"
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/ipv6/nib.h"
-#include "net/gnrc/netif.h"
 
 #include "_nib-internal.h"
 
@@ -29,7 +28,8 @@
 
 #define LINK_LOCAL_PREFIX   { 0xfe, 0x08, 0, 0, 0, 0, 0, 0 }
 #define GLOBAL_PREFIX       { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0 }
-#define IFACE               (26)
+#define GLOBAL_PREFIX_LEN   (30)
+#define IFACE               (6)
 
 static void set_up(void)
 {
@@ -119,6 +119,23 @@ static void test_nib_alloc__success_duplicate(void)
         node->mode |= _PL;
     }
     TEST_ASSERT(node == _nib_onl_alloc(&addr, iface));
+}
+
+/*
+ * Creates a persistent on-link entry with no IPv6 address and then tries to
+ * create another one with the same interface, but with an address
+ * Expected result: entries should be identical
+ */
+static void test_nib_alloc__success_noaddr_override(void)
+{
+    _nib_onl_entry_t *node1, *node2;
+    const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                      { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((node1 = _nib_onl_alloc(NULL, IFACE)));
+    TEST_ASSERT_NOT_NULL((node2 = _nib_onl_alloc(&addr, IFACE)));
+    TEST_ASSERT(node1 == node2);
+    TEST_ASSERT(ipv6_addr_equal(&addr, &node1->ipv6));
 }
 
 /*
@@ -431,7 +448,7 @@ static void test_nib_nc_add__success_duplicate(void)
         node->info |= GNRC_IPV6_NIB_NC_INFO_AR_STATE_REGISTERED;
     }
     TEST_ASSERT(node == _nib_nc_add(&addr, iface,
-                                   GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE));
+                                    GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE));
 }
 
 /*
@@ -466,7 +483,7 @@ static void test_nib_nc_add__success_full_but_garbage_collectible(void)
 
     for (int i = 0; i < (3 * GNRC_IPV6_NIB_NUMOF); i++) {
         TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, IFACE,
-                                                 GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE)));
+                                                 GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE)));
         TEST_ASSERT(last != node);
         TEST_ASSERT(ipv6_addr_equal(&addr, &node->ipv6));
         TEST_ASSERT_EQUAL_INT(IFACE, _nib_onl_get_if(node));
@@ -964,32 +981,933 @@ static void test_nib_drl_get_dr__success4(void)
     TEST_ASSERT(nib_res != node2);
 }
 
+#if GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF
+#define MAX_NUMOF   (GNRC_IPV6_NIB_NUMOF)
+#else /* GNRC_IPV6_NIB_NUMOF < GNRC_IPV6_NIB_OFFL_NUMOF */
+#define MAX_NUMOF   (GNRC_IPV6_NIB_OFFL_NUMOF)
+#endif
+
 /*
- * Creates GNRC_NETIF_NUMOF interfaces and then tries to add another.
+ * Creates MAX_NUMOF off-link entries with different next-hop addresses and
+ * then tries to add another.
  * Expected result: should return NULL
  */
-static void test_nib_iface_get__no_space_left(void)
+static void test_nib_offl_alloc__no_space_left_diff_next_hop(void)
 {
-    unsigned iface = 1;
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                    { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
 
-    for (int i = 0; i < GNRC_NETIF_NUMOF; i++) {
-        TEST_ASSERT_NOT_NULL(_nib_iface_get(iface++));
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                    GLOBAL_PREFIX_LEN)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+        next_hop.u64[1].u64++;
     }
-    TEST_ASSERT_NULL(_nib_iface_get(iface));
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, IFACE, &pfx, GLOBAL_PREFIX_LEN));
 }
 
 /*
- * Creates an interface and then gets the same interface.
- * Expected result: interface pointers should equal
+ * Creates MAX_NUMOF off-link entries with different interfaces and then tries
+ * to add another.
+ * Expected result: should return NULL
  */
-static void test_nib_iface_get__success(void)
+static void test_nib_offl_alloc__no_space_left_diff_iface(void)
 {
-    _nib_iface_t *ni1, *ni2;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned iface = IFACE;
 
-    TEST_ASSERT_NOT_NULL((ni1 = _nib_iface_get(IFACE)));
-    TEST_ASSERT_NOT_NULL((ni2 = _nib_iface_get(IFACE)));
-    TEST_ASSERT(ni1 == ni2);
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, iface, &pfx,
+                                                    GLOBAL_PREFIX_LEN)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _PL;
+        iface++;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, iface, &pfx, GLOBAL_PREFIX_LEN));
 }
+
+/*
+ * Creates MAX_NUMOF off-link entries with different next-hop addresses and
+ * interfaces and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_next_hop_iface(void)
+{
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned iface = IFACE;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, iface, &pfx,
+                                                    GLOBAL_PREFIX_LEN)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _DC;
+        next_hop.u64[1].u64++;
+        iface++;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, iface, &pfx, GLOBAL_PREFIX_LEN));
+}
+
+/*
+ * Creates GNRC_IPV6_NIB_OFFL_NUMOF off-link entries with different prefixes
+ * of the same length and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_pfx(void)
+{
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    for (int i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                    GLOBAL_PREFIX_LEN)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+        pfx.u16[0].u16++;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, IFACE, &pfx, GLOBAL_PREFIX_LEN));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefixes of the same
+ * length and different next-hop addresses and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_next_hop_pfx(void)
+{
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                    { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                    GLOBAL_PREFIX_LEN)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+        next_hop.u64[1].u64++;
+        pfx.u16[0].u16++;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, IFACE, &pfx, GLOBAL_PREFIX_LEN));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefixes of the same
+ * length and different interfaces and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_iface_pfx(void)
+{
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned iface = IFACE;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, iface, &pfx,
+                                                    GLOBAL_PREFIX_LEN)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+        iface++;
+        pfx.u16[0].u16++;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, iface, &pfx, GLOBAL_PREFIX_LEN));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefixes of the same
+ * length, different interfaces, and different next hop addresses and then
+ * tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_next_hop_iface_pfx(void)
+{
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                      { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned iface = IFACE;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, iface, &pfx,
+                                                    GLOBAL_PREFIX_LEN)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+        next_hop.u64[1].u64++;
+        iface++;
+        pfx.u16[0].u16++;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, iface, &pfx, GLOBAL_PREFIX_LEN));
+}
+
+/*
+ * Creates GNRC_IPV6_NIB_OFFL_NUMOF off-link entries with different prefix
+ * lengths and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_pfx_len(void)
+{
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned pfx_len = GLOBAL_PREFIX_LEN;
+
+    for (int i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                    pfx_len)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _PL;
+        pfx_len--;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, IFACE, &pfx, pfx_len));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefixes and then tries to
+ * add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_next_hop_pfx_len(void)
+{
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                      { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned pfx_len = GLOBAL_PREFIX_LEN;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                    pfx_len)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _PL;
+        next_hop.u64[1].u64++;
+        pfx_len--;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, IFACE, &pfx, pfx_len));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefix lengths and
+ * interfaces and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_iface_pfx_len(void)
+{
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned pfx_len = GLOBAL_PREFIX_LEN, iface = IFACE;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, iface, &pfx,
+                                                    pfx_len)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _PL;
+        iface++;
+        pfx_len--;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, iface, &pfx, pfx_len));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefix lengths,
+ * interfaces, and next hop addresses and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_next_hop_iface_pfx_len(void)
+{
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                      { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned pfx_len = GLOBAL_PREFIX_LEN, iface = IFACE;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, iface, &pfx,
+                                                    pfx_len)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _PL;
+        next_hop.u64[1].u64++;
+        iface++;
+        pfx_len--;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, iface, &pfx, pfx_len));
+}
+
+/*
+ * Creates GNRC_IPV6_NIB_OFFL_NUMOF off-link entries with different prefixes
+ * and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_pfx_pfx_len(void)
+{
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned pfx_len = GLOBAL_PREFIX_LEN;
+
+    for (int i = 0; i < GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                    pfx_len)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+        pfx.u16[0].u16++;
+        pfx_len--;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, IFACE, &pfx, pfx_len));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefixes and different
+ * next-hop addresses and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_next_hop_pfx_pfx_len(void)
+{
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                    { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned pfx_len = GLOBAL_PREFIX_LEN;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                    pfx_len)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+        next_hop.u64[1].u64++;
+        pfx.u16[0].u16++;
+        pfx_len--;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, IFACE, &pfx, pfx_len));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefixes and different
+ * interfaces and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_iface_pfx_pfx_len(void)
+{
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned pfx_len = GLOBAL_PREFIX_LEN, iface = IFACE;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, iface, &pfx,
+                                                    pfx_len)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+        iface++;
+        pfx.u16[0].u16++;
+        pfx_len--;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, iface, &pfx, pfx_len));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefixes, different
+ * interfaces, and different next hop addresses and then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_offl_alloc__no_space_left_diff_next_hop_iface_pfx_pfx_len(void)
+{
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                      { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned pfx_len = GLOBAL_PREFIX_LEN, iface = IFACE;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, iface, &pfx,
+                                                    pfx_len)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+        next_hop.u64[1].u64++;
+        iface++;
+        pfx.u16[0].u16++;
+        pfx_len--;
+    }
+    TEST_ASSERT_NULL(_nib_offl_alloc(&next_hop, iface, &pfx, pfx_len));
+}
+
+/*
+ * Creates MAX_NUMOF off-link entries with different prefixes, different
+ * interfaces, and different next hop addresses and then tries to add another
+ * equal to the last.
+ * Expected result: should return not NULL (the last)
+ */
+static void test_nib_offl_alloc__success_duplicate(void)
+{
+    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                      { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    unsigned pfx_len = GLOBAL_PREFIX_LEN, iface = IFACE;
+
+    for (int i = 0; i < MAX_NUMOF; i++) {
+        _nib_offl_entry_t *dst;
+
+        next_hop.u64[1].u64++;
+        iface++;
+        pfx.u16[0].u16++;
+        pfx_len--;
+        TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, iface, &pfx,
+                                                    pfx_len)));
+        TEST_ASSERT_NOT_NULL(dst->next_hop);
+        dst->mode |= _FT;
+    }
+    TEST_ASSERT_NOT_NULL(_nib_offl_alloc(&next_hop, iface, &pfx, pfx_len));
+}
+
+/*
+ * Creates an off-link entry with no next hop address and then adds another
+ * with equal prefix and interface to the last, but with a next hop address
+ * Expected result: the first entry should be equal to the second and both
+ * have the same next hop address
+ */
+static void test_nib_offl_alloc__success_overwrite_unspecified(void)
+{
+    _nib_offl_entry_t *dst1, *dst2;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst1 = _nib_offl_alloc(NULL, IFACE, &pfx,
+                                                 GLOBAL_PREFIX_LEN)));
+    dst1->mode |= _PL;
+    TEST_ASSERT_NOT_NULL((dst2 = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                 GLOBAL_PREFIX_LEN)));
+    TEST_ASSERT_NOT_NULL(dst1->next_hop);
+    TEST_ASSERT_EQUAL_INT(_PL, dst1->mode);
+    TEST_ASSERT(dst1 == dst2);
+    TEST_ASSERT(ipv6_addr_equal(&next_hop, &dst1->next_hop->ipv6));
+}
+
+/*
+ * Creates an off-link entry.
+ * Expected result: new entry should contain the given prefix, address and
+ *                  interface
+ */
+static void test_nib_offl_alloc__success(void)
+{
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                GLOBAL_PREFIX_LEN)));
+    TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, dst->pfx_len);
+    TEST_ASSERT(GLOBAL_PREFIX_LEN <= ipv6_addr_match_prefix(&pfx, &dst->pfx));
+    TEST_ASSERT_NOT_NULL(dst->next_hop);
+    TEST_ASSERT_EQUAL_INT(_DST, dst->next_hop->mode);
+    TEST_ASSERT(ipv6_addr_equal(&next_hop, &dst->next_hop->ipv6));
+    TEST_ASSERT_EQUAL_INT(IFACE, _nib_onl_get_if(dst->next_hop));
+}
+
+/*
+ * Creates an off-link entry, sets a neighbor cache flag, and tries to remove
+ * it.
+ * Expected result: The off-link entry is removed, but the on-link entry should
+ * still exist
+ */
+static void test_nib_offl_clear__uncleared(void)
+{
+    _nib_offl_entry_t *dst;
+    _nib_onl_entry_t *node;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                GLOBAL_PREFIX_LEN)));
+    node = dst->next_hop;
+    node->mode |= _NC;
+    _nib_offl_clear(dst);
+    TEST_ASSERT_NULL(_nib_offl_iter(NULL));
+    TEST_ASSERT(node == _nib_onl_iter(NULL));
+}
+
+/*
+ * Creates two off-link entry off-link entries and tries to remove one of them.
+ * Expected result: The NIB should only contain the one removed, the on-link
+ * entry should still exist
+ */
+static void test_nib_offl_clear__same_next_hop(void)
+{
+    _nib_offl_entry_t *dst1, *dst2, *res;
+    _nib_onl_entry_t *node;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst1 = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                 GLOBAL_PREFIX_LEN)));
+    dst1->mode |= _FT;
+    pfx.u16[0].u16++;
+    TEST_ASSERT_NOT_NULL((dst2 = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                GLOBAL_PREFIX_LEN)));
+    TEST_ASSERT(dst1->next_hop == dst2->next_hop);
+    node = dst2->next_hop;
+    TEST_ASSERT_NOT_NULL(node);
+    _nib_offl_clear(dst2);
+    TEST_ASSERT_NOT_NULL((res = _nib_offl_iter(NULL)));
+    TEST_ASSERT(dst1 == res);
+    TEST_ASSERT_NULL(_nib_offl_iter(res));
+    TEST_ASSERT(node == _nib_onl_iter(NULL));
+}
+
+/*
+ * Creates an off-link entry and tries to remove it.
+ * Expected result: The NIB should be empty
+ */
+static void test_nib_offl_clear__cleared(void)
+{
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                GLOBAL_PREFIX_LEN)));
+    _nib_offl_clear(dst);
+    TEST_ASSERT_NULL(_nib_offl_iter(NULL));
+    TEST_ASSERT_NULL(_nib_onl_iter(NULL));
+}
+
+/*
+ * Iterates over empty off-link entries
+ * Expected result: _nib_drl_iter returns NULL
+ */
+static void test_nib_offl_iter__empty(void)
+{
+    TEST_ASSERT_NULL(_nib_offl_iter(NULL));
+}
+
+/*
+ * Iterates over off-link entries with one element
+ * Expected result: _nib_offl_iter returns element with NULL, and with that
+ * element NULL.
+ */
+static void test_nib_offl_iter__one_elem(void)
+{
+    _nib_offl_entry_t *dst, *res;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                GLOBAL_PREFIX_LEN)));
+    dst->mode |= _FT;
+    TEST_ASSERT_NOT_NULL((res = _nib_offl_iter(NULL)));
+    TEST_ASSERT(res == dst);
+    TEST_ASSERT_NULL(_nib_offl_iter(res));
+}
+
+/*
+ * Iterates over off-link entries with three element
+ * Expected result: _nib_offl_iter returns element with NULL, with that element
+ * another, with that element yet another and with the last NULL.
+ */
+static void test_nib_offl_iter__three_elem(void)
+{
+    _nib_offl_entry_t *dst1, *dst2, *dst3, *res;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst1 = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                 GLOBAL_PREFIX_LEN)));
+    dst1->mode |= _FT;
+    pfx.u16[0].u16++;
+    TEST_ASSERT_NOT_NULL((dst2 = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                 GLOBAL_PREFIX_LEN)));
+    dst2->mode |= _FT;
+    pfx.u16[0].u16++;
+    TEST_ASSERT_NOT_NULL((dst3 = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                 GLOBAL_PREFIX_LEN)));
+    dst3->mode |= _FT;
+    TEST_ASSERT_NOT_NULL((res = _nib_offl_iter(NULL)));
+    TEST_ASSERT(res == dst1);
+    TEST_ASSERT_NOT_NULL((res = _nib_offl_iter(res)));
+    TEST_ASSERT(res == dst2);
+    TEST_ASSERT_NOT_NULL((res = _nib_offl_iter(res)));
+    TEST_ASSERT(res == dst3);
+    TEST_ASSERT_NULL(_nib_offl_iter(res));
+}
+
+/*
+ * Iterates over off-link entries with two elements, where there is a whole in
+ * the internal array
+ * Expected result: _nib_offl_iter returns element with NULL, with that element
+ * another, and with the last NULL.
+ */
+static void test_nib_offl_iter__three_elem_middle_removed(void)
+{
+    _nib_offl_entry_t *dst1, *dst2, *dst3, *res;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst1 = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                 GLOBAL_PREFIX_LEN)));
+    dst1->mode |= _FT;
+    pfx.u16[0].u16++;
+    TEST_ASSERT_NOT_NULL((dst2 = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                 GLOBAL_PREFIX_LEN)));
+    dst2->mode |= _FT;
+    pfx.u16[0].u16++;
+    TEST_ASSERT_NOT_NULL((dst3 = _nib_offl_alloc(&next_hop, IFACE, &pfx,
+                                                 GLOBAL_PREFIX_LEN)));
+    dst3->mode |= _FT;
+    dst2->mode = _EMPTY;
+    _nib_offl_clear(dst2);
+    TEST_ASSERT_NOT_NULL((res = _nib_offl_iter(NULL)));
+    TEST_ASSERT(res == dst1);
+    TEST_ASSERT_NOT_NULL((res = _nib_offl_iter(res)));
+    TEST_ASSERT(res == dst3);
+    TEST_ASSERT_NULL(_nib_offl_iter(res));
+}
+
+#if GNRC_IPV6_NIB_CONF_DC
+/*
+ * Creates a destination cache entry.
+ * Expected result: new entry should contain the given address and interface
+ */
+static void test_nib_dc_add__success(void)
+{
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst_addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_dc_add(&next_hop, IFACE, &dst_addr)));
+    TEST_ASSERT(dst->mode & _DC);
+    TEST_ASSERT_EQUAL_INT(IPV6_ADDR_BIT_LEN, dst->pfx_len);
+    TEST_ASSERT(ipv6_addr_equal(&dst_addr, &dst->pfx));
+    TEST_ASSERT_NOT_NULL(dst->next_hop);
+    TEST_ASSERT_EQUAL_INT(_DST, dst->next_hop->mode);
+    TEST_ASSERT(ipv6_addr_equal(&next_hop, &dst->next_hop->ipv6));
+    TEST_ASSERT_EQUAL_INT(IFACE, _nib_onl_get_if(dst->next_hop));
+}
+
+/*
+ * Creates a destination cache entry and removes it.
+ * Expected result: The destination cache should be empty
+ */
+static void test_nib_dc_remove(void)
+{
+
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst_addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_dc_add(&next_hop, IFACE, &dst_addr)));
+    _nib_dc_remove(dst);
+    TEST_ASSERT_NULL(_nib_offl_iter(NULL));
+}
+#endif
+
+/*
+ * Creates a prefix list entry.
+ * Expected result: new entry should contain the given address and interface
+ */
+static void test_nib_pl_add__success(void)
+{
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, &pfx, GLOBAL_PREFIX_LEN,
+                                            UINT32_MAX, UINT32_MAX)));
+    TEST_ASSERT(dst->mode & _PL);
+    TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, dst->pfx_len);
+    TEST_ASSERT(GLOBAL_PREFIX_LEN <= ipv6_addr_match_prefix(&pfx, &dst->pfx));
+    TEST_ASSERT_NOT_NULL(dst->next_hop);
+    TEST_ASSERT_EQUAL_INT(_DST, dst->next_hop->mode);
+    TEST_ASSERT_EQUAL_INT(IFACE, _nib_onl_get_if(dst->next_hop));
+    TEST_ASSERT_EQUAL_INT(UINT32_MAX, dst->valid_until);
+    TEST_ASSERT_EQUAL_INT(UINT32_MAX, dst->pref_until);
+}
+
+/*
+ * Creates a prefix list entry and removes it.
+ * Expected result: The prefix list should be empty
+ */
+static void test_nib_pl_remove(void)
+{
+
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, &pfx, GLOBAL_PREFIX_LEN,
+                                            UINT32_MAX, UINT32_MAX)));
+    _nib_pl_remove(dst);
+    TEST_ASSERT_NULL(_nib_offl_iter(NULL));
+}
+
+/*
+ * Creates a forwarding table entry.
+ * Expected result: new entry should contain the given address and interface
+ */
+static void test_nib_ft_add__success(void)
+{
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_ft_add(&next_hop, IFACE, &pfx,
+                                            GLOBAL_PREFIX_LEN)));
+    TEST_ASSERT(dst->mode & _FT);
+    TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, dst->pfx_len);
+    TEST_ASSERT(GLOBAL_PREFIX_LEN <= ipv6_addr_match_prefix(&pfx, &dst->pfx));
+    TEST_ASSERT_NOT_NULL(dst->next_hop);
+    TEST_ASSERT_EQUAL_INT(_DST, dst->next_hop->mode);
+    TEST_ASSERT(ipv6_addr_equal(&next_hop, &dst->next_hop->ipv6));
+    TEST_ASSERT_EQUAL_INT(IFACE, _nib_onl_get_if(dst->next_hop));
+}
+
+/*
+ * Creates a forwarding table entry and removes it.
+ * Expected result: The forwarding table should be empty
+ */
+static void test_nib_ft_remove(void)
+{
+
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+    TEST_ASSERT_NOT_NULL((dst = _nib_ft_add(&next_hop, IFACE, &pfx,
+                                            GLOBAL_PREFIX_LEN)));
+    _nib_ft_remove(dst);
+    TEST_ASSERT_NULL(_nib_offl_iter(NULL));
+}
+
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+/*
+ * Creates GNRC_IPV6_NIB_ABR_NUMOF ABR entries with different addresses and
+ * then tries to add another.
+ * Expected result: should return NULL
+ */
+static void test_nib_abr_add__no_space_left(void)
+{
+    ipv6_addr_t addr = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                { .u64 = TEST_UINT64 } } };
+
+    for (int i = 0; i < GNRC_IPV6_NIB_ABR_NUMOF; i++) {
+        TEST_ASSERT_NOT_NULL(_nib_abr_add(&addr));
+        addr.u64[1].u64++;
+    }
+    TEST_ASSERT_NULL(_nib_abr_add(&addr));
+}
+
+/*
+ * Creates GNRC_IPV6_NIB_ABR_NUMOF ABR entries with different addresses and then
+ * tries to add another that is equal to the last.
+ * Expected result: should return not NULL (the last)
+ */
+static void test_nib_abr_add__success_duplicate(void)
+{
+    _nib_abr_entry_t *abr;
+    ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                  { .u64 = TEST_UINT64 } } };
+
+    for (int i = 0; i < GNRC_IPV6_NIB_ABR_NUMOF; i++) {
+        addr.u64[1].u64++;
+        TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    }
+    TEST_ASSERT(abr == _nib_abr_add(&addr));
+}
+
+/*
+ * Creates an ABR entry.
+ * Expected result: new entry should contain the given address
+ */
+static void test_nib_abr_add__success(void)
+{
+    _nib_abr_entry_t *abr;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT(ipv6_addr_equal(&addr, &abr->addr));
+}
+
+/*
+ * Creates an ABR entry and then removes the entry.
+ * Expected result: the ABR list should be empty
+ */
+static void test_nib_abr_remove__success(void)
+{
+    _nib_abr_entry_t *abr = NULL;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL(_nib_abr_add(&addr));
+    _nib_abr_remove(&addr);
+    TEST_ASSERT_NULL(_nib_abr_iter(abr));
+}
+
+/*
+ * Creates an ABR entry and tries to add a prefix, that is not in the NIB.
+ * Expected result: the ABR's prefix list should be unchanged.
+ */
+static void test_nib_abr_add_pfx__pfx_not_in_nib(void)
+{
+    _nib_abr_entry_t *abr;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+    _nib_offl_entry_t offl;
+    offl.mode = _PL;
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
+    _nib_abr_add_pfx(abr, &offl);
+    TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
+}
+
+/*
+ * Creates an ABR entry and a prefix and tries to add that prefix.
+ * Expected result: the ABR's prefix list should be changed.
+ */
+static void test_nib_abr_add_pfx__pfx_in_nib(void)
+{
+    _nib_abr_entry_t *abr;
+    _nib_offl_entry_t *dst;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+
+
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT_NOT_NULL((dst = _nib_pl_add(IFACE, &pfx, GLOBAL_PREFIX_LEN,
+                                            UINT32_MAX, UINT32_MAX)));
+    TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
+    _nib_abr_add_pfx(abr, dst);
+    TEST_ASSERT_NOT_NULL(_nib_abr_iter_pfx(abr, NULL));
+}
+
+/*
+ * Iterates over prefixes of ABR with no prefix entries
+ * Expected result: _nib_abr_pfx_iter returns NULL
+ */
+static void test_nib_abr_iter_pfx__empty(void)
+{
+    _nib_abr_entry_t *abr;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT_NULL(_nib_abr_iter_pfx(abr, NULL));
+}
+
+/*
+ * Iterates over empty ABR entries
+ * Expected result: _nib_abr_iter returns NULL
+ */
+static void test_nib_abr_iter__empty(void)
+{
+    TEST_ASSERT_NULL(_nib_abr_iter(NULL));
+}
+
+/*
+ * Iterates over ABR entries with one element
+ * Expected result: _nib_abr_iter returns element with NULL, and with that
+ * element NULL.
+ */
+static void test_nib_abr_iter__one_elem(void)
+{
+    _nib_abr_entry_t *abr, *res;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr = _nib_abr_add(&addr)));
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(NULL)));
+    TEST_ASSERT(res == abr);
+    TEST_ASSERT_NULL(_nib_abr_iter(res));
+}
+
+/*
+ * Iterates over ABR entries with three element
+ * Expected result: _nib_abr_iter returns element with NULL, with that element
+ * another, with that element yet another and with the last NULL.
+ */
+static void test_nib_abr_iter__three_elem(void)
+{
+    _nib_abr_entry_t *abr1, *abr2, *abr3, *res;
+    ipv6_addr_t addr = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr1 = _nib_abr_add(&addr)));
+    addr.u64[1].u64++;
+    TEST_ASSERT_NOT_NULL((abr2 = _nib_abr_add(&addr)));
+    addr.u64[1].u64++;
+    TEST_ASSERT_NOT_NULL((abr3 = _nib_abr_add(&addr)));
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(NULL)));
+    TEST_ASSERT(res == abr1);
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(res)));
+    TEST_ASSERT(res == abr2);
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(res)));
+    TEST_ASSERT(res == abr3);
+    TEST_ASSERT_NULL(_nib_abr_iter(res));
+}
+
+/*
+ * Iterates over ABR entries with two elements, where there is a hole in the
+ * internal array
+ * Expected result: _nib_abr_iter returns element with NULL, with that element
+ * another, and with the last NULL.
+ */
+static void test_nib_abr_iter__three_elem_middle_removed(void)
+{
+    _nib_abr_entry_t *abr1, *abr2, *res;
+    ipv6_addr_t addr = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
+                                { .u64 = TEST_UINT64 } } };
+
+    TEST_ASSERT_NOT_NULL((abr1 = _nib_abr_add(&addr)));
+    addr.u64[1].u64++;
+    TEST_ASSERT_NOT_NULL(_nib_abr_add(&addr));
+    addr.u64[1].u64++;
+    TEST_ASSERT_NOT_NULL((abr2 = _nib_abr_add(&addr)));
+    addr.u64[1].u64--;
+    _nib_abr_remove(&addr);
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(NULL)));
+    TEST_ASSERT(res == abr1);
+    TEST_ASSERT_NOT_NULL((res = _nib_abr_iter(res)));
+    TEST_ASSERT(res == abr2);
+    TEST_ASSERT_NULL(_nib_abr_iter(res));
+}
+#endif
 
 Test *tests_gnrc_ipv6_nib_internal_tests(void)
 {
@@ -998,6 +1916,7 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_alloc__no_space_left_diff_iface),
         new_TestFixture(test_nib_alloc__no_space_left_diff_addr_iface),
         new_TestFixture(test_nib_alloc__success_duplicate),
+        new_TestFixture(test_nib_alloc__success_noaddr_override),
         new_TestFixture(test_nib_alloc__success),
         new_TestFixture(test_nib_clear__persistent),
         new_TestFixture(test_nib_clear__non_persistent_but_content),
@@ -1041,8 +1960,53 @@ Test *tests_gnrc_ipv6_nib_internal_tests(void)
         new_TestFixture(test_nib_drl_get_dr__success2),
         new_TestFixture(test_nib_drl_get_dr__success3),
         new_TestFixture(test_nib_drl_get_dr__success4),
-        new_TestFixture(test_nib_iface_get__no_space_left),
-        new_TestFixture(test_nib_iface_get__success),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_next_hop),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_iface),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_next_hop_iface),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_pfx),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_next_hop_pfx),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_iface_pfx),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_next_hop_iface_pfx),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_pfx_len),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_next_hop_pfx_len),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_iface_pfx_len),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_next_hop_iface_pfx_len),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_pfx_pfx_len),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_next_hop_pfx_pfx_len),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_iface_pfx_pfx_len),
+        new_TestFixture(test_nib_offl_alloc__no_space_left_diff_next_hop_iface_pfx_pfx_len),
+        new_TestFixture(test_nib_offl_alloc__success_duplicate),
+        new_TestFixture(test_nib_offl_alloc__success_overwrite_unspecified),
+        new_TestFixture(test_nib_offl_alloc__success),
+        new_TestFixture(test_nib_offl_clear__uncleared),
+        new_TestFixture(test_nib_offl_clear__same_next_hop),
+        new_TestFixture(test_nib_offl_clear__cleared),
+        new_TestFixture(test_nib_offl_iter__empty),
+        new_TestFixture(test_nib_offl_iter__one_elem),
+        new_TestFixture(test_nib_offl_iter__three_elem),
+        new_TestFixture(test_nib_offl_iter__three_elem_middle_removed),
+#if GNRC_IPV6_NIB_CONF_DC
+        new_TestFixture(test_nib_dc_add__success),
+        new_TestFixture(test_nib_dc_remove),
+#endif
+        new_TestFixture(test_nib_pl_add__success),
+        new_TestFixture(test_nib_pl_remove),
+        new_TestFixture(test_nib_ft_add__success),
+        new_TestFixture(test_nib_ft_remove),
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+        new_TestFixture(test_nib_abr_add__no_space_left),
+        new_TestFixture(test_nib_abr_add__success_duplicate),
+        new_TestFixture(test_nib_abr_add__success),
+        new_TestFixture(test_nib_abr_remove__success),
+        new_TestFixture(test_nib_abr_add_pfx__pfx_not_in_nib),
+        new_TestFixture(test_nib_abr_add_pfx__pfx_in_nib),
+        new_TestFixture(test_nib_abr_iter_pfx__empty),
+        /* rest of _nib_abr_iter_pfx() tested through _nib_abr_add_pfx() tests */
+        new_TestFixture(test_nib_abr_iter__empty),
+        new_TestFixture(test_nib_abr_iter__one_elem),
+        new_TestFixture(test_nib_abr_iter__three_elem),
+        new_TestFixture(test_nib_abr_iter__three_elem_middle_removed),
+#endif
     };
 
     EMB_UNIT_TESTCALLER(tests, set_up, NULL,

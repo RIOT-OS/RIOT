@@ -1,0 +1,8 @@
+/**
+ * @defgroup        cpu_mips_pic32_common Microchip MIPS common
+ * @ingroup         cpu
+ * @brief           Microchip MIPS common
+ *
+ * This module contains all common code and definition to all Microchip MIPS
+ * cpu families supported by RIOT: @ref cpu_mips_pic32mx, @ref cpu_mips_pic32mz.
+ */

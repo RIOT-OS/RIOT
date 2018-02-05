@@ -70,7 +70,7 @@ int pthread_cond_condattr_init(pthread_condattr_t *attr);
 int pthread_cond_condattr_destroy(pthread_condattr_t *attr);
 
 /**
- * @brief Get the process-shared attribute in an initialised attributes object referenced by attr
+ * @brief Get the process-shared attribute in an initialized attributes object referenced by attr
  * @note NOT USED since RIOT is a single process OS
  * @param[in] attr pre-allocated condition attribute variable structure.
  * @param[out] pshared the pre-allocated process-shared variable.
@@ -79,7 +79,7 @@ int pthread_cond_condattr_destroy(pthread_condattr_t *attr);
 int pthread_condattr_getpshared(const pthread_condattr_t *attr, int *pshared);
 
 /**
- * @brief Set the process-shared attribute in an initialised attributes object referenced by attr
+ * @brief Set the process-shared attribute in an initialized attributes object referenced by attr
  * @note NOT USED since RIOT is a single process OS
  * @param[in, out] attr pre-allocated condition attribute variable structure.
  * @param[in] pshared pshared the pre-allocated process-shared variable.

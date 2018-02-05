@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = emcute
+APPLICATION = emcute_example
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -11,7 +11,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              chronos msb-430 msb-430h nucleo32-f031 nucleo32-f042 \
                              nucleo32-f303 nucleo32-l031 nucleo-f030 nucleo-f070 \
                              nucleo-f072 nucleo-f302 nucleo-f334 nucleo-l053 \
-                             stm32f0discovery telosb waspmote-pro weio wsn430-v1_3b \
+                             stm32f0discovery telosb waspmote-pro wsn430-v1_3b \
                              wsn430-v1_4 z1
 
 # Include packages that pull up and auto-init the link layer.
@@ -33,7 +33,7 @@ USEMODULE += gnrc_icmpv6_echo
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-CFLAGS += -DDEVELHELP
+DEVELHELP ?= 1
 
 # Comment this out to join RPL DODAGs even if DIOs do not contain
 # DODAG Configuration Options (see the doc for more info)

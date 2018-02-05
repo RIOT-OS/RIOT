@@ -1,0 +1,5 @@
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_hwrng
+
+-include $(RIOTCPU)/cortexm_common/Makefile.features

@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = gnrc_tcp_server
 include ../Makefile.tests_common
 
 # If no BOARD is found in the environment, use this default:
@@ -16,8 +14,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              msb-430h nrf51dongle nrf6310 nucleo32-f031 \
                              nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo-f030 \
                              nucleo-f070 nucleo-f072 nucleo-f302 nucleo-f334 nucleo-l053 \
-                             pca10000 pca10005 sb-430 sb-430h stm32f0discovery telosb \
-                             weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
+                             sb-430 sb-430h stm32f0discovery telosb \
+                             wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -26,11 +24,6 @@ RIOTBASE ?= $(CURDIR)/../..
 CFLAGS += -DLOCAL_ADDR=\"$(TCP_LOCAL_ADDR)\"
 CFLAGS += -DLOCAL_PORT=$(TCP_LOCAL_PORT)
 CFLAGS += -DCYCLES=$(TCP_TEST_CYCLES)
-
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-#CFLAGS += -DDEVELHELP
 
 # Modules to include
 USEMODULE += gnrc_netdev_default

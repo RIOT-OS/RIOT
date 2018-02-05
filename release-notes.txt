@@ -1,3 +1,467 @@
+RIOT-2018.01 - Release Notes
+============================
+RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are typically
+found in the Internet of Things: 8-bit and 16-bit microcontrollers as well as
+light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency, soft
+real-time capabilities, small memory footprint, modularity, and uniform API
+access, independent of the underlying hardware (with partial POSIX compliance).
+
+RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community) and is
+licensed with a non-viral copyleft license (LGPLv2.1), which allows indirect
+business models around the free open-source software platform provided by RIOT.
+
+
+About this release:
+===================
+The 2018.01 release includes major progress in RIOTs network communication
+capabilities, i.e., rewrite of GNRC's neighbour discovery, confirmable messages
+in (g)CoAP, LoRa, and GoMacH as well as updates on CCN-lite and LWIP.
+Furthermore, RIOT contributes to _IKEA-Hacking_ by bringing support for
+the smart home lighting system TRADFRI (note: this will void the warranty).
+Needless to say that this release also adds and updates support for several
+platforms, drivers, and of course lots of enhancements to the documentation
+as well as numerous bug fixes. Last but not least, RIOT now has an official
+code of conduct (https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md)
+
+More than 442 pull requests with about 865 commits have been merged since the
+last release and about 96 issues have been solved. 54 people contributed with code
+in 96 days. Approximately 2370 files have been touched with 223970 insertions
+and 181409 deletions.
+
+
+Notations used below:
+=====================
+    + means new feature/item
+    * means modified feature/item
+    - means removed feature/item
+
+
+New features and changes
+========================
+System libraries
+----------------
+    + event: event queue framework like libevent
+
+Networking
+----------
+    + gcoap: confirmable messages
+    + nanocoap: no external package anymore
+    * GNRC: major rewrite of neighbour discovery
+    * GNRC: new API for network interface handling
+
+Packages
+--------
+    + gecko_sdk: library for EFM/EFR/EZR32 MCUs
+    * libcoap: git patching fixed
+    + littlefs: filesystem for constraint devices
+    - nanocoap: now part of RIOT
+    * openthread: updated
+    + semtech-loramac: LoRa MAC
+    + umorse: morse encoder
+
+Boards
+------
+    + acd52832
+    * common: restructured shared code for boards
+    + b-l475e-iot01a
+    + bluepill
+    + ikea-tradfri
+    - pca10000
+    - pca10005
+    - qemu-i386
+    + ruuvitag
+    + sltb001a
+    + teensy31
+    + thingy52
+    - x86
+
+CPU
+---
+    + efm32
+    * kinetis: unified all MCU variants
+    - x86
+
+Device Drivers
+--------------
+    + socket_zep: emulated IEEE 802.15.4 device over a UDP for native
+    + hts221
+    + lc709203f
+    + lis2dh12
+    + rn2xx3
+    + soft_spi
+    + tja1042
+
+Build System / Tooling
+----------------------
+    + flake8: python code checker
+    * make: set `-Wall -Wextra` as default for all compilers and platforms
+    - sniffer: moved to applications repository
+    + tests: add automated test scripts for many apps
+
+
+Fixed Issues from the last release (2017.10)
+============================================
+#2143: unittests: tests-core doesn't compile for all platforms
+#4499: handle of l2src_len in gnrc_ndp_rtr_sol_handle
+#4822: kw2xrf: packet loss when packets get fragmented
+#5005: ndp: router advertisement sent with global address
+#5122: NDP: global unicast address on non-6LBR nodes disappears after a while
+#5656: Possible Weakness with locking in the GNRC network stack
+#5790: ND: Lost of Global IPV6 on node after sending lot of UDP frame from BR
+#5944: msp430: ipv6_hdr unittests fail
+#6451: Wrong value in SRF08 driver
+#6502: cpu/stm32l1: RTC broken
+
+
+Known Issues
+============
+Networking related issues
+-------------------------
+#5230: gnrc ipv6: multicast packets are not dispatched to the upper layers
+#5858: gnrc: 6lo: potential problem with reassembly of fragments: If one frame
+       gets lost the reassembly state machine might get out of sync
+#7035: lwIP: hangs due to sema change after a while
+
+Timer related issues
+--------------------
+#5103: xtimer: weird behavior of tests/xtimer_drift: xtimer_drift randomly
+       jumps a few seconds on nrf52
+#5338: xtimer: xtimer_now() not ISR safe for non-32-bit platforms.
+#6052: tests: xtimer_drift gets stuck: application freezes after ~30-200 seconds
+#7114: xtimer: add's items to the wrong list if the timer overflows between
+       _xtimer_now() and irq_disable()
+
+native related issues
+---------------------
+#495:  native not float safe: When FPU is used and an asynchronous context
+       switch occurs, either the stack gets corrupted or a floating point
+       exception occurs.
+#6442: cpu/native: timer interrupt does not yield thread
+
+other platform related issues
+-----------------------------
+#1891: newlib-nano: Printf formatting does not work properly for some numeric
+       types: PRI[uxdi]64, PRI[uxdi]8 and float are not parsed in newlib-nano
+#4866: not all GPIO driver implementations are thread safe: Due to non-atomic
+       operations in the drivers some pin configurations might get lost.
+#5848: Arduino: Race condition in sys/arduino/Makefile.include
+#6018: nRF52 gnrc 6lowpan ble memory leak
+#6261: SAMD21: TC3 & TC4 issue when using TCC2
+#6379: nrf52dk/nordic_soft_device: not working anymore
+#6437: periph/spi: Leftovers from SPI rework
+#6526: atmega based boards freeze when main thread is over
+#6836: Issuing a reboot on ATmega328p makes the board loop-reboot
+#7753: pic32-wifire: race-condition when linking in concurrent build
+
+other issues
+------------
+#1263: TLSF implementation contains (a) read-before-write error(s).
+#3366: periph/i2c: handle NACK
+#4488: Making the newlib thread-safe: When calling puts/printf after
+       thread_create(), the CPU hangs for DMA enabled UART drivers.
+#5776: make: Predefining CFLAGS are parsed weirdly
+#5863: OSX + SAMR21-xpro: shell cannot handle inputs of length >64 chars
+#5962: Makefile: UNDEF variable is not working as documented
+
+
+Acknowledgements
+================
+We would like to thank all companies (vendors) that provided us with (their)
+hardware for porting and testing RIOT-OS. Further thanks go to companies and
+institutions that directly sponsored development time. And finally, big thanks
+to all of you contributing in so many different ways to make RIOT worthwhile!
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+* Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+* The code developed by the RIOT community is licensed under the GNU Lesser
+  General Public License (LGPL) version 2.1 as published by the Free Software
+  Foundation.
+* Some external sources and packages are published under a separate license.
+
+All code files contain licensing information.
+
+
+
+RIOT-2017.10 - Release Notes
+============================
+RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are typically
+found in the Internet of Things: 8-bit microcontrollers, 16-bit
+microcontrollers and light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency, soft
+real-time capabilities, small memory footprint, modularity, and uniform API
+access, independent of the underlying hardware (with partial POSIX compliance).
+
+RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community) and is
+licensed with a non-viral copyleft license (LGPLv2.1), which allows indirect
+business models around the free open-source software platform provided by RIOT.
+
+About this release:
+===================
+Most notable, this release is bringing RIOT a step closer to supporting
+over-the-air-updates by containing initial support for MCUBoot.
+Furthermore, it adds support for some new platforms (e.g. arduino-mkzero,
+nucleos, and frdm-k22f), drivers (e.g. my9221, apa102, ds1307), and of course
+a large number of bug fixes (e.g. `make buildtest` now working properly,
+various fixes to `xtimer`).
+
+About 390 pull requests with about 500 commits have been merged since the last
+release and about 60 issues have been solved. 39 people contributed with code
+in 113 days. 1825 files have been touched with 223454 insertions and 66146 deletions.
+
+Notations used below:
+=====================
++ means new feature/item
+* means modified feature/item
+- means removed feature/item
+
+New features and changes
+========================
+
+Bootloader
+-----------
++ MCUBoot: A secure bootloader for ARM MCUs is now supported. This initial support
+includes only the nrf52dk board. For more information about it refer to the mcuboot github
+page at https://github.com/runtimeco/mcuboot/blob/master/README-RIOT.rst
+
+System libraries
+----------------
++ bcd: binary coded decimal en/decoder
+
+Networking
+----------
++ gcoap: Add URI-query strings for requests + various fixes
+
+Packages
+--------
+* lwip: Updated to v2.0.3
+
+Boards
+------
++ NXP frdm-k22f
++ STM nucleo144-f722
++ Arduino arduino-mkzero
++ ti CC2650 LaunchPad
+- weio
+
+CPU
+---
++ NXP k22f
++ cc2538: ADC
++ stm32l4: RTC
++ samr21e18a
++ msp430: added flashpage driver
+- lpc11u34
+* stm32: unified stmclk implementations, reworked RTC
+* sam0: heavy unification and refactoring, updated vendor headers
++ sam_common: started unification of sam0 and sam3
+* cortexm: interrupt vector cleanup
+
+Device Drivers
+--------------
++ my9221 - LED controller + Seeed Studio Grove LED bar
++ apa102 - RGB LED
++ ds1307: RTC
++ SAUL support: lps331ap
+* SAUL gpio: allow configuration of initial state and low-active signals
+* sdcard_spi: added mtd interface
+* PM: fixed selection of default implementations for `pm_off` and `pm_set_lowest`
+
+Build System / Tooling
+------------
++ make: added pkt-prepare target
+* gcc: enabled `-fdiagnostics-color` per default for `arm` and `native` targets
+* edbg: use as default flash tool for sam0-based boards
++ added LOSTANDFOUND.md for listing removed features
+
+Fixed Issues from the last 3 releases (known issues missing in 2017.04 and 2017.07)
+===================================================================================
+#2006: cpu/nrf51822: timer callback may be fired too early
+#4841: xtimer: timer already in the list:
+#4590: pkg: building relic with clang fails.
+#4694: drivers/lm75a: does not build
+#4902: xtimer: xtimer_set: xtimer_set does not handle integer overflows well
+#5128: make: buildtest breaks when exporting FEATURES_PROVIDED var
+#5207: make: buildest fails with board dependent application Makefiles
+#5361: cpu/cc26x0: timer broken
+#5460: cpu/samd21: i2c timing with compiler optimization
+#5489: cpu/lpc11u34: ADC broken
+#5799: kw2x: 15.4 duplicate transmits
+#5928: xtimer: usage in board_init() crashes: some boards use the xtimer in there board_init()
+       function. The xtimer is however first initialized in the auto_init module which is executed
+       after board_init()
+#6022: pkg: build order issue
+#6331: RTC alarm triggered with 1s delay
+#6419: cpu/cc2538: timer broken
+#6427: xtimer: infinite loop with xtimer_mutex_lock_timeout
+#6501: boards/nucleo: Pin usage collision (SPI clk vs. LED0)
+#6542: boards/nucle-f0xx: misconfigured timer configuration
+#6904: cpu/saml21: cannot use several EXTI
+
+Known Issues
+============
+Networking related issues
+-------------------------
+#3075: nhdp: unnecessary microsecond precision: NHDP works with timer values of microsecond precision
+       which is not required. Changing to lower precision would save some memory.
+#4048: gnrc: potential racey memory leak
+#5016: gnrc_rpl: Rejoining RPL instance as root after reboot messes up routing
+#5230: gnrc ipv6: multicast packets are not dispatched to the upper layers
+#5656: Possible Weakness with locking in the GNRC network stack: For some operations mutexes to the
+       network interfaces need to get unlocked in the current implementation to not get deadlocked.
+       Recursive mutexes as provided in #5731 might help to solve this problem.
+#5748: gnrc: nodes crashing with too small packet buffer: A packet buffer of size ~512 B might lead
+       to crashes. The issue describes this for several hundret nodes, but agressive flooding with
+       just two nodes was also shown to lead to this problem.
+#5858: gnrc: 6lo: potential problem with reassembly of fragments: If one frame gets lost the reassembly
+       state machine might get out of sync
+#6123: gnrc: crash with (excessive) traffic
+#7035: lwIP: hangs due to sema change after a while
+#7737: pkg: libcoap is partially broken and outdated
+
+NDP is not working properly
+---------------------------
+#4499: handle of l2src_len in gnrc_ndp_rtr_sol_handle: Reception of a router solicitation might lead
+       to invalid zero-length link-layer addresses in neighbor cache.
+#5005: ndp: router advertisement sent with global address: Under some  circumstances a router might
+       send RAs with GUAs. While they are ignored on receive (as RFC-4861 specifies), RAs should have
+       link-local addresses and not even be send out this way.
+#5122: NDP: global unicast address on non-6LBR nodes disappears after a while: Several issues
+       (also see #5760) lead to a global unicast address effectively being banned from the network
+       (disappears from neighbor cache, is not added again)
+#5467: ipv6 address vanishes when ARO (wrongly) indicates DUP caused by outdated ncache at router
+#5539: Border Router: packet not forwarded from ethos to interface 6
+#5790: ND: Lost of Global IPV6 on node after sending lot of UDP frame from BR
+
+Timer related issues
+--------------------
+#5338: xtimer: xtimer_now() not ISR safe for non-32-bit platforms.
+#6052: tests: xtimer_drift gets stuck: xtimer_drift application freezes after ~30-200 seconds
+#6502: cpu/stm32l1: RTC broken
+#7114: xtimer: add's items to the wrong list if the timer overflows between _xtimer_now() and irq_disable()
+
+native related issues
+---------------------
+#495:  native not float safe: When the FPU is used when an asynchronous context switch occurs, either
+       the stack gets corrupted or a floating point exception occurs.
+#2175: ubjson: valgind registers "Invalid write of size 4" in unittests
+#5796: native: tlsf: early malloc will lead to a crash: TLSF needs pools to be initialized (which is
+       currently expected to be done in an application). If a malloc is needed before an application's
+       main started (e.g. driver initialization) the node can crash, since no pool is allocated yet.
+#6145: native: system reboots on SIGTRAP
+#6442: cpu/native: timer interrupt does not yield thread
+#7206: native: race-condition in IPC
+
+other platform related issues
+-----------------------------
+#1891: newlib-nano: Printf formatting does not work properly for some numeric types: PRI[uxdi]64,
+       PRI[uxdi]8 and float are not parsed in newlib-nano
+#2143: unittests: tests-core doesn't compile for all platforms: GCC build-ins were used in the
+       unittests which are not available with msp430-gcc
+#2300: qemu unittest fails because of a page fault
+#4512: pkg: tests: RELIC unittests fail on iotlab-m3
+#4560: make: clang is more pedantic than gcc oonf_api is not building with clang (partly fixed by #4593)
+#4822: kw2xrf: packet loss when packets get fragmented
+#4876: at86rf2xx: Simultaneous use of different transceiver types is not supported
+#4954: chronos: compiling with -O0 breaks
+#4866: not all GPIO driver implementations are thread safe: Due to non-atomic operations in the drivers
+       some pin configurations might get lost.
+#5009: RIOT is saw-toothing in energy consumption (even when idling)
+#5103: xtimer: weird behavior of tests/xtimer_drift: xtimer_drift randomly jumps a few seconds on nrf52
+#5405: Eratic timings on iotlab-m3 with compression context activated
+#5486: at86rf2xx: lost interrupts
+#5678: at86rf2xx: failed assertion in _isr
+#5944: msp430: ipv6_hdr unittests fail
+#5848: arduino: Race condition in sys/arduino/Makefile.include
+#6018: nRF52 gnrc 6lowpan ble memory leak
+#6261: SAMD21 TC3 & TC4 issue when using TCC2
+#6379: nrf52dk/nordic_soft_device: not working anymore
+#6437: periph/spi: Leftovers from SPI rework
+#6526: atmega based boards freeze when main thread is over
+#6836: Issuing a reboot on ATmega328p makes the board loop-reboot
+#7347: xtimer_usleep stuck for small values on nucleo-l1
+#7753: pic32-wifire: race-condition when linking in concurrent build
+#7846: stm32f1: I2C read functions return bogus values with unconnected devices
+
+other issues
+------------
+#1263: TLSF implementation contains (a) read-before-write error(s).
+#3256: make: Setting constants on compile time doesn't really set them everywhere
+#3366: periph/i2c: handle NACK
+#4488: Making the newlib thread-safe: When calling puts/printf after thread_create(), the CPU hangs
+       for DMA enabled uart drivers.
+#5561: C++11 extensions in header files
+#5776: make: Predefining CFLAGS are parsed weirdly
+#5863: OSX +  SAMR21-xpro: shell cannot handle command inputs larger than 64 chars
+#5962: Makefile: UNDEF variable is not working as documented
+#6451: Wrong value in SRF08 driver
+#7800: CBOR is broken
+
+Special Thanks
+==============
+We would like to give our special thanks to all the companies that provided us
+with their hardware for porting and testing, namely the people from (in alphabeticalorder):
+Atmel, Freescale, Imagination Technologies, Nordic, OpenMote, Phytec, SiLabs, UDOO,
+and Zolertia;
+and also companies that directly sponsored development time:
+Cisco Systems, Eïsox, Eistec, Ell-i, Engineering Spirit, Mesotic, Nordic, OTA keys and Phytec.
+We also would like to thank people from Inria Chile for their work on
+OpenThread integration and Semtech LoRa drivers.
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+* Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+* The code developed by the RIOT community is licensed under the GNU Lesser General Public
+  License (LGPL) version 2.1 as published by the Free Software Foundation.
+* Some external sources and pkg are published under a separate license.
+
+All code files contain licensing information.
+
+
+
 RIOT-2017.07 - Release Notes
 ============================
 RIOT is a multi-threading operating system which enables soft real-time
@@ -144,7 +608,6 @@ License
 * Some external sources and pkg are published under a separate license.
 
 All code files contain licensing information.
-
 
 
 
@@ -883,15 +1346,15 @@ provided by RIOT.
 
 About this release:
 ===================
-This release was focused primarily on fixing bugs, but also adds two new 
+This release was focused primarily on fixing bugs, but also adds two new
 supported radio transceivers: CC2420 and CC2538.
-This new radio support allows to new interoperability tests with other OS, 
-allowing code size comparison and overall network performance for 
+This new radio support allows to new interoperability tests with other OS,
+allowing code size comparison and overall network performance for
 platforms based on these radios.
 
 About 198 pull requests with about 325 commits have been merged since the
-last release and about 65 issues have been solved. 46 people contributed with 
-code in 112 days. 632 files have been touched with 19863 insertions and 
+last release and about 65 issues have been solved. 46 people contributed with
+code in 112 days. 632 files have been touched with 19863 insertions and
 3682 deletions.
 
 
@@ -915,14 +1378,14 @@ Core
 Network Stack
 ---
 + Introduction of netstats in several platforms.
-* RPL optional auto initialisation
+* RPL optional auto initialization
 
 
 Packages
 ---
 + Added statistics for TLSF package (#5418)
 + Added U8g2 library for monochrome displays (#5549)
-* Added on-the-fly content creation for CCN-lite. 
+* Added on-the-fly content creation for CCN-lite.
 
 
 Platforms
@@ -931,7 +1394,7 @@ Platforms
 + Added support for Libellium's waspmote-pro board.
 + Added support for the iotlab A8/M3 node (https://www.iot-lab.info/hardware/a8/)
 + Added initial and rudimentary port for TI cc2650stk "SensorTag" (#4675)
-+ Split Zolertia Remote support into Remote Prototype A (remote-pa) and 
++ Split Zolertia Remote support into Remote Prototype A (remote-pa) and
 Remote Revision A (remote-reva)
 
 Drivers
@@ -939,7 +1402,7 @@ Drivers
 + Texas Instruments CC2538 RF driver (PR #5291)
 + Texas Instruments CC2420 RF driver (PR #5591)
 + Bosch BM180 sensor.
-+ Added XBee optional AES encryption support 
++ Added XBee optional AES encryption support
 
 System libraries
 ---
@@ -947,7 +1410,7 @@ System libraries
 
 Build System
 ---
-+ Ubuntu 16.04 packaged gcc-arm-none-eabi toolchain can now be used to compile 
++ Ubuntu 16.04 packaged gcc-arm-none-eabi toolchain can now be used to compile
 RIOT for ARM boards
 
 Other
@@ -961,45 +1424,45 @@ API changes
 Fixed Issues from the last release
 ==================================
 #3824: native: gnrc: hardcore pinging crashes.
-#4583: cpp11: clang doesn't allow mutex_t to be used with constexpr All 
+#4583: cpp11: clang doesn't allow mutex_t to be used with constexpr All
 cpp11-* tests fail with clang.
-#5388: gnrc_sixlowpan_iphc_nhc: receiving NHC compressed UDP 
+#5388: gnrc_sixlowpan_iphc_nhc: receiving NHC compressed UDP
 packets hits assert in IPv6 (Fixed by #5281).
 
 
 Known Issues
 ==========
 #3075: nhdp: unnecessary microsecond precision NHDP works with timer
- values of microsecond precision which is not required. Changing to lower 
+ values of microsecond precision which is not required. Changing to lower
  precision would save some memory.
 #3086: Max. packet length for AT86RF2XX
-#4048: potential racey memory leak According to the packet buffer stats, 
-flood-pinging a multicast destination may lead to a memory leak due to a 
-race condition. However, it seems to be a rare case and a completely filled 
+#4048: potential racey memory leak According to the packet buffer stats,
+flood-pinging a multicast destination may lead to a memory leak due to a
+race condition. However, it seems to be a rare case and a completely filled
 up packet buffer was not observed.
-#5005: ndp: router advertisement sent with global address Under some 
-circumstances a router might send RAs with GUAs. While they are ignored 
-on receive (as RFC 4861 specifies), RAs should have link-local addresses 
+#5005: ndp: router advertisement sent with global address Under some
+circumstances a router might send RAs with GUAs. While they are ignored
+on receive (as RFC 4861 specifies), RAs should have link-local addresses
  and not even be send out this way.
 #5007: gnrc icmpv6: Ping reply goes out the wrong interface
-#5055: cpuid: multiple radios will get same EUI-64 Nodes with multiple 
+#5055: cpuid: multiple radios will get same EUI-64 Nodes with multiple
 interfaces might get the same EUI-64 for them since they are generated from
  the same CPU ID.
- #5230: gnrc ipv6: multicast packets are not dispatched to the upper layers. 
+ #5230: gnrc ipv6: multicast packets are not dispatched to the upper layers.
 (Fix exists, but was postponed)
-#5390: pkg: OpenWSN does not compile This package still uses deprecated 
+#5390: pkg: OpenWSN does not compile This package still uses deprecated
 modules and was not tested for a long time.
 
 native related issues
 ---------------------
-#495: native not float safe When the FPU is used when an asynchronous 
-context switch occurs, either the stack gets corrupted or a floating point 
+#495: native not float safe When the FPU is used when an asynchronous
+context switch occurs, either the stack gets corrupted or a floating point
 exception occurs.
-#534: native debugging on osx fails Using valgrind or gdb with a nativenet 
-target in OSX leads to "the network" being stuck (gdb) or the whole process 
+#534: native debugging on osx fails Using valgrind or gdb with a nativenet
+target in OSX leads to "the network" being stuck (gdb) or the whole process
 being stuck (valgrind).
-#334: nativenet crashes when hammered Flood-pinging a native instance 
-from more than one host (either multiple threads on the host system or multiple 
+#334: nativenet crashes when hammered Flood-pinging a native instance
+from more than one host (either multiple threads on the host system or multiple
 other native instances), leads to a SEGFAULT.
 #2071; WIP: native: overdue fixes
 #4590: pkg: building relic with clang fails.
@@ -1007,8 +1470,8 @@ other native instances), leads to a SEGFAULT.
 
 other platform related issues
 -----------------------------
-#4560: make: clang is more pedantic than gcc oonf_api is not building with 
-clang. 
+#4560: make: clang is more pedantic than gcc oonf_api is not building with
+clang.
 (Partly solved by #4593)
 #4866: not all GPIO driver implementations are thread safe Due to non-atomic
  operations in the drivers some pin configurations might get lost.
@@ -1017,15 +1480,15 @@ clang.
 other issues
 ------------
 #1263: TLSF implementation contains (a) read-before-write error(s).
-#2761: core: define default flags If a thread is created without the 
-corresponding flag (CREATE_STACKTEST), the ps command will yield wrong 
+#2761: core: define default flags If a thread is created without the
+corresponding flag (CREATE_STACKTEST), the ps command will yield wrong
 numbers for the stack usage.
-#2927: core: Automatically select the lowest possible LPM mode Not all 
-available low power modes (LPMs) are implemented for each platform and the 
+#2927: core: Automatically select the lowest possible LPM mode Not all
+available low power modes (LPMs) are implemented for each platform and the
 concept of how the LPM is chosen needs some reconsideration.
-#2967: Makefile.features: location is not relevant for all features Provided 
+#2967: Makefile.features: location is not relevant for all features Provided
 features for the build system should be split up into a board and cpu specific part
-#4488: Making the newlib thread-safe When calling puts/printf after 
+#4488: Making the newlib thread-safe When calling puts/printf after
 thread_create(), the CPU hangs for DMA enabled uart drivers.
 #4841: xtimer: timer already in the list Under some conditions an xtimer can end
  up twice in the internal list of the xtimer module.
@@ -1033,10 +1496,10 @@ thread_create(), the CPU hangs for DMA enabled uart drivers.
 
 Special Thanks
 ===============
-We like to give our special thanks to all the companies that provided us with their 
-hardware for porting and testing, namely the people from (in alphabeticalorder): 
+We like to give our special thanks to all the companies that provided us with their
+hardware for porting and testing, namely the people from (in alphabeticalorder):
 Atmel, Freescale, Limifrog, Nordic, OpenMote, Phytec, SiLabs, UDOO,and Zolertia;
- and also companies that directly sponsored development time:Cisco Systems, 
+ and also companies that directly sponsored development time:Cisco Systems,
 Eistec, Ell-i, Enigeering Spirit, Nordic, FreshTemp LLC, and Phytec.
 
 More information
@@ -1045,15 +1508,15 @@ http://www.riot-os.org
 
 Mailing lists
 -------------
-* RIOT OS kernel developers list 
+* RIOT OS kernel developers list
  * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
-* RIOT OS users list 
+* RIOT OS users list
  * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
  * RIOT commits
   * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
  * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
- 
+
 IRC
 ---
 * Join the RIOT IRC channel at: irc.freenode.net, #riot-os

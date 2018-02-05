@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /**
- * @brief possible return codes
+ * @brief   Possible return codes
  */
 enum {
     DHT_OK      =  0,       /**< all good */
@@ -46,7 +46,7 @@ enum {
 };
 
 /**
- * @brief data type for storing DHT sensor readings
+ * @brief   Data type for storing DHT sensor readings
  */
 typedef struct {
     uint16_t humidity;      /**< relative deca-humidity */
@@ -54,7 +54,7 @@ typedef struct {
 } dht_data_t;
 
 /**
- * @brief device type of the DHT device
+ * @brief   Device type of the DHT device
  */
 typedef enum {
     DHT11,                  /**< DHT11 device identifier */
@@ -63,7 +63,7 @@ typedef enum {
 } dht_type_t;
 
 /**
- * @brief device descriptor for DHT sensor devices
+ * @brief   Device descriptor for DHT sensor devices
  */
 typedef struct {
     gpio_t pin;             /**< GPIO pin of the device's data pin */
@@ -73,17 +73,12 @@ typedef struct {
 } dht_t;
 
 /**
- * @brief configuration parameters for DHT devices
+ * @brief   Configuration parameters for DHT devices
  */
 typedef dht_t dht_params_t;
 
 /**
- * @brief auto-initialize all configured DHT devices
- */
-void dht_auto_init(void);
-
-/**
- * @brief initialize a new DHT device
+ * @brief   Initialize a new DHT device
  *
  * @param[out] dev      device descriptor of a DHT device
  * @param[in]  params   configuration parameters

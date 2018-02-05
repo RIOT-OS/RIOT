@@ -20,8 +20,6 @@
  * @}
  */
 
-#ifdef FEATURE_PERIPH_RTC
-
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -141,7 +139,6 @@ static int _rtc_usage(void)
 {
     puts("usage: rtc <command> [arguments]");
     puts("commands:");
-    puts("\tinit\t\tinitialize the interface");
     puts("\tpoweron\t\tpower the interface on");
     puts("\tpoweroff\tpower the interface off");
     puts("\tclearalarm\tdeactivate the current alarm");
@@ -157,9 +154,6 @@ int _rtc_handler(int argc, char **argv)
     if (argc < 2) {
         _rtc_usage();
         return 1;
-    }
-    else if (strncmp(argv[1], "init", 4) == 0) {
-        rtc_init();
     }
     else if (strncmp(argv[1], "poweron", 7) == 0) {
         rtc_poweron();
@@ -189,18 +183,3 @@ int _rtc_handler(int argc, char **argv)
     }
     return 0;
 }
-
-#else
-
-#include <stdio.h>
-
-int _rtc_handler(int argc, char **argv)
-{
-    (void) argc;
-    (void) argv;
-
-    puts("not implemented");
-    return 1;
-}
-
-#endif /* FEATURE_RTC */

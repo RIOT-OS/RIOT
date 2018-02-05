@@ -125,23 +125,10 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    unsigned int corrected_now;
-    int retval;
-
-    if (dev >= TIMER_NUMOF){
-        return -1;
-    }
-
-    corrected_now = timer_read(dev);
-    retval = timer_set_absolute(dev, channel, corrected_now+timeout);
-
-    return retval;
-}
-
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
+    (void) channel;
+
     unsigned int timer_base;
     unsigned int timer_side = TIMER_A;
     unsigned long long scaledv;
@@ -184,6 +171,8 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
+    (void) channel;
+
     unsigned int timer_intbit = TIMER_TIMA_TIMEOUT;
     unsigned int timer_base;
 

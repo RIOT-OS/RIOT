@@ -1,6 +1,6 @@
 # define the cpu used by the board
-export CPU = k22f
+export CPU = kinetis
 export CPU_MODEL = mk22fn512vlh12
 
 # Include default FRDM board config
-include $(RIOTBOARD)/frdm-common/Makefile.include
+include $(RIOTBOARD)/common/frdm/Makefile.include

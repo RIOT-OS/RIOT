@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_enc28j60
+ * @ingroup     drivers_enc28j60
  * @{
  *
  * @file
@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the ENC28J60 driver
+ * @name    Set default configuration parameters for the ENC28J60 driver
  * @{
  */
 #ifndef ENC28J60_PARAM_SPI

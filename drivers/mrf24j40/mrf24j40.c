@@ -156,7 +156,7 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
      */
     mrf24j40_reg_write_long(dev, MRF24J40_TX_NORMAL_FIFO, dev->header_len);
 
-    if (dev->netdev.flags & NETDEV_IEEE802154_ACK_REQ) {
+    if (dev->fcf_low & IEEE802154_FCF_ACK_REQ) {
         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNACKREQ | MRF24J40_TXNCON_TXNTRIG);
     }
     else {

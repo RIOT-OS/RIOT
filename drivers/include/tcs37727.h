@@ -108,14 +108,14 @@ extern const saul_driver_t tcs37727_saul_driver;
 int tcs37727_init(tcs37727_t *dev, const tcs37727_params_t *params);
 
 /**
- * @brief Set RGBC enable, this activates periodic RGBC measurements.
+ * @brief   Set RGBC enable, this activates periodic RGBC measurements.
  *
  * @param[out] dev          device descriptor of sensor
  */
 void tcs37727_set_rgbc_active(const tcs37727_t *dev);
 
 /**
- * @brief Set RGBC disable, this deactivates periodic RGBC measurements
+ * @brief   Set RGBC disable, this deactivates periodic RGBC measurements
  *
  * Also turns off the sensor when proximity measurement is disabled.
  *
@@ -124,7 +124,7 @@ void tcs37727_set_rgbc_active(const tcs37727_t *dev);
 void tcs37727_set_rgbc_standby(const tcs37727_t *dev);
 
 /**
- * @brief Read sensor's data
+ * @brief   Read sensor's data
  *
  * Besides an Autogain routine is called. If a maximum or minimum threshold
  * value of the channel clear is reached, then the gain will be changed

@@ -25,7 +25,7 @@
 #endif
 
 /**
- * @name MPU-9150 register definitions
+ * @name    MPU-9150 register definitions
  * @{
  */
 #define MPU9150_YG_OFFS_TC_REG          (0x01)
@@ -65,7 +65,7 @@
 /** @} */
 
  /**
-  * @name Compass register definitions
+  * @name    Compass register definitions
   * @{
   */
 #define COMPASS_WHOAMI_REG              (0x00)
@@ -80,7 +80,7 @@
 /** @} */
 
 /**
- * @name MPU9150 bitfield definitions
+ * @name    MPU9150 bitfield definitions
  * @{
  */
 #define BIT_SLV0_DELAY_EN               (0x01)

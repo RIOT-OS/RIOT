@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_nrf51dongle nRF51 Dongle
  * @ingroup     boards
- * @brief       Board specific files for the Nordic nRF51 Dongle
+ * @brief       Support for the Nordic nRF51 Dongle
  * @{
  *
  * @file
@@ -32,8 +32,6 @@ extern "C" {
  * @brief   Xtimer configuration
  * @{
  */
-#define XTIMER_DEV                  (0)
-#define XTIMER_CHAN                 (0)
 #define XTIMER_WIDTH                (24)
 #define XTIMER_BACKOFF              (40)
 /** @} */

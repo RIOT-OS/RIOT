@@ -1,6 +1,8 @@
 export CPU_ARCH = cortex-m3
+export CPU_FAM  = sam3
 
 # include common SPI functions
 USEMODULE += periph_common
 
+include $(RIOTCPU)/sam_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

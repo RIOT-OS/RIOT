@@ -33,9 +33,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* guard file in case no I2C device is defined */
-#if I2C_NUMOF
-
 #define I2C_MAX_LOOP_CNT 10000
 
 /* static function definitions */
@@ -596,12 +593,12 @@ void i2c_poweron(i2c_t dev)
 
 void i2c_poweroff(i2c_t dev)
 {
-    int cnt = 0;
-
     switch (dev) {
 #if I2C_0_EN
     case I2C_0:
-        while ((I2C_0_DEV->SR2 & I2C_SR2_BUSY) && cnt++ < I2C_MAX_LOOP_CNT) {}
+        for (int cnt = 0;
+             ((I2C_0_DEV->SR2 & I2C_SR2_BUSY) && (cnt < I2C_MAX_LOOP_CNT));
+             cnt++) {}
 
         I2C_0_CLKDIS();
         break;
@@ -727,5 +724,3 @@ void I2C_0_ERR_ISR(void)
     i2c_irq_handler(I2C_0, I2C_0_DEV);
 }
 #endif
-
-#endif /* I2C_NUMOF */

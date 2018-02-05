@@ -1,14 +1,20 @@
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
-    USEMODULE += netdev_tap
+  USEMODULE += netdev_tap
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
-    USEMODULE += mtd_native
+  USEMODULE += mtd_native
 endif
 
 ifneq (,$(filter can,$(USEMODULE)))
-    ifeq ($(shell uname -s),Linux)
-        USEMODULE += can_linux
-        CFLAGS += -DCAN_DLL_NUMOF=2
-    endif
+  ifeq ($(shell uname -s),Linux)
+    USEMODULE += can_linux
+    CFLAGS += -DCAN_DLL_NUMOF=2
+  endif
+endif
+
+ifneq (,$(filter socket_zep,$(USEMODULE)))
+  USEMODULE += netdev_ieee802154
+  USEMODULE += checksum
+  USEMODULE += random
 endif

@@ -28,86 +28,78 @@
 #include "periph/rtc.h"
 #include "xtimer.h"
 
-#define TM_YEAR_OFFSET              (1900)
+#define PERIOD              (2U)
+#define REPEAT              (4U)
 
-#if RTC_NUMOF < 1
-#error "No RTC found. See the board specific periph_conf.h."
-#endif
+#define TM_YEAR_OFFSET      (1900)
 
-void cb(void *arg)
+static unsigned cnt = 0;
+
+static void print_time(const char *label, const struct tm *time)
+{
+    printf("%s  %04d-%02d-%02d %02d:%02d:%02d\n", label,
+            time->tm_year + TM_YEAR_OFFSET,
+            time->tm_mon + 1,
+            time->tm_mday,
+            time->tm_hour,
+            time->tm_min,
+            time->tm_sec);
+}
+
+static void inc_secs(struct tm *time, unsigned val)
+{
+    time->tm_sec += val;
+    if (time->tm_sec >= 60) {
+        time->tm_sec -= 60;
+    }
+}
+
+static void cb(void *arg)
 {
     (void)arg;
 
     puts("Alarm!");
 
-    struct tm time;
-    rtc_get_alarm(&time);
-    time.tm_sec  += 10;
-    if ( time.tm_sec > 60 )
-        rtc_clear_alarm();
-    rtc_set_alarm(&time, cb, 0);
+    if (++cnt < REPEAT) {
+        struct tm time;
+        rtc_get_alarm(&time);
+        inc_secs(&time, PERIOD);
+        rtc_set_alarm(&time, cb, NULL);
+    }
 }
-
 
 int main(void)
 {
+    struct tm time = {
+        .tm_year = 2011 - TM_YEAR_OFFSET,   /* years are counted from 1900 */
+        .tm_mon  = 11,                      /* 0 = January, 11 = December */
+        .tm_mday = 13,
+        .tm_hour = 14,
+        .tm_min  = 15,
+        .tm_sec  = 15
+    };
+
     puts("\nRIOT RTC low-level driver test");
-    puts("This test will display 'Alarm' in 10 seconds\n");
+    printf("This test will display 'Alarm!' every %u seconds for %u times\n",
+            PERIOD, REPEAT);
 
-    puts("Initializing the RTC driver");
-    rtc_init();
-
-    struct tm time;
-    time.tm_year = 2011 - TM_YEAR_OFFSET; // years are counted from 1900
-    time.tm_mon  = 11; // 0 = January, 11 = December
-    time.tm_mday = 13;
-    time.tm_hour = 14;
-    time.tm_min  = 15;
-    time.tm_sec  = 15;
-
-    printf("Setting clock to %04d-%02d-%02d %02d:%02d:%02d\n",
-                                                    time.tm_year + TM_YEAR_OFFSET,
-                                                    time.tm_mon + 1,
-                                                    time.tm_mday,
-                                                    time.tm_hour,
-                                                    time.tm_min,
-                                                    time.tm_sec);
+    /* set RTC */
+    print_time("  Setting clock to ", &time);
     rtc_set_time(&time);
 
-    xtimer_usleep(100);
-
+    /* read RTC to confirm value */
     rtc_get_time(&time);
-    printf("Clock set to %04d-%02d-%02d %02d:%02d:%02d\n",
-                                                    time.tm_year + TM_YEAR_OFFSET,
-                                                    time.tm_mon + 1,
-                                                    time.tm_mday,
-                                                    time.tm_hour,
-                                                    time.tm_min,
-                                                    time.tm_sec);
+    print_time("Clock value is now ", &time);
 
+    /* set initial alarm */
+    inc_secs(&time, PERIOD);
+    print_time("  Setting alarm to ", &time);
+    rtc_set_alarm(&time, cb, NULL);
 
-    time.tm_sec  += 10;
-
-    printf("Setting alarm to %04d-%02d-%02d %02d:%02d:%02d\n",
-                                                    time.tm_year + TM_YEAR_OFFSET,
-                                                    time.tm_mon + 1,
-                                                    time.tm_mday,
-                                                    time.tm_hour,
-                                                    time.tm_min,
-                                                    time.tm_sec);
-    rtc_set_alarm(&time, cb, 0);
-
-    xtimer_usleep(100);
-
+    /* verify alarm */
     rtc_get_alarm(&time);
-    printf("Alarm set to %04d-%02d-%02d %02d:%02d:%02d\n",
-                                                    time.tm_year + TM_YEAR_OFFSET,
-                                                    time.tm_mon + 1,
-                                                    time.tm_mday,
-                                                    time.tm_hour,
-                                                    time.tm_min,
-                                                    time.tm_sec);
+    print_time("   Alarm is set to ", &time);
+    puts("");
 
-    puts("The alarm should trigger every 10 seconds for 4 times.");
     return 0;
 }

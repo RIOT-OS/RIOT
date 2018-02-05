@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_maple-mini maple-mini
  * @ingroup     boards
- * @brief       Board specific files for the maple-mini board
+ * @brief       Support for the maple-mini board
  * @{
  *
  * @file

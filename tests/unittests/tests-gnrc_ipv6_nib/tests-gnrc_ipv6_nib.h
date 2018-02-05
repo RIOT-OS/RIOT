@@ -36,6 +36,34 @@ void tests_gnrc_ipv6_nib(void);
  */
 Test *tests_gnrc_ipv6_nib_internal_tests(void);
 
+/**
+ * @brief   Generates tests for authoritative border router list view
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_gnrc_ipv6_nib_abr_tests(void);
+
+/**
+ * @brief   Generates tests for forwarding table view
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_gnrc_ipv6_nib_ft_tests(void);
+
+/**
+ * @brief   Generates tests for neighbor cache view
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_gnrc_ipv6_nib_nc_tests(void);
+
+/**
+ * @brief   Generates tests for prefix list view
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_gnrc_ipv6_nib_pl_tests(void);
+
 #ifdef __cplusplus
 }
 #endif

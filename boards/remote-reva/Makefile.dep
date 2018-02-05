@@ -1,1 +1,1 @@
-include $(RIOTBOARD)/remote-common/Makefile.dep
+include $(RIOTBOARD)/common/remote/Makefile.dep

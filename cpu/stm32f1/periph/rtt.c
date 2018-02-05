@@ -23,9 +23,6 @@
 #include "periph/rtt.h"
 #include "periph_conf.h"
 
-/* guard file in case no RTT device was specified */
-#if RTT_NUMOF
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -35,8 +32,8 @@
 #define RTT_FLAG_ALR         ((uint16_t)0x0002)  /**< Alarm flag */
 #define RTT_FLAG_SEC         ((uint16_t)0x0001)  /**< Second flag */
 
-inline void _rtt_enter_config_mode(void);
-inline void _rtt_leave_config_mode(void);
+static inline void _rtt_enter_config_mode(void);
+static inline void _rtt_leave_config_mode(void);
 
 /*
  * callback and argument for an active alarm
@@ -170,7 +167,7 @@ void rtt_poweroff(void)
     periph_clk_dis(APB1, (RCC_APB1ENR_BKPEN|RCC_APB1ENR_PWREN)); /* disable BKP and PWR, Clock */
 }
 
-inline void _rtt_enter_config_mode(void)
+static inline void _rtt_enter_config_mode(void)
 {
     /* Loop until RTOFF flag is set */
     while (!(RTT_DEV->CRL & RTT_FLAG_RTOFF)) {}
@@ -178,7 +175,7 @@ inline void _rtt_enter_config_mode(void)
     RTT_DEV->CRL |= RTC_CRL_CNF;
 }
 
-inline void _rtt_leave_config_mode(void)
+static inline void _rtt_leave_config_mode(void)
 {
     /* leave configuration mode */
     RTT_DEV->CRL &= ~RTC_CRL_CNF;
@@ -198,5 +195,3 @@ void RTT_ISR(void)
     }
     cortexm_isr_end();
 }
-
-#endif /* RTT_NUMOF */

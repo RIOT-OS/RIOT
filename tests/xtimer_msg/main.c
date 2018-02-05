@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2013 INRIA
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,24 +13,23 @@
  * @{
  *
  * @file
- * @brief xtimer_msg test application
+ * @brief       xtimer_msg test application
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
- *
+ * @author      Sebastian Meiling <s@mlng.net>
  * @}
  */
 
 #include <stdio.h>
-#include <time.h>
 
 #include "xtimer.h"
 #include "thread.h"
 #include "msg.h"
 
-char timer_stack[THREAD_STACKSIZE_MAIN];
-char timer_stack_local[THREAD_STACKSIZE_MAIN];
+char timer_stack[THREAD_STACKSIZE_DEFAULT];
+char timer_stack_local[THREAD_STACKSIZE_DEFAULT];
 
 struct timer_msg {
     xtimer_t timer;
@@ -38,19 +38,20 @@ struct timer_msg {
     msg_t msg;
 };
 
-struct timer_msg msg_a = { .interval = 2*(1000000), .text = "Hello World", };
-struct timer_msg msg_b = { .interval = 5*(1000000), .text = "This is a Test" };
+struct timer_msg msg_a = { .interval = (2 * US_PER_SEC),
+                           .text = "Hello World" };
+struct timer_msg msg_b = { .interval = (5 * US_PER_SEC),
+                           .text = "This is a Test" };
 
 void *timer_thread(void *arg)
 {
     (void) arg;
-    timex_t now;
 
     printf("This is thread %" PRIkernel_pid "\n", thread_getpid());
 
-    /* we need a queue if the second message arrives while the first is still processed */
-    /* without a queue, the message would get lost */
-    /* because of the way this timer works, there can be max 1 queued message */
+    /* The queue is required to avoid loss of a 2nd message, when the 1st is
+     * still processed. The timing ensures that at most 1 message is queued.
+     */
     msg_t msgq[1];
     msg_init_queue(msgq, 1);
 
@@ -58,12 +59,12 @@ void *timer_thread(void *arg)
         msg_t m;
         msg_receive(&m);
         struct timer_msg *tmsg = m.content.ptr;
-        xtimer_now_timex(&now);
+        uint32_t now = xtimer_now_usec();
         printf("now=%" PRIu32 ":%" PRIu32 " -> every %" PRIu32 ".%" PRIu32 "s: %s\n",
-               now.seconds,
-               now.microseconds,
-               tmsg->interval / 1000000,
-               tmsg->interval % 1000000,
+               (now / US_PER_SEC),
+               (now % US_PER_SEC),
+               tmsg->interval / US_PER_SEC,
+               tmsg->interval % US_PER_SEC,
                tmsg->text);
 
         tmsg->msg.type = 12345;
@@ -83,7 +84,7 @@ void *timer_thread_local(void *arg)
         msg_receive(&m);
 
         uint32_t now = xtimer_now_usec();
-        int sec = now / 1000000;
+        int sec = now / US_PER_SEC;
         int min = sec / 60;
         int hr  = sec / 3600;
         printf("sec=%d min=%d hour=%d\n", sec, min, hr);
@@ -120,7 +121,7 @@ int main(void)
                    "timer local");
 
     while (1) {
-        xtimer_usleep(1*1000000);
+        xtimer_sleep(1);
         msg_try_send(&m, pid2);
     }
 }

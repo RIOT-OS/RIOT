@@ -33,6 +33,13 @@
 
 #define I2C_SPEED                  I2C_SPEED_FAST
 
+#ifndef HDC1000_RENEW_INTERVAL
+#define HDC1000_RENEW_INTERVAL     (1000000ul)
+#endif
+
+static int16_t temp_cached, hum_cached;
+static uint32_t last_read_time;
+
 int hdc1000_init(hdc1000_t *dev, const hdc1000_params_t *params)
 {
     uint8_t reg[2];
@@ -71,6 +78,12 @@ int hdc1000_init(hdc1000_t *dev, const hdc1000_params_t *params)
         return HDC1000_NOBUS;
     }
     i2c_release(dev->p.i2c);
+
+    /* initial read for caching operation */
+    if (hdc1000_read(dev, &temp_cached, &hum_cached) != HDC1000_OK) {
+        return HDC1000_BUSERR;
+    }
+    last_read_time = xtimer_now_usec();
 
     /* all set */
     return HDC1000_OK;
@@ -131,4 +144,27 @@ int hdc1000_read(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
     }
     xtimer_usleep(HDC1000_CONVERSION_TIME);
     return hdc1000_get_results(dev, temp, hum);
+}
+
+
+int hdc1000_read_cached(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
+{
+    uint32_t now = xtimer_now_usec();
+
+    /* check if readings are outdated */
+    if (now - last_read_time > HDC1000_RENEW_INTERVAL) {
+        /* update last_read_time */
+        if (hdc1000_read(dev, &temp_cached, &hum_cached) != HDC1000_OK) {
+            return HDC1000_BUSERR;
+        }
+        last_read_time = now;
+    }
+
+    if (temp) {
+        *temp = temp_cached;
+    }
+    if (hum) {
+        *hum = hum_cached;
+    }
+    return HDC1000_OK;
 }

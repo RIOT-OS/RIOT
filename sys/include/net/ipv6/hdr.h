@@ -288,7 +288,7 @@ static inline uint32_t ipv6_hdr_get_fl(const ipv6_hdr_t *hdr)
 static inline uint16_t ipv6_hdr_inet_csum(uint16_t sum, ipv6_hdr_t *hdr,
                                           uint8_t prot_num, uint16_t len)
 {
-    if ((sum + len + prot_num) > 0xffff) {
+    if (((uint32_t)sum + len + prot_num) > 0xffff) {
         /* increment by one for overflow to keep it as 1's complement sum */
         sum++;
     }

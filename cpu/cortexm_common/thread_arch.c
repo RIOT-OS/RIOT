@@ -94,7 +94,6 @@
 
 #include <stdio.h>
 
-#include "arch/thread_arch.h"
 #include "sched.h"
 #include "thread.h"
 #include "irq.h"
@@ -106,7 +105,7 @@ extern uint32_t _sstack;
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment
  *
- * This marker is used e.g. by *thread_arch_start_threading* to identify the
+ * This marker is used e.g. by *cpu_switch_context_exit* to identify the
  * stacks beginning.
  */
 #define STACK_MARKER                (0x77777777)
@@ -124,7 +123,7 @@ extern uint32_t _sstack;
  */
 #define EXCEPT_RET_TASK_MODE        (0xfffffffd)
 
-char *thread_arch_stack_init(thread_task_func_t task_func,
+char *thread_stack_init(thread_task_func_t task_func,
                              void *arg,
                              void *stack_start,
                              int stack_size)
@@ -236,7 +235,7 @@ char *thread_arch_stack_init(thread_task_func_t task_func,
     return (char*) stk;
 }
 
-void thread_arch_stack_print(void)
+void thread_stack_print(void)
 {
     int count = 0;
     uint32_t *sp = (uint32_t *)sched_active_thread->sp;
@@ -255,7 +254,7 @@ void thread_arch_stack_print(void)
 }
 
 /* This function returns the number of bytes used on the ISR stack */
-int thread_arch_isr_stack_usage(void)
+int thread_isr_stack_usage(void)
 {
     uint32_t *ptr = &_sstack;
 
@@ -267,21 +266,21 @@ int thread_arch_isr_stack_usage(void)
     return num_used_words * sizeof(*ptr);
 }
 
-void *thread_arch_isr_stack_pointer(void)
+void *thread_isr_stack_pointer(void)
 {
     void *msp = (void *)__get_MSP();
     return msp;
 }
 
-void *thread_arch_isr_stack_start(void)
+void *thread_isr_stack_start(void)
 {
     return (void *)&_sstack;
 }
 
-__attribute__((naked)) void NORETURN thread_arch_start_threading(void)
+__attribute__((naked)) void NORETURN cpu_switch_context_exit(void)
 {
     __asm__ volatile (
-    "bl     irq_arch_enable               \n" /* enable IRQs to make the SVC
+    "bl     irq_enable               \n" /* enable IRQs to make the SVC
                                            * interrupt is reachable */
     "svc    #1                            \n" /* trigger the SVC interrupt */
     "unreachable%=:                       \n" /* this loop is unreachable */
@@ -289,7 +288,7 @@ __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
     :::);
 }
 
-void thread_arch_yield(void)
+void thread_yield_higher(void)
 {
     /* trigger the PENDSV interrupt to run scheduler and schedule new thread if
      * applicable */

@@ -326,6 +326,37 @@ static void tests_spiffs_rename(void)
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
+static void tests_spiffs_statvfs(void)
+{
+    const char buf[] = "TESTSTRING";
+    struct statvfs stat1;
+    struct statvfs stat2;
+
+    int res = vfs_statvfs("/test-spiffs/", &stat1);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(1, stat1.f_bsize);
+    TEST_ASSERT_EQUAL_INT(1, stat1.f_frsize);
+    TEST_ASSERT((_dev->pages_per_sector * _dev->page_size * _dev->sector_count) >=
+                          stat1.f_blocks);
+
+    int fd = vfs_open("/test-spiffs/test.txt", O_CREAT | O_RDWR, 0);
+    TEST_ASSERT(fd >= 0);
+
+    res = vfs_write(fd, buf, sizeof(buf));
+    TEST_ASSERT(res == sizeof(buf));
+
+    res = vfs_close(fd);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    res = vfs_statvfs("/test-spiffs/", &stat2);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    TEST_ASSERT_EQUAL_INT(1, stat2.f_bsize);
+    TEST_ASSERT_EQUAL_INT(1, stat2.f_frsize);
+    TEST_ASSERT(sizeof(buf) <= (stat1.f_bfree - stat2.f_bfree));
+    TEST_ASSERT(sizeof(buf) <= (stat1.f_bavail - stat2.f_bavail));
+}
+
 Test *tests_spiffs_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -335,6 +366,7 @@ Test *tests_spiffs_tests(void)
         new_TestFixture(tests_spiffs_unlink),
         new_TestFixture(tests_spiffs_readdir),
         new_TestFixture(tests_spiffs_rename),
+        new_TestFixture(tests_spiffs_statvfs),
     };
 
     EMB_UNIT_TESTCALLER(spiffs_tests, test_spiffs_setup, test_spiffs_teardown, fixtures);

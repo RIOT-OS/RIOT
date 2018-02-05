@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Data structure with the configuration parameters
+ * @brief   Data structure with the configuration parameters
  */
 typedef struct {
     union {
@@ -56,7 +56,7 @@ typedef struct {
 } pn532_params_t;
 
 /**
- * @brief Working mode of the PN532
+ * @brief   Working mode of the PN532
  */
 typedef enum {
     PN532_I2C,
@@ -64,7 +64,7 @@ typedef enum {
 } pn532_mode_t;
 
 /**
- * @brief Device descriptor for the PN532
+ * @brief   Device descriptor for the PN532
  */
 typedef struct {
     const pn532_params_t *conf;     /**< Configuration struct */
@@ -73,7 +73,7 @@ typedef struct {
 } pn532_t;
 
 /**
- * @brief Internal buffer size
+ * @brief   Internal buffer size
  *
  * A small buffer size is enough for most applications, however if large NDEF
  * files are to be written this size shall be increased. Otherwise the files
@@ -84,7 +84,7 @@ typedef struct {
 #endif
 
 /**
- * @brief Helpers to extract firmware information from word
+ * @name    Helpers to extract firmware information from word
  * @{
  */
 #define PN532_IC_VERSION(fwver)  ((fwver >> 24) & 0xff)
@@ -94,7 +94,7 @@ typedef struct {
 /** @} */
 
 /**
- * @brief Possible SAM configurations
+ * @brief   Possible SAM configurations
  */
 typedef enum {
     PN532_SAM_NORMAL = 1,
@@ -104,7 +104,7 @@ typedef enum {
 } pn532_sam_conf_mode_t;
 
 /**
- * @brief PN532 supported targets
+ * @brief   PN532 supported targets
  */
 typedef enum {
     PN532_BR_106_ISO_14443_A = 0,
@@ -115,7 +115,7 @@ typedef enum {
 } pn532_target_t;
 
 /**
- * @brief ISO14443A Card types
+ * @brief   ISO14443A Card types
  */
 typedef enum {
     ISO14443A_UNKNOWN,
@@ -124,7 +124,7 @@ typedef enum {
 } nfc_iso14443a_type_t;
 
 /**
- * @brief ISO14443A tag description
+ * @brief   ISO14443A tag description
  */
 typedef struct {
     char target;                /**< Target */
@@ -137,7 +137,7 @@ typedef struct {
 } nfc_iso14443a_t;
 
 /**
- * @brief Mifare keys
+ * @brief   Mifare keys
  */
 typedef enum {
     PN532_MIFARE_KEY_A = 0x60,
@@ -145,7 +145,7 @@ typedef enum {
 } pn532_mifare_key_t;
 
 /**
- * @brief Obtain Tag 4 data length from buffer
+ * @brief   Obtain Tag 4 data length from buffer
  *
  * This is useful in case the length has been read and one intents to read the
  * data.
@@ -153,7 +153,7 @@ typedef enum {
 #define PN532_ISO14443A_4_LEN_FROM_BUFFER(b) ((b[0] << 8) | b[1])
 
 /**
- * @brief Hard reset the chipset
+ * @brief   Hard reset the chipset
  *
  * The chipset is reset by toggling the reset pins
  *
@@ -163,7 +163,7 @@ typedef enum {
 void pn532_reset(const pn532_t *dev);
 
 /**
- * @brief Initialize the module and peripherals
+ * @brief   Initialize the module and peripherals
  *
  * This is the first method to be called in order to interact with the pn532.
  * It configures the GPIOs and the i2c/spi interface (depending on @p mode).
@@ -181,7 +181,7 @@ int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode);
 
 #if defined(PN532_SUPPORT_I2C) || DOXYGEN
 /**
- * @brief Initialization of PN532 using i2c
+ * @brief   Initialization of PN532 using i2c
  *
  * @see pn532_init for parameter and return value details
  */
@@ -193,7 +193,7 @@ static inline int pn532_init_i2c(pn532_t *dev, const pn532_params_t *params)
 
 #if defined(PN532_SUPPORT_SPI) || DOXYGEN
 /**
- * @brief Initialization of PN532 using spi
+ * @brief   Initialization of PN532 using spi
  *
  * @see pn532_init for parameter and return value details
  */
@@ -204,7 +204,7 @@ static inline int pn532_init_spi(pn532_t *dev, const pn532_params_t *params)
 #endif
 
 /**
- * @brief Get the firmware version of the pn532
+ * @brief   Get the firmware version of the pn532
  *
  * The firmware version returned is a 4 byte long value:
  *  - ic version,
@@ -220,7 +220,7 @@ static inline int pn532_init_spi(pn532_t *dev, const pn532_params_t *params)
 int pn532_fw_version(pn532_t *dev, uint32_t *fw_ver);
 
 /**
- * @brief Read register of the pn532
+ * @brief   Read register of the pn532
  *
  * Refer to the datasheet for a comprehensive list of registers and meanings.
  * For SFR registers the high byte must be set to 0xff.
@@ -236,7 +236,7 @@ int pn532_fw_version(pn532_t *dev, uint32_t *fw_ver);
 int pn532_read_reg(pn532_t *dev, char *out, unsigned addr);
 
 /**
- * @brief Write register of the pn532
+ * @brief   Write register of the pn532
  *
  * Refer to the datasheet for a comprehensive list of registers and meanings.
  *
@@ -251,7 +251,7 @@ int pn532_read_reg(pn532_t *dev, char *out, unsigned addr);
 int pn532_write_reg(pn532_t *dev, unsigned addr, char val);
 
 /**
- * @brief Set new settings for the Security Access Module
+ * @brief   Set new settings for the Security Access Module
  *
  * @param[in]  dev          target device
  * @param[in]  mode         new mode for the SAM
@@ -263,7 +263,7 @@ int pn532_write_reg(pn532_t *dev, unsigned addr, char val);
 int pn532_sam_configuration(pn532_t *dev, pn532_sam_conf_mode_t mode, unsigned timeout);
 
 /**
- * @brief Get one ISO14443-A passive target
+ * @brief   Get one ISO14443-A passive target
  *
  * This method blocks until a target is detected.
  *
@@ -278,7 +278,7 @@ int pn532_sam_configuration(pn532_t *dev, pn532_sam_conf_mode_t mode, unsigned t
 int pn532_get_passive_iso14443a(pn532_t *dev, nfc_iso14443a_t *out, unsigned max_retries);
 
 /**
- * @brief Authenticate a Mifare classic card
+ * @brief   Authenticate a Mifare classic card
  *
  * This operation must be done before reading or writing the segment.
  *
@@ -294,7 +294,7 @@ int pn532_mifareclassic_authenticate(pn532_t *dev, nfc_iso14443a_t *card,
                                      pn532_mifare_key_t keyid, char *key, unsigned block);
 
 /**
- * @brief Read a block of a Mifare classic card
+ * @brief   Read a block of a Mifare classic card
  *
  * The block size is 16 bytes and it must be authenticated before read.
  *
@@ -308,7 +308,7 @@ int pn532_mifareclassic_authenticate(pn532_t *dev, nfc_iso14443a_t *card,
 int pn532_mifareclassic_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card, unsigned block);
 
 /**
- * @brief Write a block of a Mifare classic card
+ * @brief   Write a block of a Mifare classic card
  *
  * The block size is 16 bytes and it must be authenticated before written.
  *
@@ -322,7 +322,7 @@ int pn532_mifareclassic_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card, u
 int pn532_mifareclassic_write(pn532_t *dev, char *idata, nfc_iso14443a_t *card, unsigned block);
 
 /**
- * @brief Read a block of a Mifare Ultralight card
+ * @brief   Read a block of a Mifare Ultralight card
  *
  * The block size is 32 bytes and it must be authenticated before read.
  *
@@ -336,7 +336,7 @@ int pn532_mifareclassic_write(pn532_t *dev, char *idata, nfc_iso14443a_t *card, 
 int pn532_mifareulight_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card, unsigned page);
 
 /**
- * @brief Activate the NDEF file of a ISO14443-A Type 4 tag
+ * @brief   Activate the NDEF file of a ISO14443-A Type 4 tag
  *
  * @param[in]  dev          target device
  * @param[in]  card         card to activate
@@ -346,7 +346,7 @@ int pn532_mifareulight_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card, un
 int pn532_iso14443a_4_activate(pn532_t *dev, nfc_iso14443a_t *card);
 
 /**
- * @brief Read data from the NDEF file of a ISO14443-A Type 4 tag
+ * @brief   Read data from the NDEF file of a ISO14443-A Type 4 tag
  *
  * The first two bytes of an NDEF file are the length of the data. Afterwards,
  * at offset 0x02 starts the data itself. If one tries to read further than the
@@ -364,7 +364,7 @@ int pn532_iso14443a_4_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card, uns
                            char len);
 
 /**
- * @brief Deselect a previously selected passive card
+ * @brief   Deselect a previously selected passive card
  *
  * @param[in]  dev          target device
  * @param[in] target_id     id of the target to deselect (0x00 for all)
@@ -372,7 +372,7 @@ int pn532_iso14443a_4_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card, uns
 void pn532_deselect_passive(pn532_t *dev, unsigned target_id);
 
 /**
- * @brief Release an active passive card
+ * @brief   Release an active passive card
  *
  * @param[in]  dev          target device
  * @param[in] target_id     id of the target to release (0x00 for all)

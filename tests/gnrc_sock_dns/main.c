@@ -40,7 +40,7 @@ sock_udp_ep_t sock_dns_server;
 
 /* import "ifconfig" shell command, used for printing addresses */
 
-extern int _netif_config(int argc, char **argv);
+extern int _gnrc_netif_config(int argc, char **argv);
 
 int main(void)
 {
@@ -53,7 +53,7 @@ int main(void)
 
     /* print network addresses */
     puts("Configured network interfaces:");
-    _netif_config(0, NULL);
+    _gnrc_netif_config(0, NULL);
 
     int res = sock_dns_query(TEST_NAME, addr, AF_UNSPEC);
     if (res > 0) {

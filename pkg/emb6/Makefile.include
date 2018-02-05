@@ -5,6 +5,9 @@ EMB6_CONTRIB := $(RIOTBASE)/pkg/emb6/contrib
 INCLUDES += -I$(PKG_BUILDDIR)/target
 INCLUDES += -I$(RIOTBASE)/pkg/emb6/include
 
+CFLAGS += -Wno-unused-parameter -Wno-unused-function -Wno-type-limits
+CFLAGS += -Wno-sign-compare -Wno-missing-field-initializers
+
 ifeq (,$(filter emb6_router,$(USEMODULE)))
   CFLAGS += -DEMB6_CONF_ROUTER=FALSE
 endif

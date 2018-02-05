@@ -29,7 +29,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "kernel_types.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/pkt.h"
 #include "net/ipv6/ext.h"
 
@@ -52,12 +52,12 @@ extern "C" {
  *
  * @internal
  *
- * @param[in] iface     The receiving interface.
+ * @param[in] netif     The receiving interface.
  * @param[in] current   A snip to process.
  * @param[in] pkt       A packet.
  * @param[in] nh        A protocol number (see @ref net_protnum) of the current snip.
  */
-void gnrc_ipv6_ext_demux(kernel_pid_t iface,
+void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                          gnrc_pktsnip_t *current,
                          gnrc_pktsnip_t *pkt,
                          uint8_t nh);

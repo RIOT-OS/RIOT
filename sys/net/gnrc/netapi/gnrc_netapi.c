@@ -45,7 +45,7 @@ static inline int _get_set(kernel_pid_t pid, uint16_t type,
     msg_t cmd;
     msg_t ack;
     gnrc_netapi_opt_t o;
-    /* set ńetapi's option struct */
+    /* set netapi's option struct */
     o.opt = opt;
     o.context = context;
     o.data = data;
@@ -85,7 +85,7 @@ static inline int _snd_rcv_mbox(mbox_t *mbox, uint16_t type, gnrc_pktsnip_t *pkt
     /* send message */
     int ret = mbox_try_put(mbox, &msg);
     if (ret < 1) {
-        DEBUG("gnrc_netapi: dropped message to %p (was full)\n", mbox);
+        DEBUG("gnrc_netapi: dropped message to %p (was full)\n", (void*)mbox);
     }
     return ret;
 }

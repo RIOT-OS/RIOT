@@ -21,6 +21,7 @@
 #ifndef BMX280_PARAMS_H
 #define BMX280_PARAMS_H
 
+#include "board.h"
 #include "bmx280.h"
 #include "saul_reg.h"
 
@@ -29,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the BMX280
+ * @name    Set default configuration parameters for the BMX280
  * @{
  */
 #ifndef BMX280_PARAM_I2C_DEV

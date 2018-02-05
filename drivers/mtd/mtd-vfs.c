@@ -16,7 +16,7 @@
 #include "vfs.h"
 
 /**
- * @ingroup     mtd
+ * @ingroup     drivers_mtd
  * @{
  *
  * @file

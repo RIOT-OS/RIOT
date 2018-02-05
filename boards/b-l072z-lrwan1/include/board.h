@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_b-l072z-lrwan1 ST b-l072z-lrwan1 discovery
+ * @defgroup    boards_b-l072z-lrwan1 ST B-L072Z-LRWAN1 LoRa discovery
  * @ingroup     boards
- * @brief       Board specific files for the ST b-l072z-lrwan1 board
+ * @brief       Support for the ST B-L072Z-LRWAN1 board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the ST b-l072z-lrwan1 board
+ * @brief       Board specific definitions for the ST B-L072Z-LRWAN1 board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
@@ -33,8 +33,6 @@ extern "C" {
  * @name    xtimer configuration
  * @{
  */
-#define XTIMER_DEV          TIMER_DEV(0)
-#define XTIMER_CHAN         (0)
 #define XTIMER_WIDTH        (16)
 /** @} */
 

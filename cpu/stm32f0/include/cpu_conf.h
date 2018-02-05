@@ -55,7 +55,15 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
+#if defined(CPU_MODEL_STM32F030R8)
+#define CPU_IRQ_NUMOF                   (29U)
+#elif defined(CPU_MODEL_STM32F031K6)
+#define CPU_IRQ_NUMOF                   (28U)
+#elif defined(CPU_MODEL_STM32F051R8) || defined(CPU_MODEL_STM32F091RC)
 #define CPU_IRQ_NUMOF                   (31U)
+#else /* CPU_MODEL_STM32F042K6, CPU_MODEL_STM32F070RB, CPU_MODEL_STM32F072RB */
+#define CPU_IRQ_NUMOF                   (32U)
+#endif
 /** @} */
 
 /**

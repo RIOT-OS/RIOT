@@ -89,9 +89,12 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     /* set pin mode */
     port->CR[pin_num >> 3] &= ~(0xf << ((pin_num & 0x7) * 4));
     port->CR[pin_num >> 3] |=  ((mode & MODE_MASK) << ((pin_num & 0x7) * 4));
-    /* set initial state of output register */
-    port->BRR = (1 << pin_num);
-    port->BSRR = ((mode >> ODR_POS) << pin_num);
+
+    /* set ODR */
+    if (mode == GPIO_IN_PU)
+        port->ODR |= 1 << pin_num;
+    else
+        port->ODR &= ~(1 << pin_num);
 
     return 0; /* all OK */
 }

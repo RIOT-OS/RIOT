@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     driver_isl29125
+ * @ingroup     drivers_isl29125
  * @{
  *
  * @file

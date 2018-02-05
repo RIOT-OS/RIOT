@@ -1,1 +1,3 @@
-include $(RIOTBOARD)/iotlab-common/Makefile.features
+include $(RIOTBOARD)/common/iotlab/Makefile.features
+
+-include $(RIOTCPU)/stm32f1/Makefile.features

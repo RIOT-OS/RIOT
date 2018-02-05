@@ -35,20 +35,22 @@ ssize_t write(int fildes, const void *buf, size_t nbyte);
 
 static const char _hex_chars[16] = "0123456789ABCDEF";
 
+static const uint32_t _tenmap[] = {
+    0,
+    10LU,
+    100LU,
+    1000LU,
+    10000LU,
+    100000LU,
+    1000000LU,
+    10000000LU,
+};
+
+#define TENMAP_SIZE  (sizeof(_tenmap) / sizeof(_tenmap[0]))
+
 static inline int _is_digit(char c)
 {
     return (c >= '0' && c <= '9');
-}
-
-static inline unsigned pwr(unsigned val, unsigned exp)
-{
-    unsigned res = 1;
-
-    for (unsigned i = 0; i < exp; i++) {
-        res *= val;
-    }
-
-    return res;
 }
 
 size_t fmt_byte_hex(char *out, uint8_t byte)
@@ -58,6 +60,18 @@ size_t fmt_byte_hex(char *out, uint8_t byte)
         *out = _hex_chars[byte & 0x0F];
     }
     return 2;
+}
+
+size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n)
+{
+    size_t len = n * 2;
+    if (out) {
+        while (n--) {
+            out += fmt_byte_hex(out, *ptr++);
+        }
+    }
+
+    return len;
 }
 
 size_t fmt_strlen(const char *str)
@@ -91,6 +105,39 @@ size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n)
         out += fmt_byte_hex(out, ptr[i]);
     }
     return (n<<1);
+}
+
+static uint8_t _byte_mod25(uint8_t x)
+{
+    for (unsigned divisor = 200; divisor >= 25; divisor >>= 1) {
+        if (x >= divisor) {
+            x -= divisor;
+        }
+    }
+
+    return x;
+}
+
+static uint8_t _hex_nib(uint8_t nib)
+{
+    return _byte_mod25((nib & 0x1f) + 9);
+}
+
+size_t fmt_hex_bytes(uint8_t *out, const char *hex)
+{
+    size_t len = fmt_strlen(hex);
+
+    if (len & 1) {
+        out = NULL;
+        return 0;
+    }
+
+    size_t final_len = len >> 1;
+    for (size_t i = 0, j = 0; j < final_len; i += 2, j++) {
+        out[j] = (_hex_nib(hex[i]) << 4) | _hex_nib(hex[i+1]);
+    }
+
+    return final_len;
 }
 
 size_t fmt_u32_hex(char *out, uint32_t val)
@@ -162,8 +209,14 @@ size_t fmt_u32_dec(char *out, uint32_t val)
     size_t len = 1;
 
     /* count needed characters */
-    for (uint32_t tmp = val; (tmp > 9); len++) {
-        tmp /= 10;
+    /* avoid multiply overflow: uint32_t max len = 10 digits */
+    if (val >= 1000000000ul) {
+        len = 10;
+    }
+    else {
+        for (uint32_t tmp = 10; tmp <= val; len++) {
+            tmp *= 10;
+        }
     }
 
     if (out) {
@@ -183,12 +236,12 @@ size_t fmt_u16_dec(char *out, uint16_t val)
 
 size_t fmt_s32_dec(char *out, int32_t val)
 {
-    int negative = (val < 0);
+    unsigned negative = (val < 0);
     if (negative) {
         if (out) {
             *out++ = '-';
         }
-        val *= -1;
+        val = -val;
     }
     return fmt_u32_dec(out, val) + negative;
 }
@@ -200,30 +253,32 @@ size_t fmt_s16_dec(char *out, int16_t val)
 
 size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
 {
-    int16_t absolute, divider;
-    size_t pos = 0;
-    size_t div_len, len;
-    unsigned e;
-    char tmp[4];
+    return fmt_s32_dfp(out, val, fp_digits);
+}
 
-    if (fp_digits > 4) {
-        return 0;
-    }
+size_t fmt_s32_dfp(char *out, int32_t val, unsigned fp_digits)
+{
+    assert(fp_digits < TENMAP_SIZE);
+
+    int32_t absolute, divider;
+    unsigned div_len, len, pos = 0;
+    char tmp[9];
+
     if (fp_digits == 0) {
-        return fmt_s16_dec(out, val);
+        return fmt_s32_dec(out, val);
     }
     if (val < 0) {
         if (out) {
             out[pos++] = '-';
         }
-        val *= -1;
+        val = -val;
     }
 
-    e = pwr(10, fp_digits);
-    absolute = (val / (int)e);
+    uint32_t e = _tenmap[fp_digits];
+    absolute = (val / e);
     divider = val - (absolute * e);
 
-    pos += fmt_s16_dec(&out[pos], absolute);
+    pos += fmt_s32_dec(&out[pos], absolute);
 
     if (!out) {
         return pos + 1 + fp_digits;     /* abs len + decimal point + divider */
@@ -231,7 +286,7 @@ size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
 
     out[pos++] = '.';
     len = pos + fp_digits;
-    div_len = fmt_s16_dec(tmp, divider);
+    div_len = fmt_s32_dec(tmp, divider);
 
     while (pos < (len - div_len)) {
         out[pos++] = '0';
@@ -243,30 +298,19 @@ size_t fmt_s16_dfp(char *out, int16_t val, unsigned fp_digits)
     return pos;
 }
 
-static const uint32_t _tenmap[] = {
-    0,
-    10LU,
-    100LU,
-    1000LU,
-    10000LU,
-    100000LU,
-    1000000LU,
-    10000000LU,
-};
-
 /* this is very probably not the most efficient implementation, as it at least
  * pulls in floating point math.  But it works, and it's always nice to have
  * low hanging fruits when optimizing. (Kaspar)
  */
 size_t fmt_float(char *out, float f, unsigned precision)
 {
-    assert (precision <= 7);
+    assert(precision < TENMAP_SIZE);
 
     unsigned negative = (f < 0);
     uint32_t integer;
 
     if (negative) {
-        f *= -1;
+        f = -f;
     }
 
     integer = (uint32_t) f;

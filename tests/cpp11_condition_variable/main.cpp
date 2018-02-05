@@ -52,8 +52,8 @@ int main() {
     data = "Example data";
     {
       lock_guard<mutex> lk(m);
-      // reason: variable is read in the thread created above
-      /* cppcheck-suppress unreadVariable */
+      /* cppcheck-suppress unreadVariable
+       * (reason variable is read in the thread created above) */
       ready = true;
       cv.notify_one();
     }

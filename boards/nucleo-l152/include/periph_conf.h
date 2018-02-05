@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-l152
+ * @defgroup    boards_nucleo-l152 STM32 Nucleo-L152
+ * @ingroup     boards_common_nucleo64
+ * @brief       Support for the STM32 Nucleo-L152
  * @{
  *
  * @file
@@ -32,6 +34,9 @@ extern "C" {
  **/
 #define CLOCK_HSI           (16000000U)             /* frequency of internal oscillator */
 #define CLOCK_CORECLOCK     (32000000U)             /* targeted core clock frequency */
+/* 0: no external low speed crystal available,
+ * 1: external crystal available (always 32.768kHz) */
+#define CLOCK_LSE           (1)
 /* configuration of PLL prescaler and multiply values */
 /* CORECLOCK := HSI / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
 #define CLOCK_PLL_DIV       RCC_CFGR_PLLDIV2

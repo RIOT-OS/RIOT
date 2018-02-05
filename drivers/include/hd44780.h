@@ -32,17 +32,17 @@ extern "C" {
 #endif
 
 /**
- * @brief Maximal number of columns supported by the driver
+ * @brief   Maximal number of columns supported by the driver
  */
 #define HD44780_MAX_COLS        (40U)
 
 /**
- * @brief Maximal number of rows supported by the driver
+ * @brief   Maximal number of rows supported by the driver
  */
 #define HD44780_MAX_ROWS        (4U)
 
 /**
- * @brief Number of data pins for communication 4 or 8.
+ * @brief   Number of data pins for communication 4 or 8.
  */
 #define HD44780_MAX_PINS        (8U)
 
@@ -52,7 +52,7 @@ extern "C" {
 #define HD44780_RW_OFF          (255U)
 
 /**
- * @brief Size of RAM for custom chars
+ * @brief   Size of RAM for custom chars
  *
  * Generally the driver could support 8 chars of size 5x8 or 4 of size 5x10.
  * However, most displays only use the former, which is (hard wired) default.
@@ -83,7 +83,7 @@ typedef struct {
 } hd44780_t;
 
 /**
- * @brief Simple state values
+ * @brief   Simple state values
  */
 typedef enum {
     HD44780_OFF,                    /**< disable feature */
@@ -91,7 +91,7 @@ typedef enum {
 } hd44780_state_t;
 
 /**
- * @brief Initialize the given driver
+ * @brief   Initialize the given driver
  *
  * @param[out] dev          device descriptor of display to initialize
  * @param[in]  params       configuration parameters
@@ -101,21 +101,21 @@ typedef enum {
 int hd44780_init(hd44780_t *dev, const hd44780_params_t *params);
 
 /**
- * @brief Clear display, delete all chars
+ * @brief   Clear display, delete all chars
  *
  * @param[in]  dev          device descriptor of LCD
  */
 void hd44780_clear(const hd44780_t *dev);
 
 /**
- * @brief Reset cursor to row 0 and column 0
+ * @brief   Reset cursor to row 0 and column 0
  *
  * @param[in]  dev          device descriptor of LCD
  */
 void hd44780_home(const hd44780_t *dev);
 
 /**
- * @brief Set cursor to specific position in column and row
+ * @brief   Set cursor to specific position in column and row
  *
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  col          column position
@@ -124,7 +124,7 @@ void hd44780_home(const hd44780_t *dev);
 void hd44780_set_cursor(const hd44780_t *dev, uint8_t col, uint8_t row);
 
 /**
- * @brief Turn display on or off
+ * @brief   Turn display on or off
  *
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  state        display on or off
@@ -132,7 +132,7 @@ void hd44780_set_cursor(const hd44780_t *dev, uint8_t col, uint8_t row);
 void hd44780_display(hd44780_t *dev, hd44780_state_t state);
 
 /**
- * @brief Show cursor, on or off
+ * @brief   Show cursor, on or off
  *
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  state        cursor on or off
@@ -140,7 +140,7 @@ void hd44780_display(hd44780_t *dev, hd44780_state_t state);
 void hd44780_cursor(hd44780_t *dev, hd44780_state_t state);
 
 /**
- * @brief Blink cursor, on or off
+ * @brief   Blink cursor, on or off
  *
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  state        blink on or off
@@ -148,35 +148,35 @@ void hd44780_cursor(hd44780_t *dev, hd44780_state_t state);
 void hd44780_blink(hd44780_t *dev, hd44780_state_t state);
 
 /**
- * @brief Enable left scrolling
+ * @brief   Enable left scrolling
  *
  * @param[in]  dev          device descriptor of LCD
  */
 void hd44780_scroll_left(const hd44780_t *dev);
 
 /**
- * @brief Enable right scrolling
+ * @brief   Enable right scrolling
  *
  * @param[in]  dev          device descriptor of LCD
  */
 void hd44780_scroll_right(const hd44780_t *dev);
 
 /**
- * @brief set display direction left to right
+ * @brief   Set display direction left to right
  *
  * @param[in]  dev          device descriptor of LCD
  */
 void hd44780_left2right(hd44780_t *dev);
 
 /**
- * @brief set   display direction right to left
+ * @brief   Set display direction right to left
  *
  * @param[in]  dev          device descriptor of LCD
  */
 void hd44780_right2left(hd44780_t *dev);
 
 /**
- * @brief display autoscroll on or off
+ * @brief   Display autoscroll on or off
  *
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  state        scroll on or off
@@ -184,7 +184,7 @@ void hd44780_right2left(hd44780_t *dev);
 void hd44780_autoscroll(hd44780_t *dev, hd44780_state_t state);
 
 /**
- * @brief Create and store a custom character on display memory
+ * @brief   Create and store a custom character on display memory
  *
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  location     memory location
@@ -195,7 +195,7 @@ void hd44780_autoscroll(hd44780_t *dev, hd44780_state_t state);
 void hd44780_create_char(const hd44780_t *dev, uint8_t location, uint8_t charmap[]);
 
 /**
- * @brief Write a single character on the LCD
+ * @brief   Write a single character on the LCD
  *
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  value        the character to print, i.e., memory location
@@ -203,7 +203,7 @@ void hd44780_create_char(const hd44780_t *dev, uint8_t location, uint8_t charmap
 void hd44780_write(const hd44780_t *dev, uint8_t value);
 
 /**
- * @brief Write a string on the LCD
+ * @brief   Write a string on the LCD
  *
  * @param[in]  dev          device descriptor of LCD
  * @param[in]  data         the string to print

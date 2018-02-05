@@ -30,7 +30,7 @@
 #endif
 
 #ifndef PM_BLOCKER_INITIAL
-#define PM_BLOCKER_INITIAL { .val_u32 = 0 }
+#define PM_BLOCKER_INITIAL { .val_u32 = 0x01010101 }
 #endif
 
 /**
@@ -48,7 +48,7 @@ volatile pm_blocker_t pm_blocker = PM_BLOCKER_INITIAL;
 
 void pm_set_lowest(void)
 {
-    pm_blocker_t blocker = (pm_blocker_t) pm_blocker;
+    pm_blocker_t blocker = pm_blocker;
     unsigned mode = PM_NUM_MODES;
     while (mode) {
         if (blocker.val_u8[mode-1]) {
@@ -87,9 +87,11 @@ void pm_unblock(unsigned mode)
     irq_restore(state);
 }
 
-void __attribute__((weak)) pm_off(void)
+#ifndef PROVIDES_PM_LAYERED_OFF
+void pm_off(void)
 {
     pm_blocker.val_u32 = 0;
     pm_set_lowest();
-    while(1);
+    while(1) {}
 }
+#endif

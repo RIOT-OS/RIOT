@@ -9,12 +9,13 @@
  */
 
 /**
- * @defgroup    cpu_mips_pic32mz MIPS PIC32MZ
+ * @defgroup    cpu_mips_pic32mz Microchip PIC32MZ
  * @ingroup     cpu
+ * @brief       CPU definitions for Microchip PIC32MZ devices.
  * @{
  *
  * @file
- * @brief       main CPU definitions for pic32mz devices.
+ * @brief       CPU definitions for Microchip PIC32MZ devices.
  *
  * @author      Neil Jones <neil.jones@imgtec.com>
  */
@@ -45,6 +46,11 @@ static inline void cpu_print_last_instruction(void)
 {
     /* This function must exist else RIOT won't compile */
 }
+
+/**
+ * @brief Initialize the CPU, set IRQ priorities
+ */
+void cpu_init(void);
 
 #ifdef __cplusplus
 }

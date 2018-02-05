@@ -213,7 +213,8 @@ enum {
     NETDEV_TYPE_IEEE802154,
     NETDEV_TYPE_CC110X,
     NETDEV_TYPE_LORA,
-    NETDEV_TYPE_NRFMIN
+    NETDEV_TYPE_NRFMIN,
+    NETDEV_TYPE_SLIP,
 };
 
 /**
@@ -245,7 +246,7 @@ typedef enum {
  * May be different for certain radios.
  */
 struct netdev_radio_rx_info {
-    uint8_t rssi;       /**< RSSI of a received packet */
+    int16_t rssi;       /**< RSSI of a received packet in dBm */
     uint8_t lqi;        /**< LQI of a received packet */
 };
 
@@ -386,11 +387,12 @@ typedef struct netdev_driver {
      * @return              `< 0` on error, 0 on success
      */
     int (*set)(netdev_t *dev, netopt_t opt,
-               void *value, size_t value_len);
+               const void *value, size_t value_len);
 } netdev_driver_t;
 
 #ifdef __cplusplus
 }
 #endif
-/** @} */
+
 #endif /* NET_NETDEV_H */
+/** @} */

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2017 Freie Universität Berlin
  *               2017 Inria
+ *               2017 HAW-Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,7 +9,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-l476
+ * @defgroup    boards_nucleo-l476 STM32 Nucleo-L476
+ * @ingroup     boards_common_nucleo64
+ * @brief       Support for the STM32 Nucleo-L476
  * @{
  *
  * @file
@@ -16,6 +19,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
 #ifndef PERIPH_CONF_H
@@ -34,9 +38,28 @@ extern "C" {
 /* 0: no external high speed crystal available
  * else: actual crystal frequency [in Hz] */
 #define CLOCK_HSE           (0)
+
+#ifndef CLOCK_LSE
 /* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
+ * 1: external crystal available (always 32.768kHz)
+ * This defaults to 0 because hardware revision 'MB1136 C-01' of the nucleo-64
+ * board disconnects LSE by default. You may safely set this to 1 on revisions
+ * newer than 'MB1136 C-01' */
+#define CLOCK_LSE           (0)
+#endif
+
+/* 0: enable MSI only if HSE isn't available
+ * 1: always enable MSI (e.g. if USB or RNG is used)*/
+#define CLOCK_MSI_ENABLE    (1)
+
+#ifndef CLOCK_MSI_LSE_PLL
+/* 0: disable Hardware auto calibration with LSE
+ * 1: enable Hardware auto calibration with LSE (PLL-mode)
+ * Same as with CLOCK_LSE above this defaults to 0 because LSE is
+ * mandatory for MSI/LSE-trimming to work */
+#define CLOCK_MSI_LSE_PLL   (0)
+#endif
+
 /* give the target core clock (HCLK) frequency [in Hz], maximum: 80MHz */
 #define CLOCK_CORECLOCK     (80000000U)
 /* PLL configuration: make sure your values are legit!
@@ -236,6 +259,13 @@ static const spi_conf_t spi_config[] = {
 #define RTT_NUMOF           (1)
 #define RTT_FREQUENCY       (1024U)             /* 32768 / 2^n */
 #define RTT_MAX_VALUE       (0x0000ffff)        /* 16-bit timer */
+/** @} */
+
+/**
+ * @name   RTC configuration
+ * @{
+ */
+#define RTC_NUMOF           (1)
 /** @} */
 
 #ifdef __cplusplus

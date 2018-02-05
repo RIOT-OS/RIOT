@@ -119,6 +119,29 @@ extern "C" {
 #define VFS_DIR_BUFFER_SIZE (12)
 #endif
 
+#ifndef VFS_FILE_BUFFER_SIZE
+/**
+ * @brief Size of buffer space in vfs_file_t
+ *
+ * Same as with VFS_DIR_BUFFER_SIZE some file systems (e.g. FatFs) require more space
+ * to store data about their files.
+ *
+ *
+ * Guidelines are same as with VFS_DIR_BUFFER_SIZE, so add the following snippet
+ * to your fs header:
+ *
+ * @attention @code
+ * #if VFS_FILE_BUFFER_SIZE < 123
+ * #error VFS_FILE_BUFFER_SIZE is too small, at least 123 bytes is required
+ * #endif
+ * @endcode
+ *
+ * @attention Put the check in the public header file (.h), do not put the check in the
+ * implementation (.c) file.
+ */
+#define VFS_FILE_BUFFER_SIZE (1)
+#endif
+
 #ifndef VFS_NAME_MAX
 /**
  * @brief Maximum length of the name in a @c vfs_dirent_t (not including terminating null)
@@ -192,6 +215,7 @@ typedef struct {
     union {
         void *ptr;              /**< pointer to private data */
         int value;              /**< alternatively, you can use private_data as an int */
+        uint8_t buffer[VFS_FILE_BUFFER_SIZE]; /**< Buffer space, in case a single pointer is not enough */
     } private_data;             /**< File system driver private data, implementation defined */
 } vfs_file_t;
 

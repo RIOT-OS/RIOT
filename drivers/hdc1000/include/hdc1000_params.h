@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Set default configuration parameters for the HDC1000 driver
+ * @name    Set default configuration parameters for the HDC1000 driver
  * @{
  */
 #ifndef HDC1000_PARAM_I2C

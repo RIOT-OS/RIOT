@@ -1,4 +1,3 @@
-APPLICATION = driver_pdc8544
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_gpio periph_spi

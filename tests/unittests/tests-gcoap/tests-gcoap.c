@@ -23,6 +23,33 @@
 #include "tests-gcoap.h"
 
 /*
+ * A test set of dummy resources. The resource handlers are set to NULL.
+ */
+static const coap_resource_t resources[] = {
+    { "/act/switch", (COAP_GET | COAP_POST), NULL },
+    { "/sensor/temp", (COAP_GET), NULL },
+    { "/test/info/all", (COAP_GET), NULL },
+};
+
+static const coap_resource_t resources_second[] = {
+    { "/second/part", (COAP_GET), NULL },
+};
+
+static gcoap_listener_t listener = {
+    .resources     = (coap_resource_t *)&resources[0],
+    .resources_len = (sizeof(resources) / sizeof(resources[0])),
+    .next          = NULL
+};
+
+static gcoap_listener_t listener_second = {
+    .resources     = (coap_resource_t *)&resources_second[0],
+    .resources_len = (sizeof(resources_second) / sizeof(resources_second[0])),
+    .next          = NULL
+};
+
+static const char *resource_list_str = "</act/switch>,</sensor/temp>,</test/info/all>,</second/part>";
+
+/*
  * Client GET request success case. Test request generation.
  * Request /time resource from libcoap example
  * Includes token of length GCOAP_TOKENLEN.
@@ -226,6 +253,31 @@ static void test_gcoap__server_con_resp(void)
     TEST_ASSERT_EQUAL_INT(sizeof(resp_data), res);
 }
 
+/*
+ * Test the export of configured resources as CoRE link format string
+ */
+static void test_gcoap__server_get_resource_list(void)
+{
+    char res[128];
+    int size = 0;
+
+    gcoap_register_listener(&listener);
+    gcoap_register_listener(&listener_second);
+
+    size = gcoap_get_resource_list(NULL, 0, COAP_CT_LINK_FORMAT);
+    TEST_ASSERT_EQUAL_INT(strlen(resource_list_str), size);
+
+    res[0] = 'A';
+    size = gcoap_get_resource_list(res, 0, COAP_CT_LINK_FORMAT);
+    TEST_ASSERT_EQUAL_INT(0, size);
+    TEST_ASSERT_EQUAL_INT((int)'A', (int)res[0]);
+
+    size = gcoap_get_resource_list(res, 127, COAP_CT_LINK_FORMAT);
+    res[size] = '\0';
+    TEST_ASSERT_EQUAL_INT(strlen(resource_list_str), size);
+    TEST_ASSERT_EQUAL_STRING(resource_list_str, (char *)res);
+}
+
 Test *tests_gcoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -235,6 +287,7 @@ Test *tests_gcoap_tests(void)
         new_TestFixture(test_gcoap__server_get_resp),
         new_TestFixture(test_gcoap__server_con_req),
         new_TestFixture(test_gcoap__server_con_resp),
+        new_TestFixture(test_gcoap__server_get_resource_list)
     };
 
     EMB_UNIT_TESTCALLER(gcoap_tests, NULL, NULL, fixtures);
