@@ -178,6 +178,8 @@ int wdt_cmd(int argc, char** argv) {
 }
 
 void *wdt_reset_thread(void *arg) {
+    (void) arg;
+
     //wdt_enable();
     while (1) {
         //printf("resetting WDT...\n");

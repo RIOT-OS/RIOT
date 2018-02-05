@@ -23,6 +23,7 @@ USEMODULE += ps
 USEMODULE += auto_init
 USEMODULE += xtimer
 
+FEATURES_REQUIRED += periph_wdt
 
 include $(RIOTBASE)/Makefile.include
 

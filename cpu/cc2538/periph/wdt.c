@@ -61,7 +61,7 @@ cc2538_wdt_t * const WDT = (cc2538_wdt_t *) &SMWDTHROSC_WDCTL;
  */
 const uint16_t clk_counter_values[] = { 32, 256, 4096, 16384 };
 
-#define NUM_CNT_VALUES (sizeof(clk_counter_values) / sizeof(clk_counter_values[0]))
+#define NUM_CNT_VALUES (int8_t)(sizeof(clk_counter_values) / sizeof(clk_counter_values[0]))
 
 static uint16_t cc2538_wdt_usec_to_clk_cnt(uint32_t t_wdt) {
     uint32_t clk_cnt;
@@ -90,7 +90,7 @@ int wdt_init(uint32_t t_wdt, wdt_timing_t timing) {
     uint32_t clk_cnt;
     uint16_t sel_clk_cnt = 0;
     uint8_t sel_clk_cnt_idx = 0;
-    uint8_t i;
+    int8_t i;
 
     /* check, if WDT is already enabled */
     if (WDT->WDTbits.EN == 1) {
@@ -150,6 +150,11 @@ int wdt_init(uint32_t t_wdt, wdt_timing_t timing) {
 
 int wdt_init_cb(uint32_t t_wdt, wdt_timing_t timing, wdt_cb_t wdt_cb, void* arg) {
     /* cc2538 does not support WDT IRQ */
+    (void) t_wdt;
+    (void) timing;
+    (void) wdt_cb;
+    (void) arg;
+
     return WDT_ERR_NO_IRQ;
 }
 
