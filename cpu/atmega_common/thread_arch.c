@@ -249,7 +249,7 @@ void thread_yield_higher(void) {
 }
 
 
-// Use this interrupt to perform all context switches
+/* Use this interrupt to perform all context switches */
 ISR(AVR_CONTEXT_SWAP_INTERRUPT_VECT, ISR_NAKED) {
     __context_save();
     sched_run();

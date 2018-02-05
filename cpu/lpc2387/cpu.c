@@ -51,9 +51,9 @@ void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale)
 
     lpc2387_pclk_scale(source, target, &pclksel, prescale);
 
-    PCLKSEL0 = (PCLKSEL0 & ~(BIT2 | BIT3)) | (pclksel << 2);        // timer 0
-    PCLKSEL0 = (PCLKSEL0 & ~(BIT4 | BIT5)) | (pclksel << 4);        // timer 1
-    PCLKSEL1 = (PCLKSEL1 & ~(BIT12 | BIT13)) | (pclksel << 12); // timer 2
+    PCLKSEL0 = (PCLKSEL0 & ~(BIT2 | BIT3)) | (pclksel << 2);    /* timer 0 */
+    PCLKSEL0 = (PCLKSEL0 & ~(BIT4 | BIT5)) | (pclksel << 4);    /* timer 1 */
+    PCLKSEL1 = (PCLKSEL1 & ~(BIT12 | BIT13)) | (pclksel << 12); /* timer 2 */
 }
 
 /******************************************************************************

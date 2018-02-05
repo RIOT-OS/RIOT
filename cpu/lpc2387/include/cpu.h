@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-extern uintptr_t __stack_start;     ///< end of user stack memory space
+extern uintptr_t __stack_start;     /**< end of user stack memory space */
 
 /**
  * @brief Scale lpc2387 cpu speed

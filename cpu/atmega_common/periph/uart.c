@@ -97,7 +97,7 @@ static void _set_brr(uart_t uart, uint32_t baudrate)
 {
     uint16_t brr;
 #if defined(UART_STDIO_BAUDRATE)
-    // UBRR_VALUE and USE_2X are statically computed from <util/setbaud.h>
+    /* UBRR_VALUE and USE_2X are statically computed from <util/setbaud.h> */
     if (baudrate == UART_STDIO_BAUDRATE) {
         _update_brr(uart, UBRR_VALUE, USE_2X);
         return;
