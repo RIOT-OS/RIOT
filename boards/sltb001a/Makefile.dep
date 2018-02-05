@@ -4,7 +4,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
     USEMODULE += si7021
 endif
 
-# i2c is required for environmental sensors
-USEMODULE += periph_i2c
+# include board common dependencies
+include $(RIOTBOARD)/common/silabs/Makefile.dep
 
 include $(RIOTCPU)/efm32/Makefile.dep
