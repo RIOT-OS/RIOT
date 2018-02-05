@@ -44,10 +44,10 @@ init_mam(void)
 /*---------------------------------------------------------------------------*/
 void init_clks2(void)
 {
-    // Wait for the PLL to lock to set frequency
+    /* Wait for the PLL to lock to set frequency */
     while (!(PLLSTAT & BIT26));
 
-    // Connect the PLL as the clock source
+    /* Connect the PLL as the clock source */
     PLLCON = 0x0003;
     pllfeed();
 
@@ -57,8 +57,8 @@ void init_clks2(void)
 
 void watchdog_init(void)
 {
-    WDCLKSEL = 0;                                   // clock source: RC oscillator
-    WDMOD &= ~WDTOF;                                // clear time-out flag
+    WDCLKSEL = 0;    /* clock source: RC oscillator */
+    WDMOD &= ~WDTOF; /* clear time-out flag */
     WDTC = (F_RC_OSCILLATOR / 4) * WD_INTERVAL;
 }
 
@@ -66,7 +66,7 @@ void watchdog_init(void)
 void bl_init_clks(void)
 {
     watchdog_init();
-    PCONP = PCRTC;          // switch off everything except RTC
+    PCONP = PCRTC; /* switch off everything except RTC */
     init_clks1();
     init_clks2();
     init_mam();

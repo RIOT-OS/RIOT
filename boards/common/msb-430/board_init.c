@@ -117,8 +117,8 @@ void msp430_init_dco(void)
     /* Stop watchdog */
     WDTCTL = WDTPW + WDTHOLD;
 
-    //Init crystal for mclk
-    //XT2 = HF XTAL
+    /* Init crystal for mclk */
+    /* XT2 = HF XTAL */
     BCSCTL1 = RSEL2;
 
     /* Wait for xtal to stabilize */
