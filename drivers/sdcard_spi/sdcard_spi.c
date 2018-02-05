@@ -251,9 +251,11 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
                     if ((ocr & SYSTEM_VOLTAGE) != 0) {
                         DEBUG("OCR: SYS VOLTAGE SUPPORTED\n");
 
-                        if ((ocr & OCR_POWER_UP_STATUS) != 0) { //if power up outine is finished
+                        /* if power up outine is finished */
+                        if ((ocr & OCR_POWER_UP_STATUS) != 0) {
                             DEBUG("OCR: POWER UP ROUTINE FINISHED\n");
-                            if ((ocr & OCR_CCS) != 0) {         //if sd card is sdhc
+                            /* if sd card is sdhc */
+                            if ((ocr & OCR_CCS) != 0) {
                                 DEBUG("OCR: CARD TYPE IS SDHC (SD_V2 with block adressing)\n");
                                 card->use_block_addr = true;
                                 _unselect_card_spi(card);
@@ -795,13 +797,16 @@ static inline int _write_blocks(sdcard_spi_t *card, char cmd_idx, int bladdr, co
             written++;
         }
 
-        /* if this is a multi-block write it is needed to issue a stop command*/
+        /* if this is a multi-block write it is needed to issue a stop
+           command */
         if (cmd_idx == SD_CMD_25) {
             spi_transfer_byte(card->params.spi_dev, GPIO_UNDEF, true,
                               SD_DATA_TOKEN_CMD_25_STOP);
             DEBUG("_write_blocks: write multi (%d) blocks: [OK]\n", nbl);
 
-            _send_dummy_byte(card); //sd card needs dummy byte before we can wait for not-busy state
+            /* sd card needs dummy byte before we can wait for not-busy
+               state */
+            _send_dummy_byte(card);
             if (!_wait_for_not_busy(card, SD_WAIT_FOR_NOT_BUSY_CNT)) {
                 _unselect_card_spi(card);
                 *state = SD_RW_TIMEOUT;
