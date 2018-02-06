@@ -170,7 +170,7 @@ int hd44780_init(hd44780_t *dev, const hd44780_params_t *params)
     } else {
         /* see hitachi HD44780 datasheet page 45 figure 23 */
         _command(dev, HD44780_FUNCTIONSET | dev->flag);
-        xtimer_usleep(HD44780_INIT_WAIT_LONG);  // wait more than 4.1ms
+        xtimer_usleep(HD44780_INIT_WAIT_LONG);  /* wait more than 4.1ms */
 
         _command(dev, HD44780_FUNCTIONSET | dev->flag);
         xtimer_usleep(HD44780_INIT_WAIT_SHORT);

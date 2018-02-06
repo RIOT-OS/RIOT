@@ -188,10 +188,9 @@ static int _size(int argc, char **argv)
 
     uint32_t gb_int = bytes / (SDCARD_SPI_SI_KILO * SDCARD_SPI_SI_KILO * SDCARD_SPI_SI_KILO);
     uint32_t gb_frac = (bytes / (SDCARD_SPI_SI_KILO * SDCARD_SPI_SI_KILO))
-                       - (gb_int * SDCARD_SPI_SI_KILO); //[MB]
+                       - (gb_int * SDCARD_SPI_SI_KILO); /* [MB] */
 
     puts("\nCard size: ");
-    //fflush(stdout);
     print_u64_dec( bytes );
     printf(" bytes (%lu,%03lu GiB | %lu,%03lu GB)\n", gib_int, gib_frac, gb_int, gb_frac);
     return 0;

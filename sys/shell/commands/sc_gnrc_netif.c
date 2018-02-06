@@ -136,7 +136,7 @@ static int _netif_stats(kernel_pid_t iface, unsigned module, bool reset)
     }
     return res;
 }
-#endif // MODULE_NETSTATS
+#endif /* MODULE_NETSTATS */
 
 static void _set_usage(char *cmd_name)
 {

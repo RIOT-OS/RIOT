@@ -44,10 +44,10 @@ extern "C" {
 #define IAP_LOCATION    (0x7FFFFFF1)
 
 /* PLL */
-#define PLLCON_PLLE     (0x01)      ///< PLL Enable
-#define PLLCON_PLLD     (0x00)      ///< PLL Disable
-#define PLLCON_PLLC     (0x03)      ///< PLL Connect
-#define PLLSTAT_PLOCK   (0x0400)    //</ PLL Lock Status
+#define PLLCON_PLLE     (0x01)      /**< PLL Enable */
+#define PLLCON_PLLD     (0x00)      /**< PLL Disable */
+#define PLLCON_PLLC     (0x03)      /**< PLL Connect */
+#define PLLSTAT_PLOCK   (0x0400)    /**< PLL Lock Status */
 
 /*
  * @brief:  Converts 'addr' to sector number
