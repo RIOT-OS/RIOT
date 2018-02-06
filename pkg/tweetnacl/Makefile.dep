@@ -1,0 +1,3 @@
+ifneq (,$(filter cortexm_common,$(USEMODULE)))
+  USEMODULE += munacl_curve25519_cortexm0
+endif
