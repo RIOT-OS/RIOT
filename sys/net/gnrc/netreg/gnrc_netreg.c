@@ -96,28 +96,6 @@ gnrc_netreg_entry_t *gnrc_netreg_lookup(gnrc_nettype_t type, uint32_t demux_ctx)
     return _netreg_lookup(NULL, type, demux_ctx);
 }
 
-int gnrc_netreg_num(gnrc_nettype_t type, uint32_t demux_ctx)
-{
-    int num = 0;
-    gnrc_netreg_entry_t *entry;
-
-    if (_INVALID_TYPE(type)) {
-        return 0;
-    }
-
-    entry = netreg[type];
-
-    while (entry != NULL) {
-        if (entry->demux_ctx == demux_ctx) {
-            num++;
-        }
-
-        entry = entry->next;
-    }
-
-    return num;
-}
-
 gnrc_netreg_entry_t *gnrc_netreg_getnext(gnrc_netreg_entry_t *entry)
 {
     return (entry ? _netreg_lookup(entry, 0, entry->demux_ctx) : NULL);
