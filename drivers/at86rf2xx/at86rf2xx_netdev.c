@@ -486,6 +486,12 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = sizeof(netopt_enable_t);
             break;
 
+        case NETOPT_ACK_PENDING:
+            at86rf2xx_set_option(dev, AT86RF2XX_OPT_ACK_PENDING,
+                                 ((const bool *)val)[0]);
+            res = sizeof(netopt_enable_t);
+            break;
+
         case NETOPT_RETRANS:
             assert(len <= sizeof(uint8_t));
             at86rf2xx_set_max_retries(dev, *((const uint8_t *)val));

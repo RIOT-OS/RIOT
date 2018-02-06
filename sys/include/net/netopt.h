@@ -147,6 +147,12 @@ typedef enum {
                                  *   the current state */
     NETOPT_AUTOACK,             /**< en/disable link layer auto ACKs or read
                                  *   the current state */
+    NETOPT_ACK_PENDING,         /**< en/disable the frame pending bit of ACKs.
+                                 *   This bit is copied into the frame pending
+                                 *   subfield of the ACK if it is the response
+                                 *   to a data request MAC command frame, which
+                                 *   lets the data request sender know if the ACK
+                                 *   sender has pending data or not. */
     NETOPT_ACK_REQ,             /**< en/disable acknowledgement requests or
                                  *   read the current state */
     NETOPT_RETRANS,             /**< get/set the maximum number of

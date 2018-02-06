@@ -135,6 +135,7 @@ extern "C" {
 #define AT86RF2XX_OPT_SRC_ADDR_LONG  (NETDEV_IEEE802154_SRC_MODE_LONG)  /**< legacy define */
 #define AT86RF2XX_OPT_RAWDUMP        (NETDEV_IEEE802154_RAW)            /**< legacy define */
 #define AT86RF2XX_OPT_AUTOACK        (NETDEV_IEEE802154_ACK_REQ)        /**< legacy define */
+#define AT86RF2XX_OPT_ACK_PENDING    (NETDEV_IEEE802154_FRAME_PEND)     /**< legacy define */
 
 #define AT86RF2XX_OPT_CSMA           (0x0100)       /**< CSMA active */
 #define AT86RF2XX_OPT_PROMISCUOUS    (0x0200)       /**< promiscuous mode
