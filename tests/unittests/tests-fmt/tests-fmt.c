@@ -194,7 +194,7 @@ static void test_fmt_u32_dec(void)
 
 static void test_fmt_u16_dec(void)
 {
-    char out[5] = "----";
+    char out[8] = "zzzzzzz";
     uint16_t val = 6556;
     uint8_t chars = 0;
 
@@ -202,6 +202,12 @@ static void test_fmt_u16_dec(void)
     TEST_ASSERT_EQUAL_INT(4, chars);
     out[chars] = '\0';
     TEST_ASSERT_EQUAL_STRING("6556", (char *) out);
+
+    val = 65535;
+    chars = fmt_u16_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(5, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("65535", (char *) out);
 }
 
 static void test_fmt_s32_dec_a(void)
