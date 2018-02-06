@@ -63,6 +63,9 @@
 
 #define BLE_PRIO                    (GNRC_NETIF_PRIO)
 
+/* XXX: netdev required by gnrc_netif, but not implemented fully for
+ * nordic_softdevice_ble for legacy reasons */
+
 static char _stack[(THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)];
 
 static gnrc_netif_t *_ble_netif = NULL;
@@ -73,7 +76,7 @@ static void _ble_mac_callback(ble_mac_event_enum_t event, void* arg)
 {
     msg_t m = { .type=event, .content.ptr=arg };
 
-    if ((_ble_netif != NULL) || !msg_send_int(&m, _ble_netif->pid)) {
+    if ((_ble_netif == NULL) || !msg_send_int(&m, _ble_netif->pid)) {
         puts("_ble_mac_callback(): possibly lost interrupt");
     }
 }
@@ -174,45 +177,51 @@ static int _send(gnrc_pktsnip_t *pkt)
 
     return 0;
 }
-static int _handle_get(gnrc_netapi_opt_t *_opt)
+
+static int _netdev_init(netdev_t *dev)
+{
+    _ble_netif = dev->context;
+    ble_stack_init();
+    ble_mac_init(_ble_mac_callback);
+    _ble_netif->l2addr_len = BLE_SIXLOWPAN_L2_ADDR_LEN;
+    ble_get_mac(_ble_netif->l2addr);
+    ble_advertising_init("RIOT BLE");
+    ble_advertising_start();
+    return 0;
+}
+
+static int _netdev_get(netdev_t *netdev, netopt_t opt,
+                       void *v, size_t max_len)
 {
     int res = -ENOTSUP;
-    uint8_t *value = _opt->data;
+    uint8_t *value = v;
 
-    switch (_opt->opt) {
-        case NETOPT_ACK_REQ:
-        case NETOPT_CHANNEL:
-        case NETOPT_NID:
-        case NETOPT_ADDRESS:
-            /* -ENOTSUP */
-            break;
+    (void)netdev;
+    switch (opt) {
         case NETOPT_ADDRESS_LONG:
-            assert(_opt->data_len >= BLE_SIXLOWPAN_L2_ADDR_LEN);
+            assert(max_len >= BLE_SIXLOWPAN_L2_ADDR_LEN);
             memcpy(value, _ble_netif->l2addr, BLE_SIXLOWPAN_L2_ADDR_LEN);
-            value[0] = IPV6_IID_FLIP_VALUE;
             res = BLE_SIXLOWPAN_L2_ADDR_LEN;
             break;
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
-            assert(_opt->data_len == sizeof(uint16_t));
+            assert(max_len == sizeof(uint16_t));
             *((uint16_t *)value) = BLE_SIXLOWPAN_L2_ADDR_LEN;
             res = sizeof(uint16_t);
             break;
-#ifdef MODULE_GNRC
         case NETOPT_PROTO:
-            assert(_opt->data_len == sizeof(gnrc_nettype_t));
+            assert(max_len == sizeof(gnrc_nettype_t));
             *((gnrc_nettype_t *)value) = GNRC_NETTYPE_SIXLOWPAN;
             res = sizeof(gnrc_nettype_t);
             break;
-#endif
-/*        case NETOPT_DEVICE_TYPE:
-            assert(_opt->data_len == sizeof(uint16_t));
-            *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
+        case NETOPT_DEVICE_TYPE:
+            assert(max_len == sizeof(uint16_t));
+            *((uint16_t *)value) = NETDEV_TYPE_BLE;
             res = sizeof(uint16_t);
-            break;*/
+            break;
         case NETOPT_IPV6_IID:
             memcpy(value, _ble_netif->l2addr, BLE_SIXLOWPAN_L2_ADDR_LEN);
-            value[0] = IPV6_IID_FLIP_VALUE;
+            value[0] ^= IPV6_IID_FLIP_VALUE;
             res = BLE_SIXLOWPAN_L2_ADDR_LEN;
             break;
         default:
@@ -221,20 +230,20 @@ static int _handle_get(gnrc_netapi_opt_t *_opt)
     return res;
 }
 
-static void _netif_init(gnrc_netif_t *netif)
+static int _netdev_set(netdev_t *netdev, netopt_t opt,
+                       const void *value, size_t value_len)
 {
-    ble_stack_init();
-    ble_mac_init(_ble_mac_callback);
-    netif->l2addr_len = BLE_SIXLOWPAN_L2_ADDR_LEN;
-    ble_get_mac(netif->l2addr);
-    ble_advertising_init("RIOT BLE");
-    ble_advertising_start();
+    (void)netdev;
+    (void)opt;
+    (void)value;
+    (void)value_len;
+    return -ENOTSUP;
 }
 
 static int _netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     (void)netif;
-    assert(netif != _ble_netif);
+    assert(netif == _ble_netif);
     return _send(pkt);
 }
 
@@ -243,21 +252,6 @@ static gnrc_pktsnip_t *_netif_recv(gnrc_netif_t *netif)
     (void)netif;
     /* not supported */
     return NULL;
-}
-
-static int _netif_get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
-{
-    (void)netif;
-    assert(netif != _ble_netif);
-    return _handle_get(opt);
-}
-
-static int _netif_set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
-{
-    (void)netif;
-    (void)opt;
-    /* not supported */
-    return -ENOTSUP;
 }
 
 static void _netif_msg_handler(gnrc_netif_t *netif, msg_t *msg)
@@ -274,16 +268,29 @@ static void _netif_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 }
 
 static const gnrc_netif_ops_t _ble_ops = {
-    .init = _netif_init,
+    .init = NULL,
     .send = _netif_send,
     .recv = _netif_recv,
-    .get = _netif_get,
-    .set = _netif_set,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
     .msg_handler = _netif_msg_handler,
+};
+
+static const netdev_driver_t _ble_netdev_driver = {
+    .send = NULL,
+    .recv = NULL,
+    .init = _netdev_init,
+    .isr  =  NULL,
+    .get  = _netdev_get,
+    .set  = _netdev_set,
+};
+
+static netdev_t _ble_dummy_dev = {
+    .driver = &_ble_netdev_driver,
 };
 
 void gnrc_nordic_ble_6lowpan_init(void)
 {
-    _ble_netif = gnrc_netif_create(_stack, sizeof(_stack), BLE_PRIO,
-                                   "ble", NULL, &_ble_ops);
+    gnrc_netif_create(_stack, sizeof(_stack), BLE_PRIO,
+                      "ble", &_ble_dummy_dev, &_ble_ops);
 }
