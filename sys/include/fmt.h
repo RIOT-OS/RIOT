@@ -178,6 +178,21 @@ size_t fmt_u64_dec(char *out, uint64_t val);
 size_t fmt_u16_dec(char *out, uint16_t val);
 
 /**
+ * @brief Convert a int64 value to decimal string.
+ *
+ * Will add a leading "-" if @p val is negative.
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      nr of characters written to (or needed in) @p out
+ */
+size_t fmt_s64_dec(char *out, int64_t val);
+
+/**
  * @brief Convert a int32 value to decimal string.
  *
  * Will add a leading "-" if @p val is negative.
