@@ -1,6 +1,9 @@
 # this module contains shared code for all boards using the nrf52 CPU
 export CPU = nrf52
 
+# get SoftDevice dependency if needed (dirty hack!)
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+
 # include this module into the build
 ifeq (,$(filter thingy52 acd52832,$(BOARD)))
   INCLUDES += -I$(RIOTBOARD)/common/nrf52xxxdk/include
@@ -14,6 +17,11 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup JLink for flashing
 export JLINK_DEVICE := nrf52
+
+# The following configuration is dependencies specific
+# but they are resolved later
+# Hack to know now if 'nordic_softdevice_ble' is used
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
 # special options when using SoftDevice
 ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
