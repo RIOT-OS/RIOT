@@ -414,14 +414,14 @@ void print(const char *s, size_t n)
 
 void print_u32_dec(uint32_t val)
 {
-    char buf[10];
+    char buf[10]; /* "4294967295" */
     size_t len = fmt_u32_dec(buf, val);
     print(buf, len);
 }
 
 void print_s32_dec(int32_t val)
 {
-    char buf[11];
+    char buf[11]; /* "-2147483648" */
     size_t len = fmt_s32_dec(buf, val);
     print(buf, len);
 }
@@ -448,7 +448,7 @@ void print_u64_hex(uint64_t val)
 
 void print_u64_dec(uint64_t val)
 {
-    char buf[18];
+    char buf[20]; /* "18446744073709551615" */
     size_t len = fmt_u64_dec(buf, val);
     print(buf, len);
 }
