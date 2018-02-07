@@ -234,6 +234,18 @@ size_t fmt_u16_dec(char *out, uint16_t val)
     return fmt_u32_dec(out, val);
 }
 
+size_t fmt_s64_dec(char *out, int64_t val)
+{
+    unsigned negative = (val < 0);
+    if (negative) {
+        if (out) {
+            *out++ = '-';
+        }
+        val = -val;
+    }
+    return fmt_u64_dec(out, val) + negative;
+}
+
 size_t fmt_s32_dec(char *out, int32_t val)
 {
     unsigned negative = (val < 0);
@@ -438,6 +450,13 @@ void print_u64_dec(uint64_t val)
 {
     char buf[18];
     size_t len = fmt_u64_dec(buf, val);
+    print(buf, len);
+}
+
+void print_s64_dec(uint64_t val)
+{
+    char buf[20]; /* "-9223372036854775808" */
+    size_t len = fmt_s64_dec(buf, val);
     print(buf, len);
 }
 

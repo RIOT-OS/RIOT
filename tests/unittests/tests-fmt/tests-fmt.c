@@ -275,6 +275,74 @@ static void test_fmt_s32_dec_b(void)
     TEST_ASSERT_EQUAL_STRING("zzz", &out[12]);
 }
 
+static void test_fmt_s64_dec_a(void)
+{
+    char out[24] = "zzzzzzzzzzzzzzzzzzzzzzz";
+    int64_t val = 9876;
+    uint8_t chars = 0;
+
+    chars = fmt_s64_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(4, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("9876", (char *) out);
+
+    val = -9876;
+    chars = fmt_s64_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(5, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("-9876", (char *) out);
+
+    /* check that the buffer was not overflowed */
+    TEST_ASSERT_EQUAL_STRING("zzzzzzzzzzzzzzzzz", &out[6]);
+}
+
+static void test_fmt_s64_dec_b(void)
+{
+    char out[24] = "zzzzzzzzzzzzzzzzzzzzzzz";
+    int64_t val = 2147483647;
+    uint8_t chars = 0;
+
+    chars = fmt_s64_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(10, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("2147483647", (char *) out);
+
+    val = -2147483648;
+    chars = fmt_s64_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(11, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("-2147483648", (char *) out);
+
+    /* check that the buffer was not overflowed */
+    TEST_ASSERT_EQUAL_STRING("zzzzzzzzzzz", &out[12]);
+}
+
+static void test_fmt_s64_dec_c(void)
+{
+    char out[24] = "zzzzzzzzzzzzzzzzzzzzzzz";
+    int64_t val = 9223372036854775807ll;
+    uint8_t chars = 0;
+
+    chars = fmt_s64_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(19, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("9223372036854775807", (char *) out);
+
+    /* typing -9223372036854775808 as a decimal literal causes a compiler warning
+     * "integer constant is so large that it is unsigned"
+     * because of compiler internal workings and the C standard, using
+     * -9223372036854775807-1 works around this peculiarity.
+     * See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52661 */
+    val = -9223372036854775807ll - 1;
+    chars = fmt_s64_dec(out, val);
+    TEST_ASSERT_EQUAL_INT(20, chars);
+    out[chars] = '\0';
+    TEST_ASSERT_EQUAL_STRING("-9223372036854775808", (char *) out);
+
+    /* check that the buffer was not overflowed */
+    TEST_ASSERT_EQUAL_STRING("zz", &out[21]);
+}
+
 static void test_fmt_u64_dec_a(void)
 {
     char out[24] = "zzzzzzzzzzzzzzzzzzzzzzz";
@@ -553,6 +621,9 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_u16_dec),
         new_TestFixture(test_fmt_s32_dec_a),
         new_TestFixture(test_fmt_s32_dec_b),
+        new_TestFixture(test_fmt_s64_dec_a),
+        new_TestFixture(test_fmt_s64_dec_b),
+        new_TestFixture(test_fmt_s64_dec_c),
         new_TestFixture(test_fmt_s16_dec),
         new_TestFixture(test_fmt_s16_dfp),
         new_TestFixture(test_fmt_s32_dfp),
