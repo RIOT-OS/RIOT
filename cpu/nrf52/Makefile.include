@@ -2,10 +2,10 @@ export CPU_ARCH = cortex-m4f
 export CPU_FAM  = nrf52
 
 # Export internal ROM alignment and slot sizes for bootloader support
-export IMAGE_ALIGN = 8
-export SLOT0_SIZE = 0x8000
-export SLOT1_SIZE = 0x3C000
-export SLOT2_SIZE = 0x3C000
+export MCUBOOT_IMAGE_ALIGN = 8
+export MCUBOOT_SLOT0_SIZE = 0x8000
+export MCUBOOT_SLOT1_SIZE = 0x3C000
+export MCUBOOT_SLOT2_SIZE = 0x3C000
 
 include $(RIOTCPU)/nrf5x_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
