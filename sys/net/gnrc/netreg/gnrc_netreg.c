@@ -65,54 +65,40 @@ void gnrc_netreg_unregister(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
     LL_DELETE(netreg[type], entry);
 }
 
-gnrc_netreg_entry_t *gnrc_netreg_lookup(gnrc_nettype_t type, uint32_t demux_ctx)
+/**
+ * @brief   Searches the next entry in the registry that matches given
+ *          parameters, start lookup from beginning or given entry.
+ *
+ * @param[in] from      A registry entry to lookup from or NULL to start fresh
+ * @param[in] type      Type of the protocol.
+ * @param[in] demux_ctx The demultiplexing context for the registered thread.
+ *                      See gnrc_netreg_entry_t::demux_ctx.
+ *
+ * @return  The first entry fitting the given parameters on success
+ * @return  NULL if no entry can be found.
+ */
+static gnrc_netreg_entry_t *_netreg_lookup(gnrc_netreg_entry_t *from,
+                                           gnrc_nettype_t type,
+                                           uint32_t demux_ctx)
 {
-    gnrc_netreg_entry_t *res;
+    gnrc_netreg_entry_t *res = NULL;
 
-    if (_INVALID_TYPE(type)) {
-        return NULL;
+    if (from || !_INVALID_TYPE(type)) {
+        gnrc_netreg_entry_t *head = (from) ? from->next : netreg[type];
+        LL_SEARCH_SCALAR(head, res, demux_ctx, demux_ctx);
     }
-
-    LL_SEARCH_SCALAR(netreg[type], res, demux_ctx, demux_ctx);
 
     return res;
 }
 
-int gnrc_netreg_num(gnrc_nettype_t type, uint32_t demux_ctx)
+gnrc_netreg_entry_t *gnrc_netreg_lookup(gnrc_nettype_t type, uint32_t demux_ctx)
 {
-    int num = 0;
-    gnrc_netreg_entry_t *entry;
-
-    if (_INVALID_TYPE(type)) {
-        return 0;
-    }
-
-    entry = netreg[type];
-
-    while (entry != NULL) {
-        if (entry->demux_ctx == demux_ctx) {
-            num++;
-        }
-
-        entry = entry->next;
-    }
-
-    return num;
+    return _netreg_lookup(NULL, type, demux_ctx);
 }
 
 gnrc_netreg_entry_t *gnrc_netreg_getnext(gnrc_netreg_entry_t *entry)
 {
-    uint32_t demux_ctx;
-
-    if (entry == NULL) {
-        return NULL;
-    }
-
-    demux_ctx = entry->demux_ctx;
-
-    LL_SEARCH_SCALAR(entry->next, entry, demux_ctx, demux_ctx);
-
-    return entry;
+    return (entry ? _netreg_lookup(entry, 0, entry->demux_ctx) : NULL);
 }
 
 int gnrc_netreg_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr)

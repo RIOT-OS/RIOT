@@ -94,54 +94,52 @@ static inline int _snd_rcv_mbox(mbox_t *mbox, uint16_t type, gnrc_pktsnip_t *pkt
 int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
                          uint16_t cmd, gnrc_pktsnip_t *pkt)
 {
-    int numof = gnrc_netreg_num(type, demux_ctx);
+    int numof = 0;
+    gnrc_netreg_entry_t *sendto = gnrc_netreg_lookup(type, demux_ctx);
 
-    if (numof != 0) {
-        gnrc_netreg_entry_t *sendto = gnrc_netreg_lookup(type, demux_ctx);
-
-        gnrc_pktbuf_hold(pkt, numof - 1);
-
-        while (sendto) {
+    while (sendto) {
+        if (numof != 0) {
+            gnrc_pktbuf_hold(pkt, 1);
+        }
 #if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
-            int release = 0;
-            switch (sendto->type) {
-                case GNRC_NETREG_TYPE_DEFAULT:
-                    if (_snd_rcv(sendto->target.pid, cmd, pkt) < 1) {
-                        /* unable to dispatch packet */
-                        release = 1;
-                    }
-                    break;
+        int release = 0;
+        switch (sendto->type) {
+            case GNRC_NETREG_TYPE_DEFAULT:
+                if (_snd_rcv(sendto->target.pid, cmd, pkt) < 1) {
+                    /* unable to dispatch packet */
+                    release = 1;
+                }
+                break;
 #ifdef MODULE_GNRC_NETAPI_MBOX
-                case GNRC_NETREG_TYPE_MBOX:
-                    if (_snd_rcv_mbox(sendto->target.mbox, cmd, pkt) < 1) {
-                        /* unable to dispatch packet */
-                        release = 1;
-                    }
-                    break;
+            case GNRC_NETREG_TYPE_MBOX:
+                if (_snd_rcv_mbox(sendto->target.mbox, cmd, pkt) < 1) {
+                    /* unable to dispatch packet */
+                    release = 1;
+                }
+                break;
 #endif
 #ifdef MODULE_GNRC_NETAPI_CALLBACKS
-                case GNRC_NETREG_TYPE_CB:
-                    sendto->target.cbd->cb(cmd, pkt, sendto->target.cbd->ctx);
-                    break;
+            case GNRC_NETREG_TYPE_CB:
+                sendto->target.cbd->cb(cmd, pkt, sendto->target.cbd->ctx);
+                break;
 #endif
-                default:
-                    /* unknown dispatch type */
-                    release = 1;
-                    break;
-            }
-            if (release) {
-                gnrc_pktbuf_release(pkt);
-            }
-#else
-            if (_snd_rcv(sendto->target.pid, cmd, pkt) < 1) {
-                /* unable to dispatch packet */
-                gnrc_pktbuf_release(pkt);
-            }
-#endif
-            sendto = gnrc_netreg_getnext(sendto);
+            default:
+                /* unknown dispatch type */
+                release = 1;
+                break;
         }
+        if (release) {
+            gnrc_pktbuf_release(pkt);
+        }
+#else
+        if (_snd_rcv(sendto->target.pid, cmd, pkt) < 1) {
+            /* unable to dispatch packet */
+            gnrc_pktbuf_release(pkt);
+        }
+#endif
+        numof++;
+        sendto = gnrc_netreg_getnext(sendto);
     }
-
     return numof;
 }
 

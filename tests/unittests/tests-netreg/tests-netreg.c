@@ -85,6 +85,13 @@ void test_netreg_unregister__success3(void)
     TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16));
 }
 
+void test_netreg_lookup__empty(void)
+{
+    TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16));
+    TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16 + 1));
+    TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_TEST, GNRC_NETREG_DEMUX_CTX_ALL));
+}
+
 void test_netreg_lookup__wrong_type_undef(void)
 {
     TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
@@ -97,31 +104,17 @@ void test_netreg_lookup__wrong_type_numof(void)
     TEST_ASSERT_NULL(gnrc_netreg_lookup(GNRC_NETTYPE_NUMOF, TEST_UINT16));
 }
 
-void test_netreg_num__empty(void)
+void test_netreg_lookup__2_entries(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_TEST, TEST_UINT16));
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_TEST, TEST_UINT16 + 1));
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_TEST, GNRC_NETREG_DEMUX_CTX_ALL));
-}
-
-void test_netreg_num__wrong_type_undef(void)
-{
+    gnrc_netreg_entry_t *res = NULL;
+    /* add first entry, first lookup != NULL; second == NULL */
     TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_UNDEF, TEST_UINT16));
-}
-
-void test_netreg_num__wrong_type_numof(void)
-{
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_num(GNRC_NETTYPE_NUMOF, TEST_UINT16));
-}
-
-void test_netreg_num__2_entries(void)
-{
-    TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[0]));
-    TEST_ASSERT_EQUAL_INT(1, gnrc_netreg_num(GNRC_NETTYPE_TEST, TEST_UINT16));
+    TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
+    TEST_ASSERT_NULL((res = gnrc_netreg_getnext(res)));
+    /* add second entry, both lookups != NULL */
     TEST_ASSERT_EQUAL_INT(0, gnrc_netreg_register(GNRC_NETTYPE_TEST, &entries[1]));
-    TEST_ASSERT_EQUAL_INT(2, gnrc_netreg_num(GNRC_NETTYPE_TEST, TEST_UINT16));
+    TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
+    TEST_ASSERT_NOT_NULL((res = gnrc_netreg_getnext(res)));
 }
 
 void test_netreg_getnext__NULL(void)
@@ -134,7 +127,7 @@ void test_netreg_getnext__2_entries(void)
 {
     gnrc_netreg_entry_t *res = NULL;
 
-    test_netreg_num__2_entries();
+    test_netreg_lookup__2_entries();
     TEST_ASSERT_NOT_NULL((res = gnrc_netreg_lookup(GNRC_NETTYPE_TEST, TEST_UINT16)));
     TEST_ASSERT_NOT_NULL(gnrc_netreg_getnext(res));
 }
@@ -147,12 +140,10 @@ Test *tests_netreg_tests(void)
         new_TestFixture(test_netreg_unregister__success),
         new_TestFixture(test_netreg_unregister__success2),
         new_TestFixture(test_netreg_unregister__success3),
+        new_TestFixture(test_netreg_lookup__empty),
         new_TestFixture(test_netreg_lookup__wrong_type_undef),
         new_TestFixture(test_netreg_lookup__wrong_type_numof),
-        new_TestFixture(test_netreg_num__empty),
-        new_TestFixture(test_netreg_num__wrong_type_undef),
-        new_TestFixture(test_netreg_num__wrong_type_numof),
-        new_TestFixture(test_netreg_num__2_entries),
+        new_TestFixture(test_netreg_lookup__2_entries),
         new_TestFixture(test_netreg_getnext__NULL),
         new_TestFixture(test_netreg_getnext__2_entries),
     };

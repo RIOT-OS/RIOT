@@ -219,7 +219,7 @@ static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
 
     /* dispatch IPv6 extension header only once */
     if (should_dispatch_current_type) {
-        bool should_release = (gnrc_netreg_num(GNRC_NETTYPE_IPV6, nh) == 0) &&
+        bool should_release = (!gnrc_netreg_lookup(GNRC_NETTYPE_IPV6, nh)) &&
                               (!interested);
 
         if (!should_release) {
