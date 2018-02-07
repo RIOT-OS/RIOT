@@ -6,7 +6,19 @@
  * directory for more details.
  */
 
+#include <stdint.h>
+#include <math.h>
+#include <stdio.h>
+
 #include "test.h"
+
+#include "fmt.h"
+#include "random.h"
+#include "xtimer.h"
+
+#ifdef MODULE_PERIPH_HWRNG
+#include "periph/hwrng.h"
+#endif
 
 /**
  * @brief   Seed for initializing random module.

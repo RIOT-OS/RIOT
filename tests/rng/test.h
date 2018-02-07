@@ -9,17 +9,7 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "fmt.h"
-#include "random.h"
-#include "xtimer.h"
-
-#ifdef MODULE_PERIPH_HWRNG
-#include "periph/hwrng.h"
-#endif
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
