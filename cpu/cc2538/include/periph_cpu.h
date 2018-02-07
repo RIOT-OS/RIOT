@@ -112,6 +112,20 @@ typedef enum {
 } gpio_mode_t;
 /** @} */
 
+
+/**
+ * @name   UART device configuration
+ * @{
+ */
+typedef struct {
+    cc2538_uart_t *dev;       /**< pointer to the used UART device */
+    gpio_t rx_pin;            /**< pin used for RX */
+    gpio_t tx_pin;            /**< pin used for TX */
+    gpio_t cts_pin;           /**< CTS pin - set to GPIO_UNDEF when not using */
+    gpio_t rts_pin;           /**< RTS pin - set to GPIO_UNDEF when not using */
+} uart_conf_t;
+/** @} */
+
 /**
  * @name   Override SPI mode settings
  * @{
@@ -239,8 +253,6 @@ typedef gpio_t adc_conf_t;
 #ifdef __cplusplus
 }
 #endif
-
-#include "periph/dev_enums.h"
 
 #endif /* PERIPH_CPU_H */
 /** @} */
