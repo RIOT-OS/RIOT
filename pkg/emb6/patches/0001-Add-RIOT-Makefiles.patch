@@ -1,4 +1,4 @@
-From 4b417436908a6823e631519f794a20644a467f19 Mon Sep 17 00:00:00 2001
+From 5322d1d2280283f108f27a1720cbf6b4f958d21c Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mail@martine-lenders.eu>
 Date: Mon, 11 Jan 2016 15:09:34 +0100
 Subject: [PATCH 1/4] Add RIOT Makefiles
@@ -30,14 +30,14 @@ Subject: [PATCH 1/4] Add RIOT Makefiles
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..48422e9
+index 00000000..48422e90
 --- /dev/null
 +++ b/Makefile
 @@ -0,0 +1 @@
 +include $(RIOTBASE)/Makefile.base
 diff --git a/emb6/Makefile b/emb6/Makefile
 new file mode 100644
-index 0000000..c2ec39f
+index 00000000..c2ec39f3
 --- /dev/null
 +++ b/emb6/Makefile
 @@ -0,0 +1,3 @@
@@ -46,7 +46,7 @@ index 0000000..c2ec39f
 +include $(RIOTBASE)/Makefile.base
 diff --git a/emb6/src/mac/Makefile b/emb6/src/mac/Makefile
 new file mode 100644
-index 0000000..d0472d8
+index 00000000..d0472d85
 --- /dev/null
 +++ b/emb6/src/mac/Makefile
 @@ -0,0 +1,3 @@
@@ -55,7 +55,7 @@ index 0000000..d0472d8
 +include $(RIOTBASE)/Makefile.base
 diff --git a/emb6/src/mac/llsec/Makefile b/emb6/src/mac/llsec/Makefile
 new file mode 100644
-index 0000000..e13ee7f
+index 00000000..e13ee7f1
 --- /dev/null
 +++ b/emb6/src/mac/llsec/Makefile
 @@ -0,0 +1,3 @@
@@ -64,7 +64,7 @@ index 0000000..e13ee7f
 +include $(RIOTBASE)/Makefile.base
 diff --git a/emb6/src/net/ipv6/Makefile b/emb6/src/net/ipv6/Makefile
 new file mode 100644
-index 0000000..844e39c
+index 00000000..844e39cd
 --- /dev/null
 +++ b/emb6/src/net/ipv6/Makefile
 @@ -0,0 +1,3 @@
@@ -73,7 +73,7 @@ index 0000000..844e39c
 +include $(RIOTBASE)/Makefile.base
 diff --git a/emb6/src/net/ipv6/multicast/Makefile b/emb6/src/net/ipv6/multicast/Makefile
 new file mode 100644
-index 0000000..f1c3f1e
+index 00000000..f1c3f1e0
 --- /dev/null
 +++ b/emb6/src/net/ipv6/multicast/Makefile
 @@ -0,0 +1,3 @@
@@ -82,7 +82,7 @@ index 0000000..f1c3f1e
 +include $(RIOTBASE)/Makefile.base
 diff --git a/emb6/src/net/rpl/Makefile b/emb6/src/net/rpl/Makefile
 new file mode 100644
-index 0000000..2fd941c
+index 00000000..2fd941c7
 --- /dev/null
 +++ b/emb6/src/net/rpl/Makefile
 @@ -0,0 +1,3 @@
@@ -91,7 +91,7 @@ index 0000000..2fd941c
 +include $(RIOTBASE)/Makefile.base
 diff --git a/emb6/src/net/sicslowpan/Makefile b/emb6/src/net/sicslowpan/Makefile
 new file mode 100644
-index 0000000..9e14df3
+index 00000000..9e14df33
 --- /dev/null
 +++ b/emb6/src/net/sicslowpan/Makefile
 @@ -0,0 +1,3 @@
@@ -100,7 +100,7 @@ index 0000000..9e14df3
 +include $(RIOTBASE)/Makefile.base
 diff --git a/emb6/src/tport/Makefile b/emb6/src/tport/Makefile
 new file mode 100644
-index 0000000..1b0ca7c
+index 00000000..1b0ca7c2
 --- /dev/null
 +++ b/emb6/src/tport/Makefile
 @@ -0,0 +1,3 @@
@@ -109,7 +109,7 @@ index 0000000..1b0ca7c
 +include $(RIOTBASE)/Makefile.base
 diff --git a/target/bsp/Makefile b/target/bsp/Makefile
 new file mode 100644
-index 0000000..ce548bd
+index 00000000..ce548bd1
 --- /dev/null
 +++ b/target/bsp/Makefile
 @@ -0,0 +1,3 @@
@@ -118,13 +118,13 @@ index 0000000..ce548bd
 +include $(RIOTBASE)/Makefile.base
 diff --git a/utils/src/Makefile b/utils/src/Makefile
 new file mode 100644
-index 0000000..c9aa897
+index 00000000..c9aa8979
 --- /dev/null
 +++ b/utils/src/Makefile
 @@ -0,0 +1,3 @@
 +MODULE := emb6_utils
 +
 +include $(RIOTBASE)/Makefile.base
---
-1.9.1
+-- 
+2.16.1
 
