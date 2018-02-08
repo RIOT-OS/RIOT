@@ -73,7 +73,7 @@
  *     printf("triggered custom event with text: \"%s\"\n", custom_event->text);
  * }
  *
- * static custom_event_t custom_event = { .super.callback = custom_handler, .text = "CUSTOM EVENT" };
+ * static custom_event_t custom_event = { .super.handler = custom_handler, .text = "CUSTOM EVENT" };
  *
  * [...] event_post(&queue, &custom_event)
  * ~~~~~~~~~~~~~~~~~~~~~~~~
