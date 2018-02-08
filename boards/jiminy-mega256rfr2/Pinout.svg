@@ -302,11 +302,11 @@
 			<text x="64.01" y="455.73" class="st3" v:langID="1031"><v:paragraph v:horizAlign="2"/><v:tabList/>GND</text>		</g>
 		<g id="shape61-117" v:mID="61" v:groupContext="shape" transform="translate(251.593,-396.142)">
 			<title>Tabelle.61</title>
-			<desc>V+ bat-Chrg</desc>
+			<desc>V+ Bat-Chrg</desc>
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="45.3543" cy="452.126" width="90.71" height="11.3386"/>
 			<rect x="0" y="446.457" width="90.7087" height="11.3386" class="st4"/>
-			<text x="28.93" y="455.73" class="st3" v:langID="1031"><v:paragraph v:horizAlign="2"/><v:tabList/>V+ bat-Chrg</text>		</g>
+			<text x="28.71" y="455.73" class="st3" v:langID="1031"><v:paragraph v:horizAlign="2"/><v:tabList/>V+ Bat-Chrg</text>		</g>
 		<g id="shape62-120" v:mID="62" v:groupContext="shape" transform="translate(251.593,-413.15)">
 			<title>Tabelle.62</title>
 			<desc>V+ Bat-Chrg</desc>
