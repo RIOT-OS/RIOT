@@ -107,15 +107,8 @@ void flashpage_write(int page, void *data)
  */
 #define PRGKEY2                   (0x13141516)
 
-void flashpage_write(int page, void *data)
+static void _unlock(void)
 {
-    assert(page < (int)FLASHPAGE_NUMOF);
-
-    /* Using 32bit addresses since we are attempting fast-word erasing/writing*/
-    uint32_t *page_addr = flashpage_addr(page);
-    uint32_t *data_addr = (uint32_t*)data;
-
-    DEBUG("[flashpage] unlocking the flash module\n");
     /* Unlocking the Data memory and FLASH_PECR register access*/
     if(FLASH->PECR & FLASH_PECR_PRGLOCK)
     {
@@ -127,6 +120,60 @@ void flashpage_write(int page, void *data)
         FLASH->PRGKEYR = PRGKEY1;
         FLASH->PRGKEYR = PRGKEY2;
     }
+}
+
+static void _lock(void)
+{
+    /* Set the PRGLOCK and PELOCK Bit to lock the program memory access */
+    FLASH->PECR |= FLASH_PECR_PRGLOCK;
+    FLASH->PECR |= FLASH_PECR_PELOCK;
+}
+
+void flashpage_write_raw(void *target_addr, void *data, size_t len)
+{
+    /* The actual minimal block size for writing is 16B, thus we
+     * assert we write on multiples and no less of that length.
+     */
+    assert(!(len % FLASHPAGE_RAW_BLOCKSIZE));
+
+    /* ensure 4 byte aligned writes */
+    assert(!(((unsigned)target_addr % FLASHPAGE_RAW_ALIGNMENT) ||
+            ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
+
+    /* ensure the length doesn't exceed the actual flash size */
+    assert(((unsigned)target_addr + len) <
+           (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF)));
+
+    uint32_t *dst = (uint32_t *)target_addr;
+    uint32_t *data_addr = (uint32_t *)data;
+
+    /* write 4 bytes in one go */
+    len /= 4;
+
+    DEBUG("[flashpage_raw] unlocking the flash module\n");
+    _unlock();
+
+    DEBUG("[flashpage_raw] write: now writing the data\n");
+    for (size_t i = 0; i < len; i++) {
+        DEBUG("[flashpage_raw] writing %c to %p\n", (char)data_addr[i], dst);
+        *dst++ = *data_addr++;
+        while (FLASH->SR & FLASH_SR_BSY) {}
+    }
+    DEBUG("[flashpage_raw] write: done writing data\n");
+
+    DEBUG("flashpage_raw] now locking the flash module again\n");
+    _lock();
+}
+
+void flashpage_write(int page, void *data)
+{
+    assert(page < (int)FLASHPAGE_NUMOF);
+
+    /* Using 32bit addresses since we are attempting fast-word erasing/writing*/
+    uint32_t *page_addr = flashpage_addr(page);
+
+    DEBUG("[flashpage] unlocking the flash module\n");
+    _unlock();
 
     /* ERASE sequence */
     /* make sure no flash operation is ongoing */
@@ -153,19 +200,11 @@ void flashpage_write(int page, void *data)
     FLASH->PECR &= (uint32_t)(~FLASH_PECR_ERASE);
 
     if (data != NULL) {
-        DEBUG("[flashpage] write: now writing the data\n");
-        for (unsigned i = 0; i < (FLASHPAGE_SIZE / 4); i++) {
-            DEBUG("[flashpage] writing %c to %p\n", (char)data_addr[i], page_addr);
-            *page_addr++ = data_addr[i];
-            while (FLASH->SR & FLASH_SR_BSY) {}
-        }
-        DEBUG("[flashpage] write: done writing data\n");
+        flashpage_write_raw(page_addr, data, FLASHPAGE_SIZE);
     }
 
     DEBUG("flashpage] now locking the flash module again\n");
-    /* Set the PRGLOCK and PELOCK Bit to lock the program memory access */
-    FLASH->PECR |= FLASH_PECR_PRGLOCK;
-    FLASH->PECR |= FLASH_PECR_PELOCK;
+    _lock();
 }
 
 #endif /* defined(FLASHPAGE_SIZE) && defined(FLASHPAGE_NUMOF) */
