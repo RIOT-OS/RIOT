@@ -84,6 +84,9 @@ void stmclk_init_sysclk(void)
     RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV | RCC_CFGR_PLLMUL);
     /* Reset HSION, HSEON, CSSON and PLLON bits */
     RCC->CR &= ~(RCC_CR_HSION | RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON);
+    /* Disable any interrupts. Global interrupts could be enabled if this is
+     * called from some kind of bootloader...  */
+    unsigned state = irq_disable();
     /* Clear all interrupts */
     RCC->CIR = 0x0;
 
@@ -195,6 +198,9 @@ void stmclk_init_sysclk(void)
     /* Wait for sysyem clock to be ready before desabling other clocks*/
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != clock_cfgr_sw_rdy) {}
     RCC->CR &= ~(clock_disable_clocks);
+
+    /* Restore isr state*/
+    irq_restore(state);
 }
 
 void stmclk_switch_msi(uint32_t msi_range, uint32_t ahb_divider)
