@@ -73,7 +73,10 @@ int isrpipe_write_one(isrpipe_t *isrpipe, char c);
  *
  * @returns     number of byte read
  */
-int isrpipe_try_read(isrpipe_t *isrpipe, char *buf, size_t count);
+static inline int isrpipe_try_read(isrpipe_t *isrpipe, char *buf, size_t count)
+{
+    return tsrb_get(&isrpipe->tsrb, buf, count);
+}
 
 /**
  * @brief   Read data from isrpipe (blocking)
