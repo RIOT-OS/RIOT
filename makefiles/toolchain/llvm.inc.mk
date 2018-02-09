@@ -75,7 +75,7 @@ ifneq (,$(TARGET_ARCH))
   # include paths.
   export CFLAGS     += -target $(TARGET_ARCH) --sysroot $(GCC_SYSROOT)
   export CXXFLAGS   += -target $(TARGET_ARCH) --sysroot $(GCC_SYSROOT)
-  export LINKFLAGS  += -target $(TARGET_ARCH) --sysroot $(GCC_SYSROOT)
+  export LINKFLAGS  += -target $(TARGET_ARCH) --sysroot $(GCC_SYSROOT) -L$(GCC_SYSROOT)/lib -L$(GCC_SYSROOT)/usr/lib
 
   # Use the wildcard Makefile function to search for existing directories matching
   # the patterns above. We use the -isystem gcc/clang argument to add the include
