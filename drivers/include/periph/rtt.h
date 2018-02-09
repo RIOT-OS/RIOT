@@ -29,9 +29,6 @@
 extern "C" {
 #endif
 
-/* guard file in case no RTT device was specified */
-#if RTT_NUMOF
-
 #ifndef RTT_FREQUENCY
 #warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks" \
          "per second for the current architecture."
@@ -165,8 +162,6 @@ void rtt_poweron(void);
  * @brief Turn the RTT hardware module off
  */
 void rtt_poweroff(void);
-
-#endif /* RTT_NUMOF */
 
 #ifdef __cplusplus
 }
