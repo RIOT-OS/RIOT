@@ -871,10 +871,10 @@ static inline int _allocate_fd(int fd)
                 break;
             }
         }
-        if (fd >= VFS_MAX_OPEN_FILES) {
-            /* The _vfs_open_files array is full */
-            return -ENFILE;
-        }
+    }
+    if (fd >= VFS_MAX_OPEN_FILES) {
+        /* The _vfs_open_files array is full */
+        return -ENFILE;
     }
     else if (_vfs_open_files[fd].pid != KERNEL_PID_UNDEF) {
         /* The desired fd is already in use */
