@@ -290,7 +290,7 @@ void at_process_oob(at_dev_t *dev)
             continue;
         }
         p = buf;
-        while ((*p == '\r' || *p == '\n' || *p == ' ') && (p - buf < read)) {
+        while ((*p == '\r' || *p == '\n' || *p == ' ') && ((size_t)(p - buf) < read)) {
             p++;
         }
         clist_foreach(&dev->oob_list, _check_oob, p);
