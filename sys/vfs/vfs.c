@@ -21,6 +21,7 @@
 #include <sys/stat.h> /* for struct stat */
 #include <sys/statvfs.h> /* for struct statvfs */
 #include <fcntl.h> /* for O_ACCMODE, ..., fcntl */
+#include <unistd.h> /* for STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO */
 
 #include "vfs.h"
 #include "mutex.h"
@@ -867,6 +868,13 @@ static inline int _allocate_fd(int fd)
 {
     if (fd < 0) {
         for (fd = 0; fd < VFS_MAX_OPEN_FILES; ++fd) {
+            if ((fd == STDIN_FILENO) || (fd == STDOUT_FILENO) || (fd == STDERR_FILENO)) {
+                /* Do not auto-allocate the stdio file descriptor numbers to
+                 * avoid conflicts between normal file system users and stdio
+                 * drivers such as uart_stdio, rtt_stdio which need to be able
+                 * to bind to these specific file descriptor numbers. */
+                continue;
+            }
             if (_vfs_open_files[fd].pid == KERNEL_PID_UNDEF) {
                 break;
             }
