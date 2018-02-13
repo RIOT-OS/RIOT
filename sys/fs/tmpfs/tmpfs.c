@@ -269,9 +269,12 @@ static tmpfs_file_buf_t *find_buf_index(tmpfs_file_t *file, off_t pos, size_t *i
 static tmpfs_file_buf_t *alloc_buf(tmpfs_file_t *file, size_t nbytes)
 {
     tmpfs_file_buf_t *buf = TMPFS_MALLOC(sizeof(*buf));
-    void *data_buf = TMPFS_MALLOC(nbytes);
-    if (!buf || !data_buf) {
+    if (!buf) {
         return NULL;
+    }
+    void *data_buf = TMPFS_MALLOC(nbytes);
+    if (!data_buf) {
+        TMPFS_FREE(buf);
     }
     clist_rpush(&file->buf, &buf->next);
     buf->buf = data_buf;
