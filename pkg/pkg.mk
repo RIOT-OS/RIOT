@@ -4,6 +4,11 @@
 PKG_DIR?=$(CURDIR)
 PKG_BUILDDIR?=$(PKGDIRBASE)/$(PKG_NAME)
 
+# allow overriding package source with local folder (useful during development)
+ifneq (,$(PKG_SOURCE_LOCAL))
+  include $(RIOTBASE)/pkg/local.mk
+else
+
 .PHONY: prepare git-download clean
 
 prepare: git-download
@@ -39,3 +44,5 @@ clean::
 
 distclean::
 	rm -rf "$(PKG_BUILDDIR)"
+
+endif
