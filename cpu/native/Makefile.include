@@ -7,7 +7,3 @@ endif
 
 USEMODULE += periph
 USEMODULE += periph_uart
-
-ifeq ($(shell uname -s),Darwin)
-export CFLAGS += -D_XOPEN_SOURCE=600 -D_DARWIN_C_SOURCE
-endif
