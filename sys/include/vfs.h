@@ -562,6 +562,11 @@ struct vfs_file_system_ops {
 };
 
 /**
+ * @brief Initialize the VFS module
+ */
+void vfs_init(void);
+
+/**
  * @brief Close an open file
  *
  * @param[in]  fd    fd number to close

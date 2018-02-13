@@ -26,11 +26,6 @@
  */
 
 #include <stdio.h>
-#if MODULE_VFS
-#include <unistd.h>
-#include <errno.h>
-#include <fcntl.h>
-#endif
 #include "uart_stdio.h"
 
 #include "board.h"
@@ -42,46 +37,11 @@
 extern ethos_t ethos;
 #endif
 
-#if MODULE_VFS
-#include "vfs.h"
-#endif
-
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 static char _rx_buf_mem[UART_STDIO_RX_BUFSIZE];
 isrpipe_t uart_stdio_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
-
-#if MODULE_VFS
-static ssize_t uart_stdio_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes);
-static ssize_t uart_stdio_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes);
-
-/**
- * @brief VFS file operation table for stdin/stdout/stderr
- */
-static vfs_file_ops_t uart_stdio_vfs_ops = {
-    .read = uart_stdio_vfs_read,
-    .write = uart_stdio_vfs_write,
-};
-
-static ssize_t uart_stdio_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
-{
-    int fd = filp->private_data.value;
-    if (fd != STDIN_FILENO) {
-        return -EBADF;
-    }
-    return uart_stdio_read(dest, nbytes);
-}
-
-static ssize_t uart_stdio_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes)
-{
-    int fd = filp->private_data.value;
-    if (fd == STDIN_FILENO) {
-        return -EBADF;
-    }
-    return uart_stdio_write(src, nbytes);
-}
-#endif
 
 void uart_stdio_init(void)
 {
