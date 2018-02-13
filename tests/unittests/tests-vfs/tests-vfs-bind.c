@@ -19,6 +19,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "embUnit/embUnit.h"
 
@@ -71,6 +72,9 @@ static void test_vfs_bind(void)
     uint8_t buf[_VFS_TEST_BIND_BUFSIZE];
     fd = vfs_bind(VFS_ANY_FD, O_RDWR, &_test_bind_ops, &buf[0]);
     TEST_ASSERT(fd >= 0);
+    TEST_ASSERT(fd != STDIN_FILENO);
+    TEST_ASSERT(fd != STDOUT_FILENO);
+    TEST_ASSERT(fd != STDERR_FILENO);
     if (fd < 0) {
         return;
     }
