@@ -12,7 +12,7 @@ import sys
 
 def testfunc(child):
     child.expect_exact('\tmember, sizeof, offsetof')
-    child.expect_exact('sizeof(thread_t): 36')
+    child.expect(r'sizeof\(thread_t\): [36, 48]')
     child.expect_exact('\tsp            4   0')
     child.expect_exact('\tstatus        1   4')
     child.expect_exact('\tpriority      1   5')
