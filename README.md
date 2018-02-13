@@ -60,6 +60,8 @@ but not limited to:
 * RPL (storing mode, P2P mode)
 * CoAP
 * CCN-Lite
+* Sigfox
+* LoRaWAN (Experimental)
 
 
 ## GETTING STARTED
