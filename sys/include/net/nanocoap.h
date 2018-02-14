@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    sys_net_nanocoap nanocoap small CoAP library
- * @ingroup     sys_net
+ * @defgroup    net_nanocoap nanocoap small CoAP library
+ * @ingroup     net
  * @brief       Provides CoAP functionality optimized for minimal resource usage
  *
  * @{
@@ -192,6 +192,15 @@ extern "C" {
  */
 #define COAP_ACK_TIMEOUT        (2U)
 #define COAP_RANDOM_FACTOR      (1.5)
+
+/**
+ * @brief Maximum variation for confirmable timeout.
+ *
+ * Must be an integer, defined as:
+ *
+ *     (COAP_ACK_TIMEOUT * COAP_RANDOM_FACTOR) - COAP_ACK_TIMEOUT
+ */
+#define COAP_ACK_VARIANCE       (1U)
 #define COAP_MAX_RETRANSMIT     (4)
 #define COAP_NSTART             (1)
 #define COAP_DEFAULT_LEISURE    (5)
@@ -200,7 +209,7 @@ extern "C" {
 /**
  * @brief   Raw CoAP PDU header structure
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     uint8_t ver_t_tkl;          /**< version, token, token length           */
     uint8_t code;               /**< CoAP code (e.g.m 205)                  */
     uint16_t id;                /**< Req/resp ID                            */

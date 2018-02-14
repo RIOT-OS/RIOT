@@ -1,5 +1,4 @@
-ED = $(addprefix FEATURE_,$(sort $(filter $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))))
-ED += $(addprefix MODULE_,$(sort $(USEMODULE) $(USEPKG)))
+ED = $(addprefix MODULE_,$(sort $(USEMODULE) $(USEPKG)))
 EXTDEFINES = $(addprefix -D,$(shell echo '$(ED)' | tr 'a-z-' 'A-Z_'))
 
 # filter "pseudomodules" from "real modules", but not "no_pseudomodules"

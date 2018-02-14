@@ -31,6 +31,7 @@ static uint32_t before;
 static void callback(event_t *arg);
 static void custom_callback(event_t *event);
 static void timed_callback(void *arg);
+static void forbidden_callback(void *arg);
 
 
 static event_t event = { .handler = callback };
@@ -51,6 +52,7 @@ typedef struct {
 
 static custom_event_t custom_event = { .super.handler = custom_callback, .text = "CUSTOM CALLBACK" };
 static event_callback_t event_callback = EVENT_CALLBACK_INIT(timed_callback, 0x12345678);
+static event_callback_t noevent_callback = EVENT_CALLBACK_INIT(forbidden_callback, 0);
 
 static void custom_callback(event_t *event)
 {
@@ -69,7 +71,18 @@ static void timed_callback(void *arg)
     uint32_t now = xtimer_now_usec();
     assert((now - before >= 100000LU));
     printf("triggered timed callback with arg 0x%08x after %" PRIu32 "us\n", (unsigned)arg, now - before);
-    printf("[SUCCESS]\n");
+    puts("[SUCCESS]");
+}
+
+static void forbidden_callback(void *arg)
+{
+    (void)arg;
+    /* this callback should never be triggered! */
+    puts("call to forbidden callback");
+    puts("[FAILED]");
+    while (1) {
+        assert(false);
+    }
 }
 
 int main(void)
@@ -85,17 +98,25 @@ int main(void)
     printf("canceling 0x%08x\n", (unsigned)&event2);
     event_cancel(&queue, &event2);
 
-    printf("posting custom event\n");
+    puts("posting custom event");
     event_post(&queue, (event_t *)&custom_event);
 
     event_timeout_t event_timeout;
 
-    printf("posting timed callback with timeout 1sec\n");
+    puts("posting timed callback with timeout 1sec");
     event_timeout_init(&event_timeout, &queue, (event_t *)&event_callback);
     before = xtimer_now_usec();
-    event_timeout_set(&event_timeout, 100000LU);
+    event_timeout_set(&event_timeout, (1 * US_PER_SEC));
 
-    printf("launching event queue\n");
+    event_timeout_t event_timeout_canceled;
+
+    puts("posting timed callback with timeout 0.5sec and canceling it again");
+    event_timeout_init(&event_timeout_canceled, &queue,
+                       (event_t *)&noevent_callback);
+    event_timeout_set(&event_timeout_canceled, 500 * US_PER_MS);
+    event_timeout_clear(&event_timeout_canceled);
+
+    puts("launching event queue");
     event_loop(&queue);
 
     return 0;

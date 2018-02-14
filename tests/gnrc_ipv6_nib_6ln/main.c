@@ -88,7 +88,7 @@ static void _set_up(void)
     /* reset some fields not set by the nib interface initializer */
     _mock_netif->ipv6.mtu = IPV6_MIN_MTU;
     _mock_netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
-    gnrc_netif_ipv6_addr_remove(_mock_netif, &_loc_gb);
+    gnrc_netif_ipv6_addr_remove_internal(_mock_netif, &_loc_gb);
     _mock_netif->flags &= ~GNRC_NETIF_FLAGS_6LO_ADDRS_REG;
     gnrc_netif_release(_mock_netif);
     memset(_buffer, 0, sizeof(_buffer));
@@ -630,7 +630,7 @@ static void test_handle_pkt__nbr_adv__aro_not_my_eui64(void)
                                      SIXLOWPAN_ND_STATUS_SUCCESS);
     int idx;
 
-    idx = gnrc_netif_ipv6_addr_add(_mock_netif, &_loc_gb, _LOC_GB_PFX_LEN,
+    idx = gnrc_netif_ipv6_addr_add_internal(_mock_netif, &_loc_gb, _LOC_GB_PFX_LEN,
                                    GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
     TEST_ASSERT(idx >= 0);
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
@@ -648,7 +648,7 @@ static void test_handle_pkt__nbr_adv__aro_duplicate(void)
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_nc_set(&_rem_ll, _mock_netif->pid,
                                                   _rem_l2, sizeof(_rem_l2)));
-    idx = gnrc_netif_ipv6_addr_add(_mock_netif, &_loc_gb, _LOC_GB_PFX_LEN,
+    idx = gnrc_netif_ipv6_addr_add_internal(_mock_netif, &_loc_gb, _LOC_GB_PFX_LEN,
                                    GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE);
     TEST_ASSERT(idx >= 0);
     gnrc_ipv6_nib_handle_pkt(_mock_netif, ipv6, icmpv6, icmpv6_len);
@@ -1072,8 +1072,8 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
                                 "Unexpected prefix configured");
             TEST_ASSERT_EQUAL_INT(_LOC_GB_PFX_LEN, prefix.pfx_len);
             TEST_ASSERT_EQUAL_INT(_mock_netif->pid, prefix.iface);
-            TEST_ASSERT(_PIO_PFX_LTIME < prefix.valid_until);
-            TEST_ASSERT(_PIO_PFX_LTIME < prefix.pref_until);
+            TEST_ASSERT((_PIO_PFX_LTIME / MS_PER_SEC) < prefix.valid_until);
+            TEST_ASSERT((_PIO_PFX_LTIME / MS_PER_SEC) < prefix.pref_until);
         }
     }
     if (!pio) {

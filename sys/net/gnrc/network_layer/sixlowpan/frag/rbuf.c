@@ -46,9 +46,7 @@ static rbuf_int_t rbuf_int[RBUF_INT_SIZE];
 
 static rbuf_t rbuf[RBUF_SIZE];
 
-#if ENABLE_DEBUG
 static char l2addr_str[3 * RBUF_L2ADDR_MAX_LEN];
-#endif
 
 /* ------------------------------------
  * internal function definitions

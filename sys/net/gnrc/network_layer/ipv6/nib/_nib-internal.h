@@ -334,7 +334,7 @@ _nib_onl_entry_t *_nib_onl_iter(const _nib_onl_entry_t *last);
  *
  * @pre     `(addr != NULL)`
  *
- * @param[in] addr  The address of a node. May not be NULL.
+ * @param[in] addr  The address of a node. Must not be NULL.
  * @param[in] iface The interface to the node. May be 0 for any interface.
  *
  * @return  The NIB entry for node with @p addr and @p iface on success.
@@ -395,7 +395,7 @@ void _nib_nc_set_reachable(_nib_onl_entry_t *node);
  *
  * @pre `addr != NULL`
  *
- * @param[in] addr      The address of a node. May not be NULL.
+ * @param[in] addr      The address of a node. Must not be NULL.
  *
  * @return  The NIB entry for the new DAD table entry on success.
  * @return  NULL, if there is no space left.
@@ -425,9 +425,9 @@ static inline void _nib_dad_remove(_nib_onl_entry_t *node)
 /**
  * @brief   Creates or gets an existing default router list entry by address
  *
- * @pre     `(router_addr != NULL)`
+ * @pre     `(addr != NULL)`
  *
- * @param[in] addr  An IPv6 address. May not be NULL.
+ * @param[in] addr  An IPv6 address. Must not be NULL.
  *                  *May also be a global address!*
  * @param[in] iface The interface to the router.
  *
@@ -435,7 +435,7 @@ static inline void _nib_dad_remove(_nib_onl_entry_t *node)
  *          of _nib_dr_entry_t::next_hop set to @p router_addr.
  * @return  NULL, if no space is left.
  */
-_nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface);
+_nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *addr, unsigned iface);
 
 /**
  * @brief   Removes a default router list entry
@@ -460,7 +460,7 @@ _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last);
  *
  * @pre     `(router_addr != NULL)`
  *
- * @param[in] router_addr   The address of a default router. May not be NULL.
+ * @param[in] router_addr   The address of a default router. Must not be NULL.
  * @param[in] iface         The interface to the node. May be 0 for any
  *                          interface.
  *
@@ -499,7 +499,7 @@ _nib_dr_entry_t *_nib_drl_get_dr(void);
  *                      list). *May also be a global address!*
  * @param[in] iface     The interface to @p next_hop.
  * @param[in] pfx       The IPv6 prefix or address of the destination.
- *                      May not be NULL or unspecified address. Use
+ *                      Must not be NULL or unspecified address. Use
  *                      @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len   The length in bits of @p pfx in bits.
  *
@@ -545,7 +545,7 @@ bool _nib_offl_is_entry(const _nib_offl_entry_t *entry);
  *                      list). *May also be a global address!*
  * @param[in] iface     The interface to the destination.
  * @param[in] pfx       The IPv6 prefix or address of the destination.
- *                      May not be NULL or unspecified address. Use
+ *                      Must not be NULL or unspecified address. Use
  *                      @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len   The length in bits of @p pfx in bits.
  * @param[in] mode      [NIB-mode](_nib_onl_entry_t::mode).
@@ -585,7 +585,7 @@ static inline void _nib_offl_remove(_nib_offl_entry_t *nib_offl, uint8_t mode)
  * @pre     `(next_hop != NULL)`
  * @pre     `(dst != NULL)`
  *
- * @param[in] next_hop  Next hop to the destination. May not be NULL.
+ * @param[in] next_hop  Next hop to the destination. Must not be NULL.
  *                      *May also be a global address!*
  * @param[in] iface     The interface to the destination.
  *
@@ -627,7 +627,7 @@ static inline void _nib_dc_remove(_nib_offl_entry_t *nib_offl)
  *
  * @param[in] iface         The interface to the prefix is added to.
  * @param[in] pfx           The IPv6 prefix or address of the destination.
- *                          May not be NULL or unspecified address. Use
+ *                          Must not be NULL or unspecified address. Use
  *                          @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len       The length in bits of @p pfx in bits.
  * @param[in] valid_ltime   Valid lifetime in microseconds. `UINT32_MAX` for
@@ -661,11 +661,11 @@ void _nib_pl_remove(_nib_offl_entry_t *nib_offl);
  * @pre     `(next_hop != NULL)`
  * @pre     `(pfx != NULL) && (pfx != "::") && (pfx_len != 0) && (pfx_len <= 128)`
  *
- * @param[in] next_hop  Next hop to the destination. May not be NULL.
+ * @param[in] next_hop  Next hop to the destination. Must not be NULL.
  *                      *May also be a global address!*
  * @param[in] iface     The interface to the destination.
  * @param[in] pfx       The IPv6 prefix or address of the destination.
- *                      May not be NULL or unspecified address. Use
+ *                      Must not be NULL or unspecified address. Use
  *                      @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len   The length in bits of @p pfx in bits.
  *

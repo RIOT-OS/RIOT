@@ -1,4 +1,4 @@
-ifdef SLOT0_SIZE
+ifdef MCUBOOT_SLOT0_SIZE
 
 IMGTOOL ?= $(RIOTBASE)/dist/tools/mcuboot/imgtool.py
 override IMGTOOL := $(abspath $(IMGTOOL))
@@ -23,14 +23,14 @@ endif
 
 mcuboot: mcuboot-create-key link
 	@$(COLOR_ECHO)
-	@$(COLOR_ECHO) '${COLOR_PURPLE}Re-linking for MCUBoot at $(SLOT0_SIZE)...${COLOR_RESET}'
+	@$(COLOR_ECHO) '${COLOR_PURPLE}Re-linking for MCUBoot at $(MCUBOOT_SLOT0_SIZE)...${COLOR_RESET}'
 	@$(COLOR_ECHO)
-	$(Q)$(_LINK) $(LINKFLAGPREFIX)--defsym=offset="$$(($(SLOT0_SIZE) + $(IMAGE_HDR_SIZE)))" \
-	$(LINKFLAGPREFIX)--defsym=length="$$(($(SLOT1_SIZE) - $(IMAGE_HDR_SIZE)))" \
+	$(Q)$(_LINK) $(LINKFLAGPREFIX)--defsym=offset="$$(($(MCUBOOT_SLOT0_SIZE) + $(IMAGE_HDR_SIZE)))" \
+	$(LINKFLAGPREFIX)--defsym=length="$$(($(MCUBOOT_SLOT1_SIZE) - $(IMAGE_HDR_SIZE)))" \
 	$(LINKFLAGPREFIX)--defsym=image_header="$(IMAGE_HDR_SIZE)" -o $(ELFFILE) && \
 	$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(BINFILE) && \
 	$(IMGTOOL) sign --key $(MCUBOOT_KEYFILE) --version $(IMAGE_VERSION) --align \
-	$(IMAGE_ALIGN) -H $(IMAGE_HDR_SIZE) $(BINFILE) $(SIGN_BINFILE)
+	$(MCUBOOT_IMAGE_ALIGN) -H $(IMAGE_HDR_SIZE) $(BINFILE) $(SIGN_BINFILE)
 	@$(COLOR_ECHO)
 	@$(COLOR_ECHO) '${COLOR_PURPLE}Signed with $(MCUBOOT_KEYFILE) for version $(IMAGE_VERSION)\
 	${COLOR_RESET}'
@@ -47,10 +47,10 @@ mcuboot-flash-bootloader: $(MCUBOOT_BIN) $(FLASHDEPS)
 
 mcuboot-flash: HEXFILE = $(SIGN_BINFILE)
 mcuboot-flash: mcuboot $(FLASHDEPS) mcuboot-flash-bootloader
-	FLASH_ADDR=$(SLOT0_SIZE) $(FLASHER) $(FFLAGS)
+	FLASH_ADDR=$(MCUBOOT_SLOT0_SIZE) $(FLASHER) $(FFLAGS)
 
 else
 mcuboot:
 	$(Q)echo "error: mcuboot not supported on board $(BOARD)!"
 	$(Q)false
-endif # SLOT0_SIZE
+endif # MCUBOOT_SLOT0_SIZE

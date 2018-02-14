@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_microbit BBC micro:bit
  * @ingroup     boards
- * @brief       Board specific files for the BBC micro:bit
+ * @brief       Support for the BBC micro:bit
  * @{
  *
  * @file

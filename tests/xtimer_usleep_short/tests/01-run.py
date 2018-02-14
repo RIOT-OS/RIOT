@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright (C) 2017 Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
 #
@@ -9,9 +9,6 @@
 import os
 import sys
 import pexpect
-
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
 
 
 def testfunc(child):
@@ -30,5 +27,8 @@ def testfunc(child):
 
     child.expect(u"[SUCCESS]", timeout=3)
 
+
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

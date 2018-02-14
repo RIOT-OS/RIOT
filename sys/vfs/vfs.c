@@ -21,6 +21,7 @@
 #include <sys/stat.h> /* for struct stat */
 #include <sys/statvfs.h> /* for struct statvfs */
 #include <fcntl.h> /* for O_ACCMODE, ..., fcntl */
+#include <unistd.h> /* for STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO */
 
 #include "vfs.h"
 #include "mutex.h"
@@ -407,15 +408,25 @@ int vfs_closedir(vfs_DIR *dirp)
     return res;
 }
 
-int vfs_mount(vfs_mount_t *mountp)
+/**
+ * @brief Check if the given mount point is mounted
+ *
+ * If the mount point is not mounted, _mount_mutex will be locked by this function
+ *
+ * @param mountp    mount point to check
+ * @return 0 on success (mount point is valid and not mounted)
+ * @return -EINVAL if mountp is invalid
+ * @return -EBUSY if mountp is already mounted
+ */
+static int check_mount(vfs_mount_t *mountp)
 {
-    DEBUG("vfs_mount: %p\n", (void *)mountp);
     if ((mountp == NULL) || (mountp->fs == NULL) || (mountp->mount_point == NULL)) {
         return -EINVAL;
     }
-    DEBUG("vfs_mount: -> \"%s\" (%p), %p\n", mountp->mount_point, (void *)mountp->mount_point, mountp->private_data);
+    DEBUG("vfs_mount: -> \"%s\" (%p), %p\n",
+          mountp->mount_point, (void *)mountp->mount_point, mountp->private_data);
     if (mountp->mount_point[0] != '/') {
-        DEBUG("vfs_mount: not absolute mount_point path\n");
+        DEBUG("vfs: check_mount: not absolute mount_point path\n");
         return -EINVAL;
     }
     mountp->mount_point_len = strlen(mountp->mount_point);
@@ -425,14 +436,46 @@ int vfs_mount(vfs_mount_t *mountp)
     if (found != NULL) {
         /* Same mount is already mounted */
         mutex_unlock(&_mount_mutex);
-        DEBUG("vfs_mount: Already mounted\n");
+        DEBUG("vfs: check_mount: Already mounted\n");
         return -EBUSY;
     }
+
+    return 0;
+}
+
+int vfs_format(vfs_mount_t *mountp)
+{
+    DEBUG("vfs_format: %p\n", (void *)mountp);
+    int ret = check_mount(mountp);
+    if (ret < 0) {
+        return ret;
+    }
+    mutex_unlock(&_mount_mutex);
+
+    if (mountp->fs->fs_op != NULL) {
+        if (mountp->fs->fs_op->format != NULL) {
+            return mountp->fs->fs_op->format(mountp);
+        }
+    }
+
+    /* Format operation not supported */
+    return -ENOTSUP;
+}
+
+int vfs_mount(vfs_mount_t *mountp)
+{
+    DEBUG("vfs_mount: %p\n", (void *)mountp);
+    int ret = check_mount(mountp);
+    if (ret < 0) {
+        return ret;
+    }
+
     if (mountp->fs->fs_op != NULL) {
         if (mountp->fs->fs_op->mount != NULL) {
             /* yes, a file system driver does not need to implement mount/umount */
             int res = mountp->fs->fs_op->mount(mountp);
             if (res < 0) {
+                DEBUG("vfs_mount: error %d\n", res);
                 mutex_unlock(&_mount_mutex);
                 return res;
             }
@@ -449,10 +492,19 @@ int vfs_mount(vfs_mount_t *mountp)
 int vfs_umount(vfs_mount_t *mountp)
 {
     DEBUG("vfs_umount: %p\n", (void *)mountp);
-    if ((mountp == NULL) || (mountp->mount_point == NULL)) {
+    int ret = check_mount(mountp);
+    switch (ret) {
+    case 0:
+        DEBUG("vfs_umount: not mounted\n");
+        mutex_unlock(&_mount_mutex);
+        return -EINVAL;
+    case -EBUSY:
+        /* -EBUSY returned when fs is mounted, just continue */
+        break;
+    default:
+        DEBUG("vfs_umount: invalid fs\n");
         return -EINVAL;
     }
-    mutex_lock(&_mount_mutex);
     DEBUG("vfs_umount: -> \"%s\" open=%d\n", mountp->mount_point, atomic_load(&mountp->open_files));
     if (atomic_load(&mountp->open_files) > 0) {
         mutex_unlock(&_mount_mutex);
@@ -727,7 +779,8 @@ int vfs_bind(int fd, int flags, const vfs_file_ops_t *f_op, void *private_data)
 
 int vfs_normalize_path(char *buf, const char *path, size_t buflen)
 {
-    DEBUG("vfs_normalize_path: %p, \"%s\" (%p), %lu\n", buf, path, path, (unsigned long)buflen);
+    DEBUG("vfs_normalize_path: %p, \"%s\" (%p), %lu\n",
+          (void *)buf, path, (void *)path, (unsigned long)buflen);
     size_t len = 0;
     int npathcomp = 0;
     const char *path_end = path + strlen(path); /* Find the terminating null byte */
@@ -736,7 +789,8 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen)
     }
 
     while(path <= path_end) {
-        DEBUG("vfs_normalize_path: + %d \"%.*s\" <- \"%s\" (%p)\n", npathcomp, len, buf, path, path);
+        DEBUG("vfs_normalize_path: + %d \"%.*s\" <- \"%s\" (%p)\n",
+              npathcomp, (int)len, buf, path, (void *)path);
         if (path[0] == '\0') {
             break;
         }
@@ -814,14 +868,21 @@ static inline int _allocate_fd(int fd)
 {
     if (fd < 0) {
         for (fd = 0; fd < VFS_MAX_OPEN_FILES; ++fd) {
+            if ((fd == STDIN_FILENO) || (fd == STDOUT_FILENO) || (fd == STDERR_FILENO)) {
+                /* Do not auto-allocate the stdio file descriptor numbers to
+                 * avoid conflicts between normal file system users and stdio
+                 * drivers such as uart_stdio, rtt_stdio which need to be able
+                 * to bind to these specific file descriptor numbers. */
+                continue;
+            }
             if (_vfs_open_files[fd].pid == KERNEL_PID_UNDEF) {
                 break;
             }
         }
-        if (fd >= VFS_MAX_OPEN_FILES) {
-            /* The _vfs_open_files array is full */
-            return -ENFILE;
-        }
+    }
+    if (fd >= VFS_MAX_OPEN_FILES) {
+        /* The _vfs_open_files array is full */
+        return -ENFILE;
     }
     else if (_vfs_open_files[fd].pid != KERNEL_PID_UNDEF) {
         /* The desired fd is already in use */

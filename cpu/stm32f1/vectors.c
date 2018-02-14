@@ -130,7 +130,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [41] = isr_rtc_alarm,            /* [41] RTC Alarm through EXTI Line Interrupt */
     [42] = isr_usbwakeup,            /* [42] USB Device WakeUp from suspend through EXTI Line Interrupt */
 
-#if defined(CPU_MODEL_STM32F103RE)
+#if defined(CPU_MODEL_STM32F103RE) || defined(CPU_MODEL_STM32F103ZE)
     [43] = isr_tim8_brk,             /* [43] TIM8 Break Interrupt */
     [44] = isr_tim8_up,              /* [44] TIM8 Update Interrupt */
     [45] = isr_tim8_trg_com,         /* [45] TIM8 Trigger and Commutation Interrupt */

@@ -92,9 +92,11 @@
  *
  * Allocate a buffer and a coap_pkt_t for the request.
  *
- * If there is a payload, follow the three steps below.
+ * If there is a payload, follow the steps below.
  *
  * -# Call gcoap_req_init() to initialize the request.
+ *    -# Optionally, mark the request confirmable by calling
+ *       coap_hdr_set_type() with COAP_TYPE_CON.
  * -# Write the request payload, starting at the updated _payload_ pointer
  *    in the coap_pkt_t.
  * -# Call gcoap_finish(), which updates the packet for the payload.
@@ -413,6 +415,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Count of PDU buffers available for resending confirmable messages
+ */
+#ifndef GCOAP_RESEND_BUFS_MAX
+#define GCOAP_RESEND_BUFS_MAX      (1)
+#endif
+
+/**
  * @brief   A modular collection of resources for a server
  */
 typedef struct gcoap_listener {
@@ -435,7 +444,6 @@ typedef void (*gcoap_resp_handler_t)(unsigned req_state, coap_pkt_t* pdu,
  * @brief  Extends request memo for resending a confirmable request.
  */
 typedef struct {
-    sock_udp_ep_t remote_ep;            /**< Remote endpoint */
     uint8_t *pdu_buf;                   /**< Buffer containing the PDU */
     size_t pdu_len;                     /**< Length of pdu_buf */
 } gcoap_resend_t;
@@ -453,6 +461,7 @@ typedef struct {
         gcoap_resend_t data;            /**< Endpoint and PDU buffer, for resend */
     } msg;                              /**< Request message data; if confirmable,
                                              supports resending message */
+    sock_udp_ep_t remote_ep;            /**< Remote endpoint */
     gcoap_resp_handler_t resp_handler;  /**< Callback for the response */
     xtimer_t response_timer;            /**< Limits wait for response */
     msg_t timeout_msg;                  /**< For response timer */
@@ -484,6 +493,10 @@ typedef struct {
                                              observe memos */
     gcoap_observe_memo_t observe_memos[GCOAP_OBS_REGISTRATIONS_MAX];
                                         /**< Observed resource registrations */
+    uint8_t resend_bufs[GCOAP_RESEND_BUFS_MAX][GCOAP_PDU_BUF_SIZE];
+                                        /**< Buffers for PDU for request resends;
+                                             if first byte of an entry is zero,
+                                             the entry is available */
 } gcoap_state_t;
 
 /**

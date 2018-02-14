@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup   boards_nucleo144-common
+ * @ingroup     boards_common_nucleo144
  * @{
  *
  * @file
- * @brief     Board specific configuration of direct mapped GPIOs
+ * @brief       Board specific configuration of direct mapped GPIOs
  *
- * @author    Alexandre Abadie <alexandre.abadie@inria.fr>
- * @author    Sebastian Meiling <s@mlng.net>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef GPIO_PARAMS_H

@@ -10,9 +10,6 @@ from __future__ import print_function
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 how_many = 100
 
 
@@ -25,5 +22,8 @@ def testfunc(child):
     print("Stopped after %i iterations, but should run forever." % how_many)
     print("=> All tests successful")
 
+
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc, echo=False))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc, echo=False))

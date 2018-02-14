@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 #
@@ -307,8 +307,9 @@ def test_triple_send(board_group, application, env=None):
         sender.expect_exact(u"Success: send 4 byte over TCP to server")
         receiver.expect(u"00000000  DE  AD  BE  EF")
 
+
 if __name__ == "__main__":
-    TestStrategy().execute([BoardGroup((Board("native", "tap0"), \
-                            Board("native", "tap1")))], \
+    TestStrategy().execute([BoardGroup((Board("native", "tap0"),
+                            Board("native", "tap1")))],
                            [test_ipv6_send, test_udpv6_send, test_tcpv6_send,
                             test_triple_send])

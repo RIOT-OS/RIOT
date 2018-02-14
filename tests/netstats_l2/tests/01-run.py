@@ -18,6 +18,7 @@ def testfunc(child):
     child.expect(r'        TX packets \d+ \(Multicast: \d+\)  bytes \d+')
     child.expect(r'        TX succeeded \d+ errors \d+')
 
+
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
     from testrunner import run

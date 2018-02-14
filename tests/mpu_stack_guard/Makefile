@@ -19,7 +19,7 @@ BOARD_WHITELIST += msbiot           # cortex-m4f
 BOARD_WHITELIST += mulle            # cortex-m4
 BOARD_WHITELIST += nrf52dk          # cortex-m4f
 BOARD_WHITELIST += nucleo-f103      # cortex-m3
-BOARD_WHITELIST += nucleo-f207      # cortex-m3
+BOARD_WHITELIST += nucleo-f207zg    # cortex-m3
 BOARD_WHITELIST += nucleo-f303      # cortex-m4f
 BOARD_WHITELIST += nucleo-f334      # cortex-m4f
 BOARD_WHITELIST += nucleo-f401      # cortex-m4f
@@ -38,8 +38,6 @@ BOARD_WHITELIST += spark-core       # cortex-m3
 BOARD_WHITELIST += stm32f3discovery # cortex-m4f
 BOARD_WHITELIST += stm32f4discovery # cortex-m4f
 BOARD_WHITELIST += udoo             # cortex-m3
-
-CFLAGS += -DDEVELHELP
 
 USEMODULE += mpu_stack_guard
 

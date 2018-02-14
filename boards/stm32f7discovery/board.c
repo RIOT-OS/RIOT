@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Board specific implementations for the STM32F7Discovery evaluation board
+ * @brief       Board specific implementations for the STM32F769 Discovery board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  *

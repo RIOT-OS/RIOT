@@ -1,8 +1,7 @@
 export ROMABLE = 1
 
-include $(RIOTMAKE)/arch/mips.inc.mk
 include $(RIOTCPU)/mips_pic32_common/Makefile.include
-include $(RIOTCPU)/mips32r2_common/Makefile.include
+include $(RIOTMAKE)/arch/mips.inc.mk
 
 # define build specific options
 export CFLAGS += -march=m4k -DSKIP_COPY_TO_RAM

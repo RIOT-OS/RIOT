@@ -68,7 +68,16 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
   USEMODULE += ble_6lowpan
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_iphc
+  USEMODULE += gnrc_ipv6_nib_6ln
   USEMODULE += gnrc_ipv6_default
+  # prevent application from being a router
+  # TODO: maybe find a nicer solution in future build system update
+  _ROUTER_MODULES = gnrc_ipv6_router% gnrc_rpl netstats_rpl auto_init_gnrc_rpl
+  ifneq (,$(filter $(_ROUTER_MODULES),$(USEMODULE)))
+    $(warning nordic_softdevice_ble: Disabling router modules:\
+      $(filter $(_ROUTER_MODULES),$(USEMODULE)))
+  endif
+  USEMODULE := $(filter-out $(_ROUTER_MODULES),$(USEMODULE))
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
@@ -129,7 +138,7 @@ ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter ieee802154,$(USEMODULE)))
+ifneq (,$(filter ieee802154 nrfmin,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
   endif
@@ -652,6 +661,12 @@ ifneq (,$(filter spiffs,$(USEMODULE)))
   USEMODULE += spiffs_fs
   USEMODULE += mtd
 endif
+ifneq (,$(filter littlefs,$(USEMODULE)))
+  USEPKG += littlefs
+  USEMODULE += vfs
+  USEMODULE += littlefs_fs
+  USEMODULE += mtd
+endif
 
 ifneq (,$(filter l2filter_%,$(USEMODULE)))
   USEMODULE += l2filter
@@ -672,6 +687,11 @@ endif
 
 ifneq (,$(filter ccn-lite,$(USEPKG)))
   USEMODULE += ccn-lite-utils
+endif
+
+ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
+  USEPKG += fatfs
+  USEMODULE += vfs
 endif
 
 # always select gpio (until explicit dependencies are sorted out)

@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_remote
+ * @ingroup     boards_common_remote
  * @{
  *
  * @file
@@ -71,6 +71,24 @@ static const timer_conf_t timer_config[] = {
  * @{
  */
 #define RADIO_IRQ_PRIO      1
+/** @} */
+
+
+/**
+ * @name    UART configuration
+ * @{
+ */
+#define UART_NUMOF          (1U)
+#define UART_0_EN           1
+#define UART_IRQ_PRIO       1
+
+/* UART 0 device configuration */
+#define UART_0_DEV          UART0
+#define UART_0_IRQ          UART0_IRQn
+#define UART_0_ISR          isr_uart0
+/* UART 0 pin configuration */
+#define UART_0_TX_PIN       GPIO_PIN(0, 1)  /**< GPIO_PA1 */
+#define UART_0_RX_PIN       GPIO_PIN(0, 0)  /**< GPIO_PA0 */
 /** @} */
 
 #ifdef __cplusplus

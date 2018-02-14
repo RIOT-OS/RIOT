@@ -9,11 +9,11 @@
 /**
  * @defgroup    boards_airfy-beacon Airfy Beacon
  * @ingroup     boards
- * @brief       Board specific files for the Arify Beacon board
+ * @brief       Support for the Airfy Beacon board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Arify Beacon board
+ * @brief       Board specific definitions for the Airfy Beacon board
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */

@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_nrf52840dk nRF52840 DK
  * @ingroup     boards
- * @brief       Board specific configuration for the nRF52840 DK
+ * @brief       Support for the nRF52840 DK
  * @{
  *
  * @file
@@ -42,6 +42,7 @@ extern "C" {
 #define LED1_MASK           (1 << 14)
 #define LED2_MASK           (1 << 15)
 #define LED3_MASK           (1 << 16)
+#define LED_MASK            (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK)
 
 #define LED0_ON             (LED_PORT->OUTCLR = LED0_MASK)
 #define LED0_OFF            (LED_PORT->OUTSET = LED0_MASK)

@@ -7,6 +7,6 @@ PKG_LICENSE=MIT
 
 all: git-download
 	@cp Makefile.umorse $(PKG_BUILDDIR)/Makefile
-	$(MAKE) -C $(PKG_BUILDDIR)
+	"$(MAKE)" -C $(PKG_BUILDDIR)
 
 include $(RIOTBASE)/pkg/pkg.mk

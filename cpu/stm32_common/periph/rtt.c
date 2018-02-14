@@ -22,6 +22,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "periph/rtt.h"
+#include "stmclk.h"
 
 /* this driver is only valid for STM CPUs that provide LPTIMERs */
 #if defined(LPTIM1)
@@ -47,6 +48,26 @@
 #error "RTT config: RTT_FREQUENCY not configured or invalid for your board"
 #endif
 
+
+#if !defined(CPU_FAM_STM32F4)
+#define CLOCK_SRC_REG       RCC->CCIPR
+#define CLOCK_SRC_MASK      RCC_CCIPR_LPTIM1SEL
+#if CLOCK_LSE
+#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_1 | RCC_CCIPR_LPTIM1SEL_0)
+#else
+#define CLOCK_SRC_CFG       (RCC_CCIPR_LPTIM1SEL_0)
+#endif
+#else
+#define CLOCK_SRC_REG       RCC->DCKCFGR2
+#define CLOCK_SRC_MASK      RCC_DCKCFGR2_LPTIM1SEL
+#if CLOCK_LSE
+#define CLOCK_SRC_CFG       (RCC_DCKCFGR2_LPTIM1SEL_1 | RCC_DCKCFGR2_LPTIM1SEL_0)
+#else
+#define CLOCK_SRC_CFG       (RCC_DCKCFGR2_LPTIM1SEL_0)
+#endif
+#endif
+
+
 /* allocate memory for overflow and alarm callbacks + args */
 static rtt_cb_t ovf_cb = NULL;
 static void *ovf_arg;
@@ -55,6 +76,7 @@ static void *to_arg;
 
 void rtt_init(void)
 {
+    stmclk_enable_lfclk();
     /* power on the selected LPTIMER */
     rtt_poweron();
 
@@ -62,12 +84,8 @@ void rtt_init(void)
     LPTIM1->CR = 0;
 
     /* select low speed clock (LSI or LSE) */
-    RCC->CCIPR &= ~(RCC_CCIPR_LPTIM1SEL);
-#if CLOCK_LSE
-    RCC->CCIPR |= (RCC_CCIPR_LPTIM1SEL_1 | RCC_CCIPR_LPTIM1SEL_0);
-#else
-    RCC->CCIPR |= (RCC_CCIPR_LPTIM1SEL_0);
-#endif
+    CLOCK_SRC_REG &= ~(CLOCK_SRC_MASK);
+    CLOCK_SRC_REG |= CLOCK_SRC_CFG;
 
     /* set configuration: prescale factor and external clock (LSI or LSE) */
     LPTIM1->CFGR = PRE;

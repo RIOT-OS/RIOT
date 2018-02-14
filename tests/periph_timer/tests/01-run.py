@@ -9,9 +9,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 
 def testfunc(child):
     child.expect('Available timers: (\d+)')
@@ -23,5 +20,8 @@ def testfunc(child):
         child.expect_exact('TIMER_{}: starting'.format(timer))
     child.expect('TEST SUCCEEDED')
 
+
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

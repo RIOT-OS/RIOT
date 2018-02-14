@@ -24,6 +24,7 @@
 #include "net/gnrc.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/hdr.h"
+#include "net/lora.h"
 
 #ifdef MODULE_NETSTATS
 #include "net/netstats.h"
@@ -68,6 +69,9 @@ static const struct {
     { "promisc", NETOPT_PROMISCUOUSMODE },
     { "raw", NETOPT_RAWMODE },
     { "rtr_adv", NETOPT_IPV6_SND_RTR_ADV },
+    { "iq_invert", NETOPT_IQ_INVERT },
+    { "rx_single", NETOPT_SINGLE_RECEIVE },
+    { "chan_hop", NETOPT_CHANNEL_HOP }
 };
 
 /* utility functions */
@@ -132,7 +136,7 @@ static int _netif_stats(kernel_pid_t iface, unsigned module, bool reset)
     }
     return res;
 }
-#endif // MODULE_NETSTATS
+#endif /* MODULE_NETSTATS */
 
 static void _set_usage(char *cmd_name)
 {
@@ -143,6 +147,7 @@ static void _set_usage(char *cmd_name)
          "       * \"addr_long\" - sets long address\n"
          "       * \"addr_short\" - alias for \"addr\"\n"
          "       * \"cca_threshold\" - set ED threshold during CCA in dBm\n"
+         "       * \"freq\" - sets the \"channel\" center frequency\n"
          "       * \"channel\" - sets the frequency channel\n"
          "       * \"chan\" - alias for \"channel\"\n"
          "       * \"csma_retries\" - set max. number of channel access attempts\n"
@@ -155,6 +160,9 @@ static void _set_usage(char *cmd_name)
          "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
+         "       * \"bw\" - alias for channel bandwidth\n"
+         "       * \"sf\" - alias for spreading factor\n"
+         "       * \"cr\" - alias for coding rate\n"
          "       * \"power\" - TX power in dBm\n"
          "       * \"retrans\" - max. number of retransmissions\n"
          "       * \"src_len\" - sets the source address length in byte\n"
@@ -212,6 +220,10 @@ static void _print_netopt(netopt_t opt)
             printf("channel");
             break;
 
+        case NETOPT_CHANNEL_FREQUENCY:
+            printf("frequency [in Hz]");
+            break;
+
         case NETOPT_CHANNEL_PAGE:
             printf("page");
             break;
@@ -252,6 +264,18 @@ static void _print_netopt(netopt_t opt)
             printf("encryption key");
             break;
 
+        case NETOPT_BANDWIDTH:
+            printf("bandwidth");
+            break;
+
+        case NETOPT_SPREADING_FACTOR:
+            printf("spreading factor");
+            break;
+
+        case NETOPT_CODING_RATE:
+            printf("coding rate");
+            break;
+
         default:
             /* we don't serve these options here */
             break;
@@ -266,6 +290,19 @@ static const char *_netopt_state_str[] = {
     [NETOPT_STATE_TX] = "TX",
     [NETOPT_STATE_RESET] = "RESET",
     [NETOPT_STATE_STANDBY] = "STANDBY"
+};
+
+static const char *_netopt_bandwidth_str[] = {
+    [LORA_BW_125_KHZ] = "125",
+    [LORA_BW_250_KHZ] = "250",
+    [LORA_BW_500_KHZ] = "500"
+};
+
+static const char *_netopt_coding_rate_str[] = {
+    [LORA_CR_4_5] = "4/5",
+    [LORA_CR_4_6] = "4/6",
+    [LORA_CR_4_7] = "4/7",
+    [LORA_CR_4_8] = "4/8"
 };
 
 /* for some lines threshold might just be 0, so we can't use _LINE_THRESHOLD
@@ -346,6 +383,7 @@ static void _netif_list(kernel_pid_t iface)
     ipv6_addr_t ipv6_groups[GNRC_NETIF_IPV6_GROUPS_NUMOF];
 #endif
     uint8_t hwaddr[GNRC_NETIF_L2ADDR_MAXLEN];
+    uint32_t u32;
     uint16_t u16;
     int16_t i16;
     uint8_t u8;
@@ -364,6 +402,10 @@ static void _netif_list(kernel_pid_t iface)
     if (res >= 0) {
         printf(" Channel: %" PRIu16 " ", u16);
     }
+    res = gnrc_netapi_get(iface, NETOPT_CHANNEL_FREQUENCY, 0, &u32, sizeof(u32));
+    if (res >= 0) {
+        printf(" Frequency: %" PRIu32 "Hz ", u32);
+    }
     res = gnrc_netapi_get(iface, NETOPT_CHANNEL_PAGE, 0, &u16, sizeof(u16));
     if (res >= 0) {
         printf(" Page: %" PRIu16 " ", u16);
@@ -371,6 +413,18 @@ static void _netif_list(kernel_pid_t iface)
     res = gnrc_netapi_get(iface, NETOPT_NID, 0, &u16, sizeof(u16));
     if (res >= 0) {
         printf(" NID: 0x%" PRIx16, u16);
+    }
+    res = gnrc_netapi_get(iface, NETOPT_BANDWIDTH, 0, &u8, sizeof(u8));
+    if (res >= 0) {
+        printf(" BW: %skHz ", _netopt_bandwidth_str[u8]);
+    }
+    res = gnrc_netapi_get(iface, NETOPT_SPREADING_FACTOR, 0, &u8, sizeof(u8));
+    if (res >= 0) {
+        printf(" SF: %u ", u8);
+    }
+    res = gnrc_netapi_get(iface, NETOPT_CODING_RATE, 0, &u8, sizeof(u8));
+    if (res >= 0) {
+        printf(" CR: %s ", _netopt_coding_rate_str[u8]);
     }
     line_thresh = _newline(0U, line_thresh);
     res = gnrc_netapi_get(iface, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
@@ -421,6 +475,12 @@ static void _netif_list(kernel_pid_t iface)
                                    line_thresh);
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
     line_thresh = _netif_list_flag(iface, NETOPT_AUTOCCA, "AUTOCCA",
+                                   line_thresh);
+    line_thresh = _netif_list_flag(iface, NETOPT_IQ_INVERT, "IQ_INVERT",
+                                   line_thresh);
+    line_thresh = _netif_list_flag(iface, NETOPT_SINGLE_RECEIVE, "RX_SINGLE",
+                                   line_thresh);
+    line_thresh = _netif_list_flag(iface, NETOPT_CHANNEL_HOP, "CHAN_HOP",
                                    line_thresh);
 #ifdef MODULE_GNRC_IPV6
     res = gnrc_netapi_get(iface, NETOPT_MAX_PACKET_SIZE, GNRC_NETTYPE_IPV6, &u16, sizeof(u16));
@@ -512,6 +572,112 @@ static void _netif_list(kernel_pid_t iface)
     _netif_stats(iface, NETSTATS_IPV6, false);
 #endif
     puts("");
+}
+
+static int _netif_set_u32(kernel_pid_t iface, netopt_t opt, uint32_t context,
+                          char *u32_str)
+{
+    unsigned long int res;
+    bool hex = false;
+
+    if (_is_number(u32_str)) {
+        if ((res = strtoul(u32_str, NULL, 10)) == ULONG_MAX) {
+            puts("error: unable to parse value.\n"
+                 "Must be a 32-bit unsigned integer (dec or hex)\n");
+            return 1;
+        }
+    }
+    else {
+        if ((res = strtoul(u32_str, NULL, 32)) == ULONG_MAX) {
+            puts("error: unable to parse value.\n"
+                 "Must be a 32-bit unsigned integer (dec or hex)\n");
+            return 1;
+        }
+
+        hex = true;
+    }
+
+    assert(res <= ULONG_MAX);
+
+    if (gnrc_netapi_set(iface, opt, context, (uint32_t *)&res,
+                        sizeof(uint32_t)) < 0) {
+        printf("error: unable to set ");
+        _print_netopt(opt);
+        puts("");
+        return 1;
+    }
+
+    printf("success: set ");
+    _print_netopt(opt);
+    printf(" on interface %" PRIkernel_pid " to ", iface);
+
+    if (hex) {
+        printf("0x%04lx\n", res);
+    }
+    else {
+        printf("%lu\n", res);
+    }
+
+    return 0;
+}
+
+static int _netif_set_bandwidth(kernel_pid_t iface, char *value)
+{
+    uint8_t bw;
+
+    if (strcmp("125", value) == 0) {
+        bw = LORA_BW_125_KHZ;
+    }
+    else if (strcmp("250", value) == 0) {
+        bw = LORA_BW_250_KHZ;
+    }
+    else if (strcmp("500", value) == 0) {
+        bw = LORA_BW_500_KHZ;
+    }
+    else {
+        puts("usage: ifconfig <if_id> set bw [125|250|500]");
+        return 1;
+    }
+    if (gnrc_netapi_set(iface, NETOPT_BANDWIDTH, 0,
+                        &bw, sizeof(uint8_t)) < 0) {
+        printf("error: unable to set bandwidth to %s\n", value);
+        return 1;
+    }
+    printf("success: set bandwidth of interface %" PRIkernel_pid " to %s\n",
+           iface, value);
+
+    return 0;
+}
+
+static int _netif_set_coding_rate(kernel_pid_t iface, char *value)
+{
+    uint8_t cr;
+
+    if (strcmp("4/5", value) == 0) {
+        cr = LORA_CR_4_5;
+    }
+    else if (strcmp("4/6", value) == 0) {
+        cr = LORA_CR_4_6;
+    }
+    else if (strcmp("4/7", value) == 0) {
+        cr = LORA_CR_4_7;
+    }
+    else if (strcmp("4/8", value) == 0) {
+        cr = LORA_CR_4_8;
+    }
+    else {
+        puts("usage: ifconfig <if_id> set cr [4/5|4/6|4/7|4/8]");
+        return 1;
+    }
+    if (gnrc_netapi_set(iface, NETOPT_CODING_RATE, 0,
+                        &cr, sizeof(uint8_t)) < 0) {
+        printf("error: unable to set coding rate to %s\n", value);
+        return 1;
+    }
+    printf("success: set coding rate of interface %" PRIkernel_pid " to %s\n",
+           iface, value);
+
+    return 0;
 }
 
 static int _netif_set_u16(kernel_pid_t iface, netopt_t opt, uint16_t context,
@@ -655,12 +821,24 @@ static int _netif_set_state(kernel_pid_t iface, char *state_str)
              (strcmp("IDLE", state_str) == 0)) {
         state = NETOPT_STATE_IDLE;
     }
+    else if ((strcmp("rx", state_str) == 0) ||
+             (strcmp("RX", state_str) == 0)) {
+        state = NETOPT_STATE_RX;
+    }
+    else if ((strcmp("tx", state_str) == 0) ||
+             (strcmp("TX", state_str) == 0)) {
+        state = NETOPT_STATE_TX;
+    }
     else if ((strcmp("reset", state_str) == 0) ||
              (strcmp("RESET", state_str) == 0)) {
         state = NETOPT_STATE_RESET;
     }
+    else if ((strcmp("standby", state_str) == 0) ||
+             (strcmp("STANDBY", state_str) == 0)) {
+        state = NETOPT_STATE_STANDBY;
+    }
     else {
-        puts("usage: ifconfig <if_id> set state [off|sleep|idle|reset]");
+        puts("usage: ifconfig <if_id> set state [off|sleep|idle|rx|tx|reset|standby]");
         return 1;
     }
     if (gnrc_netapi_set(iface, NETOPT_STATE, 0,
@@ -804,6 +982,18 @@ static int _netif_set(char *cmd_name, kernel_pid_t iface, char *key, char *value
     }
     else if (strcmp("cca_threshold", key) == 0) {
         return _netif_set_u8(iface, NETOPT_CCA_THRESHOLD, 0, value);
+    }
+    else if ((strcmp("frequency", key) == 0) || (strcmp("freq", key) == 0)) {
+        return _netif_set_u32(iface, NETOPT_CHANNEL_FREQUENCY, 0, value);
+    }
+    else if ((strcmp("bandwidth", key) == 0) || (strcmp("bw", key) == 0)) {
+        return _netif_set_bandwidth(iface, value);
+    }
+    else if ((strcmp("spreading_factor", key) == 0) || (strcmp("sf", key) == 0)) {
+        return _netif_set_u8(iface, NETOPT_SPREADING_FACTOR, 0, value);
+    }
+    else if ((strcmp("coding_rate", key) == 0) || (strcmp("cr", key) == 0)) {
+        return _netif_set_coding_rate(iface, value);
     }
     else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
         return _netif_set_u16(iface, NETOPT_CHANNEL, 0, value);

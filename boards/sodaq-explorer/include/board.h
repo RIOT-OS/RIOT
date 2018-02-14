@@ -8,7 +8,7 @@
 
 /**
  * @ingroup     boards_sodaq-explorer
- * @brief       Board specific definitions for the SODAQ ExpLoRer board
+ * @brief       Support for the SODAQ ExpLoRer board
  * @{
  *
  * @file
@@ -53,6 +53,14 @@ extern "C" {
  */
 #define BTN0_PIN            GPIO_PIN(PA, 14)
 #define BTN0_MODE           GPIO_IN_PU
+/** @} */
+
+/**
+ * @name    RN2483 configuration
+ * @{
+ */
+#define RN2XX3_PARAM_UART         UART_DEV(2)
+#define RN2XX3_PARAM_PIN_RESET    GPIO_PIN(PA, 7)
 /** @} */
 
 /**

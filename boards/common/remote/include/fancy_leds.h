@@ -8,8 +8,7 @@
  */
 
 /**
- * @ingroup     boards_remote
- * @brief       LED extension
+ * @ingroup     boards_common_remote
  * @{
  *
  * @file

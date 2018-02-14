@@ -1,0 +1,3 @@
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+  USEMODULE += nrfmin
+endif

@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-l152
+ * @defgroup    boards_nucleo-l152 STM32 Nucleo-L152
+ * @ingroup     boards_common_nucleo64
+ * @brief       Support for the STM32 Nucleo-L152
  * @{
  *
  * @file

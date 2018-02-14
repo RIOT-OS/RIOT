@@ -1,17 +1,18 @@
-## the cpu to build for
+# select the used CPU
 export CPU = msp430fxyz
 export CPU_MODEL = msp430f1611
 
-# set default port depending on operating system
+# include this module in the build
+USEMODULE += boards_common_wsn430
+# use common wsn430 includes
+export INCLUDES += -I$(RIOTBOARD)/common/wsn430/include
+
+# configure the serial interface
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
-# setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-# setup flash tool
+# configure the flash tool
 export OFLAGS = -O ihex
 export FLASHER = mspdebug
 export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
-
-# include common wsn430 includes
-export INCLUDES += -I$(RIOTBOARD)/common/wsn430/include

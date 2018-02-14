@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    boards_common_arduino_due Shared Arduino Due Code
- * @ingroup     boards
- * @brief       Shared code for Arduino Due based boards
+ * @defgroup    boards_common_arduino_due Arduino Due Common
+ * @ingroup     boards_common
+ * @brief       Shared files and configuration for Arduino Due based boards.
  * @{
  *
  * @file

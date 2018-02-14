@@ -58,6 +58,9 @@ endif
 ifneq (,$(filter my9221,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/my9221/include
 endif
+ifneq (,$(filter pulse_counter,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/pulse_counter/include
+endif
 ifneq (,$(filter ina220,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ina220/include
 endif
@@ -148,6 +151,21 @@ endif
 ifneq (,$(filter apa102,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/apa102/include
 endif
+ifneq (,$(filter lc709203f, $(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lc709203f/include
+endif
 ifneq (,$(filter hts221,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/hts221/include
+endif
+ifneq (,$(filter lis3mdl,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lis3mdl/include
+endif
+ifneq (,$(filter rn2%3,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/rn2xx3/include
+endif
+ifneq (,$(filter lis2dh12,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lis2dh12/include
+endif
+ifneq (,$(filter ata8520e,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ata8520e/include
 endif

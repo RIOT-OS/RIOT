@@ -91,6 +91,7 @@ then
         run ./dist/tools/cppcheck/check.sh
         run ./dist/tools/pr_check/pr_check.sh ${CI_BASE_BRANCH}
         run ./dist/tools/coccinelle/check.sh
+        run ./dist/tools/flake8/check.sh
         QUIET=1 run ./dist/tools/headerguards/check.sh
         exit $RESULT
     fi

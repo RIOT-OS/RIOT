@@ -6,6 +6,4 @@ USEMODULE += at30tse75x
 USEMODULE += shell
 USEMODULE += shell_commands
 
-CFLAGS += -DDEVELHELP
-
 include $(RIOTBASE)/Makefile.include

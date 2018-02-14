@@ -9,12 +9,13 @@
 
 /**
  * @ingroup     boards_arduino-mkr-common
- *
+ * @{
  * @file
  * @brief       Board common implementations for the Arduino MKR boards
  *
- *  @author      Hauke Pertersen  <hauke.pertersen@fu-berlin.de>
+ * @author      Hauke Pertersen  <hauke.pertersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ *
  * @}
  */
 

@@ -7,9 +7,6 @@ BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove
 
 USEMODULE += ssp
 
-# set DEVELHELP so the board halts after crash
-CFLAGS += -DDEVELHELP
-
 include $(RIOTBASE)/Makefile.include
 
 test:

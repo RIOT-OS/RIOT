@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_mulle Eistec Mulle
  * @ingroup     boards
- * @brief       Board specific files for Eistec Mulle IoT boards
+ * @brief       Support for Eistec Mulle IoT boards
  * @{
  *
  * @file
@@ -40,7 +40,7 @@
 #define UART_STDIO_DEV      UART_DEV(1)
 
 /**
- * @brief   xtimer configuration
+ * @name    xtimer configuration
  * @{
  */
 #if 0
@@ -64,7 +64,7 @@
 /** @} */
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED_PORT            PTC

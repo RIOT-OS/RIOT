@@ -175,8 +175,11 @@ while true ; do
 done
 
 if [ -z "${USER}" ]; then
-    echo 'need to export $USER'
-    exit 1
+    export USER=$(id -un)
+    if [ -z "${USER}" ]; then
+        echo 'need to export $USER'
+        exit 1
+    fi
 fi
 if [ -z "${COMMAND}" ]; then
     COMMAND="create"

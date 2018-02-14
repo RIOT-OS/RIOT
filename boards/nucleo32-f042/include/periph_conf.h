@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo32-f042
+ * @defgroup    boards_nucleo32-f042 STM32 Nucleo32-F042
+ * @ingroup     boards_common_nucleo32
+ * @brief       Support for the STM32 Nucleo32-F042
  * @{
  *
  * @file

@@ -4,7 +4,6 @@ export NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
 export CPU = native
-export ELF = $(BINDIR)/$(APPLICATION).elf
 
 USEMODULE += native-drivers
 
@@ -43,7 +42,7 @@ else
   export DEBUGGER ?= gdb
 endif
 
-export TERMPROG ?= $(ELF)
+export TERMPROG ?= $(ELFFILE)
 export FLASHER = true
 export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
@@ -103,9 +102,9 @@ export TERMFLAGS := $(PORT) $(TERMFLAGS)
 
 export ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
-  export DEBUGGER_FLAGS = -- $(ELF) $(TERMFLAGS)
+  export DEBUGGER_FLAGS = -- $(ELFFILE) $(TERMFLAGS)
 else
-  export DEBUGGER_FLAGS = -q --args $(ELF) $(TERMFLAGS)
+  export DEBUGGER_FLAGS = -q --args $(ELFFILE) $(TERMFLAGS)
 endif
 term-valgrind: export VALGRIND_FLAGS ?= \
 	--leak-check=full \
@@ -116,7 +115,7 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--leak-check=full --track-origins=yes --fullpath-after=${RIOTBASE} \
 	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
-term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELF)
+term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
 all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
 all-debug: export CFLAGS += -g
@@ -166,10 +165,10 @@ all-valgrind: all
 all-cachegrind: all
 
 term-valgrind:
-	$(VALGRIND) $(VALGRIND_FLAGS) $(ELF) $(PORT)
+	$(VALGRIND) $(VALGRIND_FLAGS) $(ELFFILE) $(PORT)
 
 debug-valgrind-server:
-	$(VALGRIND) $(VALGRIND_FLAGS) $(ELF) $(PORT)
+	$(VALGRIND) $(VALGRIND_FLAGS) $(ELFFILE) $(PORT)
 
 debug-valgrind:
 	$(eval VALGRIND_PID ?= $(shell pgrep -n memcheck-x86-li -u ${USER} | cut -d" " -f1))
@@ -177,12 +176,12 @@ debug-valgrind:
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 term-cachegrind:
-	$(VALGRIND) $(CACHEGRIND_FLAGS) $(ELF) $(PORT)
+	$(VALGRIND) $(CACHEGRIND_FLAGS) $(ELFFILE) $(PORT)
 
 term-gprof: term
 
 eval-gprof:
-	$(GPROF) $(ELF) $(shell ls -rt gmon.out* | tail -1)
+	$(GPROF) $(ELFFILE) $(shell ls -rt gmon.out* | tail -1)
 
 eval-cachegrind:
 	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)

@@ -60,7 +60,7 @@ Reason for removal:
 - this was an early development board by Nordic which was discontinued (successor: `nrf51dk`)
 - no hardware available anymore for testing
 
-### boards/qemu-i368 [99009af25e201bbc182d376e99df34133417be6c]
+### boards/qemu-i386 [99009af25e201bbc182d376e99df34133417be6c]
 Author(s):
 - René Kijewski <rene.kijewski@fu-berlin.de>
 

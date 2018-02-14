@@ -91,7 +91,7 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_CCN_LITE_UTILS
         case GNRC_NETTYPE_CCN_CHUNK:
             printf("GNRC_NETTYPE_CCN_CHUNK (%i)\n", pkt->type);
-            printf("Content is: %.*s\n", pkt->size, (char*)pkt->data);
+            printf("Content is: %.*s\n", (int)pkt->size, (char*)pkt->data);
             break;
 #endif
 #ifdef TEST_SUITES

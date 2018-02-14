@@ -51,7 +51,7 @@ extern "C" {
  * @see [RFC 4861, section 4.3](https://tools.ietf.org/html/rfc4861#section-4.3)
  *
  * @param[in] tgt       The target address of the neighbor solicitation.
- *                      May not be NULL and **MUST NOT** be multicast.
+ *                      Must not be NULL or a multicast address.
  * @param[in] options   Options to append to the neighbor solicitation.
  *                      May be NULL for none.
  *
@@ -72,7 +72,7 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_sol_build(const ipv6_addr_t *tgt,
  *                      in the neighbor solicitaton.
  *                      For and unsolicited advertisement, the address whose
  *                      link-layer address has changed.
- *                      May not be NULL and **MUST NOT** be multicast.
+ *                      Must not be NULL or a multicast address.
  * @param[in] flags     Neighbor advertisement flags:
  *                      - @ref NDP_NBR_ADV_FLAGS_R == 1 indicates, that the
  *                        sender is a router,
@@ -162,8 +162,8 @@ gnrc_pktsnip_t *gnrc_ndp_opt_build(uint8_t type, size_t size,
  *          hosts should silently ignore it in other NDP messages.
  *
  * @param[in] l2addr        A link-layer address of variable length.
- *                          May not be NULL.
- * @param[in] l2addr_len    Length of @p l2addr. May not be 0.
+ *                          Must not be NULL.
+ * @param[in] l2addr_len    Length of @p l2addr. Must not be 0.
  * @param[in] next          More options in the packet. NULL, if there are none.
  *
  * @return  The packet snip list of options, on success
@@ -185,8 +185,8 @@ gnrc_pktsnip_t *gnrc_ndp_opt_sl2a_build(const uint8_t *l2addr,
  *          in other NDP messages.
  *
  * @param[in] l2addr        A link-layer address of variable length.
- *                          May not be NULL.
- * @param[in] l2addr_len    Length of @p l2addr. May not be 0.
+ *                          Must not be NULL.
+ * @param[in] l2addr_len    Length of @p l2addr. Must not be 0.
  * @param[in] next          More options in the packet. NULL, if there are none.
  *
  * @return  The pkt snip list of options, on success
@@ -209,8 +209,8 @@ gnrc_pktsnip_t *gnrc_ndp_opt_tl2a_build(const uint8_t *l2addr,
  *          however, since nodes should silently ignore it in other NDP messages.
  *
  * @param[in] prefix        An IPv6 address or a prefix of an IPv6 address.
- *                          May not be NULL and must not be link-local or
- *                          multicast.
+ *                          Must not be NULL or be a link-local or
+ *                          multicast address.
  * @param[in] prefix_len    The length of @p prefix in bits. Must be between
  *                          0 and 128.
  * @param[in] valid_ltime   Length of time in seconds that @p prefix is valid.
@@ -258,11 +258,11 @@ gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
  * @pre `(netif != NULL) && (dst != NULL)`
  *
  * @param[in] tgt       The target address of the neighbor solicitation.
- *                      May not be NULL and **MUST NOT** be multicast.
- * @param[in] netif     Interface to send over. May not be NULL.
+ *                      Must not be NULL or a multicast address.
+ * @param[in] netif     Interface to send over. Must not be NULL.
  * @param[in] src       Source address for the neighbor solicitation. Will be
  *                      chosen from the interface according to @p dst, if NULL.
- * @param[in] dst       Destination address for neighbor solicitation. May not
+ * @param[in] dst       Destination address for neighbor solicitation. Must not
  *                      be NULL.
  * @param[in] ext_opts  External options for the neighbor advertisement.
  *                      Leave NULL for none.
@@ -294,7 +294,7 @@ void gnrc_ndp_nbr_sol_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
  *
  * @param[in] tgt           Target address for the neighbor advertisement. May
  *                          not be NULL and **MUST NOT** be multicast.
- * @param[in] netif         Interface to send over. May not be NULL.
+ * @param[in] netif         Interface to send over. Must not be NULL.
  * @param[in] dst           Destination address for neighbor advertisement. May
  *                          not be NULL. Is set to
  *                          @ref IPV6_ADDR_ALL_NODES_LINK_LOCAL when equal to
@@ -326,7 +326,7 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
  *
  * @pre `(netif != NULL)`
  *
- * @param[in] netif Interface to send over. May not be NULL.
+ * @param[in] netif Interface to send over. Must not be NULL.
  * @param[in] dst   Destination for the router solicitation. ff02::2 if NULL.
  */
 void gnrc_ndp_rtr_sol_send(gnrc_netif_t *netif, const ipv6_addr_t *dst);
@@ -341,7 +341,7 @@ void gnrc_ndp_rtr_sol_send(gnrc_netif_t *netif, const ipv6_addr_t *dst);
  * dependent on external set-ups (e.g. if multihop prefix distribution is used).
  * Provide them via @p ext_opts
  *
- * @param[in] netif     Interface to send over. May not be NULL.
+ * @param[in] netif     Interface to send over. Must not be NULL.
  * @param[in] src       Source address for the router advertisement. May be
  *                      NULL to be determined by source address selection
  *                      (:: if @p netif has no address).

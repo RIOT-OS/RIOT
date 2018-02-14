@@ -41,11 +41,11 @@ extern "C" {
  * @pre `(netif != NULL) && (dst != NULL)`
  *
  * @param[in] tgt       The target address of the neighbor solicitation.
- *                      May not be NULL and **MUST NOT** be multicast.
- * @param[in] netif     Interface to send over. May not be NULL.
+ *                      Must not be NULL or a multicast address.
+ * @param[in] netif     Interface to send over. Must not be NULL.
  * @param[in] src       Source address for the neighbor solicitation. Will be
  *                      chosen from the interface according to @p dst, if NULL.
- * @param[in] dst       Destination address for neighbor solicitation. May not
+ * @param[in] dst       Destination address for neighbor solicitation. Must not
  *                      be NULL.
  */
 void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,

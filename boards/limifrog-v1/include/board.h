@@ -9,11 +9,11 @@
 /**
  * @defgroup    boards_limifrog-v1 LimiFrog Version 1
  * @ingroup     boards
- * @brief       Board specific files for the limifrog-v1 board.
+ * @brief       Support for the limifrog-v1 board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the limifrog-v1  board.
+ * @brief       Board specific definitions for the limifrog-v1 board
  *
  * @author      Katja Kirstein <katja.kirstein@haw-hamburg.de>
  */
@@ -50,6 +50,14 @@ extern "C" {
   */
  #define XTIMER_WIDTH        (16U)
  /** @} */
+
+ /**
+ * @name Define the interface to the LIS3MDL 3-axis magnetometer
+ * @{
+ */
+#define LIS3MDL_PARAM_I2C        (I2C_DEV(1))
+#define LIS3MDL_PARAM_ADDR       (0x28)
+/** @} */
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO

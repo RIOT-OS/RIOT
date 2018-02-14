@@ -9,15 +9,13 @@
 /**
  * @ingroup boards
  * @{
- */
-
-/**
  * @file
  * @brief       msb-430 common board initialization
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
+ * @}
  */
 
 #include "cpu.h"
@@ -119,8 +117,8 @@ void msp430_init_dco(void)
     /* Stop watchdog */
     WDTCTL = WDTPW + WDTHOLD;
 
-    //Init crystal for mclk
-    //XT2 = HF XTAL
+    /* Init crystal for mclk */
+    /* XT2 = HF XTAL */
     BCSCTL1 = RSEL2;
 
     /* Wait for xtal to stabilize */

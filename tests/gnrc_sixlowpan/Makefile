@@ -19,11 +19,6 @@ USEMODULE += gnrc_udp
 # Dumps packets
 USEMODULE += gnrc_pktdump
 
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-CFLAGS += -DDEVELHELP
-
 include $(RIOTBASE)/Makefile.include
 
 test:

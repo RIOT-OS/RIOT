@@ -17,23 +17,30 @@ import pexpect
 
 PEXPECT_PATH = os.path.dirname(pexpect.__file__)
 RIOTBASE = os.environ['RIOTBASE'] or \
-           os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+
+# Setting an empty 'TESTRUNNER_START_DELAY' environment variable use the
+# default value (3)
+MAKE_TERM_STARTED_DELAY = int(os.environ.get('TESTRUNNER_START_DELAY') or 3)
+
 
 def list_until(l, cond):
     return l[:([i for i, e in enumerate(l) if cond(e)][0])]
 
+
 def find_exc_origin(exc_info):
     pos = list_until(extract_tb(exc_info),
                      lambda frame: frame[0].startswith(PEXPECT_PATH)
-                    )[-1]
+                     )[-1]
     return (pos[3], os.path.relpath(os.path.abspath(pos[0]), RIOTBASE), pos[1])
+
 
 def run(testfunc, timeout=10, echo=True, traceback=False):
     env = os.environ.copy()
     child = pexpect.spawnu("make term", env=env, timeout=timeout)
 
     # on many platforms, the termprog needs a short while to be ready...
-    time.sleep(3)
+    time.sleep(MAKE_TERM_STARTED_DELAY)
 
     if echo:
         child.logfile = sys.stdout

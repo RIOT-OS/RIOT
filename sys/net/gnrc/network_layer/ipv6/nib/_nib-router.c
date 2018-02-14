@@ -27,9 +27,7 @@
 #include "debug.h"
 
 #if GNRC_IPV6_NIB_CONF_ROUTER
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                     bool final, _nib_abr_entry_t *abr);
@@ -54,10 +52,13 @@ void _handle_snd_mc_ra(gnrc_netif_t *netif)
         bool final_ra = (netif->ipv6.ra_sent > (UINT8_MAX - NDP_MAX_FIN_RA_NUMOF));
         uint32_t next_ra_time = random_uint32_range(NDP_MIN_RA_INTERVAL_MS,
                                                     NDP_MAX_RA_INTERVAL_MS);
+        uint32_t next_scheduled = _evtimer_lookup(netif, GNRC_IPV6_NIB_SND_MC_RA);
 
         /* router has router advertising interface or the RA is one of the
-         * (now deactivated) routers final one */
-        if (final_ra || gnrc_netif_is_rtr_adv(netif)) {
+         * (now deactivated) routers final one (and there is no next
+         * scheduled within the possible time for next_ra_time) */
+        if ((final_ra && (next_scheduled > NDP_MAX_RA_INTERVAL_MS)) ||
+            gnrc_netif_is_rtr_adv(netif)) {
             _snd_rtr_advs(netif, NULL, final_ra);
             netif->ipv6.last_ra = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
             if ((netif->ipv6.ra_sent < NDP_MAX_INIT_RA_NUMOF) || final_ra) {
@@ -192,7 +193,11 @@ void _set_rtr_adv(gnrc_netif_t *netif)
 static void _snd_ra(gnrc_netif_t *netif, const ipv6_addr_t *dst,
                     bool final, _nib_abr_entry_t *abr)
 {
-    gnrc_pktsnip_t *ext_opts = _build_ext_opts(netif, abr);
+    gnrc_pktsnip_t *ext_opts = NULL;
+
+    if (!final) {
+        ext_opts = _build_ext_opts(netif, abr);
+    }
 
     gnrc_ndp_rtr_adv_send(netif, NULL, dst, final, ext_opts);
 }

@@ -467,6 +467,10 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
     gnrc_gomach_l2_id_t id_list[GNRC_GOMACH_SLOSCH_UNIT_COUNT];
     uint8_t slots_list[GNRC_GOMACH_SLOSCH_UNIT_COUNT];
 
+    /* Check the maximum number of slots that can be allocated to senders. */
+    uint16_t max_slot_num = (GNRC_GOMACH_SUPERFRAME_DURATION_US - gnrc_gomach_phase_now(netif)) /
+                            GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
+
     for (i = 0; i < GNRC_GOMACH_SLOSCH_UNIT_COUNT; i++) {
         if (netif->mac.rx.slosch_list[i].queue_indicator > 0) {
             /* Record the device's (that will be allocated slots) address to the ID list. */
@@ -481,14 +485,20 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
             total_tdma_slot_num += slots_list[j];
 
             /* If there is no room for allocating more slots, stop. */
-            if (total_tdma_slot_num >= GNRC_GOMACH_MAX_ALLOC_SLOTS_NUM) {
+            if (total_tdma_slot_num >= max_slot_num) {
                 uint8_t redueced_slots_num;
-                redueced_slots_num = total_tdma_slot_num - GNRC_GOMACH_MAX_ALLOC_SLOTS_NUM;
+                redueced_slots_num = total_tdma_slot_num - max_slot_num;
                 slots_list[j] -= redueced_slots_num;
                 total_tdma_slot_num -= redueced_slots_num;
                 break;
             }
+
             j++;
+
+            /* If reach the maximum sender ID number limit, stop. */
+            if (total_tdma_node_num >= GNRC_GOMACH_MAX_ALLOC_SENDER_NUM) {
+                break;
+            }
         }
     }
 

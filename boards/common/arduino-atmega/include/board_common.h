@@ -8,7 +8,9 @@
  */
 
 /*
- * @ingroup     boards_arduino-atmega-common
+ * @defgroup    boards_common_arduino-atmega Arduino Atmega Common
+ * @ingroup     boards_common
+ * @brief       Shared files and configuration for Arduino Atmega boards.
  * @{
  *
  * @file

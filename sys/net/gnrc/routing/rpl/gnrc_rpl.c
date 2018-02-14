@@ -81,8 +81,8 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
     }
 
     /* register all_RPL_nodes multicast address */
-    gnrc_netif_ipv6_group_join(gnrc_netif_get_by_pid(if_pid),
-                               &ipv6_addr_all_rpl_nodes);
+    gnrc_netif_ipv6_group_join_internal(gnrc_netif_get_by_pid(if_pid),
+                                        &ipv6_addr_all_rpl_nodes);
 
     gnrc_rpl_send_DIS(NULL, (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes);
     return gnrc_rpl_pid;

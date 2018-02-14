@@ -164,14 +164,14 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     DEBUG("writing to serial port ");
 
-#if ENABLE_DEBUG
-    for (size_t i = 0; i < len; i++) {
-        DEBUG("%02x ", (unsigned char) data[i]);
+    if (ENABLE_DEBUG) {
+        for (size_t i = 0; i < len; i++) {
+            DEBUG("%02x ", (unsigned char) data[i]);
+        }
+        for (size_t i = 0; i < len; i++) {
+            DEBUG("%c", (char) data[i]);
+        }
     }
-    for (size_t i = 0; i < len; i++) {
-        DEBUG("%c", (char) data[i]);
-    }
-#endif
 
     DEBUG("\n");
 

@@ -24,9 +24,7 @@
 ipv6_addr_t gnrc_ipv6_whitelist[GNRC_IPV6_WHITELIST_SIZE];
 BITFIELD(gnrc_ipv6_whitelist_set, GNRC_IPV6_WHITELIST_SIZE);
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 int gnrc_ipv6_whitelist_add(const ipv6_addr_t *addr)
 {

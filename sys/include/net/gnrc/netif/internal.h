@@ -23,6 +23,10 @@
 
 #include "net/gnrc/netif.h"
 
+#ifdef MODULE_GNRC_IPV6_NIB
+#include "net/gnrc/ipv6/nib/conf.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -59,11 +63,11 @@ void gnrc_netif_release(gnrc_netif_t *netif);
  *      or loopback
  * @pre `(pfx_len > 0) && (pfx_len <= 128)`
  *
- * @param[in,out] netif the network interface. May not be NULL.
+ * @param[in,out] netif the network interface. Must not be NULL.
  * @param[in] addr      the address to add. If the address is already on the
  *                      interface the function will return 0, but @p flags
- *                      will be ignored. May not be NULL and may not be
- *                      link-local or multicast
+ *                      will be ignored. Must not be NULL or be a link-local or
+ *                      multicast address.
  * @param[in] pfx_len   length in bits of the prefix of @p addr
  * @param[in] flags     initial flags for the address.
  *                      - Setting the address' state to
@@ -85,8 +89,9 @@ void gnrc_netif_release(gnrc_netif_t *netif);
  * @return  >= 0, on success
  * @return  -ENOMEM, when no space for new addresses is left on the interface
  */
-int gnrc_netif_ipv6_addr_add(gnrc_netif_t *netif, const ipv6_addr_t *addr,
-                             unsigned pfx_len, uint8_t flags);
+int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
+                                      const ipv6_addr_t *addr,
+                                      unsigned pfx_len, uint8_t flags);
 
 /**
  * @brief   Removes an IPv6 address from the interface
@@ -98,8 +103,8 @@ int gnrc_netif_ipv6_addr_add(gnrc_netif_t *netif, const ipv6_addr_t *addr,
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  */
-void gnrc_netif_ipv6_addr_remove(gnrc_netif_t *netif,
-                                 const ipv6_addr_t *addr);
+void gnrc_netif_ipv6_addr_remove_internal(gnrc_netif_t *netif,
+                                          const ipv6_addr_t *addr);
 
 
 /**
@@ -240,8 +245,8 @@ gnrc_netif_t *gnrc_netif_get_by_prefix(const ipv6_addr_t *prefix);
  * @return  0, on success
  * @return  -ENOMEM, when no space for new addresses is left on the interface
  */
-int gnrc_netif_ipv6_group_join(gnrc_netif_t *netif,
-                               const ipv6_addr_t *addr);
+int gnrc_netif_ipv6_group_join_internal(gnrc_netif_t *netif,
+                                        const ipv6_addr_t *addr);
 
 /**
  * @brief   Let interface leave from an IPv6 multicast group
@@ -253,8 +258,8 @@ int gnrc_netif_ipv6_group_join(gnrc_netif_t *netif,
  *
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  */
-void gnrc_netif_ipv6_group_leave(gnrc_netif_t *netif,
-                                 const ipv6_addr_t *addr);
+void gnrc_netif_ipv6_group_leave_internal(gnrc_netif_t *netif,
+                                          const ipv6_addr_t *addr);
 
 /**
  * @brief   Returns the index of @p addr in gnrc_netif_t::ipv6_groups of @p
@@ -292,6 +297,8 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64);
  * @brief   Checks if the interface represents a router according to RFC 4861
  *
  * @attention   Requires prior locking
+ * @note        Assumed to be false, when `gnrc_ipv6_router` module is not
+ *              included.
  *
  * @param[in] netif the network interface
  *
@@ -300,15 +307,21 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64);
  * @return  true, if the interface represents a router
  * @return  false, if the interface does not represent a router
  */
+#if defined(MODULE_GNRC_IPV6_ROUTER) || defined(DOXYGEN)
 static inline bool gnrc_netif_is_rtr(const gnrc_netif_t *netif)
 {
     return (netif->flags & GNRC_NETIF_FLAGS_IPV6_FORWARDING);
 }
+#else
+#define gnrc_netif_is_rtr(netif)                (false)
+#endif
 
 /**
  * @brief   Checks if the interface is allowed to send out router advertisements
  *
  * @attention   Requires prior locking
+ * @note        Assumed to be false, when `gnrc_ipv6_router` module is not
+ *              included.
  *
  * @param[in] netif the network interface
  *
@@ -316,16 +329,24 @@ static inline bool gnrc_netif_is_rtr(const gnrc_netif_t *netif)
  * @return  false, if the interface is not allowed to send out router
  *          advertisements
  */
+#if defined(MODULE_GNRC_IPV6_ROUTER) || defined(DOXYGEN)
 static inline bool gnrc_netif_is_rtr_adv(const gnrc_netif_t *netif)
 {
     return (netif->flags & GNRC_NETIF_FLAGS_IPV6_RTR_ADV);
 }
+#else
+#define gnrc_netif_is_rtr_adv(netif)            (false)
+#endif
 
 /**
  * @brief   Checks if the interface represents a 6Lo node (6LN) according to
  *          RFC 6775
  *
  * @attention   Requires prior locking
+ * @note        Assumed to be true, when @ref GNRC_NETIF_NUMOF == 1 and
+ *              @ref net_gnrc_sixlowpan module is included (and
+ *              @ref GNRC_IPV6_NIB_CONF_6LN is not 0, otherwise assumed to be
+ *              false).
  *
  * @param[in] netif the network interface
  *
@@ -334,13 +355,20 @@ static inline bool gnrc_netif_is_rtr_adv(const gnrc_netif_t *netif)
  * @return  true, if the interface represents a 6LN
  * @return  false, if the interface does not represent a 6LN
  */
+#if (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN) || defined(DOXYGEN)
 bool gnrc_netif_is_6ln(const gnrc_netif_t *netif);
+#elif GNRC_IPV6_NIB_CONF_6LN
+#define gnrc_netif_is_6ln(netif)                (true)
+#else
+#define gnrc_netif_is_6ln(netif)                (false)
+#endif
 
 /**
  * @brief   Checks if the interface represents a 6Lo router (6LR) according to
  *          RFC 6775
  *
  * @attention   Requires prior locking
+ * @note        Assumed to be false, when @ref GNRC_IPV6_NIB_CONF_6LR == 0
  *
  * @param[in] netif the network interface
  *
@@ -349,16 +377,25 @@ bool gnrc_netif_is_6ln(const gnrc_netif_t *netif);
  * @return  true, if the interface represents a 6LR
  * @return  false, if the interface does not represent a 6LR
  */
+#if (GNRC_IPV6_NIB_CONF_6LR && \
+     /* if flag checkers even evaluate, otherwise just assume their result */ \
+     (defined(MODULE_GNRC_IPV6_ROUTER) || \
+      (GNRC_NETIF_NUMOF > 1) || !defined(MODULE_GNRC_SIXLOWPAN))) || \
+    defined(DOXYGEN)
 static inline bool gnrc_netif_is_6lr(const gnrc_netif_t *netif)
 {
     return gnrc_netif_is_rtr(netif) && gnrc_netif_is_6ln(netif);
 }
+#else
+#define gnrc_netif_is_6lr(netif)                (false)
+#endif
 
 /**
  * @brief   Checks if the interface represents a 6Lo border router (6LBR)
  *          according to RFC 6775
  *
  * @attention   Requires prior locking
+ * @note        Assumed to be false, when @ref GNRC_IPV6_NIB_CONF_6LBR == 0.
  *
  * @param[in] netif the network interface
  *
@@ -367,11 +404,15 @@ static inline bool gnrc_netif_is_6lr(const gnrc_netif_t *netif)
  * @return  true, if the interface represents a 6LBR
  * @return  false, if the interface does not represent a 6LBR
  */
+#if GNRC_IPV6_NIB_CONF_6LBR
 static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
 {
     return (netif->flags & GNRC_NETIF_FLAGS_6LO_ABR) &&
            gnrc_netif_is_6lr(netif);
 }
+#else
+#define gnrc_netif_is_6lbr(netif)               (false)
+#endif
 
 #ifdef __cplusplus
 }

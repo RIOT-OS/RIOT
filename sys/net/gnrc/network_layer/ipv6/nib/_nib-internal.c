@@ -42,9 +42,7 @@ static _nib_dr_entry_t _def_routers[GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF];
 static _nib_abr_entry_t _abrs[GNRC_IPV6_NIB_ABR_NUMOF];
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 mutex_t _nib_mutex = MUTEX_INIT;
 evtimer_msg_t _nib_evtimer;
@@ -291,6 +289,7 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
     if (ipv6_addr_is_link_local(&nce->ipv6)) {
         gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
         assert(netif != NULL);
+        (void)netif;    /* flag-checkers might evaluate just to constants */
         if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_rtr(netif)) {
             _get_l2addr_from_ipv6(nce->l2addr, &node->ipv6);
             nce->l2addr_len = sizeof(uint64_t);
@@ -765,12 +764,17 @@ _nib_offl_entry_t *_nib_pl_add(unsigned iface,
         if (pref_ltime != UINT32_MAX) {
             _evtimer_add(dst, GNRC_IPV6_NIB_PFX_TIMEOUT, &dst->pfx_timeout,
                          pref_ltime);
-            if (((pref_ltime + now) == UINT32_MAX) && (now != 0)) {
-                pref_ltime++;
+            /* ignore capped of preferred lifetimes from sec to ms conversion */
+            if (pref_ltime < (UINT32_MAX - 1)) {
+                /* prevent pref_ltime from becoming UINT32_MAX */
+                if (((pref_ltime + now) == UINT32_MAX) && (now != 0)) {
+                    pref_ltime++;
+                }
+                pref_ltime += now;
             }
-            pref_ltime += now;
         }
-        if (valid_ltime != UINT32_MAX) {
+        /* ignore capped of valid lifetimes from sec to ms conversion */
+        if (valid_ltime < (UINT32_MAX - 1)) {
             /* prevent valid_ltime from becoming UINT32_MAX */
             if ((valid_ltime + now) == UINT32_MAX) {
                 valid_ltime++;

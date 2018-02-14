@@ -172,7 +172,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [TIM1_TRG_COM_IRQn       ] = isr_tim1_trg_com,         /* [26] TIM1 Trigger and Commutation Interrupt */
     [USB_IRQn                ] = isr_usb,                  /* [67] USB event Interrupt */
     [CRS_IRQn                ] = isr_crs,                  /* [82] CRS global interrupt */
-#elif defined(CPU_MODEL_STM32L476RG)
+#elif defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG)
     [ADC1_2_IRQn             ] = isr_adc1_2,               /* [18] ADC1, ADC2 SAR global Interrupts */
     [TIM1_TRG_COM_TIM17_IRQn ] = isr_tim1_trg_com_tim17,   /* [26] TIM1 Trigger and Commutation Interrupt and TIM17 global interrupt */
     [TIM3_IRQn               ] = isr_tim3,                 /* [29] TIM3 global Interrupt */
@@ -197,6 +197,8 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [DFSDM1_FLT2_IRQn        ] = isr_dfsdm1_flt2,          /* [63] DFSDM1 Filter 2 global Interrupt */
     [OTG_FS_IRQn             ] = isr_otg_fs,               /* [67] USB OTG FS global Interrupt */
     [SAI2_IRQn               ] = isr_sai2,                 /* [75] Serial Audio Interface 2 global interrupt */
+#endif
+#if defined(CPU_MODEL_STM32L476RG)
     [LCD_IRQn                ] = isr_lcd,                  /* [78] LCD global interrupt */
 #endif
 };

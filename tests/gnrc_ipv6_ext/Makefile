@@ -22,10 +22,7 @@ USEMODULE += gnrc_udp
 # Add also the shell, some shell commands
 USEMODULE += ps
 
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-CFLAGS += -DDEVELHELP
+CFLAGS += -DGNRC_NETIF_IPV6_ADDRS_NUMOF=3
 
 include $(RIOTBASE)/Makefile.include
 

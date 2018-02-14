@@ -115,7 +115,9 @@ extern "C" {
 /**
  * @brief   Number of address registration retries
  *
- * @note    May not be greater than 7.
+ * @note    Must not be greater than 7 for @ref net_gnrc since
+ *          @ref GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE restricts it to
+ *          that number.
  */
 #define SIXLOWPAN_ND_REG_TRANSMIT_NUMOF         (3U)
 /**

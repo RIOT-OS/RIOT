@@ -7,10 +7,28 @@
  */
 
 /**
- * @defgroup    net_gnrc_gomach A traffic-adaptive multi-channel MAC
+ * @defgroup    net_gnrc_gomach GoMacH
  * @ingroup     net_gnrc
- * @brief       A traffic adaptive MAC protocol that provides high traffic
- *              adaptability, high energy efficiency and high robustness.
+ * @brief       A traffic-adaptive multi-channel MAC
+ *
+ *
+ * GoMacH is, "a General, nearly Optimal MAC protocol for multi-Hop communications",
+ * for IEEE 802.15.4 IoT/WSNs networks. It is designed to be a traffic adaptive MAC
+ * protocol that provides high traffic adaptability, high energy efficiency and high
+ * robustness.
+ *
+ * ## GoMacH's main features
+ * - doesn't rely on global synchronization.
+ * - supports for multi-hop and mesh network.
+ * - adopts a duty-cycle scheme to conserve power.
+ * - provides high traffic adaptation for handling burst or dynamic traffics.
+ *   It achieves this by dynamically allocating transmission slots to intensive
+ *   senders (that have pending packets), which enables one (or more) sender(s)
+ *   to burst transmit all of its (their) buffered packets (for the same destination) to
+ *   the receiver in one shot (or during a shot notice). The burst slotted-transmissions
+ *   will be ordered by the receiver device in a TDMA period.
+ * - adopts a multi-channel scheme for avoiding/reducing wireless interference jam.
+ *
  * @{
  *
  * @file
@@ -266,14 +284,16 @@ extern "C" {
 #endif
 
 /**
- * @brief Maximum number of slots allowed to be allocated in one cycle.
+ * @brief Maximum number of senders allowed to be allocated slots in one cycle.
  *
- * GoMacH dynamically allocates transmission slots to senders that have
- * pending packets.This macro defines the maximum number of slots allowed
- * to be allocated in one cycle.
+ * Exclude the static GoMacH MAC header payload in the beacon, which is 20 bytes,
+ * we have 107 bytes left for constructing the sender-ID list and the related slots-number
+ * list. A combined slots allocation information pair (sender ID with its corresponded
+ * allocate slots number) will cost 9 (8+1) bytes, thus we can hold a maximum of 11
+ * i.e., ((127 - 20) / 9), sender IDs in the beacon.
  */
-#ifndef GNRC_GOMACH_MAX_ALLOC_SLOTS_NUM
-#define GNRC_GOMACH_MAX_ALLOC_SLOTS_NUM           (25U)
+#ifndef GNRC_GOMACH_MAX_ALLOC_SENDER_NUM
+#define GNRC_GOMACH_MAX_ALLOC_SENDER_NUM          (11U)
 #endif
 
 /**

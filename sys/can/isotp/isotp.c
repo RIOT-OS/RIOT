@@ -509,7 +509,7 @@ static void _isotp_fill_dataframe(struct isotp *isotp, struct can_frame *frame, 
     frame->can_id = isotp->opt.tx_id;
     frame->can_dlc = num_bytes + pci_len;
 
-    DEBUG("_isotp_fill_dataframe: num_bytes=%d, pci_len=%d\n", num_bytes, pci_len);
+    DEBUG("_isotp_fill_dataframe: num_bytes=%d, pci_len=%d\n", (unsigned)num_bytes, (unsigned)pci_len);
 
     if (num_bytes < space) {
         if (isotp->opt.flags & CAN_ISOTP_TX_PADDING) {
@@ -609,6 +609,7 @@ static void _isotp_rx_timeout_task(struct isotp *isotp)
     case ISOTP_SENDING_FC:
         DEBUG("_isotp_rx_timeout_task: FC tx conf timeout\n");
         raw_can_abort(isotp->entry.ifnum, isotp->rx.tx_handle);
+        /* Fall through */
     case ISOTP_WAIT_CF:
         DEBUG("_isotp_rx_timeout_task: free rx buf\n");
         gnrc_pktbuf_release(isotp->rx.snip);

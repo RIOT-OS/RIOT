@@ -28,9 +28,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 /**
  * @brief   Determines supposed link-layer address from interface and option
@@ -190,12 +188,12 @@ static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
             (void)opt;
             return ETHERNET_ADDR_LEN;
 #endif  /* MODULE_NETDEV_ETH */
-#ifdef MODULE_NETDEV_NRFMIN
+#ifdef MODULE_NRFMIN
         case NETDEV_TYPE_NRFMIN:
             (void)opt;
             return sizeof(uint16_t);
-#endif  /* MODULE_NETDEV_NRFMIN */
-#ifdef MODULE_NETDEV_IEEE802154
+#endif  /* MODULE_NRFMIN */
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154:
             switch (opt->len) {
                 case 1U:
@@ -205,7 +203,7 @@ static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
                 default:
                     return 0U;
             }
-#endif  /* MODULE_NETDEV_IEEE802154 */
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
         default:
             (void)opt;
             return 0U;

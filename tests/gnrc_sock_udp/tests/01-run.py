@@ -9,9 +9,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 
 def testfunc(child):
     child.expect_exact(u"Calling test_sock_udp_create__EADDRINUSE()")
@@ -54,5 +51,8 @@ def testfunc(child):
     child.expect_exact(u"Calling test_sock_udp_send__no_sock()")
     child.expect_exact(u"ALL TESTS SUCCESSFUL")
 
+
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

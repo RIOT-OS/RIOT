@@ -69,13 +69,13 @@ typedef enum ina220_range {
  */
 typedef enum ina220_brng {
     INA220_BRNG_16V_FSR = 0x0000, /**< 16 V bus voltage full scale range */
-    INA220_BRNG_32V_FSR = 0x0200, /**< 32 V bus voltage full scale range, default. */
+    INA220_BRNG_32V_FSR = 0x2000, /**< 32 V bus voltage full scale range, default. */
 } ina220_brng_t;
 
 /**
  * @brief   Shunt ADC settings
  *
- * @see Table 5 in INA220 data sheet
+ * @see Table 4 in INA220 data sheet
  */
 typedef enum ina220_sadc {
     /** 9 bit resolution, 84 us conversion time */
@@ -107,7 +107,7 @@ typedef enum ina220_sadc {
 /**
  * @brief   Bus ADC settings
  *
- * @see Table 5 in INA220 data sheet
+ * @see Table 4 in INA220 data sheet
  */
 typedef enum ina220_badc {
     /** 9 bit resolution, 84 us conversion time */

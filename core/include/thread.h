@@ -447,9 +447,10 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
  */
 void thread_add_to_list(list_node_t *list, thread_t *thread);
 
-#ifdef DEVELHELP
 /**
  * @brief Returns the name of a process
+ *
+ * @note when compiling without DEVELHELP, this *always* returns NULL!
  *
  * @param[in] pid   the PID of the thread to get the name from
  *
@@ -458,6 +459,7 @@ void thread_add_to_list(list_node_t *list, thread_t *thread);
  */
 const char *thread_getname(kernel_pid_t pid);
 
+#ifdef DEVELHELP
 /**
  * @brief Measures the stack usage of a stack
  *

@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_nrf52840dk
+ * @ingroup     boards_common_nrf52xxxdk
  * @{
  *
  * @file
- * @brief       Board initialization for the nRF52840 DK
+ * @brief       Board initialization for the nRF52xxx DK
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -24,8 +24,8 @@
 void board_init(void)
 {
     /* initialize the boards LEDs */
-    LED_PORT->DIRSET = (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK);
-    LED_PORT->OUTSET = (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK);
+    LED_PORT->DIRSET = (LED_MASK);
+    LED_PORT->OUTSET = (LED_MASK);
 
     /* initialize the CPU */
     cpu_init();

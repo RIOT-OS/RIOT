@@ -16,6 +16,4 @@ DRIVER ?= kw2xrf
 # finally include the actual chosen driver
 USEMODULE += $(DRIVER)
 
-CFLAGS += -DDEVELHELP
-
 include $(RIOTBASE)/Makefile.include

@@ -9,9 +9,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 
 def testfunc(child):
     child.expect_exact('Executing test_get_addr()')
@@ -24,5 +21,8 @@ def testfunc(child):
     child.expect_exact(' + succeeded.')
     child.expect_exact('ALL TESTS SUCCESSFUL')
 
+
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

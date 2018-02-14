@@ -69,6 +69,7 @@ static inline void _set_ar_state(_nib_onl_entry_t *entry, uint16_t state)
 static inline bool _rtr_sol_on_6lr(const gnrc_netif_t *netif,
                                    const icmpv6_hdr_t *icmpv6)
 {
+    (void)netif;    /* gnrc_netif_is_6lr() might just evaluate to false */
     return gnrc_netif_is_6lr(netif) && (icmpv6->type == ICMPV6_RTR_SOL);
 }
 

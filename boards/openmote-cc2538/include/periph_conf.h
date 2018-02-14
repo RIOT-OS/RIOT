@@ -95,8 +95,8 @@ static const adc_conf_t adc_config[] = {
 #define UART_0_IRQ          UART0_IRQn
 #define UART_0_ISR          isr_uart0
 /* UART 0 pin configuration */
-#define UART_0_TX_PIN       GPIO_PA1
-#define UART_0_RX_PIN       GPIO_PA0
+#define UART_0_TX_PIN       GPIO_PIN(0, 1)  /**< GPIO_PA1 */
+#define UART_0_RX_PIN       GPIO_PIN(0, 0)  /**< GPIO_PA0 */
 /** @} */
 
 /**

@@ -21,7 +21,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG && defined(MODULE_IPV6_ADDR)
+#if defined(MODULE_IPV6_ADDR)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 

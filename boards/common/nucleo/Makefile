@@ -1,3 +1,3 @@
-MODULE = nucleo_common
+MODULE = boards_common_nucleo
 
 include $(RIOTBASE)/Makefile.base

@@ -27,7 +27,8 @@ static char stack[THREAD_STACKSIZE_MAIN];
 
 volatile unsigned done;
 
-#define TIMEOUT   (100UL * US_PER_MS)
+#define TIMEOUT     (100UL * US_PER_MS)
+#define THRESHOLD   (500U)
 
 static void *_thread(void *arg)
 {
@@ -97,12 +98,11 @@ int main(void)
     uint32_t diff = xtimer_now_usec() - before;
     printf("main: timeout triggered. time passed: %uus\n", (unsigned)diff);
 
-    if (abs(diff - TIMEOUT) < 500) {
+    if (diff < (TIMEOUT + THRESHOLD)) {
         puts("SUCCESS");
+        return 0;
     }
-    else {
-        puts("FAILURE");
-    }
+    puts("FAILURE");
 
-    return 0;
+    return 1;
 }

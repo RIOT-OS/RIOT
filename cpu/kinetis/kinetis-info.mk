@@ -83,6 +83,8 @@ ifeq ($(KINETIS_SERIES),K)
       KINETIS_RAMSIZE = 48
     else ifeq ($(KINETIS_FAMILY)$(KINETIS_SUBFAMILY),24)
       KINETIS_RAMSIZE = 256
+    else ifeq ($(KINETIS_FAMILY)$(KINETIS_SUBFAMILY),20)
+      KINETIS_RAMSIZE = 64
     endif
   else ifeq ($(KINETIS_ROMSIZE),128)
     ifeq ($(KINETIS_FAMILY),0)

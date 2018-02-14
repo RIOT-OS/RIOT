@@ -1,15 +1,12 @@
 INCLUDES += -I$(PKGDIRBASE)
-INCLUDES += -I$(RIOTPKG)/fatfs/fatfs_diskio/common/include
+INCLUDES += -I$(RIOTPKG)/fatfs/fatfs_diskio/mtd/include
 DIRS += $(PKGDIRBASE)/fatfs
 
-DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/common
+DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/mtd
 
-ifneq (,$(filter fatfs_diskio_native,$(USEMODULE)))
-  DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/native
-endif
 
-ifneq (,$(filter fatfs_diskio_sdcard_spi,$(USEMODULE)))
-  DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/sdcard_spi
+ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_vfs
 endif
 
 ifeq ($(shell uname -s),Darwin)

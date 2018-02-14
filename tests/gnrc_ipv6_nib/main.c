@@ -79,7 +79,7 @@ static void _set_up(void)
     /* reset some fields not set by the nib interface initializer */
     _mock_netif->ipv6.mtu = ETHERNET_DATA_LEN;
     _mock_netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
-    gnrc_netif_ipv6_addr_remove(_mock_netif, &_loc_gb);
+    gnrc_netif_ipv6_addr_remove_internal(_mock_netif, &_loc_gb);
     gnrc_netif_release(_mock_netif);
     memset(_buffer, 0, sizeof(_buffer));
     gnrc_pktbuf_init();
@@ -107,7 +107,7 @@ static void test_get_next_hop_l2addr__EHOSTUNREACH(const ipv6_addr_t *dst,
     }
     else if (on_link) {
         /* add _rem_gb prefix as on-link prefix */
-        TEST_ASSERT(gnrc_netif_ipv6_addr_add(_mock_netif, &addr,
+        TEST_ASSERT(gnrc_netif_ipv6_addr_add_internal(_mock_netif, &addr,
                             _REM_GB_PFX_LEN,
                             GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID) >= 0);
     }
@@ -158,7 +158,7 @@ static void test_get_next_hop_l2addr__EHOSTUNREACH(const ipv6_addr_t *dst,
         gnrc_pktbuf_release(pkt);
         TEST_ASSERT(gnrc_pktbuf_is_empty());
     }
-    gnrc_netif_ipv6_addr_remove(_mock_netif, &addr);
+    gnrc_netif_ipv6_addr_remove_internal(_mock_netif, &addr);
 }
 
 static void test_get_next_hop_l2addr__link_local_EHOSTUNREACH_no_iface(void)
@@ -1114,8 +1114,8 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
                                 "Unexpected prefix configured");
             TEST_ASSERT_EQUAL_INT(_LOC_GB_PFX_LEN, prefix.pfx_len);
             TEST_ASSERT_EQUAL_INT(_mock_netif->pid, prefix.iface);
-            TEST_ASSERT(_PIO_PFX_LTIME < prefix.valid_until);
-            TEST_ASSERT(_PIO_PFX_LTIME < prefix.pref_until);
+            TEST_ASSERT((_PIO_PFX_LTIME / MS_PER_SEC) < prefix.valid_until);
+            TEST_ASSERT((_PIO_PFX_LTIME / MS_PER_SEC) < prefix.pref_until);
         }
     }
     if (!pio || !(pio_flags & NDP_OPT_PI_FLAGS_L)) {

@@ -29,9 +29,7 @@ static mutex_t _ctx_mutex = MUTEX_INIT;
 static uint32_t _current_minute(void);
 static void _update_lifetime(uint8_t id);
 
-#if ENABLE_DEBUG
 static char ipv6str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 static inline bool _valid(uint8_t id)
 {

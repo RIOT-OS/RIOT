@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_gnrc_netif New network interface API
+ * @defgroup    net_gnrc_netif Network interface API
  * @ingroup     net_gnrc
  * @brief       Abstraction layer for GNRC's network interfaces
  *
@@ -30,6 +30,7 @@
 
 #include "kernel_types.h"
 #include "msg.h"
+#include "net/ipv6/addr.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/conf.h"
@@ -251,6 +252,166 @@ gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev);
  * @return  NULL, if no network interface with PID exists.
  */
 gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
+
+/**
+ * @brief   Gets the (unicast on anycast) IPv6 addresss of an interface (if IPv6
+ *          is supported)
+ *
+ * @pre `netif != NULL`
+ * @pre `addrs != NULL`
+ * @pre `max_len >= sizeof(ipv6_addr_t)`
+ *
+ * @param[in] netif     The interface. May not be `NULL`.
+ * @param[out] addrs    Up to the first `max_len / sizeof(ipv6_addr_t)`
+ *                      addresses assigned to @p netif. May not be `NULL`
+ * @param[in] max_len   Number of *bytes* available in @p addrs. Must be at
+ *                      least `sizeof(ipv6_addr_t)`. It is recommended to use
+ *                      @p GNRC_NETIF_IPV6_ADDRS_NUMOF `* sizeof(ipv6_addr_t)
+ *                      here (and have @p addrs of the according length).
+ *
+ * @return  Number of addresses in @p addrs times `sizeof(ipv6_addr_t)` on
+ *          success (including 0).
+ * @return  -ENOTSUP, if @p netif doesn't support IPv6.
+ */
+static inline int gnrc_netif_ipv6_addrs_get(const gnrc_netif_t *netif,
+                                            ipv6_addr_t *addrs,
+                                            size_t max_len)
+{
+    assert(netif != NULL);
+    assert(addrs != NULL);
+    assert(max_len >= sizeof(ipv6_addr_t));
+    return gnrc_netapi_get(netif->pid, NETOPT_IPV6_ADDR, 0, addrs, max_len);
+}
+
+/**
+ * @brief   Adds an (unicast or anycast) IPv6 address to an interface (if IPv6
+ *          is supported)
+ *
+ * @pre `netif != NULL`
+ * @pre `addr != NULL`
+ * @pre `(pfx_len > 0) && (pfx_len <= 128)`
+ *
+ * @param[in] netif     The interface. May not be `NULL`.
+ * @param[in] addr      The address to add to @p netif. May not be `NULL`.
+ * @param[in] pfx_len   The prefix length of @p addr. Must be greater than 0 and
+ *                      lesser than or equal to 128.
+ * @param[in] flags     [Flags](@ref net_gnrc_netif_ipv6_addrs_flags) for
+ *                      @p addr. Set @ref GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID
+ *                      to skip duplicate address detection (when activated).
+ *
+ * @return  sizeof(ipv6_addr_t) on success.
+ * @return  -ENOMEM, if no space is left on @p netif to add @p addr or its
+ *          corresponding solicited-nodes multicast address.
+ * @return  -ENOTSUP, if @p netif doesn't support IPv6.
+ */
+static inline int gnrc_netif_ipv6_addr_add(const gnrc_netif_t *netif,
+                                           ipv6_addr_t *addr, unsigned pfx_len,
+                                           uint8_t flags)
+{
+    assert(netif != NULL);
+    assert(addr != NULL);
+    assert((pfx_len > 0) && (pfx_len <= 128));
+    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR,
+                           ((pfx_len << 8U) | flags), addr,
+                           sizeof(ipv6_addr_t));
+}
+
+/**
+ * @brief   Removes a (unicast or anycast) IPv6 address from an interface (if
+ *          IPv6 is supported)
+ *
+ * @pre `netif != NULL`
+ * @pre `addr != NULL`
+ *
+ * @param[in] netif     The interface. May not be `NULL`.
+ * @param[in] addr      The address to remove from @p netif. May not be `NULL`.
+ *
+ * @return  sizeof(ipv6_addr_t) on success.
+ * @return  -ENOTSUP, if @p netif doesn't support IPv6.
+ */
+static inline int gnrc_netif_ipv6_addr_remove(const gnrc_netif_t *netif,
+                                              ipv6_addr_t *addr)
+{
+    assert(netif != NULL);
+    assert(addr != NULL);
+    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR_REMOVE,
+                           0, addr, sizeof(ipv6_addr_t));
+}
+
+/**
+ * @brief   Gets the IPv6 multicast groups an interface is joined to (if IPv6 is
+ *          supported)
+ *
+ * @pre `netif != NULL`
+ * @pre `groups != NULL`
+ * @pre `max_len >= sizeof(ipv6_addr_t)`
+ *
+ * @param[in] netif     The interface. May not be `NULL`.
+ * @param[out] groups   Up to the first `max_len / 8` multicast groups @p netif
+ *                      is joined to. May not be `NULL`
+ * @param[in] max_len   Number of *bytes* available in @p groups. Must be at
+ *                      least `sizeof(ipv6_addr_t)`. It is recommended to use
+ *                      @p GNRC_NETIF_IPV6_GROUPS_NUMOF `* sizeof(ipv6_addr_t)
+ *                      here (and have @p groups of the according length).
+ *
+ * @return  Number of addresses in @p groups times `sizeof(ipv6_addr_t)` on
+ *          success (including 0).
+ * @return  -ENOTSUP, if @p netif doesn't support IPv6.
+ */
+static inline int gnrc_netif_ipv6_groups_get(const gnrc_netif_t *netif,
+                                             ipv6_addr_t *groups,
+                                             size_t max_len)
+{
+    assert(netif != NULL);
+    assert(groups != NULL);
+    assert(max_len >= sizeof(ipv6_addr_t));
+    return gnrc_netapi_get(netif->pid, NETOPT_IPV6_GROUP, 0, groups, max_len);
+}
+
+/**
+ * @brief   Joins an IPv6 multicast group on an interface (if IPv6 is supported)
+ *
+ * @pre `netif != NULL`
+ * @pre `group != NULL`
+ *
+ * @param[in] netif     The interface.
+ * @param[in] group     The address of the multicast group to join on @p netif.
+ *                      May not be `NULL`.
+ *
+ * @return  sizeof(ipv6_addr_t) on success.
+ * @return  -ENOMEM, if no space is left on @p netif to add @p group.
+ * @return  -ENOTSUP, if @p netif doesn't support IPv6.
+ */
+static inline int gnrc_netif_ipv6_group_join(const gnrc_netif_t *netif,
+                                             ipv6_addr_t *group)
+{
+    assert(netif != NULL);
+    assert(group != NULL);
+    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_GROUP, 0, group,
+                           sizeof(ipv6_addr_t));
+}
+
+/**
+ * @brief   Leaves an IPv6 multicast group on an interface (if IPv6 is supported)
+ *
+ * @pre `netif != NULL`
+ * @pre `group != NULL`
+ *
+ * @param[in] netif     The interface.
+ * @param[in] group     The address of the multicast group to leave on @p netif.
+ *                      May not be `NULL`.
+ *
+ * @return  sizeof(ipv6_addr_t) on success.
+ * @return  -ENOTSUP, if @p netif doesn't support IPv6.
+ */
+static inline int gnrc_netif_ipv6_group_leave(const gnrc_netif_t *netif,
+                                              ipv6_addr_t *group)
+{
+    assert(netif != NULL);
+    assert(group != NULL);
+    return gnrc_netapi_set(netif->pid, NETOPT_IPV6_GROUP_LEAVE, 0, group,
+                           sizeof(ipv6_addr_t));
+}
 
 /**
  * @brief   Default operation for gnrc_netif_ops_t::get()

@@ -9,11 +9,11 @@
 /**
  * @defgroup    boards_iotlab-m3 IoT-LAB M3 open node
  * @ingroup     boards
- * @brief       Board specific files for the iotlab-m3 board.
+ * @brief       Support for the iotlab-m3 board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the iotlab-m3 board.
+ * @brief       Board specific definitions for the iotlab-m3 board
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

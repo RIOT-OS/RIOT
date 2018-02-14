@@ -3,9 +3,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 
 def expect_unary(child):
     for _ in range(20):
@@ -26,7 +23,7 @@ def expect_unary(child):
 
 
 def expect_binary(child):
-    for _ in range(20):
+    for _ in range(1500):
         for op_name in ('add', 'sub', 'mul', 'div', 'mod', 'sadd', 'ssub',
                         'smul', 'sdiv', 'min', 'max'):
             child.expect('{}\(-?\d+.\d+\, -?\d+.\d+\) = -?\d+.\d+'
@@ -40,5 +37,8 @@ def testfunc(child):
     expect_binary(child)
     child.expect_exact('SUCCESS')
 
+
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

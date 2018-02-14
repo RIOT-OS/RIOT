@@ -8,11 +8,6 @@ include ../Makefile.tests_common
 # not pull in all C++ locale code whenever exceptions are used.
 BOARD_INSUFFICIENT_MEMORY := nucleo-f334 spark-core stm32f0discovery
 
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-CFLAGS += -DDEVELHELP
-
 # If you want to add some extra flags when compile c++ files, add these flags
 # to CXXEXFLAGS variable
 CXXEXFLAGS += -std=c++11

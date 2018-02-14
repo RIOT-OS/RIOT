@@ -9,9 +9,6 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
-
 
 def _ipv6_tests(code):
     return code & (1 << 6)
@@ -98,5 +95,8 @@ def testfunc(child):
         child.expect_exact(u"Calling test_sock_ip_send6__no_sock()")
     child.expect_exact(u"ALL TESTS SUCCESSFUL")
 
+
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

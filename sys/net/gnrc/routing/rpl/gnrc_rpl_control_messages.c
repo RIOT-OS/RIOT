@@ -42,9 +42,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 #define GNRC_RPL_GROUNDED_SHIFT             (7)
 #define GNRC_RPL_MOP_SHIFT                  (3)
@@ -447,8 +445,8 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 }
                 ipv6_addr_set_aiid(&pi->prefix, iid.uint8);
                 /* TODO: find a way to do this with DAD (i.e. state != VALID) */
-                gnrc_netif_ipv6_addr_add(netif, &pi->prefix, pi->prefix_len,
-                                         GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+                gnrc_netif_ipv6_addr_add_internal(netif, &pi->prefix, pi->prefix_len,
+                                                  GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
                 /* set lifetimes */
                 gnrc_ipv6_nib_pl_set(netif->pid, &pi->prefix, pi->prefix_len,
                                      _sec_to_ms(byteorder_ntohl(pi->valid_lifetime)),
@@ -465,8 +463,8 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                     first_target = target;
                 }
 
-                DEBUG("RPL: adding FT entry %s/%d 0x%" PRIx32 "\n",
-                      ipv6_addr_to_str(addr_str, &(target->target), sizeof(addr_str)),
+                DEBUG("RPL: adding FT entry %s/%d\n",
+                      ipv6_addr_to_str(addr_str, &(target->target), (unsigned)sizeof(addr_str)),
                       target->prefix_length);
 
                 gnrc_ipv6_nib_ft_add(&(target->target), target->prefix_length, src,

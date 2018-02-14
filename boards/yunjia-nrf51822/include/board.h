@@ -9,7 +9,7 @@
 /**
  * @defgroup    boards_yunjia-nrf51822 Yunjia NRF51822
  * @ingroup     boards
- * @brief       Board specific files for the Yunjia NRF51822 board
+ * @brief       Support for the Yunjia NRF51822 board
  * @{
  *
  * @file

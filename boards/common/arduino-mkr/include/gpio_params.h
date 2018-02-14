@@ -8,14 +8,14 @@
  */
 
 /**
- * @ingroup   boards_arduino-mkr-common
+ * @ingroup     boards_common_arduino-mkr
  * @{
  *
  * @file
- * @brief     Board specific configuration of direct mapped GPIOs
+ * @brief       Board specific configuration of direct mapped GPIOs
  *
- * @author    Alexandre Abadie <alexandre.abadie@inria.fr>
- * @author    Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef GPIO_PARAMS_H

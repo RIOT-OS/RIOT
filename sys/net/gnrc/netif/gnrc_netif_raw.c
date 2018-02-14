@@ -100,8 +100,11 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         /* we don't need the netif snip: remove it */
         pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
     }
+    /* prepare packet for sending */
     vector = gnrc_pktbuf_get_iovec(pkt, &n);
     if (vector != NULL) {
+        /* reassign for later release; vector is prepended to pkt */
+        pkt = vector;
         struct iovec *v = (struct iovec *)vector->data;
         netdev_t *dev = netif->dev;
 
@@ -110,6 +113,8 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #endif
         res = dev->driver->send(dev, v, n);
     }
+    /* release old data */
+    gnrc_pktbuf_release(pkt);
     return res;
 }
 

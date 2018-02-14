@@ -49,7 +49,7 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
     const coap_endpoint_t *ep = endpoints;
     int i;
 
-    len--; // Null-terminated string
+    len--; /* Null-terminated string */
 
     while (NULL != ep->handler) {
         if (NULL == ep->core_attr) {
