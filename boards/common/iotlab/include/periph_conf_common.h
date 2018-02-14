@@ -135,8 +135,8 @@ static const uart_conf_t uart_config[] = {
 #define RTT_IRQ             RTC_IRQn
 #define RTT_ISR             isr_rtc
 #define RTT_MAX_VALUE       (0xffffffff)
-#define RTT_FREQUENCY       (1)             /* in Hz */
-#define RTT_PRESCALER       (0x7fff)        /* run with 1 Hz */
+#define RTT_FREQUENCY       (16384U)     /* in Hz */
+#define RTT_PRESCALER       (0x1)        /* run with ~16 kHz */
 /** @} */
 
 /**
