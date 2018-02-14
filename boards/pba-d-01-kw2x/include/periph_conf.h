@@ -141,6 +141,12 @@ static const adc_conf_t adc_config[] = {
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
+/*
+ * KW2xD ADC reference settings:
+ * 0: VREFH/VREFL external pin pair
+ * 1-3: reserved
+ */
+#define ADC_REF_SETTING     0
 /** @} */
 
 /**
