@@ -119,12 +119,6 @@ enum {
 #define GNRC_NETIF_FLAGS_6LO_BACKBONE              (0x00000800U)
 
 /**
- * @brief   Marks if the addresses of the interface were already registered
- *          to an interface or not
- */
-#define GNRC_NETIF_FLAGS_6LO_ADDRS_REG             (0x00001000U)
-
-/**
  * @brief   Mask for @ref gnrc_mac_tx_feedback_t
  */
 #define GNRC_NETIF_FLAGS_MAC_TX_FEEDBACK_MASK      (0x00006000U)
