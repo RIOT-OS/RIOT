@@ -25,7 +25,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef SOCK_HAS_ASYNC
 #include "event.h"
+#endif
 #include "mbox.h"
 #include "net/af.h"
 #include "net/gnrc.h"

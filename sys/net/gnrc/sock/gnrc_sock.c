@@ -55,7 +55,8 @@ void _netapi_cb(uint16_t cmd, gnrc_pktsnip_t *pkt, void *ctx)
         gnrc_sock_reg_t *reg = ctx;
 
         if (mbox_try_put(&reg->mbox, &msg) < 1) {
-            DEBUG("gnrc_sock: dropped message to %p (was full)\n", &reg->mbox);
+            DEBUG("gnrc_sock: dropped message to %p (was full)\n",
+                  (void *)&reg->mbox);
         }
         if (!(reg->event.type & SOCK_EVENT_RECV) && (reg->event_queue != NULL)) {
             reg->event.super.handler = reg->event_handler;
