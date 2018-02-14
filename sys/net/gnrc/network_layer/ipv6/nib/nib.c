@@ -1322,8 +1322,9 @@ static void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #endif  /* GNRC_IPV6_NIB_CONF_6LN */
     }
 
-#if GNRC_IPV6_NIB_CONF_6LN
-    if (gnrc_netif_is_6ln(netif)) {
+if GNRC_IPV6_NIB_CONF_6LN
+    /* mark link-local addresses as valid on 6LN */
+    if (gnrc_netif_is_6ln(netif) && ipv6_addr_is_link_local(pfx)) {
         /* don't do this beforehand or risk a deadlock:
          *  * gnrc_netif_ipv6_addr_add_internal() adds VALID (i.e. manually configured
          *    addresses to the prefix list locking the NIB's mutex which is already
@@ -1332,7 +1333,6 @@ static void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
         netif->ipv6.addrs_flags[idx] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
     }
 #endif  /* GNRC_IPV6_NIB_CONF_6LN */
-    (void)idx;
     /* TODO: make this line conditional on 6LN when there is a SLAAC
      * implementation */
 #if GNRC_IPV6_NIB_CONF_6LN
@@ -1340,6 +1340,8 @@ static void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
         !gnrc_netif_is_6lbr(netif)) {
         _handle_rereg_address(&netif->ipv6.addrs[idx]);
     }
+#else   /* GNRC_IPV6_NIB_CONF_6LN */
+    (void)idx;
 #endif  /* GNRC_IPV6_NIB_CONF_6LN */
 #if GNRC_IPV6_NIB_CONF_SLAAC
     /* TODO send NS to solicited nodes and wait netif->ipv6.retrans_time to
