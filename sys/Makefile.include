@@ -86,3 +86,12 @@ endif
 ifneq (native,$(BOARD))
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
 endif
+
+ifneq (,$(filter shell_commands,$(USEMODULE)))
+ifneq (,$(filter cortexm_common,$(USEMODULE)))
+  LINKFLAGS += $(RIOTBASE)/sys/shell/commands/shell_commands_cortexm.ld
+else
+  LINKFLAGS += $(RIOTBASE)/sys/shell/commands/shell_commands.ld
+endif
+  UNDEF += $(BINDIR)/shell_commands/shell_commands.o
+endif

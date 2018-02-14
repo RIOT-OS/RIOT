@@ -115,7 +115,7 @@ SECTIONS
         _estack = .;
     } > ram
 
-    .relocate : AT (_etext)
+    .data : AT (_etext)
     {
         . = ALIGN(4);
         _srelocate = .;

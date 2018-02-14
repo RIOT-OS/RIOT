@@ -32,7 +32,7 @@ extern "C" {
 #define DISK_READ_SECTOR_CMD    "dread_sec"
 #define DISK_READ_BYTES_CMD     "dread"
 
-extern const shell_command_t _shell_command_list[];
+extern const shell_command_t _shell_command_list;
 
 #ifdef __cplusplus
 }

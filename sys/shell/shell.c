@@ -49,7 +49,7 @@ static shell_command_handler_t find_handler(const shell_command_t *command_list,
     const shell_command_t *command_lists[] = {
         command_list,
 #ifdef MODULE_SHELL_COMMANDS
-        _shell_command_list,
+        &_shell_command_list,
 #endif
     };
 
@@ -81,7 +81,7 @@ static void print_help(const shell_command_t *command_list)
     const shell_command_t *command_lists[] = {
         command_list,
 #ifdef MODULE_SHELL_COMMANDS
-        _shell_command_list,
+        &_shell_command_list,
 #endif
     };
 
