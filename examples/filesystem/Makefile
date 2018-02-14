@@ -4,6 +4,16 @@ APPLICATION = filesystem
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 
+# Blacklisting msp430-based boards, as file syscalls are not supported
+BOARD_BLACKLIST :=  chronos \
+                    msb-430 \
+                    msb-430h \
+                    telosb \
+                    wsn430-v1_3b \
+                    wsn430-v1_4 \
+                    z1 \
+                    #
+
 BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
 
 # This has to be the absolute path to the RIOT base directory:
