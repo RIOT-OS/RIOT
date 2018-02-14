@@ -71,7 +71,7 @@ void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue,
  *        event has been processed!
  *
  * @param[in]   event_timeout   event_timout context object to use
- * @param[in]   timeout         timeout in miliseconds
+ * @param[in]   timeout         timeout in microseconds
  */
 void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout);
 
