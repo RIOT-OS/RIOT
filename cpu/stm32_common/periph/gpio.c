@@ -87,6 +87,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
 #endif
 
+    /* do not touch actual line state */
+    _port(pin)->ODR = _port(pin)->IDR;
     /* set mode */
     port->MODER &= ~(0x3 << (2 * pin_num));
     port->MODER |=  ((mode & 0x3) << (2 * pin_num));
