@@ -594,8 +594,8 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                             MS_PER_SEC);
     }
 #if !GNRC_IPV6_NIB_CONF_6LBR
-    else {
-        DEBUG("nib: multihop prefix and context dissemination activated,\n"
+    else if (gnrc_netif_is_6lr(netif)) {
+        DEBUG("nib: multihop prefix and context dissemination on router activated,\n"
               "     but no ABRO found. Discarding router advertisement silently\n");
         return;
     }
