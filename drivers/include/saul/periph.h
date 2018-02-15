@@ -19,11 +19,11 @@
 #ifndef SAUL_PERIPH_H
 #define SAUL_PERIPH_H
 
-#ifdef MODULE_SAUL_GPIO
+#if MODULE_SAUL_GPIO || DOXYGEN
 #include "periph/gpio.h"
 #endif /* MODULE_SAUL_GPIO */
 
-#ifdef MODULE_SAUL_ADC
+#if MODULE_SAUL_ADC || DOXYGEN
 #include "periph/adc.h"
 #endif /* MODULE_SAUL_ADC */
 
@@ -31,7 +31,10 @@
 extern "C" {
 #endif
 
-#ifdef MODULE_SAUL_GPIO
+#if MODULE_SAUL_GPIO || DOXYGEN
+/**
+ * @brief SAUL GPIO configuration flags
+ */
 typedef enum {
     SAUL_GPIO_INVERTED   = (1 << 0),  /**< pin is used as inverted */
     SAUL_GPIO_INIT_CLEAR = (1 << 1),  /**< set pin inactive after init */
@@ -49,7 +52,7 @@ typedef struct {
 } saul_gpio_params_t;
 #endif /* MODULE_SAUL_GPIO */
 
-#ifdef MODULE_SAUL_ADC
+#if MODULE_SAUL_ADC || DOXYGEN
 /**
  * @brief   Direct mapped ADC configuration values
  */
