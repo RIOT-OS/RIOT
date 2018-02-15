@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include "at30tse75x.h"
 
-#ifdef MODULE_AT30TSE75X
+#include "shell_commands.h"
 
 static bool initialized = false;
 static at30tse75x_t dev;
@@ -157,4 +157,4 @@ int _at30tse75x_handler(int argc, char **argv)
     return 0;
 }
 
-#endif /* MODULE_AT30TSE75X */
+REGISTER_SHELL_COMMAND("at30tse75x", "Test AT30TSE75X temperature sensor", _at30tse75x_handler);

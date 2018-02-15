@@ -27,6 +27,8 @@
 #include "can/conn/raw.h"
 #include "can/raw.h"
 
+#include "shell_commands.h"
+
 #define SC_CAN_MAX_FILTERS  10
 #define xstr(a) str(a)
 #define str(a) #a
@@ -182,3 +184,5 @@ int _can_handler(int argc, char **argv)
     }
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("can", "CAN commands", _can_handler);

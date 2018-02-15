@@ -19,6 +19,7 @@
  */
 
 #include "periph/pm.h"
+#include "shell_commands.h"
 
 int _reboot_handler(int argc, char **argv)
 {
@@ -29,3 +30,5 @@ int _reboot_handler(int argc, char **argv)
 
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("reboot", "Reboot the node", _reboot_handler);

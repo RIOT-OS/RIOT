@@ -19,8 +19,6 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#ifdef MODULE_GNRC_ICMPV6
-
 #include "byteorder.h"
 #include "net/gnrc/icmpv6.h"
 #include "net/ipv6/addr.h"
@@ -33,6 +31,8 @@
 #include "thread.h"
 #include "utlist.h"
 #include "xtimer.h"
+
+#include "shell_commands.h"
 
 static uint16_t id = 0x53;
 static uint16_t min_seq_expected = 0;
@@ -340,7 +340,7 @@ int _icmpv6_ping(int argc, char **argv)
     return success ? 0 : 1;
 }
 
-#endif
+REGISTER_SHELL_COMMAND( "ping6", "Ping via ICMPv6", _icmpv6_ping);
 
 /**
  * @}

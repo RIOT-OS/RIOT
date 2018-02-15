@@ -25,6 +25,8 @@
 #include "shell_commands.h"
 #include "diskio.h"
 
+#include "shell_commands.h"
+
 static inline uint8_t sector_read(unsigned char *read_buf, unsigned long sector, unsigned long length, unsigned long offset)
 {
     if (mci_read(read_buf, sector, 1) == DISKIO_RES_OK) {
@@ -173,3 +175,9 @@ int _read_bytes(int argc, char **argv)
     return 1;
 
 }
+
+REGISTER_SHELL_COMMAND(DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector);
+REGISTER_SHELL_COMMAND(DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes);
+REGISTER_SHELL_COMMAND(DISK_GET_SECTOR_SIZE, "Get the sector size of inserted memory card", _get_sectorsize);
+REGISTER_SHELL_COMMAND(DISK_GET_SECTOR_COUNT, "Get the sector count of inserted memory card", _get_sectorcount);
+REGISTER_SHELL_COMMAND(DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize);

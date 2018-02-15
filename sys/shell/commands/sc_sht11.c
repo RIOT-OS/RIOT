@@ -24,7 +24,7 @@
 #include <string.h>
 #include "sht11.h"
 
-#ifdef MODULE_SHT11
+#include "shell_commands.h"
 
 extern float sht11_temperature_offset;
 
@@ -109,4 +109,7 @@ int _set_offset_handler(int argc, char **argv)
     }
 }
 
-#endif
+REGISTER_SHELL_COMMAND("temp", "Prints measured temperature.", _get_temperature_handler);
+REGISTER_SHELL_COMMAND("hum", "Prints measured humidity.", _get_humidity_handler);
+REGISTER_SHELL_COMMAND("weather", "Prints measured humidity and temperature.", _get_weather_handler);
+REGISTER_SHELL_COMMAND("offset", "Set temperature offset.", _set_offset_handler);

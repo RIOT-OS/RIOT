@@ -20,6 +20,8 @@
 
 #include "ps.h"
 
+#include "shell_commands.h"
+
 int _ps_handler(int argc, char **argv)
 {
     (void) argc;
@@ -29,3 +31,5 @@ int _ps_handler(int argc, char **argv)
 
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("ps", "Prints information about running threads.", _ps_handler);

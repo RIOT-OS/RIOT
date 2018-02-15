@@ -27,6 +27,8 @@
 #include "net/ipv6/addr.h"
 #include "timex.h"
 
+#include "shell_commands.h"
+
 #define _DEFAULT_TIMEOUT (500000LU)
 
 static void _usage(char *cmd)
@@ -102,3 +104,5 @@ int _ntpdate(int argc, char **argv)
 #endif
     return 0;
 }
+
+REGISTER_SHELL_COMMAND( "ntpdate", "synchronizes with a remote time server", _ntpdate);

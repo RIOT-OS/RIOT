@@ -18,6 +18,8 @@
  * @}
  */
 
+#include "shell_commands.h"
+
 extern void heap_stats(void);
 
 int _heap_handler(int argc, char **argv)
@@ -29,3 +31,5 @@ int _heap_handler(int argc, char **argv)
 
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("heap", "Shows the heap state for the LPC2387 on the command shell.", _heap_handler);

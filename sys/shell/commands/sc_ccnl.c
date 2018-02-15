@@ -24,6 +24,8 @@
 #include "ccn-lite-riot.h"
 #include "ccnl-pkt-ndntlv.h"
 
+#include "shell_commands.h"
+
 #define BUF_SIZE (64)
 
 #define MAX_ADDR_LEN            (GNRC_NETIF_L2ADDR_MAXLEN)
@@ -266,3 +268,8 @@ int _ccnl_fib(int argc, char **argv)
     }
     return 0;
 }
+
+REGISTER_SHELL_COMMAND( "ccnl_open", "opens an interface or socket", _ccnl_open);
+REGISTER_SHELL_COMMAND( "ccnl_int", "sends an interest", _ccnl_interest);
+REGISTER_SHELL_COMMAND( "ccnl_cont", "create content and populated it", _ccnl_content);
+REGISTER_SHELL_COMMAND( "ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib);

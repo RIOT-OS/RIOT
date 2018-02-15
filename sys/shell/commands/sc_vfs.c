@@ -18,7 +18,6 @@
  * @}
  */
 
-#if MODULE_VFS
 #include <stdint.h>
 #include <inttypes.h>
 #include <stdlib.h>
@@ -30,6 +29,8 @@
 #include <fcntl.h>
 
 #include "vfs.h"
+
+#include "shell_commands.h"
 
 #define SHELL_VFS_BUFSIZE 256
 static uint8_t _shell_vfs_data_buffer[SHELL_VFS_BUFSIZE];
@@ -582,4 +583,6 @@ int _vfs_handler(int argc, char **argv)
         return 1;
     }
 }
-#endif
+
+REGISTER_SHELL_COMMAND("vfs", "virtual file system operations", _vfs_handler);
+REGISTER_SHELL_COMMAND("ls", "list files", _ls_handler);

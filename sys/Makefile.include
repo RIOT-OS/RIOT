@@ -93,5 +93,5 @@ ifneq (,$(filter cortexm_common,$(USEMODULE)))
 else
   LINKFLAGS += $(RIOTBASE)/sys/shell/commands/shell_commands.ld
 endif
-  UNDEF += $(BINDIR)/shell_commands/shell_commands.o
+  UNDEF += -Wl,--whole-archive $(BINDIR)/shell_commands.a  -Wl,--no-whole-archive
 endif

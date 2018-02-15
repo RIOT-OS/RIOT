@@ -32,6 +32,9 @@ extern "C" {
 #define DISK_READ_SECTOR_CMD    "dread_sec"
 #define DISK_READ_BYTES_CMD     "dread"
 
+#define __registered__ __attribute__((used,section("._shell_command_list"))) static
+#define REGISTER_SHELL_COMMAND(name, desc, handler) __registered__ shell_command_t handler ## _command = {name, desc, handler}
+
 extern const shell_command_t _shell_command_list;
 
 #ifdef __cplusplus

@@ -19,6 +19,8 @@
 
 #include "net/gnrc/ipv6/blacklist.h"
 
+#include "shell_commands.h"
+
 static void _usage(char *cmd)
 {
     printf("usage: * %s\n", cmd);
@@ -59,5 +61,7 @@ int _blacklist(int argc, char **argv)
     }
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist);
 
 /** @} */

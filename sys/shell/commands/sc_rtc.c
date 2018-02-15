@@ -27,6 +27,8 @@
 
 #include "periph/rtc.h"
 
+#include "shell_commands.h"
+
 static void _alarm_handler(void *arg)
 {
     (void) arg;
@@ -183,3 +185,5 @@ int _rtc_handler(int argc, char **argv)
     }
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("rtc", "control RTC peripheral interface",  _rtc_handler);

@@ -29,6 +29,8 @@
 #include "net/fib.h"
 #include "net/gnrc/ipv6.h"
 
+#include "shell_commands.h"
+
 #define INFO1_TXT "fibroute add <destination> via <next hop> [dev <device>]"
 #define INFO2_TXT " [lifetime <lifetime>]"
 #define INFO3_TXT "       <destination> - the destination address with optional prefix size, e.g. /116\n" \
@@ -252,3 +254,5 @@ int _fib_route_handler(int argc, char **argv)
     puts("\nunrecognized parameters.\nPlease enter fibroute [add|del] for more information.");
     return 1;
 }
+
+REGISTER_SHELL_COMMAND("fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler);

@@ -19,6 +19,8 @@
 #include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
 
+#include "shell_commands.h"
+
 static void _usage(char **argv);
 static int _nib_neigh(int argc, char **argv);
 static int _nib_prefix(int argc, char **argv);
@@ -244,5 +246,7 @@ static int _nib_route(int argc, char **argv)
     }
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("nib", "Configure neighbor information base", _gnrc_ipv6_nib);
 
 /** @} */

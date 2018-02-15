@@ -25,6 +25,8 @@
 
 #include "saul_reg.h"
 
+#include "shell_commands.h"
+
 /* this function does not check, if the given device is valid */
 static void probe(int num, saul_reg_t *dev)
 {
@@ -153,3 +155,5 @@ int _saul(int argc, char **argv)
     }
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("saul", "interact with sensors and actuators using SAUL", _saul);

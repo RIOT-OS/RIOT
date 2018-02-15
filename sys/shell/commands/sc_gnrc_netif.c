@@ -33,6 +33,8 @@
 #include "net/l2filter.h"
 #endif
 
+#include "shell_commands.h"
+
 /**
  * @brief   The default IPv6 prefix length if not specified.
  */
@@ -1233,6 +1235,9 @@ int _gnrc_netif_send(int argc, char **argv)
 
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("txtsnd", "Sends a custom string as is over the link layer", _gnrc_netif_send);
+
 #endif
 
 int _gnrc_netif_config(int argc, char **argv)
@@ -1347,3 +1352,5 @@ int _gnrc_netif_config(int argc, char **argv)
     _usage(argv[0]);
     return 1;
 }
+
+REGISTER_SHELL_COMMAND("ifconfig", "Configure network interfaces", _gnrc_netif_config);

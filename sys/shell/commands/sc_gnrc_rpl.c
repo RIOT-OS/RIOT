@@ -29,6 +29,8 @@
 #include "net/gnrc/rpl/p2p_structs.h"
 #endif
 
+#include "shell_commands.h"
+
 int _gnrc_rpl_init(char *arg)
 {
     kernel_pid_t iface_pid = atoi(arg);
@@ -431,6 +433,9 @@ int _gnrc_rpl(int argc, char **argv)
     puts("* show\t\t\t\t\t- show instance and dodag tables");
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl);
+
 /**
  * @}
  */

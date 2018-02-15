@@ -25,6 +25,8 @@
 #include "timex.h"
 #include "xtimer.h"
 
+#include "shell_commands.h"
+
 static xtimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
 void _del_cb(void *ptr)
 {
@@ -145,5 +147,7 @@ int _gnrc_6ctx(int argc, char **argv)
     }
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx);
 
 /** @} */

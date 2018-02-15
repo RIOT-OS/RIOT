@@ -18,6 +18,8 @@
 
 #include "net/gnrc/ipv6/whitelist.h"
 
+#include "shell_commands.h"
+
 static void _usage(char *cmd)
 {
     printf("usage: * %s\n", cmd);
@@ -58,5 +60,7 @@ int _whitelist(int argc, char **argv)
     }
     return 0;
 }
+
+REGISTER_SHELL_COMMAND("whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist);
 
 /** @} */

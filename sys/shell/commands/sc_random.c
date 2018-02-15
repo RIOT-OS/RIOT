@@ -30,6 +30,8 @@
 
 #include "random.h"
 
+#include "shell_commands.h"
+
 int _random_init(int argc, char **argv)
 {
     int initval;
@@ -64,3 +66,6 @@ int _random_get(int argc, char **argv)
 
     return 0;
 }
+
+REGISTER_SHELL_COMMAND( "random_init", "initializes the PRNG", _random_init);
+REGISTER_SHELL_COMMAND( "random_get", "returns 32 bit of pseudo randomness", _random_get);
