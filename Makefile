@@ -43,4 +43,5 @@ print-versions:
 include makefiles/boards.inc.mk
 include makefiles/app_dirs.inc.mk
 
+include makefiles/tools/riotgen.inc.mk
 -include makefiles/tests.inc.mk
