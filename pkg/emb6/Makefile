@@ -5,6 +5,9 @@ PKG_LICENSE=BSD-3-Clause
 
 # GCC 7.x fails on (intentional) fallthrough, thus disable implicit-fallthrough.
 CFLAGS += -Wno-implicit-fallthrough
+CFLAGS += -Wno-strict-aliasing
+CFLAGS += -Wno-old-style-definition
+CFLAGS += -Wno-strict-prototypes
 
 # Collect all chosen sub-modules but not the pseudo-modules and the ones
 # implemented in ./contrib/
