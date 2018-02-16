@@ -34,7 +34,7 @@
 typedef struct {
     rtc_alarm_cb_t alarm_cb;        /**< callback called from RTC interrupt */
     void *alarm_arg;                /**< argument passed to the callback */
-    uint32_t alarm;                 /**< scheduled alarm (may be defered) */
+    time_t alarm;                   /**< scheduled alarm (may be deferred) */
     uint8_t overflows;              /**< number of overflows */
 } rtc_state_t;
 
@@ -95,7 +95,7 @@ void rtc_init(void)
 
 int rtc_set_time(struct tm *time)
 {
-    uint32_t timestamp = mktime(time);
+    time_t timestamp = mktime(time);
 
     rtc_state.overflows = (timestamp >> RTC_SHIFT_VALUE);
     RTC->CNT = timestamp & RTC_MAX_VALUE;
@@ -105,7 +105,7 @@ int rtc_set_time(struct tm *time)
 
 int rtc_get_time(struct tm *time)
 {
-    uint32_t timestamp = RTC_CounterGet();
+    time_t timestamp = RTC_CounterGet();
 
     timestamp = timestamp + (rtc_state.overflows << RTC_SHIFT_VALUE);
 
