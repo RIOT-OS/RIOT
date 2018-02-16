@@ -178,7 +178,10 @@ static void _listen(sock_udp_t *sock)
                 || coap_get_type(&pdu) == COAP_TYPE_CON) {
             size_t pdu_len = _handle_req(&pdu, buf, sizeof(buf), &remote);
             if (pdu_len > 0) {
-                sock_udp_send(sock, buf, pdu_len, &remote);
+                ssize_t bytes = sock_udp_send(sock, buf, pdu_len, &remote);
+                if (bytes <= 0) {
+                    DEBUG("gcoap: send response failed: %d\n", (int)bytes);
+                }
             }
         }
         else {
@@ -807,9 +810,9 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
     }
 
     /* Memos complete; send msg and start timer */
-    size_t res = sock_udp_send(&_sock, buf, len, remote);
+    ssize_t res = sock_udp_send(&_sock, buf, len, remote);
 
-    if (res && timeout > 0) {     /* timeout may be zero for non-confirmable */
+    if ((res > 0) && (timeout > 0)) {     /* timeout may be zero for non-confirmable */
         /* We assume gcoap_req_send2() is called on some thread other than
          * gcoap's. First, put a message in the mbox for the sock udp object,
          * which will interrupt listening on the gcoap thread. (When there are
@@ -832,14 +835,14 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
             DEBUG("gcoap: can't wake up mbox; no timeout for msg\n");
         }
     }
-    if (!res) {
+    if (res <= 0) {
         if (msg_type == COAP_TYPE_CON) {
             *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
         }
         memo->state = GCOAP_MEMO_UNUSED;
         DEBUG("gcoap: sock send failed: %d\n", (int)res);
     }
-    return res;
+    return (size_t)((res > 0) ? res : 0);
 }
 
 int gcoap_resp_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code)
@@ -902,7 +905,8 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
     _find_obs_memo_resource(&memo, resource);
 
     if (memo) {
-        return sock_udp_send(&_sock, buf, len, memo->observer);
+        ssize_t bytes = sock_udp_send(&_sock, buf, len, memo->observer);
+        return (size_t)((bytes > 0) ? bytes : 0);
     }
     else {
         return 0;
