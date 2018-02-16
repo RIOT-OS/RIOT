@@ -50,6 +50,20 @@ static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
     return sizeof(eui64_t);
 }
 
+static inline int _get_short_addr(netdev_ieee802154_t *dev, void *value)
+{
+    assert(max_len >= sizeof(dev->short_addr));
+    memcpy(value, dev->short_addr, sizeof(dev->short_addr));
+    return sizeof(dev->short_addr);
+}
+
+static inline int _get_long_addr(netdev_ieee802154_t *dev, void *value)
+{
+    assert(max_len >= sizeof(dev->long_addr));
+    memcpy(value, dev->long_addr, sizeof(dev->long_addr));
+    return sizeof(dev->long_addr);
+}
+
 int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
                            size_t max_len)
 {
@@ -57,14 +71,10 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
 
     switch (opt) {
         case NETOPT_ADDRESS:
-            assert(max_len >= sizeof(dev->short_addr));
-            memcpy(value, dev->short_addr, sizeof(dev->short_addr));
-            res = sizeof(dev->short_addr);
+            res = _get_short_addr(dev, value);
             break;
         case NETOPT_ADDRESS_LONG:
-            assert(max_len >= sizeof(dev->long_addr));
-            memcpy(value, dev->long_addr, sizeof(dev->long_addr));
-            res = sizeof(dev->long_addr);
+            res = _get_long_addr(dev, value);
             break;
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
@@ -76,6 +86,15 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
                 *((uint16_t *)value) = IEEE802154_SHORT_ADDRESS_LEN;
             }
             res = sizeof(uint16_t);
+            break;
+        case NETOPT_SRC_ADDR:
+            assert(max_len >= sizeof(dev->long_addr));
+            if (dev->flags & NETDEV_IEEE802154_SRC_MODE_LONG) {
+                res = _get_long_addr(dev, value);
+            }
+            else {
+                res = _get_short_addr(dev, value);
+            }
             break;
         case NETOPT_NID:
             assert(max_len == sizeof(dev->pan));
