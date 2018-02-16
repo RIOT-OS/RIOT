@@ -21,6 +21,7 @@
 #ifndef ANALOG_UTIL_H
 #define ANALOG_UTIL_H
 
+#include <stdint.h>
 #include "periph/adc.h"
 
 #ifdef __cplusplus
