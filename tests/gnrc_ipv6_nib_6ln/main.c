@@ -89,7 +89,6 @@ static void _set_up(void)
     _mock_netif->ipv6.mtu = IPV6_MIN_MTU;
     _mock_netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
     gnrc_netif_ipv6_addr_remove_internal(_mock_netif, &_loc_gb);
-    _mock_netif->flags &= ~GNRC_NETIF_FLAGS_6LO_ADDRS_REG;
     gnrc_netif_release(_mock_netif);
     memset(_buffer, 0, sizeof(_buffer));
     gnrc_pktbuf_init();
@@ -1084,7 +1083,9 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
         TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_pl_iter(0, &state, &prefix),
                             "There is an unexpected prefix list entry");
     }
-    if (set_rtr_adv_fields) {
+    /* neighbor solicitation is only sent when router lifetime is non-zero and
+     * when PIO configures GUA */
+    if (set_rtr_adv_fields && pio && (pio_flags & NDP_OPT_PI_FLAGS_A)) {
         TEST_ASSERT(msg_avail() > 0);
         while (msg_avail()) {
             gnrc_netif_hdr_t *netif_hdr;
