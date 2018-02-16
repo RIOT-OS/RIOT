@@ -21,7 +21,7 @@
 
 #include "net/ipv6/addr.h"
 #include "net/gnrc/sixlowpan/ctx.h"
-#include "net/gnrc/sixlowpan/nd.h"
+#include "net/sixlowpan/nd.h"
 #include "timex.h"
 #include "xtimer.h"
 
@@ -45,13 +45,14 @@ int _gnrc_6ctx_list(void)
 {
     puts("cid|prefix                                     |C|ltime");
     puts("-----------------------------------------------------------");
-    for (uint8_t i = 0; i < GNRC_SIXLOWPAN_CTX_SIZE; i++) {
-        gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_id(i);
+    for (uint8_t cid = 0; cid < GNRC_SIXLOWPAN_CTX_SIZE; cid++) {
+        gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_id(cid);
         if (ctx != NULL) {
             char addr_str[IPV6_ADDR_MAX_STR_LEN];
-            printf(" %2" PRIu8 "|%39s/%-3" PRIu8 "|%" PRIx8 "|%5" PRIu16 " min\n", i,
-                   ipv6_addr_to_str(addr_str, &ctx->prefix, sizeof(addr_str)), ctx->prefix_len,
-                   (uint8_t) ((ctx->flags_id & 0xf0) >> 4), ctx->ltime);
+            printf(" %2u|%39s/%-3u|%x|%5umin\n", cid,
+                   ipv6_addr_to_str(addr_str, &ctx->prefix, sizeof(addr_str)),
+                   ctx->prefix_len, (uint8_t) ((ctx->flags_id & 0xf0) >> 4),
+                   ctx->ltime);
         }
     }
     return 0;
@@ -112,15 +113,14 @@ int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
             ctx->ltime = 0;
             del_timer[cid].callback = _del_cb;
             del_timer[cid].arg = ctx;
-            xtimer_set(&del_timer[cid], GNRC_SIXLOWPAN_ND_RTR_MIN_CTX_DELAY * US_PER_SEC);
+            xtimer_set(&del_timer[cid],
+                       SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * US_PER_SEC);
         }
     }
     else {
         printf("Context %u already marked for removal\n", cid);
         return 1;
     }
-    /* advertise updated context */
-    _adv_ctx();
     return 0;
 }
 
