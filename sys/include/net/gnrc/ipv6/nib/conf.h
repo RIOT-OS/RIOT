@@ -177,7 +177,7 @@ extern "C" {
  * @see [RFC 6775, section 8.1](https://tools.ietf.org/html/rfc6775#section-8.1)
  */
 #ifndef GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-#if GNRC_IPV6_NIB_CONF_6LN
+#if GNRC_IPV6_NIB_CONF_6LR
 #define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C (1)
 #else
 #define GNRC_IPV6_NIB_CONF_MULTIHOP_P6C (0)
