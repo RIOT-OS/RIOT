@@ -35,6 +35,10 @@ void flashpage_write(int page, void *data)
 
     MSC_Init();
     MSC_ErasePage(page_addr);
-    MSC_WriteWord(page_addr, data_addr, FLASHPAGE_SIZE);
+
+    if (data != NULL) {
+        MSC_WriteWord(page_addr, data_addr, FLASHPAGE_SIZE);
+    }
+
     MSC_Deinit();
 }
