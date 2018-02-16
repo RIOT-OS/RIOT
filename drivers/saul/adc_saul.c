@@ -34,6 +34,11 @@ static int read_adc(const void *dev, phydat_t *res)
     /* Raw ADC reading has no unit */
     res->unit = UNIT_NONE;
     res->scale = 0;
+#if MODULE_SAUL_ADC_CONVERSION
+    if (params->conv) {
+        return params->conv(params, res);
+    }
+#endif
     return 1;
 }
 

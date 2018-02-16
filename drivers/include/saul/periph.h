@@ -53,13 +53,28 @@ typedef struct {
 #endif /* MODULE_SAUL_GPIO */
 
 #if MODULE_SAUL_ADC || DOXYGEN
+#if MODULE_SAUL_ADC_CONVERSION || DOXYGEN
+/* Forward declaration */
+struct saul_adc_params;
+
+/**
+ * @brief ADC result conversion function pointer type
+ *
+ * @param[in] params  pointer to ADC params
+ * @param[in] res  an ADC sample
+ */
+typedef int (*adc_conv_t)(const struct saul_adc_params *params, phydat_t *res);
+#endif
 /**
  * @brief   Direct mapped ADC configuration values
  */
-typedef struct {
+typedef struct saul_adc_params {
     const char *name;       /**< name of the device connected to this pin */
     adc_t line;             /**< ADC line to initialize and expose */
     adc_res_t res;          /**< ADC resolution */
+#if MODULE_SAUL_ADC_CONVERSION || DOXYGEN
+    adc_conv_t conv;        /**< ADC result conversion function, NULL for no-op */
+#endif
 } saul_adc_params_t;
 #endif /* MODULE_SAUL_ADC */
 

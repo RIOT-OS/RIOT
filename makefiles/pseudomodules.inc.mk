@@ -69,6 +69,7 @@ PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
 PSEUDOMODULES += rdcli_simple_standalone
 PSEUDOMODULES += saul_adc
+PSEUDOMODULES += saul_adc_conversion
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
 PSEUDOMODULES += schedstatistics
