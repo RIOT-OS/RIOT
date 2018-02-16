@@ -196,7 +196,7 @@ int adc_init(adc_t line)
     /* select ADxxb channels, longest sample time (20 extra ADC cycles) */
     dev(line)->CFG2 = ADC_CFG2_MUXSEL_MASK | ADC_CFG2_ADLSTS(0);
     /* select software trigger, external ref pins */
-    dev(line)->SC2 = ADC_SC2_REFSEL(0);
+    dev(line)->SC2 = ADC_SC2_REFSEL(ADC_REF_SETTING);
     /* select hardware average over 32 samples */
     dev(line)->SC3 = ADC_SC3_AVGE_MASK | ADC_SC3_AVGS(3);
     /* set an (arbitrary) input channel, single-ended mode */
