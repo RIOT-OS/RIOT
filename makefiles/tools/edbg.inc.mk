@@ -16,3 +16,5 @@ FFLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE) -b -e -v -p -f $(HEXFILE)
 ifeq ($(RIOT_EDBG),$(FLASHER))
   FLASHDEPS += $(RIOT_EDBG)
 endif
+RESET ?= $(EDBG)
+RESET_FLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE)
