@@ -138,6 +138,16 @@ typedef struct {
 } phydat_t;
 
 /**
+ * @brief   Minimum value for phydat_t::val
+ */
+#define PHYDAT_MIN  (INT16_MIN)
+
+/**
+ * @brief   Maximum value for phydat_t::val
+ */
+#define PHYDAT_MAX  (INT16_MAX)
+
+/**
  * @brief   Dump the given data container to STDIO
  *
  * @param[in] data      data container to dump
