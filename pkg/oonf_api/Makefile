@@ -5,6 +5,9 @@ PKG_LICENSE=BSD-3-Clause
 
 MODULE:=$(PKG_NAME)
 
+# GCC 7.x fails on (intentional) fallthrough, thus disable implicit-fallthrough.
+CFLAGS += -Wno-implicit-fallthrough
+
 .PHONY: all
 
 all: git-download
