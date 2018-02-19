@@ -28,7 +28,7 @@
  * @brief Boot default for vrefh
  */
 /* 3300 mV is as good as any other guess */
-#define BOARD_ADC_VREFH_DEFAULT 3300
+#define BOARD_ADC_VREFH_DEFAULT         (3300)
 #endif
 
 #ifndef BOARD_ADC_VREFL_DEFAULT
@@ -36,7 +36,7 @@
  * @brief Boot default for vrefl
  */
 /* 0 mV is as good as any other guess */
-#define BOARD_ADC_VREFL_DEFAULT 0
+#define BOARD_ADC_VREFL_DEFAULT         (0)
 #endif
 
 #ifndef BOARD_ADC_VREF_SCALE_DEFAULT
@@ -44,7 +44,7 @@
  * @brief Boot default for vref scale
  */
 /* millivolts by default */
-#define BOARD_ADC_VREF_SCALE_DEFAULT -3
+#define BOARD_ADC_VREF_SCALE_DEFAULT    (-3)
 #endif
 
 /**
