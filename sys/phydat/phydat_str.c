@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_sensif
+ * @ingroup     sys_phydat
  * @{
  *
  * @file
