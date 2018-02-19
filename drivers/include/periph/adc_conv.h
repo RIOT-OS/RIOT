@@ -83,6 +83,8 @@ void adc_conv_set_vrefl(int new_vrefl);
  * This is the 10 exponent for the value in vrefh/vrefl, i.e.
  * Real Vrefh = vrefh * 10^(scale)
  * For example, scale = -3 means that vrefh, vrefl are given in millivolts.
+ *
+ * @param[in]   new_scale   Vref unit scale exponent
  */
 void adc_conv_set_scale(int new_scale);
 
