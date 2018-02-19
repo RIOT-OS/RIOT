@@ -43,3 +43,5 @@ clean::
 
 distclean::
 	$(Q)rm -rf "$(PKG_BUILDDIR)"
+
+endif
