@@ -50,7 +50,8 @@ static int mulle_vbat_volts(const saul_adc_params_t *params, phydat_t *res)
     /* The Vbat, Vchr measurement point is located on a voltage divider which
      * shows half of the full voltage, to be able to measure voltages greater
      * than ADC Vref. */
-    res->val[0] *= 2;
+    phydat_fit(res, res->val[0] * 2, 0, 0);
+
     return 1;
 }
 #endif

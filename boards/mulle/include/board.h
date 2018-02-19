@@ -24,6 +24,15 @@
 #include "mulle-nvram.h"
 #include "mtd.h"
 
+/**
+ * @name ADC sample conversion configuration
+ * @{
+ */
+#define BOARD_ADC_VREFH_DEFAULT          33000
+#define BOARD_ADC_VREFL_DEFAULT          0
+#define BOARD_ADC_VREF_SCALE_DEFAULT    -4
+/** @} */
+
 /* Use the on board RTC 32kHz clock for LPTMR clocking. */
 #undef LPTIMER_CLKSRC
 /** @brief Clock source for the LPTMR module */
