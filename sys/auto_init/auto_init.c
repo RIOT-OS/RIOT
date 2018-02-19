@@ -311,6 +311,10 @@ auto_init_mpu9150();
     extern void auto_init_bmp180(void);
     auto_init_bmp180();
 #endif
+#ifdef MODULE_BMX055
+    extern void auto_init_bmx055(void);
+    auto_init_bmx055();
+#endif
 #if defined(MODULE_BME280) || defined(MODULE_BMP280)
     extern void auto_init_bmx280(void);
     auto_init_bmx280();
