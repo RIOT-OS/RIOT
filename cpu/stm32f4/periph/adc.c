@@ -99,7 +99,7 @@ int adc_sample(adc_t line, adc_res_t res)
     int sample;
 
     /* check if resolution is applicable */
-    if (res < 0xff) {
+    if (res & 0xff) {
         return -1;
     }
 
