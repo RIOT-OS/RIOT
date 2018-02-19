@@ -171,6 +171,17 @@ static void test_reg_rm(void)
     TEST_ASSERT_EQUAL_INT(-ENODEV, res);
 
     TEST_ASSERT_EQUAL_INT(2, count());
+
+    res = saul_reg_rm(&s0);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(1, count());
+    TEST_ASSERT_EQUAL_STRING("S2", saul_reg->name);
+    TEST_ASSERT_EQUAL_STRING("S2", last()->name);
+
+    res = saul_reg_rm(&s2);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(0, count());
+    TEST_ASSERT_NULL(saul_reg);
 }
 
 Test *tests_saul_reg_tests(void)
