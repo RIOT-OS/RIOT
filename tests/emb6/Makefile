@@ -2,8 +2,6 @@
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED = periph_gpio periph_spi  # for at86rf231
-
 # MSP-430 doesn't support C11's atomic functionality yet
 BOARD_BLACKLIST := msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
 
