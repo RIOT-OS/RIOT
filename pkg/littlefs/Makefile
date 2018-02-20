@@ -1,7 +1,8 @@
 PKG_NAME=littlefs
 PKG_URL=https://github.com/geky/littlefs.git
-PKG_VERSION=be22d3449f23a24e7462114349ce04d751e42437
+PKG_VERSION=v1.3
 PKG_BUILDDIR ?= $(PKGDIRBASE)/$(PKG_NAME)
+PKG_LICENSE=Apache-2.0
 
 .PHONY: all
 
