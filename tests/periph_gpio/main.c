@@ -221,7 +221,6 @@ static int bench(int argc, char **argv)
     }
 
     puts("\nGPIO driver run-time performance benchmark\n");
-    BENCHMARK_SETUP();
     BENCHMARK_FUNC("nop loop", runs, __asm__ volatile("nop"));
     BENCHMARK_FUNC("gpio_set", runs, gpio_set(pin));
     BENCHMARK_FUNC("gpio_clear", runs, gpio_clear(pin));
