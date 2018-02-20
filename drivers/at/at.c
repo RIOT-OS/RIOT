@@ -297,3 +297,13 @@ void at_process_oob(at_dev_t *dev)
         return;
     }
 }
+
+void at_dev_poweron(at_dev_t *dev)
+{
+    uart_poweron(dev->uart);
+}
+
+void at_dev_poweroff(at_dev_t *dev)
+{
+    uart_poweroff(dev->uart);
+}

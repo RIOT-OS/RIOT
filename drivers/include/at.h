@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2018 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -28,6 +29,7 @@
  *
  * @brief       AT (Hayes) library interface
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
 #ifndef AT_H
@@ -245,6 +247,20 @@ void at_remove_oob(at_dev_t *dev, at_oob_t *oob);
  * @param[in]   dev     device to operate on
  */
 void at_process_oob(at_dev_t *dev);
+
+/**
+ * @brief   power on the AT interface
+ *
+ * @param[in]   dev     device to operate on
+ */
+void at_dev_poweron(at_dev_t *dev);
+
+/**
+ * @brief   power off the AT interface
+ *
+ * @param[in]   dev     device to operate on
+ */
+void at_dev_poweroff(at_dev_t *dev);
 
 #ifdef __cplusplus
 }
