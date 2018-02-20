@@ -88,7 +88,7 @@ static void test_atomic_dec_positive(void)
 {
     atomic_int res = ATOMIC_VAR_INIT(99);
 
-    for (int i = 99; i < -123; --i) {
+    for (int i = 99; i > -123; --i) {
         TEST_ASSERT_EQUAL_INT(i, atomic_fetch_sub(&res, 1));
         TEST_ASSERT_EQUAL_INT(i - 1, atomic_load(&res));
     }
