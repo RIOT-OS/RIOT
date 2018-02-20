@@ -274,10 +274,35 @@ struct gsm_driver {
                                 const char *result_filename,
                                 const gsm_http_params_t *params);
 
-    int(*get_loc)(gsm_t *dev, char *lon, char *lat);
-    int(*cnet_scan)(gsm_t *dev, char *buf, size_t len);
+    int (*get_loc)(gsm_t *dev, char *lon, char *lat);
+    int (*cnet_scan)(gsm_t *dev, char *buf, size_t len);
 
-    int(*time_sync)(gsm_t *dev);
+    int (*time_sync)(gsm_t *dev);
+
+    /**
+     * @brief   Start GPS
+     *
+     * @param[in]   gsmdev  device driver
+     */
+    int (*gps_start)(gsm_t *gsmdev);
+
+    /**
+     * @brief   Stop GPS
+     *
+     * @param[in]   gsmdev  device driver
+     */
+    int (*gps_stop)(gsm_t *gsmdev);
+
+    /**
+     * @brief   Get GPS NMEA frames
+     *
+     * @param[in]   gsmdev  device driver
+     * @param[out]  nmea    NMEA frames
+     * @param[in]   len     length of @p nmea
+     *
+     * @return  number of bytes in @p nmea on success
+     * @return  < 0 on error
+     */
     ssize_t (*get_nmea)(gsm_t *gsmdev, char *nmea, size_t len);
 };
 
@@ -560,6 +585,20 @@ int gsm_get_loc(gsm_t *gsmdev, char *lon, char *lat);
  * @return
  */
 int gsm_off(gsm_t *gsmdev);
+
+/**
+ * @brief gsm_gps_start
+ * @param gsmdev
+ * @return
+ */
+int gsm_gps_start(gsm_t *gsmdev);
+
+/**
+ * @brief gsm_gps_stop
+ * @param gsmdev
+ * @return
+ */
+int gsm_gps_stop(gsm_t *gsmdev);
 
 /**
  * @brief gsm_get_nmea

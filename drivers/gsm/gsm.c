@@ -740,7 +740,29 @@ int gsm_time_sync(gsm_t *gsmdev)
     return gsmdev->driver->time_sync(gsmdev);
 }
 
+int gsm_gps_start(gsm_t *gsmdev)
+{
+    if (gsmdev->driver->gps_start) {
+        return gsmdev->driver->gps_start(gsmdev);
+    }
+
+    return -ENOTSUP;
+}
+
+int gsm_gps_stop(gsm_t *gsmdev)
+{
+    if (gsmdev->driver->gps_stop) {
+        return gsmdev->driver->gps_stop(gsmdev);
+    }
+
+    return -ENOTSUP;
+}
+
 ssize_t gsm_get_nmea(gsm_t *gsmdev, char *nmea, size_t len)
 {
-    return gsmdev->driver->get_nmea(gsmdev, nmea, len);
+    if (gsmdev->driver->get_nmea) {
+        return gsmdev->driver->get_nmea(gsmdev, nmea, len);
+    }
+
+    return -ENOTSUP;
 }
