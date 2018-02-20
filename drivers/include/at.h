@@ -145,7 +145,8 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
  * @returns     length of response on success
  * @returns     <0 on error
  */
-ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
+ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
+                             size_t len, uint32_t timeout);
 
 /**
  * @brief   Send AT command, wait for multiline response
@@ -160,12 +161,14 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @param[in]   command     command to send
  * @param[out]  resp_buf    buffer for storing response
  * @param[in]   len         len of @p buffer
+ * @param[in]   keep_eol    true to keep EOL character (\r), false otherwise
  * @param[in]   timeout     timeout (in usec)
  *
  * @returns     length of response on success
  * @returns     <0 on error
  */
-ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
+ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf,
+                              size_t len, bool keep_eol, uint32_t timeout);
 
 /**
  * @brief   Expect bytes from device
@@ -189,6 +192,19 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len);
 
 /**
+ * @brief   Read raw bytes from a device
+ *
+ * @param[in]   dev     device to operate on
+ * @param[out]  bytes   buffer to hold bytes to read
+ * @param[in]   len     number of bytes to read
+ * @param[in]   timeout timeout (in usec)
+ *
+ * @return  number of bytes read on success
+ * @return  < 0 on error
+ */
+ssize_t at_read_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout);
+
+/**
  * @brief   Send command to device
  *
  * @param[in]   dev     device to operate on
@@ -206,12 +222,13 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout);
  * @param[in]   dev         device to operate on
  * @param[in]   resp_buf    buffer to store line
  * @param[in]   len         size of @p buffer
+ * @param[in]   keep_eol    true to keep EOL character (\r), false otherwise
  * @param[in]   timeout     timeout (in usec)
  *
  * @returns     line length on success
  * @returns     <0 on error
  */
-ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout);
+ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, uint32_t timeout);
 
 /**
  * @brief   Drain device input buffer
