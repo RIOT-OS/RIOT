@@ -132,6 +132,9 @@ ifeq ($(WPEDANTIC),1)
     CFLAGS += -Wpedantic -pedantic-errors
 endif
 
+# remove this once codebase is adapted
+CFLAGS += -Wno-implicit-fallthrough
+
 ifneq (10,$(if ${RIOT_VERSION},1,0)$(if ${__RIOTBUILD_FLAG},1,0))
 
 # Provide a shallow sanity check. You cannot call `make` in a module directory.
