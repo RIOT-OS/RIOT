@@ -8,6 +8,7 @@ export AR         = $(PREFIX)ar
 endif
 export AS         = $(PREFIX)as
 export LINK       = $(PREFIX)gcc
+export LINKXX     = $(PREFIX)g++
 export SIZE       = $(PREFIX)size
 export OBJCOPY   ?= $(shell command -v $(PREFIX)objcopy gobjcopy objcopy | head -n 1)
 ifeq ($(OBJCOPY),)
