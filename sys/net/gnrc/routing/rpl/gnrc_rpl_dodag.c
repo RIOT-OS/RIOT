@@ -132,6 +132,7 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, k
     assert(instance && (instance->state > 0));
 
     gnrc_rpl_dodag_t *dodag = &instance->dodag;
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
 
     dodag->dodag_id = *dodag_id;
     dodag->my_rank = GNRC_RPL_INFINITE_RANK;
@@ -150,6 +151,9 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, k
     dodag->instance = instance;
     dodag->iface = iface;
 
+    if ((netif != NULL) && !(netif->flags & GNRC_NETIF_FLAGS_IPV6_FORWARDING)) {
+        gnrc_rpl_leaf_operation(dodag);
+    }
 #ifdef MODULE_GNRC_RPL_P2P
     if ((instance->mop == GNRC_RPL_P2P_MOP) && (gnrc_rpl_p2p_ext_new(dodag) == NULL)) {
         DEBUG("RPL: could not allocate new P2P-RPL DODAG extension. Remove DODAG\n");
