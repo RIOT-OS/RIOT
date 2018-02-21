@@ -1,0 +1,97 @@
+{
+  "testRIOTDevice": {
+    "servers": {
+      "0": {
+        "shortId": 10,
+        "lifetime": 20,
+        "defaultMinPeriod": 1,
+        "notifIfDisabled": true,
+        "binding": "U"
+      }
+    },
+    "security": {
+      "0": {
+        "uri": "coaps://localhost:5685",
+        "bootstrapServer": true,
+        "securityMode": "PSK",
+        "publicKeyOrId": [
+          67,
+          108,
+          105,
+          101,
+          110,
+          116,
+          95,
+          105,
+          100,
+          101,
+          110,
+          116,
+          105,
+          116,
+          121
+        ],
+        "serverPublicKey": [],
+        "secretKey": [
+          115,
+          101,
+          99,
+          114,
+          101,
+          116,
+          80,
+          83,
+          75
+        ],
+        "smsSecurityMode": "NO_SEC",
+        "smsBindingKeyParam": [],
+        "smsBindingKeySecret": [],
+        "serverSmsNumber": "",
+        "serverId": 111,
+        "clientOldOffTime": 1,
+        "bootstrapServerAccountTimeout": 0
+      },
+      "1": {
+        "uri": "coaps://[fd00:dead:beef::1]",
+        "bootstrapServer": false,
+        "securityMode": "PSK",
+        "publicKeyOrId": [
+          67,
+          108,
+          105,
+          101,
+          110,
+          116,
+          95,
+          105,
+          100,
+          101,
+          110,
+          116,
+          105,
+          116,
+          121
+        ],
+        "serverPublicKey": [],
+        "secretKey": [
+          115,
+          101,
+          99,
+          114,
+          101,
+          116,
+          80,
+          83,
+          75
+        ],
+        "smsSecurityMode": "NO_SEC",
+        "smsBindingKeyParam": [],
+        "smsBindingKeySecret": [],
+        "serverSmsNumber": "",
+        "serverId": 10,
+        "clientOldOffTime": 1,
+        "bootstrapServerAccountTimeout": 0
+      }
+    }
+  }
+}
