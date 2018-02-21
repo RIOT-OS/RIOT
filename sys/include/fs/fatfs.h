@@ -35,15 +35,6 @@ extern "C" {
 /** The epoch offset is used to convert between FatFs and time_t timestamps */
 #define EPOCH_YEAR_OFFSET (1970)
 
-/** Size of the buffer needed for a directory entry -> @attention this should be: sizeof(DIR).
-    sizeof(DIR) currently isn't used directly because it's not possible to use that within
-    preprocessor-if (see below) */
-#define FATFS_DIR_SIZE (44)
-
-/** Size of the buffer needed for directory
-    -> should be: sizeof(fatfs_file_desc_t) */
-#define FATFS_FILE_SIZE (72)
-
 /** size needed for volume strings like "n:/" where n is the volume id */
 #define FATFS_MAX_VOL_STR_LEN (4)
 
@@ -53,14 +44,6 @@ extern "C" {
 /** most FatFs file operations need an absolute path. This defines the size of the
     needed buffer to circumvent stack allocation within vfs-wrappers */
 #define FATFS_MAX_ABS_PATH_SIZE (FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1)
-
-#if (VFS_DIR_BUFFER_SIZE < FATFS_DIR_SIZE)
-#error "VFS_DIR_BUFFER_SIZE too small"
-#endif
-
-#if (VFS_FILE_BUFFER_SIZE < FATFS_FILE_SIZE)
-#error "VFS_FILE_BUFFER_SIZE too small"
-#endif
 
 /**
  * needed info to run a FatFs instance
