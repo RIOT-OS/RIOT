@@ -313,7 +313,7 @@ LINKFLAGPREFIX ?= -Wl,
 
 DIRS += $(EXTERNAL_MODULE_DIRS)
 
-_LINK = $(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGS)
+_LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGS)
 
 ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
@@ -323,7 +323,7 @@ link: ..compiler-check ..build-message $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=$
 	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
-	$(Q)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
+	$(Q)$(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
 	$(Q)$(_LINK) -o $(ELFFILE)
 endif
