@@ -36,7 +36,7 @@ extern "C" {
 #define EPOCH_YEAR_OFFSET (1970)
 
 /** size needed for volume strings like "n:/" where n is the volume id */
-#define FATFS_MAX_VOL_STR_LEN (4)
+#define FATFS_MAX_VOL_STR_LEN (6)
 
 /** 0:mount on first file access, 1 mount in f_mount() call */
 #define FATFS_MOUNT_OPT       (1)
