@@ -46,7 +46,6 @@ static int _init(mtd_dev_t *dev)
 {
     (void)dev;
 
-    memset(dummy_memory, 0xff, sizeof(dummy_memory));
     return 0;
 }
 
@@ -407,6 +406,10 @@ static void tests_littlefs_statvfs(void)
 
 Test *tests_littlefs_tests(void)
 {
+#ifndef MTD_0
+    memset(dummy_memory, 0xff, sizeof(dummy_memory));
+#endif
+
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(tests_littlefs_format),
         new_TestFixture(tests_littlefs_mount_umount),
