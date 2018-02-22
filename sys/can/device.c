@@ -473,11 +473,10 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
     uint32_t spt_error;
     uint32_t min_spt_error = UINT32_MAX;
     uint32_t best_brp = 0;
-    uint32_t tseg;
-    uint32_t tseg1;
-    uint32_t tseg2;
+    uint32_t tseg = 0;
+    uint32_t tseg1 = 0;
+    uint32_t tseg2 = 0;
     uint32_t best_tseg = 0;
-    uint32_t rate;        /* current bitrate */
     uint32_t rate_error;
     uint32_t min_rate_error;
 
