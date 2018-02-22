@@ -31,13 +31,13 @@
 
 static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
                           sock_udp_ep_t *remote);
-static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
-static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
+static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
 /* CoAP resources */
 static const coap_resource_t _resources[] = {
-    { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler },
-    { "/riot/board", COAP_GET, _riot_board_handler },
+    { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
+    { "/riot/board", COAP_GET, _riot_board_handler, NULL },
 };
 
 static gcoap_listener_t _listener = {
@@ -98,8 +98,10 @@ static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
  *      allows any two byte value for example purposes. Semantically, the only
  *      valid action is to set the value to 0.
  */
-static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
+
     /* read coap method type in packet */
     unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
 
@@ -129,8 +131,9 @@ static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
     return 0;
 }
 
-static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     /* write the RIOT board name in the response buffer */
     memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
