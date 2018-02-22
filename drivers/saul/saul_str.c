@@ -29,27 +29,29 @@
 const char *saul_class_to_str(const uint8_t class_id)
 {
     switch (class_id) {
-        case SAUL_CLASS_UNDEF:  return "CLASS_UNDEF";
-        case SAUL_ACT_ANY:      return "ACT_ANY";
-        case SAUL_ACT_LED_RGB:  return "ACT_LED_RGB";
-        case SAUL_ACT_SERVO:    return "ACT_SERVO";
-        case SAUL_ACT_MOTOR:    return "ACT_MOTOR";
-        case SAUL_ACT_SWITCH:   return "ACT_SWITCH";
-        case SAUL_ACT_DIMMER:   return "ACT_DIMMER";
-        case SAUL_SENSE_ANY:    return "SENSE_ANY";
-        case SAUL_SENSE_BTN:    return "SENSE_BTN";
-        case SAUL_SENSE_TEMP:   return "SENSE_TEMP";
-        case SAUL_SENSE_HUM:    return "SENSE_HUM";
-        case SAUL_SENSE_LIGHT:  return "SENSE_LIGHT";
-        case SAUL_SENSE_ACCEL:  return "SENSE_ACCEL";
-        case SAUL_SENSE_MAG:    return "SENSE_MAG";
-        case SAUL_SENSE_GYRO:   return "SENSE_GYRO";
-        case SAUL_SENSE_COLOR:  return "SENSE_COLOR";
-        case SAUL_SENSE_PRESS:  return "SENSE_PRESS";
-        case SAUL_SENSE_ANALOG: return "SENSE_ANALOG";
-        case SAUL_SENSE_OBJTEMP:return "SENSE_OBJTEMP";
-        case SAUL_SENSE_COUNT:  return "SENSE_PULSE_COUNT";
-        case SAUL_CLASS_ANY:    return "CLASS_ANY";
-        default:                return "CLASS_UNKNOWN";
+        case SAUL_CLASS_UNDEF:     return "CLASS_UNDEF";
+        case SAUL_ACT_ANY:         return "ACT_ANY";
+        case SAUL_ACT_LED_RGB:     return "ACT_LED_RGB";
+        case SAUL_ACT_SERVO:       return "ACT_SERVO";
+        case SAUL_ACT_MOTOR:       return "ACT_MOTOR";
+        case SAUL_ACT_SWITCH:      return "ACT_SWITCH";
+        case SAUL_ACT_DIMMER:      return "ACT_DIMMER";
+        case SAUL_SENSE_ANY:       return "SENSE_ANY";
+        case SAUL_SENSE_BTN:       return "SENSE_BTN";
+        case SAUL_SENSE_TEMP:      return "SENSE_TEMP";
+        case SAUL_SENSE_HUM:       return "SENSE_HUM";
+        case SAUL_SENSE_LIGHT:     return "SENSE_LIGHT";
+        case SAUL_SENSE_ACCEL:     return "SENSE_ACCEL";
+        case SAUL_SENSE_MAG:       return "SENSE_MAG";
+        case SAUL_SENSE_GYRO:      return "SENSE_GYRO";
+        case SAUL_SENSE_COLOR:     return "SENSE_COLOR";
+        case SAUL_SENSE_PRESS:     return "SENSE_PRESS";
+        case SAUL_SENSE_ANALOG:    return "SENSE_ANALOG";
+        case SAUL_SENSE_UV:        return "SENSE_UV";
+        case SAUL_SENSE_OBJTEMP:   return "SENSE_OBJTEMP";
+        case SAUL_SENSE_COUNT:     return "SENSE_PULSE_COUNT";
+        case SAUL_SENSE_DISTANCE:  return "SENSE_DISTANCE";
+        case SAUL_CLASS_ANY:       return "CLASS_ANY";
+        default:                   return "CLASS_UNKNOWN";
     }
 }
