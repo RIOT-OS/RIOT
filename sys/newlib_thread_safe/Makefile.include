@@ -1,0 +1,1 @@
+UNDEF += $(BINDIR)/newlib_thread_safe/syscalls.o

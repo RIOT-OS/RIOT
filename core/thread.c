@@ -235,6 +235,11 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     thread->msg_array = NULL;
 #endif
 
+#ifdef MODULE_NEWLIB_THREAD_SAFE
+    /* initialize the reent context */
+    _REENT_INIT_PTR(&(cb->newlib_reent));
+#endif
+
     sched_num_threads++;
 
     DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name, thread->pid, priority);

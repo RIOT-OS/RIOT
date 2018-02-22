@@ -146,6 +146,10 @@ int __attribute__((used)) sched_run(void)
     mpu_enable();
 #endif
 
+#ifdef MODULE_NEWLIB_THREAD_SAFE
+    _impure_ptr = &(next_thread->newlib_reent);
+#endif
+
     DEBUG("sched_run: done, changed sched_active_thread.\n");
 
     return 1;

@@ -119,6 +119,10 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#ifdef MODULE_NEWLIB_THREAD_SAFE
+#include <sys/reent.h>
+#endif
+
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
@@ -167,6 +171,9 @@ struct _thread {
                                          (thread_t::msg_array), if any  */
     msg_t *msg_array;               /**< memory holding messages sent
                                          to this thread's message queue */
+#endif
+#if defined(MODULE_NEWLIB_THREAD_SAFE) || defined(DOXYGEN)
+    struct _reent newlib_reent;     /**< thread's re-entrent object     */
 #endif
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
     || defined(MODULE_MPU_STACK_GUARD) || defined(DOXYGEN)

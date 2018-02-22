@@ -41,10 +41,18 @@ extern "C" {
 #define THREAD_EXTRA_STACKSIZE_PRINTF   (512)
 #endif
 #ifndef THREAD_STACKSIZE_DEFAULT
+#ifdef MODULE_NEWLIB_THREAD_SAFE
+#define THREAD_STACKSIZE_DEFAULT        (1152)
+#else
 #define THREAD_STACKSIZE_DEFAULT        (1024)
 #endif
+#endif
 #ifndef THREAD_STACKSIZE_IDLE
+#ifdef MODULE_NEWLIB_THREAD_SAFE
+#define THREAD_STACKSIZE_IDLE           (384)
+#else
 #define THREAD_STACKSIZE_IDLE           (256)
+#endif
 #endif
 /** @} */
 
