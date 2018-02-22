@@ -539,7 +539,7 @@ static int _get_state(sx127x_t *dev, void *val)
 {
     uint8_t op_mode;
     op_mode = sx127x_get_op_mode(dev);
-    netopt_state_t state;
+    netopt_state_t state = NETOPT_STATE_OFF;
     switch(op_mode) {
         case SX127X_RF_OPMODE_SLEEP:
             state = NETOPT_STATE_SLEEP;
