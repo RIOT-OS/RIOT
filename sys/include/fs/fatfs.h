@@ -41,12 +41,16 @@ extern "C" {
 /** 0:mount on first file access, 1 mount in f_mount() call */
 #define FATFS_MOUNT_OPT       (1)
 
-/** most FatFs file operations need an absolute path. This defines the size of the
-    needed buffer to circumvent stack allocation within vfs-wrappers */
+/**
+ * @brief Size of path buffer for absolute paths
+ *
+ * Most FatFs file operations need an absolute path. This defines the size of
+ * the needed buffer to circumvent stack allocation within vfs-wrappers
+ */
 #define FATFS_MAX_ABS_PATH_SIZE (FATFS_MAX_VOL_STR_LEN + VFS_NAME_MAX + 1)
 
 /**
- * needed info to run a FatFs instance
+ * @brief FatFs instance descriptor
  */
 typedef struct fatfs_desc {
     FATFS fat_fs;       /**< FatFs work area needed for each volume */
@@ -58,7 +62,7 @@ typedef struct fatfs_desc {
 } fatfs_desc_t;
 
 /**
- * info of a single opened file
+ * @brief FatFs file instance descriptor
  */
 typedef struct fatfs_file_desc {
     FIL file;                     /**< FatFs work area for a single file */
