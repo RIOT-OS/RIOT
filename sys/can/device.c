@@ -473,11 +473,10 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
     uint32_t spt_error;
     uint32_t min_spt_error = UINT32_MAX;
     uint32_t best_brp = 0;
-    uint32_t tseg;
-    uint32_t tseg1;
-    uint32_t tseg2;
+    uint32_t tseg = 0;
+    uint32_t tseg1 = 0;
+    uint32_t tseg2 = 0;
     uint32_t best_tseg = 0;
-    uint32_t rate;        /* current bitrate */
     uint32_t rate_error;
     uint32_t min_rate_error;
 
@@ -515,8 +514,8 @@ int can_device_calc_bittiming(uint32_t clock, const struct can_bittiming_const *
             DEBUG("invalid brp\n");
             continue;
         }
-
-        rate = clock / (brp * nbt);
+        /* current bitrate */
+        uint32_t rate = clock / (brp * nbt);
         rate_error = max(timing->bitrate, rate) - min(timing->bitrate, rate);
         if (rate_error > min_rate_error) {
             DEBUG("timing->rate=%" PRIu32 ", rate=%" PRIu32 ", rate_error=%" PRIu32 " > min_rate_error=%" PRIu32 ", continuing\n",
