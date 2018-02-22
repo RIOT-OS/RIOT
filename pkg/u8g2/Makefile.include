@@ -2,5 +2,5 @@ INCLUDES += -I$(PKGDIRBASE)/u8g2/csrc
 
 # Link SDL if enabled.
 ifneq (,$(filter u8g2_sdl,$(USEMODULE)))
-  LINKFLAGS += `sdl-config --libs`
+  LINKFLAGS += `sdl2-config --libs`
 endif

@@ -1,0 +1,83 @@
+From a17e644521b91d5f5fc35e567375ac5998f24b66 Mon Sep 17 00:00:00 2001
+From: Bas Stottelaar <basstottelaar@gmail.com>
+Date: Sun, 11 Mar 2018 22:13:10 +0100
+Subject: [PATCH 1/1] add RIOT-OS interface.
+
+---
+ csrc/u8g2.h |  3 +++
+ csrc/u8x8.h | 17 ++++++++++++++---
+ 2 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/csrc/u8g2.h b/csrc/u8g2.h
+index 48239709..c8934cf7 100644
+--- a/csrc/u8g2.h
++++ b/csrc/u8g2.h
+@@ -388,6 +388,9 @@ void u8g2_ClearDisplay(u8g2_t *u8g2);
+ #define u8g2_SetMenuDownPin(u8g2, val) u8x8_SetMenuDownPin(u8g2_GetU8x8(u8g2), (val))
+ #endif
+ 
++#define u8g2_SetPins(u8x8,pins,pins_enabled) u8x8_SetPins(u8g2_GetU8x8(&u8g2), pins, pins_enabled)
++#define u8g2_SetDevice(u8x8,device) u8x8_SetDevice(u8g2_GetU8x8(&u8g2), device)
++
+ /*==========================================*/
+ /* u8g2_setup.c */
+ 
+diff --git a/csrc/u8x8.h b/csrc/u8x8.h
+index bbeff59f..ae65bbb1 100644
+--- a/csrc/u8x8.h
++++ b/csrc/u8x8.h
+@@ -111,6 +111,8 @@
+ #include <stdint.h>
+ #include <stddef.h>
+ 
++#include "periph/gpio.h"
++
+ #if defined(__GNUC__) && defined(__AVR__)
+ #include <avr/pgmspace.h>
+ #endif 
+@@ -174,9 +176,9 @@ uint8_t u8x8_pgm_read_esp(const uint8_t * addr);   /* u8x8_8x8.c */
+ #  define U8X8_PROGMEM
+ #endif
+ 
+-#ifdef ARDUINO
+-#define U8X8_USE_PINS
+-#endif
++//#ifdef ARDUINO
++//#define U8X8_USE_PINS
++//#endif
+ 
+ /*==========================================*/
+ /* U8X8 typedefs and data structures */
+@@ -342,6 +344,10 @@ struct u8x8_struct
+ #ifdef U8X8_USE_PINS 
+   uint8_t pins[U8X8_PIN_CNT];	/* defines a pinlist: Mainly a list of pins for the Arduino Envionment, use U8X8_PIN_xxx to access */
+ #endif
++
++gpio_t* pins;
++uint32_t pins_enabled;
++uint32_t dev;
+ };
+ 
+ #ifdef U8X8_WITH_USER_PTR
+@@ -371,6 +377,8 @@ struct u8x8_struct
+ #define u8x8_SetMenuDownPin(u8x8, val) u8x8_SetPin((u8x8),U8X8_PIN_MENU_DOWN,(val))
+ #endif
+ 
++#define u8x8_SetPins(u8x8,pins,pins_enabled) {(u8x8)->pins = (pins); (u8x8)->pins_enabled = (pins_enabled);}
++#define u8x8_SetDevice(u8x8,device) ((u8x8)->dev = device)
+ 
+ /*==========================================*/
+ 
+@@ -973,6 +981,9 @@ extern const uint8_t u8x8_font_pxplustandynewtv_u[] U8X8_FONT_SECTION("u8x8_font
+ 
+ /* end font list */
+ 
++extern uint8_t u8x8_byte_riotos_hw_spi(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr);
++extern uint8_t u8x8_gpio_and_delay_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr);
++extern uint8_t u8x8_byte_riotos_hw_i2c(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr);
+ 
+ #ifdef __cplusplus
+ }
+-- 
+2.14.2
+
