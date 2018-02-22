@@ -106,7 +106,7 @@ int lora_setup_cmd(int argc, char **argv) {
     netdev->driver->set(netdev, NETOPT_BANDWIDTH,
                         &lora_bw, sizeof(lora_bw));
     netdev->driver->set(netdev, NETOPT_SPREADING_FACTOR,
-                        &lora_sf, lora_sf);
+                        &lora_sf, sizeof(lora_sf));
     netdev->driver->set(netdev, NETOPT_CODING_RATE,
                         &lora_cr, sizeof(lora_cr));
 
