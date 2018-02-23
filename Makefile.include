@@ -134,6 +134,7 @@ endif
 
 # remove this once codebase is adapted
 CFLAGS += -Wno-implicit-fallthrough
+CXXFLAGS += -Wno-implicit-fallthrough
 
 ifneq (10,$(if ${RIOT_VERSION},1,0)$(if ${__RIOTBUILD_FLAG},1,0))
 
