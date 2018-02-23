@@ -271,6 +271,7 @@ endif
 ifneq (,$(filter sdcard_spi,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
+  USEMODULE += checksum
   USEMODULE += xtimer
 endif
 
