@@ -20,6 +20,7 @@
 #ifndef CRYPTO_MODES_CBC_H
 #define CRYPTO_MODES_CBC_H
 
+#include <stddef.h>
 #include "crypto/ciphers.h"
 
 #ifdef __cplusplus
@@ -36,9 +37,14 @@ extern "C" {
  * @param input_len  length of the input data
  * @param output     pointer to allocated memory for encrypted data. It has to
  *                   be of size data_len + BLOCK_SIZE - data_len % BLOCK_SIZE.
+ *
+ * @return            <0 on error
+ * @return            CIPHER_ERR_INVALID_LENGTH when input_len % BLOCK_SIZE != 0
+ * @return            CIPHER_ERR_ENC_FAILED on internal encrption error
+ * @return            otherwise number of input bytes that aren't consumed
  */
-int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
-                       size_t input_len, uint8_t* output);
+int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
+                       size_t input_len, uint8_t *output);
 
 
 /**
@@ -50,9 +56,14 @@ int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
  * @param input_len  length of the input data
  * @param output     pointer to allocated memory for plaintext data. It has to
  *                   be of size input_len.
+ *
+ * @return            <0 on error
+ * @return            CIPHER_ERR_INVALID_LENGTH when input_len % BLOCK_SIZE != 0
+ * @return            CIPHER_ERR_DEC_FAILED on internal decryption error
+ * @return            otherwise number of bytes decrypted
  */
-int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16], const uint8_t* input,
-                       size_t input_len, uint8_t* output);
+int cipher_decrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
+                       size_t input_len, uint8_t *output);
 
 #ifdef __cplusplus
 }
