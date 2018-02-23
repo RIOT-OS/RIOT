@@ -62,7 +62,7 @@ int adc_init(adc_t line)
 int adc_sample(adc_t line, adc_res_t res)
 {
     /* resolutions larger than 12 bits are not supported */
-    if (res == ADC_MODE_UNDEF) {
+    if (res >= ADC_MODE_UNDEF(0)) {
         return -1;
     }
 
