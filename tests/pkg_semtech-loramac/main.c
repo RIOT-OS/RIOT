@@ -30,7 +30,9 @@
 #include "sx127x_params.h"
 
 sx127x_t sx127x;
-static char print_buf[48];
+/* Application key is 16 bytes long (e.g. 32 hex chars), and thus the longest
+   possible size (with application session and network session keys) */
+static char print_buf[LORAMAC_APPKEY_LEN * 2 + 1];
 
 static void _loramac_usage(void)
 {
@@ -76,36 +78,42 @@ static int _cmd_loramac(int argc, char **argv)
             uint8_t deveui[LORAMAC_DEVEUI_LEN];
             semtech_loramac_get_deveui(deveui);
             fmt_bytes_hex(print_buf, deveui, LORAMAC_DEVEUI_LEN);
+            print_buf[LORAMAC_DEVEUI_LEN * 2] = '\0';
             printf("DEVEUI: %s\n", print_buf);
         }
         else if (strcmp("appeui", argv[2]) == 0) {
             uint8_t appeui[LORAMAC_APPEUI_LEN];
             semtech_loramac_get_appeui(appeui);
             fmt_bytes_hex(print_buf, appeui, LORAMAC_APPEUI_LEN);
+            print_buf[LORAMAC_APPEUI_LEN * 2] = '\0';
             printf("APPEUI: %s\n", print_buf);
         }
         else if (strcmp("appkey", argv[2]) == 0) {
             uint8_t appkey[LORAMAC_APPKEY_LEN];
             semtech_loramac_get_appkey(appkey);
             fmt_bytes_hex(print_buf, appkey, LORAMAC_APPKEY_LEN);
+            print_buf[LORAMAC_APPKEY_LEN * 2] = '\0';
             printf("APPKEY: %s\n", print_buf);
         }
         else if (strcmp("appskey", argv[2]) == 0) {
             uint8_t appskey[LORAMAC_APPSKEY_LEN];
             semtech_loramac_get_appskey(appskey);
             fmt_bytes_hex(print_buf, appskey, LORAMAC_APPSKEY_LEN);
+            print_buf[LORAMAC_APPSKEY_LEN * 2] = '\0';
             printf("APPSKEY: %s\n", print_buf);
         }
         else if (strcmp("nwkskey", argv[2]) == 0) {
             uint8_t nwkskey[LORAMAC_NWKSKEY_LEN];
             semtech_loramac_get_nwkskey(nwkskey);
             fmt_bytes_hex(print_buf, nwkskey, LORAMAC_NWKSKEY_LEN);
+            print_buf[LORAMAC_NWKSKEY_LEN * 2] = '\0';
             printf("NWKSKEY: %s\n", print_buf);
         }
         else if (strcmp("devaddr", argv[2]) == 0) {
             uint8_t devaddr[LORAMAC_DEVADDR_LEN];
             semtech_loramac_get_devaddr(devaddr);
             fmt_bytes_hex(print_buf, devaddr, LORAMAC_DEVADDR_LEN);
+            print_buf[LORAMAC_DEVADDR_LEN * 2] = '\0';
             printf("DEVADDR: %s\n", print_buf);
         }
         else if (strcmp("class", argv[2]) == 0) {
