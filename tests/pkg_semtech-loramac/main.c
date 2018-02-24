@@ -34,7 +34,7 @@ static char print_buf[LORAMAC_APPKEY_LEN * 2 + 1];
 
 static void _loramac_usage(void)
 {
-    puts("Usage: loramac <get|set|join|tx>");
+    puts("Usage: loramac <get|set|join|tx|link_check>");
 }
 
 static void _loramac_join_usage(void)
@@ -416,7 +416,24 @@ static int _cmd_loramac(int argc, char **argv)
                 break;
         }
 
+        if (loramac.link_chk.available) {
+            printf("Link check information:\n"
+                   "  - Demodulation margin: %d\n"
+                   "  - Number of gateways: %d\n",
+                   loramac.link_chk.demod_margin,
+                   loramac.link_chk.nb_gateways);
+        }
+
         return 0;
+    }
+    else if (strcmp(argv[1], "link_check") == 0) {
+        if (argc > 2) {
+            _loramac_usage();
+            return 1;
+        }
+
+        semtech_loramac_request_link_check(&loramac);
+        puts("Link check request scheduled");
     }
     else {
         _loramac_usage();
