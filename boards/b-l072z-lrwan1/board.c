@@ -38,4 +38,8 @@ void board_init(void)
        only if explicitly wanted by the user */
     gpio_init(LED0_PIN, GPIO_OUT);
 #endif
+
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_init(LED2_PIN, GPIO_OUT);
+    gpio_init(LED3_PIN, GPIO_OUT);
 }
