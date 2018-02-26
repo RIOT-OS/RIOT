@@ -17,6 +17,9 @@
 #include "net/gnrc/ndp.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/sixlowpan/nd.h"
+#if GNRC_IPV6_NIB_CONF_DNS
+#include "net/sock/dns.h"
+#endif
 
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 #include "_nib-6ln.h"
@@ -131,6 +134,26 @@ static gnrc_pktsnip_t *_build_ext_opts(gnrc_netif_t *netif,
     _nib_offl_entry_t *pfx = NULL;
     unsigned id = netif->pid;
 
+#if GNRC_IPV6_NIB_CONF_DNS && SOCK_HAS_IPV6
+    uint32_t rdnss_ltime = _evtimer_lookup(&sock_dns_server,
+                                           GNRC_IPV6_NIB_RDNSS_TIMEOUT);
+
+    if ((rdnss_ltime < UINT32_MAX) &&
+        (!ipv6_addr_is_link_local((ipv6_addr_t *)sock_dns_server.addr.ipv6))) {
+        gnrc_pktsnip_t *rdnsso = gnrc_ndp_opt_rdnss_build(
+                rdnss_ltime * MS_PER_SEC,
+                (ipv6_addr_t *)&sock_dns_server.addr,
+                1U, ext_opts
+            );
+        if (rdnsso == NULL) {
+            /* gnrc_ndp_opt_rdnss_build() only returns NULL when pktbuf is full
+             * in this configuration */
+            DEBUG("nib: No space left in packet buffer. Not adding RDNSSO\n");
+            return NULL;
+        }
+        ext_opts = rdnsso;
+    }
+#endif  /* GNRC_IPV6_NIB_CONF_DNS */
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
     uint16_t ltime;
     gnrc_pktsnip_t *abro;
