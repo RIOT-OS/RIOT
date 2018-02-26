@@ -33,7 +33,7 @@ extern "C" {
  * @name    LED pin definitions and handlers
  * @{
  */
-#ifdef CPU_MODEL_STM32F302R8 || defined(CPU_MODEL_STM32L433RC)
+#if defined(CPU_MODEL_STM32F302R8) || defined(CPU_MODEL_STM32L433RC)
 #define LED0_PORT           GPIOB
 #define LED0_PIN            GPIO_PIN(PORT_B, 13)
 #define LED0_MASK           (1 << 13)
@@ -53,7 +53,11 @@ extern "C" {
  * @{
  */
 #define BTN0_PIN            GPIO_PIN(PORT_C, 13)
+#ifdef CPU_MODEL_STM32L433RC
+#define BTN0_MODE           GPIO_IN_PD
+#else
 #define BTN0_MODE           GPIO_IN_PU
+#endif
 /** @} */
 
 #ifdef __cplusplus
