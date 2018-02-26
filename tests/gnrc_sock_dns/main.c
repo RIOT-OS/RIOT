@@ -35,9 +35,6 @@
 #define DNS_SERVER  "[2001:db8::1]:53"
 #endif
 
-/* global DNS server UDP endpoint */
-sock_udp_ep_t sock_dns_server;
-
 /* import "ifconfig" shell command, used for printing addresses */
 
 extern int _gnrc_netif_config(int argc, char **argv);
