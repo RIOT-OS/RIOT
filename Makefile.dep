@@ -676,6 +676,10 @@ ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += sock_util
 endif
 
+ifneq (,$(filter sock_util,$(USEMODULE)))
+  USEMODULE += posix
+endif
+
 ifneq (,$(filter event_%,$(USEMODULE)))
   USEMODULE += event
 endif
