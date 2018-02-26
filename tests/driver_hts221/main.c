@@ -47,17 +47,17 @@ int main(void)
         uint16_t hum = 0;
         int16_t temp = 0;
         if (hts221_read_humidity(&dev, &hum) != HTS221_OK) {
-            puts(" -- failed to humidity!");
+            puts(" -- failed to read humidity!");
         }
         if (hts221_read_temperature(&dev, &temp) != HTS221_OK) {
-            puts(" -- failed to temperature!");
+            puts(" -- failed to read temperature!");
         }
         bool negative = (temp < 0);
         if (negative) {
             temp = -temp;
         }
-        printf("H: %u.%u%%, T:%c%u.%u°C\n", (hum/10), (hum%10),
-               (negative ? '-' : ' '), (temp/10), (temp%10));
+        printf("H: %u.%u%%, T:%c%u.%u°C\n", (hum / 10), (hum % 10),
+               (negative ? '-' : ' '), (temp / 10), (temp % 10));
         xtimer_sleep(SLEEP_S);
     }
     return 0;
