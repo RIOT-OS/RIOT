@@ -222,6 +222,17 @@ extern "C" {
  * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_SLAAC != 0
  */
 #define GNRC_IPV6_NIB_VALID_ADDR            (0x4fd2U)
+
+/**
+ * @brief   Recursive DNS server timeout
+ *
+ * This message type is for the event of a recursive DNS server timeout.
+ * The expected message context is the [UDP end point](@ref sock_udp_ep_t)
+ * representing the DNS server.
+ *
+ * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_DNS != 0
+ */
+#define GNRC_IPV6_NIB_RDNSS_TIMEOUT         (0x4fd3U)
 /** @} */
 
 /**
