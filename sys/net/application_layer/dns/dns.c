@@ -135,6 +135,10 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
     uint8_t buf[SOCK_DNS_QUERYBUF_LEN];
     uint8_t reply_buf[512];
 
+    if (sock_dns_server.port == 0) {
+        return -ECONNREFUSED;
+    }
+
     if (strlen(domain_name) > SOCK_DNS_MAX_NAME_LEN) {
         return -ENOSPC;
     }
