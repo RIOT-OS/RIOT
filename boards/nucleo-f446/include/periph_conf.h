@@ -162,16 +162,6 @@ static const pwm_conf_t pwm_config[] = {
         .bus      = APB1
     },
     {
-        .dev      = TIM3,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .chan     = { { .pin = GPIO_PIN(PORT_B, 4), .cc_chan = 0 },
-                      { .pin = GPIO_UNDEF, .cc_chan = 0 },
-                      { .pin = GPIO_UNDEF, .cc_chan = 0 },
-                      { .pin = GPIO_UNDEF, .cc_chan = 0 } },
-        .af       = GPIO_AF2,
-        .bus      = APB1
-    },
-    {
         .dev      = TIM8,
         .rcc_mask = RCC_APB2ENR_TIM8EN,
         .chan     = { { .pin = GPIO_PIN(PORT_C, 6), .cc_chan = 0},
@@ -184,6 +174,39 @@ static const pwm_conf_t pwm_config[] = {
 };
 
 #define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+/** @} */
+
+/**
+ * @name    QDEC configuration
+ * @{
+ */
+static const qdec_conf_t qdec_config[] = {
+    {
+        .dev      = TIM3,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 6), .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_A, 7), .cc_chan = 1 } },
+        .af       = GPIO_AF2,
+        .bus      = APB1,
+        .irqn     = TIM3_IRQn
+    },
+    {
+        .dev      = TIM4,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM4EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 6), .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_B, 7), .cc_chan = 1 } },
+        .af       = GPIO_AF2,
+        .bus      = APB1,
+        .irqn     = TIM4_IRQn
+    },
+};
+
+#define QDEC_0_ISR         isr_tim3
+#define QDEC_1_ISR         isr_tim4
+
+#define QDEC_NUMOF           (sizeof(qdec_config) / sizeof(qdec_config[0]))
 /** @} */
 
 /**
