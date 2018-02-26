@@ -66,23 +66,23 @@ extern "C" {
 #define LED1_PIN            GPIO_PIN(PORT_B, 5)
 #define LED1_MASK           (1 << 5)
 
-#define LED1_ON             (GPIOB->BSRR = LED0_MASK)
-#define LED1_OFF            (GPIOB->BSRR = (LED0_MASK << 16))
-#define LED1_TOGGLE         (GPIOB->ODR  ^= LED0_MASK)
+#define LED1_ON             (GPIOB->BSRR = LED1_MASK)
+#define LED1_OFF            (GPIOB->BSRR = (LED1_MASK << 16))
+#define LED1_TOGGLE         (GPIOB->ODR  ^= LED1_MASK)
 
 #define LED2_PIN            GPIO_PIN(PORT_B, 6)
 #define LED2_MASK           (1 << 6)
 
-#define LED2_ON             (GPIOB->BSRR = LED0_MASK)
-#define LED2_OFF            (GPIOB->BSRR = (LED0_MASK << 16))
-#define LED2_TOGGLE         (GPIOB->ODR  ^= LED0_MASK)
+#define LED2_ON             (GPIOB->BSRR = LED2_MASK)
+#define LED2_OFF            (GPIOB->BSRR = (LED2_MASK << 16))
+#define LED2_TOGGLE         (GPIOB->ODR  ^= LED2_MASK)
 
 #define LED3_PIN            GPIO_PIN(PORT_B, 7)
 #define LED3_MASK           (1 << 7)
 
-#define LED3_ON             (GPIOB->BSRR = LED0_MASK)
-#define LED3_OFF            (GPIOB->BSRR = (LED0_MASK << 16))
-#define LED3_TOGGLE         (GPIOB->ODR  ^= LED0_MASK)
+#define LED3_ON             (GPIOB->BSRR = LED3_MASK)
+#define LED3_OFF            (GPIOB->BSRR = (LED3_MASK << 16))
+#define LED3_TOGGLE         (GPIOB->ODR  ^= LED3_MASK)
 /** @} */
 
 /**
