@@ -53,14 +53,14 @@
  *     sx127x_t sx127x;  /* SX1272/6 device descriptor */
  *     /* define the required keys for OTAA, e.g over-the-air activation (the
  *        null arrays need to be updated with valid LoRa values) */
- *     static uint8_t deveui[LORAMAC_DEVEUI_LEN] = { 0x00, 0x00, 0x00, 0x00, \
- *                                                   0x00, 0x00, 0x00, 0x00 }
- *     static uint8_t appeui[LORAMAC_APPEUI_LEN] = { 0x00, 0x00, 0x00, 0x00, \
- *                                                   0x00, 0x00, 0x00, 0x00 }
- *     static uint8_t appeui[LORAMAC_APPKEY_LEN] = { 0x00, 0x00, 0x00, 0x00, \
- *                                                   0x00, 0x00, 0x00, 0x00, \
- *                                                   0x00, 0x00, 0x00, 0x00, \
- *                                                   0x00, 0x00, 0x00, 0x00 }
+ *     static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = { 0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00 };
+ *     static const uint8_t appeui[LORAMAC_APPEUI_LEN] = { 0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00 };
+ *     static const uint8_t appkey[LORAMAC_APPKEY_LEN] = { 0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00 };
  * ```
  *
  * Now in the `main` function:
@@ -92,9 +92,10 @@
  *
  *     /* 5. send some data using confirmable mode on port 10 and assuming no
  *           data is received */
+ *     char *message = "This is RIOT";
  *     semtech_loramac_rx_data_t rx_data;
  *     semtech_loramac_send(LORAMAC_TX_CNF, 10,
-                            (uint8_t *)"This is RIOT", 13, &rx_data);
+                            (uint8_t *)message, strlen(message), &rx_data);
  * }
  * ```
  *
