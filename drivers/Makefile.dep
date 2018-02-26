@@ -17,6 +17,8 @@ endif
 ifneq (,$(filter at,$(USEMODULE)))
   USEMODULE += fmt
   USEMODULE += xtimer
+  USEMODULE += isrpipe
+  FEATURES_REQUIRED += periph_uart
 endif
 
 ifneq (,$(filter at30tse75x,$(USEMODULE)))

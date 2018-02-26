@@ -36,6 +36,8 @@
 #define AT_H
 
 #include <stdint.h>
+#include <unistd.h>
+#include <stdbool.h>
 
 #include "isrpipe.h"
 #include "periph/uart.h"
