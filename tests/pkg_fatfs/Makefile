@@ -32,10 +32,10 @@ FATFS_IMAGE_FILE_SIZE_MIB ?= 128
 ifeq ($(BOARD),native)
 #overwrite default mtd_native-config to use fat image as flash device
 CFLAGS += -DMTD_NATIVE_FILENAME=\"./bin/riot_fatfs_disk.img\"
-CFLAGS += -DMTD_NATIVE_PAGE_SIZE=512
-CFLAGS += -DMTD_NATIVE_SECTOR_SIZE=512
+CFLAGS += -DMTD_PAGE_SIZE=512
+CFLAGS += -DMTD_SECTOR_SIZE=512
 CFLAGS += -DFATFS_IMAGE_FILE_SIZE_MIB=$(FATFS_IMAGE_FILE_SIZE_MIB)
-CFLAGS += -DMTD_NATIVE_SECTOR_NUM=\(\(\(FATFS_IMAGE_FILE_SIZE_MIB\)*1024*1024\)/MTD_NATIVE_SECTOR_SIZE\)
+CFLAGS += -DMTD_SECTOR_NUM=\(\(\(FATFS_IMAGE_FILE_SIZE_MIB\)*1024*1024\)/MTD_SECTOR_SIZE\)
 else
 # for actual hardware use mtd_sdcard as storage device
 USEMODULE += mtd_sdcard
