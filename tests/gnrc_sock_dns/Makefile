@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := chronos telosb nucleo-f042k6 nucleo-f031k6 \
 USEMODULE += sock_dns
 USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_ipv6_default
+USEMODULE += gnrc_ipv6_nib_dns
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 
