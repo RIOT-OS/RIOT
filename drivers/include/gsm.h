@@ -14,6 +14,7 @@
 #include "rmutex.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
+#include "thread.h"
 
 #ifdef __cplusplus
 extern "C" {
