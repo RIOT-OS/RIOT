@@ -33,9 +33,14 @@ static const ublox_gsm_params_t params = {
     .base.baudrate = 115200,
     .base.baudrate_to_set = 921600/*460800*/,
     .base.ri_pin = MODEM_RI_PIN,
-    .reset_pin = MODEM_RST_PIN_,
-    .pwr_on_pin = MODEM_PWR_ON_PIN,
-    .dtr_pin = MODEM_DTR_PIN,
+    .params.reset_pin = MODEM_RST_PIN_,
+    .params.pwr_on_pin = MODEM_PWR_ON_PIN,
+    .params.dtr_pin = MODEM_DTR_PIN,
+    .params.gps_connected = true,
+    .params.gpio1_mode = UBLOX_GPIO_MODE_OUTPUT | UBLOX_GPIO_OUTPUT_HIGH,
+    .params.gpio2_mode = UBLOX_GPIO_MODE_DISABLED,
+    .params.gpio3_mode = UBLOX_GPIO_MODE_DEFAULT,
+    .params.gpio4_mode = UBLOX_GPIO_MODE_GNSS_SUPPLY_EN,
 };
 
 static ublox_gsm_t modem = {
