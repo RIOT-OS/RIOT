@@ -305,6 +305,10 @@ ifneq (,$(filter gnrc_ipv6_nib_6ln,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_nd
 endif
 
+ifneq (,$(filter gnrc_ipv6_nib_dns,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+endif
+
 ifneq (,$(filter gnrc_ipv6_nib_router,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib
 endif
@@ -315,6 +319,9 @@ ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += ipv6_addr
   USEMODULE += random
+  ifneq (,$(filter sock_dns,$(USEMODULE)))
+    USEMODULE += gnrc_ipv6_nib_dns
+  endif
 endif
 
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))

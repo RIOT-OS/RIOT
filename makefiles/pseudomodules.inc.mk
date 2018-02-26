@@ -17,6 +17,7 @@ PSEUDOMODULES += gnrc_ipv6_router_default
 PSEUDOMODULES += gnrc_ipv6_nib_6lbr
 PSEUDOMODULES += gnrc_ipv6_nib_6ln
 PSEUDOMODULES += gnrc_ipv6_nib_6lr
+PSEUDOMODULES += gnrc_ipv6_nib_dns
 PSEUDOMODULES += gnrc_ipv6_nib_router
 PSEUDOMODULES += gnrc_netdev_default
 PSEUDOMODULES += gnrc_neterr

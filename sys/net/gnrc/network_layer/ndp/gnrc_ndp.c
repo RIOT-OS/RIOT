@@ -222,6 +222,27 @@ gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next)
     return pkt;
 }
 
+gnrc_pktsnip_t *gnrc_ndp_opt_rdnss_build(uint32_t ltime, ipv6_addr_t *addrs,
+                                         unsigned addrs_num,
+                                         gnrc_pktsnip_t *next)
+{
+    assert(addrs != NULL);
+    assert(addrs_num > 0);
+    size_t opt_size = sizeof(ndp_opt_t) + (sizeof(ipv6_addr_t) * addrs_num);
+    gnrc_pktsnip_t *pkt = gnrc_ndp_opt_build(NDP_OPT_RDNSS, opt_size, next);
+
+    if (pkt != NULL) {
+        ndp_opt_rdnss_t *rdnss_opt = pkt->data;
+        rdnss_opt->resv.u16 = 0;
+        rdnss_opt->ltime = byteorder_htonl(ltime);
+        for (unsigned i = 0; i < addrs_num; i++) {
+            memcpy(&rdnss_opt->addrs[i], &addrs[i],
+                   sizeof(rdnss_opt->addrs[i]));
+        }
+    }
+    return pkt;
+}
+
 static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,
                                       const ipv6_addr_t *src,
                                       const ipv6_addr_t *dst,
