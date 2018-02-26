@@ -79,14 +79,13 @@ static int _write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size
 {
     mtd_native_dev_t *_dev = (mtd_native_dev_t*) dev;
     size_t mtd_size = dev->sector_count * dev->pages_per_sector * dev->page_size;
-    size_t sector_size = dev->pages_per_sector * dev->page_size;
 
-    DEBUG("mtd_native: write from page %" PRIu32 " count %" PRIu32 "\n", addr, size);
+    DEBUG("mtd_native: write from 0x%" PRIx32 " count %" PRIu32 "\n", addr, size);
 
     if (addr + size > mtd_size) {
         return -EOVERFLOW;
     }
-    if (((addr % sector_size) + size) > sector_size) {
+    if (((addr % dev->page_size) + size) > dev->page_size) {
         return -EOVERFLOW;
     }
 
