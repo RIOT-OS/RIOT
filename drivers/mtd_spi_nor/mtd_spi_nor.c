@@ -48,6 +48,11 @@
 #define MTD_SPI_NOR_WRITE_WAIT_US (50 * US_PER_MS)
 #endif
 
+#define MTD_32K             (32768ul)
+#define MTD_32K_ADDR_MASK   (0x7FFF)
+#define MTD_4K              (4096ul)
+#define MTD_4K_ADDR_MASK    (0xFFF)
+
 static int mtd_spi_nor_init(mtd_dev_t *mtd);
 static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t size);
 static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size);
@@ -456,35 +461,43 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
     if (addr + size > total_size) {
         return -EOVERFLOW;
     }
-    be_uint32_t addr_be = byteorder_htonl(addr);
-
-    /* write enable */
-    mtd_spi_cmd(dev, dev->opcode->wren);
-
-    if (size == total_size) {
-        mtd_spi_cmd(dev, dev->opcode->chip_erase);
-    }
-    else if ((dev->flag & SPI_NOR_F_SECT_4K) && size == 4096) {
-        /* 4 KiO sectors can be erased with sector erase command */
-        mtd_spi_cmd_addr_write(dev, dev->opcode->sector_erase, addr_be, NULL, 0);
-    }
-    else if ((dev->flag & SPI_NOR_F_SECT_32K) && size == 32768) {
-        /* 32 KiO sectors can be erased with sector erase command */
-        mtd_spi_cmd_addr_write(dev, dev->opcode->block_erase_32k, addr_be, NULL, 0);
-    }
-    else if (size % sector_size != 0) {
+    if (size % sector_size != 0) {
         return -EOVERFLOW;
     }
-    else {
-        for (size_t i = 0; i < size / sector_size; i++) {
+
+    while (size) {
+        be_uint32_t addr_be = byteorder_htonl(addr);
+        /* write enable */
+        mtd_spi_cmd(dev, dev->opcode->wren);
+
+        if (size == total_size) {
+            mtd_spi_cmd(dev, dev->opcode->chip_erase);
+            size -= total_size;
+        }
+        else if ((dev->flag & SPI_NOR_F_SECT_32K) && (size >= MTD_32K) &&
+                 ((addr & MTD_32K_ADDR_MASK) == 0)) {
+            /* 32 KiB blocks can be erased with block erase command */
+            mtd_spi_cmd_addr_write(dev, dev->opcode->block_erase_32k, addr_be, NULL, 0);
+            addr += MTD_32K;
+            size -= MTD_32K;
+        }
+        else if ((dev->flag & SPI_NOR_F_SECT_4K) && (size >= MTD_4K) &&
+                 ((addr & MTD_4K_ADDR_MASK) == 0)) {
+            /* 4 KiB sectors can be erased with sector erase command */
+            mtd_spi_cmd_addr_write(dev, dev->opcode->sector_erase, addr_be, NULL, 0);
+            addr += MTD_4K;
+            size -= MTD_4K;
+        }
+        else {
             mtd_spi_cmd_addr_write(dev, dev->opcode->block_erase, addr_be, NULL, 0);
             addr += sector_size;
-            addr_be = byteorder_htonl(addr);
+            size -= sector_size;
         }
+
+        /* waiting for the command to complete before continuing */
+        wait_for_write_complete(dev);
     }
 
-    /* waiting for the command to complete before returning */
-    wait_for_write_complete(dev);
     return 0;
 }
 
