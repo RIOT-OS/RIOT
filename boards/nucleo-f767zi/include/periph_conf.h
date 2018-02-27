@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f767 STM32 Nucleo144-F767
+ * @defgroup    boards_nucleo-f767zi STM32 Nucleo-F767ZI
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F767
+ * @brief       Support for the STM32 Nucleo-F767ZI
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo144-f767 board
+ * @brief       Peripheral MCU configuration for the nucleo-f767zi board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
