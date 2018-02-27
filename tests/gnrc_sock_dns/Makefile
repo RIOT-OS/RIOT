@@ -16,7 +16,7 @@ USEMODULE += shell_commands
 
 USEMODULE += posix
 
-LOW_MEMORY_BOARDS := nucleo-f334 msb-430 msb-430h
+LOW_MEMORY_BOARDS := nucleo-f334r8 msb-430 msb-430h
 
 ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
     CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_NETIF_IPV6_ADDRS_NUMOF=2 \

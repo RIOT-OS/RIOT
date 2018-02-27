@@ -17,9 +17,9 @@ USEMODULE += ps
 CFLAGS += -DGNRC_PKTBUF_SIZE=2048
 
 # set board specific peripheral configurations
-ifneq (,$(filter nucleo-f334,$(BOARD)))
+ifneq (,$(filter nucleo-f334r8,$(BOARD)))
 # these settings are probably valid for PoEll-i on most nucelo boards, but
-# tested only on nucleo-f334
+# tested only on nucleo-f334r8
   ENC_SPI ?= SPI_DEV\(0\)
   ENC_CS  ?= GPIO_PIN\(PORT_C,10\)
   ENC_INT ?= GPIO_PIN\(PORT_D,2\)

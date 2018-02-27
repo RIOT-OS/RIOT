@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo32-f031 \
                              nucleo32-f042 nucleo32-l031 nucleo-f030r8 \
-                             nucleo-f334 nucleo-l053 stm32f0discovery \
+                             nucleo-f334r8 nucleo-l053 stm32f0discovery \
                              telosb z1
 
 USEMODULE += sntp

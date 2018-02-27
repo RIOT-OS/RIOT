@@ -13,7 +13,7 @@ endif
 ifneq (,$(filter nucleo-f030r8 nucleo32-l031 nucleo-l053 stm32f0discovery,$(BOARD)))
   PROBLEM ?= 5
 endif
-ifneq (,$(filter nucleo-f334,$(BOARD)))
+ifneq (,$(filter nucleo-f334r8,$(BOARD)))
   PROBLEM ?= 9
 endif
 

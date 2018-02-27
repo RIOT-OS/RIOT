@@ -40,7 +40,7 @@ USEMODULE += shell_commands
 
 # Use different settings when compiling for one of the following (low-memory)
 # boards
-LOW_MEMORY_BOARDS := nucleo-f334
+LOW_MEMORY_BOARDS := nucleo-f334r8
 
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)

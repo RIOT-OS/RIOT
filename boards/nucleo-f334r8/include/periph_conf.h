@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f334 STM32 Nucleo-F334
+ * @defgroup    boards_nucleo-f334r8 STM32 Nucleo-F334R8
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F334
+ * @brief       Support for the STM32 Nucleo-F334R8
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-f334 board
+ * @brief       Peripheral MCU configuration for the nucleo-f334r8 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
