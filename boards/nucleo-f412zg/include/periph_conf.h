@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f412 STM32 Nucleo144-F412
+ * @defgroup    boards_nucleo-f412zg STM32 Nucleo-F412ZG
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F412
+ * @brief       Support for the STM32 Nucleo-F412ZG
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo144-f412 board
+ * @name        Peripheral MCU configuration for the nucleo-f412zg board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Vincent Dupont <vincent@otakeys.com>
