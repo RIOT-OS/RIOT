@@ -205,7 +205,7 @@ static int _cmd_loramac(int argc, char **argv)
             fmt_hex_bytes(nwkskey, argv[3]);
             semtech_loramac_set_nwkskey(nwkskey);
         }
-        else if (strcmp("devaddr", argv[3]) == 0) {
+        else if (strcmp("devaddr", argv[2]) == 0) {
             if ((argc < 4) || (strlen(argv[3]) != LORAMAC_DEVADDR_LEN * 2)) {
                 puts("Usage: loramac set devaddr <8 hex chars>");
                 return 1;
