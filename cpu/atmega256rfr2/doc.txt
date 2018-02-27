@@ -1,0 +1,10 @@
+/**
+ * @defgroup        cpu_atmega256rfr2 Atmel ATmega256rfr2
+ * @ingroup         cpu
+ * @brief           Implementation of Atmel's ATmega256rfr2 MCU
+ */
+
+/**
+ * @defgroup        cpu_atmega256rfr2_definitions Atmel ATmega256rfr2 Definitions
+ * @ingroup         cpu_atmega256rfr2
+ */
