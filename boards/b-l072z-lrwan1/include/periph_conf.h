@@ -152,6 +152,32 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
+ * @name I2C configuration
+ * @{
+ */
+#define I2C_0_EN            1
+#define I2C_NUMOF           I2C_0_EN
+#define I2C_IRQ_PRIO        1
+#define I2C_APBCLK          (CLOCK_APB1)
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV           I2C1
+#define I2C_0_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C1EN))
+#define I2C_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C1EN))
+#define I2C_0_EVT_IRQ       I2C1_IRQn
+#define I2C_0_EVT_ISR       isr_i2c1
+/* I2C 0 pin configuration */
+#define I2C_0_SCL_PORT      PORT_B
+#define I2C_0_SCL_PIN       8
+#define I2C_0_SCL_AF        4
+#define I2C_0_SCL_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
+#define I2C_0_SDA_PORT      PORT_B
+#define I2C_0_SDA_PIN       9
+#define I2C_0_SDA_AF        4
+#define I2C_0_SDA_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
+/** @} */
+
+/**
  * @name    ADC configuration
  * @{
  */
