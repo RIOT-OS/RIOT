@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @name    Set default configuration parameters for the DSP0401 (for Nucleo-F411)
+ * @name    Set default configuration parameters for the DSP0401 (for Nucleo-F411RE)
  * @{
  */
 #ifndef DSP0401_PARAM_SDI_PIN
