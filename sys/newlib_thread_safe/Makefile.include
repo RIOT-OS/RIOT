@@ -1,1 +1,26 @@
 UNDEF += $(BINDIR)/newlib_thread_safe/syscalls.o
+
+# define the compile test files
+define __has_reent_test
+#include <sys/reent.h>\n
+endef
+
+define __has_reent_small_test
+#include <sys/reent.h>\n
+#ifndef _REENT_SMALL\n
+#error wasting 1KB\n
+#endif\n
+endef
+
+# compile the tests
+__has_reent := $(shell printf "$(__has_reent_test)" | $(CC) -E $(CFLAGS) $(INCLUDES) - > /dev/null 2>&1 ; echo $$?)
+__has_reent_small := $(shell printf "$(__has_reent_small_test)" | $(CC) -E $(CFLAGS) $(INCLUDES) - > /dev/null 2>&1 ; echo $$?)
+
+# check if we use REENT_SMALL
+ifeq (0, $(__has_reent))
+  ifneq (0, $(__has_reent_small))
+    $(error "MODULE_NEWLIB_THREAD_SAFE defined but _REENT_SMALL not defined")
+  endif
+else
+  $(error "MODULE_NEWLIB_THREAD_SAFE defined but <sys/reent.h> not found in toolchain path")
+endif
