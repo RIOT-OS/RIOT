@@ -24,5 +24,3 @@ ifneq (,$(filter can_linux,$(USEMODULE)))
 endif
 
 include $(RIOTBASE)/Makefile.base
-
-INCLUDES = $(NATIVEINCLUDES)
