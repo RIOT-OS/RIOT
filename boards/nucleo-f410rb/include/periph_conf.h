@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f410 STM32 Nucleo-F410
+ * @defgroup    boards_nucleo-f410rb STM32 Nucleo-F410RB
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F410
+ * @brief       Support for the STM32 Nucleo-F410RB
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo-f410 board
+ * @name        Peripheral MCU configuration for the nucleo-f410rb board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
