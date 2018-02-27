@@ -1,0 +1,7 @@
+include $(RIOTCPU)/atmega_common/Makefile.features
+
+# common feature are defined in atmega_common/Makefile.features
+# Only add Additional features
+
+# Various other features (if any)
+FEATURES_PROVIDED += periph_cpuid
