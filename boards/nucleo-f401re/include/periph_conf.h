@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f401 STM32 Nucleo-F401
+ * @defgroup    boards_nucleo-f401re STM32 Nucleo-F401RE
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F401
+ * @brief       Support for the STM32 Nucleo-F401RE
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo-f401 board
+ * @name        Peripheral MCU configuration for the nucleo-f401re board
  *
  * @author      Lari Lehtomäki <lari@lehtomaki.fi>
  */

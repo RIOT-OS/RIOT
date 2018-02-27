@@ -39,7 +39,7 @@ int main(void)
     int32_t value = 0;
     puts("Welcome into Quadrature Decoder (QDEC) test program.");
     puts("This program will count pulses on all available QDEC channels");
-    puts("Written for nucleo-f401, you have to plug signals A and B as follow :");
+    puts("Written for nucleo-f401re, you have to plug signals A and B as follow :");
     puts("  QDEC0 : signal A on PA6 and signal B on PA7");
     puts("  QDEC1 : signal A on PB6 and signal B on PB7");
     puts("Quadrature decoding mode is set to X4 : counting on all edges on both signals");

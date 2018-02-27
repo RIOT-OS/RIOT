@@ -18,7 +18,7 @@ BOARD_WHITELIST := \
   nucleo-f103rb \
   nucleo-f303re \
   nucleo-f334r8 \
-  nucleo-f401 \
+  nucleo-f401re \
   nucleo-l152 \
   openmote-cc2538 \
   pba-d-01-kw2x \

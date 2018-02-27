@@ -1,4 +1,4 @@
-BOARD ?= nucleo-f401
+BOARD ?= nucleo-f401re
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_qdec
