@@ -150,6 +150,10 @@ ifneq (,$(filter mag3110,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mag3110/include
 endif
 
+ifneq (,$(filter mhz19,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mhz19/include
+endif
+
 ifneq (,$(filter mma8x5x,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mma8x5x/include
 endif
