@@ -290,8 +290,8 @@ static inline void irq_handler(PORT_Type *port, int port_num)
     uint32_t status = port->ISFR;
 
     for (int i = 0; i < 32; i++) {
-        if ((status & (1 << i)) && (port->PCR[i] & PORT_PCR_IRQC_MASK)) {
-            port->ISFR = (1 << i);
+        if ((status & (1u << i)) && (port->PCR[i] & PORT_PCR_IRQC_MASK)) {
+            port->ISFR = (1u << i);
             int ctx = get_ctx(port_num, i);
             isr_ctx[ctx].cb(isr_ctx[ctx].arg);
         }
