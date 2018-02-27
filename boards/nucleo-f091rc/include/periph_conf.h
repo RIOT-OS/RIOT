@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f091 STM32 Nucleo-F091
+ * @defgroup    boards_nucleo-f091rc STM32 Nucleo-F091RC
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F091
+ * @brief       Support for the STM32 Nucleo-F091RC
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-f091 board
+ * @brief       Peripheral MCU configuration for the nucleo-f091rc board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

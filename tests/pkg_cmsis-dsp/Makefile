@@ -13,7 +13,7 @@ BOARD_WHITELIST := \
   mbed_lpc1768 \
   msbiot \
   mulle \
-  nucleo-f091 \
+  nucleo-f091rc \
   nucleo-f103 \
   nucleo-f103 \
   nucleo-f303 \
