@@ -1,0 +1,24 @@
+# define the cpu used by the jiminy board
+export CPU = atmega256rfr2
+
+# export needed for flash rule
+export PORT_LINUX ?= /dev/ttyACM0
+export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# Serial Baud rate for Ffasher is configured to 500kBaud
+# see /usr/include/asm-generic/termbits.h for availabel baudrates on your linux system
+export PROGRAMMER_SPEED ?= 0010005
+
+export FFLAGS += -p atmega256rfr2
+
+# refine serial port information for pyterm
+# For 8MHz F_CPU following Baudrate have good error rates
+#  76923
+#  38400
+export BAUD = 38400
+
+# PROGRAMMER defaults to arduino which is the internal flasher via USB. Can be
+# overridden for debugging (which requires changes that require to use an ISP)
+export PROGRAMMER ?= wiring
+
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.include
