@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f429 STM32 Nucleo144-F429
+ * @defgroup    boards_nucleo-f429zi STM32 Nucleo-F429ZI
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F429
+ * @brief       Support for the STM32 Nucleo-F429ZI
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo144-f429 board
+ * @name        Peripheral MCU configuration for the nucleo-f429zi board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */

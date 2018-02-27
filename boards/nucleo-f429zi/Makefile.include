@@ -1,4 +1,4 @@
-# define the cpu used by the nucleo144-f429 board
+# define the cpu used by the nucleo-f429zi board
 export CPU = stm32f4
 export CPU_MODEL = stm32f429zi
 
