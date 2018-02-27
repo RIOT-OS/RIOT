@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l073 STM32 Nucleo-L073
+ * @defgroup    boards_nucleo-l073rz STM32 Nucleo-L073RZ
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-L073
+ * @brief       Support for the STM32 Nucleo-L073RZ
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-l073 board
+ * @brief       Peripheral MCU configuration for the nucleo-l073rz board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>

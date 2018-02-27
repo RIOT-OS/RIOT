@@ -12,7 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              microbit msb-430 msb-430h nrf51dongle nrf6310 \
                              nucleo32-f031 nucleo32-f042 nucleo32-f303 nucleo32-l031 \
                              nucleo-f030r8 nucleo-f070rb nucleo-f072rb nucleo-f103rb nucleo-f302r8 \
-                             nucleo-f334r8 nucleo-l053r8 nucleo-l073 opencm904 \
+                             nucleo-f334r8 nucleo-l053r8 nucleo-l073rz opencm904 \
                              spark-core stm32f0discovery telosb weio wsn430-v1_3b \
                              wsn430-v1_4 yunjia-nrf51822 z1
 
