@@ -18,20 +18,24 @@
  * @}
  */
 
-
 #include <string.h>
 #include "crypto/modes/cbc.h"
 
-int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16],
-                       const uint8_t* input, size_t length, uint8_t* output)
+int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16],
+                       const uint8_t *input, size_t length, uint8_t *output)
 {
     size_t offset = 0;
-    uint8_t block_size, input_block[CIPHER_MAX_BLOCK_SIZE] = {0},
-            *output_block_last;
+    uint8_t block_size, input_block[CIPHER_MAX_BLOCK_SIZE] = { 0 },
+    *output_block_last;
 
     block_size = cipher_get_block_size(cipher);
     if (length % block_size != 0) {
         return CIPHER_ERR_INVALID_LENGTH;
+    }
+
+    if (length == 0) {
+        /* no plaintext, no operation */
+        return 0;
     }
 
     output_block_last = iv;
@@ -53,9 +57,48 @@ int cipher_encrypt_cbc(cipher_t* cipher, uint8_t iv[16],
     return offset;
 }
 
+int cipher_encrypt_cbc_with_padding(cipher_t *cipher, uint8_t iv[16],
+                                    const uint8_t *input, size_t length, uint8_t *output, uint8_t padding_type)
+{
+    if (padding_type == PADDING_TYPE_PKCS7) {
+        /* Encrypt the bulk of data without the last block */
+        size_t last_block_offset = length - (length % cipher->interface->block_size);
+        if (last_block_offset == length) {
+            /* input data is a multiple of the blocksize -> we need to append a whole block */
+            last_block_offset -= cipher->interface->block_size;
+        }
 
-int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16],
-                       const uint8_t* input, size_t length, uint8_t* output)
+        int encrypted_bytes = cipher_encrypt_cbc(cipher, iv, input, last_block_offset, output);
+        if (encrypted_bytes < 0) {
+            return encrypted_bytes;
+        }
+        /* Move the iv to the last block of the encrypted data */
+        if (encrypted_bytes > 0) {
+            iv = output + last_block_offset - cipher->interface->block_size;
+        }
+        /* Pad the final block and encrypt it */
+        uint8_t padded_data[length - last_block_offset + cipher->interface->block_size];
+        int32_t padded_length = pkcs7_padding(input + last_block_offset, length - last_block_offset, cipher->interface->block_size, padded_data, sizeof(padded_data));
+        if (padded_length < 0) {
+            return CIPHER_ERR_PADDING_ERROR;
+        }
+
+        int encrypted_bytes_last_block = cipher_encrypt_cbc(cipher, iv, padded_data, padded_length, output + last_block_offset);
+        if (encrypted_bytes_last_block < 0) {
+            return encrypted_bytes;
+        }
+
+        encrypted_bytes += encrypted_bytes_last_block;
+        return encrypted_bytes;
+    }
+    else {
+        return CIPHER_ERR_UNKNOWN_PADDING;
+    }
+}
+
+
+int cipher_decrypt_cbc(cipher_t *cipher, uint8_t iv[16],
+                       const uint8_t *input, size_t length, uint8_t *output)
 {
     size_t offset = 0;
     const uint8_t *input_block, *input_block_last;
@@ -65,6 +108,11 @@ int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16],
     block_size = cipher_get_block_size(cipher);
     if (length % block_size != 0) {
         return CIPHER_ERR_INVALID_LENGTH;
+    }
+
+    if (length == 0) {
+        /* no plaintext, no operation */
+        return 0;
     }
 
     input_block_last = iv;
@@ -86,4 +134,24 @@ int cipher_decrypt_cbc(cipher_t* cipher, uint8_t iv[16],
     } while (offset < length);
 
     return offset;
+}
+
+int cipher_decrypt_cbc_with_padding(cipher_t *cipher, uint8_t iv[16],
+                                    const uint8_t *input, size_t length, uint8_t *output, uint8_t padding_type)
+{
+    if (padding_type == PADDING_TYPE_PKCS7) {
+        int decrypted_len = cipher_decrypt_cbc(cipher, iv, input, length, output);
+        if (decrypted_len < 0) {
+            return decrypted_len;
+        }
+        /* Decryption worked. Now remove the padding. */
+        int32_t unpadded_length = pkcs7_padding_remove(output, length, cipher->interface->block_size);
+        if (unpadded_length < 0) {
+            return CIPHER_ERR_PADDING_ERROR;
+        }
+        return unpadded_length;
+    }
+    else {
+        return CIPHER_ERR_UNKNOWN_PADDING;
+    }
 }
