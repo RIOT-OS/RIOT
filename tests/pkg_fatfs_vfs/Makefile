@@ -34,7 +34,7 @@ BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove arduino-mega2560
                    feather-m0 fox frdm-k22f frdm-k64f ikea-tradfri iotlab-a8-m3 \
                    iotlab-m3 limifrog-v1 maple-mini msb-430 msb-430h msba2 msbiot \
                    mulle nrf52840dk nrf52dk nrf6310 nucleo-f207zg nucleo-f303ze \
-                   nucleo-f412zg nucleo-f413zh nucleo144-f429 nucleo144-f446 \
+                   nucleo-f412zg nucleo-f413zh nucleo-f429zi nucleo144-f446 \
                    nucleo32-f042 nucleo32-f303 nucleo32-l031 \
                    nucleo32-l432 nucleo-f072rb nucleo-f091rc nucleo-f103rb nucleo-f302r8 \
                    nucleo-f303re nucleo-f334r8 nucleo-f401re nucleo-f410rb nucleo-f411re \

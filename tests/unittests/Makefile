@@ -120,7 +120,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        nucleo-f303ze \
                        nucleo-f412zg \
                        nucleo-f413zh \
-                       nucleo144-f429 \
+                       nucleo-f429zi \
                        nucleo144-f446 \
                        nucleo144-f722 \
                        nucleo144-f746 \
