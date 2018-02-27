@@ -874,7 +874,7 @@ static unsigned _match(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
         }
         match = ipv6_addr_match_prefix(&(netif->ipv6.addrs[i]), addr);
         if (((match > 64U) || !ipv6_addr_is_link_local(&(netif->ipv6.addrs[i]))) &&
-            (match > best_match)) {
+            (match >= best_match)) {
             if (idx != NULL) {
                 *idx = i;
             }
