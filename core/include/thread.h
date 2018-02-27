@@ -173,7 +173,7 @@ struct _thread {
                                          to this thread's message queue */
 #endif
 #if defined(MODULE_NEWLIB_THREAD_SAFE) || defined(DOXYGEN)
-    struct _reent newlib_reent;     /**< thread's re-entrent object     */
+    struct _reent newlib_reent;     /**< thread's re-entrant object     */
 #endif
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
     || defined(MODULE_MPU_STACK_GUARD) || defined(DOXYGEN)
