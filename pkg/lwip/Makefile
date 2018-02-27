@@ -9,7 +9,7 @@ LWIP_USEMODULE := $(filter $(LWIP_SUBMODULES),$(USEMODULE))
 .PHONY: all $(LWIP_SUBMODULES)
 
 all: git-download $(LWIP_USEMODULE)
-	"$(MAKE)" -f $(CURDIR)/makefiles/Makefile.lwip $ -C $(PKG_BUILDDIR)
+	"$(MAKE)" -f $(CURDIR)/makefiles/Makefile.lwip -C $(PKG_BUILDDIR)
 
 lwip_api: $(CURDIR)/makefiles/lwip_api.mk
 	"$(MAKE)" -f $< -C $(PKG_BUILDDIR)/src/api
