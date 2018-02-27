@@ -9,13 +9,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f302 STM32 Nucleo-F302
+ * @defgroup    boards_nucleo-f302r8 STM32 Nucleo-F302R8
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F302
+ * @brief       Support for the STM32 Nucleo-F302R8
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-f302 board
+ * @brief       Peripheral MCU configuration for the nucleo-f302r8 board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

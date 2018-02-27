@@ -16,7 +16,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              cc2650-launchpad cc2650stk maple-mini \
                              microbit nrf51dongle nrf6310 nucleo32-f031 \
                              nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo-f030r8 \
-                             nucleo-f070rb nucleo-f072rb nucleo-f103rb nucleo-f302 nucleo-f334 \
+                             nucleo-f070rb nucleo-f072rb nucleo-f103rb nucleo-f302r8 nucleo-f334 \
                              nucleo-l053 nucleo-l073 opencm904 \
                              spark-core stm32f0discovery yunjia-nrf51822
 
