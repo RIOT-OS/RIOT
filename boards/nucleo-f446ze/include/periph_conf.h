@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f446 STM32 Nucleo144-F446
+ * @defgroup    boards_nucleo-f446ze STM32 Nucleo-F446ZE
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F446
+ * @brief       Support for the STM32 Nucleo-F446ZE
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo144-f446 board
+ * @name        Peripheral MCU configuration for the nucleo-f446ze board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
