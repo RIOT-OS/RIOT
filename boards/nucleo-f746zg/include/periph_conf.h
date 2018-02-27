@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f746 STM32 Nucleo144-F746
+ * @defgroup    boards_nucleo-f746zg STM32 Nucleo-F746ZG
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F746
+ * @brief       Support for the STM32 Nucleo-F746ZG
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo144-f746 board
+ * @brief       Peripheral MCU configuration for the nucleo-f746zg board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
