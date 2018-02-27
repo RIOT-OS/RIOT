@@ -1,4 +1,4 @@
-# define the cpu used by the nucleo144-f303 board
+# define the cpu used by the nucleo-f303ze board
 export CPU = stm32f3
 export CPU_MODEL = stm32f303ze
 
