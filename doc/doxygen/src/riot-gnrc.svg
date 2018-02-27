@@ -418,9 +418,9 @@
           stroke-miterlimit: 4;
           stroke-width: 3;
         }
-        #gnrc-detail-conn {
+        #gnrc-detail-sock {
           fill: none;
-          stroke: url(#outer-gradient-conn);
+          stroke: url(#outer-gradient-sock);
           stroke-linecap: round;
           stroke-linejoin: miter;
           stroke-miterlimit: 4;
@@ -470,7 +470,7 @@
         }
       ]]>
     </style>
-    <linearGradient id="outer-gradient-conn" x1="0%" y1="0%" x2="0%" y2="100%">
+    <linearGradient id="outer-gradient-sock" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop style="stop-color: #3fa687; stop-opacity: 0;" offset="0" />
       <stop style="stop-color: #3fa687; stop-opacity: 0;" offset="0.1" />
       <stop style="stop-color: #3fa687; stop-opacity: 1;" offset="0.9" />
@@ -493,25 +493,25 @@
   </defs>
   <g id="transformer" transform="scale(0.75)">
     <g id="gnrc-detail" transform="translate(5,0)">
-      <rect id="gnrc-detail-conn" x="0" y="0" rx="4" ry="4" width="380" height="30" />
+      <rect id="gnrc-detail-sock" x="0" y="0" rx="4" ry="4" width="380" height="30" />
       <rect id="gnrc-detail-netdev" x="0" y="360" rx="4" ry="4" width="380" height="30" />
       <g id="gnrc-detail-gnrc" transform="translate(0,10)">
         <rect id="sys-net-border" class="outer-stroke" x="0" y="30" rx="4" ry="4"
               width="380" height="310" />
-        <g id="gnrc-conn">
-          <rect id="gnrc-conn-box" class="modbox" x="10" y="0" rx="4" ry="4"
+        <g id="gnrc-sock">
+          <rect id="gnrc-sock-box" class="modbox" x="10" y="0" rx="4" ry="4"
                 width="360" height="50" />
-          <text id="gnrc-conn-label" class="modbox-text"
-                x="190" y="32"><tspan>gnrc_conn</tspan></text>
+          <text id="gnrc-sock-label" class="modbox-text"
+                x="190" y="32"><tspan>gnrc_sock</tspan></text>
         </g>
-        <g id="netapi-conn-udp">
-          <path id="netapi-conn-udp-arrow" d="m 97.5,55 0,20" class="outer-stroke-arrow" />
-          <text id="netapi-conn-udp-label" class="outer-text-netapi"
+        <g id="netapi-sock-udp">
+          <path id="netapi-sock-udp-arrow" d="m 97.5,55 0,20" class="outer-stroke-arrow" />
+          <text id="netapi-sock-udp-label" class="outer-text-netapi"
                 x="104" y="71"><tspan>netapi</tspan></text>
         </g>
-        <g id="netapi-conn-ipv6">
-          <path id="netapi-conn-udp-arrow" d="m 190.5,55 0,100" class="outer-stroke-arrow" />
-          <text id="netapi-conn-udp-label" class="outer-text-netapi"
+        <g id="netapi-sock-ipv6">
+          <path id="netapi-sock-udp-arrow" d="m 190.5,55 0,100" class="outer-stroke-arrow" />
+          <text id="netapi-sock-udp-label" class="outer-text-netapi"
                 x="195" y="71"><tspan>netapi</tspan></text>
         </g>
         <g id="gnrc-udp">
@@ -520,9 +520,9 @@
           <text id="gnrc-udp-label" class="modbox-text"
                 x="93.5" y="112"><tspan>gnrc_udp</tspan></text>
         </g>
-        <g id="netapi-conn-tcp">
-          <path id="netapi-conn-tcp-arrow" d="m 282.5,55 0,20" class="outer-stroke-arrow" />
-          <text id="netapi-conn-tcp-label" class="outer-text-netapi"
+        <g id="netapi-sock-tcp">
+          <path id="netapi-sock-tcp-arrow" d="m 282.5,55 0,20" class="outer-stroke-arrow" />
+          <text id="netapi-sock-tcp-label" class="outer-text-netapi"
                 x="289" y="71"><tspan>netapi</tspan></text>
         </g>
         <g id="gnrc-tcp">
