@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f070 STM32 Nucleo-F070
+ * @defgroup    boards_nucleo-f070rb STM32 Nucleo-F070RB
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F070
+ * @brief       Support for the STM32 Nucleo-F070RB
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-f070 board
+ * @brief       Peripheral MCU configuration for the nucleo-f070rb board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
