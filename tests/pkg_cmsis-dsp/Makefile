@@ -19,7 +19,7 @@ BOARD_WHITELIST := \
   nucleo-f303re \
   nucleo-f334r8 \
   nucleo-f401re \
-  nucleo-l152 \
+  nucleo-l152re \
   openmote-cc2538 \
   pba-d-01-kw2x \
   samd21-xpro \

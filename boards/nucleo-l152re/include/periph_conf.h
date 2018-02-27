@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l152 STM32 Nucleo-L152
+ * @defgroup    boards_nucleo-l152re STM32 Nucleo-L152RE
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-L152
+ * @brief       Support for the STM32 Nucleo-L152RE
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-l152 board
+ * @brief       Peripheral MCU configuration for the nucleo-l152re board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
