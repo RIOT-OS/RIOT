@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f413 STM32 Nucleo144-F413
+ * @defgroup    boards_nucleo-f413zh STM32 Nucleo-F413ZH
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F413
+ * @brief       Support for the STM32 Nucleo-F413ZH
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo144-f413 board
+ * @name        Peripheral MCU configuration for the nucleo-f413zh board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Vincent Dupont <vincent@otakeys.com>
