@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l053 STM32 Nucleo-L053
+ * @defgroup    boards_nucleo-l053r8 STM32 Nucleo-L053R8
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-L053
+ * @brief       Support for the STM32 Nucleo-L053R8
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-l053 board
+ * @brief       Peripheral MCU configuration for the nucleo-l053r8 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>

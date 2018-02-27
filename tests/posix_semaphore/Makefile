@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := chronos mbed_lpc1768 msb-430 msb-430h nrf6310 \
                              nucleo32-f031 nucleo32-f042 nucleo32-l031 nucleo-f030r8 \
-                             nucleo-f334r8 nucleo-l053 spark-core \
+                             nucleo-f334r8 nucleo-l053r8 spark-core \
                              stm32f0discovery yunjia-nrf51822
 
 USEMODULE += fmt
