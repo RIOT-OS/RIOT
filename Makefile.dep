@@ -445,10 +445,6 @@ ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter lwip_%,$(USEMODULE)))
-  USEMODULE += lwip
-endif
-
-ifneq (,$(filter lwip,$(USEMODULE)))
   USEPKG += lwip
   USEMODULE += core_mbox
   USEMODULE += lwip_api
