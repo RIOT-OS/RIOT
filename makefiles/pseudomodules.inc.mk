@@ -164,6 +164,10 @@ PSEUDOMODULES += hmc5883l_int
 # interrupt variant of the ITG320X driver as pseudo module
 PSEUDOMODULES += itg320x_int
 
+# include variants of MH-Z19 drivers as pseudo modules
+PSEUDOMODULES += mhz19_uart
+PSEUDOMODULES += mhz19_pwm
+
 # include variants of MPU9X50 drivers as pseudo modules
 PSEUDOMODULES += mpu9150
 PSEUDOMODULES += mpu9250
