@@ -16,7 +16,7 @@ BOARD_WHITELIST := \
   nucleo-f091rc \
   nucleo-f103rb \
   nucleo-f103rb \
-  nucleo-f303 \
+  nucleo-f303re \
   nucleo-f334 \
   nucleo-f401 \
   nucleo-l152 \
