@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f030 STM32 Nucleo-F030
+ * @defgroup    boards_nucleo-f030r8 STM32 Nucleo-F030R8
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F030
+ * @brief       Support for the STM32 Nucleo-F030R8
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-f030 board
+ * @brief       Peripheral MCU configuration for the nucleo-f030r8 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      José Ignacio Alamos <jialamos@uc.cl>

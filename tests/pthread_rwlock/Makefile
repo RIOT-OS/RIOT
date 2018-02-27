@@ -11,7 +11,7 @@ USEMODULE += xtimer
 USEMODULE += random
 
 BOARD_INSUFFICIENT_MEMORY += chronos msb-430 msb-430h nucleo32-f031 \
-                             nucleo32-f042 nucleo32-l031 nucleo-f030 \
+                             nucleo32-f042 nucleo32-l031 nucleo-f030r8 \
                              nucleo-f334 nucleo-l053 stm32f0discovery
 
 include $(RIOTBASE)/Makefile.include

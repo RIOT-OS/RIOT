@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini \
                              cc2650-launchpad cc2650stk maple-mini \
-                             microbit nrf51dongle nrf6310 nucleo-f030 nucleo-f070 \
+                             microbit nrf51dongle nrf6310 nucleo-f030r8 nucleo-f070 \
                              nucleo-f072 nucleo-f103 nucleo-f302 nucleo-f334 nucleo-f410 \
                              nucleo-l053 nucleo-l073 nucleo32-f031 nucleo32-f042 \
                              nucleo32-f303 nucleo32-l031 opencm904 \

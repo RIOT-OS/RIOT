@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos telosb nucleo32-f042 nucleo32-f031 \
-                             nucleo-f030 nucleo-l053 nucleo32-l031 \
+                             nucleo-f030r8 nucleo-l053 nucleo32-l031 \
                              stm32f0discovery z1
 
 USEMODULE += sock_dns
