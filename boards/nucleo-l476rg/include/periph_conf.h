@@ -9,13 +9,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-l476 STM32 Nucleo-L476
+ * @defgroup    boards_nucleo-l476rg STM32 Nucleo-L476RG
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-L476
+ * @brief       Support for the STM32 Nucleo-L476RG
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-l476 board
+ * @brief       Peripheral MCU configuration for the nucleo-l476rg board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>

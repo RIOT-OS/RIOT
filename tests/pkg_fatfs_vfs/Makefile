@@ -38,7 +38,7 @@ BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove arduino-mega2560
                    nucleo32-f042 nucleo32-f303 nucleo32-l031 \
                    nucleo32-l432 nucleo-f072rb nucleo-f091rc nucleo-f103rb nucleo-f302r8 \
                    nucleo-f303re nucleo-f334r8 nucleo-f401re nucleo-f410rb nucleo-f411re \
-                   nucleo-f446re nucleo-l053r8 nucleo-l073rz nucleo-l152re nucleo-l476 \
+                   nucleo-f446re nucleo-l053r8 nucleo-l073rz nucleo-l152re nucleo-l476rg \
                    nz32-sc151 openmote-cc2538 pba-d-01-kw2x remote-pa remote-reva \
                    remote-revb samd21-xpro saml21-xpro samr21-xpro sltb001a \
                    sodaq-autonomo sodaq-explorer spark-core stm32f0discovery \

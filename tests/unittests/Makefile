@@ -146,7 +146,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        nucleo-l073rz \
                        nucleo-l152re \
                        nucleo-l433rc \
-                       nucleo-l476 \
+                       nucleo-l476rg \
                        nucleo-l496zg \
                        nz32-sc151 \
                        opencm904 \
