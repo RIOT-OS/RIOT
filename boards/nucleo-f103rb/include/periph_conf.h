@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f103 STM32 Nucleo-F103
+ * @defgroup    boards_nucleo-f103rb STM32 Nucleo-F103RB
  * @ingroup     boards_common_nucleo64
- * @brief       Support for the STM32 Nucleo-F103
+ * @brief       Support for the STM32 Nucleo-F103RB
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo-f103 board
+ * @brief       Peripheral MCU configuration for the nucleo-f103rb board
  *
  * @author      Víctor Ariño <victor.arino@triagnosys.com>
  */

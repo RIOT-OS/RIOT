@@ -14,8 +14,8 @@ BOARD_WHITELIST := \
   msbiot \
   mulle \
   nucleo-f091rc \
-  nucleo-f103 \
-  nucleo-f103 \
+  nucleo-f103rb \
+  nucleo-f103rb \
   nucleo-f303 \
   nucleo-f334 \
   nucleo-f401 \
