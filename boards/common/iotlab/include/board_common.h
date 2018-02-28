@@ -55,16 +55,16 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Define the interface to the AT86RF231 radio
+ * @name    Define the interface to the AT86RF231 radio
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
+ * @{
  */
-#define AT86RF2XX_PARAMS_BOARD      {.spi       = SPI_DEV(0), \
-                                     .spi_clk   = SPI_CLK_5MHZ, \
-                                     .cs_pin    = GPIO_PIN(PORT_A, 4), \
-                                     .int_pin   = GPIO_PIN(PORT_C, 4), \
-                                     .sleep_pin = GPIO_PIN(PORT_A, 2), \
-                                     .reset_pin = GPIO_PIN(PORT_C, 1)}
+#define AT86RF2XX_PARAM_CS         GPIO_PIN(PORT_A, 4)
+#define AT86RF2XX_PARAM_INT        GPIO_PIN(PORT_C, 4)
+#define AT86RF2XX_PARAM_SLEEP      GPIO_PIN(PORT_A, 2)
+#define AT86RF2XX_PARAM_RESET      GPIO_PIN(PORT_C, 1)
+/** @} */
 
 /**
  * @name    LED pin definitions and handlers
