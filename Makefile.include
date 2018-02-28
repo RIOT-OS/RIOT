@@ -296,8 +296,12 @@ ifeq ($(origin RIOT_VERSION), undefined)
   endif
 endif
 
+# Set module by prepending APPLICATION name with 'application_'.
+# It prevents conflict with application and modules with the same name.
+APPLICATION_MODULE ?= application_$(APPLICATION)
+
 # the binaries to link
-BASELIBS += $(BINDIR)/${APPLICATION}.a
+BASELIBS += $(BINDIR)/$(APPLICATION_MODULE).a
 BASELIBS += $(APPDEPS)
 
 .PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules

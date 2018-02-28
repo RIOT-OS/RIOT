@@ -6,6 +6,7 @@ export QQ                    # as Q, but be more quiet
 export QUIET                 # The parameter to use whether to show verbose makefile commands or not.
 
 export APPLICATION           # The application, set in the Makefile which is run by the user.
+export APPLICATION_MODULE    # The application module name.
 export BOARD                 # The board to compile the application for.
 export CPU                   # The CPU, set by the board's Makefile.include.
 export CPU_MODEL             # The specific identifier of the used CPU, used for some CPU implementations to differentiate between different memory layouts
