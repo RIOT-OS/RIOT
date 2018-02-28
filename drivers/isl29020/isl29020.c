@@ -26,27 +26,32 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-int isl29020_init(isl29020_t *dev, i2c_t i2c, uint8_t address,
-                  isl29020_range_t range, isl29020_mode_t mode)
+#define DEV_I2C      (dev->params.i2c)
+#define DEV_ADDR     (dev->params.addr)
+#define DEV_RANGE    (dev->params.range)
+#define DEV_MODE     (dev->params.mode)
+
+int isl29020_init(isl29020_t *dev, const isl29020_params_t *params)
 {
+    dev->params = *params;
+
     int res;
     uint8_t tmp;
 
     /* initialize device descriptor */
-    dev->i2c = i2c;
-    dev->address = address;
-    dev->lux_fac = (float)((1 << (10 + (2 * range))) - 1) / 0xffff;
+    dev->lux_fac = (float)((1 << (10 + (2 * DEV_RANGE))) - 1) / 0xffff;
 
     /* acquire exclusive access to the bus */
-    i2c_acquire(dev->i2c);
+    i2c_acquire(DEV_I2C);
     /* initialize the I2C bus */
-    i2c_init_master(i2c, I2C_SPEED_NORMAL);
+    i2c_init_master(DEV_I2C, I2C_SPEED_NORMAL);
 
     /* configure and enable the sensor */
-    tmp = ISL29020_CMD_EN | ISL29020_CMD_MODE | ISL29020_RES_INT_16 | range | (mode << 5);
-    res = i2c_write_reg(dev->i2c, address, ISL29020_REG_CMD, tmp);
+    tmp = (ISL29020_CMD_EN | ISL29020_CMD_MODE |
+           ISL29020_RES_INT_16 | DEV_RANGE | (DEV_MODE << 5));
+    res = i2c_write_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, tmp);
     /* release the bus for other threads */
-    i2c_release(dev->i2c);
+    i2c_release(DEV_I2C);
     if (res < 1) {
         return -1;
     }
@@ -59,11 +64,11 @@ int isl29020_read(const isl29020_t *dev)
     uint16_t res;
     int ret;
 
-    i2c_acquire(dev->i2c);
+    i2c_acquire(DEV_I2C);
     /* read lighting value */
-    ret = i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_LDATA, &low);
-    ret += i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_HDATA, &high);
-    i2c_release(dev->i2c);
+    ret = i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_LDATA, &low);
+    ret += i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_HDATA, &high);
+    i2c_release(DEV_I2C);
     if (ret < 2) {
         return -1;
     }
@@ -78,19 +83,19 @@ int isl29020_enable(const isl29020_t *dev)
     int res;
     uint8_t tmp;
 
-    i2c_acquire(dev->i2c);
-    res = i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_CMD, &tmp);
+    i2c_acquire(DEV_I2C);
+    res = i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, &tmp);
     if (res < 1) {
-        i2c_release(dev->i2c);
+        i2c_release(DEV_I2C);
         return -1;
     }
     tmp |= ISL29020_CMD_EN;
-    res = i2c_write_reg(dev->i2c, dev->address, ISL29020_REG_CMD, tmp);
+    res = i2c_write_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, tmp);
     if (res < 1) {
-        i2c_release(dev->i2c);
+        i2c_release(DEV_I2C);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_release(DEV_I2C);
     return 0;
 }
 
@@ -99,18 +104,18 @@ int isl29020_disable(const isl29020_t *dev)
     int res;
     uint8_t tmp;
 
-    i2c_acquire(dev->i2c);
-    res = i2c_read_reg(dev->i2c, dev->address, ISL29020_REG_CMD, &tmp);
+    i2c_acquire(DEV_I2C);
+    res = i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, &tmp);
     if (res < 1) {
-        i2c_release(dev->i2c);
+        i2c_release(DEV_I2C);
         return -1;
     }
     tmp &= ~(ISL29020_CMD_EN);
-    res = i2c_write_reg(dev->i2c, dev->address, ISL29020_REG_CMD, tmp);
+    res = i2c_write_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, tmp);
     if (res < 1) {
-        i2c_release(dev->i2c);
+        i2c_release(DEV_I2C);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_release(DEV_I2C);
     return 0;
 }

@@ -34,15 +34,6 @@ extern "C" {
 #define ISL29020_DEFAULT_ADDRESS        0x44
 
 /**
- * @brief   Device descriptor for ISL29020 sensors
- */
-typedef struct {
-    i2c_t i2c;                  /**< I2C device the sensor is connected to */
-    uint8_t address;            /**< I2C bus address of the sensor */
-    float lux_fac;              /**< factor to calculate actual lux value */
-} isl29020_t;
-
-/**
  * @brief   Possible modes for the ISL29020 sensor
  */
 typedef enum {
@@ -71,19 +62,23 @@ typedef struct {
 } isl29020_params_t;
 
 /**
+ * @brief   Device descriptor for ISL29020 sensors
+ */
+typedef struct {
+    isl29020_params_t params;   /**< device initialization parameters */
+    float lux_fac;              /**< factor to calculate actual lux value */
+} isl29020_t;
+
+/**
  * @brief   Initialize a new ISL29020 device
  *
  * @param[in] dev       device descriptor of an ISL29020 device
- * @param[in] i2c       I2C device the sensor is connected to
- * @param[in] address   I2C address of the sensor
- * @param[in] range     measurement range
- * @param[in] mode      configure if sensor reacts to ambient or infrared light
+ * @param[in] params    initialization parameters
  *
  * @return              0 on success
  * @return              -1 on error
  */
-int isl29020_init(isl29020_t *dev, i2c_t i2c, uint8_t address,
-                  isl29020_range_t range, isl29020_mode_t mode);
+int isl29020_init(isl29020_t *dev, const isl29020_params_t *params);
 
 /**
  * @brief   Read a lighting value from the sensor, the result is given in lux
