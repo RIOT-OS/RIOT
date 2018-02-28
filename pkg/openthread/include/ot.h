@@ -61,6 +61,7 @@ typedef struct {
  * @brief Gets packet from driver and tells OpenThread about the reception.
  *
  * @param[in]  aInstance          pointer to an OpenThread instance
+ * @param[in]  dev                pointer to a netdev instance
  */
 void recv_pkt(otInstance *aInstance, netdev_t *dev);
 
@@ -83,7 +84,7 @@ void openthread_bootstrap(void);
  *
  * @param[in]  dev                pointer to a netdev interface
  * @param[in]  tb                 pointer to the TX buffer designed for OpenThread
- * @param[in]  event              pointer to the RX buffer designed for Open_Thread
+ * @param[in]  rb                 pointer to the RX buffer designed for Open_Thread
  */
 void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
 
@@ -114,7 +115,7 @@ kernel_pid_t openthread_get_pid(void);
  */
 void ot_random_init(void);
 
-/*
+/**
  * @brief   Run OpenThread UART simulator (stdio)
  */
 void openthread_uart_run(void);
