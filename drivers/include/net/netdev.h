@@ -10,7 +10,7 @@
  */
 
 /**
- * @defgroup    drivers_netdev_api Network Device Driver API
+ * @defgroup    drivers_netdev_api Netdev - Network Device Driver API
  * @ingroup     drivers_netdev
  * @brief       This is a generic low-level network driver interface
  * @{
