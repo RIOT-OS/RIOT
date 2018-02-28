@@ -1,0 +1,5 @@
+USEMODULE += cryptofs
+USEMODULE += littlefs
+
+# Set vfs file and dir buffer sizes
+CFLAGS += -DVFS_FILE_BUFFER_SIZE=256 -DVFS_DIR_BUFFER_SIZE=44
