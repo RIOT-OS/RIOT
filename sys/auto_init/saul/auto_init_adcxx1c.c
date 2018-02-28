@@ -30,7 +30,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define ADCXX1C_NUM    (sizeof(adcxx1c_params)/sizeof(adcxx1c_params[0]))
+#define ADCXX1C_NUM   (sizeof(adcxx1c_params) / sizeof(adcxx1c_params[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -43,18 +43,22 @@ static adcxx1c_t adcxx1c_devs[ADCXX1C_NUM];
 static saul_reg_t saul_entries[ADCXX1C_NUM];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define ADCXX1C_INFO_NUM (sizeof(adcxx1c_saul_info) / sizeof(adcxx1c_saul_info[0]))
+
+/**
  * @brief   Reference the driver struct
  */
 extern saul_driver_t adcxx1c_saul_driver;
 
-
 void auto_init_adcxx1c(void)
 {
-    for (unsigned i = 0; i < ADCXX1C_NUM; i++) {
-        const adcxx1c_params_t *p = &adcxx1c_params[i];
+    assert(ADCXX1C_INFO_NUM == ADCXX1C_NUM);
 
+    for (unsigned i = 0; i < ADCXX1C_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing adcxx1c #%d\n", i);
-        if (adcxx1c_init(&adcxx1c_devs[i], p) < 0) {
+        if (adcxx1c_init(&adcxx1c_devs[i], &adcxx1c_params[i]) < 0) {
             LOG_ERROR("[auto_init_saul] error initializing adcxx1c #%d\n", i);
             continue;
         }
