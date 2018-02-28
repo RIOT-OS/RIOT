@@ -100,19 +100,6 @@ typedef struct {
 } lsm303dlhc_3d_data_t;
 
 /**
- * @brief   Device descriptor for LSM303DLHC sensors
- */
-typedef struct {
-    i2c_t i2c;                          /**< I2C device                  */
-    uint8_t acc_address;                /**< accelerometer's I2C address */
-    uint8_t mag_address;                /**< magnetometer's I2C address  */
-    gpio_t  acc_pin;                    /**< accelerometer's data ready pin */
-    gpio_t  mag_pin;                    /**< magnetometer's data ready pin  */
-    lsm303dlhc_acc_scale_t acc_scale;   /**< accelerometer scale factor */
-    lsm303dlhc_mag_gain_t mag_gain;     /**< magnetometer gain */
-} lsm303dlhc_t;
-
-/**
  * @brief   Data structure holding all the information needed for initialization
  */
 typedef struct {
@@ -128,29 +115,22 @@ typedef struct {
 } lsm303dlhc_params_t;
 
 /**
+ * @brief   Device descriptor for LSM303DLHC sensors
+ */
+typedef struct {
+    lsm303dlhc_params_t params;             /**< device initialization parameters */
+} lsm303dlhc_t;
+
+/**
  * @brief   Initialize a new LSM303DLHC device
  *
- * @param[in] dev               device descriptor of an LSM303DLHC device
- * @param[in] i2c               I2C device the sensor is connected to
- * @param[in] acc_pin           GPIO pin connected to accelerometer
- * @param[in] mag_pin           GPIO pin connected to magnetometer
- * @param[in] acc_address       I2C address of the accelerometer
- * @param[in] acc_sample_rate   accelerometer sample rate
- * @param[in] acc_scale         accelerometer scale (from +- 2g to +-16g)
- * @param[in] mag_address       I2C address of the magnetometer
- * @param[in] mag_sample_rate   magnetometer sample rate
- * @param[in] mag_gain          magnetometer gain
+ * @param[in] dev           device descriptor of an LSM303DLHC device
+ * @param[in] params        initialization parameters
  *
  * @return                  0 on success
  * @return                  -1 on error
  */
-int lsm303dlhc_init(lsm303dlhc_t *dev, i2c_t i2c, gpio_t acc_pin, gpio_t mag_pin,
-                    uint8_t acc_address,
-                    lsm303dlhc_acc_sample_rate_t acc_sample_rate,
-                    lsm303dlhc_acc_scale_t acc_scale,
-                    uint8_t mag_address,
-                    lsm303dlhc_mag_sample_rate_t mag_sample_rate,
-                    lsm303dlhc_mag_gain_t mag_gain);
+int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params);
 
 /**
  * @brief   Read a accelerometer value from the sensor.
