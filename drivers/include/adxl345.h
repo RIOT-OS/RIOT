@@ -82,10 +82,10 @@ enum {
  * @brief   List fifo mode
  */
 enum {
-    BYPASS  = 0,          /**< FIFO bypass mode */
-    FIFO    = 1,          /**< FIFO mode */
-    STREAM  = 2,          /**< FIFO stream mode */
-    TRIGGER = 3           /**< FIFO trigger mode */
+    ADXL345_BYPASS  = 0,          /**< FIFO bypass mode */
+    ADXL345_FIFO    = 1,          /**< FIFO mode */
+    ADXL345_STREAM  = 2,          /**< FIFO stream mode */
+    ADXL345_TRIGGER = 3           /**< FIFO trigger mode */
 };
 
 /**
