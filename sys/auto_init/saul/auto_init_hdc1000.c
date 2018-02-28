@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define HDC1000_NUM    (sizeof(hdc1000_params)/sizeof(hdc1000_params[0]))
+#define HDC1000_NUM    (sizeof(hdc1000_params) / sizeof(hdc1000_params[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -42,7 +42,12 @@ static hdc1000_t hdc1000_devs[HDC1000_NUM];
 static saul_reg_t saul_entries[HDC1000_NUM * 2];
 
 /**
- * @brief   Reference the driver struct
+ * @brief   Define the number of saul info
+ */
+#define HDC1000_INFO_NUM    (sizeof(hdc1000_saul_info) / sizeof(hdc1000_saul_info[0]))
+
+/**
+ * @name    Reference the driver struct
  * @{
  */
 extern saul_driver_t hdc1000_saul_temp_driver;
@@ -52,6 +57,8 @@ extern saul_driver_t hdc1000_saul_hum_driver;
 
 void auto_init_hdc1000(void)
 {
+    assert(HDC1000_NUM == HDC1000_INFO_NUM);
+
     for (unsigned i = 0; i < HDC1000_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing hdc1000 #%u\n", i);
 

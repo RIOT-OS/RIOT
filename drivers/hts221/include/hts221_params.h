@@ -46,7 +46,7 @@ extern "C" {
 #define HTS221_PARAM_RATE   (HTS221_REGS_CTRL_REG1_ODR_12HZ)
 #endif
 #ifndef HTS221_PARAMS
-#define HTS221_PARAMS       { .i2c  = HTS221_PARAM_I2C, \
+#define HTS221_PARAMS       { .i2c  = HTS221_PARAM_I2C,  \
                               .addr = HTS221_PARAM_ADDR, \
                               .avgx = HTS221_PARAM_AVGX, \
                               .rate = HTS221_PARAM_RATE }

@@ -32,26 +32,28 @@ extern "C" {
  * @{
  */
 #ifndef MRF24J40_PARAM_SPI
-#define MRF24J40_PARAM_SPI          (SPI_DEV(0))
+#define MRF24J40_PARAM_SPI          SPI_DEV(0)
 #endif
 #ifndef MRF24J40_PARAM_SPI_CLK
 #define MRF24J40_PARAM_SPI_CLK      (SPI_CLK_5MHZ)
 #endif
 #ifndef MRF24J40_PARAM_CS
-#define MRF24J40_PARAM_CS           (GPIO_PIN(0, 0))
+#define MRF24J40_PARAM_CS           GPIO_PIN(0, 0)
 #endif
 #ifndef MRF24J40_PARAM_INT
-#define MRF24J40_PARAM_INT          (GPIO_PIN(0, 1))
+#define MRF24J40_PARAM_INT          GPIO_PIN(0, 1)
 #endif
 #ifndef MRF24J40_PARAM_RESET
-#define MRF24J40_PARAM_RESET        (GPIO_PIN(0, 3))
+#define MRF24J40_PARAM_RESET        GPIO_PIN(0, 3)
 #endif
 
-#define MRF24J40_PARAMS_DEFAULT     { .spi = MRF24J40_PARAM_SPI, \
+#ifndef MRF24J40_PARAMS
+#define MRF24J40_PARAMS             { .spi = MRF24J40_PARAM_SPI,         \
                                       .spi_clk = MRF24J40_PARAM_SPI_CLK, \
-                                      .cs_pin = MRF24J40_PARAM_CS, \
-                                      .int_pin = MRF24J40_PARAM_INT, \
+                                      .cs_pin = MRF24J40_PARAM_CS,       \
+                                      .int_pin = MRF24J40_PARAM_INT,     \
                                       .reset_pin = MRF24J40_PARAM_RESET }
+#endif
 /**@}*/
 
 /**
@@ -59,11 +61,7 @@ extern "C" {
  */
 static const mrf24j40_params_t mrf24j40_params[] =
 {
-#ifdef MRF24J40_PARAMS_BOARD
-    MRF24J40_PARAMS_BOARD,
-#else
-    MRF24J40_PARAMS_DEFAULT,
-#endif
+    MRF24J40_PARAMS
 };
 
 #ifdef __cplusplus

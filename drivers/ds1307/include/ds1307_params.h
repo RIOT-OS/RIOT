@@ -30,14 +30,15 @@ extern "C" {
  * @{
  */
 #ifndef DS1307_PARAM_I2C
-#define DS1307_PARAM_I2C        (I2C_DEV(0))
+#define DS1307_PARAM_I2C        I2C_DEV(0)
 #endif
 #ifndef DS1307_PARAM_I2C_CLK
 #define DS1307_PARAM_I2C_CLK    (DS1307_I2C_MAX_CLK)
+#endif
 
-#define DS1307_PARAMS_DEFAULT   {   .i2c = DS1307_PARAM_I2C, \
-                                    .clk = DS1307_PARAM_I2C_CLK }
-
+#ifndef DS1307_PARAMS
+#define DS1307_PARAMS           { .i2c = DS1307_PARAM_I2C, \
+                                  .clk = DS1307_PARAM_I2C_CLK }
 #endif
 /** @} */
 
@@ -46,11 +47,7 @@ extern "C" {
  */
 static const ds1307_params_t ds1307_params[] =
 {
-#ifdef DS1307_PARAMS_BOARD
-    DS1307_PARAMS_BOARD,
-#else
-    DS1307_PARAMS_DEFAULT,
-#endif
+    DS1307_PARAMS
 };
 
 #ifdef __cplusplus

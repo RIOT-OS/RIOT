@@ -40,7 +40,7 @@ extern "C" {
  * @name    sx1276 configuration
  * @{
  */
-#define SX127X_PARAM_SPI                    (SPI_DEV(1))
+#define SX127X_PARAM_SPI                    SPI_DEV(1)
 #define SX127X_PARAM_SPI_NSS                GPIO_PIN(PORT_A, 15)
 
 #define SX127X_PARAM_RESET                  GPIO_PIN(PORT_C, 0)

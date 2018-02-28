@@ -29,17 +29,15 @@ extern "C" {
 #define SOFT_SPI_PARAM_MISO         (GPIO_UNDEF)
 #endif
 #ifndef SOFT_SPI_PARAM_MOSI
-#define SOFT_SPI_PARAM_MOSI         (GPIO_PIN(0, 0))
+#define SOFT_SPI_PARAM_MOSI         GPIO_PIN(0, 0)
 #endif
 #ifndef SOFT_SPI_PARAM_CLK
-#define SOFT_SPI_PARAM_CLK          (GPIO_PIN(0, 1))
+#define SOFT_SPI_PARAM_CLK          GPIO_PIN(0, 1)
 #endif
 
-#define SOFT_SPI_PARAMS_DEFAULT     {\
-                                        .miso_pin = SOFT_SPI_PARAM_MISO,\
-                                        .mosi_pin = SOFT_SPI_PARAM_MOSI,\
-                                        .clk_pin  = SOFT_SPI_PARAM_CLK,\
-                                    }
+#define SOFT_SPI_PARAMS_DEFAULT     { .miso_pin = SOFT_SPI_PARAM_MISO,  \
+                                      .mosi_pin = SOFT_SPI_PARAM_MOSI,\
+                                      .clk_pin  = SOFT_SPI_PARAM_CLK }
 
 /**
  * @brief   Sotware SPI port descriptor array

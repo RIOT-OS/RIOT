@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define LIS3MDL_NUM    (sizeof(lis3mdl_params)/sizeof(lis3mdl_params[0]))
+#define LIS3MDL_NUM    (sizeof(lis3mdl_params) / sizeof(lis3mdl_params[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -44,7 +44,7 @@ static saul_reg_t saul_entries[LIS3MDL_NUM];
 /**
  * @brief   Define the number of saul info
  */
-#define LIS3MDL_INFO_NUM    (sizeof(lis3mdl_saul_info)/sizeof(lis3mdl_saul_info[0]))
+#define LIS3MDL_INFO_NUM    (sizeof(lis3mdl_saul_info) / sizeof(lis3mdl_saul_info[0]))
 
 /**
  * @brief   Reference the driver structs

@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define LSM6DSL_NUM    (sizeof(lsm6dsl_params)/sizeof(lsm6dsl_params[0]))
+#define LSM6DSL_NUM    (sizeof(lsm6dsl_params) / sizeof(lsm6dsl_params[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -42,7 +42,12 @@ static lsm6dsl_t lsm6dsl_devs[LSM6DSL_NUM];
 static saul_reg_t saul_entries[LSM6DSL_NUM * 3];
 
 /**
- * @brief   Reference the driver structs
+ * @brief   Define the number of saul info
+ */
+#define LSM6DSL_INFO_NUM    (sizeof(lsm6dsl_saul_info) / sizeof(lsm6dsl_saul_info[0]))
+
+/**
+ * @name    Reference the driver structs
  * @{
  */
 extern saul_driver_t lsm6dsl_saul_acc_driver;
@@ -53,11 +58,12 @@ extern saul_driver_t lsm6dsl_saul_temp_driver;
 
 void auto_init_lsm6dsl(void)
 {
+    assert(LSM6DSL_NUM == LSM6DSL_INFO_NUM);
+
     for (unsigned int i = 0; i < LSM6DSL_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing lsm6dsl #%u\n", i);
 
-        int res = lsm6dsl_init(&lsm6dsl_devs[i], &lsm6dsl_params[i]);
-        if (res < 0) {
+        if (lsm6dsl_init(&lsm6dsl_devs[i], &lsm6dsl_params[i]) < 0) {
             LOG_ERROR("[auto_init_saul] error initializing lsm6dsl #%u\n", i);
             continue;
         }

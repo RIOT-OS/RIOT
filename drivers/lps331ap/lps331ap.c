@@ -45,32 +45,33 @@
 #define TEMP_BASE           (42.5f)
 #define TEMP_DIVIDER        (480U)
 
+#define DEV_I2C      (dev->params.i2c)
+#define DEV_ADDR     (dev->params.addr)
+#define DEV_RATE     (dev->params.rate)
 
-int lps331ap_init(lps331ap_t *dev, i2c_t i2c, uint8_t address, lps331ap_rate_t rate)
+int lps331ap_init(lps331ap_t *dev, const lps331ap_params_t * params)
 {
+    dev->params = *params;
+
     uint8_t tmp;
 
-    /* save device specifics */
-    dev->i2c = i2c;
-    dev->address = address;
-
     /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
+    i2c_acquire(DEV_I2C);
     /* initialize underlying I2C bus */
-    if (i2c_init_master(dev->i2c, BUS_SPEED) < 0) {
+    if (i2c_init_master(DEV_I2C, BUS_SPEED) < 0) {
         /* Release the bus for other threads. */
-        i2c_release(dev->i2c);
+        i2c_release(DEV_I2C);
         return -1;
     }
 
     /* configure device, for simple operation only CTRL_REG1 needs to be touched */
     tmp = LPS331AP_CTRL_REG1_DBDU | LPS331AP_CTRL_REG1_PD |
-          (rate << LPS331AP_CTRL_REG1_ODR_POS);
-    if (i2c_write_reg(dev->i2c, dev->address, LPS331AP_REG_CTRL_REG1, tmp) != 1) {
-        i2c_release(dev->i2c);
+          (DEV_RATE << LPS331AP_CTRL_REG1_ODR_POS);
+    if (i2c_write_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_CTRL_REG1, tmp) != 1) {
+        i2c_release(DEV_I2C);
         return -1;
     }
-    i2c_release(dev->i2c);
+    i2c_release(DEV_I2C);
 
     return 0;
 }
@@ -81,11 +82,11 @@ int lps331ap_read_temp(const lps331ap_t *dev)
     int16_t val = 0;
     float res = TEMP_BASE;      /* reference value -> see datasheet */
 
-    i2c_acquire(dev->i2c);
-    i2c_read_reg(dev->i2c, dev->address, LPS331AP_REG_TEMP_OUT_L, &tmp);
+    i2c_acquire(DEV_I2C);
+    i2c_read_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_TEMP_OUT_L, &tmp);
     val |= tmp;
-    i2c_read_reg(dev->i2c, dev->address, LPS331AP_REG_TEMP_OUT_H, &tmp);
-    i2c_release(dev->i2c);
+    i2c_read_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_TEMP_OUT_H, &tmp);
+    i2c_release(DEV_I2C);
     val |= ((uint16_t)tmp << 8);
 
     /* compute actual temperature value in °C */
@@ -101,13 +102,13 @@ int lps331ap_read_pres(const lps331ap_t *dev)
     int32_t val = 0;
     float res;
 
-    i2c_acquire(dev->i2c);
-    i2c_read_reg(dev->i2c, dev->address, LPS331AP_REG_PRESS_OUT_XL, &tmp);
+    i2c_acquire(DEV_I2C);
+    i2c_read_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_PRESS_OUT_XL, &tmp);
     val |= tmp;
-    i2c_read_reg(dev->i2c, dev->address, LPS331AP_REG_PRESS_OUT_L, &tmp);
+    i2c_read_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_PRESS_OUT_L, &tmp);
     val |= ((uint32_t)tmp << 8);
-    i2c_read_reg(dev->i2c, dev->address, LPS331AP_REG_PRESS_OUT_H, &tmp);
-    i2c_release(dev->i2c);
+    i2c_read_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_PRESS_OUT_H, &tmp);
+    i2c_release(DEV_I2C);
     val |= ((uint32_t)tmp << 16);
     /* see if value is negative */
     if (tmp & 0x80) {
@@ -126,14 +127,14 @@ int lps331ap_enable(const lps331ap_t *dev)
     uint8_t tmp;
     int status;
 
-    i2c_acquire(dev->i2c);
-    if (i2c_read_reg(dev->i2c, dev->address, LPS331AP_REG_CTRL_REG1, &tmp) != 1) {
-        i2c_release(dev->i2c);
+    i2c_acquire(DEV_I2C);
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_CTRL_REG1, &tmp) != 1) {
+        i2c_release(DEV_I2C);
         return -1;
     }
     tmp |= (LPS331AP_CTRL_REG1_PD);
-    status = i2c_write_reg(dev->i2c, dev->address, LPS331AP_REG_CTRL_REG1, tmp);
-    i2c_release(dev->i2c);
+    status = i2c_write_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_CTRL_REG1, tmp);
+    i2c_release(DEV_I2C);
 
     return status;
 }
@@ -143,14 +144,14 @@ int lps331ap_disable(const lps331ap_t *dev)
     uint8_t tmp;
     int status;
 
-    i2c_acquire(dev->i2c);
-    if (i2c_read_reg(dev->i2c, dev->address, LPS331AP_REG_CTRL_REG1, &tmp) != 1) {
-        i2c_release(dev->i2c);
+    i2c_acquire(DEV_I2C);
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_CTRL_REG1, &tmp) != 1) {
+        i2c_release(DEV_I2C);
         return -1;
     }
     tmp &= ~(LPS331AP_CTRL_REG1_PD);
-    status = i2c_write_reg(dev->i2c, dev->address, LPS331AP_REG_CTRL_REG1, tmp);
-    i2c_release(dev->i2c);
+    status = i2c_write_reg(DEV_I2C, DEV_ADDR, LPS331AP_REG_CTRL_REG1, tmp);
+    i2c_release(DEV_I2C);
 
     return status;
 }

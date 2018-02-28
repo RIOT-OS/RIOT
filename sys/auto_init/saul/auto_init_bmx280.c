@@ -29,12 +29,32 @@
 #include "bmx280.h"
 
 /**
- * @brief   Allocation of memory for device descriptors
+ * @brief   The number of configured sensors
  */
-static bmx280_t bmx280_devs[BMX280_NUMOF];
+#define BMX280_NUM    (sizeof(bmx280_params) / sizeof(bmx280_params[0]))
 
 /**
- * @brief   Reference the driver structs.
+ * @brief   Allocation of memory for device descriptors
+ */
+static bmx280_t bmx280_devs[BMX280_NUM];
+
+/**
+ * @brief   Memory for the SAUL registry entries
+ */
+#if defined(MODULE_BME280)
+#define SENSORS_NUM (3U)
+#else
+#define SENSORS_NUM (2U)
+#endif
+static saul_reg_t saul_entries[BMX280_NUM * SENSORS_NUM];
+
+/**
+ * @brief   Define the number of saul info
+ */
+#define BMX280_INFO_NUM (sizeof(bmx280_saul_info) / sizeof(bmx280_saul_info[0]))
+
+/**
+ * @name    Reference the driver structs.
  * @{
  */
 extern const saul_driver_t bmx280_temperature_saul_driver;
@@ -44,37 +64,29 @@ extern const saul_driver_t bme280_relative_humidity_saul_driver;
 #endif
 /** @} */
 
-/**
- * @brief   Memory for the SAUL registry entries
- */
-#if defined(MODULE_BME280)
-#define SENSORS_NUMOF 3
-#else
-#define SENSORS_NUMOF 2
-#endif
-static saul_reg_t saul_entries[BMX280_NUMOF * SENSORS_NUMOF];
-
 void auto_init_bmx280(void)
 {
+    assert(BMX280_INFO_NUM == BMX280_NUM);
+
     size_t se_ix = 0;
-    for (size_t i = 0; i < BMX280_NUMOF; i++) {
+    for (size_t i = 0; i < BMX280_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing BMX280 #%u\n", i);
-        int res = bmx280_init(&bmx280_devs[i], &bmx280_params[i]);
-        if (res < 0) {
+
+        if (bmx280_init(&bmx280_devs[i], &bmx280_params[i]) < 0) {
             LOG_ERROR("[auto_init_saul] error initializing BMX280 #%i\n", i);
             continue;
         }
 
         /* temperature */
         saul_entries[se_ix].dev = &bmx280_devs[i];
-        saul_entries[se_ix].name = bmx280_saul_reg_info[i].name;
+        saul_entries[se_ix].name = bmx280_saul_info[i].name;
         saul_entries[se_ix].driver = &bmx280_temperature_saul_driver;
         saul_reg_add(&saul_entries[se_ix]);
         se_ix++;
 
         /* pressure */
         saul_entries[se_ix].dev = &bmx280_devs[i];
-        saul_entries[se_ix].name = bmx280_saul_reg_info[i].name;
+        saul_entries[se_ix].name = bmx280_saul_info[i].name;
         saul_entries[se_ix].driver = &bmx280_pressure_saul_driver;
         saul_reg_add(&saul_entries[se_ix]);
         se_ix++;
@@ -82,7 +94,7 @@ void auto_init_bmx280(void)
 #if defined(MODULE_BME280)
         /* relative humidity */
         saul_entries[se_ix].dev = &bmx280_devs[i];
-        saul_entries[se_ix].name = bmx280_saul_reg_info[i].name;
+        saul_entries[se_ix].name = bmx280_saul_info[i].name;
         saul_entries[se_ix].driver = &bme280_relative_humidity_saul_driver;
         saul_reg_add(&saul_entries[se_ix]);
         se_ix++;

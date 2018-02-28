@@ -29,9 +29,13 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define HTS221_NUM      (sizeof(hts221_params)/sizeof(hts221_params[0]))
+#define HTS221_NUM      (sizeof(hts221_params) / sizeof(hts221_params[0]))
 
-#define HTS221_SAUL_NUM (sizeof(hts221_saul_info)/sizeof(hts221_saul_info[0]))
+/**
+ * @brief   Define the number of saul info
+ */
+#define HTS221_SAUL_NUM (sizeof(hts221_saul_info) / sizeof(hts221_saul_info[0]))
+
 /**
  * @brief   Allocate memory for the device descriptors
  */
@@ -43,7 +47,7 @@ static hts221_t hts221_devs[HTS221_NUM];
 static saul_reg_t saul_entries[HTS221_NUM * 2];
 
 /**
- * @brief   Reference the driver struct
+ * @name    Reference the driver struct
  * @{
  */
 extern saul_driver_t hts221_saul_temp_driver;

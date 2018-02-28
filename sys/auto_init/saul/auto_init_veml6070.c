@@ -41,14 +41,19 @@ static veml6070_t veml6070_devs[VEML6070_NUMOF];
 static saul_reg_t saul_entries[VEML6070_NUMOF];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define VEML6070_INFO_NUM    (sizeof(veml6070_saul_info) / sizeof(veml6070_saul_info[0]))
+
+/**
  * @brief   Reference the driver structs.
- * @{
  */
 extern const saul_driver_t veml6070_uv_saul_driver;
-/** @} */
 
 void auto_init_veml6070(void)
 {
+    assert(VEML6070_NUM == VEML6070_INFO_NUM);
+
     for (unsigned i = 0; i < VEML6070_NUMOF; i++) {
         LOG_DEBUG("[auto_init_saul] initializing veml6070 #%u\n", i);
 
@@ -59,7 +64,7 @@ void auto_init_veml6070(void)
         }
 
         saul_entries[(i)].dev = &(veml6070_devs[i]);
-        saul_entries[(i)].name = veml6070_saul_reg_info[i].name;
+        saul_entries[(i)].name = veml6070_saul_info[i].name;
         saul_entries[(i)].driver = &veml6070_uv_saul_driver;
 
         /* register to saul */

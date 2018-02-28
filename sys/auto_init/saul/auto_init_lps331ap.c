@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define LPS331AP_NUM    (sizeof(lps331ap_params)/sizeof(lps331ap_params[0]))
+#define LPS331AP_NUM    (sizeof(lps331ap_params) / sizeof(lps331ap_params[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -42,6 +42,11 @@ static lps331ap_t lps331ap_devs[LPS331AP_NUM];
 static saul_reg_t saul_entries[LPS331AP_NUM * 2];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define LPS331AP_INFO_NUM    (sizeof(lps331ap_saul_info) / sizeof(lps331ap_saul_info[0]))
+
+/**
  * @brief   Reference the driver struct
  */
 extern saul_driver_t lps331ap_saul_pres_driver;
@@ -50,13 +55,12 @@ extern saul_driver_t lps331ap_saul_temp_driver;
 
 void auto_init_lps331ap(void)
 {
-    for (unsigned int i = 0; i < LPS331AP_NUM; i++) {
-        const lps331ap_params_t *p = &lps331ap_params[i];
+    assert(LPS331AP_NUM == LPS331AP_INFO_NUM);
 
+    for (unsigned int i = 0; i < LPS331AP_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing lps331ap #%u\n", i);
 
-        int res = lps331ap_init(&lps331ap_devs[i], p->i2c, p->addr, p->rate);
-        if (res < 0) {
+        if (lps331ap_init(&lps331ap_devs[i], &lps331ap_params[i]) < 0) {
             LOG_ERROR("[auto_init_saul] error initializing lps331ap #%u\n", i);
             continue;
         }
