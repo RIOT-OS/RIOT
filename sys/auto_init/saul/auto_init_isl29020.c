@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define ISL29020_NUM    (sizeof(isl29020_params)/sizeof(isl29020_params[0]))
+#define ISL29020_NUM    (sizeof(isl29020_params) / sizeof(isl29020_params[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -42,6 +42,11 @@ static isl29020_t isl29020_devs[ISL29020_NUM];
 static saul_reg_t saul_entries[ISL29020_NUM];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define ISL29020_INFO_NUM    (sizeof(isl29020_saul_info) / sizeof(isl29020_saul_info[0]))
+
+/**
  * @brief   Reference the driver struct
  */
 extern saul_driver_t isl29020_saul_driver;
@@ -49,13 +54,12 @@ extern saul_driver_t isl29020_saul_driver;
 
 void auto_init_isl29020(void)
 {
-    for (unsigned int i = 0; i < ISL29020_NUM; i++) {
-        const isl29020_params_t *p = &isl29020_params[i];
+    assert(ISL29020_NUM == ISL29020_INFO_NUM);
 
+    for (unsigned int i = 0; i < ISL29020_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing isl29020 #%u\n", i);
 
-        int res = isl29020_init(&isl29020_devs[i], p->i2c, p->addr,
-                                p->range, p->mode);
+        int res = isl29020_init(&isl29020_devs[i], &isl29020_params[i]);
         if (res < 0) {
             LOG_ERROR("[auto_init_saul] error initializing isl29020 #%u\n", i);
             continue;
