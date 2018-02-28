@@ -28,7 +28,6 @@
 
 #include <stdint.h>
 
-#include "saul.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
