@@ -36,7 +36,7 @@ extern "C" {
 #define CLOCK_CORECLOCK     (32000000U)             /* targeted core clock frequency */
 /* 0: no external low speed crystal available,
  * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
+#define CLOCK_LSE           (0)
 /* configuration of PLL prescaler and multiply values */
 /* CORECLOCK := HSI / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
 #define CLOCK_PLL_DIV       RCC_CFGR_PLLDIV2
