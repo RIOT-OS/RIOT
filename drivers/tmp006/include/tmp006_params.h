@@ -41,9 +41,14 @@ extern "C" {
 #define TMP006_PARAM_RATE           TMP006_CONFIG_CR_DEF
 #endif
 
-#define TMP006_PARAMS_DEFAULT    {  .i2c  = TMP006_PARAM_I2C, \
-                                    .addr = TMP006_PARAM_ADDR, \
-                                    .rate = TMP006_PARAM_RATE }
+#ifndef TMP006_PARAMS
+#define TMP006_PARAMS              { .i2c  = TMP006_PARAM_I2C,  \
+                                     .addr = TMP006_PARAM_ADDR, \
+                                     .rate = TMP006_PARAM_RATE }
+#endif
+#ifndef TMP006_SAUL_INFO
+#define TMP006_SAUL_INFO           { .name = "tmp006" }
+#endif
 /**@}*/
 
 /**
@@ -51,11 +56,7 @@ extern "C" {
  */
 static const tmp006_params_t tmp006_params[] =
 {
-#ifdef TMP006_PARAMS_BOARD
-    TMP006_PARAMS_BOARD,
-#else
-    TMP006_PARAMS_DEFAULT,
-#endif
+    TMP006_PARAMS
 };
 
 /**
@@ -63,7 +64,7 @@ static const tmp006_params_t tmp006_params[] =
  */
 static const saul_reg_info_t tmp006_saul_info[] =
 {
-    { .name = "tmp006" }
+    TMP006_SAUL_INFO
 };
 
 #ifdef __cplusplus
