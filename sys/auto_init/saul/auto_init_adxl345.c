@@ -29,7 +29,7 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define ADXL345_NUM    (sizeof(adxl345_params)/sizeof(adxl345_params[0]))
+#define ADXL345_NUM    (sizeof(adxl345_params) / sizeof(adxl345_params[0]))
 
 /**
  * @brief   Allocate memory for the device descriptors
@@ -42,14 +42,19 @@ static adxl345_t adxl345_devs[ADXL345_NUM];
 static saul_reg_t saul_entries[ADXL345_NUM];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define ADXL345_INFO_NUM (sizeof(adxl345_saul_info) / sizeof(adxl345_saul_info[0]))
+
+/**
  * @brief   Reference the driver structs
- * @{
  */
 extern saul_driver_t adxl345_saul_driver;
-/** @} */
 
 void auto_init_adxl345(void)
 {
+    assert(ADXL345_INFO_NUM == ADXL345_NUM);
+
     for (unsigned i = 0; i < ADXL345_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing adxl345 #%u\n", i);
 
