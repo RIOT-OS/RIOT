@@ -28,28 +28,33 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define JC42_NUMOF    (sizeof(jc42_params) / sizeof(jc42_params[0]))
+#define JC42_NUM      (sizeof(jc42_params) / sizeof(jc42_params[0]))
 
 /**
  * @brief   Allocation of memory for device descriptors
  */
-static jc42_t jc42_devs[JC42_NUMOF];
+static jc42_t jc42_devs[JC42_NUM];
 
 /**
  * @brief   Memory for the SAUL registry entries
  */
-static saul_reg_t saul_entries[JC42_NUMOF];
+static saul_reg_t saul_entries[JC42_NUM];
+
+/**
+ * @brief   Define the number of saul info
+ */
+#define JC42_INFO_NUM    (sizeof(jc42_saul_info) / sizeof(jc42_saul_info[0]))
 
 /**
  * @brief   Reference the driver structs.
- * @{
  */
 extern const saul_driver_t jc42_temperature_saul_driver;
-/** @} */
 
 void auto_init_jc42(void)
 {
-    for (unsigned i = 0; i < JC42_NUMOF; i++) {
+    assert(JC42_NUM == JC42_INFO_NUM);
+
+    for (unsigned i = 0; i < JC42_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing jc42 #%u\n", i);
 
         if (jc42_init(&jc42_devs[i], &jc42_params[i]) < 0) {
@@ -59,7 +64,7 @@ void auto_init_jc42(void)
 
         /* temperature */
         saul_entries[i].dev = &(jc42_devs[i]);
-        saul_entries[i].name = jc42_saul_reg_info[i].name;
+        saul_entries[i].name = jc42_saul_info[i].name;
         saul_entries[i].driver = &jc42_temperature_saul_driver;
 
         /* register to saul */
