@@ -56,6 +56,9 @@ enum {
     SEMTECH_LORAMAC_RX_DATA,                     /**< Data received */
 };
 
+/**
+ * @brief   Structure containing LoRaWAN RX data
+ */
 typedef struct {
     uint8_t payload[LORAWAN_APP_DATA_MAX_SIZE];  /**< RX payload buffer */
     uint8_t payload_len;                         /**< Length of the RX payload */
@@ -144,28 +147,28 @@ void semtech_loramac_get_appkey(uint8_t *key);
 /**
  * @brief   Sets the application session key
  *
- * @param[in] key           The application session key
+ * @param[in] skey          The application session key
  */
 void semtech_loramac_set_appskey(const uint8_t *skey);
 
 /**
  * @brief   Gets the application session key
  *
- * @param[in] key           The application session key
+ * @param[in] skey          The application session key
  */
 void semtech_loramac_get_appskey(uint8_t *skey);
 
 /**
  * @brief   Sets the network session key
  *
- * @param[in] key           The network session key
+ * @param[in] skey          The network session key
  */
 void semtech_loramac_set_nwkskey(const uint8_t *skey);
 
 /**
  * @brief   Gets the network session key
  *
- * @param[in] key           The network session key
+ * @param[in] skey          The network session key
  */
 void semtech_loramac_get_nwkskey(uint8_t *skey);
 
@@ -242,7 +245,7 @@ bool semtech_loramac_get_public_network(void);
 /**
  * @brief   Sets the NetID (only useful with ABP join procedure)
  *
- * @param[in] network_id    The NetID
+ * @param[in] netid        The NetID
  */
 void semtech_loramac_set_netid(uint32_t netid);
 
@@ -256,7 +259,7 @@ uint32_t semtech_loramac_get_netid(void);
 /**
  * @brief   Sets the channels TX power index
  *
- * @param[in] dr           The TX power index (from 1 to 16)
+ * @param[in] power        The TX power index (from 1 to 16)
  */
 void semtech_loramac_set_tx_power(uint8_t power);
 
@@ -284,7 +287,7 @@ uint32_t semtech_loramac_get_rx2_freq(void);
 /**
  * @brief   Sets the RX2 datarate
  *
- * @param[in] freq         The RX2 datarate
+ * @param[in] dr           The RX2 datarate
  */
 void semtech_loramac_set_rx2_dr(uint8_t dr);
 
