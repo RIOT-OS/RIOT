@@ -65,35 +65,33 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Device descriptor for the TSL2561 sensor
+ * @brief   Device initialization parameters
  */
 typedef struct {
     i2c_t i2c_dev;                     /**< I2C device which is used */
     uint8_t addr;                      /**< address on I2C bus */
     uint8_t gain;                      /**< gain */
     uint8_t integration;               /**< integration time */
-} tsl2561_t;
+} tsl2561_params_t;
 
 /**
- * @brief   Device initialization parameters
+ * @brief   Device descriptor for the TSL2561 sensor
  */
-typedef tsl2561_t tsl2561_params_t;
+typedef struct {
+    tsl2561_params_t params;           /**< device initialization parameters */
+} tsl2561_t;
 
 /**
  * @brief   Initialize the given TSL2561 device
  *
  * @param[out] dev          Initialized device descriptor of BMP180 device
- * @param[in]  i2c          I2C bus the sensor is connected to
- * @param[in]  addr         I2C address of the sensor on the I2C bus
- * @param[in]  gain         TSL2561 gain
- * @param[in]  integration  TSL2561 integration time
+ * @param[in]  params       Initialization parameters
  *
  * @return                  0 on success
  * @return                  -1 if given I2C is not available
  * @return                  -2 if not a TSL2561 sensor
  */
-int tsl2561_init(tsl2561_t *dev, i2c_t i2c, uint8_t addr,
-                 uint8_t gain, uint8_t integration);
+int tsl2561_init(tsl2561_t *dev, const tsl2561_params_t *params);
 
 /**
  * @brief   Read illuminance value from the given TSL2561 device, returned in lx.
