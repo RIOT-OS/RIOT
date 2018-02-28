@@ -47,11 +47,13 @@ extern "C" {
 #define MRF24J40_PARAM_RESET        (GPIO_PIN(0, 3))
 #endif
 
-#define MRF24J40_PARAMS_DEFAULT     { .spi = MRF24J40_PARAM_SPI, \
+#ifndef MRF24J40_PARAMS
+#define MRF24J40_PARAMS             { .spi = MRF24J40_PARAM_SPI,         \
                                       .spi_clk = MRF24J40_PARAM_SPI_CLK, \
-                                      .cs_pin = MRF24J40_PARAM_CS, \
-                                      .int_pin = MRF24J40_PARAM_INT, \
+                                      .cs_pin = MRF24J40_PARAM_CS,       \
+                                      .int_pin = MRF24J40_PARAM_INT,     \
                                       .reset_pin = MRF24J40_PARAM_RESET }
+#endif
 /**@}*/
 
 /**
@@ -59,11 +61,7 @@ extern "C" {
  */
 static const mrf24j40_params_t mrf24j40_params[] =
 {
-#ifdef MRF24J40_PARAMS_BOARD
-    MRF24J40_PARAMS_BOARD,
-#else
-    MRF24J40_PARAMS_DEFAULT,
-#endif
+    MRF24J40_PARAMS
 };
 
 #ifdef __cplusplus
