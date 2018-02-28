@@ -41,9 +41,14 @@ extern "C" {
 #define HDC1000_PARAM_RES           HDC1000_14BIT
 #endif
 
-#define HDC1000_PARAMS_DEFAULT    { .i2c  = HDC1000_PARAM_I2C, \
-                                    .addr = HDC1000_PARAM_ADDR, \
-                                    .res  = HDC1000_PARAM_RES }
+#ifndef HDC1000_PARAMS
+#define HDC1000_PARAMS              { .i2c  = HDC1000_PARAM_I2C,  \
+                                      .addr = HDC1000_PARAM_ADDR, \
+                                      .res  = HDC1000_PARAM_RES }
+#endif
+#ifndef HDC1000_SAUL_INFO
+#define HDC1000_SAUL_INFO           { .name = "hdc1000" }
+#endif
 /**@}*/
 
 /**
@@ -51,11 +56,7 @@ extern "C" {
  */
 static const hdc1000_params_t hdc1000_params[] =
 {
-#ifdef HDC1000_PARAMS_BOARD
-    HDC1000_PARAMS_BOARD,
-#else
-    HDC1000_PARAMS_DEFAULT,
-#endif
+    HDC1000_PARAMS
 };
 
 /**
@@ -63,9 +64,7 @@ static const hdc1000_params_t hdc1000_params[] =
  */
 static const saul_reg_info_t hdc1000_saul_info[] =
 {
-    {
-        .name = "hdc1000",
-    },
+    HDC1000_SAUL_INFO
 };
 
 #ifdef __cplusplus
