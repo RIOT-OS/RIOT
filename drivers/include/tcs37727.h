@@ -82,11 +82,6 @@ enum {
 };
 
 /**
- * @brief   Export the sensor's SAUL interface
- */
-extern const saul_driver_t tcs37727_saul_driver;
-
-/**
  * @brief   Initialize the given TCS37727 sensor
  *
  * The sensor is initialized in RGBC only mode with proximity detection turned
