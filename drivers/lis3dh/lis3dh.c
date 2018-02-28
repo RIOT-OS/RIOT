@@ -29,6 +29,11 @@
 
 #define SPI_MODE            SPI_MODE_3
 
+#define DEV_SPI        (dev->params.spi)
+#define DEV_CS         (dev->params.cs)
+#define DEV_CLK        (dev->params.clk)
+#define DEV_SCALE      (dev->params.scale)
+
 static inline int lis3dh_write_bits(const lis3dh_t *dev, const uint8_t reg,
                                     const uint8_t mask,  const uint8_t values);
 static int lis3dh_write_reg(const lis3dh_t *dev, const uint8_t reg,
@@ -38,15 +43,12 @@ static int lis3dh_read_regs(const lis3dh_t *dev, const uint8_t reg,
 
 int lis3dh_init(lis3dh_t *dev, const lis3dh_params_t *params)
 {
+    dev->params = *params;
+
     uint8_t test;
 
-    dev->spi   = params->spi;
-    dev->clk   = params->clk;
-    dev->cs    = params->cs;
-    dev->scale = params->scale;
-
     /* initialize the chip select line */
-    if (spi_init_cs(dev->spi, dev->cs) != SPI_OK) {
+    if (spi_init_cs(DEV_SPI, DEV_CS) != SPI_OK) {
         DEBUG("[lis3dh] error while initializing CS pin\n");
         return -1;
     }
@@ -76,7 +78,7 @@ int lis3dh_init(lis3dh_t *dev, const lis3dh_params_t *params)
     lis3dh_write_reg(dev, LIS3DH_REG_CTRL_REG6, 0);
 
     /* Configure scale */
-    lis3dh_set_scale(dev, dev->scale);
+    lis3dh_set_scale(dev, DEV_SCALE);
 
     return 0;
 }
@@ -89,12 +91,12 @@ int lis3dh_read_xyz(const lis3dh_t *dev, lis3dh_data_t *acc_data)
                                  LIS3DH_SPI_MULTI_MASK);
 
     /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, dev->clk);
+    spi_acquire(DEV_SPI, DEV_CS, SPI_MODE, DEV_CLK);
     /* Perform the transaction */
-    spi_transfer_regs(dev->spi, dev->cs, addr,
+    spi_transfer_regs(DEV_SPI, DEV_CS, addr,
                       NULL, acc_data, sizeof(lis3dh_data_t));
     /* Release the bus for other threads. */
-    spi_release(dev->spi);
+    spi_release(DEV_SPI);
 
     /* Scale to milli-G */
     for (i = 0; i < 3; ++i) {
@@ -236,11 +238,11 @@ static int lis3dh_read_regs(const lis3dh_t *dev, const uint8_t reg,
                     LIS3DH_SPI_MULTI_MASK;
 
     /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, dev->clk);
+    spi_acquire(DEV_SPI, DEV_CS, SPI_MODE, DEV_CLK);
     /* Perform the transaction */
-    spi_transfer_regs(dev->spi, dev->cs, addr, NULL, buf, (size_t)len);
+    spi_transfer_regs(DEV_SPI, DEV_CS, addr, NULL, buf, (size_t)len);
     /* Release the bus for other threads. */
-    spi_release(dev->spi);
+    spi_release(DEV_SPI);
 
     return 0;
 }
@@ -262,11 +264,11 @@ static int lis3dh_write_reg(const lis3dh_t *dev, const uint8_t reg,
                     LIS3DH_SPI_SINGLE_MASK);
 
     /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, SPI_MODE, dev->clk);
+    spi_acquire(DEV_SPI, DEV_CS, SPI_MODE, DEV_CLK);
     /* Perform the transaction */
-    spi_transfer_reg(dev->spi, dev->cs, addr, value);
+    spi_transfer_reg(DEV_SPI, DEV_CS, addr, value);
     /* Release the bus for other threads. */
-    spi_release(dev->spi);
+    spi_release(DEV_SPI);
 
     return 0;
 }
