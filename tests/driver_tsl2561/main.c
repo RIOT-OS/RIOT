@@ -18,28 +18,14 @@
  * @}
  */
 
-#ifndef TEST_I2C
-#error "TEST_I2C not defined"
-#endif
-
-#ifndef TEST_ADDR
-#error "TEST_ADDR not defined"
-#endif
-
-#ifndef TEST_GAIN
-#error "TEST_GAIN not defined"
-#endif
-
-#ifndef TEST_INTEGRATION_TIME
-#error "TEST_INTEGRATION_TIME not defined"
-#endif
-
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "tsl2561.h"
 #include "xtimer.h"
 #include "board.h"
+
+#include "tsl2561.h"
+#include "tsl2561_params.h"
 
 #define SLEEP_1S   (1 * 1000 * 1000u) /* 1 second delay between printf */
 
@@ -51,8 +37,7 @@ int main(void)
 
     printf("+------------Initializing------------+\n");
 
-    switch(tsl2561_init(&dev, TEST_I2C, TEST_ADDR,
-                        TEST_GAIN, TEST_INTEGRATION_TIME)) {
+    switch(tsl2561_init(&dev, &tsl2561_params[0])) {
         case TSL2561_NOI2C:
         puts("[Error] I2C not working: cannot initialize the sensor.\n");
         break;
