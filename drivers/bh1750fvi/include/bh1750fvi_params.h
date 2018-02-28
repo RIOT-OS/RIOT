@@ -40,9 +40,11 @@ extern "C" {
 #define BH1750FVI_PARAM_I2C_CLK     (BH1750FVI_I2C_MAX_CLK)
 #endif
 
-#define BH1750FVI_PARAMS_DEFAULT    {.i2c = BH1750FVI_PARAM_I2C, \
-                                     .addr = BH1750FVI_PARAM_ADDR, \
-                                     .clk = BH1750FVI_PARAM_I2C_CLK}
+#ifndef BH1750FVI_PARAMS
+#define BH1750FVI_PARAMS            { .i2c = BH1750FVI_PARAM_I2C,   \
+                                      .addr = BH1750FVI_PARAM_ADDR, \
+                                      .clk = BH1750FVI_PARAM_I2C_CLK }
+#endif
 /**@}*/
 
 /**
@@ -50,11 +52,7 @@ extern "C" {
  */
 static const bh1750fvi_params_t bh1750fvi_params[] =
 {
-#ifdef BH1750FVI_PARAMS_BOARD
-    BH1750FVI_PARAMS_BOARD,
-#else
-    BH1750FVI_PARAMS_DEFAULT,
-#endif
+    BH1750FVI_PARAMS
 };
 
 #ifdef __cplusplus
