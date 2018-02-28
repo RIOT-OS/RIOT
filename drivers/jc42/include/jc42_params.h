@@ -43,9 +43,14 @@ extern "C" {
 #define JC42_PARAM_SPEED           I2C_SPEED_FAST
 #endif
 
-#define JC42_PARAMS_DEFAULT        { .i2c   = JC42_PARAM_I2C_DEV,  \
-                                     .speed = JC42_PARAM_SPEED, \
+#ifndef JC42_PARAMS
+#define JC42_PARAMS                { .i2c   = JC42_PARAM_I2C_DEV, \
+                                     .speed = JC42_PARAM_SPEED,   \
                                      .addr  = JC42_PARAM_ADDR }
+#endif
+#ifndef JC42_SAUL_INFO
+#define JC42_SAUL_INFO             { .name= "jc42" }
+#endif
 /**@}*/
 
 /**
@@ -53,19 +58,15 @@ extern "C" {
  */
 static const jc42_params_t jc42_params[] =
 {
-#ifdef JC42_PARAMS_BOARD
-    JC42_PARAMS_BOARD,
-#else
-    JC42_PARAMS_DEFAULT,
-#endif
+    JC42_PARAMS
 };
 
 /**
  * @brief   Configure SAUL registry entries
  */
-static const saul_reg_info_t jc42_saul_reg_info[] =
+static const saul_reg_info_t jc42_saul_info[] =
 {
-    { .name= "jc42" }
+    JC42_SAUL_INFO
 };
 
 #ifdef __cplusplus
