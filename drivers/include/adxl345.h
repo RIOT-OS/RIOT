@@ -92,8 +92,8 @@ enum {
  * @brief   Output Interrupt selection
  */
 enum {
-    INT1,  /**< Output interrupt on INT1 pin */
-    INT2   /**< Output interrupt on INT2 pin */
+    ADXL345_INT1,  /**< Output interrupt on INT1 pin */
+    ADXL345_INT2   /**< Output interrupt on INT2 pin */
 };
 
 /**
