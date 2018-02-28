@@ -105,17 +105,17 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Definition of the interface to the CC2420 radio
+ * @name    Definition of the interface to the CC2420 radio
+ * @{
  */
-#define CC2420_PARAMS_BOARD         {.spi        = SPI_DEV(0), \
-                                     .spi_clk    = SPI_CLK_5MHZ, \
-                                     .pin_cs     = GPIO_PIN(P3, 0), \
-                                     .pin_fifo   = GPIO_PIN(P1, 3), \
-                                     .pin_fifop  = GPIO_PIN(P1, 2), \
-                                     .pin_cca    = GPIO_PIN(P1, 4), \
-                                     .pin_sfd    = GPIO_PIN(P4, 1), \
-                                     .pin_vrefen = GPIO_PIN(P4, 5), \
-                                     .pin_reset  = GPIO_PIN(P4, 6)}
+#define CC2420_PARAM_CS            GPIO_PIN(P3, 0)
+#define CC2420_PARAM_FIFO          GPIO_PIN(P1, 3)
+#define CC2420_PARAM_FIFOP         GPIO_PIN(P1, 2)
+#define CC2420_PARAM_CCA           GPIO_PIN(P1, 4)
+#define CC2420_PARAM_SFD           GPIO_PIN(P4, 1)
+#define CC2420_PARAM_VREFEN        GPIO_PIN(P4, 5)
+#define CC2420_PARAM_RESET         GPIO_PIN(P4, 6)
+/** @} */
 
 #ifdef __cplusplus
 }
