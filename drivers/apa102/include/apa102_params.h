@@ -39,9 +39,11 @@ extern "C" {
 #define APA102_PARAM_CLK_PIN        (GPIO_PIN(0, 1))
 #endif
 
-#define APA102_PARAMS_DEFAULT       { .led_numof = APA102_PARAM_LED_NUMOF, \
+#ifndef APA102_PARAMS
+#define APA102_PARAMS               { .led_numof = APA102_PARAM_LED_NUMOF, \
                                       .data_pin  = APA102_PARAM_DATA_PIN, \
                                       .clk_pin   = APA102_PARAM_CLK_PIN }
+#endif
 /**@}*/
 
 /**
@@ -49,11 +51,7 @@ extern "C" {
  */
 static const  apa102_params_t apa102_params[] =
 {
-#ifdef APA102_PARAMS_BOARD
-    APA102_PARAMS_BOARD,
-#else
-    APA102_PARAMS_DEFAULT,
-#endif
+    APA102_PARAMS
 };
 
 #ifdef __cplusplus
