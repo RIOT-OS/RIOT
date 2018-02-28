@@ -25,6 +25,7 @@
 
 #include "vfs.h"
 #include "mutex.h"
+#include "rmutex.h"
 #include "thread.h"
 #include "kernel_types.h"
 #include "clist.h"
@@ -129,7 +130,7 @@ static inline int _find_mount(vfs_mount_t **mountpp, const char *name, const cha
  */
 static inline int _fd_is_valid(int fd);
 
-static mutex_t _mount_mutex = MUTEX_INIT;
+static rmutex_t _mount_mutex = RMUTEX_INIT;
 static mutex_t _open_mutex = MUTEX_INIT;
 
 int vfs_close(int fd)
@@ -430,12 +431,12 @@ static int check_mount(vfs_mount_t *mountp)
         return -EINVAL;
     }
     mountp->mount_point_len = strlen(mountp->mount_point);
-    mutex_lock(&_mount_mutex);
+    rmutex_lock(&_mount_mutex);
     /* Check for the same mount in the list of mounts to avoid loops */
     clist_node_t *found = clist_find(&_vfs_mounts_list, &mountp->list_entry);
     if (found != NULL) {
         /* Same mount is already mounted */
-        mutex_unlock(&_mount_mutex);
+        rmutex_unlock(&_mount_mutex);
         DEBUG("vfs: check_mount: Already mounted\n");
         return -EBUSY;
     }
@@ -450,7 +451,7 @@ int vfs_format(vfs_mount_t *mountp)
     if (ret < 0) {
         return ret;
     }
-    mutex_unlock(&_mount_mutex);
+    rmutex_unlock(&_mount_mutex);
 
     if (mountp->fs->fs_op != NULL) {
         if (mountp->fs->fs_op->format != NULL) {
@@ -476,14 +477,14 @@ int vfs_mount(vfs_mount_t *mountp)
             int res = mountp->fs->fs_op->mount(mountp);
             if (res < 0) {
                 DEBUG("vfs_mount: error %d\n", res);
-                mutex_unlock(&_mount_mutex);
+                rmutex_unlock(&_mount_mutex);
                 return res;
             }
         }
     }
     /* insert last in list */
     clist_rpush(&_vfs_mounts_list, &mountp->list_entry);
-    mutex_unlock(&_mount_mutex);
+    rmutex_unlock(&_mount_mutex);
     DEBUG("vfs_mount: mount done\n");
     return 0;
 }
@@ -496,10 +497,11 @@ int vfs_umount(vfs_mount_t *mountp)
     switch (ret) {
     case 0:
         DEBUG("vfs_umount: not mounted\n");
-        mutex_unlock(&_mount_mutex);
+        rmutex_unlock(&_mount_mutex);
         return -EINVAL;
     case -EBUSY:
-        /* -EBUSY returned when fs is mounted, just continue */
+        /* -EBUSY returned when fs is mounted, lock and continue */
+        rmutex_lock(&_mount_mutex);
         break;
     default:
         DEBUG("vfs_umount: invalid fs\n");
@@ -507,7 +509,7 @@ int vfs_umount(vfs_mount_t *mountp)
     }
     DEBUG("vfs_umount: -> \"%s\" open=%d\n", mountp->mount_point, atomic_load(&mountp->open_files));
     if (atomic_load(&mountp->open_files) > 0) {
-        mutex_unlock(&_mount_mutex);
+        rmutex_unlock(&_mount_mutex);
         return -EBUSY;
     }
     if (mountp->fs->fs_op != NULL) {
@@ -516,7 +518,7 @@ int vfs_umount(vfs_mount_t *mountp)
             if (res < 0) {
                 /* umount failed */
                 DEBUG("vfs_umount: ERR %d!\n", res);
-                mutex_unlock(&_mount_mutex);
+                rmutex_unlock(&_mount_mutex);
                 return res;
             }
         }
@@ -526,10 +528,10 @@ int vfs_umount(vfs_mount_t *mountp)
     if (node == NULL) {
         /* not found */
         DEBUG("vfs_umount: ERR not mounted!\n");
-        mutex_unlock(&_mount_mutex);
+        rmutex_unlock(&_mount_mutex);
         return -EINVAL;
     }
-    mutex_unlock(&_mount_mutex);
+    rmutex_unlock(&_mount_mutex);
     return 0;
 }
 
@@ -926,12 +928,12 @@ static inline int _find_mount(vfs_mount_t **mountpp, const char *name, const cha
 {
     size_t longest_match = 0;
     size_t name_len = strlen(name);
-    mutex_lock(&_mount_mutex);
+    rmutex_lock(&_mount_mutex);
 
     clist_node_t *node = _vfs_mounts_list.next;
     if (node == NULL) {
         /* list empty */
-        mutex_unlock(&_mount_mutex);
+        rmutex_unlock(&_mount_mutex);
         return -ENOENT;
     }
     vfs_mount_t *mountp = NULL;
@@ -962,12 +964,12 @@ static inline int _find_mount(vfs_mount_t **mountpp, const char *name, const cha
     } while (node != _vfs_mounts_list.next);
     if (mountp == NULL) {
         /* not found */
-        mutex_unlock(&_mount_mutex);
+        rmutex_unlock(&_mount_mutex);
         return -ENOENT;
     }
     /* Increment open files counter for this mount */
     atomic_fetch_add(&mountp->open_files, 1);
-    mutex_unlock(&_mount_mutex);
+    rmutex_unlock(&_mount_mutex);
     *mountpp = mountp;
     if (rel_path != NULL) {
         *rel_path = name + longest_match;
