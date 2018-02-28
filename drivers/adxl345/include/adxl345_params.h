@@ -62,6 +62,9 @@ extern "C" {
                                       .rate   = ADXL345_PARAM_RATE,      \
                                       .full_res = ADXL345_PARAM_FULL_RES }
 #endif
+#ifndef ADXL345_SAUL_INFO
+#define ADXL345_SAUL_INFO           { .name = "adxl345" }
+#endif
 /**@}*/
 
 /**
@@ -77,9 +80,7 @@ static const adxl345_params_t adxl345_params[] =
  */
 static const saul_reg_info_t adxl345_saul_info[] =
 {
-    {
-        .name = "adxl345"
-    }
+    ADXL345_SAUL_INFO
 };
 
 #ifdef __cplusplus
