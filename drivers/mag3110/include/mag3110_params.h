@@ -42,11 +42,14 @@ extern "C" {
 #define MAG3110_PARAM_OFFSET    { 0, 0, 0 }
 #endif
 #ifndef MAG3110_PARAMS
-#define MAG3110_PARAMS          { .i2c    = MAG3110_PARAM_I2C, \
-                                  .addr   = MAG3110_PARAM_ADDR, \
-                                  .type   = MAG3110_ID, \
+#define MAG3110_PARAMS          { .i2c    = MAG3110_PARAM_I2C,    \
+                                  .addr   = MAG3110_PARAM_ADDR,   \
+                                  .type   = MAG3110_ID,           \
                                   .dros   = MAG3110_DROS_DEFAULT, \
                                   .offset = MAG3110_PARAM_OFFSET }
+#endif
+#ifndef MAG3110_SAUL_INFO
+#define MAG3110_SAUL_INFO       { .name = "mag3110" }
 #endif
 /**@}*/
 
@@ -63,9 +66,7 @@ static const mag3110_params_t mag3110_params[] =
  */
 static const saul_reg_info_t mag3110_saul_info[] =
 {
-    {
-        .name = "mag3110"
-    }
+    MAG3110_SAUL_INFO
 };
 
 #ifdef __cplusplus
