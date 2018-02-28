@@ -710,6 +710,12 @@ ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter cryptofs,$(USEMODULE)))
+  USEMODULE += vfs
+  USEMODULE += hashes
+  USEMODULE += crypto
+endif
+
 ifneq (,$(filter benchmark,$(USEMODULE)))
   USEMODULE += xtimer
 endif

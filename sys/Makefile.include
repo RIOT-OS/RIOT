@@ -93,3 +93,7 @@ endif
 ifneq (native,$(BOARD))
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
 endif
+
+ifneq (,$(filter cryptofs,$(USEMODULE)))
+  include $(RIOTBASE)/sys/fs/cryptofs/Makefile.include
+endif

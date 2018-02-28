@@ -115,6 +115,9 @@ endif
 ifneq (,$(filter constfs,$(USEMODULE)))
   DIRS += fs/constfs
 endif
+ifneq (,$(filter cryptofs,$(USEMODULE)))
+  DIRS += fs/cryptofs
+endif
 ifneq (,$(filter devfs,$(USEMODULE)))
   DIRS += fs/devfs
 endif
