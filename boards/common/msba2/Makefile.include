@@ -28,5 +28,3 @@ USEMODULE += newlib_nano
 FFLAGS = $(PORT) $(HEXFILE)
 
 INCLUDES += -I$(RIOTBOARD)/common/msba2/include
-
-export UNDEF += $(BINDIR)/cpu/startup.o

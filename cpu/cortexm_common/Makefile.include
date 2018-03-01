@@ -2,9 +2,6 @@
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include/vendor
 
-# Explicitely tell the linker to link 'panic_arch'
-UNDEF += $(BINDIR)/cortexm_common/panic.o
-
 # All variables must be defined in the CPU configuration when using the common
 # `ldscripts/cortexm.ld`
 ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))

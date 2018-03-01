@@ -27,10 +27,6 @@ endif
 # the atmel port uses stdio_uart
 USEMODULE += stdio_uart
 
-# explicitly tell the linker to link the syscalls and startup code.
-# without this the interrupt vectors will not be linked correctly!
-UNDEF += $(BINDIR)/atmega_common/startup.o
-
 # Use ROM_LEN and RAM_LEN during link
 $(if $(ROM_LEN),,$(error ROM_LEN is not defined))
 $(if $(RAM_LEN),,$(error RAM_LEN is not defined))

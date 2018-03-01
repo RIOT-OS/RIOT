@@ -32,7 +32,6 @@ SCANBUILD_ENV_VARS := \
   RIOT_CI_BUILD \
   SIZE \
   TOOLCHAIN \
-  UNDEF \
   USER \
   #
 
