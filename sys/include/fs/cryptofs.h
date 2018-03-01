@@ -22,11 +22,13 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "vfs.h"
 #include "crypto/aes.h"
 #include "crypto/ciphers.h"
 #include "hashes/sha256.h"
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,14 +38,14 @@ extern "C" {
 #define CRYPTOFS_MAGIC_WORD (0xAB560001)
 #endif
 
-#define CRYPTOFS_HEAD_PAD           (28)
-#define CRYPTOFS_HEAD_HASH_OFFSET   (32)
-#define CRYPTOFS_HEAD_SIZE          (64)
+#define CRYPTOFS_NBPAD_OFFSET       (4)
+#define CRYPTOFS_HEAD_HASH_OFFSET   (16)
+#define CRYPTOFS_HEAD_SIZE          (48)
 
 /*
  * File header:
  * +-------------------------------------------+
- * | MAGIC_WORD (4B) | nb_pad (1B) | RFU (27B) |
+ * | MAGIC_WORD (4B) | nb_pad (1B) | RFU (11B) |
  * +-------------------------------------------+
  * | HASH (32B)                                |
  * +-------------------------------------------+
@@ -58,15 +60,13 @@ extern "C" {
  * @brief   A file in CryptoFS
  */
 typedef struct {
-    cipher_t cipher;
-    sha256_context_t hash_ctx;
+    int real_fd;
     char name[VFS_NAME_MAX + 1];
     uint8_t hash[SHA256_DIGEST_LENGTH];
-    int real_fd;
     uint8_t block[AES_BLOCK_SIZE];
+    size_t size;
     uint8_t state;
     uint8_t nb_pad;
-    size_t size;
 } cryptofs_file_t;
 
 /**
@@ -75,6 +75,10 @@ typedef struct {
 typedef struct {
     uint8_t key[AES_KEY_SIZE];
     vfs_mount_t *real_fs;
+    bool hash;
+    /* private data */
+    cipher_t cipher;
+    mutex_t lock;
 } cryptofs_t;
 
 /**
