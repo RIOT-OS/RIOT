@@ -34,17 +34,17 @@
 
 #ifndef KINETIS_HAVE_LPUART
 #ifdef LPUART0
-#define KINETIS_HAVE_LPUART      1
+#define KINETIS_HAVE_LPUART     1
 #else
-#define KINETIS_HAVE_LPUART      0
+#define KINETIS_HAVE_LPUART     0
 #endif
 #endif /* KINETIS_HAVE_LPUART */
 
 #ifndef KINETIS_HAVE_UART
 #ifdef UART0
-#define KINETIS_HAVE_UART      1
+#define KINETIS_HAVE_UART       1
 #else
-#define KINETIS_HAVE_UART      0
+#define KINETIS_HAVE_UART       0
 #endif
 #endif /* KINETIS_HAVE_LPUART */
 
@@ -54,7 +54,7 @@
  * using the BRFA field in the UART C4 register.
  */
 #ifdef UART_C4_BRFA
-#define KINETIS_UART_ADVANCED    1
+#define KINETIS_UART_ADVANCED   1
 #endif
 #endif
 
