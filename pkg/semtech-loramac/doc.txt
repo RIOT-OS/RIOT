@@ -7,7 +7,7 @@
  * # Introduction
  *
  * This package provides an API built on top of the
- * [Semtech LoRaMAC-node](github.com/Lora-net/LoRaMac-node) reference
+ * [Semtech LoRaMAC-node](https://github.com/Lora-net/LoRaMac-node) reference
  * implementation of a LoRa network.
  *
  *
@@ -87,6 +87,7 @@
  *     /* 4. join the network */
  *     if (semtech_loramac_join(LORAMAC_JOIN_OTAA) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
  *         puts("Join procedure failed");
+ *         return 1;
  *     }
  *     puts("Join procedure succeeded");
  *
