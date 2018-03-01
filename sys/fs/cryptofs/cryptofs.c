@@ -33,18 +33,42 @@ enum {
     STATE_UNENCRYPTED,
 };
 
-static int real_name(cryptofs_t *fs, const char *name, char *crypto_name, size_t len)
+static int real_dir_name(cryptofs_t *fs, const char *name, char *real_name, size_t len)
 {
-    memset(crypto_name, 0, len);
+    memset(real_name, 0, len);
 
-    if (fs->real_fs->mount_point_len > 1) {
-        return snprintf(crypto_name, len - 1, "%s/%s.sec",
-                        fs->real_fs->mount_point, name);
+    return snprintf(real_name, len - 1, "%s%s", fs->real_fs->mount_point, name);
+}
+
+static int real_name(cryptofs_t *fs, const char *name, char *real_name, size_t len)
+{
+    memset(real_name, 0, len);
+
+    return snprintf(real_name, len - 1, "%s%s.sec", fs->real_fs->mount_point, name);
+}
+
+static int _format(vfs_mount_t *mountp)
+{
+    cryptofs_t *fs = mountp->private_data;
+
+    char name[VFS_NAME_MAX + 1];
+    name[VFS_NAME_MAX] = '\0';
+    snprintf(name, VFS_NAME_MAX, "%s/%s", fs->real_fs->mount_point, CRYPTOFS_ROOT_FILENAME);
+
+    int fd = vfs_open(name, O_RDWR | O_CREAT, 0);
+    if (fd < 0) {
+        return -EINVAL;
     }
-    else {
-        return snprintf(crypto_name, len - 1, "%s%s.sec",
-                        fs->real_fs->mount_point, name);
+
+    be_uint32_t magic = byteorder_htonl(CRYPTOFS_MAGIC_WORD);
+    int res = vfs_write(fd, &magic, sizeof(magic));
+    vfs_close(fd);
+
+    if (res < (int)sizeof(magic)) {
+        return -EINVAL;
     }
+
+    return 0;
 }
 
 static int _mount(vfs_mount_t *mountp)
@@ -60,14 +84,29 @@ static int _mount(vfs_mount_t *mountp)
         return -EINVAL;
     }
 
-    return vfs_mount(fs->real_fs);
+    char name[VFS_NAME_MAX + 1];
+    name[VFS_NAME_MAX] = '\0';
+    snprintf(name, VFS_NAME_MAX, "%s/%s", fs->real_fs->mount_point, CRYPTOFS_ROOT_FILENAME);
+
+    int fd = vfs_open(name, O_RDWR, 0);
+    if (fd < 0) {
+        return -EINVAL;
+    }
+    be_uint32_t magic;
+    int res = vfs_read(fd, &magic, sizeof(magic));
+    if (res < (int)sizeof(magic) || byteorder_ntohl(magic) != CRYPTOFS_MAGIC_WORD) {
+        vfs_close(fd);
+        return -EINVAL;
+    }
+    fs->root_fd = fd;
+    return 0;
 }
 
 static int _umount(vfs_mount_t *mountp)
 {
     cryptofs_t *fs = mountp->private_data;
 
-    return vfs_umount(fs->real_fs);
+    return vfs_close(fs->root_fd);
 }
 
 static int _unlink(vfs_mount_t *mountp, const char *name)
@@ -446,7 +485,71 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
     return filp->pos;
 }
 
+static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
+{
+    (void)abs_path;
+    cryptofs_t *fs = dirp->mp->private_data;
+    char name[VFS_NAME_MAX + 1];
+
+    real_dir_name(fs, dirname, name, sizeof(name));
+
+    mutex_lock(&fs->lock);
+    unsigned i;
+    for (i = 0; i < sizeof(fs->dir) / sizeof(fs->dir[0]); i++) {
+        if (!fs->dir_used[i]) {
+            dirp->private_data.ptr = &fs->dir[i];
+            fs->dir_used[i] = 1;
+            break;
+        }
+    }
+    mutex_unlock(&fs->lock);
+
+    if (i == sizeof(fs->dir) / sizeof(fs->dir[0])) {
+        return -ENOMEM;
+    }
+
+    return vfs_opendir(dirp->private_data.ptr, name);
+}
+
+static int is_crypto_file(vfs_dirent_t *entry)
+{
+    size_t len = strlen(entry->d_name);
+
+    return (len > 3) && ((entry->d_name[len - 4] == '.') &&
+            (entry->d_name[len - 3] == 's') && (entry->d_name[len - 2] == 'e') &&
+            (entry->d_name[len - 1] == 'c'));
+}
+
+static int _readdir(vfs_DIR *dirp, vfs_dirent_t *entry)
+{
+    int res;
+    do {
+        res = vfs_readdir(dirp->private_data.ptr, entry);
+    } while (res != 0 && !is_crypto_file(entry));
+
+    if (res == 1) {
+        size_t len = strlen(entry->d_name);
+        entry->d_name[len - 4] = '\0'; /* truncate '.sec' */
+    }
+
+    return res;
+}
+
+static int _closedir(vfs_DIR *dirp)
+{
+    cryptofs_t *fs = dirp->mp->private_data;
+
+    int res = vfs_closedir(dirp->private_data.ptr);
+
+    mutex_lock(&fs->lock);
+    fs->dir_used[(vfs_DIR *)dirp->private_data.ptr - fs->dir] = 0;
+    mutex_unlock(&fs->lock);
+
+    return res;
+}
+
 static const vfs_file_system_ops_t fs_ops = {
+    .format = _format,
     .mount = _mount,
     .umount = _umount,
     .unlink = _unlink,
@@ -460,7 +563,14 @@ static const vfs_file_ops_t file_ops = {
     .lseek = _lseek,
 };
 
+static const vfs_dir_ops_t dir_ops = {
+    .readdir = _readdir,
+    .opendir = _opendir,
+    .closedir = _closedir,
+};
+
 const vfs_file_system_t cryptofs_file_system = {
     .fs_op = &fs_ops,
     .f_op = &file_ops,
+    .d_op = &dir_ops,
 };

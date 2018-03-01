@@ -42,6 +42,14 @@ extern "C" {
 #define CRYPTOFS_HEAD_HASH_OFFSET   (16)
 #define CRYPTOFS_HEAD_SIZE          (48)
 
+#ifndef CRYPTOFS_OPENDIR_MAX
+#define CRYPTOFS_OPENDIR_MAX        (1)
+#endif
+
+#ifndef CRYPTOFS_ROOT_FILENAME
+#define CRYPTOFS_ROOT_FILENAME      ".cryptofs0"
+#endif
+
 /*
  * File header:
  * +-------------------------------------------+
@@ -79,6 +87,9 @@ typedef struct {
     /* private data */
     cipher_t cipher;
     mutex_t lock;
+    vfs_DIR dir[CRYPTOFS_OPENDIR_MAX];
+    int dir_used[CRYPTOFS_OPENDIR_MAX];
+    int root_fd;
 } cryptofs_t;
 
 /**
