@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     nz32-sc151
+ * @ingroup     boards_nz32-sc151
  * @{
  *
  * @file
