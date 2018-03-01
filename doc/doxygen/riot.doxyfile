@@ -831,7 +831,6 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */pkg/lwip/* \
                          */pkg/nordic_softdevice_ble/* \
                          */pkg/openthread/* \
-                         */pkg/semtech-loramac/* \
                          */pkg/tlsf/patch.txt \
                          */sys/include/embUnit/* \
                          */sys/random/tinymt32/* \
