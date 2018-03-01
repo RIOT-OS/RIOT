@@ -123,6 +123,7 @@ endif
 
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_nib
   USEMODULE += trickle
   USEMODULE += xtimer
 endif
