@@ -176,13 +176,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         new_netif_hdr->lqi = netif_hdr->lqi;
         new_netif_hdr->rssi = netif_hdr->rssi;
         LL_APPEND(entry->pkt, netif);
-
-        if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
-                                          entry->pkt)) {
-            DEBUG("6lo rbuf: No receivers for this packet found\n");
-            gnrc_pktbuf_release(entry->pkt);
-        }
-
+        gnrc_sixlowpan_dispatch_recv(entry->pkt, NULL, 0);
         _rbuf_rem(entry);
     }
 }

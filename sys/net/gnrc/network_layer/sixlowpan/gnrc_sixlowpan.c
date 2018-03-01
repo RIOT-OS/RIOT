@@ -64,6 +64,47 @@ kernel_pid_t gnrc_sixlowpan_init(void)
     return _pid;
 }
 
+void gnrc_sixlowpan_dispatch_recv(gnrc_pktsnip_t *pkt, void *context,
+                                  unsigned page)
+{
+    gnrc_nettype_t type;
+
+    (void)context;
+    (void)page;
+#ifdef MODULE_CCNLITE
+    type = GNRC_NETTYPE_UNDEF;
+    for (gnrc_pktsnip_t *ptr = pkt; (ptr || (type == GNRC_NETTYPE_UNDEF));
+         ptr = ptr->next) {
+        if ((ptr->next) && (ptr->next->type == GNRC_NETTYPE_NETIF)) {
+            type = ptr->type;
+        }
+    }
+    assert(network_snip);
+#else   /* MODULE_CCNLITE */
+    /* just assume normal IPv6 traffic */
+    type = GNRC_NETTYPE_IPV6;
+#endif  /* MODULE_CCNLITE */
+    if (!gnrc_netapi_dispatch_receive(type,
+                                      GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+        DEBUG("6lo: No receivers for this packet found\n");
+        gnrc_pktbuf_release(pkt);
+    }
+}
+
+void gnrc_sixlowpan_dispatch_send(gnrc_pktsnip_t *pkt, void *context,
+                                  unsigned page)
+{
+    (void)context;
+    (void)page;
+    assert(pkt->type == GNRC_NETTYPE_NETIF);
+    gnrc_netif_hdr_t *hdr = pkt->data;
+    if (gnrc_netapi_send(hdr->if_pid, pkt) < 1) {
+        DEBUG("6lo: unable to send %p over interface %u\n", (void *)pkt,
+              hdr->if_pid);
+        gnrc_pktbuf_release(pkt);
+    }
+}
+
 static void _receive(gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *payload;
@@ -163,10 +204,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
         gnrc_pktbuf_release(pkt);
         return;
     }
-    if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
-        DEBUG("6lo: No receivers for this packet found\n");
-        gnrc_pktbuf_release(pkt);
-    }
+    gnrc_sixlowpan_dispatch_recv(pkt, NULL, 0);
 }
 
 static inline bool _add_uncompr_disp(gnrc_pktsnip_t *pkt)
@@ -263,11 +301,7 @@ static void _send(gnrc_pktsnip_t *pkt)
         (gnrc_pkt_len(pkt2->next) <= iface->sixlo.max_frag_size)) {
         DEBUG("6lo: Send SND command for %p to %" PRIu16 "\n",
               (void *)pkt2, hdr->if_pid);
-        if (gnrc_netapi_send(hdr->if_pid, pkt2) < 1) {
-            DEBUG("6lo: unable to send %p over %" PRIu16 "\n", (void *)pkt, hdr->if_pid);
-            gnrc_pktbuf_release(pkt2);
-        }
-
+        gnrc_sixlowpan_dispatch_send(pkt2, NULL, 0);
         return;
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
