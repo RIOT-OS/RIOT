@@ -183,7 +183,7 @@ static void tests_cryptofs_open_close(void)
 
 static void tests_cryptofs_write(void)
 {
-    const char buf[] = "TESTSTRING";
+    const char buf[] = "TESTSTRING1234567890";
     char r_buf[2 * sizeof(buf)];
 
     int res;
@@ -203,6 +203,9 @@ static void tests_cryptofs_write(void)
     TEST_ASSERT_EQUAL_INT(sizeof(buf), res);
     TEST_ASSERT_EQUAL_STRING(&buf[0], &r_buf[0]);
 
+    res = vfs_write(fd, buf, sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(sizeof(buf), res);
+
     res = vfs_close(fd);
     TEST_ASSERT_EQUAL_INT(0, res);
 
@@ -210,7 +213,7 @@ static void tests_cryptofs_write(void)
     TEST_ASSERT(fd >= 0);
 
     res = vfs_read(fd, r_buf, sizeof(r_buf));
-    TEST_ASSERT_EQUAL_INT(sizeof(buf), res);
+    TEST_ASSERT_EQUAL_INT(sizeof(r_buf), res);
     TEST_ASSERT_EQUAL_STRING(&buf[0], &r_buf[0]);
 
     res = vfs_close(fd);
