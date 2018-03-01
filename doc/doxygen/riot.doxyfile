@@ -827,7 +827,11 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/native/osx-libc-extra \
                          */cpu/x86/include/* \
                          */drivers/kw2xrf/include/overwrites.h \
-                         */pkg/*/*/* \
+                         */pkg/emb6/* \
+                         */pkg/lwip/* \
+                         */pkg/nordic_softdevice_ble/* \
+                         */pkg/openthread/* \
+                         */pkg/semtech-loramac/* \
                          */pkg/tlsf/patch.txt \
                          */sys/include/embUnit/* \
                          */sys/random/tinymt32/* \
