@@ -1,6 +1,9 @@
 # tell the build system that the CPU depends on the atmega common files
 USEMODULE += atmega_common
 
+# CPU family, see https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html
+export CPU_FAM = avr6
+
 #include periph module
 USEMODULE += periph
 

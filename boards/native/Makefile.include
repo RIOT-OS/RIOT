@@ -74,6 +74,7 @@ export CXXEXFLAGS +=
 
 ifeq ($(shell uname -m),x86_64)
   export LINKFLAGS += -m32
+  export ILINKFLAGS += -r -m elf_i386 --unique
 endif
 ifeq ($(shell uname -s),FreeBSD)
   ifeq ($(shell uname -m),amd64)

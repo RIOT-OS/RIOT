@@ -17,6 +17,8 @@ export NM          = $(LLVMPREFIX)nm
 # `makefiles/libc/newlib.mk` are not supported. Therefore
 # we just use GCC for now.
 export LD          = $(PREFIX)ld
+export ILINK       = $(LD)
+export ILINKFLAGS ?= -r --unique
 export LINK        = $(PREFIX)gcc
 export LINKXX      = $(PREFIX)g++
 # objcopy does not have a clear substitute in LLVM, use GNU binutils

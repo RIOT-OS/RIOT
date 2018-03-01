@@ -8,6 +8,9 @@ CFLAGS_OPT  ?= -Os
 
 CFLAGS    += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 ASFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG)
+# See https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html for information on
+# which CPU_FAM corresponds to your CPU
+ILINKFLAGS += -r -m $(CPU_FAM) --unique
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -e reset_handler -Wl,--gc-sections
 OFLAGS    += -j .text -j .data
 

@@ -1,6 +1,9 @@
 # tell the build system that the CPU depends on the atmega common files
 USEMODULE += atmega_common
 
+# CPU family, see https://gcc.gnu.org/onlinedocs/gcc/AVR-Options.html
+export CPU_FAM = avr51
+
 RAM_LEN = 16K
 ROM_LEN = 128K
 

@@ -56,6 +56,8 @@ export AR                    # The command to create the object file archives.
 export ARFLAGS               # Command-line options to pass to AR, default `rcs`.
 export AS                    # The assembler.
 export ASFLAGS               # Flags for the assembler.
+export ILINK                 # Command used to perform incremental linking to create intermediate object files. Usually "ld"
+export ILINKFLAGS            # Incremental link command line options.
 export LINK                  # The command used to link the files. Must take the same parameters as GCC, i.e. "ld" won't work.
 # LINKFLAGS                  # Flags to supply in the linking step.
 export LTOFLAGS              # extra CFLAGS for compiling with link time optimization
