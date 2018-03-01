@@ -44,9 +44,12 @@ USEMODULE += littlefs
 # USEMODULE += fatfs
 USEMODULE += constfs
 # USEMODULE += devfs
+USEMODULE += cryptofs
 
 # Set file systems specific variables
-ifneq (,$(filter littlefs, $(USEMODULE)))
+ifneq (,$(filter cryptofs, $(USEMODULE)))
+    CFLAGS += -DVFS_FILE_BUFFER_SIZE=92 -DVFS_DIR_BUFFER_SIZE=44
+else ifneq (,$(filter littlefs, $(USEMODULE)))
     CFLAGS += -DVFS_FILE_BUFFER_SIZE=52 -DVFS_DIR_BUFFER_SIZE=44
 else ifneq (,$(filter spiffs, $(USEMODULE)))
     SPIFFS_NB_FD ?= 8

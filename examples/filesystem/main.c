@@ -76,6 +76,23 @@ static vfs_mount_t flash_mount = {
 };
 #endif /* MTD_0 */
 
+#ifdef MODULE_CRYPTOFS
+#include "fs/cryptofs.h"
+
+#define TEST_KEY {0xe5, 0xd2, 0xf0, 0xce, 0x95, 0x3f, 0x85, 0x0b, 0xce, 0x74, 0xdf, 0xac, 0xcc, 0xb1, 0x62, 0x30}
+
+static cryptofs_t cryptofs_desc = {
+    .key = TEST_KEY,
+    .real_fs = &flash_mount,
+};
+
+static vfs_mount_t cryptofs_mount = {
+    .fs = &cryptofs_file_system,
+    .mount_point = "/cryptofs",
+    .private_data = &cryptofs_desc,
+};
+#endif
+
 /* constfs example */
 #include "fs/constfs.h"
 
@@ -116,13 +133,25 @@ static int _mount(int argc, char **argv)
     (void)argc;
     (void)argv;
 #if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
-    int res = vfs_mount(&flash_mount);
-    if (res < 0) {
-        printf("Error while mounting %s...try format\n", FLASH_MOUNT_POINT);
-        return 1;
+    if (argc < 2 || strcmp(argv[1], FLASH_MOUNT_POINT) == 0) {
+        int res = vfs_mount(&flash_mount);
+        if (res < 0) {
+            printf("Error while mounting %s...try format\n", FLASH_MOUNT_POINT);
+            return 1;
+        }
+        printf("%s successfully mounted\n", FLASH_MOUNT_POINT);
     }
+#ifdef MODULE_CRYPTOFS
+    else if (strcmp(argv[1], cryptofs_mount.mount_point) == 0) {
+        int res = vfs_mount(&cryptofs_mount);
+        if (res < 0) {
+            printf("Error while mounting %s...try format\n", cryptofs_mount.mount_point);
+            return 1;
+        }
+        printf("%s successfully mounted\n", cryptofs_mount.mount_point);
+    }
+#endif
 
-    printf("%s successfully mounted\n", FLASH_MOUNT_POINT);
     return 0;
 #else
     puts("No external flash file system selected");
@@ -132,18 +161,30 @@ static int _mount(int argc, char **argv)
 
 static int _format(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
 #if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
-    int res = vfs_format(&flash_mount);
-    if (res < 0) {
-        printf("Error while formatting %s\n", FLASH_MOUNT_POINT);
-        return 1;
+    if (argc < 2 || strcmp(argv[1], FLASH_MOUNT_POINT) == 0) {
+        int res = vfs_format(&flash_mount);
+        if (res < 0) {
+            printf("Error while formatting %s\n", FLASH_MOUNT_POINT);
+            return 1;
+        }
+        printf("%s successfully formatted\n", FLASH_MOUNT_POINT);
+    }
+#ifdef MODULE_CRYPTOFS
+    else if (strcmp(argv[1], cryptofs_mount.mount_point) == 0) {
+        int res = vfs_format(&cryptofs_mount);
+        if (res < 0) {
+            printf("Error while formatting %s\n", cryptofs_mount.mount_point);
+            return 1;
+        }
+        printf("%s successfully formatted\n", cryptofs_mount.mount_point);
     }
 
-    printf("%s successfully formatted\n", FLASH_MOUNT_POINT);
     return 0;
+#endif
 #else
+    (void)argc;
+    (void)argv;
     puts("No external flash file system selected");
     return 1;
 #endif
@@ -151,18 +192,30 @@ static int _format(int argc, char **argv)
 
 static int _umount(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
 #if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
-    int res = vfs_umount(&flash_mount);
-    if (res < 0) {
-        printf("Error while unmounting %s\n", FLASH_MOUNT_POINT);
-        return 1;
+    if (argc < 2 || strcmp(argv[1], FLASH_MOUNT_POINT) == 0) {
+        int res = vfs_umount(&flash_mount);
+        if (res < 0) {
+            printf("Error while unmounting %s\n", FLASH_MOUNT_POINT);
+            return 1;
+        }
+        printf("%s successfully unmounted\n", FLASH_MOUNT_POINT);
     }
+#ifdef MODULE_CRYPTOFS
+    else if (strcmp(argv[1], cryptofs_mount.mount_point) == 0) {
+        int res = vfs_mount(&cryptofs_mount);
+        if (res < 0) {
+            printf("Error while unmounting %s\n", cryptofs_mount.mount_point);
+            return 1;
+        }
+        printf("%s successfully unmounted\n", cryptofs_mount.mount_point);
+    }
+#endif
 
-    printf("%s successfully unmounted\n", FLASH_MOUNT_POINT);
     return 0;
 #else
+    (void)argc;
+    (void)argv;
     puts("No external flash file system selected");
     return 1;
 #endif
