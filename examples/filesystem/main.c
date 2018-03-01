@@ -179,9 +179,9 @@ static int _format(int argc, char **argv)
         }
         printf("%s successfully formatted\n", cryptofs_mount.mount_point);
     }
+#endif
 
     return 0;
-#endif
 #else
     (void)argc;
     (void)argv;
