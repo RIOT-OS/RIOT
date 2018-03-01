@@ -121,23 +121,6 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-int timer_set(tim_t dev, int channel, unsigned int timeout)
-{
-    assert(dev == 0);
-    assert(channel < CHANNELS);
-
-    (void)dev;
-
-    timeout >>= TIMER_ACCURACY_SHIFT;
-    timeout <<= TIMER_ACCURACY_SHIFT;
-
-    uint32_t status = irq_disable();
-    compares[channel] = counter + timeout;
-    irq_restore(status);
-
-    return channel;
-}
-
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
     assert(dev == 0);
