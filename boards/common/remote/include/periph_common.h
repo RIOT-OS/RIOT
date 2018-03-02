@@ -84,11 +84,19 @@ static const uart_conf_t uart_config[] = {
         .tx_pin   = GPIO_PIN(0, 1),
         .cts_pin  = GPIO_UNDEF,
         .rts_pin  = GPIO_UNDEF
+    },
+    {
+        .dev      = UART1_BASEADDR,
+        .rx_pin   = GPIO_PIN(2, 1),
+        .tx_pin   = GPIO_PIN(2, 0),
+        .cts_pin  = GPIO_UNDEF,
+        .rts_pin  = GPIO_UNDEF
     }
 };
 
 /* interrupt function name mapping */
 #define UART_0_ISR          isr_uart0
+#define UART_1_ISR          isr_uart1
 
 /* macros common across all UARTs */
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
