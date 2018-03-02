@@ -21,6 +21,8 @@
  * A quadrature encoder outputs two wave forms that are 90 degrees
  * out of phase.
  *
+ * @verbatim
+ *
  * Clockwise (C) :              Counter-clockwise (CC) :
  *  ___________________          ___________________
  * | Phase |  A  |  B  |        | Phase |  A  |  B  |
@@ -50,11 +52,12 @@
  *  6. Rising edge on B and signal A is down     => (CC) => increment counter
  *  7. Falling edge on B and signal A is up      => (C)  => increment counter
  *  8. Falling edge on B and signal A is down    => (CC) => decrement counter
+ * @endverbatim
  *
  * According to these cases, three modes are available :
- *  X1 mode : signal A, rising edges (cases 1 and 2)
- *  X2 mode : signal A, rising and falling edges (cases 1, 2, 3 and 4)
- *  X4 mode : signals A and B, rising and falling edges (all cases)
+ *  - X1 mode : signal A, rising edges (cases 1 and 2)
+ *  - X2 mode : signal A, rising and falling edges (cases 1, 2, 3 and 4)
+ *  - X4 mode : signals A and B, rising and falling edges (all cases)
  *
  * The mapping/configuration of QDEC devices (timers) and the used pins has to be
  * done in the board configuration (the board's `periph_conf.h).
