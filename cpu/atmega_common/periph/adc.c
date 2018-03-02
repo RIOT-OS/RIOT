@@ -111,7 +111,7 @@ int adc_sample(adc_t line, adc_res_t res)
 #if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281)
     ADMUX &= 0xf0;
     ADMUX |= line;
-#elif defined(CPU_ATMEGA2560)
+#elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA256RFR2)
     if (line < 8) {
         ADCSRB &= ~(1 << MUX5);
         ADMUX &= 0xf0;

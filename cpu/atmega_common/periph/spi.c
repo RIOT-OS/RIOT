@@ -54,8 +54,19 @@ void spi_init_pins(spi_t bus)
 #if defined (CPU_ATMEGA2560) || defined (CPU_ATMEGA1281)
     DDRB |= ((1 << DDB2) | (1 << DDB1) | (1 << DDB0));
 #endif
-#ifdef CPU_ATMEGA328P
+#if defined (CPU_ATMEGA328P)
     DDRB |= ((1 << DDB2) | (1 << DDB3) | (1 << DDB5));
+#endif
+#if defined (CPU_ATMEGA256RFR2)
+    /* Master: PB3 MISO set to out
+     *         PB2 MOSI set to input by hardware
+     *         PB1 SCK  set to out
+     *         PB0 /CS  kept as is, has to be configured by user. Flexibility to
+     *                  use different /CS pin.
+     * Only Master supported. Slave: Only MOSI has to be set as Input.
+     * ATmega256RFR2 data sheet p. 365
+     * */
+    DDRB |= ((1 << DDB2) | (1 << DDB1));
 #endif
 }
 

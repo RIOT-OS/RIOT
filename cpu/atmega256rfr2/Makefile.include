@@ -1,0 +1,14 @@
+# tell the build system that the CPU depends on the atmega common files
+USEMODULE += atmega_common
+# define path to atmega common module, which is needed for this CPU
+export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
+
+# explicitly tell the linker to link the syscalls and startup code.
+#   Without this the interrupt vectors will not be linked correctly!
+export UNDEF += $(BINDIR)/cpu/startup.o
+
+#include periph module
+USEMODULE += periph
+
+# CPU depends on the atmega common module, so include it
+include $(ATMEGA_COMMON)Makefile.include
