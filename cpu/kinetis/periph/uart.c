@@ -131,6 +131,18 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
+void uart_poweron(uart_t uart)
+{
+    (void)uart;
+    /* not implemented (yet) */
+}
+
+void uart_poweroff(uart_t uart)
+{
+    (void)uart;
+    /* not implemented (yet) */
+}
+
 #if KINETIS_HAVE_UART && KINETIS_HAVE_LPUART
 /* Dispatch function to pass to the proper write function depending on UART type
  * This function is only used when the CPU supports both UART and LPUART. */
