@@ -207,7 +207,7 @@ int _ccnl_interest(int argc, char **argv)
     memset(_int_buf, '\0', BUF_SIZE);
 
     struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, 0);
-    int res = ccnl_send_interest(prefix, _int_buf, BUF_SIZE);
+    int res = ccnl_send_interest(prefix, _int_buf, BUF_SIZE, NULL);
     ccnl_prefix_free(prefix);
 
     return res;
