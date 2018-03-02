@@ -27,18 +27,53 @@
 #include "vectors_cortexm.h"
 #include "vectors_kinetis.h"
 #include "wdog.h"
+#include "bit.h"
+
+/**
+ * @brief Enable workarounds for some known CPU errata
+ */
+static inline void cpu_errata_fixes(void)
+{
+#ifdef SIM_SCGC7_FLEXBUS_SHIFT
+    /* K series errata
+     * e4218: SIM/FLEXBUS: SIM_SCGC7[FLEXBUS] bit should be cleared when the
+     * FlexBus is not being used.
+     *
+     * Description: The SIM_SCGC7[FLEXBUS] bit is set by default. This means
+     * that the FlexBus will be enabled and come up in global chip select mode.
+     * With some code sequence and register value combinations the core could
+     * attempt to prefetch from the FlexBus even though it might not actually
+     * use the value it prefetched. In the case where the FlexBus is
+     * unconfigured, this can result in a hung bus cycle on the FlexBus.
+     *
+     * Workaround: If the FlexBus is not being used, disabled the clock to the
+     * FlexBus during chip initialization by clearing the SIM_SCGC7[FLEXBUS] bit.
+     * If the FlexBus will be used, then enable at least one chip select as
+     * early in the chip initialization process as possible.
+     */
+    bit_clear32(&SIM->SCGC7, SIM_SCGC7_FLEXBUS_SHIFT);
+#endif
+#ifdef RSIM
+    /* KW41Z errata
+     * e10224: RSIM: XTAL_OUT_EN signal from the pin is enabled by default
+     *
+     * Description: The XTAL_OUT_EN signal from the default XTAL_OUT_EN pin,
+     * PTB0, is enabled out of reset. This will result in the reference
+     * oscillator being enabled when this pin is asserted high regardless of the
+     * port control multiplexor setting.
+     *
+     * Workaround: To prevent the pin from enabling the XTAL out feature
+     * unintentionally, set RSIM_RF_OSC_CTRL[RADIO_EXT_OSC_OVRD_EN]=1.
+     */
+    bit_set32(&RSIM->RF_OSC_CTRL, RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_EN_SHIFT);
+#endif
+}
 
 void pre_startup(void)
 {
     /* disable the WDOG */
     wdog_disable();
-#ifdef SIM_SCGC7_FLEXBUS_SHIFT
-    /*
-     * Workaround for hardware errata e4218: "SIM/FLEXBUS: SIM_SCGC7[FLEXBUS]
-     * bit should be cleared when the FlexBus is not being used."
-     */
-    BITBAND_REG32(SIM->SCGC7, SIM_SCGC7_FLEXBUS_SHIFT) = 0;
-#endif
+    cpu_errata_fixes();
 }
 
 void dummy_handler(void)
