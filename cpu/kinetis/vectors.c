@@ -38,6 +38,7 @@
 #define FTFL_Collision_IRQn Read_Collision_IRQn
 #define PMC_IRQn LVD_LVW_IRQn
 #define Watchdog_IRQn WDOG_EWM_IRQn
+#define LVD_LVW_DCDC_IRQn LVD_LVW_IRQn
 
 #include "vectors_kinetis.h"
 
@@ -125,20 +126,28 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #elif defined(DMA_INT_INT15_MASK)
     [DMA15_IRQn      ] = isr_dma15,           /* DMA Channel 15 Transfer Complete */
 #endif
+#ifndef KINETIS_CORE_Z
     [DMA_Error_IRQn  ] = isr_dma_error,       /* DMA Error Interrupt */
+#endif
 #endif /* defined(DMA0) */
-#ifdef MCM
+#if defined(MCM) && !defined(KINETIS_CORE_Z)
     [MCM_IRQn        ] = isr_mcm,             /* Normal Interrupt */
 #endif
 #if defined(FTFA)
     [FTFA_IRQn       ] = isr_ftfa,            /* FTFA command complete */
+#ifndef KINETIS_CORE_Z
     [FTFA_Collision_IRQn] = isr_ftfa_collision, /* FTFA read collision */
+#endif
 #elif defined(FTFE)
     [FTFE_IRQn       ] = isr_ftfe,            /* FTFE command complete */
+#ifndef KINETIS_CORE_Z
     [FTFE_Collision_IRQn] = isr_ftfe_collision, /* FTFE read collision */
+#endif
 #elif defined(FTFL)
     [FTFL_IRQn       ] = isr_ftfl,            /* FTFL command complete */
+#ifndef KINETIS_CORE_Z
     [FTFL_Collision_IRQn] = isr_ftfl_collision, /* FTFL read collision */
+#endif
 #endif
 #ifdef PMC
     [LVD_LVW_IRQn    ] = isr_lvd_lvw,         /* Low Voltage Detect, Low Voltage Warning */
@@ -245,11 +254,15 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [RTC_Seconds_IRQn] = isr_rtc_seconds,     /* RTC seconds interrupt */
 #endif
 #ifdef PIT
+#ifdef KINETIS_CORE_Z
+    [PIT_IRQn        ] = isr_pit,             /* PIT any channel interrupt */
+#else
     [PIT0_IRQn       ] = isr_pit0,            /* PIT timer channel 0 interrupt */
     [PIT1_IRQn       ] = isr_pit1,            /* PIT timer channel 1 interrupt */
     [PIT2_IRQn       ] = isr_pit2,            /* PIT timer channel 2 interrupt */
     [PIT3_IRQn       ] = isr_pit3,            /* PIT timer channel 3 interrupt */
 #endif
+#endif /* defined(PIT) */
 #ifdef PDB0
     [PDB0_IRQn       ] = isr_pdb0,            /* PDB0 Interrupt */
 #endif
@@ -274,6 +287,11 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #ifdef PORTA
     [PORTA_IRQn      ] = isr_porta,           /* Port A interrupt */
 #endif
+#ifdef KINETIS_CORE_Z
+#if defined(PORTB) && defined(PORTC)
+    [PORTB_PORTC_IRQn] = isr_portb_portc,     /* Port B, C combined interrupt */
+#endif
+#else
 #ifdef PORTB
     [PORTB_IRQn      ] = isr_portb,           /* Port B interrupt */
 #endif
@@ -285,6 +303,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #endif
 #ifdef PORTE
     [PORTE_IRQn      ] = isr_porte,           /* Port E interrupt */
+#endif
 #endif
 #if __CORTEX_M >= 3
     [SWI_IRQn        ] = isr_swi,             /* Software interrupt */
@@ -349,6 +368,12 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #endif
 #ifdef USBHS
     [USBHS_IRQn      ] = isr_usbhs,           /* USB high speed OTG interrupt */
+#endif
+#ifdef BTLE_RF
+    [Radio_0_IRQn    ] = isr_radio_0,         /* Radio INT0 interrupt */
+#endif
+#ifdef ZLL
+    [Radio_1_IRQn    ] = isr_radio_1,         /* Radio INT1 interrupt */
 #endif
 };
 

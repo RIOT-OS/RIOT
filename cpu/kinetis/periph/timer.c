@@ -32,6 +32,16 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
+#ifdef PIT_LTMR64H_LTH_MASK
+/* The KW41Z PIT module provides only one IRQ for all PIT channels combined. */
+/* TODO: find a better way to distinguish which Kinetis CPUs have separate PIT
+ * channel interrupts */
+#define KINETIS_PIT_COMBINED_IRQ 1
+#else
+/* K60, K64F etc have a separate IRQ number for each PIT channel */
+#define KINETIS_PIT_COMBINED_IRQ 0
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -189,10 +199,15 @@ static inline int pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
     /* Clear IRQ flag */
     PIT->CHANNEL[pit_config[dev].count_ch].TFLG = PIT_TFLG_TIF_MASK;
+#if KINETIS_PIT_COMBINED_IRQ
+    /* One IRQ for all channels */
+    /* NVIC_ClearPendingIRQ(PIT_IRQn); */ /* does it make sense to clear this IRQ flag? */
+    NVIC_EnableIRQ(PIT_IRQn);
+#else
     /* Refactor the below lines if there are any CPUs where the PIT IRQs are not sequential */
     NVIC_ClearPendingIRQ(PIT0_IRQn + pit_config[dev].count_ch);
     NVIC_EnableIRQ(PIT0_IRQn + pit_config[dev].count_ch);
-
+#endif
     /* Reset up-counter */
     pit[dev].count = PIT_MAX_VALUE;
     pit[dev].ldval = PIT_MAX_VALUE;
@@ -710,6 +725,22 @@ void timer_stop(tim_t dev)
 }
 
 /* ****** ISR instances ****** */
+
+void isr_pit(void)
+{
+    /* Some of the lower end Kinetis CPUs combine the individual PIT interrupt
+     * flags into a single NVIC IRQ signal. This means that software needs to
+     * test which timer(s) went off when an IRQ occurs. */
+    for (size_t i = 0; i < PIT_NUMOF; ++i) {
+        if (PIT->CHANNEL[pit_config[i].count_ch].TCTRL & PIT_TCTRL_TIE_MASK) {
+            /* Interrupt is enabled */
+            if (PIT->CHANNEL[pit_config[i].count_ch].TFLG) {
+                /* Timer interrupt flag is set */
+                pit_irq_handler(_pit_tim_t(i));
+            }
+        }
+    }
+}
 
 #ifdef PIT_ISR_0
 void PIT_ISR_0(void)

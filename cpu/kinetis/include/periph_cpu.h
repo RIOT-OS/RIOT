@@ -46,6 +46,8 @@ typedef uint16_t gpio_t;
  */
 #define GPIO_PIN(x, y)      (((x + 1) << 12) | (x << 6) | y)
 
+#ifdef SIM_UIDH_UID_MASK
+/* Kinetis Cortex-M4 has a 128 bit SIM UID */
 /**
  * @brief   Starting offset of CPU_ID
  */
@@ -55,6 +57,17 @@ typedef uint16_t gpio_t;
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (16U)
+#else /* defined(SIM_UIDH_UID_MASK) */
+/* Kinetis Cortex-M0+ has a 96 bit SIM UID */
+/**
+ * @brief   Starting offset of CPU_ID
+ */
+#define CPUID_ADDR          (&SIM->UIDMH)
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (12U)
+#endif /* defined(SIM_UIDH_UID_MASK) */
 
 /**
  * @brief   Generate GPIO mode bitfields
@@ -66,11 +79,6 @@ typedef uint16_t gpio_t;
  * - bit 7: output or input mode
  */
 #define GPIO_MODE(pu, pe, od, out)   (pu | (pe << 1) | (od << 5) | (out << 7))
-
-/**
- * @brief   Define the maximum number of PWM channels that can be configured
- */
-#define PWM_CHAN_MAX        (4U)
 
 /**
  * @brief   Define a CPU specific SPI hardware chip select line macro
@@ -135,7 +143,9 @@ typedef enum {
     GPIO_AF_5      = PORT_PCR_MUX(5),       /**< use alternate function 5 */
     GPIO_AF_6      = PORT_PCR_MUX(6),       /**< use alternate function 6 */
     GPIO_AF_7      = PORT_PCR_MUX(7),       /**< use alternate function 7 */
+#ifdef PORT_PCR_ODE_MASK
     GPIO_PCR_OD    = (PORT_PCR_ODE_MASK),   /**< open-drain mode */
+#endif
     GPIO_PCR_PD    = (PORT_PCR_PE_MASK),    /**< enable pull-down */
     GPIO_PCR_PU    = (PORT_PCR_PE_MASK | PORT_PCR_PS_MASK)  /**< enable PU */
 } gpio_pcr_t;
@@ -186,8 +196,14 @@ typedef enum {
 } adc_res_t;
 /** @} */
 
+#if defined(FTM_CnSC_MSB_MASK)
 /**
- * @name    PWM mode configuration bits
+ * @brief   Define the maximum number of PWM channels that can be configured
+ */
+#define PWM_CHAN_MAX        (4U)
+
+/**
+ * @name   PWM mode configuration
  * @{
  */
 #define HAVE_PWM_MODE_T
@@ -196,7 +212,7 @@ typedef enum {
     PWM_RIGHT  = (FTM_CnSC_MSB_MASK | FTM_CnSC_ELSA_MASK),  /**< right aligned */
     PWM_CENTER = (FTM_CnSC_MSB_MASK)                        /**< center aligned */
 } pwm_mode_t;
-/** @} */
+#endif /* defined(FTM_CnSC_MSB_MASK) */
 #endif /* ndef DOXYGEN */
 
 /**
@@ -279,6 +295,7 @@ typedef struct {
     uint8_t irqn;
 } lptmr_conf_t;
 
+#ifdef FTM_CnSC_MSB_MASK
 /**
  * @brief   PWM configuration structure
  */
@@ -292,6 +309,7 @@ typedef struct {
     uint8_t chan_numof;     /**< number of actually configured channels */
     uint8_t ftm_num;        /**< FTM number used */
 } pwm_conf_t;
+#endif
 
 /**
  * @brief   SPI module configuration options

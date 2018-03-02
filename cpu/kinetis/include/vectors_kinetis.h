@@ -121,6 +121,7 @@ void isr_lvd_lvw(void);      /**< PMC controller low-voltage detect, low-voltage
 void isr_mcg(void);          /**< MCG interrupt handler */
 void isr_mcm(void);          /**< MCM normal interrupt handler */
 void isr_pdb0(void);         /**< PDB0 interrupt handler */
+void isr_pit(void);          /**< PIT any channel interrupt handler */
 void isr_pit0(void);         /**< PIT timer channel 0 interrupt handler */
 void isr_pit1(void);         /**< PIT timer channel 1 interrupt handler */
 void isr_pit2(void);         /**< PIT timer channel 2 interrupt handler */
@@ -130,6 +131,9 @@ void isr_portb(void);        /**< Port B pin detect interrupt handler */
 void isr_portc(void);        /**< Port C pin detect interrupt handler */
 void isr_portd(void);        /**< Port D pin detect interrupt handler */
 void isr_porte(void);        /**< Port E pin detect interrupt handler */
+void isr_portb_portc(void);  /**< Port B, C combined pin detect interrupt handler */
+void isr_radio_0(void);      /**< Radio transceiver INT0 interrupt handler */
+void isr_radio_1(void);      /**< Radio transceiver INT1 interrupt handler */
 void isr_rng(void);          /**< RNG interrupt handler */
 void isr_rtc(void);          /**< RTC interrupt handler */
 void isr_rtc_seconds(void);  /**< RTC seconds interrupt handler */
@@ -141,6 +145,7 @@ void isr_swi(void);          /**< Software interrupt handler */
 void isr_tpm0(void);         /**< TPM0 interrupt handler */
 void isr_tpm1(void);         /**< TPM1 interrupt handler */
 void isr_tpm2(void);         /**< TPM2 interrupt handler */
+void isr_trng0(void);        /**< TRNG0 interrupt handler */
 void isr_tsi0(void);         /**< TSI0 interrupt handler */
 void isr_uart0_err(void);    /**< UART0 error interrupt handler */
 void isr_uart0_lon(void);    /**< UART0 LON interrupt handler */
