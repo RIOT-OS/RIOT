@@ -63,6 +63,15 @@
 #define LPUART_OVERSAMPLING_RATE (16)
 #endif
 
+/* Default LPUART clock setting to avoid compilation failures, define this in
+ * periph_conf.h to set board specific configuration if using the LPUART. */
+#ifndef LPUART_0_SRC
+#define LPUART_0_SRC            0
+#endif
+#ifndef LPUART_1_SRC
+#define LPUART_1_SRC            0
+#endif
+
 /**
  * @brief Runtime configuration space, holds pointers to callback functions for RX
  */
@@ -296,7 +305,19 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
     LPUART_Type *dev = uart_config[uart].dev;
     uint32_t clk = uart_config[uart].freq;
 
-    /* Remember to select a module clock in board_init! (SIM->SOPT2[LPUART0SRC]) */
+    /* Set LPUART clock source */
+#ifdef SIM_SOPT2_LPUART0SRC
+    if (dev == LPUART0) {
+        SIM->SOPT2 = (SIM->SOPT2 & ~SIM_SOPT2_LPUART0SRC_MASK) |
+            SIM_SOPT2_LPUART0SRC(LPUART_0_SRC);
+    }
+#endif
+#ifdef SIM_SOPT2_LPUART1SRC
+    if (dev == LPUART1) {
+        SIM->SOPT2 = (SIM->SOPT2 & ~SIM_SOPT2_LPUART1SRC_MASK) |
+            SIM_SOPT2_LPUART1SRC(LPUART_1_SRC);
+    }
+#endif
 
     /* Select mode */
     /* transmitter and receiver disabled */
