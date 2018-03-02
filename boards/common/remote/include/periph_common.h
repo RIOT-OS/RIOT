@@ -78,17 +78,18 @@ static const timer_conf_t timer_config[] = {
  * @{
  */
 static const uart_conf_t uart_config[] = {
+    /* UART0 is mapped to debug usb */
     {
         .dev      = UART0_BASEADDR,
-        .rx_pin   = GPIO_PIN(0, 0),
-        .tx_pin   = GPIO_PIN(0, 1),
+        .rx_pin   = GPIO_PIN(PORT_A, 0),
+        .tx_pin   = GPIO_PIN(PORT_A, 1),
         .cts_pin  = GPIO_UNDEF,
         .rts_pin  = GPIO_UNDEF
     },
     {
         .dev      = UART1_BASEADDR,
-        .rx_pin   = GPIO_PIN(2, 1),
-        .tx_pin   = GPIO_PIN(2, 0),
+        .rx_pin   = GPIO_PIN(PORT_C, 1),
+        .tx_pin   = GPIO_PIN(PORT_C, 0),
         .cts_pin  = GPIO_UNDEF,
         .rts_pin  = GPIO_UNDEF
     }
