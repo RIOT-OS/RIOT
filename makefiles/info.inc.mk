@@ -56,6 +56,8 @@ info-build:
 	@echo 'FEATURES_CONFLICT:     $(FEATURES_CONFLICT)'
 	@echo 'FEATURES_CONFLICT_MSG: $(FEATURES_CONFLICT_MSG)'
 	@echo ''
+	@echo -e 'INCLUDES:$(patsubst %, \n\t%, $(INCLUDES))'
+	@echo ''
 	@echo 'CC:      $(CC)'
 	@echo -e 'CFLAGS:$(patsubst %, \n\t%, $(CFLAGS))'
 	@echo ''
