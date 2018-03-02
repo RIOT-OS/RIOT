@@ -135,7 +135,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
     compares[channel] = counter + timeout;
     irq_restore(status);
 
-    return channel;
+    return 1;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
@@ -152,7 +152,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     compares[channel] = value;
     irq_restore(status);
 
-    return channel;
+    return 1;
 }
 
 int timer_clear(tim_t dev, int channel)
@@ -166,7 +166,7 @@ int timer_clear(tim_t dev, int channel)
     compares[channel] = 0;
     irq_restore(status);
 
-    return channel;
+    return 1;
 }
 
 unsigned int timer_read(tim_t dev)
