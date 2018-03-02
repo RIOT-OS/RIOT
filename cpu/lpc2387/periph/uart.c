@@ -98,3 +98,15 @@ void UART0_IRQHandler(void)
 
     VICVectAddr = 0;                    /* Acknowledge Interrupt */
 }
+
+void uart_poweron(uart_t uart)
+{
+    (void)uart;
+    /* not implemented (yet) */
+}
+
+void uart_poweroff(uart_t uart)
+{
+    (void)uart;
+    /* not implemented (yet) */
+}
