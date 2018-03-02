@@ -7,6 +7,10 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+# allow board aliases for this example (needed because we use the BOARD
+# variable in this Makefile)
+include $(RIOTBASE)/makefiles/boards/alias.inc.mk
+
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f031k6 nucleo-f042k6 \
                              nucleo-l031k6 nucleo-f030r8 nucleo-l053r8 stm32f0discovery \
                              telosb z1
