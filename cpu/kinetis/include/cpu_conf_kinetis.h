@@ -30,9 +30,9 @@ extern "C"
  * @name   ARM Cortex-M specific CPU configuration
  * @{
  */
-#define CPU_DEFAULT_IRQ_PRIO            (1U)
-#define CPU_IRQ_NUMOF                   (NUMBER_OF_INT_VECTORS)
-#define CPU_FLASH_BASE                  (0x00000000)
+#define CPU_DEFAULT_IRQ_PRIO    (1U)
+#define CPU_IRQ_NUMOF           (NUMBER_OF_INT_VECTORS)
+#define CPU_FLASH_BASE          (0x00000000)
 /** @} */
 
 /**
@@ -40,16 +40,16 @@ extern "C"
  * @{
  */
 #define PIN_MUX_FUNCTION_ANALOG 0
-#define PIN_MUX_FUNCTION_GPIO 1
+#define PIN_MUX_FUNCTION_GPIO   1
 /** @} */
 
 /**
  * @name GPIO interrupt flank settings
  * @{
  */
-#define PIN_INTERRUPT_RISING 0b1001
-#define PIN_INTERRUPT_FALLING 0b1010
-#define PIN_INTERRUPT_EDGE 0b1011
+#define PIN_INTERRUPT_RISING    0b1001
+#define PIN_INTERRUPT_FALLING   0b1010
+#define PIN_INTERRUPT_EDGE      0b1011
 /** @} */
 
 /**
@@ -61,27 +61,27 @@ extern "C"
  * matters for the RIOT driver implementations.
  */
 #if !defined(MCG_C2_RANGE0) && defined(MCG_C2_RANGE)
-#define MCG_C2_RANGE0(x) MCG_C2_RANGE(x)
+#define MCG_C2_RANGE0(x)        MCG_C2_RANGE(x)
 #endif
 #if !defined(MCG_C2_RANGE0_MASK) && defined(MCG_C2_RANGE_MASK)
-#define MCG_C2_RANGE0_MASK MCG_C2_RANGE_MASK
+#define MCG_C2_RANGE0_MASK      MCG_C2_RANGE_MASK
 #endif
 #if !defined(MCG_C7_OSCSEL) && defined(MCG_C7_OSCSEL_SHIFT)
-#define MCG_C7_OSCSEL(x) (((uint32_t)(x) << MCG_C7_OSCSEL_SHIFT) & MCG_C7_OSCSEL_MASK)
+#define MCG_C7_OSCSEL(x)        (((uint32_t)(x) << MCG_C7_OSCSEL_SHIFT) & MCG_C7_OSCSEL_MASK)
 #endif
 #if !defined(OSC0) && defined(OSC)
 #define OSC0 OSC
 #endif
 #if !defined(SIM_SOPT2_LPUART0SRC_MASK) && defined(SIM_SOPT2_LPUARTSRC_MASK)
-#define SIM_SOPT2_LPUART0SRC_MASK SIM_SOPT2_LPUARTSRC_MASK
-#define SIM_SOPT2_LPUART0SRC_SHIFT SIM_SOPT2_LPUARTSRC_SHIFT
-#define SIM_SOPT2_LPUART0SRC SIM_SOPT2_LPUARTSRC
+#define SIM_SOPT2_LPUART0SRC_MASK   SIM_SOPT2_LPUARTSRC_MASK
+#define SIM_SOPT2_LPUART0SRC_SHIFT  SIM_SOPT2_LPUARTSRC_SHIFT
+#define SIM_SOPT2_LPUART0SRC        SIM_SOPT2_LPUARTSRC
 #endif
 #if !defined(SIM_SCGC5_LPTMR_SHIFT) && defined(SIM_SCGC5_LPTIMER_SHIFT)
-#define SIM_SCGC5_LPTMR_SHIFT SIM_SCGC5_LPTIMER_SHIFT
+#define SIM_SCGC5_LPTMR_SHIFT   SIM_SCGC5_LPTIMER_SHIFT
 #endif
 #if !defined(SIM_SCGC5_LPTMR_MASK) && defined(SIM_SCGC5_LPTIMER_MASK)
-#define SIM_SCGC5_LPTMR_MASK SIM_SCGC5_LPTIMER_MASK
+#define SIM_SCGC5_LPTMR_MASK    SIM_SCGC5_LPTIMER_MASK
 #endif
 #if !defined(GPIOA_BASE) && defined(PTA_BASE)
 #define GPIOA_BASE PTA_BASE
