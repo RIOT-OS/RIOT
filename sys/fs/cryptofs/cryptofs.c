@@ -60,11 +60,28 @@ static int _format(vfs_mount_t *mountp)
         return -EINVAL;
     }
 
+    mutex_init(&fs->lock);
+
+    if (cipher_init(&fs->cipher, CIPHER_AES_128, fs->key,
+                    sizeof(fs->key)) != CIPHER_INIT_SUCCESS) {
+        return -EINVAL;
+    }
+
+    mutex_lock(&fs->lock);
     be_uint32_t magic = byteorder_htonl(CRYPTOFS_MAGIC_WORD);
-    int res = vfs_write(fd, &magic, sizeof(magic));
+    uint8_t buf[AES_BLOCK_SIZE];
+    for (unsigned i = 0; i < AES_BLOCK_SIZE / sizeof(magic); i += sizeof(magic)) {
+        memcpy(buf + i, &magic, sizeof(magic));
+    }
+    if (cipher_encrypt(&fs->cipher, buf, buf) < 1) {
+        mutex_unlock(&fs->lock);
+        return -EIO;
+    }
+
+    int res = vfs_write(fd, buf, sizeof(buf));
     vfs_close(fd);
 
-    if (res < (int)sizeof(magic)) {
+    if (res < (int)sizeof(buf)) {
         return -EINVAL;
     }
 
@@ -92,11 +109,26 @@ static int _mount(vfs_mount_t *mountp)
     if (fd < 0) {
         return -EINVAL;
     }
-    be_uint32_t magic;
-    int res = vfs_read(fd, &magic, sizeof(magic));
-    if (res < (int)sizeof(magic) || byteorder_ntohl(magic) != CRYPTOFS_MAGIC_WORD) {
+
+    uint8_t buf[AES_BLOCK_SIZE];
+    int res = vfs_read(fd, buf, sizeof(buf));
+    if (res < (int)sizeof(buf)) {
         vfs_close(fd);
         return -EINVAL;
+    }
+    mutex_lock(&fs->lock);
+    if (cipher_decrypt(&fs->cipher, buf, buf) < 1) {
+        mutex_unlock(&fs->lock);
+        return -EIO;
+    }
+    mutex_unlock(&fs->lock);
+    be_uint32_t magic;
+    for (unsigned i = 0; i < AES_BLOCK_SIZE / sizeof(magic); i += sizeof(magic)) {
+        memcpy(&magic, buf + i, sizeof(magic));
+        if (byteorder_ntohl(magic) != CRYPTOFS_MAGIC_WORD) {
+            vfs_close(fd);
+            return -EINVAL;
+        }
     }
     fs->root_fd = fd;
     return 0;
