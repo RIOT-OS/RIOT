@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Overwrite the default gpio_t type definition
+ * @name    CPU specific gpio_t type definition
  * @{
  */
 #define HAVE_GPIO_T
@@ -50,6 +50,7 @@ typedef uint16_t gpio_t;
  * @brief   Starting offset of CPU_ID
  */
 #define CPUID_ADDR          (&SIM->UIDH)
+
 /**
  * @brief   Length of the CPU_ID in octets
  */
@@ -85,12 +86,12 @@ typedef uint16_t gpio_t;
 #define SPI_HWCS_NUMOF      (5)
 
 /**
- * @brief   This CPU makes use of the following shared SPI functions
+ * @name    This CPU makes use of the following shared SPI functions
  * @{
  */
-#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
-#define PERIPH_SPI_NEEDS_TRANSFER_REG
-#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE  1
+#define PERIPH_SPI_NEEDS_TRANSFER_REG   1
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS  1
 /** @} */
 
 /**
@@ -99,13 +100,13 @@ typedef uint16_t gpio_t;
 #define PERIPH_TIMER_PROVIDES_SET
 
 /**
- * @brief   define number of usable power modes
+ * @brief   number of usable power modes
  */
 #define PM_NUM_MODES    (1U)
 
 #ifndef DOXYGEN
 /**
- * @brief   Override GPIO modes
+ * @name    GPIO pin modes
  * @{
  */
 #define HAVE_GPIO_MODE_T
@@ -121,7 +122,7 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
- * @brief   Define a condensed set of PORT PCR values
+ * @brief   PORT control register bitmasks
  *
  * To combine values just aggregate them using a logical OR.
  */
@@ -141,7 +142,7 @@ typedef enum {
 
 #ifndef DOXYGEN
 /**
- * @brief   Override flank configuration values
+ * @name    GPIO flank configuration values
  * @{
  */
 #define HAVE_GPIO_FLANK_T
@@ -156,7 +157,7 @@ typedef enum {
 /**
  * @brief   Available ports on the Kinetis family
  *
- * @todo    This is not equal for all members of the Kinetis family, right?
+ * Not all CPUs have the full number of ports, see your CPU data sheet for pinout.
  */
 enum {
     PORT_A = 0,             /**< port A */
@@ -171,7 +172,7 @@ enum {
 
 #ifndef DOXYGEN
 /**
- * @brief   Override default ADC resolution values
+ * @name   ADC resolution values
  * @{
  */
 #define HAVE_ADC_RES_T
@@ -186,7 +187,7 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   Override default PWM mode configuration
+ * @name    PWM mode configuration bits
  * @{
  */
 #define HAVE_PWM_MODE_T
@@ -199,13 +200,13 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
- * @brief    UART transmission modes
+ * @brief   UART transmission modes
  */
 typedef enum {
     /** @brief 8 data bits, no parity, 1 stop bit */
     UART_MODE_8N1 = 0,
     /** @brief 8 data bits, even parity, 1 stop bit */
-#if defined(UART_C1_M_MASK)
+#if defined(UART_C1_M_MASK) || DOXYGEN
     /* LPUART and UART mode bits coincide, so the same setting for UART works on
      * the LPUART as well */
     UART_MODE_8E1 = (UART_C1_M_MASK | UART_C1_PE_MASK),
@@ -214,7 +215,7 @@ typedef enum {
     UART_MODE_8E1 = (LPUART_CTRL_M_MASK | LPUART_CTRL_PE_MASK),
 #endif
     /** @brief 8 data bits, odd parity, 1 stop bit */
-#if defined(UART_C1_M_MASK)
+#if defined(UART_C1_M_MASK) || DOXYGEN
     UART_MODE_8O1 = (UART_C1_M_MASK | UART_C1_PE_MASK | UART_C1_PT_MASK),
 #elif defined(LPUART_CTRL_M_MASK)
     /* For CPUs which only have the LPUART */
@@ -224,7 +225,7 @@ typedef enum {
 
 #ifndef DOXYGEN
 /**
- * @brief   Override default ADC resolution values
+ * @name    SPI mode bitmasks
  * @{
  */
 #define HAVE_SPI_MODE_T
@@ -314,10 +315,12 @@ enum {
 };
 
 /**
- * @brief   Hardware timer type-specific device macros
+ * @name    Hardware timer type-specific device macros
  * @{
  */
+/** @brief  Timers using PIT backend */
 #define TIMER_PIT_DEV(x)   (TIMER_DEV(0 + (x)))
+/** @brief  Timers using LPTMR backend */
 #define TIMER_LPTMR_DEV(x) (TIMER_DEV(PIT_NUMOF + (x)))
 /** @} */
 
