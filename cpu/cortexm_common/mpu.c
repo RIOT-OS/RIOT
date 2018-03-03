@@ -36,8 +36,13 @@ int mpu_enable(void) {
 #if __MPU_PRESENT
     MPU->CTRL |= MPU_CTRL_PRIVDEFENA_Msk | MPU_CTRL_ENABLE_Msk;
 
-    /* Enable the memory fault exception */
+#ifdef SCB_SHCSR_MEMFAULTENA_Msk
+    /* Enable the memory fault exception if SCB SHCSR (System Handler Control
+     * and State Register) has a separate bit for mem faults. That is the case
+     * on ARMv7-M. ARMv6-M does not support separate exception enable for mem
+     * faults and all fault conditions cause a HardFault. */
     SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk;
+#endif
 
     return 0;
 #else
