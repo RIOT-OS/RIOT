@@ -293,6 +293,10 @@ typedef struct {
 typedef struct {
     /** LPTMR device base pointer */
     LPTMR_Type *dev;
+    /** Input clock frequency */
+    uint32_t base_freq;
+    /** Clock source setting */
+    uint8_t src;
     /** IRQn interrupt number */
     uint8_t irqn;
 } lptmr_conf_t;
