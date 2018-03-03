@@ -27,15 +27,17 @@
 
 static int get_digital_pin(const char* pinstring, int* pin)
 {
-    int arduino_pin;
+    int arduino_pin = -1;
+    char *endptr  = NULL;
 
     if (*pinstring == 'A') {
         // TODO : add analogInputToDigitalPin macro to arduino_board.h for all boards
         return -1;
     }
-    arduino_pin = atoi(pinstring);
 
-    if (arduino_pin > (int)(sizeof(arduino_pinmap)/sizeof(arduino_pinmap[0]))) {
+    arduino_pin = strtol(pinstring, &endptr, 0);
+
+    if (*endptr != '\0' || arduino_pin == -1 || arduino_pin > (int)(sizeof(arduino_pinmap)/sizeof(arduino_pinmap[0]))) {
         return -1;
     }
 
@@ -53,7 +55,7 @@ static int init_pin(int argc, char **argv, int mode)
     }
 
     if (get_digital_pin(argv[1], &pin) != 0) {
-        printf("Could not map Arduino pin %s to a gpio\n", argv[1]);
+        printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
 
@@ -87,7 +89,7 @@ static int read(int argc, char **argv)
     }
 
     if (get_digital_pin(argv[1], &pin) != 0) {
-        printf("Could not map Arduino pin %s to a gpio\n", argv[1]);
+        printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
 
@@ -111,7 +113,7 @@ static int set(int argc, char **argv)
     }
 
     if (get_digital_pin(argv[1], &pin) != 0) {
-        printf("Could not map Arduino pin %s to a gpio\n", argv[1]);
+        printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
 
@@ -131,7 +133,7 @@ static int clear(int argc, char **argv)
     }
 
     if (get_digital_pin(argv[1], &pin) != 0) {
-        printf("Could not map Arduino pin %s to a gpio\n", argv[1]);
+        printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
 
@@ -151,7 +153,7 @@ static int toggle(int argc, char **argv)
     }
 
     if (get_digital_pin(argv[1], &pin) != 0) {
-        printf("Could not map Arduino pin %s to a gpio\n", argv[1]);
+        printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
 
