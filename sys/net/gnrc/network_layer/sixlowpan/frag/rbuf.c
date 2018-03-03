@@ -16,9 +16,9 @@
 #include <stdbool.h>
 
 #include "rbuf.h"
+#include "net/ipv6.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
-#include "net/gnrc/ipv6/netif.h"
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/frag.h"
 #include "net/sixlowpan.h"
@@ -39,16 +39,14 @@
 #ifndef RBUF_INT_SIZE
 /* same as ((int) ceil((double) N / D)) */
 #define DIV_CEIL(N, D) (((N) + (D) - 1) / (D))
-#define RBUF_INT_SIZE (DIV_CEIL(GNRC_IPV6_NETIF_DEFAULT_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * RBUF_SIZE)
+#define RBUF_INT_SIZE (DIV_CEIL(IPV6_MIN_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * RBUF_SIZE)
 #endif
 
 static rbuf_int_t rbuf_int[RBUF_INT_SIZE];
 
 static rbuf_t rbuf[RBUF_SIZE];
 
-#if ENABLE_DEBUG
 static char l2addr_str[3 * RBUF_L2ADDR_MAX_LEN];
-#endif
 
 /* ------------------------------------
  * internal function definitions
@@ -72,8 +70,8 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
               size_t frag_size, size_t offset)
 {
     rbuf_t *entry;
-    /* cppcheck is clearly wrong here */
-    /* cppcheck-suppress variableScope */
+    /* cppcheck-suppress variableScope
+     * (reason: cppcheck is clearly wrong here) */
     unsigned int data_offset = 0;
     size_t original_size = frag_size;
     sixlowpan_frag_t *frag = pkt->data;
@@ -178,13 +176,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         new_netif_hdr->lqi = netif_hdr->lqi;
         new_netif_hdr->rssi = netif_hdr->rssi;
         LL_APPEND(entry->pkt, netif);
-
-        if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
-                                          entry->pkt)) {
-            DEBUG("6lo rbuf: No receivers for this packet found\n");
-            gnrc_pktbuf_release(entry->pkt);
-        }
-
+        gnrc_sixlowpan_dispatch_recv(entry->pkt, NULL, 0);
         _rbuf_rem(entry);
     }
 }
@@ -237,10 +229,11 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
     new->end = end;
 
     DEBUG("6lo rfrag: add interval (%" PRIu16 ", %" PRIu16 ") to entry (%s, ",
-          new->start, new->end, gnrc_netif_addr_to_str(l2addr_str,
-                  sizeof(l2addr_str), entry->src, entry->src_len));
-    DEBUG("%s, %u, %u)\n", gnrc_netif_addr_to_str(l2addr_str,
-            sizeof(l2addr_str), entry->dst, entry->dst_len),
+          new->start, new->end, gnrc_netif_addr_to_str(entry->src,
+                                                       entry->src_len,
+                                                       l2addr_str));
+    DEBUG("%s, %u, %u)\n", gnrc_netif_addr_to_str(entry->dst, entry->dst_len,
+                                                  l2addr_str),
           (unsigned)entry->pkt->size, entry->tag);
 
     LL_PREPEND(entry->ints, new);
@@ -257,11 +250,12 @@ static void _rbuf_gc(void)
         /* since pkt occupies pktbuf, aggressivly collect garbage */
         if ((rbuf[i].pkt != NULL) &&
               ((now_usec - rbuf[i].arrival) > RBUF_TIMEOUT)) {
-            DEBUG("6lo rfrag: entry (%s, ", gnrc_netif_addr_to_str(l2addr_str,
-                    sizeof(l2addr_str), rbuf[i].src, rbuf[i].src_len));
+            DEBUG("6lo rfrag: entry (%s, ",
+                  gnrc_netif_addr_to_str(rbuf[i].src, rbuf[i].src_len,
+                                         l2addr_str));
             DEBUG("%s, %u, %u) timed out\n",
-                  gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), rbuf[i].dst,
-                                         rbuf[i].dst_len),
+                  gnrc_netif_addr_to_str(rbuf[i].dst, rbuf[i].dst_len,
+                                         l2addr_str),
                   (unsigned)rbuf[i].pkt->size, rbuf[i].tag);
 
             gnrc_pktbuf_release(rbuf[i].pkt);
@@ -285,11 +279,11 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
             (memcmp(rbuf[i].src, src, src_len) == 0) &&
             (memcmp(rbuf[i].dst, dst, dst_len) == 0)) {
             DEBUG("6lo rfrag: entry %p (%s, ", (void *)(&rbuf[i]),
-                  gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
-                                         rbuf[i].src, rbuf[i].src_len));
+                  gnrc_netif_addr_to_str(rbuf[i].src, rbuf[i].src_len,
+                                         l2addr_str));
             DEBUG("%s, %u, %u) found\n",
-                  gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str),
-                                         rbuf[i].dst, rbuf[i].dst_len),
+                  gnrc_netif_addr_to_str(rbuf[i].dst, rbuf[i].dst_len,
+                                         l2addr_str),
                   (unsigned)rbuf[i].pkt->size, rbuf[i].tag);
             rbuf[i].arrival = now_usec;
             return &(rbuf[i]);
@@ -336,11 +330,9 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     res->cur_size = 0;
 
     DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
-          gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->src,
-                                 res->src_len));
+          gnrc_netif_addr_to_str(res->src, res->src_len, l2addr_str));
     DEBUG("%s, %u, %u) created\n",
-          gnrc_netif_addr_to_str(l2addr_str, sizeof(l2addr_str), res->dst,
-                                 res->dst_len), (unsigned)res->pkt->size,
+          gnrc_netif_addr_to_str(res->dst, res->dst_len, l2addr_str), (unsigned)res->pkt->size,
           res->tag);
 
     return res;

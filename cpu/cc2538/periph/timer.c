@@ -132,7 +132,8 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
         }
 
         if (freq != sys_clock_freq()) {
-            DEBUG("In 32-bit mode, the GPTimer frequency must equal the system clock frequency (%u).", sys_clock_freq());
+            DEBUG("In 32-bit mode, the GPTimer frequency must equal the system clock frequency (%u).\n",
+                  (unsigned)sys_clock_freq());
             return -1;
         }
     }
@@ -173,7 +174,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
     DEBUG("%s(%u, %u, %u)\n", __FUNCTION__, tim, channel, value);
 
-    if ((tim >= TIMER_NUMOF) || (channel >= timer_config[tim].chn) ) {
+    if ((tim >= TIMER_NUMOF) || (channel >= (int)timer_config[tim].chn) ) {
         return -1;
     }
     /* clear any pending match interrupts */
@@ -194,7 +195,7 @@ int timer_clear(tim_t tim, int channel)
 {
     DEBUG("%s(%u, %u)\n", __FUNCTION__, tim, channel);
 
-    if ( (tim >= TIMER_NUMOF) || (channel >= timer_config[tim].chn) ) {
+    if ( (tim >= TIMER_NUMOF) || (channel >= (int)timer_config[tim].chn) ) {
         return -1;
     }
     /* clear interupt flags */
@@ -259,7 +260,7 @@ static void irq_handler(tim_t tim, int channel)
 {
   DEBUG("%s(%u,%d)\n", __FUNCTION__, tim, channel);
   assert(tim < TIMER_NUMOF);
-  assert(channel < timer_config[tim].chn);
+  assert(channel < (int)timer_config[tim].chn);
 
   uint32_t mis;
   /* Latch the active interrupt flags */

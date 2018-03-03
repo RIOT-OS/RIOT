@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-f334
+ * @defgroup    boards_nucleo-f334 STM32 Nucleo-F334
+ * @ingroup     boards_common_nucleo64
+ * @brief       Support for the STM32 Nucleo-F334
  * @{
  *
  * @file

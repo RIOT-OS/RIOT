@@ -1,7 +1,7 @@
-From 1e2d232135cb2ecbc4ea1668a668b74e242ba3fd Mon Sep 17 00:00:00 2001
+From 5c168fc6d96d8dc84907e667a70b3a85b8402270 Mon Sep 17 00:00:00 2001
 From: Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
 Date: Wed, 6 Sep 2017 20:23:56 +0200
-Subject: [PATCH 1/2] u8g2: add RIOT  makefiles
+Subject: [PATCH 1/3] u8g2: add RIOT makefiles
 
 ---
  Makefile                 | 22 ++++++++++++++++++++++
@@ -72,5 +72,5 @@ index 0000000..32e7913
 +
 +include $(RIOTBASE)/Makefile.base
 -- 
-2.18.2
+2.7.4
 

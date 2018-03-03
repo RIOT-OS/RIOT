@@ -122,7 +122,6 @@
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
-#include "arch/thread_arch.h"
 #include "cpu_conf.h"
 #include "sched.h"
 
@@ -168,6 +167,11 @@
 /** @} */
 
 /**
+ * @brief Prototype for a thread entry function
+ */
+typedef void *(*thread_task_func_t)(void *arg);
+
+/**
  * @brief @c thread_t holds thread's context data.
  */
 struct _thread {
@@ -177,27 +181,31 @@ struct _thread {
 
     kernel_pid_t pid;               /**< thread's process id            */
 
-#ifdef MODULE_CORE_THREAD_FLAGS
+#if defined(MODULE_CORE_THREAD_FLAGS) || defined(DOXYGEN)
     thread_flags_t flags;           /**< currently set flags            */
 #endif
 
     clist_node_t rq_entry;          /**< run queue entry                */
 
 #if defined(MODULE_CORE_MSG) || defined(MODULE_CORE_THREAD_FLAGS) \
-    || defined(MODULE_CORE_MBOX)
+    || defined(MODULE_CORE_MBOX) || defined(DOXYGEN)
     void *wait_data;                /**< used by msg, mbox and thread
                                          flags                          */
 #endif
-#if defined(MODULE_CORE_MSG)
-    list_node_t msg_waiters;        /**< threads waiting on message     */
-    cib_t msg_queue;                /**< message queue                  */
-    msg_t *msg_array;               /**< memory holding messages        */
+#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
+    list_node_t msg_waiters;        /**< threads waiting for their message
+                                         to be delivered to this thread
+                                         (i.e. all blocked sends)       */
+    cib_t msg_queue;                /**< index of this [thread's message queue]
+                                         (thread_t::msg_array), if any  */
+    msg_t *msg_array;               /**< memory holding messages sent
+                                         to this thread's message queue */
 #endif
-
-#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
+    || defined(MODULE_MPU_STACK_GUARD) || defined(DOXYGEN)
     char *stack_start;              /**< thread's stack start address   */
 #endif
-#ifdef DEVELHELP
+#if defined(DEVELHELP) || defined(DOXYGEN)
     const char *name;               /**< thread's name                  */
     int stack_size;                 /**< thread's stack size            */
 #endif
@@ -439,9 +447,10 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
  */
 void thread_add_to_list(list_node_t *list, thread_t *thread);
 
-#ifdef DEVELHELP
 /**
  * @brief Returns the name of a process
+ *
+ * @note when compiling without DEVELHELP, this *always* returns NULL!
  *
  * @param[in] pid   the PID of the thread to get the name from
  *
@@ -450,6 +459,7 @@ void thread_add_to_list(list_node_t *list, thread_t *thread);
  */
 const char *thread_getname(kernel_pid_t pid);
 
+#ifdef DEVELHELP
 /**
  * @brief Measures the stack usage of a stack
  *
@@ -461,6 +471,26 @@ const char *thread_getname(kernel_pid_t pid);
  */
 uintptr_t thread_measure_stack_free(char *stack);
 #endif /* DEVELHELP */
+
+/**
+ * @brief   Get the number of bytes used on the ISR stack
+ */
+int thread_isr_stack_usage(void);
+
+/**
+ * @brief   Get the current ISR stack pointer
+ */
+void *thread_isr_stack_pointer(void);
+
+/**
+ * @brief   Get the start of the ISR stack
+ */
+void *thread_isr_stack_start(void);
+
+/**
+ * @brief Print the current stack to stdout
+ */
+void thread_stack_print(void);
 
 /**
  * @brief   Prints human readable, ps-like thread information for debugging purposes

@@ -34,19 +34,19 @@ __attribute__((naked)) void thread_yield_higher(void)
 }
 
 /* This function calculates the ISR_usage */
-int thread_arch_isr_stack_usage(void)
+int thread_isr_stack_usage(void)
 {
     /* TODO */
     return -1;
 }
 
-void *thread_arch_isr_stack_pointer(void)
+void *thread_isr_stack_pointer(void)
 {
     /* TODO */
     return (void *)-1;
 }
 
-void *thread_arch_isr_stack_start(void)
+void *thread_isr_stack_start(void)
 {
     /* TODO */
     return (void *)-1;
@@ -71,9 +71,9 @@ NORETURN void cpu_switch_context_exit(void)
  * thread_stack_init behavior. */
 __attribute__((section (".fini9"))) void __main_epilogue(void) { __asm__("ret"); }
 
-//----------------------------------------------------------------------------
-// Processor specific routine - here for MSP
-//----------------------------------------------------------------------------
+/* ------------------------------------------------------------------------- */
+/*  Processor specific routine - here for MSP */
+/* ------------------------------------------------------------------------- */
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
     unsigned short stk = (unsigned short)((uintptr_t) stack_start + stack_size);

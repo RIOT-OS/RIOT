@@ -128,6 +128,10 @@ bool RFCORE_ASSERT_failure(const char *expr, const char *func, int line)
 #if (DEVELHELP || ENABLE_DEBUG)
     DEBUG_PRINT("RFCORE_ASSERT(%s) failed at line %u in %s()!\n", expr, line, func);
     DEBUG_PRINT("  RFCORE_SFR_RFERRF = 0x%02x\n", (unsigned int)RFCORE_SFR_RFERRF);
+#else
+    (void)expr;
+    (void)func;
+    (void)line;
 #endif
 
     return false;

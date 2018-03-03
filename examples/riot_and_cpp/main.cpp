@@ -21,14 +21,9 @@
  * @author      DangNhat Pham-Huu <51002279@hcmut.edu.vn>
  */
 
-/*
- * all included headers defining c functions, i.e. all RIOT functions, must be marked as extern "C"
- */
-extern "C" {
 #include "thread.h"
 
 #include "c_functions.h"
-}
 
 #include <cstdio>
 #include <vector>

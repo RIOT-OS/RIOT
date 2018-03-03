@@ -127,6 +127,8 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
+    (void) channel;
+
     unsigned int timer_base;
     unsigned int timer_side = TIMER_A;
     unsigned long long scaledv;
@@ -169,6 +171,8 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
+    (void) channel;
+
     unsigned int timer_intbit = TIMER_TIMA_TIMEOUT;
     unsigned int timer_base;
 

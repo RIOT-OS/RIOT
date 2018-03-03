@@ -237,7 +237,7 @@ int pthread_join(pthread_t th, void **thread_return)
             other->joining_thread = sched_active_pid;
             /* go blocked, I'm waking up if other thread exits */
             thread_sleep();
-            /* no break */
+            /* falls through */
         case (PTS_ZOMBIE):
             if (thread_return) {
                 *thread_return = other->returnval;

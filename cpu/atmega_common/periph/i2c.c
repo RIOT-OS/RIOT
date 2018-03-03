@@ -51,7 +51,7 @@ static mutex_t lock = MUTEX_INIT;
 int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 {
     /* TWI Bit Rate Register - division factor for the bit rate generator */
-    uint8_t twibrr;
+    unsigned long twibrr;
     /* TWI Prescaler Bits - default 0 */
     uint8_t twipb = 0;
 
@@ -64,39 +64,41 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     switch (speed) {
 
         case I2C_SPEED_LOW:
-            if (CLOCK_CORECLOCK > 20000000U || CLOCK_CORECLOCK < 1000000U) {
+            if ((CLOCK_CORECLOCK > 20000000UL)
+                || (CLOCK_CORECLOCK < 1000000UL)) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK / 10000) - 16) / (2 * 4);  /* CLK Prescaler 4 */
+            twibrr = ((CLOCK_CORECLOCK / 10000UL) - 16) / (2 * 4);  /* CLK Prescaler 4 */
             twipb = 1;
             break;
 
         case I2C_SPEED_NORMAL:
-            if (CLOCK_CORECLOCK > 50000000U || CLOCK_CORECLOCK < 2000000U) {
+            if ((CLOCK_CORECLOCK > 50000000UL)
+                || (CLOCK_CORECLOCK < 2000000UL)) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK / 100000) - 16) / 2;
+            twibrr = ((CLOCK_CORECLOCK / 100000UL) - 16) / 2;
             break;
 
         case I2C_SPEED_FAST:
-            if (CLOCK_CORECLOCK < 7500000U) {
+            if (CLOCK_CORECLOCK < 7500000UL) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK / 400000) - 16) / 2;
+            twibrr = ((CLOCK_CORECLOCK / 400000UL) - 16) / 2;
             break;
 
         case I2C_SPEED_FAST_PLUS:
-            if (CLOCK_CORECLOCK < 18000000U) {
+            if (CLOCK_CORECLOCK < 18000000UL) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK / 1000000) - 16) / 2;
+            twibrr = ((CLOCK_CORECLOCK / 1000000UL) - 16) / 2;
             break;
 
         case I2C_SPEED_HIGH:
-            if (CLOCK_CORECLOCK < 62000000U) {
+            if (CLOCK_CORECLOCK < 62000000UL) {
                 return -2;
             }
-            twibrr = ((CLOCK_CORECLOCK / 3400000) - 16) / 2;
+            twibrr = ((CLOCK_CORECLOCK / 3400000UL) - 16) / 2;
             break;
 
         default:
@@ -112,9 +114,9 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     /* disable device */
     TWCR &= ~(1 << TWEN);
     /* configure I2C clock */
-    TWBR = twibrr;                // Set TWI Bit Rate Register
-    TWSR &= ~(0x03);              // Reset TWI Prescaler Bits
-    TWSR |= twipb;                // Set TWI Prescaler Bits
+    TWBR = (uint8_t)twibrr;     /* Set TWI Bit Rate Register */
+    TWSR &= ~(0x03);            /* Reset TWI Prescaler Bits */
+    TWSR |= twipb;              /* Set TWI Prescaler Bits */
     /* enable device */
     TWCR |= (1 << TWEN);
 
@@ -123,14 +125,18 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 
 int i2c_acquire(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
     mutex_lock(&lock);
     return 0;
 }
 
 int i2c_release(i2c_t dev)
 {
-    assert(dev < I2C_NUMOF);
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
     mutex_unlock(&lock);
     return 0;
 }
@@ -142,10 +148,13 @@ int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
 
 int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
+    assert(length > 0);
+
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
+
     uint8_t *my_data = data;
-
-    assert((dev < I2C_NUMOF) && (length > 0));
-
     /* send start condition and slave address */
     if (_start(address, I2C_FLAG_READ) != 0) {
         return 0;
@@ -180,7 +189,11 @@ int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
 
 int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
 {
-    assert((dev < I2C_NUMOF) && (length > 0));
+    assert(length > 0);
+
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
 
     /* start transmission and send slave address */
     if (_start(address, I2C_FLAG_WRITE) != 0) {
@@ -206,7 +219,11 @@ int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
 {
     int bytes = 0;
 
-    assert((dev < I2C_NUMOF) && (length > 0));
+    assert(length > 0);
+
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
 
     /* start transmission and send slave address */
     if (_start(address, I2C_FLAG_WRITE) != 0) {
@@ -231,7 +248,11 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
 {
     int bytes = 0;
 
-    assert((dev < I2C_NUMOF) && (length > 0));
+    assert(length > 0);
+
+    if (!(dev < I2C_NUMOF)) {
+        return -1;
+    }
 
     /* start transmission and send slave address */
     if (_start(address, I2C_FLAG_WRITE) != 0) {
@@ -251,12 +272,14 @@ int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, in
 void i2c_poweron(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
+    (void) dev;
     power_twi_enable();
 }
 
 void i2c_poweroff(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
+    (void) dev;
     power_twi_disable();
 }
 

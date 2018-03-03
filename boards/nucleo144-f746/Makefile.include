@@ -3,4 +3,4 @@ export CPU = stm32f7
 export CPU_MODEL = stm32f746zg
 
 # load the common Makefile.include for Nucleo boards
-include $(RIOTBOARD)/nucleo144-common/Makefile.include
+include $(RIOTBOARD)/common/nucleo144/Makefile.include

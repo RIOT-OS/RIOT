@@ -41,7 +41,7 @@
 #else
 #include <ucontext.h>
 #endif
-#endif // BSD/Linux
+#endif /* BSD/Linux */
 #include <netdb.h>
 #include <ifaddrs.h>
 #include <time.h>
@@ -94,6 +94,7 @@ extern void (*real_srandom)(unsigned int seed);
 extern int (*real_accept)(int socket, ...);
 /* The ... is a hack to save includes: */
 extern int (*real_bind)(int socket, ...);
+extern int (*real_connect)(int socket, ...);
 extern int (*real_chdir)(const char *path);
 extern int (*real_close)(int);
 extern int (*real_fcntl)(int, int, ...);
@@ -108,6 +109,7 @@ extern int (*real_fork)(void);
 extern int (*real_getaddrinfo)(const char *node, ...);
 extern int (*real_getifaddrs)(struct ifaddrs **ifap);
 extern int (*real_getpid)(void);
+extern int (*real_gettimeofday)(struct timeval *t, ...);
 extern int (*real_ioctl)(int fildes, int request, ...);
 extern int (*real_listen)(int socket, int backlog);
 extern int (*real_open)(const char *path, int oflag, ...);

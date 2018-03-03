@@ -1,4 +1,3 @@
-export GDBPREFIX  ?= $(PREFIX)
 export LLVMPREFIX ?= llvm-
 # Apple XCode doesn't prefix its tools with llvm-, but manually installed LLVM
 # on OSX might have the llvm- prefix, we can't simply test against uname -s.
@@ -10,12 +9,15 @@ endif
 export CC          = clang
 export CXX         = clang++
 export CCAS       ?= $(CC)
-export LINK        = $(CC)
 export AS          = $(LLVMPREFIX)as
 export AR          = $(LLVMPREFIX)ar
 export NM          = $(LLVMPREFIX)nm
-# There is no LLVM linker yet, use GNU binutils.
-#export LINKER      = $(LLVMPREFIX)ld
+# LLVM does have a linker, however, it is not entirely
+# compatible with GCC. For instance spec files as used in
+# `makefiles/libc/newlib.mk` are not supported. Therefore
+# we just use GCC for now.
+export LINK        = $(PREFIX)gcc
+export LINKXX      = $(PREFIX)g++
 # objcopy does not have a clear substitute in LLVM, use GNU binutils
 #export OBJCOPY     = $(LLVMPREFIX)objcopy
 export OBJCOPY    ?= $(shell command -v $(PREFIX)objcopy gobjcopy objcopy | head -n 1)
@@ -25,9 +27,10 @@ export OBJCOPY     = true
 endif
 export OBJDUMP     = $(LLVMPREFIX)objdump
 export SIZE        = $(LLVMPREFIX)size
-export DBG         = $(GDBPREFIX)gdb
 # LLVM lacks a binutils strip tool as well...
 #export STRIP      = $(LLVMPREFIX)strip
+# We use GDB for debugging for now, maybe LLDB will be supported in the future.
+include $(RIOTMAKE)/tools/gdb.inc.mk
 
 ifneq (,$(TARGET_ARCH))
   # Clang on Linux uses GCC's C++ headers and libstdc++ (installed with GCC)
@@ -52,7 +55,8 @@ ifneq (,$(TARGET_ARCH))
   # Tell clang to cross compile
   export CFLAGS     += -target $(TARGET_ARCH)
   export CXXFLAGS   += -target $(TARGET_ARCH)
-  export LINKFLAGS  += -target $(TARGET_ARCH)
+  # We currently don't use LLVM for linking (see comment above).
+  #export LINKFLAGS  += -target $(TARGET_ARCH)
 
   # Use the wildcard Makefile function to search for existing directories matching
   # the patterns above. We use the -isystem gcc/clang argument to add the include

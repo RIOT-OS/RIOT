@@ -19,6 +19,7 @@
 #ifndef TSL2561_PARAMS_H
 #define TSL2561_PARAMS_H
 
+#include "board.h"
 #include "saul_reg.h"
 #include "tsl2561.h"
 

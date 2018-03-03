@@ -1,4 +1,3 @@
-APPLICATION = driver_dsp0401
 include ../Makefile.tests_common
 
 USEMODULE += dsp0401

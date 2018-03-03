@@ -40,6 +40,9 @@ static msg_t ot_alarm_msg;
  */
 void otPlatAlarmStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 {
+    (void)aInstance;
+    (void)aT0;
+
     DEBUG("openthread: otPlatAlarmStartAt: aT0: %" PRIu32 ", aDT: %" PRIu32 "\n", aT0, aDt);
     ot_alarm_msg.type = OPENTHREAD_XTIMER_MSG_TYPE_EVENT;
 
@@ -55,6 +58,7 @@ void otPlatAlarmStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 /* OpenThread will call this to stop alarms */
 void otPlatAlarmStop(otInstance *aInstance)
 {
+    (void)aInstance;
     DEBUG("openthread: otPlatAlarmStop\n");
     xtimer_remove(&ot_timer);
 }

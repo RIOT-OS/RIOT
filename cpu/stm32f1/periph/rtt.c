@@ -23,9 +23,6 @@
 #include "periph/rtt.h"
 #include "periph_conf.h"
 
-/* guard file in case no RTT device was specified */
-#if RTT_NUMOF
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -198,5 +195,3 @@ void RTT_ISR(void)
     }
     cortexm_isr_end();
 }
-
-#endif /* RTT_NUMOF */

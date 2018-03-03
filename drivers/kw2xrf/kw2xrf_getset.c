@@ -346,7 +346,7 @@ uint8_t kw2xrf_get_cca_mode(kw2xrf_t *dev)
     return (tmp & MKW2XDM_PHY_CTRL4_CCATYPE_MASK) >> MKW2XDM_PHY_CTRL4_CCATYPE_SHIFT;
 }
 
-uint32_t kw2xrf_get_rssi(uint32_t value)
+int16_t kw2xrf_get_rssi(uint32_t value)
 {
     /* Get rssi (Received Signal Strength Indicator, unit is dBm)
      * from lqi (Link Quality Indicator) value.
@@ -361,7 +361,7 @@ uint32_t kw2xrf_get_rssi(uint32_t value)
      */
     uint32_t a = (uint32_t)(295.4 * 65536 / 2.84);
     uint32_t b = (uint32_t)(65536 / 2.84);
-    return (a - (b * value)) >> 16;
+    return ((b * value) - a) >> 16;
 }
 
 void kw2xrf_set_option(kw2xrf_t *dev, uint16_t option, bool state)

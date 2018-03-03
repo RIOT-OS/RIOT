@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = sntp
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo32-f031 \
@@ -14,10 +12,5 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_netdev_default
 USEMODULE += shell
 USEMODULE += shell_commands
-
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-CFLAGS += -DDEVELHELP
 
 include $(RIOTBASE)/Makefile.include

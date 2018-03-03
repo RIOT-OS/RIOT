@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "bitfield.h"
 #include "evtimer_msg.h"
 #include "kernel_types.h"
 #include "mutex.h"
@@ -31,9 +32,11 @@
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
 #endif
+#include "net/gnrc/ipv6/nib/ft.h"
 #include "net/gnrc/ipv6/nib/nc.h"
 #include "net/gnrc/ipv6/nib/conf.h"
 #include "net/gnrc/pktqueue.h"
+#include "net/gnrc/sixlowpan/ctx.h"
 #include "net/ndp.h"
 #include "random.h"
 
@@ -55,6 +58,15 @@ extern "C" {
 #define _DAD    (0x20)      /**< 6LoWPAN duplicate address detection table */
 #define _DST    (0x40)      /**< there is @ref _nib_offl_entry_t pointing
                                  to this @ref _nib_onl_entry_t */
+/** @} */
+
+/**
+ * @name    Off-link entry flags
+ * @anchor  net_gnrc_ipv6_nib_offl_flags
+ * @{
+ */
+#define _PFX_ON_LINK    (0x0001)
+#define _PFX_SLAAC      (0x0002)
 /** @} */
 
 /**
@@ -105,16 +117,34 @@ typedef struct _nib_onl_entry {
      * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ARSM != 0.
      */
     uint8_t l2addr[GNRC_IPV6_NIB_L2ADDR_MAX_LEN];
+#endif
     /**
-     * @brief Event for @ref GNRC_IPV6_NIB_REACH_TIMEOUT and
+     * @brief Event for @ref GNRC_IPV6_NIB_SND_UC_NS,
+     *        @ref GNRC_IPV6_NIB_SND_MC_NS, @ref GNRC_IPV6_NIB_REACH_TIMEOUT and
      *        @ref GNRC_IPV6_NIB_DELAY_TIMEOUT
      *
-     * @note    Events of these types can't be in the event queue at the same
-     *          time (since they only have one NUD state at a time). Because of
-     *          this we can use one event for both of them (but need the
-     *          different types, since the events are handled differently)
+     * @note    Four event types
+     *          1. To easier distinguish multicast probes in _evtimer_lookup for
+     *             rate-limiting from unicast probes.
+     *          2. Since the types can't be in the event queue at the same time
+     *             (since they only have one NUD state at a time and probing is
+     *             one of these states). Because of this we can use one event
+     *             for all of them (but need the different types, since the
+     *             events are handled differently).
+     * @note    This is also available with @ref GNRC_IPV6_NIB_CONF_ARSM == 0,
+     *          since 6Lo address registration uses it to time the sending of
+     *          neighbor solicitations.
      */
     evtimer_msg_event_t nud_timeout;
+    /**
+     * @brief Event for @ref GNRC_IPV6_NIB_SND_NA
+     */
+    evtimer_msg_event_t snd_na;
+#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
+    evtimer_msg_event_t reply_rs;           /**< Event for @ref GNRC_IPV6_NIB_REPLY_RS */
+#endif
+#if GNRC_IPV6_NIB_CONF_6LR || defined(DOXYGEN)
+    evtimer_msg_event_t addr_reg_timeout;   /**< Event for @ref GNRC_IPV6_NIB_ADDR_REG_TIMEOUT */
 #endif
 
     /**
@@ -154,7 +184,10 @@ typedef struct _nib_onl_entry {
  */
 typedef struct {
     _nib_onl_entry_t *next_hop; /**< next hop to destination */
-    uint16_t ltime;             /**< lifetime in seconds */
+    /**
+     * @brief   Event for @ref GNRC_IPV6_NIB_RTR_TIMEOUT
+     */
+    evtimer_msg_event_t rtr_timeout;
 } _nib_dr_entry_t;
 
 /**
@@ -163,55 +196,49 @@ typedef struct {
 typedef struct {
     _nib_onl_entry_t *next_hop; /**< next hop to destination */
     ipv6_addr_t pfx;            /**< prefix to the destination */
-    unsigned pfx_len;           /**< prefix-length in bits of
-                                 *   _nib_onl_entry_t::pfx */
+    /**
+     * @brief   Event for @ref GNRC_IPV6_NIB_PFX_TIMEOUT
+     */
+    evtimer_msg_event_t pfx_timeout;
+#ifdef GNRC_IPV6_NIB_CONF_ROUTER
+    /**
+     * @brief   Event for @ref GNRC_IPV6_NIB_ROUTE_TIMEOUT
+     */
+    evtimer_msg_event_t route_timeout;
+#endif
     uint8_t mode;               /**< [mode](@ref net_gnrc_ipv6_nib_mode) of the
                                  *   off-link entry */
+    uint8_t pfx_len;            /**< prefix-length in bits of
+                                 *   _nib_onl_entry_t::pfx */
+    uint16_t flags;             /**< [flags](@ref net_gnrc_ipv6_nib_offl_flags */
+    uint32_t valid_until;       /**< timestamp (in ms) until which the prefix
+                                     valid (UINT32_MAX means forever) */
+    uint32_t pref_until;        /**< timestamp (in ms) until which the prefix
+                                     preferred (UINT32_MAX means forever) */
 } _nib_offl_entry_t;
 
 /**
- * @brief   Interface specific information for Neighbor Discovery
+ * @brief   Internal NIB-representation of the authoritative border router
+ *          for multihop prefix and 6LoWPAN context dissemination
  */
 typedef struct {
-#if GNRC_IPV6_NIB_CONF_ARSM
+    ipv6_addr_t addr;               /**< The address of the border router */
+    uint32_t version;               /**< last received version of the info of
+                                     *   the _nib_abr_entry_t::addr */
+    uint32_t valid_until;           /**< timestamp (in minutes) until which
+                                     *   information is valid */
+    evtimer_msg_event_t timeout;    /**< timeout of the information */
     /**
-     * @brief   base for random reachable time calculation
+     * @brief   Bitfield marking the prefixes in the NIB's off-link entries
+     *          disseminated by _nib_abr_entry_t::addr
      */
-    uint32_t reach_time_base;
-    uint32_t reach_time;                /**< reachable time (in ms) */
-    uint32_t retrans_time;              /**< retransmission time (in ms) */
-#endif
-#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
+    BITFIELD(pfxs, GNRC_IPV6_NIB_OFFL_NUMOF);
     /**
-     * @brief   timestamp in milliseconds of last unsolicited router
-     *          advertisement
-     *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ROUTER.
+     * @brief   Bitfield marking the contexts disseminated by
+     *          _nib_abr_entry_t::addr
      */
-    uint32_t last_ra;
-#endif
-    kernel_pid_t pid;                   /**< identifier of the interface */
-#if GNRC_IPV6_NIB_CONF_ROUTER || defined(DOXYGEN)
-    /**
-     * @brief   number of unsolicited router advertisements sent
-     *
-     * This only counts up to the first @ref NDP_MAX_INIT_RA_NUMOF on interface
-     * initialization. The last @ref NDP_MAX_FIN_RA_NUMOF of an advertising
-     * interface are counted from UINT8_MAX - @ref NDP_MAX_FIN_RA_NUMOF + 1.
-     *
-     * @note    Only available if @ref GNRC_IPV6_NIB_CONF_ROUTER.
-     */
-    uint8_t ra_sent;
-#endif
-    /**
-     * @brief   number of unsolicited router solicitations scheduled
-     */
-    uint8_t rs_sent;
-    /**
-     * @brief   number of unsolicited neighbor advertisements scheduled
-     */
-    uint8_t na_sent;
-} _nib_iface_t;
+    BITFIELD(ctxs, GNRC_SIXLOWPAN_CTX_SIZE);
+} _nib_abr_entry_t;
 
 /**
  * @brief   Mutex for locking the NIB
@@ -222,6 +249,16 @@ extern mutex_t _nib_mutex;
  * @brief   Event timer for the NIB.
  */
 extern evtimer_msg_t _nib_evtimer;
+
+/**
+ * @brief   Primary default router.
+ *
+ * This value is returned by @ref @_nib_drl_get_dr() when it is not NULL and it
+ * is reachable. Otherwise it is selected with the [default router selection
+ * algoritm](https://tools.ietf.org/html/rfc4861#section-6.3.6) by that function.
+ * Exposed to be settable by @ref net_gnrc_ipv6_nib_ft.
+ */
+extern _nib_dr_entry_t *_prime_def_router;
 
 /**
  * @brief   Initializes NIB internally
@@ -297,7 +334,7 @@ _nib_onl_entry_t *_nib_onl_iter(const _nib_onl_entry_t *last);
  *
  * @pre     `(addr != NULL)`
  *
- * @param[in] addr  The address of a node. May not be NULL.
+ * @param[in] addr  The address of a node. Must not be NULL.
  * @param[in] iface The interface to the node. May be 0 for any interface.
  *
  * @return  The NIB entry for node with @p addr and @p iface on success.
@@ -358,7 +395,7 @@ void _nib_nc_set_reachable(_nib_onl_entry_t *node);
  *
  * @pre `addr != NULL`
  *
- * @param[in] addr      The address of a node. May not be NULL.
+ * @param[in] addr      The address of a node. Must not be NULL.
  *
  * @return  The NIB entry for the new DAD table entry on success.
  * @return  NULL, if there is no space left.
@@ -388,9 +425,9 @@ static inline void _nib_dad_remove(_nib_onl_entry_t *node)
 /**
  * @brief   Creates or gets an existing default router list entry by address
  *
- * @pre     `(router_addr != NULL)`
+ * @pre     `(addr != NULL)`
  *
- * @param[in] addr  An IPv6 address. May not be NULL.
+ * @param[in] addr  An IPv6 address. Must not be NULL.
  *                  *May also be a global address!*
  * @param[in] iface The interface to the router.
  *
@@ -398,7 +435,7 @@ static inline void _nib_dad_remove(_nib_onl_entry_t *node)
  *          of _nib_dr_entry_t::next_hop set to @p router_addr.
  * @return  NULL, if no space is left.
  */
-_nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface);
+_nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *addr, unsigned iface);
 
 /**
  * @brief   Removes a default router list entry
@@ -423,7 +460,7 @@ _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last);
  *
  * @pre     `(router_addr != NULL)`
  *
- * @param[in] router_addr   The address of a default router. May not be NULL.
+ * @param[in] router_addr   The address of a default router. Must not be NULL.
  * @param[in] iface         The interface to the node. May be 0 for any
  *                          interface.
  *
@@ -431,6 +468,17 @@ _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last);
  * @return  NULL, if there is no such entry.
  */
 _nib_dr_entry_t *_nib_drl_get(const ipv6_addr_t *router_addr, unsigned iface);
+
+/**
+ * @brief   Gets external forwarding table entry representation from default
+ *          router entry
+ *
+ * @pre `(drl != NULL) && (drl->next_hop != NULL) && (fte != NULL)`
+ *
+ * @param[in] drl   Default router entry.
+ * @param[out] fte  External representation of the forwarding table entry.
+ */
+void _nib_drl_ft_get(const _nib_dr_entry_t *drl, gnrc_ipv6_nib_ft_t *fte);
 
 /**
  * @brief   Gets *the* default router
@@ -451,7 +499,7 @@ _nib_dr_entry_t *_nib_drl_get_dr(void);
  *                      list). *May also be a global address!*
  * @param[in] iface     The interface to @p next_hop.
  * @param[in] pfx       The IPv6 prefix or address of the destination.
- *                      May not be NULL or unspecified address. Use
+ *                      Must not be NULL or unspecified address. Use
  *                      @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len   The length in bits of @p pfx in bits.
  *
@@ -479,6 +527,16 @@ void _nib_offl_clear(_nib_offl_entry_t *dst);
 _nib_offl_entry_t *_nib_offl_iter(const _nib_offl_entry_t *last);
 
 /**
+ * @brief   Checks if @p entry was allocated using _nib_offl_alloc()
+ *
+ * @param[in] entry An entry.
+ *
+ * @return  true, if @p entry was allocated using @ref _nib_offl_alloc()
+ * @return  false, if @p entry was not allocated using @ref _nib_offl_alloc()
+ */
+bool _nib_offl_is_entry(const _nib_offl_entry_t *entry);
+
+/**
  * @brief   Helper function for view-level add-functions below
  *
  * @pre     `(pfx != NULL) && (pfx != "::") && (pfx_len != 0) && (pfx_len <= 128)`
@@ -487,7 +545,7 @@ _nib_offl_entry_t *_nib_offl_iter(const _nib_offl_entry_t *last);
  *                      list). *May also be a global address!*
  * @param[in] iface     The interface to the destination.
  * @param[in] pfx       The IPv6 prefix or address of the destination.
- *                      May not be NULL or unspecified address. Use
+ *                      Must not be NULL or unspecified address. Use
  *                      @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len   The length in bits of @p pfx in bits.
  * @param[in] mode      [NIB-mode](_nib_onl_entry_t::mode).
@@ -527,7 +585,7 @@ static inline void _nib_offl_remove(_nib_offl_entry_t *nib_offl, uint8_t mode)
  * @pre     `(next_hop != NULL)`
  * @pre     `(dst != NULL)`
  *
- * @param[in] next_hop  Next hop to the destination. May not be NULL.
+ * @param[in] next_hop  Next hop to the destination. Must not be NULL.
  *                      *May also be a global address!*
  * @param[in] iface     The interface to the destination.
  *
@@ -565,23 +623,27 @@ static inline void _nib_dc_remove(_nib_offl_entry_t *nib_offl)
  *
  * @pre     `(next_hop != NULL)`
  * @pre     `(pfx != NULL) && (pfx != "::") && (pfx_len != 0) && (pfx_len <= 128)`
+ * @pre     `(pref_ltime <= valid_ltime)`
  *
- * @param[in] iface     The interface to the prefix is added to.
- * @param[in] pfx       The IPv6 prefix or address of the destination.
- *                      May not be NULL or unspecified address. Use
- *                      @ref _nib_drl_add() for default route destinations.
- * @param[in] pfx_len   The length in bits of @p pfx in bits.
+ * @param[in] iface         The interface to the prefix is added to.
+ * @param[in] pfx           The IPv6 prefix or address of the destination.
+ *                          Must not be NULL or unspecified address. Use
+ *                          @ref _nib_drl_add() for default route destinations.
+ * @param[in] pfx_len       The length in bits of @p pfx in bits.
+ * @param[in] valid_ltime   Valid lifetime in microseconds. `UINT32_MAX` for
+ *                          infinite.
+ * @param[in] pref_ltime    Preferred lifetime in microseconds. `UINT32_MAX` for
+ *                          infinite.
  *
  * @return  A new or existing off-link entry with _nib_offl_entry_t::pfx set to
  *          @p pfx.
  * @return  NULL, if no space is left.
  */
-static inline _nib_offl_entry_t *_nib_pl_add(unsigned iface,
-                                             const ipv6_addr_t *pfx,
-                                             unsigned pfx_len)
-{
-    return _nib_offl_add(NULL, iface, pfx, pfx_len, _PL);
-}
+_nib_offl_entry_t *_nib_pl_add(unsigned iface,
+                               const ipv6_addr_t *pfx,
+                               unsigned pfx_len,
+                               uint32_t valid_ltime,
+                               uint32_t pref_ltime);
 
 /**
  * @brief   Removes a prefix list entry
@@ -590,10 +652,7 @@ static inline _nib_offl_entry_t *_nib_pl_add(unsigned iface,
  *
  * Corresponding on-link entry is removed, too.
  */
-static inline void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
-{
-    _nib_offl_remove(nib_offl, _PL);
-}
+void _nib_pl_remove(_nib_offl_entry_t *nib_offl);
 
 #if GNRC_IPV6_NIB_CONF_ROUTER || DOXYGEN
 /**
@@ -602,11 +661,11 @@ static inline void _nib_pl_remove(_nib_offl_entry_t *nib_offl)
  * @pre     `(next_hop != NULL)`
  * @pre     `(pfx != NULL) && (pfx != "::") && (pfx_len != 0) && (pfx_len <= 128)`
  *
- * @param[in] next_hop  Next hop to the destination. May not be NULL.
+ * @param[in] next_hop  Next hop to the destination. Must not be NULL.
  *                      *May also be a global address!*
  * @param[in] iface     The interface to the destination.
  * @param[in] pfx       The IPv6 prefix or address of the destination.
- *                      May not be NULL or unspecified address. Use
+ *                      Must not be NULL or unspecified address. Use
  *                      @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len   The length in bits of @p pfx in bits.
  *
@@ -639,18 +698,92 @@ static inline void _nib_ft_remove(_nib_offl_entry_t *nib_offl)
 }
 #endif  /* GNRC_IPV6_NIB_CONF_ROUTER */
 
+#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C || defined(DOXYGEN)
 /**
- * @brief   Gets (or creates if it not exists) interface information for
- *          neighbor discovery
+ * @brief   Creates or gets an existing authoritative border router.
  *
- * @pre `(iface <= _NIB_IF_MAX)`
+ * @pre `addr != NULL`
  *
- * @param[in] iface Interface identifier to get information for.
+ * @param[in] addr  Address of the authoritative border router.
  *
- * @return  Interface information on @p iface.
- * @return  NULL, if no space left for interface.
+ * @return  An authoritative border router entry, on success.
+ * @return  NULL, if no space is left.
  */
-_nib_iface_t *_nib_iface_get(unsigned iface);
+_nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr);
+
+/**
+ * @brief   Removes an authoritative border router
+ *
+ * @pre `addr != NULL`
+ *
+ * @param[in] addr  Address of the authoritative border router.
+ */
+void _nib_abr_remove(const ipv6_addr_t *addr);
+
+/**
+ * @brief   Adds a prefix to the managed prefix of the authoritative border
+ *          router
+ *
+ * @pre `(abr != NULL) && (offl != NULL) && (offl->mode & _PL)`
+ *
+ * @param[in] abr   The border router.
+ * @param[in] offl  The prefix to add.
+ */
+void _nib_abr_add_pfx(_nib_abr_entry_t *abr, const _nib_offl_entry_t *offl);
+
+/**
+ * @brief   Iterates over an authoritative border router's prefixes
+ *
+ * @pre `(abr != NULL)`
+ *
+ * @param[in] abr   The border router
+ * @param[in] last  Last prefix (NULL to start)
+ *
+ * @return  entry after @p last.
+ * @return  NULL, if @p last is the last prefix of @p abr or if @p last
+ *          wasn't in NIB (and != NULL).
+ */
+_nib_offl_entry_t *_nib_abr_iter_pfx(const _nib_abr_entry_t *abr,
+                                     const _nib_offl_entry_t *last);
+
+/**
+ * @brief   Iterates over authoritative border router entries
+ *
+ * @param[in] last  Last entry (NULL to start).
+ *
+ * @return  entry after @p last.
+ * @return  NULL, if @p last is the last ABR in the NIB.
+ */
+_nib_abr_entry_t *_nib_abr_iter(const _nib_abr_entry_t *last);
+#endif
+
+/**
+ * @brief   Gets external forwarding table entry representation from off-link
+ *          entry
+ *
+ * @pre `(dst != NULL) && (dst->next_hop != NULL) && (fte != NULL)`
+ *
+ * @param[in] dst   Off-link entry.
+ * @param[out] fte  External representation of the forwarding table entry.
+ */
+void _nib_ft_get(const _nib_offl_entry_t *dst, gnrc_ipv6_nib_ft_t *fte);
+
+/**
+ * @brief   Gets best match to @p dst from all off-link entries and default
+ *          route.
+ *
+ * @pre `(dst != NULL) && (fte != NULL)`
+ *
+ * @param[in] dst   Destination address to get the off-link entry for.
+ * @param[in] pkt   Packet causing the route look-up (provided to allow reactive
+ *                  routing protocols to queue it if needed). May be NULL.
+ * @param[out] fte  Resulting forwarding table entry.
+ *
+ * @return  0, on success.
+ * @return  -ENETUNREACH, when no route was found.
+ */
+int _nib_get_route(const ipv6_addr_t *dst, gnrc_pktsnip_t *ctx,
+                   gnrc_ipv6_nib_ft_t *entry);
 
 /**
  * @brief   Looks up if an event is queued in the event timer

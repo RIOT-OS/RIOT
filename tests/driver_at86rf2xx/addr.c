@@ -20,7 +20,7 @@
 
 void print_addr(uint8_t *addr, size_t addr_len)
 {
-    for (int i = 0; i < addr_len; i++) {
+    for (size_t i = 0; i < addr_len; i++) {
         if (i != 0) {
             printf(":");
         }

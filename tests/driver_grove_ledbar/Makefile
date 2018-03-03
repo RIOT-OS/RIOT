@@ -1,4 +1,3 @@
-APPLICATION = driver_grove_ledbar
 include ../Makefile.tests_common
 
 USEMODULE += grove_ledbar

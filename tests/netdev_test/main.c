@@ -22,7 +22,7 @@
 #include "msg.h"
 #include "net/ethernet.h"
 #include "net/gnrc.h"
-#include "net/gnrc/netdev/eth.h"
+#include "net/gnrc/netif/ethernet.h"
 #include "net/netdev_test.h"
 #include "od.h"
 #include "thread.h"
@@ -53,7 +53,6 @@ static const uint8_t _test_dst[] = { 0xf5, 0x19, 0x9a, 0x1d, 0xd8, 0x8f };
 static const uint8_t _test_src[] = { 0x41, 0x9b, 0x9f, 0x56, 0x36, 0x46 };
 
 static char _mac_stack[_MAC_STACKSIZE];
-static gnrc_netdev_t _gnrc_dev;
 static netdev_test_t _dev;
 static msg_t _main_msg_queue[_MAIN_MSG_QUEUE_SIZE];
 static uint8_t _tmp[_EXP_LENGTH];
@@ -197,15 +196,12 @@ static int test_receive(void)
         puts("=================");
         puts("expected");
         puts("=================");
-        puts(gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                    _test_src,
-                                    ETHERNET_ADDR_LEN));
+        puts(gnrc_netif_addr_to_str(_test_src, ETHERNET_ADDR_LEN, addr_str));
         puts("=================");
         puts("received source");
         puts("=================");
-        puts(gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                    gnrc_netif_hdr_get_src_addr(hdr->data),
-                                    ETHERNET_ADDR_LEN));
+        puts(gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(hdr->data),
+                                    ETHERNET_ADDR_LEN, addr_str));
         return 0;
     }
     if (memcmp(gnrc_netif_hdr_get_dst_addr(hdr->data), _dev_addr,
@@ -215,15 +211,12 @@ static int test_receive(void)
         puts("=================");
         puts("expected");
         puts("=================");
-        puts(gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                    _dev_addr,
-                                    ETHERNET_ADDR_LEN));
+        puts(gnrc_netif_addr_to_str(_dev_addr, ETHERNET_ADDR_LEN, addr_str));
         puts("====================");
         puts("received destination");
         puts("====================");
-        puts(gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                    gnrc_netif_hdr_get_dst_addr(hdr->data),
-                                    ETHERNET_ADDR_LEN));
+        puts(gnrc_netif_addr_to_str(gnrc_netif_hdr_get_dst_addr(hdr->data),
+                                    ETHERNET_ADDR_LEN, addr_str));
         return 0;
     }
 
@@ -265,13 +258,8 @@ int main(void)
     netdev_test_set_send_cb(&_dev, _dev_send);
     netdev_test_set_get_cb(&_dev, NETOPT_ADDRESS, _dev_get_addr);
     netdev_test_set_set_cb(&_dev, NETOPT_ADDRESS, _dev_set_addr);
-    gnrc_netdev_eth_init(&_gnrc_dev, (netdev_t *)(&_dev));
-    _mac_pid = gnrc_netdev_init(_mac_stack, _MAC_STACKSIZE, _MAC_PRIO,
-                                "gnrc_netdev_eth_test", &_gnrc_dev);
-    if (_mac_pid <= KERNEL_PID_UNDEF) {
-        puts("Could not start MAC thread\n");
-        return 1;
-    }
+    _mac_pid = gnrc_netif_ethernet_create(_mac_stack, _MAC_STACKSIZE, _MAC_PRIO,
+                                          "netdev_test", (netdev_t *)&_dev)->pid;
 
     /* test execution */
     EXECUTE(test_get_addr);

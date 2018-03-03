@@ -34,7 +34,14 @@ get_apps() {
 # Only print for boards in $BOARDS.
 get_supported_boards() {
     local appdir=$1
-    for board in $(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null )
+    local boards="$(make --no-print-directory -C$appdir info-boards-supported 2>/dev/null || echo broken)"
+
+    if [ "$boards" = broken ]; then
+        echo "makefile_broken"
+        return
+    fi
+
+    for board in $boards
     do
         echo $board
     done | $(_greplist $BOARDS)
@@ -58,18 +65,26 @@ get_compile_jobs() {
         | xargs '-d\n' -n 1 echo $0 compile
 }
 
+print_worker() {
+    [ -n "$DWQ_WORKER" ] && \
+        echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
+}
+
 # compile one app for one board. delete intermediates.
 compile() {
     local appdir=$1
     local board=$2
 
+    [ "$board" = "makefile_broken" ] && error "$0: Makefile in \"$appdir\" seems to be broken!"
+
     # set build directory. CI ensures only one build at a time in $(pwd).
-    rm -rf build
     export BINDIR="$(pwd)/build"
     export PKGDIRBASE="${BINDIR}/pkg"
 
-    [ -n "$DWQ_WORKER" ] && \
-        echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
+    # Pre-build cleanup
+    rm -rf ${BINDIR}
+
+    print_worker
 
     # sanity checks
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board)"
@@ -87,10 +102,13 @@ compile() {
         fi
     fi
 
-    echo "-- build directory size: $(du -sh ${BINDIR} | cut -f1)"
+    if [ -d ${BINDIR} ]
+    then
+        echo "-- build directory size: $(du -sh ${BINDIR} | cut -f1)"
 
-    # cleanup
-    rm -Rf build
+        # cleanup
+        rm -rf ${BINDIR}
+    fi
 
     return $RES
 }
@@ -99,6 +117,8 @@ compile() {
 static_tests() {
     local repo=${CI_BASE_REPO:-https://github.com/RIOT-OS/RIOT}
     local branch=${CI_BASE_BRANCH:-master}
+
+    print_worker
 
     OUT="$(git remote add upstream $repo 2>&1 && git fetch upstream ${branch}:${branch} 2>&1)"
     RES=$?

@@ -61,15 +61,45 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
 
 /**
+ * @brief   Available ports on the SAMD21 & SAML21
+ */
+enum {
+    PA = 0,                 /**< port A */
+    PB = 1,                 /**< port B */
+    PC = 2,                 /**< port C */
+};
+
+/**
+ * @brief   Generate GPIO mode bitfields
+ *
+ * We use 3 bit to determine the pin functions:
+ * - bit 0: PD(0) or PU(1)
+ * - bit 1: input enable
+ * - bit 2: pull enable
+ */
+#define GPIO_MODE(pr, ie, pe)   (pr | (ie << 1) | (pe << 2))
+
+/**
  * @name    Power mode configuration
  * @{
  */
 #define PM_NUM_MODES        (3)
-/** @todo   we block all modes per default, until PM is cleanly implemented */
-#define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
 /** @} */
 
 #ifndef DOXYGEN
+/**
+ * @brief   Override GPIO modes
+ */
+#define HAVE_GPIO_MODE_T
+typedef enum {
+    GPIO_IN    = GPIO_MODE(0, 1, 0),    /**< IN */
+    GPIO_IN_PD = GPIO_MODE(0, 1, 1),    /**< IN with pull-down */
+    GPIO_IN_PU = GPIO_MODE(1, 1, 1),    /**< IN with pull-up */
+    GPIO_OUT   = GPIO_MODE(0, 0, 0),    /**< OUT (push-pull) */
+    GPIO_OD    = 0xfe,                  /**< not supported by HW */
+    GPIO_OD_PU = 0xff                   /**< not supported by HW */
+} gpio_mode_t;
+
 /**
  * @brief   Override active flank configuration values
  * @{

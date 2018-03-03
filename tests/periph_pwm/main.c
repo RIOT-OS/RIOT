@@ -48,27 +48,27 @@ int main(void)
     puts("Connect an LED or scope to PWM pins to see something\n");
 
     printf("Available PWM devices: %i\n", PWM_NUMOF);
-    for (int i = 0; i < PWM_NUMOF; i++) {
+    for (unsigned i = 0; i < PWM_NUMOF; i++) {
         uint32_t real_f = pwm_init(PWM_DEV(i), MODE, FREQU, STEPS);
         if (real_f == 0) {
-            printf("Error initializing PWM_%i\n", i);
+            printf("Error initializing PWM_%u\n", i);
             return 1;
         }
         else {
-            printf("Initialized PWM_%i @ %" PRIu32 "Hz\n", i, real_f);
+            printf("Initialized PWM_%u @ %" PRIu32 "Hz\n", i, real_f);
         }
     }
 
     puts("\nLetting the PWM pins oscillate now...");
     while (1) {
-        for (int i = 0; i < PWM_NUMOF; i++) {
+        for (unsigned i = 0; i < PWM_NUMOF; i++) {
             for (uint8_t chan = 0; chan < pwm_channels(PWM_DEV(i)); chan++) {
                 pwm_set(PWM_DEV(i), chan, state);
             }
         }
 
         state += step;
-        if (state <= 0 || state >= STEPS) {
+        if (state <= 0 || state >= (int)STEPS) {
             step = -step;
         }
 

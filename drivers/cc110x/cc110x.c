@@ -96,7 +96,7 @@ uint8_t cc110x_set_address(cc110x_t *dev, uint8_t address)
 {
     DEBUG("%s:%s:%u setting address %u\n", RIOT_FILE_RELATIVE, __func__,
             __LINE__, (unsigned)address);
-    if (!(address < MIN_UID) || (address > MAX_UID)) {
+    if (!(address < MIN_UID)) {
         if (dev->radio_state != RADIO_UNKNOWN) {
             cc110x_write_register(dev, CC110X_ADDR, address);
             dev->radio_address = address;

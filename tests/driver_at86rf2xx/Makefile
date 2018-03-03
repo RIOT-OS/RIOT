@@ -1,4 +1,3 @@
-APPLICATION = driver_at86rf2xx
 include ../Makefile.tests_common
 
 # exclude boards with insufficient memory
@@ -29,7 +28,5 @@ DRIVER ?= at86rf231
 
 # include the selected driver
 USEMODULE += $(DRIVER)
-
-CFLAGS += -DDEVELHELP
 
 include $(RIOTBASE)/Makefile.include

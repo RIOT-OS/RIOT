@@ -22,9 +22,6 @@
 #include "periph/rtc.h"
 #include "periph_conf.h"
 
-/* guard file in case no RTC device was specified */
-#if RTC_NUMOF
-
 typedef struct {
     rtc_alarm_cb_t cb;        /**< callback called from RTC interrupt */
     void *arg;                /**< argument passed to the callback */
@@ -234,5 +231,3 @@ void isr_rtc(void)
     }
     cortexm_isr_end();
 }
-
-#endif /* RTC_NUMOF */

@@ -64,6 +64,3 @@ export LINKFLAGS += $(MIPS_HAL_LDFLAGS)
 export LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
 export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT)
 export LINKFLAGS += -Wl,--gc-sections
-
-# This CPU implementation is using the new core/CPU interface:
-export CFLAGS += -DCOREIF_NG=1

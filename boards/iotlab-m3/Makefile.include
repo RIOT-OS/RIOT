@@ -1,6 +1,6 @@
-USEMODULE += iotlab-common
+USEMODULE += boards_common_iotlab
 
-include $(RIOTBOARD)/iotlab-common/Makefile.include
+include $(RIOTBOARD)/common/iotlab/Makefile.include
 
 # add iotlab-m3 include path
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

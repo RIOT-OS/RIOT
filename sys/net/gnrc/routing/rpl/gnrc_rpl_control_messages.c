@@ -20,6 +20,7 @@
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc.h"
 #include "net/eui64.h"
 
@@ -41,9 +42,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 #define GNRC_RPL_GROUNDED_SHIFT             (7)
 #define GNRC_RPL_MOP_SHIFT                  (3)
@@ -53,32 +52,53 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define GNRC_RPL_PRF_MASK                   (0x7)
 #define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT    (1 << 6)
 
+static gnrc_netif_t *_find_interface_with_rpl_mcast(void)
+{
+    gnrc_netif_t *netif = NULL;
+
+    while ((netif = gnrc_netif_iter(netif))) {
+        for (unsigned i = 0; i < GNRC_NETIF_IPV6_GROUPS_NUMOF; i++) {
+            if (ipv6_addr_equal(&netif->ipv6.groups[i], &ipv6_addr_all_rpl_nodes)) {
+                return netif;
+            }
+        }
+    }
+    return NULL;
+}
+
 void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ipv6_addr_t *dst,
                    ipv6_addr_t *dodag_id)
 {
+    gnrc_netif_t *netif;
+
     (void)dodag_id;
     gnrc_pktsnip_t *hdr;
     if (iface == KERNEL_PID_UNDEF) {
-        if ((iface = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes))
-            == KERNEL_PID_UNDEF) {
+        netif = _find_interface_with_rpl_mcast();
+
+        if (netif == NULL) {
             DEBUG("RPL: no suitable interface found for this destination address\n");
             gnrc_pktbuf_release(pkt);
             return;
         }
+        iface = netif->pid;
+    }
+    else {
+        netif = gnrc_netif_get_by_pid(iface);
+    }
+
+    if (dst == NULL) {
+        dst = (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes;
     }
 
     if (src == NULL) {
-        src = gnrc_ipv6_netif_match_prefix(iface, &ipv6_addr_link_local_prefix);
+        src = gnrc_netif_ipv6_addr_best_src(netif, dst, true);
 
         if (src == NULL) {
             DEBUG("RPL: no suitable src address found\n");
             gnrc_pktbuf_release(pkt);
             return;
         }
-    }
-
-    if (dst == NULL) {
-        dst = (ipv6_addr_t *) &ipv6_addr_all_rpl_nodes;
     }
 
     hdr = gnrc_ipv6_hdr_build(pkt, src, dst);
@@ -128,10 +148,25 @@ gnrc_pktsnip_t *_dio_dodag_conf_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *dod
 }
 
 #ifndef GNRC_RPL_WITHOUT_PIO
+static bool _get_pl_entry(unsigned iface, ipv6_addr_t *pfx,
+                          unsigned pfx_len, gnrc_ipv6_nib_pl_t *ple)
+{
+    void *state = NULL;
+
+    while (gnrc_ipv6_nib_pl_iter(iface, &state, ple)) {
+        if (ipv6_addr_match_prefix(&ple->pfx, pfx) >= pfx_len) {
+            return true;
+        }
+    }
+    return false;
+}
+
 gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *dodag)
 {
+    gnrc_ipv6_nib_pl_t ple;
     gnrc_rpl_opt_prefix_info_t *prefix_info;
     gnrc_pktsnip_t *opt_snip;
+
     if ((opt_snip = gnrc_pktbuf_add(pkt, NULL, sizeof(gnrc_rpl_opt_prefix_info_t),
                                     GNRC_NETTYPE_UNDEF)) == NULL) {
         DEBUG("RPL: BUILD PREFIX INFO - no space left in packet buffer\n");
@@ -143,13 +178,28 @@ gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *do
     prefix_info->length = GNRC_RPL_OPT_PREFIX_INFO_LEN;
     /* auto-address configuration */
     prefix_info->LAR_flags = GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT;
-    prefix_info->valid_lifetime = dodag->netif_addr->valid;
-    prefix_info->pref_lifetime = dodag->netif_addr->preferred;
-    prefix_info->prefix_len = dodag->netif_addr->prefix_len;
+    prefix_info->prefix_len = 64;
+    if (_get_pl_entry(dodag->iface, &dodag->dodag_id, prefix_info->prefix_len,
+                      &ple)) {
+        uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+        uint32_t valid_ltime = (ple.valid_until < UINT32_MAX) ?
+                               (ple.valid_until - now) / MS_PER_SEC : UINT32_MAX;
+        uint32_t pref_ltime = (ple.pref_until < UINT32_MAX) ?
+                              (ple.pref_until - now) / MS_PER_SEC : UINT32_MAX;
+
+        prefix_info->valid_lifetime = byteorder_htonl(valid_ltime);
+        prefix_info->pref_lifetime = byteorder_htonl(pref_ltime);
+    }
+    else {
+        DEBUG("RPL: Prefix of DODAG-ID not in prefix list\n");
+        gnrc_pktbuf_release(pkt);
+        return NULL;
+    }
     prefix_info->reserved = 0;
 
     memset(&prefix_info->prefix, 0, sizeof(prefix_info->prefix));
-    ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id, dodag->netif_addr->prefix_len);
+    ipv6_addr_init_prefix(&prefix_info->prefix, &dodag->dodag_id,
+                          prefix_info->prefix_len);
     return opt_snip;
 }
 #endif
@@ -306,6 +356,21 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
     }
 }
 
+static inline uint32_t _sec_to_ms(uint32_t sec)
+{
+    if (sec == UINT32_MAX) {
+        /* infinite stays infinite */
+        return UINT32_MAX;
+    }
+    else if (sec > ((UINT32_MAX - 1) / MS_PER_SEC)) {
+        /* truncate long intervals to largest possible value */
+        return UINT32_MAX - 1;
+    }
+    else {
+        return sec * MS_PER_SEC;
+    }
+}
+
 /** @todo allow target prefixes in target options to be of variable length */
 bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt, uint16_t len,
                     ipv6_addr_t *src, uint32_t *included_opts)
@@ -315,7 +380,6 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
     gnrc_rpl_dodag_t *dodag = &inst->dodag;
     eui64_t iid;
     *included_opts = 0;
-    ipv6_addr_t *me;
 
 #ifndef GNRC_RPL_WITHOUT_VALIDATION
     if (!gnrc_rpl_validation_options(msg_type, inst, opt, len)) {
@@ -372,15 +436,21 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
 #endif
                 gnrc_rpl_opt_prefix_info_t *pi = (gnrc_rpl_opt_prefix_info_t *) opt;
                 /* check for the auto address-configuration flag */
-                if ((gnrc_netapi_get(dodag->iface, NETOPT_IPV6_IID, 0, &iid, sizeof(eui64_t)) < 0)
-                     && !(pi->LAR_flags & GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
+                gnrc_netif_t *netif = gnrc_netif_get_by_pid(dodag->iface);
+
+                assert(netif != NULL);
+                if ((gnrc_netif_ipv6_get_iid(netif, &iid) < 0)
+                    && !(pi->LAR_flags & GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
                     break;
                 }
                 ipv6_addr_set_aiid(&pi->prefix, iid.uint8);
-                me = gnrc_ipv6_netif_add_addr(dodag->iface, &pi->prefix, pi->prefix_len, 0);
-                if (me) {
-                    dodag->netif_addr = gnrc_ipv6_netif_addr_get(me);
-                }
+                /* TODO: find a way to do this with DAD (i.e. state != VALID) */
+                gnrc_netif_ipv6_addr_add_internal(netif, &pi->prefix, pi->prefix_len,
+                                                  GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
+                /* set lifetimes */
+                gnrc_ipv6_nib_pl_set(netif->pid, &pi->prefix, pi->prefix_len,
+                                     _sec_to_ms(byteorder_ntohl(pi->valid_lifetime)),
+                                     _sec_to_ms(byteorder_ntohl(pi->pref_lifetime)));
 
                 break;
 
@@ -393,22 +463,13 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                     first_target = target;
                 }
 
-                uint32_t fib_dst_flags = 0;
+                DEBUG("RPL: adding FT entry %s/%d\n",
+                      ipv6_addr_to_str(addr_str, &(target->target), (unsigned)sizeof(addr_str)),
+                      target->prefix_length);
 
-                if (target->prefix_length <= IPV6_ADDR_BIT_LEN) {
-                    fib_dst_flags = ((uint32_t)(target->prefix_length) << FIB_FLAG_NET_PREFIX_SHIFT);
-                }
-
-                DEBUG("RPL: adding fib entry %s/%d 0x%" PRIx32 "\n",
-                      ipv6_addr_to_str(addr_str, &(target->target), sizeof(addr_str)),
-                      target->prefix_length,
-                      fib_dst_flags);
-
-                fib_add_entry(&gnrc_ipv6_fib_table, dodag->iface, target->target.u8,
-                              sizeof(ipv6_addr_t), fib_dst_flags, src->u8,
-                              sizeof(ipv6_addr_t), FIB_FLAG_RPL_ROUTE,
-                              (dodag->default_lifetime * dodag->lifetime_unit) *
-                              MS_PER_SEC);
+                gnrc_ipv6_nib_ft_add(&(target->target), target->prefix_length, src,
+                                     dodag->iface,
+                                     dodag->default_lifetime * dodag->lifetime_unit);
                 break;
 
             case (GNRC_RPL_OPT_TRANSIT):
@@ -422,18 +483,15 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 }
 
                 do {
-                    DEBUG("RPL: updating fib entry %s/%d\n",
+                    DEBUG("RPL: updating FT entry %s/%d\n",
                           ipv6_addr_to_str(addr_str, &(first_target->target), sizeof(addr_str)),
                           first_target->prefix_length);
 
-                    fib_update_entry(&gnrc_ipv6_fib_table,
-                                     first_target->target.u8,
-                                     sizeof(ipv6_addr_t), src->u8,
-                                     sizeof(ipv6_addr_t),
-                                     ((transit->e_flags & GNRC_RPL_OPT_TRANSIT_E_FLAG) ?
-                                      0x0 : FIB_FLAG_RPL_ROUTE),
-                                     (transit->path_lifetime *
-                                      dodag->lifetime_unit * MS_PER_SEC));
+                    gnrc_ipv6_nib_ft_add(&(first_target->target),
+                                         first_target->prefix_length, src,
+                                         dodag->iface,
+                                         transit->path_lifetime * dodag->lifetime_unit);
+
                     first_target = (gnrc_rpl_opt_target_t *) (((uint8_t *) (first_target)) +
                                    sizeof(gnrc_rpl_opt_t) + first_target->length);
                 }
@@ -475,6 +533,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
 
     if (gnrc_rpl_instance_add(dio->instance_id, &inst)) {
         /* new instance and DODAG */
+        gnrc_netif_t *netif;
 
         if (byteorder_ntohs(dio->rank) == GNRC_RPL_INFINITE_RANK) {
             DEBUG("RPL: ignore INFINITE_RANK DIO when we are not yet part of this DODAG\n");
@@ -486,11 +545,14 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
         inst->of = gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
 
         if (iface == KERNEL_PID_UNDEF) {
-            iface = gnrc_ipv6_netif_find_by_addr(NULL, &ipv6_addr_all_rpl_nodes);
-            assert(iface != KERNEL_PID_UNDEF);
+            netif = _find_interface_with_rpl_mcast();
         }
+        else {
+            netif = gnrc_netif_get_by_pid(iface);
+        }
+        assert(netif != NULL);
 
-        gnrc_rpl_dodag_init(inst, &dio->dodag_id, iface, NULL);
+        gnrc_rpl_dodag_init(inst, &dio->dodag_id, netif->pid);
 
         dodag = &inst->dodag;
 
@@ -531,23 +593,14 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
 #endif
         }
 
-        /* if there was no netif_addr created manually or by a PIO, then leave this DODAG */
-        if (!dodag->netif_addr) {
-            ipv6_addr_t *configured_addr;
-
-            if (!(configured_addr = gnrc_ipv6_netif_match_prefix(dodag->iface, &dodag->dodag_id))) {
-                DEBUG("RPL: no IPv6 address configured to match the given dodag id: %s\n",
-                      ipv6_addr_to_str(addr_str, &(dodag->dodag_id), sizeof(addr_str)));
-                gnrc_rpl_instance_remove(inst);
-                return;
-            }
-
-            if (!(dodag->netif_addr = gnrc_ipv6_netif_addr_get(configured_addr))) {
-                DEBUG("RPL: no netif address found for %s\n",
-                       ipv6_addr_to_str(addr_str, configured_addr, sizeof(addr_str)));
-                gnrc_rpl_instance_remove(inst);
-                return;
-            }
+        /* if there was no address created manually or by a PIO on the interface,
+         * leave this DODAG */
+        if (gnrc_netif_ipv6_addr_match(netif, &dodag->dodag_id) < 0) {
+            DEBUG("RPL: no IPv6 address configured on interface %i to match the "
+                  "given dodag id: %s\n", netif->pid,
+                  ipv6_addr_to_str(addr_str, &(dodag->dodag_id), sizeof(addr_str)));
+            gnrc_rpl_instance_remove(inst);
+            return;
         }
 
         gnrc_rpl_delay_dao(dodag);
@@ -618,7 +671,6 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
         DEBUG("RPL: Could not allocate new parent.\n");
         return;
     }
-    /* cppcheck-suppress nullPointer */
     else if (parent != NULL) {
         trickle_increment_counter(&dodag->trickle);
     }
@@ -727,72 +779,42 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
         destination = &(dodag->parents->addr);
     }
 
-    gnrc_pktsnip_t *pkt = NULL, **ptr = NULL,  *tmp = NULL, *tr_int = NULL;
+    gnrc_pktsnip_t *pkt = NULL, *tmp = NULL;
     gnrc_rpl_dao_t *dao;
-    bool ext_processed = false, int_processed = false;
 
     /* find my address */
     ipv6_addr_t *me = NULL;
-    gnrc_ipv6_netif_find_by_prefix(&me, &dodag->dodag_id);
-    if (me == NULL) {
+    gnrc_netif_t *netif = gnrc_netif_get_by_prefix(&dodag->dodag_id);
+    int idx;
+
+    if (netif == NULL) {
         DEBUG("RPL: no address configured\n");
         return;
     }
+    idx = gnrc_netif_ipv6_addr_match(netif, &dodag->dodag_id);
+    me = &netif->ipv6.addrs[idx];
 
-    mutex_lock(&(gnrc_ipv6_fib_table.mtx_access));
+    /* add external and RPL FT entries */
+    /* TODO: nib: dropped support for external transit options for now */
+    void *ft_state = NULL;
+    gnrc_ipv6_nib_ft_t fte;
+    while(gnrc_ipv6_nib_ft_iter(NULL, dodag->iface, &ft_state, &fte)) {
+        DEBUG("RPL: Send DAO - building transit option\n");
 
-    /* add external and RPL FIB entries */
-    for (size_t i = 0; i < gnrc_ipv6_fib_table.size; ++i) {
-        fib_entry_t *fentry = &gnrc_ipv6_fib_table.data.entries[i];
-        if (fentry->lifetime != 0) {
-            if (!(fentry->next_hop_flags & FIB_FLAG_RPL_ROUTE)) {
-                ptr = &tmp;
-                if (!ext_processed) {
-                    DEBUG("RPL: Send DAO - building external transit\n");
-                    if ((tmp = _dao_transit_build(NULL, lifetime, true)) == NULL) {
-                        DEBUG("RPL: Send DAO - no space left in packet buffer\n");
-                        mutex_unlock(&(gnrc_ipv6_fib_table.mtx_access));
-                        return;
-                    }
-                    ext_processed = true;
-                }
-            }
-            else {
-                ptr = &pkt;
-                if (!int_processed) {
-                    DEBUG("RPL: Send DAO - building internal transit\n");
-                    if ((tr_int = pkt = _dao_transit_build(NULL, lifetime, false)) == NULL) {
-                        DEBUG("RPL: Send DAO - no space left in packet buffer\n");
-                        mutex_unlock(&(gnrc_ipv6_fib_table.mtx_access));
-                        return;
-                    }
-                    int_processed = true;
-                }
-            }
-            ipv6_addr_t *addr = (ipv6_addr_t *) fentry->global->address;
-            if (ipv6_addr_is_global(addr)) {
-                size_t prefix_length = (fentry->global_flags >> FIB_FLAG_NET_PREFIX_SHIFT);
+        if ((pkt = _dao_transit_build(pkt, lifetime, false)) == NULL) {
+            DEBUG("RPL: Send DAO - no space left in packet buffer\n");
+            return;
+        }
+        if (ipv6_addr_is_global(&fte.dst) &&
+            !ipv6_addr_is_unspecified(&fte.next_hop)) {
+            DEBUG("RPL: Send DAO - building target %s/%d\n",
+                  ipv6_addr_to_str(addr_str, &fte.dst, sizeof(addr_str)), fte.dst_len);
 
-                DEBUG("RPL: Send DAO - building target %s/%d\n",
-                      ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
-                      (int) prefix_length);
-
-                if ((*ptr = _dao_target_build(*ptr, addr, (uint8_t) prefix_length)) == NULL) {
-                    DEBUG("RPL: Send DAO - no space left in packet buffer\n");
-                    mutex_unlock(&(gnrc_ipv6_fib_table.mtx_access));
-                    return;
-                }
+            if ((pkt = _dao_target_build(pkt, &fte.dst, fte.dst_len)) == NULL) {
+                DEBUG("RPL: Send DAO - no space left in packet buffer\n");
+                return;
             }
         }
-    }
-
-    mutex_unlock(&(gnrc_ipv6_fib_table.mtx_access));
-
-    if (tr_int) {
-        tr_int->next = tmp;
-    }
-    else {
-        pkt = tmp;
     }
 
     /* add own address */

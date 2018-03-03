@@ -69,7 +69,7 @@ static int write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
     if (addr + size > sizeof(dummy_memory)) {
         return -EOVERFLOW;
     }
-    if (size > PAGE_SIZE) {
+    if (((addr % PAGE_SIZE) + size) > PAGE_SIZE) {
         return -EOVERFLOW;
     }
     memcpy(dummy_memory + addr, buff, size);
@@ -211,6 +211,18 @@ static void test_mtd_write_read(void)
     /* out of bounds write (addr + count) */
     ret = mtd_write(dev, buf, (dev->pages_per_sector * dev->page_size * dev->sector_count)
                     - (sizeof(buf) / 2), sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+
+    /* out of bounds write (more than page size) */
+    const size_t page_size = dev->page_size;
+    const uint8_t buf_page[page_size + 1];
+    ret = mtd_write(dev, buf_page, 0, sizeof(buf_page));
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+
+    /* pages overlap write */
+    ret = mtd_write(dev, buf, dev->page_size - (sizeof(buf) / 2), sizeof(buf));
+    TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
+    ret = mtd_write(dev, buf_page, 1, sizeof(buf_page) - 1);
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, ret);
 }
 

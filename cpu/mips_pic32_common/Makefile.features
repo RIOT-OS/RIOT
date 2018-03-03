@@ -1,0 +1,3 @@
+FEATURES_PROVIDED += periph_cpuid
+
+-include $(RIOTCPU)/mips32r2_common/Makefile.features

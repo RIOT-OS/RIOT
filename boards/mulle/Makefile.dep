@@ -12,7 +12,12 @@ USEMODULE += nvram
 USEMODULE += devfs
 USEMODULE += mtd_spi_nor
 
+# mulle always uses the rtt for the oscillator
+USEMODULE += periph_rtt
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
   USEMODULE += saul_adc
 endif
+
+include $(RIOTCPU)/kinetis/Makefile.dep

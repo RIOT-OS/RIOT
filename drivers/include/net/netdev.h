@@ -10,7 +10,7 @@
  */
 
 /**
- * @defgroup    drivers_netdev_api Network Device Driver API
+ * @defgroup    drivers_netdev_api Netdev - Network Device Driver API
  * @ingroup     drivers_netdev
  * @brief       This is a generic low-level network driver interface
  * @{
@@ -211,9 +211,11 @@ enum {
     NETDEV_TYPE_RAW,
     NETDEV_TYPE_ETHERNET,
     NETDEV_TYPE_IEEE802154,
+    NETDEV_TYPE_BLE,
     NETDEV_TYPE_CC110X,
     NETDEV_TYPE_LORA,
-    NETDEV_TYPE_NRFMIN
+    NETDEV_TYPE_NRFMIN,
+    NETDEV_TYPE_SLIP,
 };
 
 /**
@@ -245,7 +247,7 @@ typedef enum {
  * May be different for certain radios.
  */
 struct netdev_radio_rx_info {
-    uint8_t rssi;       /**< RSSI of a received packet */
+    int16_t rssi;       /**< RSSI of a received packet in dBm */
     uint8_t lqi;        /**< LQI of a received packet */
 };
 

@@ -19,6 +19,8 @@
 #ifndef W5100_PARAMS_H
 #define W5100_PARAMS_H
 
+#include "board.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

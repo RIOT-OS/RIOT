@@ -24,8 +24,7 @@
 #include "log.h"
 #include "enc28j60.h"
 #include "enc28j60_params.h"
-#include "net/gnrc/netdev.h"
-#include "net/gnrc/netdev/eth.h"
+#include "net/gnrc/netif/ethernet.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -33,7 +32,7 @@
  */
 #define ENC28J60_MAC_STACKSIZE   (THREAD_STACKSIZE_DEFAULT)
 #ifndef ENC28J60_MAC_PRIO
-#define ENC28J60_MAC_PRIO        (GNRC_NETDEV_MAC_PRIO)
+#define ENC28J60_MAC_PRIO        (GNRC_NETIF_PRIO)
 #endif
 /*** @} */
 
@@ -47,7 +46,6 @@
  * @{
  */
 static enc28j60_t dev[ENC28J60_NUM];
-static gnrc_netdev_t gnrc_adpt[ENC28J60_NUM];
 /** @} */
 
 /**
@@ -63,11 +61,9 @@ void auto_init_enc28j60(void)
 
         /* setup netdev device */
         enc28j60_setup(&dev[i], &enc28j60_params[i]);
-        /* initialize netdev <-> gnrc adapter state */
-        gnrc_netdev_eth_init(&gnrc_adpt[i], (netdev_t *)&dev[i]);
-        /* start gnrc netdev thread */
-        gnrc_netdev_init(stack[i], ENC28J60_MAC_STACKSIZE, ENC28J60_MAC_PRIO,
-                         "gnrc_enc28j60", &gnrc_adpt[i]);
+        gnrc_netif_ethernet_create(stack[i], ENC28J60_MAC_STACKSIZE,
+                                   ENC28J60_MAC_PRIO, "enc28j60",
+                                   (netdev_t *)&dev[i]);
     }
 }
 

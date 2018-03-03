@@ -9,11 +9,13 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
-import testrunner
 
 def testfunc(child):
-    child.expect(u"OK \\([0-9]+ tests\\)")
+    child.expect([r"OK \([0-9]+ tests\)",
+                  r"error: unable to initialize RTC \[I2C initialization error\]"])
+
 
 if __name__ == "__main__":
-    sys.exit(testrunner.run(testfunc))
+    sys.path.append(os.path.join(os.environ['RIOTBASE'], 'dist/tools/testrunner'))
+    from testrunner import run
+    sys.exit(run(testfunc))

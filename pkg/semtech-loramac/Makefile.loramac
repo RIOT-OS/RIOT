@@ -1,0 +1,11 @@
+DIRS += src/mac
+DIRS += src/mac/region
+DIRS += src/system/crypto
+DIRS += src/boards/mcu/stm32
+
+INCLUDES += -I$(PKGDIRBASE)/semtech-loramac/src/mac \
+            -I$(PKGDIRBASE)/semtech-loramac/src/boards/mcu/stm32 \
+            -I$(PKGDIRBASE)/semtech-loramac/src/system/crypto \
+            -I$(PKGDIRBASE)/semtech-loramac/src
+
+include $(RIOTBASE)/Makefile.base

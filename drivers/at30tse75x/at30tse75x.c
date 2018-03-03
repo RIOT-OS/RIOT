@@ -110,11 +110,6 @@ int at30tse75x_set_resolution(const at30tse75x_t *dev, at30tse75x_resolution_t r
 {
     uint8_t config;
 
-    if(resolution < AT30TSE75X_RESOLUTION_9BIT ||
-       resolution > AT30TSE75X_RESOLUTION_12BIT) {
-        return -2;
-    }
-
     if(at30tse75x_get_config(dev, &config) != 0) {
         return -1;
     }
@@ -187,11 +182,6 @@ int at30tse75x_set_alarm_polarity(const at30tse75x_t *dev, at30tse75x_alarm_pola
 
 int at30tse75x_set_fault_tolerance(const at30tse75x_t *dev, at30tse75x_fault_tolerance_t tolerance)
 {
-    if(tolerance < AT30TSE75X_ALARM_AFTER_1 ||
-       tolerance > AT30TSE75X_ALARM_AFTER_6) {
-        return -2;
-    }
-
     uint8_t config;
     if(at30tse75x_get_config(dev, &config) != 0) {
         return -1;

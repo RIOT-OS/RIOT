@@ -229,7 +229,7 @@ bool gnrc_mac_queue_rx_packet(gnrc_mac_rx_t *rx, uint32_t priority, gnrc_pktsnip
         return true;
     }
 
-    DEBUG("[gnrc_mac] Can't push RX packet @ %p, no entries left\n", pkt);
+    DEBUG("[gnrc_mac] Can't push RX packet @ %p, no entries left\n", (void*)pkt);
     return false;
 }
 #endif /* GNRC_MAC_RX_QUEUE_SIZE != 0 */
@@ -252,10 +252,23 @@ void gnrc_mac_dispatch(gnrc_mac_rx_t *rx)
             /* make append netif header after payload again */
             rx->dispatch_buffer[i]->next = netif;
 #endif
+
+#ifdef MODULE_GNRC_GOMACH
+            /* save pointer to netif header */
+            gnrc_pktsnip_t *netif = rx->dispatch_buffer[i]->next->next;
+
+            /* remove GoMacH header */
+            rx->dispatch_buffer[i]->next->next = NULL;
+            gnrc_pktbuf_release(rx->dispatch_buffer[i]->next);
+
+            /* make append netif header after payload again */
+            rx->dispatch_buffer[i]->next = netif;
+#endif
+
             if (!gnrc_netapi_dispatch_receive(rx->dispatch_buffer[i]->type,
                                               GNRC_NETREG_DEMUX_CTX_ALL,
                                               rx->dispatch_buffer[i])) {
-                DEBUG("Unable to forward packet of type %i\n", buffer[i]->type);
+                DEBUG("Unable to forward packet of type %i\n", rx->dispatch_buffer[i]->type);
                 gnrc_pktbuf_release(rx->dispatch_buffer[i]);
             }
             rx->dispatch_buffer[i] = NULL;

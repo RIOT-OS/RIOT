@@ -17,7 +17,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include "net/gnrc/ipv6/netif.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/rpl.h"
 #include "net/gnrc/rpl/structs.h"
 #include "net/gnrc/rpl/dodag.h"
@@ -32,9 +32,7 @@
 int _gnrc_rpl_init(char *arg)
 {
     kernel_pid_t iface_pid = atoi(arg);
-    gnrc_ipv6_netif_t *entry = gnrc_ipv6_netif_get(iface_pid);
-
-    if (entry == NULL) {
+    if (gnrc_netif_get_by_pid(iface_pid) == NULL) {
         puts("unknown interface specified");
         return 1;
     }

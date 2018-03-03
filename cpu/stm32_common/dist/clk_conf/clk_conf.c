@@ -405,7 +405,7 @@ int main(int argc, char **argv)
             break;
         }
     }
-    if (cfg->family == STM32F0) {
+    if (cfg->family != STM32F0) {
         for (apb2_pre = 1; apb2_pre <= 16; apb2_pre <<= 1) {
             if (coreclock / apb2_pre <= cfg->max_apb2) {
                 break;

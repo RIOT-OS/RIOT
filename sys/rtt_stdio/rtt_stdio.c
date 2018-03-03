@@ -78,12 +78,21 @@
  */
 
 #include <stdio.h>
+#if MODULE_VFS
+#include <unistd.h>
+#include <errno.h>
+#include <fcntl.h>
+#endif
 #include <string.h>
 #include <rtt_stdio.h>
 
 #include "thread.h"
 #include "mutex.h"
 #include "xtimer.h"
+
+#if MODULE_VFS
+#include "vfs.h"
+#endif
 
 /* This parameter affects the bandwidth of both input and output. Decreasing
    it will significantly improve bandwidth at the cost of CPU time. */
@@ -277,6 +286,39 @@ int rtt_write(const char* buf_ptr, unsigned num_bytes) {
     return num_bytes_written;
 }
 
+#if MODULE_VFS
+
+static ssize_t rtt_stdio_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes);
+static ssize_t rtt_stdio_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes);
+
+/**
+ * @brief VFS file operation table for stdin/stdout/stderr
+ */
+static vfs_file_ops_t rtt_stdio_vfs_ops = {
+    .read = rtt_stdio_vfs_read,
+    .write = rtt_stdio_vfs_write,
+};
+
+static ssize_t rtt_stdio_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
+{
+    int fd = filp->private_data.value;
+    if (fd != STDIN_FILENO) {
+        return -EBADF;
+    }
+    return rtt_read(dest, nbytes);
+}
+
+static ssize_t rtt_stdio_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes)
+{
+    int fd = filp->private_data.value;
+    if (fd == STDIN_FILENO) {
+        return -EBADF;
+    }
+    return rtt_write(src, nbytes);
+}
+
+#endif
+
 void uart_stdio_init(void) {
     #ifndef RTT_STDIO_DISABLE_STDIN
     stdin_enabled = 1;
@@ -285,6 +327,22 @@ void uart_stdio_init(void) {
     #ifdef RTT_STDIO_ENABLE_BLOCKING_STDOUT
     blocking_stdout = 1;
     #endif
+
+#if MODULE_VFS
+    int fd;
+    fd = vfs_bind(STDIN_FILENO, O_RDONLY, &rtt_stdio_vfs_ops, (void *)STDIN_FILENO);
+    if (fd < 0) {
+        /* How to handle errors on init? */
+    }
+    fd = vfs_bind(STDOUT_FILENO, O_WRONLY, &rtt_stdio_vfs_ops, (void *)STDOUT_FILENO);
+    if (fd < 0) {
+        /* How to handle errors on init? */
+    }
+    fd = vfs_bind(STDERR_FILENO, O_WRONLY, &rtt_stdio_vfs_ops, (void *)STDERR_FILENO);
+    if (fd < 0) {
+        /* How to handle errors on init? */
+    }
+#endif
 
     /* the mutex should start locked */
     mutex_lock(&_rx_mutex);

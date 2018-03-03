@@ -57,12 +57,8 @@ extern int _at30tse75x_handler(int argc, char **argv);
 extern int _saul(int argc, char **argv);
 #endif
 
-#if FEATURE_PERIPH_RTC
+#ifdef MODULE_PERIPH_RTC
 extern int _rtc_handler(int argc, char **argv);
-#endif
-
-#ifdef CPU_X86
-extern int _x86_lspci(int argc, char **argv);
 #endif
 
 #ifdef MODULE_MCI
@@ -89,8 +85,10 @@ extern int _gnrc_ipv6_nib(int argc, char **argv);
 #endif
 
 #ifdef MODULE_GNRC_NETIF
-extern int _netif_config(int argc, char **argv);
-extern int _netif_send(int argc, char **argv);
+extern int _gnrc_netif_config(int argc, char **argv);
+#ifdef MODULE_GNRC_TXTSND
+extern int _gnrc_netif_send(int argc, char **argv);
+#endif
 #endif
 
 #ifdef MODULE_FIB
@@ -180,27 +178,20 @@ const shell_command_t _shell_command_list[] = {
     { "random_init", "initializes the PRNG", _random_init },
     { "random_get", "returns 32 bit of pseudo randomness", _random_get },
 #endif
-#if FEATURE_PERIPH_RTC
+#ifdef MODULE_PERIPH_RTC
     {"rtc", "control RTC peripheral interface",  _rtc_handler},
-#endif
-#ifdef CPU_X86
-    {"lspci", "Lists PCI devices", _x86_lspci},
 #endif
 #ifdef MODULE_GNRC_IPV6_NIB
     {"nib", "Configure neighbor information base", _gnrc_ipv6_nib},
 #endif
 #ifdef MODULE_GNRC_NETIF
-    {"ifconfig", "Configure network interfaces", _netif_config},
+    {"ifconfig", "Configure network interfaces", _gnrc_netif_config},
 #ifdef MODULE_GNRC_TXTSND
-    {"txtsnd", "Sends a custom string as is over the link layer", _netif_send },
+    {"txtsnd", "Sends a custom string as is over the link layer", _gnrc_netif_send },
 #endif
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
-#endif
-#ifdef MODULE_GNRC_IPV6_NC
-    {"ncache", "manage neighbor cache by hand", _ipv6_nc_manage },
-    {"routers", "IPv6 default router list", _ipv6_nc_routers },
 #endif
 #ifdef MODULE_GNRC_IPV6_WHITELIST
     {"whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist },

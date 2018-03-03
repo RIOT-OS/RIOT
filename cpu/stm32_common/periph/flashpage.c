@@ -25,12 +25,11 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-#if defined(FLASHPAGE_SIZE) && defined(FLASHPAGE_NUMOF)
 #include "periph/flashpage.h"
 
 void flashpage_write(int page, void *data)
 {
-    assert(page < FLASHPAGE_NUMOF);
+    assert(page < (int)FLASHPAGE_NUMOF);
 
     uint16_t *page_addr = flashpage_addr(page);
     uint16_t *data_addr = (uint16_t *)data;
@@ -89,5 +88,3 @@ void flashpage_write(int page, void *data)
         while (RCC->CR & RCC_CR_HSIRDY) {}
     }
 }
-
-#endif /* defined(FLASHPAGE_SIZE) && defined(FLASHPAGE_NUMOF) */

@@ -1,4 +1,3 @@
-APPLICATION = driver_ds1307
 include ../Makefile.tests_common
 
 USEMODULE += ds1307

@@ -1,5 +1,3 @@
-# name of your application
-APPLICATION = gnrc_udp
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := calliope-mini chronos microbit msb-430 msb-430h \
@@ -21,8 +19,6 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
-
-CFLAGS += -DDEVELHELP
 
 include $(RIOTBASE)/Makefile.include
 

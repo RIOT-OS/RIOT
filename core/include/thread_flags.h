@@ -97,9 +97,12 @@
  *      }
  */
 #define THREAD_FLAG_MSG_WAITING      (0x1<<15)
-
-#define THREAD_FLAG_MUTEX_UNLOCKED   (0x1<<14)
-#define THREAD_FLAG_TIMEOUT          (0x1<<13)
+/**
+ * @brief Set by @ref xtimer_set_timeout_flag() when the timer expires
+ *
+ * @see xtimer_set_timeout_flag
+ */
+#define THREAD_FLAG_TIMEOUT          (0x1<<14)
 /** @} */
 
 /**

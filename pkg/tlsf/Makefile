@@ -15,7 +15,7 @@ all: $(PKG_SRCDIR)/$(PKG_NAME).a
 prepare: $(PKG_SRCDIR)/Makefile
 
 $(PKG_SRCDIR)/$(PKG_NAME).a: $(PKG_SRCDIR)/Makefile
-	$(Q)make -C $(<D)
+	$(Q)"$(MAKE)" -C $(<D)
 
 $(PKG_SRCDIR)/Makefile: $(PKG_BUILDDIR)/$(PKG_FILE) $(CURDIR)/patch.txt
 	rm -rf $(@D)

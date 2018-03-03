@@ -16,6 +16,7 @@
 #include "embUnit.h"
 
 #include "net/gnrc/pkt.h"
+#include "net/gnrc/pktbuf.h"
 #include "net/gnrc/priority_pktqueue.h"
 
 #include "unittests-constants.h"
@@ -31,6 +32,7 @@ static gnrc_priority_pktqueue_t pkt_queue;
 static void set_up(void)
 {
     pkt_queue.first = NULL;
+    gnrc_pktbuf_init();
 }
 
 static void test_gnrc_priority_pktqueue_init(void)
@@ -118,10 +120,15 @@ static void test_gnrc_priority_pktqueue_length(void)
 
 static void test_gnrc_priority_pktqueue_flush(void)
 {
-    gnrc_pktsnip_t pkt1 = PKT_INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
-    gnrc_pktsnip_t pkt2 = PKT_INIT_ELEM_STATIC_DATA(TEST_STRING16, NULL);
-    gnrc_priority_pktqueue_node_t elem1 = PRIORITY_PKTQUEUE_NODE_INIT(1,&pkt1);
-    gnrc_priority_pktqueue_node_t elem2 = PRIORITY_PKTQUEUE_NODE_INIT(0,&pkt2);
+    gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING8),
+                                           GNRC_NETTYPE_TEST);
+    gnrc_pktsnip_t *pkt2 = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
+                                           GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt1);
+    TEST_ASSERT_NOT_NULL(pkt2);
+
+    gnrc_priority_pktqueue_node_t elem1 = PRIORITY_PKTQUEUE_NODE_INIT(1,pkt1);
+    gnrc_priority_pktqueue_node_t elem2 = PRIORITY_PKTQUEUE_NODE_INIT(0,pkt2);
 
     gnrc_priority_pktqueue_push(&pkt_queue, &elem1);
     gnrc_priority_pktqueue_push(&pkt_queue, &elem2);
@@ -134,29 +141,36 @@ static void test_gnrc_priority_pktqueue_flush(void)
 
 static void test_gnrc_priority_pktqueue_head(void)
 {
-    gnrc_pktsnip_t pkt1 = PKT_INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
-    gnrc_pktsnip_t pkt2 = PKT_INIT_ELEM_STATIC_DATA(TEST_STRING12, NULL);
-    gnrc_pktsnip_t pkt3 = PKT_INIT_ELEM_STATIC_DATA(TEST_STRING16, NULL);
-    gnrc_priority_pktqueue_node_t elem1 = PRIORITY_PKTQUEUE_NODE_INIT(1,&pkt1);
-    gnrc_priority_pktqueue_node_t elem2 = PRIORITY_PKTQUEUE_NODE_INIT(1,&pkt2);
-    gnrc_priority_pktqueue_node_t elem3 = PRIORITY_PKTQUEUE_NODE_INIT(0,&pkt3);
+    gnrc_pktsnip_t *pkt1 = gnrc_pktbuf_add(NULL, TEST_STRING8, sizeof(TEST_STRING8),
+                                           GNRC_NETTYPE_TEST);
+    gnrc_pktsnip_t *pkt2 = gnrc_pktbuf_add(NULL, TEST_STRING12, sizeof(TEST_STRING12),
+                                           GNRC_NETTYPE_TEST);
+    gnrc_pktsnip_t *pkt3 = gnrc_pktbuf_add(NULL, TEST_STRING16, sizeof(TEST_STRING16),
+                                           GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt1);
+    TEST_ASSERT_NOT_NULL(pkt2);
+    TEST_ASSERT_NOT_NULL(pkt3);
+
+    gnrc_priority_pktqueue_node_t elem1 = PRIORITY_PKTQUEUE_NODE_INIT(1,pkt1);
+    gnrc_priority_pktqueue_node_t elem2 = PRIORITY_PKTQUEUE_NODE_INIT(1,pkt2);
+    gnrc_priority_pktqueue_node_t elem3 = PRIORITY_PKTQUEUE_NODE_INIT(0,pkt3);
 
     gnrc_pktsnip_t *head = gnrc_priority_pktqueue_head(&pkt_queue);
     TEST_ASSERT_NULL(head);
 
     gnrc_priority_pktqueue_push(&pkt_queue, &elem1);
     head = gnrc_priority_pktqueue_head(&pkt_queue);
-    TEST_ASSERT(head == &pkt1);
+    TEST_ASSERT(head == pkt1);
 
     gnrc_priority_pktqueue_push(&pkt_queue, &elem2);
     head = gnrc_priority_pktqueue_head(&pkt_queue);
 
-    TEST_ASSERT(head == &pkt1);
+    TEST_ASSERT(head == pkt1);
 
     gnrc_priority_pktqueue_push(&pkt_queue, &elem3);
     head = gnrc_priority_pktqueue_head(&pkt_queue);
 
-    TEST_ASSERT(head == &pkt3);
+    TEST_ASSERT(head == pkt3);
 
     gnrc_priority_pktqueue_flush(&pkt_queue);
 

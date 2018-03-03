@@ -150,7 +150,7 @@ CPUs share the same code for task switching and interrupt handling). This
 shared code is put in its own directories, following a `xxxxx_common` naming
 scheme. Examples for this is code shared across architectures (e.g.
 `cortexm_common`, `msp430_comon`) or code shared among vendors (e.g.
-`kinetis_common`).
+`stm32_common`).
 
 See @ref cpu for more detailed informtation.
 

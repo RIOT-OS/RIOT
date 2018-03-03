@@ -1,5 +1,3 @@
-APPLICATION = hello_mcuboot
-
 BOARD ?= nrf52dk
 
 include ../Makefile.tests_common

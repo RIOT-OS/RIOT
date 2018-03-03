@@ -22,7 +22,6 @@
 #define IRQ_H
 
 #include <stdbool.h>
-#include "arch/irq_arch.h"
 
 #ifdef __cplusplus
  extern "C" {

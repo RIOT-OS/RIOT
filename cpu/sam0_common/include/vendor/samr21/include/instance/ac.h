@@ -3,7 +3,7 @@
  *
  * \brief Instance description for AC
  *
- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
- /**
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMR21_AC_INSTANCE_
@@ -84,7 +81,7 @@
 #define AC_CMP_NUM                  2        // Number of comparators
 #define AC_GCLK_ID_ANA              32       // Index of Generic Clock for analog
 #define AC_GCLK_ID_DIG              31       // Index of Generic Clock for digital
-#define AC_NUM_CMP                  2
+#define AC_NUM_CMP                  2       
 #define AC_PAIRS                    1        // Number of pairs of comparators
 
 #endif /* _SAMR21_AC_INSTANCE_ */

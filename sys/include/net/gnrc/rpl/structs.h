@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-#include "net/gnrc/ipv6/netif.h"
+#include "byteorder.h"
 #include "net/ipv6/addr.h"
 #include "xtimer.h"
 #include "trickle.h"
@@ -190,14 +190,16 @@ typedef struct __attribute__((packed)) {
  *      </a>
  */
 typedef struct __attribute__((packed)) {
-    uint8_t type;               /**< option type */
-    uint8_t length;             /**< option length without the first two bytes */
-    uint8_t prefix_len;         /**< prefix length */
-    uint8_t LAR_flags;          /**< flags and resereved */
-    uint32_t valid_lifetime;    /**< valid lifetime */
-    uint32_t pref_lifetime;     /**< preferred lifetime */
-    uint32_t reserved;          /**< reserved */
-    ipv6_addr_t prefix;         /**< prefix used for Stateless Address Autoconfiguration */
+    uint8_t type;                       /**< option type */
+    uint8_t length;                     /**< option length without the first
+                                         *   two bytes */
+    uint8_t prefix_len;                 /**< prefix length */
+    uint8_t LAR_flags;                  /**< flags and resereved */
+    network_uint32_t valid_lifetime;    /**< valid lifetime */
+    network_uint32_t pref_lifetime;     /**< preferred lifetime */
+    uint32_t reserved;                  /**< reserved */
+    ipv6_addr_t prefix;                 /**< prefix used for Stateless Address
+                                         *   Autoconfiguration */
 } gnrc_rpl_opt_prefix_info_t;
 
 /**
@@ -268,7 +270,6 @@ typedef struct {
  */
 struct gnrc_rpl_dodag {
     ipv6_addr_t dodag_id;           /**< id of the DODAG */
-    gnrc_ipv6_netif_addr_t *netif_addr; /**< netif address for this DODAG */
     gnrc_rpl_parent_t *parents;     /**< pointer to the parents list of this DODAG */
     gnrc_rpl_instance_t *instance;  /**< pointer to the instance that this dodag is part of */
     uint8_t dtsn;                   /**< DAO Trigger Sequence Number */

@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the stm32f769discovery6 board
+ * @brief       Peripheral MCU configuration for the STM32F769 Discovery board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */

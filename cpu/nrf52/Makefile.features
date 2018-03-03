@@ -1,0 +1,4 @@
+# The ADC does not depend on any board configuration, so always available
+FEATURES_PROVIDED += periph_adc
+
+-include $(RIOTCPU)/nrf5x_common/Makefile.features

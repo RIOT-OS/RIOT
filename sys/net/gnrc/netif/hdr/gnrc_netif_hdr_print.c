@@ -23,7 +23,7 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
     char addr_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 
     printf("if_pid: %u  ", (unsigned) hdr->if_pid);
-    printf("rssi: %u  ", (unsigned) hdr->rssi);
+    printf("rssi: %d  ", (signed) hdr->rssi);
     printf("lqi: %u\n", (unsigned) hdr->lqi);
     printf("flags: ");
 
@@ -44,9 +44,8 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
 
     if (hdr->src_l2addr_len > 0) {
         printf("src_l2addr: %s\n",
-               gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                      gnrc_netif_hdr_get_src_addr(hdr),
-                                      (size_t)hdr->src_l2addr_len));
+               gnrc_netif_addr_to_str(gnrc_netif_hdr_get_src_addr(hdr),
+                                      hdr->src_l2addr_len, addr_str));
     }
     else {
         puts("src_l2addr: (nil)");
@@ -54,9 +53,8 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
 
     if (hdr->dst_l2addr_len > 0) {
         printf("dst_l2addr: %s\n",
-               gnrc_netif_addr_to_str(addr_str, sizeof(addr_str),
-                                      gnrc_netif_hdr_get_dst_addr(hdr),
-                                      (size_t)hdr->dst_l2addr_len));
+               gnrc_netif_addr_to_str(gnrc_netif_hdr_get_dst_addr(hdr),
+                                      hdr->dst_l2addr_len, addr_str));
     }
     else {
         puts("dst_l2addr: (nil)");

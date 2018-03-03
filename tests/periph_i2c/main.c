@@ -37,8 +37,8 @@ int cmd_init_master(int argc, char **argv)
         puts("Error: Init: Invalid number of arguments!");
         printf("Usage:\n%s: [DEVICE] [SPEED]\n", argv[0]);
         puts("    with DEVICE:");
-        for (int i = 0; i < I2C_NUMOF; i++) {
-            printf("          %i -> I2C_%i\n", i, i);
+        for (unsigned i = 0; i < I2C_NUMOF; i++) {
+            printf("          %u -> I2C_%u\n", i, i);
         }
         puts("         SPEED:");
         puts("          0 -> SPEED_LOW (10kbit/s)");
@@ -181,7 +181,7 @@ int cmd_read(int argc, char **argv)
     addr = atoi(argv[1]);
     length = atoi(argv[2]);
 
-    if (length < 1 || length > BUFSIZE) {
+    if (length < 1 || length > (int)BUFSIZE) {
         puts("Error: invalid LENGTH parameter given\n");
         return 1;
     }
@@ -229,7 +229,7 @@ int cmd_read_reg(int argc, char **argv)
     reg = atoi(argv[2]);
     length = atoi(argv[3]);
 
-    if (length < 1 || length > BUFSIZE) {
+    if (length < 1 || length > (int)BUFSIZE) {
         puts("Error: invalid LENGTH parameter given");
         return 1;
     }

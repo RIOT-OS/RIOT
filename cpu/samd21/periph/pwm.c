@@ -30,7 +30,6 @@
 #include "periph/gpio.h"
 #include "periph/pwm.h"
 
-
 static inline int _num(pwm_t dev)
 {
     return ((int)(pwm_config[dev].dev) & 0xc00) >> 10;
@@ -115,7 +114,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     f_real = (CLOCK_CORECLOCK / (scale * res));
 
     /* configure the used pins */
-    for (int i = 0; i < PWM_MAX_CHANNELS; i++) {
+    for (unsigned i = 0; i < PWM_MAX_CHANNELS; i++) {
         if (pwm_config[dev].chan[i].pin != GPIO_UNDEF) {
             gpio_init(pwm_config[dev].chan[i].pin, GPIO_OUT);
             gpio_init_mux(pwm_config[dev].chan[i].pin, pwm_config[dev].chan[i].mux);

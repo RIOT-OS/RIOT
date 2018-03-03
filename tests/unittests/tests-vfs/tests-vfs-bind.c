@@ -19,6 +19,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "embUnit/embUnit.h"
 
@@ -71,6 +72,9 @@ static void test_vfs_bind(void)
     uint8_t buf[_VFS_TEST_BIND_BUFSIZE];
     fd = vfs_bind(VFS_ANY_FD, O_RDWR, &_test_bind_ops, &buf[0]);
     TEST_ASSERT(fd >= 0);
+    TEST_ASSERT(fd != STDIN_FILENO);
+    TEST_ASSERT(fd != STDOUT_FILENO);
+    TEST_ASSERT(fd != STDERR_FILENO);
     if (fd < 0) {
         return;
     }
@@ -107,11 +111,25 @@ static void test_vfs_bind__leak_fds(void)
     test_vfs_bind();
 }
 
+static void test_vfs_bind__allocate_invalid_fd(void)
+{
+    /* Check that fds >= VFS_MAX_OPEN_FILES fails with -ENFILE, to avoid out of
+     * bounds array access */
+    /* This test assumes FD numbering begins at 0, update this test if
+     * VFS_MAX_OPEN_FILES is a valid fd number */
+    int fd;
+    fd = vfs_bind(VFS_MAX_OPEN_FILES, O_RDONLY, &_test_bind_ops, NULL);
+    TEST_ASSERT_EQUAL_INT(-ENFILE, fd);
+    fd = vfs_bind((VFS_MAX_OPEN_FILES + 1), O_RDONLY, &_test_bind_ops, NULL);
+    TEST_ASSERT_EQUAL_INT(-ENFILE, fd);
+}
+
 Test *tests_vfs_bind_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_vfs_bind),
         new_TestFixture(test_vfs_bind__leak_fds),
+        new_TestFixture(test_vfs_bind__allocate_invalid_fd),
     };
 
     EMB_UNIT_TESTCALLER(vfs_bind_tests, NULL, NULL, fixtures);

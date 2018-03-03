@@ -23,7 +23,7 @@
 
 #ifdef KW2XRF_TESTMODE
 
-inline static void enable_xcvr_test_mode(kw2xrf_t *dev)
+static inline void enable_xcvr_test_mode(kw2xrf_t *dev)
 {
     uint8_t reg;
 
@@ -36,7 +36,7 @@ inline static void enable_xcvr_test_mode(kw2xrf_t *dev)
     kw2xrf_write_iregs(dev, MKW2XDMI_TESTMODE_CTRL, &reg, 1);
 }
 
-inline static void disable_xcvr_test_mode(kw2xrf_t *dev)
+static inline void disable_xcvr_test_mode(kw2xrf_t *dev)
 {
     uint8_t reg;
 

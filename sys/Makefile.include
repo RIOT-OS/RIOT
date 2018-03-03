@@ -83,4 +83,6 @@ ifneq (,$(filter ssp,$(USEMODULE)))
   include $(RIOTBASE)/sys/ssp/Makefile.include
 endif
 
-INCLUDES += -I$(RIOTBASE)/sys/libc/include
+ifneq (native,$(BOARD))
+  INCLUDES += -I$(RIOTBASE)/sys/libc/include
+endif

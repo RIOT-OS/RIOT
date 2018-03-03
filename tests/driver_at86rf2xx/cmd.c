@@ -25,9 +25,10 @@
 
 #include "od.h"
 
-#define _MAX_ADDR_LEN   (8)
+#define _MAX_ADDR_LEN    (8)
+#define MAC_VECTOR_SIZE  (2) /* mhr + payload */
 
-static int _parse_addr(uint8_t *out, size_t out_len, const char *in);
+static size_t _parse_addr(uint8_t *out, size_t out_len, const char *in);
 static int send(int iface, le_uint16_t dst_pan, uint8_t *dst_addr,
                 size_t dst_len, char *data);
 
@@ -133,7 +134,7 @@ int ifconfig(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    for (int i = 0; i < AT86RF2XX_NUM; i++) {
+    for (unsigned int i = 0; i < AT86RF2XX_NUM; i++) {
         ifconfig_list(i);
     }
     return 0;
@@ -148,7 +149,8 @@ int txtsnd(int argc, char **argv)
 {
     char *text;
     uint8_t addr[_MAX_ADDR_LEN];
-    int iface, idx = 2, res;
+    int iface, idx = 2;
+    size_t res;
     le_uint16_t pan = { 0 };
 
     switch (argc) {
@@ -156,7 +158,7 @@ int txtsnd(int argc, char **argv)
             break;
         case 5:
             res = _parse_addr((uint8_t *)&pan, sizeof(pan), argv[idx++]);
-            if ((res <= 0) || (res > sizeof(pan))) {
+            if ((res == 0) || (res > sizeof(pan))) {
                 txtsnd_usage(argv[0]);
                 return 1;
             }
@@ -169,12 +171,12 @@ int txtsnd(int argc, char **argv)
 
     iface = atoi(argv[1]);
     res = _parse_addr(addr, sizeof(addr), argv[idx++]);
-    if (res <= 0) {
+    if (res == 0) {
         txtsnd_usage(argv[0]);
         return 1;
     }
     text = argv[idx++];
-    return send(iface, pan, addr, (size_t)res, text);
+    return send(iface, pan, addr, res, text);
 }
 
 static inline int _dehex(char c, int default_)
@@ -193,7 +195,7 @@ static inline int _dehex(char c, int default_)
     }
 }
 
-static int _parse_addr(uint8_t *out, size_t out_len, const char *in)
+static size_t _parse_addr(uint8_t *out, size_t out_len, const char *in)
 {
     const char *end_str = in;
     uint8_t *out_end = out;
@@ -248,8 +250,7 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
 {
     int res;
     netdev_ieee802154_t *dev;
-    const size_t count = 2;         /* mhr + payload */
-    struct iovec vector[count];
+    struct iovec vector[MAC_VECTOR_SIZE];
     uint8_t *src;
     size_t src_len;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
@@ -288,7 +289,7 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
     }
     vector[0].iov_base = mhr;
     vector[0].iov_len = (size_t)res;
-    res = dev->netdev.driver->send((netdev_t *)dev, vector, count);
+    res = dev->netdev.driver->send((netdev_t *)dev, vector, MAC_VECTOR_SIZE);
     if (res < 0) {
         puts("txtsnd: Error on sending");
         return 1;

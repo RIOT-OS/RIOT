@@ -32,9 +32,12 @@
 /* pointer to reserved flash rom section for configuration data */
 __attribute((aligned(256))) char configmem[256] __attribute__((section(".configmem")));
 
-static unsigned int iap_command[5];         // contains parameters for IAP command
-static unsigned int iap_result[2];          // contains results
-typedef void (*IAP)(unsigned int[], unsigned int[]);    // typedefinition for IAP entry function
+/* contains parameters for IAP command */
+static unsigned int iap_command[5];
+/* contains results */
+static unsigned int iap_result[2];
+/* typedefinition for IAP entry function */
+typedef void (*IAP)(unsigned int[], unsigned int[]);
 IAP IAP_Entry;
 
 /* some function prototypes */
@@ -148,13 +151,13 @@ uint8_t flashrom_erase(uint8_t *addr)
 
 static uint32_t iap(uint32_t code, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
 {
-    iap_command[0] = code;      // set command code
-    iap_command[1] = p1;        // set 1st param
-    iap_command[2] = p2;        // set 2nd param
-    iap_command[3] = p3;        // set 3rd param
-    iap_command[4] = p4;        // set 4th param
+    iap_command[0] = code;      /* set command code */
+    iap_command[1] = p1;        /* set 1st param */
+    iap_command[2] = p2;        /* set 2nd param */
+    iap_command[3] = p3;        /* set 3rd param */
+    iap_command[4] = p4;        /* set 4th param */
 
-    ((void (*)())0x7ffffff1)(iap_command, iap_result);      // IAP entry point
+    ((void (*)())0x7ffffff1)(iap_command, iap_result); /* IAP entry point */
     return *iap_result;
 }
 

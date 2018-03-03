@@ -1,8 +1,8 @@
-APPLICATION = driver_hd44780
 include ../Makefile.tests_common
 
 # the stm32f4discovery does not have the arduino pinout
-BOARD_BLACKLIST := stm32f4discovery
+BOARD_BLACKLIST := stm32f4discovery jiminy-mega256rfr2
+
 # currently the test provides config params for arduinos only
 FEATURES_REQUIRED += arduino
 

@@ -689,16 +689,16 @@ static int xbee_recv(netdev_t *dev, void *buf, size_t len, void *info)
     size = (size_t)(xbee->rx_limit - 1);
     if (buf == NULL) {
         if (len > 0) {
-            DEBUG("[xbee] recv: reading size and dropping: %i\n", size);
+            DEBUG("[xbee] recv: reading size and dropping: %u\n", (unsigned)size);
             xbee->rx_count = 0;
         }
         else {
-            DEBUG("[xbee] recv: reading size without dropping: %i\n", size);
+            DEBUG("[xbee] recv: reading size without dropping: %u\n", (unsigned)size);
         }
     }
     else {
         size = (size > len) ? len : size;
-        DEBUG("[xbee] recv: consuming packet: reading %i byte\n", size);
+        DEBUG("[xbee] recv: consuming packet: reading %u byte\n", (unsigned)size);
         memcpy(buf, xbee->rx_buf, size);
         xbee->rx_count = 0;
     }
@@ -748,6 +748,10 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
             else {
                 *((uint16_t *)value) = IEEE802154_SHORT_ADDRESS_LEN;
             }
+            return sizeof(uint16_t);
+        case NETOPT_DEVICE_TYPE:
+            assert(max_len == sizeof(uint16_t));
+            *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
             return sizeof(uint16_t);
         case NETOPT_IPV6_IID:
             if (max_len < sizeof(eui64_t)) {

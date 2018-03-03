@@ -19,7 +19,7 @@
 #ifndef ARDUINO_BOARD_H
 #define ARDUINO_BOARD_H
 
-#include "periph/gpio.h"
+#include "arduino_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,14 +28,24 @@ extern "C" {
 #define ARDUINO_LED         (2)
 
 static const gpio_t arduino_pinmap[] = {
-    GPIO_PIN(PORT_D, 12),
-    GPIO_PIN(PORT_D, 13),
-    GPIO_PIN(PORT_D, 14),
-    GPIO_PIN(PORT_D, 15),
-    GPIO_PIN(PORT_A, 12),
-    GPIO_PIN(PORT_A, 15),
-    GPIO_PIN(PORT_B, 1),
-    GPIO_PIN(PORT_B, 2),
+    ARDUINO_PIN_0,
+    ARDUINO_PIN_1,
+    ARDUINO_PIN_2,
+    ARDUINO_PIN_3,
+    ARDUINO_PIN_4,
+    ARDUINO_PIN_5,
+    ARDUINO_PIN_6,
+    ARDUINO_PIN_7,
+};
+
+/**
+ * @brief   Look-up table for the Arduino's analog pins
+ */
+static const adc_t arduino_analog_map[] = {
+    ARDUINO_A0,
+    ARDUINO_A1,
+    ARDUINO_A2,
+    ARDUINO_A3,
 };
 
 #ifdef __cplusplus

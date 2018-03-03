@@ -11,7 +11,7 @@
  * @defgroup    net_netopt   Configuration options for network APIs
  * @ingroup     net
  * @brief       List of available configuration options for the
- *              @ref net_gnrc_netdev and the @ref net_gnrc_netapi
+ *              @ref drivers_netdev_api and the @ref net_gnrc_netapi
  * @{
  *
  * @file
@@ -59,6 +59,11 @@ typedef enum {
     NETOPT_NID,
 
     /**
+     * @brief   get/set hop limit as uint8_t
+     */
+    NETOPT_HOP_LIMIT,
+
+    /**
      * @brief   get the IPv6 interface identifier of a network interface as
      *          eui64_t.
      *
@@ -73,6 +78,58 @@ typedef enum {
      * <a href="https://tools.ietf.org/html/rfc4944">RFC 4944</a>).
      */
     NETOPT_IPV6_IID,
+
+    /**
+     * @brief   get IPv6 addresses of an interface as array of @ref ipv6_addr_t
+     *          or add an IPv6 address as @ref ipv6_addr_t to an  interface
+     *
+     * When adding an IPv6 address to a GNRC interface using
+     * @ref GNRC_NETAPI_MSG_TYPE_SET, the gnrc_netapi_opt_t::context field can
+     * be used to pass the prefix length (8 MSB) and some flags (8 LSB)
+     * according to @ref net_gnrc_netif_ipv6_addrs_flags. The address is however always
+     * considered to be manually added.
+     * When getting the option you can pass an array of @ref ipv6_addr_t of any
+     * length greater than 0 to the getter. The array will be filled up to to
+     * its maximum and the remaining addresses on the interface will be ignored
+     */
+    NETOPT_IPV6_ADDR,
+    /**
+     * @brief   Removes an IPv6 address as @ref ipv6_addr_t from an interface
+     */
+    NETOPT_IPV6_ADDR_REMOVE,
+    /**
+     * @brief   get the flags to the addresses returned by @ref NETOPT_IPV6_ADDR
+     *          as array of uint8_t
+     *
+     * The information contained in the array is very specific to the
+     * interface's API. For GNRC e.g. the values are according to
+     * @ref net_gnrc_netif_ipv6_addrs_flags.
+     */
+    NETOPT_IPV6_ADDR_FLAGS,
+    /**
+     * @brief   get IPv6 multicast groups of an interface as array of
+     *          @ref ipv6_addr_t or join an IPv6 multicast group as
+     *          @ref ipv6_addr_t on an interface
+     *
+     * When adding an IPv6 address to a GNRC interface using
+     * @ref GNRC_NETAPI_MSG_TYPE_SET, the gnrc_netapi_opt_t::context field can
+     * be used to pass the prefix length (8 MSB) and some flags (8 LSB)
+     * according to @ref net_gnrc_netif_ipv6_addrs_flags. The address is however always
+     * considered to be manually added.
+     * When getting the option you can pass an array of @ref ipv6_addr_t of any
+     * length greater than 0 to the getter. The array will be filled up to to
+     * its maximum and the remaining addresses on the interface will be ignored
+     */
+    NETOPT_IPV6_GROUP,
+    /**
+     * @brief   Leaves an IPv6 multicast group as @ref ipv6_addr_t on an
+     *          interface
+     */
+    NETOPT_IPV6_GROUP_LEAVE,
+    NETOPT_IPV6_FORWARDING,     /**< en/disable IPv6 forwarding or read the
+                                 *   current state */
+    NETOPT_IPV6_SND_RTR_ADV,    /**< en/disable sending of IPv6 router
+                                 *   advertisements or read the current state */
     NETOPT_TX_POWER,            /**< get/set the output power for radio
                                  *   devices in dBm as int16_t in host byte
                                  *   order */
@@ -90,6 +147,12 @@ typedef enum {
                                  *   the current state */
     NETOPT_AUTOACK,             /**< en/disable link layer auto ACKs or read
                                  *   the current state */
+    NETOPT_ACK_PENDING,         /**< en/disable the frame pending bit of ACKs.
+                                 *   This bit is copied into the frame pending
+                                 *   subfield of the ACK if it is the response
+                                 *   to a data request MAC command frame, which
+                                 *   lets the data request sender know if the ACK
+                                 *   sender has pending data or not. */
     NETOPT_ACK_REQ,             /**< en/disable acknowledgement requests or
                                  *   read the current state */
     NETOPT_RETRANS,             /**< get/set the maximum number of
@@ -319,6 +382,17 @@ typedef enum {
     NETOPT_INTEGRITY_CHECK,
 
     /**
+     * @brief   Get/Set the channel center frequency.
+     *
+     * Values are retrieved/passed as uint32_t in host byte order.
+     *
+     * For example, with LoRa, this corresponds to the center frequency of
+     * each channel (867300000, etc) for a given frequency band
+     * (868, 915, etc).
+     */
+    NETOPT_CHANNEL_FREQUENCY,
+
+    /**
      * @brief   Enable/disable channel hopping.
      */
     NETOPT_CHANNEL_HOP,
@@ -350,11 +424,6 @@ typedef enum {
     NETOPT_TX_TIMEOUT,
 
     /**
-     * @brief   Get/Set the radio modem type as uint8_t.
-     */
-    NETOPT_DEVICE_MODE,
-
-    /**
      * @brief   Get/Set the radio modulation bandwidth as uint8_t.
      */
     NETOPT_BANDWIDTH,
@@ -378,6 +447,10 @@ typedef enum {
      * @brief   Enable/disable IQ inverted.
      */
     NETOPT_IQ_INVERT,
+
+    NETOPT_6LO_IPHC,            /**< en/disable header compression according to
+                                 *   [RFC 6282](https://tools.ietf.org/html/rfc6282)
+                                 *   or read the current state */
 
     /**
      * @brief   Get retry amount from missing ACKs of the last transmission

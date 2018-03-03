@@ -1,0 +1,8 @@
+dist: trusty
+
+before_install:
+  - sudo apt-get install coreutils realpath doxygen graphviz python-lesscpy cppcheck coccinelle pcregrep python3-pip
+  - sudo pip3 install flake8
+
+script:
+  - make static-test

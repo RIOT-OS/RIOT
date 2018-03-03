@@ -1,2 +1,0 @@
-USEMODULE += gnrc_ipv6_nc
-USEMODULE += gnrc_ipv6_netif

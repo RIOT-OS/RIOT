@@ -9,6 +9,10 @@ ifneq (,$(filter newlib_nano,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
+  CFLAGS += -D_GNU_SOURCE=1
+endif
+
 ifeq (1,$(USE_NEWLIB_NANO))
   export LINKFLAGS += -specs=nano.specs
 endif

@@ -1,4 +1,3 @@
-APPLICATION = driver_dht
 include ../Makefile.tests_common
 
 USEMODULE += dht

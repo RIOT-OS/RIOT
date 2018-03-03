@@ -31,14 +31,7 @@
 
 static void set_up(void)
 {
-    evtimer_event_t *tmp;
-
-    for (evtimer_event_t *ptr = _nib_evtimer.events;
-         (ptr != NULL) && (tmp = (ptr->next), 1);
-         ptr = tmp) {
-        evtimer_del((evtimer_t *)(&_nib_evtimer), ptr);
-    }
-    _nib_init();
+    gnrc_ipv6_nib_init();
 }
 
 /*
@@ -114,9 +107,9 @@ static void test_nib_nc_set__ENOMEM_diff_addr_iface(void)
 static void test_nib_nc_set__success(void)
 {
     void *iter_state = NULL;
-    ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                  { .u64 = TEST_UINT64 } } };
-    uint8_t l2addr[] = L2ADDR;
+    static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
+                                             { .u64 = TEST_UINT64 } } };
+    static const uint8_t l2addr[] = L2ADDR;
     gnrc_ipv6_nib_nc_t nce;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_nc_set(&addr, IFACE, l2addr,
@@ -179,7 +172,7 @@ static void test_nib_nc_del__unknown(void)
         iface++;
         l2addr[7]++;
     }
-    gnrc_ipv6_nib_nc_del(&addr);
+    gnrc_ipv6_nib_nc_del(&addr, iface);
     while (gnrc_ipv6_nib_nc_iter(0, &iter_state, &nce)) {
         count++;
     }
@@ -195,12 +188,12 @@ static void test_nib_nc_del__success(void)
     void *iter_state = NULL;
     static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                              { .u64 = TEST_UINT64 } } };
-    uint8_t l2addr[] = L2ADDR;
+    static const uint8_t l2addr[] = L2ADDR;
     gnrc_ipv6_nib_nc_t nce;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_nc_set(&addr, IFACE, l2addr,
                                                   sizeof(l2addr)));
-    gnrc_ipv6_nib_nc_del(&addr);
+    gnrc_ipv6_nib_nc_del(&addr, IFACE);
     TEST_ASSERT(!gnrc_ipv6_nib_nc_iter(0, &iter_state, &nce));
 }
 
@@ -283,20 +276,12 @@ static void test_nib_nc_mark_reachable__unmanaged(void)
 static void test_nib_nc_mark_reachable__success(void)
 {
     void *iter_state = NULL;
-    _nib_onl_entry_t *node;
-#if GNRC_IPV6_NIB_CONF_ARSM
-    evtimer_msg_event_t *event;
-#endif
-    _nib_iface_t *iface;
     static const ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
                                              { .u64 = TEST_UINT64 } } };
     gnrc_ipv6_nib_nc_t nce;
 
-    TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, IFACE,
-                                             GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE)));
-    /* set an "infinite" reachability time */
-    iface = _nib_iface_get(_nib_onl_get_if(node));
-    iface->reach_time = UINT32_MAX;
+    TEST_ASSERT_NOT_NULL(_nib_nc_add(&addr, IFACE,
+                                     GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE));
 
     /* check pre-state */
     TEST_ASSERT(gnrc_ipv6_nib_nc_iter(0, &iter_state, &nce));
@@ -313,11 +298,6 @@ static void test_nib_nc_mark_reachable__success(void)
     /* check if entry is reachable */
     TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE,
                           gnrc_ipv6_nib_nc_get_nud_state(&nce));
-    /* check if there now is an event for reachability timeout of node */
-    TEST_ASSERT_NOT_NULL((event = (evtimer_msg_event_t *)_nib_evtimer.events));
-    TEST_ASSERT_EQUAL_INT(GNRC_IPV6_NIB_REACH_TIMEOUT, event->msg.type);
-    TEST_ASSERT_MESSAGE(node == event->msg.content.ptr,
-                        "event's context is not node");
 #endif
     /* check if still the only entry */
     TEST_ASSERT(!gnrc_ipv6_nib_nc_iter(0, &iter_state, &nce));

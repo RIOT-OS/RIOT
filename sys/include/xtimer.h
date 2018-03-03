@@ -533,14 +533,15 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
  */
 #define XTIMER_CHAN (0)
 
-#endif
-
-#ifndef XTIMER_WIDTH
 #if (TIMER_0_MAX_VALUE) == 0xfffffful
 #define XTIMER_WIDTH (24)
 #elif (TIMER_0_MAX_VALUE) == 0xffff
 #define XTIMER_WIDTH (16)
-#else
+#endif
+
+#endif
+
+#ifndef XTIMER_WIDTH
 /**
  * @brief xtimer timer width
  *
@@ -548,7 +549,6 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
  * Default is 32.
  */
 #define XTIMER_WIDTH (32)
-#endif
 #endif
 
 #if (XTIMER_WIDTH != 32) || DOXYGEN
@@ -579,7 +579,11 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 #endif
 
 #ifndef XTIMER_SHIFT
-#if (XTIMER_HZ == XTIMER_HZ_BASE)
+#if (XTIMER_HZ == 32768ul)
+/* No shift necessary, the conversion is not a power of two and is handled by
+ * functions in tick_conversion.h */
+#define XTIMER_SHIFT (0)
+#elif (XTIMER_HZ == XTIMER_HZ_BASE)
 /**
  * @brief   xtimer prescaler value
  *

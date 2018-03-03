@@ -1,17 +1,13 @@
-# name of your application
-APPLICATION = od
 include ../Makefile.tests_common
 
 USEMODULE += od
-
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-CFLAGS += -DDEVELHELP
+# USEMODULE += od_string
 
 include $(RIOTBASE)/Makefile.include
 
 test:
-# `testrunner` calls `make term` recursively, results in duplicated `TERMFLAGS`.
-# So clears `TERMFLAGS` before run.
-	TERMFLAGS= tests/01-run.py
+ifeq (,$(filter od_string,$(USEMODULE)))
+	tests/01-run.py
+else
+	tests/02-run.py
+endif

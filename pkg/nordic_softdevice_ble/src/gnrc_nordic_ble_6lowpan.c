@@ -35,6 +35,7 @@
  * @brief       Glue for Nordic's SoftDevice BLE 6lowpan blob to netapi
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Martine Lenders <m.lenders@fu-berlin.de>
  * @}
  */
 
@@ -45,6 +46,7 @@
 #include "thread.h"
 
 #include "net/gnrc.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/nettype.h"
 
 #include "ble-core.h"
@@ -59,13 +61,14 @@
 #include "od.h"
 #endif
 
-#define BLE_NETAPI_MSG_QUEUE_SIZE   (8U)
-#define BLE_PRIO                    (THREAD_PRIORITY_MAIN - 1)
+#define BLE_PRIO                    (GNRC_NETIF_PRIO)
 
-kernel_pid_t gnrc_nordic_ble_6lowpan_pid;
+/* XXX: netdev required by gnrc_netif, but not implemented fully for
+ * nordic_softdevice_ble for legacy reasons */
+
 static char _stack[(THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)];
 
-static uint8_t _own_mac_addr[BLE_SIXLOWPAN_L2_ADDR_LEN];
+static gnrc_netif_t *_ble_netif = NULL;
 
 static uint8_t _sendbuf[BLE_SIXLOWPAN_MTU];
 
@@ -73,7 +76,7 @@ static void _ble_mac_callback(ble_mac_event_enum_t event, void* arg)
 {
     msg_t m = { .type=event, .content.ptr=arg };
 
-    if (!msg_send_int(&m, gnrc_nordic_ble_6lowpan_pid)) {
+    if ((_ble_netif == NULL) || !msg_send_int(&m, _ble_netif->pid)) {
         puts("_ble_mac_callback(): possibly lost interrupt");
     }
 }
@@ -103,8 +106,8 @@ static void _handle_raw_sixlowpan(ble_mac_inbuf_t *inbuf)
 
     gnrc_netif_hdr_init(netif_hdr->data, BLE_SIXLOWPAN_L2_ADDR_LEN, BLE_SIXLOWPAN_L2_ADDR_LEN);
     gnrc_netif_hdr_set_src_addr(netif_hdr->data, inbuf->src, BLE_SIXLOWPAN_L2_ADDR_LEN);
-    gnrc_netif_hdr_set_dst_addr(netif_hdr->data, _own_mac_addr, BLE_SIXLOWPAN_L2_ADDR_LEN);
-    ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = gnrc_nordic_ble_6lowpan_pid;
+    gnrc_netif_hdr_set_dst_addr(netif_hdr->data, _ble_netif->l2addr, BLE_SIXLOWPAN_L2_ADDR_LEN);
+    ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = _ble_netif->pid;
 
     DEBUG("_handle_raw_sixlowpan(): received packet from %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x "
             "of length %d\n",
@@ -174,45 +177,51 @@ static int _send(gnrc_pktsnip_t *pkt)
 
     return 0;
 }
-static int _handle_get(gnrc_netapi_opt_t *_opt)
+
+static int _netdev_init(netdev_t *dev)
+{
+    _ble_netif = dev->context;
+    ble_stack_init();
+    ble_mac_init(_ble_mac_callback);
+    _ble_netif->l2addr_len = BLE_SIXLOWPAN_L2_ADDR_LEN;
+    ble_get_mac(_ble_netif->l2addr);
+    ble_advertising_init("RIOT BLE");
+    ble_advertising_start();
+    return 0;
+}
+
+static int _netdev_get(netdev_t *netdev, netopt_t opt,
+                       void *v, size_t max_len)
 {
     int res = -ENOTSUP;
-    uint8_t *value = _opt->data;
+    uint8_t *value = v;
 
-    switch (_opt->opt) {
-        case NETOPT_ACK_REQ:
-        case NETOPT_CHANNEL:
-        case NETOPT_NID:
-        case NETOPT_ADDRESS:
-            /* -ENOTSUP */
-            break;
+    (void)netdev;
+    switch (opt) {
         case NETOPT_ADDRESS_LONG:
-            assert(_opt->data_len >= BLE_SIXLOWPAN_L2_ADDR_LEN);
-            memcpy(value, _own_mac_addr, BLE_SIXLOWPAN_L2_ADDR_LEN);
-            value[0] = IPV6_IID_FLIP_VALUE;
+            assert(max_len >= BLE_SIXLOWPAN_L2_ADDR_LEN);
+            memcpy(value, _ble_netif->l2addr, BLE_SIXLOWPAN_L2_ADDR_LEN);
             res = BLE_SIXLOWPAN_L2_ADDR_LEN;
             break;
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
-            assert(_opt->data_len == sizeof(uint16_t));
+            assert(max_len == sizeof(uint16_t));
             *((uint16_t *)value) = BLE_SIXLOWPAN_L2_ADDR_LEN;
             res = sizeof(uint16_t);
             break;
-#ifdef MODULE_GNRC
         case NETOPT_PROTO:
-            assert(_opt->data_len == sizeof(gnrc_nettype_t));
+            assert(max_len == sizeof(gnrc_nettype_t));
             *((gnrc_nettype_t *)value) = GNRC_NETTYPE_SIXLOWPAN;
             res = sizeof(gnrc_nettype_t);
             break;
-#endif
-/*        case NETOPT_DEVICE_TYPE:
-            assert(_opt->data_len == sizeof(uint16_t));
-            *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
+        case NETOPT_DEVICE_TYPE:
+            assert(max_len == sizeof(uint16_t));
+            *((uint16_t *)value) = NETDEV_TYPE_BLE;
             res = sizeof(uint16_t);
-            break;*/
+            break;
         case NETOPT_IPV6_IID:
-            memcpy(value, _own_mac_addr, BLE_SIXLOWPAN_L2_ADDR_LEN);
-            value[0] = IPV6_IID_FLIP_VALUE;
+            memcpy(value, _ble_netif->l2addr, BLE_SIXLOWPAN_L2_ADDR_LEN);
+            value[0] ^= IPV6_IID_FLIP_VALUE;
             res = BLE_SIXLOWPAN_L2_ADDR_LEN;
             break;
         default:
@@ -221,97 +230,67 @@ static int _handle_get(gnrc_netapi_opt_t *_opt)
     return res;
 }
 
-/**
- * @brief   Startup code and event loop of the gnrc_nordic_ble_6lowpan layer
- *
- * @return          never returns
- */
-static void *_gnrc_nordic_ble_6lowpan_thread(void *args)
+static int _netdev_set(netdev_t *netdev, netopt_t opt,
+                       const void *value, size_t value_len)
 {
-    (void)args;
+    (void)netdev;
+    (void)opt;
+    (void)value;
+    (void)value_len;
+    return -ENOTSUP;
+}
 
-    DEBUG("gnrc_nordic_ble_6lowpan: starting thread\n");
+static int _netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
+{
+    (void)netif;
+    assert(netif == _ble_netif);
+    return _send(pkt);
+}
 
-    gnrc_nordic_ble_6lowpan_pid = thread_getpid();
-
-    gnrc_netapi_opt_t *opt;
-    int res;
-    msg_t msg, reply, msg_queue[BLE_NETAPI_MSG_QUEUE_SIZE];
-
-    /* setup the message queue */
-    msg_init_queue(msg_queue, BLE_NETAPI_MSG_QUEUE_SIZE);
-
-    /* initialize BLE stack */
-    assert((unsigned)softdevice_handler_isEnabled());
-
-    ble_stack_init();
-    ble_get_mac(_own_mac_addr);
-
-    ble_mac_init(_ble_mac_callback);
-
-    ble_advertising_init("RIOT BLE");
-    ble_advertising_start();
-
-    /* register the device to the network stack*/
-    gnrc_netif_add(thread_getpid());
-
-    /* start the event loop */
-    while (1) {
-//        DEBUG("gnrc_nordic_ble_6lowpan: waiting for incoming messages\n");
-        msg_receive(&msg);
-        /* dispatch NETDEV and NETAPI messages */
-        switch (msg.type) {
-            case BLE_EVENT_RX_DONE:
-                {
-                    DEBUG("ble rx:\n");
-                    _handle_raw_sixlowpan(msg.content.ptr);
-                    ble_mac_busy_rx = 0;
-                    break;
-                }
-            case GNRC_NETAPI_MSG_TYPE_SND:
-                DEBUG("gnrc_nordic_ble_6lowpan: GNRC_NETAPI_MSG_TYPE_SND received\n");
-                _send(msg.content.ptr);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_SET:
-                /* read incoming options */
-                opt = msg.content.ptr;
-                DEBUG("gnrc_nordic_ble_6lowpan: GNRC_NETAPI_MSG_TYPE_SET received. opt=%s\n",
-                      netopt2str(opt->opt));
-                /* set option for device driver */
-                res = ENOTSUP;
-                DEBUG("gnrc_nordic_ble_6lowpan: response of netdev->set: %i\n", res);
-                /* send reply to calling thread */
-                reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
-                reply.content.value = (uint32_t)res;
-                msg_reply(&msg, &reply);
-                break;
-            case GNRC_NETAPI_MSG_TYPE_GET:
-                /* read incoming options */
-                opt = msg.content.ptr;
-                DEBUG("gnrc_nordic_ble_6lowpan: GNRC_NETAPI_MSG_TYPE_GET received. opt=%s\n",
-                      netopt2str(opt->opt));
-                res = _handle_get(opt);
-                DEBUG("gnrc_nordic_ble_6lowpan: response of netdev->get: %i\n", res);
-                /* send reply to calling thread */
-                reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
-                reply.content.value = (uint32_t)res;
-                msg_reply(&msg, &reply);
-                break;
-            default:
-                DEBUG("gnrc_nordic_ble_6lowpan: Unknown command %" PRIu16 "\n", msg.type);
-                break;
-        }
-    }
-    /* never reached */
+static gnrc_pktsnip_t *_netif_recv(gnrc_netif_t *netif)
+{
+    (void)netif;
+    /* not supported */
     return NULL;
 }
 
+static void _netif_msg_handler(gnrc_netif_t *netif, msg_t *msg)
+{
+    switch (msg->type) {
+        case BLE_EVENT_RX_DONE:
+            {
+                DEBUG("ble rx:\n");
+                _handle_raw_sixlowpan(msg->content.ptr);
+                ble_mac_busy_rx = 0;
+                break;
+            }
+    }
+}
+
+static const gnrc_netif_ops_t _ble_ops = {
+    .init = NULL,
+    .send = _netif_send,
+    .recv = _netif_recv,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
+    .msg_handler = _netif_msg_handler,
+};
+
+static const netdev_driver_t _ble_netdev_driver = {
+    .send = NULL,
+    .recv = NULL,
+    .init = _netdev_init,
+    .isr  =  NULL,
+    .get  = _netdev_get,
+    .set  = _netdev_set,
+};
+
+static netdev_t _ble_dummy_dev = {
+    .driver = &_ble_netdev_driver,
+};
+
 void gnrc_nordic_ble_6lowpan_init(void)
 {
-    kernel_pid_t res = thread_create(_stack, sizeof(_stack), BLE_PRIO,
-                        THREAD_CREATE_STACKTEST,
-                        _gnrc_nordic_ble_6lowpan_thread, NULL,
-                        "ble");
-    assert(res > 0);
-    (void)res;
+    gnrc_netif_create(_stack, sizeof(_stack), BLE_PRIO,
+                      "ble", &_ble_dummy_dev, &_ble_ops);
 }

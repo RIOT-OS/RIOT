@@ -27,7 +27,6 @@ endif
 
 # Use colored compiler output if the compiler supports this and if this is not
 # disabled by the user
-CC_NOCOLOR ?= 0
 ifeq ($(CC_NOCOLOR),0)
   ifeq ($(shell $(CC) -fdiagnostics-color -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
     CFLAGS += -fdiagnostics-color

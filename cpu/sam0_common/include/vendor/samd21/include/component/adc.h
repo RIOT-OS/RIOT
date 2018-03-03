@@ -3,7 +3,7 @@
  *
  * \brief Component description for ADC
  *
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMD21_ADC_COMPONENT_
@@ -97,7 +94,7 @@ typedef union {
 
 #define ADC_REFCTRL_REFSEL_Pos      0            /**< \brief (ADC_REFCTRL) Reference Selection */
 #define ADC_REFCTRL_REFSEL_Msk      (0xFul << ADC_REFCTRL_REFSEL_Pos)
-#define ADC_REFCTRL_REFSEL(value)   ((ADC_REFCTRL_REFSEL_Msk & ((value) << ADC_REFCTRL_REFSEL_Pos)))
+#define ADC_REFCTRL_REFSEL(value)   (ADC_REFCTRL_REFSEL_Msk & ((value) << ADC_REFCTRL_REFSEL_Pos))
 #define   ADC_REFCTRL_REFSEL_INT1V_Val    0x0ul  /**< \brief (ADC_REFCTRL) 1.0V voltage reference */
 #define   ADC_REFCTRL_REFSEL_INTVCC0_Val  0x1ul  /**< \brief (ADC_REFCTRL) 1/1.48 VDDANA */
 #define   ADC_REFCTRL_REFSEL_INTVCC1_Val  0x2ul  /**< \brief (ADC_REFCTRL) 1/2 VDDANA (only for VDDANA > 2.0V) */
@@ -129,7 +126,7 @@ typedef union {
 
 #define ADC_AVGCTRL_SAMPLENUM_Pos   0            /**< \brief (ADC_AVGCTRL) Number of Samples to be Collected */
 #define ADC_AVGCTRL_SAMPLENUM_Msk   (0xFul << ADC_AVGCTRL_SAMPLENUM_Pos)
-#define ADC_AVGCTRL_SAMPLENUM(value) ((ADC_AVGCTRL_SAMPLENUM_Msk & ((value) << ADC_AVGCTRL_SAMPLENUM_Pos)))
+#define ADC_AVGCTRL_SAMPLENUM(value) (ADC_AVGCTRL_SAMPLENUM_Msk & ((value) << ADC_AVGCTRL_SAMPLENUM_Pos))
 #define   ADC_AVGCTRL_SAMPLENUM_1_Val     0x0ul  /**< \brief (ADC_AVGCTRL) 1 sample */
 #define   ADC_AVGCTRL_SAMPLENUM_2_Val     0x1ul  /**< \brief (ADC_AVGCTRL) 2 samples */
 #define   ADC_AVGCTRL_SAMPLENUM_4_Val     0x2ul  /**< \brief (ADC_AVGCTRL) 4 samples */
@@ -154,7 +151,7 @@ typedef union {
 #define ADC_AVGCTRL_SAMPLENUM_1024  (ADC_AVGCTRL_SAMPLENUM_1024_Val << ADC_AVGCTRL_SAMPLENUM_Pos)
 #define ADC_AVGCTRL_ADJRES_Pos      4            /**< \brief (ADC_AVGCTRL) Adjusting Result / Division Coefficient */
 #define ADC_AVGCTRL_ADJRES_Msk      (0x7ul << ADC_AVGCTRL_ADJRES_Pos)
-#define ADC_AVGCTRL_ADJRES(value)   ((ADC_AVGCTRL_ADJRES_Msk & ((value) << ADC_AVGCTRL_ADJRES_Pos)))
+#define ADC_AVGCTRL_ADJRES(value)   (ADC_AVGCTRL_ADJRES_Msk & ((value) << ADC_AVGCTRL_ADJRES_Pos))
 #define ADC_AVGCTRL_MASK            0x7Ful       /**< \brief (ADC_AVGCTRL) MASK Register */
 
 /* -------- ADC_SAMPCTRL : (ADC Offset: 0x03) (R/W  8) Sampling Time Control -------- */
@@ -173,7 +170,7 @@ typedef union {
 
 #define ADC_SAMPCTRL_SAMPLEN_Pos    0            /**< \brief (ADC_SAMPCTRL) Sampling Time Length */
 #define ADC_SAMPCTRL_SAMPLEN_Msk    (0x3Ful << ADC_SAMPCTRL_SAMPLEN_Pos)
-#define ADC_SAMPCTRL_SAMPLEN(value) ((ADC_SAMPCTRL_SAMPLEN_Msk & ((value) << ADC_SAMPCTRL_SAMPLEN_Pos)))
+#define ADC_SAMPCTRL_SAMPLEN(value) (ADC_SAMPCTRL_SAMPLEN_Msk & ((value) << ADC_SAMPCTRL_SAMPLEN_Pos))
 #define ADC_SAMPCTRL_MASK           0x3Ful       /**< \brief (ADC_SAMPCTRL) MASK Register */
 
 /* -------- ADC_CTRLB : (ADC Offset: 0x04) (R/W 16) Control B -------- */
@@ -206,7 +203,7 @@ typedef union {
 #define ADC_CTRLB_CORREN            (0x1ul << ADC_CTRLB_CORREN_Pos)
 #define ADC_CTRLB_RESSEL_Pos        4            /**< \brief (ADC_CTRLB) Conversion Result Resolution */
 #define ADC_CTRLB_RESSEL_Msk        (0x3ul << ADC_CTRLB_RESSEL_Pos)
-#define ADC_CTRLB_RESSEL(value)     ((ADC_CTRLB_RESSEL_Msk & ((value) << ADC_CTRLB_RESSEL_Pos)))
+#define ADC_CTRLB_RESSEL(value)     (ADC_CTRLB_RESSEL_Msk & ((value) << ADC_CTRLB_RESSEL_Pos))
 #define   ADC_CTRLB_RESSEL_12BIT_Val      0x0ul  /**< \brief (ADC_CTRLB) 12-bit result */
 #define   ADC_CTRLB_RESSEL_16BIT_Val      0x1ul  /**< \brief (ADC_CTRLB) For averaging mode output */
 #define   ADC_CTRLB_RESSEL_10BIT_Val      0x2ul  /**< \brief (ADC_CTRLB) 10-bit result */
@@ -217,7 +214,7 @@ typedef union {
 #define ADC_CTRLB_RESSEL_8BIT       (ADC_CTRLB_RESSEL_8BIT_Val     << ADC_CTRLB_RESSEL_Pos)
 #define ADC_CTRLB_PRESCALER_Pos     8            /**< \brief (ADC_CTRLB) Prescaler Configuration */
 #define ADC_CTRLB_PRESCALER_Msk     (0x7ul << ADC_CTRLB_PRESCALER_Pos)
-#define ADC_CTRLB_PRESCALER(value)  ((ADC_CTRLB_PRESCALER_Msk & ((value) << ADC_CTRLB_PRESCALER_Pos)))
+#define ADC_CTRLB_PRESCALER(value)  (ADC_CTRLB_PRESCALER_Msk & ((value) << ADC_CTRLB_PRESCALER_Pos))
 #define   ADC_CTRLB_PRESCALER_DIV4_Val    0x0ul  /**< \brief (ADC_CTRLB) Peripheral clock divided by 4 */
 #define   ADC_CTRLB_PRESCALER_DIV8_Val    0x1ul  /**< \brief (ADC_CTRLB) Peripheral clock divided by 8 */
 #define   ADC_CTRLB_PRESCALER_DIV16_Val   0x2ul  /**< \brief (ADC_CTRLB) Peripheral clock divided by 16 */
@@ -252,7 +249,7 @@ typedef union {
 
 #define ADC_WINCTRL_WINMODE_Pos     0            /**< \brief (ADC_WINCTRL) Window Monitor Mode */
 #define ADC_WINCTRL_WINMODE_Msk     (0x7ul << ADC_WINCTRL_WINMODE_Pos)
-#define ADC_WINCTRL_WINMODE(value)  ((ADC_WINCTRL_WINMODE_Msk & ((value) << ADC_WINCTRL_WINMODE_Pos)))
+#define ADC_WINCTRL_WINMODE(value)  (ADC_WINCTRL_WINMODE_Msk & ((value) << ADC_WINCTRL_WINMODE_Pos))
 #define   ADC_WINCTRL_WINMODE_DISABLE_Val 0x0ul  /**< \brief (ADC_WINCTRL) No window mode (default) */
 #define   ADC_WINCTRL_WINMODE_MODE1_Val   0x1ul  /**< \brief (ADC_WINCTRL) Mode 1: RESULT > WINLT */
 #define   ADC_WINCTRL_WINMODE_MODE2_Val   0x2ul  /**< \brief (ADC_WINCTRL) Mode 2: RESULT < WINUT */
@@ -308,7 +305,7 @@ typedef union {
 
 #define ADC_INPUTCTRL_MUXPOS_Pos    0            /**< \brief (ADC_INPUTCTRL) Positive Mux Input Selection */
 #define ADC_INPUTCTRL_MUXPOS_Msk    (0x1Ful << ADC_INPUTCTRL_MUXPOS_Pos)
-#define ADC_INPUTCTRL_MUXPOS(value) ((ADC_INPUTCTRL_MUXPOS_Msk & ((value) << ADC_INPUTCTRL_MUXPOS_Pos)))
+#define ADC_INPUTCTRL_MUXPOS(value) (ADC_INPUTCTRL_MUXPOS_Msk & ((value) << ADC_INPUTCTRL_MUXPOS_Pos))
 #define   ADC_INPUTCTRL_MUXPOS_PIN0_Val   0x0ul  /**< \brief (ADC_INPUTCTRL) ADC AIN0 Pin */
 #define   ADC_INPUTCTRL_MUXPOS_PIN1_Val   0x1ul  /**< \brief (ADC_INPUTCTRL) ADC AIN1 Pin */
 #define   ADC_INPUTCTRL_MUXPOS_PIN2_Val   0x2ul  /**< \brief (ADC_INPUTCTRL) ADC AIN2 Pin */
@@ -361,7 +358,7 @@ typedef union {
 #define ADC_INPUTCTRL_MUXPOS_DAC    (ADC_INPUTCTRL_MUXPOS_DAC_Val  << ADC_INPUTCTRL_MUXPOS_Pos)
 #define ADC_INPUTCTRL_MUXNEG_Pos    8            /**< \brief (ADC_INPUTCTRL) Negative Mux Input Selection */
 #define ADC_INPUTCTRL_MUXNEG_Msk    (0x1Ful << ADC_INPUTCTRL_MUXNEG_Pos)
-#define ADC_INPUTCTRL_MUXNEG(value) ((ADC_INPUTCTRL_MUXNEG_Msk & ((value) << ADC_INPUTCTRL_MUXNEG_Pos)))
+#define ADC_INPUTCTRL_MUXNEG(value) (ADC_INPUTCTRL_MUXNEG_Msk & ((value) << ADC_INPUTCTRL_MUXNEG_Pos))
 #define   ADC_INPUTCTRL_MUXNEG_PIN0_Val   0x0ul  /**< \brief (ADC_INPUTCTRL) ADC AIN0 Pin */
 #define   ADC_INPUTCTRL_MUXNEG_PIN1_Val   0x1ul  /**< \brief (ADC_INPUTCTRL) ADC AIN1 Pin */
 #define   ADC_INPUTCTRL_MUXNEG_PIN2_Val   0x2ul  /**< \brief (ADC_INPUTCTRL) ADC AIN2 Pin */
@@ -384,13 +381,13 @@ typedef union {
 #define ADC_INPUTCTRL_MUXNEG_IOGND  (ADC_INPUTCTRL_MUXNEG_IOGND_Val << ADC_INPUTCTRL_MUXNEG_Pos)
 #define ADC_INPUTCTRL_INPUTSCAN_Pos 16           /**< \brief (ADC_INPUTCTRL) Number of Input Channels Included in Scan */
 #define ADC_INPUTCTRL_INPUTSCAN_Msk (0xFul << ADC_INPUTCTRL_INPUTSCAN_Pos)
-#define ADC_INPUTCTRL_INPUTSCAN(value) ((ADC_INPUTCTRL_INPUTSCAN_Msk & ((value) << ADC_INPUTCTRL_INPUTSCAN_Pos)))
+#define ADC_INPUTCTRL_INPUTSCAN(value) (ADC_INPUTCTRL_INPUTSCAN_Msk & ((value) << ADC_INPUTCTRL_INPUTSCAN_Pos))
 #define ADC_INPUTCTRL_INPUTOFFSET_Pos 20           /**< \brief (ADC_INPUTCTRL) Positive Mux Setting Offset */
 #define ADC_INPUTCTRL_INPUTOFFSET_Msk (0xFul << ADC_INPUTCTRL_INPUTOFFSET_Pos)
-#define ADC_INPUTCTRL_INPUTOFFSET(value) ((ADC_INPUTCTRL_INPUTOFFSET_Msk & ((value) << ADC_INPUTCTRL_INPUTOFFSET_Pos)))
+#define ADC_INPUTCTRL_INPUTOFFSET(value) (ADC_INPUTCTRL_INPUTOFFSET_Msk & ((value) << ADC_INPUTCTRL_INPUTOFFSET_Pos))
 #define ADC_INPUTCTRL_GAIN_Pos      24           /**< \brief (ADC_INPUTCTRL) Gain Factor Selection */
 #define ADC_INPUTCTRL_GAIN_Msk      (0xFul << ADC_INPUTCTRL_GAIN_Pos)
-#define ADC_INPUTCTRL_GAIN(value)   ((ADC_INPUTCTRL_GAIN_Msk & ((value) << ADC_INPUTCTRL_GAIN_Pos)))
+#define ADC_INPUTCTRL_GAIN(value)   (ADC_INPUTCTRL_GAIN_Msk & ((value) << ADC_INPUTCTRL_GAIN_Pos))
 #define   ADC_INPUTCTRL_GAIN_1X_Val       0x0ul  /**< \brief (ADC_INPUTCTRL) 1x */
 #define   ADC_INPUTCTRL_GAIN_2X_Val       0x1ul  /**< \brief (ADC_INPUTCTRL) 2x */
 #define   ADC_INPUTCTRL_GAIN_4X_Val       0x2ul  /**< \brief (ADC_INPUTCTRL) 4x */
@@ -489,13 +486,13 @@ typedef union {
 
 /* -------- ADC_INTFLAG : (ADC Offset: 0x18) (R/W  8) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint8_t  RESRDY:1;         /*!< bit:      0  Result Ready                       */
-    uint8_t  OVERRUN:1;        /*!< bit:      1  Overrun                            */
-    uint8_t  WINMON:1;         /*!< bit:      2  Window Monitor                     */
-    uint8_t  SYNCRDY:1;        /*!< bit:      3  Synchronization Ready              */
-    uint8_t  :4;               /*!< bit:  4.. 7  Reserved                           */
+    __I uint8_t  RESRDY:1;         /*!< bit:      0  Result Ready                       */
+    __I uint8_t  OVERRUN:1;        /*!< bit:      1  Overrun                            */
+    __I uint8_t  WINMON:1;         /*!< bit:      2  Window Monitor                     */
+    __I uint8_t  SYNCRDY:1;        /*!< bit:      3  Synchronization Ready              */
+    __I uint8_t  :4;               /*!< bit:  4.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } ADC_INTFLAG_Type;
@@ -547,7 +544,7 @@ typedef union {
 
 #define ADC_RESULT_RESULT_Pos       0            /**< \brief (ADC_RESULT) Result Conversion Value */
 #define ADC_RESULT_RESULT_Msk       (0xFFFFul << ADC_RESULT_RESULT_Pos)
-#define ADC_RESULT_RESULT(value)    ((ADC_RESULT_RESULT_Msk & ((value) << ADC_RESULT_RESULT_Pos)))
+#define ADC_RESULT_RESULT(value)    (ADC_RESULT_RESULT_Msk & ((value) << ADC_RESULT_RESULT_Pos))
 #define ADC_RESULT_MASK             0xFFFFul     /**< \brief (ADC_RESULT) MASK Register */
 
 /* -------- ADC_WINLT : (ADC Offset: 0x1C) (R/W 16) Window Monitor Lower Threshold -------- */
@@ -565,7 +562,7 @@ typedef union {
 
 #define ADC_WINLT_WINLT_Pos         0            /**< \brief (ADC_WINLT) Window Lower Threshold */
 #define ADC_WINLT_WINLT_Msk         (0xFFFFul << ADC_WINLT_WINLT_Pos)
-#define ADC_WINLT_WINLT(value)      ((ADC_WINLT_WINLT_Msk & ((value) << ADC_WINLT_WINLT_Pos)))
+#define ADC_WINLT_WINLT(value)      (ADC_WINLT_WINLT_Msk & ((value) << ADC_WINLT_WINLT_Pos))
 #define ADC_WINLT_MASK              0xFFFFul     /**< \brief (ADC_WINLT) MASK Register */
 
 /* -------- ADC_WINUT : (ADC Offset: 0x20) (R/W 16) Window Monitor Upper Threshold -------- */
@@ -583,7 +580,7 @@ typedef union {
 
 #define ADC_WINUT_WINUT_Pos         0            /**< \brief (ADC_WINUT) Window Upper Threshold */
 #define ADC_WINUT_WINUT_Msk         (0xFFFFul << ADC_WINUT_WINUT_Pos)
-#define ADC_WINUT_WINUT(value)      ((ADC_WINUT_WINUT_Msk & ((value) << ADC_WINUT_WINUT_Pos)))
+#define ADC_WINUT_WINUT(value)      (ADC_WINUT_WINUT_Msk & ((value) << ADC_WINUT_WINUT_Pos))
 #define ADC_WINUT_MASK              0xFFFFul     /**< \brief (ADC_WINUT) MASK Register */
 
 /* -------- ADC_GAINCORR : (ADC Offset: 0x24) (R/W 16) Gain Correction -------- */
@@ -602,7 +599,7 @@ typedef union {
 
 #define ADC_GAINCORR_GAINCORR_Pos   0            /**< \brief (ADC_GAINCORR) Gain Correction Value */
 #define ADC_GAINCORR_GAINCORR_Msk   (0xFFFul << ADC_GAINCORR_GAINCORR_Pos)
-#define ADC_GAINCORR_GAINCORR(value) ((ADC_GAINCORR_GAINCORR_Msk & ((value) << ADC_GAINCORR_GAINCORR_Pos)))
+#define ADC_GAINCORR_GAINCORR(value) (ADC_GAINCORR_GAINCORR_Msk & ((value) << ADC_GAINCORR_GAINCORR_Pos))
 #define ADC_GAINCORR_MASK           0x0FFFul     /**< \brief (ADC_GAINCORR) MASK Register */
 
 /* -------- ADC_OFFSETCORR : (ADC Offset: 0x26) (R/W 16) Offset Correction -------- */
@@ -621,7 +618,7 @@ typedef union {
 
 #define ADC_OFFSETCORR_OFFSETCORR_Pos 0            /**< \brief (ADC_OFFSETCORR) Offset Correction Value */
 #define ADC_OFFSETCORR_OFFSETCORR_Msk (0xFFFul << ADC_OFFSETCORR_OFFSETCORR_Pos)
-#define ADC_OFFSETCORR_OFFSETCORR(value) ((ADC_OFFSETCORR_OFFSETCORR_Msk & ((value) << ADC_OFFSETCORR_OFFSETCORR_Pos)))
+#define ADC_OFFSETCORR_OFFSETCORR(value) (ADC_OFFSETCORR_OFFSETCORR_Msk & ((value) << ADC_OFFSETCORR_OFFSETCORR_Pos))
 #define ADC_OFFSETCORR_MASK         0x0FFFul     /**< \brief (ADC_OFFSETCORR) MASK Register */
 
 /* -------- ADC_CALIB : (ADC Offset: 0x28) (R/W 16) Calibration -------- */
@@ -641,10 +638,10 @@ typedef union {
 
 #define ADC_CALIB_LINEARITY_CAL_Pos 0            /**< \brief (ADC_CALIB) Linearity Calibration Value */
 #define ADC_CALIB_LINEARITY_CAL_Msk (0xFFul << ADC_CALIB_LINEARITY_CAL_Pos)
-#define ADC_CALIB_LINEARITY_CAL(value) ((ADC_CALIB_LINEARITY_CAL_Msk & ((value) << ADC_CALIB_LINEARITY_CAL_Pos)))
+#define ADC_CALIB_LINEARITY_CAL(value) (ADC_CALIB_LINEARITY_CAL_Msk & ((value) << ADC_CALIB_LINEARITY_CAL_Pos))
 #define ADC_CALIB_BIAS_CAL_Pos      8            /**< \brief (ADC_CALIB) Bias Calibration Value */
 #define ADC_CALIB_BIAS_CAL_Msk      (0x7ul << ADC_CALIB_BIAS_CAL_Pos)
-#define ADC_CALIB_BIAS_CAL(value)   ((ADC_CALIB_BIAS_CAL_Msk & ((value) << ADC_CALIB_BIAS_CAL_Pos)))
+#define ADC_CALIB_BIAS_CAL(value)   (ADC_CALIB_BIAS_CAL_Msk & ((value) << ADC_CALIB_BIAS_CAL_Pos))
 #define ADC_CALIB_MASK              0x07FFul     /**< \brief (ADC_CALIB) MASK Register */
 
 /* -------- ADC_DBGCTRL : (ADC Offset: 0x2A) (R/W  8) Debug Control -------- */

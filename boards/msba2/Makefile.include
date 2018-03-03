@@ -2,6 +2,6 @@ ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += cc110x
 endif
 
-USEMODULE += msba2-common
+USEMODULE += boards_common_msba2
 
-include $(RIOTBOARD)/msba2-common/Makefile.include
+include $(RIOTBOARD)/common/msba2/Makefile.include

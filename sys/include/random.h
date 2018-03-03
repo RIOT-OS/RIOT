@@ -27,9 +27,18 @@
 #define RANDOM_H
 
 #include <inttypes.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef RANDOM_SEED_DEFAULT
+/**
+ * @brief   Seed selected when all tries to collect seeds from a random source
+ *          failed
+ */
+#define RANDOM_SEED_DEFAULT (1)
 #endif
 
 /**
@@ -66,6 +75,11 @@ void random_init_by_array(uint32_t init_key[], int key_length);
  * @return a random number on [0,0xffffffff]-interval
  */
 uint32_t random_uint32(void);
+
+/**
+ * @brief writes random bytes in the [0,0xff]-interval to memory
+ */
+void random_bytes(uint8_t *buf, size_t size);
 
 /**
  * @brief   generates a random number r with a <= r < b.

@@ -1,5 +1,5 @@
 MODULE = board
 
-DIRS = $(RIOTBOARD)/arduino-mkr-common
+DIRS = $(RIOTBOARD)/common/arduino-mkr
 
 include $(RIOTBASE)/Makefile.base

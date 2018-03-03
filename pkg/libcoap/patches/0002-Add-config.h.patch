@@ -1,4 +1,4 @@
-From 8be22676f13bd7d254378e2c04119e1632ed55d7 Mon Sep 17 00:00:00 2001
+From 64fc056031b36a6799c8f1fe28c16b2ef6bdde1b Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mlenders@inf.fu-berlin.de>
 Date: Thu, 31 Oct 2013 14:02:07 +0100
 Subject: [PATCH 2/9] Add config.h
@@ -145,6 +145,6 @@ index 0000000..8915dd3
 +/* #undef ssize_t */
 +
 +#define WITH_POSIX 1
---
-1.8.3.2
+-- 
+2.15.1
 

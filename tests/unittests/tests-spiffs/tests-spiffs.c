@@ -143,6 +143,34 @@ static void test_spiffs_teardown(void)
     vfs_unlink("/test-spiffs/test1.txt");
     vfs_unlink("/test-spiffs/a/test2.txt");
     vfs_umount(&_test_spiffs_mount);
+
+    spiffs_desc.base_addr = 0;
+    spiffs_desc.block_count = 0;
+}
+
+static void tests_spiffs_format(void)
+{
+    int res;
+    vfs_umount(&_test_spiffs_mount);
+    res = mtd_erase(_dev, 0, _dev->page_size * _dev->pages_per_sector * _dev->sector_count);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    res = vfs_mount(&_test_spiffs_mount);
+    TEST_ASSERT(res < 0);
+
+    /* 1. format an invalid file system (failed mount) */
+    res = vfs_format(&_test_spiffs_mount);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    res = vfs_mount(&_test_spiffs_mount);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    res = vfs_umount(&_test_spiffs_mount);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    /* 2. format a valid file system */
+    res = vfs_format(&_test_spiffs_mount);
+    TEST_ASSERT_EQUAL_INT(0, res);
 }
 
 static void tests_spiffs_mount_umount(void)
@@ -326,15 +354,101 @@ static void tests_spiffs_rename(void)
     TEST_ASSERT_EQUAL_INT(0, res);
 }
 
+static void tests_spiffs_statvfs(void)
+{
+    const char buf[] = "TESTSTRING";
+    struct statvfs stat1;
+    struct statvfs stat2;
+
+    int res = vfs_statvfs("/test-spiffs/", &stat1);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(1, stat1.f_bsize);
+    TEST_ASSERT_EQUAL_INT(1, stat1.f_frsize);
+    TEST_ASSERT((_dev->pages_per_sector * _dev->page_size * _dev->sector_count) >=
+                          stat1.f_blocks);
+
+    int fd = vfs_open("/test-spiffs/test.txt", O_CREAT | O_RDWR, 0);
+    TEST_ASSERT(fd >= 0);
+
+    res = vfs_write(fd, buf, sizeof(buf));
+    TEST_ASSERT(res == sizeof(buf));
+
+    res = vfs_close(fd);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    res = vfs_statvfs("/test-spiffs/", &stat2);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    TEST_ASSERT_EQUAL_INT(1, stat2.f_bsize);
+    TEST_ASSERT_EQUAL_INT(1, stat2.f_frsize);
+    TEST_ASSERT(sizeof(buf) <= (stat1.f_bfree - stat2.f_bfree));
+    TEST_ASSERT(sizeof(buf) <= (stat1.f_bavail - stat2.f_bavail));
+}
+
+static void tests_spiffs_partition(void)
+{
+    vfs_umount(&_test_spiffs_mount);
+
+    spiffs_desc.base_addr = _dev->page_size * _dev->pages_per_sector;
+    spiffs_desc.block_count = 2;
+    mtd_erase(_dev, 0, _dev->page_size * _dev->pages_per_sector * _dev->sector_count);
+
+    int res = vfs_format(&_test_spiffs_mount);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    res = vfs_mount(&_test_spiffs_mount);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+#if SPIFFS_USE_MAGIC
+    /* if SPIFFS_USE_MAGIC is used, a magic word is written in each sector */
+    uint8_t buf[4];
+    const uint8_t buf_erased[4] = {0xff, 0xff, 0xff, 0xff};
+    int nread;
+    res = 0;
+    for (size_t i = 0; i < _dev->page_size * _dev->pages_per_sector; i += sizeof(buf)) {
+        nread = mtd_read(_dev, buf, _dev->page_size * _dev->pages_per_sector + i, sizeof(buf));
+        TEST_ASSERT_EQUAL_INT(sizeof(buf), nread);
+        res |= memcmp(buf, buf_erased, sizeof(buf));
+    }
+    TEST_ASSERT(res != 0);
+    res = 0;
+    for (size_t i = 0; i < _dev->page_size * _dev->pages_per_sector; i += sizeof(buf)) {
+        nread = mtd_read(_dev, buf, (2 * _dev->page_size * _dev->pages_per_sector) + i, sizeof(buf));
+        TEST_ASSERT_EQUAL_INT(sizeof(buf), nread);
+        res |= memcmp(buf, buf_erased, sizeof(buf));
+    }
+    TEST_ASSERT(res != 0);
+    /* Check previous sector (must be erased) */
+    res = 0;
+    for (size_t i = 0; i < _dev->page_size * _dev->pages_per_sector; i += sizeof(buf)) {
+        nread = mtd_read(_dev, buf, i, sizeof(buf));
+        TEST_ASSERT_EQUAL_INT(sizeof(buf), nread);
+        res |= memcmp(buf, buf_erased, sizeof(buf));
+    }
+    TEST_ASSERT(res == 0);
+    /* Check next sector (must be erased) */
+    res = 0;
+    for (size_t i = 0; i < _dev->page_size * _dev->pages_per_sector; i += sizeof(buf)) {
+        nread = mtd_read(_dev, buf, (3 * _dev->page_size * _dev->pages_per_sector) + i, sizeof(buf));
+        TEST_ASSERT_EQUAL_INT(sizeof(buf), nread);
+        res |= memcmp(buf, buf_erased, sizeof(buf));
+    }
+    TEST_ASSERT(res == 0);
+#endif
+}
+
 Test *tests_spiffs_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(tests_spiffs_format),
         new_TestFixture(tests_spiffs_mount_umount),
         new_TestFixture(tests_spiffs_open_close),
         new_TestFixture(tests_spiffs_write),
         new_TestFixture(tests_spiffs_unlink),
         new_TestFixture(tests_spiffs_readdir),
         new_TestFixture(tests_spiffs_rename),
+        new_TestFixture(tests_spiffs_statvfs),
+        new_TestFixture(tests_spiffs_partition),
     };
 
     EMB_UNIT_TESTCALLER(spiffs_tests, test_spiffs_setup, test_spiffs_teardown, fixtures);

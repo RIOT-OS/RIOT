@@ -22,6 +22,7 @@
 
 #include "net/gnrc/tftp.h"
 #include "net/gnrc/netapi.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/udp.h"
 #include "net/gnrc/ipv6.h"
@@ -253,14 +254,13 @@ static int _tftp_server(tftp_context_t *ctxt);
 static uint16_t _tftp_get_maximum_block_size(void)
 {
     uint16_t tmp;
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-    size_t ifnum = gnrc_netif_get(ifs);
+    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
 
-    if (ifnum > 0 && gnrc_netapi_get(ifs[0], NETOPT_MAX_PACKET_SIZE, 0, &tmp, sizeof(uint16_t)) >= 0) {
+    if ((netif != NULL) && gnrc_netapi_get(netif->pid, NETOPT_MAX_PACKET_SIZE,
+                                           0, &tmp, sizeof(uint16_t)) >= 0) {
         /* TODO calculate proper block size */
         return tmp - sizeof(udp_hdr_t) - sizeof(ipv6_hdr_t) - 10;
     }
-
     return GNRC_TFTP_MAX_TRANSFER_UNIT;
 }
 
@@ -367,7 +367,7 @@ int _tftp_init_ctxt(ipv6_addr_t *addr, const char *file_name,
     /* generate a random source UDP source port */
     do {
         ctxt->src_port = (random_uint32() & 0xff) + GNRC_TFTP_DEFAULT_SRC_PORT;
-    } while (gnrc_netreg_num(GNRC_NETTYPE_UDP, ctxt->src_port));
+    } while (gnrc_netreg_lookup(GNRC_NETTYPE_UDP, ctxt->src_port));
 
     return TS_FINISHED;
 }
@@ -722,7 +722,7 @@ tftp_state _tftp_state_processes(tftp_context_t *ctxt, msg_t *m)
             _tftp_send_dack(ctxt, outbuf, TO_ACK);
 
             /* check if the data transfer has finished */
-            if (proc < ctxt->block_size) {
+            if (proc < (int)ctxt->block_size) {
                 DEBUG("tftp: transfer finished\n");
 
                 if (ctxt->stop_cb) {

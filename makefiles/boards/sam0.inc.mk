@@ -1,25 +1,34 @@
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+# Use DEBUG_ADAPTER_ID to specify the programmer serial number to use:
+# export DEBUG_ADAPTER_ID="ATML..."
+
+# The SERIAL setting is only available for backwards compatibility with older
+# settings.
+ifneq (,$(SERIAL))
+  EDBG_ARGS += --serial $(SERIAL)
+  SERIAL_TTY = $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL)))
+  ifeq (,$(SERIAL_TTY))
+    $(error Did not find a device with serial $(SERIAL))
+  endif
+  PORT_LINUX := $(SERIAL_TTY)
+  export DEBUG_ADAPTER_ID ?= $(SERIAL)
+endif
 
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-# Add board selector (USB serial) to OpenOCD options if specified.
-# Use /dist/tools/usb-serial/list-ttys.sh to find out serial number.
-#   Usage: SERIAL="ATML..." BOARD=<board> make flash
-ifneq (,$(SERIAL))
-    export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
-    EDBG_ARGS += --serial $(SERIAL)
-    SERIAL_TTY = $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL)))
-    ifeq (,$(SERIAL_TTY))
-        $(error Did not find a device with serial $(SERIAL))
-    endif
-    PORT_LINUX := $(SERIAL_TTY)
-endif
+# Default for these boards is to use a CMSIS-DAP programmer
+export DEBUG_ADAPTER ?= dap
 
-# set this to either openocd or edbg
-PROGRAMMER ?= edbg
+# EDBG can only be used with a compatible Atmel programmer
+ifeq ($(DEBUG_ADAPTER),dap)
+  # set this to either openocd or edbg
+  PROGRAMMER ?= edbg
+else
+  PROGRAMMER ?= openocd
+endif
 
 # use edbg if selected and a device type has been set
 ifeq ($(PROGRAMMER),edbg)

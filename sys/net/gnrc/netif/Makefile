@@ -1,3 +1,3 @@
-MODULE = gnrc_netif
+MODULE := gnrc_netif
 
 include $(RIOTBASE)/Makefile.base

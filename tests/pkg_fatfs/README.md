@@ -1,27 +1,17 @@
-Using FatFs on native
+Using FatFs on RIOT
 =======================================
-To use this test on native you need a FAT image file. The following commands can be used to create such an image and mount it afterwards so you can add files to your virtual disk that can later be accessed from RIOT.
 
-1. create an enpty file with a size of 128MB
-`dd if=/dev/zero of=riot_fatfs_disk.img bs=1M count=128`
+# native
 
-2. create a FAT file system within the file
-`mkfs.fat riot_fatfs_disk.img`
+To use this test on native you can either use a FAT-formatted image file or directly use the mkfs command from the RIOT shell.
+Use `make image` to extract a prepared image file that already contains a simple test.txt file.
+This is only a convinience function to allow testing against a "default linux" formatted fat volume without the need to call mount or other stuff that may require super user privileges.
+Optionally `make compressed-image` can be used to generate the compressed image that is in turn used by `make image`.
 
-3. create a mount point which you can use later to add files with your file browser
-`sudo mkdir -p /media/riot_fatfs_disk`
+To tell RIOT where your image file is located you can use the define `MTD_NATIVE_FILENAME`.
 
-4. give all needed rights for that mountpoint to your user
-`sudo chown <your_username> /media/riot_fatfs_disk/`
+	NOTE: You shouldn't leave the image mounted while you use it in RIOT, the abstraction layer between FatFs and the image file mimics a dumb block device (i.e. behaves much like the devices that are actually meant to be used with FAT) That implies it doesn't show any modifications in RIOT that you perform on your OS and the other way round. So always remember to mount/unmount correctly or your FS will probably get damaged.
 
-5. mount the image -> the disk should now be accessible from any program
-`sudo mount -o loop,umask=000 riot_fatfs_disk.img /media/riot_fatfs_disk`
+# Real Hardware
 
-6. When you are done -> unmount the disk before you use it under RIOT
-`sudo umount /media/riot_fatfs_disk`
-
-#####NOTE:
-You shouldn't leave the image mounted while you use it in RIOT, the abstraction layer between FatFs and the image file mimics a dumb block device
-(i.e. behaves much like the devices that are actually meant to be used with FAT) That implies it doesn't show any modifications in RIOT that you perform on your OS and the other way round. So always remember to mount/unmount correctly or your FS will probably get damaged.
-
-To tell RIOT where your image file is located you can use the image_path entry in the volume_files array in fatfs_diskio_native/diskio.c.
+Currently the test defaults to sdcard_spi on real hardware. But generally any device that supports the mtd-interface can be used with FatFs.

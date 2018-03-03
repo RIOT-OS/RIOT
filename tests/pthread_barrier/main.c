@@ -56,7 +56,7 @@ int main(void)
 {
     random_init(RAND_SEED);
 
-    puts("Start.\n");
+    puts("START\n");
     pthread_barrier_init(&barrier, NULL, NUM_CHILDREN);
 
     pthread_t children[NUM_CHILDREN];
@@ -70,6 +70,7 @@ int main(void)
     }
 
     pthread_barrier_destroy(&barrier);
-    puts("\nDone.");
+    puts("");
+    puts("SUCCESS");
     return 0;
 }

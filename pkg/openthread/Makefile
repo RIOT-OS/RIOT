@@ -10,7 +10,9 @@ $(info $$OPENTHREAD_ARGS is [${OPENTHREAD_ARGS}])
 
 .PHONY: all
 
-OPENTHREAD_COMMON_FLAGS=-fdata-sections -ffunction-sections -Os
+OPENTHREAD_COMMON_FLAGS = -fdata-sections -ffunction-sections -Os
+OPENTHREAD_COMMON_FLAGS += -Wno-implicit-fallthrough
+
 all: git-download
 	cd $(PKG_BUILDDIR) && PREFIX="/" ./bootstrap
 	cd $(PKG_BUILDDIR) && CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)"\
@@ -29,4 +31,5 @@ all: git-download
 	cp $(PKG_BUILDDIR)/output/lib/libopenthread-ftd.a ${BINDIR}/libopenthread.a
 	cp $(PKG_BUILDDIR)/output/lib/libopenthread-cli-ftd.a ${BINDIR}/libopenthread-cli.a
 	sed -ie 's/BASE/_BASE/g' $(PKG_BUILDDIR)/output/include/openthread/types.h
+
 include $(RIOTBASE)/pkg/pkg.mk

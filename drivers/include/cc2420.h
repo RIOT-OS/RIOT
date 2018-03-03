@@ -62,6 +62,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   RSSI offset
+ */
+#define CC2420_RSSI_OFFSET      (-45)
+
+/**
  * @brief   A couple of return values used in this driver
  */
 enum {

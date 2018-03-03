@@ -1,0 +1,7 @@
+# define the cpu used by the acd52832
+export CPU_MODEL = nrf52832xxaa
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+
+include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include

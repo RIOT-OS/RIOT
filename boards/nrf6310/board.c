@@ -11,7 +11,7 @@
  * @{
  *
  * @file        board.c
- * @brief       Board specific implementations for the nRF51822 evaluation board pca10005
+ * @brief       Board specific implementations for the NRF6310 board
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
  * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>

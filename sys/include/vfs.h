@@ -119,6 +119,29 @@ extern "C" {
 #define VFS_DIR_BUFFER_SIZE (12)
 #endif
 
+#ifndef VFS_FILE_BUFFER_SIZE
+/**
+ * @brief Size of buffer space in vfs_file_t
+ *
+ * Same as with VFS_DIR_BUFFER_SIZE some file systems (e.g. FatFs) require more space
+ * to store data about their files.
+ *
+ *
+ * Guidelines are same as with VFS_DIR_BUFFER_SIZE, so add the following snippet
+ * to your fs header:
+ *
+ * @attention @code
+ * #if VFS_FILE_BUFFER_SIZE < 123
+ * #error VFS_FILE_BUFFER_SIZE is too small, at least 123 bytes is required
+ * #endif
+ * @endcode
+ *
+ * @attention Put the check in the public header file (.h), do not put the check in the
+ * implementation (.c) file.
+ */
+#define VFS_FILE_BUFFER_SIZE (1)
+#endif
+
 #ifndef VFS_NAME_MAX
 /**
  * @brief Maximum length of the name in a @c vfs_dirent_t (not including terminating null)
@@ -192,6 +215,7 @@ typedef struct {
     union {
         void *ptr;              /**< pointer to private data */
         int value;              /**< alternatively, you can use private_data as an int */
+        uint8_t buffer[VFS_FILE_BUFFER_SIZE]; /**< Buffer space, in case a single pointer is not enough */
     } private_data;             /**< File system driver private data, implementation defined */
 } vfs_file_t;
 
@@ -402,6 +426,16 @@ struct vfs_dir_ops {
  * Similar, but not equal, to struct super_operations in Linux
  */
 struct vfs_file_system_ops {
+    /**
+     * @brief Format the file system on the given mount point
+     *
+     * @param[in]   mountp  file system to format
+     *
+     * @return 0 on success
+     * @return <0 on error
+     */
+    int (*format) (vfs_mount_t *mountp);
+
     /**
      * @brief Perform any extra processing needed after mounting a file system
      *
@@ -670,6 +704,21 @@ int vfs_readdir(vfs_DIR *dirp, vfs_dirent_t *entry);
  * @return <0 on error, the directory stream dirp should be considered invalid
  */
 int vfs_closedir(vfs_DIR *dirp);
+
+/**
+ * @brief Format a file system
+ *
+ * @p mountp should have been populated in advance with a file system driver,
+ * a mount point, and private_data (if the file system driver uses one).
+ *
+ * @pre @p mountp must not be mounted
+ *
+ * @param[in]  mountp   pointer to the mount structure of the filesystem to format
+ *
+ * @return 0 on success
+ * @return <0 on error
+ */
+int vfs_format(vfs_mount_t *mountp);
 
 /**
  * @brief Mount a file system

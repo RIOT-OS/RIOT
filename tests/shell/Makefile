@@ -1,4 +1,3 @@
-APPLICATION = shell
 include ../Makefile.tests_common
 
 USEMODULE += shell
@@ -11,3 +10,6 @@ DISABLE_MODULE += auto_init
 BOARD_BLACKLIST += chronos
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	tests/01-run.py

@@ -65,18 +65,17 @@
  * packet will be silently discarded.
  *
  * The @ref GNRC_NETTYPE_SIXLOWPAN header must at least have the gnrc_netif_hdr_t::if_pid field
- * set to a legal, 6LoWPAN compatible interface (a @ref gnrc_sixlowpan_netif_t entry referred to as
- * `iface` in the following must exist) referred to as "the interface thread" in the following,
- * otherwise the packet will be discarded.
+ * set to a legal, 6LoWPAN compatible interface referred to as `netif` in the
+ * following, otherwise the packet will be discarded.
  *
- * If @ref net_gnrc_sixlowpan_iphc is included and gnrc_sixlowpan_netif_t::iphc_enable of `iface`
+ * If @ref net_gnrc_sixlowpan_iphc is included and gnrc_sixlowpan_netif_t::iphc_enable of `netif`
  * is true the @ref GNRC_NETTYPE_IPV6 header will be compressed according to
  * <a href="https://tools.ietf.org/html/rfc6282">RFC 6282</a>. If it is false the
  * @ref SIXLOWPAN_UNCOMP dispatch will be appended as a new @ref gnrc_pktsnip_t to the packet.
  * The false case also applies if @ref net_gnrc_sixlowpan_iphc is not included.
  *
  * If the packet without @ref GNRC_NETTYPE_NETIF header is shorter than
- * gnrc_sixlowpan_netif_t::max_frag_size of `iface` the packet will be send to the interface
+ * gnrc_netif_t::sixlo::max_frag_size of `netif` the packet will be send to the `netif`'s
  * thread. Otherwise if @ref net_gnrc_sixlowpan_frag is included the packet will be fragmented
  * according to <a href="https://tools.ietf.org/html/rfc4944">RFC 4944</a> if the packet is without
  * @ref GNRC_NETTYPE_NETIF header shorter than @ref SIXLOWPAN_FRAG_MAX_LEN. If none of these cases
@@ -105,6 +104,7 @@
 #include "kernel_types.h"
 
 #include "net/gnrc/sixlowpan/frag.h"
+#include "net/gnrc/sixlowpan/internal.h"
 #include "net/gnrc/sixlowpan/iphc.h"
 #include "net/sixlowpan.h"
 

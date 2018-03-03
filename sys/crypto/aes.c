@@ -724,15 +724,15 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize)
 {
     uint8_t i;
 
-    // Make sure that context is large enough. If this is not the case,
-    // you should build with -DAES
+    /* Make sure that context is large enough. If this is not the case,
+       you should build with -DAES */
     if(CIPHER_MAX_CONTEXT_SIZE < AES_KEY_SIZE) {
         return CIPHER_ERR_BAD_CONTEXT_SIZE;
     }
 
-    //key must be at least CIPHERS_MAX_KEY_SIZE Bytes long
+    /* key must be at least CIPHERS_MAX_KEY_SIZE Bytes long */
     if (keySize < CIPHERS_MAX_KEY_SIZE) {
-        //fill up by concatenating key to as long as needed
+        /* fill up by concatenating key to as long as needed */
         for (i = 0; i < CIPHERS_MAX_KEY_SIZE; i++) {
             context->context[i] = key[(i % keySize)];
         }
@@ -939,7 +939,7 @@ static int aes_set_decrypt_key(const unsigned char *userKey, const int bits,
 int aes_encrypt(const cipher_context_t *context, const uint8_t *plainBlock,
                 uint8_t *cipherBlock)
 {
-    //setup AES_KEY
+    /* setup AES_KEY */
     int res;
     AES_KEY aeskey;
     const AES_KEY *key = &aeskey;
@@ -1198,7 +1198,7 @@ int aes_encrypt(const cipher_context_t *context, const uint8_t *plainBlock,
 int aes_decrypt(const cipher_context_t *context, const uint8_t *cipherBlock,
                 uint8_t *plainBlock)
 {
-    //setup AES_KEY
+    /* setup AES_KEY */
     int res;
     AES_KEY aeskey;
     const AES_KEY *key = &aeskey;

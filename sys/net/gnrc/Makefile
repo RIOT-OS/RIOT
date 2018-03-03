@@ -16,12 +16,6 @@ endif
 ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
   DIRS += network_layer/ipv6/hdr
 endif
-ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
-  DIRS += network_layer/ipv6/nc
-endif
-ifneq (,$(filter gnrc_ipv6_netif,$(USEMODULE)))
-  DIRS += network_layer/ipv6/netif
-endif
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   DIRS += network_layer/ipv6/nib
 endif
@@ -32,28 +26,13 @@ ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
   DIRS += network_layer/ipv6/blacklist
 endif
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
-  DIRS += network_layer/ndp
-endif
-ifneq (,$(filter gnrc_ndp_internal,$(USEMODULE)))
-  DIRS += network_layer/ndp/internal
-endif
-ifneq (,$(filter gnrc_ndp_host,$(USEMODULE)))
-  DIRS += network_layer/ndp/host
-endif
-ifneq (,$(filter gnrc_ndp_node,$(USEMODULE)))
-  DIRS += network_layer/ndp/node
-endif
-ifneq (,$(filter gnrc_ndp_router,$(USEMODULE)))
-  DIRS += network_layer/ndp/router
-endif
-ifneq (,$(filter gnrc_ndp2,$(USEMODULE)))
-    DIRS += network_layer/ndp2
+    DIRS += network_layer/ndp
 endif
 ifneq (,$(filter gnrc_netapi,$(USEMODULE)))
   DIRS += netapi
 endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
-  DIRS += netif
+    DIRS += netif
 endif
 ifneq (,$(filter gnrc_netif_hdr,$(USEMODULE)))
   DIRS += netif/hdr
@@ -72,6 +51,12 @@ ifneq (,$(filter gnrc_pkt,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
   DIRS += link_layer/lwmac
+endif
+ifneq (,$(filter gnrc_pktbuf_malloc,$(USEMODULE)))
+    DIRS += pktbuf_malloc
+endif
+ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
+    DIRS += link_layer/gomach
 endif
 ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
   DIRS += pktbuf_static
@@ -108,15 +93,6 @@ ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/nd
-endif
-ifneq (,$(filter gnrc_sixlowpan_nd_router,$(USEMODULE)))
-  DIRS += network_layer/sixlowpan/nd/router
-endif
-ifneq (,$(filter gnrc_sixlowpan_netif,$(USEMODULE)))
-  DIRS += network_layer/sixlowpan/netif
-endif
-ifneq (,$(filter gnrc_slip,$(USEMODULE)))
-  DIRS += link_layer/slip
 endif
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   DIRS += sock

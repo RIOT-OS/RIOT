@@ -86,7 +86,7 @@ int isrpipe_read(isrpipe_t *isrpipe, char *buf, size_t count);
  * @param[in]   isrpipe    isrpipe object to operate on
  * @param[in]   buf        buffer to write to
  * @param[in]   count      number of bytes to read
- * @param[in]   timeout    timeout in ms
+ * @param[in]   timeout    timeout in microseconds
  *
  * @returns     number of bytes read
  * @returns     -ETIMEDOUT on timeout
@@ -102,7 +102,7 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buf, size_t count, uint32_t t
  * @param[in]   isrpipe    isrpipe object to operate on
  * @param[in]   buf        buffer to write to
  * @param[in]   count      number of bytes to read
- * @param[in]   timeout    timeout in ms
+ * @param[in]   timeout    timeout in microseconds
  *
  * @returns     number of bytes read
  * @returns     -ETIMEDOUT on timeout

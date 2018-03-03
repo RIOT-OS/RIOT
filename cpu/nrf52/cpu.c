@@ -68,15 +68,17 @@ void cpu_init(void)
 #ifdef SOFTDEVICE_PRESENT
     softdevice_handler_init(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, &_ble_evt_buffer,
             BLE_STACK_EVT_MSG_BUF_SIZE, NULL);
-#endif
-    /* call cortexm default initialization */
-    cortexm_init();
 
-#ifdef SOFTDEVICE_PRESENT
     /* fixup swi0 (used as softdevice PendSV trampoline) */
     NVIC_EnableIRQ(SWI0_EGU0_IRQn);
     NVIC_SetPriority(SWI0_EGU0_IRQn, 6);
+#else
+    /* call cortexm default initialization */
+    cortexm_init();
 #endif
+
+    /* enable wake up on events for __WFE CPU sleep */
+    SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
 
     /* trigger static peripheral initialization */
     periph_init();

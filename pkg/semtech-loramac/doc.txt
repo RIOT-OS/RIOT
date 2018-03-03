@@ -1,0 +1,113 @@
+/**
+ * @defgroup pkg_semtech-loramac   Semtech LoRaMAC implementation
+ * @ingroup  pkg
+ * @ingroup  net
+ * @brief    Provides a RIOT adaption of Semtech LoRaMAC implementation
+ *
+ * # Introduction
+ *
+ * This package provides an API built on top of the
+ * [Semtech LoRaMAC-node](https://github.com/Lora-net/LoRaMac-node) reference
+ * implementation of a LoRa network.
+ *
+ *
+ * # Importing this package in an application
+ *
+ * This package only works with Semtech SX1272 and SX1276 radio devices. Thus,
+ * in order to use it properly, the application `Makefile` must import the
+ * corresponding device driver:
+ * ```
+ *     USEMODULE += sx1272  # for a SX1272 radio device
+ *     USEMODULE += sx1276  # for a SX1276 radio device
+ * ```
+ *
+ * In order to use this package in an application, add the following in
+ * the application `Makefile`:
+ * ```
+ *     USEPKG += semtech-loramac
+ * ```
+ *
+ * Since the LoRa radio depends on regional parameters regarding the access
+ * to the physical support, the region where the device is used needs to be
+ * set at compile time. Example for EU868:
+ * ```
+ *     CFLAGS += -DREGION_EU868
+ * ```
+ *
+ * # Using the package API
+ *
+ * The package provides a simple API for initializing the MAC, setting/getting
+ * parameters, joining a network and sending/receiving packets to/from a LoRa
+ * Network.
+ *
+ * In your `main.c`, some header files must be first included:
+ * ```c
+ *     #include "net/loramac.h"     /* core loramac definitions */
+ *     #include "semtech-loramac.h" /* package API */
+ *     #include "sx127x.h"          /* SX1272/6 device driver API */
+ *     #include "sx127x_params.h"   /* SX1272/6 device driver initialization parameters */
+ * ```
+ *
+ * Then define global variables:
+ * ```c
+ *     sx127x_t sx127x;  /* SX1272/6 device descriptor */
+ *     /* define the required keys for OTAA, e.g over-the-air activation (the
+ *        null arrays need to be updated with valid LoRa values) */
+ *     static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = { 0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00 };
+ *     static const uint8_t appeui[LORAMAC_APPEUI_LEN] = { 0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00 };
+ *     static const uint8_t appkey[LORAMAC_APPKEY_LEN] = { 0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00, \
+ *                                                         0x00, 0x00, 0x00, 0x00 };
+ * ```
+ *
+ * Now in the `main` function:
+ * 1. setup the radio driver with the initialization parameters (spi bus, pins, etc)
+ * 2. initialize the LoRaMAC MAC layer
+ * 3. set the LoRa keys
+ * 4. join the network
+ * 5. send some data to the network
+ *
+ * ```c
+ * int main(void)
+ * {
+ *     /* 1. setup the radio driver */
+ *     sx127x_setup(&sx127x, &sx127x_params[0]);
+ *
+ *     /* 2. initialize the LoRaMAC MAC layer */
+ *     semtech_loramac_init(&sx127x);
+ *
+ *     /* 3. set the device required keys */
+ *     semtech_loramac_set_deveui(deveui);
+ *     semtech_loramac_set_appeui(appeui);
+ *     semtech_loramac_set_appkey(appkey);
+ *
+ *     /* 4. join the network */
+ *     if (semtech_loramac_join(LORAMAC_JOIN_OTAA) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
+ *         puts("Join procedure failed");
+ *         return 1;
+ *     }
+ *     puts("Join procedure succeeded");
+ *
+ *     /* 5. send some data using confirmable mode on port 10 and assuming no
+ *           data is received */
+ *     char *message = "This is RIOT";
+ *     semtech_loramac_rx_data_t rx_data;
+ *     semtech_loramac_send(LORAMAC_TX_CNF, 10,
+                            (uint8_t *)message, strlen(message), &rx_data);
+ * }
+ * ```
+ *
+ * @warning It is not possible to directly call the original LoRaMAC-node API
+ *          using this package. This package should only be considered as a
+ *          wrapper around the original LoRaMAC-node API and only the API
+ *          provided by this package should be used.
+ *
+ * # License
+ *
+ * The library is using the BSD 3-clause license.
+ *
+ * @see      github.com/Lora-net/LoRaMac-node
+ */

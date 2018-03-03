@@ -28,13 +28,14 @@
 void auto_init_gnrc_rpl(void)
 {
 #if (GNRC_NETIF_NUMOF == 1)
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-    gnrc_netif_get(ifs);
-    DEBUG("auto_init_gnrc_rpl: initializing RPL on interface %" PRIkernel_pid "\n", ifs[0]);
-    gnrc_rpl_init(ifs[0]);
+    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
+    assert(netif != NULL);
+    DEBUG("auto_init_gnrc_rpl: initializing RPL on interface %" PRIkernel_pid "\n",
+          netif->pid);
+    gnrc_rpl_init(netif->pid);
     return;
 #elif defined(GNRC_RPL_DEFAULT_NETIF)
-    if (gnrc_netif_exist(GNRC_RPL_DEFAULT_NETIF)) {
+    if (gnrc_netif_get_by_pid(GNRC_RPL_DEFAULT_NETIF) != NULL) {
         DEBUG("auto_init_gnrc_rpl: initializing RPL on interface %" PRIkernel_pid "\n",
               GNRC_RPL_DEFAULT_NETIF);
         gnrc_rpl_init(GNRC_RPL_DEFAULT_NETIF);

@@ -51,6 +51,14 @@ extern "C" {
 #define STACK_CANARY_WORD   (0xE7FEE7FEu)
 
 /**
+ * @brief   All Cortex-m-based CPUs provide pm_set_lowest
+ *
+ * The pm_set_lowest is provided either by the pm_layered module if used, or
+ * alternatively as fallback by the cortexm's own implementation.
+ */
+#define PROVIDES_PM_SET_LOWEST
+
+/**
  * @brief   Initialization of the CPU
  */
 void cpu_init(void);
@@ -96,10 +104,14 @@ static inline void cortexm_sleep(int deep)
     }
 
     /* ensure that all memory accesses have completed and trigger sleeping */
-    __disable_irq();
+    unsigned state = irq_disable();
     __DSB();
     __WFI();
-    __enable_irq();
+#if defined(CPU_MODEL_STM32L152RE)
+    /* STM32L152RE crashes without this __NOP(). See #8518. */
+    __NOP();
+#endif
+    irq_restore(state);
 }
 
 /**

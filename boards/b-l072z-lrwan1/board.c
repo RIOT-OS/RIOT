@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Board specific implementations for the ST b-l072z-lrwan1 discovery board
+ * @brief       Board specific implementations for the ST B-L072Z-LRWAN1 board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
@@ -38,4 +38,8 @@ void board_init(void)
        only if explicitly wanted by the user */
     gpio_init(LED0_PIN, GPIO_OUT);
 #endif
+
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_init(LED2_PIN, GPIO_OUT);
+    gpio_init(LED3_PIN, GPIO_OUT);
 }

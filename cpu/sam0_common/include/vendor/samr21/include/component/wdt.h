@@ -3,7 +3,7 @@
  *
  * \brief Component description for WDT
  *
- * Copyright (c) 2014 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2015 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -39,9 +39,6 @@
  *
  * \asf_license_stop
  *
- */
- /**
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
 #ifndef _SAMR21_WDT_COMPONENT_
@@ -97,7 +94,7 @@ typedef union {
 
 #define WDT_CONFIG_PER_Pos          0            /**< \brief (WDT_CONFIG) Time-Out Period */
 #define WDT_CONFIG_PER_Msk          (0xFul << WDT_CONFIG_PER_Pos)
-#define WDT_CONFIG_PER(value)       ((WDT_CONFIG_PER_Msk & ((value) << WDT_CONFIG_PER_Pos)))
+#define WDT_CONFIG_PER(value)       (WDT_CONFIG_PER_Msk & ((value) << WDT_CONFIG_PER_Pos))
 #define   WDT_CONFIG_PER_8_Val            0x0ul  /**< \brief (WDT_CONFIG) 8 clock cycles */
 #define   WDT_CONFIG_PER_16_Val           0x1ul  /**< \brief (WDT_CONFIG) 16 clock cycles */
 #define   WDT_CONFIG_PER_32_Val           0x2ul  /**< \brief (WDT_CONFIG) 32 clock cycles */
@@ -124,7 +121,7 @@ typedef union {
 #define WDT_CONFIG_PER_16K          (WDT_CONFIG_PER_16K_Val        << WDT_CONFIG_PER_Pos)
 #define WDT_CONFIG_WINDOW_Pos       4            /**< \brief (WDT_CONFIG) Window Mode Time-Out Period */
 #define WDT_CONFIG_WINDOW_Msk       (0xFul << WDT_CONFIG_WINDOW_Pos)
-#define WDT_CONFIG_WINDOW(value)    ((WDT_CONFIG_WINDOW_Msk & ((value) << WDT_CONFIG_WINDOW_Pos)))
+#define WDT_CONFIG_WINDOW(value)    (WDT_CONFIG_WINDOW_Msk & ((value) << WDT_CONFIG_WINDOW_Pos))
 #define   WDT_CONFIG_WINDOW_8_Val         0x0ul  /**< \brief (WDT_CONFIG) 8 clock cycles */
 #define   WDT_CONFIG_WINDOW_16_Val        0x1ul  /**< \brief (WDT_CONFIG) 16 clock cycles */
 #define   WDT_CONFIG_WINDOW_32_Val        0x2ul  /**< \brief (WDT_CONFIG) 32 clock cycles */
@@ -167,7 +164,7 @@ typedef union {
 
 #define WDT_EWCTRL_EWOFFSET_Pos     0            /**< \brief (WDT_EWCTRL) Early Warning Interrupt Time Offset */
 #define WDT_EWCTRL_EWOFFSET_Msk     (0xFul << WDT_EWCTRL_EWOFFSET_Pos)
-#define WDT_EWCTRL_EWOFFSET(value)  ((WDT_EWCTRL_EWOFFSET_Msk & ((value) << WDT_EWCTRL_EWOFFSET_Pos)))
+#define WDT_EWCTRL_EWOFFSET(value)  (WDT_EWCTRL_EWOFFSET_Msk & ((value) << WDT_EWCTRL_EWOFFSET_Pos))
 #define   WDT_EWCTRL_EWOFFSET_8_Val       0x0ul  /**< \brief (WDT_EWCTRL) 8 clock cycles */
 #define   WDT_EWCTRL_EWOFFSET_16_Val      0x1ul  /**< \brief (WDT_EWCTRL) 16 clock cycles */
 #define   WDT_EWCTRL_EWOFFSET_32_Val      0x2ul  /**< \brief (WDT_EWCTRL) 32 clock cycles */
@@ -232,10 +229,10 @@ typedef union {
 
 /* -------- WDT_INTFLAG : (WDT Offset: 0x6) (R/W  8) Interrupt Flag Status and Clear -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-typedef union {
+typedef union { // __I to avoid read-modify-write on write-to-clear register
   struct {
-    uint8_t  EW:1;             /*!< bit:      0  Early Warning                      */
-    uint8_t  :7;               /*!< bit:  1.. 7  Reserved                           */
+    __I uint8_t  EW:1;             /*!< bit:      0  Early Warning                      */
+    __I uint8_t  :7;               /*!< bit:  1.. 7  Reserved                           */
   } bit;                       /*!< Structure used for bit  access                  */
   uint8_t reg;                 /*!< Type      used for register access              */
 } WDT_INTFLAG_Type;
@@ -281,7 +278,7 @@ typedef union {
 
 #define WDT_CLEAR_CLEAR_Pos         0            /**< \brief (WDT_CLEAR) Watchdog Clear */
 #define WDT_CLEAR_CLEAR_Msk         (0xFFul << WDT_CLEAR_CLEAR_Pos)
-#define WDT_CLEAR_CLEAR(value)      ((WDT_CLEAR_CLEAR_Msk & ((value) << WDT_CLEAR_CLEAR_Pos)))
+#define WDT_CLEAR_CLEAR(value)      (WDT_CLEAR_CLEAR_Msk & ((value) << WDT_CLEAR_CLEAR_Pos))
 #define   WDT_CLEAR_CLEAR_KEY_Val         0xA5ul  /**< \brief (WDT_CLEAR) Clear Key */
 #define WDT_CLEAR_CLEAR_KEY         (WDT_CLEAR_CLEAR_KEY_Val       << WDT_CLEAR_CLEAR_Pos)
 #define WDT_CLEAR_MASK              0xFFul       /**< \brief (WDT_CLEAR) MASK Register */

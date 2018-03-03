@@ -32,10 +32,24 @@
  */
 static uint8_t page_mem[FLASHPAGE_SIZE];
 
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+/*
+ * @brief   Allocate an aligned buffer for raw writings
+ */
+static char raw_buf[64] __attribute__ ((aligned (FLASHPAGE_RAW_ALIGNMENT)));
+
+static uint32_t getaddr(const char *str)
+{
+    uint32_t addr = strtol(str, NULL, 16);
+
+    return addr;
+}
+#endif
+
 static int getpage(const char *str)
 {
     int page = atoi(str);
-    if ((page >= FLASHPAGE_NUMOF) || (page < 0)) {
+    if ((page >= (int)FLASHPAGE_NUMOF) || (page < 0)) {
         printf("error: page %i is invalid\n", page);
         return -1;
     }
@@ -164,6 +178,29 @@ static int cmd_write(int argc, char **argv)
     return 0;
 }
 
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+static int cmd_write_raw(int argc, char **argv)
+{
+    uint32_t addr;
+
+    if (argc < 3) {
+        printf("usage: %s <addr> <data>\n", argv[0]);
+        return 1;
+    }
+
+    addr = getaddr(argv[1]);
+
+    /* try to align */
+    memcpy(raw_buf, argv[2], strlen(argv[2]));
+
+    flashpage_write_raw((void*)addr, raw_buf, strlen(raw_buf));
+
+    printf("wrote local data to flash address %#lx of len %u\n",
+           addr, strlen(raw_buf));
+    return 0;
+}
+#endif
+
 static int cmd_erase(int argc, char **argv)
 {
     int page;
@@ -195,7 +232,7 @@ static int cmd_edit(int argc, char **argv)
     }
 
     offset = atoi(argv[1]);
-    if (offset >= FLASHPAGE_SIZE) {
+    if (offset >= (int)FLASHPAGE_SIZE) {
         printf("error: given offset is out of bounce\n");
         return -1;
     }
@@ -225,7 +262,7 @@ static int cmd_test(int argc, char **argv)
         return 1;
     }
 
-    for (int i = 0; i < sizeof(page_mem); i++) {
+    for (unsigned i = 0; i < sizeof(page_mem); i++) {
         page_mem[i] = (uint8_t)fill++;
         if (fill > 'z') {
             fill = 'a';
@@ -248,6 +285,9 @@ static const shell_command_t shell_commands[] = {
     { "dump_local", "Dump the local page buffer to STDOUT", cmd_dump_local },
     { "read", "Read and output the given page", cmd_read },
     { "write", "Write (ASCII) data to the given page", cmd_write },
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+    { "write_raw", "Write (ASCII, max 64B) data to the given address", cmd_write_raw },
+#endif
     { "erase", "Erase the given page", cmd_erase },
     { "edit", "Write bytes to the local page", cmd_edit },
     { "test", "Write and verify test pattern", cmd_test },

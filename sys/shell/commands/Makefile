@@ -17,20 +17,14 @@ endif
 ifneq (,$(filter random,$(USEMODULE)))
   SRC += sc_random.c
 endif
-ifeq ($(CPU),x86)
-  SRC += sc_x86_lspci.c
-endif
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
     SRC += sc_at30tse75x.c
 endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
-  SRC += sc_netif.c
+  SRC += sc_gnrc_netif.c
 endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c
-endif
-ifneq (,$(filter gnrc_ipv6_nc,$(USEMODULE)))
-  SRC += sc_ipv6_nc.c
 endif
 ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   SRC += sc_gnrc_ipv6_nib.c
@@ -41,11 +35,10 @@ endif
 ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
   SRC += sc_blacklist.c
 endif
-# The ping command in sc_icmpv6_echo requires xtimer, too. However, this is
-# implicitly pulled in by gnrc_ipv6_netif (which is a dependency of gnrc_ipv6)
-# already.
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
+ifneq (,$(filter xtimer,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c
+endif
 endif
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c

@@ -11,19 +11,22 @@
 #include <string.h>
 
 #include "fmt.h"
-#include "nanocoap.h"
+#include "net/nanocoap.h"
 
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;
 
-static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len)
+static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
 {
+    (void)context;
     return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
             COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
-static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len)
+static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
 {
+    (void) context;
+
     ssize_t p = 0;
     char rsp[16];
     unsigned code = COAP_CODE_EMPTY;
@@ -55,8 +58,8 @@ static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len)
 /* must be sorted by path (alphabetically) */
 const coap_resource_t coap_resources[] = {
     COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
-    { "/riot/board", COAP_GET, _riot_board_handler },
-    { "/riot/value", COAP_GET | COAP_PUT | COAP_POST, _riot_value_handler },
+    { "/riot/board", COAP_GET, _riot_board_handler, NULL },
+    { "/riot/value", COAP_GET | COAP_PUT | COAP_POST, _riot_value_handler, NULL },
 };
 
 const unsigned coap_resources_numof = sizeof(coap_resources) / sizeof(coap_resources[0]);

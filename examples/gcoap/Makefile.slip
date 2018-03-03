@@ -48,7 +48,7 @@ USEMODULE += gnrc_rpl
 
 # Border router requirements
 # Include SLIP package for IP over Serial communication
-USEMODULE += gnrc_slip
+USEMODULE += slipdev
 # Specify the mandatory networking modules for 6LoWPAN border router
 USEMODULE += gnrc_sixlowpan_border_router_default
 # Additional networking modules that can be dropped if not needed

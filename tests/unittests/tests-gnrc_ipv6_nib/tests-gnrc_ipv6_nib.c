@@ -18,5 +18,8 @@
 void tests_gnrc_ipv6_nib(void)
 {
     TESTS_RUN(tests_gnrc_ipv6_nib_internal_tests());
+    TESTS_RUN(tests_gnrc_ipv6_nib_abr_tests());
+    TESTS_RUN(tests_gnrc_ipv6_nib_ft_tests());
     TESTS_RUN(tests_gnrc_ipv6_nib_nc_tests());
+    TESTS_RUN(tests_gnrc_ipv6_nib_pl_tests());
 }

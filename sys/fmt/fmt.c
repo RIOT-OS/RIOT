@@ -62,6 +62,18 @@ size_t fmt_byte_hex(char *out, uint8_t byte)
     return 2;
 }
 
+size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n)
+{
+    size_t len = n * 2;
+    if (out) {
+        while (n--) {
+            out += fmt_byte_hex(out, *ptr++);
+        }
+    }
+
+    return len;
+}
+
 size_t fmt_strlen(const char *str)
 {
     const char *tmp = str;
@@ -93,6 +105,39 @@ size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n)
         out += fmt_byte_hex(out, ptr[i]);
     }
     return (n<<1);
+}
+
+static uint8_t _byte_mod25(uint8_t x)
+{
+    for (unsigned divisor = 200; divisor >= 25; divisor >>= 1) {
+        if (x >= divisor) {
+            x -= divisor;
+        }
+    }
+
+    return x;
+}
+
+static uint8_t _hex_nib(uint8_t nib)
+{
+    return _byte_mod25((nib & 0x1f) + 9);
+}
+
+size_t fmt_hex_bytes(uint8_t *out, const char *hex)
+{
+    size_t len = fmt_strlen(hex);
+
+    if (len & 1) {
+        out = NULL;
+        return 0;
+    }
+
+    size_t final_len = len >> 1;
+    for (size_t i = 0, j = 0; j < final_len; i += 2, j++) {
+        out[j] = (_hex_nib(hex[i]) << 4) | _hex_nib(hex[i+1]);
+    }
+
+    return final_len;
 }
 
 size_t fmt_u32_hex(char *out, uint32_t val)
@@ -164,8 +209,14 @@ size_t fmt_u32_dec(char *out, uint32_t val)
     size_t len = 1;
 
     /* count needed characters */
-    for (uint32_t tmp = 10; tmp <= val; len++) {
-        tmp *= 10;
+    /* avoid multiply overflow: uint32_t max len = 10 digits */
+    if (val >= 1000000000ul) {
+        len = 10;
+    }
+    else {
+        for (uint32_t tmp = 10; tmp <= val; len++) {
+            tmp *= 10;
+        }
     }
 
     if (out) {
@@ -181,6 +232,18 @@ size_t fmt_u32_dec(char *out, uint32_t val)
 size_t fmt_u16_dec(char *out, uint16_t val)
 {
     return fmt_u32_dec(out, val);
+}
+
+size_t fmt_s64_dec(char *out, int64_t val)
+{
+    unsigned negative = (val < 0);
+    if (negative) {
+        if (out) {
+            *out++ = '-';
+        }
+        val = -val;
+    }
+    return fmt_u64_dec(out, val) + negative;
 }
 
 size_t fmt_s32_dec(char *out, int32_t val)
@@ -351,14 +414,14 @@ void print(const char *s, size_t n)
 
 void print_u32_dec(uint32_t val)
 {
-    char buf[10];
+    char buf[10]; /* "4294967295" */
     size_t len = fmt_u32_dec(buf, val);
     print(buf, len);
 }
 
 void print_s32_dec(int32_t val)
 {
-    char buf[11];
+    char buf[11]; /* "-2147483648" */
     size_t len = fmt_s32_dec(buf, val);
     print(buf, len);
 }
@@ -385,8 +448,15 @@ void print_u64_hex(uint64_t val)
 
 void print_u64_dec(uint64_t val)
 {
-    char buf[18];
+    char buf[20]; /* "18446744073709551615" */
     size_t len = fmt_u64_dec(buf, val);
+    print(buf, len);
+}
+
+void print_s64_dec(uint64_t val)
+{
+    char buf[20]; /* "-9223372036854775808" */
+    size_t len = fmt_s64_dec(buf, val);
     print(buf, len);
 }
 

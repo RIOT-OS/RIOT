@@ -13,15 +13,14 @@
  */
 
 #include <string.h>
-#include "net/gnrc/ipv6/netif.h"
+#include "net/gnrc/netif/internal.h"
+#include "net/ipv6/ext/rh.h"
 #include "net/gnrc/rpl/srh.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 #define GNRC_RPL_SRH_PADDING(X)     ((X & 0xF0) >> 4)
 #define GNRC_RPL_SRH_COMPRE(X)      (X & 0x0F)
@@ -72,7 +71,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
             tmp_addr_len = sizeof(ipv6_addr_t) - tmp_pref_elided;
         }
         memcpy(&tmp.u8[tmp_pref_elided], &addr_vec[k * compri_addr_len], tmp_addr_len);
-        if (gnrc_ipv6_netif_find_by_addr(NULL, &tmp) != KERNEL_PID_UNDEF) {
+        if (gnrc_netif_get_by_ipv6_addr(&tmp) != NULL) {
             if (found && ((k - found_pos) > 1)) {
                 DEBUG("RPL SRH: found multiple addresses that belong to me - discard\n");
                 /* TODO send an ICMP Parameter Problem (Code 0) and discard the packet */

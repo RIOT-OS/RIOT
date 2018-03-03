@@ -111,12 +111,30 @@ endif
 
 QQ=
 
+# Set this to 1 to enable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+DEVELHELP ?= 0
+ifeq ($(DEVELHELP),1)
+  CFLAGS += -DDEVELHELP
+endif
+
 # Fail on warnings. Can be overridden by `make WERROR=0`.
 WERROR ?= 1
 export WERROR
 ifeq ($(WERROR),1)
-  CFLAGS += -Werror
+  CFLAGS += -Wall -Werror -Wextra
 endif
+
+WPEDANTIC ?= 0
+export WPEDANTIC
+ifeq ($(WPEDANTIC),1)
+    CFLAGS += -Wpedantic -pedantic-errors
+endif
+
+# remove this once codebase is adapted
+CFLAGS += -Wno-implicit-fallthrough
+CXXFLAGS += -Wno-implicit-fallthrough
 
 ifneq (10,$(if ${RIOT_VERSION},1,0)$(if ${__RIOTBUILD_FLAG},1,0))
 
@@ -207,6 +225,9 @@ INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBAS
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 
+# process provided features
+-include $(RIOTBOARD)/$(BOARD)/Makefile.features
+
 # mandatory includes!
 include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
@@ -222,9 +243,6 @@ GNRC_NETIF_NUMOF ?= 1
 ifneq ($(GNRC_NETIF_NUMOF),1)
   CFLAGS += -DGNRC_NETIF_NUMOF=$(GNRC_NETIF_NUMOF)
 endif
-
-# process provided features
-include $(RIOTMAKE)/features.inc.mk
 
 # process dependencies
 include $(RIOTBASE)/Makefile.dep
@@ -278,11 +296,15 @@ ifeq ($(origin RIOT_VERSION), undefined)
   endif
 endif
 
+# Set module by prepending APPLICATION name with 'application_'.
+# It prevents conflict with application and modules with the same name.
+APPLICATION_MODULE ?= application_$(APPLICATION)
+
 # the binaries to link
-BASELIBS += $(BINDIR)/${APPLICATION}.a
+BASELIBS += $(BINDIR)/$(APPLICATION_MODULE).a
 BASELIBS += $(APPDEPS)
 
-.PHONY: all link clean flash term doc debug debug-server reset objdump help info-modules
+.PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
 .PHONY: ..in-docker-container
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
@@ -296,7 +318,7 @@ LINKFLAGPREFIX ?= -Wl,
 
 DIRS += $(EXTERNAL_MODULE_DIRS)
 
-_LINK = $(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGPREFIX)--cref $(LINKFLAGS)
+_LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map $(LINKFLAGS)
 
 ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
@@ -306,7 +328,7 @@ link: ..compiler-check ..build-message $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=$
 	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
-	$(Q)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
+	$(Q)$(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
 	$(Q)$(_LINK) -o $(ELFFILE)
 endif
@@ -372,14 +394,21 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-flash: all $(FLASHDEPS)
+# if make target != 'flash-only', add target 'all' to ensure build before flash
+ifeq (,$(filter flash-only, $(MAKECMDGOALS)))
+  BUILD_BEFORE_FLASH = all
+endif
+
+flash: $(BUILD_BEFORE_FLASH) $(FLASHDEPS)
 	@command -v $(FLASHER) >/dev/null 2>&1 || \
 		{ $(COLOR_ECHO) \
 		'${COLOR_RED}Flash program $(FLASHER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(FLASHER) $(FFLAGS)
 
-preflash: all
+flash-only: flash
+
+preflash: $(BUILD_BEFORE_FLASH)
 	$(PREFLASHER) $(PREFFLAGS)
 
 term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
@@ -408,6 +437,13 @@ debug-server:
 		'${COLOR_RED}Debug server program $(DEBUGSERVER) not found. Aborting.${COLOR_RESET}'; \
 		exit 1; }
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
+
+emulate:
+	@command -v $(EMULATOR) >/dev/null 2>&1 || \
+		{ $(COLOR_ECHO) \
+		'${COLOR_RED}Emulation program $(EMULATOR) not found. Aborting.${COLOR_RESET}'; \
+		exit 1; }
+	$(EMULATOR) $(EMULATOR_FLAGS)
 
 reset:
 	@command -v $(RESET) >/dev/null 2>&1 || \
@@ -567,6 +603,6 @@ CFLAGS := $(patsubst -D%,,$(CFLAGS))
 CFLAGS := $(patsubst -U%,,$(CFLAGS))
 CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
 
-# include multislot support
-include $(RIOTMAKE)/multislot.mk
+# include mcuboot support
+include $(RIOTMAKE)/mcuboot.mk
 endif # BOARD=none

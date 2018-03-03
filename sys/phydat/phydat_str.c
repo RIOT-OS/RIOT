@@ -32,7 +32,7 @@ void phydat_dump(phydat_t *data, uint8_t dim)
     }
     printf("Data:");
     for (uint8_t i = 0; i < dim; i++) {
-        char scale_str;
+        char scale_prefix;
 
         switch (data->unit) {
             case UNIT_UNDEF:
@@ -43,16 +43,16 @@ void phydat_dump(phydat_t *data, uint8_t dim)
             case UNIT_TEMP_C:
             case UNIT_TEMP_F:
                 /* no string conversion */
-                scale_str = '\0';
+                scale_prefix = '\0';
                 break;
             default:
-                scale_str = phydat_scale_to_str(data->scale);
+                scale_prefix = phydat_prefix_from_scale(data->scale);
         }
 
         printf("\t[%i] ", (int)i);
 
-        if (scale_str) {
-            printf("%i%c", (int)data->val[i], scale_str);
+        if (scale_prefix) {
+            printf("%i%c", (int)data->val[i], scale_prefix);
         }
         else if (data->scale == 0) {
             printf("%i", (int)data->val[i]);
@@ -89,13 +89,14 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_GS:       return "Gs";
         case UNIT_BAR:      return "Bar";
         case UNIT_PA:       return "Pa";
+        case UNIT_PPM:      return "ppm";
         case UNIT_CD:       return "cd";
         case UNIT_PERCENT:  return "%";
         default:            return "";
     }
 }
 
-char phydat_scale_to_str(int8_t scale)
+char phydat_prefix_from_scale(int8_t scale)
 {
     switch (scale) {
         case -3:    return 'm';

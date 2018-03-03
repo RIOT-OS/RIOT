@@ -58,7 +58,7 @@ Start the libcoap example server with the command below.
 
 Enter the query below in the RIOT CLI.
 
-    > coap get fe80::d8b8:65ff:feee:121b 5683 /.well-known/core
+    > coap get fe80::d8b8:65ff:feee:121b%6 5683 /.well-known/core
 
 CLI output:
 

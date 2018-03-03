@@ -36,9 +36,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* guard file in case no I2C device is defined */
-#if I2C_NUMOF
-
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, int ccr);
 static void _toggle_pins(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda);
@@ -251,6 +248,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
 {
     int n = length;
     I2C_TypeDef *i2c;
+    char *in = (char *)data;
 
     switch (dev) {
 #if I2C_0_EN
@@ -285,7 +283,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
         }
 
         /* read byte */
-        *(char*)data++ = i2c->DR;
+        *(in++) = i2c->DR;
     }
 
     /* set STOP */
@@ -504,5 +502,3 @@ void I2C_0_ERR_ISR(void)
     while (1) {}
 }
 #endif /* I2C_0_EN */
-
-#endif /* I2C_NUMOF */

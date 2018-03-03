@@ -21,7 +21,8 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/sixlowpan/frag.h"
-#include "net/gnrc/sixlowpan/netif.h"
+#include "net/gnrc/sixlowpan/internal.h"
+#include "net/gnrc/netif.h"
 #include "net/sixlowpan.h"
 #include "utlist.h"
 
@@ -81,7 +82,7 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt, size_t payload_len,
     return frag;
 }
 
-static uint16_t _send_1st_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t *pkt,
+static uint16_t _send_1st_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
                                    size_t payload_len, size_t datagram_size)
 {
     gnrc_pktsnip_t *frag;
@@ -91,7 +92,7 @@ static uint16_t _send_1st_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t
     int payload_diff = (datagram_size - payload_len);
     /* virtually add payload_diff to flooring to account for offset (must be divisable by 8)
      * in uncompressed datagram */
-    uint16_t max_frag_size = _floor8(iface->max_frag_size + payload_diff -
+    uint16_t max_frag_size = _floor8(iface->sixlo.max_frag_size + payload_diff -
                                      sizeof(sixlowpan_frag_t)) - payload_diff;
     sixlowpan_frag_t *hdr;
     uint8_t *data;
@@ -130,22 +131,18 @@ static uint16_t _send_1st_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t
     DEBUG("6lo frag: send first fragment (datagram size: %u, "
           "datagram tag: %" PRIu16 ", fragment size: %" PRIu16 ")\n",
           (unsigned int)datagram_size, _tag, local_offset);
-    if (gnrc_netapi_send(iface->pid, frag) < 1) {
-        DEBUG("6lo frag: unable to send first fragment\n");
-        gnrc_pktbuf_release(frag);
-    }
-
+    gnrc_sixlowpan_dispatch_send(frag, NULL, 0);
     return local_offset;
 }
 
-static uint16_t _send_nth_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t *pkt,
+static uint16_t _send_nth_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
                                    size_t payload_len, size_t datagram_size,
                                    uint16_t offset)
 {
     gnrc_pktsnip_t *frag;
     /* since dispatches aren't supposed to go into subsequent fragments, we need not account
      * for payload difference as for the first fragment */
-    uint16_t max_frag_size = _floor8(iface->max_frag_size - sizeof(sixlowpan_frag_n_t));
+    uint16_t max_frag_size = _floor8(iface->sixlo.max_frag_size - sizeof(sixlowpan_frag_n_t));
     uint16_t local_offset = 0, offset_count = 0;
     sixlowpan_frag_n_t *hdr;
     uint8_t *data;
@@ -208,24 +205,20 @@ static uint16_t _send_nth_fragment(gnrc_sixlowpan_netif_t *iface, gnrc_pktsnip_t
           "fragment size: %" PRIu16 ")\n",
           (unsigned int)datagram_size, _tag, hdr->offset, hdr->offset << 3,
           local_offset);
-    if (gnrc_netapi_send(iface->pid, frag) < 1) {
-        DEBUG("6lo frag: unable to send subsequent fragment\n");
-        gnrc_pktbuf_release(frag);
-    }
-
+    gnrc_sixlowpan_dispatch_send(frag, NULL, 0);
     return local_offset;
 }
 
 void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
 {
-    gnrc_sixlowpan_netif_t *iface = gnrc_sixlowpan_netif_get(fragment_msg->pid);
+    gnrc_netif_t *iface = gnrc_netif_get_by_pid(fragment_msg->pid);
     uint16_t res;
     /* payload_len: actual size of the packet vs
      * datagram_size: size of the uncompressed IPv6 packet */
     size_t payload_len = gnrc_pkt_len(fragment_msg->pkt->next);
     msg_t msg;
 
-#if defined(DEVELHELP) && defined(ENABLE_DEBUG)
+#if defined(DEVELHELP) && ENABLE_DEBUG
     if (iface == NULL) {
         DEBUG("6lo frag: iface == NULL, expect segmentation fault.\n");
         /* remove original packet from packet buffer */

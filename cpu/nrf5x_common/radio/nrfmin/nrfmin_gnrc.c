@@ -18,8 +18,9 @@
  * @}
  */
 
+#include "net/gnrc.h"
 #include "thread.h"
-#include "net/gnrc/netdev.h"
+#include "net/gnrc/netif.h"
 
 #include "nrfmin_gnrc.h"
 
@@ -31,7 +32,7 @@
  * @{
  */
 #ifndef NRFMIN_GNRC_THREAD_PRIO
-#define NRFMIN_GNRC_THREAD_PRIO     GNRC_NETDEV_MAC_PRIO
+#define NRFMIN_GNRC_THREAD_PRIO     GNRC_NETIF_PRIO
 #endif
 
 #ifndef NRFMIN_GNRC_STACKSIZE
@@ -48,12 +49,6 @@
  * @brief   Allocate the stack for the GNRC netdev thread to run in
  */
 static char stack[NRFMIN_GNRC_STACKSIZE];
-
-/**
- * @brief   Allocate the GNRC netdev data structure.
- */
-static gnrc_netdev_t plug;
-
 
 static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
 {
@@ -81,7 +76,7 @@ static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
     return 0;
 }
 
-static int gnrc_nrfmin_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
+static int gnrc_nrfmin_send(gnrc_netif_t *dev, gnrc_pktsnip_t *pkt)
 {
     int res;
     struct iovec *vec;
@@ -124,7 +119,7 @@ static int gnrc_nrfmin_send(gnrc_netdev_t *dev, gnrc_pktsnip_t *pkt)
     return res;
 }
 
-static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netdev_t *dev)
+static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif_t *dev)
 {
     int pktsize;
     nrfmin_hdr_t *nrfmin;
@@ -175,7 +170,7 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netdev_t *dev)
     }
     netif->lqi = 0;
     netif->rssi = 0;
-    netif->if_pid = plug.pid;
+    netif->if_pid = dev->pid;
     pkt_snip->type = nrfmin->proto;
 
     /* finally: remove the nrfmin header and append the netif header */
@@ -185,17 +180,17 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netdev_t *dev)
     return pkt_snip;
 }
 
+static const gnrc_netif_ops_t gnrc_nrfmin_ops = {
+    .send = gnrc_nrfmin_send,
+    .recv = gnrc_nrfmin_recv,
+    .get = gnrc_netif_get_from_netdev,
+    .set = gnrc_netif_set_from_netdev,
+};
+
 void gnrc_nrfmin_init(void)
 {
     /* setup the NRFMIN driver */
     nrfmin_setup();
-
-    /* initialize the GNRC plug struct */
-    plug.send = gnrc_nrfmin_send;
-    plug.recv = gnrc_nrfmin_recv;
-    plug.dev = &nrfmin_dev;
-
-    gnrc_netdev_init(stack, sizeof(stack),
-                      NRFMIN_GNRC_THREAD_PRIO,
-                      "nrfmin", &plug);
+    gnrc_netif_create(stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO, "nrfmin",
+                      (netdev_t *)&nrfmin_dev, &gnrc_nrfmin_ops);
 }

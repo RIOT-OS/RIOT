@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 
-#include "arch/thread_arch.h"
 #include "thread.h"
 #include "sched.h"
 #include "irq.h"
@@ -64,7 +63,7 @@ static void __enter_thread_mode(void);
  * @brief Since AVR doesn't support direct manipulation of the program counter we
  * model a stack like it would be left by __context_save().
  * The resulting layout in memory is the following:
- * ---------------thread_t (not created by thread_arch_stack_init) ----------
+ * ---------------thread_t (not created by thread_stack_init) ----------
  * local variables (a temporary value and the stackpointer)
  * -----------------------------------------------------------------------
  * a marker (AFFE) - for debugging purposes (helps finding the stack
@@ -92,7 +91,7 @@ static void __enter_thread_mode(void);
  * it inside of the programm counter of the MCU.
  * if task_func returns sched_task_exit gets popped into the PC
  */
-char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
+char *thread_stack_init(thread_task_func_t task_func, void *arg,
                              void *stack_start, int stack_size)
 {
     uint16_t tmp_adress;
@@ -193,14 +192,14 @@ char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
 }
 
 /**
- * @brief thread_arch_stack_print prints the stack to stdout.
+ * @brief thread_stack_print prints the stack to stdout.
  * It depends on getting the correct values for stack_start, stack_size and sp
  * from sched_active_thread.
  * Maybe it would be good to change that to way that is less dependant on
  * getting correct values elsewhere (since it is a debugging tool and in the
  * presence of bugs the data may be corrupted).
  */
-void thread_arch_stack_print(void)
+void thread_stack_print(void)
 {
     uint8_t  found_marker = 1;
     uint8_t *sp = (uint8_t *)sched_active_thread->sp;
@@ -223,8 +222,8 @@ void thread_arch_stack_print(void)
     printf("stack size: %u bytes\n", size);
 }
 
-void thread_arch_start_threading(void) __attribute__((naked));
-void thread_arch_start_threading(void)
+void cpu_switch_context_exit(void) __attribute__((naked));
+void cpu_switch_context_exit(void)
 {
     sched_run();
     AVR_CONTEXT_SWAP_INIT;
@@ -245,12 +244,12 @@ void NORETURN __enter_thread_mode(void)
     UNREACHABLE();
 }
 
-void thread_arch_yield(void) {
+void thread_yield_higher(void) {
     AVR_CONTEXT_SWAP_TRIGGER;
 }
 
 
-// Use this interrupt to perform all context switches
+/* Use this interrupt to perform all context switches */
 ISR(AVR_CONTEXT_SWAP_INTERRUPT_VECT, ISR_NAKED) {
     __context_save();
     sched_run();

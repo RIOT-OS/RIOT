@@ -1,0 +1,8 @@
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += periph_rtt
+endif
+ifneq (,$(filter periph_timer,$(USEMODULE)))
+  # RTT is used as the time base for the LPTMR driver.
+  # TODO: Remove when LPTMR is refactored.
+  FEATURES_OPTIONAL += periph_rtt
+endif

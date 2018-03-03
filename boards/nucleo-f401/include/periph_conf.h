@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup     boards_nucleo-f401
+ * @defgroup    boards_nucleo-f401 STM32 Nucleo-F401
+ * @ingroup     boards_common_nucleo64
+ * @brief       Support for the STM32 Nucleo-F401
  * @{
  *
  * @file
@@ -133,19 +135,42 @@ static const pwm_conf_t pwm_config[] = {
         .af       = GPIO_AF1,
         .bus      = APB1
     },
-    {
-        .dev      = TIM3,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .chan     = { { .pin = GPIO_PIN(PORT_B, 4) /* D5 */, .cc_chan = 0 },
-                      { .pin = GPIO_PIN(PORT_C, 7) /* D9 */, .cc_chan = 1 },
-                      { .pin = GPIO_PIN(PORT_C, 8),          .cc_chan = 2 },
-                      { .pin = GPIO_PIN(PORT_C, 9),          .cc_chan = 3 } },
-        .af       = GPIO_AF2,
-        .bus      = APB1
-    },
 };
 
 #define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+/** @} */
+
+/**
+ * @name    QDEC configuration
+ * @{
+ */
+static const qdec_conf_t qdec_config[] = {
+    {
+        .dev      = TIM3,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 6),             .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_A, 7),             .cc_chan = 1 } },
+        .af       = GPIO_AF2,
+        .bus      = APB1,
+        .irqn     = TIM3_IRQn
+    },
+    {
+        .dev      = TIM4,
+        .max      = 0xffffffff,
+        .rcc_mask = RCC_APB1ENR_TIM4EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 6),             .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_B, 7),             .cc_chan = 1 } },
+        .af       = GPIO_AF2,
+        .bus      = APB1,
+        .irqn     = TIM4_IRQn
+    },
+};
+
+#define QDEC_0_ISR         isr_tim3
+#define QDEC_1_ISR         isr_tim4
+
+#define QDEC_NUMOF           (sizeof(qdec_config) / sizeof(qdec_config[0]))
 /** @} */
 
 /**

@@ -7,6 +7,9 @@ endif
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
   DIRS += posix/sockets
 endif
+ifneq (,$(filter posix_time,$(USEMODULE)))
+  DIRS += posix/time
+endif
 ifneq (,$(filter pthread,$(USEMODULE)))
   DIRS += posix/pthread
 endif
@@ -57,9 +60,6 @@ ifneq (,$(filter cipher_modes,$(USEMODULE)))
 endif
 ifneq (,$(filter nhdp,$(USEMODULE)))
   DIRS += net/routing/nhdp
-endif
-ifneq (,$(filter gnrc_netdev,$(USEMODULE)))
-  DIRS += net/gnrc/link_layer/netdev
 endif
 ifneq (,$(filter fib,$(USEMODULE)))
   DIRS += net/network_layer/fib
@@ -120,6 +120,9 @@ ifneq (,$(filter devfs,$(USEMODULE)))
 endif
 ifneq (,$(filter l2filter,$(USEMODULE)))
   DIRS += net/link_layer/l2filter
+endif
+ifneq (,$(filter nanocoap,$(USEMODULE)))
+  DIRS += net/application_layer/nanocoap
 endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))

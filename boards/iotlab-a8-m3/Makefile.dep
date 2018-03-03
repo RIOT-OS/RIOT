@@ -1,1 +1,1 @@
-include $(RIOTBOARD)/iotlab-common/Makefile.dep
+include $(RIOTBOARD)/common/iotlab/Makefile.dep

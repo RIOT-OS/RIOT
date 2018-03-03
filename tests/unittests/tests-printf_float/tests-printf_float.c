@@ -25,7 +25,7 @@
 
 #include "tests-printf_float.h"
 
-#define BUFSIZE             (10)
+#define BUFSIZE             (12)
 
 static const double in0 = 2016.0349;
 static const double in1 = 123.4567;
@@ -37,7 +37,7 @@ static void sfprintf_float(void)
     char *str = tmp;
 
     snprintf(str, BUFSIZE, "%f", in0);
-    TEST_ASSERT_EQUAL_STRING("2016.0349", str);
+    TEST_ASSERT_EQUAL_STRING("2016.034900", str);
 
     snprintf(str, BUFSIZE, "%.2f", in0);
     TEST_ASSERT_EQUAL_STRING("2016.03", str);

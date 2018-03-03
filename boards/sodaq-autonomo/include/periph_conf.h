@@ -125,7 +125,7 @@ static const uart_conf_t uart_config[] = {
     {
         .dev      = &SERCOM4->USART,
         .rx_pin   = GPIO_PIN(PB,13),
-        .tx_pin   = GPIO_PIN(PA,14),
+        .tx_pin   = GPIO_PIN(PB,14),
         .mux      = GPIO_MUX_C,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_2,
@@ -141,7 +141,7 @@ static const uart_conf_t uart_config[] = {
         .tx_pad   = UART_PAD_TX_2,
         .flags    = UART_FLAG_NONE,
         .gclk_src = GCLK_CLKCTRL_GEN_GCLK0
-    }
+    },
 };
 
 /* interrupt function name mapping */

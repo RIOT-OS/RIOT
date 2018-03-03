@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2017 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -17,6 +18,7 @@
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef AT86RF2XX_INTERNAL_H
@@ -29,6 +31,26 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief Max. allowed transmit power for the transceiver
+ */
+#ifdef MODULE_AT86RF212B
+#define AT86RF2XX_TXPOWER_MAX           (36)
+#elif MODULE_AT86RF233
+#define AT86RF2XX_TXPOWER_MAX           (21)
+#else
+#define AT86RF2XX_TXPOWER_MAX           (20)
+#endif
+
+/**
+ * @brief Transmit power offset
+ */
+#ifdef MODULE_AT86RF212B
+#define AT86RF2XX_TXPOWER_OFF           (25)
+#else
+#define AT86RF2XX_TXPOWER_OFF           (17)
 #endif
 
 /**
@@ -59,7 +81,7 @@ extern "C" {
  *
  * @return              the value of the specified register
  */
-uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr);
+uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr);
 
 /**
  * @brief   Write to a register at address `addr` from device `dev`.
@@ -68,8 +90,7 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, const uint8_t addr);
  * @param[in] addr      address of the register to write
  * @param[in] value     value to write to the given register
  */
-void at86rf2xx_reg_write(const at86rf2xx_t *dev, const uint8_t addr,
-                         const uint8_t value);
+void at86rf2xx_reg_write(const at86rf2xx_t *dev, uint8_t addr, uint8_t value);
 
 /**
  * @brief   Read a chunk of data from the SRAM of the given device
@@ -79,10 +100,8 @@ void at86rf2xx_reg_write(const at86rf2xx_t *dev, const uint8_t addr,
  * @param[out] data     buffer to read data into
  * @param[in]  len      number of bytes to read from SRAM
  */
-void at86rf2xx_sram_read(const at86rf2xx_t *dev,
-                         const uint8_t offset,
-                         uint8_t *data,
-                         const size_t len);
+void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
+                         uint8_t *data, size_t len);
 
 /**
  * @brief   Write a chunk of data into the SRAM of the given device
@@ -92,10 +111,8 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev,
  * @param[in] data      data to copy into SRAM
  * @param[in] len       number of bytes to write to SRAM
  */
-void at86rf2xx_sram_write(const at86rf2xx_t *dev,
-                          const uint8_t offset,
-                          const uint8_t *data,
-                          const size_t len);
+void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
+                          const uint8_t *data, size_t len);
 
 /**
  * @brief   Start a read transcation internal frame buffer of the given device
@@ -116,8 +133,7 @@ void at86rf2xx_fb_start(const at86rf2xx_t *dev);
  * @param[out] data     buffer to copy the data to
  * @param[in]  len      number of bytes to read from the frame buffer
  */
-void at86rf2xx_fb_read(const at86rf2xx_t *dev,
-                       uint8_t *data, const size_t len);
+void at86rf2xx_fb_read(const at86rf2xx_t *dev, uint8_t *data, size_t len);
 
 /**
  * @brief   Stop a read transcation internal frame buffer of the given device
@@ -140,14 +156,14 @@ uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev);
 /**
  * @brief   Make sure that device is not sleeping
  *
- * @param[in] dev       device to eventually wake up
+ * @param[in,out] dev   device to eventually wake up
  */
 void at86rf2xx_assert_awake(at86rf2xx_t *dev);
 
 /**
  * @brief   Trigger a hardware reset
  *
- * @param[in] dev       device to reset
+ * @param[in,out] dev   device to reset
  */
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
 
@@ -155,7 +171,7 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev);
 /**
  * @brief   Set PHY parameters based on channel and page number
  *
- * @param[in] dev       device to configure
+ * @param[in,out] dev   device to configure
  */
 void at86rf2xx_configure_phy(at86rf2xx_t *dev);
 
@@ -175,7 +191,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev);
  * @param[out] data     buffer to copy the random data to
  * @param[in]  len      number of random bytes to store in data
  */
-void at86rf2xx_get_random(at86rf2xx_t *dev, uint8_t *data, const size_t len);
+void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len);
 #endif
 
 #ifdef __cplusplus
