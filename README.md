@@ -72,11 +72,12 @@ If you compile RIOT for the native cpu and include the `netdev_tap` module,
 you can specify a network interface like this: `PORT=tap0 make term`
 
 #### SETTING UP A TAP NETWORK
-There is a shellscript in `RIOT/dist/tools/tapsetup` called `tapsetup` which
+There is a shell script in `RIOT/dist/tools/tapsetup` called `tapsetup` which
 you can use to create a network of tap interfaces.
 
 *USAGE*
-To create a bridge and two (or count at your option) tap interfaces:
+
+To create a bridge and two (or `count` at your option) tap interfaces:
 
     ./dist/tools/tapsetup/tapsetup [-c [<count>]]
 
