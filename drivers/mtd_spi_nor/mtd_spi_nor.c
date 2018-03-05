@@ -93,8 +93,6 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
         }
         TRACE("\n");
     }
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
 
     do {
         /* Send opcode followed by address */
@@ -104,9 +102,6 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
         /* Read data */
         spi_transfer_bytes(dev->spi, dev->cs, false, NULL, dest, count);
     } while(0);
-
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
 }
 
 /**
@@ -135,8 +130,6 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
         }
         TRACE("\n");
     }
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
 
     do {
         /* Send opcode followed by address */
@@ -148,9 +141,6 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
             spi_transfer_bytes(dev->spi, dev->cs, false, (void *)src, NULL, count);
         }
     } while(0);
-
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
 }
 
 /**
@@ -166,13 +156,8 @@ static void mtd_spi_cmd_read(const mtd_spi_nor_t *dev, uint8_t opcode, void* des
 {
     TRACE("mtd_spi_cmd_read: %p, %02x, %p, %" PRIu32 "\n",
         (void *)dev, (unsigned int)opcode, dest, count);
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
 
     spi_transfer_regs(dev->spi, dev->cs, opcode, NULL, dest, count);
-
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
 }
 
 /**
@@ -188,13 +173,8 @@ static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, 
 {
     TRACE("mtd_spi_cmd_write: %p, %02x, %p, %" PRIu32 "\n",
         (void *)dev, (unsigned int)opcode, src, count);
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
 
     spi_transfer_regs(dev->spi, dev->cs, opcode, (void *)src, NULL, count);
-
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
 }
 
 /**
@@ -208,13 +188,8 @@ static void mtd_spi_cmd(const mtd_spi_nor_t *dev, uint8_t opcode)
 {
     TRACE("mtd_spi_cmd: %p, %02x\n",
         (void *)dev, (unsigned int)opcode);
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
 
     spi_transfer_byte(dev->spi, dev->cs, false, opcode);
-
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
 }
 
 /**
@@ -241,9 +216,6 @@ static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
     mtd_jedec_id_t jedec;
 
     DEBUG("mtd_spi_read_jedec_id: rdid=0x%02x\n", (unsigned int)dev->opcode->rdid);
-
-    /* Acquire exclusive access to the bus. */
-    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
 
     /* Send opcode */
     spi_transfer_byte(dev->spi, dev->cs, true, dev->opcode->rdid);
@@ -283,8 +255,6 @@ static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
         *out = jedec;
     }
 
-    /* Release the bus for other threads. */
-    spi_release(dev->spi);
     return status;
 }
 
@@ -332,8 +302,10 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     DEBUG("mtd_spi_nor_init: CS init\n");
     spi_init_cs(dev->spi, dev->cs);
 
+    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
     int res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
     if (res < 0) {
+        spi_release(dev->spi);
         return -EIO;
     }
     DEBUG("mtd_spi_nor_init: Found chip with ID: (%d, 0x%02x, 0x%02x, 0x%02x)\n",
@@ -341,6 +313,8 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 
     uint8_t status;
     mtd_spi_cmd_read(dev, dev->opcode->rdsr, &status, sizeof(status));
+    spi_release(dev->spi);
+
     DEBUG("mtd_spi_nor_init: device status = 0x%02x\n", (unsigned int)status);
 
     /* check whether page size and sector size are powers of two (most chips' are)
@@ -402,7 +376,10 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
         return 0;
     }
     be_uint32_t addr_be = byteorder_htonl(addr);
+
+    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
     mtd_spi_cmd_addr_read(dev, dev->opcode->read, addr_be, dest, size);
+    spi_release(dev->spi);
 
     return size;
 }
@@ -430,6 +407,7 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
     }
     be_uint32_t addr_be = byteorder_htonl(addr);
 
+    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
     /* write enable */
     mtd_spi_cmd(dev, dev->opcode->wren);
 
@@ -438,6 +416,8 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
 
     /* waiting for the command to complete before returning */
     wait_for_write_complete(dev);
+
+    spi_release(dev->spi);
     return size;
 }
 
@@ -465,6 +445,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         return -EOVERFLOW;
     }
 
+    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
     while (size) {
         be_uint32_t addr_be = byteorder_htonl(addr);
         /* write enable */
@@ -497,6 +478,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         /* waiting for the command to complete before continuing */
         wait_for_write_complete(dev);
     }
+    spi_release(dev->spi);
 
     return 0;
 }
@@ -505,6 +487,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
 {
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
 
+    spi_acquire(dev->spi, dev->cs, dev->mode, dev->clk);
     switch (power) {
         case MTD_POWER_UP:
             mtd_spi_cmd(dev, dev->opcode->wake);
@@ -513,6 +496,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
             mtd_spi_cmd(dev, dev->opcode->sleep);
             break;
     }
+    spi_release(dev->spi);
 
     return 0;
 }
