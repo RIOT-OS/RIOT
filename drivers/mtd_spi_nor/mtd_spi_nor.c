@@ -78,17 +78,16 @@ const mtd_desc_t mtd_spi_nor_driver = {
  * @param[in]  count  number of bytes to read after the address has been sent
  */
 static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
-    be_uint32_t addr, void* dest, uint32_t count)
+                                  be_uint32_t addr, void *dest, uint32_t count)
 {
     TRACE("mtd_spi_cmd_addr_read: %p, %02x, (%02x %02x %02x %02x), %p, %" PRIu32 "\n",
-        (void *)dev, (unsigned int)opcode, addr.u8[0], addr.u8[1], addr.u8[2],
-        addr.u8[3], dest, count);
+          (void *)dev, (unsigned int)opcode, addr.u8[0], addr.u8[1], addr.u8[2],
+          addr.u8[3], dest, count);
 
     uint8_t *addr_buf = &addr.u8[4 - dev->addr_width];
     if (ENABLE_TRACE) {
         TRACE("mtd_spi_cmd_addr_read: addr:");
-        for (unsigned int i = 0; i < dev->addr_width; ++i)
-        {
+        for (unsigned int i = 0; i < dev->addr_width; ++i) {
             TRACE(" %02x", addr_buf[i]);
         }
         TRACE("\n");
@@ -101,7 +100,7 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
 
         /* Read data */
         spi_transfer_bytes(dev->spi, dev->cs, false, NULL, dest, count);
-    } while(0);
+    } while (0);
 }
 
 /**
@@ -115,17 +114,16 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
  * @param[in]  count  number of bytes to write after the opcode has been sent
  */
 static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
-    be_uint32_t addr, const void* src, uint32_t count)
+                                   be_uint32_t addr, const void *src, uint32_t count)
 {
     TRACE("mtd_spi_cmd_addr_write: %p, %02x, (%02x %02x %02x %02x), %p, %" PRIu32 "\n",
-        (void *)dev, (unsigned int)opcode, addr.u8[0], addr.u8[1], addr.u8[2],
-        addr.u8[3], src, count);
+          (void *)dev, (unsigned int)opcode, addr.u8[0], addr.u8[1], addr.u8[2],
+          addr.u8[3], src, count);
 
     uint8_t *addr_buf = &addr.u8[4 - dev->addr_width];
     if (ENABLE_TRACE) {
         TRACE("mtd_spi_cmd_addr_write: addr:");
-        for (unsigned int i = 0; i < dev->addr_width; ++i)
-        {
+        for (unsigned int i = 0; i < dev->addr_width; ++i) {
             TRACE(" %02x", addr_buf[i]);
         }
         TRACE("\n");
@@ -140,7 +138,7 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
         if (cont) {
             spi_transfer_bytes(dev->spi, dev->cs, false, (void *)src, NULL, count);
         }
-    } while(0);
+    } while (0);
 }
 
 /**
@@ -152,10 +150,10 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
  * @param[out] dest   read buffer
  * @param[in]  count  number of bytes to write after the opcode has been sent
  */
-static void mtd_spi_cmd_read(const mtd_spi_nor_t *dev, uint8_t opcode, void* dest, uint32_t count)
+static void mtd_spi_cmd_read(const mtd_spi_nor_t *dev, uint8_t opcode, void *dest, uint32_t count)
 {
     TRACE("mtd_spi_cmd_read: %p, %02x, %p, %" PRIu32 "\n",
-        (void *)dev, (unsigned int)opcode, dest, count);
+          (void *)dev, (unsigned int)opcode, dest, count);
 
     spi_transfer_regs(dev->spi, dev->cs, opcode, NULL, dest, count);
 }
@@ -169,10 +167,10 @@ static void mtd_spi_cmd_read(const mtd_spi_nor_t *dev, uint8_t opcode, void* des
  * @param[out] src    write buffer
  * @param[in]  count  number of bytes to write after the opcode has been sent
  */
-static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, uint8_t opcode, const void* src, uint32_t count)
+static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, uint8_t opcode, const void *src, uint32_t count)
 {
     TRACE("mtd_spi_cmd_write: %p, %02x, %p, %" PRIu32 "\n",
-        (void *)dev, (unsigned int)opcode, src, count);
+          (void *)dev, (unsigned int)opcode, src, count);
 
     spi_transfer_regs(dev->spi, dev->cs, opcode, (void *)src, NULL, count);
 }
@@ -187,7 +185,7 @@ static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, 
 static void mtd_spi_cmd(const mtd_spi_nor_t *dev, uint8_t opcode)
 {
     TRACE("mtd_spi_cmd: %p, %02x\n",
-        (void *)dev, (unsigned int)opcode);
+          (void *)dev, (unsigned int)opcode);
 
     spi_transfer_byte(dev->spi, dev->cs, false, opcode);
 }
@@ -242,14 +240,14 @@ static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
         }
     }
     DEBUG("mtd_spi_read_jedec_id: bank=%u manuf=0x%02x\n", (unsigned int)jedec.bank,
-        (unsigned int)jedec.manuf);
+          (unsigned int)jedec.manuf);
 
     /* Read device ID */
     if (status == 0) {
         spi_transfer_bytes(dev->spi, dev->cs, false, NULL, (char *)&jedec.device[0], sizeof(jedec.device));
     }
     DEBUG("mtd_spi_read_jedec_id: device=0x%02x, 0x%02x\n",
-        (unsigned int)jedec.device[0], (unsigned int)jedec.device[1]);
+          (unsigned int)jedec.device[0], (unsigned int)jedec.device[1]);
 
     if (status == 0) {
         *out = jedec;
@@ -282,16 +280,16 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
 
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
-        (unsigned long)dev->spi, (unsigned long)dev->cs, (void *)dev->opcode);
+          (unsigned long)dev->spi, (unsigned long)dev->cs, (void *)dev->opcode);
 
     DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
-        "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
-        "%" PRIu32 " pages, "
-        "%" PRIu32 " pages/sector, %" PRIu32 " bytes/page)\n",
-        mtd->pages_per_sector * mtd->sector_count * mtd->page_size,
-        mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
-        mtd->pages_per_sector * mtd->sector_count,
-        mtd->pages_per_sector, mtd->page_size);
+          "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
+          "%" PRIu32 " pages, "
+          "%" PRIu32 " pages/sector, %" PRIu32 " bytes/page)\n",
+          mtd->pages_per_sector * mtd->sector_count * mtd->page_size,
+          mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
+          mtd->pages_per_sector * mtd->sector_count,
+          mtd->pages_per_sector, mtd->page_size);
     DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->addr_width);
 
     if (dev->addr_width == 0) {
@@ -309,7 +307,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
         return -EIO;
     }
     DEBUG("mtd_spi_nor_init: Found chip with ID: (%d, 0x%02x, 0x%02x, 0x%02x)\n",
-        dev->jedec_id.bank, dev->jedec_id.manuf, dev->jedec_id.device[0], dev->jedec_id.device[1]);
+          dev->jedec_id.bank, dev->jedec_id.manuf, dev->jedec_id.device[0], dev->jedec_id.device[1]);
 
     uint8_t status;
     mtd_spi_cmd_read(dev, dev->opcode->rdsr, &status, sizeof(status));
@@ -332,7 +330,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     dev->page_addr_mask = mask;
     dev->page_addr_shift = shift;
     DEBUG("mtd_spi_nor_init: page_addr_mask = 0x%08" PRIx32 ", page_addr_shift = %u\n",
-        mask, (unsigned int)shift);
+          mask, (unsigned int)shift);
 
     mask = 0;
     shift = 0;
@@ -347,7 +345,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     dev->sec_addr_shift = shift;
 
     DEBUG("mtd_spi_nor_init: sec_addr_mask = 0x%08" PRIx32 ", sec_addr_shift = %u\n",
-        mask, (unsigned int)shift);
+          mask, (unsigned int)shift);
 
     return 0;
 }
@@ -355,7 +353,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t size)
 {
     DEBUG("mtd_spi_nor_read: %p, %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
-        (void *)mtd, dest, addr, size);
+          (void *)mtd, dest, addr, size);
     const mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
     size_t chipsize = mtd->page_size * mtd->pages_per_sector * mtd->sector_count;
     if (addr > chipsize) {
@@ -387,8 +385,9 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
 static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size)
 {
     uint32_t total_size = mtd->page_size * mtd->pages_per_sector * mtd->sector_count;
+
     DEBUG("mtd_spi_nor_write: %p, %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
-        (void *)mtd, src, addr, size);
+          (void *)mtd, src, addr, size);
     if (size == 0) {
         return 0;
     }
@@ -424,7 +423,7 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
 static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 {
     DEBUG("mtd_spi_nor_erase: %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
-        (void *)mtd, addr, size);
+          (void *)mtd, addr, size);
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
     uint32_t sector_size = mtd->page_size * mtd->pages_per_sector;
     uint32_t total_size = sector_size * mtd->sector_count;
@@ -435,7 +434,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
          * software bugs (the erase-all-your-files kind) */
         DEBUG("addr = %" PRIx32 " ~dev->erase_addr_mask = %" PRIx32 "", addr, ~dev->sec_addr_mask);
         DEBUG("mtd_spi_nor_erase: ERR: erase addr not aligned on %" PRIu32 " byte boundary.\n",
-            sector_size);
+              sector_size);
         return -EOVERFLOW;
     }
     if (addr + size > total_size) {
