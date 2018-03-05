@@ -48,6 +48,10 @@ static int littlefs_err_to_errno(ssize_t err)
         return -ENOTDIR;
     case LFS_ERR_ISDIR:
         return -EISDIR;
+    case LFS_ERR_NOTEMPTY:
+        return -ENOTEMPTY;
+    case LFS_ERR_BADF:
+        return -EBADF;
     case LFS_ERR_INVAL:
         return -EINVAL;
     case LFS_ERR_NOSPC:
