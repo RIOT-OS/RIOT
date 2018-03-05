@@ -1,18 +1,19 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  *               2017 Inria
+ *               2018 Kaspar Schleiser <kaspar@schleiser.de>
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License v2.1. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
- * @ingroup     cpu_stm32l0
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
- * @brief       Implementation of the CPU initialization
+ * @brief       Implementation of STM32 clock configuration
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
@@ -21,9 +22,11 @@
  */
 
 #include "cpu.h"
+#include "board.h"
 #include "periph_conf.h"
 #include "periph/init.h"
 
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 
 /* Check the source to be used for the PLL */
 #if defined(CLOCK_HSI) && defined(CLOCK_HSE)
@@ -39,21 +42,6 @@
 #else
 #error "Please provide CLOCK_HSI or CLOCK_HSE in boards/NAME/includes/perhip_cpu.h"
 #endif
-
-static void clk_init(void);
-
-/**
- * @brief Initialize the CPU, set IRQ priorities
- */
-void cpu_init(void)
-{
-    /* initialize the Cortex-M core */
-    cortexm_init();
-    /* initialize the clock system */
-    clk_init();
-    /* trigger static peripheral initialization */
-    periph_init();
-}
 
 /**
  * @brief Configure the controllers clock system
@@ -72,7 +60,7 @@ void cpu_init(void)
  * NOTE: currently there is not timeout for initialization of PLL and other locks
  *       -> when wrong values are chosen, the initialization could stall
  */
-static void clk_init(void)
+void stmclk_init_sysclk(void)
 {
     /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
     /* Set MSION bit */
@@ -82,7 +70,14 @@ static void clk_init(void)
     /* Reset HSION, HSEON, CSSON and PLLON bits */
     RCC->CR &= ~(RCC_CR_HSION | RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON);
     /* Disable all interrupts */
+
+#if defined(CPU_FAM_STM32L0)
     RCC->CICR = 0x0;
+#elif defined(CPU_FAM_STM32L1)
+    RCC->CIR = 0x0;
+#else
+#error unexpected MCU
+#endif
 
     /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration */
     /* Enable high speed clock source */
@@ -90,6 +85,9 @@ static void clk_init(void)
     /* Wait till the high speed clock source is ready
      * NOTE: the MCU will stay here forever if you use an external clock source and it's not connected */
     while (!(RCC->CR & CLOCK_CR_SOURCE_RDY)) {}
+#if defined(CPU_FAM_STM32L1)
+    FLASH->ACR |= FLASH_ACR_ACC64;
+#endif
     /* Enable Prefetch Buffer */
     FLASH->ACR |= FLASH_ACR_PRFTEN;
     /* Flash 1 wait state */
@@ -119,3 +117,5 @@ static void clk_init(void)
     /* Wait till PLL is used as system clock source */
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
 }
+
+#endif /* defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) */
