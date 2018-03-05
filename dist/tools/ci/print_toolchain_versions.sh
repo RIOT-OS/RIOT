@@ -68,7 +68,7 @@ printf "%21s: %s\n" "avr-libc" "$(avr_libc_version avr-gcc)"
 printf "\n"
 printf "%s\n" "Installed development tools"
 printf "%s\n" "---------------------------"
-for c in cmake cppcheck git; do
+for c in cmake cppcheck doxygen flake8 git; do
     printf "%21s: %s\n" "$c" "$(get_cmd_version $c)"
 done
 printf "%21s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
