@@ -1,0 +1,38 @@
+ifeq ("$(CPU_ARCH)","cortex-m4f")
+	PQ_COMMON_IMPL?=m4
+	ifneq ("$(wildcard $(PKGDIRBASE)/pqm4/crypto_kem/$(PQ_KEM)/m4)","")
+		PQ_KEM_IMPL?=m4
+	endif
+	export PQ_COMMON_IMPL
+endif
+
+ifneq (,$(filter "cortex-m0" "cortex-m0plus", "$(CPU_ARCH)"))
+	PQ_COMMON_IMPL?=m0
+	export PQ_COMMON_IMPL
+endif
+
+ifeq ($(PQ_COMMON_IMPL),)
+	PQ_COMMON_IMPL=generic
+endif
+
+INCLUDES += -I$(PKGDIRBASE)/pqm4/common/$(PQ_COMMON_IMPL)/
+INCLUDES += -I$(PKGDIRBASE)/pqm4/common/
+
+
+ifdef PQ_KEM
+	export PQ_KEM
+	PQ_KEM_IMPL?=ref
+	export PQ_KEM_IMPL
+	CFLAGS += -DPQ_KEM=$(PQ_KEM)
+	INCLUDES += -I$(PKGDIRBASE)/pqm4/crypto_kem/$(PQ_KEM)/$(PQ_KEM_IMPL)
+endif
+
+ifdef PQ_SIGN
+	export PQ_SIGN
+	PQ_SIGN_IMPL?=ref
+	export PQ_SIGN_IMPL
+	CFLAGS += -DPQ_SIGN=$(PQ_SIGN)
+	INCLUDES += -I$(PKGDIRBASE)/pqm4/crypto_sign/$(PQ_SIGN)/$(PQ_SIGN_IMPL)
+endif
+
+INCLUDES += -I$(PKGDIRBASE)/pqm4/
