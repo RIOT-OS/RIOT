@@ -140,7 +140,8 @@ ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
         return -EINVAL;
     }
     if ((remote == NULL) &&
-        /* sock can't be NULL as per assertion above */
+        /* cppcheck-suppress nullPointerRedundantCheck
+         * (reason: sock can't be NULL as per the check above) */
         (sock->remote.family == AF_UNSPEC)) {
         return -ENOTCONN;
     }
