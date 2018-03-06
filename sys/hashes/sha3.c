@@ -57,6 +57,7 @@
  */
 
 #include <hashes/sha3.h>
+#include <stdint.h>
 
 /**
  * Function to compute the Keccak[r, c] sponge function over a given input.
@@ -193,9 +194,13 @@ void sha3_512_final(keccak_state_t *ctx, void *digest)
    ================================================================
  */
 
-typedef unsigned char UINT8;
-typedef unsigned long long int UINT64;
+typedef uint8_t UINT8;
+typedef uint64_t UINT64;
 typedef UINT64 tKeccakLane;
+
+#if __BYTE_ORDER__ == __ORDER__LITTLE_ENDIAN__
+#define LITTLE_ENDIAN
+#endif
 
 #ifndef LITTLE_ENDIAN
 /** Function to load a 64-bit value using the little-endian (LE) convention.
