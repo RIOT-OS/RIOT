@@ -1,7 +1,9 @@
 /*
  * Copyright (C) 2013 INRIA
- * Copyright (C) 2014 Freie Universität Berlin
- * Copyright (C) 2016 TriaGnoSys GmbH
+ *               2014 Freie Universität Berlin
+ *               2016 TriaGnoSys GmbH
+ *               2018 Kaspar Schleiser <kaspar@schleiser.de>
+ *
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -9,7 +11,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32f1
+ * @ingroup     cpu_stm32_common
  * @{
  *
  * @file
@@ -21,6 +23,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
  * @author      Víctor Ariño <victor.arino@zii.aero>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
