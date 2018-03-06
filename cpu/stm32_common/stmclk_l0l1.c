@@ -92,8 +92,6 @@ void stmclk_init_sysclk(void)
     FLASH->ACR |= FLASH_ACR_PRFTEN;
     /* Flash 1 wait state */
     FLASH->ACR |= CLOCK_FLASH_LATENCY;
-    /* Power enable */
-    periph_clk_en(APB1, RCC_APB1ENR_PWREN);
     /* Select the Voltage Range 1 (1.8 V) */
     PWR->CR = PWR_CR_VOS_0;
     /* Wait Until the Voltage Regulator is ready */

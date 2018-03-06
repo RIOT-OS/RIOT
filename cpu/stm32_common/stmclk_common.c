@@ -31,12 +31,6 @@
 #define BIT_CR_DBP          PWR_CR_DBP
 #endif
 
-#if defined (CPU_FAM_STM32L4)
-#define BIT_APB_PWREN       RCC_APB1ENR1_PWREN
-#else
-#define BIT_APB_PWREN       RCC_APB1ENR_PWREN
-#endif
-
 #if defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define REG_LSE             CSR
 #define BIT_LSEON           RCC_CSR_LSEON
@@ -100,12 +94,10 @@ void stmclk_disable_lfclk(void)
 
 void stmclk_dbp_unlock(void)
 {
-    periph_clk_en(APB1, BIT_APB_PWREN);
     PWR->REG_PWR_CR |= BIT_CR_DBP;
 }
 
 void stmclk_dbp_lock(void)
 {
     PWR->REG_PWR_CR &= ~(BIT_CR_DBP);
-    periph_clk_dis(APB1, BIT_APB_PWREN);
 }

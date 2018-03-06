@@ -30,12 +30,21 @@
 
 #include "cpu.h"
 #include "stmclk.h"
+#include "periph_cpu.h"
 #include "periph/init.h"
+
+#if defined (CPU_FAM_STM32L4)
+#define BIT_APB_PWREN       RCC_APB1ENR1_PWREN
+#else
+#define BIT_APB_PWREN       RCC_APB1ENR_PWREN
+#endif
 
 void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
+    /* enable PWR module */
+    periph_clk_en(APB1, BIT_APB_PWREN);
     /* initialize the system clock as configured in the periph_conf.h */
     stmclk_init_sysclk();
     /* trigger static peripheral initialization */
