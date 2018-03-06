@@ -12,6 +12,7 @@
 
 #include "fmt.h"
 #include "net/nanocoap.h"
+#include "hashes/sha256.h"
 
 /* internal value that can be read/written via CoAP */
 static uint8_t internal_value = 0;
@@ -55,9 +56,58 @@ static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, vo
             COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
 }
 
+ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context)
+{
+    (void)context;
+
+    /* using a shared sha256 context *will* break if two requests are handled
+     * at the same time.  doing it anyways, as this is meant to showcase block1
+     * support, not proper synchronisation. */
+    static sha256_context_t sha256;
+
+    uint8_t digest[SHA256_DIGEST_LENGTH];
+
+    uint32_t result = COAP_CODE_204;
+
+    coap_block1_t block1;
+    int blockwise = coap_get_block1(pkt, &block1);
+
+    printf("_sha256_handler(): received data: offset=%u len=%u blockwise=%i more=%i\n", \
+            (unsigned)block1.offset, pkt->payload_len, blockwise, block1.more);
+
+    if (block1.offset == 0) {
+        puts("_sha256_handler(): init");
+        sha256_init(&sha256);
+    }
+
+    sha256_update(&sha256, pkt->payload, pkt->payload_len);
+
+    if (block1.more == 1) {
+        result = COAP_CODE_231;
+    }
+
+    size_t result_len = 0;
+    if (!blockwise || !block1.more) {
+        puts("_sha256_handler(): finish");
+        sha256_final(&sha256, digest);
+        result_len = SHA256_DIGEST_LENGTH * 2;
+    }
+
+    ssize_t reply_len = coap_build_reply(pkt, result, buf, len, 0);
+    uint8_t *pkt_pos = (uint8_t*)pkt->hdr + reply_len;
+    pkt_pos += coap_put_block1_ok(pkt_pos, &block1, 0);
+    if (result_len) {
+        *pkt_pos++ = 0xFF;
+        pkt_pos += fmt_bytes_hex((char *)pkt_pos, digest, sizeof(digest));
+    }
+
+    return pkt_pos - (uint8_t*)pkt->hdr;
+}
+
 /* must be sorted by path (alphabetically) */
 const coap_resource_t coap_resources[] = {
     COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
+    { "/sha256", COAP_POST, _sha256_handler, NULL },
     { "/riot/board", COAP_GET, _riot_board_handler, NULL },
     { "/riot/value", COAP_GET | COAP_PUT | COAP_POST, _riot_value_handler, NULL },
 };
