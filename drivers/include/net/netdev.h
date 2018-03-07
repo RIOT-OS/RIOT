@@ -195,8 +195,8 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <sys/uio.h>
 
+#include "iolist.h"
 #include "net/netopt.h"
 
 #ifdef MODULE_NETSTATS_L2
@@ -294,17 +294,14 @@ typedef struct netdev_driver {
     /**
      * @brief Send frame
      *
-     * @pre `(dev != NULL)`
-     * @pre `(count == 0) || (vector != NULL)`
-     *      (`(count != 0) => (vector != NULL)`)
+     * @pre `(dev != NULL) && (iolist != NULL`
      *
      * @param[in] dev       network device descriptor
-     * @param[in] vector    io vector array to send
-     * @param[in] count     nr of entries in vector
+     * @param[in] iolist    io vector list to send
      *
      * @return number of bytes sent, or `< 0` on error
      */
-    int (*send)(netdev_t *dev, const struct iovec *vector, unsigned count);
+    int (*send)(netdev_t *dev, const iolist_t *iolist);
 
     /**
      * @brief Get a received frame

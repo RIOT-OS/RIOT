@@ -189,12 +189,11 @@ static int _init(netdev_t *encdev)
     return 0;
 }
 
-static size_t iovec_count_total(const struct iovec *vector, int count)
+static size_t iolist_count_total(const iolist_t *iolist)
 {
     size_t result = 0;
-    while(count--) {
-        result += vector->iov_len;
-        vector++;
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+        result += iol->iol_len;
     }
     return result;
 }
@@ -256,13 +255,13 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
     }
 }
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     ethos_t * dev = (ethos_t *) netdev;
     (void)dev;
 
     /* count total packet length */
-    size_t pktlen = iovec_count_total(vector, count);
+    size_t pktlen = iolist_count_total(iolist);
 
     /* lock line in order to prevent multiple writes */
     mutex_lock(&dev->out_mutex);
@@ -271,14 +270,13 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
     uint8_t frame_delim = ETHOS_FRAME_DELIMITER;
     uart_write(dev->uart, &frame_delim, 1);
 
-    /* send iovec */
-    while(count--) {
-        size_t n = vector->iov_len;
-        uint8_t *ptr = vector->iov_base;
+    /* send iolist */
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+        size_t n = iol->iol_len;
+        uint8_t *ptr = iol->iol_base;
         while(n--) {
             _write_escaped(dev->uart, *ptr++);
         }
-        vector++;
     }
 
     uart_write(dev->uart, &frame_delim, 1);

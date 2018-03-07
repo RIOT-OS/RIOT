@@ -634,21 +634,23 @@ int xbee_init(netdev_t *dev)
     return 0;
 }
 
-static int xbee_send(netdev_t *dev, const struct iovec *vector, unsigned count)
+static int xbee_send(netdev_t *dev, const iolist_t *iolist)
 {
     xbee_t *xbee = (xbee_t *)dev;
     size_t size;
     uint8_t csum;
 
-    assert(xbee && vector && (count > 0));
+    assert(xbee && iolist);
 
     /* calculate the checksum and the packet size */
-    size = vector[0].iov_len;
-    csum = _cksum(3, (uint8_t *)vector[0].iov_base, size);
-    for (unsigned i = 1; i < count; i++) {
-        size += vector[i].iov_len;
-        for (size_t p = 0; p < vector[i].iov_len; p++) {
-            csum -= ((uint8_t *)vector[i].iov_base)[p];
+    size = iolist->iol_len;
+    csum = _cksum(3, (uint8_t *)iolist->iol_base, size);
+    for (const iolist_t *iol = iolist->iol_next; iol; iol = iol->iol_next) {
+        size_t len = iol->iol_len;
+
+        size += len;
+        for (size_t p = 0; p < len; p++) {
+            csum -= ((uint8_t *)iol->iol_base)[p];
         }
     }
 
@@ -661,13 +663,13 @@ static int xbee_send(netdev_t *dev, const struct iovec *vector, unsigned count)
     /* send the actual data packet */
     DEBUG("[xbee] send: now sending out %i byte\n", (int)size);
     mutex_lock(&(xbee->tx_lock));
-    for (unsigned i = 0; i < count; i++) {
-        uart_write(xbee->p.uart, vector[i].iov_base, vector[i].iov_len);
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+        uart_write(xbee->p.uart, iol->iol_base, iol->iol_len);
     }
     uart_write(xbee->p.uart, &csum, 1);
     mutex_unlock(&(xbee->tx_lock));
 
-    /* return number of payload byte */
+    /* return number of payload bytes */
     return (int)size;
 }
 

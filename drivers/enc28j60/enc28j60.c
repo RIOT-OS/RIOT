@@ -240,7 +240,7 @@ static void on_int(void *arg)
     netdev->event_callback(arg, NETDEV_EVENT_ISR);
 }
 
-static int nd_send(netdev_t *netdev, const struct iovec *data, unsigned count)
+static int nd_send(netdev_t *netdev, const iolist_t *iolist)
 {
     enc28j60_t *dev = (enc28j60_t *)netdev;
     uint8_t ctrl = 0;
@@ -256,9 +256,9 @@ static int nd_send(netdev_t *netdev, const struct iovec *data, unsigned count)
     cmd_w_addr(dev, ADDR_WRITE_PTR, BUF_TX_START);
     /* write control byte and the actual data into the buffer */
     cmd_wbm(dev, &ctrl, 1);
-    for (unsigned i = 0; i < count; i++) {
-        c += data[i].iov_len;
-        cmd_wbm(dev, (uint8_t *)data[i].iov_base, data[i].iov_len);
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+        c += iol->iol_len;
+        cmd_wbm(dev, iol->iol_base, iol->iol_len);
     }
     /* set TX end pointer */
     cmd_w_addr(dev, ADDR_TX_END, cmd_r_addr(dev, ADDR_WRITE_PTR) - 1);

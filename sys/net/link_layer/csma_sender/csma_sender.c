@@ -78,8 +78,7 @@ static inline uint32_t choose_backoff_period(int be,
  * @brief Perform a CCA and send the given packet if medium is available
  *
  * @param[in] device    netdev device, needs to be already initialized
- * @param[in] vector    pointer to the data
- * @param[in] count     number of elements in @p vector
+ * @param[in] iolist    pointer to the data
  *
  * @return              the return value of device driver's
  *                      netdev_driver_t::send() function if medium was
@@ -88,7 +87,7 @@ static inline uint32_t choose_backoff_period(int be,
  * @return              -EBUSY if radio medium was not available
  *                      to send the given data
  */
-static int send_if_cca(netdev_t *device, struct iovec *vector, unsigned count)
+static int send_if_cca(netdev_t *device, iolist_t *iolist)
 {
     netopt_enable_t hwfeat;
 
@@ -107,7 +106,7 @@ static int send_if_cca(netdev_t *device, struct iovec *vector, unsigned count)
     /* if medium is clear, send the packet and return */
     if (hwfeat == NETOPT_ENABLE) {
         DEBUG("csma: Radio medium available: sending packet.\n");
-        return device->driver->send(device, vector, count);
+        return device->driver->send(device, iolist);
     }
 
     /* if we arrive here, medium was not available for transmission */
@@ -117,8 +116,8 @@ static int send_if_cca(netdev_t *device, struct iovec *vector, unsigned count)
 
 /*------------------------- "EXPORTED" FUNCTIONS -------------------------*/
 
-int csma_sender_csma_ca_send(netdev_t *dev, struct iovec *vector,
-                             unsigned count, const csma_sender_conf_t *conf)
+int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
+                             const csma_sender_conf_t *conf)
 {
     netopt_enable_t hwfeat;
 
@@ -153,7 +152,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, struct iovec *vector,
     if (ok) {
         /* device does CSMA/CA all by itself: let it do its job */
         DEBUG("csma: Network device does hardware CSMA/CA\n");
-        return dev->driver->send(dev, vector, count);
+        return dev->driver->send(dev, iolist);
     }
 
     /* if we arrive here, then we must perform the CSMA/CA procedure
@@ -169,7 +168,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, struct iovec *vector,
         xtimer_usleep(bp);
 
         /* try to send after a CCA */
-        res = send_if_cca(dev, vector, count);
+        res = send_if_cca(dev, iolist);
         if (res >= 0) {
             /* TX done */
             return res;
@@ -195,7 +194,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, struct iovec *vector,
 }
 
 
-int csma_sender_cca_send(netdev_t *dev, struct iovec *vector, unsigned count)
+int csma_sender_cca_send(netdev_t *dev, iolist_t *iolist)
 {
     netopt_enable_t hwfeat;
 
@@ -226,12 +225,12 @@ int csma_sender_cca_send(netdev_t *dev, struct iovec *vector, unsigned count)
     if (ok) {
         /* device does auto-CCA: let him do its job */
         DEBUG("csma: Network device does auto-CCA checking.\n");
-        return dev->driver->send(dev, vector, count);
+        return dev->driver->send(dev, iolist);
     }
 
     /* if we arrive here, we must do CCA ourselves to see if radio medium
        is clear before sending */
-    res = send_if_cca(dev, vector, count);
+    res = send_if_cca(dev, iolist);
     if (res == -EBUSY) {
         DEBUG("csma: Transmission cancelled!\n");
     }

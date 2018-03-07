@@ -224,10 +224,12 @@ int send_cmd(int argc, char **argv)
     printf("sending \"%s\" payload (%d bytes)\n",
            argv[1], strlen(argv[1]) + 1);
 
-    struct iovec vec[1];
-    vec[0].iov_base = argv[1];
-    vec[0].iov_len = strlen(argv[1]) + 1;
-    if (netdev->driver->send(netdev, vec, 1) == -ENOTSUP) {
+    iolist_t iolist = {
+        .iol_base = argv[1],
+        .iol_len = (strlen(argv[1]) + 1)
+    };
+
+    if (netdev->driver->send(netdev, &iolist) == -ENOTSUP) {
         puts("Cannot send: radio is still transmitting");
     }
 

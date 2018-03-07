@@ -110,6 +110,7 @@ endif
 ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev_eth
+  USEMODULE += iolist
 endif
 
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))

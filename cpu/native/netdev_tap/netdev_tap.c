@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 /* needs to be included before native's declarations of ntohl etc. */
@@ -51,6 +52,7 @@
 
 #include "async_read.h"
 
+#include "iolist.h"
 #include "net/eui64.h"
 #include "net/netdev.h"
 #include "net/netdev/eth.h"
@@ -64,7 +66,7 @@
 
 /* netdev interface */
 static int _init(netdev_t *netdev);
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned n);
+static int _send(netdev_t *netdev, const iolist_t *iolist);
 static int _recv(netdev_t *netdev, void *buf, size_t n, void *info);
 
 static inline void _get_mac_addr(netdev_t *netdev, uint8_t *dst)
@@ -273,17 +275,20 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     return -1;
 }
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned n)
+static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
-    int res = _native_writev(dev->tap_fd, vector, n);
+
+    struct iovec iov[iolist_count(iolist)];
+
+    unsigned n;
+    size_t bytes = iolist_to_iovec(iolist, iov, &n);
+
+    int res = _native_writev(dev->tap_fd, iov, n);
 #ifdef MODULE_NETSTATS_L2
-    size_t bytes = 0;
-    for (unsigned i = 0; i < n; i++) {
-        bytes += vector->iov_len;
-        vector++;
-    }
     netdev->stats.tx_bytes += bytes;
+#else
+    (void)bytes;
 #endif
     if (netdev->event_callback) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);

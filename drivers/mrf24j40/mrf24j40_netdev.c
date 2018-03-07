@@ -39,22 +39,6 @@
 
 #define _MAX_MHR_OVERHEAD   (25)
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
-static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
-static int _init(netdev_t *netdev);
-static void _isr(netdev_t *netdev);
-static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len);
-static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len);
-
-const netdev_driver_t mrf24j40_driver = {
-    .send = _send,
-    .recv = _recv,
-    .init = _init,
-    .isr = _isr,
-    .get = _get,
-    .set = _set,
-};
-
 static void _irq_handler(void *arg)
 {
     netdev_t *dev = (netdev_t *) arg;
@@ -83,18 +67,17 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
-    const struct iovec *ptr = vector;
     size_t len = 0;
 
     mrf24j40_tx_prepare(dev);
 
     /* load packet data into FIFO */
-    for (unsigned i = 0; i < count; i++, ptr++) {
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         /* current packet data + FCS too long */
-        if ((len + ptr->iov_len + 2) > IEEE802154_FRAME_LEN_MAX) {
+        if ((len + iol->iol_len + 2) > IEEE802154_FRAME_LEN_MAX) {
             DEBUG("[mrf24j40] error: packet too large (%u byte) to be send\n",
                   (unsigned)len + 2);
             return -EOVERFLOW;
@@ -103,11 +86,12 @@ static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.tx_bytes += len;
 #endif
-        len = mrf24j40_tx_load(dev, ptr->iov_base, ptr->iov_len, len);
-        if (i == 0) {
+        len = mrf24j40_tx_load(dev, iol->iol_base, iol->iol_len, len);
+        /* only on first iteration: */
+        if (iol == iolist) {
             dev->header_len = len;
             /* Grab the FCF bits from the frame header */
-            dev->fcf_low = *(uint8_t*)(ptr->iov_base);
+            dev->fcf_low = *(uint8_t*)(iol->iol_base);
         }
 
     }
@@ -581,3 +565,12 @@ static void _isr(netdev_t *netdev)
     }
     DEBUG("[mrf24j40] END IRQ\n");
 }
+
+const netdev_driver_t mrf24j40_driver = {
+    .send = _send,
+    .recv = _recv,
+    .init = _init,
+    .isr = _isr,
+    .get = _get,
+    .set = _set,
+};
