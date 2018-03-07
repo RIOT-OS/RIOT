@@ -829,7 +829,6 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */drivers/kw2xrf/include/overwrites.h \
                          */pkg/emb6/* \
                          */pkg/lwip/* \
-                         */pkg/openthread/* \
                          */pkg/tlsf/patch.txt \
                          */sys/include/embUnit/* \
                          */sys/random/tinymt32/* \
