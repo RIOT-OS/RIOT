@@ -58,14 +58,19 @@ extern "C" {
 #define LSM6DSL_PARAM_GYRO_FIFO_DEC  (LSM6DSL_DECIMATION_NO)
 #endif
 
-#define LSM6DSL_PARAMS_DEFAULT       { .i2c             = LSM6DSL_PARAM_I2C, \
-                                       .addr            = LSM6DSL_PARAM_ADDR, \
-                                       .acc_odr         = LSM6DSL_PARAM_ACC_ODR, \
-                                       .gyro_odr        = LSM6DSL_PARAM_GYRO_ODR, \
-                                       .acc_fs          = LSM6DSL_PARAM_ACC_FS, \
-                                       .gyro_fs         = LSM6DSL_PARAM_GYRO_FS, \
+#ifndef LSM6DSL_PARAMS
+#define LSM6DSL_PARAMS               { .i2c             = LSM6DSL_PARAM_I2C,          \
+                                       .addr            = LSM6DSL_PARAM_ADDR,         \
+                                       .acc_odr         = LSM6DSL_PARAM_ACC_ODR,      \
+                                       .gyro_odr        = LSM6DSL_PARAM_GYRO_ODR,     \
+                                       .acc_fs          = LSM6DSL_PARAM_ACC_FS,       \
+                                       .gyro_fs         = LSM6DSL_PARAM_GYRO_FS,      \
                                        .acc_decimation  = LSM6DSL_PARAM_ACC_FIFO_DEC, \
                                        .gyro_decimation = LSM6DSL_PARAM_GYRO_FIFO_DEC }
+#endif
+#ifndef LSM6DSL_SAUL_INFO
+#define LSM6DSL_SAUL_INFO            { .name = "lsm6dsl" }
+#endif
 /** @} */
 
 /**
@@ -73,11 +78,7 @@ extern "C" {
  */
 static const lsm6dsl_params_t lsm6dsl_params[] =
 {
-#ifdef LSM6DSL_PARAMS_CUSTOM
-    LSM6DSL_PARAMS_CUSTOM,
-#else
-    LSM6DSL_PARAMS_DEFAULT,
-#endif
+    LSM6DSL_PARAMS
 };
 
 /**
@@ -85,7 +86,7 @@ static const lsm6dsl_params_t lsm6dsl_params[] =
  */
 static const saul_reg_info_t lsm6dsl_saul_info[] =
 {
-    { .name = "lsm6dsl" }
+    LSM6DSL_SAUL_INFO
 };
 
 #ifdef __cplusplus
