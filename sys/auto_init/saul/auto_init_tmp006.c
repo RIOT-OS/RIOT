@@ -43,12 +43,19 @@ static tmp006_t tmp006_devs[TMP006_NUM];
 static saul_reg_t saul_entries[TMP006_NUM];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define TMP006_INFO_NUM    (sizeof(tmp006_saul_info) / sizeof(tmp006_saul_info[0]))
+
+/**
  * @brief   Reference the driver struct
  */
 extern const saul_driver_t tmp006_saul_driver;
 
 void auto_init_tmp006(void)
 {
+    assert(TMP006_NUM == TMP006_INFO_NUM);
+
     for (unsigned i = 0; i < TMP006_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing tmp006 #%u\n", i);
 
