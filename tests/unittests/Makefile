@@ -171,7 +171,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        stm32f0discovery \
                        stm32f3discovery \
                        stm32f4discovery \
-                       stm32f7discovery \
+                       stm32f769i-disco \
                        udoo \
                        yunjia-nrf51822 \
                        #
