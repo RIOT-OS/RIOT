@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_iotlab-m3
+ * @ingroup     boards_iotlab-a8-m3
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the iotlab-m3 board
+ * @brief       Peripheral MCU configuration for the iotlab-a8-m3 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_iotlab-m3 IoT-LAB M3 open node
+ * @defgroup    boards_iotlab-a8-m3 IoT-LAB A8 M3 open node
  * @ingroup     boards
- * @brief       Support for the iotlab-m3 board
+ * @brief       Support for the iotlab-a8-m3 board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the iotlab-m3 board
+ * @brief       Board specific definitions for the iotlab-a8-m3 board
  *
  */
 
