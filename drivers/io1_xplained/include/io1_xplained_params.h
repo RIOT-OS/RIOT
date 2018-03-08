@@ -35,10 +35,18 @@ extern "C" {
  * @{
  */
 #ifndef IO1_XPLAINED_PARAM_ADDR
-#define IO1_XPLAINED_PARAM_ADDR       (0x07)
+#define IO1_XPLAINED_PARAM_ADDR   (0x07)
 #endif
 
-#define IO1_XPLAINED_PARAMS_DEFAULT   { .addr = IO1_XPLAINED_PARAM_ADDR }
+#ifndef IO1_XPLAINED_PARAMS
+#define IO1_XPLAINED_PARAMS       { .addr = IO1_XPLAINED_PARAM_ADDR }
+#endif
+#ifndef IO1_XPLAINED_SAUL_INFO
+#define IO1_XPLAINED_SAUL_INFO    {{ .name = "Temperature (IO1 Xplained)" }, \
+                                   { .name = "LED (IO1 Xplained)" },         \
+                                   { .name = "GPIO1 (IO1 Xplained)" },       \
+                                   { .name = "GPIO2 (IO1 Xplained)" }}
+#endif
 /**@}*/
 
 /**
@@ -46,24 +54,15 @@ extern "C" {
  */
 static const io1_xplained_params_t io1_xplained_params[] =
 {
-#ifdef IO1_XPLAINED_PARAMS_BOARD
-    IO1_XPLAINED_PARAMS_BOARD,
-#else
-    IO1_XPLAINED_PARAMS_DEFAULT,
-#endif
+    IO1_XPLAINED_PARAMS
 };
 
 /**
  * @brief   Allocate and configure entries to the SAUL registry
  */
-saul_reg_info_t io1_xplained_saul_reg_info[][4] =
+saul_reg_info_t io1_xplained_saul_info[][4] =
 {
-    {
-        { .name = "Temperature (IO1 Xplained)" },
-        { .name = "LED (IO1 Xplained)" },
-        { .name = "GPIO1 (IO1 Xplained)" },
-        { .name = "GPIO2 (IO1 Xplained)" }
-    }
+    IO1_XPLAINED_SAUL_INFO
 };
 
 /**
