@@ -280,6 +280,12 @@ ifneq (,$(filter sht11,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter si114%,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += si114x
+endif
+
 ifneq (,$(filter si70%,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
