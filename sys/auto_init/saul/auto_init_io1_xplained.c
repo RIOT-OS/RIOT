@@ -49,14 +49,14 @@ static saul_reg_t saul_entries[IO1_XPLAINED_NUM * 4];
  * @name    Reference the driver structs.
  * @{
  */
-extern const saul_driver_t _saul_driver;
+extern const saul_driver_t gpio_out_saul_driver;
 extern const saul_driver_t io1_xplained_temperature_saul_driver;
 /** @} */
 
 void auto_init_io1_xplained(void)
 {
     /* There are 4 saul reg info for each configured device */
-    assert(IO1_XPLAINED_NUM == (IO1_XPLAINED_INFO_NUM >> 2));
+    assert(IO1_XPLAINED_NUM == IO1_XPLAINED_INFO_NUM);
 
     for (unsigned i = 0; i < IO1_XPLAINED_NUM; i++) {
         if (io1_xplained_init(&io1_xplained_devs[i],
@@ -73,8 +73,9 @@ void auto_init_io1_xplained(void)
 
         /* GPIOs */
         for (unsigned j = 1; j < 4; j++) {
-            saul_entries[i * 4 + j].dev = &(io1_xplained_saul_gpios[j - 1]);
-            saul_entries[i * 4 + j].name = io1_xplained_saul_info[i][j - 1].name;
+            saul_entries[i * 4 + j].dev = &(io1_xplained_saul_gpios[j]);
+            saul_entries[i * 4 + j].name = io1_xplained_saul_info[i][j].name;
+            saul_entries[i * 4 + j].driver = &gpio_out_saul_driver;
             saul_reg_add(&(saul_entries[i * 4 + j]));
         }
     }
