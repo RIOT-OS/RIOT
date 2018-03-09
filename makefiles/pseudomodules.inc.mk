@@ -75,6 +75,7 @@ PSEUDOMODULES += sock_async
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
 PSEUDOMODULES += sock_udp
+PSEUDOMODULES += tlsman_tinydtls
 
 # print ascii representation in function od_hex_dump()
 PSEUDOMODULES += od_string
