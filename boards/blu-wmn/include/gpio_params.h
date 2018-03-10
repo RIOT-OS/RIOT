@@ -23,6 +23,7 @@
 
 #include "board.h"
 #include "saul/periph.h"
+#include "blu-wmn_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {

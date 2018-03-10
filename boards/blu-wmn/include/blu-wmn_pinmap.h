@@ -62,8 +62,6 @@ extern "C" {
 #define JTAG_TDI                GPIO_PIN(PORT_C, 5)
 #define JTAG_TCK                GPIO_PIN(PORT_C, 2)
 #define JTAG_TMS                GPIO_PIN(PORT_C, 3)
-#define RTC_CRYSTAL1            GPIO_PIN(PORT_C, 6)
-#define RTC_CRYSTAL2            GPIO_PIN(PORT_C, 7)
 /** @ */
 
 #ifdef __cplusplus

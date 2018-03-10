@@ -39,7 +39,9 @@ extern "C" {
  * baudrate to 9600 for this board
  * @{
  */
+#ifndef UART_STDIO_BAUDRATE
 #define UART_STDIO_BAUDRATE (9600U)
+#endif
 /** @} */
 
 /**
@@ -50,37 +52,35 @@ extern "C" {
 /**
  * @brief   Context swap defines
  *
- * Setup to use PC5 which is pin change interrupt 13 (PCINT13)
+ * Setup to use PC4 which is pin change interrupt 20 (PCINT13)
  * This emulates a software triggered interrupt
  */
 #define AVR_CONTEXT_SWAP_INIT do { \
-            DDRD |= (1 << PC4); \
-            PCICR |= (1 << PCIE3); \
-            PCMSK3 |= (1 << PCINT20); \
+            DDRC |= (1 << PC4); \
+            PCICR |= (1 << PCIE2); \
+            PCMSK2 |= (1 << PCINT20); \
 } while (0)
-#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT3_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTD ^= (1 << PC4)
+#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT2_vect
+#define AVR_CONTEXT_SWAP_TRIGGER   PORTC ^= (1 << PC4)
 
 /**
  * @name    xtimer configuration values
  * @{
  */
+#define XTIMER_DEV                  (0)
+#define XTIMER_CHAN                 (0)
 #define XTIMER_WIDTH                (16)
-#define XTIMER_HZ                   (32768UL)
+#define XTIMER_HZ                   (125000UL)
 #define XTIMER_BACKOFF              (40)
 /** @} */
 
 /**
  * @brief   Define the interface to the AT86RF212B / AT86RF231 radio
- *
- * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  */
-#define AT86RF2XX_PARAMS_BOARD      {.spi       = SPI_DEV(0), \
-                                     .spi_clk   = SPI_CLK_5MHZ, \
-                                     .cs_pin    = GPIO_PIN(PORT_D, 7), \
-                                     .int_pin   = GPIO_PIN(PORT_D, 4), \
-                                     .sleep_pin = GPIO_PIN(PORT_D, 5), \
-                                     .reset_pin = GPIO_PIN(PORT_D, 6)}
+#define AT86RF2XX_PARAM_CS          WIRELESS_SEL
+#define AT86RF2XX_PARAM_INT         WIRELESS_INT
+#define AT86RF2XX_PARAM_SLEEP       WIRELESS_SLP
+#define AT86RF2XX_PARAM_RESET       WIRELESS_RST
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
