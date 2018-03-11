@@ -1,6 +1,6 @@
 Expected result
 ===============
-Use the provided shell commands, to read and write pages from/to the MCU's
+Use the provided shell commands to read and write pages from/to the MCU's
 internal flash memory. For altering the data in a flash page, use a sequence
 similar to this:
 - read some page from the flash, this will load this page into a local buffer
@@ -34,5 +34,5 @@ What else to check:
 
 Background
 ==========
-This test provides you with tools to test implementations of the `flashpage`
-peripheral driver interface.
+This test application provides shell commands to verify the implementations of
+the `flashpage` peripheral driver interface.

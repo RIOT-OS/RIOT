@@ -173,7 +173,7 @@ static int cmd_write(int argc, char **argv)
         return 1;
     }
 
-    printf("wrote local page to flash page %i at addr %p\n",
+    printf("wrote local page buffer to flash page %i at addr %p\n",
            page, flashpage_addr(page));
     return 0;
 }
@@ -270,11 +270,11 @@ static int cmd_test(int argc, char **argv)
     }
 
     if (flashpage_write_and_verify(page, page_mem) != FLASHPAGE_OK) {
-        printf("error verifying the content of page %i: ", page);
+        printf("error verifying the content of page %i\n", page);
         return 1;
     }
 
-    printf("wrote local page to flash page %i at addr %p\n",
+    printf("wrote local page buffer to flash page %i at addr %p\n",
            page, flashpage_addr(page));
     return 0;
 }
@@ -283,13 +283,13 @@ static const shell_command_t shell_commands[] = {
     { "info", "Show information about pages", cmd_info },
     { "dump", "Dump the selected page to STDOUT", cmd_dump },
     { "dump_local", "Dump the local page buffer to STDOUT", cmd_dump_local },
-    { "read", "Read and output the given page", cmd_read },
-    { "write", "Write (ASCII) data to the given page", cmd_write },
+    { "read", "Copy the given page to the local page buffer and dump to STDOUT", cmd_read },
+    { "write", "Write the local page buffer to the given page", cmd_write },
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
     { "write_raw", "Write (ASCII, max 64B) data to the given address", cmd_write_raw },
 #endif
-    { "erase", "Erase the given page", cmd_erase },
-    { "edit", "Write bytes to the local page", cmd_edit },
+    { "erase", "Erase the given page buffer", cmd_erase },
+    { "edit", "Write bytes to the local page buffer", cmd_edit },
     { "test", "Write and verify test pattern", cmd_test },
     { NULL, NULL, NULL }
 };
