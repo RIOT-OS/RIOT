@@ -218,6 +218,49 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 #endif /* ndef CPU_FAM_STM32F1 */
 
+#ifdef MODULE_PERIPH_DMA
+/**
+ * @brief   DMA configuration
+ */
+typedef struct {
+    int stream;            /**< DMA stream */
+} dma_conf_t;
+
+/**
+ * @brief   DMA type
+ */
+typedef unsigned dma_t;
+
+/**
+ * @brief   DMA modes
+ */
+typedef enum {
+    DMA_PERIPH_TO_MEM,     /**< Peripheral to memory */
+    DMA_MEM_TO_PERIPH,     /**< Memory to peripheral */
+    DMA_MEM_TO_MEM,        /**< Memory to memory */
+} dma_mode_t;
+
+/**
+ * @name    DMA Increment modes
+ * @{
+ */
+#define DMA_INC_SRC_ADDR  (0x01)
+#define DMA_INC_DST_ADDR  (0x02)
+#define DMA_INC_BOTH_ADDR (DMA_INC_SRC_ADDR | DMA_INC_DST_ADDR)
+/** @} */
+
+/**
+ * @name    DMA data width
+ * @{
+ */
+#define DMA_DATA_WIDTH_BYTE      (0x00)
+#define DMA_DATA_WIDTH_HALF_WORD (0x04)
+#define DMA_DATA_WIDTH_WORD      (0x08)
+#define DMA_DATA_WIDTH_MASK      (0x0C)
+#define DMA_DATA_WIDTH_SHIFT     (2)
+/** @} */
+#endif /* MODULE_PERIPH_DMA */
+
 /**
  * @brief   DAC line configuration data
  */
@@ -293,8 +336,8 @@ typedef struct {
 #endif
     uint8_t bus;            /**< APB bus */
     uint8_t irqn;           /**< IRQ channel */
-#if 0 /* TODO */
-    uint8_t dma_stream;     /**< DMA stream used for TX */
+#ifdef MODULE_PERIPH_DMA
+    dma_t dma;              /**< Logical DMA stream used for TX */
     uint8_t dma_chan;       /**< DMA channel used for TX */
 #endif
 #ifdef MODULE_STM32_PERIPH_UART_HW_FC
@@ -321,7 +364,14 @@ typedef struct {
 #endif
     uint32_t rccmask;       /**< bit in the RCC peripheral enable register */
     uint8_t apbbus;         /**< APBx bus the device is connected to */
+#ifdef MODULE_PERIPH_DMA
+    dma_t tx_dma;           /**< Logical DMA stream used for TX */
+    uint8_t tx_dma_chan;    /**< DMA channel used for TX */
+    dma_t rx_dma;           /**< Logical DMA stream used for RX */
+    uint8_t rx_dma_chan;    /**< DMA channel used for RX */
+#endif
 } spi_conf_t;
+
 
 /**
  * @brief   Get the actual bus clock frequency for the APB buses
@@ -371,6 +421,247 @@ void gpio_init_af(gpio_t pin, gpio_af_t af);
  * @param[in] pin       pin to configure
  */
 void gpio_init_analog(gpio_t pin);
+
+#ifdef MODULE_PERIPH_DMA
+/**
+ * @brief   DMA stream not defined
+ */
+#define DMA_STREAM_UNDEF (UINT_MAX)
+
+/**
+ * @brief   Initialize DMA
+ */
+void dma_init(void);
+
+/**
+ * @brief   Execute a DMA transfer
+ *
+ * This function blocks until the transfer is completed. This is a convenience
+ * function which configure, start, wait and stop a DMA transfer.
+ *
+ * @param[in]  dma     logical DMA stream
+ * @param[in]  chan    DMA channel
+ * @param[in]  src     source buffer
+ * @param[out] dst     destination buffer
+ * @param[in]  len     length to transfer
+ * @param[in]  mode    DMA mode
+ * @param[in]  flags   DMA configuration
+ *
+ * @return < 0 on error, the number of transfered bytes otherwise
+ */
+int dma_transfer(dma_t dma, int chan, const void *src, void *dst, size_t len,
+                 dma_mode_t mode, uint8_t flags);
+
+/**
+ * @brief   Acquire a DMA stream
+ *
+ * @param[in] dma     logical DMA stream
+ */
+void dma_acquire(dma_t dma);
+
+/**
+ * @brief   Release a DMA stream
+ *
+ * @param[in] dma     logical DMA stream
+ */
+void dma_release(dma_t dma);
+
+/**
+ * @brief   Start a DMA transfer on a stream
+ *
+ * Start a DMA transfer on a given stream. The stream must be configured first
+ * by a @p dma_configure call.
+ *
+ * @param[in] dma     logical DMA stream
+ */
+void dma_start(dma_t dma);
+
+/**
+ * @brief   Suspend a DMA transfer on a stream
+ *
+ * @param[in] dma     logical DMA stream
+ *
+ * @return the remaining number of bytes to transfer
+ */
+uint16_t dma_suspend(dma_t dma);
+
+/**
+ * @brief   Resume a suspended DMA transfer on a stream
+ *
+ * @param[in] dma         logical DMA stream
+ * @param[in] reamaining  the remaining number of bytes to transfer
+ */
+void dma_resume(dma_t dma, uint16_t remaining);
+
+/**
+ * @brief   Stop a DMA transfer on a stream
+ *
+ * @param[in] dma     logical DMA stream
+ */
+void dma_stop(dma_t dma);
+
+/**
+ * @brief   Wait for the end of a transfer
+ *
+ * @param[in] dma     logical DMA stream
+ */
+void dma_wait(dma_t dma);
+
+/**
+ * @brief   Configure a DMA stream for a new transfer
+ *
+ * @param[in]  dma     logical DMA stream
+ * @param[in]  chan    DMA channel
+ * @param[in]  src     source buffer
+ * @param[out] dst     destination buffer
+ * @param[in]  len     length to transfer
+ * @param[in]  mode    DMA mode
+ * @param[in]  flags   DMA configuration
+ *
+ * @return < 0 on error, 0 on success
+ */
+int dma_configure(dma_t dma, int chan, const void *src, void *dst, size_t len,
+                  dma_mode_t mode, uint8_t flags);
+
+/**
+ * @brief   Get DMA base register
+ *
+ * For simplifying DMA stream handling, we map the DMA channels transparently to
+ * one integer number, such that DMA1 stream0 equals 0, DMA2 stream0 equals 8,
+ * DMA2 stream 7 equals 15 and so on.
+ *
+ * @param[in] stream    physical DMA stream
+ */
+static inline DMA_TypeDef *dma_base(int stream)
+{
+    return (stream < 8) ? DMA1 : DMA2;
+}
+
+/**
+ * @brief   Power on the DMA device the given stream belongs to
+ *
+ * @param[in] stream    physical DMA stream
+ */
+static inline void dma_poweron(int stream)
+{
+    if (stream < 8) {
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA1EN);
+    }
+    else {
+        periph_clk_en(AHB1, RCC_AHB1ENR_DMA2EN);
+    }
+}
+
+/**
+ * @brief   Get the DMA stream base address
+ *
+ * @param[in] stream    physical DMA stream
+ *
+ * @return  base address for the selected DMA stream
+ */
+static inline DMA_Stream_TypeDef *dma_stream(int stream)
+{
+    uint32_t base = (uint32_t)dma_base(stream);
+
+    return (DMA_Stream_TypeDef *)(base + (0x10 + (0x18 * (stream & 0x7))));
+}
+
+/**
+ * @brief   Select high or low DMA interrupt register based on stream number
+ *
+ * @param[in] stream    physical DMA stream
+ *
+ * @return  0 for streams 0-3, 1 for streams 3-7
+ */
+static inline int dma_hl(int stream)
+{
+    return ((stream & 0x4) >> 2);
+}
+
+/**
+ * @brief   Get the interrupt flag clear bit position in the DMA LIFCR register
+ *
+ * @param[in] stream    physical DMA stream
+ */
+static inline uint32_t dma_ifc(int stream)
+{
+    switch (stream & 0x3) {
+        case 0:
+            return (1 << 5);
+        case 1:
+            return (1 << 11);
+        case 2:
+            return (1 << 21);
+        case 3:
+            return (1 << 27);
+        default:
+            return 0;
+    }
+}
+
+/**
+ * @brief   Enable the interrupt of a given stream
+ *
+ * @param[in] stream    physical DMA stream
+ */
+static inline void dma_isr_enable(int stream)
+{
+    if (stream < 7) {
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream));
+    }
+    else if (stream == 7) {
+        NVIC_EnableIRQ(DMA1_Stream7_IRQn);
+    }
+    else if (stream < 13) {
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 8)));
+    }
+    else if (stream < 16) {
+        NVIC_EnableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
+    }
+}
+
+/**
+ * @brief   Disable the interrupt of a given stream
+ *
+ * @param[in] stream    physical DMA stream
+ */
+static inline void dma_isr_disable(int stream)
+{
+    if (stream < 7) {
+        NVIC_DisableIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream));
+    }
+    else if (stream == 7) {
+        NVIC_DisableIRQ(DMA1_Stream7_IRQn);
+    }
+    else if (stream < 13) {
+        NVIC_DisableIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 8)));
+    }
+    else if (stream < 16) {
+        NVIC_DisableIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
+    }
+}
+
+/**
+ * @brief   Clear the interrupt of a given stream
+ *
+ * @param[in] stream    physical DMA stream
+ */
+static inline void dma_isr_clear(int stream)
+{
+    if (stream < 7) {
+        NVIC_ClearPendingIRQ((IRQn_Type)((int)DMA1_Stream0_IRQn + stream));
+    }
+    else if (stream == 7) {
+        NVIC_ClearPendingIRQ((IRQn_Type)DMA1_Stream7_IRQn);
+    }
+    else if (stream < 13) {
+        NVIC_ClearPendingIRQ((IRQn_Type)((int)DMA2_Stream0_IRQn + (stream - 8)));
+    }
+    else if (stream < 16) {
+        NVIC_ClearPendingIRQ((IRQn_Type)((int)DMA2_Stream5_IRQn + (stream - 13)));
+    }
+}
+#endif /* MODULE_PERIPH_DMA */
 
 #ifdef __cplusplus
 }
