@@ -1,3 +1,4 @@
+FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_hwrng
 
 -include $(RIOTCPU)/stm32_common/Makefile.features

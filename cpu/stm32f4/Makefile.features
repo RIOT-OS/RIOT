@@ -1,3 +1,4 @@
+FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_hwrng
 
 # the granularity of provided feature definition for STMs is currently by CPU
