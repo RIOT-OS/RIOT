@@ -1,0 +1,3 @@
+ifneq (,$(filter prng_fortuna,$(USEMODULE)))
+  CFLAGS += -DCRYPTO_AES
+endif
