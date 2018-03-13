@@ -107,6 +107,11 @@ static const dac_chan_conf_t dac_channel_config[] = {
 /** @} */
 
 /**
+ * @brief   Hardware crypto configuration
+ */
+#define HWCRYPTO_NUMOF      (1)
+
+/**
  * @name    I2C configuration
  * @{
  */
