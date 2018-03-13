@@ -24,6 +24,11 @@ extern "C" {
 #define PROVIDES_PM_SET_LOWEST
 /** @} */
 
+/**
+ * @brief   Prevent shared timer functions from being used
+ */
+#define PERIPH_TIMER_PROVIDES_SET   1
+
 #ifdef __cplusplus
 }
 #endif
