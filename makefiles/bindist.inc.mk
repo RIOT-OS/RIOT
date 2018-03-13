@@ -1,4 +1,5 @@
-USEMODULE += $(BIN_USEMODULE)
+# Avoid including APPLICATION_MODULE twice to prevent multiple definition errors
+USEMODULE += $(filter-out $(APPLICATION_MODULE),$(BIN_USEMODULE))
 
 DIST_FILES += $(BIN_USEMODULE:%=bin/$(BOARD)/%.a)
 
