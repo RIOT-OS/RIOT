@@ -6,7 +6,7 @@ export CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb $(CFLAGS_FPU)
 ifneq (llvm,$(TOOLCHAIN))
 # Clang (observed with v3.7) does not understand  -mno-thumb-interwork, only add if
 # not building with LLVM
-export CFLAGS_CPU  += -mno-thumb-interwork
+export CFLAGS      += -mno-thumb-interwork
 endif
 export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
 export CFLAGS_DBG  ?= -ggdb -g3
