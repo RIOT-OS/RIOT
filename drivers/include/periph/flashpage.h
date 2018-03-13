@@ -130,7 +130,7 @@ static inline int flashpage_page(void *addr)
  * @param[in] data      data to write to the page, MUST be FLASHPAGE_SIZE
  *                      byte. Set to NULL for page erase only.
  */
-void flashpage_write(int page, void *data);
+void flashpage_write(int page, const void *data);
 
 /**
  * @brief   Write any number of data bytes to a given location in the
@@ -153,7 +153,7 @@ void flashpage_write(int page, void *data);
  *                          ensure it doesn't exceed the actual flash
  *                          memory size.
  */
-void flashpage_write_raw(void *target_addr, void *data, size_t len);
+void flashpage_write_raw(void *target_addr, const void *data, size_t len);
 
 /**
  * @brief   Read the given page into the given memory location
@@ -174,7 +174,7 @@ void flashpage_read(int page, void *data);
  * @return              FLASHPAGE_OK if data in the page is identical to @p data
  * @return              FLASHPAGE_NOMATCH if data and page content diverge
  */
-int flashpage_verify(int page, void *data);
+int flashpage_verify(int page, const void *data);
 
 /**
  * @brief   Write the given page and verify the results
@@ -188,7 +188,7 @@ int flashpage_verify(int page, void *data);
  * @return              FLASHPAGE_OK on success
  * @return              FLASHPAGE_NOMATCH if data and page content diverge
  */
-int flashpage_write_and_verify(int page, void *data);
+int flashpage_write_and_verify(int page, const void *data);
 
 #ifdef __cplusplus
 }
