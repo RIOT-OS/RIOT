@@ -1,0 +1,50 @@
+From 9316beb6e9e60ae76f18657ff4d89e093f8b5aa2 Mon Sep 17 00:00:00 2001
+From: tobhe <t.heider@campus.lmu.de>
+Date: Thu, 20 Jul 2017 15:30:27 +0200
+Subject: [PATCH] Add RIOT OS support
+
+---
+ Makefile              |  5 +++++
+ platform-specific.inc | 14 +++++++++++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+ create mode 100644 Makefile
+
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 0000000..8edee31
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,5 @@
++MODULE:=$(shell basename $(CURDIR))
++INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTCPU)/$(CPU)/include
++CFLAGS += -D__RIOT__ -Wno-error
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/platform-specific.inc b/platform-specific.inc
+index 148cafc..2ee4040 100644
+--- a/platform-specific.inc
++++ b/platform-specific.inc
+@@ -5,7 +5,19 @@
+ 
+ #include "types.h"
+ 
+-#if (defined(_WIN32) || defined(_WIN64))
++#if (defined(__RIOT__))
++/* RIOT OS*/
++
++#include "random.h"
++
++static int default_RNG(uint8_t *dest, unsigned size) {
++
++    random_bytes(dest, size);
++    return 1;
++}
++#define default_RNG_defined 1
++
++#elif (defined(_WIN32) || defined(_WIN64))
+ /* Windows */
+ 
+ // use pragma syntax to prevent tweaking the linker script for getting CryptXYZ function
+-- 
+2.20.1
+

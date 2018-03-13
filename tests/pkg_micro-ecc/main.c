@@ -36,8 +36,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "hashes/sha256.h"
 #include "uECC.h"
+#include "hashes/sha256.h"
 
 #define TESTROUNDS  16
 
@@ -84,78 +84,90 @@ int main(void)
 
     uint8_t l_sig[public_key_size];
 
-    printf("Testing %d random private key pairs and signature without using HWRNG\n", TESTROUNDS);
+    printf("Testing %d random private key pairs and signature\n", TESTROUNDS);
 
-    /* use pre-generated keys for no-HWRNG platforms */
-    uint8_t l_private1[] = {
-        0x9b, 0x4c, 0x4b, 0xa0, 0xb7, 0xb1, 0x25, 0x23,
-        0x9c, 0x09, 0x85, 0x4f, 0x9a, 0x21, 0xb4, 0x14,
-        0x70, 0xe0, 0xce, 0x21, 0x25, 0x00, 0xa5, 0x62,
-        0x34, 0xa4, 0x25, 0xf0, 0x0f, 0x00, 0xeb, 0xe7,
-    };
-    uint8_t l_public1[] = {
-        0x54, 0x3e, 0x98, 0xf8, 0x14, 0x55, 0x08, 0x13,
-        0xb5, 0x1a, 0x1d, 0x02, 0x02, 0xd7, 0x0e, 0xab,
-        0xa0, 0x98, 0x74, 0x61, 0x91, 0x12, 0x3d, 0x96,
-        0x50, 0xfa, 0xd5, 0x94, 0xa2, 0x86, 0xa8, 0xb0,
-        0xd0, 0x7b, 0xda, 0x36, 0xba, 0x8e, 0xd3, 0x9a,
-        0xa0, 0x16, 0x11, 0x0e, 0x1b, 0x6e, 0x81, 0x13,
-        0xd7, 0xf4, 0x23, 0xa1, 0xb2, 0x9b, 0xaf, 0xf6,
-        0x6b, 0xc4, 0x2a, 0xdf, 0xbd, 0xe4, 0x61, 0x5c,
-    };
-    uint8_t l_private2[] = {
-        0xb5, 0x45, 0xaf, 0xa0, 0x2e, 0x5c, 0xa6, 0x17,
-        0x3b, 0x5a, 0x55, 0x76, 0x67, 0x5d, 0xd4, 0x5e,
-        0x41, 0x7c, 0x4f, 0x19, 0x9f, 0xb9, 0x75, 0xdc,
-        0xba, 0x57, 0xc4, 0xa2, 0x26, 0xc6, 0x86, 0x2a,
-    };
-    uint8_t l_public2[] = {
-        0x2e, 0x81, 0x24, 0x3c, 0x44, 0xac, 0x63, 0x13,
-        0x9b, 0xc1, 0x27, 0xe9, 0x53, 0x3b, 0x0a, 0xe2,
-        0xf9, 0x22, 0xcd, 0x06, 0xfd, 0x12, 0x17, 0x2e,
-        0xe5, 0x0e, 0xb5, 0xce, 0x6b, 0x50, 0xe2, 0x44,
-        0xbf, 0x6b, 0x3f, 0xe8, 0x4e, 0x70, 0xd1, 0x06,
-        0x85, 0x84, 0xb8, 0xef, 0xe2, 0x25, 0x91, 0x21,
-        0xf3, 0x46, 0x70, 0xa9, 0x1c, 0x79, 0x19, 0xe3,
-        0xfb, 0x11, 0x36, 0x64, 0x37, 0x64, 0x58, 0xc9,
-    };
-    uint8_t tmp[2 * SHA256_DIGEST_LENGTH + SHA256_INTERNAL_BLOCK_SIZE];
+    uint8_t l_private1[curve_size];
+    uint8_t l_private2[curve_size];
+
+    uint8_t l_public1[public_key_size];
+    uint8_t l_public2[public_key_size];
 
     for (i = 0; i < TESTROUNDS; ++i) {
         printf(".");
 
-        if (!uECC_shared_secret(l_public2, l_private1, l_secret1, curve)) {
-            printf("\nRound %d: shared_secret() failed (1)", i);
+        if (!uECC_make_key(l_public1, l_private1, curve) || !uECC_make_key(l_public2, l_private2, curve)) {
+            printf("\nRound %d: uECC_make_key() failed", i);
             errorc++;
-        } else {
-            if (!uECC_shared_secret(l_public1, l_private2, l_secret2, curve)) {
-                printf("\nRound: %d: shared_secret() failed (2)", i);
+        }
+        else {
+            if (!uECC_shared_secret(l_public2, l_private1, l_secret1, curve)) {
+                printf("\nRound %d: shared_secret() failed (1)", i);
                 errorc++;
-            } else {
-                if (memcmp(l_secret1, l_secret2, sizeof(l_secret1)) != 0) {
-                    printf("\nShared secrets are not identical!\n");
+            }
+            else {
+                if (!uECC_shared_secret(l_public1, l_private2, l_secret2, curve)) {
+                    printf("\nRound: %d: shared_secret() failed (2)", i);
                     errorc++;
                 }
-
-                /* copy some bogus data into the hash */
-                memcpy(l_hash, l_public1, 32);
-
-                uECC_SHA256_HashContext ctx;
-                ctx.uECC.init_hash = &_init_sha256;
-                ctx.uECC.update_hash = &_update_sha256;
-                ctx.uECC.finish_hash = &_finish_sha256;
-                ctx.uECC.block_size = 64;
-                ctx.uECC.result_size = 32;
-                ctx.uECC.tmp = tmp;
-                if (uECC_sign_deterministic(l_private1, l_hash, sizeof(l_hash),
-                                            &ctx.uECC, l_sig, curve) != 1) {
-                    printf("\nRound %d: uECC_sign_deterministic() failed", i);
-                    errorc++;
-                } else {
-                    if (uECC_verify(l_public1, l_hash, sizeof(l_hash), l_sig,
-                                    curve) != 1) {
-                        printf("\nRound %d: uECC_verify() failed", i);
+                else {
+                    if (memcmp(l_secret1, l_secret2, sizeof(l_secret1)) != 0) {
+                        printf("\nShared secrets are not identical!\n");
                         errorc++;
+                    }
+
+                    /* copy some bogus data into the hash */
+                    memcpy(l_hash, l_public1, 32);
+
+                    if ((uECC_sign(l_private1, l_hash, sizeof(l_hash), l_sig, curve)) != 1) {
+                        printf("\nRound %d: uECC_sign() failed", i);
+                        errorc++;
+                    }
+                    else {
+                        if ((uECC_verify(l_public1, l_hash, sizeof(l_hash), l_sig, curve)) != 1) {
+                            printf("\nRound %d: uECC_verify() failed", i);
+                            errorc++;
+                        }
+                    }
+
+                    /* copy some new bogus data into the hash */
+                    memcpy(l_hash, l_public1, 32);
+
+                    /* use pre-generated keys for deterministic sign */
+                    uint8_t l_private_static[] = {
+                        0x9b, 0x4c, 0x4b, 0xa0, 0xb7, 0xb1, 0x25, 0x23,
+                        0x9c, 0x09, 0x85, 0x4f, 0x9a, 0x21, 0xb4, 0x14,
+                        0x70, 0xe0, 0xce, 0x21, 0x25, 0x00, 0xa5, 0x62,
+                        0x34, 0xa4, 0x25, 0xf0, 0x0f, 0x00, 0xeb, 0xe7,
+                    };
+                    uint8_t l_public_static[] = {
+                        0x54, 0x3e, 0x98, 0xf8, 0x14, 0x55, 0x08, 0x13,
+                        0xb5, 0x1a, 0x1d, 0x02, 0x02, 0xd7, 0x0e, 0xab,
+                        0xa0, 0x98, 0x74, 0x61, 0x91, 0x12, 0x3d, 0x96,
+                        0x50, 0xfa, 0xd5, 0x94, 0xa2, 0x86, 0xa8, 0xb0,
+                        0xd0, 0x7b, 0xda, 0x36, 0xba, 0x8e, 0xd3, 0x9a,
+                        0xa0, 0x16, 0x11, 0x0e, 0x1b, 0x6e, 0x81, 0x13,
+                        0xd7, 0xf4, 0x23, 0xa1, 0xb2, 0x9b, 0xaf, 0xf6,
+                        0x6b, 0xc4, 0x2a, 0xdf, 0xbd, 0xe4, 0x61, 0x5c,
+                    };
+                    uint8_t tmp[2 * SHA256_DIGEST_LENGTH + SHA256_INTERNAL_BLOCK_SIZE];
+
+                    uECC_SHA256_HashContext ctx;
+                    ctx.uECC.init_hash = &_init_sha256;
+                    ctx.uECC.update_hash = &_update_sha256;
+                    ctx.uECC.finish_hash = &_finish_sha256;
+                    ctx.uECC.block_size = 64;
+                    ctx.uECC.result_size = 32;
+                    ctx.uECC.tmp = tmp;
+                    if (uECC_sign_deterministic(l_private_static, l_hash, sizeof(l_hash),
+                                                &ctx.uECC, l_sig, curve) != 1) {
+                        printf("\nRound %d: uECC_sign_deterministic() failed", i);
+                        errorc++;
+                    } else {
+                        if (uECC_verify(l_public_static, l_hash, sizeof(l_hash), l_sig,
+                                        curve) != 1) {
+                            printf("\nRound %d: uECC_verify() failed", i);
+                            errorc++;
+                        }
                     }
                 }
             }

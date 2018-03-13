@@ -16,22 +16,7 @@ USEPKG += micro-ecc
 ```
 to your Makefile.
 
-## Choosing the right API
+## Examples
 
-Before using the Micro-ECC library, you need to check the `Makefile.features`
-of your target board to see if `periph_hwrng` is provided.
-
-If it is provided, you may safely use `uECC_make_key` to generate ECDSA key
-pairs and call `uECC_sign`/`uECC_verify` to sign/verify the ECDSA signatures.
-
-If not, you cannot use `uECC_make_key` or `uECC_sign` APIs anymore. The ECDSA
-keys have to be generated on a platform with HWRNG support (e.g., `native`) and
-transferred to your target device. You need to use `uECC_sign_deterministic` to
-perform ECDSA deterministic signing (standardized by RFC 6979). You can still
-use `uECC_verify` to verify the signatures from both signing APIs.
-
-**WARNING** Calling `uECC_make_key` and `uECC_sign` APIs on platforms without
-HWRNG support will lead to compile failure.
-
-Examples of using these uECC APIs can be found in the `test` folder of the
+Examples of using the uECC API can be found in the `test` folder of the
 Micro-ECC upstream.
