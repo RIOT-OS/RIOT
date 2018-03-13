@@ -24,11 +24,11 @@
 #include "irq.h"
 #include "periph/flashpage.h"
 
-void flashpage_write(int page, void *data)
+void flashpage_write(int page, const void *data)
 {
     assert(page < FLASHPAGE_NUMOF);
 
-    uint8_t *src = (uint8_t *)data;
+    const uint8_t *src = data;
     uint8_t *dst = (uint8_t *)flashpage_addr(page);
     unsigned istate;
 
