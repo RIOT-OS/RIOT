@@ -126,7 +126,7 @@ static void _erase_page(void *page_addr)
 #endif
 }
 
-void flashpage_write_raw(void *target_addr, void *data, size_t len)
+void flashpage_write_raw(void *target_addr, const void *data, size_t len)
 {
     /* assert multiples of FLASHPAGE_RAW_BLOCKSIZE are written and no less of
        that length. */
@@ -142,10 +142,10 @@ void flashpage_write_raw(void *target_addr, void *data, size_t len)
 
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
     uint32_t *dst = target_addr;
-    uint32_t *data_addr = (uint32_t *)data;
+    const uint32_t *data_addr = data;
 #else
     uint16_t *dst = (uint16_t *)target_addr;
-    uint16_t *data_addr = (uint16_t *)data;
+    const uint16_t *data_addr = data;
 
     uint32_t hsi_state = (RCC->CR & RCC_CR_HSION);
     /* the internal RC oscillator (HSI) must be enabled */
@@ -181,7 +181,7 @@ void flashpage_write_raw(void *target_addr, void *data, size_t len)
 #endif
 }
 
-void flashpage_write(int page, void *data)
+void flashpage_write(int page, const void *data)
 {
     assert(page < (int)FLASHPAGE_NUMOF);
 
