@@ -2,6 +2,8 @@ include $(RIOTCPU)/efm32/efm32-features.mk
 
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_hwcrypto
+FEATURES_PROVIDED += periph_pm
 
 FEATURES_CONFLICT += periph_rtc:periph_rtt
 FEATURES_CONFLICT_MSG += "On the EFM32, the RTC and RTT map to the same hardware peripheral."
