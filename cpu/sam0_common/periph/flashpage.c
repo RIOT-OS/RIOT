@@ -56,7 +56,7 @@ static void _lock(void)
 #endif
 }
 
-void flashpage_write_raw(void *target_addr, void *data, size_t len)
+void flashpage_write_raw(void *target_addr, const void *data, size_t len)
 {
     /* The actual minimal block size for writing is 16B, thus we
      * assert we write on multiples and no less of that length.
@@ -72,7 +72,7 @@ void flashpage_write_raw(void *target_addr, void *data, size_t len)
            (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF)));
 
     uint32_t *dst = (uint32_t *)target_addr;
-    uint32_t *data_addr = (uint32_t *)data;
+    const uint32_t *data_addr = data;
 
     /* write 4 bytes in one go */
     len /= 4;
@@ -88,7 +88,7 @@ void flashpage_write_raw(void *target_addr, void *data, size_t len)
     _lock();
 }
 
-void flashpage_write(int page, void *data)
+void flashpage_write(int page, const void *data)
 {
     assert(page < FLASHPAGE_NUMOF);
 
