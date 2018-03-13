@@ -54,8 +54,21 @@ extern "C" {
 /** @} */
 
 /**
- * @name    RTC configuration
+ * @brief   Hardware crypto configuration
  * @{
+ */
+static const hwcrypto_conf_t hwcrypto_config[] = {
+    {
+        .dev = CRYPTO,
+        .cmu = cmuClock_CRYPTO
+    }
+};
+
+#define HWCRYPTO_NUMOF      PERIPH_NUMOF(hwcrypto_config)
+/** @} */
+
+/**
+ * @brief   RTC configuration
  */
 #define RTC_NUMOF           (1U)
 /** @} */

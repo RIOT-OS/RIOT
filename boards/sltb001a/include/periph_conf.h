@@ -85,6 +85,20 @@ static const adc_chan_conf_t adc_channel_config[] = {
 /** @} */
 
 /**
+ * @brief   Hardware crypto configuration
+ * @{
+ */
+static const hwcrypto_conf_t hwcrypto_config[] = {
+    {
+        .dev = CRYPTO,
+        .cmu = cmuClock_CRYPTO
+    }
+};
+
+#define HWCRYPTO_NUMOF      PERIPH_NUMOF(hwcrypto_config)
+/** @} */
+
+/**
  * @name    I2C configuration
  * @{
  */
