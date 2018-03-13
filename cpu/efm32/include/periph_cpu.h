@@ -213,16 +213,28 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
- * @brief   Override hardware crypto supported methods.
+ * @brief   Hardware crypto configuration.
  * @{
  */
+#ifdef _SILICON_LABS_32B_SERIES_0
 #define HAVE_HWCRYPTO_AES128
 #ifdef AES_CTRL_AES256
 #define HAVE_HWCRYPTO_AES256
 #endif
+#endif
+
 #ifdef _SILICON_LABS_32B_SERIES_1
+#define HAVE_HWCRYPTO_AES128
+#define HAVE_HWCRYPTO_AES256
 #define HAVE_HWCRYPTO_SHA1
 #define HAVE_HWCRYPTO_SHA256
+#endif
+
+#ifdef _SILICON_LABS_32B_SERIES_1
+typedef struct {
+    CRYPTO_TypeDef *dev;    /**< crypto device used */
+    CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
+} hwcrypto_conf_t;
 #endif
 /** @} */
 
