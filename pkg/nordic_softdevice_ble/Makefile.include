@@ -26,6 +26,9 @@ CFLAGS += -Wno-pedantic -Wno-unused-parameter -Wno-sign-compare
 # so set this, otherwise linking fails
 CFLAGS_FPU := -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
+# ble_6lowpan.a is provided as a binary-only library within the softdevice package
+LIBS += ble_6lowpan
+
 DIRS += \
 		$(RIOTBASE)/pkg/nordic_softdevice_ble/src \
 		$(NORDIC_SRCS)/components/softdevice/common/softdevice_handler \
