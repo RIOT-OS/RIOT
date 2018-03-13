@@ -65,6 +65,13 @@ extern "C" {
 #elif defined(CPU_MODEL_STM32F103RE) || defined(CPU_MODEL_STM32F103ZE)
 #define FLASHPAGE_NUMOF     (256U)
 #endif
+
+/* The minimum block size which can be written is 2B. However, the erase
+ * block is always FLASHPAGE_SIZE.
+ */
+#define FLASHPAGE_RAW_BLOCKSIZE    (2U)
+/* Writing should be always 4 bytes aligned */
+#define FLASHPAGE_RAW_ALIGNMENT    (4U)
 /** @} */
 
 #ifdef __cplusplus
