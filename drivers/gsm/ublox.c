@@ -47,7 +47,7 @@ static int init(gsm_t *dev)
     ublox_gsm_t *ublox = (ublox_gsm_t *)dev;
     at_dev_t *at_dev = &dev->at_dev;
     int res;
-    char buf[40];
+    char buf[128];
     char *pos;
 
     rmutex_lock(&dev->mutex);
@@ -128,7 +128,7 @@ static int init(gsm_t *dev)
         at_send_cmd_wait_ok(at_dev, buf, GSM_SERIAL_TIMEOUT);
     }
     /* GPIO4 */
-    if (ublox->params.gpio1_mode != UBLOX_GPIO_MODE_DEFAULT) {
+    if (ublox->params.gpio4_mode != UBLOX_GPIO_MODE_DEFAULT) {
         pos = buf;
         pos += fmt_str(pos, "AT+UGPIOC=");
         pos += fmt_u16_dec(pos, UBLOX_GPIO4);
@@ -375,7 +375,7 @@ static int download_file(gsm_t *dev, const char *resp_name,
                 && strncmp(resp + 12, resp_name, strlen(resp_name)) == 0) {
             pos = resp + 14 + strlen(resp_name);
             unsigned long block_size = strtoul(pos, &pos, 10);
-            pos++; /* remove '"' */
+            pos += 2; /* remove ',"' */
             if (fd >= 0) {
                 ret = write(fd, pos, block_size);
                 if (ret < 0) {
