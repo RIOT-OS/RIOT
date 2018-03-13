@@ -35,7 +35,7 @@ void flashpage_read(int page, void *data)
     memcpy(data, flashpage_addr(page), FLASHPAGE_SIZE);
 }
 
-int flashpage_verify(int page, void *data)
+int flashpage_verify(int page, const void *data)
 {
     assert(page < (int)FLASHPAGE_NUMOF);
 
@@ -47,7 +47,7 @@ int flashpage_verify(int page, void *data)
     }
 }
 
-int flashpage_write_and_verify(int page, void *data)
+int flashpage_write_and_verify(int page, const void *data)
 {
     flashpage_write(page, data);
     return flashpage_verify(page, data);
