@@ -342,14 +342,21 @@ ifneq (,$(filter mrf24j40,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
 endif
 
-ifneq (,$(filter mtd_sdcard,$(USEMODULE)))
+ifneq (,$(filter mtd_%,$(USEMODULE)))
   USEMODULE += mtd
-  USEMODULE += sdcard_spi
-endif
 
-ifneq (,$(filter mtd_spi_nor,$(USEMODULE)))
-  USEMODULE += mtd
-  FEATURES_REQUIRED += periph_spi
+  ifneq (,$(filter mtd_sdcard,$(USEMODULE)))
+    USEMODULE += sdcard_spi
+  endif
+
+  ifneq (,$(filter mtd_spi_nor,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_spi
+  endif
+
+  ifneq (,$(filter mtd_flashpage,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_flashpage
+    FEATURES_REQUIRED += periph_flashpage_raw
+  endif
 endif
 
 ifneq (,$(filter my9221,$(USEMODULE)))
