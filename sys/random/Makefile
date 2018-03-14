@@ -1,4 +1,4 @@
-SRC := seed.c
+SRC := random.c
 
 BASE_MODULE := prng
 SUBMODULES := 1
