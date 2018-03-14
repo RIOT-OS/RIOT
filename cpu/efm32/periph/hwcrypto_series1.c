@@ -60,47 +60,43 @@ static mutex_t hwcrypto_lock[HWCRYPTO_NUMOF];
  */
 static state_t state[HWCRYPTO_NUMOF];
 
-int hwcrypto_init(hwcrypto_t dev)
+void hwcrypto_init(hwcrypto_t dev)
 {
     assert(dev < HWCRYPTO_NUMOF);
-
-    /* enable clocks */
-    CMU_ClockEnable(cmuClock_HFPER, true);
-    CMU_ClockEnable(hwcrypto_config[dev].cmu, true);
 
     /* initialize lock */
     mutex_init(&hwcrypto_lock[dev]);
 
-    return 0;
+    /* clear the state */
+    memset(&state[dev], 0, sizeof(state_t));
 }
 
 int hwcrypto_cipher_init(hwcrypto_t dev, hwcrypto_cipher_t cipher, hwcrypto_mode_t mode)
 {
     /* check if cipher is supported */
     if (!hwcrypto_cipher_supported(dev, cipher)) {
-        return -1;
+        return HWCRYPTO_NOTSUP;
     }
 
     /* initialize state */
     state[dev].cipher.cipher = cipher;
     state[dev].cipher.mode = mode;
 
-    return 0;
+    return HWCRYPTO_OK;
 }
 
 int hwcrypto_cipher_set(hwcrypto_t dev, hwcrypto_opt_t option, const void *value, uint32_t size)
 {
     switch (option) {
         case HWCRYPTO_OPT_KEY:
-            if (state[dev].cipher.cipher == HWCRYPTO_AES128) {
+            if (state[dev].cipher.cipher == HWCRYPTO_AES128 && size == 16) {
                 memcpy(state[dev].cipher.key, value, 16);
             }
-            else if (state[dev].cipher.cipher == HWCRYPTO_AES256) {
+            else if (state[dev].cipher.cipher == HWCRYPTO_AES256 && size == 32) {
                 memcpy(state[dev].cipher.key, value, 32);
             }
             else {
-                /* incorrect size */
-                return -2;
+                return HWCRYPTO_INVALID;
             }
 
             break;
@@ -109,36 +105,31 @@ int hwcrypto_cipher_set(hwcrypto_t dev, hwcrypto_opt_t option, const void *value
                 state[dev].cipher.mode != HWCRYPTO_MODE_OFB &&
                 state[dev].cipher.mode != HWCRYPTO_MODE_CFB
                 ) {
-                /* other modes don't use iv */
-                return -1;
+                return HWCRYPTO_NOTSUP;
             }
 
             if (size != 16) {
-                /* incorrect iv size */
-                return -2;
+                return HWCRYPTO_INVALID;
             }
 
             memcpy(state[dev].cipher.opts.iv, value, 16);
             break;
         case HWCRYPTO_OPT_COUNTER:
             if (state[dev].cipher.mode != HWCRYPTO_MODE_CTR) {
-                /* other modes don't use counter */
-                return -1;
+                return HWCRYPTO_NOTSUP;
             }
 
             if (size != 16) {
-                /* incorrect counter size */
-                return -2;
+                return HWCRYPTO_INVALID;
             }
 
             memcpy(state[dev].cipher.opts.counter, value, 16);
             break;
         default:
-            /* option not supported */
-            return -1;
+            return HWCRYPTO_NOTSUP;
     }
 
-    return 0;
+    return HWCRYPTO_OK;
 }
 
 static int hwcrypto_cipher_encrypt_decrypt(hwcrypto_t dev, const uint8_t *plain_block, uint8_t *cipher_block, uint32_t block_size, bool encrypt)
@@ -148,8 +139,7 @@ static int hwcrypto_cipher_encrypt_decrypt(hwcrypto_t dev, const uint8_t *plain_
     assert(!((intptr_t) cipher_block & 0x03));
 
     if ((block_size % 16) != 0) {
-        /* invalid block size */
-        return -2;
+        return HWCRYPTO_INVALID;
     }
 
     switch (state[dev].cipher.cipher) {
@@ -171,7 +161,7 @@ static int hwcrypto_cipher_encrypt_decrypt(hwcrypto_t dev, const uint8_t *plain_
                     CRYPTO_AES_CTR128(hwcrypto_config[dev].dev, cipher_block, plain_block, block_size, state[dev].cipher.key, state[dev].cipher.opts.counter, NULL);
                     break;
                 default:
-                    return -1;
+                    return HWCRYPTO_NOTSUP;
             }
 
             break;
@@ -193,12 +183,12 @@ static int hwcrypto_cipher_encrypt_decrypt(hwcrypto_t dev, const uint8_t *plain_
                     CRYPTO_AES_CTR256(hwcrypto_config[dev].dev, cipher_block, plain_block, block_size, state[dev].cipher.key, state[dev].cipher.opts.counter, NULL);
                     break;
                 default:
-                    return -1;
+                    return HWCRYPTO_NOTSUP;
             }
 
             break;
         default:
-            return -1;
+            return HWCRYPTO_NOTSUP;
     }
 
     return block_size;
@@ -216,15 +206,15 @@ int hwcrypto_cipher_decrypt(hwcrypto_t dev, const uint8_t *cipher_block, uint8_t
 
 int hwcrypto_hash_init(hwcrypto_t dev, hwcrypto_hash_t hash)
 {
-    /* check if hash is supported */
+    /* check if hash algorithm is supported */
     if (!hwcrypto_hash_supported(dev, hash)) {
-        return -1;
+        return HWCRYPTO_NOTSUP;
     }
 
-    /* initialie state */
+    /* initialize state */
     state[dev].hash.hash = hash;
 
-    return 0;
+    return HWCRYPTO_OK;
 }
 
 int hwcrypto_hash_update(hwcrypto_t dev, const uint8_t *block, uint32_t block_size)
@@ -237,8 +227,7 @@ int hwcrypto_hash_update(hwcrypto_t dev, const uint8_t *block, uint32_t block_si
             CRYPTO_SHA_256(hwcrypto_config[dev].dev, block, block_size, state[dev].hash.digest);
             break;
         default:
-            /* hash not supported */
-            return -1;
+            return HWCRYPTO_NOTSUP;
     }
 
     return block_size;
@@ -249,23 +238,20 @@ int hwcrypto_hash_final(hwcrypto_t dev, uint8_t *result, uint32_t result_size)
     switch (state[dev].hash.hash) {
         case HWCRYPTO_SHA1:
             if (result_size > sizeof(CRYPTO_SHA1_Digest_TypeDef)) {
-                /* result size larger than digest size */
-                return -2;
+                return HWCRYPTO_INVALID;
             }
 
             memcpy(result, state[dev].hash.digest, result_size);
             break;
         case HWCRYPTO_SHA256:
             if (result_size > sizeof(CRYPTO_SHA256_Digest_TypeDef)) {
-                /* result size larger than digest size */
-                return -2;
+                return HWCRYPTO_INVALID;
             }
 
             memcpy(result, state[dev].hash.digest, result_size);
             break;
         default:
-            /* hash not supported */
-            return -1;
+            return HWCRYPTO_NOTSUP;
     }
 
     return result_size;
@@ -275,22 +261,17 @@ int hwcrypto_acquire(hwcrypto_t dev)
 {
     mutex_lock(&hwcrypto_lock[dev]);
 
-    return 0;
+    CMU_ClockEnable(cmuClock_HFPER, true);
+    CMU_ClockEnable(hwcrypto_config[dev].cmu, true);
+
+    return HWCRYPTO_OK;
 }
 
 int hwcrypto_release(hwcrypto_t dev)
 {
+    CMU_ClockEnable(hwcrypto_config[dev].cmu, false);
+
     mutex_unlock(&hwcrypto_lock[dev]);
 
-    return 0;
-}
-
-void hwcrypto_poweron(hwcrypto_t dev)
-{
-    CMU_ClockEnable(hwcrypto_config[dev].cmu, true);
-}
-
-void hwcrypto_poweroff(hwcrypto_t dev)
-{
-    CMU_ClockEnable(hwcrypto_config[dev].cmu, false);
+    return HWCRYPTO_OK;
 }
