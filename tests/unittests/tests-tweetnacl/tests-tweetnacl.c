@@ -30,6 +30,7 @@ static const char message[] = "0123456789abcdef";
 static char r[sizeof(message)];
 
 #define MLEN (sizeof(message) + crypto_box_ZEROBYTES)
+#define SMLEN (sizeof(message) + crypto_sign_BYTES)
 
 static unsigned char alice_pk[crypto_box_PUBLICKEYBYTES];
 static unsigned char alice_sk[crypto_box_SECRETKEYBYTES];
@@ -39,6 +40,11 @@ static unsigned char m[MLEN];
 static unsigned char c[MLEN];
 static const unsigned char n[crypto_box_NONCEBYTES];
 static unsigned char result[MLEN];
+
+static unsigned char sign_sk[crypto_sign_SECRETKEYBYTES];
+static unsigned char sign_pk[crypto_sign_PUBLICKEYBYTES];
+static unsigned char verify_result[SMLEN];
+static unsigned char sm[SMLEN];
 
 static void setUp(void)
 {
@@ -80,10 +86,54 @@ static void test_tweetnacl_01(void)
     TEST_ASSERT_EQUAL_STRING("0123456789abcdef", (const char*)r);
 }
 
+static void test_tweetnacl_02(void)
+{
+    int res;
+
+    unsigned long long int smlen;
+    unsigned long long int verify_result_len;
+
+    memset(sm, '\0', SMLEN);
+
+    /* Creating keypair ... */
+    crypto_sign_keypair(sign_pk, sign_sk);
+
+    /* Sign */
+    crypto_sign(sm, &smlen, (const unsigned char *)message, sizeof(message), sign_sk);
+
+    /* Verifying... */
+    res = crypto_sign_open(verify_result, &verify_result_len, sm, smlen, sign_pk);
+
+    TEST_ASSERT_EQUAL_INT(SMLEN, smlen);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    memset(r, 0, sizeof(r));
+    memcpy(r, verify_result + crypto_sign_BYTES, SMLEN - crypto_sign_BYTES);
+
+    TEST_ASSERT_EQUAL_STRING("0123456789abcdef", (const char*)r);
+}
+
+static void test_tweetnacl_03(void)
+{
+    int res;
+
+    unsigned long long int verify_result_len;
+
+    /* changing message at random position (10) */
+    sm[crypto_sign_BYTES + 10] = 'A';
+
+    /* Verifying... */
+    res = crypto_sign_open(verify_result, &verify_result_len, sm, SMLEN, sign_pk);
+
+    TEST_ASSERT_EQUAL_INT(-1, res);
+}
+
 Test *tests_tweetnacl_all(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_tweetnacl_01)
+        new_TestFixture(test_tweetnacl_01),
+        new_TestFixture(test_tweetnacl_02),
+        new_TestFixture(test_tweetnacl_03)
     };
 
     EMB_UNIT_TESTCALLER(tweetnacl_tests, setUp, tearDown, fixtures);
