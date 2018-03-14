@@ -15,15 +15,6 @@
 
 void randombytes(uint8_t *target, uint64_t n)
 {
-    uint32_t random;
-    uint8_t *random_pos = (uint8_t*)&random;
-    unsigned _n = 0;
-
-    while (n--) {
-        if (! (_n++ & 0x3)) {
-            random = random_uint32();
-            random_pos = (uint8_t *) &random;
-        }
-        *target++ = *random_pos++;
-    }
+    /* tweetnacl needs uint64_t as "n" parameter, random provides uint32 */
+    random_bytes(target, n);
 }
