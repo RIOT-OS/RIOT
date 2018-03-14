@@ -32,14 +32,12 @@ RIOT is developed by an open community that anyone is welcome to join:
    Wiki](https://github.com/RIOT-OS/RIOT/wiki/Contributing-to-RIOT).
  - [Subscribe](http://lists.riot-os.org/mailman/listinfo/users) to
    users@riot-os.org to ask for help using RIOT or writing an application for
-   RIOT (or to just stay in the loop). A searchable archive of this list is
-   available at the
-   [RIOT user Gmane newsgroup](http://news.gmane.org/gmane.os.riot.user)
+   RIOT (or to just stay in the loop). An archive of this list [is available
+   here](https://lists.riot-os.org/pipermail/users/).
  - [Subscribe](http://lists.riot-os.org/mailman/listinfo/devel) to
    devel@riot-os.org to follow and discuss kernel and network stack
-   developement, or hardware support. A searchable archive of this list is
-   available at the
-   [RIOT devel Gmane newsgroup](http://news.gmane.org/gmane.os.riot.devel)
+   developement, or hardware support. An archive of this list [is available
+   here](https://lists.riot-os.org/pipermail/devel/).
  - Follow us on [Twitter](https://twitter.com/RIOT_OS) for news from the RIOT
    community.
  - Regarding critical vulnerabilities we would appreciate if you give us a
