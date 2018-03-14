@@ -24,7 +24,7 @@
 /**
  * @brief Bitmap of supported ciphers.
  */
-static uint32_t cipher_bitmap = (
+static const uint32_t cipher_bitmap = (
 #ifdef HAVE_HWCRYPTO_AES128
     (1 << HWCRYPTO_AES128) +
 #endif
@@ -66,7 +66,7 @@ static uint32_t cipher_bitmap = (
 #endif
     0);
 
-inline int hwcrypto_cipher_supported(hwcrypto_t dev, hwcrypto_cipher_t cipher)
+inline bool hwcrypto_cipher_supported(hwcrypto_t dev, hwcrypto_cipher_t cipher)
 {
     (void) dev;
 
@@ -78,7 +78,7 @@ inline int hwcrypto_cipher_supported(hwcrypto_t dev, hwcrypto_cipher_t cipher)
 /**
  * @brief Bitmap of supported hashes.
  */
-static uint32_t hash_bitmap = (
+static const uint32_t hash_bitmap = (
 #ifdef HAVE_HWCRYPTO_MD4
     (1 << HWCRYPTO_MD4) +
 #endif
@@ -105,7 +105,7 @@ static uint32_t hash_bitmap = (
 #endif
     0);
 
-inline int hwcrypto_hash_supported(hwcrypto_t dev, hwcrypto_hash_t hash)
+inline bool hwcrypto_hash_supported(hwcrypto_t dev, hwcrypto_hash_t hash)
 {
     (void) dev;
 
