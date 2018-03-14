@@ -26,7 +26,7 @@
 /**
  * @brief   Dummy data buffer.
  */
-static uint8_t data[32] __attribute__((aligned));
+static uint8_t data[64] __attribute__((aligned));
 
 /**
  * @brief   Dummy key.
@@ -222,9 +222,24 @@ int main(void)
         test_hash(dev, "SHA-1", HWCRYPTO_SHA1, 20);
 #endif
 
+#ifdef HAVE_HWCRYPTO_SHA224
+        /* SHA-224 tests */
+        test_hash(dev, "SHA-224", HWCRYPTO_SHA224, 28);
+#endif
+
 #ifdef HAVE_HWCRYPTO_SHA256
         /* SHA-256 tests */
         test_hash(dev, "SHA-256", HWCRYPTO_SHA256, 32);
+#endif
+
+#ifdef HAVE_HWCRYPTO_SHA384
+        /* SHA-384 tests */
+        test_hash(dev, "SHA-384", HWCRYPTO_SHA384, 48);
+#endif
+
+#ifdef HAVE_HWCRYPTO_SHA512
+        /* SHA-512 tests */
+        test_hash(dev, "SHA-512", HWCRYPTO_SHA512, 64);
 #endif
     }
 
