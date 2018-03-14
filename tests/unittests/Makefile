@@ -24,6 +24,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              microbit \
                              msb-430 \
                              msb-430h \
+                             msba2 \
                              nrf51dongle \
                              nrf6310 \
                              nucleo32-f031 \
