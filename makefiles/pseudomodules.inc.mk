@@ -140,4 +140,8 @@ PSEUDOMODULES += crypto_aes_precalculated
 # This pseudomodule causes a loop in AES to be unrolled (more flash, less CPU)
 PSEUDOMODULES += crypto_aes_unroll
 
+# declare oonf submodules as pseudomodules, but exclude oonf_api
+PSEUDOMODULES += oonf_%
+NO_PSEUDOMODULES += oonf_api
+
 # Packages may also add modules to PSEUDOMODULES in their `Makefile.include`.

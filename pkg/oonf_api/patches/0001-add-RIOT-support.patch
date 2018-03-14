@@ -26,7 +26,7 @@ new file mode 100644
 index 0000000..1f1cd9c
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,28 @@
 +#
 +# to use oonf_api in your RIOT project,
 +# add the following to your Makefile:
@@ -50,19 +50,18 @@ index 0000000..1f1cd9c
 +ifneq (,$(filter oonf_regex,$(USEMODULE)))
 +	DIRS += external/regex
 +endif
-+
-+all:
-+	mkdir -p $(BINDIR)
-+	@for i in $(DIRS) ; do $(MAKE) -C $$i || exit 1; done ;
-+
-+clean:
++include $(RIOTBASE)/Makefile.base
++# Build static archive from the submodule objects
++all: $(BINDIR)/$(MODULE).a
++$(patsubst %,$(BINDIR)/%.o,$(filter oonf_%,$(USEMODULE))): | ${DIRS:%=ALL--%}
++$(BINDIR)/$(MODULE).a: $(patsubst %,$(BINDIR)/%.o,$(filter oonf_%,$(USEMODULE))) | ${DIRS:%=ALL--%}
 diff --git a/external/regex/Makefile b/external/regex/Makefile
 new file mode 100644
 index 0000000..3bc1ce1
 --- /dev/null
 +++ b/external/regex/Makefile
 @@ -0,0 +1,4 @@
-+MODULE:=oonf_$(shell basename $(CURDIR))
++MODULE:=oonf_$(notdir $(CURDIR))
 +INCLUDES += $(CURDIR)/..
 +
 +include $(RIOTBASE)/Makefile.base
@@ -72,7 +71,7 @@ index 0000000..5e0046d
 --- /dev/null
 +++ b/src-api/common/Makefile
 @@ -0,0 +1,3 @@
-+MODULE:=oonf_$(shell basename $(CURDIR))
++MODULE:=oonf_$(notdir $(CURDIR))
 +
 +include $(RIOTBASE)/Makefile.base
 diff --git a/src-api/common/autobuf.c b/src-api/common/autobuf.c
@@ -188,7 +187,7 @@ index 0000000..5e0046d
 --- /dev/null
 +++ b/src-api/rfc5444/Makefile
 @@ -0,0 +1,3 @@
-+MODULE:=oonf_$(shell basename $(CURDIR))
++MODULE:=oonf_$(notdir $(CURDIR))
 +
 +include $(RIOTBASE)/Makefile.base
 diff --git a/src-api/rfc5444/rfc5444_api_config.h b/src-api/rfc5444/rfc5444_api_config.h

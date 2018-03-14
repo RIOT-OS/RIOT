@@ -12,10 +12,6 @@ CFLAGS += -Wno-implicit-fallthrough
 
 all: git-download
 	"$(MAKE)" -C $(PKG_BUILDDIR)
-	"$(MAKE)" $(BINDIR)/$(MODULE).a
-
-$(BINDIR)/$(MODULE).a: $(BINDIR)/oonf_*.a
-	mkdir -p $(BINDIR)/$(MODULE); cd $(BINDIR)/$(MODULE); for var in $?; do ar -x $$var; done; ar -r -c -s $(BINDIR)/$(MODULE).a *.o
 
 include $(RIOTBASE)/pkg/pkg.mk
 ifneq (,$(filter -Wformat-nonliteral -Wformat=2, $(CFLAGS)))
