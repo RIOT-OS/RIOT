@@ -19,3 +19,5 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   USEMODULE += checksum
   USEMODULE += random
 endif
+
+-include $(RIOTCPU)/native/Makefile.dep
