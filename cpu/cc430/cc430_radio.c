@@ -58,7 +58,7 @@ void cc430_radio_delay_rf(volatile uint32_t p){
     while(p)
     {
         p--;
-    }    
+    }
 }
 
 
@@ -73,40 +73,40 @@ uint8_t cc430_radio_strobe(uint8_t strobe)
 {
   uint8_t statusByte = 0;
   uint16_t  gdo_state;
-  
-  // Check for valid strobe command 
+
+  // Check for valid strobe command
   if((strobe == 0xBD) || ((strobe >= RF_SRES) && (strobe <= RF_SNOP)))
   {
-    // Clear the Status read flag 
-    RF1AIFCTL1 &= ~(RFSTATIFG);    
-    
+    // Clear the Status read flag
+    RF1AIFCTL1 &= ~(RFSTATIFG);
+
     // Wait for radio to be ready for next instruction
     while( !(RF1AIFCTL1 & RFINSTRIFG)) {}
-    
+
     // Write the strobe instruction
     if ((strobe > RF_SRES) && (strobe < RF_SNOP))
     {
       gdo_state = cc430_radio_read_single_reg(IOCFG2);    // buffer IOCFG2 state
       cc430_radio_write_single_reg(IOCFG2, 0x29);         // chip-ready to GDO2
-      
-      RF1AINSTRB = strobe; 
+
+      RF1AINSTRB = strobe;
       if ( (RF1AIN&0x04)== 0x04 )           // chip at sleep mode
       {
         if ( (strobe == RF_SXOFF) || (strobe == RF_SPWD) || (strobe == RF_SWOR) ) { }
-        else    
+        else
         {
           while ((RF1AIN&0x04)== 0x04) {}     // chip-ready ?
           // Delay for ~810usec at 1.05MHz CPU clock, see erratum RF1A7
-          __delay_cycles(850);              
+          __delay_cycles(850);
         }
       }
       cc430_radio_write_single_reg(IOCFG2, gdo_state);    // restore IOCFG2 setting
-    
+
       while( !(RF1AIFCTL1 & RFSTATIFG) );
     }
     else                            // chip active mode (SRES)
-    {   
-      RF1AINSTRB = strobe;     
+    {
+      RF1AINSTRB = strobe;
     }
     statusByte = RF1ASTATB;
   }
@@ -124,7 +124,7 @@ uint8_t cc430_radio_strobe(uint8_t strobe)
 uint8_t cc430_radio_read_single_reg(uint8_t addr)
 {
     uint8_t data_out;
-  
+
   // Check for valid configuration register address, 0x3E refers to PATABLE
     if ((addr <= TEST0) || (addr == PATABLE))
     {
@@ -136,7 +136,7 @@ uint8_t cc430_radio_read_single_reg(uint8_t addr)
     // Send address + Instruction + 1 dummy byte (auto-read)
         RF1AINSTR1B = (addr | RF_STATREGRD);
     }
-  
+
     while (!(RF1AIFCTL1 & RFDOUTIFG) ){}
     data_out = RF1ADOUT1B;                    // Read data and clears the RFDOUTIFG
 
@@ -152,7 +152,7 @@ uint8_t cc430_radio_read_single_reg(uint8_t addr)
  *
  */
 void cc430_radio_write_single_reg(uint8_t addr, uint8_t value)
-{   
+{
     while (!(RF1AIFCTL1 & RFINSTRIFG));       // Wait for the Radio to be ready for next instruction
     RF1AINSTRB = (addr | RF_REGWR);         // Send address + Instruction
     RF1ADINB = value;                       // Write data in
@@ -173,9 +173,9 @@ void cc430_radio_write_single_reg(uint8_t addr, uint8_t value)
 void cc430_radio_read_burst_reg(uint8_t addr, void *buffer, uint8_t count)
 {
     uint8_t i;
-  
+
     while (!(RF1AIFCTL1 & RFINSTRIFG)){}       // Wait for INSTRIFG
-    RF1AINSTR1B = (addr | RF_REGRD);          // Send addr of first conf. reg. to be read 
+    RF1AINSTR1B = (addr | RF_REGRD);          // Send addr of first conf. reg. to be read
                                             // ... and the burst-register read instruction
     for (i = 0; i < (count-1); i++)
     {
@@ -196,7 +196,7 @@ void cc430_radio_read_burst_reg(uint8_t addr, void *buffer, uint8_t count)
  *
  */
 void cc430_radio_write_burst_reg(uint8_t addr, void* buffer, uint8_t count)
-{  
+{
     uint8_t i;
 
     while (!(RF1AIFCTL1 & RFINSTRIFG));       // Wait for the Radio to be ready for next instruction
@@ -206,7 +206,7 @@ void cc430_radio_write_burst_reg(uint8_t addr, void* buffer, uint8_t count)
     {
         RF1ADINB = ((uint8_t*)buffer)[i];                   // Send data
         while (!(RFDINIFG & RF1AIFCTL1)){}       // Wait for TX to finish
-    } 
+    }
     i = RF1ADOUTB;                            // Reset RFDOUTIFG flag which contains status byte
 }
 
@@ -286,28 +286,27 @@ int8_t cc430_radio_write_pa_table(uint8_t value)
         return 0;
         break;
     }
-  
 
-    while(valueRead != value) 
+
+    while(valueRead != value)
     {
     /* Write the power output to the PA_TABLE and verify the write operation.  */
-        uint8_t i = 0; 
+        uint8_t i = 0;
 
     /* wait for radio to be ready for next instruction */
         while( !(RF1AIFCTL1 & RFINSTRIFG)){}
 
         RF1AINSTRW = rf1ainstrw_value;
-    
+
     /* wait for radio to be ready for next instruction */
         while( !(RF1AIFCTL1 & RFINSTRIFG)){}
-        RF1AINSTR1B = RF_PATABRD;                 
-    
-    
-    // Traverse PATABLE pointers to read 
+        RF1AINSTR1B = RF_PATABRD;
+
+    // Traverse PATABLE pointers to read
         for (i = 0; i < 7; i++)
         {
             while( !(RF1AIFCTL1 & RFDOUTIFG)){}
-            valueRead  = RF1ADOUT1B;     
+            valueRead  = RF1ADOUT1B;
         }
         while( !(RF1AIFCTL1 & RFDOUTIFG)){}
         valueRead  = RF1ADOUTB;
@@ -328,11 +327,11 @@ int8_t cc430_radio_write_pa_table(uint8_t value)
  */
 void cc430_radio_transmit(void *buffer, uint8_t length)
 {
-    RF1AIES |= BIT9;                          
+    RF1AIES |= BIT9;
     RF1AIFG &= ~BIT9;                         // Clear pending interrupts
-   
+
     cc430_radio_write_burst_reg(RF_TXFIFOWR, buffer, length);
-  
+
     cc430_radio_strobe( RF_STX );                         // cc430_radio_strobe STX
 }
 
@@ -351,8 +350,8 @@ void cc430_radio_receive(void *buffer, uint8_t *length)
 {
     cc430_radio_pid = thread_getpid();
     thread_sleep();
-    *length = cc430_radio_read_single_reg(RXBYTES);    
-    cc430_radio_read_burst_reg(RF_RXFIFORD, buffer, *length);  
+    *length = cc430_radio_read_single_reg(RXBYTES);
+    cc430_radio_read_burst_reg(RF_RXFIFORD, buffer, *length);
 }
 
 /**
@@ -360,10 +359,10 @@ void cc430_radio_receive(void *buffer, uint8_t *length)
  *
  */
 void cc430_radio_receive_on(void)
-{  
+{
     RF1AIFG &= ~BIT4;                         // Clear a pending interrupt
-    RF1AIE  |= BIT4;                          // Enable the interrupt 
-  
+    RF1AIE  |= BIT4;                          // Enable the interrupt
+
   // Previous state has been Tx
     cc430_radio_strobe( RF_SIDLE );
     cc430_radio_delay_rf(TX_TO_IDLE_TIME);
@@ -381,7 +380,7 @@ void cc430_radio_receive_off(void)
 {
     RF1AIE &= ~BIT4;                          // Disable RX interrupts
     RF1AIFG &= ~BIT4;                         // Clear pending IFG
-  
+
   // Previous state has been Rx
     cc430_radio_strobe( RF_SIDLE );
     cc430_radio_delay_rf(RX_TO_IDLE_TIME);
