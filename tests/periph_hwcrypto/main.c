@@ -56,21 +56,10 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
         return;
     }
 
-    /* initialize hwcrypto module */
-    result = hwcrypto_init(dev);
-
-    if (result != 0) {
-        printf("Unable to init: %d\n", result);
-        return;
-    }
-
-    /* turn it on */
-    hwcrypto_poweron(dev);
-
     /* acquire hwcrypto module */
     result = hwcrypto_acquire(dev);
 
-    if (result != 0) {
+    if (result != HWCRYPTO_OK) {
         printf("Unable to acquire: %d\n", result);
         hwcrypto_release(dev);
 
@@ -80,7 +69,7 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
     /* initialize cipher */
     result = hwcrypto_cipher_init(dev, cipher, mode);
 
-    if (result != 0) {
+    if (result != HWCRYPTO_OK) {
         printf("Unable to init cipher: %d\n", result);
         hwcrypto_release(dev);
 
@@ -89,7 +78,7 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
 
     result = hwcrypto_cipher_set(dev, HWCRYPTO_OPT_KEY, key, key_size);
 
-    if (result != 0) {
+    if (result != HWCRYPTO_OK) {
         printf("Unable to set key: %d\n", result);
         hwcrypto_release(dev);
 
@@ -99,7 +88,7 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
     if (mode == HWCRYPTO_MODE_CBC || mode == HWCRYPTO_MODE_CFB || mode == HWCRYPTO_MODE_OFB) {
         result = hwcrypto_cipher_set(dev, HWCRYPTO_OPT_IV, iv, 16);
 
-        if (result != 0) {
+        if (result != HWCRYPTO_OK) {
             printf("Unable to set iv: %d\n", result);
             hwcrypto_release(dev);
 
@@ -109,7 +98,7 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
     else if (mode == HWCRYPTO_MODE_CTR) {
         result = hwcrypto_cipher_set(dev, HWCRYPTO_OPT_COUNTER, counter, 16);
 
-        if (result != 0) {
+        if (result != HWCRYPTO_OK) {
             printf("Unable to set counter: %d\n", result);
             hwcrypto_release(dev);
 
@@ -139,9 +128,6 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
 
     /* release it */
     hwcrypto_release(dev);
-
-    /* power it off */
-    hwcrypto_poweroff(dev);
 }
 #endif
 
@@ -158,21 +144,10 @@ static void test_hash(hwcrypto_t dev, char *name, hwcrypto_hash_t hash, uint8_t 
         return;
     }
 
-    /* initialize hwcrypto module */
-    result = hwcrypto_init(dev);
-
-    if (result != 0) {
-        printf("Unable to init: %d\n", result);
-        return;
-    }
-
-    /* turn it on */
-    hwcrypto_poweron(dev);
-
     /* acquire hwcrypto module */
     result = hwcrypto_acquire(dev);
 
-    if (result != 0) {
+    if (result != HWCRYPTO_OK) {
         printf("Unable to acquire: %d\n", result);
         hwcrypto_release(dev);
 
@@ -182,7 +157,7 @@ static void test_hash(hwcrypto_t dev, char *name, hwcrypto_hash_t hash, uint8_t 
     /* initialize hash */
     result = hwcrypto_hash_init(dev, hash);
 
-    if (result != 0) {
+    if (result != HWCRYPTO_OK) {
         printf("Unable to init hash: %d\n", result);
         hwcrypto_release(dev);
 
@@ -210,9 +185,6 @@ static void test_hash(hwcrypto_t dev, char *name, hwcrypto_hash_t hash, uint8_t 
 
     /* release it */
     hwcrypto_release(dev);
-
-    /* power it off */
-    hwcrypto_poweroff(dev);
 }
 #endif
 
@@ -225,7 +197,7 @@ int main(void)
 
     /* run a test for every hardware crypto peripheral */
     for (int i = 0; i < (int) HWCRYPTO_NUMOF; i++) {
-        hwcrypto_t dev = (hwcrypto_t) i;
+        hwcrypto_t dev = HWCRYPTO_DEV(i);
 
 #ifdef HAVE_HWCRYPTO_AES128
         /* AES-128 tests */

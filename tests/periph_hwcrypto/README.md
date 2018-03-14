@@ -1,8 +1,10 @@
 Expected result
 ===============
-You should be presented with the RIOT shell, providing you with commands to initialize a board
-as master or slave, and to send and receive data via SPI.
+This application will run all supported hardware accelerated ciphers and hashing algorithms.
+
+For the ones supported, no error should be raised. Note that this test only checks if the
+implementation works, and does not verify results against reference results.
 
 Background
 ==========
-Test for the low-level SPI driver.
+Test for the low-level hardware crypto driver.
