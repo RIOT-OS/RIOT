@@ -26,7 +26,7 @@ new file mode 100644
 index 0000000..1f1cd9c
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,24 @@
 +#
 +# to use oonf_api in your RIOT project,
 +# add the following to your Makefile:
@@ -51,10 +51,6 @@ index 0000000..1f1cd9c
 +	DIRS += external/regex
 +endif
 +include $(RIOTBASE)/Makefile.base
-+# Build static archive from the submodule objects
-+all: $(BINDIR)/$(MODULE).a
-+$(patsubst %,$(BINDIR)/%.o,$(filter oonf_%,$(USEMODULE))): | ${DIRS:%=ALL--%}
-+$(BINDIR)/$(MODULE).a: $(patsubst %,$(BINDIR)/%.o,$(filter oonf_%,$(USEMODULE))) | ${DIRS:%=ALL--%}
 diff --git a/external/regex/Makefile b/external/regex/Makefile
 new file mode 100644
 index 0000000..3bc1ce1
