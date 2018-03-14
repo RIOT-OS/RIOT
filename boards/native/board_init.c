@@ -15,6 +15,7 @@
  */
 #include <stdio.h>
 #include "board.h"
+#include "periph/init.h"
 
 #include "board_internal.h"
 
@@ -30,6 +31,9 @@ void board_init(void)
 {
     LED0_OFF;
     LED1_ON;
+
+    /* trigger static peripheral initialization */
+    periph_init();
 
     puts("RIOT native board initialized.");
 }

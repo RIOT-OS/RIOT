@@ -1,5 +1,5 @@
 APPLICATION = periph_hwcrypto
-BOARD ?= stk3600
+BOARD ?= native
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_hwcrypto
