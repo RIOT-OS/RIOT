@@ -14,7 +14,7 @@
  * Modern CPUs may be equipped with a hardware crypto peripheral to speed up
  * cryptographical operations such as (as)symmetric ciphers and hashing
  * algorithms. With no or little intervention, the CPU can typically execute
- * more operations than the software alternative.
+ * more operations than the software alternative, using less instructions.
  *
  * This driver provides an abstract for the different ciphers and hashes that
  * may be supported. Using HAVE_HWCRYPTO_xxx defines, software may choose to
@@ -39,6 +39,7 @@
 #ifndef HWCRYPTO_H
 #define HWCRYPTO_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "periph_cpu.h"
@@ -48,12 +49,29 @@
 extern "C" {
 #endif
 
-#ifndef HAVE_HWCRYPTO_T
+/**
+ * @brief   Default hardware crypto device access macro
+ */
+#ifndef HWCRYPTO_DEV
+#define HWCRYPTO_DEV(x)     (x)
+#endif
+
 /**
  * @brief   Hardware crypto type identifier
  */
+#ifndef HAVE_HWCRYPTO_T
 typedef unsigned int hwcrypto_t;
 #endif
+
+/**
+ * @brief   Status codes used by the hardware crypto driver interface
+ */
+enum {
+    HWCRYPTO_OK         =  0,   /**< everything went as planned */
+    HWCRYPTO_NOTSUP     = -1,   /**< cipher, hash or argument not supported */
+    HWCRYPTO_INVALID    = -2,   /**< argument value invalid */
+    HWCRYPTO_ERROR      = -3,   /**< other error */
+};
 
 /**
  * @brief   Supported ciphers.
@@ -130,69 +148,72 @@ typedef enum {
  * @brief   Determine if the given hardware crypto peripheral supports the
  *          given cipher.
  *
- * This method should not require the peripheral to be initialized. It will
- * also not change its state.
+ * This method should not require the peripheral to be initialized or acquired.
+ * It should also not change its state.
  *
  * The method should return a deterministic result.
  *
  * @param[in] dev           the device
  * @param[in] cipher        cipher to check
  *
- * @return                  nonzero value if supported
- * @return                  0 if unsupported
+ * @return                  true if supported
+ * @return                  false if unsupported
  */
-int hwcrypto_cipher_supported(hwcrypto_t dev, hwcrypto_cipher_t cipher);
+bool hwcrypto_cipher_supported(hwcrypto_t dev, hwcrypto_cipher_t cipher);
 
 /**
  * @brief   Determine if the given hardware crypto peripheral supports the
  *          given hashing algorithm.
  *
- * This method should not require the peripheral to be initialized. It will
- * also not change its state.
+ * This method should not require the peripheral to be initialized or acquired.
+ * It should also not change its state.
  *
  * The method should return a deterministic result.
  *
  * @param[in] dev           the device
  * @param[in] hash          hashing algorithm to check
  *
- * @return                  nonzero value if supported
- * @return                  0 if unsupported
+ * @return                  true if supported
+ * @return                  false if unsupported
  */
-int hwcrypto_hash_supported(hwcrypto_t dev, hwcrypto_hash_t hash);
+bool hwcrypto_hash_supported(hwcrypto_t dev, hwcrypto_hash_t hash);
 
 /**
  * @brief   Initialize the hardware crypto peripheral.
  *
- * The peripheral should be turned on in this method.
+ * The method should initialize the peripheral. It may power on the device if
+ * needed, but it must ensure that the peripheral is powered off when exiting
+ * this method.
+ *
+ * This function is intended to be called by the board initialization code
+ * during system startup to prepare the (shared) hardware crypto device for
+ * further usage. It uses the board specific initialization parameters as
+ * defined in the board's `periph_conf.h`.
+ *
+ * Errors (e.g. invalid @p dev parameter) are not signaled through a return
+ * value, but should be signaled using the assert() function internally.
  *
  * @param[in] dev           the device to initialize
- *
- * @return                  0 on success
- * @return                  -1 if an error occurs
  */
-int hwcrypto_init(hwcrypto_t dev);
+void hwcrypto_init(hwcrypto_t dev);
 
 /**
  * @brief   Initialize hardware crypto device for a given encryption or
  *          decryption algorithm.
  *
- * The implementation must use a key (size) as defined by the cipher. It must
- * not apply a different key scheduling algorithm.
- *
  * The mode parameter can be used to change the cipher's mode of operation. If
  * a mode does not apply, use @p HWCRYPTO_MODE_NONE.
  *
  * This operation may alter the peripheral's state, therefore it should be used
- * exclusively. A peripheral may become uninitialized after it is powered off
- * and on inbetween.
+ * exclusively.
  *
  * @param[in] dev           the device to initialize
  * @param[in] cipher        cipher to initialize
- * @param[in] mode          cipher mode of operation.
+ * @param[in] mode          cipher mode of operation
  *
- * @return                  0 on success
- * @return                  -1 if cipher is not supported
- * @return                  -2 if device could not be prepared
+ * @return                  HWCRYPTO_OK on success
+ * @return                  HWCRYPTO_NOTSUP if cipher or mode is not supported
+ * @return                  HWCRYPTO_ERROR if other error
  */
 int hwcrypto_cipher_init(hwcrypto_t dev,
                          hwcrypto_cipher_t cipher,
@@ -205,23 +226,25 @@ int hwcrypto_cipher_init(hwcrypto_t dev,
  * is returned.
  *
  * This operation may alter the peripheral's state, therefore it should be used
- * exclusively. A peripheral may become uninitialized after it is powered off
- * and on inbetween.
- *
- * The peripheral's state is undefined if this method is used after one or more
- * encryption or decryption round(s).
+ * exclusively.
  *
  * A hardware crypto device not initialized for cipher mode may produce
  * unexpected results.
+ *
+ * The peripheral's state may be undefined if this method is used after one or
+ * more encryption or decryption round(s).
  *
  * @param[in] dev           the device to initialize
  * @param[in] option        option from @p hwcrypto_opt_t to initialize
  * @param[in] value         pointer to option value
  * @param[in] size          option size
  *
- * @return                  0 on success
- * @return                  -1 if option is not supported or applicable
- * @return                  -2 if value is not supported or applicable
+ * @return                  HWCRYPTO_OK on success
+ * @return                  HWCRYPTO_NOTSUP if option not supported or
+ *                          applicable
+ * @return                  HWCRYPTO_INVALID if value is not supported or
+ *                          applicable
+ * @return                  HWCRYPTO_ERROR if other error
  */
 int hwcrypto_cipher_set(hwcrypto_t dev,
                         hwcrypto_opt_t option,
@@ -238,8 +261,7 @@ int hwcrypto_cipher_set(hwcrypto_t dev,
  * size. This allows for minimal CPU intervention for large blocks of data.
  *
  * This operation may alter the peripheral's state, therefore it should be used
- * exclusively. A peripheral may become uninitialized after it is powered off
- * and on inbetween.
+ * exclusively.
  *
  * A hardware crypto device not initialized for cipher mode may produce
  * unexpected results.
@@ -249,9 +271,10 @@ int hwcrypto_cipher_set(hwcrypto_t dev,
  * @param[out] cipher_block the cipher output buffer (may overlap plain_block)
  * @param[in] block_size    size of the plain_block and cipher_block in bytes
  *
- * @return                  0 on success
- * @return                  -1 if cipher operation not supported
- * @return                  -2 if block_size is invalid
+ * @return                  HWCRYPTO_OK on success
+ * @return                  HWCRYPTO_NOTSUP if cipher operation not supported
+ * @return                  HWCRYPTO_INVALID if @p block_size is invalid
+ * @return                  HWCRYPTO_ERROR if other error
  */
 int hwcrypto_cipher_encrypt(hwcrypto_t dev,
                             const uint8_t *plain_block,
@@ -268,8 +291,7 @@ int hwcrypto_cipher_encrypt(hwcrypto_t dev,
  * size. This allows for minimal CPU intervention for large blocks of data.
  *
  * This operation may alter the peripheral's state, therefore it should be used
- * exclusively. A peripheral may become uninitialized after it is powered off
- * and on inbetween.
+ * exclusively.
  *
  * A hardware crypto device not initialized for cipher mode may produce
  * unexpected results.
@@ -279,9 +301,10 @@ int hwcrypto_cipher_encrypt(hwcrypto_t dev,
  * @param[out] plain_block  the plain output buffer (may overlap cipher_block)
  * @param[in] block_size    size of the cipher_block and plain_block in bytes
  *
- * @return                  0 on success
- * @return                  -1 if cipher operation not supported
- * @return                  -2 if block_size is invalid
+ * @return                  HWCRYPTO_OK on success
+ * @return                  HWCRYPTO_NOTSUP if cipher operation not supported
+ * @return                  HWCRYPTO_INVALID if @p block_size is invalid
+ * @return                  HWCRYPTO_ERROR if other error
  */
 int hwcrypto_cipher_decrypt(hwcrypto_t dev,
                             const uint8_t *cipher_block,
@@ -292,15 +315,14 @@ int hwcrypto_cipher_decrypt(hwcrypto_t dev,
  * @brief   Initialize hardware crypto device for a given hashing algorithm.
  *
  * This operation may alter the peripheral's state, therefore it should be used
- * exclusively. A peripheral may become uninitialized after it is powered off
- * and on inbetween.
+ * exclusively.
  *
  * @param[in] dev           the device to initialize
  * @param[in] hash          desired hash algorithm
  *
- * @return                  0 on success
- * @return                  -1 if hash is not supported
- * @return                  -2 if device could not be prepared
+ * @return                  HWCRYPTO_OK on success
+ * @return                  HWCRYPTO_NOTSUP if hash is not supported
+ * @return                  HWCRYPTO_ERROR if other error
  */
 int hwcrypto_hash_init(hwcrypto_t dev, hwcrypto_hash_t hash);
 
@@ -308,8 +330,7 @@ int hwcrypto_hash_init(hwcrypto_t dev, hwcrypto_hash_t hash);
  * @brief   Update the digest with a block of data.
  *
  * This operation may alter the peripheral's state, therefore it should be used
- * exclusively. A peripheral may become uninitialized after it is powered off
- * and on inbetween.
+ * exclusively.
  *
  * A hardware crypto device not initialized for hashing may produce unexpected
  * results.
@@ -319,9 +340,9 @@ int hwcrypto_hash_init(hwcrypto_t dev, hwcrypto_hash_t hash);
  * @param[in] block_size    number of bytes in data block
  *
  * @return                  number of bytes added to digest
- * @return                  -1 if hash is not supported
- * @return                  -2 if block_size is incorrect
- * @return                  -3 if digest could not be updated
+ * @return                  HWCRYPTO_NOTSUP if hashing operation not supported
+ * @return                  HWCRYPTO_INVALID if block_size is incorrect
+ * @return                  HWCRYPTO_ERROR if digest could not be updated
  */
 int hwcrypto_hash_update(hwcrypto_t dev,
                          const uint8_t* block,
@@ -331,8 +352,7 @@ int hwcrypto_hash_update(hwcrypto_t dev,
  * @brief   Finalize the hash and copy the result to result buffer.
  *
  * This operation may alter the peripheral's state, therefore it should be used
- * exclusively. A peripheral may become uninitialized after it is powered off
- * and on inbetween.
+ * exclusively.
  *
  * A hardware crypto device not initialized for hashing may produce unexpected
  * results.
@@ -342,8 +362,9 @@ int hwcrypto_hash_update(hwcrypto_t dev,
  * @param[in] result_size   number of bytes to copy from digest to result
  *
  * @return                  number of bytes copied
- * @return                  -1 if hash is not supported
- * @returned                -2 if @p result_size exceeds hash size
+ * @return                  HWCRYPTO_NOTSUP if hash is not supported
+ * @returned                HWCRYPTO_INVALID if @p result_size exceeds hash
+ *                          size
  */
 int hwcrypto_hash_final(hwcrypto_t dev,
                         uint8_t* result,
@@ -357,8 +378,8 @@ int hwcrypto_hash_final(hwcrypto_t dev,
  *
  * @param[in] dev           the device to initialize
  *
- * @return                  0 on success
- * @return                  -1 on error
+ * @return                  HWCRYPTO_OK on success
+ * @return                  HWCRYPTO_ERROR on error
  */
 int hwcrypto_acquire(hwcrypto_t dev);
 
@@ -367,24 +388,10 @@ int hwcrypto_acquire(hwcrypto_t dev);
  *
  * @param[in] dev           the device to initialize
  *
- * @return                  0 on success
- * @return                  -1 on error
+ * @return                  HWCRYPTO_OK on success
+ * @return                  HWCRYPTO_ERROR on error
  */
 int hwcrypto_release(hwcrypto_t dev);
-
-/**
- * @brief   Power on the hardware crypto peripheral.
- *
- * @param[in] dev           the device to initialize
- */
-void hwcrypto_poweron(hwcrypto_t dev);
-
-/**
- * @brief   Power off the hardware crypto peripheral.
- *
- * @param[in] dev           the device to initialize
- */
-void hwcrypto_poweroff(hwcrypto_t dev);
 
 #ifdef __cplusplus
 }
