@@ -111,6 +111,17 @@ ifneq (,$(filter encx24j600,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter esp8266_sock_udp,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += ipv4_addr
+  USEMODULE += esp8266
+  USEMODULE += sema
+endif
+
+ifneq (,$(filter esp8266,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter ethos,$(USEMODULE)))
   USEMODULE += iolist
   USEMODULE += netdev_eth

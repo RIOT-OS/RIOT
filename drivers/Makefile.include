@@ -233,3 +233,9 @@ endif
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/xbee/include
 endif
+ifneq (,$(filter esp8266,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/esp8266/include
+endif
+ifneq (,$(filter esp8266_sock_udp,$(USEMODULE)))
+    DIRS += $(RIOTBASE)/drivers/esp8266/sock_udp
+endif

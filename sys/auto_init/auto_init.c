@@ -152,6 +152,11 @@ void auto_init(void)
     gnrc_ipv6_nib_init();
 #endif
 
+#ifdef MODULE_ESP8266
+    extern void auto_init_esp8266(void);
+    auto_init_esp8266();
+#endif
+
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
 
