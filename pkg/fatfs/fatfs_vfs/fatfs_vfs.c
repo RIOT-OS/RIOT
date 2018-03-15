@@ -36,6 +36,17 @@
 static int fatfs_err_to_errno(int32_t err);
 static void _fatfs_time_to_timespec(WORD fdate, WORD ftime, time_t *time);
 
+/**
+ * @brief Concatenate drive number and path into the buffer provided by fs_desc
+ *
+ * Most FatFs library file operations need an absolute path.
+ */
+static void _build_abs_path(fatfs_desc_t *fs_desc, const char *name)
+{
+    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%u:/%s",
+             fs_desc->vol_idx, name);
+}
+
 static int _mount(vfs_mount_t *mountp)
 {
     /* if one of the lines below fail to compile you probably need to adjust
@@ -45,13 +56,12 @@ static int _mount(vfs_mount_t *mountp)
 
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
 
-    char volume_str[FATFS_MAX_VOL_STR_LEN];
-    snprintf(volume_str, sizeof(volume_str), "%d:/", fs_desc->vol_idx);
+    _build_abs_path(fs_desc, "");
 
     memset(&fs_desc->fat_fs, 0, sizeof(fs_desc->fat_fs));
 
-    DEBUG("mounting file system of volume '%s'\n", volume_str);
-    FRESULT res = f_mount(&fs_desc->fat_fs, volume_str, 1);
+    DEBUG("mounting file system of volume '%s'\n", fs_desc->abs_path_str_buff);
+    FRESULT res = f_mount(&fs_desc->fat_fs, fs_desc->abs_path_str_buff, 1);
 
     if (res == FR_OK) {
         DEBUG("[OK]");
@@ -69,11 +79,10 @@ static int _umount(vfs_mount_t *mountp)
 
     DEBUG("fatfs_vfs.c: _umount: private_data = %p\n", mountp->private_data);
 
-    char volume_str[FATFS_MAX_VOL_STR_LEN];
-    snprintf(volume_str, sizeof(volume_str), "%d:/", fs_desc->vol_idx);
+    _build_abs_path(fs_desc, "");
 
-    DEBUG("unmounting file system of volume '%s'\n", volume_str);
-    FRESULT res = f_unmount(volume_str);
+    DEBUG("unmounting file system of volume '%s'\n", fs_desc->abs_path_str_buff);
+    FRESULT res = f_unmount(fs_desc->abs_path_str_buff);
 
     if (res == FR_OK) {
         DEBUG("[OK]");
@@ -90,8 +99,7 @@ static int _unlink(vfs_mount_t *mountp, const char *name)
 {
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
 
-    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
-             fs_desc->vol_idx, name);
+    _build_abs_path(fs_desc, name);
 
     return fatfs_err_to_errno(f_unlink(fs_desc->abs_path_str_buff));
 }
@@ -102,10 +110,9 @@ static int _rename(vfs_mount_t *mountp, const char *from_path,
     char fatfs_abs_path_to[FATFS_MAX_ABS_PATH_SIZE];
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
 
-    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
-             fs_desc->vol_idx, from_path);
+    _build_abs_path(fs_desc, from_path);
 
-    snprintf(fatfs_abs_path_to, sizeof(fatfs_abs_path_to), "%d:/%s",
+    snprintf(fatfs_abs_path_to, sizeof(fatfs_abs_path_to), "%u:/%s",
              fs_desc->vol_idx, to_path);
 
     return fatfs_err_to_errno(f_rename(fs_desc->abs_path_str_buff,
@@ -117,8 +124,7 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
 {
     fatfs_file_desc_t *fd = (fatfs_file_desc_t *)&filp->private_data.buffer[0];
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)filp->mp->private_data;
-    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
-             fs_desc->vol_idx, name);
+    _build_abs_path(fs_desc, name);
 
     (void) abs_path;
     (void) mode; /* fatfs can't use mode param with f_open*/
@@ -251,8 +257,7 @@ static int _fstat(vfs_file_t *filp, struct stat *buf)
     FILINFO fi;
     FRESULT res;
 
-    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
-             fs_desc->vol_idx, fd->fname);
+    _build_abs_path(fs_desc, fd->fname);
 
     memset(buf, 0, sizeof(*buf));
 
@@ -295,8 +300,7 @@ static int _opendir(vfs_DIR *dirp, const char *dirname, const char *abs_path)
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)dirp->mp->private_data;
     (void) abs_path;
 
-    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
-             fs_desc->vol_idx, dirname);
+    _build_abs_path(fs_desc, dirname);
 
     return fatfs_err_to_errno(f_opendir(dir, fs_desc->abs_path_str_buff));
 }
@@ -334,8 +338,7 @@ static int _mkdir (vfs_mount_t *mountp, const char *name, mode_t mode)
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
     (void) mode;
 
-    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
-             fs_desc->vol_idx, name);
+    _build_abs_path(fs_desc, name);
 
     return fatfs_err_to_errno(f_mkdir(fs_desc->abs_path_str_buff));
 }
@@ -344,8 +347,7 @@ static int _rmdir (vfs_mount_t *mountp, const char *name)
 {
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)mountp->private_data;
 
-    snprintf(fs_desc->abs_path_str_buff, FATFS_MAX_ABS_PATH_SIZE, "%d:/%s",
-             fs_desc->vol_idx, name);
+    _build_abs_path(fs_desc, name);
 
     return fatfs_err_to_errno(f_unlink(fs_desc->abs_path_str_buff));
 }
