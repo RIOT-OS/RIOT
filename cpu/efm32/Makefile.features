@@ -1,5 +1,6 @@
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_hwcrypto
 FEATURES_PROVIDED += periph_pm
 
 ifeq (1,$(EFM32_TNRG))

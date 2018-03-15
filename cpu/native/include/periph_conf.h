@@ -21,6 +21,13 @@
 #endif
 
 /**
+ * @name Number of hardware crypto devices
+ * @{
+ */
+#define HWCRYPTO_NUMOF      (1U)
+/** @} */
+
+/**
  * @name hardware timer clock skew avoidance
  * @{
  */

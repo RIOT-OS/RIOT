@@ -16,6 +16,7 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Bas Stottelaar <basstottelaar@gmail.com>
  *
  * @}
  */
@@ -25,6 +26,9 @@
 #endif
 #ifdef MODULE_PERIPH_RTC
 #include "periph/rtc.h"
+#endif
+#ifdef MODULE_PERIPH_HWCRYPTO
+#include "periph/hwcrypto.h"
 #endif
 #ifdef MODULE_PERIPH_HWRNG
 #include "periph/hwrng.h"
@@ -42,6 +46,13 @@ void periph_init(void)
     /* Initialize RTC */
 #ifdef MODULE_PERIPH_RTC
     rtc_init();
+#endif
+
+#ifdef MODULE_PERIPH_HWCRYPTO
+    /* initialize hardware crypto devices */
+    for (unsigned i = 0; i < HWCRYPTO_NUMOF; i++) {
+        hwcrypto_init(HWCRYPTO_DEV(i));
+    }
 #endif
 
 #ifdef MODULE_PERIPH_HWRNG

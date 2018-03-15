@@ -1,3 +1,7 @@
+ifneq (,$(filter periph_hwcrypto,$(USEMODULE)))
+  USEMODULE += periph_hwcrypto_series$(EFM32_SERIES)
+endif
+
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += periph_rtc_series$(EFM32_SERIES)
 endif

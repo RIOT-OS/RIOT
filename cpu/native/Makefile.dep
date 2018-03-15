@@ -1,0 +1,5 @@
+# Link OpenSSL for hardware crypto emulation
+ifneq (,$(filter periph_hwcrypto,$(USEMODULE)))
+    LINKFLAGS += `pkg-config --libs openssl`
+    CFLAGS += `pkg-config --cflags openssl`
+endif
