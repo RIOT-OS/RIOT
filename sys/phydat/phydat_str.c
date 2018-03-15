@@ -52,7 +52,7 @@ void phydat_dump(phydat_t *data, uint8_t dim)
         printf("\t[%i] ", (int)i);
 
         if (scale_prefix) {
-            printf("%i%c", (int)data->val[i], scale_prefix);
+            printf("%i %c", (int)data->val[i], scale_prefix);
         }
         else if (data->scale == 0) {
             printf("%i", (int)data->val[i]);
