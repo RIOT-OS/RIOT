@@ -47,9 +47,6 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 
-    /* Disable JTAG to be able to use PCINTs on PC2-PC5 */
-    MCUCR=(1<<JTD);
-
     irq_enable();
 }
 

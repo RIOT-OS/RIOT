@@ -56,12 +56,12 @@ extern "C" {
  * This emulates a software triggered interrupt
  */
 #define AVR_CONTEXT_SWAP_INIT do { \
-            DDRC |= (1 << PC4); \
-            PCICR |= (1 << PCIE2); \
-            PCMSK2 |= (1 << PCINT20); \
+            DDRB |= (1 << PB0); \
+            PCICR |= (1 << PCIE1); \
+            PCMSK1 |= (1 << PCINT8); \
 } while (0)
-#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT2_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTC ^= (1 << PC4)
+#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT1_vect
+#define AVR_CONTEXT_SWAP_TRIGGER   PORTB ^= (1 << PB0)
 
 /**
  * @name    xtimer configuration values
