@@ -43,6 +43,8 @@
 #include "native_internal.h"
 #include "tty_uart.h"
 
+#include "periph/init.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -536,6 +538,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     }
 #endif
 
+    periph_init();
     board_init();
 
     puts("RIOT native hardware initialization complete.\n");

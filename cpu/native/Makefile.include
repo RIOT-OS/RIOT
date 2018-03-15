@@ -7,3 +7,6 @@ endif
 
 USEMODULE += periph
 USEMODULE += periph_uart
+
+# include common peripheral initialization
+USEMODULE += periph_common

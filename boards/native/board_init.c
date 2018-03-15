@@ -15,8 +15,6 @@
  */
 #include <stdio.h>
 #include "board.h"
-#include "periph/rtc.h"
-#include "periph/hwrng.h"
 
 #include "board_internal.h"
 
@@ -32,12 +30,7 @@ void board_init(void)
 {
     LED0_OFF;
     LED1_ON;
-#ifdef MODULE_PERIPH_RTC
-    rtc_init();
-#endif
-#ifdef MODULE_PERIPH_HWRNG
-    hwrng_init();
-#endif
+
     puts("RIOT native board initialized.");
 }
 
