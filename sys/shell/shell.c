@@ -282,6 +282,13 @@ static inline void print_prompt(void)
 
 void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
 {
+#ifndef SHELL_NO_ECHO
+    /* If echo is enabled, switch stdout to unbuffered mode. Otherwise we'll
+     * buffer output characters and only echo them back after ENTER has been
+     * pressed. */
+    setvbuf(stdout, NULL, _IONBF, 0);
+#endif
+
     print_prompt();
 
     while (1) {
