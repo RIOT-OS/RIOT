@@ -1,7 +1,7 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
-    USEMODULE += saul_gpio
-    USEMODULE += bmp280
-    USEMODULE += si7021
+  USEMODULE += saul_gpio
+  USEMODULE += bmp280
+  USEMODULE += si7021
 endif
 
 # include board common dependencies
