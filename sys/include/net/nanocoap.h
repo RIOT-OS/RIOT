@@ -47,9 +47,14 @@ extern "C" {
  * @name    Nanocoap specific maximum values
  * @{
  */
-#define NANOCOAP_URL_MAX        (64)
-#define NANOCOAP_QS_MAX         (64)
+#define NANOCOAP_NOPTS_MAX      (16)
+#define NANOCOAP_URI_MAX        (64)
 /** @} */
+
+#ifdef MODULE_GCOAP
+#define NANOCOAP_URL_MAX        NANOCOAP_URI_MAX
+#define NANOCOAP_QS_MAX         (64)
+#endif
 
 /**
  * @name    CoAP option numbers
@@ -220,14 +225,26 @@ typedef struct __attribute__((packed)) {
  * @brief   CoAP option array entry
  */
 typedef struct {
-    coap_hdr_t *hdr;                /**< pointer to raw packet              */
-    uint8_t url[NANOCOAP_URL_MAX];  /**< parsed request URL                 */
-    uint8_t qs[NANOCOAP_QS_MAX];    /**< parsed query string                */
-    uint8_t *token;                 /**< pointer to token                   */
-    uint8_t *payload;               /**< pointer to payload                 */
-    unsigned payload_len;           /**< length of payload                  */
-    uint16_t content_type;          /**< content type                       */
-    uint32_t observe_value;         /**< observe value                      */
+    uint16_t opt_num;           /**< full CoAP option number    */
+    uint16_t offset;            /**< offset in packet           */
+} coap_optpos_t;
+
+/**
+ * @brief   CoAP PDU parsing context structure
+ */
+typedef struct {
+    coap_hdr_t *hdr;                            /**< pointer to raw packet   */
+    uint8_t *token;                             /**< pointer to token        */
+    uint8_t *payload;                           /**< pointer to payload      */
+    uint16_t payload_len;                       /**< length of payload       */
+    uint16_t options_len;                       /**< length of options array */
+    coap_optpos_t options[NANOCOAP_NOPTS_MAX];  /**< option offset array     */
+#ifdef MODULE_GCOAP
+    uint8_t url[NANOCOAP_URI_MAX];              /**< parsed request URL      */
+    uint8_t qs[NANOCOAP_QS_MAX];                /**< parsed query string     */
+    uint16_t content_type;                      /**< content type            */
+    uint32_t observe_value;                     /**< observe value           */
+#endif
 } coap_pkt_t;
 
 /**
@@ -391,6 +408,33 @@ size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum, uint16_t content_type
  * @returns     amount of bytes written to @p buf
  */
 size_t coap_put_option_uri(uint8_t *buf, uint16_t lastonum, const char *uri, uint16_t optnum);
+
+
+/**
+ * @brief    Get content type from packet
+ *
+ * @param[in]   pkt     packet to work on
+ *
+ * @returns     the packet's content type value if included,
+ *              COAP_FORMAT_NONE otherwise
+ */
+unsigned coap_get_content_type(coap_pkt_t *pkt);
+
+/**
+ * @brief    Get the packet's request URI
+ *
+ * This function decodes the pkt's URI option into a "/"-seperated and
+ * NULL-terminated string.
+ *
+ * Caller must ensure @p target can hold at least NANOCOAP_URI_MAX bytes!
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[out]  target  buffer for target URI
+ *
+ * @returns     -ENOSPC     if URI option is larger than NANOCOAP_URI_MAX
+ * @returns     nr of bytes written to @p target (including '\0')
+ */
+int coap_get_uri(coap_pkt_t *pkt, uint8_t *target);
 
 /**
  * @brief   Get the CoAP version number
@@ -556,6 +600,7 @@ static inline unsigned coap_method2flag(unsigned code)
     return (1 << (code - 1));
 }
 
+#if defined(MODULE_GCOAP) || defined(DOXYGEN)
 /**
  * @brief   Identifies a packet containing an observe option
  *
@@ -590,6 +635,7 @@ static inline uint32_t coap_get_observe(coap_pkt_t *pkt)
 {
     return pkt->observe_value;
 }
+#endif
 
 /**
  * @brief   Reference to the default .well-known/core handler defined by the
