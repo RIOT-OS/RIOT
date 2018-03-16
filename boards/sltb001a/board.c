@@ -22,7 +22,10 @@
 #include "board.h"
 #include "board_common.h"
 #include "periph/gpio.h"
+
+#ifdef MODULE_SILABS_PIC
 #include "pic.h"
+#endif
 
 void board_init(void)
 {

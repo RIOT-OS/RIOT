@@ -20,9 +20,15 @@
 
 #include "board_common.h"
 
+#ifdef MODULE_SILABS_AEM
 #include "aem.h"
+#endif
+#ifdef MODULE_SILABS_BC
 #include "bc.h"
+#endif
+#ifdef MODULE_SILABS_PIC
 #include "pic.h"
+#endif
 
 void board_common_init(void)
 {
