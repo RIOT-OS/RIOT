@@ -6,7 +6,6 @@ PKG_LICENSE=MIT
 .PHONY: all
 
 all: git-download
-	@cp Makefile.cn-cbor $(PKG_BUILDDIR)/src/Makefile
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(CURDIR)/Makefile.cn-cbor
 
 include $(RIOTBASE)/pkg/pkg.mk
