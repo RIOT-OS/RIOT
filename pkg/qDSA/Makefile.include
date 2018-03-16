@@ -1,0 +1,13 @@
+ifneq (,$(filter cortexm_common,$(USEMODULE)))
+  QDSA_IMPL ?= arm
+else
+ifneq (,$(filter atmega_common,$(USEMODULE)))
+  QDSA_IMPL ?= avr
+else
+  QDSA_IMPL ?= cref
+endif
+endif
+
+export QDSA_IMPL
+
+INCLUDES += -I$(PKGDIRBASE)/qDSA/$(QDSA_IMPL)

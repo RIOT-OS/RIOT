@@ -1,2 +1,2 @@
 USEMODULE += random
-USEPKG += tweetnacl
+USEPKG += qDSA
