@@ -207,6 +207,15 @@ ifneq (,$(filter tests-cpp_%, $(UNIT_TESTS)))
   export CPPMIX := 1
 endif
 
+ifneq (, $(filter $(AVR_BOARDS), $(BOARD)))
+  LARGE_STACK_TESTS += tests-qDSA
+endif
+
+LARGE_STACK_TESTS += tests-tweetnacl
+ifneq (,$(filter $(LARGE_STACK_TESTS), $(UNIT_TESTS)))
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF\)
+endif
+
 DISABLE_MODULE += auto_init
 
 # Pull in `Makefile.include`s from the test suites:
