@@ -86,9 +86,6 @@ extern "C" {
  * Connection to the on-board pressure sensor (BMP280).
  * @{
  */
-#ifndef BMP280_ENABLED
-#define BMP280_ENABLED          (1)
-#endif
 #define BMP280_I2C              I2C_DEV(0)
 
 #define BMX280_PARAM_I2C_DEV    BMP280_I2C
@@ -178,9 +175,6 @@ extern "C" {
  * Connection to the on-board temperature/humidity sensor (Si7021).
  * @{
  */
-#ifndef SI7021_ENABLED
-#define SI7021_ENABLED          (1)
-#endif
 #define SI7021_I2C              I2C_DEV(0)
 
 #define SI70XX_PARAM_I2C_DEV    SI7021_I2C
