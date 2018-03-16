@@ -9,12 +9,6 @@ OLD_USEPKG := $(sort $(USEPKG))
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
 
-ifneq (,$(filter cbor_ctime,$(USEMODULE)))
-  ifneq (,$(filter newlib,$(USEMODULE)))
-    USEMODULE += newlib_gnu_source
-  endif
-endif
-
 ifneq (,$(filter ndn-riot,$(USEPKG)))
   USEMODULE += gnrc
   USEMODULE += xtimer
