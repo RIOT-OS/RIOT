@@ -21,9 +21,8 @@
 
 #include "board.h"
 #include "board_common.h"
-#include "pic.h"
-
 #include "periph/gpio.h"
+#include "pic.h"
 
 void board_init(void)
 {

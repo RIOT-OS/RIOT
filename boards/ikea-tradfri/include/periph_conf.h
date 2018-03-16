@@ -20,9 +20,7 @@
 #define PERIPH_CONF_H
 
 #include "cpu.h"
-
 #include "periph_cpu.h"
-
 #include "em_cmu.h"
 
 #ifdef __cplusplus
