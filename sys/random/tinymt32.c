@@ -24,14 +24,6 @@
 
 #include "tinymt32/tinymt32.h"
 
-#define _ALIGNMENT_MASK (sizeof(uint32_t) - 1)
-
-/* fits size to byte alignment */
-static inline uint8_t *_align(uint8_t *buf)
-{
-    return (uint8_t *)(((size_t) buf + _ALIGNMENT_MASK) & ~(_ALIGNMENT_MASK));
-}
-
 static tinymt32_t _random;
 
 void random_init(uint32_t seed)
