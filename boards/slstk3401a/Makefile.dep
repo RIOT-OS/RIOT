@@ -1,0 +1,9 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += si7021
+endif
+
+# include board common dependencies
+include $(RIOTBOARD)/common/silabs/Makefile.dep
+
+include $(RIOTCPU)/efm32/Makefile.dep
