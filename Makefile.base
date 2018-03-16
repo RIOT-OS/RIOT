@@ -68,9 +68,11 @@ $(BINDIR)/$(MODULE)/:
 $(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
 
 $(BINDIR)/$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
-	@# Recreate archive to cleanup deleted/non selected source files objects
+# Recreate archive to cleanup deleted/non selected source files objects
 	$(Q)$(RM) $@
-	$(Q)$(AR) $(ARFLAGS) $@ $^
+# Add split debug information as well (objfile.dwo), if found, without adding it
+# as a dependency for the recipe
+	$(Q)$(AR) $(ARFLAGS) $@ $^ $(wildcard $(patsubst %.o,%.dwo,$^))
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)

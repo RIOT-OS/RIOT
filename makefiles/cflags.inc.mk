@@ -33,6 +33,22 @@ ifeq ($(CC_NOCOLOR),0)
   endif
 endif
 
+# Place DWARF debugging sections in separate .dwo files instead of in the object
+# .o files, if the compiler supports this and if this is not disabled by the user
+ifneq ($(NOSPLITDEBUG),1)
+  ifeq ($(shell $(CC) -gsplit-dwarf -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+    CFLAGS += -gsplit-dwarf
+  endif
+endif
+
+# use compression on debugging information if supported by the compiler and not
+# disabled by the user
+ifneq ($(NOCOMPRESSDEBUG),1)
+  ifeq ($(shell $(CC) -gz -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+    CFLAGS += -gz
+  endif
+endif
+
 # Fast-out on old style function definitions.
 # They cause unreadable error compiler errors on missing semicolons.
 # Worse yet they hide errors by accepting wildcard argument types.
