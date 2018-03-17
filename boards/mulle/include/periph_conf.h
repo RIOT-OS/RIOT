@@ -137,6 +137,7 @@ static const uart_conf_t uart_config[] = {
         .scgc_bit = SIM_SCGC4_UART0_SHIFT,
         .mode   = UART_MODE_8N1,
         .type   = KINETIS_UART,
+        .llwu_rx = LLWU_WAKEUP_PIN_UNDEF,
     },
     {
         .dev    = UART1,
@@ -150,6 +151,7 @@ static const uart_conf_t uart_config[] = {
         .scgc_bit = SIM_SCGC4_UART1_SHIFT,
         .mode   = UART_MODE_8N1,
         .type   = KINETIS_UART,
+        .llwu_rx = LLWU_WAKEUP_PIN_PTC3,
     },
 };
 
