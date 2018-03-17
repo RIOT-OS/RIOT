@@ -32,7 +32,9 @@ extern "C" {
  * @{
  */
 #define DHCPV6_CLIENT_PORT          (546U)  /**< client port */
+#ifndef DHCPV6_SERVER_PORT          /* only reconfigure for testing!!1! */
 #define DHCPV6_SERVER_PORT          (547U)  /**< server and relay agent port */
+#endif
 /** @} */
 
 /**

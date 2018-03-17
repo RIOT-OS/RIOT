@@ -620,4 +620,10 @@ void auto_init(void)
     test_utils_interactive_sync();
 #endif
 #endif /* MODULE_TEST_UTILS_INTERACTIVE_SYNC */
+
+#ifdef MODULE_AUTO_INIT_DHCPV6_CLIENT
+    DEBUG("auto_init DHCPv6 client");
+    extern void dhcpv6_client_auto_init(void);
+    dhcpv6_client_auto_init();
+#endif /* MODULE_AUTO_INIT_DHCPV6_CLIENT */
 }
