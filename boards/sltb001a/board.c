@@ -21,9 +21,11 @@
 
 #include "board.h"
 #include "board_common.h"
-#include "pic.h"
-
 #include "periph/gpio.h"
+
+#ifdef MODULE_SILABS_PIC
+#include "pic.h"
+#endif
 
 void board_init(void)
 {
@@ -34,23 +36,23 @@ void board_init(void)
     board_common_init();
 
 #ifdef MODULE_SILABS_PIC
-    /* enable the CCS811 air quality/gas sensor */
 #if CCS811_ENABLED
+    /* enable the CCS811 air quality/gas sensor */
     pic_write(CCS811_PIC_ADDR, (1 << CCS811_PIC_EN_BIT) | (1 << CCS811_PIC_WAKE_BIT));
 #endif
 
-    /* enable the IMU sensor */
 #if ICM_20648_ENABLED
+    /* enable the IMU sensor */
     pic_write(ICM20648_PIC_ADDR, 1 << ICM20648_PIC_EN_BIT);
 #endif
 
+#if defined(MODULE_BMP280) || defined(MODULE_SI7021) || SI1133_ENABLED || SI7210A_ENABLED
     /* enable the environmental sensors */
-#if BMP280_ENABLED || SI1133_ENABLED || SI7021_ENABLED || SI7210A_ENABLED
     pic_write(ENV_SENSE_PIC_ADDR, 1 << ENV_SENSE_PIC_BIT);
 #endif
 
-    /* enable the RGB leds */
 #if RGB_LED1_ENABLED || RGB_LED2_ENABLED || RGB_LED3_ENABLED || RGB_LED4_ENABLED
+    /* enable the RGB leds */
     pic_write(RGB_LED_ADDR,
               (1 << RGB_LED_EN_BIT) |
               (RGB_LED1_ENABLED << RGB_LED1_EN_BIT) |
