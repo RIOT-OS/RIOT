@@ -39,6 +39,7 @@ gnrc_netif_t *gnrc_netif_raw_create(char *stack, int stacksize,
                                     netdev_t *dev)
 {
     return gnrc_netif_create(stack, stacksize, priority, name, dev,
+                             gnrc_netif_thread,
                              &raw_ops);
 }
 
