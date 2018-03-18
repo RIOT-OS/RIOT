@@ -15,6 +15,7 @@
 
 #include "net/gnrc.h"
 #include "net/gnrc/netif/ieee802154.h"
+#include "net/gnrc/netif/internal.h"
 #include "net/netdev/ieee802154.h"
 
 #ifdef MODULE_GNRC_IPV6
@@ -29,6 +30,7 @@
 #endif
 
 #ifdef MODULE_NETDEV_IEEE802154
+static void *_bootstrap(void *args);
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
@@ -44,7 +46,13 @@ gnrc_netif_t *gnrc_netif_ieee802154_create(char *stack, int stacksize,
                                            netdev_t *dev)
 {
     return gnrc_netif_create(stack, stacksize, priority, name, dev,
+                             _bootstrap,
                              &ieee802154_ops);
+}
+
+static void *_bootstrap(void *args)
+{
+    return gnrc_netif_thread(args);
 }
 
 static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
