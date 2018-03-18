@@ -276,6 +276,9 @@ struct netdev {
     const struct netdev_driver *driver;     /**< ptr to that driver's interface. */
     netdev_event_cb_t event_callback;       /**< callback for device events */
     void* context;                          /**< ptr to network stack context */
+#ifdef MODULE_NETDEV_LAYER
+    netdev_t *lower;                        /**< ptr to the lower netdev layer */
+#endif
 #ifdef MODULE_NETSTATS_L2
     netstats_t stats;                       /**< transceiver's statistics */
 #endif
