@@ -28,17 +28,17 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define MHZ19_NUMOF    (sizeof(mhz19_params) / sizeof(mhz19_params[0]))
+#define MHZ19_NUM   (sizeof(mhz19_params) / sizeof(mhz19_params[0]))
 
 /**
  * @brief   Allocation of memory for device descriptors
  */
-static mhz19_t mhz19_devs[MHZ19_NUMOF];
+static mhz19_t mhz19_devs[MHZ19_NUM];
 
 /**
  * @brief   Memory for the SAUL registry entries
  */
-static saul_reg_t saul_entries[MHZ19_NUMOF];
+static saul_reg_t saul_entries[MHZ19_NUM];
 
 /**
  * @brief   Define the number of saul info
@@ -54,7 +54,7 @@ void auto_init_mhz19(void)
 {
     assert(MHZ19_NUM == MHZ19_INFO_NUM);
 
-    for (unsigned i = 0; i < MHZ19_NUMOF; i++) {
+    for (unsigned i = 0; i < MHZ19_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing mhz19 #%u\n", i);
 
         if (mhz19_init(&mhz19_devs[i], &mhz19_params[i]) < 0) {
@@ -63,7 +63,7 @@ void auto_init_mhz19(void)
         }
 
         saul_entries[i].dev = &(mhz19_devs[i]);
-        saul_entries[i].name = mhz19_saul_reg_info[i].name;
+        saul_entries[i].name = mhz19_saul_info[i].name;
         saul_entries[i].driver = &mhz19_ppm_saul_driver;
 
         /* register to saul */

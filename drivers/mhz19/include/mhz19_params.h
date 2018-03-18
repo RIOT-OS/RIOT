@@ -57,7 +57,7 @@ static const mhz19_params_t mhz19_params[] =
  * for each device. Please be awar that the indexes are used in
  * auto_init_mhz280, so make sure the indexes match.
  */
-static const saul_reg_info_t mhz19_saul_reg_info[] =
+static const saul_reg_info_t mhz19_saul_info[] =
 {
     MHZ19_SAUL_INFO
 };
