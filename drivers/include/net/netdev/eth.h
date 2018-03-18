@@ -29,34 +29,23 @@ extern "C" {
 #endif
 
 /**
- * @brief   Fallback function for netdev ethernet devices' _get function
- *
- * Supposed to be used by netdev drivers as default case.
- *
- * @warning Driver *MUST* implement NETOPT_ADDRESS case!
- *
- * @param[in]   dev     network device descriptor
- * @param[in]   opt     option type
- * @param[out]  value   pointer to store the option's value in
- * @param[in]   max_len maximal amount of byte that fit into @p value
- *
- * @return              number of bytes written to @p value
- * @return              <0 on error
+ * @brief   Layer descriptor for ethernet netdev layer
  */
-int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
+typedef struct {
+    netdev_t netdev;    /**< Netdev layer parent struct. */
+    uint8_t type;       /**< Device type, used to determine multicast detection. */
+    netdev_t *hwdev;    /**< Pointer to the hardware driver struct. */
+} netdev_eth_t;
 
 /**
- * @brief   Fallback function for netdev ethernet devices' _set function
+ * @brief   Add a ethernet netdev layer to the top of the netdev stack
  *
- * @param[in] dev       network device descriptor
- * @param[in] opt       option type
- * @param[in] value     value to set
- * @param[in] value_len the length of @p value
+ * @param[in] head    Top netdev device of the stack.
+ * @param[in] layer   New ethernet layer to push to the top of the stack.
  *
- * @return              number of bytes used from @p value
- * @return              <0 on error
+ * @return  The new top of the netdev stack.
  */
-int netdev_eth_set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len);
+netdev_t *netdev_eth_add(netdev_t *head, netdev_eth_t *layer);
 
 #ifdef __cplusplus
 }

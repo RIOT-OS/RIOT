@@ -60,6 +60,10 @@ ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
 endif
 
+ifneq (,$(filter netdev_eth,$(USEMODULE)))
+  USEMODULE += netdev_layer
+endif
+
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += uhcpc
   USEMODULE += gnrc_sock_udp
