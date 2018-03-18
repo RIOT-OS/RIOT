@@ -29,6 +29,7 @@
 #include <stdbool.h>
 
 #include "kernel_types.h"
+#include "thread.h"
 #include "msg.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/netapi.h"
@@ -57,11 +58,20 @@ extern "C" {
 typedef struct gnrc_netif_ops gnrc_netif_ops_t;
 
 /**
+ * @brief   Netif bootstrap function prototype for netdev stack
+ *
+ * Called as a starting point for the netif threads. Expected to call the
+ * thread event handler @ref gnrc_netif_thread.
+ */
+typedef thread_task_func_t gnrc_netif_bootstrap_t;
+
+/**
  * @brief   Representation of a network interface
  */
 typedef struct {
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
     netdev_t *dev;                          /**< Network device of the network interface */
+    netdev_t *hwdev;                        /**< Hardware layer of the network device */
     rmutex_t mutex;                         /**< Mutex of the interface */
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
@@ -211,6 +221,7 @@ struct gnrc_netif_ops {
  * @param[in] priority  Priority for the network interface's thread.
  * @param[in] name      Name for the network interface. May be NULL.
  * @param[in] dev       Device for the interface.
+ * @param[in] bootstrap Device bootstrap function for netdev setup.
  * @param[in] ops       Operations for the network interface.
  *
  * @note If @ref DEVELHELP is defined netif_params_t::name is used as the
@@ -224,6 +235,7 @@ struct gnrc_netif_ops {
  */
 gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
                                 const char *name, netdev_t *dev,
+                                gnrc_netif_bootstrap_t bootstrap,
                                 const gnrc_netif_ops_t *ops);
 
 /**
@@ -478,6 +490,12 @@ char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
  */
 size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out);
 
+/**
+ * @brief   gnrc netif thread event handler.
+ *
+ * @param[in] args   The network interface
+ */
+void *gnrc_netif_thread(void *args);
 #ifdef __cplusplus
 }
 #endif
