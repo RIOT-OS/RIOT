@@ -114,6 +114,9 @@ static const uart_conf_t uart_config[] = {
         .scgc_bit = SIM_SCGC5_LPUART0_SHIFT,
         .mode   = UART_MODE_8N1,
         .type   = KINETIS_LPUART,
+        /* Using LLWU requires using lower baud rates */
+        /* LLWU_WAKEUP_PIN_PTC6 is the correct setting on this dev board if using LLWU */
+        .llwu_rx = LLWU_WAKEUP_PIN_UNDEF,
     },
 };
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
