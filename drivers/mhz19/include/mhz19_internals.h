@@ -27,7 +27,7 @@ extern "C" {
  *
  * Fixed at 9600 by design.
  */
-#define MHZ19_UART_BAUDRATE             9600
+#define MHZ19_UART_BAUDRATE 9600
 
 /**
  * @name    MH-Z19 Buffer size
@@ -42,7 +42,7 @@ extern "C" {
  * The start byte is not stored because it is not used in the checksum
  * calculation.
  */
-#define MHZ19_BUF_SIZE                  8
+#define MHZ19_BUF_SIZE      8
 
 
 /**
@@ -54,7 +54,7 @@ extern "C" {
  * A single byte takes 10 bits effectively: a start bit, 8 bits data
  * and stop bit. 9 bytes are transmitted, thus 10 bits * 9 / 9600bps = 9.3 ms.
  */
-#define MHZ19_READ_TIMEOUT              20
+#define MHZ19_READ_TIMEOUT  20
 
 /**
  * @name    MH-Z19 transmission constants

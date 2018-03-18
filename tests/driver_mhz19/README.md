@@ -1,7 +1,8 @@
-# MH-Z19 Driver Test
+# MH-Z19/MH-Z19B Driver Test
 
 ## Introduction
-This test will test if the MH-Z19 C02 gas sensor is working.
+This test will test if the MH-Z19 C02 gas sensor is working. The MH-Z19B seems
+to be newer design which also works with this driver.
 
 ## Configuration
 

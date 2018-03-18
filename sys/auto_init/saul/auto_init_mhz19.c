@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Koen Zandberg
+ * Copyright (C) 2018 Koen Zandberg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -57,7 +57,6 @@ void auto_init_mhz19(void)
             continue;
         }
 
-        /* temperature */
         saul_entries[i].dev = &(mhz19_devs[i]);
         saul_entries[i].name = mhz19_saul_reg_info[i].name;
         saul_entries[i].driver = &mhz19_ppm_saul_driver;

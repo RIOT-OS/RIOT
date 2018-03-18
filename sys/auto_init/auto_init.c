@@ -283,6 +283,10 @@ void auto_init(void)
 extern void auto_init_lis3mdl(void);
 auto_init_lis3mdl();
 #endif
+#ifdef MODULE_MHZ19
+    extern void auto_init_mhz19(void);
+    auto_init_mhz19();
+#endif
 #ifdef MODULE_MAG3110
     extern void auto_init_mag3110(void);
     auto_init_mag3110();
