@@ -98,7 +98,8 @@
 typedef struct {
     uart_rx_cb_t rx_cb;     /**< data received interrupt callback */
     void *arg;              /**< argument to both callback routines */
-    unsigned active;        /**< set to 1 while the receiver is active */
+    unsigned active;        /**< set to 1 while the receiver is active, to avoid mismatched PM_BLOCK/PM_UNBLOCK */
+    unsigned enabled;       /**< set to 1 while the receiver is enabled, to avoid mismatched PM_BLOCK/PM_UNBLOCK */
 } uart_isr_ctx_t;
 
 /**
@@ -110,9 +111,13 @@ static inline void uart_init_pins(uart_t uart);
 
 #if KINETIS_HAVE_UART
 static inline void uart_init_uart(uart_t uart, uint32_t baudrate);
+static inline void uart_poweron_uart(uart_t uart);
+static inline void uart_poweroff_uart(uart_t uart);
 #endif
 #if KINETIS_HAVE_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate);
+static inline void uart_poweron_lpuart(uart_t uart);
+static inline void uart_poweroff_lpuart(uart_t uart);
 #endif
 
 /* Only use the dispatch function for uart_write if both UART and LPUART are
@@ -142,6 +147,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     config[uart].rx_cb = rx_cb;
     config[uart].arg = arg;
     config[uart].active = 0;
+    config[uart].enabled = 0;
 
     uart_init_pins(uart);
 
@@ -163,34 +169,86 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             return UART_NODEV;
     }
 
-    if (config[uart].rx_cb) {
-#if MODULE_PERIPH_LLWU
-        if (uart_config[uart].llwu_rx != LLWU_WAKEUP_PIN_UNDEF) {
-            /* Configure the RX pin for LLWU wakeup to be able to use RX in LLS mode */
-            llwu_wakeup_pin_set(uart_config[uart].llwu_rx, LLWU_WAKEUP_EDGE_FALLING, NULL, NULL);
-        }
-        else
-#endif
-        {
-            /* UART and LPUART receivers are stopped in LLS, prevent LLS when there
-             * is a configured RX callback and no LLWU wakeup pin configured */
-            DEBUG("uart: Blocking LLS\n");
-            PM_BLOCK(KINETIS_PM_LLS);
-        }
-    }
+    uart_poweron(uart);
+
     return UART_OK;
 }
 
 void uart_poweron(uart_t uart)
 {
-    (void)uart;
-    /* not implemented (yet) */
+    assert(uart < UART_NUMOF);
+    if (config[uart].rx_cb) {
+        unsigned state = irq_disable();
+        if (!config[uart].enabled) {
+            config[uart].enabled = 1;
+#if MODULE_PERIPH_LLWU
+            if (uart_config[uart].llwu_rx != LLWU_WAKEUP_PIN_UNDEF) {
+                /* Configure the RX pin for LLWU wakeup to be able to use RX in LLS mode */
+                llwu_wakeup_pin_set(uart_config[uart].llwu_rx, LLWU_WAKEUP_EDGE_FALLING, NULL, NULL);
+            }
+            else
+#endif
+            {
+                /* UART and LPUART receivers are stopped in LLS, prevent LLS when there
+                 * is a configured RX callback and no LLWU wakeup pin configured */
+                DEBUG("uart: Blocking LLS\n");
+                PM_BLOCK(KINETIS_PM_LLS);
+            }
+        }
+        irq_restore(state);
+    }
+    switch (uart_config[uart].type) {
+#if KINETIS_HAVE_UART
+        case KINETIS_UART:
+            uart_poweron_uart(uart);
+            break;
+#endif
+#if KINETIS_HAVE_LPUART
+        case KINETIS_LPUART:
+            uart_poweron_lpuart(uart);
+            break;
+#endif
+        default:
+            return;
+    }
 }
 
 void uart_poweroff(uart_t uart)
 {
-    (void)uart;
-    /* not implemented (yet) */
+    assert(uart < UART_NUMOF);
+    if (config[uart].rx_cb) {
+        unsigned state = irq_disable();
+        if (config[uart].enabled) {
+            config[uart].enabled = 0;
+#if MODULE_PERIPH_LLWU
+            if (uart_config[uart].llwu_rx != LLWU_WAKEUP_PIN_UNDEF) {
+                /* Disable LLWU wakeup for the RX pin */
+                llwu_wakeup_pin_set(uart_config[uart].llwu_rx, LLWU_WAKEUP_EDGE_NONE, NULL, NULL);
+            }
+            else
+#endif
+            {
+                /* re-enable LLS since we are not listening anymore */
+                DEBUG("uart: unblocking LLS\n");
+                PM_UNBLOCK(KINETIS_PM_LLS);
+            }
+        }
+        irq_restore(state);
+    }
+    switch (uart_config[uart].type) {
+#if KINETIS_HAVE_UART
+        case KINETIS_UART:
+            uart_poweroff_uart(uart);
+            break;
+#endif
+#if KINETIS_HAVE_LPUART
+        case KINETIS_LPUART:
+            uart_poweroff_lpuart(uart);
+            break;
+#endif
+        default:
+            return;
+    }
 }
 
 #if KINETIS_HAVE_UART && KINETIS_HAVE_LPUART
@@ -258,8 +316,8 @@ static inline void uart_init_uart(uart_t uart, uint32_t baudrate)
      * TXFIFOSIZE == 0 means size = 1 (i.e. only one byte, no hardware FIFO) */
     if ((dev->PFIFO & UART_PFIFO_TXFIFOSIZE_MASK) != 0) {
         uint8_t txfifo_size =
-        (2 << ((dev->PFIFO & UART_PFIFO_TXFIFOSIZE_MASK) >>
-        UART_PFIFO_TXFIFOSIZE_SHIFT));
+            (2 << ((dev->PFIFO & UART_PFIFO_TXFIFOSIZE_MASK) >>
+            UART_PFIFO_TXFIFOSIZE_SHIFT));
         dev->TWFIFO = UART_TWFIFO_TXWATER(txfifo_size - 1);
     }
     else {
@@ -273,11 +331,12 @@ static inline void uart_init_uart(uart_t uart, uint32_t baudrate)
     dev->CFIFO = UART_CFIFO_RXFLUSH_MASK | UART_CFIFO_TXFLUSH_MASK;
 #endif /* KINETIS_UART_ADVANCED */
 
-    /* enable transmitter and receiver + RX interrupt + IDLE interrupt */
-    dev->C2 = UART_C2_TE_MASK | UART_C2_RE_MASK | UART_C2_RIE_MASK | UART_C2_ILIE_MASK;
-    /* enable interrupts on failure flags */
-    dev->C3 |= UART_C3_ORIE_MASK | UART_C3_PEIE_MASK | UART_C3_FEIE_MASK | UART_C3_NEIE_MASK;
-
+    /* enable receiver + RX interrupt + IDLE interrupt */
+    if (config[uart].rx_cb) {
+        dev->C2 = UART_C2_TE_MASK | UART_C2_RE_MASK | UART_C2_RIE_MASK | UART_C2_ILIE_MASK;
+        /* enable interrupts on failure flags */
+        dev->C3 |= UART_C3_ORIE_MASK | UART_C3_PEIE_MASK | UART_C3_FEIE_MASK | UART_C3_NEIE_MASK;
+    }
     /* enable receive interrupt */
     NVIC_EnableIRQ(uart_config[uart].irqn);
 }
@@ -292,6 +351,28 @@ KINETIS_UART_WRITE_INLINE void uart_write_uart(uart_t uart, const uint8_t *data,
     }
     /* Wait for transmission complete */
     while ((dev->S1 & UART_S1_TC_MASK) == 0) {}
+}
+
+static inline void uart_poweron_uart(uart_t uart)
+{
+    UART_Type *dev = uart_config[uart].dev;
+
+    /* Enable transmitter */
+    bit_set8(&dev->C2, UART_C2_TE_SHIFT);
+    if (config[uart].rx_cb) {
+        /* Enable receiver */
+        bit_set8(&dev->C2, UART_C2_RE_SHIFT);
+    }
+}
+
+static inline void uart_poweroff_uart(uart_t uart)
+{
+    UART_Type *dev = uart_config[uart].dev;
+
+    /* Disable receiver */
+    bit_clear8(&dev->C2, UART_C2_RE_SHIFT);
+    /* Disable transmitter */
+    bit_clear8(&dev->C2, UART_C2_TE_SHIFT);
 }
 
 #if defined(UART_0_ISR) || defined(UART_1_ISR) || defined(UART_2_ISR) || \
@@ -441,12 +522,18 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
     /* set baud rate, enable RX active edge interrupt */
     dev->BAUD = LPUART_BAUD_OSR(best_osr - 1) | LPUART_BAUD_SBR(sbr) | LPUART_BAUD_RXEDGIE_MASK;
 
-    /* enable transmitter and receiver + RX interrupt */
-    dev->CTRL |= LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK |
-        LPUART_CTRL_RIE_MASK | LPUART_CTRL_IDLECFG(LPUART_IDLECFG) |
-        LPUART_CTRL_ILIE_MASK;
+    /* Enable transmitter */
+    dev->CTRL |= LPUART_CTRL_TE_MASK;
 
-    /* enable receive interrupt */
+    if (config[uart].rx_cb) {
+        /* enable receiver + RX interrupt + error interrupts */
+        dev->CTRL |= LPUART_CTRL_RE_MASK | LPUART_CTRL_RIE_MASK |
+            LPUART_CTRL_ILIE_MASK | LPUART_CTRL_IDLECFG(LPUART_IDLECFG) |
+            LPUART_CTRL_ORIE_MASK | LPUART_CTRL_PEIE_MASK |
+            LPUART_CTRL_FEIE_MASK | LPUART_CTRL_NEIE_MASK;
+    }
+
+    /* enable interrupts from LPUART module */
     NVIC_EnableIRQ(uart_config[uart].irqn);
 }
 
@@ -460,6 +547,28 @@ KINETIS_UART_WRITE_INLINE void uart_write_lpuart(uart_t uart, const uint8_t *dat
     }
     /* Wait for transmission complete */
     while ((dev->STAT & LPUART_STAT_TC_MASK) == 0) {}
+}
+
+static inline void uart_poweron_lpuart(uart_t uart)
+{
+    LPUART_Type *dev = uart_config[uart].dev;
+
+    /* Enable transmitter */
+    bit_set32(&dev->CTRL, LPUART_CTRL_TE_SHIFT);
+    if (config[uart].rx_cb) {
+        /* Enable receiver */
+        bit_set32(&dev->CTRL, LPUART_CTRL_RE_SHIFT);
+    }
+}
+
+static inline void uart_poweroff_lpuart(uart_t uart)
+{
+    LPUART_Type *dev = uart_config[uart].dev;
+
+    /* Disable receiver */
+    bit_clear32(&dev->CTRL, LPUART_CTRL_RE_SHIFT);
+    /* Disable transmitter */
+    bit_clear32(&dev->CTRL, LPUART_CTRL_TE_SHIFT);
 }
 
 #if defined(LPUART_0_ISR) || defined(LPUART_1_ISR) || defined(LPUART_2_ISR) || \
