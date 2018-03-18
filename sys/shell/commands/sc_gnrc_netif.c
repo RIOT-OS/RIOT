@@ -426,6 +426,10 @@ static void _netif_list(kernel_pid_t iface)
     if (res >= 0) {
         printf(" CR: %s ", _netopt_coding_rate_str[u8]);
     }
+    res = gnrc_netapi_get(iface, NETOPT_LINK_CONNECTED, 0, &u8, sizeof(u8));
+    if (res >= 0) {
+        printf(" Link: %s ", (netopt_enable_t)u8 ? "up" : "down" );
+    }
     line_thresh = _newline(0U, line_thresh);
     res = gnrc_netapi_get(iface, NETOPT_ADDRESS_LONG, 0, hwaddr, sizeof(hwaddr));
     if (res >= 0) {
