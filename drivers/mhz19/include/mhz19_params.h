@@ -34,28 +34,21 @@ extern "C" {
 #ifndef MHZ19_PARAM_UART_DEV
 #define MHZ19_PARAM_UART_DEV        UART_DEV(1)
 #endif
-#ifndef MHZ19_PARAM_UART_BAUD
-#define MHZ19_PARAM_UART_BAUDRATE   9600
+
+#ifndef MHZ19_PARAMS
+#define MHZ19_PARAMS    { .uart = MHZ19_PARAM_UART_DEV }
 #endif
 
-#define MHZ19_PARAMS_DEFAULT    { .uart = MHZ19_PARAM_UART_DEV }
-
+#ifndef MHZ19_SAUL_INFO
+#define MHZ19_SAUL_INFO { .name = "mh-z19" }
+#endif
 /**
  * @brief   Configure MHZ19
  */
 static const mhz19_params_t mhz19_params[] =
 {
-#ifdef MHZ19_PARAMS_BOARD
-    MHZ19_PARAMS_BOARD,
-#else
-    MHZ19_PARAMS_DEFAULT
-#endif
+    MHZ19_PARAMS
 };
-
-/**
- * @brief   The number of configured sensors
- */
-#define MHZ19_NUMOF    (sizeof(mhz19_params) / sizeof(mhz19_params[0]))
 
 /**
  * @brief   Configuration details of SAUL registry entries
@@ -64,9 +57,9 @@ static const mhz19_params_t mhz19_params[] =
  * for each device. Please be awar that the indexes are used in
  * auto_init_mhz280, so make sure the indexes match.
  */
-static const saul_reg_info_t mhz19_saul_reg_info[MHZ19_NUMOF] =
+static const saul_reg_info_t mhz19_saul_reg_info[] =
 {
-    { .name = "mh-z19" }
+    MHZ19_SAUL_INFO
 };
 
 #ifdef __cplusplus

@@ -41,14 +41,19 @@ static mhz19_t mhz19_devs[MHZ19_NUMOF];
 static saul_reg_t saul_entries[MHZ19_NUMOF];
 
 /**
+ * @brief   Define the number of saul info
+ */
+#define MHZ19_INFO_NUM    (sizeof(mhz19_saul_info) / sizeof(mhz19_saul_info[0]))
+
+/**
  * @brief   Reference the driver structs.
- * @{
  */
 extern const saul_driver_t mhz19_ppm_saul_driver;
-/** @} */
 
 void auto_init_mhz19(void)
 {
+    assert(MHZ19_NUM == MHZ19_INFO_NUM);
+
     for (unsigned i = 0; i < MHZ19_NUMOF; i++) {
         LOG_DEBUG("[auto_init_saul] initializing mhz19 #%u\n", i);
 
