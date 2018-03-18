@@ -19,9 +19,12 @@
 #include "net/ethernet/hdr.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "net/gnrc/netif/internal.h"
 #ifdef MODULE_GNRC_IPV6
 #include "net/ipv6/hdr.h"
 #endif
+
+#include "net/netdev/eth.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -31,6 +34,7 @@
 #endif
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
+static void *_bootstrap(void *arg);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
 static const gnrc_netif_ops_t ethernet_ops = {
@@ -45,6 +49,7 @@ gnrc_netif_t *gnrc_netif_ethernet_create(char *stack, int stacksize,
                                          netdev_t *dev)
 {
     return gnrc_netif_create(stack, stacksize, priority, name, dev,
+                             _bootstrap,
                              &ethernet_ops);
 }
 
@@ -69,6 +74,11 @@ static inline void _addr_set_multicast(uint8_t *dst, gnrc_pktsnip_t *payload)
             _addr_set_broadcast(dst);
             break;
     }
+}
+
+static void *_bootstrap(void *args)
+{
+    return gnrc_netif_thread(args);
 }
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
