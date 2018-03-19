@@ -1,0 +1,22 @@
+# define the cpu used by SLSTK3402A
+export CPU = efm32
+export CPU_MODEL = efm32pg12b500f1024gl125
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup JLink for flashing
+export JLINK_DEVICE := $(CPU_MODEL)
+include $(RIOTMAKE)/tools/jlink.inc.mk
+
+# add board common drivers
+USEMODULE += boards_common_silabs
+USEMODULE += silabs_aem
+USEMODULE += silabs_bc
+
+# include board common
+include $(RIOTBOARD)/common/silabs/Makefile.include
