@@ -43,14 +43,12 @@
  * In your `main.c`, some header files must be first included:
  * ```c
  *     #include "net/loramac.h"     /* core loramac definitions */
- *     #include "semtech-loramac.h" /* package API */
- *     #include "sx127x.h"          /* SX1272/6 device driver API */
- *     #include "sx127x_params.h"   /* SX1272/6 device driver initialization parameters */
+ *     #include "semtech_loramac.h" /* package API */
  * ```
  *
  * Then define global variables:
  * ```c
- *     sx127x_t sx127x;  /* SX1272/6 device descriptor */
+ *     semtech_loramac_t loramac;  /* The loramac stack device descriptor */
  *     /* define the required keys for OTAA, e.g over-the-air activation (the
  *        null arrays need to be updated with valid LoRa values) */
  *     static const uint8_t deveui[LORAMAC_DEVEUI_LEN] = { 0x00, 0x00, 0x00, 0x00, \
@@ -64,39 +62,40 @@
  * ```
  *
  * Now in the `main` function:
- * 1. setup the radio driver with the initialization parameters (spi bus, pins, etc)
- * 2. initialize the LoRaMAC MAC layer
- * 3. set the LoRa keys
- * 4. join the network
- * 5. send some data to the network
+ * 1. initialize the LoRaMAC MAC layer
+ * 2. set the LoRa keys
+ * 3. join the network
+ * 4. send some data to the network
+ * 5. wait for any potentially received data
  *
  * ```c
  * int main(void)
  * {
- *     /* 1. setup the radio driver */
- *     sx127x_setup(&sx127x, &sx127x_params[0]);
+ *     /* 1. initialize the LoRaMAC MAC layer */
+ *     semtech_loramac_init(&loramac);
  *
- *     /* 2. initialize the LoRaMAC MAC layer */
- *     semtech_loramac_init(&sx127x);
+ *     /* 2. set the keys identifying the device */
+ *     semtech_loramac_set_deveui(&loramac, deveui);
+ *     semtech_loramac_set_appeui(&loramac, appeui);
+ *     semtech_loramac_set_appkey(&loramac, appkey);
  *
- *     /* 3. set the device required keys */
- *     semtech_loramac_set_deveui(deveui);
- *     semtech_loramac_set_appeui(appeui);
- *     semtech_loramac_set_appkey(appkey);
- *
- *     /* 4. join the network */
- *     if (semtech_loramac_join(LORAMAC_JOIN_OTAA) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
+ *     /* 3. join the network */
+ *     if (semtech_loramac_join(&loramac, LORAMAC_JOIN_OTAA) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
  *         puts("Join procedure failed");
  *         return 1;
  *     }
  *     puts("Join procedure succeeded");
  *
- *     /* 5. send some data using confirmable mode on port 10 and assuming no
- *           data is received */
+ *     /* 4. send some data */
  *     char *message = "This is RIOT";
- *     semtech_loramac_rx_data_t rx_data;
- *     semtech_loramac_send(LORAMAC_TX_CNF, 10,
-                            (uint8_t *)message, strlen(message), &rx_data);
+ *     semtech_loramac_send(&loramac, (uint8_t *)message, strlen(message));
+ *
+ *     /* 5. wait for any potentially received data */
+ *     if (semtech_loramac_recv(&loramac) == SEMTECH_LORAMAC_DATA_RECEIVED) {
+ *         loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
+ *         printf("Data received: %s, port: %d\n",
+ *                (char *)loramac.rx_data.payload, loramac.rx_data.port);
+ *     }
  * }
  * ```
  *
