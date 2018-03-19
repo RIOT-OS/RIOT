@@ -36,6 +36,9 @@
   sa_family_t sa_prefix##family
 
 #define __SOCKADDR_COMMON_SIZE  (sizeof (unsigned short int))
+#ifdef __MACH__
+#define AF_LINK (18)    /* Link layer interface */
+#endif
 #endif
 
 #include <stdlib.h>
