@@ -28,7 +28,12 @@
 extern "C" {
 #endif
 
+#ifndef __MACH__
 typedef size_t socklen_t;           /**< socket address length */
+#else
+/* Defined for OSX with a different type */
+typedef __darwin_socklen_t socklen_t;   /**< socket address length */
+#endif
 
 #ifdef __cplusplus
 }
