@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "msg.h"
+#include "mutex.h"
 
 #include "net/netdev.h"
 #include "net/loramac.h"
@@ -63,30 +64,21 @@
 
 #define SEMTECH_LORAMAC_MSG_QUEUE                   (16U)
 #define SEMTECH_LORAMAC_LORAMAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
+static msg_t _semtech_loramac_msg_queue[SEMTECH_LORAMAC_MSG_QUEUE];
 static char _semtech_loramac_stack[SEMTECH_LORAMAC_LORAMAC_STACKSIZE];
 kernel_pid_t semtech_loramac_pid;
-kernel_pid_t semtech_loramac_handler_pid;
 
+sx127x_t sx127x;
 RadioEvents_t semtech_loramac_radio_events;
-uint8_t semtech_loramac_dev_eui[LORAMAC_DEVEUI_LEN];
-uint8_t semtech_loramac_app_eui[LORAMAC_APPEUI_LEN];
-uint8_t semtech_loramac_app_key[LORAMAC_APPKEY_LEN];
-uint8_t semtech_loramac_nwk_skey[LORAMAC_NWKSKEY_LEN];
-uint8_t semtech_loramac_app_skey[LORAMAC_APPSKEY_LEN];
-uint8_t semtech_loramac_dev_addr[LORAMAC_DEVADDR_LEN];
-
-static uint8_t _semtech_loramac_radio_payload[SX127X_RX_BUFFER_SIZE];
-static semtech_loramac_rx_data_t _semtech_loramac_rx_data;
+LoRaMacPrimitives_t semtech_loramac_primitives;
+LoRaMacCallback_t semtech_loramac_callbacks;
 
 typedef struct {
-    uint8_t port;
-    uint8_t cnf;
-    uint8_t dr;
     uint8_t *payload;
     uint8_t len;
 } loramac_send_params_t;
 
-typedef void (*semtech_loramac_func_t)(void *);
+typedef void (*semtech_loramac_func_t)(semtech_loramac_t *, void *);
 
 /**
  * @brief   Struct containing a semtech loramac function call
@@ -99,12 +91,13 @@ typedef struct {
 } semtech_loramac_call_t;
 
 /* Prepares the payload of the frame */
-static bool _semtech_loramac_send(uint8_t cnf, uint8_t port, uint8_t dr,
+static bool _semtech_loramac_send(semtech_loramac_t *mac,
                                   uint8_t *payload, uint8_t len)
 {
     DEBUG("[semtech-loramac] send frame %s\n", (char *)payload);
     McpsReq_t mcpsReq;
     LoRaMacTxInfo_t txInfo;
+    uint8_t dr = semtech_loramac_get_dr(mac);
 
     if (LoRaMacQueryTxPossible(len, &txInfo) != LORAMAC_STATUS_OK) {
         DEBUG("[semtech-loramac] empty frame in order to flush MAC commands\n");
@@ -115,10 +108,10 @@ static bool _semtech_loramac_send(uint8_t cnf, uint8_t port, uint8_t dr,
         mcpsReq.Req.Unconfirmed.Datarate = (int8_t)dr;
     }
     else {
-        if (cnf == LORAMAC_TX_UNCNF) {
+        if (mac->cnf == LORAMAC_TX_UNCNF) {
             DEBUG("[semtech-loramac] MCPS_UNCONFIRMED\n");
             mcpsReq.Type = MCPS_UNCONFIRMED;
-            mcpsReq.Req.Unconfirmed.fPort = port;
+            mcpsReq.Req.Unconfirmed.fPort = mac->port;
             mcpsReq.Req.Unconfirmed.fBuffer = payload;
             mcpsReq.Req.Unconfirmed.fBufferSize = len;
             mcpsReq.Req.Unconfirmed.Datarate = (int8_t)dr;
@@ -126,7 +119,7 @@ static bool _semtech_loramac_send(uint8_t cnf, uint8_t port, uint8_t dr,
         else {
             DEBUG("[semtech-loramac] MCPS_CONFIRMED\n");
             mcpsReq.Type = MCPS_CONFIRMED;
-            mcpsReq.Req.Confirmed.fPort = port;
+            mcpsReq.Req.Confirmed.fPort = mac->port;
             mcpsReq.Req.Confirmed.fBuffer = payload;
             mcpsReq.Req.Confirmed.fBufferSize = len;
             mcpsReq.Req.Confirmed.NbTrials = 3;
@@ -156,9 +149,8 @@ static void mcps_confirm(McpsConfirm_t *confirm)
                    Check TxPower */
                 DEBUG("[semtech-loramac] MCPS confirm event UNCONFIRMED\n");
                 msg_t msg;
-                msg.type = MSG_TYPE_LORAMAC_NOTIFY;
-                msg.content.value = SEMTECH_LORAMAC_TX_DONE;
-                msg_send(&msg, semtech_loramac_handler_pid);
+                msg.type = MSG_TYPE_LORAMAC_TX_DONE;
+                msg_send(&msg, semtech_loramac_pid);
                 break;
             }
 
@@ -214,28 +206,15 @@ static void mcps_indication(McpsIndication_t *indication)
     }
 
     msg_t msg;
-    msg.type = MSG_TYPE_LORAMAC_NOTIFY;
     if (indication->RxData) {
-        indication->Buffer[indication->BufferSize] = '\0';
-        memcpy(_semtech_loramac_rx_data.payload, indication->Buffer,
-               indication->BufferSize);
-        _semtech_loramac_rx_data.payload[indication->BufferSize] = 0;
-        _semtech_loramac_rx_data.payload_len = indication->BufferSize;
-        _semtech_loramac_rx_data.port = indication->Port;
-        DEBUG("[semtech-loramac] MCPS indication:\n"
-              "  - Payload: %s\n"
-              "  - Size: %d\n"
-              "  - Port: %d\n",
-              (char *)_semtech_loramac_rx_data.payload,
-              _semtech_loramac_rx_data.payload_len,
-              _semtech_loramac_rx_data.port
-              );
-        msg.content.value = SEMTECH_LORAMAC_RX_DATA;
+        DEBUG("[semtech-loramac] MCPS indication: data received\n");
+        msg.type = MSG_TYPE_LORAMAC_RX;
+        msg.content.ptr = indication;
     }
     else {
-        msg.content.value = SEMTECH_LORAMAC_TX_DONE;
+        msg.type = MSG_TYPE_LORAMAC_TX_DONE;
     }
-    msg_send(&msg, semtech_loramac_handler_pid);
+    msg_send(&msg, semtech_loramac_pid);
 }
 
 /*MLME-Confirm event function */
@@ -248,17 +227,17 @@ static void mlme_confirm(MlmeConfirm_t *confirm)
                 /* Status is OK, node has joined the network */
                 DEBUG("[semtech-loramac] join succeeded\n");
                 msg_t msg;
-                msg.type = MSG_TYPE_LORAMAC_NOTIFY;
+                msg.type = MSG_TYPE_LORAMAC_JOIN;
                 msg.content.value = SEMTECH_LORAMAC_JOIN_SUCCEEDED;
-                msg_send(&msg, semtech_loramac_handler_pid);
+                msg_send(&msg, semtech_loramac_pid);
             }
             else {
                 DEBUG("[semtech-loramac] join not successful\n");
                 /* Join was not successful. */
                 msg_t msg;
-                msg.type = MSG_TYPE_LORAMAC_NOTIFY;
+                msg.type = MSG_TYPE_LORAMAC_JOIN;
                 msg.content.value = SEMTECH_LORAMAC_JOIN_FAILED;
-                msg_send(&msg, semtech_loramac_handler_pid);
+                msg_send(&msg, semtech_loramac_pid);
             }
             break;
 
@@ -267,24 +246,10 @@ static void mlme_confirm(MlmeConfirm_t *confirm)
     }
 }
 
-void _loramac_set_rx2_params(uint32_t freq, uint8_t dr)
+void _init_loramac(semtech_loramac_t *mac,
+                   LoRaMacPrimitives_t * primitives, LoRaMacCallback_t *callbacks)
 {
-    Rx2ChannelParams_t params;
-    params.Frequency = freq;
-    params.Datarate = dr;
-
-    MibRequestConfirm_t mibReq;
-    mibReq.Type = MIB_RX2_DEFAULT_CHANNEL;
-    mibReq.Param.Rx2DefaultChannel = params;
-    LoRaMacMibSetRequestConfirm(&mibReq);
-
-    mibReq.Type = MIB_RX2_CHANNEL;
-    mibReq.Param.Rx2Channel = params;
-    LoRaMacMibSetRequestConfirm(&mibReq);
-}
-
-void _init_loramac(LoRaMacPrimitives_t * primitives, LoRaMacCallback_t *callbacks)
-{
+    mutex_lock(&mac->lock);
     DEBUG("[semtech-loramac] initializing loramac\n");
     primitives->MacMcpsConfirm = mcps_confirm;
     primitives->MacMcpsIndication = mcps_indication;
@@ -324,9 +289,11 @@ void _init_loramac(LoRaMacPrimitives_t * primitives, LoRaMacCallback_t *callback
 #else
 #error "Please define a region in the compiler options."
 #endif
+    mutex_unlock(&mac->lock);
 
 #if defined(REGION_EU868) && USE_SEMTECH_DEFAULT_CHANNEL_LINEUP
     DEBUG("[semtech-loramac] EU868 region: use default channels\n");
+    mutex_lock(&mac->lock);
     LoRaMacChannelAdd(3, (ChannelParams_t)LC4);
     LoRaMacChannelAdd(4, (ChannelParams_t)LC5);
     LoRaMacChannelAdd(5, (ChannelParams_t)LC6);
@@ -334,15 +301,25 @@ void _init_loramac(LoRaMacPrimitives_t * primitives, LoRaMacCallback_t *callback
     LoRaMacChannelAdd(7, (ChannelParams_t)LC8);
     LoRaMacChannelAdd(8, (ChannelParams_t)LC9);
     LoRaMacChannelAdd(9, (ChannelParams_t)LC10);
+    mutex_unlock(&mac->lock);
 
-    _loramac_set_rx2_params(LORAMAC_DEFAULT_RX2_FREQ, LORAMAC_DEFAULT_RX2_DR);
+    semtech_loramac_set_rx2_dr(mac, LORAMAC_DEFAULT_RX2_DR);
+    semtech_loramac_set_rx2_freq(mac, LORAMAC_DEFAULT_RX2_FREQ);
 #endif
+
+    semtech_loramac_set_dr(mac, LORAMAC_DEFAULT_DR);
+    semtech_loramac_set_adr(mac, LORAMAC_DEFAULT_ADR);
+    semtech_loramac_set_public_network(mac, LORAMAC_DEFAULT_PUBLIC_NETWORK);
+    semtech_loramac_set_class(mac, LORAMAC_DEFAULT_DEVICE_CLASS);
+    semtech_loramac_set_tx_port(mac, LORAMAC_DEFAULT_TX_PORT);
+    semtech_loramac_set_tx_mode(mac, LORAMAC_DEFAULT_TX_MODE);
 }
 
-static void _join_otaa(void)
+static void _join_otaa(semtech_loramac_t *mac)
 {
     DEBUG("[semtech-loramac] starting OTAA join\n");
 
+    mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_NETWORK_JOINED;
     mibReq.Param.IsNetworkJoined = false;
@@ -350,65 +327,69 @@ static void _join_otaa(void)
 
     MlmeReq_t mlmeReq;
     mlmeReq.Type = MLME_JOIN;
-    mlmeReq.Req.Join.DevEui = semtech_loramac_dev_eui;
-    mlmeReq.Req.Join.AppEui = semtech_loramac_app_eui;
-    mlmeReq.Req.Join.AppKey = semtech_loramac_app_key;
+    mlmeReq.Req.Join.DevEui = mac->deveui;
+    mlmeReq.Req.Join.AppEui = mac->appeui;
+    mlmeReq.Req.Join.AppKey = mac->appkey;
     mlmeReq.Req.Join.NbTrials = LORAWAN_MAX_JOIN_RETRIES;
     LoRaMacMlmeRequest(&mlmeReq);
+    mutex_unlock(&mac->lock);
 }
 
-static void _join_abp(void)
+static void _join_abp(semtech_loramac_t *mac)
 {
     DEBUG("[semtech-loramac] starting ABP join\n");
 
+    semtech_loramac_set_netid(mac, LORAMAC_DEFAULT_NETID);
+
+    mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_NETWORK_JOINED;
     mibReq.Param.IsNetworkJoined = false;
     LoRaMacMibSetRequestConfirm(&mibReq);
 
-    semtech_loramac_set_netid(LORAMAC_DEFAULT_NETID);
-
     mibReq.Type = MIB_DEV_ADDR;
-    mibReq.Param.DevAddr = ((uint32_t)semtech_loramac_dev_addr[0] << 24 |
-                            (uint32_t)semtech_loramac_dev_addr[1] << 16 |
-                            (uint32_t)semtech_loramac_dev_addr[2] << 8 |
-                            (uint32_t)semtech_loramac_dev_addr[3]);
+    mibReq.Param.DevAddr = ((uint32_t)mac->devaddr[0] << 24 |
+                            (uint32_t)mac->devaddr[1] << 16 |
+                            (uint32_t)mac->devaddr[2] << 8 |
+                            (uint32_t)mac->devaddr[3]);
     LoRaMacMibSetRequestConfirm(&mibReq);
 
     mibReq.Type = MIB_NWK_SKEY;
-    mibReq.Param.NwkSKey = semtech_loramac_nwk_skey;
+    mibReq.Param.NwkSKey = mac->nwkskey;
     LoRaMacMibSetRequestConfirm(&mibReq);
 
     mibReq.Type = MIB_APP_SKEY;
-    mibReq.Param.AppSKey = semtech_loramac_app_skey;
+    mibReq.Param.AppSKey = mac->appskey;
     LoRaMacMibSetRequestConfirm(&mibReq);
 
     mibReq.Type = MIB_NETWORK_JOINED;
     mibReq.Param.IsNetworkJoined = true;
     LoRaMacMibSetRequestConfirm(&mibReq);
+
+    /* switch back to idle state now*/
+    mac->state = SEMTECH_LORAMAC_STATE_IDLE;
+    mutex_unlock(&mac->lock);
 }
 
-static void _join(void *arg)
+static void _join(semtech_loramac_t *mac, void *arg)
 {
-    (void) arg;
     uint8_t join_type = *(uint8_t *)arg;
 
     switch (join_type) {
         case LORAMAC_JOIN_OTAA:
-            _join_otaa();
+            _join_otaa(mac);
             break;
 
         case LORAMAC_JOIN_ABP:
-            _join_abp();
+            _join_abp(mac);
             break;
     }
 }
 
-static void _send(void *arg)
+static void _send(semtech_loramac_t *mac, void *arg)
 {
     loramac_send_params_t params = *(loramac_send_params_t *)arg;
-    _semtech_loramac_send(params.cnf, params.port, params.dr,
-                          params.payload, params.len);
+    _semtech_loramac_send(mac, params.payload, params.len);
 }
 
 static void _semtech_loramac_call(semtech_loramac_func_t func, void *arg)
@@ -417,10 +398,10 @@ static void _semtech_loramac_call(semtech_loramac_func_t func, void *arg)
     call.func = func;
     call.arg = arg;
 
-    msg_t msg;
+    msg_t msg, msg_resp;
     msg.type = MSG_TYPE_LORAMAC_CMD;
     msg.content.ptr = &call;
-    msg_send(&msg, semtech_loramac_pid);
+    msg_send_receive(&msg, &msg_resp, semtech_loramac_pid);
 }
 
 static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
@@ -454,12 +435,12 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
         case NETDEV_EVENT_RX_COMPLETE:
         {
             size_t len;
+            uint8_t radio_payload[SX127X_RX_BUFFER_SIZE];
             len = dev->driver->recv(dev, NULL, 0, 0);
-            dev->driver->recv(dev, _semtech_loramac_radio_payload, len, &packet_info);
-            semtech_loramac_radio_events.RxDone(_semtech_loramac_radio_payload,
-                                                 len,
-                                                 packet_info.rssi,
-                                                 packet_info.snr);
+            dev->driver->recv(dev, radio_payload, len, &packet_info);
+            semtech_loramac_radio_events.RxDone(radio_payload,
+                                                len, packet_info.rssi,
+                                                packet_info.snr);
             break;
         }
         case NETDEV_EVENT_RX_TIMEOUT:
@@ -492,69 +473,105 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
 
 void *_semtech_loramac_event_loop(void *arg)
 {
-    (void) arg;
-    static msg_t _msg_q[SEMTECH_LORAMAC_MSG_QUEUE];
-    msg_init_queue(_msg_q, SEMTECH_LORAMAC_MSG_QUEUE);
-    LoRaMacPrimitives_t primitives;
-    LoRaMacCallback_t callbacks;
-
-    _init_loramac(&primitives, &callbacks);
-    semtech_loramac_set_dr(LORAMAC_DEFAULT_DR);
-    semtech_loramac_set_adr(LORAMAC_DEFAULT_ADR);
-    semtech_loramac_set_public_network(LORAMAC_DEFAULT_PUBLIC_NETWORK);
-    semtech_loramac_set_class(LORAMAC_DEFAULT_DEVICE_CLASS);
+    msg_init_queue(_semtech_loramac_msg_queue, SEMTECH_LORAMAC_MSG_QUEUE);
+    semtech_loramac_t *mac = (semtech_loramac_t *)arg;
 
     while (1) {
         msg_t msg;
         msg_receive(&msg);
-        switch (msg.type) {
-            case MSG_TYPE_ISR:
-            {
-                netdev_t *dev = msg.content.ptr;
-                dev->driver->isr(dev);
-                break;
-            }
-            case MSG_TYPE_RX_TIMEOUT:
-                DEBUG("[semtech-loramac] RX timer timeout\n");
-                semtech_loramac_radio_events.RxTimeout();
-                break;
+        if (msg.type == MSG_TYPE_ISR) {
+            netdev_t *dev = msg.content.ptr;
+            dev->driver->isr(dev);
+        }
+        else {
+            switch (msg.type) {
+                case MSG_TYPE_RX_TIMEOUT:
+                    DEBUG("[semtech-loramac] RX timer timeout\n");
+                    semtech_loramac_radio_events.RxTimeout();
+                    break;
 
-            case MSG_TYPE_TX_TIMEOUT:
-                DEBUG("[semtech-loramac] TX timer timeout\n");
-                semtech_loramac_radio_events.TxTimeout();
-                break;
+                case MSG_TYPE_TX_TIMEOUT:
+                    DEBUG("[semtech-loramac] TX timer timeout\n");
+                    semtech_loramac_radio_events.TxTimeout();
+                    break;
 
-            case MSG_TYPE_MAC_TIMEOUT:
-            {
-                DEBUG("[semtech-loramac] MAC timer timeout\n");
-                void (*callback)(void) = msg.content.ptr;
-                callback();
-                break;
+                case MSG_TYPE_MAC_TIMEOUT:
+                {
+                    DEBUG("[semtech-loramac] MAC timer timeout\n");
+                    void (*callback)(void) = msg.content.ptr;
+                    callback();
+                    break;
+                }
+                case MSG_TYPE_LORAMAC_CMD:
+                {
+                    msg_t msg_resp;
+                    DEBUG("[semtech-loramac] loramac cmd\n");
+                    mac->state = SEMTECH_LORAMAC_STATE_BUSY;
+                    semtech_loramac_call_t *call = msg.content.ptr;
+                    call->func(mac, call->arg);
+                    msg_reply(&msg, &msg_resp);
+                    break;
+                }
+                case MSG_TYPE_LORAMAC_JOIN:
+                {
+                    DEBUG("[semtech-loramac] loramac join notification\n");
+                    msg_t msg_ret;
+                    msg_ret.content.value = msg.content.value;
+                    msg_send(&msg_ret, mac->caller_pid);
+                    /* switch back to idle state now*/
+                    mac->state = SEMTECH_LORAMAC_STATE_IDLE;
+                    break;
+                }
+                case MSG_TYPE_LORAMAC_TX_DONE:
+                {
+                    DEBUG("[semtech-loramac] loramac TX done\n");
+                    msg_t msg_ret;
+                    msg_ret.type = MSG_TYPE_LORAMAC_TX_DONE;
+                    msg_send(&msg_ret, mac->caller_pid);
+                    /* switch back to idle state now*/
+                    mac->state = SEMTECH_LORAMAC_STATE_IDLE;
+                    break;
+                }
+                case MSG_TYPE_LORAMAC_RX:
+                {
+                    msg_t msg_ret;
+                    msg_ret.type = MSG_TYPE_LORAMAC_RX;
+                    McpsIndication_t *indication = (McpsIndication_t *)msg.content.ptr;
+                    memcpy(mac->rx_data.payload,
+                           indication->Buffer, indication->BufferSize);
+                    mac->rx_data.payload_len = indication->BufferSize;
+                    mac->rx_data.port = indication->Port;
+                    DEBUG("[semtech-loramac] loramac RX data:\n"
+                          "  - Payload: %s\n"
+                          "  - Size: %d\n"
+                          "  - Port: %d\n",
+                          (char *)mac->rx_data.payload,
+                          mac->rx_data.payload_len,
+                          mac->rx_data.port);
+                    msg_send(&msg_ret, mac->caller_pid);
+                    /* switch back to idle state now*/
+                    mac->state = SEMTECH_LORAMAC_STATE_IDLE;
+                    break;
+                }
+                default:
+                    DEBUG("[semtech-loramac] Unexpected msg type '%04x'\n",
+                          msg.type);
             }
-            case MSG_TYPE_LORAMAC_CMD:
-            {
-                DEBUG("[semtech-loramac] loramac cmd\n");
-                semtech_loramac_call_t *call = msg.content.ptr;
-                call->func(call->arg);
-                break;
-            }
-            default:
-                DEBUG("[semtech-loramac] Unexpected msg type '%04x'\n", msg.type);
         }
     }
 }
 
-int semtech_loramac_init(sx127x_t *dev)
+int semtech_loramac_init(semtech_loramac_t *mac)
 {
-    dev->netdev.driver = &sx127x_driver;
-    dev->netdev.event_callback = _semtech_loramac_event_cb;
+    sx127x_setup(&sx127x, &sx127x_params[0]);
+    sx127x.netdev.driver = &sx127x_driver;
+    sx127x.netdev.event_callback = _semtech_loramac_event_cb;
 
-    semtech_loramac_handler_pid = thread_getpid();
     semtech_loramac_pid = thread_create(_semtech_loramac_stack,
                                         sizeof(_semtech_loramac_stack),
                                         THREAD_PRIORITY_MAIN - 1,
                                         THREAD_CREATE_STACKTEST,
-                                        _semtech_loramac_event_loop, NULL,
+                                        _semtech_loramac_event_loop, mac,
                                         "recv_thread");
 
     if (semtech_loramac_pid <= KERNEL_PID_UNDEF) {
@@ -562,17 +579,29 @@ int semtech_loramac_init(sx127x_t *dev)
         return -1;
     }
 
+    _init_loramac(mac, &semtech_loramac_primitives, &semtech_loramac_callbacks);
+
     return 0;
 }
 
-uint8_t semtech_loramac_join(uint8_t type)
+uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type)
 {
+    DEBUG("Starting join procedure: %d\n", type);
+
+    if (mac->state != SEMTECH_LORAMAC_STATE_IDLE) {
+        DEBUG("[semtech-loramac] internal mac is busy\n");
+        return SEMTECH_LORAMAC_BUSY;
+    }
+
+    mac->caller_pid = thread_getpid();
+
     _semtech_loramac_call(_join, &type);
 
     if (type == LORAMAC_JOIN_OTAA) {
         /* Wait until the OTAA join procedure is complete */
         msg_t msg;
         msg_receive(&msg);
+        mac->state = SEMTECH_LORAMAC_STATE_IDLE;
         return (uint8_t)msg.content.value;
     }
 
@@ -580,36 +609,47 @@ uint8_t semtech_loramac_join(uint8_t type)
     return SEMTECH_LORAMAC_JOIN_SUCCEEDED;
 }
 
-uint8_t semtech_loramac_send(uint8_t cnf, uint8_t port,
-                             uint8_t *tx_buf, uint8_t tx_len,
-                             semtech_loramac_rx_data_t *rx_data)
+uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
 {
+    mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_NETWORK_JOINED;
     LoRaMacMibGetRequestConfirm(&mibReq);
+    bool is_joined = mibReq.Param.IsNetworkJoined;
+    mutex_unlock(&mac->lock);
 
-    if (!mibReq.Param.IsNetworkJoined) {
+    if (!is_joined) {
         DEBUG("[semtech-loramac] network is not joined\n");
         return SEMTECH_LORAMAC_NOT_JOINED;
     }
 
+    if (mac->state != SEMTECH_LORAMAC_STATE_IDLE) {
+        DEBUG("[semtech-loramac] internal mac is busy\n");
+        return SEMTECH_LORAMAC_BUSY;
+    }
+
     loramac_send_params_t params;
-    params.cnf = cnf;
-    params.port = port;
-    params.dr = semtech_loramac_get_dr();
-    params.payload = tx_buf;
-    params.len = tx_len;
+    params.payload = data;
+    params.len = len;
 
     _semtech_loramac_call(_send, &params);
 
-    /* Wait until sending is fully done */
+    return SEMTECH_LORAMAC_TX_SCHEDULED;
+}
+
+uint8_t semtech_loramac_recv(semtech_loramac_t *mac)
+{
+    mac->caller_pid = thread_getpid();
+
+    /* Wait until the mac receive some information */
     msg_t msg;
     msg_receive(&msg);
-    uint8_t status = (uint8_t)msg.content.value;
-    if (status == SEMTECH_LORAMAC_RX_DATA) {
-        memcpy(rx_data, &_semtech_loramac_rx_data,
-               sizeof(semtech_loramac_rx_data_t));
+    uint8_t ret = SEMTECH_LORAMAC_TX_DONE;
+    if (msg.type == MSG_TYPE_LORAMAC_RX) {
+        ret = SEMTECH_LORAMAC_DATA_RECEIVED;
     }
 
-    return status;
+    DEBUG("[semtech-loramac] MAC reply received: %d\n", ret);
+
+    return ret;
 }
