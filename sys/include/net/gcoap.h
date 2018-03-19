@@ -574,7 +574,7 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @param[in] buf           Buffer containing the PDU
  * @param[in] len           Length of the buffer
  * @param[in] remote        Destination for the packet
- * @param[in] resp_handler  Callback when response received
+ * @param[in] resp_handler  Callback when response received, may be NULL
  *
  * @return  length of the packet
  * @return  0 if cannot send
@@ -592,7 +592,7 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
  * @param[in] len           Length of the buffer
  * @param[in] addr          Destination for the packet
  * @param[in] port          Port at the destination
- * @param[in] resp_handler  Callback when response received
+ * @param[in] resp_handler  Callback when response received, may be NULL
  *
  * @return  length of the packet
  * @return  0 if cannot send

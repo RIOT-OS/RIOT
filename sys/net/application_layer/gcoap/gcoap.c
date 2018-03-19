@@ -200,7 +200,9 @@ static void _listen(sock_udp_t *sock)
             case COAP_TYPE_ACK:
                 xtimer_remove(&memo->response_timer);
                 memo->state = GCOAP_MEMO_RESP;
-                memo->resp_handler(memo->state, &pdu, &remote);
+                if (memo->resp_handler) {
+                    memo->resp_handler(memo->state, &pdu, &remote);
+                }
 
                 if (memo->send_limit >= 0) {        /* if confirmable */
                     *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
@@ -749,7 +751,6 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
 {
     gcoap_request_memo_t *memo = NULL;
     assert(remote != NULL);
-    assert(resp_handler != NULL);
 
     /* Find empty slot in list of open requests. */
     mutex_lock(&_coap_state.lock);
