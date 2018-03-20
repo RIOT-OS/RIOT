@@ -1,4 +1,4 @@
-HOST_TOOLS=ethos uhcpd
+HOST_TOOLS=ethos
 
 .PHONY: all $(HOST_TOOLS)
 

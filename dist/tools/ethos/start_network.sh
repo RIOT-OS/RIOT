@@ -20,20 +20,13 @@ cleanup() {
     echo "Cleaning up..."
     remove_tap
     ip a d fd00:dead:beef::1/128 dev lo
-    kill ${UHCPD_PID}
     trap "" INT QUIT TERM EXIT
-}
-
-start_uhcpd() {
-    ${UHCPD} ${TAP} ${PREFIX} > /dev/null &
-    UHCPD_PID=$!
 }
 
 PORT=$1
 TAP=$2
 PREFIX=$3
 BAUDRATE=115200
-UHCPD="$(readlink -f "${ETHOS_DIR}/../uhcpd/bin")/uhcpd"
 
 [ -z "${PORT}" -o -z "${TAP}" -o -z "${PREFIX}" ] && {
     echo "usage: $0 <serial-port> <tap-device> <prefix> [baudrate]"
@@ -47,4 +40,4 @@ UHCPD="$(readlink -f "${ETHOS_DIR}/../uhcpd/bin")/uhcpd"
 trap "cleanup" INT QUIT TERM EXIT
 
 
-create_tap && start_uhcpd && "${ETHOS_DIR}/ethos" ${TAP} ${PORT} ${BAUDRATE}
+create_tap && "${ETHOS_DIR}/ethos" ${TAP} ${PORT} ${BAUDRATE}
