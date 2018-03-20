@@ -7,6 +7,8 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+CFLAGS=-DGNRC_NETIF_IPV6_GROUPS_NUMOF=5
+
 # use ethos (ethernet over serial) for network communication and stdio over
 # UART, but not on native, as native has a tap interface towards the host.
 ifeq (,$(filter native,$(BOARD)))
@@ -52,11 +54,12 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
-# include UHCP client
-USEMODULE += gnrc_uhcpc
+# include DHCPv6 client
+USEMODULE += gnrc_dhcpv6_client
 
-# Optionally include RPL as a routing protocol. When includede gnrc_uhcpc will
-# configure the node as a RPL DODAG root when receiving a prefix.
+# Optionally include RPL as a routing protocol. When including
+# gnrc_dhcpv6_client will configure the node as a RPL DODAG root when receiving
+# a prefix.
 #USEMODULE += gnrc_rpl
 
 # Comment this out to disable code in RIOT that does safety checking
@@ -67,16 +70,9 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 TAP ?= tap0
-IPV6_PREFIX ?= 2001:db8::/64
+IPV6_PREFIX ?= 2001:db8::/32
 
-ifeq (native,$(BOARD))
-TERMDEPS += uhcpd-daemon
-
-.PHONY: uhcpd-daemon
-
-uhcpd-daemon: host-tools
-	$(RIOTTOOLS)/uhcpd/bin/uhcpd $(TAP) $(IPV6_PREFIX) &
-else
+ifneq (native,$(BOARD))
 # We override the `make term` command to use ethos
 TERMPROG ?= sudo sh $(RIOTTOOLS)/ethos/start_network.sh
 TERMFLAGS ?= $(PORT) $(TAP) $(IPV6_PREFIX)

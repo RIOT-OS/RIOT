@@ -1,30 +1,49 @@
 # gnrc_border_router using automatic configuration
-This setup uses a single serial interface, ethos (Ethernet Over Serial) 
-and UHCP (micro Host Configuration Protocol). 
+This setup uses a single serial interface, ethos (Ethernet Over Serial) and
+DHCPv6.
 Ethos multiplexes serial data to separate ethernet packets from shell commands.
-UHCP is in charge of configuring the wireless interface prefix 
-and routes on the BR.
+DHCPv6 is in charge of configuring the wireless interface prefix on the BR.
 
-The script `start_network.sh` enables a *ready-to-use* BR in only one command.
+The script `start_network.sh` enables a *ready-to-use* BR in only one command
+(given you have set-up a DHCPv6 server on your machine).
 
 ## Requirements
 This functionality works only on Linux machines.
 Mac OSX support will be added in the future (lack of native `tap` interface).
 
+You also will need to have a DHCPv6 server to be set up. As an example we use
+KEA (`sudo apt-get install kea-dhcp6-server` on Debian and Ubuntu machines), as
+it is supported by the ISC, freely available and easy to configure, but you can
+use any DHCPv6 client that is compliant to the DHCPv6 RFCs.
+
 ## Setup
-First, you need to compile `ethos`.
-Go to `/dist/tools/ethos` and type:
+You need to configure your DHCPv6 server for prefix delegation of the prefix you
+choose. Here is an example configuration for KEA with the prefix `2001:db8::/32`
+on the interface `tap0` (keep the attributes not mentioned here as is; for
+native, when using the `dist/tools/tapsetup/tapsetup` script you need to take
+the `tapbr0` interface though):
 
-```bash
-make clean all
+```json
+"Dhcp6":
+{
+  "interfaces-config": {
+    "interfaces": [ "tap0" ]
+  },
+  ...
+  "subnet6": [
+  {    "interface": "tap0",
+       "subnet": "2001:db8::/16",
+       "pd-pools": [ { "prefix": "2001:db8::",
+                       "prefix-len": 16,
+                       "delegated-len": 64 } ] },
+  ]
+  ...
+}
 ```
 
-Then, you need to compile UHCP.
-This tool is found in `/dist/tools/uhcpd`. So, as for `ethos`:
-
-```bash
-make clean all
-```
+Note that when working with TAP interfaces you might need to restart your DHCPv6
+server once *after* you started the border router application (see below), since
+Linux might not recognize the interface as connected.
 
 Afterwards, proceed to compile and flash `gnrc_border_router` to your board:
 
@@ -32,50 +51,65 @@ Afterwards, proceed to compile and flash `gnrc_border_router` to your board:
 make clean all flash
 ```
 
-## Usage
-Start the `start_network.sh` script by doing on `dist/tools/ethos`:
+When using `native` you also might need to configure your tap interface:
 
-```bash
-sudo sh start_network.sh /dev/ttyACMx tap0 2001:db8::/64
+```sh
+sudo ip a a fe80::1 dev tap0
+sudo ip route add 2001:db8::/32 via fe80::2 dev tap0
 ```
 
-This will execute the needed commands to setup a `tap` interface 
-and configure the BR.
-Notice that this will also configure `2001:db8::/64` as a prefix.
-This prefix should be announced to other motes through the wireless interface.
+For other platforms this is done via the `start_network.sh` script in
+`dist/tools/ethos` that is started by the `make term` target so you don't need
+to do that.
 
-As said previously, `ethos` allows to send IP packets and shell commands.
-This is done through the same serial interface.
-By typing `help` you will get the list of available shell commands.
+## Usage
+Just use the `make term` command as you usually would. The example's Makefile
+assures that the rest is done for you:
+
+```bash
+make term
+```
+
+If you want to use another interface with ethos or have configured another
+prefix on your DHCPv6 server, you can set those using the `TAP` and
+`IPV6_PREFIX` variable respectively:
+
+```bash
+TAP=tap1 IPV6_PREFIX=2001:db8:8000::/40 make term
+```
+
+As said previously, `ethos` (which will be started via `make term`) allows to
+send IP packets and shell commands. This is done through the same serial
+interface.  By typing `help` you will get the list of available shell commands.
 
 At this point you should be able to ping motes using their global address.
-For instance, if you use the [`gnrc_networking`](https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_networking) example on the mote, you can 
+For instance, if you use the [`gnrc_networking`](https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_networking) example on the mote, you can
 ping it from your machine with:
 
 ```
-> ping6 2001:db8:0:1234:0:567:8:1
+> ping6 2001:db8:0:1:1234:0:567:8:1
 ```
 
 Just replace this address by your mote's address.
-Using `ifconfig` on the shell of your mote shows you the addresses of your 
+Using `ifconfig` on the shell of your mote shows you the addresses of your
 mote, for instance:
 
 ```
-Iface  7   HWaddr: 59:72  Channel: 26  Page: 0  NID: 0x23
-            Long HWaddr: 5a:46:10:6e:f2:f5:d9:72 
-            TX-Power: 0dBm  State: IDLE  max. Retrans.: 3  CSMA Retries: 4 
-            AUTOACK  CSMA  MTU:1280  HL:64  6LO  RTR  RTR_ADV  IPHC  
-            Source address length: 8
-            Link type: wireless
-            inet6 addr: ff02::1/128  scope: local [multicast]
-            inet6 addr: fe80::5846:106e:f2f5:d972/64  scope: local
-            inet6 addr: ff02::1:fff5:d972/128  scope: local [multicast]
-            inet6 addr: 2001:db8::5846:106e:f2f5:d972/64  scope: global
-            inet6 addr: ff02::2/128  scope: local [multicast]
+Iface  7  HWaddr: 45:5b  Channel: 26  NID: 0x23
+          Long HWaddr: 00:5a:45:50:0a:00:45:5b
+          MTU:1280  HL:64  RTR
+          RTR_ADV  IPHC
+          Source address length: 8
+          Link type: wireless
+          inet6 addr: fe80::25a:4550:a00:455b  scope: local  VAL
+          inet6 addr: 2001:db8:0:1:25a:4550:a00:455b  scope: global  VAL
+          inet6 group: ff02::2
+          inet6 group: ff02::1
+          inet6 group: ff02::1:ff00:455b
 ```
 
-The script also sets up a ULA (Unique Local Address) address on your 
-Linux `tap0` network interface.
+There is also an ULA (Unique Local Address) address set-up on your loopback
+interface.
 You can check your ULA on your PC with `ifconfig` Linux command.
 On this example, such address can be pinged from 6lo motes:
 
@@ -89,7 +123,7 @@ Thus far, IPv6 communication with between your PC and your motes is enabled.
 You can use `ethos` as a standalone driver, if you want to setup the BR manually.
 
 ## Setup
-To select ethos as the serial driver, be sure that the `Makefile` 
+To select ethos as the serial driver, be sure that the `Makefile`
 has the following:
 
 ```make
@@ -99,8 +133,6 @@ USEMODULE += stdio_ethos
 CFLAGS += '-DETHOS_UART=UART_DEV(0)' -DETHOS_BAUDRATE=115200
 FEATURES_REQUIRED += periph_uart
 endif
-# include UHCP client
-USEMODULE += gnrc_uhcpc
 ```
 
 You'll need IPv6 access to the nodes attached to the BR from your Linux PC.
@@ -116,10 +148,10 @@ Then configure it to route the packets coming from your 6lo network:
 
 ```bash
 sudo ip link set tap0 up
-sudo ip a a 2001:db8::1/48 dev tap0
-sudo ip r d 2001:db8::/48 dev tap0
+sudo ip a a 2001:db8::1/32 dev tap0
+sudo ip r d 2001:db8::/32 dev tap0
 sudo ip r a 2001:db8::2 dev tap0
-sudo ip r a 2001:db8::/48 via 2001:db8::2 dev tap0
+sudo ip r a 2001:db8::/32 via 2001:db8::2 dev tap0
 ```
 
 Please note that the prefix `2001:db8::` is used as an example.
