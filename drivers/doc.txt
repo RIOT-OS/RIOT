@@ -47,5 +47,5 @@
  /**
  * @defgroup    drivers_soft_periph Soft Peripheral Driver Interface
  * @ingroup     drivers
- * @brief       Software emulated peripheral driver interface for UART, SPI, etc
+ * @brief       Software emulated @ref drivers_periph for UART, SPI, etc
  */
