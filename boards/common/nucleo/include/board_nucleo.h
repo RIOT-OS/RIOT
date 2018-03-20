@@ -53,7 +53,7 @@ extern "C" {
 #endif
 
 #if defined(CPU_FAM_STM32F4) || defined(CPU_MODEL_STM32F303ZE)
-#define XTIMER_BACKOFF              (5)
+#define XTIMER_BACKOFF              (8)
 #define XTIMER_OVERHEAD             (6)
 #endif
 /** @} */
