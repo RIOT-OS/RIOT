@@ -28,7 +28,6 @@ ifeq (,$(filter native,$(BOARD)))
   # ethos baudrate can be configured from make command
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE) -DUSE_ETHOS_FOR_STDIO
-  FEATURES_REQUIRED += periph_uart
 else
   GNRC_NETIF_NUMOF := 2
   TERMFLAGS += -z [::1]:17754
