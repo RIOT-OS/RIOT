@@ -48,7 +48,7 @@ extern "C" {
 #endif
 
 #if defined(CPU_FAM_STM32L1)
-#define XTIMER_BACKOFF              (3)
+#define XTIMER_BACKOFF              (11)
 #define XTIMER_OVERHEAD             (6)
 #endif
 
