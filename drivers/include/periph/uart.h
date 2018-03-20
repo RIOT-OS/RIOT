@@ -141,6 +141,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
  * given buffer have been send. The way this data is send is up to the
  * implementation: active waiting, interrupt driven, DMA, etc.
  *
+ * @note    The function MUST only return, after the transfer of the given data
+ *          is complete, meaning that all bytes MUST have been actually shifted
+ *          out before the function returns.
+ *
  * @param[in] uart          UART device to use for transmission
  * @param[in] data          data buffer to send
  * @param[in] len           number of bytes to send
