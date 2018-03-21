@@ -130,4 +130,4 @@ extern "C" {
 }
 #endif
 
-#endif /* cc430_radio_rfsetting_H */
+#endif /* CC430_RADIO_RFSETTING_H */

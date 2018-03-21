@@ -8,8 +8,8 @@
 
 #include <stdint.h>
 
-#ifndef cc430_radio_H
-#define cc430_radio_H
+#ifndef CC430_RADIO_H
+#define CC430_RADIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,4 +63,4 @@ void cc430_radio_write_rf_reg(const uint8_t SmartRFSetting[][2], uint8_t size);
 }
 #endif
 
-#endif /* cc430_radio_H */
+#endif /* CC430_RADIO_H */
