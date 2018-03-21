@@ -1,12 +1,23 @@
+/*
+ * Copyright (C) 2018 Baptiste Cartier
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 /*****************************************************************
-* Configuration file for the cc1101 registers, change the desired value here.
-* Texas Instrument's SmartRF Studio software can be used to generate this software,
-* but it requires a Windows OS to work.
+ * Configuration file for the cc1101 registers, change the desired value here.
+ * Texas Instrument's SmartRF Studio software can be used to generate this software,
+ * but it requires a Windows OS to work.
 *****************************************************************/
 
 
 #ifndef CC430_RADIO_RFSETTING_H
 #define CC430_RADIO_RFSETTING_H
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #ifndef RECEIVE_OR_TRANSMIT
@@ -14,7 +25,7 @@
 #endif
 
 /*****************************************************************
-* Example configuration for radio module
+ * Example configuration for radio module
 *****************************************************************/
 
 #if RECEIVE_OR_TRANSMIT == 1
@@ -114,3 +125,9 @@
 #define CC430_RADIO_RFSETTING_TEST0      0x0B
 
 #endif /*RECEIVE_OR_TRANSMIT == 1*/
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* cc430_radio_rfsetting_H */
