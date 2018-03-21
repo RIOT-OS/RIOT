@@ -43,3 +43,9 @@
  * @ingroup     drivers
  * @brief       Drivers for storage devices
  */
+
+ /**
+ * @defgroup    drivers_soft_periph Soft Peripheral Driver Interface
+ * @ingroup     drivers
+ * @brief       Software emulated @ref drivers_periph for UART, SPI, etc
+ */
