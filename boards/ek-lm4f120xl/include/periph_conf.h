@@ -68,31 +68,35 @@ extern "C" {
 #define TIMER_1_IRQ_CHAN    Timer1A_IRQn
 /** @} */
 
+
 /**
- * @name UART configuration
+ * @name    UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_1_EN           0
-#define UART_IRQ_PRIO       1
-#define UART_CLK            ROM_SysCtlClockGet()  /* UART clock runs with 40MHz */
-/* UART 0 device configuration */
-#define UART_0_DEV          UART0_BASE
-#define UART_0_CLK          (40000000)
-#define UART_0_IRQ_CHAN     UART0_IRQn
-#define UART_0_ISR          isr_uart0
-/* UART 0 pin configuration */
-#define UART_0_PORT         GPIOA
-#define UART_0_TX_PIN       UART_PA1_U0TX
-#define UART_0_RX_PIN       UART_PA0_U0RX
+static const uart_conf_t uart_config[] = {
+    {
+        .uart_sysctl       = SYSCTL_PERIPH_UART0,
+        .uart_base         = UART0_BASE,
+        .uart_txint_mode   = UART_TXINT_MODE_EOT,
+        .uart_fifo_tx      = UART_FIFO_TX4_8,
+        .uart_fifo_rx      = UART_FIFO_RX4_8,
+        .uart_irq_chan     = UART0_IRQn,
+        .uart_im_r         = &UART0_IM_R,
+        .gpio_sysctl       = SYSCTL_PERIPH_GPIOA,
+        .gpio_port         = GPIO_PORTA_BASE,
+        .pins = {
+          .rx   = GPIO_PA0_U0RX,
+          .tx   = GPIO_PA1_U0TX,
+          .mask = (GPIO_PIN_0 | GPIO_PIN_1)
+          }
+    },
+};
 
-/* UART 1 device configuration */
-#define UART_1_DEV          UART1_BASE
-#define UART_1_CLK          (40000000)
-#define UART_1_IRQ_CHAN     UART1_IRQn
-#define UART_1_ISR          isr_uart1
-/** @} */
+/* interrupt function name mapping */
+#define UART_0_ISR          isr_uart0
+
+/* macros common across all UARTs */
+#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 
 /**
  * @name   ADC configuration
