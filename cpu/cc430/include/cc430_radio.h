@@ -1,10 +1,10 @@
 /*
-* Copyright (C) 2018 Baptiste Cartier
-*
-* This file is subject to the terms and conditions of the GNU Lesser General
-* Public License v2.1. See the file LICENSE in the top level directory for more
-* details.
-*/
+ * Copyright (C) 2018 Baptiste Cartier
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
 #include <stdint.h>
 
@@ -39,9 +39,9 @@ extern "C" {
 #define RADIOINSTRW_MAX                      0x7EC0
 #define RADIOINSTRW_DEFAULT_8_8DBM           0x7EC6
 
-#define TX_TO_IDLE_TIME     10    // TX to IDLE, no calibration: ~1us   => 0.3us *10 = 3us
-#define RX_TO_IDLE_TIME     2     // RX to IDLE, no calibration: ~0.1us => 0.3*2 = 0.6us
-#define IDLE_TO_RX_TIME     300   // IDLE to RX, no calibration: 75.1us => 0.3*300 = 90us
+#define TX_TO_IDLE_TIME     10      // TX to IDLE, no calibration: ~1us   => 0.3us *10 = 3us
+#define RX_TO_IDLE_TIME     2       // RX to IDLE, no calibration: ~0.1us => 0.3*2 = 0.6us
+#define IDLE_TO_RX_TIME     300     // IDLE to RX, no calibration: 75.1us => 0.3*300 = 90us
 
 
 void cc430_radio_delay_rf(volatile unsigned long p);
@@ -50,7 +50,7 @@ uint8_t cc430_radio_read_single_reg(uint8_t addr);
 void cc430_radio_write_single_reg(uint8_t addr, uint8_t value);
 void cc430_radio_read_burst_reg(uint8_t addr, void *buffer, uint8_t count);
 void cc430_radio_write_burst_reg(uint8_t addr, void *buffer, uint8_t count);
-void cc430_radio_reset_radio_core (void);
+void cc430_radio_reset_radio_core(void);
 int8_t cc430_radio_write_pa_table(uint8_t value);
 void cc430_radio_transmit(void *buffer, uint8_t length);
 void cc430_radio_receive(void *buffer, uint8_t *length);
