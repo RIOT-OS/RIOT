@@ -86,6 +86,17 @@ ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += random
 endif
 
+ifneq (,$(filter gnrc_dhcpv6_%, $(USEMODULE)))
+  USEMODULE += gnrc_dhcpv6
+endif
+
+ifneq (,$(filter gnrc_dhcpv6_client,$(USEMODULE)))
+  USEMODULE += dhcpv6_client
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_sock_udp
+endif
+
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
   USEMODULE += uhcpc
   USEMODULE += gnrc_sock_udp
