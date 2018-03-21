@@ -259,7 +259,7 @@ static const spi_conf_t spi_config[] = {
 #define I2C_0_SCL_AF        4
 #define I2C_0_SCL_CLKEN()   (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN))
 #define I2C_0_SDA_PORT      GPIOB
-#define I2C_0_SDA_PIN       7
+#define I2C_0_SDA_PIN       9
 #define I2C_0_SDA_AF        4
 #define I2C_0_SDA_CLKEN()   (periph_clk_en(AHB1, RCC_AHB1ENR_GPIOBEN))
 /** @} */
