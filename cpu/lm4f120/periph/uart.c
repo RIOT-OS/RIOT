@@ -39,7 +39,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* Check the arguments */
     assert(uart < UART_NUMOF);
 
-
     /* Check to make sure the UART peripheral is present */
     if(!ROM_SysCtlPeripheralPresent(uart_config[uart].uart_sysctl)){
         return UART_NODEV;
@@ -47,11 +46,23 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     ROM_SysCtlPeripheralEnable(uart_config[uart].uart_sysctl);
     ROM_SysCtlPeripheralEnable(uart_config[uart].gpio_sysctl);
-    //no checks for rx_cb
-    ROM_GPIOPinConfigure(uart_config[uart].pins.rx);
+
+    /* Configure the Rx and Tx pins. If no callback function is defined,
+     * the UART should be initialised in Tx only mode.
+     */
+    if (rx_cb) {
+        ROM_GPIOPinConfigure(uart_config[uart].pins.rx);
+    }
     ROM_GPIOPinConfigure(uart_config[uart].pins.tx);
-    //no checks for rx_cb
-    ROM_GPIOPinTypeUART(uart_config[uart].gpio_port, uart_config[uart].pins.mask);
+
+    if (rx_cb) {
+        ROM_GPIOPinTypeUART(uart_config[uart].gpio_port,
+          uart_config[uart].pins.mask_tx | uart_config[uart].pins.mask_rx );
+    }
+    else {
+        ROM_GPIOPinTypeUART(uart_config[uart].gpio_port,
+          uart_config[uart].pins.mask_tx);
+    }
 
     ROM_UARTDisable(uart_config[uart].uart_base);
     ROM_UARTConfigSetExpClk(uart_config[uart].uart_base,

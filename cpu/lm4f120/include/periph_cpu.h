@@ -123,7 +123,8 @@ typedef struct {
     struct {
         unsigned long rx;              /**< pin used for RX */
         unsigned long tx;              /**< pin used for TX */
-        unsigned long mask;            /**< Pin mask */
+        unsigned long mask_rx;            /**< Pin mask for RX*/
+        unsigned long mask_tx;            /**< Pin mask for TX*/
     } pins;                            /**< Pin setting */
 } uart_conf_t;
 /** @} */

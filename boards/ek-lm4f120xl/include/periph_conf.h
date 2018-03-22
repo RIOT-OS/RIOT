@@ -87,7 +87,8 @@ static const uart_conf_t uart_config[] = {
         .pins = {
           .rx   = GPIO_PA0_U0RX,
           .tx   = GPIO_PA1_U0TX,
-          .mask = (GPIO_PIN_0 | GPIO_PIN_1)
+          .mask_rx = (GPIO_PIN_0),
+          .mask_tx = (GPIO_PIN_1),
           }
     },
 };
