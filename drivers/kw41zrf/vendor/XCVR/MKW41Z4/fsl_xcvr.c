@@ -531,6 +531,7 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
                             int16_t tempDegC,
                             XCVR_INIT_MODE_CHG_T first_init)
 {
+    (void) tempDegC;
     xcvrStatus_t config_status = gXcvrSuccess_c;
     uint32_t temp;
 
@@ -1247,7 +1248,7 @@ healthStatus_t XCVR_HealthCheck ( void ) /* Allow upper layers to poll the radio
 
 void XCVR_FadLppsControl(FAD_LPPS_CTRL_T control)
 {
-
+    (void) control;
 }
 
 /* Helper function to map radio mode to LL usage */
@@ -2087,6 +2088,9 @@ xcvrStatus_t XCVR_CoexistenceSetPriority(XCVR_COEX_PRIORITY_T rxPriority, XCVR_C
 
     /* Save the updated registers values. */
     XCVR_CoexistenceSaveRestoreTimings(1);
+#else /* gMWS_UseCoexistence_d */
+    (void) rxPriority;
+    (void) txPriority;
 #endif /* gMWS_UseCoexistence_d */
 
     return gXcvrSuccess_c;
@@ -2135,6 +2139,8 @@ xcvrStatus_t XCVR_CoexistenceSaveRestoreTimings(uint8_t saveTimings)
         tsm_timing50_saved = XCVR_TSM->TIMING50;
 #endif
     }
+#else /* gMWS_UseCoexistence_d */
+    (void) saveTimings;
 #endif /* gMWS_UseCoexistence_d */
 
     return gXcvrSuccess_c;
