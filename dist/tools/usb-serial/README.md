@@ -45,7 +45,7 @@ solution):
       ifeq ($(PORT),)
         # try to find tty name by serial number, only works on Linux currently.
         ifeq ($(OS),Linux)
-          PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh "^$(PROGRAMMER_SERIAL)$$"))
+          PORT := $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh "^$(PROGRAMMER_SERIAL)$$"))
         endif
       endif
     endif
@@ -53,7 +53,7 @@ solution):
     # Fallback PORT if no serial was specified or if the specified serial was not found
     ifeq ($(PORT),)
         ifeq ($(OS),Linux)
-          PORT := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh))
+          PORT := $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh))
         else ifeq ($(OS),Darwin)
           PORT := $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
         endif
