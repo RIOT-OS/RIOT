@@ -117,6 +117,7 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq);
  */
 static inline void kw41zrf_abort_sequence(kw41zrf_t *dev)
 {
+    (void) dev;
     /* Writing IDLE to XCVSEQ aborts any ongoing sequence */
     ZLL->PHY_CTRL = (ZLL->PHY_CTRL &
         ~(ZLL_PHY_CTRL_XCVSEQ_MASK |
@@ -201,6 +202,7 @@ static inline void kw41zrf_timer_init(kw41zrf_t *dev, kw41zrf_timer_timebase_t t
  */
 static inline uint32_t kw41zrf_get_timestamp(kw41zrf_t *dev)
 {
+    (void) dev;
     return ZLL->TIMESTAMP;
 }
 

@@ -371,6 +371,7 @@ static int kw41zrf_netdev_set_state(kw41zrf_t *dev, netopt_state_t state)
 
 static netopt_state_t kw41zrf_netdev_get_state(kw41zrf_t *dev)
 {
+    (void) dev;
     if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
         return NETOPT_STATE_SLEEP;
     }

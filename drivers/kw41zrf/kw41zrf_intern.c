@@ -54,6 +54,7 @@ void kw41zrf_set_irq_callback(void (*cb)(void *arg), void *arg)
 
 void kw41zrf_disable_interrupts(kw41zrf_t *dev)
 {
+    (void) dev;
     DEBUG("[kw41zrf] disable interrupts\n");
     /* Clear and disable all interrupts */
     ZLL->PHY_CTRL |=
@@ -151,6 +152,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
 
 void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
 {
+    (void) dev;
     DEBUG("[kw41zrf] set sequence to %u\n", (unsigned int)seq);
     assert((ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK) == XCVSEQ_IDLE);
     while ((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_SEQ_IDLE_MASK) == 0) {
@@ -165,6 +167,7 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
 
 int kw41zrf_can_switch_to_idle(kw41zrf_t *dev)
 {
+    (void) dev;
     uint8_t seq = (ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK) >> ZLL_PHY_CTRL_XCVSEQ_SHIFT;
 
     DEBUG("[kw41zrf] XCVSEQ=0x%x, SEQ_STATE=0x%" PRIx32 ", SEQ_CTRL_STS=0x%" PRIx32 "\n", seq,

@@ -76,6 +76,7 @@ uint16_t kw41zrf_get_txpower(kw41zrf_t *dev)
 
 uint8_t kw41zrf_get_channel(kw41zrf_t *dev)
 {
+    (void) dev;
     return (ZLL->CHANNEL_NUM0 & ZLL_CHANNEL_NUM0_CHANNEL_NUM0_MASK);
 }
 
@@ -283,5 +284,6 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
 
 void kw41zrf_set_rx_watermark(kw41zrf_t *dev, uint8_t value)
 {
+    (void) dev;
     ZLL->RX_WTR_MARK = ZLL_RX_WTR_MARK_RX_WTR_MARK(value);
 }
