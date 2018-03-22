@@ -51,7 +51,7 @@ CXXUWFLAGS += -std=%
 ifeq ($(LTO),1)
   $(warning Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.)
   LTOFLAGS = -flto
-  LINKFLAGS += ${LTOFLAGS}
+  LINKFLAGS += $(LTOFLAGS)
 endif
 
 # Forbid common symbols to prevent accidental aliasing.

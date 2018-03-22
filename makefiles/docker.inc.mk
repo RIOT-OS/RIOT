@@ -87,7 +87,7 @@ DOCKER_OVERRIDE_CMDLINE := $(strip $(DOCKER_OVERRIDE_CMDLINE))
 # The `flash`, `term`, `debugserver` etc. targets usually require access to
 # hardware which may not be reachable from inside the container.
 ..in-docker-container:
-	@$(COLOR_ECHO) '${COLOR_GREEN}Launching build container using image "$(DOCKER_IMAGE)".${COLOR_RESET}'
+	@$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET)'
 	docker run $(DOCKER_FLAGS) -t -u "$$(id -u)" \
 	    -v '$(RIOTBASE):$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu' \

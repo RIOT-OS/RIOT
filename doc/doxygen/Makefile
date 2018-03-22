@@ -3,7 +3,7 @@ RIOTBASE=$(shell git rev-parse --show-toplevel)
 export STRIP_FROM_INC_PATH_LIST=$(shell \
     git ls-tree -dr --full-tree --name-only HEAD core drivers sys |\
     grep '/include$$' |\
-    sed 's/.*/\"$(subst /,\/,${RIOTBASE})\/\0\"/')
+    sed 's/.*/\"$(subst /,\/,$(RIOTBASE))\/\0\"/')
 
 # use lessc (http://lesscss.org/#using-less) for compiling CSS, alternatively
 # fall back to lesscpy (https://github.com/lesscpy/lesscpy)

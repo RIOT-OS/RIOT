@@ -12,7 +12,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # setup the flash tool used
 ifeq ($(PROGRAMMER),jlink)
   # in case J-Link is attached to SWD pins, use a plain CPU memory model
-  export JLINK_DEVICE := ${MKR_JLINK_DEVICE}
+  export JLINK_DEVICE := $(MKR_JLINK_DEVICE)
   include $(RIOTMAKE)/tools/jlink.inc.mk
 else
   # by default, we use BOSSA to flash this board and take into account the

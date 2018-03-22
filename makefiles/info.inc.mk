@@ -3,7 +3,7 @@
         info-features-provided info-features-required
 
 info-objsize:
-	@case "${SORTROW}" in \
+	@case "$(SORTROW)" in \
 	  text) SORTROW=1 ;; \
 	  data) SORTROW=2 ;; \
 	  bss) SORTROW=3 ;; \

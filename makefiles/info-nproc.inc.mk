@@ -19,10 +19,10 @@ ifneq (, $(filter buildtest info-concurrency, $(MAKECMDGOALS)))
     NPROC := $(shell echo $$(($(NPROC) + 1)))
 
     ifneq (, $(NPROC_MAX))
-      NPROC := $(shell if [ ${NPROC} -gt $(NPROC_MAX) ]; then echo $(NPROC_MAX); else echo ${NPROC}; fi)
+      NPROC := $(shell if [ $(NPROC) -gt $(NPROC_MAX) ]; then echo $(NPROC_MAX); else echo $(NPROC); fi)
     endif
     ifneq (, $(NPROC_MIN))
-      NPROC := $(shell if [ ${NPROC} -lt $(NPROC_MIN) ]; then echo $(NPROC_MIN); else echo ${NPROC}; fi)
+      NPROC := $(shell if [ $(NPROC) -lt $(NPROC_MIN) ]; then echo $(NPROC_MIN); else echo $(NPROC); fi)
     endif
   endif
 endif
