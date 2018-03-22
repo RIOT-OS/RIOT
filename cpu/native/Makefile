@@ -27,5 +27,3 @@ ifneq (,$(filter trace,$(USEMODULE)))
 endif
 
 include $(RIOTBASE)/Makefile.base
-
-INCLUDES = $(NATIVEINCLUDES)
