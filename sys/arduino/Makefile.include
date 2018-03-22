@@ -3,7 +3,7 @@ SKETCHES = $(wildcard $(APPDIR)/*.sketch)
 SRCDIR = $(RIOTBASE)/sys/arduino
 
 # run the Arduino pre-build script
-$(shell $(RIOTBASE)/dist/tools/arduino/pre_build.sh $(SRCDIR) $(APPDIR) $(SKETCHES))
+$(shell $(RIOTTOOLS)/arduino/pre_build.sh $(SRCDIR) $(APPDIR) $(SKETCHES))
 
 # include the Arduino headers
 INCLUDES += -I$(RIOTBASE)/sys/arduino/include
