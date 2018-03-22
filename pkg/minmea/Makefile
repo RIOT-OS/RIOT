@@ -6,7 +6,7 @@ PKG_LICENSE=WTFPL
 .PHONY: all
 
 all: git-download
-	@cp Makefile.${PKG_NAME} $(PKG_BUILDDIR)/Makefile
+	@cp Makefile.$(PKG_NAME) $(PKG_BUILDDIR)/Makefile
 	"$(MAKE)" -C $(PKG_BUILDDIR)
 
 include $(RIOTBASE)/pkg/pkg.mk
