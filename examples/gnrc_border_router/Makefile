@@ -91,10 +91,10 @@ TERMDEPS += uhcpd-daemon
 .PHONY: uhcpd-daemon
 
 uhcpd-daemon: host-tools
-	$(RIOTBASE)/dist/tools/uhcpd/bin/uhcpd $(TAP) $(IPV6_PREFIX) &
+	$(RIOTTOOLS)/uhcpd/bin/uhcpd $(TAP) $(IPV6_PREFIX) &
 else
 # We override the `make term` command to use ethos
-TERMPROG ?= sudo sh $(RIOTBASE)/dist/tools/ethos/start_network.sh
+TERMPROG ?= sudo sh $(RIOTTOOLS)/ethos/start_network.sh
 TERMFLAGS ?= $(PORT) $(TAP) $(IPV6_PREFIX)
 
 # We depend on the ethos host tools to run the border router, we build them
@@ -107,7 +107,7 @@ include $(RIOTBASE)/Makefile.include
 .PHONY: host-tools
 
 host-tools:
-	$(Q)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools
+	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
