@@ -202,6 +202,26 @@ extern "C" {
  * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_ROUTER != 0
  */
 #define GNRC_IPV6_NIB_ROUTE_TIMEOUT         (0x4fd0U)
+
+/**
+ * @brief   Perform DAD event.
+ *
+ * This message type is for performing DAD for a given address. The expected
+ * message context is a TENTATIVE IPv6 address.
+ *
+ * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_SLAAC != 0
+ */
+#define GNRC_IPV6_NIB_DAD                   (0x4fd1U)
+
+/**
+ * @brief   Validate a tentative address event.
+ *
+ * Moves a TENTATIVE address to VALID state. The expected message context is a
+ * TENTATIVE IPv6 address.
+ *
+ * @note    Only handled with @ref GNRC_IPV6_NIB_CONF_SLAAC != 0
+ */
+#define GNRC_IPV6_NIB_VALID_ADDR            (0x4fd2U)
 /** @} */
 
 /**
