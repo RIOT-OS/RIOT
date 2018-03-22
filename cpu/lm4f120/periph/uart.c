@@ -150,3 +150,10 @@ void UART_0_ISR(void)
     irq_handler((uart_t)0);
 }
 #endif
+
+#ifdef UART_1_ISR
+void UART_1_ISR(void)
+{
+    irq_handler((uart_t)1);
+}
+#endif
