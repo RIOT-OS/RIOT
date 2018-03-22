@@ -543,6 +543,10 @@ ifneq (,$(filter xtimer,$(USEMODULE)))
   USEMODULE += div
 endif
 
+ifneq (,$(filter saul,$(USEMODULE)))
+  USEMODULE += phydat
+endif
+
 ifneq (,$(filter saul_reg,$(USEMODULE)))
   USEMODULE += saul
 endif
