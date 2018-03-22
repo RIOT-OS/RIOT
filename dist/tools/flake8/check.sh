@@ -17,9 +17,8 @@ else
     CRESET=
 fi
 
-DIST_TOOLS=${RIOTBASE:-.}/dist/tools
-
-. "${DIST_TOOLS}/ci/changed_files.sh"
+: "${RIOTTOOLS:=${PWD}/dist/tools}"
+. "${RIOTTOOLS}"/ci/changed_files.sh
 
 FILES=$(FILEREGEX='(?=*.py$|pyterm$)' changed_files)
 
@@ -33,7 +32,7 @@ ${FLAKE8_CMD} --version &> /dev/null || {
     exit 1
 }
 
-ERRORS=$(${FLAKE8_CMD} --config="${DIST_TOOLS}/flake8/flake8.cfg" ${FILES})
+ERRORS=$(${FLAKE8_CMD} --config="${RIOTTOOLS}"/flake8/flake8.cfg ${FILES})
 
 if [ -n "${ERRORS}" ]
 then
