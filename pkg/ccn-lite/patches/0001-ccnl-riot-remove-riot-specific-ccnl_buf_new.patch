@@ -1,0 +1,38 @@
+From 8f2cb10afd5636aeaea7e89c7acd221cecfb4ce8 Mon Sep 17 00:00:00 2001
+From: Kaspar Schleiser <kaspar@schleiser.de>
+Date: Thu, 22 Feb 2018 23:04:08 +0100
+Subject: [PATCH] ccnl-riot: remove riot specific ccnl_buf_new()
+
+---
+ src/ccnl-riot/src/ccn-lite-riot.c | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+diff --git a/src/ccnl-riot/src/ccn-lite-riot.c b/src/ccnl-riot/src/ccn-lite-riot.c
+index 6f978d15f1..65d749ec97 100644
+--- a/src/ccnl-riot/src/ccn-lite-riot.c
++++ b/src/ccnl-riot/src/ccn-lite-riot.c
+@@ -183,21 +183,6 @@ extern int ccnl_isContent(unsigned char *buf, int len, int suite);
+  * @}
+  */
+ 
+-// ----------------------------------------------------------------------
+-struct ccnl_buf_s*
+-ccnl_buf_new(void *data, int len)
+-{
+-    struct ccnl_buf_s *b = ccnl_malloc(sizeof(struct ccnl_buf_s) + len);
+-
+-    if (!b)
+-        return NULL;
+-    b->next = NULL;
+-    b->datalen = len;
+-    if (data)
+-        memcpy(b->data, data, len);
+-    return b;
+-}
+-
+ /* add a netif to CCN-lite's interfaces, set the nettype, and register a receiver */
+ int
+ ccnl_open_netif(kernel_pid_t if_pid, gnrc_nettype_t netreg_type)
+-- 
+2.16.1
+

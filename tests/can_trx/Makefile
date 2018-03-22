@@ -1,4 +1,3 @@
-export APPLICATION = can_trx
 include ../Makefile.tests_common
 
 USEMODULE += shell

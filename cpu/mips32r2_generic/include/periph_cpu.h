@@ -24,6 +24,13 @@ extern "C" {
 #define PROVIDES_PM_SET_LOWEST
 /** @} */
 
+/**
+ * @name    timer configuration
+ * @{
+ */
+#define PERIPH_TIMER_PROVIDES_SET
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
