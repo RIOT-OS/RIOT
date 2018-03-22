@@ -13,12 +13,12 @@ RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
-GITCACHE       ?= $(RIOTBASE)/dist/tools/git/git-cache
+GITCACHE       ?= $(RIOTTOOLS)/git/git-cache
 APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
 PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
-DLCACHE        ?= $(RIOTBASE)/dist/tools/dlcache/dlcache.sh
+DLCACHE        ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR    ?= $(RIOTBASE)/.dlcache
 
 __DIRECTORY_VARIABLES := \
@@ -457,7 +457,7 @@ term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
 	$(TERMPROG) $(TERMFLAGS)
 
 list-ttys:
-	$(Q)$(RIOTBASE)/dist/tools/usb-serial/list-ttys.sh
+	$(Q)$(RIOTTOOLS)/usb-serial/list-ttys.sh
 
 doc:
 	make -BC $(RIOTBASE) doc
@@ -493,7 +493,7 @@ eclipsesym.xml: $(CURDIR)/eclipsesym.xml
 
 $(CURDIR)/eclipsesym.xml:
 	$(Q)printf "%s\n" $(CC) $(CFLAGS_WITH_MACROS) $(INCLUDES) | \
-		$(RIOTBASE)/dist/tools/eclipsesym/cmdline2xml.sh > $@
+		$(RIOTTOOLS)/eclipsesym/cmdline2xml.sh > $@
 
 # Export variables used throughout the whole make system:
 include $(RIOTMAKE)/vars.inc.mk
@@ -597,7 +597,7 @@ ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
 endif
 
 # Include desvirt Makefile
-include $(RIOTBASE)/dist/tools/desvirt/Makefile.desvirt
+include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 
 # include bindist target
 include $(RIOTMAKE)/bindist.inc.mk
@@ -611,7 +611,7 @@ include $(RIOTMAKE)/modules.inc.mk
 .PHONY: $(RIOTBUILD_CONFIG_HEADER_C)
 $(RIOTBUILD_CONFIG_HEADER_C):
 	@mkdir -p '$(dir $@)'
-	$(Q)'$(RIOTBASE)/dist/tools/genconfigheader/genconfigheader.sh' '$@' $(CFLAGS_WITH_MACROS)
+	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' '$@' $(CFLAGS_WITH_MACROS)
 
 CFLAGS_WITH_MACROS := $(CFLAGS)
 
