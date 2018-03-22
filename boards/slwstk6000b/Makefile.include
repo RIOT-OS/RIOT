@@ -1,0 +1,27 @@
+include $(RIOTBOARD)/slwstk6000b/module-info.mk
+
+# add module specific includes
+export INCLUDES += -I$(RIOTBOARD)/slwstk6000b/modules/$(BOARD_MODULE)/include
+
+# define the cpu used by SLWSTK6000B
+export CPU = efm32
+export CPU_MODEL = $(MODULE_CPU)
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup JLink for flashing
+export JLINK_DEVICE := $(MODULE_JLINK_DEVICE)
+include $(RIOTMAKE)/tools/jlink.inc.mk
+
+# add board common drivers
+USEMODULE += boards_common_silabs
+USEMODULE += silabs_aem
+USEMODULE += silabs_bc
+
+# include board common
+include $(RIOTBOARD)/common/silabs/Makefile.include

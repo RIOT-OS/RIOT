@@ -1,0 +1,24 @@
+# This file contains the supported modules by the SLWSTK6000B wireless starter
+# kit. See Silicon Labs website for more information.
+
+# The intended usage is to grep for the exact module name, and split by spaces
+# to get the required information.
+
+# Module - CPU - JLink Device
+slwrb4150a efr32mg1p233f256gm48 efr32mg1pxxxf256
+slwrb4150b efr32mg1p233f256gm48 efr32mg1pxxxf256
+slwrb4151a efr32mg1p232f256gm48 efr32mg1pxxxf256
+slwrb4152a efr32mg1p232f256gm48 efr32mg1pxxxf256
+slwrb4153a efr32mg1p132f256gm48 efr32mg1pxxxf256
+slwrb4154a efr32mg1p732f256gm32 efr32mg1pxxxf256
+slwrb4158a efr32mg13p733f512gm48 efr32mg13p733f512gm48
+slwrb4159a efr32mg13p632f512gm48 efr32mg13p632f512gm48
+slwrb4161a efr32mg12p432f1024gl125 efr32mg12p432f1024gl125
+slwrb4162a efr32mg12p332f1024gl125 efr32mg12p332f1024gl125
+slwrb4163a efr32mg12p433f1024gl125 efr32mg12p433f1024gl125
+slwrb4164a efr32mg12p433f1024gl125 efr32mg12p433f1024gl125
+slwrb4167a efr32mg13p733f512gm48 efr32mg13p733f512gm48
+slwrb4168a efr32mg13p732f512gm48 efr32mg13p732f512gm48
+slwrb4169a efr32mg14p733f256gm48 efr32mg14p733f256gm48
+slwrb4169b efr32mg14p733f256gm48 efr32mg14p733f256gm48
+slwrb4170a efr32mg12p433f1024gm68 efr32mg12p433f1024gm68
