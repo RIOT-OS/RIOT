@@ -337,11 +337,17 @@ endif
 endif
 endif # BUILD_IN_DOCKER
 
+# Check given command is available in the path
+#   check_cmd 'command' 'description'
+define check_cmd
+	@command -v $1 >/dev/null 2>&1 || \
+	  { $(COLOR_ECHO) \
+	    '$(COLOR_RED)$2 $1 is required but not found in PATH.  Aborting.$(COLOR_RESET)'; \
+	    exit 1;}
+endef
+
 ..compiler-check:
-	@command -v $(CC) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'$(COLOR_RED)Compiler $(CC) is required but not found in PATH.  Aborting.$(COLOR_RESET)'; \
-		exit 1; }
+	$(call check_cmd,$(CC),Compiler)
 
 ..build-message:
 	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".$(COLOR_RESET)'
@@ -400,10 +406,7 @@ ifeq (,$(filter flash-only, $(MAKECMDGOALS)))
 endif
 
 flash: $(BUILD_BEFORE_FLASH) $(FLASHDEPS)
-	@command -v $(FLASHER) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'$(COLOR_RED)Flash program $(FLASHER) not found. Aborting.$(COLOR_RESET)'; \
-		exit 1; }
+	$(call check_cmd,$(FLASHER),Flash program)
 	$(FLASHER) $(FFLAGS)
 
 flash-only: flash
@@ -412,10 +415,7 @@ preflash: $(BUILD_BEFORE_FLASH)
 	$(PREFLASHER) $(PREFFLAGS)
 
 term: $(filter flash, $(MAKECMDGOALS)) $(TERMDEPS)
-	@command -v $(TERMPROG) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'$(COLOR_RED)Terminal program $(TERMPROG) not found. Aborting.$(COLOR_RESET)'; \
-		exit 1; }
+	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS)
 
 list-ttys:
@@ -425,41 +425,26 @@ doc:
 	make -BC $(RIOTBASE) doc
 
 debug:
-	@command -v $(DEBUGGER) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'$(COLOR_RED)Debug program $(DEBUGGER) not found. Aborting.$(COLOR_RESET)'; \
-		exit 1; }
+	$(call check_cmd,$(DEBUGGER),Debug program)
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 debug-server:
-	@command -v $(DEBUGSERVER) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'$(COLOR_RED)Debug server program $(DEBUGSERVER) not found. Aborting.$(COLOR_RESET)'; \
-		exit 1; }
+	$(call check_cmd,$(DEBUGSERVER),Debug server program)
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
 emulate:
-	@command -v $(EMULATOR) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'$(COLOR_RED)Emulation program $(EMULATOR) not found. Aborting.$(COLOR_RESET)'; \
-		exit 1; }
+	$(call check_cmd,$(EMULATOR),Emulation program)
 	$(EMULATOR) $(EMULATOR_FLAGS)
 
 reset:
-	@command -v $(RESET) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'$(COLOR_RED)Reset program $(RESET) not found. Aborting.$(COLOR_RESET)'; \
-		exit 1; }
+	$(call check_cmd,$(RESET),Reset program)
 	$(RESET) $(RESET_FLAGS)
 
 # Default OBJDUMPFLAGS for platforms which do not specify it:
 OBJDUMPFLAGS ?= -S -D -h
 
 objdump:
-	@command -v $(OBJDUMP) >/dev/null 2>&1 || \
-		{ $(COLOR_ECHO) \
-		'$(COLOR_RED)Objdump program $(OBJDUMP) not found. Aborting.$(COLOR_RESET)'; \
-		exit 1; }
+	$(call check_cmd,$(OBJDUMP),Objdump program)
 	$(OBJDUMP) $(OBJDUMPFLAGS) $(ELFFILE) | less
 
 # Generate an XML file containing all macro definitions and include paths for
