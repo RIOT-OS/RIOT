@@ -12,7 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              nucleo32-f303 nucleo32-l031 nucleo-f030 nucleo-f070 \
                              nucleo-f072 nucleo-f302 nucleo-f334 nucleo-l053 \
                              stm32f0discovery telosb waspmote-pro wsn430-v1_3b \
-                             wsn430-v1_4 z1
+                             wsn430-v1_4 z1 mega-xplained
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
