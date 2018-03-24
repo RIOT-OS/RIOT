@@ -1,6 +1,8 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-mega2560 waspmote-pro
+BOARD_INSUFFICIENT_MEMORY := arduino-mega2560 \
+                             mega-xplained \
+                             waspmote-pro
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 

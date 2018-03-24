@@ -21,6 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              feather-m0 \
                              limifrog-v1 maple-mini \
                              mbed_lpc1768 \
+                             mega-xplained \
                              microbit \
                              msb-430 \
                              msb-430h \
