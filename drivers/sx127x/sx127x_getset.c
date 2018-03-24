@@ -707,23 +707,13 @@ void sx127x_set_payload_length(sx127x_t *dev, uint8_t len)
     sx127x_reg_write(dev, SX127X_REG_LR_PAYLOADLENGTH, len);
 }
 
-static inline uint8_t sx127x_get_pa_select(uint32_t channel)
+static inline uint8_t sx127x_get_pa_select(const sx127x_t *dev)
 {
-#if defined(MODULE_SX1272)
-    (void) channel;
-#if SX1272_DEFAULT_PASELECT
-    return SX127X_RF_PACONFIG_PASELECT_RFO;
-#else
-    return SX127X_RF_PACONFIG_PASELECT_PABOOST;
-#endif
-#else /* MODULE_SX1276 */
-    if (channel < SX127X_RF_MID_BAND_THRESH) {
+    if (dev->params.paselect == SX127X_PA_BOOST) {
         return SX127X_RF_PACONFIG_PASELECT_PABOOST;
     }
-    else {
-        return SX127X_RF_PACONFIG_PASELECT_RFO;
-    }
-#endif
+
+    return SX127X_RF_PACONFIG_PASELECT_RFO;
 }
 
 uint8_t sx127x_get_tx_power(const sx127x_t *dev)
@@ -745,7 +735,7 @@ void sx127x_set_tx_power(sx127x_t *dev, int8_t power)
 #endif
 
     pa_config = ((pa_config & SX127X_RF_PACONFIG_PASELECT_MASK) |
-                 sx127x_get_pa_select(dev->settings.channel));
+                 sx127x_get_pa_select(dev));
 
 #if defined(MODULE_SX1276)
     /* max power is 14dBm */
