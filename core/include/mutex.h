@@ -58,7 +58,7 @@ typedef struct {
  * @brief This is the value of the mutex when locked and no threads are waiting
  *        for it
  */
-#define MUTEX_LOCKED ((void *)-1)
+#define MUTEX_LOCKED ((list_node_t *)-1)
 /**
  * @endcond
  */
