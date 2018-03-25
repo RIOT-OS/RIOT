@@ -1,0 +1,11 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+# limit the stack size so most tests and examples compile
+CFLAGS += -DTHREAD_STACKSIZE_DEFAULT=512
+
+# include board common dependencies
+include $(RIOTBOARD)/common/silabs/Makefile.dep
+
+include $(RIOTCPU)/efm32/Makefile.dep
