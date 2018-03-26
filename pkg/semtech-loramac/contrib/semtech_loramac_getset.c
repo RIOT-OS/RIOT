@@ -190,8 +190,8 @@ void semtech_loramac_set_tx_power(uint8_t power)
 {
     DEBUG("[semtech-loramac] set TX power %d\n", power);
     MibRequestConfirm_t mibReq;
-    mibReq.Type = MIB_CHANNELS_TX_POWER;
-    mibReq.Param.ChannelsTxPower = power;
+    mibReq.Type = MIB_CHANNELS_DEFAULT_TX_POWER;
+    mibReq.Param.ChannelsDefaultTxPower = power;
     LoRaMacMibSetRequestConfirm(&mibReq);
 }
 
@@ -199,9 +199,9 @@ uint8_t semtech_loramac_get_tx_power(void)
 {
     DEBUG("[semtech-loramac] get TX power\n");
     MibRequestConfirm_t mibReq;
-    mibReq.Type = MIB_CHANNELS_TX_POWER;
+    mibReq.Type = MIB_CHANNELS_DEFAULT_TX_POWER;
     LoRaMacMibGetRequestConfirm(&mibReq);
-    return (uint8_t)mibReq.Param.ChannelsTxPower;
+    return (uint8_t)mibReq.Param.ChannelsDefaultTxPower;
 }
 
 void semtech_loramac_set_rx2_freq(uint8_t freq)
