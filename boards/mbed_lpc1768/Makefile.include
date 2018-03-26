@@ -6,7 +6,7 @@ export DEBUGGER =
 export DEBUGSERVER =
 
 HEXFILE = $(BINFILE)
-export FFLAGS =
+export FFLAGS = $(HEXFILE)
 export DEBUGGER_FLAGS =
 
 # define the default port depending on the host OS
