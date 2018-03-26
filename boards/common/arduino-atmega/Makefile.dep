@@ -1,3 +1,5 @@
+USEMODULE += boards_common_atmega
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
