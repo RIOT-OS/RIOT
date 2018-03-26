@@ -1,5 +1,7 @@
 include ../Makefile.tests_common
 
+BOARD_INSUFFICIENT_MEMORY := stk3200
+
 USEMODULE += bmp180
 USEMODULE += xtimer
 USEMODULE += printf_float

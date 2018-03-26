@@ -1,8 +1,9 @@
 include ../Makefile.tests_common
 
+<<<<<<< HEAD
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
                              chronos msb-430 msb-430h nucleo-f031k6 \
-                             nucleo-f303k8
+                             nucleo-f303k8 stk3200
 
 DISABLE_MODULE += auto_init
 

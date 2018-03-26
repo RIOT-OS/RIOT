@@ -16,7 +16,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              nucleo-f070rb nucleo-f072rb nucleo-f103rb \
                              nucleo-f302r8 nucleo-f334r8 nucleo-l053r8 \
                              nucleo-l073rz opencm904 spark-core \
-                             stm32f0discovery telosb waspmote-pro \
+                             stk3200 stm32f0discovery telosb waspmote-pro \
                              weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 # The following boards do not have an available UART
