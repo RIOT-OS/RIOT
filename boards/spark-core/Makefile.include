@@ -12,6 +12,7 @@ export DEBUGGER = # spark core has no debugger
 export RESET = # dfu-util has no support for resetting the device
 
 export OFLAGS = -O binary
+HEXFILE = $(ELFFILE:.elf=.bin)
 export FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D "$(HEXFILE)"
 
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
