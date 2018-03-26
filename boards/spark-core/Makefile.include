@@ -7,8 +7,6 @@ PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-export BINFILE = $(patsubst %.elf,%.bin,$(ELFFILE))
-
 export FLASHER = dfu-util
 export DEBUGGER = # spark core has no debugger
 export RESET = # dfu-util has no support for resetting the device
