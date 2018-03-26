@@ -75,20 +75,18 @@ extern "C" {
  */
 static const uart_conf_t uart_config[] = {
     {
-        .uart_sysctl       = SYSCTL_PERIPH_UART0,
-        .uart_base         = UART0_BASE,
+        .dev               = 0,
         .uart_txint_mode   = UART_TXINT_MODE_EOT,
         .uart_fifo_tx      = UART_FIFO_TX4_8,
         .uart_fifo_rx      = UART_FIFO_RX4_8,
         .uart_irq_chan     = UART0_IRQn,
-        .uart_im_r         = &UART0_IM_R,
         .gpio_sysctl       = SYSCTL_PERIPH_GPIOA,
         .gpio_port         = GPIO_PORTA_BASE,
         .pins = {
-          .rx   = GPIO_PA0_U0RX,
-          .tx   = GPIO_PA1_U0TX,
-          .mask_rx = (GPIO_PIN_0),
-          .mask_tx = (GPIO_PIN_1),
+          .rx              = GPIO_PA0_U0RX,
+          .tx              = GPIO_PA1_U0TX,
+          .mask_rx         = (GPIO_PIN_0),
+          .mask_tx         = (GPIO_PIN_1),
           }
     },
 };

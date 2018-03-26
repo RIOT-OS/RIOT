@@ -111,20 +111,18 @@ typedef enum {
  * @{
  */
 typedef struct {
-    unsigned long uart_sysctl;         /**< UART device in sysctl */
-    unsigned long uart_base;           /**< UART base address */
+    unsigned long dev;                 /**< UART device number */
     unsigned long uart_txint_mode;     /**< UART TX interrupt mode */
     unsigned long uart_fifo_tx;        /**< UART TX fifo select */
     unsigned long uart_fifo_rx;        /**< UART RX fifo select */
     IRQn_Type uart_irq_chan;           /**< UART IRQ channel */
-    volatile unsigned long * uart_im_r;/**< UART RX Enable Register */
     unsigned long gpio_sysctl;         /**< GPIO device in sysctl */
     unsigned long gpio_port;           /**< GPIO port */
     struct {
         unsigned long rx;              /**< pin used for RX */
         unsigned long tx;              /**< pin used for TX */
-        unsigned long mask_rx;            /**< Pin mask for RX*/
-        unsigned long mask_tx;            /**< Pin mask for TX*/
+        unsigned long mask_rx;         /**< Pin mask for RX*/
+        unsigned long mask_tx;         /**< Pin mask for TX*/
     } pins;                            /**< Pin setting */
 } uart_conf_t;
 /** @} */
@@ -145,10 +143,6 @@ typedef struct {
     unsigned long ssi_base;            /**< SSI base address */
     unsigned long gpio_sysctl;         /**< GPIO device in sysctl */
     unsigned long gpio_port;           /**< GPIO port */
-
-
-    volatile unsigned long * uart_im_r;        /**< UART RX fifo select */
-
     struct {
         unsigned long clk;             /**< pin used for SCK */
         unsigned long fss;             /**< pin used for FSS */
