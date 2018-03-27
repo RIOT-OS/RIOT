@@ -112,6 +112,7 @@ ifneq (,$(filter encx24j600,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ethos,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
   USEMODULE += iolist
   USEMODULE += netdev_eth
   USEMODULE += random
