@@ -143,6 +143,10 @@ ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+  USEMODULE += netif
+endif
+
 ifneq (,$(filter ieee802154 nrfmin,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
