@@ -49,13 +49,18 @@ void phydat_dump(phydat_t *data, uint8_t dim)
                 scale_prefix = phydat_prefix_from_scale(data->scale);
         }
 
-        printf("\t[%i] ", (int)i);
-
+        printf("\t");
+        if (dim > 1) {
+            printf("[%u] ", (unsigned int)i);
+        }
+        else {
+            printf("     ");
+        }
         if (scale_prefix) {
-            printf("%i %c", (int)data->val[i], scale_prefix);
+            printf("%6d %c", (int)data->val[i], scale_prefix);
         }
         else if (data->scale == 0) {
-            printf("%i", (int)data->val[i]);
+            printf("%6d", (int)data->val[i]);
         }
         else if ((data->scale > -5) && (data->scale < 0)) {
             char num[8];
