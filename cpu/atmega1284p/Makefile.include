@@ -1,0 +1,8 @@
+# tell the build system that the CPU depends on the atmega common files
+USEMODULE += atmega_common
+
+# define path to atmega common module, which is needed for this CPU
+export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
+
+# CPU depends on the atmega common module, so include it
+include $(ATMEGA_COMMON)Makefile.include

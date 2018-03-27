@@ -140,6 +140,10 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
          || (_port_num(pin) != PORT_D && _port_num(pin) != PORT_E)
 #elif defined(CPU_ATMEGA328P)
          || (pin_num < 2) || (_port_num(pin) != PORT_D)
+#elif defined(CPU_ATMEGA1284P)
+         || (_port_num(pin) == PORT_B && pin_num != 2)
+         || (_port_num(pin) == PORT_D && pin_num < 2)
+         || (_port_num(pin) != PORT_D && _port_num(pin) != PORT_D)
 #endif
          || ((mode != GPIO_IN) && (mode != GPIO_IN_PU))) {
         return -1;
@@ -153,6 +157,11 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 #if defined(CPU_ATMEGA328P)
     /* INT pins start at PD2 instead of at PD0 */
     pin_num -= 2;
+#elif defined(CPU_ATMEGA1284P)
+    /* INT pins start at PD2 instead of at PD0 on PORT_D */
+    if (_port_num(pin) == PORT_D) {
+        pin_num -= 2;
+    }
 #endif
 
     EIMSK |= (1 << pin_num);
@@ -186,6 +195,14 @@ void gpio_irq_enable(gpio_t pin)
 #if defined(CPU_ATMEGA328P)
     /* INT pins start at PD2 instead of at PD0 */
     EIMSK |= (1 << (_pin_num(pin) - 2));
+#elif defined(CPU_ATMEGA1284P)
+    /* INT pins start at PD2 instead of at PD0 on PORT_D */
+    if (_port_num(pin) == PORT_D) {
+        EIMSK |= (1 << (_pin_num(pin) - 2));
+    }
+    else {
+        EIMSK |= (1 << _pin_num(pin));
+    }
 #else
     EIMSK |= (1 << _pin_num(pin));
 #endif
@@ -196,6 +213,14 @@ void gpio_irq_disable(gpio_t pin)
 #if defined(CPU_ATMEGA328P)
     /* INT pins start at PD2 instead of at PD0 */
     EIMSK &= ~(1 << (_pin_num(pin) - 2));
+#elif defined (CPU_ATMEGA1284P)
+    /* INT pins start at PD2 instead of at PD0 on PORT_D */
+    if (_port_num(pin) == PORT_D) {
+        EIMSK &= ~(1 << (_pin_num(pin) - 2));
+    }
+    else {
+        EIMSK &= ~(1 << _pin_num(pin));
+    }
 #else
     EIMSK &= ~(1 << _pin_num(pin));
 #endif

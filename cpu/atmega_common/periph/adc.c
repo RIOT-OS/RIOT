@@ -67,6 +67,9 @@ int adc_init(adc_t line)
 #if defined(CPU_ATMEGA328P)
     DDRC &= ~(1 << line);
     PORTC &= ~(1 << line);
+#elif defined(CPU_ATMEGA1284P)
+    DDRA &= ~(1 << line);
+    PORTA &= ~(1 << line);
 #elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA1281)
     if (line < 8) {
         DDRF  &= ~(1 << line);
@@ -108,7 +111,7 @@ int adc_sample(adc_t line, adc_res_t res)
     _prep();
 
     /* set conversion channel */
-#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281)
+#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P)
     ADMUX &= 0xf0;
     ADMUX |= line;
 #elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA256RFR2)

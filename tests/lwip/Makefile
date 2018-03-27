@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 # moment.
 BOARD_BLACKLIST := arduino-uno arduino-duemilanove arduino-mega2560 chronos \
                    msb-430 msb-430h telosb waspmote-pro wsn430-v1_3b \
-                   wsn430-v1_4 z1 jiminy-mega256rfr2
+                   wsn430-v1_4 z1 jiminy-mega256rfr2 mega-xplained
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon nrf6310 nucleo32-f031 nucleo32-f042 \
                              nucleo32-l031 nucleo-f030 nucleo-f334 nucleo-l053 \
                              stm32f0discovery yunjia-nrf51822

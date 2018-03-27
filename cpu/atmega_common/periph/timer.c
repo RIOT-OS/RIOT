@@ -212,10 +212,12 @@ ISR(TIMER_1_ISRB, ISR_BLOCK)
     _isr(1, 1);
 }
 
+#ifdef TIMER_1_ISRC
 ISR(TIMER_1_ISRC, ISR_BLOCK)
 {
     _isr(1, 2);
 }
+#endif /* TIMER_1_ISRC */
 #endif /* TIMER_1 */
 
 #ifdef TIMER_2

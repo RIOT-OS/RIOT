@@ -2,6 +2,7 @@ include ../Makefile.tests_common
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno
 BOARD_BLACKLIST += chronos
+BOARD_BLACKLIST += mega-xplained
 BOARD_BLACKLIST += mips-malta
 BOARD_BLACKLIST += msb-430 msb-430h
 BOARD_BLACKLIST += nucleo32-f031
