@@ -336,7 +336,6 @@ otError otPlatRadioSetTransmitPower(otInstance *aInstance, int8_t aPower)
 otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aPacket)
 {
     (void) aInstance;
-    struct iovec pkt;
 
     /* Populate iolist with transmit data
      * Unlike RIOT, OpenThread includes two bytes FCS (0x00 0x00) so
@@ -351,7 +350,7 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aPacket)
     if (ENABLE_DEBUG) {
         DEBUG("otPlatRadioTransmit->channel: %i, length %d\n",
               (int) aPacket->mChannel, (int)aPacket->mLength);
-        for (size_t i = 0; i < pkt.iov_len; ++i) {
+        for (size_t i = 0; i < aPacket->mLength; ++i) {
             DEBUG("%x ", aPacket->mPsdu[i]);
         }
         DEBUG("\n");
@@ -359,7 +358,7 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aPacket)
     _set_channel(aPacket->mChannel);
 
     /* send packet though netdev */
-    _dev->driver->send(_dev, &pkt, 1);
+    _dev->driver->send(_dev, &iolist);
     otPlatRadioTxStarted(aInstance, aPacket);
 
     return OT_ERROR_NONE;
