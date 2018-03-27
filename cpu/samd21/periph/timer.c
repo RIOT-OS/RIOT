@@ -142,14 +142,14 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         /* set timeout value */
         switch (channel) {
         case 0:
-            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
+            TIMER_0_DEV.INTFLAG.reg = TC_INTFLAG_MC0;
             TIMER_0_DEV.CC[0].reg = value;
-            TIMER_0_DEV.INTENSET.bit.MC0 = 1;
+            TIMER_0_DEV.INTENSET.reg = TC_INTENSET_MC0;
             break;
         case 1:
-            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
+            TIMER_0_DEV.INTFLAG.reg = TC_INTFLAG_MC1;
             TIMER_0_DEV.CC[1].reg = value;
-            TIMER_0_DEV.INTENSET.bit.MC1 = 1;
+            TIMER_0_DEV.INTENSET.reg = TC_INTENSET_MC1;
             break;
         default:
             return -1;
@@ -161,14 +161,14 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         /* set timeout value */
         switch (channel) {
         case 0:
-            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
+            TIMER_1_DEV.INTFLAG.reg = TC_INTFLAG_MC0;
             TIMER_1_DEV.CC[0].reg = value;
-            TIMER_1_DEV.INTENSET.bit.MC0 = 1;
+            TIMER_1_DEV.INTENSET.reg = TC_INTENSET_MC0;
             break;
         case 1:
-            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
+            TIMER_1_DEV.INTFLAG.reg = TC_INTFLAG_MC1;
             TIMER_1_DEV.CC[1].reg = value;
-            TIMER_1_DEV.INTENSET.bit.MC1 = 1;
+            TIMER_1_DEV.INTENSET.reg = TC_INTENSET_MC1;
             break;
         default:
             return -1;
@@ -191,12 +191,12 @@ int timer_clear(tim_t dev, int channel)
     case TIMER_0:
         switch (channel) {
         case 0:
-            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
-            TIMER_0_DEV.INTENCLR.bit.MC0 = 1;
+            TIMER_0_DEV.INTFLAG.reg = TC_INTFLAG_MC0;
+            TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
             break;
         case 1:
-            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
-            TIMER_0_DEV.INTENCLR.bit.MC1 = 1;
+            TIMER_0_DEV.INTFLAG.reg = TC_INTFLAG_MC1;
+            TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             break;
         default:
             return -1;
@@ -207,12 +207,12 @@ int timer_clear(tim_t dev, int channel)
     case TIMER_1:
         switch (channel) {
         case 0:
-            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
-            TIMER_1_DEV.INTENCLR.bit.MC0 = 1;
+            TIMER_1_DEV.INTFLAG.reg = TC_INTFLAG_MC0;
+            TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
             break;
         case 1:
-            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
-            TIMER_1_DEV.INTENCLR.bit.MC1 = 1;
+            TIMER_1_DEV.INTFLAG.reg = TC_INTFLAG_MC1;
+            TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             break;
         default:
             return -1;
@@ -309,16 +309,16 @@ static inline void _irq_enable(tim_t dev)
 void TIMER_0_ISR(void)
 {
     if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
+        TIMER_0_DEV.INTFLAG.reg = TC_INTFLAG_MC0;
+        TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
         if(config[TIMER_0].cb) {
-            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
-            TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
             config[TIMER_0].cb(config[TIMER_0].arg, 0);
         }
     }
-    else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
+    if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
+        TIMER_0_DEV.INTFLAG.reg = TC_INTFLAG_MC1;
+        TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
         if(config[TIMER_0].cb) {
-            TIMER_0_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
-            TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_0].cb(config[TIMER_0].arg, 1);
         }
     }
@@ -332,16 +332,16 @@ void TIMER_0_ISR(void)
 void TIMER_1_ISR(void)
 {
     if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
+        TIMER_1_DEV.INTFLAG.reg = TC_INTFLAG_MC0;
+        TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
         if (config[TIMER_1].cb) {
-            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC0;
-            TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
             config[TIMER_1].cb(config[TIMER_1].arg, 0);
         }
     }
-    else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
+    if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
+        TIMER_1_DEV.INTFLAG.reg = TC_INTFLAG_MC1;
+        TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
         if(config[TIMER_1].cb) {
-            TIMER_1_DEV.INTFLAG.reg |= TC_INTFLAG_MC1;
-            TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_1].cb(config[TIMER_1].arg, 1);
         }
     }
