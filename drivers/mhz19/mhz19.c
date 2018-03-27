@@ -81,35 +81,59 @@ int mhz19_init(mhz19_t *dev, const mhz19_params_t *params)
     return MHZ19_OK;
 }
 
-int mhz19_get_ppm(mhz19_t *dev, int16_t *ppm)
+/*
+ * Do a raw send/receive exchange to the sensor. As exchanges between the
+ * MH-Z19 and the host always consists of 9 bytes in each direction, the size
+ * of the input and output arrays is fixed at 9 bytes here. The returned bytes
+ * from the MH-Z19 appear in mhz19_t::rxmem
+ *
+ * @param[in]  dev   The mhz19 device context
+ * @param[in]  out   the 9 bytes to transmit to the device
+ */
+static void mhz19_xmit(mhz19_t *dev, const uint8_t *in)
 {
-    xtimer_t timer; /* MH-Z19 timout timer, in case it doesn't respond */
-    int res = MHZ19_OK;
-
+    /* MH-Z19 timout timer, for the case the sensor doesn't respond */
+    xtimer_t timer;
     timer.callback = _mhz19_timeout;
     timer.arg = dev;
     timer.target = 0;
     timer.long_target = 0;
-    DEBUG("mhz19: Starting measurement\n");
-    /* Lock concurrent access guard mutex */
-    mutex_lock(&dev->mutex);
-    /* Reset the buffer */
-    dev->idx = 0;
-    /* Send read command */
-    uart_write(dev->params->uart, value_read, sizeof(value_read));
 
-    /* Lock synchronisation mutex */
+    /* Reset the buffer index to zero */
+    dev->idx = 0;
+
+    /* Send read command to the sensor */
+    uart_write(dev->params->uart, in, MHZ19_BUF_SIZE + 1);
+
+    /* First time locking the synchronisation mutex */
     mutex_lock(&dev->sync);
     /* Schedule timeout wakeup callback */
     xtimer_set(&timer, MHZ19_READ_TIMEOUT * US_PER_MS);
 
-    /* Wait until the timeout or the UART ISR unlocks the mutex */
+    /* By locking the same mutex another time, this thread blocks until
+     * something else calls the unlock. In this case it has to wait for
+     * either the timeout xtimer callback or the UART ISR having received 9
+     * bytes. This way we have both a timeout scheduled and a regular wait
+     * for the UART to finish.
+     */
     mutex_lock(&dev->sync);
 
-    /* Unlock mutex again to reset it */
+    /* Unlock mutex again to reset it to unlocked */
     mutex_unlock(&dev->sync);
-    /* Clean up timer */
+    /* Clean up timer in case it didn't fire yet */
     xtimer_remove(&timer);
+
+}
+
+int mhz19_get_ppm(mhz19_t *dev, int16_t *ppm)
+{
+    int res = MHZ19_OK;
+
+    /* First lock, guarantees no concurrent access to the UART device */
+    mutex_lock(&dev->mutex);
+    DEBUG("mhz19: Starting measurement\n");
+    mhz19_xmit(dev, value_read);
+
     DEBUG("mhz19: Checking buffer: %d\n", dev->idx);
     /* MHZ19_BUF_SIZE indicates completely filled buffer */
     if (dev->idx == MHZ19_BUF_SIZE) {
@@ -133,7 +157,7 @@ int mhz19_get_ppm(mhz19_t *dev, int16_t *ppm)
         DEBUG("mhz19: Timeout trying to retrieve measurement\n");
         res = MHZ19_ERR_TIMEOUT;
     }
-    /* Unlock guard mutex */
+    /* Unlock concurrency guard mutex */
     mutex_unlock(&dev->mutex);
 
     return res;
