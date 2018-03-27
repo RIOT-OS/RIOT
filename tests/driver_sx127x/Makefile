@@ -13,7 +13,7 @@ USEMODULE += xtimer
 DRIVER ?= sx1276
 
 # use SX1276 by default
-USEMODULE += ${DRIVER}
+USEMODULE += $(DRIVER)
 
 FEATURES_REQUIRED ?= periph_spi
 FEATURES_REQUIRED ?= periph_gpio

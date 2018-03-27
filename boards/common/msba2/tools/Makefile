@@ -5,10 +5,10 @@ prefix=/usr/local
 all: lpc2k_pgm pseudoterm
 
 SRC  = lpc2k_pgm.c download.c uuencode.c ihex.c serial.c chipinfo.c boot_2xxx.c boot_23xx.c control_2xxx.c
-OBJS = ${addprefix obj/,${patsubst %.c,%.o,$(SRC)}}
+OBJS = $(addprefix obj/,$(patsubst %.c,%.o,$(SRC)))
 
 PSEUDOTERM_SRC = pseudoterm.c serial.c control_2xxx.c
-PSEUDOTERM_OBJS = ${addprefix obj/,${patsubst %.c,%.o,$(PSEUDOTERM_SRC)}}
+PSEUDOTERM_OBJS = $(addprefix obj/,$(patsubst %.c,%.o,$(PSEUDOTERM_SRC)))
 
 TARGETDIR = bin
 

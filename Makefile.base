@@ -3,24 +3,24 @@ ifeq (, $(__RIOTBUILD_FLAG))
 endif
 
 unexport DIRS
-DIRS := $(sort $(abspath ${DIRS}))
+DIRS := $(sort $(abspath $(DIRS)))
 
 MODULE ?= $(shell basename $(CURDIR))
 
-.PHONY: all ${DIRS:%=ALL--%} ${DIRS:%=CLEAN--%}
+.PHONY: all $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%)
 
 all: $(BINDIR)/$(MODULE).a ..nothing
 
 ..nothing:
 	@:
 
-clean:: ${DIRS:%=CLEAN--%}
+clean:: $(DIRS:%=CLEAN--%)
 
-${DIRS:%=ALL--%}:
-	$(QQ)"$(MAKE)" -C ${@:ALL--%=%}
+$(DIRS:%=ALL--%):
+	$(QQ)"$(MAKE)" -C $(@:ALL--%=%)
 
-${DIRS:%=CLEAN--%}:
-	$(QQ)"$(MAKE)" -C ${@:CLEAN--%=%} clean
+$(DIRS:%=CLEAN--%):
+	$(QQ)"$(MAKE)" -C $(@:CLEAN--%=%) clean
 
 ## submodules
 ifeq (1, $(SUBMODULES))
@@ -67,7 +67,7 @@ $(BINDIR)/$(MODULE)/:
 
 $(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
 
-$(BINDIR)/$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
+$(BINDIR)/$(MODULE).a: $(OBJ) | $(DIRS:%=ALL--%)
 	@# Recreate archive to cleanup deleted/non selected source files objects
 	$(Q)$(RM) $@
 	$(Q)$(AR) $(ARFLAGS) $@ $^
