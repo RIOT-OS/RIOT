@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
- * Copyright (C) 2015 Freie Universität Berlin
+ *               2015 Freie Universität Berlin
  *               2017 HAW Hamburg
+ *               2018 RWTH Aachen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,9 +22,9 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @}
  */
-
 
 #include "luid.h"
 #include "byteorder.h"
@@ -85,18 +86,22 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_START, false);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_END, true);
+
+    /* enable safe mode (protect RX FIFO until reading data starts) */
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
+                        AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
+
 #ifdef MODULE_NETSTATS_L2
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END, true);
 #endif
+
     /* set default protocol */
 #ifdef MODULE_GNRC_SIXLOWPAN
     dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
 #elif MODULE_GNRC
     dev->netdev.proto = GNRC_NETTYPE_UNDEF;
 #endif
-    /* enable safe mode (protect RX FIFO until reading data starts) */
-    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
-                        AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);
+
 #ifdef MODULE_AT86RF212B
     at86rf2xx_set_page(dev, AT86RF2XX_DEFAULT_PAGE);
 #endif
@@ -113,11 +118,12 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     tmp |= (AT86RF2XX_TRX_CTRL_0_CLKM_CTRL__OFF);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_0, tmp);
 
+    /* clear interrupt flags, AT86RF233 Manual p.33*/
+    at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
+
     /* enable interrupts */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
                         AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
-    /* clear interrupt flags */
-    at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
     /* go into RX state */
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
