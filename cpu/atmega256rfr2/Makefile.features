@@ -5,3 +5,4 @@ include $(RIOTCPU)/atmega_common/Makefile.features
 
 # Various other features (if any)
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_hwrng
