@@ -93,7 +93,7 @@ typedef enum {
  *
  * @return  An initialized netreg entry
  */
-#ifdef MODULE_GNRC_NETAPI_MBOX
+#if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
 #define GNRC_NETREG_ENTRY_INIT_PID(demux_ctx, pid)  { NULL, demux_ctx, \
                                                       GNRC_NETREG_TYPE_DEFAULT, \
                                                       { pid } }
