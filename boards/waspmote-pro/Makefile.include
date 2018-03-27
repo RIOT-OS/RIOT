@@ -33,5 +33,5 @@ ifeq ($(PROGRAMMER), stk500v1)
   export PROGRAMMER_FLAGS = -P $(PORT) -b 115200
 endif
 
-export OFLAGS += -j .text -j .data -O ihex
+OFLAGS += -j .text -j .data
 export FFLAGS += -p m1281 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -U flash:w:$(HEXFILE)

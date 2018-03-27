@@ -15,7 +15,6 @@ export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 export DEBUGSERVER = st-util
 
 # define st-flash parameters
-export OFLAGS = -O binary
-HEXFILE = $(ELFFILE:.elf=.bin)
+HEXFILE = $(BINFILE)
 export FFLAGS = write $(HEXFILE) 0x8000000
 export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)

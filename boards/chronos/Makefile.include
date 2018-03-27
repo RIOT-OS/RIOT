@@ -3,7 +3,6 @@ export CPU = cc430
 export CPU_MODEL = cc430f6137
 
 # flasher configuration
-export OFLAGS = -O ihex
 export FLASHER = mspdebug
 export FFLAGS = rf2500 "prog $(HEXFILE)"
 

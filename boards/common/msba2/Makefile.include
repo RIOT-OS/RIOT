@@ -29,8 +29,6 @@ export FFLAGS = $(PORT) $(HEXFILE)
 INCLUDES += -I$(RIOTBOARD)/common/msba2/include
 INCLUDES += -I$(RIOTBOARD)/common/msba2/drivers/include
 
-export OFLAGS = -O ihex
-
 export UNDEF += $(BINDIR)/cpu/startup.o
 
 USEMODULE += boards_common_msba2-drivers

@@ -25,12 +25,10 @@ ifneq ($(shell uname -s),Darwin)
 else
   ifeq (0,$(shell which gobjcopy 2>&1 > /dev/null ; echo $$?))
     export OBJCOPY ?= gobjcopy
-    export OFLAGS ?= -O ihex
   else
     # If gobjcopy is not available, just do nothing. The hexfile
     # is not used for native anyways.
     export OBJCOPY ?= true
-    export OFLAGS =
   endif
 endif
 

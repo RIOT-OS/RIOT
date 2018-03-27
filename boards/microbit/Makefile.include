@@ -12,7 +12,6 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # we support flashing through plain fscopy or using JLink
 PROGRAMMER ?= fscopy
 ifeq (fscopy,$(PROGRAMMER))
-  export OFLAGS = -O ihex
   export FFLAGS =
   export DEBUGGER_FLAGS =
 
