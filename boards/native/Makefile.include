@@ -27,9 +27,9 @@ else
     export OBJCOPY ?= gobjcopy
     export OFLAGS ?= -O ihex
   else
-    # If gobjcopy is not available, just create an empty file. The hexfile
+    # If gobjcopy is not available, just do nothing. The hexfile
     # is not used for native anyways.
-    export OBJCOPY ?= touch
+    export OBJCOPY ?= true
     export OFLAGS =
   endif
 endif
