@@ -1,0 +1,6 @@
+/**
+ * @defgroup pkg_lua Lua ported to RIOT
+ * @ingroup  pkg
+ * @brief    Provides Lua support for RIOT
+ * @see      https://github.com/lua/lua
+ */
