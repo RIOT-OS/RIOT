@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
  *               2017 HAW Hamburg
+ *               2018 RWTH Aachen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,13 +22,17 @@
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @}
  */
 
 #include "at86rf2xx.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
+
+#ifndef MODULE_AT86RFR2
 #include "periph/spi.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -109,6 +114,12 @@ static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                           0x0a, 0x0b, 0x0b, 0x0b, 0x0c, 0x0c,
                                           0x0c, 0x0d, 0x0d, 0x0d, 0x0e, 0x0e,
                                           0x0e, 0x0f };
+#elif MODULE_AT86RFR2
+/*  {3.5, 3.3, 2.8, 2.3, 1.8, 1.2, 0.5,
+ *   -0.5, -1.5, -2.5, -3.5, -4.5, -6.5, -8.5, -11.5, -16.5};
+ */
+static const int16_t tx_pow_to_dbm[] = { 4, 3, 3, 2, 2, 1, 0,
+                                         -1, -2, -3, -4, -5, -6, -7, -12, -17 };
 #else
 static const int16_t tx_pow_to_dbm[] = { 3, 3, 2, 2, 1, 1, 0,
                                          -1, -2, -3, -4, -5, -7, -9, -12, -17 };
@@ -233,6 +244,10 @@ int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR);
     DEBUG("txpower value: %x\n", txpower);
     return _tx_pow_to_dbm_212b(dev->netdev.chan, dev->page, txpower);
+#elif defined(MODULE_AT86RFR2)
+    (void)dev;
+    uint8_t txpower = *AT86RF2XX_REG__PHY_TX_PWR & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
+    return tx_pow_to_dbm[txpower];
 #else
     uint8_t txpower = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_TX_PWR)
                       & AT86RF2XX_PHY_TX_PWR_MASK__TX_PWR;
@@ -242,6 +257,16 @@ int16_t at86rf2xx_get_txpower(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
 {
+#ifdef MODULE_AT86RFR2
+    /* find the right configuration which is the nearest to the transmit power
+     * take the next value, it is the next smaller than the requested.
+     */
+    unsigned int i = 0;
+    while (tx_pow_to_dbm[i] > txpower) {
+        i++;
+    }
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR, i);
+#else /* END MODULE_AT86RFR2 */
     txpower += AT86RF2XX_TXPOWER_OFF;
 
     if (txpower < 0) {
@@ -263,17 +288,42 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PHY_TX_PWR,
                         dbm_to_tx_pow[txpower]);
 #endif
+#endif /* END other then MODULE_AT86RFR2 */
 }
 
 int16_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
 {
+#if defined(MODULE_AT86RFR2)
+    (void)dev;
+    uint8_t rxsens = *AT86RF2XX_REG__RX_SYN & AT86RF2XX_RX_SYN__RX_PDT_LEVEL;
+    if (rxsens == 0){
+        return RSSI_BASE_VAL;
+    }else {
+        return RSSI_BASE_VAL + 3*(rxsens-1);
+    }
+#else
     uint8_t rxsens = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN)
                      & AT86RF2XX_RX_SYN__RX_PDT_LEVEL;
     return rx_sens_to_dbm[rxsens];
+#endif
 }
 
 void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int16_t rxsens)
 {
+#if MODULE_AT86RFR2
+    (void)dev;
+    /* Always set the treshhold which at least limits the requested value.
+    * requesting -50dBm will result in -48dBm */
+    rxsens = (rxsens - RSSI_BASE_VAL)/3;
+    if (rxsens >14){
+        rxsens =14;
+    }else if(rxsens <0){
+        rxsens =0;
+    }else{
+        rxsens +=1;
+    }
+    *AT86RF2XX_REG__RX_SYN = (*AT86RF2XX_REG__RX_SYN & ~(AT86RF2XX_RX_SYN__RX_PDT_LEVEL)) | rxsens;
+#else
     rxsens += MIN_RX_SENSITIVITY;
 
     if (rxsens < 0) {
@@ -287,6 +337,7 @@ void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int16_t rxsens)
     tmp &= ~(AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
     tmp |= (dbm_to_rx_sens[rxsens] & AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp);
+#endif
 }
 
 uint8_t at86rf2xx_get_max_retries(const at86rf2xx_t *dev)
@@ -446,6 +497,16 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                           : (tmp & ~AT86RF2XX_IRQ_STATUS_MASK__RX_START);
             at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
             break;
+#ifdef MODULE_AT86RFR2
+        case AT86RF2XX_OPT_TELL_TX_END:
+            DEBUG("[at86rf2xx] opt: %s TX END IRQ\n",
+                  (state ? "enable" : "disable"));
+            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
+            tmp = (state) ? (tmp |  AT86RF2XX_IRQ_STATUS_MASK__TX_END)
+                          : (tmp & ~AT86RF2XX_IRQ_STATUS_MASK__TX_END);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
+            break;
+#endif
         case AT86RF2XX_OPT_ACK_PENDING:
             DEBUG("[at86rf2xx] opt: enabling pending ACKs\n");
             tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
@@ -479,7 +540,9 @@ static inline void _set_state(at86rf2xx_t *dev, uint8_t state, uint8_t cmd)
      * in https://github.com/RIOT-OS/RIOT/pull/5244
      */
     if (state != AT86RF2XX_STATE_RX_AACK_ON) {
-        while (at86rf2xx_get_status(dev) != state) {}
+        while (at86rf2xx_get_status(dev) != state) {
+            DEBUG("_set_state: state is: 0x%02x\n", state);
+        }
     }
     /* Although RX_AACK_ON state doesn't get read back,
      * at least make sure if state transition is in progress or not
@@ -499,6 +562,7 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
      * in progress */
     do {
         old_state = at86rf2xx_get_status(dev);
+        DEBUG("at86rf2xx_set_state: 0x%02x old_state is: 0x%02x\n", state, old_state);
     } while (old_state == AT86RF2XX_STATE_BUSY_RX_AACK ||
              old_state == AT86RF2XX_STATE_BUSY_TX_ARET ||
              old_state == AT86RF2XX_STATE_IN_PROGRESS);
@@ -522,7 +586,15 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
             /* Discard all IRQ flags, framebuffer is lost anyway */
             at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
             /* Go to SLEEP mode from TRX_OFF */
+#ifdef MODULE_AT86RFR2
+            /* reset interrupts states in device */
+            dev->irq_status = 0;
+            dev->irq_status1 = 0;
+            /* Setting SLPTR bit brings radio transceiver to sleep in in TRX_OFF*/
+            *AT86RF2XX_REG__TRXPR |= (AT86RF2XX_TRXPR_SLPTR);
+#else
             gpio_set(dev->params.sleep_pin);
+#endif
             dev->state = state;
         }
         else {
@@ -534,5 +606,6 @@ uint8_t at86rf2xx_set_state(at86rf2xx_t *dev, uint8_t state)
         }
     }
 
+    DEBUG("at86rf2xx_set_state: new state is: 0x%02x\n\n", at86rf2xx_get_status(dev));
     return old_state;
 }

@@ -33,8 +33,10 @@ extern "C" {
  * is to use double speed.
  *
  * For 8MHz F_CPU following Baudrate have good error rates
- *  76923
- *  38400
+ *  76800
+ *  38400 Seems to fast for long byte streams, collecting in interrupt to slow.
+ *  19200
+ *   9600
  *
  * Matches this with BAUD in Board/Makefile.include
  *
@@ -88,6 +90,8 @@ extern "C" {
 #define XTIMER_CHAN         (0)
 #define XTIMER_WIDTH        (16)
 #define XTIMER_HZ           (125000UL)
+#define XTIMER_OVERHEAD     (33)
+#define XTIMER_ISR_BACKOFF  (40)
 /** @} */
 
 /**
