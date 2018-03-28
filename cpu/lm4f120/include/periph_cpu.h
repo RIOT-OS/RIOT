@@ -111,19 +111,19 @@ typedef enum {
  * @{
  */
 typedef struct {
-    unsigned long dev;                 /**< UART device number */
-    unsigned long uart_txint_mode;     /**< UART TX interrupt mode */
-    unsigned long uart_fifo_tx;        /**< UART TX fifo select */
-    unsigned long uart_fifo_rx;        /**< UART RX fifo select */
-    IRQn_Type uart_irq_chan;           /**< UART IRQ channel */
-    unsigned long gpio_sysctl;         /**< GPIO device in sysctl */
-    unsigned long gpio_port;           /**< GPIO port */
+    unsigned int dev;              /**< UART device number */
+    unsigned long uart_txint_mode;  /**< UART TX interrupt mode */
+    unsigned long uart_fifo_tx;     /**< UART TX fifo select */
+    unsigned long uart_fifo_rx;     /**< UART RX fifo select */
+    IRQn_Type uart_irq_chan;        /**< UART IRQ channel */
+    unsigned long gpio_sysctl;      /**< GPIO device in sysctl */
+    unsigned long gpio_port;        /**< GPIO port */
     struct {
-        unsigned long rx;              /**< pin used for RX */
-        unsigned long tx;              /**< pin used for TX */
-        unsigned long mask_rx;         /**< Pin mask for RX*/
-        unsigned long mask_tx;         /**< Pin mask for TX*/
-    } pins;                            /**< Pin setting */
+        unsigned long rx;           /**< pin used for RX */
+        unsigned long tx;           /**< pin used for TX */
+        unsigned long mask_rx;      /**< Pin mask for RX*/
+        unsigned long mask_tx;      /**< Pin mask for TX*/
+    } pins;                         /**< Pin setting */
 } uart_conf_t;
 /** @} */
 
