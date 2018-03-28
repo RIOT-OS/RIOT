@@ -1,0 +1,3 @@
+USEPKG += tlsf
+USEMODULE += lua-contrib
+USEMODULE += printf_float

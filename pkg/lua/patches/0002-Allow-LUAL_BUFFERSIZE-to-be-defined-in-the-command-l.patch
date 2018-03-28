@@ -1,0 +1,33 @@
+From 2e86c4b6b7061b69929d601096e3f0a086ffcc81 Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Thu, 3 May 2018 16:55:05 +0200
+Subject: [PATCH 2/8] Allow LUAL_BUFFERSIZE to be defined in the command line.
+
+---
+ luaconf.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/luaconf.h b/luaconf.h
+index 118f997a..e816db00 100644
+--- a/luaconf.h
++++ b/luaconf.h
+@@ -748,12 +748,16 @@
+ ** smaller buffer would force a memory allocation for each call to
+ ** 'string.format'.)
+ */
++#ifndef LUAL_BUFFERSIZE
++
+ #if LUA_FLOAT_TYPE == LUA_FLOAT_LONGDOUBLE
+ #define LUAL_BUFFERSIZE		8192
+ #else
+ #define LUAL_BUFFERSIZE   ((int)(0x80 * sizeof(void*) * sizeof(lua_Integer)))
+ #endif
+ 
++#endif
++
+ /* }================================================================== */
+ 
+ 
+-- 
+2.17.1
+

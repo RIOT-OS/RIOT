@@ -1,9 +1,9 @@
-SRC := $(filter-out lua.c luac.c,$(wildcard *.c))
+SRC := $(filter-out loadlib.c lua.c luac.c,$(wildcard *.c))
 
-# This builds for native using POSIX system calls and some extra libraries, and
-# removes a compiler warning that warns against using tmpnam().
-ifeq ($(BOARD),native)
-  CFLAGS += -DLUA_USE_LINUX
-endif
+CFLAGS += -fstack-usage -fconserve-stack \
+          -DLUA_MAXCAPTURES=16 \
+          -DL_MAXLENNUM=50
+#    Enable these options to debug stack usage
+#          -Wstack-usage=128 -Wno-error=stack-usage=128
 
 include $(RIOTBASE)/Makefile.base
