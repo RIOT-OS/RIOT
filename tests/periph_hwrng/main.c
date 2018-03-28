@@ -50,7 +50,7 @@ int main(void)
             printf("\n");
         }
 
-        xtimer_usleep(1000 * 1000);
+        xtimer_usleep(1000U * 1000U);
     }
 
     return 0;
