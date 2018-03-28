@@ -1,3 +1,6 @@
+# Globally set default goal to `all`
+.DEFAULT_GOAL := all
+
 # include Makefile.local if it exists
 -include Makefile.local
 
@@ -460,8 +463,7 @@ $(CURDIR)/eclipsesym.xml:
 # Export variables used throughout the whole make system:
 include $(RIOTMAKE)/vars.inc.mk
 
-# Include build targets for selected tools after the default RIOT targets have
-# been defined (-> so the `all` will be always the first target)
+# Include build targets for selected tools
 include $(RIOTMAKE)/tools/targets.inc.mk
 
 # Warn if the selected board and drivers don't provide all needed features:
@@ -590,4 +592,9 @@ CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
 
 # include mcuboot support
 include $(RIOTMAKE)/mcuboot.mk
+
+# Sanity check, 'all' should be the default goal
+ifneq (all, $(.DEFAULT_GOAL))
+  $(error .DEFAULT_GOAL := $(.DEFAULT_GOAL))
+endif
 endif # BOARD=none

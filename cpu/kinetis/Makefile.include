@@ -44,7 +44,4 @@ USEMODULE += periph_wdog
 $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin: $(RIOTCPU)/$(CPU)/dist/wdog-disable.s
 	$(Q)$(MAKE) -C $(RIOTCPU)/$(CPU)/dist/ $(notdir $@)
 
-# Reset the default goal to not make wdog-disable.bin the default target.
-.DEFAULT_GOAL :=
-
 include $(RIOTMAKE)/arch/cortexm.inc.mk

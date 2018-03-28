@@ -15,9 +15,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 .PHONY: flash
 flash: $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
 
-# Reset the default goal.
-.DEFAULT_GOAL :=
-
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
 # wdog-disable.bin is a precompiled binary which will disable the watchdog and

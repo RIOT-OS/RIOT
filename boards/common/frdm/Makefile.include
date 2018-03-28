@@ -26,9 +26,6 @@ export OPENOCD_EXTRA_INIT
 .PHONY: flash
 flash: $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
 
-# Reset the default goal.
-.DEFAULT_GOAL :=
-
 export OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/old-openocd-$(CPU_FAMILY).cfg
 endif
 
