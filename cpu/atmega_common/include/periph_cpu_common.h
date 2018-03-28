@@ -174,6 +174,19 @@ typedef struct {
  * @brief   WDT can be stopped on AVR
  */
 #define WDT_HAS_STOP                    (1)
+/** @} */
+
+/**
+￼* @name RTT configuration
+￼* @{
+￼*/
+#define RTT_MAX_VALUE    (0x00FFFFFF)    /* 24-bit timer */
+
+/* possible values: 32, 128, 256, 512, 1024, 4096, 32768 */
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY    (1024U)         /* in Hz. */
+#endif
+/** @} */
 
 #ifdef __cplusplus
 }
