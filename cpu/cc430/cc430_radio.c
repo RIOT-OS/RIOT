@@ -64,7 +64,8 @@ void cc430_radio_delay_rf(volatile uint32_t p)
  *
  * @param[in]   uint8_t strobe      Type of command to be sent
  *
- * @return      uint8_t statusByte  value of the RF1ASTATB register, or 0 if invalid strobe command
+ * @return      uint8_t statusByte  value of the RF1ASTATB register,
+ *                                  or 0 if invalid strobe command
  */
 uint8_t cc430_radio_strobe(uint8_t strobe)
 {
@@ -147,7 +148,8 @@ uint8_t cc430_radio_read_single_reg(uint8_t addr)
  */
 void cc430_radio_write_single_reg(uint8_t addr, uint8_t value)
 {
-    while (!(RF1AIFCTL1 & RFINSTRIFG));     // Wait for the Radio to be ready for next instruction
+    // Wait for the Radio to be ready for next instruction
+    while (!(RF1AIFCTL1 & RFINSTRIFG)){}
     RF1AINSTRB = (addr | RF_REGWR);         // Send address + Instruction
     RF1ADINB = value;                       // Write data in
 
@@ -160,7 +162,8 @@ void cc430_radio_write_single_reg(uint8_t addr, uint8_t value)
  * @brief   Read sequentially in multiple registers of the cc1101 from a base address
  *
  * @param[in]  uint8_t addr     Address of the first register
- * @param[out] void * buffer    Values of the registers are written here, buffer must be of size uint8_t
+ * @param[out] void * buffer    Values of the registers are written here,
+ *                              buffer must be of size uint8_t
  * @param[in]  uint8_t count    Number of register to be read
  *
  */
@@ -173,8 +176,9 @@ void cc430_radio_read_burst_reg(uint8_t addr, void *buffer, uint8_t count)
     RF1AINSTR1B = (addr | RF_REGRD);            // Send addr of first conf. reg. to be read
                                                 // ... and the burst-register read instruction
     for (i = 0; i < (count - 1); i++) {
+        // Wait for the Radio Core to update the RF1ADOUTB reg
         while (!(RFDOUTIFG & RF1AIFCTL1)) {
-        }                                           // Wait for the Radio Core to update the RF1ADOUTB reg
+        }
         ((uint8_t *)buffer)[i] = RF1ADOUT1B;        // Read DOUT from Radio Core + clears RFDOUTIFG
         // Also initiates auo-read for next DOUT byte
     }
@@ -193,8 +197,8 @@ void cc430_radio_read_burst_reg(uint8_t addr, void *buffer, uint8_t count)
 void cc430_radio_write_burst_reg(uint8_t addr, void *buffer, uint8_t count)
 {
     uint8_t i;
-
-    while (!(RF1AIFCTL1 & RFINSTRIFG));                             // Wait for the Radio to be ready for next instruction
+    // Wait for the Radio to be ready for next instruction
+    while (!(RF1AIFCTL1 & RFINSTRIFG)){}
     RF1AINSTRW = ((addr | RF_REGWR) << 8) + ((uint8_t *)buffer)[0]; // Send address + Instruction
 
     for (i = 1; i < count; i++) {
@@ -246,7 +250,6 @@ int8_t cc430_radio_write_pa_table(uint8_t value)
     uint8_t valueRead = 0;
     uint16_t rf1ainstrw_value;
 
-    //int8_t return_code = 1;
 
     switch (value) {
         case cc430_radio_POWER_OUTPUT_MINUS_30DBM:
@@ -315,8 +318,8 @@ int8_t cc430_radio_write_pa_table(uint8_t value)
 
 
 /**
- * @brief   Transmit data with the radio module. User must make sure they do not overflow the TXBuffer
- * of the radio module
+ * @brief   Transmit data with the radio module. User must make sure
+ * they do not overflow the TXBuffer of the radio module
  *
  * @param[in]  void * buffer      buffer of bytes to be sent
  * @param[in]  uint8_t length     number of bytes to be sent
