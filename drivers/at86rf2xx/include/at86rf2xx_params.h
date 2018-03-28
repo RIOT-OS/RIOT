@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
  *               2015 Hauke Petersen <hauke.petersen@fu-berlin.de>
+ *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
 
 #ifndef AT86RF2XX_PARAMS_H
@@ -49,7 +51,9 @@ extern "C" {
 #define AT86RF2XX_PARAM_RESET       (GPIO_PIN(0, 3))
 #endif
 
-#ifndef AT86RF2XX_PARAMS
+#if defined(MODULE_AT86RFR2)
+#define AT86RF2XX_PARAMS            { 0 }
+#elif !defined(AT86RF2XX_PARAMS)
 #define AT86RF2XX_PARAMS            { .spi = AT86RF2XX_PARAM_SPI,         \
                                       .spi_clk = AT86RF2XX_PARAM_SPI_CLK, \
                                       .cs_pin = AT86RF2XX_PARAM_CS,       \
@@ -57,6 +61,7 @@ extern "C" {
                                       .sleep_pin = AT86RF2XX_PARAM_SLEEP, \
                                       .reset_pin = AT86RF2XX_PARAM_RESET }
 #endif
+
 /**@}*/
 
 /**

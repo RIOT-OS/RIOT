@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
- * Copyright (C) 2015 Freie Universität Berlin
+ *               2015 Freie Universität Berlin
  *               2017 HAW Hamburg
+ *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -19,6 +20,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
 
 #ifndef AT86RF2XX_INTERNAL_H
@@ -73,6 +75,18 @@ extern "C" {
  */
 #define AT86RF2XX_RESET_DELAY           (62U)
 
+#ifdef MODULE_AT86RFR2
+/**
+ * netdev_t to at86rfr2_dev for Interrupt handling
+ */
+extern netdev_t *at86rfr2_dev;
+
+/**
+ * \brief Enabling the receive and transmit led and debug pins.
+ */
+void enable_rxtx_led(void);
+#endif
+
 /**
  * @brief   Read from a register at address `addr` from device `dev`.
  *
@@ -81,7 +95,11 @@ extern "C" {
  *
  * @return              the value of the specified register
  */
+#ifdef MODULE_AT86RFR2
+uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, volatile uint8_t *addr);
+#else
 uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr);
+#endif
 
 /**
  * @brief   Write to a register at address `addr` from device `dev`.
@@ -90,7 +108,12 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr);
  * @param[in] addr      address of the register to write
  * @param[in] value     value to write to the given register
  */
+#ifdef MODULE_AT86RFR2
+void at86rf2xx_reg_write(const at86rf2xx_t *dev, volatile uint8_t *addr,
+                         const uint8_t value);
+#else
 void at86rf2xx_reg_write(const at86rf2xx_t *dev, uint8_t addr, uint8_t value);
+#endif
 
 /**
  * @brief   Read a chunk of data from the SRAM of the given device

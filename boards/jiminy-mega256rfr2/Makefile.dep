@@ -1,1 +1,6 @@
+# export board specific dependencies to the global includes-listing
 USEMODULE += boards_common_atmega
+
+ifneq (, $(filter gnrc_netdev_default netdev_default, $(USEMODULE)))
+USEMODULE += at86rfr2
+endif

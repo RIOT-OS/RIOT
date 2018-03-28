@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -24,6 +25,7 @@
  * @author      Daniel Krebs <github@daniel-krebs.net>
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
 
 #ifndef AT86RF2XX_H
@@ -87,9 +89,11 @@ extern "C" {
 #elif MODULE_AT86RF212B
 /**
  * @note for the default settings in RIOT for the at86rf212b,
- *       for other seetings this value may change.
+ *       for other settings this value may change.
  */
 #   define RSSI_BASE_VAL                   (-98)
+#elif MODULE_AT86RFR2
+#   define RSSI_BASE_VAL                   (-90)
 #else
 #   define RSSI_BASE_VAL                   (-91)
 #endif
@@ -112,19 +116,19 @@ extern "C" {
  * @name    Flags for device internal states (see datasheet)
  * @{
  */
-#define AT86RF2XX_STATE_P_ON           (0x00)     /**< initial power on */
-#define AT86RF2XX_STATE_BUSY_RX        (0x01)     /**< busy receiving data (basic mode) */
-#define AT86RF2XX_STATE_BUSY_TX        (0x02)     /**< busy transmitting data (basic mode) */
-#define AT86RF2XX_STATE_FORCE_TRX_OFF  (0x03)     /**< force transition to idle */
-#define AT86RF2XX_STATE_RX_ON          (0x06)     /**< listen mode (basic mode) */
-#define AT86RF2XX_STATE_TRX_OFF        (0x08)     /**< idle */
-#define AT86RF2XX_STATE_PLL_ON         (0x09)     /**< ready to transmit */
-#define AT86RF2XX_STATE_SLEEP          (0x0f)     /**< sleep mode */
-#define AT86RF2XX_STATE_BUSY_RX_AACK   (0x11)     /**< busy receiving data (extended mode) */
-#define AT86RF2XX_STATE_BUSY_TX_ARET   (0x12)     /**< busy transmitting data (extended mode) */
-#define AT86RF2XX_STATE_RX_AACK_ON     (0x16)     /**< wait for incoming data */
-#define AT86RF2XX_STATE_TX_ARET_ON     (0x19)     /**< ready for sending data */
-#define AT86RF2XX_STATE_IN_PROGRESS    (0x1f)     /**< ongoing state conversion */
+#define AT86RF2XX_STATE_P_ON           (0x00)       /**< initial power on */
+#define AT86RF2XX_STATE_BUSY_RX        (0x01)       /**< busy receiving data (basic mode) */
+#define AT86RF2XX_STATE_BUSY_TX        (0x02)       /**< busy transmitting data (basic mode) */
+#define AT86RF2XX_STATE_FORCE_TRX_OFF  (0x03)       /**< force transition to idle */
+#define AT86RF2XX_STATE_RX_ON          (0x06)       /**< listen mode (basic mode) */
+#define AT86RF2XX_STATE_TRX_OFF        (0x08)       /**< idle */
+#define AT86RF2XX_STATE_PLL_ON         (0x09)       /**< ready to transmit */
+#define AT86RF2XX_STATE_SLEEP          (0x0f)       /**< sleep mode */
+#define AT86RF2XX_STATE_BUSY_RX_AACK   (0x11)       /**< busy receiving data (extended mode) */
+#define AT86RF2XX_STATE_BUSY_TX_ARET   (0x12)       /**< busy transmitting data (extended mode) */
+#define AT86RF2XX_STATE_RX_AACK_ON     (0x16)       /**< wait for incoming data */
+#define AT86RF2XX_STATE_TX_ARET_ON     (0x19)       /**< ready for sending data */
+#define AT86RF2XX_STATE_IN_PROGRESS    (0x1f)       /**< ongoing state conversion */
 /** @} */
 
 /**
@@ -140,18 +144,18 @@ extern "C" {
 #define AT86RF2XX_OPT_AUTOACK        (NETDEV_IEEE802154_ACK_REQ)        /**< legacy define */
 #define AT86RF2XX_OPT_ACK_PENDING    (NETDEV_IEEE802154_FRAME_PEND)     /**< legacy define */
 
-#define AT86RF2XX_OPT_CSMA           (0x0100)       /**< CSMA active */
-#define AT86RF2XX_OPT_PROMISCUOUS    (0x0200)       /**< promiscuous mode
-                                                     *   active */
-#define AT86RF2XX_OPT_PRELOADING     (0x0400)       /**< preloading enabled */
-#define AT86RF2XX_OPT_TELL_TX_START  (0x0800)       /**< notify MAC layer on TX
-                                                     *   start */
-#define AT86RF2XX_OPT_TELL_TX_END    (0x1000)       /**< notify MAC layer on TX
-                                                     *   finished */
-#define AT86RF2XX_OPT_TELL_RX_START  (0x2000)       /**< notify MAC layer on RX
-                                                     *   start */
-#define AT86RF2XX_OPT_TELL_RX_END    (0x4000)       /**< notify MAC layer on RX
-                                                     *   finished */
+#define AT86RF2XX_OPT_CSMA           (0x0100)                           /**< CSMA active */
+#define AT86RF2XX_OPT_PROMISCUOUS    (0x0200)                           /**< promiscuous mode
+                                                                         *   active */
+#define AT86RF2XX_OPT_PRELOADING     (0x0400)                           /**< preloading enabled */
+#define AT86RF2XX_OPT_TELL_TX_START  (0x0800)                           /**< notify MAC layer on TX
+                                                                         *   start */
+#define AT86RF2XX_OPT_TELL_TX_END    (0x1000)                           /**< notify MAC layer on TX
+                                                                         *   finished */
+#define AT86RF2XX_OPT_TELL_RX_START  (0x2000)                           /**< notify MAC layer on RX
+                                                                         *   start */
+#define AT86RF2XX_OPT_TELL_RX_END    (0x4000)                           /**< notify MAC layer on RX
+                                                                         *   finished */
 /** @} */
 
 /**
@@ -185,9 +189,21 @@ typedef struct {
     uint8_t pending_tx;                 /**< keep track of pending TX calls
                                              this is required to know when to
                                              return to @ref at86rf2xx_t::idle_state */
-#if AT86RF2XX_HAVE_RETRIES
+#if AT86RF2XX_HAVE_RETRIES || MODULE_AT86RFR2
     /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
     uint8_t tx_retries;                 /**< Number of NOACK retransmissions */
+#endif
+#ifdef MODULE_AT86RFR2
+    /* ATmega256rfr2 signals transceiver events with different interrupts
+     * they have to be stored to mimic the same flow as external transceiver
+     * Use irq_status to map saved interrupts of SOC transceiver,
+     * as they clear after IRQ callback.
+     *
+     *  irq_status = IRQ_STATUS
+     *  irq_status = IRQ_STATUS1
+     * */
+    uint8_t irq_status;                     /**< save irq status */
+    uint8_t irq_status1;                    /**< save irq status1 */
 #endif
     /** @} */
 } at86rf2xx_t;
