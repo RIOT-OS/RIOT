@@ -133,7 +133,7 @@ void uart_poweroff(uart_t uart)
 /**
  * The UART interrupt handler.
  */
-void irq_handler(uart_t uart)
+static inline void irq_handler(uart_t uart)
 {
     assert(uart < UART_NUMOF);
 
