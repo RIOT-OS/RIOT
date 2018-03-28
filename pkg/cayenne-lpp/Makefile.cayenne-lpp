@@ -1,0 +1,3 @@
+MODULE = cayenne-lpp
+
+include $(RIOTBASE)/Makefile.base
