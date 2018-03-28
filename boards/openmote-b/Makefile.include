@@ -1,0 +1,36 @@
+# define the cpu used by the OpenMote-B board
+export CPU = cc2538
+export CPU_MODEL = cc2538sf53
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyUSB1
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+
+# Set default flash tool
+export PROGRAMMER ?= cc2538-bsl
+
+ifeq ($(PROGRAMMER),cc2538-bsl)
+  OS := $(shell uname)
+  ifeq ($(OS),Linux)
+    PORT_BSL ?= $(PORT_LINUX)
+  else ifeq ($(OS),Darwin)
+    PORT_BSL ?= $(PORT_DARWIN)
+  endif
+  export FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
+  export FFLAGS  = -p "$(PORT_BSL)" --bootloader-invert-lines -e -w -v -b 460800 $(HEXFILE)
+else ifeq ($(PROGRAMMER),jlink)
+  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+  export FFLAGS  = $(BINDIR) $(HEXFILE)
+  export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+  export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
+  export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+endif
+
+export OFLAGS    = -O binary
+export HEXFILE = $(ELFFILE:.elf=.bin)
+export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+export RESET_FLAGS = $(BINDIR)
+export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
