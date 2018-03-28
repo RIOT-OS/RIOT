@@ -21,4 +21,4 @@ export PROGRAMMER ?= buspirate
 export PROGRAMMER_FLAGS = -P /dev/ttyUSB0
 
 export OFLAGS += -j .text -j .data -O ihex
-export FFLAGS += -p m1284p -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex
+export FFLAGS += -p m1284p -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -U flash:w:$(HEXFILE)

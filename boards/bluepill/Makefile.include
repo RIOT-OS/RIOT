@@ -16,12 +16,12 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # (ground) GPIO B1.
 ifeq ($(PROGRAMMER),dfu-util)
   export ROM_OFFSET ?= 0x2000 # Skip the space needed by the embedded bootloader
-  export BINFILE = $(patsubst %.elf,%.bin,$(ELFFILE))
   export FLASHER = dfu-util
   export DEBUGGER = # no debugger
   export RESET = # dfu-util has no support for resetting the device
 
   export OFLAGS = -O binary
+  HEXFILE = $(ELFFILE:.elf=.bin)
   export FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D "$(HEXFILE)"
 else
 

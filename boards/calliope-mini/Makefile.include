@@ -13,7 +13,6 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 PROGRAMMER ?= fscopy
 ifeq (fscopy,$(PROGRAMMER))
   export OFLAGS = -O ihex
-  export HEXFILE = $(ELFFILE:.elf=.hex)
   export FFLAGS =
   export DEBUGGER_FLAGS =
 

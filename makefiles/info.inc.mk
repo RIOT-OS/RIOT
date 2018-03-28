@@ -18,7 +18,7 @@ info-objsize:
 	  sort -rnk$${SORTROW}
 
 info-buildsize:
-	@$(SIZE) -d -B $(BINDIR)/$(APPLICATION).elf || echo ''
+	@$(SIZE) -d -B $(ELFFILE) || echo ''
 
 info-build:
 	@echo 'APPLICATION: $(APPLICATION)'

@@ -7,7 +7,6 @@ TEENSY_LOADER = $(RIOTBASE)/dist/tools/teensy-loader-cli/teensy_loader
 FLASHER = $(TEENSY_LOADER)
 
 OFLAGS = -O ihex
-HEXFILE = $(ELFFILE:.elf=.hex)
 
 FFLAGS ?= --mcu=mk20dx256 $(HEXFILE)
 
