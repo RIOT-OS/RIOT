@@ -593,4 +593,9 @@ CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
 
 # include mcuboot support
 include $(RIOTMAKE)/mcuboot.mk
+
+# Sanity check, 'all' should be the default goal
+ifneq (all, $(.DEFAULT_GOAL))
+  $(error .DEFAULT_GOAL := $(.DEFAULT_GOAL))
+endif
 endif # BOARD=none
