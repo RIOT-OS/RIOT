@@ -6,20 +6,17 @@
  * details.
  */
 
-
-
-
 /**
- * @ingroup     cc430
+ * @ingroup     drivers_cc430
  * @{
  *
- * @file        RF1A.c
+ * @file        cc430_radio.c
  * @brief       Definitions for radio function
  *
  * API for the cc1101 radio module embedded on the cc430
  *
  * @author      Baptiste Cartier
- *
+ * @}
  */
 
 #include <msp430.h> // generic file for register name, I/O, ...
