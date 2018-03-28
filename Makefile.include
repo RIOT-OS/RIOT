@@ -1,3 +1,6 @@
+# Globally set default goal to `all`
+.DEFAULT_GOAL := all
+
 # include Makefile.local if it exists
 -include Makefile.local
 
