@@ -4,3 +4,5 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_adc
   USEMODULE += saul_gpio
 endif
+
+include $(RIOTCPU)/atmega_common/Makefile.dep
