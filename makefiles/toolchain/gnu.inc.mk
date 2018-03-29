@@ -3,8 +3,10 @@ export CXX        = $(PREFIX)g++
 export CCAS      ?= $(CC)
 ifeq ($(LTO),1)
 export AR         = $(PREFIX)gcc-ar
+export RANLIB     = $(PREFIX)gcc-ranlib
 else
 export AR         = $(PREFIX)ar
+export RANLIB     = $(PREFIX)ranlib
 endif
 export AS         = $(PREFIX)as
 export LINK       = $(PREFIX)gcc
