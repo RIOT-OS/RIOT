@@ -32,6 +32,7 @@
 #               options:
 #               GDB_PORT:       port opened for GDB connections
 #               TELNET_PORT:    port opened for telnet connections
+#               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
 #               ELFFILE:        path to the ELF file to debug
 #
@@ -133,8 +134,7 @@ test_serial() {
 
 test_dbg() {
     if [ -z "${DBG}" ]; then
-        echo "Error: No debugger defined in DBG env var"
-        exit 1
+        DBG="${GDB}"
     fi
 }
 
