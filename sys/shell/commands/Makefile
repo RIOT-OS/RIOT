@@ -81,4 +81,8 @@ ifneq (,$(filter i2c_scan,$(USEMODULE)))
   SRC += sc_i2c_scan.c
 endif
 
+ifneq (,$(filter semtech-loramac,$(USEPKG)))
+  SRC += sc_loramac.c
+endif
+
 include $(RIOTBASE)/Makefile.base
