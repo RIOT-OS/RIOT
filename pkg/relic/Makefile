@@ -20,7 +20,7 @@ $(PKG_BUILDDIR)/Makefile: $(TOOLCHAIN_FILE)
 		  -DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off -Wno-dev $(RELIC_CONFIG_FLAGS) .
 
 $(TOOLCHAIN_FILE): fix_source
-	$(RIOTBASE)/dist/tools/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
+	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
 
 fix_source: git-download
 	./fix-util_print_wo_args.sh $(PKG_BUILDDIR)

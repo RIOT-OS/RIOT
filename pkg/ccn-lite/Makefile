@@ -19,6 +19,6 @@ $(PKG_BUILDDIR)/src/Makefile: $(TOOLCHAIN_FILE)
 		  -DCCNL_RIOT=1 -DRIOT_CFLAGS="$(RIOT_CFLAGS)" -DBUILD_TESTING=OFF .
 
 $(TOOLCHAIN_FILE): git-download
-	$(RIOTBASE)/dist/tools/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
+	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
 
 include $(RIOTBASE)/pkg/pkg.mk
