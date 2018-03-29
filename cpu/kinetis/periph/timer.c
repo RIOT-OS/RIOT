@@ -177,6 +177,8 @@ static inline void _pit_set_counter(uint8_t dev)
     PIT->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
     /* Restore previous timer state */
     PIT->CHANNEL[ch].TCTRL = pit[dev].tctrl;
+    /* Set the next cycle to reload the maximum value */
+    PIT->CHANNEL[ch].LDVAL = PIT_MAX_VALUE;
 }
 
 static inline int pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
@@ -224,17 +226,18 @@ static inline int pit_set(uint8_t dev, uint32_t timeout)
     const uint8_t ch = pit_config[dev].count_ch;
     /* Disable IRQs to minimize the number of lost ticks */
     unsigned int mask = irq_disable();
+    uint32_t cval = pit[dev].ldval;
     pit[dev].ldval = timeout;
     pit[dev].tctrl = PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
     /* Add the new timeout offset to the up-counter */
     pit[dev].count += timeout;
-    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
+    if (PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) {
         /* Timer is currently running */
-        uint32_t cval = PIT->CHANNEL[ch].CVAL;
-        /* Subtract if there was anything left on the counter */
-        pit[dev].count -= cval;
+        cval = PIT->CHANNEL[ch].CVAL;
         _pit_set_counter(dev);
     }
+    /* Subtract if there was anything left on the counter */
+    pit[dev].count -= cval;
     irq_restore(mask);
     return 0;
 }
@@ -250,7 +253,7 @@ static inline int pit_set_absolute(uint8_t dev, uint32_t target)
     pit[dev].tctrl = PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
     /* Set the new target time in the up-counter */
     pit[dev].count = target;
-    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
+    if (PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) {
         _pit_set_counter(dev);
     }
 
@@ -264,18 +267,18 @@ static inline int pit_clear(uint8_t dev)
     /* Disable IRQs to minimize the number of lost ticks */
     unsigned int mask = irq_disable();
 
+    uint32_t cval = pit[dev].ldval;
     pit[dev].ldval = PIT_MAX_VALUE;
     pit[dev].tctrl = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
-    /* pit[dev].count += PIT_MAX_VALUE + 1; */ /* == 0 (mod 2**32) */
 
     if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
         /* Timer is currently running */
-        uint32_t cval = PIT->CHANNEL[ch].CVAL;
-        /* Subtract if there was anything left on the counter */
-        pit[dev].count -= cval;
+        cval = PIT->CHANNEL[ch].CVAL;
         /* Set a long timeout */
         _pit_set_counter(ch);
     }
+    /* Subtract if there was anything left on the counter */
+    pit[dev].count -= cval;
 
     irq_restore(mask);
     return 0;
@@ -284,40 +287,42 @@ static inline int pit_clear(uint8_t dev)
 static inline uint32_t pit_read(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].count_ch;
-    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
-        /* Timer running */
-        return pit[dev].count - PIT->CHANNEL[ch].CVAL;
+    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) == 0) {
+        /* Timer stopped, CVAL is unreliable */
+        return pit[dev].count - pit[dev].ldval;
     }
-    else {
-        /* Timer stopped */
-        return pit[dev].count;
-    }
+    /* Timer running */
+    return pit[dev].count - PIT->CHANNEL[ch].CVAL;
 }
 
 static inline void pit_start(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].count_ch;
+    unsigned int mask = irq_disable();
     if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
         /* Already running */
+        irq_restore(mask);
         return;
     }
     PIT->CHANNEL[ch].LDVAL = pit[dev].ldval;
-    pit[dev].count += pit[dev].ldval;
     PIT->CHANNEL[ch].TCTRL = pit[dev].tctrl;
+    irq_restore(mask);
 }
 
 static inline void pit_stop(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].count_ch;
+    unsigned int mask = irq_disable();
     if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) == 0) {
         /* Already stopped */
+        irq_restore(mask);
         return;
     }
     uint32_t cval = PIT->CHANNEL[ch].CVAL;
     pit[dev].tctrl = PIT->CHANNEL[ch].TCTRL;
     PIT->CHANNEL[ch].TCTRL = 0;
-    pit[dev].count -= cval;
     pit[dev].ldval = cval;
+    irq_restore(mask);
 }
 
 static inline void pit_irq_handler(tim_t dev)
@@ -325,7 +330,6 @@ static inline void pit_irq_handler(tim_t dev)
     uint8_t ch = pit_config[_pit_index(dev)].count_ch;
     pit_t *pit_ctx = &pit[_pit_index(dev)];
     pit_ctx->ldval = PIT_MAX_VALUE;
-    pit_ctx->count += PIT_MAX_VALUE;
     pit_ctx->tctrl = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
     _pit_set_counter(_pit_index(dev));
 
