@@ -213,11 +213,9 @@
 #define NET_GCOAP_H
 
 #include <stdint.h>
-#include <stdatomic.h>
 
 #include "net/ipv6/addr.h"
 #include "net/sock/udp.h"
-#include "mutex.h"
 #include "net/nanocoap.h"
 #include "xtimer.h"
 
@@ -476,28 +474,6 @@ typedef struct {
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     unsigned token_len;                 /**< Actual length of token attribute */
 } gcoap_observe_memo_t;
-
-/**
- * @brief   Container for the state of gcoap itself
- */
-typedef struct {
-    mutex_t lock;                       /**< Shares state attributes safely */
-    gcoap_listener_t *listeners;        /**< List of registered listeners */
-    gcoap_request_memo_t open_reqs[GCOAP_REQ_WAITING_MAX];
-                                        /**< Storage for open requests; if first
-                                             byte of an entry is zero, the entry
-                                             is available */
-    atomic_uint next_message_id;        /**< Next message ID to use */
-    sock_udp_ep_t observers[GCOAP_OBS_CLIENTS_MAX];
-                                        /**< Observe clients; allows reuse for
-                                             observe memos */
-    gcoap_observe_memo_t observe_memos[GCOAP_OBS_REGISTRATIONS_MAX];
-                                        /**< Observed resource registrations */
-    uint8_t resend_bufs[GCOAP_RESEND_BUFS_MAX][GCOAP_PDU_BUF_SIZE];
-                                        /**< Buffers for PDU for request resends;
-                                             if first byte of an entry is zero,
-                                             the entry is available */
-} gcoap_state_t;
 
 /**
  * @brief   Initializes the gcoap thread and device
