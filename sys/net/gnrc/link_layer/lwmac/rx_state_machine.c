@@ -76,16 +76,16 @@ static uint8_t _packet_process_in_wait_for_wr(gnrc_netif_t *netif)
             bcast_hdr = (gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_LWMAC))->data;
             uint8_t bcast_seq = bcast_hdr->seq_nr;
 
-            if ((gnrc_netdev->rx.rx_bcast_seq == bcast_seq) &&
-                (gnrc_netdev->rx.rx_bcast_id.len > 0) &&
-                (memcmp(&info.src_addr.addr, &gnrc_netdev->rx.rx_bcast_id.addr,
-                        gnrc_netdev->rx.rx_bcast_id.len) == 0)) {
+            if ((netif->mac.rx.rx_bcast_seq == bcast_seq) &&
+                (netif->mac.rx.rx_bcast_id.len > 0) &&
+                (memcmp(&info.src_addr.addr, &netif->mac.rx.rx_bcast_id.addr,
+                		netif->mac.rx.rx_bcast_id.len) == 0)) {
         	    LOG_INFO("[LWMAC-rx] received duplicate broadcast packet!\n");
         	    gnrc_pktbuf_release(pkt);
             }
             else {
-                _gnrc_lwmac_dispatch_defer(gnrc_netdev->rx.dispatch_buffer, pkt);
-                gnrc_mac_dispatch(&gnrc_netdev->rx);
+                _gnrc_lwmac_dispatch_defer(netif->mac.rx.dispatch_buffer, pkt);
+                gnrc_mac_dispatch(&netif->mac.rx);
             }
 
             rx_info |= GNRC_LWMAC_RX_FOUND_BROADCAST;
@@ -94,13 +94,11 @@ static uint8_t _packet_process_in_wait_for_wr(gnrc_netif_t *netif)
             /* quit TX in this cycle to avoid collisions with broadcast packets */
             gnrc_lwmac_set_quit_tx(netif, true);
 
-            gnrc_netdev_lwmac_set_quit_tx(gnrc_netdev, true);
-
             /* record broadcast node's ID and broadcast sequence for avoiding receiving
              * duplicate broadcast packet */
-            gnrc_netdev->rx.rx_bcast_seq = bcast_seq;
-            gnrc_netdev->rx.rx_bcast_id = info.src_addr;
-            gnrc_netdev->mac_info |= GNRC_NETDEV_LWMAC_GOT_BCAST;
+            netif->mac.rx.rx_bcast_seq = bcast_seq;
+            netif->mac.rx.rx_bcast_id = info.src_addr;
+            netif->mac.mac_info |= GNRC_NETDEV_LWMAC_GOT_BCAST;
             break;
         }
 
