@@ -610,6 +610,8 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 #define XTIMER_SHIFT (4)
 #elif (XTIMER_HZ >> 5 == XTIMER_HZ_BASE) || (XTIMER_HZ << 5 == XTIMER_HZ_BASE)
 #define XTIMER_SHIFT (5)
+#elif (XTIMER_HZ >> 6 == XTIMER_HZ_BASE) || (XTIMER_HZ << 6 == XTIMER_HZ_BASE)
+#define XTIMER_SHIFT (6)
 #else
 #error "XTIMER_SHIFT cannot be derived for given XTIMER_HZ, verify settings!"
 #endif
