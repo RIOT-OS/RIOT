@@ -26,9 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* \cond DOXYGEN_BLACKLIST */
-
-/* $Id$ */
+/* $Id: time.h 2503 2016-02-07 22:59:47Z joerg_wunsch $ */
 
 /** \file */
 
@@ -101,15 +99,21 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include <stdint.h>
-#include <sys/types.h>
-
 #ifdef __cplusplus
-extern "C" {
+extern          "C" {
 #endif
+
+#include <inttypes.h>
+#include <stdlib.h>
 
     /** \ingroup avr_time */
     /* @{ */
+
+    /**
+        time_t represents seconds elapsed from Midnight, Jan 1 2000 UTC (the Y2K 'epoch').
+        Its range allows this implementation to represent time up to Tue Feb 7 06:28:15 2136 UTC.
+    */
+    typedef uint32_t time_t;
 
     /**
     The time function returns the systems current time stamp.
@@ -128,22 +132,7 @@ extern "C" {
         The tm structure contains a representation of time 'broken down' into components of the
         Gregorian calendar.
 
-        The normal ranges of the elements are..
-
-    \code
-        tm_sec      seconds after the minute - [ 0 to 59 ]
-        tm_min      minutes after the hour - [ 0 to 59 ]
-        tm_hour     hours since midnight - [ 0 to 23 ]
-        tm_mday     day of the month - [ 1 to 31 ]
-        tm_wday     days since Sunday - [ 0 to 6 ]
-        tm_mon      months since January - [ 0 to 11 ]
-        tm_year     years since 1900
-        tm_yday     days since January 1 - [ 0 to 365 ]
-        tm_isdst    Daylight Saving Time flag *
-
-    \endcode
-
-        *The value of tm_isdst is zero if Daylight Saving Time is not in effect, and is negative if
+        The value of tm_isdst is zero if Daylight Saving Time is not in effect, and is negative if
         the information is not available.
 
         When Daylight Saving Time is in effect, the value represents the number of
@@ -153,18 +142,18 @@ extern "C" {
 
     */
     struct tm {
-        int tm_sec;
-        int tm_min;
-        int tm_hour;
-        int tm_mday;
-        int tm_wday;
-        int tm_mon;
-        int tm_year;
-        int tm_yday;
-        int tm_isdst;
+        int8_t          tm_sec; /**< seconds after the minute - [ 0 to 59 ] */
+        int8_t          tm_min; /**< minutes after the hour - [ 0 to 59 ] */
+        int8_t          tm_hour; /**< hours since midnight - [ 0 to 23 ] */
+        int8_t          tm_mday; /**< day of the month - [ 1 to 31 ] */
+        int8_t          tm_wday; /**< days since Sunday - [ 0 to 6 ] */
+        int8_t          tm_mon; /**< months since January - [ 0 to 11 ] */
+        int16_t         tm_year; /**< years since 1900 */
+        int16_t         tm_yday; /**< days since January 1 - [ 0 to 365 ] */
+        int16_t         tm_isdst; /**< Daylight Saving Time flag */
     };
 
-
+#ifndef __DOXYGEN__
     /* We have to provide clock_t / CLOCKS_PER_SEC so that libstdc++-v3 can
        be built.  We define CLOCKS_PER_SEC via a symbol _CLOCKS_PER_SEC_
        so that the user can provide the value on the link line, which should
@@ -173,6 +162,7 @@ extern "C" {
     extern char *_CLOCKS_PER_SEC_;
 #define CLOCKS_PER_SEC ((clock_t) _CLOCKS_PER_SEC_)
     extern clock_t clock(void);
+#endif	/* !__DOXYGEN__ */
 
     /**
     This function 'compiles' the elements of a broken-down time structure, returning a binary time stamp.
@@ -387,10 +377,10 @@ extern "C" {
         Structure which represents a date as a year, week number of that year, and day of week.
         See http://en.wikipedia.org/wiki/ISO_week_date for more information.
     */
-    struct week_date{
-        int year;
-        int week;
-        int day;
+    struct week_date {
+        int year; /**< year number (Gregorian calendar) */
+        int week; /**< week number (#1 is where first Thursday is in) */
+        int day; /**< day within week */
     };
 
     /**
@@ -511,21 +501,9 @@ extern "C" {
     */
     unsigned long   lm_sidereal(const time_t * timer);
 
-    struct timespec {
-        time_t  tv_sec;
-        long    tv_nsec;
-    };
-
     /* @} */
-
-/* /endcond */
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* TIME_H */
-
-/**
-\endcond
-*/
+#endif              /* TIME_H  */

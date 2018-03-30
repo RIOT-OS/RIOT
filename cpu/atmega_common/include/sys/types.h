@@ -35,7 +35,7 @@ typedef          int pid_t;       /**< Used for process IDs and process group ID
 typedef unsigned int size_t;      /**< Used for sizes of objects */
 typedef   signed int ssize_t;     /**< Used for a count of bytes or an error indication */
 typedef      int32_t suseconds_t; /**< Used for time in microseconds */
-typedef      int32_t time_t;      /**< Used for time in seconds */
+typedef     uint32_t time_t;      /**< Used for time in seconds */
 typedef     uint32_t timer_t;     /**< Used for timer ID returned by timer_create() */
 typedef     uint16_t uid_t;       /**< Used for user IDs */
 typedef     uint32_t useconds_t;  /**< Used for time in microseconds */

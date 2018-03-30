@@ -15,7 +15,7 @@
 #ifndef SYS_STAT_H
 #define SYS_STAT_H
 
-#include <time.h> /* for struct timespec */
+#include <time.h>      /* for struct timespec */
 #include <sys/types.h> /* for fsblkcnt_t, fsfilcnt_t */
 
 #ifdef __cplusplus
