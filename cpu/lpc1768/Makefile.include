@@ -1,3 +1,5 @@
 export CPU_ARCH = cortex-m3
 
+USEMODULE += pm_layered
+
 include $(RIOTMAKE)/arch/cortexm.inc.mk
