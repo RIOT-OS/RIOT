@@ -816,7 +816,7 @@ uint32_t _evtimer_lookup(const void *ctx, uint16_t type)
 
     DEBUG("nib: lookup ctx = %p, type = %04x\n", (void *)ctx, type);
     while (event != NULL) {
-        offset += event->event.offset;
+        offset += event->event.offset_ms;
         if ((event->msg.type == type) &&
             ((ctx == NULL) || (event->msg.content.ptr == ctx))) {
             return offset;

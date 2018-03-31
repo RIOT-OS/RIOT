@@ -802,10 +802,10 @@ uint32_t _evtimer_lookup(const void *ctx, uint16_t type);
  * @param[in] ctx       The context of the event
  * @param[in] type      [Type of the event](@ref net_gnrc_ipv6_nib_msg).
  * @param[in,out] event Representation of the event.
- * @param[in] offset    Offset in milliseconds to the event.
+ * @param[in] offset_ms Offset in milliseconds to the event.
  */
 static inline void _evtimer_add(void *ctx, int16_t type,
-                                evtimer_msg_event_t *event, uint32_t offset)
+                                evtimer_msg_event_t *event, uint32_t offset_ms)
 {
 #ifdef MODULE_GNRC_IPV6
     kernel_pid_t target_pid = gnrc_ipv6_pid;
@@ -814,7 +814,7 @@ static inline void _evtimer_add(void *ctx, int16_t type,
 #endif
     evtimer_del((evtimer_t *)(&_nib_evtimer), (evtimer_event_t *)event);
     event->event.next = NULL;
-    event->event.offset = offset;
+    event->event.offset_ms = offset_ms;
     event->msg.type = type;
     event->msg.content.ptr = ctx;
     evtimer_add_msg(&_nib_evtimer, event, target_pid);
