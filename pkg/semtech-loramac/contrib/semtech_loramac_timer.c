@@ -19,9 +19,9 @@
  * @}
  */
 
-#include "semtech-loramac/board.h"
 #include "xtimer.h"
 #include "thread.h"
+#include "semtech-loramac/timer.h"
 
 extern kernel_pid_t semtech_loramac_pid;
 
@@ -62,27 +62,27 @@ void TimerSetValue(TimerEvent_t *obj, uint32_t value)
 
     /* According to the lorawan specifications, the data sent from the gateway
        could arrive with a short shift in time of +/- 20ms. Here the timeout is
-       triggered 50ms in advance to make sure the radio switches to RX mode on
+       triggered 22ms in advance to make sure the radio switches to RX mode on
        time and doesn't miss any downlink messages. */
-    obj->timeout = (value - 50) * 1000;
+    obj->timeout = (value - 22) * US_PER_MS;
 }
 
 TimerTime_t TimerGetCurrentTime(void)
 {
     uint64_t CurrentTime = xtimer_now_usec64();
-    return (TimerTime_t)CurrentTime;
+    return (TimerTime_t)CurrentTime / US_PER_MS;
 }
 
 TimerTime_t TimerGetElapsedTime(TimerTime_t savedTime)
 {
     uint64_t CurrentTime = xtimer_now_usec64();
-    return (TimerTime_t)(CurrentTime - savedTime);
+    return (TimerTime_t)(CurrentTime - savedTime) / US_PER_MS;
 }
 
 TimerTime_t TimerGetFutureTime(TimerTime_t eventInFuture)
 {
     uint64_t CurrentTime = xtimer_now_usec64();
-    return (TimerTime_t)(CurrentTime + eventInFuture);
+    return (TimerTime_t)(CurrentTime + eventInFuture) / US_PER_MS;
 }
 
 void TimerLowPowerHandler( void )
