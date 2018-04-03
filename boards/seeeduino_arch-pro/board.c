@@ -21,8 +21,25 @@
 
 #include "board.h"
 
-static void leds_init(void);
+#include "periph/gpio.h"
+
 extern void SystemInit(void);
+
+/**
+ * @brief Initialize the on-board LEDs.
+ */
+static void leds_init(void)
+{
+    gpio_init(LED0_PIN, GPIO_OUT);
+    gpio_init(LED1_PIN, GPIO_OUT);
+    gpio_init(LED2_PIN, GPIO_OUT);
+    gpio_init(LED3_PIN, GPIO_OUT);
+
+    LED0_OFF;
+    LED1_OFF;
+    LED2_OFF;
+    LED3_OFF;
+}
 
 void board_init(void)
 {
@@ -32,27 +49,4 @@ void board_init(void)
     cpu_init();
     /* initialize the boards LEDs */
     leds_init();
-}
-
-/**
- * @brief Initialize the boards on-board LEDs (LED1 to LED4)
- *
- * The LED initialization is hard-coded in this function. As the LEDs are
- * soldered onto the board they are fixed to their CPU pins.
- *
- * The LEDs are connected to the following pins:
- * - LED1: P1.18
- * - LED2: P1.20
- * - LED3: P1.21
- * - LED4: P1.23
- *
- * The LEDs are active-low (current-sink).
- */
-static void leds_init(void)
-{
-    /* configure LED pins as output */
-    LED_PORT->FIODIR |= (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK);
-
-    /* turn off all LEDs */
-    LED_PORT->FIOSET = (LED0_MASK | LED1_MASK | LED2_MASK | LED3_MASK);
 }
