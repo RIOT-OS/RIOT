@@ -309,6 +309,12 @@ static void test_ipv6_addr_idx__empty(void)
     TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_idx(netifs[0], &addr));
 }
 
+static void test_ipv6_addr_idx__unspecified_addr(void)
+{
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_idx(netifs[0],
+                                                       &ipv6_addr_unspecified));
+}
+
 static void test_ipv6_addr_idx__wrong_netif(void)
 {
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_LL };
@@ -338,6 +344,12 @@ static void test_ipv6_addr_match__empty(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
 
     TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_match(netifs[0], &addr));
+}
+
+static void test_ipv6_addr_match__unspecified_addr(void)
+{
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_addr_match(netifs[0],
+                                                         &ipv6_addr_unspecified));
 }
 
 static void test_ipv6_addr_match__wrong_netif(void)
@@ -416,6 +428,13 @@ static void test_ipv6_addr_best_src__multicast_input(void)
     TEST_ASSERT(ipv6_addr_equal(&addr1, out));
 }
 
+static void test_ipv6_addr_best_src__unspecified_addr(void)
+{
+    TEST_ASSERT_NULL(gnrc_netif_ipv6_addr_best_src(netifs[0],
+                                                   &ipv6_addr_unspecified,
+                                                   false));
+}
+
 static void test_ipv6_addr_best_src__other_subnet(void)
 {
     static const ipv6_addr_t mc_addr = IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL;
@@ -437,6 +456,11 @@ static void test_get_by_ipv6_addr__empty(void)
     TEST_ASSERT_NULL(gnrc_netif_get_by_ipv6_addr(&addr));
 }
 
+static void test_get_by_ipv6_addr__unspecified_addr(void)
+{
+    TEST_ASSERT_NULL(gnrc_netif_get_by_ipv6_addr(&ipv6_addr_unspecified));
+}
+
 static void test_get_by_ipv6_addr__success(void)
 {
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_LL };
@@ -451,6 +475,11 @@ static void test_get_by_prefix__empty(void)
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
 
     TEST_ASSERT_NULL(gnrc_netif_get_by_prefix(&addr));
+}
+
+static void test_get_by_prefix__unspecified_addr(void)
+{
+    TEST_ASSERT_NULL(gnrc_netif_get_by_prefix(&ipv6_addr_unspecified));
 }
 
 static void test_get_by_prefix__success18(void)
@@ -554,6 +583,20 @@ static void test_ipv6_group_idx__empty(void)
 {
     TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_group_idx(netifs[0],
                                                         &ipv6_addr_all_nodes_link_local));
+}
+
+static void test_ipv6_group_idx__unspecified_addr(void)
+{
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_group_idx(netifs[0],
+                                                        &ipv6_addr_unspecified));
+}
+
+static void test_ipv6_group_idx__unicast_addr(void)
+{
+    static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
+
+    TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_ipv6_group_idx(netifs[0],
+                                                        &addr));
 }
 
 static void test_ipv6_group_idx__wrong_netif(void)
@@ -1335,20 +1378,25 @@ static Test *embunit_tests_gnrc_netif(void)
         new_TestFixture(test_ipv6_addr_remove__not_allocated),
         new_TestFixture(test_ipv6_addr_remove__success),
         new_TestFixture(test_ipv6_addr_idx__empty),
+        new_TestFixture(test_ipv6_addr_idx__unspecified_addr),
         new_TestFixture(test_ipv6_addr_idx__wrong_netif),
         new_TestFixture(test_ipv6_addr_idx__wrong_addr),
         new_TestFixture(test_ipv6_addr_idx__success),
         new_TestFixture(test_ipv6_addr_match__empty),
+        new_TestFixture(test_ipv6_addr_match__unspecified_addr),
         new_TestFixture(test_ipv6_addr_match__wrong_netif),
         new_TestFixture(test_ipv6_addr_match__wrong_addr),
         new_TestFixture(test_ipv6_addr_match__success18),
         new_TestFixture(test_ipv6_addr_match__success23),
         new_TestFixture(test_ipv6_addr_match__success64),
         new_TestFixture(test_ipv6_addr_best_src__multicast_input),
+        new_TestFixture(test_ipv6_addr_best_src__unspecified_addr),
         new_TestFixture(test_ipv6_addr_best_src__other_subnet),
         new_TestFixture(test_get_by_ipv6_addr__empty),
+        new_TestFixture(test_get_by_ipv6_addr__unspecified_addr),
         new_TestFixture(test_get_by_ipv6_addr__success),
         new_TestFixture(test_get_by_prefix__empty),
+        new_TestFixture(test_get_by_prefix__unspecified_addr),
         new_TestFixture(test_get_by_prefix__success18),
         new_TestFixture(test_get_by_prefix__success23),
         new_TestFixture(test_get_by_prefix__success64),
@@ -1358,6 +1406,8 @@ static Test *embunit_tests_gnrc_netif(void)
         new_TestFixture(test_ipv6_group_leave__not_allocated),
         new_TestFixture(test_ipv6_group_leave__success),
         new_TestFixture(test_ipv6_group_idx__empty),
+        new_TestFixture(test_ipv6_group_idx__unspecified_addr),
+        new_TestFixture(test_ipv6_group_idx__unicast_addr),
         new_TestFixture(test_ipv6_group_idx__wrong_netif),
         new_TestFixture(test_ipv6_group_idx__wrong_addr),
         new_TestFixture(test_ipv6_group_idx__success),
