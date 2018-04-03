@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file system_efr32mg1p.h
  * @brief CMSIS Cortex-M3/M4 System Layer for EFR32 devices.
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -126,7 +126,7 @@ uint32_t SystemCoreClockGet(void);
  *****************************************************************************/
 static __INLINE void SystemCoreClockUpdate(void)
 {
-  SystemCoreClockGet();
+  (void)SystemCoreClockGet();
 }
 
 uint32_t SystemMaxCoreClockGet(void);

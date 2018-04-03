@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_gpio_p.h
  * @brief EFR32MG1P_GPIO_P register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -56,10 +56,10 @@ typedef struct {
   __IOM uint32_t DOUT;         /**< Port Data Out Register  */
   uint32_t       RESERVED0[2]; /**< Reserved for future use **/
   __IOM uint32_t DOUTTGL;      /**< Port Data Out Toggle Register  */
-  __IM uint32_t  DIN;          /**< Port Data In Register  */
+  __IM uint32_t  DIN;          /**< Port Data in Register  */
   __IOM uint32_t PINLOCKN;     /**< Port Unlocked Pins Register  */
   uint32_t       RESERVED1[1]; /**< Reserved for future use **/
-  __IOM uint32_t OVTDIS;       /**< Over Voltage Disable for all modes  */
+  __IOM uint32_t OVTDIS;       /**< Over Voltage Disable for All Modes  */
   uint32_t       RESERVED2[1]; /**< Reserved future */
 } GPIO_P_TypeDef;
 

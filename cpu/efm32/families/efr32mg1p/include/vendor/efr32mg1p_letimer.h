@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_letimer.h
  * @brief EFR32MG1P_LETIMER register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -137,7 +137,7 @@ typedef struct {
 #define _LETIMER_CTRL_BUFTOP_MASK               0x100UL                                /**< Bit mask for LETIMER_BUFTOP */
 #define _LETIMER_CTRL_BUFTOP_DEFAULT            0x00000000UL                           /**< Mode DEFAULT for LETIMER_CTRL */
 #define LETIMER_CTRL_BUFTOP_DEFAULT             (_LETIMER_CTRL_BUFTOP_DEFAULT << 8)    /**< Shifted mode DEFAULT for LETIMER_CTRL */
-#define LETIMER_CTRL_COMP0TOP                   (0x1UL << 9)                           /**< Compare Value 0 Is Top Value */
+#define LETIMER_CTRL_COMP0TOP                   (0x1UL << 9)                           /**< Compare Value 0 is Top Value */
 #define _LETIMER_CTRL_COMP0TOP_SHIFT            9                                      /**< Shift value for LETIMER_COMP0TOP */
 #define _LETIMER_CTRL_COMP0TOP_MASK             0x200UL                                /**< Bit mask for LETIMER_COMP0TOP */
 #define _LETIMER_CTRL_COMP0TOP_DEFAULT          0x00000000UL                           /**< Mode DEFAULT for LETIMER_CTRL */

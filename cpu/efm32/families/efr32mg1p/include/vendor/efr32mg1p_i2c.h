@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_i2c.h
  * @brief EFR32MG1P_I2C register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -98,7 +98,7 @@ typedef struct {
 #define _I2C_CTRL_AUTOACK_MASK             0x4UL                            /**< Bit mask for I2C_AUTOACK */
 #define _I2C_CTRL_AUTOACK_DEFAULT          0x00000000UL                     /**< Mode DEFAULT for I2C_CTRL */
 #define I2C_CTRL_AUTOACK_DEFAULT           (_I2C_CTRL_AUTOACK_DEFAULT << 2) /**< Shifted mode DEFAULT for I2C_CTRL */
-#define I2C_CTRL_AUTOSE                    (0x1UL << 3)                     /**< Automatic STOP when Empty */
+#define I2C_CTRL_AUTOSE                    (0x1UL << 3)                     /**< Automatic STOP When Empty */
 #define _I2C_CTRL_AUTOSE_SHIFT             3                                /**< Shift value for I2C_AUTOSE */
 #define _I2C_CTRL_AUTOSE_MASK              0x8UL                            /**< Bit mask for I2C_AUTOSE */
 #define _I2C_CTRL_AUTOSE_DEFAULT           0x00000000UL                     /**< Mode DEFAULT for I2C_CTRL */
@@ -149,7 +149,7 @@ typedef struct {
 #define I2C_CTRL_BITO_40PCC                (_I2C_CTRL_BITO_40PCC << 12)     /**< Shifted mode 40PCC for I2C_CTRL */
 #define I2C_CTRL_BITO_80PCC                (_I2C_CTRL_BITO_80PCC << 12)     /**< Shifted mode 80PCC for I2C_CTRL */
 #define I2C_CTRL_BITO_160PCC               (_I2C_CTRL_BITO_160PCC << 12)    /**< Shifted mode 160PCC for I2C_CTRL */
-#define I2C_CTRL_GIBITO                    (0x1UL << 15)                    /**< Go Idle on Bus Idle Timeout  */
+#define I2C_CTRL_GIBITO                    (0x1UL << 15)                    /**< Go Idle on Bus Idle Timeout */
 #define _I2C_CTRL_GIBITO_SHIFT             15                               /**< Shift value for I2C_GIBITO */
 #define _I2C_CTRL_GIBITO_MASK              0x8000UL                         /**< Bit mask for I2C_GIBITO */
 #define _I2C_CTRL_GIBITO_DEFAULT           0x00000000UL                     /**< Mode DEFAULT for I2C_CTRL */
@@ -174,12 +174,12 @@ typedef struct {
 /* Bit fields for I2C CMD */
 #define _I2C_CMD_RESETVALUE                0x00000000UL                    /**< Default value for I2C_CMD */
 #define _I2C_CMD_MASK                      0x000000FFUL                    /**< Mask for I2C_CMD */
-#define I2C_CMD_START                      (0x1UL << 0)                    /**< Send start condition */
+#define I2C_CMD_START                      (0x1UL << 0)                    /**< Send Start Condition */
 #define _I2C_CMD_START_SHIFT               0                               /**< Shift value for I2C_START */
 #define _I2C_CMD_START_MASK                0x1UL                           /**< Bit mask for I2C_START */
 #define _I2C_CMD_START_DEFAULT             0x00000000UL                    /**< Mode DEFAULT for I2C_CMD */
 #define I2C_CMD_START_DEFAULT              (_I2C_CMD_START_DEFAULT << 0)   /**< Shifted mode DEFAULT for I2C_CMD */
-#define I2C_CMD_STOP                       (0x1UL << 1)                    /**< Send stop condition */
+#define I2C_CMD_STOP                       (0x1UL << 1)                    /**< Send Stop Condition */
 #define _I2C_CMD_STOP_SHIFT                1                               /**< Shift value for I2C_STOP */
 #define _I2C_CMD_STOP_MASK                 0x2UL                           /**< Bit mask for I2C_STOP */
 #define _I2C_CMD_STOP_DEFAULT              0x00000000UL                    /**< Mode DEFAULT for I2C_CMD */
@@ -194,12 +194,12 @@ typedef struct {
 #define _I2C_CMD_NACK_MASK                 0x8UL                           /**< Bit mask for I2C_NACK */
 #define _I2C_CMD_NACK_DEFAULT              0x00000000UL                    /**< Mode DEFAULT for I2C_CMD */
 #define I2C_CMD_NACK_DEFAULT               (_I2C_CMD_NACK_DEFAULT << 3)    /**< Shifted mode DEFAULT for I2C_CMD */
-#define I2C_CMD_CONT                       (0x1UL << 4)                    /**< Continue transmission */
+#define I2C_CMD_CONT                       (0x1UL << 4)                    /**< Continue Transmission */
 #define _I2C_CMD_CONT_SHIFT                4                               /**< Shift value for I2C_CONT */
 #define _I2C_CMD_CONT_MASK                 0x10UL                          /**< Bit mask for I2C_CONT */
 #define _I2C_CMD_CONT_DEFAULT              0x00000000UL                    /**< Mode DEFAULT for I2C_CMD */
 #define I2C_CMD_CONT_DEFAULT               (_I2C_CMD_CONT_DEFAULT << 4)    /**< Shifted mode DEFAULT for I2C_CMD */
-#define I2C_CMD_ABORT                      (0x1UL << 5)                    /**< Abort transmission */
+#define I2C_CMD_ABORT                      (0x1UL << 5)                    /**< Abort Transmission */
 #define _I2C_CMD_ABORT_SHIFT               5                               /**< Shift value for I2C_ABORT */
 #define _I2C_CMD_ABORT_MASK                0x20UL                          /**< Bit mask for I2C_ABORT */
 #define _I2C_CMD_ABORT_DEFAULT             0x00000000UL                    /**< Mode DEFAULT for I2C_CMD */
@@ -285,12 +285,12 @@ typedef struct {
 #define _I2C_STATUS_PNACK_MASK             0x8UL                              /**< Bit mask for I2C_PNACK */
 #define _I2C_STATUS_PNACK_DEFAULT          0x00000000UL                       /**< Mode DEFAULT for I2C_STATUS */
 #define I2C_STATUS_PNACK_DEFAULT           (_I2C_STATUS_PNACK_DEFAULT << 3)   /**< Shifted mode DEFAULT for I2C_STATUS */
-#define I2C_STATUS_PCONT                   (0x1UL << 4)                       /**< Pending continue */
+#define I2C_STATUS_PCONT                   (0x1UL << 4)                       /**< Pending Continue */
 #define _I2C_STATUS_PCONT_SHIFT            4                                  /**< Shift value for I2C_PCONT */
 #define _I2C_STATUS_PCONT_MASK             0x10UL                             /**< Bit mask for I2C_PCONT */
 #define _I2C_STATUS_PCONT_DEFAULT          0x00000000UL                       /**< Mode DEFAULT for I2C_STATUS */
 #define I2C_STATUS_PCONT_DEFAULT           (_I2C_STATUS_PCONT_DEFAULT << 4)   /**< Shifted mode DEFAULT for I2C_STATUS */
-#define I2C_STATUS_PABORT                  (0x1UL << 5)                       /**< Pending abort */
+#define I2C_STATUS_PABORT                  (0x1UL << 5)                       /**< Pending Abort */
 #define _I2C_STATUS_PABORT_SHIFT           5                                  /**< Shift value for I2C_PABORT */
 #define _I2C_STATUS_PABORT_MASK            0x20UL                             /**< Bit mask for I2C_PABORT */
 #define _I2C_STATUS_PABORT_DEFAULT         0x00000000UL                       /**< Mode DEFAULT for I2C_STATUS */
@@ -403,12 +403,12 @@ typedef struct {
 /* Bit fields for I2C IF */
 #define _I2C_IF_RESETVALUE                 0x00000010UL                    /**< Default value for I2C_IF */
 #define _I2C_IF_MASK                       0x0007FFFFUL                    /**< Mask for I2C_IF */
-#define I2C_IF_START                       (0x1UL << 0)                    /**< START condition Interrupt Flag */
+#define I2C_IF_START                       (0x1UL << 0)                    /**< START Condition Interrupt Flag */
 #define _I2C_IF_START_SHIFT                0                               /**< Shift value for I2C_START */
 #define _I2C_IF_START_MASK                 0x1UL                           /**< Bit mask for I2C_START */
 #define _I2C_IF_START_DEFAULT              0x00000000UL                    /**< Mode DEFAULT for I2C_IF */
 #define I2C_IF_START_DEFAULT               (_I2C_IF_START_DEFAULT << 0)    /**< Shifted mode DEFAULT for I2C_IF */
-#define I2C_IF_RSTART                      (0x1UL << 1)                    /**< Repeated START condition Interrupt Flag */
+#define I2C_IF_RSTART                      (0x1UL << 1)                    /**< Repeated START Condition Interrupt Flag */
 #define _I2C_IF_RSTART_SHIFT               1                               /**< Shift value for I2C_RSTART */
 #define _I2C_IF_RSTART_MASK                0x2UL                           /**< Bit mask for I2C_RSTART */
 #define _I2C_IF_RSTART_DEFAULT             0x00000000UL                    /**< Mode DEFAULT for I2C_IF */
@@ -483,7 +483,7 @@ typedef struct {
 #define _I2C_IF_CLTO_MASK                  0x8000UL                        /**< Bit mask for I2C_CLTO */
 #define _I2C_IF_CLTO_DEFAULT               0x00000000UL                    /**< Mode DEFAULT for I2C_IF */
 #define I2C_IF_CLTO_DEFAULT                (_I2C_IF_CLTO_DEFAULT << 15)    /**< Shifted mode DEFAULT for I2C_IF */
-#define I2C_IF_SSTOP                       (0x1UL << 16)                   /**< Slave STOP condition Interrupt Flag */
+#define I2C_IF_SSTOP                       (0x1UL << 16)                   /**< Slave STOP Condition Interrupt Flag */
 #define _I2C_IF_SSTOP_SHIFT                16                              /**< Shift value for I2C_SSTOP */
 #define _I2C_IF_SSTOP_MASK                 0x10000UL                       /**< Bit mask for I2C_SSTOP */
 #define _I2C_IF_SSTOP_DEFAULT              0x00000000UL                    /**< Mode DEFAULT for I2C_IF */

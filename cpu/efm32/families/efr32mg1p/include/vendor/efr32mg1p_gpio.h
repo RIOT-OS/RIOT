@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_gpio.h
  * @brief EFR32MG1P_GPIO register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -66,7 +66,7 @@ typedef struct {
   __IOM uint32_t IFS;            /**< Interrupt Flag Set Register  */
   __IOM uint32_t IFC;            /**< Interrupt Flag Clear Register  */
   __IOM uint32_t IEN;            /**< Interrupt Enable Register  */
-  __IOM uint32_t EM4WUEN;        /**< EM4 wake up Enable Register  */
+  __IOM uint32_t EM4WUEN;        /**< EM4 Wake Up Enable Register  */
 
   uint32_t       RESERVED1[4];   /**< Reserved for future use **/
   __IOM uint32_t ROUTEPEN;       /**< I/O Routing Pin Enable Register  */
@@ -87,7 +87,7 @@ typedef struct {
 /* Bit fields for GPIO P_CTRL */
 #define _GPIO_P_CTRL_RESETVALUE                         0x00500050UL                                  /**< Default value for GPIO_P_CTRL */
 #define _GPIO_P_CTRL_MASK                               0x10711071UL                                  /**< Mask for GPIO_P_CTRL */
-#define GPIO_P_CTRL_DRIVESTRENGTH                       (0x1UL << 0)                                  /**< Drive strength for port */
+#define GPIO_P_CTRL_DRIVESTRENGTH                       (0x1UL << 0)                                  /**< Drive Strength for Port */
 #define _GPIO_P_CTRL_DRIVESTRENGTH_SHIFT                0                                             /**< Shift value for GPIO_DRIVESTRENGTH */
 #define _GPIO_P_CTRL_DRIVESTRENGTH_MASK                 0x1UL                                         /**< Bit mask for GPIO_DRIVESTRENGTH */
 #define _GPIO_P_CTRL_DRIVESTRENGTH_DEFAULT              0x00000000UL                                  /**< Mode DEFAULT for GPIO_P_CTRL */
@@ -100,12 +100,12 @@ typedef struct {
 #define _GPIO_P_CTRL_SLEWRATE_MASK                      0x70UL                                        /**< Bit mask for GPIO_SLEWRATE */
 #define _GPIO_P_CTRL_SLEWRATE_DEFAULT                   0x00000005UL                                  /**< Mode DEFAULT for GPIO_P_CTRL */
 #define GPIO_P_CTRL_SLEWRATE_DEFAULT                    (_GPIO_P_CTRL_SLEWRATE_DEFAULT << 4)          /**< Shifted mode DEFAULT for GPIO_P_CTRL */
-#define GPIO_P_CTRL_DINDIS                              (0x1UL << 12)                                 /**< Data In Disable */
+#define GPIO_P_CTRL_DINDIS                              (0x1UL << 12)                                 /**< Data in Disable */
 #define _GPIO_P_CTRL_DINDIS_SHIFT                       12                                            /**< Shift value for GPIO_DINDIS */
 #define _GPIO_P_CTRL_DINDIS_MASK                        0x1000UL                                      /**< Bit mask for GPIO_DINDIS */
 #define _GPIO_P_CTRL_DINDIS_DEFAULT                     0x00000000UL                                  /**< Mode DEFAULT for GPIO_P_CTRL */
 #define GPIO_P_CTRL_DINDIS_DEFAULT                      (_GPIO_P_CTRL_DINDIS_DEFAULT << 12)           /**< Shifted mode DEFAULT for GPIO_P_CTRL */
-#define GPIO_P_CTRL_DRIVESTRENGTHALT                    (0x1UL << 16)                                 /**< Alternate drive strength for port */
+#define GPIO_P_CTRL_DRIVESTRENGTHALT                    (0x1UL << 16)                                 /**< Alternate Drive Strength for Port */
 #define _GPIO_P_CTRL_DRIVESTRENGTHALT_SHIFT             16                                            /**< Shift value for GPIO_DRIVESTRENGTHALT */
 #define _GPIO_P_CTRL_DRIVESTRENGTHALT_MASK              0x10000UL                                     /**< Bit mask for GPIO_DRIVESTRENGTHALT */
 #define _GPIO_P_CTRL_DRIVESTRENGTHALT_DEFAULT           0x00000000UL                                  /**< Mode DEFAULT for GPIO_P_CTRL */
@@ -118,7 +118,7 @@ typedef struct {
 #define _GPIO_P_CTRL_SLEWRATEALT_MASK                   0x700000UL                                    /**< Bit mask for GPIO_SLEWRATEALT */
 #define _GPIO_P_CTRL_SLEWRATEALT_DEFAULT                0x00000005UL                                  /**< Mode DEFAULT for GPIO_P_CTRL */
 #define GPIO_P_CTRL_SLEWRATEALT_DEFAULT                 (_GPIO_P_CTRL_SLEWRATEALT_DEFAULT << 20)      /**< Shifted mode DEFAULT for GPIO_P_CTRL */
-#define GPIO_P_CTRL_DINDISALT                           (0x1UL << 28)                                 /**< Alternate Data In Disable */
+#define GPIO_P_CTRL_DINDISALT                           (0x1UL << 28)                                 /**< Alternate Data in Disable */
 #define _GPIO_P_CTRL_DINDISALT_SHIFT                    28                                            /**< Shift value for GPIO_DINDISALT */
 #define _GPIO_P_CTRL_DINDISALT_MASK                     0x10000000UL                                  /**< Bit mask for GPIO_DINDISALT */
 #define _GPIO_P_CTRL_DINDISALT_DEFAULT                  0x00000000UL                                  /**< Mode DEFAULT for GPIO_P_CTRL */
