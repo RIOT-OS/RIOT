@@ -43,6 +43,13 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @name    EEPROM configuration
+ * @{
+ */
+#define EEPROM_SIZE                (4096U)  /* 4kB */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
