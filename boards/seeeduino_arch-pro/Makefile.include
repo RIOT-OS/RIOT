@@ -11,6 +11,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 DEBUG_ADAPTER ?= dap
 
 # this board uses openocd
+export IMAGE_FILE = $(HEXFILE)
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
 # generate image checksum from hex file
