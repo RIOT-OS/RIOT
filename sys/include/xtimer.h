@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * Copyright (C) 2016 Eistec AB
+ *               2016 Eistec AB
+ *               2018 Josua Arndt
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +11,7 @@
 /**
  * @defgroup  sys_xtimer Timers
  * @ingroup   sys
+ *
  * @brief     Provides a high level timer module to register
  *            timers, get current system time, and let a thread sleep for
  *            a certain amount of time.
@@ -22,9 +24,12 @@
  *
  * @{
  * @file
- * @brief   xtimer interface definitions
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
- * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @brief     xtimer interface definitions
+ *
+ * @author    Kaspar Schleiser <kaspar@schleiser.de>
+ * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author    Josua Arndt <jarndt@ias.rwth-aachen.de>
+ *
  */
 #ifndef XTIMER_H
 #define XTIMER_H
@@ -62,41 +67,41 @@ typedef struct {
 /**
  * @brief xtimer callback type
  */
-typedef void (*xtimer_callback_t)(void*);
+typedef void (*xtimer_callback_t)(void *);
 
 /**
  * @brief xtimer timer structure
  */
 typedef struct xtimer {
-    struct xtimer *next;         /**< reference to next timer in timer lists */
-    uint32_t target;             /**< lower 32bit absolute target time */
-    uint32_t long_target;        /**< upper 32bit absolute target time */
-    xtimer_callback_t callback;  /**< callback function to call when timer
-                                     expires */
-    void *arg;                   /**< argument to pass to callback function */
+    struct xtimer *next;            /**< reference to next timer in timer lists */
+    uint32_t target;                /**< lower 32bit absolute target time in ticks*/
+    uint32_t long_target;           /**< upper 32bit absolute target time in ticks*/
+    xtimer_callback_t callback;     /**< callback function to call when timer
+                                        expires */
+    void *arg;                      /**< argument to pass to callback function */
 } xtimer_t;
 
 /**
  * @brief get the current system time as 32bit time stamp value
  *
- * @note    Overflows 2**32 ticks, thus returns xtimer_now64() % 32,
- *          but is cheaper.
+ * @note     Overflows 2**32 ticks, thus returns xtimer_now64() % 32,
+ *           but is cheaper.
  *
- * @return  current time as 32bit time stamp
+ * @return   current time as 32bit time stamp
  */
 static inline xtimer_ticks32_t xtimer_now(void);
 
 /**
  * @brief get the current system time as 64bit time stamp
  *
- * @return  current time as 64bit time stamp
+ * @return   current time as 64bit time stamp
  */
 static inline xtimer_ticks64_t xtimer_now64(void);
 
 /**
  * @brief get the current system time into a timex_t
  *
- * @param[out] out  pointer to timex_t the time will be written to
+ * @param[out] out   pointer to timex_t the time will be written to
  */
 void xtimer_now_timex(timex_t *out);
 
@@ -140,7 +145,7 @@ static inline void xtimer_sleep(uint32_t seconds);
  * the specified amount in microseconds, so only use it there for *very* short
  * periods, e.g., less than XTIMER_BACKOFF.
  *
- * @param[in] microseconds  the amount of microseconds the thread should sleep
+ * @param[in] microseconds   the amount of microseconds the thread should sleep
  */
 static inline void xtimer_usleep(uint32_t microseconds);
 
@@ -164,7 +169,7 @@ static inline void xtimer_nanosleep(uint32_t nanoseconds);
  * the specified amount, so only use it there for *very* short periods,
  * e.g. less than XTIMER_BACKOFF.
  *
- * @param[in] ticks  number of ticks the thread should sleep
+ * @param[in] ticks   number of ticks the thread should sleep
  */
 static inline void xtimer_tsleep32(xtimer_ticks32_t ticks);
 
@@ -175,7 +180,7 @@ static inline void xtimer_tsleep32(xtimer_ticks32_t ticks);
  * the specified amount, so only use it there for *very* short periods,
  * e.g. less than XTIMER_BACKOFF.
  *
- * @param[in] ticks  number of ticks the thread should sleep
+ * @param[in] ticks   number of ticks the thread should sleep
  */
 static inline void xtimer_tsleep64(xtimer_ticks64_t ticks);
 
@@ -184,112 +189,122 @@ static inline void xtimer_tsleep64(xtimer_ticks64_t ticks);
  *
  * This function will spin-block, so only use it *very* short periods.
  *
- * @param[in] ticks  the number of xtimer ticks the thread should spin for
+ * @param[in] ticks   the number of xtimer ticks the thread should spin for
  */
 static inline void xtimer_spin(xtimer_ticks32_t ticks);
 
 /**
  * @brief will cause the calling thread to be suspended until the absolute
- * time (@p last_wakeup + @p period).
+ * time (@p last_wakeup_ticks + period_ticks). @p period_us will be internally
+ * converted to ticks.
  *
- * When the function returns, @p last_wakeup is set to
- * (@p last_wakeup + @p period).
+ * When the function returns, @p last_wakeup_ticks is set to
+ * (@p last_wakeup_ticks + @p period_ticks).
  *
  * This function can be used to create periodic wakeups.
- * @c last_wakeup should be set to xtimer_now() before first call of the
+ * @c last_wakeup_ticks should be set to xtimer_now() before first call of the
  * function.
  *
- * If the result of (@p last_wakeup + @p period) would be in the past, the function
- * sets @p last_wakeup to @p last_wakeup + @p period and returns immediately.
+ * If the result of (@p last_wakeup_ticks + @p period_ticks) would be in
+ * the past, the function sets @p last_wakeup_ticks to
+ * (@p last_wakeup_ticks + @p period_ticks) and returns immediately.
  *
- * @param[in] last_wakeup   base time stamp for the wakeup
- * @param[in] period        time in microseconds that will be added to last_wakeup
+ * @param[in] last_wakeup_ticks   base time stamp for the wakeup
+ * @param[in] period_us           time in microseconds that will be added to
+ *                                last_wakeup
  */
-static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup, uint32_t period);
+static inline void xtimer_periodic_wakeup(xtimer_ticks32_t *last_wakeup_ticks,
+                                          uint32_t period_us);
 
 /**
  * @brief Set a timer that sends a message
  *
- * This function sets a timer that will send a message @p offset ticks
- * from now.
+ * This function sets a timer that will send a message @p offset_us
+ * microseconds from now.
  *
- * The mesage struct specified by msg parameter will not be copied, e.g., it
+ * The message struct specified by msg parameter will not be copied, i.e., it
  * needs to point to valid memory until the message has been delivered.
  *
- * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use.
- * @param[in] offset        microseconds from now
- * @param[in] msg           ptr to msg that will be sent
- * @param[in] target_pid    pid the message will be sent to
+ * @param[in] timer        timer struct to work with.
+ *                         Its xtimer_t::target and xtimer_t::long_target
+ *                         fields need to be initialized with 0 on first use.
+ * @param[in] offset_us    microseconds from now
+ * @param[in] msg          ptr to msg that will be sent
+ * @param[in] target_pid   pid the message will be sent to
  */
-static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset, msg_t *msg, kernel_pid_t target_pid);
+static inline void xtimer_set_msg(xtimer_t *timer, uint32_t offset_us,
+                                  msg_t *msg, kernel_pid_t target_pid);
 
 /**
  * @brief Set a timer that sends a message, 64bit version
  *
- * This function sets a timer that will send a message @p offset microseconds
- * from now.
+ * This function sets a timer that will send a message @p offset_us
+ * microseconds from now.
  *
- * The mesage struct specified by msg parameter will not be copied, e.g., it
+ * The message struct specified by msg parameter will not be copied, i.e., it
  * needs to point to valid memory until the message has been delivered.
  *
- * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use.
- * @param[in] offset        microseconds from now
- * @param[in] msg           ptr to msg that will be sent
- * @param[in] target_pid    pid the message will be sent to
+ * @param[in] timer        timer struct to work with.
+ *                         Its xtimer_t::target and xtimer_t::long_target
+ *                         fields need to be initialized with 0 on first use.
+ * @param[in] offset_us    microseconds from now
+ * @param[in] msg          ptr to msg that will be sent
+ * @param[in] target_pid   pid the message will be sent to
  */
-static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_t target_pid);
+static inline void xtimer_set_msg64(xtimer_t *timer, uint64_t offset_us,
+                                    msg_t *msg, kernel_pid_t target_pid);
 
 /**
  * @brief Set a timer that wakes up a thread
  *
- * This function sets a timer that will wake up a thread when the timer has
- * expired.
+ * This function sets a timer that will call thread_wakeup on the given @p pid
+ * after @p offset_us microseconds have passed. This function does not put any
+ * threads to sleep.
  *
- * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use
- * @param[in] offset        microseconds from now
- * @param[in] pid           pid of the thread that will be woken up
+ * @param[in] timer       timer struct to work with.
+ *                        Its xtimer_t::target and xtimer_t::long_target
+ *                        fields need to be initialized with 0 on first use
+ * @param[in] offset_us   microseconds from now
+ * @param[in] pid         pid of the thread that will be woken up
  */
-static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);
+static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset_us,
+                                     kernel_pid_t pid);
 
 /**
  * @brief Set a timer that wakes up a thread, 64bit version
  *
- * This function sets a timer that will wake up a thread when the timer has
- * expired.
+ * This function sets a timer that will call thread_wakeup on the given @p pid
+ * after @p offset_us microseconds have passed. This function does not put any
+ * threads to sleep.
  *
- * @param[in] timer         timer struct to work with.
- *                          Its xtimer_t::target and xtimer_t::long_target
- *                          fields need to be initialized with 0 on first use
- * @param[in] offset        microseconds from now
- * @param[in] pid           pid of the thread that will be woken up
+ * @param[in] timer       timer struct to work with.
+ *                        Its xtimer_t::target and xtimer_t::long_target
+ *                        fields need to be initialized with 0 on first use
+ * @param[in] offset_us   microseconds from now
+ * @param[in] pid         pid of the thread that will be woken up
  */
-static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_pid_t pid);
+static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset_us,
+                                       kernel_pid_t pid);
 
 /**
  * @brief Set a timer to execute a callback at some time in the future
  *
  * Expects timer->callback to be set.
  *
- * The callback specified in the timer struct will be executed @p offset
- * ticks in the future.
+ * The callback specified in the timer struct will be executed @p offset_us
+ * microseconds in the future.
  *
  * @warning BEWARE! Callbacks from xtimer_set() are being executed in interrupt
  * context (unless offset < XTIMER_BACKOFF). DON'T USE THIS FUNCTION unless you
  * know *exactly* what that means.
  *
- * @param[in] timer     the timer structure to use.
- *                      Its xtimer_t::target and xtimer_t::long_target
- *                      fields need to be initialized with 0 on first use
- * @param[in] offset    time in microseconds from now specifying that timer's
- *                      callback's execution time
+ * @param[in] timer       the timer structure to use.
+ *                        Its xtimer_t::target and xtimer_t::long_target
+ *                        fields need to be initialized with 0 on first use
+ * @param[in] offset_us   time in microseconds from now specifying that timer's
+ *                        callback's execution time
  */
-static inline void xtimer_set(xtimer_t *timer, uint32_t offset);
+static inline void xtimer_set(xtimer_t *timer, uint32_t offset_us);
 
 /**
  * @brief Set a timer to execute a callback at some time in the future, 64bit
@@ -297,7 +312,7 @@ static inline void xtimer_set(xtimer_t *timer, uint32_t offset);
  *
  * Expects timer->callback to be set.
  *
- * The callback specified in the timer struct will be executed @p offset_usec
+ * The callback specified in the timer struct will be executed @p offset_us
  * microseconds in the future.
  *
  * @warning BEWARE! Callbacks from xtimer_set() are being executed in interrupt
@@ -317,133 +332,133 @@ static inline void xtimer_set64(xtimer_t *timer, uint64_t offset_us);
  *
  * @note this function runs in O(n) with n being the number of active timers
  *
- * @param[in] timer ptr to timer structure that will be removed
+ * @param[in] timer   ptr to timer structure that will be removed
  */
 void xtimer_remove(xtimer_t *timer);
 
 /**
  * @brief receive a message blocking but with timeout
  *
- * @param[out] msg      pointer to a msg_t which will be filled in case of
- *                      no timeout
- * @param[in]  timeout  timeout in microseconds relative
+ * @param[out] msg         pointer to a msg_t which will be filled in case of
+ *                         no timeout
+ * @param[in] timeout_us   timeout in microseconds relative
  *
- * @return     < 0 on error, other value otherwise
+ * @return                 < 0 on error, other value otherwise
  */
-static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout);
+static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_us);
 
 /**
  * @brief receive a message blocking but with timeout, 64bit version
  *
- * @param[out] msg      pointer to a msg_t which will be filled in case of no
- *                      timeout
- * @param[in]  timeout  timeout in microseconds relative
+ * @param[out] msg          pointer to a msg_t which will be filled in case of
+ *                          no timeout
+ * @param[in]  timeout_us   timeout in microseconds relative
  *
- * @return     < 0 on error, other value otherwise
+ * @return                  < 0 on error, other value otherwise
  */
-static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
+static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout_us);
 
 /**
  * @brief Convert microseconds to xtimer ticks
  *
- * @param[in] usec  microseconds
+ * @param[in] us   microseconds
  *
- * @return xtimer time stamp
+ * @return         xtimer time stamp
  */
-static inline xtimer_ticks32_t xtimer_ticks_from_usec(uint32_t usec);
+static inline xtimer_ticks32_t xtimer_ticks_from_usec(uint32_t us);
 
 /**
  * @brief Convert microseconds to xtimer ticks, 64 bit version
  *
- * @param[in] usec  microseconds
+ * @param[in] us   microseconds
  *
- * @return xtimer time stamp
+ * @return         xtimer time stamp
  */
-static inline xtimer_ticks64_t xtimer_ticks_from_usec64(uint64_t usec);
+static inline xtimer_ticks64_t xtimer_ticks_from_usec64(uint64_t us);
 
 /**
  * @brief Convert xtimer ticks to microseconds
  *
- * @param[in] ticks  xtimer time stamp
+ * @param[in] ticks   xtimer time stamp
  *
- * @return microseconds
+ * @return            microseconds
  */
 static inline uint32_t xtimer_usec_from_ticks(xtimer_ticks32_t ticks);
 
 /**
  * @brief Convert xtimer ticks to microseconds, 64 bit version
  *
- * @param[in] ticks  xtimer time stamp
+ * @param[in] ticks   xtimer time stamp
  *
- * @return microseconds
+ * @return            microseconds
  */
 static inline uint64_t xtimer_usec_from_ticks64(xtimer_ticks64_t ticks);
 
 /**
  * @brief Create an xtimer time stamp
  *
- * @param[in] ticks  number of xtimer ticks
+ * @param[in] ticks   number of xtimer ticks
  *
- * @return xtimer time stamp
+ * @return            xtimer time stamp
  */
 static inline xtimer_ticks32_t xtimer_ticks(uint32_t ticks);
 
 /**
  * @brief Create an xtimer time stamp, 64 bit version
  *
- * @param[in] ticks  number of xtimer ticks
+ * @param[in] ticks   number of xtimer ticks
  *
- * @return xtimer time stamp
+ * @return            xtimer time stamp
  */
 static inline xtimer_ticks64_t xtimer_ticks64(uint64_t ticks);
 
 /**
  * @brief Compute difference between two xtimer time stamps
  *
- * @param[in] a  left operand
- * @param[in] b  right operand
+ * @param[in] a   left operand
+ * @param[in] b   right operand
  *
- * @return @p a - @p b
+ * @return        @p a - @p b
  */
 static inline xtimer_ticks32_t xtimer_diff(xtimer_ticks32_t a, xtimer_ticks32_t b);
 
 /**
  * @brief Compute difference between two xtimer time stamps, 64 bit version
  *
- * @param[in] a  left operand
- * @param[in] b  right operand
+ * @param[in] a   left operand
+ * @param[in] b   right operand
  *
- * @return @p a - @p b
+ * @return        @p a - @p b
  */
 static inline xtimer_ticks64_t xtimer_diff64(xtimer_ticks64_t a, xtimer_ticks64_t b);
 
 /**
  * @brief Compute 32 bit difference between two 64 bit xtimer time stamps
  *
- * @param[in] a  left operand
- * @param[in] b  right operand
+ * @param[in] a   left operand
+ * @param[in] b   right operand
  *
- * @return @p a - @p b cast truncated to 32 bit
+ * @return        @p a - @p b cast truncated to 32 bit
  */
 static inline xtimer_ticks32_t xtimer_diff32_64(xtimer_ticks64_t a, xtimer_ticks64_t b);
 
 /**
  * @brief Compare two xtimer time stamps
  *
- * @param[in] a  left operand
- * @param[in] b  right operand
+ * @param[in] a   left operand
+ * @param[in] b   right operand
  *
- * @return @p a < @p b
+ * @return        @p a < @p b
  */
 static inline bool xtimer_less(xtimer_ticks32_t a, xtimer_ticks32_t b);
 
 /**
  * @brief Compare two xtimer time stamps, 64 bit version
  *
- * @param[in] a  left operand
- * @param[in] b  right operand
+ * @param[in] a   left operand
+ * @param[in] b   right operand
  *
- * @return @p a < @p b
+ * @return        @p a < @p b
  */
 static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
 
@@ -452,24 +467,24 @@ static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
  *
  * @note this requires core_thread_flags to be enabled
  *
- * @param[in]    mutex  mutex to lock
- * @param[in]    us     timeout in microseconds relative
+ * @param[in] mutex   mutex to lock
+ * @param[in] us      timeout in microseconds relative
  *
- * @return       0, when returned after mutex was locked
- * @return       -1, when the timeout occcured
+ * @return            0, when returned after mutex was locked
+ * @return            -1, when the timeout occcured
  */
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
 
 /**
- * @brief    Set timeout thread flag after @p timeout
+ * @brief    Set timeout thread flag after @p timeout_us
  *
  * This function will set THREAD_FLAG_TIMEOUT on the current thread after @p
- * timeout usec have passed.
+ * timeout_us microseconds have passed.
  *
- * @param[in]   t       timer struct to use
- * @param[in]   timeout timeout in usec
+ * @param[in] t            timer struct to use
+ * @param[in] timeout_us   timeout in microseconds relative
  */
-void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
+void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout_us);
 
 /**
  * @brief xtimer backoff value
