@@ -784,13 +784,20 @@ static void _receive(gnrc_pktsnip_t *pkt)
     /* extract header */
     hdr = (ipv6_hdr_t *)ipv6->data;
 
+    uint16_t ipv6_len = byteorder_ntohs(hdr->len);
+
+    if ((ipv6_len == 0) && (hdr->nh != PROTNUM_IPV6_NONXT)) {
+        /* this doesn't even make sense */
+        DEBUG("ipv6: payload length 0, but next header not NONXT\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
     /* if available, remove any padding that was added by lower layers
      * to fulfill their minimum size requirements (e.g. ethernet) */
-    if ((ipv6 != pkt) && (byteorder_ntohs(hdr->len) < pkt->size)) {
+    else if ((ipv6 != pkt) && (ipv6_len < pkt->size)) {
         gnrc_pktbuf_realloc_data(pkt, byteorder_ntohs(hdr->len));
     }
-    else if (byteorder_ntohs(hdr->len) >
-             (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t))) {
+    else if (ipv6_len > (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t))) {
         DEBUG("ipv6: invalid payload length: %d, actual: %d, dropping packet\n",
               (int) byteorder_ntohs(hdr->len),
               (int) (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t)));
