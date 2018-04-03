@@ -29,6 +29,14 @@
 
 static int i2c_dev = -1;
 
+static i2c_speed_t map_speed[] = {
+    I2C_SPEED_LOW,
+    I2C_SPEED_NORMAL,
+    I2C_SPEED_FAST,
+    I2C_SPEED_FAST_PLUS,
+    I2C_SPEED_HIGH
+};
+
 int cmd_init_master(int argc, char **argv)
 {
     int dev, speed, res;
@@ -52,7 +60,12 @@ int cmd_init_master(int argc, char **argv)
     dev = atoi(argv[1]);
     speed = atoi(argv[2]);
 
-    res = i2c_init_master(dev, speed);
+    if (speed < 0 || speed > 4) {
+        puts("Error: Speed value not in range (0 - 4)");
+        return 1;
+    }
+
+    res = i2c_init_master(dev, map_speed[speed]);
     if (res == -1) {
         puts("Error: Init: Given device not available");
         return 1;
