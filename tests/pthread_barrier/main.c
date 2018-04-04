@@ -44,7 +44,7 @@ static void *run(void *id_)
         pthread_barrier_wait(&barrier);
 
         uint32_t timeout_us = random_uint32() % 2500000;
-        printf("Child %i sleeps for %8" PRIu32 " µs.\n", id, timeout_us);
+        printf("Child %i sleeps for %8" PRIu32 " us.\n", id, timeout_us);
         xtimer_usleep(timeout_us);
     }
 
