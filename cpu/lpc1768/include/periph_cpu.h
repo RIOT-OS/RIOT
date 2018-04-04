@@ -71,7 +71,7 @@ typedef enum {
 /**
  * @brief   Power management configuration
  */
-#define PM_NUM_MODES    (3U)
+#define PM_NUM_MODES    (2U)
 
 #ifdef __cplusplus
 }

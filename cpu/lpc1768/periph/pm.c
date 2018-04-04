@@ -33,11 +33,10 @@ void pm_set(unsigned mode)
             LPC_SC->PCON = 0x00;
             cortexm_sleep(1);
             break;
-        case 2:
+        default:
             /* enter sleep mode */
             LPC_SC->PCON = 0x00;
             cortexm_sleep(0);
-            break;
     }
 }
 
