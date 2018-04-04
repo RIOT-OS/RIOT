@@ -372,9 +372,14 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief   CPU provides own pm_off() function
+ */
+#define PROVIDES_PM_LAYERED_OFF
+
+/**
  * @brief   Number of usable power modes.
  */
-#define PM_NUM_MODES    (3U)
+#define PM_NUM_MODES    (2U)
 
 #ifdef __cplusplus
 }
