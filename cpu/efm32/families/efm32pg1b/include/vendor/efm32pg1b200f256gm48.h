@@ -2,10 +2,10 @@
  * @file efm32pg1b200f256gm48.h
  * @brief CMSIS Cortex-M Peripheral Access Layer Header File
  *        for EFM32PG1B200F256GM48
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -189,11 +189,11 @@ typedef enum IRQn{
 #define EXT_IRQ_COUNT             34             /**< Number of External (NVIC) interrupts */
 
 /** AF channels connect the different on-chip peripherals with the af-mux */
-#define AFCHAN_MAX                72
+#define AFCHAN_MAX                72U
 /** AF channel maximum location number */
-#define AFCHANLOC_MAX             32
+#define AFCHANLOC_MAX             32U
 /** Analog AF channels */
-#define AFACHAN_MAX               61
+#define AFACHAN_MAX               61U
 
 /* Part number capabilities */
 

@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_ldma.h
  * @brief EFR32MG1P_LDMA register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -69,7 +69,7 @@ typedef struct {
   __IM uint32_t   IF;           /**< Interrupt Flag Register  */
   __IOM uint32_t  IFS;          /**< Interrupt Flag Set Register  */
   __IOM uint32_t  IFC;          /**< Interrupt Flag Clear Register  */
-  __IOM uint32_t  IEN;          /**< Interrupt Enable register  */
+  __IOM uint32_t  IEN;          /**< Interrupt Enable Register  */
 
   uint32_t        RESERVED2[4]; /**< Reserved registers */
   LDMA_CH_TypeDef CH[8];        /**< DMA Channel Registers */

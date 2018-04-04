@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_cryotimer.h
  * @brief EFR32MG1P_CRYOTIMER register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -132,7 +132,7 @@ typedef struct {
 /* Bit fields for CRYOTIMER EM4WUEN */
 #define _CRYOTIMER_EM4WUEN_RESETVALUE             0x00000000UL                            /**< Default value for CRYOTIMER_EM4WUEN */
 #define _CRYOTIMER_EM4WUEN_MASK                   0x00000001UL                            /**< Mask for CRYOTIMER_EM4WUEN */
-#define CRYOTIMER_EM4WUEN_EM4WU                   (0x1UL << 0)                            /**< EM4 Wake-up enable */
+#define CRYOTIMER_EM4WUEN_EM4WU                   (0x1UL << 0)                            /**< EM4 Wake-up Enable */
 #define _CRYOTIMER_EM4WUEN_EM4WU_SHIFT            0                                       /**< Shift value for CRYOTIMER_EM4WU */
 #define _CRYOTIMER_EM4WUEN_EM4WU_MASK             0x1UL                                   /**< Bit mask for CRYOTIMER_EM4WU */
 #define _CRYOTIMER_EM4WUEN_EM4WU_DEFAULT          0x00000000UL                            /**< Mode DEFAULT for CRYOTIMER_EM4WUEN */
@@ -141,7 +141,7 @@ typedef struct {
 /* Bit fields for CRYOTIMER IF */
 #define _CRYOTIMER_IF_RESETVALUE                  0x00000000UL                        /**< Default value for CRYOTIMER_IF */
 #define _CRYOTIMER_IF_MASK                        0x00000001UL                        /**< Mask for CRYOTIMER_IF */
-#define CRYOTIMER_IF_PERIOD                       (0x1UL << 0)                        /**< Wakeup event/Interrupt */
+#define CRYOTIMER_IF_PERIOD                       (0x1UL << 0)                        /**< Wakeup Event/Interrupt */
 #define _CRYOTIMER_IF_PERIOD_SHIFT                0                                   /**< Shift value for CRYOTIMER_PERIOD */
 #define _CRYOTIMER_IF_PERIOD_MASK                 0x1UL                               /**< Bit mask for CRYOTIMER_PERIOD */
 #define _CRYOTIMER_IF_PERIOD_DEFAULT              0x00000000UL                        /**< Mode DEFAULT for CRYOTIMER_IF */

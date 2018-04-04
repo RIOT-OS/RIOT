@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_leuart.h
  * @brief EFR32MG1P_LEUART register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -122,12 +122,12 @@ typedef struct {
 #define LEUART_CTRL_STOPBITS_DEFAULT             (_LEUART_CTRL_STOPBITS_DEFAULT << 4) /**< Shifted mode DEFAULT for LEUART_CTRL */
 #define LEUART_CTRL_STOPBITS_ONE                 (_LEUART_CTRL_STOPBITS_ONE << 4)     /**< Shifted mode ONE for LEUART_CTRL */
 #define LEUART_CTRL_STOPBITS_TWO                 (_LEUART_CTRL_STOPBITS_TWO << 4)     /**< Shifted mode TWO for LEUART_CTRL */
-#define LEUART_CTRL_INV                          (0x1UL << 5)                         /**< Invert Input And Output */
+#define LEUART_CTRL_INV                          (0x1UL << 5)                         /**< Invert Input and Output */
 #define _LEUART_CTRL_INV_SHIFT                   5                                    /**< Shift value for LEUART_INV */
 #define _LEUART_CTRL_INV_MASK                    0x20UL                               /**< Bit mask for LEUART_INV */
 #define _LEUART_CTRL_INV_DEFAULT                 0x00000000UL                         /**< Mode DEFAULT for LEUART_CTRL */
 #define LEUART_CTRL_INV_DEFAULT                  (_LEUART_CTRL_INV_DEFAULT << 5)      /**< Shifted mode DEFAULT for LEUART_CTRL */
-#define LEUART_CTRL_ERRSDMA                      (0x1UL << 6)                         /**< Clear RX DMA On Error */
+#define LEUART_CTRL_ERRSDMA                      (0x1UL << 6)                         /**< Clear RX DMA on Error */
 #define _LEUART_CTRL_ERRSDMA_SHIFT               6                                    /**< Shift value for LEUART_ERRSDMA */
 #define _LEUART_CTRL_ERRSDMA_MASK                0x40UL                               /**< Bit mask for LEUART_ERRSDMA */
 #define _LEUART_CTRL_ERRSDMA_DEFAULT             0x00000000UL                         /**< Mode DEFAULT for LEUART_CTRL */
@@ -338,7 +338,7 @@ typedef struct {
 #define _LEUART_TXDATAX_TXDATA_MASK              0x1FFUL                                 /**< Bit mask for LEUART_TXDATA */
 #define _LEUART_TXDATAX_TXDATA_DEFAULT           0x00000000UL                            /**< Mode DEFAULT for LEUART_TXDATAX */
 #define LEUART_TXDATAX_TXDATA_DEFAULT            (_LEUART_TXDATAX_TXDATA_DEFAULT << 0)   /**< Shifted mode DEFAULT for LEUART_TXDATAX */
-#define LEUART_TXDATAX_TXBREAK                   (0x1UL << 13)                           /**< Transmit Data As Break */
+#define LEUART_TXDATAX_TXBREAK                   (0x1UL << 13)                           /**< Transmit Data as Break */
 #define _LEUART_TXDATAX_TXBREAK_SHIFT            13                                      /**< Shift value for LEUART_TXBREAK */
 #define _LEUART_TXDATAX_TXBREAK_MASK             0x2000UL                                /**< Bit mask for LEUART_TXBREAK */
 #define _LEUART_TXDATAX_TXBREAK_DEFAULT          0x00000000UL                            /**< Mode DEFAULT for LEUART_TXDATAX */

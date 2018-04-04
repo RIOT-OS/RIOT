@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_crypto.h
  * @brief EFR32MG1P_CRYPTO register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -70,7 +70,7 @@ typedef struct {
   __IOM uint32_t IFS;            /**< Interrupt Flag Set Register  */
   __IOM uint32_t IFC;            /**< Interrupt Flag Clear Register  */
   __IOM uint32_t IEN;            /**< Interrupt Enable Register  */
-  __IOM uint32_t SEQ0;           /**< Sequence register 0  */
+  __IOM uint32_t SEQ0;           /**< Sequence Register 0  */
   __IOM uint32_t SEQ1;           /**< Sequence Register 1  */
   __IOM uint32_t SEQ2;           /**< Sequence Register 2  */
   __IOM uint32_t SEQ3;           /**< Sequence Register 3  */
@@ -102,7 +102,7 @@ typedef struct {
   uint32_t       RESERVED10[3];  /**< Reserved for future use **/
   __IOM uint32_t DDATA0BYTE;     /**< DDATA0 Register Byte Access  */
   __IOM uint32_t DDATA1BYTE;     /**< DDATA1 Register Byte Access  */
-  __IOM uint32_t DDATA0BYTE32;   /**< DDATA0 Register Byte 32 access.  */
+  __IOM uint32_t DDATA0BYTE32;   /**< DDATA0 Register Byte 32 Access  */
   uint32_t       RESERVED11[13]; /**< Reserved for future use **/
   __IOM uint32_t QDATA0;         /**< QDATA0 Register Access  */
   __IOM uint32_t QDATA1;         /**< QDATA1 Register Access  */
@@ -659,12 +659,12 @@ typedef struct {
 #define _CRYPTO_STATUS_SEQRUNNING_MASK               0x1UL                                      /**< Bit mask for CRYPTO_SEQRUNNING */
 #define _CRYPTO_STATUS_SEQRUNNING_DEFAULT            0x00000000UL                               /**< Mode DEFAULT for CRYPTO_STATUS */
 #define CRYPTO_STATUS_SEQRUNNING_DEFAULT             (_CRYPTO_STATUS_SEQRUNNING_DEFAULT << 0)   /**< Shifted mode DEFAULT for CRYPTO_STATUS */
-#define CRYPTO_STATUS_INSTRRUNNING                   (0x1UL << 1)                               /**< Action is active */
+#define CRYPTO_STATUS_INSTRRUNNING                   (0x1UL << 1)                               /**< Action is Active */
 #define _CRYPTO_STATUS_INSTRRUNNING_SHIFT            1                                          /**< Shift value for CRYPTO_INSTRRUNNING */
 #define _CRYPTO_STATUS_INSTRRUNNING_MASK             0x2UL                                      /**< Bit mask for CRYPTO_INSTRRUNNING */
 #define _CRYPTO_STATUS_INSTRRUNNING_DEFAULT          0x00000000UL                               /**< Mode DEFAULT for CRYPTO_STATUS */
 #define CRYPTO_STATUS_INSTRRUNNING_DEFAULT           (_CRYPTO_STATUS_INSTRRUNNING_DEFAULT << 1) /**< Shifted mode DEFAULT for CRYPTO_STATUS */
-#define CRYPTO_STATUS_DMAACTIVE                      (0x1UL << 2)                               /**< DMA Action is active */
+#define CRYPTO_STATUS_DMAACTIVE                      (0x1UL << 2)                               /**< DMA Action is Active */
 #define _CRYPTO_STATUS_DMAACTIVE_SHIFT               2                                          /**< Shift value for CRYPTO_DMAACTIVE */
 #define _CRYPTO_STATUS_DMAACTIVE_MASK                0x4UL                                      /**< Bit mask for CRYPTO_DMAACTIVE */
 #define _CRYPTO_STATUS_DMAACTIVE_DEFAULT             0x00000000UL                               /**< Mode DEFAULT for CRYPTO_STATUS */
@@ -807,12 +807,12 @@ typedef struct {
 #define _CRYPTO_SEQCTRL_DMA1SKIP_MASK                0xC000000UL                               /**< Bit mask for CRYPTO_DMA1SKIP */
 #define _CRYPTO_SEQCTRL_DMA1SKIP_DEFAULT             0x00000000UL                              /**< Mode DEFAULT for CRYPTO_SEQCTRL */
 #define CRYPTO_SEQCTRL_DMA1SKIP_DEFAULT              (_CRYPTO_SEQCTRL_DMA1SKIP_DEFAULT << 26)  /**< Shifted mode DEFAULT for CRYPTO_SEQCTRL */
-#define CRYPTO_SEQCTRL_DMA0PRESA                     (0x1UL << 28)                             /**< DMA0 Preserve A */
+#define CRYPTO_SEQCTRL_DMA0PRESA                     (0x1UL << 28)                             /**< DMA0 Preserve a */
 #define _CRYPTO_SEQCTRL_DMA0PRESA_SHIFT              28                                        /**< Shift value for CRYPTO_DMA0PRESA */
 #define _CRYPTO_SEQCTRL_DMA0PRESA_MASK               0x10000000UL                              /**< Bit mask for CRYPTO_DMA0PRESA */
 #define _CRYPTO_SEQCTRL_DMA0PRESA_DEFAULT            0x00000000UL                              /**< Mode DEFAULT for CRYPTO_SEQCTRL */
 #define CRYPTO_SEQCTRL_DMA0PRESA_DEFAULT             (_CRYPTO_SEQCTRL_DMA0PRESA_DEFAULT << 28) /**< Shifted mode DEFAULT for CRYPTO_SEQCTRL */
-#define CRYPTO_SEQCTRL_DMA1PRESA                     (0x1UL << 29)                             /**< DMA1 Preserve A */
+#define CRYPTO_SEQCTRL_DMA1PRESA                     (0x1UL << 29)                             /**< DMA1 Preserve a */
 #define _CRYPTO_SEQCTRL_DMA1PRESA_SHIFT              29                                        /**< Shift value for CRYPTO_DMA1PRESA */
 #define _CRYPTO_SEQCTRL_DMA1PRESA_MASK               0x20000000UL                              /**< Bit mask for CRYPTO_DMA1PRESA */
 #define _CRYPTO_SEQCTRL_DMA1PRESA_DEFAULT            0x00000000UL                              /**< Mode DEFAULT for CRYPTO_SEQCTRL */
@@ -844,7 +844,7 @@ typedef struct {
 /* Bit fields for CRYPTO IF */
 #define _CRYPTO_IF_RESETVALUE                        0x00000000UL                        /**< Default value for CRYPTO_IF */
 #define _CRYPTO_IF_MASK                              0x00000003UL                        /**< Mask for CRYPTO_IF */
-#define CRYPTO_IF_INSTRDONE                          (0x1UL << 0)                        /**< Instruction done */
+#define CRYPTO_IF_INSTRDONE                          (0x1UL << 0)                        /**< Instruction Done */
 #define _CRYPTO_IF_INSTRDONE_SHIFT                   0                                   /**< Shift value for CRYPTO_INSTRDONE */
 #define _CRYPTO_IF_INSTRDONE_MASK                    0x1UL                               /**< Bit mask for CRYPTO_INSTRDONE */
 #define _CRYPTO_IF_INSTRDONE_DEFAULT                 0x00000000UL                        /**< Mode DEFAULT for CRYPTO_IF */

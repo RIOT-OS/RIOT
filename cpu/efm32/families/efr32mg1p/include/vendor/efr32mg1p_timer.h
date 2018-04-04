@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_timer.h
  * @brief EFR32MG1P_TIMER register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -202,7 +202,7 @@ typedef struct {
 #define _TIMER_CTRL_ATI_MASK                       0x10000000UL                             /**< Bit mask for TIMER_ATI */
 #define _TIMER_CTRL_ATI_DEFAULT                    0x00000000UL                             /**< Mode DEFAULT for TIMER_CTRL */
 #define TIMER_CTRL_ATI_DEFAULT                     (_TIMER_CTRL_ATI_DEFAULT << 28)          /**< Shifted mode DEFAULT for TIMER_CTRL */
-#define TIMER_CTRL_RSSCOIST                        (0x1UL << 29)                            /**< Reload-Start Sets Compare Output initial State */
+#define TIMER_CTRL_RSSCOIST                        (0x1UL << 29)                            /**< Reload-Start Sets Compare Output Initial State */
 #define _TIMER_CTRL_RSSCOIST_SHIFT                 29                                       /**< Shift value for TIMER_RSSCOIST */
 #define _TIMER_CTRL_RSSCOIST_MASK                  0x20000000UL                             /**< Bit mask for TIMER_RSSCOIST */
 #define _TIMER_CTRL_RSSCOIST_DEFAULT               0x00000000UL                             /**< Mode DEFAULT for TIMER_CTRL */
@@ -1307,7 +1307,7 @@ typedef struct {
 #define _TIMER_DTCTRL_DTIPOL_MASK                  0x4UL                                 /**< Bit mask for TIMER_DTIPOL */
 #define _TIMER_DTCTRL_DTIPOL_DEFAULT               0x00000000UL                          /**< Mode DEFAULT for TIMER_DTCTRL */
 #define TIMER_DTCTRL_DTIPOL_DEFAULT                (_TIMER_DTCTRL_DTIPOL_DEFAULT << 2)   /**< Shifted mode DEFAULT for TIMER_DTCTRL */
-#define TIMER_DTCTRL_DTCINV                        (0x1UL << 3)                          /**< DTI Complementary Output Invert. */
+#define TIMER_DTCTRL_DTCINV                        (0x1UL << 3)                          /**< DTI Complementary Output Invert */
 #define _TIMER_DTCTRL_DTCINV_SHIFT                 3                                     /**< Shift value for TIMER_DTCINV */
 #define _TIMER_DTCTRL_DTCINV_MASK                  0x8UL                                 /**< Bit mask for TIMER_DTCINV */
 #define _TIMER_DTCTRL_DTCINV_DEFAULT               0x00000000UL                          /**< Mode DEFAULT for TIMER_DTCTRL */

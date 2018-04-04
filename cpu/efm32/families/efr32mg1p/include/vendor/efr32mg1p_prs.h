@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_prs.h
  * @brief EFR32MG1P_PRS register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -958,7 +958,7 @@ typedef struct {
 #define _PRS_CH_CTRL_ANDNEXT_MASK              0x10000000UL                               /**< Bit mask for PRS_ANDNEXT */
 #define _PRS_CH_CTRL_ANDNEXT_DEFAULT           0x00000000UL                               /**< Mode DEFAULT for PRS_CH_CTRL */
 #define PRS_CH_CTRL_ANDNEXT_DEFAULT            (_PRS_CH_CTRL_ANDNEXT_DEFAULT << 28)       /**< Shifted mode DEFAULT for PRS_CH_CTRL */
-#define PRS_CH_CTRL_ASYNC                      (0x1UL << 30)                              /**< Asynchronous reflex */
+#define PRS_CH_CTRL_ASYNC                      (0x1UL << 30)                              /**< Asynchronous Reflex */
 #define _PRS_CH_CTRL_ASYNC_SHIFT               30                                         /**< Shift value for PRS_ASYNC */
 #define _PRS_CH_CTRL_ASYNC_MASK                0x40000000UL                               /**< Bit mask for PRS_ASYNC */
 #define _PRS_CH_CTRL_ASYNC_DEFAULT             0x00000000UL                               /**< Mode DEFAULT for PRS_CH_CTRL */

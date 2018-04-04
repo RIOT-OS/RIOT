@@ -1,10 +1,10 @@
 /***************************************************************************//**
  * @file system_efr32mg1p.c
  * @brief CMSIS Cortex-M3/M4 System Layer for EFR32 devices.
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -143,7 +143,7 @@ uint32_t SystemCoreClockGet(void)
   ret   = SystemHFClockGet();
   presc = (CMU->HFCOREPRESC & _CMU_HFCOREPRESC_PRESC_MASK)
           >> _CMU_HFCOREPRESC_PRESC_SHIFT;
-  ret  /= (presc + 1);
+  ret  /= presc + 1U;
 
   /* Keep CMSIS system clock variable up-to-date */
   SystemCoreClock = ret;
@@ -163,8 +163,11 @@ uint32_t SystemCoreClockGet(void)
  ******************************************************************************/
 uint32_t SystemMaxCoreClockGet(void)
 {
-  return (EFR32_HFRCO_MAX_FREQ > EFR32_HFXO_FREQ \
-          ? EFR32_HFRCO_MAX_FREQ : EFR32_HFXO_FREQ);
+#if (EFR32_HFRCO_MAX_FREQ > EFR32_HFXO_FREQ)
+  return EFR32_HFRCO_MAX_FREQ;
+#else
+  return EFR32_HFXO_FREQ;
+#endif
 }
 
 /***************************************************************************//**
@@ -257,9 +260,10 @@ void SystemHFXOClockSet(uint32_t freq)
   SystemHFXOClock = freq;
 
   /* Update core clock frequency if HFXO is used to clock core */
-  if ((CMU->HFCLKSTATUS & _CMU_HFCLKSTATUS_SELECTED_MASK) == CMU_HFCLKSTATUS_SELECTED_HFXO) {
+  if ((CMU->HFCLKSTATUS & _CMU_HFCLKSTATUS_SELECTED_MASK)
+      == CMU_HFCLKSTATUS_SELECTED_HFXO) {
     /* The function will update the global variable */
-    SystemCoreClockGet();
+    (void)SystemCoreClockGet();
   }
 #else
   (void)freq; /* Unused parameter */
@@ -283,7 +287,7 @@ void SystemInit(void)
 #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
   /* Set floating point coprosessor access mode. */
   SCB->CPACR |= ((3UL << 10 * 2)                      /* set CP10 Full Access */
-                 | (3UL << 11 * 2)  );              /* set CP11 Full Access */
+                 | (3UL << 11 * 2));                  /* set CP11 Full Access */
 #endif
 
   /****************************
@@ -291,7 +295,7 @@ void SystemInit(void)
    * Enable bypass switch as errata workaround. The bypass current limit will be
    * disabled again in CHIP_Init() to avoid added current consumption. */
 
-  EMU->DCDCCLIMCTRL |= 1 << _EMU_DCDCCLIMCTRL_BYPLIMEN_SHIFT;
+  EMU->DCDCCLIMCTRL |= 1U << _EMU_DCDCCLIMCTRL_BYPLIMEN_SHIFT;
   EMU->DCDCCTRL = (EMU->DCDCCTRL & ~_EMU_DCDCCTRL_DCDCMODE_MASK)
                   | EMU_DCDCCTRL_DCDCMODE_BYPASS;
   *(volatile uint32_t *)(0x400E3074) &= ~(0x1UL << 0);
@@ -374,9 +378,10 @@ void SystemLFXOClockSet(uint32_t freq)
   SystemLFXOClock = freq;
 
   /* Update core clock frequency if LFXO is used to clock core */
-  if ((CMU->HFCLKSTATUS & _CMU_HFCLKSTATUS_SELECTED_MASK) == CMU_HFCLKSTATUS_SELECTED_LFXO) {
+  if ((CMU->HFCLKSTATUS & _CMU_HFCLKSTATUS_SELECTED_MASK)
+      == CMU_HFCLKSTATUS_SELECTED_LFXO) {
     /* The function will update the global variable */
-    SystemCoreClockGet();
+    (void)SystemCoreClockGet();
   }
 #else
   (void)freq; /* Unused parameter */

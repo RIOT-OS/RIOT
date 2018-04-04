@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_rmu.h
  * @brief EFR32MG1P_RMU register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -125,7 +125,7 @@ typedef struct {
 /* Bit fields for RMU RSTCAUSE */
 #define _RMU_RSTCAUSE_RESETVALUE           0x00000000UL                            /**< Default value for RMU_RSTCAUSE */
 #define _RMU_RSTCAUSE_MASK                 0x00010F1DUL                            /**< Mask for RMU_RSTCAUSE */
-#define RMU_RSTCAUSE_PORST                 (0x1UL << 0)                            /**< Power On Reset */
+#define RMU_RSTCAUSE_PORST                 (0x1UL << 0)                            /**< Power on Reset */
 #define _RMU_RSTCAUSE_PORST_SHIFT          0                                       /**< Shift value for RMU_PORST */
 #define _RMU_RSTCAUSE_PORST_MASK           0x1UL                                   /**< Bit mask for RMU_PORST */
 #define _RMU_RSTCAUSE_PORST_DEFAULT        0x00000000UL                            /**< Mode DEFAULT for RMU_RSTCAUSE */

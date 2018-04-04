@@ -1,10 +1,10 @@
 /**************************************************************************//**
  * @file efr32mg1p_idac.h
  * @brief EFR32MG1P_IDAC register and bit field definitions
- * @version 5.3.3
+ * @version 5.4.0
  ******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. http://www.silabs.com</b>
+ * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
  ******************************************************************************
  *
  * Permission is granted to anyone to use this software for any purpose,
@@ -247,7 +247,7 @@ typedef struct {
 /* Bit fields for IDAC DUTYCONFIG */
 #define _IDAC_DUTYCONFIG_RESETVALUE                    0x00000000UL                                    /**< Default value for IDAC_DUTYCONFIG */
 #define _IDAC_DUTYCONFIG_MASK                          0x00000002UL                                    /**< Mask for IDAC_DUTYCONFIG */
-#define IDAC_DUTYCONFIG_EM2DUTYCYCLEDIS                (0x1UL << 1)                                    /**< Duty Cycle Enable. */
+#define IDAC_DUTYCONFIG_EM2DUTYCYCLEDIS                (0x1UL << 1)                                    /**< Duty Cycle Enable */
 #define _IDAC_DUTYCONFIG_EM2DUTYCYCLEDIS_SHIFT         1                                               /**< Shift value for IDAC_EM2DUTYCYCLEDIS */
 #define _IDAC_DUTYCONFIG_EM2DUTYCYCLEDIS_MASK          0x2UL                                           /**< Bit mask for IDAC_EM2DUTYCYCLEDIS */
 #define _IDAC_DUTYCONFIG_EM2DUTYCYCLEDIS_DEFAULT       0x00000000UL                                    /**< Mode DEFAULT for IDAC_DUTYCONFIG */
@@ -301,12 +301,12 @@ typedef struct {
 /* Bit fields for IDAC APORTREQ */
 #define _IDAC_APORTREQ_RESETVALUE                      0x00000000UL                             /**< Default value for IDAC_APORTREQ */
 #define _IDAC_APORTREQ_MASK                            0x0000000CUL                             /**< Mask for IDAC_APORTREQ */
-#define IDAC_APORTREQ_APORT1XREQ                       (0x1UL << 2)                             /**< 1 if the APORT bus connected to APORT1X is requested */
+#define IDAC_APORTREQ_APORT1XREQ                       (0x1UL << 2)                             /**< 1 If the APORT Bus Connected to APORT1X is Requested */
 #define _IDAC_APORTREQ_APORT1XREQ_SHIFT                2                                        /**< Shift value for IDAC_APORT1XREQ */
 #define _IDAC_APORTREQ_APORT1XREQ_MASK                 0x4UL                                    /**< Bit mask for IDAC_APORT1XREQ */
 #define _IDAC_APORTREQ_APORT1XREQ_DEFAULT              0x00000000UL                             /**< Mode DEFAULT for IDAC_APORTREQ */
 #define IDAC_APORTREQ_APORT1XREQ_DEFAULT               (_IDAC_APORTREQ_APORT1XREQ_DEFAULT << 2) /**< Shifted mode DEFAULT for IDAC_APORTREQ */
-#define IDAC_APORTREQ_APORT1YREQ                       (0x1UL << 3)                             /**< 1 if the bus connected to APORT1Y is requested */
+#define IDAC_APORTREQ_APORT1YREQ                       (0x1UL << 3)                             /**< 1 If the Bus Connected to APORT1Y is Requested */
 #define _IDAC_APORTREQ_APORT1YREQ_SHIFT                3                                        /**< Shift value for IDAC_APORT1YREQ */
 #define _IDAC_APORTREQ_APORT1YREQ_MASK                 0x8UL                                    /**< Bit mask for IDAC_APORT1YREQ */
 #define _IDAC_APORTREQ_APORT1YREQ_DEFAULT              0x00000000UL                             /**< Mode DEFAULT for IDAC_APORTREQ */
@@ -315,12 +315,12 @@ typedef struct {
 /* Bit fields for IDAC APORTCONFLICT */
 #define _IDAC_APORTCONFLICT_RESETVALUE                 0x00000000UL                                       /**< Default value for IDAC_APORTCONFLICT */
 #define _IDAC_APORTCONFLICT_MASK                       0x0000000CUL                                       /**< Mask for IDAC_APORTCONFLICT */
-#define IDAC_APORTCONFLICT_APORT1XCONFLICT             (0x1UL << 2)                                       /**< 1 if the bus connected to APORT1X is in conflict with another peripheral */
+#define IDAC_APORTCONFLICT_APORT1XCONFLICT             (0x1UL << 2)                                       /**< 1 If the Bus Connected to APORT1X is in Conflict With Another Peripheral */
 #define _IDAC_APORTCONFLICT_APORT1XCONFLICT_SHIFT      2                                                  /**< Shift value for IDAC_APORT1XCONFLICT */
 #define _IDAC_APORTCONFLICT_APORT1XCONFLICT_MASK       0x4UL                                              /**< Bit mask for IDAC_APORT1XCONFLICT */
 #define _IDAC_APORTCONFLICT_APORT1XCONFLICT_DEFAULT    0x00000000UL                                       /**< Mode DEFAULT for IDAC_APORTCONFLICT */
 #define IDAC_APORTCONFLICT_APORT1XCONFLICT_DEFAULT     (_IDAC_APORTCONFLICT_APORT1XCONFLICT_DEFAULT << 2) /**< Shifted mode DEFAULT for IDAC_APORTCONFLICT */
-#define IDAC_APORTCONFLICT_APORT1YCONFLICT             (0x1UL << 3)                                       /**< 1 if the bus connected to APORT1Y is in conflict with another peripheral */
+#define IDAC_APORTCONFLICT_APORT1YCONFLICT             (0x1UL << 3)                                       /**< 1 If the Bus Connected to APORT1Y is in Conflict With Another Peripheral */
 #define _IDAC_APORTCONFLICT_APORT1YCONFLICT_SHIFT      3                                                  /**< Shift value for IDAC_APORT1YCONFLICT */
 #define _IDAC_APORTCONFLICT_APORT1YCONFLICT_MASK       0x8UL                                              /**< Bit mask for IDAC_APORT1YCONFLICT */
 #define _IDAC_APORTCONFLICT_APORT1YCONFLICT_DEFAULT    0x00000000UL                                       /**< Mode DEFAULT for IDAC_APORTCONFLICT */
