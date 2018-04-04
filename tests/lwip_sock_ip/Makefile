@@ -37,6 +37,8 @@ DISABLE_MODULE += auto_init
 CFLAGS += -DSO_REUSE
 CFLAGS += -DLWIP_SO_RCVTIMEO
 
+TEST_ON_CI_WHITELIST += all
+
 include $(RIOTBASE)/Makefile.include
 
 test:

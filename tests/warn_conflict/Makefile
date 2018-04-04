@@ -10,6 +10,8 @@ BOARD_WHITELIST := stm32f4discovery
 # user application.
 FEATURES_REQUIRED = periph_dac periph_spi
 
+TEST_ON_CI_WHITELIST += all
+
 include $(RIOTBASE)/Makefile.include
 
 test:
