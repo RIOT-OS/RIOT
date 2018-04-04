@@ -30,7 +30,6 @@
 
 static unsigned char _int_buf[BUF_SIZE];
 
-static const char *_default_content = "Start the RIOT!";
 static unsigned char _out[CCNL_MAX_PACKET_SIZE];
 
 /* usage for open command */
@@ -75,44 +74,45 @@ int _ccnl_open(int argc, char **argv)
 
 static void _content_usage(char *argv)
 {
-    printf("usage: %s <URI> [content]\n"
-            "%% %s /riot/peter/schmerzl             (default content)\n"
+    printf("usage: %s [URI] [content]\n"
+            "prints the CS if called without parameters:\n"
             "%% %s /riot/peter/schmerzl RIOT\n",
-            argv, argv, argv);
+            argv, argv);
 }
 
 int _ccnl_content(int argc, char **argv)
 {
     if (argc < 2) {
+        ccnl_cs_dump(&ccnl_relay);
+        return 0;
+    }
+    if (argc == 2) {
         _content_usage(argv[0]);
         return -1;
     }
 
     int arg_len;
-    char *body = (char*) _default_content;
     char buf[BUF_SIZE+1]; /* add one extra space to fit trailing '\0' */
 
-    if (argc > 2) {
-        unsigned pos = 0;
-        for (int i = 2; (i < argc) && (pos < BUF_SIZE); ++i) {
-            arg_len = strlen(argv[i]);
-            if ((pos + arg_len) > BUF_SIZE) {
-                arg_len = BUF_SIZE - pos;
-            }
-            strncpy(&buf[pos], argv[i], arg_len);
-            pos += arg_len;
-            /* increment pos _after_ adding ' ' */
-            buf[pos++] = ' ';
+    unsigned pos = 0;
+    for (int i = 2; (i < argc) && (pos < BUF_SIZE); ++i) {
+        arg_len = strlen(argv[i]);
+        if ((pos + arg_len) > BUF_SIZE) {
+            arg_len = BUF_SIZE - pos;
         }
-        /* decrement pos _before_ to overwrite last ' ' with '\0' */
-        buf[--pos] = '\0';
-        body = buf;
+        strncpy(&buf[pos], argv[i], arg_len);
+        pos += arg_len;
+        /* increment pos _after_ adding ' ' */
+        buf[pos++] = ' ';
     }
-    arg_len = strlen(body);
+    /* decrement pos _before_ to overwrite last ' ' with '\0' */
+    buf[--pos] = '\0';
+
+    arg_len = strlen(buf);
 
     struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, NULL);
     int offs = CCNL_MAX_PACKET_SIZE;
-    arg_len = ccnl_ndntlv_prependContent(prefix, (unsigned char*) body, arg_len, NULL, NULL, &offs, _out);
+    arg_len = ccnl_ndntlv_prependContent(prefix, (unsigned char*) buf, arg_len, NULL, NULL, &offs, _out);
 
     ccnl_prefix_free(prefix);
 

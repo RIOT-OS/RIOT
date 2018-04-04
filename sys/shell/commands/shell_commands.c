@@ -213,7 +213,7 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_CCN_LITE_UTILS
     { "ccnl_open", "opens an interface or socket", _ccnl_open },
     { "ccnl_int", "sends an interest", _ccnl_interest },
-    { "ccnl_cont", "create content and populated it", _ccnl_content },
+    { "ccnl_cs", "shows CS or creates content and populates it", _ccnl_content },
     { "ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib },
 #endif
 #ifdef MODULE_SNTP

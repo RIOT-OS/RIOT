@@ -15,12 +15,13 @@ RIOT provides three shell to interact with the CCN-Lite stack:
                 If the second parameter is omitted, the Interest will be
                 broadcasted. You may call it like this:
                 `ccnl_int /riot/peter/schmerzl b6:e5:94:26:ab:da`
-* `ccnl_cont` - generates and populates content. The command expects one
-                mandatory and one optional parameter. The first parameter
-                specifies the name of the content to be created, the second
-                parameter specifies the content itself. The second parameter
-                may include spaces, e.g. you can call:
-                `ccnl_cont /riot/peter/schmerzl Hello World! Hello RIOT!`
+* `ccnl_cs`   - dumps CS or generates and populates content. If the command is
+                called without parameters, it will print all content items in
+                the cache. Otherwise, the command expects two parameters. The
+                first parameter specifies the name of the content to be created,
+                the second parameter specifies the content itself. The second
+                parameter may include spaces, e.g. you can call:
+               `ccnl_cont /riot/peter/schmerzl Hello World! Hello RIOT!`
 * `ccnl_fib`  - modifies the FIB or shows its current state. If the command is
                 called without parameters, it will print the current state of
                 the FIB. It can also be called with the action parameters `add`
