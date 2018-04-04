@@ -1,0 +1,37 @@
+From a8ad896613571b16c53d9915f7b413fae7ea2879 Mon Sep 17 00:00:00 2001
+From: Kaspar Schleiser <kaspar@schleiser.de>
+Date: Fri, 16 Mar 2018 15:33:00 +0100
+Subject: [PATCH] implement alignment-safe ntoh16p() && ntoh32p()
+
+---
+ src/cn-cbor.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/src/cn-cbor.c b/src/cn-cbor.c
+index a7677ae..400de5f 100644
+--- a/src/cn-cbor.c
++++ b/src/cn-cbor.c
+@@ -51,8 +51,18 @@ static double decode_half(int half) {
+ 
+ /* Fix these if you can't do non-aligned reads */
+ #define ntoh8p(p) (*(unsigned char*)(p))
+-#define ntoh16p(p) (ntohs(*(unsigned short*)(p)))
+-#define ntoh32p(p) (ntohl(*(unsigned long*)(p)))
++static uint16_t ntoh16p(unsigned char *p) {
++    uint16_t tmp;
++    memcpy(&tmp, p, sizeof(tmp));
++    return ntohs(tmp);
++}
++
++static uint32_t ntoh32p(unsigned char *p) {
++    uint32_t tmp;
++    memcpy(&tmp, p, sizeof(tmp));
++    return ntohl(tmp);
++}
++
+ static uint64_t ntoh64p(unsigned char *p) {
+   uint64_t ret = ntoh32p(p);
+   ret <<= 32;
+-- 
+2.16.2
+

@@ -25,11 +25,7 @@
 
 #include "cn-cbor/cn-cbor.h"
 #include "embUnit.h"
-
-typedef struct buffer {
-    size_t size;
-    unsigned char *pntr;
-} buffer_t;
+#include "fmt.h"
 
 typedef struct {
     char *hex;
@@ -37,7 +33,6 @@ typedef struct {
 } cbor_failure;
 
 static cn_cbor *cbor;
-static buffer_t pbuf;
 static size_t test, offs;
 static unsigned char ebuf[EBUF_SIZE];
 static cn_cbor_errback errb;
@@ -52,29 +47,7 @@ static void setup_cn_cbor(void)
 
 static void teardown_cn_cbor(void)
 {
-        free(pbuf.pntr);
         cn_cbor_free(cbor);
-}
-
-static bool parse_hex(char *inpt)
-{
-    int strl = strlen(inpt);
-    size_t offs;
-
-    if (strl % 2 != 0) {
-        pbuf.size = -1;
-        pbuf.pntr = NULL;
-        return false;
-    }
-
-    pbuf.size = strl / 2;
-    pbuf.pntr = malloc(pbuf.size);
-
-    for (offs = 0; offs < pbuf.size; offs++) {
-        sscanf(inpt + (2 * offs), "%02hhx", &pbuf.pntr[offs]);
-    }
-
-    return true;
 }
 
 static void test_parse(void)
@@ -133,16 +106,21 @@ static void test_parse(void)
     };
 
     for (test = 0; test < sizeof(tests) / sizeof(char*); test++) {
-        TEST_ASSERT(parse_hex(tests[test]));
+        unsigned char buf[64] = {0};
+        TEST_ASSERT((strlen(tests[test])/2) <= sizeof(buf));
+
+        size_t len = fmt_hex_bytes(buf, tests[test]);
+        TEST_ASSERT(len);
+
         errb.err = CN_CBOR_NO_ERROR;
 
-        cbor = cn_cbor_decode(pbuf.pntr, pbuf.size, &errb);
+        cbor = cn_cbor_decode(buf, len, &errb);
         TEST_ASSERT_EQUAL_INT(errb.err, CN_CBOR_NO_ERROR);
         TEST_ASSERT_NOT_NULL(cbor);
 
         cn_cbor_encoder_write(ebuf, 0, sizeof(ebuf), cbor);
-        for (offs = 0; offs < pbuf.size; offs++) {
-            TEST_ASSERT_EQUAL_INT(pbuf.pntr[offs], ebuf[offs]);
+        for (offs = 0; offs < len; offs++) {
+            TEST_ASSERT_EQUAL_INT(buf[offs], ebuf[offs]);
         }
     }
 }
@@ -165,9 +143,13 @@ static void test_errors(void)
             &inv));
 
     for (offs = 0; offs < sizeof(tests) / sizeof(cbor_failure); offs++) {
-        TEST_ASSERT(parse_hex(tests[offs].hex));
+        unsigned char buf[32] = {0};
+        TEST_ASSERT((strlen(tests[offs].hex)/2) <= sizeof(buf));
 
-        cbor = cn_cbor_decode(pbuf.pntr, pbuf.size, &errb);
+        size_t len = fmt_hex_bytes(buf, tests[offs].hex);
+        TEST_ASSERT(len);
+
+        cbor = cn_cbor_decode(buf, len, &errb);
         TEST_ASSERT_NULL(cbor);
         TEST_ASSERT_EQUAL_INT(errb.err, tests[offs].err);
     }
