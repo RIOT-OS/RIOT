@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Bas Stottelaar <basstottelaar@gmail.com>
+ * Copyright (C) 2017-2018 Bas Stottelaar <basstottelaar@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -33,9 +33,13 @@ void pm_set(unsigned mode)
             /* after exiting EM2, clocks are restored */
             EMU_EnterEM2(true);
             break;
-        case 2:
+        default:
             /* wait for next event or interrupt */
             EMU_EnterEM1();
-            break;
     }
+}
+
+void pm_off(void)
+{
+    EMU_EnterEM4();
 }
