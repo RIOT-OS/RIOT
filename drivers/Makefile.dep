@@ -303,6 +303,10 @@ ifneq (,$(filter mma8x5x,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter motor_driver,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pwm
+endif
+
 ifneq (,$(filter mpl3115a2,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
