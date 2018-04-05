@@ -7,6 +7,8 @@
 # directory for more details.
 #
 
+FLAKE8_CMD="python3 -m flake8"
+
 if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
     CERROR="\e[1;31m"
     CRESET="\e[0m"
@@ -26,7 +28,12 @@ then
     exit 0
 fi
 
-ERRORS=$(flake8 --config=${DIST_TOOLS}/flake8/flake8.cfg ${FILES})
+${FLAKE8_CMD} --version &> /dev/null || {
+    printf "${CERROR}$0: cannot execute \"${FLAKE8_CMD}\"!${CRESET}\n"
+    exit 1
+}
+
+ERRORS=$(${FLAKE8_CMD} --config=${DIST_TOOLS}/flake8/flake8.cfg ${FILES})
 
 if [ -n "${ERRORS}" ]
 then
