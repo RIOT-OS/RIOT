@@ -1,0 +1,6 @@
+/**
+ * @defgroup pkg_ucglib Color graphics library for embedded systems
+ * @ingroup  pkg
+ * @brief    Provides a color graphics library for OLED and LCD displays
+ * @see      https://github.com/olikraus/ucglib
+ */
