@@ -1,0 +1,88 @@
+From a3187bd1bbf0d11f73d6108daff89f7ab009dd35 Mon Sep 17 00:00:00 2001
+From: Bas Stottelaar <basstottelaar@gmail.com>
+Date: Fri, 2 Mar 2018 00:16:43 +0100
+Subject: [PATCH 1/1] add RIOT-OS interface.
+
+---
+ csrc/ucg.h | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
+
+diff --git a/csrc/ucg.h b/csrc/ucg.h
+index c070a77..553562c 100644
+--- a/csrc/ucg.h
++++ b/csrc/ucg.h
+@@ -84,17 +84,19 @@
+ #include <stdint.h>
+ #include <stddef.h>
+ 
++#include "periph/gpio.h"
++
+ 
+ #ifdef __cplusplus
+ extern "C"
+ {
+ #endif
+ 
+-#if defined(ARDUINO)
+-#ifndef USE_PIN_LIST
++//#if defined(ARDUINO)
++//#ifndef USE_PIN_LIST
+ #define USE_PIN_LIST
+-#endif
+-#endif
++//#endif
++//#endif
+ 
+ #ifdef __GNUC__
+ #  define UCG_NOINLINE __attribute__((noinline))
+@@ -413,12 +415,14 @@ struct _ucg_t
+ 
+   /* only for Arduino/C++ Interface */
+ #ifdef USE_PIN_LIST
+-  uint8_t pin_list[UCG_PIN_COUNT];
++  gpio_t* pin_list;
++  uint32_t pins_enabled;
++  uint32_t dev;
+ 
+-#ifdef __AVR__
+-  volatile uint8_t *data_port[UCG_PIN_COUNT];
+-  uint8_t data_mask[UCG_PIN_COUNT];
+-#endif
++//#ifdef __AVR__
++//  volatile uint8_t *data_port[UCG_PIN_COUNT];
++//  uint8_t data_mask[UCG_PIN_COUNT];
++//#endif
+ 
+ #endif
+ 
+@@ -434,6 +438,9 @@ struct _ucg_t
+   
+ };
+ 
++#define ucg_SetPins(ucg,pins,pins_enabled) {(ucg)->pin_list = (pins); (ucg)->pins_enabled = (pins_enabled);}
++#define ucg_SetDevice(ucg,device) ((ucg)->dev = device)
++
+ #define ucg_GetWidth(ucg) ((ucg)->dimension.w)
+ #define ucg_GetHeight(ucg) ((ucg)->dimension.h)
+ 
+@@ -574,6 +581,7 @@ ucg_int_t ucg_Init(ucg_t *ucg, ucg_dev_fnptr device_cb, ucg_dev_fnptr ext_cb, uc
+ /*================================================*/
+ /* ucg_dev_sdl.c */
+ ucg_int_t ucg_sdl_dev_cb(ucg_t *ucg, ucg_int_t msg, void *data);
++int ucg_sdl_get_key(void);
+ 
+ /*================================================*/
+ /* ucg_pixel.c */
+@@ -2172,7 +2180,8 @@ extern const ucg_fntpgm_uint8_t ucg_font_osr41_tr[] UCG_FONT_SECTION("ucg_font_o
+ 
+ #endif
+ 
+-
++int16_t ucg_com_riotos_hw_spi(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data);
++ucg_int_t ucg_dev_dummy_cb(ucg_t *ucg, ucg_int_t msg, void *data);
+ 
+ #ifdef __cplusplus
+ }
+-- 
+2.14.2
+
