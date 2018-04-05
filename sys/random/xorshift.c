@@ -20,7 +20,6 @@
  */
 
 #include <stdint.h>
-#include <stdio.h>
 
 #include "random.h"
 
@@ -63,7 +62,6 @@ uint32_t random_uint32(void)
 
 void random_init(uint32_t val)
 {
-    printf("random init %u\n", (unsigned)val);
     if (!val) {
         val = 1;
     }
