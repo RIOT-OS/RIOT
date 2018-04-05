@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_netdev_ble Netdev BLE mode
+ * @defgroup    drivers_netdev_ble netdev BLE mode
  * @ingroup     drivers_netdev_api
  * @brief       BLE adaption of netdev
  * @{
