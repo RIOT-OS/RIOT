@@ -87,9 +87,8 @@ get_app_board_pairs() {
 # use dwqc to create full "appdir board" compile job list
 get_compile_jobs() {
     get_apps | \
-        dwqc -E BOARDS -E APPS -s \
-        "$0 get_app_board_pairs \${1}" \
-        | xargs '-d\n' -n 1 echo $0 compile
+        dwqc ${DWQ_JOBID:+--subjob} -E BOARDS -E APPS -s \
+        "$0 get_app_board_pairs \${1} | xargs '-d\n' -n 1 echo $0 compile"
 }
 
 print_worker() {
