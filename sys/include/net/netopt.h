@@ -532,6 +532,8 @@ typedef enum {
      */
     NETOPT_TX_RETRIES_NEEDED,
 
+    NETOPT_BLE_CTX,             /**< set radio context (channel, CRC, AA) */
+
     /* add more options if needed */
 
     /**
