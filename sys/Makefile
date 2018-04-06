@@ -124,6 +124,9 @@ endif
 ifneq (,$(filter nanocoap,$(USEMODULE)))
   DIRS += net/application_layer/nanocoap
 endif
+ifneq (,$(filter skald,$(USEMODULE)))
+  DIRS += net/skald
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))
 

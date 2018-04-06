@@ -7,6 +7,8 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
+FEATURES_PROVIDED += radio_ble
+FEATURES_PROVIDED += radio_nrfble
 FEATURES_PROVIDED += radio_nrfmin
 
 # The board MPU family (used for grouping by the CI system)

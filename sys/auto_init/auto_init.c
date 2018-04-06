@@ -80,6 +80,10 @@
 #include "net/gnrc/ipv6/nib.h"
 #endif
 
+#ifdef MODULE_SKALD
+#include "net/skald.h"
+#endif
+
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -150,6 +154,10 @@ void auto_init(void)
 #ifdef MODULE_GNRC_IPV6_NIB
     DEBUG("Auto init gnrc_ipv6_nib module.\n");
     gnrc_ipv6_nib_init();
+#endif
+#ifdef MODULE_SKALD
+    DEBUG("Auto init Skald\n");
+    skald_init();
 #endif
 
 /* initialize network devices */
