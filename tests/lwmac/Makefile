@@ -12,6 +12,11 @@ BOARD ?= samr21-xpro
 # be then accordingly extended.
 BOARD_WHITELIST := samr21-xpro
 
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+CFLAGS += -DDEVELHELP
+
 # Modules to include:
 USEMODULE += shell
 USEMODULE += shell_commands
