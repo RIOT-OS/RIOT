@@ -11,7 +11,8 @@
  * @{
  *
  * @file
- * @brief       Example application for demonstrating the RIOT network stack
+ * @brief       Example application for demonstrating RIOT's MQTT-SN library
+ *              emCute
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
