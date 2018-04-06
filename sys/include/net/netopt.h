@@ -532,7 +532,12 @@ typedef enum {
      */
     NETOPT_TX_RETRIES_NEEDED,
 
-    NETOPT_BLE_CTX,             /**< set radio context (channel, CRC, AA) */
+    /**
+     * @brief   (netdev_ble_ctx_t) set BLE radio context (channel, CRC, AA)
+     *
+     * @warning As @ref drivers_netdev_ble is still experimental, use with care!
+     */
+    NETOPT_BLE_CTX,
 
     /* add more options if needed */
 
