@@ -30,6 +30,7 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
+#include "periph_cpu_pins.h"
 
 /*
  * @brief     Define GPIO interruptions for an specific atmega CPU, by default
