@@ -43,7 +43,9 @@ static const  saul_gpio_params_t saul_gpio_params[] =
         .name = "Button(B1 User)",
         .pin  = BTN0_PIN,
         .mode = BTN0_MODE,
+#ifndef CPU_MODEL_STM32L433RC
         .flags = SAUL_GPIO_INVERTED
+#endif
     },
 };
 

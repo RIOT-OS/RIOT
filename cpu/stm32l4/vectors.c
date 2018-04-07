@@ -165,7 +165,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [RNG_IRQn                ] = isr_rng,                  /* [80] RNG global interrupt */
     [FPU_IRQn                ] = isr_fpu,                  /* [81] FPU global interrupt */
 
-#if defined(CPU_MODEL_STM32L432KC)
+#if defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L433RC)
     [ADC1_IRQn               ] = isr_adc1,                 /* [18] ADC1 global Interrupt */
     [TIM1_TRG_COM_IRQn       ] = isr_tim1_trg_com,         /* [26] TIM1 Trigger and Commutation Interrupt */
     [USB_IRQn                ] = isr_usb,                  /* [67] USB event Interrupt */
