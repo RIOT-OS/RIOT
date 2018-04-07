@@ -45,3 +45,15 @@ static inline uint16_t _ddr_addr(gpio_t pin)
 {
     return (_port_addr(pin) - 0x01);
 }
+
+static inline uint8_t _pcicr_num(gpio_t pin)
+{
+}
+
+static inline uint16_t _pcmsk_addr(gpio_t pin)
+{
+}
+
+static inline uint8_t _pcint_num(gpio_t pin)
+{
+}
