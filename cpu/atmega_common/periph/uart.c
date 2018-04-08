@@ -170,6 +170,7 @@ static inline void isr_handler(int num)
 
     if (sched_context_switch_request) {
         thread_yield();
+        thread_yield_isr();
     }
 }
 

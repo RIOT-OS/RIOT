@@ -176,6 +176,7 @@ static inline void _isr(tim_t tim, int chan)
 
     if (sched_context_switch_request) {
         thread_yield();
+        thread_yield_isr();
     }
 
     __exit_isr();
