@@ -146,9 +146,9 @@ static inline void _xtimer_spin(uint32_t offset_ticks)
 
 #if XTIMER_MASK
     offset_ticks = _xtimer_lltimer_mask(offset_ticks);
-    while (_xtimer_lltimer_mask(_xtimer_lltimer_now() - start) < offset_ticks) ;
+    while (_xtimer_lltimer_mask(_xtimer_lltimer_now() - start) < offset_ticks) {}
 #else
-    while ((_xtimer_lltimer_now() - start) < offset_ticks) ;
+    while ((_xtimer_lltimer_now() - start) < offset_ticks) {}
 #endif
 }
 
