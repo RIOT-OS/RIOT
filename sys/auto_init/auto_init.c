@@ -159,6 +159,16 @@ void auto_init(void)
     DEBUG("Auto init Skald\n");
     skald_init();
 #endif
+#ifdef MODULE_RDCLI_COMMON
+    DEBUG("Auto init rdcli_common module\n");
+    extern void rdcli_common_init(void);
+    rdcli_common_init();
+#endif
+#ifdef MODULE_RDCLI_SIMPLE_STANDALONE
+    DEBUG("Auto init rdcli_simple module\n");
+    extern void rdcli_simple_run(void);
+    rdcli_simple_run();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
