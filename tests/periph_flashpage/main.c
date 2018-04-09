@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Manual test application for UART peripheral drivers
+ * @brief       Manual test application for flashpage peripheral drivers
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
