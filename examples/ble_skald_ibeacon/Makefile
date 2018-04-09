@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = skald_ibeacon
+APPLICATION = ble_skald_ibeacon
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= nrf52dk
