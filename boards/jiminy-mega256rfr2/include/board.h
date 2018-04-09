@@ -76,21 +76,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name Context swap defines
- * This emulates a software triggered interrupt
- * @{
- */
-#define AVR_CONTEXT_SWAP_INIT do { \
-        DDRE |= (1 << PE7); \
-        EICRB |= (1 << ISC70); \
-        EIMSK |= (1 << INT7); \
-        sei(); \
-} while (0)
-#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  INT7_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTE ^= (1 << PE7)
-/** @} */
-
-/**
  * @name xtimer configuration values
  * @{
  */
