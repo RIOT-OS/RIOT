@@ -292,6 +292,27 @@ static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_
 static inline void xtimer_set(xtimer_t *timer, uint32_t offset);
 
 /**
+ * @brief Set a timer to execute a callback at some time in the future, 64bit
+ * version
+ *
+ * Expects timer->callback to be set.
+ *
+ * The callback specified in the timer struct will be executed @p offset_usec
+ * microseconds in the future.
+ *
+ * @warning BEWARE! Callbacks from xtimer_set() are being executed in interrupt
+ * context (unless offset < XTIMER_BACKOFF). DON'T USE THIS FUNCTION unless you
+ * know *exactly* what that means.
+ *
+ * @param[in] timer       the timer structure to use.
+ *                        Its xtimer_t::target and xtimer_t::long_target
+ *                        fields need to be initialized with 0 on first use
+ * @param[in] offset_us   time in microseconds from now specifying that timer's
+ *                        callback's execution time
+ */
+static inline void xtimer_set64(xtimer_t *timer, uint64_t offset_us);
+
+/**
  * @brief remove a timer
  *
  * @note this function runs in O(n) with n being the number of active timers

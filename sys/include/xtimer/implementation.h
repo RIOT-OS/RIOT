@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- * Copyright (C) 2016 Eistec AB
+ *               2016 Eistec AB
+ *               2018 Josua Arndt
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,8 +14,11 @@
  * @{
  * @file
  * @brief   xtimer implementation
+ *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author  Josua Arndt <jarndt@ias.rwth-aachen.de>
+ *
  */
 #ifndef XTIMER_IMPLEMENTATION_H
 #define XTIMER_IMPLEMENTATION_H
@@ -215,6 +219,12 @@ static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_
 static inline void xtimer_set(xtimer_t *timer, uint32_t offset)
 {
     _xtimer_set(timer, _xtimer_ticks_from_usec(offset));
+}
+
+static inline void xtimer_set64(xtimer_t *timer, uint64_t period_us)
+{
+    uint64_t ticks = _xtimer_ticks_from_usec64(period_us);
+    _xtimer_set64(timer, ticks, ticks >> 32);
 }
 
 static inline int xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout)
