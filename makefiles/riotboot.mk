@@ -1,4 +1,4 @@
-ifdef RIOTBOOT_SLOT0_SIZE
+ifneq (,$(filter riotboot%, $(MAKECMDGOALS)))
 
 .PHONY: riotboot/flash riotboot/flash-bootloader riotboot/flash-slot1 riotboot/flash-slot2 \
         riotboot/verify-image
