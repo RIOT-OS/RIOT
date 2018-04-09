@@ -57,9 +57,9 @@ else:
 
 
 # Reading command line
-#if len(sys.argv) != 3:
-#    exit('! Usage: robotis-loader.py <serial-port> <binary>')
-#pgm, port, binary = sys.argv
+# if len(sys.argv) != 3:
+#     exit('! Usage: robotis-loader.py <serial-port> <binary>')
+# pgm, port, binary = sys.argv
 
 pgm = sys.argv[0]
 port = os.environ["PORT"]
@@ -86,13 +86,13 @@ try:
     size = stat.st_size
     firmware = open(binary, 'rb')
     print('* Opening %s, size=%d' % (binary, size))
-except:
+except:  # noqa: E722
     exit('! Unable to open file %s' % binary)
 
 # Opening serial port
 try:
     s = serial.Serial(port, baudrate=115200)
-except:
+except:  # noqa: E722
     exit('! Unable to open serial port %s' % port)
 
 print('* Resetting the board')
@@ -102,7 +102,7 @@ time.sleep(0.1)
 s.setRTS(False)
 s.write(b'CM9X')
 s.close()
-time.sleep(1.0);
+time.sleep(1.0)
 
 print('* Connecting...')
 s = serial.Serial(port, baudrate=115200)
