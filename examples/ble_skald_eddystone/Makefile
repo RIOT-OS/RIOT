@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = skald_eddystone
+APPLICATION = ble_skald_eddystone
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= nrf52dk
