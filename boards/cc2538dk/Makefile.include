@@ -30,8 +30,8 @@ else ifeq ($(PROGRAMMER),jlink)
   export FFLAGS  = $(BINDIR) $(HEXFILE)
 endif
 
-export OFLAGS    = -O binary --gap-fill 0xff
-export HEXFILE = $(ELFFILE:.elf=.bin)
+OFLAGS = --gap-fill 0xff
+HEXFILE = $(BINFILE)
 export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 

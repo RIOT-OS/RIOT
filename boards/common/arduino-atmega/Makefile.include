@@ -17,5 +17,5 @@ export DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBU
 
 export PROGRAMMER_FLAGS = -P $(PORT) -b $(PROGRAMMER_SPEED)
 
-export OFLAGS += -j .text -j .data -O ihex
+OFLAGS += -j .text -j .data
 export FFLAGS += -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -D -U flash:w:$(HEXFILE)

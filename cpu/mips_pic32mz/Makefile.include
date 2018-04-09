@@ -12,7 +12,7 @@ export LINKFLAGS += -Tpic32mz2048_uhi.ld
 
 # the pickit programmer (MPLAB-IPE) wants physical addresses in the hex file!!
 export OBJCOPY = objcopy #use system objcopy as toolchain one is broken.
-export OFLAGS += -O ihex \
+export OFLAGS += \
     --change-section-lma .lowerbootflashalias-0xA0000000 \
     --change-section-lma .bootflash1-0xA0000000 \
     --change-section-lma .bootflash2-0xA0000000 \

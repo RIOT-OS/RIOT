@@ -17,8 +17,7 @@ ifeq ($(PROGRAMMER),jlink)
   export TUI := 1
   include $(RIOTMAKE)/tools/jlink.inc.mk
 else
-  export OFLAGS = -O binary
-  export HEXFILE = $(ELFFILE:.elf=.bin)
+  HEXFILE = $(BINFILE)
   export FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
   export FFLAGS  = -p "$(PORT)" -e -w -v -b 460800 $(HEXFILE)
 endif

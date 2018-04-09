@@ -308,7 +308,7 @@ BASELIBS += $(BINDIR)/$(APPLICATION_MODULE).a
 BASELIBS += $(APPDEPS)
 
 .PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
-.PHONY: print-size
+.PHONY: print-size elffile binfile hexfile
 .PHONY: ..in-docker-container
 # Target can depend on FORCE to always rebuild but still let make use file
 # modification timestamp (contrary to .PHONY).
@@ -317,6 +317,12 @@ BASELIBS += $(APPDEPS)
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
+BINFILE ?= $(ELFFILE:.elf=.bin)
+
+# Targets to get given file
+elffile: $(ELFFILE)
+hexfile: $(HEXFILE)
+binfile: $(BINFILE)
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
@@ -355,8 +361,11 @@ $(BINDIR)/$(APPLICATION_MODULE).a: FORCE
 print-size: $(ELFFILE)
 	$(Q)$(SIZE) $<
 
-$(HEXFILE): $(ELFFILE)
-	$(Q)$(OBJCOPY) $(OFLAGS) $< $@
+%.hex: %.elf
+	$(Q)$(OBJCOPY) $(OFLAGS) -Oihex $< $@
+
+%.bin: %.elf
+	$(Q)$(OBJCOPY) $(OFLAGS) -Obinary $< $@
 
 endif # BUILD_IN_DOCKER
 

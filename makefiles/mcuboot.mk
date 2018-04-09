@@ -6,7 +6,6 @@ override IMGTOOL := $(abspath $(IMGTOOL))
 BINFILE ?= $(BINDIR)/$(APPLICATION).bin
 SIGN_BINFILE = $(BINDIR)/signed-$(APPLICATION).bin
 MCUBOOT_KEYFILE ?= $(BINDIR)/key.pem
-OFLAGS = -O binary
 MCUBOOT_BIN ?= $(BINDIR)/mcuboot.bin
 MCUBOOT_BIN_URL ?= http://download.riot-os.org/mynewt.mcuboot.bin
 MCUBOOT_BIN_MD5 ?= 0c71a0589bd3709fc2d90f07a0035ce7
@@ -28,7 +27,7 @@ mcuboot: mcuboot-create-key link
 	$(Q)$(_LINK) $(LINKFLAGPREFIX)--defsym=offset="$$(($(MCUBOOT_SLOT0_SIZE) + $(IMAGE_HDR_SIZE)))" \
 	$(LINKFLAGPREFIX)--defsym=length="$$(($(MCUBOOT_SLOT1_SIZE) - $(IMAGE_HDR_SIZE)))" \
 	$(LINKFLAGPREFIX)--defsym=image_header="$(IMAGE_HDR_SIZE)" -o $(ELFFILE) && \
-	$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(BINFILE) && \
+	$(OBJCOPY) $(OFLAGS) -Obinary $(ELFFILE) $(BINFILE) && \
 	$(IMGTOOL) sign --key $(MCUBOOT_KEYFILE) --version $(IMAGE_VERSION) --align \
 	$(MCUBOOT_IMAGE_ALIGN) -H $(IMAGE_HDR_SIZE) $(BINFILE) $(SIGN_BINFILE)
 	@$(COLOR_ECHO)

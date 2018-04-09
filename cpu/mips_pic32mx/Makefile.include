@@ -11,18 +11,18 @@ export LINKFLAGS += -Tpic32mx512_12_128_uhi.ld
 
 # the pickit programmer (MPLAB-IPE) wants physical addresses in the hex file!!
 export OBJCOPY = objcopy #use system objcopy as toolchain one is broken.
-export OFLAGS += -O ihex \
-				--change-section-lma .bootflash-0xA0000000 \
-				--change-section-lma .exception_vector-0x80000000 \
-				--change-section-lma .text-0x80000000 \
-				--change-section-lma .init-0x80000000 \
-				--change-section-lma .fini-0x80000000 \
-				--change-section-lma .eh_frame-0x80000000 \
-				--change-section-lma .gcc_except_table-0x80000000 \
-				--change-section-lma .jcr-0x80000000 \
-				--change-section-lma .ctors-0x80000000 \
-				--change-section-lma .dtors-0x80000000 \
-				--change-section-lma .rodata-0x80000000 \
-				--change-section-lma .data-0x80000000 \
-				--change-section-lma .bss-0x80000000 \
-				--change-section-lma .startdata-0x80000000 \
+export OFLAGS += \
+    --change-section-lma .bootflash-0xA0000000 \
+    --change-section-lma .exception_vector-0x80000000 \
+    --change-section-lma .text-0x80000000 \
+    --change-section-lma .init-0x80000000 \
+    --change-section-lma .fini-0x80000000 \
+    --change-section-lma .eh_frame-0x80000000 \
+    --change-section-lma .gcc_except_table-0x80000000 \
+    --change-section-lma .jcr-0x80000000 \
+    --change-section-lma .ctors-0x80000000 \
+    --change-section-lma .dtors-0x80000000 \
+    --change-section-lma .rodata-0x80000000 \
+    --change-section-lma .data-0x80000000 \
+    --change-section-lma .bss-0x80000000 \
+    --change-section-lma .startdata-0x80000000 \

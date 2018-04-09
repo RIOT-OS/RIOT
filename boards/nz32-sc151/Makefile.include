@@ -13,8 +13,7 @@ export FLASHER = dfu-util
 export DEBUGGER = # dfu-util has no debugger
 export RESET = # dfu-util has no support for resetting the device
 
-export OFLAGS = -O binary
-HEXFILE = $(ELFFILE:.elf=.bin)
+HEXFILE = $(BINFILE)
 export FFLAGS = -d $(ID) -a 0 -s 0x08000000:leave -D "$(HEXFILE)"
 export TERMFLAGS = -p $(PORT)
 

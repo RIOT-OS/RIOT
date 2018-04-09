@@ -7,8 +7,7 @@ export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/robotis-loader.py
 export DEBUGGER =
 export DEBUGSERVER =
 
-export OFLAGS = -O binary
-export HEXFILE = $(ELFFILE:.elf=.bin)
+HEXFILE = $(BINFILE)
 export FFLAGS =
 export DEBUGGER_FLAGS =
 

@@ -22,8 +22,8 @@ else ifeq ($(PROGRAMMER),jlink)
   export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 endif
 
-export OFLAGS    = -O binary --gap-fill 0xff
-export HEXFILE = $(ELFFILE:.elf=.bin)
+OFLAGS = --gap-fill 0xff
+HEXFILE = $(BINFILE)
 export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb

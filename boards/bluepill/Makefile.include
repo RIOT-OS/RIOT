@@ -20,8 +20,7 @@ ifeq ($(PROGRAMMER),dfu-util)
   export DEBUGGER = # no debugger
   export RESET = # dfu-util has no support for resetting the device
 
-  export OFLAGS = -O binary
-  HEXFILE = $(ELFFILE:.elf=.bin)
+  HEXFILE = $(BINFILE)
   export FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D "$(HEXFILE)"
 else
 

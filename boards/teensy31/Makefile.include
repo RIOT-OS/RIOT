@@ -6,8 +6,6 @@ CPU_MODEL = mk20dx256vlh7
 TEENSY_LOADER = $(RIOTBASE)/dist/tools/teensy-loader-cli/teensy_loader
 FLASHER = $(TEENSY_LOADER)
 
-OFLAGS = -O ihex
-
 FFLAGS ?= --mcu=mk20dx256 $(HEXFILE)
 
 ifeq ($(TEENSY_LOADER),$(FLASHER))
