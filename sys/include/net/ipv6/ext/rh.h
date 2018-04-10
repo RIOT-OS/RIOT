@@ -44,9 +44,7 @@ extern "C" {
 /**
  * @brief   IPv6 routing extension header.
  *
- * @see <a href="https://tools.ietf.org/html/rfc2460#section-4.4">
- *          RFC 2460, section 4.4
- *      </a>
+ * @see [RFC 8200](https://tools.ietf.org/html/rfc8200#section-4.4)
  *
  * @extends ipv6_ext_t
  */

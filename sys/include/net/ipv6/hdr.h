@@ -61,9 +61,7 @@ extern "C" {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * @see <a href="http://tools.ietf.org/html/rfc2460#section-3">
- *          RFC 2460, section 3
- *      </a>
+ * @see [RFC 8200, section 3](http://tools.ietf.org/html/rfc8200#section-3)
  */
 typedef struct __attribute__((packed)) {
     /**
@@ -268,9 +266,7 @@ static inline uint32_t ipv6_hdr_get_fl(const ipv6_hdr_t *hdr)
 /**
  * @brief   Calculates the Internet Checksum for the IPv6 Pseudo Header.
  *
- * @see <a href="https://tools.ietf.org/html/rfc2460#section-8.1">
- *          RFC 2460, section 8.1
- *      </a>
+ * @see [RFC 8200, section 8.1](https://tools.ietf.org/html/rfc8200#section-8.1)
  *
  * @param[in] sum       Preinialized value of the sum.
  * @param[in] prot_num  The @ref net_protnum you want to calculate the
