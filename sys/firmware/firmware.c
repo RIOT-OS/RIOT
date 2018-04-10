@@ -37,7 +37,7 @@
 void firmware_metadata_print(firmware_metadata_t *metadata)
 {
     printf("Firmware magic_number: 0x%08x\n", (unsigned)metadata->magic_number);
-    printf("Firmware Size: %"PRIu32"\n", metadata->size);
+    printf("Firmware Size: %" PRIu32 "\n", metadata->size);
     printf("Firmware APPID: %#x\n", (unsigned)metadata->appid);
     printf("Firmware Version: %#x\n", (unsigned)metadata->version);
     printf("Firmware start address: 0x%08x\n", (unsigned)metadata->start_addr);
@@ -90,14 +90,15 @@ int firmware_validate_metadata_signature(firmware_metadata_t *metadata, const un
 
 uint32_t firmware_metadata_checksum(firmware_metadata_t *metadata)
 {
-    return fletcher32((uint16_t*)metadata, FIRMWARE_CHECKSUM_LEN / 2);
+    return fletcher32((uint16_t *)metadata, FIRMWARE_CHECKSUM_LEN / 2);
 }
 
 int firmware_sign_metadata(firmware_metadata_t *metadata, unsigned char *sk)
 {
     unsigned char sm[FIRMWARE_SIGN_BYTES + crypto_sign_BYTES];
     unsigned long long smlen;
-    crypto_sign(sm, &smlen, (unsigned char*)metadata, FIRMWARE_SIGN_BYTES, sk);
+
+    crypto_sign(sm, &smlen, (unsigned char *)metadata, FIRMWARE_SIGN_BYTES, sk);
     memcpy(metadata->sig, sm, crypto_sign_BYTES);
     return 0;
 }
@@ -110,11 +111,12 @@ static const unsigned _firmware_slot_start[] = {
     CPU_FLASH_BASE + SLOT0_SIZE + SLOT1_SIZE
 };
 
-const unsigned firmware_num_slots = sizeof(_firmware_slot_start)/sizeof(unsigned);
+const unsigned firmware_num_slots = sizeof(_firmware_slot_start) / sizeof(unsigned);
 
 void firmware_jump_to_image(firmware_metadata_t *metadata)
 {
     uint32_t addr = (unsigned)metadata + (unsigned)sizeof(firmware_metadata_t);
+
     cpu_jump_to_image(addr);
 }
 
@@ -137,14 +139,15 @@ int firmware_target_slot(void)
     return firmware_current_slot() == 1 ? 2 : 1;
 }
 
-firmware_metadata_t *firmware_get_metadata(unsigned slot) {
-    assert (slot < FIRMWARE_NUM_SLOTS);
+firmware_metadata_t *firmware_get_metadata(unsigned slot)
+{
+    assert(slot < FIRMWARE_NUM_SLOTS);
     return (firmware_metadata_t *)_firmware_slot_start[slot];
 }
 
 unsigned firmware_get_image_startaddr(unsigned slot)
 {
-    assert (slot < FIRMWARE_NUM_SLOTS);
+    assert(slot < FIRMWARE_NUM_SLOTS);
     return _firmware_slot_start[slot] + sizeof(firmware_metadata_t);
 }
 
@@ -156,8 +159,8 @@ void firmware_jump_to_slot(unsigned slot)
 void firmware_dump_slot_addrs(void)
 {
     for (unsigned i = 1; i < FIRMWARE_NUM_SLOTS; i++) {
-        printf("slot %u: metadata: 0x%08x image: 0x%08x\n", i, \
-                (unsigned)_firmware_slot_start[i], firmware_get_image_startaddr(i));
+        printf("slot %u: metadata: 0x%08x image: 0x%08x\n", i,
+               (unsigned)_firmware_slot_start[i], firmware_get_image_startaddr(i));
     }
 }
 #else /* BOARD_NATIVE */
