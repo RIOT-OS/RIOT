@@ -848,9 +848,11 @@ static inline bool _addr_anycast(const gnrc_netif_t *netif, unsigned idx)
 
 static int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
 {
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
-        if (ipv6_addr_equal(&netif->ipv6.addrs[i], addr)) {
-            return i;
+    if (!ipv6_addr_is_unspecified(addr)) {
+        for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+            if (ipv6_addr_equal(&netif->ipv6.addrs[i], addr)) {
+                return i;
+            }
         }
     }
     return -1;
@@ -1097,9 +1099,11 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
 
 static int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
 {
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_GROUPS_NUMOF; i++) {
-        if (ipv6_addr_equal(&netif->ipv6.groups[i], addr)) {
-            return i;
+    if (!ipv6_addr_is_unspecified(addr)) {
+        for (unsigned i = 0; i < GNRC_NETIF_IPV6_GROUPS_NUMOF; i++) {
+            if (ipv6_addr_equal(&netif->ipv6.groups[i], addr)) {
+                return i;
+            }
         }
     }
     return -1;
