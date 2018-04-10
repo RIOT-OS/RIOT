@@ -29,35 +29,29 @@
 
 
 #ifdef RDCLI_EP
-#define EP_LEN          (sizeof(RDCLI_EP))
-#define BUFSIZE         (EP_LEN + 1)
+#define BUFSIZE         (sizeof(RDCLI_EP))  /* contains \0 termination char */
 #else
-#define PREFIX_LEN      (sizeof(RDCLI_EP_PREFIX))
-#define BUFSIZE         (PREFIX_LEN + RDCLI_EP_SUFFIX_LEN + 1)
+#define PREFIX_LEN      (sizeof(RDCLI_EP_PREFIX))       /* contains \0 char */
+#define BUFSIZE         (PREFIX_LEN + RDCLI_EP_SUFFIX_LEN)
 #endif
 
 char rdcli_ep[BUFSIZE];
 
 void rdcli_common_init(void)
 {
-    size_t pos = 0;
-
 #ifdef RDCLI_EP
-    memcpy(rdcli_ep, RDCLI_EP, EP_LEN);
-    pos += EP_LEN;
+    memcpy(rdcli_ep, RDCLI_EP, BUFSIZE);
 #else
     uint8_t luid[RDCLI_EP_SUFFIX_LEN / 2];
 
-    if (PREFIX_LEN) {
-        memcpy(rdcli_ep, RDCLI_EP_PREFIX, PREFIX_LEN);
-        pos += PREFIX_LEN - 1;
+    if (PREFIX_LEN > 1) {
+        memcpy(rdcli_ep, RDCLI_EP_PREFIX, (PREFIX_LEN - 1));
     }
 
     luid_get(luid, sizeof(luid));
-    fmt_bytes_hex(&rdcli_ep[pos], luid, sizeof(luid));
+    fmt_bytes_hex(&rdcli_ep[PREFIX_LEN - 1], luid, sizeof(luid));
+    rdcli_ep[BUFSIZE - 1] = '\0';
 #endif
-
-    rdcli_ep[pos] = '\0';
 }
 
 int rdcli_common_add_qstring(coap_pkt_t *pkt)
