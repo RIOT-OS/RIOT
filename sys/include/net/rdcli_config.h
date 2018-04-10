@@ -63,6 +63,8 @@ extern "C" {
 #ifndef RDCLI_EP
 /**
  * @brief   Number of generated hexadecimal characters added to the ep
+ *
+ * @note    Must be an even number
  */
 #define RDCLI_EP_SUFFIX_LEN     (16)
 
