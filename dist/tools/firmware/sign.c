@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2017 Kaspar Schleiser <kaspar@schleiser.de>
- *               2016 Mark Solters <msolters@gmail.com>
+ * Copyright (c) 2016 Mark Solters <msolters@gmail.com>
  *               2016 Inria
+ *               2017 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * All rights reserved.
  *
@@ -32,7 +32,7 @@
  */
 
 /**
- * @ingroup     FW
+ * @ingroup     tools
  * @file
  * @brief       Meta-data generation and signing for FW images
  *
