@@ -22,13 +22,14 @@
 #include "tests-nanocoap.h"
 
 /*
- * Validates encoded message ID byte order.
+ * Validates encoded message ID byte order and put/get URI option.
  */
-static void test_nanocoap__req_msgid(void)
+static void test_nanocoap__hdr(void)
 {
     uint8_t buf[128];
     uint16_t msgid = 0xABCD;
-    char path[] = "/test";
+    char path[] = "/test/abcd/efgh";
+    unsigned char path_tmp[64] = {0};
 
     uint8_t *pktpos = &buf[0];
     pktpos += coap_build_hdr((coap_hdr_t *)pktpos, COAP_REQ, NULL, 0, COAP_METHOD_GET, msgid);
@@ -38,12 +39,16 @@ static void test_nanocoap__req_msgid(void)
     coap_parse(&pkt, &buf[0], pktpos - &buf[0]);
 
     TEST_ASSERT_EQUAL_INT(msgid, coap_get_id(&pkt));
+
+    int res = coap_get_uri(&pkt, path_tmp);
+    TEST_ASSERT_EQUAL_INT(sizeof(path), res);
+    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)path_tmp);
 }
 
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_nanocoap__req_msgid),
+        new_TestFixture(test_nanocoap__hdr),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);

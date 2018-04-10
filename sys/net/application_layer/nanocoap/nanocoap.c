@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-17 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2016-18 Kaspar Schleiser <kaspar@schleiser.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -29,7 +29,7 @@
 #include "debug.h"
 
 static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end);
-static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes);
+int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target);
 
 /* http://tools.ietf.org/html/rfc7252#section-3
  *  0                   1                   2                   3
@@ -46,17 +46,14 @@ static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes);
  */
 int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
 {
-    uint8_t *urlpos = pkt->url;
     coap_hdr_t *hdr = (coap_hdr_t *)buf;
-
     pkt->hdr = hdr;
 
     uint8_t *pkt_pos = hdr->data;
     uint8_t *pkt_end = buf + len;
 
-    memset(pkt->url, '\0', NANOCOAP_URL_MAX);
+    pkt->payload = NULL;
     pkt->payload_len = 0;
-    pkt->observe_value = UINT32_MAX;
 
     /* token value (tkl bytes) */
     if (coap_get_token_len(pkt)) {
@@ -67,9 +64,13 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
         pkt->token = NULL;
     }
 
+    coap_optpos_t *optpos = pkt->options;
+    unsigned option_count = 0;
+    unsigned option_nr = 0;
+
     /* parse options */
-    int option_nr = 0;
     while (pkt_pos != pkt_end) {
+        uint8_t *option_start = pkt_pos;
         uint8_t option_byte = *pkt_pos++;
         if (option_byte == 0xff) {
             pkt->payload = pkt_pos;
@@ -89,56 +90,179 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
                 return -EBADMSG;
             }
             option_nr += option_delta;
-            DEBUG("option nr=%i len=%i\n", option_nr, option_len);
+            DEBUG("option count=%u nr=%u len=%i\n", option_count, option_nr, option_len);
 
-            switch (option_nr) {
-                case COAP_OPT_URI_HOST:
-                    DEBUG("nanocoap: ignoring Uri-Host option!\n");
-                    break;
-                case COAP_OPT_URI_PATH:
-                    *urlpos++ = '/';
-                    memcpy(urlpos, pkt_pos, option_len);
-                    urlpos += option_len;
-                    break;
-                case COAP_OPT_CONTENT_FORMAT:
-                    if (option_len == 0) {
-                        pkt->content_type = 0;
-                    }
-                    else if (option_len == 1) {
-                        pkt->content_type = *pkt_pos;
-                    }
-                    else if (option_len == 2) {
-                        memcpy(&pkt->content_type, pkt_pos, 2);
-                        pkt->content_type = ntohs(pkt->content_type);
-                    }
-                    break;
-                case COAP_OPT_OBSERVE:
-                    if (option_len < 4) {
-                        pkt->observe_value = _decode_uint(pkt_pos, option_len);
-                    }
-                    else {
-                        DEBUG("nanocoap: discarding packet with invalid option length.\n");
-                        return -EBADMSG;
-                    }
-                    break;
-                default:
-                    DEBUG("nanocoap: unhandled option nr=%i len=%i critical=%u\n", option_nr, option_len, option_nr & 1);
-                    if (option_nr & 1) {
-                        DEBUG("nanocoap: discarding packet with unknown critical option.\n");
-                        return -EBADMSG;
-                    }
+            if (option_delta) {
+                optpos->opt_num = option_nr;
+                optpos->offset = (uintptr_t)option_start - (uintptr_t)hdr;
+                DEBUG("optpos option_nr=%u %u\n", (unsigned)option_nr, (unsigned)optpos->offset);
+                optpos++;
+                option_count++;
             }
 
             pkt_pos += option_len;
+
+            if (pkt_pos > (buf + len)) {
+                DEBUG("nanocoap: bad pkt\n");
+                return -EBADMSG;
+            }
         }
     }
 
-    DEBUG("coap pkt parsed. code=%u detail=%u payload_len=%u, 0x%02x\n",
+    pkt->options_len = option_count;
+    if (!pkt->payload) {
+        pkt->payload = pkt_pos;
+    }
+
+#ifdef MODULE_GCOAP
+    coap_get_uri(pkt, pkt->url);
+    pkt->content_type = coap_get_content_type(pkt);
+
+    if (coap_get_option_uint(pkt, COAP_OPT_OBSERVE, &pkt->observe_value) != 0) {
+        pkt->observe_value = UINT32_MAX;
+    }
+#endif
+
+    DEBUG("coap pkt parsed. code=%u detail=%u payload_len=%u, nopts=%u, 0x%02x\n",
           coap_get_code_class(pkt),
           coap_get_code_detail(pkt),
-          pkt->payload_len, hdr->code);
+          pkt->payload_len, option_count, hdr->code);
 
     return 0;
+}
+
+uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
+{
+    coap_optpos_t *optpos = pkt->options;
+    unsigned opt_count = pkt->options_len;
+
+    while (opt_count--) {
+        if (optpos->opt_num == opt_num) {
+            return (uint8_t*)pkt->hdr + optpos->offset;
+        }
+        optpos++;
+    }
+    return NULL;
+}
+
+static uint8_t *_parse_option(coap_pkt_t *pkt, uint8_t *pkt_pos, uint16_t *delta, int *opt_len)
+{
+    uint8_t *hdr_end = pkt->payload;
+
+    if (pkt_pos == hdr_end) {
+        return NULL;
+    }
+
+    uint8_t option_byte = *pkt_pos++;
+
+    *delta = _decode_value(option_byte >> 4, &pkt_pos, hdr_end);
+    *opt_len = _decode_value(option_byte & 0xf, &pkt_pos, hdr_end);
+
+    return pkt_pos;
+}
+
+static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes)
+{
+    assert(nbytes <= 4);
+
+    uint32_t res = 0;
+    if (nbytes) {
+        memcpy(((uint8_t *)&res) + (4 - nbytes), pkt_pos, nbytes);
+    }
+    return ntohl(res);
+}
+
+int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target)
+{
+    assert(target);
+
+    uint8_t *opt_pos = coap_find_option(pkt, opt_num);
+    if (opt_pos) {
+        uint16_t delta;
+        int option_len = 0;
+        uint8_t *pkt_pos = _parse_option(pkt, opt_pos, &delta, &option_len);
+        if (option_len >= 0) {
+            if (option_len > 4) {
+                DEBUG("nanocoap: uint option with len > 4 (unsupported).\n");
+                return -ENOSPC;
+            }
+            *target = _decode_uint(pkt_pos, option_len);
+            return 0;
+        }
+        else {
+            DEBUG("nanocoap: discarding packet with invalid option length.\n");
+            return -EBADMSG;
+        }
+    }
+    return -1;
+}
+
+uint8_t *coap_iterate_option(coap_pkt_t *pkt, uint8_t **optpos, int *opt_len, int first)
+{
+    uint8_t *data_start;
+
+    uint16_t delta = 0;
+    data_start = _parse_option(pkt, *optpos, &delta, opt_len);
+    if (data_start && (first || !delta)) {
+        *optpos = data_start + *opt_len;
+        return data_start;
+    }
+    else {
+        *optpos = NULL;
+        return NULL;
+    }
+}
+
+unsigned coap_get_content_type(coap_pkt_t *pkt)
+{
+    uint8_t *opt_pos = coap_find_option(pkt, COAP_OPT_CONTENT_FORMAT);
+    unsigned content_type = COAP_FORMAT_NONE;
+    if (opt_pos) {
+        uint16_t delta;
+        int option_len = 0;
+        uint8_t *pkt_pos = _parse_option(pkt, opt_pos, &delta, &option_len);
+
+        if (option_len == 0) {
+            content_type = 0;
+        } else if (option_len == 1) {
+            content_type = *pkt_pos;
+        } else if (option_len == 2) {
+            memcpy(&content_type, pkt_pos, 2);
+            content_type = ntohs(content_type);
+        }
+    }
+
+    return content_type;
+}
+
+int coap_get_uri(coap_pkt_t *pkt, uint8_t *target)
+{
+    uint8_t *opt_pos = coap_find_option(pkt, COAP_OPT_URI_PATH);
+    if (!opt_pos) {
+        *target++ = '/';
+        *target = '\0';
+        return 2;
+    }
+
+    unsigned left = NANOCOAP_URI_MAX - 1;
+    uint8_t *part_start = NULL;
+    do {
+        int opt_len;
+        part_start = coap_iterate_option(pkt, &opt_pos, &opt_len, part_start==NULL);
+        if (part_start) {
+            if (left < (unsigned)(opt_len + 1)) {
+                return -ENOSPC;
+            }
+            *target++ = '/';
+            memcpy(target, part_start, opt_len);
+            target += opt_len;
+            left -= (opt_len + 1);
+        }
+    } while(opt_pos);
+
+    *target = '\0';
+
+    return NANOCOAP_URI_MAX - left;
 }
 
 ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len)
@@ -154,13 +278,23 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 
     unsigned method_flag = coap_method2flag(coap_get_code_detail(pkt));
 
+#ifdef MODULE_GCOAP
+    uint8_t *uri = pkt->url;
+#else
+    uint8_t uri[NANOCOAP_URI_MAX];
+    if (coap_get_uri(pkt, uri) <= 0) {
+        return -EBADMSG;
+    }
+#endif
+    DEBUG("nanocoap: URI path: \"%s\"\n", uri);
+
     for (unsigned i = 0; i < coap_resources_numof; i++) {
         const coap_resource_t *resource = &coap_resources[i];
         if (!(resource->methods & method_flag)) {
             continue;
         }
 
-        int res = strcmp((char *)pkt->url, resource->path);
+        int res = strcmp((char *)uri, resource->path);
         if (res > 0) {
             continue;
         }
@@ -282,17 +416,6 @@ static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end)
     return res;
 }
 
-static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes)
-{
-    assert(nbytes <= 4);
-
-    uint32_t res = 0;
-    if (nbytes) {
-        memcpy(((uint8_t *)&res) + (4 - nbytes), pkt_pos, nbytes);
-    }
-    return ntohl(res);
-}
-
 static unsigned _put_delta_optlen(uint8_t *buf, unsigned offset, unsigned shift, unsigned val)
 {
     if (val < 13) {
@@ -407,4 +530,13 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
     unsigned payload_len = bufpos - payload;
 
     return coap_build_reply(pkt, COAP_CODE_205, buf, len, payload_len);
+}
+
+unsigned coap_get_len(coap_pkt_t *pkt)
+{
+    unsigned pktlen = sizeof(coap_hdr_t) + coap_get_token_len(pkt);
+    if (pkt->payload) {
+        pktlen += pkt->payload_len + 1;
+    }
+    return pktlen;
 }
