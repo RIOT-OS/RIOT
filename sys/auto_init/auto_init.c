@@ -163,6 +163,11 @@ void auto_init(void)
     extern void rdcli_common_init(void);
     rdcli_common_init();
 #endif
+#ifdef MODULE_RDCLI_STANDALONE
+    DEBUG("Auto init rdcli_standalone\n");
+    extern void rdcli_standalone_run(void);
+    rdcli_standalone_run();
+#endif
 #ifdef MODULE_RDCLI_SIMPLE_STANDALONE
     DEBUG("Auto init rdcli_simple module\n");
     extern void rdcli_simple_run(void);
