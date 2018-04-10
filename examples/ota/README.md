@@ -11,11 +11,13 @@ CoAP.
   keypair
 
 - flash image and bootloader
+
     $ "BOARD=samr21-xpro APP_VER=$(data +%s) make -j4 riotboot/flash
 
-- recompile using 
+- recompile using
+
     $ BOARD=samr21-xpro APP_VER=$(data +%s) make -j4 clean riotboot
 
 - send upate via coap, e.g.,
-    $ coap-cli -m put coap://[<node-ip-address]/firmware -b 64 -f bin/samr21-xpro/ota_example-slot2.bin
 
+    $ coap-cli -m put coap://[<node-ip-address]/firmware -b 64 -f bin/samr21-xpro/ota_example-slot2.bin
