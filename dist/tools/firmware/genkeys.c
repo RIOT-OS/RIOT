@@ -22,7 +22,7 @@ int genkeys(int argc, const char *argv[])
         return 1;
     }
 
-    crypto_sign_keypair(pk,sk);
+    crypto_sign_keypair(pk, sk);
 
     const char err[] = "error writing to %s\n";
     if (!to_file(argv[1], sk, sizeof(sk))) {
