@@ -768,6 +768,21 @@ ifneq (,$(filter rdcli_simple,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter rdcli_standalone,$(USEMODULE)))
+  USEMODULE += rdcli
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter rdcli,$(USEMODULE)))
+  USEMODULE += rdcli_common
+  USEMODULE += core_thread_flags
+  USEMODULE += gcoap
+  USEMODULE += fmt
+  ifneq (,$(filter shell_commands,$(USEMODULE)))
+    USEMODULE += sock_util
+  endif
+endif
+
 ifneq (,$(filter rdcli_common,$(USEMODULE)))
   USEMODULE += fmt
   USEMODULE += gcoap
