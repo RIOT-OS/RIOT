@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Firmware update cia CoAP implementation
+ * @brief       Firmware update via CoAP implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
@@ -37,7 +37,7 @@ ssize_t ota_coap_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *contex
     coap_block1_t block1;
     int blockwise = coap_get_block1(pkt, &block1);
 
-    LOG_INFO("ota: received bytes %u-%u", \
+    LOG_INFO("ota: received bytes %u-%u",
              (unsigned)block1.offset, (unsigned)block1.offset + pkt->payload_len);
 
     if (_state.state == FIRMWARE_UPDATE_VERIFIED) {
@@ -59,7 +59,8 @@ ssize_t ota_coap_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *contex
     }
     else {
         if (block1.offset == _state.offset) {
-            res = firmware_update_putbytes(&_state, block1.offset, pkt->payload, pkt->payload_len);
+            res = firmware_update_putbytes(&_state, block1.offset,
+                    pkt->payload, pkt->payload_len);
         }
         else {
             LOG_INFO("coap_ota_handler(): ignoring already received block\n");
