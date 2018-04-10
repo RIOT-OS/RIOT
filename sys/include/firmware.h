@@ -16,8 +16,8 @@
  *
  * ## Overview
  *
- * riotboot the name of a minimal bootloader application and infrastructure.  It
- * consists of
+ * riotboot is the name of a minimal bootloader application and infrastructure.
+ * It consists of
  *
  * - the application "riotboot" in "dist/riotboot" which serves as
  *   minimal bootloader
@@ -27,7 +27,7 @@
  *
  * - the module "ota_coap" which serves as transport for the updates
  *
- * - a tool in dist/tools/formware which handles key generation
+ * - a tool in dist/tools/firmware which handles key generation
  *   and firmware image signing.
  *
  * - a couple of make targets to glue everything together
@@ -70,8 +70,8 @@
  * The module "firmware_update" provides a simple API that can be fed image data
  * in arbitrary block sizes.  The API is similar to stream hashing. There's
  * "firmware_update_init()", "firmware_update_put_bytes()" and
- * "firmware_update_finish()".  The module transparently handles safe image
- * verification and flah writing.
+ * "firmware_update_finish()".  The module transparently handles image
+ * verification and flash writing.
  *
  * A tool in dist/tools/firmware can create the necessary keys using tweetnacl,
  * and also sign/verify firmware images.
@@ -91,7 +91,7 @@
  * ## Usage
  *
  * riotboot needs a public key to be compiled in the image for verification purposes.
- * Create a keypair using dist/tools/firware.
+ * Create a keypair using dist/tools/firmware.
  *
  * riotboot needs some board specific support, mainly slot size configuration, in
  * order to work for a specific board.
@@ -234,26 +234,40 @@ void firmware_jump_to_image(firmware_metadata_t *metadata);
 
 /**
  * @brief  Get currently running image slot
+ *
+ * returns nr of currently active slot
  */
 int firmware_current_slot(void);
 
 /**
  * @brief  Get next (to be empty) image slot
+ *
+ * returns free target slot
  */
 int firmware_target_slot(void);
 
 /**
  * @brief  Get metadata of firmware slot
+ *
+ * @param[in]   slot    slot nr to work on
+ *
+ * returns metadata of image slot nr @p slot
  */
 firmware_metadata_t *firmware_get_metadata(unsigned slot);
 
 /**
  * @brief  Get jump-to address of firmware slot
+ *
+ * @param[in]   slot    slot nr to work on
+ *
+ * @returns address of first byte of @p slot
  */
 unsigned firmware_get_image_startaddr(unsigned slot);
 
 /**
  * @brief  Boot into image in slot @p slot
+ *
+ * @param[in]   slot    slot nr to jump to
  */
 void firmware_jump_to_slot(unsigned slot);
 
@@ -262,6 +276,9 @@ void firmware_jump_to_slot(unsigned slot);
  */
 void firmware_dump_slot_addrs(void);
 
+/**
+ * @brief   Number of configured firmware slots (incl. bootloader slot)
+ */
 extern const unsigned firmware_num_slots;
 
 #ifdef __cplusplus
