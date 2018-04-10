@@ -539,6 +539,13 @@ typedef enum {
      */
     NETOPT_BLE_CTX,
 
+    /**
+     * @brief   (@ref netopt_enable_t) enable hardware checksumming
+     *
+     * If enabled, enable hardware checksumming of incoming frames.
+     */
+    NETOPT_CHECKSUM,
+
     /* add more options if needed */
 
     /**
