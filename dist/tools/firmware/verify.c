@@ -21,7 +21,8 @@ int verify(int argc, char *argv[])
     firmware_metadata_t metadata;
 
     if (argc < 4) {
-        goto usage;
+        fprintf(stderr, "usage: %s\n", verify_usage);
+        return 1;
     }
 
     if (!from_file(argv[2], &metadata, sizeof(metadata))) {
@@ -59,9 +60,4 @@ int verify(int argc, char *argv[])
 
 out:
     return res;
-
-usage:
-    fprintf(stderr, "usage: %s\n", verify_usage);
-    return 1;
 }
-
