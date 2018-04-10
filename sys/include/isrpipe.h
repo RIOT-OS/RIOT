@@ -65,10 +65,24 @@ void isrpipe_init(isrpipe_t *isrpipe, char *buf, size_t bufsize);
 int isrpipe_write_one(isrpipe_t *isrpipe, char c);
 
 /**
+ * @brief   Try to read data from isrpipe (non blocking)
+ *
+ * @param[in]   isrpipe     isrpipe object to operate on
+ * @param[out]  buffer      buffer to write to
+ * @param[in]   count       number of bytes to read
+ *
+ * @returns     number of byte read
+ */
+static inline int isrpipe_try_read(isrpipe_t *isrpipe, char *buf, size_t count)
+{
+    return tsrb_get(&isrpipe->tsrb, buf, count);
+}
+
+/**
  * @brief   Read data from isrpipe (blocking)
  *
  * @param[in]   isrpipe    isrpipe object to operate on
- * @param[in]   buf        buffer to write to
+ * @param[out]  buf        buffer to write to
  * @param[in]   count      number of bytes to read
  *
  * @returns     number of bytes read
@@ -84,7 +98,7 @@ int isrpipe_read(isrpipe_t *isrpipe, char *buf, size_t count);
  * @note This function might return less than @p count bytes
  *
  * @param[in]   isrpipe    isrpipe object to operate on
- * @param[in]   buf        buffer to write to
+ * @param[out]  buf        buffer to write to
  * @param[in]   count      number of bytes to read
  * @param[in]   timeout    timeout in microseconds
  *
@@ -100,7 +114,7 @@ int isrpipe_read_timeout(isrpipe_t *isrpipe, char *buf, size_t count, uint32_t t
  * timeout or when @p count bytes have been received.
  *
  * @param[in]   isrpipe    isrpipe object to operate on
- * @param[in]   buf        buffer to write to
+ * @param[out]  buf        buffer to write to
  * @param[in]   count      number of bytes to read
  * @param[in]   timeout    timeout in microseconds
  *

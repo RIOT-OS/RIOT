@@ -722,6 +722,15 @@ ifneq (,$(filter rdcli_common,$(USEMODULE)))
   USEMODULE += fmt
   USEMODULE += gcoap
   USEMODULE += luid
+
+ifneq (,$(filter gsm_%,$(USEMODULE)))
+  USEMODULE += gsm
+endif
+
+ifneq (,$(filter gsm,$(USEMODULE)))
+  USEMODULE += at
+  USEMODULE += fmt
+  USEMODULE += ipv4_addr
 endif
 
 # always select gpio (until explicit dependencies are sorted out)
