@@ -24,16 +24,18 @@ int main(int argc, char *argv[])
     }
     if (!strcmp(argv[1], "verify")) {
         return verify(argc, argv);
-    } else if (!strcmp(argv[1], "genkeys")) {
+    }
+    else if (!strcmp(argv[1], "genkeys")) {
         return genkeys(argc - 1, &argv[1]);
-    } else if (!strcmp(argv[1], "sign")) {
+    }
+    else if (!strcmp(argv[1], "sign")) {
         return sign(argc - 1, &argv[1]);
     }
 
 usage:
-    fprintf(stderr, "usage: %s\n"  \
-                    "       %s\n"  \
-                    "       %s\n", \
-                    genkeys_usage, sign_usage, verify_usage);
+    fprintf(stderr, "usage: %s\n"
+            "       %s\n"
+            "       %s\n",
+            genkeys_usage, sign_usage, verify_usage);
     return 1;
 }
