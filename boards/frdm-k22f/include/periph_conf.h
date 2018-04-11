@@ -41,20 +41,24 @@ static const clock_config_t clock_config = {
      */
     .clkdiv1 = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV2(1) |
                SIM_CLKDIV1_OUTDIV3(2) | SIM_CLKDIV1_OUTDIV4(2),
+    .rtc_clc = 0, /* External load caps on the FRDM-K22F board */
+    .osc32ksel = SIM_SOPT1_OSC32KSEL(2),
+    .clock_flags =
+        KINETIS_CLOCK_OSC0_EN |
+        KINETIS_CLOCK_RTCOSC_EN |
+        KINETIS_CLOCK_USE_FAST_IRC |
+        0,
     .default_mode = KINETIS_MCG_MODE_FEE,
     /* The crystal connected to OSC0 is 8 MHz */
     .erc_range = KINETIS_MCG_ERC_RANGE_HIGH,
-    .fcrdiv = 0, /* Fast IRC divide by 1 => 4 MHz */
-    .oscsel = 0, /* Use OSC0 for external clock */
-    .clc = 0, /* External load caps on the FRDM-K22F board */
-    .fll_frdiv = 0b011, /* Divide by 256 */
+    .osc_clc = 0, /* External load caps on the FRDM-K22F board */
+    .oscsel = MCG_C7_OSCSEL(0), /* Use OSC0 for external clock */
+    .fcrdiv = MCG_SC_FCRDIV(0), /* Fast IRC divide by 1 => 4 MHz */
+    .fll_frdiv = MCG_C1_FRDIV(0b011), /* Divide by 256 */
     .fll_factor_fei = KINETIS_MCG_FLL_FACTOR_1464, /* FLL freq = 48 MHz */
     .fll_factor_fee = KINETIS_MCG_FLL_FACTOR_1920, /* FLL freq = 60 MHz */
-    .pll_prdiv = 0b00011, /* Divide by 4 */
-    .pll_vdiv = 0b00110, /* Multiply by 30 => PLL freq = 60 MHz */
-    .enable_oscillator = true,
-    .select_fast_irc = true,
-    .enable_mcgirclk = false,
+    .pll_prdiv = MCG_C5_PRDIV0(0b00011), /* Divide by 4 */
+    .pll_vdiv  = MCG_C6_VDIV0(0b00110), /* Multiply by 30 => PLL freq = 60 MHz */
 };
 #define CLOCK_CORECLOCK              (60000000ul)
 #define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 2)

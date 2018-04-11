@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2016 Freie Universität Berlin
+ * Copyright (C) 2017-2018 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           CPU specific definitions for internal peripheral handling
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
 
 #ifndef PERIPH_CPU_H
@@ -427,50 +429,202 @@ typedef enum {
 } kinetis_mcg_erc_range_t;
 
 /**
+ * @brief   Clock generation configuration flags
+ *
+ * @see "Clock distribution -> High-Level device clocking diagram" in every
+ * Kinetis CPU reference manual
+ */
+typedef enum {
+    /**
+     * @brief   Turn on OSC0 oscillator
+     *
+     * - If this flag is set, the OSC0 oscillator expects a crystal between
+     * the pins XTAL0 and EXTAL0, and the OSCCLK internal signal will be
+     * provided by OSC0.
+     * - If not set, the EXTAL0 pin will be used directly as the OSCCLK signal.
+     */
+    KINETIS_CLOCK_OSC0_EN           = (1 <<  0),
+    /**
+     * @brief   Turn on RTC oscillator
+     *
+     * - If this flag is set, the RTC oscillator expects a crystal between
+     * the pins XTAL32 and EXTAL32.
+     * - If not set, the EXTAL32 pin can be used as an external clock signal on
+     * certain CPU models.
+     */
+    KINETIS_CLOCK_RTCOSC_EN         = (1 <<  1),
+    /**
+     * @brief   Use the fast internal reference clock as MCGIRCLK signal
+     *
+     * This flag corresponds to the IRCS bit in the MCG_C2 register.
+     *
+     * @note This flag affects the clock frequency of the CPU when using the MCG
+     * in FBI, or BLPI clocking modes.
+     *
+     * - If this flag is set, the fast internal reference clock (up to 4 MHz,
+     * depends on settings) will be routed to the MCGIRCLK internal clock signal.
+     * - If not set, the slow internal reference clock (32 kHz) will be routed to
+     * the MCGIRCLK internal clock signal. FBI and BLPI modes will clock the core
+     * at 32 kHz.
+     */
+    KINETIS_CLOCK_USE_FAST_IRC      = (1 <<  2),
+    /**
+     * @brief   Enable MCGIRCLK internal clock signal
+     *
+     * This flag corresponds to the IRCLKEN bit in the MCG_C1 register.
+     *
+     * - If this flag is set, the MCG will provide MCGIRCLK for use by other
+     * peripherals.
+     */
+    KINETIS_CLOCK_MCGIRCLK_EN       = (1 <<  3),
+    /**
+     * @brief   Enable MCGIRCLK signal during STOP modes
+     *
+     * This flag corresponds to the IREFSTEN bit in the MCG_SC register.
+     *
+     * - If this flag is set, MCGIRCLK internal clock signal will be available
+     *   for clocking peripherals during CPU STOP modes.
+     * - If not set, the MCGIRCLK internal clock signal will be stopped during
+     *   CPU STOP modes.
+     */
+    KINETIS_CLOCK_MCGIRCLK_STOP_EN  = (1 <<  4),
+} kinetis_clock_flags_t;
+
+/**
  * @brief Clock configuration for Kinetis CPUs
  */
 typedef struct {
-    /** Clock divider bitfield setting, see reference manual for SIM_CLKDIV1 */
+    /**
+     * @brief   Clock divider bitfield setting
+     *
+     * The value will be written to the SIM_CLKDIV1 hardware register without
+     * any transformation. Use the SIM_CLKDIV1_OUTDIVx() macros to ensure the
+     * proper bit shift for the chosen divider settings.
+     *
+     * @see CPU reference manual, SIM_CLKDIV1
+     */
     uint32_t clkdiv1;
-    /** MCG mode used after initialization, see kinetis_mcg_mode_t */
+    /**
+     * @brief   RTC oscillator Capacitor Load Configuration bits
+     *
+     * The bits will be passed directly to the RTC_CR register without any
+     * transformation, i.e. the SC16P bit is (unintuitively) at bit position 10,
+     * SC8P is at position 11, and so on (see details in the reference manual).
+     * Use the RTC_CR_SCxP_MASK macros to avoid accidentally reversing the bits
+     * here.
+     *
+     * @see CPU reference manual, RTC_CR[SCxP]
+     */
+    uint32_t rtc_clc;
+    /**
+     * @brief   ERCLK32K 32 kHz reference selection
+     *
+     * The bits will be passed directly to the SIM_SOPT1 register without any
+     * transformation, use the SIM_SOPT1_OSC32KSEL() macro to ensure the proper
+     * bit shift for the chosen setting.
+     *
+     * This signal is the input clock to the RTC module on some CPUs and an input
+     * option for the LPTMRx modules. On other CPUs the RTC is clocked directly
+     * by the RTC oscillator output without passing through this clock multiplexer.
+     *
+     * @see CPU reference manual, SIM_SOPT1[OSC32KSEL]
+     */
+    uint32_t osc32ksel;
+    /**
+     * @brief   Flags which will enable various clocking options at init
+     *
+     * @see @ref kinetis_clock_flags_t
+     */
+    unsigned int clock_flags;
+    /**
+     * @brief   MCG mode used after initialization
+     *
+     * @see @ref kinetis_mcg_mode_t
+     */
     kinetis_mcg_mode_t default_mode;
-    /** ERC range setting, see kinetis_mcg_erc_range_t */
+    /**
+     * @brief   ERC range setting
+     *
+     * @see @ref kinetis_mcg_erc_range_t
+     */
     kinetis_mcg_erc_range_t erc_range;
-    /** Fast internal reference clock divider, see reference manual for MCG_SC[FCRDIV] */
-    uint8_t fcrdiv;
-    /** Oscillator selection, see reference manual for MCG_C7[OSCSEL] */
+    /**
+     * @brief   OSC0 Capacitor Load Configuration bits
+     *
+     * The bits will be passed directly to the OSC_CR register without any
+     * transformation, i.e. the SC16P bit is (unintuitively) the LSB, SC8P is
+     * the next bit, and so on (see details in the reference manual). Use the
+     * OSC_CR_SCxP_MASK macros to avoid accidentally reversing the bits here.
+     *
+     * @see CPU reference manual, OSC_CR[SCxP]
+     */
+    uint8_t osc_clc;
+    /**
+     * @brief   MCG external reference oscillator selection
+     *
+     * The bits will be passed directly to the MCG_C7 register without any
+     * transformation, use the MCG_C7_OSCSEL() macro to ensure the proper bit
+     * shift for the chosen setting.
+     *
+     * @see CPU reference manual, MCG_C7[OSCSEL]
+     */
     uint8_t oscsel;
-    /** Capacitor Load configuration bits, see reference manual for OSC_CR */
-    uint8_t clc;
-    /** FLL ERC divider setting, see reference manual for MCG_C1[FRDIV] */
+    /**
+     * @brief   Fast internal reference clock divider
+     *
+     * The bits will be passed directly to the MCG_SC register without any
+     * transformation, use the MCG_SC_FCRDIV() macro to ensure the proper bit
+     * shift for the chosen setting.
+     *
+     * @see CPU reference manual, MCG_SC[FCRDIV]
+     */
+    uint8_t fcrdiv;
+    /**
+     * @brief   FLL ERC divider setting
+     *
+     * The bits will be passed directly to the MCG_C1 register without any
+     * transformation, use the MCG_C1_FRDIV() macro to ensure the proper bit
+     * shift for the chosen setting.
+     *
+     * @see CPU reference manual, MCG_C1[FRDIV]
+     */
     uint8_t fll_frdiv;
-    /** FLL multiplier when running in FEI mode */
+    /**
+     * @brief   FLL multiplier when running in FEI mode
+     *
+     * @see @ref kinetis_mcg_fll_t
+     * @see CPU reference manual, MCG_C4[DMX32, DRST_DRS]
+     */
     kinetis_mcg_fll_t fll_factor_fei;
-    /** FLL multiplier when running in FEE mode */
+    /**
+     * @brief   FLL multiplier when running in FEE mode
+     *
+     * @see @ref kinetis_mcg_fll_t
+     * @see CPU reference manual, MCG_C4[DMX32, DRST_DRS]
+     */
     kinetis_mcg_fll_t fll_factor_fee;
 #if KINETIS_HAVE_PLL
-    /** PLL ERC divider setting, see reference manual for MCG_C5[PRDIV] */
+    /**
+     * @brief   PLL ERC divider setting
+     *
+     * The bits will be passed directly to the MCG_C5 register without any
+     * transformation, use the MCG_C5_PRDIV0() macro to ensure the proper bit
+     * shift for the chosen setting.
+     *
+     * @see CPU reference manual, MCG_C5[PRDIV0]
+     */
     uint8_t pll_prdiv;
-    /** PLL VCO divider setting, see reference manual for MCG_C6[VDIV0] */
+    /**
+     * @brief   PLL VCO divider setting
+     *
+     * The bits will be passed directly to the MCG_C6 register without any
+     * transformation, use the MCG_C6_VDIV0() macro to ensure the proper bit
+     * shift for the chosen setting.
+     *
+     * @see CPU reference manual, MCG_C6[VDIV0]
+     */
     uint8_t pll_vdiv;
 #endif /* KINETIS_HAVE_PLL */
-    /**
-     * @brief External reference clock selection
-     *
-     * True: Use oscillator circuit with external crystal.
-     * False: Use external clock signal directly.
-     */
-    bool enable_oscillator;
-    /**
-     * @brief Use fast internal reference clock for MCGIRCLK
-     *
-     * See reference manual for MCG module and MCG_C2[IRCS]
-     */
-    bool select_fast_irc;
-    /**
-     * @brief Enable MCGIRCLK output from MCG for use as alternate clock in some modules
-     */
-    bool enable_mcgirclk;
 } clock_config_t;
 
 /**
