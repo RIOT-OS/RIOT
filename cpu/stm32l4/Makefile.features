@@ -1,3 +1,6 @@
+FEATURES_PROVIDED += periph_flash_common
+FEATURES_PROVIDED += periph_flashpage
+FEATURES_PROVIDED += periph_flashpage_raw
 FEATURES_PROVIDED += periph_hwrng
 
 -include $(RIOTCPU)/stm32_common/Makefile.features
