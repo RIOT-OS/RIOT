@@ -12,6 +12,31 @@
  * @ingroup     net
  * @brief       Provides CoAP functionality optimized for minimal resource usage
  *
+ * # Create a Block-wise Response (Block2)
+ *
+ * Block-wise is a CoAP extension (RFC 7959) to divide a large payload across
+ * multiple physical packets. This section describes how to write a block-wise
+ * payload for a response, and is known as Block2. (Block1 is for a block-wise
+ * payload in a request.) See _riot_board_handler() in the nanocoap_server
+ * example for an example handler implementation.
+ *
+ * Start with coap_block2_init() to read the client request and initialize a
+ * coap_slicer_t struct with the size and location for this slice of the
+ * overall payload. Then write the block2 option in the response with
+ * coap_opt_put_block2(). The option includes an indicator ("more") that a
+ * slice completes the overall payload transfer. You may not know the value for
+ * _more_ at this point, but you must initialize the space in the packet for
+ * the option before writing the payload. The option is rewritten later.
+ *
+ * Next, use the coap_blockwise_put_xxx() functions to write the payload
+ * content. These functions use the coap_block_slicer_t to enable or disable
+ * actually writing the content, depending on the current position within the
+ * overall payload transfer.
+ *
+ * Finally, use the convenience function coap_block2_build_reply(), which
+ * finalizes the packet and calls coap_block2_finish() internally to update
+ * the block2 option.
+ *
  * @{
  *
  * @file
@@ -62,8 +87,10 @@ extern "C" {
  * @name    Nanocoap specific maximum values
  * @{
  */
-#define NANOCOAP_NOPTS_MAX      (16)
-#define NANOCOAP_URI_MAX        (64)
+#define NANOCOAP_NOPTS_MAX          (16)
+#define NANOCOAP_URI_MAX            (64)
+#define NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)  /**< Maximum size for a blockwise
+                                            *  transfer as power of 2 */
 /** @} */
 
 #ifdef MODULE_GCOAP
@@ -144,6 +171,16 @@ typedef struct {
     int more;                       /**< -1 for no option, 0 for last block,
                                           1 for more blocks coming          */
 } coap_block1_t;
+
+/**
+ * @brief Blockwise transfer helper struct
+ */
+typedef struct {
+    size_t start;                   /**< Start offset of the current block  */
+    size_t end;                     /**< End offset of the current block    */
+    size_t cur;                     /**< Offset of the generated content    */
+    uint8_t *opt;                   /**< Pointer to the placed option       */
+} coap_block_slicer_t;
 
 /**
  * @brief   Global CoAP resource list
@@ -412,6 +449,17 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsign
 int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block1);
 
 /**
+ * @brief    Block2 option getter
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[out]  block2  ptr to preallocated coap_block1_t structure
+ *
+ * @returns     0 if block2 option not present
+ * @returns     1 if structure has been filled
+ */
+int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block2);
+
+/**
  * @brief   Insert block1 option into buffer
  *
  * @param[out]  buf         buffer to write to
@@ -489,6 +537,23 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
  * @return        total number of bytes written to buffer
  */
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
+
+/**
+ * @brief   Insert block2 option into buffer
+ *
+ * When calling this function to initialize a packet with a block2 option, the
+ * more flag must be set to prevent the creation of an option with a length too
+ * small to contain the size bit.
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          must be < 23
+ * @param[in]   slicer      coap blockwise slicer helper struct
+ * @param[in]   more        more flag (1 or 0)
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer, bool more);
 
 /**
  * @brief   Get content type from packet
@@ -603,6 +668,83 @@ static inline ssize_t coap_get_location_query(const coap_pkt_t *pkt,
     return coap_opt_get_string(pkt, COAP_OPT_LOCATION_QUERY,
                                target, max_len, '&');
 }
+
+/**
+ * @brief Initialize a block2 slicer struct for writing the payload
+ *
+ * This function determines the size of the response payload based on the
+ * size requested by the client in @p pkt.
+ *
+ * @param[in]   pkt         packet to work on
+ * @param[out]  slicer      Preallocated slicer struct to fill
+ */
+void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
+
+/**
+ * @brief Finish a block2 response
+ *
+ * This function finalizes the block2 response header
+ *
+ * Checks whether the `more` bit should be set in the block2 option and
+ * sets/clears it if required.  Doesn't return the number of bytes as this
+ * overwrites bytes in the packet, it doesn't add new bytes to the packet.
+ *
+ * @param[inout]  slicer      Preallocated slicer struct to use
+ */
+void coap_block2_finish(coap_block_slicer_t *slicer);
+
+/**
+ * @brief   Build reply to CoAP block2 request
+ *
+ * This function can be used to create a reply to a CoAP block2 request
+ * packet. In addition to @ref coap_build_reply, this function checks the
+ * block2 option and returns an error message to the client if necessary.
+ *
+ * @param[in]   pkt         packet to reply to
+ * @param[in]   code        reply code (e.g., COAP_CODE_204)
+ * @param[out]  rbuf        buffer to write reply to
+ * @param[in]   rlen        size of @p rbuf
+ * @param[in]   payload_len length of payload
+ * @param[in]   slicer      slicer to use
+ *
+ * @returns     size of reply packet on success
+ * @returns     <0 on error
+ */
+ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
+                                uint8_t *rbuf, unsigned rlen, unsigned payload_len,
+                                coap_block_slicer_t *slicer);
+
+/**
+ * @brief Add a single character to a block2 reply.
+ *
+ * This function is used to add single characters to a CoAP block2 reply. It
+ * checks whether the character should be added to the buffer and ignores it
+ * when the character is outside the current block2 request.
+ *
+ * @param[in]   slicer      slicer to use
+ * @param[in]   bufpos      pointer to the current payload buffer position
+ * @param[in]   c           character to write
+ *
+ * @returns     Number of bytes writen to @p bufpos
+ */
+size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, char c);
+
+/**
+ * @brief Add a byte array to a block2 reply.
+ *
+ * This function is used to add an array of bytes to a CoAP block2 reply. it
+ * checks which parts of the string should be added to the reply and ignores
+ * parts that are outside the current block2 request.
+ *
+ * @param[in]   slicer      slicer to use
+ * @param[in]   bufpos      pointer to the current payload buffer position
+ * @param[in]   c           byte array to copy
+ * @param[in]   len         length of the byte array
+ *
+ * @returns     Number of bytes writen to @p bufpos
+ */
+size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
+                                const uint8_t *c, size_t len);
 
 /**
  * @brief   Helper to decode SZX value to size in bytes
