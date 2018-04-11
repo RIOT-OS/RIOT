@@ -51,7 +51,7 @@ $(BINDIR)/$(APPLICATION)-slot2.bin: OFFSET=$(SLOT2_OFFSET)
 $(BINDIR)/$(APPLICATION)-slot2.bin: $(BINDIR)/$(APPLICATION)-slot2.elf
 
 # creating pubkey header file
-link: | $(BINDIR)/riotbuild/ota_pubkey.h
+$(RIOTBUILD_CONFIG_HEADER_C): $(BINDIR)/riotbuild/ota_pubkey.h
 $(BINDIR)/riotbuild/ota_pubkey.h: $(RIOTBOOT_PUBKEY)
 	@mkdir -p $(@D)
 	@{ \
