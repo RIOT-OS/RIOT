@@ -124,7 +124,8 @@ void sx127x_read_fifo(const sx127x_t *dev, uint8_t *buffer, uint8_t size)
     sx127x_reg_read_burst(dev, 0, buffer, size);
 }
 
-void sx127x_rx_chain_calibration(sx127x_t *dev)
+#if defined(MODULE_SX1276)
+void sx1276_rx_chain_calibration(sx127x_t *dev)
 {
     uint8_t reg_pa_config_init_val;
     uint32_t initial_freq;
@@ -164,6 +165,7 @@ void sx127x_rx_chain_calibration(sx127x_t *dev)
     sx127x_reg_write(dev, SX127X_REG_PACONFIG, reg_pa_config_init_val);
     sx127x_set_channel(dev, initial_freq);
 }
+#endif
 
 int16_t sx127x_read_rssi(const sx127x_t *dev)
 {
