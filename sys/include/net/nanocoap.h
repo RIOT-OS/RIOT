@@ -411,7 +411,7 @@ size_t coap_put_option_uri(uint8_t *buf, uint16_t lastonum, const char *uri, uin
 
 
 /**
- * @brief    Get content type from packet
+ * @brief   Get content type from packet
  *
  * @param[in]   pkt     packet to work on
  *
@@ -421,7 +421,7 @@ size_t coap_put_option_uri(uint8_t *buf, uint16_t lastonum, const char *uri, uin
 unsigned coap_get_content_type(coap_pkt_t *pkt);
 
 /**
- * @brief    Get the packet's request URI
+ * @brief   Get the packet's request URI
  *
  * This function decodes the pkt's URI option into a "/"-seperated and
  * NULL-terminated string.
