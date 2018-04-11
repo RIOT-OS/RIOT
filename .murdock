@@ -9,6 +9,8 @@ export DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 NIGHTLY=${NIGHTLY:-0}
 RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 
+DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS"
+
 check_label() {
     local label="${1}"
     [ -z "${CI_PULL_LABELS}" ] && return 1
@@ -87,7 +89,7 @@ get_app_board_pairs() {
 # use dwqc to create full "appdir board" compile job list
 get_compile_jobs() {
     get_apps | \
-        dwqc -E BOARDS -E APPS -s \
+        dwqc ${DWQ_ENV} -s \
         "$0 get_app_board_pairs \${1}" \
         | xargs '-d\n' -n 1 echo $0 compile
 }
@@ -160,6 +162,7 @@ test_job() {
     }
 
     dwqc \
+        ${DWQ_ENV} \
         ${DWQ_JOBID:+--subjob} \
         --file $flashfile:$appdir/bin/${board}/$(basename $flashfile) \
         --queue ${TEST_QUEUE:-$board} \
