@@ -722,6 +722,7 @@ ifneq (,$(filter rdcli_common,$(USEMODULE)))
   USEMODULE += fmt
   USEMODULE += gcoap
   USEMODULE += luid
+endif
 
 ifneq (,$(filter gsm_%,$(USEMODULE)))
   USEMODULE += gsm
