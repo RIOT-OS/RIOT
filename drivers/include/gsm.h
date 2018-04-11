@@ -48,6 +48,13 @@ extern "C" {
 #define GSM_THREAD_PRIO         (THREAD_PRIORITY_MAIN + 1)
 #endif
 
+#ifndef GSM_PPP_NUMBER
+/**
+ * @brief   GSM default PPP number
+ */
+#define GSM_PPP_NUMBER         "*99#"
+#endif
+
 typedef struct gsm_driver gsm_driver_t;
 
 typedef void (*gsm_sms_cb_t)(void *arg, char *sms, char *sender, char *date);
@@ -57,6 +64,14 @@ enum {
     GSM_OFF,
     GSM_ON,
 };
+
+typedef enum {
+    GSM_CTX_IP = 0,
+    GSM_CTX_PPP,
+    GSM_CTX_IPV6,
+    GSM_CTX_IP4V6,
+    GSM_CTX_COUNT,
+} gsm_context_type_t;
 
 typedef enum {
     GSM_CT_APPLICATION_X_WWW_URL_ENCODED,
@@ -412,6 +427,18 @@ int gsm_signal_get(gsm_t *gsmdev, unsigned *csq, unsigned *ber);
 int gsm_imei_get(gsm_t *gsmdev, char *buf, size_t len);
 
 /**
+ * @brief   Get modem identification
+ *
+ * @param[in]   gsmdev  device to operate on
+ * @param[out]  buf     buffer to write identification in
+ * @param[in]   len     length of @p buf
+ *
+ * @return  length of the response on success
+ * @return  < 0 on error
+ */
+ssize_t gsm_identification_get(gsm_t *gsmdev, char *buf, size_t len);
+
+/**
  * @brief   Get SIM ICCID
  *
  * @param[in]   gsmdev  device to operate on
@@ -431,6 +458,34 @@ int gsm_iccid_get(gsm_t *gsmdev, char *buf, size_t len);
  * @return  modem IP address
  */
 uint32_t gsm_gprs_getip(gsm_t *gsmdev);
+
+/**
+ * @brief Setup pdp context
+ *
+ * @param[in]   gsmdev  device to operate on
+ * @param[in]   ctx     context to setup
+ * @param[in]   type    pdp type
+ * @param[in]   apn     access point name
+ * @param[in]   user    user identifier (optional)
+ * @param[in]   pass    password        (optional)
+ *
+ * @return  0 on success
+ * @return  < 0 on error
+ */
+int gsm_setup_pdp_context(gsm_t *gsmdev, uint8_t ctx, gsm_context_type_t type,
+        const char * apn, const char * user, const char * pass);
+
+/**
+ * @brief Start dialing
+ *
+ * @param[in]   gsmdev          device to operate on
+ * @param[in]   number          the number to call
+ * @param[in]   is_voice_call   set to true for a voice call, false for data call
+ *
+ * @return  0 on success
+ * @return  < 0 on error
+ */
+int gsm_dial(gsm_t *gsmdev, const char * number, bool is_voice_call);
 
 /**
  * @brief   Print modem status on stdout

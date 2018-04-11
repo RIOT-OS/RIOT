@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include "thread.h"
 #include "fmt.h"
@@ -21,6 +22,8 @@
 
 #define MODEM_INIT_MAXTRIES (3)
 
+static const char * gsm_context_types[GSM_CTX_COUNT] = { "IP", "PPP", "IPV6", "IP4V6" };
+
 static void *_gsm_idle_thread(void *arg);
 
 int gsm_init(gsm_t *gsmdev, const gsm_params_t *params)
@@ -28,8 +31,9 @@ int gsm_init(gsm_t *gsmdev, const gsm_params_t *params)
     unsigned tries = MODEM_INIT_MAXTRIES;
     int res;
 
-    assert(gsmdev && gsmdev->driver);
+    assert(gsmdev);
     assert(params);
+
     LOG_INFO("gsm: initializing...\n");
 
     rmutex_init(&gsmdev->mutex);
@@ -52,9 +56,11 @@ int gsm_init(gsm_t *gsmdev, const gsm_params_t *params)
     }
 
     /* reset device */
-    res = gsmdev->driver->reset(gsmdev);
-    if (res) {
-        goto out;
+    if(gsmdev->driver->reset) {
+        res = gsmdev->driver->reset(gsmdev);
+        if (res) {
+            goto out;
+        }
     }
 
     /* wait for boot */
@@ -63,6 +69,7 @@ int gsm_init(gsm_t *gsmdev, const gsm_params_t *params)
         res = at_send_cmd_wait_ok(at_dev, "AT", GSM_SERIAL_TIMEOUT);
     } while (res != 0 && (tries--));
     if (res) {
+        LOG_INFO("gsm: no response\n");
         goto out;
     }
 
@@ -92,9 +99,11 @@ int gsm_init(gsm_t *gsmdev, const gsm_params_t *params)
     }
 
     /* device specific init */
-    res = gsmdev->driver->init(gsmdev);
-    if (res) {
-        goto out;
+    if(gsmdev->driver->init) {
+        res = gsmdev->driver->init(gsmdev);
+        if (res) {
+            goto out;
+        }
     }
 
     gsmdev->state = GSM_ON;
@@ -102,6 +111,8 @@ int gsm_init(gsm_t *gsmdev, const gsm_params_t *params)
     gsmdev->pid = thread_create(gsmdev->stack, sizeof(gsmdev->stack), GSM_THREAD_PRIO,
                                 THREAD_CREATE_STACKTEST, _gsm_idle_thread, gsmdev, "gsm");
 
+
+    LOG_INFO("gsm: initialized\n");
 out:
     rmutex_unlock(&gsmdev->mutex);
     return res;
@@ -388,45 +399,6 @@ int gsm_check_pin(gsm_t *gsmdev)
     return res;
 }
 
-//int gsm_gprs_init(gsm_t *gsmdev, const char *apn)
-//{
-//    char buf[64];
-//    int res;
-//    at_dev_t *at_dev = &gsmdev->at_dev;
-//
-//    mutex_lock(&gsmdev->mutex);
-//
-//    /* close possible open GPRS connection */
-//    at_send_cmd_wait_ok(at_dev, "AT+SAPBR=0,1", GSM_SERIAL_TIMEOUT);
-//
-//    /* set GPRS */
-//    res = at_send_cmd_wait_ok(at_dev, "AT+SAPBR=3,1,\"Contype\",\"GPRS\"", GSM_SERIAL_TIMEOUT);
-//    if (res) {
-//        goto out;
-//    }
-//
-//    /* set APN */
-//    char *pos = buf;
-//    pos += fmt_str(pos, "AT+SAPBR=3,1,\"APN\",\"");
-//    pos += fmt_str(pos, apn);
-//    pos += fmt_str(pos, "\"");
-//    *pos = '\0';
-//    res = at_send_cmd_wait_ok(at_dev, buf, GSM_SERIAL_TIMEOUT);
-//    if (res) {
-//        goto out;
-//    }
-//
-//    xtimer_usleep(100000U);
-//
-//    /* AT+SAPBR=1,1 -> open GPRS */
-//    res = at_send_cmd_wait_ok(at_dev, "AT+SAPBR=1,1", GSM_SERIAL_TIMEOUT * 5);
-//
-//out:
-//    mutex_unlock(&gsmdev->mutex);
-//
-//    return res;
-//}
-
 int gsm_creg_get(gsm_t *gsmdev)
 {
     char buf[64];
@@ -516,6 +488,39 @@ ssize_t gsm_imei_get(gsm_t *gsmdev, char *buf, size_t len)
     return res;
 }
 
+ssize_t gsm_identification_get(gsm_t *gsmdev, char *buf, size_t len)
+{
+    ssize_t res = -1;
+    if(gsmdev && buf){
+
+        rmutex_lock(&gsmdev->mutex);
+
+        res = at_send_cmd_get_lines(&gsmdev->at_dev, "ATI", buf, len, false, GSM_SERIAL_TIMEOUT);
+
+        rmutex_unlock(&gsmdev->mutex);
+
+        if(res >= 0) {
+            char * pos = &buf[res -1]; /* will provide the pointer to index of the terminator */
+
+            /* OK is still in the buffer, so find final character */
+            if(strncmp(pos - 2, "OK", 2) == 0) {
+                pos -= 2;
+
+                while(--pos != buf) {
+                    if(isalnum(*pos)) {
+                        break;
+                    }
+                }
+
+                *(++pos) = '\0';
+                res = pos - buf;
+            }
+        }
+    }
+
+    return res;
+}
+
 int gsm_signal_get(gsm_t *gsmdev, unsigned *rssi, unsigned *ber)
 {
     char buf[32];
@@ -540,28 +545,6 @@ int gsm_signal_get(gsm_t *gsmdev, unsigned *rssi, unsigned *ber)
     return res;
 }
 
-//uint32_t gsm_gprs_getip(gsm_t *gsmdev)
-//{
-//    char buf[40];
-//    char *pos = buf;
-//    uint32_t ip = 0;
-//
-//    mutex_lock(&gsmdev->mutex);
-//
-//    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+SAPBR=2,1", buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
-//    if ((res > 13) && strncmp(buf, "+SAPBR: 1,1,\"", 13) == 0) {
-//        res -= 1;   /* cut off " */
-//        buf[res] = '\0';
-//        pos += 13; /* skip +SAPBR: 1,1," */
-//
-//        ipv4_addr_from_str((ipv4_addr_t *)&ip, pos);
-//    }
-//
-//    mutex_unlock(&gsmdev->mutex);
-//
-//    return ip;
-//}
-
 uint32_t gsm_gprs_getip(gsm_t *gsmdev)
 {
     char buf[40];
@@ -584,14 +567,83 @@ uint32_t gsm_gprs_getip(gsm_t *gsmdev)
     return ip;
 }
 
+int gsm_setup_pdp_context(gsm_t *gsmdev, uint8_t ctx, gsm_context_type_t type,
+        const char * apn, const char * user, const char * pass)
+{
+    int result = -1;
+
+    if((gsmdev) && (type < GSM_CTX_COUNT))
+    {
+        char buf[128] = { 0 };
+        char *pos = buf;
+
+        pos += fmt_str(pos, "AT+CGDCONT=");
+        pos += fmt_u32_dec(pos, ctx);
+        pos += fmt_str(pos, ",\"");
+        pos += fmt_str(pos, gsm_context_types[type]);
+        pos += fmt_str(pos, "\",\"");
+        pos += fmt_str(pos, apn);
+
+        if(user){
+            pos += fmt_str(pos, "\",\"");
+            pos += fmt_str(pos, user);
+
+            if(pass) {
+                pos += fmt_str(pos, "\",\"");
+                pos += fmt_str(pos, pass);
+            }
+        }
+        pos += fmt_str(pos, "\"\0");
+
+        rmutex_lock(&gsmdev->mutex);
+
+         /* AT+CGDCONT=<ctx>,"<type>","<apn>",["<user>",["<pass>"]] */
+        result = at_send_cmd_wait_ok(&gsmdev->at_dev, buf, GSM_SERIAL_TIMEOUT);
+
+        rmutex_unlock(&gsmdev->mutex);
+    }
+
+    return result;
+}
+
+int gsm_dial(gsm_t *gsmdev, const char * number, bool is_voice_call)
+{
+    int result = -1;
+
+    if(gsmdev && number) {
+        char buf[64];
+        char *pos = buf;
+
+        pos += fmt_str(pos, "ATD");
+        pos += fmt_str(pos, number);
+
+        if(is_voice_call) {
+            pos += fmt_str(pos, ";");
+        }
+        *pos = '\0';
+
+        rmutex_lock(&gsmdev->mutex);
+
+        result = at_send_cmd_get_resp(&gsmdev->at_dev, buf, buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
+        if (result > 0) {
+            if (strcmp(buf, "CONNECT") == 0) {
+                result = 0;
+            }
+        }
+
+        rmutex_unlock(&gsmdev->mutex);
+    }
+
+    return result;
+}
+
 void gsm_print_status(gsm_t *gsmdev)
 {
     char buf[64];
 
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "ATI", buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
+    int res = gsm_identification_get(gsmdev, buf, sizeof(buf));
 
     if (res >= 2) {
-        buf[res] = '\0';
         printf("gsm: device type %s\n", buf);
     }
     else {
