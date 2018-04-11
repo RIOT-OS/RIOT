@@ -98,7 +98,7 @@ int firmware_update_init(firmware_update_t *state, int target_slot);
  *
  * @returns         0 on success, <0 otherwise
  */
-int firmware_update_putbytes(firmware_update_t *state, size_t offset
+int firmware_update_putbytes(firmware_update_t *state, size_t offset,
                              const uint8_t *bytes, size_t len);
 
 /**
