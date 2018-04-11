@@ -515,11 +515,11 @@ ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
     EXPECT_ERRORS := 1
   endif
 
-  # Test if any required feature conflict with another one.
-  CONFLICT := $(foreach var,$(FEATURES_CONFLICT),$(if $(filter $(words $(subst :, ,$(var))),$(words $(filter $(FEATURES_REQUIRED),$(subst :, ,$(var))))),$(subst :, ,$(var))))
+  # Test if any used feature conflict with another one.
+  CONFLICT := $(foreach var,$(FEATURES_CONFLICT),$(if $(filter $(words $(subst :, ,$(var))),$(words $(filter $(FEATURES_USED),$(subst :, ,$(var))))),$(subst :, ,$(var))))
   ifneq (, $(strip $(CONFLICT)))
     $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)The following features may conflict:$(COLOR_RESET)"\
-                          "$(COLOR_GREEN)$(sort $(filter $(FEATURES_REQUIRED), $(CONFLICT)))$(COLOR_RESET)" 1>&2)
+                          "$(COLOR_GREEN)$(sort $(filter $(FEATURES_USED), $(CONFLICT)))$(COLOR_RESET)" 1>&2)
     ifneq (, $(FEATURES_CONFLICT_MSG))
         $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Rationale: $(COLOR_RESET)$(FEATURES_CONFLICT_MSG)" 1>&2)
     endif
