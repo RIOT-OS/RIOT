@@ -12,5 +12,8 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 export DEBUG_ADAPTER ?= stlink
 export STLINK_VERSION ?= 2-1
 
+# call a 'reset halt' command before starting the debugger
+export OPENOCD_DBG_START_CMD = -c 'reset halt'
+
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk
