@@ -53,6 +53,10 @@ void rtt_init(void)
     RTC_Type *rtt = RTT_DEV;
 
     RTT_UNLOCK();
+    if (!(rtt->SR & RTC_SR_TIF_MASK)) {
+        /* RTC is already started, let it run */
+        return;
+    }
     /* Reset RTC */
     rtt->CR = RTC_CR_SWR_MASK;
     /* cppcheck-suppress redundantAssignment
