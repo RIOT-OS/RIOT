@@ -33,6 +33,18 @@ extern "C"
  * @name Clock system configuration
  * @{
  */
+/* The crystal on the Mulle is designed for 12.5 pF load capacitance. According
+ * to the data sheet, the K60 will have a 5 pF parasitic capacitance on the
+ * XTAL32/EXTAL32 connection. The board traces might give some minor parasitic
+ * capacitance as well. */
+/* Use the equation
+ * CL = (C1 * C2) / (C1 + C2) + Cstray
+ * with C1 == C2:
+ * C1 = 2 * (CL - Cstray)
+ */
+/* enable 14pF load capacitor which will yield a crystal load capacitance of 12 pF */
+#define RTC_LOAD_CAP_BITS   (RTC_CR_SC8P_MASK | RTC_CR_SC4P_MASK | RTC_CR_SC2P_MASK)
+
 static const clock_config_t clock_config = {
     /*
      * This configuration results in the system running from the FLL output with
@@ -48,24 +60,28 @@ static const clock_config_t clock_config = {
      * consumption than using the 16 MHz crystal and the OSC0 module */
     .clkdiv1 = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV2(0) |
                SIM_CLKDIV1_OUTDIV3(1) | SIM_CLKDIV1_OUTDIV4(1),
+    .rtc_clc = RTC_LOAD_CAP_BITS,
+    .osc32ksel = SIM_SOPT1_OSC32KSEL(2),
+    .clock_flags =
+        /* no OSC0_EN, the RTC module provides the clock input signal for the FLL */
+        KINETIS_CLOCK_RTCOSC_EN |
+        KINETIS_CLOCK_USE_FAST_IRC |
+        0,
     .default_mode = KINETIS_MCG_MODE_FEE,
     .erc_range = KINETIS_MCG_ERC_RANGE_LOW, /* Input clock is 32768 Hz */
-    .fcrdiv = 0, /* Fast IRC divide by 1 => 4 MHz */
-    .oscsel = 1, /* Use RTC for external clock */
     /* 16 pF capacitors yield ca 10 pF load capacitance as required by the
      * onboard xtal, not used when OSC0 is disabled */
-    .clc = 0b0001,
-    .fll_frdiv = 0b000, /* Divide by 1 => FLL input 32768 Hz */
+    .osc_clc = OSC_CR_SC16P_MASK,
+    .oscsel = MCG_C7_OSCSEL(1), /* Use RTC for external clock */
+    .fcrdiv = MCG_SC_FCRDIV(0), /* Fast IRC divide by 1 => 4 MHz */
+    .fll_frdiv = MCG_C1_FRDIV(0b000), /* Divide by 1 => FLL input 32768 Hz */
     .fll_factor_fei = KINETIS_MCG_FLL_FACTOR_1464, /* FLL freq = 48 MHz */
     .fll_factor_fee = KINETIS_MCG_FLL_FACTOR_1464, /* FLL freq = 48 MHz */
     /* PLL is unavailable when using a 32768 Hz source clock, so the
      * configuration below can only be used if the above config is modified to
      * use the 16 MHz crystal instead of the RTC. */
-    .pll_prdiv = 0b00111, /* Divide by 8 */
-    .pll_vdiv = 0b01100, /* Multiply by 36 => PLL freq = 72 MHz */
-    .enable_oscillator = false, /* the RTC module provides the clock input signal */
-    .select_fast_irc = true, /* Only used for FBI mode */
-    .enable_mcgirclk = false,
+    .pll_prdiv = MCG_C5_PRDIV0(0b00111), /* Divide by 8 */
+    .pll_vdiv = MCG_C6_VDIV0(0b01100), /* Multiply by 36 => PLL freq = 72 MHz */
 };
 #define CLOCK_CORECLOCK              (48000000ul)
 #define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 1)
@@ -381,21 +397,6 @@ static const spi_conf_t spi_config[] = {
 #define RTT_UNLOCK()        (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_RTC_SHIFT) = 1)
 #define RTT_MAX_VALUE       (0xffffffff)
 #define RTT_FREQUENCY       (1)             /* in Hz */
-
-/**
- * RTC module crystal load capacitance configuration bits.
- */
-/* The crystal on the Mulle is designed for 12.5 pF load capacitance. According
- * to the data sheet, the K60 will have a 5 pF parasitic capacitance on the
- * XTAL32/EXTAL32 connection. The board traces might give some minor parasitic
- * capacitance as well. */
-/* Use the equation
- * CL = (C1 * C2) / (C1 + C2) + Cstray
- * with C1 == C2:
- * C1 = 2 * (CL - Cstray)
- */
-/* enable 14pF load capacitor which will yield a crystal load capacitance of 12 pF */
-#define RTC_LOAD_CAP_BITS   (RTC_CR_SC8P_MASK | RTC_CR_SC4P_MASK | RTC_CR_SC2P_MASK)
 
 /** @} */
 
