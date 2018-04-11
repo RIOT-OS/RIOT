@@ -117,8 +117,10 @@ int sx127x_init(sx127x_t *dev)
 
 void sx127x_init_radio_settings(sx127x_t *dev)
 {
-    sx127x_set_modem(dev, SX127X_MODEM_DEFAULT);
+    DEBUG("[sx127x] initialize radio settings\n");
     sx127x_set_channel(dev, SX127X_CHANNEL_DEFAULT);
+    sx127x_set_modem(dev, SX127X_MODEM_DEFAULT);
+    sx127x_set_tx_power(dev, SX127X_RADIO_TX_POWER);
     sx127x_set_bandwidth(dev, LORA_BW_DEFAULT);
     sx127x_set_spreading_factor(dev, LORA_SF_DEFAULT);
     sx127x_set_coding_rate(dev, LORA_CR_DEFAULT);
@@ -128,7 +130,6 @@ void sx127x_init_radio_settings(sx127x_t *dev)
     sx127x_set_fixed_header_len_mode(dev, LORA_FIXED_HEADER_LEN_MODE_DEFAULT);
     sx127x_set_iq_invert(dev, LORA_IQ_INVERTED_DEFAULT);
     sx127x_set_payload_length(dev, LORA_PAYLOAD_LENGTH_DEFAULT);
-    sx127x_set_tx_power(dev, SX127X_RADIO_TX_POWER);
     sx127x_set_preamble_length(dev, LORA_PREAMBLE_LENGTH_DEFAULT);
     sx127x_set_symbol_timeout(dev, LORA_SYMBOL_TIMEOUT_DEFAULT);
     sx127x_set_rx_single(dev, SX127X_RX_SINGLE);
