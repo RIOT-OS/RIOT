@@ -49,18 +49,18 @@ bool sx127x_test(const sx127x_t *dev)
 
 #if defined(MODULE_SX1272)
     if (version != VERSION_SX1272) {
-        DEBUG("[Error] sx1272 test failed, invalid version number: %d\n",
+        DEBUG("[sx127x] sx1272 test failed, invalid version number: %d\n",
               version);
         return false;
     }
-    DEBUG("SX1272 transceiver detected.\n");
+    DEBUG("[sx127x] SX1272 transceiver detected.\n");
 #else /* MODULE_SX1276) */
     if (version != VERSION_SX1276) {
-        DEBUG("[Error] sx1276 test failed, invalid version number: %d\n",
+        DEBUG("[sx127x] sx1276 test failed, invalid version number: %d\n",
               version);
         return false;
     }
-    DEBUG("SX1276 transceiver detected.\n");
+    DEBUG("[sx127x] SX1276 transceiver detected.\n");
 #endif
 
     return true;

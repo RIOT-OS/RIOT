@@ -96,7 +96,7 @@ int sx127x_init(sx127x_t *dev)
 
     /* Check presence of SX127X */
     if (!sx127x_test(dev)) {
-        DEBUG("[Error] init : sx127x test failed\n");
+        DEBUG("[sx127x] init: sx127x test failed\n");
         return -SX127X_ERR_TEST_FAILED;
     }
 
@@ -205,20 +205,24 @@ static void sx127x_on_dio3_isr(void *arg)
 /* Internal event handlers */
 static void _init_isrs(sx127x_t *dev)
 {
-    if (gpio_init_int(dev->params.dio0_pin, GPIO_IN, GPIO_RISING, sx127x_on_dio0_isr, dev) < 0) {
-        DEBUG("Error: cannot initialize DIO0 pin\n");
+    if (gpio_init_int(dev->params.dio0_pin, GPIO_IN, GPIO_RISING,
+                      sx127x_on_dio0_isr, dev) < 0) {
+        DEBUG("[sx127x] error: cannot initialize DIO0 pin\n");
     }
 
-    if (gpio_init_int(dev->params.dio1_pin, GPIO_IN, GPIO_RISING, sx127x_on_dio1_isr, dev) < 0) {
-        DEBUG("Error: cannot initialize DIO1 pin\n");
+    if (gpio_init_int(dev->params.dio1_pin, GPIO_IN, GPIO_RISING,
+                      sx127x_on_dio1_isr, dev) < 0) {
+        DEBUG("[sx127x] error: cannot initialize DIO1 pin\n");
     }
 
-    if (gpio_init_int(dev->params.dio2_pin, GPIO_IN, GPIO_RISING, sx127x_on_dio2_isr, dev) < 0) {
-        DEBUG("Error: cannot initialize DIO2 pin\n");
+    if (gpio_init_int(dev->params.dio2_pin, GPIO_IN, GPIO_RISING,
+                      sx127x_on_dio2_isr, dev) < 0) {
+        DEBUG("[sx127x] error: cannot initialize DIO2 pin\n");
     }
 
-    if (gpio_init_int(dev->params.dio3_pin, GPIO_IN, GPIO_RISING, sx127x_on_dio3_isr, dev) < 0) {
-        DEBUG("Error: cannot initialize DIO3 pin\n");
+    if (gpio_init_int(dev->params.dio3_pin, GPIO_IN, GPIO_RISING,
+                      sx127x_on_dio3_isr, dev) < 0) {
+        DEBUG("[sx127x] error: cannot initialize DIO3 pin\n");
     }
 }
 
@@ -253,11 +257,11 @@ static int _init_peripherals(sx127x_t *dev)
     res = spi_init_cs(dev->params.spi, dev->params.nss_pin);
 
     if (res != SPI_OK) {
-        DEBUG("sx127x: error initializing SPI_%i device (code %i)\n",
+        DEBUG("[sx127x] error initializing SPI_%i device (code %i)\n",
                   dev->params.spi, res);
         return 0;
     }
 
-    DEBUG("sx127x: peripherals initialized with success\n");
+    DEBUG("[sx127x] peripherals initialized with success\n");
     return 1;
 }
