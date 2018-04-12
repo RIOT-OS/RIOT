@@ -100,8 +100,8 @@ extern "C" {
 enum {
     SX127X_INIT_OK = 0,                /**< Initialization was successful */
     SX127X_ERR_SPI,                    /**< Failed to initialize SPI bus or CS line */
-    SX127X_ERR_TEST_FAILED,            /**< SX127X testing failed during initialization (check chip) */
-    SX127X_ERR_THREAD                  /**< Unable to create DIO handling thread (check amount of free memory) */
+    SX127X_ERR_GPIOS,                  /**< Failed to initialize GPIOs */
+    SX127X_ERR_NODEV                   /**< No valid device version found */
 };
 
 /**

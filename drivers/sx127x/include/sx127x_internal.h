@@ -42,12 +42,14 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Tests the transceiver version type.
+ * @brief   Check the transceiver version
  *
  * @param[in] dev                      The sx127x device descriptor
- * @return true if test passed, false otherwise
+ *
+ * @return 0 when a valid device version is found
+ * @return -1 when no valid device version is found
  */
-bool sx127x_test(const sx127x_t *dev);
+int sx127x_check_version(const sx127x_t *dev);
 
 /**
  * @brief   Writes the radio register at specified address.

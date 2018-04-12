@@ -42,7 +42,7 @@
 #define SX127X_SPI_MODE     (SPI_MODE_0)
 
 
-bool sx127x_test(const sx127x_t *dev)
+int sx127x_check_version(const sx127x_t *dev)
 {
     /* Read version number and compare with sx127x assigned revision */
     uint8_t version = sx127x_reg_read(dev, SX127X_REG_VERSION);
@@ -51,19 +51,19 @@ bool sx127x_test(const sx127x_t *dev)
     if (version != VERSION_SX1272) {
         DEBUG("[sx127x] sx1272 test failed, invalid version number: %d\n",
               version);
-        return false;
+        return -1;
     }
-    DEBUG("[sx127x] SX1272 transceiver detected.\n");
+    DEBUG("[sx127x] SX1272 transceiver detected\n");
 #else /* MODULE_SX1276) */
     if (version != VERSION_SX1276) {
         DEBUG("[sx127x] sx1276 test failed, invalid version number: %d\n",
               version);
-        return false;
+        return -1;
     }
-    DEBUG("[sx127x] SX1276 transceiver detected.\n");
+    DEBUG("[sx127x] SX1276 transceiver detected\n");
 #endif
 
-    return true;
+    return 0;
 }
 
 void sx127x_reg_write(const sx127x_t *dev, uint8_t addr, uint8_t data)
