@@ -2194,7 +2194,7 @@ static void _gomach_init(gnrc_netif_t *netif)
 
     netif->mac.tx.t2u_fail_count = 0;
 
-#if (GNRC_GOMACH_ENABLE_DUTYCYLE_RECORD == 1)
+#if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
     /* Start duty cycle recording */
     netif->mac.prot.gomach.system_start_time_ticks = xtimer_now_usec64();
     netif->mac.prot.gomach.last_radio_on_time_ticks =
