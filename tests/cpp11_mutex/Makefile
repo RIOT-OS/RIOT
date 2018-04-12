@@ -15,6 +15,8 @@ CXXEXFLAGS += -std=c++11
 USEMODULE += cpp11-compat
 USEMODULE += xtimer
 
+TEST_ON_CI_WHITELIST += all
+
 include $(RIOTBASE)/Makefile.include
 
 test:

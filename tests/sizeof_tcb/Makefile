@@ -8,6 +8,8 @@ include ../Makefile.tests_common
 # enabled by defaule:
 # DISABLE_MODULE += core_msg
 
+TEST_ON_CI_WHITELIST += all
+
 include $(RIOTBASE)/Makefile.include
 
 test:
