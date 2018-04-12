@@ -34,9 +34,7 @@ extern "C" {
 /**
  * @brief   IPv6 extension headers.
  *
- * @see <a href="https://tools.ietf.org/html/rfc2460#section-4">
- *          RFC 2460, section 4.1
- *      </a>
+ * @see [RFC 8200, section 4](https://tools.ietf.org/html/rfc8200#section-4)
  */
 typedef struct __attribute__((packed)) {
     uint8_t nh;     /**< next header */

@@ -204,7 +204,7 @@ static void test_gnrc_udp__csum_zero(void)
     int status = _compute_checksum(payload_data, sizeof(payload_data), &checksum);
 
     TEST_ASSERT_EQUAL_INT(0, status);
-    /* https://tools.ietf.org/html/rfc2460#section-8.1
+    /* https://tools.ietf.org/html/rfc8200#section-8.1
      * bullet 4
      * "if that computation yields a result of zero, it must be changed
      * to hex FFFF for placement in the UDP header."
@@ -228,7 +228,7 @@ static void test_gnrc_udp__csum_all(void)
 
         TEST_ASSERT_EQUAL_INT(0, status);
         if (i == 0xFFFF) {
-            /* https://tools.ietf.org/html/rfc2460#section-8.1
+            /* https://tools.ietf.org/html/rfc8200#section-8.1
              * bullet 4
              * "if that computation yields a result of zero, it must be changed
              * to hex FFFF for placement in the UDP header."
