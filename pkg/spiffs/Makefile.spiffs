@@ -1,0 +1,6 @@
+MODULE := spiffs
+
+# Disable 'ISO C99 doesn’t support unnamed structs/unions [-Werror=pedantic]'
+CFLAGS += -Wno-pedantic
+
+include $(RIOTBASE)/Makefile.base
