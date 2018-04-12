@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2017-2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,8 +27,20 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Error codes used by the rdcli_simple implementation
+ */
+enum {
+    RDCLI_SIMPLE_OK  = 0,       /**< all ok */
+    RDCLI_SIMPLE_ERR = -1,      /**< return for formatting and network errors */
+};
+
+/**
  * @brief   Initiate the node registration by sending an empty CoAP POST message
  *          to the RD server's /.well-known/core resource
+ *
+ * @return  RDCLI_SIMPLE_OK on success
+ * @return  RDCLI_ERROR if something goes wrong preparing or sending the
+ *          initial request
  */
 int rdcli_simple_register(void);
 

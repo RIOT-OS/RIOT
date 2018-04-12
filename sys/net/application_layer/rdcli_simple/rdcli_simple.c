@@ -42,19 +42,21 @@ static const sock_udp_ep_t remote = {
 int rdcli_simple_register(void)
 {
     /* build the initial CON packet */
-    int res = gcoap_req_init(&pkt, buf, sizeof(buf), COAP_METHOD_POST,
-                             "/.well-known/core");
-    if (res < 0) {
-        return res;
+    if (gcoap_req_init(&pkt, buf, sizeof(buf), COAP_METHOD_POST,
+                             "/.well-known/core") < 0) {
+        return RDCLI_SIMPLE_ERR;
     }
     /* make packet confirmable */
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
     /* add Uri-Query options */
-    res = rdcli_common_add_qstring(&pkt);
-    if (res < 0) {
-        return res;
+    if (rdcli_common_add_qstring(&pkt) < 0) {
+        return RDCLI_SIMPLE_ERR;
     }
     /* finish, we don't have any payload */
     ssize_t len = gcoap_finish(&pkt, 0, COAP_FORMAT_LINK);
-    return (int)gcoap_req_send2(buf, len, &remote, NULL);
+    if (gcoap_req_send2(buf, len, &remote, NULL) == 0) {
+        return RDCLI_SIMPLE_ERR;
+    }
+
+    return RDCLI_SIMPLE_OK;
 }
