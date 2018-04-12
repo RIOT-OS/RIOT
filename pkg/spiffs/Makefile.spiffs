@@ -1,0 +1,3 @@
+MODULE := spiffs
+
+include $(RIOTBASE)/Makefile.base
