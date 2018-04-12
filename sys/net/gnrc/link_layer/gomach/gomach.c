@@ -949,15 +949,6 @@ static void gomach_t2k_end(gnrc_netif_t *netif)
     netif->mac.rx.listen_state = GNRC_GOMACH_LISTEN_SLEEP;
     gnrc_gomach_set_enter_new_cycle(netif, false);
     gnrc_gomach_set_update(netif, true);
-
-#if (GNRC_GOMACH_ENABLE_DUTYCYLE_RECORD == 1)
-    /* Output duty-cycle ratio */
-    uint64_t duty;
-    duty = xtimer_now_usec64();
-    duty = (netif->mac.prot.gomach.awake_duration_sum_ticks) * 100 /
-           (duty - netif->mac.prot.gomach.system_start_time_ticks);
-    printf("[GoMacH]: achieved radio duty-cycle: %lu %% \n", (uint32_t)duty);
-#endif
 }
 
 static void gomach_t2k_update(gnrc_netif_t *netif)
@@ -1406,15 +1397,6 @@ static void gomach_t2u_end(gnrc_netif_t *netif)
     netif->mac.rx.listen_state = GNRC_GOMACH_LISTEN_SLEEP;
     gnrc_gomach_set_enter_new_cycle(netif, false);
     gnrc_gomach_set_update(netif, true);
-
-#if (GNRC_GOMACH_ENABLE_DUTYCYLE_RECORD == 1)
-    /* Output duty-cycle ratio */
-    uint64_t duty;
-    duty = xtimer_now_usec64();
-    duty = (netif->mac.prot.gomach.awake_duration_sum_ticks) * 100 /
-           (duty - netif->mac.prot.gomach.system_start_time_ticks);
-    printf("[GoMacH]: achieved radio duty-cycle: %lu %% \n", (uint32_t)duty);
-#endif
 }
 
 static void gomach_t2u_update(gnrc_netif_t *netif)
@@ -2004,6 +1986,17 @@ static void _gomach_msg_handler(gnrc_netif_t *netif, msg_t *msg)
             gnrc_gomach_set_update(netif, true);
             break;
         }
+#if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
+        case GNRC_MAC_TYPE_GET_DUTYCYCLE: {
+            /* Output GoMacH's current radio duty-cycle. */
+            uint64_t duty;
+            duty = xtimer_now_usec64();
+            duty = (netif->mac.prot.gomach.awake_duration_sum_ticks) * 100 /
+                   (duty - netif->mac.prot.gomach.system_start_time_ticks);
+            printf("[GoMacH]: achieved radio duty-cycle: %lu %% \n", (uint32_t)duty);
+            break;
+        }
+#endif
         default: {
             DEBUG("[GoMacH]: Unknown command %" PRIu16 "\n", msg->type);
             break;
