@@ -39,12 +39,15 @@ static void *reg_runner(void *arg)
 
     while (1) {
         if (rdcli_simple_register() != RDCLI_SIMPLE_OK) {
-            LOG_ERROR("[rdcli_simple] error: unable to trigger registration\n");
+            /* if this fails once, it will always fail, so we might as well
+             * quit now */
+            LOG_ERROR("[rdcli_simple] error: unable to send registration\n");
+            break;
         }
         xtimer_sleep(RDCLI_UPDATE_INTERVAL);
     }
 
-    return NULL;    /* should never be reached */
+    return NULL;
 }
 
 void rdcli_simple_run(void)
