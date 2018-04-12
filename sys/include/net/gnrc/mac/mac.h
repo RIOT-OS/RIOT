@@ -56,6 +56,15 @@ extern "C" {
 #define GNRC_MAC_TX_QUEUE_SIZE             (8U)
 #endif
 
+/**
+ * @brief Enable/disable MAC radio duty-cycle recording and displaying.
+ *
+ * Set "1" to enable, set "0" to disable.
+ */
+#ifndef GNRC_MAC_ENABLE_DUTYCYCLE_RECORD
+#define GNRC_MAC_ENABLE_DUTYCYCLE_RECORD    (1U)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
