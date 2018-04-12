@@ -41,6 +41,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   MAC message type for getting radio's duty-cycle.
+ */
+#ifndef GNRC_MAC_TYPE_GET_DUTYCYCLE
+#define GNRC_MAC_TYPE_GET_DUTYCYCLE      (0x4401)
+#endif
+
+/**
  * @brief definition for device transmission feedback types
  */
 typedef enum {

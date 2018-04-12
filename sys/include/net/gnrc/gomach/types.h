@@ -85,15 +85,6 @@ extern "C" {
 #define GNRC_GOMACH_TYPE_KNOWN             (1U)
 
 /**
- * @brief Enable/disable duty-cycle record and print out.
- *
- * Set "1" to enable, set "0" to disable.
- */
-#ifndef GNRC_GOMACH_ENABLE_DUTYCYLE_RECORD
-#define GNRC_GOMACH_ENABLE_DUTYCYLE_RECORD    (0U)
-#endif
-
-/**
  * @brief   State-machine states of Broadcast procedure of GoMacH.
  */
 typedef enum {
@@ -304,8 +295,7 @@ typedef struct gomach {
     uint8_t rx_pkt_lqi;                                         /**< LQI of latest received
                                                                      packet */
 
-
-#if (GNRC_GOMACH_ENABLE_DUTYCYLE_RECORD == 1)
+#if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
     /* Parameters for recording duty-cycle */
     uint64_t last_radio_on_time_ticks;                          /**< The last time in ticks
                                                                      when radio is on */
