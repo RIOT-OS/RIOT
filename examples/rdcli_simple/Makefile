@@ -35,9 +35,11 @@ CFLAGS += -DDEVELHELP
 RD_LT ?= 60
 # Override this variable to set the RD server address (default is the all nodes
 # multicast address)
-RD_SERVER ?= IPV6_ADDR_ALL_NODES_LINK_LOCAL
+RD_ADDR ?= \"ff02::1\"
+RD_PORT ?= 5683
 
 CFLAGS += -DRDCLI_LT=$(RD_LT)
-CFLAGS += -DRDCLI_SERVER_ADDR=$(RD_SERVER)
+CFLAGS += -DRDCLI_SERVER_ADDR=$(RD_ADDR)
+CFLAGS += -DRDCLI_SERVER_PORT=$(RD_PORT)
 
 include $(RIOTBASE)/Makefile.include

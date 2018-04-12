@@ -38,14 +38,16 @@ static void *reg_runner(void *arg)
     xtimer_sleep(RDCLI_STARTUP_DELAY);
 
     while (1) {
-        int res = rdcli_simple_register();
-        if (res < 0) {
-            LOG_ERROR("[rdcli_simple] error: unable to trigger registration\n");
+        if (rdcli_simple_register() != RDCLI_SIMPLE_OK) {
+            /* if this fails once, it will always fail, so we might as well
+             * quit now */
+            LOG_ERROR("[rdcli_simple] error: unable to send registration\n");
+            break;
         }
         xtimer_sleep(RDCLI_UPDATE_INTERVAL);
     }
 
-    return NULL;    /* should never be reached */
+    return NULL;
 }
 
 void rdcli_simple_run(void)
