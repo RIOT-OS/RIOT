@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "cpu.h"
 #include "periph_conf.h"
@@ -51,9 +52,12 @@ int main(void)
     puts("Initializing the RTT driver");
     rtt_init();
 
-    puts("Setting initial alarm");
-    last = TICKS_TO_WAIT;
-    rtt_set_alarm(TICKS_TO_WAIT, cb, 0);
+    uint32_t now = rtt_get_counter();
+    printf("RTT now: %" PRIu32 "\n", now);
+
+    last = (now + TICKS_TO_WAIT) & RTT_MAX_VALUE;
+    printf("Setting initial alarm to now + 10 s (%" PRIu32 ")\n", last);
+    rtt_set_alarm(last, cb, 0);
 
     puts("Done setting up the RTT, wait for many Hellos");
     return 0;
