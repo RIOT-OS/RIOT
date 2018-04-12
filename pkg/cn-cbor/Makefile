@@ -1,6 +1,6 @@
 PKG_NAME=cn-cbor
 PKG_URL=https://github.com/cabo/cn-cbor
-PKG_VERSION=2f9c3b1931eb012909e74f3b628e6a31fd446ad1
+PKG_VERSION=f1cf9ffdf5cfab935a45900556f9b68af925c256
 PKG_LICENSE=MIT
 
 .PHONY: all
