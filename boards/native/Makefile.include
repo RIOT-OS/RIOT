@@ -1,7 +1,9 @@
-export CPU = native
+export NATIVEINCLUDES += -DNATIVE_INCLUDES
+export NATIVEINCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
+export NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
+export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
-# Configuration for core/include/kernel_types.h
-CFLAGS += -DNATIVE_INCLUDES
+export CPU = native
 
 USEMODULE += native-drivers
 
@@ -113,7 +115,7 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
-all-valgrind: export CFLAGS += $(shell pkg-config valgrind --cflags)
+all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
 all-debug: export CFLAGS += -g
 all-cachegrind: export CFLAGS += -g
 all-gprof: export CFLAGS += -pg
@@ -121,6 +123,8 @@ all-gprof: export LINKFLAGS += -pg
 all-asan: export CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
 all-asan: export CFLAGS += -DNATIVE_IN_CALLOC
 all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g
+
+export INCLUDES += $(NATIVEINCLUDES)
 
 export CFLAGS += -DDEBUG_ASSERT_VERBOSE
 
