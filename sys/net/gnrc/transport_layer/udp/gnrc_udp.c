@@ -87,7 +87,7 @@ static uint16_t _calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr,
     }
     /* return inverted results */
     if (csum == 0xFFFF) {
-        /* https://tools.ietf.org/html/rfc2460#section-8.1
+        /* https://tools.ietf.org/html/rfc8200#section-8.1
          * bullet 4
          * "if that computation yields a result of zero, it must be changed
          * to hex FFFF for placement in the UDP header."
@@ -137,7 +137,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     /* validate checksum */
     if (byteorder_ntohs(hdr->checksum) == 0) {
-        /* RFC 2460 Section 8.1
+        /* RFC 8200 Section 8.1
          * "IPv6 receivers must discard UDP packets containing a zero checksum,
          * and should log the error."
          */
