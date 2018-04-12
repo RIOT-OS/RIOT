@@ -2,6 +2,7 @@
 #define AT_EOL            "\r\n"
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "shell.h"
 #include "xtimer.h"
@@ -88,8 +89,13 @@ int _modem_init_pdp_handler(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    gsm_setup_pdp_context((gsm_t *)&modem, 0, GSM_CTX_IP, argv[1],
-            (argv[2]) ? argv[2] : NULL, (argv[3]) ? argv[3] : NULL);
+    if(argc < 2) {
+        printf("Usage: %s <context> <apn> [user [pass]]\n", argv[0]);
+        return 1;
+    }
+
+    gsm_setup_pdp_context((gsm_t *)&modem,  (uint8_t)atoi(argv[1]), GSM_CTX_IP, argv[2],
+            (argv[3]) ? argv[3] : NULL, (argv[4]) ? argv[4] : NULL);
     return 0;
 }
 
@@ -140,7 +146,7 @@ int _modem_cpin_handler(int argc, char **argv)
 
 
     result = gsm_set_pin((gsm_t *)&modem, argv[1]);
-    if(result) {
+    if(result >= 0) {
         printf("Simcard unlocked\n");
     }
 
@@ -151,7 +157,7 @@ static const shell_command_t commands[] = {
     {"atcmd",        "Sends an AT cmd",     _at_send_handler},
     {"modem_status", "Print Modem status",  _modem_status_handler},
     {"init",         "Init modem",          _modem_init_handler},
-    {"init_pdp",     "Init GPRS connection",_modem_init_pdp_handler},
+    {"init_pdp",     "Init PDP context",    _modem_init_pdp_handler},
     {"simpin",       "Enter simpin",        _modem_cpin_handler},
     {"sim_status",   "Check sim status",    _modem_cpin_status_handler},
     {"ppp_dial",     "PPP Dial out",        _modem_ppp_dialout_handler},
