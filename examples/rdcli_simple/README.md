@@ -14,7 +14,11 @@ CFLAGS="-DRDCLI_LT=\"7200\" -DRDCLI_EP=\"MyNode\"" make all
 
 Per default, the node is looking for the CoRE RD at the all nodes link-local
 multicast address [FF02::1]:5683. To change the target address or port, simply
-redefine `RDCLI_SERVER_ADDR` and `RDCLI_SERVER_PORT`, e.g.:
+override the `RD_ADDR` and `RD_PORT` variables, e.g.:
 ```
-CFLAGS="-DRDCLI_SERVER_ADDR=IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL" make all
+RD_ADDR=\\\"::1\\\" RD_PORT=12345 make all
+```
+or
+```
+RD_ADDR=\\\"abc:0815::123\\\" make all
 ```
