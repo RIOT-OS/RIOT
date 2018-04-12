@@ -378,7 +378,12 @@ int main(void)
     memcpy(&sx127x.params, sx127x_params, sizeof(sx127x_params));
     netdev_t *netdev = (netdev_t*) &sx127x;
     netdev->driver = &sx127x_driver;
-    netdev->driver->init(netdev);
+
+    if (netdev->driver->init(netdev) < 0) {
+        puts("Failed to initialize SX127x device, exiting");
+        return 1;
+    }
+
     netdev->event_callback = _event_cb;
 
     _recv_pid = thread_create(stack, sizeof(stack), THREAD_PRIORITY_MAIN - 1,
