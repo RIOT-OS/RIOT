@@ -197,7 +197,7 @@ ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
 {
     ipv6_hdr_t *hdr = NULL;
     gnrc_pktsnip_t *tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
-    if ((tmp) && ipv6_hdr_is(tmp->data)) {
+    if ((tmp != NULL) && (tmp->data != NULL) && ipv6_hdr_is(tmp->data)) {
         hdr = ((ipv6_hdr_t*) tmp->data);
     }
 
@@ -715,7 +715,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 
     for (ipv6 = pkt; ipv6 != NULL; ipv6 = ipv6->next) { /* find IPv6 header if already marked */
         if ((ipv6->type == GNRC_NETTYPE_IPV6) && (ipv6->size == sizeof(ipv6_hdr_t)) &&
-            (ipv6_hdr_is(ipv6->data))) {
+            (ipv6->data != NULL) && (ipv6_hdr_is(ipv6->data))) {
             break;
         }
 
@@ -723,7 +723,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     }
 
     if (ipv6 == NULL) {
-        if (!ipv6_hdr_is(pkt->data)) {
+        if ((pkt->data == NULL) || !ipv6_hdr_is(pkt->data)) {
             DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
             gnrc_pktbuf_release(pkt);
             return;
