@@ -5,4 +5,9 @@ CFLAGS += -Wno-unused-parameter -Wno-format
 # used by MIPS
 CFLAGS += -Wno-missing-field-initializers
 
+# Disable debug printing
+ifneq ($(DEVELHELP),1)
+  CFLAGS += -DLFS_NO_DEBUG -DLFS_NO_WARN -DLFS_NO_ERROR
+endif
+
 include $(RIOTBASE)/Makefile.base
