@@ -75,8 +75,10 @@ int main(void)
 
     /* print RD client information */
     puts("RD client information:");
-    printf("  ep: %s\n", rdcli_common_get_ep());
-    printf("  lt: %is\n", (int)RDCLI_LT);
+    printf(" RD addr: %s\n", RDCLI_SERVER_ADDR);
+    printf(" RD port: %u\n", (unsigned)RDCLI_SERVER_PORT);
+    printf("      ep: %s\n", rdcli_common_get_ep());
+    printf("      lt: %is\n", (int)RDCLI_LT);
 
     /* run the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
