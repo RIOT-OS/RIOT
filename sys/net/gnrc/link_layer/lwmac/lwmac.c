@@ -931,7 +931,7 @@ static void _lwmac_init(gnrc_netif_t *netif)
     /* Start duty cycling */
     lwmac_set_state(netif, GNRC_LWMAC_START);
 
-#if (GNRC_LWMAC_ENABLE_DUTYCYLE_RECORD == 1)
+#if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
     /* Start duty cycle recording */
     netif->mac.prot.lwmac.system_start_time_ticks = rtt_get_counter();
     netif->mac.prot.lwmac.last_radio_on_time_ticks = netif->mac.prot.lwmac.system_start_time_ticks;
