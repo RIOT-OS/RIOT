@@ -122,7 +122,7 @@ static inline void cortexm_sleep(int deep)
 static inline void cortexm_isr_end(void)
 {
     if (sched_context_switch_request) {
-        thread_yield();
+        thread_yield_higher();
     }
 }
 
