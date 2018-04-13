@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016-17 Kaspar Schleiser <kaspar@schleiser.de>
  *               2017 Freie Universität Berlin
+ *               2018 Josua Arndt
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Martine Lenders <m.lenders@fu-berlin.de>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
  * @}
  */
@@ -102,16 +104,17 @@ static void _update_timer(evtimer_t *evtimer)
 
 static uint32_t _get_offset(xtimer_t *timer)
 {
-    uint64_t now = xtimer_now_usec64();
-    uint64_t target = ((uint64_t)timer->long_target) << 32 | timer->target;
+    uint64_t now_us = xtimer_now_usec64();
+    uint64_t target_us = _xtimer_usec_from_ticks64(
+                        ((uint64_t)timer->long_target) << 32 | timer->target);
 
-    if (target <= now) {
+    if (target_us <= now_us) {
         return 0;
     }
     else {
-        target -= now;
+        target_us -= now_us;
         /* add half of 125 so integer division rounds to nearest */
-        return div_u64_by_125((target >> 3) + 62);
+        return div_u64_by_125((target_us >> 3) + 62);
     }
 }
 
