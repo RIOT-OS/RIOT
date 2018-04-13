@@ -59,7 +59,7 @@ int main(void)
 
         /* format data */
         for (int i = 0; i < 3; i++) {
-            size_t len = fmt_s16_dfp(str_out[i], data[i], 3);
+            size_t len = fmt_s16_dfp(str_out[i], data[i], -3);
             str_out[i][len] = '\0';
         }
 
