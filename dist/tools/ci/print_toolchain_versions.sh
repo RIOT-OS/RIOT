@@ -50,27 +50,27 @@ avr_libc_version() {
 
 printf "%s\n" "Installed compiler toolchains "
 printf "%s\n" "-----------------------------"
-printf "%21s: %s\n" "native gcc" "$(get_cmd_version gcc)"
+printf "%23s: %s\n" "native gcc" "$(get_cmd_version gcc)"
 for p in arm-none-eabi avr mips-mti-elf msp430 riscv-none-embed; do
-    printf "%21s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
+    printf "%23s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
 done
-printf "%21s: %s\n" "clang" "$(get_cmd_version clang)"
+printf "%23s: %s\n" "clang" "$(get_cmd_version clang)"
 printf "\n"
 printf "%s\n" "Installed compiler libs"
 printf "%s\n" "-----------------------"
 # platform specific newlib version
 for p in arm-none-eabi mips-mti-elf riscv-none-embed; do
-    printf "%21s: %s\n" "$p-newlib" "$(newlib_version ${p}-gcc)"
+    printf "%23s: %s\n" "$p-newlib" "$(newlib_version ${p}-gcc)"
 done
 # avr libc version
-printf "%21s: %s\n" "avr-libc" "$(avr_libc_version avr-gcc)"
+printf "%23s: %s\n" "avr-libc" "$(avr_libc_version avr-gcc)"
 # tools
 printf "\n"
 printf "%s\n" "Installed development tools"
 printf "%s\n" "---------------------------"
 for c in cmake cppcheck doxygen flake8 git; do
-    printf "%21s: %s\n" "$c" "$(get_cmd_version $c)"
+    printf "%23s: %s\n" "$c" "$(get_cmd_version $c)"
 done
-printf "%21s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
+printf "%23s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
 
 exit 0
