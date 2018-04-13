@@ -91,14 +91,6 @@ extern "C" {
 #define GNRC_LWMAC_RADIO_IS_ON               (0x04)
 
 /**
- * @brief   Enable/disable duty-cycle record and print out.
- *          Set "1" to enable, set "0" to disable.
- */
-#ifndef GNRC_LWMAC_ENABLE_DUTYCYLE_RECORD
-#define GNRC_LWMAC_ENABLE_DUTYCYLE_RECORD    (0U)
-#endif
-
-/**
  * @brief The default largest number of parallel timeouts in LWMAC
  */
 #ifndef GNRC_LWMAC_TIMEOUT_COUNT
@@ -204,7 +196,7 @@ typedef struct lwmac {
     uint8_t lwmac_info;                                         /**< LWMAC's internal informations (flags) */
     gnrc_lwmac_timeout_t timeouts[GNRC_LWMAC_TIMEOUT_COUNT];    /**< Store timeouts used for protocol */
 
-#if (GNRC_LWMAC_ENABLE_DUTYCYLE_RECORD == 1)
+#if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
     /* Parameters for recording duty-cycle */
     uint32_t last_radio_on_time_ticks;                          /**< The last time in ticks when radio is on */
     uint32_t radio_off_time_ticks;                              /**< The time in ticks when radio is off */
