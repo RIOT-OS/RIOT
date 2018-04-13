@@ -1,1 +1,4 @@
 INCLUDES += -I$(PKGDIRBASE)/cn-cbor/include
+
+#enable context pointer
+CFLAGS += -DUSE_CBOR_CONTEXT
