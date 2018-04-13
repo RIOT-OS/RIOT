@@ -51,7 +51,7 @@ avr_libc_version() {
 printf "%s\n" "Installed compiler toolchains "
 printf "%s\n" "-----------------------------"
 printf "%21s: %s\n" "native gcc" "$(get_cmd_version gcc)"
-for p in arm-none-eabi avr mips-mti-elf msp430; do
+for p in arm-none-eabi avr mips-mti-elf msp430 riscv-none-embed; do
     printf "%21s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
 done
 printf "%21s: %s\n" "clang" "$(get_cmd_version clang)"
@@ -59,7 +59,7 @@ printf "\n"
 printf "%s\n" "Installed compiler libs"
 printf "%s\n" "-----------------------"
 # platform specific newlib version
-for p in arm-none-eabi mips-mti-elf; do
+for p in arm-none-eabi mips-mti-elf riscv-none-embed; do
     printf "%21s: %s\n" "$p-newlib" "$(newlib_version ${p}-gcc)"
 done
 # avr libc version
