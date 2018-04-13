@@ -38,7 +38,7 @@
 /**
  * @brief Write a single data to the LED controller
  */
-void _write(my9221_t *dev, uint16_t data)
+static void _write(my9221_t *dev, uint16_t data)
 {
     assert(dev);
 
@@ -52,7 +52,7 @@ void _write(my9221_t *dev, uint16_t data)
 /**
  * @brief Load data into the latch register of the LED controller
  */
-void _latch(my9221_t *dev)
+static void _latch(my9221_t *dev)
 {
     assert(dev);
 
@@ -68,7 +68,7 @@ void _latch(my9221_t *dev)
 /**
  * @brief Write state data of all LEDs to the controller
  */
-void _set_state(my9221_t *dev)
+static void _set_state(my9221_t *dev)
 {
     assert(dev);
 
