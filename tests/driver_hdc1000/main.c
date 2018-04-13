@@ -51,9 +51,9 @@ int main(void)
         size_t len;
         hdc1000_read(&dev, &temp, &hum);
 
-        len = fmt_s16_dfp(tstr, temp, 2);
+        len = fmt_s16_dfp(tstr, temp, -2);
         tstr[len] = '\0';
-        len = fmt_s16_dfp(hstr, hum, 2);
+        len = fmt_s16_dfp(hstr, hum, -2);
         hstr[len] = '\0';
         printf("Reading: T: %s °C  RH: %s %%\n", tstr, hstr);
 

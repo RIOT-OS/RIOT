@@ -64,7 +64,7 @@ void phydat_dump(phydat_t *data, uint8_t dim)
         }
         else if ((data->scale > -5) && (data->scale < 0)) {
             char num[8];
-            size_t len = fmt_s16_dfp(num, data->val[i], data->scale * -1);
+            size_t len = fmt_s16_dfp(num, data->val[i], data->scale);
             num[len] = '\0';
             printf("%s", num);
         }
