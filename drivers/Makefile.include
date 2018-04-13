@@ -46,6 +46,10 @@ ifneq (,$(filter cc2420,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc2420/include
 endif
 
+ifneq (,$(filter ccs811,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ccs811/include
+endif
+
 ifneq (,$(filter dht,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dht/include
 endif
