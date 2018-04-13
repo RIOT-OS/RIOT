@@ -32,22 +32,15 @@ typedef struct {
     cn_cbor_error err;
 } cbor_failure;
 
-static cn_cbor *cbor;
 static size_t test, offs;
 static unsigned char ebuf[EBUF_SIZE];
 static cn_cbor_errback errb;
 
 static void setup_cn_cbor(void)
 {
-    cbor = NULL;
     test = 0;
     offs = 0;
     memset(ebuf, '\0', EBUF_SIZE);
-}
-
-static void teardown_cn_cbor(void)
-{
-        cn_cbor_free(cbor);
 }
 
 static void test_parse(void)
@@ -114,7 +107,7 @@ static void test_parse(void)
 
         errb.err = CN_CBOR_NO_ERROR;
 
-        cbor = cn_cbor_decode(buf, len, &errb);
+        cn_cbor *cbor = cn_cbor_decode(buf, len, &errb);
         TEST_ASSERT_EQUAL_INT(errb.err, CN_CBOR_NO_ERROR);
         TEST_ASSERT_NOT_NULL(cbor);
 
@@ -122,6 +115,7 @@ static void test_parse(void)
         for (offs = 0; offs < len; offs++) {
             TEST_ASSERT_EQUAL_INT(buf[offs], ebuf[offs]);
         }
+        cn_cbor_free(cbor);
     }
 }
 
@@ -149,9 +143,10 @@ static void test_errors(void)
         size_t len = fmt_hex_bytes(buf, tests[offs].hex);
         TEST_ASSERT(len);
 
-        cbor = cn_cbor_decode(buf, len, &errb);
+        cn_cbor *cbor = cn_cbor_decode(buf, len, &errb);
         TEST_ASSERT_NULL(cbor);
         TEST_ASSERT_EQUAL_INT(errb.err, tests[offs].err);
+        cn_cbor_free(cbor);
     }
 }
 
@@ -162,7 +157,7 @@ TestRef test_cn_cbor(void)
         new_TestFixture(test_errors)
     };
 
-    EMB_UNIT_TESTCALLER(tests_cn_cbor, setup_cn_cbor, teardown_cn_cbor, fixtures);
+    EMB_UNIT_TESTCALLER(tests_cn_cbor, setup_cn_cbor, NULL, fixtures);
     return (TestRef) & tests_cn_cbor;
 }
 
