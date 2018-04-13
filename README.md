@@ -1,3 +1,5 @@
+[![Nightly CI status master](https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg)](https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/output.html)
+
                           ZZZZZZ
                         ZZZZZZZZZZZZ
                       ZZZZZZZZZZZZZZZZ
