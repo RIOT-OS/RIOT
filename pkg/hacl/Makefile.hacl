@@ -1,0 +1,5 @@
+MODULE=hacl
+
+include $(RIOTBASE)/Makefile.base
+
+CFLAGS += -DKRML_NOUINT128 -Wno-unused-parameter
