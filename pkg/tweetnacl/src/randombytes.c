@@ -7,11 +7,7 @@
  */
 
 #include <stdint.h>
-#include <string.h>
-
 #include "random.h"
-
-#include <stdio.h>
 
 void randombytes(uint8_t *target, uint64_t n)
 {
