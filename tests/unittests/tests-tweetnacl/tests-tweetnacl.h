@@ -26,22 +26,9 @@ extern "C" {
 #endif
 
 /**
- * @brief MANDATORY function for collecting random Bytes
- *        required by the tweetnacl package
- */
-extern void randombytes(uint8_t *target, uint64_t n);
-
-/**
 *  @brief   The entry point of this test suite.
 */
 void tests_tweetnacl(void);
-
-/**
- * @brief   Generates tests for tweetnacl
- *
- * @return  embUnit tests if successful, NULL if not.
- */
-Test *tests_tweetnacl_tests(void);
 
 #ifdef __cplusplus
 }
