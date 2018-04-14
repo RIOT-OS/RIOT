@@ -32,9 +32,6 @@
 #include "debug.h"
 #define ENABLE_DEBUG      (0)
 
-/* guard file in case no I2C device is defined */
-#if I2C_NUMOF
-
 #define MT_START            0x08
 #define MT_START_REPEATED   0x10
 #define MT_ADDRESS_ACK      0x18
@@ -369,5 +366,3 @@ static void _stop(void)
     DEBUG("STOP condition transmitted\n");
     TWCR = 0;
 }
-
-#endif /* I2C_NUMOF */
