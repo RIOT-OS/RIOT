@@ -36,9 +36,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* guard this file in case no I2C device is defined */
-#if I2C_NUMOF
-
 #ifndef I2C_0_SCL_PIN
 #define I2C_0_SCL_PIN i2c_config[I2C_0].scl_pin
 #endif
@@ -666,5 +663,3 @@ void i2c_poweroff(i2c_t dev)
         SYS_CTRL_DCGCI2C &= ~1; /**< Disable the I2C0 clock. */
     }
 }
-
-#endif /* I2C_NUMOF */
