@@ -53,7 +53,7 @@ u8g2_SetDevice(&u8g2, SPI_DEV(0));
 For targets without an I2C or SPI, virtual displays are available. These displays are part of U8g2, but are not compiled by default.
 
 * By adding `USEMODULE += u8g2_utf8`, a terminal display is used as virtual display, using UTF8 block characters that are printed to stdout.
-* By adding `USEMODULE += u8g2_sdl`, a SDL virtual display will be used. This is only available on native targets that have SDL installed. It uses `sdl-config` to find the headers and libraries. Note that RIOT-OS builds 32-bit binaries and requires 32-bit SDL libraries.
+* By adding `USEMODULE += u8g2_sdl`, a SDL virtual display will be used. This is only available on native targets that have SDL installed. It uses `sdl2-config` to find the headers and libraries. Note that RIOT-OS builds 32-bit binaries and requires 32-bit SDL libraries.
 
 ### Example
 ```

@@ -63,6 +63,12 @@
 #include <stdio.h>
 
 #include "periph/gpio.h"
+#if TEST_OUTPUT == TEST_OUTPUT_SPI
+#include "periph/spi.h"
+#endif
+#if TEST_OUTPUT == TEST_OUTPUT_I2C
+#include "periph/i2c.h"
+#endif
 
 #include "xtimer.h"
 #include "u8g2.h"
@@ -143,7 +149,7 @@ int main(void)
     TEST_DISPLAY(&u8g2, U8G2_R0, u8x8_byte_riotos_hw_spi, u8x8_gpio_and_delay_riotos);
 
     u8g2_SetPins(&u8g2, pins, pins_enabled);
-    u8g2_SetDevice(&u8g2, TEST_SPI);
+    u8g2_SetDevice(&u8g2, SPI_DEV(TEST_SPI));
 #endif
 
     /* initialize to I2C */
@@ -153,7 +159,7 @@ int main(void)
     TEST_DISPLAY(&u8g2, U8G2_R0, u8x8_byte_riotos_hw_i2c, u8x8_gpio_and_delay_riotos);
 
     u8g2_SetPins(&u8g2, pins, pins_enabled);
-    u8g2_SetDevice(&u8g2, TEST_I2C);
+    u8g2_SetDevice(&u8g2, I2C_DEV(TEST_I2C));
     u8g2_SetI2CAddress(&u8g2, TEST_ADDR);
 #endif
 
@@ -166,27 +172,34 @@ int main(void)
     /* start drawing in a loop */
     puts("Drawing on screen.");
 
-    while (true) {
+    while (1) {
         u8g2_FirstPage(&u8g2);
 
         do {
             u8g2_SetDrawColor(&u8g2, 1);
             u8g2_SetFont(&u8g2, u8g2_font_helvB12_tf);
 
-            if (screen == 0) {
-                u8g2_DrawStr(&u8g2, 12, 22, "THIS");
-            }
-            else if (screen == 1) {
-                u8g2_DrawStr(&u8g2, 24, 22, "IS");
-            }
-            else if (screen == 2) {
-                u8g2_DrawBitmap(&u8g2, 0, 0, 8, 32, logo);
+            switch (screen) {
+                case 0:
+                    u8g2_DrawStr(&u8g2, 12, 22, "THIS");
+                    break;
+                case 1:
+                    u8g2_DrawStr(&u8g2, 24, 22, "IS");
+                    break;
+                case 2:
+                    u8g2_DrawBitmap(&u8g2, 0, 0, 8, 32, logo);
+                    break;
             }
         } while (u8g2_NextPage(&u8g2));
 
 #if TEST_OUTPUT == TEST_OUTPUT_STDOUT
         /* transfer screen buffer to stdout */
         utf8_show();
+#endif
+
+#if TEST_OUTPUT == TEST_OUTPUT_SDL
+        /* handle SDL events */
+        u8g_sdl_get_key();
 #endif
 
         /* show screen in next iteration */
