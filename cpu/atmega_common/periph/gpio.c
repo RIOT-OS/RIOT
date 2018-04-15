@@ -30,6 +30,7 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
+#include "periph_cpu.h"
 
 #define GPIO_BASE_PORT_A        (0x20)
 #define GPIO_OFFSET_PORT_H      (0xCB)
@@ -40,18 +41,18 @@
  * @brief     Define GPIO interruptions for an specific atmega CPU, by default
  *            2 (for small atmega CPUs)
  */
-#if defined(INT2_vect)
-#define GPIO_EXT_INT_NUMOF      (3U)
+#if defined(INT7_vect)
+#define GPIO_EXT_INT_NUMOF      (8U)
+#elif defined(INT6_vect)
+#define GPIO_EXT_INT_NUMOF      (7U)
+#elif defined(INT5_vect)
+#define GPIO_EXT_INT_NUMOF      (6U)
+#elif defined(INT4_vect)
+#define GPIO_EXT_INT_NUMOF      (5U)
 #elif defined(INT3_vect)
 #define GPIO_EXT_INT_NUMOF      (4U)
-#elif defined(INT4_vect)
-#define GPIO_EXT_INT_NUMOF      (4U)
-#elif defined(INT5_vect)
-#define GPIO_EXT_INT_NUMOF      (4U)
-#elif defined(INT6_vect)
-#define GPIO_EXT_INT_NUMOF      (4U)
-#elif defined(INT7_vect)
-#define GPIO_EXT_INT_NUMOF      (4U)
+#elif defined(INT2_vect)
+#define GPIO_EXT_INT_NUMOF      (3U)
 #else
 #define GPIO_EXT_INT_NUMOF      (2U)
 #endif
@@ -109,6 +110,21 @@ static inline uint16_t _pin_addr(gpio_t pin)
     return (_port_addr(pin) - 0x02);
 }
 
+static inline int8_t _int_num(gpio_t pin)
+{
+    uint8_t num;
+    const gpio_t ext_ints[GPIO_EXT_INT_NUMOF] = CPU_ATMEGA_EXT_INTS;
+
+    /* find pin in ext_ints array to get the interrupt number */
+    for (num = 0; num < GPIO_EXT_INT_NUMOF; num++) {
+        if (pin == ext_ints[num]) {
+            return num;
+        }
+    }
+
+    return -1;
+}
+
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     switch (mode) {
@@ -132,20 +148,14 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    uint8_t pin_num = _pin_num(pin);
+    int8_t int_num = _int_num(pin);
 
-    if ((_port_num(pin) == PORT_D && pin_num > 3)
-#if defined (PORTE)
-         || (_port_num(pin) == PORT_E && pin_num < 4)
-         || (_port_num(pin) != PORT_D && _port_num(pin) != PORT_E)
-#elif defined(CPU_ATMEGA328P)
-         || (pin_num < 2) || (_port_num(pin) != PORT_D)
-#elif defined(CPU_ATMEGA1284P)
-         || (_port_num(pin) == PORT_B && pin_num != 2)
-         || (_port_num(pin) == PORT_D && pin_num < 2)
-         || (_port_num(pin) != PORT_D && _port_num(pin) != PORT_D)
-#endif
-         || ((mode != GPIO_IN) && (mode != GPIO_IN_PU))) {
+    if ((mode != GPIO_IN) && (mode != GPIO_IN_PU)) {
+        return -1;
+    }
+
+    /* not a valid interrupt pin */
+    if (int_num < 0) {
         return -1;
     }
 
@@ -154,35 +164,27 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* clear global interrupt flag */
     cli();
 
-#if defined(CPU_ATMEGA328P)
-    /* INT pins start at PD2 instead of at PD0 */
-    pin_num -= 2;
-#elif defined(CPU_ATMEGA1284P)
-    /* INT pins start at PD2 instead of at PD0 on PORT_D */
-    if (_port_num(pin) == PORT_D) {
-        pin_num -= 2;
-    }
-#endif
-
-    EIMSK |= (1 << pin_num);
+    /* enable interrupt number int_num */
+    EIMSK |= (1 << int_num);
 
     /* configure the flank */
     if (flank > GPIO_RISING) {
         return -1;
     }
 
-    if (pin_num < 4) {
-        EICRA |= (flank << (pin_num * 2));
+    /* apply flank to interrupt number int_num */
+    if (int_num < 4) {
+        EICRA |= (flank << (int_num * 2));
     }
 #if defined(EICRB)
     else {
-        EICRB |= (flank << (pin_num * 2) % 4);
+        EICRB |= (flank << ((int_num % 4) * 2));
     }
 #endif
 
     /* set callback */
-    config[pin_num].cb = cb;
-    config[pin_num].arg = arg;
+    config[int_num].cb = cb;
+    config[int_num].arg = arg;
 
     /* set global interrupt flag */
     sei();
@@ -192,38 +194,12 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
-#if defined(CPU_ATMEGA328P)
-    /* INT pins start at PD2 instead of at PD0 */
-    EIMSK |= (1 << (_pin_num(pin) - 2));
-#elif defined(CPU_ATMEGA1284P)
-    /* INT pins start at PD2 instead of at PD0 on PORT_D */
-    if (_port_num(pin) == PORT_D) {
-        EIMSK |= (1 << (_pin_num(pin) - 2));
-    }
-    else {
-        EIMSK |= (1 << _pin_num(pin));
-    }
-#else
-    EIMSK |= (1 << _pin_num(pin));
-#endif
+    EIMSK |= (1 << _int_num(pin));
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-#if defined(CPU_ATMEGA328P)
-    /* INT pins start at PD2 instead of at PD0 */
-    EIMSK &= ~(1 << (_pin_num(pin) - 2));
-#elif defined (CPU_ATMEGA1284P)
-    /* INT pins start at PD2 instead of at PD0 on PORT_D */
-    if (_port_num(pin) == PORT_D) {
-        EIMSK &= ~(1 << (_pin_num(pin) - 2));
-    }
-    else {
-        EIMSK &= ~(1 << _pin_num(pin));
-    }
-#else
-    EIMSK &= ~(1 << _pin_num(pin));
-#endif
+    EIMSK &= ~(1 << _int_num(pin));
 }
 
 int gpio_read(gpio_t pin)
@@ -261,10 +237,10 @@ void gpio_write(gpio_t pin, int value)
     }
 }
 
-static inline void irq_handler(uint8_t pin_num)
+static inline void irq_handler(uint8_t int_num)
 {
     __enter_isr();
-    config[pin_num].cb(config[pin_num].arg);
+    config[int_num].cb(config[int_num].arg);
     __exit_isr();
 }
 
