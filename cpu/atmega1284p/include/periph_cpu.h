@@ -35,7 +35,7 @@ extern "C" {
 #define GPIO_PIN(x, y)          ((x << 4) | y)
 
 /**
- * @brief   Available ports on the ATmega328p family
+ * @brief   Available ports on the ATmega1284p family
  */
 enum {
     PORT_A = 0,       /**< port A */
@@ -43,6 +43,15 @@ enum {
     PORT_C = 2,       /**< port C */
     PORT_D = 3        /**< port D */
 };
+
+/**
+ * @brief   Available external interrupt pins on the ATmega1284p family
+ *
+ * In order of their interrupt number
+ */
+#define CPU_ATMEGA_EXT_INTS    { GPIO_PIN(PORT_D, 2), \
+                                 GPIO_PIN(PORT_D, 3), \
+                                 GPIO_PIN(PORT_B, 2) }
 
 /**
  * @name   Defines for the I2C interface
