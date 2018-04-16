@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_hifive HiFive1
- * @ingroup     boards
- * @brief       Support for the HiFive1 RISC-V board
+ * @ingroup     boards_hifive
  * @{
  *
  * @file

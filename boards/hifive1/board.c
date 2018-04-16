@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_hifive HiFive1
+ * @ingroup     boards_hifive
  * @{
  *
  * @file
- * @brief       Support for the HiFive1 RISC-V board
+ * @brief       Support for the SiFive HiFive1 RISC-V board
  *
  * @author      Ken Rabold, JP Bonn
  *

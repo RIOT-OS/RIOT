@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_hifive
+ * @defgroup    boards_hifive SiFive HiFive1 RISC-V board
  * @ingroup     boards
- * @brief       Support for the HiFive1 RISC-V board
+ * @brief       Support for the SiFive HiFive1 RISC-V board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the HiFive1 RISC-V board
+ * @brief       Board specific definitions for the SiFive HiFive1 RISC-V board
  *
  * @author      Ken Rabold
  */
@@ -46,6 +46,7 @@ extern "C" {
 #define LED2_ON             gpio_clear(LED2_PIN)
 #define LED2_OFF            gpio_set(LED2_PIN)
 #define LED2_TOGGLE         gpio_toggle(LED2_PIN)
+/** @} */
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
@@ -54,8 +55,6 @@ void board_init(void);
 
 /**
  * @brief   Initialize the board clock to use PLL and faster SPI access.
- * @detail  This must be done before UART initialization.  RIOT assumes
- *          newlib initializes the UART in the _init() routine.
  */
 void board_init_clock(void);
 

@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup        cpu_fe310
- * @ingroup         cpu
- * @brief           CPU specific implementations for the SiFive FE310 cpu
+ * @ingroup         cpu_fe310
  * @{
  *
  * @file
@@ -21,6 +19,10 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+/**
+ * @name Configuration of default stack sizes
+ * @{
+ */
 #ifndef THREAD_EXTRA_STACKSIZE_PRINTF
 #define THREAD_EXTRA_STACKSIZE_PRINTF   (256)
 #endif
@@ -30,6 +32,7 @@
 #ifndef THREAD_STACKSIZE_IDLE
 #define THREAD_STACKSIZE_IDLE           (256)
 #endif
+/** @} */
 
 #ifdef __cplusplus
 extern "C" {

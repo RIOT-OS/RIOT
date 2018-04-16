@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2017 JP Bonn
  *
@@ -41,8 +40,7 @@ static void check_context_switch_frame_alignment(void)
                    "Stack pointer should be 16 byte aligned");
     _Static_assert(sizeof(struct context_switch_frame) == CONTEXT_FRAME_SIZE,
                    "context_switch_frame size mismatch");
-    CHECK_OFFSET(filler0);
-    CHECK_OFFSET(filler1);
+    CHECK_OFFSET(pad);
     CHECK_OFFSET(pc);
     CHECK_OFFSET(s0);
     CHECK_OFFSET(s1);

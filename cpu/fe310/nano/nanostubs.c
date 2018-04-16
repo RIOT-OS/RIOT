@@ -148,3 +148,30 @@ _off_t _lseek(int fd, _off_t pos, int dir)
     errno = ENODEV;
     return -1;
 }
+
+int _gettimeofday(struct timeval *tp, void *tzp)
+{
+    (void) tp;
+    (void) tzp;
+    errno = EINVAL;
+    return -1;
+}
+
+int _getpid(void)
+{
+    return thread_getpid();
+}
+
+int _kill(int pid, int sig)
+{
+    (void) pid;
+    (void) sig;
+    errno = EINVAL;
+    return -1;
+}
+
+void _exit(int _status)
+{
+    (void) _status;
+    while(1);
+}

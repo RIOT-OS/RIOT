@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2017 JP Bonn
  *
@@ -8,9 +7,7 @@
  */
 
 /**
- * @defgroup    cpu_fe310
- * @ingroup     cpu
- * @brief       Freedom E cpu
+ * @ingroup     cpu_fe310
  * @{
  *
  * @file
@@ -32,59 +29,61 @@
 extern "C" {
 #endif
 
+#if !defined(__ASSEMBLER__)
+
 /**
- * @brief   context_switch_frame stores the registers and PC for a context switch.
+ * @brief   Stores the registers and PC for a context switch.
  *
  * This also defines context_switch_frame offsets for assembly language.  The
  * structure is sized to maintain 16 byte stack alignment per the ABI.
  * https://github.com/riscv/riscv-elf-psabi-doc
  *
  */
-#if !defined(__ASSEMBLER__)
-
-/* N.B.: update the definitions below if this changes */
 struct context_switch_frame {
-    uint32_t filler0;   /* filler to maintain 16 byte alignment */
-    uint32_t filler1;   /* filler to maintain 16 byte alignment */
-    uint32_t pc;
+    uint32_t pad[2];                /**< padding to maintain 16 byte alignment */
+    uint32_t pc;                    /**< program counter */
     /* Callee saved registers */
-    uint32_t s0;
-    uint32_t s1;
-    uint32_t s2;
-    uint32_t s3;
-    uint32_t s4;
-    uint32_t s5;
-    uint32_t s6;
-    uint32_t s7;
-    uint32_t s8;
-    uint32_t s9;
-    uint32_t s10;
-    uint32_t s11;
-    /* Caller saved register */
-    uint32_t ra;
-    uint32_t tp;
-    uint32_t t0;
-    uint32_t t1;
-    uint32_t t2;
-    uint32_t t3;
-    uint32_t t4;
-    uint32_t t5;
-    uint32_t t6;
-    uint32_t a0;
-    uint32_t a1;
-    uint32_t a2;
-    uint32_t a3;
-    uint32_t a4;
-    uint32_t a5;
-    uint32_t a6;
-    uint32_t a7;
+    uint32_t s0;                    /**< s0 register */
+    uint32_t s1;                    /**< s1 register */
+    uint32_t s2;                    /**< s2 register */
+    uint32_t s3;                    /**< s3 register */
+    uint32_t s4;                    /**< s4 register */
+    uint32_t s5;                    /**< s5 register */
+    uint32_t s6;                    /**< s6 register */
+    uint32_t s7;                    /**< s7 register */
+    uint32_t s8;                    /**< s8 register */
+    uint32_t s9;                    /**< s9 register */
+    uint32_t s10;                   /**< s10 register */
+    uint32_t s11;                   /**< s11 register */
+    /* Caller saved registers */
+    uint32_t ra;                    /**< ra register */
+    uint32_t tp;                    /**< tp register */
+    uint32_t t0;                    /**< t0 register */
+    uint32_t t1;                    /**< t1 register */
+    uint32_t t2;                    /**< t2 register */
+    uint32_t t3;                    /**< t3 register */
+    uint32_t t4;                    /**< t4 register */
+    uint32_t t5;                    /**< t5 register */
+    uint32_t t6;                    /**< t6 register */
+    uint32_t a0;                    /**< a0 register */
+    uint32_t a1;                    /**< a1 register */
+    uint32_t a2;                    /**< a2 register */
+    uint32_t a3;                    /**< a3 register */
+    uint32_t a4;                    /**< a4 register */
+    uint32_t a5;                    /**< a5 register */
+    uint32_t a6;                    /**< a6 register */
+    uint32_t a7;                    /**< a7 register */
 };
+
 #endif /* __ASSEMBLER__ */
 
 
+/**
+ * @name Register offsets
+ * @{
+ */
 /* These values are checked for correctness in context_frame.c */
-#define filler0_OFFSET 0
-#define filler1_OFFSET 4
+#define pad_OFFSET    0
 #define pc_OFFSET     8
 #define s0_OFFSET     12
 #define s1_OFFSET     16
@@ -115,9 +114,16 @@ struct context_switch_frame {
 #define a5_OFFSET     116
 #define a6_OFFSET     120
 #define a7_OFFSET     124
+/** @} */
 
+/**
+ * @brief Size of context switch frame
+ */
 #define CONTEXT_FRAME_SIZE (a7_OFFSET + 4)
 
+/**
+ * @brief Offset of stack pointer in struct _thread
+ */
 #define SP_OFFSET_IN_THREAD 0
 
 

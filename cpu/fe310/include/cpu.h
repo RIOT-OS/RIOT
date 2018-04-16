@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    cpu_fe310
+ * @defgroup    cpu_fe310 SiFive FE310
  * @ingroup     cpu
  * @brief       Common implementations and headers for RISC-V
  * @{
