@@ -27,6 +27,9 @@ USEMODULE += nanocoap_sock
 # include this for nicely formatting the returned internal value
 USEMODULE += fmt
 
+# include sha256 (used by example blockwise handler)
+USEMODULE += hashes
+
 # include this for printing IP addresses
 USEMODULE += shell_commands
 

@@ -65,6 +65,8 @@ extern "C" {
 #define COAP_OPT_URI_PATH       (11)
 #define COAP_OPT_CONTENT_FORMAT (12)
 #define COAP_OPT_URI_QUERY      (15)
+#define COAP_OPT_BLOCK2         (23)
+#define COAP_OPT_BLOCK1         (27)
 /** @} */
 
 /**
@@ -212,6 +214,16 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Blockwise transfer (RFC7959)
+ * @{
+ */
+#define COAP_BLOCKWISE_NUM_OFF  (4)
+#define COAP_BLOCKWISE_MORE_OFF (3)
+#define COAP_BLOCKWISE_SZX_MASK (0x07)
+#define COAP_BLOCKWISE_SZX_MAX  (7)
+/** @} */
+
+/**
  * @brief   Raw CoAP PDU header structure
  */
 typedef struct __attribute__((packed)) {
@@ -261,6 +273,17 @@ typedef struct {
     coap_handler_t handler;         /**< ptr to resource handler            */
     void *context;                  /**< ptr to user defined context data   */
 } coap_resource_t;
+
+/**
+ * @brief   Block1 helper struct
+ */
+typedef struct {
+    size_t offset;                  /**< offset of received data            */
+    uint32_t blknum;                /**< block number                       */
+    unsigned szx;                   /**< szx value                          */
+    int more;                       /**< -1 for no option, 0 for last block,
+                                          1 for more blocks coming          */
+} coap_block1_t;
 
 /**
  * @brief   Global CoAP resource list
@@ -409,6 +432,71 @@ size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum, uint16_t content_type
  */
 size_t coap_put_option_uri(uint8_t *buf, uint16_t lastonum, const char *uri, uint16_t optnum);
 
+/**
+ * @brief    Generic block option getter
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[in]   option  actual block option number to get
+ * @param[out]  blknum  block number
+ * @param[out]  szx     SZX value
+ *
+ * @returns     -1 if option not found
+ * @returns     0 if more flag is not set
+ * @returns     1 if more flag is set
+ */
+int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsigned *szx);
+
+/**
+ * @brief    Block1 option getter
+ *
+ * This function gets a CoAP packet's block1 option and parses it into a helper
+ * structure.
+ *
+ * If no block1 option is present in @p pkt, the values in @p block1 will be
+ * initialized with zero. That implies both block1->offset and block1->more are
+ * also valid in that case, as packet with offset==0 and more==0 means it contains
+ * all the payload for the corresponding request.
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[out]  block1  ptr to preallocated coap_block1_t structure
+ *
+ * @returns     0 if block1 option not present
+ * @returns     1 if structure has been filled
+ */
+int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block1);
+
+/**
+ * @brief   Insert block1 option into buffer
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          must be < 27
+ * @param[in]   blknum      block number
+ * @param[in]   szx         SXZ value
+ * @param[in]   more        more flag (1 or 0)
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+size_t coap_put_option_block1(uint8_t *buf, uint16_t lastonum, unsigned blknum, unsigned szx, int more);
+
+/**
+ * @brief   Insert block1 option into buffer (from coap_block1_t)
+ *
+ * This function is wrapper around @ref coap_put_option_block1(),
+ * taking its arguments from a coap_block1_t struct.
+ *
+ * It will write option Nr. 27 (COAP_OPT_BLOCK1).
+ *
+ * It is safe to be called when @p block1 was generated for a non-blockwise
+ * request.
+ *
+ * @param[in]   pkt_pos     buffer to write to
+ * @param[in]   block1      ptr to block1 struct (created by coap_get_block1())
+ * @param[in]   lastonum    last option number (must be < 27)
+ *
+ * @returns     amount of bytes written to @p pkt_pos
+ */
+size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t lastonum);
 
 /**
  * @brief   Get content type from packet
@@ -435,6 +523,18 @@ unsigned coap_get_content_type(coap_pkt_t *pkt);
  * @returns     nr of bytes written to @p target (including '\0')
  */
 int coap_get_uri(coap_pkt_t *pkt, uint8_t *target);
+
+/**
+ * @brief    Helper to decode SZX value to size in bytes
+ *
+ * @param[in]   szx     SZX value to decode
+ *
+ * @returns     SZX value decoded to bytes
+ */
+static inline unsigned coap_szx2size(unsigned szx)
+{
+    return (1 << (szx + 4));
+}
 
 /**
  * @brief   Get the CoAP version number
