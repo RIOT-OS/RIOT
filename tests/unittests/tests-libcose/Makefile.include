@@ -1,0 +1,7 @@
+﻿CFLAGS +=-DCOSE_SIGNATURES_MAX=2
+
+USEPKG += libcose
+
+USEMODULE += random
+USEMODULE += memarray
+USEMODULE += libcose_crypt_hacl
