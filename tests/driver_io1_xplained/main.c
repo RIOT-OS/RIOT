@@ -21,12 +21,16 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "io1_xplained.h"
-#include "io1_xplained_params.h"
 #include "xtimer.h"
 #include "board.h"
 
-#define SLEEP_1S   (1 * 1000 * 1000u) /* 1 seconds delay between each test */
+#include "periph/gpio.h"
+
+#include "at30tse75x.h"
+#include "io1_xplained.h"
+#include "io1_xplained_params.h"
+
+#define DELAY_1S   (1U) /* 1 seconds delay between each test */
 
 int main(void)
 {
@@ -45,27 +49,27 @@ int main(void)
     puts("\n+--------Starting tests --------+");
     while (1) {
         /* Get temperature in degrees celsius */
-        io1_xplained_read_temperature(&dev, &temperature);
+        at30tse75x_get_temperature(&dev.temp, &temperature);
         printf("Temperature [°C]: %.2f\n"
-               "\n+-------------------------------------+\n",
+               "+-------------------------------------+\n",
                temperature);
-        xtimer_usleep(SLEEP_1S);
+        xtimer_sleep(DELAY_1S);
 
         /* set led */
-        io1_xplained_set_led();
-        xtimer_usleep(SLEEP_1S);
+        gpio_set(IO1_LED_PIN);
+        xtimer_sleep(DELAY_1S);
 
         /* clear led */
-        io1_xplained_clear_led();
-        xtimer_usleep(SLEEP_1S);
+        gpio_clear(IO1_LED_PIN);
+        xtimer_sleep(DELAY_1S);
 
         /* toggle led */
-        io1_xplained_toggle_led();
-        xtimer_usleep(SLEEP_1S);
+        gpio_toggle(IO1_LED_PIN);
+        xtimer_sleep(DELAY_1S);
 
         /* toggle led again */
-        io1_xplained_toggle_led();
-        xtimer_usleep(SLEEP_1S);
+        gpio_toggle(IO1_LED_PIN);
+        xtimer_sleep(DELAY_1S);
     }
 
     return 0;
