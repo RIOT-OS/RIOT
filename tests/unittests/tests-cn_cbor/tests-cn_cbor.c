@@ -18,14 +18,17 @@
   */
 
 #define EBUF_SIZE 32
+#define NUM_BLOCKS  7
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "assert.h"
 #include "cn-cbor/cn-cbor.h"
 #include "embUnit.h"
 #include "fmt.h"
+#include "memarray.h"
 
 typedef struct {
     char *hex;
@@ -36,11 +39,44 @@ static size_t test, offs;
 static unsigned char ebuf[EBUF_SIZE];
 static cn_cbor_errback errb;
 
+/* Block allocator */
+static cn_cbor block_storage_data[NUM_BLOCKS];
+static memarray_t storage;
+
+/* calloc/free functions */
+static void *cbor_calloc(size_t count, size_t size, void *memblock);
+static void cbor_free(void *ptr, void *memblock);
+
+/* CN_CBOR block allocator context struct*/
+static cn_cbor_context ct =
+{
+    .calloc_func = cbor_calloc,
+    .free_func = cbor_free,
+    .context = &storage,
+};
+
+static void *cbor_calloc(size_t count, size_t size, void *memblock)
+{
+    (void)count;
+    assert(count == 1); /* Count is always 1 with cn-cbor */
+    void *block = memarray_alloc(memblock);
+    if (block) {
+        memset(block, 0, size);
+    }
+    return block;
+}
+
+static void cbor_free(void *ptr, void *memblock)
+{
+    memarray_free(memblock, ptr);
+}
+
 static void setup_cn_cbor(void)
 {
     test = 0;
     offs = 0;
     memset(ebuf, '\0', EBUF_SIZE);
+    memarray_init(&storage, block_storage_data, sizeof(cn_cbor), NUM_BLOCKS);
 }
 
 static void test_parse(void)
@@ -107,7 +143,7 @@ static void test_parse(void)
 
         errb.err = CN_CBOR_NO_ERROR;
 
-        cn_cbor *cbor = cn_cbor_decode(buf, len, &errb);
+        cn_cbor *cbor = cn_cbor_decode(buf, len, &ct, &errb);
         TEST_ASSERT_EQUAL_INT(errb.err, CN_CBOR_NO_ERROR);
         TEST_ASSERT_NOT_NULL(cbor);
 
@@ -115,7 +151,7 @@ static void test_parse(void)
         for (offs = 0; offs < len; offs++) {
             TEST_ASSERT_EQUAL_INT(buf[offs], ebuf[offs]);
         }
-        cn_cbor_free(cbor);
+        cn_cbor_free(cbor, &ct);
     }
 }
 
@@ -143,10 +179,10 @@ static void test_errors(void)
         size_t len = fmt_hex_bytes(buf, tests[offs].hex);
         TEST_ASSERT(len);
 
-        cn_cbor *cbor = cn_cbor_decode(buf, len, &errb);
+        cn_cbor *cbor = cn_cbor_decode(buf, len, &ct, &errb);
         TEST_ASSERT_NULL(cbor);
         TEST_ASSERT_EQUAL_INT(errb.err, tests[offs].err);
-        cn_cbor_free(cbor);
+        cn_cbor_free(cbor, &ct);
     }
 }
 
