@@ -28,10 +28,10 @@
 static char worker_stack[THREAD_STACKSIZE_MAIN];
 static evtimer_t evtimer;
 static evtimer_msg_event_t events[] = {
-    { .event = { .offset = 1000 }, .msg = { .content = { .ptr = "supposed to be 1000" } } },
-    { .event = { .offset = 1500 }, .msg = { .content = { .ptr = "supposed to be 1500" } } },
-    { .event = { .offset = 659 }, .msg = { .content = { .ptr = "supposed to be 659" } } },
-    { .event = { .offset = 3954 }, .msg = { .content = { .ptr = "supposed to be 3954" } } },
+    { .event = { .offset_ms = 1000 }, .msg = { .content = { .ptr = "supposed to be 1000" } } },
+    { .event = { .offset_ms = 1500 }, .msg = { .content = { .ptr = "supposed to be 1500" } } },
+    { .event = { .offset_ms = 659 }, .msg = { .content = { .ptr = "supposed to be 659" } } },
+    { .event = { .offset_ms = 3954 }, .msg = { .content = { .ptr = "supposed to be 3954" } } },
 };
 
 #define NEVENTS ((unsigned)(sizeof(events) / sizeof(evtimer_msg_event_t)))

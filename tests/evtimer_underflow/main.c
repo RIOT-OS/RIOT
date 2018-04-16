@@ -30,14 +30,14 @@ msg_t worker_msg_queue[WORKER_MSG_QUEUE_SIZE];
 static char worker_stack[THREAD_STACKSIZE_MAIN];
 static evtimer_t evtimer;
 static evtimer_msg_event_t events[] = {
-    { .event = { .offset = 0 }, .msg = { .content = { .ptr = "1" } } },
-    { .event = { .offset = 0 }, .msg = { .content = { .ptr = "2" } } },
-    { .event = { .offset = 0 }, .msg = { .content = { .ptr = "3" } } },
-    { .event = { .offset = 0 }, .msg = { .content = { .ptr = "4" } } },
-    { .event = { .offset = 0 }, .msg = { .content = { .ptr = "5" } } },
-    { .event = { .offset = 0 }, .msg = { .content = { .ptr = "6" } } },
-    { .event = { .offset = 0 }, .msg = { .content = { .ptr = "7" } } },
-    { .event = { .offset = 0 }, .msg = { .content = { .ptr = "8" } } },
+    { .event = { .offset_ms = 0 }, .msg = { .content = { .ptr = "1" } } },
+    { .event = { .offset_ms = 0 }, .msg = { .content = { .ptr = "2" } } },
+    { .event = { .offset_ms = 0 }, .msg = { .content = { .ptr = "3" } } },
+    { .event = { .offset_ms = 0 }, .msg = { .content = { .ptr = "4" } } },
+    { .event = { .offset_ms = 0 }, .msg = { .content = { .ptr = "5" } } },
+    { .event = { .offset_ms = 0 }, .msg = { .content = { .ptr = "6" } } },
+    { .event = { .offset_ms = 0 }, .msg = { .content = { .ptr = "7" } } },
+    { .event = { .offset_ms = 0 }, .msg = { .content = { .ptr = "8" } } },
 };
 
 #define NEVENTS (sizeof(events) / sizeof(evtimer_msg_event_t))
