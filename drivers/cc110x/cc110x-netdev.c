@@ -104,15 +104,15 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t value_len)
         case NETOPT_CHANNEL:
             assert(value_len > 1);
             *((uint16_t *)value) = (uint16_t)cc110x->radio_channel;
-            return 2;
+            return sizeof(uint16_t);
         case NETOPT_ADDRESS:
             assert(value_len > 0);
             *((uint8_t *)value) = cc110x->radio_address;
-            return 1;
+            return sizeof(uint8_t);
         case NETOPT_MAX_PACKET_SIZE:
             assert(value_len > 0);
-            *((uint8_t *)value) = CC110X_PACKET_LENGTH;
-            return 1;
+            *((uint16_t *)value) = CC110X_PACKET_LENGTH;
+            return sizeof(uint16_t);
         case NETOPT_IPV6_IID:
             return _get_iid(dev, value, value_len);
         case NETOPT_ADDR_LEN:
@@ -133,8 +133,8 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
     switch (opt) {
         case NETOPT_CHANNEL:
             {
-                const uint8_t *arg = value;
-                uint8_t channel = arg[value_len-1];
+                const uint16_t *arg = value;
+                uint8_t channel = (uint8_t)(*arg);
             #if CC110X_MIN_CHANNR
                 if (channel < CC110X_MIN_CHANNR) {
                     return -EINVAL;
@@ -146,7 +146,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
                 if (cc110x_set_channel(cc110x, channel) == -1) {
                     return -EINVAL;
                 }
-                return 1;
+                return sizeof(uint16_t);
             }
         case NETOPT_ADDRESS:
             if (value_len < 1) {
@@ -155,7 +155,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
             if (!cc110x_set_address(cc110x, *(const uint8_t*)value)) {
                 return -EINVAL;
             }
-            return 1;
+            return sizeof(uint8_t);
 #ifdef MODULE_GNRC_NETIF
         case NETOPT_PROTO:
             if (value_len != sizeof(gnrc_nettype_t)) {
