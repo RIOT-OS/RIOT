@@ -873,10 +873,9 @@ static void _lwmac_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 #if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
         case GNRC_MAC_TYPE_GET_DUTYCYCLE: {
             /* Output LWMAC's radio duty-cycle ratio */
-            uint64_t duty;
-            duty = (uint64_t) rtt_get_counter();
-            duty = ((uint64_t) netif->mac.prot.lwmac.awake_duration_sum_ticks) * 100 /
-                   (duty - (uint64_t)netif->mac.prot.lwmac.system_start_time_ticks);
+            uint64_t duty = xtimer_now_usec64();
+            duty = ((uint64_t) netif->mac.prot.lwmac.awake_duration_sum_ms) * 100 /
+                   (duty - (uint64_t)netif->mac.prot.lwmac.system_start_time_ms);
             printf("[LWMAC]: achieved radio duty-cycle: %lu %% \n", (uint32_t)duty);
             break;
         }
@@ -935,9 +934,9 @@ static void _lwmac_init(gnrc_netif_t *netif)
 
 #if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
     /* Start duty cycle recording */
-    netif->mac.prot.lwmac.system_start_time_ticks = rtt_get_counter();
-    netif->mac.prot.lwmac.last_radio_on_time_ticks = netif->mac.prot.lwmac.system_start_time_ticks;
-    netif->mac.prot.lwmac.awake_duration_sum_ticks = 0;
+    netif->mac.prot.lwmac.system_start_time_ms = xtimer_now_usec64();
+    netif->mac.prot.lwmac.last_radio_on_time_ms = netif->mac.prot.lwmac.system_start_time_ms;
+    netif->mac.prot.lwmac.awake_duration_sum_ms = 0;
     netif->mac.prot.lwmac.lwmac_info |= GNRC_LWMAC_RADIO_IS_ON;
 #endif
 }

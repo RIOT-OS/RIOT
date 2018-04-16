@@ -463,11 +463,11 @@ static bool _send_data(gnrc_netif_t *netif)
 
     DEBUG("[LWMAC-tx]: spent %lu WR in TX\n", netif->mac.tx.wr_sent);
 
-#if (LWMAC_ENABLE_DUTYCYLE_RECORD == 1)
-    netif->mac.prot.lwmac.pkt_start_sending_time_ticks =
-        rtt_get_counter() - netif->mac.prot.lwmac.pkt_start_sending_time_ticks;
+#if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
+    netif->mac.prot.lwmac.pkt_start_sending_time_ms =
+        xtimer_now_usec64() - netif->mac.prot.lwmac.pkt_start_sending_time_ms;
     DEBUG("[LWMAC-tx]: pkt sending delay in TX: %lu us\n",
-          RTT_TICKS_TO_US(netif->mac.prot.lwmac.pkt_start_sending_time_ticks));
+          (uint32_t)netif->mac.prot.lwmac.pkt_start_sending_time_ms);
 #endif
 
     return true;
@@ -491,8 +491,8 @@ void gnrc_lwmac_tx_start(gnrc_netif_t *netif,
     netif->mac.tx.state = GNRC_LWMAC_TX_STATE_INIT;
     netif->mac.tx.wr_sent = 0;
 
-#if (LWMAC_ENABLE_DUTYCYLE_RECORD == 1)
-    netif->mac.prot.lwmac.pkt_start_sending_time_ticks = rtt_get_counter();
+#if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
+    netif->mac.prot.lwmac.pkt_start_sending_time_ms = xtimer_now_usec64();
 #endif
 }
 
