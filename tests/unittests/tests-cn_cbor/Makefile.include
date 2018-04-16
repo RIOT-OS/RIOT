@@ -1,2 +1,3 @@
 ﻿USEPKG += cn-cbor
 USEMODULE += fmt
+USEMODULE += memarray
