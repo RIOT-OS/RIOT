@@ -88,7 +88,6 @@ static const clock_config_t clock_config = {
 #define PIT_ISR_0               isr_pit1
 #define PIT_ISR_1               isr_pit3
 #define LPTMR_ISR_0             isr_lptmr0
-
 /** @} */
 
 /**

@@ -27,8 +27,8 @@ extern "C" {
 #endif
 
 /**
- * @brief   Mapping of MCU pins to Waspomte board pins
- *
+ * @name   Mapping of MCU pins to Waspomte board pins
+ * @{
  */
 /*
  * DESCRIPTION WASP API PIN               PORT   PIN
@@ -84,7 +84,7 @@ extern "C" {
 #define RTC_PW                  GPIO_PIN(PORT_G, 2)
 #define	RTC_SLEEP               GPIO_PIN(PORT_G, 1)
 #define	LOW_BAT_MON             GPIO_PIN(PORT_G, 0)
-/** @ */
+/** @} */
 
 #ifdef __cplusplus
 }

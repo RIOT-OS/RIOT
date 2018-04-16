@@ -115,7 +115,6 @@ static const clock_config_t clock_config = {
 #define PIT_ISR_0               isr_pit1
 #define PIT_ISR_1               isr_pit3
 #define LPTMR_ISR_0             isr_lptmr0
-
 /** @} */
 
 /**
@@ -334,8 +333,6 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
 /** @} */
 
-/** @} */
-
 /**
  * @name I2C configuration
  * @{
@@ -397,7 +394,6 @@ static const spi_conf_t spi_config[] = {
 #define RTT_UNLOCK()        (BITBAND_REG32(SIM->SCGC6, SIM_SCGC6_RTC_SHIFT) = 1)
 #define RTT_MAX_VALUE       (0xffffffff)
 #define RTT_FREQUENCY       (1)             /* in Hz */
-
 /** @} */
 
 #ifdef __cplusplus
