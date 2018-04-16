@@ -7,6 +7,7 @@
  */
 
 #include <arpa/inet.h>
+#include <stdio.h>
 
 #include "net/af.h"
 #include "net/sock/udp.h"
