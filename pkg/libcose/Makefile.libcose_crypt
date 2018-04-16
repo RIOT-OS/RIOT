@@ -1,0 +1,4 @@
+MODULE := libcose_crypt
+SUBMODULES = 1
+
+include $(RIOTBASE)/Makefile.base
