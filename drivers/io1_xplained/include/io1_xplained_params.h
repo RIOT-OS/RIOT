@@ -65,16 +65,27 @@ saul_reg_info_t io1_xplained_saul_info[][4] =
     IO1_XPLAINED_SAUL_INFO
 };
 
+#ifdef MODULE_SAUL_GPIO
 /**
  * @brief   Allocate and configure the extension LED gpios
  */
-gpio_t io1_xplained_saul_gpios[3] =
+saul_gpio_params_t io1_xplained_saul_gpios[] =
 {
-    IO1_LED_PIN,
-    IO1_GPIO1_PIN,
-    IO1_GPIO2_PIN,
+    {
+        .pin = IO1_LED_PIN,
+        .mode = GPIO_OUT,
+        .flags = SAUL_GPIO_INVERTED,
+    },
+    {
+        .pin = IO1_GPIO1_PIN,
+        .mode = GPIO_OUT,
+    },
+    {
+        .pin = IO1_GPIO2_PIN,
+        .mode = GPIO_OUT
+    }
 };
-
+#endif
 
 #ifdef __cplusplus
 }
