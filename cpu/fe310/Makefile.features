@@ -1,0 +1,2 @@
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_pm

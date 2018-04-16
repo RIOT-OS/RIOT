@@ -1,0 +1,12 @@
+# define the cpu used by the HiFive1 board
+export CPU = fe310
+export CPU_MODEL = fe310
+
+# Uses UART0 for stdio input/output (comment out to disable)
+USEMODULE += uart_stdio
+
+# this board uses openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk
+
+# use our own openocd script to flash since HiFive1 has reset problems.
+export FLASHER = $(RIOTBASE)/boards/hifive1/dist/flasher.sh
