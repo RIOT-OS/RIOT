@@ -40,6 +40,7 @@
 
 #include "saul.h"
 #include "at30tse75x.h"
+#include "sdcard_spi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +52,7 @@ extern "C" {
 enum {
     IO1_XPLAINED_OK = 0,           /**< Initialization successful */
     IO1_XPLAINED_NOTEMP,           /**< Error during temperature sensor initialization */
+    IO1_XPLAINED_NOSDCARD,         /**< Error during sdcard initialization */
     IO1_XPLAINED_NOLED,            /**< Error during extension LED initialization */
     IO1_XPLAINED_NOGPIO1,          /**< Error during extension GPIO1 initialization */
     IO1_XPLAINED_NOGPIO2,          /**< Error during extension GPIO2 initialization */
@@ -71,6 +73,7 @@ typedef struct {
 typedef struct {
     io1_xplained_params_t params;  /**< Initialization parameters */
     at30tse75x_t temp;             /**< On-board temperature sensor */
+    sdcard_spi_t sdcard;           /**< On-board SD card */
 } io1_xplained_t;
 
 /**
