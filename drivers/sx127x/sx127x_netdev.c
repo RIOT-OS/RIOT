@@ -46,7 +46,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     sx127x_t *dev = (sx127x_t*) netdev;
 
     if (sx127x_get_state(dev) == SX127X_RF_TX_RUNNING) {
-        DEBUG("[WARNING] Cannot send packet: radio already in transmitting "
+        DEBUG("[sx127x] Cannot send packet: radio already in transmitting "
               "state.\n");
         return -ENOTSUP;
     }
@@ -220,14 +220,17 @@ static int _init(netdev_t *netdev)
     sx127x->settings = settings;
 
     /* Launch initialization of driver and device */
-    DEBUG("init_radio: initializing driver...\n");
-    sx127x_init(sx127x);
+    DEBUG("[sx127x] netdev: initializing driver...\n");
+    if (sx127x_init(sx127x) != SX127X_INIT_OK) {
+        DEBUG("[sx127x] netdev: initialization failed\n");
+        return -1;
+    }
 
     sx127x_init_radio_settings(sx127x);
     /* Put chip into sleep */
     sx127x_set_sleep(sx127x);
 
-    DEBUG("init_radio: sx127x initialization done\n");
+    DEBUG("[sx127x] netdev: initialization done\n");
 
     return 0;
 }
@@ -561,10 +564,11 @@ void _on_dio0_irq(void *arg)
             }
             break;
         case SX127X_RF_IDLE:
-            printf("sx127x_on_dio0: IDLE state\n");
+            DEBUG("[sx127x] netdev: sx127x_on_dio0: IDLE state\n");
             break;
         default:
-            printf("sx127x_on_dio0: Unknown state [%d]\n", dev->settings.state);
+            DEBUG("[sx127x] netdev: sx127x_on_dio0: unknown state [%d]\n",
+                  dev->settings.state);
             break;
     }
 }
@@ -604,7 +608,7 @@ void _on_dio1_irq(void *arg)
             }
             break;
         default:
-            puts("sx127x_on_dio1: Unknown state");
+            puts("[sx127x] netdev: sx127x_on_dio1: unknown state");
             break;
     }
 }
@@ -657,7 +661,7 @@ void _on_dio2_irq(void *arg)
             }
             break;
         default:
-            puts("sx127x_on_dio2: Unknown state");
+            puts("[sx127x] netdev: sx127x_on_dio2: unknown state");
             break;
     }
 }
@@ -684,7 +688,7 @@ void _on_dio3_irq(void *arg)
             netdev->event_callback(netdev, NETDEV_EVENT_CAD_DONE);
             break;
         default:
-            puts("sx127x_on_dio3: Unknown modem");
+            puts("[sx127x] netdev: sx127x_on_dio3: unknown modem");
             break;
     }
 }

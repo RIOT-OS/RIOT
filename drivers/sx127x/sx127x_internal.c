@@ -42,28 +42,28 @@
 #define SX127X_SPI_MODE     (SPI_MODE_0)
 
 
-bool sx127x_test(const sx127x_t *dev)
+int sx127x_check_version(const sx127x_t *dev)
 {
     /* Read version number and compare with sx127x assigned revision */
     uint8_t version = sx127x_reg_read(dev, SX127X_REG_VERSION);
 
 #if defined(MODULE_SX1272)
     if (version != VERSION_SX1272) {
-        DEBUG("[Error] sx1272 test failed, invalid version number: %d\n",
+        DEBUG("[sx127x] sx1272 test failed, invalid version number: %d\n",
               version);
-        return false;
+        return -1;
     }
-    DEBUG("SX1272 transceiver detected.\n");
+    DEBUG("[sx127x] SX1272 transceiver detected\n");
 #else /* MODULE_SX1276) */
     if (version != VERSION_SX1276) {
-        DEBUG("[Error] sx1276 test failed, invalid version number: %d\n",
+        DEBUG("[sx127x] sx1276 test failed, invalid version number: %d\n",
               version);
-        return false;
+        return -1;
     }
-    DEBUG("SX1276 transceiver detected.\n");
+    DEBUG("[sx127x] SX1276 transceiver detected\n");
 #endif
 
-    return true;
+    return 0;
 }
 
 void sx127x_reg_write(const sx127x_t *dev, uint8_t addr, uint8_t data)
@@ -124,7 +124,8 @@ void sx127x_read_fifo(const sx127x_t *dev, uint8_t *buffer, uint8_t size)
     sx127x_reg_read_burst(dev, 0, buffer, size);
 }
 
-void sx127x_rx_chain_calibration(sx127x_t *dev)
+#if defined(MODULE_SX1276)
+void sx1276_rx_chain_calibration(sx127x_t *dev)
 {
     uint8_t reg_pa_config_init_val;
     uint32_t initial_freq;
@@ -164,6 +165,7 @@ void sx127x_rx_chain_calibration(sx127x_t *dev)
     sx127x_reg_write(dev, SX127X_REG_PACONFIG, reg_pa_config_init_val);
     sx127x_set_channel(dev, initial_freq);
 }
+#endif
 
 int16_t sx127x_read_rssi(const sx127x_t *dev)
 {
