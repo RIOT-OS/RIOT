@@ -72,11 +72,14 @@ void auto_init_io1_xplained(void)
         saul_reg_add(&(saul_entries[i * 4]));
 
         /* GPIOs */
-        for (unsigned j = 1; j < 4; j++) {
-            saul_entries[i * 4 + j].dev = &(io1_xplained_saul_gpios[j]);
-            saul_entries[i * 4 + j].name = io1_xplained_saul_info[i][j].name;
-            saul_entries[i * 4 + j].driver = &gpio_out_saul_driver;
-            saul_reg_add(&(saul_entries[i * 4 + j]));
+        for (unsigned j = 0;
+             j < sizeof(io1_xplained_saul_gpios) / sizeof(io1_xplained_saul_gpios[0]);
+             j++) {
+            saul_reg_t *entry = &saul_entries[i * 4 + j + 1];
+            entry->dev = &(io1_xplained_saul_gpios[j]);
+            entry->name = io1_xplained_saul_info[i][j + 1].name;
+            entry->driver = &gpio_out_saul_driver;
+            saul_reg_add(entry);
         }
     }
 }
