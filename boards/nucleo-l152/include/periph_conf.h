@@ -39,8 +39,8 @@ extern "C" {
  * 1: external crystal available (always 32.768kHz)
  *
  * LSE might not be available by default in early (C-01) Nucleo boards.
- * For newer revisions, LSE crystal is present, but currently is not working.
- * (issue at https://github.com/RIOT-OS/RIOT/pull/8545).
+ * For newer revisions, an LSE crystal is present and CLOCK_LSE can be set to 1
+ * if one wants to use it.
  */
 #ifndef CLOCK_LSE
 #define CLOCK_LSE           (0)
