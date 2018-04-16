@@ -81,37 +81,12 @@ typedef struct {
  *
  * @return                  IO1_XPLAINED_OK on success
  * @return                  -IO1_XPLAINED_NOTEMP if temperature sensor initialization failed
+ * @return                  -IO1_XPLAINED_NOSDCARD if sdcard initialization failed
  * @return                  -IO1_XPLAINED_NOLED if LED initialization failed
  * @return                  -IO1_XPLAINED_NOGPIO1 if GPIO1 initialization failed
  * @return                  -IO1_XPLAINED_NOGPIO2 if GPIO2 initialization failed
  */
 int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params);
-
-/**
- * @brief   Read temperature value from the given IO1 Xplained extension, returned in °C
- *
- * @param[in] dev           Device descriptor of IO1 Xplained to read from
- * @param[out] temperature  Temperature in °C
- *
- * @return                  IO1_XPLAINED_READ_OK on success
- * @return                  -IO1_XPLAINED_READ_ERR if temperature sensor read failed
- */
-int io1_xplained_read_temperature(const io1_xplained_t *dev, float *temperature);
-
-/**
- * @brief   Set the on-board led of the IO1 Xplained extension
- */
-void io1_xplained_set_led(void);
-
-/**
- * @brief   Clear the on-board led of the IO1 Xplained extension
- */
-void io1_xplained_clear_led(void);
-
-/**
- * @brief   Toggle the on-board led of the IO1 Xplained extension
- */
-void io1_xplained_toggle_led(void);
 
 #ifdef __cplusplus
 }
