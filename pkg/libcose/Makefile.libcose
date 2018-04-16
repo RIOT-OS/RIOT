@@ -1,0 +1,3 @@
+MODULE := libcose
+
+include $(RIOTBASE)/Makefile.base
