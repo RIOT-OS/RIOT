@@ -21,6 +21,8 @@
 #ifndef ANALOG_UTIL_H
 #define ANALOG_UTIL_H
 
+#include <stdint.h>
+
 #include "periph/adc.h"
 
 #ifdef __cplusplus
@@ -33,8 +35,6 @@ extern "C" {
  * This function is useful for converting sampled ADC values into their physical
  * representation.
  *
- * The min value is asserted to be smaller than the max value.
- *
  * @param[in] sample        sampled ADC value
  * @param[in] res           ADC resolution
  * @param[in] min           the lower bound of the target interval
@@ -42,7 +42,7 @@ extern "C" {
  *
  * @return                  the mapped value
  */
-int adc_util_map(int sample, adc_res_t res, int min, int max);
+int32_t adc_util_map(int sample, adc_res_t res, int32_t min, int32_t max);
 
 /**
  * @brief   Map a sampled ADC value to a given range (using floating point
