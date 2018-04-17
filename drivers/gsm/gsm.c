@@ -1,382 +1,230 @@
 /*
  * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
  * Copyright (C) 2018 OTA keys S.A.
+ * Copyright (C) 2018 Max van Kessel <maxvankessel@betronic.nl>
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
-#include <errno.h>
+#include <ctype.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <ctype.h>
+#include <errno.h>
 
-#include "thread.h"
-#include "fmt.h"
 #include "log.h"
 #include "gsm.h"
+#include "fmt.h"
 #include "xtimer.h"
-#include "net/ipv4/addr.h"
 
-#define MODEM_INIT_MAXTRIES (3)
+/**
+ * @ingroup     drivers_gsm
+ * @{
+ *
+ * @file
+ * @brief       Generic gsm implementation.
+ *
+ * @author
+ *
+ * @}
+ */
 
-static const char * gsm_context_types[GSM_CTX_COUNT] = { "IP", "PPP", "IPV6", "IP4V6" };
+#define LOG_HEADER  "gsm: "
 
-static void *_gsm_idle_thread(void *arg);
+static void * idle_thread(void *arg);
+static void creg_cb(void *arg, const char *buf);
 
-int gsm_init(gsm_t *gsmdev, const gsm_params_t *params)
+int gsm_init(gsm_t *dev, gsm_params_t *params)
 {
-    unsigned tries = MODEM_INIT_MAXTRIES;
-    int res;
+    int err = -EINVAL;
 
-    assert(gsmdev);
-    assert(params);
+    if(dev){
 
-    LOG_INFO("gsm: initializing...\n");
+        /* initialize and lock device */
+        rmutex_init(&dev->mutex);
+        rmutex_lock(&dev->mutex);
 
-    rmutex_init(&gsmdev->mutex);
-    rmutex_lock(&gsmdev->mutex);
+        /* store provided parameters in device */
+        dev->params = params;
 
-    at_dev_t *at_dev = &gsmdev->at_dev;
-    gsmdev->params = *params;
-    /* initialize driver struct */
-    if (gsmdev->driver->init_drv) {
-        res = gsmdev->driver->init_drv(gsmdev, params);
-        if (res) {
+        /* initialize AT device */
+        err = at_dev_init(&dev->at_dev, params->uart, params->baudrate,
+                dev->buffer, GSM_UART_BUFSIZE);
+
+        if(err) {
+            LOG_WARNING(LOG_HEADER"failed to initialize at parser with %d\n", err);
             goto out;
         }
-    }
 
-    /* initialize AT device */
-    res = at_dev_init(at_dev, params->uart, params->baudrate, gsmdev->buf, sizeof(gsmdev->buf));
-    if (res) {
-        goto out;
-    }
+        if((dev->driver) && (dev->driver->init_base)) {
+            err = dev->driver->init_base(dev);
 
-    /* reset device */
-    if(gsmdev->driver->reset) {
-        res = gsmdev->driver->reset(gsmdev);
-        if (res) {
-            goto out;
-        }
-    }
-
-    /* wait for boot */
-    do {
-        xtimer_usleep(100000U);
-        res = at_send_cmd_wait_ok(at_dev, "AT", GSM_SERIAL_TIMEOUT);
-    } while (res != 0 && (tries--));
-    if (res) {
-        LOG_INFO("gsm: no response\n");
-        goto out;
-    }
-
-    /* Change baudrate if requested */
-    if (gsmdev->params.baudrate_to_set && (gsmdev->driver->change_baudrate)) {
-        res = gsmdev->driver->change_baudrate(gsmdev, gsmdev->params.baudrate_to_set);
-        if (res) {
-            goto out;
-        }
-        at_dev_poweroff(at_dev);
-        res = at_dev_init(at_dev, params->uart, params->baudrate_to_set, gsmdev->buf,
-                          sizeof(gsmdev->buf));
-        if (res) {
-            goto out;
-        }
-        xtimer_usleep(100000U);
-        res = at_send_cmd_wait_ok(at_dev, "AT", GSM_SERIAL_TIMEOUT);
-        if (res) {
-            goto out;
-        }
-    }
-
-    /* enable rf */
-    res = at_send_cmd_wait_ok(at_dev, "AT+CFUN=1", GSM_SERIAL_TIMEOUT*30);
-    if (res) {
-        goto out;
-    }
-
-    /* device specific init */
-    if(gsmdev->driver->init) {
-        res = gsmdev->driver->init(gsmdev);
-        if (res) {
-            goto out;
-        }
-    }
-
-    gsmdev->state = GSM_ON;
-    /* create OOB thread */
-    gsmdev->pid = thread_create(gsmdev->stack, sizeof(gsmdev->stack), GSM_THREAD_PRIO,
-                                THREAD_CREATE_STACKTEST, _gsm_idle_thread, gsmdev, "gsm");
-
-
-    LOG_INFO("gsm: initialized\n");
-out:
-    rmutex_unlock(&gsmdev->mutex);
-    return res;
-}
-
-int gsm_receive_sms(gsm_t *gsmdev, gsm_sms_cb_t cb, void *arg)
-{
-    assert(gsmdev);
-
-    rmutex_lock(&gsmdev->mutex);
-
-    gsmdev->sms_cb = cb;
-    gsmdev->sms_arg = arg;
-
-    /* Enable reception */
-    int res = at_send_cmd_wait_ok(&gsmdev->at_dev, "AT+CNMI=1,1", GSM_SERIAL_TIMEOUT);
-    if (res) {
-        goto out;
-    }
-    /* set text mode */
-    res = at_send_cmd_wait_ok(&gsmdev->at_dev, "AT+CMGF=1", GSM_SERIAL_TIMEOUT);
-    if (res) {
-        goto out;
-    }
-    /* set header info */
-    res = at_send_cmd_wait_ok(&gsmdev->at_dev, "AT+CSDH=1", GSM_SERIAL_TIMEOUT);
-    if (res) {
-        goto out;
-    }
-    /* set default storage */
-    char buf[32];
-    res = at_send_cmd_get_lines(&gsmdev->at_dev, "AT+CPMS=\"ME\",\"ME\",\"ME\"",
-                                buf, sizeof(buf), false, GSM_SERIAL_TIMEOUT);
-    if (res < 0) {
-        goto out;
-    }
-
-    /* delete all messages */
-    res = at_send_cmd_wait_ok(&gsmdev->at_dev, "AT+CMGD=0,4", GSM_SERIAL_TIMEOUT);
-
-out:
-    rmutex_unlock(&gsmdev->mutex);
-    return res;
-}
-
-static void _wkup_cb(void *arg)
-{
-    gsm_t *gsmdev = arg;
-
-    at_dev_poweron(&gsmdev->at_dev);
-
-    gsmdev->driver->wake_up(gsmdev);
-
-    gsmdev->state = GSM_ON;
-    thread_wakeup(gsmdev->pid);
-
-    if (gsmdev->wkup_cb) {
-        gsmdev->wkup_cb(gsmdev->wkup_arg);
-    }
-}
-
-void gsm_sleep(gsm_t *gsmdev, gsm_wkup_cb_t cb, void *arg)
-{
-    rmutex_lock(&gsmdev->mutex);
-
-    gsmdev->wkup_cb = cb;
-    gsmdev->wkup_arg = arg;
-
-    if (gsmdev->driver->sleep(gsmdev)) {
-        rmutex_unlock(&gsmdev->mutex);
-        return;
-    }
-
-    at_dev_poweroff(&gsmdev->at_dev);
-    gsmdev->state = GSM_OFF;
-
-    if (gsmdev->params.ri_pin != GPIO_UNDEF) {
-        gpio_init_int(gsmdev->params.ri_pin, GPIO_IN, GPIO_FALLING, _wkup_cb, gsmdev);
-    }
-
-    rmutex_unlock(&gsmdev->mutex);
-}
-
-
-#define GSM_SMS_FIELD_NUMOF     (11)
-#define GSM_SMS_FIELD_SENDER_ID (1)
-#define GSM_SMS_FIELD_DATE_ID   (3)
-#define GSM_SMS_FIELD_LEN_ID    (GSM_SMS_FIELD_NUMOF - 1)
-
-static void _sms_cb(void *arg, const char *buf)
-{
-    gsm_t *gsmdev = arg;
-    char resp_buf[64];
-    char sms_buf[256];
-    char req_buf[32];
-    char *sms = NULL;
-    char *sender = NULL;
-    char *date = NULL;
-    unsigned long len = 0;
-    unsigned i = 0;
-
-    LOG_DEBUG("SMS received\n");
-
-    rmutex_lock(&gsmdev->mutex);
-
-    if (strncmp(buf, "+CMTI: \"ME\",", 12) != 0) {
-        rmutex_unlock(&gsmdev->mutex);
-        return;
-    }
-    unsigned long index = strtoul(buf + 12, NULL, 10);
-    char *pos = req_buf;
-    pos += fmt_str(pos, "AT+CMGR=");
-    pos += fmt_u32_dec(pos, index);
-    *pos = '\0';
-    int res = at_send_cmd_get_lines(&gsmdev->at_dev, req_buf, sms_buf, sizeof(sms_buf),
-                                    false, GSM_SERIAL_TIMEOUT);
-    if (res < 0) {
-        rmutex_unlock(&gsmdev->mutex);
-        return;
-    }
-
-    char *cur = sms_buf;
-    do {
-        if (i == GSM_SMS_FIELD_SENDER_ID) {
-            sender = cur + 1; /* remove leading '"' */
-        }
-        if (i == GSM_SMS_FIELD_DATE_ID) {
-            date = cur + 1; /* remove leading '"' */
-            if (*cur == '\"') {
-                while (*cur != ',') {
-                    cur++;
-                }
-                cur++;
+            if(err) {
+                LOG_WARNING(LOG_HEADER"failed to initialize base with %d\n", err);
+                goto out;
             }
         }
-        if (i == GSM_SMS_FIELD_LEN_ID) {
-            len = strtoul(cur, NULL, 0);
+
+        err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CREG=1", GSM_SERIAL_TIMEOUT_US);
+        if(err < 0) {
+            LOG_INFO(LOG_HEADER"failed to enable unsolicited result for CREG\n");
         }
-        while (*cur != ',' && *cur != '\n') {
-            cur++;
+
+        err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CMEE=1", GSM_SERIAL_TIMEOUT_US);
+        if(err < 0) {
+            LOG_INFO(LOG_HEADER"failed to enable extended error notification CMEE\n");
         }
-        *cur = '\0';
-        cur++;
-        i++;
-    } while (i < GSM_SMS_FIELD_NUMOF);
 
-    if (sender) {
-        sender[strlen(sender) - 1] = '\0'; /* remove trailing '"' */
-    }
-    if (date) {
-        date[strlen(date) - 1] = '\0'; /* remove trailing '"' */
+        dev->pid = thread_create(dev->stack, GSM_THREAD_STACKSIZE, GSM_THREAD_PRIO,
+                THREAD_CREATE_STACKTEST, idle_thread, dev, "gsm");
+
+out:
+        rmutex_unlock(&dev->mutex);
     }
 
-    pos = req_buf;
-    pos += fmt_str(pos, "AT+CMGD=");
-    pos += fmt_u32_dec(pos, index);
-    *pos = '\0';
-    res = at_send_cmd_get_lines(&gsmdev->at_dev, req_buf, resp_buf, sizeof(resp_buf),
-                                true, GSM_SERIAL_TIMEOUT);
-    if (res < 0) {
-        rmutex_unlock(&gsmdev->mutex);
-        return;
-    }
+    return err;
+}
 
-    if (len) {
-        while ((*cur == '\r' || *cur == '\n') && (*cur != '\0')) {
-            cur++;
+int gsm_power_on(gsm_t *dev)
+{
+    int err = -EINVAL;
+
+    if(dev) {
+        rmutex_lock(&dev->mutex);
+
+        if((dev->driver) && (dev->driver->power_on)) {
+            err = dev->driver->power_on(dev);
+
+            if(err <= 0) {
+                LOG_WARNING(LOG_HEADER"failed to power on\n");
+            }
+            else {
+                dev->state = GSM_ON;
+            }
         }
-        sms = cur;
-        sms[len] = '\0';
+        rmutex_unlock(&dev->mutex);
     }
 
-    rmutex_unlock(&gsmdev->mutex);
+    return err;
+}
 
-    if (gsmdev->sms_cb) {
-        gsmdev->sms_cb(gsmdev->sms_arg, sms, sender, date);
+void gsm_power_off(gsm_t *dev)
+{
+    if(dev) {
+        int err = -EINVAL;
+        rmutex_lock(&dev->mutex);
+
+        err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CFUN=0",
+                GSM_SERIAL_TIMEOUT_US * 30);
+
+        if((dev->driver) && (dev->driver->power_off)) {
+            err = dev->driver->power_off(dev);
+
+            if(err <= 0) {
+                LOG_WARNING(LOG_HEADER"failed to power off\n");
+            }
+            else {
+                dev->state = GSM_OFF;
+            }
+        }
+        rmutex_unlock(&dev->mutex);
     }
 }
 
-static void _creg_cb(void *arg, const char *buf)
+int gsm_enable_radio(gsm_t *dev)
 {
-    (void)arg;
-    LOG_DEBUG("CREG received: %s\n", buf);
-}
+    int err = -EINVAL;
 
-static void *_gsm_idle_thread(void *arg)
-{
-    gsm_t *gsmdev = arg;
+    if(dev) {
+        rmutex_lock(&dev->mutex);
 
-    at_oob_t oob[] = {
-        {
-            .urc = "+CMTI",
-            .cb = _sms_cb,
-            .arg = gsmdev,
-        },
-        {
-            .urc = "+CREG",
-            .cb = _creg_cb,
-            .arg = gsmdev,
-        },
-    };
+        err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CFUN=1",
+                GSM_SERIAL_TIMEOUT_US * 30);
 
-    for (unsigned i = 0; i < sizeof(oob) / sizeof(oob[0]); i++) {
-        at_add_oob(&gsmdev->at_dev, &oob[i]);
+        rmutex_unlock(&dev->mutex);
     }
 
-    while (1) {
-        if (gsmdev->state == GSM_ON) {
-            rmutex_lock(&gsmdev->mutex);
-            at_process_oob(&gsmdev->at_dev);
-            rmutex_unlock(&gsmdev->mutex);
-            xtimer_sleep(1);
+    return err;
+}
+
+int gsm_disable_radio(gsm_t *dev)
+{
+    int err = -EINVAL;
+
+    if(dev) {
+        rmutex_lock(&dev->mutex);
+
+        err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CFUN=0",
+                GSM_SERIAL_TIMEOUT_US * 30);
+
+        rmutex_unlock(&dev->mutex);
+    }
+
+    return err;
+}
+
+int gsm_set_puk(gsm_t *dev, const char *puk, const char *pin)
+{
+    int res = -EINVAL;
+
+    if((strlen(pin) == 4)) {
+        char buf[GSM_AT_LINEBUFFER_SIZE_SMALL];
+        char *pos = buf;
+        bool quotes = false;
+
+        pos += fmt_str(pos, "AT+CPIN=");
+        if(strlen(puk) == 8) {
+            pos += fmt_str(pos, "\"");
+            pos += fmt_str(pos, puk);
+            pos += fmt_str(pos, "\",\"");
+
+            quotes = true;
         }
-        else {
-            thread_sleep();
+        pos += fmt_str(pos, pin);
+        if(quotes){
+            pos += fmt_str(pos, "\"");
+        }
+        *pos = '\0';
+
+        rmutex_lock(&dev->mutex);
+
+        res = at_send_cmd_get_resp(&dev->at_dev, buf, buf,
+        GSM_AT_LINEBUFFER_SIZE_SMALL, GSM_SERIAL_TIMEOUT_US);
+
+        rmutex_unlock(&dev->mutex);
+
+        if(res > 0) {
+            /* if one matches (equals 0), return 0 */
+            res = strncmp(buf, "OK", 2) && strncmp(buf, "+CPIN: READY", 12);
+
+            if(res > 0) {
+                LOG_INFO(LOG_HEADER"unexpected response: %s\n", buf);
+            }
         }
     }
 
-    return NULL;
+    return res;
 }
 
-int gsm_off(gsm_t *gsmdev)
+int gsm_set_pin(gsm_t *dev, const char *pin)
 {
-    LOG_INFO("gsm: turning off.\n");
-    at_dev_t *at_dev = &gsmdev->at_dev;
-    return at_send_cmd_wait_ok(at_dev, "AT+CFUN=0", GSM_SERIAL_TIMEOUT*30);
+    return gsm_set_puk(dev, NULL, pin);
 }
 
-int gsm_set_pin(gsm_t *gsmdev, const char *pin)
+
+int gsm_check_pin(gsm_t *dev)
 {
-    if (strlen(pin) != 4) {
-        return -EINVAL;
-    }
+    int res;
+    char linebuf[GSM_AT_LINEBUFFER_SIZE_SMALL];
 
-    rmutex_lock(&gsmdev->mutex);
+    rmutex_lock(&dev->mutex);
 
-    xtimer_usleep(100000U);
+    res = at_send_cmd_get_resp(&dev->at_dev, "AT+CPIN?", linebuf,
+            GSM_AT_LINEBUFFER_SIZE_SMALL, GSM_SERIAL_TIMEOUT_US);
 
-    char buf[32];
-    char *pos = buf;
-    pos += fmt_str(pos, "AT+CPIN=");
-    pos += fmt_str(pos, pin);
-    *pos = '\0';
-
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, buf, buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
-    rmutex_unlock(&gsmdev->mutex);
-
-    if (res > 0) {
-        /* if one matches (equals 0), return 0 */
-        return strncmp(buf, "OK", 2) && strncmp(buf, "+CPIN: READY", 12);
-    }
-    else {
-        return -1;
-    }
-}
-
-int gsm_check_pin(gsm_t *gsmdev)
-{
-    char linebuf[32];
-
-    rmutex_lock(&gsmdev->mutex);
-    xtimer_usleep(100000U);
-
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+CPIN?", linebuf, sizeof(linebuf), GSM_SERIAL_TIMEOUT);
+    rmutex_unlock(&dev->mutex);
 
     if (res > 0) {
         if (!strncmp(linebuf, "OK", res)) {
@@ -391,91 +239,85 @@ int gsm_check_pin(gsm_t *gsmdev)
             res = 1;
         }
         else {
+            LOG_INFO(LOG_HEADER"unexpected response: %s\n", linebuf);
             res = -1;
         }
     }
 
-    rmutex_unlock(&gsmdev->mutex);
     return res;
 }
 
-int gsm_creg_get(gsm_t *gsmdev)
+int gsm_check_operator(gsm_t *dev)
 {
-    char buf[64];
+    char buf[GSM_AT_LINEBUFFER_SIZE];
 
-    rmutex_lock(&gsmdev->mutex);
+    rmutex_lock(&dev->mutex);
 
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+CREG?", buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
-    if ((res > 0) && (strncmp(buf, "+CREG: 0,", 9) == 0)) {
-        res = atoi(buf + 9);
-    }
-    else {
-        res = -1;
-    }
-
-    rmutex_unlock(&gsmdev->mutex);
-
-    return res;
-}
-
-int gsm_reg_check(gsm_t *gsmdev)
-{
-    char buf[64];
-
-    rmutex_lock(&gsmdev->mutex);
-
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+COPS?", buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
-    if ((res > 0) && (strncmp(buf, "+COPS: 0,", 9) == 0)) {
+    int res = at_send_cmd_get_resp(&dev->at_dev, "AT+COPS?", buf, sizeof(buf),
+            GSM_SERIAL_TIMEOUT_US);
+    if ((res > 0) && (strncmp(buf, "+COPS:", 6) == 0)) {
         res = 0;
     }
     else {
         res = -1;
     }
 
-    rmutex_unlock(&gsmdev->mutex);
+    rmutex_unlock(&dev->mutex);
 
     return res;
 }
 
-size_t gsm_reg_get(gsm_t *gsmdev, char *outbuf, size_t len)
+size_t gsm_get_operator(gsm_t *dev, char *outbuf, size_t len)
 {
-    char buf[64];
+    char buf[GSM_AT_LINEBUFFER_SIZE];
     char *pos = buf;
 
-    rmutex_lock(&gsmdev->mutex);
+    rmutex_lock(&dev->mutex);
 
-    size_t outlen = 0;
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+COPS?", buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
-    if ((res > 12) && (strncmp(pos, "+COPS: 0,", 9) == 0)) {
-        /* skip '+COPS: 0,[01],"' */
-        pos += 12;
+    int res = at_send_cmd_get_resp(&dev->at_dev, "AT+COPS?", buf, sizeof(buf),
+            GSM_SERIAL_TIMEOUT_US);
 
-        while (*pos != '"' && len--) {
-            *outbuf++ = *pos++;
-            outlen++;
-        }
-        if (len) {
-            *outbuf = '\0';
-            res = outlen;
+    rmutex_unlock(&dev->mutex);
+
+    if(res > 0) {
+        /* +COPS: 1,0,"NL KPN KPN",8 */
+        if(strncmp(pos, "+COPS:", 6) == 0) {
+            size_t outlen = 0;
+            if(pos[7] == '0') {
+                strcpy(outbuf, "Unknown");
+                res = 8;
+            }
+            else {
+                /* skip '+COPS: [0-3],[0-3],"' */
+                pos = strchr(buf, '"');
+                while((*(++pos) != '"') && (len--)) {
+                    *outbuf++ = *pos;
+                    outlen++;
+                }
+                if(len) {
+                    *outbuf = '\0';
+                    res = outlen;
+                }
+                else {
+                    res = -ENOSPC;
+                }
+            }
         }
         else {
-            return -ENOSPC;
+            res = -1;
+            LOG_INFO(LOG_HEADER"unexpected response: %s\n", buf);
         }
     }
-    else {
-        res = -1;
-    }
-
-    rmutex_unlock(&gsmdev->mutex);
 
     return res;
 }
 
-ssize_t gsm_imei_get(gsm_t *gsmdev, char *buf, size_t len)
+ssize_t gsm_get_imei(gsm_t *dev, char *buf, size_t len)
 {
-    rmutex_lock(&gsmdev->mutex);
+    rmutex_lock(&dev->mutex);
 
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+GSN", buf, len, GSM_SERIAL_TIMEOUT);
+    int res = at_send_cmd_get_resp(&dev->at_dev, "AT+GSN", buf, len,
+            GSM_SERIAL_TIMEOUT_US);
     if (res > 0) {
         buf[res] = '\0';
     }
@@ -483,21 +325,86 @@ ssize_t gsm_imei_get(gsm_t *gsmdev, char *buf, size_t len)
         res = -1;
     }
 
-    rmutex_unlock(&gsmdev->mutex);
+    rmutex_unlock(&dev->mutex);
 
     return res;
 }
 
-ssize_t gsm_identification_get(gsm_t *gsmdev, char *buf, size_t len)
+ssize_t gsm_get_imsi(gsm_t *dev, char *buf, size_t len)
+{
+    rmutex_lock(&dev->mutex);
+
+    int res = at_send_cmd_get_resp(&dev->at_dev, "AT+CIMI", buf, len,
+            GSM_SERIAL_TIMEOUT_US);
+
+    if (res > 0) {
+        if(strncmp(buf, "+CME ERROR:", 10) == 0) {
+            res = -1;
+            LOG_INFO(LOG_HEADER"unexpected response: %s\n", buf);
+        }
+    }
+    else {
+        res = -1;
+    }
+
+    rmutex_unlock(&dev->mutex);
+
+    return res;
+}
+
+ssize_t gsm_get_simcard_identification(gsm_t *dev, char *outbuf, size_t len)
+{
+    int err = -EINVAL;
+
+    if(dev) {
+        char buf[GSM_AT_LINEBUFFER_SIZE];
+        char *pos = buf;
+
+
+        rmutex_lock(&dev->mutex);
+
+        err = at_send_cmd_get_resp(&dev->at_dev, "AT+CCID", buf, len,
+        GSM_SERIAL_TIMEOUT_US);
+
+        rmutex_unlock(&dev->mutex);
+
+        if(err <= 0) {
+            goto out;
+        }
+
+        if(strncmp(buf, "+CCID:", 6) == 0) {
+            pos = strchr(buf, '"');
+            if(pos) {
+                size_t outlen = 0;
+                while((*(++pos) != '"') && (len--)) {
+                    *outbuf++ = *pos;
+                    outlen++;
+                }
+                if(len) {
+                    *outbuf = '\0';
+                    err = outlen;
+                }
+                else {
+                    err = -ENOSPC;
+                }
+            }
+        }
+    }
+out:
+    return err;
+}
+
+ssize_t gsm_get_identification(gsm_t *dev, char *buf, size_t len)
 {
     ssize_t res = -1;
-    if(gsmdev && buf){
+    if(dev && buf){
 
-        rmutex_lock(&gsmdev->mutex);
+        rmutex_lock(&dev->mutex);
 
-        res = at_send_cmd_get_lines(&gsmdev->at_dev, "ATI", buf, len, false, GSM_SERIAL_TIMEOUT);
+        res = at_send_cmd_get_lines(&dev->at_dev, "ATI", buf, len, false,
+                GSM_SERIAL_TIMEOUT_US);
 
-        rmutex_unlock(&gsmdev->mutex);
+        rmutex_unlock(&dev->mutex);
 
         if(res >= 0) {
             char * pos = &buf[res -1]; /* will provide the pointer to index of the terminator */
@@ -521,14 +428,15 @@ ssize_t gsm_identification_get(gsm_t *gsmdev, char *buf, size_t len)
     return res;
 }
 
-int gsm_signal_get(gsm_t *gsmdev, unsigned *rssi, unsigned *ber)
+int gsm_get_signal(gsm_t *dev, unsigned *rssi, unsigned *ber)
 {
     char buf[32];
     char *pos = buf;
 
-    rmutex_lock(&gsmdev->mutex);
+    rmutex_lock(&dev->mutex);
 
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+CSQ", buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
+    int res = at_send_cmd_get_resp(&dev->at_dev, "AT+CSQ", buf, sizeof(buf),
+            GSM_SERIAL_TIMEOUT_US);
     if ((res > 2) && strncmp(buf, "+CSQ: ", 6) == 0) {
         pos += 6; /* skip "+CSQ: " */
         *rssi = scn_u32_dec(pos, 2);
@@ -540,281 +448,203 @@ int gsm_signal_get(gsm_t *gsmdev, unsigned *rssi, unsigned *ber)
         res = -1;
     }
 
-    rmutex_unlock(&gsmdev->mutex);
+    rmutex_unlock(&dev->mutex);
 
     return res;
 }
 
-uint32_t gsm_gprs_getip(gsm_t *gsmdev)
+int gsm_get_registration(gsm_t *dev)
 {
-    char buf[40];
-    char *pos = buf;
-    uint32_t ip = 0;
+    int res = -EINVAL;
 
-    rmutex_lock(&gsmdev->mutex);
+    if(dev) {
+        char buf[GSM_AT_LINEBUFFER_SIZE];
 
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+CGPADDR=1", buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
-    if ((res > 13) && strncmp(buf, "+CGPADDR: 1,\"", 13) == 0) {
-        res -= 1;   /* cut off " */
-        buf[res] = '\0';
-        pos += 13; /* skip '+CGPADDR: 1,"' */
+        rmutex_lock(&dev->mutex);
 
-        ipv4_addr_from_str((ipv4_addr_t *)&ip, pos);
+        res = at_send_cmd_get_resp(&dev->at_dev, "AT+CREG?", buf, sizeof(buf),
+                GSM_SERIAL_TIMEOUT_US);
+
+        rmutex_unlock(&dev->mutex);
+
+        if((res > 0) && (strncmp(buf, "+CREG:", 6) == 0)) {
+            char * pos = strchr(buf, ',');
+            if(pos){
+                res = atoi(++pos);
+            }
+            else {
+                res = -1;
+            }
+        } else {
+            res = -1;
+        }
     }
 
-    rmutex_unlock(&gsmdev->mutex);
-
-    return ip;
+    return res;
 }
 
-int gsm_setup_pdp_context(gsm_t *gsmdev, uint8_t ctx, gsm_context_type_t type,
-        const char * apn, const char * user, const char * pass)
+ssize_t __attribute__((weak)) gsm_get_local_time(gsm_t *dev, char * outbuf, size_t len)
 {
-    int result = -1;
+    ssize_t res = -1;
+    if(dev && outbuf) {
+        char buf[GSM_AT_LINEBUFFER_SIZE];
 
-    if((gsmdev) && (type < GSM_CTX_COUNT))
-    {
-        char buf[128] = { 0 };
-        char *pos = buf;
+        rmutex_lock(&dev->mutex);
 
-        pos += fmt_str(pos, "AT+CGDCONT=");
-        pos += fmt_u32_dec(pos, ctx);
-        pos += fmt_str(pos, ",\"");
-        pos += fmt_str(pos, gsm_context_types[type]);
-        pos += fmt_str(pos, "\",\"");
-        pos += fmt_str(pos, apn);
+        res = at_send_cmd_get_lines(&dev->at_dev, "AT+CCLK?", buf,
+                GSM_AT_LINEBUFFER_SIZE, false, GSM_SERIAL_TIMEOUT_US);
 
-        if(user){
-            pos += fmt_str(pos, "\",\"");
-            pos += fmt_str(pos, user);
+        rmutex_unlock(&dev->mutex);
 
-            if(pass) {
-                pos += fmt_str(pos, "\",\"");
-                pos += fmt_str(pos, pass);
+        if(res > 0) {
+            if(strncmp(buf, "+CCLK:", 6) == 0) {
+                char * pos = strchr(buf, '"');
+                if(pos) {
+                    size_t outlen = 0;
+                    while((*(++pos) != '"') && (len--)) {
+                        *outbuf++ = *pos;
+                        outlen++;
+                    }
+                    if(len) {
+                        *outbuf = '\0';
+                        res = outlen;
+                    }
+                    else {
+                        res = -ENOSPC;
+                    }
+                }
+                else {
+                    res = -1;
+                }
             }
         }
-        pos += fmt_str(pos, "\"\0");
-
-        rmutex_lock(&gsmdev->mutex);
-
-         /* AT+CGDCONT=<ctx>,"<type>","<apn>",["<user>",["<pass>"]] */
-        result = at_send_cmd_wait_ok(&gsmdev->at_dev, buf, GSM_SERIAL_TIMEOUT);
-
-        rmutex_unlock(&gsmdev->mutex);
     }
 
-    return result;
+    return res;
 }
 
-int gsm_dial(gsm_t *gsmdev, const char * number, bool is_voice_call)
+
+ssize_t gsm_cmd(gsm_t *dev, const char *cmd, uint8_t *buf, size_t len, unsigned timeout)
 {
-    int result = -1;
+    rmutex_lock(&dev->mutex);
 
-    if(gsmdev && number) {
-        char buf[64];
-        char *pos = buf;
+    ssize_t res = at_send_cmd_get_lines(&dev->at_dev, cmd, (char *)buf, len,
+            true, GSM_SERIAL_TIMEOUT_US * timeout);
 
-        pos += fmt_str(pos, "ATD");
-        pos += fmt_str(pos, number);
+    rmutex_unlock(&dev->mutex);
 
-        if(is_voice_call) {
-            pos += fmt_str(pos, ";");
-        }
-        *pos = '\0';
-
-        rmutex_lock(&gsmdev->mutex);
-
-        result = at_send_cmd_get_resp(&gsmdev->at_dev, buf, buf, sizeof(buf), GSM_SERIAL_TIMEOUT);
-        if (result > 0) {
-            if (strcmp(buf, "CONNECT") == 0) {
-                result = 0;
-            }
-        }
-
-        rmutex_unlock(&gsmdev->mutex);
-    }
-
-    return result;
+    return res;
 }
 
-void gsm_print_status(gsm_t *gsmdev)
+
+void gsm_print_status(gsm_t *dev)
 {
-    char buf[64];
+    char buf[GSM_AT_LINEBUFFER_SIZE];
 
-    int res = gsm_identification_get(gsmdev, buf, sizeof(buf));
+    int res = gsm_get_identification(dev, buf, GSM_AT_LINEBUFFER_SIZE);
 
-    if (res >= 2) {
-        printf("gsm: device type %s\n", buf);
-    }
-    else {
+    if(res >= 2) {
+        printf(LOG_HEADER"device type %s\n", buf);
+    } else {
         printf("gsm: error reading device type!\n");
     }
 
-    res = gsm_imei_get(gsmdev, buf, sizeof(buf));
-    if (res >= 0) {
-        printf("gsm: IMEI: \"%s\"\n", buf);
-    }
-    else {
-        printf("gsm: error getting IMEI\n");
-    }
-
-    res = gsm_iccid_get(gsmdev, buf, sizeof(buf));
-    if (res >= 0) {
-        printf("gsm: ICCID: \"%s\"\n", buf);
-    }
-    else {
-        printf("gsm: error getting ICCID\n");
+    res = gsm_get_imei(dev, buf, GSM_AT_LINEBUFFER_SIZE);
+    if(res >= 0) {
+        printf(LOG_HEADER"IMEI: \"%s\"\n", buf);
+    } else {
+        printf(LOG_HEADER"error getting IMEI\n");
     }
 
-
-    res = gsm_reg_get(gsmdev, buf, sizeof(buf));
-    if (res >= 0) {
-        printf("gsm: registered to \"%s\"\n", buf);
+    res = gsm_get_simcard_identification(dev, buf, GSM_AT_LINEBUFFER_SIZE);
+    if(res >= 0) {
+        printf(LOG_HEADER"ICCID: \"%s\"\n", buf);
+    } else {
+        printf(LOG_HEADER"error getting ICCID\n");
     }
-    else {
-        printf("gsm: not registered\n");
+
+    res = gsm_get_imsi(dev, buf, GSM_AT_LINEBUFFER_SIZE);
+    if(res >= 0) {
+        printf(LOG_HEADER"IMSI: \"%s\"\n", buf);
+    } else {
+        printf(LOG_HEADER"error getting IMSI\n");
+    }
+
+    res = gsm_get_registration(dev);
+    if(res >= 0) {
+        printf(LOG_HEADER"registration code: %d\n", res);
+
+        res = gsm_get_operator(dev, buf, GSM_AT_LINEBUFFER_SIZE);
+        if(res >= 0) {
+            printf(LOG_HEADER"registered to \"%s\"\n", buf);
+        } else {
+            printf(LOG_HEADER"no operator\n");
+        }
+    } else {
+        printf(LOG_HEADER"not registered\n");
     }
 
     unsigned rssi;
     unsigned ber;
-    res = gsm_signal_get(gsmdev, &rssi, &ber);
-    if (res == 0) {
-        printf("gsm: RSSI=%u ber=%u%%\n", rssi, ber);
+    res = gsm_get_signal(dev, &rssi, &ber);
+    if(res == 0) {
+        printf(LOG_HEADER"RSSI=%u ber=%u%%\n", rssi, ber);
+    } else {
+        printf(LOG_HEADER"error getting signal strength\n");
     }
-    else {
-        printf("gsm: error getting signal strength\n");
+}
+
+void gsm_register_urc_callback(gsm_t *dev, const char * urc,
+                                    at_oob_cb_t cb, void * args)
+{
+    if(dev) {
+        at_oob_t oob = {
+            .urc = urc,
+            .cb = cb,
+            .arg = args
+        };
+
+        at_add_oob(&dev->at_dev, &oob);
+    }
+}
+
+static void * idle_thread(void *arg)
+{
+    unsigned i;
+    gsm_t *dev = arg;
+    at_oob_t oob[] = {
+        {
+            .urc = "+CREG",
+            .cb = creg_cb,
+            .arg = dev,
+        },
+    };
+
+    assert(dev);
+
+    /* register all unsolicited result codes */
+    for(i = 0; i < sizeof(oob) / sizeof(oob[0]); i++) {
+        at_add_oob(&dev->at_dev, &oob[i]);
     }
 
-    uint32_t ip = gsm_gprs_getip(gsmdev);
-    if (ip) {
-        printf("gsm: GPRS connected. IP=");
-        for (unsigned i = 0; i < 4; i++) {
-            uint8_t *_tmp = (uint8_t*) &ip;
-            printf("%u%s", (unsigned)_tmp[i], (i < 3) ? "." : "\n");
+    while(1) {
+        if(dev->state >= GSM_ON) {
+            rmutex_lock(&dev->mutex);
+            at_process_oob(&dev->at_dev);
+            rmutex_unlock(&dev->mutex);
+            xtimer_sleep(1);
+        }
+        else {
+            thread_sleep();
         }
     }
-    else {
-        printf("gsm: error getting GPRS state\n");
-    }
+
+    return NULL;
 }
 
-int gsm_iccid_get(gsm_t *gsmdev, char *buf, size_t len)
+static void creg_cb(void *arg, const char *buf)
 {
-    rmutex_lock(&gsmdev->mutex);
-
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+CCID", buf, len, GSM_SERIAL_TIMEOUT);
-    if (res > 0) {
-        if (!strncmp(buf, "+CCID: ", 7)) {
-            memcpy(buf, buf + 7, res - 7);
-            buf[res - 7] = '\0';
-        }
-    }
-    else {
-        res = -1;
-    }
-
-    rmutex_unlock(&gsmdev->mutex);
-
-    return res;
+    (void)arg;
+    LOG_DEBUG(LOG_HEADER"CREG received: %s\n", buf);
 }
 
-int gsm_gps_get_loc(gsm_t *gsmdev, uint8_t *buf, size_t len)
-{
-    rmutex_lock(&gsmdev->mutex);
-
-    int res = at_send_cmd_get_resp(&gsmdev->at_dev, "AT+CGPSINF=0", (char *)buf, len, GSM_SERIAL_TIMEOUT);
-
-    rmutex_unlock(&gsmdev->mutex);
-
-    return res;
-}
-
-ssize_t gsm_cmd(gsm_t *gsmdev, const char *cmd, uint8_t *buf, size_t len, unsigned timeout)
-{
-    rmutex_lock(&gsmdev->mutex);
-
-    ssize_t res = at_send_cmd_get_lines(&gsmdev->at_dev, cmd, (char *)buf, len, true, GSM_SERIAL_TIMEOUT * timeout);
-
-    rmutex_unlock(&gsmdev->mutex);
-
-    return res;
-}
-
-int gsm_get_loc(gsm_t *gsmdev, char *lon, char *lat)
-{
-    return gsmdev->driver->get_loc(gsmdev, lon, lat);
-}
-
-int gsm_cnet_scan(gsm_t *gsmdev, char *buf, size_t len)
-{
-    return gsmdev->driver->cnet_scan(gsmdev, buf, len);
-}
-
-ssize_t gsm_http_get(gsm_t *gsmdev, const char *url, uint8_t *resultbuf, size_t len,
-                     const gsm_http_params_t *params)
-{
-    return gsmdev->driver->http_get(gsmdev, url, resultbuf, len, params);
-}
-
-ssize_t gsm_http_get_file(gsm_t *gsmdev, const char *url, const char *filename,
-                          const gsm_http_params_t *params)
-{
-    return gsmdev->driver->http_get_file(gsmdev, url, filename, params);
-}
-
-ssize_t gsm_http_post(gsm_t *gsmdev,
-                      const char *url,
-                      const uint8_t *data, size_t data_len,
-                      uint8_t *resultbuf, size_t result_len,
-                      const gsm_http_params_t *params)
-{
-    return gsmdev->driver->http_post(gsmdev, url, data, data_len, resultbuf, result_len, params);
-}
-
-ssize_t gsm_http_post_file(gsm_t *gsmdev, const char *url,
-                           const char *filename,
-                           uint8_t *resultbuf, size_t result_len,
-                           const gsm_http_params_t *params)
-{
-    return gsmdev->driver->http_post_file(gsmdev, url, filename, resultbuf, result_len, params);
-}
-
-ssize_t gsm_http_post_file_2(gsm_t *gsmdev, const char *url,
-                             const char *filename,
-                             const char *result_filename,
-                             const gsm_http_params_t *params)
-{
-    return gsmdev->driver->http_post_file_2(gsmdev, url, filename, result_filename, params);
-}
-
-int gsm_time_sync(gsm_t *gsmdev)
-{
-    return gsmdev->driver->time_sync(gsmdev);
-}
-
-int gsm_gps_start(gsm_t *gsmdev)
-{
-    if (gsmdev->driver->gps_start) {
-        return gsmdev->driver->gps_start(gsmdev);
-    }
-
-    return -ENOTSUP;
-}
-
-int gsm_gps_stop(gsm_t *gsmdev)
-{
-    if (gsmdev->driver->gps_stop) {
-        return gsmdev->driver->gps_stop(gsmdev);
-    }
-
-    return -ENOTSUP;
-}
-
-ssize_t gsm_get_nmea(gsm_t *gsmdev, char *nmea, size_t len)
-{
-    if (gsmdev->driver->get_nmea) {
-        return gsmdev->driver->get_nmea(gsmdev, nmea, len);
-    }
-
-    return -ENOTSUP;
-}

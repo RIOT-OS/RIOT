@@ -1,669 +1,349 @@
 /*
  * Copyright (C) 2016 Kaspar Schleiser <kaspar@schleiser.de>
  * Copyright (C) 2018 OTA keys S.A.
+ * Copyright (C) 2018 Max van Kessel <maxvankessel@betronic.nl>
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
+/**
+ * @defgroup    drivers_gsm     GSM
+ * @ingroup     drivers
+ * @brief       A generic implementation of the GSM API
+ *
+ * @{
+ *
+ * @file
+ * @brief   GSM-independent driver
+ *
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Vincent Dupont <vincent@otakeys.com>
+ * @author  Max van Kessel <maxvankessel@betronic.nl>
+ */
 #ifndef GSM_H
 #define GSM_H
 
-#include "at.h"
+#include <stdint.h>
+
 #include "rmutex.h"
-#include "periph/uart.h"
-#include "periph/gpio.h"
 #include "thread.h"
+
+#include "periph/gpio.h"
+#include "periph/uart.h"
+
+#include "at.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef GSM_UART_BUFSIZE
 /**
- * @brief   AT device buffer size
+ * @brief   gsm thread stack size
  */
-#define GSM_UART_BUFSIZE        (1024U)
-#endif
-
-#ifndef GSM_SERIAL_TIMEOUT
-/**
- * @brief   AT device default timeout
- */
-#define GSM_SERIAL_TIMEOUT      (1000000U)
-#endif
-
 #ifndef GSM_THREAD_STACKSIZE
-/**
- * @brief   GSM thread stack size
- */
 #define GSM_THREAD_STACKSIZE    (THREAD_STACKSIZE_DEFAULT)
 #endif
 
-#ifndef GSM_THREAD_PRIO
 /**
- * @brief   GSM thread priority
+ * @brief   gsm thread priority
  */
+#ifndef GSM_THREAD_PRIO
 #define GSM_THREAD_PRIO         (THREAD_PRIORITY_MAIN + 1)
 #endif
 
-#ifndef GSM_PPP_NUMBER
 /**
- * @brief   GSM default PPP number
+ * @brief   at device buffer size
  */
-#define GSM_PPP_NUMBER         "*99#"
+#ifndef GSM_UART_BUFSIZE
+#define GSM_UART_BUFSIZE        (1024U)
 #endif
 
+/**
+ * @brief   at device default timeout in micro seconds
+ */
+#ifndef GSM_SERIAL_TIMEOUT_US
+#define GSM_SERIAL_TIMEOUT_US   (1000000U)
+#endif
+
+/**
+ * @brief   small line buffer size
+ */
+#ifndef GSM_AT_LINEBUFFER_SIZE_SMALL
+#define GSM_AT_LINEBUFFER_SIZE_SMALL    (32)
+#endif
+
+/**
+ * @brief   normal linebuffer size
+ */
+#ifndef GSM_AT_LINEBUFFER_SIZE
+#define GSM_AT_LINEBUFFER_SIZE          (64)
+#endif
+
+/**
+ * @brief States of gsm modem
+ */
+enum {
+    GSM_OFF,    /**< GSM_OFF */
+    GSM_ON,     /**< GSM_ON */
+};
+
+/**
+ * @brief   Default gsm_driver_t type definition
+ */
 typedef struct gsm_driver gsm_driver_t;
 
-typedef void (*gsm_sms_cb_t)(void *arg, char *sms, char *sender, char *date);
-typedef void (*gsm_wkup_cb_t)(void *arg);
-
-enum {
-    GSM_OFF,
-    GSM_ON,
-};
-
-typedef enum {
-    GSM_CTX_IP = 0,
-    GSM_CTX_PPP,
-    GSM_CTX_IPV6,
-    GSM_CTX_IP4V6,
-    GSM_CTX_COUNT,
-} gsm_context_type_t;
-
-typedef enum {
-    GSM_CT_APPLICATION_X_WWW_URL_ENCODED,
-    GSM_CT_TEXT_PLAIN,
-    GSM_CT_APPLICATION_OCTET_STREAM,
-    GSM_CT_MULTIPART_FORM_DATA,
-    GSM_CT_APPLICATION_JSON,
-    GSM_CT_APPLICATION_XML,
-    /* Add new content types here */
-    GSM_CT_MAX,
-} gsm_content_type_t;
-
-typedef struct {
-    uint16_t port;
-    gsm_content_type_t content_type;
-    const char *user_agent;
-} gsm_http_params_t;
-
 /**
- * @brief   GSM device parameters
+ * @brief   gsm device parameters
  *
- * GSM device common parameters.
- * GSM implementations can extend this structure with device specific fields
+ * Common GSM parameters.
  */
-typedef struct {
-    uart_t uart;
-    uint32_t baudrate;
-    uint32_t baudrate_to_set;
-    gpio_t ri_pin;
+typedef struct gsm_params {
+    uart_t      uart;       /**< communication interface of modem */
+    uint32_t    baudrate;   /**< initial baudrate */
+    gpio_t      ri_pin;     /**< ring indicator */
 } gsm_params_t;
 
-/**
- * @brief   GSM device descriptor
- */
-typedef struct {
-    /**
-     * GSM driver
-     */
-    const gsm_driver_t *driver;
-    /**
-     * GSM parameters
-     */
-    gsm_params_t params;
-    /**
-     * AT device
-     */
-    at_dev_t at_dev;
-    /**
-     * GSM lock
-     */
-    rmutex_t mutex;
-    /**
-     * AT device buffer
-     */
-    char buf[GSM_UART_BUFSIZE];
-    /**
-     * GSM thread stack
-     */
-    char stack[GSM_THREAD_STACKSIZE];
-    /**
-     * GSM thread PID
-     */
-    kernel_pid_t pid;
-    /**
-     * GSM state (on / off)
-     */
-    int state;
-    /**
-     * SMS callback
-     */
-    gsm_sms_cb_t sms_cb;
-    /**
-     * SMS callback parameter
-     */
-    void *sms_arg;
-    /**
-     * Wake up callback
-     */
-    gsm_wkup_cb_t wkup_cb;
-    /**
-     * Wake up callback parameter
-     */
-    void *wkup_arg;
+typedef struct gsm {
+    const gsm_driver_t  *driver;                    /**< gsm driver */
+    const gsm_params_t  *params;                    /**< gsm parameters */
+
+    rmutex_t        mutex;                          /**< lock */
+    kernel_pid_t    pid;                            /**< thread pid */
+    char            stack[GSM_THREAD_STACKSIZE];    /**< stack */
+    int             state;                          /**< gsm state */
+
+    at_dev_t        at_dev;                         /**< at parser */
+    char            buffer[GSM_UART_BUFSIZE];       /**< at buffer */
 } gsm_t;
 
-/**
- * @brief   GSM driver
- */
 struct gsm_driver {
-    /**
-     * @brief   Initialize the device driver
-     *
-     * Initialize the internal structure with the given @p param. This function
-     * is called once and should not act on the device itself.
-     *
-     * @param[in]   dev     device driver to initialize
-     * @param[in]   params  device driver parameters
-     *
-     * @return 0 on success
-     */
-    int (*init_drv)(gsm_t *dev, const gsm_params_t *params);
-
-    /**
-     * @brief   Perform a hardware reset on the device
-     *
-     * @param[in]   dev     device driver
-     *
-     * @return 0 on success
-     */
-    int (*reset)(gsm_t *dev);
-
-    /**
-     * @brief   Initialize the device
-     *
-     * This function actually initialize the hardware
-     *
-     * @param[in]   dev     device driver
-     *
-     * @return 0 on success
-     */
-    int (*init)(gsm_t *dev);
-
-    /**
-     * @brief   Change device baudrate
-     *
-     * @param[in]   dev     device driver
-     *
-     * @return 0 on success
-     * @return < 0 on error
-     */
-    int (*change_baudrate)(gsm_t *dev, uint32_t baudrate);
-
-    /**
-     * @brief   Put the device to sleep
-     *
-     * After this funtion is called successfully, the AT device UART may be
-     * powered off. If the RI pin is defined, it is used as interrupt source for
-     * wake up.
-     *
-     * @param[in]   dev     device driver
-     *
-     * @return 0 on success
-     * @return < 0 on error, or if device can not sleep
-     */
-    int (*sleep)(gsm_t *dev);
-
-    /**
-     * @brief   Wake up the device
-     *
-     * Before this funtion is called, the AT device UART is powered on.
-     *
-     * @param[in]   dev     device driver
-     *
-     * @return 0 on success
-     * @return < 0 on errir, or if device can not wake up
-     */
-    int (*wake_up)(gsm_t *dev);
-
-    /**
-     * @brief   Initialize GPRS data connection
-     *
-     * @param[in]   gsmdev  device driver
-     * @param[in]   apn     APN name to use
-     * @param[in]   user    APN user if authentication is needed
-     * @param[in]   passwd  APN password it authentication is needed
-     *
-     * @return 0 on success
-     * @return < 0 on error
-     */
-    int (*gprs_init)(gsm_t *gsmdev, const char *apn, const char *user, const char *passwd);
-
-    /**
-     * @brief   Send an HTTP GET request and return a buffer
-     *
-     * @param[in]   gsmdev  device driver
-     */
-    ssize_t (*http_get)(gsm_t *gsmdev, const char *url,
-                        uint8_t *resultbuf, size_t len,
-                        const gsm_http_params_t *params);
-
-    /**
-     * @brief   Send an HTTP GET request and return a file
-     *
-     * @param[in]   gsmdev  device driver
-     */
-    ssize_t (*http_get_file)(gsm_t *gsmdev, const char *url, const char *filename,
-                             const gsm_http_params_t *params);
-
-    /**
-     * @brief   Send an HTTP POST request from a buffer an return a buffer
-     *
-     * @param[in]   gsmdev  device driver
-     */
-    ssize_t (*http_post)(gsm_t *gsmdev, const char *url,
-                         const uint8_t *data, size_t data_len,
-                         uint8_t *resultbuf, size_t result_len,
-                         const gsm_http_params_t *params);
-
-    /**
-     * @brief   Send an HTTP POST request from a file and return a buffer
-     *
-     * @param[in]   gsmdev  device driver
-     */
-    ssize_t (*http_post_file)(gsm_t *gsmdev, const char *url,
-                              const char *filename,
-                              uint8_t *resultbuf, size_t result_len,
-                              const gsm_http_params_t *params);
-
-    /**
-     * @brief   Send an HTTP POST request from a file and return a file
-     *
-     * @param[in]   gsmdev  device driver
-     */
-    ssize_t (*http_post_file_2)(gsm_t *gsmdev, const char *url,
-                                const char *filename,
-                                const char *result_filename,
-                                const gsm_http_params_t *params);
-
-    int (*get_loc)(gsm_t *dev, char *lon, char *lat);
-    int (*cnet_scan)(gsm_t *dev, char *buf, size_t len);
-
-    int (*time_sync)(gsm_t *dev);
-
-    /**
-     * @brief   Start GPS
-     *
-     * @param[in]   gsmdev  device driver
-     */
-    int (*gps_start)(gsm_t *gsmdev);
-
-    /**
-     * @brief   Stop GPS
-     *
-     * @param[in]   gsmdev  device driver
-     */
-    int (*gps_stop)(gsm_t *gsmdev);
-
-    /**
-     * @brief   Get GPS NMEA frames
-     *
-     * @param[in]   gsmdev  device driver
-     * @param[out]  nmea    NMEA frames
-     * @param[in]   len     length of @p nmea
-     *
-     * @return  number of bytes in @p nmea on success
-     * @return  < 0 on error
-     */
-    ssize_t (*get_nmea)(gsm_t *gsmdev, char *nmea, size_t len);
+    int (*init_base)(gsm_t *dev);
+    int (*power_on)(gsm_t *dev);
+    int (*power_off)(gsm_t *dev);
+    void (*sleep)(gsm_t *dev);
 };
 
 /**
- * @brief   Initialize GSM device
+ * @brief   Initialize gsm module and base module.
  *
- * @param[in]   gsmdev  device struct to operate on
- * @param[in]   params  parameter struct used to initialize @p gsmdev
+ * @param[in] dev       Device to initialize
+ * @param[in] params
  *
- * @returns     0 on success
- * @returns     <0 otherwise
+ * @return    0 for success
+ * @return  < 0 for failure
  */
-int gsm_init(gsm_t *gsmdev, const gsm_params_t *params);
+int gsm_init(gsm_t *dev, gsm_params_t *params);
 
 /**
- * @brief   Set SIM card PIN
+ * @brief   Powers the gsm module.
  *
- * @param[in]   gsmdev  device struct to operate on
- * @param[in]   pin     PIN to set
+ * @param[in] dev   Device to operate on
  *
- * @returns     0 on success
- * @returns     -1 on error
+ * @return    0 for success
+ * @return  < 0 for failure
  */
-int gsm_set_pin(gsm_t *gsmdev, const char *pin);
+int gsm_power_on(gsm_t *dev);
 
 /**
- * @brief   Test if SIM card needs PIN
+ * @brief   Turns the gsm module off.
  *
- * @param[in]   gsmdev  device struct to operate on
+ * @param[in] dev  Device to operate on
  *
- * @returns     0 if SIM doesn't need pin
- * @returns     1 if SIM needs to be unlocked with PIN
+ * @return  none
  */
-int gsm_check_pin(gsm_t *gsmdev);
+void gsm_power_off(gsm_t *dev);
 
 /**
- * @brief   Initialize GPRS connection
+ * @brief   Enables the gsm radio.
  *
- * @param[in]   gsmdev  device struct to operate on
- * @param[in]   apn     APN used to connect
- * @param[in]   user    APN user if authentication is needed
- * @param[in]   passwd  APN password if authentication is needed
+ * @param[in] dev   Device to enable
  *
- * @returns     0 on success
- * @returns     <0 otherwise
+ * @return    0 for success
+ * @return  < 0 for failure
  */
-static inline int gsm_gprs_init(gsm_t *gsmdev, const char *apn, const char *user, const char *passwd)
-{
-    return gsmdev->driver->gprs_init(gsmdev, apn, user, passwd);
-}
+int gsm_enable_radio(gsm_t *dev);
 
 /**
- * @brief   Check if modem is registered to network
+ * @brief   Disable the gsm radio.
  *
- * @param[in]   gsmdev  device to operate on
+ * @param[in] dev   Device to disable
  *
- * @returns     0 if registered
- * @returns     1 otherwise
+ * @return    0 for success
+ * @return  < 0 for failure
  */
-int gsm_reg_check(gsm_t *gsmdev);
+int gsm_disable_radio(gsm_t *dev);
 
 /**
- * @brief   Get network registration state
+ * @brief   Set sim puk into modem and pin
  *
- * @param[in]   gsmdev  device to operate on
- * @param[out]  buf     response buffer
- * @param[in]   len     response buffer length
+ * @param[in] dev   Device to write to
+ * @param[in] puk   Puk to set
+ * @param[in] pin   Set new pin
  *
- * @return  number of bytes in @buf on success
- * @return  -1 on error
+ * @return    0 for success
+ * @return  < 0 for failure
  */
-size_t gsm_reg_get(gsm_t *gsmdev, char *buf, size_t len);
+int gsm_set_puk(gsm_t *dev, const char *puk, const char *pin);
 
 /**
- * @brief   Get CREG value
+ * @brief   Set sim pin into modem
  *
- * @param[in]   gsmdev  device to operate on
+ * @param[in] dev   Device to write to
+ * @param[in] pin   Pin to set
+ *
+ * @return    0 for success
+ * @return  < 0 for failure
+ */
+int gsm_set_pin(gsm_t *dev, const char *pin);
+
+/**
+ * @brief   Checks if modem is already unlocked or needs unlocking
+ *
+ * @param[in] dev   Device to write to
+ *
+ * @return  > 0 for pin required
+ * @return    0 for unlocked
+ * @return  < 0 for failure
+ */
+int gsm_check_pin(gsm_t *dev);
+
+/**
+ * @brief   Checks if an operator is available
+ *
+ * @param[in] dev   Device to operate on
+ *
+ * @return    0 for success
+ * @return  < 0 for failure
+ */
+int gsm_check_operator(gsm_t *dev);
+
+/**
+ * @brief   Gets a list of operators
+ *
+ * @param[in]   dev     Device to operate on
+ * @param[out]  outbuf  Buffer to store operator data in
+ * @param[in]   len     Length of buffer
+ *
+ * @return  Length of data written into @p outbuf.
+ * @return  < 0 for failure
+ */
+size_t gsm_get_operator(gsm_t *dev, char *outbuf, size_t len);
+
+/**
+ * @brief   gets International Mobile Equipment Identity (IMEI)
+ *
+ * @param[in]   dev    Device to write to
+ * @param[out]  buf    Buffer to store imei data in
+ * @param[in]   len    Length of buffer
+ *
+ * @return  Length of data written into @p buf.
+ * @return  < 0 for failure
+ */
+ssize_t gsm_get_imei(gsm_t *dev, char *buf, size_t len);
+
+/**
+ * @brief   Gets International Mobile Subscriber Identity (IMSI)
+ *
+ * @param[in]   dev    Device to write to
+ * @param[out]  buf    Buffer to store imsi data in
+ * @param[in]   len    Length of buffer
+ *
+ * @return  Length of data written into @p buf.
+ * @return  < 0 for failure
+ */
+ssize_t gsm_get_imsi(gsm_t *dev, char *buf, size_t len);
+
+/**
+ * @brief   Gets simcard identification
+ *
+ * @param[in]   dev    Device to write to
+ * @param[out]  outbuf Buffer to store ccid data in
+ * @param[in]   len    Length of buffer
+ *
+ * @return  Length of data written into @p outbuf.
+ * @return  < 0 for failure
+ */
+ssize_t gsm_get_simcard_identification(gsm_t *dev, char *outbuf, size_t len);
+
+/**
+ * @brief   Gets modem identification
+ *
+ * @param[in] dev   Device to write to
+ *
+ * @return  Length of data written into @p buf.
+ * @return  < 0 for failure
+ */
+ssize_t gsm_get_identification(gsm_t *dev, char *buf, size_t len);
+
+/**
+ * @brief   Gets modem signal quality
+ *
+ * @param[in]   dev     Device to write to
+ * @param[out]  rssi    RSSI value
+ * @param[out]  ber     Bearer value
+ *
+ * @return    0 for success
+ * @return  < 0 for failure
+ */
+int gsm_get_signal(gsm_t *dev, unsigned *rssi, unsigned *ber);
+
+/**
+ * @brief   Get registration value
+ *
+ * @param[in]   dev  device to operate on
  *
  * @return  positive CREG value on success
  * @return  < 0 on error
  */
-int gsm_creg_get(gsm_t *gsmdev);
+int gsm_get_registration(gsm_t *dev);
 
 /**
- * @brief   Get CSQ values
+ * @brief   Gets modem local time
  *
- * @param[in]   gsmdev  device to operate on
- * @param[out]  csq     CSQ signal quality
- * @param[out]  ber     Bit Error Rate from CSQ
+ * @param[in]   dev    Device to write to
+ * @param[out]  outbuf Buffer to store time in
+ * @param[in]   len    Length of buffer
  *
- * @return  0 on succes
- * @return  < 0 on error
+ * @return  Length of data written into @p outbuf.
+ * @return  < 0 for failure
  */
-int gsm_signal_get(gsm_t *gsmdev, unsigned *csq, unsigned *ber);
+ssize_t gsm_get_local_time(gsm_t *dev, char * outbuf, size_t len);
 
-/**
- * @brief   Get modem IMEI
- *
- * @param[in]   gsmdev  device to operate on
- * @param[out]  buf     buffer to write IMEI in
- * @param[in]   len     length of @p buf
- *
- * @return  0 on success
- * @return  < 0 on error
- */
-int gsm_imei_get(gsm_t *gsmdev, char *buf, size_t len);
-
-/**
- * @brief   Get modem identification
- *
- * @param[in]   gsmdev  device to operate on
- * @param[out]  buf     buffer to write identification in
- * @param[in]   len     length of @p buf
- *
- * @return  length of the response on success
- * @return  < 0 on error
- */
-ssize_t gsm_identification_get(gsm_t *gsmdev, char *buf, size_t len);
-
-/**
- * @brief   Get SIM ICCID
- *
- * @param[in]   gsmdev  device to operate on
- * @param[out]  buf     buffer to write ICCID in
- * @param[in]   len     length of @p buf
- *
- * @return  0 on success
- * @return  < 0 on error
- */
-int gsm_iccid_get(gsm_t *gsmdev, char *buf, size_t len);
-
-/**
- * @brief   Get IP address
- *
- * @param[in]   gsmdev  device to operate on
- *
- * @return  modem IP address
- */
-uint32_t gsm_gprs_getip(gsm_t *gsmdev);
-
-/**
- * @brief Setup pdp context
- *
- * @param[in]   gsmdev  device to operate on
- * @param[in]   ctx     context to setup
- * @param[in]   type    pdp type
- * @param[in]   apn     access point name
- * @param[in]   user    user identifier (optional)
- * @param[in]   pass    password        (optional)
- *
- * @return  0 on success
- * @return  < 0 on error
- */
-int gsm_setup_pdp_context(gsm_t *gsmdev, uint8_t ctx, gsm_context_type_t type,
-        const char * apn, const char * user, const char * pass);
-
-/**
- * @brief Start dialing
- *
- * @param[in]   gsmdev          device to operate on
- * @param[in]   number          the number to call
- * @param[in]   is_voice_call   set to true for a voice call, false for data call
- *
- * @return  0 on success
- * @return  < 0 on error
- */
-int gsm_dial(gsm_t *gsmdev, const char * number, bool is_voice_call);
-
-/**
- * @brief   Print modem status on stdout
- *
- * @param[in]   gsmdev  device to operate on
- */
-void gsm_print_status(gsm_t *gsmdev);
-
-/**
- * @brief   Enable SMS reception
- *
- * @param[in]   gsmdev      device to operate on
- * @param[in]   cb          SMS callback
- * @param[in]   arg         SMS callback argument
- *
- * @return  0 on success
- * @return  < 0 on error
- */
-int gsm_receive_sms(gsm_t *gsmdev, gsm_sms_cb_t cb, void *arg);
-
-/**
- * @brief   Put the modem in sleep mode
- *
- * @param[in]   gsmdev      device to operate on
- * @param[in]   cb          wake up callback, called when the modem requests a wakeup
- * @param[in]   arg         wake up callback argument
- */
-void gsm_sleep(gsm_t *gsmdev, gsm_wkup_cb_t cb, void *arg);
-
-/**
- * @brief   Send a HTTP GET request
- *
- * @param[in]   gsmdev      device to operate on
- * @param[in]   url         URL to contact, must contain http(s)://
- * @param[out]  resultbuf   buffer to hold HTTP response
- * @param[in]   len         length of @p resultbuf
- *
- * @return  length of the response on success
- * @return  -1 on error
- */
-ssize_t gsm_http_get(gsm_t *gsmdev, const char *url, uint8_t *resultbuf, size_t len,
-                     const gsm_http_params_t *params);
-
-/**
- * @brief   Send a HTTP GET request and save the response in a file
- *
- * @param[in]   gsmdev      device to operate on
- * @param[in]   url         URL to contact, must contain http(s)://
- * @param[in]   filename    file where the response will be saved
- *
- * @return  length of the response on success
- * @return  -1 on error
- */
-ssize_t gsm_http_get_file(gsm_t *gsmdev, const char *url, const char *filename,
-                          const gsm_http_params_t *params);
-
-/**
- * @brief   Send a HTTP POST request
- *
- * @param[in]   gsmdev      device to operate on
- * @param[in]   url         URL to contact, must contain http(s)://
- * @param[in]   data        POST data to send, without HTTP header
- * @param[in]   data_len    length of @p post_data
- * @param[out]  resultbuf   buffer to hold HTTP response
- * @param[in]   result_len  length of @p resultbuf
- *
- * @return  length of the response on success
- * @return  -1 on error
- */
-ssize_t gsm_http_post(gsm_t *gsmdev,
-                      const char *url,
-                      const uint8_t *data, size_t data_len,
-                      uint8_t *resultbuf, size_t result_len,
-                      const gsm_http_params_t *params);
-
-/**
- * @brief   Send a file as HTTP POST request
- *
- * @param[in]   gsmdev      device to operate on
- * @param[in]   url         URL to contact, must contain http(s)://
- * @param[in]   filename    file containing data to send
- * @param[out]  resultbuf   buffer to hold HTTP response
- * @param[in]   result_len  length of @p resultbuf
- *
- * @return  length of the response on sucess
- * @retuen  -1 on error
- */
-ssize_t gsm_http_post_file(gsm_t *gsmdev, const char *url,
-                           const char *filename,
-                           uint8_t *resultbuf, size_t result_len,
-                           const gsm_http_params_t *params);
-
-/**
- * @brief   Send a file as HTTP POST request and save the response in a file
- *
- * @param[in]   gsmdev      device to operate on
- * @param[in]   url         URL to contact, must contain http(s)://
- * @param[in]   filename    file containing data to send
- * @param[in]   result_filename file where the response will be saved
- *
- * @return  length of the response on sucess
- * @retuen  -1 on error
- */
-ssize_t gsm_http_post_file_2(gsm_t *gsmdev, const char *url,
-                             const char *filename,
-                             const char *result_filename,
-                             const gsm_http_params_t *params);
-
-/**
- * @brief
- * @param gsmdev
- * @param buf
- * @param len
- * @return
- */
-int gsm_cnet_scan(gsm_t *gsmdev, char *buf, size_t len);
 
 /**
  * @brief   Send a 'raw' command to the modem and get the result
  *
- * @param[in]   gsmdev  device to operate on
- * @param[in]   cmd     command to send
- * @param[out]  buf     response buffer
- * @param[in]   len     length of @p buf
- * @param[in]   timeout command timeout
+ * @param[in]   dev         device to operate on
+ * @param[in]   cmd         command to send
+ * @param[out]  buf         response buffer
+ * @param[in]   len         length of @p buf
+ * @param[in]   timeout_sec command timeout in seconds
  *
  * @return  the length of the response on success
  * @return  < 0 on error
  */
-ssize_t gsm_cmd(gsm_t *gsmdev, const char *cmd, uint8_t *buf, size_t len, unsigned timeout);
+ssize_t gsm_cmd(gsm_t *dev, const char *cmd, uint8_t *buf, size_t len,
+        unsigned timeout_sec);
 
 /**
- * @brief gsm_gps_get_loc
- * @param gsmdev
- * @param buf
- * @param len
- * @return
+ * @brief   Print modem status on stdout
+ *
+ * @param[in]   dev  device to operate on
  */
-int gsm_gps_get_loc(gsm_t *gsmdev, uint8_t *buf, size_t len);
+void gsm_print_status(gsm_t *dev);
 
 /**
- * @brief gsm_get_loc
- * @param gsmdev
- * @param lon
- * @param lat
- * @return
+ * @brief Register a unsolicited result code
+ *
+ * @param[in] dev   device to operate on
+ * @param[in] urc   unsolicited result code to act on
+ * @param[in] cb    callback function
+ * @param[in] args  arguments for the callback
  */
-int gsm_get_loc(gsm_t *gsmdev, char *lon, char *lat);
-
-/**
- * @brief gsm_off
- * @param gsmdev
- * @return
- */
-int gsm_off(gsm_t *gsmdev);
-
-/**
- * @brief gsm_gps_start
- * @param gsmdev
- * @return
- */
-int gsm_gps_start(gsm_t *gsmdev);
-
-/**
- * @brief gsm_gps_stop
- * @param gsmdev
- * @return
- */
-int gsm_gps_stop(gsm_t *gsmdev);
-
-/**
- * @brief gsm_get_nmea
- * @param gsmdev
- * @param nmea
- * @param len
- * @return
- */
-ssize_t gsm_get_nmea(gsm_t *gsmdev, char *nmea, size_t len);
+void gsm_register_urc_callback(gsm_t *dev, const char * urc,
+                                    at_oob_cb_t cb, void * args);
 
 #ifdef __cplusplus
 }
