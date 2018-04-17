@@ -288,6 +288,12 @@ class SerCmd(cmd.Cmd):
         """
         self.ser.write("help\n".encode("utf-8"))
 
+    def do_EOF(self, line):
+        """Handle EOF (Ctrl+D) nicely."""
+        self.logger.debug("Received EOF")
+        self.do_PYTERM_exit("")
+        sys.exit(0)
+
     def complete_date(self, text, line, begidx, endidm):
         """Auto completion for date string.
         """
