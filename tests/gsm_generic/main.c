@@ -6,8 +6,11 @@
 
 #include "shell.h"
 #include "xtimer.h"
-#include "gsm.h"
 #include "board.h"
+
+#include "gsm.h"
+#include "gsm/gsm_gprs.h"
+#include "gsm/gsm_call.h"
 
 #ifndef APN
 #define APN               "apn"
@@ -37,17 +40,13 @@
 #define MODEM_DTR_PIN     GPIO_UNDEF
 #endif
 
-static gsm_driver_t fake_driver;
-
 static const gsm_params_t params = {
     .uart            = UART_MODEM,
     .baudrate        = 115200,
     .ri_pin          = MODEM_RI_PIN,
 };
 
-static gsm_t modem = {
-    .driver = &fake_driver,
-};
+static gsm_t modem;
 
 #define MAX_CMD_LEN 128
 int _at_send_handler(int argc, char **argv)
@@ -94,8 +93,9 @@ int _modem_init_pdp_handler(int argc, char **argv)
         return 1;
     }
 
-    gsm_setup_pdp_context((gsm_t *)&modem,  (uint8_t)atoi(argv[1]), GSM_CTX_IP, argv[2],
-            (argv[3]) ? argv[3] : NULL, (argv[4]) ? argv[4] : NULL);
+    gsm_gprs_setup_pdp_context((gsm_t *)&modem, (uint8_t)atoi(argv[1]),
+            GSM_CONTEXT_IP, argv[2], (argv[3]) ? argv[3] : NULL,
+            (argv[4]) ? argv[4] : NULL);
     return 0;
 }
 
@@ -104,7 +104,7 @@ int _modem_ppp_dialout_handler(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    int result = gsm_dial((gsm_t *)&modem, GSM_PPP_NUMBER, false);
+    int result = gsm_call_dial((gsm_t *)&modem, GSM_PPP_NUMBER, false);
 
     if(result >= 0) {
         printf("PPP dialout success");
@@ -140,14 +140,33 @@ int _modem_cpin_handler(int argc, char **argv)
     int result;
 
     if (argc < 2) {
-        printf("Usage: %s <pin>\n", argv[0]);
+        printf("Usage: %s <pin> [puk]\n", argv[0]);
         return 1;
     }
 
-
-    result = gsm_set_pin((gsm_t *)&modem, argv[1]);
-    if(result >= 0) {
+    result = gsm_set_puk((gsm_t *)&modem, argv[2], argv[1]);
+    if(result == 0) {
         printf("Simcard unlocked\n");
+    }
+    else {
+        printf("Error %d", result);
+    }
+
+    return 0;
+}
+
+int _modem_local_time_handler(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    char buffer[64];
+    int result = gsm_get_local_time((gsm_t *)&modem, buffer, 32);
+    if(result > 0) {
+        printf("Local Time: %s\n", buffer);
+    }
+    else {
+        printf("Error %d", result);
     }
 
     return 0;
@@ -161,6 +180,7 @@ static const shell_command_t commands[] = {
     {"simpin",       "Enter simpin",        _modem_cpin_handler},
     {"sim_status",   "Check sim status",    _modem_cpin_status_handler},
     {"ppp_dial",     "PPP Dial out",        _modem_ppp_dialout_handler},
+    {"time",         "Local Time",          _modem_local_time_handler},
     {NULL, NULL, NULL}
 };
 
