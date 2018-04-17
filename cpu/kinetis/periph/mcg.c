@@ -74,10 +74,9 @@ static void kinetis_mcg_enable_osc(void)
 #if defined(OSC0)
     /* Kinetis CPU with OSC module */
     /* Enable Oscillator */
-    if (clock_config.enable_oscillator) {
+    if (clock_config.clock_flags & KINETIS_CLOCK_OSC0_EN) {
         /* Configure oscillator */
-        OSC0->CR = (uint8_t)(OSC_CR_ERCLKEN_MASK | OSC_CR_EREFSTEN_MASK |
-            (clock_config.clc & 0xf));
+        OSC0->CR = OSC_CR_ERCLKEN_MASK | OSC_CR_EREFSTEN_MASK | clock_config.osc_clc;
         bit_set8(&MCG->C2, MCG_C2_EREFS0_SHIFT);
 
         /* wait for OSC initialization */
@@ -97,22 +96,84 @@ static void kinetis_mcg_enable_osc(void)
      * to the RSIM clock output, thus the RSIM, instead of the MCG, controls the
      * external clock source selection. */
 
-    /* Enable RF oscillator circuit */
-    /* Current setting is that the OSC only runs in RUN and WAIT modes, see ref.man. */
-    RSIM->CONTROL = (RSIM->CONTROL & ~RSIM_CONTROL_RF_OSC_EN_MASK) | RSIM_CONTROL_RF_OSC_EN(1);
-
-    if (clock_config.enable_oscillator) {
+    if (clock_config.clock_flags & KINETIS_CLOCK_OSC0_EN) {
         /* Disable RF oscillator bypass, if it was enabled before */
         bit_clear32(&RSIM->RF_OSC_CTRL, RSIM_RF_OSC_CTRL_RF_OSC_BYPASS_EN_SHIFT);
-        /* Wait for oscillator ready signal */
-        while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
     }
     else {
         /* Enable RF oscillator bypass, to use the EXTAL pin as external clock
          * source without the oscillator circuit */
         bit_set32(&RSIM->RF_OSC_CTRL, RSIM_RF_OSC_CTRL_RF_OSC_BYPASS_EN_SHIFT);
     }
+
+    /* Enable RF oscillator circuit */
+    /* Current setting is that the OSC only runs in RUN and WAIT modes, see ref.man. */
+    RSIM->CONTROL = (RSIM->CONTROL & ~RSIM_CONTROL_RF_OSC_EN_MASK) | RSIM_CONTROL_RF_OSC_EN(1);
+
+    /* Wait for oscillator ready signal */
+    while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
 #endif /* defined OSC0/RSIM */
+}
+
+/**
+ * @brief   Initialize the 32 kHz reference clock (ERCLK32K)
+ *
+ * This will enable the RTC oscillator if enabled in the configuration.
+ */
+static void kinetis_mcg_init_erclk32k(void)
+{
+    /* Enable RTC oscillator if selected */
+    if (clock_config.clock_flags & KINETIS_CLOCK_RTCOSC_EN) {
+        RTC_CLKEN();
+        if (!(RTC->CR & RTC_CR_OSCE_MASK)) {
+            /* Only touch if it was previously not running. The RTC is not reset
+             * by software resets, only by power on reset */
+            RTC->CR = RTC_CR_OSCE_MASK | RTC_CR_SUP_MASK | clock_config.rtc_clc;
+        }
+    }
+    /* Select ERCLK32K source */
+    SIM->SOPT1 = (SIM->SOPT1 & ~SIM_SOPT1_OSC32KSEL_MASK) | clock_config.osc32ksel;
+}
+
+/**
+ * @brief   Initialize the MCG internal reference clock (MCGIRCLK)
+ *
+ * This clock signal can be used for directly clocking certain peripherals, and
+ * can be chosen as the MCG output clock (MCGOUTCLK).
+ */
+static void kinetis_mcg_init_mcgirclk(void)
+{
+    /* Configure internal reference clock */
+    if (clock_config.clock_flags & KINETIS_CLOCK_USE_FAST_IRC) {
+        /* Fast IRC divider setting */
+        uint8_t tmp = MCG->SC;
+        /* Avoid clearing w1c flags during writeback */
+        tmp &= ~(MCG_SC_ATMF_MASK | MCG_SC_LOCS0_MASK);
+        /* Write new FCRDIV setting */
+        tmp &= ~MCG_SC_FCRDIV_MASK;
+        tmp |= clock_config.fcrdiv;
+        MCG->SC = tmp;
+        bit_set8(&MCG->C2, MCG_C2_IRCS_SHIFT);
+    }
+    else {
+        bit_clear8(&MCG->C2, MCG_C2_IRCS_SHIFT);
+    }
+    /* Enable/disable MCGIRCLK */
+    /* MCGIRCLK can be used as an alternate clock source for certain modules */
+    if (clock_config.clock_flags & KINETIS_CLOCK_MCGIRCLK_EN) {
+        bit_set8(&MCG->C1, MCG_C1_IRCLKEN_SHIFT);
+    }
+    else {
+        bit_clear8(&MCG->C1, MCG_C1_IRCLKEN_SHIFT);
+    }
+
+    if (clock_config.clock_flags & KINETIS_CLOCK_MCGIRCLK_STOP_EN) {
+        /* Enable MCGIRCLK during STOP (but only when also IRCLKEN is set) */
+        bit_set8(&MCG->C1, MCG_C1_IREFSTEN_SHIFT);
+    }
+    else {
+        bit_clear8(&MCG->C1, MCG_C1_IREFSTEN_SHIFT);
+    }
 }
 
 /**
@@ -416,42 +477,23 @@ void kinetis_mcg_init(void)
     SIM->CLKDIV1 = clock_config.clkdiv1;
 
     /* Select external reference clock source for the FLL */
-    MCG->C7 = MCG_C7_OSCSEL(clock_config.oscsel);
+    MCG->C7 = clock_config.oscsel;
 
     /* Set external reference clock divider for the FLL */
-    MCG->C1 = (MCG->C1 & ~MCG_C1_FRDIV_MASK) | MCG_C1_FRDIV(clock_config.fll_frdiv);
+    MCG->C1 = (MCG->C1 & ~MCG_C1_FRDIV_MASK) | clock_config.fll_frdiv;
 
 #if KINETIS_HAVE_PLL
     /* set ERC divider for the PLL */
-    MCG->C5 = (uint8_t)(MCG_C5_PRDIV0(clock_config.pll_prdiv));
+    MCG->C5 = clock_config.pll_prdiv;
 
     /* set PLL VCO divider */
-    MCG->C6 = (uint8_t)(MCG_C6_VDIV0(clock_config.pll_vdiv));
+    MCG->C6 = clock_config.pll_vdiv;
 #endif /* KINETIS_HAVE_PLL */
 
-    /* Configure internal reference clock */
-    if (clock_config.select_fast_irc) {
-        /* Fast IRC divider setting */
-        uint8_t tmp = MCG->SC;
-        /* Avoid clearing w1c flags during writeback */
-        tmp &= ~(MCG_SC_ATMF_MASK | MCG_SC_LOCS0_MASK);
-        /* Write new FCRDIV setting */
-        tmp &= ~MCG_SC_FCRDIV_MASK;
-        tmp |= MCG_SC_FCRDIV(clock_config.fcrdiv);
-        MCG->SC = tmp;
-        bit_set8(&MCG->C2, MCG_C2_IRCS_SHIFT);
-    }
-    else {
-        bit_clear8(&MCG->C2, MCG_C2_IRCS_SHIFT);
-    }
-    /* Enable/disable MCGIRCLK */
-    /* MCGIRCLK can be used as an alternate clock source for certain modules */
-    if (clock_config.enable_mcgirclk) {
-        bit_set8(&MCG->C1, MCG_C1_IRCLKEN_SHIFT);
-    }
-    else {
-        bit_clear8(&MCG->C1, MCG_C1_IRCLKEN_SHIFT);
-    }
+    kinetis_mcg_init_mcgirclk();
+
+    kinetis_mcg_init_erclk32k();
+
     /* Switch to the selected MCG mode */
     kinetis_mcg_set_mode(clock_config.default_mode);
     irq_restore(mask);

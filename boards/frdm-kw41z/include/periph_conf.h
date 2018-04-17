@@ -39,20 +39,30 @@ static const clock_config_t clock_config = {
      * Flash: 24 MHz
      */
     .clkdiv1            = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV4(1),
+    /* unsure if this RTC load cap configuration is correct, but it matches the
+     * settings used by the example code in the NXP provided SDK */
+    .rtc_clc            = 0,
+    /* Use the 32 kHz oscillator as ERCLK32K. Note that the values here have a
+     * different mapping for the KW41Z than the values used in the Kinetis K series */
+    .osc32ksel          = SIM_SOPT1_OSC32KSEL(0),
+    .clock_flags =
+        KINETIS_CLOCK_OSC0_EN | /* Enable RSIM oscillator */
+        KINETIS_CLOCK_RTCOSC_EN |
+        KINETIS_CLOCK_USE_FAST_IRC |
+        KINETIS_CLOCK_MCGIRCLK_EN | /* Used for LPUART clocking */
+        KINETIS_CLOCK_MCGIRCLK_STOP_EN |
+        0,
     /* Using FEI mode by default, the external crystal settings below are only
      * used if mode is changed to an external mode (PEE, FBE, or FEE) */
     .default_mode       = KINETIS_MCG_MODE_FEI,
     /* The crystal connected to RSIM OSC is 32 MHz */
     .erc_range          = KINETIS_MCG_ERC_RANGE_VERY_HIGH,
-    .fcrdiv             = 0, /* Fast IRC divide by 1 => 4 MHz */
-    .oscsel             = 0, /* Use RSIM for external clock */
-    .clc                = 0, /* no load cap configuration */
-    .fll_frdiv          = 0b101, /* Divide by 1024 */
+    .osc_clc            = 0, /* no load cap configuration */
+    .oscsel             = MCG_C7_OSCSEL(0), /* Use RSIM for external clock */
+    .fcrdiv             = MCG_SC_FCRDIV(0), /* Fast IRC divide by 1 => 4 MHz */
+    .fll_frdiv          = MCG_C1_FRDIV(0b101), /* Divide by 1024 */
     .fll_factor_fei     = KINETIS_MCG_FLL_FACTOR_1464, /* FEI FLL freq = 48 MHz */
     .fll_factor_fee     = KINETIS_MCG_FLL_FACTOR_1280, /* FEE FLL freq = 40 MHz */
-    .enable_oscillator  = true, /* Use RF module oscillator */
-    .select_fast_irc    = true,
-    .enable_mcgirclk    = true, /* Used for LPUART clocking */
 };
 /* Radio xtal frequency, either 32 MHz or 26 MHz */
 #define CLOCK_RADIOXTAL              (32000000ul)
