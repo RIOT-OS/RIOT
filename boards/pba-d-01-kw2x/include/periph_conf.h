@@ -43,20 +43,24 @@ static const clock_config_t clock_config = {
      */
     .clkdiv1 = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV2(0) |
                SIM_CLKDIV1_OUTDIV4(1),
+    .rtc_clc = 0, /* External load caps on the FRDM-K22F board */
+    .osc32ksel = SIM_SOPT1_OSC32KSEL(2),
+    .clock_flags =
+        /* No OSC0_EN, use modem clock from EXTAL0 */
+        KINETIS_CLOCK_RTCOSC_EN |
+        KINETIS_CLOCK_USE_FAST_IRC |
+        0,
     .default_mode = KINETIS_MCG_MODE_PEE,
     /* The modem generates a 4 MHz clock signal */
     .erc_range = KINETIS_MCG_ERC_RANGE_HIGH,
-    .fcrdiv = 0, /* Fast IRC divide by 1 => 4 MHz */
-    .oscsel = 0, /* Use EXTAL0 for external clock */
-    .clc = 0, /* OSC0 is unused*/
-    .fll_frdiv = 0b010, /* Divide by 128 */
+    .osc_clc = 0, /* OSC0 is unused*/
+    .oscsel = MCG_C7_OSCSEL(0), /* Use EXTAL0 for external clock */
+    .fcrdiv = MCG_SC_FCRDIV(0), /* Fast IRC divide by 1 => 4 MHz */
+    .fll_frdiv = MCG_C1_FRDIV(0b010), /* Divide by 128 */
     .fll_factor_fei = KINETIS_MCG_FLL_FACTOR_1464, /* FLL freq = 48 MHz */
     .fll_factor_fee = KINETIS_MCG_FLL_FACTOR_1280, /* FLL freq = 40 MHz */
-    .pll_prdiv = 0b00001, /* Divide by 2 */
-    .pll_vdiv = 0b00000, /* Multiply by 24 => PLL freq = 48 MHz */
-    .enable_oscillator = false, /* Use modem clock from EXTAL0 */
-    .select_fast_irc = true,
-    .enable_mcgirclk = false,
+    .pll_prdiv = MCG_C5_PRDIV0(0b00001), /* Divide by 2 */
+    .pll_vdiv = MCG_C6_VDIV0(0b00000), /* Multiply by 24 => PLL freq = 48 MHz */
 };
 #define CLOCK_CORECLOCK              (48000000ul)
 #define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 1)

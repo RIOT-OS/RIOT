@@ -124,6 +124,10 @@ extern "C"
 /** Enable PIT clock gate */
 #define PIT_CLKEN()    (bit_set32(&SIM->SCGC6, SIM_SCGC6_PIT_SHIFT))
 #endif
+#ifdef SIM_SCGC6_RTC_SHIFT
+/** Enable RTC clock gate */
+#define RTC_CLKEN()    (bit_set32(&SIM->SCGC6, SIM_SCGC6_RTC_SHIFT))
+#endif
 /** @} */
 
 /**

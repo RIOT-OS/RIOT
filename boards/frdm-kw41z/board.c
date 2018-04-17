@@ -20,17 +20,11 @@
 
 #include "board.h"
 #include "periph/gpio.h"
-#include "periph/rtt.h"
 
 void board_init(void)
 {
     /* initialize the CPU core */
     cpu_init();
-
-#if MODULE_XTIMER && !(KINETIS_XTIMER_SOURCE_PIT)
-    /* Start the RTT, used as time base for xtimer when using LPTMR backend */
-    rtt_init();
-#endif
 
     /* initialize and turn off LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
