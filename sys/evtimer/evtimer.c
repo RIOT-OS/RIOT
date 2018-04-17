@@ -81,14 +81,14 @@ static void _del_event_from_list(evtimer_t *evtimer, evtimer_event_t *event)
     }
 }
 
-static void _set_timer(xtimer_t *timer, uint32_t offset)
+static void _set_timer(xtimer_t *timer, uint32_t offset_ms)
 {
-    uint64_t offset_in_us = (uint64_t)offset * 1000;
+    uint64_t offset_us = (uint64_t)offset_ms * 1000;
 
-    DEBUG("evtimer: now=%" PRIu32 " setting xtimer to %" PRIu32 ":%" PRIu32 "\n",
-          xtimer_now_usec(), (uint32_t)(offset_in_us >> 32),
-          (uint32_t)(offset_in_us));
-    _xtimer_set64(timer, offset_in_us, offset_in_us >> 32);
+    DEBUG("evtimer: now=%" PRIu32 " us setting xtimer to %" PRIu32 ":%" PRIu32 " us\n",
+          xtimer_now_usec(), (uint32_t)(offset_us >> 32), (uint32_t)(offset_us));
+
+    xtimer_set64(timer, offset_us);
 }
 
 static void _update_timer(evtimer_t *evtimer)
