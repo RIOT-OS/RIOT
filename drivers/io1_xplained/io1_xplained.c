@@ -24,7 +24,7 @@
 #include "at30tse75x.h"
 #include "sdcard_spi.h"
 
-#include "periph/adc.h"
+#include "periph/i2c.h"
 #include "periph/gpio.h"
 
 #define ENABLE_DEBUG (0)
@@ -73,6 +73,11 @@ int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params)
         }
     }
 
+    if (adc_init(IO1_LIGHT_ADC_LINE) < 0) {
+        DEBUG("[io1_xplained] Light sensor (ADC) initialization failed\n");
+        return -IO1_XPLAINED_NOLIGHT;
+    }
+
     if (gpio_init(IO1_LED_PIN, GPIO_OUT) < 0) {
         DEBUG("[io1_xplained] LED initialization failed\n");
         return -IO1_XPLAINED_NOLED;
@@ -91,4 +96,18 @@ int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params)
     DEBUG("IO1 Xplained extension initialized with success!\n");
 
     return IO1_XPLAINED_OK;
+}
+
+int io1_xplained_read_light_level(uint16_t *light)
+{
+    int sample = adc_sample(IO1_LIGHT_ADC_LINE, IO1_LIGHT_ADC_RES);
+
+    if (sample < 0) {
+        DEBUG("[io1_xplained] Light sensor read failed\n");
+        return -IO1_XPLAINED_READ_ERR;
+    }
+
+    *light = (1023 - sample);
+
+    return IO1_XPLAINED_READ_OK;
 }

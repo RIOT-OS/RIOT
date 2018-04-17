@@ -53,11 +53,12 @@ enum {
     IO1_XPLAINED_OK = 0,           /**< Initialization successful */
     IO1_XPLAINED_NOTEMP,           /**< Error during temperature sensor initialization */
     IO1_XPLAINED_NOSDCARD,         /**< Error during sdcard initialization */
+    IO1_XPLAINED_NOLIGHT,          /**< Error during light sensor (ADC) initialization */
     IO1_XPLAINED_NOLED,            /**< Error during extension LED initialization */
     IO1_XPLAINED_NOGPIO1,          /**< Error during extension GPIO1 initialization */
     IO1_XPLAINED_NOGPIO2,          /**< Error during extension GPIO2 initialization */
-    IO1_XPLAINED_READ_OK,          /**< Temperature read successful */
-    IO1_XPLAINED_READ_ERR          /**< Error when reading temperature sensor */
+    IO1_XPLAINED_READ_OK,          /**< Light sensor read successful */
+    IO1_XPLAINED_READ_ERR          /**< Error when reading light sensor */
 };
 
 /**
@@ -90,6 +91,16 @@ typedef struct {
  * @return                  -IO1_XPLAINED_NOGPIO2 if GPIO2 initialization failed
  */
 int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params);
+
+/**
+ * @brief   Read light sensor level on the IO1 Xplained extension
+ *
+ * @param[out] light        Light level value (between 0 and 1023)
+ *
+ * @return                  IO1_XPLAINED_READ_OK on success
+ * @return                  -IO1_XPLAINED_READ_ERR when the value cannot be read
+ */
+int io1_xplained_read_light_level(uint16_t *light);
 
 #ifdef __cplusplus
 }

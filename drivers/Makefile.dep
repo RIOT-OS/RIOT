@@ -152,6 +152,7 @@ endif
 
 ifneq (,$(filter io1_xplained,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_adc
   USEMODULE += at30tse75x
   USEMODULE += sdcard_spi
 endif
