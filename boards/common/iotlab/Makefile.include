@@ -10,6 +10,10 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*B)))
 export BAUD = 500000
 include $(RIOTMAKE)/tools/serial.inc.mk
 
+# call a 'reset halt' command before starting the debugger
+# it is required as `connect_assert_srst` is set
+export OPENOCD_DBG_START_CMD = -c 'reset halt'
+
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
