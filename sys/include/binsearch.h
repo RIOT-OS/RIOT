@@ -40,7 +40,7 @@
  * "name" field of the first elements will be 4 bytes more than the address of
  * "my_table". With this two numbers we can compute the address of the i-th
  * "name" field as:
- *      <address of my_table> + offset + i*stride
+ *      [address of my_table] + offset + i*stride
  * Where stride=12 bytes and offset = 4 bytes.
  */
 
