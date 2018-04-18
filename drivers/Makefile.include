@@ -70,6 +70,10 @@ ifneq (,$(filter feetech,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/feetech/include
 endif
 
+ifneq (,$(filter fxos8700,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/fxos8700/include
+endif
+
 ifneq (,$(filter grove_ledbar,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/grove_ledbar/include
 endif

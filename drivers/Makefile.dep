@@ -123,6 +123,11 @@ ifneq (,$(filter feetech,$(USEMODULE)))
   USEMODULE += uart_half_duplex
 endif
 
+ifneq (,$(filter fxos8700,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter grove_ledbar,$(USEMODULE)))
   USEMODULE += my9221
 endif
