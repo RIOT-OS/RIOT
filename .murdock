@@ -122,7 +122,9 @@ compile() {
 
     # compile
     CCACHE_BASEDIR="$(pwd)" BOARD=$board RIOT_CI_BUILD=1 \
-        make -C${appdir} clean all -j${JOBS:-4}
+        make -C${appdir} clean -j${JOBS:-4}
+    CCACHE_BASEDIR="$(pwd)" BOARD=$board RIOT_CI_BUILD=1 \
+        make -C${appdir} all -j${JOBS:-4}
     RES=$?
 
     # run tests
