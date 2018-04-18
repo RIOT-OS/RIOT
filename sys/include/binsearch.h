@@ -1,5 +1,18 @@
+/*
+ * Copyright (C) 2017 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
+ *
+ * @defgroup    sys_binsearch Binary Search
+ * @ingroup     sys
+ * @brief   Generic binary search for tables containing strings.
  * @file
+ * @{
  *
  * @brief   Generic binary search for tables containing strings.
  * @author  Juan Carrano <j.carrano@fu-berlin.de>
@@ -35,6 +48,10 @@
 #define BINSEARCH_H
 
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define BINSEARCH_NOTFOUND (-1)
 
@@ -115,5 +132,11 @@ int binsearch_str(const void *start, size_t offset, size_t stride, size_t nmemb,
 const void * binsearch_str_p(const void *start, size_t offset, size_t stride,
                              size_t nmemb, const char *str, size_t n);
 
+
+#ifdef __cplusplus
+}
+#endif
+
+/** @} */
 
 #endif /* BINSEARCH_H */
