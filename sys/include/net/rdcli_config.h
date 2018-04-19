@@ -7,8 +7,9 @@
  */
 
 /**
- * @defgroup    net_rdcli_config CoAP Resource Directory Client Configuration
- * @ingroup     net_rdcli
+ * @defgroup    net_rdcli_config CoRE RD Client Configuration
+ * @ingroup     net
+ * @brief       Shared CoRE Resource Directory Client Configuration
  * @{
  *
  * @file

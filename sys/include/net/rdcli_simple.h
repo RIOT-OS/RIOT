@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_rdcli_simple Simple CoRE Resource Directory Registration
- * @ingroup     net_rdcli
+ * @defgroup    net_rdcli_simple CoRE RD Simple Client
+ * @ingroup     net
  * @brief       CoAP-based CoRE Resource Directory client supporting the simple
  *              registration only
  * @{
