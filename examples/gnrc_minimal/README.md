@@ -29,7 +29,3 @@ is achieved by:
  * Reducing the maximum neighbor cache size from 8 to 1.
 
 Please take a look at the Makefile to see how the configuration is done.
-
-## Support for XBee
-Please uncomment the lines in the Makefile in order to support the XBee into
-this example.
