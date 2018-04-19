@@ -23,11 +23,12 @@ void event_queue_init(event_queue_t *queue)
 
 void event_post(event_queue_t *queue, event_t *event)
 {
-    assert(!event->list_node.next);
-    assert(queue->waiter);
+    assert(queue && queue->waiter && event);
 
     unsigned state = irq_disable();
-    clist_rpush(&queue->event_list, &event->list_node);
+    if (!event->list_node.next) {
+        clist_rpush(&queue->event_list, &event->list_node);
+    }
     irq_restore(state);
 
     thread_flags_set(queue->waiter, THREAD_FLAG_EVENT);
