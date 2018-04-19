@@ -74,6 +74,9 @@ The external module can optionally define the following files:
   API headers include paths to the `USEMODULE_INCLUDES` variable.
 * `Makefile.dep` file to set module dependencies
 
+An example can be found in
+[`tests/external_module_dirs`](https://github.com/RIOT-OS/RIOT/tree/master/tests/external_module_dirs)
+
 Pseudomodules                                                  {#pseudomodules}
 =============
 Pseudomodules are modules that do not have any code. Their main use cases are
