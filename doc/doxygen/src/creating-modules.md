@@ -67,8 +67,8 @@ their dependencies.
 Modules outside of RIOTBASE                      {#modules-outside-of-riotbase}
 ===========================
 Modules can be defined outside `RIOTBASE`. In addition to add it to `USEMODULE`
-the user needs to add the path to the module to `EXTERNAL_MODULES` and add the
-include path to the API definitions to `INCLUDES`.
+the user needs to add the path to the module to `EXTERNAL_MODULE_DIRS` and add
+the include path to the API definitions to `INCLUDES`.
 
 Pseudomodules                                                  {#pseudomodules}
 =============
