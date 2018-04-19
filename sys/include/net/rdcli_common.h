@@ -7,8 +7,9 @@
  */
 
 /**
- * @defgroup    net_rdcli_common Shared Functions for CoRE RD Clients
- * @ingroup     net_rdcli
+ * @defgroup    net_rdcli_common CoRE RD Client Common
+ * @ingroup     net
+ * @brief       Shared functionality for CoRE Resource Directory clients
  * @{
  *
  * @file
