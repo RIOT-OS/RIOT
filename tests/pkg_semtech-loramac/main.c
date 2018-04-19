@@ -26,10 +26,8 @@
 #include "net/loramac.h"
 #include "semtech_loramac.h"
 
-#include "sx127x.h"
-#include "sx127x_params.h"
+semtech_loramac_t loramac;
 
-sx127x_t sx127x;
 /* Application key is 16 bytes long (e.g. 32 hex chars), and thus the longest
    possible size (with application session and network session keys) */
 static char print_buf[LORAMAC_APPKEY_LEN * 2 + 1];
@@ -76,49 +74,49 @@ static int _cmd_loramac(int argc, char **argv)
 
         if (strcmp("deveui", argv[2]) == 0) {
             uint8_t deveui[LORAMAC_DEVEUI_LEN];
-            semtech_loramac_get_deveui(deveui);
+            semtech_loramac_get_deveui(&loramac, deveui);
             fmt_bytes_hex(print_buf, deveui, LORAMAC_DEVEUI_LEN);
             print_buf[LORAMAC_DEVEUI_LEN * 2] = '\0';
             printf("DEVEUI: %s\n", print_buf);
         }
         else if (strcmp("appeui", argv[2]) == 0) {
             uint8_t appeui[LORAMAC_APPEUI_LEN];
-            semtech_loramac_get_appeui(appeui);
+            semtech_loramac_get_appeui(&loramac, appeui);
             fmt_bytes_hex(print_buf, appeui, LORAMAC_APPEUI_LEN);
             print_buf[LORAMAC_APPEUI_LEN * 2] = '\0';
             printf("APPEUI: %s\n", print_buf);
         }
         else if (strcmp("appkey", argv[2]) == 0) {
             uint8_t appkey[LORAMAC_APPKEY_LEN];
-            semtech_loramac_get_appkey(appkey);
+            semtech_loramac_get_appkey(&loramac, appkey);
             fmt_bytes_hex(print_buf, appkey, LORAMAC_APPKEY_LEN);
             print_buf[LORAMAC_APPKEY_LEN * 2] = '\0';
             printf("APPKEY: %s\n", print_buf);
         }
         else if (strcmp("appskey", argv[2]) == 0) {
             uint8_t appskey[LORAMAC_APPSKEY_LEN];
-            semtech_loramac_get_appskey(appskey);
+            semtech_loramac_get_appskey(&loramac, appskey);
             fmt_bytes_hex(print_buf, appskey, LORAMAC_APPSKEY_LEN);
             print_buf[LORAMAC_APPSKEY_LEN * 2] = '\0';
             printf("APPSKEY: %s\n", print_buf);
         }
         else if (strcmp("nwkskey", argv[2]) == 0) {
             uint8_t nwkskey[LORAMAC_NWKSKEY_LEN];
-            semtech_loramac_get_nwkskey(nwkskey);
+            semtech_loramac_get_nwkskey(&loramac, nwkskey);
             fmt_bytes_hex(print_buf, nwkskey, LORAMAC_NWKSKEY_LEN);
             print_buf[LORAMAC_NWKSKEY_LEN * 2] = '\0';
             printf("NWKSKEY: %s\n", print_buf);
         }
         else if (strcmp("devaddr", argv[2]) == 0) {
             uint8_t devaddr[LORAMAC_DEVADDR_LEN];
-            semtech_loramac_get_devaddr(devaddr);
+            semtech_loramac_get_devaddr(&loramac, devaddr);
             fmt_bytes_hex(print_buf, devaddr, LORAMAC_DEVADDR_LEN);
             print_buf[LORAMAC_DEVADDR_LEN * 2] = '\0';
             printf("DEVADDR: %s\n", print_buf);
         }
         else if (strcmp("class", argv[2]) == 0) {
             printf("Device class: ");
-            switch(semtech_loramac_get_class()) {
+            switch(semtech_loramac_get_class(&loramac)) {
                 case LORAMAC_CLASS_A:
                     puts("A");
                     break;
@@ -135,27 +133,27 @@ static int _cmd_loramac(int argc, char **argv)
         }
         else if (strcmp("dr", argv[2]) == 0) {
             printf("DATARATE: %d\n",
-                   semtech_loramac_get_dr());
+                   semtech_loramac_get_dr(&loramac));
         }
         else if (strcmp("adr", argv[2]) == 0) {
             printf("ADR: %s\n",
-                   semtech_loramac_get_adr() ? "on" : "off");
+                   semtech_loramac_get_adr(&loramac) ? "on" : "off");
         }
         else if (strcmp("public", argv[2]) == 0) {
             printf("Public network: %s\n",
-                   semtech_loramac_get_public_network() ? "on" : "off");
+                   semtech_loramac_get_public_network(&loramac) ? "on" : "off");
         }
         else if (strcmp("netid", argv[2]) == 0) {
-            printf("NetID: %lu\n", semtech_loramac_get_netid());
+            printf("NetID: %lu\n", semtech_loramac_get_netid(&loramac));
         }
         else if (strcmp("tx_power", argv[2]) == 0) {
-            printf("TX power index: %d\n", semtech_loramac_get_tx_power());
+            printf("TX power index: %d\n", semtech_loramac_get_tx_power(&loramac));
         }
         else if (strcmp("rx2_freq", argv[2]) == 0) {
-            printf("RX2 freq: %lu\n", semtech_loramac_get_rx2_freq());
+            printf("RX2 freq: %lu\n", semtech_loramac_get_rx2_freq(&loramac));
         }
         else if (strcmp("rx2_dr", argv[2]) == 0) {
-            printf("RX2 dr: %d\n", semtech_loramac_get_rx2_dr());
+            printf("RX2 dr: %d\n", semtech_loramac_get_rx2_dr(&loramac));
         }
         else {
             _loramac_get_usage();
@@ -175,7 +173,7 @@ static int _cmd_loramac(int argc, char **argv)
             }
             uint8_t deveui[LORAMAC_DEVEUI_LEN];
             fmt_hex_bytes(deveui, argv[3]);
-            semtech_loramac_set_deveui(deveui);
+            semtech_loramac_set_deveui(&loramac, deveui);
         }
         else if (strcmp("appeui", argv[2]) == 0) {
             if ((argc < 4) || (strlen(argv[3]) != LORAMAC_APPEUI_LEN * 2)) {
@@ -184,7 +182,7 @@ static int _cmd_loramac(int argc, char **argv)
             }
             uint8_t appeui[LORAMAC_APPEUI_LEN];
             fmt_hex_bytes(appeui, argv[3]);
-            semtech_loramac_set_appeui(appeui);
+            semtech_loramac_set_appeui(&loramac, appeui);
         }
         else if (strcmp("appkey", argv[2]) == 0) {
             if ((argc < 4) || (strlen(argv[3]) != LORAMAC_APPKEY_LEN * 2)) {
@@ -193,7 +191,7 @@ static int _cmd_loramac(int argc, char **argv)
             }
             uint8_t appkey[LORAMAC_APPKEY_LEN];
             fmt_hex_bytes(appkey, argv[3]);
-            semtech_loramac_set_appkey(appkey);
+            semtech_loramac_set_appkey(&loramac, appkey);
         }
         else if (strcmp("appskey", argv[2]) == 0) {
             if ((argc < 4) || (strlen(argv[3]) != LORAMAC_APPSKEY_LEN * 2)) {
@@ -202,7 +200,7 @@ static int _cmd_loramac(int argc, char **argv)
             }
             uint8_t appskey[LORAMAC_APPSKEY_LEN];
             fmt_hex_bytes(appskey, argv[3]);
-            semtech_loramac_set_appskey(appskey);
+            semtech_loramac_set_appskey(&loramac, appskey);
         }
         else if (strcmp("nwkskey", argv[2]) == 0) {
             if ((argc < 4) || (strlen(argv[3]) != LORAMAC_NWKSKEY_LEN * 2)) {
@@ -211,7 +209,7 @@ static int _cmd_loramac(int argc, char **argv)
             }
             uint8_t nwkskey[LORAMAC_NWKSKEY_LEN];
             fmt_hex_bytes(nwkskey, argv[3]);
-            semtech_loramac_set_nwkskey(nwkskey);
+            semtech_loramac_set_nwkskey(&loramac, nwkskey);
         }
         else if (strcmp("devaddr", argv[2]) == 0) {
             if ((argc < 4) || (strlen(argv[3]) != LORAMAC_DEVADDR_LEN * 2)) {
@@ -220,7 +218,7 @@ static int _cmd_loramac(int argc, char **argv)
             }
             uint8_t devaddr[LORAMAC_DEVADDR_LEN];
             fmt_hex_bytes(devaddr, argv[3]);
-            semtech_loramac_set_devaddr(devaddr);
+            semtech_loramac_set_devaddr(&loramac, devaddr);
         }
         else if (strcmp("class", argv[2]) == 0) {
             if (argc < 4) {
@@ -241,7 +239,7 @@ static int _cmd_loramac(int argc, char **argv)
                 puts("Usage: loramac set class <A,B,C>");
                 return 1;
             }
-            semtech_loramac_set_class(cls);
+            semtech_loramac_set_class(&loramac, cls);
         }
         else if (strcmp("dr", argv[2]) == 0) {
             if (argc < 4) {
@@ -253,7 +251,7 @@ static int _cmd_loramac(int argc, char **argv)
                 puts("Usage: loramac set dr <0..16>");
                 return 1;
             }
-            semtech_loramac_set_dr(dr);
+            semtech_loramac_set_dr(&loramac, dr);
         }
         else if (strcmp("adr", argv[2]) == 0) {
             if (argc < 4) {
@@ -271,7 +269,7 @@ static int _cmd_loramac(int argc, char **argv)
                 puts("Usage: loramac set adr <on|off>");
                 return 1;
             }
-            semtech_loramac_set_adr(adr);
+            semtech_loramac_set_adr(&loramac, adr);
         }
         else if (strcmp("public", argv[2]) == 0) {
             if (argc < 4) {
@@ -289,14 +287,14 @@ static int _cmd_loramac(int argc, char **argv)
                 puts("Usage: loramac set public <on|off>");
                 return 1;
             }
-            semtech_loramac_set_public_network(public);
+            semtech_loramac_set_public_network(&loramac, public);
         }
         else if (strcmp("netid", argv[2]) == 0) {
             if (argc < 4) {
                 puts("Usage: loramac set netid <integer value>");
                 return 1;
             }
-            semtech_loramac_set_netid(strtoul(argv[2], NULL, 0));
+            semtech_loramac_set_netid(&loramac, strtoul(argv[2], NULL, 0));
         }
         else if (strcmp("tx_power", argv[2]) == 0) {
             if (argc < 4) {
@@ -308,7 +306,7 @@ static int _cmd_loramac(int argc, char **argv)
                 puts("Usage: loramac set tx_power <0..16>");
                 return 1;
             }
-            semtech_loramac_set_tx_power(power);
+            semtech_loramac_set_tx_power(&loramac, power);
         }
         else if (strcmp("rx2_freq", argv[2]) == 0) {
             if (argc < 4) {
@@ -316,7 +314,7 @@ static int _cmd_loramac(int argc, char **argv)
                 return 1;
             }
             uint32_t freq = atoi(argv[3]);
-            semtech_loramac_set_rx2_freq(freq);
+            semtech_loramac_set_rx2_freq(&loramac, freq);
         }
         else if (strcmp("rx2_dr", argv[2]) == 0) {
             if (argc < 4) {
@@ -328,7 +326,7 @@ static int _cmd_loramac(int argc, char **argv)
                 puts("Usage: loramac set rx2_dr <0..16>");
                 return 1;
             }
-            semtech_loramac_set_rx2_dr(dr);
+            semtech_loramac_set_rx2_dr(&loramac, dr);
         }
         else {
             _loramac_set_usage();
@@ -353,7 +351,7 @@ static int _cmd_loramac(int argc, char **argv)
             return 1;
         }
 
-        if (semtech_loramac_join(join_type) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
+        if (semtech_loramac_join(&loramac, join_type) != SEMTECH_LORAMAC_JOIN_SUCCEEDED) {
             puts("Join procedure failed!");
             return 1;
         }
@@ -391,23 +389,34 @@ static int _cmd_loramac(int argc, char **argv)
             }
         }
 
-        semtech_loramac_rx_data_t rx_data;
-        switch (semtech_loramac_send(cnf, port,
-                                     (uint8_t *)argv[2], strlen(argv[2]),
-                                     &rx_data)) {
-            case SEMTECH_LORAMAC_RX_DATA:
-                printf("Data received: %s, port: %d\n",
-                       (char *)rx_data.payload, rx_data.port);
-                return 0;
+        semtech_loramac_set_tx_mode(&loramac, cnf);
+        semtech_loramac_set_tx_port(&loramac, port);
 
-            case SEMTECH_LORAMAC_TX_DONE:
-                puts("TX done");
-                return 0;
-
+        switch (semtech_loramac_send(&loramac,
+                                     (uint8_t *)argv[2], strlen(argv[2]))) {
             case SEMTECH_LORAMAC_NOT_JOINED:
                 puts("Failed: not joined");
                 return 1;
+
+            case SEMTECH_LORAMAC_BUSY:
+                puts("Failed: mac is busy");
+                return 1;
         }
+
+        /* clear the rx buffer of the mac */
+        switch (semtech_loramac_recv(&loramac)) {
+            case SEMTECH_LORAMAC_DATA_RECEIVED:
+                loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
+                printf("Data received: %s, port: %d\n",
+                       (char *)loramac.rx_data.payload, loramac.rx_data.port);
+                break;
+
+            case SEMTECH_LORAMAC_TX_DONE:
+                puts("TX complete, no data received");
+                break;
+        }
+
+        return 0;
     }
     else {
         _loramac_usage();
@@ -424,8 +433,7 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    sx127x_setup(&sx127x, &sx127x_params[0]);
-    semtech_loramac_init(&sx127x);
+    semtech_loramac_init(&loramac);
 
     puts("All up, running the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
