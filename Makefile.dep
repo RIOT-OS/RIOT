@@ -534,7 +534,6 @@ endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_REQUIRED += arduino
-  FEATURES_REQUIRED += cpp
   USEMODULE += xtimer
 endif
 
