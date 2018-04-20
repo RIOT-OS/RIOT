@@ -149,6 +149,11 @@ void event_queue_init(event_queue_t *queue);
 /**
  * @brief   Queue an event
  *
+ * The given event will be posted on the given @p queue. If the event is already
+ * queued when calling this function, the event will not be touched and remain
+ * in the previous position on the queue. So reposting an event while it is
+ * already on the queue will have no effect.
+ *
  * @param[in]   queue   event queue to queue event in
  * @param[in]   event   event to queue in event queue
  */
