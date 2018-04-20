@@ -115,14 +115,14 @@ const unsigned firmware_num_slots = sizeof(_firmware_slot_start) / sizeof(unsign
 
 void firmware_jump_to_image(firmware_metadata_t *metadata)
 {
-    uint32_t addr = (unsigned)metadata + (unsigned)sizeof(firmware_metadata_t);
+    uint32_t addr = (unsigned)metadata + FIRMWARE_METADATA_SIZE;
 
     cpu_jump_to_image(addr);
 }
 
 int firmware_current_slot(void)
 {
-    unsigned base_addr = cpu_get_image_baseaddr() - sizeof(firmware_metadata_t);
+    unsigned base_addr = cpu_get_image_baseaddr() - FIRMWARE_METADATA_SIZE;
 
     for (unsigned i = 1; i < firmware_num_slots; i++) {
         if (base_addr == _firmware_slot_start[i]) {
@@ -148,7 +148,7 @@ firmware_metadata_t *firmware_get_metadata(unsigned slot)
 unsigned firmware_get_image_startaddr(unsigned slot)
 {
     assert(slot < FIRMWARE_NUM_SLOTS);
-    return _firmware_slot_start[slot] + sizeof(firmware_metadata_t);
+    return _firmware_slot_start[slot] + FIRMWARE_METADATA_SIZE;
 }
 
 void firmware_jump_to_slot(unsigned slot)
