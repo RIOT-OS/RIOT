@@ -7,7 +7,9 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
-FEATURES_PROVIDED += arduino
+ifeq (,$(filter jiminy-mega256rfr2,$(BOARD)))
+  FEATURES_PROVIDED += arduino
+endif
 
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = avr8
