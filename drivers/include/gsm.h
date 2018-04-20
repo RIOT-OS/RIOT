@@ -85,9 +85,12 @@ extern "C" {
  * @brief States of gsm modem
  */
 enum {
-    GSM_OFF,    /**< GSM_OFF */
-    GSM_BOOT,   /**< GSM_BOOT */
-    GSM_ON,     /**< GSM_ON */
+    GSM_UNDEFINED = 0,  /**< GSM_UNDEFINED */
+    GSM_OFF,            /**< GSM_OFF */
+    GSM_BOOT,           /**< GSM_BOOT */
+    GSM_ON,             /**< GSM_ON */
+    GSM_SLEEP,          /**< GSM_SLEEP */
+
 };
 
 /**
@@ -157,6 +160,15 @@ struct gsm_driver {
     void (*sleep)(gsm_t *dev);
 
     /**
+     * @brief   Wake module
+     *
+     * @param[in]   dev     device to act on
+     *
+     * @return 0 for succes
+     */
+    int (*wake_up)(gsm_t *dev);
+
+    /**
      * @brief   Reset module
      *
      * @param[in]   dev     device to act on
@@ -194,6 +206,25 @@ int gsm_power_on(gsm_t *dev);
  * @return  none
  */
 void gsm_power_off(gsm_t *dev);
+
+/**
+ * @brief   Wakes the gsm module.
+ *
+ * @param[in] dev   Device to operate on
+ *
+ * @return    0 for success
+ * @return  < 0 for failure
+ */
+int gsm_wake_up(gsm_t *dev);
+
+/**
+ * @brief   Lets the gsm module sleep.
+ *
+ * @param[in] dev  Device to operate on
+ *
+ * @return  none
+ */
+void gsm_sleep(gsm_t *dev);
 
 /**
  * @brief   Enables the gsm radio.

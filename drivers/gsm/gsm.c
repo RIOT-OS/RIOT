@@ -148,6 +148,44 @@ void gsm_power_off(gsm_t *dev)
     }
 }
 
+int gsm_wake_up(gsm_t *dev)
+{
+    int err = -EINVAL;
+    if(dev) {
+
+        rmutex_lock(&dev->mutex);
+
+        if((dev->driver) && (dev->driver->wake_up)) {
+            err = dev->driver->wake_up(dev);
+
+            if(err < 0) {
+                LOG_WARNING(LOG_HEADER"failed to wake\n");
+            }
+            else {
+                dev->state = GSM_UNDEFINED;
+                err = -1;
+            }
+        }
+        rmutex_unlock(&dev->mutex);
+    }
+
+    return err;
+}
+
+void gsm_sleep(gsm_t *dev)
+{
+    if(dev) {
+        rmutex_lock(&dev->mutex);
+
+        if((dev->driver) && (dev->driver->sleep)) {
+            dev->driver->sleep(dev);
+
+            dev->state = GSM_SLEEP;
+        }
+        rmutex_unlock(&dev->mutex);
+    }
+}
+
 int gsm_enable_radio(gsm_t *dev)
 {
     int err = -EINVAL;
