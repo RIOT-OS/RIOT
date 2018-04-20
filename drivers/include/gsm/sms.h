@@ -18,8 +18,8 @@
  *
  * @author  Max van Kessel <maxvankessel@betronic.nl>
  */
-#ifndef GSM_SMS_H
-#define GSM_SMS_H
+#ifndef SMS_H
+#define SMS_H
 
 #include <stdint.h>
 
@@ -107,4 +107,4 @@ int gsm_sms_enable_reception(gsm_sms_t * sms, gsm_sms_cb_t cb, void *arg);
 }
 #endif
 
-#endif /* GSM_SMS_H */
+#endif /* SMS_H */

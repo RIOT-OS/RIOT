@@ -19,8 +19,8 @@
  * @author  Max van Kessel <maxvankessel@betronic.nl>
  */
 
-#ifndef GSM_CALL_H
-#define GSM_CALL_H
+#ifndef CALL_H
+#define CALL_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -66,4 +66,4 @@ int gsm_call_switch_to_command_mode(gsm_t *dev);
  */
 int gsm_call_switch_to_data_mode(gsm_t *dev);
 
-#endif /* GSM_CALL_H */
+#endif /* CALL_H */

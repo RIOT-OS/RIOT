@@ -13,8 +13,8 @@
 #include <stdlib.h>
 
 #include <fmt.h>
+#include "../include/gsm/sms.h"
 #include "log.h"
-#include "gsm/gsm_sms.h"
 
 /**
  * @ingroup     drivers_gsm

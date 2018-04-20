@@ -25,19 +25,39 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "gpio.h"
+#include "periph/gpio.h"
 #include "gsm.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @brief Specifies the default on time the power key needs for action
+ */
 #ifndef QUECTEL_POWER_KEY_ON_TIME_US
-#define QUECTEL_POWER_KEY_ON_TIME_US            (2000 * US_PER_MS)
+#define QUECTEL_POWER_KEY_ON_TIME_US            (1000 * US_PER_MS)
 #endif
 
+/**
+ * @brief Specifies the default off time the power key needs for action
+ */
+#ifndef QUECTEL_POWER_KEY_OFF_TIME_US
+#define QUECTEL_POWER_KEY_OFF_TIME_US           (1000 * US_PER_MS)
+#endif
+
+/**
+ * @brief Specifies the default time of action on the status line
+ */
 #ifndef QUECTEL_STATUS_DETECT_TIMEOUT_US
-#define QUECTEL_STATUS_DETECT_TIMEOUT_US       (1000 * US_PER_MS)
+#define QUECTEL_STATUS_DETECT_TIMEOUT_US        (5000 * US_PER_MS)
+#endif
+
+/**
+ * @brief Specifies the default time on the reset pin
+ */
+#ifndef QUECTEL_RESET_TIME_US
+#define QUECTEL_RESET_TIME_US                   (500 * US_PER_MS)
 #endif
 
 typedef struct gsm_quectel_params {
@@ -50,18 +70,13 @@ typedef struct gsm_quectel_params {
     bool        invert_reset_pin;   /**< select inversion of reset pin*/
     gpio_t      dtr_pin;            /**< quectel dtr pin (modem intput) */
     gpio_t      dcd_pin;            /**< quectel dcd pin (modem output) */
-} gsm_quectel_params_t;
+} quectel_params_t;
 
-typedef struct gsm_quectel {
-    gsm_t base;
+typedef struct quectel {
+    gsm_t base;                     /**< gsm base driver */
+} quectel_t;
 
-} gsm_quectel_t;
-
-
-
-
-extern const gsm_generic_driver_t gsm_quectel_driver;
-
+extern const gsm_driver_t quectel_driver;
 
 #ifdef __cplusplus
 }

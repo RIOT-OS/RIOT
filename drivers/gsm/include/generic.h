@@ -6,8 +6,8 @@
  * details.
  */
 
-#ifndef GSM_GENERIC_H
-#define GSM_GENERIC_H
+#ifndef GENERIC_H
+#define GENERIC_H
 
 #include "gsm.h"
 
@@ -15,14 +15,14 @@
 extern "C" {
 #endif
 
-typedef struct gsm gsm_generic_t;
+typedef struct gsm generic_t;
 
-typedef struct gsm_driver gsm_generic_driver_t;
+typedef struct gsm_driver generic_driver_t;
 
-extern const gsm_generic_driver_t gsm_generic_driver;
+extern const generic_driver_t generic_driver;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* GSM_GENERIC_H */
+#endif /* GENERIC_H */

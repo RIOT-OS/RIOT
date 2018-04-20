@@ -78,6 +78,10 @@ ifneq (,$(filter hd44780,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/hd44780/include
 endif
 
+ifneq (,$(filter gsm_%,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/gsm/include
+endif
+
 ifneq (,$(filter hdc1000,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/hdc1000/include
 endif

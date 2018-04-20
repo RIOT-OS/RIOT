@@ -86,6 +86,7 @@ extern "C" {
  */
 enum {
     GSM_OFF,    /**< GSM_OFF */
+    GSM_BOOT,   /**< GSM_BOOT */
     GSM_ON,     /**< GSM_ON */
 };
 
@@ -119,10 +120,49 @@ typedef struct gsm {
 } gsm_t;
 
 struct gsm_driver {
+
+    /**
+     * @brief   Initialize the device driver
+     *
+     * @param[in]   dev     device driver to initialize
+     *
+     * @return 0 on success
+     */
     int (*init_base)(gsm_t *dev);
+
+    /**
+     * @brief   Power on the module
+     *
+     * @param[in]   dev     device to act on
+     *
+     * @return 0 on success
+     */
     int (*power_on)(gsm_t *dev);
+
+    /**
+     * @brief   Power off the module
+     *
+     * @param[in]   dev     device to act on
+     *
+     * @return 0 on success
+     */
     int (*power_off)(gsm_t *dev);
+
+    /**
+     * @brief   Set module to sleep
+     *
+     * @param[in]   dev     device to act on
+     *
+     */
     void (*sleep)(gsm_t *dev);
+
+    /**
+     * @brief   Reset module
+     *
+     * @param[in]   dev     device to act on
+     *
+     */
+    void (*reset)(gsm_t *dev);
 };
 
 /**
@@ -174,6 +214,17 @@ int gsm_enable_radio(gsm_t *dev);
  * @return  < 0 for failure
  */
 int gsm_disable_radio(gsm_t *dev);
+
+/**
+ * @brief   Checks if gsm is alive
+ * @note    Time between retries is GSM_SERIAL_TIMEOUT_US
+ *
+ * @param[in] dev       Device to operate on
+ * @param[in] retries   Number of retries
+ *
+ * @return    true for success, otherwise false
+ */
+bool gsm_is_alive(gsm_t *dev, uint8_t retries);
 
 /**
  * @brief   Set sim puk into modem and pin

@@ -14,7 +14,8 @@
 #include "fmt.h"
 #include "log.h"
 #include "net/ipv4/addr.h"
-#include "gsm/gsm_gprs.h"
+
+#include "gsm/gprs.h"
 
 /**
  * @ingroup     drivers_gsm

@@ -34,7 +34,9 @@
 #define LOG_HEADER  "gsm: "
 
 static void * idle_thread(void *arg);
+
 static void creg_cb(void *arg, const char *buf);
+static void ring_cb(void *arg);
 
 int gsm_init(gsm_t *dev, gsm_params_t *params)
 {
@@ -67,14 +69,8 @@ int gsm_init(gsm_t *dev, gsm_params_t *params)
             }
         }
 
-        err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CREG=1", GSM_SERIAL_TIMEOUT_US);
-        if(err < 0) {
-            LOG_INFO(LOG_HEADER"failed to enable unsolicited result for CREG\n");
-        }
-
-        err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CMEE=1", GSM_SERIAL_TIMEOUT_US);
-        if(err < 0) {
-            LOG_INFO(LOG_HEADER"failed to enable extended error notification CMEE\n");
+        if(dev->params->ri_pin != GPIO_UNDEF) {
+            gpio_init_int(dev->params->ri_pin, GPIO_IN, GPIO_FALLING, ring_cb, dev);
         }
 
         dev->pid = thread_create(dev->stack, GSM_THREAD_STACKSIZE, GSM_THREAD_PRIO,
@@ -94,16 +90,35 @@ int gsm_power_on(gsm_t *dev)
     if(dev) {
         rmutex_lock(&dev->mutex);
 
+        dev->state = GSM_BOOT;
+
         if((dev->driver) && (dev->driver->power_on)) {
             err = dev->driver->power_on(dev);
 
-            if(err <= 0) {
+            if(err < 0) {
                 LOG_WARNING(LOG_HEADER"failed to power on\n");
+
+                dev->state = GSM_OFF;
             }
             else {
                 dev->state = GSM_ON;
             }
         }
+
+        if(dev->state == GSM_ON) {
+            /* enable network registration unsolicited result code */
+            err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CREG=1", GSM_SERIAL_TIMEOUT_US);
+            if(err < 0) {
+                LOG_INFO(LOG_HEADER"failed to enable unsolicited result for CREG\n");
+            }
+
+            /* set error result codes to numeric values */
+            err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CMEE=1", GSM_SERIAL_TIMEOUT_US);
+            if(err < 0) {
+                LOG_INFO(LOG_HEADER"failed to enable extended error notification CMEE\n");
+            }
+        }
+
         rmutex_unlock(&dev->mutex);
     }
 
@@ -117,12 +132,12 @@ void gsm_power_off(gsm_t *dev)
         rmutex_lock(&dev->mutex);
 
         err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CFUN=0",
-                GSM_SERIAL_TIMEOUT_US * 30);
+                GSM_SERIAL_TIMEOUT_US * 3);
 
         if((dev->driver) && (dev->driver->power_off)) {
             err = dev->driver->power_off(dev);
 
-            if(err <= 0) {
+            if(err < 0) {
                 LOG_WARNING(LOG_HEADER"failed to power off\n");
             }
             else {
@@ -163,6 +178,26 @@ int gsm_disable_radio(gsm_t *dev)
     }
 
     return err;
+}
+
+bool gsm_is_alive(gsm_t *dev, uint8_t retries)
+{
+    bool alive = false;
+    if(dev) {
+        int err;
+        /* send AT to see if it's alive */
+        do {
+            err = at_send_cmd_wait_ok(&dev->at_dev, "AT",
+                    GSM_SERIAL_TIMEOUT_US);
+
+            xtimer_usleep(GSM_SERIAL_TIMEOUT_US);
+        } while(err != 0 && (retries--));
+
+        if(err == 0) {
+            alive = true;
+        }
+    }
+    return alive;
 }
 
 int gsm_set_puk(gsm_t *dev, const char *puk, const char *pin)
@@ -283,9 +318,9 @@ size_t gsm_get_operator(gsm_t *dev, char *outbuf, size_t len)
         /* +COPS: 1,0,"NL KPN KPN",8 */
         if(strncmp(pos, "+COPS:", 6) == 0) {
             size_t outlen = 0;
-            if(pos[7] == '0') {
-                strcpy(outbuf, "Unknown");
-                res = 8;
+            if(res < 10) {
+                /* not registered yet */
+                res = -1;
             }
             else {
                 /* skip '+COPS: [0-3],[0-3],"' */
@@ -338,7 +373,8 @@ ssize_t gsm_get_imsi(gsm_t *dev, char *buf, size_t len)
             GSM_SERIAL_TIMEOUT_US);
 
     if (res > 0) {
-        if(strncmp(buf, "+CME ERROR:", 10) == 0) {
+        if((strncmp(buf, "+CME ERROR:", 10) == 0)
+                || (strncmp(buf, "ERROR:", 6) == 0)) {
             res = -1;
             LOG_INFO(LOG_HEADER"unexpected response: %s\n", buf);
         }
@@ -369,15 +405,21 @@ ssize_t gsm_get_simcard_identification(gsm_t *dev, char *outbuf, size_t len)
         rmutex_unlock(&dev->mutex);
 
         if(err <= 0) {
+            if(err == 0){
+                err = -1;
+            }
             goto out;
         }
 
         if(strncmp(buf, "+CCID:", 6) == 0) {
-            pos = strchr(buf, '"');
+            pos = strchr(buf, ':');
             if(pos) {
                 size_t outlen = 0;
-                while((*(++pos) != '"') && (len--)) {
-                    *outbuf++ = *pos;
+                while((!isalnum(*(++pos)))
+                        && ((buf + GSM_AT_LINEBUFFER_SIZE) > pos)) {  }
+
+                while((isalnum(*pos)) && (len--)) {
+                    *outbuf++ = *pos++;
                     outlen++;
                 }
                 if(len) {
@@ -388,6 +430,9 @@ ssize_t gsm_get_simcard_identification(gsm_t *dev, char *outbuf, size_t len)
                     err = -ENOSPC;
                 }
             }
+        }
+        else {
+            err = -1;
         }
     }
 out:
@@ -571,7 +616,7 @@ void gsm_print_status(gsm_t *dev)
     }
 
     res = gsm_get_registration(dev);
-    if(res >= 0) {
+    if(res > 0) {
         printf(LOG_HEADER"registration code: %d\n", res);
 
         res = gsm_get_operator(dev, buf, GSM_AT_LINEBUFFER_SIZE);
@@ -628,7 +673,7 @@ static void * idle_thread(void *arg)
     }
 
     while(1) {
-        if(dev->state >= GSM_ON) {
+        if(dev->state > GSM_OFF) {
             rmutex_lock(&dev->mutex);
             at_process_oob(&dev->at_dev);
             rmutex_unlock(&dev->mutex);
@@ -646,5 +691,14 @@ static void creg_cb(void *arg, const char *buf)
 {
     (void)arg;
     LOG_DEBUG(LOG_HEADER"CREG received: %s\n", buf);
+}
+
+static void ring_cb(void *arg)
+{
+    if(arg){
+        LOG_INFO(LOG_HEADER"ring\n");
+        thread_wakeup(((gsm_t *)arg)->pid);
+    }
+
 }
 

@@ -18,8 +18,8 @@
  *
  * @author  Max van Kessel <maxvankessel@betronic.nl>
  */
-#ifndef GSM_GPRS_H
-#define GSM_GPRS_H
+#ifndef GPRS_H
+#define GPRS_H
 
 #include <stdint.h>
 
@@ -110,4 +110,4 @@ int gsm_gprs_get_registration(gsm_t *dev);
 }
 #endif
 
-#endif /* GSM_SMS_H */
+#endif /* GPRS_H */

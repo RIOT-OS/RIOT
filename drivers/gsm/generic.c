@@ -12,7 +12,7 @@
 
 #include "log.h"
 #include "xtimer.h"
-#include "gsm/gsm_generic.h"
+#include "generic.h"
 
 /**
  * @ingroup     drivers_gsm
@@ -28,7 +28,7 @@
 
 #define LOG_HEADER  "gsm_generic: "
 
-int gsm_generic_init(gsm_generic_t *dev)
+int generic_init(generic_t *dev)
 {
     int err = -EINVAL;
 
@@ -39,20 +39,21 @@ int gsm_generic_init(gsm_generic_t *dev)
         /* generic modem should be on by default */
 
         /* send AT to see if it's alive */
-        do {
-            xtimer_usleep(GSM_SERIAL_TIMEOUT_US);
-            err = at_send_cmd_wait_ok(&dev->at_dev, "AT", GSM_SERIAL_TIMEOUT_US);
-        } while(err != 0 && (retries--));
+        err = gsm_is_alive(dev, 3);
 
         if(err) {
             LOG_INFO(LOG_HEADER"no response on AT\n");
 
             /* TODO no response on AT check if device is in command mode */
         }
+        else {
+            dev->state = GSM_ON;
+        }
+
     }
     return err;
 }
 
-const gsm_driver_t gsm_generic_driver = {
-    .init_base = gsm_generic_init,
+const gsm_driver_t generic_driver = {
+    .init_base = generic_init,
 };

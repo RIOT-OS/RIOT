@@ -12,7 +12,8 @@
 
 #include "fmt.h"
 #include "log.h"
-#include "gsm/gsm_call.h"
+
+#include "gsm/call.h"
 
 /**
  * @ingroup     drivers_gsm
@@ -63,7 +64,7 @@ int gsm_call_dial(gsm_t *dev, const char * number, bool is_voice_call)
     return result;
 }
 
-int gsm_call_switch_to_command_mode(gsm_t *dev)
+int __attribute__((weak)) gsm_call_switch_to_command_mode(gsm_t *dev)
 {
     int err = -EINVAL;
 
@@ -78,7 +79,7 @@ int gsm_call_switch_to_command_mode(gsm_t *dev)
     return err;
 }
 
-int gsm_call_switch_to_data_mode(gsm_t *dev)
+int __attribute__((weak)) gsm_call_switch_to_data_mode(gsm_t *dev)
 {
     int err = -EINVAL;
 

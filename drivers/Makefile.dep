@@ -134,6 +134,14 @@ ifneq (,$(filter grove_ledbar,$(USEMODULE)))
   USEMODULE += my9221
 endif
 
+ifneq (,$(filter gsm_quectel,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
+ifneq (,$(filter gsm_ublox,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 ifneq (,$(filter hd44780,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer
