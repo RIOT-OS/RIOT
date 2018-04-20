@@ -52,7 +52,7 @@ extern saul_driver_t pulse_counter_saul_driver;
 
 void auto_init_pulse_counter(void)
 {
-    assert(PULSE_COUNTER_NUM == PULSE_COUNTER_INFO_NUM)
+    assert(PULSE_COUNTER_NUM == PULSE_COUNTER_INFO_NUM);
     for (unsigned i = 0; i < PULSE_COUNTER_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing pulse_counter #%u\n", i);
 
