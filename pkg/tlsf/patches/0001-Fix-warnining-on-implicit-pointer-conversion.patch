@@ -1,0 +1,25 @@
+From fb4b4cf6d2d0bbac15a973f292b21939f2abc38b Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Mon, 23 Apr 2018 13:55:42 +0200
+Subject: [PATCH] Fix warnining on implicit pointer conversion.
+
+---
+ tlsf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tlsf.c b/tlsf.c
+index f4fc786..eb1cb9c 100644
+--- a/tlsf.c
++++ b/tlsf.c
+@@ -898,7 +898,7 @@ int tlsf_check(tlsf_t tlsf)
+ static void default_walker(void* ptr, size_t size, int used, void* user)
+ {
+ 	(void)user;
+-	printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, block_from_ptr(ptr));
++	printf("\t%p %s size: %x (%p)\n", ptr, used ? "used" : "free", (unsigned int)size, (void *)block_from_ptr(ptr));
+ }
+ 
+ void tlsf_walk_pool(pool_t pool, tlsf_walker walker, void* user)
+-- 
+2.1.4
+
