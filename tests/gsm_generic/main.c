@@ -8,13 +8,9 @@
 #include "xtimer.h"
 #include "board.h"
 
-#include "gsm.h"
-#include "gsm/gsm_gprs.h"
-#include "gsm/gsm_call.h"
-
-#ifndef APN
-#define APN               "apn"
-#endif
+#include "generic.h"
+#include "gsm/gprs.h"
+#include "gsm/call.h"
 
 #ifndef UART_NUMOF
 #define UART_NUMOF        (1)
@@ -28,25 +24,15 @@
 #define MODEM_RI_PIN      GPIO_UNDEF
 #endif
 
-#ifndef MODEM_RST_PIN_
-#define MODEM_RST_PIN_    GPIO_UNDEF
-#endif
-
-#ifndef MODEM_PWR_ON_PIN
-#define MODEM_PWR_ON_PIN  GPIO_UNDEF
-#endif
-
-#ifndef MODEM_DTR_PIN
-#define MODEM_DTR_PIN     GPIO_UNDEF
-#endif
-
 static const gsm_params_t params = {
     .uart            = UART_MODEM,
     .baudrate        = 115200,
     .ri_pin          = MODEM_RI_PIN,
 };
 
-static gsm_t modem;
+static gsm_t modem = {
+        .driver = &generic_driver,
+};
 
 #define MAX_CMD_LEN 128
 int _at_send_handler(int argc, char **argv)
