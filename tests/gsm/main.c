@@ -1,10 +1,14 @@
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "shell.h"
 #include "xtimer.h"
-#include "gsm/ublox.h"
+#include "ublox.h"
 #include "board.h"
+
+#include "gsm/gprs.h"
+#include "gsm/sms.h"
 
 #define APN "apn"
 
@@ -28,24 +32,26 @@
 #define MODEM_DTR_PIN   GPIO_UNDEF
 #endif
 
-static const ublox_gsm_params_t params = {
+static const ublox_params_t params = {
     .base.uart = UART_MODEM,
     .base.baudrate = 115200,
-    .base.baudrate_to_set = 921600/*460800*/,
     .base.ri_pin = MODEM_RI_PIN,
-    .params.reset_pin = MODEM_RST_PIN_,
-    .params.pwr_on_pin = MODEM_PWR_ON_PIN,
-    .params.dtr_pin = MODEM_DTR_PIN,
-    .params.gps_connected = true,
-    .params.gpio1_mode = UBLOX_GPIO_MODE_OUTPUT | UBLOX_GPIO_OUTPUT_HIGH,
-    .params.gpio2_mode = UBLOX_GPIO_MODE_DISABLED,
-    .params.gpio3_mode = UBLOX_GPIO_MODE_DEFAULT,
-    .params.gpio4_mode = UBLOX_GPIO_MODE_GNSS_SUPPLY_EN,
+    .change_over_baudrate = 921600/*460800*/,
+    .reset_pin = MODEM_RST_PIN_,
+    .pwr_on_pin = MODEM_PWR_ON_PIN,
+    .dtr_pin = MODEM_DTR_PIN,
+    .gps_connected = true,
+    .gpio1_mode = UBLOX_GPIO_MODE_OUTPUT | UBLOX_GPIO_OUTPUT_HIGH,
+    .gpio2_mode = UBLOX_GPIO_MODE_DISABLED,
+    .gpio3_mode = UBLOX_GPIO_MODE_DEFAULT,
+    .gpio4_mode = UBLOX_GPIO_MODE_GNSS_SUPPLY_EN,
 };
 
-static ublox_gsm_t modem = {
-    .base.driver = &ublox_gsm_driver,
+static ublox_t modem = {
+    .base.driver = &ublox_driver,
 };
+
+static gsm_sms_t sms;
 
 #define MAX_CMD_LEN 128
 int _at_send_handler(int argc, char **argv)
@@ -79,17 +85,42 @@ int _modem_init_handler(int argc, char **argv)
     (void)argv;
 
     gsm_init((gsm_t *)&modem, (gsm_params_t *)&params);
+
+    gsm_sms_init(&sms, (gsm_t *)&modem);
+
     return 0;
 }
 
-int _modem_init_gprs_handler(int argc, char **argv)
+int _modem_init_pdp_handler(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
 
-    gsm_gprs_init((gsm_t *)&modem, APN, NULL, NULL);
+    uint8_t context = (uint8_t)atoi(argv[1]);
+
+    if(argc < 2) {
+        printf("Usage: %s <context> <apn> [user [pass]]\n", argv[0]);
+        return 1;
+    }
+
+    if(gsm_gprs_setup_pdp_context((gsm_t *)&modem, (context),
+            GSM_CONTEXT_IP, argv[2], (argv[3]) ? argv[3] : NULL,
+            (argv[4]) ? argv[4] : NULL) == 0) {
+
+        if(gsm_grps_attach((gsm_t *)&modem) != 0) {
+            printf("failed to attach gprs");
+            return 0;
+        }
+
+        if(gsm_grps_activate_context((gsm_t *)&modem, context) != 0) {
+            printf("failed to activate gprs context %u", context);
+            return 0;
+        }
+    }
+
     return 0;
 }
+
 
 
 static void sms_cb(void *arg, char *sms, char *sender, char *date)
@@ -103,12 +134,22 @@ int _modem_sms_handler(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    gsm_receive_sms((gsm_t *)&modem, sms_cb, NULL);
+    gsm_sms_set_format(&sms, GSM_SMS_MESSAGE_FORMAT_TEXT);
+
+    gsm_sms_set_characters(&sms, NULL);
+
+    gsm_sms_enable_reception(&sms, sms_cb, NULL);
     return 0;
 }
 
 int _modem_get_handler(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
+    printf("Not implemented yet.");
+
+    /*
     if (argc < 2) {
         printf("Usage: %s <url> [resp_file]\n", argv[0]);
         return 1;
@@ -133,12 +174,18 @@ int _modem_get_handler(int argc, char **argv)
         }
         return 0;
     }
-
-    return 1;
+*/
+    return 0;
 }
 
 int _modem_post_handler(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
+    printf("Not implemented yet.");
+
+    /*
     if (argc < 3) {
         printf("Usage: %s <url> <req_file> [resp_file]\n", argv[0]);
         return 1;
@@ -163,6 +210,7 @@ int _modem_post_handler(int argc, char **argv)
         }
         return 0;
     }
+    */
     return 0;
 }
 
@@ -170,7 +218,7 @@ static const shell_command_t commands[] = {
     {"atcmd", "Sends an AT cmd", _at_send_handler},
     {"modem_status", "Print Modem status", _modem_status_handler},
     {"init", "Init modem", _modem_init_handler},
-    {"init_gprs", "Init GPRS connection", _modem_init_gprs_handler},
+    {"init_gprs", "Init GPRS connection", _modem_init_pdp_handler},
     {"sms", "Enable sms reception", _modem_sms_handler},
     {"get", "Send http get request", _modem_get_handler},
     {"post", "Send http post request", _modem_post_handler},
