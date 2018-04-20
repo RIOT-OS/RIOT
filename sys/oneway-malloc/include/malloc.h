@@ -20,6 +20,8 @@
  *
  * @note        You should prefer statically allocated memory whenever possible.
  *
+ * @see         pkg_tlsf
+ *
  * @{
  * @file
  *
