@@ -179,6 +179,30 @@ int _modem_power_handler(int argc, char **argv)
     return 0;
 }
 
+int _modem_radio_handler(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: %s <on/off>\n", argv[0]);
+        return 1;
+    }
+
+    if(strncmp(argv[1], "1", 1) == 0) {
+        int result = gsm_enable_radio((gsm_t *)&modem);
+
+        if(result == 0) {
+            printf("Device radio on\n");
+        }
+        else {
+            printf("Error %d", result);
+        }
+    }
+    else {
+        gsm_disable_radio((gsm_t *)&modem);
+    }
+
+    return 0;
+}
+
 static const shell_command_t commands[] = {
     {"atcmd",        "Sends an AT cmd",     _at_send_handler},
     {"modem_status", "Print Modem status",  _modem_status_handler},
@@ -187,6 +211,7 @@ static const shell_command_t commands[] = {
     {"simpin",       "Enter simpin",        _modem_cpin_handler},
     {"sim_status",   "Check sim status",    _modem_cpin_status_handler},
     {"power",        "Power (On/Off)",      _modem_power_handler},
+    {"radio",        "Radio (On/Off)",      _modem_radio_handler},
     {NULL, NULL, NULL}
 };
 
