@@ -1,4 +1,4 @@
-ifneq (,$(filter riotboot%, $(MAKECMDGOALS)))
+ifneq (,$(filter riotboot,$(FEATURES_USED)))
 
 .PHONY: riotboot/flash riotboot/flash-bootloader riotboot/flash-slot1 riotboot/flash-slot2 \
         riotboot/verify-image
@@ -85,7 +85,7 @@ riotboot/flash: riotboot/flash-slot1
 
 else
 riotboot:
-	$(Q)echo "error: riotboot not supported on board $(BOARD)!"
+	$(Q)echo "error: riotboot feature not selected! (try FEATURES_REQUIRED += riotboot)"
 	$(Q)false
 
 endif # RIOTBOOT_SLOT0_SIZE
