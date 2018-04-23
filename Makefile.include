@@ -387,7 +387,7 @@ endif # RIOTNOLINK
 $(ELFFILE): $(BASELIBS)
 	$(Q)$(_LINK) -o $@
 
-$(BINDIR)/$(APPLICATION_MODULE).a: $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=$(BINDIR)/%.a) $(APPDEPS)
+$(BINDIR)/$(APPLICATION_MODULE).a: $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=$(BINDIR)/%.a) $(APPDEPS) $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 $(BINDIR)/$(APPLICATION_MODULE).a: FORCE
 
@@ -425,14 +425,14 @@ endef
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(RIOTBUILD_CONFIG_HEADER_C) pkg-prepare: clean
+    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(RIOTBUILD_CONFIG_HEADER_C) pkg-prepare $(BUILDDEPS): clean
 endif
 
 .PHONY: pkg-prepare $(USEPKG:%=$(BINDIR)/%.a)
 pkg-prepare:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i prepare ; done
 
-$(USEPKG:%=$(BINDIR)/%.a): $(RIOTBUILD_CONFIG_HEADER_C) pkg-prepare
+$(USEPKG:%=$(BINDIR)/%.a): $(RIOTBUILD_CONFIG_HEADER_C) pkg-prepare $(BUILDDEPS)
 	@mkdir -p $(BINDIR)
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst $(BINDIR)/%.a,%,$@)
 
