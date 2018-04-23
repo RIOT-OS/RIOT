@@ -366,6 +366,7 @@ DIRS += $(EXTERNAL_MODULE_DIRS)
 
 # Define dependencies required for building (headers, downloading source files,)
 BUILDDEPS += $(RIOTBUILD_CONFIG_HEADER_C)
+BUILDDEPS += pkg-prepare
 BUILDDEPS += $(APPDEPS)
 
 # Save value to verify it is not modified later
@@ -429,14 +430,14 @@ endef
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) pkg-prepare $(BUILDDEPS): clean
+    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(BUILDDEPS): clean
 endif
 
 .PHONY: pkg-prepare $(USEPKG:%=$(BINDIR)/%.a)
 pkg-prepare:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i prepare ; done
 
-$(USEPKG:%=$(BINDIR)/%.a): pkg-prepare $(BUILDDEPS)
+$(USEPKG:%=$(BINDIR)/%.a): $(BUILDDEPS)
 	@mkdir -p $(BINDIR)
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst $(BINDIR)/%.a,%,$@)
 
