@@ -18,7 +18,8 @@ COMMON_HDR     := common.h
 RIOT_FIRMWARE_SRC := \
 	$(SHA256_DIR)/sha256.c \
 	$(RIOTBASE)/sys/checksum/fletcher32.c \
-	$(RIOTBASE)/sys/firmware/firmware.c
+	$(RIOTBASE)/sys/firmware/firmware.c \
+	$(RIOTBASE)/sys/firmware/firmware_simple.c
 
 RIOT_FIRMWARE_HDR := $(RIOT_INCLUDE)/firmware.h \
 	$(RIOT_INCLUDE)/hashes/sha256.h \
