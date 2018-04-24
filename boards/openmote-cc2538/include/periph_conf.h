@@ -101,7 +101,6 @@ static const uart_conf_t uart_config[] = {
 
 /* macros common across all UARTs */
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
-
 /** @} */
 
 /**

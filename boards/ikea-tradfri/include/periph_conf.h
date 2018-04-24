@@ -54,9 +54,11 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   RTC configuration
+ * @name    RTC configuration
+ * @{
  */
 #define RTC_NUMOF           (1U)
+/** @} */
 
 /**
  * @name    RTT configuration

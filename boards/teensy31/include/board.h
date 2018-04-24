@@ -23,6 +23,10 @@
 #include "periph_conf.h"
 #include "mtd.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Use the on board RTC 32kHz clock for LPTMR clocking. */
 #undef LPTIMER_CLKSRC
 /** @brief Clock source for the LPTMR module */
@@ -55,10 +59,6 @@
 #define LED0_OFF            (LED_PORT->PCOR = (1 << LED0_BIT))
 #define LED0_TOGGLE         (LED_PORT->PTOR = (1 << LED0_BIT))
 /** @} */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO

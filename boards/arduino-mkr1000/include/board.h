@@ -37,7 +37,7 @@ extern "C" {
 #define ARDUINO_LED         (6U)
 
 /**
- * @brief   LED pin definitions and handlers
+ * @name    LED pin definitions and handlers
  * @{
  */
 #define LED0_PIN            GPIO_PIN(PA, 20)

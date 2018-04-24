@@ -6,15 +6,6 @@
  * details.
  */
 
-#ifndef MULLE_NVRAM_H
-#define MULLE_NVRAM_H
-
-#include "nvram.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * @ingroup     boards_mulle
  * @{
@@ -24,6 +15,15 @@ extern "C" {
  *
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
  */
+
+#ifndef MULLE_NVRAM_H
+#define MULLE_NVRAM_H
+
+#include "nvram.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum mulle_nvram_address {
     /** @brief NVRAM magic number, used to identify an initialized FRAM device. */
@@ -36,10 +36,9 @@ typedef enum mulle_nvram_address {
 
 extern nvram_t *mulle_nvram;
 
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* MULLE_NVRAM_H */
+/** @} */

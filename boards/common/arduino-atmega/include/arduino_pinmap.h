@@ -33,9 +33,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   Mapping of MCU pins to Arduino pins
+ * @name    Mapping of MCU pins to Arduino pins
  *
  * @note    ISCP pins are not mapped.
+ * @{
  */
 
 /* Digital pins */
@@ -158,7 +159,6 @@ extern "C" {
 #define ARDUINO_PIN_A14         ARDUINO_PIN_68
 #define ARDUINO_PIN_A15         ARDUINO_PIN_69
 #endif
-/** @ */
 
 #define ARDUINO_A0              ADC_LINE(0)
 #define ARDUINO_A1              ADC_LINE(1)
@@ -178,6 +178,7 @@ extern "C" {
 #define ARDUINO_A14             ADC_LINE(14)
 #define ARDUINO_A15             ADC_LINE(15)
 #endif
+/** @} */
 
 #ifdef __cplusplus
 }
