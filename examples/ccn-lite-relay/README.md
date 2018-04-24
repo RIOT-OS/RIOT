@@ -21,7 +21,7 @@ RIOT provides three shell to interact with the CCN-Lite stack:
                 first parameter specifies the name of the content to be created,
                 the second parameter specifies the content itself. The second
                 parameter may include spaces, e.g. you can call:
-               `ccnl_cont /riot/peter/schmerzl Hello World! Hello RIOT!`
+               `ccnl_cs /riot/peter/schmerzl Hello World! Hello RIOT!`
 * `ccnl_fib`  - modifies the FIB or shows its current state. If the command is
                 called without parameters, it will print the current state of
                 the FIB. It can also be called with the action parameters `add`
@@ -44,7 +44,7 @@ An example usage of this application could be setup like this:
    windows.
 3. Call `make -B clean all term` in the first terminal and `PORT=tap1 make
    term` in the second one.
-4. Enter `ccnl_cont /riot/peter/schmerzl Hello World! Hello RIOT!` on the first
+4. Enter `ccnl_cs /riot/peter/schmerzl Hello World! Hello RIOT!` on the first
    terminal.
 5. Add a FIB entry for this prefix on the second node, e.g. using the broadcast
    address: `ccnl_fib add /riot/peter/schmerzl ff:ff:ff:ff:ff:ff`
