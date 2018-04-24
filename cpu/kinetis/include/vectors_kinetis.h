@@ -109,6 +109,7 @@ void isr_i2c0(void);         /**< I2C0 interrupt handler */
 void isr_i2c1(void);         /**< I2C1 interrupt handler */
 void isr_i2c2(void);         /**< I2C2 interrupt handler */
 void isr_i2c3(void);         /**< I2C3 interrupt handler */
+void isr_i2s0(void);         /**< I2S0 interrupt handler */
 void isr_i2s0_rx(void);      /**< I2S0 receive interrupt handler */
 void isr_i2s0_tx(void);      /**< I2S0 transmit interrupt handler */
 void isr_llwu(void);         /**< Low leakage wakeup interrupt handler */
@@ -159,6 +160,7 @@ void isr_uart1_err(void);    /**< UART1 error interrupt handler */
 void isr_uart1_rx_tx(void);  /**< UART1 receive/transmit interrupt handler */
 void isr_uart2(void);        /**< UART2 unified interrupt handler */
 void isr_uart2_err(void);    /**< UART2 error interrupt handler */
+void isr_uart2_flexio(void); /**< UART2 or FlexIO interrupt handler */
 void isr_uart2_rx_tx(void);  /**< UART2 receive/transmit interrupt handler */
 void isr_uart3(void);        /**< UART3 unified interrupt handler */
 void isr_uart3_err(void);    /**< UART3 error interrupt handler */

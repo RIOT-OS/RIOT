@@ -183,8 +183,14 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [SPI2_IRQn       ] = isr_spi2,            /* SPI2 Interrupt */
 #endif
 #ifdef I2S0
+#ifdef I2S_TCR1_TFW_MASK
+    /* K parts */
     [I2S0_Tx_IRQn    ] = isr_i2s0_tx,         /* I2S0 transmit interrupt */
     [I2S0_Rx_IRQn    ] = isr_i2s0_rx,         /* I2S0 receive interrupt */
+#else
+    /* KL parts */
+    [I2S0_IRQn       ] = isr_i2s0,            /* I2S0 interrupt */
+#endif
 #endif
 #ifdef UART0
 #ifdef KINETIS_SINGLE_UART_IRQ
@@ -206,8 +212,11 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #endif
 #endif
 #ifdef UART2
-#ifdef KINETIS_SINGLE_UART_IRQ
-    [UART2_IRQn] = isr_uart2,     /* UART2 interrupt */
+#if defined(KINETIS_SINGLE_UART_IRQ)
+    [UART2_IRQn] = isr_uart2,                 /* UART2 interrupt */
+#elif defined(FLEXIO_VERID_MAJOR_MASK)
+    /* KL parts with FlexIO uses combined IRQ */
+    [UART2_FLEXIO_IRQn] = isr_uart2_flexio,   /* UART2 or FLEXIO */
 #else
     [UART2_RX_TX_IRQn] = isr_uart2_rx_tx,     /* UART2 Receive/Transmit interrupt */
     [UART2_ERR_IRQn  ] = isr_uart2_err,       /* UART2 Error interrupt */

@@ -311,10 +311,17 @@ typedef enum {
 #ifdef KINETIS_HAVE_MK_SPI
 #define HAVE_SPI_MODE_T
 typedef enum {
+#if defined(SPI_CTAR_CPHA_MASK)
     SPI_MODE_0 = 0,                                         /**< CPOL=0, CPHA=0 */
     SPI_MODE_1 = (SPI_CTAR_CPHA_MASK),                      /**< CPOL=0, CPHA=1 */
     SPI_MODE_2 = (SPI_CTAR_CPOL_MASK),                      /**< CPOL=1, CPHA=0 */
     SPI_MODE_3 = (SPI_CTAR_CPOL_MASK | SPI_CTAR_CPHA_MASK)  /**< CPOL=1, CPHA=1 */
+#elif defined(SPI_C1_CPHA_MASK)
+    SPI_MODE_0 = 0,                                         /**< CPOL=0, CPHA=0 */
+    SPI_MODE_1 = (SPI_C1_CPHA_MASK),                        /**< CPOL=0, CPHA=1 */
+    SPI_MODE_2 = (SPI_C1_CPOL_MASK),                        /**< CPOL=1, CPHA=0 */
+    SPI_MODE_3 = (SPI_C1_CPOL_MASK | SPI_C1_CPHA_MASK)      /**< CPOL=1, CPHA=1 */
+#endif
 } spi_mode_t;
 /** @} */
 #endif /* KINETIS_HAVE_MK_SPI */
