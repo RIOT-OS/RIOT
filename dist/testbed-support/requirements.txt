@@ -1,0 +1,2 @@
+iotlabcli>=2.5.4
+iotlabsshcli>=0.2.3
