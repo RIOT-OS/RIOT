@@ -319,8 +319,11 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [DAC1_IRQn       ] = isr_dac1,            /* DAC1 interrupt */
 #endif
 #ifdef MCG
+#ifndef MCG_MC_LIRC_DIV2_MASK
+    /* Only on full MCG, not MCG_Lite */
     [MCG_IRQn        ] = isr_mcg,             /* MCG Interrupt */
-#endif
+#endif /* MCG_MC_LIRC_DIV2_MASK */
+#endif /* MCG */
 #ifdef LPTMR0
     [LPTMR0_IRQn     ] = isr_lptmr0,          /* LPTimer interrupt */
 #endif

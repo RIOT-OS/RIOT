@@ -27,7 +27,7 @@ config CPU_FAM_K
 config CPU_FAM_L
     bool
     select CPU_COMMON_KINETIS
-    select HAS_PERIPH_MCG
+    select HAS_PERIPH_MCG_LITE
 
 config CPU_FAM_W
     bool
@@ -125,6 +125,11 @@ config HAS_PERIPH_MCG
     bool
     help
         Indicates that the cpu uses the Kinetis Multipurpose Clock Generator.
+
+config HAS_PERIPH_MCG_LITE
+    bool
+    help
+        Indicates that the cpu uses the lite version of the Kinetis Multipurpose Clock Generator.
 
 config HAS_PERIPH_ICS
     bool

@@ -26,6 +26,8 @@ endif
 
 ifeq (ea,$(CPU_FAM))
   FEATURES_PROVIDED += periph_ics
+else ifeq (l,$(CPU_FAM))
+  FEATURES_PROVIDED += periph_mcg_lite
 else
   FEATURES_PROVIDED += periph_mcg
 endif
