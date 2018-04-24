@@ -319,8 +319,10 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [PORTA_IRQn      ] = isr_porta,           /* Port A interrupt */
 #endif
 #ifdef KINETIS_CORE_Z
-#if defined(PORTB) && defined(PORTC)
+#if defined(PORTB) && defined(PORTC) && !defined(PORTD)
     [PORTB_PORTC_IRQn] = isr_portb_portc,     /* Port B, C combined interrupt */
+#elif defined(PORTC) && defined(PORTD)
+    [PORTC_PORTD_IRQn] = isr_portc_portd,     /* Port C, D combined interrupt */
 #endif
 #else
 #ifdef PORTB

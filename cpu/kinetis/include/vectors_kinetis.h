@@ -134,6 +134,7 @@ void isr_portc(void);        /**< Port C pin detect interrupt handler */
 void isr_portd(void);        /**< Port D pin detect interrupt handler */
 void isr_porte(void);        /**< Port E pin detect interrupt handler */
 void isr_portb_portc(void);  /**< Port B, C combined pin detect interrupt handler */
+void isr_portc_portd(void);  /**< Port C, D combined pin detect interrupt handler */
 void isr_radio_0(void);      /**< Radio transceiver INT0 interrupt handler */
 void isr_radio_1(void);      /**< Radio transceiver INT1 interrupt handler */
 void isr_rng(void);          /**< RNG interrupt handler */
