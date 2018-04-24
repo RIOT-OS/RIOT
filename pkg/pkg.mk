@@ -19,7 +19,7 @@ else
 git-download: $(PKG_BUILDDIR)/.git-downloaded
 endif
 
-GITAMFLAGS = --ignore-whitespace
+GITAMFLAGS = --no-gpg-sign --ignore-whitespace
 
 ifneq (,$(wildcard $(PKG_DIR)/patches))
 $(PKG_BUILDDIR)/.git-patched: $(PKG_BUILDDIR)/.git-downloaded $(PKG_DIR)/Makefile $(PKG_DIR)/patches/*.patch
