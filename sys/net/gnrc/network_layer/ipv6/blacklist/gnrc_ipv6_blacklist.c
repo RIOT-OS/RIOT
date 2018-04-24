@@ -25,9 +25,7 @@
 ipv6_addr_t gnrc_ipv6_blacklist[GNRC_IPV6_BLACKLIST_SIZE];
 BITFIELD(gnrc_ipv6_blacklist_set, GNRC_IPV6_BLACKLIST_SIZE);
 
-#if ENABLE_DEBUG
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-#endif
 
 int gnrc_ipv6_blacklist_add(const ipv6_addr_t *addr)
 {
