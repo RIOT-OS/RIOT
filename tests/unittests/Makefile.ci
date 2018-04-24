@@ -28,6 +28,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     esp8266-olimex-mod \
     esp8266-sparkfun-thing \
     feather-m0 \
+    frdm-kl43z \
     hamilton \
     hifive1 \
     hifive1b \

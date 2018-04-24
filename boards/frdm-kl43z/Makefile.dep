@@ -1,0 +1,6 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += saul_adc
+  USEMODULE += mag3110
+  USEMODULE += mma8x5x
+endif
