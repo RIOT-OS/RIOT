@@ -47,17 +47,18 @@
 #include <string.h>
 
 #include "firmware.h"
+#include "firmware/simple.h"
 #include "common.h"
 
 const char sign_usage[] = "firmware sign <FIRMWARE> <VERSION> <APPID> <START-ADDR> <seckey> <outfile|->";
 
 int sign(int argc, char *argv[])
 {
-    firmware_metadata_t metadata;
+    firmware_simple_t metadata;
     unsigned char sk[FIRMWARE_SECKEY_LEN];
     ssize_t firmware_size;
 
-    memset(&metadata, '\0', sizeof(firmware_metadata_t));
+    memset(&metadata, '\0', sizeof(firmware_simple_t));
 
     if (argc < 7) {
         fprintf(stderr, "usage: %s\n", sign_usage);
@@ -76,26 +77,26 @@ int sign(int argc, char *argv[])
     }
 
     /* Generate FW image metadata */
-    memcpy(&metadata.magic_number, "RIOT", 4);
+    memcpy(&metadata.metadata.magic_number, "RIOT", 4);
     metadata.size = firmware_size;
-    sscanf(argv[2], "%x", (unsigned int *)&(metadata.version));
+    sscanf(argv[2], "%x", (unsigned int *)&(metadata.metadata.version));
     sscanf(argv[3], "%x", &(metadata.appid));
-    sscanf(argv[4], "%u", &(metadata.start_addr));
+    sscanf(argv[4], "%u", &(metadata.metadata.start_addr));
 
     /* calculate metadata checksum */
-    metadata.chksum = firmware_metadata_checksum(&metadata);
+    metadata.metadata.chksum = firmware_metadata_checksum(&metadata.metadata);
 
     /* sign */
-    firmware_sign_metadata(&metadata, sk);
+    firmware_simple_sign(&metadata, sk);
 
     /* talk to the user */
     if (strcmp(argv[6], "-")) {
-        firmware_metadata_print(&metadata);
-        printf("Metadata size: %lu\n", sizeof(firmware_metadata_t));
+        firmware_simple_print(&metadata);
+        printf("Metadata size: %lu\n", sizeof(firmware_simple_t));
     }
 
     /* Write the metadata */
-    if (!to_file(argv[6], &metadata, sizeof(firmware_metadata_t))) {
+    if (!to_file(argv[6], &metadata, FIRMWARE_METADATA_SIZE)) {
         fprintf(stderr, "Error: cannot write output\n");
         return(1);
     }

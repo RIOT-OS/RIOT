@@ -53,9 +53,8 @@
  *
  * - "RIOT" as magic number
  * - an application version
- * - an application ID
+ * - Start address
  * - a checksum
- * - a signature
  *
  * The bootloader only cares about checksum and application version. It expects a
  * running image to verify the metadata.
@@ -119,33 +118,12 @@ extern "C" {
 
 #include <stdint.h>
 
-#include "hashes/sha256.h"
-#include "tweetnacl.h"
-
-/**
- *  @brief Provisional length for signed hash
- */
-#define FIRMWARE_SIG_LEN            (crypto_sign_BYTES)
-
-/**
- *  @brief Length of secret Ed25519 key
- */
-#define FIRMWARE_SECKEY_LEN         (crypto_sign_SECRETKEYBYTES)
-
-/**
- *  @brief Length of public Ed25519 key
- */
-#define FIRMWARE_PUBKEY_LEN         (crypto_sign_PUBLICKEYBYTES)
-
 /**
  *  @brief Number of metadata bytes that get checksummed
+ *
+ *  Includes magic number, version, and start address.
  */
-#define FIRMWARE_CHECKSUM_LEN       (20)
-
-/**
- *  @brief Length of bytes to be signed
- */
-#define FIRMWARE_SIGN_BYTES         (FIRMWARE_CHECKSUM_LEN + 4 + SHA256_DIGEST_LENGTH)
+#define FIRMWARE_CHECKSUM_LEN       (16)
 
 /**
  *  @brief Length of metadata prefixed to firmware binaries
@@ -153,11 +131,6 @@ extern "C" {
 #ifndef FIRMWARE_METADATA_SIZE
 #define FIRMWARE_METADATA_SIZE      (256)
 #endif
-
-/**
- *  @brief Length of padding to align metadata size
- */
-#define FIRMWARE_PADDING            (FIRMWARE_METADATA_SIZE-(FIRMWARE_SIGN_BYTES + FIRMWARE_SIG_LEN))
 
 /**
  *  @brief Real length of metadata without padding
@@ -170,25 +143,13 @@ extern "C" {
  */
 typedef struct {
     uint32_t magic_number;              /**< metadata magic_number (always "RIOT")  */
-    uint32_t appid;                     /**< Integer representing the application ID*/
     uint32_t version;                   /**< Integer representing firmware version  */
-    uint32_t size;                      /**< Size of firmware image (w/o metadata)  */
     uint32_t start_addr;                /**< Start address in flash                 */
+    uint32_t metadata_type;             /**< Type of metadata, 16 bits type,
+                                          16 bit version */
     uint32_t chksum;                    /**< checksum of metadata                   */
-    uint8_t hash[SHA256_DIGEST_LENGTH]; /**< SHA256 Hash of firmware image          */
-    uint8_t sig[FIRMWARE_SIG_LEN];      /**< Firmware signature                     */
-    uint8_t pad[FIRMWARE_PADDING];      /**< padding to total of
-                                             FIRMWARE_METADATA_SIZE bytes           */
 } firmware_metadata_t;
 /** @} */
-
-/**
- * @brief  Print formatted FW image metadata to STDIO
- *
- * @param[in] metadata  ptr to firmware metadata
- *
- */
-void firmware_metadata_print(firmware_metadata_t *metadata);
 
 /**
  * @brief  Validate FW image metadata
@@ -205,24 +166,6 @@ int firmware_validate_metadata_checksum(firmware_metadata_t *metadata);
  *
  */
 uint32_t firmware_metadata_checksum(firmware_metadata_t *metadata);
-
-/**
- * @brief  Sign metadata
- *
- * @param[in] metadata  ptr to firmware metadata
- * @param[in] sk        NaCL secret signing key to use
- *
- */
-int firmware_sign_metadata(firmware_metadata_t *metadata, unsigned char *sk);
-
-/**
- * @brief  Validate FW metadata signature
- *
- * @param[in] metadata  ptr to firmware metadata
- * @param[in] pk        NaCL public signing key to use
- *
- */
-int firmware_validate_metadata_signature(firmware_metadata_t *metadata, const unsigned char *pk);
 
 /**
  * @brief  Jump to image

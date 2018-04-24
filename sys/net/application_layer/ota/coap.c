@@ -18,14 +18,14 @@
  * @}
  */
 
-#include "firmware_update.h"
+#include "firmware/simple.h"
 #include "log.h"
 #include "net/nanocoap.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static firmware_update_t _state;
+static firmware_simple_update_t _state;
 
 ssize_t ota_coap_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
 {
@@ -41,7 +41,7 @@ ssize_t ota_coap_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *contex
              (unsigned)block1.offset, (unsigned)block1.offset + pkt->payload_len);
 
     if (_state.state == FIRMWARE_UPDATE_VERIFIED) {
-        unsigned total = _state.metadata_buf.size + FIRMWARE_METADATA_SIZE;
+        unsigned total = _state.m.metadata.size + FIRMWARE_METADATA_SIZE;
         LOG_INFO(" of %u (left=%u)\n", total,
                  total - block1.offset - pkt->payload_len);
     }
@@ -51,15 +51,15 @@ ssize_t ota_coap_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *contex
 
     if (block1.offset == 0) {
         /* initialize firmware upgrade state struct */
-        firmware_update_init(&_state, firmware_target_slot());
+        firmware_simple_init(&_state);
     }
 
     if (_state.state == FIRMWARE_UPDATE_IDLE) {
         res = -1;
     }
     else {
-        if (block1.offset == _state.offset) {
-            res = firmware_update_putbytes(&_state, block1.offset,
+        if (block1.offset == _state.writer.offset) {
+            res = firmware_simple_putbytes(&_state,
                     pkt->payload, pkt->payload_len);
         }
         else {
@@ -78,7 +78,7 @@ ssize_t ota_coap_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *contex
     }
 
     if (!res && (!blockwise || !block1.more)) {
-        if (firmware_update_finish(&_state) != 0) {
+        if (firmware_simple_finish(&_state) != 0) {
             result = COAP_CODE_BAD_OPTION;
         }
     }
