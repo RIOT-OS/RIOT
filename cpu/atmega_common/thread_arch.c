@@ -28,7 +28,6 @@
 #include "cpu.h"
 #include "board.h"
 
-
 /*
  * local function declarations  (prefixed with __)
  */
@@ -69,7 +68,7 @@ static void __enter_thread_mode(void);
  * if task_func returns sched_task_exit gets popped into the PC
  */
 char *thread_stack_init(thread_task_func_t task_func, void *arg,
-                             void *stack_start, int stack_size)
+                        void *stack_start, int stack_size)
 {
     uint16_t tmp_adress;
     uint8_t *stk;
@@ -111,7 +110,6 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
     *stk = (uint8_t) 0x00;
 #endif
 
-
     /* r0 */
     stk--;
     *stk = (uint8_t) 0x00;
@@ -140,7 +138,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
 
     int i;
 
-    for (i = 2; i <= 23 ; i++) {
+    for (i = 2; i <= 23; i++) {
         stk--;
         *stk = (uint8_t) 0;
     }
@@ -178,7 +176,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
  */
 void thread_stack_print(void)
 {
-    uint8_t  found_marker = 1;
+    uint8_t found_marker = 1;
     uint8_t *sp = (uint8_t *)sched_active_thread->sp;
     uint16_t size = 0;
 
@@ -193,8 +191,7 @@ void thread_stack_print(void)
         if ((*sp == 0xFE) && (*(sp + 1) == 0xAF)) {
             found_marker = 0;
         }
-    }
-    while (found_marker == 1);
+    } while (found_marker == 1);
 
     printf("stack size: %u bytes\n", size);
 }
@@ -209,13 +206,12 @@ void cpu_switch_context_exit(void)
 /**
  * @brief Set the MCU into Thread-Mode and load the initial task from the stack and run it
  */
-
 void NORETURN __enter_thread_mode(void) __attribute__((naked));
 void NORETURN __enter_thread_mode(void)
 {
     irq_enable();
     __context_restore();
-    __asm__ volatile("ret");
+    __asm__ volatile ("ret");
 
     UNREACHABLE();
 }
@@ -236,12 +232,12 @@ void thread_yield_isr(void) {
     sched_run();
     __context_restore();
 
-    __asm__ volatile("reti");
+    __asm__ volatile ("reti");
 }
 
 __attribute__((always_inline)) static inline void __context_save(void)
 {
-    __asm__ volatile(
+    __asm__ volatile (
         "push __tmp_reg__                    \n\t"
         "in   __tmp_reg__, __SREG__          \n\t"
         "cli                                 \n\t"
@@ -292,13 +288,13 @@ __attribute__((always_inline)) static inline void __context_save(void)
         "st   x+, __tmp_reg__                \n\t"
         "in   __tmp_reg__, __SP_H__          \n\t"
         "st   x+, __tmp_reg__                \n\t"
-    );
+        );
 
 }
 
 __attribute__((always_inline)) static inline void __context_restore(void)
 {
-    __asm__ volatile(
+    __asm__ volatile (
         "lds  r26, sched_active_thread       \n\t"
         "lds  r27, sched_active_thread + 1   \n\t"
         "ld   r28, x+                        \n\t"
@@ -347,5 +343,5 @@ __attribute__((always_inline)) static inline void __context_restore(void)
         "pop  __tmp_reg__                    \n\t"
         "out  __SREG__, __tmp_reg__          \n\t"
         "pop  __tmp_reg__                    \n\t"
-    );
+        );
 }
