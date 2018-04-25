@@ -19,10 +19,12 @@ else
 git-download: $(PKG_BUILDDIR)/.git-downloaded
 endif
 
+GITAMFLAGS = --no-gpg-sign --ignore-whitespace
+
 ifneq (,$(wildcard $(PKG_DIR)/patches))
 $(PKG_BUILDDIR)/.git-patched: $(PKG_BUILDDIR)/.git-downloaded $(PKG_DIR)/Makefile $(PKG_DIR)/patches/*.patch
 	git -C $(PKG_BUILDDIR) checkout -f $(PKG_VERSION)
-	git -C $(PKG_BUILDDIR) am --ignore-whitespace "$(PKG_DIR)"/patches/*.patch
+	git -C $(PKG_BUILDDIR) am $(GITAMFLAGS) "$(PKG_DIR)"/patches/*.patch
 	touch $@
 endif
 
