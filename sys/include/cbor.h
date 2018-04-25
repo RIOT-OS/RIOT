@@ -14,6 +14,10 @@
  *
  * @brief CBOR serializer/deserializer
  *
+ * @deprecated This library is based on a draft-version of
+ *             [RFC7049](https://tools.ietf.org/html/rfc7049) and also has other
+ *             flaws. Please use alternatives like @ref pkg_cn-cbor instead.
+ *
  * This is an implementation suited for constrained devices
  * Characteristics:
  * - No dynamic memory allocation (i.e. no calls to `malloc()`, `free()`) used
