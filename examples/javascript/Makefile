@@ -4,6 +4,9 @@ APPLICATION = riot_javascript
 # default BOARD environment
 BOARD ?= native
 
+# This has to be the absolute path to the RIOT base directory:
+RIOTBASE ?= $(CURDIR)/../..
+
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini \
                              cc2650-launchpad cc2650stk maple-mini \
                              microbit nrf51dongle nrf6310 nucleo-f030 nucleo-f070 \
@@ -30,7 +33,7 @@ endif
 # Add the package for Jerryscript
 USEPKG += jerryscript
 
-include $(CURDIR)/../../Makefile.include
+include $(RIOTBASE)/Makefile.include
 
 JS_PATH := $(BINDIR)/js/$(MODULE)
 # add directory of generated *.js.h files to include path
