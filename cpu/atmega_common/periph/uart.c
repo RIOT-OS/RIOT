@@ -160,46 +160,37 @@ void uart_poweroff(uart_t uart)
 
 static inline void isr_handler(int num)
 {
+    __enter_isr();
+
     isr_ctx[num].rx_cb(isr_ctx[num].arg, dev[num]->DR);
 
-    if (sched_context_switch_request) {
-        thread_yield();
-        thread_yield_isr();
-    }
+    __exit_isr();
 }
 
 #ifdef UART_0_ISR
 ISR(UART_0_ISR, ISR_BLOCK)
 {
-    __enter_isr();
     isr_handler(0);
-    __exit_isr();
 }
 #endif /* UART_0_ISR */
 
 #ifdef UART_1_ISR
 ISR(UART_1_ISR, ISR_BLOCK)
 {
-    __enter_isr();
     isr_handler(1);
-    __exit_isr();
 }
 #endif /* UART_1_ISR */
 
 #ifdef UART_2_ISR
 ISR(UART_2_ISR, ISR_BLOCK)
 {
-    __enter_isr();
     isr_handler(2);
-    __exit_isr();
 }
 #endif /* UART_2_ISR */
 
 #ifdef UART_3_ISR
 ISR(UART_3_ISR, ISR_BLOCK)
 {
-    __enter_isr();
     isr_handler(3);
-    __exit_isr();
 }
 #endif /* UART_3_ISR */

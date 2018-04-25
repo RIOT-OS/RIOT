@@ -35,7 +35,8 @@
 
 #include <avr/interrupt.h>
 #include "cpu_conf.h"
-
+#include "sched.h"
+#include "thread.h"
 /**
  * For downwards compatibility with old RIOT code.
  * TODO: remove once core was adjusted
@@ -52,7 +53,7 @@ extern "C" {
 extern volatile uint8_t __in_isr;
 
 /**
- * @brief Flag entering of an ISR
+ * @brief Run this code on entering interrupt routines
  */
 static inline void __enter_isr(void)
 {
@@ -60,10 +61,22 @@ static inline void __enter_isr(void)
 }
 
 /**
- * @brief Flag exiting of an ISR
+ * @brief   Exit ISR mode and yield with a return from interrupt. Use at the
+ * end of ISRs in place of thread_yield_higher. If thread_yield is needed, use
+ * thread_yield followed by thread_yield_isr instead of thread_yield alone.
+ */
+void thread_yield_isr(void);
+
+/**
+ * @brief Run this code on exiting interrupt routines
  */
 static inline void __exit_isr(void)
 {
+    if (sched_context_switch_request) {
+        thread_yield();
+        __in_isr = 0;
+        thread_yield_isr();
+    }
     __in_isr = 0;
 }
 
@@ -127,13 +140,6 @@ static inline void atmega_set_prescaler(uint8_t clk_scale)
  * @brief   Initializes avrlibc stdio
  */
 void atmega_stdio_init(void);
-
-/**
- * @brief   Exit ISR mode and yield with a return from interrupt. Use at the
- * end of ISRs in place of thread_yield_higher. If thread_yield is needed, use
- * thread_yield followed by thread_yield_isr instead of thread_yield alone.
- */
-void thread_yield_isr(void);
 
 #ifdef __cplusplus
 }

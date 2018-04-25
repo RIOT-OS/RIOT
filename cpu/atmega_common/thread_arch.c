@@ -236,8 +236,6 @@ void thread_yield_isr(void) {
     sched_run();
     __context_restore();
 
-    __exit_isr();
-
     __asm__ volatile("reti");
 }
 
