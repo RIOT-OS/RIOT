@@ -23,7 +23,7 @@
 
 #include "thread.h"
 
-#define P(NAME) printf("\t%-*s%4u%4u\n", 11, #NAME, \
+#define P(NAME) printf("\t%-11s%4u%4u\n", #NAME, \
                        (unsigned)sizeof(((thread_t *) 0)->NAME), \
                        (unsigned)offsetof(thread_t, NAME));
 
