@@ -47,17 +47,16 @@ extern "C" {
 
 #if ENABLE_DEBUG_PRINT_TICK_CONVERSION
 #ifndef MODULE_FMT
-#error "Module fmt is necessary to ENABLE_DEBUG_TICKS set 'USEMODULE += fmt' \
-in the makefile."
+#error Module fmt is necessary to ENABLE_DEBUG_TICKS
+/* Add module fmt to the makefile.
+ * USEMODULE += fmt
+ */
 #endif
 #endif
 
 inline void debug_print_ticks32(uint32_t clock_hz, char *sign, uint32_t from,
                          char *base_from, uint32_t to,char *base_to) {
     if(ENABLE_DEBUG_PRINT_TICK_CONVERSION){
-        // printf("32bit %" PRIu32 " %s 1MHz : %" PRIu32 " %s = %" PRIu32 " %s\n",
-        // clock_hz , sign, from, base_from, to, base_to);
-        
         print_str("32bit ");
         print_u32_dec(clock_hz);
         print_str(" ");
@@ -77,17 +76,6 @@ inline void debug_print_ticks32(uint32_t clock_hz, char *sign, uint32_t from,
 inline void debug_print_ticks64(uint32_t clock_hz, char *sign, uint64_t from,
                          char *base_from, uint64_t to,char *base_to) {
     if(ENABLE_DEBUG_PRINT_TICK_CONVERSION){
-        // char buf[21];
-        // size_t size = fmt_u64_dec(buf, from);
-        // buf[size] = '\0';
-
-        // printf("64bit %" PRIu32 " %s 1MHz : %s %s",
-        //     clock_hz , sign, buf, base_from);
-
-        // size = fmt_u64_dec(buf, to);
-        // buf[size] = '\0';
-        // printf(" = %s %s\n",buf, base_to);
-
         print_str("64bit ");
         print_u32_dec(clock_hz);
         print_str(" ");
