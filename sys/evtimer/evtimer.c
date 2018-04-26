@@ -35,8 +35,7 @@
  * handle the pointer hack in this function */
 void evtimer_add_event_to_list(evtimer_t *evtimer, evtimer_event_t *event)
 {
-    uint32_t delta_sum = 0;
-
+    DEBUG("evtimer: new event offset %" PRIu32 " ms\n", event->offset);
     /* we want list->next to point to the first list element. thus we take the
      * *address* of evtimer->events, then cast it from (evtimer_event_t **) to
      * (evtimer_event_t*). After that, list->next actually equals
@@ -45,20 +44,32 @@ void evtimer_add_event_to_list(evtimer_t *evtimer, evtimer_event_t *event)
 
     while (list->next) {
         evtimer_event_t *list_entry = list->next;
-        if ((list_entry->offset + delta_sum) > event->offset) {
+        /* Stop when new event time is nearer then next */
+        if (event->offset < list_entry->offset) {
+            DEBUG("evtimer: next %" PRIu32 " < %" PRIu32 " ms\n",
+                  event->offset, list_entry->offset);
             break;
         }
-        delta_sum += list_entry->offset;
+        /* Set event offset relative to previous event */
+        event->offset -= list_entry->offset;
         list = list->next;
     }
 
+    DEBUG("evtimer: new event relativ offset %" PRIu32 " ms\n", event->offset);
+
+    /* Set found next bigger event after new event */
     event->next = list->next;
     if (list->next) {
+        /* Set offset following event relative to new event */
         evtimer_event_t *next_entry = list->next;
-        next_entry->offset += delta_sum;
+        DEBUG("evtimer: recalculate offset for %" PRIu32 " ms\n",
+              next_entry->offset);
+
         next_entry->offset -= event->offset;
+
+        DEBUG("evtimer: resulting new event offset %" PRIu32 " ms\n",
+              next_entry->offset);
     }
-    event->offset -= delta_sum;
 
     list->next = event;
 }
