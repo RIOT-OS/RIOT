@@ -55,23 +55,52 @@ in the makefile."
 inline void debug_print_ticks32(uint32_t clock_hz, char *sign, uint32_t from,
                          char *base_from, uint32_t to,char *base_to) {
     if(ENABLE_DEBUG_PRINT_TICK_CONVERSION){
-        printf("32bit %" PRIu32 " %s 1MHz : %" PRIu32 " %s = %" PRIu32 " %s\n",
-        clock_hz , sign, from, base_from, to, base_to);
+        // printf("32bit %" PRIu32 " %s 1MHz : %" PRIu32 " %s = %" PRIu32 " %s\n",
+        // clock_hz , sign, from, base_from, to, base_to);
+        
+        print_str("32bit ");
+        print_u32_dec(clock_hz);
+        print_str(" ");
+        print_str(sign);
+        print_str(" 1MHz : ");
+        print_u32_dec(from);
+        print_str(" ");
+        print_str(base_from);
+        print_str(" = ");
+        print_u32_dec(to);
+        print_str(" ");
+        print_str(base_to);
+        print_str("\n");
     }
 }
 
-inline void debug_print_ticks64(uint32_t clock_hz, char *sign, uint32_t from,
-                         char *base_from, uint32_t to,char *base_to) {
+inline void debug_print_ticks64(uint32_t clock_hz, char *sign, uint64_t from,
+                         char *base_from, uint64_t to,char *base_to) {
     if(ENABLE_DEBUG_PRINT_TICK_CONVERSION){
-        char buf_from[21];
-        char buf_to[21];
-        size_t size = fmt_u64_dec(buf_from, from);
-        buf_from[size] = '\0';
-        size = fmt_u64_dec(buf_to, to);
-        buf_to[size] = '\0';
+        // char buf[21];
+        // size_t size = fmt_u64_dec(buf, from);
+        // buf[size] = '\0';
 
-        printf("64bit %" PRIu32 " %s 1MHz : %s %s = %s %s\n",
-            clock_hz , sign, buf_from, base_from, buf_to, base_to);
+        // printf("64bit %" PRIu32 " %s 1MHz : %s %s",
+        //     clock_hz , sign, buf, base_from);
+
+        // size = fmt_u64_dec(buf, to);
+        // buf[size] = '\0';
+        // printf(" = %s %s\n",buf, base_to);
+
+        print_str("64bit ");
+        print_u32_dec(clock_hz);
+        print_str(" ");
+        print_str(sign);
+        print_str(" 1MHz : ");
+        print_u64_dec(from);
+        print_str(" ");
+        print_str(base_from);
+        print_str(" = ");
+        print_u64_dec(to);
+        print_str(" ");
+        print_str(base_to);
+        print_str("\n");
     }
 }
 
