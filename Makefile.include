@@ -362,7 +362,7 @@ $(_SUBMAKE_LIBS): $(BINDIR)/$(APPLICATION_MODULE).a $(USEPKG:%=$(BINDIR)/%.a)
 
 # 'print-size' triggers a rebuild. Use 'info-buildsize' if you do not need to rebuild.
 print-size: $(ELFFILE)
-	$(Q)$(SIZE) $<
+	$(Q)$(SIZE) $(SIZEFLAGS) $<
 
 %.hex: %.elf
 	$(Q)$(OBJCOPY) $(OFLAGS) -Oihex $< $@
