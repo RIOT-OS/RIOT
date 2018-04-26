@@ -1,4 +1,5 @@
-[![Nightly CI status master](https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg)](https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/output.html)
+[![Nightly CI status master][master-ci-badge]][master-ci-link]
+[![IRC][irc-badge]][irc-link]
 
                           ZZZZZZ
                         ZZZZZZZZZZZZ
@@ -29,7 +30,7 @@
 The friendly Operating System for IoT!
 
 RIOT is a real-time multi-threading operating system that supports a range of
-devices that are typically found in the Internet of Things (IoT): 
+devices that are typically found in the Internet of Things (IoT):
 8-bit, 16-bit and 32-bit microcontrollers.
 
 RIOT is based on the following design principles: energy-efficiency, real-time
@@ -112,3 +113,9 @@ All code files contain licensing information.
 For more information, see the RIOT website:
 
 http://www.riot-os.org
+
+
+[master-ci-badge]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg
+[master-ci-link]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/output.html
+[irc-badge]: https://img.shields.io/badge/IRC-join%20chat%20%E2%86%92-blue.svg
+[irc-link]: http://webchat.freenode.net?channels=%23riot-os
