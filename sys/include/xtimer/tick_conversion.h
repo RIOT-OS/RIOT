@@ -205,11 +205,15 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
 #else
 /* No matching implementation found, try to give meaningful error messages */
 #if ((XTIMER_HZ % 15625) == 0)
-#error "Unsupported hardware timer frequency (XTIMER_HZ), missing XTIMER_SHIFT \
-in board.h? See xtimer.h documentation for more info"
+#error Unsupported hardware timer frequency (XTIMER_HZ).
+/* Xtimer is not correctly configured maybe missing XTIMER_SHIFT in board.h?
+ * See xtimer.h documentation for more information!
+ */
 #else
-#error "Unknown hardware timer frequency (XTIMER_HZ), check board.h and/or add \
-an implementation in sys/include/xtimer/tick_conversion.h"
+#error Unknown hardware timer frequency (XTIMER_HZ).
+/* Check board.h and/or add an implementation in
+ * sys/include/xtimer/tick_conversion.h to convert the hardware ticks
+ */
 #endif
 #endif
 
