@@ -17,52 +17,6 @@
  * @author  Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author  Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
-
-/*
- * As tick_conversion.h is included in multiple files ENABLE_DEBUG can not be
- * used as it gets redefined "[-Werror]"
- * To use  the debug print enable module fmt in the project makefile
- *
- * USEMODULE += fmt
- * CFLAGS += -DENABLE_DEBUG_TICKS=1
- * */
-#ifndef ENABLE_DEBUG_TICKS
-#define ENABLE_DEBUG_TICKS   (0)
-#endif
-#if ENABLE_DEBUG_TICKS
-#ifndef MODULE_FMT
-#error "Module fmt is necessary to ENABLE_DEBUG_TICKS set 'USEMODULE += fmt' \
-in the makefile."
-#endif
-#include <stdio.h>
-#include <string.h>
-#include "fmt.h"
-#define DEBUG_PRINT_TICKS_32( CLOCK_HZ, EQUAL, VALUE1, VALUE2, BASE2) ({\
-char buf_1[21];                                                         \
-char buf_2[21];                                                         \
-size_t size = fmt_u32_dec(buf_1, VALUE1);                               \
-buf_1[size] = '\0';                                                     \
-size = fmt_u32_dec(buf_2, VALUE2);                                      \
-buf_2[size] = '\0';                                                     \
-printf("32bit %" PRIu32 " "EQUAL" 1MHz : %s "#VALUE1" = %s "BASE2"\n",  \
-       (uint32_t)CLOCK_HZ , buf_1, buf_2);                              \
-})
-
-#define DEBUG_PRINT_TICKS_64( CLOCK_HZ, EQUAL, VALUE1, VALUE2, BASE2) ({\
-char buf_1[21];                                                         \
-char buf_2[21];                                                         \
-size_t size = fmt_u64_dec(buf_1, VALUE1);                               \
-buf_1[size] = '\0';                                                     \
-size = fmt_u64_dec(buf_2, VALUE2);                                      \
-buf_2[size] = '\0';                                                     \
-printf("64bit %" PRIu32 " "EQUAL" 1MHz : %s "#VALUE1" = %s "BASE2"\n",  \
-       (uint32_t)CLOCK_HZ , buf_1, buf_2);                              \
-})
-#else
-#define DEBUG_PRINT_TICKS_32(CLOCK_HZ, EQUAL, VALUE1, VALUE2, BASE2) {}
-#define DEBUG_PRINT_TICKS_64(CLOCK_HZ, EQUAL, VALUE1, VALUE2, BASE2) {}
-#endif
-
 #ifndef XTIMER_TICK_CONVERSION_H
 #define XTIMER_TICK_CONVERSION_H
 
@@ -70,11 +24,56 @@ printf("64bit %" PRIu32 " "EQUAL" 1MHz : %s "#VALUE1" = %s "BASE2"\n",  \
 #error "Do not include this file directly! Use xtimer.h instead"
 #endif
 
+#include <stdio.h>
+#include <string.h>
+#include "fmt.h"
 #include "div.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*
+ * As tick_conversion.h is included in multiple files ENABLE_DEBUG can not be
+ * used as it gets redefined "[-Werror]"
+ * Activate the debug print and enable module fmt in the project makefile as follow
+ *
+ * USEMODULE += fmt
+ * CFLAGS += -DENABLE_DEBUG_PRINT_TICK_CONVERSION=1
+ * */
+#ifndef ENABLE_DEBUG_PRINT_TICK_CONVERSION
+#define ENABLE_DEBUG_PRINT_TICK_CONVERSION   (0)
+#endif
+
+#if ENABLE_DEBUG_PRINT_TICK_CONVERSION
+#ifndef MODULE_FMT
+#error "Module fmt is necessary to ENABLE_DEBUG_TICKS set 'USEMODULE += fmt' \
+in the makefile."
+#endif
+#endif
+
+inline void debug_print_ticks32(uint32_t clock_hz, char *sign, uint32_t from,
+                         char *base_from, uint32_t to,char *base_to) {
+    if(ENABLE_DEBUG_PRINT_TICK_CONVERSION){
+        printf("32bit %" PRIu32 " %s 1MHz : %" PRIu32 " %s = %" PRIu32 " %s\n",
+        clock_hz , sign, from, base_from, to, base_to);
+    }
+}
+
+inline void debug_print_ticks64(uint32_t clock_hz, char *sign, uint32_t from,
+                         char *base_from, uint32_t to,char *base_to) {
+    if(ENABLE_DEBUG_PRINT_TICK_CONVERSION){
+        char buf_from[21];
+        char buf_to[21];
+        size_t size = fmt_u64_dec(buf_from, from);
+        buf_from[size] = '\0';
+        size = fmt_u64_dec(buf_to, to);
+        buf_to[size] = '\0';
+
+        printf("64bit %" PRIu32 " %s 1MHz : %s %s = %s %s\n",
+            clock_hz , sign, buf_from, base_from, buf_to, base_to);
+    }
+}
 
 /* Some optimizations for common timer frequencies */
 #if (XTIMER_SHIFT != 0)
@@ -85,25 +84,25 @@ extern "C" {
 #if (XTIMER_HZ != (1000000ul << XTIMER_SHIFT))
 #error XTIMER_HZ != (1000000ul << XTIMER_SHIFT)
 #endif
-/* XTIMER_HZ is a power-of-two multiple of 1 MHz and is bigger than 1000MHz */
+/* XTIMER_HZ is a power-of-two multiple of 1 MHz and is bigger than 1MHz */
 /* e.g. cc2538 uses a 16 MHz timer */
 static inline uint32_t _xtimer_ticks_from_usec(uint32_t us) {
-    DEBUG_PRINT_TICKS_32(XTIMER_HZ, ">", us, us << XTIMER_SHIFT, "ticks");
+    debug_print_ticks32(XTIMER_HZ, ">", us, "us", us >> XTIMER_SHIFT, "ticks");
     return (us << XTIMER_SHIFT); /* multiply by power of two */
 }
 
 static inline uint64_t _xtimer_ticks_from_usec64(uint64_t us) {
-    DEBUG_PRINT_TICKS_64(XTIMER_HZ, ">", us, us << XTIMER_SHIFT, "ticks");
+    debug_print_ticks64(XTIMER_HZ, ">", us, "us", us >> XTIMER_SHIFT, "ticks");
     return (us << XTIMER_SHIFT); /* multiply by power of two */
 }
 
 static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
-    DEBUG_PRINT_TICKS_32(XTIMER_HZ, ">", ticks, ticks >> XTIMER_SHIFT, "us");
+    debug_print_ticks64(XTIMER_HZ, ">", ticks, "ticks", ticks >> XTIMER_SHIFT, "us");
     return (ticks >> XTIMER_SHIFT); /* divide by power of two */
 }
 
 static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
-    DEBUG_PRINT_TICKS_64(XTIMER_HZ, ">", ticks, ticks >> XTIMER_SHIFT, "us");
+    debug_print_ticks64(XTIMER_HZ, ">", ticks, "ticks", ticks >> XTIMER_SHIFT, "us");
     return (ticks >> XTIMER_SHIFT); /* divide by power of two */
 }
 
@@ -111,25 +110,25 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
 #if ((XTIMER_HZ << XTIMER_SHIFT) != 1000000ul)
 #error (XTIMER_HZ << XTIMER_SHIFT) != 1000000ul
 #endif
-/* 1 MHz is a power-of-two multiple of XTIMER_HZ and is smaller than 1000MHz */
+/* 1 MHz is a power-of-two multiple of XTIMER_HZ and is smaller than 1MHz */
 /* e.g. ATmega2560 uses a 250 kHz timer */
 static inline uint32_t _xtimer_ticks_from_usec(uint32_t us) {
-    DEBUG_PRINT_TICKS_32(XTIMER_HZ, "<", us, us >> XTIMER_SHIFT, "ticks");
+    debug_print_ticks32(XTIMER_HZ, "<", us, "us", us >> XTIMER_SHIFT, "ticks");
     return (us >> XTIMER_SHIFT); /* divide by power of two */
 }
 
 static inline uint64_t _xtimer_ticks_from_usec64(uint64_t us) {
-    DEBUG_PRINT_TICKS_64(XTIMER_HZ, "<", us, us >> XTIMER_SHIFT, "ticks");
+    debug_print_ticks64(XTIMER_HZ, "<", us, "us", us >> XTIMER_SHIFT, "ticks");
     return (us >> XTIMER_SHIFT); /* divide by power of two */
 }
 
 static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
-    DEBUG_PRINT_TICKS_32(XTIMER_HZ, "<", ticks, ticks << XTIMER_SHIFT, "us");
+    debug_print_ticks32(XTIMER_HZ, "<", ticks, "ticks", ticks << XTIMER_SHIFT, "us");
     return (ticks << XTIMER_SHIFT); /* multiply by power of two */
 }
 
 static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
-    DEBUG_PRINT_TICKS_64(XTIMER_HZ, "<", ticks, ticks << XTIMER_SHIFT, "us");
+    debug_print_ticks64(XTIMER_HZ, "<", ticks, "ticks", ticks << XTIMER_SHIFT, "us");
     return (ticks << XTIMER_SHIFT); /* multiply by power of two */
 }
 #endif /* defined(XTIMER_SHIFT) && (XTIMER_SHIFT != 0) */
@@ -137,22 +136,23 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
 /* This is the most straightforward as the xtimer API is based around
  * microseconds for representing time values. */
 static inline uint32_t _xtimer_ticks_from_usec(uint32_t us) {
-    DEBUG_PRINT_TICKS_32(XTIMER_HZ, "=", us, us, "ticks");
+    debug_print_ticks32(XTIMER_HZ, "=", us, "us", us, "ticks");
     return us; /* no-op */
 }
 
 static inline uint64_t _xtimer_ticks_from_usec64(uint64_t us) {
-    DEBUG_PRINT_TICKS_64(XTIMER_HZ, "=", us, us, "ticks");
+    debug_print_ticks64(XTIMER_HZ, "=", us, "us", us, "ticks");
     return us; /* no-op */
 }
 
 static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
     DEBUG_PRINT_TICKS_32(XTIMER_HZ, "=", ticks, ticks, "us");
+    debug_print_ticks32(XTIMER_HZ, "=", ticks, "ticks", ticks, "us");
     return ticks; /* no-op */
 }
 
 static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
-    DEBUG_PRINT_TICKS_64(XTIMER_HZ, "=", ticks, ticks , "us");
+    debug_print_ticks32(XTIMER_HZ, "=", ticks, "ticks", ticks, "us");
     return ticks; /* no-op */
 }
 #elif XTIMER_HZ == (32768ul)
@@ -161,14 +161,12 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
  * multiplying by the fraction (32768 / 1000000), we will instead use
  * (512 / 15625), which reduces the truncation caused by the integer widths */
 static inline uint32_t _xtimer_ticks_from_usec(uint32_t us) {
-    DEBUG_PRINT_TICKS_32(XTIMER_HZ, "<", us, div_u64_by_15625div512(us),
-            "ticks");
+    debug_print_ticks32(XTIMER_HZ, "<", us, "us", div_u64_by_15625div512(us), "ticks");
     return div_u32_by_15625div512(us);
 }
 
 static inline uint64_t _xtimer_ticks_from_usec64(uint64_t us) {
-    DEBUG_PRINT_TICKS_64(XTIMER_HZ, "<", us, div_u64_by_15625div512(us),
-            "ticks");
+    debug_print_ticks64(XTIMER_HZ, "<", us, "us", div_u64_by_15625div512(us), "ticks");
     return div_u64_by_15625div512(us);
 }
 
@@ -176,14 +174,14 @@ static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
     /* return (us * 15625) / 512; */
     /* Using 64 bit multiplication to avoid truncating the top 9 bits */
     uint64_t us = (uint64_t)ticks * 15625ul;
-    DEBUG_PRINT_TICKS_32XTIMER_HZ, "<", ticks, (us >> 9) , "us");
+    debug_print_ticks32(XTIMER_HZ, "<", ticks, "ticks", (us >> 9), "us");
     return (us >> 9); /* equivalent to (us / 512) */
 }
 
 static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
     /* return (us * 15625) / 512; */
     uint64_t us = (uint64_t)ticks * 15625ul;
-    DEBUG_PRINT_TICKS_64(XTIMER_HZ, "<", ticks, (us >> 9) , "us");
+    debug_print_ticks32(XTIMER_HZ, "<", ticks, "ticks", (us >> 9), "us");
     return (us >> 9); /* equivalent to (us / 512) */
 }
 
