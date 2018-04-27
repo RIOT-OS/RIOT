@@ -248,10 +248,6 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
 
     mutex_lock(&dev->devlock);
 
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += count;
-#endif
-
     /* set write pointer */
     cmd_w_addr(dev, ADDR_WRITE_PTR, BUF_TX_START);
     /* write control byte and the actual data into the buffer */
@@ -260,8 +256,23 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
         c += iol->iol_len;
         cmd_wbm(dev, iol->iol_base, iol->iol_len);
     }
+#ifdef MODULE_NETSTATS_L2
+    netdev->stats.tx_bytes += c;
+#endif
     /* set TX end pointer */
     cmd_w_addr(dev, ADDR_TX_END, cmd_r_addr(dev, ADDR_WRITE_PTR) - 1);
+
+    /*
+     * Sometimes, either directly after reset or after some time operation,
+     * the ENC28J80 doesn't generate interrupts when packet transmission has
+     * been finished. ENC28J80 is then not operational anymore. The workaround
+     * (found in http://ww1.microchip.com/downloads/en/DeviceDoc/80349c.pdf
+     * chip errata chapter 12) is to reset the transmit logic prior each
+     * transmission.
+     */
+    cmd_bfs(dev, REG_ECON1, -1, ECON1_TXRST);
+    cmd_bfc(dev, REG_ECON1, -1, ECON1_TXRST);
+
     /* trigger the send process */
     cmd_bfs(dev, REG_ECON1, -1, ECON1_TXRTS);
 
