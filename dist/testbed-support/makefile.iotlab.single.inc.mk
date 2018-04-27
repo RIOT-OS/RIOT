@@ -44,6 +44,7 @@ ifeq (,$(IOTLAB_NODE))
   $(warning    Example: m3-380.grenoble.iot-lab.info or a8-1.grenoble.iot-lab.info)
   $(warning  * <type>-<number> when run from iot-lab frontend)
   $(warning    Example: m3-380 or a8-1)
+  $(warning  * 'auto' or 'auto-ssh' to try auto-detecting the node from your experiment
   $(error)
 endif
 
@@ -58,6 +59,49 @@ IOTLAB_FLASHFILE ?= $(ELFFILE)
 
 # Specify experiment-id option if provided
 _IOTLAB_EXP_ID := $(if $(IOTLAB_EXP_ID),--id $(IOTLAB_EXP_ID))
+
+# Number of the node to take from the list in 'auto' and 'auto-ssh' mode
+# Default to 1 so the first one
+IOTLAB_NODE_AUTO_NUM ?= 1
+
+# board-archi mapping
+IOTLAB_ARCHI_iotlab-m3      = m3:at86rf231
+IOTLAB_ARCHI_iotlab-a8-m3   = a8:at86rf231
+IOTLAB_ARCHI_wsn430-v1_3b   = wsn430:cc1101
+IOTLAB_ARCHI_wsn430-v1_4    = wsn430:cc2420
+IOTLAB_ARCHI_samr21-xpro    = samr21:at86rf233
+IOTLAB_ARCHI_arduino-zero   = arduino-zero:xbee
+IOTLAB_ARCHI_b-l072z-lrwan1 = st-lrwan1:sx1276
+IOTLAB_ARCHI := $(IOTLAB_ARCHI_$(BOARD))
+
+# Try detecting the node automatically
+#  * It takes the first working node that match BOARD
+#    * Check correctly deployed nodes with 'deploymentresults == "0"'
+#    * Select nodes by architucture using the board-archi mapping
+#    * Nodes for current server in 'auto'
+ifneq (,$(filter auto auto-ssh,$(IOTLAB_NODE)))
+  ifeq (,$(IOTLAB_ARCHI))
+    $(error Could not find 'archi' for $(BOARD), update mapping in $(lastword $(MAKEFILE_LIST)))
+  endif
+
+  _NODES_DEPLOYED = $(shell iotlab-experiment --jmespath='deploymentresults."0"' --format='" ".join' get $(_IOTLAB_EXP_ID) --print)
+  ifeq (auto,$(IOTLAB_NODE))
+    _NODES_DEPLOYED := $(filter %.$(shell hostname).iot-lab.info, $(_NODES_DEPLOYED))
+  endif
+  _NODES_FOR_BOARD = $(shell iotlab-experiment --jmespath="items[?archi=='$(IOTLAB_ARCHI)'].network_address" --format='" ".join' get $(_IOTLAB_EXP_ID) --resources)
+
+  _IOTLAB_NODE := $(word $(IOTLAB_NODE_AUTO_NUM),$(filter $(_NODES_DEPLOYED),$(_NODES_FOR_BOARD)))
+  ifeq (auto,$(IOTLAB_NODE))
+    override IOTLAB_NODE := $(firstword $(subst ., ,$(_IOTLAB_NODE)))
+  else
+    override IOTLAB_NODE := $(_IOTLAB_NODE)
+  endif
+
+  ifeq (,$(IOTLAB_NODE))
+    $(error Could not automatically find a node for BOARD=$(BOARD))
+  endif
+  override IOTLAB_NODE := $(patsubst node-%,%,$(IOTLAB_NODE))
+endif
 
 
 # If the IOTLAB_NODE format is:
