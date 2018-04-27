@@ -18,7 +18,9 @@ export USEMODULE += periph_common
 export USEMODULE += stdio_uart
 
 # include module specific includes
-export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/include/vendor
+export INCLUDES += -I$(RIOTCPU)/atmega_common/include \
+                   -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include \
+                   -isystem$(RIOTCPU)/atmega_common/avr_libc_extra/include/vendor
 
 ifeq ($(LTO),1)
   # avr-gcc <4.8.3 has a bug when using LTO which causes a warning to be printed always:
@@ -37,3 +39,6 @@ LINKFLAGS += $(LINKFLAGPREFIX)--defsym=__DATA_REGION_LENGTH__=$(RAM_LEN)
 LDSCRIPT_COMPAT = $(if $(shell $(TARGET_ARCH)-ld --verbose | grep __TEXT_REGION_LENGTH__),,\
                     -T$(RIOTCPU)/$(CPU)/ldscripts_compat/avr_2.26.ld)
 LINKFLAGS += $(LDSCRIPT_COMPAT)
+
+# avr libc needs some RIOT-specific support code
+USEMODULE += avr_libc_extra
