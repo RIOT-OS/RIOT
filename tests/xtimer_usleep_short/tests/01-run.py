@@ -25,15 +25,7 @@ def testfunc(child):
             break
         i = i - 1
 
-    child.expect(u"Slept for (\\d+) expected (\\d+)", timeout=3)
-    runtime = int(child.match.group(1))
-    expected = int(child.match.group(2))
-
-    if runtime < expected*0.9 or runtime > expected*1.1:
-            print("xtimer slept to long")
-            print("[FAILED]")
-            return
-
+    child.expect(u"Slept for \\d+ expected \\d+")
     child.expect(u"[SUCCESS]", timeout=3)
 
 

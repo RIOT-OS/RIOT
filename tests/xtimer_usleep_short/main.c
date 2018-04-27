@@ -28,9 +28,9 @@ int main(void)
 {
     xtimer_sleep(3);
     printf("This test will call xtimer_usleep for values from %d down to %d\n",
-            TEST_USLEEP_MAX, TEST_USLEEP_MIN);
+           TEST_USLEEP_MAX, TEST_USLEEP_MIN);
 
-    uint32_t start, sleeping_time=0;
+    uint32_t start, sleeping_time = 0;
 
     for (int i = TEST_USLEEP_MAX; i >= TEST_USLEEP_MIN; i--) {
         printf("going to sleep %d usecs...\n", i);
@@ -39,9 +39,18 @@ int main(void)
         sleeping_time += xtimer_now_usec() - start;
     }
 
-    printf("Slept for %" PRIu32 " expected %" PRIu32"\n", sleeping_time, TEST_TIME);
+    printf("Slept for %" PRIu32 " expected %" PRIu32 "\n",
+           sleeping_time, (uint32_t)TEST_TIME);
 
-    puts("[SUCCESS]");
+    if ((sleeping_time < ((uint32_t)TEST_TIME)*9/10)
+        || (sleeping_time > ((uint32_t)TEST_TIME) * 11/10)) {
+        printf("Sleep time is not in 10%% range %" PRIu32 " < %" PRIu32 " < %" PRIu32 "\n",
+               ((uint32_t)(TEST_TIME)*9/10), ((uint32_t)TEST_TIME), ((uint32_t)(TEST_TIME)*11/10) );
+        puts("[FAILED]");
+    }
+    else {
+        puts("[SUCCESS]");
+    }
 
     return 0;
 }
