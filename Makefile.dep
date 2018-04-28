@@ -728,6 +728,11 @@ ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
   USEPKG += tlsf
 endif
 
+ifneq (,$(filter uuid,$(USEMODULE)))
+  USEMODULE += hashes
+  USEMODULE += random
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 
