@@ -96,7 +96,7 @@ int main(void)
     xtimer_set_timeout_flag(&t, TIMEOUT);
     thread_flags_wait_any(THREAD_FLAG_TIMEOUT);
     uint32_t diff = xtimer_now_usec() - before;
-    printf("main: timeout triggered. time passed: %uus\n", (unsigned)diff);
+    printf("main: timeout triggered. time passed: %"PRIu32"us\n", diff);
 
     if (diff < (TIMEOUT + THRESHOLD)) {
         puts("SUCCESS");
