@@ -298,6 +298,16 @@ ifneq (,$(filter sdcard_spi,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter sens0,$(USEMODULE)))
+  USEMODULE += sens0_specs
+endif
+
+ifneq (,$(filter sens0_i2c,$(USEMODULE)))
+  USEMODULE += sens0
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter sht11,$(USEMODULE)))
   USEMODULE += xtimer
 endif

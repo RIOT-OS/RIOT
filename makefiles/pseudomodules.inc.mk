@@ -68,6 +68,7 @@ PSEUDOMODULES += rdcli_simple_standalone
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
+PSEUDOMODULES += sens0_i2c
 PSEUDOMODULES += schedstatistics
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_ip
