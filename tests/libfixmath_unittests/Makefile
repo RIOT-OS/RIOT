@@ -15,6 +15,8 @@ ifneq (,$(filter native,$(BOARD)))
   export LINKFLAGS += -lm
 endif
 
+USEMODULE += printf_float
+
 include $(RIOTBASE)/Makefile.include
 
 test:
