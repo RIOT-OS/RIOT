@@ -11,15 +11,17 @@ import sys
 
 
 def testfunc(child):
-    child.expect_exact("xtimer_periodic_wakeup test application.")
+    child.expect(u"xtimer_periodic_wakeup test application runs (\d+)")
+    SLEEP_TIMES_NUMOF = int(child.match.group(1))
 
-    for i in range(256):
-        child.expect(u"Testing interval \d+... \(now=\d+\)")
-    for i in range(256):
-        child.expect(u" +\d+ diff=\d+")
+    for i in range(SLEEP_TIMES_NUMOF):
+        child.expect(u"Testing interval \d+ ticks \(now=\d+\)")
+    for i in range(SLEEP_TIMES_NUMOF):
+        child.expect(u"Interval \d+ ticks diff=\d+")
 
     child.expect(u"Min/max error: \d+/\d+")
     child.expect_exact("Test complete.")
+    child.expect_exact("[SUCCESS]")
 
 
 if __name__ == "__main__":
