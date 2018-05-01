@@ -32,8 +32,7 @@
 
 #define OPENTHREAD_SPINEL_FRAME_MARKER      (0x7e)
 
-static serial_msg_t * gSerialMessage[OPENTHREAD_NUMBER_OF_SERIAL_BUFFER];
-static uint8_t gSerialBuff[OPENTHREAD_NUMBER_OF_SERIAL_BUFFER][OPENTHREAD_SERIAL_BUFFER_SIZE];
+static serial_msg_t gSerialMessage[OPENTHREAD_NUMBER_OF_SERIAL_BUFFER];
 static uint16_t frameLength = 0;
 
 #ifdef MODULE_OPENTHREAD_NCP_FTD
@@ -43,7 +42,7 @@ static bool gOnGoingSpinelReception = false;
 int8_t getFirstEmptySerialBuffer(void) {
     int8_t i = 0;
     for (i = 0; i < OPENTHREAD_NUMBER_OF_SERIAL_BUFFER; i++) {
-        if (gSerialMessage[i]->serial_buffer_status == OPENTHREAD_SERIAL_BUFFER_STATUS_FREE) {
+        if (gSerialMessage[i].serial_buffer_status == OPENTHREAD_SERIAL_BUFFER_STATUS_FREE) {
             break;
         }
     }
@@ -67,7 +66,7 @@ static void uart_handler(void* arg, char c)  {
         }
         frameLength = 0;
 
-        gSerialMessage[currentSerialBufferNumber]->buf[frameLength] = c;
+        gSerialMessage[currentSerialBufferNumber].buf[frameLength] = c;
 
         gOnGoingSpinelReception = true;
     }
@@ -80,17 +79,17 @@ static void uart_handler(void* arg, char c)  {
             frameLength--;
             return;
         }
-        if(gSerialMessage[currentSerialBufferNumber]->serial_buffer_status != OPENTHREAD_SERIAL_BUFFER_STATUS_FULL) {
-            gSerialMessage[currentSerialBufferNumber]->buf[frameLength] = (uint8_t) c;
-            gSerialMessage[currentSerialBufferNumber]->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_READY_TO_PROCESS;
-            gSerialMessage[currentSerialBufferNumber]->length = frameLength + 1;
+        if(gSerialMessage[currentSerialBufferNumber].serial_buffer_status != OPENTHREAD_SERIAL_BUFFER_STATUS_FULL) {
+            gSerialMessage[currentSerialBufferNumber].buf[frameLength] = (uint8_t) c;
+            gSerialMessage[currentSerialBufferNumber].serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_READY_TO_PROCESS;
+            gSerialMessage[currentSerialBufferNumber].length = frameLength + 1;
             msg_t msg;
             msg.type = OPENTHREAD_SERIAL_MSG_TYPE_EVENT;
-            msg.content.ptr = gSerialMessage[currentSerialBufferNumber];
+            msg.content.ptr = &gSerialMessage[currentSerialBufferNumber];
             msg_send_int(&msg, openthread_get_pid());
         }
         else {
-            gSerialMessage[currentSerialBufferNumber]->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
+            gSerialMessage[currentSerialBufferNumber].serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
         }
         gOnGoingSpinelReception = false;
         frameLength = 0;
@@ -99,8 +98,8 @@ static void uart_handler(void* arg, char c)  {
         if (currentSerialBufferNumber == OPENTHREAD_ERROR_NO_EMPTY_SERIAL_BUFFER) {
             return;
         }
-        if (gSerialMessage[currentSerialBufferNumber]->serial_buffer_status != OPENTHREAD_SERIAL_BUFFER_STATUS_FULL) {
-            gSerialMessage[currentSerialBufferNumber]->buf[frameLength] = (uint8_t) c;
+        if (gSerialMessage[currentSerialBufferNumber].serial_buffer_status != OPENTHREAD_SERIAL_BUFFER_STATUS_FULL) {
+            gSerialMessage[currentSerialBufferNumber].buf[frameLength] = (uint8_t) c;
         }
     }
 
@@ -108,7 +107,7 @@ static void uart_handler(void* arg, char c)  {
         frameLength++;
         if (frameLength >= OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE) {
             DEBUG("SERIAL: ERROR => OPENTHREAD_SERIAL_BUFFER__PAYLOAD_SIZE overflowed\n");
-            gSerialMessage[currentSerialBufferNumber]->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FULL;
+            gSerialMessage[currentSerialBufferNumber].serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FULL;
         }
     }
 }
@@ -118,26 +117,26 @@ static void uart_handler(void* arg, char c)  {
 static void uart_handler(void* arg, char c) {
     (void)arg;
 
-    if (frameLength == 0 && gSerialMessage != NULL) {
-        memset(gSerialMessage[0], 0, sizeof(serial_msg_t));
+    if (frameLength == 0) {
+        memset(&gSerialMessage[0], 0, sizeof(serial_msg_t));
     }
     switch (c) {
         case '\r':
         case '\n':
             if (frameLength > 0) {
-                gSerialMessage[0]->buf[frameLength] = c;
+                gSerialMessage[0].buf[frameLength] = c;
                 frameLength++;
-                gSerialMessage[0]->length = frameLength;
+                gSerialMessage[0].length = frameLength;
                 msg_t msg;
                 msg.type = OPENTHREAD_SERIAL_MSG_TYPE_EVENT;
-                msg.content.ptr = gSerialMessage[0];
+                msg.content.ptr = &gSerialMessage[0];
                 msg_send_int(&msg, openthread_get_pid());
                 frameLength = 0;
             }
             break;
         default:
             if (frameLength < OPENTHREAD_SERIAL_BUFFER_SIZE) {
-                gSerialMessage[0]->buf[frameLength] = c;
+                gSerialMessage[0].buf[frameLength] = c;
                 frameLength++;
             }
             break;
@@ -150,8 +149,7 @@ static void uart_handler(void* arg, char c) {
 otError otPlatUartEnable(void)
 {
     for (uint8_t i = 0; i < OPENTHREAD_NUMBER_OF_SERIAL_BUFFER; i++) {
-        gSerialMessage[i] = (serial_msg_t*) &gSerialBuff[i];
-        gSerialMessage[i]->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
+        gSerialMessage[i].serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
     }
 
     uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, (uart_rx_cb_t) uart_handler, NULL);
