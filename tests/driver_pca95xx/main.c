@@ -28,11 +28,12 @@
 #include "pca95xx_params.h"
 #include "shell.h"
 
-static pca95xx_t pca95xx_dev = { .params.i2c = PCA95XX_PARAM_I2C,
-                                 .params.addr = PCA95XX_PARAM_ADDR };
+static pca95xx_t pca95xx_dev = { .params.i2c   = PCA95XX_PARAM_I2C,
+                                 .params.addr  = PCA95XX_PARAM_ADDR,
+                                 .params.flags = PCA95XX_PARAM_FLAGS };
 
-static pca95xx_int_t pca95xx_int_dev = { .params.i2c = PCA95XX_PARAM_I2C,
-                                         .params.addr = PCA95XX_PARAM_ADDR,
+static pca95xx_int_t pca95xx_int_dev = { .params.i2c     = PCA95XX_PARAM_I2C,
+                                         .params.addr    = PCA95XX_PARAM_ADDR,
                                          .params.int_pin = PCA95XX_PARAM_INT_PIN };
 
 static void cb(void *arg)
