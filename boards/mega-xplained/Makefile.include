@@ -2,23 +2,12 @@
 export CPU = atmega1284p
 
 # configure the terminal program
-export PORT_LINUX  ?= /dev/ttyACM0
-export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
-export BAUD        ?= 9600
-include $(RIOTMAKE)/tools/serial.inc.mk
-
-export FLASHER = avrdude
-export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
-export DEBUGSERVER_PORT = 4242
-export DEBUGSERVER = $(DIST_PATH)/debug_srv.sh
-export DEBUGSERVER_FLAGS = "-g -j usb :$(DEBUGSERVER_PORT)"
-export DEBUGGER_FLAGS = "-x $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)"
-export DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBUGSERVER_PORT)
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+PROGRAMMER_SPEED ?= 9600
 
 # PROGRAMMER defaults to the Bus Pirate ISP
-export PROGRAMMER ?= buspirate
+PROGRAMMER ?= buspirate
+FFLAGS += -p m1284p
 
-export PROGRAMMER_FLAGS = -P /dev/ttyUSB0
-
-OFLAGS += -j .text -j .data
-export FFLAGS += -p m1284p -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -U flash:w:$(HEXFILE)
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.include
