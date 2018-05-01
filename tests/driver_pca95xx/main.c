@@ -33,7 +33,7 @@ static pca95xx_t pca95xx_dev = { .params.i2c = PCA95XX_PARAM_I2C,
 
 static pca95xx_int_t pca95xx_int_dev = { .params.i2c = PCA95XX_PARAM_I2C,
                                          .params.addr = PCA95XX_PARAM_ADDR,
-                                         .params.int_pin = PCA95XX_PARAM_PIN };
+                                         .params.int_pin = PCA95XX_PARAM_INT_PIN };
 
 static void cb(void *arg)
 {
@@ -51,7 +51,7 @@ static int init_pin(int argc, char **argv)
     pca95xx_dev.params.pin = atoi(argv[1]);
 
     if (pca95xx_init(&pca95xx_dev, &(pca95xx_dev.params)) < 0) {
-        printf("Error to initialize PCA95xx pin %i\n", pca95xx_dev.params.pin);
+        printf("Error initializing PCA95xx pin %i\n", pca95xx_dev.params.pin);
         return 1;
     }
 
@@ -165,6 +165,10 @@ static const shell_command_t shell_commands[] = {
 int main(void)
 {
     puts("PCA95xx I2C GPIO expander driver test\n");
+
+    /* Enable pin change interrupts */
+    pca95xx_int_dev.cb = cb;
+    pca95xx_int_init(&pca95xx_int_dev, &(pca95xx_int_dev.params));
 
     /* start the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];

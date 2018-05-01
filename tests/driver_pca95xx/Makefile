@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 FEATURES_REQUIRED = periph_gpio \
                     periph_i2c
 
-USEMODULE += shell
-USEMODULE += xtimer
+USEMODULE += pca95xx \
+             shell
 
 include $(RIOTBASE)/Makefile.include
