@@ -105,7 +105,7 @@ typedef struct pca95xx_int {
     pca95xx_int_params_t params;    /**< device driver configuration */
     pca95xx_int_cb_t cb;            /**< alert callback */
     void *arg;                      /**< alert callback param */
-} pc95xx_int_t;
+} pca95xx_int_t;
 
 /**
  * @brief   Initialize a PCA95xx GPIO device

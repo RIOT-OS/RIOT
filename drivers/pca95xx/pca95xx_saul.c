@@ -26,7 +26,9 @@
 
 static int read(const void *dev, phydat_t *res)
 {
-    res->val = pca95xx_read((const pca95xx_t *)dev, dev->params.pin);
+    uint8_t pin = ((pca95xx_t *)dev)->params.pin;
+
+    res->val[0] = pca95xx_read((const pca95xx_t *)dev, pin);
 
     res->unit = UNIT_BOOL;
     res->scale = 0;
@@ -36,7 +38,9 @@ static int read(const void *dev, phydat_t *res)
 
 static int write(const void *dev, phydat_t *state)
 {
-    pca95xx_write((const pca95xx_t *)dev, dev->params.pin, state->val);
+    uint8_t pin = ((pca95xx_t *)dev)->params.pin;
+
+    pca95xx_write((const pca95xx_t *)dev, pin, state->val[0]);
 
     return 1;
 }

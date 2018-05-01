@@ -18,7 +18,6 @@
  */
 
 #include "assert.h"
-#include "debug.h"
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
@@ -79,26 +78,26 @@ int pca95xx_init(pca95xx_t *dev, const pca95xx_params_t *params)
 
     /* Register read/write test */
     reg_addr = _get_reg(dev->params.pin,
-                        dev->params.flags, PCA95XX_INPUT_INVERT);
+                        dev->params.flags, PCA95XX_POLAR_ADDR);
     i2c_read_reg(I2C, ADDR, reg_addr, &reg[0]);
 
     /* Toggle value */
     reg[1] = reg[0] ^ (1 << _pin_bit(dev->params.pin));
 
     i2c_write_reg(I2C, ADDR, reg_addr, reg[1]);
-    i2c_read_reg(I2C, ADR, reg_addr, &reg[0]);
+    i2c_read_reg(I2C, ADDR, reg_addr, &reg[0]);
 
     /* Write should have actually written the register */
     if (reg[0] != reg[1]) {
         i2c_release(I2C);
-        DEBUG("[pca95xx] init - error: unable to set reg (reg=%x)\n", regs[1]);
-        return ADS101X_NODEV;
+        DEBUG("[pca95xx] init - error: unable to set reg (reg=%x)\n", reg[1]);
+        return PCA95XX_NODEV;
     }
 
     /* Set register back if it was already at its intended value */
     /* Also ensures that invert register is initialized properly */
     if ((dev->params.flags & PCA95XX_INPUT_INVERT)
-        != (reg[0] & PCA95XX_INPUT_INVERT) {
+        != (reg[0] & PCA95XX_INPUT_INVERT)) {
 
         reg[0] ^= (1 << _pin_bit(dev->params.pin));
 
@@ -108,8 +107,7 @@ int pca95xx_init(pca95xx_t *dev, const pca95xx_params_t *params)
     i2c_release(I2C);
 
     /* Finish initialize by setting pin to initial value */
-    void pca95xx_write(dev, dev->params.pin,
-                       (dev->params.flags & PCA95XX_INIT_SET));
+    pca95xx_write(dev, dev->params.pin, (dev->params.flags & PCA95XX_INIT_SET));
 
     return PCA95XX_OK;
 }

@@ -50,13 +50,13 @@ extern "C" {
 #ifndef PCA95XX_PARAMS
 #define PCA95XX_PARAMS        { .i2c          = PCA95XX_PARAM_I2C,  \
                                 .addr         = PCA95XX_PARAM_ADDR, \
-                                .pin          = PCA95XX_PARAM_PIN,
+                                .pin          = PCA95XX_PARAM_PIN,  \
                                 .flags        = PCA95XX_PARAM_FLAGS }
 #endif
 #ifndef PCA95XX_INT_PARAMS
 #define PCA95XX_INT_PARAMS    { .i2c          = PCA95XX_PARAM_I2C,  \
                                 .addr         = PCA95XX_PARAM_ADDR, \
-                                .int_pin      = PCA95XX_PARAM_ALERT_PIN }
+                                .int_pin      = PCA95XX_PARAM_INT_PIN }
 #endif
 #ifndef PCA95XX_SAUL_INFO
 #define PCA95XX_SAUL_INFO     { .name = "pca95xx" }
