@@ -9,9 +9,9 @@
 
 FLAKE8_CMD="python3 -m flake8"
 
-if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
-    CERROR="\e[1;31m"
-    CRESET="\e[0m"
+if tput colors &> /dev/null && [ "$(tput colors)" -ge 8 ]; then
+    CERROR=$'\033[1;31m'
+    CRESET=$'\033[0m'
 else
     CERROR=
     CRESET=
@@ -19,7 +19,7 @@ fi
 
 DIST_TOOLS=${RIOTBASE:-.}/dist/tools
 
-. ${DIST_TOOLS}/ci/changed_files.sh
+. "${DIST_TOOLS}/ci/changed_files.sh"
 
 FILES=$(FILEREGEX='(?=*.py$|pyterm$)' changed_files)
 
@@ -29,16 +29,16 @@ then
 fi
 
 ${FLAKE8_CMD} --version &> /dev/null || {
-    printf "${CERROR}$0: cannot execute \"${FLAKE8_CMD}\"!${CRESET}\n"
+    printf "%s%s: cannot execute \"%s\"!%s\n" "${CERROR}" "$0" "${FLAKE8_CMD}" "${CRESET}"
     exit 1
 }
 
-ERRORS=$(${FLAKE8_CMD} --config=${DIST_TOOLS}/flake8/flake8.cfg ${FILES})
+ERRORS=$(${FLAKE8_CMD} --config="${DIST_TOOLS}/flake8/flake8.cfg" ${FILES})
 
 if [ -n "${ERRORS}" ]
 then
-    printf "${CERROR}There are style issues in the following Python scripts:${CRESET}\n\n"
-    printf "${ERRORS}\n"
+    printf "%sThere are style issues in the following Python scripts:%s\n\n" "${CERROR}" "${CRESET}"
+    printf "%s\n" "${ERRORS}"
     exit 1
 else
     exit 0
