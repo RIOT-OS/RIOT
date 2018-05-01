@@ -41,12 +41,12 @@ static inline uint8_t _get_reg(uint8_t pin, pca95xx_flags_t flags, uint8_t reg)
     }
 
     /* Offset reg for high pins */
-    if (pin < 8) {
-        return reg;
+    if (pin >= 8) {
+        reg++;
     }
-    else {
-        return reg + 1;
-    }
+
+    DEBUG("[pca95xx] get_reg - selecting reg %i\n", reg);
+    return reg;
 }
 
 static inline uint8_t _pin_bit(uint8_t pin)
@@ -76,13 +76,15 @@ int pca95xx_init(pca95xx_t *dev, const pca95xx_params_t *params)
         return PCA95XX_NOI2C;
     }
 
+    uint8_t pin_b = _pin_bit(dev->params.pin);
+
     /* Register read/write test */
     reg_addr = _get_reg(dev->params.pin,
                         dev->params.flags, PCA95XX_POLAR_ADDR);
     i2c_read_reg(I2C, ADDR, reg_addr, &reg[0]);
 
     /* Toggle value */
-    reg[1] = reg[0] ^ (1 << _pin_bit(dev->params.pin));
+    reg[1] = reg[0] ^ (1 << pin_b);
 
     i2c_write_reg(I2C, ADDR, reg_addr, reg[1]);
     i2c_read_reg(I2C, ADDR, reg_addr, &reg[0]);
@@ -96,8 +98,9 @@ int pca95xx_init(pca95xx_t *dev, const pca95xx_params_t *params)
 
     /* Set register back if it was already at its intended value */
     /* Also ensures that invert register is initialized properly */
-    if ((dev->params.flags & PCA95XX_INPUT_INVERT)
-        != (reg[0] & PCA95XX_INPUT_INVERT)) {
+    uint8_t do_invert = dev->params.flags & PCA95XX_INPUT_INVERT;
+    if ((do_invert && !(reg[0] & (1 << pin_b)))
+        || (!do_invert && (reg[0] & (1 << pin_b)))) {
 
         reg[0] ^= (1 << _pin_bit(dev->params.pin));
 
@@ -174,6 +177,8 @@ void pca95xx_set(const pca95xx_t *dev, uint8_t pin)
     i2c_acquire(I2C);
 
     if (dev->params.flags & PCA95XX_HIGH_DRIVE) {
+        DEBUG("[pca95xx] set - driving pin %i high\n", pin);
+
         /* Set pin high */
         reg_addr = _get_reg(pin, dev->params.flags, PCA95XX_OUTPUT_ADDR);
         i2c_read_reg(I2C, ADDR, reg_addr, &reg);
@@ -191,6 +196,8 @@ void pca95xx_set(const pca95xx_t *dev, uint8_t pin)
         i2c_write_reg(I2C, ADDR, reg_addr, reg);
     }
     else {
+        DEBUG("[pca95xx] set - setting pin %i to high-Z\n", pin);
+
         /* Set pin to input */
         reg_addr = _get_reg(pin, dev->params.flags, PCA95XX_CONFIG_ADDR);
         i2c_read_reg(I2C, ADDR, reg_addr, &reg);
@@ -211,6 +218,8 @@ void pca95xx_clear(const pca95xx_t *dev, uint8_t pin)
     i2c_acquire(I2C);
 
     if (dev->params.flags & PCA95XX_LOW_DRIVE) {
+        DEBUG("[pca95xx] clear - driving pin %i low\n", pin);
+
         /* Set pin low */
         reg_addr = _get_reg(pin, dev->params.flags, PCA95XX_OUTPUT_ADDR);
         i2c_read_reg(I2C, ADDR, reg_addr, &reg);
@@ -228,6 +237,8 @@ void pca95xx_clear(const pca95xx_t *dev, uint8_t pin)
         i2c_write_reg(I2C, ADDR, reg_addr, reg);
     }
     else {
+        DEBUG("[pca95xx] clear - setting pin %i to high-Z\n", pin);
+
         /* Set pin to input */
         reg_addr = _get_reg(pin, dev->params.flags, PCA95XX_CONFIG_ADDR);
         i2c_read_reg(I2C, ADDR, reg_addr, &reg);
