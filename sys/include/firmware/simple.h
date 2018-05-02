@@ -42,6 +42,8 @@
 
 typedef struct {
     firmware_metadata_t metadata;       /**< generic bootloader specific firmware info */
+    uint32_t metadata_type;             /**< Type of metadata, 16 bits type,
+                                          16 bit version */
     uint32_t appid;                     /**< Application type ID */
     uint32_t size;                      /**< Size of firmware image */
     uint8_t hash[SHA256_DIGEST_LENGTH]; /**< SHA256 Hash of firmware image */

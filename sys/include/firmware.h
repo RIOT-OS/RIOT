@@ -123,7 +123,7 @@ extern "C" {
  *
  *  Includes magic number, version, and start address.
  */
-#define FIRMWARE_CHECKSUM_LEN       (16)
+#define FIRMWARE_CHECKSUM_LEN       (12)
 
 /**
  *  @brief Length of metadata prefixed to firmware binaries
@@ -145,8 +145,6 @@ typedef struct {
     uint32_t magic_number;              /**< metadata magic_number (always "RIOT")  */
     uint32_t version;                   /**< Integer representing firmware version  */
     uint32_t start_addr;                /**< Start address in flash                 */
-    uint32_t metadata_type;             /**< Type of metadata, 16 bits type,
-                                          16 bit version */
     uint32_t chksum;                    /**< checksum of metadata                   */
 } firmware_metadata_t;
 /** @} */
