@@ -168,8 +168,8 @@ int main(void)
     puts("PCA95xx I2C GPIO expander driver test\n");
 
     /* Enable pin change interrupts */
-    pca95xx_int_dev.cb = cb;
     pca95xx_int_init(&pca95xx_int_dev, &(pca95xx_int_dev.params));
+    pca95xx_enable_int(&pca95xx_int_dev, cb, NULL);
 
     /* start the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
