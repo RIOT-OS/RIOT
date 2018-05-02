@@ -44,7 +44,7 @@ void firmware_simple_print(firmware_simple_t *simple)
     printf("Firmware Version: %#x\n", (unsigned)simple->metadata.version);
     printf("Firmware start address: 0x%08x\n", (unsigned)simple->metadata.start_addr);
     /* Only output full info if the metadata_type matches */
-    if (simple->metadata.metadata_type == FIRMWARE_METADATA_RIOTBOOT)
+    if (simple->metadata_type == FIRMWARE_METADATA_RIOTBOOT)
     {
         printf("Firmware APPID: %#x\n", (unsigned)simple->appid);
         printf("Firmware Size: %" PRIu32 "\n", simple->size);
