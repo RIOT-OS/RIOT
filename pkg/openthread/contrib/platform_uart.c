@@ -40,7 +40,7 @@ static int8_t currentSerialBufferNumber = 0;
 static bool gOnGoingSpinelReception = false;
 
 int8_t getFirstEmptySerialBuffer(void) {
-    int8_t i = 0;
+    uint8_t i = 0;
     for (i = 0; i < OPENTHREAD_NUMBER_OF_SERIAL_BUFFER; i++) {
         if (gSerialMessage[i].serial_buffer_status == OPENTHREAD_SERIAL_BUFFER_STATUS_FREE) {
             break;
