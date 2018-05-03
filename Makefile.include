@@ -11,6 +11,7 @@ RIOTCPU        ?= $(RIOTBASE)/cpu
 RIOTBOARD      ?= $(RIOTBASE)/boards
 RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
+RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTBASE)/dist/tools/git/git-cache
 APPDIR         ?= $(CURDIR)
@@ -26,6 +27,7 @@ __DIRECTORY_VARIABLES := \
   RIOTBOARD \
   RIOTMAKE \
   RIOTPKG \
+  RIOTTOOLS \
   RIOTPROJECT \
   APPDIR \
   BINDIRBASE \
@@ -43,6 +45,7 @@ override RIOTCPU        := $(abspath $(RIOTCPU))
 override RIOTBOARD      := $(abspath $(RIOTBOARD))
 override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
+override RIOTTOOLS      := $(abspath $(RIOTTOOLS))
 override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
 override GITCACHE       := $(abspath $(GITCACHE))
 override APPDIR         := $(abspath $(APPDIR))

@@ -22,6 +22,7 @@ export RIOTBASE              # The root folder of RIOT. The folder where this ve
 export RIOTCPU               # For third party CPUs this folder is the base of the CPUs.
 export RIOTBOARD             # For third party BOARDs this folder is the base of the BOARDs.
 export RIOTPKG               # For overriding RIOT's pkg directory
+export RIOTTOOLS             # Location of host machine tools
 export RIOTPROJECT           # Top level git root of the project being built, or PWD if not a git repository
 export RIOTMAKE              # Location of all supplemental Makefiles (such as this file)
 export BINDIRBASE            # This is the folder where the application should be built in. For each BOARD a different subfolder is used.
