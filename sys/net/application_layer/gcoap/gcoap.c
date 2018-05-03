@@ -715,8 +715,9 @@ void gcoap_register_listener(gcoap_listener_t *listener)
     _last->next = listener;
 }
 
-int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len, unsigned code,
-                                                              char *path) {
+int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                   unsigned code, const char *path)
+{
     (void)len;
 
     pdu->hdr = (coap_hdr_t *)buf;
