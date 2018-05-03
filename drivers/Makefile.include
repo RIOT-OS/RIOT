@@ -2,6 +2,10 @@ ifneq (,$(filter adcxx1c,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/adcxx1c/include
 endif
 
+ifneq (,$(filter ads101x,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ads101x/include
+endif
+
 ifneq (,$(filter adxl345,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/adxl345/include
 endif

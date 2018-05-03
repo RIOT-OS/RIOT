@@ -6,6 +6,13 @@ ifneq (,$(filter adc%1c,$(USEMODULE)))
   USEMODULE += adcxx1c
 endif
 
+ifneq (,$(filter ads101%,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += ads101x
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter adxl345,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
