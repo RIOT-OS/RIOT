@@ -32,7 +32,31 @@
 #define _XFA(name, prio) __attribute__((used, section(".xfa." #name "." #prio)))
 
 /**
- * @brief Define a cross-file array
+ * @brief helper macro for other XFA_* macros
+ *
+ * @internal
+ */
+#define _XFA_CONST(name, prio) __attribute__((used, section(".roxfa." #name "." #prio)))
+
+/**
+ * @brief Define a read-only cross-file array
+ *
+ * This macro defines the symbols necessary to use XFA_START() and XFA_END().
+ * It needs to be part of one single compilation unit.
+ *
+ * @param[in]   type    name of the cross-file array
+ * @param[in]   name    name of the cross-file array
+ */
+#define XFA_INIT_CONST(type, name) \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
+    const _XFA_CONST(name, 0_) type name [0] = {}; \
+    const _XFA_CONST(name, 9_) type name ## _end [0] = {}; \
+    _Pragma("GCC diagnostic pop") \
+    extern unsigned __xfa_dummy
+
+/**
+ * @brief Define a writable cross-file array
  *
  * This macro defines the symbols necessary to use XFA_START() and XFA_END().
  * It needs to be part of one single compilation unit.
@@ -43,13 +67,28 @@
 #define XFA_INIT(type, name) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-    const _XFA(name, 0_) type name [0] = {}; \
-    const _XFA(name, 9_) type name ## _end [0] = {}; \
+    _XFA(name, 0_) type name [0] = {}; \
+    _XFA(name, 9_) type name ## _end [0] = {}; \
     _Pragma("GCC diagnostic pop") \
     extern unsigned __xfa_dummy
 
 /**
- * @brief Declare an external cross-file array
+ * @brief Declare an external read-only cross-file array
+ *
+ * This macro defines the symbols necessary to use XFA_START() and XFA_END().
+ * Think of this as XFA_INIT() but with "extern" keyword.
+ * It is supposed to be used in compilation units where the cross file array is
+ * being accessed, but not defined using XFA_INIT.
+ *
+ * @param[in]   type    name of the cross-file array
+ * @param[in]   name    name of the cross-file array
+ */
+#define XFA_USE_CONST(type, name) \
+    extern const type name [0]; \
+    extern const type name ## _end [0];
+
+/**
+ * @brief Declare an external writable cross-file array
  *
  * This macro defines the symbols necessary to use XFA_START() and XFA_END().
  * Think of this as XFA_INIT() but with "extern" keyword.
@@ -60,11 +99,11 @@
  * @param[in]   name    name of the cross-file array
  */
 #define XFA_USE(type, name) \
-    extern const type name [0]; \
-    extern const type name ## _end [0];
+    extern type name [0]; \
+    extern type name ## _end [0];
 
 /**
- * @brief Define variable in cross-file array
+ * @brief Define variable in writable cross-file array
  *
  * Variables will end up sorted by prio.
  *
@@ -78,6 +117,20 @@
 #define XFA(xfa_name, prio) _XFA(xfa_name, 5_ ##prio)
 
 /**
+ * @brief Define variable in read-only cross-file array
+ *
+ * Variables will end up sorted by prio.
+ *
+ * Add this to the type in a variable definition, e.g.:
+ *
+ *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
+ *
+ * @param[in]   name    name of the xfa
+ * @param[in]   prio    priority within the xfa
+ */
+#define XFA_CONST(xfa_name, prio) _XFA_CONST(xfa_name, 5_ ##prio)
+
+/**
  * @brief Add a pointer to cross-file array
  *
  * Pointers will end up sorted by prio.
@@ -88,14 +141,13 @@
  * @param[in]   entry       pointer variable to add to xfa
  */
 #define XFA_ADD_PTR(xfa_name, prio, name, entry) \
-    _XFA(xfa_name, 5_ ##prio) \
+    _XFA_CONST(xfa_name, 5_ ##prio) \
     const typeof(entry) xfa_name ## _ ## prio ## _ ## name = entry
 
 /**
  * @brief Calculate number of entries in cross-file array
- *
  */
-#define XFA_LEN(type, name) (((char*)name ## _end - (char*)name)/sizeof(type))
+#define XFA_LEN(type, name) (((const char*)name ## _end - (const char*)name) / sizeof(type))
 
 /** @} */
 #endif /* XFA_H */
