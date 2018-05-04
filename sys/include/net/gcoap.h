@@ -506,6 +506,9 @@ void gcoap_register_listener(gcoap_listener_t *listener);
  * @param[in] code      Request code: GCOAP_[GET|POST|PUT|DELETE]
  * @param[in] path      Resource path, *must* start with '/'
  *
+ * @pre @p path not `NULL`
+ * @pre @p path must start with `/`
+ *
  * @return  0 on success
  * @return  < 0 on error
  */

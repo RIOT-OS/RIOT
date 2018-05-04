@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stdatomic.h>
 
+#include "assert.h"
 #include "net/gcoap.h"
 #include "mutex.h"
 #include "random.h"
@@ -718,6 +719,8 @@ void gcoap_register_listener(gcoap_listener_t *listener)
 int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                    unsigned code, const char *path)
 {
+    assert((path != NULL) && (path[0] == '/'));
+
     (void)len;
 
     pdu->hdr = (coap_hdr_t *)buf;
