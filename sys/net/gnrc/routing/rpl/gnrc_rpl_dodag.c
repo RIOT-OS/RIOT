@@ -258,6 +258,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
         if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
 #endif
         if (parent == dodag->parents) {
+            gnrc_ipv6_nib_ft_del(NULL, 0);
             gnrc_ipv6_nib_ft_add(NULL, 0, &parent->addr, dodag->iface,
                                  dodag->default_lifetime * dodag->lifetime_unit);
         }
@@ -308,6 +309,7 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
 #ifdef MODULE_GNRC_RPL_P2P
     if (dodag->instance->mop != GNRC_RPL_P2P_MOP) {
 #endif
+        gnrc_ipv6_nib_ft_del(NULL, 0);
         gnrc_ipv6_nib_ft_add(NULL, 0, &dodag->parents->addr, dodag->iface,
                              dodag->default_lifetime * dodag->lifetime_unit);
 #ifdef MODULE_GNRC_RPL_P2P
