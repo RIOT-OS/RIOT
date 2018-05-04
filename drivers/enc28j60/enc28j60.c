@@ -248,10 +248,6 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
 
     mutex_lock(&dev->devlock);
 
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += count;
-#endif
-
     /* set write pointer */
     cmd_w_addr(dev, ADDR_WRITE_PTR, BUF_TX_START);
     /* write control byte and the actual data into the buffer */
@@ -264,6 +260,10 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
     cmd_w_addr(dev, ADDR_TX_END, cmd_r_addr(dev, ADDR_WRITE_PTR) - 1);
     /* trigger the send process */
     cmd_bfs(dev, REG_ECON1, -1, ECON1_TXRTS);
+
+#ifdef MODULE_NETSTATS_L2
+    netdev->stats.tx_bytes += c;
+#endif
 
     mutex_unlock(&dev->devlock);
     return c;
