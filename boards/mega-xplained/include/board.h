@@ -50,22 +50,6 @@ extern "C" {
 #define UART_STDIO_DEV       (UART_DEV(1))
 
 /**
- * @name    Context swap defines
- *
- * Setup to use PD7 which is pin change interrupt 31 (PCINT31)
- * This emulates a software triggered interrupt
- * @{
- */
-#define AVR_CONTEXT_SWAP_INIT do { \
-            DDRD |= (1 << PD7); \
-            PCICR |= (1 << PCIE3); \
-            PCMSK3 |= (1 << PCINT31); \
-} while (0)
-#define AVR_CONTEXT_SWAP_INTERRUPT_VECT  PCINT3_vect
-#define AVR_CONTEXT_SWAP_TRIGGER   PORTD ^= (1 << PD7)
-/** @} */
-
-/**
  * @name    xtimer configuration values
  *
  * Xtimer runs at 8MHz / 64 = 125kHz

@@ -313,10 +313,9 @@ ISR(INT6_vect, ISR_BLOCK)
 }
 #endif
 
-#if defined(INT7_vect) && !defined(BOARD_JIMINY_MEGA256RFR2)
-/**< INT7 is context swap pin for the Jiminy board */
+#if defined(INT7_vect)
 ISR(INT7_vect, ISR_BLOCK)
 {
     irq_handler(7); /**< predefined interrupt pin */
 }
-#endif  /* INT7_vect && END BOARD_JIMINY_MEGA256RFR2 */
+#endif
