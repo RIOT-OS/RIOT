@@ -294,7 +294,11 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [92] = isr_quadspi,              /* [92] QuadSPI global Interrupt */
     [95] = isr_fmpi2c1_ev,           /* [95] FMPI2C1 Event Interrupt */
     [96] = isr_fmpi2c1_er,           /* [96] FMPI2C1 Error Interrupt */
-#elif defined(CPU_MODEL_STM32F413VG) || defined(CPU_MODEL_STM32F413ZH)
+#elif defined(CPU_MODEL_STM32F413CG) || defined(CPU_MODEL_STM32F413RG) \
+    || defined(CPU_MODEL_STM32F413MG) || defined(CPU_MODEL_STM32F413VG) \
+    || defined(CPU_MODEL_STM32F413ZG) || defined(CPU_MODEL_STM32F413CH) \
+    || defined(CPU_MODEL_STM32F413RH) || defined(CPU_MODEL_STM32F413MH) \
+    || defined(CPU_MODEL_STM32F413VH) || defined(CPU_MODEL_STM32F413ZH)
     [18] = isr_adc,                  /* [18] ADC1, ADC2 and ADC3 global Interrupts */
     [19] = isr_can1_tx,              /* [19] CAN1 TX Interrupt */
     [20] = isr_can1_rx0,             /* [20] CAN1 RX0 Interrupt */
