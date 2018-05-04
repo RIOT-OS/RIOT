@@ -1,0 +1,6 @@
+# lwIP's memory management doesn't seem to work on non 32-bit platforms at the
+# moment.
+FEATURES_REQUIRED += arch_32bit
+
+# lwip currently doesn't compile on esp8266
+FEATURES_BLACKLIST += arch_esp8266
