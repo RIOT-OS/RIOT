@@ -1,5 +1,7 @@
 # MCU defined features that are provided independent on board definitions
 
+FEATURES_PROVIDED += arch_32bit
+FEATURES_PROVIDED += arch_esp8266
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_pm
