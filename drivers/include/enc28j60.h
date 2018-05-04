@@ -53,6 +53,7 @@ typedef struct {
     gpio_t reset_pin;       /**< pin connected to the RESET line */
     mutex_t devlock;        /**< lock the device on access */
     int8_t bank;            /**< remember the active register bank */
+    uint32_t tx_time;       /**< last transmission time for timeout handling */
 } enc28j60_t;
 
 /**
