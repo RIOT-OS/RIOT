@@ -467,6 +467,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                       ipv6_addr_to_str(addr_str, &(target->target), (unsigned)sizeof(addr_str)),
                       target->prefix_length);
 
+                gnrc_ipv6_nib_ft_del(&(target->target), target->prefix_length);
                 gnrc_ipv6_nib_ft_add(&(target->target), target->prefix_length, src,
                                      dodag->iface,
                                      dodag->default_lifetime * dodag->lifetime_unit);
@@ -487,6 +488,8 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                           ipv6_addr_to_str(addr_str, &(first_target->target), sizeof(addr_str)),
                           first_target->prefix_length);
 
+                    gnrc_ipv6_nib_ft_del(&(first_target->target),
+                                         first_target->prefix_length);
                     gnrc_ipv6_nib_ft_add(&(first_target->target),
                                          first_target->prefix_length, src,
                                          dodag->iface,
