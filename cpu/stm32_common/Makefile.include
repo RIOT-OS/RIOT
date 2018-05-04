@@ -17,6 +17,12 @@ export INCLUDES += -I$(RIOTCPU)/stm32_common/include
 
 include $(RIOTCPU)/stm32_common/stm32_mem_lengths.mk
 
+info-stm32:
+	@$(COLOR_ECHO) "CPU: $(CPU_MODEL)"
+	@$(COLOR_ECHO) "\tPin count:\t$(STM32_PINCOUNT)"
+	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN)"
+	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN)"
+
 ifneq (,$(CCMRAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
 endif
