@@ -48,7 +48,11 @@ enum {
 /**
  * @brief   Available number of ADC devices
  */
-#if defined(CPU_MODEL_STM32F401RE) || defined(CPU_MODEL_STM32F410RB) || defined(CPU_MODEL_STM32F411RE)|| defined(CPU_MODEL_STM32F413ZH)
+#if defined(CPU_MODEL_STM32F401RE) || defined(CPU_MODEL_STM32F410RB) \
+    || defined(CPU_MODEL_STM32F411RE)|| defined(CPU_MODEL_STM32F413ZH) \
+    || defined(CPU_MODEL_STM32F423CH) || defined(CPU_MODEL_STM32F423RH) \
+    || defined(CPU_MODEL_STM32F423MH) || defined(CPU_MODEL_STM32F423VH) \
+    || defined(CPU_MODEL_STM32F423ZH)
 #define ADC_DEVS            (1U)
 #elif defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG) || defined(CPU_MODEL_STM32F446RE) || defined(CPU_MODEL_STM32F429ZI)
 #define ADC_DEVS            (3U)
