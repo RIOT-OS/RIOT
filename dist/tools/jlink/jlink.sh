@@ -59,7 +59,7 @@ _JLINK_SERVER=JLinkGDBServer
 _JLINK_IF=SWD
 _JLINK_SPEED=2000
 # default terminal frontend
-_JLINK_TERMPROG=${RIOTBASE}/dist/tools/pyterm/pyterm
+_JLINK_TERMPROG=${RIOTTOOLS}/pyterm/pyterm
 _JLINK_TERMFLAGS="-ts 19021"
 
 #
@@ -164,7 +164,7 @@ do_flash() {
     if [ ! -z "${JLINK_POST_FLASH}" ]; then
         printf "${JLINK_POST_FLASH}\n" >> ${BINDIR}/burn.seg
     fi
-    cat ${RIOTBASE}/dist/tools/jlink/reset.seg >> ${BINDIR}/burn.seg
+    cat ${RIOTTOOLS}/jlink/reset.seg >> ${BINDIR}/burn.seg
     # flash device
     sh -c "${JLINK} ${JLINK_SERIAL} \
                     -device '${JLINK_DEVICE}' \
@@ -218,7 +218,7 @@ do_reset() {
                     -speed '${JLINK_SPEED}' \
                     -if '${JLINK_IF}' \
                     -jtagconf -1,-1 \
-                    -commandfile '${RIOTBASE}/dist/tools/jlink/reset.seg'"
+                    -commandfile '${RIOTTOOLS}/jlink/reset.seg'"
 }
 
 do_term() {
@@ -245,7 +245,7 @@ do_term() {
             -speed '${JLINK_SPEED}' \
             -if '${JLINK_IF}' \
             -jtagconf -1,-1 \
-            -commandfile '${RIOTBASE}/dist/tools/jlink/term.seg' & \
+            -commandfile '${RIOTTOOLS}/jlink/term.seg' & \
             echo  \$! > $JLINK_PIDFILE" &
 
     sh -c "${JLINK_TERMPROG} ${JLINK_TERMFLAGS}"
