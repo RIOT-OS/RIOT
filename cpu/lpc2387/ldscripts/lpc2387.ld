@@ -9,10 +9,10 @@
 /* specify the LPC2387 memory areas (see LPC2387 datasheet page 15)  */
 MEMORY
 {
-    flash               : ORIGIN = 0,          LENGTH = 504K    /* FLASH ROM 512kByte without ISP bootloader*/
+    flash (rx)          : ORIGIN = 0,          LENGTH = 504K    /* FLASH ROM 512kByte without ISP bootloader*/
     infomem             : ORIGIN = 0x0007D000, LENGTH = 4K      /* Last sector in FLASH ROM for config data */
     ram_battery         : ORIGIN = 0xE0084000, LENGTH = 2K      /* Battery RAM                              */
-    ram                 : ORIGIN = 0x40000000, LENGTH = 64K     /* LOCAL ON-CHIP STATIC RAM                 */
+    ram (w!rx)          : ORIGIN = 0x40000000, LENGTH = 64K     /* LOCAL ON-CHIP STATIC RAM                 */
     ram_usb             : ORIGIN = 0x7FD00000, LENGTH = 16K     /* USB RAM  !!! first 1024 bytes are occupied from GPDMA for MCI */
     ram_ethernet        : ORIGIN = 0x7FE00000, LENGTH = 16K     /* ethernet RAM                             */
 }
