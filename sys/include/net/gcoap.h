@@ -227,7 +227,9 @@ extern "C" {
 /**
  * @brief  Size for module message queue
  */
+#ifndef GCOAP_MSG_QUEUE_SIZE
 #define GCOAP_MSG_QUEUE_SIZE    (4)
+#endif
 
 /**
  * @brief   Server port; use RFC 7252 default if not defined

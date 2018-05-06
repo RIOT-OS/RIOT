@@ -92,16 +92,17 @@ static gcoap_state_t _coap_state = {
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _msg_stack[GCOAP_STACK_SIZE];
+static msg_t _msg_queue[GCOAP_MSG_QUEUE_SIZE];
 static sock_udp_t _sock;
 
 
 /* Event/Message loop for gcoap _pid thread. */
 static void *_event_loop(void *arg)
 {
-    msg_t msg_rcvd, msg_queue[GCOAP_MSG_QUEUE_SIZE];
+    msg_t msg_rcvd;
     (void)arg;
 
-    msg_init_queue(msg_queue, GCOAP_MSG_QUEUE_SIZE);
+    msg_init_queue(_msg_queue, GCOAP_MSG_QUEUE_SIZE);
 
     sock_udp_ep_t local;
     memset(&local, 0, sizeof(sock_udp_ep_t));
