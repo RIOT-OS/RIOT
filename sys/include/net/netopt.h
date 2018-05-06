@@ -546,6 +546,14 @@ typedef enum {
      */
     NETOPT_CHECKSUM,
 
+    /**
+     * @brief   (@ref netopt_enable_t) enable busy mode
+     *
+     * When set, the PHY will enter busy mode, in which it will not accept
+     * incoming frames until unset.
+     */
+    NETOPT_PHY_BUSY,
+
     /* add more options if needed */
 
     /**

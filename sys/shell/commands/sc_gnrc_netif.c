@@ -67,6 +67,7 @@ static const struct {
     { "iphc", NETOPT_6LO_IPHC },
     { "preload", NETOPT_PRELOADING },
     { "promisc", NETOPT_PROMISCUOUSMODE },
+    { "phy_busy", NETOPT_PHY_BUSY },
     { "raw", NETOPT_RAWMODE },
     { "rtr_adv", NETOPT_IPV6_SND_RTR_ADV },
     { "iq_invert", NETOPT_IQ_INVERT },
@@ -162,6 +163,7 @@ static void _set_usage(char *cmd_name)
          "       * \"page\" - set the channel page (IEEE 802.15.4)\n"
          "       * \"pan\" - alias for \"nid\"\n"
          "       * \"pan_id\" - alias for \"nid\"\n"
+         "       * \"phy_busy\" - set busy mode on-off\n"
          "       * \"bw\" - alias for channel bandwidth\n"
          "       * \"sf\" - alias for spreading factor\n"
          "       * \"cr\" - alias for coding rate\n"
@@ -280,6 +282,10 @@ static void _print_netopt(netopt_t opt)
 
         case NETOPT_CHECKSUM:
             printf("checksum");
+            break;
+
+        case NETOPT_PHY_BUSY:
+            printf("PHY busy");
             break;
 
         default:
