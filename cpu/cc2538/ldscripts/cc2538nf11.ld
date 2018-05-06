@@ -19,10 +19,10 @@
 /* Memory Space Definitions: */
 MEMORY
 {
-    rom   (rx ) : ORIGIN = 0x00200000, LENGTH = 128K - 44
-    cca   (rx ) : ORIGIN = 0x0027ffd4, LENGTH = 44
-    sram1 (rwx) : ORIGIN = 0x20004000, LENGTH = 16K
-    ram   (rwx) : ORIGIN = 0x20004000, LENGTH = 16K
+    rom (rx)    : ORIGIN = 0x00200000, LENGTH = 128K - 44
+    cca         : ORIGIN = 0x0027ffd4, LENGTH = 44
+    sram1       : ORIGIN = 0x20004000, LENGTH = 16K
+    ram (w!rx)  : ORIGIN = 0x20004000, LENGTH = 16K
 }
 
 /* MCU Specific Section Definitions */
