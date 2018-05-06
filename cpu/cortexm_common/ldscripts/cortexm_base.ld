@@ -115,7 +115,7 @@ SECTIONS
         _estack = .;
     } > ram
 
-    .relocate : AT (_etext)
+    .relocate :
     {
         . = ALIGN(4);
         _srelocate = .;
@@ -124,7 +124,7 @@ SECTIONS
         KEEP (*(.openocd .openocd.*))
         . = ALIGN(4);
         _erelocate = .;
-    } > ram
+    } > ram AT> rom
 
     /* .bss section which is used for uninitialized data */
     .bss (NOLOAD) :
