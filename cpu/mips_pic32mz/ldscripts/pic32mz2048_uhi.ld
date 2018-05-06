@@ -67,7 +67,7 @@ PROVIDE (__use_excpt_boot = 0);
 EXTERN (__register_excpt_boot);
 
 ASSERT (DEFINED(__register_excpt_boot) || __use_excpt_boot == 0,
-	"Registration for boot context is required for UHI chaining")
+        "Registration for boot context is required for UHI chaining")
 
 /* Control if subnormal floating-point values are flushed to zero in
    hardware.  This applies to both FPU and MSA operations.  */
@@ -77,8 +77,8 @@ PROVIDE (__flush_to_zero = 1);
    quiet or verbose exception handling above */
 EXTERN (__exception_handle);
 PROVIDE(__exception_handle = (DEFINED(__exception_handle_quiet)
-				      ? __exception_handle_quiet
-				      : __exception_handle_verbose));
+                                      ? __exception_handle_quiet
+                                      : __exception_handle_verbose));
 PROVIDE(_mips_handle_exception = __exception_handle);
 
 /*
@@ -122,13 +122,13 @@ SECTIONS
 {
   /* Start of bootrom */
   .lowerbootflashalias __bev_override : /* Runs uncached (from 0xBfc00000) until I$ is
-			       initialized. */
+                               initialized. */
   AT (__lower_boot_flash_start)
   {
     __base = .;
 
-    *(.reset)		/* Reset entry point. */
-    *(.boot)		/* Boot code. */
+    *(.reset)           /* Reset entry point. */
+    *(.boot)            /* Boot code. */
     . = ALIGN(8);
 
     . = __base + 0xff40; /*Alternate Config bits (lower Alias)*/
@@ -234,12 +234,12 @@ SECTIONS
     /* Leave space for all the vector entries */
     . = __base + 0x200 + (__isr_vec_space * __isr_vec_count);
     ASSERT(__isr_vec_space == (DEFINED(__isr_vec_sw0)
-			       ? __isr_vec_sw1 - __isr_vec_sw0
-			       : __isr_vec_space),
-	   "Actual ISR vector spacing does not match __isr_vec_space");
+                               ? __isr_vec_sw1 - __isr_vec_sw0
+                               : __isr_vec_space),
+           "Actual ISR vector spacing does not match __isr_vec_space");
     ASSERT(__base + 0x200 == (DEFINED(__isr_vec_sw0)
-			      ? __isr_vec_sw0 & 0xfffffffe : __base + 0x200),
-	   "__isr_vec_sw0 is not placed at EBASE + 0x200");
+                              ? __isr_vec_sw0 & 0xfffffffe : __base + 0x200),
+           "__isr_vec_sw0 is not placed at EBASE + 0x200");
     . = ALIGN(8);
   } = 0
 
