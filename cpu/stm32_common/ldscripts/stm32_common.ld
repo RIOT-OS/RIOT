@@ -22,7 +22,7 @@ ccmram_length = DEFINED( ccmram_len ) ? ccmram_len : 0x0 ;
 
 MEMORY
 {
-    ccmram (rwx): ORIGIN = 0x10000000, LENGTH = ccmram_length
+    ccmram  : ORIGIN = 0x10000000, LENGTH = ccmram_length
 }
 
 INCLUDE cortexm.ld
