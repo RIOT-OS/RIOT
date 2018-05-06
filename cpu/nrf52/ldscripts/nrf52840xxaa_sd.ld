@@ -20,8 +20,8 @@
 
 MEMORY
 {
-  rom (rx) : ORIGIN = 0x1f000, LENGTH = 0xe1000
-  ram (rwx) :  ORIGIN = 0x20002800, LENGTH = 0x3D800
+    rom (rx)    : ORIGIN =    0x1f000, LENGTH = 0xe1000
+    ram (w!rx)  : ORIGIN = 0x20002800, LENGTH = 0x3D800
 }
 
 INCLUDE cortexm_base.ld
