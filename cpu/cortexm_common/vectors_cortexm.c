@@ -43,11 +43,10 @@
  * @brief   Memory markers, defined in the linker script
  * @{
  */
-extern uint32_t _sfixed;
-extern uint32_t _efixed;
 extern uint32_t _etext;
-extern uint32_t _srelocate;
-extern uint32_t _erelocate;
+extern uint32_t __data_start;
+extern uint32_t __data_end;
+extern uint32_t __data_load_start;
 extern uint32_t _szero;
 extern uint32_t _ezero;
 extern uint32_t _sstack;
@@ -78,7 +77,6 @@ __attribute__((weak)) void post_startup (void)
 void reset_handler_default(void)
 {
     uint32_t *dst;
-    uint32_t *src = &_etext;
 
 #ifdef MODULE_PUF_SRAM
     puf_sram_init((uint8_t *)&_srelocate, SEED_RAM_LEN);
@@ -98,12 +96,13 @@ void reset_handler_default(void)
 #endif
 
     /* load data section from flash to ram */
-    for (dst = &_srelocate; dst < &_erelocate; ) {
+    uint32_t *src = &__data_load_start;
+    for (dst = &__data_start; dst < &__data_end; ) {
         *(dst++) = *(src++);
     }
     /* default bss section to zero */
-    for (dst = &_szero; dst < &_ezero; ) {
-        *(dst++) = 0;
+    for (dst = &_szero; dst < &_ezero; ++dst) {
+        *dst = 0;
     }
 
 #ifdef MODULE_MPU_STACK_GUARD
