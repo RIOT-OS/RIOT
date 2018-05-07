@@ -45,6 +45,8 @@
 
 #include "uart_stdio.h"
 
+#include <sys/times.h>
+
 #ifdef MODULE_XTIMER
 #include <sys/time.h>
 #include "div.h"
@@ -462,6 +464,23 @@ int _unlink_r(struct _reent *r, const char *path)
 #endif /* MODULE_VFS */
 
 /**
+ * Create a hard link (not implemented).
+ *
+ * @todo    Not implemented.
+ *
+ * @return  -1. Sets errno to ENOSYS.
+ */
+int _link_r(struct _reent *ptr, const char *old_name, const char *new_name)
+{
+    (void)old_name;
+    (void)new_name;
+
+    ptr->_errno = ENOSYS;
+
+    return -1;
+}
+
+/**
  * @brief Query whether output stream is a terminal
  *
  * @param r     TODO
@@ -516,3 +535,18 @@ int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restric
     return -1;
 }
 #endif
+
+/**
+ * Current process times (not implemented).
+ *
+ * @param[out]  ptms    Not modified.
+ *
+ * @return  -1, this function always fails. errno is set to ENOSYS.
+ */
+clock_t _times_r(struct _reent *ptr, struct tms *ptms)
+{
+    (void)ptms;
+    ptr->_errno = ENOSYS;
+
+    return (-1);
+}
