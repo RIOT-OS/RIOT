@@ -32,7 +32,6 @@
  * @name I2C configuration
  * @{
  */
-#define I2C_NUMOF               1
 #define I2C_0_EN                1
 #define I2C_IRQ_PRIO            1
 
@@ -40,15 +39,15 @@
 #define I2C_0_DEV               0
 #define I2C_0_IRQ               I2C_IRQn
 #define I2C_0_IRQ_HANDLER       isr_i2c
-#define I2C_0_SCL_PIN           GPIO_PC3
-#define I2C_0_SDA_PIN           GPIO_PC2
 
-static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+static const i2c_conf_t i2c_config[] = {
     {
-        .scl_pin = I2C_0_SCL_PIN,
-        .sda_pin = I2C_0_SDA_PIN,
+        .scl_pin = GPIO_PIN(2, 3),  /**< GPIO_PC3 */
+        .sda_pin = GPIO_PIN(2, 2)   /**< GPIO_PC2 */
     },
 };
+
+#define I2C_NUMOF               (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**
