@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <string.h>
+
 #include "fmt.h"
 #include "div.h"
 
@@ -40,7 +41,7 @@ extern "C" {
  *
  * USEMODULE += fmt
  * CFLAGS += -DENABLE_DEBUG_PRINT_TICK_CONVERSION=1
- * */
+ */
 #ifndef ENABLE_DEBUG_PRINT_TICK_CONVERSION
 #define ENABLE_DEBUG_PRINT_TICK_CONVERSION   (0)
 #endif
@@ -48,15 +49,13 @@ extern "C" {
 #if ENABLE_DEBUG_PRINT_TICK_CONVERSION
 #ifndef MODULE_FMT
 #error Module fmt is necessary to ENABLE_DEBUG_TICKS
-/* Add module fmt to the makefile.
- * USEMODULE += fmt
- */
 #endif
 #endif
 
 inline void debug_print_ticks32(uint32_t clock_hz, char *sign, uint32_t from,
-                         char *base_from, uint32_t to,char *base_to) {
-    if(ENABLE_DEBUG_PRINT_TICK_CONVERSION){
+                                char *base_from, uint32_t to, char *base_to)
+{
+    if (ENABLE_DEBUG_PRINT_TICK_CONVERSION) {
         print_str("32bit ");
         print_u32_dec(clock_hz);
         print_str(" ");
@@ -74,8 +73,9 @@ inline void debug_print_ticks32(uint32_t clock_hz, char *sign, uint32_t from,
 }
 
 inline void debug_print_ticks64(uint32_t clock_hz, char *sign, uint64_t from,
-                         char *base_from, uint64_t to,char *base_to) {
-    if(ENABLE_DEBUG_PRINT_TICK_CONVERSION){
+                                char *base_from, uint64_t to, char *base_to)
+{
+    if (ENABLE_DEBUG_PRINT_TICK_CONVERSION) {
         print_str("64bit ");
         print_u32_dec(clock_hz);
         print_str(" ");
@@ -163,7 +163,6 @@ static inline uint64_t _xtimer_ticks_from_usec64(uint64_t us) {
 }
 
 static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
-    DEBUG_PRINT_TICKS_32(XTIMER_HZ, "=", ticks, ticks, "us");
     debug_print_ticks32(XTIMER_HZ, "=", ticks, "ticks", ticks, "us");
     return ticks; /* no-op */
 }
