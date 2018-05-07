@@ -25,35 +25,7 @@
 
 #include "cpu_conf_common.h"
 
-#if defined(CPU_MODEL_STM32F401RE)
-#include "vendor/stm32f401xe.h"
-#elif defined(CPU_MODEL_STM32F407VG)
-#include "vendor/stm32f407xx.h"
-#elif defined(CPU_MODEL_STM32F410RB)
-#include "vendor/stm32f410rx.h"
-#elif defined(CPU_MODEL_STM32F411RE)
-#include "vendor/stm32f411xe.h"
-#elif defined(CPU_MODEL_STM32F412ZG)
-#include "vendor/stm32f412zx.h"
-#elif defined(CPU_MODEL_STM32F413CG) || defined(CPU_MODEL_STM32F413RG) \
-    || defined(CPU_MODEL_STM32F413MG) || defined(CPU_MODEL_STM32F413VG) \
-    || defined(CPU_MODEL_STM32F413ZG) || defined(CPU_MODEL_STM32F413CH) \
-    || defined(CPU_MODEL_STM32F413RH) || defined(CPU_MODEL_STM32F413MH) \
-    || defined(CPU_MODEL_STM32F413VH) || defined(CPU_MODEL_STM32F413ZH)
-#include "vendor/stm32f413xx.h"
-#elif defined(CPU_MODEL_STM32F415RG)
-#include "vendor/stm32f415xx.h"
-#elif defined(CPU_MODEL_STM32F423CH) || defined(CPU_MODEL_STM32F423RH) \
-    || defined(CPU_MODEL_STM32F423MH) || defined(CPU_MODEL_STM32F423VH) \
-    || defined(CPU_MODEL_STM32F423ZH)
-#include "vendor/stm32f423xx.h"
-#elif defined(CPU_MODEL_STM32F429ZI)
-#include "vendor/stm32f429xx.h"
-#elif defined(CPU_MODEL_STM32F437VG)
-#include "vendor/stm32f437xx.h"
-#elif defined(CPU_MODEL_STM32F446RE) || defined(CPU_MODEL_STM32F446ZE)
-#include "vendor/stm32f446xx.h"
-#endif
+#include "vendor/stm32f4xx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,27 +36,19 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
-#if defined(CPU_MODEL_STM32F401RE)
+#if defined(CPU_LINE_STM32F401xE)
 #define CPU_IRQ_NUMOF                   (85U)
-#elif defined(CPU_MODEL_STM32F407VG) || defined(CPU_MODEL_STM32F415RG)
+#elif defined(CPU_LINE_STM32F407xx) || defined(CPU_LINE_STM32F415xx)
 #define CPU_IRQ_NUMOF                   (82U)
-#elif defined(CPU_MODEL_STM32F410RB)
+#elif defined(CPU_LINE_STM32F410Rx)
 #define CPU_IRQ_NUMOF                   (98U)
-#elif defined(CPU_MODEL_STM32F411RE)
+#elif defined(CPU_LINE_STM32F411xE)
 #define CPU_IRQ_NUMOF                   (86U)
-#elif defined(CPU_MODEL_STM32F412ZG) || defined(CPU_MODEL_STM32F446RE) \
-    || defined(CPU_MODEL_STM32F446ZE)
+#elif defined(CPU_LINE_STM32F412Zx) || defined(CPU_LINE_STM32F446xx)
 #define CPU_IRQ_NUMOF                   (97U)
-#elif defined(CPU_MODEL_STM32F413CG) || defined(CPU_MODEL_STM32F413RG) \
-    || defined(CPU_MODEL_STM32F413MG) || defined(CPU_MODEL_STM32F413VG) \
-    || defined(CPU_MODEL_STM32F413ZG) || defined(CPU_MODEL_STM32F413CH) \
-    || defined(CPU_MODEL_STM32F413RH) || defined(CPU_MODEL_STM32F413MH) \
-    || defined(CPU_MODEL_STM32F413VH) || defined(CPU_MODEL_STM32F413ZH) \
-    || defined(CPU_MODEL_STM32F423CH) || defined(CPU_MODEL_STM32F423RH) \
-    || defined(CPU_MODEL_STM32F423MH) || defined(CPU_MODEL_STM32F423VH) \
-    || defined(CPU_MODEL_STM32F423ZH)
+#elif defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx)
 #define CPU_IRQ_NUMOF                   (102U)
-#elif defined(CPU_MODEL_STM32F429ZI) || defined(CPU_MODEL_STM32F437VG)
+#elif defined(CPU_LINE_STM32F429xx) || defined(CPU_LINE_STM32F437xx)
 #define CPU_IRQ_NUMOF                   (91U)
 #endif
 #define CPU_FLASH_BASE                  FLASH_BASE
