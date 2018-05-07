@@ -1,6 +1,8 @@
 # export the CPU family so we can differentiate between them in the code
 FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
 export CFLAGS += -DCPU_FAM_$(FAM)
+CPU_LINE = CPU_LINE_$(shell echo $(CPU_MODEL) | cut -c -9 | tr 'a-z-' 'A-Z_')
+export CFLAGS += -D$(CPU_LINE)
 
 # include common periph module
 USEMODULE += periph_common
@@ -25,6 +27,7 @@ include $(RIOTCPU)/stm32_common/stm32_mem_lengths.mk
 
 info-stm32:
 	@$(COLOR_ECHO) "CPU: $(CPU_MODEL)"
+	@$(COLOR_ECHO) "\tLine: $(CPU_LINE)"
 	@$(COLOR_ECHO) "\tPin count:\t$(STM32_PINCOUNT)"
 	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN)"
 	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN)"
