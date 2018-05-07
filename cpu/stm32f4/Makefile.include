@@ -3,5 +3,8 @@ export CPU_FAM  = stm32f4
 
 USEMODULE += pm_layered
 
+# this STM32 CPU has flash sectors instead of (equally sized) pages
+export CFLAGS += -DFLASH_SECTORS
+
 include $(RIOTCPU)/stm32_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

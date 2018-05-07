@@ -48,6 +48,37 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Flash sector configuration
+ * @{
+ */
+#if defined(CPU_MODEL_STM32F401RE)
+#define FLASHSECTOR_SMALL_SECTOR    (16U)
+#define FLASHSECTOR_BANK_SIZE       (512U)
+#define FLASHSECTOR_NUMOF           (8U)
+#elif defined(CPU_MODEL_STM32F407VG)
+#define FLASHSECTOR_SMALL_SECTOR    (16U)
+#define FLASHSECTOR_BANK_SIZE       (1024U)
+#define FLASHSECTOR_NUMOF           (12U)
+#elif defined(CPU_MODEL_STM32F411RE)
+#define FLASHSECTOR_SMALL_SECTOR    (16U)
+#define FLASHSECTOR_BANK_SIZE       (512U)
+#define FLASHSECTOR_NUMOF           (8U)
+#elif defined(CPU_MODEL_STM32F413ZH)
+#define FLASHSECTOR_SMALL_SECTOR    (16U)
+#define FLASHSECTOR_BANK_SIZE       (1536U)
+#define FLASHSECTOR_NUMOF           (16U)
+#elif defined(CPU_MODEL_STM32F415RG)
+#define FLASHSECTOR_SMALL_SECTOR    (16U)
+#define FLASHSECTOR_BANK_SIZE       (1024U)
+#define FLASHSECTOR_NUMOF           (12U)
+#elif defined(CPU_MODEL_STM32F446RE)
+#define FLASHSECTOR_SMALL_SECTOR    (16U)
+#define FLASHSECTOR_BANK_SIZE       (512U)
+#define FLASHSECTOR_NUMOF           (8U)
+#endif
+/** @} */
+
+/**
  * @brief   ARM Cortex-M specific CPU configuration
  * @{
  */
