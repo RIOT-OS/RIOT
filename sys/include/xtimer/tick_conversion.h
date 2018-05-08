@@ -24,11 +24,8 @@
 #error "Do not include this file directly! Use xtimer.h instead"
 #endif
 
-#include <stdio.h>
-#include <string.h>
-
-#include "fmt.h"
 #include "div.h"
+#include "fmt.h"
 
 #ifdef __cplusplus
 extern "C" {
