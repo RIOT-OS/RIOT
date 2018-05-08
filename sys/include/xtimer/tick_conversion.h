@@ -52,28 +52,8 @@ extern "C" {
 #endif
 #endif
 
-inline void debug_print_ticks32(uint32_t clock_hz, char *sign, uint32_t from,
-                                char *base_from, uint32_t to, char *base_to)
-{
-    if (ENABLE_DEBUG_PRINT_TICK_CONVERSION) {
-        print_str("32bit ");
-        print_u32_dec(clock_hz);
-        print_str(" ");
-        print_str(sign);
-        print_str(" 1MHz : ");
-        print_u32_dec(from);
-        print_str(" ");
-        print_str(base_from);
-        print_str(" = ");
-        print_u32_dec(to);
-        print_str(" ");
-        print_str(base_to);
-        print_str("\n");
-    }
-}
-
-inline void debug_print_ticks64(uint32_t clock_hz, char *sign, uint64_t from,
-                                char *base_from, uint64_t to, char *base_to)
+inline void debug_print_ticks(uint32_t clock_hz, char *sign, uint64_t from,
+                              char *base_from, uint64_t to, char *base_to)
 {
     if (ENABLE_DEBUG_PRINT_TICK_CONVERSION) {
         print_str("64bit ");
@@ -105,25 +85,27 @@ inline void debug_print_ticks64(uint32_t clock_hz, char *sign, uint64_t from,
 /* e.g. cc2538 uses a 16 MHz timer */
 static inline uint32_t _xtimer_ticks_from_usec(uint32_t us)
 {
-    debug_print_ticks32(XTIMER_HZ, ">", us, "us", us >> XTIMER_SHIFT, "ticks");
+    debug_print_ticks(XTIMER_HZ, ">", (uint64_t)us, "us",
+                      (uint64_t)(us >> XTIMER_SHIFT), "ticks");
     return (us << XTIMER_SHIFT); /* multiply by power of two */
 }
 
 static inline uint64_t _xtimer_ticks_from_usec64(uint64_t us)
 {
-    debug_print_ticks64(XTIMER_HZ, ">", us, "us", us >> XTIMER_SHIFT, "ticks");
+    debug_print_ticks(XTIMER_HZ, ">", us, "us", us >> XTIMER_SHIFT, "ticks");
     return (us << XTIMER_SHIFT); /* multiply by power of two */
 }
 
 static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks)
 {
-    debug_print_ticks64(XTIMER_HZ, ">", ticks, "ticks", ticks >> XTIMER_SHIFT, "us");
+    debug_print_ticks(XTIMER_HZ, ">", (uint64_t)ticks, "ticks",
+                      (uint64_t)(ticks >> XTIMER_SHIFT), "us");
     return (ticks >> XTIMER_SHIFT); /* divide by power of two */
 }
 
 static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks)
 {
-    debug_print_ticks64(XTIMER_HZ, ">", ticks, "ticks", ticks >> XTIMER_SHIFT, "us");
+    debug_print_ticks(XTIMER_HZ, ">", ticks, "ticks", ticks >> XTIMER_SHIFT, "us");
     return (ticks >> XTIMER_SHIFT); /* divide by power of two */
 }
 
@@ -135,25 +117,27 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks)
 /* e.g. ATmega2560 uses a 250 kHz timer */
 static inline uint32_t _xtimer_ticks_from_usec(uint32_t us)
 {
-    debug_print_ticks32(XTIMER_HZ, "<", us, "us", us >> XTIMER_SHIFT, "ticks");
+    debug_print_ticks(XTIMER_HZ, "<", (uint64_t)us, "us",
+                      (uint64_t)(us >> XTIMER_SHIFT), "ticks");
     return (us >> XTIMER_SHIFT); /* divide by power of two */
 }
 
 static inline uint64_t _xtimer_ticks_from_usec64(uint64_t us)
 {
-    debug_print_ticks64(XTIMER_HZ, "<", us, "us", us >> XTIMER_SHIFT, "ticks");
+    debug_print_ticks(XTIMER_HZ, "<", us, "us", us >> XTIMER_SHIFT, "ticks");
     return (us >> XTIMER_SHIFT); /* divide by power of two */
 }
 
 static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks)
 {
-    debug_print_ticks32(XTIMER_HZ, "<", ticks, "ticks", ticks << XTIMER_SHIFT, "us");
+    debug_print_ticks(XTIMER_HZ, "<", (uint64_t)ticks, "ticks",
+                      (uint64_t)(ticks << XTIMER_SHIFT), "us");
     return (ticks << XTIMER_SHIFT); /* multiply by power of two */
 }
 
 static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks)
 {
-    debug_print_ticks64(XTIMER_HZ, "<", ticks, "ticks", ticks << XTIMER_SHIFT, "us");
+    debug_print_ticks(XTIMER_HZ, "<", ticks, "ticks", ticks << XTIMER_SHIFT, "us");
     return (ticks << XTIMER_SHIFT); /* multiply by power of two */
 }
 #endif /* defined(XTIMER_SHIFT) && (XTIMER_SHIFT != 0) */
@@ -162,25 +146,25 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks)
  * microseconds for representing time values. */
 static inline uint32_t _xtimer_ticks_from_usec(uint32_t us)
 {
-    debug_print_ticks32(XTIMER_HZ, "=", us, "us", us, "ticks");
+    debug_print_ticks(XTIMER_HZ, "=", (uint64_t)us, "us", (uint64_t)us, "ticks");
     return us; /* no-op */
 }
 
 static inline uint64_t _xtimer_ticks_from_usec64(uint64_t us)
 {
-    debug_print_ticks64(XTIMER_HZ, "=", us, "us", us, "ticks");
+    debug_print_ticks(XTIMER_HZ, "=", us, "us", us, "ticks");
     return us; /* no-op */
 }
 
 static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks)
 {
-    debug_print_ticks32(XTIMER_HZ, "=", ticks, "ticks", ticks, "us");
+    debug_print_ticks(XTIMER_HZ, "=", (uint64_t)ticks, "ticks", (uint64_t)ticks, "us");
     return ticks; /* no-op */
 }
 
 static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks)
 {
-    debug_print_ticks32(XTIMER_HZ, "=", ticks, "ticks", ticks, "us");
+    debug_print_ticks(XTIMER_HZ, "=", ticks, "ticks", ticks, "us");
     return ticks; /* no-op */
 }
 #elif XTIMER_HZ == (32768ul)
@@ -190,13 +174,14 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks)
  * (512 / 15625), which reduces the truncation caused by the integer widths */
 static inline uint32_t _xtimer_ticks_from_usec(uint32_t us)
 {
-    debug_print_ticks32(XTIMER_HZ, "<", us, "us", div_u64_by_15625div512(us), "ticks");
+    debug_print_ticks(XTIMER_HZ, "<", (uint64_t)us, "us",
+                      (uint64_t)div_u64_by_15625div512(us), "ticks");
     return div_u32_by_15625div512(us);
 }
 
 static inline uint64_t _xtimer_ticks_from_usec64(uint64_t us)
 {
-    debug_print_ticks64(XTIMER_HZ, "<", us, "us", div_u64_by_15625div512(us), "ticks");
+    debug_print_ticks(XTIMER_HZ, "<", us, "us", div_u64_by_15625div512(us), "ticks");
     return div_u64_by_15625div512(us);
 }
 
@@ -206,7 +191,8 @@ static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks)
     /* Using 64 bit multiplication to avoid truncating the top 9 bits */
     uint64_t us = (uint64_t)ticks * 15625ul;
 
-    debug_print_ticks32(XTIMER_HZ, "<", ticks, "ticks", (us >> 9), "us");
+    debug_print_ticks(XTIMER_HZ, "<", (uint64_t)ticks, "ticks",
+                      (uint64_t)(us >> 9), "us");
     return (us >> 9); /* equivalent to (us / 512) */
 }
 
@@ -215,7 +201,7 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks)
     /* return (us * 15625) / 512; */
     uint64_t us = (uint64_t)ticks * 15625ul;
 
-    debug_print_ticks32(XTIMER_HZ, "<", ticks, "ticks", (us >> 9), "us");
+    debug_print_ticks(XTIMER_HZ, "<", ticks, "ticks", (us >> 9), "us");
     return (us >> 9); /* equivalent to (us / 512) */
 }
 
