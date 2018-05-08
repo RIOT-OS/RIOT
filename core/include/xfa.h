@@ -36,7 +36,7 @@
  *
  * @internal
  */
-#define _XFA_CONST(name, prio) __attribute__((used, section(".roxfa." #name "." #prio)))
+#define _XFA_CONST(name, prio) __attribute__((used, section(".roxfa." #name "." #prio))) const
 
 /**
  * @brief Define a read-only cross-file array
@@ -50,10 +50,10 @@
 #define XFA_INIT_CONST(type, name) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-    const _XFA_CONST(name, 0_) type name [0] = {}; \
-    const _XFA_CONST(name, 9_) type name ## _end [0] = {}; \
+    _XFA_CONST(name, 0_) const type name [0] = {}; \
+    _XFA_CONST(name, 9_) const type name ## _end [0] = {}; \
     _Pragma("GCC diagnostic pop") \
-    extern unsigned __xfa_dummy
+    extern const unsigned __xfa_dummy
 
 /**
  * @brief Define a writable cross-file array
@@ -70,7 +70,7 @@
     _XFA(name, 0_) type name [0] = {}; \
     _XFA(name, 9_) type name ## _end [0] = {}; \
     _Pragma("GCC diagnostic pop") \
-    extern unsigned __xfa_dummy
+    extern const unsigned __xfa_dummy
 
 /**
  * @brief Declare an external read-only cross-file array
