@@ -171,6 +171,11 @@ static void mcps_confirm(McpsConfirm_t *confirm)
                 break;
         }
     }
+    else {
+        msg_t msg;
+        msg.type = MSG_TYPE_LORAMAC_TX_CNF_FAILED;
+        msg_send(&msg, semtech_loramac_pid);
+    }
 }
 
 /* MCPS-Indication event function */
@@ -555,6 +560,14 @@ void *_semtech_loramac_event_loop(void *arg)
                     mac->state = SEMTECH_LORAMAC_STATE_IDLE;
                     break;
                 }
+                case MSG_TYPE_LORAMAC_TX_CNF_FAILED:
+                    DEBUG("[semtech-loramac] loramac TX failed\n");
+                    msg_t msg_ret;
+                    msg_ret.type = MSG_TYPE_LORAMAC_TX_CNF_FAILED;
+                    msg_send(&msg_ret, mac->caller_pid);
+                    /* switch back to idle state now*/
+                    mac->state = SEMTECH_LORAMAC_STATE_IDLE;
+                    break;
                 case MSG_TYPE_LORAMAC_RX:
                 {
                     msg_t msg_ret;
@@ -678,10 +691,18 @@ uint8_t semtech_loramac_recv(semtech_loramac_t *mac)
     /* Wait until the mac receive some information */
     msg_t msg;
     msg_receive(&msg);
-    uint8_t ret = SEMTECH_LORAMAC_TX_DONE;
-    if (msg.type == MSG_TYPE_LORAMAC_RX) {
-        ret = SEMTECH_LORAMAC_DATA_RECEIVED;
-    }
+    uint8_t ret;
+    switch (msg.type) {
+        case MSG_TYPE_LORAMAC_RX:
+            ret = SEMTECH_LORAMAC_DATA_RECEIVED;
+            break;
+        case MSG_TYPE_LORAMAC_TX_CNF_FAILED:
+            ret = SEMTECH_LORAMAC_TX_CNF_FAILED;
+            break;
+        default:
+            ret = SEMTECH_LORAMAC_TX_DONE;
+            break;
+     }
 
     DEBUG("[semtech-loramac] MAC reply received: %d\n", ret);
 

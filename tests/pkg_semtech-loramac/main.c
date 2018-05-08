@@ -411,6 +411,10 @@ static int _cmd_loramac(int argc, char **argv)
                        (char *)loramac.rx_data.payload, loramac.rx_data.port);
                 break;
 
+            case SEMTECH_LORAMAC_TX_CNF_FAILED:
+                puts("Confirmable TX failed");
+                break;
+
             case SEMTECH_LORAMAC_TX_DONE:
                 puts("TX complete, no data received");
                 break;

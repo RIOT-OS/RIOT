@@ -45,6 +45,7 @@ extern "C" {
 #define MSG_TYPE_LORAMAC_TX_DONE       (0x3462)  /**< MAC TX completes */
 #define MSG_TYPE_LORAMAC_RX            (0x3463)  /**< Some data received */
 #define MSG_TYPE_LORAMAC_LINK_CHECK    (0x3464)  /**< Link check info received */
+#define MSG_TYPE_LORAMAC_TX_CNF_FAILED (0x3465)  /**< MAC TX confirmed failed */
 /** @} */
 
 /**
@@ -61,6 +62,7 @@ enum {
     SEMTECH_LORAMAC_NOT_JOINED,                  /**< MAC is not joined */
     SEMTECH_LORAMAC_TX_SCHEDULED,                /**< TX data scheduled */
     SEMTECH_LORAMAC_TX_DONE,                     /**< Transmission completed */
+    SEMTECH_LORAMAC_TX_CNF_FAILED,               /**< Confirmable transmission failed */
     SEMTECH_LORAMAC_DATA_RECEIVED,               /**< Data received */
     SEMTECH_LORAMAC_BUSY                         /**< Internal MAC is busy */
 };
