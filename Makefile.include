@@ -233,6 +233,11 @@ export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 # Add standard include directories
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 
+# Augmentation ldscript for cross file arrays (XFA)
+# this argument must come before any other -T options on the command line,
+# otherwise we get an error message ".text not found for insert"
+export LINKFLAGS += -T$(RIOTBASE)/core/ldscripts/xfa.ld
+
 # process provided features
 -include $(RIOTBOARD)/$(BOARD)/Makefile.features
 
