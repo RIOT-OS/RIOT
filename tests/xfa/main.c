@@ -26,6 +26,7 @@
 #include "xfatest.h"
 
 XFA_INIT(xfatest_t, xfatest);
+XFA_INIT_CONST(xfatest_t, xfatest_const);
 
 /* hack to force inclusion of otherwise unused compilation units */
 extern int hack1;
@@ -33,9 +34,15 @@ extern int hack2;
 
 int main(void)
 {
+    puts("Cross file array test");
+
     unsigned n = XFA_LEN(xfatest_t, xfatest);
     for (unsigned i = 0; i < n; i++) {
-        printf("%u %s\n", xfatest[i].val, xfatest[i].text);
+        printf("(%u/%u): %u, \"%s\"\n", i, n, xfatest[i].val, xfatest[i].text);
+    }
+    n = XFA_LEN(xfatest_t, xfatest_const);
+    for (unsigned i = 0; i < n; i++) {
+        printf("(%u/%u): %u, \"%s\"\n", i, n, xfatest_const[i].val, xfatest_const[i].text);
     }
 
     hack1 = hack2;
