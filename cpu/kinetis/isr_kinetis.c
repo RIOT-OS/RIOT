@@ -223,4 +223,4 @@ WEAK_DEFAULT void isr_wdog_ewm(void);
  * tables, or link the table from a different CPU, and catch many other mistakes. */
 /* We subtract the expected number of used vectors, which are: The initial stack
  * pointer + the Cortex-M common IRQs + the Kinetis CPU specific IRQs */
-ISR_VECTOR(99) const isr_t vector_padding[(0x400 / sizeof(isr_t)) - 1 - CPU_NONISR_EXCEPTIONS - CPU_IRQ_NUMOF];
+ISR_VECTOR(99) const isr_t vector_padding[(0x400 / sizeof(isr_t)) - 1 - CPU_NONISR_EXCEPTIONS - CPU_IRQ_NUMOF] = {0};
