@@ -27,6 +27,8 @@ static volatile int indicator;
 static kernel_pid_t main_pid;
 static char stack[THREAD_STACKSIZE_DEFAULT];
 
+static const unsigned KITERATIONS = 100;
+
 static void *second_thread(void *arg)
 {
     (void) arg;
@@ -42,6 +44,7 @@ static void *second_thread(void *arg)
 int main(void)
 {
     uint32_t count = 0;
+    uint32_t kcount = 0;
 
     indicator = 0;
     main_pid = thread_getpid();
@@ -64,8 +67,10 @@ int main(void)
             printf("[ERROR] threads did not sleep properly (%d).\n", indicator);
             return 1;
         }
-        if ((count % 100000) == 0) {
-            printf("[ALIVE] alternated %"PRIu32"k times.\n", (count / 1000));
+        if (count == (KITERATIONS * 1000)) {
+            count = 0;
+            kcount += KITERATIONS;
+            printf("[ALIVE] alternated %"PRIu32"k times.\n", kcount);
         }
         mutex_unlock_and_sleep(&mutex);
     }
