@@ -241,6 +241,15 @@ static void mlme_confirm(MlmeConfirm_t *confirm)
             }
             break;
 
+        case MLME_LINK_CHECK:
+            if (confirm->Status == LORAMAC_EVENT_INFO_STATUS_OK) {
+                DEBUG("[semtech-loramac] link check received\n");
+                msg_t msg;
+                msg.type = MSG_TYPE_LORAMAC_LINK_CHECK;
+                msg.content.ptr = confirm;
+                msg_send(&msg, semtech_loramac_pid);
+            }
+
         default:
             break;
     }
@@ -313,6 +322,7 @@ void _init_loramac(semtech_loramac_t *mac,
     semtech_loramac_set_class(mac, LORAMAC_DEFAULT_DEVICE_CLASS);
     semtech_loramac_set_tx_port(mac, LORAMAC_DEFAULT_TX_PORT);
     semtech_loramac_set_tx_mode(mac, LORAMAC_DEFAULT_TX_MODE);
+    mac->link_chk.available = false;
 }
 
 static void _join_otaa(semtech_loramac_t *mac)
@@ -522,6 +532,19 @@ void *_semtech_loramac_event_loop(void *arg)
                     mac->state = SEMTECH_LORAMAC_STATE_IDLE;
                     break;
                 }
+                case MSG_TYPE_LORAMAC_LINK_CHECK:
+                {
+                    MlmeConfirm_t *confirm = (MlmeConfirm_t *)msg.content.ptr;
+                    mac->link_chk.demod_margin = confirm->DemodMargin;
+                    mac->link_chk.nb_gateways = confirm->NbGateways;
+                    mac->link_chk.available = true;
+                    DEBUG("[semtech-loramac] link check info received:\n"
+                          "  - Demodulation marging: %d\n"
+                          "  - Number of gateways: %d\n",
+                          mac->link_chk.demod_margin,
+                          mac->link_chk.nb_gateways);
+                    break;
+                }
                 case MSG_TYPE_LORAMAC_TX_DONE:
                 {
                     DEBUG("[semtech-loramac] loramac TX done\n");
@@ -609,6 +632,16 @@ uint8_t semtech_loramac_join(semtech_loramac_t *mac, uint8_t type)
     return SEMTECH_LORAMAC_JOIN_SUCCEEDED;
 }
 
+void semtech_loramac_request_link_check(semtech_loramac_t *mac)
+{
+    mutex_lock(&mac->lock);
+    mac->link_chk.available = false;
+    MlmeReq_t mlmeReq;
+    mlmeReq.Type = MLME_LINK_CHECK;
+    LoRaMacMlmeRequest(&mlmeReq);
+    mutex_unlock(&mac->lock);
+}
+
 uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
 {
     mutex_lock(&mac->lock);
@@ -616,6 +649,7 @@ uint8_t semtech_loramac_send(semtech_loramac_t *mac, uint8_t *data, uint8_t len)
     mibReq.Type = MIB_NETWORK_JOINED;
     LoRaMacMibGetRequestConfirm(&mibReq);
     bool is_joined = mibReq.Param.IsNetworkJoined;
+    mac->link_chk.available = false;
     mutex_unlock(&mac->lock);
 
     if (!is_joined) {
