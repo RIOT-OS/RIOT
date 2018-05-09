@@ -236,7 +236,7 @@ INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBAS
 # Augmentation ldscript for cross file arrays (XFA)
 # this argument must come before any other -T options on the command line,
 # otherwise we get an error message ".text not found for insert"
-export LINKFLAGS += -T$(RIOTBASE)/core/ldscripts/xfa.ld
+LINKFLAGS += -Txfa.ld
 
 # process provided features
 -include $(RIOTBOARD)/$(BOARD)/Makefile.features
@@ -256,6 +256,10 @@ include $(RIOTCPU)/$(CPU)/Makefile.include
 TOOLCHAINS_SUPPORTED ?= gnu
 # Import all toolchain settings
 include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
+
+# Append ldscript path after importing CPU and board makefiles to allow
+# overriding the core ldscripts
+LINKFLAGS += -L$(RIOTBASE)/core/ldscripts
 
 # Tell ccache to pass the original file to the compiler, instead of passing the
 # preprocessed code. Without this setting, the compilation will fail with
