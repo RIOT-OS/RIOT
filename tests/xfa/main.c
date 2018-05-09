@@ -37,12 +37,14 @@ int main(void)
     puts("Cross file array test");
 
     unsigned n = XFA_LEN(xfatest_t, xfatest);
+    printf("xfatest[%u]:\n", n);
     for (unsigned i = 0; i < n; i++) {
-        printf("(%u/%u): %u, \"%s\"\n", i, n, xfatest[i].val, xfatest[i].text);
+        printf("[%u] = %u, \"%s\"\n", i, xfatest[i].val, xfatest[i].text);
     }
     n = XFA_LEN(xfatest_t, xfatest_const);
+    printf("xfatest_const[%u]:\n", n);
     for (unsigned i = 0; i < n; i++) {
-        printf("(%u/%u): %u, \"%s\"\n", i, n, xfatest_const[i].val, xfatest_const[i].text);
+        printf("[%u] = %u, \"%s\"\n", i, xfatest_const[i].val, xfatest_const[i].text);
     }
 
     hack1 = hack2;
