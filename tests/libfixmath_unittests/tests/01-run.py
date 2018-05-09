@@ -9,9 +9,13 @@
 import os
 import sys
 
+# Float and print operations are slow on boards
+# Got 80 iotlab-m3 and 250 on samr21-xpro
+TIMEOUT = 300
+
 
 def testfunc(child):
-    child.expect('SUCCESS')
+    child.expect('SUCCESS', timeout=TIMEOUT)
 
 
 if __name__ == "__main__":
