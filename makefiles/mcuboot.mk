@@ -1,6 +1,6 @@
 ifdef MCUBOOT_SLOT0_SIZE
 
-IMGTOOL ?= $(RIOTBASE)/dist/tools/mcuboot/imgtool.py
+IMGTOOL ?= $(RIOTTOOLS)/mcuboot/imgtool.py
 override IMGTOOL := $(abspath $(IMGTOOL))
 
 BINFILE ?= $(BINDIR)/$(APPLICATION).bin
