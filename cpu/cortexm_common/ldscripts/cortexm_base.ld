@@ -201,16 +201,15 @@ SECTIONS
     _edata = .; PROVIDE (edata = .);
     .bss (NOLOAD)   :
     {
-      _szero = .;
-      __bss_start = .;
-      __bss_start__ = .;
+        __bss_start = .;
+        __bss_start__ = .;
         *(.dynbss)
         *(.bss .bss.* .gnu.linkonce.b.*)
         *(COMMON)
     } > ram
     . = ALIGN(32 / 8);
     _bss_end__ = . ; __bss_end__ = . ;
-    _ezero = .;
+    __bss_end = .;
     __end__ = . ;
     _end = .; PROVIDE (end = .);
     .stack (NOLOAD) :

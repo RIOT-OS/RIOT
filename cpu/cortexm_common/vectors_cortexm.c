@@ -47,8 +47,8 @@ extern uint32_t _etext;
 extern uint32_t __data_start;
 extern uint32_t __data_end;
 extern uint32_t __data_load_start;
-extern uint32_t _szero;
-extern uint32_t _ezero;
+extern uint32_t __bss_start;
+extern uint32_t __bss_end;
 extern uint32_t _sstack;
 extern uint32_t _estack;
 extern uint8_t _sram;
@@ -101,7 +101,7 @@ void reset_handler_default(void)
         *(dst++) = *(src++);
     }
     /* default bss section to zero */
-    for (dst = &_szero; dst < &_ezero; ++dst) {
+    for (dst = &__bss_start; dst < &__bss_end; ++dst) {
         *dst = 0;
     }
 
