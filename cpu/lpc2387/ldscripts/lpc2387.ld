@@ -184,7 +184,7 @@ SECTIONS
      * collect all initialized .data sections that go into RAM
      * initial values get placed at the end of .text in flash
      */
-    .data : AT (_etext)
+    .data :
     {
         . = ALIGN(4);                   /* ensure data is aligned so relocation can use 4-byte operations */
         _data = .;                      /* create a global symbol marking the start of the .data section  */
@@ -209,7 +209,7 @@ SECTIONS
         KEEP(*(SORT(.fini_array.*)))
             KEEP(*(.fini_array))
             PROVIDE_HIDDEN (__fini_array_end = .);
-    } >ram                              /* put all the above into RAM (but load the LMA copy into FLASH) */
+    } > ram AT> flash                   /* put all the above into RAM (but load the LMA copy into FLASH) */
     . = ALIGN(4);                       /* ensure data is aligned so relocation can use 4-byte operations */
     _edata = .;                         /* define a global symbol marking the end of the .data section  */
 
