@@ -206,7 +206,7 @@ SECTIONS
         *(.dynbss)
         *(.bss .bss.* .gnu.linkonce.b.*)
         *(COMMON)
-    } > ram
+    }
     . = ALIGN(32 / 8);
     _bss_end__ = . ; __bss_end__ = . ;
     __bss_end = .;
@@ -220,7 +220,7 @@ SECTIONS
         KEEP (*(.isr_stack))
         . = ALIGN(8);
         _estack = .;
-    } > ram
+    }
 
     /* heap section */
     . = ALIGN(4);
@@ -228,7 +228,7 @@ SECTIONS
     {
         _sheap = . ;
         _eheap = ORIGIN(ram) + LENGTH(ram) ;
-    } > ram
+    }
 
     /* Stabs debugging sections.  */
     .stab          0 : { *(.stab) }
