@@ -30,7 +30,7 @@ MEMORY
     vectors    : ORIGIN = _rom_start_addr, LENGTH = _vectors_length
     flashsec   : ORIGIN = _rom_start_addr + _vectors_length, LENGTH = _flashsec_length
     rom (rx)   : ORIGIN = _rom_start_addr + _vectors_length + _flashsec_length, LENGTH = _rom_length - (_vectors_length + _flashsec_length)
-    ram (!rx)  : ORIGIN = _ram_start_addr, LENGTH = _ram_length
+    ram (w!rx) : ORIGIN = _ram_start_addr, LENGTH = _ram_length
 }
 
 SECTIONS
