@@ -129,6 +129,17 @@ int ccm_compute_adata_mac(cipher_t* cipher, uint8_t* auth_data,
 }
 
 
+/* Check if 'value' can be stored in 'num_bytes' */
+static inline int _fits_in_nbytes(size_t value, uint8_t num_bytes)
+{
+    /* Not allowed to shift more or equal than left operand width
+     * So we shift by maximum num bits of size_t -1 and compare to 1
+     */
+    unsigned shift = (8 * min(sizeof(size_t), num_bytes)) - 1;
+    return (value >> shift) <= 1;
+}
+
+
 int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data, uint32_t auth_data_len,
                        uint8_t mac_length, uint8_t length_encoding,
                        uint8_t* nonce, size_t nonce_len,
@@ -136,7 +147,6 @@ int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data, uint32_t auth_data_
                        uint8_t* output)
 {
     int len = -1;
-    uint32_t length_max;
     uint8_t nonce_counter[16] = {0}, mac_iv[16] = {0}, mac[16] = {0},
                                 stream_block[16] = {0}, zero_block[16] = {0}, block_size;
 
@@ -144,9 +154,8 @@ int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data, uint32_t auth_data_
         return CCM_ERR_INVALID_MAC_LENGTH;
     }
 
-    length_max = 2 << (8 * length_encoding);
     if (length_encoding < 2 || length_encoding > 8 ||
-            input_len - auth_data_len > length_max) {
+            !_fits_in_nbytes(input_len, length_encoding)) {
         return CCM_ERR_INVALID_LENGTH_ENCODING;
     }
 
@@ -197,7 +206,6 @@ int cipher_decrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
                        uint8_t* input, size_t input_len, uint8_t* plain)
 {
     int len = -1;
-    uint32_t length_max;
     uint8_t nonce_counter[16] = {0}, mac_iv[16] = {0}, mac[16] = {0},
                                 mac_recv[16] = {0}, stream_block[16] = {0}, zero_block[16] = {0},
                                         plain_len, block_size;
@@ -206,9 +214,8 @@ int cipher_decrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
         return CCM_ERR_INVALID_MAC_LENGTH;
     }
 
-    length_max = 2 << (8 * length_encoding);
     if (length_encoding < 2 || length_encoding > 8 ||
-            input_len - auth_data_len > length_max) {
+            !_fits_in_nbytes(input_len, length_encoding)) {
         return CCM_ERR_INVALID_LENGTH_ENCODING;
     }
 

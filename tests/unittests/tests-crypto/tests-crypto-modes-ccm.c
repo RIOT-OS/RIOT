@@ -190,11 +190,71 @@ static void test_crypto_modes_ccm_decrypt(void)
 }
 
 
+typedef int (*func_ccm_t)(cipher_t*, uint8_t*, uint32_t, uint8_t, uint8_t,
+                          uint8_t*, size_t, uint8_t*, size_t, uint8_t*);
+
+static int _test_ccm_len(func_ccm_t func, uint8_t len_encoding,
+                         uint8_t *input, size_t input_len, size_t adata_len)
+{
+    int ret;
+    cipher_t cipher;
+    uint8_t mac_length = 8;
+    uint8_t nonce[15] = {0};
+    uint8_t key[16] = {0};
+
+    uint8_t nonce_len = nonce_and_len_encoding_size - len_encoding;
+    cipher_init(&cipher, CIPHER_AES_128, key, 16);
+
+    ret = func(&cipher, NULL, adata_len, mac_length, len_encoding,
+               nonce, nonce_len, input, input_len, data);
+    return ret;
+}
+
+
+/* Test length checking in ccm functions. */
+static void test_crypto_modes_ccm_check_len(void)
+{
+    int ret;
+    /* Just 1 to big to fit */
+    ret = _test_ccm_len(cipher_encrypt_ccm, 2, NULL, 1 << 16, 0);
+    TEST_ASSERT_EQUAL_INT(CCM_ERR_INVALID_LENGTH_ENCODING, ret);
+    ret = _test_ccm_len(cipher_decrypt_ccm, 2, NULL, 1 << 16, 0);
+    TEST_ASSERT_EQUAL_INT(CCM_ERR_INVALID_LENGTH_ENCODING, ret);
+
+    /* adata_len should not change the result (was wrong in previous implem) */
+    ret = _test_ccm_len(cipher_encrypt_ccm, 2, NULL, 1 << 16, 65535);
+    TEST_ASSERT_EQUAL_INT(CCM_ERR_INVALID_LENGTH_ENCODING, ret);
+    ret = _test_ccm_len(cipher_decrypt_ccm, 2, NULL, 1 << 16, 65535);
+    TEST_ASSERT_EQUAL_INT(CCM_ERR_INVALID_LENGTH_ENCODING, ret);
+
+    /* Valid length that were wrongly checked */
+    /* Check should work with len_encoding >= 4, test with 8 */
+    uint8_t input[8];
+    ret = _test_ccm_len(cipher_encrypt_ccm, 8, input, 8, 0);
+    TEST_ASSERT_MESSAGE(ret > 0, "Encryption : failed with valid input_len");
+
+    /* einput is encrypted value for
+     * - 8 * 0 input
+     * - All 0 nonce and key
+     * - adata_len == 0
+     * - mac_len == 8 and len_encoding = 8
+     */
+    uint8_t einput[16] = {
+        0xa2, 0x46, 0x75, 0xfc, 0x5f, 0x1b, 0x01, 0x37,
+        0x8a, 0x85, 0xd7, 0xf8, 0x42, 0x82, 0x6a, 0x63,
+    };
+
+    ret = _test_ccm_len(cipher_decrypt_ccm, 8, einput, 16, 0);
+    TEST_ASSERT_MESSAGE(ret > 0, "Decryption : failed with valid input_len");
+}
+
+
 Test* tests_crypto_modes_ccm_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_modes_ccm_encrypt),
         new_TestFixture(test_crypto_modes_ccm_decrypt),
+        new_TestFixture(test_crypto_modes_ccm_check_len),
     };
 
     EMB_UNIT_TESTCALLER(crypto_modes_ccm_tests, NULL, NULL, fixtures);
