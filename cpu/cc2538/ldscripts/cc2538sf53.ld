@@ -19,9 +19,9 @@
 /* Memory Space Definitions: */
 MEMORY
 {
-    rom   (rx ) : ORIGIN = 0x00200000, LENGTH = 512K - 44
-    cca   (rx ) : ORIGIN = 0x0027ffd4, LENGTH = 44
-    ram   (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
+    rom (rx)    : ORIGIN = 0x00200000, LENGTH = 512K - 44
+    cca         : ORIGIN = 0x0027ffd4, LENGTH = 44
+    ram (w!rx)  : ORIGIN = 0x20000000, LENGTH = 32K
 }
 
 /* MCU Specific Section Definitions */
