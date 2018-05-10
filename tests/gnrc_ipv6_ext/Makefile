@@ -1,7 +1,7 @@
 # name of your application
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos maple-mini msb-430 msb-430h \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos frdm-ke02z maple-mini msb-430 msb-430h \
                              nrf51dongle nrf6310 nucleo-f031k6 nucleo-f042k6 \
                              nucleo-l031k6 nucleo-f030r8 nucleo-f103rb nucleo-f334r8 nucleo-l053r8 \
                              spark-core stm32f0discovery telosb \

@@ -1,5 +1,10 @@
 FEATURES_PROVIDED += periph_cpuid
+
+# Kinetis E series doesn't have a hardware RNG unit
+ifneq ($(KINETIS_SERIES),E)
 FEATURES_PROVIDED += periph_hwrng
+endif # ifneq ($(KINETIS_SERIES),E)
+
 FEATURES_PROVIDED += periph_gpio
 
 include $(RIOTCPU)/cortexm_common/Makefile.features

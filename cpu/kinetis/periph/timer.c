@@ -2,6 +2,7 @@
  * Copyright (C) 2016 Eistec AB
  * Copyright (C) 2014 Freie Universität Berlin
  * Copyright (C) 2014-2015 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2018 Ishraq Ibne Ashraf
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -20,6 +21,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * @}
  */
@@ -94,10 +96,12 @@ typedef struct {
 } lptmr_t;
 
 static const pit_conf_t pit_config[PIT_NUMOF] = PIT_CONFIG;
+#if defined(LPTMR0)
 static const lptmr_conf_t lptmr_config[LPTMR_NUMOF] = LPTMR_CONFIG;
+static lptmr_t lptmr[LPTMR_NUMOF];
+#endif /* defined(LPTMR0) */
 
 static pit_t pit[PIT_NUMOF];
-static lptmr_t lptmr[LPTMR_NUMOF];
 
 /**
  * @brief  Find out whether a given timer is a LPTMR or a PIT timer
@@ -341,6 +345,7 @@ static inline void pit_irq_handler(tim_t dev)
 /* ****** LPTMR module functions ****** */
 
 /* Forward declarations */
+#if defined(LPTMR0)
 static inline int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg);
 static inline int lptmr_set(uint8_t dev, uint16_t timeout);
 static inline int lptmr_set_absolute(uint8_t dev, uint16_t target);
@@ -582,6 +587,7 @@ static inline void lptmr_irq_handler(tim_t tim)
 
     cortexm_isr_end();
 }
+#endif /* defined(LPTMR0) */
 
 /* ****** Common timer API functions ****** */
 
@@ -595,8 +601,10 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
     switch (_timer_variant(dev)) {
         case TIMER_PIT:
             return pit_init(_pit_index(dev), freq, cb, arg);
+#if defined(LPTMR0)
         case TIMER_LPTMR:
             return lptmr_init(_lptmr_index(dev), freq, cb, arg);
+#endif /* defined(LPTMR0) */
         default:
             return -1;
     }
@@ -616,8 +624,10 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
     switch (_timer_variant(dev)) {
         case TIMER_PIT:
             return pit_set(_pit_index(dev), timeout);
+#if defined(LPTMR0)
         case TIMER_LPTMR:
             return lptmr_set(_lptmr_index(dev), timeout);
+#endif /* defined(LPTMR0) */
         default:
             return -1;
     }
@@ -637,8 +647,10 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int target)
     switch (_timer_variant(dev)) {
         case TIMER_PIT:
             return pit_set_absolute(_pit_index(dev), target);
+#if defined(LPTMR0)
         case TIMER_LPTMR:
-            return lptmr_set_absolute(_lptmr_index(dev), target);;
+            return lptmr_set_absolute(_lptmr_index(dev), target);
+#endif /* defined(LPTMR0) */
         default:
             return -1;
     }
@@ -660,8 +672,10 @@ int timer_clear(tim_t dev, int channel)
     switch (_timer_variant(dev)) {
         case TIMER_PIT:
             return pit_clear(_pit_index(dev));
+#if defined(LPTMR0)
         case TIMER_LPTMR:
             return lptmr_clear(_lptmr_index(dev));
+#endif /* defined(LPTMR0) */
         default:
             return -1;
     }
@@ -679,8 +693,10 @@ unsigned int timer_read(tim_t dev)
     switch (_timer_variant(dev)) {
         case TIMER_PIT:
             return pit_read(_pit_index(dev));
+#if defined(LPTMR0)
         case TIMER_LPTMR:
             return lptmr_read(_lptmr_index(dev));
+#endif /* defined(LPTMR0) */
         default:
             return 0;
     }
@@ -697,9 +713,11 @@ void timer_start(tim_t dev)
         case TIMER_PIT:
             pit_start(_pit_index(dev));
             return;
+#if defined(LPTMR0)
         case TIMER_LPTMR:
             lptmr_start(_lptmr_index(dev));
             return;
+#endif /* defined(LPTMR0) */
         default:
             return;
     }
@@ -716,9 +734,11 @@ void timer_stop(tim_t dev)
         case TIMER_PIT:
             pit_stop(_pit_index(dev));
             return;
+#if defined(LPTMR0)
         case TIMER_LPTMR:
             lptmr_stop(_lptmr_index(dev));
             return;
+#endif /* defined(LPTMR0) */
         default:
             return;
     }

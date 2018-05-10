@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := chronos telosb nucleo-f042k6 nucleo-f031k6 \
+BOARD_INSUFFICIENT_MEMORY := chronos frdm-ke02z telosb nucleo-f042k6 nucleo-f031k6 \
                              nucleo-f030r8 nucleo-l053r8 nucleo-l031k6 \
                              stm32f0discovery z1
 

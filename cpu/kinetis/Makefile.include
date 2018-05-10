@@ -37,7 +37,12 @@ export UNDEF += $(BINDIR)/cpu/fcfield.o
 USEMODULE += periph_common
 
 # select kinetis periph drivers
+
+# Kinetis E series doesn't have a MCG unit
+ifneq ($(KINETIS_SERIES),E)
 USEMODULE += periph_mcg
+endif # ifneq ($(KINETIS_SERIES),E)
+
 USEMODULE += periph_wdog
 
 # Define a recipe to build the watchdog disable binary, used when flashing

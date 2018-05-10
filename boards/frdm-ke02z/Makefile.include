@@ -1,0 +1,10 @@
+# define the cpu used by the board
+export CPU = kinetis
+export CPU_MODEL = mke02z64vqh2
+export KINETIS_RAMSIZE = 4
+
+# Include default FRDM board config
+include $(RIOTBOARD)/common/frdm/Makefile.include
+
+# No RNG
+FEATURES_PROVIDED := $(filter-out periph_hwrng,$(FEATURES_PROVIDED))

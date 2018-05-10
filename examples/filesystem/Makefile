@@ -14,7 +14,7 @@ BOARD_BLACKLIST :=  chronos \
                     z1 \
                     #
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
+BOARD_INSUFFICIENT_MEMORY := frdm-ke02z nucleo-f031k6
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..

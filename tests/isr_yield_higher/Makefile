@@ -1,7 +1,7 @@
 APPLICATION = isr_yield_higher
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
+BOARD_INSUFFICIENT_MEMORY := frdm-ke02z nucleo-f031k6
 
 USEMODULE += xtimer
 

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 PHYTEC Messtechnik GmbH
  * Copyright (C) 2015 Eistec AB
+ * Copyright (C) 2018 Ishraq Ibne Ashraf
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -18,6 +19,7 @@
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * @}
  */
@@ -70,7 +72,15 @@ void wdog_disable(void)
                                | WDOG_STCTRLH_ALLOWUPDATE_MASK
                                | WDOG_STCTRLH_CLKSRC_MASK);
 #else
+
+/* Kinetis E series doesn't have COPC register in the SIM unit */
+#if !defined(KINETIS_SERIES_E)
     /* disable the COP WDOG */
     SIM->COPC = (uint32_t)0x00u;
+#else /* !defined(KINETIS_SERIES_E) */
+    /* Disable watchdog */
+    WDOG->CS1 &= ~(WDOG_CS1_EN_MASK);
+#endif /* !defined(KINETIS_SERIES_E) */
+
 #endif
 }

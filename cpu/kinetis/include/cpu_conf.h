@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Eistec AB
+ * Copyright (C) 2018 Ishraq Ibne Ashraf
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,6 +15,7 @@
  * @brief           Implementation specific CPU configuration options
  *
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author          Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  */
 
 #ifndef CPU_CONF_H
@@ -30,6 +32,8 @@
 #include "cpu_conf_kinetis_v.h"
 #elif defined(KINETIS_SERIES_W)
 #include "cpu_conf_kinetis_w.h"
+#elif defined(KINETIS_SERIES_E)
+#include "cpu_conf_kinetis_e.h"
 #endif /* defined(KINETIS_SERIES_x) */
 
 #ifndef MCU_MEM_MAP_VERSION

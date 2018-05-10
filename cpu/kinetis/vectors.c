@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Eistec AB
+ * Copyright (C) 2018 Ishraq Ibne Ashraf
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -15,6 +16,7 @@
  * @brief Interrupt vector for Kinetis MCUs
  *
  * @author Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * @note It is not necessary to modify this file to define custom interrupt
  * service routines. All symbols are defined weak, it is only necessary to
@@ -191,15 +193,21 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [UART0_LON_IRQn  ] = isr_uart0_lon,       /* UART0 LON interrupt */
 #endif
     [UART0_RX_TX_IRQn] = isr_uart0_rx_tx,     /* UART0 Receive/Transmit interrupt */
+#if !defined(KINETIS_SERIES_E)
     [UART0_ERR_IRQn  ] = isr_uart0_err,       /* UART0 Error interrupt */
+#endif
 #endif
 #ifdef UART1
     [UART1_RX_TX_IRQn] = isr_uart1_rx_tx,     /* UART1 Receive/Transmit interrupt */
+#if !defined(KINETIS_SERIES_E)
     [UART1_ERR_IRQn  ] = isr_uart1_err,       /* UART1 Error interrupt */
+#endif
 #endif
 #ifdef UART2
     [UART2_RX_TX_IRQn] = isr_uart2_rx_tx,     /* UART2 Receive/Transmit interrupt */
+#if !defined(KINETIS_SERIES_E)
     [UART2_ERR_IRQn  ] = isr_uart2_err,       /* UART2 Error interrupt */
+#endif
 #endif
 #ifdef UART3
     [UART3_RX_TX_IRQn] = isr_uart3_rx_tx,     /* UART3 Receive/Transmit interrupt */
@@ -251,16 +259,20 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #endif
 #ifdef RTC
     [RTC_IRQn        ] = isr_rtc,             /* RTC interrupt */
+#if !defined(KINETIS_SERIES_E)
     [RTC_Seconds_IRQn] = isr_rtc_seconds,     /* RTC seconds interrupt */
 #endif
+#endif
 #ifdef PIT
-#ifdef KINETIS_CORE_Z
+#if defined(KINETIS_CORE_Z) && !defined(KINETIS_SERIES_E)
     [PIT_IRQn        ] = isr_pit,             /* PIT any channel interrupt */
 #else
     [PIT0_IRQn       ] = isr_pit0,            /* PIT timer channel 0 interrupt */
     [PIT1_IRQn       ] = isr_pit1,            /* PIT timer channel 1 interrupt */
+#if !defined(KINETIS_SERIES_E)
     [PIT2_IRQn       ] = isr_pit2,            /* PIT timer channel 2 interrupt */
     [PIT3_IRQn       ] = isr_pit3,            /* PIT timer channel 3 interrupt */
+#endif
 #endif
 #endif /* defined(PIT) */
 #ifdef PDB0
@@ -284,6 +296,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #ifdef LPTMR0
     [LPTMR0_IRQn     ] = isr_lptmr0,          /* LPTimer interrupt */
 #endif
+#if !defined(KINETIS_SERIES_E)
 #ifdef PORTA
     [PORTA_IRQn      ] = isr_porta,           /* Port A interrupt */
 #endif
@@ -304,6 +317,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #ifdef PORTE
     [PORTE_IRQn      ] = isr_porte,           /* Port E interrupt */
 #endif
+#endif /* !defined(KINETIS_SERIES_E) */
 #endif
 #if __CORTEX_M >= 3
     [SWI_IRQn        ] = isr_swi,             /* Software interrupt */

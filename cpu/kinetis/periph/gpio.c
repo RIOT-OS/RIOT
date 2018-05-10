@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  * Copyright (C) 2014 Eistec AB
+ * Copyright (C) 2018 Ishraq Ibne Ashraf
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -21,6 +22,7 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * @}
  */
@@ -122,22 +124,38 @@ static inline PORT_Type *port(gpio_t pin)
 
 static inline GPIO_Type *gpio(gpio_t pin)
 {
+#if !defined(KINETIS_SERIES_E)
     return (GPIO_Type *)(GPIO_ADDR_BASE | (pin & GPIO_ADDR_MASK));
+#else /* !defined(KINETIS_SERIES_E) */
+    return (GPIO_Type *)(GPIOA_BASE + (((uint8_t)((pin >> 8) / 4)) * 64));
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 static inline int port_num(gpio_t pin)
 {
+#if !defined(KINETIS_SERIES_E)
     return (int)((pin >> GPIO_SHIFT) & 0x7);
+#else /* !defined(KINETIS_SERIES_E) */
+    return (int)(pin >> 8);
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 static inline int pin_num(gpio_t pin)
 {
+#if !defined(KINETIS_SERIES_E)
     return (int)(pin & 0x3f);
+#else /* !defined(KINETIS_SERIES_E) */
+    return (int)((pin & 0xff) + (((pin >> 8) - (((uint8_t)((pin >> 8) / 4)) * 4)) * 8));
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 static inline void clk_en(gpio_t pin)
 {
+    (void)pin;
+
+#if !defined(KINETIS_SERIES_E)
     bit_set32(&SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT + port_num(pin));
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 /**
@@ -145,7 +163,15 @@ static inline void clk_en(gpio_t pin)
  */
 static inline int get_ctx(int port, int pin)
 {
+    (void)port;
+    (void)pin;
+    (void)isr_map;
+
+#if !defined(KINETIS_SERIES_E)
     return (isr_map[(port * 4) + (pin >> 3)] >> ((pin & 0x7) * 4)) & 0xf;
+#else /* !defined(KINETIS_SERIES_E) */
+    return -1;
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 /**
@@ -153,12 +179,18 @@ static inline int get_ctx(int port, int pin)
  */
 static int get_free_ctx(void)
 {
+    (void)isr_ctx;
+
+#if !defined(KINETIS_SERIES_E)
     for (unsigned int i = 0; i < CTX_NUMOF; i++) {
         if (isr_ctx[i].cb == NULL) {
             return i;
         }
     }
     return -1;
+#else /* !defined(KINETIS_SERIES_E) */
+    return -1;
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 /**
@@ -166,8 +198,15 @@ static int get_free_ctx(void)
  */
 static void write_map(int port, int pin, int ctx)
 {
+    (void)port;
+    (void)pin;
+    (void)ctx;
+    (void)isr_map;
+
+#if !defined(KINETIS_SERIES_E)
     isr_map[(port * 4) + (pin >> 3)] &= ~(0xf << ((pin & 0x7) * 4));
     isr_map[(port * 4) + (pin >> 3)] |=  (ctx << ((pin & 0x7) * 4));
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 /**
@@ -175,31 +214,62 @@ static void write_map(int port, int pin, int ctx)
  */
 static void ctx_clear(int port, int pin)
 {
+    (void)port;
+    (void)pin;
+    (void)write_map;
+
+#if !defined(KINETIS_SERIES_E)
     int ctx = get_ctx(port, pin);
     write_map(port, pin, ctx);
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    /* set pin to analog mode while configuring it */
-    gpio_init_port(pin, GPIO_AF_ANALOG);
-
     /* set pin direction */
     if (mode & MODE_OUT) {
         gpio(pin)->PDDR |=  (1 << pin_num(pin));
+
+#if defined(KINETIS_SERIES_E)
+        /* Input disable */
+        gpio(pin)->PIDR |= (1 << pin_num(pin));
+#endif /* defined(KINETIS_SERIES_E) */
+
     }
     else {
         gpio(pin)->PDDR &= ~(1 << pin_num(pin));
+
+#if defined(KINETIS_SERIES_E)
+        /* Input enable */
+        gpio(pin)->PIDR &= ~(1 << pin_num(pin));
+#endif /* defined(KINETIS_SERIES_E) */
+
     }
+
+#if !defined(KINETIS_SERIES_E)
+    /* set pin to analog mode while configuring it */
+    gpio_init_port(pin, GPIO_AF_ANALOG);
 
     /* enable GPIO function */
     port(pin)->PCR[pin_num(pin)] = (GPIO_AF_GPIO | (mode & MODE_PCR_MASK));
+#endif /* !defined(KINETIS_SERIES_E) */
+
     return 0;
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
+    (void)pin;
+    (void)mode;
+    (void)flank;
+    (void)cb;
+    (void)arg;
+    (void)write_map;
+    (void)get_free_ctx;
+    (void)isr_ctx;
+
+#if !defined(KINETIS_SERIES_E)
     if (gpio_init(pin, mode) < 0) {
         return -1;
     }
@@ -225,10 +295,18 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* finally, enable the interrupt for the selected pin */
     port(pin)->PCR[pin_num(pin)] |= flank;
     return 0;
+#else /* !defined(KINETIS_SERIES_E) */
+    return -1;
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 void gpio_init_port(gpio_t pin, uint32_t pcr)
 {
+    (void)pin;
+    (void)pcr;
+    (void)ctx_clear;
+
+#if !defined(KINETIS_SERIES_E)
     /* enable PORT clock in case it was not active before */
     clk_en(pin);
 
@@ -242,19 +320,28 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
     if (isr_state & PORT_PCR_IRQC_MASK) {
         ctx_clear(port_num(pin), pin_num(pin));
     }
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 void gpio_irq_enable(gpio_t pin)
 {
+    (void)pin;
+
+#if !defined(KINETIS_SERIES_E)
     int ctx = get_ctx(port_num(pin), pin_num(pin));
     port(pin)->PCR[pin_num(pin)] |= isr_ctx[ctx].state;
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
+    (void)pin;
+
+#if !defined(KINETIS_SERIES_E)
     int ctx = get_ctx(port_num(pin), pin_num(pin));
     isr_ctx[ctx].state = port(pin)->PCR[pin_num(pin)] & PORT_PCR_IRQC_MASK;
     port(pin)->PCR[pin_num(pin)] &= ~(PORT_PCR_IRQC_MASK);
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
 int gpio_read(gpio_t pin)
@@ -294,6 +381,10 @@ void gpio_write(gpio_t pin, int value)
 
 static inline void irq_handler(PORT_Type *port, int port_num)
 {
+    (void)port;
+    (void)port_num;
+
+#if !defined(KINETIS_SERIES_E)
     /* take interrupt flags only from pins which interrupt is enabled */
     uint32_t status = port->ISFR;
 
@@ -305,8 +396,10 @@ static inline void irq_handler(PORT_Type *port, int port_num)
         }
     }
     cortexm_isr_end();
+#endif /* !defined(KINETIS_SERIES_E) */
 }
 
+#if !defined(KINETIS_SERIES_E)
 #ifdef PORTA_BASE
 void isr_porta(void)
 {
@@ -364,3 +457,4 @@ void isr_portb_portc(void)
     irq_handler(PORTC, 2);
 }
 #endif
+#endif /* !defined(KINETIS_SERIES_E) */

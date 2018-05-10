@@ -6,7 +6,7 @@ BOARD ?= native
 
 # stm32f0discovery objects are too big with ARM Embedded Toolchain v4.9.3 20141119
 # (used currently by travis)
-BOARD_INSUFFICIENT_MEMORY= nucleo-f031k6 nucleo-f042k6 stm32f0discovery
+BOARD_INSUFFICIENT_MEMORY= frdm-ke02z nucleo-f031k6 nucleo-f042k6 stm32f0discovery
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..

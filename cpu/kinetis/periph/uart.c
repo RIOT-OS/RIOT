@@ -2,6 +2,7 @@
  * Copyright (C) 2017 Eistec AB
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2018 Ishraq Ibne Ashraf
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -20,6 +21,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * @}
  */
@@ -267,7 +269,9 @@ static inline void irq_handler_uart(uart_t uart)
 #if (KINETIS_UART_ADVANCED == 0)
     /* clear overrun flag */
     if (dev->S1 & UART_S1_OR_MASK) {
+#if !defined(KINETIS_SERIES_E)
         dev->S1 = UART_S1_OR_MASK;
+#endif /* !defined(KINETIS_SERIES_E) */
     }
 #endif
 

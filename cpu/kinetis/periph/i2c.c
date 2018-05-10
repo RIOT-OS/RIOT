@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  * Copyright (C) 2015 Eistec AB
+ * Copyright (C) 2018 Ishraq Ibne Ashraf
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -21,6 +22,7 @@
  *
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * @}
  */
@@ -89,6 +91,10 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     int pin_sda = 0;
     uint32_t baudrate_flags = 0;
 
+    (void)pin_scl;
+    (void)pin_sda;
+    (void)i2c_port;
+
     /** @todo Kinetis I2C: Add automatic baud rate flags selection function */
     /*
      * See the Chapter "I2C divider and hold values":
@@ -136,11 +142,16 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
 
         case I2C_0:
             i2c = I2C_0_DEV;
+
+#if !defined(KINETIS_SERIES_E)
             i2c_port = I2C_0_PORT;
             pin_scl = I2C_0_SCL_PIN;
             pin_sda = I2C_0_SDA_PIN;
-            I2C_0_CLKEN();
             I2C_0_PORT_CLKEN();
+#endif /* !defined(KINETIS_SERIES_E) */
+
+            I2C_0_CLKEN();
+
             break;
 #endif
 
@@ -148,9 +159,11 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             return -1;
     }
 
+#if !defined(KINETIS_SERIES_E)
     /* configure pins, alternate output */
     i2c_port->PCR[pin_scl] = I2C_0_PORT_CFG;
     i2c_port->PCR[pin_sda] = I2C_0_PORT_CFG;
+#endif /* !defined(KINETIS_SERIES_E) */
 
     i2c->F = baudrate_flags;
 

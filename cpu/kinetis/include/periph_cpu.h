@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015-2016 Freie Universität Berlin
  * Copyright (C) 2017-2018 Eistec AB
+ * Copyright (C) 2018 Ishraq Ibne Ashraf
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author          Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  */
 
 #ifndef PERIPH_CPU_H
@@ -46,9 +48,14 @@ typedef uint16_t gpio_t;
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
+#if !defined(KINETIS_SERIES_E)
 #define GPIO_PIN(x, y)      (((x + 1) << 12) | (x << 6) | y)
+#else /* !defined(KINETIS_SERIES_E) */
+#define GPIO_PIN(x, y)      (((x) << 8) | (y))
+#endif /* !defined(KINETIS_SERIES_E) */
 
 #ifdef SIM_UIDH_UID_MASK
+#if !defined(KINETIS_SERIES_E)
 /* Kinetis Cortex-M4 has a 128 bit SIM UID */
 /**
  * @brief   Starting offset of CPU_ID
@@ -59,6 +66,17 @@ typedef uint16_t gpio_t;
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (16U)
+#else /* !defined(KINETIS_SERIES_E) */
+/* Kinetis E series has a 64 bit SIM UID */
+/**
+ * @brief   Starting offset of CPU_ID
+ */
+#define CPUID_ADDR          (&SIM->UIDL)
+/**
+ * @brief   Length of the CPU_ID in octets
+ */
+#define CPUID_LEN           (8U)
+#endif /* !defined(KINETIS_SERIES_E) */
 #else /* defined(SIM_UIDH_UID_MASK) */
 /* Kinetis Cortex-M0+ has a 96 bit SIM UID */
 /**
@@ -179,6 +197,9 @@ enum {
     PORT_E = 4,             /**< port E */
     PORT_F = 5,             /**< port F */
     PORT_G = 6,             /**< port G */
+#if defined(KINETIS_SERIES_E)
+    PORT_H = 7,             /**< port H */
+#endif /* defined(KINETIS_SERIES_E) */
     GPIO_PORTS_NUMOF        /**< overall number of available ports */
 };
 

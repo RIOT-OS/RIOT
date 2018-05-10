@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Eistec AB
+ * Copyright (C) 2018 Ishraq Ibne Ashraf
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           CPU specific definitions common to all Kinetis CPUs
  *
  * @author          Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author          Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  */
 
 #ifndef CPU_CONF_KINETIS_H
@@ -157,6 +159,28 @@ extern "C"
 #define PIT_TCTRL_CHN_SHIFT  (2)
 #define PORT_IRQS   { PORTA_IRQn, PORTB_IRQn, PORTC_IRQn, PORTD_IRQn, PORTE_IRQn }
 #endif /* MK20D7_H_ */
+/** @} */
+
+/**
+ * @name MKE02Z Compatibility layer
+ * @{
+ */
+#if defined(MKE02Z_H_)
+#define PORT_PCR_MUX(n) 0
+#define PORT_PCR_PE_MASK 0
+#define PORT_PCR_PS_MASK 0
+#define PORT_PCR_IRQC(n) 0
+#define ADC_CFG1_MODE(n) 0
+#define SPI_CTAR_CPHA_MASK 0
+#define SPI_CTAR_CPOL_MASK 0
+typedef struct {} LPTMR_Type;
+#define MCG_C4_DRST_DRS(n) 0
+#define MCG_C4_DMX32_MASK 0
+#define MCG_C2_RANGE0(n) 0
+#define PORTA_BASE 0
+#define SIM_SCGC5_PORTA_SHIFT 0
+#define PIT_CLKEN() (bit_set32(&SIM->SCGC, SIM_SCGC_PIT_SHIFT))
+#endif /* MKE02Z_H_ */
 /** @} */
 
 
