@@ -1,3 +1,132 @@
+RIOT-2018.4 - Release Notes
+============================
+RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are typically
+found in the Internet of Things: 8-bit and 16-bit microcontrollers as well as
+light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency, soft
+real-time capabilities, small memory footprint, modularity, and uniform API
+access, independent of the underlying hardware (with partial POSIX compliance).
+
+RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community) and is
+licensed with a non-viral copyleft license (LGPLv2.1), which allows indirect
+business models around the free open-source software platform provided by RIOT.
+
+
+About this release:
+===================
+The 2018.04 release includes major progress in support for current crypto
+libraries.  A lot of work has gone into updating drivers to RIOT's unified
+configuration scheme.  Support for ten new boards has been added.  In our quest
+to improve and automate testing, many test scripts have been fixed and
+improved, and RIOT's CI now runs many tests on real hardware during its nightly
+build testing. And as usual, many tiny fixes and improvements have been merged.
+
+About 390 pull requests with about 1073 commits have been merged since the last
+release and about 54 issues have been solved. 44 people contributed with code
+in 98 days. Approximately 1491 files have been touched with 208426 insertions.
+
+
+Notations used below:
+=====================
+    + means new feature/item
+    * means modified feature/item
+    - means removed feature/item
+
+New features and changes
+========================
+System libraries
+----------------
+    - cbor: deprecated in favour of cn-cbor
+    + hashes: add sha-3 implementation
+
+Networking
+----------
+    * netdev: replaced "struct iovec" with iolist_t
+    + nanocoap: added server-side block1 support
+    + skald: a BLE advertising stack
+
+Packages
+--------
+    + cayenne-lpp: A Cayenne LPP library written in C
+    + HACL*: a formally verified cryptographic library written in F*
+    + qDSA: Small and Secure Digital Signatures with Curve-based
+            Diffie--Hellman Key Pairs
+    + libcose: Constrained node COSE library
+    + cn-cbor: A constrained node implementation of CBOR in C
+    + ucglib
+
+Boards
+------
+    + arduino-mkrfox1200
+    + frdm-kw41z
+    + jiminy-mega256rfr2
+    + mega-xplained
+    + nucleo-l433rc
+    + nucleo-l452re
+    + slstk3401a
+    + slwstk6000b
+    + stk3600
+    + stk3700
+
+CPU
+---
+    + atmega1284p
+    + NXP Kinetis KW41Z
+
+Device Drivers
+--------------
+    + bmx055: Bosch bmx055 9-axis IMU
+    + ata8520e: Microchip ATA8520E Sigfox(tm) transceiver
+
+Build System / Tooling
+----------------------
+    + ci: initial on-hardware test support
+
+Known Issues
+===========
+
+Please refer to the issue tracker at https://github.com/RIOT-OS/RIOT/issues.
+
+Acknowledgements
+================
+We would like to thank all companies (vendors) that provided us with (their)
+hardware for porting and testing RIOT-OS. Further thanks go to companies and
+institutions that directly sponsored development time. And finally, big thanks
+to all of you contributing in so many different ways to make RIOT worthwhile!
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+* Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+* The code developed by the RIOT community is licensed under the GNU Lesser
+  General Public License (LGPL) version 2.1 as published by the Free Software
+  Foundation.
+* Some external sources and packages are published under a separate license.
+
+All code files contain licensing information.
+
+
+
 RIOT-2018.01 - Release Notes
 ============================
 RIOT is a multi-threading operating system which enables soft real-time
