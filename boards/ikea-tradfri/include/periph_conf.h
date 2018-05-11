@@ -32,7 +32,7 @@ extern "C" {
  * @{
  */
 #ifndef CLOCK_HF
-#define CLOCK_HF            cmuSelect_HFRCO
+#define CLOCK_HF            cmuSelect_HFXO
 #endif
 #ifndef CLOCK_CORE_DIV
 #define CLOCK_CORE_DIV      cmuClkDiv_1

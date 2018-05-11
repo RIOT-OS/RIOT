@@ -1,5 +1,6 @@
 CPU = efm32
 CPU_FAM = efr32mg1p
+export EFM32_FAMILY = efr32mg1p
 CPU_MODEL = efr32mg1p132f256gm32
 
 # Put defined MCU peripherals here (in alphabetical order)
