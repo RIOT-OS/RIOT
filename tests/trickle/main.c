@@ -60,6 +60,7 @@ int main(void)
 {
     msg_t msg;
     unsigned counter = 0;
+    prev_now = xtimer_now_usec();
 
     trickle_start(sched_active_pid, &trickle, TRICKLE_MSG, TR_IMIN,
                   TR_IDOUBLINGS, TR_REDCONST);
