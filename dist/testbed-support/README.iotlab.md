@@ -39,7 +39,7 @@ brackets):
 
 ### Format of a Resource ID
 Both variables `IOTLAB_PHY_NODES` and `IOTLAB_EXCLUDE_NODES` use the resource id
-string format as specified in the output of `experiment-cli submit --help`.
+string format as specified in the output of `iotlab-experiment submit --help`.
 An example would be: 1-3+7+10-13
 
 ### Targets
