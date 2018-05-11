@@ -474,6 +474,19 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             if (snp->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
                 memcpy(tcb->local_addr, &((ipv6_hdr_t *)ip)->dst, sizeof(ipv6_addr_t));
                 memcpy(tcb->peer_addr, &((ipv6_hdr_t *)ip)->src, sizeof(ipv6_addr_t));
+
+                /* In case peer_addr is link local: Store interface Id in tcb */
+                if (ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
+                    gnrc_pktsnip_t *tmp = NULL;
+                    LL_SEARCH_SCALAR(in_pkt, tmp, type, GNRC_NETTYPE_NETIF);
+                    /* cppcheck-suppress knownConditionTrueFalse */
+                    if (tmp == NULL) {
+                        DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() :\
+                               incomming packet had no netif header\n");
+                        return 0;
+                    }
+                    tcb->ll_iface = ((gnrc_netif_hdr_t *)tmp->data)->if_pid;
+                }
             }
 #else
             DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() : Received address was not stored\n");

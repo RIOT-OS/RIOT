@@ -52,36 +52,37 @@ int gnrc_tcp_init(void);
  */
 void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb);
 
- /**
-  * @brief Opens a connection actively.
-  *
-  * @pre gnrc_tcp_tcb_init() must have been successfully called.
-  * @pre @p tcb must not be NULL
-  * @pre @p target_addr must not be NULL.
-  * @pre @p target_port must not be 0.
-  *
-  * @note Blocks until a connection has been established or an error occured.
-  *
-  * @param[in,out] tcb              TCB holding the connection information.
-  * @param[in]     address_family   Address family of @p target_addr.
-  * @param[in]     target_addr      Pointer to target address.
-  * @param[in]     target_port      Target port number.
-  * @param[in]     local_port       If zero or PORT_UNSPEC, the connections
-  *                                 source port is randomly chosen. If local_port is non-zero
-  *                                 the local_port is used as source port.
-  *
-  * @returns   Zero on success.
-  *            -EAFNOSUPPORT if @p address_family is not supported.
-  *            -EINVAL if @p address_family is not the same the address_family use by the TCB.
-  *            -EISCONN if TCB is already in use.
-  *            -ENOMEM if the receive buffer for the TCB could not be allocated.
-  *            -EADDRINUSE if @p local_port is already used by another connection.
-  *            -ETIMEDOUT if the connection could not be opened.
-  *            -ECONNREFUSED if the connection was resetted by the peer.
-  */
-int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
-                         const uint8_t *target_addr, const uint16_t target_port,
-                         const uint16_t local_port);
+/**
+ * @brief Opens a connection actively.
+ *
+ * @pre gnrc_tcp_tcb_init() must have been successfully called.
+ * @pre @p tcb must not be NULL
+ * @pre @p target_addr must not be NULL.
+ * @pre @p target_port must not be 0.
+ *
+ * @note Blocks until a connection has been established or an error occured.
+ *
+ * @param[in,out] tcb              TCB holding the connection information.
+ * @param[in]     address_family   Address family of @p target_addr.
+ * @param[in]     target_addr      Pointer to target address.
+ * @param[in]     target_port      Target port number.
+ * @param[in]     local_port       If zero or PORT_UNSPEC, the connections
+ *                                 source port is randomly chosen. If local_port is non-zero
+ *                                 the local_port is used as source port.
+ *
+ * @returns   Zero on success.
+ *            -EAFNOSUPPORT if @p address_family is not supported.
+ *            -EINVAL if @p address_family is not the same the address_family use by the TCB.
+ *                    or @p target_addr is invalid.
+ *            -EISCONN if TCB is already in use.
+ *            -ENOMEM if the receive buffer for the TCB could not be allocated.
+ *            -EADDRINUSE if @p local_port is already used by another connection.
+ *            -ETIMEDOUT if the connection could not be opened.
+ *            -ECONNREFUSED if the connection was resetted by the peer.
+ */
+int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  uint8_t address_family,
+                         char *target_addr, uint16_t target_port,
+                         uint16_t local_port);
 
 /**
  * @brief Opens a connection passively, by waiting for an incomming request.
@@ -105,12 +106,13 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
  * @returns   Zero on success.
  *            -EAFNOSUPPORT if local_addr != NULL and @p address_family is not supported.
  *            -EINVAL if @p address_family is not the same the address_family used in TCB.
+ *                    or @p target_addr is invalid.
  *            -EISCONN if TCB is already in use.
  *            -ENOMEM if the receive buffer for the TCB could not be allocated.
  *            Hint: Increase "GNRC_TCP_RCV_BUFFERS".
  */
-int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
-                          const uint8_t *local_addr, const uint16_t local_port);
+int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
+                          const char *local_addr, uint16_t local_port);
 
 /**
  * @brief Transmit data to connected peer.

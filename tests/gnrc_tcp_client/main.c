@@ -65,21 +65,19 @@ void *cli_thread(void *arg)
     /* Transmission control block */
     gnrc_tcp_tcb_t tcb;
 
-    /* Target peer address information */
-    ipv6_addr_t target_addr;
-    uint16_t target_port;
-
-    /* Initialize target information */
-    ipv6_addr_from_str(&target_addr, TARGET_ADDR);
-    target_port = TARGET_PORT;
-
     printf("Client running: TID=%d\n", tid);
     while (cycles < CYCLES) {
+
+        /* Copy peer address information. NOTE: This test uses link-local addresses
+         * -> The Device identifier is removed from target_addr in each iteration! */
+        char target_addr[] = TARGET_ADDR;
+        uint16_t target_port = TARGET_PORT;
+
         /* Initialize TCB */
         gnrc_tcp_tcb_init(&tcb);
 
         /* Connect to peer */
-        int ret = gnrc_tcp_open_active(&tcb, AF_INET6, (uint8_t *) &target_addr, target_port, 0);
+        int ret = gnrc_tcp_open_active(&tcb, AF_INET6, target_addr, target_port, 0);
         switch (ret) {
             case 0:
                 DEBUG("TID=%d : gnrc_tcp_open_active() : 0 : ok\n", tid);
