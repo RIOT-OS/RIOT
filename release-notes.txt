@@ -1,4 +1,4 @@
-RIOT-2018.4 - Release Notes
+RIOT-2018.04 - Release Notes
 ============================
 RIOT is a multi-threading operating system which enables soft real-time
 capabilities and comes with support for a range of devices that are typically
