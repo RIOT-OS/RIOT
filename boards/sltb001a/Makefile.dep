@@ -9,5 +9,9 @@ endif
 USEMODULE += boards_common_silabs
 USEMODULE += silabs_pic
 
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += rail
+endif
+
 # include board common dependencies
 include $(RIOTBOARD)/common/silabs/Makefile.dep

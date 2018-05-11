@@ -260,4 +260,10 @@ void auto_init(void)
             auto_init_dfplayer();
         }
     }
+
+    if (IS_USED(MODULE_RAIL)) {
+        LOG_DEBUG("Auto init Silabs RAIL radio driver\n");
+        extern void auto_init_rail(void);
+        auto_init_rail();
+    }
 }

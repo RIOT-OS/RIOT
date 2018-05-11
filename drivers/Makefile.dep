@@ -136,6 +136,17 @@ ifneq (,$(filter atwinc15x0,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
 endif
 
+ifneq (,$(filter rail,$(USEMODULE)))
+  USEPKG += gecko_sdk
+  USEMODULE += xtimer
+  USEMODULE += luid
+  USEMODULE += netif
+  USEMODULE += ieee802154
+  USEMODULE += netdev_ieee802154
+  USEMODULE += gecko_sdk_librail
+  USEMODULE += netopt
+endif
+
 ifneq (,$(filter bh1750fvi,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
