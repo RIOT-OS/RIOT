@@ -113,16 +113,6 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @name    Radio device configuration
- *
- * The radio is not guarded by a NUMOF define, as the radio is selected by its
- * own module in the build system.
- * @{
- */
-#define RADIO_IRQ_PRIO      1
-/** @} */
-
-/**
  * @name    PWM configuration
  * @{
  */
