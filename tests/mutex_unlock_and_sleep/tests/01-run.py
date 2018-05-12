@@ -11,7 +11,7 @@ import sys
 
 
 def testfunc(child):
-    for i in range(20):
+    for i in range(10):
         child.expect(r"\[ALIVE\] alternated \d+k times.")
 
 
