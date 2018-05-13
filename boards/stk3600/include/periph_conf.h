@@ -237,6 +237,9 @@ static const uart_conf_t uart_config[] = {
         .rx_pin = GPIO_PIN(PE, 1),
         .tx_pin = GPIO_PIN(PE, 0),
         .loc = UART_ROUTE_LOCATION_LOC1,
+#if EFM32_UART_MODES
+        .mode = UART_MODE_8N1,
+#endif
         .cmu = cmuClock_UART0,
         .irq = UART0_RX_IRQn
     },
@@ -245,6 +248,9 @@ static const uart_conf_t uart_config[] = {
         .rx_pin = GPIO_PIN(PD, 1),
         .tx_pin = GPIO_PIN(PD, 0),
         .loc = USART_ROUTE_LOCATION_LOC1,
+#if EFM32_UART_MODES
+        .mode = UART_MODE_8N1,
+#endif
         .cmu = cmuClock_USART1,
         .irq = USART1_RX_IRQn
     },
@@ -253,6 +259,9 @@ static const uart_conf_t uart_config[] = {
         .rx_pin = GPIO_PIN(PD, 5),
         .tx_pin = GPIO_PIN(PD, 4),
         .loc = LEUART_ROUTE_LOCATION_LOC0,
+#if EFM32_UART_MODES
+        .mode = UART_MODE_8N1,
+#endif
         .cmu = cmuClock_LEUART0,
         .irq = LEUART0_IRQn
     }
