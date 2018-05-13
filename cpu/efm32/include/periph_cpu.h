@@ -360,13 +360,30 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   Internal macro for combining UART modes data bits (x), stop bits
+ *          (y, in half bits) and parity (z).
+ */
+#define UART_MODE(x, y, z)      ((z << 8) | ((y * 2) << 4) | x)
+
+/**
+ * @brief   Internal, pre-defined UART modes.
+ * @{
+ */
+#define UART_MODE_8N1           UART_MODE(8, 1, 0)
+#define UART_MODE_8E1           UART_MODE(8, 1, 2)
+/** @} */
+
+/**
  * @brief   UART device configuration.
  */
 typedef struct {
     void *dev;              /**< UART, USART or LEUART device used */
     gpio_t rx_pin;          /**< pin used for RX */
     gpio_t tx_pin;          /**< pin used for TX */
-    uint32_t loc;           /**< location of USART pins */
+    uint32_t loc;           /**< location of UART pins */
+#if EFM32_UART_MODES
+    uint32_t mode;          /**< UART mode of operation */
+#endif
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
     IRQn_Type irq;          /**< the devices base IRQ channel */
 } uart_conf_t;

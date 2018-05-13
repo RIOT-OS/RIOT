@@ -26,8 +26,10 @@
 #include "periph/gpio.h"
 
 #include "em_usart.h"
+#include "em_usart_utils.h"
 #if LOW_POWER_ENABLED && defined(LEUART_COUNT) && LEUART_COUNT > 0
 #include "em_leuart.h"
+#include "em_leuart_utils.h"
 #endif
 
 /**
@@ -73,6 +75,11 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
         init.enable = usartDisable;
         init.baudrate = baudrate;
+#if EFM32_UART_MODES
+        init.databits = USART_DataBits2Def((uart_config[dev].mode >> 0) & 0xf);
+        init.stopbits = USART_StopBits2Def((uart_config[dev].mode >> 4) & 0xf);
+        init.parity = USART_Parity2Def((uart_config[dev].mode >> 8) & 0xf);
+#endif
 
         USART_InitAsync(uart, &init);
 
@@ -104,6 +111,11 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
         init.enable = leuartDisable;
         init.baudrate = baudrate;
+#if EFM32_UART_MODES
+        init.databits = LEUART_DataBits2Def((uart_config[dev].mode >> 0) & 0xf);
+        init.stopbits = LEUART_StopBits2Def((uart_config[dev].mode >> 4) & 0xf);
+        init.parity = LEUART_Parity2Def((uart_config[dev].mode >> 8) & 0xf);
+#endif
 
         LEUART_Init(leuart, &init);
 
