@@ -22,12 +22,14 @@
 
 #include "saul.h"
 #include "io1_xplained.h"
+#include "at30tse75x.h"
 
 static float temperature;
 
 static int read_temperature(const void *dev, phydat_t *res)
 {
-    io1_xplained_read_temperature((const io1_xplained_t *)dev, &temperature);
+    const io1_xplained_t *io1 = (const io1_xplained_t *)dev;
+    at30tse75x_get_temperature(&io1->temp, &temperature);
     res->val[0] = (int)(temperature * 100.0);
     res->unit = UNIT_TEMP_C;
     res->scale = -2;

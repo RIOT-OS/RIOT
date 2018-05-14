@@ -22,7 +22,9 @@
 
 #include "cpu.h"
 #include "periph_cpu.h"
-
+#include "periph/adc.h"
+#include "periph/gpio.h"
+#include "periph/spi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,8 +34,30 @@ extern "C" {
  * @name    IO1 Xplained I2C addresses
  * @{
  */
-#define TEMPERATURE_BASE_ADDR          (0x48)
-#define TEMPERATURE_DEFAULT_ADDR       (0x07)
+#define IO1_TEMPERATURE_BASE_ADDR          (0x48)
+#define IO1_TEMPERATURE_DEFAULT_ADDR       (0x07)
+/** @} */
+
+/**
+ * @name    IO1 Xplained SD Card configuration
+ * @{
+ */
+#define IO1_SDCARD_SPI_PARAM_SPI           SPI_DEV(1)
+#define IO1_SDCARD_SPI_PARAM_CS            GPIO_PIN(1,3)
+#define IO1_SDCARD_SPI_PARAM_CLK           GPIO_PIN(1,23)
+#define IO1_SDCARD_SPI_PARAM_MOSI          GPIO_PIN(1,22)
+#define IO1_SDCARD_SPI_PARAM_MISO          GPIO_PIN(1,2)
+#define IO1_SDCARD_SPI_PARAM_POWER         (GPIO_UNDEF)
+#define IO1_SDCARD_SPI_PARAM_POWER_AH      (true)
+#define IO1_SDCARD_SPI_PARAM_DETECT        GPIO_PIN(0,23)
+/** @} */
+
+/**
+ * @name    IO1 Xplained Light sensor ADC configuration
+ * @{
+ */
+#define IO1_LIGHT_ADC_LINE                 ADC_LINE(0)
+#define IO1_LIGHT_ADC_RES                  ADC_RES_10BIT
 /** @} */
 
 /**

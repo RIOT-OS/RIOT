@@ -40,6 +40,7 @@
 
 #include "saul.h"
 #include "at30tse75x.h"
+#include "sdcard_spi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,11 +52,13 @@ extern "C" {
 enum {
     IO1_XPLAINED_OK = 0,           /**< Initialization successful */
     IO1_XPLAINED_NOTEMP,           /**< Error during temperature sensor initialization */
+    IO1_XPLAINED_NOSDCARD,         /**< Error during sdcard initialization */
+    IO1_XPLAINED_NOLIGHT,          /**< Error during light sensor (ADC) initialization */
     IO1_XPLAINED_NOLED,            /**< Error during extension LED initialization */
     IO1_XPLAINED_NOGPIO1,          /**< Error during extension GPIO1 initialization */
     IO1_XPLAINED_NOGPIO2,          /**< Error during extension GPIO2 initialization */
-    IO1_XPLAINED_READ_OK,          /**< Temperature read successful */
-    IO1_XPLAINED_READ_ERR          /**< Error when reading temperature sensor */
+    IO1_XPLAINED_READ_OK,          /**< Light sensor read successful */
+    IO1_XPLAINED_READ_ERR          /**< Error when reading light sensor */
 };
 
 /**
@@ -71,6 +74,7 @@ typedef struct {
 typedef struct {
     io1_xplained_params_t params;  /**< Initialization parameters */
     at30tse75x_t temp;             /**< On-board temperature sensor */
+    sdcard_spi_t sdcard;           /**< On-board SD card */
 } io1_xplained_t;
 
 /**
@@ -81,6 +85,7 @@ typedef struct {
  *
  * @return                  IO1_XPLAINED_OK on success
  * @return                  -IO1_XPLAINED_NOTEMP if temperature sensor initialization failed
+ * @return                  -IO1_XPLAINED_NOSDCARD if sdcard initialization failed
  * @return                  -IO1_XPLAINED_NOLED if LED initialization failed
  * @return                  -IO1_XPLAINED_NOGPIO1 if GPIO1 initialization failed
  * @return                  -IO1_XPLAINED_NOGPIO2 if GPIO2 initialization failed
@@ -88,30 +93,14 @@ typedef struct {
 int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params);
 
 /**
- * @brief   Read temperature value from the given IO1 Xplained extension, returned in °C
+ * @brief   Read light sensor level on the IO1 Xplained extension
  *
- * @param[in] dev           Device descriptor of IO1 Xplained to read from
- * @param[out] temperature  Temperature in °C
+ * @param[out] light        Light level value (between 0 and 1023)
  *
  * @return                  IO1_XPLAINED_READ_OK on success
- * @return                  -IO1_XPLAINED_READ_ERR if temperature sensor read failed
+ * @return                  -IO1_XPLAINED_READ_ERR when the value cannot be read
  */
-int io1_xplained_read_temperature(const io1_xplained_t *dev, float *temperature);
-
-/**
- * @brief   Set the on-board led of the IO1 Xplained extension
- */
-void io1_xplained_set_led(void);
-
-/**
- * @brief   Clear the on-board led of the IO1 Xplained extension
- */
-void io1_xplained_clear_led(void);
-
-/**
- * @brief   Toggle the on-board led of the IO1 Xplained extension
- */
-void io1_xplained_toggle_led(void);
+int io1_xplained_read_light_level(uint16_t *light);
 
 #ifdef __cplusplus
 }
