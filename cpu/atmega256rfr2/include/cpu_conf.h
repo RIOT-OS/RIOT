@@ -43,7 +43,7 @@ extern "C" {
 #define THREAD_STACKSIZE_DEFAULT   (512)
 #endif
 
-#define THREAD_STACKSIZE_IDLE      (129)
+#define THREAD_STACKSIZE_IDLE      (128)
 #ifdef __cplusplus
 }
 #endif
