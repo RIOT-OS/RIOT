@@ -84,8 +84,8 @@
  * @param[in]   name    name of the cross-file array
  */
 #define XFA_USE_CONST(type, name) \
-    extern const type name [0]; \
-    extern const type name ## _end [0];
+    extern const type name []; \
+    extern const type name ## _end []
 
 /**
  * @brief Declare an external writable cross-file array
@@ -99,8 +99,8 @@
  * @param[in]   name    name of the cross-file array
  */
 #define XFA_USE(type, name) \
-    extern type name [0]; \
-    extern type name ## _end [0];
+    extern type name []; \
+    extern type name ## _end []
 
 /**
  * @brief Define variable in writable cross-file array
