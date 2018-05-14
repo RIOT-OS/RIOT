@@ -173,10 +173,14 @@ SECTIONS
     .data.rel.ro    : { *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*) *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*) }
     .dynamic        : { *(.dynamic) }
     .got            : { *(.got.plt) *(.igot.plt) *(.got) *(.igot) }
+    /* The relocation code assumes that the addresses are aligned in both ROM and RAM,
+     * This alignment section ensures that the LMA is aligned (ROM address) */
+    .romalign (NOLOAD) : { . = ALIGN(4); } > rom
 
     /* Writable sections, must be relocated from ROM to RAM during early boot */
     .data           :
     {
+        . = ALIGN(4);
         __data_start = .;
         *(.data .data.* .gnu.linkonce.d.*)
         SORT(CONSTRUCTORS)
@@ -184,6 +188,7 @@ SECTIONS
     __data_load_start = LOADADDR(.data);
     .ramfunc        :
     {
+        . = ALIGN(4);
         __ramfunc_start = .;
         *(.ramfunc .ramfunc.*)
     } > ram AT> rom
@@ -201,6 +206,7 @@ SECTIONS
     _edata = .; PROVIDE (edata = .);
     .bss (NOLOAD)   :
     {
+        . = ALIGN(4);
         __bss_start = .;
         __bss_start__ = .;
         *(.dynbss)
