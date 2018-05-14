@@ -2,6 +2,8 @@ include $(RIOTCPU)/mips32r2_common/Makefile.include
 
 export INCLUDES += -I$(RIOTCPU)/mips_pic32_common/include
 
+LINKFLAGS += -L$(RIOTCPU)/mips_pic32_common/ldscripts
+
 USEMODULE += mips_pic32_common
 USEMODULE += mips_pic32_common_periph
 
