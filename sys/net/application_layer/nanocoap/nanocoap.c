@@ -497,9 +497,12 @@ static unsigned _put_delta_optlen(uint8_t *buf, unsigned offset, unsigned shift,
 
 size_t coap_put_option(uint8_t *buf, uint16_t lastonum, uint16_t onum, uint8_t *odata, size_t olen)
 {
+#if COAP_OPTIONS_SORT
+    unsigned delta = (lastonum <= onum) ? (onum - lastonum) : 0;
+#else
     assert(lastonum <= onum);
-
     unsigned delta = (onum - lastonum);
+#endif
     *buf = 0;
 
     /* write delta value to option header: 4 upper bits of header (shift 4) +
@@ -612,7 +615,6 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, uint8_t *val,
 
     uint16_t lastonum = (pkt->options_len)
             ? pkt->options[pkt->options_len - 1].opt_num : 0;
-    assert(optnum >= lastonum);
 
     size_t optlen = coap_put_option(pkt->payload, lastonum, optnum, val, val_len);
     assert(pkt->payload_len > optlen);
@@ -625,6 +627,76 @@ static ssize_t _add_opt_pkt(coap_pkt_t *pkt, uint16_t optnum, uint8_t *val,
 
     return optlen;
 }
+
+#if COAP_OPTIONS_SORT
+/*
+ * Sort the stored message options by option number. Rewrite the buffer and
+ * update the options attributes in the pkt struct.
+ *
+ * pkt[inout]     Packet for sort
+ * returns        0 on success
+ */
+static ssize_t _sort_opts(coap_pkt_t *pkt)
+{
+    if (pkt->options_len <= 1) {
+        return 0;
+    }
+
+    uint8_t *options = (uint8_t *)pkt->hdr + coap_get_total_hdr_len(pkt);
+    /* scratch buffer to hold sorted options, with extra space to handle any
+     * large option header */
+    uint8_t scratch[(pkt->payload - options) + 4];
+    uint8_t *scratch_pos = &scratch[0];
+
+    unsigned sorted   = 0;        /* count of sorted elements */
+    uint8_t *next_pos = options;
+
+    do {
+        // find next option to write
+        unsigned i, best_i = sorted;
+        for (i = sorted+1; i < pkt->options_len; i++) {
+            if (pkt->options[i].opt_num < pkt->options[best_i].opt_num) {
+                best_i = i;
+            }
+        }
+        i = best_i;
+        /* prepare to relocate option memo currently at sorted location */
+        coap_optpos_t bubble_opt;
+        bubble_opt.opt_num = pkt->options[sorted].opt_num;
+        bubble_opt.offset  = pkt->options[sorted].offset;
+
+        /* read selected option */
+        uint16_t delta;      // unused
+        int option_len;
+        uint8_t *val = _parse_option(pkt, (uint8_t *)pkt->hdr + pkt->options[i].offset,
+                                     &delta, &option_len);
+
+        /* write option to scratch buffer */
+        uint8_t *last_pos = next_pos;
+        next_pos += coap_put_option(scratch_pos,
+                                    sorted ? pkt->options[sorted-1].opt_num : 0,
+                                    pkt->options[i].opt_num, val, option_len);
+        scratch_pos += (next_pos - last_pos);
+
+        /* update pkt->options record and save bubbled option */
+        pkt->options[sorted].opt_num = pkt->options[i].opt_num;
+        pkt->options[sorted].offset  = last_pos - (uint8_t *)pkt->hdr;
+        if (i != sorted) {
+            pkt->options[i].opt_num = bubble_opt.opt_num;
+            pkt->options[i].offset  = bubble_opt.offset;
+        }
+    } while (++sorted < pkt->options_len);
+
+    int len_delta = next_pos - pkt->payload;
+    DEBUG("sort moves payload by %d\n", len_delta);
+
+    memcpy(options, &scratch[0], next_pos - options);
+
+    pkt->payload     += len_delta;
+    pkt->payload_len -= len_delta;
+    return 0;
+}
+#endif
 
 ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string,
                            char separator)
@@ -670,6 +742,11 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value)
 
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
 {
+#if COAP_OPTIONS_SORT
+    if (flags & COAP_OPT_FINISH_SORT) {
+        _sort_opts(pkt);
+    }
+#endif
     if (flags & COAP_OPT_FINISH_PAYLOAD) {
         assert(pkt->payload_len > 1);
 

@@ -226,6 +226,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief Allows sorting Options in coap_opt_finish() when enabled (1).
+ */
+#ifndef COAP_OPTIONS_SORT
+#define COAP_OPTIONS_SORT       (0)
+#endif
+
+/**
  * @name coap_opt_finish() flag parameter values
  *
  * Directs packet/buffer updates when user finishes adding options
@@ -235,6 +242,8 @@ extern "C" {
 #define COAP_OPT_FINISH_NONE     (0x0000)
 /** @brief    expect a payload to follow */
 #define COAP_OPT_FINISH_PAYLOAD  (0x0001)
+/** @brief    sort Options; only valid when COAP_OPTIONS_SORT enabled */
+#define COAP_OPT_FINISH_SORT     (0x0002)
 /** @} */
 
 /**
