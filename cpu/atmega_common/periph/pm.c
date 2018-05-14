@@ -30,14 +30,12 @@
 
 void pm_reboot(void)
 {
-#if defined(CPU_ATMEGA256RFR2)
     /* clear MCU Status Register Interrupt flags */
     MCUSR = 0x00;
     /* Softreset recognition feature, "r3" will be read out in .init0
      * to be able to distinguish WDT reset and WDT software reset
      */
     __asm__ __volatile__("mov r3, %0\n" :: "r" (0xAA));
-#endif /* CPU_ATMEGA256RFR2 */
 
     /*
      * Since the AVR doesn't support a real software reset, we set the Watchdog
