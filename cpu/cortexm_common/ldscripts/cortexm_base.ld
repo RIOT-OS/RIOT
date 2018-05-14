@@ -22,6 +22,7 @@ SECTIONS
     {
         _isr_vectors = DEFINED(_isr_vectors) ? _isr_vectors : . ;
         KEEP(*(SORT(.vectors*)))
+        . = ALIGN(4);
     }
     .interp         : { *(.interp) }
     .note.gnu.build-id : { *(.note.gnu.build-id) }
@@ -83,6 +84,7 @@ SECTIONS
     .iplt           : { *(.iplt) }
     .text           :
     {
+        . = ALIGN(4);
         *(.text.unlikely .text.*_unlikely .text.unlikely.*)
         *(.text.exit .text.exit.*)
         *(.text.startup .text.startup.*)
@@ -91,7 +93,9 @@ SECTIONS
         /* .gnu.warning sections are handled specially by elf32.em.  */
         *(.gnu.warning)
         *(.glue_7t) *(.glue_7) *(.vfp11_veneer) *(.v4_bx)
+        . = ALIGN(4);
     }
+    . = ALIGN(4);
     .fini           :
     {
         KEEP (*(SORT_NONE(.fini)))
@@ -99,8 +103,20 @@ SECTIONS
     PROVIDE (__etext = .);
     PROVIDE (_etext = .);
     PROVIDE (etext = .);
-    .rodata         : { *(.rodata .rodata.* .gnu.linkonce.r.*) }
-    .rodata1        : { *(.rodata1) }
+    .rodata         :
+    {
+        . = ALIGN(4);
+        *(.rodata .rodata.* .gnu.linkonce.r.*)
+        . = ALIGN(4);
+    }
+    . = ALIGN(4);
+    .rodata1        :
+    {
+        . = ALIGN(4);
+        *(.rodata1)
+        . = ALIGN(4);
+    }
+    . = ALIGN(4);
     .openocd        :
     {
         KEEP (*(.openocd .openocd.*))
@@ -122,23 +138,29 @@ SECTIONS
      * saves RAM space. */
     .preinit_array  :
     {
+        . = ALIGN(4);
         PROVIDE_HIDDEN (__preinit_array_start = .);
         KEEP (*(.preinit_array))
         PROVIDE_HIDDEN (__preinit_array_end = .);
+        . = ALIGN(4);
     } > rom
     .init_array     :
     {
+        . = ALIGN(4);
         PROVIDE_HIDDEN (__init_array_start = .);
         KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
         KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
         PROVIDE_HIDDEN (__init_array_end = .);
+        . = ALIGN(4);
     } > rom
     .fini_array     :
     {
+        . = ALIGN(4);
         PROVIDE_HIDDEN (__fini_array_start = .);
         KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
         KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
         PROVIDE_HIDDEN (__fini_array_end = .);
+        . = ALIGN(4);
     } > rom
     .ctors          :
     {
@@ -173,9 +195,6 @@ SECTIONS
     .data.rel.ro    : { *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*) *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*) }
     .dynamic        : { *(.dynamic) }
     .got            : { *(.got.plt) *(.igot.plt) *(.got) *(.igot) }
-    /* The relocation code assumes that the addresses are aligned in both ROM and RAM,
-     * This alignment section ensures that the LMA is aligned (ROM address) */
-    .romalign (NOLOAD) : { . = ALIGN(4); } > rom
 
     /* Writable sections, must be relocated from ROM to RAM during early boot */
     .data           :
@@ -184,6 +203,7 @@ SECTIONS
         __data_start = .;
         *(.data .data.* .gnu.linkonce.d.*)
         SORT(CONSTRUCTORS)
+        . = ALIGN(4);
     } > ram AT> rom
     __data_load_start = LOADADDR(.data);
     .ramfunc        :
@@ -191,6 +211,7 @@ SECTIONS
         . = ALIGN(4);
         __ramfunc_start = .;
         *(.ramfunc .ramfunc.*)
+        . = ALIGN(4);
     } > ram AT> rom
     __ramfunc_end = .;
     /* Exception handling  */
@@ -212,6 +233,7 @@ SECTIONS
         *(.dynbss)
         *(.bss .bss.* .gnu.linkonce.b.*)
         *(COMMON)
+        . = ALIGN(4);
     }
     . = ALIGN(32 / 8);
     _bss_end__ = . ; __bss_end__ = . ;
