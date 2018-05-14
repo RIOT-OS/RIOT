@@ -19,6 +19,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              chronos \
                              ek-lm4f120xl \
                              feather-m0 \
+                             ikea-tradfri \
                              limifrog-v1 maple-mini \
                              mbed_lpc1768 \
                              mega-xplained \
@@ -56,10 +57,13 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              samd21-xpro \
                              samr21-xpro \
                              seeeduino_arch-pro \
+                             slstk3401a \
+                             sltb001a \
                              slwstk6220a \
                              sodaq-autonomo \
                              sodaq-explorer \
                              spark-core \
+                             stk3600 \
                              stm32f0discovery \
                              stm32f3discovery \
                              teensy31 \
