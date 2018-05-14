@@ -7,6 +7,9 @@ export CFLAGS += -DCPU_MODEL_$(MODEL)
 export UNDEF += $(BINDIR)/msp430_common/startup.o
 export USEMODULE += msp430_common msp430_common_periph periph_common
 
+# Ignore unknown pragmas (for xfa with gcc 4.6.3)
+CFLAGS += -Wno-pragmas
+
 DEFAULT_MODULE += oneway_malloc
 
 # include the msp430 common Makefile
