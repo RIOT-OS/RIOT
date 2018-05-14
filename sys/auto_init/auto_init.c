@@ -353,6 +353,10 @@ auto_init_mpu9150();
     extern void auto_init_hdc1000(void);
     auto_init_hdc1000();
 #endif
+#ifdef MODULE_FXOS8700
+    extern void auto_init_fxos8700(void);
+    auto_init_fxos8700();
+#endif
 #ifdef MODULE_HTS221
     extern void auto_init_hts221(void);
     auto_init_hts221();
