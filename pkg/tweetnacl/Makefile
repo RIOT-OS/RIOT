@@ -6,7 +6,6 @@ PKG_LICENSE=PD
 .PHONY: all
 
 all: git-download
-	@cp $(RIOTBASE)/pkg/tweetnacl/src/* $(PKG_BUILDDIR)
-	"$(MAKE)" -C $(PKG_BUILDDIR)
+	$(Q)"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.riot
 
 include $(RIOTBASE)/pkg/pkg.mk
