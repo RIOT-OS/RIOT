@@ -221,13 +221,26 @@ void NORETURN __enter_thread_mode(void)
 }
 
 void thread_yield_higher(void) {
+
     if (irq_is_in() == 0) {
         __context_save();
         sched_run();
         __context_restore();
+
         __asm__ volatile("ret");
     } else {
+#if !defined(ISR_CONTEXT_SWITCH_ALLOWED)
         sched_context_switch_request = 1;
+#else
+        __context_save();
+        sched_run();
+        __context_restore();
+
+        __exit_isr();
+    PORTF |= (1 << 6);
+    PORTF &= ~(1 << 6);
+        __asm__ volatile("reti");
+#endif
     }
 }
 
@@ -237,7 +250,8 @@ void thread_yield_isr(void) {
     __context_restore();
 
     __exit_isr();
-
+    PORTF |= (1 << 5);
+    PORTF &= ~(1 << 5);
     __asm__ volatile("reti");
 }
 

@@ -165,7 +165,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
         sched_set_status(target, STATUS_PENDING);
 
         irq_restore(state);
-        thread_yield_higher();
+
     }
 
     return 1;
@@ -207,8 +207,11 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
         msg_t *target_message = (msg_t*) target->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
-
+#if !defined(ISR_CONTEXT_SWITCH_ALLOWED)
         sched_context_switch_request = 1;
+#else
+        thread_yield_higher();
+#endif
         return 1;
     }
     else {
@@ -272,7 +275,11 @@ int msg_reply_int(msg_t *m, msg_t *reply)
     msg_t *target_message = (msg_t*) target->wait_data;
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
-    sched_context_switch_request = 1;
+#if !defined(ISR_CONTEXT_SWITCH_ALLOWED)
+        sched_context_switch_request = 1;
+#else
+        thread_yield_higher();
+#endif
     return 1;
 }
 
