@@ -174,11 +174,12 @@ static inline void _isr(tim_t tim, int chan)
     *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
     ctx[tim].cb(ctx[tim].arg, chan);
 
+#if !defined(ISR_CONTEXT_SWITCH_ALLOWED)
     if (sched_context_switch_request) {
         thread_yield();
         thread_yield_isr();
     }
-
+#endif
     __exit_isr();
 }
 #endif

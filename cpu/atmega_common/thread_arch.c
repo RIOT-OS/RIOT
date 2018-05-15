@@ -237,8 +237,6 @@ void thread_yield_higher(void) {
         __context_restore();
 
         __exit_isr();
-    PORTF |= (1 << 6);
-    PORTF &= ~(1 << 6);
         __asm__ volatile("reti");
 #endif
     }
