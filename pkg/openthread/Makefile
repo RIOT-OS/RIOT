@@ -22,7 +22,7 @@ OPENTHREAD_COMMON_FLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter
 
 all: git-download
 	cd $(PKG_BUILDDIR) && PREFIX="/" ./bootstrap
-	cd $(PKG_BUILDDIR) && CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)"\
+	cd $(PKG_BUILDDIR) && LIBS="" CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)"\
 		OBJC="" OBJCXX="" AR="$(AR)" RANLIB="$(RANLIB)" NM="$(NM)" \
 		STRIP="$(STRIP)" \
 		CPPFLAGS="$(OPENTHREAD_COMMON_FLAGS) $(CFLAGS_CPU) -D$(CONFIG_FILE)" \
@@ -31,7 +31,7 @@ all: git-download
 		LDFLAGS="$(OPENTHREAD_COMMON_FLAGS) $(CFLAGS_CPU) -nostartfiles -specs=nano.specs \
 		-specs=nosys.specs -Wl,--gc-sections -Wl,-Map=map.map " \
 		./configure --disable-docs --host=$(TARGET_ARCH) --target=$(TARGET_ARCH) \
-		--prefix=/ --enable-default-logging $(OPENTHREAD_ARGS)
+		--prefix=/ $(OPENTHREAD_ARGS)
 	cd $(PKG_BUILDDIR) &&  DESTDIR=$(PKG_BUILDDIR)/output PREFIX=/ make -j4 --no-print-directory install
 
 	cp $(PKG_BUILDDIR)/output/lib/libmbedcrypto.a ${BINDIR}/mbedcrypto.a
