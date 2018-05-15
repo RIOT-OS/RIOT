@@ -484,26 +484,56 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 #endif
 
 /**
- * @brief xtimer overhead value, in hardware ticks
+ * @brief xtimer backoff overhead, in hardware ticks
  *
- * This value specifies the time a timer will be late if uncorrected, e.g.,
- * the system-specific xtimer execution time from timer ISR to executing
- * a timer's callback's first instruction.
+ * This value specifies the time needed to reach the comparison for XTIMER_BACKOFF
+ * and to get back to the calling thread.
  *
- * E.g., with XTIMER_OVERHEAD == 0
- * start=xtimer_now();
- * xtimer_set(&timer, X);
- * (in callback:)
- * overhead=xtimer_now()-start-X;
- *
- * xtimer automatically substracts XTIMER_OVERHEAD from a timer's target time,
- * but when the timer triggers, xtimer will spin-lock until a timer's target
- * time is reached, so timers will never trigger early.
+ * xtimer automatically substracts XTIMER_BACKOFF_OVERHEAD from a timer's target
+ * time before executing the callback. Thus, setting a to high value will lead to
+ * early trigger.
  *
  * This is supposed to be defined per-device in e.g., periph_conf.h.
+ * Use `tests/xtimer_configuration` to test and evaluate XTIMER_BACKOFF_OVERHEAD.
+ */
+#ifndef XTIMER_BACKOFF_OVERHEAD
+#define XTIMER_BACKOFF_OVERHEAD 1
+#endif
+
+/**
+ * @brief xtimer overhead value, in hardware ticks
+ *
+ * This value specifies the time interval which is subtracted from the target
+ * time to ensure that the timer is not executed to late.
+ * This is used to correct the system-specific xtimer execution time from timer
+ * ISR to executing a timer's callback's first instruction.
+ *
+ * xtimer automatically substracts XTIMER_OVERHEAD from a timer's target time,
+ * but when the timer triggers, xtimer will spin-lock until a timer's
+ * target - XTIMER_SHOOT_OVERHEAD is reached, so timers will trigger on spot.
+ *
+ * This is supposed to be defined per-device in e.g., periph_conf.h.
+ * Use `tests/xtimer_configuration` to test and evaluate XTIMER_OVERHEAD.
  */
 #ifndef XTIMER_OVERHEAD
 #define XTIMER_OVERHEAD 20
+#endif
+
+/**
+ * @brief xtimer shoot overhead, in hardware ticks
+ *
+ * This value specifies the time needed to get out of the timer interrupt to the
+ * thread which waits to get activ.
+ *
+ * xtimer automatically substracts XTIMER_SHOOT_OVERHEAD from a timer's target
+ * time before executing the callback. Thus, setting a to high value will lead to
+ * early trigger.
+ *
+ * This is supposed to be defined per-device in e.g., periph_conf.h.
+ * Use `tests/xtimer_configuration` to test and evaluate XTIMER_SHOOT_OVERHEAD.
+ */
+#ifndef XTIMER_SHOOT_OVERHEAD
+#define XTIMER_SHOOT_OVERHEAD 0
 #endif
 
 #ifndef XTIMER_ISR_BACKOFF

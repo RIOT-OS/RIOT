@@ -26,7 +26,7 @@
 #ifndef XTIMER_H
 #error "Do not include this file directly! Use xtimer.h instead"
 #endif
-
+#include <stdio.h>
 #include "periph/timer.h"
 
 #ifdef __cplusplus
@@ -71,16 +71,12 @@ uint64_t _xtimer_now64(void);
 /**
  * @brief Sets the timer to the appropriate timer_list or list_head.
  *
- * @note    The target to set the timer to has to be at least bigger then the
- *          ticks needed to jump into the function and calculate '_xtimer_now()'.
- *          So that 'now' did not pass the target.
- *          This is crucial when using low CPU frequencies and/or when the
- *          '_xtimer_now()' call needs multiple xtimer ticks to evaluate.
- *
- * @param[in] timer   pointer to xtimer_t which is added to the list.
- * @param[in] target  Absolute target value in ticks.
+ * @param[in] timer      pointer to xtimer_t which is added to the list.
+ * @param[in] offset     Offset in ticks.
+ * @param[in] irq_state  Interrupt state after ensuring lltimer overflow is
+ *                       not happening in XTIMER_BACKOFF ticks.
  */
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
+void _xtimer_set_absolute(xtimer_t *timer, uint32_t offset, unsigned irq_state);
 void _xtimer_set(xtimer_t *timer, uint32_t offset);
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);

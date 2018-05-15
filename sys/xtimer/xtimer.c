@@ -73,65 +73,68 @@ void _xtimer_tsleep(uint32_t offset, uint32_t long_offset)
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     xtimer_t timer;
     mutex_t mutex = MUTEX_INIT;
+    uint32_t mult;
 
     timer.callback = _callback_unlock_mutex;
     timer.arg = (void*) &mutex;
 
     uint32_t target = (*last_wakeup) + period;
+
+    /* wait for hardware timer overflow */
+    uint32_t max = _xtimer_lltimer_mask(0xFFFFFFFF) - XTIMER_BACKOFF;
+    /* make sure the timer counter arrives in the next timer period */
+    if(_xtimer_lltimer_now()>= max){}
+
+    unsigned irq_state = irq_disable();
     uint32_t now = _xtimer_now();
+
     /* make sure we're not setting a value in the past */
     if (now < (*last_wakeup)) {
-        /* base timer overflowed between last_wakeup and now */
-        if (!((now < target) && (target < (*last_wakeup)))) {
-            /* target time has already passed */
-            goto out;
+        /* last_wakeup < target, base overflowed but target not, target passed. */
+        /* target <= now , both overflowed, target passed. */
+        if ( (*last_wakeup < target) || (target <= now) ) {
+            //now = _xtimer_now();
+            /* now - target, will always be the difference. (modulo power of two) */
+            mult = (now - target) / period;
+            /* Skip missed targets */
+            *last_wakeup = (mult * period) + target;
+            irq_restore(irq_state);
+            return;
         }
     }
     else {
-        /* base timer did not overflow */
-        if ((((*last_wakeup) <= target) && (target <= now))) {
-            /* target time has already passed */
-            goto out;
+        /* last_wakeup < now, base timer did not overflow */
+        /* target <= now AND target did not overflow, target passed */
+        if ( (target <= now) && ((*last_wakeup) <= target) ) {
+            //now = _xtimer_now();
+            /* now - target, will always be the difference. (modulo power of two) */
+            mult = (now - target)/ period;
+            /* Skip missed targets */
+            *last_wakeup = (mult * period) + target;
+            irq_restore(irq_state);
+            return;
         }
     }
 
-    /*
+    /* For very small offsets, spin.
      * For large offsets, set an absolute target time.
      * As that might cause an underflow, for small offsets, set a relative
      * target time.
-     * For very small offsets, spin.
-     */
-    /*
-     * Note: last_wakeup _must never_ specify a time in the future after
-     * _xtimer_periodic_sleep returns.
-     * If this happens, last_wakeup may specify a time in the future when the
-     * next call to _xtimer_periodic_sleep is made, which in turn will trigger
-     * the overflow logic above and make the next timer fire too early, causing
-     * last_wakeup to point even further into the future, leading to a chain
-     * reaction.
-     *
-     * tl;dr Don't return too early!
      */
     uint32_t offset = target - now;
     DEBUG("xps, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
     if (offset < XTIMER_PERIODIC_SPIN) {
+        irq_restore(irq_state);
         _xtimer_spin(offset);
     }
     else {
-        if (offset < XTIMER_PERIODIC_RELATIVE) {
-            /* NB: This will overshoot the target by the amount of time it took
-             * to get here from the beginning of xtimer_periodic_wakeup()
-             *
-             * Since interrupts are normally enabled inside this function, this time may
-             * be undeterministic. */
-            target = _xtimer_now() + offset;
-        }
         mutex_lock(&mutex);
-        DEBUG("xps, abs: %" PRIu32 "\n", target);
-        _xtimer_set_absolute(&timer, target);
+        period = target - _xtimer_now();
+        DEBUG("xps, target: %" PRIu32 " period %" PRIu32 "\n", target, period);
+        _xtimer_set_absolute(&timer, period, irq_state);
         mutex_lock(&mutex);
     }
-out:
+
     *last_wakeup = target;
 }
 

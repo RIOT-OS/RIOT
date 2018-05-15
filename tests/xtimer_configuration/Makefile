@@ -1,10 +1,6 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
-
 USEMODULE += xtimer
-
-TEST_ON_CI_WHITELIST += all
 
 # Port and pin configuration for probing with oscilloscope
 # Define Test pin for hardware timer interrupt, hardware dependent
@@ -17,8 +13,11 @@ CFLAGS += -DDEBUG_TIMER_PIN=PORTF4
 # Port number should be found in port enum e.g in cpu/include/periph_cpu.h
 FEATURES_REQUIRED += periph_gpio
 # Jiminy probing Pins
-CFLAGS += -DWORKER_THREAD_PIN_1=GPIO_PIN\(5,7\)
-CFLAGS += -DWORKER_THREAD_PIN_2=GPIO_PIN\(5,6\)
-CFLAGS += -DMAIN_THREAD_PIN=GPIO_PIN\(5,5\)
+CFLAGS += -DSLEEP_PIN_1=GPIO_PIN\(5,5\)
+CFLAGS += -DSLEEP_PIN_2=GPIO_PIN\(5,6\)
+CFLAGS += -DSLEEP_PIN_3=GPIO_PIN\(5,7\)
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	./tests/01-run.py

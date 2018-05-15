@@ -88,6 +88,13 @@ extern "C" {
 #define XTIMER_CHAN         (0)
 #define XTIMER_WIDTH        (16)
 #define XTIMER_HZ           (125000UL)
+
+#define XTIMER_OVERHEAD (25)
+#define XTIMER_SHOOT_OVERHEAD (18)
+#define XTIMER_BACKOFF_OVERHEAD (16)
+#define XTIMER_BACKOFF  (2*(XTIMER_OVERHEAD+XTIMER_SHOOT_OVERHEAD))
+#define XTIMER_ISR_BACKOFF (XTIMER_OVERHEAD+XTIMER_SHOOT_OVERHEAD)
+
 /** @} */
 
 /**
@@ -101,16 +108,6 @@ extern "C" {
 #define BOOTLOADER_CLEARS_WATCHDOG_AND_PASSES_MCUSR 1
 /** @} */
 
-/**
- * @name Indicate Watchdog cleared in bootloader an
- *
- * AVR CPUs need to reset the Watchdog as fast as possible.
- * This flag indicates that the watchdog is reseted in the bootloader
- * and that the MCUSR value is stored in register 2 (r2)
- * @{
- */
-#define BOOTLOADER_CLEARS_WATCHDOG_AND_PASSES_MCUSR 1
-/** @} */
 
 /**
  * @name CPU clock scale for jiminy-megarfr256rfr2

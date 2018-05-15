@@ -17,6 +17,7 @@
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * 
  * @}
  */
 
@@ -40,8 +41,6 @@ static volatile uint32_t _long_cnt = 0;
 volatile uint32_t _xtimer_high_cnt = 0;
 #endif
 
-static inline void xtimer_spin_until(uint32_t value);
-
 static xtimer_t *timer_list_head = NULL;
 static xtimer_t *overflow_list_head = NULL;
 static xtimer_t *long_list_head = NULL;
@@ -61,15 +60,6 @@ static inline int _this_high_period(uint32_t target);
 static inline int _is_set(xtimer_t *timer)
 {
     return (timer->target || timer->long_target);
-}
-
-static inline void xtimer_spin_until(uint32_t target)
-{
-#if XTIMER_MASK
-    target = _xtimer_lltimer_mask(target);
-#endif
-    while (_xtimer_lltimer_now() > target) {}
-    while (_xtimer_lltimer_now() < target) {}
 }
 
 void xtimer_init(void)
@@ -135,8 +125,11 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
 
 void _xtimer_set(xtimer_t *timer, uint32_t offset)
 {
+    uint32_t old_now;
+
     DEBUG("timer_set(): offset=%" PRIu32 " now=%" PRIu32 " (%" PRIu32 ")\n",
           offset, xtimer_now().ticks32, _xtimer_lltimer_now());
+
     if (!timer->callback) {
         DEBUG("timer_set(): timer has no callback.\n");
         return;
@@ -144,14 +137,30 @@ void _xtimer_set(xtimer_t *timer, uint32_t offset)
 
     xtimer_remove(timer);
 
-    if (offset < XTIMER_BACKOFF) {
-        _xtimer_spin(offset);
-        _shoot(timer);
+    /* wait for hardware timer overflow */
+    uint32_t max = _xtimer_lltimer_mask(0xFFFFFFFF) - XTIMER_BACKOFF;
+    /* make sure the timer counter arrives in the next timer period */
+    if( (old_now =_xtimer_lltimer_now()) >= max ){
+        /* offset shorter then XTIMER_BACKOFF*/
+        if(offset < XTIMER_BACKOFF) {
+            _xtimer_spin(offset);
+        }else {
+            /* wait for overflow */
+            while (_xtimer_lltimer_now() >= max ){}
+            /* correct offset */
+            old_now = _xtimer_lltimer_mask(_xtimer_lltimer_now() - old_now);
+            if( old_now <= offset) {
+                offset -= old_now;
+            }else {
+                /* thread was delayed by higher prior task and timer allready past */
+                return;
+            }
+        }
     }
-    else {
-        uint32_t target = _xtimer_now() + offset;
-        _xtimer_set_absolute(timer, target);
-    }
+
+    unsigned irq_state = irq_disable();
+
+    _xtimer_set_absolute(timer, offset, irq_state);
 }
 
 static void _periph_timer_callback(void *arg, int chan)
@@ -175,42 +184,31 @@ static inline void _lltimer_set(uint32_t target)
     timer_set_absolute(XTIMER_DEV, XTIMER_CHAN, _xtimer_lltimer_mask(target));
 }
 
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
+void _xtimer_set_absolute(xtimer_t *timer, uint32_t offset, unsigned irq_state)
 {
     uint32_t now = _xtimer_now();
-    int res = 0;
 
-    timer->next = NULL;
-
-    /* Ensure that offset is bigger than 'XTIMER_BACKOFF',
-     * 'target - now' will allways be the offset no matter if target < or > now.
-     *
-     * This expects that target was not set too close to now and overrun now, so
-     * from setting target up until the call of '_xtimer_now()' above now has not
-     * become equal or bigger than target.
-     * This is crucial when using low CPU frequencies so reaching the '_xtimer_now()'
-     * call needs multiple xtimer ticks.
-     *
-     * '_xtimer_set()' and `_xtimer_periodic_wakeup()` ensure this by already
-     * backing off for small values. */
-    uint32_t offset = (target - now);
-
-    DEBUG("timer_set_absolute(): now=%" PRIu32 " target=%" PRIu32 " offset=%" PRIu32 "\n",
-          now, target, offset);
+    DEBUG("timer_set_absolute(): now=%" PRIu32 " offset=%" PRIu32 "\n",
+          now, offset);
 
     if (offset <= XTIMER_BACKOFF) {
         /* backoff */
-        xtimer_spin_until(target);
+        irq_restore(irq_state);
+        if (XTIMER_BACKOFF_OVERHEAD < offset) {
+            offset -= XTIMER_BACKOFF_OVERHEAD;
+        }
+        _xtimer_spin(offset);
         _shoot(timer);
-        return 0;
+        return;
     }
 
-    unsigned state = irq_disable();
     if (_is_set(timer)) {
         _remove(timer);
     }
+    /* Ensure timer is not integrated in the list anymore. */
+    timer->next = NULL;
 
-    timer->target = target;
+    timer->target = now + offset;
     timer->long_target = _long_cnt;
 
     /* Ensure timer is fired in right timer period.
@@ -220,7 +218,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
      * If `target < XTIMER_OVERHEAD` the new target will be at the end of this
      * 32bit period, as `target - XTIMER_OVERHEAD` is a big number instead of a
      * small at the beginning of the next period. */
-    target = target - XTIMER_OVERHEAD;
+    uint32_t target = timer->target - XTIMER_OVERHEAD;
 
     /* 32 bit target overflow, target is in next 32bit period */
     if (target < now) {
@@ -247,9 +245,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
         }
     }
 
-    irq_restore(state);
-
-    return res;
+    irq_restore(irq_state);
 }
 
 static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)
@@ -470,7 +466,7 @@ static void _timer_callback(void)
 
     _in_handler = 1;
 
-    DEBUG("_timer_callback() now=%" PRIu32 " (%" PRIu32 ")pleft=%" PRIu32 "\n",
+    DEBUG("_timer_callback() now=%" PRIu32 " (%" PRIu32 ") left=%" PRIu32 "\n",
           xtimer_now().ticks32, _xtimer_lltimer_mask(xtimer_now().ticks32),
           _xtimer_lltimer_mask(0xffffffff - xtimer_now().ticks32));
 
@@ -482,9 +478,7 @@ static void _timer_callback(void)
          * In this case, we advance to the next timer period.
          */
         _next_period();
-
         reference = 0;
-
         /* make sure the timer counter also arrived
          * in the next timer period */
         while (_xtimer_lltimer_now() == _xtimer_lltimer_mask(0xFFFFFFFF)) {}
@@ -496,13 +490,14 @@ static void _timer_callback(void)
         /* set our period reference to the current time. */
         reference = _xtimer_lltimer_now();
     }
-
 overflow:
     /* check if next timers are close to expiring */
-    while (timer_list_head && (_time_left(_xtimer_lltimer_mask(timer_list_head->target), reference) < XTIMER_ISR_BACKOFF)) {
-        /* make sure we don't fire too early */
-        while (_time_left(_xtimer_lltimer_mask(timer_list_head->target), reference)) {}
-
+    while (timer_list_head
+           && (_time_left(
+                   _xtimer_lltimer_mask(timer_list_head->target - XTIMER_SHOOT_OVERHEAD),
+                   reference) < XTIMER_ISR_BACKOFF)) {
+        /* save target for later use */
+        uint32_t target = timer_list_head->target;
         /* pick first timer in list */
         xtimer_t *timer = timer_list_head;
 
@@ -512,31 +507,26 @@ overflow:
         /* make sure timer is recognized as being already fired */
         timer->target = 0;
         timer->long_target = 0;
+        /* Ensure timer is not integrated in the list anymore. */
+        timer->next = NULL;
 
+        /* new reference for now and for next timer */
+        reference = _xtimer_lltimer_now();
+        /* make sure we don't fire too early. But correct time needed to shoot. */
+        uint32_t offset = _xtimer_lltimer_mask(_xtimer_lltimer_mask(target)-reference);
+        DEBUG("spin=%" PRIu32 "\n", offset);
+
+        if (XTIMER_SHOOT_OVERHEAD < offset) {
+            offset -= XTIMER_SHOOT_OVERHEAD;
+            _xtimer_spin(offset);
+        }
         /* fire timer */
         _shoot(timer);
-    }
-
-    /* possibly executing all callbacks took enough
-     * time to overflow.  In that case we advance to
-     * next timer period and check again for expired
-     * timers.*/
-    /* check if the end of this period is very soon */
-    uint32_t now = _xtimer_lltimer_now() + XTIMER_ISR_BACKOFF;
-    if (now < reference) {
-        DEBUG("_timer_callback: overflowed while executing callbacks. %i\n",
-              timer_list_head != NULL);
-        _next_period();
-        /* wait till overflow */
-        while( reference < _xtimer_lltimer_now()){}
-        reference = 0;
-        goto overflow;
     }
 
     if (timer_list_head) {
         /* schedule callback on next timer target time */
         next_target = timer_list_head->target - XTIMER_OVERHEAD;
-
         /* make sure we're not setting a time in the past */
         if (next_target < (_xtimer_now() + XTIMER_ISR_BACKOFF)) {
             goto overflow;
@@ -546,26 +536,17 @@ overflow:
         /* there's no timer planned for this timer period */
         /* schedule callback on next overflow */
         next_target = _xtimer_lltimer_mask(0xFFFFFFFF);
-        uint32_t now = _xtimer_lltimer_now();
-
-        /* check for overflow again */
-        if (now < reference) {
-            _next_period();
-            reference = 0;
-            goto overflow;
-        }
-        else {
-            /* check if the end of this period is very soon */
-            if (_xtimer_lltimer_mask(now + XTIMER_ISR_BACKOFF) < now) {
-                /* spin until next period, then advance */
-                while (_xtimer_lltimer_now() >= now) {}
-                _next_period();
-                reference = 0;
-                goto overflow;
-            }
-        }
     }
-
+    /* check for overflow */
+    /* Or if the end of this period is very soon */
+    uint32_t now = _xtimer_lltimer_now();
+    if (now < reference || _xtimer_lltimer_mask(now + XTIMER_ISR_BACKOFF) < now) {
+        _next_period();
+        /* wait till overflow */
+        while( reference < _xtimer_lltimer_now()){}
+        reference = 0;
+        goto overflow;
+    }
     _in_handler = 0;
 
     /* set low level timer */
