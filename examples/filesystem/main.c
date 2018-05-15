@@ -103,7 +103,7 @@ static constfs_t constfs_desc = {
 };
 
 /* constfs mount point, as for previous example, it needs a file system driver,
- * a mount poinr and private_data is a pointer to the constfs descriptor */
+ * a mount point and private_data as a pointer to the constfs descriptor */
 static vfs_mount_t const_mount = {
     .fs = &constfs_file_system,
     .mount_point = "/const",
