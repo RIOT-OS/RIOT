@@ -243,9 +243,10 @@ static void test_clist_foreach(void)
         clist_rpush(list, &tests_clist_buf[i]);
     }
 
-    clist_foreach(list, _foreach_test_trampoline, NULL);
+    void *res = clist_foreach(list, _foreach_test_trampoline, NULL);
 
     TEST_ASSERT(_foreach_called == _foreach_abort_after);
+    TEST_ASSERT(res == &tests_clist_buf[_foreach_abort_after-1]);
 
     _foreach_called = 0;
     for (int i = 0; i < TEST_CLIST_LEN; i++) {
@@ -253,9 +254,10 @@ static void test_clist_foreach(void)
     }
 
     _foreach_abort_after = (TEST_CLIST_LEN + 1);
-    clist_foreach(list, _foreach_test_trampoline, NULL);
+    res = clist_foreach(list, _foreach_test_trampoline, NULL);
 
     TEST_ASSERT(_foreach_called == TEST_CLIST_LEN);
+    TEST_ASSERT(res == NULL);
 }
 
 static int _cmp(clist_node_t *a, clist_node_t *b)
