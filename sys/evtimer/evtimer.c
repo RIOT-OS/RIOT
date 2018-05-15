@@ -150,9 +150,12 @@ void evtimer_add(evtimer_t *evtimer, evtimer_event_t *event)
         _set_timer(&evtimer->timer, event->offset);
     }
     irq_restore(state);
+#if !defined(ISR_CONTEXT_SWITCH_ALLOWED)
     if (sched_context_switch_request) {
         thread_yield_higher();
     }
+#endif
+
 }
 
 void evtimer_del(evtimer_t *evtimer, evtimer_event_t *event)
