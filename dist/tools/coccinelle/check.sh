@@ -6,9 +6,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-: ${RIOTBASE:=$(pwd)}
-
-. ${RIOTBASE}/dist/tools/ci/changed_files.sh
+: "${RIOTTOOLS:=${PWD}/dist/tools}"
+. "${RIOTTOOLS}"/ci/changed_files.sh
 
 EXIT_CODE=0
 
@@ -26,7 +25,7 @@ indent() {
 
 coccinelle_checkone() {
     OUT="$(spatch --very-quiet \
-        --macro-file-builtins ${RIOTBASE}/dist/tools/coccinelle/include/riot-standard.h \
+        --macro-file-builtins ${RIOTTOOLS}/coccinelle/include/riot-standard.h \
         --sp-file $patch ${FILES} | filter)"
 
     if [ -n "$OUT" ]; then
@@ -65,10 +64,9 @@ fi
 : ${COCCINELLE_QUIET:=0}
 
 if [ -z "$*" ]; then
-    coccinelle_checkall ${RIOTBASE}/dist/tools/coccinelle/force
+    coccinelle_checkall "${RIOTTOOLS}"/coccinelle/force
 
-    COCCINELLE_WARNONLY=1 \
-        coccinelle_checkall ${RIOTBASE}/dist/tools/coccinelle/warn
+    COCCINELLE_WARNONLY=1 coccinelle_checkall "${RIOTTOOLS}"/coccinelle/warn
 else
     for patch in "$@"; do
         coccinelle_checkone "$patch"

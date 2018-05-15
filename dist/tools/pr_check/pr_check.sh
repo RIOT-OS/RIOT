@@ -8,7 +8,8 @@
 #
 
 EXIT_CODE=0
-source ./dist/tools/pr_check/check_labels.sh
+: "${RIOTTOOLS:=${PWD}/dist/tools}"
+. "${RIOTTOOLS}"/pr_check/check_labels.sh
 
 if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
     CERROR="\e[1;31m"
