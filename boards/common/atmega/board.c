@@ -31,6 +31,7 @@ void led_init(void);
 
 void board_init(void)
 {
+    atmega_wdog_init();
     atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
     atmega_stdio_init();
     cpu_init();

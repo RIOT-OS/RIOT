@@ -124,6 +124,23 @@ static inline void atmega_set_prescaler(uint8_t clk_scale)
 }
 
 /**
+ * @brief   Initializes watchdog
+ */
+static inline void atmega_wdog_init(void)
+{
+    /* Reset the watchdog if the reboot was triggered due to it */
+    if (MCUSR & (1 << WDRF)) {
+        MCUSR &= ~(1 << WDRF);
+
+        /* Enable watchdog change */
+        WDTCSR |= 1 << WDCE;
+
+        /* Clear settings within 4 cycles */
+        WDTCSR = 0;
+    }
+}
+
+/**
  * @brief   Initializes avrlibc stdio
  */
 void atmega_stdio_init(void);
