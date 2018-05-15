@@ -81,6 +81,7 @@ uint8_t cc430_get_radio_state(void)
         case 6:
         case 7:
             state = FS_WAKEUP;
+            break;
         case 8:
         case 12:
             state = CALIBRATE;
@@ -103,6 +104,7 @@ uint8_t cc430_get_radio_state(void)
             break;
         case 18:
             state = FSTXON;
+            break;
         case 19:
         case 20:
             state = TX;
@@ -119,4 +121,3 @@ uint8_t cc430_get_radio_state(void)
     }
     return state;
 }
-

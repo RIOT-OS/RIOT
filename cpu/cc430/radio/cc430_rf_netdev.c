@@ -148,7 +148,6 @@ static int _send(netdev_t *dev, const iolist_t *iolist)
 {
     netdev_cc110x_t *netdev_cc110x = (netdev_cc110x_t *)dev;
     cc110x_pkt_t *cc110x_pkt = iolist->iol_base;
-    uint8_t state_was_RX = 0;
 
     uint16_t size;
 
@@ -191,11 +190,8 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 
     cc110x_t *cc110x = &((netdev_cc110x_t *) dev)->cc110x;
 
-    //(void) dev;
     (void) info;
     size_t pkt_len;
-    uint8_t bytesRead;
-    uint8_t bytesInRxFIFO;
 
     if (buf == NULL) {
         /* GNRC wants to know how much data we've got for it */
