@@ -32,7 +32,7 @@ export DEBUG_ADAPTER ?= dap
 #   Usage: SERIAL="0200..." BOARD="pba-d-01-kw2x" make flash
 ifneq (,$(SERIAL))
   export OPENOCD_EXTRA_INIT += "-c cmsis_dap_serial $(SERIAL)"
-  SERIAL_TTY = $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL)))
+  SERIAL_TTY = $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh $(SERIAL)))
   ifeq (,$(SERIAL_TTY))
     $(error Did not find a device with serial $(SERIAL))
   endif
