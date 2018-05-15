@@ -237,13 +237,19 @@ static int _foreach_test_trampoline(clist_node_t *node, void *arg)
 
 static void test_clist_foreach(void)
 {
+    void *res;
     list_node_t *list = &test_clist;
+
+    _foreach_called = 0;
+    res = clist_foreach(list, _foreach_test_trampoline, NULL);
+    TEST_ASSERT(_foreach_called == 0);
+    TEST_ASSERT(res == NULL);
 
     for (int i = 0; i < TEST_CLIST_LEN; i++) {
         clist_rpush(list, &tests_clist_buf[i]);
     }
 
-    void *res = clist_foreach(list, _foreach_test_trampoline, NULL);
+    res = clist_foreach(list, _foreach_test_trampoline, NULL);
 
     TEST_ASSERT(_foreach_called == _foreach_abort_after);
     TEST_ASSERT(res == &tests_clist_buf[_foreach_abort_after-1]);
