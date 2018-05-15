@@ -15,7 +15,8 @@ export FFLAGS += -p atmega256rfr2
 # For 8MHz F_CPU following Baudrate have good error rates
 #  76923
 #  38400
-export BAUD = 38400
+BAUD = 38400
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 # PROGRAMMER defaults to arduino which is the internal flasher via USB. Can be
 # overridden for debugging (which requires changes that require to use an ISP)
@@ -25,4 +26,4 @@ export PROGRAMMER ?= wiring
 BOOTLOADER_SIZE ?= 4K
 ROM_RESERVED ?= $(BOOTLOADER_SIZE)
 
-include $(RIOTBOARD)/common/arduino-atmega/Makefile.include
+include $(RIOTMAKE)/tools/avrdude.inc.mk
