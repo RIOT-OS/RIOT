@@ -5,12 +5,12 @@
 # default target when `make` is called without any further argument.
 
 # target for building the bossac binary
-$(RIOTBASE)/dist/tools/bossa/bossac:
+$(RIOTTOOLS)/bossa/bossac:
 	@echo "[INFO] bossac binary not found - building it from source"
-	@make -C $(RIOTBASE)/dist/tools/bossa
+	@make -C $(RIOTTOOLS)/bossa
 	@echo "[INFO] bossac binary successfully build!"
 
-$(RIOTBASE)/dist/tools/edbg/edbg:
+$(RIOTTOOLS)/edbg/edbg:
 	@echo "[INFO] edbg binary not found - building it from source now"
-	CC= CFLAGS= make -C $(RIOTBASE)/dist/tools/edbg
+	CC= CFLAGS= make -C $(RIOTTOOLS)/edbg
 	@echo "[INFO] edbg binary successfully build!"

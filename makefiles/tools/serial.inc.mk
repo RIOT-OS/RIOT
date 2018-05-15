@@ -14,7 +14,7 @@ export BAUD ?= 115200
 
 RIOT_TERMINAL ?= pyterm
 ifeq ($(RIOT_TERMINAL),pyterm)
-    export TERMPROG  ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
+    export TERMPROG  ?= $(RIOTTOOLS)/pyterm/pyterm
     export TERMFLAGS ?= -p "$(PORT)" -b "$(BAUD)"
 else ifeq ($(RIOT_TERMINAL),picocom)
     export TERMPROG  ?= picocom

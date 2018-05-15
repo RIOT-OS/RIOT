@@ -1,4 +1,4 @@
-RIOT_EDBG = $(RIOTBASE)/dist/tools/edbg/edbg
+RIOT_EDBG = $(RIOTTOOLS)/edbg/edbg
 EDBG ?= $(RIOT_EDBG)
 FLASHER ?= $(EDBG)
 HEXFILE = $(BINFILE)

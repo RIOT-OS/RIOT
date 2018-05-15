@@ -1,4 +1,4 @@
-export FLASHER ?= $(RIOTBASE)/dist/tools/bossa/bossac
+export FLASHER ?= $(RIOTTOOLS)/bossa/bossac
 export FFLAGS  ?= -p $(PORT) -e -i -w -v -b -R $(HEXFILE)
 
 HEXFILE = $(BINFILE)
@@ -20,6 +20,6 @@ endif
 
 # if we go with the default (BOSSA shipped with RIOT), we download and build
 # the tool if not already done
-ifeq ($(RIOTBASE)/dist/tools/bossa/bossac,$(FLASHER))
-  FLASHDEPS += $(RIOTBASE)/dist/tools/bossa/bossac
+ifeq ($(RIOTTOOLS)/bossa/bossac,$(FLASHER))
+  FLASHDEPS += $(RIOTTOOLS)/bossa/bossac
 endif
