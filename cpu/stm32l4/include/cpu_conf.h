@@ -27,7 +27,7 @@
 
 #if defined(CPU_MODEL_STM32L496ZG)
 #include "vendor/stm32l496xx.h"
-#elif defined(CPU_MODEL_STM32L476RG)
+#elif defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG)
 #include "vendor/stm32l476xx.h"
 #elif defined(CPU_MODEL_STM32L475VG)
 #include "vendor/stm32l475xx.h"
