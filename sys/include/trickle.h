@@ -58,7 +58,6 @@ typedef struct {
     trickle_callback_t callback;    /**< callback function and parameter that
                                          trickle calls after each interval */
     msg_t msg;                      /**< the msg_t to use for intervals */
-    uint64_t msg_time;              /**< interval in ms */
     xtimer_t msg_timer;             /**< xtimer to send a msg_t to the target
                                          thread for a new interval */
 } trickle_t;
