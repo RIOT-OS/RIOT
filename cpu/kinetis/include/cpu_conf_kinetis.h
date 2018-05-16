@@ -155,6 +155,7 @@ extern "C"
 #define LPTMR0_IRQn LPTimer_IRQn
 #define PIT_TCTRL_CHN_MASK   (0x4u)
 #define PIT_TCTRL_CHN_SHIFT  (2)
+#define PORT_IRQS   { PORTA_IRQn, PORTB_IRQn, PORTC_IRQn, PORTD_IRQn, PORTE_IRQn }
 #endif /* MK20D7_H_ */
 /** @} */
 
