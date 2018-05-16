@@ -43,8 +43,28 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+const char *cc110x_state_to_text(uint8_t state)
+{
+    switch (state){
+    case RADIO_IDLE:
+        return "idle";
+    case RADIO_TX_BUSY:
+        return "tx busy";
+    case RADIO_RX:
+        return "rx";
+    case RADIO_RX_BUSY:
+        return "rx busy";
+    case RADIO_PWD:
+        return "pwd";
+    case RADIO_UNKNOWN:
+        return "unknown";
+    }
+    return "invalid";
+}
+
 static void _rx_abort(cc110x_t *dev)
 {
+    DEBUG("_rx_abort\n");
     gpio_irq_disable(dev->params.gdo2);
 
     cc110x_strobe(dev, CC110X_SIDLE);    /* Switch to IDLE (should already be)... */
@@ -55,6 +75,7 @@ static void _rx_abort(cc110x_t *dev)
 
 static void _rx_start(cc110x_t *dev)
 {
+    DEBUG("_rx_start\n");
     dev->radio_state = RADIO_RX_BUSY;
 
     cc110x_pkt_buf_t *pkt_buf = &dev->pkt_buf;
@@ -67,6 +88,7 @@ static void _rx_start(cc110x_t *dev)
 
 static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
 {
+    DEBUG("_rx_read_data\n");
     int fifo = cc110x_get_reg_robust(dev, 0xfb);
 
     if (fifo & 0x80) {
@@ -140,6 +162,7 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
 
 static void _rx_continue(cc110x_t *dev, void(*callback)(void*), void*arg)
 {
+    DEBUG("_rx_continue\n");
 
     if (dev->radio_state != RADIO_RX_BUSY) {
         DEBUG("%s:%s:%u _rx_continue in invalid state\n", RIOT_FILE_RELATIVE,
@@ -160,8 +183,14 @@ static void _tx_abort(cc110x_t *dev)
     cc110x_switch_to_rx(dev);
 }
 
-static void _tx_continue(cc110x_t *dev)
+/**
+ * @brief Continue transmission
+ * @param dev CC110X device to continue transmission one
+ * @param fifo Number of bytes available in FIFO or 0 if unknown
+ */
+static void _tx_continue(cc110x_t *dev, uint8_t fifo)
 {
+    DEBUG("_tx_continue with fifo = %" PRIu8 "\n", fifo);
     gpio_irq_disable(dev->params.gdo2);
 
     cc110x_pkt_t *pkt = &dev->pkt_buf.packet;
@@ -177,19 +206,25 @@ static void _tx_continue(cc110x_t *dev)
         return;
     }
 
-    int fifo = 64 - cc110x_get_reg_robust(dev, 0xfa);
-
-    if (fifo & 0x80) {
-        DEBUG("%s:%s:%u tx underflow!\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-        _tx_abort(dev);
-        return;
-    }
-
     if (!fifo) {
-        DEBUG("%s:%s:%u fifo full!?\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
-        _tx_abort(dev);
-        return;
+        DEBUG("cc110x_get_reg_robust\n");
+        fifo = CC110X_FIFO_LENGTH - cc110x_get_reg_robust(dev, 0xfa);
+
+        if (fifo & 0x80) {
+            DEBUG("%s:%s:%u tx underflow!\n", RIOT_FILE_RELATIVE, 
+                                              __func__, __LINE__);
+            _tx_abort(dev);
+            return;
+        }
+
+        if (!fifo) {
+            DEBUG("%s:%s:%u fifo full!?\n", RIOT_FILE_RELATIVE,
+                                            __func__, __LINE__);
+            _tx_abort(dev);
+            return;
+        }
     }
+
 
     int to_send = left > fifo ? fifo : left;
 
@@ -216,6 +251,7 @@ static void _tx_continue(cc110x_t *dev)
 
 void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg)
 {
+    DEBUG("cc110x_isr_handler");
     switch (dev->radio_state) {
         case RADIO_RX:
             if (gpio_read(dev->params.gdo2)) {
@@ -231,7 +267,7 @@ void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg)
             break;
         case RADIO_TX_BUSY:
             if (!gpio_read(dev->params.gdo2)) {
-                _tx_continue(dev);
+                _tx_continue(dev, 0);
             }
             else {
                 DEBUG("cc110x_isr_handler() RADIO_TX_BUSY + GDO2\n");
@@ -281,17 +317,20 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
     cc110x_hook_tx();
 #endif
 
+    DEBUG("write_reg IOCFG2, 0x02\n");
     cc110x_write_reg(dev, CC110X_IOCFG2, 0x02);
 
     /* Put CC110x in IDLE mode to flush the FIFO */
+    DEBUG("strobe SIDLE\n");
     cc110x_strobe(dev, CC110X_SIDLE);
     /* Flush TX FIFO to be sure it is empty */
+    DEBUG("strobe SFTX\n");
     cc110x_strobe(dev, CC110X_SFTX);
 
     memcpy((char*)&dev->pkt_buf.packet, packet, size);
     dev->pkt_buf.pos = 0;
 
-    _tx_continue(dev);
+    _tx_continue(dev, CC110X_FIFO_LENGTH);
 
     return (int)size;
 }

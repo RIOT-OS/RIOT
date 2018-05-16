@@ -35,7 +35,7 @@ extern "C" {
  * @{
  */
 char *cc110x_get_marc_state(cc110x_t *dev);
-char *cc110x_state_to_text(uint8_t state);
+const char *cc110x_state_to_text(uint8_t state);
 int cc110x_rd_set_mode(cc110x_t *dev, int mode);
 uint8_t cc110x_get_buffer_pos(cc110x_t *dev);
 void cc110x_isr_handler(cc110x_t *dev, void(*callback)(void*), void*arg);
