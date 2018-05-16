@@ -253,26 +253,28 @@ extern "C" {
 #endif
 
 /**
- * @brief   Size of the buffer used to write options, other than Uri-Path, in a
- *          request
+ * @brief   Reduce payload length by this value for a request created with
+ *          gcoap_req_init()
  *
- * Accommodates Content-Format and Uri-Queries
+ * Accommodates writing Content-Format option in gcoap_finish()
  */
-#define GCOAP_REQ_OPTIONS_BUF   (40)
+#define GCOAP_REQ_OPTIONS_BUF   (4)
 
 /**
- * @brief   Size of the buffer used to write options in a response
+ * @brief   Reduce payload length by this value for a respons created with
+ *          gcoap_resp_init()
  *
- * Accommodates Content-Format.
+ * Accommodates writing Content-Format option in gcoap_finish()
  */
-#define GCOAP_RESP_OPTIONS_BUF  (8)
+#define GCOAP_RESP_OPTIONS_BUF  (4)
 
 /**
- * @brief   Size of the buffer used to write options in an Observe notification
+ * @brief   Reduce payload length by this value for an observe notification
+ *          created with gcoap_obs_init()
  *
- * Accommodates Content-Format and Observe.
+ * Accommodates writing Content-Format option in gcoap_finish()
  */
-#define GCOAP_OBS_OPTIONS_BUF   (8)
+#define GCOAP_OBS_OPTIONS_BUF   (4)
 
 /**
  * @brief   Maximum number of requests awaiting a response
@@ -506,6 +508,11 @@ void gcoap_register_listener(gcoap_listener_t *listener);
 
 /**
  * @brief   Initializes a CoAP request PDU on a buffer.
+
+ * @warning After you use this function, you may not add Options with option
+ * number less than COAP_OPT_URI_PATH. Otherwise, use the struct-based API
+ * described with @link net_nanocoap nanocoap @endlink to initialize the
+ * message. See the implementation of gcoap_req_init() itself as an example.
  *
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
@@ -525,8 +532,14 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 /**
  * @brief   Finishes formatting a CoAP PDU after the payload has been written
  *
- * Assumes the PDU has been initialized with gcoap_req_init() or
- * gcoap_resp_init().
+ * Assumes the PDU has been initialized with a gcoap_xxx_init() function, like
+ * gcoap_req_init().
+ *
+ * @warning To use this function, you only may have added an Option with
+ * option number less than COAP_OPT_CONTENT_FORMAT. Otherwise, use the
+ * struct-based API described with @link net_nanocoap nanocoap. @endlink With
+ * this API, you specify the format with coap_opt_add_uint(), prepare for the
+ * payload with coap_opt_finish(), and then write the payload.
  *
  * @param[in,out] pdu       Request metadata
  * @param[in] payload_len   Length of the payload, or 0 if none
