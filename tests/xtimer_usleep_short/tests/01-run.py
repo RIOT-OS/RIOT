@@ -12,6 +12,7 @@ import pexpect
 
 DEVIATION = .1
 
+
 def testfunc(child):
     child.expect(u"This test will call xtimer_usleep for values from (\d+) down to (\d+)")
     sleep_max = int(child.match.group(1))
