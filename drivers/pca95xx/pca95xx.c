@@ -154,7 +154,7 @@ static void _isr_cb_mux(void *arg)
         _set_pflag(pin, &(PFLAGS), PCA95XX_INT_LASTVAL, pin_val);
 
         /* Interrupt is not enabled */
-        if (!(dev->int_info[num] & PCA95XX_INT_EN)) {
+        if (!(dev->int_info[num] & (1 << PCA95XX_INT_EN))) {
             continue;
         }
 
@@ -265,6 +265,14 @@ int pca95xx_init_pin(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode)
         _set_pflag(pin, &(PFLAGS), PCA95XX_HIGH_DRIVE, 0);
     }
 
+    /* Make the drive settings take effect */
+    if (pca95xx_read(dev, pin)) {
+        pca95xx_set(dev, pin);
+    }
+    else {
+        pca95xx_clear(dev, pin);
+    }
+
     return 0;
 }
 
@@ -274,7 +282,7 @@ int pca95xx_init_int(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode,
     int8_t num;
 
     /* Check for interrupt service */
-    if ((dev->params.int_pin != GPIO_UNDEF) || (PCA95XX_MAX_INTS == 0)) {
+    if ((dev->params.int_pin == GPIO_UNDEF) || (PCA95XX_MAX_INTS == 0)) {
         DEBUG("[pca95xx] init_int - error: no interrupt service\n");
         return -1;
     }
