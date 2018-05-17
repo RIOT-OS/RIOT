@@ -54,7 +54,7 @@ extern "C" {
  * @brief   PCA95xx default maximum number of interrupts
  */
 #ifndef PCA95XX_MAX_INTS
-#define PCA95XX_MAX_INTS  (2U)
+#define PCA95XX_MAX_INTS  (2)
 #endif
 
 /**
@@ -70,7 +70,7 @@ enum {
 /**
  * @brief   Device flags
  */
-typdef enum {
+typedef enum {
     PCA95XX_16PIN_DEV    /**< device has 16 pins */
 } pca95xx_dflags_t;
 
@@ -133,7 +133,7 @@ int pca95xx_init(pca95xx_t *dev, const pca95xx_params_t *params);
  *
  * @return zero on successful initialization, non zero on error
  */
-int pca95xx_init_pin(const pca95xx_t *dev, uint8_t pin, gpio_mode_t mode);
+int pca95xx_init_pin(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode);
 
 /**
  * @brief   Initialize a GPIO pin for external interrupt usage
@@ -161,7 +161,7 @@ int pca95xx_init_int(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode,
  * @param[in] dev    device descriptor
  * @param[in] pin    the pin to enable the interrupt for
  */
-void pca95xx_irq_enable(pca95xx_t *dev, gpio_t pin);
+void pca95xx_irq_enable(pca95xx_t *dev, uint8_t pin);
 
 /**
  * @brief   Disable the pin interrupt if configured as interrupt source
@@ -169,7 +169,7 @@ void pca95xx_irq_enable(pca95xx_t *dev, gpio_t pin);
  * @param[in] dev    device descriptor
  * @param[in] pin    the pin to disable the interrupt for
  */
-void pca95xx_irq_disable(pca95xx_t *dev, gpio_t pin);
+void pca95xx_irq_disable(pca95xx_t *dev, uint8_t pin);
 
 /**
  * @brief   Get the current value of the device's pin

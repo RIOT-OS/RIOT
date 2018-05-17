@@ -101,9 +101,7 @@ static inline int8_t _get_int_num(uint8_t pin, uint8_t int_info[])
     }
 
     /* No entry with that pin */
-    if (num == PCA95XX_MAX_INTS) {
-        return -1;
-    }
+    return -1;
 }
 
 static void _isr_cb_mux(void *arg)
@@ -148,7 +146,7 @@ static void _isr_cb_mux(void *arg)
         pin_val &= 0x01;
 
         /* Pin has not changed */
-        if (pin_val = _get_pflag(pin, PFLAGS, PCA95XX_INT_LASTVAL)) {
+        if (pin_val == _get_pflag(pin, PFLAGS, PCA95XX_INT_LASTVAL)) {
             continue;
         }
 
@@ -230,7 +228,7 @@ int pca95xx_init(pca95xx_t *dev, const pca95xx_params_t *params)
     return PCA95XX_OK;
 }
 
-int pca95xx_init_pin(const pca95xx_t *dev, uint8_t pin, gpio_mode_t mode)
+int pca95xx_init_pin(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode)
 {
     /* Note: treat using pull-up/down as the same as without */
     if (mode == GPIO_IN_PD
@@ -266,6 +264,8 @@ int pca95xx_init_pin(const pca95xx_t *dev, uint8_t pin, gpio_mode_t mode)
 
         _set_pflag(pin, &(PFLAGS), PCA95XX_HIGH_DRIVE, 0);
     }
+
+    return 0;
 }
 
 int pca95xx_init_int(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode,
@@ -283,7 +283,7 @@ int pca95xx_init_int(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode,
     num = _get_int_num(pin, dev->int_info);
     if (num < 0) {
         for (num = 0; num < PCA95XX_MAX_INTS; num++) {
-            if (dev->cbs[num] == NULL) {
+            if (dev->cbs[num].cb == NULL) {
                 break;
             }
         }
@@ -318,8 +318,8 @@ int pca95xx_init_int(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode,
 
     /* Force interrupt safe callback assign order */
     volatile gpio_cb_t vcb = cb;
-    volatile *varg = arg;
-    dev->cbs[num].arg = varg;
+    volatile void *varg = arg;
+    dev->cbs[num].arg = (void *)varg;
     dev->cbs[num].cb = vcb;
 
     DEBUG("[pca95xx] init_int - interrupts initialized on pin %i\n", pin);
@@ -327,7 +327,7 @@ int pca95xx_init_int(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode,
     return 0;
 }
 
-void pca95xx_irq_enable(pca95xx_int_t *dev, uint8_t pin)
+void pca95xx_irq_enable(pca95xx_t *dev, uint8_t pin)
 {
     int8_t num = _get_int_num(pin, dev->int_info);
 
@@ -341,7 +341,7 @@ void pca95xx_irq_enable(pca95xx_int_t *dev, uint8_t pin)
     dev->int_info[num] |= (1 << PCA95XX_INT_EN);
 }
 
-void pca95xx_irq_disable(pca95xx_int_t *dev, uint8_t pin)
+void pca95xx_irq_disable(pca95xx_t *dev, uint8_t pin)
 {
     int8_t num = _get_int_num(pin, dev->int_info);
 
@@ -382,7 +382,7 @@ void pca95xx_set(const pca95xx_t *dev, uint8_t pin)
 
     i2c_acquire(I2C);
 
-    if (_get_pflag(pin, PFLAGS, PCA95XX_HIGH_DRIVE) {
+    if (_get_pflag(pin, PFLAGS, PCA95XX_HIGH_DRIVE)) {
         DEBUG("[pca95xx] set - driving pin %i high\n", pin);
 
         /* Set pin high */
@@ -423,7 +423,7 @@ void pca95xx_clear(const pca95xx_t *dev, uint8_t pin)
 
     i2c_acquire(I2C);
 
-    if (_get_pflag(pin, PFLAGS, PCA95XX_LOW_DRIVE) {
+    if (_get_pflag(pin, PFLAGS, PCA95XX_LOW_DRIVE)) {
         DEBUG("[pca95xx] clear - driving pin %i low\n", pin);
 
         /* Set pin low */
