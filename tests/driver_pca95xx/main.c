@@ -23,62 +23,109 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "gpio.h"
 #include "irq.h"
 #include "pca95xx.h"
 #include "pca95xx_params.h"
 #include "shell.h"
 
-static pca95xx_t pca95xx_dev = { .params.i2c   = PCA95XX_PARAM_I2C,
-                                 .params.addr  = PCA95XX_PARAM_ADDR,
-                                 .params.flags = PCA95XX_PARAM_FLAGS };
-
-static pca95xx_int_t pca95xx_int_dev = { .params.i2c     = PCA95XX_PARAM_I2C,
-                                         .params.addr    = PCA95XX_PARAM_ADDR,
-                                         .params.int_pin = PCA95XX_PARAM_INT_PIN };
+/* Define device descriptor */
+pca95xx_dev_t pca95xx_dev;
 
 static void cb(void *arg)
 {
-    (void)arg;
-    puts("PCA95xx pin change interrupt");
+    printf("PCA95xx PCINT on pin %i\n", (uint8_t)arg);
 }
 
-static int init_pin(int argc, char **argv)
+static int init_out(int argc, char **argv)
 {
+    int pin;
+
     if (argc < 2) {
         printf("usage: %s <pin>\n", argv[0]);
         return 1;
     }
 
-    pca95xx_dev.params.pin = atoi(argv[1]);
+    pin = atoi(argv[1]);
 
-    if (pca95xx_init(&pca95xx_dev, &(pca95xx_dev.params)) < 0) {
-        printf("Error initializing PCA95xx pin %i\n", pca95xx_dev.params.pin);
-        return 1;
-    }
-
-    return 0;
-}
-
-static int init_out(int argc, char **argv)
-{
-    pca95xx_dev.params.flags |= PCA95XX_HIGH_DRIVE | PCA95XX_LOW_DRIVE;
-
-    return init_pin(argc, argv);
+    return pca95xx_init_pin(&pca95xx_dev, pin, GPIO_OUT);
 }
 
 static int init_in(int argc, char **argv)
 {
-    pca95xx_dev.params.flags &= ~(PCA95XX_HIGH_DRIVE | PCA95XX_LOW_DRIVE);
+    int pin;
 
-    return init_pin(argc, argv);
+    if (argc < 2) {
+        printf("usage: %s <pin>\n", argv[0]);
+        return 1;
+    }
+
+    pin = atoi(argv[1]);
+
+    return pca95xx_init_pin(&pca95xx_dev, pin, GPIO_IN);
 }
 
 static int init_od(int argc, char **argv)
 {
-    pca95xx_dev.params.flags &= ~PCA95XX_HIGH_DRIVE;
-    pca95xx_dev.params.flags |= PCA95XX_LOW_DRIVE;
+    int pin;
 
-    return init_pin(argc, argv);
+    if (argc < 2) {
+        printf("usage: %s <pin>\n", argv[0]);
+        return 1;
+    }
+
+    pin = atoi(argv[1]);
+
+    return pca95xx_init_pin(&pca95xx_dev, pin, GPIO_OD);
+}
+
+static int init_int(int argc, char **argv)
+{
+    /* pin must fit into a void pointer */
+    uint8_t pin;
+
+    if (argc < 2) {
+        printf("usage: %s <pin>\n", argv[0]);
+        return 1;
+    }
+
+    pin = atoi(argv[1]);
+
+    pca95xx_init_int(&pca95xx_dev, pin, GPIO_IN, GPIO_BOTH, cb, (void *)pin);
+
+    return 0;
+}
+
+static int irq_en(int argc, char **argv)
+{
+    int pin;
+
+    if (argc < 2) {
+        printf("usage: %s <pin>\n", argv[0]);
+        return 1;
+    }
+
+    pin = atoi(argv[1]);
+
+    pca95xx_irq_enable(&pca95xx_dev, pin);
+
+    return 0;
+}
+
+static int irq_dis(int argc, char **argv)
+{
+    int pin;
+
+    if (argc < 2) {
+        printf("usage: %s <pin>\n", argv[0]);
+        return 1;
+    }
+
+    pin = atoi(argv[1]);
+
+    pca95xx_irq_disable(&pca95xx_dev, pin);
+
+    return 0;
 }
 
 static int read(int argc, char **argv)
@@ -104,36 +151,48 @@ static int read(int argc, char **argv)
 
 static int set(int argc, char **argv)
 {
+    int pin;
+
     if (argc < 2) {
         printf("usage: %s <pin>\n", argv[0]);
         return 1;
     }
 
-    pca95xx_set(&pca95xx_dev, atoi(argv[1]));
+    pin = atoi(argv[1]);
+
+    pca95xx_set(&pca95xx_dev, pin);
 
     return 0;
 }
 
 static int clear(int argc, char **argv)
 {
+    int pin;
+
     if (argc < 2) {
         printf("usage: %s <pin>\n", argv[0]);
         return 1;
     }
 
-    pca95xx_clear(&pca95xx_dev, atoi(argv[1]));
+    pin = atoi(argv[1]);
+
+    pca95xx_clear(&pca95xx_dev, pin);
 
     return 0;
 }
 
 static int toggle(int argc, char **argv)
 {
+    int pin;
+
     if (argc < 2) {
         printf("usage: %s <pin>\n", argv[0]);
         return 1;
     }
 
-    pca95xx_toggle(&pca95xx_dev, atoi(argv[1]));
+    pin = atoi(argv[1]);
+
+    pca95xx_toggle(&pca95xx_dev, pin);
 
     return 0;
 }
@@ -141,12 +200,18 @@ static int toggle(int argc, char **argv)
 
 static int write(int argc, char **argv)
 {
+    int pin;
+    int val;
+
     if (argc < 3) {
         printf("usage: %s <pin> <value>\n", argv[0]);
         return 1;
     }
 
-    pca95xx_write(&pca95xx_dev, atoi(argv[1]), atoi(argv[2]));
+    pin = atoi(argv[1]);
+    val = atoi(argv[2]);
+
+    pca95xx_write(&pca95xx_dev, pin, val);
 
     return 0;
 }
@@ -155,6 +220,9 @@ static const shell_command_t shell_commands[] = {
     { "init_out", "init as output (push-pull mode)", init_out },
     { "init_in", "init as input", init_in },
     { "init_od", "init as output (open-drain mode)", init_od },
+    { "init_int", "configure interrupt", init_int },
+    { "irq_en", "enable interrupt", irq_en },
+    { "irq_dis" "disable interrupt", irq_dis },
     { "read", "read pin status", read },
     { "set", "set pin to HIGH", set },
     { "clear", "set pin to LOW", clear },
@@ -165,11 +233,15 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    puts("PCA95xx I2C GPIO expander driver test\n");
+    int ret;
 
-    /* Enable pin change interrupts */
-    pca95xx_int_init(&pca95xx_int_dev, &(pca95xx_int_dev.params));
-    pca95xx_enable_int(&pca95xx_int_dev, cb, NULL);
+    puts("PCA95xx I2C GPIO expander driver test");
+
+    puts("Initializing PCA95xx");
+    ret = pca95xx_init(&pca95xx_dev, &pca95xx_params);
+    if (ret < 0) {
+        printf("Error: pca95xx_init returned %i", ret);
+    }
 
     /* start the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
