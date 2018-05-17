@@ -20,7 +20,6 @@
 #define PCA95XX_PARAMS_H
 
 #include "board.h"
-#include "saul_reg.h"
 #include "pca95xx.h"
 
 #ifdef __cplusplus
@@ -37,29 +36,18 @@ extern "C" {
 #ifndef PCA95XX_PARAM_ADDR
 #define PCA95XX_PARAM_ADDR       (PCA95XX_I2C_ADDRESS)
 #endif
-#ifndef PCA95XX_PARAM_PIN
-#define PCA95XX_PARAM_PIN        (0U)
-#endif
-#ifndef PCA95XX_PARAM_FLAGS
-#define PCA95XX_PARAM_FLAGS      (PCA95XX_16PIN_DEV)
-#endif
 #ifndef PCA95XX_PARAM_INT_PIN
 #define PCA95XX_PARAM_INT_PIN    (GPIO_UNDEF)
 #endif
+#ifndef PCA95XX_PARAM_DFLAGS
+#define PCA95XX_PARAM_DFLAGS     (PCA95XX_16PIN_DEV)
+#endif
 
 #ifndef PCA95XX_PARAMS
-#define PCA95XX_PARAMS        { .i2c          = PCA95XX_PARAM_I2C,  \
-                                .addr         = PCA95XX_PARAM_ADDR, \
-                                .pin          = PCA95XX_PARAM_PIN,  \
-                                .flags        = PCA95XX_PARAM_FLAGS }
-#endif
-#ifndef PCA95XX_INT_PARAMS
-#define PCA95XX_INT_PARAMS    { .i2c          = PCA95XX_PARAM_I2C,  \
-                                .addr         = PCA95XX_PARAM_ADDR, \
-                                .int_pin      = PCA95XX_PARAM_INT_PIN }
-#endif
-#ifndef PCA95XX_SAUL_INFO
-#define PCA95XX_SAUL_INFO     { .name = "pca95xx" }
+#define PCA95XX_PARAMS        { .i2c          = PCA95XX_PARAM_I2C,     \
+                                .addr         = PCA95XX_PARAM_ADDR,    \
+                                .int_pin      = PCA95XX_PARAM_INT_PIN, \
+                                .dflags       = PCA95XX_PARAM_DFLAGS }
 #endif
 /** @} */
 
@@ -69,19 +57,6 @@ extern "C" {
 static const pca95xx_params_t pca95xx_params[] =
 {
     PCA95XX_PARAMS
-};
-static const pca95xx_int_params_t pca95xx_int_params[] =
-{
-    PCA95XX_INT_PARAMS
-};
-
-
-/**
- * @brief   Additional meta information to keep in the SAUL registry
- */
-static const saul_reg_info_t pca95xx_saul_info[] =
-{
-    PCA95XX_SAUL_INFO
 };
 
 #ifdef __cplusplus
