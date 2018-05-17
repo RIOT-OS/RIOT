@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 Matthew Blue <matthew.blue.neuro@gmail.com>
+ * Copyright (C) 2015 Freie Universität Berlin
+ *               2018 Matthew Blue <matthew.blue.neuro@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -37,13 +38,23 @@ extern "C" {
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
+/* Included for PCA95XX_MAX_INTS */
+#include "board.h"
+
 /**
  * @brief  PCA95xx default address (PCA9539 address, A0 = 0, A1 = 0)
  *
- * Note that many of the supported devices have different addresses.
+ * @note   Many of the supported devices have different addresses.
  */
 #ifndef PCA95XX_I2C_ADDRESS
 #define PCA95XX_I2C_ADDRESS  (0x74)
+#endif
+
+/**
+ * @brief   PCA95xx default maximum number of interrupts
+ */
+#ifndef PCA95XX_MAX_INTS
+#define PCA95XX_MAX_INTS  (2U)
 #endif
 
 /**
@@ -57,55 +68,51 @@ enum {
 };
 
 /**
- * @brief   Pin flags
+ * @brief   Device flags
  */
-typedef enum {
-    PCA95XX_INIT_SET     = (1 << 0),    /**< initialize pin high, otherwise low */
-    PCA95XX_16PIN_DEV    = (1 << 1),    /**< device has 16 pins */
-    PCA95XX_HIGH_DRIVE   = (1 << 2),    /**< drive pin when set high */
-    PCA95XX_LOW_DRIVE    = (1 << 3),    /**< drive pin when set low */
-    PCA95XX_INPUT_INVERT = (1 << 4)     /**< invert input */
-} pca95xx_flags_t;
+typdef enum {
+    PCA95XX_16PIN_DEV    /**< device has 16 pins */
+} pca95xx_dflags_t;
 
 /**
  * @brief   PCA95xx params
  */
 typedef struct pca95xx_params {
-    i2c_t i2c;                /**< i2c device */
-    uint8_t addr;             /**< i2c address */
-    uint8_t pin;              /**< pin number */
-    pca95xx_flags_t flags;    /**< flags of the specified pin */
+    i2c_t i2c;                  /**< i2c device */
+    uint8_t addr;               /**< i2c address */
+    gpio_t int_pin;             /**< interrupt pin */
+    pca95xx_dflags_t dflags;    /**< device flags */
 } pca95xx_params_t;
+
+/**
+ * @brief   Pin flags
+ */
+enum {
+    PCA95XX_LOW_DRIVE     = 0,    /**< drive pin when set low */
+    PCA95XX_HIGH_DRIVE    = 1,    /**< drive pin when set high */
+};
+
+/**
+ * @brief   Interrupt info
+ *
+ * @note    The first nibble of dev.int_info[n] contains the pin number
+ */
+enum {
+    PCA95XX_INT_EN      = 4,    /**< Interrupt is enabled */
+    PCA95XX_INT_LASTVAL = 5,    /**< Last value of the interrupt pin */
+    PCA95XX_INT_FALL    = 6,    /**< Run callback on falling input */
+    PCA95XX_INT_RISE    = 7     /**< Run callback on rising input */
+};
 
 /**
  * @brief   PCA95xx device descriptor
  */
 typedef struct pca95xx {
-    pca95xx_params_t params;    /**< device driver configuration */
+    pca95xx_params_t params;                 /**< device driver configuration */
+    uint32_t pflags;                         /**< pin flags */
+    gpio_isr_ctx_t cbs[PCA95XX_MAX_INTS];    /**< array of callbacks */
+    uint8_t int_info[PCA95XX_MAX_INTS];      /**< array of interrupt pin info */
 } pca95xx_t;
-
-/**
- * @brief   PCA95xx interrupt params
- */
-typedef struct pca95xx_int_params {
-    i2c_t i2c;         /**< i2c device */
-    uint8_t addr;      /**< i2c address */
-    gpio_t int_pin;    /**< interrupt pin (GPIO_UNDEF if not connected) */
-} pca95xx_int_params_t;
-
-/**
- * @brief   PCA95xx interrupt callback
- */
-typedef void (*pca95xx_int_cb_t)(void *);
-
-/**
- * @brief   PCA95xx interrupt device descriptor
- */
-typedef struct pca95xx_int {
-    pca95xx_int_params_t params;    /**< device driver configuration */
-    pca95xx_int_cb_t cb;            /**< alert callback */
-    void *arg;                      /**< alert callback param */
-} pca95xx_int_t;
 
 /**
  * @brief   Initialize a PCA95xx GPIO device
@@ -118,25 +125,51 @@ typedef struct pca95xx_int {
 int pca95xx_init(pca95xx_t *dev, const pca95xx_params_t *params);
 
 /**
- * @brief   Initialize a PCA95xx interrupt device
+ * @brief   Initialize the PCA95xx pin as general purpose input or output
  *
- * @param[in,out] dev  device descriptor
- * @param[in] params   device configuration
+ * @param[in] dev   device descriptor
+ * @param[in] pin   pin to initialize
+ * @param[in] mode  mode of the pin, see @c gpio_mode_t
  *
  * @return zero on successful initialization, non zero on error
  */
-int pca95xx_int_init(pca95xx_int_t *dev, const pca95xx_int_params_t *params);
+int pca95xx_init_pin(const pca95xx_t *dev, uint8_t pin, gpio_mode_t mode);
 
 /**
- * @brief   Enable interrupt
+ * @brief   Initialize a GPIO pin for external interrupt usage
  *
- * @param[in] dev   device descriptor
- * @param[in] cb    callback called when the alert fires
- * @param[in] arg   callback argument
+ * The registered callback function will be called in interrupt context every
+ * time the defined flank(s) are detected.
  *
- * @return zero on success, non zero on error
+ * The interrupt is activated automatically after the initialization.
+ *
+ * @param[in,out] dev   device descriptor
+ * @param[in] pin       pin to initialize
+ * @param[in] mode      mode of the pin, see @c gpio_mode_t
+ * @param[in] flank     define the active flank(s)
+ * @param[in] cb        callback that is called from interrupt context
+ * @param[in] arg       optional argument passed to the callback
+ *
+ * @return zero on successful initialization, non zero on error
  */
-int pca95xx_enable_int(pca95xx_int_t *dev, pca95xx_int_cb_t cb, void *arg);
+int pca95xx_init_int(pca95xx_t *dev, uint8_t pin, gpio_mode_t mode,
+                     gpio_flank_t flank, gpio_cb_t cb, void *arg);
+
+/**
+ * @brief   Enable pin interrupt if configured as interrupt source
+ *
+ * @param[in] dev    device descriptor
+ * @param[in] pin    the pin to enable the interrupt for
+ */
+void pca95xx_irq_enable(pca95xx_t *dev, gpio_t pin);
+
+/**
+ * @brief   Disable the pin interrupt if configured as interrupt source
+ *
+ * @param[in] dev    device descriptor
+ * @param[in] pin    the pin to disable the interrupt for
+ */
+void pca95xx_irq_disable(pca95xx_t *dev, gpio_t pin);
 
 /**
  * @brief   Get the current value of the device's pin
