@@ -23,18 +23,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "gpio.h"
 #include "irq.h"
 #include "pca95xx.h"
 #include "pca95xx_params.h"
+#include "periph/gpio.h"
 #include "shell.h"
 
 /* Define device descriptor */
-pca95xx_dev_t pca95xx_dev;
+pca95xx_t pca95xx_dev;
 
 static void cb(void *arg)
 {
-    printf("PCA95xx PCINT on pin %i\n", (uint8_t)arg);
+    printf("PCA95xx PCINT on pin %i\n", (intptr_t)arg);
 }
 
 static int init_out(int argc, char **argv)
@@ -82,7 +82,7 @@ static int init_od(int argc, char **argv)
 static int init_int(int argc, char **argv)
 {
     /* pin must fit into a void pointer */
-    uint8_t pin;
+    intptr_t pin;
 
     if (argc < 2) {
         printf("usage: %s <pin>\n", argv[0]);
@@ -222,7 +222,7 @@ static const shell_command_t shell_commands[] = {
     { "init_od", "init as output (open-drain mode)", init_od },
     { "init_int", "configure interrupt", init_int },
     { "irq_en", "enable interrupt", irq_en },
-    { "irq_dis" "disable interrupt", irq_dis },
+    { "irq_dis", "disable interrupt", irq_dis },
     { "read", "read pin status", read },
     { "set", "set pin to HIGH", set },
     { "clear", "set pin to LOW", clear },
@@ -238,7 +238,7 @@ int main(void)
     puts("PCA95xx I2C GPIO expander driver test");
 
     puts("Initializing PCA95xx");
-    ret = pca95xx_init(&pca95xx_dev, &pca95xx_params);
+    ret = pca95xx_init(&pca95xx_dev, &pca95xx_params[0]);
     if (ret < 0) {
         printf("Error: pca95xx_init returned %i", ret);
     }
