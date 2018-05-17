@@ -63,7 +63,7 @@ static inline uint8_t _pin_bit(uint8_t pin)
 static inline uint8_t _get_pflag(uint8_t pin, uint32_t pflags, uint8_t flag)
 {
     /* Shift to the correct entry */
-    pflags >>= 2*pin;
+    pflags >>= 2 * pin;
 
     if (pflags & (1 << flag)) {
         return 1;
@@ -77,10 +77,10 @@ static inline void _set_pflag(uint8_t pin, uint32_t *pflags,
                               uint8_t flag, uint8_t val)
 {
     if (val) {
-        *pflags |= (1 << (2*pin + flag));
+        *pflags |= (1UL << (2 * pin + flag));
     }
     else {
-        *pflags &= ~(1 << (2*pin + flag));
+        *pflags &= ~(1UL << (2 * pin + flag));
     }
 }
 

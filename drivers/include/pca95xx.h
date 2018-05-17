@@ -71,7 +71,7 @@ enum {
  * @brief   Device flags
  */
 typedef enum {
-    PCA95XX_16PIN_DEV    /**< device has 16 pins */
+    PCA95XX_16PIN_DEV    = 0    /**< device has 16 pins */
 } pca95xx_dflags_t;
 
 /**
@@ -89,7 +89,7 @@ typedef struct pca95xx_params {
  */
 enum {
     PCA95XX_LOW_DRIVE     = 0,    /**< drive pin when set low */
-    PCA95XX_HIGH_DRIVE    = 1,    /**< drive pin when set high */
+    PCA95XX_HIGH_DRIVE    = 1     /**< drive pin when set high */
 };
 
 /**
