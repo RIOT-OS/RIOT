@@ -37,8 +37,7 @@ USEMODULE += timex
 USEMODULE += xtimer
 USEMODULE += random
 USEMODULE += prng_xorshift
-
-USEPKG += tlsf
+USEMODULE += tlsf-malloc
 
 USEPKG += ccn-lite
 

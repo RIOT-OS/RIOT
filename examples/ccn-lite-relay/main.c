@@ -37,7 +37,7 @@ static uint32_t _tlsf_heap[TLSF_BUFFER];
 
 int main(void)
 {
-    tlsf_create_with_pool(_tlsf_heap, sizeof(_tlsf_heap));
+    tlsf_add_global_pool(_tlsf_heap, sizeof(_tlsf_heap));
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Basic CCN-Lite example");

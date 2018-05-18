@@ -28,6 +28,7 @@
 
 #ifdef MODULE_TLSF
 #include "tlsf.h"
+#include "tlsf-malloc.h"
 #endif
 
 /* list of states copied from tcb.h */
@@ -146,7 +147,7 @@ void ps(void)
            overall_stacksz, overall_used);
 #   ifdef MODULE_TLSF
     puts("\nHeap usage:");
-    tlsf_walk_pool(NULL);
+    tlsf_walk_pool(tlsf_get_pool(_tlsf_get_global_control()), NULL, NULL);
 #   endif
 #endif
 }

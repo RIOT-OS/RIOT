@@ -723,6 +723,10 @@ ifneq (,$(filter rdcli_common,$(USEMODULE)))
   USEMODULE += luid
 endif
 
+ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
+  USEPKG += tlsf
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 
