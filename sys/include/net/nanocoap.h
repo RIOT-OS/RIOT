@@ -175,7 +175,7 @@ extern "C" {
 /**
  * @brief   Nanocoap-specific value to indicate no format specified
  */
-#define COAP_FORMAT_NONE        (65535)
+#define COAP_FORMAT_NONE        (UINT16_MAX)
 
 /**
  * @name    Nanocoap specific maximum values

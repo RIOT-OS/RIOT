@@ -38,6 +38,12 @@
 #define GCOAP_RESOURCE_WRONG_METHOD -1
 #define GCOAP_RESOURCE_NO_PATH -2
 
+/*
+ * gcoap internal Content-Format option value. Not intended for use in a
+ * transmitted packet. Must be a 3-byte unsigned value.
+ */
+#define COAP_FORMAT_NO_PAYLOAD  (UINT16_MAX + 1)
+
 /* Internal functions */
 static void *_event_loop(void *arg);
 static void _listen(sock_udp_t *sock);
