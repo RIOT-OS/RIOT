@@ -372,6 +372,22 @@ typedef struct {
 #endif
 } spi_conf_t;
 
+#ifdef CPU_LINE_STM32F423
+#define HAVE_HWCRYPTO_AES128
+#define HAVE_HWCRYPTO_AES256
+
+typedef struct {
+    AES_TypeDef *aes_dev;
+    uint32_t rccmask;
+    uint8_t ahbbus;
+#ifdef MODULE_PERIPH_DMA
+    dma_t in_dma;
+    uint8_t in_dma_chan;
+    dma_t out_dma;
+    uint8_t out_dma_chan;
+#endif
+} hwcrypto_conf_t;
+#endif
 
 /**
  * @brief   Get the actual bus clock frequency for the APB buses
