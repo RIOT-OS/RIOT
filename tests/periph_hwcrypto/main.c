@@ -43,6 +43,15 @@ static uint8_t iv[32] __attribute__((aligned));
  */
 static uint8_t counter[32] __attribute__((aligned));
 
+static void printf_buffer(uint8_t *buf, size_t len, char *label)
+{
+    printf("%s: ", label);
+    for (size_t i = 0; i < len; i++) {
+        printf("%02X", buf[i]);
+    }
+    printf("\n");
+}
+
 #if defined(HAVE_HWCRYPTO_AES128) || defined(HAVE_HWCRYPTO_AES256)
 static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hwcrypto_mode_t mode, uint8_t key_size, uint8_t block_size)
 {
@@ -84,6 +93,7 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
 
         return;
     }
+    printf_buffer(key, key_size, "key");
 
     if (mode == HWCRYPTO_MODE_CBC || mode == HWCRYPTO_MODE_CFB || mode == HWCRYPTO_MODE_OFB) {
         result = hwcrypto_cipher_set(dev, HWCRYPTO_OPT_IV, iv, 16);
@@ -94,6 +104,7 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
 
             return;
         }
+        printf_buffer(iv, 16, "IV");
     }
     else if (mode == HWCRYPTO_MODE_CTR) {
         result = hwcrypto_cipher_set(dev, HWCRYPTO_OPT_COUNTER, counter, 16);
@@ -104,9 +115,11 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
 
             return;
         }
+        printf_buffer(counter, 16, "Counter");
     }
 
     /* test encryption */
+    printf_buffer(data, block_size, "Plain data");
     result = hwcrypto_cipher_encrypt(dev, data, data, block_size);
 
     if (result != block_size) {
@@ -115,6 +128,7 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
 
         return;
     }
+    printf_buffer(data, block_size, "Encrypted data");
 
     /* test decryption */
     result = hwcrypto_cipher_decrypt(dev, data, data, block_size);
@@ -125,6 +139,7 @@ static void test_cipher(hwcrypto_t dev, char *name, hwcrypto_cipher_t cipher, hw
 
         return;
     }
+    printf_buffer(data, block_size, "Decrypted data");
 
     /* release it */
     hwcrypto_release(dev);
@@ -194,6 +209,19 @@ int main(void)
     puts("In this test, the supported cipher and hash functions will be "
          "tested on each hardware crypto peripheral. It will test the "
          "implementation only, not the results.\n");
+
+    for (unsigned i = 0; i < sizeof(key); i++) {
+        key[i] = i;
+    }
+    for (unsigned i = 0; i < sizeof(iv); i++) {
+        iv[i] = i;
+    }
+    for (unsigned i = 0; i < sizeof(data); i++) {
+        data[i] = sizeof(data) - i;
+    }
+    for (unsigned i = 0; i < sizeof(counter); i++) {
+        counter[i] = 0;
+    }
 
     /* run a test for every hardware crypto peripheral */
     for (int i = 0; i < (int) HWCRYPTO_NUMOF; i++) {
