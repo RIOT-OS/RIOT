@@ -55,6 +55,7 @@
 
 #include <limits.h>
 
+#include "cb_mux.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
@@ -117,14 +118,30 @@ typedef enum {
 #endif
 
 /**
- * @brief   Signature of event callback functions triggered from interrupts
- *
- * @param[in] arg       optional context for the callback
+ * @brief   Structure to hold interrupt callback information
  */
-typedef void (*gpio_cb_t)(void *arg);
+typedef cb_mux_t gpio_int_t;
 
 /**
- * @brief   Default interrupt context for GPIO pins
+ * @brief   Tell users of periph/gpio.h to use new behavior
+ */
+#ifndef GPIO_USE_INT_ENTRY
+#ifdef MODULE_CB_MUX
+#define GPIO_USE_INT_ENTRY    (1)
+#else /* MODULE_CB_MUX */
+#define GPIO_USE_INT_ENTRY    (0)
+#endif /* MODULE_CB_MUX */
+#endif /* GPIO_USE_INT_ENTRY */
+
+/**
+ * @brief   Signature of event callback functions triggered from interrupts
+ */
+typedef cb_mux_cb_t gpio_cb_t;
+
+/**
+ * @brief   Default interrupt context for GPIO pins (DEPRECATED)
+ *
+ * @note    In the process of being removed in favor of cb_mux entries
  */
 #ifndef HAVE_GPIO_ISR_CTX_T
 typedef struct {
@@ -156,6 +173,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  *
  * The interrupt is activated automatically after the initialization.
  *
+ * @param[in] entry     structure to hold callback information
  * @param[in] pin       pin to initialize
  * @param[in] mode      mode of the pin, see @c gpio_mode_t
  * @param[in] flank     define the active flank(s)
@@ -165,8 +183,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  * @return              0 on success
  * @return              -1 on error
  */
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg);
+int gpio_init_int(gpio_int_t *entry, gpio_t pin, gpio_mode_t mode,
+                  gpio_flank_t flank, gpio_cb_t cb, void *arg);
 
 /**
  * @brief   Enable pin interrupt if configured as interrupt source
