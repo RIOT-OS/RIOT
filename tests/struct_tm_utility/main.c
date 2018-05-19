@@ -113,7 +113,13 @@ static int cmd_day(int argc, char **argv)
             puts("The supplied date is invalid, but no error should occur.");
         }
 
+#ifndef ATMEGA_INCOMPATIBLE_TIME_H
         int wday, yday;
+#else
+        int8_t wday;
+        int16_t yday;
+#endif
+
         tm_get_wyday(year, mon - 1, day, &wday, &yday);
         printf("What weekday was %04d-%02d-%02d? The %d(th) day of the year was a %.3s.\n",
                year, mon, day, yday + 1, DAY_NAMES[wday]);

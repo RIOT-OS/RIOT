@@ -153,6 +153,12 @@ extern          "C" {
         int16_t         tm_isdst; /**< Daylight Saving Time flag */
     };
 
+    /**
+        ATmega compatibility problem define
+        NOTE: Added for RIOT compatibility
+     */
+#define ATMEGA_INCOMPATIBLE_TIME_H
+
 #ifndef __DOXYGEN__
     /* We have to provide clock_t / CLOCKS_PER_SEC so that libstdc++-v3 can
        be built.  We define CLOCKS_PER_SEC via a symbol _CLOCKS_PER_SEC_
