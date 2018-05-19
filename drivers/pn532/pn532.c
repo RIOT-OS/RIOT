@@ -78,6 +78,14 @@
 /* Length for passive listings */
 #define LIST_PASSIVE_LEN_14443(num)   (num * 20)
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
+
 #if ENABLE_DEBUG
 #define PRINTBUFF printbuff
 static void printbuff(uint8_t *buff, unsigned len)
@@ -114,8 +122,8 @@ int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
 
     dev->conf = params;
 
-    gpio_init_int(dev->conf->irq, GPIO_IN_PU, GPIO_FALLING,
-                  _nfc_event, (void *)dev);
+    gpio_init_int(INT_ENTRY, dev->conf->irq, GPIO_IN_PU,
+                  GPIO_FALLING, _nfc_event, (void *)dev);
 
     gpio_init(dev->conf->reset, GPIO_OUT);
     gpio_set(dev->conf->reset);

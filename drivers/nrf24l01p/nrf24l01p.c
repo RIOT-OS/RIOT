@@ -34,6 +34,14 @@
 #define SPI_MODE            SPI_MODE_0
 #define SPI_CLK             SPI_CLK_400KHZ
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
+
 int nrf24l01p_read_reg(const nrf24l01p_t *dev, char reg, char *answer)
 {
     /* Acquire exclusive access to the bus. */
@@ -81,7 +89,8 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
     spi_init_cs(dev->spi, dev->cs);
 
     /* Init IRQ pin */
-    gpio_init_int(dev->irq, GPIO_IN_PU, GPIO_FALLING, nrf24l01p_rx_cb, dev);
+    gpio_init_int(INT_ENTRY, dev->irq, GPIO_IN_PU,
+                  GPIO_FALLING, nrf24l01p_rx_cb, dev);
 
     /* Test the SPI connection */
     if (spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK) != SPI_OK) {

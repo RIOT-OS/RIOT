@@ -23,6 +23,14 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
+
 /*
  * does a crc check and returns the checksum
  */
@@ -53,7 +61,8 @@ int lc709203f_init(lc709203f_t *dev, const lc709203f_params_t *params)
     dev->params = *params;
     dev->bus = params->bus;
     dev->addr = params->addr;
-    gpio_init_int(dev->params.alarm_pin, GPIO_IN, GPIO_FALLING, dev->cb, dev->arg);
+    gpio_init_int(INT_ENTRY, dev->params.alarm_pin, GPIO_IN,
+                  GPIO_FALLING, dev->cb, dev->arg);
     i2c_acquire(dev->bus);
     if (i2c_init_master(dev->bus, I2C_SPEED_FAST)) {
         i2c_release(dev->bus);

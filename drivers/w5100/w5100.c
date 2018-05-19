@@ -45,6 +45,14 @@
 
 static const netdev_driver_t netdev_driver_w5100;
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
+
 static inline void send_addr(w5100_t *dev, uint16_t addr)
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -123,7 +131,7 @@ void w5100_setup(w5100_t *dev, const w5100_params_t *params)
 
     /* initialize the chip select pin and the external interrupt pin */
     spi_init_cs(dev->p.spi, dev->p.cs);
-    gpio_init_int(dev->p.evt, GPIO_IN, GPIO_FALLING, extint, dev);
+    gpio_init_int(INT_ENTRY, dev->p.evt, GPIO_IN, GPIO_FALLING, extint, dev);
 }
 
 static int init(netdev_t *netdev)

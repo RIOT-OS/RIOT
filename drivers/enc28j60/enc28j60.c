@@ -74,6 +74,13 @@
 #define BUF_RX_START                (0)
 #define BUF_RX_END                  (BUF_TX_START - 2)
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
 
 static void switch_bank(enc28j60_t *dev, int8_t bank)
 {
@@ -325,7 +332,8 @@ static int nd_init(netdev_t *netdev)
         DEBUG("[enc28j60] init: error initializing the CS pin [%i]\n", res);
         return -1;
     }
-    gpio_init_int(dev->int_pin, GPIO_IN, GPIO_FALLING, on_int, (void *)dev);
+    gpio_init_int(INT_ENTRY, dev->int_pin, GPIO_IN,
+                  GPIO_FALLING, on_int, (void *)dev);
 
     /* wait at least 1ms and then release device from reset state */
     xtimer_usleep(DELAY_RESET);

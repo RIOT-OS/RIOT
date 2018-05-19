@@ -40,6 +40,14 @@
 #define I2C (dev->params.i2c)
 #define ADDR (dev->params.addr)
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
+
 static int _ads101x_init_test(i2c_t i2c, uint8_t addr);
 
 int ads101x_init(ads101x_t *dev, const ads101x_params_t *params)
@@ -174,7 +182,8 @@ int ads101x_enable_alert(ads101x_alert_t *dev,
     /* Enable interrupt */
     dev->arg = arg;
     dev->cb = cb;
-    gpio_init_int(dev->params.alert_pin, GPIO_IN, GPIO_FALLING, cb, arg);
+    gpio_init_int(INT_ENTRY, dev->params.alert_pin,
+                  GPIO_IN, GPIO_FALLING, cb, arg);
 
     return ADS101X_OK;
 }

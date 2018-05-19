@@ -29,6 +29,14 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
+
 /**********************************************************************
  * internal API declaration
  **********************************************************************/
@@ -60,7 +68,8 @@ int pir_init(pir_t *dev, const pir_params_t *params)
         gpio_mode = GPIO_IN_PU;
     }
 
-    if (gpio_init_int(dev->p.gpio, gpio_mode, GPIO_BOTH, pir_callback, dev)) {
+    if (gpio_init_int(INT_ENTRY, dev->p.gpio, gpio_mode,
+                      GPIO_BOTH, pir_callback, dev)) {
         return PIR_NOGPIO;
     }
     return PIR_OK;
@@ -176,7 +185,8 @@ static int pir_activate_int(pir_t *dev)
         gpio_mode = GPIO_IN_PU;
     }
 
-    if (gpio_init_int(dev->p.gpio, gpio_mode, GPIO_BOTH, pir_callback, dev)) {
+    if (gpio_init_int(INT_ENTRY, dev->p.gpio, gpio_mode,
+                      GPIO_BOTH, pir_callback, dev)) {
         return PIR_NOGPIO;
     }
     return PIR_OK;

@@ -37,6 +37,14 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
+
 static int _send(netdev_t *dev, const iolist_t *iolist)
 {
     DEBUG("%s:%u\n", __func__, __LINE__);
@@ -200,8 +208,8 @@ static int _init(netdev_t *dev)
 
     cc110x_t *cc110x = &((netdev_cc110x_t*) dev)->cc110x;
 
-    gpio_init_int(cc110x->params.gdo2, GPIO_IN, GPIO_BOTH,
-                  &_netdev_cc110x_isr, (void*)dev);
+    gpio_init_int(INT_ENTRY, cc110x->params.gdo2, GPIO_IN,
+                  GPIO_BOTH, &_netdev_cc110x_isr, (void*)dev);
 
     gpio_set(cc110x->params.gdo2);
     gpio_irq_disable(cc110x->params.gdo2);

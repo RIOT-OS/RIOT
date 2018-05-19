@@ -36,6 +36,14 @@
  * value 0x20: cycle time = Tconvert x 64 */
 #define CONF_TEST_VALUE (0x20)
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
+
 int adcxx1c_init(adcxx1c_t *dev, const adcxx1c_params_t *params)
 {
     assert(dev && params);
@@ -114,7 +122,8 @@ int adcxx1c_enable_alert(adcxx1c_t *dev, adcxx1c_cb_t cb, void *arg)
         dev->cb = cb;
         dev->arg = arg;
         /* alert active low */
-        gpio_init_int(dev->params.alert_pin, GPIO_IN, GPIO_FALLING, _alert_cb, dev);
+        gpio_init_int(INT_ENTRY, dev->params.alert_pin, GPIO_IN,
+                      GPIO_FALLING, _alert_cb, dev);
     }
 
     return ADCXX1C_OK;
