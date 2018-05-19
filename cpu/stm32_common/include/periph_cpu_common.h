@@ -120,6 +120,14 @@ typedef enum {
 #define HAVE_GPIO_T
 typedef uint32_t gpio_t;
 /** @} */
+
+/**
+ * @name    Define a custom type for cb_mux cbid
+ * @{
+ */
+#define HAVE_CB_MUX_CBID_T
+typedef uint32_t cb_mux_cbid_t;
+/** @} */
 #endif
 
 /**

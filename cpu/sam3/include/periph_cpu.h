@@ -36,6 +36,14 @@ typedef uint32_t gpio_t;
 /** @} */
 
 /**
+ * @name    Define a custom type for cb_mux cbid
+ * @{
+ */
+#define HAVE_CB_MUX_CBID_T
+typedef uint32_t cb_mux_cbid_t;
+/** @} */
+
+/**
  * @brief Definition of a fitting UNDEF value
  */
 #define GPIO_UNDEF          (0xffffffff)

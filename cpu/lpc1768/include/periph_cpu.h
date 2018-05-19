@@ -37,6 +37,14 @@ typedef uint8_t gpio_t;
 /** @} */
 
 /**
+ * @name    Define a custom type for cb_mux cbid
+ * @{
+ */
+#define HAVE_CB_MUX_CBID_T
+typedef uint8_t cb_mux_cbid_t;
+/** @} */
+
+/**
  * @brief   Define a custom GPIO_PIN macro for the lpc1768
  */
 #define GPIO_PIN(port, pin)     (gpio_t)((port << 5) | pin)

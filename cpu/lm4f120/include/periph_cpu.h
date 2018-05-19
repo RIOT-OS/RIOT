@@ -37,6 +37,14 @@ typedef uint32_t gpio_t;
 #define GPIO_PIN(x,y) ((gpio_t)((x<<4) | y))
 /** @} */
 
+/**
+ * @name    Define a custom type for cb_mux cbid
+ * @{
+ */
+#define HAVE_CB_MUX_CBID_T
+typedef uint32_t cb_mux_cbid_t;
+/** @} */
+
 #ifndef DOXYGEN
 /**
  * @brief   Override GPIO modes

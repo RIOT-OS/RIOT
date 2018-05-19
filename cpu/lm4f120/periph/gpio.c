@@ -161,9 +161,12 @@ void isr_gpio_portf(void){
     _isr_gpio(5);
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_init_int(gpio_int_t *entry, gpio_t pin, gpio_mode_t mode,
+                  gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
+    /* FIXME: utilize gpio.h/cb_mux API change */
+    (void)entry;
+
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
     const uint32_t icr_reg_addr = port_addr + GPIO_ICR_R_OFF;

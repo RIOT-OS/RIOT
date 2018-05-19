@@ -102,9 +102,12 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_init_int(gpio_int_t *entry, gpio_t pin, gpio_mode_t mode,
+                  gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
+    /* FIXME: utilize gpio.h/cb_mux API change */
+    (void)entry;
+
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
 
