@@ -501,6 +501,15 @@ extern          "C" {
     */
     unsigned long   lm_sidereal(const time_t * timer);
 
+    /**
+        Definition of struct timespec for the atmega
+        NOTE: Added for RIOT compatibility and standard compliance
+     */
+    struct timespec {
+        time_t    tv_sec;
+        long      tv_nsec;
+    };
+
     /* @} */
 #ifdef __cplusplus
 }
