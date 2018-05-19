@@ -74,13 +74,13 @@ void wdog_disable(void)
 #else
 
 /* Kinetis E series doesn't have COPC register in the SIM unit */
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     /* disable the COP WDOG */
     SIM->COPC = (uint32_t)0x00u;
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     /* Disable watchdog */
     WDOG->CS1 &= ~(WDOG_CS1_EN_MASK);
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 
 #endif
 }

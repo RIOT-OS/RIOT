@@ -23,9 +23,9 @@
 
 #if (KINETIS_FAMILY == 0)
 #if (KINETIS_SUBFAMILY == 2)
-#if defined(CPU_MODEL_MKE02Z64VQH2)
-#include "vendor/MKE02Z.h"
-#endif /* CPU_MODEL_MKE02Z64VQH2 */
+#if defined(CPU_MODEL_MKE02Z64VQH4)
+#include "vendor/MKE02Z4.h"
+#endif /* CPU_MODEL_MKE02Z64VQH4 */
 #endif /* (KINETIS_SUBFAMILY == y) */
 #endif /* (KINETIS_FAMILY == x) */
 

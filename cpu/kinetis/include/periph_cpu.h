@@ -48,14 +48,14 @@ typedef uint16_t gpio_t;
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
 #define GPIO_PIN(x, y)      (((x + 1) << 12) | (x << 6) | y)
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
 #define GPIO_PIN(x, y)      (((x) << 8) | (y))
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 
 #ifdef SIM_UIDH_UID_MASK
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
 /* Kinetis Cortex-M4 has a 128 bit SIM UID */
 /**
  * @brief   Starting offset of CPU_ID
@@ -66,17 +66,17 @@ typedef uint16_t gpio_t;
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (16U)
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
 /* Kinetis E series has a 64 bit SIM UID */
 /**
  * @brief   Starting offset of CPU_ID
  */
-#define CPUID_ADDR          (&SIM->UIDL)
+#define CPUID_ADDR          (&SIM->UUIDL)
 /**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (8U)
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 #else /* defined(SIM_UIDH_UID_MASK) */
 /* Kinetis Cortex-M0+ has a 96 bit SIM UID */
 /**
@@ -197,9 +197,9 @@ enum {
     PORT_E = 4,             /**< port E */
     PORT_F = 5,             /**< port F */
     PORT_G = 6,             /**< port G */
-#if defined(KINETIS_SERIES_E)
+#if defined(_MKE02Z4_H_)
     PORT_H = 7,             /**< port H */
-#endif /* defined(KINETIS_SERIES_E) */
+#endif /* defined(_MKE02Z4_H_) */
     GPIO_PORTS_NUMOF        /**< overall number of available ports */
 };
 

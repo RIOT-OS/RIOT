@@ -165,20 +165,30 @@ extern "C"
  * @name MKE02Z Compatibility layer
  * @{
  */
-#if defined(MKE02Z_H_)
+#if defined(_MKE02Z4_H_)
+#undef TPM0
+#undef TPM1
+#define PORTA_BASE 0
 #define PORT_PCR_MUX(n) 0
 #define PORT_PCR_PE_MASK 0
 #define PORT_PCR_PS_MASK 0
 #define PORT_PCR_IRQC(n) 0
 #define ADC_CFG1_MODE(n) 0
+#define MCG_C2_RANGE0(n) 0
+#define MCG_C4_DMX32_MASK 0
 #define SPI_CTAR_CPHA_MASK 0
 #define SPI_CTAR_CPOL_MASK 0
 typedef struct {} LPTMR_Type;
 #define MCG_C4_DRST_DRS(n) 0
-#define MCG_C4_DMX32_MASK 0
-#define MCG_C2_RANGE0(n) 0
-#define PORTA_BASE 0
+#define PIT0_IRQn PIT_CH0_IRQn
+#define PIT1_IRQn PIT_CH1_IRQn
+#define WDOG_EWM_IRQn WDOG_IRQn
 #define SIM_SCGC5_PORTA_SHIFT 0
+#define UART0_RX_TX_IRQn UART0_IRQn
+#define UART1_RX_TX_IRQn UART1_IRQn
+#define UART2_RX_TX_IRQn UART2_IRQn
+#define SIM_UIDH_UID_MASK SIM_UUIDH_ID_MASK
+#define SIM_SCGC_IIC_MASK SIM_SCGC_I2C_MASK
 #define PIT_CLKEN() (bit_set32(&SIM->SCGC, SIM_SCGC_PIT_SHIFT))
 #endif /* MKE02Z_H_ */
 /** @} */

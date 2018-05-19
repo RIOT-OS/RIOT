@@ -143,12 +143,12 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
         case I2C_0:
             i2c = I2C_0_DEV;
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
             i2c_port = I2C_0_PORT;
             pin_scl = I2C_0_SCL_PIN;
             pin_sda = I2C_0_SDA_PIN;
             I2C_0_PORT_CLKEN();
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 
             I2C_0_CLKEN();
 
@@ -159,11 +159,11 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             return -1;
     }
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     /* configure pins, alternate output */
     i2c_port->PCR[pin_scl] = I2C_0_PORT_CFG;
     i2c_port->PCR[pin_sda] = I2C_0_PORT_CFG;
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 
     i2c->F = baudrate_flags;
 

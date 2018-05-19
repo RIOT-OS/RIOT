@@ -269,9 +269,9 @@ static inline void irq_handler_uart(uart_t uart)
 #if (KINETIS_UART_ADVANCED == 0)
     /* clear overrun flag */
     if (dev->S1 & UART_S1_OR_MASK) {
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
         dev->S1 = UART_S1_OR_MASK;
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
     }
 #endif
 

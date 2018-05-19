@@ -56,7 +56,7 @@ void rtt_init(void)
 
     RTT_UNLOCK();
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     /* Reset RTC */
     rtt->CR = RTC_CR_SWR_MASK;
     /* cppcheck-suppress redundantAssignment
@@ -79,7 +79,7 @@ void rtt_init(void)
     rtt->IER = 0;
 
     rtt_poweron();
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     /* LPOCLK (1kHz) as clock source */
     rtt->SC |= RTC_SC_RTCLKS(0x01);
     /* Prescaler (one tick every 100ms) */
@@ -90,7 +90,7 @@ void rtt_init(void)
     rtt->SC &= ~(RTC_SC_RTCO_MASK);
     /* Set modulo value to 0 */
     rtt->MOD |= RTC_MOD_MOD(0);
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 }
 
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
@@ -99,13 +99,13 @@ void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
     rtt_callback.overflow_cb = cb;
     rtt_callback.overflow_arg = arg;
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     rtt->IER |= RTC_IER_TOIE_MASK;
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     rtt_callback.alarm_cb = cb;
     rtt_callback.alarm_arg = arg;
     rtt->SC |= RTC_SC_RTIE_MASK;
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 }
 
 void rtt_clear_overflow_cb(void)
@@ -114,20 +114,20 @@ void rtt_clear_overflow_cb(void)
     rtt_callback.overflow_cb = NULL;
     rtt_callback.overflow_arg = NULL;
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     rtt->IER &= ~(RTC_IER_TOIE_MASK);
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     rtt_callback.alarm_cb = NULL;
     rtt_callback.alarm_arg = NULL;
     rtt->SC &= ~(RTC_SC_RTIE_MASK);
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 }
 
 uint32_t rtt_get_counter(void)
 {
     RTC_Type *rtt = RTT_DEV;
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     uint32_t t;
     for (int i = 0; i < 3; i++) {
         /* Read twice to make sure we get a stable reading */
@@ -139,28 +139,28 @@ uint32_t rtt_get_counter(void)
     }
     /* Fallback if we are not getting stable readings */
     return t;
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     return rtt->CNT;
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 }
 
 void rtt_set_counter(uint32_t counter)
 {
     RTC_Type *rtt = RTT_DEV;
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     /* Disable time counter before writing to the timestamp register */
     rtt->SR &= ~RTC_SR_TCE_MASK;
     rtt->TSR = counter;
     /* Enable when done */
     rtt->SR |= RTC_SR_TCE_MASK;
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     /* Disable interrupt */
     rtt->SC &= ~(RTC_SC_RTIE_MASK);
     rtt->MOD = counter;
     /* Enable interrupt */
     rtt->SC |= RTC_SC_RTIE_MASK;
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 }
 
 
@@ -171,14 +171,14 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
      * immediately when the counter becomes equal to the alarm time. */
     RTC_Type *rtt = RTT_DEV;
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     /* Disable Timer Alarm Interrupt */
     rtt->IER &= ~(RTC_IER_TAIE_MASK);
     rtt->TAR = alarm - 1;
 
     /* Enable Timer Alarm Interrupt */
     rtt->IER |= RTC_IER_TAIE_MASK;
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     /* Disable interrupt */
     rtt->SC &= ~(RTC_SC_RTIE_MASK);
     rtt->MOD = alarm - 1;
@@ -192,7 +192,7 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 
     rtt_callback.overflow_cb = cb;
     rtt_callback.overflow_arg = arg;
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 
     rtt_callback.alarm_cb = cb;
     rtt_callback.alarm_arg = arg;
@@ -206,27 +206,27 @@ uint32_t rtt_get_alarm(void)
 {
     RTC_Type *rtt = RTT_DEV;
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     return rtt->TAR + 1;
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     return rtt->MOD + 1;
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 }
 
 void rtt_clear_alarm(void)
 {
     RTC_Type *rtt = RTT_DEV;
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     /* Disable Timer Alarm Interrupt */
     rtt->IER &= ~RTC_IER_TAIE_MASK;
     rtt->TAR = 0;
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     /* Disable interrupt */
     rtt->SC &= ~(RTC_SC_RTIE_MASK);
     rtt_callback.overflow_arg = NULL;
     rtt_callback.overflow_arg = NULL;
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 
     rtt_callback.alarm_cb = NULL;
     rtt_callback.alarm_arg = NULL;
@@ -236,31 +236,31 @@ void rtt_clear_alarm(void)
 
 void rtt_poweron(void)
 {
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     RTC_Type *rtt = RTT_DEV;
     /* Enable Time Counter */
     rtt->SR |= RTC_SR_TCE_MASK;
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     RTT_UNLOCK();
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 }
 
 void rtt_poweroff(void)
 {
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     RTC_Type *rtt = RTT_DEV;
     /* Disable Time Counter */
     rtt->SR &= ~RTC_SR_TCE_MASK;
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     RTT_LOCK();
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 }
 
 void RTT_ISR(void)
 {
     RTC_Type *rtt = RTT_DEV;
 
-#if !defined(KINETIS_SERIES_E)
+#if !defined(_MKE02Z4_H_)
     if (rtt->SR & RTC_SR_TAF_MASK) {
         if (rtt_callback.alarm_cb != NULL) {
             /* Disable Timer Alarm Interrupt */
@@ -274,7 +274,7 @@ void RTT_ISR(void)
             rtt_callback.overflow_cb(rtt_callback.overflow_arg);
         }
     }
-#else /* !defined(KINETIS_SERIES_E) */
+#else /* !defined(_MKE02Z4_H_) */
     if ((rtt->SC & RTC_SC_RTIF_MASK)) {
         /* Disable interrupt */
         rtt->SC &= ~(RTC_SC_RTIE_MASK);
@@ -290,7 +290,7 @@ void RTT_ISR(void)
         /* Clear the interrupt flag and request */
         rtt->SC |= RTC_SC_RTIF_MASK;
     }
-#endif /* !defined(KINETIS_SERIES_E) */
+#endif /* !defined(_MKE02Z4_H_) */
 
     cortexm_isr_end();
 }
