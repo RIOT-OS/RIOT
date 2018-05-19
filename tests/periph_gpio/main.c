@@ -28,6 +28,14 @@
 
 #define BENCH_RUNS_DEFAULT      (1000UL * 1000)
 
+/* Interrupt struct for gpio_init_int */
+#if GPIO_USE_INT_ENTRY
+static gpio_int_t int_entry;
+#define INT_ENTRY (&int_entry)
+#else
+#define INT_ENTRY (NULL)
+#endif
+
 static void cb(void *arg)
 {
     printf("INT: external interrupt from pin %i\n", (int)arg);
@@ -140,7 +148,8 @@ static int init_int(int argc, char **argv)
         }
     }
 
-    if (gpio_init_int(GPIO_PIN(po, pi), mode, flank, cb, (void *)pi) < 0) {
+    if (gpio_init_int(INT_ENTRY, GPIO_PIN(po, pi), mode,
+                      flank, cb, (void *)pi) < 0) {
         printf("error: init_int of GPIO_PIN(%i, %i) failed\n", po, pi);
         return 1;
     }
