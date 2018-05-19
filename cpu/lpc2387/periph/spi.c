@@ -47,8 +47,6 @@ void spi_init(spi_t bus)
 {
     assert(bus == SPI_DEV(0));
 
-    /* interface setup */
-    SSP0CR0 = 7;
     /* configure pins */
     spi_init_pins(bus);
     /*  power off the bus (default is on) */
@@ -81,6 +79,8 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     mutex_lock(&lock);
     /*  power on */
     PCONP |= (PCSSP0);
+    /* interface setup */
+    SSP0CR0 = 7;
 
     /* configure bus clock */
     lpc2387_pclk_scale(CLOCK_CORECLOCK / 1000, (uint32_t)clk, &pclksel, &cpsr);
