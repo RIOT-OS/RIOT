@@ -168,7 +168,6 @@ extern "C"
 #if defined(_MKE02Z4_H_)
 #undef TPM0
 #undef TPM1
-#define PORTA_BASE 0
 #define PORT_PCR_MUX(n) 0
 #define PORT_PCR_PE_MASK 0
 #define PORT_PCR_PS_MASK 0

@@ -197,9 +197,7 @@ enum {
     PORT_E = 4,             /**< port E */
     PORT_F = 5,             /**< port F */
     PORT_G = 6,             /**< port G */
-#if defined(_MKE02Z4_H_)
     PORT_H = 7,             /**< port H */
-#endif /* defined(_MKE02Z4_H_) */
     GPIO_PORTS_NUMOF        /**< overall number of available ports */
 };
 
