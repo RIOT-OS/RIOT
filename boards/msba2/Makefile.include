@@ -1,7 +1,3 @@
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
-  USEMODULE += cc110x
-endif
-
 USEMODULE += boards_common_msba2
 
 include $(RIOTBOARD)/common/msba2/Makefile.include
