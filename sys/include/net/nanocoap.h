@@ -232,9 +232,6 @@ typedef struct {
     uint16_t options_len;                       /**< length of options array */
     coap_optpos_t options[NANOCOAP_NOPTS_MAX];  /**< option offset array     */
 #ifdef MODULE_GCOAP
-    uint8_t url[NANOCOAP_URI_MAX];              /**< parsed request URL      */
-    uint8_t qs[NANOCOAP_QS_MAX];                /**< parsed query string     */
-    uint16_t content_type;                      /**< content type            */
     uint32_t observe_value;                     /**< observe value           */
 #endif
 } coap_pkt_t;
