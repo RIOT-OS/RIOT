@@ -27,17 +27,7 @@ void board_init(void)
     /* Initialize the Cortex-M0+ core */
     cpu_init();
 
-    /* System initialization */
-
-    /* SPI0 pinselect */
-    bit_set32(&(SIM->PINSEL), SIM_PINSEL_SPI0PS_SHIFT);
-    bit_set32(&(SIM->SOPT), SIM_SOPT_NMIE_SHIFT);
-    bit_set32(&(SIM->SOPT), SIM_SOPT_RSTPE_SHIFT);
-    bit_set32(&(SIM->SOPT), SIM_SOPT_SWDE_SHIFT);
-
-    /* Enable SWD and FLASH clock */
-    bit_set32(&(SIM->SCGC), SIM_SCGC_SWD_SHIFT);
-    bit_set32(&(SIM->SCGC), SIM_SCGC_FLASH_SHIFT);
+    /* System clock initialization */
 
     /* Set BUS_CLOCK = CORE_CLOCK  */
     bit_clear32(&(SIM->BUSDIV), SIM_BUSDIV_BUSDIV_SHIFT);
