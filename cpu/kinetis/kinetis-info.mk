@@ -123,6 +123,12 @@ else ifeq ($(KINETIS_SERIES),W)
     $(error Unknown Kinetis W)
   endif
 else ifeq ($(KINETIS_SERIES),E)
+  KINETIS_RAMSIZE = $(KINETIS_ROMSIZE)/8
+
+  ifeq ($(KINETIS_FAMILY)$(KINETIS_SUBFAMILY) $(KINETIS_ROMSIZE),02 64)
+    KINETIS_RAMSIZE = 4
+  endif
+
   KINETIS_SRAM_L_SIZE = $(KINETIS_RAMSIZE)/4
 endif
 export KINETIS_RAMSIZE
