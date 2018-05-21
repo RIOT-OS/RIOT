@@ -79,7 +79,11 @@ void wdog_disable(void)
     SIM->COPC = (uint32_t)0x00u;
 #else /* !defined(_MKE02Z4_H_) */
     /* Disable watchdog */
-    WDOG->CS1 &= ~(WDOG_CS1_EN_MASK);
+    WDOG->CNT = WDOG_UPDATE_KEY1;
+    WDOG->CNT = WDOG_UPDATE_KEY2;
+    WDOG->TOVAL = 0xFFFFU;
+    WDOG->CS1 = (uint8_t)(((WDOG->CS1) & ~WDOG_CS1_EN_MASK) | WDOG_CS1_UPDATE_MASK);
+    WDOG->CS2 |= 0;
 #endif /* !defined(_MKE02Z4_H_) */
 
 #endif
