@@ -186,10 +186,18 @@ typedef struct {} LPTMR_Type;
 #define UART0_RX_TX_IRQn UART0_IRQn
 #define UART1_RX_TX_IRQn UART1_IRQn
 #define UART2_RX_TX_IRQn UART2_IRQn
-#define SIM_UIDH_UID_MASK SIM_UUIDH_ID_MASK
 #define SIM_SCGC_IIC_MASK SIM_SCGC_I2C_MASK
+
+/* Enable PIT clock gate */
+#if defined(SIM_SCGC6_PIT_SHIFT)
+/* Most Kinetis models */
+#define PIT_CLKEN() (bit_set32(&SIM->SCGC6, SIM_SCGC6_PIT_SHIFT))
+#elif defined(SIM_SCGC_PIT_SHIFT)
+/* KE0x specific */
 #define PIT_CLKEN() (bit_set32(&SIM->SCGC, SIM_SCGC_PIT_SHIFT))
-#endif /* MKE02Z_H_ */
+#endif
+
+#endif /* _MKE02Z4_H_ */
 /** @} */
 
 

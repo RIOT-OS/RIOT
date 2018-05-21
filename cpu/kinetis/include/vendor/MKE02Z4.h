@@ -2981,8 +2981,8 @@ typedef struct {
   __IO uint32_t SOPT;                              /**< System Options Register, offset: 0x4 */
   __IO uint32_t PINSEL;                            /**< Pin Selection Register, offset: 0x8 */
   __IO uint32_t SCGC;                              /**< System Clock Gating Control Register, offset: 0xC */
-  __I  uint32_t UUIDL;                             /**< Universally Unique Identifier Low Register, offset: 0x10 */
-  __I  uint32_t UUIDH;                             /**< Universally Unique Identifier High Register, offset: 0x14 */
+  __I  uint32_t UIDL;                              /**< Universally Unique Identifier Low Register, offset: 0x10 */
+  __I  uint32_t UIDH;                              /**< Universally Unique Identifier High Register, offset: 0x14 */
   __IO uint32_t BUSDIV;                            /**< BUS Clock Divider Register, offset: 0x18 */
 } SIM_Type;
 
@@ -3180,15 +3180,15 @@ typedef struct {
 #define SIM_SCGC_ACMP1_SHIFT                     (31U)
 #define SIM_SCGC_ACMP1(x)                        (((uint32_t)(((uint32_t)(x)) << SIM_SCGC_ACMP1_SHIFT)) & SIM_SCGC_ACMP1_MASK)
 
-/*! @name UUIDL - Universally Unique Identifier Low Register */
-#define SIM_UUIDL_ID_MASK                        (0xFFFFFFFFU)
-#define SIM_UUIDL_ID_SHIFT                       (0U)
-#define SIM_UUIDL_ID(x)                          (((uint32_t)(((uint32_t)(x)) << SIM_UUIDL_ID_SHIFT)) & SIM_UUIDL_ID_MASK)
+/*! @name UIDL - Universally Unique Identifier Low Register */
+#define SIM_UIDL_UID_MASK                        (0xFFFFFFFFU)
+#define SIM_UIDL_UID_SHIFT                       (0U)
+#define SIM_UIDL_UID(x)                          (((uint32_t)(((uint32_t)(x)) << SIM_UIDL_UID_SHIFT)) & SIM_UIDL_UID_MASK)
 
-/*! @name UUIDH - Universally Unique Identifier High Register */
-#define SIM_UUIDH_ID_MASK                        (0xFFFFFFFFU)
-#define SIM_UUIDH_ID_SHIFT                       (0U)
-#define SIM_UUIDH_ID(x)                          (((uint32_t)(((uint32_t)(x)) << SIM_UUIDH_ID_SHIFT)) & SIM_UUIDH_ID_MASK)
+/*! @name UIDH - Universally Unique Identifier High Register */
+#define SIM_UIDH_UID_MASK                        (0xFFFFFFFFU)
+#define SIM_UIDH_UID_SHIFT                       (0U)
+#define SIM_UIDH_UID(x)                          (((uint32_t)(((uint32_t)(x)) << SIM_UIDH_UID_SHIFT)) & SIM_UIDH_UID_MASK)
 
 /*! @name BUSDIV - BUS Clock Divider Register */
 #define SIM_BUSDIV_BUSDIV_MASK                   (0x1U)

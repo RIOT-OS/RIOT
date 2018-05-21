@@ -55,7 +55,7 @@ typedef uint16_t gpio_t;
 #endif /* !defined(_MKE02Z4_H_) */
 
 #ifdef SIM_UIDH_UID_MASK
-#if !defined(_MKE02Z4_H_)
+#if defined(SIM_UIDMH_UID_MASK) && defined(SIM_UIDML_UID_MASK)
 /* Kinetis Cortex-M4 has a 128 bit SIM UID */
 /**
  * @brief   Starting offset of CPU_ID
@@ -66,17 +66,17 @@ typedef uint16_t gpio_t;
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (16U)
-#else /* !defined(_MKE02Z4_H_) */
-/* Kinetis E series has a 64 bit SIM UID */
+#else /* defined(SIM_UIDMH_UID_MASK) && defined(SIM_UIDML_UID_MASK) */
+/* Kinetis MCU with 64-bit SIM UID */
 /**
  * @brief   Starting offset of CPU_ID
  */
-#define CPUID_ADDR          (&SIM->UUIDL)
+#define CPUID_ADDR          (&SIM->UIDL)
 /**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (8U)
-#endif /* !defined(_MKE02Z4_H_) */
+#endif /* defined(SIM_UIDMH_UID_MASK) && defined(SIM_UIDML_UID_MASK) */
 #else /* defined(SIM_UIDH_UID_MASK) */
 /* Kinetis Cortex-M0+ has a 96 bit SIM UID */
 /**
