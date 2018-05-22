@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <stdio.h>
+
 #include "at.h"
 #include "shell.h"
 #include "timex.h"
