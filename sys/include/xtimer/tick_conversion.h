@@ -132,7 +132,7 @@ inline static uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
  */
 #endif
 /*
- * Now, check if XTIMER_HZ is a frequency multiple of 1MHz (or 15675, which is
+ * Now, check if XTIMER_HZ is a frequency multiple of 1MHz (or 15625, which is
  * a lower divisor for lower frequencies, e.g. 32768)
  */
 #elif (XTIMER_HZ % 15625 == 0)
