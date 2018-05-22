@@ -253,10 +253,8 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
 #else
 #error Unknown hardware timer frequency (XTIMER_HZ), check board.h and/or add an implementation in sys/include/xtimer/tick_conversion.h
 #endif
-/*
- * End of optimisations
- */
-#endif
+
+#endif /* XTIMER_HZ == 1MHz */
 
 #ifdef __cplusplus
 }
