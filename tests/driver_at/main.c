@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 OTA keys S.A.
+ *               2018 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,34 +15,38 @@
  * @brief    AT module test application
  *
  * @author   Vincent Dupont <vincent@otakeys.com>
+ * @author   Alexandre Abadie <alexandre.abadie@inria.fr>
  *
  * @}
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "at.h"
 #include "shell.h"
 #include "timex.h"
 
+#include "periph/uart.h"
+
 static at_dev_t at_dev;
 static char buf[256];
 static char resp[1024];
-
-#ifndef UART_AT
-#define UART_AT     UART_DEV(1)
-#endif
-
-#ifndef BAUDRATE_AT
-#define BAUDRATE_AT 115200
-#endif
 
 static int init(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
 
-    at_dev_init(&at_dev, UART_AT, BAUDRATE_AT, buf, sizeof(buf));
+    if (argc < 3) {
+        printf("Usage: %s <uart> <baudrate>\n", argv[0]);
+        return 1;
+    }
+
+    uint8_t uart = atoi(argv[1]);
+    uint32_t baudrate = atoi(argv[2]);
+
+    at_dev_init(&at_dev, UART_DEV(uart), baudrate, buf, sizeof(buf));
 
     return 0;
 }
@@ -49,17 +54,16 @@ static int init(int argc, char **argv)
 static int send(int argc, char **argv)
 {
     if (argc < 2) {
-        puts("Please enter a command");
+        printf("Usage: %s <command>\n", argv[0]);
         return 1;
     }
 
-    if (at_send_cmd_get_resp(&at_dev, argv[1], resp, sizeof(resp), 10 * US_PER_SEC) > 0) {
-        puts("Response:");
-        puts(resp);
-    }
-    else {
+    if (at_send_cmd_get_resp(&at_dev, argv[1], resp, sizeof(resp), 10 * US_PER_SEC) < 0) {
         puts("Error");
+        return 1;
     }
+
+    printf("Response: %s\n", resp);
 
     return 0;
 }
