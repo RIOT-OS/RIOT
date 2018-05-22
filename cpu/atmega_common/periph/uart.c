@@ -58,9 +58,7 @@
 
 /**
  * @brief   Configured device map
- * @{
  */
-#if UART_NUMOF
 static mega_uart_t *dev[] = {
 #ifdef UART_0
     UART_0,
@@ -75,10 +73,6 @@ static mega_uart_t *dev[] = {
     UART_3
 #endif
 };
-#else
-/* fallback if no UART is defined */
-static const mega_uart_t *dev[] = { NULL };
-#endif
 
 /**
  * @brief   Allocate memory to store the callback functions.
