@@ -4,7 +4,7 @@ FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
-FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_uart periph_lpuart
 
 # load the common Makefile.features for Nucleo boards
 include $(RIOTBOARD)/common/nucleo144/Makefile.features

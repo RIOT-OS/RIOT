@@ -113,6 +113,18 @@ static const timer_conf_t timer_config[] = {
  */
 static const uart_conf_t uart_config[] = {
     {
+        .dev        = LPUART1,
+        .rcc_mask   = RCC_APB1ENR2_LPUART1EN,
+        .rx_pin     = GPIO_PIN(PORT_G, 8),
+        .tx_pin     = GPIO_PIN(PORT_G, 7),
+        .rx_af      = GPIO_AF8,
+        .tx_af      = GPIO_AF8,
+        .bus        = APB12,
+        .irqn       = LPUART1_IRQn,
+        .type       = STM32_LPUART,
+        .clk_src    = 0,
+    },
+    {
         .dev        = USART3,
         .rcc_mask   = RCC_APB1ENR1_USART3EN,
         .rx_pin     = GPIO_PIN(PORT_D, 9),
@@ -130,8 +142,9 @@ static const uart_conf_t uart_config[] = {
     }
 };
 
-#define UART_0_ISR          (isr_usart3)
-#define UART_0_DMA_ISR      (isr_dma1_stream5)
+#define UART_0_ISR          (isr_lpuart1)
+#define UART_1_ISR          (isr_usart3)
+#define UART_1_DMA_ISR      (isr_dma1_stream5)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
