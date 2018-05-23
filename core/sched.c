@@ -81,7 +81,9 @@ schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 
 int __attribute__((used)) sched_run(void)
 {
+#if !defined(ISR_CONTEXT_SWITCH_ALLOWED)
     sched_context_switch_request = 0;
+#endif
 
     thread_t *active_thread = (thread_t *)sched_active_thread;
 
@@ -194,6 +196,7 @@ void sched_switch(uint16_t other_prio)
           active_thread->pid, current_prio, on_runqueue, other_prio);
 
     if (!on_runqueue || (current_prio > other_prio)) {
+#if !defined(ISR_CONTEXT_SWITCH_ALLOWED)
         if (irq_is_in()) {
             DEBUG("sched_switch: setting sched_context_switch_request.\n");
             sched_context_switch_request = 1;
@@ -202,6 +205,10 @@ void sched_switch(uint16_t other_prio)
             DEBUG("sched_switch: yielding immediately.\n");
             thread_yield_higher();
         }
+#else
+        DEBUG("sched_switch: yielding immediately.\n");
+        thread_yield_higher();
+#endif
     }
     else {
         DEBUG("sched_switch: continuing without yield.\n");

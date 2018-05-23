@@ -162,10 +162,12 @@ static inline void isr_handler(int num)
 {
     isr_ctx[num].rx_cb(isr_ctx[num].arg, dev[num]->DR);
 
+#if !defined(ISR_CONTEXT_SWITCH_ALLOWED)
     if (sched_context_switch_request) {
         thread_yield();
         thread_yield_isr();
     }
+#endif
 }
 
 #ifdef UART_0_ISR
