@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo32-f031 nucleo32-f042 \
-                             nucleo32-l031 nucleo-f030r8 nucleo-f334r8 nucleo-l053r8 \
+BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo-f031k6 nucleo-f042k6 \
+                             nucleo-l031k6 nucleo-f030r8 nucleo-f334r8 nucleo-l053r8 \
                              stm32f0discovery
 
 BOARD_BLACKLIST += mips-malta

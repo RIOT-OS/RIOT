@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 # exclude boards with insufficient memory
-BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
+BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
 
 FEATURES_REQUIRED = periph_spi periph_gpio
 

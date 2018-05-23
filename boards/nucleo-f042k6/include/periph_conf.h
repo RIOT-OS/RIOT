@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017   Inria
+ * Copyright (C) 2016  OTA keys
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,15 +7,15 @@
  */
 
 /**
- * @defgroup    boards_nucleo32-f303 STM32 Nucleo32-F303
+ * @defgroup    boards_nucleo-f042k6 STM32 Nucleo-F042K6
  * @ingroup     boards_common_nucleo32
- * @brief       Support for the STM32 Nucleo32-F303
+ * @brief       Support for the STM32 Nucleo-F042K6
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo32-f303 board
+ * @brief       Peripheral MCU configuration for the nucleo-f042k6 board
  *
- * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
 #ifndef PERIPH_CONF_H
@@ -35,8 +35,8 @@ extern "C" {
  * @{
  */
 /* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 72MHz */
-#define CLOCK_CORECLOCK     (64000000U)
+ * maximum: 48MHz */
+#define CLOCK_CORECLOCK     (48000000U)
 /* 0: no external high speed crystal available
  * else: actual crystal frequency [in Hz] */
 #define CLOCK_HSE           (0U)
@@ -46,15 +46,15 @@ extern "C" {
 /* peripheral clock setup */
 #define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
 #define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2     /* max 36MHz */
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* max 72MHz */
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1_DIV      RCC_CFGR_PPRE_DIV1      /* max 48MHz */
+#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2          (CLOCK_APB1)
 
 /* PLL factors */
 #define CLOCK_PLL_PREDIV     (2)
-#define CLOCK_PLL_MUL        (16)
+#define CLOCK_PLL_MUL        (12)
 /** @} */
+
 
 /**
  * @name   Timer configuration
@@ -85,8 +85,8 @@ static const uart_conf_t uart_config[] = {
         .rcc_mask   = RCC_APB1ENR_USART2EN,
         .rx_pin     = GPIO_PIN(PORT_A, 15),
         .tx_pin     = GPIO_PIN(PORT_A, 2),
-        .rx_af      = GPIO_AF7,
-        .tx_af      = GPIO_AF7,
+        .rx_af      = GPIO_AF1,
+        .tx_af      = GPIO_AF1,
         .bus        = APB1,
         .irqn       = USART2_IRQn
     },
@@ -94,9 +94,9 @@ static const uart_conf_t uart_config[] = {
         .dev        = USART1,
         .rcc_mask   = RCC_APB2ENR_USART1EN,
         .rx_pin     = GPIO_PIN(PORT_A, 10),
-        .tx_pin     = GPIO_PIN(PORT_A,  9),
-        .rx_af      = GPIO_AF7,
-        .tx_af      = GPIO_AF7,
+        .tx_pin     = GPIO_PIN(PORT_A, 9),
+        .rx_af      = GPIO_AF1,
+        .tx_af      = GPIO_AF1,
         .bus        = APB2,
         .irqn       = USART1_IRQn
     }
@@ -114,24 +114,34 @@ static const uart_conf_t uart_config[] = {
  */
 static const pwm_conf_t pwm_config[] = {
     {
-        .dev      = TIM3,
-        .rcc_mask = RCC_APB1ENR_TIM3EN,
-        .chan     = { { .pin = GPIO_PIN(PORT_B, 0) /* D3 */, .cc_chan = 2 },
-                      { .pin = GPIO_PIN(PORT_B, 1) /* D6 */, .cc_chan = 3 },
-                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
-                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 } },
-        .af       = GPIO_AF2,
-        .bus      = APB1
-    },
-    {
         .dev      = TIM1,
         .rcc_mask = RCC_APB2ENR_TIM1EN,
         .chan     = { { .pin = GPIO_PIN(PORT_A, 8) /* D9 */, .cc_chan = 0 },
                       { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
                       { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
                       { .pin = GPIO_UNDEF,                   .cc_chan = 0 } },
-        .af       = GPIO_AF6,
+        .af       = GPIO_AF2,
         .bus      = APB2
+    },
+    {
+        .dev      = TIM14,
+        .rcc_mask = RCC_APB1ENR_TIM14EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 1) /* D6 */, .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 } },
+        .af       = GPIO_AF0,
+        .bus      = APB1
+    },
+    {
+        .dev      = TIM3,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 0) /* D3 */, .cc_chan = 2 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 }},
+        .af       = GPIO_AF1,
+        .bus      = APB1
     }
 };
 
@@ -146,19 +156,19 @@ static const pwm_conf_t pwm_config[] = {
  * @{
  */
 static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
+    {       /* for APB1 @ 48000000Hz */
+        7,  /* -> 187500Hz */
+        6,  /* -> 375000Hz */
+        5,  /* -> 750000Hz */
+        2,  /* -> 6000000Hz */
+        1   /* -> 12000000Hz */
     },
-    {       /* for APB2 @ 64000000Hz */
-        7,  /* -> 250000Hz */
-        6,  /* -> 500000Hz */
-        5,  /* -> 1000000Hz */
-        3,  /* -> 4000000Hz */
-        2   /* -> 8000000Hz */
+    {       /* for APB2 @ 48000000Hz */
+        7,  /* -> 187500Hz */
+        6,  /* -> 375000Hz */
+        5,  /* -> 750000Hz */
+        2,  /* -> 6000000Hz */
+        1   /* -> 12000000Hz */
     }
 };
 
@@ -182,6 +192,10 @@ static const spi_conf_t spi_config[] = {
  * @name RTC configuration
  * @{
  */
+/**
+ * Nucleo-f042 does not have any LSE, current RTC driver does not support LSI as
+ * clock source, so disabling RTC.
+ */
 #define RTC_NUMOF           (0U)
 /** @} */
 
@@ -189,7 +203,15 @@ static const spi_conf_t spi_config[] = {
  * @name   ADC configuration
  * @{
  */
-#define ADC_NUMOF (0)
+#define ADC_CONFIG {            \
+    { GPIO_PIN(PORT_A, 0), 0 }, \
+    { GPIO_PIN(PORT_A, 1), 1 }, \
+    { GPIO_PIN(PORT_A, 3), 3 }, \
+    { GPIO_PIN(PORT_A, 4), 4 }, \
+    { GPIO_PIN(PORT_A, 7), 7 }  \
+}
+
+#define ADC_NUMOF          (5)
 /** @} */
 
 #ifdef __cplusplus

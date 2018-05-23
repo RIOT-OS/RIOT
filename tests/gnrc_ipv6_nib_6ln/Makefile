@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := chronos nucleo-f030r8 nucleo-l053r8 nucleo32-f031 \
-                             nucleo32-l031 nucleo32-f042 stm32f0discovery \
+BOARD_INSUFFICIENT_MEMORY := chronos nucleo-f030r8 nucleo-l053r8 nucleo-f031k6 \
+                             nucleo-l031k6 nucleo-f042k6 stm32f0discovery \
                              telosb wsn430-v1_3b wsn430-v1_4
 
 USEMODULE += gnrc_ipv6

@@ -1,20 +1,21 @@
 /*
- * Copyright (C) 2016  OTA keys
- *
+ * Copyright (C) 2017  Inria
+ *               2017  OTA keys
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
 /**
- * @defgroup    boards_nucleo32-f042 STM32 Nucleo32-F042
+ * @defgroup    boards_nucleo-f031k6 STM32 Nucleo-F031K6
  * @ingroup     boards_common_nucleo32
- * @brief       Support for the STM32 Nucleo32-F042
+ * @brief       Support for the STM32 Nucleo-F031K6
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo32-f042 board
+ * @brief       Peripheral MCU configuration for the nucleo-f031k6 board
  *
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
@@ -36,25 +37,24 @@ extern "C" {
  */
 /* give the target core clock (HCLK) frequency [in Hz],
  * maximum: 48MHz */
-#define CLOCK_CORECLOCK     (48000000U)
+#define CLOCK_CORECLOCK      (48000000U)
 /* 0: no external high speed crystal available
  * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (0U)
+#define CLOCK_HSE            (0U)
 /* 0: no external low speed crystal available,
  * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (0)
+#define CLOCK_LSE            (0)
 /* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE_DIV1      /* max 48MHz */
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2          (CLOCK_APB1)
+#define CLOCK_AHB_DIV        RCC_CFGR_HPRE_DIV1
+#define CLOCK_AHB            (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB1_DIV       RCC_CFGR_PPRE_DIV1      /* max 48MHz */
+#define CLOCK_APB1           (CLOCK_CORECLOCK / 1)
+#define CLOCK_APB2           (CLOCK_APB1)
 
 /* PLL factors */
 #define CLOCK_PLL_PREDIV     (2)
 #define CLOCK_PLL_MUL        (12)
 /** @} */
-
 
 /**
  * @name   Timer configuration
@@ -76,25 +76,15 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
- * @name   UART configuration
+ * @name UART configuration
  * @{
  */
 static const uart_conf_t uart_config[] = {
     {
-        .dev        = USART2,
-        .rcc_mask   = RCC_APB1ENR_USART2EN,
-        .rx_pin     = GPIO_PIN(PORT_A, 15),
-        .tx_pin     = GPIO_PIN(PORT_A, 2),
-        .rx_af      = GPIO_AF1,
-        .tx_af      = GPIO_AF1,
-        .bus        = APB1,
-        .irqn       = USART2_IRQn
-    },
-    {
         .dev        = USART1,
         .rcc_mask   = RCC_APB2ENR_USART1EN,
-        .rx_pin     = GPIO_PIN(PORT_A, 10),
-        .tx_pin     = GPIO_PIN(PORT_A, 9),
+        .rx_pin     = GPIO_PIN(PORT_A, 15),
+        .tx_pin     = GPIO_PIN(PORT_A, 2),
         .rx_af      = GPIO_AF1,
         .tx_af      = GPIO_AF1,
         .bus        = APB2,
@@ -102,14 +92,13 @@ static const uart_conf_t uart_config[] = {
     }
 };
 
-#define UART_0_ISR          (isr_usart2)
-#define UART_1_ISR          (isr_usart1)
+#define UART_0_ISR          (isr_usart1)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
 
 /**
- * @name    PWM configuration
+ * @name   PWM configuration
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
@@ -139,10 +128,10 @@ static const pwm_conf_t pwm_config[] = {
         .chan     = { { .pin = GPIO_PIN(PORT_B, 0) /* D3 */, .cc_chan = 2 },
                       { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
                       { .pin = GPIO_UNDEF,                   .cc_chan = 0 },
-                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 }},
+                      { .pin = GPIO_UNDEF,                   .cc_chan = 0 } },
         .af       = GPIO_AF1,
         .bus      = APB1
-    }
+    },
 };
 
 #define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
@@ -193,7 +182,7 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 /**
- * Nucleo-f042 does not have any LSE, current RTC driver does not support LSI as
+ * Nucleo-f031 does not have any LSE, current RTC driver does not support LSI as
  * clock source, so disabling RTC.
  */
 #define RTC_NUMOF           (0U)
@@ -211,7 +200,7 @@ static const spi_conf_t spi_config[] = {
     { GPIO_PIN(PORT_A, 7), 7 }  \
 }
 
-#define ADC_NUMOF          (5)
+#define ADC_NUMOF           (5)
 /** @} */
 
 #ifdef __cplusplus

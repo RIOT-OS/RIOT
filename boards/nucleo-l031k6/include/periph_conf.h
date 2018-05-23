@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo32-l031 STM32 Nucleo32-L031
+ * @defgroup    boards_nucleo-l031k6 STM32 Nucleo-L031K6
  * @ingroup     boards_common_nucleo32
- * @brief       Support for the STM32 Nucleo32-L031
+ * @brief       Support for the STM32 Nucleo-L031K6
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo32-l031 board
+ * @brief       Peripheral MCU configuration for the nucleo-l031k6 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Aabdie <alexandre.abadie@inria.fr>
