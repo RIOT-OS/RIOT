@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo32-l432 STM32 Nucleo32-L432
+ * @defgroup    boards_nucleo-l432kc STM32 Nucleo-L432KC
  * @ingroup     boards_common_nucleo32
- * @brief       Support for the STM32 Nucleo32-L432
+ * @brief       Support for the STM32 Nucleo-L432KC
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo32-l432 board
+ * @brief       Peripheral MCU configuration for the nucleo-l432kc board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Vincent Dupont <vincent@otakeys.com>
