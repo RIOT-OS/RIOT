@@ -58,12 +58,48 @@ static int send(int argc, char **argv)
         return 1;
     }
 
-    if (at_send_cmd_get_resp(&at_dev, argv[1], resp, sizeof(resp), 10 * US_PER_SEC) < 0) {
+    ssize_t len;
+    if ((len = at_send_cmd_get_resp(&at_dev, argv[1], resp, sizeof(resp), 10 * US_PER_SEC)) < 0) {
         puts("Error");
         return 1;
     }
 
-    printf("Response: %s\n", resp);
+    printf("Response (len=%d): %s\n", (int)len, resp);
+
+    return 0;
+}
+
+static int send_ok(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: %s <command>\n", argv[0]);
+        return 1;
+    }
+
+    if (at_send_cmd_wait_ok(&at_dev, argv[1], 10 * US_PER_SEC) < 0) {
+        puts("Error");
+        return 1;
+    }
+
+    puts("OK");
+
+    return 0;
+}
+
+static int send_lines(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: %s <command>\n", argv[0]);
+        return 1;
+    }
+
+    ssize_t len;
+    if ((len = at_send_cmd_get_lines(&at_dev, argv[1], resp, sizeof(resp), 10 * US_PER_SEC)) < 0) {
+        puts("Error");
+        return 1;
+    }
+
+    printf("Response (len=%d): %s\n", (int)len, resp);
 
     return 0;
 }
@@ -81,6 +117,8 @@ static int drain(int argc, char **argv)
 static const shell_command_t shell_commands[] = {
     { "init", "Initialize AT device", init },
     { "send", "Send a command and wait response", send },
+    { "send_ok", "Send a command and wait OK", send_ok },
+    { "send_lines", "Send a command and wait lines", send_lines },
     { "drain", "Drain AT device", drain },
     { NULL, NULL, NULL },
 };
