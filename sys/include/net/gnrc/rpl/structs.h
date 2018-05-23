@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2013  INRIA.
- * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
+ * Copyright (C) 2017       HAW Hamburg
+ * Copyright (C) 2015–2018  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+ * Copyright (C) 2013       INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,7 +18,7 @@
  * Header file, which defines all structs used by RPL.
  *
  * @author      Eric Engel <eric.engel@fu-berlin.de>
- * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
 #ifndef NET_GNRC_RPL_STRUCTS_H
@@ -29,7 +30,8 @@ extern "C" {
 
 #include "byteorder.h"
 #include "net/ipv6/addr.h"
-#include "xtimer.h"
+#include "evtimer.h"
+#include "evtimer_msg.h"
 #include "trickle.h"
 
 /**
@@ -221,14 +223,17 @@ typedef struct gnrc_rpl_instance gnrc_rpl_instance_t;
  * @cond INTERNAL */
 struct gnrc_rpl_parent {
     gnrc_rpl_parent_t *next;        /**< pointer to the next parent */
-    uint8_t state;                  /**< 0 for unsued, 1 for used */
+    uint8_t state;                  /**< see @ref gnrc_rpl_parent_states */
     ipv6_addr_t addr;               /**< link-local IPv6 address of this parent */
     uint8_t dtsn;                   /**< last seen dtsn of this parent */
     uint16_t rank;                  /**< rank of the parent */
     gnrc_rpl_dodag_t *dodag;        /**< DODAG the parent belongs to */
-    uint32_t lifetime;              /**< lifetime of this parent in seconds */
-    double  link_metric;            /**< metric of the link */
+    double link_metric;             /**< metric of the link */
     uint8_t link_metric_type;       /**< type of the metric */
+    /**
+     * @brief Parent timeout events (see @ref GNRC_RPL_MSG_TYPE_PARENT_TIMEOUT)
+     */
+    evtimer_msg_event_t timeout_event;
 };
 /**
  * @endcond
@@ -289,7 +294,7 @@ struct gnrc_rpl_dodag {
     bool dao_ack_received;          /**< flag to check for DAO-ACK */
     uint8_t dio_opts;               /**< options in the next DIO
                                          (see @ref GNRC_RPL_REQ_DIO_OPTS "DIO Options") */
-    uint8_t dao_time;               /**< time to schedule a DAO in seconds */
+    evtimer_msg_event_t dao_event;  /**< DAO TX events (see @ref GNRC_RPL_MSG_TYPE_DODAG_DAO_TX) */
     trickle_t trickle;              /**< trickle representation */
 };
 
@@ -301,7 +306,10 @@ struct gnrc_rpl_instance {
     gnrc_rpl_of_t *of;              /**< configured Objective Function */
     uint16_t min_hop_rank_inc;      /**< minimum hop rank increase */
     uint16_t max_rank_inc;          /**< max increase in the rank */
-    int8_t cleanup;                 /**< cleanup time in seconds */
+    /**
+     * @brief Instance cleanup events (see @ref GNRC_RPL_MSG_TYPE_INSTANCE_CLEANUP)
+     */
+    evtimer_msg_event_t cleanup_event;
 };
 /**
  * @endcond

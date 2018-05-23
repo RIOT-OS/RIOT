@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2013 - 2014  INRIA.
  * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
- * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
+ * Copyright (C) 2015 - 2018 Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -92,7 +92,7 @@
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @author      Fabian Brandt <fabianbr@zedat.fu-berlin.de>
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
- * @author      Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
 #ifndef NET_GNRC_RPL_H
@@ -326,23 +326,37 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  * @{
  */
 #ifndef GNRC_RPL_DAO_SEND_RETRIES
-#define GNRC_RPL_DAO_SEND_RETRIES (4)
+#define GNRC_RPL_DAO_SEND_RETRIES   (4)
 #endif
-#ifndef GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK
-#define GNRC_RPL_DEFAULT_WAIT_FOR_DAO_ACK (3)
+#ifndef GNRC_RPL_DAO_ACK_DELAY
+#define GNRC_RPL_DAO_ACK_DELAY      (3000UL)
 #endif
-#ifndef GNRC_RPL_REGULAR_DAO_INTERVAL
-#define GNRC_RPL_REGULAR_DAO_INTERVAL (60)
+#ifndef GNRC_RPL_DAO_DELAY_LONG
+/**
+ * @brief Long delay for DAOs in milli seconds
+ */
+#define GNRC_RPL_DAO_DELAY_LONG     (60000UL)
 #endif
-#ifndef GNRC_RPL_DEFAULT_DAO_DELAY
-#define GNRC_RPL_DEFAULT_DAO_DELAY (1)
+#ifndef GNRC_RPL_DAO_DELAY_DEFAULT
+/**
+ * @brief Default delay for DAOs in milli seconds
+ */
+#define GNRC_RPL_DAO_DELAY_DEFAULT  (1000UL)
+#endif
+#ifndef GNRC_RPL_DAO_DELAY_JITTER
+/**
+ * @brief Jitter for DAOs in milli seconds
+ */
+#define GNRC_RPL_DAO_DELAY_JITTER   (1000UL)
 #endif
 /** @} */
 
 /**
- * @brief Cleanup timeout in seconds
+ * @brief Cleanup interval in milliseconds.
  */
-#define GNRC_RPL_CLEANUP_TIME (5)
+#ifndef GNRC_RPL_CLEANUP_TIME
+#define GNRC_RPL_CLEANUP_TIME (5 * MS_PER_SEC)
+#endif
 
 /**
  * @name Node Status
@@ -451,6 +465,13 @@ extern const ipv6_addr_t ipv6_addr_all_rpl_nodes;
  * @brief Statistics for RPL control messages
  */
 extern netstats_rpl_t gnrc_rpl_netstats;
+#endif
+
+/**
+ * @brief Number of DIS retries before parent times out
+ */
+#ifndef GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES
+#define GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES (3)
 #endif
 
 /**

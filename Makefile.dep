@@ -127,6 +127,7 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += trickle
   USEMODULE += xtimer
+  USEMODULE += evtimer
 endif
 
 ifneq (,$(filter trickle,$(USEMODULE)))

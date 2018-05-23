@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2013 - 2014  INRIA.
- * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
+ * Copyright (C) 2018       HAW Hamburg
+ * Copyright (C) 2015–2017  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
+ * Copyright (C) 2013–2014  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -12,7 +13,7 @@
  *
  * @file
  *
- * @author  Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
 #include "net/af.h"
@@ -23,6 +24,7 @@
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc.h"
 #include "net/eui64.h"
+#include "gnrc_rpl_internal/globals.h"
 
 #ifdef MODULE_NETSTATS_RPL
 #include "gnrc_rpl_internal/netstats.h"
@@ -687,7 +689,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
 
     /* sender of incoming DIO is not a parent of mine (anymore) and has an INFINITE rank
        and I have a rank != INFINITE_RANK */
-    if (parent->state == 0) {
+    if (parent->state == GNRC_RPL_PARENT_UNUSED) {
         if ((byteorder_ntohs(dio->rank) == GNRC_RPL_INFINITE_RANK)
              && (dodag->my_rank != GNRC_RPL_INFINITE_RANK)) {
             trickle_reset_timer(&dodag->trickle);
