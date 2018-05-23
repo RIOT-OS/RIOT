@@ -12,7 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              microbit nrf51dongle nrf6310 nucleo-f030r8 nucleo-f070rb \
                              nucleo-f072rb nucleo-f103rb nucleo-f302r8 nucleo-f334r8 nucleo-f410rb \
                              nucleo-l053r8 nucleo-l073rz nucleo-f031k6 nucleo-f042k6 \
-                             nucleo32-f303 nucleo-l031k6 opencm904 \
+                             nucleo-f303k8 nucleo-l031k6 opencm904 \
                              spark-core stm32f0discovery yunjia-nrf51822 \
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
