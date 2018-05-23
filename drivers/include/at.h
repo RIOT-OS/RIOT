@@ -35,6 +35,7 @@
 
 #include <stdint.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #include "isrpipe.h"
 #include "periph/uart.h"
@@ -138,13 +139,15 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command, char *resp_buf,
  * @param[in]   dev         device to operate on
  * @param[in]   command     command to send
  * @param[out]  resp_buf    buffer for storing response
- * @param[in]   len         len of @p buffer
+ * @param[in]   len         len of @p resp_buf
+ * @param[in]   keep_eol    true to keep the CR character in the response
  * @param[in]   timeout     timeout (in usec)
  *
  * @returns     length of response on success
  * @returns     <0 on error
  */
-ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf, size_t len, uint32_t timeout);
+ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command, char *resp_buf,
+                              size_t len, bool keep_eol, uint32_t timeout);
 
 /**
  * @brief   Expect bytes from device
@@ -184,13 +187,14 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout);
  *
  * @param[in]   dev         device to operate on
  * @param[in]   resp_buf    buffer to store line
- * @param[in]   len         size of @p buffer
+ * @param[in]   len         size of @p resp_buf
+ * @param[in]   keep_eol    true to keep the CR character in the response
  * @param[in]   timeout     timeout (in usec)
  *
  * @returns     line length on success
  * @returns     <0 on error
  */
-ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout);
+ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, uint32_t timeout);
 
 /**
  * @brief   Drain device input buffer
