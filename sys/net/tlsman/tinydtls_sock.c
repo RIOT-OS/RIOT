@@ -19,7 +19,7 @@
  */
 
 #include "net/tlsman.h"
-#include "net/tlsman/tinydtls.h"
+#include "net/tlsman/tinydtls_sock.h"
 #include "dtls.h"
 
 /* NOTE DISCUSSION: Should be in sys/include/tlsman or in the app directory? */
@@ -80,8 +80,10 @@ static dtls_handler_t _tinydtls_handler_cbs = {
 
 #ifdef SOCK_HAS_ASYNC
 
+/* Asynchronous events */
 static void _kill_handshake(event_t *event);
 static void _stop_listening(event_t *event);
+static void _async_tinydtls_handle_read(event_t *arg);
 
 static event_t kill_handshake_event = { .handler = _kill_handshake };
 static event_t stop_listening_event = { .handler = _stop_listening };
@@ -89,21 +91,23 @@ static event_timeout_t kill_handshake_timeout;
 static event_timeout_t stop_listening_timeout;
 
 static uint8_t _async_recv_watchdog;    /* Counter for disabling the listening mode */
-static bool _async_rcv_pkt;             /** Flag to determine if a packet was recveided */
+static bool _async_rcv_pkt;             /** Flag to determine if a packet was received */
 
 /* NOTE: Global pointers required for current limitations of event.h */
-/* NOTE DISCUSSION: This approach is adequate? can be replicated for tinyDTLS interanl buffers? */
+/* NOTE DISCUSSION: This approach is adequate? can be replicated for tinyDTLS internal buffers? */
 static ssize_t _tinydtls_packet_received_size;
 static uint8_t *_tinydtls_packet_received;
 static tinydtls_session_t *_async_session;
 
 /*
  * This event permits to advance on event_get() and terminate it if necessary
+ *  to terminate the asynchronous listening status for the handshake.
  */
 static void _kill_handshake(event_t *event)
 {
     (void) event;
 
+    /* TODO DISCUSSION Risk of race condition? */
     _async_rcv_pkt ? ++_async_recv_watchdog : --_async_recv_watchdog;
     _async_rcv_pkt = false;
 
@@ -117,6 +121,9 @@ static void _kill_handshake(event_t *event)
     }
 }
 
+/*
+ *Disable the listening mode
+ */
 static void _stop_listening(event_t *event)
 {
 
@@ -126,7 +133,7 @@ static void _stop_listening(event_t *event)
 }
 
 /**
- * This is the generic evnt for retrieving sock messages.
+ * This is the generic event for retrieving sock messages.
  * There are two m
  */
 static void _async_tinydtls_handle_read(event_t *arg)
@@ -185,34 +192,37 @@ static void _async_tinydtls_handle_read(event_t *arg)
     }
 }
 
-void tlsman_tinydtls_set_async_parameters(tinydtls_session_t *dtls_session,
-                                          event_queue_t *sock_event_queue,
-                                          uint8_t *buffer, ssize_t size)
+void set_async_listening(void)
 {
-    dtls_session->sock_event_queue = sock_event_queue;
+    DEBUG("%s: Launching timer event\n", __func__);
+    event_timeout_set(&stop_listening_timeout, TINYDTLS_HDSK_TIMEOUT);
+}
+
+void set_async_parameters(tlsman_session_t *session,
+                                 event_queue_t *sock_event_queue,
+                                 uint8_t *buffer, ssize_t size)
+{
+
+    DEBUG("%s: Linking buffer %p (size %u) to sock\n", __func__, buffer, size);
+
+    session->sock_event_queue = sock_event_queue;
 
     _tinydtls_packet_received = buffer;
     _tinydtls_packet_received_size = size;
 
-    event_queue_init(dtls_session->sock_event_queue);
-    /* FIXME: Here or in the hadnshake? */
-    event_timeout_init(&kill_handshake_timeout, dtls_session->sock_event_queue,
+    event_queue_init(session->sock_event_queue);
+    /* FIXME: Here or in the handshake? */
+    event_timeout_init(&kill_handshake_timeout, session->sock_event_queue,
                        &kill_handshake_event);
-    event_timeout_init(&stop_listening_timeout, dtls_session->sock_event_queue,
+    event_timeout_init(&stop_listening_timeout, session->sock_event_queue,
                        &stop_listening_event);
 
-    sock_udp_set_event_queue(dtls_session->sock,
-                             dtls_session->sock_event_queue,
+    sock_udp_set_event_queue(session->sock,
+                             session->sock_event_queue,
                              _async_tinydtls_handle_read);
 
-    DEBUG("(%s)> gnrc_sock_async set!\n", __func__);
+    DEBUG("%s: gnrc_sock_async set!\n", __func__);
 
-}
-
-void tlsman_tinydtls_set_listening_timeout(void)
-{
-
-    event_timeout_set(&stop_listening_timeout, TINYDTLS_HDSK_TIMEOUT);
 }
 
 #endif /* SOCK_HAS_ASYNC */
@@ -374,6 +384,7 @@ ssize_t _tinydtls_handle_read(tinydtls_session_t *tinydtls_session,
 
     if (pckt_rcvd_size <= 0) {
         DEBUG("%s: sock_udp_recv error code: %i\n", __func__, pckt_rcvd_size);
+
         return TINYDTLS_HANDSHAKE_NON_RECORD;
     }
 
@@ -418,19 +429,30 @@ ssize_t _tinydtls_handle_read(tinydtls_session_t *tinydtls_session,
     return TINYDTLS_HANDSHAKE_NEW_RECORD;
 }
 
-bool is_cipher_tinydtls(int cipher)
+/*
+ * @brief Determine if the list of cipher suites is valid
+ *
+ * The only two cipher suites supported by tinyDTLS are selected at compilation
+ * time. This only verifies if said cipher suites are present in the compiled
+ * code and at least one of them matches the cipher suite listed.
+ *
+ * @param[in] cipher    Cipher suite to check
+ *
+ * @return true if cipher suite is supported
+ */
+bool _is_cipher_tinydtls(uint16_t cipher)
 {
 
 #if defined(DTLS_PSK)
     if (cipher == TLS_PSK_WITH_AES_128_CCM_8) {
-        DEBUG("DTLS_PSK ciphersuite Detected\n");
+        DEBUG("DTLS_PSK cipher suite Detected\n");
         return true;
     }
 #endif
 
 #if defined(DTLS_ECC)
     if (cipher == TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8) {
-        DEBUG("DTLS_ECC ciphersuite Detected\n");
+        DEBUG("DTLS_ECC cipher suite Detected\n");
         return true;
     }
 #endif
@@ -472,7 +494,7 @@ static int _send_to_peer(struct dtls_context_t *ctx,
 }
 
 /**
- * @brief Reception of a DTLS Applicaiton data record.
+ * @brief Reception of a DTLS Application data record.
  */
 static int _read_from_peer(struct dtls_context_t *ctx,
                            session_t *session,
@@ -491,7 +513,7 @@ static int _read_from_peer(struct dtls_context_t *ctx,
     for (i = 0; i < len; i++) {
         printf("%2X ", data[i]);
     }
-    printf(" -- (Total: %i bytes)\n", len );
+    printf(" -- (Total: %zu bytes)\n", len );
     if (!user_session->resp_handler) {
         printf("%s: No callback was provided by the user!\n", __func__);
     }
@@ -499,13 +521,8 @@ static int _read_from_peer(struct dtls_context_t *ctx,
 
     if (user_session->resp_handler) {
         DEBUG("%s: Launching callback...\n", __func__);
-#ifdef WITH_RIOT_GNRC
         (*user_session->resp_handler)((uint8_t *)data, len, (void *) user_session->sock);
-#endif  /* WITH_RIOT_GNRC */
 
-#ifdef WITH_RIOT_SOCKETS
-#warning "Not supported yet"
-#endif  /* WITH_RIOT_SOCKETS */
     }
 
     return TLSMAN_ERROR_SUCCESS;
@@ -553,78 +570,8 @@ static int _client_events(struct dtls_context_t *ctx,
     return TLSMAN_ERROR_SUCCESS;
 }
 
-ssize_t tlsman_tinydtls_init_context(tinydtls_session_t *dtls_session,
-                                     tlsman_resp_handler_t resp_cb,
-                                     const uint8_t flags)
-{
 
-    dtls_session->context = NULL;
-    session_t *dst = &dtls_session->dst;
-    sock_udp_ep_t *remote = dtls_session->remote;
-
-    /* FIXME: Risk of race condition? */
-    dtls_session->is_connected = TINYDTLS_EVENTS_ZERO;
-
-    dtls_set_log_level(TINYDTLS_LOG_LVL);
-
-#ifdef WITH_RIOT_GNRC
-
-    DEBUG("%s: Linking DTLS session to UDP sock\n", __func__);
-
-    dtls_session->dst.size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
-    dtls_session->dst.port = dtls_session->remote->port;
-
-    /* NOTE: Parsing iface for the remote */
-    if (gnrc_netif_numof() == 1) {
-        /* assign the single interface found in gnrc_netif_numof() */
-        dtls_session->dst.ifindex = (uint16_t)gnrc_netif_iter(NULL)->pid;
-        dtls_session->remote->netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
-    }
-    else {
-        /* FIXME This probably is not valid with multiple interfaces */
-        dtls_session->dst.ifindex = dtls_session->remote->netif;
-    }
-
-    /* NOTE: remote.addr and dst->addr are different structures. */
-    if (memcpy(&dst->addr, &remote->addr.ipv6, 16) == NULL) {
-        DEBUG("ERROR: memcpy failed!");
-        return -1;
-    }
-
-    dtls_session->resp_handler = resp_cb;
-    dtls_session->context = dtls_new_context(dtls_session);
-
-    if (flags & TLSMAN_FLAG_SIDE_SERVER) {
-        _tinydtls_handler_cbs.event = NULL; /* FIXME REMOVE(?) */
-#ifdef DTLS_PSK
-        _tinydtls_handler_cbs.get_psk_info = _server_get_psk_info;
-#endif  /* DTLS_PSK */
-    }
-    else {
-        _tinydtls_handler_cbs.event = _client_events;
-#ifdef DTLS_PSK
-        _tinydtls_handler_cbs.get_psk_info = _get_psk_info;
-#endif  /* DTLS_PSK */
-    }
-
-    if (dtls_session->context) {
-        dtls_set_handler(dtls_session->context, &_tinydtls_handler_cbs);
-        return 0;
-    }
-
-    return TLSMAN_ERROR_UNABLE_CONTEXT;
-
-#endif /* WITH_RIOT_GNRC */
-
-#ifdef WITH_RIOT_SOCKETS
-#warning "tinyDTLS with sockets not tested yet"
-
-#endif /* WITH_RIOT_SOCKETS */
-
-    return TLSMAN_ERROR_FATAL;
-}
-
-ssize_t tlsman_tinydtls_send(tinydtls_session_t *dtls_session,
+ssize_t _tinydtls_send(tlsman_session_t *dtls_session,
                              uint8_t *data, size_t data_size,
                              uint8_t flags)
 {
@@ -635,10 +582,10 @@ ssize_t tlsman_tinydtls_send(tinydtls_session_t *dtls_session,
     (void) flags;
 
     while (len > 0) {
-        DEBUG("%s: Sending %zu bytes...\n", __func__, len);
+        /* DEBUG("%s: Sending %zu bytes...\n", __func__, len); */
         ssize_t res = dtls_write(dtls_session->context, &dtls_session->dst, (uint8 *)data, len);
         if (res >= 0) {
-            /* DISCUSSION: This is appropiate? */
+            /* DISCUSSION: This is appropriate? */
             memmove(data, data + res, len - res);
             len -= res;
 
@@ -655,83 +602,7 @@ ssize_t tlsman_tinydtls_send(tinydtls_session_t *dtls_session,
     return 0;
 }
 
-ssize_t tlsman_tinydtls_listening(tinydtls_session_t *dtls_session,
-                                  void *pkt_buff,
-                                  size_t pkt_size)
-{
-
-    /*
-     * This intented to handle handshake and reception of real data
-     * WITHOUT timeouts (and server side)
-     */
-    /* TODO Be able to kill it */
-    /* TODO Handle errors */
-
-#ifdef  SOCK_HAS_ASYNC
-    (void) pkt_buff;
-    (void) pkt_size;
-    DEBUG("%s: Starting (Async) listening for DTLS records!\n", __func__);
-    _async_session = dtls_session;  /* FIXME: Mutex here? */
-    _async_recv_watchdog = 1;       /* We are to use it as boolean now */
-
-    while (_async_recv_watchdog > 0) {
-        event_t *event = event_get(dtls_session->sock_event_queue);
-        if (event) {
-            event->handler(event);
-        }
-        xtimer_usleep(200); /* FIXME: Magic number for now */
-    }
-    DEBUG("%s: Stopping (Async) listening for DTLS records!\n", __func__);
-
-#else /* SOCK_HAS_ASYNC */
-
-    ssize_t pckt_rcvd_size;
-    session_t *peer = &dtls_session->dst;
-    static sock_udp_ep_t remote = { .family = AF_INET6 };
-
-    /* NOTE FIXME Blocking? one second?  */
-    pckt_rcvd_size = sock_udp_recv(dtls_session->sock, pkt_buff, pkt_size,
-                                   0, &remote);
-
-    if (pckt_rcvd_size <= 0) {
-        if ((pckt_rcvd_size != -ETIMEDOUT)
-            && ((pckt_rcvd_size != -EAGAIN))
-            && ENABLE_DEBUG) {
-            DEBUG("%s: sock_udp_recv error code is %i\n", __func__, pckt_rcvd_size);
-        }
-        return 0;
-    }
-
-    /* We need to update the remote (and the session) */
-    dtls_session->remote = &remote;
-
-    /* Equivalent to  _tinydtls_handle_read() */
-    peer->size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
-    peer->port = remote.port;
-
-    /* TESTING : Override behavior for the server? */
-    peer->ifindex = SOCK_ADDR_ANY_NETIF;
-
-    if (memcpy(&peer->addr, remote.addr.ipv6, 16) == NULL) {
-        DEBUG("ERROR: memcpy failed!");
-        return TINYDTLS_HANDSHAKE_NON_RECORD;
-    }
-
-    if (ENABLE_DEBUG) {
-        DEBUG("(%s): Msg received from [", __func__);
-        ipv6_addr_print(&peer->addr);
-        DEBUG("]:%u (netif: %i)\n", peer->port, peer->ifindex);
-    }
-
-    /* Server dont care about the result */
-    dtls_handle_message(dtls_session->context, peer, pkt_buff, (int) pckt_rcvd_size);
-
-#endif
-
-    return 0;
-}
-
-size_t tlsman_tintdytls_rcv(tinydtls_session_t *dtls_session,
+size_t _tintdytls_rcv(tinydtls_session_t *dtls_session,
                             void *pkt_buff,
                             size_t pkt_size)
 {
@@ -757,7 +628,8 @@ size_t tlsman_tintdytls_rcv(tinydtls_session_t *dtls_session,
         }
         xtimer_usleep(200); /* FIXME: Magic number for now */
     }
-    DEBUG("%s: Stoping NON-blocking Listening for DTLS records!\n", __func__);
+    event_timeout_clear(&stop_listening_timeout);
+    DEBUG("%s: Stopping NON-blocking Listening for DTLS records!\n", __func__);
     return 0;
 
 #else /* SOCK_HAS_ASYNC */
@@ -772,7 +644,7 @@ size_t tlsman_tintdytls_rcv(tinydtls_session_t *dtls_session,
             return TLSMAN_ERROR_REMOTE_RESET;
         }
         else if (res == TINYDTLS_HANDSHAKE_NON_RECORD) {
-            DEBUG("%s: Not more DTLS records avaiable in the buffer\n", __func__);
+            DEBUG("%s: Not more DTLS records available in the buffer\n", __func__);
             return 0;
         }
     } while (!dtls_session->is_data_app);
@@ -784,10 +656,7 @@ size_t tlsman_tintdytls_rcv(tinydtls_session_t *dtls_session,
 ssize_t _tinydtls_handshake(tinydtls_session_t *session,
                             uint8_t *pkt_buff, size_t pkt_size, uint8_t flags)
 {
-
-#ifdef WITH_RIOT_GNRC
-
-    if (flags && 0x10 == TLSMAN_FLAG_NONBLOCKING) {
+    if (flags & TLSMAN_FLAG_NONBLOCKING)  {
         DEBUG("%s: Starting NON-blocking DTLS handshake!\n", __func__);
 #ifdef SOCK_HAS_ASYNC
         (void) pkt_buff;
@@ -811,7 +680,7 @@ ssize_t _tinydtls_handshake(tinydtls_session_t *session,
              * same time that we can answer very fast at any UDP packet received
              *
              * NOTE: event_get() is non-blocking. However, _async_tinydtls_handle_read()
-             *       its blocking (sock_udp_recv() set to SOCK_NO_TIMEOUT).
+             *       it's blocking (sock_udp_recv() set to SOCK_NO_TIMEOUT).
              */
             event_t *event = event_get(session->sock_event_queue);
             if (event) {
@@ -819,11 +688,12 @@ ssize_t _tinydtls_handshake(tinydtls_session_t *session,
             }
 
             if (session->is_connected == TINYDTLS_EVENTS_ZERO) {
+                DEBUG("%s: session->is_connected is TINYDTLS_EVENTS_ZERO!\n",__func__);
                 event_timeout_clear(&kill_handshake_timeout); /* Reset the timer */
                 dtls_connect(session->context, &session->dst);
                 event_timeout_set(&kill_handshake_timeout, TINYDTLS_HDSK_TIMEOUT);
             }
-            xtimer_usleep(200);  /* FIXME: Magic number for now */
+            xtimer_usleep(500);  /* FIXME: Magic number for now */
         }
 
         DEBUG("%s:NON-blocking DTLS handshake finished!\n", __func__);
@@ -838,7 +708,7 @@ ssize_t _tinydtls_handshake(tinydtls_session_t *session,
 
 #else   /* SOCK_HAS_ASYNC */
         /* TODO DISCUSSION: Throw error instead of this? */
-        puts("WARNING: Non event module! behavior is synncrhonous!");
+        puts("WARNING: module gnrc_sock_async not enabled. Behavior is synchronous!");
 #endif  /* SOCK_HAS_ASYNC */
     }
 
@@ -868,24 +738,18 @@ ssize_t _tinydtls_handshake(tinydtls_session_t *session,
         }
 
         if ((--watchdog == 0U) || (res == TINYDTLS_HANDSHAKE_IS_FATAL)) {
-            DEBUG("%s: DTLS handhsake timeout!\n", __func__);
+            DEBUG("%s: DTLS handshake timeout!\n", __func__);
             return TLSMAN_ERROR_HANDSHAKE_TIMEOUT;
         }
 
         xtimer_usleep(500);
     }
 #endif  /* !SOCK_HAS_ASYNC */
-#endif  /* WITH_RIOT_GNRC */
-
-#ifdef WITH_RIOT_SOCKETS
-#warning "Not tested yet"
-#endif /* WITH_RIOT_SOCKETS */
 
     return 0;
-
 }
 
-ssize_t tlsman_tinydtls_renegotiate(tinydtls_session_t *session,
+ssize_t _tinydtls_renegotiate(tinydtls_session_t *session,
                                     uint8_t *pkt_buff, size_t pkt_size,
                                     uint8_t flags)
 {
@@ -900,7 +764,7 @@ ssize_t tlsman_tinydtls_renegotiate(tinydtls_session_t *session,
     return _tinydtls_handshake(session, pkt_buff, pkt_size, flags);
 }
 
-ssize_t tlsman_tinydtls_rehandshake(tinydtls_session_t *dtls_session,
+ssize_t _tinydtls_rehandshake(tinydtls_session_t *dtls_session,
                                     uint8_t *pkt_buff, size_t pkt_size,
                                     uint8_t flags)
 {
@@ -932,37 +796,310 @@ ssize_t tlsman_tinydtls_rehandshake(tinydtls_session_t *dtls_session,
     return TLSMAN_ERROR_UNABLE_CONTEXT; /* TODO: New error type? */
 }
 
-ssize_t tlsman_tinydtls_connect(tinydtls_session_t *dtls_session,
-                                uint8_t *pkt_buff, size_t pkt_size,
-                                uint8_t flags)
-{
+ssize_t load_stack(uint16_t *ciphersuites_list, size_t total, uint8_t flags){
+    bool match = false;
 
+    if (!(flags & TLSMAN_FLAG_STACK_DTLS)) {
+        DEBUG("%s: TinyDTLS only support UDP!\n", __func__);
+        return TLSMAN_ERROR_TRANSPORT_NOT_SUPPORTED;
+    }
+
+    /* NOTE: tinyDTLS can only select cipher suites at the compilation time */
+    size_t aux;
+    for (aux = 0; aux <  total; aux++) {
+        if (_is_cipher_tinydtls(ciphersuites_list[aux])) {
+            match = true;
+            break;
+        }
+    }
+
+    if (!match) {
+        DEBUG("%s: TinyDTLS Cipher suite not supported!\n", __func__);
+        return TLSMAN_ERROR_CIPHER_NOT_SUPPORTED;
+    }
+
+    dtls_init(); /*TinyDTLS mandatory starting settings*/
+
+#ifdef TINYDTLS_LOG_LVL
+    dtls_set_log_level(TINYDTLS_LOG_LVL);
+#endif
+
+    return 0;
+}
+
+
+ssize_t init_context(tlsman_session_t *session, tlsman_resp_handler_t resp_cb,
+                     const uint8_t flags)
+{
+    /*
+     * FIXME DISCUSSION: A more elegant solution need to be used!
+     *
+     * We are dereferencing a structure which the first time should be
+     * pointing to null.
+     *
+     * This also will change if tinydtls_session_t is modified.
+     * Including compilation with PSK or ECC
+     *
+     */
+    /*
+       if ((session->tinydtls_context.context != (void *)0x1) &&
+        (session->tinydtls_context.context != NULL)){
+        DEBUG("tinyDTLS: DTLS context already exist!\n");
+        return 0;
+       }
+     */
+
+    assert(session);
+    /* assert(session->local); */
+    assert(session->remote);
+    assert(session->sock);
+    DEBUG("tinyDTLS: Creating context (sock)\n");
+
+    session->context = NULL;
+    session_t *dst = &session->dst;
+    sock_udp_ep_t *remote = session->remote;
+
+    /* FIXME: Risk of race condition? */
+    session->last_known_error = TLSMAN_ERROR_NON_STARTED;
+    session->is_connected = TINYDTLS_EVENTS_ZERO;
+
+    DEBUG("%s: Linking DTLS session to UDP sock\n", __func__);
+
+    session->dst.size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
+    session->dst.port = session->remote->port;
+
+    /* NOTE: Parsing iface for the remote */
+    if (gnrc_netif_numof() == 1) {
+        /* assign the single interface found in gnrc_netif_numof() */
+        session->dst.ifindex = (uint16_t)gnrc_netif_iter(NULL)->pid;
+        session->remote->netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+    }
+    else {
+        /* FIXME This probably is not valid with multiple interfaces */
+        session->dst.ifindex = session->remote->netif;
+    }
+
+    /* NOTE: remote.addr and dst->addr are different structures. */
+    if (memcpy(&dst->addr, &remote->addr.ipv6, 16) == NULL) {
+        DEBUG("ERROR: memcpy failed!");
+        return -1;
+    }
+
+    session->resp_handler = resp_cb;
+    session->context = dtls_new_context(session);
+
+    if (flags & TLSMAN_FLAG_SIDE_SERVER) {
+        _tinydtls_handler_cbs.event = NULL; /* FIXME REMOVE(?) */
+#ifdef DTLS_PSK
+        _tinydtls_handler_cbs.get_psk_info = _server_get_psk_info;
+#endif  /* DTLS_PSK */
+    }
+    else {
+        _tinydtls_handler_cbs.event = _client_events;
+#ifdef DTLS_PSK
+        _tinydtls_handler_cbs.get_psk_info = _get_psk_info;
+#endif  /* DTLS_PSK */
+    }
+
+    if (session->context) {
+        dtls_set_handler(session->context, &_tinydtls_handler_cbs);
+        return 0;
+    }
+
+    session->last_known_error = TLSMAN_ERROR_UNABLE_CONTEXT;
+    return TLSMAN_ERROR_UNABLE_CONTEXT;
+}
+
+ssize_t connect(tlsman_session_t *session, uint8_t flags,
+                uint8_t *pkt_buff, size_t pkt_size)
+{
     /* NOTE: Irrelevant if socks or sockets */
-    if (dtls_session->is_connected == TINYDTLS_EVENT_RENEGOTIATE) {
+    if (session->is_connected == TINYDTLS_EVENT_RENEGOTIATE) {
         /* TODO FIXME: Do we need to do something to our current peer? */
     }
-    if (dtls_connect(dtls_session->context, &dtls_session->dst) < 0) {
+    if (dtls_connect(session->context, &session->dst) < 0) {
         DEBUG("ERROR: Unable to start a DTLS channel!\n");
         return TLSMAN_ERROR_FATAL;
     }
 
-    return _tinydtls_handshake(dtls_session, pkt_buff, pkt_size, flags);
+    ssize_t res =  _tinydtls_handshake(session, pkt_buff, pkt_size, flags);
+    session->last_known_error = res;
+    return res;
 }
 
-void tlsman_tinydtls_free_context(tinydtls_session_t *dtls_session)
+bool is_channel_ready(tlsman_session_t *session) {
+
+    if (session->is_connected == TINYDTLS_EVENT_FINISHED) {
+        return true;
+    }
+
+    return false;
+}
+
+
+ssize_t send_data_app(tlsman_session_t *session, const void *data, size_t len)
 {
 
-    dtls_free_context(dtls_session->context);
-    dtls_free_context(dtls_session->cache);
-    dtls_session->is_connected = TINYDTLS_EVENTS_ZERO;
+    DEBUG("%s: Starting to send upper layer data (Size: %zu)\n", __func__, len);
+
+    ssize_t res;
+
+    /* TODO DISCUSSION: UDP fragmentation handled here or by the client? */
+    res = _tinydtls_send(session, (uint8 *) data, len, 0);
+
+    session->last_known_error = res;
+
+    return res;
+}
+
+ssize_t retrieve_data_app(tlsman_session_t *session, void *pkt_buff, size_t max_len)
+{
+    /* DEBUG("%s: checking if there is (D)TLS Data Application data\n", __func__); */
+
+    ssize_t res = _tintdytls_rcv(session, pkt_buff, max_len);
+
+    session->last_known_error = res;
+
+    return res;
+}
+
+void release_resources(tlsman_session_t *session)
+{
+
+    dtls_free_context(session->context);
+    dtls_free_context(session->cache);
+    session->is_connected = TINYDTLS_EVENTS_ZERO;
 
 #ifdef SOCK_HAS_ASYNC
     event_timeout_clear(&kill_handshake_timeout);
     event_timeout_clear(&stop_listening_timeout);
-    event_timeout_clear(&kill_handshake_timeout);
-    event_timeout_clear(&stop_listening_timeout);
-    sock_udp_set_event_queue(dtls_session->sock, NULL, NULL);
+    sock_udp_set_event_queue(session->sock, NULL, NULL);
 #endif /* SOCK_HAS_ASYNC */
 
     DEBUG("%s: Resources released\n", __func__);
+}
+
+ssize_t close_channel(tlsman_session_t *session)
+{
+    if (dtls_close(session->context, &session->dst) < 0) {
+        DEBUG("ERROR: Unable to close DTLS channel!\n");
+        session->last_known_error = TLSMAN_ERROR_UNABLE_CLOSE;
+        return TLSMAN_ERROR_UNABLE_CLOSE;
+    }
+
+    /* NOTE DISCUSSION: This state is correct? or should be TINYDTLS_EVENTS_ZERO?  */
+    session->is_connected = TINYDTLS_EVENT_RENEGOTIATE;
+
+    session->last_known_error = 0;
+    return 0;
+}
+
+
+ssize_t renegotiate(tlsman_session_t *session, uint8_t flags,
+                                   uint8_t *pkt_buff, size_t pkt_size)
+{
+
+    ssize_t res;
+
+    res = _tinydtls_renegotiate(session, pkt_buff, pkt_size, flags);
+    if (res < 0) {
+        DEBUG("%s: DTLS renegotiation failed!\n", __func__);
+        session->last_known_error = TLSMAN_ERROR_SESSION_REN;
+        return TLSMAN_ERROR_SESSION_REN;
+    }
+    session->last_known_error = 0;
+    return 0;
+}
+
+ssize_t rehandshake(tlsman_session_t *session, uint8_t flags,
+                             uint8_t *pkt_buff, size_t pkt_size)
+{
+    ssize_t res = _tinydtls_rehandshake(session, pkt_buff, pkt_size, flags);
+    if (res < 0) {
+        DEBUG("%s: DTLS attempt for a new handshake failed!\n", __func__);
+        session->last_known_error = TLSMAN_ERROR_SESSION_REN;
+        return TLSMAN_ERROR_SESSION_REN;
+    }
+
+    session->last_known_error = 0;
+
+    return 0;
+}
+
+ssize_t listening(tlsman_session_t *session, uint8_t flags,
+                         uint8_t *pkt_buff, size_t pkt_size)
+{
+
+    (void) flags; /* TODO */
+
+    /*
+     * This intended to handle handshake and reception of real data
+     * WITHOUT timeouts (and only for the server side)
+     */
+    /* TODO Be able to kill it */
+    /* TODO Handle errors */
+
+#ifdef  SOCK_HAS_ASYNC
+    (void) pkt_buff;
+    (void) pkt_size;
+    DEBUG("%s: Starting (Async) listening for DTLS records!\n", __func__);
+    _async_session = session;  /* FIXME: Mutex here? */
+    _async_recv_watchdog = 1;       /* We are to use it as boolean now */
+
+    while (_async_recv_watchdog > 0) {
+        event_t *event = event_get(session->sock_event_queue);
+        if (event) {
+            event->handler(event);
+        }
+        xtimer_usleep(200); /* FIXME: Magic number for now */
+    }
+    DEBUG("%s: Stopping (Async) listening for DTLS records!\n", __func__);
+
+#else /* SOCK_HAS_ASYNC */
+
+    ssize_t pckt_rcvd_size;
+    session_t *peer = &session->dst;
+    static sock_udp_ep_t remote = { .family = AF_INET6 };
+
+    /* NOTE FIXME Blocking? one second?  */
+    pckt_rcvd_size = sock_udp_recv(session->sock, pkt_buff, pkt_size,
+                                   0, &remote);
+    if (pckt_rcvd_size <= 0) {
+        if ((pckt_rcvd_size != -ETIMEDOUT)
+            && ((pckt_rcvd_size != -EAGAIN))
+            && ENABLE_DEBUG) {
+            DEBUG("%s: sock_udp_recv error code is %i\n", __func__, pckt_rcvd_size);
+            return 0;
+        }
+        return 1;
+    }
+
+    /* We need to update the remote (and the session) */
+    session->remote = &remote;
+
+    /* Equivalent to  _tinydtls_handle_read() */
+    peer->size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
+    peer->port = remote.port;
+
+    /* TESTING : Override behavior for the server? */
+    peer->ifindex = SOCK_ADDR_ANY_NETIF;
+
+    if (memcpy(&peer->addr, remote.addr.ipv6, 16) == NULL) {
+        DEBUG("ERROR: memcpy failed!");
+        return TINYDTLS_HANDSHAKE_NON_RECORD;
+    }
+
+    if (ENABLE_DEBUG) {
+        DEBUG("(%s): Msg received from [", __func__);
+        ipv6_addr_print(&peer->addr);
+        DEBUG("]:%u (netif: %i)\n", peer->port, peer->ifindex);
+    }
+
+    /* Server don't care about the result */
+    dtls_handle_message(session->context, peer, pkt_buff, (int) pckt_rcvd_size);
+
+#endif
+
+    return 1;
+
 }
