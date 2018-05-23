@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers
+ * @ingroup     drivers_periph_timer
  * @{
  *
  * @file
