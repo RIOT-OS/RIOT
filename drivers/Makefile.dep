@@ -21,6 +21,13 @@ ifneq (,$(filter apa102,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
+ifneq (,$(filter at,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  USEMODULE += fmt
+  USEMODULE += xtimer
+  USEMODULE += isrpipe
+endif
+
 ifneq (,$(filter at30tse75x,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
