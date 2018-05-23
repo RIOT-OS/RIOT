@@ -169,19 +169,19 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
 
     if (!out) {
         dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, &tmp,
-                      (void *)&(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, 0);
+                      &(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, 0);
     }
     else {
         dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, out,
-                      (void *)&(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
+                      &(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
     }
     if (!in) {
         dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
-                      (void *)&(dev(bus)->DR), &tmp, len, DMA_PERIPH_TO_MEM, 0);
+                      &(dev(bus)->DR), &tmp, len, DMA_PERIPH_TO_MEM, 0);
     }
     else {
         dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
-                      (void *)&(dev(bus)->DR), in, len, DMA_PERIPH_TO_MEM, DMA_INC_DST_ADDR);
+                      &(dev(bus)->DR), in, len, DMA_PERIPH_TO_MEM, DMA_INC_DST_ADDR);
     }
     dev(bus)->CR2 |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
 
