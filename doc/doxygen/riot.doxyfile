@@ -826,6 +826,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/msp430_common/include/sys/*.h \
                          */cpu/native/osx-libc-extra \
                          */cpu/x86/include/* \
+                         */cpu/atmega_common/include/getopt.h \
                          */drivers/kw2xrf/include/overwrites.h \
                          */pkg/emb6/* \
                          */pkg/lwip/* \
