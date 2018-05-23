@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2018 Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief   Auto initialization for at86rf2xx network interfaces
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Josua Arndt <jarndt@ias.rwth-aachen.de>
  */
 
 #ifdef MODULE_AT86RF2XX
@@ -37,12 +39,23 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+#ifndef AT86RF2XX_MAC_STACKSIZE
+    #define AT86RF2XX_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+#endif
+
 #ifndef AT86RF2XX_MAC_PRIO
 #define AT86RF2XX_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
 
+#ifdef MODULE_AT86RFR2
+/* The atmegarfr2 has a at86rf2xx included with register access no spi required.
+ * As of now it is not intended to support external at86rf2xx devices at the
+ * same time as the On-Chip transceiver drive is in use.
+ */
+    #define AT86RF2XX_NUM 1
+#else
 #define AT86RF2XX_NUM (sizeof(at86rf2xx_params) / sizeof(at86rf2xx_params[0]))
+#endif
 
 static at86rf2xx_t at86rf2xx_devs[AT86RF2XX_NUM];
 static char _at86rf2xx_stacks[AT86RF2XX_NUM][AT86RF2XX_MAC_STACKSIZE];

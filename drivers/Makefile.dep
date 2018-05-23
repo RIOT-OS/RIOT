@@ -33,15 +33,17 @@ ifneq (,$(filter at30tse75x,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
-ifneq (,$(filter at86rf2%,$(USEMODULE)))
+ifneq (,$(filter at86rf2% at86rfr2,$(USEMODULE)))
   USEMODULE += at86rf2xx
   USEMODULE += xtimer
   USEMODULE += luid
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
+ifneq (,$(filter at86rf2%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
+endif
 endif
 
 ifneq (,$(filter ata8520e,$(USEMODULE)))

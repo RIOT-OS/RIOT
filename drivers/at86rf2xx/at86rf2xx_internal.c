@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
- * Copyright (C) 2015 Freie Universität Berlin
+ *               2015 Freie Universität Berlin
+ *               2018 RWTH Aachen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @}
  */
 
@@ -27,14 +29,44 @@
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
+#define ENABLE_HEX_DUMP_RX  (0)
+#if ENABLE_HEX_DUMP_RX
+#include "od.h"
+#endif
+
+#ifdef MODULE_AT86RFR2
+/* SOC uses no SPI, but uses memcpy */
+#include <string.h>
+#else
 #define SPIDEV          (dev->params.spi)
 #define CSPIN           (dev->params.cs_pin)
+#endif
 
+#ifndef MODULE_AT86RFR2 /* SOC uses no SPI */
 static inline void getbus(const at86rf2xx_t *dev)
 {
     spi_acquire(SPIDEV, CSPIN, SPI_MODE_0, dev->params.spi_clk);
 }
+#endif
 
+#ifdef MODULE_AT86RFR2
+void at86rf2xx_reg_write(__attribute__((unused)) const at86rf2xx_t *dev,
+                         volatile uint8_t *addr, uint8_t value)
+{
+    /* already casted *(volatile uint8_t *) in iom256rfr2, _SFR_MEM8(), _MMIO_BYTE */
+    *(addr) = value;
+}
+
+uint8_t at86rf2xx_reg_read(__attribute__((unused)) const at86rf2xx_t *dev,
+                           volatile uint8_t *addr)
+{
+    /* already casted *(volatile uint8_t *) in iom256rfr2 */
+    return *addr;
+}
+#else /* END of MODULE_AT86RFR2 */
 void at86rf2xx_reg_write(const at86rf2xx_t *dev, uint8_t addr, uint8_t value)
 {
     uint8_t reg = (AT86RF2XX_ACCESS_REG | AT86RF2XX_ACCESS_WRITE | addr);
@@ -55,10 +87,14 @@ uint8_t at86rf2xx_reg_read(const at86rf2xx_t *dev, uint8_t addr)
 
     return value;
 }
+#endif
 
-void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
+void at86rf2xx_sram_read(__attribute__((unused)) const at86rf2xx_t *dev, uint8_t offset,
                          uint8_t *data, size_t len)
 {
+#ifdef MODULE_AT86RFR2
+    memcpy( data, (void *)(AT86RF2XX_REG__TRXFBST + offset), len);
+#else
     uint8_t reg = (AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_READ);
 
     getbus(dev);
@@ -66,11 +102,15 @@ void at86rf2xx_sram_read(const at86rf2xx_t *dev, uint8_t offset,
     spi_transfer_byte(SPIDEV, CSPIN, true, offset);
     spi_transfer_bytes(SPIDEV, CSPIN, false, NULL, data, len);
     spi_release(SPIDEV);
+#endif
 }
 
-void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
+void at86rf2xx_sram_write(__attribute__((unused)) const at86rf2xx_t *dev, uint8_t offset,
                           const uint8_t *data, size_t len)
 {
+#ifdef MODULE_AT86RFR2
+    memcpy((void *)(AT86RF2XX_REG__TRXFBST + offset), data, len);
+#else
     uint8_t reg = (AT86RF2XX_ACCESS_SRAM | AT86RF2XX_ACCESS_WRITE);
 
     getbus(dev);
@@ -78,27 +118,49 @@ void at86rf2xx_sram_write(const at86rf2xx_t *dev, uint8_t offset,
     spi_transfer_byte(SPIDEV, CSPIN, true, offset);
     spi_transfer_bytes(SPIDEV, CSPIN, false, data, NULL, len);
     spi_release(SPIDEV);
+#endif
 }
 
-void at86rf2xx_fb_start(const at86rf2xx_t *dev)
+void at86rf2xx_fb_start(__attribute__((unused)) const at86rf2xx_t *dev)
 {
+#ifdef MODULE_AT86RFR2
+    // nothing to do here
+#else
     uint8_t reg = AT86RF2XX_ACCESS_FB | AT86RF2XX_ACCESS_READ;
 
     getbus(dev);
     spi_transfer_byte(SPIDEV, CSPIN, true, reg);
+#endif
 }
 
-void at86rf2xx_fb_read(const at86rf2xx_t *dev,
+void at86rf2xx_fb_read(__attribute__((unused)) const at86rf2xx_t *dev,
                        uint8_t *data, size_t len)
 {
+#ifdef MODULE_AT86RFR2
+    memcpy( data, (void *)(AT86RF2XX_REG__TRXFBST), len);
+#else
     spi_transfer_bytes(SPIDEV, CSPIN, true, NULL, data, len);
+#endif
+
+#if ENABLE_HEX_DUMP_RX
+    puts("RECEIVED:");
+    od_hex_dump(data, len, OD_WIDTH_DEFAULT);
+#endif
 }
 
-void at86rf2xx_fb_stop(const at86rf2xx_t *dev)
+void at86rf2xx_fb_stop(__attribute__((unused)) const at86rf2xx_t *dev)
 {
+#ifdef MODULE_AT86RFR2
+    /* clear frame buffer protection */
+    /* TODO investigate calls from _recv As there is a problem of releasing
+     * frame buffer to early, postpone release.
+     */
+    // *AT86RF2XX_REG__TRX_CTRL_2 &= ~(1<<RX_SAFE_MODE);
+#else
     /* transfer one byte (which we ignore) to release the chip select */
     spi_transfer_byte(SPIDEV, CSPIN, false, 1);
     spi_release(SPIDEV);
+#endif
 }
 
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
@@ -116,7 +178,13 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 {
     if (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {
         /* wake up and wait for transition to TRX_OFF */
+#ifdef MODULE_AT86RFR2
+        /* Setting SLPTR bit in TRXPR to = returns the radio transceiver
+         * to the TRX_OFF state */
+        *AT86RF2XX_REG__TRXPR &= ~(AT86RF2XX_TRXPR_SLPTR);
+#else
         gpio_clear(dev->params.sleep_pin);
+#endif
         xtimer_usleep(AT86RF2XX_WAKEUP_DELAY);
 
         /* update state: on some platforms, the timer behind xtimer
@@ -134,9 +202,13 @@ void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
 {
     /* trigger hardware reset */
+#ifdef MODULE_AT86RFR2
+    *(AT86RF2XX_REG__TRXPR) |= AT86RF2XX_TRXPR_TRXRST; // set reset bit
+#else
     gpio_clear(dev->params.reset_pin);
     xtimer_usleep(AT86RF2XX_RESET_PULSE_WIDTH);
     gpio_set(dev->params.reset_pin);
+#endif
     xtimer_usleep(AT86RF2XX_RESET_DELAY);
 
     /* update state: if the radio state was P_ON (initialization phase),

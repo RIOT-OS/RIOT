@@ -1,0 +1,5 @@
+# export cpu specific dependencies to the global includes-listing
+
+ifneq (, $(filter periph_hwrng, $(USEMODULE)))
+  FEATURES_REQUIRED += xtimer
+endif
