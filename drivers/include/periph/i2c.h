@@ -31,7 +31,7 @@
  * // next we write the register address, but create no STOP condition when done
  * i2c_write_byte(dev, device_addr, reg_addr, (i2C_NOSTOP | I2C_ADDR10));
  * // and now we read the register value
- * i2c_read(dev, device_addr, &reg_value, 1, I2C_ADDR10);
+ * i2c_read_byte(dev, device_addr, &reg_value, I2C_ADDR10);
  * // finally we have to release the bus
  * i2c_release(dev);
  * @endcode
@@ -46,9 +46,9 @@
  * // first, acquire the shared bus again
  * i2c_acquire(dev);
  * // write the 16-bit register address to the device and prevent STOP condition
- * i2c_write(dev, device_addr, reg_addr, I2C_NOSTOP);
+ * i2c_write_byte(dev, device_addr, reg_addr, I2C_NOSTOP);
  * // and write the data after a REPEATED START
- * i2c_write(dev, device_addr, reg_data, 2, 0);
+ * i2c_write_bytes(dev, device_addr, reg_data, 2, 0);
  * // and finally free the bus again
  * i2c_release(dev);
  * @endcode
@@ -254,21 +254,6 @@ int i2c_acquire(i2c_t dev);
 void i2c_release(i2c_t dev);
 
 /**
- * @brief   Read data from the given I2C device
- *
- * @param[in]  dev          I2C peripheral device
- * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
- * @param[out] data         memory location to store received data
- * @param[in]  len          the number of bytes to read into @p data
- * @param[in]  flags        optional flags (see @ref i2c_flags_t)
- *
- * @return                  I2C_ACK on successful transfer of @p len byte
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_ERR for any other error
- */
-int i2c_read(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t flags);
-
-/**
  * @brief   Convenience function for reading one byte from a given register
  *          address
  *
@@ -331,8 +316,7 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
 int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags);
 
 /**
- * @brief   Convenience function for reading one byte from a given register
- *          address
+ * @brief   Convenience function for reading bytes from a device
  *
  * @note    This function is using a repeated start sequence for reading from
  *          the specified register address.
@@ -350,22 +334,6 @@ int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags);
 
 int i2c_read_bytes(i2c_t dev, uint16_t addr,
                    void *data, size_t len, uint8_t flags);
-
-/**
- * @brief   Write data from/to the given I2C device
- *
- * @param[in]  dev          I2C peripheral device
- * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
- * @param[out] data         array holding the received bytes
- * @param[in]  len          the number of bytes to write
- * @param[in]  flags        optional flags (see @ref i2c_flags_t)
- *
- * @return                  I2C_ACK on successful transfer of @p len byte
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_ERR for any other error
- */
-int i2c_write(i2c_t dev, uint16_t addr,
-              const void *data, size_t len, uint8_t flags);
 
 /**
  * @brief   Convenience function for writing a single byte onto the bus
