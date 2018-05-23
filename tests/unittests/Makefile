@@ -33,16 +33,16 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              nucleo32-f303 \
                              nucleo32-l031 \
                              nucleo32-l432 \
-                             nucleo-f030 \
-                             nucleo-f070 \
-                             nucleo-f072 \
-                             nucleo-f091 \
-                             nucleo-f103 \
-                             nucleo-f302 \
-                             nucleo-f334 \
-                             nucleo-f410 \
-                             nucleo-l053 \
-                             nucleo-l073 \
+                             nucleo-f030r8 \
+                             nucleo-f070rb \
+                             nucleo-f072rb \
+                             nucleo-f091rc \
+                             nucleo-f103rb \
+                             nucleo-f302r8 \
+                             nucleo-f334r8 \
+                             nucleo-f410rb \
+                             nucleo-l053r8 \
+                             nucleo-l073rz \
                              nucleo-l433rc \
                              nz32-sc151 \
                              opencm904 \
@@ -130,23 +130,23 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        nucleo32-f303 \
                        nucleo32-l031 \
                        nucleo32-l432 \
-                       nucleo-f030 \
-                       nucleo-f070 \
-                       nucleo-f072 \
-                       nucleo-f091 \
-                       nucleo-f103 \
-                       nucleo-f302 \
-                       nucleo-f303 \
-                       nucleo-f334 \
-                       nucleo-f401 \
-                       nucleo-f410 \
-                       nucleo-f411 \
-                       nucleo-f446 \
-                       nucleo-l053 \
-                       nucleo-l073 \
-                       nucleo-l152 \
+                       nucleo-f030r8 \
+                       nucleo-f070rb \
+                       nucleo-f072rb \
+                       nucleo-f091rc \
+                       nucleo-f103rb \
+                       nucleo-f302r8 \
+                       nucleo-f303re \
+                       nucleo-f334r8 \
+                       nucleo-f401re \
+                       nucleo-f410rb \
+                       nucleo-f411re \
+                       nucleo-f446re \
+                       nucleo-l053r8 \
+                       nucleo-l073rz \
+                       nucleo-l152re \
                        nucleo-l433rc \
-                       nucleo-l476 \
+                       nucleo-l476rg \
                        nucleo-l496zg \
                        nz32-sc151 \
                        opencm904 \

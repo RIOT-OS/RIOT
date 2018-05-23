@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
 
-BOARD ?= nucleo-l152
+BOARD ?= nucleo-l152re
 
 USEMODULE += od
 USEMODULE += shell

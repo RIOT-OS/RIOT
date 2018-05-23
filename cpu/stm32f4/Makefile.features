@@ -5,9 +5,9 @@ FEATURES_PROVIDED += periph_hwrng
 # stm32f4 have an RNG peripheral.  As during evaluation of the features , no
 # CPU variable is available, we need to filter by board.
 #
-BOARDS_WITHOUT_HWRNG += nucleo-f401
-BOARDS_WITHOUT_HWRNG += nucleo-f411
-BOARDS_WITHOUT_HWRNG += nucleo-f446
+BOARDS_WITHOUT_HWRNG += nucleo-f401re
+BOARDS_WITHOUT_HWRNG += nucleo-f411re
+BOARDS_WITHOUT_HWRNG += nucleo-f446re
 BOARDS_WITHOUT_HWRNG += nucleo144-f446
 
 -include $(RIOTCPU)/stm32_common/Makefile.features

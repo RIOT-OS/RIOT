@@ -7,7 +7,7 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f030 nucleo-l053 \
+BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f030r8 nucleo-l053r8 \
                              nucleo32-f031 nucleo32-f042 nucleo32-l031 \
                              stm32f0discovery telosb wsn430-v1_3b wsn430-v1_4 \
                              z1

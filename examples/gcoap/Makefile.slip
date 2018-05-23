@@ -10,7 +10,7 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f030 nucleo-f334 \
+BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f030r8 nucleo-f334r8 \
                              stm32f0discovery telosb wsn430-v1_3b wsn430-v1_4 \
                              z1
 

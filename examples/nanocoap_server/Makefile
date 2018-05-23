@@ -8,7 +8,7 @@ BOARD ?= native
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo32-f031 nucleo32-f042 \
-                             nucleo32-l031 nucleo-f030 nucleo-l053 stm32f0discovery \
+                             nucleo32-l031 nucleo-f030r8 nucleo-l053r8 stm32f0discovery \
                              telosb z1
 
 # Include packages that pull up and auto-init the link layer.
@@ -40,7 +40,7 @@ USEMODULE += shell_commands
 
 # Use different settings when compiling for one of the following (low-memory)
 # boards
-LOW_MEMORY_BOARDS := nucleo-f334
+LOW_MEMORY_BOARDS := nucleo-f334r8
 
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)
