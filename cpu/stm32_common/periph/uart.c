@@ -118,24 +118,21 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
-void uart_write(uart_t uart, const uint8_t *data, size_t len)
+static inline void send_byte(uart_t uart, uint8_t byte)
 {
-    assert(uart < UART_NUMOF);
-
-    for (size_t i = 0; i < len; i++) {
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
     || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
     || defined(CPU_FAM_STM32F7)
-        while (!(dev(uart)->ISR & USART_ISR_TXE)) {}
-        dev(uart)->TDR = data[i];
+    while (!(dev(uart)->ISR & USART_ISR_TXE)) {}
+    dev(uart)->TDR = byte;
 #else
-        while (!(dev(uart)->SR & USART_SR_TXE)) {}
-        dev(uart)->DR = data[i];
+    while (!(dev(uart)->SR & USART_SR_TXE)) {}
+    dev(uart)->DR = byte;
 #endif
-    }
+}
 
-    /* make sure the function is synchronous by waiting for the transfer to
-     * finish */
+static inline void wait_for_tx_complete(uart_t uart)
+{
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) \
     || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
     || defined(CPU_FAM_STM32F7)
@@ -143,6 +140,57 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #else
     while (!(dev(uart)->SR & USART_SR_TC)) {}
 #endif
+}
+
+void uart_write(uart_t uart, const uint8_t *data, size_t len)
+{
+    assert(uart < UART_NUMOF);
+
+#ifdef MODULE_PERIPH_DMA
+    if (!len) {
+        return;
+    }
+    if (uart_config[uart].dma != DMA_STREAM_UNDEF) {
+        if (irq_is_in()) {
+            uint16_t todo = 0;
+            if (dev(uart)->CR3 & USART_CR3_DMAT) {
+                /* DMA transfer for UART on-going */
+                todo = dma_suspend(uart_config[uart].dma);
+            }
+            if (todo) {
+                dma_stop(uart_config[uart].dma);
+                dev(uart)->CR3 &= ~USART_CR3_DMAT;
+            }
+            for (unsigned i = 0; i < len; i++) {
+                send_byte(uart, data[i]);
+            }
+            if (todo > 0) {
+                wait_for_tx_complete(uart);
+                dev(uart)->CR3 |= USART_CR3_DMAT;
+                dma_resume(uart_config[uart].dma, todo);
+            }
+        }
+        else {
+            dma_acquire(uart_config[uart].dma);
+            dev(uart)->CR3 |= USART_CR3_DMAT;
+            dma_transfer(uart_config[uart].dma, uart_config[uart].dma_chan, data,
+                         (void *)&dev(uart)->DR, len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
+            dma_release(uart_config[uart].dma);
+
+            /* make sure the function is synchronous by waiting for the transfer to
+             * finish */
+            wait_for_tx_complete(uart);
+            dev(uart)->CR3 &= ~USART_CR3_DMAT;
+        }
+        return;
+    }
+#endif
+    for (size_t i = 0; i < len; i++) {
+        send_byte(uart, data[i]);
+    }
+    /* make sure the function is synchronous by waiting for the transfer to
+     * finish */
+    wait_for_tx_complete(uart);
 }
 
 void uart_poweron(uart_t uart)
