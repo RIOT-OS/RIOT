@@ -1,7 +1,7 @@
 include ../Makefile.tests_common
 
 # some boards have not enough rom and/or ram
-BOARD_BLACKLIST += nucleo-f031k6 nucleo32-f042 nucleo32-l031 pic32-clicker
+BOARD_BLACKLIST += nucleo-f031k6 nucleo-f042k6 nucleo32-l031 pic32-clicker
 BOARD_INSUFFICIENT_MEMORY += arduino-duemilanove arduino-uno
 
 # override PRNG if desired (see sys/random for alternatives)
