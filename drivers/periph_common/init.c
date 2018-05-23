@@ -20,6 +20,9 @@
  * @}
  */
 
+#ifdef MODULE_PERIPH_I2C
+#include "periph/i2c.h"
+#endif
 #ifdef MODULE_PERIPH_SPI
 #include "periph/spi.h"
 #endif
@@ -35,6 +38,13 @@
 
 void periph_init(void)
 {
+    /* initialize configured I2C devices */
+#ifdef I2C_NUMOF
+    for (unsigned i = 0; i < I2C_NUMOF; i++) {
+        i2c_init(I2C_DEV(i));
+    }
+#endif
+
     /* initialize configured SPI devices */
 #ifdef MODULE_PERIPH_SPI
     for (unsigned i = 0; i < SPI_NUMOF; i++) {
