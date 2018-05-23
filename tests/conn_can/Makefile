@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo32-f031 nucleo32-f042 \
+BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f031k6 nucleo32-f042 \
                              nucleo32-f303 nucleo32-l031 nucleo-f030r8 nucleo-f070rb \
                              nucleo-f072rb nucleo-f302r8 nucleo-f303re nucleo-f334r8 \
                              nucleo-l053r8 stm32f0discovery telosb wsn430-v1_3b \

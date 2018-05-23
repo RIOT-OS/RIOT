@@ -25,7 +25,7 @@ else
   USEMODULE += mtd_sdcard
 endif
 
-BOARD_INSUFFICIENT_MEMORY := nucleo32-f031
+BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
 
 # this list is composed of boards with sufficient memory and support spi/gpio + native
 BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove arduino-mega2560 \

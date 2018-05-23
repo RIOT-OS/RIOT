@@ -11,7 +11,7 @@ TCP_TEST_CYCLES ?= 3
 # Mark Boards with insufficient memory
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              arduino-uno calliope-mini chronos mega-xplained \
-                             microbit msb-430 msb-430h nrf51dongle nrf6310 nucleo32-f031 \
+                             microbit msb-430 msb-430h nrf51dongle nrf6310 nucleo-f031k6 \
                              nucleo32-f042 nucleo32-f303 nucleo32-l031 nucleo-f030r8 \
                              nucleo-f070rb nucleo-f072rb nucleo-f302r8 nucleo-f334r8 nucleo-l053r8 \
                              sb-430 sb-430h stm32f0discovery telosb \
