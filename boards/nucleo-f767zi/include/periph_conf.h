@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2017 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,15 +7,15 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f746 STM32 Nucleo144-F746
+ * @defgroup    boards_nucleo-f767zi STM32 Nucleo-F767ZI
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F746
+ * @brief       Support for the STM32 Nucleo-F767ZI
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the nucleo144-f746 board
+ * @brief       Peripheral MCU configuration for the nucleo-f767zi board
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #ifndef PERIPH_CONF_H

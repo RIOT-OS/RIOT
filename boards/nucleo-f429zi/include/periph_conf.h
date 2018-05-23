@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f446 STM32 Nucleo144-F446
+ * @defgroup    boards_nucleo-f429zi STM32 Nucleo-F429ZI
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F446
+ * @brief       Support for the STM32 Nucleo-F429ZI
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo144-f446 board
+ * @name        Peripheral MCU configuration for the nucleo-f429zi board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
@@ -36,7 +36,7 @@ extern "C" {
  */
 /* give the target core clock (HCLK) frequency [in Hz],
  * maximum: 180MHz */
-#define CLOCK_CORECLOCK     (180000000U)
+#define CLOCK_CORECLOCK     (168000000U)
 /* 0: no external high speed crystal available
  * else: actual crystal frequency [in Hz] */
 #define CLOCK_HSE           (8000000U)
@@ -53,19 +53,9 @@ extern "C" {
 
 /* Main PLL factors */
 #define CLOCK_PLL_M          (4)
-#define CLOCK_PLL_N          (180)
+#define CLOCK_PLL_N          (168)
 #define CLOCK_PLL_P          (2)
-#define CLOCK_PLL_Q          (0)
-
-/* PLL SAI configuration */
-#define CLOCK_ENABLE_PLL_SAI (1)
-#define CLOCK_PLL_SAI_M      (4)
-#define CLOCK_PLL_SAI_N      (192)
-#define CLOCK_PLL_SAI_P      (8)
-#define CLOCK_PLL_SAI_Q      (0)
-
-/* Use alternative source for 48MHz clock */
-#define CLOCK_USE_ALT_48MHZ  (1)
+#define CLOCK_PLL_Q          (7)
 /** @} */
 
 /**
@@ -184,19 +174,19 @@ static const pwm_conf_t pwm_config[] = {
  * @{
  */
 static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 90000000Hz */
-        7,  /* -> 351562Hz */
-        7,  /* -> 351562Hz */
-        6,  /* -> 703125Hz */
-        3,  /* -> 5625000Hz */
-        2   /* -> 11250000Hz */
+    {       /* for APB1 @ 42000000Hz */
+        7,  /* -> 164062Hz */
+        6,  /* -> 328125Hz */
+        4,  /* -> 1312500Hz */
+        2,  /* -> 5250000Hz */
+        1   /* -> 10500000Hz */
     },
-    {       /* for APB2 @ 180000000Hz */
-        7,  /* -> 703125Hz */
-        7,  /* -> 703125Hz */
-        7,  /* -> 703125Hz */
-        4,  /* -> 5625000Hz */
-        3   /* -> 11250000Hz */
+    {       /* for APB2 @ 84000000Hz */
+        7,  /* -> 328125Hz */
+        7,  /* -> 328125Hz */
+        5,  /* -> 1312500Hz */
+        3,  /* -> 5250000Hz */
+        2   /* -> 10500000Hz */
     }
 };
 
@@ -245,10 +235,24 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name    ADC configuration
+ * @name   ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32F429zi order. Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A5
+ *
  * @{
  */
-#define ADC_NUMOF          (0)
+#define ADC_NUMOF          (6U)
+#define ADC_CONFIG {              \
+    {GPIO_PIN(PORT_A, 3), 2, 3},  \
+    {GPIO_PIN(PORT_C, 0), 2, 10}, \
+    {GPIO_PIN(PORT_C, 3), 2, 13}, \
+    {GPIO_PIN(PORT_F, 3), 2, 9},  \
+    {GPIO_PIN(PORT_F, 5), 2, 15}, \
+    {GPIO_PIN(PORT_F, 10), 2, 8}, \
+}
 /** @} */
 
 #ifdef __cplusplus

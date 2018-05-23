@@ -8,13 +8,13 @@
  */
 
 /**
- * @defgroup    boards_nucleo144-f412 STM32 Nucleo144-F412
+ * @defgroup    boards_nucleo-f413zh STM32 Nucleo-F413ZH
  * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo144-F412
+ * @brief       Support for the STM32 Nucleo-F413ZH
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the nucleo144-f412 board
+ * @name        Peripheral MCU configuration for the nucleo-f413zh board
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @author      Vincent Dupont <vincent@otakeys.com>
@@ -72,6 +72,29 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+#ifdef MODULE_PERIPH_DMA
+static const dma_conf_t dma_config[] = {
+    { .stream = 4  },
+    { .stream = 14 },
+    { .stream = 6  },
+    { .stream = 10 },
+    { .stream = 8  },
+};
+
+#define DMA_0_ISR  isr_dma1_stream4
+#define DMA_1_ISR  isr_dma2_stream6
+#define DMA_2_ISR  isr_dma1_stream6
+#define DMA_3_ISR  isr_dma2_stream2
+#define DMA_4_ISR  isr_dma2_stream0
+
+#define DMA_NUMOF           (sizeof(dma_config) / sizeof(dma_config[0]))
+#endif
+/** @} */
+
+/**
  * @name    Timer configuration
  * @{
  */
@@ -104,9 +127,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART3_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 0,
+        .dma_chan   = 7,
 #endif
     },
     {
@@ -118,23 +141,23 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 5,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 1,
+        .dma_chan   = 5,
 #endif
     },
     {
         .dev        = USART2,
-        .rcc_mask   = RCC_APB2ENR_USART1EN,
+        .rcc_mask   = RCC_APB1ENR_USART2EN,
         .rx_pin     = GPIO_PIN(PORT_D, 6),
         .tx_pin     = GPIO_PIN(PORT_D, 5),
         .rx_af      = GPIO_AF7,
         .tx_af      = GPIO_AF7,
-        .bus        = APB2,
+        .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 4,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 3,
+        .dma_chan   = 4,
 #endif
     },
 };
@@ -212,7 +235,13 @@ static const spi_conf_t spi_config[] = {
         .cs_pin   = GPIO_PIN(PORT_A, 4),
         .af       = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
+        .apbbus   = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 3,
+        .tx_dma_chan = 2,
+        .rx_dma   = 4,
+        .rx_dma_chan = 3,
+#endif
     }
 };
 
@@ -226,7 +255,7 @@ static const spi_conf_t spi_config[] = {
 #define I2C_NUMOF           (1U)
 #define I2C_0_EN            1
 #define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (42000000U)
+#define I2C_APBCLK          (CLOCK_APB1)
 
 /* I2C 0 device configuration */
 #define I2C_0_DEV           I2C1
@@ -251,7 +280,7 @@ static const spi_conf_t spi_config[] = {
  * @name   ADC configuration
  *
  * Note that we do not configure all ADC channels,
- * and not in the STM32F412zg order. Instead, we
+ * and not in the STM32F413zh order. Instead, we
  * just define 6 ADC channels, for the Nucleo
  * Arduino header pins A0-A5
  *
@@ -273,6 +302,15 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 #define RTC_NUMOF           (1)
+/** @} */
+
+/**
+ * @name    RTT configuration
+ * @{
+ */
+#define RTT_NUMOF           (1)
+#define RTT_FREQUENCY       (4096)
+#define RTT_MAX_VALUE       (0xffff)
 /** @} */
 
 #ifdef __cplusplus
