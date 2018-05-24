@@ -1,0 +1,10 @@
+/**
+ * @defgroup pkg_nimble     NimBLE BLE stack
+ * @ingroup  pkg
+ * @ingroup  net
+ * @brief    RIOT port of the NimBLE BLE stack
+ *
+ * This package includes the NimBLE BLE stack to RIOT.
+ *
+ * @see https://github.com/apache/mynewt-nimble
+ */

@@ -1,0 +1,34 @@
+NIMIBASE = -I$(PKGDIRBASE)/nimble
+
+# include RIOT glue code headers
+INCLUDES += -I$(RIOTPKG)/nimble/contrib/include
+
+# include tinycrypt headers
+INCLUDES += $(NIMIBASE)/ext/tinycrypt/include
+
+# include the RIOT NPL headers
+INCLUDES += $(NIMIBASE)/porting/npl/riot/include
+
+# include nimble controller headers
+INCLUDES += $(NIMIBASE)/nimble/transport/ram/include
+INCLUDES += $(NIMIBASE)/nimble/controller/include
+INCLUDES += $(NIMIBASE)/nimble/drivers/nrf52/include
+
+# include nimble host headers
+INCLUDES += $(NIMIBASE)/nimble/include
+INCLUDES += $(NIMIBASE)/nimble/host/include
+INCLUDES += $(NIMIBASE)/nimble/host/services/ans/include
+INCLUDES += $(NIMIBASE)/nimble/host/services/bas/include
+INCLUDES += $(NIMIBASE)/nimble/host/services/bleuart/include
+INCLUDES += $(NIMIBASE)/nimble/host/services/gap/include
+INCLUDES += $(NIMIBASE)/nimble/host/services/gatt/include
+INCLUDES += $(NIMIBASE)/nimble/host/services/ias/include
+INCLUDES += $(NIMIBASE)/nimble/host/services/lls/include
+INCLUDES += $(NIMIBASE)/nimble/host/services/tps/include
+INCLUDES += $(NIMIBASE)/nimble/host/store/ram/include
+INCLUDES += $(NIMIBASE)/nimble/host/util/include
+INCLUDES += $(NIMIBASE)/porting/nimble/include
+
+# set environment
+CFLAGS += -DNIMBLE_CFG_CONTROLLER=1
+CFLAGS += -DMYNEWT_VAL_OS_CPUTIME_FREQ=32768
