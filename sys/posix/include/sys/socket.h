@@ -86,10 +86,10 @@ extern "C" {
  * @name    Socket types
  * @{
  */
-#define SOCK_DGRAM      (1)     /**< Datagram socket */
-#define SOCK_RAW        (2)     /**< Raw socket */
-#define SOCK_SEQPACKET  (3)     /**< Sequenced-packet socket */
-#define SOCK_STREAM     (4)     /**< Stream socket */
+#define SOCK_STREAM     (1)     /**< Stream socket */
+#define SOCK_DGRAM      (2)     /**< Datagram socket */
+#define SOCK_RAW        (3)     /**< Raw socket */
+#define SOCK_SEQPACKET  (5)     /**< Sequenced-packet socket */
 /** @} */
 
 #define SOL_SOCKET      (-1)    /**< Options to be accessed at socket level, not protocol level */
