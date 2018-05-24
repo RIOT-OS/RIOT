@@ -38,7 +38,7 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     /* First set ADDR and register with no stop */
     err = i2c_write_bytes(dev, addr, &reg, (flags & I2C_REG16) ? 2 : 1,
                           flags & I2C_NOSTOP );
-    if (err != I2C_ACK) {
+    if (err < 0) {
         return err;
     }
     /* Then get the data from device */
@@ -70,7 +70,7 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
     /* First set ADDR and register with no stop */
     err = i2c_write_bytes(dev, addr, &reg, (flags & I2C_REG16) ? 2 : 1,
                           flags & I2C_NOSTOP );
-    if (err != I2C_ACK) {
+    if (err < 0) {
         return err;
     }
     /* Then write data to the device */
