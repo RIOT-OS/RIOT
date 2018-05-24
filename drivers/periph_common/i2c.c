@@ -25,13 +25,13 @@
 #ifdef I2C_NUMOF
 
 #ifdef PERIPH_I2C_NEED_READ_REGS
-int i2c_read_reg(ic2_t dev, uint16_t addr, uint16_t reg,
+int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                  void *data, uint8_t flags)
 {
     return i2c_read_regs(dev, addr, reg, data, 1, flags);
 }
 
-int i2c_read_regs(ic2_t dev, uint16_t addr, uint16_t reg,
+int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   void *data, size_t len, uint8_t flags)
 {
     uint8_t err;
@@ -46,14 +46,14 @@ int i2c_read_regs(ic2_t dev, uint16_t addr, uint16_t reg,
 }
 #endif /* PERIPH_I2C_NEED_READ_REGS */
 
-int i2c_read_byte(ic2_t dev, uint16_t addr, void *data, uint8_t flags)
+int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags)
 {
     return i2c_read_bytes(dev, addr, data, 1, flags);
 }
 
 int i2c_write_byte(i2c_t dev, uint16_t addr, uint8_t data, uint8_t flags)
 {
-    return i2c_write_bytes(dev, addr, addr, 1, flags);
+    return i2c_write_bytes(dev, addr, &data, 1, flags);
 }
 
 #ifdef PERIPH_I2C_NEED_WRITE_REGS
