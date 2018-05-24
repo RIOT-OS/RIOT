@@ -379,7 +379,7 @@ ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
     &_estack,
     {
         /* entry point of the program */
-        [ 0]         = reset_handler_default,
+        [ 0] = reset_handler_default,
         /* [-14] non maskable interrupt handler */
         [ 1] = nmi_default,
         /* [-13] hard fault exception */
