@@ -1,5 +1,7 @@
+FEATURES_PROVIDED += periph_flash_common
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_raw
+FEATURES_PROVIDED += periph_eeprom
 FEATURES_PROVIDED += periph_hwrng
 
 BOARDS_WITHOUT_HWRNG += nucleo-l031k6
