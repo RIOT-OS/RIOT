@@ -201,7 +201,7 @@ static int _init(netdev_t *dev)
     cc110x_t *cc110x = &((netdev_cc110x_t*) dev)->cc110x;
 
     gpio_init_int(cc110x->params.gdo2, GPIO_IN, GPIO_BOTH,
-            &_netdev_cc110x_isr, (void*)dev);
+                  &_netdev_cc110x_isr, (void*)dev);
 
     gpio_set(cc110x->params.gdo2);
     gpio_irq_disable(cc110x->params.gdo2);

@@ -208,6 +208,42 @@ extern "C" {
 #define CC110X_RXFIFO       (0x3F)      /**< RX FIFO: Read operations read from the RX FIFO (SB: +0x80; BURST: +0xC0) */
 /** @} */
 
+
+/**
+ * @name GDO configuration values
+ *
+ * Values that can be written to the GDO0, GDO1 and GDO2 configuration registers
+ * @{
+ */
+
+/** @brief GDO goes high when RX FIFO is filled at or above threshold */
+#define CC110X_GDO_HIGH_ON_RX_FIFO_ABOVE_THRESHOLD   (0x00)
+/**
+ * @brief GDO goes high when RX FIFO is filled at or above threshold or when
+ *        packet is fully received
+ */
+#define CC110X_GDO_HIGH_ON_RX_FIFO_FILLED_OR_PKT_END (0x01)
+/** @brief GDO goes low when TX FIFO is filled less than threshold */
+#define CC110X_GDO_LOW_ON_TX_FIFO_BELOW_THRESHOLD    (0x02)
+/** @brief  GDO goes low when TX FIFO becomes empty */
+#define CC110X_GDO_LOW_ON_TX_FIFO_EMPTY              (0x03)
+/** @brief  GDO goes high when RX FIFO overflows */
+#define CC110X_GDO_HIGH_ON_RX_FIFO_OVERFLOW          (0x04)
+/** @brief GDO goes high when TX FIFO underflows */
+#define CC110X_GDO_HIGH_ON_TX_FIFO_UNDERFLOW         (0x05)
+/**
+ * @brief GDO goes high when sync word was just received until the packet is
+ *        fully received, or when sync word has been send until packet is fully
+ *        send
+ */
+#define CC110X_GDO_HIGH_ON_SYNC_WORD                 (0x06)
+/**
+ * @brief GDO goes high when a packet is received and CRC is correct.
+ *        Goes back to low when first byte of RX fifo has been read
+ */
+#define CC110X_GDO_HIGH_ON_PACKET_RECEIVED           (0x07)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
