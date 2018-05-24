@@ -7,13 +7,13 @@
  */
 
 /**
- * @defgroup    boards_stm32f7discovery STM32F769 Discovery board
+ * @defgroup    boards_stm32f769i-disco STM32F769I-DISCO board
  * @ingroup     boards
- * @brief       Support for the STM32F769 Discovery board
+ * @brief       Support for the STM32F769I-DISCO board
  * @{
  *
  * @file
- * @brief       Board specific definitions for the STM32F769 Discovery board
+ * @brief       Board specific definitions for the STM32F769I-DISCO board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Sebastian Meiling <s@mlng.net>

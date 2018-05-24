@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_stm32f7discovery
+ * @ingroup     boards_stm32f769i-disco
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the STM32F769 Discovery board
+ * @brief       Peripheral MCU configuration for the STM32F769I-DISCO board
  *
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
