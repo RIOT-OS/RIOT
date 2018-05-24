@@ -28,13 +28,13 @@ int main(void)
     printf("This test will call xtimer_usleep for values from %d down to %d\n",
            TEST_USLEEP_MAX, TEST_USLEEP_MIN);
 
-    uint32_t start, slept, test_time = 0, sleeping_time = 0;
+    uint32_t test_time = 0, sleeping_time = 0;
 
     for (int i = TEST_USLEEP_MAX; i >= TEST_USLEEP_MIN; i--) {
         printf("going to sleep %d us\n", i);
-        start = xtimer_now_usec();
+        uint32_t start = xtimer_now_usec();
         xtimer_usleep(i);
-        slept = xtimer_now_usec() - start;
+        uint32_t slept = xtimer_now_usec() - start;
         printf("Slept for      %" PRIu32 " us\n", slept);
         sleeping_time += slept;
         test_time += i;
