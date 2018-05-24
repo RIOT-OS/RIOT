@@ -84,6 +84,9 @@
 #include "net/skald.h"
 #endif
 
+#ifdef MODULE_NDN_RIOT
+#include "ndn-riot/ndn.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -263,6 +266,12 @@ void auto_init(void)
 #ifdef MODULE_GNRC_UHCPC
     extern void auto_init_gnrc_uhcpc(void);
     auto_init_gnrc_uhcpc();
+#endif
+
+/* initialize NDN module after the network devices are initialized */
+#ifdef MODULE_NDN_RIOT
+    DEBUG("Auto init NDN module.\n");
+    ndn_init();
 #endif
 
 /* initialize sensors and actuators */
