@@ -126,6 +126,12 @@ extern "C" {
 #endif
 
 /**
+ * @todo    Remove dev_enums.h include once all platforms are ported to the
+ *          updated periph interface
+ */
+#include "periph/dev_enums.h"
+
+/**
  * @brief   Default I2C device access macro
  * @{
  */
@@ -165,7 +171,7 @@ typedef unsigned int i2c_t;
 typedef enum {
     I2C_SPEED_LOW = 0,      /**< low speed mode:    ~10kbit/s */
     I2C_SPEED_NORMAL,       /**< normal mode:       ~100kbit/s */
-    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/sj */
+    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/s */
     I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
     I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
@@ -242,7 +248,7 @@ int i2c_init(i2c_t dev);
  *
  * @param[in] dev           I2C device to access
  *
- * @return                  0 on success
+ * @return                  0 on success, -1 on error
  */
 int i2c_acquire(i2c_t dev);
 
@@ -250,8 +256,10 @@ int i2c_acquire(i2c_t dev);
  * @brief   Release the given I2C device to be used by others
  *
  * @param[in] dev           I2C device to release
+ *
+ * @return                  0 on success, -1 on error
  */
-void i2c_release(i2c_t dev);
+int i2c_release(i2c_t dev);
 
 /**
  * @brief   Convenience function for reading one byte from a given register
@@ -378,7 +386,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
  * @param[in]  reg          register address to read from (8- or 16-bit,
  *                          right-aligned)
  * @param[in]  addr         7-bit or 10-bit device address (right-aligned)
- * @param[out] data         memory location to store received data
+ * @param[in]  data         byte to write
  * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
  * @return                  I2C_ACK on successful transfer of @p data
