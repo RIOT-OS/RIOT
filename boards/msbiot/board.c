@@ -25,9 +25,6 @@ static void gpios_init(void);
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
-
     /* initialize the boards LEDs */
     gpios_init();
 }

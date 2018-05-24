@@ -25,9 +25,6 @@ void board_init(void)
 {
     /* initialize the boards LEDs, this is done for debugging purpose */
     leds_init();
-
-    /* initialize the CPU */
-    cpu_init();
 }
 
 /**

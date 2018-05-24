@@ -103,9 +103,6 @@ void board_init(void)
     /* Turn on AVDD for reading voltages */
     gpio_set(MULLE_POWER_AVDD);
 
-    /* initialize the CPU */
-    cpu_init();
-
     /* NVRAM requires xtimer for timing */
     xtimer_init();
 

@@ -60,6 +60,10 @@ void software_init_hook(void)
 
 void mips_start(void)
 {
+    /* initialize the CPU */
+    cpu_init();
+
+    /* initialize board */
     board_init();
 
     /* kernel_init */

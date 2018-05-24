@@ -65,7 +65,4 @@ void board_init(void)
     gpio_set(LED2_PIN);
 
     modem_clock_init();
-
-    /* initialize the CPU core */
-    cpu_init();
 }

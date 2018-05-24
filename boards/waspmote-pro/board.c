@@ -59,7 +59,7 @@ void board_init(void)
 #endif
 
     atmega_stdio_init();
-    cpu_init();
+
     led_init();
     irq_enable();
 }

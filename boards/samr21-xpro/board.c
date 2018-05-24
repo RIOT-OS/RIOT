@@ -44,7 +44,4 @@ void board_init(void)
     gpio_init(RFCTL2_PIN, GPIO_OUT);
     /* set default antenna switch configuration */
     board_antenna_config(RFCTL_ANTENNA_DEFAULT);
-
-    /* initialize the CPU */
-    cpu_init();
 }

@@ -24,9 +24,6 @@
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
-
     /* perform common board initialization */
     board_common_init();
 }

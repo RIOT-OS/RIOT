@@ -89,7 +89,6 @@ static void msp430_init_cpuclk(uint8_t speed)
 
 void board_init(void)
 {
-    msp430_cpu_init();
     msb_ports_init();
 
     /* initialize CPU clock */

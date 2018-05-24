@@ -28,9 +28,6 @@ void board_init(void)
     SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK;
     PORTA->PCR[18] &= ~(PORT_PCR_ISF_MASK | PORT_PCR_MUX(0x07));
 
-    /* initialize the CPU core */
-    cpu_init();
-
     /* initialize and turn off the on-board RGB-LED */
     gpio_init(LED0_PIN, GPIO_OUT);
     gpio_init(LED1_PIN, GPIO_OUT);

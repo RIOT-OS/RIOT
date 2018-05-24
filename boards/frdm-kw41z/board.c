@@ -23,9 +23,6 @@
 
 void board_init(void)
 {
-    /* initialize the CPU core */
-    cpu_init();
-
     /* initialize and turn off LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
     gpio_set(LED0_PIN);

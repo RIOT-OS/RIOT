@@ -120,6 +120,8 @@ void reset_handler_default(void)
 
     post_startup();
 
+    /* initialize the CPU */
+    cpu_init();
     /* initialize the board (which also initiates CPU initialization) */
     board_init();
 

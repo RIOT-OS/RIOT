@@ -23,9 +23,6 @@
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
-
 #ifdef AUTO_INIT_LED0
     /* The LED pin is also used for SPI, so we enable it
        only if explicitly wanted by the user */

@@ -33,9 +33,6 @@
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
-
     /* initialization of on-board LEDs
      * NOTE: LED0 must be explicitly enabled as it is also used for SPI_DEV(0) */
 #ifdef AUTO_INIT_LED0

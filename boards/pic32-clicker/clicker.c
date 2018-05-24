@@ -37,9 +37,6 @@ void board_init(void)
     LED1_OFF;
     LED2_OFF;
 
-    /* initialize the CPU */
-    cpu_init();
-
     /* Stop the linker from throwing away the PIC32 config register settings */
     dummy();
 }
