@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,8 +17,12 @@
  * An event queue is basically a FIFO queue of events, with some functions to
  * efficiently and safely handle adding and getting events to / from such a
  * queue.
+ *
  * An event queue is bound to a thread, but any thread or ISR can put events
- * into a queue.
+ * into a queue. In most cases, the owning thread of a queue is set during the
+ * queue's initialization. But it is also possible to initialize a queue in a
+ * detached state from a different context and to set the owning thread
+ * at a later point of time using the event_queue_claim() function.
  *
  * An event is a structure containing a pointer to an event handler. It can be
  * extended to provide context or arguments to the handler.  It can also be
@@ -84,6 +89,7 @@
  * @brief       Event API
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef EVENT_H
@@ -110,6 +116,11 @@ extern "C" {
  * @brief   event_queue_t static initializer
  */
 #define EVENT_QUEUE_INIT    { .waiter = (thread_t *)sched_active_thread }
+
+/**
+ * @brief   static initializer for detached event queues
+ */
+#define EVENT_QUEUE_INIT_DETACHED   { 0 }
 
 /**
  * @brief   event structure forward declaration
@@ -145,6 +156,25 @@ typedef struct {
  * @param[out]  queue   event queue object to initialize
  */
 void event_queue_init(event_queue_t *queue);
+
+/**
+ * @brief   Initialize an event queue not binding it to a thread
+ *
+ * @param[out]  queue   event queue object to initialize
+ */
+void event_queue_init_detached(event_queue_t *queue);
+
+/**
+ * @brief   Bind an event queue to the calling thread
+ *
+ * This function must only be called once and only if the given queue is not
+ * yet bound to a thread.
+ *
+ * @pre     (queue->waiter == NULL)
+ *
+ * @param[out]  queue   event queue object to bind to a thread
+ */
+void event_queue_claim(event_queue_t *queue);
 
 /**
  * @brief   Queue an event
@@ -191,6 +221,8 @@ event_t *event_get(event_queue_t *queue);
  *
  * In order to handle an event retrieved using this function,
  * call event->handler(event).
+ *
+ * @note    There can only be a single waiter on a queue!
  *
  * @param[in]   queue   event queue to get event from
  *
