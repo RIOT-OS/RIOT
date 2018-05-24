@@ -113,6 +113,7 @@ static isr_ctx_t isr_ctx[CTX_NUMOF];
  */
 static uint32_t isr_map[ISR_MAP_SIZE];
 
+static const uint8_t port_irqs[] = PORT_IRQS;
 
 static inline PORT_Type *port(gpio_t pin)
 {
@@ -217,9 +218,11 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
     /* clear interrupt flags */
     port(pin)->ISFR &= ~(1 << pin_num(pin));
+
     /* enable global port interrupts in the NVIC */
-    NVIC_EnableIRQ(PORTA_IRQn + port_num(pin));
-    /* finally, enable the interrupt for the select pin */
+    NVIC_EnableIRQ(port_irqs[port_num(pin)]);
+
+    /* finally, enable the interrupt for the selected pin */
     port(pin)->PCR[pin_num(pin)] |= flank;
     return 0;
 }
