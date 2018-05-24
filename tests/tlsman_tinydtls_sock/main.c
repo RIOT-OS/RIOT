@@ -39,24 +39,31 @@
 #define SECURE_CIPHER_LIST { SECURE_CIPHER_PSK_IDS, SECURE_CIPHER_RPK_IDS }
 
 #define MAIN_QUEUE_SIZE     (8)
+
+extern void client_side(tlsman_driver_t *tlsman_session, const uint8_t tlsman_flags);
+
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
-extern void client_side(void);
+tlsman_driver_t tlsman_session;
 
-static void test_load_stack(void)
+
+
+static void test_load_stack(uint8_t tlsman_flags)
 {
 
     /* The Cipher(s) the application must use (Hardcoded) */
-    int cipers[] = SECURE_CIPHER_LIST;
+    uint16_t ciphers[] = SECURE_CIPHER_LIST;
 
-    assert(0 ==
-           tlsman_load_stack(cipers, sizeof(cipers), TLSMAN_FLAG_STACK_DTLS));
+     assert (!tlsman_load_stack(&tlsman_session, ciphers, sizeof(ciphers),
+                                       tlsman_flags));
 
 }
 
 int main(void)
 {
 
+    uint8_t tlsman_flags = TLSMAN_FLAG_SIDE_CLIENT     |
+                           TLSMAN_FLAG_STACK_DTLS;
 
     /* we need a message queue for the thread running the shell in order to
      * receive potentially fast incoming networking packets */
@@ -67,9 +74,9 @@ int main(void)
      * First step: Init the (D)TLS stack. Either server or client
      * NOTE: This must be called once time only.
      */
-    CALL(test_load_stack());
+    CALL(test_load_stack(tlsman_flags));
 
-    client_side();
+    client_side(&tlsman_session, tlsman_flags);
 
     return 0;
 }
