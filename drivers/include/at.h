@@ -57,6 +57,16 @@ extern "C" {
 /** Shortcut for getting send end of line length */
 #define AT_SEND_EOL_LEN  (sizeof(AT_SEND_EOL) - 1)
 
+#ifndef AT_RECV_EOL_1
+/** 1st end of line character received (S3 aka CR character for a modem) */
+#define AT_RECV_EOL_1   "\r"
+#endif
+
+#ifndef AT_RECV_EOL_2
+/** 1st end of line character received (S4 aka LF character for a modem) */
+#define AT_RECV_EOL_2   "\n"
+#endif
+
 /**
  * @brief AT device structure
  */

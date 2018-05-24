@@ -70,7 +70,7 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
             return -1;
         }
 
-        if (at_expect_bytes(dev, AT_SEND_EOL "\r\n", timeout)) {
+        if (at_expect_bytes(dev, AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2, timeout)) {
             return -2;
         }
     }
@@ -114,6 +114,9 @@ out:
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
                               char *resp_buf, size_t len, bool keep_eol, uint32_t timeout)
 {
+    const char eol[] = AT_RECV_EOL_1 AT_RECV_EOL_2;
+    assert(sizeof(eol) > 1);
+
     ssize_t res;
     size_t bytes_left = len - 1;
     char *pos = resp_buf;
@@ -131,7 +134,7 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
         res = at_readline(dev, pos, bytes_left, keep_eol, timeout);
         if (res == 0) {
             if (bytes_left) {
-                *pos++ = '\n';
+                *pos++ = eol[sizeof(eol) - 2];
                 bytes_left--;
             }
             continue;
@@ -154,7 +157,7 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
             else {
                 pos += res;
                 if (bytes_left) {
-                    *pos++ = '\n';
+                    *pos++ = eol[sizeof(eol) - 2];
                     bytes_left--;
                 }
                 else {
@@ -184,7 +187,7 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
         return -1;
     }
 
-    if (at_expect_bytes(dev, AT_SEND_EOL "\n", timeout)) {
+    if (at_expect_bytes(dev, AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
         return -2;
     }
 
@@ -215,6 +218,9 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
 
 ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, uint32_t timeout)
 {
+    const char eol[] = AT_RECV_EOL_1 AT_RECV_EOL_2;
+    assert(sizeof(eol) > 1);
+
     ssize_t res = -1;
     char *resp_pos = resp_buf;
 
@@ -226,12 +232,12 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, ui
             if (AT_PRINT_INCOMING) {
                 print(resp_pos, read_res);
             }
-            if (*resp_pos == '\r') {
+            if (sizeof(eol) > 2 && *resp_pos == eol[0]) {
                 if (!keep_eol) {
                     continue;
                 }
             }
-            if (*resp_pos == '\n') {
+            if (*resp_pos == eol[sizeof(eol) - 2]) {
                 *resp_pos = '\0';
                 res = resp_pos - resp_buf;
                 goto out;
