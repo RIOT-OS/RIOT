@@ -31,8 +31,7 @@ extern "C" {
 extern evtimer_msg_t gnrc_rpl_evtimer;
 
 /**
- * @defgroup gnrc_rpl_events RPL events
- * Events for RPL.
+ * @name Events for RPL.
  * @{
  */
 /**
@@ -55,8 +54,7 @@ extern evtimer_msg_t gnrc_rpl_evtimer;
 #define GNRC_RPL_PARENT_PROBE_INTERVAL        (2 * MS_PER_SEC)
 
 /**
- * @defgroup gnrc_rpl_parent_states Parent states
- * State of a RPL parent
+ * @name State of a RPL parent
  * @{
  */
 /**
