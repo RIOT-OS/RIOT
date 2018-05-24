@@ -26,9 +26,6 @@ def testfunc(child):
             sleep_exp = int(child.match.group(1))
 
             child.expect(u"Slept for      (\d+) us", timeout=3)
-            slept = int(child.match.group(1))
-            if slept < sleep_exp*(1-DEVIATION) or slept > sleep_exp*(1+DEVIATION):
-                print("More than %2.0f%% deviation." % (DEVIATION*100))
 
         except pexpect.TIMEOUT:
             print("xtimer stuck when trying to sleep %d us" % (sleep_exp))
@@ -36,14 +33,7 @@ def testfunc(child):
             break
         i = i - 1
 
-    child.expect(u"Slept for (\d+) expected (\d+)")
-    sleep_exp = int(child.match.group(1))
-    slept = int(child.match.group(2))
-
-    if slept < sleep_exp*(1-DEVIATION) or slept > sleep_exp*(1+DEVIATION):
-        print("All test together had more than %2.0f%% deviation." % (DEVIATION*100))
-        print("[FAILED]")
-        return
+    child.expect(u"Slept for (\d+) us expected (\d+) us")
 
     child.expect(u"[SUCCESS]", timeout=3)
 
