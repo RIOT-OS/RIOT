@@ -51,6 +51,11 @@ extern "C" {
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
 /** @} */
 
+/**
+ * @brief   Initialize board specific hardware, including clock, LEDs, and std-IO
+ */
+void board_init(void);
+
 #ifdef __cplusplus
 }
 #endif
