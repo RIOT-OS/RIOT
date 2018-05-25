@@ -108,6 +108,11 @@ extern "C" {
 #define CC2420_PARAM_RESET          GPIO_PIN(P4, 6)
 /** @} */
 
+/**
+ * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
+ */
+void board_init(void);
+
 #ifdef __cplusplus
 }
 #endif
