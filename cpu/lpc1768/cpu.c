@@ -20,11 +20,15 @@
 #include "cpu.h"
 #include "periph/init.h"
 
+extern void SystemInit(void);
+
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
 void cpu_init(void)
 {
+    /* initialize core clocks via CMSIS function */
+    SystemInit();
     /* initialize the Cortex-M core */
     cortexm_init();
     /* trigger static peripheral initialization */
