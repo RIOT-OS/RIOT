@@ -42,6 +42,21 @@ typedef uint8_t gpio_t;
 #define GPIO_PIN(port, pin)     (gpio_t)((port << 5) | pin)
 
 /**
+ * @brief   Custom device ID location in gpio_t
+ */
+#define GPIO_EXP_DEV_LOC    (4U)
+
+/**
+ * @brief   Custom maximum device mask for gpio_exp
+ */
+#define GPIO_EXP_MAXDEVMASK    (0x07)
+
+/**
+ * @brief   Custom maximum pin mask for gpio_exp
+ */
+#define GPIO_EXP_MAXPINMASK    (0x0f)
+
+/**
  * @name    Override the default GPIO mode values
  * @{
  */

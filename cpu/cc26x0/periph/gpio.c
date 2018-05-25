@@ -20,6 +20,7 @@
  */
 
 #include "cpu.h"
+#include "gpio_exp.h"
 #include "periph/gpio.h"
 
 #define GPIO_ISR_CHAN_NUMOF     (32)
@@ -33,6 +34,8 @@ static gpio_isr_ctx_t gpio_chan[GPIO_ISR_CHAN_NUMOF];
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
+    GPIO_INTERCEPT_INIT(pin, mode);
+
     if ((unsigned int)pin > 31)
         return -1;
 
@@ -54,6 +57,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                    gpio_cb_t cb, void *arg)
 {
+    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
+
     int init = gpio_init(pin, mode);
     if (init != 0)
         return init;
@@ -75,16 +80,22 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
+    GPIO_INTERCEPT_IRQ_ENABLE(pin);
+
     IOC->CFG[pin] |= IOCFG_EDGEIRQ_ENABLE;
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
+    GPIO_INTERCEPT_IRQ_DISABLE(pin);
+
     IOC->CFG[pin] &= ~IOCFG_EDGEIRQ_ENABLE;
 }
 
 int gpio_read(gpio_t pin)
 {
+    GPIO_INTERCEPT_READ(pin);
+
     if (GPIO->DOE & (1 << pin)) {
         return (GPIO->DOUT >> pin) & 1;
     }
@@ -95,21 +106,29 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
+    GPIO_INTERCEPT_SET(pin);
+
     GPIO->DOUTSET = (1 << pin);
 }
 
 void gpio_clear(gpio_t pin)
 {
+    GPIO_INTERCEPT_CLEAR(pin);
+
     GPIO->DOUTCLR = (1 << pin);
 }
 
 void gpio_toggle(gpio_t pin)
 {
+    GPIO_INTERCEPT_TOGGLE(pin);
+
     GPIO->DOUTTGL = (1 << pin);
 }
 
 void gpio_write(gpio_t pin, int value)
 {
+    GPIO_INTERCEPT_WRITE(pin, value);
+
     if (value) {
         GPIO->DOUTSET = (1 << pin);
     } else {

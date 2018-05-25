@@ -21,6 +21,7 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include "gpio_exp.h"
 #include "periph/gpio.h"
 #include "board.h"
 
@@ -122,6 +123,8 @@ static inline int check_valid_port(uint8_t port)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
+    GPIO_INTERCEPT_INIT(pin, mode);
+
     uint8_t port = GPIO_PORT(pin);
     uint32_t pin_no = GPIO_PIN_NO(pin);
     uint8_t output = 0, pu = 0, pd = 0, od = 0;
@@ -175,6 +178,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
+    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
+
     (void)pin;
     (void)mode;
     (void)flank;
@@ -186,8 +191,28 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return -1;
 }
 
+void gpio_irq_enable(gpio_t pin)
+{
+    GPIO_INTERCEPT_IRQ_ENABLE(pin);
+
+    (void)pin;
+
+    /* TODO: Not implemented yet */
+}
+
+void gpio_irq_disable(gpio_t pin)
+{
+    GPIO_INTERCEPT_IRQ_DISABLE(pin);
+
+    (void)pin;
+
+    /* TODO: Not implemented yet */
+}
+
 int gpio_read(gpio_t pin)
 {
+    GPIO_INTERCEPT_READ(pin);
+
     assert(check_valid_port(GPIO_PORT(pin)));
 
     return PORTx(GPIO_PORT(pin)) & GPIO_PIN_NO(pin);
@@ -195,6 +220,8 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
+    GPIO_INTERCEPT_SET(pin);
+
     assert(check_valid_port(GPIO_PORT(pin)));
 
     LATxSET(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
@@ -202,6 +229,8 @@ void gpio_set(gpio_t pin)
 
 void gpio_clear(gpio_t pin)
 {
+    GPIO_INTERCEPT_CLEAR(pin);
+
     assert(check_valid_port(GPIO_PORT(pin)));
 
     LATxCLR(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
@@ -209,6 +238,8 @@ void gpio_clear(gpio_t pin)
 
 void gpio_toggle(gpio_t pin)
 {
+    GPIO_INTERCEPT_TOGGLE(pin);
+
     assert(check_valid_port(GPIO_PORT(pin)));
 
     LATxINV(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
@@ -216,6 +247,8 @@ void gpio_toggle(gpio_t pin)
 
 void gpio_write(gpio_t pin, int value)
 {
+    GPIO_INTERCEPT_WRITE(pin, value);
+
     if (value)
         gpio_set(pin);
     else

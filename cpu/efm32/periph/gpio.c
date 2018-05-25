@@ -22,9 +22,8 @@
  */
 
 #include "cpu.h"
-
+#include "gpio_exp.h"
 #include "periph/gpio.h"
-
 #include "em_gpio.h"
 
 /**
@@ -54,6 +53,8 @@ static inline uint32_t _pin_mask(gpio_t pin)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
+    GPIO_INTERCEPT_INIT(pin, mode);
+
     /* check for valid pin */
     if (pin == GPIO_UNDEF) {
         return -1;
@@ -75,6 +76,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
+    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
+
     int result = gpio_init(pin, mode);
 
     if (result != 0) {
@@ -103,36 +106,50 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
+    GPIO_INTERCEPT_IRQ_ENABLE(pin);
+
     GPIO_IntEnable(_pin_mask(pin));
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
+    GPIO_INTERCEPT_IRQ_DISABLE(pin);
+
     GPIO_IntDisable(_pin_mask(pin));
 }
 
 int gpio_read(gpio_t pin)
 {
+    GPIO_INTERCEPT_READ(pin);
+
     return GPIO_PinInGet(_port_num(pin), _pin_num(pin));
 }
 
 void gpio_set(gpio_t pin)
 {
+    GPIO_INTERCEPT_SET(pin);
+
     GPIO_PinOutSet(_port_num(pin), _pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
+    GPIO_INTERCEPT_CLEAR(pin);
+
     GPIO_PinOutClear(_port_num(pin), _pin_num(pin));
 }
 
 void gpio_toggle(gpio_t pin)
 {
+    GPIO_INTERCEPT_TOGGLE(pin);
+
     GPIO_PinOutToggle(_port_num(pin), _pin_num(pin));
 }
 
 void gpio_write(gpio_t pin, int value)
 {
+    GPIO_INTERCEPT_WRITE(pin, value);
+
     if (value) {
         GPIO_PinOutSet(_port_num(pin), _pin_num(pin));
     }

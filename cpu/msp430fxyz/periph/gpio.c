@@ -21,6 +21,7 @@
 
 #include "cpu.h"
 #include "bitarithm.h"
+#include "gpio_exp.h"
 #include "periph/gpio.h"
 
 /**
@@ -81,6 +82,8 @@ static int _ctx(gpio_t pin)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
+    GPIO_INTERCEPT_INIT(pin, mode);
+
     msp_port_t *port = _port(pin);
 
     /* check if port is valid and mode applicable */
@@ -102,6 +105,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                     gpio_cb_t cb, void *arg)
 {
+    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
+
     msp_port_isr_t *port = _isr_port(pin);
 
     /* check if port, pull resistor and flank configuration are valid */
@@ -153,6 +158,8 @@ void gpio_periph_mode(gpio_t pin, bool enable)
 
 void gpio_irq_enable(gpio_t pin)
 {
+    GPIO_INTERCEPT_IRQ_ENABLE(pin);
+
     msp_port_isr_t *port = _isr_port(pin);
     if (port) {
         port->IE |= _pin(pin);
@@ -161,6 +168,8 @@ void gpio_irq_enable(gpio_t pin)
 
 void gpio_irq_disable(gpio_t pin)
 {
+    GPIO_INTERCEPT_IRQ_DISABLE(pin);
+
     msp_port_isr_t *port = _isr_port(pin);
     if (port) {
         port->IE &= ~(_pin(pin));
@@ -169,6 +178,8 @@ void gpio_irq_disable(gpio_t pin)
 
 int gpio_read(gpio_t pin)
 {
+    GPIO_INTERCEPT_READ(pin);
+
     msp_port_t *port = _port(pin);
     if (port->DIR & _pin(pin)) {
         return (int)(port->OD & _pin(pin));
@@ -180,21 +191,29 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
+    GPIO_INTERCEPT_SET(pin);
+
     _port(pin)->OD |= _pin(pin);
 }
 
 void gpio_clear(gpio_t pin)
 {
+    GPIO_INTERCEPT_CLEAR(pin);
+
     _port(pin)->OD &= ~(_pin(pin));
 }
 
 void gpio_toggle(gpio_t pin)
 {
+    GPIO_INTERCEPT_TOGGLE(pin);
+
     _port(pin)->OD ^= _pin(pin);
 }
 
 void gpio_write(gpio_t pin, int value)
 {
+    GPIO_INTERCEPT_WRITE(pin, value);
+
     if (value) {
         _port(pin)->OD |= _pin(pin);
     }
