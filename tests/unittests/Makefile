@@ -164,6 +164,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        samr21-xpro \
                        seeeduino_arch-pro \
                        slstk3401a \
+                       slstk3402a \
                        sltb001a \
                        slwstk6000b \
                        slwstk6220a \
