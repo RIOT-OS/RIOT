@@ -23,6 +23,7 @@
 
 
 void mips_start(void);
+void cpu_init(void);
 
 extern void _fini(void);
 extern void atexit(void (*)(void));
