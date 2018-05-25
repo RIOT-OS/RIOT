@@ -14,4 +14,8 @@ ifneq (,$(filter auto_init_can,$(USEMODULE)))
   DIRS += can
 endif
 
+ifneq (,$(filter auto_init_gpio_exp,$(USEMODULE)))
+  DIRS += gpio_exp
+endif
+
 include $(RIOTBASE)/Makefile.base
