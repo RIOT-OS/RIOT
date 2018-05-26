@@ -275,6 +275,47 @@ gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *ol
  */
 gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type);
 
+/**
+ * @brief   Merge pktsnip chain to single pktsnip.
+ *
+ *          Example:
+ *              Input:
+ *                                                                  buffer
+ *              +---------------------------+                      +------+
+ *              | size = 8                  | data       +-------->|      |
+ *              | type = NETTYPE_IPV6       |------------+         +------+
+ *              +---------------------------+                      .      .
+ *                    | next                                       .      .
+ *                    v                                            .      .
+ *              +---------------------------+                      +------+
+ *              | size = 40                 | data    +----------->|      |
+ *              | type = NETTYPE_UDP        |---------+            +------+
+ *              +---------------------------+                      .      .
+ *                    | next                                       .      .
+ *                    v
+ *              +---------------------------+                      +------+
+ *              | size = 14                 | data +-------------->|      |
+ *              | type = NETTYPE_UNDEF      |------+               +------+
+ *              +---------------------------+                      .      .
+ *
+ *
+ *              Output:
+ *                                                                  buffer
+ *              +---------------------------+                      +------+
+ *              | size = 62                 | data       +-------->|      |
+ *              | type = NETTYPE_IPV6       |------------+         |      |
+ *              +---------------------------+                      |      |
+ *                                                                 |      |
+ *                                                                 +------+
+ *                                                                 .      .
+ *
+ * @param[in,out] pkt   The snip to merge.
+ *
+ * @return  0, on success
+ * @return  ENOMEM, if no space is left in the packet buffer.
+ */
+int gnrc_pktbuf_merge(gnrc_pktsnip_t *pkt);
+
 #ifdef DEVELHELP
 /**
  * @brief   Prints some statistics about the packet buffer to stdout.

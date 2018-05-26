@@ -540,4 +540,49 @@ gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t t
     return new;
 }
 
+int gnrc_pktbuf_merge(gnrc_pktsnip_t *pkt)
+{
+    gnrc_pktsnip_t *next;
+    int iter = 0;
+
+    size_t size = gnrc_pkt_len(pkt);
+    if (pkt->size >= size) {
+        return 0;
+    }
+
+    mutex_lock(&_mutex);
+
+    /* Allocate new buffer */
+    uint8_t *new_data = _pktbuf_alloc(size);
+    if (new_data == NULL) {
+        DEBUG("pktbuf: error allocating new data section\n");
+        mutex_unlock(&_mutex);
+        return ENOMEM;
+    }
+
+    /* Copy data to new buffer */
+    next = pkt;
+    while (next != NULL) {
+        if (next->data != NULL) {
+            memcpy(&new_data[iter], next->data, next->size);
+            iter += next->size;
+        }
+        next = next->next;
+    }
+
+    /* Use first pktsnip for new data */
+    next = pkt->next;
+    pkt->next = NULL;
+    _pktbuf_free(pkt->data, pkt->size);
+    pkt->data = new_data;
+    pkt->size = size;
+
+    mutex_unlock(&_mutex);
+
+    /* Release old pktsnips and data*/
+    gnrc_pktbuf_release(next);
+
+    return 0;
+}
+
 /** @} */
