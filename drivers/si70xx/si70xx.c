@@ -39,11 +39,11 @@ static uint16_t _do_measure(const si70xx_t *dev, uint8_t command)
 
     i2c_acquire(SI70XX_I2C);
 
-    if (i2c_write_byte(SI70XX_I2C, SI70XX_ADDR, command) != 1) {
+    if (i2c_write_byte(SI70XX_I2C, SI70XX_ADDR, command, 0) != 0) {
         DEBUG("[ERROR] Cannot write command '%d' to I2C.\n", command);
     }
 
-    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, result, 2) != 2) {
+    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, result, 2, 0) != 0) {
         DEBUG("[ERROR] Cannot read command '%d' result from I2C.\n", command);
     }
 
@@ -66,11 +66,11 @@ static uint64_t _get_serial(const si70xx_t *dev)
     out[0] = SI70XX_READ_ID_FIRST_A;
     out[1] = SI70XX_READ_ID_FIRST_B;
 
-    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2) != 2) {
+    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2, 0) != 0) {
         DEBUG("[ERROR] Cannot write command 'READ_ID_FIRST' to I2C.\n");
     }
 
-    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, in_first, 8) != 8) {
+    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, in_first, 8, 0) != 0) {
         DEBUG("[ERROR] Cannot read device first ID from I2C.\n");
     }
 
@@ -78,11 +78,11 @@ static uint64_t _get_serial(const si70xx_t *dev)
     out[0] = SI70XX_READ_ID_SECOND_A;
     out[1] = SI70XX_READ_ID_SECOND_B;
 
-    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2) != 2) {
+    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2, 0) != 0) {
         DEBUG("[ERROR] Cannot write command 'READ_ID_SECOND' to I2C.\n");
     }
 
-    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, in_second, 8) != 8) {
+    if (i2c_read_bytes(SI70XX_I2C, SI70XX_ADDR, in_second, 8, 0) != 0) {
         DEBUG("[ERROR] Cannot read device second ID from I2C.\n");
     }
 
@@ -115,11 +115,11 @@ static uint8_t _get_revision(const si70xx_t *dev)
     out[0] = SI70XX_READ_REVISION_A;
     out[1] = SI70XX_READ_REVISION_B;
 
-    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2) != 2) {
+    if (i2c_write_bytes(SI70XX_I2C, SI70XX_ADDR, out, 2, 0) != 0) {
         DEBUG("[ERROR] Cannot write command 'READ_REVISION' to I2C.\n");
     }
 
-    if (i2c_read_byte(SI70XX_I2C, SI70XX_ADDR, &in) != 1) {
+    if (i2c_read_byte(SI70XX_I2C, SI70XX_ADDR, &in, 0) != 0) {
         DEBUG("[ERROR] Cannot read device revision from I2C.\n");
     }
 
@@ -153,12 +153,6 @@ int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
     /* setup the i2c bus */
     i2c_acquire(SI70XX_I2C);
 
-    if (i2c_init_master(SI70XX_I2C, I2C_SPEED_NORMAL) != 0) {
-        DEBUG("[ERROR] Cannot initialize I2C bus.\n");
-        i2c_release(SI70XX_I2C);
-        return -SI70XX_ERR_NOI2C;
-    }
-
     if (_test_device(dev) != SI70XX_OK) {
         DEBUG("[ERROR] No valid device found.\n");
         i2c_release(SI70XX_I2C);
@@ -166,7 +160,7 @@ int si70xx_init(si70xx_t *dev, const si70xx_params_t *params)
     }
 
     /* initialize the peripheral */
-    if (i2c_write_byte(SI70XX_I2C, SI70XX_ADDR, SI70XX_RESET) != 1) {
+    if (i2c_write_byte(SI70XX_I2C, SI70XX_ADDR, SI70XX_RESET, 0) != 0) {
         DEBUG("[ERROR] Cannot reset device.\n");
         i2c_release(SI70XX_I2C);
         return SI70XX_ERR_I2C;
