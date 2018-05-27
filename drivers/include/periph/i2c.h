@@ -29,7 +29,7 @@
  * // before accessing the bus, we need to acquire it
  * i2c_acquire(dev);
  * // next we write the register address, but create no STOP condition when done
- * i2c_write_byte(dev, device_addr, reg_addr, (i2C_NOSTOP | I2C_ADDR10));
+ * i2c_write_byte(dev, device_addr, reg_addr, (I2C_NOSTOP | I2C_ADDR10));
  * // and now we read the register value
  * i2c_read_byte(dev, device_addr, &reg_value, I2C_ADDR10);
  * // finally we have to release the bus
