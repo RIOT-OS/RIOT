@@ -96,7 +96,7 @@ int lps331ap_read_pres(const lps331ap_t *dev);
  * @param[in] dev       device descriptor of sensor to enable
  *
  * @return              0 on success
- * @return              -1 on error
+ * @return              <0 on error
  */
 int lps331ap_enable(const lps331ap_t *dev);
 
@@ -106,7 +106,7 @@ int lps331ap_enable(const lps331ap_t *dev);
  * @param[in] dev       device descriptor of sensor to disable
  *
  * @return              0 on success
- * @return              -1 on error
+ * @return              <0 on error
  */
 int lps331ap_disable(const lps331ap_t *dev);
 
