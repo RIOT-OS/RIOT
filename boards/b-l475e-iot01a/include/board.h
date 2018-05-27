@@ -54,6 +54,28 @@ extern "C" {
 #define BTN_B1_PIN          GPIO_PIN(PORT_C, 13)
 
 /**
+ * @name    HTS221 temperature/humidity sensor configuration
+ * @{
+ */
+#define HTS221_PARAM_I2C    I2C_DEV(1)
+/** @} */
+
+/**
+ * @name    LIS3MDL 3-axis magnetometer configuration
+ * @{
+ */
+#define LIS3MDL_PARAM_I2C   I2C_DEV(1)
+/** @} */
+
+/**
+ * @name    LSM6DSL accelerometer sensor configuration
+ * @{
+ */
+#define LSM6DSL_PARAM_I2C   I2C_DEV(1)
+#define LSM6DSL_PARAM_ADDR  (0x6A)
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
