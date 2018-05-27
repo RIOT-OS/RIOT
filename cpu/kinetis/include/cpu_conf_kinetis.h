@@ -197,6 +197,8 @@ typedef struct {} LPTMR_Type;
 #define PIT_CLKEN() (bit_set32(&SIM->SCGC, SIM_SCGC_PIT_SHIFT))
 #endif
 
+#define ICS_TRIM_VALUE 0x58
+
 #endif /* _MKE02Z4_H_ */
 /** @} */
 

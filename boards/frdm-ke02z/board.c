@@ -32,9 +32,8 @@ void board_init(void)
     /* Set BUS_CLOCK = CORE_CLOCK  */
     bit_clear32(&(SIM->BUSDIV), SIM_BUSDIV_BUSDIV_SHIFT);
 
-    /* FEI mode by default */
-    /* Trim internal reference clock (FLL input) to 39.062kHz */
-    ICS->C3 = 0x57;
+    /* Trim internal reference clock (FLL input) */
+    ICS->C3 = ICS_C3_SCTRIM(ICS_TRIM_VALUE);
 
     /* Wait for the FLL to lock on target frequency */
     while(!(ICS->S & ICS_S_LOCK_MASK)) {}
