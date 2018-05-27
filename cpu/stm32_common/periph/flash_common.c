@@ -38,8 +38,8 @@
 
 void _unlock(void)
 {
-    DEBUG("[flash-common] unlocking the flash module\n");
     if (CNTRL_REG & CNTRL_REG_LOCK) {
+        DEBUG("[flash-common] unlocking the flash module\n");
         KEY_REG = FLASH_KEY1;
         KEY_REG = FLASH_KEY2;
     }
@@ -47,6 +47,8 @@ void _unlock(void)
 
 void _lock(void)
 {
-    DEBUG("[flash-common] locking the flash module\n");
-    CNTRL_REG |= CNTRL_REG_LOCK;
+    if (!(CNTRL_REG & CNTRL_REG_LOCK)) {
+        DEBUG("[flash-common] locking the flash module\n");
+        CNTRL_REG |= CNTRL_REG_LOCK;
+    }
 }
