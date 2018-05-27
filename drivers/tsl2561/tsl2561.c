@@ -51,12 +51,6 @@ int tsl2561_init(tsl2561_t *dev, const tsl2561_params_t *params)
 
     _print_init_info(dev);
 
-    /* Initialize I2C interface */
-    if (i2c_init_master(DEV_I2C, I2C_SPEED_NORMAL)) {
-        DEBUG("[Error] I2C device not enabled\n");
-        return TSL2561_NOI2C;
-    }
-
     DEBUG("[Info] I2C device initialized with success!\n");
 
     /* Acquire exclusive access */
@@ -67,7 +61,7 @@ int tsl2561_init(tsl2561_t *dev, const tsl2561_params_t *params)
     /* Verify sensor ID */
     uint8_t id;
     i2c_read_reg(DEV_I2C, DEV_ADDR,
-                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_ID, &id);
+                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_ID, &id, 0);
     DEBUG("[Info] ID ? %d\n", id);
     if (id != TSL2561_ID ) {
         DEBUG("[Error] not a TSL2561 sensor\n");
@@ -79,12 +73,12 @@ int tsl2561_init(tsl2561_t *dev, const tsl2561_params_t *params)
     /* configuring gain and integration time */
     i2c_write_reg(DEV_I2C, DEV_ADDR,
                   TSL2561_COMMAND_MODE | TSL2561_REGISTER_TIMING,
-                  DEV_INTEGRATION | DEV_GAIN);
+                  DEV_INTEGRATION | DEV_GAIN, 0);
 
 #if ENABLE_DEBUG
     uint8_t timing;
     i2c_read_reg(DEV_I2C, DEV_ADDR,
-                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_TIMING, &timing);
+                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_TIMING, &timing, 0);
     DEBUG("[Info] Timing ? %d (expected: %d)\n",
           timing, DEV_INTEGRATION | DEV_GAIN);
 #endif
@@ -191,11 +185,11 @@ static void _enable(const tsl2561_t *dev)
     /* enabling device */
     i2c_write_reg(DEV_I2C, DEV_ADDR,
                   TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL,
-                  TSL2561_CONTROL_POWERON);
+                  TSL2561_CONTROL_POWERON, 0);
 #if ENABLE_DEBUG
     uint8_t en;
     i2c_read_reg(DEV_I2C, DEV_ADDR,
-                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL, &en);
+                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL, &en, 0);
     DEBUG("[Info] Enabled ? %s\n", en == 3 ? "true" : "false");
 #endif
 }
@@ -206,12 +200,12 @@ static void _disable(const tsl2561_t *dev)
     /* disabling device */
     i2c_write_reg(DEV_I2C, DEV_ADDR,
                   TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL,
-                  TSL2561_CONTROL_POWEROFF );
+                  TSL2561_CONTROL_POWEROFF, 0);
 
 #if ENABLE_DEBUG
     uint8_t dis;
     i2c_read_reg(DEV_I2C, DEV_ADDR,
-                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL, &dis);
+                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL, &dis, 0);
     DEBUG("[Info] Disabled ? %s\n", dis == 0 ? "true": "false");
 #endif
 }
@@ -240,7 +234,7 @@ static void _read_data(const tsl2561_t *dev, uint16_t *full, uint16_t *ir)
     /* Read full spectrum channel */
     i2c_read_regs(DEV_I2C, DEV_ADDR,
                   TSL2561_COMMAND_MODE | TSL2561_COMMAND_WORD | TSL2561_REGISTER_CHAN0,
-                  buffer, 2);
+                  buffer, 2, 0);
     *full = (buffer[1] << 8) | buffer[0];
 
     memset(buffer, 0, sizeof(buffer));
@@ -248,7 +242,7 @@ static void _read_data(const tsl2561_t *dev, uint16_t *full, uint16_t *ir)
     /* Read infrared spectrum channel */
     i2c_read_regs(DEV_I2C, DEV_ADDR,
                   TSL2561_COMMAND_MODE | TSL2561_COMMAND_WORD | TSL2561_REGISTER_CHAN1,
-                  buffer, 2);
+                  buffer, 2, 0);
     *ir = (buffer[1] << 8) | buffer[0];
 
     /* Turn the device off to save power */
