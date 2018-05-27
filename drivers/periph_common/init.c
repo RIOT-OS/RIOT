@@ -39,7 +39,7 @@
 void periph_init(void)
 {
     /* initialize configured I2C devices */
-#ifdef I2C_NUMOF
+#ifdef MODULE_PERIPH_I2C
     for (unsigned i = 0; i < I2C_NUMOF; i++) {
         i2c_init(I2C_DEV(i));
     }
