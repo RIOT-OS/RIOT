@@ -43,16 +43,14 @@ int isl29020_init(isl29020_t *dev, const isl29020_params_t *params)
 
     /* acquire exclusive access to the bus */
     i2c_acquire(DEV_I2C);
-    /* initialize the I2C bus */
-    i2c_init_master(DEV_I2C, I2C_SPEED_NORMAL);
 
     /* configure and enable the sensor */
     tmp = (ISL29020_CMD_EN | ISL29020_CMD_MODE |
            ISL29020_RES_INT_16 | DEV_RANGE | (DEV_MODE << 5));
-    res = i2c_write_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, tmp);
+    res = i2c_write_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, tmp, 0);
     /* release the bus for other threads */
     i2c_release(DEV_I2C);
-    if (res < 1) {
+    if (res < 0) {
         return -1;
     }
     return 0;
@@ -66,10 +64,10 @@ int isl29020_read(const isl29020_t *dev)
 
     i2c_acquire(DEV_I2C);
     /* read lighting value */
-    ret = i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_LDATA, &low);
-    ret += i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_HDATA, &high);
+    ret = i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_LDATA, &low, 0);
+    ret += i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_HDATA, &high, 0);
     i2c_release(DEV_I2C);
-    if (ret < 2) {
+    if (ret < 0) {
         return -1;
     }
     res = (high << 8) | low;
@@ -84,14 +82,14 @@ int isl29020_enable(const isl29020_t *dev)
     uint8_t tmp;
 
     i2c_acquire(DEV_I2C);
-    res = i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, &tmp);
-    if (res < 1) {
+    res = i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, &tmp, 0);
+    if (res < 0) {
         i2c_release(DEV_I2C);
         return -1;
     }
     tmp |= ISL29020_CMD_EN;
-    res = i2c_write_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, tmp);
-    if (res < 1) {
+    res = i2c_write_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, tmp, 0);
+    if (res < 0) {
         i2c_release(DEV_I2C);
         return -1;
     }
@@ -105,14 +103,14 @@ int isl29020_disable(const isl29020_t *dev)
     uint8_t tmp;
 
     i2c_acquire(DEV_I2C);
-    res = i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, &tmp);
-    if (res < 1) {
+    res = i2c_read_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, &tmp, 0);
+    if (res < 0) {
         i2c_release(DEV_I2C);
         return -1;
     }
     tmp &= ~(ISL29020_CMD_EN);
-    res = i2c_write_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, tmp);
-    if (res < 1) {
+    res = i2c_write_reg(DEV_I2C, DEV_ADDR, ISL29020_REG_CMD, tmp, 0);
+    if (res < 0) {
         i2c_release(DEV_I2C);
         return -1;
     }
