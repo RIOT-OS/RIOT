@@ -1,0 +1,2 @@
+# include test specific includes
+export INCLUDES += -I$(CURDIR)/include
