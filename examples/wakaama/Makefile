@@ -35,6 +35,12 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
+# NOTE: Required by object_float_sensor.c
+USEMODULE += saul_reg
+# NOTE: Uncomment to automatically add any supported devices to the lwm2m client
+#USEMODULE += saul_default
+
+# NOTE: Load module for memory allocator
 USEMODULE += memarray
 
 # Comment this out to disable code in RIOT that does safety checking

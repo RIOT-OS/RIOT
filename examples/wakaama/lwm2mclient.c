@@ -446,6 +446,10 @@ void *lwm2m_run_server(void *arg)
         return NULL;
     }
 
+    /* This will auto-add all supported devices currently in the SAUL registry */
+    lwm2m_auto_add_float_sensors(lwm2mH);
+    lwm2m_auto_add_bool_sensors(lwm2mH);
+
 #ifdef BOARD_NATIVE
     signal(SIGINT, handle_sigint);
 #endif /* BOARD_NATIVE */
@@ -485,6 +489,10 @@ void *lwm2m_run_server(void *arg)
         else {
             tv = RESPONSE_TIMEOUT;
         }
+
+        /* Update sensor values. */
+        lwm2m_poll_float_sensors(lwm2mH);
+        lwm2m_poll_bool_sensors(lwm2mH);
 
         /*
          * This function does two things:
