@@ -33,11 +33,11 @@ extern "C" {
  * @brief   Struct for holding cc110x IO parameters
  */
 typedef struct cc110x_params {
-    spi_t spi;          /**< what */
-    gpio_t cs;          /**< does */
-    gpio_t gdo0;        /**< this */
-    gpio_t gdo1;        /**< look */
-    gpio_t gdo2;        /**< like */
+    spi_t spi;          /**< SPI bus the CC110x is connected to */
+    gpio_t cs;          /**< GPIO connected to the chip select pin of the CC110x */
+    gpio_t gdo0;        /**< GPIO connected to the GDO0 pin of the CC110x */
+    gpio_t gdo1;        /**< GPIO connected to the GDO1 pin of the CC110x */
+    gpio_t gdo2;        /**< GPIO connected to the GDO2 pin of the CC110x */
 } cc110x_params_t;
 
 /**

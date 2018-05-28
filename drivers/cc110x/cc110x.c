@@ -151,7 +151,7 @@ void cc110x_switch_to_rx(cc110x_t *dev)
 
     dev->radio_state = RADIO_RX;
 
-    cc110x_write_reg(dev, CC110X_IOCFG2, 0x6);
+    cc110x_write_reg(dev, CC110X_IOCFG2, CC110X_GDO_HIGH_ON_SYNC_WORD);
     cc110x_strobe(dev, CC110X_SRX);
 
     gpio_irq_enable(dev->params.gdo2);

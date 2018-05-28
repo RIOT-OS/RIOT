@@ -38,10 +38,33 @@
 #include "cpu_conf.h"
 #include "cpu.h"
 
+#ifdef MODULE_OD
+#include "od.h"
+#endif
+
 #include "log.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+
+const char *cc110x_state_to_text(uint8_t state)
+{
+    switch (state){
+    case RADIO_IDLE:
+        return "idle";
+    case RADIO_TX_BUSY:
+        return "tx busy";
+    case RADIO_RX:
+        return "rx";
+    case RADIO_RX_BUSY:
+        return "rx busy";
+    case RADIO_PWD:
+        return "pwd";
+    case RADIO_UNKNOWN:
+        return "unknown";
+    }
+    return "invalid";
+}
 
 static void _rx_abort(cc110x_t *dev)
 {
@@ -61,7 +84,8 @@ static void _rx_start(cc110x_t *dev)
     pkt_buf->pos = 0;
 
     gpio_irq_disable(dev->params.gdo2);
-    cc110x_write_reg(dev, CC110X_IOCFG2, 0x01);
+    cc110x_write_reg(dev, CC110X_IOCFG2,
+                     CC110X_GDO_HIGH_ON_RX_FIFO_FILLED_OR_PKT_END);
     gpio_irq_enable(dev->params.gdo2);
 }
 
@@ -69,7 +93,7 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
 {
     int fifo = cc110x_get_reg_robust(dev, 0xfb);
 
-    if (fifo & 0x80) {
+    if (fifo & RXFIFO_OVERFLOW) {
         DEBUG("%s:%s:%u rx overflow\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
         _rx_abort(dev);
         return;
@@ -120,11 +144,10 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
         int crc_ok = (status[I_LQI] & CRC_OK) >> 7;
 
         if (crc_ok) {
-                    LOG_DEBUG("cc110x: received packet from=%u to=%u payload "
-                            "len=%u\n",
-                    (unsigned)pkt_buf->packet.phy_src,
-                    (unsigned)pkt_buf->packet.address,
-                    pkt_buf->packet.length-3);
+            LOG_DEBUG("cc110x: received packet from=%u to=%u payload len=%u\n",
+                      (unsigned)pkt_buf->packet.phy_src,
+                      (unsigned)pkt_buf->packet.address,
+                      pkt_buf->packet.length - 3);
             /* let someone know that we've got a packet */
             callback(arg);
 
@@ -133,6 +156,10 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
         else {
             DEBUG("%s:%s:%u crc-error\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
             dev->cc110x_statistic.packets_in_crc_fail++;
+#if defined(MODULE_OD) && ENABLE_DEBUG
+            od_hex_dump(pkt_buf->packet.data, pkt_buf->packet.length - 3,
+                        OD_WIDTH_DEFAULT);
+#endif
             _rx_abort(dev);
         }
     }
@@ -140,7 +167,6 @@ static void _rx_read_data(cc110x_t *dev, void(*callback)(void*), void*arg)
 
 static void _rx_continue(cc110x_t *dev, void(*callback)(void*), void*arg)
 {
-
     if (dev->radio_state != RADIO_RX_BUSY) {
         DEBUG("%s:%s:%u _rx_continue in invalid state\n", RIOT_FILE_RELATIVE,
                 __func__, __LINE__);
@@ -177,9 +203,9 @@ static void _tx_continue(cc110x_t *dev)
         return;
     }
 
-    int fifo = 64 - cc110x_get_reg_robust(dev, 0xfa);
+    int fifo = CC110X_FIFO_LENGTH - cc110x_get_reg_robust(dev, 0xfa);
 
-    if (fifo & 0x80) {
+    if (fifo & TXFIFO_UNDERFLOW) {
         DEBUG("%s:%s:%u tx underflow!\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
         _tx_abort(dev);
         return;
@@ -205,11 +231,12 @@ static void _tx_continue(cc110x_t *dev)
     if (to_send < left) {
         /* set GDO2 to 0x2 -> will deassert at TX FIFO below threshold */
         gpio_irq_enable(dev->params.gdo2);
-        cc110x_write_reg(dev, CC110X_IOCFG2, 0x02);
+        cc110x_write_reg(dev, CC110X_IOCFG2,
+                         CC110X_GDO_LOW_ON_TX_FIFO_BELOW_THRESHOLD);
     }
     else {
         /* set GDO2 to 0x6 -> will deassert at packet end */
-        cc110x_write_reg(dev, CC110X_IOCFG2, 0x06);
+        cc110x_write_reg(dev, CC110X_IOCFG2, CC110X_GDO_HIGH_ON_SYNC_WORD);
         gpio_irq_enable(dev->params.gdo2);
     }
 }
@@ -281,7 +308,8 @@ int cc110x_send(cc110x_t *dev, cc110x_pkt_t *packet)
     cc110x_hook_tx();
 #endif
 
-    cc110x_write_reg(dev, CC110X_IOCFG2, 0x02);
+    cc110x_write_reg(dev, CC110X_IOCFG2,
+                     CC110X_GDO_LOW_ON_TX_FIFO_BELOW_THRESHOLD);
 
     /* Put CC110x in IDLE mode to flush the FIFO */
     cc110x_strobe(dev, CC110X_SIDLE);
