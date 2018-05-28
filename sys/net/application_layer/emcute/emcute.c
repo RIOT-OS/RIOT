@@ -118,7 +118,7 @@ static int syncsend(uint8_t resp, size_t len, bool unlock)
      * remove was called */
     thread_flags_clear(TFLAGS_ANY);
 
-    for (unsigned retries = 0; retries < EMCUTE_N_RETRY; retries++) {
+    for (unsigned retries = 0; retries <= EMCUTE_N_RETRY; retries++) {
         DEBUG("[emcute] syncsend: sending round %i\n", retries);
         sock_udp_send(&sock, tbuf, len, &gateway);
 
@@ -128,7 +128,7 @@ static int syncsend(uint8_t resp, size_t len, bool unlock)
             DEBUG("[emcute] syncsend: got response [%i]\n", result);
             xtimer_remove(&timer);
             res = result;
-            retries = EMCUTE_N_RETRY;
+            break;
         }
     }
 
