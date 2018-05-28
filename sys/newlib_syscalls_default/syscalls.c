@@ -537,18 +537,3 @@ int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restric
     return -1;
 }
 #endif
-
-/**
- * Current process times (not implemented).
- *
- * @param[out]  ptms    Not modified.
- *
- * @return  -1, this function always fails. errno is set to ENOSYS.
- */
-clock_t _times_r(struct _reent *ptr, struct tms *ptms)
-{
-    (void)ptms;
-    ptr->_errno = ENOSYS;
-
-    return (-1);
-}

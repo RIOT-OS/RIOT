@@ -1,0 +1,22 @@
+/**
+ * @ingroup  sys
+ * @defgroup sys_newlib_stubs Newlib system call stubs
+ *
+ *
+ * These module provide stubs (functions that always return an error) for the
+ * system calls required by newlib:
+ *
+ *  - File handling: _open_r, _close_r, _lseek_r, _read_r, _write_r, _stat_r,
+ *    _fstat_r, _link_r, _unlink_r, _fcntl_r
+ *  - Process control: _execve_r, _wait_r, _fork_r, _getpid_r
+ *  - Memory management: _sbrk_r
+ *  - Timekeeping: _gettimeofday_r, _times_r
+ *
+ * Stubs for these functions can be found in the newlib source, under newlib/libc/reent/.
+ *
+ * Stubs may be needed if an external module uses a standard library function
+ * that depends on a syscall, but it is not desired to pull in the code needed
+ * to support it (for example, there is no point in having VFS if there is no
+ * storage support.) In many of these cases it is perfectly acceptable if those
+ * functions do nothing but fail.
+ */

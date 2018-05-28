@@ -68,6 +68,14 @@ ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
   include $(RIOTBASE)/sys/newlib_syscalls_default/Makefile.include
 endif
 
+ifneq (,$(filter newlib_stubs_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/newlib_stubs/Makefile.include
+endif
+
+ifneq (,$(filter newlib_syscalls_riot_%,$(USEMODULE)))
+  include $(RIOTBASE)/sys/newlib_syscalls_riot/Makefile.include
+endif
+
 ifneq (,$(filter arduino,$(USEMODULE)))
   include $(RIOTBASE)/sys/arduino/Makefile.include
 endif

@@ -369,12 +369,29 @@ endif
 ifneq (,$(filter newlib,$(USEMODULE)))
   # allow custom newlib syscalls implementations by adding
   # newlib_syscalls_XXX to USEMODULE
-  ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
+  # Once all syscall are split into "real" implementations and stubs, this
+  # module should go away
+  ifeq (,$(filter-out newlib_syscalls_riot_%,$(filter newlib_syscalls_%,$(USEMODULE))))
     USEMODULE += newlib_syscalls_default
+  endif
+  # If xtimer is available, use it to provide the clock function, but only if
+  # the stub module was not explicitly selected
+  ifeq (,$(filter newlib_stubs_clock,$(USEMODULE)))
+    ifneq (,$(filter xtimer,$(USEMODULE)))
+      USEMODULE += newlib_syscalls_riot_clock
+    endif
   endif
   ifeq (,$(filter stdio_rtt,$(USEMODULE)))
     USEMODULE += stdio_uart
   endif
+endif
+
+ifneq (,$(filter newlib_syscalls_riot_%,$(USEMODULE)))
+  USEMODULE += newlib_syscalls_riot
+endif
+
+ifneq (,$(filter newlib_stubs_%,$(USEMODULE)))
+  USEMODULE += newlib_stubs
 endif
 
 ifneq (,$(filter posix_sockets,$(USEMODULE)))

@@ -132,4 +132,8 @@ PSEUDOMODULES += crypto_aes_precalculated
 # This pseudomodule causes a loop in AES to be unrolled (more flash, less CPU)
 PSEUDOMODULES += crypto_aes_unroll
 
+# Newlib system call implementation and stubs are submodules
+PSEUDOMODULES += newlib_syscalls_riot_%
+PSEUDOMODULES += newlib_stubs_%
+
 # Packages may also add modules to PSEUDOMODULES in their `Makefile.include`.

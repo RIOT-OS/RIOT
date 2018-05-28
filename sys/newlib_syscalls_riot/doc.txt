@@ -1,0 +1,27 @@
+/**
+ * @ingroup  sys
+ * @defgroup sys_newlib_syscalls_riot RIOT-Newlib system calls
+ *
+ *
+ * @brief   Implementation if system calls for newlib using RIOT functionality.
+ *
+ * The submodules in here use RIOT modules to provide a portable set of system
+ * calls for newlib.
+ *
+ * System calls are split into submodules according to which of RIOT's module
+ * they require. Special logic in Makefile.dep causes the correct system calls
+ * to be enabled automatically whenever the required modules are enabled.
+ *
+ * For example, using xtimer automatically causes newlib_syscalls_riot_clock to
+ * be used.
+ *
+ * If the functionality of these system calls is not needed, but only their
+ * existence, to avoid a linking error the newlib_stubs module can be used.
+ * This can be useful if one has a package that uses functionality in the
+ * standard library that requires the system calls, but it is not a problem if
+ * those calls always fail.
+ *
+ * Submodules:
+ *
+ * - sys_newlib_syscalls_riot_clock
+ */

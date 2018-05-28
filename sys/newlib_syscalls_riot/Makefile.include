@@ -1,0 +1,3 @@
+ifneq (,$(filter newlib_syscalls_riot_clock,$(USEMODULE)))
+  UNDEF += $(BINDIR)/newlib_syscalls_riot/clock.o
+endif

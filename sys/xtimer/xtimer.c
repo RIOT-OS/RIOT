@@ -20,7 +20,6 @@
 
 #include <assert.h>
 #include <stdint.h>
-#include <string.h>
 
 #include "xtimer.h"
 #include "mutex.h"
