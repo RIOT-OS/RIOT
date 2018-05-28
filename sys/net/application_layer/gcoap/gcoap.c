@@ -279,7 +279,6 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         case GCOAP_RESOURCE_NO_PATH:
             return gcoap_response(pdu, buf, len, COAP_CODE_PATH_NOT_FOUND);
         case GCOAP_RESOURCE_FOUND:
-            /* used below to ensure a memo not already recorded for the resource */
             _find_obs_memo_resource(&resource_memo, resource);
             break;
     }
@@ -288,8 +287,12 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         int empty_slot = _find_obs_memo(&memo, remote, pdu);
         /* record observe memo */
         if (memo == NULL) {
-            if (empty_slot >= 0 && resource_memo == NULL) {
-
+            if ((resource_memo != NULL)
+                    && _endpoints_equal(remote, resource_memo->observer)) {
+                /* observer re-registering with new token */
+                memo = resource_memo;
+            }
+            else if ((empty_slot >= 0) && (resource_memo == NULL)) {
                 int obs_slot = _find_observer(&observer, remote);
                 /* cache new observer */
                 if (observer == NULL) {
