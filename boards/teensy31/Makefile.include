@@ -3,7 +3,7 @@ CPU = kinetis
 CPU_MODEL = mk20dx256vlh7
 
 # custom flasher to use with the bootloader
-TEENSY_LOADER = $(RIOTBASE)/dist/tools/teensy-loader-cli/teensy_loader
+TEENSY_LOADER = $(RIOTTOOLS)/teensy-loader-cli/teensy_loader
 FLASHER = $(TEENSY_LOADER)
 
 FFLAGS ?= --mcu=mk20dx256 $(HEXFILE)
@@ -18,7 +18,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial-*)))
 
 $(TEENSY_LOADER):
 	@echo "[INFO] teensy_loader binary not found - building it from source now"
-	CC= CFLAGS= make -C $(RIOTBASE)/dist/tools/teensy-loader-cli
+	CC= CFLAGS= make -C $(RIOTTOOLS)/teensy-loader-cli
 	@echo "[INFO] teensy_loader binary successfully build!"
 
 # setup serial terminal

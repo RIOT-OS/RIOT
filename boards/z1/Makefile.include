@@ -9,5 +9,5 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup flash tool
-export FLASHER = $(RIOTBASE)/dist/tools/goodfet/goodfet.bsl
+export FLASHER = $(RIOTTOOLS)/goodfet/goodfet.bsl
 export FFLAGS = --z1 -I -c $(PORT) -r -e -p $(HEXFILE)

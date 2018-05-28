@@ -7,7 +7,7 @@ export PROGRAMMER_SERIAL ?= 06EB
 
 # setup serial terminal
 # the debug UART is always the second tty with the matching serial number:
-PORT_LINUX ?= $(word 2,$(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh '^$(PROGRAMMER_SERIAL)'))
+PORT_LINUX ?= $(word 2,$(shell $(RIOTTOOLS)/usb-serial/find-tty.sh '^$(PROGRAMMER_SERIAL)'))
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
@@ -23,7 +23,7 @@ export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 export PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
-  export FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
+  export FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
   export FFLAGS  = -p "$(PORT)" -e -w -v $(HEXFILE)
 else ifeq ($(PROGRAMMER),jlink)
   export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh

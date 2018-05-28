@@ -12,7 +12,7 @@ ifeq ($(PROGRAMMER),cc2538-bsl)
   else ifeq ($(OS),Darwin)
     PORT_BSL ?= $(PORT_DARWIN)
   endif
-  export FLASHER = $(RIOTBASE)/dist/tools/cc2538-bsl/cc2538-bsl.py
+  export FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
   export FFLAGS  = -p "$(PORT_BSL)" -e -w -v -b 115200 $(HEXFILE)
 else ifeq ($(PROGRAMMER),jlink)
   export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
