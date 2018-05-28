@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_stm32f130c8t6
+ * @ingroup     boards_bluepill
  * @{
  *
  * @file

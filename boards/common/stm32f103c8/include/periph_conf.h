@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_bluepill
+ * @ingroup     boards_common_stm32f103c8
  * @{
  *
  * @file
