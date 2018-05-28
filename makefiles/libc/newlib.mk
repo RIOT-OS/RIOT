@@ -66,6 +66,13 @@ endif
 ifeq (1,$(USE_NEWLIB_NANO))
   # newlib-nano include directory is called either newlib-nano or nano. Use the one we find first.
   NEWLIB_NANO_INCLUDE_DIR ?= $(firstword $(wildcard $(addprefix $(NEWLIB_INCLUDE_DIR)/, newlib-nano nano)))
+
+  # Workaround for systems where the nano header is not installed.
+  # For ArchLinux, see https://bugs.archlinux.org/task/50481
+  ifeq ($(NEWLIB_NANO_INCLUDE_DIR),)
+    NEWLIB_NANO_INCLUDE_DIR = NEWLIB_INCLUDE_DIR
+  endif
+
   # newlib-nano overrides newlib.h and its include dir should therefore go before
   # the regular system include dirs.
   INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
