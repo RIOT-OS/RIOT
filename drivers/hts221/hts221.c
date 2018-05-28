@@ -148,14 +148,8 @@ int hts221_init(hts221_t *dev, const hts221_params_t *params)
     uint8_t reg;
 
     memcpy(&dev->p, params, sizeof(hts221_params_t));
-    /* initialize the I2C bus */
-    i2c_acquire(BUS);
-    if (i2c_init(BUS) < 0) {
-        i2c_release(BUS);
-        DEBUG("%s: i2c_init failed!\n", DEBUG_FUNC);
-        return -HTS221_NOBUS;
-    }
 
+    i2c_acquire(BUS);
     /* try if we can interact with the device by reading its manufacturer ID */
     if (i2c_read_reg(BUS, ADDR, HTS221_REGS_WHO_AM_I, &reg, 0) != 1) {
         i2c_release(BUS);
