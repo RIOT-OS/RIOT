@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 Hamburg University of Applied Sciences
  *               2014-2017 Freie Universität Berlin
- *               2016 OTA keys S.A.
+ *               2016-2017 OTA keys S.A.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -152,23 +152,64 @@ void spi_release(spi_t bus)
     mutex_unlock(&locks[bus]);
 }
 
-void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
-                        const void *out, void *in, size_t len)
+static inline void _wait_for_end(spi_t bus)
+{
+    /* make sure the transfer is completed before continuing, see reference
+     * manual(s) -> section 'Disabling the SPI' */
+    while (!(dev(bus)->SR & SPI_SR_TXE)) {}
+    while (dev(bus)->SR & SPI_SR_BSY) {}
+}
+
+#ifdef MODULE_PERIPH_DMA
+static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
+{
+    uint8_t tmp = 0;
+    dma_acquire(spi_config[bus].tx_dma);
+    dma_acquire(spi_config[bus].rx_dma);
+
+    if (!out) {
+        dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, &tmp,
+                      (void *)&(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, 0);
+    }
+    else {
+        dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, out,
+                      (void *)&(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
+    }
+    if (!in) {
+        dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
+                      (void *)&(dev(bus)->DR), &tmp, len, DMA_PERIPH_TO_MEM, 0);
+    }
+    else {
+        dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
+                      (void *)&(dev(bus)->DR), in, len, DMA_PERIPH_TO_MEM, DMA_INC_DST_ADDR);
+    }
+    dev(bus)->CR2 |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
+
+    dma_start(spi_config[bus].rx_dma);
+    dma_start(spi_config[bus].tx_dma);
+
+    dma_wait(spi_config[bus].rx_dma);
+    dma_wait(spi_config[bus].tx_dma);
+
+    dev(bus)->CR2 &= ~(SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN);
+
+    dma_stop(spi_config[bus].tx_dma);
+    dma_stop(spi_config[bus].rx_dma);
+
+    dma_release(spi_config[bus].tx_dma);
+    dma_release(spi_config[bus].rx_dma);
+
+    _wait_for_end(bus);
+}
+#endif
+
+static void _transfer_no_dma(spi_t bus, const void *out, void *in, size_t len)
 {
     const uint8_t *outbuf = out;
     uint8_t *inbuf = in;
 
-    /* make sure at least one input or one output buffer is given */
-    assert(outbuf || inbuf);
-
     /* we need to recast the data register to uint_8 to force 8-bit access */
     volatile uint8_t *DR = (volatile uint8_t*)&(dev(bus)->DR);
-
-    /* active the given chip select line */
-    dev(bus)->CR1 |= (SPI_CR1_SPE);     /* this pulls the HW CS line low */
-    if ((cs != SPI_HWCS_MASK) && (cs != SPI_CS_UNDEF)) {
-        gpio_clear((gpio_t)cs);
-    }
 
     /* transfer data, use shortpath if only sending data */
     if (!inbuf) {
@@ -200,10 +241,32 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         }
     }
 
-    /* make sure the transfer is completed before continuing, see reference
-     * manual(s) -> section 'Disabling the SPI' */
-    while (!(dev(bus)->SR & SPI_SR_TXE)) {}
-    while (dev(bus)->SR & SPI_SR_BSY) {}
+    _wait_for_end(bus);
+}
+
+void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
+                        const void *out, void *in, size_t len)
+{
+    /* make sure at least one input or one output buffer is given */
+    assert(out || in);
+
+    /* active the given chip select line */
+    dev(bus)->CR1 |= (SPI_CR1_SPE);     /* this pulls the HW CS line low */
+    if ((cs != SPI_HWCS_MASK) && (cs != SPI_CS_UNDEF)) {
+        gpio_clear((gpio_t)cs);
+    }
+
+#ifdef MODULE_PERIPH_DMA
+    if (spi_config[bus].tx_dma != DMA_STREAM_UNDEF
+            && spi_config[bus].rx_dma != DMA_STREAM_UNDEF) {
+        _transfer_dma(bus, out, in, len);
+    }
+    else {
+#endif
+    _transfer_no_dma(bus, out, in, len);
+#ifdef MODULE_PERIPH_DMA
+    }
+#endif
 
     /* release the chip select if not specified differently */
     if ((!cont) && (cs != SPI_CS_UNDEF)) {
