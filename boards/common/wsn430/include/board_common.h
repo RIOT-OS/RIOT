@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef BOARD_COMMON_H
+#define BOARD_COMMON_H
 
 #include "cpu.h"
 
@@ -73,5 +73,5 @@ extern "C" {
 }
 #endif
 
-#endif /* BOARD_H */
+#endif /* BOARD_COMMON_H */
 /** @} */
