@@ -75,10 +75,10 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
     panic_arch();
 #ifndef DEVELHELP
     /* DEVELHELP not set => reboot system */
-    pm_reboot();
+    reboot();                              /* change */
 #else
     /* DEVELHELP set => power off system */
-    pm_off();
+    //pm_off();  ---------> /* change */
 #endif
 
     /* tell the compiler that we won't return from this function

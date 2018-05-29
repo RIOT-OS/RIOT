@@ -1,0 +1,22 @@
+export CPU_ARCH = cortex-m4
+
+export CFLAGS += -DPART_CC3200
+export CFLAGS += -DSL_PLATFORM_MULTI_THREADED
+
+USEMODULE += cc3200_driverlib cc3200_simplelink
+
+# When driverlib rom will be supported by TI
+#export CFLAGS += -DTARGET_IS_CC3200
+#USEMODULE +=  cc3200_simplelink
+
+
+
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/simplelink/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/simplelink
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/oslib
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/inc
+
+include $(RIOTCPU)/Makefile.include.cortexm_common
+
+INCLUDES += -I$(RIOTCPU)/$(CPU)/sdk/driverlib
