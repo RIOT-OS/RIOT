@@ -131,6 +131,24 @@ extern "C"
 /** @} */
 
 /**
+ * @name    I2C hardware information
+ * @{
+ */
+#ifdef SIM_SCGC4_I2C0_SHIFT
+/** Enable I2C0 clock gate */
+#define I2C0_CLKEN()    (bit_set32(&SIM->SCGC4, SIM_SCGC4_I2C0_SHIFT))
+#endif
+#ifdef SIM_SCGC4_I2C1_SHIFT
+/** Enable I2C1 clock gate */
+#define I2C1_CLKEN()    (bit_set32(&SIM->SCGC4, SIM_SCGC4_I2C1_SHIFT))
+#endif
+#ifdef SIM_SCGC1_I2C2_SHIFT
+/** Enable I2C2 clock gate */
+#define I2C2_CLKEN()    (bit_set32(&SIM->SCGC1, SIM_SCGC1_I2C2_SHIFT))
+#endif
+/** @} */
+
+/**
  * @name Hardware random number generator module configuration
  * @{
  */
