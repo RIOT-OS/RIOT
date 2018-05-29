@@ -28,7 +28,6 @@ EXPECTED_PS = (
 CMDS = {
     'start_test': ('[TEST_START]'),
     'end_test': ('[TEST_END]'),
-    '\n': ('>'),
     '123456789012345678901234567890123456789012345678901234567890':
         ('shell: command not found: '
          '123456789012345678901234567890123456789012345678901234567890'),
@@ -41,6 +40,7 @@ CMDS = {
 
 
 def check_cmd(child, cmd, expected):
+    child.expect('>')
     child.sendline(cmd)
     for line in expected:
         child.expect_exact(line)
