@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include "assert.h"
+#include "log.h"
 #include "utlist.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/nettype.h"
@@ -38,13 +39,20 @@ void gnrc_netreg_init(void)
 
 int gnrc_netreg_register(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
 {
+#ifdef DEVELHELP
 #if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
-    /* only threads with a message queue are allowed to register at gnrc */
-    assert((entry->type != GNRC_NETREG_TYPE_DEFAULT) ||
-           sched_threads[entry->target.pid]->msg_array);
+    bool has_msg_q = (entry->type != GNRC_NETREG_TYPE_DEFAULT) ||
+                     sched_threads[entry->target.pid]->msg_array;
 #else
+    bool has_msg_q = sched_threads[entry->target.pid]->msg_array;
+#endif
+
     /* only threads with a message queue are allowed to register at gnrc */
-    assert(sched_threads[entry->target.pid]->msg_array);
+    if (!has_msg_q) {
+        LOG_ERROR("\n!!!! gnrc_netreg: initialize message queue of thread %u "
+                  "using msg_init_queue() !!!!\n\n", entry->target.pid);
+    }
+    assert(has_msg_q);
 #endif
 
     if (_INVALID_TYPE(type)) {
