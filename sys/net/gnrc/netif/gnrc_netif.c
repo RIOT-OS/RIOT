@@ -555,9 +555,6 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
         gnrc_netif_release(netif);
         return -ENOMEM;
     }
-    netif->ipv6.addrs_flags[idx] = flags;
-    memcpy(&netif->ipv6.addrs[idx], addr, sizeof(netif->ipv6.addrs[idx]));
-#ifdef MODULE_GNRC_IPV6_NIB
 #if GNRC_IPV6_NIB_CONF_ARSM
     ipv6_addr_t sol_nodes;
     int res;
@@ -570,8 +567,12 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
         DEBUG("nib: Can't join solicited-nodes of %s on interface %u\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               netif->pid);
+        return res;
     }
 #endif /* GNRC_IPV6_NIB_CONF_ARSM */
+    netif->ipv6.addrs_flags[idx] = flags;
+    memcpy(&netif->ipv6.addrs[idx], addr, sizeof(netif->ipv6.addrs[idx]));
+#ifdef MODULE_GNRC_IPV6_NIB
     if (_get_state(netif, idx) == GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID) {
         void *state = NULL;
         gnrc_ipv6_nib_pl_t ple;

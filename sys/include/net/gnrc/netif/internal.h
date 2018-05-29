@@ -87,7 +87,8 @@ void gnrc_netif_release(gnrc_netif_t *netif);
  * @note    Only available with @ref net_gnrc_ipv6 "gnrc_ipv6".
  *
  * @return  >= 0, on success
- * @return  -ENOMEM, when no space for new addresses is left on the interface
+ * @return  -ENOMEM, when no space for new addresses (or its solicited nodes
+ *          multicast address) is left on the interface
  */
 int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
                                       const ipv6_addr_t *addr,
