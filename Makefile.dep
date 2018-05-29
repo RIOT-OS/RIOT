@@ -910,6 +910,10 @@ FEATURES_OPTIONAL += periph_pm
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
+# include staging tree (if requested)
+ifeq (1,$(ENABLE_STAGING))
+  include $(RIOTBASE)/staging/Makefile.dep
+endif
 
 # all periph features correspond to a periph submodule
 # FEATURES_USED is defined in Makefile.features

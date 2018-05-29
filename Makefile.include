@@ -374,6 +374,12 @@ include $(RIOTBASE)/drivers/Makefile.include
 # include external modules configuration
 -include $(EXTERNAL_MODULE_DIRS:%=%/Makefile.include)
 
+# include staging tree (if requested)
+ifeq (1,$(ENABLE_STAGING))
+  include $(RIOTBASE)/staging/Makefile.include
+  DIRS += $(STAGING_DIRS)
+endif
+
 # Deduplicate includes without sorting them
 # see https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting
 define uniq
