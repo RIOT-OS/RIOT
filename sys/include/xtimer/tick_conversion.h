@@ -49,8 +49,8 @@ extern "C" {
 #endif
 #endif
 
-inline void debug_print_ticks(uint32_t clock_hz, char *sign, uint64_t from,
-                              char *base_from, uint64_t to, char *base_to)
+__attribute__((always_inline)) inline void debug_print_ticks(uint32_t clock_hz,
+        char *sign, uint64_t from, char *base_from, uint64_t to, char *base_to)
 {
     if (ENABLE_DEBUG_PRINT_TICK_CONVERSION) {
         print_str("64bit ");
