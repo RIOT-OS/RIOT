@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Andrew Moon (dedicated to the public domain)
+ * Copyright (C) 2016 Andrew Moon (dedicated to the public domain)
  * Copyright (C) 2018 Freie Universität Berlin
  * Copyright (C) 2018 Inria
  *
@@ -90,5 +90,5 @@ void poly1305_auth(uint8_t *mac, const uint8_t *data, size_t len,
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif /* CRYPTO_POLY1305_H */
 /** @} */
