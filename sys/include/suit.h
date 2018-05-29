@@ -118,13 +118,13 @@ typedef enum {
  * @brief SUIT manifest struct
  */
 typedef struct {
-    const uint8_t *buf;         /**< buffer containing the manifest */
-    size_t len;                 /**< lenght of the manifest */
     uint32_t version;           /**< Manifest Version field */
     uint32_t timestamp;         /**< Manifest timestamp */
     uint32_t size;              /**< Manifest payload size */
     const uint8_t *conditions;  /**< ptr to the conditionals in cbor form */
     size_t condition_len;       /**< length of the conditionals */
+    const uint8_t *urls;        /**< ptr to the urls in cbor form */
+    size_t url_len;             /**< length of the urls */
     const uint8_t *digests;     /**< ptr to the digests */
     size_t digest_len;          /**< length of the digest */
     uint8_t *identifier;        /**< Storage identifier */
@@ -154,7 +154,7 @@ const uuid_t* suit_get_uuid_vendor(void);
 const uuid_t* suit_get_uuid_class(void);
 const uuid_t* suit_get_uuid_device(void);
 
-ssize_t suit_get_url(const suit_manifest_t *manifest, uint8_t **buf);
+ssize_t suit_get_url(const suit_manifest_t *manifest, char *buf, size_t len);
 
 uint32_t suit_get_version(const suit_manifest_t *manifest);
 

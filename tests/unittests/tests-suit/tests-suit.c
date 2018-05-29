@@ -34,9 +34,7 @@ static unsigned char test_out_cbor[] = {
   0x53, 0x5c, 0xf5, 0x32, 0xde, 0xfe, 0x9c, 0xe3, 0x36, 0x8a, 0x6e, 0xf6
 };
 
-
-
-
+static char uri_buf[128];
 
 void test_suit_01(void)
 {
@@ -55,6 +53,8 @@ void test_suit_01(void)
                 SUIT_DIGEST_TYPE_CIPHERTEXT, digest, &dlen), 0);
     /* Always fails */
     TEST_ASSERT_EQUAL_INT(suit_verify_conditions(&manifest), -3);
+    TEST_ASSERT_EQUAL_INT(suit_get_url(&manifest, uri_buf, sizeof(uri_buf)), 24);
+    TEST_ASSERT_EQUAL_STRING("coap://[ff02::1]/fw/test", (char*)uri_buf);
 }
 
 Test *tests_suit_tests(void)

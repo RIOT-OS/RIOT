@@ -236,10 +236,47 @@ int suit_verify_conditions(suit_manifest_t *manifest)
     return SUIT_OK;
 }
 
+ssize_t suit_get_url(const suit_manifest_t *manifest, char *buf, size_t len)
+{
+    CborParser parser;
+    CborValue it, arr, uri;
+    cbor_parser_init(manifest->urls, manifest->url_len, CborValidateStrictMode, &parser, &it);
+    if (!cbor_value_is_array(&it)) {
+        return -1;
+    }
+    size_t arr_len;
+    cbor_value_get_array_length(&it, &arr_len);
+    if (arr_len == 0)
+    {
+        return -1;
+    }
+    cbor_value_enter_container(&it, &arr);
+    if (!cbor_value_is_array(&arr)) {
+        return -1;
+    }
+    cbor_value_get_array_length(&arr, &arr_len);
+    if (arr_len != 2)
+    {
+        return -1;
+    }
+    cbor_value_enter_container(&arr, &uri);
+    cbor_value_advance(&uri);
+    if (!cbor_value_is_text_string(&uri)) {
+        return -1;
+    }
+    size_t uri_len;
+    cbor_value_get_string_length(&uri, &uri_len);
+    if (uri_len > len) {
+        return -1;
+    }
+    else {
+        cbor_value_copy_text_string(&uri, buf, &len, NULL);
+        return uri_len;
+    }
+}
+
 int suit_parse(suit_manifest_t *manifest, const uint8_t *buf, size_t len)
 {
-    manifest->buf = buf;
-    manifest->len = len;
     CborParser parser;
     CborValue it, arr, pi;
     manifest->size = 0;
@@ -301,7 +338,9 @@ int suit_parse(suit_manifest_t *manifest, const uint8_t *buf, size_t len)
     parse_manifest_size(manifest, &pi);
     cbor_value_advance(&pi);
     cbor_value_advance(&pi);
+    manifest->urls = pi.ptr;
     cbor_value_advance(&pi);
+    manifest->url_len = pi.ptr - manifest->urls;
     parse_manifest_digestalgo(manifest, &pi);
     cbor_value_advance(&pi);
     manifest->digests = pi.ptr;
