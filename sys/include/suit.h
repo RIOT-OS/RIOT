@@ -38,17 +38,15 @@ extern "C" {
 #endif
 
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "cbor.h"
 
 #define SUIT_MANIFEST_MIN_LENGTH            9
 #define SUIT_MANIFEST_PAYLOADINFO_LENGTH    7
-#define SUIT_CONDITION_PARAM_SIZE          16
-#define SUIT_CONDITIONS_MAX                 3
-#define SUIT_URIS_MAX                       1
-#define SUIT_URI_MAX_SIZE                 127
 
 #define SUIT_MANIFEST_IDX_MANIFESTVERSION   0
 #define SUIT_MANIFEST_IDX_TEXT              1
@@ -69,14 +67,28 @@ extern "C" {
 #define SUIT_PAYLOADINFO_IDX_DIGESTS        5
 #define SUIT_PAYLOADINFO_IDX_PAYLOAD        6
 
+/**
+ * @name suit parser error codes
+ */
 typedef enum {
     SUIT_OK                   = 0,
     SUIT_ERR_INVALID_MANIFEST = -1,
     SUIT_ERR_NOT_SUPPORTED    = -2,
+    SUIT_ERR_COND             = -3,
 } suit_error_t;
 
 /**
- * SUIT payload digest algorithms
+ * @name SUIT conditionals
+ */
+enum {
+    SUIT_COND_VENDOR_ID     = 1,
+    SUIT_COND_CLASS_ID      = 2,
+    SUIT_COND_DEV_ID        = 3,
+    SUIT_COND_BEST_BEFORE   = 4,
+};
+
+/**
+ * @name SUIT payload digest algorithms
  *
  * Unofficial list from
  * [suit-manifest-generator](https://github.com/ARMmbed/suit-manifest-generator)
@@ -89,7 +101,7 @@ typedef enum {
 } suit_digest_t;
 
 /**
- * SUIT payload digest types
+ * @name SUIT payload digest types
  *
  * Unofficial list from
  * [suit-manifest-generator](https://github.com/ARMmbed/suit-manifest-generator)
@@ -102,24 +114,30 @@ typedef enum {
 } suit_digest_type_t;
 
 /**
- * SUIT manifest struct
- *
+ * @brief SUIT manifest struct
  */
 typedef struct {
-    const uint8_t *buf;
-    size_t len;
-    uint32_t version;
-    uint32_t timestamp;
-    uint32_t size;
-    suit_digest_t algo;
-    uint8_t *identifier;
-    const uint8_t *digests;
-    size_t digest_len;
+    const uint8_t *buf;         /**< buffer containing the manifest */
+    size_t len;                 /**< lenght of the manifest */
+    uint32_t version;           /**< Manifest Version field */
+    uint32_t timestamp;         /**< Manifest timestamp */
+    uint32_t size;              /**< Manifest payload size */
+    const uint8_t *conditions;  /**< ptr to the conditionals in cbor form */
+    size_t condition_len;       /**< length of the conditionals */
+    const uint8_t *digests;     /**< ptr to the digests */
+    size_t digest_len;          /**< length of the digest */
+    uint8_t *identifier;        /**< Storage identifier */
+    suit_digest_t algo;         /**< Digest algorithm used */
 } suit_manifest_t;
 
 /**
- * Parse a buffer containing a cbor encoded manifest into a suit_manifest_t
- * struct
+ * @brief Initialize the UUID's for conditionals
+ */
+void suit_uuid_init(void);
+
+/**
+ * @brief Parse a buffer containing a cbor encoded manifest into a
+ * suit_manifest_t struct
  *
  * @param   manifest    manifest to fill
  * @param   buf         Buffer to read from
@@ -136,6 +154,8 @@ ssize_t suit_get_url(const suit_manifest_t *manifest, uint8_t **buf);
 uint32_t suit_get_version(const suit_manifest_t *manifest);
 
 uint32_t suit_get_timestamp(const suit_manifest_t *manifest);
+
+int suit_verify_conditions(suit_manifest_t *manifest);
 
 static inline uint32_t suit_payload_get_size(const suit_manifest_t *manifest)
 {

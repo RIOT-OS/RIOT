@@ -825,6 +825,7 @@ endif
 
 ifneq (,$(filter suit,$(USEMODULE)))
   USEPKG += tinycbor
+  USEMODULE += uuid
 endif
 
 # always select gpio (until explicit dependencies are sorted out)
