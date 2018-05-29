@@ -99,7 +99,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
     cc110x_pkt.length = (uint8_t) payload_len + CC110X_HEADER_LENGTH;
 
-    DEBUG("gnrc_cc110x: sending packet from %u to %u with payload "
+    DEBUG("gnrc_cc110x: sending packet from %02x to %02x with payload "
             "length %u\n",
             (unsigned)cc110x_pkt.phy_src,
             (unsigned)cc110x_pkt.address,
