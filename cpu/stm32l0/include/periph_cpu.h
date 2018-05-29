@@ -76,6 +76,20 @@ typedef struct {
  */
 #define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
 
+/**
+ * @name    EEPROM configuration
+ * @{
+ */
+#define EEPROM_START_ADDR          (0x08080000)
+#if defined(CPU_MODEL_STM32L073RZ) || defined(CPU_MODEL_STM32L072CZ)
+#define EEPROM_SIZE                (6144U)  /* 6kB */
+#elif defined(CPU_MODEL_STM32L053R8)
+#define EEPROM_SIZE                (2048U)  /* 2kB */
+#elif defined(CPU_MODEL_STM32L031K6)
+#define EEPROM_SIZE                (1024U)  /* 1kB */
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
