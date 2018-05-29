@@ -44,6 +44,7 @@ extern "C" {
 #include <unistd.h>
 
 #include "cbor.h"
+#include "uuid.h"
 
 #define SUIT_MANIFEST_MIN_LENGTH            9
 #define SUIT_MANIFEST_PAYLOADINFO_LENGTH    7
@@ -148,6 +149,10 @@ void suit_uuid_init(void);
  */
 int suit_parse(suit_manifest_t *manifest, const uint8_t *buf,
                size_t len);
+
+const uuid_t* suit_get_uuid_vendor(void);
+const uuid_t* suit_get_uuid_class(void);
+const uuid_t* suit_get_uuid_device(void);
 
 ssize_t suit_get_url(const suit_manifest_t *manifest, uint8_t **buf);
 

@@ -43,6 +43,21 @@ static void _set_uuid(uuid_t *uuid, const uuid_t *ns, const uint8_t *name, size_
     }
 }
 
+const uuid_t* suit_get_uuid_vendor(void)
+{
+    return (const uuid_t*)vendor_id;
+}
+
+const uuid_t* suit_get_uuid_class(void)
+{
+    return (const uuid_t*)class_id;
+}
+
+const uuid_t* suit_get_uuid_device(void)
+{
+    return (const uuid_t*)device_id;
+}
+
 void suit_uuid_init(void)
 {
     uint8_t cpuid[CPUID_LEN];
