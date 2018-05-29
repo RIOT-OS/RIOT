@@ -42,13 +42,6 @@ extern "C" {
 #define THREAD_STACKSIZE_IDLE      (128)
 /** @} */
 
-/**
- * @name    EEPROM configuration
- * @{
- */
-#define EEPROM_SIZE                (1024U)  /* 1kB */
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif

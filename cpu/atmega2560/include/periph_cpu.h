@@ -66,6 +66,13 @@ enum {
 #define I2C_PIN_MASK            (1 << PORTD0) | (1 << PORTD1)
 /** @} */
 
+/**
+ * @name    EEPROM configuration
+ * @{
+ */
+#define EEPROM_SIZE                (4096U)  /* 4kB */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
