@@ -77,7 +77,6 @@ typedef struct {
  */
 enum {
     BMP180_OK = 0,                              /**< everything was fine */
-    BMP180_ERR_NOI2C,                           /**< error initializing the I2C bus */
     BMP180_ERR_NODEV,                           /**< did not detect BMP180 */
     BMP180_ERR_NOCAL,                           /**< error when reading calibration values */
 };
@@ -89,7 +88,6 @@ enum {
  * @param[in]  params       Initialization parameters
  *
  * @return                  BMP180_OK on success
- * @return                  -BMP180_ERR_NOI2C if given I2C is not enabled in board config
  * @return                  -BMP180_ERR_NODEV if not a BMP180 at given address
  * @return                  -BMP180_ERR_NOCAL if an error occured when reading calibration values
  */
