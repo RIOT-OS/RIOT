@@ -169,11 +169,11 @@ typedef unsigned int i2c_t;
  */
 #ifndef HAVE_I2C_SPEED_T
 typedef enum {
-    I2C_SPEED_LOW = 0,      /**< low speed mode:    ~10kbit/s */
-    I2C_SPEED_NORMAL,       /**< normal mode:       ~100kbit/s */
-    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/s */
-    I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
-    I2C_SPEED_HIGH,         /**< high speed mode:   ~3.4Mbit/s */
+    I2C_SPEED_LOW = 0,      /**< low speed mode:     ~10 kbit/s */
+    I2C_SPEED_NORMAL,       /**< normal mode:       ~100 kbit/s */
+    I2C_SPEED_FAST,         /**< fast mode:         ~400 kbit/s */
+    I2C_SPEED_FAST_PLUS,    /**< fast plus mode:   ~1000 kbit/s */
+    I2C_SPEED_HIGH,         /**< high speed mode:  ~3400 kbit/s */
 } i2c_speed_t;
 #endif
 /** @} */
@@ -187,7 +187,7 @@ typedef enum {
     I2C_ADDR10  = 0x01,     /**< use 10-bit device addressing */
     I2C_REG16   = 0x02,     /**< use 16-bit register addressing */
     I2C_NOSTOP  = 0x04,     /**< do not issue a STOP condition after transfer */
-    I2C_NOSTART = 0x08      /**< skip START sequence, ignores address field */
+    I2C_NOSTART = 0x08,     /**< skip START sequence, ignores address field */
 } i2c_flags_t;
 #endif
 /** @} */
