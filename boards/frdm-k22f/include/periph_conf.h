@@ -237,34 +237,19 @@ static const spi_conf_t spi_config[] = {
 * @name I2C configuration
 * @{
 */
-#define I2C_NUMOF                    (1U)
-#define I2C_0_EN                     1
-/* Low (10 kHz): MUL = 2, SCL divider = 1536, total: 3072 */
-#define KINETIS_I2C_F_ICR_LOW        (0x36)
-#define KINETIS_I2C_F_MULT_LOW       (1)
-/* Normal (100 kHz): MUL = 2, SCL divider = 160, total: 320 */
-#define KINETIS_I2C_F_ICR_NORMAL     (0x1D)
-#define KINETIS_I2C_F_MULT_NORMAL    (1)
-/* Fast (400 kHz): MUL = 1, SCL divider = 80, total: 80 */
-#define KINETIS_I2C_F_ICR_FAST       (0x14)
-#define KINETIS_I2C_F_MULT_FAST      (0)
-/* Fast plus (1000 kHz): MUL = 1, SCL divider = 30, total: 30 */
-#define KINETIS_I2C_F_ICR_FAST_PLUS  (0x05)
-#define KINETIS_I2C_F_MULT_FAST_PLUS (0)
-
-/* I2C 0 device configuration */
-#define I2C_0_DEV                    I2C0
-#define I2C_0_CLKEN()                (SIM->SCGC4 |= (SIM_SCGC4_I2C0_MASK))
-#define I2C_0_CLKDIS()               (SIM->SCGC4 &= ~(SIM_SCGC4_I2C0_MASK))
-#define I2C_0_IRQ                    I2C0_IRQn
-#define I2C_0_IRQ_HANDLER            isr_i2c0
-/* I2C 0 pin configuration */
-#define I2C_0_PORT                   PORTB
-#define I2C_0_PORT_CLKEN()           (SIM->SCGC5 |= (SIM_SCGC5_PORTB_MASK))
-#define I2C_0_PIN_AF                 2
-#define I2C_0_SDA_PIN                3
-#define I2C_0_SCL_PIN                2
-#define I2C_0_PORT_CFG               (PORT_PCR_MUX(I2C_0_PIN_AF) | PORT_PCR_ODE_MASK)
+static const i2c_conf_t i2c_config[] = {
+    {
+        .i2c = I2C0,
+        .scl_pin = GPIO_PIN(PORT_B, 2),
+        .sda_pin = GPIO_PIN(PORT_B, 3),
+        .freq = CLOCK_BUSCLOCK,
+        .speed = I2C_SPEED_FAST,
+        .irqn = I2C0_IRQn,
+        .scl_pcr = (PORT_PCR_MUX(2) | PORT_PCR_ODE_MASK),
+        .sda_pcr = (PORT_PCR_MUX(2) | PORT_PCR_ODE_MASK),
+    },
+};
+#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 #ifdef __cplusplus
