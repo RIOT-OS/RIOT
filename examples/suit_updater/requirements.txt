@@ -1,0 +1,3 @@
+cbor
+ed25519
+pyasn1

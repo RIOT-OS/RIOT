@@ -8,4 +8,8 @@ ifneq (,$(filter firmware_simple,$(USEMODULE)))
   SRC += firmware_simple.c
 endif
 
+ifneq (,$(filter firmware_manifest,$(USEMODULE)))
+  SRC += firmware_manifest.c
+endif
+
 include $(RIOTBASE)/Makefile.base
