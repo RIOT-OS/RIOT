@@ -20,7 +20,6 @@
 
 #include <string.h>
 
-#include "cpu.h"
 #include "periph_cpu.h"
 #include "assert.h"
 
