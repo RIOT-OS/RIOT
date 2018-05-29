@@ -1,0 +1,46 @@
+# Define the cpu used by the CC3200 board:
+export CPU        = cc3200
+# export CPU_MODEL ?= cc3200
+
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+	USEMODULE += cc110x gnrc_netdev2 gnrc_cc110x
+endif
+
+# setup serial terminal
+export PORT      ?= /dev/ttyUSB1 # use PORT=29 if WIN lanchpad port is COM29
+include $(RIOTBOARD)/Makefile.include.serial
+
+# debugger config
+export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+
+# board unit test using gdb
+export BOARD_TEST_SCRIPT = $(RIOTBOARD)/$(BOARD)/dist/board_test.sh
+export TEST_SUITE ?= suite
+
+export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+
+# Define the flash-tool and default port:
+export PROGRAMMER ?= cc3200prog
+
+ifeq ($(PROGRAMMER),openocd)
+  export FLASHER = TBD
+  export FFLAGS  = -p "$(PORT)" -e -w -v $(HEXFILE)
+else ifeq ($(PROGRAMMER),cc3200prog)
+
+  export ENERGIA_ROOT?=/opt/energia-0101E0017/
+
+  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+  export FFLAGS  = $(ENERGIA_ROOT) $(PORT) $(HEXFILE)
+endif
+
+export OFLAGS    = -O binary --gap-fill 0xff
+export HEXFILE = $(ELFFILE:.elf=.bin)
+export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist $(ELFFILE)
+export RESET_FLAGS = $(BINDIR)
+
+export BTEST_FLAGS = $(CURDIR)/tests $(ELFFILE) $(TEST_SUITE)
+
+export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+
+# include cortex defaults
+#include $(RIOTBOARD)/Makefile.include.cortexm_common
