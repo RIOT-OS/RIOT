@@ -98,6 +98,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     port->OTYPER |=  (((mode >> 4) & 0x1) << pin_num);
     /* set pin speed to maximum */
     port->OSPEEDR |= (3 << (2 * pin_num));
+    /* Clear selected function */
+    port->AFR[(pin_num > 7) ? 1 : 0] &= ~(0xf << ((pin_num & 0x07) * 4));
 
     return 0;
 }
