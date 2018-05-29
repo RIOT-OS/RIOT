@@ -12,6 +12,7 @@ import sys
 
 
 def testfunc(child):
+    child.expect('>')
     child.sendline('ifconfig')
     child.expect(r'       Statistics for Layer 2')
     child.expect(r'        RX packets \d+  bytes \d+')

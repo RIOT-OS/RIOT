@@ -50,6 +50,7 @@ def _check_help(child):
 
 
 def _check_ps(child):
+    child.expect('>')
     child.sendline('ps')
     for line in PS_EXPECTED:
         child.expect(line)
