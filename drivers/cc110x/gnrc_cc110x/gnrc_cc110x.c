@@ -67,6 +67,14 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
             cc110x_pkt.flags = 1;
             break;
 #endif
+#ifdef MODULE_CCN_LITE
+        case GNRC_NETTYPE_CCN:
+            cc110x_pkt.flags = 1;
+            break;
+        case GNRC_NETTYPE_CCN_CHUNK:
+            cc110x_pkt.flags = 2;
+            break;
+#endif
         default:
             cc110x_pkt.flags = 0;
     }
@@ -128,6 +136,16 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         case 1:
             addr_len = 8;
             nettype = GNRC_NETTYPE_SIXLOWPAN;
+            break;
+#endif
+#ifdef MODULE_CCN_LITE
+        case 1:
+            addr_len = 1;
+            nettype = GNRC_NETTYPE_CCN;
+            break;
+        case 2:
+            addr_len = 1;
+            nettype = GNRC_NETTYPE_CCN_CHUNK;
             break;
 #endif
         default:
