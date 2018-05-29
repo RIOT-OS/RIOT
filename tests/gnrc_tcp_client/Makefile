@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 BOARD ?= native
 PORT ?= tap1
 
-TCP_TARGET_ADDR ?= fe80::affe
+TCP_TARGET_ADDR ?= fe80::affe%5
 TCP_TARGET_PORT ?= 80
 TCP_TEST_CYCLES ?= 3
 
@@ -21,6 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
 CFLAGS += -DTARGET_ADDR=\"$(TCP_TARGET_ADDR)\"
 CFLAGS += -DTARGET_PORT=$(TCP_TARGET_PORT)
 CFLAGS += -DCYCLES=$(TCP_TEST_CYCLES)
+CFLAGS += -DGNRC_NETIF_IPV6_GROUPS_NUMOF=3
 
 # Modules to include
 USEMODULE += gnrc_netdev_default

@@ -112,8 +112,8 @@ static void _setup_timeout(xtimer_t *timer, const uint32_t duration, const xtime
  *            -ETIMEDOUT if the connection opening timed out.
  *            -ECONNREFUSED if the connection was resetted by the peer.
  */
-static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint16_t target_port,
-                          const uint8_t *local_addr, uint16_t local_port, uint8_t passive)
+static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t target_port,
+                          const char *local_addr, uint16_t local_port, uint8_t passive)
 {
     msg_t msg;
     xtimer_t connection_timeout;
@@ -146,7 +146,10 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
 #ifdef MODULE_GNRC_IPV6
         /* If local address is specified: Copy it into TCB */
         else if (tcb->address_family == AF_INET6) {
-                memcpy(tcb->local_addr, local_addr, sizeof(ipv6_addr_t));
+            if (ipv6_addr_from_str((ipv6_addr_t *) tcb->local_addr,  local_addr) == NULL) {
+                DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Invalid peer addr\n");
+                return -EINVAL;
+            }
         }
 #endif
         /* Set port number to listen on */
@@ -154,10 +157,21 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     }
     /* Setup active connection */
     else {
-        /* Copy target address and port number into TCB */
+        /* Parse target address and port number into TCB */
  #ifdef MODULE_GNRC_IPV6
         if ((target_addr != NULL) && (tcb->address_family == AF_INET6)) {
-            memcpy(tcb->peer_addr, target_addr, sizeof(ipv6_addr_t));
+
+            /* Extract interface (optional) specifier from target address */
+            int ll_iface = ipv6_addr_split_iface(target_addr);
+            if (ipv6_addr_from_str((ipv6_addr_t *) tcb->peer_addr, target_addr) == NULL) {
+                DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Invalid peer addr\n");
+                return -EINVAL;
+            }
+
+            /* In case the given address is link-local: Memorize the interface Id if existing. */
+            if ((ll_iface > 0) && ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
+                tcb->ll_iface = ll_iface;
+            }
         }
  #endif
         /* Assign port numbers, verfication happens in fsm */
@@ -172,10 +186,10 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const uint8_t *target_addr, uint1
     /* Call FSM with event: CALL_OPEN */
     ret = _fsm(tcb, FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
     if (ret == -ENOMEM) {
-        DEBUG("gnrc_tcp.c : gnrc_tcp_connect() : Out of receive buffers.\n");
+        DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Out of receive buffers.\n");
     }
     else if(ret == -EADDRINUSE) {
-        DEBUG("gnrc_tcp.c : gnrc_tcp_connect() : local_port is already in use.\n");
+        DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : local_port is already in use.\n");
     }
 
     /* Wait until a connection was established or closed */
@@ -245,9 +259,9 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
     mutex_init(&(tcb->function_lock));
 }
 
-int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
-                         const uint8_t *target_addr, const uint16_t target_port,
-                         const uint16_t local_port)
+int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
+                         char *target_addr, uint16_t target_port,
+                         uint16_t local_port)
 {
     assert(tcb != NULL);
     assert(target_addr != NULL);
@@ -270,8 +284,8 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
     return _gnrc_tcp_open(tcb, target_addr, target_port, NULL, local_port, 0);
 }
 
-int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb,  const uint8_t address_family,
-                          const uint8_t *local_addr, const uint16_t local_port)
+int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
+                          const char *local_addr, uint16_t local_port)
 {
     assert(tcb != NULL);
     assert(local_port != PORT_UNSPEC);

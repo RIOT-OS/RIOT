@@ -46,19 +46,35 @@ static msg_t _eventloop_msg_queue[TCP_EVENTLOOP_MSG_QUEUE_SIZE];
  */
 static int _send(gnrc_pktsnip_t *pkt)
 {
+    assert(pkt != NULL);
+
     /* NOTE: In sending direction: pkt = nw, nw->next = tcp, tcp->next = payload */
-    gnrc_pktsnip_t *tcp;
+    gnrc_pktsnip_t *tcp = NULL;
+    gnrc_pktsnip_t *nw = NULL;
 
     /* Search for TCP header */
     LL_SEARCH_SCALAR(pkt, tcp, type, GNRC_NETTYPE_TCP);
+    /* cppcheck-suppress knownConditionTrueFalse */
     if (tcp == NULL) {
         DEBUG("gnrc_tcp_eventloop : _send() : tcp header missing.\n");
         gnrc_pktbuf_release(pkt);
         return -EBADMSG;
     }
 
+    /* Search for network layer */
+#ifdef MODULE_GNRC_IPV6
+    /* Get IPv6 header, discard packet if doesn't contain an ipv6 header */
+    LL_SEARCH_SCALAR(pkt, nw, type, GNRC_NETTYPE_IPV6);
+    if (nw == NULL) {
+        DEBUG("gnrc_tcp_eventloop.c : _send() : pkt contains no ipv6 layer header\n");
+        gnrc_pktbuf_release(pkt);
+        return -EBADMSG;
+    }
+#endif
+
     /* Dispatch packet to network layer */
-    if (!gnrc_netapi_dispatch_send(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+    assert(nw != NULL);
+    if (!gnrc_netapi_dispatch_send(nw->type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
         DEBUG("gnrc_tcp_eventloop : _send() : network layer not found\n");
         gnrc_pktbuf_release(pkt);
     }
