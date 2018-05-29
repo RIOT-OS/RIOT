@@ -49,11 +49,12 @@ typedef struct {
 typedef struct {
     uint8_t k;                      /**< redundancy constant */
     uint8_t Imax;                   /**< maximum interval size,
-                                         described as of Imin doublings */
+                                         described as of Imin doublings in ms */
     uint16_t c;                     /**< counter */
-    uint32_t Imin;                  /**< minimum interval size */
-    uint32_t I;                     /**< current interval size */
-    uint32_t t;                     /**< time within the current interval */
+    uint32_t Imin;                  /**< minimum interval size in ms */
+    uint32_t I;                     /**< current interval size in ms */
+    uint32_t t;                     /**< time within the current interval
+                                         in ms */
     kernel_pid_t pid;               /**< pid of trickles target thread */
     trickle_callback_t callback;    /**< callback function and parameter that
                                          trickle calls after each interval */
@@ -81,8 +82,8 @@ void trickle_reset_timer(trickle_t *trickle);
  * @param[in] pid                   target thread
  * @param[in] trickle               trickle timer
  * @param[in] msg_type              msg_t.type for messages
- * @param[in] Imin                  minimum interval
- * @param[in] Imax                  maximum interval
+ * @param[in] Imin                  minimum interval in ms
+ * @param[in] Imax                  maximum interval in ms
  * @param[in] k                     redundancy constant
  */
 void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t msg_type,
