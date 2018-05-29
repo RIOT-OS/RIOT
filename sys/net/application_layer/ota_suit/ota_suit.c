@@ -6,6 +6,8 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#include "fmt.h"
 #include "net/ota_suit.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
@@ -57,6 +59,30 @@ ssize_t _slot_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
             COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
+ssize_t _uuid_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context)
+{
+    uint32_t type = (uint32_t)context;
+    ssize_t reply_len = coap_build_reply(pkt, COAP_CODE_205, buf, len, 0);
+    uint8_t *pkt_pos = (uint8_t*)pkt->hdr + reply_len;
+    *pkt_pos++ = 0xFF;
+    const uuid_t *uuid = NULL;
+    switch(type) {
+        case 'v':
+            uuid = suit_get_uuid_vendor();
+            break;
+        case 'c':
+            uuid = suit_get_uuid_class();
+            break;
+        case 'd':
+            uuid = suit_get_uuid_device();
+            break;
+        default:
+            return -1;
+    }
+    pkt_pos += fmt_bytes_hex((char *)pkt_pos, (uint8_t*)uuid, sizeof(uuid_t));
+    return pkt_pos - (uint8_t*)pkt->hdr;
+}
+
 static void *_ota_suit_thread(void* arg)
 {
     (void)arg;
@@ -69,6 +95,8 @@ static void *_ota_suit_thread(void* arg)
     return NULL;
 }
 
+
+
 void ota_suit_run(void)
 {
     thread_create(_stack, STACKSIZE, PRIO, THREAD_CREATE_STACKTEST,
@@ -78,9 +106,12 @@ void ota_suit_run(void)
 /* must be sorted by path (alphabetically) */
 const coap_resource_t coap_resources[] = {
     COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER,
-    { "/sys/firmware", COAP_POST, _manifest_handler, NULL },
-    { "/sys/firmware/0", COAP_GET, _slot_handler, (void *)0 },
-    { "/sys/firmware/1", COAP_GET, _slot_handler, (void *)1 },
+    { "/s/fw", COAP_POST, _manifest_handler, NULL },
+    { "/s/fw/0", COAP_GET, _slot_handler, (void *)0 },
+    { "/s/fw/1", COAP_GET, _slot_handler, (void *)1 },
+    { "/s/fw/c", COAP_GET, _uuid_handler, (void *)'c' },
+    { "/s/fw/d", COAP_GET, _uuid_handler, (void *)'d' },
+    { "/s/fw/v", COAP_GET, _uuid_handler, (void *)'v' },
 };
 
 const unsigned coap_resources_numof = sizeof(coap_resources) / sizeof(coap_resources[0]);

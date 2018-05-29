@@ -13,6 +13,8 @@
 #include "thread.h"
 #include "net/nanocoap.h"
 #include "net/nanocoap_sock.h"
+#include "net/sock.h"
+#include "net/sock/util.h"
 #include "cn-cbor/cn-cbor.h"
 #include "fmt.h"
 #include "mutex.h"
@@ -124,26 +126,39 @@ static int _manifest_verify(firmware_manifest_t *state)
             state->mbuf_len, &ct);
     if (res != 0) {
         LOG_WARNING("Could not decode cose struct: %d\n", res);
-        goto out;
+        return res;
     }
     /* Verify cose */
     res = cose_sign_verify(&cose_in, &key, 0, verification_buf,
             sizeof(verification_buf), &ct);
     if (res != 0) {
         LOG_WARNING("Could not verify cose struct: %d\n", res);
-        goto out;
+        return res;
     }
     /* Parse manifest */
     res = suit_parse(&state->manifest, cose_in.payload, cose_in.payload_len);
     if (res < 0) {
-        goto out;
+        return res;
     }
     if (!_check_timestamp(state)) {
         LOG_WARNING("Timestamp failure, ignoring update\n");
-        goto out;
+        return res;
     }
-out:
-    return res;
+    char path[128];
+    char hostport[SOCK_HOSTPORT_MAXLEN];
+    if (suit_get_url(&state->manifest, path, sizeof(path))) {
+        LOG_ERROR("ota: Unable to get url\n");
+        return -1;
+    }
+    if (sock_urlsplit(path, hostport, state->path) < 0) {
+        LOG_ERROR("ota: Unable to parse url\n");
+        return -1;
+    }
+    if (sock_udp_str2ep(&state->remote, hostport) < 0) {
+        LOG_ERROR("ota: Unable to parse url\n");
+        return -1;
+    }
+    return 0;
 }
 
 static int suit_finish_update(firmware_manifest_t* state)
@@ -172,26 +187,13 @@ static ssize_t fetch_block(firmware_manifest_t *state, unsigned num, sock_udp_ep
     uint8_t buf[128];
     coap_pkt_t pkt;
     uint8_t *pktpos = buf;
-    sock_udp_ep_t remote = {
-        .family    = AF_INET6,
-        .netif     = SOCK_ADDR_ANY_NETIF,
-        .port      = COAP_PORT,
-    };
-    ipv6_addr_from_str((ipv6_addr_t *)&remote.addr.ipv6,
-                           "fe80::845d:8bff:fe1c:c24f");
-
-    char path[32];
-    memcpy(path, "/fw/", 4);
-    fmt_u16_dec(path+4, firmware_target_slot());
-    path[5] = '\0';
-
     pkt.hdr = (coap_hdr_t*)buf;
     pktpos += coap_build_hdr(pkt.hdr, COAP_REQ, NULL, 0, COAP_METHOD_GET, num);
-    pktpos += coap_put_option_uri(pktpos, 0, path, COAP_OPT_URI_PATH);
+    pktpos += coap_put_option_uri(pktpos, 0, state->path, COAP_OPT_URI_PATH);
     pktpos += coap_put_option_block2(pktpos, COAP_OPT_URI_PATH, num, 2, 0);
     pkt.payload_len = pktpos - buf;
 
-    int res = nanocoap_request(&pkt, local, &remote, sizeof(buf) );
+    int res = nanocoap_request(&pkt, local, &state->remote, sizeof(buf) );
     if (res > 0)
     {
         coap_block1_t block2;

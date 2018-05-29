@@ -30,6 +30,9 @@ extern "C" {
 #include "memarray.h"
 #include "cn-cbor/cn-cbor.h"
 #include "firmware/flashwrite.h"
+#include "net/sock.h"
+#include "net/sock/udp.h"
+#include "net/sock/util.h"
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -42,8 +45,12 @@ extern "C" {
 #define OTA_MANIFEST_MSG_NEXT       0x03
 #define OTA_MANIFEST_MSG_FINAL      0x04
 
+#define OTA_URL_PATH_LEN            SOCK_URLPATH_MAXLEN
+
 typedef struct {
     uint8_t mbuf[MANIFEST_BUF_SIZE];
+    char path[OTA_URL_PATH_LEN];
+    sock_udp_ep_t remote;
     size_t mbuf_len;
     mutex_t lock;
     kernel_pid_t pid;

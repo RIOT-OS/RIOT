@@ -133,8 +133,8 @@ endif
 ifneq (,$(filter cord_ep,$(USEMODULE)))
     DIRS += net/application_layer/cord/ep
 endif
-ifneq (,$(filter ota_%,$(USEMODULE)))
-  DIRS += net/application_layer/ota
+ifneq (,$(filter ota_suit,$(USEMODULE)))
+  DIRS += net/application_layer/ota_suit
 endif
 
 
