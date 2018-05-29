@@ -151,34 +151,6 @@ static inline void pit_start(uint8_t dev);
 static inline void pit_stop(uint8_t dev);
 static inline void pit_irq_handler(tim_t dev);
 
-static inline void _pit_set_cb_config(uint8_t dev, timer_cb_t cb, void *arg)
-{
-    /* set callback function */
-    pit[dev].isr_ctx.cb = cb;
-    pit[dev].isr_ctx.arg = arg;
-}
-
-/** use channel n-1 as prescaler */
-static inline void _pit_set_prescaler(uint8_t ch, uint32_t freq)
-{
-    /* Disable channel completely */
-    PIT->CHANNEL[ch].TCTRL = 0x0;
-    PIT->CHANNEL[ch].LDVAL = (PIT_BASECLOCK / freq) - 1;
-    /* Start the prescaler counter immediately */
-    PIT->CHANNEL[ch].TCTRL = (PIT_TCTRL_TEN_MASK);
-}
-
-static inline void _pit_set_counter(uint8_t dev)
-{
-    const uint8_t ch = pit_config[dev].count_ch;
-    /* Disable channel completely */
-    PIT->CHANNEL[ch].TCTRL = 0x0;
-    PIT->CHANNEL[ch].LDVAL = pit[dev].ldval;
-    PIT->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
-    /* Restore previous timer state */
-    PIT->CHANNEL[ch].TCTRL = pit[dev].tctrl;
-}
-
 static inline int pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     /* Turn on module clock gate */
@@ -188,32 +160,38 @@ static inline int pit_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
     /* Disable IRQs to avoid race with ISR */
     unsigned int mask = irq_disable();
-
+    uint8_t count_ch = pit_config[dev].count_ch;
     /* Clear configuration */
-    PIT->CHANNEL[pit_config[dev].count_ch].TCTRL = 0;
+    PIT->CHANNEL[count_ch].TCTRL = 0;
 
     /* Freeze timers during debug break, resume normal operations (clear MDIS) */
     PIT->MCR = PIT_MCR_FRZ_MASK;
 
-    _pit_set_cb_config(dev, cb, arg);
+    /* set callback function */
+    pit[dev].isr_ctx.cb = cb;
+    pit[dev].isr_ctx.arg = arg;
 
     /* Clear IRQ flag */
-    PIT->CHANNEL[pit_config[dev].count_ch].TFLG = PIT_TFLG_TIF_MASK;
+    PIT->CHANNEL[count_ch].TFLG = PIT_TFLG_TIF_MASK;
 #if KINETIS_PIT_COMBINED_IRQ
     /* One IRQ for all channels */
     /* NVIC_ClearPendingIRQ(PIT_IRQn); */ /* does it make sense to clear this IRQ flag? */
     NVIC_EnableIRQ(PIT_IRQn);
 #else
     /* Refactor the below lines if there are any CPUs where the PIT IRQs are not sequential */
-    NVIC_ClearPendingIRQ(PIT0_IRQn + pit_config[dev].count_ch);
-    NVIC_EnableIRQ(PIT0_IRQn + pit_config[dev].count_ch);
+    NVIC_ClearPendingIRQ(PIT0_IRQn + count_ch);
+    NVIC_EnableIRQ(PIT0_IRQn + count_ch);
 #endif
     /* Reset up-counter */
     pit[dev].count = PIT_MAX_VALUE;
-    pit[dev].ldval = PIT_MAX_VALUE;
-    pit[dev].tctrl = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
-    _pit_set_prescaler(pit_config[dev].prescaler_ch, freq);
-    _pit_set_counter(dev);
+    PIT->CHANNEL[count_ch].LDVAL = PIT_MAX_VALUE;
+    /* Disable prescaler channel */
+    PIT->CHANNEL[pit_config[dev].prescaler_ch].TCTRL = 0x0;
+    /* Load prescaler value */
+    PIT->CHANNEL[pit_config[dev].prescaler_ch].LDVAL = (PIT_BASECLOCK / freq) - 1;
+    /* Start the prescaler counter */
+    PIT->CHANNEL[pit_config[dev].prescaler_ch].TCTRL = (PIT_TCTRL_TEN_MASK);
+    PIT->CHANNEL[count_ch].TCTRL = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
 
     irq_restore(mask);
     return 0;
@@ -224,17 +202,18 @@ static inline int pit_set(uint8_t dev, uint32_t timeout)
     const uint8_t ch = pit_config[dev].count_ch;
     /* Disable IRQs to minimize the number of lost ticks */
     unsigned int mask = irq_disable();
-    pit[dev].ldval = timeout;
-    pit[dev].tctrl = PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
+    /* Subtract if there was anything left on the counter */
+    pit[dev].count -= PIT->CHANNEL[ch].CVAL;
+    /* Set new timeout */
+    PIT->CHANNEL[ch].TCTRL = 0;
+    PIT->CHANNEL[ch].LDVAL = timeout;
+    PIT->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
+    PIT->CHANNEL[ch].TCTRL = PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
     /* Add the new timeout offset to the up-counter */
     pit[dev].count += timeout;
-    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
-        /* Timer is currently running */
-        uint32_t cval = PIT->CHANNEL[ch].CVAL;
-        /* Subtract if there was anything left on the counter */
-        pit[dev].count -= cval;
-        _pit_set_counter(dev);
-    }
+    /* Set the timer to reload the maximum value to be able to count the number
+     * of overflow ticks inside the ISR */
+    PIT->CHANNEL[ch].LDVAL = PIT_MAX_VALUE;
     irq_restore(mask);
     return 0;
 }
@@ -244,16 +223,18 @@ static inline int pit_set_absolute(uint8_t dev, uint32_t target)
     uint8_t ch = pit_config[dev].count_ch;
     /* Disable IRQs to minimize the number of lost ticks */
     unsigned int mask = irq_disable();
-    uint32_t now = pit_read(dev);
+    uint32_t now = pit[dev].count - PIT->CHANNEL[ch].CVAL;
     uint32_t offset = target - now;
-    pit[dev].ldval = offset;
-    pit[dev].tctrl = PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
+    /* Set new timeout */
+    PIT->CHANNEL[ch].TCTRL = 0;
+    PIT->CHANNEL[ch].LDVAL = offset;
+    PIT->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
+    PIT->CHANNEL[ch].TCTRL = PIT_TCTRL_TIE_MASK | PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
     /* Set the new target time in the up-counter */
     pit[dev].count = target;
-    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
-        _pit_set_counter(dev);
-    }
-
+    /* Set the timer to reload the maximum value to be able to count the number
+     * of overflow ticks inside the ISR */
+    PIT->CHANNEL[ch].LDVAL = PIT_MAX_VALUE;
     irq_restore(mask);
     return 0;
 }
@@ -263,77 +244,60 @@ static inline int pit_clear(uint8_t dev)
     uint8_t ch = pit_config[dev].count_ch;
     /* Disable IRQs to minimize the number of lost ticks */
     unsigned int mask = irq_disable();
-
-    pit[dev].ldval = PIT_MAX_VALUE;
-    pit[dev].tctrl = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
-    /* pit[dev].count += PIT_MAX_VALUE + 1; */ /* == 0 (mod 2**32) */
-
-    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
-        /* Timer is currently running */
-        uint32_t cval = PIT->CHANNEL[ch].CVAL;
-        /* Subtract if there was anything left on the counter */
-        pit[dev].count -= cval;
-        /* Set a long timeout */
-        _pit_set_counter(ch);
-    }
-
+    /* Subtract if there was anything left on the counter */
+    pit[dev].count -= PIT->CHANNEL[ch].CVAL;
+    /* No need to add PIT_MAX_VALUE + 1 to the counter because of modulo 2**32 */
+    /* Set a long timeout */
+    PIT->CHANNEL[ch].TCTRL = 0;
+    PIT->CHANNEL[ch].LDVAL = PIT_MAX_VALUE;
+    PIT->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
+    PIT->CHANNEL[ch].TCTRL = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
     irq_restore(mask);
     return 0;
 }
 
+/* CVAL is unreliable if the timer is not enabled (TCTRL_TEN bit clear),
+ * by stopping the prescaler instead of the counter channel we avoid this issue,
+ * and additionally do not need to worry about saving the control registers or
+ * recomputing the target time when starting the timer */
 static inline uint32_t pit_read(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].count_ch;
-    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
-        /* Timer running */
-        return pit[dev].count - PIT->CHANNEL[ch].CVAL;
-    }
-    else {
-        /* Timer stopped */
-        return pit[dev].count;
-    }
+    return pit[dev].count - PIT->CHANNEL[ch].CVAL;
 }
 
 static inline void pit_start(uint8_t dev)
 {
-    uint8_t ch = pit_config[dev].count_ch;
-    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) != 0) {
-        /* Already running */
-        return;
-    }
-    PIT->CHANNEL[ch].LDVAL = pit[dev].ldval;
-    pit[dev].count += pit[dev].ldval;
-    PIT->CHANNEL[ch].TCTRL = pit[dev].tctrl;
+    uint8_t ch = pit_config[dev].prescaler_ch;
+    PIT->CHANNEL[ch].TCTRL = PIT_TCTRL_TEN_MASK;
 }
 
 static inline void pit_stop(uint8_t dev)
 {
-    uint8_t ch = pit_config[dev].count_ch;
-    if ((PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) == 0) {
-        /* Already stopped */
-        return;
-    }
-    uint32_t cval = PIT->CHANNEL[ch].CVAL;
-    pit[dev].tctrl = PIT->CHANNEL[ch].TCTRL;
+    uint8_t ch = pit_config[dev].prescaler_ch;
     PIT->CHANNEL[ch].TCTRL = 0;
-    pit[dev].count -= cval;
-    pit[dev].ldval = cval;
 }
 
 static inline void pit_irq_handler(tim_t dev)
 {
     uint8_t ch = pit_config[_pit_index(dev)].count_ch;
     pit_t *pit_ctx = &pit[_pit_index(dev)];
-    pit_ctx->ldval = PIT_MAX_VALUE;
-    pit_ctx->count += PIT_MAX_VALUE;
-    pit_ctx->tctrl = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
-    _pit_set_counter(_pit_index(dev));
+    if (!PIT->CHANNEL[ch].TFLG) {
+        DEBUG("PIT%u!TFLG\n", (unsigned)dev);
+        return;
+    }
+    /* Add the overflow amount to the counter before resetting */
+    /* (this may be > 0 if the IRQ handler was delayed e.g. by irq_disable etc.) */
+    pit_ctx->count += PIT->CHANNEL[ch].LDVAL - PIT->CHANNEL[ch].CVAL;
+    /* inline pit_clear */
+    PIT->CHANNEL[ch].TCTRL = 0;
+    PIT->CHANNEL[ch].LDVAL = PIT_MAX_VALUE;
+    PIT->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
+    PIT->CHANNEL[ch].TCTRL = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
 
     if (pit_ctx->isr_ctx.cb != NULL) {
         pit_ctx->isr_ctx.cb(pit_ctx->isr_ctx.arg, 0);
     }
-
-    PIT->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
 
     cortexm_isr_end();
 }
