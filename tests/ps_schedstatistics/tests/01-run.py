@@ -39,7 +39,6 @@ def _check_startup(child):
 
 
 def _check_help(child):
-    child.sendline('')
     child.expect('>')
     child.sendline('help')
     child.expect_exact('Command              Description')

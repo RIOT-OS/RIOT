@@ -119,14 +119,7 @@ def _check_day(child):
                        'but no error should occur.')
 
 
-def _wait_prompt(child):
-    child.sendline('')
-    child.expect('>')
-    child.sendline('')
-
-
 def testfunc(child):
-    _wait_prompt(child)
     _check_help(child)
     _check_days_in(child)
     _check_leap_year(child)

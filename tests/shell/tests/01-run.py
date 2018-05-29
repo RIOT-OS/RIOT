@@ -49,7 +49,6 @@ def check_cmd(child, cmd, expected):
 def testfunc(child):
     # check startup message
     child.expect('test_shell.')
-    child.sendline('\n')
 
     # loop other defined commands and expected output
     for cmd, expected in CMDS.items():
