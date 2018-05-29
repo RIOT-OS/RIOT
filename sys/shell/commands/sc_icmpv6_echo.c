@@ -129,7 +129,7 @@ static void _print_stats(char *addr_str, int success, int count, uint64_t total_
     printf("--- %s ping statistics ---\n", addr_str);
 
     if (success > 0) {
-        uint32_t avg_rtt = (uint32_t)(sum_rtt / count); /* get average */
+        uint32_t avg_rtt = (uint32_t)(sum_rtt / success); /* get average */
         printf("%d packets transmitted, %d received, %d%% packet loss, time %"
                PRIu32 ".06%" PRIu32 " s\n", count, success,
                (100 - ((success * 100) / count)),
