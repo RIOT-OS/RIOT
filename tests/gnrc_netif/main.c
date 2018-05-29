@@ -34,6 +34,7 @@
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/netdev_test.h"
+#include "net/netif.h"
 #include "utlist.h"
 #include "xtimer.h"
 
@@ -1029,6 +1030,82 @@ static void test_netapi_set__SRC_LEN(void)
                                     sizeof(orig_ieee802154)));
 }
 
+static void test_netif_iter(void)
+{
+    netif_t netif = NETIF_INVALID;
+    int netif_count = 0;
+
+    while ((netif = netif_iter(netif)) != NETIF_INVALID) {
+        netif_count++;
+    }
+    TEST_ASSERT_EQUAL_INT(gnrc_netif_numof(), netif_count);
+}
+
+static void test_netif_get_name(void)
+{
+    char exp_name[NETIF_NAMELENMAX];
+    char name[NETIF_NAMELENMAX];
+    int res;
+    netif_t netif = netif_iter(NETIF_INVALID);
+    /* there must be at least one interface */
+    TEST_ASSERT(NETIF_INVALID != netif);
+
+    res = netif_get_name(netif, name);
+    sprintf(exp_name, "if%d", (int)netif);
+    TEST_ASSERT_EQUAL_INT(strlen(exp_name), res);
+    TEST_ASSERT_EQUAL_STRING(&exp_name[0], &name[0]);
+    TEST_ASSERT_EQUAL_INT(0, netif_get_name(INT16_MAX, name));
+}
+
+static void test_netif_get_by_name(void)
+{
+    char name[NETIF_NAMELENMAX] = "6nPRK28";
+    netif_t netif = netif_iter(NETIF_INVALID);
+
+    TEST_ASSERT_EQUAL_INT(NETIF_INVALID, netif_get_by_name(name));
+    /* there must be at least one interface */
+    TEST_ASSERT(NETIF_INVALID != netif);
+    TEST_ASSERT(netif_get_name(netif, name) > 0);
+    TEST_ASSERT_EQUAL_INT(netif, netif_get_by_name(name));
+}
+
+static void test_netif_get_opt(void)
+{
+    /* just repeat one of the gnrc_netapi_get tests, just with netif_get_opt */
+    static const uint8_t exp_ethernet[] = ETHERNET_SRC;
+    uint8_t value[GNRC_NETIF_L2ADDR_MAXLEN];
+
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
+                          netif_get_opt((netif_t)ethernet_netif->pid,
+                                        NETOPT_ADDRESS, 0,
+                                        &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ethernet, value, sizeof(exp_ethernet)));
+}
+
+static void test_netif_set_opt(void)
+{
+    /* just repeat one of the gnrc_netapi_set tests, just with netif_set_opt */
+    static const uint8_t exp_ethernet[] = ETHERNET_SRC;
+    uint8_t value[] = { LA1 + 1, LA2 + 2, LA3 + 3, LA4 + 4, LA5 + 5, LA6 + 6 };
+
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
+                          netif_set_opt((netif_t)ethernet_netif->pid,
+                                        NETOPT_ADDRESS, 0,
+                                        &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(value), ethernet_netif->l2addr_len);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(value, ethernet_netif->l2addr,
+                                    ETHERNET_ADDR_LEN));
+    /* return addresses to previous state for further testing */
+    memcpy(value, exp_ethernet, sizeof(exp_ethernet));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
+                          netif_set_opt(ethernet_netif->pid,
+                                        NETOPT_ADDRESS, 0,
+                                        &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(value), ethernet_netif->l2addr_len);
+    TEST_ASSERT_EQUAL_INT(0, memcmp(value, ethernet_netif->l2addr,
+                                    sizeof(value)));
+}
+
 static void test_netapi_send__raw_unicast_ethernet_packet(void)
 {
     uint8_t dst[] = { LA1, LA2, LA3, LA4, LA5, LA6 + 1 };
@@ -1431,6 +1508,11 @@ static Test *embunit_tests_gnrc_netif(void)
         new_TestFixture(test_netapi_set__ADDRESS),
         new_TestFixture(test_netapi_set__ADDRESS_LONG),
         new_TestFixture(test_netapi_set__SRC_LEN),
+        new_TestFixture(test_netif_iter),
+        new_TestFixture(test_netif_get_name),
+        new_TestFixture(test_netif_get_by_name),
+        new_TestFixture(test_netif_get_opt),
+        new_TestFixture(test_netif_set_opt),
         /* only add tests not involving output here */
     };
     EMB_UNIT_TESTCALLER(tests, _set_up, NULL, fixtures);

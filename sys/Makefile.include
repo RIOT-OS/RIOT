@@ -13,6 +13,9 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
+ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/netif/include
+endif
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/sock/include
   ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
