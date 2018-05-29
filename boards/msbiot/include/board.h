@@ -73,6 +73,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Button pin definitions
+ * @{
+ */
+#define BUTTON0_PIN         GPIO_PIN(PORT_B, 13)
+#define BUTTON1_PIN         GPIO_PIN(PORT_A, 0)
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
