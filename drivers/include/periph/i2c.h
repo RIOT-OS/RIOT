@@ -234,11 +234,8 @@ enum {
  * internally by the i2c_init function!
  *
  * @param[in] dev       the device to initialize
- *
- * @return                  0 on successful initialization
- * @return                  -1 on undefined device given
  */
-int i2c_init(i2c_t dev);
+void i2c_init(i2c_t dev);
 
 /**
  * @brief   Get mutually exclusive access to the given I2C bus
