@@ -70,7 +70,7 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
             return -1;
         }
 
-        if (at_expect_bytes(dev, AT_SEND_EOL "\r\n", timeout)) {
+        if (at_expect_bytes(dev, AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2, timeout)) {
             return -2;
         }
     }
@@ -101,10 +101,10 @@ ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
         goto out;
     }
 
-    res = at_readline(dev, resp_buf, len, timeout);
+    res = at_readline(dev, resp_buf, len, false, timeout);
     if (res == 0) {
         /* skip possible empty line */
-        res = at_readline(dev, resp_buf, len, timeout);
+        res = at_readline(dev, resp_buf, len, false, timeout);
     }
 
 out:
@@ -112,8 +112,11 @@ out:
 }
 
 ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
-                              char *resp_buf, size_t len, uint32_t timeout)
+                              char *resp_buf, size_t len, bool keep_eol, uint32_t timeout)
 {
+    const char eol[] = AT_RECV_EOL_1 AT_RECV_EOL_2;
+    assert(sizeof(eol) > 1);
+
     ssize_t res;
     size_t bytes_left = len - 1;
     char *pos = resp_buf;
@@ -128,17 +131,21 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
     }
 
     while (1) {
-        res = at_readline(dev, pos, bytes_left, timeout);
+        res = at_readline(dev, pos, bytes_left, keep_eol, timeout);
         if (res == 0) {
+            if (bytes_left) {
+                *pos++ = eol[sizeof(eol) - 2];
+                bytes_left--;
+            }
             continue;
         }
         else if (res > 0) {
             bytes_left -= res;
-            if ((res == 2) && (strncmp(pos, "OK", 2) == 0)) {
+            if ((res == (2 + keep_eol)) && (strncmp(pos, "OK", 2) == 0)) {
                 res = len - bytes_left;
                 break;
             }
-            else if ((res == 5) && (strncmp(pos, "ERROR", 5) == 0)) {
+            else if ((res == (5 + keep_eol)) && (strncmp(pos, "ERROR", 5) == 0)) {
                 return -1;
             }
             else if (strncmp(pos, "+CME ERROR:", 11) == 0) {
@@ -150,7 +157,7 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
             else {
                 pos += res;
                 if (bytes_left) {
-                    *pos++ = '\n';
+                    *pos++ = eol[sizeof(eol) - 2];
                     bytes_left--;
                 }
                 else {
@@ -180,7 +187,7 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
         return -1;
     }
 
-    if (at_expect_bytes(dev, AT_SEND_EOL "\n", timeout)) {
+    if (at_expect_bytes(dev, AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
         return -2;
     }
 
@@ -209,8 +216,11 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
     return res;
 }
 
-ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout)
+ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, uint32_t timeout)
 {
+    const char eol[] = AT_RECV_EOL_1 AT_RECV_EOL_2;
+    assert(sizeof(eol) > 1);
+
     ssize_t res = -1;
     char *resp_pos = resp_buf;
 
@@ -222,10 +232,12 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, uint32_t timeout)
             if (AT_PRINT_INCOMING) {
                 print(resp_pos, read_res);
             }
-            if (*resp_pos == '\r') {
-                continue;
+            if (sizeof(eol) > 2 && *resp_pos == eol[0]) {
+                if (!keep_eol) {
+                    continue;
+                }
             }
-            if (*resp_pos == '\n') {
+            if (*resp_pos == eol[sizeof(eol) - 2]) {
                 *resp_pos = '\0';
                 res = resp_pos - resp_buf;
                 goto out;

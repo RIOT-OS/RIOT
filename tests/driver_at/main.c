@@ -94,7 +94,7 @@ static int send_lines(int argc, char **argv)
     }
 
     ssize_t len;
-    if ((len = at_send_cmd_get_lines(&at_dev, argv[1], resp, sizeof(resp), 10 * US_PER_SEC)) < 0) {
+    if ((len = at_send_cmd_get_lines(&at_dev, argv[1], resp, sizeof(resp), true, 10 * US_PER_SEC)) < 0) {
         puts("Error");
         return 1;
     }
