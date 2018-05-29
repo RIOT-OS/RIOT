@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
- * Copyright (C) 2015 Eistec AB
+ * Copyright (C) 2015-2018 Eistec AB
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,8 +11,6 @@
 /**
  * @ingroup     cpu_kinetis
  * @ingroup     drivers_periph_i2c
- *
- * @note        This driver only implements the 7-bit addressing master mode.
  *
  * @{
  *
@@ -26,16 +24,22 @@
  */
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "cpu.h"
 #include "irq.h"
+#include "bit.h"
 #include "mutex.h"
 #include "periph_conf.h"
 #include "periph/i2c.h"
 
 #define ENABLE_DEBUG    (0)
 /* Define ENABLE_TRACE to 1 to enable printing of all TX/RX bytes to UART for extra verbose debugging */
-#define ENABLE_TRACE    (0)
+#define ENABLE_TRACE    (1)
+/* Define ENABLE_INIT_DEBUG to 1 to enable DEBUG prints in i2c_init. Currently
+ * this causes the system to hang when running i2c_init during boot because of
+ * uninitialized stdio UART */
+#define ENABLE_INIT_DEBUG (0)
 #include "debug.h"
 
 #if ENABLE_TRACE
@@ -45,474 +49,378 @@
 #endif
 
 /**
- * @brief Array holding one pre-initialized mutex for each I2C device
+ * @brief   Array of I2C module clock dividers
+ *
+ * The index in this array is the I2C_F setting number
  */
-static mutex_t locks[] =  {
-#if I2C_0_EN
-    [I2C_0] = MUTEX_INIT,
-#endif
-#if I2C_1_EN
-    [I2C_1] = MUTEX_INIT,
-#endif
-#if I2C_2_EN
-    [I2C_2] = MUTEX_INIT
-#endif
-#if I2C_3_EN
-    [I2C_3] = MUTEX_INIT
-#endif
+/*
+ * Divider values were copied from K22F reference manual
+ */
+static const uint16_t i2c_dividers[] = {
+      20,   22,   24,   26,   28,   30,   34,   40, /* 0x00 ~ 0x07 */
+      28,   32,   36,   40,   44,   48,   56,   68, /* 0x08 ~ 0x0f */
+      48,   56,   64,   72,   80,   88,  104,  128, /* 0x10 ~ 0x17 */
+      80,   96,  112,  128,  144,  160,  192,  240, /* 0x18 ~ 0x1f */
+     160,  192,  224,  256,  288,  320,  384,  480, /* 0x20 ~ 0x27 */
+     320,  384,  448,  512,  576,  640,  768,  960, /* 0x28 ~ 0x2f */
+     640,  768,  896, 1024, 1152, 1280, 1536, 1920, /* 0x30 ~ 0x37 */
+    1280, 1536, 1792, 2048, 2304, 2560, 3072, 3840, /* 0x38 ~ 0x3f */
 };
+
+/**
+ * @brief   Driver internal state
+ */
+typedef struct {
+    mutex_t mtx; /**< Mutex preventing multiple users of the same bus */
+    unsigned active; /**< State variable to help catch user mistakes */
+} i2c_state_t;
+static i2c_state_t i2c_state[I2C_NUMOF];
+
 
 int i2c_acquire(i2c_t dev)
 {
-    if ((unsigned int)dev >= I2C_NUMOF) {
-        return -1;
-    }
-    mutex_lock(&locks[dev]);
+    assert((unsigned)dev < I2C_NUMOF);
+    mutex_lock(&i2c_state[dev].mtx);
     return 0;
 }
 
 int i2c_release(i2c_t dev)
 {
-    if ((unsigned int)dev >= I2C_NUMOF) {
-        return -1;
-    }
-    mutex_unlock(&locks[dev]);
+    /* Check that the bus was properly stopped before releasing */
+    /* It is a programming error to release the bus after sending a start
+     * condition but before sending a stop condition */
+    assert(i2c_state[dev].active == 0);
+
+    mutex_unlock(&i2c_state[dev].mtx);
     return 0;
 }
 
-int i2c_init_master(i2c_t dev, i2c_speed_t speed)
+static uint8_t i2c_find_divider(unsigned freq, unsigned speed)
 {
-    DEBUG("i2c_init_master: %lu, %lu\n", (unsigned long)dev, (unsigned long) speed);
-    I2C_Type *i2c;
-    PORT_Type *i2c_port;
-    int pin_scl = 0;
-    int pin_sda = 0;
-    uint32_t baudrate_flags = 0;
-
-    /** @todo Kinetis I2C: Add automatic baud rate flags selection function */
-    /*
-     * See the Chapter "I2C divider and hold values":
-     *     Kinetis K60 Reference Manual, section 51.4.1.10, Table 51-41.
-     *     Kinetis MKW2x  Reference Manual, section 52.4.1.10, Table 52-41.
+    unsigned diff = UINT_MAX;
+    /* Use maximum divider if nothing matches */
+    uint8_t F = sizeof(i2c_dividers) / sizeof(i2c_dividers[0]) - 1;
+    /* We avoid using the MULT field to simplify the driver and avoid having to
+     * work around hardware errata on some Kinetis parts
      *
-     * baud rate = I2C_module_clock / (mul × ICR)
+     * See:
+     * https://community.nxp.com/thread/377611
+     * https://mcuoneclipse.com/2012/12/05/kl25z-and-i2c-missing-repeated-start-condition/
+     *
+     * e6070:   I2C: Repeat start cannot be generated if the I2Cx_F[MULT] field is set to a non-zero value
+     *
+     * Description:
+     * If the I2Cx_F[MULT] field is written with a non-zero value, then a repeat
+     * start cannot be generated
+     *
+     * Workaround:
+     * There are two possible workarounds:
+     * 1) Configure I2Cx_F[MULT] to zero if a repeat start has to be generated.
+     * 2) Temporarily set I2Cx_F [MULT] to zero immediately before setting the
+     *    Repeat START bit in the I2C C1 register (I2Cx_C1[RSTA]=1) and restore
+     *    the I2Cx_F [MULT] field to the original value after the repeated start
+     *    has occurred
      */
-    switch (speed) {
-        case I2C_SPEED_LOW:
-            baudrate_flags |= I2C_F_MULT(KINETIS_I2C_F_MULT_LOW) |
-                I2C_F_ICR(KINETIS_I2C_F_ICR_LOW);
-            break;
-
-        case I2C_SPEED_NORMAL:
-            baudrate_flags |= I2C_F_MULT(KINETIS_I2C_F_MULT_NORMAL) |
-                I2C_F_ICR(KINETIS_I2C_F_ICR_NORMAL);
-            break;
-
-        case I2C_SPEED_FAST:
-            baudrate_flags |= I2C_F_MULT(KINETIS_I2C_F_MULT_FAST) |
-                I2C_F_ICR(KINETIS_I2C_F_ICR_FAST);
-            break;
-
-        case I2C_SPEED_FAST_PLUS:
-            baudrate_flags |= I2C_F_MULT(KINETIS_I2C_F_MULT_FAST_PLUS) |
-                I2C_F_ICR(KINETIS_I2C_F_ICR_FAST_PLUS);
-            break;
-
-        default:
-            /*
-             * High speed mode is not supported on Kinetis devices,
-             * see: https://community.freescale.com/thread/316371
-             *
-             * Hardware allows setting the baud rate high enough but the
-             * capacitance of the bus and lacking a proper high speed mode SCL
-             * driver will make the signals go out of spec.
-             */
-            return -2;
+    for (unsigned k = 0; k < sizeof(i2c_dividers) / sizeof(i2c_dividers[0]); ++k) {
+        /* Test dividers until we find one that gives a good match */
+        unsigned lim = (speed * i2c_dividers[k]);
+        if (lim >= freq) {
+            if ((lim - freq) < diff) {
+                diff = (lim - freq);
+                F = k;
+            }
+        }
     }
+    if (ENABLE_INIT_DEBUG) {
+        DEBUG("i2c_divider: speed = %u, freq = %u, diff = %u, F = 0x%02x\n", speed, freq, diff, F);
+    }
+    return F;
+}
 
-    /* read static device configuration */
-    switch (dev) {
-#if I2C_0_EN
+static inline void i2c_clear_irq_flags(I2C_Type *i2c)
+{
+    i2c->S = i2c->S;
+}
 
-        case I2C_0:
-            i2c = I2C_0_DEV;
-            i2c_port = I2C_0_PORT;
-            pin_scl = I2C_0_SCL_PIN;
-            pin_sda = I2C_0_SDA_PIN;
-            I2C_0_CLKEN();
-            I2C_0_PORT_CLKEN();
+void i2c_init(i2c_t dev)
+{
+    if (ENABLE_INIT_DEBUG) {
+        DEBUG("i2c_init: %u\n", (unsigned) dev);
+    }
+    assert((unsigned)dev < I2C_NUMOF);
+    const i2c_conf_t *conf = &i2c_config[dev];
+    I2C_Type *i2c = conf->i2c;
+    /* Turn on the module clock gate */
+    switch ((uintptr_t)i2c) {
+#ifdef I2C0
+        case (uintptr_t)I2C0:
+            I2C0_CLKEN();
             break;
 #endif
-
+#ifdef I2C1
+        case (uintptr_t)I2C1:
+            I2C1_CLKEN();
+            break;
+#endif
+#ifdef I2C2
+        case (uintptr_t)I2C2:
+            I2C2_CLKEN();
+            break;
+#endif
         default:
-            return -1;
+            if (ENABLE_INIT_DEBUG) {
+                DEBUG("i2c_init: Unknown I2C device %p\n", (void *)i2c);
+            }
+            return;
     }
+    i2c_state[dev].mtx = (mutex_t)MUTEX_INIT_LOCKED;
+    i2c_state[dev].active = 0;
+    if (ENABLE_INIT_DEBUG) {
+        DEBUG("i2c_init: init SCL pin\n");
+    }
+    gpio_init_port(conf->scl_pin, conf->scl_pcr);
+    if (ENABLE_INIT_DEBUG) {
+        DEBUG("i2c_init: init SDA pin\n");
+    }
+    gpio_init_port(conf->sda_pin, conf->sda_pcr);
+    /* Configure master settings */
+    i2c->C1 = 0; /* Disable module while messing with the settings */
+    /* Configure glitch filter register */
+#ifdef I2C_FLT_SHEN_MASK
+    i2c->FLT = I2C_FLT_SHEN_MASK;
+#else
+    i2c->FLT = 0;
+#endif
+    i2c->F = i2c_find_divider(conf->freq, (unsigned)conf->speed);
+    /* Enable module */
+    i2c->C1 = I2C_C1_IICEN_MASK;
+    i2c_clear_irq_flags(i2c);
+    NVIC_EnableIRQ(conf->irqn);
+    mutex_unlock(&i2c_state[dev].mtx);
+}
 
-    /* configure pins, alternate output */
-    i2c_port->PCR[pin_scl] = I2C_0_PORT_CFG;
-    i2c_port->PCR[pin_sda] = I2C_0_PORT_CFG;
+/* Internal helper for checking status flags after transmission */
+static int i2c_tx(i2c_t dev, uint8_t byte)
+{
+    I2C_Type *i2c = i2c_config[dev].i2c;
+    TRACE("i2c: tx: %02x\n", (unsigned)byte);
+    i2c->D = byte;
+    uint8_t S;
+    uint16_t timeout = UINT16_MAX;
+    do {
+        S = i2c->S;
+    } while (!(S & I2C_S_IICIF_MASK) && --timeout);
 
-    i2c->F = baudrate_flags;
+    i2c_clear_irq_flags(i2c);
 
-    /* enable i2c-module and interrupt */
-    i2c->C1 = I2C_C1_IICEN_MASK | I2C_C1_IICIE_MASK | I2C_C1_TXAK_MASK;
-    i2c->C2 = 0;
-
+    if (S & I2C_S_ARBL_MASK) {
+        DEBUG("i2c: arbitration lost\n");
+        bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+        i2c_state[dev].active = 0;
+        return -EAGAIN;
+    }
+    if (timeout == 0) {
+        /* slave stretches the clock for too long */
+        DEBUG("i2c: tx timeout\n");
+        return -ETIMEDOUT;
+    }
+    if (S & I2C_S_RXAK_MASK) {
+        DEBUG("i2c: NACK\n");
+        return -EIO;
+    }
     return 0;
 }
 
-/*
- * Check for bus master arbitration lost.
- * Arbitration is lost in the following circumstances:
- * 1. SDA is sampled as low when the master drives high during an
- *    address or data transmit cycle.
- * 2. SDA is sampled as low when the master drives high during the
- *    acknowledge bit of a data receive cycle.
- * 3. A START cycle is attempted when the bus is busy.
- * 4. A repeated START cycle is requested in slave mode.
- * 5. A STOP condition is detected when the master did not request
- *    it.
- */
-static inline int _i2c_arbitration_lost(I2C_Type *dev)
+static int i2c_stop(i2c_t dev)
 {
-    return (int)(dev->S & I2C_S_ARBL_MASK);
-}
-
-static inline int _i2c_start(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
-{
-    /* bus free ? */
-    if (dev->S & I2C_S_BUSY_MASK) {
-        DEBUG("i2c:_start: bus busy\n");
-        return -1;
+    I2C_Type *i2c = i2c_config[dev].i2c;
+    /* Send stop condition */
+    TRACE("i2c: stop C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
+    bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+    unsigned timeout = 0x10000;
+    while ((i2c->S & I2C_S_BUSY_MASK) && --timeout) {}
+    i2c_state[dev].active = 0;
+    if (timeout == 0) {
+        /* slave stretches the clock for too long */
+        DEBUG("i2c: timeout while stopping\n");
+        return -ETIMEDOUT;
     }
-
-    dev->S = I2C_S_IICIF_MASK;
-
-    dev->C1 = I2C_C1_IICEN_MASK | I2C_C1_MST_MASK | I2C_C1_TX_MASK;
-    dev->D = address << 1 | (rw_flag & 1);
-
-    /* wait for bus-busy to be set */
-    while (!(dev->S & I2C_S_BUSY_MASK)) {
-        if (_i2c_arbitration_lost(dev)) {
-            DEBUG("i2c:_start: arbitration lost\n");
-            return -1;
-        }
-    }
-
-    /* wait for address transfer to complete */
-    while (!(dev->S & I2C_S_IICIF_MASK));
-
-    dev->S = I2C_S_IICIF_MASK;
-
-    if (_i2c_arbitration_lost(dev)) {
-        DEBUG("i2c:_start: arbitration lost late\n");
-        return -1;
-    }
-
-    /* check for receive acknowledge */
-    if (dev->S & I2C_S_RXAK_MASK) {
-        DEBUG("i2c:_start: no addr ack\n");
-        return -1;
-    }
-
+    TRACE("i2c: STOP C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
     return 0;
 }
 
-static inline int _i2c_restart(I2C_Type *dev, uint8_t address, uint8_t rw_flag)
+static int i2c_tx_addr(i2c_t dev, uint8_t byte)
 {
-    /* put master in rx mode and repeat start */
-    dev->C1 |= I2C_C1_RSTA_MASK;
-    dev->D = address << 1 | (rw_flag & 1);
+    int res = i2c_tx(dev, byte);
+    if (res < 0) {
+        if (res == -EIO) {
+            /* No ACK received, remap EIO to ENXIO for missing addr ack */
+            res = -ENXIO;
+        }
+        int stopres = i2c_stop(dev);
+        if (stopres < 0) {
+            return stopres;
+        }
+    }
+    return res;
+}
 
-    /* wait for address transfer to complete */
-    while (!(dev->S & I2C_S_IICIF_MASK));
+static int i2c_start(i2c_t dev, uint16_t addr, unsigned read_flag, uint8_t flags)
+{
+    I2C_Type *i2c = i2c_config[dev].i2c;
+    TRACE("i2c: start C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
+    /* Send start condition */
+    if (i2c->C1 & I2C_C1_MST_MASK) {
+        /* Repeat start */
+        i2c->C1 |= I2C_C1_IICEN_MASK | I2C_C1_RSTA_MASK | I2C_C1_TX_MASK;
+    }
+    else {
+        /* Initial start */
+        if (read_flag && (flags & I2C_ADDR10)) {
+            /* 10 bit addressing does not allow reading without a repeated start */
+            return -EINVAL;
+        }
+        /* slave -> master transition triggers the initial start condition */
+        i2c->C1 |= I2C_C1_IICEN_MASK | I2C_C1_MST_MASK | I2C_C1_TX_MASK;
+    }
+    i2c_state[dev].active = 1;
+    TRACE("i2c: Start C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
+    if (i2c->S & I2C_S_ARBL_MASK) {
+        DEBUG("i2c: arbitration lost\n");
+        i2c_clear_irq_flags(i2c);
+        bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+        i2c_state[dev].active = 0;
+        return -EAGAIN;
+    }
+    if (flags & I2C_ADDR10) {
+        /* 10 bit addressing */
+        /* Send 10 bit address tag + 2 msb + R/W flag */
+        uint8_t msb = (addr >> 8);
+        uint8_t lsb = (addr & 0xff);
+        uint8_t addr_rw = I2C_10BIT_MAGIC | (msb << 1);
+        if (read_flag) {
+            addr_rw |= I2C_READ;
+        }
+        int res = i2c_tx_addr(dev, addr_rw);
+        if (res < 0) {
+            return res;
+        }
+        if (!read_flag) {
+            /* Send lower 8 bits of address */
+            res = i2c_tx_addr(dev, lsb);
+        }
+        return res;
+    }
+    /* 7 bit addressing */
+    /* Send address + R/W flag */
+    uint8_t addr_rw = (addr << 1);
+    if (read_flag) {
+        addr_rw |= I2C_READ;
+    }
+    return i2c_tx_addr(dev, addr_rw);
+}
 
-    dev->S = I2C_S_IICIF_MASK;
-
-    if (_i2c_arbitration_lost(dev)) {
-        DEBUG("i2c:_restart: arbitration lost\n");
-        return -1;
+int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t flags)
+{
+    assert((data != NULL) || (len == 0));
+    I2C_Type *i2c = i2c_config[dev].i2c;
+    DEBUG("i2c: r a:%02x, l:%u, f:%02x\n", addr, (unsigned)len, (unsigned)flags);
+    if (len == 1) {
+        /* Send NACK after next byte */
+        bit_set8(&i2c->C1, I2C_C1_TXAK_SHIFT);
+    }
+    else {
+        bit_clear8(&i2c->C1, I2C_C1_TXAK_SHIFT);
     }
 
-    /* check for receive acknowledge */
-    if (dev->S & I2C_S_RXAK_MASK) {
-        DEBUG("i2c:_restart: no addr ack\n");
-        return -1;
+    if (!(flags & I2C_NOSTART)) {
+        /* Send start condition and address */
+        int res = i2c_start(dev, addr, 1, flags);
+        if (res < 0) {
+            return res;
+        }
     }
+    if (len > 0) {
+        bit_clear8(&i2c->C1, I2C_C1_TX_SHIFT);
+        /* Initiate master receive mode by reading the data register once when the
+         * C1[TX] bit is cleared and C1[MST] is set */
+        volatile uint8_t dummy;
+        dummy = i2c->D;
+        ++dummy;
+    }
+    TRACE("i2c: read C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
+    uint8_t *datap = data;
+    while (len > 0) {
+        uint8_t S;
+        do {
+            S = i2c->S;
+        } while (!(S & I2C_S_IICIF_MASK));
 
+        i2c_clear_irq_flags(i2c);
+
+        if (S & I2C_S_ARBL_MASK) {
+            DEBUG("i2c: rx arbitration lost\n");
+            bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+            i2c_state[dev].active = 0;
+            return -EAGAIN;
+        }
+        --len;
+        if (len == 1) {
+            /* Send NACK after next byte */
+            bit_set8(&i2c->C1, I2C_C1_TXAK_SHIFT);
+        }
+        else if (len == 0) {
+            /* Switching the module to TX mode lets us read the data register
+             * without triggering a new reception */
+            bit_set8(&i2c->C1, I2C_C1_TX_SHIFT);
+        }
+
+        *datap = i2c->D;
+        TRACE("i2c: rx: %02x\n", (unsigned)*datap);
+        ++datap;
+    }
+    if (!(flags & I2C_NOSTOP)) {
+        int res = i2c_stop(dev);
+        if (res < 0) {
+            return res;
+        }
+    }
     return 0;
 }
 
-static inline int _i2c_receive(I2C_Type *dev, uint8_t *data, int length)
+int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint8_t flags)
 {
-    int n = 0;
-
-    /* set receive mode */
-    dev->C1 = I2C_C1_IICEN_MASK | I2C_C1_MST_MASK;
-
-    if (length == 1) {
-        /* Send NACK after receiving the next byte */
-        dev->C1 |= I2C_C1_TXAK_MASK;
-    }
-
-    /* Initiate master receive mode by reading the data register */
-    dev->D;
-
-    while (length > 0) {
-        while (!(dev->S & I2C_S_IICIF_MASK));
-
-        dev->S = I2C_S_IICIF_MASK;
-
-        if (_i2c_arbitration_lost(dev)) {
-            DEBUG("i2c:_receive: arbitration lost (to go=%d)\n", length);
-            return -1;
+    assert((data != NULL) || (len == 0));
+    I2C_Type *i2c = i2c_config[dev].i2c;
+    DEBUG("i2c: w a:%02x, l:%u, f:%02x\n", addr, (unsigned)len, (unsigned)flags);
+    if (!(flags & I2C_NOSTART)) {
+        int res = i2c_start(dev, addr, 0, flags);
+        if (res < 0) {
+            return res;
         }
-
-        length--;
-
-        if (length == 1) {
-            /* Send NACK after receiving the next byte */
-            dev->C1 |= I2C_C1_TXAK_MASK;
+    }
+    const uint8_t *datap = data;
+    bit_set8(&i2c->C1, I2C_C1_TX_SHIFT);
+    TRACE("i2c: write C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
+    for (size_t k = 0; k < len; ++k) {
+        int res = i2c_tx(dev, datap[k]);
+        if ((res == -EIO) && (k == (len - 1))) {
+            /* NACK on the final byte is normal */
+            break;
         }
-
-        if (length == 0) {
-            /* Stop immediately because the receiving of the next byte will be
-             * initiated by reading the data register (dev->D). */
-            dev->C1 &= ~I2C_C1_MST_MASK;
+        else if (res < 0) {
+            int stopres = i2c_stop(dev);
+            if (stopres < 0) {
+                return stopres;
+            }
+            return res;
         }
-
-        data[n] = dev->D;
-        TRACE("i2c: rx: %02x\n", (unsigned int)data[n]);
-        n++;
     }
-
-    return n;
-}
-
-static inline int _i2c_transmit(I2C_Type *dev, const uint8_t *data, int length)
-{
-    int n = 0;
-
-    while (length > 0) {
-        TRACE("i2c: tx: %02x\n", data[n]);
-        dev->D = data[n];
-
-        while (!(dev->S & I2C_S_IICIF_MASK));
-
-        dev->S = I2C_S_IICIF_MASK;
-
-        if (dev->S & I2C_S_RXAK_MASK) {
-            return n;
+    if (!(flags & I2C_NOSTOP)) {
+        int res = i2c_stop(dev);
+        if (res < 0) {
+            return res;
         }
-
-        n++;
-        length--;
     }
-
-    return n;
-}
-
-static inline void _i2c_stop(I2C_Type *dev)
-{
-    /* put bus in idle state */
-    dev->C1 = I2C_C1_IICEN_MASK;
-
-    /* wait for bus idle */
-    while (dev->S & I2C_S_BUSY_MASK);
-}
-
-static inline void _i2c_reset(I2C_Type *dev)
-{
-    /* put bus in idle state */
-    dev->C1 = I2C_C1_IICEN_MASK;
-    /* reset status flags */
-    dev->S = I2C_S_ARBL_MASK | I2C_S_IICIF_MASK;
-}
-
-
-int i2c_read_byte(i2c_t dev, uint8_t address, void *data)
-{
-    return i2c_read_bytes(dev, address, data, 1);
-}
-
-int i2c_read_bytes(i2c_t dev, uint8_t address, void *data, int length)
-{
-    I2C_Type *i2c;
-    int n = 0;
-
-    switch (dev) {
-#if I2C_0_EN
-
-        case I2C_0:
-            i2c = I2C_0_DEV;
-            break;
-#endif
-
-        default:
-            return -1;
-    }
-
-    if (_i2c_start(i2c, address, I2C_FLAG_READ)) {
-        _i2c_reset(i2c);
-        return -1;
-    }
-
-    n = _i2c_receive(i2c, (uint8_t *)data, length);
-    if (n < 0) {
-        _i2c_reset(i2c);
-        return -1;
-    }
-
-    _i2c_stop(i2c);
-
-    return n;
-}
-
-int i2c_write_byte(i2c_t dev, uint8_t address, uint8_t data)
-{
-    return i2c_write_bytes(dev, address, &data, 1);
-}
-
-int i2c_write_bytes(i2c_t dev, uint8_t address, const void *data, int length)
-{
-    I2C_Type *i2c;
-    int n = 0;
-
-    switch (dev) {
-#if I2C_0_EN
-
-        case I2C_0:
-            i2c = I2C_0_DEV;
-            break;
-#endif
-
-        default:
-            return -1;
-    }
-
-    if (_i2c_start(i2c, address, I2C_FLAG_WRITE)) {
-        _i2c_reset(i2c);
-        return -1;
-    }
-
-    n = _i2c_transmit(i2c, data, length);
-    _i2c_stop(i2c);
-
-    return n;
-}
-
-int i2c_read_reg(i2c_t dev, uint8_t address, uint8_t reg, void *data)
-{
-    return i2c_read_regs(dev, address, reg, data, 1);
-
-}
-
-int i2c_read_regs(i2c_t dev, uint8_t address, uint8_t reg, void *data, int length)
-{
-    I2C_Type *i2c;
-    int n = 0;
-
-    switch (dev) {
-#if I2C_0_EN
-
-        case I2C_0:
-            i2c = I2C_0_DEV;
-            break;
-#endif
-
-        default:
-            return -1;
-    }
-
-    if (_i2c_start(i2c, address, I2C_FLAG_WRITE)) {
-        _i2c_reset(i2c);
-        return -1;
-    }
-
-    /* send reg */
-    n = _i2c_transmit(i2c, &reg, 1);
-
-    if (!n) {
-        _i2c_stop(i2c);
-        return n;
-    }
-
-    if (_i2c_restart(i2c, address, I2C_FLAG_READ)) {
-        _i2c_reset(i2c);
-        return -1;
-    }
-
-    n = _i2c_receive(i2c, (uint8_t *)data, length);
-    if (n < 0) {
-        _i2c_reset(i2c);
-        return -1;
-    }
-
-    _i2c_stop(i2c);
-
-    return n;
-}
-
-int i2c_write_reg(i2c_t dev, uint8_t address, uint8_t reg, uint8_t data)
-{
-    return i2c_write_regs(dev, address, reg, &data, 1);
-}
-
-int i2c_write_regs(i2c_t dev, uint8_t address, uint8_t reg, const void *data, int length)
-{
-    I2C_Type *i2c;
-    int n = 0;
-
-    switch (dev) {
-#if I2C_0_EN
-
-        case I2C_0:
-            i2c = I2C_0_DEV;
-            break;
-#endif
-
-        default:
-            return -1;
-    }
-
-    if (_i2c_start(i2c, address, I2C_FLAG_WRITE)) {
-        _i2c_reset(i2c);
-        return -1;
-    }
-
-    n = _i2c_transmit(i2c, &reg, 1);
-
-    if (!n) {
-        _i2c_stop(i2c);
-        return n;
-    }
-
-    n = _i2c_transmit(i2c, data, length);
-    _i2c_stop(i2c);
-
-    return n;
-}
-
-void i2c_poweron(i2c_t dev)
-{
-    switch (dev) {
-#if I2C_0_EN
-
-        case I2C_0:
-            I2C_0_CLKEN();
-            break;
-#endif
-    }
-}
-
-void i2c_poweroff(i2c_t dev)
-{
-    switch (dev) {
-#if I2C_0_EN
-
-        case I2C_0:
-            I2C_0_CLKDIS();
-            break;
-#endif
-    }
+    return 0;
 }
