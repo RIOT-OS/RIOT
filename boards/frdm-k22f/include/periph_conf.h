@@ -80,11 +80,13 @@ static const clock_config_t clock_config = {
     },                           \
 }
 #define LPTMR_NUMOF             (1U)
-#define LPTMR_CONFIG {           \
-    {                            \
-        .dev = LPTMR0,           \
-        .irqn = LPTMR0_IRQn,     \
-    }                            \
+#define LPTMR_CONFIG {          \
+    {                           \
+        .dev = LPTMR0,          \
+        .irqn = LPTMR0_IRQn,    \
+        .src = 2,               \
+        .base_freq = 32768u,    \
+    },                          \
 }
 #define TIMER_NUMOF             ((PIT_NUMOF) + (LPTMR_NUMOF))
 
