@@ -70,6 +70,10 @@ extern "C" {
 /**
  * @brief   Maximum number of unicast and anycast addresses per interface
  *
+ * @note    If you change this, please make sure that
+ *          @ref GNRC_NETIF_IPV6_GROUPS_NUMOF is also large enough to fit the
+ *          addresses' solicited nodes multicast addresses.
+ *
  * Default: 2 (link-local + corresponding global address)
  */
 #ifndef GNRC_NETIF_IPV6_ADDRS_NUMOF
