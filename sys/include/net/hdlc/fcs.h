@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 José Ignacio Alamos <jialamos@uc.cl>
+ * Copyright (C) 2018 Max van Kessel
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for
@@ -7,16 +8,16 @@
  */
 
 /**
- * @defgroup    net_hdlc_fcs    FCS calculation
- * @ingroup     net_hdlc
+ * @ingroup     net_hdlc    Frame check sequence calculation
  * @brief       FCS calculation routine
  *
  * @{
  *
  * @file
- * @brief       Routine for DCS calculation
+ * @brief       Routine for FCS calculation
  *
  * @author      José Ignacio Alamos <jialamos@uc.cl>
+ * @author      Max van Kessel
  */
 #ifndef NET_HDLC_FCS_H
 #define NET_HDLC_FCS_H
@@ -27,8 +28,9 @@
 extern "C" {
 #endif
 
-
-/* Table for fast calculation of fcs16 */
+/**
+ * @brief  FCS(16-bit CRC_CCITT) table
+ */
 static uint16_t fcstab[256] = {
     0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
     0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
@@ -70,8 +72,8 @@ static uint16_t fcstab[256] = {
  * This function does only one iteration of the Frame Checksum Sequence calculation. It's pretended to be used when data
  * arrives serially.
  *
- * @param fcs16 Accumulation of FCS
- * @param c current byte for FCS calculation.
+ * @param[in] fcs16 Accumulation of FCS
+ * @param[in] c     Current byte for FCS calculation.
  *
  * @return Accumulation of FCS after current byte.
  */
