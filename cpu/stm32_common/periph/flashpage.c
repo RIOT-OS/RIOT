@@ -65,6 +65,12 @@ static void _unlock_flash(void)
 #endif
 }
 
+static void _wait_for_pending_operations(void)
+{
+    DEBUG("[flashpage] waiting for any pending operation to finish\n");
+    while (FLASH->SR & FLASH_SR_BSY) {}
+}
+
 static void _erase_page(void *page_addr)
 {
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
@@ -81,8 +87,8 @@ static void _erase_page(void *page_addr)
     _unlock_flash();
 
     /* make sure no flash operation is ongoing */
-    DEBUG("[flashpage] erase: waiting for any operation to finish\n");
-    while (FLASH->SR & FLASH_SR_BSY) {}
+    _wait_for_pending_operations();
+
     /* set page erase bit and program page address */
     DEBUG("[flashpage] erase: setting the erase bit\n");
     CNTRL_REG |= FLASH_CR_PER;
@@ -97,8 +103,9 @@ static void _erase_page(void *page_addr)
     DEBUG("[flashpage] erase: trigger the page erase\n");
     CNTRL_REG |= FLASH_CR_STRT;
 #endif
-    DEBUG("[flashpage] erase: wait as long as device is busy\n");
-    while (FLASH->SR & FLASH_SR_BSY) {}
+    /* wait as long as device is busy */
+    _wait_for_pending_operations();
+
     /* reset PER bit */
     DEBUG("[flashpage] erase: resetting the page erase bit\n");
     CNTRL_REG &= ~(FLASH_CR_PER);
@@ -151,7 +158,8 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     for (size_t i = 0; i < (len / FLASHPAGE_DIV); i++) {
         DEBUG("[flashpage_raw] writing %c to %p\n", (char)data_addr[i], dst);
         *dst++ = data_addr[i];
-        while (FLASH->SR & FLASH_SR_BSY) {}
+        /* wait as long as device is busy */
+        _wait_for_pending_operations();
     }
 
     /* clear program bit again */
