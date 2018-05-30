@@ -6,7 +6,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-NOVENDOR=":!*/include/vendor/*"
+NOVENDOR=":!*/vendor/*"
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.
