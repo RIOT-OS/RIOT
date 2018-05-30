@@ -831,6 +831,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */pkg/lwip/* \
                          */pkg/tlsf/patch.txt \
                          */sys/include/embUnit/* \
+                         */sys/random/fortuna/* \
                          */sys/random/tinymt32/* \
                          */toolchain/* \
                          */vendor/* \

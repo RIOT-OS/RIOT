@@ -21,6 +21,7 @@
  *  - Mersenne Twister
  *  - Simple Park-Miller PRNG
  *  - Musl C PRNG
+ *  - Fortuna (CS)PRNG
  */
 
 #ifndef RANDOM_H
