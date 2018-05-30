@@ -105,9 +105,9 @@ def _check_day(child):
                        'but no error should occur.')
 
 
-def _wait_prompt(child):
-    child.sendline('')
-    child.expect('>')
+def _wait_prompt(child, *args, **kwargs):
+    import riot
+    riot.expect_working_shell_prompt(child, sendlinestep=0.5)
 
 
 def testfunc(child):
