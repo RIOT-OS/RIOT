@@ -42,6 +42,14 @@ enum {
 };
 
 /**
+ * @brief   Available external interrupt pins on the ATmega328p family
+ *
+ * In order of their interrupt number.
+ */
+#define CPU_ATMEGA_EXT_INTS    { GPIO_PIN(PORT_D, 2), \
+                                 GPIO_PIN(PORT_D, 3) }
+
+/**
  * @name   Defines for the I2C interface
  * @{
  */
