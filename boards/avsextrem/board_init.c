@@ -41,19 +41,21 @@ void init_clks1(void)
     PLLCON &= ~0x0002;
     pllfeed();
 
-    while (PLLSTAT & BIT25);  /* wait until PLL is disconnected before
-                               * disabling - deadlock otherwise */
+    /* wait until PLL is disconnected before disabling - deadlock otherwise */
+    while (PLLSTAT & BIT25) {}
 
     // Disable PLL
     PLLCON &= ~0x0001;
     pllfeed();
 
-    while (PLLSTAT & BIT24); // wait until PLL is disabled
+    // wait until PLL is disabled
+    while (PLLSTAT & BIT24) {}
 
     SCS |= 0x10;    // main OSC between 15MHz and 24MHz (more stable in tests)
     SCS |= 0x20;     // Enable main OSC
 
-    while (!(SCS & 0x40));   // Wait until main OSC is usable
+    // Wait until main OSC is usable
+    while (!(SCS & 0x40)) {}
 
     /* select main OSC, 16MHz, as the PLL clock source */
     CLKSRCSEL = 0x0001;

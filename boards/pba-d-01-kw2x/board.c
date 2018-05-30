@@ -51,7 +51,7 @@ static inline void modem_clock_init(void)
     KW2XDRF_GPIO->PSOR = (1 << KW2XDRF_RST_PIN);
 
     /* wait for modem IRQ_B interrupt request */
-    while (KW2XDRF_GPIO->PDIR & (1 << KW2XDRF_IRQ_PIN));
+    while (KW2XDRF_GPIO->PDIR & (1 << KW2XDRF_IRQ_PIN)) {}
 }
 
 void board_init(void)

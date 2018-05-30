@@ -59,7 +59,9 @@ void cc430_cpu_init(void)
     // changed is n x 32 x 32 x f_MCLK / f_FLL_reference. See UCS chapter in 5xx
     // UG for optimization.
     // 32 x 32 x 8 MHz / 32,768 Hz = 250000 = MCLK cycles for DCO to settle
-    for (i = 0xFF; i > 0; i--); // Time for flag to set
+
+    // Time for flag to set
+    for (i = 0xFF; i > 0; i--) {}
 
     // Loop until XT1 & DCO stabilizes, use do-while to insure that
     // body is executed at least once

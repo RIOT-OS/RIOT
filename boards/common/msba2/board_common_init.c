@@ -45,14 +45,14 @@ init_mam(void)
 void init_clks2(void)
 {
     /* Wait for the PLL to lock to set frequency */
-    while (!(PLLSTAT & BIT26));
+    while (!(PLLSTAT & BIT26)) {}
 
     /* Connect the PLL as the clock source */
     PLLCON = 0x0003;
     pllfeed();
 
     /* Check connect bit status */
-    while (!(PLLSTAT & BIT25));
+    while (!(PLLSTAT & BIT25)) {}
 }
 
 void watchdog_init(void)
