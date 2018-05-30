@@ -53,7 +53,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* enable clocks: serial power domain and UART */
     PRCM->PDCTL0SERIAL = 1;
-    while (!(PRCM->PDSTAT0 & PDSTAT0_SERIAL_ON)) ;
+    while (!(PRCM->PDSTAT0 & PDSTAT0_SERIAL_ON)) {}
     uart_poweron(uart);
 
     /* disable and reset the UART */

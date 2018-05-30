@@ -92,7 +92,7 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 void uart_write(uart_t dev, const uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
-        while (!(_uart(dev)->STATUS & USART_STATUS_TXBL));
+        while (!(_uart(dev)->STATUS & USART_STATUS_TXBL)) {}
         _uart(dev)->TXDATA = data[i];
     }
 }

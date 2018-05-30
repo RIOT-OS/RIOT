@@ -60,7 +60,7 @@ void rtc_init(void)
                             | OSC32KCTRL_OSC32K_ENABLE;
 
     /* Wait XOSC32K Ready */
-    while (OSC32KCTRL->STATUS.bit.XOSC32KRDY==0);
+    while (OSC32KCTRL->STATUS.bit.XOSC32KRDY==0) {}
 
     /* RTC source clock is external oscillator at 1kHz */
     OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_XOSC1K;
@@ -82,7 +82,7 @@ void rtc_init(void)
                            | OSC32KCTRL_OSC32K_ENABLE;
 
     /* Wait OSC32K Ready */
-    while (OSC32KCTRL->STATUS.bit.OSC32KRDY==0);
+    while (OSC32KCTRL->STATUS.bit.OSC32KRDY==0) {}
 
     /* RTC uses internal 32,768KHz Oscillator */
     OSC32KCTRL->RTCCTRL.reg = OSC32KCTRL_RTCCTRL_RTCSEL_OSC1K;
@@ -100,7 +100,7 @@ void rtc_init(void)
     /* Software Reset the RTC */
     RTC->MODE2.CTRLA.bit.SWRST = 1;
     /* Wait end of reset */
-    while (RTC->MODE2.CTRLA.bit.SWRST);
+    while (RTC->MODE2.CTRLA.bit.SWRST) {}
 
     /* RTC config with RTC_MODE2_CTRL_CLKREP = 0 (24h) */
     RTC->MODE2.CTRLA.reg = RTC_MODE2_CTRLA_PRESCALER_DIV1024 |  /* CLK_RTC_CNT = 1KHz / 1024 -> 1Hz */
@@ -120,14 +120,14 @@ int rtc_set_time(struct tm *time)
         return -1;
     }
     else {
-        while (RTC->MODE2.SYNCBUSY.bit.CLOCK);
+        while (RTC->MODE2.SYNCBUSY.bit.CLOCK) {}
         RTC->MODE2.CLOCK.reg = RTC_MODE2_CLOCK_YEAR(time->tm_year - reference_year)
                              | RTC_MODE2_CLOCK_MONTH(time->tm_mon + 1)
                              | RTC_MODE2_CLOCK_DAY(time->tm_mday)
                              | RTC_MODE2_CLOCK_HOUR(time->tm_hour)
                              | RTC_MODE2_CLOCK_MINUTE(time->tm_min)
                              | RTC_MODE2_CLOCK_SECOND(time->tm_sec);
-        while (RTC->MODE2.SYNCBUSY.bit.CLOCK);
+        while (RTC->MODE2.SYNCBUSY.bit.CLOCK) {}
     }
    return 0;
 }
@@ -165,7 +165,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
                                            | RTC_MODE2_ALARM_MINUTE(time->tm_min)
                                            | RTC_MODE2_ALARM_SECOND(time->tm_sec);
         RTC->MODE2.Mode2Alarm[0].MASK.reg = RTC_MODE2_MASK_SEL(6);
-        while (RTC->MODE2.SYNCBUSY.bit.ALARM0);
+        while (RTC->MODE2.SYNCBUSY.bit.ALARM0) {}
     }
 
     /* Setup interrupt */
@@ -211,13 +211,13 @@ void rtc_clear_alarm(void)
 void rtc_poweron(void)
 {
     RTC->MODE2.CTRLA.bit.ENABLE = 1;
-    while (RTC->MODE2.SYNCBUSY.bit.ENABLE);
+    while (RTC->MODE2.SYNCBUSY.bit.ENABLE) {}
 }
 
 void rtc_poweroff(void)
 {
     RTC->MODE2.CTRLA.bit.ENABLE = 0;
-    while (RTC->MODE2.SYNCBUSY.bit.ENABLE);
+    while (RTC->MODE2.SYNCBUSY.bit.ENABLE) {}
 }
 
 void isr_rtc(void)

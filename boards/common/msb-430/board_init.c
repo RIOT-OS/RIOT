@@ -125,7 +125,8 @@ void msp430_init_dco(void)
     do {
         IFG1 &= ~OFIFG;             /* Clear oscillator fault flag */
 
-        for (i = 0xFF; i > 0; i--); /* Time for flag to set */
+        /* Time for flag to set */
+        for (i = 0xFF; i > 0; i--) {}
     }
     while ((IFG1 & OFIFG) != 0);    /* Oscillator fault flag still set? */
 

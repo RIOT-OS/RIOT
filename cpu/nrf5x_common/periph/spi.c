@@ -104,7 +104,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
 
         dev(bus)->EVENTS_READY = 0;
         dev(bus)->TXD = (uint8_t)tmp;
-        while (dev(bus)->EVENTS_READY != 1);
+        while (dev(bus)->EVENTS_READY != 1) {}
         tmp = (uint8_t)dev(bus)->RXD;
 
         if (in_buf) {

@@ -36,7 +36,7 @@ void hwrng_init(void)
     SYS_CTRL_RCGCRFC = 1;
 
     /* Wait for the clock ungating to take effect */
-    while (SYS_CTRL_RCGCRFC != 1);
+    while (SYS_CTRL_RCGCRFC != 1) {}
 
     /* Infinite RX - FRMCTRL0[3:2] = 10. This will mess with radio operation */
     RFCORE_XREG_FRMCTRL0 = 0x00000008;
@@ -49,7 +49,7 @@ void hwrng_init(void)
      * have died out. A convenient way to do this is to wait for the RSSI-valid
      * signal to go high."
      */
-    while (!RFCORE->XREG_RSSISTATbits.RSSI_VALID);
+    while (!RFCORE->XREG_RSSISTATbits.RSSI_VALID) {}
 
     /*
      * Form the seed by concatenating bits from IF_ADC in the RF receive path.

@@ -41,11 +41,11 @@ static void clk_init(void)
     /* enable the oscillator */
     CMU->OSCENCMD = CMU_OSCENCMD_HFXOEN;
     /* wait for external oscillator to be stable */
-    while (!(CMU->STATUS & CMU_STATUS_HFXORDY));
+    while (!(CMU->STATUS & CMU_STATUS_HFXORDY)) {}
     /* switch to the external oscillator */
     CMU->CMD = CMU_CMD_HFCLKSEL_HFXO;
     /* wait until clock source is applied */
-    while (!(CMU->STATUS & CMU_STATUS_HFXOSEL));
+    while (!(CMU->STATUS & CMU_STATUS_HFXOSEL)) {}
 #endif
 
     /* set the core clock divider */

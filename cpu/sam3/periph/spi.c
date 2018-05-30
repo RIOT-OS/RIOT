@@ -115,9 +115,9 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
     else {
         for (size_t i = 0; i < len; i++) {
-            while (!(dev(bus)->SPI_SR & SPI_SR_TDRE));
+            while (!(dev(bus)->SPI_SR & SPI_SR_TDRE)) {}
             dev(bus)->SPI_TDR = out_buf[i];
-            while (!(dev(bus)->SPI_SR & SPI_SR_RDRF));
+            while (!(dev(bus)->SPI_SR & SPI_SR_RDRF)) {}
             in_buf[i] = dev(bus)->SPI_RDR;
         }
     }

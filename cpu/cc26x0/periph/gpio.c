@@ -38,10 +38,10 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
     /* enable GPIO clock */
     PRCM->PDCTL0 |= PDCTL0_PERIPH_ON;
-    while(!(PRCM->PDSTAT0 & PDSTAT0_PERIPH_ON)) ;
+    while(!(PRCM->PDSTAT0 & PDSTAT0_PERIPH_ON)) {}
     PRCM->GPIOCLKGR |= 1;
     PRCM->CLKLOADCTL |= CLKLOADCTL_LOAD;
-    while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) ;
+    while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) {}
 
     /* configure the GPIO mode */
     IOC->CFG[pin] = mode;

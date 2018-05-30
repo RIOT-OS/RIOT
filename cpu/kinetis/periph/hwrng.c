@@ -44,13 +44,13 @@ void hwrng_read(void *buf, unsigned int num)
     KINETIS_RNGA->CR = RNG_CR_INTM_MASK | RNG_CR_HA_MASK | RNG_CR_GO_MASK;
 
     /* self-seeding */
-    while (!(KINETIS_RNGA->SR & RNG_SR_OREG_LVL_MASK));
+    while (!(KINETIS_RNGA->SR & RNG_SR_OREG_LVL_MASK)) {}
 
     KINETIS_RNGA->ER = KINETIS_RNGA->OR ^ (uint32_t)buf;
 
     while (count < num) {
         /* wait for random data to be ready to read */
-        while (!(KINETIS_RNGA->SR & RNG_SR_OREG_LVL_MASK));
+        while (!(KINETIS_RNGA->SR & RNG_SR_OREG_LVL_MASK)) {}
 
         uint32_t tmp = KINETIS_RNGA->OR;
 

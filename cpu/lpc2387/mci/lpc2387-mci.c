@@ -205,7 +205,7 @@ static void ready_reception(unsigned int blks, unsigned int bs)
     MCI_CLEAR = 0x72A;                      /* Clear status flags */
     MCI_MASK0 = 0x72A;                      /* DataBlockEnd StartBitErr DataEnd RxOverrun DataTimeOut DataCrcFail */
 
-    for (n = 0; bs > 1; bs >>= 1, n += 0x10);
+    for (n = 0; bs > 1; bs >>= 1, n += 0x10) {}
 
     MCI_DATA_CTRL  = n | 0xB;               /* Start to receive data blocks */
 }

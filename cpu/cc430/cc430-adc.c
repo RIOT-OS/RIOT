@@ -89,7 +89,7 @@ uint16_t adc12_single_conversion(uint16_t ref, uint16_t sht, uint16_t channel)
     /* Wait until ADC12 has finished */
     xtimer_usleep(150);
 
-    while (!adc12_data_ready);
+    while (!adc12_data_ready) {}
 
     /* Shut down ADC12 */
     ADC12CTL0 &= ~(ADC12ENC | ADC12SC | sht);

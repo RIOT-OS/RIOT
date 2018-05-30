@@ -62,7 +62,7 @@ void cpu_init(void)
                      CKGR_MOR_MOSCXTEN |
                      CKGR_MOR_MOSCRCEN);
     /* wait for crystal to be stable */
-    while (!(PMC->PMC_SR & PMC_SR_MOSCXTS));
+    while (!(PMC->PMC_SR & PMC_SR_MOSCXTS)) {}
 
     /* select crystal to clock the main clock */
     PMC->CKGR_MOR = (CKGR_MOR_KEY(MORKEY) |
@@ -71,7 +71,7 @@ void cpu_init(void)
                      CKGR_MOR_MOSCRCEN |
                      CKGR_MOR_MOSCSEL);
     /* wait for main oscillator selection to be complete */
-    while (!(PMC->PMC_SR & PMC_SR_MOSCSELS));
+    while (!(PMC->PMC_SR & PMC_SR_MOSCSELS)) {}
 
     /* setup PLLA */
     PMC->CKGR_PLLAR = (CKGR_PLLAR_ONE |
@@ -79,16 +79,16 @@ void cpu_init(void)
                        CKGR_PLLAR_MULA(CLOCK_PLL_MUL) |
                        CKGR_PLLAR_DIVA(CLOCK_PLL_DIV));
     /* wait for PLL to lock */
-    while (!(PMC->PMC_SR & PMC_SR_LOCKA));
+    while (!(PMC->PMC_SR & PMC_SR_LOCKA)) {}
 
     /* before switching to PLLA, we need to switch to main clock */
     PMC->PMC_MCKR = PMC_MCKR_CSS_MAIN_CLK;
-    while (!(PMC->PMC_SR & PMC_SR_MCKRDY));
+    while (!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
 
     /* use PLLA as main clock source */
     PMC->PMC_MCKR = PMC_MCKR_CSS_PLLA_CLK;
     /* wait for master clock to be ready */
-    while (!(PMC->PMC_SR & PMC_SR_MCKRDY));
+    while (!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
 
     /* trigger static peripheral initialization */
     periph_init();

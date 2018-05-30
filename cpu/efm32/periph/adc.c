@@ -88,7 +88,7 @@ int adc_sample(adc_t line, adc_res_t res)
     /* start conversion and block until it completes */
     ADC_Start(adc_config[dev].dev, adcStartSingle);
 
-    while (adc_config[dev].dev->STATUS & ADC_STATUS_SINGLEACT);
+    while (adc_config[dev].dev->STATUS & ADC_STATUS_SINGLEACT) {}
 
     int result = ADC_DataSingleGet(adc_config[dev].dev);
 
