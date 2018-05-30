@@ -374,6 +374,10 @@ auto_init_mpu9150();
     extern void auto_init_dht(void);
     auto_init_dht();
 #endif
+#ifdef MODULE_SHT11
+    extern void auto_init_sht11(void);
+    auto_init_sht11();
+#endif
 #ifdef MODULE_TMP006
     extern void auto_init_tmp006(void);
     auto_init_tmp006();
