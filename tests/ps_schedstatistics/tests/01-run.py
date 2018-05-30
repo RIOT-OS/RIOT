@@ -55,8 +55,14 @@ def _check_ps(child):
         child.expect(line)
 
 
+def _wait_shell_ready(child):
+    import riot
+    riot.expect_working_shell_prompt(child, sendlinestep=0.5)
+
+
 def testfunc(child):
     _check_startup(child)
+    _wait_shell_ready(child)
     _check_help(child)
     _check_ps(child)
 
