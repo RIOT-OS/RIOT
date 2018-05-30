@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup    net_hdlc
+ * @defgroup    net_hdlc    High-Level Data Link Control layer
  * @ingroup     net
- * @brief       This is a generic low-level hdlc parser, according to ISO13239
+ * @brief       Layered implementation of hdlc parser, according to ISO13239
  * @{
  *
  * @file
@@ -36,13 +36,6 @@ extern "C" {
  */
 #ifndef HDLC_BUFSIZE
 #define HDLC_BUFSIZE (128)
-#endif
-
-/**
- * @brief Default timeout for retransmission of sequence flag
- */
-#ifndef HDLC_MAX_IDLE_TIME_MS
-#define HDLC_MAX_IDLE_TIME_MS   (100 * US_PER_MS)
 #endif
 
 /**
@@ -86,7 +79,6 @@ typedef struct {
     tsrb_t inbuf;                   /**< RX buffer */
     uint8_t rxmem[HDLC_BUFSIZE];    /**< memory used by RX buffer */
     uint8_t txmem[HDLC_BUFSIZE];    /**< memory used by TX buffer */
-
     uint16_t fcs;                   /**< checksum variable */
     uint8_t esc;                    /**< escaping next character */
     uint8_t state;                  /**< parser state */

@@ -8,8 +8,7 @@
  */
 
 /**
- * @defgroup    net_hdlc_hdr    HDLC header
- * @ingroup     net_hdlc
+ * @ingroup     net_hdlc   HDLC header
  * @brief       HDLC header architecture
  *
  * @{
@@ -29,14 +28,29 @@
 extern "C" {
 #endif
 
+/* HDLC frame type mask */
+#define HDLC_FRAME_TYPE_MASK  (0x03)
+
+/* HDLC type shift */
+#define HDLC_TYPE_SHIFT       (2)
+
+/* HDLC type mask */
+#define HDLC_TYPE_MASK        (0x03)
+
+/* HDLC (recv) sequence number shift */
+#define HDLC_SEQNO_SHIFT      (5)
+
+/* HDLC sequence number mask */
+#define HDLC_SEQNO_MASK       (0x03)
+
 /**
  * @brief HDLC types
  */
 typedef enum {
-    HDLC_TYPE_RECEIVE_READY     = 0,        /**< ready receive type */
-    HDLC_TYPE_RECEIVE_NOT_READY = (1 << 1), /**< receive not ready */
-    HDLC_TYPE_REJECT            = (1 << 0), /**< reject */
-    HDLC_TYPE_SELECTIVE_REJECT  = (3 << 0), /**< selective reject */
+    HDLC_TYPE_RECEIVE_READY     = 0x0, /**< ready receive type */
+    HDLC_TYPE_REJECT            = 0x1, /**< reject */
+    HDLC_TYPE_RECEIVE_NOT_READY = 0x2, /**< receive not ready */
+    HDLC_TYPE_SELECTIVE_REJECT  = 0x3, /**< selective reject */
 } hdlc_type_t;
 
 /**
@@ -45,38 +59,8 @@ typedef enum {
 typedef enum {
     HDLC_FRAME_TYPE_INFORMATION = 0, /**< represents i(nformation) frame */
     HDLC_FRAME_TYPE_SUPERVISORY = 1, /**< represents s(upervisory) frame*/
-    HDLC_FRAME_TYPE_UNNUMBERED = 3,  /**< represents u(numbered) frame */
+    HDLC_FRAME_TYPE_UNNUMBERED  = 3, /**< represents u(numbered) frame */
 } hdlc_frame_type_t;
-
-/**
- * @brief HDLC Supervisory Frames
- */
-typedef struct __attribute__((packed)) {
-    uint8_t id : 2;
-    hdlc_type_t type : 2;
-    uint8_t poll_final : 1;
-    uint8_t sequence_no : 3;
-} hdlc_control_s_frame_t;
-
-/**
- * @brief HDLC Information Frames
- */
-typedef struct __attribute__((packed)) {
-    uint8_t id : 1;
-    uint8_t send_sequence_no : 3;
-    uint8_t poll_final : 1;
-    uint8_t sequence_no : 3;
-} hdlc_control_i_frame_t;
-
-/**
- * @brief HDLC Unnumbered Frames
- */
-typedef struct __attribute__((packed)) {
-    uint8_t id : 2;
-    hdlc_type_t type : 2;
-    uint8_t poll_final : 1;
-    hdlc_type_t type_x : 3;
-} hdlc_control_u_frame_t;
 
 /**
  * @brief Data type to represent an HDLC header.
@@ -96,14 +80,49 @@ typedef struct __attribute__((packed)) {
  *
  */
 typedef struct __attribute__((packed)) {
-    uint8_t address;                /**< Address field oh HDLC header */
-    union{
-        hdlc_control_s_frame_t s;
-        hdlc_control_i_frame_t i;
-        hdlc_control_u_frame_t u;
-        uint8_t frame;              /**< Control field of HDLC header */
-    }control;
+    uint8_t address; /**< Address field oh HDLC header */
+    uint8_t control; /**< Control field of HDLC header */
 } hdlc_hdr_t;
+
+/**
+ * @brief Get type of message
+ * @note Only valid for supervisory and unnumbered frames
+ *
+ * @param[in] hdr Header to get message type from
+ *
+ * @return message type
+ */
+static inline hdlc_type_t hdlc_get_type(hdlc_hdr_t *hdr)
+{
+    return (hdlc_type_t)((hdr->control >> HDLC_TYPE_SHIFT) & HDLC_TYPE_MASK);
+}
+
+/**
+ * @brief Get type of frame
+ *
+ * @param[in] hdr Header to get type from
+ *
+ * @return type of frame
+ */
+static inline hdlc_frame_type_t hdlc_get_frame_type(hdlc_hdr_t *hdr)
+{
+    if (hdr->control & 0x01) {
+        return (hdlc_frame_type_t)hdr->control & HDLC_FRAME_TYPE_MASK;
+    }
+    return HDLC_FRAME_TYPE_INFORMATION;
+}
+
+/**
+ * @brief Get received sequence number
+ *
+ * @param[in] hdr Header to get seqno from
+ *
+ * @return sequence number
+ */
+static inline uint8_t hdlc_get_recv_seqno(hdlc_hdr_t *hdr)
+{
+    return (uint8_t)((hdr->control >> HDLC_SEQNO_SHIFT) & HDLC_SEQNO_MASK);
+}
 
 #ifdef __cplusplus
 }

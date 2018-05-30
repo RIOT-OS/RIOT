@@ -39,8 +39,8 @@ static int _init(netdev_t *netdev)
 {
     hdlc_t *dev = (hdlc_t *)netdev;
 
-    if(netdev->lower != NULL) {
-        netdev->lower->event_callback =  netdev_event_cb_pass;
+    if (netdev->lower != NULL) {
+        netdev->lower->event_callback = netdev_event_cb_pass;
     }
 
     /* initialize buffers */
@@ -53,7 +53,7 @@ static int _tsrb_peek_one(const tsrb_t * rb)
 {
     int res = -1;
 
-    if(!tsrb_empty(rb)) {
+    if (!tsrb_empty(rb)) {
         res = (unsigned char)rb->buf[rb->reads & (rb->size - 1)];
     }
 
@@ -64,7 +64,7 @@ static void _drop_input(hdlc_t *dev)
 {
     int c = tsrb_get_one(&dev->inbuf);
 
-    while((c > 0) && (c != HDLC_FLAG_SEQUENCE)) {
+    while ((c > 0) && (c != HDLC_FLAG_SEQUENCE)) {
         c = tsrb_get_one(&dev->inbuf);
     }
 }
@@ -144,11 +144,11 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     (void)info;
     uint8_t *ptr = buf;
 
-    if(len > 0) {
+    if (len > 0) {
         LOG_DEBUG(MODULE);
     }
 
-    for(; length > 0; length--) {
+    for (; length > 0; length--) {
         int byte;
 
         if ((byte = _tsrb_peek_one(&dev->inbuf)) < 0) {
@@ -159,8 +159,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         LOG_DEBUG("%02x ", byte);
 
         /* start or restart */
-        if(byte == HDLC_FLAG_SEQUENCE) {
-            if(res >= 2) {
+        if (byte == HDLC_FLAG_SEQUENCE) {
+            if (res >= 2) {
                 /* complete, remove checksum */
                 res -= 2;
 
@@ -171,7 +171,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         }
         else {
             /* drop if buf is null */
-            if(buf) {
+            if (buf) {
                 *(ptr++) = (uint8_t)byte;
                 res++;
             }
@@ -181,9 +181,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         (void)tsrb_get_one(&dev->inbuf);
     }
 
-    if(len == 0) {
+    if (len == 0) {
         /* the user was warned not to use a buffer size > `INT_MAX` ;-) */
-       res = (int)tsrb_avail(&dev->inbuf);
+        res = (int)tsrb_avail(&dev->inbuf);
     }
 
     return res;
@@ -195,16 +195,17 @@ static void _isr(netdev_t *netdev)
 
     int bytes_expected = netdev_recv_pass(netdev, NULL, 0, NULL);
 
-    for(; bytes_expected; --bytes_expected) {
+    for (; bytes_expected; --bytes_expected) {
         uint8_t byte;
 
-        if(netdev_recv_pass(netdev, &byte, 1, NULL) > 0) {
-            if(_rx_cb(dev, byte) > 0) {
+        if (netdev_recv_pass(netdev, &byte, 1, NULL) > 0) {
+            if (_rx_cb(dev, byte) > 0) {
 
                 LOG_INFO(MODULE"frame received\n");
 
                 if (netdev->event_callback != NULL) {
-                    netdev->event_callback((netdev_t *)dev, NETDEV_EVENT_RX_COMPLETE);
+                    netdev->event_callback((netdev_t *)dev,
+                            NETDEV_EVENT_RX_COMPLETE);
                 }
             }
         }
@@ -241,10 +242,10 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
     ptr = _add(ptr, HDLC_FLAG_SEQUENCE, true, NULL);
 
-    for(const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         uint8_t * data = iol->iol_base;
 
-        for(unsigned j = 0; j < iol->iol_len; j++, data++) {
+        for (unsigned j = 0; j < iol->iol_len; j++, data++) {
             ptr = _add(ptr, *data, false, &fcs);
 
             LOG_DEBUG("%02x ", *data);
@@ -290,27 +291,27 @@ void hdlc_setup(hdlc_t *dev)
 
 void hdlc_hdr_print(hdlc_hdr_t *hdr)
 {
+    hdlc_frame_type_t f = hdlc_get_frame_type(hdr);
+
     printf("   address: %" PRIu8 "\n", hdr->address);
 
-    if(hdr->control.frame & (1 << 7)) {
+    if ((f == HDLC_FRAME_TYPE_SUPERVISORY) || (f == HDLC_FRAME_TYPE_UNNUMBERED)) {
+        hdlc_type_t t = hdlc_get_type(hdr);
         /* s or u frame */
-        if(hdr->control.s.id == (1 << 0)) {
+        if (f == HDLC_FRAME_TYPE_SUPERVISORY) {
             printf("   control frame: supervisory\n");
-            printf("   control recv seq: %" PRIu8 "\n", hdr->control.s.sequence_no);
-            printf("   control type: %" PRIu8 "\n", hdr->control.s.type);
+            printf("   control recv seq: %" PRIu8 "\n", hdlc_get_recv_seqno(hdr));
         }
         else {
             printf("   control frame: unnumbered\n");
-            printf("   control type: %" PRIu8 "\n", hdr->control.u.type);
-            printf("   control type: %" PRIu8 "\n", hdr->control.u.type_x);
         }
+        printf("   control type: %" PRIu8 "\n", t);
     }
     else {
         /* information frame */
         printf("   control frame: information\n");
-        printf("   control recv seq: %" PRIu8 "\n", hdr->control.i.sequence_no);
-        printf("   control send seq: %" PRIu8 "\n", hdr->control.i.send_sequence_no);
+        printf("   control recv seq: %" PRIu8 "\n", hdlc_get_recv_seqno(hdr));
     }
 
-    printf("   control : %" PRIu8 "\n", hdr->control.frame);
+    printf("   control : %" PRIu8 "\n", hdr->control);
 }
