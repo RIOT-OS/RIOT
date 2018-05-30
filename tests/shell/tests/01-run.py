@@ -46,9 +46,17 @@ def check_cmd(child, cmd, expected):
         child.expect_exact(line)
 
 
+def _wait_shell_ready(child, *args, **kwargs):
+    import riot
+    riot.expect_working_shell_prompt(child, sendlinestep=0.5, *args, **kwargs)
+
+
 def testfunc(child):
     # check startup message
     child.expect('test_shell.')
+
+    # Wait until shell is ready to get commands
+    _wait_shell_ready(child)
 
     # loop other defined commands and expected output
     for cmd, expected in CMDS.items():
