@@ -26,7 +26,7 @@
 #include "xtimer.h"
 #endif
 
-#ifdef MODULE_TLSF
+#ifdef MODULE_TLSF_MALLOC
 #include "tlsf.h"
 #include "tlsf-malloc.h"
 #endif
@@ -145,7 +145,7 @@ void ps(void)
 #ifdef DEVELHELP
     printf("\t%5s %-21s|%13s%6s %6i (%5i)\n", "|", "SUM", "|", "|",
            overall_stacksz, overall_used);
-#   ifdef MODULE_TLSF
+#   ifdef MODULE_TLSF_MALLOC
     puts("\nHeap usage:");
     tlsf_walk_pool(tlsf_get_pool(_tlsf_get_global_control()), NULL, NULL);
 #   endif
