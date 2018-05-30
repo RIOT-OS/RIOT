@@ -134,6 +134,13 @@ else
 endif
 
 
+# Display value of IOTLAB_NODE, useful to get the value calculated when using
+# IOTLAB_NODE=auto or auto-ssh
+.PHONY: info-iotlab-node
+info-iotlab-node:
+	@echo $(IOTLAB_NODE)
+
+
 # Configure FLASHER, RESET, TERMPROG depending on BOARD and if on frontend
 
 # Command to check if 'stdin' is 0. Cannot use 'cmp - <(echo 0)' without bash shell
