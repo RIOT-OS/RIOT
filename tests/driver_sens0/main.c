@@ -30,7 +30,7 @@
 /**
  * @brief   Read sensors every second
  */
-#define INTERVAL            (1LU * US_PER_SEC)
+#define INTERVAL            (1000LU * US_PER_SEC)
 
 
 /* The sensor configuration below was written for a FRDM-K64F board with a
