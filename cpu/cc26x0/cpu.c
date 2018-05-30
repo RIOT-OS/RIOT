@@ -51,7 +51,8 @@ void cpu_init(void)
 static void cpu_clock_init(void)
 {
     AON_WUC->AUXCTL |= AUXCTL_AUX_FORCE_ON; /* power on AUX_PD */
-    while(!(AON_WUC->PWRSTAT & PWRSTAT_AUX_PD_ON)) {} /* wait for AUX_PD to be powered on */
+    /* wait for AUX_PD to be powered on */
+    while(!(AON_WUC->PWRSTAT & PWRSTAT_AUX_PD_ON)) {}
     AUX_WUC->MODCLKEN0 |= MODCLKEN0_AUX_DDI0_OSC_EN; /* turn on oscillator interface clock */
 
     DDI_0_OSC->CTL0 |= HF_CLOCK_SOURCE | LF_CLOCK_SOURCE; /* configure HF and LF clocks */

@@ -117,7 +117,8 @@ int kinetis_adc_calibrate(ADC_Type *dev)
 
     dev->SC3 |= ADC_SC3_CAL_MASK;
 
-    while (dev->SC3 & ADC_SC3_CAL_MASK) {} /* wait for calibration to finish */
+    /* wait for calibration to finish */
+    while (dev->SC3 & ADC_SC3_CAL_MASK) {}
 
     while (!(dev->SC1[0] & ADC_SC1_COCO_MASK)) {}
 

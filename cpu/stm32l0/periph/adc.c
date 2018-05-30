@@ -56,13 +56,15 @@ static void _enable_adc(void)
 {
     if ((ADC1->CR & ADC_CR_ADEN) != 0) {
         ADC1->CR |= ADC_CR_ADDIS;
-        while(ADC1->CR & ADC_CR_ADEN) {} /* Wait for ADC disabled */
+        /* Wait for ADC disabled */
+        while(ADC1->CR & ADC_CR_ADEN) {}
     }
 
     if ((ADC1->CR & ADC_CR_ADEN) == 0) {
         /* Then, start a calibration */
         ADC1->CR |= ADC_CR_ADCAL;
-        while(ADC1->CR & ADC_CR_ADCAL) {} /* Wait for the end of calibration */
+        /* Wait for the end of calibration */
+        while(ADC1->CR & ADC_CR_ADCAL) {}
     }
 
     /* Clear flag */
@@ -80,7 +82,8 @@ static void _disable_adc(void)
     /* Disable ADC */
     if ((ADC1->CR & ADC_CR_ADEN) != 0) {
         ADC1->CR |= ADC_CR_ADDIS;
-        while(ADC1->CR & ADC_CR_ADEN) {} /* Wait for ADC disabled */
+        /* Wait for ADC disabled */
+        while(ADC1->CR & ADC_CR_ADEN) {}
         /* Disable Voltage regulator */
         ADC1->CR = 0;
         ADC1->ISR = 0;

@@ -843,7 +843,8 @@ diskio_result_t mci_write(const unsigned char *buff, unsigned long sector, unsig
         buff += 512;             /* Next user buffer address */
     }
 
-    while (!(XferStat & 0xC)) {} /* Wait for all blocks sent (block underrun) */
+    /* Wait for all blocks sent (block underrun) */
+    while (!(XferStat & 0xC)) {}
 
     if (XferStat & 0x8) {
         count = 1;    /* Abort if any MCI error has occured */

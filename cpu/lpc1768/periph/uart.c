@@ -158,7 +158,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     }
 
     for (size_t i = 0; i < len; i++) {
-        while (!(dev->LSR & (1 << 5))) {}     /* wait for THRE bit to be set */
+        /* wait for THRE bit to be set */
+        while (!(dev->LSR & (1 << 5))) {}
         dev->THR = data[i];
     }
 }

@@ -155,7 +155,8 @@ void rtt_poweron(void)
     /* RTC clock source configuration */
     PWR->CR |= PWR_CR_DBP;                   /* Allow access to BKP Domain */
     RCC->BDCR |= RCC_BDCR_LSEON;             /* Enable LSE OSC */
-    while(!(RCC->BDCR & RCC_BDCR_LSERDY)) {} /* Wait till LSE is ready */
+    /* Wait till LSE is ready */
+    while(!(RCC->BDCR & RCC_BDCR_LSERDY)) {}
     RCC->BDCR |= RCC_BDCR_RTCSEL_LSE;        /* Select the RTC Clock Source */
     RCC->BDCR |= RCC_BDCR_RTCEN;             /* enable RTC */
 }
