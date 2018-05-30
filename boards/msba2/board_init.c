@@ -55,7 +55,8 @@ void init_clks1(void)
 
     SCS |= 0x20;                        /* Enable main OSC */
 
-    while (!(SCS & 0x40)) {}            /* Wait until main OSC is usable */
+    /* Wait until main OSC is usable */
+    while (!(SCS & 0x40)) {}
 
     /* select main OSC, 16MHz, as the PLL clock source */
     CLKSRCSEL = 0x0001;

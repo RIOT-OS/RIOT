@@ -149,7 +149,8 @@ void msp430_init_dco(void)
     WDTCTL = WDTPW + WDTHOLD;             /* Stop WDT */
     BCSCTL1 |= DIVA1 + DIVA0;             /* ACLK = LFXT1CLK/8 */
 
-    for (i = 0xffff; i > 0; i--) {}       /* Delay for XTAL to settle */
+    /* Delay for XTAL to settle */
+    for (i = 0xffff; i > 0; i--) {}
 
     CCTL2 = CCIS0 + CM0 + CAP;            /* Define CCR2, CAP, ACLK */
     TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continous mode */
@@ -158,7 +159,8 @@ void msp430_init_dco(void)
     while (1) {
         unsigned int compare;
 
-        while ((CCTL2 & CCIFG) != CCIFG) {} /* Wait until capture occured! */
+        /* Wait until capture occured! */
+        while ((CCTL2 & CCIFG) != CCIFG) {}
 
         CCTL2 &= ~CCIFG;                    /* Capture occured, clear flag */
         compare = CCR2;                     /* Get current captured SMCLK */
