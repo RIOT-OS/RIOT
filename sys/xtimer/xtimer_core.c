@@ -62,8 +62,8 @@ static inline void xtimer_spin_until(uint32_t target) {
 #if XTIMER_MASK
     target = _xtimer_lltimer_mask(target);
 #endif
-    while (_xtimer_lltimer_now() > target);
-    while (_xtimer_lltimer_now() < target);
+    while (_xtimer_lltimer_now() > target) {}
+    while (_xtimer_lltimer_now() < target) {}
 }
 
 void xtimer_init(void)
