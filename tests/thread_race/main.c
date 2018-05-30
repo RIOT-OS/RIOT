@@ -60,7 +60,7 @@ static void _spin(void)
     /* Volatile so it is not messed with by optimizations */
     volatile uint8_t i;
 
-    for (i = 0; i < 255; i++) ;
+    for (i = 0; i < 255; i++) {}
 }
 
 int main(void)

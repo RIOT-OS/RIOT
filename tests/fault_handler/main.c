@@ -48,6 +48,6 @@ int main(void)
     puts(PRINT_MACRO(INVALID_INSTRUCTION));
     INVALID_INSTRUCTION;
     puts("Failed to crash the program, hanging...");
-    while(1);
+    while (1) {}
     return 0;
 }

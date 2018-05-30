@@ -241,7 +241,7 @@ int main(void)
 
     puts("All tests passed!");
 
-    while(1);
+    while (1) {}
 
     return 0;
 }
