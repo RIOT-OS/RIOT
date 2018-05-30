@@ -279,6 +279,13 @@ ifneq (,$(filter pcd8544,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter pppos,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  USEMODULE += tsrb
+  USEMODULE += hdlc
+  USEMODULE += netdev_ppp
+endif
+
 ifneq (,$(filter rgbled,$(USEMODULE)))
   USEMODULE += color
 endif
