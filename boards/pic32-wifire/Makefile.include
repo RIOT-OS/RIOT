@@ -7,4 +7,13 @@ PORT_LINUX ?= /dev/ttyUSB0
 BAUD ?= 9600
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-FLASHFILE ?= $(HEXFILE)
+# pic32prog
+#
+# For PICkit3:
+#
+# * Connect the chipKIT-Wi-Fire to USB
+# * Connect the PICkit3 to ICSP holes
+# * https://docs.creatordev.io/wifire/guides/wifire-programming/
+# * The triangle `▶` goes into the port number 1 (a hole with a square around it)
+#   opposite side of the JP1 ICSP text.
+include $(RIOTMAKE)/tools/pic32prog.inc.mk
