@@ -291,6 +291,7 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                     && _endpoints_equal(remote, resource_memo->observer)) {
                 /* observer re-registering with new token */
                 memo = resource_memo;
+                observer = resource_memo->observer;
             }
             else if ((empty_slot >= 0) && (resource_memo == NULL)) {
                 int obs_slot = _find_observer(&observer, remote);
