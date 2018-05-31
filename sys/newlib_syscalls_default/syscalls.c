@@ -49,12 +49,6 @@
 
 #include <sys/times.h>
 
-#ifdef MODULE_XTIMER
-#include <sys/time.h>
-#include "div.h"
-#include "xtimer.h"
-#endif
-
 /**
  * @brief manage the heap
  */
@@ -517,23 +511,3 @@ int _kill(pid_t pid, int sig)
     errno = ESRCH;                         /* not implemented yet */
     return -1;
 }
-
-#ifdef MODULE_XTIMER
-int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restrict tzp)
-{
-    (void) r;
-    (void) tzp;
-    uint64_t now = xtimer_now_usec64();
-    tp->tv_sec = div_u64_by_1000000(now);
-    tp->tv_usec = now - (tp->tv_sec * US_PER_SEC);
-    return 0;
-}
-#else
-int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restrict tzp)
-{
-    (void) tp;
-    (void) tzp;
-    r->_errno = ENOSYS;
-    return -1;
-}
-#endif

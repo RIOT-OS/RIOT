@@ -1,3 +1,7 @@
 ifneq (,$(filter newlib_syscalls_riot_clock,$(USEMODULE)))
   UNDEF += $(BINDIR)/newlib_syscalls_riot/clock.o
 endif
+
+ifneq (,$(filter newlib_syscalls_riot_time,$(USEMODULE)))
+  UNDEF += $(BINDIR)/newlib_syscalls_riot/time.o
+endif

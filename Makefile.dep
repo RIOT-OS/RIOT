@@ -381,6 +381,11 @@ ifneq (,$(filter newlib,$(USEMODULE)))
       USEMODULE += newlib_syscalls_riot_clock
     endif
   endif
+  ifeq (,$(filter newlib_stubs_time,$(USEMODULE)))
+    ifneq (,$(filter periph_rtc,$(USEMODULE)))
+      USEMODULE += newlib_syscalls_riot_time
+    endif
+  endif
   ifeq (,$(filter stdio_rtt,$(USEMODULE)))
     USEMODULE += stdio_uart
   endif

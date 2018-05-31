@@ -2,3 +2,6 @@ ifneq (,$(filter newlib_stubs_clock,$(USEMODULE)))
   UNDEF += $(BINDIR)/newlib_stubs/clock.o
 endif
 
+ifneq (,$(filter newlib_stubs_time,$(USEMODULE)))
+  UNDEF += $(BINDIR)/newlib_stubs/time.o
+endif

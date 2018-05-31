@@ -24,4 +24,5 @@
  * Submodules:
  *
  * - sys_newlib_syscalls_riot_clock
+ * - sys_newlib_syscalls_riot_time
  */
