@@ -16,6 +16,7 @@
  * @file
  * @brief       Low-level I2C driver implementation
  *
+ * This driver supports the STM32 F0, F3, F7, L0 and L4 families.
  * @note This implementation only implements the 7-bit addressing polling mode
  * (for now interrupt mode is not available)
  *
@@ -45,11 +46,10 @@
 
 #define TICK_TIMEOUT    (0xFFFF)
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L4)
-
 #define I2C_IRQ_PRIO            (1)
+#define I2C_FLAG_READ           (I2C_READ)
+#define I2C_FLAG_WRITE          (0)
+
 #define CLEAR_FLAG              (I2C_ICR_NACKCF | I2C_ICR_ARLOCF | I2C_ICR_BERRCF)
 #define ERROR_FLAG              (I2C_ISR_NACKF | I2C_ISR_ARLO | I2C_ISR_BERR)
 
@@ -164,7 +164,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data,
     if (!(flags & I2C_NOSTART)) {
         DEBUG("[i2c] read_bytes: start transmission\n");
         /* start reception and send slave address */
-        _start(i2c, address, length, I2C_READ, flags);
+        _start(i2c, address, length, I2C_FLAG_READ, flags);
     }
 
     DEBUG("[i2c] read_bytes: read the data\n");
@@ -235,7 +235,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
     if (!(flags & I2C_NOSTART)) {
         DEBUG("[i2c] write_bytes: start transmission\n");
         /* start transmission and send slave address */
-        _start(i2c, address, length, 0, flags);
+        _start(i2c, address, length, I2C_FLAG_WRITE, flags);
     }
 
     DEBUG("[i2c] write_bytes: write the data\n");
@@ -271,7 +271,7 @@ int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg, const void *data,
 
     /* start transmission and send slave address */
     /* increase length because our data is register+data */
-    _start(i2c, address, length + 1, 0, flags);
+    _start(i2c, address, length + 1, I2C_FLAG_WRITE, flags);
 
     /* send register number */
     DEBUG("[i2c] write_regs: ACK received, write reg into DR\n");
@@ -445,5 +445,3 @@ void I2C_1_ISR(void)
     irq_handler(I2C_DEV(1));
 }
 #endif /* I2C_1_ISR */
-
-#endif /* CPU_FAM_STM32L0 || CPU_FAM_STM32F3 */
