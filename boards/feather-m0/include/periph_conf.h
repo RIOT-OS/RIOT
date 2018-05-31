@@ -208,23 +208,18 @@ static const spi_conf_t spi_config[] = {
  * @name    I2C configuration
  * @{
  */
-#define I2C_NUMOF           (1U)
-#define I2C_0_EN            1
-#define I2C_1_EN            0
-#define I2C_2_EN            0
-#define I2C_3_EN            0
-#define I2C_IRQ_PRIO        1
-
-#define I2C_0_DEV           SERCOM3->I2CM
-#define I2C_0_IRQ           SERCOM3_IRQn
-#define I2C_0_ISR           isr_sercom3
-/* I2C 0 GCLK */
-#define I2C_0_GCLK_ID       SERCOM3_GCLK_ID_CORE
-#define I2C_0_GCLK_ID_SLOW  SERCOM3_GCLK_ID_SLOW
-/* I2C 0 pin configuration */
-#define I2C_0_SDA           GPIO_PIN(PA, 22) /* SDA pin */
-#define I2C_0_SCL           GPIO_PIN(PA, 23) /* SCL pin */
-#define I2C_0_MUX           GPIO_MUX_C
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev      = &(SERCOM3->I2CM),
+        .speed    = I2C_SPEED_NORMAL,
+        .sda_pin  = GPIO_PIN(PA, 22),
+        .scl_pin  = GPIO_PIN(PA, 23),
+        .mux      = GPIO_MUX_C,
+        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0,
+        .flags    = I2C_FLAG_NONE
+     }
+};
+#define I2C_NUMOF          (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**
