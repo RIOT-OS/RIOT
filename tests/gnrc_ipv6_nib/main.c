@@ -449,8 +449,67 @@ static void test_handle_pkt__nbr_sol__invalid_dst(void)
     TEST_ASSERT_EQUAL_INT(0, msg_avail());
 }
 
+static void test_pkt_is_nbr_adv(gnrc_pktsnip_t *pkt, const ipv6_addr_t *dst,
+                                const ipv6_addr_t *tgt,
+                                const uint8_t *tgt_l2addr,
+                                size_t tgt_l2addr_len)
+{
+    gnrc_pktsnip_t *options;
+    gnrc_netif_hdr_t *netif_hdr;
+    ipv6_hdr_t *ipv6_hdr;
+    ndp_nbr_adv_t *nbr_adv;
+
+    /* first snip is a netif header to _mock_netif */
+    TEST_ASSERT_NOT_NULL(pkt);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_NETIF, pkt->type);
+    TEST_ASSERT(sizeof(gnrc_netif_hdr_t) <= pkt->size);
+    netif_hdr = pkt->data;
+    TEST_ASSERT_EQUAL_INT(_mock_netif->pid, netif_hdr->if_pid);
+    /* second snip is an IPv6 header to dst */
+    TEST_ASSERT_NOT_NULL(pkt->next);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_IPV6, pkt->next->type);
+    TEST_ASSERT_EQUAL_INT(sizeof(ipv6_hdr_t), pkt->next->size);
+    ipv6_hdr = pkt->next->data;
+    if ((tgt_l2addr != NULL) && (tgt_l2addr_len > 0)) {
+        TEST_ASSERT(!ipv6_addr_is_multicast(&ipv6_hdr->dst));
+    }
+    TEST_ASSERT_MESSAGE(ipv6_addr_equal(dst, &ipv6_hdr->dst),
+                        "dst != ipv6_hdr->dst");
+    TEST_ASSERT_EQUAL_INT(255, ipv6_hdr->hl);
+    /* third snip is a valid solicited neighbor advertisement to tgt */
+    TEST_ASSERT_NOT_NULL(pkt->next->next);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_ICMPV6, pkt->next->next->type);
+    TEST_ASSERT_EQUAL_INT(sizeof(ndp_nbr_adv_t), pkt->next->next->size);
+    nbr_adv = pkt->next->next->data;
+    TEST_ASSERT_EQUAL_INT(ICMPV6_NBR_ADV, nbr_adv->type);
+    TEST_ASSERT_EQUAL_INT(0, nbr_adv->code);
+    TEST_ASSERT(!ipv6_addr_is_multicast(&nbr_adv->tgt));
+    TEST_ASSERT_MESSAGE(ipv6_addr_equal(tgt, &nbr_adv->tgt),
+                        "tgt != nbr_adv->tgt");
+    options = pkt->next->next->next;
+    if ((tgt_l2addr != NULL) && (tgt_l2addr_len > 0)) {
+        ndp_opt_t *tl2ao;
+
+        TEST_ASSERT(nbr_adv->flags & NDP_NBR_ADV_FLAGS_S);
+
+        /* fourth snip is a TL2AO for tgt_l2addr */
+        TEST_ASSERT_NOT_NULL(options);
+        TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_UNDEF, options->type);
+        TEST_ASSERT_EQUAL_INT(ceil8(sizeof(ndp_opt_t) + tgt_l2addr_len),
+                              options->size);
+        tl2ao = options->data;
+        TEST_ASSERT_EQUAL_INT(NDP_OPT_TL2A, tl2ao->type);
+        TEST_ASSERT_EQUAL_INT(1, tl2ao->len);
+        TEST_ASSERT_MESSAGE(memcmp(tl2ao + 1, tgt_l2addr, tgt_l2addr_len) == 0,
+                            "tl2ao.l2addr != tgt_l2addr");
+    }
+    /* no further options */
+    TEST_ASSERT_NULL(options->next);
+}
+
 static void test_handle_pkt__nbr_sol__invalid_sl2ao(void)
 {
+    msg_t msg;
     gnrc_ipv6_nib_nc_t nce;
     void *state = NULL;
     size_t icmpv6_len = _set_nbr_sol(&ipv6_addr_unspecified, &_loc_sol_nodes,
@@ -461,6 +520,15 @@ static void test_handle_pkt__nbr_sol__invalid_sl2ao(void)
     TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_nc_iter(0, &state, &nce),
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
+
+    /* check if SLAAC generated neighbor advertisement */
+    TEST_ASSERT_EQUAL_INT(1, msg_avail());
+    msg_receive(&msg);
+    TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
+    test_pkt_is_nbr_adv(msg.content.ptr, &ipv6_addr_all_nodes_link_local,
+                        &_loc_ll, NULL, 0);
+    gnrc_pktbuf_release(msg.content.ptr);
+
     TEST_ASSERT_EQUAL_INT(0, msg_avail());
 }
 
@@ -477,56 +545,6 @@ static void test_handle_pkt__nbr_sol__tgt_not_assigned(void)
                         "There is an unexpected neighbor cache entry");
     /* TODO: check other views as well */
     TEST_ASSERT_EQUAL_INT(0, msg_avail());
-}
-
-static void test_pkt_is_nbr_adv(gnrc_pktsnip_t *pkt, const ipv6_addr_t *dst,
-                                const ipv6_addr_t *tgt,
-                                const uint8_t *tgt_l2addr,
-                                size_t tgt_l2addr_len)
-{
-    gnrc_netif_hdr_t *netif_hdr;
-    ipv6_hdr_t *ipv6_hdr;
-    ndp_nbr_adv_t *nbr_adv;
-    ndp_opt_t *tl2ao;
-
-    /* first snip is a netif header to _mock_netif */
-    TEST_ASSERT_NOT_NULL(pkt);
-    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_NETIF, pkt->type);
-    TEST_ASSERT(sizeof(gnrc_netif_hdr_t) <= pkt->size);
-    netif_hdr = pkt->data;
-    TEST_ASSERT_EQUAL_INT(_mock_netif->pid, netif_hdr->if_pid);
-    /* second snip is an IPv6 header to dst */
-    TEST_ASSERT_NOT_NULL(pkt->next);
-    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_IPV6, pkt->next->type);
-    TEST_ASSERT_EQUAL_INT(sizeof(ipv6_hdr_t), pkt->next->size);
-    ipv6_hdr = pkt->next->data;
-    TEST_ASSERT(!ipv6_addr_is_multicast(&ipv6_hdr->dst));
-    TEST_ASSERT_MESSAGE(ipv6_addr_equal(dst, &ipv6_hdr->dst),
-                        "dst != ipv6_hdr->dst");
-    TEST_ASSERT_EQUAL_INT(255, ipv6_hdr->hl);
-    /* third snip is a valid solicited neighbor advertisement to tgt */
-    TEST_ASSERT_NOT_NULL(pkt->next->next);
-    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_ICMPV6, pkt->next->next->type);
-    TEST_ASSERT_EQUAL_INT(sizeof(ndp_nbr_adv_t), pkt->next->next->size);
-    nbr_adv = pkt->next->next->data;
-    TEST_ASSERT_EQUAL_INT(ICMPV6_NBR_ADV, nbr_adv->type);
-    TEST_ASSERT_EQUAL_INT(0, nbr_adv->code);
-    TEST_ASSERT(!ipv6_addr_is_multicast(&nbr_adv->tgt));
-    TEST_ASSERT_MESSAGE(ipv6_addr_equal(tgt, &nbr_adv->tgt),
-                        "tgt != nbr_adv->tgt");
-    TEST_ASSERT(nbr_adv->flags & NDP_NBR_ADV_FLAGS_S);
-    /* fourth snip is a TL2AO for tgt_l2addr */
-    TEST_ASSERT_NOT_NULL(pkt->next->next->next);
-    TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_UNDEF, pkt->next->next->next->type);
-    TEST_ASSERT_EQUAL_INT(ceil8(sizeof(ndp_opt_t) + tgt_l2addr_len),
-                          pkt->next->next->next->size);
-    tl2ao = pkt->next->next->next->data;
-    TEST_ASSERT_EQUAL_INT(NDP_OPT_TL2A, tl2ao->type);
-    TEST_ASSERT_EQUAL_INT(1, tl2ao->len);
-    TEST_ASSERT_MESSAGE(memcmp(tl2ao + 1, tgt_l2addr, tgt_l2addr_len) == 0,
-                        "tl2ao.l2addr != tgt_l2addr");
-    /* no further options */
-    TEST_ASSERT_NULL(pkt->next->next->next->next);
 }
 
 static void test_handle_pkt__nbr_sol__ll_src(unsigned exp_nud_state,
@@ -1096,9 +1114,50 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
     state = NULL;
     if (pio) {
         if (pio_flags & NDP_OPT_PI_FLAGS_A) {
+            msg_t msg;
+            gnrc_pktsnip_t *pkt;
+            gnrc_netif_hdr_t *netif_hdr;
+            ipv6_hdr_t *ipv6_hdr;
+            ndp_nbr_adv_t *nbr_sol;
+
             TEST_ASSERT_MESSAGE(gnrc_netif_ipv6_addr_idx(_mock_netif,
                                                          &_loc_gb) >= 0,
                                 "Address was not configured by PIO");
+
+            /* Check if SLAAC generated a neighbor solicitation */
+            TEST_ASSERT_EQUAL_INT(1, msg_avail());
+            msg_receive(&msg);
+            TEST_ASSERT_EQUAL_INT(GNRC_NETAPI_MSG_TYPE_SND, msg.type);
+            pkt = msg.content.ptr;
+            /* first snip is a netif header to _mock_netif */
+            TEST_ASSERT_NOT_NULL(pkt);
+            TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_NETIF, pkt->type);
+            TEST_ASSERT(sizeof(gnrc_netif_hdr_t) <= pkt->size);
+            netif_hdr = pkt->data;
+            TEST_ASSERT_EQUAL_INT(_mock_netif->pid, netif_hdr->if_pid);
+            /* second snip is an IPv6 header to solicited nodes of _loc_gb */
+            TEST_ASSERT_NOT_NULL(pkt->next);
+            TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_IPV6, pkt->next->type);
+            TEST_ASSERT_EQUAL_INT(sizeof(ipv6_hdr_t), pkt->next->size);
+            ipv6_hdr = pkt->next->data;
+            TEST_ASSERT_MESSAGE(ipv6_addr_equal(&ipv6_hdr->dst,
+                                                &_loc_sol_nodes),
+                                "ipv6_hdr->dst != _loc_sol_nodes");
+            TEST_ASSERT_EQUAL_INT(255, ipv6_hdr->hl);
+            /* third snip is a valid solicited neighbor solicitation to
+             * _loc_gb */
+            TEST_ASSERT_NOT_NULL(pkt->next->next);
+            TEST_ASSERT_EQUAL_INT(GNRC_NETTYPE_ICMPV6, pkt->next->next->type);
+            TEST_ASSERT_EQUAL_INT(sizeof(ndp_nbr_sol_t), pkt->next->next->size);
+            nbr_sol = pkt->next->next->data;
+            TEST_ASSERT_EQUAL_INT(ICMPV6_NBR_SOL, nbr_sol->type);
+            TEST_ASSERT_EQUAL_INT(0, nbr_sol->code);
+            TEST_ASSERT(!ipv6_addr_is_multicast(&nbr_sol->tgt));
+            TEST_ASSERT_MESSAGE(ipv6_addr_equal(&_loc_gb, &nbr_sol->tgt),
+                                "_loc_gb != nbr_sol->tgt");
+            /* no further options */
+            TEST_ASSERT_NULL(pkt->next->next->next);
+            gnrc_pktbuf_release(pkt);
         }
         else {
             TEST_ASSERT_MESSAGE(gnrc_netif_ipv6_addr_idx(_mock_netif,
