@@ -382,19 +382,23 @@ typedef struct {
 #endif
 } spi_conf_t;
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L4)
-
 /**
  * @brief   Default mapping of I2C bus speed values
  * @{
  */
 #define HAVE_I2C_SPEED_T
 typedef enum {
-    I2C_SPEED_NORMAL,       /**< normal mode:       ~100kbit/s */
-    I2C_SPEED_FAST,         /**< fast mode:         ~400kbit/s */
-    I2C_SPEED_FAST_PLUS,    /**< fast plus mode:    ~1Mbit/s */
+#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1)
+    I2C_SPEED_LOW,          /**< low speed mode: ~10kit/s */
+#endif
+    I2C_SPEED_NORMAL,       /**< normal mode:  ~100kbit/s */
+    I2C_SPEED_FAST,         /**< fast mode:    ~400kbit/s */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L4)
+    I2C_SPEED_FAST_PLUS,    /**< fast plus mode: ~1Mbit/s */
+#endif
 } i2c_speed_t;
 /** @} */
 
@@ -413,9 +417,16 @@ typedef struct {
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
     uint32_t rcc_sw_mask;   /**< bit to switch I2C clock */
 #endif
+#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1)
+    uint32_t clk;           /**< bus frequency as defined in board config */
+#endif
     uint8_t irqn;           /**< I2C event interrupt number */
 } i2c_conf_t;
 
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L4)
 /**
  * @brief   Structure for I2C timing register settings
  *
