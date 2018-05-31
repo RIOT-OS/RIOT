@@ -105,12 +105,12 @@ int i2c_init(i2c_t dev)
     /* Check if module is enabled. */
     if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_ENABLE) {
         DEBUG("STATUS_ERR_DENIED\n");
-        return -3;
+        return I2C_ERR;
     }
     /* Check if reset is in progress. */
     if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_SWRST) {
         DEBUG("STATUS_BUSY\n");
-        return -3;
+        return I2C_ERR;
     }
 
     /************ SERCOM PAD0 - SDA and SERCOM PAD1 - SCL *************/
@@ -142,7 +142,7 @@ int i2c_init(i2c_t dev)
             break;
         default:
             DEBUG("BAD BAUDRATE\n");
-            return -2;
+            return I2C_ERR;
     }
     /* Get the baudrate */
     tmp_baud = (int32_t)(((CLOCK_CORECLOCK +
@@ -164,45 +164,53 @@ int i2c_init(i2c_t dev)
             bus(dev)->STATUS.reg = BUSSTATE_IDLE;
         }
     }
-    return 0;
+    return I2C_ACK;
 }
 
 int i2c_acquire(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
     mutex_lock(&locks[dev]);
-    return 0;
+    return I2C_ACK;
 }
 
 int i2c_release(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
     mutex_unlock(&locks[dev]);
-    return 0;
+    return I2C_ACK;
 }
 
 int i2c_read_bytes(i2c_t dev, uint16_t addr,
                    void *data, size_t len, uint8_t flags)
 {
     assert(dev < I2C_NUMOF);
+    if (len < 1) {
+        DEBUG("Length must be > 0\n");
+        return I2C_ERR;
+    }
 
-    if (!(flags & I2C_NOSTART)) {
-        /* start transmission and send slave address */
-        if (_start(bus(dev), (addr << 1) | I2C_READ) < 0) {
-            DEBUG("Start command failed\n");
-            return 0;
-        }
+    /* check for unimplemented flags */
+    if ((flags & (I2C_NOSTOP | I2C_NOSTART | I2C_ADDR10)) != 0) {
+        DEBUG("Flag not supported\n");
+        return I2C_ERR;
     }
+
+    if (_start(bus(dev), (addr << 1) | I2C_READ) < 0) {
+        DEBUG("Start command failed\n");
+        return I2C_ADDR_NACK;
+    }
+
     /* read data to register */
-    if (_read(bus(dev), data, len) < 0) {
+    if (_read(bus(dev), data, len - 1) < 0) {
         DEBUG("Read command failed\n");
-        return 0;
+        return I2C_DATA_NACK;
     }
-    if (!(flags & I2C_NOSTOP)) {
-        _stop(bus(dev));
-    }
-    /* return number of bytes sent */
-    return len;
+    /* must stop before reading the last byte else another read happens */
+    _stop(bus(dev));
+    ((uint8_t*)data)[len - 1] = bus(dev)->DATA.reg;
+
+    return I2C_ACK;
 }
 
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
@@ -210,20 +218,25 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
 {
     assert(dev < I2C_NUMOF);
 
+    if ((flags & I2C_ADDR10) != 0) {
+        DEBUG("Does not support 10 addr\n");
+        return I2C_ERR;
+    }
+
     if (!(flags & I2C_NOSTART)) {
         if (_start(bus(dev), (addr<<1)) < 0) {
             DEBUG("Start command failed\n");
-            return 0;
+            return I2C_ADDR_NACK;
         }
     }
     if (_write(bus(dev), data, len) < 0) {
         DEBUG("Write command failed\n");
-        return 0;
+        return I2C_DATA_NACK;
     }
     if (!(flags & I2C_NOSTOP)) {
         _stop(bus(dev));
     }
-    return len;
+    return I2C_ACK;
 }
 
 void _i2c_poweron(i2c_t dev)
