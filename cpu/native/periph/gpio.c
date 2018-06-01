@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     native_cpu
+ * @ingroup     cpu_native
  * @ingroup     drivers_periph_gpio
  * @{
  *

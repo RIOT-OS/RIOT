@@ -11,7 +11,7 @@
  */
 
 /**
- * @addtogroup    native_cpu
+ * @ingroup    cpu_native
  * @{
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
  */

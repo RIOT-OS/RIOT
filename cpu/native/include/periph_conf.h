@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup native_cpu
+ * @ingroup cpu_native
  * @{
  * @file
  * @author  Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
