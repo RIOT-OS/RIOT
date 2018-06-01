@@ -31,6 +31,15 @@ static inline size_t min(size_t a, size_t b)
     return a <= b ? a : b;
 }
 
+size_t firmware_flashwrite_slotsize(const firmware_flashwrite_t *state)
+{
+    switch (state->target_slot) {
+        case 1: return SLOT1_SIZE;
+        case 2: return SLOT2_SIZE;
+        default: return 0;
+    }
+}
+
 int firmware_flashwrite_init(firmware_flashwrite_t *state, int target_slot,
         size_t offset)
 {

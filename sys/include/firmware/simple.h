@@ -101,11 +101,12 @@ void firmware_simple_print(firmware_simple_t *riotboot);
 int firmware_simple_sign(firmware_simple_t *riotboot, unsigned char *sk);
 
 /**
- * @brief  Validate FW metadata signature
+ * @brief  Validate FW metadata
  *
  * @param[in] metadata  ptr to firmware metadata
  * @param[in] pk        NaCL public signing key to use
  *
  */
-int firmware_simple_validate_signature(firmware_simple_t *riotboot, const unsigned char *pk);
+int firmware_simple_validate(firmware_simple_t *riotboot, const unsigned char *pk);
+
 #endif /* FIRMWARE_SIMPLE_H */

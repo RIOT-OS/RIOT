@@ -101,6 +101,8 @@ int firmware_flashwrite_putbytes(firmware_flashwrite_t *state,
 int firmware_flashwrite_finish(firmware_flashwrite_t *state,
         firmware_metadata_t *metadata, size_t len);
 
+size_t firmware_flashwrite_slotsize(const firmware_flashwrite_t *state);
+
 #ifdef __cplusplus
 }
 #endif

@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <errno.h>
 #include <string.h>
 
 #define LOG_PREFIX "firmware_simple: "
@@ -67,9 +68,20 @@ void firmware_simple_print(firmware_simple_t *simple)
     }
 }
 
-int firmware_simple_validate_signature(firmware_simple_t *simple, const unsigned char *pk)
+int firmware_simple_validate_size(firmware_simple_update_t *simple)
+{
+    if (simple->m.metadata.size <= firmware_flashwrite_slotsize(&simple->writer)) {
+        return 0;
+    }
+    else {
+        return -1;
+    }
+}
+
+int firmware_simple_validate(firmware_simple_t *simple, const unsigned char *pk)
 {
     if (firmware_validate_metadata_checksum(&simple->metadata)) {
+        LOG_WARNING("%s: metadata chacksum invalid\n", __func__);
         return -1;
     }
 
@@ -81,7 +93,7 @@ int firmware_simple_validate_signature(firmware_simple_t *simple, const unsigned
     unsigned long long mlen;
     int res = crypto_sign_open(m, &mlen, sm, FIRMWARE_SIGN_BYTES + crypto_sign_BYTES, pk);
     if (res) {
-        LOG_INFO("%s: RIOTboot metadata signature invalid\n", __func__);
+        LOG_WARNING("%s: RIOTboot metadata signature invalid\n", __func__);
     }
     return res;
 }
@@ -115,8 +127,13 @@ static ssize_t _simple_recv_metadata(firmware_simple_update_t *state, const uint
             return -1;
         }
 
-        /* check metadata magic nr, checksum and signature */
-        if (firmware_simple_validate_signature(metadata, ota_public_key)) {
+        if (firmware_simple_validate_size(state)) {
+            LOG_WARNING("%s: firmware size invalid\n", __func__);
+            return -ENOSPC;
+        }
+
+        /* check metadata magic nr, checksum, signature and general validity */
+        if (firmware_simple_validate(metadata, ota_public_key)) {
             LOG_WARNING(LOG_PREFIX "verification failed!\n");
             return -1;
         }
