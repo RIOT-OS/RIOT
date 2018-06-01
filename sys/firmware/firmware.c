@@ -90,13 +90,13 @@ int firmware_target_slot(void)
 
 firmware_metadata_t *firmware_get_metadata(unsigned slot)
 {
-    assert(slot < FIRMWARE_NUM_SLOTS);
+    assert(slot < firmware_num_slots);
     return (firmware_metadata_t *)_firmware_slot_start[slot];
 }
 
 unsigned firmware_get_image_startaddr(unsigned slot)
 {
-    assert(slot < FIRMWARE_NUM_SLOTS);
+    assert(slot < firmware_num_slots);
     return firmware_get_metadata(slot)->start_addr;
 }
 
@@ -107,7 +107,7 @@ void firmware_jump_to_slot(unsigned slot)
 
 void firmware_dump_slot_addrs(void)
 {
-    for (unsigned i = 1; i < FIRMWARE_NUM_SLOTS; i++) {
+    for (unsigned i = 1; i < firmware_num_slots; i++) {
         printf("slot %u: metadata: 0x%08x image: 0x%08x\n", i,
                (unsigned)_firmware_slot_start[i], firmware_get_image_startaddr(i));
     }
