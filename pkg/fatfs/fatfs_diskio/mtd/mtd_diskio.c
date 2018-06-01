@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup  sys_fatfs_diskio
+ * @ingroup  pkg_fatfs
  * @{
  *
  * @file
