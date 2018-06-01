@@ -535,7 +535,7 @@ diskio_sta_t mci_initialize(void)
     //for (Timer[0] = 2; Timer[0]; );
     xtimer_usleep(250);
 
-    send_cmd(CMD0, 0, 0, NULL);             /* Enter idle state */
+    send_cmd(CMD0, 0, 0, resp);             /* Enter idle state */
     CardRCA = 0;
 
     /*---- Card is 'idle' state ----*/
