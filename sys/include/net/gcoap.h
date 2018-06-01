@@ -158,7 +158,13 @@
  * bytes long. For resources that change slowly, this length can be reduced via
  * GCOAP_OBS_VALUE_WIDTH.
  *
- * To cancel a notification, the server expects to receive a GET request with
+ * A client always may re-register for a resource with the same token or with
+ * a new token to indicate continued interest in receiving notifications about
+ * it. Of course the client must not already be using any new token in the
+ * registration for a different resource. Successful registration always is
+ * indicated by the presence of the Observe option in the response.
+ *
+ * To cancel registration, the server expects to receive a GET request with
  * the Observe option value set to 1. The server does not support cancellation
  * via a reset (RST) response to a non-confirmable notification.
  *

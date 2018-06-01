@@ -279,21 +279,34 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         case GCOAP_RESOURCE_NO_PATH:
             return gcoap_response(pdu, buf, len, COAP_CODE_PATH_NOT_FOUND);
         case GCOAP_RESOURCE_FOUND:
+            /* find observe registration for resource */
             _find_obs_memo_resource(&resource_memo, resource);
             break;
     }
 
     if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
+        /* lookup remote+token */
         int empty_slot = _find_obs_memo(&memo, remote, pdu);
-        /* record observe memo */
-        if (memo == NULL) {
-            if ((resource_memo != NULL)
-                    && _endpoints_equal(remote, resource_memo->observer)) {
-                /* observer re-registering with new token */
-                memo = resource_memo;
-                observer = resource_memo->observer;
+        /* validate re-registration request */
+        if (resource_memo != NULL) {
+            if (memo != NULL) {
+                if (memo != resource_memo) {
+                    /* reject token already used for a different resource */
+                    memo = NULL;
+                    coap_clear_observe(pdu);
+                    DEBUG("gcoap: can't change resource for token\n");
+                }
+                /* otherwise OK to re-register resource with the same token */
             }
-            else if ((empty_slot >= 0) && (resource_memo == NULL)) {
+            else if (_endpoints_equal(remote, resource_memo->observer)) {
+                /* accept new token for resource */
+                memo = resource_memo;
+            }
+        }
+        /* initialize new registration request */
+        if ((memo == NULL) && coap_has_observe(pdu)) {
+            /* verify resource not already registerered (for another endpoint) */
+            if ((empty_slot >= 0) && (resource_memo == NULL)) {
                 int obs_slot = _find_observer(&observer, remote);
                 /* cache new observer */
                 if (observer == NULL) {
@@ -306,6 +319,7 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                 }
                 if (observer != NULL) {
                     memo = &_coap_state.observe_memos[empty_slot];
+                    memo->observer = observer;
                 }
             }
             if (memo == NULL) {
@@ -313,9 +327,10 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                 DEBUG("gcoap: can't register observe memo\n");
             }
         }
+        /* finish registration */
         if (memo != NULL) {
-            memo->observer  = observer;
-            memo->resource  = resource;
+            /* resource may be assigned here if it is not already registered */
+            memo->resource = resource;
             memo->token_len = coap_get_token_len(pdu);
             if (memo->token_len) {
                 memcpy(&memo->token[0], pdu->token, memo->token_len);
