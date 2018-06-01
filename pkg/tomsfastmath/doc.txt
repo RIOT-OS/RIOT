@@ -1,0 +1,12 @@
+/**
+ * @defgroup tomsfastmath tomsfastmath
+ * @ingroup pkg
+ * @brief   TomsFastMath is a fast public domain, open source, large integer arithmetic library written in portable ISO C
+ * @see     https://github.com/libtom/tomsfastmath
+ *
+ * There are 2 defines which you will probably need to configure:
+ *
+ * FP_MAX_SIZE Integers in tomsfastmath have a fixed precision which is to be set at compile time. Set the desired bitlength with this define. The default value is 4096 + a little overhead.
+ *
+ * THREAD_STACKSIZE_MAIN If you use a lot of large integers, you will probably need to increase the maximum stack size of the main thread (or the thread where you do your calculations).
+ */
