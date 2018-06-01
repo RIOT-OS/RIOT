@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup
- * @ingroup
+ * @ingroup     tests
  * @brief
  * @{
  *
@@ -16,6 +15,7 @@
  * @brief
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
+ * @}
  */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
@@ -46,4 +46,3 @@ extern "C" {
 #endif
 
 #endif /* CONSTANTS_H */
-/** @} */

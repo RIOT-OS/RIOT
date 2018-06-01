@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     fs
+ * @ingroup     unittests
  * @brief
  * @{
  *
