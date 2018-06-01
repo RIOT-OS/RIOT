@@ -39,10 +39,10 @@ static int ina220_read_reg(const ina220_t *dev, uint8_t reg, uint16_t *out)
     } tmp = { .u16 = 0 };
     int status = 0;
 
-    status = i2c_read_regs(dev->i2c, dev->addr, reg, &tmp.c[0], 2);
+    status = i2c_read_regs(dev->i2c, dev->addr, reg, &tmp.c[0], 2, 0);
 
-    if (status != 2) {
-        return -1;
+    if (status < 0) {
+        return status;
     }
 
     *out = ntohs(tmp.u16);
@@ -60,10 +60,10 @@ static int ina220_write_reg(const ina220_t *dev, uint8_t reg, uint16_t in)
 
     tmp.u16 = htons(in);
 
-    status = i2c_write_regs(dev->i2c, dev->addr, reg, &tmp.c[0], 2);
+    status = i2c_write_regs(dev->i2c, dev->addr, reg, &tmp.c[0], 2, 0);
 
-    if (status != 2) {
-        return -1;
+    if (status < 0) {
+        return status;
     }
 
     return 0;
