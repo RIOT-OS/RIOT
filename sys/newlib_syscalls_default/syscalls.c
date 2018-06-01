@@ -8,7 +8,9 @@
  */
 
 /**
- * @ingroup     sys_newlib
+ * @defgroup    sys_newlib Newlib system call
+ * @ingroup     sys
+ * @brief       Newlib system call
  * @{
  *
  * @file

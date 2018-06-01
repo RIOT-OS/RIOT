@@ -70,3 +70,4 @@ int cipher_decrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
 #endif
 
 #endif /* CRYPTO_MODES_CBC_H */
+/** @} */

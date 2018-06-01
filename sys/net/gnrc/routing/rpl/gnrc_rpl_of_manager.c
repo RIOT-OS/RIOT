@@ -10,7 +10,7 @@
 
 /**
  *
- * @ingroup rpl
+ * @ingroup net_gnrc_rpl
  * @{
  * @file
  * @brief   RPL Objective functions manager

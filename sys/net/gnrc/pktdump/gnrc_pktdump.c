@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_pktdump
+ * @ingroup     net_gnrc_pktdump
  * @{
  *
  * @file

@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup base64
+ * @ingroup sys_base64
  * @{
  * @file
  * @brief   Functions to encode and decode base64
