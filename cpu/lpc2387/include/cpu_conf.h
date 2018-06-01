@@ -15,8 +15,7 @@ extern "C" {
 #endif
 
 /**
- * @ingroup     conf
- * @ingroup     lpc2387
+ * @ingroup     cpu_lpc2387
  *
  * @{
  */

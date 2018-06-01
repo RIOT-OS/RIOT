@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_k22f
+ * @ingroup     cpu_kinetis
  * @{
  *
  * @file

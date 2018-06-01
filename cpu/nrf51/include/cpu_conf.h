@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup         cpu_nrf51822
+ * @defgroup        cpu_nrf51 Nordic nRF51 MCU
+ * @ingroup         cpu
+ * @brief           Nordic nRF51 family of CPUs
  * @{
  *
  * @file

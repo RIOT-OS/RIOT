@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 /**
- * @ingroup     cc430
+ * @ingroup     cpu_cc430
  */
 
 /**

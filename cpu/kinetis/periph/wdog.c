@@ -9,7 +9,7 @@
 
 /**
  * @ingroup     cpu_kinetis
- * @ingroup     drivers_periph_watchdog
+ * @ingroup     cpu_kinetis_wdog
  *
  * @{
  *

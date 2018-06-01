@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     lpc2387
+ * @ingroup     cpu_lpc2387
  * @{
  */
 

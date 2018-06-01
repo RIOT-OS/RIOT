@@ -9,7 +9,7 @@
 
 /**
  * @ingroup     cpu_cc2538
- * @ingroup     drivers_periph_hwng
+ * @ingroup     drivers_periph_hwrng
  * @{
  *
  * @file

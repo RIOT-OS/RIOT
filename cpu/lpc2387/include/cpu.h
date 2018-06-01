@@ -10,7 +10,7 @@
 #define CPU_H
 
 /**
- * @defgroup    lpc2387     NXP LPC2387
+ * @defgroup    cpu_lpc2387     NXP LPC2387
  * @ingroup     cpu
  * @brief       NXP LPC2387 specific code
  * @{
