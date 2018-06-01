@@ -43,7 +43,7 @@ static int sens0_i2c_write_seq(i2c_t i2c, uint8_t addr, uint8_t nelem, const sen
         int res = i2c_write_reg(i2c, addr, regs[k].reg, regs[k].value, 0);
         DEBUG("sens0: write i2c %u, addr 0x%02x, reg 0x%02x, value 0x%02x\n",
             (unsigned)i2c, (unsigned)addr, (unsigned)regs[k].reg, (unsigned)regs[k].value);
-        if (res != I2C_ACK) {
+        if (res < 0) {
             DEBUG("sens0: error writing i2c %u, addr 0x%02x, reg 0x%02x: %d\n",
                 (unsigned)i2c, (unsigned)addr, (unsigned)regs[k].reg, res);
             return -EIO;
@@ -72,7 +72,7 @@ int sens0_i2c_init(const sens0_i2c_t *dev)
         if (specs->id.mask) {
             /* Check hardware identification */
             res = i2c_read_reg(params->i2c, params->addr, specs->id.reg, &reg, 0);
-            if (res != I2C_ACK) {
+            if (res < 0) {
                 LOG_ERROR("sens0: error reading hardware ID: %d\n", res);
                 ret = -EIO;
                 break;
@@ -122,13 +122,13 @@ static void sens0_i2c_set_power(const sens0_i2c_t *dev, uint8_t value)
     do {
         uint8_t tmp = 0;
         res = i2c_read_reg(params->i2c, params->addr, specs->power_reg, &tmp, 0);
-        if (res != I2C_ACK) {
+        if (res < 0) {
             LOG_ERROR("sens0: error reading power reg: %d\n", res);
             break;
         }
         tmp = (tmp & ~(specs->power_mask)) | value;
         res = i2c_write_reg(params->i2c, params->addr, specs->power_reg, tmp, 0);
-        if (res != I2C_ACK) {
+        if (res < 0) {
             LOG_ERROR("sens0: error writing power reg: %d\n", res);
             break;
         }
@@ -165,7 +165,6 @@ int sens0_i2c_read(const sens0_i2c_t *dev, phydat_t *data, uint8_t iout)
         LOG_ERROR("sens0: i2c_acquire error: %d\n", res);
         return -EINVAL;
     }
-    int ret = 0;
     do {
         if (specs->measurement_req.mask == 0) {
             /* Skip measurement request if mask is zero */
@@ -175,24 +174,22 @@ int sens0_i2c_read(const sens0_i2c_t *dev, phydat_t *data, uint8_t iout)
         if (specs->measurement_req.mask < 0xffu) {
             /* Read modify write */
             res = i2c_read_reg(params->i2c, params->addr, specs->measurement_req.reg, &tmp, 0);
-            if (res != I2C_ACK) {
+            if (res < 0) {
                 LOG_ERROR("sens0: error reading measurement request reg: %d\n", res);
-                ret = -EIO;
                 break;
             }
             tmp &= ~(specs->measurement_req.mask);
         }
         tmp |= specs->measurement_req.value;
         res = i2c_write_reg(params->i2c, params->addr, specs->measurement_req.reg, tmp, 0);
-        if (res != I2C_ACK) {
+        if (res < 0) {
             LOG_ERROR("sens0: error writing measurement request: %d\n", res);
-            ret = -EIO;
             break;
         }
     } while(0);
     i2c_release(params->i2c);
-    if (ret != 0) {
-        return ret;
+    if (res < 0) {
+        return res;
     }
     if (specs->measurement_delay > 0) {
         xtimer_usleep(specs->measurement_delay);
@@ -204,7 +201,7 @@ int sens0_i2c_read(const sens0_i2c_t *dev, phydat_t *data, uint8_t iout)
     }
     res = i2c_read_regs(params->i2c, params->addr, out_spec->reg, buf, raw_size, 0);
     i2c_release(params->i2c);
-    if (res != I2C_ACK) {
+    if (res < 0) {
         LOG_ERROR("sens0: error reading values (i2c=%u, addr=0x%02x, reg=0x%02x, size=%u): %d\n",
             params->i2c, params->addr, out_spec->reg, raw_size, res);
         return -EIO;
