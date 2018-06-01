@@ -52,11 +52,13 @@
 
 #define TICK_TIMEOUT            (0xFFFF)
 
+#define ERROR_FLAG              (I2C_SR1_AF | I2C_SR1_ARLO | I2C_SR1_BERR)
+
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, uint32_t clk, uint32_t ccr);
 static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, uint8_t flags);
 static inline void _clear_addr(I2C_TypeDef *dev);
-static inline void _write(I2C_TypeDef *dev, const uint8_t *data, int length);
+static inline int _write(I2C_TypeDef *dev, const uint8_t *data, int length);
 static inline void _stop(I2C_TypeDef *dev);
 static inline int _wait_ready(I2C_TypeDef *dev);
 
@@ -163,6 +165,8 @@ static void _i2c_init(I2C_TypeDef *i2c, uint32_t clk, uint32_t ccr)
     /* configure device */
     i2c->OAR1 |= (1 << 14); /* datasheet: bit 14 should be kept 1 */
     i2c->OAR1 &= ~I2C_OAR1_ADDMODE; /* make sure we are in 7-bit address mode */
+    /* Clear flags */
+    i2c->SR1 &= ~ERROR_FLAG;
     /* enable device */
     i2c->CR1 |= I2C_CR1_PE;
 }
@@ -205,6 +209,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
                    uint8_t flags)
 {
     assert(dev < I2C_NUMOF);
+    uint16_t tick = TICK_TIMEOUT;
 
     size_t n = length;
     char *in = (char *)data;
@@ -230,7 +235,12 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
 
     while (n--) {
         /* wait for reception to complete */
-        while (!(i2c->SR1 & I2C_SR1_RXNE)) {}
+        while (!(i2c->SR1 & I2C_SR1_RXNE)) {
+            if ((i2c->SR1 & ERROR_FLAG) || !tick) {
+                length = 0;
+                break;
+            }
+        }
 
         if (n == 1) {
             /* disable ACK */
@@ -255,6 +265,7 @@ int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg, void *data,
                   size_t length, uint8_t flags)
 {
     assert(dev < I2C_NUMOF);
+    uint16_t tick = TICK_TIMEOUT;
 
     I2C_TypeDef *i2c = i2c_config[dev].dev;
     assert(i2c != NULL);
@@ -270,9 +281,18 @@ int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg, void *data,
     _start(i2c, address, I2C_FLAG_WRITE, flags);
     DEBUG("[i2c] read_regs: Write reg into DR\n");
     _clear_addr(i2c);
-    while (!(i2c->SR1 & I2C_SR1_TXE)) {}
+    while (!(i2c->SR1 & I2C_SR1_TXE) && tick--) {
+        if ((i2c->SR1 & ERROR_FLAG) || !tick) {
+            break;
+        }
+    }
     i2c->DR = reg;
-    while (!(i2c->SR1 & I2C_SR1_TXE)) {}
+    tick = TICK_TIMEOUT;
+    while (!(i2c->SR1 & I2C_SR1_TXE) && tick--) {
+        if ((i2c->SR1 & ERROR_FLAG) || !tick) {
+            break;
+        }
+    }
     DEBUG("[i2c] read_regs: Now start a read transaction\n");
     return i2c_read_bytes(dev, address, data, length, flags);
 }
@@ -298,7 +318,9 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
 
     _clear_addr(i2c);
     /* send out data bytes */
-    _write(i2c, data, length);
+    if (_write(i2c, data, length) < 0) {
+        length = 0;
+    }
     if (!(flags & I2C_NOSTOP)) {
         /* end transmission */
         DEBUG("[i2c] write_bytes: Ending transmission\n");
@@ -326,9 +348,13 @@ int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg, const void *data,
     _start(i2c, address, I2C_FLAG_WRITE, flags);
     _clear_addr(i2c);
     /* send register address and wait for complete transfer to be finished*/
-    _write(i2c, (uint8_t *)&reg, 1);
+    if (_write(i2c, (uint8_t *)&reg, 1) < 0) {
+        length = 0;
+    }
     /* write data to register */
-    _write(i2c, data, length);
+    else if (_write(i2c, data, length) < 0) {
+        length = 0;
+    }
     /* finish transfer */
     _stop(i2c);
     /* return number of bytes send */
@@ -338,7 +364,9 @@ int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg, const void *data,
 static void _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag, uint8_t flags)
 {
     (void)flags;
-start:
+
+    /* Clear flags */
+    i2c->SR1 &= ~ERROR_FLAG;
 
     /* generate start condition */
     i2c->CR1 |= I2C_CR1_START;
@@ -349,12 +377,11 @@ start:
     /* send address and read/write flag */
     i2c->DR = (address << 1) | rw_flag;
 
+    uint16_t tick = TICK_TIMEOUT;
     /* Wait for ADDR flag to be set */
-    while (!(i2c->SR1 & I2C_SR1_ADDR)) {
-        if (i2c->SR1 & I2C_SR1_AF) {
-            /* if the device answers NACK on sending the address, retry */
-            i2c->SR1 &= ~(I2C_SR1_AF);
-            goto start;
+    while (!(i2c->SR1 & I2C_SR1_ADDR) && tick--) {
+        if ((i2c->SR1 & ERROR_FLAG) || !tick) {
+            return;
         }
     }
 }
@@ -365,7 +392,7 @@ static inline void _clear_addr(I2C_TypeDef *i2c)
     i2c->SR2;
 }
 
-static inline void _write(I2C_TypeDef *i2c, const uint8_t *data, int length)
+static inline int _write(I2C_TypeDef *i2c, const uint8_t *data, int length)
 {
     DEBUG("[i2c] write: Looping through bytes\n");
 
@@ -375,19 +402,31 @@ static inline void _write(I2C_TypeDef *i2c, const uint8_t *data, int length)
         DEBUG("[i2c] write: Written %i byte to data reg, now waiting for DR "
               "to be empty again\n", i);
 
+        uint16_t tick = TICK_TIMEOUT;
         /* wait for transfer to finish */
-        while (!(i2c->SR1 & I2C_SR1_TXE)) {}
+        while (!(i2c->SR1 & I2C_SR1_TXE) && tick--) {
+            if ((i2c->SR1 & ERROR_FLAG) || !tick) {
+                return -1;
+            }
+        }
 
         DEBUG("[i2c] write: DR is now empty again\n");
     }
+
+    return 0;
 }
 
 static inline void _stop(I2C_TypeDef *i2c)
 {
+    uint16_t tick = TICK_TIMEOUT;
     /* make sure last byte was send */
     DEBUG("[i2c] write: Wait if last byte hasn't been sent\n");
 
-    while (!(i2c->SR1 & I2C_SR1_BTF)) {}
+    while (!(i2c->SR1 & I2C_SR1_BTF) && tick--) {
+        if ((i2c->SR1 & ERROR_FLAG) || !tick) {
+            break;
+        }
+    }
 
     /* send STOP condition */
     i2c->CR1 |= I2C_CR1_STOP;
