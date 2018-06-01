@@ -8,7 +8,9 @@
  */
 
 /**
- * @ingroup     boards_common_stm32f103c8
+ * @defgroup    boards_common_stm32f103c8 STM32F103C8 based boards common
+ * @ingroup     boards_common
+ * @brief       Shared files and configuration for STM32F103C8 based boards
  * @{
  *
  * @file
@@ -260,3 +262,4 @@ static const spi_conf_t spi_config[] = {
 #endif
 
 #endif /* PERIPH_CONF_H */
+/** @} */
