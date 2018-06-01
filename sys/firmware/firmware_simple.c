@@ -22,6 +22,8 @@
 
 #include <string.h>
 
+#define LOG_PREFIX "firmware_simple: "
+
 #ifdef RIOT_VERSION
 #include "log.h"
 #include "ota_pubkey.h"
@@ -105,22 +107,22 @@ static ssize_t _simple_recv_metadata(firmware_simple_update_t *state, const uint
     if ((state->writer.offset + to_copy) >= FIRMWARE_METADATA_SIZE - 1) {
         /* Full metadata received */
         firmware_simple_t *metadata = &state->m.metadata;
-        LOG_INFO("ota: verifying metadata ...\n");
+        LOG_INFO(LOG_PREFIX "verifying metadata ...\n");
         if (metadata->metadata.start_addr != firmware_get_image_startaddr(state->writer.target_slot)) {
-            LOG_WARNING("ota: start address doesn't match selected slot. Aborting.\n");
-            LOG_WARNING("ota: (image start=%p slot start=%p)\n", (void *)metadata->metadata.start_addr, \
+            LOG_WARNING(LOG_PREFIX "start address doesn't match selected slot. Aborting.\n");
+            LOG_WARNING(LOG_PREFIX "(image start=%p slot start=%p)\n", (void *)metadata->metadata.start_addr, \
                         (void *)firmware_get_image_startaddr(state->writer.target_slot));
             return -1;
         }
 
         /* check metadata magic nr, checksum and signature */
         if (firmware_simple_validate_signature(metadata, ota_public_key)) {
-            LOG_WARNING("ota: verification failed!\n");
+            LOG_WARNING(LOG_PREFIX "verification failed!\n");
             return -1;
         }
         else {
             state->state = FIRMWARE_UPDATE_VERIFIED;
-            LOG_INFO("ota: verification successful\n");
+            LOG_INFO(LOG_PREFIX "verification successful\n");
         }
         state->writer.flashpage++;
     }
@@ -161,7 +163,7 @@ int firmware_simple_finish(firmware_simple_update_t *state)
 {
     firmware_simple_t *metadata = &state->m.metadata;
 
-    LOG_DEBUG("ota: verifying hash...\n");
+    LOG_DEBUG(LOG_PREFIX "verifying hash...\n");
     sha256_init(&state->sha);
     sha256_update(&state->sha, (void*)metadata->metadata.start_addr,
             metadata->size);
@@ -169,18 +171,18 @@ int firmware_simple_finish(firmware_simple_update_t *state)
     sha256_final(&state->sha, state->writer.flashpage_buf);
 
     if (memcmp(state->writer.flashpage_buf, metadata->hash, SHA256_DIGEST_LENGTH)) {
-        LOG_WARNING("ota: image hash incorrect!\n");
+        LOG_WARNING(LOG_PREFIX "image hash incorrect!\n");
         state->state = FIRMWARE_UPDATE_IDLE;
         return -1;
     }
 
-    LOG_DEBUG("ota: hash verified, re-flashing first block...\n");
+    LOG_DEBUG(LOG_PREFIX "hash verified, re-flashing first block...\n");
     if (firmware_flashwrite_finish(&state->writer,
                 (firmware_metadata_t*)metadata, sizeof(firmware_simple_t)) != 0) {
         return -1;
     }
 
-    LOG_INFO("ota: firmware flashing completed successfully\n");
+    LOG_INFO(LOG_PREFIX "firmware flashing completed successfully\n");
     return 0;
 
 }
