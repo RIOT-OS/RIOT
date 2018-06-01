@@ -21,8 +21,10 @@
 #include <string.h>
 
 #include "firmware/flashwrite.h"
-#include "log.h"
 #include "od.h"
+
+#define LOG_PREFIX "firmware_flashwrite: "
+#include "log.h"
 
 static inline size_t min(size_t a, size_t b)
 {
@@ -32,7 +34,7 @@ static inline size_t min(size_t a, size_t b)
 int firmware_flashwrite_init(firmware_flashwrite_t *state, int target_slot,
         size_t offset)
 {
-    LOG_INFO("ota: initializing update to target slot %i\n",
+    LOG_INFO(LOG_PREFIX "initializing update to target slot %i\n",
              target_slot);
 
     memset(state, 0, sizeof(firmware_flashwrite_t));
@@ -47,7 +49,7 @@ int firmware_flashwrite_init(firmware_flashwrite_t *state, int target_slot,
 int firmware_flashwrite_putbytes(firmware_flashwrite_t *state,
         const uint8_t *bytes, size_t len, bool more)
 {
-    LOG_INFO("ota: processing bytes %u-%u\n", state->offset, state->offset + len - 1);
+    LOG_INFO(LOG_PREFIX "processing bytes %u-%u\n", state->offset, state->offset + len - 1);
 
     while (len) {
         size_t flashpage_pos = state->offset % FLASHPAGE_SIZE;
@@ -64,7 +66,7 @@ int firmware_flashwrite_putbytes(firmware_flashwrite_t *state,
         len -= to_copy;
         if ((!flashpage_avail) || (!more)) {
             if (flashpage_write_and_verify(state->flashpage, state->flashpage_buf) != FLASHPAGE_OK) {
-                LOG_WARNING("ota: error writing flashpage %u!\n", state->flashpage);
+                LOG_WARNING(LOG_PREFIX "error writing flashpage %u!\n", state->flashpage);
                 return -1;
             }
             state->flashpage++;
@@ -98,11 +100,11 @@ int firmware_flashwrite_finish(firmware_flashwrite_t *state,
 
     int flashpage = flashpage_page(slot_start);
     if (flashpage_write_and_verify(flashpage, firstpage) != FLASHPAGE_OK) {
-        LOG_WARNING("ota: re-flashing first block failed!\n");
+        LOG_WARNING(LOG_PREFIX "re-flashing first block failed!\n");
         goto out;
     }
 
-    LOG_INFO("ota: firmware flashing completed successfully\n");
+    LOG_INFO(LOG_PREFIX "firmware flashing completed successfully\n");
     res = 0;
 
 out:
