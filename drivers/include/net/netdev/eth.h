@@ -7,6 +7,7 @@
  */
 
 /**
+ * @defgroup    drivers_netdev_eth Ethernet drivers
  * @ingroup     drivers_netdev_api
  * @{
  *

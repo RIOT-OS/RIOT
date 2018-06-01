@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup   drivers_adcxx1x ADCXX1C ADC device driver
+ * @defgroup   drivers_adcxx1c ADCXX1C ADC device driver
  * @ingroup    drivers_sensors
  * @brief      I2C Analog-to-Digital Converter device driver
  *
