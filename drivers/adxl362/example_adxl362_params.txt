@@ -1,0 +1,65 @@
+/*
+ * Copyright (C) 2016 Eistec AB
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/* Copy this file to adxl362_params.h and modify to fit your setup. */
+
+/**
+ * @ingroup   boards_xxx
+ * @{
+ *
+ * @file
+ * @brief     ADXL362 board specific configuration
+ *
+ * @author    Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ */
+
+#ifndef ADXL362_PARAMS_H
+#define ADXL362_PARAMS_H
+
+#include "board.h"
+#include "adxl362.h"
+#include "saul_reg.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief    ADXL362 configuration
+ */
+static const  adxl362_params_t adxl362_params[] =
+{
+    {
+        .spi   = SPI_DEV(1),
+        .cs    = GPIO_PIN(PORT_E,4),
+        .range = ADXL362_RANGE_4G,
+        .odr   = ADXL362_ODR_100HZ,
+    },
+};
+
+/**
+ * @brief   Additional meta information to keep in the SAUL registry
+ */
+static const saul_reg_info_t adxl362_saul_reg_info[] =
+{
+    {
+        /* acceleration SAUL provider name */
+        .name = "adxl362-acc",
+    },
+    {
+        /* temperature SAUL provider name */
+        .name = "adxl362-temp",
+    },
+};
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ADXL362_PARAMS_H */
+/** @} */

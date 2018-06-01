@@ -286,6 +286,10 @@ void auto_init(void)
     extern void auto_init_adc(void);
     auto_init_adc();
 #endif
+#ifdef MODULE_ADXL362
+    extern void auto_init_adxl362(void);
+    auto_init_adxl362();
+#endif
 #ifdef MODULE_LSM303DLHC
     extern void auto_init_lsm303dlhc(void);
     auto_init_lsm303dlhc();
