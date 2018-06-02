@@ -203,38 +203,6 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   I2C transfer results
- */
-enum {
-    /**
-     * @brief   All bytes were transferred successfully
-     */
-    I2C_ACK = 0,
-    /**
-     * @brief   NACK when transferring the address byte
-     *
-     * After the address + the read/write bit were send, we got an NACK as
-     * response. This means most probably, that there is no slave with the used
-     * address on the bus, or the slave did just not respond for some reason.
-     */
-    I2C_ADDR_NACK = -1,
-    /**
-     * @brief   NACK while writing data bytes
-     *
-     * The slave responded to a data byte written to it with a NACK.
-     */
-    I2C_DATA_NACK = -2,
-     /**
-      * @brief   Internal error
-      *
-      * This status code is returned, on any other internal error that might
-      * have occurred. Possible reasons are not supported modes (e.g. 10-bit
-      * addressing).
-      */
-    I2C_ERR = -3
-};
-
-/**
  * @brief   Initialize the given I2C bus
  *
  * The given I2C device will be initialized with the parameters as specified in
@@ -282,9 +250,13 @@ int i2c_release(i2c_t dev);
  * @param[out] data         memory location to store received data
  * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
- * @return                  I2C_ACK on successful transfer of @p len byte
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_ERR for any other error
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
  */
 
 int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
@@ -305,9 +277,13 @@ int i2c_read_reg(i2c_t dev, uint16_t addr, uint16_t reg,
  * @param[in]  len          the number of bytes to read into @p data
  * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
- * @return                  I2C_ACK on successful transfer of @p len byte
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_ERR for any other error
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
  */
 int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   void *data, size_t len, uint8_t flags);
@@ -323,9 +299,13 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
  * @param[out] data         memory location to store received data
  * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
- * @return                  I2C_ACK on successful transfer of @p len byte
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_ERR for any other error
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
  */
 
 int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags);
@@ -342,9 +322,13 @@ int i2c_read_byte(i2c_t dev, uint16_t addr, void *data, uint8_t flags);
  * @param[in]  len          the number of bytes to read into @p data
  * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
- * @return                  I2C_ACK on successful transfer of @p len byte
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_ERR for any other error
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
  */
 
 int i2c_read_bytes(i2c_t dev, uint16_t addr,
@@ -358,10 +342,13 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr,
  * @param[in] data          byte to write to the device
  * @param[in] flags         optional flags (see @ref i2c_flags_t)
  *
- * @return                  I2C_ACK on successful transfer of @p data
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_DATA_NACK if response to the data byte was NACK
- * @return                  I2C_ERR for any other error
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
  */
 int i2c_write_byte(i2c_t dev, uint16_t addr, uint8_t data, uint8_t flags);
 
@@ -374,10 +361,13 @@ int i2c_write_byte(i2c_t dev, uint16_t addr, uint8_t data, uint8_t flags);
  * @param[in] len           the number of bytes to write
  * @param[in] flags         optional flags (see @ref i2c_flags_t)
  *
- * @return                  I2C_ACK on successful transfer of @p data
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_DATA_NACK if response to the data byte was NACK
- * @return                  I2C_ERR for any other error
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
  */
 int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
                     size_t len, uint8_t flags);
@@ -396,10 +386,13 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data,
  * @param[in]  data         byte to write
  * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
- * @return                  I2C_ACK on successful transfer of @p data
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_DATA_NACK if response to the data byte was NACK
- * @return                  I2C_ERR for any other error
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
  */
 int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
                   uint8_t data, uint8_t flags);
@@ -418,10 +411,13 @@ int i2c_write_reg(i2c_t dev, uint16_t addr, uint16_t reg,
  * @param[in]  len          the number of bytes to write
  * @param[in]  flags        optional flags (see @ref i2c_flags_t)
  *
- * @return                  I2C_ACK on successful transfer of @p data
- * @return                  I2C_ADDR_NACK if response to address byte was NACK
- * @return                  I2C_DATA_NACK if response to the data byte was NACK
- * @return                  I2C_ERR for any other error
+ * @return                  0 When success
+ * @return                  -EIO When slave device doesn't ACK the byte
+ * @return                  -ENXIO When no devices respond on the address sent on the bus
+ * @return                  -ETIMEDOUT  When timeout occurs before device's response
+ * @return                  -EINVAL When an invalid argument is given
+ * @return                  -EOPNOTSUPP When MCU driver doesn't support the flag operation
+ * @return                  -EAGAIN When a lost bus arbitration occurs
  */
 int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   const void *data, size_t len, uint8_t flags);
