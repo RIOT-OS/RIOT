@@ -37,8 +37,8 @@ int i2c_read_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                   void *data, size_t len, uint8_t flags)
 {
     /* First set ADDR and register with no stop */
-    int8_t ret = i2c_write_bytes(dev, addr, &reg, (flags & I2C_REG16) ? 2 : 1,
-                                 flags | I2C_NOSTOP);
+    int ret = i2c_write_bytes(dev, addr, &reg, (flags & I2C_REG16) ? 2 : 1,
+                              flags | I2C_NOSTOP);
     if (ret < 0) {
         return ret;
     }
@@ -70,8 +70,8 @@ int i2c_write_regs(i2c_t dev, uint16_t addr, uint16_t reg,
                    const void *data, size_t len, uint8_t flags)
 {
     /* First set ADDR and register with no stop */
-    int8_t ret = i2c_write_bytes(dev, addr, &reg, (flags & I2C_REG16) ? 2 : 1,
-                                 flags | I2C_NOSTOP);
+    int ret = i2c_write_bytes(dev, addr, &reg, (flags & I2C_REG16) ? 2 : 1,
+                              flags | I2C_NOSTOP);
     if (ret < 0) {
         return ret;
     }
