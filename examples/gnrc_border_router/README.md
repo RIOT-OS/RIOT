@@ -20,7 +20,7 @@ make clean all
 ```
 
 Then, you need to compile UHCP.
-This tool is found in `/dist/tools/uhcp`. So, as for `ethos`:
+This tool is found in `/dist/tools/uhcpd`. So, as for `ethos`:
 
 ```bash
 make clean all
