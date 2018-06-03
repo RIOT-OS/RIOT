@@ -103,6 +103,14 @@ extern "C" {
  * @see xtimer_set_timeout_flag
  */
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
+/**
+ * @brief Set by some drivers for signalling from an ISR to an application thread
+ *
+ * Example usages include periph drivers waiting for data to be read or written
+ * when using an IRQ driven or DMA driven method, and in network device drivers
+ * waiting for feedback from the hardware when trying to send a frame etc.
+ */
+#define THREAD_FLAG_IRQ_SERVICED    (1u << 13)
 /** @} */
 
 /**
