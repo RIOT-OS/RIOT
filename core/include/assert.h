@@ -114,9 +114,12 @@ NORETURN void _assert_failure(const char *file, unsigned line);
 #define static_assert(...) _Static_assert(__VA_ARGS__)
 #else
 /**
- * @brief static_assert dummy for c-version < c11
+ * @brief static_assert for c-version < c11
+ *
+ * Generates a division by zero compile error when cond is false
  */
-#define static_assert(...) struct static_assert_dummy
+#define static_assert(cond, ...) \
+    enum { static_assert_failed_on_div_by_0 = 1 / (!!(cond)) }
 #endif
 #endif
 
