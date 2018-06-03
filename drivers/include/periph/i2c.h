@@ -164,6 +164,16 @@ typedef unsigned int i2c_t;
 #define I2C_READ            (0x0001)
 
 /**
+ * @brief   Special bit pattern indicating a 10 bit address is used
+ *
+ * Should only be used internally in CPU driver implementations, this is not
+ * intended to be used by applications.
+ *
+ * @see https://www.i2c-bus.org/addressing/10-bit-addressing/
+ */
+#define I2C_10BIT_MAGIC     (0xF0u)
+
+/**
  * @brief   Default mapping of I2C bus speed values
  * @{
  */
