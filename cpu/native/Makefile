@@ -26,6 +26,10 @@ ifneq (,$(filter trace,$(USEMODULE)))
 	DIRS += trace
 endif
 
+ifneq (,$(filter mci,$(USEMODULE)))
+	DIRS += mci
+endif
+
 include $(RIOTBASE)/Makefile.base
 
 INCLUDES = $(NATIVEINCLUDES)

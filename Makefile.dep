@@ -777,3 +777,11 @@ USEPKG := $(sort $(USEPKG))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
   include $(RIOTBASE)/Makefile.dep
 endif
+
+ifneq (,$(filter osl,$(USEMODULE)))
+  USEMODULE += ftl
+endif
+
+ifneq (,$(filter ftl,$(USEMODULE)))
+  USEMODULE += hamming256
+endif
