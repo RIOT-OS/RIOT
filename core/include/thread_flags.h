@@ -62,7 +62,7 @@
 #include "sched.h"  /* for thread_t typedef */
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -96,13 +96,13 @@
  *          ...
  *      }
  */
-#define THREAD_FLAG_MSG_WAITING      (0x1<<15)
+#define THREAD_FLAG_MSG_WAITING     (1u << 15)
 /**
  * @brief Set by @ref xtimer_set_timeout_flag() when the timer expires
  *
  * @see xtimer_set_timeout_flag
  */
-#define THREAD_FLAG_TIMEOUT          (0x1<<14)
+#define THREAD_FLAG_TIMEOUT         (1u << 14)
 /** @} */
 
 /**
