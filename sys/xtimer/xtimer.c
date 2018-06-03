@@ -186,7 +186,7 @@ void xtimer_now_timex(timex_t *out)
 {
     uint64_t now = xtimer_usec_from_ticks64(xtimer_now64());
 
-    out->seconds = div_u64_by_1000000(now);
+    out->seconds = div_u64_by_inv(now, div_inv_64(1000000));
     out->microseconds = now - (out->seconds * US_PER_SEC);
 }
 

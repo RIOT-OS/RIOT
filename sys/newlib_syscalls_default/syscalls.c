@@ -503,7 +503,7 @@ int _gettimeofday_r(struct _reent *r, struct timeval *restrict tp, void *restric
     (void) r;
     (void) tzp;
     uint64_t now = xtimer_now_usec64();
-    tp->tv_sec = div_u64_by_1000000(now);
+    tp->tv_sec = div_u64_by_inv(now, div_inv_64(1000000));
     tp->tv_usec = now - (tp->tv_sec * US_PER_SEC);
     return 0;
 }

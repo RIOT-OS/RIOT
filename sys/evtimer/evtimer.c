@@ -124,8 +124,14 @@ static uint32_t _get_offset(xtimer_t *timer)
     }
     else {
         target_us -= now_us;
+
         /* add half of 125 so integer division rounds to nearest */
-        return div_u64_by_125((target_us >> 3) + 62);
+        target_us = (target_us >> 3) + 62;
+
+        /* a higher value would overflow the result type */
+        assert(target_us <= 536870911999LLU);
+
+        return (uint32_t)div_u64_by_inv(target_us, div_inv_64(125));
     }
 }
 
