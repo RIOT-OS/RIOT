@@ -311,6 +311,9 @@ endif
 # handle removal of default modules
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
+# list of all RIOT packages
+ALL_PKGS = $(sort $(patsubst $(RIOTPKG)/%/Makefile,%,$(wildcard $(RIOTPKG)/*/Makefile)))
+
 # process dependencies
 include $(RIOTBASE)/Makefile.dep
 
