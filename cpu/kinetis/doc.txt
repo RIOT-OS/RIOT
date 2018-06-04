@@ -60,6 +60,7 @@ No configuration is necessary.
         },
     };
     #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+    #define I2C_0_ISR           (isr_i2c0)
 
 
 @defgroup    cpu_kinetis_pwm Kinetis PWM
