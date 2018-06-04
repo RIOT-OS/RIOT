@@ -13,8 +13,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              nucleo-f031k6 nucleo-f042k6 nucleo-f303k8 nucleo-l031k6 \
                              nucleo-f030r8 nucleo-f070rb nucleo-f072rb nucleo-f103rb nucleo-f302r8 \
                              nucleo-f334r8 nucleo-l053r8 nucleo-l073rz opencm904 \
-                             spark-core stm32f0discovery telosb weio wsn430-v1_3b \
-                             wsn430-v1_4 yunjia-nrf51822 z1
+                             spark-core stm32f0discovery stm32mindev telosb \
+                             weio wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 # The following boards do not have an available UART
 BOARD_BLACKLIST += mips-malta pic32-wifire pic32-clicker ruuvitag thingy52

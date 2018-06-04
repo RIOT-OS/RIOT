@@ -11,7 +11,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              hifive1 microbit msb-430 msb-430h nrf51dongle nrf6310 nucleo-f031k6 \
                              nucleo-f042k6 nucleo-f303k8 nucleo-l031k6 nucleo-f030r8 \
                              nucleo-f070rb nucleo-f072rb nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \
-                             nucleo-l053r8 spark-core stm32f0discovery \
+                             nucleo-l053r8 spark-core stm32f0discovery stm32mindev \
                              telosb wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 # Include packages that pull up and auto-init the link layer.
