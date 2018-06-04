@@ -54,6 +54,10 @@ void cc110x_cs(cc110x_t *dev)
 #ifndef GPIO_READS_SPI_PINS
     gpio_init(dev->params.gdo1, GPIO_IN);
 #endif
+#ifdef CC110X_PARAM_GDO1_AF
+    /* Reconfigure MISO/GDO1 to be used as regular GPIO */
+    gpio_init_af(dev->params.gdo1, CC110X_PARAM_GDO1_AF);
+#endif
     /* CS to low */
     gpio_clear(dev->params.cs);
     /* Wait for SO to go low (voltage regulator
