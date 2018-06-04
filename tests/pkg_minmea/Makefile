@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEPKG += minmea
+USEMODULE += minmea
 
 USEMODULE += fmt
 

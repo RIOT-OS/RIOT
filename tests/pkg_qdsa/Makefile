@@ -12,7 +12,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano\
 
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_DEFAULT\)
 
-USEPKG += qDSA
+USEMODULE += qDSA
 USEMODULE += random
 USEMODULE += embunit
 

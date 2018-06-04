@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEPKG += lua
+USEMODULE += lua
 
 # This application uses getchar and thus expects input from stdio
 USEMODULE += stdin

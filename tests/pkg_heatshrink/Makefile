@@ -9,7 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
 
 TEST_ON_CI_WHITELIST += all
 
-USEPKG += heatshrink
+USEMODULE += heatshrink
 USEMODULE += embunit
 
 include $(RIOTBASE)/Makefile.include

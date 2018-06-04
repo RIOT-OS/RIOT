@@ -6,7 +6,7 @@ BOARD_WHITELIST += native nrf52dk
 
 TEST_ON_CI_WHITELIST += all
 
-USEPKG += tinycrypt
-USEMODULE = fmt
+USEMODULE += tinycrypt
+USEMODULE += fmt
 
 include $(RIOTBASE)/Makefile.include

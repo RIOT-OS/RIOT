@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEPKG += cayenne-lpp
+USEMODULE += cayenne-lpp
 
 TEST_ON_CI_WHITELIST += all
 

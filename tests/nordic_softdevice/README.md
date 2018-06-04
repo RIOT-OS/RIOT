@@ -10,4 +10,4 @@ how to setup an IPv6 connection to your device.
 
 For more features, you can use the SoftDevice with RIOTs `gnrc_networking`
 example application. Simply build `gnrc_networking` for a SoftDevice-capable
-device, e.g. `USEPKG=nordic_softdevice_ble BOARD=nrf52dk make ...`.
+device, e.g. `USEMODULE=nordic_softdevice_ble BOARD=nrf52dk make ...`.

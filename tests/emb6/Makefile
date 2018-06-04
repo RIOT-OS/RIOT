@@ -13,7 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
                              stm32f0discovery stm32l0538-disco telosb \
                              waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
 
-USEPKG += emb6
+USEMODULE += emb6
 
 USEMODULE += emb6_router
 USEMODULE += emb6_sock_udp

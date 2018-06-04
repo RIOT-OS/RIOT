@@ -16,7 +16,7 @@ TEST_ON_CI_WHITELIST += native
 
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_DEFAULT\)
 
-USEPKG += libcose
+USEMODULE += libcose
 USEMODULE += libcose_crypt_hacl
 USEMODULE += memarray
 USEMODULE += embunit

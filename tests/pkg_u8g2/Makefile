@@ -6,7 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
 
 USEMODULE += xtimer
 
-USEPKG += u8g2
+USEMODULE += u8g2
 
 # set default device parameters in case they are undefined
 TEST_OUTPUT ?= 1

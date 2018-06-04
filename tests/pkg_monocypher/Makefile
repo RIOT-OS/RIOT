@@ -14,7 +14,7 @@ CFLAGS += "-DTHREAD_STACKSIZE_MAIN=(4096 + THREAD_STACKSIZE_DEFAULT + THREAD_EXT
 
 USEMODULE += embunit
 USEMODULE += random
-USEPKG += monocypher
+USEMODULE += monocypher
 
 TEST_ON_CI_WHITELIST += all
 include $(RIOTBASE)/Makefile.include

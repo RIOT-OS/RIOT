@@ -31,7 +31,7 @@ BOARD_BLACKLIST := \
 
 TEST_ON_CI_WHITELIST += all
 
-USEPKG += ubasic
+USEMODULE += ubasic
 USEMODULE += ubasic_tests
 
 include $(RIOTBASE)/Makefile.include

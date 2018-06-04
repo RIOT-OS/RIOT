@@ -17,7 +17,7 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     z1 \
                     #
 
-USEPKG += cn-cbor
+USEMODULE += cn-cbor
 USEMODULE += embunit
 USEMODULE += fmt
 USEMODULE += memarray

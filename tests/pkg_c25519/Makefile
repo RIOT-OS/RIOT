@@ -2,7 +2,7 @@ include ../Makefile.tests_common
 
 USEMODULE += embunit
 USEMODULE += random
-USEPKG += c25519
+USEMODULE += c25519
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
                              arduino-uno

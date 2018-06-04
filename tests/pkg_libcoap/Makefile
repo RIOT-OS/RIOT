@@ -14,7 +14,7 @@ BOARD_INSUFFICIENT_MEMORY := chronos i-nucleo-lrwan1 msb-430 msb-430h \
 
 USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_sock_udp
-USEPKG += libcoap
+USEMODULE += libcoap
 
 TEST_ON_CI_WHITELIST += all
 

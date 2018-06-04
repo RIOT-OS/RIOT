@@ -7,7 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
 BOARD_BLACKLIST = chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
 
 USEMODULE += hashes
-USEPKG += micro-ecc
+USEMODULE += micro-ecc
 
 TEST_ON_CI_WHITELIST += all
 

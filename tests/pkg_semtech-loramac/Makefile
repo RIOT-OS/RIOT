@@ -16,7 +16,7 @@ BOARD_WITHOUT_LORAMAC_RX := waspmote-pro
 LORA_DRIVER ?= sx1276
 LORA_REGION ?= EU868
 
-USEPKG += semtech-loramac
+USEMODULE += semtech-loramac
 USEMODULE += $(LORA_DRIVER)
 
 # load loramac RX if board supports it

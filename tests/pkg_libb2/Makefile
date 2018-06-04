@@ -9,7 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
 
 TEST_ON_CI_WHITELIST += all
 
-USEPKG += libb2
+USEMODULE += libb2
 USEMODULE += embunit
 
 include $(RIOTBASE)/Makefile.include

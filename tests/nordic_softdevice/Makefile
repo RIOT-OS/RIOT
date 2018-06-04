@@ -2,7 +2,7 @@ BOARD ?= nrf52dk
 include ../Makefile.tests_common
 
 # Use the Nordic SoftDevice
-USEPKG += nordic_softdevice_ble
+USEMODULE += nordic_softdevice_ble
 
 # use a minimal GNRC configuration
 USEMODULE += gnrc_netdev_default

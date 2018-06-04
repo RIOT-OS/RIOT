@@ -11,7 +11,7 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
 
 USEMODULE += embunit
 USEMODULE += fmt
-USEPKG += tinycbor
+USEMODULE += tinycbor
 
 USEMODULE += tinycbor_float
 

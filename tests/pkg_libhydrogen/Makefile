@@ -9,7 +9,7 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
 
 TEST_ON_CI_WHITELIST += all
 
-USEPKG += libhydrogen
+USEMODULE += libhydrogen
 USEMODULE += embunit
 
 include $(RIOTBASE)/Makefile.include
