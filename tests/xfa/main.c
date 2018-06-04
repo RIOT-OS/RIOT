@@ -28,10 +28,6 @@
 XFA_INIT(xfatest_t, xfatest);
 XFA_INIT_CONST(xfatest_t, xfatest_const);
 
-/* hack to force inclusion of otherwise unused compilation units */
-extern int hack1;
-extern int hack2;
-
 int main(void)
 {
     puts("Cross file array test");
@@ -46,8 +42,6 @@ int main(void)
     for (unsigned i = 0; i < n; i++) {
         printf("[%u] = %u, \"%s\"\n", i, xfatest_const[i].val, xfatest_const[i].text);
     }
-
-    hack1 = hack2;
 
     return 0;
 }
