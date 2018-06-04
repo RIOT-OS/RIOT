@@ -1,4 +1,4 @@
-_ALLMODULES = $(sort $(USEMODULE) $(USEPKG))
+_ALLMODULES = $(sort $(USEMODULE))
 
 # Define MODULE_MODULE_NAME preprocessor macros for all modules.
 ED = $(addprefix MODULE_,$(_ALLMODULES))

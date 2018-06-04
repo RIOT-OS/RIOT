@@ -15,7 +15,7 @@ export INCLUDES              # The extra include paths, set by the various Makef
 export CXXINCLUDES           # The extra include paths for c++, set by the various Makefile.include files.
 
 export USEMODULE             # Sys Module dependencies of the application. Set in the application's Makefile.
-export USEPKG                # Pkg dependencies (third party modules) of the application. Set in the application's Makefile.
+export USEPKG                # Pkg dependencies (third party modules) of the application. Calculated by the build system from USEMODULE.
 export DISABLE_MODULE        # Used in the application's Makefile to suppress DEFAULT_MODULEs.
 export APPDEPS               # Files / Makefile targets that need to be created before the application can be build. Set in the application's Makefile.
 # BUILDDEPS                  # Files / Makefile targets that need to be created before starting to build.

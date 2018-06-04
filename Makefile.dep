@@ -1,6 +1,5 @@
 #
 OLD_USEMODULE := $(sort $(USEMODULE))
-OLD_USEPKG := $(sort $(USEPKG))
 
 # include board dependencies
 -include $(RIOTBOARD)/$(BOARD)/Makefile.dep
@@ -903,6 +902,12 @@ FEATURES_OPTIONAL += periph_gpio
 # always select power management if available
 FEATURES_OPTIONAL += periph_pm
 
+# Transitional option until dependencies do not use `USEPKG` anymore
+_USEPKG := $(USEPKG)
+USEMODULE += $(_USEPKG)
+# deduce packages from USEMODULE
+USEPKG = $(sort $(filter $(ALL_PKGS),$(USEMODULE)))
+
 # include package dependencies
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
@@ -921,8 +926,8 @@ endif
 
 # recursively catch transitive dependencies
 USEMODULE := $(sort $(USEMODULE))
-USEPKG := $(sort $(USEPKG))
-ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
+
+ifneq ($(OLD_USEMODULE),$(USEMODULE))
   include $(RIOTBASE)/Makefile.dep
 endif
 
