@@ -102,11 +102,11 @@ static inline uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
  * multiplying by the fraction (32768 / 1000000), we will instead use
  * (512 / 15625), which reduces the truncation caused by the integer widths */
 static inline uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
-    return div_u32_by_inv(usec, div_inv_32(15625)) >> 9;
+    return div_u32_by_inv(usec, div_inv_32(15625)) << 9;
 }
 
 static inline uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
-    return div_u64_by_inv(usec, div_inv_64(15625)) >> 9;
+    return div_u64_by_inv(usec, div_inv_64(15625)) << 9;
 }
 
 static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
