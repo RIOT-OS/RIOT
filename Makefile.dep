@@ -19,12 +19,13 @@ endif
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
 
-ifneq (,$(filter ndn-riot,$(USEPKG)))
+
+ifneq (,$(filter ndn-riot,$(USEMODULE)))
   USEMODULE += gnrc
   USEMODULE += xtimer
   USEMODULE += random
   USEMODULE += hashes
-  USEPKG += micro-ecc
+  USEMODULE += micro-ecc
 endif
 
 ifneq (,$(filter csma_sender,$(USEMODULE)))
@@ -77,7 +78,7 @@ ifneq (,$(filter uhcpc,$(USEMODULE)))
   USEMODULE += posix_inet
 endif
 
-ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
+ifneq (,$(filter nordic_softdevice_ble,$(USEMODULE)))
   FEATURES_REQUIRED += ble_nordic_softdevice
   USEMODULE += softdevice_handler
   USEMODULE += ble_common
@@ -496,7 +497,10 @@ ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter lwip_%,$(USEMODULE)))
-  USEPKG += lwip
+  USEMODULE += lwip
+endif
+
+ifneq (,$(filter lwip,$(USEMODULE)))
   USEMODULE += core_mbox
   USEMODULE += lwip_api
   USEMODULE += lwip_contrib
@@ -528,7 +532,6 @@ endif
 
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
-  USEPKG += libfixmath
   USEMODULE += libfixmath
 endif
 
@@ -547,7 +550,7 @@ ifneq (,$(filter oonf_rfc5444,$(USEMODULE)))
 endif
 
 ifneq (,$(filter oonf_common,$(USEMODULE)))
-  USEPKG += oonf_api
+  USEMODULE += oonf_api
   USEMODULE += posix_sockets
 endif
 
@@ -768,13 +771,11 @@ ifneq (,$(filter event,$(USEMODULE)))
 endif
 
 ifneq (,$(filter spiffs,$(USEMODULE)))
-  USEPKG += spiffs
   USEMODULE += vfs
   USEMODULE += spiffs_fs
   USEMODULE += mtd
 endif
 ifneq (,$(filter littlefs,$(USEMODULE)))
-  USEPKG += littlefs
   USEMODULE += vfs
   USEMODULE += littlefs_fs
   USEMODULE += mtd
@@ -799,7 +800,7 @@ ifneq (,$(filter nanocoap_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
-  USEPKG += fatfs
+  USEMODULE += fatfs
   USEMODULE += vfs
 endif
 
@@ -846,7 +847,7 @@ ifneq (,$(filter cord_common,$(USEMODULE)))
 endif
 
 ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
-  USEPKG += tlsf
+  USEMODULE += tlsf
 endif
 
 ifneq (,$(filter usbus,$(USEMODULE)))
