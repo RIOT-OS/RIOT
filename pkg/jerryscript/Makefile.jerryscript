@@ -4,8 +4,6 @@ JERRYHEAP  ?= 16
 
 EXT_CFLAGS :=-D__TARGET_RIOT
 
-EXT_CFLAGS += $(CFLAGS)
-
 .PHONY: libjerry riot-jerry flash clean
 
 # all: libjerry riot-jerry
