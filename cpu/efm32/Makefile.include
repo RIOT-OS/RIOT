@@ -7,11 +7,11 @@ export CPU_FAM = $(EFM32_FAMILY)
 export CFLAGS += -D$(shell echo $(CPU_MODEL) | tr 'a-z' 'A-Z')
 
 # include Gecko SDK package
-USEPKG += gecko_sdk
+USEMODULE += gecko_sdk
 
 # CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
 ifeq ($(CPU_ARCH),cortex-m0plus)
-  USEPKG += cmsis-dsp
+  USEMODULE += cmsis-dsp
 endif
 
 # include CPU family module

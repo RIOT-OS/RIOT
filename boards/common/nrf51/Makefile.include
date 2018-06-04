@@ -8,7 +8,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 INCLUDES += -I$(RIOTBOARD)/common/nrf51/include
 
 # use alternative xtimer mapping if applicable
-ifneq (,$(filter nimble,$(USEPKG)))
+ifneq (,$(filter nimble,$(USEMODULE)))
   CFLAGS += -DBOARD_NRF51_XTIMER_ALT
 endif
 

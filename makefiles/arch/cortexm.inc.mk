@@ -113,7 +113,7 @@ export MCPU ?= $(CPU_ARCH)
 endif
 
 # CMSIS DSP needs to know about the CPU core
-ifneq (,$(filter cmsis-dsp,$(USEPKG)))
+ifneq (,$(filter cmsis-dsp,$(USEMODULE)))
 # definition needed to use cmsis-dsp headers
 ifeq ($(CPU_ARCH),cortex-m0)
 export CFLAGS += -DARM_MATH_CM0

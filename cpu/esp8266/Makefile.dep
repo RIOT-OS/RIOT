@@ -25,7 +25,7 @@ ifneq (, $(filter esp_wifi, $(USEMODULE)))
     USEMODULE += netdev_eth
 endif
 
-ifneq (, $(filter lua, $(USEPKG)))
+ifneq (, $(filter lua, $(USEMODULE)))
     USEMODULE += newlib_syscalls_default
     USEMODULE += xtimer
 endif
@@ -34,7 +34,7 @@ ifneq (, $(filter lwip%, $(USEMODULE)))
     USEMODULE += newlib_syscalls_default
 endif
 
-ifneq (,$(filter ndn-riot,$(USEPKG)))
+ifneq (,$(filter ndn-riot,$(USEMODULE)))
     USEMODULE += crypto
     USEMODULE += cipher_modes
 endif

@@ -82,7 +82,7 @@ ifneq (,$(filter mtd,$(USEMODULE)))
     USEMODULE += esp_idf_spi_flash
 endif
 
-ifneq (,$(filter ndn-riot,$(USEPKG)))
+ifneq (,$(filter ndn-riot,$(USEMODULE)))
     USEMODULE += crypto
     USEMODULE += cipher_modes
 endif
