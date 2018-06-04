@@ -5,7 +5,7 @@ PKG_LICENSE=ISC
 
 .PHONY: all
 
-export RIOT_CFLAGS = $(CFLAGS) $(INCLUDES)
+RIOT_CFLAGS := $(INCLUDES)
 
 TOOLCHAIN_FILE=$(PKG_BUILDDIR)/xcompile-toolchain.cmake
 
