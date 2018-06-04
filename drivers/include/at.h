@@ -67,6 +67,16 @@ extern "C" {
 #define AT_RECV_EOL_2   "\n"
 #endif
 
+#ifndef AT_RECV_OK
+/** default OK reply of an AT device */
+#define AT_RECV_OK "OK"
+#endif
+
+#ifndef AT_RECV_ERROR
+/** default ERROR reply of an AT device */
+#define AT_RECV_ERROR "ERROR"
+#endif
+
 /**
  * @brief AT device structure
  */
