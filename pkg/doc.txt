@@ -6,12 +6,10 @@
  * Using packages
  * ==============
  * To add a package to the list of compiled modules you have to add it to the
- * `USEPKG` macro in your application's Makefile. If the package provides
- * header files you might need to update the `INCLUDE` macro, too:
+ * `USEPKG` macro in your application's Makefile.
  *
  * ~~~~~~~~ {.mk}
  * USEPKG += <pkg_name>
- * INCLUDE += $(RIOTPKG)/<pkg_name>/...
  * ~~~~~~~~
  *
  * Porting an external library
