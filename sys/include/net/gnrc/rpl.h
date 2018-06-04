@@ -451,6 +451,19 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /** @} */
 
 /**
+ * @brief DIS Solicited Information option (numbers)
+ * @see <a href="https://tools.ietf.org/html/rfc6550#section-6.7.9">
+ *          RFC6550, section 6.7.9, Solicited Information
+ *      </a>
+ *  @{
+ */
+#define GNRC_RPL_DIS_SOLICITED_INFO_LENGTH  (19)
+#define GNRC_RPL_DIS_SOLICITED_INFO_FLAG_V  (1 << 7)
+#define GNRC_RPL_DIS_SOLICITED_INFO_FLAG_I  (1 << 6)
+#define GNRC_RPL_DIS_SOLICITED_INFO_FLAG_D  (1 << 5)
+/** @} */
+
+/**
  * @brief PID of the RPL thread.
  */
 extern kernel_pid_t gnrc_rpl_pid;
@@ -513,8 +526,11 @@ void gnrc_rpl_send_DIO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination);
  *
  * @param[in] instance          Pointer to the RPL instance, optional.
  * @param[in] destination       IPv6 addres of the destination.
+ * @param[in] options           Pointer to the first option to be attached.
+ * @param[in] num_opts          The number of options to attach.
  */
-void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination);
+void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination,
+                       gnrc_rpl_internal_opt_t **options, size_t num_opts);
 
 /**
  * @brief   Send a DAO of the @p dodag to the @p destination.
@@ -530,7 +546,7 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, 
  *
  * @param[in] instance          Pointer to the RPL instance.
  * @param[in] destination       IPv6 addres of the destination.
- * @param[in] seq				Sequence number to be acknowledged.
+ * @param[in] seq               Sequence number to be acknowledged.
  */
 void gnrc_rpl_send_DAO_ACK(gnrc_rpl_instance_t *instance, ipv6_addr_t *destination, uint8_t seq);
 
