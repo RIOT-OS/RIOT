@@ -34,7 +34,7 @@ USEMODULE += gnrc_sock_udp
 USEMODULE += shell
 USEMODULE += shell_commands
 
-USEPKG += tinydtls
+USEMODULE += tinydtls
 
 # UDP Port to use (20220 is default for DTLS).
 DTLS_PORT ?= 20220

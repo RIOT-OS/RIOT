@@ -35,7 +35,7 @@ CFLAGS += -DTHREAD_STACKSIZE_MAIN=9092
 endif
 
 # Add the package for Jerryscript
-USEPKG += jerryscript
+USEMODULE += jerryscript
 
 JS_PATH = $(BINDIR)/js/$(MODULE)
 

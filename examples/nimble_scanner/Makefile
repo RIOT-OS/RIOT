@@ -12,7 +12,7 @@ USEMODULE += xtimer
 USEMODULE += shell
 
 # configure and use Nimble
-USEPKG += nimble
+USEMODULE += nimble
 USEMODULE += nimble_scanner
 USEMODULE += nimble_scanlist
 

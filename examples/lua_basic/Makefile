@@ -37,7 +37,7 @@ ifneq ($(BOARD),native)
   CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+2048)'
 endif
 
-USEPKG += lua
+USEMODULE += lua
 
 LUA_PATH = $(BINDIR)/lua
 

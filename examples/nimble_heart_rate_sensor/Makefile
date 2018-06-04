@@ -11,7 +11,7 @@ RIOTBASE ?= $(CURDIR)/../..
 USEMODULE += event_timeout
 
 # Include NimBLE
-USEPKG += nimble
+USEMODULE += nimble
 USEMODULE += nimble_svc_gap
 USEMODULE += nimble_svc_gatt
 

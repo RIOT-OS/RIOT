@@ -52,7 +52,7 @@ QUIET ?= 1
 # appropriate measurements.
 CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+7000)'
 
-USEPKG += lua
+USEMODULE += lua
 
 LUA_PATH = $(BINDIR)/lua
 

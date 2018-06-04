@@ -23,7 +23,7 @@ USEMODULE += random
 USEMODULE += shell
 USEMODULE += shell_commands
 
-USEPKG += ndn-riot
+USEMODULE += ndn-riot
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

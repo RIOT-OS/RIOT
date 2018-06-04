@@ -35,6 +35,6 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_pktdump
 USEMODULE += prng_xorshift
 
-USEPKG += ccn-lite
+USEMODULE += ccn-lite
 
 include $(RIOTBASE)/Makefile.include
