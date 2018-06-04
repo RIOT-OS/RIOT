@@ -30,6 +30,8 @@
 #include "irq.h"
 #include "bit.h"
 #include "mutex.h"
+#include "thread.h"
+#include "thread_flags.h"
 #include "periph_conf.h"
 #include "periph/i2c.h"
 
@@ -47,6 +49,11 @@
 #else
 #define TRACE(...)
 #endif
+
+/**
+ * @brief   Thread flag used internally for signaling between ISR and user thread
+ */
+#define THREAD_FLAG_KINETIS_I2C (1u << 8)
 
 /**
  * @brief   Array of I2C module clock dividers
@@ -68,19 +75,42 @@ static const uint16_t i2c_dividers[] = {
 };
 
 /**
+ * @brief   I2C IRQ reception state
+ */
+typedef struct {
+    uint8_t *datap; /**< pointer to output buffer */
+    size_t bytes_left; /**< how many bytes left to receive */
+} i2c_rx_t;
+
+/**
+ * @brief   I2C IRQ transmission state
+ */
+typedef struct {
+    const uint8_t *datap; /**< pointer to input buffer */
+    size_t bytes_left; /**< how many bytes left to transmit */
+} i2c_tx_t;
+/**
  * @brief   Driver internal state
  */
 typedef struct {
     mutex_t mtx; /**< Mutex preventing multiple users of the same bus */
-    unsigned active; /**< State variable to help catch user mistakes */
+    kernel_pid_t pid; /**< PID of thread waiting for a transfer to complete */
+    uint8_t active; /**< State variable to help catch user mistakes */
+    union {
+        i2c_tx_t tx; /**< State of ongoing transmission sequence */
+        i2c_rx_t rx; /**< State of ongoing reception sequence */
+    };
+    int retval; /**< return value from ISR */
 } i2c_state_t;
-static i2c_state_t i2c_state[I2C_NUMOF];
 
+
+static i2c_state_t i2c_state[I2C_NUMOF];
 
 int i2c_acquire(i2c_t dev)
 {
     assert((unsigned)dev < I2C_NUMOF);
     mutex_lock(&i2c_state[dev].mtx);
+    i2c_state[dev].pid = thread_getpid();
     return 0;
 }
 
@@ -175,6 +205,7 @@ void i2c_init(i2c_t dev)
     }
     i2c_state[dev].mtx = (mutex_t)MUTEX_INIT_LOCKED;
     i2c_state[dev].active = 0;
+    i2c_state[dev].pid = KERNEL_PID_UNDEF;
     if (ENABLE_INIT_DEBUG) {
         DEBUG("i2c_init: init SCL pin\n");
     }
@@ -199,38 +230,6 @@ void i2c_init(i2c_t dev)
     mutex_unlock(&i2c_state[dev].mtx);
 }
 
-/* Internal helper for checking status flags after transmission */
-static int i2c_tx(i2c_t dev, uint8_t byte)
-{
-    I2C_Type *i2c = i2c_config[dev].i2c;
-    TRACE("i2c: tx: %02x\n", (unsigned)byte);
-    i2c->D = byte;
-    uint8_t S;
-    uint16_t timeout = UINT16_MAX;
-    do {
-        S = i2c->S;
-    } while (!(S & I2C_S_IICIF_MASK) && --timeout);
-
-    i2c_clear_irq_flags(i2c);
-
-    if (S & I2C_S_ARBL_MASK) {
-        DEBUG("i2c: arbitration lost\n");
-        bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
-        i2c_state[dev].active = 0;
-        return -EAGAIN;
-    }
-    if (timeout == 0) {
-        /* slave stretches the clock for too long */
-        DEBUG("i2c: tx timeout\n");
-        return -ETIMEDOUT;
-    }
-    if (S & I2C_S_RXAK_MASK) {
-        DEBUG("i2c: NACK\n");
-        return -EIO;
-    }
-    return 0;
-}
-
 static int i2c_stop(i2c_t dev)
 {
     I2C_Type *i2c = i2c_config[dev].i2c;
@@ -251,16 +250,35 @@ static int i2c_stop(i2c_t dev)
 
 static int i2c_tx_addr(i2c_t dev, uint8_t byte)
 {
-    int res = i2c_tx(dev, byte);
+    I2C_Type *i2c = i2c_config[dev].i2c;
+    TRACE("i2c: txa: %02x\n", (unsigned)byte);
+    i2c->D = byte;
+    uint8_t S;
+    uint16_t timeout = UINT16_MAX;
+    do {
+        S = i2c->S;
+    } while (!(S & I2C_S_IICIF_MASK) && --timeout);
+
+    i2c_clear_irq_flags(i2c);
+
+    int res = 0;
+    if (S & I2C_S_ARBL_MASK) {
+        DEBUG("i2c: arbitration lost\n");
+        res = -EAGAIN;
+    }
+    else if (timeout == 0) {
+        /* slave stretches the clock for too long */
+        DEBUG("i2c: tx timeout\n");
+        res = -ETIMEDOUT;
+    }
+    else if (S & I2C_S_RXAK_MASK) {
+        DEBUG("i2c: NACK\n");
+        res = -ENXIO;
+    }
     if (res < 0) {
-        if (res == -EIO) {
-            /* No ACK received, remap EIO to ENXIO for missing addr ack */
-            res = -ENXIO;
-        }
-        int stopres = i2c_stop(dev);
-        if (stopres < 0) {
-            return stopres;
-        }
+        bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+        i2c_state[dev].active = 0;
+        i2c_clear_irq_flags(i2c);
     }
     return res;
 }
@@ -279,6 +297,13 @@ static int i2c_start(i2c_t dev, uint16_t addr, unsigned read_flag, uint8_t flags
         if (read_flag && (flags & I2C_ADDR10)) {
             /* 10 bit addressing does not allow reading without a repeated start */
             return -EINVAL;
+        }
+        uint16_t timeout = UINT16_MAX;
+        while ((i2c->S & I2C_S_BUSY_MASK) && --timeout) {}
+        if (timeout == 0) {
+            /* Someone else is using the bus for a long time, try again later */
+            DEBUG("i2c: start timeout\n");
+            return -EAGAIN;
         }
         /* slave -> master transition triggers the initial start condition */
         i2c->C1 |= I2C_C1_IICEN_MASK | I2C_C1_MST_MASK | I2C_C1_TX_MASK;
@@ -341,43 +366,35 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
         }
     }
     if (len > 0) {
+        /* We need IRQs enabled for interrupt based transfers */
+        assert(!__get_PRIMASK());
+        assert(!irq_is_in());
         bit_clear8(&i2c->C1, I2C_C1_TX_SHIFT);
-        /* Initiate master receive mode by reading the data register once when the
-         * C1[TX] bit is cleared and C1[MST] is set */
+        /* Configure IRQ transfer */
+        i2c_state[dev].rx.datap = data;
+        i2c_state[dev].rx.bytes_left = len;
+        i2c_state[dev].retval = 0;
+        bit_set8(&i2c->C1, I2C_C1_IICIE_SHIFT);
+        /* Initiate master receive mode by reading the data register once when
+         * the C1[TX] bit is cleared and C1[MST] is set */
         volatile uint8_t dummy;
         dummy = i2c->D;
         ++dummy;
-    }
-    TRACE("i2c: read C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
-    uint8_t *datap = data;
-    while (len > 0) {
-        uint8_t S;
-        do {
-            S = i2c->S;
-        } while (!(S & I2C_S_IICIF_MASK));
-
-        i2c_clear_irq_flags(i2c);
-
-        if (S & I2C_S_ARBL_MASK) {
-            DEBUG("i2c: rx arbitration lost\n");
+        /* Wait until the ISR signals back */
+        TRACE("i2c: read C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
+        thread_flags_t tflg = thread_flags_wait_any(THREAD_FLAG_KINETIS_I2C | THREAD_FLAG_TIMEOUT);
+        TRACE("i2c: rx done, %u left, ret: %d\n",
+            i2c_state[dev].rx.bytes_left, i2c_state[dev].retval);
+        if (!(tflg & THREAD_FLAG_KINETIS_I2C)) {
             bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
             i2c_state[dev].active = 0;
-            return -EAGAIN;
+            return -ETIMEDOUT;
         }
-        --len;
-        if (len == 1) {
-            /* Send NACK after next byte */
-            bit_set8(&i2c->C1, I2C_C1_TXAK_SHIFT);
+        if (i2c_state[dev].retval < 0) {
+            /* An error occurred */
+            /* The module has been stopped from the ISR, no need to clear the MST bit */
+            return i2c_state[dev].retval;
         }
-        else if (len == 0) {
-            /* Switching the module to TX mode lets us read the data register
-             * without triggering a new reception */
-            bit_set8(&i2c->C1, I2C_C1_TX_SHIFT);
-        }
-
-        *datap = i2c->D;
-        TRACE("i2c: rx: %02x\n", (unsigned)*datap);
-        ++datap;
     }
     if (!(flags & I2C_NOSTOP)) {
         int res = i2c_stop(dev);
@@ -399,21 +416,33 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
             return res;
         }
     }
-    const uint8_t *datap = data;
-    bit_set8(&i2c->C1, I2C_C1_TX_SHIFT);
-    TRACE("i2c: write C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
-    for (size_t k = 0; k < len; ++k) {
-        int res = i2c_tx(dev, datap[k]);
-        if ((res == -EIO) && (k == (len - 1))) {
-            /* NACK on the final byte is normal */
-            break;
+    if (len > 0) {
+        /* We need IRQs enabled for interrupt based transfers */
+        assert(!__get_PRIMASK());
+        assert(!irq_is_in());
+        /* Configure IRQ transfer */
+        bit_set8(&i2c->C1, I2C_C1_TX_SHIFT);
+        i2c_state[dev].tx.datap = data;
+        i2c_state[dev].tx.bytes_left = len;
+        i2c_state[dev].retval = 0;
+        bit_set8(&i2c->C1, I2C_C1_IICIE_SHIFT);
+        TRACE("i2c: write C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
+        /* Initiate transfer by writing the first byte, the remaining bytes will
+         * be fed by the ISR */
+        i2c->D = *((const uint8_t *)data);
+        /* Wait until the ISR signals back */
+        thread_flags_t tflg = thread_flags_wait_any(THREAD_FLAG_KINETIS_I2C | THREAD_FLAG_TIMEOUT);
+        TRACE("i2c: rx done, %u left, ret: %d\n",
+            i2c_state[dev].rx.bytes_left, i2c_state[dev].retval);
+        if (!(tflg & THREAD_FLAG_KINETIS_I2C)) {
+            bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+            i2c_state[dev].active = 0;
+            return -ETIMEDOUT;
         }
-        else if (res < 0) {
-            int stopres = i2c_stop(dev);
-            if (stopres < 0) {
-                return stopres;
-            }
-            return res;
+        if (i2c_state[dev].retval < 0) {
+            /* An error occurred */
+            /* The module has been stopped from the ISR, no need to clear the MST bit */
+            return i2c_state[dev].retval;
         }
     }
     if (!(flags & I2C_NOSTOP)) {
@@ -424,3 +453,113 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
     }
     return 0;
 }
+
+static inline void i2c_irq_signal_done(I2C_Type *i2c, kernel_pid_t pid)
+{
+    thread_flags_set((thread_t *)thread_get(pid), THREAD_FLAG_KINETIS_I2C);
+    bit_clear8(&i2c->C1, I2C_C1_IICIE_SHIFT);
+}
+
+/**
+ * @brief   Master transmit mode IRQ handler
+ */
+static void i2c_irq_mst_tx_handler(I2C_Type *i2c, i2c_state_t *state, uint8_t S)
+{
+    size_t len = state->tx.bytes_left;
+    assert(len != 0); /* This only happens if this periph driver is broken */
+    --len;
+    state->tx.bytes_left = len;
+    if (len == 0) {
+        /* We are done, NACK on the last byte is OK */
+        DEBUG("i2c: TX done\n");
+        i2c_irq_signal_done(i2c, state->pid);
+    }
+    else {
+        if (S & I2C_S_RXAK_MASK) {
+            /* NACK */
+            /* Abort master transfer */
+            DEBUG("i2c: NACK\n");
+            bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+            state->active = 0;
+            state->retval = -EIO;
+            i2c_irq_signal_done(i2c, state->pid);
+        }
+        /* transmit the next byte */
+        /* Increment first, datap points to the last byte transmitted */
+        ++state->tx.datap;
+        i2c->D = *state->tx.datap;
+        TRACE("i2c: tx: %02x\n", (unsigned)*(state->tx.datap));
+    }
+}
+
+/**
+ * @brief   Master receive mode IRQ handler
+ */
+static void i2c_irq_mst_rx_handler(I2C_Type *i2c, i2c_state_t *state)
+{
+    size_t len = state->rx.bytes_left;
+    assert(len != 0); /* This only happens if this periph driver is broken */
+    --len;
+    if (len == 1) {
+        /* Send NACK after the next byte */
+        bit_set8(&i2c->C1, I2C_C1_TXAK_SHIFT);
+    }
+    else if (len == 0) {
+        /* Switching the module to TX mode lets us read the data register
+         * without triggering a new reception */
+        bit_set8(&i2c->C1, I2C_C1_TX_SHIFT);
+        i2c_irq_signal_done(i2c, state->pid);
+    }
+    state->rx.bytes_left = len;
+    /* Read data reception buffer, this will trigger reception of the following
+     * byte iff TX and MST bits in the C1 register are set */
+    *state->rx.datap = i2c->D;
+    TRACE("i2c: rx: %02x\n", (unsigned)*(state->rx.datap));
+    ++state->rx.datap;
+}
+
+void i2c_irq_handler(i2c_t dev)
+{
+    I2C_Type *i2c = i2c_config[dev].i2c;
+    i2c_state_t *state = &i2c_state[dev];
+    uint8_t S = i2c->S;
+    /* Clear IRQ flags */
+    i2c->S = S;
+    if (i2c->C1 & I2C_C1_MST_MASK) {
+        /* Master mode handler */
+        if (S & I2C_S_ARBL_MASK) {
+            DEBUG("i2c: arbitration lost\n");
+            /* Abort master transfer */
+            bit_clear8(&i2c->C1, I2C_C1_MST_SHIFT);
+            state->active = 0;
+            state->retval = -EAGAIN;
+            i2c_irq_signal_done(i2c, state->pid);
+        }
+        if (i2c->C1 & I2C_C1_TX_MASK) {
+            /* Transmit mode */
+            i2c_irq_mst_tx_handler(i2c, state, S);
+        }
+        else {
+            /* Receive mode */
+            i2c_irq_mst_rx_handler(i2c, state);
+        }
+    }
+    else {
+        /* TODO: Slave mode handler goes here */
+    }
+    cortexm_isr_end();
+}
+
+#ifdef I2C_0_ISR
+void I2C_0_ISR(void)
+{
+    i2c_irq_handler(I2C_DEV(0));
+}
+#endif /* I2C_0_ISR */
+
+#ifdef I2C_1_ISR
+void I2C_1_ISR(void)
+{
+    i2c_irq_handler(I2C_DEV(1));
+}
+#endif /* I2C_1_ISR */
