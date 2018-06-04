@@ -6,7 +6,7 @@
 The library is originally written for Arduino boards, but it runs just fine on other platforms, as long as the right drivers are available.
 
 ## Usage
-Just put `USEPKG += u8g2` in your Makefile and `#include "u8g2.h"` to your code. Refer to the [U8g2 wiki](https://github.com/olikraus/u8g2/wiki) for more information on the API.
+Just put `USEMODULE += u8g2` in your Makefile and `#include "u8g2.h"` to your code. Refer to the [U8g2 wiki](https://github.com/olikraus/u8g2/wiki) for more information on the API.
 
 ## RIOT-OS interface
 This package patches the original source to add an interface for RIOT-OS.

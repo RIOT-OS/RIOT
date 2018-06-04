@@ -12,7 +12,7 @@ upstream code.
 
 Add
 ```Makefile
-USEPKG += micro-ecc
+USEMODULE += micro-ecc
 ```
 to your Makefile.
 

@@ -29,7 +29,7 @@
  * Just add it as a package in your application:
  *
  * ```makefile
- * USEPKG += c25519
+ * USEMODULE += c25519
  * ```
  *
  * @see      https://www.dlbeer.co.nz/oss/c25519.html

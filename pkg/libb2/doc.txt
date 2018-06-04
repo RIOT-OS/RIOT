@@ -24,7 +24,7 @@
  * Add it as a package in your application's Makefile:
  *
  * ```makefile
- * USEPKG += libb2
+ * USEMODULE += libb2
  * ```
  *
  * Include the BLAKE2 header in your code:

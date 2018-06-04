@@ -6,10 +6,10 @@
  * Using packages
  * ==============
  * To add a package to the list of compiled modules you have to add it to the
- * `USEPKG` macro in your application's Makefile.
+ * `USEMODULE` macro in your application's Makefile.
  *
  * ~~~~~~~~ {.mk}
- * USEPKG += <pkg_name>
+ * USEMODULE += <pkg_name>
  * ~~~~~~~~
  *
  * Porting an external library

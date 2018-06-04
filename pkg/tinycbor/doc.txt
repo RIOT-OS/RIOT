@@ -17,7 +17,7 @@
  * Just add it as a package in your application's Makefile:
  *
  * ```makefile
- * USEPKG += tinycbor
+ * USEMODULE += tinycbor
  * ```
  *
  * TinyCBOR has optional floating point support. In RIOT-OS this is enabled by

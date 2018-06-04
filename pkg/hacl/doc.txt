@@ -11,7 +11,7 @@
  * Just add it as a package in your application:
  *
  * ```makefile
- * USEPKG += hacl
+ * USEMODULE += hacl
  * ```
  *
  * And don't forget to include the header for the HACL* standard API:

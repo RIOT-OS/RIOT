@@ -12,7 +12,7 @@
  * Just add it as a package in your application:
  *
  * ```makefile
- * USEPKG += nanocbor
+ * USEMODULE += nanocbor
  * ```
  *
  * @see      https://github.com/bergzand/nanocbor

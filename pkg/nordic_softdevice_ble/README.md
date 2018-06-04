@@ -9,7 +9,7 @@ SoftDevice as Bluetooth BLE transport for RIOT's 6lowpan stack.
 examples automatically download the SDK and compile / link / flash all needed
 code.
 
-If you want to manually set up included modules, add "USEPKG +=
+If you want to manually set up included modules, add "USEMODULE +=
 nordic_softdevice_ble" to your application's Makefile.
 
 See README-BLE-6LoWPAN.md for instructions on how to set up 6lowpan over BLE on

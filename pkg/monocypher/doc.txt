@@ -33,7 +33,7 @@
  * Just add it as a package in your application:
  *
  * ```makefile
- * USEPKG += monocypher
+ * USEMODULE += monocypher
  * ```
  *
  * @see     https://monocypher.org/

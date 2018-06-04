@@ -6,7 +6,7 @@
 The library is originally written for Arduino boards, but it runs just fine on other platforms, as long as the right drivers are available.
 
 ## Usage
-Just put `USEPKG += ucglib` in your Makefile and `#include "ucg.h"` to your code. Refer to the [Ucglib wiki](https://github.com/olikraus/ucglib/wiki) for more information on the API.
+Just put `USEMODULE += ucglib` in your Makefile and `#include "ucg.h"` to your code. Refer to the [Ucglib wiki](https://github.com/olikraus/ucglib/wiki) for more information on the API.
 
 ## RIOT-OS interface
 This package patches the original source to add an interface for RIOT-OS.

@@ -17,7 +17,7 @@
  * Add it as a package in your application's Makefile:
  *
  * ```makefile
- * USEPKG += libhydrogen
+ * USEMODULE += libhydrogen
  * ```
  *
  * Include the LibHydrogen header in your code:

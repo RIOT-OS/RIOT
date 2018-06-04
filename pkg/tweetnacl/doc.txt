@@ -43,7 +43,7 @@
  * Just add it as a package in your application:
  * 
  * ```makefile
- * USEPKG += tweetnacl
+ * USEMODULE += tweetnacl
  * ```
  * 
  * And don't forget to include the header:

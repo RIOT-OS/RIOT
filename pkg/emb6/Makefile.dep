@@ -8,7 +8,6 @@ ifneq (,$(filter emb6_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter emb6,$(USEMODULE)))
-  USEPKG += emb6
   USEMODULE += emb6_bsp
   USEMODULE += emb6_common
   USEMODULE += emb6_contrib

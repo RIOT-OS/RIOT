@@ -1,4 +1,4 @@
-ifneq (,$(filter libcoap,$(USEPKG)))
+ifneq (,$(filter libcoap,$(USEMODULE)))
   USEMODULE += posix_sockets
   USEMODULE += posix_headers
   USEMODULE += gnrc_sock_udp

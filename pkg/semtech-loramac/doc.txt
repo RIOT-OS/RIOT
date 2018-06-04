@@ -24,7 +24,7 @@
  * In order to use this package in an application, add the following in
  * the application `Makefile`:
  * ```
- *     USEPKG += semtech-loramac
+ *     USEMODULE += semtech-loramac
  * ```
  *
  * Since the LoRa radio depends on regional parameters regarding the access

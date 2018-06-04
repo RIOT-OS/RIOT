@@ -1,10 +1,10 @@
-USEPKG += nanocbor
+USEMODULE += nanocbor
 
 USEMODULE += libcose_crypt
 
 ifneq (,$(filter libcose_crypt_tweetnacl,$(USEMODULE)))
-  USEPKG += tweetnacl
+  USEMODULE += tweetnacl
 endif
 ifneq (,$(filter libcose_crypt_hacl,$(USEMODULE)))
-  USEPKG += hacl
+  USEMODULE += hacl
 endif

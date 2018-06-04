@@ -14,7 +14,7 @@
  * # Usage
  * Just put
  * ```
- * USEPKG += relic
+ * USEMODULE += relic
  * ```
  * in your Makefile and
  * ```c
