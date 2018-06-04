@@ -2,6 +2,10 @@
 APPLICATION = xfa
 include ../Makefile.tests_common
 
+TEST_ON_CI_WHITELIST += all
+test:
+	tests/01-run.py
+
 include $(RIOTBASE)/Makefile.include
 
 all: static-test
