@@ -1,0 +1,2 @@
+USEMODULE += boards_common_stm32f103c8
+include $(RIOTBOARD)/common/stm32f103c8/Makefile.include
