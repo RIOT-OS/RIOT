@@ -18,7 +18,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini 
                              nucleo-f042k6 nucleo-f303k8 nucleo-l031k6 nucleo-f030r8 \
                              nucleo-f070rb nucleo-f072rb nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \
                              nucleo-l053r8 nucleo-l073rz opencm904 \
-                             spark-core stm32f0discovery yunjia-nrf51822
+                             spark-core stm32f0discovery stm32mindev yunjia-nrf51822
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
