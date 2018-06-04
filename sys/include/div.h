@@ -172,12 +172,9 @@ uint64_t _div_mulhi64(const uint64_t a, const uint64_t b);
  */
 static inline uint8_t div_u8_by_inv(const uint8_t val, const uint8_t inv)
 {
-    uint16_t tmp;
+    const uint16_t tmp = (uint16_t)val * (uint16_t)inv;
 
-    tmp = (uint16_t)val * (uint16_t)inv;
-    tmp >>= 9;
-
-    return (uint8_t)tmp;
+    return (uint8_t)(tmp >> 9);
 }
 
 /**
@@ -190,12 +187,9 @@ static inline uint8_t div_u8_by_inv(const uint8_t val, const uint8_t inv)
  */
 static inline uint16_t div_u16_by_inv(const uint16_t val, const uint16_t inv)
 {
-    uint32_t tmp;
+    const uint32_t tmp = (uint32_t)val * (uint32_t)inv;
 
-    tmp = (uint32_t)val * (uint32_t)inv;
-    tmp >>= 17;
-
-    return (uint16_t)tmp;
+    return (uint16_t)(tmp >> 17);
 }
 
 /**
@@ -208,12 +202,9 @@ static inline uint16_t div_u16_by_inv(const uint16_t val, const uint16_t inv)
  */
 static inline uint32_t div_u32_by_inv(const uint32_t val, const uint32_t inv)
 {
-    uint64_t tmp;
+    const uint64_t tmp = (uint64_t)val * (uint64_t)inv;
 
-    tmp = (uint64_t)val * (uint64_t)inv;
-    tmp >>= 33;
-
-    return (uint32_t)tmp;
+    return (uint32_t)(tmp >> 33);
 }
 
 /**
