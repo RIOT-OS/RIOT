@@ -84,7 +84,7 @@ void kw41zrf_setup(kw41zrf_t *dev)
 int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
 {
     if (dev == NULL) {
-        return -ENODEV;
+        return -EINVAL;
     }
 
     /* Save a copy of the RF_OSC_EN setting to use when the radio is in deep sleep */
