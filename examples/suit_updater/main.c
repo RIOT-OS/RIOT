@@ -27,6 +27,7 @@
 #include "net/ota_suit.h"
 #include "firmware/manifest.h"
 #include "xtimer.h"
+#include "ps.h"
 
 #define MAIN_QUEUE_SIZE     (4)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -46,7 +47,8 @@ int main(void)
     /* start shell */
     puts("All up and running");
     while(1) {
-        xtimer_sleep(100);
+        xtimer_sleep(10);
+        ps();
     }
 
     /* should be never reached */

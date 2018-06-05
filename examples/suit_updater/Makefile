@@ -34,6 +34,7 @@ USEMODULE += gnrc_udp
 USEMODULE += gnrc_sock_udp
 USEMODULE += fmt
 USEMODULE += hashes
+USEMODULE += ps
 USEPKG += libcose
 
 # include this for printing IP addresses
