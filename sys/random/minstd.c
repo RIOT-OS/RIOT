@@ -41,7 +41,7 @@ static uint32_t _seed = 1;
 
 int rand_minstd(void)
 {
-    uint32_t hi = div_u32_by_inv(_seed, div_inv_32(44488));
+    uint32_t hi = div_32(_seed, 44488);
     uint32_t lo = _seed - hi*44488;
     uint32_t test = (a * lo) - (r * hi);
 

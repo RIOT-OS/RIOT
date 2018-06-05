@@ -131,7 +131,7 @@ static uint32_t _get_offset(xtimer_t *timer)
         /* a higher value would overflow the result type */
         assert(target_us <= 536870911999LLU);
 
-        return (uint32_t)div_u64_by_inv(target_us, div_inv_64(125));
+        return (uint32_t)div_64(target_us, 125);
     }
 }
 
