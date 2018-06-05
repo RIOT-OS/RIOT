@@ -1,6 +1,6 @@
 PKG_NAME=libcose
 PKG_URL=https://github.com/bergzand/libcose
-PKG_VERSION=v0.3.1
+PKG_VERSION=37c34288b96935d070e3ebf287e3c650f184a161
 PKG_LICENSE=LGPL
 
 .PHONY: all

@@ -72,7 +72,7 @@ void suit_uuid_init(void)
 #endif
     _set_uuid((uuid_t*)class_id, (uuid_t*)vendor_id, (uint8_t*)RIOT_BOARD, sizeof(RIOT_BOARD) - 1);
 #if ENABLE_DEBUG
-    DEBUG("class id: ");
+    DEBUG("class id \"%s\": ", RIOT_BOARD);
     for(unsigned i = 0; i < sizeof(uuid_t); i++) {
         DEBUG("%.2x", class_id[i]);
     }
@@ -103,7 +103,40 @@ static int _check_cond_uuid(const CborValue *it, uuid_t *uuid)
     return uuid_equal(uuid, &cond);
 }
 
-int _check_cond(int num, CborValue *cond)
+int _check_cond_time(CborValue *it, uint64_t curtime)
+{
+    uint8_t timestr[32];
+    size_t len;
+    cbor_value_get_string_length(it, &len);
+    if (len > sizeof(timestr)) {
+        return -1;
+    }
+    cbor_value_copy_byte_string(it, timestr, &len, NULL);
+    CborParser p;
+    CborValue t;
+    /* First grab the time, then verify */
+    CborError err = cbor_parser_init(timestr, len, CborValidateBasic, &p, &t);
+    if (err) {
+        return err;
+    }
+    if (!cbor_value_is_tag(&t)) {
+        return -1;
+    }
+    CborTag tag;
+    cbor_value_get_tag(&t, &tag);
+    if (tag != CborUnixTime_tTag) {
+        return -1;
+    }
+    cbor_value_advance(&t);
+    if (!cbor_value_is_integer(&t)) {
+        return -1;
+    }
+    uint64_t bestbefore;
+    cbor_value_get_uint64(&t, &bestbefore);
+    return (bestbefore > curtime);
+}
+
+int _check_cond(int num, CborValue *cond, uint64_t curtime)
 {
     switch(num) {
         case SUIT_COND_VENDOR_ID:
@@ -113,7 +146,7 @@ int _check_cond(int num, CborValue *cond)
         case SUIT_COND_DEV_ID:
            return _check_cond_uuid(cond, (uuid_t*)device_id);
         case SUIT_COND_BEST_BEFORE:
-            break;
+           return _check_cond_time(cond, curtime);
     }
     return 0;
 }
@@ -200,7 +233,7 @@ int _check_payloadinfo(CborValue *it)
     return SUIT_OK;
 }
 
-int suit_verify_conditions(suit_manifest_t *manifest)
+int suit_verify_conditions(suit_manifest_t *manifest, uint64_t curtime)
 {
     CborParser parser;
     CborValue it, arr;
@@ -227,8 +260,8 @@ int suit_verify_conditions(suit_manifest_t *manifest)
         int num = 0;
         cbor_value_get_int(&cond, &num);
         cbor_value_advance(&cond);
-        int res = _check_cond(num, &cond);
-        if (!res) {
+        int res = _check_cond(num, &cond, curtime);
+        if (res != 1) {
             return SUIT_ERR_COND;
         }
         cbor_value_advance(&arr);

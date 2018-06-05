@@ -160,7 +160,7 @@ uint32_t suit_get_version(const suit_manifest_t *manifest);
 
 uint32_t suit_get_timestamp(const suit_manifest_t *manifest);
 
-int suit_verify_conditions(suit_manifest_t *manifest);
+int suit_verify_conditions(suit_manifest_t *manifest, uint64_t curtime);
 
 static inline uint32_t suit_payload_get_size(const suit_manifest_t *manifest)
 {

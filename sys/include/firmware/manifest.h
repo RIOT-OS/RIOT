@@ -44,9 +44,13 @@ extern "C" {
 #define OTA_MANIFEST_MSG_START      0x02
 #define OTA_MANIFEST_MSG_NEXT       0x03
 #define OTA_MANIFEST_MSG_FINAL      0x04
+#define OTA_MANIFEST_REQ_TIME       0x05
 
 #define OTA_URL_PATH_LEN            SOCK_URLPATH_MAXLEN
 
+#define FIRMWARE_MANIFEST_TIME_INTERVAL 300
+#define FIRMWARE_MANIFEST_TIME_SERVER   "fe80::12e2:d5ff:ff00:1d9"
+#define FIRMWARE_MANIFEST_TIME_URL      "/t"
 typedef struct {
     uint8_t mbuf[MANIFEST_BUF_SIZE];
     char path[OTA_URL_PATH_LEN];
@@ -54,15 +58,14 @@ typedef struct {
     size_t mbuf_len;
     mutex_t lock;
     kernel_pid_t pid;
-    cn_cbor blocks[OTA_MANIFEST_BLOCKS];
     memarray_t storage;
     suit_manifest_t manifest;
-    uint8_t coap_buf[COAP_MSG_BUF];
     firmware_flashwrite_t writer;
 } firmware_manifest_t;
 
 void firmware_manifest_run(void);
 int firmware_manifest_putbytes(uint8_t *buf, size_t len, size_t offset, bool more);
+uint64_t firmware_manifest_get_time(void);
 
 #ifdef __cplusplus
 }

@@ -21,14 +21,13 @@ USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_router_default
 # Additional networking modules that can be dropped if not needed
-#USEMODULE += gnrc_icmpv6_echo
+USEMODULE += gnrc_icmpv6_echo
 # Add also the shell, some shell commands
 #USEMODULE += shell
 #USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += ota_suit
 USEMODULE += libcose_crypt_tweetnacl
-USEMODULE += memarray
 USEMODULE += nanocoap_sock
 USEMODULE += suit
 USEMODULE += gnrc_udp
@@ -36,6 +35,9 @@ USEMODULE += gnrc_sock_udp
 USEMODULE += fmt
 USEMODULE += hashes
 USEPKG += libcose
+
+# include this for printing IP addresses
+#USEMODULE += shell_commands
 
 FEATURES_REQUIRED += riotboot
 

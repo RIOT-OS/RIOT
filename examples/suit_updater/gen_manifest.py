@@ -106,13 +106,19 @@ def _get_conditions(args):
     uuid_vendor = None
     if args.vendorname:
         uuid_vendor = uuid.uuid5(uuid.NAMESPACE_DNS, str(args.vendorname))
+        print("Vendor ID: {}".format(uuid_vendor.hex))
         conds.append([CONDITION_VENDORID, uuid_vendor.bytes])
         if args.classname:
             uuid_class = uuid.uuid5(uuid_vendor, args.classname)
             conds.append([CONDITION_CLASSID, uuid_class.bytes])
+            print("Class ID: {}".format(uuid_class.hex))
             if args.deviceid:
                 conds.append([CONDITION_DEVICEID,
                               binascii.unhexlify(args.deviceid)])
+    if args.valid_duration:
+
+        timestamp = cbor.dumps(cbor.Tag(1, _get_timestamp() + args.valid_duration))
+        conds.append([CONDITION_BESTBEFORE, timestamp])
     return conds
 
 
@@ -177,6 +183,8 @@ def _get_args():
                         help="Device ID uuid")
     parser.add_argument("-V", "--version", type=int,
                         help="Firmware version")
+    parser.add_argument("-b", "--valid-duration", type=int,
+                        help="Valid duration in seconds")
     parser.add_argument("-o", "--output", type=argparse.FileType('wb'),
                         help="Signed manifest output file")
     parser.add_argument("file", type=argparse.FileType('rb'),
@@ -192,8 +200,9 @@ def main():
     key_data = args.key.read()
     skey = _parse_privkey(key_data)
     suit = _format_suit(args)
+    print("manifest generated, {} bytes long".format(len(cbor.dumps(suit))))
     sign = _sign1(cbor.dumps(suit), "test", skey)
-    args.output.write(cbor.dumps(suit))
+    args.output.write(cbor.dumps(sign))
     return 0
 
 

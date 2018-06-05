@@ -9,6 +9,7 @@
 #include "firmware/manifest.h"
 
 #include "cose.h"
+#include "cbor.h"
 #include "log.h"
 #include "thread.h"
 #include "net/nanocoap.h"
@@ -46,32 +47,138 @@ static bool _check_timestamp(firmware_manifest_t *state);
 static bool _check_digest(firmware_manifest_t *state, uint8_t *digest);
 static void *_firmware_manifest_thread(void *arg);
 
-static void *cose_calloc(size_t count, size_t size, void *context);
-static void cose_free(void *ptr, void *context);
+static xtimer_t timer;
+static uint64_t boottime;
+static uint64_t prev_time;
+static msg_t time_msg;
+static uint8_t time_buf[128];
+static size_t time_buf_len;
 
-/* CN_CBOR block allocator context struct*/
-static cn_cbor_context ct =
-{
-    .calloc_func = cose_calloc,
-    .free_func = cose_free,
-    .context = &_fw_man,
-};
 
-static void *cose_calloc(size_t count, size_t size, void *context)
+static ssize_t fetch_time_block(unsigned num, sock_udp_ep_t *local)
 {
-    (void)count;
-    firmware_manifest_t *state = (firmware_manifest_t*)context;
-    void *block = memarray_alloc(&state->storage);
-    if (block) {
-        memset(block, 0, size);
+    sock_udp_ep_t remote;
+    remote.port = COAP_PORT;
+    ipv6_addr_from_str((ipv6_addr_t *)&remote.addr.ipv6, FIRMWARE_MANIFEST_TIME_SERVER);
+    remote.family = AF_INET6;
+    uint8_t buf[128];
+    coap_pkt_t pkt;
+    uint8_t *pktpos = buf;
+    pkt.hdr = (coap_hdr_t*)buf;
+    pktpos += coap_build_hdr(pkt.hdr, COAP_REQ, NULL, 0, COAP_METHOD_GET, num);
+    pktpos += coap_put_option_uri(pktpos, 0, FIRMWARE_MANIFEST_TIME_URL, COAP_OPT_URI_PATH);
+    pktpos += coap_put_option_block2(pktpos, COAP_OPT_URI_PATH, num, 2, 0);
+    pkt.payload = pktpos;
+    pkt.payload_len = 0;
+
+    int res = nanocoap_request(&pkt, local, &remote, sizeof(buf) );
+    if (res > 0)
+    {
+        coap_block1_t block2;
+        coap_get_block2(&pkt, &block2);
+
+        if (block2.offset == 0) {
+            /* Init */
+        }
+        if (block2.offset + pkt.payload_len > sizeof(time_buf)) {
+            LOG_ERROR("ota: received firmware larger than expected: %u, aborting\n", block2.offset + pkt.payload_len);
+            return -1;
+        }
+        memcpy(&time_buf[block2.offset], pkt.payload, pkt.payload_len);
+        time_buf_len += pkt.payload_len;
+        return block2.more;
     }
-    return block;
+    return -1;
 }
 
-static void cose_free(void *ptr, void *context)
+static int _fetch_time(void)
 {
-    firmware_manifest_t *state = (firmware_manifest_t*)context;
-    memarray_free(&state->storage, ptr);
+    int res = 0;
+    int more = 1;
+    unsigned blknum = 0;
+    time_buf_len = 0;
+    cose_sign_iter_t iter;
+    cose_signature_t signature;
+    sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
+    local.port = 12345;
+    while (more) {
+        more = fetch_time_block(blknum, &local);
+        if (more < 0) {
+            LOG_ERROR("ota: error fetching time block: %d\n", more);
+            res = more;
+            return -1;
+        }
+        if (more == 0) {
+            break;
+        }
+        blknum++;
+    }
+    cose_sign_init(&cose_in, 0);
+    /* Decode cose */
+    res = cose_sign_decode(&cose_in, time_buf,
+            time_buf_len);
+    if (res != 0) {
+        LOG_WARNING("Could not decode cose time struct: %d\n", res);
+        return res;
+    }
+
+    CborParser p;
+    CborValue it;
+    /* First grab the time, then verify */
+    CborError err = cbor_parser_init(cose_in.payload, cose_in.payload_len, CborValidateBasic, &p, &it);
+    if (err) {
+        return err;
+    }
+    if (!cbor_value_is_tag(&it)) {
+        LOG_ERROR("Invalid Time struct, no tag\n");
+        return -1;
+    }
+    CborTag tag;
+    cbor_value_get_tag(&it, &tag);
+    if (tag != CborUnixTime_tTag) {
+        LOG_ERROR("Invalid Time struct, incorrect tag\n");
+        return -1;
+    }
+    cbor_value_advance(&it);
+    if (!cbor_value_is_integer(&it)) {
+        LOG_ERROR("Invalid Time struct, no integer\n");
+        return -1;
+    }
+    uint64_t abstime;
+    cbor_value_get_uint64(&it, &abstime);
+    uint64_t reltime = abstime - xtimer_now_usec64()/US_PER_SEC;
+
+    cose_sign_iter_init(&cose_in, &iter);
+    cose_sign_iter(&iter, &signature);
+    /* Verify cose */
+    res = cose_sign_verify(&cose_in, &signature, &key, verification_buf,
+            sizeof(verification_buf));
+    if (res != 0) {
+        LOG_WARNING("Could not verify cose time struct: %d\n", res);
+        return res;
+    }
+    if (abstime > prev_time) {
+        prev_time = abstime;
+        boottime = reltime;
+        return 0;
+
+    }
+    else {
+        LOG_ERROR("Invalid time received (non-monotonic)\n");
+        return -1;
+    }
+}
+
+static void _update_time(void)
+{
+    time_msg.type = OTA_MANIFEST_REQ_TIME;
+    xtimer_set_msg64(&timer, FIRMWARE_MANIFEST_TIME_INTERVAL * US_PER_SEC, &time_msg, sched_active_pid);
+    _fetch_time();
+}
+
+uint64_t firmware_manifest_get_time(void)
+{
+    return xtimer_now_usec64()/US_PER_SEC + boottime;
 }
 
 static bool _check_timestamp(firmware_manifest_t *state)
@@ -120,17 +227,23 @@ int firmware_manifest_putbytes(uint8_t *buf, size_t len, size_t offset, bool mor
 
 static int _manifest_verify(firmware_manifest_t *state)
 {
+    cose_signature_t signature;
     cose_sign_init(&cose_in, 0);
     /* Decode cose */
     int res = cose_sign_decode(&cose_in, state->mbuf,
-            state->mbuf_len, &ct);
+            state->mbuf_len);
     if (res != 0) {
         LOG_WARNING("Could not decode cose struct: %d\n", res);
         return res;
     }
+    {
+        cose_sign_iter_t iter;
+        cose_sign_iter_init(&cose_in, &iter);
+        cose_sign_iter(&iter, &signature);
+    }
     /* Verify cose */
-    res = cose_sign_verify(&cose_in, &key, 0, verification_buf,
-            sizeof(verification_buf), &ct);
+    res = cose_sign_verify(&cose_in, &signature, &key, verification_buf,
+            sizeof(verification_buf));
     if (res != 0) {
         LOG_WARNING("Could not verify cose struct: %d\n", res);
         return res;
@@ -140,13 +253,18 @@ static int _manifest_verify(firmware_manifest_t *state)
     if (res < 0) {
         return res;
     }
+    if (suit_verify_conditions(&state->manifest, firmware_manifest_get_time()) != SUIT_OK)
+    {
+        LOG_WARNING("Conditionals failure, ignoring update\n");
+        return -1;
+    }
     if (!_check_timestamp(state)) {
         LOG_WARNING("Timestamp failure, ignoring update\n");
-        return res;
+        return -1;
     }
     char path[128];
     char hostport[SOCK_HOSTPORT_MAXLEN];
-    if (suit_get_url(&state->manifest, path, sizeof(path))) {
+    if (suit_get_url(&state->manifest, path, sizeof(path)) < 0) {
         LOG_ERROR("ota: Unable to get url\n");
         return -1;
     }
@@ -191,7 +309,8 @@ static ssize_t fetch_block(firmware_manifest_t *state, unsigned num, sock_udp_ep
     pktpos += coap_build_hdr(pkt.hdr, COAP_REQ, NULL, 0, COAP_METHOD_GET, num);
     pktpos += coap_put_option_uri(pktpos, 0, state->path, COAP_OPT_URI_PATH);
     pktpos += coap_put_option_block2(pktpos, COAP_OPT_URI_PATH, num, 2, 0);
-    pkt.payload_len = pktpos - buf;
+    pkt.payload = pktpos;
+    pkt.payload_len = 0;
 
     int res = nanocoap_request(&pkt, local, &state->remote, sizeof(buf) );
     if (res > 0)
@@ -234,12 +353,12 @@ static int _get_update(void)
     int res = _manifest_verify(&_fw_man);
     if (res < 0) {
         LOG_ERROR("Manifest verify result %i\n", res);
-        return res;
+        goto out;
     }
     int more = 1;
     unsigned blknum = 0;
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
-    local.port = 12345;
+    local.port = 12346;
     while (more) {
         more = fetch_block(&_fw_man, blknum, &local);
         if (more < 0) {
@@ -270,15 +389,22 @@ static void *_firmware_manifest_thread(void* arg)
     msg_init_queue(msg_queue, 4);
     _fw_man.pid = sched_active_pid;
     mutex_init(&_fw_man.lock);
-    memarray_init(&_fw_man.storage, _fw_man.blocks, sizeof(cn_cbor),
-                  OTA_MANIFEST_BLOCKS);
+    prev_time = 0;
+    xtimer_sleep(5);
+    _update_time();
     while(1) {
         msg_receive(&msg);
         switch (msg.type) {
             case OTA_MANIFEST_MSG_MANIFEST:
             {
-               _get_update();
-               break;
+                _get_update();
+                break;
+            }
+
+            case OTA_MANIFEST_REQ_TIME:
+            {
+                _update_time();
+                break;
             }
             default:
                 break;

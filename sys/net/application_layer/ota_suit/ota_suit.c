@@ -83,6 +83,15 @@ ssize_t _uuid_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context)
     return pkt_pos - (uint8_t*)pkt->hdr;
 }
 
+static ssize_t _time_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+{
+    (void)context;
+    uint8_t time[16];
+    size_t time_len = fmt_u64_dec((char*)time, firmware_manifest_get_time());
+    return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
+            COAP_FORMAT_TEXT, time, time_len);
+}
+
 static void *_ota_suit_thread(void* arg)
 {
     (void)arg;
@@ -112,6 +121,7 @@ const coap_resource_t coap_resources[] = {
     { "/s/fw/c", COAP_GET, _uuid_handler, (void *)'c' },
     { "/s/fw/d", COAP_GET, _uuid_handler, (void *)'d' },
     { "/s/fw/v", COAP_GET, _uuid_handler, (void *)'v' },
+    { "/s/t",    COAP_GET, _time_handler, NULL },
 };
 
 const unsigned coap_resources_numof = sizeof(coap_resources) / sizeof(coap_resources[0]);

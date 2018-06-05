@@ -28,7 +28,7 @@
 #include "firmware/manifest.h"
 #include "xtimer.h"
 
-#define MAIN_QUEUE_SIZE     (8)
+#define MAIN_QUEUE_SIZE     (4)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 int main(void)
@@ -38,6 +38,7 @@ int main(void)
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
     puts("RIOT suit OTA example application");
     printf("Running from slot %i\n", firmware_current_slot());
+    suit_uuid_init();
 
     firmware_manifest_run();
     ota_suit_run();
