@@ -436,108 +436,116 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     /* These settings do not require the transceiver to be powered on */
     switch (opt) {
         case NETOPT_STATE:
-            if (len < sizeof(netopt_state_t)) {
+            if (len != sizeof(netopt_state_t)) {
                 return -EOVERFLOW;
             }
             *((netopt_state_t *)value) = kw41zrf_netdev_get_state(dev);
-            return sizeof(netopt_state_t);
+            return len;
 
         case NETOPT_MAX_PACKET_SIZE:
-            if (len < sizeof(int16_t)) {
+            if (len != sizeof(int16_t)) {
                 return -EOVERFLOW;
             }
-
             *((uint16_t *)value) = KW41ZRF_MAX_PKT_LENGTH - _MAX_MHR_OVERHEAD;
-            return sizeof(uint16_t);
+            return len;
 
         case NETOPT_PRELOADING:
-            if (dev->netdev.flags & KW41ZRF_OPT_PRELOADING) {
-                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            if (len != sizeof(netopt_enable_t)) {
+                return -EOVERFLOW;
             }
-            else {
-                *((netopt_enable_t *)value) = NETOPT_DISABLE;
-            }
-            return sizeof(netopt_enable_t);
+            *((netopt_enable_t *)value) =
+                !!(dev->netdev.flags & KW41ZRF_OPT_PRELOADING);
+            return len;
 
         case NETOPT_PROMISCUOUSMODE:
-            if (dev->netdev.flags & KW41ZRF_OPT_PROMISCUOUS) {
-                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            if (len != sizeof(netopt_enable_t)) {
+                return -EOVERFLOW;
             }
-            else {
-                *((netopt_enable_t *)value) = NETOPT_DISABLE;
-            }
-            return sizeof(netopt_enable_t);
+            *((netopt_enable_t *)value) =
+                !!(dev->netdev.flags & KW41ZRF_OPT_PROMISCUOUS);
+            return len;
 
         case NETOPT_RX_START_IRQ:
+            if (len != sizeof(netopt_enable_t)) {
+                return -EOVERFLOW;
+            }
             *((netopt_enable_t *)value) =
                 !!(dev->netdev.flags & KW41ZRF_OPT_TELL_RX_START);
-            return sizeof(netopt_enable_t);
+            return len;
 
         case NETOPT_RX_END_IRQ:
+            if (len != sizeof(netopt_enable_t)) {
+                return -EOVERFLOW;
+            }
             *((netopt_enable_t *)value) =
                 !!(dev->netdev.flags & KW41ZRF_OPT_TELL_RX_END);
-            return sizeof(netopt_enable_t);
+            return len;
 
         case NETOPT_TX_START_IRQ:
+            if (len != sizeof(netopt_enable_t)) {
+                return -EOVERFLOW;
+            }
             *((netopt_enable_t *)value) =
                 !!(dev->netdev.flags & KW41ZRF_OPT_TELL_TX_START);
-            return sizeof(netopt_enable_t);
+            return len;
 
         case NETOPT_TX_END_IRQ:
+            if (len != sizeof(netopt_enable_t)) {
+                return -EOVERFLOW;
+            }
             *((netopt_enable_t *)value) =
                 !!(dev->netdev.flags & KW41ZRF_OPT_TELL_TX_END);
-            return sizeof(netopt_enable_t);
+            return len;
 
         case NETOPT_CSMA:
+            if (len != sizeof(netopt_enable_t)) {
+                return -EOVERFLOW;
+            }
             *((netopt_enable_t *)value) =
                 !!(dev->netdev.flags & KW41ZRF_OPT_CSMA);
-            return sizeof(netopt_enable_t);
+            return len;
 
         case NETOPT_CSMA_RETRIES:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 return -EOVERFLOW;
             }
             *((uint8_t *)value) = dev->csma_max_backoffs;
-            return sizeof(uint8_t);
+            return len;
 
         case NETOPT_CSMA_MAXBE:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 return -EOVERFLOW;
             }
             *((uint8_t *)value) = dev->csma_max_be;
-            return sizeof(uint8_t);
+            return len;
 
         case NETOPT_CSMA_MINBE:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 return -EOVERFLOW;
             }
             *((uint8_t *)value) = dev->csma_min_be;
-            return sizeof(uint8_t);
+            return len;
 
         case NETOPT_RETRANS:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 return -EOVERFLOW;
             }
             *((uint8_t *)value) = dev->max_retrans;
-            return sizeof(uint8_t);
+            return len;
 
         case NETOPT_TX_RETRIES_NEEDED:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 return -EOVERFLOW;
             }
-            else {
-                *(uint8_t *)value = dev->num_retrans;
-            }
-            return sizeof(uint8_t);
+            *((uint8_t *)value) = dev->num_retrans;
+            return len;
 
         case NETOPT_CHANNEL_PAGE:
-            if (len < sizeof(uint16_t)) {
+            if (len != sizeof(uint16_t)) {
                 return -EOVERFLOW;
             }
-            else {
-                *(uint16_t *)value = 0;
-            }
-            return sizeof(uint16_t);
+            *((uint16_t *)value) = 0;
+            return len;
 
         default:
             break;
@@ -572,44 +580,44 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
 
     switch (opt) {
         case NETOPT_TX_POWER:
-            if (len < sizeof(int16_t)) {
+            if (len != sizeof(int16_t)) {
                 res = -EOVERFLOW;
                 break;
             }
             *((uint16_t *)value) = kw41zrf_get_txpower(dev);
-            res = sizeof(uint16_t);
+            res = len;
             break;
 
         case NETOPT_IS_CHANNEL_CLR:
-            if (kw41zrf_cca(dev) == 0) {
-                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            if (len != sizeof(netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
             }
-            else {
-                *((netopt_enable_t *)value) = NETOPT_DISABLE;
-            }
-            res = sizeof(netopt_enable_t);
+            *((netopt_enable_t *)value) = !(kw41zrf_cca(dev));
+            res = len;
             break;
 
         case NETOPT_CCA_THRESHOLD:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(int8_t)) {
                 res = -EOVERFLOW;
                 break;
             }
-            *(int8_t *)value = kw41zrf_get_cca_threshold(dev);
-            res = sizeof(int8_t);
+            *((int8_t *)value) = kw41zrf_get_cca_threshold(dev);
+            res = len;
             break;
 
         case NETOPT_CCA_MODE:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 res = -EOVERFLOW;
                 break;
             }
-            *(uint8_t *)value = kw41zrf_get_cca_mode(dev);
-            switch (*((int8_t *)value)) {
+            uint8_t mode = kw41zrf_get_cca_mode(dev);
+            switch (mode) {
                 case NETDEV_IEEE802154_CCA_MODE_1:
                 case NETDEV_IEEE802154_CCA_MODE_2:
                 case NETDEV_IEEE802154_CCA_MODE_3:
-                    res = sizeof(uint8_t);
+                    *((uint8_t *)value) = mode;
+                    res = len;
                     break;
                 default:
                     res = -EINVAL;
@@ -618,12 +626,12 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             break;
 
         case NETOPT_LAST_ED_LEVEL:
-            if (len < sizeof(int8_t)) {
+            if (len != sizeof(int8_t)) {
                 res = -EOVERFLOW;
                 break;
             }
-            *(int8_t *)value = kw41zrf_get_ed_level(dev);
-            res = sizeof(int8_t);
+            *((int8_t *)value) = kw41zrf_get_ed_level(dev);
+            res = len;
             break;
 
         default:
