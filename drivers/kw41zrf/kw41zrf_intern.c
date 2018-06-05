@@ -120,7 +120,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
             /* Wait for oscillator ready signal before attempting to recover from DSM */
             while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
             /* If we are already awake we can just return now. */
-            if (!(RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK)) {
+            if (!(kw41zrf_is_dsm())) {
                 /* Already awake */
                 break;
             }
@@ -129,7 +129,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
              * on the clocks */
             RSIM->ZIG_WAKE = KW41ZRF_DSM_EXIT_DELAY + RSIM->DSM_TIMER + RSIM->DSM_OSC_OFFSET;
             /* Wait to come out of DSM */
-            while (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {}
+            while (kw41zrf_is_dsm()) {}
 
             /* Convert DSM ticks (32.768 kHz) to event timer ticks (1 MHz) */
             uint64_t tmp = (uint64_t)(RSIM->ZIG_WAKE - RSIM->ZIG_SLEEP) * 15625ul;
@@ -145,7 +145,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
         }
         case KW41ZRF_POWER_DSM:
         {
-            if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+            if (kw41zrf_is_dsm()) {
                 /* Already asleep */
                 break;
             }
@@ -175,7 +175,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
              * enter DSM and we get stuck in the while() below */
             RSIM->DSM_CONTROL = (RSIM_DSM_CONTROL_DSM_TIMER_EN_MASK |
                                 RSIM_DSM_CONTROL_ZIG_SYSCLK_REQUEST_EN_MASK);
-            while (!(RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK)) {}
+            while (!(kw41zrf_is_dsm())) {}
             /* Restore saved RF_OSC_EN bits (from kw41zrf_init)
              * This will disable the RF oscillator unless the system was
              * configured to use the RF oscillator before kw41zrf_init() was

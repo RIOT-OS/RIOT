@@ -342,9 +342,9 @@ static int kw41zrf_netdev_set_state(kw41zrf_t *dev, netopt_state_t state)
             /* There is no deeper 'off' mode than deep sleep mode */
             /* fall through */
         case NETOPT_STATE_SLEEP:
-            if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+            if (kw41zrf_is_dsm()) {
                 /* Transceiver is already in deep sleep mode */
-                break;;
+                break;
             }
             kw41zrf_abort_sequence(dev);
             kw41zrf_set_power_mode(dev, KW41ZRF_POWER_DSM);
@@ -385,7 +385,7 @@ static netopt_state_t kw41zrf_netdev_get_state(kw41zrf_t *dev)
     (void) dev;
     /* ZLL register access require that the transceiver is powered on and not in
      * deep sleep mode */
-    if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+    if (kw41zrf_is_dsm()) {
         /* Transceiver is in deep sleep mode */
         return NETOPT_STATE_SLEEP;
     }
@@ -545,7 +545,7 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
 
     /* The below settings require the transceiver to be powered on */
     bool put_to_sleep_when_done = false;
-    if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+    if (kw41zrf_is_dsm()) {
         /* Transceiver is in deep sleep mode */
         switch (opt) {
             case NETOPT_TX_POWER:
@@ -657,74 +657,86 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
             break;
 
         case NETOPT_STATE:
-            if (len > sizeof(netopt_state_t)) {
+            if (len != sizeof(const netopt_state_t)) {
                 res = -EOVERFLOW;
+                break;
             }
-            else {
-                res = kw41zrf_netdev_set_state(dev, *((const netopt_state_t *)value));
-            }
+            res = kw41zrf_netdev_set_state(dev, *((const netopt_state_t *)value));
             break;
 
         case NETOPT_PRELOADING:
+            if (len != sizeof(const netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
             kw41zrf_set_option(dev, KW41ZRF_OPT_PRELOADING,
-                               ((const netopt_enable_t *)value)[0]);
-            res = sizeof(netopt_enable_t);
+                               *((const netopt_enable_t *)value));
+            res = len;
             break;
 
         case NETOPT_RX_END_IRQ:
+            if (len != sizeof(const netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
             kw41zrf_set_option(dev, KW41ZRF_OPT_TELL_RX_END,
-                               ((const netopt_enable_t *)value)[0]);
-            res = sizeof(netopt_enable_t);
+                               *((const netopt_enable_t *)value));
+            res = len;
             break;
 
         case NETOPT_TX_START_IRQ:
+            if (len != sizeof(const netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
             kw41zrf_set_option(dev, KW41ZRF_OPT_TELL_TX_START,
-                               ((const netopt_enable_t *)value)[0]);
-            res = sizeof(netopt_enable_t);
+                               *((const netopt_enable_t *)value));
+            res = len;
             break;
 
         case NETOPT_TX_END_IRQ:
+            if (len != sizeof(const netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
             kw41zrf_set_option(dev, KW41ZRF_OPT_TELL_TX_END,
-                               ((const netopt_enable_t *)value)[0]);
-            res = sizeof(netopt_enable_t);
+                               *((const netopt_enable_t *)value));
+            res = len;
             break;
 
         case NETOPT_CSMA_RETRIES:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 res = -EOVERFLOW;
+                break;
             }
-            else {
-                dev->csma_max_backoffs = *((const uint8_t*)value);
-                res = sizeof(uint8_t);
-            }
+            dev->csma_max_backoffs = *((const uint8_t*)value);
+            res = len;
             break;
 
         case NETOPT_CSMA_MAXBE:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 res = -EOVERFLOW;
+                break;
             }
-            else {
-                dev->csma_max_be = *((const uint8_t*)value);
-                res = sizeof(uint8_t);
-            }
+            dev->csma_max_be = *((const uint8_t*)value);
+            res = len;
             break;
 
         case NETOPT_CSMA_MINBE:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 res = -EOVERFLOW;
+                break;
             }
-            else {
-                dev->csma_min_be = *((const uint8_t*)value);
-                res = sizeof(uint8_t);
-            }
+            dev->csma_min_be = *((const uint8_t*)value);
+            res = len;
             break;
 
         case NETOPT_RETRANS:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(uint8_t)) {
                 return -EOVERFLOW;
             }
             dev->max_retrans = *((const uint8_t *)value);
-            res = sizeof(uint8_t);
+            res = len;
             break;
 
         default:
@@ -733,7 +745,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
 
     bool put_to_sleep_when_done = false;
 
-    if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+    if (kw41zrf_is_dsm()) {
         /* Transceiver is in deep sleep mode, check if setting the option
          * requires the radio powered on */
         switch (opt) {
@@ -762,117 +774,130 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
     switch (opt) {
         case NETOPT_AUTOACK:
             /* Set up HW generated automatic ACK after Receive */
+            if (len != sizeof(const netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
             kw41zrf_set_option(dev, KW41ZRF_OPT_AUTOACK,
-                               ((const netopt_enable_t *)value)[0]);
-            res = sizeof(netopt_enable_t);
+                               *((const netopt_enable_t *)value));
+            res = len;
             break;
 
         case NETOPT_ACK_REQ:
+            if (len != sizeof(const netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
             kw41zrf_set_option(dev, KW41ZRF_OPT_ACK_REQ,
-                               ((const netopt_enable_t *)value)[0]);
+                               *((const netopt_enable_t *)value));
             /* don't set res to set netdev_ieee802154_t::flags */
             break;
 
         case NETOPT_PROMISCUOUSMODE:
+            if (len != sizeof(const netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
             kw41zrf_set_option(dev, KW41ZRF_OPT_PROMISCUOUS,
-                               ((const netopt_enable_t *)value)[0]);
-            res = sizeof(netopt_enable_t);
+                               *((const netopt_enable_t *)value));
+            res = len;
             break;
 
         case NETOPT_RX_START_IRQ:
+            if (len != sizeof(const netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
             kw41zrf_set_option(dev, KW41ZRF_OPT_TELL_RX_START,
-                               ((const netopt_enable_t *)value)[0]);
-            res = sizeof(netopt_enable_t);
+                               *((const netopt_enable_t *)value));
+            res = len;
             break;
 
         case NETOPT_CSMA:
+            if (len != sizeof(const netopt_enable_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
             kw41zrf_set_option(dev, KW41ZRF_OPT_CSMA,
                                ((const netopt_enable_t *)value)[0]);
-            res = sizeof(netopt_enable_t);
+            res = len;
             break;
 
         case NETOPT_ADDRESS:
-            if (len > sizeof(uint16_t)) {
+            if (len != sizeof(const uint16_t)) {
                 res = -EOVERFLOW;
+                break;
             }
-            else {
-                kw41zrf_set_addr_short(dev, *((const uint16_t *)value));
-                /* don't set res to set netdev_ieee802154_t::short_addr */
-            }
+            kw41zrf_set_addr_short(dev, *((const uint16_t *)value));
+            /* don't set res to set netdev_ieee802154_t::short_addr */
             break;
 
         case NETOPT_ADDRESS_LONG:
-            if (len > sizeof(uint64_t)) {
-                return -EOVERFLOW;
+            if (len != sizeof(const uint64_t)) {
+                res = -EOVERFLOW;
+                break;
             }
-            else {
-                kw41zrf_set_addr_long(dev, *((const uint64_t *)value));
-                /* don't set res to set netdev_ieee802154_t::short_addr */
-            }
+            kw41zrf_set_addr_long(dev, *((const uint64_t *)value));
+            /* don't set res to set netdev_ieee802154_t::short_addr */
             break;
 
         case NETOPT_NID:
-            if (len > sizeof(uint16_t)) {
-                return -EOVERFLOW;
+            if (len != sizeof(const uint16_t)) {
+                res = -EOVERFLOW;
+                break;
             }
-            else {
-                kw41zrf_set_pan(dev, *((const uint16_t *)value));
-                /* don't set res to set netdev_ieee802154_t::pan */
-            }
+            kw41zrf_set_pan(dev, *((const uint16_t *)value));
+            /* don't set res to set netdev_ieee802154_t::pan */
             break;
 
         case NETOPT_CHANNEL:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(const uint8_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            if (kw41zrf_set_channel(dev, *((const uint8_t *)value))) {
                 res = -EINVAL;
+                break;
             }
-            else {
-                uint8_t chan = ((const uint8_t *)value)[0];
-                if (kw41zrf_set_channel(dev, chan)) {
-                    res = -EINVAL;
-                    break;
-                }
-                /* don't set res to set netdev_ieee802154_t::chan */
-            }
+            /* don't set res to set netdev_ieee802154_t::chan */
             break;
 
         case NETOPT_TX_POWER:
-            if (len < sizeof(int16_t)) {
+            if (len != sizeof(const uint16_t)) {
                 res = -EOVERFLOW;
+                break;
             }
-            else {
-                kw41zrf_set_tx_power(dev, *(const int16_t *)value);
-                res = sizeof(int16_t);
-            }
+            kw41zrf_set_tx_power(dev, *(const int16_t *)value);
+            res = len;
             break;
 
         case NETOPT_CCA_THRESHOLD:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(const uint8_t)) {
                 res = -EOVERFLOW;
+                break;
             }
-            else {
-                kw41zrf_set_cca_threshold(dev, *((const uint8_t*)value));
-                res = sizeof(uint8_t);
-            }
+            kw41zrf_set_cca_threshold(dev, *((const uint8_t*)value));
+            res = len;
             break;
 
         case NETOPT_CCA_MODE:
-            if (len < sizeof(uint8_t)) {
+            if (len != sizeof(const uint8_t)) {
                 res = -EOVERFLOW;
+                break;
             }
-            else {
-                switch (*((const uint8_t*)value)) {
-                    case NETDEV_IEEE802154_CCA_MODE_1:
-                    case NETDEV_IEEE802154_CCA_MODE_2:
-                    case NETDEV_IEEE802154_CCA_MODE_3:
-                        kw41zrf_set_cca_mode(dev, *((const uint8_t*)value));
-                        res = sizeof(uint8_t);
-                        break;
-                    case NETDEV_IEEE802154_CCA_MODE_4:
-                    case NETDEV_IEEE802154_CCA_MODE_5:
-                    case NETDEV_IEEE802154_CCA_MODE_6:
-                    default:
-                        break;
-                }
+            uint8_t mode = *((const uint8_t*)value);
+            switch (mode) {
+                case NETDEV_IEEE802154_CCA_MODE_1:
+                case NETDEV_IEEE802154_CCA_MODE_2:
+                case NETDEV_IEEE802154_CCA_MODE_3:
+                    kw41zrf_set_cca_mode(dev, mode);
+                    res = len;
+                    break;
+                case NETDEV_IEEE802154_CCA_MODE_4:
+                case NETDEV_IEEE802154_CCA_MODE_5:
+                case NETDEV_IEEE802154_CCA_MODE_6:
+                default:
+                    break;
             }
             break;
 
@@ -886,8 +911,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
     }
 
     if (res == -ENOTSUP) {
-        res = netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
-                                     value, len);
+        res = netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt, value, len);
     }
 
     return res;
@@ -1139,7 +1163,7 @@ static void kw41zrf_netdev_isr(netdev_t *netdev)
     }
 
     /* ZLL register access requires that the transceiver is not in deep sleep mode */
-    if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+    if (kw41zrf_is_dsm()) {
         /* Transceiver is sleeping, the IRQ must have occurred before entering
          * sleep, discard the call */
         return;

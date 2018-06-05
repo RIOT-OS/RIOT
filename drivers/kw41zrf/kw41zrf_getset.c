@@ -187,7 +187,7 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
 {
     DEBUG("[kw41zrf] set option 0x%04x to %x\n", option, state);
 
-    if (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK) {
+    if (kw41zrf_is_dsm()) {
         /* Transceiver is sleeping */
         switch (option) {
             /* Modifying these options require that the transceiver is not in

@@ -134,6 +134,17 @@ static inline void kw41zrf_abort_sequence(kw41zrf_t *dev)
 }
 
 /**
+ * @brief   Check if the radio is in deep sleep mode
+ *
+ * @return non-zero if radio is in deep sleep
+ * @return 0 if radio is not in deep sleep mode
+ */
+static inline uint32_t kw41zrf_is_dsm(void)
+{
+    return (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_ZIG_DEEP_SLEEP_STATUS_MASK);
+}
+
+/**
  * @brief Set event timer counter value
  *
  * @param[in] dev       kw41zrf device descriptor
