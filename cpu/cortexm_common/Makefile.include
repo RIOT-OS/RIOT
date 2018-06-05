@@ -2,10 +2,6 @@
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include/vendor
 
-ifneq (,$(ROM_OFFSET))
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFSET)
-endif
-
 # All variables must be defined in the CPU configuration when using the common
 # `ldscripts/cortexm.ld`
 ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
@@ -18,3 +14,10 @@ ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_length=$(ROM_LEN)
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
 endif
+
+
+# Only define the linker symbol if the variable is set
+# The variable can be set using target specific variable thanks to lazy evaluation
+
+# ROM_OFFSET: offset in rom to start linking, allows supporting a bootloader
+LINKFLAGS += $(if $(ROM_OFFSET),$(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFSET))
