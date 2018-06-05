@@ -73,7 +73,7 @@ def _parse_privkey(skey):
         pem_input = skey.decode('ascii')
         skey = base64.b64decode(''.join(pem_input.splitlines()[1:-1]))
     keys_input, _ = der_decoder(skey, asn1Spec=EddsaPrivateKey())
-    return ed25519.SigningKey(_get_skey(keys_input))
+    return _get_skey(keys_input)
 
 
 def _format_sign1(payload, protected, unprotected, signature):
@@ -175,6 +175,8 @@ def _get_args():
     parser.add_argument("-u", "--uri", type=str, help="Full uri to the binary")
     parser.add_argument("-k", "--key", type=argparse.FileType('rb'),
                         help="File containing the ed25519 key")
+    parser.add_argument("-r", "--raw", help="File is a raw ed25519 byte key",
+            action="store_true")
     parser.add_argument("-e", "--vendorname", type=str,
                         help="Vendor")
     parser.add_argument("-c", "--classname", type=str,
@@ -198,7 +200,11 @@ def main():
     args = _get_args()
     print(args)
     key_data = args.key.read()
-    skey = _parse_privkey(key_data)
+    skey = None
+    if args.raw:
+        skey = ed25519.SigningKey(key_data)
+    else:
+        skey = ed25519.SigningKey(_parse_privkey(key_data))
     suit = _format_suit(args)
     print("manifest generated, {} bytes long".format(len(cbor.dumps(suit))))
     sign = _sign1(cbor.dumps(suit), "test", skey)
