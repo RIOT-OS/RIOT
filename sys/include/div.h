@@ -28,6 +28,7 @@
 #ifndef DIV_H
 #define DIV_H
 
+#include <inttypes.h>
 #include <stdint.h>
 
 #include "assert.h"
@@ -37,114 +38,166 @@ extern "C" {
 #endif
 
 /**
- * @brief   Calculate 8-bit multiplicative inverse
+ * @brief   Internal 65-bit shift and comparison: 2*x > y
  *
- * Result is calculated during compilation (requires const num). Bitshifted by
- * 9 to give the most representation to the smallest interesting number (3)
+ * @param[in] x    greater / 2
+ * @param[in] y    lesser
  *
- * @param[in] num  reciprocal
- *
- * @return         result, bitshifted by 9
+ * @return         if 2*x > y then 1, else 0
  */
-__attribute__((always_inline)) static inline uint8_t div_inv_8(
-                                             const uint8_t num)
+__attribute__((always_inline)) static inline uint8_t _div_shcom(
+                                             const uint64_t x, const uint64_t y)
 {
-    /* cannot be represented due to bit shift */
-    assert(num > 2);
+    if (x & (1ULL << 63)) {
+        return 1;
+    }
 
-    const uint16_t numerator = (1 << 9);
+    if ((x << 1) > y) {
+        return 1;
+    }
 
-    if ((numerator % num) * 2 >= num) {
-        /* fraction is >= 0.5, so round up */
-        return (uint8_t)(numerator / num) + 1;
+    return 0;
+}
+
+/**
+ * @brief   Internal 65-bit shift and subtraction: 2*x - y
+ *
+ * @param[in] x    minuend / 2
+ * @param[in] y    subtrahend
+ *
+ * @return         difference
+ */
+__attribute__((always_inline)) static inline uint64_t _div_shsub(
+                                             const uint64_t x, const uint64_t y)
+{
+    if (x & (1ULL << 63)) {
+        uint64_t tmp;
+
+        /* = 2^64 - 1 - y */
+        tmp = (uint64_t)(-1) - y;
+
+        /* = (2^64 - 1 - y) + (2*x - 2^64) */
+        /* = 2*x - y - 1 */
+        tmp += (x << 1);
+
+        /* = 2*x - y */
+        return tmp + 1;
+    }
+
+    return (x << 1) - y;
+}
+
+/**
+ * @brief   Internal 64-bit fraction calculation
+ *
+ * @param[in] num  numerator
+ * @param[in] den  denominator
+ *
+ * @return         result, bitshifted by 64
+ */
+__attribute__((always_inline, optimize("unroll-all-loops"))) static inline
+               uint64_t _div_frac(const uint64_t num, const uint64_t den)
+{
+    uint64_t ans = 0, rem = num;
+
+    /* binary long division */
+    for (uint8_t i = 0; i < 64; i++) {
+        if (_div_shcom(rem, den)) {
+            /* den goes into num for this bit */
+            ans |= (1ULL << (63 - i));
+
+            /* subtract and move to next bit */
+            rem = _div_shsub(rem, den);
+        }
+        else {
+            /* move to next bit */
+            rem <<= 1;
+        }
+    }
+
+    /* rounding */
+    if (_div_shcom(rem, den)) {
+        ans++;
+    }
+
+    return ans;
+}
+
+/**
+ * @brief   Compile-time calculate 16-bit fraction
+ *
+ * For fractions that are less than one. Result is calculated during
+ * compilation (requires const input).
+ *
+ * @param[in] num  numerator
+ * @param[in] den  denominator
+ *
+ * @return         result, bitshifted by 16
+ */
+__attribute__((always_inline)) static inline uint16_t div_frac_16(
+                               const uint16_t num, const uint16_t den)
+{
+    assert((den > 0) && (num < den));
+
+    /* done during compile time, so trade efficiency for simplicity */
+    const uint64_t ans = _div_frac((uint64_t)num << 48, (uint64_t)den << 48);
+
+    if ((ans << 16) > (1ULL << 63)) {
+        /* round the result */
+        return (uint16_t)(ans >> 48) + 1;
     }
     else {
-        return (uint8_t)(numerator / num);
+        return (uint16_t)(ans >> 48);
     }
 }
 
 /**
- * @brief   Calculate 16-bit multiplicative inverse
+ * @brief   Compile-time calculate 32-bit fraction
  *
- * Result is calculated during compilation (requires const num). Bitshifted by
- * 17 to give the most representation to the smallest interesting number (3)
+ * For fractions that are less than one. Result is calculated during
+ * compilation (requires const input).
  *
- * @param[in] num  reciprocal
+ * @param[in] num  numerator
+ * @param[in] den  denominator
  *
- * @return         result, bitshifted by 17
+ * @return         result, bitshifted by 32
  */
-__attribute__((always_inline)) static inline uint16_t div_inv_16(
-                                             const uint16_t num)
+__attribute__((always_inline)) static inline uint32_t div_frac_32(
+                               const uint32_t num, const uint32_t den)
 {
-    /* cannot be represented due to bit shift */
-    assert(num > 2);
+    assert((den > 0) && (num < den));
 
-    const uint32_t numerator = (1UL << 17);
+    /* done during compile time, so trade efficiency for simplicity */
+    const uint64_t ans = _div_frac((uint64_t)num << 32, (uint64_t)den << 32);
 
-    if ((numerator % num) * 2 >= num) {
-        /* fraction is >= 0.5, so round up */
-        return (uint16_t)(numerator / num) + 1;
+    if ((ans << 32) > (1ULL << 63)) {
+        /* round the result */
+        return (uint32_t)(ans >> 32) + 1;
     }
     else {
-        return (uint16_t)(numerator / num);
+        return (uint32_t)(ans >> 32);
     }
 }
 
 /**
- * @brief   Calculate 32-bit multiplicative inverse
+ * @brief   Compile-time calculate 64-bit fraction
  *
- * Result is calculated during compilation (requires const num). Bitshifted by
- * 33 to give the most representation to the smallest interesting number (3)
+ * For fractions that are less than one. Result is calculated during
+ * compilation (requires const input).
  *
- * @param[in] num  reciprocal
+ * @param[in] num  numerator
+ * @param[in] den  denominator
  *
- * @return         result, bitshifted by 33
+ * @return         result, bitshifted by 64
  */
-__attribute__((always_inline)) static inline uint32_t div_inv_32(
-                                             const uint32_t num)
+__attribute__((always_inline)) static inline uint64_t div_frac_64(
+                               const uint64_t num, const uint64_t den)
 {
-    /* cannot be represented due to bit shift */
-    assert(num > 2);
+    assert((den > 0) && (num < den));
 
-    const uint64_t numerator = (1ULL << 33);
+    const uint64_t ans = _div_frac(num, den);
 
-    if ((numerator % num) * 2 >= num) {
-        /* fraction is >= 0.5, so round up */
-        return (uint32_t)(numerator / num) + 1;
-    }
-    else {
-        return (uint32_t)(numerator / num);
-    }
-}
-
-/**
- * @brief   Calculate 64-bit multiplicative inverse
- *
- * Result is calculated during compilation (requires const num). Bitshifted by
- * 65 to give the most representation to the smallest interesting number (3)
- *
- * @param[in] num  reciprocal
- *
- * @return         result, bitshifted by 65
- */
-__attribute__((always_inline)) static inline uint64_t div_inv_64(
-                                             const uint64_t num)
-{
-    /* cannot be represented due to bit shift */
-    assert(num > 2);
-
-    /* find the last bits without using 128-bit ints */
-    const uint64_t numerator = (1ULL << 63);
-    const uint64_t most_sig = (numerator / num) << 2;
-    const uint64_t least_sig = ((numerator % num) << 2) / num;
-
-    if ((((numerator % num) << 2) % num) * 2 >= num) {
-        /* fraction is >= 0.5, so round up */
-        return (most_sig + least_sig + 1);
-    }
-    else {
-        return (most_sig + least_sig);
-    }
+    return ans;
 }
 
 /**
@@ -163,61 +216,136 @@ __attribute__((always_inline)) static inline uint64_t div_inv_64(
 uint64_t _div_mulhi64(const uint64_t a, const uint64_t b);
 
 /**
- * @brief   Divide 8-bit number using an inverse
+ * @brief   Multiply 16-bit number with a fraction
  *
- * @param[in] val  numerator
- * @param[in] inv  multiplicative inverse of denominator (bitshifted by 9)
+ * @param[in] val   integer
+ * @param[in] frac  fraction (bitshifted by 16)
  *
- * @return         result
+ * @return          result
  */
-static inline uint8_t div_u8_by_inv(const uint8_t val, const uint8_t inv)
+static inline uint16_t div_mul_w_frac_16(const uint16_t val, const uint16_t frac)
 {
-    const uint16_t tmp = (uint16_t)val * (uint16_t)inv;
+    const uint32_t tmp = (uint32_t)val * (uint32_t)frac;
 
-    return (uint8_t)(tmp >> 9);
+    return (uint16_t)(tmp >> 16);
 }
 
 /**
- * @brief   Divide 16-bit number using an inverse
+ * @brief   Multiply 32-bit number with a fraction
  *
- * @param[in] val  numerator
- * @param[in] inv  multiplicative inverse of denominator (bitshifted by 17)
+ * @param[in] val   integer
+ * @param[in] frac  fraction (bitshifted by 32)
  *
- * @return         result
+ * @return          result
  */
-static inline uint16_t div_u16_by_inv(const uint16_t val, const uint16_t inv)
+static inline uint32_t div_mul_w_frac_32(const uint32_t val, const uint32_t frac)
 {
-    const uint32_t tmp = (uint32_t)val * (uint32_t)inv;
+    const uint64_t tmp = (uint64_t)val * (uint64_t)frac;
 
-    return (uint16_t)(tmp >> 17);
+    return (uint32_t)(tmp >> 32);
 }
 
 /**
- * @brief   Divide 32-bit number using an inverse
+ * @brief   Multiply 64-bit number with a fraction
  *
- * @param[in] val  numerator
- * @param[in] inv  multiplicative inverse of denominator (bitshifted by 33)
+ * @param[in] val   integer
+ * @param[in] frac  fraction (bitshifted by 64)
  *
- * @return         result
+ * @return          result
  */
-static inline uint32_t div_u32_by_inv(const uint32_t val, const uint32_t inv)
+static inline uint64_t div_mul_w_frac_64(const uint64_t val, const uint64_t frac)
 {
-    const uint64_t tmp = (uint64_t)val * (uint64_t)inv;
-
-    return (uint32_t)(tmp >> 33);
+    return _div_mulhi64(val, frac);
 }
 
 /**
- * @brief   Divide 64-bit number using an inverse
+ * @brief   Division of a 16-bit number with high-accuracy
  *
- * @param[in] val  numerator
- * @param[in] inv  multiplicative inverse of denominator (bitshifted by 65)
+ * This is partially calculated during compilation for speed, which requires
+ * that the denominator is a constant.
  *
- * @return         result
+ * @param[in] num   numerator
+ * @param[in] den   denominator
+ *
+ * @return          result
  */
-static inline uint64_t div_u64_by_inv(const uint64_t val, const uint64_t inv)
+__attribute__((always_inline, optimize("unroll-all-loops"))) static inline
+               uint16_t div_16(const uint16_t num, const uint16_t den)
 {
-    return (_div_mulhi64(val, inv) >> 1);
+    uint8_t exp;
+
+    /* find highest power of two less than den */
+    for (exp = 15; exp > 0; exp--) {
+        if ((1U << exp) < den) {
+            break;
+        }
+    }
+
+    /* Make inverse: (1 > inv >= 0.5) for greatest accuracy */
+    const uint16_t inv = div_frac_16((1U << exp), den);
+
+    /* last step is only thing calculated at runtime */
+    return (div_mul_w_frac_16(num, inv) >> exp);
+}
+
+/**
+ * @brief   Division of a 32-bit number with high-accuracy
+ *
+ * This is partially calculated during compilation for speed, which requires
+ * that the denominator is a constant.
+ *
+ * @param[in] num   numerator
+ * @param[in] den   denominator
+ *
+ * @return          result
+ */
+__attribute__((always_inline, optimize("unroll-all-loops"))) static inline
+               uint32_t div_32(const uint32_t num, const uint32_t den)
+{
+    uint8_t exp;
+
+    /* find highest power of two less than den */
+    for (exp = 31; exp > 0; exp--) {
+        if ((1UL << exp) < den) {
+            break;
+        }
+    }
+
+    /* Make inverse: (1 > inv >= 0.5) for greatest accuracy */
+    const uint32_t inv = div_frac_32((1UL << exp), den);
+
+    /* last step is only thing calculated at runtime */
+    return (div_mul_w_frac_32(num, inv) >> exp);
+}
+
+/**
+ * @brief   Division of a 64-bit number with high-accuracy
+ *
+ * This is partially calculated during compilation for speed, which requires
+ * that the denominator is a constant.
+ *
+ * @param[in] num   numerator
+ * @param[in] den   denominator
+ *
+ * @return          result
+ */
+__attribute__((always_inline, optimize("unroll-all-loops"))) static inline
+               uint64_t div_64(const uint64_t num, const uint64_t den)
+{
+    uint8_t exp;
+
+    /* find highest power of two less than den */
+    for (exp = 63; exp > 0; exp--) {
+        if ((1ULL << exp) < den) {
+            break;
+        }
+    }
+
+    /* Make inverse: (1 > inv >= 0.5) for greatest accuracy */
+    const uint64_t inv = div_frac_64((1ULL << exp), den);
+
+    /* last step is only thing calculated at runtime */
+    return (div_mul_w_frac_64(num, inv) >> exp);
 }
 
 #ifdef __cplusplus
