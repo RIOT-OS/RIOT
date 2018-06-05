@@ -83,7 +83,7 @@ int gettimeofday(struct timeval *__restrict __p, void *__restrict __tz)
     (void)__tz;
 
     uint64_t now = counter * US_PER_MS;
-    __p->tv_sec = div_u64_by_inv(now, div_inv_64(1000000));
+    __p->tv_sec = div_64(now, 1000000UL);
     __p->tv_usec = now - (__p->tv_sec * US_PER_SEC);
 
     return 0;
