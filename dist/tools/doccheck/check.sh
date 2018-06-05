@@ -8,7 +8,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-RIOTBASE=$(readlink -f "$(dirname $(realpath $0))/../../..")
+RIOTBASE="$(cd $(dirname $0)/../../..; pwd)"
 
 if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
     CERROR="\e[1;31m"
