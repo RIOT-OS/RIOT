@@ -37,7 +37,8 @@ def find_exc_origin(exc_info):
 
 def run(testfunc, timeout=10, echo=True, traceback=False):
     env = os.environ.copy()
-    child = pexpect.spawnu("make term", env=env, timeout=timeout, codec_errors='replace')
+    child = pexpect.spawnu("make term", env=env, timeout=timeout,
+                           codec_errors='replace')
 
     # on many platforms, the termprog needs a short while to be ready...
     time.sleep(MAKE_TERM_STARTED_DELAY)
@@ -61,7 +62,8 @@ def run(testfunc, timeout=10, echo=True, traceback=False):
         return 1
     except pexpect.EOF:
         trace = find_exc_origin(sys.exc_info()[2])
-        print("Unexpected end of file in expect script at \"%s\" (%s:%d)" % trace)
+        print("Unexpected end of file in expect script at "
+              "\"%s\" (%s:%d)" % trace)
         if traceback:
             print_tb(sys.exc_info()[2])
         return 1
