@@ -96,7 +96,17 @@ typedef struct {
     NRF_TWIM_Type *dev;         /**< TWIM hardware device */
     uint8_t scl;                /**< SCL pin */
     uint8_t sda;                /**< SDA pin */
+    i2c_speed_t speed;          /**< Bus speed */
 } i2c_conf_t;
+/** @} */
+
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_WRITE_REG
+/** @} */
 
 #ifdef __cplusplus
 }
