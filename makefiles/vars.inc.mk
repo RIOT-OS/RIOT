@@ -63,7 +63,7 @@ export WERROR                # Treat all compiler warnings as errors if set to 1
 export GITCACHE              # path to git-cache executable
 export FLASHER               # The command to call on "make flash".
 export FFLAGS                # The parameters to supply to FLASHER.
-export FLASH_ADDR          # Define an offset to flash code into ROM memory.
+export FLASH_ADDR            # Define an offset to flash code into ROM memory.
 export TERMPROG              # The command to call on "make term".
 export TERMFLAGS             # Additional parameters to supply to TERMPROG.
 export PORT                  # The port to connect the TERMPROG to.
