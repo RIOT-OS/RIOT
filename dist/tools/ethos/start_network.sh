@@ -1,6 +1,18 @@
 #!/bin/sh
 
-ETHOS_DIR="$(dirname $(readlink -f $0))"
+ETHOS_DIR="$(cd $(dirname $0); pwd)"
+ETHOS="${ETHOS_DIR}/ethos"
+[ ! -f ${ETHOS} ] && {
+    echo "missing binary (${ETHOS})"
+    exit 1
+}
+
+UHCPD_DIR="$(cd ${ETHOS_DIR}; cd ../uhcpd; pwd)"
+UHCPD="${UHCPD_DIR}/bin/uhcpd"
+[ ! -f ${UHCPD} ] && {
+    echo "missing binary (${UHCPD})"
+    exit 1
+}
 
 create_tap() {
     ip tuntap add ${TAP} mode tap user ${USER}
@@ -33,7 +45,6 @@ PORT=$1
 TAP=$2
 PREFIX=$3
 BAUDRATE=115200
-UHCPD="$(readlink -f "${ETHOS_DIR}/../uhcpd/bin")/uhcpd"
 
 [ -z "${PORT}" -o -z "${TAP}" -o -z "${PREFIX}" ] && {
     echo "usage: $0 <serial-port> <tap-device> <prefix> [baudrate]"
