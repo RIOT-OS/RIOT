@@ -14,7 +14,7 @@
 #include "firmware/manifest.h"
 
 #define COAP_INBUF_SIZE     (256U)
-#define STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
+#define STACKSIZE           (2 * THREAD_STACKSIZE_DEFAULT)
 #define PRIO                (THREAD_PRIORITY_MAIN)
 #define TNAME               "coap"
 /* initialize nanocoap server instance */
