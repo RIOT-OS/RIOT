@@ -897,6 +897,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
                 case NETDEV_IEEE802154_CCA_MODE_5:
                 case NETDEV_IEEE802154_CCA_MODE_6:
                 default:
+                    res = -EINVAL;
                     break;
             }
             break;
