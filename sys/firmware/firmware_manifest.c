@@ -391,7 +391,9 @@ static void *_firmware_manifest_thread(void* arg)
     mutex_init(&_fw_man.lock);
     prev_time = 0;
     xtimer_sleep(5);
+#if 0
     _update_time();
+#endif
     while(1) {
         msg_receive(&msg);
         switch (msg.type) {
