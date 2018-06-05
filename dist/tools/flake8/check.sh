@@ -17,7 +17,10 @@ else
     CRESET=
 fi
 
-: "${RIOTTOOLS:=${PWD}/dist/tools}"
+: "${RIOTBASE:=$(cd $(dirname $0)/../../../; pwd)}"
+cd $RIOTBASE
+
+: "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
 . "${RIOTTOOLS}"/ci/changed_files.sh
 
 FILES=$(FILEREGEX='(?=*.py$|pyterm$)' changed_files)

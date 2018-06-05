@@ -7,9 +7,13 @@
 # directory for more details.
 #
 
-EXIT_CODE=0
-: "${RIOTTOOLS:=${PWD}/dist/tools}"
+: "${RIOTBASE:=$(cd $(dirname $0)/../../../; pwd)}"
+cd $RIOTBASE
+
+: "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
 . "${RIOTTOOLS}"/pr_check/check_labels.sh
+
+EXIT_CODE=0
 
 if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
     CERROR="\e[1;31m"
