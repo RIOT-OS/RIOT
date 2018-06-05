@@ -317,6 +317,17 @@ ALL_PKGS = $(sort $(patsubst $(RIOTPKG)/%/Makefile,%,$(wildcard $(RIOTPKG)/*/Mak
 # process dependencies
 include $(RIOTBASE)/Makefile.dep
 
+# Detect if an application or Makefile.dep defined USEPKG
+ifneq (,$(USEPKG))
+  ifeq ($(origin USEPKG), file)
+    $(warning USEPKG was defined in a file as: $(USEPKG))
+    $(error Packages dependencies should now be declared using USEMODULE instead of USEPKG)
+  endif
+endif
+
+# deduce packages from USEMODULE
+USEPKG = $(filter $(ALL_PKGS),$(USEMODULE))
+
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
