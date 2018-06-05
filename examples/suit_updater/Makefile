@@ -75,3 +75,10 @@ else
     CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
   endif
 endif
+
+# TODO keys should be generated in `bin` not here
+BUILDDEPS += keys.h
+keys.h: $(RIOTTOOLS)/firmware/pub.key
+	cp $< pubkey
+	xxd -i pubkey $@
+	rm pubkey
