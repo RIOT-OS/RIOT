@@ -2,11 +2,11 @@ INCLUDES += -I$(PKGDIRBASE)
 INCLUDES += -I$(RIOTPKG)/fatfs/fatfs_diskio/mtd/include
 DIRS += $(PKGDIRBASE)/fatfs
 
-DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/mtd
+DIRS += $(RIOTPKG)/fatfs/fatfs_diskio/mtd
 
 
 ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
-  DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_vfs
+  DIRS += $(RIOTPKG)/fatfs/fatfs_vfs
 endif
 
 #if periph_rtc is available use it. Otherwise use static timestamps
