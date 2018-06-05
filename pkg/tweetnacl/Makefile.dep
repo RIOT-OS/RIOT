@@ -1,1 +1,3 @@
-USEMODULE+=random
+ifneq (,$(filter tweetnacl,$(USEMODULE)))
+  USEMODULE += random
+endif

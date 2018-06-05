@@ -1,7 +1,9 @@
-ifneq (,$(filter cortex-m23 cortex-m0%,$(CPU_ARCH)))
-  USEMODULE += qDSA_asm
-endif
+ifneq (,$(filter qDSA,$(USEMODULE)))
+  ifneq (,$(filter cortex-m23 cortex-m0%,$(CPU_ARCH)))
+    USEMODULE += qDSA_asm
+  endif
 
-ifneq (,$(filter atmega_common,$(USEMODULE)))
-  USEMODULE += qDSA_asm
+  ifneq (,$(filter atmega_common,$(USEMODULE)))
+    USEMODULE += qDSA_asm
+  endif
 endif

@@ -1,10 +1,11 @@
-USEMODULE += nanocbor
+ifneq (,$(filter libcose,$(USEMODULE)))
+  USEMODULE += nanocbor
+  USEMODULE += libcose_crypt
 
-USEMODULE += libcose_crypt
-
-ifneq (,$(filter libcose_crypt_tweetnacl,$(USEMODULE)))
-  USEMODULE += tweetnacl
-endif
-ifneq (,$(filter libcose_crypt_hacl,$(USEMODULE)))
-  USEMODULE += hacl
+  ifneq (,$(filter libcose_crypt_tweetnacl,$(USEMODULE)))
+    USEMODULE += tweetnacl
+  endif
+  ifneq (,$(filter libcose_crypt_hacl,$(USEMODULE)))
+    USEMODULE += hacl
+  endif
 endif

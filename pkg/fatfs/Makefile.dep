@@ -1,6 +1,8 @@
-USEMODULE += fatfs_diskio_mtd
-USEMODULE += auto_init_storage
-USEMODULE += mtd
+ifneq (,$(filter fatfs,$(USEMODULE)))
+  USEMODULE += fatfs_diskio_mtd
+  USEMODULE += auto_init_storage
+  USEMODULE += mtd
 
-# Use RTC for timestamps if available
-FEATURES_OPTIONAL += periph_rtc
+  # Use RTC for timestamps if available
+  FEATURES_OPTIONAL += periph_rtc
+endif

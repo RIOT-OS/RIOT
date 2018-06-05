@@ -1,1 +1,3 @@
-USEMODULE+=random
+ifneq (,$(filter hacl,$(USEMODULE)))
+  USEMODULE += random
+endif

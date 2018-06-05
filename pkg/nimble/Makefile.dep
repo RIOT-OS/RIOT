@@ -1,17 +1,19 @@
-# RIOT specific dependencies
-USEMODULE += posix_semaphore
-USEMODULE += event_callback
-USEMODULE += xtimer
+ifneq (,$(filter nimble,$(USEMODULE)))
+  # RIOT specific dependencies
+  USEMODULE += posix_semaphore
+  USEMODULE += event_callback
+  USEMODULE += xtimer
 
-# Requires nimble feature
-FEATURES_REQUIRED += ble_nimble
+  # Requires nimble feature
+  FEATURES_REQUIRED += ble_nimble
 
-# glue code
-USEMODULE += nimble_riot_contrib
+  # glue code
+  USEMODULE += nimble_riot_contrib
 
-# RIOT port
-USEMODULE += nimble_porting_nimble
-USEMODULE += nimble_npl_riot
+  # RIOT port
+  USEMODULE += nimble_porting_nimble
+  USEMODULE += nimble_npl_riot
+endif
 
 # if nothing else is specified, we build the host and controller
 ifeq (,$(filter nimble_host nimble_controller,$(USEMODULE)))
