@@ -40,7 +40,16 @@
 #include <auto_init.h>
 #endif
 
-extern int main(void);
+#ifndef DEFAULT_APP_ENTRY
+#define DEFAULT_APP_ENTRY main
+#endif
+
+#define QUOTE(s) #s
+#define RESOLVE_NAME(name) QUOTE(name)
+#define DEFAULT_APP_ENTRY_NAME RESOLVE_NAME(DEFAULT_APP_ENTRY)
+
+extern int DEFAULT_APP_ENTRY(void);
+
 static void *main_trampoline(void *arg)
 {
     (void) arg;
@@ -54,9 +63,9 @@ static void *main_trampoline(void *arg)
     stat->laststart = 0;
 #endif
 
-    LOG_INFO("main(): This is RIOT! (Version: " RIOT_VERSION ")\n");
+    LOG_INFO(DEFAULT_APP_ENTRY_NAME "(): This is RIOT! (Version: " RIOT_VERSION ")\n");
 
-    main();
+    DEFAULT_APP_ENTRY();
     return NULL;
 }
 
