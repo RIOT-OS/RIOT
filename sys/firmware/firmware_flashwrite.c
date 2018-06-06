@@ -37,9 +37,10 @@ int firmware_flashwrite_init(firmware_flashwrite_t *state, int target_slot,
 
     memset(state, 0, sizeof(firmware_flashwrite_t));
 
-    state->offset = offset;
+    state->offset = offset % FLASHPAGE_SIZE;
     state->target_slot = target_slot;
     state->flashpage = flashpage_page(firmware_get_metadata(target_slot));
+    state->flashpage += offset / FLASHPAGE_SIZE;
 
     return 0;
 }

@@ -199,7 +199,6 @@ static ssize_t fetch_block(firmware_manifest_t *state, unsigned num, sock_udp_ep
 
         if (block2.offset == 0) {
             firmware_flashwrite_init(&_fw_man.writer, firmware_target_slot(), FIRMWARE_METADATA_SIZE);
-            _fw_man.writer.flashpage++;
         }
         if (block2.offset + pkt.payload_len > _fw_man.manifest.size) {
             LOG_ERROR("ota: received firmware larger than expected: %u, aborting\n", block2.offset + pkt.payload_len);
