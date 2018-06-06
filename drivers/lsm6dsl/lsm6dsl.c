@@ -62,7 +62,7 @@ int lsm6dsl_init(lsm6dsl_t *dev, const lsm6dsl_params_t *params)
 
     xtimer_usleep(LSM6DSL_BOOT_WAIT);
 
-    if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_WHO_AM_I, &tmp, 0) != 1) {
+    if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_WHO_AM_I, &tmp, 0) < 0) {
         i2c_release(BUS);
         DEBUG("[ERROR] lsm6dsl_init: i2c_read_reg LSM6DSL_REG_WHO_AM_I!\n");
         return -LSM6DSL_ERROR_BUS;
@@ -92,7 +92,7 @@ int lsm6dsl_init(lsm6dsl_t *dev, const lsm6dsl_params_t *params)
 
     i2c_release(BUS);
 
-    if (res < 4) {
+    if (res < 0) {
         DEBUG("[ERROR] lsm6dsl_init: config\n");
         return -LSM6DSL_ERROR_CNF;
     }
@@ -122,7 +122,7 @@ int lsm6dsl_read_acc(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
     data->z |= tmp << 8;
     i2c_release(BUS);
 
-    if (res < 6) {
+    if (res < 0) {
         DEBUG("[ERROR] lsm6dsl_read_acc\n");
         return -LSM6DSL_ERROR_BUS;
     }
@@ -158,7 +158,7 @@ int lsm6dsl_read_gyro(const lsm6dsl_t *dev, lsm6dsl_3d_data_t *data)
     data->z |= tmp << 8;
     i2c_release(BUS);
 
-    if (res < 6) {
+    if (res < 0) {
         DEBUG("[ERROR] lsm6dsl_read_gyro\n");
         return -LSM6DSL_ERROR_BUS;
     }
@@ -177,12 +177,12 @@ int lsm6dsl_read_temp(const lsm6dsl_t *dev, int16_t *data)
     uint16_t traw;
     /* read raw temperature */
     i2c_acquire(BUS);
-    if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUT_TEMP_L, &tmp, 0) != 1) {
+    if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUT_TEMP_L, &tmp, 0) < 0) {
         i2c_release(BUS);
         return -LSM6DSL_ERROR_BUS;
     }
     traw = tmp;
-    if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUT_TEMP_H, &tmp, 0) != 1) {
+    if (i2c_read_reg(BUS, ADDR, LSM6DSL_REG_OUT_TEMP_H, &tmp, 0) < 0) {
         i2c_release(BUS);
         return -LSM6DSL_ERROR_BUS;
     }
@@ -202,7 +202,7 @@ int lsm6dsl_acc_power_down(const lsm6dsl_t *dev)
 
     i2c_acquire(BUS);
     res = i2c_read_reg(BUS, ADDR, LSM6DSL_REG_CTRL1_XL, &tmp, 0);
-    if (res != 1) {
+    if (res < 0) {
         i2c_release(BUS);
         DEBUG("[ERROR] lsm6dsl_acc_power_down\n");
         return -LSM6DSL_ERROR_BUS;
@@ -213,7 +213,7 @@ int lsm6dsl_acc_power_down(const lsm6dsl_t *dev)
 
     i2c_release(BUS);
 
-    if (res != 1) {
+    if (res < 0) {
         DEBUG("[ERROR] lsm6dsl_acc_power_down\n");
         return -LSM6DSL_ERROR_BUS;
     }
@@ -228,7 +228,7 @@ int lsm6dsl_gyro_power_down(const lsm6dsl_t *dev)
 
     i2c_acquire(BUS);
     res = i2c_read_reg(BUS, ADDR, LSM6DSL_REG_CTRL2_G, &tmp, 0);
-    if (res != 1) {
+    if (res < 0) {
         i2c_release(BUS);
         DEBUG("[ERROR] lsm6dsl_gyro_power_down\n");
         return -LSM6DSL_ERROR_BUS;
@@ -239,7 +239,7 @@ int lsm6dsl_gyro_power_down(const lsm6dsl_t *dev)
 
     i2c_release(BUS);
 
-    if (res != 1) {
+    if (res < 0) {
         DEBUG("[ERROR] lsm6dsl_gyro_power_down\n");
         return -LSM6DSL_ERROR_BUS;
     }
@@ -254,7 +254,7 @@ int lsm6dsl_acc_power_up(const lsm6dsl_t *dev)
 
     i2c_acquire(BUS);
     res = i2c_read_reg(BUS, ADDR, LSM6DSL_REG_CTRL1_XL, &tmp, 0);
-    if (res != 1) {
+    if (res < 0) {
         i2c_release(BUS);
         DEBUG("[ERROR] lsm6dsl_acc_power_up\n");
         return -LSM6DSL_ERROR_BUS;
@@ -266,7 +266,7 @@ int lsm6dsl_acc_power_up(const lsm6dsl_t *dev)
 
     i2c_release(BUS);
 
-    if (res != 1) {
+    if (res < 0) {
         DEBUG("[ERROR] lsm6dsl_acc_power_up\n");
         return -LSM6DSL_ERROR_BUS;
     }
@@ -281,7 +281,7 @@ int lsm6dsl_gyro_power_up(const lsm6dsl_t *dev)
 
     i2c_acquire(BUS);
     res = i2c_read_reg(BUS, ADDR, LSM6DSL_REG_CTRL2_G, &tmp, 0);
-    if (res != 1) {
+    if (res < 0) {
         i2c_release(BUS);
         DEBUG("[ERROR] lsm6dsl_gyro_power_up\n");
         return -LSM6DSL_ERROR_BUS;
@@ -293,7 +293,7 @@ int lsm6dsl_gyro_power_up(const lsm6dsl_t *dev)
 
     i2c_release(BUS);
 
-    if (res != 1) {
+    if (res < 0) {
         DEBUG("[ERROR] lsm6dsl_gyro_power_up\n");
         return -LSM6DSL_ERROR_BUS;
     }
