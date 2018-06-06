@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sys_autoinit
+ * @ingroup sys_auto_init
  * @{
  * @file
  * @brief   initializes any used module that has a trivial init function
