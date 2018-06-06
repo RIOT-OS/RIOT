@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2010,2015 Freie Universität Berlin
  * Copyright (C) 2010 Kaspar Schleiser <kaspar@schleiser.de>
- * Copyright (C) 2013 INRIA
+ * Copyright (C) 2013-2018 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,19 +9,56 @@
  */
 
 /**
- * @defgroup    sys_auto_init Auto-init
+ * @defgroup    sys_auto_init Auto-initialization
  * @ingroup     sys
  * @brief       Auto initialize modules
- * @note        This feature can be used by any application by adding auto_init to
- *              USEMODULE in the application's Makefile. auto_init will initialize
- *              any other included module that does not require a parameter in
- *              its init function, i.e. if the prototype looks like this: void
- *              MODULE_init(void). Most timer modules or simple drivers can be
- *              initialized by auto_init. The modules will be initialized in
- *              the context of the main thread right before the main function
- *              gets called. Be aware that most modules expect to be
- *              initialized only once, so do not call a module's init function
- *              when using auto_init unless you know what you're doing.
+ *
+ * This feature can be enabled in any application by adding the `auto_init`
+ * module to the application's `Makefile`:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * USEMODULE += auto_init
+ * ~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * `auto_init` initializes any included module that provides
+ * auto-initialization capabilities.
+ * This concerns first any other included module that does not require a
+ * parameter in its init function, i.e. if the init prototype looks like this:
+ * `void MODULE_init(void)`. Most timer modules or simple drivers can be
+ * initialized by `auto_init`.
+ * The modules will be initialized in the context of the main thread right
+ * before the main function gets called. Be aware that most modules expect to
+ * be initialized only once, so do not call a module's init function when using
+ * `auto_init` unless you know what you're doing.
+ *
+ * More complex device [drivers](@ref drivers), for example
+ * [SAUL](@ref drivers_saul) drivers or
+ * [network device drivers](@ref drivers_netdev), can also be initialized
+ * automatically using the `auto_init` module.
+ * To do so, each driver implementation must provide default initialization
+ * parameters in the `DRIVER_params.h` file.
+ * These parameters can be overriden from the application code in several ways
+ * (examples with the @ref drivers_bmp180 oversampling parameter
+ * `BMP180_PARAM_OVERSAMPLING`):
+ *
+ *  - by passing them via the `CFLAGS` variable on the build command line:
+ *
+ * ```
+ * CFLAGS=-DBMP180_PARAM_OVERSAMPLING=1 USEMODULE=bmp180 make BOARD=arduino-zero -C examples/default
+ * ```
+ *
+ * - by setting the `CFLAGS` variable in the application `Makefile`:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ * CFLAGS += -DBMP180_PARAM_OVERSAMPLING=1
+ * ~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * - by copying the `bmp180_params.h` header to the application directory and
+ * editing it there with the desired values. This file is be included first
+ * and thus the one from the driver implementation is skipped.
+ *
+ * From low-level CPU peripheral, the default initialization parameters are
+ * defined in each board configuration that provides them.
  */
 
 /**
@@ -29,7 +66,7 @@
  * @ingroup     sys_auto_init
  * @brief       Provides auto-initialization of SAUL drivers
  *
- * @see @ref drivers_saul
+ * @see @ref drivers_saul, @ref sys_auto_init
  */
 
 /**
@@ -38,7 +75,7 @@
  * @brief       Provides auto-initialization of
  * [network device drivers](@ref drivers_netdev) via GNRC
  *
- * @see @ref net_gnrc_netif
+ * @see @ref net_gnrc_netif, @ref sys_auto_init
  */
 
 /**
@@ -49,6 +86,7 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #ifndef AUTO_INIT_H
