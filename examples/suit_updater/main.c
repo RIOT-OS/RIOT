@@ -27,10 +27,50 @@
 #include "net/ota_suit.h"
 #include "firmware/manifest.h"
 #include "xtimer.h"
+
+#include "net/ipv6/addr.h"
+
 #include "ps.h"
 
 #define MAIN_QUEUE_SIZE     (4)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+
+static void print_iface_addresses(kernel_pid_t iface);
+
+static void print_interfaces_addresses(void)
+{
+    gnrc_netif_t *netif = NULL;
+    while ((netif = gnrc_netif_iter(netif))) {
+        print_iface_addresses(netif->pid);
+    }
+}
+
+static void print_iface_addresses(kernel_pid_t iface)
+{
+    char addr_str[IPV6_ADDR_MAX_STR_LEN];
+    ipv6_addr_t ipv6_addrs[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+    int res = gnrc_netapi_get(iface, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
+                          sizeof(ipv6_addrs));
+
+    if (res < 0) {
+        return;
+    }
+    uint8_t ipv6_addrs_flags[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+
+    memset(ipv6_addrs_flags, 0, sizeof(ipv6_addrs_flags));
+    /* assume it to succeed (otherwise array will stay 0) */
+    gnrc_netapi_get(iface, NETOPT_IPV6_ADDR_FLAGS, 0, ipv6_addrs_flags,
+                    sizeof(ipv6_addrs_flags));
+
+    for (unsigned i = 0; i < (res / sizeof(ipv6_addr_t)); i++) {
+        /* print only global addresses */
+        if (ipv6_addr_is_link_local(&ipv6_addrs[i])) {
+            continue;
+        }
+        ipv6_addr_to_str(addr_str, &ipv6_addrs[i], sizeof(addr_str));
+        printf("iface %u inet6 addr: %s\n", iface, addr_str);
+    }
+}
 
 int main(void)
 {
@@ -49,6 +89,7 @@ int main(void)
     while(1) {
         xtimer_sleep(10);
         ps();
+        print_interfaces_addresses();
     }
 
     /* should be never reached */
