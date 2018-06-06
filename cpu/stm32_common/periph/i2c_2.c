@@ -33,6 +33,7 @@
  */
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "cpu.h"
 #include "irq.h"
@@ -56,10 +57,10 @@
 
 /* static function definitions */
 static void _i2c_init(I2C_TypeDef *i2c, uint32_t clk, uint32_t ccr);
-static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, uint8_t flags);
+static inline int _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag, uint8_t flags);
 static inline void _clear_addr(I2C_TypeDef *dev);
 static inline int _write(I2C_TypeDef *dev, const uint8_t *data, int length);
-static inline void _stop(I2C_TypeDef *dev);
+static inline int _stop(I2C_TypeDef *dev);
 static inline int _wait_ready(I2C_TypeDef *dev);
 
 /**
@@ -137,13 +138,8 @@ void i2c_init(i2c_t dev)
         /* reset pins for alternate function */
         gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
         gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
-#ifdef CPU_FAM_STM32F1
-        gpio_init_af(i2c_config[dev].scl_pin, GPIO_AF_OUT_OD);
-        gpio_init_af(i2c_config[dev].sda_pin, GPIO_AF_OUT_OD);
-#else
         gpio_init_af(i2c_config[dev].scl_pin, i2c_config[dev].scl_af);
         gpio_init_af(i2c_config[dev].sda_pin, i2c_config[dev].sda_af);
-#endif
         /* make peripheral soft reset */
         i2c->CR1 |= I2C_CR1_SWRST;
         i2c->CR1 &= ~I2C_CR1_SWRST;
@@ -209,6 +205,11 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
                    uint8_t flags)
 {
     assert(dev < I2C_NUMOF);
+
+    if (flags & I2C_ADDR10) {
+        return -EOPNOTSUPP;
+    }
+
     uint16_t tick = TICK_TIMEOUT;
 
     size_t n = length;
@@ -218,9 +219,14 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
 
     assert(i2c != NULL);
 
+    int ret = 0;
+
     if (!(flags & I2C_NOSTART)) {
         DEBUG("[i2c] read_bytes: Send Slave address and wait for ADDR == 1\n");
-        _start(i2c, address, I2C_FLAG_READ, flags);
+        ret = _start(i2c, address, I2C_FLAG_READ, flags);
+        if (ret < 0) {
+            return ret;
+        }
     }
 
     if (length == 1) {
@@ -235,10 +241,9 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
 
     while (n--) {
         /* wait for reception to complete */
-        while (!(i2c->SR1 & I2C_SR1_RXNE)) {
+        while (!(i2c->SR1 & I2C_SR1_RXNE) && tick--) {
             if ((i2c->SR1 & ERROR_FLAG) || !tick) {
-                length = 0;
-                break;
+                return -ETIMEDOUT;
             }
         }
 
@@ -255,10 +260,15 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
         /* set STOP */
         i2c->CR1 |= (I2C_CR1_STOP);
 
-        while (i2c->CR1 & I2C_CR1_STOP) {}
+        tick = TICK_TIMEOUT;
+        while ((i2c->CR1 & I2C_CR1_STOP) && tick--) {
+            if (!tick) {
+                return -ETIMEDOUT;
+            }
+        }
     }
 
-    return length;
+    return ret;
 }
 
 int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg, void *data,
@@ -270,27 +280,36 @@ int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg, void *data,
     I2C_TypeDef *i2c = i2c_config[dev].dev;
     assert(i2c != NULL);
 
-
-    int res = _wait_ready(i2c);
-    if (res != 0) {
-        return res;
+    if ((flags & I2C_REG16) || (flags & I2C_ADDR10)) {
+        return -EOPNOTSUPP;
     }
 
-    /* send start condition and slave address */
-    DEBUG("[i2c] read_regs: Send slave address and clear ADDR flag\n");
-    _start(i2c, address, I2C_FLAG_WRITE, flags);
+    int ret = _wait_ready(i2c);
+    if (ret < 0) {
+        return ret;
+    }
+
+    if (!(flags & I2C_NOSTART)) {
+        /* send start condition and slave address */
+        DEBUG("[i2c] read_regs: Send slave address and clear ADDR flag\n");
+        ret = _start(i2c, address, I2C_FLAG_WRITE, flags);
+        if (ret < 0) {
+            return ret;
+        }
+    }
+
     DEBUG("[i2c] read_regs: Write reg into DR\n");
     _clear_addr(i2c);
     while (!(i2c->SR1 & I2C_SR1_TXE) && tick--) {
         if ((i2c->SR1 & ERROR_FLAG) || !tick) {
-            break;
+            return -ETIMEDOUT;
         }
     }
     i2c->DR = reg;
     tick = TICK_TIMEOUT;
     while (!(i2c->SR1 & I2C_SR1_TXE) && tick--) {
         if ((i2c->SR1 & ERROR_FLAG) || !tick) {
-            break;
+            return -ETIMEDOUT;
         }
     }
     DEBUG("[i2c] read_regs: Now start a read transaction\n");
@@ -302,33 +321,44 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
 {
     assert(dev < I2C_NUMOF);
 
+    if (flags & I2C_ADDR10) {
+        return -EOPNOTSUPP;
+    }
+
     I2C_TypeDef *i2c = i2c_config[dev].dev;
     assert(i2c != NULL);
 
-    int res = _wait_ready(i2c);
-    if (res != 0) {
-        return res;
+    int ret = _wait_ready(i2c);
+    if (ret != 0) {
+        return ret;
     }
 
     if (!(flags & I2C_NOSTART)) {
         /* start transmission and send slave address */
         DEBUG("[i2c] write_bytes: sending start sequence\n");
-        _start(i2c, address, I2C_FLAG_WRITE, flags);
+        ret = _start(i2c, address, I2C_FLAG_WRITE, flags);
+        if (ret < 0) {
+            return ret;
+        }
     }
 
     _clear_addr(i2c);
     /* send out data bytes */
-    if (_write(i2c, data, length) < 0) {
-        length = 0;
+    ret = _write(i2c, data, length);
+    if (ret < 0) {
+        return ret;
     }
     if (!(flags & I2C_NOSTOP)) {
         /* end transmission */
         DEBUG("[i2c] write_bytes: Ending transmission\n");
-        _stop(i2c);
+        ret = _stop(i2c);
+        if (ret < 0) {
+            return ret;
+        }
         DEBUG("[i2c] write_bytes: STOP condition was send out\n");
     }
 
-    return length;
+    return ret;
 }
 
 int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg, const void *data,
@@ -339,29 +369,48 @@ int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg, const void *data,
     I2C_TypeDef *i2c = i2c_config[dev].dev;
     assert(i2c != NULL);
 
-    int res = _wait_ready(i2c);
-    if (res != 0) {
-        return res;
+    if ((flags & I2C_REG16) || (flags & I2C_ADDR10)) {
+        return -EOPNOTSUPP;
     }
 
-    /* start transmission and send slave address */
-    _start(i2c, address, I2C_FLAG_WRITE, flags);
+    int ret = _wait_ready(i2c);
+    if (ret != 0) {
+        return ret;
+    }
+
+    if (!(flags & I2C_NOSTART)) {
+        /* start transmission and send slave address */
+        ret = _start(i2c, address, I2C_FLAG_WRITE, flags);
+        if (ret < 0) {
+            return ret;
+        }
+    }
+
     _clear_addr(i2c);
     /* send register address and wait for complete transfer to be finished*/
-    if (_write(i2c, (uint8_t *)&reg, 1) < 0) {
-        length = 0;
+    ret = _write(i2c, (uint8_t *)&reg, 1);
+    if (ret < 0) {
+        return ret;
     }
+
     /* write data to register */
-    else if (_write(i2c, data, length) < 0) {
-        length = 0;
+    ret = _write(i2c, data, length);
+    if (ret < 0) {
+        return ret;
     }
-    /* finish transfer */
-    _stop(i2c);
-    /* return number of bytes send */
-    return length;
+
+    if (!(flags & I2C_NOSTOP)) {
+        /* finish transfer */
+        ret = _stop(i2c);
+        if (ret < 0) {
+            return ret;
+        }
+    }
+
+    return ret;
 }
 
-static void _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag, uint8_t flags)
+static int _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag, uint8_t flags)
 {
     (void)flags;
 
@@ -381,9 +430,11 @@ static void _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag, uint8_t f
     /* Wait for ADDR flag to be set */
     while (!(i2c->SR1 & I2C_SR1_ADDR) && tick--) {
         if ((i2c->SR1 & ERROR_FLAG) || !tick) {
-            return;
+            return -ETIMEDOUT;
         }
     }
+
+    return 0;
 }
 
 static inline void _clear_addr(I2C_TypeDef *i2c)
@@ -406,7 +457,7 @@ static inline int _write(I2C_TypeDef *i2c, const uint8_t *data, int length)
         /* wait for transfer to finish */
         while (!(i2c->SR1 & I2C_SR1_TXE) && tick--) {
             if ((i2c->SR1 & ERROR_FLAG) || !tick) {
-                return -1;
+                return -ETIMEDOUT;
             }
         }
 
@@ -416,7 +467,7 @@ static inline int _write(I2C_TypeDef *i2c, const uint8_t *data, int length)
     return 0;
 }
 
-static inline void _stop(I2C_TypeDef *i2c)
+static inline int _stop(I2C_TypeDef *i2c)
 {
     uint16_t tick = TICK_TIMEOUT;
     /* make sure last byte was send */
@@ -424,12 +475,14 @@ static inline void _stop(I2C_TypeDef *i2c)
 
     while (!(i2c->SR1 & I2C_SR1_BTF) && tick--) {
         if ((i2c->SR1 & ERROR_FLAG) || !tick) {
-            break;
+            return -ETIMEDOUT;
         }
     }
 
     /* send STOP condition */
     i2c->CR1 |= I2C_CR1_STOP;
+
+    return 0;
 }
 
 static inline int _wait_ready(I2C_TypeDef *i2c)
