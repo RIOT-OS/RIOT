@@ -1,0 +1,24 @@
+# RIOT specific dependencies
+USEMODULE += posix_semaphore
+USEMODULE += event_callback
+USEMODULE += xtimer
+
+# glue code
+USEMODULE += nimble_riot_contrib
+
+# nimble sub-modules that we build
+USEMODULE += nimble_tinycrypt
+USEMODULE += nimble_host
+USEMODULE += nimble_host_services_gap
+USEMODULE += nimble_host_services_gatt
+USEMODULE += nimble_host_util
+USEMODULE += nimble_host_store_ram
+USEMODULE += nimble_porting_nimble
+USEMODULE += nimble_npl_riot
+
+# nimble controller specific sub-modules
+USEMODULE += nimble_controller
+USEMODULE += nimble_transport_ram
+ifeq (nrf52,$(CPU_FAM))
+  USEMODULE += nimble_drivers_nrf52
+endif
