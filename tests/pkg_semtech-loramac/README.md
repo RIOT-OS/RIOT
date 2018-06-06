@@ -70,7 +70,8 @@ The default region is `EU868`.
 ## Using the shell
 This application provides the `loramac` command for configuring the MAC,
 joining a network and sending/receiving data to/from a LoRaWAN network.
-`join` and `tx` subcommands are blocking until the MAC is done.
+`join` and `tx` subcommands are blocking until the MAC is done. Class A
+is activated by default.
 
 ### Joining with Over The Air Activation
 
@@ -116,6 +117,12 @@ The datarate for RX2 should be DR3 (SF9BW125) as seen in
 * Send unconfirmable data on port 10:
 ```
     > loramac tx This\ is\ RIOT! uncnf 10
+```
+When using Class A (default mode) downlink messages will be received in
+the next uplink:
+```
+    > loramac tx hello
+      Data received: RIOT, port: 1
 ```
 
 ### Other shell commands
