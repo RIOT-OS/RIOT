@@ -225,6 +225,31 @@ static inline uint32_t byteorder_swapl(uint32_t v);
 static inline uint64_t byteorder_swapll(uint64_t v);
 
 /**
+ * @brief           Read a little endian encoded unsigned integer from a buffer
+ *                  into host byte order encoded variable, 16-bit
+ *
+ * @note            This function is agnostic to the alignment of the target
+ *                  value in the given buffer
+ *
+ * @param[in] buf   position in a buffer holding the target value
+ *
+ * @return          16-bit unsigned integer in host byte order
+ */
+static inline uint16_t byteorder_lebuftohs(const uint8_t *buf);
+
+/**
+ * @brief           Write a host byte order encoded unsigned integer as little
+ *                  endian encoded value into a buffer, 16-bit
+ *
+ * @note            This function is alignment agnostic and works with any given
+ *                  memory location of the buffer
+ *
+ * @param[out] buf  target buffer, must be able to accept 2 bytes
+ * @param[in]  val  value written to the buffer, in host byte order
+ */
+static inline void byteorder_htolebufs(uint8_t *buf, uint16_t val);
+
+/**
  * @brief          Convert from host byte order to network byte order, 16 bit.
  * @see            byteorder_htons()
  * @param[in]      v   The integer to convert.
@@ -416,6 +441,26 @@ static inline uint64_t ntohll(uint64_t v)
 {
     network_uint64_t input = { v };
     return byteorder_ntohll(input);
+}
+
+static inline uint16_t byteorder_lebuftohs(const uint8_t *buf)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    return (uint16_t)((buf[0] << 8) | buf[1]);
+#else
+    return (uint16_t)((buf[1] << 8) | buf[0]);
+#endif
+}
+
+static inline void byteorder_htolebufs(uint8_t *buf, uint16_t val)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    buf[0] = (uint8_t)(val >> 8);
+    buf[1] = (uint8_t)(val & 0xff);
+#else
+    buf[0] = (uint8_t)(val & 0xff);
+    buf[1] = (uint8_t)(val >> 8);
+#endif
 }
 
 #ifdef __cplusplus
