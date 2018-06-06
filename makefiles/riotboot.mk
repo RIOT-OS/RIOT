@@ -63,6 +63,27 @@ riotboot/bootloader/%:
 		PATH=$(PATH) BOARD=$(BOARD) \
 			make --no-print-directory -C $(RIOTBASE)/dist/riotboot $*
 
+BOOTLOADER_BIN = $(RIOTBASE)/dist/riotboot/bin/$(BOARD)
+$(BOOTLOADER_BIN)/riotboot.extended.bin: $(BOOTLOADER_BIN)/riotboot.bin
+	cp $^ $@.tmp
+	truncate -s $$(($(RIOTBOOT_SLOT0_SIZE))) $@.tmp
+	mv $@.tmp $@
+
+# Only call sub make if not already in riotboot
+ifneq ($(BOOTLOADER_BIN)/riotboot.bin,$(BINFILE))
+  $(BOOTLOADER_BIN)/riotboot.bin: riotboot/bootloader/binfile
+endif
+
+riotboot/combined-slot1: $(BINDIR)/$(APPLICATION)-slot1-combined.bin
+$(BINDIR)/$(APPLICATION)-slot1-combined.bin: $(BOOTLOADER_BIN)/riotboot.extended.bin $(BINDIR)/$(APPLICATION)-slot1.signed.bin
+	cat $^ > $@
+# edbg
+riotboot/flash-combined-slot1: HEXFILE=$(BINDIR)/$(APPLICATION)-slot1-combined.bin
+# openocd
+riotboot/flash-combined-slot1: IMAGE_FILE=$(BINDIR)/$(APPLICATION)-slot1-combined.bin
+riotboot/flash-combined-slot1: $(BINDIR)/$(APPLICATION)-slot1-combined.bin
+	$(FLASHER) $(FFLAGS)
+
 riotboot/flash-slot1: IMAGE_OFFSET=$(RIOTBOOT_SLOT0_SIZE)
 # edbg
 riotboot/flash-slot1: HEXFILE=$(BINDIR)/$(APPLICATION)-slot1.signed.bin
