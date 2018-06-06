@@ -5,3 +5,9 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
     USEMODULE += periph_i2c_2
   endif
 endif
+
+# flashpage and eeprom periph implementations share flash lock/unlock functions
+# in periph_flash_common
+ifneq (,$(filter periph_flashpage periph_eeprom,$(FEATURES_REQUIRED)))
+  FEATURES_REQUIRED += periph_flash_common
+endif
