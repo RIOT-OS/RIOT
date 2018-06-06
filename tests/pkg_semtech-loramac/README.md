@@ -88,6 +88,9 @@ is activated by default.
 ```
 ### Joining with Activation By Personalization
 
+OTAA is always prefered in real world scenarios.
+However, ABP can be practical for testing or workshops.
+
 * Set your Device Address, Network Session Key , Application Session Key:
 ```
     > loramac set devaddr AAAAAAAA
@@ -99,6 +102,10 @@ is activated by default.
     > loramac join abp
     Join procedure succeeded!
 ```
+Saving frame counters in flash memory is not (yet) supported.
+Before sending data, it's necessary to clear frame counters in
+Network Server! Otherwise uplink messages won't work.
+
 **NOTE**:
 If using TTN with ABP make sure to set the correct datarate for RX2.
 Otherwise confirmed and downlink messages won't work.
