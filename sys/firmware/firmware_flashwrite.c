@@ -48,8 +48,8 @@ int firmware_flashwrite_init(firmware_flashwrite_t *state, int target_slot,
 int firmware_flashwrite_putbytes(firmware_flashwrite_t *state,
         const uint8_t *bytes, size_t len, bool more)
 {
-    LOG_INFO("ota: processing bytes %u-%u\n", state->offset, state->offset + len - 1);
-
+    LOG_INFO("ota: processing bytes %u-%u page %u-%p\n", state->offset, state->offset + len - 1,
+             state->flashpage, flashpage_addr(state->flashpage));
     while (len) {
         size_t flashpage_pos = state->offset % FLASHPAGE_SIZE;
         size_t flashpage_avail = FLASHPAGE_SIZE - flashpage_pos;
