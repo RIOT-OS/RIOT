@@ -67,9 +67,9 @@ extern "C" {
 #endif
 
 /**
- * @brief xtimer backoff value in ticks for default hardware timer
+ * @brief xtimer backoff value in microseconds for default hardware timer
  *
- * All timers that are less than the backoff in ticks will fall back to
+ * All timers that are less than the backoff in microseconds will fall back to
  * a faster timer. If there is no faster timer, xtimer will just spin.
  */
 #ifndef XTIMER_BACKOFF
@@ -78,11 +78,11 @@ extern "C" {
 
 #ifndef XTIMER_ISR_BACKOFF
 /**
- * @brief   xtimer IRQ backoff time in ticks for default hardware timer
+ * @brief   xtimer IRQ backoff time in microseconds for default hardware timer
  *
- * When scheduling the next IRQ, if it is less than the backoff time in ticks
- * in the future, fall back to a faster timer. If there is no faster timer,
- * then just spin.
+ * When scheduling the next IRQ, if it is less than the backoff time in
+ * microseconds in the future, fall back to a faster timer. If there is no
+ * faster timer, then just spin.
  */
 #define XTIMER_ISR_BACKOFF 20
 #endif
@@ -127,11 +127,12 @@ static const xtimer_llparams_timer_t xtimer_llparams_timer0
  */
 #ifndef XTIMER_PARAMS
 #define XTIMER_PARAMS    { .hz          = XTIMER_HZ ,                      \
-                           .ll          = (void *)&xtimer_llparams_timer0, \
-                           .width       = XTIMER_WIDTH,                    \
                            .backoff     = XTIMER_BACKOFF,                  \
                            .backoff_isr = XTIMER_ISR_BACKOFF,              \
-                           .overhead    = XTIMER_OVERHEAD }
+                           .ll          = (void *)&xtimer_llparams_timer0, \
+                           .width       = XTIMER_WIDTH,                    \
+                           .overhead    = XTIMER_OVERHEAD,                 \
+                           .flags       = XTIMER_FLAGS }
 #endif
 
 static const xtimer_params_t xtimer_params[] =

@@ -34,7 +34,7 @@ static int _dev_init(xtimer_hal_t *dev, xtimer_hal_cb_t cb, void *arg)
 static void _dev_set(xtimer_hal_t *dev, uint32_t target,
                      xtimer_hal_cb_t cb, void *arg)
 {
-    rtt_set_alarm(_xtimer_lltimer_mask(dev->params.width, target), cb, arg);
+    rtt_set_alarm(_xtimer_lltimer_mask(dev->params->width, target), cb, arg);
 }
 
 static uint32_t _dev_now(xtimer_hal_t *dev)

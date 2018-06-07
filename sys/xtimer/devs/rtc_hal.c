@@ -37,7 +37,7 @@ static void _dev_set(xtimer_hal_t *dev, uint32_t target,
 {
     struct tm time;
 
-    gmtime_r(_xtimer_lltimer_mask(dev->params.width, target), &time);
+    gmtime_r(_xtimer_lltimer_mask(dev->params->width, target), &time);
 
     rtc_set_alarm(&time, cb, arg);
 }

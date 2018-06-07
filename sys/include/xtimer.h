@@ -470,30 +470,6 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
  */
 void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 
-/**
- * @brief xtimer backoff value
- *
- * All timers that are less than XTIMER_BACKOFF microseconds in the future will
- * just spin.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#ifndef XTIMER_BACKOFF
-#define XTIMER_BACKOFF 30
-#endif
-
-#ifndef XTIMER_ISR_BACKOFF
-/**
- * @brief   xtimer IRQ backoff time, in hardware ticks
- *
- * When scheduling the next IRQ, if it is less than the backoff time
- * in the future, just spin.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#define XTIMER_ISR_BACKOFF 20
-#endif
-
 #ifndef XTIMER_PERIODIC_SPIN
 /**
  * @brief   xtimer_periodic_wakeup spin cutoff

@@ -24,14 +24,14 @@
 
 /* access to low-level through generic layer */
 #define LLDEV       (*(xtimer_lldev_timer_t *)(dev->ll))
-#define LLPARAMS    (*(xtimer_llparams_timer_t *)(dev->params.ll))
+#define LLPARAMS    (*(xtimer_llparams_timer_t *)(dev->params->ll))
 
 static int _dev_init(xtimer_hal_t *dev, xtimer_hal_cb_t cb, void *arg)
 {
-    timer_init(LLPARAMS.devid, dev->params.hz, cb, *arg);
+    timer_init(LLPARAMS.devid, dev->params->hz, cb, *arg);
 
     timer_set_absolute(LLPARAMS.devid, LLPARAMS.chan,
-                       _xtimer_lltimer_mask(dev->params.width, (uint32_t)(-1)));
+        _xtimer_lltimer_mask(dev->params->width, (uint32_t)(-1)));
 }
 
 static void _dev_set(xtimer_hal_t *dev, uint32_t target,
@@ -42,7 +42,7 @@ static void _dev_set(xtimer_hal_t *dev, uint32_t target,
     (void)arg;
 
     timer_set_absolute(LLPARAMS.devid, LLPARAMS.chan,
-                       _xtimer_lltimer_mask(dev->params.width, target));
+                       _xtimer_lltimer_mask(dev->params->width, target));
 }
 
 static uint32_t _dev_now(xtimer_hal_t *dev)
