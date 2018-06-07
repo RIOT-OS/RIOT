@@ -45,8 +45,8 @@ extern "C" {
  *
  * @return         if 2*x > y then 1, else 0
  */
-__attribute__((always_inline)) static inline uint8_t _div_shcom(
-                                             const uint64_t x, const uint64_t y)
+__attribute__((always_inline)) __attribute__((optimize("merge-all-constants")))
+    static inline uint8_t _div_shcom(const uint64_t x, const uint64_t y)
 {
     if (x & (1ULL << 63)) {
         return 1;
@@ -67,8 +67,8 @@ __attribute__((always_inline)) static inline uint8_t _div_shcom(
  *
  * @return         difference
  */
-__attribute__((always_inline)) static inline uint64_t _div_shsub(
-                                             const uint64_t x, const uint64_t y)
+__attribute__((always_inline)) __attribute__((optimize("merge-all-constants")))
+    static inline uint64_t _div_shsub(const uint64_t x, const uint64_t y)
 {
     if (x & (1ULL << 63)) {
         uint64_t tmp;
@@ -95,8 +95,9 @@ __attribute__((always_inline)) static inline uint64_t _div_shsub(
  *
  * @return         result, bitshifted by 64
  */
-__attribute__((always_inline, optimize("unroll-all-loops"))) static inline
-               uint64_t _div_frac(const uint64_t num, const uint64_t den)
+__attribute__((always_inline))
+__attribute__((optimize("unroll-all-loops", "merge-all-constants")))
+    static inline uint64_t _div_frac(const uint64_t num, const uint64_t den)
 {
     uint64_t ans = 0, rem = num;
 
@@ -134,8 +135,8 @@ __attribute__((always_inline, optimize("unroll-all-loops"))) static inline
  *
  * @return         result, bitshifted by 16
  */
-__attribute__((always_inline)) static inline uint16_t div_frac_16(
-                               const uint16_t num, const uint16_t den)
+__attribute__((always_inline)) __attribute__((optimize("merge-all-constants")))
+    static inline uint16_t div_frac_16(const uint16_t num, const uint16_t den)
 {
     assert((den > 0) && (num < den));
 
@@ -162,8 +163,8 @@ __attribute__((always_inline)) static inline uint16_t div_frac_16(
  *
  * @return         result, bitshifted by 32
  */
-__attribute__((always_inline)) static inline uint32_t div_frac_32(
-                               const uint32_t num, const uint32_t den)
+__attribute__((always_inline)) __attribute__((optimize("merge-all-constants")))
+    static inline uint32_t div_frac_32(const uint32_t num, const uint32_t den)
 {
     assert((den > 0) && (num < den));
 
@@ -190,8 +191,8 @@ __attribute__((always_inline)) static inline uint32_t div_frac_32(
  *
  * @return         result, bitshifted by 64
  */
-__attribute__((always_inline)) static inline uint64_t div_frac_64(
-                               const uint64_t num, const uint64_t den)
+__attribute__((always_inline)) __attribute__((optimize("merge-all-constants")))
+    static inline uint64_t div_frac_64(const uint64_t num, const uint64_t den)
 {
     assert((den > 0) && (num < den));
 
@@ -269,8 +270,9 @@ static inline uint64_t div_mul_w_frac_64(const uint64_t val, const uint64_t frac
  *
  * @return          result
  */
-__attribute__((always_inline, optimize("unroll-all-loops"))) static inline
-               uint16_t div_16(const uint16_t num, const uint16_t den)
+__attribute__((always_inline))
+__attribute__((optimize("unroll-all-loops", "merge-all-constants")))
+    static inline uint16_t div_16(const uint16_t num, const uint16_t den)
 {
     uint8_t exp;
 
@@ -299,8 +301,9 @@ __attribute__((always_inline, optimize("unroll-all-loops"))) static inline
  *
  * @return          result
  */
-__attribute__((always_inline, optimize("unroll-all-loops"))) static inline
-               uint32_t div_32(const uint32_t num, const uint32_t den)
+__attribute__((always_inline))
+__attribute__((optimize("unroll-all-loops", "merge-all-constants")))
+    static inline uint32_t div_32(const uint32_t num, const uint32_t den)
 {
     uint8_t exp;
 
@@ -329,8 +332,9 @@ __attribute__((always_inline, optimize("unroll-all-loops"))) static inline
  *
  * @return          result
  */
-__attribute__((always_inline, optimize("unroll-all-loops"))) static inline
-               uint64_t div_64(const uint64_t num, const uint64_t den)
+__attribute__((always_inline))
+__attribute__((optimize("unroll-all-loops", "merge-all-constants")))
+    static inline uint64_t div_64(const uint64_t num, const uint64_t den)
 {
     uint8_t exp;
 
