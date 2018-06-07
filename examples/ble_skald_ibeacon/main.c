@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Setting up an iBeacon using Skald
+ * @brief       Setting up a BLE iBeacon using Skald
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *

@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = skald_eddystone
+APPLICATION = ble_skald_ibeacon
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= nrf52dk
@@ -8,7 +8,7 @@ BOARD ?= nrf52dk
 RIOTBASE ?= $(CURDIR)/../..
 
 # include Skald
-USEMODULE += skald_eddystone
+USEMODULE += skald_ibeacon
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
