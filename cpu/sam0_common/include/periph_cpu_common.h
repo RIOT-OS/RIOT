@@ -15,6 +15,7 @@
  * @brief           Common CPU specific definitions for all SAMx21 based CPUs
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author          Dylan Laduranty <dylan.laduranty@mesotic.com>
  */
 
 #ifndef PERIPH_CPU_COMMON_H
@@ -39,6 +40,16 @@ extern "C" {
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
 /** @} */
 
 /**
@@ -231,6 +242,40 @@ typedef struct {
     spi_misopad_t miso_pad; /**< pad to use for MISO line */
     spi_mosipad_t mosi_pad; /**< pad to use for MOSI and CLK line */
 } spi_conf_t;
+/** @} */
+
+/**
+ * @brief   Available SERCOM I2C flag selections
+ */
+typedef enum {
+    I2C_FLAG_NONE            = 0x0,    /**< No flags set */
+    I2C_FLAG_RUN_STANDBY     = 0x1,    /**< run SERCOM in standby mode */
+} i2c_flag_t;
+
+/**
+ * @brief   Override I2C clock speed values
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       = 10000U,      /**< low speed mode:    ~10kbit/s */
+    I2C_SPEED_NORMAL    = 100000U,     /**< normal mode:       ~100kbit/s */
+    I2C_SPEED_FAST      = 400000U,     /**< fast mode:         ~400kbit/s */
+    I2C_SPEED_FAST_PLUS = 1000000U,    /**< fast plus mode:    ~1Mbit/s */
+    I2C_SPEED_HIGH      = 3400000U,    /**< high speed mode:   ~3.4Mbit/s */
+} i2c_speed_t;
+
+/**
+ * @brief   I2C device configuration
+ */
+typedef struct {
+    SercomI2cm *dev;        /**< pointer to the used I2C device */
+    i2c_speed_t speed;      /**< baudrate used for the bus */
+    gpio_t scl_pin;         /**< used SCL pin */
+    gpio_t sda_pin;         /**< used MOSI pin */
+    gpio_mux_t mux;         /**< alternate function (mux) */
+    uint8_t gclk_src;       /**< GCLK source which supplys SERCOM */
+    uint8_t flags;          /**< allow SERCOM to run in standby mode */
+} i2c_conf_t;
 
 /**
  * @brief   Set up alternate function (PMUX setting) for a PORT pin
