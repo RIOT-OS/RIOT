@@ -28,13 +28,15 @@ extern "C" {
 
 /** @brief Transceiver sequence identifiers */
 enum kw41zrf_xcvseq {
-    XCVSEQ_IDLE           = 0b000,
-    XCVSEQ_RECEIVE        = 0b001,
-    XCVSEQ_TRANSMIT       = 0b010,
-    XCVSEQ_CCA            = 0b011,
-    XCVSEQ_TX_RX          = 0b100,
-    XCVSEQ_CONTINUOUS_CCA = 0b101,
+    XCVSEQ_IDLE             =  0b000,
+    XCVSEQ_RECEIVE          =  0b001,
+    XCVSEQ_TRANSMIT         =  0b010,
+    XCVSEQ_CCA              =  0b011,
+    XCVSEQ_TX_RX            =  0b100,
+    XCVSEQ_CONTINUOUS_CCA   =  0b101,
     /* Other values are reserved */
+    /* Special value for idle_seq when sleeping */
+    XCVSEQ_DSM_IDLE         = 0b1000,
 };
 
 /**

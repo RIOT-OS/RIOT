@@ -182,8 +182,6 @@ static void kw41zrf_tx_exec(kw41zrf_t *dev)
  */
 static void kw41zrf_wait_idle(kw41zrf_t *dev)
 {
-    /* Wait for oscillator ready signal if coming out of sleep mode */
-    while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
     /* make sure any ongoing T or TR sequence is finished */
     if (kw41zrf_can_switch_to_idle(dev) == 0) {
         DEBUG("[kw41zrf] TX already in progress\n");
@@ -213,6 +211,10 @@ static void kw41zrf_wait_idle(kw41zrf_t *dev)
 int kw41zrf_cca(kw41zrf_t *dev)
 {
     kw41zrf_wait_idle(dev);
+    if (kw41zrf_is_dsm()) {
+        /* bring the device out of DSM */
+        kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
+    }
     kw41zrf_abort_sequence(dev);
     kw41zrf_unmask_irqs();
     kw41zrf_set_sequence(dev, XCVSEQ_CCA);
@@ -229,6 +231,10 @@ static int kw41zrf_netdev_send(netdev_t *netdev, const iolist_t *iolist)
     size_t len = 0;
 
     kw41zrf_wait_idle(dev);
+    if (kw41zrf_is_dsm()) {
+        /* bring the device out of DSM */
+        kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
+    }
 
     /* load packet data into buffer */
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
@@ -285,7 +291,7 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
     if (buf == NULL) {
         if (len > 0) {
             /* discard what we have stored in the buffer, go back to RX mode */
-            dev->idle_seq = XCVSEQ_RECEIVE;
+            dev->recv_blocked = false;
             if (kw41zrf_can_switch_to_idle(dev)) {
                 kw41zrf_abort_sequence(dev);
                 kw41zrf_set_sequence(dev, dev->idle_seq);
@@ -326,7 +332,7 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
     }
 
     /* Go back to RX mode */
-    dev->idle_seq = XCVSEQ_RECEIVE;
+    dev->recv_blocked = false;
     if (kw41zrf_can_switch_to_idle(dev)) {
         kw41zrf_abort_sequence(dev);
         kw41zrf_set_sequence(dev, dev->idle_seq);
@@ -348,7 +354,7 @@ static int kw41zrf_netdev_set_state(kw41zrf_t *dev, netopt_state_t state)
             }
             kw41zrf_abort_sequence(dev);
             kw41zrf_set_power_mode(dev, KW41ZRF_POWER_DSM);
-            dev->idle_seq = XCVSEQ_IDLE;
+            dev->idle_seq = XCVSEQ_DSM_IDLE;
             break;
         case NETOPT_STATE_STANDBY:
             kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
@@ -365,6 +371,10 @@ static int kw41zrf_netdev_set_state(kw41zrf_t *dev, netopt_state_t state)
         case NETOPT_STATE_TX:
             if (dev->netdev.flags & KW41ZRF_OPT_PRELOADING) {
                 kw41zrf_wait_idle(dev);
+                if (kw41zrf_is_dsm()) {
+                    /* bring the device out of DSM */
+                    kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
+                }
                 dev->csma_be = dev->csma_min_be;
                 dev->csma_num_backoffs = 0;
                 dev->num_retrans = 0;
@@ -1020,8 +1030,8 @@ static uint32_t _isr_event_seq_r(kw41zrf_t *dev, uint32_t irqsts)
         else {
             /* No error reported */
             DEBUG("[kw41zrf] success (R)\n");
-            /* Wait in SEQ_IDLE until recv has been called */
-            dev->idle_seq = XCVSEQ_IDLE;
+            /* Block XCVSEQ_RECEIVE until netdev->recv has been called */
+            dev->recv_blocked = true;
             kw41zrf_set_sequence(dev, dev->idle_seq);
             if (dev->netdev.flags & KW41ZRF_OPT_TELL_RX_END) {
                 dev->netdev.netdev.event_callback(&dev->netdev.netdev, NETDEV_EVENT_RX_COMPLETE);

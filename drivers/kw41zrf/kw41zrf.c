@@ -71,13 +71,13 @@ void kw41zrf_setup(kw41zrf_t *dev)
     /* initialize device descriptor */
     dev->idle_seq = XCVSEQ_RECEIVE;
     dev->pm_blocked = false;
+    dev->recv_blocked = false;
     /* Set default parameters according to STD IEEE802.15.4-2015 */
     dev->csma_max_be = 5;
     dev->csma_min_be = 3;
     dev->max_retrans = 3;
     dev->csma_max_backoffs = 4;
 
-//     kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
     DEBUG("[kw41zrf] setup finished\n");
 }
 

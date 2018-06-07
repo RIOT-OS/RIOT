@@ -118,23 +118,26 @@ typedef struct {
      * @name   device specific fields
      * @{
      */
-    thread_t *thread;          /**< Network driver thread, for providing feedback from IRQ handler */
-    uint32_t tx_warmup_time;   /**< TX warmup time, in event timer ticks */
-    uint32_t rx_warmup_time;   /**< RX warmup time, in event timer ticks */
-    uint8_t max_retrans;       /**< Maximum number of frame retransmissions
-                                *   when no Ack frame is received (macMaxFrameRetries) */
-    uint8_t csma_max_backoffs; /**< Maximum number of CSMA backoffs when
-                                *   waiting for channel clear (macMaxCsmaBackoffs) */
-    uint8_t csma_min_be;       /**< Minimum backoff exponent (macMinBe) */
-    uint8_t csma_max_be;       /**< Maximum backoff exponent (macMaxBe) */
-    int16_t tx_power;          /**< The current tx-power setting of the device */
-    uint8_t idle_seq;          /**< state to return to after sending */
-    uint8_t cca_result;        /**< Used for passing CCA result from ISR to user */
-    uint8_t csma_be;           /**< Counter used internally by send implementation */
-    uint8_t csma_num_backoffs; /**< Counter used internally by send implementation */
-    uint8_t num_retrans;       /**< Counter used internally by send implementation */
-    bool pm_blocked;           /**< true if we have blocked a low power mode in the CPU */
-    uint32_t rf_osc_en_idle;   /**< RF_OSC_EN bits setting when RF module is in standby */
+    thread_t *thread;           /**< Network driver thread, for providing feedback from IRQ handler */
+    uint32_t tx_warmup_time;    /**< TX warmup time, in event timer ticks */
+    uint32_t rx_warmup_time;    /**< RX warmup time, in event timer ticks */
+    uint32_t rf_osc_en_idle;    /**< RF_OSC_EN bits setting when RF module is in standby */
+    uint8_t max_retrans;        /**< Maximum number of frame retransmissions
+                                 *   when no Ack frame is received (macMaxFrameRetries) */
+    uint8_t csma_max_backoffs;  /**< Maximum number of CSMA backoffs when
+                                 *   waiting for channel clear (macMaxCsmaBackoffs) */
+    uint8_t csma_min_be;        /**< Minimum backoff exponent (macMinBe) */
+    uint8_t csma_max_be;        /**< Maximum backoff exponent (macMaxBe) */
+    int16_t tx_power;           /**< The current tx-power setting of the device */
+    uint8_t idle_seq;           /**< state to return to after sending */
+    uint8_t cca_result;         /**< Used for passing CCA result from ISR to user */
+    uint8_t csma_be;            /**< Counter used internally by send implementation */
+    uint8_t csma_num_backoffs;  /**< Counter used internally by send implementation */
+    uint8_t num_retrans;        /**< Counter used internally by send implementation */
+    bool pm_blocked;            /**< true if we have blocked a low power mode in the CPU */
+    bool recv_blocked;          /**< blocks moving to XCVSEQ_RECEIVE to prevent
+                                 *   overwriting the RX buffer before the higher
+                                 *   layers have copied it to system RAM */
     /** @} */
 } kw41zrf_t;
 

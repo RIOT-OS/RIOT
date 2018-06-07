@@ -197,6 +197,16 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
 {
     (void) dev;
     DEBUG("[kw41zrf] set sequence to %u\n", (unsigned int)seq);
+    bool back_to_sleep = false;
+    if (seq == XCVSEQ_DSM_IDLE) {
+        back_to_sleep = true;
+        seq = XCVSEQ_IDLE;
+    }
+    else if ((seq == XCVSEQ_RECEIVE) && dev->recv_blocked) {
+        /* Wait in standby until recv has been called to avoid corrupting the RX
+         * buffer before the frame has been received by the higher layers */
+        seq = XCVSEQ_IDLE;
+    }
     assert((ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK) == XCVSEQ_IDLE);
     while ((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_SEQ_IDLE_MASK) == 0) {
         kw41zrf_abort_sequence(dev);
@@ -207,26 +217,31 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
     ZLL->PHY_CTRL = (ZLL->PHY_CTRL & ~(ZLL_PHY_CTRL_XCVSEQ_MASK | ZLL_PHY_CTRL_SEQMSK_MASK)) | seq;
     while (((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_MASK) >>
         ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_SHIFT) != (ZLL_PHY_CTRL_XCVSEQ_MASK & seq)) {}
+    if (back_to_sleep) {
+        kw41zrf_set_power_mode(dev, KW41ZRF_POWER_DSM);
+    }
 }
 
 int kw41zrf_can_switch_to_idle(kw41zrf_t *dev)
 {
     (void) dev;
-    uint8_t seq = (ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK) >> ZLL_PHY_CTRL_XCVSEQ_SHIFT;
+    if (!kw41zrf_is_dsm()) {
+        uint8_t seq = (ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK) >> ZLL_PHY_CTRL_XCVSEQ_SHIFT;
 
-    DEBUG("[kw41zrf] XCVSEQ=0x%x, SEQ_STATE=0x%" PRIx32 ", SEQ_CTRL_STS=0x%" PRIx32 "\n", seq,
-        ZLL->SEQ_STATE, ZLL->SEQ_CTRL_STS);
+        DEBUG("[kw41zrf] XCVSEQ=0x%x, SEQ_STATE=0x%" PRIx32 ", SEQ_CTRL_STS=0x%" PRIx32 "\n", seq,
+            ZLL->SEQ_STATE, ZLL->SEQ_CTRL_STS);
 
-    switch (seq)
-    {
-        case XCVSEQ_TRANSMIT:
-        case XCVSEQ_TX_RX:
-        case XCVSEQ_CCA:
-            /* We should wait until TX or CCA has finished before moving to
-             * another mode */
-            return 0;
-        default:
-            break;
+        switch (seq)
+        {
+            case XCVSEQ_TRANSMIT:
+            case XCVSEQ_TX_RX:
+            case XCVSEQ_CCA:
+                /* We should wait until TX or CCA has finished before moving to
+                 * another mode */
+                return 0;
+            default:
+                break;
+        }
     }
 
     return 1;
