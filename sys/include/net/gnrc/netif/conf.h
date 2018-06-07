@@ -74,7 +74,7 @@ extern "C" {
  *          @ref GNRC_NETIF_IPV6_GROUPS_NUMOF is also large enough to fit the
  *          addresses' solicited nodes multicast addresses.
  *
- * Default: 2 (link-local + corresponding global address)
+ * Default: 2 (1 link-local + 1 global address)
  */
 #ifndef GNRC_NETIF_IPV6_ADDRS_NUMOF
 #define GNRC_NETIF_IPV6_ADDRS_NUMOF    (2)
@@ -83,11 +83,13 @@ extern "C" {
 /**
  * @brief   Maximum number of multicast groups per interface
  *
- * Default: 2 (all-nodes + solicited-nodes of link-local and global unicast
+ * Default: 3 (all-nodes + solicited-nodes of link-local and global unicast
  * address) + @ref GNRC_NETIF_RPL_ADDR + @ref GNRC_NETIF_IPV6_RTR_ADDR
  */
 #ifndef GNRC_NETIF_IPV6_GROUPS_NUMOF
-#define GNRC_NETIF_IPV6_GROUPS_NUMOF   (2 + GNRC_NETIF_RPL_ADDR + GNRC_NETIF_IPV6_RTR_ADDR)
+#define GNRC_NETIF_IPV6_GROUPS_NUMOF   (GNRC_NETIF_IPV6_ADDRS_NUMOF + \
+                                        GNRC_NETIF_RPL_ADDR + \
+                                        GNRC_NETIF_IPV6_RTR_ADDR + 1)
 #endif
 
 /**
