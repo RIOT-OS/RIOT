@@ -606,7 +606,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 
         dr = _nib_drl_add(&ipv6->src, netif->pid);
         if (dr != NULL) {
-            _evtimer_add(netif, GNRC_IPV6_NIB_RTR_TIMEOUT, &dr->rtr_timeout,
+            _evtimer_add(dr, GNRC_IPV6_NIB_RTR_TIMEOUT, &dr->rtr_timeout,
                          rtr_ltime * MS_PER_SEC);
         }
         else {
