@@ -27,7 +27,7 @@
 #error "Do not include this file directly! Use xtimer.h instead"
 #endif
 
-#include "periph/timer.h"
+#include "xtimer/hal.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,24 +41,6 @@ extern volatile uint32_t _xtimer_high_cnt;
  * @brief IPC message type for xtimer msg callback
  */
 #define MSG_XTIMER 12345
-
-/**
- * @brief returns the (masked) low-level timer counter value.
- */
-static inline uint32_t _xtimer_lltimer_now(void)
-{
-    return timer_read(XTIMER_DEV);
-}
-
-/**
- * @brief drop bits of a value that don't fit into the low-level timer.
- */
-static inline uint32_t _xtimer_lltimer_mask(uint32_t val)
-{
-    /* cppcheck-suppress shiftTooManyBits
-     * (reason: cppcheck bug. `XTIMER_MASK` is zero when `XTIMER_WIDTH` is 32) */
-    return val & ~XTIMER_MASK;
-}
 
 /**
  * @{

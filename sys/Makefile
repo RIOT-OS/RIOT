@@ -71,7 +71,7 @@ ifneq (,$(filter log_%,$(USEMODULE)))
   DIRS += log
 endif
 ifneq (,$(filter xtimer,$(USEMODULE)))
-  DIRS += xtimer
+  DIRS += xtimer xtimer/devs
 endif
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   DIRS += cpp11-compat
