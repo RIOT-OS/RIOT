@@ -572,7 +572,11 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             case NETOPT_CCA_MODE:
             case NETOPT_LAST_ED_LEVEL:
                 kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
-                DEBUG("[kw41zrf] Wake to get %s\n", netopt2str(opt));
+#ifdef MODULE_NETOPT
+                DEBUG("[kw41zrf] Wake to get opt %s\n", netopt2str(opt));
+#else
+                DEBUG("[kw41zrf] Wake to get opt %d\n", (int)opt);
+#endif
                 put_to_sleep_when_done = true;
                 break;
 
@@ -780,7 +784,11 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
             case NETOPT_CCA_THRESHOLD:
             case NETOPT_CCA_MODE:
                 kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
-                DEBUG("[kw41zrf] Wake to set %s\n", netopt2str(opt));
+#ifdef MODULE_NETOPT
+                DEBUG("[kw41zrf] Wake to set opt %s\n", netopt2str(opt));
+#else
+                DEBUG("[kw41zrf] Wake to set opt %d\n", (int)opt);
+#endif
                 put_to_sleep_when_done = true;
                 break;
 
