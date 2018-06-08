@@ -796,71 +796,77 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
                        gcoap_resp_handler_t resp_handler)
 {
     gcoap_request_memo_t *memo = NULL;
-    assert(remote != NULL);
-
-    /* Find empty slot in list of open requests. */
-    mutex_lock(&_coap_state.lock);
-    for (int i = 0; i < GCOAP_REQ_WAITING_MAX; i++) {
-        if (_coap_state.open_reqs[i].state == GCOAP_MEMO_UNUSED) {
-            memo = &_coap_state.open_reqs[i];
-            memo->state = GCOAP_MEMO_WAIT;
-            break;
-        }
-    }
-    if (!memo) {
-        mutex_unlock(&_coap_state.lock);
-        DEBUG("gcoap: dropping request; no space for response tracking\n");
-        return 0;
-    }
-
     unsigned msg_type  = (*buf & 0x30) >> 4;
     uint32_t timeout   = 0;
-    memo->resp_handler = resp_handler;
-    memcpy(&memo->remote_ep, remote, sizeof(sock_udp_ep_t));
 
-    switch (msg_type) {
-    case COAP_TYPE_CON:
-        /* copy buf to resend_bufs record */
-        memo->msg.data.pdu_buf = NULL;
-        for (int i = 0; i < GCOAP_RESEND_BUFS_MAX; i++) {
-            if (!_coap_state.resend_bufs[i][0]) {
-                memo->msg.data.pdu_buf = &_coap_state.resend_bufs[i][0];
-                memcpy(memo->msg.data.pdu_buf, buf, GCOAP_PDU_BUF_SIZE);
-                memo->msg.data.pdu_len = len;
+    assert(remote != NULL);
+
+    /* Only allocate memory if necessary (i.e. if user is interested in the
+     * response or request is confirmable) */
+    if ((resp_handler != NULL) || (msg_type == COAP_TYPE_CON)) {
+        mutex_lock(&_coap_state.lock);
+        /* Find empty slot in list of open requests. */
+        for (int i = 0; i < GCOAP_REQ_WAITING_MAX; i++) {
+            if (_coap_state.open_reqs[i].state == GCOAP_MEMO_UNUSED) {
+                memo = &_coap_state.open_reqs[i];
+                memo->state = GCOAP_MEMO_WAIT;
                 break;
             }
         }
-        if (memo->msg.data.pdu_buf) {
-            memo->send_limit  = COAP_MAX_RETRANSMIT;
-            timeout           = (uint32_t)COAP_ACK_TIMEOUT * US_PER_SEC;
-            uint32_t variance = (uint32_t)COAP_ACK_VARIANCE * US_PER_SEC;
-            timeout = random_uint32_range(timeout, timeout + variance);
+        if (!memo) {
+            mutex_unlock(&_coap_state.lock);
+            DEBUG("gcoap: dropping request; no space for response tracking\n");
+            return 0;
         }
-        else {
-            memo->state = GCOAP_MEMO_UNUSED;
-            DEBUG("gcoap: no space for PDU in resend bufs\n");
-        }
-        break;
 
-    case COAP_TYPE_NON:
-        memo->send_limit = GCOAP_SEND_LIMIT_NON;
-        memcpy(&memo->msg.hdr_buf[0], buf, GCOAP_HEADER_MAXLEN);
-        timeout = GCOAP_NON_TIMEOUT;
-        break;
-    default:
-        memo->state = GCOAP_MEMO_UNUSED;
-        DEBUG("gcoap: illegal msg type %u\n", msg_type);
-        break;
-    }
-    mutex_unlock(&_coap_state.lock);
-    if (memo->state == GCOAP_MEMO_UNUSED) {
-        return 0;
+        memo->resp_handler = resp_handler;
+        memcpy(&memo->remote_ep, remote, sizeof(sock_udp_ep_t));
+
+        switch (msg_type) {
+        case COAP_TYPE_CON:
+            /* copy buf to resend_bufs record */
+            memo->msg.data.pdu_buf = NULL;
+            for (int i = 0; i < GCOAP_RESEND_BUFS_MAX; i++) {
+                if (!_coap_state.resend_bufs[i][0]) {
+                    memo->msg.data.pdu_buf = &_coap_state.resend_bufs[i][0];
+                    memcpy(memo->msg.data.pdu_buf, buf, GCOAP_PDU_BUF_SIZE);
+                    memo->msg.data.pdu_len = len;
+                    break;
+                }
+            }
+            if (memo->msg.data.pdu_buf) {
+                memo->send_limit  = COAP_MAX_RETRANSMIT;
+                timeout           = (uint32_t)COAP_ACK_TIMEOUT * US_PER_SEC;
+                uint32_t variance = (uint32_t)COAP_ACK_VARIANCE * US_PER_SEC;
+                timeout = random_uint32_range(timeout, timeout + variance);
+            }
+            else {
+                memo->state = GCOAP_MEMO_UNUSED;
+                DEBUG("gcoap: no space for PDU in resend bufs\n");
+            }
+            break;
+
+        case COAP_TYPE_NON:
+            memo->send_limit = GCOAP_SEND_LIMIT_NON;
+            memcpy(&memo->msg.hdr_buf[0], buf, GCOAP_HEADER_MAXLEN);
+            timeout = GCOAP_NON_TIMEOUT;
+            break;
+        default:
+            memo->state = GCOAP_MEMO_UNUSED;
+            DEBUG("gcoap: illegal msg type %u\n", msg_type);
+            break;
+        }
+        mutex_unlock(&_coap_state.lock);
+        if (memo->state == GCOAP_MEMO_UNUSED) {
+            return 0;
+        }
     }
 
     /* Memos complete; send msg and start timer */
     ssize_t res = sock_udp_send(&_sock, buf, len, remote);
 
-    if ((res > 0) && (timeout > 0)) {     /* timeout may be zero for non-confirmable */
+    /* timeout may be zero for non-confirmable */
+    if ((memo != NULL) && (res > 0) && (timeout > 0)) {
         /* We assume gcoap_req_send2() is called on some thread other than
          * gcoap's. First, put a message in the mbox for the sock udp object,
          * which will interrupt listening on the gcoap thread. (When there are
@@ -884,10 +890,12 @@ size_t gcoap_req_send2(const uint8_t *buf, size_t len,
         }
     }
     if (res <= 0) {
-        if (msg_type == COAP_TYPE_CON) {
-            *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
+        if (memo != NULL) {
+            if (msg_type == COAP_TYPE_CON) {
+                *memo->msg.data.pdu_buf = 0;    /* clear resend buffer */
+            }
+            memo->state = GCOAP_MEMO_UNUSED;
         }
-        memo->state = GCOAP_MEMO_UNUSED;
         DEBUG("gcoap: sock send failed: %d\n", (int)res);
     }
     return (size_t)((res > 0) ? res : 0);
