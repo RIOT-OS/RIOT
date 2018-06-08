@@ -35,7 +35,6 @@
 
 #include "periph/uart.h"
 
-
 /**
  * @brief   Maximum percentage error in calculated baud before switching to
  *          double speed transmission (U2X)
@@ -90,6 +89,7 @@ static void _update_brr(uart_t uart, uint16_t brr, bool double_speed)
 static void _set_brr(uart_t uart, uint32_t baudrate)
 {
     uint16_t brr;
+
 #if defined(UART_STDIO_BAUDRATE)
     /* UBRR_VALUE and USE_2X are statically computed from <util/setbaud.h> */
     if (baudrate == UART_STDIO_BAUDRATE) {
@@ -115,7 +115,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* register interrupt context */
     isr_ctx[uart].rx_cb = rx_cb;
-    isr_ctx[uart].arg   = arg;
+    isr_ctx[uart].arg = arg;
 
     /* disable and reset UART */
     dev[uart]->CSRB = 0;
@@ -134,14 +134,13 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         dev[uart]->CSRB = (1 << TXEN0);
     }
 
-
     return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
-        while (!(dev[uart]->CSRA & (1 << UDRE0))) {};
+        while (!(dev[uart]->CSRA & (1 << UDRE0))) {}
         dev[uart]->DR = data[i];
     }
 }
