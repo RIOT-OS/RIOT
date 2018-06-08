@@ -44,7 +44,8 @@
 #include "irq.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -88,7 +89,7 @@ void cpu_init(void);
 /**
  * @brief   Print the last instruction's address
  */
- static inline void __attribute__((always_inline)) cpu_print_last_instruction(void)
+static inline void __attribute__((always_inline)) cpu_print_last_instruction(void)
 {
     uint8_t hi;
     uint8_t lo;
@@ -111,13 +112,13 @@ void cpu_init(void);
  * Some CPUs may not support the highest prescaler settings
  */
 enum {
-    CPU_ATMEGA_CLK_SCALE_DIV1 = 0,
-    CPU_ATMEGA_CLK_SCALE_DIV2 = 1,
-    CPU_ATMEGA_CLK_SCALE_DIV4 = 2,
-    CPU_ATMEGA_CLK_SCALE_DIV8 = 3,
-    CPU_ATMEGA_CLK_SCALE_DIV16 = 4,
-    CPU_ATMEGA_CLK_SCALE_DIV32 = 5,
-    CPU_ATMEGA_CLK_SCALE_DIV64 = 6,
+    CPU_ATMEGA_CLK_SCALE_DIV1   = 0,
+    CPU_ATMEGA_CLK_SCALE_DIV2   = 1,
+    CPU_ATMEGA_CLK_SCALE_DIV4   = 2,
+    CPU_ATMEGA_CLK_SCALE_DIV8   = 3,
+    CPU_ATMEGA_CLK_SCALE_DIV16  = 4,
+    CPU_ATMEGA_CLK_SCALE_DIV32  = 5,
+    CPU_ATMEGA_CLK_SCALE_DIV64  = 6,
     CPU_ATMEGA_CLK_SCALE_DIV128 = 7,
     CPU_ATMEGA_CLK_SCALE_DIV256 = 8,
     CPU_ATMEGA_CLK_SCALE_DIV512 = 9,
