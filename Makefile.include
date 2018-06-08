@@ -229,7 +229,7 @@ export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 # Add standard include directories
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/$(BOARD)/include))
 
 # process provided features
 -include $(RIOTBOARD)/$(BOARD)/Makefile.features
