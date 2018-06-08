@@ -15,7 +15,7 @@ ifneq (,$(filter cortex-m0%,$(CPU_ARCH)))
 endif
 endif
 
-export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+export CFLAGS_LINK  = -ffunction-sections -fdata-sections -fshort-enums
 export CFLAGS_DBG  ?= -ggdb -g3
 export CFLAGS_OPT  ?= -Os
 
