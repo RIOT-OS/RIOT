@@ -47,6 +47,11 @@ int main(void)
         return 1;
     }
 
+    if (result == BMX280_ERR_NOCAL) {
+        puts("[Error] Could not read calibration data");
+        return 1;
+    }
+
     printf("Initialization successful\n\n");
 
     printf("+------------Calibration Data------------+\n");
