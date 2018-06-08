@@ -78,58 +78,58 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
 
     /* put marker on stack */
     stk--;
-    *stk = (uint8_t) 0xAF;
+    *stk = (uint8_t)0xAF;
     stk--;
-    *stk = (uint8_t) 0xFE;
+    *stk = (uint8_t)0xFE;
 
     /* save sched_task_exit */
     stk--;
-    tmp_adress = (uint16_t) sched_task_exit;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    tmp_adress = (uint16_t)sched_task_exit;
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
     stk--;
     tmp_adress >>= 8;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
 
 #if FLASHEND > 0x1ffff
     /* Devices with more than 128kb FLASH use a 17 bit PC, we set whole the top byte forcibly to 0 */
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 #endif
 
     /* save address to task_func in place of the program counter */
     stk--;
-    tmp_adress = (uint16_t) task_func;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    tmp_adress = (uint16_t)task_func;
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
     stk--;
     tmp_adress >>= 8;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
 
 #if FLASHEND > 0x1ffff
     /* Devices with more than 128kb FLASH use a 17 bit PC, we set whole the top byte forcibly to 0 */
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 #endif
 
     /* r0 */
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 
     /* status register (with interrupts enabled) */
     stk--;
-    *stk = (uint8_t) 0x80;
+    *stk = (uint8_t)0x80;
 
 #if defined(EIND)
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 #endif
 #if defined(RAMPZ)
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 #endif
 
     /* r1 - has always to be 0 */
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
     /*
      * Space for registers r2 -r23
      *
@@ -140,7 +140,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
 
     for (i = 2; i <= 23; i++) {
         stk--;
-        *stk = (uint8_t) 0;
+        *stk = (uint8_t)0;
     }
 
     /*
@@ -148,22 +148,22 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
      * r24 and r25
      * */
     stk--;
-    tmp_adress = (uint16_t) arg;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    tmp_adress = (uint16_t)arg;
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
     stk--;
     tmp_adress >>= 8;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
 
     /*
      * Space for registers r26-r31
      */
     for (i = 26; i <= 31; i++) {
         stk--;
-        *stk = (uint8_t) i;
+        *stk = (uint8_t)i;
     }
 
     stk--;
-    return (char *) stk;
+    return (char *)stk;
 }
 
 /**
@@ -216,18 +216,21 @@ void NORETURN __enter_thread_mode(void)
     UNREACHABLE();
 }
 
-void thread_yield_higher(void) {
+void thread_yield_higher(void)
+{
     if (irq_is_in() == 0) {
         __context_save();
         sched_run();
         __context_restore();
-        __asm__ volatile("ret");
-    } else {
+        __asm__ volatile ("ret");
+    }
+    else {
         sched_context_switch_request = 1;
     }
 }
 
-void thread_yield_isr(void) {
+void thread_yield_isr(void)
+{
     __context_save();
     sched_run();
     __context_restore();
@@ -287,9 +290,7 @@ __attribute__((always_inline)) static inline void __context_save(void)
         "in   __tmp_reg__, __SP_L__          \n\t"
         "st   x+, __tmp_reg__                \n\t"
         "in   __tmp_reg__, __SP_H__          \n\t"
-        "st   x+, __tmp_reg__                \n\t"
-        );
-
+        "st   x+, __tmp_reg__                \n\t");
 }
 
 __attribute__((always_inline)) static inline void __context_restore(void)
@@ -342,6 +343,5 @@ __attribute__((always_inline)) static inline void __context_restore(void)
 #endif
         "pop  __tmp_reg__                    \n\t"
         "out  __SREG__, __tmp_reg__          \n\t"
-        "pop  __tmp_reg__                    \n\t"
-        );
+        "pop  __tmp_reg__                    \n\t");
 }
