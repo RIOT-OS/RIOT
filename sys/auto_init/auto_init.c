@@ -414,6 +414,10 @@ auto_init_mpu9150();
     extern void auto_init_si114x(void);
     auto_init_si114x();
 #endif
+#ifdef MODULE_MHZ19
+    extern void auto_init_mhz19(void);
+    auto_init_mhz19();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 

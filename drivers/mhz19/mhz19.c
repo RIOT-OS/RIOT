@@ -1,0 +1,86 @@
+/*
+ * Copyright (C) 2018 Beduino Master Projekt - University of Bremen
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     drivers_mhz19
+ * @{
+ *
+ * @file
+ * @brief       Device driver implementation for the Zhengzhou Winsen Electronics Technology MH-Z19 CO2 sensor
+ *
+ * @author      Christian Manal <manal@uni-bremen.de>
+ *
+ * @}
+ */
+
+#include "mhz19.h"
+#include "xtimer.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
+int mhz19_init(mhz19_t *dev, mhz19_params_t *params)
+{
+    dev->pin = params->pin;
+    gpio_init(dev->pin, GPIO_IN_PD);
+    /* Take one measurement to make sure there's an mhz19 on the pin */
+    if (mhz19_get_ppm(dev) == MHZ19_ERROR) {
+        return MHZ19_ERROR;
+    }
+    return MHZ19_OK;
+}
+
+int16_t mhz19_get_ppm(mhz19_t *dev)
+{
+    uint32_t start, middle, end, th, tl;
+    /*
+     * Per the docs, one sample should take 1004ms +-5%. Worst case is
+     * that  we come in right after the rising edge of the current cycle,
+     * so we wanna wait two cycles plus some wiggle room at most for
+     * a measurement.
+     */
+    int16_t timeout = 2100;
+
+    DEBUG("%s: Waiting for high level to end\n", __func__);
+    while (gpio_read(dev->pin) && timeout) {
+        timeout--;
+        xtimer_usleep(US_PER_MS);
+    }
+
+    DEBUG("%s: Waiting for initial rising edge\n", __func__);
+    while (!gpio_read(dev->pin) && timeout) {
+        timeout--;
+        xtimer_usleep(US_PER_MS);
+    }
+
+    start = xtimer_now_usec() / US_PER_MS;
+    DEBUG("%s: Waiting for falling edge\n", __func__);
+    while (gpio_read(dev->pin) && timeout) {
+        timeout--;
+        xtimer_usleep(US_PER_MS);
+    }
+    middle = xtimer_now_usec() / US_PER_MS;
+    DEBUG("%s: Waiting for rising edge\n", __func__);
+    while (!gpio_read(dev->pin) && timeout) {
+        timeout--;
+        xtimer_usleep(US_PER_MS);
+    }
+
+    /* If we waited too long for flanks, something went wrong */
+    if (!timeout) {
+        DEBUG("%s: Measurement timed out\n", __func__);
+        return MHZ19_ERROR;
+    }
+
+    end = xtimer_now_usec() / US_PER_MS;
+
+    th = (middle - start);
+    tl = (end - middle);
+
+    return (int16_t)(2000 * (th - 2) / (th + tl - 4));
+}
