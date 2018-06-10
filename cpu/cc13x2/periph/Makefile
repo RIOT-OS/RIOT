@@ -1,0 +1,1 @@
+include $(RIOTMAKE)/periph.mk
