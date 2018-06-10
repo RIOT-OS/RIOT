@@ -7,18 +7,18 @@
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted (subject to the limitations in the
 * disclaimer below) provided that the following conditions are met:
-* 
+*
 * * Redistributions of source code must retain the above copyright
 *   notice, this list of conditions and the following disclaimer.
-* 
+*
 * * Redistributions in binary form must reproduce the above copyright
 *   notice, this list of conditions and the following disclaimer in the
 *   documentation and/or other materials provided with the distribution.
-* 
+*
 * * Neither the name of the copyright holder nor the names of its
 *   contributors may be used to endorse or promote products derived from
 *   this software without specific prior written permission.
-* 
+*
 * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
 * GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
 * HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -44,10 +44,10 @@
 #define IFR_RAM             (0)
 
 #if RADIO_IS_GEN_3P0
-#define RDINDX              (0x41U) 
+#define RDINDX              (0x41U)
 #define K3_BASE_INDEX       (0x11U) /* Based for read index */
 #else
-#define RDRSRC              (0x03U) 
+#define RDRSRC              (0x03U)
 #define KW4x_512_BASE       (0x20000U)
 #define KW4x_256_BASE       (0x10000U)
 #endif /* RADIO_IS_GEN_3P0 */
@@ -136,11 +136,11 @@ const uint32_t BLOCK_1_IFR[]=
  ******************************************************************************/
 
 /*! *********************************************************************************
- * \brief  Read command for reading the first 32bit word from IFR, encapsulates different 
+ * \brief  Read command for reading the first 32bit word from IFR, encapsulates different
  *  flash IFR read mechanisms for multiple generations of SOC
- * 
+ *
  * \param read_addr flash address
- * 
+ *
  * \return 8 bytes of packed data containing radio trims only
  *
 ***********************************************************************************/
@@ -152,9 +152,9 @@ uint32_t read_first_ifr_word(uint32_t read_addr)
 
 /*! *********************************************************************************
  * \brief  Read command for reading additional 32bit words from IFR. Encapsulates multiple IFR read mechanisms.
- * 
+ *
  * \param read_addr flash address
- * 
+ *
  * \return 8 bytes of packed data containing radio trims only
  *
  * \remarks PRE-CONDITIONS:
@@ -193,9 +193,9 @@ uint32_t read_another_ifr_word(void)
 #if RADIO_IS_GEN_3P0
 /*! *********************************************************************************
  * \brief  Read command for reading from IFR using RDINDEX command
- * 
+ *
  * \param read_addr flash address
- * 
+ *
  * \return 8 bytes of packed data containing radio trims only
  *
 ***********************************************************************************/
@@ -207,7 +207,7 @@ uint64_t read_index_ifr(uint32_t read_addr)
 
     while ((FTFE_FSTAT_CCIF_MASK & FTFE->FSTAT) == 0); /* Wait till CCIF=1 to make sure not interrupting a prior operation */
 
-    if ((FTFE->FSTAT & FTFE_FSTAT_ACCERR_MASK) == FTFE_FSTAT_ACCERR_MASK ) 
+    if ((FTFE->FSTAT & FTFE_FSTAT_ACCERR_MASK) == FTFE_FSTAT_ACCERR_MASK )
     {
         FTFE->FSTAT = (1 << FTFE_FSTAT_ACCERR_SHIFT); /* Write 1 to ACCEER to clear errors */
     }
@@ -234,15 +234,15 @@ uint64_t read_index_ifr(uint32_t read_addr)
 
 /*! *********************************************************************************
  * \brief  Read command for reading from IFR
- * 
+ *
  * \param read_addr flash address
- * 
+ *
  * \return packed data containing radio trims only
  *
 ***********************************************************************************/
 #if RADIO_IS_GEN_2P0
 uint32_t read_resource_ifr(uint32_t read_addr)
-{ 
+{
 
     uint32_t packed_data;
     uint8_t flash_addr23_16, flash_addr15_8, flash_addr7_0;
@@ -282,7 +282,7 @@ uint32_t read_resource_ifr(uint32_t read_addr)
 }
 #else
 uint64_t read_resource_ifr(uint32_t read_addr)
-{ 
+{
 
     uint64_t packed_data;
     uint8_t flash_addr23_16, flash_addr15_8, flash_addr7_0;
@@ -336,7 +336,7 @@ uint64_t read_resource_ifr(uint32_t read_addr)
 
 /*! *********************************************************************************
  * \brief  Store a SW trim value in the table passed in from calling function.
- * 
+ *
  * \param sw_trim_tbl pointer to the software trim table to hold SW trim values
  * \param num_entries the number of entries in the SW trim table
  * \param addr the software trim ID
@@ -363,11 +363,11 @@ void store_sw_trim(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries, 
 
 /*! *********************************************************************************
  * \brief  Process block 1 IFR data.
- * 
+ *
  * \param sw_trim_tbl pointer to the software trim table to hold SW trim values
  * \param num_entries the number of entries in the SW trim table
  *
- * \remarks 
+ * \remarks
  *  Uses a IFR v2 formatted default array if the IFR is blank or corrupted.
  *  Stores SW trim values to an array passed into this function.
  *
@@ -426,12 +426,12 @@ void handle_ifr(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries)
                 { /* Invalid address case */
 
                 }
-            } 
+            }
 
         packed_data=read_another_ifr_word();
         }
-    } 
-    else 
+    }
+    else
     {
         /* Valid header is not present, use blind IFR trim table */
         ifr_ptr = BLOCK_1_IFR;
@@ -453,7 +453,7 @@ void handle_ifr(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries)
                 /* Place SW trim in array for driver SW to use */
                 store_sw_trim(sw_trim_tbl, num_entries, dest_addr, dest_data);
             }
-            else 
+            else
             {
                 dest_addr = packed_data;
                 ifr_ptr++;
@@ -506,11 +506,11 @@ uint32_t handle_ifr_die_kw_type(void)
 
 /*! *********************************************************************************
  * \brief  Dumps block 1 IFR data to an array.
- * 
+ *
  * \param dump_tbl pointer to the table to hold the dumped IFR values
  * \param num_entries the number of entries to dump
  *
- * \remarks 
+ * \remarks
  *  Starts at the first address in IFR and dumps sequential entries.
  *
 ***********************************************************************************/
@@ -533,4 +533,3 @@ void dump_ifr(uint32_t * dump_tbl, uint8_t num_entries)
         dump_ptr++;
     }
 }
-

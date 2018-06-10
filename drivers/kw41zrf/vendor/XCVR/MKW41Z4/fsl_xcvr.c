@@ -7,18 +7,18 @@
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted (subject to the limitations in the
 * disclaimer below) provided that the following conditions are met:
-* 
+*
 * * Redistributions of source code must retain the above copyright
 *   notice, this list of conditions and the following disclaimer.
-* 
+*
 * * Redistributions in binary form must reproduce the above copyright
 *   notice, this list of conditions and the following disclaimer in the
 *   documentation and/or other materials provided with the distribution.
-* 
+*
 * * Neither the name of the copyright holder nor the names of its
 *   contributors may be used to endorse or promote products derived from
 *   this software without specific prior written permission.
-* 
+*
 * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
 * GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
 * HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -326,7 +326,7 @@ void rf_osc_shutdown(void)
         RSIM->CONTROL &= ~RSIM_CONTROL_RF_OSC_EN_MASK;
     }
 }
-    
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -354,7 +354,7 @@ xcvrStatus_t XCVR_Init(radio_mode_t radio_mode, data_rate_t data_rate)
 
 #if RADIO_IS_GEN_2P0
     RSIM->RF_OSC_CTRL &= ~RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_MASK; /* Set EXT_OSC_OVRD value to zero */
-    RSIM->RF_OSC_CTRL |= RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_EN_MASK; /* Enable over-ride with zero value */   
+    RSIM->RF_OSC_CTRL |= RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_EN_MASK; /* Enable over-ride with zero value */
 #endif /* RADIO_IS_GEN_2P0 */
 
     /* Check that this is the proper radio version */
@@ -382,7 +382,7 @@ xcvrStatus_t XCVR_Init(radio_mode_t radio_mode, data_rate_t data_rate)
     while ((RSIM->POWER & RSIM_POWER_SPM_RUN_ACK_STAT_MASK) == 0)
     {
     }
-    RSIM->CONTROL |= RSIM_CONTROL_RSIM_CGC_XCVR_EN_MASK; 
+    RSIM->CONTROL |= RSIM_CONTROL_RSIM_CGC_XCVR_EN_MASK;
     rf_osc_startup(); /* Start RF_OSC to allow radio registers access */
 #else
     SIM->SCGC5 |= SIM_SCGC5_PHYDIG_MASK;
@@ -394,17 +394,17 @@ xcvrStatus_t XCVR_Init(radio_mode_t radio_mode, data_rate_t data_rate)
 #endif /* ifndef SIMULATION */
 
     /* Perform the desired XCVR initialization and configuration */
-    status = XCVR_GetDefaultConfig(radio_mode, data_rate, 
-                                   (const xcvr_common_config_t **)&radio_common_config, 
-                                   (const xcvr_mode_config_t **)&radio_mode_cfg, 
-                                   (const xcvr_mode_datarate_config_t **)&mode_datarate_config, 
+    status = XCVR_GetDefaultConfig(radio_mode, data_rate,
+                                   (const xcvr_common_config_t **)&radio_common_config,
+                                   (const xcvr_mode_config_t **)&radio_mode_cfg,
+                                   (const xcvr_mode_datarate_config_t **)&mode_datarate_config,
                                    (const xcvr_datarate_config_t **)&datarate_config);
-								  
+
     if (status == gXcvrSuccess_c)
     {
-        status = XCVR_Configure((const xcvr_common_config_t *)radio_common_config, 
-                                (const xcvr_mode_config_t *)radio_mode_cfg, 
-                                (const xcvr_mode_datarate_config_t *)mode_datarate_config, 
+        status = XCVR_Configure((const xcvr_common_config_t *)radio_common_config,
+                                (const xcvr_mode_config_t *)radio_mode_cfg,
+                                (const xcvr_mode_datarate_config_t *)mode_datarate_config,
                                 (const xcvr_datarate_config_t *)datarate_config, 25, XCVR_FIRST_INIT);
         current_xcvr_config.radio_mode = radio_mode;
         current_xcvr_config.data_rate = data_rate;
@@ -424,11 +424,11 @@ void XCVR_Deinit(void)
 #endif /* RADIO_IS_GEN_3P0 */
 }
 
-xcvrStatus_t XCVR_GetDefaultConfig(radio_mode_t radio_mode, 
-                                   data_rate_t data_rate, 
-                                   const xcvr_common_config_t ** com_config, 
-                                   const xcvr_mode_config_t ** mode_config, 
-                                   const xcvr_mode_datarate_config_t ** mode_datarate_config, 
+xcvrStatus_t XCVR_GetDefaultConfig(radio_mode_t radio_mode,
+                                   data_rate_t data_rate,
+                                   const xcvr_common_config_t ** com_config,
+                                   const xcvr_mode_config_t ** mode_config,
+                                   const xcvr_mode_datarate_config_t ** mode_datarate_config,
                                    const xcvr_datarate_config_t ** datarate_config)
 {
     xcvrStatus_t status = gXcvrSuccess_c;
@@ -470,7 +470,7 @@ xcvrStatus_t XCVR_GetDefaultConfig(radio_mode_t radio_mode,
         case MSK:
             *mode_config = ( const xcvr_mode_config_t *)&msk_mode_config; /* MSK configuration */
             break;
-        default:    
+        default:
             status = gXcvrInvalidParameters_c;
             break;
     }
@@ -524,15 +524,15 @@ xcvrStatus_t XCVR_GetDefaultConfig(radio_mode_t radio_mode,
     return status;
 }
 
-xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config, 
-                            const xcvr_mode_config_t *mode_config, 
-                            const xcvr_mode_datarate_config_t *mode_datarate_config, 
-                            const xcvr_datarate_config_t *datarate_config, 
-                            int16_t tempDegC, 
+xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
+                            const xcvr_mode_config_t *mode_config,
+                            const xcvr_mode_datarate_config_t *mode_datarate_config,
+                            const xcvr_datarate_config_t *datarate_config,
+                            int16_t tempDegC,
                             XCVR_INIT_MODE_CHG_T first_init)
 {
     xcvrStatus_t config_status = gXcvrSuccess_c;
-    uint32_t temp; 
+    uint32_t temp;
 
     /* Turn on the module clocks before doing anything */
 #if RADIO_IS_GEN_3P0
@@ -593,7 +593,7 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
     temp = XCVR_MISC->XCVR_CTRL;
     temp &= ~(mode_config->xcvr_ctrl.mask | XCVR_CTRL_XCVR_CTRL_REF_CLK_FREQ_MASK);
     temp |= mode_config->xcvr_ctrl.init;
-	
+
 #if RF_OSC_26MHZ == 1
     {
         temp |= XCVR_CTRL_XCVR_CTRL_REF_CLK_FREQ(1);
@@ -664,7 +664,7 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
 #endif /* RF_OSC_26MHZ == 1 */
         XCVR_ANA->RX_AUXPLL = temp;
     }
-    
+
     /* Configure RX_DIG_CTRL */
 #if RF_OSC_26MHZ == 1
     {
@@ -715,7 +715,7 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
 #if RADIO_IS_GEN_3P0
         XCVR_RX_DIG->DCOC_CTRL_2 = datarate_config->dcoc_ctrl_2_init_26mhz;
 #endif /* RADIO_IS_GEN_3P0 */
-    
+
     /* customize DCOC_CTRL_0 settings for Gen2 GFSK BT=0.5, h=0.32 */
 #if RADIO_IS_GEN_2P0
         if ((mode_config->radio_mode == ANT_MODE) || (mode_config->radio_mode == GFSK_BT_0p5_h_0p32))
@@ -968,7 +968,7 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
         XCVR_TSM->TIMING53 = com_config->tsm_timing_53_init;
         XCVR_TSM->TIMING57 = com_config->tsm_timing_57_init;
         XCVR_TSM->TIMING58 = com_config->tsm_timing_58_init;
-		
+
 #if RF_OSC_26MHZ == 1
         {
             XCVR_TSM->END_OF_SEQ = XCVR_TSM_END_OF_SEQ_END_OF_TX_WU(END_OF_TX_WU) |
@@ -987,7 +987,7 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
 
         XCVR_TSM->PA_RAMP_TBL0 = com_config->pa_ramp_tbl_0_init;
         XCVR_TSM->PA_RAMP_TBL1 = com_config->pa_ramp_tbl_1_init;
-		
+
 #if RADIO_IS_GEN_3P0
         XCVR_TSM->PA_RAMP_TBL2 = com_config->pa_ramp_tbl_2_init;
         XCVR_TSM->PA_RAMP_TBL3 = com_config->pa_ramp_tbl_3_init;
@@ -1008,19 +1008,19 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
         XCVR_TSM->TIMING20 += B1(2); /*  (sy_pd_en) */
         XCVR_TSM->TIMING21 += B1(2); /* (sy_lo_divn_en) */
         XCVR_TSM->TIMING23 += B1(2); /* (sy_lo_tx_en) */
-        XCVR_TSM->TIMING26 += B1(2); /* (tx_pa_en) */ 
+        XCVR_TSM->TIMING26 += B1(2); /* (tx_pa_en) */
         XCVR_TSM->TIMING34 += B1(2); /* (pll_dig_en) */
         XCVR_TSM->TIMING35 += B1(2); /* (tx_dig_en) */
         XCVR_TSM->TIMING38 += B1(2); /* (sigma_delta_en) */
         XCVR_TSM->TIMING58 += B1(2)  /* (tx_hpm_dac_en) */
         temp = XCVR_TSM->TIMING14;
-        temp &= 0xFFFF0000; 
+        temp &= 0xFFFF0000;
         temp |= B0(END_OF_TX_WU - 4) | B1(END_OF_TX_WU + 1); /* (sy_pd_cycle_slip_ld_ft_en) */
         XCVR_TSM->TIMING14 = temp;
 #endif /* (PA_RAMP_TIME == 4) */
 #endif /* RADIO_IS_GEN_3P0 */
     }
-    
+
 #if RADIO_IS_GEN_3P0
     if (mode_config->radio_mode == ZIGBEE_MODE)
     {
@@ -1048,7 +1048,7 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
         XCVR_TSM->TIMING35 = com_config->tsm_timing_35_init | mode_config->tsm_timing_35_init; /* LSbyte is mode specific, other bytes are common */
     }
 #endif /* RADIO_IS_GEN_3P0 */
-    
+
     /*******************************************************************************/
     /* XCVR_TX_DIG configs */
     /*******************************************************************************/
@@ -1071,7 +1071,7 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
         XCVR_TX_DIG->CTRL = com_config->tx_ctrl;
         XCVR_TX_DIG->DATA_PADDING = com_config->tx_data_padding;
         XCVR_TX_DIG->DFT_PATTERN = com_config->tx_dft_pattern;
-		
+
 #if !RADIO_IS_GEN_2P1
         XCVR_TX_DIG->RF_DFT_BIST_1 = com_config->rf_dft_bist_1;
         XCVR_TX_DIG->RF_DFT_BIST_2 = com_config->rf_dft_bist_2;
@@ -1123,12 +1123,12 @@ xcvrStatus_t XCVR_ChangeMode (radio_mode_t new_radio_mode, data_rate_t new_data_
     const xcvr_common_config_t * radio_common_config;
 
     status = XCVR_GetDefaultConfig(new_radio_mode, new_data_rate, (void *)&radio_common_config, (void *)&radio_mode_cfg, (void *)&mode_datarate_config, (void *)&datarate_config );
-    
+
     if (status == gXcvrSuccess_c)
     {
-        status = XCVR_Configure((const xcvr_common_config_t *)radio_common_config, 
-                                (const xcvr_mode_config_t *)radio_mode_cfg, 
-                                (const xcvr_mode_datarate_config_t *)mode_datarate_config, 
+        status = XCVR_Configure((const xcvr_common_config_t *)radio_common_config,
+                                (const xcvr_mode_config_t *)radio_mode_cfg,
+                                (const xcvr_mode_datarate_config_t *)mode_datarate_config,
                                 (const xcvr_datarate_config_t *)datarate_config, 25, XCVR_MODE_CHANGE);
         current_xcvr_config.radio_mode = new_radio_mode;
         current_xcvr_config.data_rate = new_data_rate;
@@ -1151,14 +1151,14 @@ void XCVR_EnaNBRSSIMeas( uint8_t IIRnbEnable )
 
 xcvrStatus_t XCVR_OverrideFrequency ( uint32_t freq, uint32_t refOsc )
 {
-    double integer_used_in_Hz, 
-           integer_used_in_LSB, 
-           numerator_fraction, 
-           numerator_in_Hz, 
-           numerator_in_LSB, 
+    double integer_used_in_Hz,
+           integer_used_in_LSB,
+           numerator_fraction,
+           numerator_in_Hz,
+           numerator_in_LSB,
            numerator_unrounded,
-           real_int_and_fraction, 
-           real_fraction, 
+           real_int_and_fraction,
+           real_fraction,
            requested_freq_in_LSB,
            sdm_lsb;
     uint32_t temp;
@@ -1183,11 +1183,11 @@ xcvrStatus_t XCVR_OverrideFrequency ( uint32_t freq, uint32_t refOsc )
 
     real_fraction = real_int_and_fraction - integer_truncated;
 
-    if (real_fraction > 0.5) 
+    if (real_fraction > 0.5)
     {
         integer_to_use = integer_truncated + 1;
-    } 
-    else                     
+    }
+    else
     {
         integer_to_use = integer_truncated;
     }
@@ -1209,7 +1209,7 @@ xcvrStatus_t XCVR_OverrideFrequency ( uint32_t freq, uint32_t refOsc )
     /* Write the Low Port Integer and Numerator */
     temp = XCVR_PLL_DIG->LPM_SDM_CTRL1;
     temp &= ~XCVR_PLL_DIG_LPM_SDM_CTRL1_LPM_INTG_MASK;
-    temp |= (XCVR_PLL_DIG_LPM_SDM_CTRL1_LPM_INTG(integer_to_use) | 
+    temp |= (XCVR_PLL_DIG_LPM_SDM_CTRL1_LPM_INTG(integer_to_use) |
              XCVR_PLL_DIG_LPM_SDM_CTRL1_SDM_MAP_DISABLE_MASK);
     XCVR_PLL_DIG->LPM_SDM_CTRL1 = temp;
 
@@ -1271,7 +1271,7 @@ link_layer_t map_mode_to_ll(radio_mode_t mode)
         case GFSK_BT_0p5_h_1p0:
         case GFSK_BT_0p3_h_0p5:
         case GFSK_BT_0p7_h_0p5:
-        case MSK: 
+        case MSK:
             llret = GENFSK_LL;
             break;
         default:
@@ -1389,7 +1389,7 @@ xcvrStatus_t XCVR_OverrideChannel(uint8_t channel, uint8_t useMappedChannel)
     {
         /* Clear all of the overrides and restore to LL channel control */
         temp = XCVR_PLL_DIG->CHAN_MAP;
-        temp &= ~(XCVR_PLL_DIG_CHAN_MAP_CHANNEL_NUM_MASK | XCVR_PLL_DIG_CHAN_MAP_BOC_MASK 
+        temp &= ~(XCVR_PLL_DIG_CHAN_MAP_CHANNEL_NUM_MASK | XCVR_PLL_DIG_CHAN_MAP_BOC_MASK
 #if !RADIO_IS_GEN_2P1
                  | XCVR_PLL_DIG_CHAN_MAP_ZOC_MASK
 #endif /* !RADIO_IS_GEN_2P1 */
@@ -1398,7 +1398,7 @@ xcvrStatus_t XCVR_OverrideChannel(uint8_t channel, uint8_t useMappedChannel)
 #endif /* RADIO_IS_GEN_3P0 */
                  );
 
-      XCVR_PLL_DIG->CHAN_MAP = temp; 
+      XCVR_PLL_DIG->CHAN_MAP = temp;
 
       /* Stop using the manual frequency setting */
       XCVR_PLL_DIG->LPM_SDM_CTRL1 &= ~XCVR_PLL_DIG_LPM_SDM_CTRL1_SDM_MAP_DISABLE_MASK;
@@ -1438,7 +1438,7 @@ xcvrStatus_t XCVR_OverrideChannel(uint8_t channel, uint8_t useMappedChannel)
                         | XCVR_PLL_DIG_CHAN_MAP_ZOC_MASK
 #endif /* !RADIO_IS_GEN_2P1 */
                         );
-                XCVR_PLL_DIG->CHAN_MAP = temp; 
+                XCVR_PLL_DIG->CHAN_MAP = temp;
                 break;
         }
     }
@@ -1448,7 +1448,7 @@ xcvrStatus_t XCVR_OverrideChannel(uint8_t channel, uint8_t useMappedChannel)
 #if !RADIO_IS_GEN_2P1
                                   | XCVR_PLL_DIG_CHAN_MAP_ZOC_MASK
 #endif /* !RADIO_IS_GEN_2P1 */
-                                  ); 
+                                  );
 
         XCVR_PLL_DIG->LPM_SDM_CTRL3 = XCVR_PLL_DIG_LPM_SDM_CTRL3_LPM_DENOM(gPllDenom_c);
         XCVR_PLL_DIG->LPM_SDM_CTRL2 = XCVR_PLL_DIG_LPM_SDM_CTRL2_LPM_NUM(mapTable[channel].numerator);
@@ -1503,16 +1503,16 @@ uint32_t XCVR_GetFreq ( void )
     if (pll_num_unsigned & 0x04000000U)
     {
         /* Sign extend the numerator */
-        pll_num = (~pll_num_unsigned + 1) & 0x03FFFFFFU; 
+        pll_num = (~pll_num_unsigned + 1) & 0x03FFFFFFU;
 
         /* Calculate the frequency in MHz */
-        freq_float = (ref_clk * 2 * (pll_int - ((float)pll_num / pll_denom))); 
+        freq_float = (ref_clk * 2 * (pll_int - ((float)pll_num / pll_denom)));
     }
     else
     {
         /* Calculate the frequency in MHz */
         pll_num = pll_num_unsigned;
-        freq_float = (ref_clk * 2 * (pll_int + ((float)pll_num / (float)pll_denom))); 
+        freq_float = (ref_clk * 2 * (pll_int + ((float)pll_num / (float)pll_denom)));
     }
 
     freq = (uint32_t)freq_float;
@@ -1580,9 +1580,9 @@ xcvrStatus_t XCVR_DftTxPatternReg(uint16_t channel_num, radio_mode_t radio_mode,
     uint8_t dft_mode = 0;
     uint8_t dft_clk_sel = 0;
     xcvrStatus_t status = gXcvrSuccess_c;
-    
+
     XCVR_ChangeMode(radio_mode, data_rate);
-    
+
     /* Select the RF Channel, using the Channel Number register */
     XCVR_OverrideChannel(channel_num, 1);
 
@@ -1659,9 +1659,9 @@ xcvrStatus_t XCVR_DftTxLfsrReg(uint16_t channel_num, radio_mode_t radio_mode, da
     {
         return gXcvrInvalidParameters_c;
     }
-    
+
     XCVR_ChangeMode(radio_mode, data_rate);
-    
+
     /* Select the RF Channel, using the Channel Number register */
     XCVR_OverrideChannel(channel_num, 1);
 
@@ -1754,12 +1754,12 @@ xcvrStatus_t XCVR_ForcePAPower(uint8_t pa_power)
     {
         return gXcvrInvalidParameters_c; /* Failure */
     }
-    
+
     if (pa_power != 1)
     {
         pa_power = pa_power & 0xFEU; /* Ensure LSbit is cleared */
     }
-    
+
     XCVR_MISC->XCVR_CTRL &= ~XCVR_CTRL_XCVR_CTRL_TGT_PWR_SRC_MASK; /* Use PA_POWER in TSM registers */
     XCVR_TSM->PA_POWER = pa_power;
 
@@ -1768,29 +1768,29 @@ xcvrStatus_t XCVR_ForcePAPower(uint8_t pa_power)
 
 xcvrStatus_t XCVR_CoexistenceInit(void)
 {
-#if gMWS_UseCoexistence_d  
+#if gMWS_UseCoexistence_d
     uint32_t temp = 0x00U;
     uint32_t end_of_tx_wu = 0x00U;
     uint32_t end_of_rx_wu = 0x00U;
-    
+
 #if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
 #if (XCVR_COEX_RF_ACTIVE_PIN == ANT_A)
     uint32_t tsm_timing47 = 0x00U;
 #else /* (XCVR_COEX_RF_ACTIVE_PIN == ANT_B) */
     uint32_t tsm_timing48 = 0x00U;
 #endif /* (XCVR_COEX_RF_ACTIVE_PIN == ANT_A) */
-    uint32_t tsm_timing50 = 0x00U;    
+    uint32_t tsm_timing50 = 0x00U;
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d) */
-    
+
 #if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)
     // RF_ACTIVE = ANT_B (PTC1, gpio1_trig_en)
     uint32_t tsm_timing48 = 0x00U;
     // RF_PRIORITY = ANT_A (PTC4, gpio0_trig_en)
-    uint32_t tsm_timing47 = 0x00U;    
+    uint32_t tsm_timing47 = 0x00U;
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */
-    
+
     uint16_t tsm_timing43_rx = 0x00;
-    uint16_t tsm_timing43_tx = 0x00;    
+    uint16_t tsm_timing43_tx = 0x00;
 
     /* Select GPIO mode for FAD pins */
     temp = XCVR_MISC->FAD_CTRL;
@@ -1802,10 +1802,10 @@ xcvrStatus_t XCVR_CoexistenceInit(void)
                     XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_SHIFT;
     end_of_rx_wu = (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK) >>
                     XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;
-    
+
 /*****************
  *  TX SEQUENCE  *
- *****************/    
+ *****************/
 
     if (end_of_tx_wu < gMWS_CoexRfActiveAssertTime_d)
     {
@@ -1815,35 +1815,35 @@ xcvrStatus_t XCVR_CoexistenceInit(void)
     {
         temp = gMWS_CoexRfActiveAssertTime_d;
     }
-    
-    /* Save the TX RF_ACTIVE start time. */
-    tsm_timing43_tx = end_of_tx_wu - temp; 
 
-#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)    
+    /* Save the TX RF_ACTIVE start time. */
+    tsm_timing43_tx = end_of_tx_wu - temp;
+
+#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
     /* Set RF_ACTIVE pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any TX sequence. */
 #if (XCVR_COEX_RF_ACTIVE_PIN == ANT_A)
-    tsm_timing47 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_SHIFT) & 
+    tsm_timing47 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_SHIFT) &
                                                         XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_MASK);
 #else
-    tsm_timing48 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING48_GPIO1_TRIG_EN_TX_HI_SHIFT) & 
-                                                        XCVR_TSM_TIMING48_GPIO1_TRIG_EN_TX_HI_MASK);    
+    tsm_timing48 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING48_GPIO1_TRIG_EN_TX_HI_SHIFT) &
+                                                        XCVR_TSM_TIMING48_GPIO1_TRIG_EN_TX_HI_MASK);
 #endif /* (XCVR_COEX_RF_ACTIVE_PIN == ANT_A) */
 
     /* Set STATUS pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any TX sequence. */
-    tsm_timing50 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_SHIFT) & 
+    tsm_timing50 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_SHIFT) &
                                                         XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_MASK);
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d) */
 
 #if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)
     /* Set RF_ACTIVE pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any TX sequence. */
-    tsm_timing48 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING48_GPIO1_TRIG_EN_TX_HI_SHIFT) & 
+    tsm_timing48 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING48_GPIO1_TRIG_EN_TX_HI_SHIFT) &
                                                         XCVR_TSM_TIMING48_GPIO1_TRIG_EN_TX_HI_MASK);
 
     /* Set STATUS pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any TX sequence. */
-    tsm_timing47 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_SHIFT) & 
-                                                        XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_MASK);        
-#endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */  
-    
+    tsm_timing47 = (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_SHIFT) &
+                                                        XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_MASK);
+#endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */
+
 /*****************
  *  RX SEQUENCE  *
  *****************/
@@ -1858,22 +1858,22 @@ xcvrStatus_t XCVR_CoexistenceInit(void)
     }
 
     /* Save the RX RF_ACTIVE start time. */
-    tsm_timing43_rx = end_of_rx_wu - temp; 
+    tsm_timing43_rx = end_of_rx_wu - temp;
 
-#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)    
+#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
     /* Set RF_ACTIVE pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any RX sequence. */
 #if (XCVR_COEX_RF_ACTIVE_PIN == ANT_A)
-    tsm_timing47 |= (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_SHIFT) & 
+    tsm_timing47 |= (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_SHIFT) &
                                                          XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_MASK);
 #else
-    tsm_timing48 |= (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING48_GPIO1_TRIG_EN_RX_HI_SHIFT) & 
+    tsm_timing48 |= (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING48_GPIO1_TRIG_EN_RX_HI_SHIFT) &
                                                          XCVR_TSM_TIMING48_GPIO1_TRIG_EN_RX_HI_MASK);
 #endif /* (XCVR_COEX_RF_ACTIVE_PIN == ANT_A) */
 
     /* Set STATUS pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any RX sequence and clear it gMWS_CoexPrioSignalTime_d uS before RX start. */
-    tsm_timing50 |= ((((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_SHIFT) & 
+    tsm_timing50 |= ((((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_SHIFT) &
                                                           XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_MASK) |
-                     (((uint32_t)(end_of_rx_wu - gMWS_CoexPrioSignalTime_d) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_SHIFT) & 
+                     (((uint32_t)(end_of_rx_wu - gMWS_CoexPrioSignalTime_d) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_SHIFT) &
                                                                              XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_MASK));
 
 #if (XCVR_COEX_RF_ACTIVE_PIN == ANT_A)
@@ -1885,11 +1885,11 @@ xcvrStatus_t XCVR_CoexistenceInit(void)
     temp = XCVR_TSM->TIMING48;
     temp &= ~(XCVR_TSM_TIMING48_GPIO1_TRIG_EN_TX_HI_MASK | XCVR_TSM_TIMING48_GPIO1_TRIG_EN_RX_HI_MASK);
     temp |= tsm_timing48;
-    XCVR_TSM->TIMING48 = temp;    
+    XCVR_TSM->TIMING48 = temp;
 #endif /* (XCVR_COEX_RF_ACTIVE_PIN == ANT_A) */
 
     temp = XCVR_TSM->TIMING50;
-    temp &= ~(XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_MASK | 
+    temp &= ~(XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_MASK |
               XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_MASK |
               XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_MASK);
     temp |= tsm_timing50;
@@ -1905,32 +1905,32 @@ xcvrStatus_t XCVR_CoexistenceInit(void)
     PORTC->PCR[3] = (PORTC->PCR[3] & ~PORT_PCR_MUX_MASK) | PORT_PCR_MUX(2);
 #endif /* (XCVR_COEX_RF_ACTIVE_PIN == ANT_A) */
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d) */
-    
-#if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)    
+
+#if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)
     /* Set RF_ACTIVE pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any RX sequence. */
-    tsm_timing48 |= (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING48_GPIO1_TRIG_EN_RX_HI_SHIFT) & 
+    tsm_timing48 |= (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING48_GPIO1_TRIG_EN_RX_HI_SHIFT) &
                                                          XCVR_TSM_TIMING48_GPIO1_TRIG_EN_RX_HI_MASK);
-    
+
     /* Set PRIORITY pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any RX sequence and clear it gMWS_CoexPrioSignalTime_d uS before RX start. */
-    tsm_timing47 |= (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_SHIFT) & 
+    tsm_timing47 |= (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_SHIFT) &
                                                           XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_MASK);
-    
+
     /* RF_ACTIVE */
     temp = XCVR_TSM->TIMING48;
     temp &= ~(XCVR_TSM_TIMING48_GPIO1_TRIG_EN_TX_HI_MASK | XCVR_TSM_TIMING48_GPIO1_TRIG_EN_RX_HI_MASK);
     temp |= tsm_timing48;
     XCVR_TSM->TIMING48 = temp;
-    
+
     /* RF_PRIORITY */
     temp = XCVR_TSM->TIMING47;
     temp &= ~(XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_MASK | XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_MASK);
     temp |= tsm_timing47;
     XCVR_TSM->TIMING47 = temp;
-    
+
     /* Overwrite pins settings */
     GPIOC->PDDR |= 0x12;
     PORTC->PCR[4] = (PORTC->PCR[4] & ~PORT_PCR_MUX_MASK) | PORT_PCR_MUX(2);
-    PORTC->PCR[1] = (PORTC->PCR[1] & ~PORT_PCR_MUX_MASK) | PORT_PCR_MUX(2);    
+    PORTC->PCR[1] = (PORTC->PCR[1] & ~PORT_PCR_MUX_MASK) | PORT_PCR_MUX(2);
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */
 
     tsm_timing43_tx += gMWS_CoexConfirmWaitTime_d;
@@ -1941,14 +1941,14 @@ xcvrStatus_t XCVR_CoexistenceInit(void)
     }
 
     tsm_timing43_rx += gMWS_CoexConfirmWaitTime_d;
-    
+
     if (tsm_timing43_rx > end_of_rx_wu - 1)
     {
         tsm_timing43_rx = end_of_rx_wu - 1;
     }
 
     XCVR_TSM->TIMING43 = ((((uint32_t)(tsm_timing43_tx) << XCVR_TSM_TIMING43_TSM_SPARE0_EN_TX_HI_SHIFT) & XCVR_TSM_TIMING43_TSM_SPARE0_EN_TX_HI_MASK) |
-                          (((uint32_t)(tsm_timing43_tx + 2) << XCVR_TSM_TIMING43_TSM_SPARE0_EN_TX_LO_SHIFT) & XCVR_TSM_TIMING43_TSM_SPARE0_EN_TX_LO_MASK) | 
+                          (((uint32_t)(tsm_timing43_tx + 2) << XCVR_TSM_TIMING43_TSM_SPARE0_EN_TX_LO_SHIFT) & XCVR_TSM_TIMING43_TSM_SPARE0_EN_TX_LO_MASK) |
                           (((uint32_t)(tsm_timing43_rx) << XCVR_TSM_TIMING43_TSM_SPARE0_EN_RX_HI_SHIFT) & XCVR_TSM_TIMING43_TSM_SPARE0_EN_RX_HI_MASK) |
                           (((uint32_t)(tsm_timing43_rx + 2) << XCVR_TSM_TIMING43_TSM_SPARE0_EN_RX_LO_SHIFT) & XCVR_TSM_TIMING43_TSM_SPARE0_EN_RX_LO_MASK));
 
@@ -1957,8 +1957,8 @@ xcvrStatus_t XCVR_CoexistenceInit(void)
     XCVR_TSM->CTRL |= XCVR_TSM_CTRL_TSM_IRQ0_EN_MASK;
 
     /* Save the updated registers values. */
-    XCVR_CoexistenceSaveRestoreTimings(1);    
-#endif /* gMWS_UseCoexistence_d */ 
+    XCVR_CoexistenceSaveRestoreTimings(1);
+#endif /* gMWS_UseCoexistence_d */
 
     return gXcvrSuccess_c;
 }
@@ -1971,21 +1971,21 @@ xcvrStatus_t XCVR_CoexistenceSetPriority(XCVR_COEX_PRIORITY_T rxPriority, XCVR_C
     uint32_t end_of_rx_wu = 0x00U;
 #if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
     uint32_t tsm_timing50 = 0x00U;
-#endif    
+#endif
 #if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)
     uint32_t tsm_timing47 = 0x00U;
-#endif    
+#endif
 
     /* Read the END_OF_TX_WU and END_OF_RX_WU for XCVR */
     end_of_tx_wu = (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_MASK) >>
                     XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_SHIFT;
     end_of_rx_wu = (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK) >>
-                    XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;    
+                    XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;
 
 /*****************
  *      RX       *
  *****************/
-    
+
     if (XCVR_COEX_HIGH_PRIO == rxPriority)
     {
         if (end_of_rx_wu < gMWS_CoexRfActiveAssertTime_d)
@@ -1999,30 +1999,30 @@ xcvrStatus_t XCVR_CoexistenceSetPriority(XCVR_COEX_PRIORITY_T rxPriority, XCVR_C
 
 #if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
         /* Set STATUS pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any RX sequence and clear it gMWS_CoexPrioSignalTime_d uS before RX start for high priority RX. */
-        tsm_timing50 = ((((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_SHIFT) & 
+        tsm_timing50 = ((((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_SHIFT) &
                                                              XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_MASK) |
-                        (((uint32_t)(end_of_rx_wu - gMWS_CoexPrioSignalTime_d) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_SHIFT) & 
+                        (((uint32_t)(end_of_rx_wu - gMWS_CoexPrioSignalTime_d) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_SHIFT) &
                                                                                   XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_MASK));
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d) */
 #if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)
      /* Set STATUS pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any RX sequence */
-        tsm_timing47 = (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_SHIFT) & 
-                                                            XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_MASK);   
+        tsm_timing47 = (((uint32_t)(end_of_rx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_SHIFT) &
+                                                            XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_MASK);
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */
     }
     else
     {
         /* Low priority RX */
 #if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
-        tsm_timing50 = (((0xFFU << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_SHIFT) & 
+        tsm_timing50 = (((0xFFU << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_SHIFT) &
                                    XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_HI_MASK) |
-                        ((0xFFU << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_SHIFT) & 
+                        ((0xFFU << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_SHIFT) &
                                    XCVR_TSM_TIMING50_GPIO3_TRIG_EN_RX_LO_MASK));
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d) */
-#if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)        
-        tsm_timing47 = (((0xFFU << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_SHIFT) & 
+#if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)
+        tsm_timing47 = (((0xFFU << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_SHIFT) &
                                    XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_MASK) |
-                        ((0xFFU << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_LO_SHIFT) & 
+                        ((0xFFU << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_LO_SHIFT) &
                                    XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_LO_MASK));
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */
     }
@@ -2043,26 +2043,26 @@ xcvrStatus_t XCVR_CoexistenceSetPriority(XCVR_COEX_PRIORITY_T rxPriority, XCVR_C
 
         /* Set STATUS pin HIGH gMWS_CoexRfActiveAssertTime_d uS prior to any TX sequence for HIGH priority TX. */
 #if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
-        tsm_timing50 |= (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_SHIFT) & 
+        tsm_timing50 |= (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_SHIFT) &
                                                              XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_MASK);
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d) */
-#if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)        
-        tsm_timing47 |= (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_SHIFT) & 
+#if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)
+        tsm_timing47 |= (((uint32_t)(end_of_tx_wu - temp) << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_SHIFT) &
                                                              XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_MASK);
-#endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */                
+#endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */
     }
     else
-    {        
+    {
 #if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
         /* Set STATUS pin HIGH at END_OF_TX_WU prior to any TX sequence for LOW priority TX. */
-        tsm_timing50 |= (((uint32_t)(end_of_tx_wu) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_SHIFT) & 
+        tsm_timing50 |= (((uint32_t)(end_of_tx_wu) << XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_SHIFT) &
                                                       XCVR_TSM_TIMING50_GPIO3_TRIG_EN_TX_HI_MASK);
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d) */
 #if (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d)
-        /* Set STATUS pin LOW at END_OF_TX_WU prior to any TX sequence for LOW priority TX. */                
-        tsm_timing47 = (((0xFFU << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_SHIFT) & 
+        /* Set STATUS pin LOW at END_OF_TX_WU prior to any TX sequence for LOW priority TX. */
+        tsm_timing47 = (((0xFFU << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_SHIFT) &
                                    XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_HI_MASK) |
-                        ((0xFFU << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_LO_SHIFT) & 
+                        ((0xFFU << XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_LO_SHIFT) &
                                    XCVR_TSM_TIMING47_GPIO0_TRIG_EN_TX_LO_MASK));
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */
     }
@@ -2082,9 +2082,9 @@ xcvrStatus_t XCVR_CoexistenceSetPriority(XCVR_COEX_PRIORITY_T rxPriority, XCVR_C
               XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_HI_MASK |
               XCVR_TSM_TIMING47_GPIO0_TRIG_EN_RX_LO_MASK);
     temp |= tsm_timing47;
-    XCVR_TSM->TIMING47 = temp;    
+    XCVR_TSM->TIMING47 = temp;
 #endif /* (gMWS_Coex_Model_d == gMWS_Coex_Prio_Only_d) */
-    
+
     /* Save the updated registers values. */
     XCVR_CoexistenceSaveRestoreTimings(1);
 #endif /* gMWS_UseCoexistence_d */
@@ -2101,25 +2101,25 @@ xcvrStatus_t XCVR_CoexistenceSaveRestoreTimings(uint8_t saveTimings)
     static uint32_t tsm_ovrd3_saved = 0x00;
     static uint32_t tsm_timing47_saved = 0x00;
     static uint32_t tsm_timing48_saved = 0x00;
-#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)    
+#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
     static uint32_t tsm_timing49_saved = 0x00;
     static uint32_t tsm_timing50_saved = 0x00;
-#endif    
+#endif
 
     if (saveTimings == 0)
     {
         /* Restore registers values. */
-        XCVR_TSM->OVRD0 = tsm_ovrd0_saved; 
+        XCVR_TSM->OVRD0 = tsm_ovrd0_saved;
         XCVR_TSM->OVRD1 = tsm_ovrd1_saved;
         XCVR_TSM->OVRD2 = tsm_ovrd2_saved;
         XCVR_TSM->OVRD3 = tsm_ovrd3_saved;
 
         XCVR_TSM->TIMING47 = tsm_timing47_saved;
         XCVR_TSM->TIMING48 = tsm_timing48_saved;
-#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)        
+#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
         XCVR_TSM->TIMING49 = tsm_timing49_saved;
         XCVR_TSM->TIMING50 = tsm_timing50_saved;
-#endif        
+#endif
     }
     else
     {
@@ -2130,13 +2130,12 @@ xcvrStatus_t XCVR_CoexistenceSaveRestoreTimings(uint8_t saveTimings)
         tsm_ovrd3_saved = XCVR_TSM->OVRD3;
         tsm_timing47_saved = XCVR_TSM->TIMING47;
         tsm_timing48_saved = XCVR_TSM->TIMING48;
-#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)        
+#if (gMWS_Coex_Model_d == gMWS_Coex_Status_Prio_d)
         tsm_timing49_saved = XCVR_TSM->TIMING49;
         tsm_timing50_saved = XCVR_TSM->TIMING50;
-#endif        
+#endif
     }
 #endif /* gMWS_UseCoexistence_d */
 
     return gXcvrSuccess_c;
 }
-

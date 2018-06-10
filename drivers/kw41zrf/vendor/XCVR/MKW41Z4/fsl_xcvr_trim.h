@@ -6,18 +6,18 @@
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted (subject to the limitations in the
 * disclaimer below) provided that the following conditions are met:
-* 
+*
 * * Redistributions of source code must retain the above copyright
 *   notice, this list of conditions and the following disclaimer.
-* 
+*
 * * Redistributions in binary form must reproduce the above copyright
 *   notice, this list of conditions and the following disclaimer in the
 *   documentation and/or other materials provided with the distribution.
-* 
+*
 * * Neither the name of the copyright holder nor the names of its
 *   contributors may be used to endorse or promote products derived from
 *   this software without specific prior written permission.
-* 
+*
 * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
 * GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
 * HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -102,8 +102,8 @@ typedef enum /* Enumeration of ADC_GAIN_CAL 2 */
 /* \brief  Defines an entry in an array of structs to describe TZA DCOC STEP and TZA_DCOC_STEP_RECIPROCAL. */
 typedef struct
 {
-    uint16_t dcoc_step; 
-    uint16_t dcoc_step_rcp; 
+    uint16_t dcoc_step;
+    uint16_t dcoc_step_rcp;
 } TZAdcocstep_t;
 
 typedef struct
@@ -136,4 +136,3 @@ void DCOC_DAC_INIT_Cal(uint8_t standalone_operation);
 /*! @}*/
 
 #endif /* _FSL_XCVR_TRIM_H_ */
-

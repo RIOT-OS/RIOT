@@ -7,18 +7,18 @@
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted (subject to the limitations in the
 * disclaimer below) provided that the following conditions are met:
-* 
+*
 * * Redistributions of source code must retain the above copyright
 *   notice, this list of conditions and the following disclaimer.
-* 
+*
 * * Redistributions in binary form must reproduce the above copyright
 *   notice, this list of conditions and the following disclaimer in the
 *   documentation and/or other materials provided with the distribution.
-* 
+*
 * * Neither the name of the copyright holder nor the names of its
 *   contributors may be used to endorse or promote products derived from
 *   this software without specific prior written permission.
-* 
+*
 * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
 * GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
 * HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -151,7 +151,7 @@ typedef struct
  *
  * @param sw_trim_tbl pointer to the table used to store software trim values.
  * @param num_entries the number of entries that can be stored in the SW trim table.
- */ 
+ */
 void handle_ifr(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries);
 
 /*!
@@ -160,7 +160,7 @@ void handle_ifr(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries);
  * This function handles reading die ID value for debug and testing usage.
  *
  * @return the value of the die ID field.
- */ 
+ */
 uint32_t handle_ifr_die_id(void);
 
 /*!
@@ -169,7 +169,7 @@ uint32_t handle_ifr_die_id(void);
  * This function handles reading KW chip version for debug and testing usage.
  *
  * @return the value of the KW version field.
- */ 
+ */
 uint32_t handle_ifr_die_kw_type(void);
 
 /*!
@@ -179,8 +179,7 @@ uint32_t handle_ifr_die_kw_type(void);
  *
  * @param dump_tbl pointer to the table used to store IFR entry values.
  * @param num_entries the number of entries that can be stored in the dump table.
- */ 
+ */
 void dump_ifr(uint32_t * dump_tbl, uint8_t num_entries);
 
 #endif /*__IFR_RADIO_H__ */
-
