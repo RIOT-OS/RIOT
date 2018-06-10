@@ -1,0 +1,7 @@
+ifneq (,$(filter ccn-lite,$(USEPKG)))
+  USEMODULE += ccn-lite-utils
+  USEMODULE += evtimer
+  USEMODULE += random
+  USEMODULE += timex
+  USEMODULE += tlsf-malloc
+endif

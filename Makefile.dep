@@ -705,10 +705,6 @@ ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
 endif
 
-ifneq (,$(filter ccn-lite,$(USEPKG)))
-  USEMODULE += ccn-lite-utils
-endif
-
 ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
   USEPKG += fatfs
   USEMODULE += vfs
