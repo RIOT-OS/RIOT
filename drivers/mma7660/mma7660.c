@@ -23,6 +23,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+
 #include "periph/i2c.h"
 
 #include "mma7660.h"
@@ -46,17 +48,8 @@
 int mma7660_init(mma7660_t *dev, const mma7660_params_t *params)
 {
     /* write device descriptor */
-    dev->params = *params;
+    memcpy(&dev->params, params, sizeof(mma7660_params_t));
 
-    i2c_acquire(DEV_I2C);
-    /* initialize the I2C bus */
-    if (i2c_init_master(DEV_I2C, I2C_SPEED) < 0) {
-        i2c_release(DEV_I2C);
-        return -MMA7660_I2C_ERR;
-    }
-    i2c_release(DEV_I2C);
-
-    /* set device to standby-mode befor configuration */
     if (mma7660_set_mode(dev, 0, 0, 0, 0) != MMA7660_OK) {
         DEBUG("mma7660_set_mode failed!\n");
         return -MMA7660_I2C_WRITE_ERR;
@@ -93,9 +86,9 @@ int mma7660_set_mode(const mma7660_t *dev, uint8_t active,
           (prescale << MODE_PRESCALE_SHIFT)   |
           MODE_INTERRUPT_DEFAULT;
     i2c_acquire(DEV_I2C);
-    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_MODE, reg);
+    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_MODE, reg, 0);
     i2c_release(DEV_I2C);
-    if (rv != 1) {
+    if (rv != 0) {
         return -MMA7660_I2C_WRITE_ERR;
     }
 
@@ -106,9 +99,9 @@ int mma7660_read_tilt(const mma7660_t *dev, uint8_t *res)
 {
     int rv;
     i2c_acquire(DEV_I2C);
-    rv = i2c_read_reg(DEV_I2C, DEV_ADDR, MMA7660_TILT, (char*)res);
+    rv = i2c_read_reg(DEV_I2C, DEV_ADDR, MMA7660_TILT, (char *)res, 0);
     i2c_release(DEV_I2C);
-    if (rv != 1) {
+    if (rv != 0) {
         return -MMA7660_I2C_READ_ERR;
     }
 
@@ -119,9 +112,9 @@ int mma7660_write_sleep_count(const mma7660_t *dev, uint8_t sleep)
 {
     int rv;
     i2c_acquire(DEV_I2C);
-    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_SPCNT, sleep);
+    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_SPCNT, sleep, 0);
     i2c_release(DEV_I2C);
-    if (rv != 1) {
+    if (rv != 0) {
         return -MMA7660_I2C_WRITE_ERR;
     }
 
@@ -132,9 +125,9 @@ int mma7660_config_interrupts(const mma7660_t *dev, uint8_t isource_flags)
 {
     int rv;
     i2c_acquire(DEV_I2C);
-    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_INTSU, isource_flags);
+    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_INTSU, isource_flags, 0);
     i2c_release(DEV_I2C);
-    if (rv != 1) {
+    if (rv != 0) {
         return -MMA7660_I2C_WRITE_ERR;
     }
 
@@ -146,9 +139,9 @@ int mma7660_config_samplerate(const mma7660_t *dev, uint8_t amsr, uint8_t awsr, 
     int rv;
     char ch = amsr | awsr | (filt << SR_FILT_SHIFT);
     i2c_acquire(DEV_I2C);
-    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_SR, ch);
+    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_SR, ch, 0);
     i2c_release(DEV_I2C);
-    if (rv != 1) {
+    if (rv != 0) {
         return -MMA7660_I2C_WRITE_ERR;
     }
 
@@ -159,9 +152,9 @@ int mma7660_config_pdet(const mma7660_t *dev, uint8_t pdth, uint8_t enabled_axes
     int rv;
     char ch = pdth | ((~enabled_axes) & PDET_AXIS_MASK);
     i2c_acquire(DEV_I2C);
-    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_PDET, ch);
+    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_PDET, ch, 0);
     i2c_release(DEV_I2C);
-    if (rv != 1) {
+    if (rv != 0) {
         return -MMA7660_I2C_WRITE_ERR;
     }
 
@@ -171,9 +164,9 @@ int mma7660_config_pdet(const mma7660_t *dev, uint8_t pdth, uint8_t enabled_axes
 int mma7660_config_pd(const mma7660_t *dev, uint8_t pd) {
     int rv;
     i2c_acquire(DEV_I2C);
-    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_PD, (char)pd);
+    rv = i2c_write_reg(DEV_I2C, DEV_ADDR, MMA7660_PD, (char)pd, 0);
     i2c_release(DEV_I2C);
-    if (rv != 1) {
+    if (rv != 0) {
         return -MMA7660_I2C_WRITE_ERR;
     }
 
@@ -187,7 +180,7 @@ int mma7660_read_counts(const mma7660_t *dev, int8_t *x, int8_t *y, int8_t *z)
     i2c_acquire(DEV_I2C);
 
     while (retries > 0) {
-        if (i2c_read_reg(DEV_I2C, DEV_ADDR, MMA7660_XOUT, &t) != 1) {
+        if (i2c_read_reg(DEV_I2C, DEV_ADDR, MMA7660_XOUT, &t, 0) != 0) {
             i2c_release(DEV_I2C);
             return -MMA7660_READ_ERR;
         }
@@ -203,7 +196,7 @@ int mma7660_read_counts(const mma7660_t *dev, int8_t *x, int8_t *y, int8_t *z)
     *x = (int8_t)t;
 
     while (retries > 0) {
-        if (i2c_read_reg(DEV_I2C, DEV_ADDR, MMA7660_YOUT, &t) != 1) {
+        if (i2c_read_reg(DEV_I2C, DEV_ADDR, MMA7660_YOUT, &t, 0) != 0) {
             i2c_release(DEV_I2C);
             return -MMA7660_READ_ERR;
         }
@@ -219,7 +212,7 @@ int mma7660_read_counts(const mma7660_t *dev, int8_t *x, int8_t *y, int8_t *z)
     *y = (int8_t)t;
 
     while (retries > 0) {
-        if (i2c_read_reg(DEV_I2C, DEV_ADDR, MMA7660_ZOUT, &t) != 1) {
+        if (i2c_read_reg(DEV_I2C, DEV_ADDR, MMA7660_ZOUT, &t, 0) != 0) {
             i2c_release(DEV_I2C);
             return -MMA7660_READ_ERR;
         }
