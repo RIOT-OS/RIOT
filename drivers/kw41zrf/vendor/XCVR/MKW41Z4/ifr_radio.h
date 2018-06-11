@@ -60,14 +60,14 @@
 #define IS_A_SW_ID(x)           ((IFR_SW_ID_MIN < (x)) && (IFR_SW_ID_MAX >= (x)))
 
 /* K3 valid registers support */
-#if (defined(CPU_K32W042S1M2CAx_M0P) || defined(CPU_K32W042S1M2VPJ_M0P))
+#if (defined(CPU_MODEL_K32W042S1M2CAx_M0P) || defined(CPU_MODEL_K32W042S1M2VPJ_M0P))
 #define IS_VALID_REG_ADDR(x)    (((x) & 0xFFFF0000U) == 0x41000000U) /* Valid addresses are 0x410xxxxx */
-#endif /* (defined(CPU_K32W042S1M2CAx_M0P) || defined(CPU_K32W042S1M2VPJ_M0P)) */
+#endif /* (defined(CPU_MODEL_K32W042S1M2CAx_M0P) || defined(CPU_MODEL_K32W042S1M2VPJ_M0P)) */
 /* KW41 and KW35/36 valid registers support */
-#if (defined(CPU_MKW41Z256VHT4) || defined(CPU_MKW41Z512VHT4) || \
-     defined(CPU_MKW31Z256VHT4) || defined(CPU_MKW31Z512VHT4) || \
-     defined(CPU_MKW21Z256VHT4) || defined(CPU_MKW21Z512VHT4) || \
-     defined(CPU_MKW35A512VFP4) || defined(CPU_MKW36A512VFP4) )
+#if (defined(CPU_MODEL_MKW41Z256VHT4) || defined(CPU_MODEL_MKW41Z512VHT4) || \
+     defined(CPU_MODEL_MKW31Z256VHT4) || defined(CPU_MODEL_MKW31Z512VHT4) || \
+     defined(CPU_MODEL_MKW21Z256VHT4) || defined(CPU_MODEL_MKW21Z512VHT4) || \
+     defined(CPU_MODEL_MKW35A512VFP4) || defined(CPU_MODEL_MKW36A512VFP4) )
 
 #define IS_VALID_REG_ADDR(x)    (((x) & 0xFFFF0000U) == 0x40050000U) /* Valid addresses are 0x4005xxxx */
 #endif

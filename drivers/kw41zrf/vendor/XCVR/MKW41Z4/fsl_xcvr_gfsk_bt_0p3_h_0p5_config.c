@@ -167,7 +167,6 @@ const xcvr_mode_datarate_config_t xcvr_GFSK_BT_0p3_h_0p5_1mbps_config =
                              XCVR_RX_DIG_AGC_CTRL_2_TZA_PDET_SEL_HI(5) |
                              XCVR_RX_DIG_AGC_CTRL_2_AGC_FAST_EXPIRE(16),
 #endif
-                             XCVR_RX_DIG_AGC_CTRL_2_AGC_FAST_EXPIRE(5),
     .agc_ctrl_2_init_32mhz = XCVR_RX_DIG_AGC_CTRL_2_BBA_GAIN_SETTLE_TIME(12) |
                              XCVR_RX_DIG_AGC_CTRL_2_BBA_PDET_SEL_LO(5) |
                              XCVR_RX_DIG_AGC_CTRL_2_BBA_PDET_SEL_HI(6) |

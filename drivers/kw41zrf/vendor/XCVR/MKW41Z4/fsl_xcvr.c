@@ -33,11 +33,13 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "fsl_device_registers.h"
-#include "fsl_common.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <math.h>
+#include "cpu.h"
 #include "fsl_xcvr.h"
 #include "fsl_xcvr_trim.h"
-#include <math.h>
 #include "ifr_radio.h"
 
 /*******************************************************************************

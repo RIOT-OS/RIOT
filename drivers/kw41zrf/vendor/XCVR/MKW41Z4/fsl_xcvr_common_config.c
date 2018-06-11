@@ -482,7 +482,7 @@ const xcvr_common_config_t xcvr_common_config =
                           XCVR_TSM_PA_RAMP_TBL1_PA_RAMP6(PA_RAMP_6) | XCVR_TSM_PA_RAMP_TBL1_PA_RAMP7(PA_RAMP_7),
 
     .recycle_count_init_26mhz = B3(0) | B2(0x1C + ADD_FOR_26MHZ) | B1(0x06) | B0(0x66 + ADD_FOR_26MHZ),
-    .recycle_count_init_26mhz = B3(0) | B2(0x1C) | B1(0x06) | B0(0x66),
+    .recycle_count_init_32mhz = B3(0) | B2(0x1C) | B1(0x06) | B0(0x66),
 
     .tsm_timing_00_init = B3(END_OF_RX_WD) | B2(0x00) | B1(END_OF_TX_WD) | B0(0x00), /* bb_ldo_hf_en */
     .tsm_timing_01_init = B3(END_OF_RX_WD) | B2(0x00) | B1(END_OF_TX_WD) | B0(0x00), /* bb_ldo_adcdac_en */

@@ -85,7 +85,7 @@ const xcvr_mode_config_t gfsk_bt_0p7_h_0p5_mode_config =
 
     /* XCVR_RX_DIG configs */
     .rx_dig_ctrl_init_26mhz = XCVR_RX_DIG_RX_DIG_CTRL_RX_FSK_ZB_SEL(0) | /* Depends on protocol */
-                              XCVR_RX_DIG_RX_DIG_CTRL_RX_DC_RESID_EN(1), /* Depends on protocol */
+                              XCVR_RX_DIG_RX_DIG_CTRL_RX_DC_RESID_EN(1) | /* Depends on protocol */
                               XCVR_RX_DIG_RX_DIG_CTRL_RX_SRC_RATE(0),
 
     .rx_dig_ctrl_init_32mhz = XCVR_RX_DIG_RX_DIG_CTRL_RX_FSK_ZB_SEL(0) | /* Depends on protocol */

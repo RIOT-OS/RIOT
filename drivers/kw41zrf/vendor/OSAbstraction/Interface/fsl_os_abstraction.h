@@ -40,7 +40,9 @@
 #ifndef _FSL_OS_ABSTRACTION_H_
 #define _FSL_OS_ABSTRACTION_H_
 
-#include "EmbeddedTypes.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include "fsl_os_abstraction_config.h"
 
 #ifdef  __cplusplus
@@ -85,14 +87,14 @@ extern "C"
   typedef void (*osaTimerFctPtr_t) (void const *argument);
 /*! @brief Thread Definition structure contains startup information of a thread.*/
 typedef struct osaThreadDef_tag  {
-  osaTaskPtr_t           pthread;    /*!< start address of thread function*/
-  uint32_t             tpriority;    /*!< initial thread priority*/
-  uint32_t             instances;    /*!< maximum number of instances of that thread function*/
-  uint32_t             stacksize;    /*!< stack size requirements in bytes; 0 is default stack size*/
-  uint32_t              *tstack;
+  osaTaskPtr_t          pthread;    /*!< start address of thread function*/
+  uint32_t              tpriority;    /*!< initial thread priority*/
+  uint32_t              instances;    /*!< maximum number of instances of that thread function*/
+  uint32_t              stacksize;    /*!< stack size requirements in bytes; 0 is default stack size*/
+  uint32_t             *tstack;
   void                 *tlink;
-  uint8_t               *tname;
-  bool_t               useFloat;
+  uint8_t              *tname;
+  bool                  useFloat;
 } osaThreadDef_t;
 /*! @brief Thread Link Definition structure .*/
 typedef struct osaThreadLink_tag{
@@ -444,7 +446,7 @@ osaStatus_t OSA_MutexDestroy(osaMutexId_t mutexId);
  * @retval handler to the new event if the event is created successfully.
  * @retval NULL   if the event can not be created.
  */
-osaEventId_t OSA_EventCreate(bool_t autoClear);
+osaEventId_t OSA_EventCreate(bool autoClear);
 
 /*!
  * @brief Sets one or more event flags.
@@ -498,7 +500,7 @@ osaStatus_t OSA_EventClear(osaEventId_t eventId, osaEventFlags_t flagsToClear);
  *          FreeRTOS.
  *
  */
-osaStatus_t OSA_EventWait(osaEventId_t eventId, osaEventFlags_t flagsToWait, bool_t waitAll, uint32_t millisec, osaEventFlags_t *pSetFlags);
+osaStatus_t OSA_EventWait(osaEventId_t eventId, osaEventFlags_t flagsToWait, bool waitAll, uint32_t millisec, osaEventFlags_t *pSetFlags);
 
 /*!
  * @brief Destroys a previously created event object.

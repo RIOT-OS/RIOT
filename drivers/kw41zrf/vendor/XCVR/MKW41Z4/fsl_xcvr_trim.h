@@ -37,8 +37,7 @@
 #define _FSL_XCVR_TRIM_H_
 /* Clang-format on. */
 
-//#include "fsl_common.h"
-#include "fsl_device_registers.h"
+#include "cpu.h"
 #include "fsl_xcvr.h"
 
 /*!

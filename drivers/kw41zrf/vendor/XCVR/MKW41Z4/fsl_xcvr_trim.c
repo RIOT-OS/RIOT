@@ -33,17 +33,22 @@
 * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fsl_device_registers.h"
-#include "fsl_common.h"
+#include <math.h>
+#include "cpu.h"
 #include "fsl_xcvr.h"
 #include "fsl_xcvr_trim.h"
 #include "dbg_ram_capture.h"
-#include "math.h"
 
 /*******************************************************************************
 * Definitions
 ******************************************************************************/
 
+#ifndef MIN
+#define MIN(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
+#endif
 
 /*******************************************************************************
 * Prototypes

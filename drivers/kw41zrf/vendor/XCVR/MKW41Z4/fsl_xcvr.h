@@ -38,7 +38,7 @@
 #define _FSL_XCVR_H_
 /* clang-format on */
 
-#include "fsl_device_registers.h"
+#include "cpu.h"
 #include "fsl_xcvr_trim.h"
 #if defined(gMWS_UseCoexistence_d)
 #if gMWS_UseCoexistence_d

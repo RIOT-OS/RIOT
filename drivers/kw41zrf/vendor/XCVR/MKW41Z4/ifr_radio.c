@@ -34,7 +34,7 @@
 * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "fsl_device_registers.h"
+#include "cpu.h"
 #include "fsl_xcvr.h"
 #include "ifr_radio.h"
 #include "fsl_os_abstraction.h"
@@ -387,11 +387,11 @@ void handle_ifr(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries)
 #if RADIO_IS_GEN_3P0
     read_addr = K3_BASE_INDEX;
 #else
-#ifdef CPU_MKW41Z256VHT4
+#ifdef CPU_MODEL_MKW41Z256VHT4
     read_addr = KW4x_256_BASE;
 #else
     read_addr = KW4x_512_BASE;
-#endif /* CPU_MKW41Z256VHT4 */
+#endif /* CPU_MODEL_MKW41Z256VHT4 */
 #endif /* RADIO_IS_GEN_3P0 */
 
     /* Read first entry in IFR table */
