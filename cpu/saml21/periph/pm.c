@@ -38,6 +38,7 @@ void pm_set(unsigned mode)
                 DEBUG("pm_set(): setting STANDBY mode.\n");
                 _mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
                 break;
+            default: /* Falls through */
             case 2:
                 DEBUG("pm_set(): setting IDLE mode.\n");
                 _mode = PM_SLEEPCFG_SLEEPMODE_IDLE2;
