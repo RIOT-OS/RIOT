@@ -39,6 +39,8 @@ USEMODULE += ps
 USEMODULE += saul_reg
 # NOTE: Uncomment to automatically add any supported devices to the lwm2m client
 #USEMODULE += saul_default
+# NOTE: Uncomment to automatically add all GPIO pins from the SAUL registry to the lwm2m client
+#USEMODULE += saul_gpio
 
 # NOTE: Load module for memory allocator
 USEMODULE += memarray

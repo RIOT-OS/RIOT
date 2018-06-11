@@ -149,6 +149,7 @@ static uint8_t prv_bool_write(uint16_t instance_id, int num_data,
                     target->polarity = value;
                     result = COAP_204_CHANGED;
                 }
+                break;
             case LWM2M_DOUTPUT_ATTR:
                 if (lwm2m_data_decode_bool(&data_array[i], &value) != 1) {
                     result = COAP_400_BAD_REQUEST;
@@ -158,6 +159,7 @@ static uint8_t prv_bool_write(uint16_t instance_id, int num_data,
                     prv_actuator_write_bool(target);
                     result = COAP_204_CHANGED;
                 }
+                break;
             default:
                 result = COAP_404_NOT_FOUND;
                 break;
@@ -252,7 +254,7 @@ int lwm2m_get_bool_actuator(lwm2m_object_t **object, saul_reg_t *dev)
         }
         self_alloc = true;
 
-        (*object)->objID = LWM2M_DIGITIAL_ACTUATOR_ID;
+        (*object)->objID = LWM2M_DIGITAL_ACTUATOR_ID;
 
         (*object)->readFunc = prv_bool_read;
         (*object)->writeFunc = prv_bool_write;
@@ -261,7 +263,7 @@ int lwm2m_get_bool_actuator(lwm2m_object_t **object, saul_reg_t *dev)
     }
     else {
         /* Check for mismatching sensor IDs */
-        if ((*object)->objID != LWM2M_DIGITIAL_ACTUATOR_ID) {
+        if ((*object)->objID != LWM2M_DIGITAL_ACTUATOR_ID) {
             DEBUG("%s: mismatching sensor ids\n", __func__);
             return -EINVAL;
         }
@@ -315,7 +317,7 @@ void lwm2m_free_bool_actuator(lwm2m_object_t *obj)
 int lwm2m_auto_add_bool_actuators(lwm2m_context_t *context)
 {
     int added = 0;
-    int id = LWM2M_DIGITIAL_ACTUATOR_ID;
+    int id = LWM2M_DIGITAL_ACTUATOR_ID;
     int added_tmp = 0;
     saul_reg_t *reg;
     lwm2m_object_t *object = NULL;
@@ -325,7 +327,7 @@ int lwm2m_auto_add_bool_actuators(lwm2m_context_t *context)
         if (lwm2m_saul_type_to_obj_id(reg->driver->type) == id) {
             DEBUG("%s: adding instance of %s\n", __func__,
                   lwm2m_object_id_to_str(id));
-            if (lwm2m_get_bool_sensor(&object, reg) == 0) {
+            if (lwm2m_get_bool_actuator(&object, reg) == 0) {
                 added_tmp++;
             }
         }
@@ -349,7 +351,7 @@ void lwm2m_poll_bool_actuators(lwm2m_context_t *lwm2mH)
     DEBUG("%s: updating sensor values", __func__);
 
     for (; object != NULL; object = object->next) {
-        if (object->objID == LWM2M_DIGITIAL_ACTUATOR_ID) {
+        if (object->objID == LWM2M_DIGITAL_ACTUATOR_ID) {
             lwm2m_uri_t uri;
             uri.flag = LWM2M_URI_FLAG_OBJECT_ID | LWM2M_URI_FLAG_INSTANCE_ID | LWM2M_URI_FLAG_RESOURCE_ID;
             uri.objectId = object->objID;

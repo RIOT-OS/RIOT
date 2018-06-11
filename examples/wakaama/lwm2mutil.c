@@ -36,9 +36,8 @@ int lwm2m_saul_type_to_obj_id(uint8_t saul_type)
             return LWM2M_DISTANCE_SENSOR_ID;
         case SAUL_SENSE_BTN:
             return LWM2M_DIGITAL_SENSOR_ID;
-
-        /* Needed for project, but no driver yet */
         case SAUL_SENSE_CO2:
+            return LWM2M_GENERIC_SENSOR_ID;
 
         /* Need data types other than float or bool */
         case SAUL_SENSE_ACCEL:
@@ -52,6 +51,7 @@ int lwm2m_saul_type_to_obj_id(uint8_t saul_type)
         case SAUL_ACT_SERVO:
         case SAUL_ACT_MOTOR:
         case SAUL_ACT_SWITCH:
+            return LWM2M_DIGITAL_ACTUATOR_ID;
         case SAUL_ACT_DIMMER:
 
         case SAUL_CLASS_ANY:
@@ -87,6 +87,7 @@ const char *lwm2m_object_id_to_str(const uint16_t id)
         case LWM2M_DISTANCE_SENSOR_ID:      return "DISTANCE_SENSOR";
         case LWM2M_RATE_SENSOR_ID:          return "RATE_SENSOR";
         case LWM2M_DIGITAL_SENSOR_ID:       return "DIGITAL_SENSOR";
+        case LWM2M_DIGITAL_ACTUATOR_ID:     return "DIGITAL_ACTUATOR";
         default:                            return "UNDEFINED_OBJECT";
     }
 }

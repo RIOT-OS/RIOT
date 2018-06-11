@@ -79,7 +79,7 @@ extern "C" {
 /* Sensors that return digital values */
 #define LWM2M_DIGITAL_SENSOR_ID       (3200u)
 /* Actuators */
-#define LWM2M_DIGITIAL_ACTUATOR_ID    (3201u)
+#define LWM2M_DIGITAL_ACTUATOR_ID     (3201u)
 /** @} */
 
 /**
@@ -164,6 +164,16 @@ int lwm2m_get_bool_actuator(lwm2m_object_t **object, saul_reg_t *dev);
  * @param[in] obj  Pointer to the object to release.
  */
 void lwm2m_free_bool_actuator(lwm2m_object_t *obj);
+
+/**
+ * @brief  Automatically adds objects all supported devices in the SAUL registry
+ *         to an LWM2M client instance.
+ *
+ * @param[in] context  The LWM2M client context to add objects to.
+ *
+ * @return The number of objects added.
+ */
+int lwm2m_auto_add_bool_actuators(lwm2m_context_t *context);
 
 /**
  * @brief  Notify observers about value changes.
