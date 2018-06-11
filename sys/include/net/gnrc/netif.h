@@ -30,6 +30,9 @@
 
 #include "kernel_types.h"
 #include "msg.h"
+#ifdef MODULE_GNRC_NETIF_EVENTS
+#include "event.h"
+#endif /* MODULE_GNRC_NETIF_EVENTS */
 #include "net/ipv6/addr.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/pkt.h"
@@ -75,6 +78,22 @@ typedef struct {
      * @see net_gnrc_netif_flags
      */
     uint32_t flags;
+#if defined(MODULE_GNRC_NETIF_EVENTS) || DOXYGEN
+    /**
+     * @brief   Event queue for asynchronous events
+     */
+    event_queue_t evq;
+    /**
+     * @brief   Pointer to event instance table
+     *
+     * This pointer gives a way to allocate events on the stack of each
+     * gnrc_netif thread, instead of having a single global instance which will
+     * not work if the system has more than one network interface.
+     * The _event_cb function of gnrc_netif.c uses this pointer to be able to
+     * post events from interrupt context.
+     */
+    void *events;
+#endif /* MODULE_GNRC_NETIF_EVENTS */
 #if (GNRC_NETIF_L2ADDR_MAXLEN > 0)
     /**
      * @brief   The link-layer address currently used as the source address
