@@ -21,6 +21,12 @@ ifneq (,$(filter ndn-riot,$(USEPKG)))
   USEPKG += micro-ecc
 endif
 
+ifneq (,$(filter contikimac,$(USEMODULE)))
+  USEMODULE += netdev_layer
+  USEMODULE += gnrc_netif_events
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   USEMODULE += random
   USEMODULE += xtimer

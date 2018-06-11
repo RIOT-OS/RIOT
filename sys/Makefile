@@ -19,6 +19,9 @@ endif
 ifneq (,$(filter shell_commands,$(USEMODULE)))
   DIRS += shell/commands
 endif
+ifneq (,$(filter contikimac,$(USEMODULE)))
+  DIRS += net/link_layer/contikimac
+endif
 ifneq (,$(filter net_help,$(USEMODULE)))
   DIRS += net/crosslayer/net_help
 endif
