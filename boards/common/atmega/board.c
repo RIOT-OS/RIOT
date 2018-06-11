@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_common_atmega
+ * @ingroup     boards_common
  * @{
  *
  * @file

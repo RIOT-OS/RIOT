@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     auto_init_sdcard_spi
+ * @ingroup     sys_auto_init
  * @{
  *
  * @file

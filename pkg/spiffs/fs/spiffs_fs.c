@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     fs
+ * @ingroup     pkg_spiffs
  * @{
  *
  * @file

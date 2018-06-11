@@ -8,9 +8,8 @@
  * directory for more details.
  */
 
-
 /**
- * @defgroup    sys_autoinit Auto-init
+ * @defgroup    sys_auto_init Auto-init
  * @ingroup     sys
  * @brief       Auto initialize modules
  * @note        This feature can be used by any application by adding auto_init to
@@ -23,7 +22,26 @@
  *              gets called. Be aware that most modules expect to be
  *              initialized only once, so do not call a module's init function
  *              when using auto_init unless you know what you're doing.
+ */
+
+/**
+ * @defgroup    sys_auto_init_saul SAUL drivers auto-initialization
+ * @ingroup     sys_auto_init
+ * @brief       Provides auto-initialization of SAUL drivers
  *
+ * @see @ref drivers_saul
+ */
+
+/**
+ * @defgroup    sys_auto_init_gnrc_netif GNRC netif drivers auto-initialization
+ * @ingroup     sys_auto_init
+ * @brief       Provides auto-initialization of
+ * [network device drivers](@ref drivers_netdev) via GNRC
+ *
+ * @see @ref net_gnrc_netif
+ */
+
+/**
  * @{
  *
  * @file

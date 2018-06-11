@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cc430
+ * @ingroup     cpu_cc430
  * @ingroup     drivers_periph_rtc
  * @{
  *

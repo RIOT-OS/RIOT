@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys_net_nanocoap
+ * @ingroup     net_nanocoap
  * @{
  *
  * @file

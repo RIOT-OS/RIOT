@@ -1,7 +1,7 @@
 /**
  * @defgroup        cpu_efm32 Silicon Labs EFM32/EFR32/EZR32
  * @ingroup         cpu
- * @brief           Implementation of Silicon Labs's EFM32/EFR32/EZR32 MCUs
+ * @brief           Silicon Labs's EFM32/EFR32/EZR32 MCUs implementation
  *
  * This module contains all code and definitions for the Silicon Labs
  * EFM32/EFR32/EZR32 MCUs. It uses the Gecko SDK (vendor library) for the
@@ -63,4 +63,40 @@
  *
  * The EFM32/EFR32/EZR32 MCUs have support for low-power peripherals. Support
  * is enabled by default, but can be disabled by setting LOW_POWER_ENABLED=0.
+ */
+
+/**
+ * @defgroup        cpu_efm32gg Silicon Labs EFM32GG family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFM32GG MCUs family implementation
+ */
+
+/**
+ * @defgroup        cpu_efm32lg Silicon Labs EFM32LG family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFM32LG MCUs family implementation
+ */
+
+/**
+ * @defgroup        cpu_efm32pg1b Silicon Labs EFM32PG1B family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFM32PG1B MCUs family implementation
+ */
+
+/**
+ * @defgroup        cpu_efm32pg12b Silicon Labs EFM32PG12B family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFM32PG12B MCUs family implementation
+ */
+
+/**
+ * @defgroup        cpu_efr32mg1p Silicon Labs EFR32MG1P family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFR32MG1P MCUs family implementation
+ */
+
+/**
+ * @defgroup        cpu_efr32mg12p Silicon Labs EFR32MG12P family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFR32MG12P MCUs family implementation
  */

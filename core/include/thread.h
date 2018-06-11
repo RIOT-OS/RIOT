@@ -241,7 +241,6 @@ struct _thread {
 
 /**
  * @def THREAD_EXTRA_STACKSIZE_PRINTF
- * @ingroup conf
  * @brief Size of the task's printf stack in bytes
  *
  * @note This value must be defined by the CPU specific implementation, please

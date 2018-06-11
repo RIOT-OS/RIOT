@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup ps
+ * @ingroup sys_ps
  * @{
  * @file
  * @brief   UNIX like ps command

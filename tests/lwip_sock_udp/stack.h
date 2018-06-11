@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup
- * @ingroup
+ * @ingroup     tests
  * @brief
  * @{
  *
@@ -16,6 +15,7 @@
  * @brief
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @}
  */
 #ifndef STACK_H
 #define STACK_H
@@ -130,4 +130,3 @@ bool _check_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
 #endif
 
 #endif /* STACK_H */
-/** @} */

@@ -71,3 +71,4 @@ int cipher_decrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
 #endif
 
 #endif /* CRYPTO_MODES_CTR_H */
+/** @} */

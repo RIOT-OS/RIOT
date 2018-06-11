@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup   boards_frdm_k22f
+ * @ingroup   boards_frdm-k22f
  * @{
  *
  * @file

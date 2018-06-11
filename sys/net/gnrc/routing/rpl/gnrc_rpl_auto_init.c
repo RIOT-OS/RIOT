@@ -8,7 +8,7 @@
  */
 
 /*
- * @ingroup gnrc_rpl
+ * @ingroup net_gnrc_rpl
  * @{
  *
  * @file

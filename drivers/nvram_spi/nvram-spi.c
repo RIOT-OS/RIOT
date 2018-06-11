@@ -17,7 +17,7 @@
 #include "xtimer.h"
 
 /**
- * @ingroup     nvram
+ * @ingroup     drivers_nvram
  * @{
  *
  * @file

@@ -7,7 +7,9 @@
  */
 
 /**
- * @ingroup         cpu_msp430fxyz
+ * @defgroup    cpu_msp430fxyz TI MSP430F
+ * @ingroup     cpu
+ * @brief       Texas Instruments MSP430F family specific code
  * @{
  *
  * @file

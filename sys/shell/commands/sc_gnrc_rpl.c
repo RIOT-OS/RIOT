@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     sys_shell_commands.h
+ * @ingroup     sys_shell_commands
  * @{
  *
  * @file

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup         cpu_cc26x0_i2c_definitions
+ * @ingroup         cpu_cc26x0_definitions
  * @{
  *
  * @file

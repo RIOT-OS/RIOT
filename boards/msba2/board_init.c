@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup msba2
+ * @ingroup     boards_msba2
  * @{
  */
 

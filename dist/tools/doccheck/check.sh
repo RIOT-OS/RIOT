@@ -64,7 +64,8 @@ UNDEFINED_GROUPS_PRINT=$( \
 if [ -n "${UNDEFINED_GROUPS}" ]
 then
     COUNT=$(echo "${UNDEFINED_GROUPS}" | wc -l)
-    echo -ne "${CWARN}WARNING${CRESET} "
+    echo -ne "${CERROR}ERROR${CRESET} "
     echo -e "There are ${CWARN}${COUNT}${CRESET} undefined Doxygen groups:"
     echo "${UNDEFINED_GROUPS_PRINT}"
+    exit 2
 fi

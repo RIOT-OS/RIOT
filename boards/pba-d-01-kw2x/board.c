@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     board_pba-d-01
+ * @ingroup     boards_pba-d-01-kw2x
  * @{
  *
  * @file

@@ -7,7 +7,8 @@
  */
 
 /**
- * @ingroup drivers_netdev_api
+ * @defgroup    drivers_netdev_ieee802154 802.15.4 radio drivers
+ * @ingroup     drivers_netdev_api
  * @brief
  * @{
  *

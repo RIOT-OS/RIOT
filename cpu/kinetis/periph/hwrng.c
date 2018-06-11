@@ -9,7 +9,7 @@
 
 /**
  * @ingroup     cpu_kinetis
- * @ingroup     drivers_periph_hwng
+ * @ingroup     drivers_periph_hwrng
  *
  * @{
  *

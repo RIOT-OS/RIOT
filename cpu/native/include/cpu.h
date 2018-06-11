@@ -7,8 +7,8 @@
  */
 
 /**
- * @ingroup arch
- * @defgroup    native_cpu  Native
+ * @ingroup cpu
+ * @defgroup    cpu_native  Native
  * @brief       Native CPU specific code
  * @details     The native CPU uses system calls to simulate hardware access.
  * @ingroup     cpu

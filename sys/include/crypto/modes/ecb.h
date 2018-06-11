@@ -60,3 +60,4 @@ int cipher_decrypt_ecb(cipher_t* cipher, uint8_t* input, size_t length,
 #endif
 
 #endif /* CRYPTO_MODES_ECB_H */
+/** @} */

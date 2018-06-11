@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup     net_tcp
  * @{
  *
  * @file

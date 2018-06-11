@@ -10,7 +10,7 @@
 #define SHT11_BOARD_H
 
 /**
- * @ingroup     lpc2387
+ * @ingroup     boards_common_msba2
  * @{
  */
 

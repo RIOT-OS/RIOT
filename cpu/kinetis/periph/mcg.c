@@ -9,7 +9,7 @@
 
 /**
  * @ingroup     cpu_kinetis
- * @ingroup     drivers_periph_mcg
+ * @ingroup     cpu_kinetis_mcg
  * @{
  *
  * @file

@@ -7,7 +7,7 @@
  */
 
 /**
-  * @ingroup sys_newlib
+  * @ingroup    sys_newlib
   * @{
   *
   * @file

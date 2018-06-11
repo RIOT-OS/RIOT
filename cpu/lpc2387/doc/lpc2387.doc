@@ -1,6 +1,6 @@
 /**
  * @defgroup lpc2387_intro LPC2387 Introduction
- * @ingroup lpc2387
+ * @ingroup cpu_lpc2387
 
 <h2>First steps</h2>
 \li See the manual for toolchain and ide setup

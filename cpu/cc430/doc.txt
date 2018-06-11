@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    cc430 TI CC430
+ * @defgroup    cpu_cc430 TI CC430
  * @brief       Texas Instruments CC430 specific code
  * @ingroup     cpu
  */

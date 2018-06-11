@@ -7,10 +7,12 @@
  */
 
 /**
+ * @ingroup     tests
  * @{
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @}
  */
 
 
@@ -369,5 +371,3 @@ bool _check_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     return false;
 #endif
 }
-
-/** @} */

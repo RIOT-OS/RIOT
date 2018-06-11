@@ -7,10 +7,12 @@
  */
 
 /**
+ * @ingroup     tests
  * @{
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @}
  */
 
 
@@ -167,6 +169,3 @@ bool _check_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                 (data_len == udp->next->size) &&
                 (memcmp(data, udp->next->data, data_len) == 0));
 }
-
-
-/** @} */
