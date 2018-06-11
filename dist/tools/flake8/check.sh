@@ -20,7 +20,9 @@ fi
 : "${RIOTTOOLS:=${PWD}/dist/tools}"
 . "${RIOTTOOLS}"/ci/changed_files.sh
 
-FILES=$(FILEREGEX='(?=*.py$|pyterm$)' changed_files)
+EXCLUDE='^(.+/vendor/|dist/tools/cc2538-bsl|dist/tools/mcuboot|dist/tools/uhcpd)'
+FILEREGEX='(\.py$|pyterm$)'
+FILES=$(FILEREGEX=${FILEREGEX} EXCLUDE=${EXCLUDE} changed_files)
 
 if [ -z "${FILES}" ]
 then
