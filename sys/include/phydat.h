@@ -104,6 +104,7 @@ enum {
     UNIT_PERCENT,   /**< out of 100 */
     UNIT_PERMILL,   /**< out of 1000 */
     UNIT_PPM,       /**< part per million */
+    UNIT_PPB,       /**< part per billion */
     /* aggregate values */
     UNIT_TIME,      /**< the three dimensions contain sec, min, and hours */
     UNIT_DATE       /**< the 3 dimensions contain days, months and years */
