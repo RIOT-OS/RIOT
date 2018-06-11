@@ -19,6 +19,7 @@
 #include <kernel_defines.h>
 
 #include "bitfield.h"
+#include "event.h"
 #include "net/ethernet.h"
 #include "net/ipv6.h"
 #include "net/gnrc.h"
@@ -39,6 +40,16 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
+
+#ifdef MODULE_GNRC_NETIF_EVENTS
+/**
+ * @brief   Event type used for passing netdev pointers together with the event
+ */
+typedef struct {
+    event_t super;
+    netdev_t *dev;
+} event_netdev_t;
+#endif /* MODULE_GNRC_NETIF_EVENTS */
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
 static void _configure_netdev(netdev_t *dev);
@@ -1348,6 +1359,93 @@ void gnrc_netif_default_init(gnrc_netif_t *netif)
 #endif
 }
 
+#if IS_USED(MODULE_GNRC_NETIF_EVENTS)
+/**
+ * @brief   Call the ISR handler from an event
+ *
+ * @param[in]   evp     pointer to the event
+ */
+static void _event_handler_isr(event_t *evp)
+{
+    gnrc_netif_t *netif = container_of(evp, gnrc_netif_t, event_isr);
+    netif->dev->driver->isr(netif->dev);
+}
+#endif
+
+static inline void _event_post(gnrc_netif_t *netif)
+{
+#if IS_USED(MODULE_GNRC_NETIF_EVENTS)
+    event_post(&netif->evq, &netif->event_isr);
+#else
+    (void)netif;
+#endif
+}
+
+/**
+ * @brief   Retrieve the netif event queue if enabled
+ *
+ * @param[in]   netif   gnrc_netif instance to operate on
+ *
+ * @return              NULL if MODULE_GNRC_NETIF_EVENTS is not enabled
+ * @return              gnrc_netif_t::evq if MODULE_GNRC_NETIF_EVENTS is enabled
+ */
+static inline event_queue_t *_get_evq(gnrc_netif_t *netif)
+{
+#ifdef MODULE_GNRC_NETIF_EVENTS
+    return &netif->evq;
+#else
+    (void)netif;
+    return NULL;
+#endif
+}
+
+/**
+ * @brief   Process any pending events and wait for IPC messages
+ *
+ * This function will block until an IPC message is received. Events posted to
+ * the event queue will be processed while waiting for messages.
+ *
+ * @param[in]   netif   gnrc_netif instance to operate on
+ * @param[out]  msg     pointer to message buffer to write the first received message
+ *
+ * @return >0 if msg contains a new message
+ */
+static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
+{
+    if (IS_USED(MODULE_GNRC_NETIF_EVENTS)) {
+        while (1) {
+            /* Using messages for external IPC, and events for internal events */
+
+            /* First drain the queues before blocking the thread */
+            /* Events will be handled before messages */
+            DEBUG("gnrc_netif: handling events\n");
+            event_t *evp;
+            /* We can not use event_loop() or event_wait() because then we would not
+             * wake up when a message arrives */
+            event_queue_t *evq = _get_evq(netif);
+            while ((evp = event_get(evq))) {
+                DEBUG("gnrc_netif: event %p\n", (void *)evp);
+                if (evp->handler) {
+                    evp->handler(evp);
+                }
+            }
+            /* non-blocking msg check */
+            int msg_waiting = msg_try_receive(msg);
+            if (msg_waiting > 0) {
+                return;
+            }
+            DEBUG("gnrc_netif: waiting for events\n");
+            /* Block the thread until something interesting happens */
+            thread_flags_wait_any(THREAD_FLAG_MSG_WAITING | THREAD_FLAG_EVENT);
+        }
+    }
+    else {
+        /* Only messages used for event handling */
+        DEBUG("gnrc_netif: waiting for incoming messages\n");
+        msg_receive(msg);
+    }
+}
+
 static void *_gnrc_netif_thread(void *args)
 {
     gnrc_netapi_opt_t *opt;
@@ -1355,13 +1453,20 @@ static void *_gnrc_netif_thread(void *args)
     netdev_t *dev;
     int res;
     msg_t reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
-    msg_t msg, msg_queue[CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE];
+    msg_t msg_queue[CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE];
 
     DEBUG("gnrc_netif: starting thread %i\n", sched_active_pid);
     netif = args;
     gnrc_netif_acquire(netif);
     dev = netif->dev;
     netif->pid = sched_active_pid;
+
+#if IS_USED(MODULE_GNRC_NETIF_EVENTS)
+    netif->event_isr.handler = _event_handler_isr,
+    /* set up the event queue */
+    event_queue_init(&netif->evq);
+#endif /* MODULE_GNRC_NETIF_EVENTS */
+
     /* setup the link-layer's message queue */
     msg_init_queue(msg_queue, CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE);
     /* register the event callback with the device driver */
@@ -1394,9 +1499,13 @@ static void *_gnrc_netif_thread(void *args)
 #endif
 
     while (1) {
-        DEBUG("gnrc_netif: waiting for incoming messages\n");
-        msg_receive(&msg);
+        msg_t msg;
+        /* msg will be filled by _process_events_await_msg.
+         * The function will not return until a message has been received. */
+        _process_events_await_msg(netif, &msg);
+
         /* dispatch netdev, MAC and gnrc_netapi messages */
+        DEBUG("gnrc_netif: message %u\n", (unsigned)msg.type);
         switch (msg.type) {
             case NETDEV_MSG_TYPE_EVENT:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_EVENT received\n");
@@ -1487,11 +1596,16 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
     gnrc_netif_t *netif = (gnrc_netif_t *) dev->context;
 
     if (event == NETDEV_EVENT_ISR) {
-        msg_t msg = { .type = NETDEV_MSG_TYPE_EVENT,
-                      .content = { .ptr = netif } };
+        if (IS_USED(MODULE_GNRC_NETIF_EVENTS)) {
+            _event_post(netif);
+        }
+        else {
+            msg_t msg = { .type = NETDEV_MSG_TYPE_EVENT,
+                          .content = { .ptr = netif } };
 
-        if (msg_send(&msg, netif->pid) <= 0) {
-            puts("gnrc_netif: possibly lost interrupt.");
+            if (msg_send(&msg, netif->pid) <= 0) {
+                puts("gnrc_netif: possibly lost interrupt.");
+            }
         }
     }
     else {
