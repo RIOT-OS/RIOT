@@ -147,7 +147,10 @@ void ps(void)
            overall_stacksz, overall_used);
 #   ifdef MODULE_TLSF_MALLOC
     puts("\nHeap usage:");
-    tlsf_walk_pool(tlsf_get_pool(_tlsf_get_global_control()), NULL, NULL);
+    tlsf_size_container_t sizes = { .free = 0, .used = 0 };
+    tlsf_walk_pool(tlsf_get_pool(_tlsf_get_global_control()), tlsf_size_walker, &sizes);
+    printf("\tTotal free size: %u\n", sizes.free);
+    printf("\tTotal used size: %u\n", sizes.used);
 #   endif
 #endif
 }
