@@ -17,6 +17,7 @@
  * @brief       nanocoap API
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Ken Bannister <kb2ma@runbox.com>
  */
 
 #ifndef NET_NANOCOAP_H
@@ -225,6 +226,18 @@ extern "C" {
 /** @} */
 
 /**
+ * @name coap_opt_finish() flag parameter values
+ *
+ * Directs packet/buffer updates when user finishes adding options
+ * @{
+ */
+/** @brief    no special handling required */
+#define COAP_OPT_FINISH_NONE     (0x0000)
+/** @brief    expect a payload to follow */
+#define COAP_OPT_FINISH_PAYLOAD  (0x0001)
+/** @} */
+
+/**
  * @brief   Raw CoAP PDU header structure
  */
 typedef struct __attribute__((packed)) {
@@ -391,6 +404,22 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
                        size_t token_len, unsigned code, uint16_t id);
 
 /**
+ * @brief   Initialize a packet struct, to build a message buffer
+ *
+ * @pre  buf              CoAP header already initialized
+ * @post pkt.flags        all zeroed
+ * @post pkt.payload      points to first byte after header
+ * @post pkt.payload_len  set to maximum space available for options + payload
+ *
+ * @param[out]   pkt        pkt to initialize
+ * @param[in]    buf        buffer to write for pkt, with CoAP header already
+ *                          initialized
+ * @param[in]    len        length of buf
+ * @param[in]    header_len length of header in buf, including token
+ */
+void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len);
+
+/**
  * @brief   Insert a CoAP option into buffer
  *
  * This function writes a CoAP option with nr. @p onum to @p buf.
@@ -498,6 +527,52 @@ size_t coap_put_option_block1(uint8_t *buf, uint16_t lastonum, unsigned blknum, 
  * @returns     amount of bytes written to @p pkt_pos
  */
 size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t lastonum);
+
+/**
+ * @brief   Encode the given string as option(s) into pkt
+ *
+ * Use separator to split string into multiple options.
+ *
+ * @post pkt.payload advanced to first byte after option(s)
+ * @post pkt.payload_len reduced by option(s) length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     optnum      option number to use
+ * @param[in]     string      string to encode as option
+ * @param[in]     separator   character used in @p string to separate parts
+ *
+ * @return        number of bytes written to buffer
+ * @return        -ENOSPC if no available options
+ */
+ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string, char separator);
+
+/**
+ * @brief   Encode the given uint option into pkt
+ *
+ * @post pkt.payload advanced to first byte after option
+ * @post pkt.payload_len reduced by option length
+ *
+ * @param[in,out] pkt         pkt referencing target buffer
+ * @param[in]     optnum      option number to use
+ * @param[in]     value       uint to encode
+ *
+ * @return        number of bytes written to buffer
+ * @return        <0 reserved for error but not implemented yet
+ */
+ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
+
+/**
+ * @brief   Finalizes options as required and prepares for payload
+ *
+ * @post pkt.payload advanced to first available byte after options
+ * @post pkt.payload_len is maximum bytes available for payload
+ *
+ * @param[in,out] pkt         pkt to update
+ * @param[in]     flags       see COAP_OPT_FINISH... macros
+ *
+ * @return        total number of bytes written to buffer
+ */
+ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
 
 /**
  * @brief   Get content type from packet
