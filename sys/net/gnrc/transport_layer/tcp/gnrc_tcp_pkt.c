@@ -205,7 +205,10 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
 
     /* Build network layer header */
 #ifdef MODULE_GNRC_IPV6
-    gnrc_pktsnip_t *ip6_snp = gnrc_ipv6_hdr_build(tcp_snp, NULL, (ipv6_addr_t *) tcb->peer_addr);
+    ipv6_addr_t *src_addr = (ipv6_addr_t *) tcb->local_addr;
+    ipv6_addr_t *dst_addr = (ipv6_addr_t *) tcb->peer_addr;
+
+    gnrc_pktsnip_t *ip6_snp = gnrc_ipv6_hdr_build(tcp_snp, src_addr, dst_addr);
     if (ip6_snp == NULL) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for IPv6 Header.\n");
         gnrc_pktbuf_release(tcp_snp);
