@@ -496,6 +496,7 @@ size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out);
  * @param[in] args   The network interface
  */
 void *gnrc_netif_thread(void *args);
+
 #ifdef __cplusplus
 }
 #endif

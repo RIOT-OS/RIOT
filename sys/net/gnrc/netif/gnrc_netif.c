@@ -1258,9 +1258,9 @@ void *gnrc_netif_thread(void *args)
     netif->pid = sched_active_pid;
     /* setup the link-layer's message queue */
     msg_init_queue(msg_queue, _NETIF_NETAPI_MSG_QUEUE_SIZE);
-    dev->context = netif;
     /* register the event callback with the device driver */
     dev->event_callback = _event_cb;
+    dev->context = netif;
     /* initialize low-level driver */
     dev->driver->init(dev);
     _configure_netdev(dev);
