@@ -24,6 +24,7 @@
 #define IP_VERSION6     (0x60U)
 
 
+static void *_bootstrap(void *args);
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
@@ -39,13 +40,18 @@ gnrc_netif_t *gnrc_netif_raw_create(char *stack, int stacksize,
                                     netdev_t *dev)
 {
     return gnrc_netif_create(stack, stacksize, priority, name, dev,
-                             gnrc_netif_thread,
+                             _bootstrap,
                              &raw_ops);
 }
 
 static inline uint8_t _get_version(uint8_t *data)
 {
     return (data[0] & IP_VERSION_MASK);
+}
+
+static void *_bootstrap(void *args)
+{
+    return gnrc_netif_thread(args);
 }
 
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
