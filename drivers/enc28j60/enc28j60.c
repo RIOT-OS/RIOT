@@ -447,7 +447,6 @@ static void nd_isr(netdev_t *netdev)
 
 static int nd_get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
-    (void)max_len;
     enc28j60_t *dev = (enc28j60_t *)netdev;
     int res = -ENOTSUP;
 
@@ -473,7 +472,6 @@ static int nd_get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 
 static int nd_set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_len)
 {
-    (void)value_len;
     enc28j60_t *dev = (enc28j60_t *)netdev;
     int res = -ENOTSUP;
 
