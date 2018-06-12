@@ -78,6 +78,13 @@ static inline void _addr_set_multicast(uint8_t *dst, gnrc_pktsnip_t *payload)
 
 static void *_bootstrap(void *args)
 {
+    gnrc_netif_t *netif = args;
+    netdev_eth_t eth_layer;
+
+    gnrc_netif_acquire(netif);
+    /* Add netdev ethernet layer to the stack */
+    netif->dev = netdev_eth_add(netif->dev, &eth_layer);
+    gnrc_netif_release(netif);
     return gnrc_netif_thread(args);
 }
 
