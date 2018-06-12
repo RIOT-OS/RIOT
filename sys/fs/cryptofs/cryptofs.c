@@ -33,6 +33,36 @@ enum {
     STATE_UNENCRYPTED,
 };
 
+static int _init_cipher(cryptofs_t *fs)
+{
+    mutex_init(&fs->lock);
+
+    if (cipher_init(&fs->cipher, CIPHER_AES_128, fs->key,
+                    sizeof(fs->key)) != CIPHER_INIT_SUCCESS) {
+        return -EINVAL;
+    }
+
+    return 0;
+}
+
+static int _decrypt(cryptofs_t *fs, const void *in, void *out)
+{
+    mutex_lock(&fs->lock);
+    int ret = cipher_decrypt(&fs->cipher, in, out);
+    mutex_unlock(&fs->lock);
+
+    return ret;
+}
+
+static int _encrypt(cryptofs_t *fs, const void *in, void *out)
+{
+    mutex_lock(&fs->lock);
+    int ret = cipher_encrypt(&fs->cipher, in, out);
+    mutex_unlock(&fs->lock);
+
+    return ret;
+}
+
 static int real_dir_name(cryptofs_t *fs, const char *name, char *real_name, size_t len)
 {
     memset(real_name, 0, len);
@@ -60,21 +90,16 @@ static int _format(vfs_mount_t *mountp)
         return -EINVAL;
     }
 
-    mutex_init(&fs->lock);
-
-    if (cipher_init(&fs->cipher, CIPHER_AES_128, fs->key,
-                    sizeof(fs->key)) != CIPHER_INIT_SUCCESS) {
+    if (_init_cipher(fs) < 0) {
         return -EINVAL;
     }
 
-    mutex_lock(&fs->lock);
     be_uint32_t magic = byteorder_htonl(CRYPTOFS_MAGIC_WORD);
     uint8_t buf[AES_BLOCK_SIZE];
     for (unsigned i = 0; i < AES_BLOCK_SIZE / sizeof(magic); i += sizeof(magic)) {
         memcpy(buf + i, &magic, sizeof(magic));
     }
-    if (cipher_encrypt(&fs->cipher, buf, buf) < 1) {
-        mutex_unlock(&fs->lock);
+    if (_encrypt(fs, buf, buf) < 1) {
         return -EIO;
     }
 
@@ -94,10 +119,7 @@ static int _mount(vfs_mount_t *mountp)
 
     BUILD_BUG_ON(VFS_FILE_BUFFER_SIZE < sizeof(cryptofs_file_t));
 
-    mutex_init(&fs->lock);
-
-    if (cipher_init(&fs->cipher, CIPHER_AES_128, fs->key,
-                    sizeof(fs->key)) != CIPHER_INIT_SUCCESS) {
+    if (_init_cipher(fs) < 0) {
         return -EINVAL;
     }
 
@@ -116,12 +138,9 @@ static int _mount(vfs_mount_t *mountp)
         vfs_close(fd);
         return -EINVAL;
     }
-    mutex_lock(&fs->lock);
-    if (cipher_decrypt(&fs->cipher, buf, buf) < 1) {
-        mutex_unlock(&fs->lock);
+    if (_decrypt(fs, buf, buf) < 1) {
         return -EIO;
     }
-    mutex_unlock(&fs->lock);
     be_uint32_t magic;
     for (unsigned i = 0; i < AES_BLOCK_SIZE / sizeof(magic); i += sizeof(magic)) {
         memcpy(&magic, buf + i, sizeof(magic));
@@ -165,12 +184,9 @@ static int store_head(cryptofs_t *fs, cryptofs_file_t *file, int fd)
     memset(buf, AES_BLOCK_SIZE - sizeof(magic) - 1, sizeof(buf));
     memcpy(buf, &magic, sizeof(magic));
     buf[CRYPTOFS_NBPAD_OFFSET] = file->nb_pad;
-    mutex_lock(&fs->lock);
-    if (cipher_encrypt(&fs->cipher, buf, buf) < 1) {
-        mutex_unlock(&fs->lock);
+    if (_encrypt(fs, buf, buf) < 1) {
         return -EIO;
     }
-    mutex_unlock(&fs->lock);
     if (vfs_write(fd, buf, sizeof(buf)) != sizeof(buf)) {
         vfs_close(fd);
         vfs_unlink(file->name);
@@ -179,12 +195,9 @@ static int store_head(cryptofs_t *fs, cryptofs_file_t *file, int fd)
 
     /* Store Hash */
     memset(buf, 0, sizeof(buf));
-    mutex_lock(&fs->lock);
-    if (cipher_encrypt(&fs->cipher, file->hash, buf) < 1) {
-        mutex_unlock(&fs->lock);
+    if (_encrypt(fs, file->hash, buf) < 1) {
         return -EIO;
     }
-    mutex_unlock(&fs->lock);
     if (vfs_write(fd, buf, sizeof(buf)) != sizeof(buf)) {
         vfs_close(fd);
         vfs_unlink(file->name);
@@ -220,12 +233,9 @@ static int load_head(cryptofs_t *fs, cryptofs_file_t *file, int fd)
     if (res < 0) {
         return res;
     }
-    mutex_lock(&fs->lock);
-    if (cipher_decrypt(&fs->cipher, buf, buf) < 1) {
-        mutex_unlock(&fs->lock);
+    if (_decrypt(fs, buf, buf) < 1) {
         return -EIO;
     }
-    mutex_unlock(&fs->lock);
     memcpy(&magic, buf, sizeof(magic));
     if (byteorder_ntohl(magic) != CRYPTOFS_MAGIC_WORD) {
         return -EBADF;
@@ -236,13 +246,10 @@ static int load_head(cryptofs_t *fs, cryptofs_file_t *file, int fd)
     if (res != sizeof(buf)) {
         return res;
     }
-    mutex_lock(&fs->lock);
-    if (cipher_decrypt(&fs->cipher, buf, buf) < 1 ||
-            cipher_decrypt(&fs->cipher, buf + AES_BLOCK_SIZE, buf + AES_BLOCK_SIZE) < 1) {
-        mutex_unlock(&fs->lock);
+    if (_decrypt(fs, buf, buf) < 1 ||
+            _decrypt(fs, buf + AES_BLOCK_SIZE, buf + AES_BLOCK_SIZE) < 1) {
         return -EIO;
     }
-    mutex_unlock(&fs->lock);
 
     memcpy(file->hash, buf, sizeof(buf));
 
@@ -262,12 +269,9 @@ static int check_hash(cryptofs_file_t *file, int fd)
 
 static int encrpyt_and_write_block(cryptofs_t *fs, vfs_file_t *filp, cryptofs_file_t *file, const uint8_t *block)
 {
-    mutex_lock(&fs->lock);
-    if (cipher_encrypt(&fs->cipher, block, file->block) < 1) {
-        mutex_unlock(&fs->lock);
+    if (_encrypt(fs, block, file->block) < 1) {
         return -EIO;
     }
-    mutex_unlock(&fs->lock);
     file->state = STATE_ENCRYPTED;
     vfs_lseek(file->real_fd, filp->pos + CRYPTOFS_HEAD_SIZE - (filp->pos % AES_BLOCK_SIZE), SEEK_SET);
     int res = vfs_write(file->real_fd, file->block, sizeof(file->block));
@@ -286,12 +290,9 @@ static int read_and_decrypt_block(cryptofs_t *fs, vfs_file_t *filp, cryptofs_fil
         return res;
     }
     file->state = STATE_ENCRYPTED;
-    mutex_lock(&fs->lock);
-    if (cipher_decrypt(&fs->cipher, file->block, block) < 1) {
-        mutex_unlock(&fs->lock);
+    if (_decrypt(fs, file->block, block) < 1) {
         return -EIO;
     }
-    mutex_unlock(&fs->lock);
     file->state = STATE_UNENCRYPTED;
     return 0;
 }
