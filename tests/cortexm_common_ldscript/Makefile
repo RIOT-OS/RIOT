@@ -7,6 +7,15 @@ include ../Makefile.tests_common
 BOARD_WHITELIST += iotlab-a8-m3
 BOARD_WHITELIST += iotlab-m3
 BOARD_WHITELIST += samr21-xpro
+# Boards using a bootloader and ROM_OFFSET by default
+BOARD_WHITELIST += arduino-mkr1000
+BOARD_WHITELIST += arduino-mkrfox1200
+BOARD_WHITELIST += arduino-mkrzero
+BOARD_WHITELIST += bluepill
+BOARD_WHITELIST += feather-m0
+BOARD_WHITELIST += opencm904
+BOARD_WHITELIST += spark-core
+BOARD_WHITELIST += stm32mindev
 
 include $(RIOTBASE)/Makefile.include
 
@@ -15,12 +24,16 @@ include $(RIOTBASE)/Makefile.include
 # Compile time tests for ROM_OFFSET #
 # # # # # # # # # # # # # # # # # # #
 
-COMPILE_TESTS = test-elffile-overflow
+COMPILE_TESTS = test-elffile-overflow test-elffile-fw_rom_length
 
 all: compile-tests
 
 compile-tests: $(COMPILE_TESTS)
 .PHONY: compile-tests $(COMPILE_TESTS)
+
+
+# iotlab-m3 defines ROM_LEN as 512K which is not handled by bash math operations
+ROM_LEN_BYTES = $(shell printf "0x%x\n" $$(($(ROM_LEN:%K=%*1024))))
 
 
 # test-elffile-overflow depends on $(BINFILE) to prevent:
@@ -35,3 +48,20 @@ _test-elffile-overflow-runtest: $(BINFILE)
 	$(Q)\
 	{ $(_LINK) -o /dev/null  2>&1 | grep -q "region \`rom' overflowed by 1 byte" ; } \
 	  && echo [OK] || { echo [ERROR] Compilation should have failed >&2; exit 1; }
+
+
+# Test `ROM_OFFSET` is removed from firmware rom length if the board defines it
+test-elffile-fw_rom_length: $(ELFFILE)
+	$(Q)echo -n "Test rom offset substracted from rom length in elffile: "
+	$(Q)\
+	if test -n "$(ROM_OFFSET)"; then \
+	  TEST_FW_LEN=$$($(PREFIX)readelf --symbols $^ 2>/dev/null | awk '/_fw_rom_length/{printf "0x%s\n", $$2}'); \
+	  EXPECT_FW_LEN=$$(printf "0x%08x" $$(( $(ROM_LEN_BYTES) - $(ROM_OFFSET) ))); \
+	  if test $${TEST_FW_LEN} != $${EXPECT_FW_LEN}; then \
+	    echo "[ERROR] Rom offset not taken into account for firmware length $${TEST_FW_LEN} != $${EXPECT_FW_LEN}" >&2; \
+	    exit 1;\
+	  fi ;\
+	  echo [OK] ; \
+	else \
+	  echo "[SKIP](Reason: board does not have a ROM_OFFSET configured)" ;\
+	fi
