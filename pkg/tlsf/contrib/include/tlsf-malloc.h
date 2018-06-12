@@ -44,6 +44,28 @@ extern "C" {
 #endif
 
 /**
+ * @brief Struct to hold the total sizes of free and used blocks
+ * Used for @ref tlsf_size_walker()
+ */
+typedef struct {
+    unsigned free;          /**< total free size */
+    unsigned used;          /**< total used size */
+} tlsf_size_container_t;
+
+/**
+ * Walk the memory pool to print all block sizes and to calculate
+ * the total amount of free and used block sizes.
+ *
+ * @note This function is passed to tlsf_walk_pool()
+ *
+ * @param   ptr        Pointer to the current block.
+ * @param   size       Size of the current block at @p ptr.
+ * @param   used       Shows whether the current block is used or free.
+ * @param   user       Custom data expected to be of type ``pointer to tlsf_size_container_t``
+ */
+void tlsf_size_walker(void* ptr, size_t size, int used, void* user);
+
+/**
  * Add an area of memory to the global allocator pool.
  *
  * The first time this function is called, it will automatically perform a
