@@ -10,25 +10,21 @@
  * @file
  * @brief       OpenThread test application
  *
- * @author      Baptiste Clenet <baptiste.clenet@xsoen.com>
+ * @author      Baptiste Clenet <bapclenet@gmail.com>
  */
 
 #include <stdio.h>
 
-#include "net/ipv6/addr.h"
-#include "openthread/ip6.h"
-#include "openthread/thread.h"
-#include "openthread/udp.h"
 #include "ot.h"
-#include "shell.h"
-#include "shell_commands.h"
+
 int main(void)
 {
-    printf("Get PANID\n");
+    puts("This a test for OpenThread");
+    /* Example of how to call OpenThread stack functions */
+    puts("Get PANID ");
     uint16_t panid = 0;
     uint8_t res = ot_call_command("panid", NULL, (void*)&panid);
     printf("Current panid: 0x%x (res:%x)\n", panid, res);
 
-    openthread_uart_run();
     return 0;
 }
