@@ -89,6 +89,10 @@ PSEUDOMODULES += adc081c
 PSEUDOMODULES += adc101c
 PSEUDOMODULES += adc121c
 
+# MH-Z19 UART and PWM drivers
+PSEUDOMODULES += mhz19_uart
+PSEUDOMODULES += mhz19_pwm
+
 # include variants of SX127X drivers as pseudo modules
 PSEUDOMODULES += sx1272
 PSEUDOMODULES += sx1276

@@ -26,7 +26,9 @@ static int read_ppm(const void *dev, phydat_t *res)
     int16_t ppm;
 
     /* Drops the const keyword, otherwise the mutex can't be locked */
-    mhz19_get_ppm((mhz19_t *)dev, &ppm);
+    if (mhz19_get_ppm((mhz19_t *)dev, &ppm) < 0) {
+        return -ECANCELED;
+    }
     res->val[0] = ppm;
     res->unit = UNIT_PPM;
     res->scale = 0;

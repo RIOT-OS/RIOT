@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Koen Zandberg
+ * Copyright (C) 2018 Beduino Master Projekt - University of Bremen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,8 +16,8 @@
  * ## Description
  *
  * The MH-Z19 is a C02 sensor. Measurements are provided in ppm over UART and
- * PWM. Only the UART interface is implemented in this driver. PPM range from
- * 0 (theoretically) to 2000 or 5000 depending on the sensor settings.
+ * PWM. PPM range from 0 (theoretically) to 2000 or 5000 depending on the sensor
+ * settings.
  *
  * @note The sensor requires considerable time before accurate measurements are
  * provided
@@ -27,15 +28,23 @@
  * @brief       Interface definition for the mh-z19 CO2 sensor driver.
  *
  * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Christian Manal <manal@uni-bremen.de>
  */
 
 #ifndef MHZ19_H
 #define MHZ19_H
 
-#include "periph/uart.h"
 #include "saul.h"
+
+#ifdef MODULE_MHZ19_UART
+#include "periph/uart.h"
 #include "mhz19_internals.h"
 #include "mutex.h"
+#endif /* MODULE_MHZ19_UART */
+
+#ifdef MODULE_MHZ19_PWM
+#include "periph/gpio.h"
+#endif /* MODULE_MHZ19_PWM */
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +60,7 @@ enum {
     MHZ19_ERR_CHECKSUM  = -3,       /**< checksum failure on received data */
 };
 
+#ifdef MODULE_MHZ19_UART
 /**
  * @brief   Device initialization parameters
  */
@@ -68,6 +78,23 @@ typedef struct {
     uint8_t idx;                    /**< rx buffer index */
     uint8_t rxmem[MHZ19_BUF_SIZE];  /**< rx buffer */
 } mhz19_t;
+#endif /* MODULE_MHZ19_UART */
+
+#ifdef MODULE_MHZ19_PWM
+/**
+ * @brief  Device initialization parameters
+ */
+typedef struct {
+    gpio_t pin;   /**< Pin the sensor is connected to */
+} mhz19_params_t;
+
+/**
+ * @brief  Device descriptor for a mhz19 driver
+ */
+typedef struct {
+    gpio_t pin;   /**< Pin the sensor is connected to */
+} mhz19_t;
+#endif /* MODULE_MHZ19_PWM */
 
 /**
  * @brief   Export SAUL endpoint
