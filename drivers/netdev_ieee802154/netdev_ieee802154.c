@@ -136,6 +136,11 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             res = sizeof(l2filter_t **);
             break;
 #endif
+        case NETOPT_NETDEV802154_PTR:
+            assert(max_len >= sizeof(netdev_ieee802154_t**));
+            *((netdev_ieee802154_t **)value) = dev;
+            res = sizeof(netdev_ieee802154_t**);
+            break;
         default:
             break;
     }
