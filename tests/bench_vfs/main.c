@@ -149,7 +149,9 @@ static void init_fs(void)
 #include "fs/littlefs_fs.h"
 static char fs_name[] = "littlefs";
 
-static littlefs_desc_t littlefs_desc;
+static littlefs_desc_t littlefs_desc = {
+    .lock = MUTEX_INIT,
+};
 
 static vfs_mount_t _bench_mount = {
     .fs = &littlefs_file_system,
@@ -167,14 +169,30 @@ static void init_fs(void)
 #define "No or unsupported file system module used"
 #endif
 
-#define FILE_LOOP_SIZE  (20)
-#define LOOP_SIZE       (100)
+#ifndef FILE_LOOP_SIZE
+#define FILE_LOOP_SIZE  (4u)
+#endif
+
+#ifndef LOOP_SIZE
+#define LOOP_SIZE       (16u)
+#endif
+
 #define BASE_NAME       "/bench/test"
+
+#ifndef BUF_SIZE
+#define BUF_SIZE        (256u)
+#endif
+
+static char buf[BUF_SIZE];
 
 int main(void)
 {
     printf("benchmarking file system: %s\n", fs_name);
     init_fs();
+
+    for (size_t i = 0; i < BUF_SIZE; i++) {
+        buf[i] = '0' + i % 10;
+    }
 
     xtimer_ticks32_t begin;
     xtimer_ticks32_t end;
@@ -197,31 +215,32 @@ int main(void)
     puts("[END] Mount test");
 
     int fd;
-    char buf[] = "1234567890123456789012345678901234567890";
     uint32_t total_time = 0;
 
     puts("[BEGIN] Write test...");
-    for (int f = 0; f < FILE_LOOP_SIZE; f++) {
+    for (unsigned f = 0; f < FILE_LOOP_SIZE; f++) {
         char name[20];
         sprintf(name, BASE_NAME"%d", f);
         begin = xtimer_now();
         fd = vfs_open(name, O_CREAT | O_RDWR, 0);
-        for (int i = 0; i < LOOP_SIZE; i++) {
-            vfs_write(fd, buf, sizeof(buf) - 1);
+        for (unsigned i = 0; i < LOOP_SIZE; i++) {
+            vfs_write(fd, buf, sizeof(buf));
         }
         vfs_close(fd);
         end = xtimer_now();
         diff = xtimer_diff(end, begin);
         printf("File #%d, %u bytes written in: %" PRIu32 "us\n", f,
-               (unsigned)(LOOP_SIZE * (sizeof(buf) - 1)), xtimer_usec_from_ticks(diff));
+               LOOP_SIZE * sizeof(buf), xtimer_usec_from_ticks(diff));
         total_time += xtimer_usec_from_ticks(diff);
     }
     printf("Mean time: %" PRIu32 "us\n", total_time / (uint32_t)FILE_LOOP_SIZE);
+    printf("Throughput: %f kB/s\n",
+           ((float)(FILE_LOOP_SIZE * LOOP_SIZE * sizeof(buf) * 1000.0) / (float)total_time));
     puts("[END] Write test");
 
     total_time = 0;
     puts("[BEGIN] Read test...");
-    for (int f = 0; f < FILE_LOOP_SIZE; f++) {
+    for (unsigned f = 0; f < FILE_LOOP_SIZE; f++) {
         char name[20];
         sprintf(name, BASE_NAME"%d", f);
         begin = xtimer_now();
@@ -239,11 +258,13 @@ int main(void)
         total_time += xtimer_usec_from_ticks(diff);
     }
     printf("Mean time: %" PRIu32 "us\n", total_time / (uint32_t)FILE_LOOP_SIZE);
+    printf("Throughput: %f kB/s\n",
+           ((float)(FILE_LOOP_SIZE * LOOP_SIZE * sizeof(buf) * 1000.0) / (float)total_time));
     puts("[END] Read test");
 
     total_time = 0;
     puts("[BEGIN] Remove test...");
-    for (int f = 0; f < FILE_LOOP_SIZE; f++) {
+    for (unsigned f = 0; f < FILE_LOOP_SIZE; f++) {
         char name[20];
         sprintf(name, BASE_NAME"%d", f);
         begin = xtimer_now();

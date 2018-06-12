@@ -2,8 +2,9 @@ include ../Makefile.tests_common
 
 USEMODULE += vfs
 USEMODULE += xtimer
+USEMODULE += printf_float
 
-FS ?= spiffs
+FS ?= littlefs
 
 USEMODULE += $(FS)
 
