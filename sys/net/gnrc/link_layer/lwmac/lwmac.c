@@ -57,6 +57,7 @@
  */
 kernel_pid_t lwmac_pid;
 
+static void *_bootstrap(void *args);
 static void rtt_cb(void *arg);
 static void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate);
 static void lwmac_schedule_update(gnrc_netif_t *netif);
@@ -80,7 +81,14 @@ gnrc_netif_t *gnrc_netif_lwmac_create(char *stack, int stacksize,
                                       netdev_t *dev)
 {
     return gnrc_netif_create(stack, stacksize, priority, name, dev,
-                             &lwmac_ops);
+                             _bootstrap, &lwmac_ops);
+}
+
+static void *_bootstrap(void *args)
+{
+    gnrc_netif_t *netif = args;
+    netif->hwdev = netif->dev;
+    return gnrc_netif_thread(args);
 }
 
 static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
@@ -114,7 +122,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     netdev_ieee802154_rx_info_t rx_info;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
+    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->hwdev;
     gnrc_pktsnip_t *pkt = NULL;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
 
