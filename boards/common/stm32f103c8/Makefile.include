@@ -26,9 +26,9 @@ ifeq ($(PROGRAMMER),dfu-util)
   export FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D "$(HEXFILE)"
 else
 
-# this board uses openocd by default
-export DEBUG_ADAPTER ?= stlink
-export STLINK_VERSION ?= 2
+  # this board uses openocd by default
+  export DEBUG_ADAPTER ?= stlink
+  export STLINK_VERSION ?= 2
 
-include $(RIOTMAKE)/tools/openocd.inc.mk
+  include $(RIOTMAKE)/tools/openocd.inc.mk
 endif
