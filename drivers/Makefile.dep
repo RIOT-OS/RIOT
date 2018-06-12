@@ -204,9 +204,16 @@ ifneq (,$(filter mag3110,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
-ifneq (,$(filter mhz19,$(USEMODULE)))
+ifneq (,$(filter mhz19_uart,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += mhz19
   FEATURES_REQUIRED += periph_uart
+endif
+
+ifneq (,$(filter mhz19_pwm,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += mhz19
+  FEATURES_REQUIRED += periph_gpio
 endif
 
 ifneq (,$(filter mma8x5x,$(USEMODULE)))

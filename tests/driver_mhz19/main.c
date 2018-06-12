@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Koen Zandberg <koen@bergzand.net>
+ * Copyright (C) 2018 Beduino Master Projekt - University of Bremen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,28 +15,20 @@
  * @brief       Test application for the MH-Z19 sensor driver
  *
  * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Christian Manal <manal@uni-bremen.de>
  *
  * @}
  */
 
-#ifndef TEST_UART
-#error "TEST_UART not defined"
-#endif
-
 #include <stdio.h>
-
 #include "xtimer.h"
-
-#include "periph/uart.h"
-
 #include "mhz19.h"
+#include "mhz19_params.h"
 
 int main(void)
 {
     mhz19_t dev;
-    mhz19_params_t params = {
-        .uart = TEST_UART,
-    };
+    mhz19_params_t params = MHZ19_PARAMS;
 
     puts("MH-Z19 CO2 sensor test application\n");
 

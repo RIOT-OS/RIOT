@@ -1,12 +1,15 @@
 include ../Makefile.tests_common
 
-USEMODULE += mhz19
+DRIVER ?= mhz19_uart
+
+USEMODULE += $(DRIVER)
 USEMODULE += xtimer
 
-# set default device parameters in case they are undefined
-TEST_UART ?= 1
-
-# export parameters
-CFLAGS += -DTEST_UART=$(TEST_UART)
+ifneq (,$(filter mhz19_uart,$(USEMODULE)))
+  # set default device parameters in case they are undefined
+  TEST_UART ?= 1
+  # export parameters
+  CFLAGS += -DMHZ19_PARAM_UART_DEV=UART_DEV\($(TEST_UART)\)
+endif
 
 include $(RIOTBASE)/Makefile.include
