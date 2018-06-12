@@ -1,15 +1,8 @@
-ifeq ($(BOARD), native)
-  $(error Newlib is not supported on native target)
-endif
-
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
   USE_NEWLIB_NANO = 1
   # Test if nano.specs is available
-  ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
-    # Clang/llvm has no support for specs files
-    ifneq ($(TOOLCHAIN),llvm)
-      USE_NANO_SPECS_FILE = 1
-    endif
+  ifeq ($(shell $(LINK) -Werror -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+    USE_NANO_SPECS_FILE = 1
     ifeq ($(shell echo "int main(){} void _exit(int n) {(void)n;while(1);}" | LC_ALL=C $(CC) -xc - -o /dev/null -lc -specs=nano.specs -Wall -Wextra -pedantic 2>&1 | grep -q "use of wchar_t values across objects may fail" ; echo $$?),0)
         CFLAGS += -fshort-wchar
         LINKFLAGS += -Wl,--no-wchar-size-warning
@@ -49,26 +42,23 @@ NEWLIB_INCLUDE_PATTERNS ?= \
   /usr/$(TARGET_ARCH)/include \
   /usr/local/opt/$(TARGET_ARCH)*/$(TARGET_ARCH)/include \
   /usr/local/opt/gcc-*/$(TARGET_ARCH)/include \
-  #
-# Use the wildcard Makefile function to search for existing directories matching
-# the patterns above. We use the -isystem gcc/clang argument to add the include
-# directories as system include directories, which means they will not be
-# searched until after all the project specific include directories (-I/path)
+
+# Search for a newlib.h inside the above newlib include directory patterns
 NEWLIB_INCLUDE_FILE = $(firstword $(wildcard $(addsuffix /newlib.h,$(NEWLIB_INCLUDE_PATTERNS))))
 
 # If nothing was found we will try to fall back to searching for a cross-gcc in
 # the current PATH and use a relative path for the includes
 ifeq (,$(NEWLIB_INCLUDE_FILE))
-  $(warning Using relative include dir)
+  $(warning newlib.h not found, guessing newlib include path from gcc path)
   NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell command -v $(PREFIX)gcc 2>/dev/null))/../$(TARGET_ARCH)/include))
 else
   NEWLIB_INCLUDE_DIR := $(dir $(NEWLIB_INCLUDE_FILE))
 endif
 
 ifneq (1,$(USE_NANO_SPECS_FILE))
-  # A cross GCC already knows the target libc include path (build-in at compile time)
-  # but Clang, when cross-compiling, needs to be told where to find the headers
-  # for the system being built.
+  # We use the -isystem gcc/clang argument to add the include
+  # directories as system include directories, which means they will not be
+  # searched until after all the project specific include directories (-I/path)
   NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR)
   NEWLIB_INCLUDES += $(addprefix -isystem ,$(abspath $(wildcard $(dir $(NEWLIB_INCLUDE_DIR))/usr/include)))
   ifeq (1,$(USE_NEWLIB_NANO))
