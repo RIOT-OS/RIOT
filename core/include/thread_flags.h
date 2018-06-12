@@ -39,7 +39,7 @@
  * Usually, if it is only of interest that an event occurred, but not how many
  * of them, thread flags should be considered.
  *
- * Note that some flags (currently the three most significant bits) are used by
+ * Note that some flags (currently the four most significant bits) are used by
  * core functions, system libraries, and device drivers and should not be set by
  * a user application. These special flags can still be waited for to create
  * event loops and wait conditions.
@@ -113,6 +113,16 @@ extern "C" {
  * waiting for feedback from the hardware when trying to send a frame etc.
  */
 #define THREAD_FLAG_IRQ_SERVICED    (1u << 13)
+
+#ifndef THREAD_FLAG_EVENT
+/**
+ * @brief   Thread flag use to notify available events in an event queue
+ *
+ * @see @ref event_wait, @ref event_post, @ref event_loop
+ */
+#define THREAD_FLAG_EVENT           (1u << 12)
+#endif
+
 /** @} */
 
 /**
