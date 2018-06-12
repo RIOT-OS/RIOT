@@ -24,7 +24,8 @@ include $(RIOTBASE)/Makefile.include
 # Compile time tests for ROM_OFFSET #
 # # # # # # # # # # # # # # # # # # #
 
-COMPILE_TESTS = test-elffile-overflow test-elffile-fw_rom_length
+COMPILE_TESTS  = test-elffile-overflow test-elffile-fw_rom_length
+COMPILE_TESTS += tests-offsets
 
 all: compile-tests
 
@@ -65,3 +66,35 @@ test-elffile-fw_rom_length: $(ELFFILE)
 	else \
 	  echo "[SKIP](Reason: board does not have a ROM_OFFSET configured)" ;\
 	fi
+
+
+# Test elffiles must not have $(ELFFILE) prerequisite as target specific
+# variables are used for configuration and they also apply to prerequisites.
+#
+# https://www.gnu.org/software/make/manual/make.html#Target_002dspecific
+
+ELFFILES_DEPS = $(BASELIBS) FORCE
+
+
+# Compile elf files with different ROM_OFFSET
+# and verify the offset is taken into account
+
+OFFSETS_TESTS = 0x1000 0x2000
+tests-offsets: $(OFFSETS_TESTS:%=test-offset_%)
+
+.PHONY: test-offset_%
+test-offset_%: $(BINDIR)/$(APPLICATION)_offset_%.elf
+	$(Q)echo -n "Test compilation with offset $*: "
+	$(Q)\
+	TEST_START_ADDR=$$($(PREFIX)readelf --section-headers $^ 2>/dev/null | awk '/.text/{printf "0x%s\n", $$5}'); \
+	EXPECT_START_ADDR=$$(printf "0x%08x" $$(( $(ROM_START_ADDR) + $* ))); \
+	if test $${TEST_START_ADDR} != $${EXPECT_START_ADDR}; then \
+	  echo "[ERROR] Linker offset not used $${TEST_START_ADDR} != $${EXPECT_START_ADDR}" >&2; \
+	  exit 1;\
+	fi
+	$(Q)echo [OK]
+
+$(BINDIR)/$(APPLICATION)_offset_%.elf: ROM_OFFSET=$*
+$(BINDIR)/$(APPLICATION)_offset_%.elf: $(ELFFILES_DEPS)
+	$(Q)$(_LINK) -o $@
+.PRECIOUS: $(BINDIR)/$(APPLICATION)_offset_%.elf
