@@ -52,6 +52,8 @@ gnrc_netif_t *gnrc_netif_ieee802154_create(char *stack, int stacksize,
 
 static void *_bootstrap(void *args)
 {
+    gnrc_netif_t *netif = args;
+    netif->hwdev = netif->dev;
     return gnrc_netif_thread(args);
 }
 
@@ -86,7 +88,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     netdev_ieee802154_rx_info_t rx_info;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
+    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->hwdev;
     gnrc_pktsnip_t *pkt = NULL;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
 
@@ -174,7 +176,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     netdev_t *dev = netif->dev;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
+    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->hwdev;
     gnrc_netif_hdr_t *netif_hdr;
     const uint8_t *src, *dst = NULL;
     int res = 0;
