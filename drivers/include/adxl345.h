@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_adxl345 ADXL345 3-Axis accelerometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver interface for the ADXL345
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

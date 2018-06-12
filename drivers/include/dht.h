@@ -11,8 +11,11 @@
 /**
  * @defgroup    drivers_dht DHT Family of Humidity and Temperature Sensors
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the DHT Family of humidity
  *              and temperature sensors
+ *
+ * This driver provides @ref drivers_saul capabilities.
  *
  * @{
  *

@@ -9,9 +9,11 @@
 /**
  * @defgroup    drivers_pulse_counter Pulse counter
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  *
  * @brief       GPIO based pulse counting driver
  *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

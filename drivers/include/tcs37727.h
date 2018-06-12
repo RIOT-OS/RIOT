@@ -10,9 +10,10 @@
 /**
  * @defgroup    drivers_tcs37727 TCS37727 RGB Light Sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the AMS TCS37727 Color Light-To-Digital Converter
  *
- *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

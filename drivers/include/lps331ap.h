@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_lps331ap LPS331AP Pressure Sensor Driver
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the LPS331AP pressure sensor
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

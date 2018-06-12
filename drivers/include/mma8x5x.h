@@ -10,14 +10,17 @@
 /**
  * @defgroup    drivers_mma8x5x MMA8x5x Accelerometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the Freescale MMA8x5x 3-Axis accelerometer.
- *              The driver will initialize the accelerometer for best
- *              resolution. After the initialization the accelerometer will make
- *              measurements at periodic times. The measurements period and
- *              scale range can be determined by accelerometer initialization.
- *              This driver only implements basic functionality (i.e. no support
- *              for external interrupt pins).
  *
+ * The driver will initialize the accelerometer for best resolution. After the
+ * initialization the accelerometer will make measurements at periodic times.
+ * The measurements period and scale range can be determined by accelerometer
+ * initialization.
+ * This driver only implements basic functionality (i.e. no support
+ * for external interrupt pins).
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
