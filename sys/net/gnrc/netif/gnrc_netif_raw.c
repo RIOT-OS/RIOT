@@ -15,6 +15,7 @@
 
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif/raw.h"
+#include "net/gnrc/netif/internal.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
