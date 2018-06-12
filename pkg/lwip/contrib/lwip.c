@@ -19,6 +19,7 @@
 #include "netif/lowpan6.h"
 
 #ifdef MODULE_NETDEV_TAP
+#include "net/netdev/eth.h"
 #include "netdev_tap.h"
 #include "netdev_tap_params.h"
 #endif
@@ -55,6 +56,7 @@ static struct netif netif[LWIP_NETIF_NUMOF];
 #endif
 
 #ifdef MODULE_NETDEV_TAP
+static netdev_eth_t eth_layer[LWIP_NETIF_NUMOF];
 static netdev_tap_t netdev_taps[LWIP_NETIF_NUMOF];
 #endif
 
@@ -73,7 +75,8 @@ void lwip_bootstrap(void)
 #ifdef MODULE_NETDEV_TAP
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i]);
-        if (netif_add(&netif[i], &netdev_taps[i], lwip_netdev_init,
+        netdev_eth_add((netdev_t*)&netdev_taps[i], &eth_layer[i]);
+        if (netif_add(&netif[i], &eth_layer[i], lwip_netdev_init,
                       tcpip_input) == NULL) {
             DEBUG("Could not add netdev_tap device\n");
             return;
