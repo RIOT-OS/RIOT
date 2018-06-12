@@ -40,7 +40,9 @@
  * of them, thread flags should be considered.
  *
  * Note that some flags (currently the three most significant bits) are used by
- * core functions and should not be set by the user. They can be waited for.
+ * core functions, system libraries, and device drivers and should not be set by
+ * a user application. These special flags can still be waited for to create
+ * event loops and wait conditions.
  *
  * This API is optional and must be enabled by adding "core_thread_flags" to USEMODULE.
  *
@@ -104,7 +106,7 @@ extern "C" {
  */
 #define THREAD_FLAG_TIMEOUT         (1u << 14)
 /**
- * @brief Set by some drivers for signalling from an ISR to an application thread
+ * @brief Set by some drivers for signaling from an ISR to an application thread
  *
  * Example usages include periph drivers waiting for data to be read or written
  * when using an IRQ driven or DMA driven method, and in network device drivers
