@@ -19,7 +19,7 @@
 #include <stdint.h>
 
 #include "msg.h"
-#include "openthread/platform/alarm.h"
+#include "openthread/platform/alarm-milli.h"
 #include "ot.h"
 #include "thread.h"
 #include "xtimer.h"
@@ -38,7 +38,7 @@ static msg_t ot_alarm_msg;
  * @param[in] aT0        The reference time.
  * @param[in] aDt        The time delay in milliseconds from @p aT0.
  */
-void otPlatAlarmStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
+void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 {
     (void)aInstance;
     (void)aT0;
@@ -56,7 +56,7 @@ void otPlatAlarmStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
 }
 
 /* OpenThread will call this to stop alarms */
-void otPlatAlarmStop(otInstance *aInstance)
+void otPlatAlarmMilliStop(otInstance *aInstance)
 {
     (void)aInstance;
     DEBUG("openthread: otPlatAlarmStop\n");
@@ -64,7 +64,7 @@ void otPlatAlarmStop(otInstance *aInstance)
 }
 
 /* OpenThread will call this for getting running time in millisecs */
-uint32_t otPlatAlarmGetNow(void)
+uint32_t otPlatAlarmMilliGetNow(void)
 {
     uint32_t now = xtimer_now_usec() / US_PER_MS;
     DEBUG("openthread: otPlatAlarmGetNow: %" PRIu32 "\n", now);
