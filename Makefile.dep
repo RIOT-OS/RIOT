@@ -693,6 +693,8 @@ endif
 
 ifneq (,$(filter sock_util,$(USEMODULE)))
   USEMODULE += posix
+  USEMODULE += fmt
+  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter event_%,$(USEMODULE)))
