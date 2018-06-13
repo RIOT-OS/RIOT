@@ -50,6 +50,14 @@ extern "C" {
 #define CRYPTOFS_ROOT_FILENAME      ".cryptofs0"
 #endif
 
+#ifndef CRYPTOFS_BLOCK_SIZE
+#define CRYPTOFS_BLOCK_SIZE         (4 * AES_BLOCK_SIZE)
+#endif
+
+#if CRYPTOFS_BLOCK_SIZE % AES_BLOCK_SIZE != 0
+#error "CRYPTOFS_BLOCK_SIZE must be a multiple of AES_BLOCK_SIZE"
+#endif
+
 /*
  * File header:
  * +-------------------------------------------+
@@ -71,7 +79,7 @@ typedef struct {
     int real_fd;
     char name[VFS_NAME_MAX + 1];
     uint8_t hash[SHA256_DIGEST_LENGTH];
-    uint8_t block[AES_BLOCK_SIZE];
+    uint8_t block[CRYPTOFS_BLOCK_SIZE];
     size_t size;
     uint8_t state;
     uint8_t nb_pad;
