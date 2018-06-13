@@ -222,11 +222,11 @@ static int hwcrypto_cipher_encrypt_decrypt(hwcrypto_t hwcrypto, const uint8_t *i
     dma_acquire(hwcrypto_config[hwcrypto].out_dma);
 
     dma_configure(hwcrypto_config[hwcrypto].in_dma, hwcrypto_config[hwcrypto].in_dma_chan,
-                  in, (void *)&dev(hwcrypto)->DINR, block_size,
+                  in, (void *)&dev(hwcrypto)->DINR, block_size / 4,
                   DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR | DMA_DATA_WIDTH_WORD);
 
     dma_configure(hwcrypto_config[hwcrypto].out_dma, hwcrypto_config[hwcrypto].out_dma_chan,
-                  (const void *)&dev(hwcrypto)->DOUTR, out, block_size,
+                  (const void *)&dev(hwcrypto)->DOUTR, out, block_size / 4,
                   DMA_PERIPH_TO_MEM, DMA_INC_DST_ADDR | DMA_DATA_WIDTH_WORD);
 
     dma_start(hwcrypto_config[hwcrypto].in_dma);
