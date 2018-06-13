@@ -38,6 +38,23 @@
  */
 sht1x_dev_t sht1x_devs[SHT1X_NUM];
 
+#ifdef MODULE_AUTO_INIT_SAUL
+
+/**
+ * @brief   Memory for the SAUL registry entries
+ */
+static saul_reg_t saul_entries[SHT1X_NUM * 2];
+
+/**
+ * @name    Import SAUL endpoints
+ * @{
+ */
+extern const saul_driver_t sht1x_saul_temp_driver;
+extern const saul_driver_t sht1x_saul_hum_driver;
+/** @} */
+
+#endif /* MODULE_AUTO_INIT_SAUL */
+
 static void sht1x_error(unsigned int num, const char *reason)
 {
     LOG_ERROR("[auto_init] error initializing SHT10/SHT11/SHT15 sensor "
@@ -66,6 +83,17 @@ void auto_init_sht1x(void)
                 sht1x_error(i, "?");
                 continue;
         }
+
+#ifdef MODULE_AUTO_INIT_SAUL
+        saul_entries[(i * 2)    ].dev = &(sht1x_devs[i]);
+        saul_entries[(i * 2) + 1].dev = &(sht1x_devs[i]);
+        saul_entries[(i * 2)    ].name = sht1x_saul_info[(i * 2)    ].name;
+        saul_entries[(i * 2) + 1].name = sht1x_saul_info[(i * 2) + 1].name;
+        saul_entries[(i * 2)    ].driver = &sht1x_saul_temp_driver;
+        saul_entries[(i * 2) + 1].driver = &sht1x_saul_hum_driver;
+        saul_reg_add(&(saul_entries[(i * 2)    ]));
+        saul_reg_add(&(saul_entries[(i * 2) + 1]));
+#endif /* MODULE_AUTO_INIT_SAUL */
     }
 }
 

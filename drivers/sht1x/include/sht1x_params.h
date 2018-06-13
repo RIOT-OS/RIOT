@@ -48,11 +48,41 @@ extern "C" {
 /**@}*/
 
 /**
+ * @name    Set default SAUL info text depending on used pseudo module
+ * @{
+ */
+#ifndef SHT1X_SAULINFO
+#ifdef MODULE_SHT15
+#define SHT1X_SAULINFO                { .name = "SHT15 temperature" }, \
+                                      { .name = "SHT15 humidity" }
+#else
+#ifdef MODULE_SHT10
+#define SHT1X_SAULINFO                { .name = "SHT10 temperature" }, \
+                                      { .name = "SHT10 humidity" }
+#else
+/* SHT11 is the most commonly used, so use that as default */
+#define SHT1X_SAULINFO                { .name = "SHT11 temperature" }, \
+                                      { .name = "SHT11 humidity" }
+#endif /* MODULE_SHT10 */
+#endif /* MODULE_SHT15 */
+#endif /* SHT1X_SAULINFO */
+
+/**@}*/
+
+/**
  * @brief   Configure SHT1X devices
  */
 static const sht1x_params_t sht1x_params[] =
 {
     SHT1X_PARAMS
+};
+
+/**
+ * @brief   Allocate and configure entries to the SAUL registry
+ */
+static const saul_reg_info_t sht1x_saul_info[] =
+{
+    SHT1X_SAULINFO
 };
 
 #ifdef __cplusplus
