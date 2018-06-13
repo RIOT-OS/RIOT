@@ -653,11 +653,6 @@ ifneq (,$(filter random,$(USEMODULE)))
   USEMODULE += luid
 endif
 
-ifneq (,$(filter openthread_contrib,$(USEMODULE)))
-  USEMODULE += openthread_contrib_netdev
-  FEATURES_REQUIRED += cpp
-endif
-
 ifneq (,$(filter asymcute,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_util
@@ -729,11 +724,6 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
   USEMODULE += gnrc_sock_udp
   USEMODULE += sock_util
-endif
-
-ifneq (,$(filter openthread,$(USEPKG)))
-  USEMODULE += openthread_contrib
-  USEMODULE += mbedcrypto
 endif
 
 ifneq (,$(filter luid,$(USEMODULE)))
