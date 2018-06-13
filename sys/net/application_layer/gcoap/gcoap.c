@@ -285,15 +285,15 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
 
     if (coap_get_observe(pdu) == COAP_OBS_REGISTER) {
         int empty_slot = _find_obs_memo(&memo, remote, pdu);
+        if ((resource_memo != NULL)
+                && _endpoints_equal(remote, resource_memo->observer)) {
+            /* observer re-registering with new token */
+            memo = resource_memo;
+            observer = resource_memo->observer;
+        }
         /* record observe memo */
         if (memo == NULL) {
-            if ((resource_memo != NULL)
-                    && _endpoints_equal(remote, resource_memo->observer)) {
-                /* observer re-registering with new token */
-                memo = resource_memo;
-                observer = resource_memo->observer;
-            }
-            else if ((empty_slot >= 0) && (resource_memo == NULL)) {
+            if ((empty_slot >= 0) && (resource_memo == NULL)) {
                 int obs_slot = _find_observer(&observer, remote);
                 /* cache new observer */
                 if (observer == NULL) {
