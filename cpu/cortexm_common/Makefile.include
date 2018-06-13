@@ -21,3 +21,5 @@ endif
 
 # ROM_OFFSET: offset in rom to start linking, allows supporting a bootloader
 LINKFLAGS += $(if $(ROM_OFFSET),$(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFSET))
+# FW_ROM_LEN: rom length to use for firmware linking. Allows linking only in a section of the rom.
+LINKFLAGS += $(if $(FW_ROM_LEN),$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(FW_ROM_LEN))

@@ -21,7 +21,9 @@
  */
 
 _rom_offset = DEFINED( _rom_offset ) ? _rom_offset : 0x0;
-_fw_rom_length = _rom_length - _rom_offset;
+_fw_rom_length = DEFINED( _fw_rom_length ) ? _fw_rom_length : _rom_length - _rom_offset;
+
+ASSERT((_fw_rom_length <= _rom_length - _rom_offset), "Specified firmware size does not fit in ROM");
 
 MEMORY
 {
