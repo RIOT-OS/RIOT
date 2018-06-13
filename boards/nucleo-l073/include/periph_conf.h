@@ -196,44 +196,35 @@ static const spi_conf_t spi_config[] = {
  * @name I2C configuration
  * @{
  */
-#define I2C_0_EN            1
-#define I2C_1_EN            1
-#define I2C_NUMOF           (I2C_0_EN + I2C_1_EN)
-#define I2C_IRQ_PRIO        1
-#define I2C_APBCLK          (CLOCK_APB1)
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev            = I2C1,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_B, 8),
+        .sda_pin        = GPIO_PIN(PORT_B, 9),
+        .scl_af         = GPIO_AF4,
+        .sda_af         = GPIO_AF4,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR_I2C1EN,
+        .irqn           = I2C1_IRQn
+    },
+    {
+        .dev            = I2C2,
+        .speed          = I2C_SPEED_NORMAL,
+        .scl_pin        = GPIO_PIN(PORT_B, 13),
+        .sda_pin        = GPIO_PIN(PORT_B, 14),
+        .scl_af         = GPIO_AF5,
+        .sda_af         = GPIO_AF5,
+        .bus            = APB1,
+        .rcc_mask       = RCC_APB1ENR_I2C2EN,
+        .irqn           = I2C2_IRQn
+    }
+};
 
-/* I2C 0 device configuration */
-#define I2C_0_DEV           I2C1
-#define I2C_0_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C1EN))
-#define I2C_0_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C1EN))
-#define I2C_0_EVT_IRQ       I2C1_IRQn
-#define I2C_0_EVT_ISR       isr_i2c1
-/* I2C 0 pin configuration */
-#define I2C_0_SCL_PORT      PORT_B
-#define I2C_0_SCL_PIN       8
-#define I2C_0_SCL_AF        4
-#define I2C_0_SCL_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
-#define I2C_0_SDA_PORT      PORT_B
-#define I2C_0_SDA_PIN       9
-#define I2C_0_SDA_AF        4
-#define I2C_0_SDA_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
+#define I2C_0_ISR           isr_i2c1
+#define I2C_1_ISR           isr_i2c2
 
-/* I2C 1 device configuration */
-#define I2C_1_DEV           I2C2
-#define I2C_1_CLKEN()       (periph_clk_en(APB1, RCC_APB1ENR_I2C2EN))
-#define I2C_1_CLKDIS()      (periph_clk_dis(APB1, RCC_APB1ENR_I2C2EN))
-#define I2C_1_EVT_IRQ       I2C2_IRQn
-#define I2C_1_EVT_ISR       isr_i2c2
-/* I2C 1 pin configuration */
-#define I2C_1_SCL_PORT      PORT_B
-#define I2C_1_SCL_PIN       13
-#define I2C_1_SCL_AF        5
-#define I2C_1_SCL_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
-#define I2C_1_SDA_PORT      PORT_B
-#define I2C_1_SDA_PIN       14
-#define I2C_1_SDA_AF        5
-#define I2C_1_SDA_CLKEN()   (periph_clk_en(AHB, RCC_IOPENR_GPIOBEN))
-
+#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**

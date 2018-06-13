@@ -1,0 +1,7 @@
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+  ifneq (,$(filter $(CPU),stm32f0 stm32f3 stm32f7 stm32l0 stm32l4))
+    USEMODULE += periph_i2c_1
+  else # stm32f1/f2/f4/l1
+    USEMODULE += periph_i2c_2
+  endif
+endif
