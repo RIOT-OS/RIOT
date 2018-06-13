@@ -141,11 +141,17 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
         }
         else if (res > 0) {
             bytes_left -= res;
-            if ((res == (2 + keep_eol)) && (strncmp(pos, "OK", 2) == 0)) {
+            size_t len_ok = sizeof(AT_RECV_OK) - 1;
+            size_t len_error = sizeof(AT_RECV_ERROR) - 1;
+            if (((size_t )res == (len_ok + keep_eol)) &&
+                (len_ok != 0) &&
+                (strncmp(pos, AT_RECV_OK, len_ok) == 0)) {
                 res = len - bytes_left;
                 break;
             }
-            else if ((res == (5 + keep_eol)) && (strncmp(pos, "ERROR", 5) == 0)) {
+            else if (((size_t )res == (len_error + keep_eol)) &&
+                     (len_error != 0) &&
+                     (strncmp(pos, AT_RECV_ERROR, len_error) == 0)) {
                 return -1;
             }
             else if (strncmp(pos, "+CME ERROR:", 11) == 0) {
@@ -204,8 +210,10 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
     char resp_buf[64];
 
     res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf), timeout);
+
     if (res > 0) {
-        if (strcmp(resp_buf, "OK") == 0) {
+        ssize_t len_ok = sizeof(AT_RECV_OK) - 1;
+        if ((len_ok != 0) && (strcmp(resp_buf, AT_RECV_OK) == 0)) {
             res = 0;
         }
         else {
