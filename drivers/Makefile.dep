@@ -304,6 +304,7 @@ endif
 
 ifneq (,$(filter sht1%,$(USEMODULE)))
   USEMODULE += sht1x
+  FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer
 endif
 

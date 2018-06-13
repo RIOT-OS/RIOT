@@ -59,6 +59,14 @@ extern "C" {
 #define MSP430_HAS_EXTERNAL_CRYSTAL 0
 /** @} */
 
+/**
+ * @name   Configure on-board SHT11 device
+ * @{
+ */
+#define SHT1X_PARAM_CLK             (GPIO_PIN(3, 5))
+#define SHT1X_PARAM_DATA            (GPIO_PIN(3, 4))
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
