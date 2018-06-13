@@ -66,7 +66,7 @@ static inline void mbox_init(mbox_t *mbox, msg_t *queue, unsigned int queue_size
 /**
  * @brief Add message to mailbox
  *
- * If the mailbox is full, this fuction will return right away.
+ * If the mailbox is full, this function will return right away.
  *
  * @internal
  *
@@ -82,7 +82,7 @@ int _mbox_put(mbox_t *mbox, msg_t *msg, int blocking);
 /**
  * @brief Get message from mailbox
  *
- * If the mailbox is empty, this fuction will return right away.
+ * If the mailbox is empty, this function will return right away.
  *
  * @internal
  *
@@ -98,7 +98,7 @@ int _mbox_get(mbox_t *mbox, msg_t *msg, int blocking);
 /**
  * @brief Add message to mailbox
  *
- * If the mailbox is full, this fuction will block until space becomes
+ * If the mailbox is full, this function will block until space becomes
  * available.
  *
  * @param[in] mbox  ptr to mailbox to operate on
@@ -112,7 +112,7 @@ static inline void mbox_put(mbox_t *mbox, msg_t *msg)
 /**
  * @brief Add message to mailbox
  *
- * If the mailbox is full, this fuction will return right away.
+ * If the mailbox is full, this function will return right away.
  *
  * @param[in] mbox  ptr to mailbox to operate on
  * @param[in] msg   ptr to message that will be copied into mailbox
@@ -128,7 +128,7 @@ static inline int mbox_try_put(mbox_t *mbox, msg_t *msg)
 /**
  * @brief Get message from mailbox
  *
- * If the mailbox is empty, this fuction will block until a message becomes
+ * If the mailbox is empty, this function will block until a message becomes
  * available.
  *
  * @param[in] mbox  ptr to mailbox to operate on
@@ -142,7 +142,7 @@ static inline void mbox_get(mbox_t *mbox, msg_t *msg)
 /**
  * @brief Get message from mailbox
  *
- * If the mailbox is empty, this fuction will return right away.
+ * If the mailbox is empty, this function will return right away.
  *
  * @param[in] mbox  ptr to mailbox to operate on
  * @param[in] msg   ptr to storage for retrieved message
