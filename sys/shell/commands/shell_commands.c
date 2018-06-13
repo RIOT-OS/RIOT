@@ -37,7 +37,7 @@ extern int _heap_handler(int argc, char **argv);
 extern int _ps_handler(int argc, char **argv);
 #endif
 
-#ifdef MODULE_SHT11
+#ifdef MODULE_SHT1X
 extern int _get_temperature_handler(int argc, char **argv);
 extern int _get_humidity_handler(int argc, char **argv);
 extern int _get_weather_handler(int argc, char **argv);
@@ -153,7 +153,7 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},
 #endif
-#ifdef MODULE_SHT11
+#ifdef MODULE_SHT1X
     {"temp", "Prints measured temperature.", _get_temperature_handler},
     {"hum", "Prints measured humidity.", _get_humidity_handler},
     {"weather", "Prints measured humidity and temperature.", _get_weather_handler},

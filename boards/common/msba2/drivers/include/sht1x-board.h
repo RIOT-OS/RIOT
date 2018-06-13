@@ -6,8 +6,8 @@
  * directory for more details.
  */
 
-#ifndef SHT11_BOARD_H
-#define SHT11_BOARD_H
+#ifndef SHT1X_BOARD_H
+#define SHT1X_BOARD_H
 
 /**
  * @ingroup     boards_common_msba2
@@ -32,25 +32,25 @@ extern "C" {
 #endif
 
 /*  serial clock line low */
-#define SHT11_SCK_LOW   FIO1CLR = BIT25;
+#define SHT1X_SCK_LOW   FIO1CLR = BIT25;
 /*  serial clock line high */
-#define SHT11_SCK_HIGH  FIO1SET = BIT25;
+#define SHT1X_SCK_HIGH  FIO1SET = BIT25;
 /*  read serial I/O */
-#define SHT11_DATA      ((FIO1PIN & BIT26) != 0)
+#define SHT1X_DATA      ((FIO1PIN & BIT26) != 0)
 /*  serial I/O line low */
-#define SHT11_DATA_LOW  (FIO1CLR = BIT26);
+#define SHT1X_DATA_LOW  (FIO1CLR = BIT26);
 /*  serial I/O line high */
-#define SHT11_DATA_HIGH (FIO1SET = BIT26);
+#define SHT1X_DATA_HIGH (FIO1SET = BIT26);
 /*  serial I/O as input */
-#define SHT11_DATA_IN   (FIO1DIR &= ~BIT26)
+#define SHT1X_DATA_IN   (FIO1DIR &= ~BIT26)
 /*  serial I/O as output */
-#define SHT11_DATA_OUT  (FIO1DIR |= BIT26)
+#define SHT1X_DATA_OUT  (FIO1DIR |= BIT26)
 
-#define SHT11_INIT      FIO1DIR |= BIT25; PINSEL3 &= ~(BIT14|BIT15 | BIT16|BIT17);
+#define SHT1X_INIT      FIO1DIR |= BIT25; PINSEL3 &= ~(BIT14|BIT15 | BIT16|BIT17);
 
 #ifdef __cplusplus
 }
 #endif
 
 /** @} */
-#endif /* SHT11_BOARD_H */
+#endif /* SHT1X_BOARD_H */

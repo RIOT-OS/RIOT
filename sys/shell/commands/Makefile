@@ -8,8 +8,8 @@ endif
 ifneq (,$(filter ps,$(USEMODULE)))
   SRC += sc_ps.c
 endif
-ifneq (,$(filter sht11,$(USEMODULE)))
-  SRC += sc_sht11.c
+ifneq (,$(filter sht1x,$(USEMODULE)))
+  SRC += sc_sht1x.c
 endif
 ifneq (,$(filter lpc2387,$(USEMODULE)))
   SRC += sc_heap.c

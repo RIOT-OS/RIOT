@@ -20,8 +20,8 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_SHT11
-#include "sht11.h"
+#ifdef MODULE_SHT1X
+#include "sht1x.h"
 #endif
 
 #ifdef MODULE_MCI
@@ -101,9 +101,9 @@ void auto_init(void)
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
 #endif
-#ifdef MODULE_SHT11
-    DEBUG("Auto init SHT11 module.\n");
-    sht11_init();
+#ifdef MODULE_SHT1X
+    DEBUG("Auto init SHT1X module.\n");
+    sht1x_init();
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");

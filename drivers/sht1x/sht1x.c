@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_sht11
+ * @ingroup     drivers_sht1x
  * @brief       Driver for the Sensirion SHT11 humidity and temperature sensor
  * @{
  *
@@ -16,7 +16,7 @@
  *
  * @version     $Revision: 2396 $
  *
- * @note        $Id: sht11.c 2396 2010-07-06 15:12:35Z ziegert $
+ * @note        $Id: sht1x.c 2396 2010-07-06 15:12:35Z ziegert $
  * @}
  */
 
@@ -25,11 +25,11 @@
 
 #include "xtimer.h"
 #include "mutex.h"
-#include "sht11.h"
-#include "sht11-board.h"
+#include "sht1x.h"
+#include "sht1x-board.h"
 #include "bitarithm.h"
 
-float sht11_temperature_offset;
+float sht1x_temperature_offset;
 
 /**
  * @brief   Perform measurement
@@ -76,15 +76,15 @@ static void transmission_start(void);
 static inline void clk_signal(void);
 
 /* mutex for exclusive measurement operation */
-mutex_t sht11_mutex = MUTEX_INIT;
+mutex_t sht1x_mutex = MUTEX_INIT;
 
 /*---------------------------------------------------------------------------*/
 static inline void clk_signal(void)
 {
-    SHT11_SCK_HIGH;
-    xtimer_usleep(SHT11_CLK_WAIT);
-    SHT11_SCK_LOW;
-    xtimer_usleep(SHT11_CLK_WAIT);
+    SHT1X_SCK_HIGH;
+    xtimer_usleep(SHT1X_CLK_WAIT);
+    SHT1X_SCK_LOW;
+    xtimer_usleep(SHT1X_CLK_WAIT);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -93,17 +93,17 @@ static uint8_t write_byte(uint8_t value)
     uint8_t i;
     uint8_t ack;
 
-    SHT11_DATA_OUT;
+    SHT1X_DATA_OUT;
 
     /* send value bit by bit to sht11 */
     for (i = 0; i < 8; i++) {
         if (value & BIT7) {
-            SHT11_DATA_HIGH;
-            xtimer_usleep(SHT11_DATA_WAIT);
+            SHT1X_DATA_HIGH;
+            xtimer_usleep(SHT1X_DATA_WAIT);
         }
         else {
-            SHT11_DATA_LOW;
-            xtimer_usleep(SHT11_DATA_WAIT);
+            SHT1X_DATA_LOW;
+            xtimer_usleep(SHT1X_DATA_WAIT);
         }
 
         /* trigger clock signal */
@@ -114,9 +114,9 @@ static uint8_t write_byte(uint8_t value)
     }
 
     /* wait for ack */
-    SHT11_DATA_IN;
-    xtimer_usleep(SHT11_CLK_WAIT);
-    ack = SHT11_DATA;
+    SHT1X_DATA_IN;
+    xtimer_usleep(SHT1X_CLK_WAIT);
+    ack = SHT1X_DATA;
 
     clk_signal();
 
@@ -128,40 +128,40 @@ static uint8_t read_byte(uint8_t ack)
     uint8_t i;
     uint8_t value = 0;
 
-    SHT11_DATA_IN;
-    xtimer_usleep(SHT11_DATA_WAIT);
+    SHT1X_DATA_IN;
+    xtimer_usleep(SHT1X_DATA_WAIT);
 
     /* read value bit by bit */
     for (i = 0; i < 8; i++) {
         value = value << 1;
-        SHT11_SCK_HIGH;
-        xtimer_usleep(SHT11_CLK_WAIT);
+        SHT1X_SCK_HIGH;
+        xtimer_usleep(SHT1X_CLK_WAIT);
 
-        if (SHT11_DATA) {
+        if (SHT1X_DATA) {
             /* increase data by one when DATA is high */
             value++;
         }
 
-        SHT11_SCK_LOW;
-        xtimer_usleep(SHT11_CLK_WAIT);
+        SHT1X_SCK_LOW;
+        xtimer_usleep(SHT1X_CLK_WAIT);
     }
 
     /* send ack if necessary */
-    SHT11_DATA_OUT;
+    SHT1X_DATA_OUT;
 
     if (ack) {
-        SHT11_DATA_LOW;
-        xtimer_usleep(SHT11_DATA_WAIT);
+        SHT1X_DATA_LOW;
+        xtimer_usleep(SHT1X_DATA_WAIT);
     }
     else {
-        SHT11_DATA_HIGH;
-        xtimer_usleep(SHT11_DATA_WAIT);
+        SHT1X_DATA_HIGH;
+        xtimer_usleep(SHT1X_DATA_WAIT);
     }
 
     clk_signal();
 
     /* release data line */
-    SHT11_DATA_IN;
+    SHT1X_DATA_IN;
 
     return value;
 }
@@ -173,31 +173,31 @@ static void transmission_start(void)
                  ___     ___
        SCK : ___|   |___|   |______
     */
-    SHT11_DATA_OUT;
+    SHT1X_DATA_OUT;
 
     /* set initial state */
-    SHT11_DATA_HIGH;
-    xtimer_usleep(SHT11_DATA_WAIT);
-    SHT11_SCK_LOW;
-    xtimer_usleep(SHT11_CLK_WAIT);
+    SHT1X_DATA_HIGH;
+    xtimer_usleep(SHT1X_DATA_WAIT);
+    SHT1X_SCK_LOW;
+    xtimer_usleep(SHT1X_CLK_WAIT);
 
-    SHT11_SCK_HIGH;
-    xtimer_usleep(SHT11_CLK_WAIT);
+    SHT1X_SCK_HIGH;
+    xtimer_usleep(SHT1X_CLK_WAIT);
 
-    SHT11_DATA_LOW;
-    xtimer_usleep(SHT11_DATA_WAIT);
+    SHT1X_DATA_LOW;
+    xtimer_usleep(SHT1X_DATA_WAIT);
 
-    SHT11_SCK_LOW;
-    xtimer_usleep(SHT11_CLK_WAIT);
+    SHT1X_SCK_LOW;
+    xtimer_usleep(SHT1X_CLK_WAIT);
 
-    SHT11_SCK_HIGH;
-    xtimer_usleep(SHT11_CLK_WAIT);
+    SHT1X_SCK_HIGH;
+    xtimer_usleep(SHT1X_CLK_WAIT);
 
-    SHT11_DATA_HIGH;
-    xtimer_usleep(SHT11_DATA_WAIT);
+    SHT1X_DATA_HIGH;
+    xtimer_usleep(SHT1X_DATA_WAIT);
 
-    SHT11_SCK_LOW;
-    xtimer_usleep(SHT11_CLK_WAIT);
+    SHT1X_SCK_LOW;
+    xtimer_usleep(SHT1X_CLK_WAIT);
 }
 /*---------------------------------------------------------------------------*/
 static void connection_reset(void)
@@ -208,10 +208,10 @@ static void connection_reset(void)
        SCK : __| |__| |__| |__| |__| |__| |__| |__| |__| |______|   |___|   |__
     */
     uint8_t i;
-    SHT11_DATA_HIGH;
-    xtimer_usleep(SHT11_DATA_WAIT);
-    SHT11_SCK_LOW;
-    xtimer_usleep(SHT11_CLK_WAIT);
+    SHT1X_DATA_HIGH;
+    xtimer_usleep(SHT1X_DATA_WAIT);
+    SHT1X_SCK_LOW;
+    xtimer_usleep(SHT1X_CLK_WAIT);
 
     for (i = 0; i < 9; i++) {
         clk_signal();
@@ -232,8 +232,8 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
     xtimer_usleep(1000);
 
     /* wait untile sensor has finished measurement or timeout */
-    for (i = 0; (i < SHT11_MEASURE_TIMEOUT) && (!error); i++) {
-        ack = SHT11_DATA;
+    for (i = 0; (i < SHT1X_MEASURE_TIMEOUT) && (!error); i++) {
+        ack = SHT1X_DATA;
 
         if (!ack) {
             break;
@@ -245,44 +245,44 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
     error += ack;
 
     /* read MSB */
-    *(p_value + 1) = read_byte(SHT11_ACK);
+    *(p_value + 1) = read_byte(SHT1X_ACK);
     /* read LSB */
-    *(p_value) = read_byte(SHT11_ACK);
+    *(p_value) = read_byte(SHT1X_ACK);
     /* read checksum */
-    *p_checksum = read_byte(SHT11_NO_ACK);
+    *p_checksum = read_byte(SHT1X_NO_ACK);
 
     return (!error);
 }
 /*---------------------------------------------------------------------------*/
-void sht11_init(void)
+void sht1x_init(void)
 {
-    sht11_temperature_offset = 0;
-    SHT11_INIT;
+    sht1x_temperature_offset = 0;
+    SHT1X_INIT;
     xtimer_usleep(11 * 1000);
 }
 /*---------------------------------------------------------------------------*/
-uint8_t sht11_read_status(uint8_t *p_value, uint8_t *p_checksum)
+uint8_t sht1x_read_status(uint8_t *p_value, uint8_t *p_checksum)
 {
     uint8_t error = 0;
 
     transmission_start();
-    error |= write_byte(SHT11_STATUS_REG_R);
-    *p_value = read_byte(SHT11_ACK);
-    *p_checksum = read_byte(SHT11_NO_ACK);
+    error |= write_byte(SHT1X_STATUS_REG_R);
+    *p_value = read_byte(SHT1X_ACK);
+    *p_checksum = read_byte(SHT1X_NO_ACK);
     return (!error);
 }
 /*---------------------------------------------------------------------------*/
-uint8_t sht11_write_status(uint8_t *p_value)
+uint8_t sht1x_write_status(uint8_t *p_value)
 {
     uint8_t error = 0;
 
     transmission_start();
-    error += write_byte(SHT11_STATUS_REG_W);
+    error += write_byte(SHT1X_STATUS_REG_W);
     error += write_byte(*p_value);
     return (!error);
 }
 /*---------------------------------------------------------------------------*/
-uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode)
+uint8_t sht1x_read_sensor(sht1x_val_t *value, sht1x_mode_t mode)
 {
     uint8_t error = 0;
     uint8_t checksum;
@@ -313,28 +313,28 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode)
     value->relhum = 0;
     value->relhum_temp = 0;
 
-    mutex_lock(&sht11_mutex);
+    mutex_lock(&sht1x_mutex);
     connection_reset();
 
     /* measure humidity */
     if (mode & HUMIDITY) {
-        error += (!measure((uint8_t *) &humi_int, &checksum, SHT11_MEASURE_HUMI));
+        error += (!measure((uint8_t *) &humi_int, &checksum, SHT1X_MEASURE_HUMI));
     }
 
     /* measure temperature */
     if (mode & TEMPERATURE) {
-        error += (!measure((uint8_t *) &temp_int, &checksum, SHT11_MEASURE_TEMP));
+        error += (!measure((uint8_t *) &temp_int, &checksum, SHT1X_MEASURE_TEMP));
     }
 
     /* break on error */
     if (error != 0) {
         connection_reset();
-        mutex_unlock(&sht11_mutex);
+        mutex_unlock(&sht1x_mutex);
         return 0;
     }
 
     if (mode & TEMPERATURE) {
-        value->temperature = D1 + (D2 * ((float) temp_int)) + sht11_temperature_offset;
+        value->temperature = D1 + (D2 * ((float) temp_int)) + sht1x_temperature_offset;
     }
 
     if (mode & HUMIDITY) {
@@ -345,6 +345,6 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode)
         }
     }
 
-    mutex_unlock(&sht11_mutex);
+    mutex_unlock(&sht1x_mutex);
     return 1;
 }

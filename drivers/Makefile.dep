@@ -302,7 +302,8 @@ ifneq (,$(filter servo,$(USEMODULE)))
   FEATURES_REQUIRED += periph_pwm
 endif
 
-ifneq (,$(filter sht11,$(USEMODULE)))
+ifneq (,$(filter sht1%,$(USEMODULE)))
+  USEMODULE += sht1x
   USEMODULE += xtimer
 endif
 
