@@ -145,17 +145,18 @@ static vfs_mount_t _test_cryptofs_mount = {
 static void test_cryptofs_setup(void)
 {
     littlefs_desc.dev = _dev;
+    vfs_mount(&_test_littlefs_mount);
 }
 
 static void test_cryptofs_teardown(void)
 {
-
+    vfs_umount(&_test_littlefs_mount);
 }
 
 static void tests_cryptofs_mount_umount(void)
 {
     int res;
-    res = vfs_format(&_test_littlefs_mount);
+    res = vfs_format(&_test_cryptofs_mount);
     TEST_ASSERT_EQUAL_INT(0, res);
 
     res = vfs_mount(&_test_cryptofs_mount);
