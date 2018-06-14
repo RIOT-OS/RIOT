@@ -87,10 +87,35 @@ void gpio_init_af(gpio_t pin, uint8_t sel, uint8_t over);
  * @param[in] func  Set pin for peripheral function (input)
  */
 void gpio_init_mux(gpio_t pin, uint8_t over, uint8_t sel, uint8_t func);
+
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+/** @} */
+
+/**
+ * @name   Override I2C clock speed values
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       = 0x01,     /**< not supported */
+    I2C_SPEED_NORMAL    = 100000U,  /**< normal mode:   ~100kbit/s */
+    I2C_SPEED_FAST      = 400000U,  /**< fast mode:     ~400kbit/s */
+    I2C_SPEED_FAST_PLUS = 0x02,     /**< not supported */
+    I2C_SPEED_HIGH      = 0x03,     /**< not supported */
+} i2c_speed_t;
+/** @} */
 /**
  * @brief   I2C configuration options
  */
 typedef struct {
+    i2c_speed_t speed;      /**< baudrate used for the bus */
     gpio_t scl_pin;         /**< pin used for SCL */
     gpio_t sda_pin;         /**< pin used for SDA */
 } i2c_conf_t;
