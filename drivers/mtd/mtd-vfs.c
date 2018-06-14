@@ -15,6 +15,9 @@
 #include "mtd.h"
 #include "vfs.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 /**
  * @ingroup     drivers_mtd
  * @{
@@ -114,22 +117,43 @@ static ssize_t mtd_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes)
     if (mtd == NULL) {
         return -EFAULT;
     }
+    uint32_t sector_size = mtd->pages_per_sector * mtd->page_size;
+    if (filp->pos % sector_size != 0) {
+        DEBUG("mtd_vfs_write: cur file pos not aligned on a sector boundary\n");
+        return -EINVAL;
+    }
+    if (nbytes % sector_size != 0) {
+        DEBUG("mtd_vfs_write: size not aligned on a sector boundary\n");
+        return -EINVAL;
+    }
     uint32_t size = mtd->page_size * mtd->sector_count * mtd->pages_per_sector;
     uint32_t dest = filp->pos;
     if (dest >= size) {
         /* attempt to write outside the device memory */
+        DEBUG("mtd_vfs_write: trying to write outside memory\n");
         return -ENOSPC;
     }
     if ((dest + nbytes) > size) {
         nbytes = size - dest;
     }
-    int res = mtd_write(mtd, src, dest, nbytes);
+    int res = mtd_erase(mtd, filp->pos, nbytes);
     if (res < 0) {
+        DEBUG("mtd_vfs_write: error when erasing\n");
         return res;
     }
+    const uint8_t *src_ = src;
+    size_t total = 0;
+    for (size_t i = 0; i < nbytes; i += mtd->page_size) {
+        res = mtd_write(mtd, src_ + i, dest + i, mtd->page_size);
+        if (res < 0) {
+            DEBUG("mtd_vfs_write: error when writing\n");
+            return res;
+        }
+        total += res;
+    }
     /* Advance file position */
-    filp->pos += res;
-    return res;
+    filp->pos += total;
+    return total;
 }
 
 /** @} */
