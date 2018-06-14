@@ -661,7 +661,7 @@ static void test_pktbuf_hold__pkt_null(void)
 
 static void test_pktbuf_hold__pkt_external(void)
 {
-    gnrc_pktsnip_t pkt = { NULL, TEST_STRING8, sizeof(TEST_STRING8), 1, GNRC_NETTYPE_TEST };
+    gnrc_pktsnip_t pkt = { NULL, (void *)TEST_STRING8, sizeof(TEST_STRING8), 1, GNRC_NETTYPE_TEST };
 
     gnrc_pktbuf_hold(&pkt, 1);
     TEST_ASSERT(gnrc_pktbuf_is_empty());

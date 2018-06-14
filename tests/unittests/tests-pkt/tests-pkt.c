@@ -27,10 +27,10 @@
 #include "tests-pkt.h"
 
 #define _INIT_ELEM(len, _data, _next) \
-    { .users = 1, .next = (_next), .data = (_data), \
+    { .users = 1, .next = (_next), .data = (void *)(_data), \
       .size = (len), .type = GNRC_NETTYPE_UNDEF \
     }
-#define _INIT_ELEM_STATIC_DATA(data, next) _INIT_ELEM(sizeof(data), data, next)
+#define _INIT_ELEM_STATIC_DATA(data, next) _INIT_ELEM(sizeof(data), (void *)(data), (next))
 
 #define _INIT_ELEM_STATIC_TYPE(_type, _next) \
     { .users = 1, .next = (_next), .data = NULL, .size = 0, .type = (_type) }
