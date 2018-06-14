@@ -79,6 +79,15 @@ typedef uint32_t gpio_t;
 void gpio_init_af(gpio_t pin, uint8_t sel, uint8_t over);
 
 /**
+ * @brief   Configure an alternate function for the given pin
+ *
+ * @param[in] pin   gpio pin
+ * @param[in] over  Override pin configuration
+ * @param[in] sel   Set peripheral function for pin (output)
+ * @param[in] func  Set pin for peripheral function (input)
+ */
+void gpio_init_mux(gpio_t pin, uint8_t over, uint8_t sel, uint8_t func);
+/**
  * @brief   I2C configuration options
  */
 typedef struct {
