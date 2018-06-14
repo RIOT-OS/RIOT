@@ -32,23 +32,17 @@
  * @name    I2C configuration
  * @{
  */
-#define I2C_NUMOF               1
-#define I2C_0_EN                1
 #define I2C_IRQ_PRIO            1
 
-/* I2C 0 device configuration */
-#define I2C_0_DEV               0
-#define I2C_0_IRQ               I2C_IRQn
-#define I2C_0_IRQ_HANDLER       isr_i2c
-#define I2C_0_SCL_PIN           GPIO_PB1
-#define I2C_0_SDA_PIN           GPIO_PB0
-
-static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+static const i2c_conf_t i2c_config[] = {
     {
-        .scl_pin = I2C_0_SCL_PIN,
-        .sda_pin = I2C_0_SDA_PIN,
+        .speed = I2C_SPEED_FAST,    /**< bus speed */
+        .scl_pin = GPIO_PIN(1, 1),  /**< GPIO_PB1 */
+        .sda_pin = GPIO_PIN(1, 0)   /**< GPIO_PB0 */
     },
 };
+
+#define I2C_NUMOF               (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**
