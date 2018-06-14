@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2018 Acutam Automation, LLC
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief       SAUL registry shell commands
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  *
  * @}
  */
@@ -25,57 +27,65 @@
 
 #include "saul_reg.h"
 
-/* this function does not check, if the given device is valid */
-static void probe(int num, saul_reg_t *dev)
+/* this function does not check if the given device is valid */
+static void probe(unsigned num, saul_ctxt_ptr_t ctxt_ptr, void *arg)
 {
+    (void)arg;
+
     int dim;
     phydat_t res;
 
-    dim = saul_reg_read(dev, &res);
+    dim = saul_reg_read(ctxt_ptr.reg, ctxt_ptr.ctxt, &res);
     if (dim <= 0) {
-        printf("error: failed to read from device #%i\n", num);
+        printf("error: failed to read from device #%u\n", num);
         return;
     }
+
     /* print results */
-    printf("Reading from #%i (%s|%s)\n", num, dev->name,
-           saul_class_to_str(dev->driver->type));
+    printf("Reading from #%u (", num);
+
+    /* replace context item number in name */
+    printf(ctxt_ptr.reg->name, ctxt_ptr.num);
+
+    printf("|%s)\n", saul_class_to_str(ctxt_ptr.reg->driver->type));
+
     phydat_dump(&res, dim);
 }
 
 static void probe_all(void)
 {
-    saul_reg_t *dev = saul_reg;
-    int i = 0;
+    saul_reg_iter(probe, NULL);
+}
 
-    while (dev) {
-        probe(i++, dev);
-        puts("");
-        dev = dev->next;
-    }
+static void list_print_item(unsigned num, saul_ctxt_ptr_t ctxt_ptr, void *arg)
+{
+    (void)arg;
+
+    printf("#%u\t%s\t", num, saul_class_to_str(ctxt_ptr.reg->driver->type));
+
+    /* replace context item number in name */
+    printf(ctxt_ptr.reg->name, ctxt_ptr.num);
+
+    /* print newline */
+    puts("");
 }
 
 static void list(void)
 {
-    saul_reg_t *dev = saul_reg;
-    int i = 0;
-
-    if (dev) {
+    if (saul_reg) {
         puts("ID\tClass\t\tName");
     }
     else {
         puts("No devices found");
     }
-    while (dev) {
-        printf("#%i\t%s\t%s\n",
-               i++, saul_class_to_str(dev->driver->type), dev->name);
-        dev = dev->next;
-    }
+
+    saul_reg_iter(list_print_item, NULL);
 }
 
 static void read(int argc, char **argv)
 {
-    int num;
-    saul_reg_t *dev;
+    unsigned num;
+    saul_ctxt_ptr_t ctxt_ptr;
 
     if (argc < 3) {
         printf("usage: %s %s <device id>|all\n", argv[0], argv[1]);
@@ -87,18 +97,17 @@ static void read(int argc, char **argv)
     }
     /* get device id */
     num = atoi(argv[2]);
-    dev = saul_reg_find_nth(num);
-    if (dev == NULL) {
+    if (saul_reg_find_nth(&ctxt_ptr, num) == NULL) {
         puts("error: undefined device id given");
         return;
     }
-    probe(num, dev);
+    probe(num, ctxt_ptr, NULL);
 }
 
 static void write(int argc, char **argv)
 {
     int num, dim;
-    saul_reg_t *dev;
+    saul_ctxt_ptr_t ctxt_ptr;
     phydat_t data;
 
     if (argc < 4) {
@@ -107,8 +116,7 @@ static void write(int argc, char **argv)
         return;
     }
     num = atoi(argv[2]);
-    dev = saul_reg_find_nth(num);
-    if (dev == NULL) {
+    if (saul_reg_find_nth(&ctxt_ptr, num) == NULL) {
         puts("error: undefined device given");
         return;
     }
@@ -118,11 +126,16 @@ static void write(int argc, char **argv)
     for (int i = 0; i < dim; i++) {
         data.val[i] = atoi(argv[i + 3]);
     }
+
     /* print values before writing */
-    printf("Writing to device #%i - %s\n", num, dev->name);
+    printf("Writing to device #%i - ", num);
+    /* replace context in name */
+    printf(ctxt_ptr.reg->name, ctxt_ptr.num);
+    puts("");
+
     phydat_dump(&data, dim);
     /* write values to device */
-    dim = saul_reg_write(dev, &data);
+    dim = saul_reg_write(ctxt_ptr.reg, ctxt_ptr.ctxt, &data);
     if (dim <= 0) {
         if (dim == -ENOTSUP) {
             printf("error: device #%i is not writable\n", num);
