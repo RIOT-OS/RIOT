@@ -111,14 +111,15 @@ enum {
  * Actuators can chose to either just return -ENOTSUP or to return their current
  * set value (e.g. useful for reading back the current state of a switch)
  *
- * @param[in] dev       device descriptor of the target device
- * @param[out] res      data read from the device
+ * @param[in] dev     device descriptor of the target device
+ * @param[in] ctxt    context for target device
+ * @param[out] res    data read from the device
  *
  * @return  number of values written into to result data structure [1-3]
  * @return  -ENOTSUP if the device does not support this operation
  * @return  -ECANCELED on other errors
  */
-typedef int(*saul_read_t)(const void *dev, phydat_t *res);
+typedef int(*saul_read_t)(const void *dev, const uint8_t ctxt, phydat_t *res);
 
 /**
  * @brief   Write a value (a set of values) to a device
@@ -131,14 +132,15 @@ typedef int(*saul_read_t)(const void *dev, phydat_t *res);
  * For actuators this function is used to influence the actuators state, e.g.
  * switching a switch or setting the speed of a motor.
  *
- * @param[in] dev       device descriptor of the target device
- * @param[in] data      data to write to the device
+ * @param[in] dev     device descriptor of the target device
+ * @param[in] ctxt    context for target device
+ * @param[in] data    data to write to the device
  *
  * @return  number of values actually processed by the device [1-3]
  * @return  -ENOTSUP if the device does not support this operation
  * @return  -ECANCELED on other errors
  */
-typedef int(*saul_write_t)(const void *dev, phydat_t *data);
+typedef int(*saul_write_t)(const void *dev, const uint8_t ctxt, phydat_t *data);
 
 /**
  * @brief   Definition of the RIOT actuator/sensor interface
@@ -152,7 +154,7 @@ typedef struct {
 /**
  * @brief   Default not supported function
  */
-int saul_notsup(const void *dev, phydat_t *dat);
+int saul_notsup(const void *dev, const uint8_t ctxt, phydat_t *dat);
 
 /**
  * @brief   Helper function converts a class ID to a string

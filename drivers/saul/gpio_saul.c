@@ -26,12 +26,12 @@
 #include "saul/periph.h"
 
 
-static int read(const void *dev, phydat_t *res)
+static int read(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
     const saul_gpio_params_t *p = (const saul_gpio_params_t *)dev;
     int inverted = (p->flags & SAUL_GPIO_INVERTED);
 
-    res->val[0] = (gpio_read(p->pin)) ? !inverted : inverted;
+    res->val[0] = (gpio_read(p->pin + ctxt)) ? !inverted : inverted;
 
     memset(&(res->val[1]), 0, 2 * sizeof(int16_t));
     res->unit = UNIT_BOOL;
@@ -39,13 +39,13 @@ static int read(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int write(const void *dev, phydat_t *state)
+static int write(const void *dev, const uint8_t ctxt, phydat_t *state)
 {
     const saul_gpio_params_t *p = (const saul_gpio_params_t *)dev;
     int inverted = (p->flags & SAUL_GPIO_INVERTED);
     int value = (state->val[0] ? !inverted : inverted);
 
-    gpio_write(p->pin, value);
+    gpio_write(p->pin + ctxt, value);
     return 1;
 }
 

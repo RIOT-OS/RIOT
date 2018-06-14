@@ -19,6 +19,8 @@
 #ifndef SAUL_PERIPH_H
 #define SAUL_PERIPH_H
 
+#include "saul_reg.h"
+
 #if MODULE_SAUL_GPIO || DOXYGEN
 #include "periph/gpio.h"
 #endif /* MODULE_SAUL_GPIO */
@@ -45,10 +47,11 @@ typedef enum {
  * @brief   Direct mapped GPIO configuration values
  */
 typedef struct {
-    const char *name;           /**< name of the device connected to this pin */
-    gpio_t pin;                 /**< GPIO pin to initialize and expose */
-    gpio_mode_t mode;           /**< pin mode to use */
-    saul_gpio_flags_t flags;    /**< Configuration flags */
+    const char *name;            /**< name of the device(s) on this pin */
+    gpio_t pin;                  /**< GPIO pin offset for ctxtlist */
+    saul_ctxt_list_t pinlist;    /**< bit list of pins to map */
+    gpio_mode_t mode;            /**< pin mode to use */
+    saul_gpio_flags_t flags;     /**< Configuration flags */
 } saul_gpio_params_t;
 #endif /* MODULE_SAUL_GPIO */
 
@@ -57,9 +60,10 @@ typedef struct {
  * @brief   Direct mapped ADC configuration values
  */
 typedef struct {
-    const char *name;       /**< name of the device connected to this pin */
-    adc_t line;             /**< ADC line to initialize and expose */
-    adc_res_t res;          /**< ADC resolution */
+    const char *name;             /**< name of the device(s) on this pin */
+    adc_t line;                   /**< ADC line offset for ctxtlist */
+    saul_ctxt_list_t linelist;    /**< bit list of lines to expose */
+    adc_res_t res;                /**< ADC resolution */
 } saul_adc_params_t;
 #endif /* MODULE_SAUL_ADC */
 

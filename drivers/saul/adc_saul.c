@@ -26,10 +26,10 @@
 #include "periph/adc.h"
 
 
-static int read_adc(const void *dev, phydat_t *res)
+static int read_adc(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
     const saul_adc_params_t *params = *((const saul_adc_params_t **)dev);
-    res->val[0] = adc_sample(params->line, params->res);
+    res->val[0] = adc_sample(params->line + ctxt, params->res);
     memset(&(res->val[1]), 0, 2 * sizeof(res->val[1]));
     /* Raw ADC reading has no unit */
     res->unit = UNIT_NONE;
