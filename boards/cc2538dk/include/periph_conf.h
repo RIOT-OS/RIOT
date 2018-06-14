@@ -84,23 +84,17 @@ static const uart_conf_t uart_config[] = {
  * @name I2C configuration
  * @{
  */
-#define I2C_NUMOF               1
-#define I2C_0_EN                1
 #define I2C_IRQ_PRIO            1
 
-/* I2C 0 device configuration */
-#define I2C_0_DEV               0
-#define I2C_0_IRQ               I2C_IRQn
-#define I2C_0_IRQ_HANDLER       isr_i2c
-#define I2C_0_SCL_PIN           GPIO_PA2 /* SPI_SCK on the SmartRF06 baseboard */
-#define I2C_0_SDA_PIN           GPIO_PA4 /* SPI_MOSI on the SmartRF06 baseboard */
-
-static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+static const i2c_conf_t i2c_config[] = {
     {
-        .scl_pin = GPIO_PA2, /* SPI_SCK on the SmartRF06 baseboard */
-        .sda_pin = GPIO_PA4, /* SPI_MOSI on the SmartRF06 baseboard */
+        .speed = I2C_SPEED_FAST,    /**< bus speed */
+        .scl_pin = GPIO_PIN(0, 2),  /**< GPIO_PA2, SPI_SCK  on SmartRF06 */
+        .sda_pin = GPIO_PIN(0, 4)   /**< GPIO_PA4, SPI_MOSI on SmartRF06 */
     },
 };
+
+#define I2C_NUMOF               (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**
