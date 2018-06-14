@@ -226,6 +226,11 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
     sched_set_status(me, STATUS_REPLY_BLOCKED);
     me->wait_data = (void*) reply;
 
+    /* we re-use (abuse) reply for sending, because wait_data might be
+     * overwritten if the target is not in RECEIVE_BLOCKED */
+    *reply = *m;
+
+    /* msg_send blocks until reply received */
 #ifdef MODULE_CORE_PRIORITY_INHERITANCE
     thread_t *recv_thread = (thread_t*) sched_threads[target_pid];
     uint8_t prio_backup = recv_thread->priority;
@@ -234,13 +239,6 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
     if (me->priority < recv_thread->priority) {
         sched_change_priority(recv_thread, me->priority);
     }
-#endif
-
-    /* we re-use (abuse) reply for sending, because wait_data might be
-     * overwritten if the target is not in RECEIVE_BLOCKED */
-    *reply = *m;
-    /* msg_send blocks until reply received */
-#ifdef MODULE_CORE_PRIORITY_INHERITANCE
     int res = _msg_send(reply, target_pid, true, state);
     sched_change_priority(recv_thread, prio_backup);
     return res;

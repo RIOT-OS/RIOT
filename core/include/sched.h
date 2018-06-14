@@ -179,10 +179,9 @@ NORETURN void sched_task_exit(void);
 /**
  * @brief   Change the priority of the given thread
  *
- * @note    This functions expects interrupts to be disabled when called!
- *
  * @pre     (thread != NULL)
  * @pre     (priority < SCHED_PRIO_LEVELS)
+ * @pre     interrupts must be disabled
  *
  * @param[in,out] thread    target thread
  * @param[in]     priority  new priority to assign to @p thread
