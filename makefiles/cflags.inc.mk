@@ -39,11 +39,11 @@ endif
 ifeq ($(shell $(CC) -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
   # duplicated parameters don't hurt
   CFLAGS += -Wstrict-prototypes -Wold-style-definition
-  CXXUWFLAGS += -Wstrict-prototypes -Wold-style-definition
 endif
 
 # Unwanted flags for c++
 CXXUWFLAGS += -std=%
+CXXUWFLAGS += -Wstrict-prototypes -Wold-style-definition
 
 ifeq ($(LTO),1)
   $(warning Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.)
