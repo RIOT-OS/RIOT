@@ -72,14 +72,39 @@ void auto_init_gpio(void)
         else {
             saul_reg_entries[i].driver = &gpio_out_saul_driver;
         }
-        /* initialize the GPIO pin */
-        gpio_init(p->pin, p->mode);
+
         /* set initial pin state if configured */
+        phydat_t s;
         if (p->flags & (SAUL_GPIO_INIT_CLEAR | SAUL_GPIO_INIT_SET)) {
-            phydat_t s;
             s.val[0] = (p->flags & SAUL_GPIO_INIT_SET);
-            saul_reg_entries[i].driver->write(p, &s);
         }
+        else {
+            s.val[0] = -1;
+        }
+
+        /* initialize the GPIO pin(s) */
+        if (p->pinlist == 0) {
+            /* ignore empty pinlist */
+            gpio_init(p->pin, p->mode);
+            if (s.val[0] != -1) {
+                saul_reg_entries[i].driver->write(p, 0, &s);
+            }
+        }
+        else {
+            for (unsigned j = 0; j < 8 * sizeof(p->pinlist); j++) {
+                /* check to see if this context bit is enabled */
+                if ((p->pinlist >> j) & 0x1) {
+                    gpio_init(p->pin + j, p->mode);
+                    if (s.val[0] != -1) {
+                        saul_reg_entries[i].driver->write(p, j, &s);
+                    }
+                }
+            }
+        }
+
+        /* populate context list */
+        saul_reg_entries[i].ctxtlist = p->pinlist;
+
         /* add to registry */
         saul_reg_add(&(saul_reg_entries[i]));
     }
