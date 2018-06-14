@@ -31,7 +31,7 @@
 #include "memarray.h"
 
 typedef struct {
-    char *hex;
+    const char *hex;
     cn_cbor_error err;
 } cbor_failure;
 
@@ -81,7 +81,7 @@ static void setup_cn_cbor(void)
 
 static void test_parse(void)
 {
-    char *tests[] = {
+    const char *tests[] = {
         "00",                       // 0
         "01",                       // 1
         "17",                       // 23
@@ -134,7 +134,7 @@ static void test_parse(void)
         "bf61610161629f0203ffff",   // {_ "a": 1, "b": [_ 2, 3]}
     };
 
-    for (test = 0; test < sizeof(tests) / sizeof(char*); test++) {
+    for (test = 0; test < sizeof(tests) / sizeof(tests[0]); test++) {
         unsigned char buf[64] = {0};
         TEST_ASSERT((strlen(tests[test])/2) <= sizeof(buf));
 
