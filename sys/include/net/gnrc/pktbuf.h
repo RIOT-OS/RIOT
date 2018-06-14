@@ -84,7 +84,7 @@ void gnrc_pktbuf_init(void);
  * @return  Pointer to the packet part that represents the new gnrc_pktsnip_t.
  * @return  NULL, if no space is left in the packet buffer.
  */
-gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
+gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t size,
                                 gnrc_nettype_t type);
 
 /**

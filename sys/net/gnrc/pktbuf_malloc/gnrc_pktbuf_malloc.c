@@ -60,7 +60,7 @@ static inline void _free(void *ptr)
 #endif
 
 /* internal gnrc_pktbuf functions */
-static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, void *data, size_t size,
+static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size_t size,
                                     gnrc_nettype_t type);
 
 static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
@@ -83,7 +83,7 @@ void gnrc_pktbuf_init(void)
 #endif
 }
 
-gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
+gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t size,
                                 gnrc_nettype_t type)
 {
     gnrc_pktsnip_t *pkt;
@@ -270,7 +270,7 @@ bool gnrc_pktbuf_is_sane(void)
 }
 #endif
 
-static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, void *data, size_t size,
+static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size_t size,
                                     gnrc_nettype_t type)
 {
     gnrc_pktsnip_t *pkt = _malloc(sizeof(gnrc_pktsnip_t));
