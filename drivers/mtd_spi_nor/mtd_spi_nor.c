@@ -44,10 +44,6 @@
 #define TRACE(...)
 #endif
 
-#ifndef MTD_SPI_NOR_WRITE_WAIT_US
-#define MTD_SPI_NOR_WRITE_WAIT_US (50 * US_PER_MS)
-#endif
-
 #define MTD_32K             (32768ul)
 #define MTD_32K_ADDR_MASK   (0x7FFF)
 #define MTD_4K              (4096ul)
@@ -266,11 +262,7 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev)
         if ((status & 1) == 0) { /* TODO magic number */
             break;
         }
-#if MODULE_XTIMER
-        xtimer_usleep(MTD_SPI_NOR_WRITE_WAIT_US);
-#else
         thread_yield();
-#endif
     } while (1);
 }
 
