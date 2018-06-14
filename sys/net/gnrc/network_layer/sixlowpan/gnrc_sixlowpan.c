@@ -35,7 +35,7 @@
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-static gnrc_sixlowpan_msg_frag_t fragment_msg = {KERNEL_PID_UNDEF, NULL, 0, 0};
+static gnrc_sixlowpan_msg_frag_t fragment_msg = {NULL, 0, 0, KERNEL_PID_UNDEF};
 #endif
 
 #if ENABLE_DEBUG
