@@ -57,8 +57,8 @@ endif
 # Forbid common symbols to prevent accidental aliasing.
 CFLAGS += -fno-common
 
-# Enable all default warnings
-CFLAGS += -Wall
+# Enable all default warnings and all extra warnings
+CFLAGS += -Wall -Wextra
 
 # Warn if a user-supplied include directory does not exist.
 CFLAGS += -Wmissing-include-dirs
