@@ -262,6 +262,34 @@ struct _thread {
 #endif
 
 /**
+ * @brief Large stack size
+ */
+#ifndef THREAD_STACKSIZE_LARGE
+#define THREAD_STACKSIZE_LARGE (THREAD_STACKSIZE_MEDIUM * 2)
+#endif
+
+/**
+ * @brief Medium stack size
+ */
+#ifndef THREAD_STACKSIZE_MEDIUM
+#define THREAD_STACKSIZE_MEDIUM THREAD_STACKSIZE_DEFAULT
+#endif
+
+/**
+ * @brief Small stack size
+ */
+#ifndef THREAD_STACKSIZE_SMALL
+#define THREAD_STACKSIZE_SMALL (THREAD_STACKSIZE_MEDIUM / 2)
+#endif
+
+/**
+ * @brief Tiny stack size
+ */
+#ifndef THREAD_STACKSIZE_TINY
+#define THREAD_STACKSIZE_TINY (THREAD_STACKSIZE_MEDIUM / 4)
+#endif
+
+/**
  * @brief Minimum stack size
  */
 #ifndef THREAD_STACKSIZE_MINIMUM
