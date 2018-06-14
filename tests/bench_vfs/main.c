@@ -143,7 +143,6 @@ static void init_fs(void)
     spiffs_desc.dev = _dev;
 #endif
     mtd_init(_dev);
-    mtd_erase(_dev, 0, _dev->page_size * _dev->pages_per_sector * _dev->sector_count);
 }
 #elif defined(MODULE_LITTLEFS)
 #include "fs/littlefs_fs.h"
@@ -163,24 +162,33 @@ static void init_fs(void)
 {
     littlefs_desc.dev = _dev;
     mtd_init(_dev);
-    mtd_erase(_dev, 0, _dev->page_size * _dev->pages_per_sector * _dev->sector_count);
 }
 #else
-#define "No or unsupported file system module used"
+static char fs_name[] = "raw_mtd";
+
+static void init_fs(void)
+{
+    mtd_init(_dev);
+}
+
+#define BASE_NAME       "/dev/mtd"
+#define DO_NOT_MOUNT
 #endif
 
 #ifndef FILE_LOOP_SIZE
-#define FILE_LOOP_SIZE  (4u)
+#define FILE_LOOP_SIZE  (1u)
 #endif
 
 #ifndef LOOP_SIZE
 #define LOOP_SIZE       (16u)
 #endif
 
+#ifndef BASE_NAME
 #define BASE_NAME       "/bench/test"
+#endif
 
 #ifndef BUF_SIZE
-#define BUF_SIZE        (256u)
+#define BUF_SIZE        (4096u)
 #endif
 
 static char buf[BUF_SIZE];
@@ -198,6 +206,7 @@ int main(void)
     xtimer_ticks32_t end;
     xtimer_ticks32_t diff;
 
+#ifndef DO_NOT_MOUNT
     puts("[BEGIN] Format test...");
     begin = xtimer_now();
     vfs_format(&_bench_mount);
@@ -213,9 +222,11 @@ int main(void)
     diff = xtimer_diff(end, begin);
     printf("Test time: %" PRIu32 "us\n", xtimer_usec_from_ticks(diff));
     puts("[END] Mount test");
+#endif
 
     int fd;
     uint32_t total_time = 0;
+    int ret;
 
     puts("[BEGIN] Write test...");
     for (unsigned f = 0; f < FILE_LOOP_SIZE; f++) {
@@ -224,7 +235,11 @@ int main(void)
         begin = xtimer_now();
         fd = vfs_open(name, O_CREAT | O_RDWR, 0);
         for (unsigned i = 0; i < LOOP_SIZE; i++) {
-            vfs_write(fd, buf, sizeof(buf));
+            ret = vfs_write(fd, buf, sizeof(buf));
+            if (ret != (int)sizeof(buf)) {
+                printf("[END] error when writing (%d)\n", ret);
+                break;
+            }
         }
         vfs_close(fd);
         end = xtimer_now();
@@ -239,6 +254,7 @@ int main(void)
     puts("[END] Write test");
 
     total_time = 0;
+    uint32_t read_total = 0;
     puts("[BEGIN] Read test...");
     for (unsigned f = 0; f < FILE_LOOP_SIZE; f++) {
         char name[20];
@@ -256,10 +272,11 @@ int main(void)
         printf("File #%d, %d bytes read in: %" PRIu32 "us\n", f,
                total, xtimer_usec_from_ticks(diff));
         total_time += xtimer_usec_from_ticks(diff);
+        read_total += total;
     }
     printf("Mean time: %" PRIu32 "us\n", total_time / (uint32_t)FILE_LOOP_SIZE);
     printf("Throughput: %f kB/s\n",
-           ((float)(FILE_LOOP_SIZE * LOOP_SIZE * sizeof(buf) * 1000.0) / (float)total_time));
+           ((float)(read_total * 1000.0) / (float)total_time));
     puts("[END] Read test");
 
     total_time = 0;
@@ -277,6 +294,7 @@ int main(void)
     printf("Mean time: %" PRIu32 "us\n", total_time / (uint32_t)FILE_LOOP_SIZE);
     puts("[END] Remove test");
 
+#ifndef DO_NOT_MOUNT
     puts("[BEGIN] Unmount test...");
     begin = xtimer_now();
     vfs_umount(&_bench_mount);
@@ -284,6 +302,7 @@ int main(void)
     diff = xtimer_diff(end, begin);
     printf("Test time: %" PRIu32 "us\n", xtimer_usec_from_ticks(diff));
     puts("[END] Unmount test");
+#endif
 
     return 0;
 }
