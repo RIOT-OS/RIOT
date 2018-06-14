@@ -5,7 +5,7 @@ include ../Makefile.tests_common
 # disabled by default:
 # USEMODULE += core_thread_flags
 #
-# enabled by defaule:
+# enabled by default:
 # DISABLE_MODULE += core_msg
 
 TEST_ON_CI_WHITELIST += all
