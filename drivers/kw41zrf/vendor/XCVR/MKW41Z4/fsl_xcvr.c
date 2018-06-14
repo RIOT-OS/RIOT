@@ -1234,11 +1234,11 @@ void XcvrPanic(XCVR_PANIC_ID_T panic_id, uint32_t panic_address)
     }
     else
     {
-        uint8_t dummy;
+        volatile uint8_t dummy = 0;
 
         while(1)
         {
-            dummy = dummy;
+            ++dummy;
         }
     }
 }
