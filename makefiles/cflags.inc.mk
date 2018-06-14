@@ -40,9 +40,6 @@ ifeq ($(shell $(CC) -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-de
   # duplicated parameters don't hurt
   CFLAGS += -Wstrict-prototypes -Wold-style-definition
   CXXUWFLAGS += -Wstrict-prototypes -Wold-style-definition
-  ifeq ($(WERROR),1)
-    CFLAGS += -Werror=strict-prototypes -Werror=old-style-definition
-  endif
 endif
 
 # Unwanted flags for c++
