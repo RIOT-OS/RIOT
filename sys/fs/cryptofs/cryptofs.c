@@ -235,6 +235,7 @@ static int store_head(cryptofs_t *fs, cryptofs_file_t *file, int fd)
     memset(buf, AES_BLOCK_SIZE - sizeof(magic) - 1, AES_BLOCK_SIZE);
     memcpy(buf, &magic, sizeof(magic));
     buf[CRYPTOFS_NBPAD_OFFSET] = file->nb_pad;
+    buf[CRYPTOFS_MODE_OFFSET] = file->mode;
     if (_encrypt(fs, buf, buf, AES_BLOCK_SIZE) < 1) {
         return -EIO;
     }
@@ -292,6 +293,13 @@ static int load_head(cryptofs_t *fs, cryptofs_file_t *file, int fd)
         return -EBADF;
     }
     file->nb_pad = buf[CRYPTOFS_NBPAD_OFFSET];
+    file->mode = buf[CRYPTOFS_MODE_OFFSET];
+    switch (file->mode) {
+    case mode_ecb:
+        break;
+    default:
+        return -ENOTSUP;
+    }
 
     res = vfs_read(fd, buf, sizeof(buf));
     if (res != sizeof(buf)) {
@@ -315,16 +323,13 @@ static int check_hash(cryptofs_file_t *file, int fd)
     return memcmp(file->hash, sha, SHA256_DIGEST_LENGTH);
 }
 
-static int encrpyt_and_write_block(cryptofs_t *fs, vfs_file_t *filp, cryptofs_file_t *file, const uint8_t *block, size_t nbytes, bool seek)
+static int encrpyt_and_write_block(cryptofs_t *fs, vfs_file_t *filp, cryptofs_file_t *file, const uint8_t *block, size_t nbytes)
 {
     DEBUG("cryptofs: write_block (pos=%ld)\n", filp->pos);
     if (_encrypt(fs, block, file->block, nbytes) < 1) {
         return -EIO;
     }
     file->state = STATE_ENCRYPTED;
-    if (seek) {
-        vfs_lseek(file->real_fd, filp->pos + CRYPTOFS_HEAD_SIZE - (filp->pos % AES_BLOCK_SIZE), SEEK_SET);
-    }
     int res = vfs_write(file->real_fd, file->block, nbytes);
     if (res < 0) {
         return res;
@@ -333,12 +338,9 @@ static int encrpyt_and_write_block(cryptofs_t *fs, vfs_file_t *filp, cryptofs_fi
     return 0;
 }
 
-static int read_and_decrypt_block(cryptofs_t *fs, vfs_file_t *filp, cryptofs_file_t *file, uint8_t *block, size_t nbytes, bool seek)
+static int read_and_decrypt_block(cryptofs_t *fs, vfs_file_t *filp, cryptofs_file_t *file, uint8_t *block, size_t nbytes)
 {
     DEBUG("cryptofs: read_block (pos=%ld)\n", filp->pos);
-    if (seek) {
-        vfs_lseek(file->real_fd, filp->pos + CRYPTOFS_HEAD_SIZE - (filp->pos % AES_BLOCK_SIZE), SEEK_SET);
-    }
     int res = vfs_read(file->real_fd, file->block, nbytes);
     if (res < 0) {
         return res;
@@ -359,7 +361,8 @@ static int sync(cryptofs_t *fs, vfs_file_t *filp, cryptofs_file_t *file)
     int pad = AES_BLOCK_SIZE - rem;
     if (rem) {
         memset(file->block + rem, pad, pad);
-        if (encrpyt_and_write_block(fs, filp, file, file->block, AES_BLOCK_SIZE, true) < 0) {
+        vfs_lseek(file->real_fd, filp->pos + CRYPTOFS_HEAD_SIZE - (filp->pos % AES_BLOCK_SIZE), SEEK_SET);
+        if (encrpyt_and_write_block(fs, filp, file, file->block, AES_BLOCK_SIZE) < 0) {
             return -EIO;
         }
         file->nb_pad = pad;
@@ -418,7 +421,8 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, con
         if (rem) {
             DEBUG("cryptofs: open: loading last block\n");
             /* Load last block and seek back to the begining of the block */
-            read_and_decrypt_block(fs, filp, file, file->block, AES_BLOCK_SIZE, true);
+            vfs_lseek(file->real_fd, filp->pos + CRYPTOFS_HEAD_SIZE - (filp->pos % AES_BLOCK_SIZE), SEEK_SET);
+            read_and_decrypt_block(fs, filp, file, file->block, AES_BLOCK_SIZE);
             vfs_lseek(file->real_fd, filp->pos + CRYPTOFS_HEAD_SIZE - (filp->pos % AES_BLOCK_SIZE), SEEK_SET);
         }
     }
@@ -480,7 +484,7 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
     while (nb_block) {
         if (nbytes >= AES_BLOCK_SIZE) {
             size_t to_dec = nbytes > sizeof(file->block) ? sizeof(file->block) : nbytes - nbytes % AES_BLOCK_SIZE;
-            if (read_and_decrypt_block(fs, filp, file, dest_, to_dec, false) < 0) {
+            if (read_and_decrypt_block(fs, filp, file, dest_, to_dec) < 0) {
                 DEBUG("cryptofs: error when reading\n");
                 return -EIO;
             }
@@ -491,7 +495,7 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
             nb_block -= to_dec / AES_BLOCK_SIZE;
         }
         else {
-            if (read_and_decrypt_block(fs, filp, file, file->block, AES_BLOCK_SIZE, false) < 0) {
+            if (read_and_decrypt_block(fs, filp, file, file->block, AES_BLOCK_SIZE) < 0) {
                 DEBUG("cryptofs: error when reading\n");
                 return -EIO;
             }
@@ -533,7 +537,7 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
         filp->pos += written;
         src_ += written;
         if (filp->pos % AES_BLOCK_SIZE == 0) {
-            res = encrpyt_and_write_block(fs, filp, file, file->block, AES_BLOCK_SIZE, false);
+            res = encrpyt_and_write_block(fs, filp, file, file->block, AES_BLOCK_SIZE);
             if (res < 0) {
                 DEBUG("cryptofs: error when writing\n");
                 return res;
@@ -550,7 +554,7 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
     while (nb_block) {
         if (nbytes >= AES_BLOCK_SIZE) {
             size_t to_enc = nbytes > sizeof(file->block) ? sizeof(file->block) : nbytes - nbytes % AES_BLOCK_SIZE;
-            res = encrpyt_and_write_block(fs, filp, file, src_, to_enc, false);
+            res = encrpyt_and_write_block(fs, filp, file, src_, to_enc);
             if (res < 0) {
                 DEBUG("cryptofs: error when writing\n");
                 return res;
@@ -563,7 +567,7 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
         }
         else {
             if ((size_t)filp->pos < file->size) {
-                if (read_and_decrypt_block(fs, filp, file, file->block, AES_BLOCK_SIZE, false) < 0) {
+                if (read_and_decrypt_block(fs, filp, file, file->block, AES_BLOCK_SIZE) < 0) {
                     DEBUG("cryptofs: error when writing\n");
                     return -EIO;
                 }
@@ -591,7 +595,7 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
 
     if (file->state == STATE_UNENCRYPTED) {
         if ((size_t)filp->pos + AES_BLOCK_SIZE < file->size) {
-            encrpyt_and_write_block(fs, filp, file, file->block, AES_BLOCK_SIZE, false);
+            encrpyt_and_write_block(fs, filp, file, file->block, AES_BLOCK_SIZE);
         }
         else {
             sync(fs, filp, file);
@@ -609,7 +613,7 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
 
     file->state = STATE_INVALID;
     filp->pos = vfs_lseek(file->real_fd, off, whence) - CRYPTOFS_HEAD_SIZE;
-    read_and_decrypt_block(fs, filp, file, file->block, AES_BLOCK_SIZE, false);
+    read_and_decrypt_block(fs, filp, file, file->block, AES_BLOCK_SIZE);
     /* Seek back to the beginning of the block */
     vfs_lseek(file->real_fd, filp->pos + CRYPTOFS_HEAD_SIZE - (filp->pos % AES_BLOCK_SIZE), SEEK_SET);
     return filp->pos;
