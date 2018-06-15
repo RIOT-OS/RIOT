@@ -50,7 +50,7 @@ static uint16_t max_byte_count = 0;
 #endif
 
 /* internal gnrc_pktbuf functions */
-static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, void *data, size_t size,
+static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size_t size,
                                     gnrc_nettype_t type);
 static void *_pktbuf_alloc(size_t size);
 static void _pktbuf_free(void *data, size_t size);
@@ -88,7 +88,7 @@ void gnrc_pktbuf_init(void)
     mutex_unlock(&_mutex);
 }
 
-gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, void *data, size_t size,
+gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t size,
                                 gnrc_nettype_t type)
 {
     gnrc_pktsnip_t *pkt;
@@ -367,7 +367,7 @@ bool gnrc_pktbuf_is_sane(void)
 }
 #endif
 
-static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, void *data, size_t size,
+static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size_t size,
                                     gnrc_nettype_t type)
 {
     gnrc_pktsnip_t *pkt = _pktbuf_alloc(sizeof(gnrc_pktsnip_t));
