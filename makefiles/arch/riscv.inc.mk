@@ -17,3 +17,5 @@ export CFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) $(CFLAGS_LINK)
 export ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 # export linker flags
 export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -Wl,--gc-sections -static -lgcc
+# ld defaults to elf64-littleriscv, tell it to use elf32 in incremental links
+ILINKFLAGS += -m elf32lriscv -r --unique
