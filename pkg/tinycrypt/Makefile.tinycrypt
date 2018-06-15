@@ -1,0 +1,3 @@
+MODULE = tinycrypt
+
+include $(RIOTBASE)/Makefile.base
