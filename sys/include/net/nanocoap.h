@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016-17 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2018 Ken Bannister <kb2ma@runbox.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +11,32 @@
  * @defgroup    net_nanocoap nanocoap small CoAP library
  * @ingroup     net
  * @brief       Provides CoAP functionality optimized for minimal resource usage
+ *
+ * nanocoap includes both server-side request handling and response generation,
+ * and client-side request generation.
+ *
+ * ## Write Options and Payload ##
+ *
+ * For both server responses and client requests, CoAP uses an Option mechanism
+ * to encode message metadata that is not required for each message. For
+ * example, the resource URI path is required only for a request, and is encoded
+ * as the Uri-Path option.
+ *
+ * nanocoap provides two APIs for writing CoAP options:
+ *
+ * - a minimal API that requires only a reference to the buffer; however, the
+ *    caller must remember and provide the last option number written, as well
+ *    as the buffer position
+ *
+ * - a convenient API that uses a coap_pkt_t struct to track each option as it
+ *   is written
+ *
+ * By default, the caller *must* write options in order by option number
+ * (see "CoAP option numbers", below). However, the struct-based API supports
+ * use of the `nanocoap_options_sort` submodule. This submodule allows the user
+ * to enter options in any order, and then sorts them in coap_opt_finish(). By
+ * default, options are sorted automatically. However, by redefining
+ * COAP_OPT_FINISH_DEFAULTS, the caller can choose when to sort.
  *
  * @{
  *

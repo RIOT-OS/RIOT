@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016-18 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2018 Ken Bannister <kb2ma@runbox.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Nanocoap implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Ken Bannister <kb2ma@runbox.com>
  *
  * @}
  */
