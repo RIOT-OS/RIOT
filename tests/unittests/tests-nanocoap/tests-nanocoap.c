@@ -145,7 +145,7 @@ static void test_nanocoap__get_multi_path(void)
     TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
 }
 
-#if COAP_OPTIONS_SORT
+#ifdef MODULE_NANOCOAP_OPTIONS_SORT
 /*
  * Builds on put_req test, to test resorting options in option number order.
  */
@@ -248,7 +248,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_req),
         new_TestFixture(test_nanocoap__put_req),
         new_TestFixture(test_nanocoap__get_multi_path),
-#if COAP_OPTIONS_SORT
+#ifdef MODULE_NANOCOAP_OPTIONS_SORT
         new_TestFixture(test_nanocoap__put_opt_sort),
         new_TestFixture(test_nanocoap__put_opt_sort_presorted),
         new_TestFixture(test_nanocoap__put_opt_sort_1opt),
