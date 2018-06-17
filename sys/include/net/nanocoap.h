@@ -240,6 +240,17 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief Default flags for coap_opt_finish()
+ */
+#ifndef COAP_OPT_FINISH_DEFAULTS
+#ifdef MODULE_NANOCOAP_OPTIONS_SORT
+#define COAP_OPT_FINISH_DEFAULTS   COAP_OPT_FINISH_SORT
+#else
+#define COAP_OPT_FINISH_DEFAULTS   COAP_OPT_FINISH_NONE
+#endif
+#endif
+
+/**
  * @brief   Raw CoAP PDU header structure
  */
 typedef struct __attribute__((packed)) {
@@ -570,7 +581,9 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
  * @post pkt.payload_len is maximum bytes available for payload
  *
  * @param[in,out] pkt         pkt to update
- * @param[in]     flags       see COAP_OPT_FINISH... macros
+ * @param[in]     flags       see COAP_OPT_FINISH... macros; the values
+ *                            provided in this parameter are combined with
+ *                            COAP_OPT_FINISH_DEFAULTS
  *
  * @return        total number of bytes written to buffer
  */

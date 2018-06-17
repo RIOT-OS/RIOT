@@ -612,6 +612,8 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value)
 
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
 {
+    flags |= COAP_OPT_FINISH_DEFAULTS;
+
 #ifdef MODULE_NANOCOAP_OPTIONS_SORT
     if (flags & COAP_OPT_FINISH_SORT) {
         _sort_opts(pkt);
