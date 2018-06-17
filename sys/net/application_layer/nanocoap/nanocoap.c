@@ -616,7 +616,10 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
     if (flags & COAP_OPT_FINISH_SORT) {
         _sort_opts(pkt);
     }
+#else
+    assert(flags ^ COAP_OPT_FINISH_SORT);
 #endif
+
     if (flags & COAP_OPT_FINISH_PAYLOAD) {
         assert(pkt->payload_len > 1);
 
