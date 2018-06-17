@@ -96,3 +96,13 @@ ssize_t _sort_opts(coap_pkt_t *pkt)
     pkt->payload_len -= len_delta;
     return 0;
 }
+
+bool coap_opt_sorted(coap_pkt_t *pkt)
+{
+    for (unsigned i = 1; i < pkt->options_len; i++) {
+        if (pkt->options[i].opt_num < pkt->options[i-1].opt_num) {
+            return false;
+        }
+    }
+    return true;
+}

@@ -19,6 +19,7 @@
 #include "embUnit.h"
 
 #include "net/nanocoap.h"
+#include "net/nanocoap_opt_sort.h"
 
 #include "unittests-constants.h"
 #include "tests-nanocoap.h"
@@ -148,6 +149,7 @@ static void test_nanocoap__get_multi_path(void)
 #ifdef MODULE_NANOCOAP_OPTIONS_SORT
 /*
  * Builds on put_req test, to test resorting options in option number order.
+ * Also verifies coap_opt_sorted().
  */
 static void test_nanocoap__put_opt_sort(void)
 {
@@ -164,7 +166,12 @@ static void test_nanocoap__put_opt_sort(void)
     /* out of order; 12, 11 */
     coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_TEXT);
     coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+
+    TEST_ASSERT(!coap_opt_sorted(&pkt));
+
     len = coap_opt_finish(&pkt, COAP_OPT_FINISH_SORT);
+
+    TEST_ASSERT(coap_opt_sorted(&pkt));
 
     memset(&pkt, 0, sizeof(coap_pkt_t));
     int res = coap_parse(&pkt, &buf[0], len);
