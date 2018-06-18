@@ -48,11 +48,14 @@ static char rawdmp_stack[THREAD_STACKSIZE_MAIN];
 void dump_pkt(gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *snip = pkt;
+    gnrc_netif_hdr_t *netif_hdr = pkt->next->data;
+    uint8_t lqi = netif_hdr->lqi;
 
+    pkt = gnrc_pktbuf_remove_snip(pkt, pkt->next);
     uint64_t now_us = xtimer_usec_from_ticks64(xtimer_now64());
 
     printf("rftest-rx --- len 0x%02x lqi 0x%02x rx_time 0x%08" PRIx32 "%08" PRIx32 "\n\n",
-           gnrc_pkt_len(pkt), 0, (uint32_t)(now_us >> 32), (uint32_t)(now_us & 0xffffffff));
+           gnrc_pkt_len(pkt), lqi, (uint32_t)(now_us >> 32), (uint32_t)(now_us & 0xffffffff));
 
     while (snip) {
         for (size_t i = 0; i < snip->size; i++) {
