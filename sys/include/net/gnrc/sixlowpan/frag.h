@@ -73,11 +73,11 @@ typedef struct {
  * @brief   Definition of 6LoWPAN fragmentation type.
  */
 typedef struct {
-    kernel_pid_t pid;       /**< PID of the interface */
     gnrc_pktsnip_t *pkt;    /**< Pointer to the IPv6 packet to be fragmented */
     size_t datagram_size;   /**< Length of just the IPv6 packet to be fragmented */
     uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
                              *   payload datagram */
+    kernel_pid_t pid;       /**< PID of the interface */
 } gnrc_sixlowpan_msg_frag_t;
 
 /**
