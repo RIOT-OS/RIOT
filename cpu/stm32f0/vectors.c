@@ -80,7 +80,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [22] = isr_tim17,                /* [22] TIM17 global Interrupt */
     [25] = isr_spi1,                 /* [25] SPI1 global Interrupt */
 
-#if defined(CPU_MODEL_STM32F030R8)
+#if defined(CPU_LINE_STM32F030x8)
     [ 4] = isr_rcc,                  /* [ 4] RCC global Interrupt */
     [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupt */
     [ 6] = isr_exti,                 /* [ 6] EXTI Line 2 and 3 Interrupt */
@@ -97,7 +97,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [26] = isr_spi2,                 /* [26] SPI2 global Interrupt */
     [27] = isr_usart1,               /* [27] USART1 global Interrupt */
     [28] = isr_usart2,               /* [28] USART2 global Interrupt */
-#elif defined(CPU_MODEL_STM32F031K6)
+#elif defined(CPU_LINE_STM32F031x6)
     [ 1] = isr_pvd,                  /* [ 1] PVD Interrupt through EXTI Lines 16 */
     [ 4] = isr_rcc,                  /* [ 4] RCC global Interrupt */
     [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupt */
@@ -111,7 +111,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [15] = isr_tim2,                 /* [15] TIM2 global Interrupt */
     [23] = isr_i2c1,                 /* [23] I2C1 Event Interrupt & EXTI Line23 Interrupt (I2C1 wakeup) */
     [27] = isr_usart1,               /* [27] USART1 global Interrupt & EXTI Line25 Interrupt (USART1 wakeup) */
-#elif defined(CPU_MODEL_STM32F042K6)
+#elif defined(CPU_LINE_STM32F042x6)
     [ 1] = isr_pvd_vddio2,           /* [ 1] PVD & VDDIO2 Interrupts through EXTI Lines 16 and 31 */
     [ 4] = isr_rcc_crs,              /* [ 4] RCC & CRS Global Interrupts */
     [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupts */
@@ -130,7 +130,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [28] = isr_usart2,               /* [28] USART2 global Interrupt */
     [30] = isr_cec_can,              /* [30] CEC and CAN global Interrupts & EXTI Line27 Interrupt */
     [31] = isr_usb,                  /* [31] USB global Interrupts & EXTI Line18 Interrupt */
-#elif defined(CPU_MODEL_STM32F051R8)
+#elif defined(CPU_LINE_STM32F051x8)
     [ 1] = isr_pvd,                  /* [ 1] PVD Interrupt through EXTI Lines 16 */
     [ 4] = isr_rcc,                  /* [ 4] RCC global Interrupt */
     [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupts */
@@ -151,7 +151,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [27] = isr_usart1,               /* [27] USART1 global Interrupt & EXTI Line25 Interrupt (USART1 wakeup) */
     [28] = isr_usart2,               /* [28] USART2 global Interrupt */
     [30] = isr_cec_can,              /* [30] CEC and CAN global Interrupts & EXTI Line27 Interrupt */
-#elif defined(CPU_MODEL_STM32F070RB)
+#elif defined(CPU_LINE_STM32F070xB)
     [ 4] = isr_rcc,                  /* [ 4] RCC global Interrupt */
     [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupt */
     [ 6] = isr_exti,                 /* [ 6] EXTI Line 2 and 3 Interrupt */
@@ -171,7 +171,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [28] = isr_usart2,               /* [28] USART2 global Interrupt */
     [29] = isr_usart3_4,             /* [29] USART3 and USART4 global Interrupt */
     [31] = isr_usb,                  /* [31] USB global Interrupt  & EXTI Line18 Interrupt */
-#elif defined(CPU_MODEL_STM32F072RB)
+#elif defined(CPU_LINE_STM32F072xB)
     [ 1] = isr_pvd_vddio2,           /* [ 1] PVD & VDDIO2 Interrupt through EXTI Lines 16 and 31 */
     [ 4] = isr_rcc_crs,              /* [ 4] RCC & CRS global Interrupt */
     [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupt */
@@ -195,7 +195,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [29] = isr_usart3_4,             /* [29] USART3 and USART4 global Interrupt */
     [30] = isr_cec_can,              /* [30] CEC and CAN global Interrupts & EXTI Line27 Interrupt */
     [31] = isr_usb,                  /* [31] USB global Interrupt  & EXTI Line18 Interrupt */
-#elif defined(CPU_MODEL_STM32F091RC)
+#elif defined(CPU_LINE_STM32F091xC)
     [ 1] = isr_pvd_vddio2,           /* [ 1] PVD & VDDIO2 Interrupts through EXTI Lines 16 and 31 */
     [ 4] = isr_rcc_crs,              /* [ 4] RCC & CRS global Interrupts */
     [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupts */
