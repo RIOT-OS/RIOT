@@ -34,8 +34,10 @@ typedef struct {
     reg32_t ICR; /**< interrupt clear */
     reg32_t RIS; /**< raw interrupt status */
     reg32_t MIS; /**< masked interrupt status */
+    reg32_t __reserved1[0x100]; /**< meh */
     reg32_t TEST; /**< test mode */
     reg32_t INT_CAUS; /**< interrupt cause test mode */
+    reg32_t __reserved2[0x1f9]; /**< meh */
     reg32_t LOCK; /**< lock */
 } wdt_regs_t;
 
