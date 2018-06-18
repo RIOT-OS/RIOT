@@ -23,6 +23,10 @@ doc: html
 html: src/css/riot.css src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
 
+.PHONY: xml
+xml: src/css/riot.css src/changelog.md
+	( cat riot.doxyfile ; echo "GENERATE_XML = yes" ) | doxygen -
+
 .PHONY: man
 man: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
@@ -44,4 +48,4 @@ latex: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
 
 clean:
-	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md
+	-@rm -rf latex xml man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md
