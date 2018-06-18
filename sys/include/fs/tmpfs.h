@@ -39,6 +39,18 @@
 extern "C" {
 #endif
 
+#ifndef TMPFS_MAX_FILES
+#define TMPFS_MAX_FILES     (16)
+#endif
+
+#ifndef TMPFS_BUF_SIZE
+#define TMPFS_BUF_SIZE      (128)
+#endif
+
+#ifndef TMPFS_MAX_BUF
+#define TMPFS_MAX_BUF       (128)
+#endif
+
 /**
  * @brief   tmpfs file system superblock
  */

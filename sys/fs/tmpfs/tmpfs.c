@@ -27,25 +27,19 @@
 #include "fs/tmpfs.h"
 #include "vfs.h"
 #include "mutex.h"
+#include "memarray.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
-
-#ifndef TMPFS_MALLOC
-#define TMPFS_MALLOC malloc
-#endif
-
-#ifndef TMPFS_FREE
-#define TMPFS_FREE free
-#endif
 
 /**
  * @brief   tmpfs file buffer element
  */
 typedef struct {
     clist_node_t next;  /**< next buffer in list */
-    void *buf;          /**< data buffer */
     size_t size;        /**< data buffer size */
+    size_t offset;      /**< current offset in buf, = size if full buf is used */
+    void *buf;          /**< data buffer */
 } tmpfs_file_buf_t;
 
 /**
@@ -58,16 +52,25 @@ typedef struct {
     size_t size;                    /**< total file size */
 } tmpfs_file_t;
 
+static tmpfs_file_t _file_buf[TMPFS_MAX_FILES];
+#define TMPFS_REAL_BUF_SIZE     (sizeof(tmpfs_file_buf_t) + TMPFS_BUF_SIZE)
+static uint8_t _buf[TMPFS_MAX_BUF][TMPFS_REAL_BUF_SIZE];
+static int _initialized = 0;
+static mutex_t _buf_lock = MUTEX_INIT;
+static memarray_t _file_array;
+static memarray_t _buf_array;
+
 static void free_file(tmpfs_file_t *file)
 {
     clist_node_t *node;
 
+    mutex_lock(&_buf_lock);
     while ((node = clist_lpop(&file->buf)) != NULL) {
         tmpfs_file_buf_t *buf = container_of(node, tmpfs_file_buf_t, next);
-        TMPFS_FREE(buf->buf);
-        TMPFS_FREE(buf);
+        memarray_free(&_buf_array, buf);
     }
-    TMPFS_FREE(file);
+    memarray_free(&_file_array, file);
+    mutex_unlock(&_buf_lock);
 }
 
 static int _mount(vfs_mount_t *mountp)
@@ -75,6 +78,14 @@ static int _mount(vfs_mount_t *mountp)
     tmpfs_t *tmpfs = mountp->private_data;
 
     mutex_init(&tmpfs->lock);
+
+    mutex_lock(&_buf_lock);
+    if (!_initialized) {
+        memarray_init(&_file_array, _file_buf, sizeof(tmpfs_file_t), TMPFS_MAX_FILES);
+        memarray_init(&_buf_array, _buf, TMPFS_REAL_BUF_SIZE, TMPFS_MAX_BUF);
+        _initialized = 1;
+    }
+    mutex_unlock(&_buf_lock);
 
     return 0;
 }
@@ -200,7 +211,10 @@ static int _statvfs(vfs_mount_t *mountp, const char *restrict path, struct statv
 
 static tmpfs_file_t *add_file(tmpfs_t *tmpfs, const char *name)
 {
-    tmpfs_file_t *file = TMPFS_MALLOC(sizeof(tmpfs_file_t));
+    tmpfs_file_t *file;
+    mutex_lock(&_buf_lock);
+    file = memarray_alloc(&_file_array);
+    mutex_unlock(&_buf_lock);
     if (!file) {
         return NULL;
     }
@@ -226,10 +240,12 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode, con
         if ((flags & O_CREAT) && ((flags & O_ACCMODE) != O_RDONLY)) {
             file = add_file(tmpfs, name);
             if (!file) {
+                DEBUG("tmpfs: open: error when adding file\n");
                 ret = -ENOMEM;
             }
         }
         else {
+            DEBUG("tmpfs: open: no file found\n");
             ret = -EINVAL;
         }
     }
@@ -248,38 +264,42 @@ static tmpfs_file_buf_t *find_buf_index(tmpfs_file_t *file, off_t pos, size_t *i
 {
     assert(index);
     size_t cur = 0;
+    *index = 0;
 
     clist_node_t *node = file->buf.next;
     if (!node) {
+        DEBUG("tmpfs: find_buf: no buf\n");
         return NULL;
     }
     do {
+        DEBUG("tmpfs: find_buf: finding buf at pos=%d, cur=%u\n", (int)pos, (unsigned)cur);
         node = node->next;
         tmpfs_file_buf_t *buf = container_of(node, tmpfs_file_buf_t, next);
         if ((size_t)pos < cur + buf->size) {
             *index = pos - cur;
             return buf;
         }
-        cur += buf->size;
+        cur += buf->offset;
     } while (node != file->buf.next);
+
+    DEBUG("tmpfs: find_buf: buf not found\n");
 
     return NULL;
 }
 
-static tmpfs_file_buf_t *alloc_buf(tmpfs_file_t *file, size_t nbytes)
+static tmpfs_file_buf_t *alloc_buf(tmpfs_file_t *file)
 {
-    tmpfs_file_buf_t *buf = TMPFS_MALLOC(sizeof(*buf));
+    tmpfs_file_buf_t *buf;
+    mutex_lock(&_buf_lock);
+    buf = memarray_alloc(&_buf_array);
+    mutex_unlock(&_buf_lock);
     if (!buf) {
         return NULL;
     }
-    void *data_buf = TMPFS_MALLOC(nbytes);
-    if (!data_buf) {
-        TMPFS_FREE(buf);
-    }
+    memset(buf, 0, sizeof(*buf));
     clist_rpush(&file->buf, &buf->next);
-    buf->buf = data_buf;
-    buf->size = nbytes;
-    file->size += nbytes;
+    buf->buf = (uint8_t *)buf + sizeof(*buf);
+    buf->size = TMPFS_BUF_SIZE;
 
     return buf;
 }
@@ -287,40 +307,49 @@ static tmpfs_file_buf_t *alloc_buf(tmpfs_file_t *file, size_t nbytes)
 static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
 {
     tmpfs_file_t *file = filp->private_data.ptr;
-    tmpfs_file_buf_t *buf = NULL;
-    size_t index;
+    tmpfs_file_buf_t *buf;
     size_t written = 0;
+    size_t index;
 
-    if ((size_t)filp->pos < file->size) {
-        buf = find_buf_index(file, filp->pos, &index);
-    }
+    DEBUG("tmpfs: write: writing %u bytes (%p)\n", (unsigned)nbytes, src);
+
+    buf = find_buf_index(file, filp->pos, &index);
     if (!buf) {
-        buf = alloc_buf(file, nbytes);
+        buf = alloc_buf(file);
         if (!buf) {
+            DEBUG("tmpfs: write: error when allocating buf\n");
             return -ENOMEM;
         }
         index = 0;
     }
 
     while (nbytes) {
+        DEBUG("tmpfs: write: trying to write remaining %u bytes\n", (unsigned)nbytes);
         if (nbytes <= buf->size - index) {
             memcpy((char *)buf->buf + index, src, nbytes);
             written += nbytes;
+            if (nbytes > buf->offset - index) {
+                buf->offset += nbytes - (buf->offset - index);
+            }
             nbytes = 0;
         }
         else {
-            memcpy((char *)buf->buf + index, src, buf->size - index);
-            nbytes -= buf->size - index;
-            written += buf->size - index;
-            src = (char *)src + buf->size - index;
+            size_t to_write = buf->size - index;
+            memcpy((char *)buf->buf + index, src, to_write);
+            nbytes -= to_write;
+            written += to_write;
+            src = (char *)src + to_write;
+            buf->offset += to_write - (buf->offset - index);
+            file->size += to_write - (buf->offset - index);
             clist_node_t *node = &buf->next;
             if (node != file->buf.next) {
                 buf = container_of(node->next, tmpfs_file_buf_t, next);
             }
             else {
-                buf = alloc_buf(file, nbytes);
+                buf = alloc_buf(file);
                 if (!buf) {
-                    return -ENOMEM;
+                    DEBUG("tmpfs: write: error when allocating buf\n");
+                    break;
                 }
             }
             index = 0;
@@ -328,6 +357,12 @@ static ssize_t _write(vfs_file_t *filp, const void *src, size_t nbytes)
     }
 
     filp->pos += written;
+    if ((size_t)filp->pos > file->size) {
+        file->size = filp->pos;
+    }
+
+    DEBUG("tmpfs: write: %u bytes written, size=%u, buf->offset=%u\n",
+          (unsigned)written, (unsigned)file->size, (unsigned)buf->offset);
 
     return written;
 }
@@ -340,31 +375,33 @@ static ssize_t _read(vfs_file_t *filp, void *dest, size_t nbytes)
     size_t read = 0;
 
     if (!buf) {
+        DEBUG("tmpfs: read: no buf found\n");
         return -EOVERFLOW;
     }
 
     while (nbytes) {
-        if (nbytes <= buf->size - index) {
+        if (nbytes <= buf->offset - index) {
             memcpy(dest, (char *)buf->buf + index, nbytes);
             read += nbytes;
-            dest = (char *)dest + nbytes;
             nbytes = 0;
         }
         else {
-            memcpy(dest, (char *)buf->buf + index, buf->size - index);
-            read += buf->size - index;
-            nbytes -= buf->size - index;
-            dest = (char *)dest + buf->size - index;
+            memcpy(dest, (char *)buf->buf + index, buf->offset - index);
+            read += buf->offset - index;
+            nbytes -= buf->offset - index;
+            dest = (char *)dest + buf->offset - index;
             clist_node_t *node = &buf->next;
             if (node != file->buf.next) {
                 buf = container_of(node->next, tmpfs_file_buf_t, next);
-                index = 0;
             }
             else {
-                return read;
+                break;
             }
+            index = 0;
         }
     }
+
+    filp->pos += read;
 
     return read;
 }

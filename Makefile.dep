@@ -655,6 +655,7 @@ endif
 
 ifneq (,$(filter tmpfs,$(USEMODULE)))
   USEMODULE += vfs
+  USEMODULE += memarray
 endif
 
 ifneq (,$(filter vfs,$(USEMODULE)))
