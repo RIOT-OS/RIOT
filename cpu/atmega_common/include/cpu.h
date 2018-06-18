@@ -36,7 +36,7 @@
 #include <avr/interrupt.h>
 #include "cpu_conf.h"
 
-/**
+/*
  * For downwards compatibility with old RIOT code.
  * TODO: remove once core was adjusted
  */
@@ -47,12 +47,21 @@ extern "C" {
 #endif
 
 /**
+ * @class ATMega
+ * @ingroup cpu_atmega_common
+ * Interface to Atmel's ATMega family of CPUs.
+ */
+
+
+/**
  * @brief global in-ISR state variable
+ * @memberof ATMega
  */
 extern volatile uint8_t __in_isr;
 
 /**
  * @brief Flag entering of an ISR
+ * @memberof ATMega
  */
 static inline void __enter_isr(void)
 {
@@ -61,6 +70,7 @@ static inline void __enter_isr(void)
 
 /**
  * @brief Flag exiting of an ISR
+ * @memberof ATMega
  */
 static inline void __exit_isr(void)
 {
@@ -69,11 +79,13 @@ static inline void __exit_isr(void)
 
 /**
  * @brief Initialization of the CPU
+ * @memberof ATMega
  */
 void cpu_init(void);
 
 /**
  * @brief   Print the last instruction's address
+ * @memberof ATMega
  */
 __attribute__((always_inline)) static inline void cpu_print_last_instruction(void)
 {
@@ -94,6 +106,7 @@ __attribute__((always_inline)) static inline void cpu_print_last_instruction(voi
 
 /**
  * @brief   ATmega system clock prescaler settings
+ * @memberof ATMega
  *
  * Some CPUs may not support the highest prescaler settings
  */
@@ -112,6 +125,7 @@ enum {
 
 /**
  * @brief   Initializes system clock prescaler
+ * @memberof ATMega
  */
 static inline void atmega_set_prescaler(uint8_t clk_scale)
 {
@@ -125,6 +139,7 @@ static inline void atmega_set_prescaler(uint8_t clk_scale)
 
 /**
  * @brief   Initializes avrlibc stdio
+ * @memberof ATMega
  */
 void atmega_stdio_init(void);
 
@@ -132,6 +147,8 @@ void atmega_stdio_init(void);
  * @brief   Exit ISR mode and yield with a return from interrupt. Use at the
  * end of ISRs in place of thread_yield_higher. If thread_yield is needed, use
  * thread_yield followed by thread_yield_isr instead of thread_yield alone.
+ *
+ * @memberof ATMega
  */
 void thread_yield_isr(void);
 
