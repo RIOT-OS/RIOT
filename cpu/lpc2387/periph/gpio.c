@@ -67,18 +67,19 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
-
-    if (mode != GPIO_OUT) {
-        return -1;
-    }
-
     FIO_PORT_t *_port = &FIO_PORTS[port];
 
-    /* set mask */
-    _port->MASK = ~(0x1<<_pin);
-
     /* set direction */
-    _port->DIR = ~0;
+    switch (mode){
+        case GPIO_OUT:
+            _port->DIR |= 1<<_pin;
+            break;
+        case GPIO_IN:
+            _port->DIR &= ~(1<<_pin);
+            break;
+        default:
+            return -1;
+    }
 
     gpio_init_mux(pin, 0);
 
@@ -88,13 +89,13 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_mux(unsigned pin, unsigned mux)
 {
     (void) mux;
-    unsigned _pin = pin & 31;
-    PINSEL[pin>>4] &= ~(0x1 << (_pin*2));
+    unsigned pos = (pin & 0xf) << 1;
+    PINSEL[pin>>4] &= ~(0x3 << pos);
     return 0;
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                    gpio_cb_t cb, void *arg)
+                  gpio_cb_t cb, void *arg)
 {
     (void)mode;
 
@@ -222,8 +223,7 @@ int gpio_read(gpio_t pin)
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
     FIO_PORT_t *_port = &FIO_PORTS[port];
-    _port->MASK = ~(1<<_pin);
-    return _port->PIN != 0;
+    return (_port->PIN & (1 << _pin)) != 0;
 }
 
 void gpio_set(gpio_t pin)
@@ -231,8 +231,7 @@ void gpio_set(gpio_t pin)
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
     FIO_PORT_t *_port = &FIO_PORTS[port];
-    _port->MASK = ~(1<<_pin);
-    _port->SET = ~0;
+    _port->SET = 1 << _pin;
 }
 
 void gpio_clear(gpio_t pin)
@@ -240,8 +239,7 @@ void gpio_clear(gpio_t pin)
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
     FIO_PORT_t *_port = &FIO_PORTS[port];
-    _port->MASK = ~(1<<_pin);
-    _port->CLR = ~0;
+    _port->CLR = 1 << _pin;
 }
 
 void gpio_toggle(gpio_t dev)
