@@ -19,22 +19,22 @@ ifeq (,$(PORT))
       endif
       # if SERIAL_PATTERN is not set, we will get the first port of the first USB
       # to serial adapter
-      PORT_LINUX := $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL_PATTERN)))
+      PORT_LINUX = $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL_PATTERN)))
     endif
-    PORT := $(PORT_LINUX)
+    PORT = $(PORT_LINUX)
   else ifeq ($(OS),Darwin)
     ifeq (,$(PORT_DARWIN))
       ifneq (,$(USB_UART_ID))
         # Try to match with a USB serial number
-        PORT_DARWIN := $(firstword $(sort $(wildcard /dev/tty.usbserial-$(USB_UART_ID)*)))
+        PORT_DARWIN = $(firstword $(sort $(wildcard /dev/tty.usbserial-$(USB_UART_ID)*)))
         # There may be other patterns which should be tried as well.
       endif
       ifeq (,$(PORT_DARWIN))
         # Look for any USB to serial adapter by default
-        PORT_DARWIN := $(firstword $(sort $(wildcard /dev/tty.usbmodem* /dev/tty.usbserial-* /dev/tty.SLAB_USBtoUART*)))
+        PORT_DARWIN = $(firstword $(sort $(wildcard /dev/tty.usbmodem* /dev/tty.usbserial-* /dev/tty.SLAB_USBtoUART*)))
       endif
     endif
-    PORT := $(PORT_DARWIN)
+    PORT = $(PORT_DARWIN)
   endif
 endif
 export BAUD ?= 115200
