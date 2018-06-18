@@ -16,9 +16,9 @@
  *
  * How To Use
  * ----------
- * First you need to @ref including-modules "include" a module that implements
- * this API in your application's Makefile. For example the implementation for
- * @ref net_gnrc "GNRC" is called `gnrc_sock_ip`.
+ * First you need to ["include"](md_src_creating-an-application.html#including-modules)
+ * a module that implements this API in your application's Makefile. For example
+ * the implementation for @ref net_gnrc "GNRC" is called `gnrc_sock_ip`.
  *
  * ### A Simple IPv6 Server
  *
@@ -58,9 +58,9 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Above you see a simple IPv6 server. Don't forget to also
- * @ref including-modules "include" the IPv6 module of your networking
- * implementation (e.g. `gnrc_ipv6_default` for @ref net_gnrc "GNRC") and at
- * least one network device.
+ * ["include"](md_src_creating-an-application.html#including-modules) the IPv6
+ * module of your networking implementation (e.g. `gnrc_ipv6_default` for
+ * @ref net_gnrc "GNRC") and at least one network device.
  *
  * After including header files for the @ref net_af "address families",
  * @ref net_protnum "protocol numbers" and the @ref net_sock_ip "raw `sock`s"
@@ -193,7 +193,7 @@
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * Again: Don't forget to also @ref including-modules "include" the IPv6 module
+ * Again: Don't forget to also ["include"](md_src_creating-an-application.html#including-modules) the IPv6 module
  * of your networking implementation (e.g. `gnrc_ipv6_default` for
  * @ref net_gnrc "GNRC") and at least one network device.
  *

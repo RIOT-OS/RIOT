@@ -68,7 +68,7 @@ Type `help` to discover available commands. For further information see the
 [README of the `default` example](https://github.com/RIOT-OS/RIOT/tree/).
 
 To use RIOT directly on your embedded platform, and for more hands-on details
-with RIOT, see @ref getting-started.
+with RIOT, see @ref md_src_getting-started.
 
 Before that, skimming through the next section is recommended (but not
 mandatory).
@@ -196,7 +196,8 @@ starting point for anyone who is new to RIOT.
 For more information best browse that directory and have a look at the
 `README.md` files that ship with each example.
 
-To create your own application - here or anywhere else - see @ref creating-an-application
+To create your own application - here or anywhere else - see
+@ref md_src_creating-an-application
 
 ### tests
 Many features/modules in RIOT come with their own test application, which are
@@ -220,9 +221,9 @@ Furthermore you can find here scripts to do all kind of code and style checks.
 
 Further information
 -------------------
- - @ref getting-started
- - @ref creating-an-application
- - @ref creating-modules
+ - @ref md_src_getting-started
+ - @ref md_src_creating-an-application
+ - @ref md_src_creating-modules
 
 <!--
 Idea for this section: just name each of RIOT's main features/concepts and link

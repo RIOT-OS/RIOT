@@ -8,7 +8,7 @@ porting guide for further information).
 
 The general structure
 ---------------------
-Like @ref creating-an-application "applications", modules are directories
+Like ["applications"](md_src_creating-an-application.html), modules are directories
 containing source files and a Makefile. Additionally their API can be defined
 in one or more header files, residing in the include path of their
 super-module.

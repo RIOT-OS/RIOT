@@ -409,7 +409,7 @@ LOOKUP_CACHE_SIZE      = 1
 # normally produced when WARNINGS is set to YES.
 # The default value is: NO.
 
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class will
 # be included in the documentation.
@@ -498,7 +498,7 @@ INTERNAL_DOCS          = NO
 # and Mac users are advised to set this option to NO.
 # The default value is: system dependent.
 
-CASE_SENSE_NAMES       = YES
+CASE_SENSE_NAMES       = NO
 
 # If the HIDE_SCOPE_NAMES tag is set to NO then doxygen will show members with
 # their full class and namespace scopes in the documentation. If set to YES the
@@ -761,11 +761,6 @@ INPUT                  = ../../doc.txt \
                          ../../pkg \
                          ../../sys \
                          src/ \
-                         src/mainpage.md \
-                         src/creating-modules.md \
-                         src/creating-an-application.md \
-                         src/getting-started.md \
-                         src/changelog.md \
                          ../../LOSTANDFOUND.md
 
 # This tag can be used to specify the character encoding of the source files
@@ -788,7 +783,8 @@ INPUT_ENCODING         = UTF-8
 
 FILE_PATTERNS          = *.txt \
                          *.h \
-                         *.hpp
+                         *.hpp \
+                         *.md
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -835,6 +831,8 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */sys/random/tinymt32/* \
                          */toolchain/* \
                          */vendor/* \
+                         README.md \
+                         README-BLE-6LoWPAN.md
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -921,7 +919,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE =
+USE_MDFILE_AS_MAINPAGE = src/mainpage.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing

@@ -30,8 +30,8 @@ int main(void)
 The application's Makefile
 --------------------------
 ### The minimal Makefile
-At minimum the Makefile of an application (see @ref getting-started) needs to
-define the following macros:
+At minimum the Makefile of an application (see @ref md_src_getting-started) needs
+to define the following macros:
  * `APPLICATION`: should contain the name of your application
  * `RIOTBASE`: specifies the path to your copy of the RIOT repository (note
    that you may want to use `$(CURDIR)` here, to give a relative path)
