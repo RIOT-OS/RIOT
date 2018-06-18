@@ -1,7 +1,6 @@
 OPENTHREAD_DIR = $(RIOTBASE)/pkg/openthread
 
 INCLUDES += -I$(OPENTHREAD_DIR)/include \
-            -I$(OPENTHREAD_DIR)/include/openthread \
             -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/output/include \
             -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include/openthread \
 
