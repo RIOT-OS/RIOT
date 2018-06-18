@@ -37,13 +37,18 @@ int main(void)
 
     printf("+------------Initializing------------+\n");
     result = bmx280_init(&dev, &bmx280_params[0]);
-    if (result == -1) {
+    if (result == BMX280_ERR_I2C) {
         puts("[Error] The given i2c is not enabled");
         return 1;
     }
 
-    if (result == -2) {
+    if (result == BMX280_ERR_NODEV) {
         printf("[Error] The sensor did not answer correctly at address 0x%02X\n", bmx280_params[0].i2c_addr);
+        return 1;
+    }
+
+    if (result == BMX280_ERR_NOCAL) {
+        puts("[Error] Could not read calibration data");
         return 1;
     }
 
