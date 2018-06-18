@@ -7,7 +7,7 @@
 OS := $(shell uname)
 ifeq (,$(PORT))
   ifeq (,$(USB_UART_ID))
-    USB_UART_ID := $(DEBUG_ADAPTER_ID)
+    USB_UART_ID = $(DEBUG_ADAPTER_ID)
   endif
   ifeq ($(OS),Linux)
     ifeq (,$(PORT_LINUX))
@@ -15,7 +15,7 @@ ifeq (,$(PORT))
       # debug adapter, fall back to searching for any USB TTY
       ifneq (,$(USB_UART_ID))
         # Match only exact serial number
-        SERIAL_PATTERN := '^$(USB_UART_ID)$$'
+        SERIAL_PATTERN = '^$(USB_UART_ID)$$'
       endif
       # if SERIAL_PATTERN is not set, we will get the first port of the first USB
       # to serial adapter
