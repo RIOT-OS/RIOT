@@ -37,9 +37,6 @@ ifeq (,$(PORT))
     PORT := $(PORT_DARWIN)
   endif
 endif
-ifeq ($(PORT),)
-  $(info Warning: no PORT set!)
-endif
 export BAUD ?= 115200
 
 RIOT_TERMINAL ?= pyterm
