@@ -31,6 +31,7 @@
 #include "byteorder.h"
 #include "kernel_types.h"
 #include "net/gnrc/pkt.h"
+#include "net/ieee802154.h"
 #include "net/sixlowpan.h"
 
 #ifdef __cplusplus
@@ -41,6 +42,32 @@ extern "C" {
  * @brief   Message type for passing one 6LoWPAN fragment down the network stack
  */
 #define GNRC_SIXLOWPAN_MSG_FRAG_SND    (0x0225)
+
+/**
+ * @brief   An entry in the 6LoWPAN reassembly buffer.
+ *
+ * A recipient of a fragment SHALL use
+ *
+ * 1. the source address,
+ * 2. the destination address,
+ * 3. the datagram size (gnrc_pktsnip_t::size of rbuf_t::pkt), and
+ * 4. the datagram tag
+ *
+ * to identify all fragments that belong to the given datagram.
+ *
+ * @see [RFC 4944, section 5.3](https://tools.ietf.org/html/rfc4944#section-5.3)
+ */
+typedef struct {
+    /**
+     * @brief   The reassembled packet in the packet buffer
+     */
+    gnrc_pktsnip_t *pkt;
+    uint8_t src[IEEE802154_LONG_ADDRESS_LEN];   /**< source address */
+    uint8_t dst[IEEE802154_LONG_ADDRESS_LEN];   /**< destination address */
+    uint8_t src_len;                            /**< length of gnrc_sixlowpan_rbuf_t::src */
+    uint8_t dst_len;                            /**< length of gnrc_sixlowpan_rbuf_t::dst */
+    uint16_t tag;                               /**< the datagram's tag */
+} gnrc_sixlowpan_rbuf_t;
 
 /**
  * @brief   Definition of 6LoWPAN fragmentation type.

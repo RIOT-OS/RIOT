@@ -30,7 +30,6 @@
 extern "C" {
 #endif
 
-#define RBUF_L2ADDR_MAX_LEN (8U)               /**< maximum length for link-layer addresses */
 #define RBUF_SIZE           (4U)               /**< size of the reassembly buffer */
 #define RBUF_TIMEOUT        (3U * US_PER_SEC) /**< timeout for reassembly in microseconds */
 
@@ -53,33 +52,19 @@ typedef struct rbuf_int {
 } rbuf_int_t;
 
 /**
- * @brief   An entry in the 6LoWPAN reassembly buffer.
+ * @brief   Internal representation of the 6LoWPAN reassembly buffer.
  *
- * @details A receipient of a fragment SHALL use
- *
- * 1. the source address,
- * 2. the destination address,
- * 3. the datagram size (gnrc_pktsnip_t::size of rbuf_t::pkt), and
- * 4. the datagram tag
- *
- * to identify all fragments that belong to the given datagram.
- *
- * @see <a href="https://tools.ietf.org/html/rfc4944#section-5.3">
- *          RFC 4944, section 5.3
- *      </a>
+ * Additional members help with correct reassembly of the buffer.
  *
  * @internal
+ *
+ * @extends gnrc_sixlowpan_rbuf_t
  */
 typedef struct {
+    gnrc_sixlowpan_rbuf_t super;        /**< exposed part of the reassembly buffer */
     rbuf_int_t *ints;                   /**< intervals of the fragment */
-    gnrc_pktsnip_t *pkt;                /**< the reassembled packet in packet buffer */
     uint32_t arrival;                   /**< time in microseconds of arrival of
                                          *   last received fragment */
-    uint8_t src[RBUF_L2ADDR_MAX_LEN];   /**< source address */
-    uint8_t dst[RBUF_L2ADDR_MAX_LEN];   /**< destination address */
-    uint8_t src_len;                    /**< length of source address */
-    uint8_t dst_len;                    /**< length of destination address */
-    uint16_t tag;                       /**< the datagram's tag */
     uint16_t cur_size;                  /**< the datagram's current size */
 } rbuf_t;
 
