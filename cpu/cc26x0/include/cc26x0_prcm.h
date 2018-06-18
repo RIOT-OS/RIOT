@@ -17,7 +17,7 @@
 #ifndef CC26X0_PRCM_H
 #define CC26X0_PRCM_H
 
-#include <cc26x0.h>
+#include <cc26xx_cc13xx.h>
 
 #ifdef __cplusplus
 extern "C" {

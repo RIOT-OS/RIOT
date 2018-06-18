@@ -7,15 +7,15 @@
  */
 
 /**
- * @ingroup         cpu_cc26x0_definitions
+ * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
  *
  * @file
- * @brief           CC26x0 VIMS register definitions
+ * @brief           CC26xx/CC13xx VIMS register definitions
  */
 
-#ifndef CC26X0_VIMS_H
-#define CC26X0_VIMS_H
+#ifndef CC26XX_CC13XX_VIMS_H
+#define CC26XX_CC13XX_VIMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -155,7 +155,8 @@ typedef struct {
     reg32_t __reserved19[2]; /**< meh */
     reg32_t FSM_BSLP0; /**< FMC FSM bank sector lock program 0 */
     reg32_t FSM_BSLP1; /**< FMC FSM bank sector lock program 1 */
-    reg32_t __reserved20[0x42]; /**< meh */
+    reg32_t FSM_PGM_128; /**< Enable 128-bit programming. CC26x2_CC13x2 only */
+    reg32_t __reserved20[0x41]; /**< meh */
     reg32_t FCFG_BANK; /**< FMC flash configuration bank */
     reg32_t FCFG_WRAPPER; /**< FMC flash wrapper configuration */
     reg32_t FCFG_BNK_TYPE; /**< FMC flash bank type */
@@ -232,6 +233,6 @@ typedef struct {
 }
 #endif
 
-#endif /* CC26X0_VIMS_H */
+#endif /* CC26XX_CC13XX_VIMS_H */
 
 /*@}*/

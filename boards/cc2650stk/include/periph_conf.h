@@ -74,8 +74,8 @@ static const timer_conf_t timer_config[] = {
  * @{
  */
 #define UART_NUMOF          (1)
-#define UART_RX_PIN         (28)
-#define UART_TX_PIN         (29)
+#define UART0_RX_PIN         (28)
+#define UART0_TX_PIN         (29)
 /** @} */
 
 /**

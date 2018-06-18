@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_cc26x0
+ * @ingroup     cpu_cc26xx_cc13xx
  * @ingroup     drivers_periph_uart
  * @{
  *
@@ -15,6 +15,7 @@
  * @brief       Low-level UART driver implementation
  *
  * @author      Leon M. George <leon@georgemail.eu>
+ * @author      Anton Gerasimov <tossel@gmail.com>
  *
  * @}
  */
@@ -44,13 +45,33 @@
  */
 static uart_isr_ctx_t ctx[UART_NUMOF];
 
-
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     /* make sure the uart device is valid */
-    if (uart != 0) {
+    if (uart > UART_NUMOF) {
         return UART_NODEV;
     }
+
+#if defined(CPU_VARIANT_X2)
+    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
+    int tx_pin = (uart == 1) ? UART1_TX_PIN : UART0_TX_PIN;
+    int rx_pin = (uart == 1) ? UART1_RX_PIN : UART0_RX_PIN;
+    int irqn = (uart == 1) ? UART1_IRQN : UART0_IRQN;
+#  if UART_HW_FLOW_CONTROL
+    int rts_pin = (uart == 1) ? UART1_RTS_PIN : UART0_RTS_PIN;
+    int cts_pin = (uart == 1) ? UART1_CTS_PIN : UART0_CTS_PIN;
+#  endif // UART_HW_FLOW_CONTROL
+#elif defined(CPU_VARIANT_X0)
+    uart_regs_t *uart_reg = UART0;
+    int tx_pin = UART0_TX_PIN;
+    int rx_pin = UART0_RX_PIN;
+    int irqn = UART0_IRQN;
+#  if UART_HW_FLOW_CONTROL
+    int rts_pin = UART0_RTS_PIN;
+    int cts_pin = UART0_CTS_PIN;
+#  endif // UART_HW_FLOW_CONTROL
+#endif // CPU_VARIANT_X2
+
 
     /* enable clocks: serial power domain and UART */
     PRCM->PDCTL0SERIAL = 1;
@@ -58,36 +79,36 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     uart_poweron(uart);
 
     /* disable and reset the UART */
-    UART->CTL = 0;
+    uart_reg->CTL = 0;
 
     /* save context */
-    ctx[0].rx_cb = rx_cb;
-    ctx[0].arg = arg;
+    ctx[uart].rx_cb = rx_cb;
+    ctx[uart].arg = arg;
 
     /* configure pins */
-    IOC->CFG[UART_TX_PIN] =  IOCFG_PORTID_UART0_TX;
-    IOC->CFG[UART_RX_PIN] = (IOCFG_PORTID_UART0_RX | IOCFG_INPUT_ENABLE);
+    IOC->CFG[tx_pin] =  IOCFG_PORTID_UART0_TX;
+    IOC->CFG[rx_pin] = (IOCFG_PORTID_UART0_RX | IOCFG_INPUT_ENABLE);
 #if UART_HW_FLOW_CONTROL
-    IOC->CFG[UART_RTS_PIN] =  IOCFG_PORTID_UART0_RTS;
-    IOC->CFG[UART_CTS_PIN] = (IOCFG_PORTID_UART0_CTS | IOCFG_INPUT_ENABLE);
+    IOC->CFG[rts_pin] =  IOCFG_PORTID_UART0_RTS;
+    IOC->CFG[cts_pin] = (IOCFG_PORTID_UART0_CTS | IOCFG_INPUT_ENABLE);
 #endif
 
     /* calculate baud-rate */
     uint32_t tmp = (CLOCK_CORECLOCK * 4);
     tmp += (baudrate / 2);
     tmp /= baudrate;
-    UART->IBRD = (tmp >> FRAC_BITS);
-    UART->FBRD = (tmp & FRAC_MASK);
+    uart_reg->IBRD = (tmp >> FRAC_BITS);
+    uart_reg->FBRD = (tmp & FRAC_MASK);
 
     /* configure line to 8N1 mode, LRCH must be written after IBRD and FBRD! */
-    UART->LCRH = UART_LCRH_WLEN_8;
+    uart_reg->LCRH = UART_LCRH_WLEN_8;
 
     /* enable the RX interrupt */
-    UART->IMSC = UART_IMSC_RXIM;
-    NVIC_EnableIRQ(UART0_IRQN);
+    uart_reg->IMSC = UART_IMSC_RXIM;
+    NVIC_EnableIRQ(irqn);
 
     /* start the UART */
-    UART->CTL = ENABLE_MASK;
+    uart_reg->CTL = ENABLE_MASK;
 
     return UART_OK;
 }
@@ -112,9 +133,11 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
            stop_bits == UART_STOP_BITS_2);
 
     /* make sure the uart device is valid */
-    if (uart != 0) {
+    if (uart >= UART_NUMOF) {
         return UART_NODEV;
     }
+
+    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
 
     /* cc26x0 does not support mark or space parity */
     if (parity == UART_PARITY_MARK || parity == UART_PARITY_SPACE) {
@@ -122,12 +145,14 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
     }
 
     /* Disable UART and clear old settings */
-    UART->CTL = 0;
-    UART->LCRH = 0;
+    uart_reg->CTL = 0;
+    uart_reg->LCRH = 0;
 
     /* Apply setting and enable UART */
-    UART->LCRH = data_bits | parity | stop_bits;
-    UART->CTL = ENABLE_MASK;
+    /* cppcheck-suppress redundantAssignment
+     * (reason: disable-enable cycle requires writing zero first) */
+    uart_reg->LCRH = data_bits | parity | stop_bits;
+    uart_reg->CTL = ENABLE_MASK;
 
     return UART_OK;
 }
@@ -135,30 +160,30 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    (void) uart;
+    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
 
     for (size_t i = 0; i < len; i++) {
-        while (UART->FR & UART_FR_TXFF) {}
-        UART->DR = data[i];
+        while (uart_reg->FR & UART_FR_TXFF) {}
+        uart_reg->DR = data[i];
     }
 }
 
 void uart_poweron(uart_t uart)
 {
-    (void) uart;
+    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
 
-    PRCM->UARTCLKGR = 1;
+    PRCM->UARTCLKGR |= 0x1;
     PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
     while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) {}
 
-    UART->CTL = ENABLE_MASK;
+    uart_reg->CTL = ENABLE_MASK;
 }
 
 void uart_poweroff(uart_t uart)
 {
-    (void) uart;
+    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
 
-    UART->CTL = 0;
+    uart_reg->CTL = 0;
 
     PRCM->UARTCLKGR = 0;
     PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
@@ -166,17 +191,26 @@ void uart_poweroff(uart_t uart)
 
 }
 
-void isr_uart(void)
+static void isr_uart(uart_t uart)
 {
+    uart_regs_t *uart_reg = (uart == 1) ? UART1 : UART0;
     /* remember pending interrupts */
-    uint32_t mis = UART->MIS;
+    uint32_t mis = uart_reg->MIS;
     /* clear them */
-    UART->ICR = mis;
+    uart_reg->ICR = mis;
 
     /* read received byte and pass it to the RX callback */
     if (mis & UART_MIS_RXMIS) {
-        ctx[0].rx_cb(ctx[0].arg, (uint8_t)UART->DR);
+        ctx[uart].rx_cb(ctx[uart].arg, (uint8_t)uart_reg->DR);
     }
 
     cortexm_isr_end();
+}
+
+void isr_uart0(void) {
+    isr_uart(0);
+}
+
+void isr_uart1(void) {
+    isr_uart(1);
 }

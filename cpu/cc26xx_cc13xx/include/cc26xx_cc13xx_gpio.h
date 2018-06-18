@@ -6,20 +6,20 @@
  * details.
  */
 /**
- * @ingroup         cpu_cc26x0_definitions
+ * @ingroup         cpu_cc26xx_cc13xx_definitions
  * @{
  *
  * @file
- * @brief           Driver for the cc26x0 GPIO controller
+ * @brief           Driver for the cc26xx/cc13xx GPIO controller
  *
  * @author          Leon George <leon@georgemail.eu>
  *
  */
 
-#ifndef CC26X0_GPIO_H
-#define CC26X0_GPIO_H
+#ifndef CC26XX_CC13XX_GPIO_H
+#define CC26XX_CC13XX_GPIO_H
 
-#include "cc26x0.h"
+#include "cc26xx_cc13xx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,6 +58,6 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26X0_GPIO_H */
+#endif /* CC26XX_CC13XX_GPIO_H */
 
 /** @} */

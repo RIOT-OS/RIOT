@@ -2,9 +2,6 @@
 MODULE = cpu
 
 # Add a list of subdirectories, that should also be built:
-DIRS = periph $(RIOTCPU)/cortexm_common
-
-# (file triggers compiler bug. see #5775)
-SRC_NOLTO += vectors.c
+DIRS = periph $(RIOTCPU)/cortexm_common $(RIOTCPU)/cc26xx_cc13xx
 
 include $(RIOTBASE)/Makefile.base
