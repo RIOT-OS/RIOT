@@ -253,7 +253,7 @@ extern evtimer_msg_t _nib_evtimer;
 /**
  * @brief   Primary default router.
  *
- * This value is returned by @ref @_nib_drl_get_dr() when it is not NULL and it
+ * This value is returned by @ref _nib_drl_get_dr() when it is not NULL and it
  * is reachable. Otherwise it is selected with the [default router selection
  * algoritm](https://tools.ietf.org/html/rfc4861#section-6.3.6) by that function.
  * Exposed to be settable by @ref net_gnrc_ipv6_nib_ft.
@@ -383,8 +383,7 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce);
 
 /**
  * @brief   Sets a NUD-managed neighbor cache entry to reachable and sets the
- *          respective event in @ref _nib_evtimer "event timer"
- *          (@ref GNRC_IPV6_NIB_MSG_NUD_SET_STALE)
+ *          respective event in @ref _nib_evtimer "event timer".
  *
  * @param[in,out] node  A node.
  */
