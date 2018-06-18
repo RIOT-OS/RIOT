@@ -95,9 +95,9 @@ export LINKFLAGS += -ffunction-sections
 
 # set the tap interface for term/valgrind
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
-  export PORT ?= tap0
+  PORT ?= tap0
 else
-  export PORT =
+  PORT =
 endif
 
 TERMFLAGS := $(PORT) $(TERMFLAGS)
