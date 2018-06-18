@@ -40,9 +40,8 @@ def generate_changelog(template_filename, changelog_filename, output_filename):
                 # parse out release number
                 release = release_match.group(1)
                 title = "Release %s" % release
-                tag = "release-%s" % release.replace('.', '-')
                 # append as level 1 title with reference anchor tag
-                changelog_lines.append("# %s {#%s}\n" % (title, tag))
+                changelog_lines.append("# %s\n" % (title))
                 title = True
             else:
                 # append non-title log lines as verbatim (so notation is kept)
