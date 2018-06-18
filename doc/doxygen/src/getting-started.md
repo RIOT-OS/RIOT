@@ -1,10 +1,8 @@
-Getting started                                              {#getting-started}
+Getting started
 ===============
 
-[TOC]
-
-Downloading RIOT code                                  {#downloading-riot-code}
-=====================
+Downloading RIOT code
+---------------------
 You can obtain the latest RIOT code from
 our [Github](https://github.com/RIOT-OS/) repository either by
 [downloading the latest tarball](https://github.com/RIOT-OS/RIOT/releases) or
@@ -14,15 +12,14 @@ In order to clone the RIOT repository, you need the
 [Git revision control system](http://git-scm.com/) and run the following
 command:
 
-~~~~~~~~ {.sh}
+~~~~~~~~ shell
 git clone git://github.com/RIOT-OS/RIOT.git
 ~~~~~~~~
 
-Compiling RIOT                                                {#compiling-riot}
-==============
+Compiling RIOT
+--------------
 
-Setting up a toolchain                                {#setting-up-a-toolchain}
-----------------------
+### Setting up a toolchain
 Depending on the hardware you want to use, you need to first install a
 corresponding toolchain. The Wiki on RIOT's Github page contains a lot of
 information that can help you with your platform:
@@ -32,8 +29,7 @@ information that can help you with your platform:
 * [Atmel ATmega](https://github.com/RIOT-OS/RIOT/wiki/Family%3A-ATmega)
 * [native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
 
-The build system                                            {#the-build-system}
-----------------
+### The build system
 RIOT uses [GNU make](https://www.gnu.org/software/make/) as build system. The
 simplest way to compile and link an application with RIOT, is to set up a
 Makefile providing at least the following variables:
@@ -47,7 +43,7 @@ Makefile providing at least the following variables:
 Additionally it has to include the `Makefile.include`, located in RIOT's root
 directory:
 
-~~~~~~~~ {.mk}
+~~~~~~~~ makefile
 # a minimal application Makefile
 APPLICATION = mini-makefile
 BOARD ?= native
@@ -60,7 +56,7 @@ You can use Make's `?=` operator in order to allow overwriting
 variables from the command line. For example, you can easily specify the target
 platform, using the sample Makefile, by invoking make like this:
 
-~~~~~~~~ {.sh}
+~~~~~~~~ shell
 make BOARD=iotlab-m3
 ~~~~~~~~
 
@@ -89,19 +85,18 @@ hex file in the `bin` folder of your application directory.
 Learn more about the build system in the
 [Wiki](https://github.com/RIOT-OS/RIOT/wiki/The-Make-Build-System)
 
-Building and executing an example           {#building-and-executing-an-example}
----------------------------------
+### Building and executing an example
 RIOT provides a number of examples in the `examples/` directory. Every example
 has a README that documents its usage and its purpose. You can build them by
 typing
 
-~~~~~~~~ {.sh}
+~~~~~~~~ shell
 make BOARD=samr21-xpro
 ~~~~~~~~
 
 or
 
-~~~~~~~~ {.sh}
+~~~~~~~~ shell
 make all BOARD=samr21-xpro
 ~~~~~~~~
 
@@ -109,20 +104,20 @@ into your shell.
 
 To flash the application to a board just type
 
-~~~~~~~~ {.sh}
+~~~~~~~~ shell
 make flash BOARD=samr21-xpro
 ~~~~~~~~
 
 You can then access the board via the serial interface:
 
-~~~~~~~~ {.sh}
+~~~~~~~~ shell
 make term BOARD=samr21-xpro
 ~~~~~~~~
 
 If you are using multiple boards you can use the `PORT` macro to specify the
 serial interface:
 
-~~~~~~~~ {.sh}
+~~~~~~~~ shell
 make term BOARD=samr21-xpro PORT=/dev/ttyACM1
 ~~~~~~~~
 
@@ -134,7 +129,7 @@ We use `pyterm` as the default terminal application. It is shipped with RIOT in
 the `dist/tools/pyterm/` directory. If you choose to use another terminal
 program you can set `TERMPROG` (and if need be the `TERMFLAGS`) macros:
 
-~~~~~~~~ {.sh}
+~~~~~~~~ shell
 make -C examples/gnrc_networking/ term \
     BOARD=samr21-xpro \
     TERMPROG=gtkterm \

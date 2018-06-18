@@ -1,15 +1,13 @@
-Creating an application                              {#creating-an-application}
+Creating an application
 =======================
-
-[TOC]
 
 To create your own application you need to create a directory containing one or
 multiple C file(s) with your source code and a Makefile. A template Makefile is
 available in the `dist` folder of the
 [RIOT repository](https://github.com/RIOT-OS/RIOT).
 
-The main function                                          {#the-main-function}
-=================
+The main function
+-----------------
 After the board is initialized, RIOT starts two threads: the idle thread and
 the main thread. The idle thread has the lowest priority and will run whenever
 no other thread is ready to run. It will automatically use the lowest possible
@@ -19,7 +17,7 @@ priorities - is the first thread that runs and calls the `main()` function.
 This function needs to be defined in the source code of the application
 (typically located in `main.c`).
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
 #include <stdio.h>
 
 int main(void)
@@ -29,10 +27,9 @@ int main(void)
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The application's Makefile                         {#the-applications-makefile}
-==========================
-The minimal Makefile                                    {#the-minimal-makefile}
---------------------
+The application's Makefile
+--------------------------
+### The minimal Makefile
 At minimum the Makefile of an application (see @ref getting-started) needs to
 define the following macros:
  * `APPLICATION`: should contain the name of your application
@@ -44,7 +41,7 @@ default, but is recommended to be overridable with the `?=` operator.
 Additionally, it is required to include the `Makefile.include` from the
 `RIOTBASE`.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ makefile
 # Set the name of your application:
 APPLICATION = foobar
 
@@ -57,8 +54,7 @@ RIOTBASE ?= $(CURDIR)/../../RIOT
 include $(RIOTBASE)/Makefile.include
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-How to handle unsupported boards?                  {#handle-unsupported-boards}
----------------------------------
+### How to handle unsupported boards?
 Sometimes it is necessary to exclude boards because they don't provide a
 required functionality or don't have sufficient memory. RIOT's build system
 looks for the macros `BOARD_BLACKLIST`, `BOARD_WHITELIST`, and
@@ -74,8 +70,7 @@ build in any case. A CI system can use the information provided by the
 process, since some linkers will issue an error if the code won't fit the
 target board's flash memory or RAM.
 
-Including modules                                          {#including-modules}
------------------
+### Including modules
 By default a RIOT application comprises only of the applications' code itself,
 the kernel, and platform specific code. In order to use additional modules,
 such as a particular [device driver](@ref drivers) or [a system library](@ref sys)
@@ -84,7 +79,7 @@ names to the USEMODULE variable. For example, to build an application using the
 SHT11 temperature sensor and UDP/IPv6 functionalities of the GNRC network stack,
 your Makefile needs to contain these lines:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~ makefile
 USEMODULE += sht11
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_udp

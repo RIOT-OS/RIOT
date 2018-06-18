@@ -1,10 +1,8 @@
-RIOT Documentation                                                  {#mainpage}
-==================
+Overview
+========
 
-[TOC]
-
-RIOT in a nutshell                                        {#riot-in-a-nutshell}
-==================
+RIOT in a nutshell
+------------------
 RIOT is an open-source  microkernel-based operating system, designed to match
 the requirements of Internet of Things (IoT) devices and other embedded
 devices. These requirements include a very low memory footprint (on the order
@@ -23,8 +21,8 @@ Across all supported hardware (32-bit, 16-bit, and 8-bit platforms). RIOT
 provides a consistent API and enables ANSI C and C++ application programming,
 with  multithreading, IPC, system timers, mutexes etc.
 
-Contribute to RIOT                                        {#contribute-to-riot}
-==================
+Contribute to RIOT
+------------------
 RIOT is developed by an open community that anyone is welcome to join:
  - Download and contribute your code on
    [GitHub](https://github.com/RIOT-OS/RIOT). You can read about how to
@@ -47,13 +45,13 @@ RIOT is developed by an open community that anyone is welcome to join:
    [irc.freenode.org \#riot-os](irc://irc.freenode.org/riot-os)
 
 
-The quickest start                                        {#the-quickest-start}
-==================
+The quickest start
+------------------
 You can run RIOT on most IoT devices, on open-access testbed hardware (e.g.
 IoT-lab), and also directly as a process on your Linux/FreeBSD/OSX machine (we
 call this the `native` port). Try it right now in your terminal window:
 
-~~~~~~~{.sh}
+~~~~~~~shell
 git clone git://github.com/RIOT-OS/RIOT.git # assumption: git is pre-installed
 cd RIOT
 git checkout <LATEST_RELEASE>
@@ -75,8 +73,8 @@ with RIOT, see @ref getting-started.
 Before that, skimming through the next section is recommended (but not
 mandatory).
 
-Structure                                                          {#structure}
-=========
+Structure
+---------
 
 This section walks you through RIOT's structure. Once you understand this
 structure, you will easily find your way around in RIOT's code base.
@@ -102,16 +100,14 @@ directory.
 The following list gives a more detailed description of each of RIOT's
 top-level directories:
 
-core
-----
+### core
 This directory contains the actual kernel. The kernel consists of the
 scheduler, inter-process-communication (messaging), threading, thread
 synchronization, and supporting data-structures and type definitions.
 
 See @ref core for further information and API documentations.
 
-boards
-------
+### boards
 The platform dependent code is split into two logic elements: CPUs and boards,
 while maintaining a strict 1-to-n relationship, a board has exactly one CPU,
 while a CPU can be part of n boards. The CPU part contains all generic, CPU
@@ -130,8 +126,7 @@ e.g. OpenOCD configuration files. For most boards, these files are located in a
 
 See here @ref boards for further information.
 
-cpu
----
+### cpu
 For each supported CPU this directory contains a sub-directory with the name of
 the CPU. These directories then contain all CPU specific configurations, such
 as implementations of power management (LPM), interrupt handling and vectors,
@@ -152,8 +147,7 @@ scheme. Examples for this is code shared across architectures (e.g.
 
 See @ref cpu for more detailed informtation.
 
-drivers
--------
+### drivers
 This directory contains the drivers for external devices such as network
 interfaces, sensors and actuators. Each device driver is put into its own
 sub-directory with the name of that device.
@@ -165,8 +159,7 @@ and board code.
 
 See @ref drivers for more details.
 
-sys
----
+### sys
 RIOT follows the micro-kernel design paradigm where everything is supposed to
 be a module. All of these modules that are not part of the hardware abstraction
 nor device drivers can be found in this directory. The libraries include data
@@ -176,8 +169,7 @@ the RIOT shell and many more.
 
 See @ref sys for a complete list of available libraries
 
-sys/net
--------
+### sys/net
 The `sys/net` sub-directory needs to be explicitly mentioned, as this is where
 all the networking code in RIOT resides. Here you can find the network stack
 implementations (e.g. the @ref net_gnrc "GNRC" stack) as well as network stack agnostic code as
@@ -185,8 +177,7 @@ header definitions or network types.
 
 See @ref net for more details on networking code.
 
-pkg
----
+### pkg
 RIOT comes with support for a number of external libraries (e.g.
 [ccn-lite](https://github.com/cn-uofbasel/ccn-lite),
 [microcoap](https://github.com/1248/microcoap)). The way they are included is
@@ -197,8 +188,7 @@ directory.
 
 See @ref pkg for a detailed description on how this works.
 
-examples
---------
+### examples
 Here you find a number of example applications that demonstrate certain
 features of RIOT. The default example found in this directory is a good
 starting point for anyone who is new to RIOT.
@@ -208,15 +198,13 @@ For more information best browse that directory and have a look at the
 
 To create your own application - here or anywhere else - see @ref creating-an-application
 
-tests
------
+### tests
 Many features/modules in RIOT come with their own test application, which are
 located in this directory. In contrary to the examples these tests are mostly
 focusing on a single aspect than on a set of features. Despite for testing, you
 might consider these tests also for insights on understanding RIOT.
 
-dist & doc
-----------
+### dist & doc
 All the tooling around RIOT can be found in these two folders.
 
 `doc` contains the doxygen configuration and also contains the compiled doxygen
@@ -230,8 +218,8 @@ debugging, reseting (e.g. support for [OpenOCD](http://openocd.org/),
 integration to open testbeds such as the [IoT-LAB](https://www.iot-lab.info/).
 Furthermore you can find here scripts to do all kind of code and style checks.
 
-Further information                                      {#further-information}
-===================
+Further information
+-------------------
  - @ref getting-started
  - @ref creating-an-application
  - @ref creating-modules

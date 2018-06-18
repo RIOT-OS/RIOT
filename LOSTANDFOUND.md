@@ -38,7 +38,7 @@ Listing the authors of the removed code is done for appreciation of their work.
 This way, their names are never removed from the RIOT repository.
 
 
-# Removed Features
+## Removed Features
 
 ### boards/pca10000 [9447cb303426d7c6348bb84999f88bf929cd6263]
 Author(s):
