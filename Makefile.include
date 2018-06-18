@@ -310,6 +310,14 @@ APPLICATION_MODULE ?= application_$(APPLICATION)
 BASELIBS += $(BINDIR)/$(APPLICATION_MODULE).a
 BASELIBS += $(APPDEPS)
 
+
+# include bindist target
+include $(RIOTMAKE)/bindist.inc.mk
+
+# Add all USEMODULE modules to CFLAGS and populate BASELIBS
+include $(RIOTMAKE)/modules.inc.mk
+
+
 .PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile binfile hexfile
 .PHONY: ..in-docker-container
@@ -602,12 +610,6 @@ endif
 
 # Include desvirt Makefile
 include $(RIOTTOOLS)/desvirt/Makefile.desvirt
-
-# include bindist target
-include $(RIOTMAKE)/bindist.inc.mk
-
-# Add all USEMODULE modules to CFLAGS
-include $(RIOTMAKE)/modules.inc.mk
 
 # Build a header file with all common macro definitions and undefinitions
 # make it phony to force re-run of the script every time even if the file exists
