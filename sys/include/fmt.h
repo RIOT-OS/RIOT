@@ -295,6 +295,17 @@ size_t fmt_float(char *out, float f, unsigned precision);
 size_t fmt_strlen(const char *str);
 
 /**
+ * @brief Count at most @p maxlen characters until '\0' (exclusive) in @p str
+ *
+ * @param[in]   str     Pointer to string
+ * @param[in]   maxlen  Maximum number of chars to count
+ *
+ * @return      nr of characters in string @p str points to, or @p maxlen if no
+ *              null terminator is found within @p maxlen chars
+ */
+size_t fmt_strnlen(const char *str, size_t maxlen);
+
+/**
  * @brief Copy null-terminated string (excluding terminating \0)
  *
  * If @p out is NULL, will only return the number of bytes that would have

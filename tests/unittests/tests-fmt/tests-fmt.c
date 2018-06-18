@@ -704,6 +704,17 @@ static void test_fmt_strlen(void)
     TEST_ASSERT_EQUAL_INT(21, fmt_strlen(long_str));
 }
 
+static void test_fmt_strnlen(void)
+{
+    const char *empty_str = "";
+    const char *short_str = "short";
+    const char *long_str = "this is a long string";
+
+    TEST_ASSERT_EQUAL_INT(0, fmt_strnlen(empty_str, 16));
+    TEST_ASSERT_EQUAL_INT(5, fmt_strnlen(short_str, 16));
+    TEST_ASSERT_EQUAL_INT(16, fmt_strnlen(long_str, 16));
+}
+
 static void test_fmt_str(void)
 {
     const char *string1 = "string1";
@@ -778,6 +789,7 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_s16_dfp),
         new_TestFixture(test_fmt_s32_dfp),
         new_TestFixture(test_fmt_strlen),
+        new_TestFixture(test_fmt_strnlen),
         new_TestFixture(test_fmt_str),
         new_TestFixture(test_scn_u32_dec),
         new_TestFixture(test_fmt_lpad),
