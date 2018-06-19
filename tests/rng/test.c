@@ -59,6 +59,8 @@ static void test_init(char *name)
         puts("Park & Miller Minimal Standard PRNG.\n");
 #elif MODULE_PRNG_MUSL_LCG
         puts("Musl C PRNG.\n");
+#elif MODULE_PRNG_SHA1PRNG
+        puts("SHA1 PRNG.\n");
 #elif MODULE_PRNG_TINYMT32
         puts("Tiny Mersenne Twister PRNG.\n");
 #elif MODULE_PRNG_XORSHIFT
