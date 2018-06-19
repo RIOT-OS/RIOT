@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2015-18 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,12 +15,14 @@
  * @brief       Sniffer application for RIOT
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Martine Lenders <m.lenders@fu-berlin.de>
  *
  * @}
  */
 
 #include <stdio.h>
 
+#include "fmt.h"
 #include "thread.h"
 #include "xtimer.h"
 #include "shell.h"
@@ -59,16 +61,21 @@ void dump_pkt(gnrc_pktsnip_t *pkt)
     pkt = gnrc_pktbuf_remove_snip(pkt, pkt->next);
     uint64_t now_us = xtimer_usec_from_ticks64(xtimer_now64());
 
-    printf("rftest-rx --- len 0x%02x lqi 0x%02x rx_time 0x%08" PRIx32 "%08" PRIx32 "\n\n",
-           gnrc_pkt_len(pkt), lqi, (uint32_t)(now_us >> 32), (uint32_t)(now_us & 0xffffffff));
-
+    print_str("rftest-rx --- len ");
+    print_u32_hex((uint32_t)gnrc_pkt_len(pkt));
+    print_str(" lqi ");
+    print_byte_hex(lqi);
+    print_str(" rx_time ");
+    print_u64_hex(now_us);
+    print_str("\n");
     while (snip) {
         for (size_t i = 0; i < snip->size; i++) {
-            printf("0x%02x ", ((uint8_t *)(snip->data))[i]);
+            print_byte_hex(((uint8_t *)(snip->data))[i]);
+            print_str(" ");
         }
         snip = snip->next;
     }
-    puts("\n");
+    print_str("\n\n");
 
     gnrc_pktbuf_release(pkt);
 }
