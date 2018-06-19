@@ -148,8 +148,8 @@ def main():
                                   "connected via serial line")
     serial_p.add_argument("tty", type=str,
                           help="Serial port to board with sniffer application")
-    serial_p.add_argument("baudrate", type=int,
-                          help="Baudrate of the serial port")
+    serial_p.add_argument("-b", "--baudrate", type=int, default=112500,
+                          nargs="?", help="Baudrate of the serial port")
     socket_p = sp.add_parser("socket",
                              help="Parse output of a TCP-connected sniffer "
                                   "application")
