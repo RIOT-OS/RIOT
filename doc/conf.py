@@ -194,3 +194,32 @@ breathe_domain_by_extension = {
         "h" : "c",
         "c" : "c",
         }
+
+# -- Hacks for Read the Docs ------------------------------------------
+#  This will only be used when we are inside RTD
+#  Taken from http://breathe.readthedocs.io/en/latest/readthedocs.html
+
+import subprocess, sys
+
+def _run_cmd(cmd):
+    """Run an arbitrary command and check exit status"""
+    try:
+        retcode = subprocess.call(cmd, shell=True)
+        if retcode < 0:
+            sys.stderr.write("command terminated by signal %s" % (-retcode))
+    except OSError as e:
+        sys.stderr.write("command execution failed: %s" % e)
+
+def generate_doxygen_breathe(app):
+    """Run the doxygen make commands if we're on the ReadTheDocs server"""
+    read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+    if read_the_docs_build:
+        _run_cmd("cd doxygen; make xml")
+        _run_cmd("breathe-apidoc -g group -o breathe doxygen/xml")
+
+
+def setup(app):
+    """Add hook for building doxygen xml when needed"""
+    app.connect("builder-inited", generate_doxygen_breathe)
+
