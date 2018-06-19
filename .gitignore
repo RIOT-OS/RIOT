@@ -10,7 +10,7 @@ doc/doxygen/*.db
 doc/doxygen/*.tmp
 doc/breathe/*.rst
 doc/breathe/*/*.rst
-doc/sphinx/build
+_build
 # Built binaries
 *bin
 # Backup files

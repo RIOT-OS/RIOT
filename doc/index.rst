@@ -8,11 +8,11 @@ Table of contents
 .. toctree::
    :maxdepth: 2
 
-   ../../doxygen/src/mainpage
-   ../../doxygen/src/getting-started
-   ../../doxygen/src/creating-an-application
-   ../../doxygen/src/creating-modules
-   ../../breathe/grouplist
+   doxygen/src/mainpage
+   doxygen/src/getting-started
+   doxygen/src/creating-an-application
+   doxygen/src/creating-modules
+   breathe/grouplist
 
 
 Changelog
@@ -21,4 +21,4 @@ Changelog
 .. toctree::
    :maxdepth: 2
 
-   ../../doxygen/src/changelog
+   doxygen/src/changelog
