@@ -33,6 +33,7 @@ SUCH DAMAGE.
 '''
 
 from __future__ import print_function
+import argparse
 import sys
 import re
 import socket
@@ -106,21 +107,21 @@ def generate_pcap(port, out):
             out.flush()
 
 
-def connect(argv):
-    connType = argv[1]
+def connect(args):
+    connType = args.conn_type
 
     conn = None
     if connType == "serial":
         # open serial port
         try:
-            conn = Serial(argv[2], argv[3], dsrdtr=0, rtscts=0,
+            conn = Serial(args.tty, args.baudrate, dsrdtr=0, rtscts=0,
                           timeout=1)
         except IOError:
             print("error opening serial port", file=sys.stderr)
             sys.exit(2)
     elif connType == "socket":
-        host = argv[2]
-        port = int(argv[3])
+        host = args.host
+        port = args.port
 
         try:
             sock = socket.socket()
@@ -135,32 +136,41 @@ def connect(argv):
 
     return conn
 
-def main(argv):
-    if len(argv) < 5:
-        print("Usage: %s serial tty baudrate channel [outfile]\n"
-              "       %s socket host port channel [outfile]" % (argv[0], argv[0]),
-              file=sys.stderr)
-        print("       channel = 11-26", file=sys.stderr)
-        sys.exit(2)
+def main():
+    if sys.version_info > (3,):
+        default_outfile = sys.stdout.buffer
+    else:
+        default_outfile = sys.stdout
+    p = argparse.ArgumentParser()
+    sp = p.add_subparsers(dest="conn_type")
+    serial_p = sp.add_parser("serial",
+                             help="Parse output of sniffer application "
+                                  "connected via serial line")
+    serial_p.add_argument("tty", type=str,
+                          help="Serial port to board with sniffer application")
+    serial_p.add_argument("baudrate", type=int,
+                          help="Baudrate of the serial port")
+    socket_p = sp.add_parser("socket",
+                             help="Parse output of a TCP-connected sniffer "
+                                  "application")
+    socket_p.add_argument("host", type=str,
+                          help="Host of the TCP-based sniffer application")
+    socket_p.add_argument("port", type=int,
+                          help="Port of the TCP-based sniffer application")
+    p.add_argument("channel", type=int, help="Channel to sniff on")
+    p.add_argument("outfile", type=argparse.FileType("w+b"),
+                   default=default_outfile, nargs="?",
+                   help="PCAP file to output to")
+    args = p.parse_args()
 
-    conn = connect(argv)
+    conn = connect(args)
 
     sleep(1)
-    configure_interface(conn, int(argv[4]))
+    configure_interface(conn, args.channel)
     sleep(1)
 
-    # figure out where to write
     try:
-        sys.stderr.write('trying to open file %s\n' % argv[5])
-        outfile = open(argv[5], 'w+b')
-    except IndexError:
-        if sys.version_info > (3,):
-            outfile = sys.stdout.buffer
-        else:
-            outfile = sys.stdout
-
-    try:
-        generate_pcap(conn, outfile)
+        generate_pcap(conn, args.outfile)
     except KeyboardInterrupt:
         conn.close()
         print()
@@ -168,4 +178,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
