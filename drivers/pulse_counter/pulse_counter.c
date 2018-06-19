@@ -38,7 +38,15 @@ static void pulse_counter_trigger(void *arg)
 /* Initialize pulse counter */
 int pulse_counter_init(pulse_counter_t *dev, const pulse_counter_params_t *params)
 {
-    if (gpio_init_int(params->gpio, GPIO_IN_PU, params->gpio_flank, pulse_counter_trigger, dev)) {
+    gpio_mode_t gpio_mode;
+    if (params->gpio_flank == GPIO_FALLING) {
+        gpio_mode = GPIO_IN_PU;
+    }
+    else {
+        gpio_mode = GPIO_IN_PD;
+    }
+
+    if (gpio_init_int(params->gpio, gpio_mode, params->gpio_flank, pulse_counter_trigger, dev)) {
         return -1;
     }
 
