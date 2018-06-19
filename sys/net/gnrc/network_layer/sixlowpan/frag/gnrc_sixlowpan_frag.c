@@ -31,6 +31,10 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+static gnrc_sixlowpan_msg_frag_t _fragment_msg = {
+        NULL, 0, 0, KERNEL_PID_UNDEF
+    };
+
 #if ENABLE_DEBUG
 /* For PRIu16 etc. */
 #include <inttypes.h>
@@ -209,8 +213,15 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
     return local_offset;
 }
 
-void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
+gnrc_sixlowpan_msg_frag_t *gnrc_sixlowpan_msg_frag_get(void)
 {
+    return (_fragment_msg.pkt == NULL) ? &_fragment_msg : NULL;
+}
+
+void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
+{
+    assert(ctx != NULL);
+    gnrc_sixlowpan_msg_frag_t *fragment_msg = ctx;
     gnrc_netif_t *iface = gnrc_netif_get_by_pid(fragment_msg->pid);
     uint16_t res;
     /* payload_len: actual size of the packet vs
@@ -218,6 +229,9 @@ void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
     size_t payload_len = gnrc_pkt_len(fragment_msg->pkt->next);
     msg_t msg;
 
+    assert((fragment_msg->pkt == pkt) || (pkt == NULL));
+    (void)page;
+    (void)pkt;
 #if defined(DEVELHELP) && ENABLE_DEBUG
     if (iface == NULL) {
         DEBUG("6lo frag: iface == NULL, expect segmentation fault.\n");
@@ -275,13 +289,15 @@ void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg)
     }
 }
 
-void gnrc_sixlowpan_frag_handle_pkt(gnrc_pktsnip_t *pkt)
+void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
 {
     gnrc_netif_hdr_t *hdr = pkt->next->data;
     sixlowpan_frag_t *frag = pkt->data;
     uint16_t offset = 0;
     size_t frag_size;
 
+    (void)ctx;
+    (void)page;
     switch (frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) {
         case SIXLOWPAN_FRAG_1_DISP:
             frag_size = (pkt->size - sizeof(sixlowpan_frag_t));
