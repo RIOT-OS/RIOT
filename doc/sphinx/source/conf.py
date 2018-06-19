@@ -171,6 +171,8 @@ source_parsers = {
    '.md': 'recommonmark.parser.CommonMarkParser',
 }
 
+# -- Options for parsing markdown --------------------------------------------
+
 from recommonmark.transform import AutoStructify
 
 def setup(app):
@@ -179,10 +181,16 @@ def setup(app):
             }, True)
     app.add_transform(AutoStructify)
 
-# -- Options for Breathe
+# -- Options for Breathe -----------------------------------------------------
 
 _doxyxml_path = os.path.join('..', '..', 'doxygen', 'xml')
 
 breathe_projects = { "riot": _doxyxml_path }
 breathe_default_project = "riot"
 
+# If we don't specify this, breathe will use the cpp domain and qualifiers such
+# as restrict will cause errors.
+breathe_domain_by_extension = {
+        "h" : "c",
+        "c" : "c",
+        }
