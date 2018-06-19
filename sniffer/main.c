@@ -47,7 +47,7 @@
 /**
  * @brief   Stack for the raw dump thread
  */
-static char rawdmp_stack[THREAD_STACKSIZE_MAIN];
+static char rawdmp_stack[THREAD_STACKSIZE_SMALL];
 
 /**
  * @brief   Make a raw dump of the given packet contents
