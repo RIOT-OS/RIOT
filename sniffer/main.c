@@ -38,6 +38,11 @@
 #define RAWDUMP_PRIO            (THREAD_PRIORITY_MAIN - 1)
 
 /**
+ * @brief   Message queue size of the RAW dump thread
+ */
+#define RAWDUMP_MSG_Q_SIZE      (32U)
+
+/**
  * @brief   Stack for the raw dump thread
  */
 static char rawdmp_stack[THREAD_STACKSIZE_MAIN];
@@ -72,12 +77,14 @@ void dump_pkt(gnrc_pktsnip_t *pkt)
  */
 void *rawdump(void *arg)
 {
+    msg_t msg_q[RAWDUMP_MSG_Q_SIZE];
+
     (void)arg;
-    msg_t msg;
-
+    msg_init_queue(msg_q, RAWDUMP_MSG_Q_SIZE);
     while (1) {
-        msg_receive(&msg);
+        msg_t msg;
 
+        msg_receive(&msg);
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV:
                 dump_pkt((gnrc_pktsnip_t *)msg.content.ptr);
