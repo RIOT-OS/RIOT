@@ -215,7 +215,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [92] = isr_quadspi,              /* [92] Quad SPI global interrupt */
     [93] = isr_lptim1,               /* [93] LP TIM1 interrupt */
 
-#if defined(CPU_MODEL_STM32F746ZG)
+#if defined(CPU_LINE_STM32F746xx)
     [63] = isr_can2_tx,              /* [63] CAN2 TX Interrupt */
     [64] = isr_can2_rx0,             /* [64] CAN2 RX0 Interrupt */
     [65] = isr_can2_rx1,             /* [65] CAN2 RX1 Interrupt */
@@ -229,7 +229,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [95] = isr_i2c4_ev,              /* [95] I2C4 Event Interrupt */
     [96] = isr_i2c4_er,              /* [96] I2C4 Error Interrupt */
     [97] = isr_spdif_rx,             /* [97] SPDIF-RX global Interrupt */
-#elif defined(CPU_MODEL_STM32F767ZI)
+#elif defined(CPU_LINE_STM32F767xx)
     [63] = isr_can2_tx,              /* [63] CAN2 TX Interrupt */
     [64] = isr_can2_rx0,             /* [64] CAN2 RX0 Interrupt */
     [65] = isr_can2_rx1,             /* [65] CAN2 RX1 Interrupt */
@@ -250,7 +250,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [107] = isr_can3_sce,             /* [107] CAN3 SCE Interrupt */
     [108] = isr_jpeg,                 /* [108] JPEG global Interrupt */
     [109] = isr_mdios,                /* [109] MDIO Slave global Interrupt */
-#elif defined(CPU_MODEL_STM32F769NI)
+#elif defined(CPU_LINE_STM32F769xx)
     [63] = isr_can2_tx,              /* [63] CAN2 TX Interrupt */
     [64] = isr_can2_rx0,             /* [64] CAN2 RX0 Interrupt */
     [65] = isr_can2_rx1,             /* [65] CAN2 RX1 Interrupt */
