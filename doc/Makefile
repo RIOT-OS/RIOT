@@ -21,11 +21,10 @@ clean:
 
 .PHONY: clean
 
-breathe:
-	mkdir -p breathe
-
-breathe/grouplist.rst: doxygen/xml/index.xml | breathe
+breathe/grouplist.rst: doxygen/xml/index.xml
 	breathe-apidoc -g group -o breathe doxygen/xml
+	rm  breathe/group/group__boards__*
+	rm  breathe/group/group__cpu__*
 
 doxygen/xml/index.xml:
 	(cd doxygen && make xml)

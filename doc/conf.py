@@ -217,6 +217,8 @@ def generate_doxygen_breathe(app):
     if read_the_docs_build:
         _run_cmd("cd doxygen; make xml")
         _run_cmd("breathe-apidoc -g group -o breathe doxygen/xml")
+        _run_cmd("rm breathe/group/group__boards__*")
+        _run_cmd("rm breathe/group/group__cpu__*")
 
 
 def setup(app):
