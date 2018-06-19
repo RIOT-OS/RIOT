@@ -12,6 +12,7 @@ Table of contents
    ../../doxygen/src/getting-started
    ../../doxygen/src/creating-an-application
    ../../doxygen/src/creating-modules
+   ../../breathe/grouplist
 
 
 Changelog
