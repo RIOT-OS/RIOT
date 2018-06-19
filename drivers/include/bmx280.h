@@ -164,9 +164,8 @@ typedef struct {
  */
 enum {
     BMX280_OK           =  0,     /**< everything was fine */
-    BMX280_ERR_I2C      = -1,     /**< error initializing the I2C bus */
-    BMX280_ERR_NODEV    = -2,     /**< did not detect BME280 or BMP280 */
-    BMX280_ERR_NOCAL    = -3,     /**< could not read calibration data */
+    BMX280_ERR_NODEV    = -1,     /**< did not detect BME280 or BMP280 */
+    BMX280_ERR_NOCAL    = -2,     /**< could not read calibration data */
 };
 
 /**
