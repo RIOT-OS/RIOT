@@ -24,17 +24,8 @@
 
 #include "cpu_conf_common.h"
 
-#if defined(CPU_MODEL_STM32F303VC)
-#include "vendor/stm32f303xc.h"
-#elif defined(CPU_MODEL_STM32F334R8)
-#include "vendor/stm32f334x8.h"
-#elif defined(CPU_MODEL_STM32F303RE) || defined(CPU_MODEL_STM32F303ZE)
-#include "vendor/stm32f303xe.h"
-#elif defined(CPU_MODEL_STM32F303K8)
-#include "vendor/stm32f303x8.h"
-#elif defined(CPU_MODEL_STM32F302R8)
-#include "vendor/stm32f302x8.h"
-#endif
+#include "vendor/stm32f3xx.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,7 +35,7 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
-#if defined(CPU_MODEL_STM32F303RE) || defined (CPU_MODEL_STM32F303ZE)
+#if defined(CPU_LINE_STM32F303xE)
 #define CPU_IRQ_NUMOF                   (85U)
 #else
 #define CPU_IRQ_NUMOF                   (82U)
