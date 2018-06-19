@@ -41,6 +41,7 @@ else
     /usr/$(TARGET_ARCH)/include \
     /usr/local/opt/$(TARGET_ARCH)*/$(TARGET_ARCH)/include \
     /usr/local/opt/gcc-*/$(TARGET_ARCH)/include \
+    #
 
   # Search for a newlib.h inside the above newlib include directory patterns
   NEWLIB_INCLUDE_FILE = $(firstword $(wildcard $(addsuffix /newlib.h,$(NEWLIB_INCLUDE_PATTERNS))))
