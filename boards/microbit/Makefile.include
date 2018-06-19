@@ -9,15 +9,11 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-# we support flashing through plain fscopy or using JLink
-PROGRAMMER ?= fscopy
-ifeq (fscopy,$(PROGRAMMER))
-  export FFLAGS =
-  export DEBUGGER_FLAGS =
-
-  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
-  export DEBUGGER =
-  export DEBUGSERVER =
+# we support flashing using openocd (via CMSIS-DAP interface) or using JLink
+PROGRAMMER ?= openocd
+ifeq (openocd,$(PROGRAMMER))
+  export DEBUG_ADAPTER ?= dap
+  include $(RIOTMAKE)/tools/openocd.inc.mk
 else ifeq (jlink,$(PROGRAMMER))
   export JLINK_DEVICE := nrf51822
   include $(RIOTMAKE)/tools/jlink.inc.mk
