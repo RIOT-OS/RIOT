@@ -756,6 +756,13 @@ ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += random
 endif
 
+ifneq (,$(filter sock_secure,$(USEMODULE)))
+  USEMODULE += tlsman
+  ifneq (,$(filter tinydtls,$(USEMODULE)))
+    USEMODULE += tlsman_tinydtls
+  endif
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 
