@@ -87,14 +87,15 @@ static const uart_conf_t uart_config[] = {
             .mask_rx        = (GPIO_PIN_0),
             .mask_tx        = (GPIO_PIN_1),
         }
-    },
+    }
 };
 
 /* interrupt function name mapping */
-#define UART_0_ISR          isr_uart0
+#define UART_0_ISR          (isr_uart0)
 
 /* macros common across all UARTs */
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+/** @} */
 
 /**
  * @name   ADC configuration
