@@ -27,9 +27,6 @@
 #include "bitarithm.h"
 #include "periph/pwm.h"
 
-/* guard file in case no PWM device is defined */
-#ifdef PWM_NUMOF
-
 /**
  * @note The PWM is always initialized with left-aligned mode.
  *
@@ -126,5 +123,3 @@ void pwm_poweroff(pwm_t dev)
     PWM1TCR &= ~(BIT0);
     PCONP &= ~(PCPWM1);
 }
-
-#endif /* PWM_NUMOF */
