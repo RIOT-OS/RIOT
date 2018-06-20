@@ -1,0 +1,169 @@
+.. _riot-201707---release-notes:
+
+============================
+RIOT-2017.07 - Release Notes
+============================
+
+RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are
+typically found in the Internet of Things: 8-bit microcontrollers,
+16-bit microcontrollers and light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency,
+soft real-time capabilities, small memory footprint, modularity, and
+uniform API access, independent of the underlying hardware (with partial
+POSIX compliance).
+
+RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community)
+and is licensed with a non-viral copyleft license (LGPLv2.1), which
+allows indirect business models around the free open-source software
+platform provided by RIOT.
+
+About this release:
+===================
+
+This release provides fixes, code cleanup and improved documentation, as
+well as enhancements. New features brought by this release include:
+
+-  CAN support (Controller Area Network)
+-  Support for CoAP OBSERVE requests
+-  Basic Thread stack support (initial support for OpenThread)
+-  radio duty cycling with LwMAC protocol
+-  LoRa radio drivers supporting Semtech hardware
+
+About 230 pull requests with about 442 commits have been merged since
+the last release and about 13 issues have been solved. 45 people
+contributed with code in 56 days. 1395 files have been touched with
+211720 insertions and 65729 deletions.
+
+Notations used below:
+=====================
+
+-  means new feature/item
+
+-  means modified feature/item
+
+-  means removed feature/item
+
+New features and changes
+========================
+
+API changes
+-----------
+
+-  removed conn API
+
+System libraries
+----------------
+
+-  AES CMAC encryption
+-  GCC's Stack Smashing Protector (SSP) support
+
+-  Remove 3-DES crypto
+
+Networking
+----------
+
+-  CAN stack
+-  CoAP OBSERVE request
+-  LwMAC protocol
+-  OpenThread
+-  Layer 2 filtering (l2filter)
+
+-  LwIP port to v2.0.2
+-  NHDP port to sock API
+
+-  removed conn API
+
+Packages
+--------
+
+-  OpenThread
+
+Boards
+------
+
+-  Arduino MKR1000 (without WiFi)
+-  Nucleo144-f412
+-  Nucleo144-f746
+-  Nucleo144-f767
+-  NZ32-SC151 (STM32L1)
+-  ST B-L072-LRWAN1 (with LoRa radio)
+-  STM32F769 discovery
+
+-  Full support for PhyNode
+
+CPU
+---
+
+-  lm4120: SPI support
+-  SAM3: ADC support, DAC support
+-  SAMD21: flashpage, ADC support
+-  SAML21: ADC, I2C support
+-  STM32F413vg support
+-  STM32F7 family (ARM Cortex-M7)
+-  STM32L0 family: I2C support
+
+-  STM32: unified DAC support
+-  STM32F1/F2/F4 clock initialization refactoring
+
+Device Drivers
+--------------
+
+-  ADCXX1C I2C ADC support
+-  BMP280 temperature/pressure sensor
+-  DSP0401 4 digits 16 segment alphanumeric display
+-  MMA8x5x motion detection sensor
+-  Semtech SX1272 and SX1276 LoRa drivers
+
+Build System
+------------
+
+-  EDBG support
+-  http download with caching (dlcache)
+-  Use Coccinelle static code checker in CI
+
+Special Thanks
+==============
+
+We would like to give our special thanks to all the companies that
+provided us with their hardware for porting and testing, namely the
+people from (in alphabeticalorder): Atmel, Freescale, Imagination
+Technologies, Nordic, OpenMote, Phytec, SiLabs, UDOO, and Zolertia; and
+also companies that directly sponsored development time: Cisco Systems,
+Eïsox, Eistec, Ell-i, Engineering Spirit, Mesotic, Nordic, OTA keys and
+Phytec. We also would like to thank people from Inria Chile for their
+work on OpenThread integration and Semtech LoRa drivers.
+
+More information
+================
+
+http://www.riot-os.org
+
+Mailing lists
+-------------
+
+-  RIOT OS kernel developers list devel@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/devel)
+-  RIOT OS users list users@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/users)
+-  RIOT commits commits@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/commits)
+-  Github notifications notifications@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+
+-  Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+
+-  The code developed by the RIOT community is licensed under the GNU
+   Lesser General Public License (LGPL) version 2.1 as published by the
+   Free Software Foundation.
+-  Some external sources and pkg are published under a separate license.
+
+All code files contain licensing information.

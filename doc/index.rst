@@ -1,6 +1,12 @@
-=================================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Welcome to the RIOT documentation
-=================================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+.. warning::
+
+   This manual is **not official** and is currently under development. The
+   official RIOT docs are hosted under http://doc.riot-os.org/.
+
 
 Table of contents
 -----------------
@@ -8,17 +14,16 @@ Table of contents
 .. toctree::
    :maxdepth: 2
 
-   doxygen/src/mainpage
-   doxygen/src/getting-started
-   doxygen/src/creating-an-application
-   doxygen/src/creating-modules
-   breathe/grouplist
+   manual/index
+   api-reference/index
 
 
 Changelog
 ---------
 
 .. toctree::
-   :maxdepth: 2
+   :glob:
+   :reversed:
+   :maxdepth: 1
 
-   doxygen/src/changelog
+   changelog/*

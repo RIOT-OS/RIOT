@@ -1,0 +1,239 @@
+.. _riot-201607---release-notes:
+
+============================
+RIOT-2016.07 - Release Notes
+============================
+
+RIOT is a real-time multi-threading operating system that supports a
+range of devices that are typically found in the Internet of Things:
+8-bit microcontrollers, 16-bit microcontrollers and light-weight 32-bit
+processors.
+
+RIOT is based on the following design principles: energy-efficiency,
+real-time capabilities, small memory footprint, modularity, and uniform
+API access, independent of the underlying hardware (this API offers
+partial POSIX compliance).
+
+RIOT is developed by an international open source community which is
+independent of specific vendors (e.g. similarly to the Linux community)
+and is licensed with a non-viral copyleft license (LGPLv2.1), which
+allows indirect business models around the free open-source software
+platform provided by RIOT.
+
+About this release:
+===================
+
+This release was focused primarily on fixing bugs, but also adds two new
+supported radio transceivers: CC2420 and CC2538. This new radio support
+allows to new interoperability tests with other OS, allowing code size
+comparison and overall network performance for platforms based on these
+radios.
+
+About 198 pull requests with about 325 commits have been merged since
+the last release and about 65 issues have been solved. 46 people
+contributed with code in 112 days. 632 files have been touched with
+19863 insertions and 3682 deletions.
+
+Notations used below:
+=====================
+
+-  means new feature/item
+
+-  means modified feature/item
+
+-  means removed feature/item
+
+New features and changes
+========================
+
+General
+-------
+
+-  No major changes or new features coming on this release.
+
+Core
+----
+
+-  Introduced Mailbox IPC API (#4919)
+
+-  Improved clist
+
+Network Stack
+-------------
+
+-  Introduction of netstats in several platforms.
+
+-  RPL optional auto initialization
+
+Packages
+--------
+
+-  Added statistics for TLSF package (#5418)
+-  Added U8g2 library for monochrome displays (#5549)
+
+-  Added on-the-fly content creation for CCN-lite.
+
+Platforms
+---------
+
+-  nrf52dk: add support for building with Nordic SoftDevice (6lo over
+   BLE)
+-  Added support for Libellium's waspmote-pro board.
+-  Added support for the iotlab A8/M3 node
+   (https://www.iot-lab.info/hardware/a8/)
+-  Added initial and rudimentary port for TI cc2650stk "SensorTag"
+   (#4675)
+-  Split Zolertia Remote support into Remote Prototype A (remote-pa) and
+   Remote Revision A (remote-reva)
+
+Drivers
+-------
+
+-  Texas Instruments CC2538 RF driver (PR #5291)
+-  Texas Instruments CC2420 RF driver (PR #5591)
+-  Bosch BM180 sensor.
+-  Added XBee optional AES encryption support
+
+System libraries
+----------------
+
+-  Several xtimer bug fixes
+
+Build System
+------------
+
+-  Ubuntu 16.04 packaged gcc-arm-none-eabi toolchain can now be used to
+   compile RIOT for ARM boards
+
+Other
+-----
+
+-  Reworked UART and code factorisation for ATmega CPUs.
+
+API changes
+-----------
+
+-  Unified interface of hashing functions
+
+Fixed Issues from the last release
+==================================
+
+-  #3824: native: gnrc: hardcore pinging crashes.
+-  #4583: cpp11: clang doesn't allow mutex_t to be used with constexpr
+   All cpp11-\* tests fail with clang.
+-  #5388: gnrc_sixlowpan_iphc_nhc: receiving NHC compressed UDP packets
+   hits assert in IPv6 (Fixed by #5281).
+
+Known Issues
+============
+
+-  #3075: nhdp: unnecessary microsecond precision NHDP works with timer
+   values of microsecond precision which is not required. Changing to
+   lower precision would save some memory.
+-  #3086: Max. packet length for AT86RF2XX
+-  #4048: potential racey memory leak According to the packet buffer
+   stats, flood-pinging a multicast destination may lead to a memory
+   leak due to a race condition. However, it seems to be a rare case and
+   a completely filled up packet buffer was not observed.
+-  #5005: ndp: router advertisement sent with global address Under some
+   circumstances a router might send RAs with GUAs. While they are
+   ignored on receive (as RFC 4861 specifies), RAs should have
+   link-local addresses and not even be send out this way.
+-  #5007: gnrc icmpv6: Ping reply goes out the wrong interface
+-  #5055: cpuid: multiple radios will get same EUI-64 Nodes with
+   multiple interfaces might get the same EUI-64 for them since they are
+   generated from the same CPU ID. #5230: gnrc ipv6: multicast packets
+   are not dispatched to the upper layers. (Fix exists, but was
+   postponed)
+-  #5390: pkg: OpenWSN does not compile This package still uses
+   deprecated modules and was not tested for a long time.
+
+native related issues
+---------------------
+
+-  #495: native not float safe When the FPU is used when an asynchronous
+   context switch occurs, either the stack gets corrupted or a floating
+   point exception occurs.
+-  #534: native debugging on osx fails Using valgrind or gdb with a
+   nativenet target in OSX leads to "the network" being stuck (gdb) or
+   the whole process being stuck (valgrind).
+-  #334: nativenet crashes when hammered Flood-pinging a native instance
+   from more than one host (either multiple threads on the host system
+   or multiple other native instances), leads to a SEGFAULT.
+-  #2071; WIP: native: overdue fixes
+-  #4590: pkg: building relic with clang fails.
+-  #5432: native: valgrind fails
+
+other platform related issues
+-----------------------------
+
+-  #4560: make: clang is more pedantic than gcc oonf_api is not building
+   with clang. (Partly solved by #4593)
+-  #4866: not all GPIO driver implementations are thread safe Due to
+   non-atomic operations in the drivers some pin configurations might
+   get lost. #5486: at86rf2xx: lost interrupts
+
+other issues
+------------
+
+-  #1263: TLSF implementation contains (a) read-before-write error(s).
+-  #2761: core: define default flags If a thread is created without the
+   corresponding flag (CREATE_STACKTEST), the ps command will yield
+   wrong numbers for the stack usage.
+-  #2927: core: Automatically select the lowest possible LPM mode Not
+   all available low power modes (LPMs) are implemented for each
+   platform and the concept of how the LPM is chosen needs some
+   reconsideration.
+-  #2967: Makefile.features: location is not relevant for all features
+   Provided features for the build system should be split up into a
+   board and cpu specific part
+-  #4488: Making the newlib thread-safe When calling puts/printf after
+   thread_create(), the CPU hangs for DMA enabled uart drivers.
+-  #4841: xtimer: timer already in the list Under some conditions an
+   xtimer can end up twice in the internal list of the xtimer module.
+-  #5338: xtimer: xtimer_now() not ISR safe For non-32-bit platforms.
+
+Special Thanks
+==============
+
+We like to give our special thanks to all the companies that provided us
+with their hardware for porting and testing, namely the people from (in
+alphabeticalorder): Atmel, Freescale, Limifrog, Nordic, OpenMote,
+Phytec, SiLabs, UDOO,and Zolertia; and also companies that directly
+sponsored development time:Cisco Systems, Eistec, Ell-i, Enigeering
+Spirit, Nordic, FreshTemp LLC, and Phytec.
+
+More information
+================
+
+http://www.riot-os.org
+
+Mailing lists
+-------------
+
+-  RIOT OS kernel developers list
+-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+-  RIOT OS users list
+-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+-  RIOT commits
+-  commits@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/commits)
+-  Github notifications
+-  notifications@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+
+-  Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+
+-  Most of the code developed by the RIOT community is licensed under
+   the GNU Lesser General Public License (LGPL) version 2.1 as published
+   by the Free Software Foundation.
+-  Some external sources are published under a separate, LGPL compatible
+   license (e.g. some files developed by SICS).
+
+All code files contain licensing information.

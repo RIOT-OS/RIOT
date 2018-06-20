@@ -1,0 +1,143 @@
+.. _riot-201704---release-notes:
+
+============================
+RIOT-2017.04 - Release Notes
+============================
+
+RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are
+typically found in the Internet of Things: 8-bit microcontrollers,
+16-bit microcontrollers and light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency,
+soft real-time capabilities, small memory footprint, modularity, and
+uniform API access, independent of the underlying hardware (with partial
+POSIX compliance).
+
+RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community)
+and is licensed with a non-viral copyleft license (LGPLv2.1), which
+allows indirect business models around the free open-source software
+platform provided by RIOT.
+
+About this release:
+===================
+
+This release provides a lot of new features, fixes and enhancements.
+Among these has been a huge cleanup regarding cppcheck and
+documentation, and we're pleased to announce that all remaining doxygen
+and cppcheck warnings have been fixed. We're also proud to present a
+Virtual File System layer and integration of the SPIFFS file system. A
+lot of work has gone into support for STMicroelectronics's Nucleo
+family, with RIOT now supporting 28 (up from 13) Nucleo boards. And as
+always, there was a lot of under-the-hood cleanup, bug fixing and
+documentation work.
+
+About 200 pull requests with about 562 commits have been merged since
+the last release and about 23 issues have been solved. 32 people
+contributed with code in 91 days. 2697 files have been touched with
+716950 insertions and 492623 deletions.
+
+Notations used below:
+=====================
+
+-  means new feature/item
+
+-  means modified feature/item
+
+-  means removed feature/item
+
+New features and changes
+========================
+
+Core
+----
+
+-  full C11 atomics support
+-  rmutex, a recursive mutex implementation
+
+API changes
+-----------
+
+-  renamed NTOH*() -> ntoh*(), HTON*() -> hton*()
+
+-  removed gpioint API, which was unnused and obsoleted by periph/gpio
+
+-  renamed uuid module to luid
+
+System libraries
+----------------
+
+-  VFS: virtual file system layer
+-  fmt: add print_byte_hex(), fmt_lpad()
+
+-  3DES: removed support as 3DES is considered legacy crypto
+
+Networking
+----------
+
+-  emCute - a small MQTT-SN implementation
+-  sock_dns: a simple DNS resolver
+
+Packages
+--------
+
+-  SPIFFS, the first file system supported by RIOT's VFS layer
+-  jerryscript, a Javascript interpreter
+
+Drivers
+-------
+
+-  added dynamixel server motor driver
+-  removed ltc4150 driver
+-  removed smb380 driver
+
+Build System
+------------
+
+-  Experimental distributed building using Murdock
+-  most makfiles moved from root into makefiles/
+-  added submodule support
+
+Special Thanks
+==============
+
+We like to give our special thanks to all the companies that provided us
+with their hardware for porting and testing, namely the people from (in
+alphabeticalorder): Atmel, Freescale, Imagination Technologies, Nordic,
+OpenMote, Phytec, SiLabs, UDOO, and Zolertia; and also companies that
+directly sponsored development time: Cisco Systems, Eistec, Ell-i,
+Enigeering Spirit, Nordic, OTAkeys and Phytec.
+
+More information
+================
+
+http://www.riot-os.org
+
+Mailing lists
+-------------
+
+-  RIOT OS kernel developers list devel@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/devel)
+-  RIOT OS users list users@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/users)
+-  RIOT commits commits@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/commits)
+-  Github notifications notifications@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+
+-  Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+
+-  Most of the code developed by the RIOT community is licensed under
+   the GNU Lesser General Public License (LGPL) version 2.1 as published
+   by the Free Software Foundation.
+-  Some external sources are published under a separate, LGPL compatible
+   license (e.g. some files developedby SICS).
+
+All code files contain licensing information.

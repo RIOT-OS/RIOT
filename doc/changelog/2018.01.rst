@@ -1,0 +1,257 @@
+.. _riot-201801---release-notes:
+
+============================
+RIOT-2018.01 - Release Notes
+============================
+
+RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are
+typically found in the Internet of Things: 8-bit and 16-bit
+microcontrollers as well as light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency,
+soft real-time capabilities, small memory footprint, modularity, and
+uniform API access, independent of the underlying hardware (with partial
+POSIX compliance).
+
+RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community)
+and is licensed with a non-viral copyleft license (LGPLv2.1), which
+allows indirect business models around the free open-source software
+platform provided by RIOT.
+
+About this release:
+===================
+
+The 2018.01 release includes major progress in RIOTs network
+communication capabilities, i.e., rewrite of GNRC's neighbour discovery,
+confirmable messages in (g)CoAP, LoRa, and GoMacH as well as updates on
+CCN-lite and LWIP. Furthermore, RIOT contributes to *IKEA-Hacking* by
+bringing support for the smart home lighting system TRADFRI (note: this
+will void the warranty). Needless to say that this release also adds and
+updates support for several platforms, drivers, and of course lots of
+enhancements to the documentation as well as numerous bug fixes. Last
+but not least, RIOT now has an official code of conduct
+(https://github.com/RIOT-OS/RIOT/blob/master/CODE_OF_CONDUCT.md)
+
+More than 442 pull requests with about 865 commits have been merged
+since the last release and about 96 issues have been solved. 54 people
+contributed with code in 96 days. Approximately 2370 files have been
+touched with 223970 insertions and 181409 deletions.
+
+Notations used below:
+=====================
+
+::
+
+   + means new feature/item
+   * means modified feature/item
+   - means removed feature/item
+
+New features and changes
+========================
+
+System libraries
+----------------
+
+::
+
+   + event: event queue framework like libevent
+
+Networking
+----------
+
+::
+
+   + gcoap: confirmable messages
+   + nanocoap: no external package anymore
+   * GNRC: major rewrite of neighbour discovery
+   * GNRC: new API for network interface handling
+
+Packages
+--------
+
+::
+
+   + gecko_sdk: library for EFM/EFR/EZR32 MCUs
+   * libcoap: git patching fixed
+   + littlefs: filesystem for constraint devices
+   - nanocoap: now part of RIOT
+   * openthread: updated
+   + semtech-loramac: LoRa MAC
+   + umorse: morse encoder
+
+Boards
+------
+
+::
+
+   + acd52832
+   * common: restructured shared code for boards
+   + b-l475e-iot01a
+   + bluepill
+   + ikea-tradfri
+   - pca10000
+   - pca10005
+   - qemu-i386
+   + ruuvitag
+   + sltb001a
+   + teensy31
+   + thingy52
+   - x86
+
+CPU
+---
+
+::
+
+   + efm32
+   * kinetis: unified all MCU variants
+   - x86
+
+Device Drivers
+--------------
+
+::
+
+   + socket_zep: emulated IEEE 802.15.4 device over a UDP for native
+   + hts221
+   + lc709203f
+   + lis2dh12
+   + rn2xx3
+   + soft_spi
+   + tja1042
+
+.. _build-system--tooling:
+
+Build System / Tooling
+----------------------
+
+::
+
+   + flake8: python code checker
+   * make: set `-Wall -Wextra` as default for all compilers and platforms
+   - sniffer: moved to applications repository
+   + tests: add automated test scripts for many apps
+
+.. _fixed-issues-from-the-last-release-201710:
+
+Fixed Issues from the last release (2017.10)
+============================================
+
+-  #2143: unittests: tests-core doesn't compile for all platforms
+-  #4499: handle of l2src_len in gnrc_ndp_rtr_sol_handle
+-  #4822: kw2xrf: packet loss when packets get fragmented
+-  #5005: ndp: router advertisement sent with global address
+-  #5122: NDP: global unicast address on non-6LBR nodes disappears after
+   a while
+-  #5656: Possible Weakness with locking in the GNRC network stack
+-  #5790: ND: Lost of Global IPV6 on node after sending lot of UDP frame
+   from BR
+-  #5944: msp430: ipv6_hdr unittests fail
+-  #6451: Wrong value in SRF08 driver
+-  #6502: cpu/stm32l1: RTC broken
+
+Known Issues
+============
+
+Networking related issues
+-------------------------
+
+-  #5230: gnrc ipv6: multicast packets are not dispatched to the upper
+   layers
+-  #5858: gnrc: 6lo: potential problem with reassembly of fragments: If
+   one frame gets lost the reassembly state machine might get out of
+   sync
+-  #7035: lwIP: hangs due to sema change after a while
+
+Timer related issues
+--------------------
+
+-  #5103: xtimer: weird behavior of tests/xtimer_drift: xtimer_drift
+   randomly jumps a few seconds on nrf52
+-  #5338: xtimer: xtimer_now() not ISR safe for non-32-bit platforms.
+-  #6052: tests: xtimer_drift gets stuck: application freezes after
+   ~30-200 seconds
+-  #7114: xtimer: add's items to the wrong list if the timer overflows
+   between \_xtimer_now() and irq_disable()
+
+native related issues
+---------------------
+
+-  #495: native not float safe: When FPU is used and an asynchronous
+   context switch occurs, either the stack gets corrupted or a floating
+   point exception occurs.
+-  #6442: cpu/native: timer interrupt does not yield thread
+
+other platform related issues
+-----------------------------
+
+-  #1891: newlib-nano: Printf formatting does not work properly for some
+   numeric types: PRI[uxdi]64, PRI[uxdi]8 and float are not parsed in
+   newlib-nano
+-  #4866: not all GPIO driver implementations are thread safe: Due to
+   non-atomic operations in the drivers some pin configurations might
+   get lost.
+-  #5848: Arduino: Race condition in sys/arduino/Makefile.include
+-  #6018: nRF52 gnrc 6lowpan ble memory leak
+-  #6261: SAMD21: TC3 & TC4 issue when using TCC2
+-  #6379: nrf52dk/nordic_soft_device: not working anymore
+-  #6437: periph/spi: Leftovers from SPI rework
+-  #6526: atmega based boards freeze when main thread is over
+-  #6836: Issuing a reboot on ATmega328p makes the board loop-reboot
+-  #7753: pic32-wifire: race-condition when linking in concurrent build
+
+other issues
+------------
+
+-  #1263: TLSF implementation contains (a) read-before-write error(s).
+-  #3366: periph/i2c: handle NACK
+-  #4488: Making the newlib thread-safe: When calling puts/printf after
+   thread_create(), the CPU hangs for DMA enabled UART drivers.
+-  #5776: make: Predefining CFLAGS are parsed weirdly
+-  #5863: OSX + SAMR21-xpro: shell cannot handle inputs of length >64
+   chars
+-  #5962: Makefile: UNDEF variable is not working as documented
+
+Acknowledgements
+================
+
+We would like to thank all companies (vendors) that provided us with
+(their) hardware for porting and testing RIOT-OS. Further thanks go to
+companies and institutions that directly sponsored development time. And
+finally, big thanks to all of you contributing in so many different ways
+to make RIOT worthwhile!
+
+More information
+================
+
+http://www.riot-os.org
+
+Mailing lists
+-------------
+
+-  RIOT OS kernel developers list devel@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/devel)
+-  RIOT OS users list users@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/users)
+-  RIOT commits commits@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/commits)
+-  Github notifications notifications@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+
+-  Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+
+-  The code developed by the RIOT community is licensed under the GNU
+   Lesser General Public License (LGPL) version 2.1 as published by the
+   Free Software Foundation.
+-  Some external sources and packages are published under a separate
+   license.
+
+All code files contain licensing information.

@@ -1,0 +1,274 @@
+.. _riot-201512---release-notes:
+
+============================
+RIOT-2015.12 - Release Notes
+============================
+
+RIOT is a real-time multi-threading operating system that supports a
+range of devices that are typically found in the Internet of Things:
+8-bit microcontrollers, 16-bit microcontrollers and light-weight 32-bit
+processors.
+
+RIOT is based on the following design principles: energy-efficiency,
+real-time capabilities, small memory footprint, modularity, and uniform
+API access, independent of the underlying hardware (this API offers
+partial POSIX compliance).
+
+RIOT is developed by an international open source community which is
+independent of specific vendors (e.g. similarly to the Linux community).
+
+About this release:
+===================
+
+This release is mostly a clean-up and bug-fixing release. Besides that,
+it introduces SAUL, the [S]ensor [A]ctuator [U]ber [L]ayer, which offers
+a unified API to interact with all different types of sensors and
+actuators on RIOT supported hardware. Furthermore, it re-enables the
+support for ICN by integrating CCN-Lite as a package. A lot of new
+overall documentation was added and existing documentation was improved
+(http://riot-os.org/api/). In addition, a Vagrant
+(https://www.vagrantup.com/) configuration file was added to the RIOT
+repository in order to create reproducible and portable environments
+that contain all necessary toolchains.
+
+About 222 pull requests with about 631 commits have been merged since
+the last release and 48 additional issues have been solved. 37 people
+contributed code in 102 days. 980 files have been touched with ~59779
+insertions and ~12115 deletions.
+
+Notations used below:
+=====================
+
+-  means new feature/item
+
+-  means modified feature/item
+
+-  means removed feature/item
+
+New features and changes
+========================
+
+General
+-------
+
+Device support
+--------------
+
+-  SAUL [S]ensor [A]ctuator [U]ber [L]ayer
+
+Core
+----
+
+-  replaced deprecated dINT()/eINT() calls by up-to-date
+   disableIRQ()/enableIRQ()/restoreIRQ() calls throughout the whole core
+
+Network Stack
+-------------
+
+-  TFTP support
+-  6LoWPAN: Next Header Compression
+-  leaf mode for RPL nodes
+
+-  RPL: refactoring of instances and dodags (saved 1kB ROM and 0,5kB
+   RAM)
+-  FIB: initial source route support
+-  change to non-blocking 6LoWPAN fragmentation
+-  POSIX sockets: various fixes
+-  periodic stats printing for ping6 command
+-  convert all vtimer into xtimer calls
+-  send router advertisements without PIOs
+
+Packages
+--------
+
+-  CCN-Lite as a ICN network stack
+-  RELIC: efficient cryptography library
+
+-  fix TLSF to compile with -pedantic
+
+Supported platforms
+-------------------
+
+Additional support for the following boards:
+
+-  weio board with NXP LPC11U34 (ARM Cortex-M0)
+-  Silicon Labs Wireless Eval Kit SLWSTK6220A (Wonder Gecko)
+-  STM32 Nucleo-F401
+
+Drivers
+-------
+
+-  Arduino-mega2560 GPIO
+-  Arduino pin mapping for Mega2560 and Due
+
+Network drivers
+---------------
+
+-  enc28j60 Ethernet chip
+-  at86rf2xx: Add support for channel page
+
+-  at86rf2xx: fix LQI reading
+-  implement sleep mode for at86rf2xx
+
+Sensors drivers
+---------------
+
+-  AT30TSE75x temperature sensor
+-  TCS3772 Color Light-to-Digital converter
+
+System libraries
+----------------
+
+-  partial support for the Arduino API
+-  lightweight semaphores
+-  fmt: simple string formatting library
+-  xtimer: 32-bit version of msg_recv_timeout
+
+-  implicit socket binding for POSIX connect() and sendto()
+-  posix_semaphore: make API POSIX compliant
+
+Examples
+--------
+
+-  microcoap/conn example
+-  minimal GNRC networking example
+
+Build System
+------------
+
+-  split the Cortex-M0 buildtest group to avoid timeout issues with
+   Travis
+-  split the Cortex-M4 buildtest group to avoid timeout issues with
+   Travis
+
+Other
+-----
+
+-  vagrant configuration
+-  documentation: various high-level descriptions of crucial features
+-  IoT-LAB: create and connect to debug server
+
+-  pyterm: fix problems with German umlauts as input
+
+Fixed Issues from the last release
+==================================
+
+-  #2724: Add support for serial number passing to CMSIS boards,
+   document it Documentation about how to discover and set the serial
+   number of CMSIS-DAP chips is missing
+-  #3201: Odd length packet snips cause invalid check sum If an odd
+   length packet snip occurs in a packet and is not the last snip (in
+   the order the packet is supposed to be, not in the list's order) in a
+   packet it will generate a wrong check sum.
+
+Known Issues
+============
+
+network related issues
+----------------------
+
+-  #3075: nhdp: unnecessary microsecond precision NHDP works with timer
+   values of microsecond precision which is not required. Changing to
+   lower precision would save some memory.
+-  #3086: Max. packet length for AT86RF2XX The size of the link-layer
+   header is not dynamically calculated, but instead the maximum size is
+   always assumed.
+-  #3970: RPL: Advertise DODAG only over the assigned interface gnrc_rpl
+   seems to multicast DIOs over all interfaces, though gnrc_rpl_init
+   expects an interface as parameter and sets the RPL-nodes multicast
+   address only for that interface.
+-  #4048: potential racey memory leak According to the packet buffer
+   stats, flood-pinging a multicast destination may lead to a memory
+   leak due to a race condition. However, it seems to be a rare case and
+   a completely filled up packet buffer was not observed.
+-  #4462: IPHC/NHC broken between Linux and a RIOT node with a
+   RIOT-based border router in between.
+
+native related issues
+---------------------
+
+-  #495: native not float safe When the FPU is used when an asynchronous
+   context switch occurs, either the stack gets corrupted or a floating
+   point exception occurs.
+-  #534: native debugging on osx fails Using valgrind or gdb with a
+   nativenet target in OSX leads to "the network" being stuck (gdb) or
+   the whole process being stuck (valgrind).
+-  #3341 and #3824: nativenet crashes when hammered Flood-pinging a
+   native instance from more than one host (either multiple threads on
+   the host system or multiple other native instances), leads to a
+   SEGFAULT.
+-  #4608: tests/xtimer_usleep_until: unstable behaviour The test starts
+   to output "too large difference" and fails after a random period of
+   time.
+
+other platform related issues
+-----------------------------
+
+-  #4560: make: clang is more pedantic than gcc oonf_api is not building
+   with clang.
+-  #4583: cpp11: clang doesn't allow ``mutex_t`` to be used with
+   ``constexpr`` All cpp11-\* tests fail with clang.
+
+other issues
+------------
+
+-  #2761: core: define default flags If a thread is created without the
+   corresponding flag (CREATE_STACKTEST), the ps command will yield
+   wrong numbers for the stack usage
+-  #2927: core: Automatically select the lowest possible LPM mode Not
+   all available low power modes (LPMs) are implemented for each
+   platform and the concept of how the LPM is chosen needs some
+   reconsideration
+-  #2967: Makefile.features: location is not relevant for all features
+   Provided features for the build system should be split up into a
+   board and cpu specific part
+-  #3109: periph/random: random_read should return unsigned int The
+   documentation of this function does not match corresponding
+   implementation.
+-  #4488: Making the newlib thread-safe When calling puts/printf after
+   thread_create(), the CPU hangs for DMA enabled uart drivers.
+
+Special Thanks
+--------------
+
+We like to give our special thanks to all the companies that provided us
+with their hardware for porting and testing, namely the people from (in
+alphabetical order): Atmel, Freescale, Limifrog, Phytec, SiLabs, and
+Zolertia; and also companies that directly sponsored development time:
+Cisco Systems, Google, Eistec, Ell-i, Engineering Spirit, FreshTemp LLC,
+and Phytec.
+
+More information
+================
+
+http://www.riot-os.org
+
+Mailing lists
+-------------
+
+-  RIOT OS kernel developers list
+-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+-  RIOT OS users list
+-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+-  RIOT commits
+-  commits@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/commits)
+-  Github notifications
+-  notifications@riot-os.org
+   (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+
+-  Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+
+-  Most of the code developed by the RIOT community is licensed under
+   the GNU Lesser General Public License (LGPL) version 2.1 as published
+   by the Free Software Foundation.
+-  Some external sources are published under a separate, LGPL compatible
+   license (e.g. some files developed by SICS).
+
+All code files contain licensing information.

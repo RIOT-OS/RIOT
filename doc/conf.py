@@ -26,6 +26,7 @@ version = ''
 # The full version, including alpha/beta/rc tags
 release = '2018.04'
 
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 # -- General configuration ---------------------------------------------------
 
@@ -41,6 +42,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
+    'sphinx.ext.extlinks',
     'breathe'
 ]
 
@@ -77,7 +79,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'classic'
+html_theme = 'classic' if not read_the_docs_build else 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -212,8 +214,6 @@ def _run_cmd(cmd):
 
 def generate_doxygen_breathe(app):
     """Run the doxygen make commands if we're on the ReadTheDocs server"""
-    read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
-
     if read_the_docs_build:
         _run_cmd("cd doxygen; make xml")
         _run_cmd("breathe-apidoc -g group -o breathe doxygen/xml")

@@ -1783,6 +1783,8 @@ Fixed Issues from the last release
 
 Known Issues
 ==========
+
+network related issues
 ----------------------
 * #3075: nhdp: unnecessary microsecond precision
     NHDP works with timer values of microsecond precision which is not required. Changing
