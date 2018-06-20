@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2018 RWTH Aachen, Josua Arndt, Steffen Robertz
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     cpu_atmega256rfr2
+ * @{
+ *
+ * @file
+ * @brief       Low-Level RTC Implementation using a watch crystal on async. Timer 2
+ *
+ * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
+ *
+ * @}
+ */
 #include <avr/interrupt.h>
 #include <stdio.h>
 #include "periph/rtc.h"
