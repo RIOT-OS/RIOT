@@ -256,7 +256,7 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
         /* no sock or sock currently unbound */
         memset(&local, 0, sizeof(local));
         if ((src_port = _get_dyn_port(sock)) == GNRC_SOCK_DYN_PORTRANGE_ERR) {
-            return -EINVAL;
+            return -EADDRINUSE;
         }
         /* cppcheck-suppress nullPointer
          * (reason: sock *can* be NULL at this place, cppcheck is weird here as
