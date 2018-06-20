@@ -97,14 +97,13 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     }
     memset(&sock->local, 0, sizeof(sock_udp_ep_t));
     if (local != NULL) {
-        if (local->port == 0U) {
-            local->port = _get_dyn_port(sock);
-            if (local->port == GNRC_SOCK_DYN_PORTRANGE_ERR) {
-                return -EADDRINUSE;
-            }
+        uint16_t port = local->port;
+
+        if (gnrc_af_not_supported(local->family)) {
+            return -EAFNOSUPPORT;
         }
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
-        if (!(flags & SOCK_FLAGS_REUSE_EP)) {
+        if ((port != 0) && !(flags & SOCK_FLAGS_REUSE_EP)) {
             for (sock_udp_t *ptr = _udp_socks; ptr != NULL;
                  ptr = (sock_udp_t *)ptr->reg.next) {
                 if (memcmp(&ptr->local, local, sizeof(sock_udp_ep_t)) == 0) {
@@ -116,10 +115,14 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         sock->reg.next = (gnrc_sock_reg_t *)_udp_socks;
         _udp_socks = sock;
 #endif
-        if (gnrc_af_not_supported(local->family)) {
-            return -EAFNOSUPPORT;
+        if (port == 0U) {
+            port = _get_dyn_port(sock);
+            if (port == GNRC_SOCK_DYN_PORTRANGE_ERR) {
+                return -EADDRINUSE;
+            }
         }
         memcpy(&sock->local, local, sizeof(sock_udp_ep_t));
+        sock->local.port = port;
     }
     memset(&sock->remote, 0, sizeof(sock_udp_ep_t));
     if (remote != NULL) {
