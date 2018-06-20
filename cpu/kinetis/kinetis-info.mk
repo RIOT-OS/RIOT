@@ -32,7 +32,11 @@ export KINETIS_SPEED := $(word 11, $(KINETIS_INFO))
 ifeq ($(KINETIS_CORE), Z)
   # Cortex-M0+
   export CPU_ARCH = cortex-m0plus
-  export CPU_FAMILY = klx
+  ifeq ($(KINETIS_SERIES), E)
+    export CPU_FAMILY = kex
+  else
+    export CPU_FAMILY = klx
+  endif
 else ifeq ($(KINETIS_CORE), D)
   # Cortex-M4
   export CPU_ARCH = cortex-m4

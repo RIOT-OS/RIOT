@@ -55,6 +55,7 @@
 #
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
+# @author       Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
 
 # Default GDB port, set to 0 to disable, required != 0 for debug and debug-server targets
 : ${GDB_PORT:=3333}
@@ -168,6 +169,7 @@ do_flash() {
             -c 'telnet_port 0' \
             -c 'gdb_port 0' \
             -c 'init' \
+            ${OPENOCD_POST_INIT_CMDS} \
             -c 'targets' \
             -c 'reset halt' \
             ${OPENOCD_PRE_FLASH_CMDS} \
