@@ -293,17 +293,18 @@ typedef struct sock_udp sock_udp_t;
  * @brief   Creates a new UDP sock object
  *
  * @pre `(sock != NULL)`
- * @pre `(local == NULL) || (local->port != 0)`
+ * @pre `(local == NULL)`
  * @pre `(remote == NULL) || (remote->port != 0)`
  *
  * @param[out] sock     The resulting sock object.
  * @param[in] local     Local end point for the sock object.
  *                      May be NULL.
- *                      sock_udp_ep_t::port must not be 0 if `local != NULL`.
  *                      sock_udp_ep_t::netif must either be
  *                      @ref SOCK_ADDR_ANY_NETIF or equal to
  *                      sock_udp_ep_t::netif of @p remote if `remote != NULL`.
  *                      If NULL @ref sock_udp_send() may bind implicitly.
+ *                      sock_udp_ep_t::port may also be 0 to bind the `sock` to
+ *                      an ephemeral port.
  * @param[in] remote    Remote end point for the sock object.
  *                      May be `NULL` but then the `remote` parameter of
  *                      @ref sock_udp_send() may not be `NULL` or it will
@@ -318,7 +319,8 @@ typedef struct sock_udp sock_udp_t;
  *
  * @return  0 on success.
  * @return  -EADDRINUSE, if `local != NULL` and @p local is already used
- *         elsewhere
+ *          elsewhere or if `local->port == 0` but the pool of ephemeral ports
+ *          is depleted
  * @return  -EAFNOSUPPORT, if `local != NULL` or `remote != NULL` and
  *          sock_udp_ep_t::family of @p local or @p remote is not supported.
  * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote is an invalid address.
