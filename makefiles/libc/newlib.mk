@@ -1,7 +1,8 @@
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
+  USE_NEWLIB_NANO = 1
   # Test if nano.specs is available
-  ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
-    USE_NEWLIB_NANO = 1
+  ifeq ($(shell $(LINK) -Werror -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+    USE_NANO_SPECS_FILE = 1
     ifeq ($(shell echo "int main(){} void _exit(int n) {(void)n;while(1);}" | LC_ALL=C $(CC) -xc - -o /dev/null -lc -specs=nano.specs -Wall -Wextra -pedantic 2>&1 | grep -q "use of wchar_t values across objects may fail" ; echo $$?),0)
         CFLAGS += -fshort-wchar
         LINKFLAGS += -Wl,--no-wchar-size-warning
@@ -13,61 +14,61 @@ ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
   CFLAGS += -D_GNU_SOURCE=1
 endif
 
-ifeq (1,$(USE_NEWLIB_NANO))
-  export LINKFLAGS += -specs=nano.specs
-endif
-
 export LINKFLAGS += -lc
 
-# Search for Newlib include directories
+ifeq (1,$(USE_NANO_SPECS_FILE))
+  export LINKFLAGS += -specs=nano.specs
+  export CFLAGS += -specs=nano.specs
+else
+  # Search for Newlib include directories
 
-# Since Clang is not installed as a separate instance for each crossdev target
-# we need to tell it where to look for platform specific includes (Newlib
-# headers instead of Linux/Glibc headers.)
-# On GCC this is done when building the cross compiler toolchain so we do not
-# actually need to specify the include paths for system includes.
-# Ubuntu gcc-arm-embedded toolchain (https://launchpad.net/gcc-arm-embedded)
-# places newlib headers in several places, but the primary source seem to be
-# /etc/alternatives/gcc-arm-none-eabi-include
-# Gentoo Linux crossdev place the newlib headers in /usr/arm-none-eabi/include
-# Arch Linux also place the newlib headers in /usr/arm-none-eabi/include
-# Ubuntu seem to put a copy of the newlib headers in the same place as
-# Gentoo crossdev, but we prefer to look at /etc/alternatives first.
-# On OSX, newlib includes are possibly located in
-# /usr/local/opt/arm-none-eabi*/arm-none-eabi/include or /usr/local/opt/gcc-arm/arm-none-eabi/include
-NEWLIB_INCLUDE_PATTERNS ?= \
-  /etc/alternatives/gcc-$(TARGET_ARCH)-include \
-  /usr/$(TARGET_ARCH)/include \
-  /usr/local/opt/$(TARGET_ARCH)*/$(TARGET_ARCH)/include \
-  /usr/local/opt/gcc-*/$(TARGET_ARCH)/include \
-  #
-# Use the wildcard Makefile function to search for existing directories matching
-# the patterns above. We use the -isystem gcc/clang argument to add the include
-# directories as system include directories, which means they will not be
-# searched until after all the project specific include directories (-I/path)
-NEWLIB_INCLUDE_DIR ?= $(firstword $(wildcard $(NEWLIB_INCLUDE_PATTERNS)))
+  # Since Clang is not installed as a separate instance for each crossdev target
+  # we need to tell it where to look for platform specific includes (Newlib
+  # headers instead of Linux/Glibc headers.)
+  # On GCC this is done when building the cross compiler toolchain so we do not
+  # actually need to specify the include paths for system includes.
+  # Ubuntu gcc-arm-embedded toolchain (https://launchpad.net/gcc-arm-embedded)
+  # places newlib headers in several places, but the primary source seem to be
+  # /etc/alternatives/gcc-arm-none-eabi-include
+  # Gentoo Linux crossdev place the newlib headers in /usr/arm-none-eabi/include
+  # Arch Linux also place the newlib headers in /usr/arm-none-eabi/include
+  # Ubuntu seem to put a copy of the newlib headers in the same place as
+  # Gentoo crossdev, but we prefer to look at /etc/alternatives first.
+  # On OSX, newlib includes are possibly located in
+  # /usr/local/opt/arm-none-eabi*/arm-none-eabi/include or /usr/local/opt/gcc-arm/arm-none-eabi/include
+  NEWLIB_INCLUDE_PATTERNS ?= \
+    /etc/alternatives/gcc-$(TARGET_ARCH)-include \
+    /usr/$(TARGET_ARCH)/include \
+    /usr/local/opt/$(TARGET_ARCH)*/$(TARGET_ARCH)/include \
+    /usr/local/opt/gcc-*/$(TARGET_ARCH)/include \
+    #
 
-# If nothing was found we will try to fall back to searching for a cross-gcc in
-# the current PATH and use a relative path for the includes
-ifeq (,$(NEWLIB_INCLUDE_DIR))
-  NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell command -v $(PREFIX)gcc 2>/dev/null))/../$(TARGET_ARCH)/include))
-endif
+  # Search for a newlib.h inside the above newlib include directory patterns
+  NEWLIB_INCLUDE_FILE = $(firstword $(wildcard $(addsuffix /newlib.h,$(NEWLIB_INCLUDE_PATTERNS))))
 
-ifeq ($(TOOLCHAIN),llvm)
-  # A cross GCC already knows the target libc include path (build-in at compile time)
-  # but Clang, when cross-compiling, needs to be told where to find the headers
-  # for the system being built.
-  # We also add -nostdinc to avoid including the host system headers by mistake
-  # in case some header is missing from the cross tool chain
-  NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR) -nostdinc
+  # If nothing was found we will try to fall back to searching for a cross-gcc in
+  # the current PATH and use a relative path for the includes
+  ifeq (,$(NEWLIB_INCLUDE_FILE))
+    $(warning newlib.h not found, guessing newlib include path from gcc path)
+    NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell command -v $(PREFIX)gcc 2>/dev/null))/../$(TARGET_ARCH)/include))
+  else
+    NEWLIB_INCLUDE_DIR := $(dir $(NEWLIB_INCLUDE_FILE))
+  endif
+
+  # We use the -isystem gcc/clang argument to add the include
+  # directories as system include directories, which means they will not be
+  # searched until after all the project specific include directories (-I/path)
+  NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR)
   NEWLIB_INCLUDES += $(addprefix -isystem ,$(abspath $(wildcard $(dir $(NEWLIB_INCLUDE_DIR))/usr/include)))
-endif
-
-ifeq (1,$(USE_NEWLIB_NANO))
-  NEWLIB_NANO_INCLUDE_DIR ?= $(NEWLIB_INCLUDE_DIR)/newlib-nano
-  # newlib-nano overrides newlib.h and its include dir should therefore go before
-  # the regular system include dirs.
-  INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
+  ifeq (1,$(USE_NEWLIB_NANO))
+    # newlib-nano include directory is called either newlib-nano or nano. Use the one we find first.
+    NEWLIB_NANO_INCLUDE_DIR ?= $(firstword $(wildcard $(addprefix $(NEWLIB_INCLUDE_DIR)/, newlib-nano nano)))
+    ifneq ($(NEWLIB_NANO_INCLUDE_DIR),)
+      # newlib-nano overrides newlib.h and its include dir
+      # should therefore go before the other newlib includes.
+      NEWLIB_INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(NEWLIB_INCLUDES)
+    endif
+  endif
 endif
 
 # Newlib includes should go before GCC includes. This is especially important
