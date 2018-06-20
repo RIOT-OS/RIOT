@@ -311,6 +311,25 @@ BASELIBS += $(BINDIR)/$(APPLICATION_MODULE).a
 BASELIBS += $(APPDEPS)
 
 
+# add extra include paths for packages in $(USEMODULE)
+export USEMODULE_INCLUDES =
+
+include $(RIOTBASE)/sys/Makefile.include
+include $(RIOTBASE)/drivers/Makefile.include
+
+# include Makefile.includes for packages in $(USEPKG)
+$(RIOTPKG)/%/Makefile.include::
+	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
+
+$(info $(USEPKG:%=$(RIOTPKG)/%/Makefile.include))
+.PHONY: $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
+-include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
+
+USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a[$$0]++' | tr '\n' ' ')
+
+INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
+
+
 # include bindist target
 include $(RIOTMAKE)/bindist.inc.mk
 
@@ -399,27 +418,10 @@ endef
 	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".$(COLOR_RESET)'
 	@$(COLOR_ECHO)
 
-# add extra include paths for packages in $(USEMODULE)
-export USEMODULE_INCLUDES =
-
-include $(RIOTBASE)/sys/Makefile.include
-include $(RIOTBASE)/drivers/Makefile.include
-
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
     all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(RIOTBUILD_CONFIG_HEADER_C) pkg-prepare: clean
 endif
-
-# include Makefile.includes for packages in $(USEPKG)
-$(RIOTPKG)/%/Makefile.include::
-	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
-
-.PHONY: $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
--include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
-
-USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a[$$0]++' | tr '\n' ' ')
-
-INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
 .PHONY: pkg-prepare $(USEPKG:%=$(BINDIR)/%.a)
 pkg-prepare:
