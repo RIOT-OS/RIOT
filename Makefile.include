@@ -362,6 +362,9 @@ LINKFLAGPREFIX ?= -Wl,
 
 DIRS += $(EXTERNAL_MODULE_DIRS)
 
+# Save value to verify it is not modified later
+_BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
+
 # Linker rule
 $(ELFFILE): FORCE
 ifeq ($(BUILDOSXNATIVE),1)
@@ -642,6 +645,14 @@ include $(RIOTMAKE)/murdock.inc.mk
 # Sanity check, 'all' should be the default goal
 ifneq (all, $(.DEFAULT_GOAL))
   $(error .DEFAULT_GOAL := $(.DEFAULT_GOAL))
+endif
+
+
+# Detect if BASELIBS changed since its first use
+ifneq ($(_BASELIBS_VALUE_BEFORE_USAGE),$(BASELIBS))
+  $(warning $(sort $(filter-out $(_BASELIBS_VALUE_BEFORE_USAGE), $(BASELIBS)) \
+                   $(filter-out $(BASELIBS), $(_BASELIBS_VALUE_BEFORE_USAGE))))
+  $(error BASELIBS value changed)
 endif
 
 endif # BOARD=none
