@@ -77,7 +77,15 @@ ifeq (1,$(USE_NEWLIB_NANO))
                                                     $(NEWLIB_INCLUDE_DIR)nano))
   # newlib-nano overrides newlib.h and its include dir should therefore go before
   # the regular system include dirs.
-  INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
+  ifeq (0,$(words $(wildcard $(NEWLIB_NANO_INCLUDE_DIR))))
+    # HACK until this is really fixed. It keeps the old build system behaviour
+    # but removes the error on non existing directory
+    $(warning $(lastword $(MAKEFILE_LIST)) could not correctly find include path to newlib-nano headers.)
+    $(warning It was set to $(NEWLIB_NANO_INCLUDE_DIR) which does not exist on your system.)
+    $(warning The non newlib-nano newlib.h may be used)
+  else
+    INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
+  endif
 endif
 
 # Newlib includes should go before GCC includes. This is especially important
