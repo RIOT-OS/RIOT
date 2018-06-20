@@ -243,34 +243,26 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     else if (sock->remote.family == AF_UNSPEC) {
         return -ENOTCONN;
     }
-    /* cppcheck-suppress nullPointerRedundantCheck
-     * (reason: compiler evaluates lazily so this isn't a redundundant check and
-     * cppcheck is being weird here anyways) */
-    if ((sock == NULL) || (sock->local.family == AF_UNSPEC)) {
+    if (sock->local.family == AF_UNSPEC) {
         /* no sock or sock currently unbound */
         memset(&local, 0, sizeof(local));
         if ((src_port = _get_dyn_port(sock)) == GNRC_SOCK_DYN_PORTRANGE_ERR) {
             return -EINVAL;
         }
-        /* cppcheck-suppress nullPointer
-         * (reason: sock *can* be NULL at this place, cppcheck is weird here as
-         * well, see above) */
-        if (sock != NULL) {
-            /* bind sock object implicitly */
-            sock->local.port = src_port;
-            if (remote == NULL) {
-                sock->local.family = sock->remote.family;
-            }
-            else {
-                sock->local.family = remote->family;
-            }
-            gnrc_sock_create(&sock->reg, GNRC_NETTYPE_UDP, src_port);
+        /* bind sock object implicitly */
+        sock->local.port = src_port;
+        if (remote == NULL) {
+            sock->local.family = sock->remote.family;
+        }
+        else {
+            sock->local.family = remote->family;
+        }
+        gnrc_sock_create(&sock->reg, GNRC_NETTYPE_UDP, src_port);
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
             /* prepend to current socks */
             sock->reg.next = (gnrc_sock_reg_t *)_udp_socks;
             _udp_socks = sock;
 #endif /* MODULE_GNRC_SOCK_CHECK_REUSE */
-        }
     }
     else {
         src_port = sock->local.port;
