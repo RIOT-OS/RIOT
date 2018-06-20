@@ -420,6 +420,8 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
  *                      sock_udp_ep_t::port may not be 0.
  *
  * @return  The number of bytes sent on success.
+ * @return  -EADDRINUSE, if `sock` has no local end-point or was `NULL` and the
+ *          pool of available ephemeral ports is depleted.
  * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_udp_ep_t::family of
  *          @p remote is != AF_UNSPEC and not supported.
  * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
