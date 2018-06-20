@@ -27,6 +27,8 @@
 #include "periph_conf.h"
 #include "periph/rtc.h"
 #include "xtimer.h"
+#include "msg.h"
+#include "thread.h"
 
 #define PERIOD              (2U)
 #define REPEAT              (4U)
@@ -56,16 +58,8 @@ static void inc_secs(struct tm *time, unsigned val)
 
 static void cb(void *arg)
 {
-    (void)arg;
-
-    puts("Alarm!");
-
-    if (++cnt < REPEAT) {
-        struct tm time;
-        rtc_get_time(&time);
-        inc_secs(&time, PERIOD);
-        rtc_set_alarm(&time, cb, NULL);
-    }
+    msg_t msg;
+    msg_send(&msg, *(kernel_pid_t *)arg);
 }
 
 int main(void)
@@ -94,12 +88,27 @@ int main(void)
     /* set initial alarm */
     inc_secs(&time, PERIOD);
     print_time("  Setting alarm to ", &time);
-    rtc_set_alarm(&time, cb, NULL);
+
+    kernel_pid_t p_main = sched_active_pid;
+    rtc_set_alarm(&time, cb, &p_main); 
 
     /* verify alarm */
     rtc_get_alarm(&time);
     print_time("   Alarm is set to ", &time);
     puts("");
+
+    msg_t msg_req;
+    while (cnt++ < REPEAT) {
+        msg_receive(&msg_req);
+        puts("Alarm!");
+
+        struct tm time;
+        rtc_get_time(&time);
+        inc_secs(&time, PERIOD);
+        rtc_set_alarm(&time, cb, &p_main);
+    }
+
+    puts("[SUCCESS]");
 
     return 0;
 }
