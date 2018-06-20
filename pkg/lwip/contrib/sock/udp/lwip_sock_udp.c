@@ -29,7 +29,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                     const sock_udp_ep_t *remote, uint16_t flags)
 {
     assert(sock != NULL);
-    assert(local == NULL || local->port != 0);
+    assert(local == NULL);
     assert(remote == NULL || remote->port != 0);
 
     int res;
