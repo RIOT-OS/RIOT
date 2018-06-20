@@ -9,17 +9,15 @@ PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-# define jlink as default programmer, but overridable
-PROGRAMMER ?= jlink
+# The following configuration is dependencies specific
+# but they are resolved later
+# Hack to know now if 'nordic_softdevice_ble' is used
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
+PROGRAMMER ?= jlink
 ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing
   export JLINK_DEVICE := nrf52
-
-  # The following configuration is dependencies specific
-  # but they are resolved later
-  # Hack to know now if 'nordic_softdevice_ble' is used
-  include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
   # special options when using SoftDevice
   ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
@@ -27,6 +25,16 @@ ifeq (jlink,$(PROGRAMMER))
     export FLASH_ADDR := 0x1f000
     export LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
   endif
-
   include $(RIOTMAKE)/tools/jlink.inc.mk
+else ifeq (openocd,$(PROGRAMMER))
+  # setup OpenOCD for flashing. Version 0.10 of OpenOCD doesn't contain support
+  # for nrf52dk and nrf52840dk boards. To use OpenOCD with these a version
+  # build from source (master > 2018, August the 13rd) is required.
+  ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
+    # openocd doesn't work (yet) with softdevice
+    $(error Cannot use OpenOCD with nordic_softdevice module)
+  endif
+  export DEBUG_ADAPTER ?= jlink
+  export OPENOCD_CONFIG := $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
+  include $(RIOTMAKE)/tools/openocd.inc.mk
 endif
