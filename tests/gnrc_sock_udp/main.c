@@ -117,6 +117,22 @@ static void test_sock_udp_create__only_local(void)
     assert(-ENOTCONN == sock_udp_get_remote(&_sock, &ep));
 }
 
+static void test_sock_udp_create__only_local_port0(void)
+{
+    static const sock_udp_ep_t local = { .family = AF_INET6,
+                                         .port = 0U };
+    sock_udp_ep_t ep;
+
+    assert(0 == sock_udp_create(&_sock, &local, NULL, SOCK_FLAGS_REUSE_EP));
+    assert(0 == sock_udp_get_local(&_sock, &ep));
+    assert(AF_INET6 == ep.family);
+    assert(memcmp(&ipv6_addr_unspecified, &ep.addr.ipv6,
+                  sizeof(ipv6_addr_t)) == 0);
+    assert(SOCK_ADDR_ANY_NETIF == ep.netif);
+    assert(0U != ep.port);
+    assert(-ENOTCONN == sock_udp_get_remote(&_sock, &ep));
+}
+
 static void test_sock_udp_create__only_local_reuse_ep(void)
 {
     static const sock_udp_ep_t local = { .family = AF_INET6,
@@ -663,6 +679,7 @@ int main(void)
     CALL(test_sock_udp_create__EINVAL_netif());
     CALL(test_sock_udp_create__no_endpoints());
     CALL(test_sock_udp_create__only_local());
+    CALL(test_sock_udp_create__only_local_port0());
     CALL(test_sock_udp_create__only_local_reuse_ep());
     CALL(test_sock_udp_create__only_remote());
     CALL(test_sock_udp_create__full());
