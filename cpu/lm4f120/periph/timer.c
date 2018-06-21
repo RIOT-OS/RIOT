@@ -29,9 +29,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* guard file in case no timers are defined */
-#if TIMER_NUMOF
-
 /**
  * @brief Struct holding the configuration data
  * @{
@@ -344,6 +341,4 @@ void isr_wtimer1a(void)
     cortexm_isr_end();
 }
 #endif /* TIMER_1_EN */
-
-#endif /* TIMER_NUMOF */
 /** @} */
