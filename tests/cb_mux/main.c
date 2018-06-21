@@ -53,7 +53,7 @@ int main(void)
 
     for (num = 0; num < 5; num++) {
         entries[num].cb = cb;
-        entries[num].arg = (void *)num;
+        entries[num].arg = (void *)(uintptr_t)num;
         entries[num].cbid = num;
     }
 
@@ -114,7 +114,7 @@ int main(void)
     while (num < 5) {
         cb_mux_add(&cb_mux_head, &(entries[num]));
 
-        printf("Added entry %i\n", num);
+        printf("Added entry %u\n", (unsigned)num);
 
         num = cb_mux_find_free_id(cb_mux_head);
     }
@@ -125,7 +125,7 @@ int main(void)
 
     for (num = 0; num < 5; num++) {
         if ((uintptr_t)entries[num].info & (1 << ITER_TEST)) {
-            printf("Entry %i was updated correctly\n", num);
+            printf("Entry %u was updated correctly\n", (unsigned)num);
         }
     }
 
