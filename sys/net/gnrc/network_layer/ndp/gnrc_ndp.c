@@ -475,6 +475,11 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
             /* get address from source selection algorithm.
              * Only link local addresses may be used (RFC 4861 section 4.1) */
             src = gnrc_netif_ipv6_addr_best_src(netif, dst, true);
+
+            if (src == NULL) {
+                DEBUG("ndp rtr: no VALID source address found for RA\n");
+                break;
+            }
         }
         /* add SL2A for source address */
         if (src != NULL) {
