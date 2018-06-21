@@ -28,6 +28,38 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#ifdef MODULE_SOCK_SECURE
+#include "net/sock/secure.h"
+#include "od.h"
+
+#define SECURE_CIPHER_PSK_IDS (0xC0A8)
+#define SECURE_CIPHER_RPK_IDS (0xC0AE)
+#define SECURE_CIPHER_LIST { SECURE_CIPHER_PSK_IDS, SECURE_CIPHER_RPK_IDS }
+
+sock_secure_session_t secure_session = { .flag=0, .cb=NULL};
+uint8_t *ext_buf;
+size_t  ext_bufsize;
+static void _dtls_data_app_handler(uint8_t *buf, size_t bufsize, void *sock)
+{
+    (void) sock;
+    coap_pkt_t pkt;
+    ssize_t res = bufsize;
+    if (coap_parse(&pkt, buf, res) < 0) {
+        DEBUG("error parsing packet\n");
+        return;
+    }
+    if ((res = coap_handle_req(&pkt, ext_buf, res)) > 0) {
+        if(ENABLE_DEBUG){
+          DEBUG("%s: Sending %i bytes by means of secure channel...\n", __func__, res );
+          od_hex_dump(ext_buf, res, OD_WIDTH_DEFAULT);
+        }
+
+        sock_secure_write(&secure_session, ext_buf, res);
+    }
+}
+
+#endif /* MODULE_SOCK_SECURE */
+
 ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *remote, size_t len)
 {
     ssize_t res;
@@ -123,8 +155,20 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
     sock_udp_t sock;
     sock_udp_ep_t remote;
 
+#ifdef MODULE_SOCK_SECURE
+    secure_session.flag = TLSMAN_FLAG_STACK_DTLS | TLSMAN_FLAG_SIDE_SERVER;
+    uint16_t ciphers[] = SECURE_CIPHER_LIST;
+    sock_secure_load_stack(&secure_session, ciphers, sizeof(ciphers));
+    ext_buf = buf;
+    ext_bufsize = bufsize;
+#endif /* MODULE_SOCK_SECURE */
+
     if (!local->port) {
+#ifdef MODULE_SOCK_SECURE
+        local->port = COAP_PORT +1; /* CoAPS default port 5684 */
+#else
         local->port = COAP_PORT;
+#endif
     }
 
     ssize_t res = sock_udp_create(&sock, local, NULL, 0);
@@ -132,6 +176,28 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
         return -1;
     }
 
+    DEBUG("Listening to udp port %u\n", local->port);
+
+#ifdef MODULE_SOCK_SECURE
+    res = sock_secure_initialized(&secure_session,
+                                          _dtls_data_app_handler,
+                                          (void *)&sock,
+                                          (sock_secure_ep_t*)&local,
+                                          (sock_secure_ep_t *)&remote);
+
+    if (res != 0) {
+        puts("ERROR: Unable to init sock_secure!");
+        return -1;
+    }
+
+      while(sock_secure_read(&secure_session))
+      {
+        xtimer_usleep(500);
+      }
+
+      sock_secure_release(&secure_session);
+
+#else /* MODULE_SOCK_SECURE */
     while (1) {
         res = sock_udp_recv(&sock, buf, bufsize, -1, &remote);
         if (res == -1) {
@@ -149,6 +215,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
             }
         }
     }
+#endif /* MODULE_SOCK_SECURE */
 
     return 0;
 }
