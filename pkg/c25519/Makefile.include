@@ -1,0 +1,1 @@
+INCLUDES += -I$(PKGDIRBASE)/c25519/src
