@@ -39,6 +39,11 @@
 #include "debug.h"
 
 /**
+ * This driver is incompatible with the nRF SoftDevice
+ */
+#ifndef SOFTDEVICE_PRESENT
+
+/**
  * @brief   Driver specific device configuration
  * @{
  */
@@ -561,3 +566,5 @@ const netdev_driver_t nrfmin_netdev = {
     .get  = nrfmin_get,
     .set  = nrfmin_set
 };
+
+#endif /* SOFTDEVICE_PRESENT */

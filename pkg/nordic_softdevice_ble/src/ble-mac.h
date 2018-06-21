@@ -64,7 +64,7 @@ typedef enum {
  * @param[in] eui48                    The input EUI48 (6 bytes long)
  * @param[in] _public                  True if public interface, false otherwise
  */
-static inline void ble_eui64_from_eui48(uint8_t eui64[8], uint8_t eui48[6], int _public)
+static inline void ble_eui64_from_eui48(uint8_t eui64[8], const uint8_t eui48[6], int _public)
 {
     eui64[0] = eui48[5];
     eui64[1] = eui48[4];
@@ -90,6 +90,7 @@ typedef struct {
     uint8_t payload[BLE_SIXLOWPAN_MTU];  /**< Payload of the packet */
     uint16_t len;                        /**< Length of the packet */
     int8_t rssi;                         /**< RSSI of the received packet */
+    uint8_t ch_index;                    /**< Channel index for the RSSI measurement */
 } ble_mac_inbuf_t;
 
 /**

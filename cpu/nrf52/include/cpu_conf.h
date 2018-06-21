@@ -42,7 +42,11 @@ extern "C" {
  * @name    ARM Cortex-M specific CPU configuration
  * @{
  */
+#ifdef SOFTDEVICE_PRESENT
+#define CPU_DEFAULT_IRQ_PRIO            (6U)
+#else
 #define CPU_DEFAULT_IRQ_PRIO            (2U)
+#endif
 #define CPU_FLASH_BASE                  (0x00000000)
 #ifdef CPU_MODEL_NRF52832XXAA
 #define CPU_IRQ_NUMOF                   (38U)
@@ -50,6 +54,11 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (46U)
 #endif
 /** @} */
+
+/**
+ * Enables the cpu_init subfunctions in cpu/cortexm_common
+ */
+#define CPU_CORTEXM_INIT_SUBFUNCTIONS 1
 
 /**
  * @brief   Flash page configuration
@@ -71,6 +80,7 @@ extern "C" {
 #ifdef SOFTDEVICE_PRESENT
 #ifndef DONT_OVERRIDE_NVIC
 #include "nrf_soc.h"
+#include "nrf_nvic.h"
 #undef NVIC_SetPriority
 #define NVIC_SetPriority    sd_nvic_SetPriority
 #endif /* DONT_OVERRIDE_NVIC */

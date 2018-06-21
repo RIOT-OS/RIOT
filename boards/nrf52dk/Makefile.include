@@ -1,3 +1,4 @@
 export CPU_MODEL = nrf52832xxaa
+export CPU_MODEL_SHORT = nrf52832
 
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include

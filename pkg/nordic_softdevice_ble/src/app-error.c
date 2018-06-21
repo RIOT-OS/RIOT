@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Nordic Semiconductor
+ * Copyright (c) 2018, Nordic Semiconductor
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,57 +38,54 @@
  * @{
  *
  * @file
- *
- * @brief   Basic BLE functions.
- *
- * @author  Wojciech Bober <wojciech.bober@nordicsemi.no>
+ *         NRF5 Soft Device error handler
+ * @author
+ *         Pekka Nikander <pekka.nikander@iki.fi>
  */
-#ifndef BLE_CORE_H
-#define BLE_CORE_H
 
-#include <stdint.h>
+#include "app_error.h"
+#include "nrf_strerror.h"
+#include "nrf_sdm.h"
 
-#ifdef __cplusplus
-extern "C" {
+#include "log.h"
+
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
+void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
+{
+    LOG_ERROR("=== NRF Fatal error:\n");
+
+    assert_info_t * p_assert_info = (assert_info_t *)info;
+    error_info_t  * p_error_info  = (error_info_t *)info;
+    switch (id) {
+
+#if defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
+    case NRF_FAULT_ID_SD_ASSERT:
+        LOG_ERROR("=== SOFTDEVICE: ASSERTION FAILED\n");
+        break;
+    case NRF_FAULT_ID_APP_MEMACC:
+        LOG_ERROR("=== SOFTDEVICE: INVALID MEMORY ACCESS\n");
+        break;
 #endif
+    case NRF_FAULT_ID_SDK_ASSERT:
+        LOG_ERROR("=== ASSERTION FAILED at %s:%u\n",
+              p_assert_info->p_file_name,
+              p_assert_info->line_num);
+        break;
+    case NRF_FAULT_ID_SDK_ERROR:
+        LOG_ERROR("=== ERROR %u [%s] at %s:%u\r\nPC at: 0x%08x\n",
+              p_error_info->err_code,
+              nrf_strerror_get(p_error_info->err_code),
+              p_error_info->p_file_name,
+              p_error_info->line_num,
+              pc);
+        break;
+    default:
+        LOG_ERROR("=== UNKNOWN FAULT at 0x%08X\n", pc);
+        break;
+    }
 
-/**
- * BLE observers priority.
- */
-#define BLE_IPV6_MEDIUM_BLE_OBSERVER_PRIO   1
-
-/**
- * @brief Initialize and enable the BLE stack.
- */
-void ble_stack_init(void);
-
-/**
- * @brief Initialize BLE advertising data.
- *
- * @param name Human readable device name that will be advertised
- */
-void ble_advertising_init(const char *name);
-
-/**
- * @brief Start BLE advertising.
- */
-void ble_advertising_start(void);
-
-/**
- * @brief Return device EUI64 MAC address
- *
- * @param addr pointer to a buffer to store the address
- */
-void ble_get_mac(uint8_t addr[8]);
-
-#ifdef __cplusplus
+    LOG_ERROR("=== End of error report\n");
+    core_panic(PANIC_ASSERT_FAIL, "NRF Fatal error");
 }
-#endif
-
-#endif /* BLE_CORE_H */
-
-/**
- * @}
- * @}
- * @}
- */

@@ -32,6 +32,11 @@
 #define ENABLE_DEBUG            (0)
 #include "debug.h"
 
+/**
+ * This driver is incompatible with the nRF SoftDevice
+ */
+#ifndef SOFTDEVICE_PRESENT
+
 /* driver specific device configuration */
 #define CONF_MODE               RADIO_MODE_MODE_Ble_1Mbit
 #define CONF_LEN                (8U)
@@ -358,3 +363,5 @@ static const netdev_driver_t netdev_driver = {
     .get  = _nrfble_get,
     .set  = _nrfble_set
 };
+
+#endif /* SOFTDEVICE_PRESENT */

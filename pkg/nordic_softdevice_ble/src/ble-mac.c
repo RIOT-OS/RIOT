@@ -33,6 +33,8 @@
 
 #define DONT_OVERRIDE_NVIC
 
+#include "nrf_sdh_ble.h"
+
 #include "ble-core.h"
 #include "ble_ipsp.h"
 #include "ble_gap.h"
@@ -71,7 +73,7 @@ static ble_mac_callback_t _callback;
  * @return a pointer to interface structure
  * @return NULL if no interface has been found for a given handle
  */
-static ble_mac_interface_t *ble_mac_interface_lookup(ble_ipsp_handle_t *handle)
+static ble_mac_interface_t *ble_mac_interface_lookup(ble_ipsp_handle_t const *handle)
 {
     if (handle == NULL) {
         return NULL;
@@ -97,7 +99,7 @@ static ble_mac_interface_t *ble_mac_interface_lookup(ble_ipsp_handle_t *handle)
  * @return  NULL if interface table is full
  */
 static ble_mac_interface_t *ble_mac_interface_add(uint8_t peer[8],
-                                                  ble_ipsp_handle_t *handle)
+                                                  ble_ipsp_handle_t const *handle)
 {
     DEBUG("ble_mac_interface_add()\n");
     for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
@@ -205,7 +207,7 @@ int ble_mac_send(uint8_t dest[8], void *data, size_t len)
     }
 }
 
-static uint32_t ble_mac_ipsp_evt_handler_irq(ble_ipsp_handle_t *p_handle, ble_ipsp_evt_t *p_evt)
+static uint32_t ble_mac_ipsp_evt_handler_irq(ble_ipsp_handle_t const *p_handle, ble_ipsp_evt_t const *p_evt)
 {
     uint32_t retval = NRF_SUCCESS;
 
@@ -220,9 +222,9 @@ static uint32_t ble_mac_ipsp_evt_handler_irq(ble_ipsp_handle_t *p_handle, ble_ip
             uint8_t peer_addr[8];
 
             DEBUG("ble-mac: channel connected\n");
-            ble_eui64_from_eui48(peer_addr, p_evt->evt_param->params.ch_conn_request.peer_addr.addr,
-                                 p_evt->evt_param->params.ch_conn_request.peer_addr.addr_type ==
-                                 BLE_GAP_ADDR_TYPE_PUBLIC);
+            ble_eui64_from_eui48(peer_addr,
+                                 p_evt->p_evt_param->p_peer->addr,
+                                 p_evt->p_evt_param->p_peer->addr_type == BLE_GAP_ADDR_TYPE_PUBLIC);
 
             p_instance = ble_mac_interface_add(peer_addr, p_handle);
 
@@ -253,17 +255,19 @@ static uint32_t ble_mac_ipsp_evt_handler_irq(ble_ipsp_handle_t *p_handle, ble_ip
                     break;
                 }
 
-                if (p_evt->evt_param->params.ch_rx.len > BLE_SIXLOWPAN_MTU) {
+                if (p_evt->p_evt_param->p_l2cap_evt->params.rx.sdu_len > BLE_SIXLOWPAN_MTU) {
                     DEBUG("ble-mac: packet buffer is too small!\n");
                     break;
                 }
 
                 ble_mac_busy_rx = 1;
 
-                inbuf.len = p_evt->evt_param->params.ch_rx.len;
-                memcpy(inbuf.payload, p_evt->evt_param->params.ch_rx.p_data, inbuf.len);
+                inbuf.len = p_evt->p_evt_param->p_l2cap_evt->params.rx.sdu_buf.len;
+                memcpy(inbuf.payload,
+                       p_evt->p_evt_param->p_l2cap_evt->params.rx.sdu_buf.p_data,
+                       inbuf.len);
                 memcpy(inbuf.src, p_instance->peer_addr, 8);
-                sd_ble_gap_rssi_get(p_handle->conn_handle, &inbuf.rssi);
+                sd_ble_gap_rssi_get(p_handle->conn_handle, &inbuf.rssi, &inbuf.ch_index);
 
                 _callback(BLE_EVENT_RX_DONE, &inbuf);
             }
@@ -293,7 +297,7 @@ void ble_mac_init(ble_mac_callback_t callback)
     assert(callback);
 
     uint32_t res;
-    ble_ipsp_init_t ipsp_init_params = {
+    const ble_ipsp_init_t ipsp_init_params = {
         .evt_handler = ble_mac_ipsp_evt_handler_irq
     };
 

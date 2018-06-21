@@ -59,6 +59,14 @@ You can then check the connection using the following commands:
 If you'd like to learn more about the procedure please refer to
 [Connecting devices to the router].
 
+Debugging at the Linux side
+===========================
+
+To see what the Linux is doing, you have to enable `bluetooth_6lowpan` debugging.
+For how to enable kernel module logs, see https://www.kernel.org/doc/html/v4.15/admin-guide/dynamic-debug-howto.html
+
+
+
 Distributing routable IPv6 prefix
 =================================
 In Linux, Router Advertisement Daemon (RADVD) can be used to distribute prefixes

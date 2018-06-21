@@ -1,36 +1,104 @@
 NORDIC_SRCS := $(PKGDIRBASE)/nordic_softdevice_ble/src
 
-INCLUDES += \
-			-I$(RIOTBASE)/pkg/nordic_softdevice_ble/src \
-			-I$(NORDIC_SRCS)/components/ble/common \
-			-I$(NORDIC_SRCS)/components/device \
-			-I$(NORDIC_SRCS)/components/iot/ble_6lowpan \
-			-I$(NORDIC_SRCS)/components/iot/ble_ipsp \
-			-I$(NORDIC_SRCS)/components/iot/common \
-			-I$(NORDIC_SRCS)/components/libraries/scheduler \
-			-I$(NORDIC_SRCS)/components/libraries/util \
-			-I$(NORDIC_SRCS)/components/softdevice/common/softdevice_handler \
-			-I$(NORDIC_SRCS)/components/softdevice/s1xx_iot/headers \
-			-I$(NORDIC_SRCS)/components/softdevice/s1xx_iot/headers/nrf52 \
-			-I$(NORDIC_SRCS)/components/toolchain
-
-CFLAGS += -DNRF52 \
-		  -DBLE_STACK_SUPPORT_REQD \
-		  -DISR_STACKSIZE=8192 \
-		  -DSOFTDEVICE_PRESENT \
-		  -DS132
-
-CFLAGS += -Wno-pedantic -Wno-unused-parameter -Wno-sign-compare
-
-# Nordic's ble_6lowpan.a is compiled with hard-float
-# so set this, otherwise linking fails
-CFLAGS_FPU := -mfloat-abi=hard -mfpu=fpv4-sp-d16
-
-DIRS += \
-		$(RIOTBASE)/pkg/nordic_softdevice_ble/src \
-		$(NORDIC_SRCS)/components/softdevice/common/softdevice_handler \
-		$(NORDIC_SRCS)/components/ble/common \
-		$(NORDIC_SRCS)/components/iot/ble_ipsp
-
 # LLVM ARM assembler has massive problems digesting this
 TOOLCHAINS_BLACKLIST += llvm
+
+INCLUDES += -I$(RIOTBASE)/pkg/nordic_softdevice_ble/src
+INCLUDES += -I$(NORDIC_SRCS)/components/ble/common
+INCLUDES += -I$(NORDIC_SRCS)/components/ble/nrf_ble_gatt
+INCLUDES += -I$(NORDIC_SRCS)/components/ble/ble_services/ble_ipsp
+INCLUDES += -I$(NORDIC_SRCS)/components/iot/common
+INCLUDES += -I$(NORDIC_SRCS)/components/libraries/atomic
+INCLUDES += -I$(NORDIC_SRCS)/components/libraries/atomic_flags
+INCLUDES += -I$(NORDIC_SRCS)/components/libraries/experimental_section_vars
+INCLUDES += -I$(NORDIC_SRCS)/components/libraries/strerror
+INCLUDES += -I$(NORDIC_SRCS)/components/libraries/util
+INCLUDES += -I$(NORDIC_SRCS)/components/softdevice/common
+INCLUDES += -I$(NORDIC_SRCS)/components/softdevice/s132/headers
+INCLUDES += -I$(NORDIC_SRCS)/components/softdevice/s132/headers/nrf52
+INCLUDES += -I$(NORDIC_SRCS)/modules/nrfx/mdk
+INCLUDES += -I$(NORDIC_SRCS)/config/$(CPU_MODEL_SHORT)/config
+
+#
+# Sets up the interrutp stack for running SoftDevice
+#
+# Currently this does not work, as the trampoline for
+# jumping to the ISR stack is missing.  See `README.md`
+#
+CFLAGS += -DISR_STACKSIZE=8192
+
+#
+# Automatically sets the right Nordic style CPU definition from CPU_MODEL,
+# e.g. nrf52832xxaa -> -DNRF52328_XXAA
+#
+ifneq (,$(CPU_MODEL))
+CFLAGS += \
+  -D$(shell echo $(CPU_MODEL) | sed -e 's/\([a-z0-9]*\)\(xx[a-z][a-z]\)/\1_\2/' | tr '[a-z]' '[A-Z]')
+endif
+
+#
+# Automatically sets the right Nordic style SD definition from NRF_SD_VERS,
+# e.g. s132 -> -DS132
+#
+ifneq (,$(NRF_SD_VERS))
+CFLAGS += -D$(shell echo $(NRF_SD_VERS) | tr '[a-z]' '[A-Z]')
+endif
+
+#
+# Flags to affect RIOT compilation
+#
+CFLAGS += -DBLE_STACK_SUPPORT_REQD
+CFLAGS += -DSOFTDEVICE_PRESENT
+
+#
+# Flags to affect Nordic code compilation
+#
+
+CFLAGS += -DNRF_SDH_ENABLED
+CFLAGS += -DNRF_SDH_BLE_ENABLED
+CFLAGS += -DNRF_SDH_BLE_TOTAL_LINK_COUNT=1
+CFLAGS += -DNRF_SDH_BLE_PERIPHERAL_LINK_COUNT=1
+CFLAGS += -DNRF_SDH_BLE_VS_UUID_COUNT=1
+
+CFLAGS += -DNRF_BLE_GATT_ENABLED=1
+
+CFLAGS += -DNRF_BLE_CONN_PARAMS_ENABLED=1
+CFLAGS += -DNRF_BLE_CONN_PARAMS_MAX_SLAVE_LATENCY_DEVIATION=499
+CFLAGS += -DNRF_BLE_CONN_PARAMS_MAX_SUPERVISION_TIMEOUT_DEVIATION=65535
+
+# Configuration for running without LF crystal
+# See http://infocenter.nordicsemi.com/index.jsp?\
+# topic=%2Fcom.nordic.infocenter.s132.api.v6.0.0\
+# %2Fstructnrf__clock__lf__cfg__t.html&cp=2_3_1_1_0_2_8_4_0
+# CFLAGS += -DNRF_SDH_CLOCK_LF_SRC=0
+# CFLAGS += -DNRF_SDH_CLOCK_LF_RC_CTIV=6
+# CFLAGS += -DNRF_SDH_CLOCK_LF_RC_TEMP_CTIV=2
+# CFLAGS += -DNRF_SDH_CLOCK_LF_ACCURACY=1
+
+# Uncomment to enable debug printing for Nordic IPSP
+# CFLAGS += -DIOT_BLE_IPSP_CONFIG_LOG_LEVEL=4
+# CFLAGS += -DIOT_BLE_IPSP_CONFIG_LOG_ENABLED=1
+
+#
+# Relax GCC warnigns for Nordic's code
+#
+CFLAGS += -Wno-expansion-to-defined
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-format
+
+DIRS += $(RIOTBASE)/pkg/nordic_softdevice_ble/src
+DIRS += $(NORDIC_SRCS)/components/ble/common
+DIRS += $(NORDIC_SRCS)/components/ble/nrf_ble_gatt
+DIRS += $(NORDIC_SRCS)/components/ble/ble_services/ble_ipsp
+DIRS += $(NORDIC_SRCS)/components/libraries/strerror
+DIRS += $(NORDIC_SRCS)/components/libraries/experimental_section_vars
+DIRS += $(NORDIC_SRCS)/components/libraries/util
+DIRS += $(NORDIC_SRCS)/components/softdevice/common
+
+#
+# Include also the 6lowpan code, but only if enabled
+#
+ifneq (,$(filter nordic_softdevice_sixlowpan,$(USEMODULE)))
+DIRS += $(RIOTBASE)/pkg/nordic_softdevice_ble/src/sixlowpan
+endif

@@ -1,3 +1,8 @@
+# Create a short name of the CPU, needed to include
+# the right Nordic SDK configuration (that is, if SDK is used)
+export CPU_MODEL_SHORT = \
+      $(shell echo $(CPU_MODEL) | sed -e 's/\([a-z0-9]*\)xx[a-z][a-z]/\1/')
+
 # export the CPU family so we can differentiate between them in the code
 FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
 export CFLAGS += -DCPU_FAM_$(FAM)

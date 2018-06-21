@@ -1,0 +1,12 @@
+diff a/components/ble/common/ble_conn_state.c b/components/ble/common/ble_conn_state.c
+--- a/components/ble/common/ble_conn_state.c	2018-03-22 14:25:08.000000000 +0200
++++ b/components/ble/common/ble_conn_state.c	2018-06-16 18:32:41.000000000 +0300
+@@ -175,7 +175,7 @@
+ /**@brief Function for invalidating records with a @ref BLE_CONN_STATUS_DISCONNECTED
+  *        connection status
+  */
+-static void record_purge_disconnected()
++static void record_purge_disconnected(void)
+ {
+     nrf_atflags_t                     disconnected_flags = ~m_bcs.flags.connected_flags;
+     ble_conn_state_conn_handle_list_t disconnected_list;

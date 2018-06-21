@@ -1,0 +1,12 @@
+diff --git a/components/libraries/util/app_error_weak.c b/components/libraries/util/app_error_weak.c
+index 4551e7d..1a486be 100755
+--- a/components/libraries/util/app_error_weak.c
++++ b/components/libraries/util/app_error_weak.c
+@@ -42,6 +42,7 @@
+ #include "nrf_log.h"
+ #include "nrf_log_ctrl.h"
+ #include "nrf_strerror.h"
++#include "app_util_platform.h"
+ 
+ #if defined(SOFTDEVICE_PRESENT) && SOFTDEVICE_PRESENT
+ #include "nrf_sdm.h"

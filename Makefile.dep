@@ -66,10 +66,7 @@ ifneq (,$(filter uhcpc,$(USEMODULE)))
   USEMODULE += posix
 endif
 
-ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
-  USEMODULE += softdevice_handler
-  USEMODULE += ble_common
-  USEMODULE += ble_6lowpan
+ifneq (,$(filter nordic_softdevice_sixlowpan,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_iphc
   USEMODULE += gnrc_ipv6_nib_6ln
@@ -82,6 +79,17 @@ ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
       $(filter $(_ROUTER_MODULES),$(USEMODULE)))
   endif
   USEMODULE := $(filter-out $(_ROUTER_MODULES),$(USEMODULE))
+  USEPKG += nordic_softdevice_ble
+endif
+
+ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
+  USEMODULE += nrf5_ble_common
+  USEMODULE += nrf5_ble_gatt
+  USEMODULE += nrf5_ble_ipsp
+  USEMODULE += nrf5_libraries_strerror
+  USEMODULE += nrf5_libraries_util
+  USEMODULE += nrf5_section_vars
+  USEMODULE += nrf5_softdevice_common
 endif
 
 ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))

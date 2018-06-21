@@ -50,7 +50,6 @@
 #include "net/gnrc/nettype.h"
 
 #include "ble-core.h"
-#include "softdevice_handler.h"
 
 #include "ble-mac.h"
 
