@@ -40,6 +40,9 @@ ifneq (,$(filter xtimer,$(USEMODULE)))
   SRC += sc_icmpv6_echo.c
 endif
 endif
+ifneq (,$(filter gnrc_pktbuf_cmd,$(USEMODULE)))
+    SRC += sc_gnrc_pktbuf.c
+endif
 ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c
 endif

@@ -108,6 +108,10 @@ extern int _whitelist(int argc, char **argv);
 extern int _blacklist(int argc, char **argv);
 #endif
 
+#ifdef MODULE_GNRC_PKTBUF_CMD
+extern int _gnrc_pktbuf_cmd(int argc, char **argv);
+#endif
+
 #ifdef MODULE_GNRC_RPL
 extern int _gnrc_rpl(int argc, char **argv);
 #endif
@@ -198,6 +202,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_IPV6_BLACKLIST
     {"blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist },
+#endif
+#ifdef MODULE_GNRC_PKTBUF_CMD
+    {"pktbuf", "prints internal stats of the packet buffer", _gnrc_pktbuf_cmd },
 #endif
 #ifdef MODULE_GNRC_RPL
     {"rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl },
