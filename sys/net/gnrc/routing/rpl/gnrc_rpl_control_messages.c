@@ -114,6 +114,11 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
     pkt = hdr;
 
     hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    if (hdr == NULL) {
+        DEBUG("RPL: Send - no space left in packet buffer\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
     ((gnrc_netif_hdr_t *)hdr->data)->if_pid = iface;
     LL_PREPEND(pkt, hdr);
 
