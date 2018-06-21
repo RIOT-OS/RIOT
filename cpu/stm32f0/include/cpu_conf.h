@@ -46,6 +46,9 @@
 #ifdef CPU_MODEL_STM32F031K6
 #include "vendor/stm32f031x6.h"
 #endif
+#ifdef CPU_MODEL_STM32F030CC
+#include "vendor/stm32f030xc.h"
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -61,9 +64,11 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (28U)
 #elif defined(CPU_MODEL_STM32F051R8) || defined(CPU_MODEL_STM32F091RC)
 #define CPU_IRQ_NUMOF                   (31U)
-#else /* CPU_MODEL_STM32F042K6, CPU_MODEL_STM32F070RB, CPU_MODEL_STM32F072RB */
+#else /* CPU_MODEL_STM32F042K6, CPU_MODEL_STM32F070RB, CPU_MODEL_STM32F072RB,
+       * CPU_MODEL_STM32F030CC */
 #define CPU_IRQ_NUMOF                   (32U)
 #endif
+#define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
 /**
@@ -74,14 +79,15 @@ extern "C" {
  *
  * @{
  */
-#if defined(CPU_MODEL_STM32F091RC) || defined(CPU_MODEL_STM32F072RB)
+#if defined(CPU_MODEL_STM32F091RC) || defined(CPU_MODEL_STM32F072RB) \
+   || defined(CPU_MODEL_STM32F030CC)
 #define FLASHPAGE_SIZE      (2048U)
 #elif defined(CPU_MODEL_STM32F051R8) || defined(CPU_MODEL_STM32F042K6) \
    || defined(CPU_MODEL_STM32F070RB) || defined(CPU_MODEL_STM32F030R8)
 #define FLASHPAGE_SIZE      (1024U)
 #endif
 
-#if defined(CPU_MODEL_STM32F091RC)
+#if defined(CPU_MODEL_STM32F091RC) || defined(CPU_MODEL_STM32F030CC)
 #define FLASHPAGE_NUMOF     (128U)
 #elif defined(CPU_MODEL_STM32F051R8) || defined(CPU_MODEL_STM32F072RB) \
    || defined(CPU_MODEL_STM32F030R8) || defined(CPU_MODEL_STM32F070RB)

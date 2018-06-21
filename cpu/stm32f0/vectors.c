@@ -63,6 +63,7 @@ WEAK_DEFAULT void isr_tsc(void);
 WEAK_DEFAULT void isr_usart1(void);
 WEAK_DEFAULT void isr_usart2(void);
 WEAK_DEFAULT void isr_usart3_4(void);
+WEAK_DEFAULT void isr_usart3_6(void);
 WEAK_DEFAULT void isr_usart3_8(void);
 WEAK_DEFAULT void isr_usb(void);
 WEAK_DEFAULT void isr_wwdg(void);
@@ -79,8 +80,26 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [21] = isr_tim16,                /* [21] TIM16 global Interrupt */
     [22] = isr_tim17,                /* [22] TIM17 global Interrupt */
     [25] = isr_spi1,                 /* [25] SPI1 global Interrupt */
-
-#if defined(CPU_MODEL_STM32F030R8)
+#if defined(CPU_MODEL_STM32F030CC)
+    [ 4] = isr_rcc,                  /* [ 4] RCC global Interrupt */
+    [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupt */
+    [ 6] = isr_exti,                 /* [ 6] EXTI Line 2 and 3 Interrupt */
+    [ 7] = isr_exti,                 /* [ 7] EXTI Line 4 to 15 Interrupt */
+    [ 9] = isr_dma1_channel1,        /* [ 9] DMA1 Channel 1 Interrupt */
+    [10] = isr_dma1_channel2_3,      /* [10] DMA1 Channel 2 and Channel 3 Interrupt */
+    [11] = isr_dma1_channel4_5,      /* [11] DMA1 Channel 4 and Channel 5 Interrupt */
+    [12] = isr_adc1,                 /* [12] ADC1 Interrupt */
+    [13] = isr_tim1_brk_up_trg_com,  /* [13] TIM1 Break, Update, Trigger and Commutation Interrupt */
+    [17] = isr_tim6,                 /* [17] TIM6 global Interrupt */
+    [20] = isr_tim15,                /* [20] TIM15 global Interrupt */
+    [23] = isr_i2c1,                 /* [23] I2C1 Event Interrupt */
+    [24] = isr_i2c2,                 /* [24] I2C2 Event Interrupt */
+    [26] = isr_spi2,                 /* [26] SPI2 global Interrupt */
+    [27] = isr_usart1,               /* [27] USART1 global Interrupt */
+    [28] = isr_usart2,               /* [28] USART2 global Interrupt */
+    [29] = isr_usart3_6,             /* [29] USART3..6 global Interrupt */
+    [31] = isr_usb,                  /* [31] USB global Interrupts & EXTI Line18 Interrupt */
+#elif defined(CPU_MODEL_STM32F030R8)
     [ 4] = isr_rcc,                  /* [ 4] RCC global Interrupt */
     [ 5] = isr_exti,                 /* [ 5] EXTI Line 0 and 1 Interrupt */
     [ 6] = isr_exti,                 /* [ 6] EXTI Line 2 and 3 Interrupt */
