@@ -48,7 +48,11 @@ int main(void)
 
     /* initialize nanocoap server instance */
     uint8_t buf[COAP_INBUF_SIZE];
+#ifdef MODULE_SOCK_SECURE
+    sock_udp_ep_t local = { .port=COAP_PORT + 1, .family=AF_INET6 };
+#else
     sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET6 };
+#endif
     nanocoap_server(&local, buf, sizeof(buf));
 
     /* should be never reached */
