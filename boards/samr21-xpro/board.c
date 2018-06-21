@@ -20,13 +20,12 @@
  * @}
  */
 
-#include "board.h"
-#include "periph/gpio.h"
+#include "onboard_led.h"
 
 void board_init(void)
 {
     /* initialize the on-board LED */
-    gpio_init(LED0_PIN, GPIO_OUT);
+    onboard_led_init();
 
     /* initialize the CPU */
     cpu_init();

@@ -2,6 +2,9 @@
 export CPU = stm32f3
 export CPU_MODEL = stm32f303vc
 
+# use on-board LEDs
+USEMODULE += onboard_led
+
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))

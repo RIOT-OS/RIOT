@@ -18,20 +18,12 @@
  * @}
  */
 
-#include "board.h"
-#include "periph/gpio.h"
+#include "onboard_led.h"
 
 void board_init(void)
 {
     /* initialize the boards LEDs */
-    gpio_init(LED0_PIN, GPIO_OUT);
-    gpio_init(LED1_PIN, GPIO_OUT);
-    gpio_init(LED2_PIN, GPIO_OUT);
-    gpio_init(LED3_PIN, GPIO_OUT);
-    gpio_init(LED4_PIN, GPIO_OUT);
-    gpio_init(LED5_PIN, GPIO_OUT);
-    gpio_init(LED6_PIN, GPIO_OUT);
-    gpio_init(LED7_PIN, GPIO_OUT);
+    onboard_led_init();
 
     /* initialize the CPU */
     cpu_init();
