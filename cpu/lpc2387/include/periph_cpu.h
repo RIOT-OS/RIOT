@@ -39,12 +39,22 @@ extern "C" {
  * @brief Fast GPIO register definition struct
  */
 typedef struct {
-    __IO uint32_t DIR;      /**< he */
-    uint32_t _reserved[3];  /**< really */
-    __IO uint32_t MASK;     /**< wants */
-    __IO uint32_t PIN;      /**< to */
-    __IO uint32_t SET;      /**< know */
-    __IO uint32_t CLR;      /**< everything */
+    /** @brief Direction: Output if corresponding bit is set, otherwise input */
+    __IO uint32_t DIR;
+    /** @brief 12 bytes of reseved memory we don't need to access */
+    uint32_t _reserved[3];
+    /** @brief Set bits to ignore corresponding bits when accessing `PIN`, `SET`
+     *         or `CLR` register of this port
+     */
+    __IO uint32_t MASK;
+    /** @brief The current state of each pin of this port is accessible here
+     *         (regardless of direction): If bit is set input is high
+     */
+    __IO uint32_t PIN;
+    /** @brief Output pins are set to high by setting the corresponding bit */
+    __IO uint32_t SET;
+    /** @brief Output pins are set to low by setting the corresponding bit */
+    __IO uint32_t CLR;
 } FIO_PORT_t;
 
 #define FIO_PORTS   ((FIO_PORT_t*)FIO_BASE_ADDR)
@@ -54,7 +64,7 @@ typedef struct {
 int gpio_init_mux(unsigned pin, unsigned mux);
 void gpio_init_states(void);
 
-#define GPIO_PIN(port, pin) (port*32 + pin)
+#define GPIO_PIN(port, pin) (port<<5 | pin)
 
 #ifndef DOXYGEN
 #define HAVE_GPIO_FLANK_T
