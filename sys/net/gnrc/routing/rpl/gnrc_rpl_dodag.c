@@ -116,6 +116,8 @@ bool gnrc_rpl_instance_remove(gnrc_rpl_instance_t *inst)
 #endif
     gnrc_rpl_dodag_remove_all_parents(dodag);
     trickle_stop(&dodag->trickle);
+    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->dao_event);
+    evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&inst->cleanup_event);
     memset(inst, 0, sizeof(gnrc_rpl_instance_t));
     return true;
 }
