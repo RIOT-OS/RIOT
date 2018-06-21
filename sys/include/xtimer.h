@@ -34,7 +34,6 @@
 #include "msg.h"
 #include "mutex.h"
 
-#include "board.h"
 #include "periph_conf.h"
 
 #ifdef __cplusplus
@@ -471,53 +470,6 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
  */
 void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 
-/**
- * @brief xtimer backoff value
- *
- * All timers that are less than XTIMER_BACKOFF microseconds in the future will
- * just spin.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#ifndef XTIMER_BACKOFF
-#define XTIMER_BACKOFF 30
-#endif
-
-/**
- * @brief xtimer overhead value, in hardware ticks
- *
- * This value specifies the time a timer will be late if uncorrected, e.g.,
- * the system-specific xtimer execution time from timer ISR to executing
- * a timer's callback's first instruction.
- *
- * E.g., with XTIMER_OVERHEAD == 0
- * start=xtimer_now();
- * xtimer_set(&timer, X);
- * (in callback:)
- * overhead=xtimer_now()-start-X;
- *
- * xtimer automatically substracts XTIMER_OVERHEAD from a timer's target time,
- * but when the timer triggers, xtimer will spin-lock until a timer's target
- * time is reached, so timers will never trigger early.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#ifndef XTIMER_OVERHEAD
-#define XTIMER_OVERHEAD 20
-#endif
-
-#ifndef XTIMER_ISR_BACKOFF
-/**
- * @brief   xtimer IRQ backoff time, in hardware ticks
- *
- * When scheduling the next IRQ, if it is less than the backoff time
- * in the future, just spin.
- *
- * This is supposed to be defined per-device in e.g., periph_conf.h.
- */
-#define XTIMER_ISR_BACKOFF 20
-#endif
-
 #ifndef XTIMER_PERIODIC_SPIN
 /**
  * @brief   xtimer_periodic_wakeup spin cutoff
@@ -541,104 +493,12 @@ void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 #define XTIMER_PERIODIC_RELATIVE (512)
 #endif
 
-/*
- * Default xtimer configuration
- */
-#ifndef XTIMER_DEV
-/**
- * @brief Underlying hardware timer device to assign to xtimer
- */
-#define XTIMER_DEV TIMER_DEV(0)
-/**
- * @brief Underlying hardware timer channel to assign to xtimer
- */
-#define XTIMER_CHAN (0)
-
-#if (TIMER_0_MAX_VALUE) == 0xfffffful
-#define XTIMER_WIDTH (24)
-#elif (TIMER_0_MAX_VALUE) == 0xffff
-#define XTIMER_WIDTH (16)
-#endif
-
-#endif
-
-#ifndef XTIMER_WIDTH
-/**
- * @brief xtimer timer width
- *
- * This value specifies the width (in bits) of the hardware timer used by xtimer.
- * Default is 32.
- */
-#define XTIMER_WIDTH (32)
-#endif
-
-#if (XTIMER_WIDTH != 32) || DOXYGEN
-/**
- * @brief xtimer timer mask
- *
- * This value specifies the mask relative to 0xffffffff that the used timer
- * counts to, e.g., 0xffffffff & ~TIMER_MAXVALUE.
- *
- * For a 16bit timer, the mask would be 0xFFFF0000, for a 24bit timer, the mask
- * would be 0xFF000000.
- */
-#define XTIMER_MASK ((0xffffffff >> XTIMER_WIDTH) << XTIMER_WIDTH)
-#else
-#define XTIMER_MASK (0)
-#endif
-
 /**
  * @brief  Base frequency of xtimer is 1 MHz
  */
 #define XTIMER_HZ_BASE (1000000ul)
 
-#ifndef XTIMER_HZ
-/**
- * @brief  Frequency of the underlying hardware timer
- */
-#define XTIMER_HZ XTIMER_HZ_BASE
-#endif
-
-#ifndef XTIMER_SHIFT
-#if (XTIMER_HZ == 32768ul)
-/* No shift necessary, the conversion is not a power of two and is handled by
- * functions in tick_conversion.h */
-#define XTIMER_SHIFT (0)
-#elif (XTIMER_HZ == XTIMER_HZ_BASE)
-/**
- * @brief   xtimer prescaler value
- *
- * If the underlying hardware timer is running at a power of two multiple of
- * 15625, XTIMER_SHIFT can be used to adjust the difference.
- *
- * For a 1 MHz hardware timer, set XTIMER_SHIFT to 0.
- * For a 2 MHz or 500 kHz, set XTIMER_SHIFT to 1.
- * For a 4 MHz or 250 kHz, set XTIMER_SHIFT to 2.
- * For a 8 MHz or 125 kHz, set XTIMER_SHIFT to 3.
- * For a 16 MHz or 62.5 kHz, set XTIMER_SHIFT to 4.
- * and for 32 MHz, set XTIMER_SHIFT to 5.
- *
- * The direction of the shift is handled by the macros in tick_conversion.h
- */
-#define XTIMER_SHIFT (0)
-#elif (XTIMER_HZ >> 1 == XTIMER_HZ_BASE) || (XTIMER_HZ << 1 == XTIMER_HZ_BASE)
-#define XTIMER_SHIFT (1)
-#elif (XTIMER_HZ >> 2 == XTIMER_HZ_BASE) || (XTIMER_HZ << 2 == XTIMER_HZ_BASE)
-#define XTIMER_SHIFT (2)
-#elif (XTIMER_HZ >> 3 == XTIMER_HZ_BASE) || (XTIMER_HZ << 3 == XTIMER_HZ_BASE)
-#define XTIMER_SHIFT (3)
-#elif (XTIMER_HZ >> 4 == XTIMER_HZ_BASE) || (XTIMER_HZ << 4 == XTIMER_HZ_BASE)
-#define XTIMER_SHIFT (4)
-#elif (XTIMER_HZ >> 5 == XTIMER_HZ_BASE) || (XTIMER_HZ << 5 == XTIMER_HZ_BASE)
-#define XTIMER_SHIFT (5)
-#elif (XTIMER_HZ >> 6 == XTIMER_HZ_BASE) || (XTIMER_HZ << 6 == XTIMER_HZ_BASE)
-#define XTIMER_SHIFT (6)
-#else
-#error "XTIMER_SHIFT cannot be derived for given XTIMER_HZ, verify settings!"
-#endif
-#else
-#error "XTIMER_SHIFT is set relative to XTIMER_HZ, no manual define required!"
-#endif
+#include "xtimer/hal.h"
 
 #include "xtimer/tick_conversion.h"
 
