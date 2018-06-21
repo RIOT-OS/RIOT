@@ -1,0 +1,34 @@
+From b441a46b5e1efdf8bd793613afbdc140a604775b Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Wed, 30 May 2018 09:37:21 +0200
+Subject: [PATCH] Fix GCC warning regarding strcpy.
+
+GCC's -Wsizeof-pointer-memaccess (activated by -Wall) checks calls of the form
+
+  strncpy(dest, src, sizeof(X))
+
+And emits a warning if X does not seem to make sense. In Relic, src = X= a constant
+string and this triggers gcc's warning.
+
+I replaced stncpy by memcpy. Because the strings being usd do not contain embedded
+zeroes, this should not be a proble,
+---
+ include/relic_arch.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/relic_arch.h b/include/relic_arch.h
+index 0fec392b..77232041 100644
+--- a/include/relic_arch.h
++++ b/include/relic_arch.h
+@@ -67,7 +67,7 @@
+ #if ARCH == AVR
+ #define FETCH(STR, ID, L)	arch_copy_rom(STR, STRING(ID), L);
+ #else
+-#define FETCH(STR, ID, L)	strncpy(STR, ID, L);
++#define FETCH(STR, ID, L)	memcpy(STR, ID, L);
+ #endif
+ 
+ /*============================================================================*/
+-- 
+2.17.0
+
