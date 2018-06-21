@@ -174,10 +174,12 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
     /* apply flank to interrupt number int_num */
     if (int_num < 4) {
+        EICRA &= ~(0x3 << (int_num * 2));
         EICRA |= (flank << (int_num * 2));
     }
 #if defined(EICRB)
     else {
+        EICRB &= ~(0x3 << ((int_num % 4) * 2));
         EICRB |= (flank << ((int_num % 4) * 2));
     }
 #endif
