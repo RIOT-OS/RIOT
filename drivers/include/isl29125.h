@@ -100,13 +100,21 @@ typedef enum {
 } isl29125_resolution_t;
 
 /**
- * @brief   Device descriptor for ISL29125 sensors
+ * @brief   Device parameters for ISL29125 sensors
  */
 typedef struct {
     i2c_t i2c;                      /**< I2C device the sensor is connected to */
     gpio_t gpio;                    /**< GPIO pin for interrupt/sync mode */
-    isl29125_range_t range;         /**< sensor range */
-    isl29125_resolution_t res;      /**< sensor resolution */
+    isl29125_range_t range;         /**< measurement range */
+    isl29125_mode_t mode;           /**< AD conversion mode */
+    isl29125_resolution_t res;      /**< AD conversion resolution */
+} isl29125_params_t;
+
+/**
+ * @brief   Device descriptor for ISL29125 sensors
+ */
+typedef struct {
+    isl29125_params_t params;       /**< device parameters */
 } isl29125_t;
 
 /**
@@ -141,18 +149,12 @@ typedef enum {
  * @brief   Initialize a new ISL29125 device
  *
  * @param[in] dev           device descriptor of an ISL29125 device
- * @param[in] i2c           I2C device the sensor is connected to
- * @param[in] gpio          GPIO pin for interrupt/sync mode (currently unused)
- * @param[in] mode          operation mode
- * @param[in] range         measurement range
- * @param[in] resolution    AD conversion resolution
+ * @param[in] params        initialization parameters
  *
- * @return              0 on success
- * @return              -1 on error
+ * @return                  0 on success
+ * @return                  -1 on error
  */
-int isl29125_init(isl29125_t *dev, i2c_t i2c, gpio_t gpio,
-                  isl29125_mode_t mode, isl29125_range_t range,
-                  isl29125_resolution_t resolution);
+int isl29125_init(isl29125_t *dev, const isl29125_params_t *params);
 
 /**
  * @brief   Initialize interrupts
