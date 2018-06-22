@@ -27,8 +27,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#ifdef SPI_NUMOF
-
 /**
  * @brief Array holding one pre-initialized mutex for each SPI device
  */
@@ -137,5 +135,3 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         gpio_set((gpio_t)cs);
     }
 }
-
-#endif /* SPI_NUMOF */
