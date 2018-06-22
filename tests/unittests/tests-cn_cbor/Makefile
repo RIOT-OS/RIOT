@@ -1,4 +1,4 @@
-﻿include $(RIOTBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base
 
 # Tests will fail on platforms <64 bit if not set.
 # Workaround for missing overflow detection in cn-cbor.
