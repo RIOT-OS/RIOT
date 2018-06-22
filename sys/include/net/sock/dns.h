@@ -70,7 +70,7 @@ typedef struct {
  * By supplying AF_INET, AF_INET6 or AF_UNSPEC in @p family requesting of A
  * records (IPv4), AAAA records (IPv6) or both can be selected.
  *
- * This fuction will return the first DNS record it receives. IF both A and
+ * This function will return the first DNS record it receives. IF both A and
  * AAAA are requested, AAAA will be preferred.
  *
  * @note @p addr_out needs to provide space for any possible result!
