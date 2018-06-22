@@ -64,6 +64,9 @@ void cpu_init(void)
     /* initialize hf clock */
     clock_init_hf();
 
+    /* enable instruction cache */
+    NRF_NVMC->ICACHECNF = (NVMC_ICACHECNF_CACHEEN_Msk);
+
     /* softdevice needs to be enabled from ISR context */
 #ifdef SOFTDEVICE_PRESENT
     softdevice_handler_init(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, &_ble_evt_buffer,
