@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) Lorenz Hüther, Mathias Detmers
  *
  * This file is subject to the terms and conditions of the GNU Lesser
