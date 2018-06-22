@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "at.h"
 #include "shell.h"
@@ -114,12 +115,101 @@ static int drain(int argc, char **argv)
     return 0;
 }
 
+#ifdef MODULE_AT_URC
+#ifndef MAX_URC_NB
+#define MAX_URC_NB  5
+#endif
+
+#ifndef MAX_URC_LEN
+#define MAX_URC_LEN 32
+#endif
+
+static at_urc_t urc_list[MAX_URC_NB];
+static char urc_str[MAX_URC_NB][MAX_URC_LEN];
+static bool urc_used[MAX_URC_NB];
+
+static void _urc_cb(void *arg, const char *urc)
+{
+    (void)arg;
+    printf("urc received: %s\n", urc);
+}
+
+static int add_urc(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: %s <urc>\n", argv[0]);
+        return 1;
+    }
+
+    if (strlen(argv[1]) > MAX_URC_LEN - 1) {
+        puts("urc is too long");
+        return 1;
+    }
+
+    for (size_t i = 0; i < MAX_URC_NB; i++) {
+        if (!urc_used[i]) {
+            strcpy(urc_str[i], argv[1]);
+            urc_list[i].code = urc_str[i];
+            urc_list[i].arg = NULL;
+            urc_list[i].cb = _urc_cb;
+            urc_used[i] = true;
+            at_add_urc(&at_dev, &urc_list[i]);
+            puts("urc registered");
+            return 0;
+        }
+    }
+
+    puts("Not enough memory, urc is not registered");
+    return 1;
+}
+
+static int process_urc(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: %s <timeout>\n", argv[0]);
+        return 1;
+    }
+
+    uint32_t timeout = strtoul(argv[1], NULL, 0);
+    at_process_urc(&at_dev, timeout);
+
+    puts("urc processed");
+
+    return 0;
+}
+
+static int remove_urc(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("Usage: %s <urc>\n", argv[0]);
+        return 1;
+    }
+
+    for (size_t i = 0; i < MAX_URC_NB; i++) {
+        if (urc_used[i] && strcmp(urc_list[i].code, argv[1]) == 0) {
+            at_remove_urc(&at_dev, &urc_list[i]);
+            urc_used[i] = false;
+            puts("urc removed");
+            return 0;
+        }
+    }
+
+    puts("urc not found");
+    return 1;
+}
+#endif
+
 static const shell_command_t shell_commands[] = {
     { "init", "Initialize AT device", init },
     { "send", "Send a command and wait response", send },
     { "send_ok", "Send a command and wait OK", send_ok },
     { "send_lines", "Send a command and wait lines", send_lines },
     { "drain", "Drain AT device", drain },
+#ifdef MODULE_AT_URC
+    { "add_urc", "Register an URC", add_urc },
+    { "remove_urc", "De-register an URC", remove_urc },
+    { "process_urc", "Process the URCs", process_urc },
+#endif
     { NULL, NULL, NULL },
 };
 
