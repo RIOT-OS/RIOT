@@ -520,6 +520,9 @@ ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
   ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
     USEMODULE += gnrc_pktbuf_static
   endif
+  ifeq (gnrc_pktbuf_cmd,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+    USEMODULE += gnrc_pktbuf_static
+  endif
   USEMODULE += gnrc_pkt
 endif
 
