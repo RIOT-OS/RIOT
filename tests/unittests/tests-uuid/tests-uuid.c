@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2018 Freie Universität Berlin
  * Copyright (C) 2018 Inria
  *
