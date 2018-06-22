@@ -631,6 +631,10 @@ ifneq (,$(filter random,$(USEMODULE)))
     USEMODULE += tinymt32
   endif
 
+  ifneq (,$(filter prng_sha1prng,$(USEMODULE)))
+    USEMODULE += hashes
+  endif
+
   USEMODULE += luid
 endif
 
