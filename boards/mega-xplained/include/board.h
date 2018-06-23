@@ -67,11 +67,14 @@ extern "C" {
  * @{
  */
 /* LED0,2 currently unsupported due to lack of GPIO_OD support */
-#define LED1_PIN     GPIO_PIN(PORT_B, 3)
-#define LED1_MODE    GPIO_OUT
+#define LED_PORT_PIN0    GPIO_PIN(PORT_B, 0)
 
-#define LED3_PIN     GPIO_PIN(PORT_B, 2)
-#define LED3_MODE    GPIO_OUT
+#define LED1_PIN         GPIO_PIN(PORT_B, 3)
+#define LED1_MODE        GPIO_OUT
+
+#define LED3_PIN         GPIO_PIN(PORT_B, 2)
+#define LED3_MODE        GPIO_OUT
+
 /** @} */
 
 /**
@@ -94,13 +97,15 @@ extern "C" {
  * @name    Button pin configuration
  * @{
  */
-#define BTN0_PIN     GPIO_PIN(PORT_B, 0)
-#define BTN0_MODE    GPIO_IN
-
-#define BTN1_PIN     GPIO_PIN(PORT_B, 1)
-#define BTN1_MODE    GPIO_IN
+#define BTN_PORT_PIN0    GPIO_PIN(PORT_B, 0)
 
 /* BTN2 currently unsupported due to lack of GPIO_OD support */
+#define BTN0_PIN         GPIO_PIN(PORT_B, 0)
+#define BTN0_MODE        GPIO_IN
+
+#define BTN1_PIN         GPIO_PIN(PORT_B, 1)
+#define BTN1_MODE        GPIO_IN
+/** @} */
 
 /**
  * @name    ADC NTC, light sensor, and filter lines

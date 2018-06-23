@@ -34,28 +34,20 @@ extern "C" {
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
     {
-        .name = "Button 0",
-        .pin  = BTN0_PIN,
+        .name = "Button %u",
+        .pin = BTN_PORT_PIN0,
+        .pinlist = (1 << (BTN0_PIN - BTN_PORT_PIN0))
+                   | (1 << (BTN1_PIN - BTN_PORT_PIN0)),
         .mode = BTN0_MODE,
-        .flags = SAUL_GPIO_INVERTED,
-    },
-    {
-        .name = "Button 1",
-        .pin  = BTN1_PIN,
-        .mode = BTN1_MODE,
         .flags = SAUL_GPIO_INVERTED,
     },
     /* BTN2, LED0,2 currently unsupported due to lack of GPIO_OD support */
     {
-        .name = "LED 1",
-        .pin = LED1_PIN,
+        .name = "LED %u",
+        .pin = LED_PORT_PIN0,
+        .pinlist = (1 << (LED1_PIN - LED_PORT_PIN0))
+                   | (1 << (LED3_PIN - LED_PORT_PIN0)),
         .mode = LED1_MODE,
-        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
-    },
-    {
-        .name = "LED 3",
-        .pin = LED3_PIN,
-        .mode = LED3_MODE,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     }
 };
