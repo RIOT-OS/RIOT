@@ -23,8 +23,10 @@
 #include "saul.h"
 #include "tmp006.h"
 
-static int read_temp(const void *dev, phydat_t *res)
+static int read_temp(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (tmp006_read_temperature((const tmp006_t *)dev, &res->val[0],
                                 &res->val[1]) != TMP006_OK) {
         return -ECANCELED;

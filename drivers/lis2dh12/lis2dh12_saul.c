@@ -21,8 +21,10 @@
 #include "saul.h"
 #include "lis2dh12.h"
 
-static int read_accelerometer(const void *dev, phydat_t *res)
+static int read_accelerometer(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (lis2dh12_read((const lis2dh12_t *)dev, res->val) != LIS2DH12_OK) {
         return 0;
     }

@@ -23,8 +23,10 @@
 #include "saul.h"
 #include "hts221.h"
 
-static int read_temp(const void *dev, phydat_t *res)
+static int read_temp(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (hts221_read_temperature((const hts221_t *)dev, &res->val[0]) != HTS221_OK) {
         return -ECANCELED;
     }
@@ -34,8 +36,10 @@ static int read_temp(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int read_hum(const void *dev, phydat_t *res)
+static int read_hum(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (hts221_read_humidity((const hts221_t *)dev, (uint16_t *)&res->val[0]) != HTS221_OK) {
         return -ECANCELED;
     }

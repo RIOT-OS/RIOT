@@ -21,8 +21,10 @@
 #include "saul.h"
 #include "adxl345.h"
 
-static int read_acc(const void *dev, phydat_t *res)
+static int read_acc(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     adxl345_read((const adxl345_t *)dev, (adxl345_data_t *)res->val);
 
     res->unit = UNIT_G;

@@ -31,8 +31,10 @@
  * (5/8) * 2^16 = 40960 */
 #define CONV_TO_B10    (40960L)
 
-static int read_adc(const void *dev, phydat_t *res)
+static int read_adc(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     /* Change the mux channel */
     ads101x_set_mux_gain((const ads101x_t *)dev,
                          ((ads101x_t *)dev)->params.mux_gain);

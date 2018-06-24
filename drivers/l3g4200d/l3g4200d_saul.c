@@ -23,8 +23,10 @@
 #include "saul.h"
 #include "l3g4200d.h"
 
-static int read(const void *dev, phydat_t *res)
+static int read(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     l3g4200d_read((const l3g4200d_t *)dev, (l3g4200d_data_t *)res);
     res->unit = UNIT_DPS;
     res->scale = 0;

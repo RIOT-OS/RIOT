@@ -23,16 +23,20 @@
 #include "saul.h"
 #include "pulse_counter.h"
 
-static int read_pulse_counter(const void *dev, phydat_t *res)
+static int read_pulse_counter(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     res->val[0] = pulse_counter_read_with_reset(dev);
     res->unit  = UNIT_NONE;
     res->scale = 0;
     return 1;
 }
 
-static int write_pulse_counter(const void *dev, phydat_t *data)
+static int write_pulse_counter(const void *dev, const uint8_t ctxt, phydat_t *data)
 {
+    (void)ctxt;
+
     pulse_counter_reset(dev);
     (void) data;
     return 1;

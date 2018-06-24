@@ -22,8 +22,10 @@
 
 #include "si70xx.h"
 
-static int read_temperature(const void *dev, phydat_t *res)
+static int read_temperature(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     res->val[0] = (int32_t) si70xx_get_temperature((const si70xx_t *)dev);
     res->unit = UNIT_TEMP_C;
     res->scale = -2;
@@ -31,8 +33,10 @@ static int read_temperature(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int read_relative_humidity(const void *dev, phydat_t *res)
+static int read_relative_humidity(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     res->val[0] = (int32_t) si70xx_get_relative_humidity((const si70xx_t *)dev);
     res->unit = UNIT_PERCENT;
     res->scale = -2;

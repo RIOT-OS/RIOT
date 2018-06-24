@@ -23,16 +23,20 @@
 #include "saul.h"
 #include "lps331ap.h"
 
-static int read_pres(const void *dev, phydat_t *res)
+static int read_pres(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     res->val[0] = (int16_t)lps331ap_read_pres((const lps331ap_t *)dev);
     res->unit = UNIT_BAR;
     res->scale = -3;
     return 1;
 }
 
-static int read_temp(const void *dev, phydat_t *res)
+static int read_temp(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     res->val[0] = (int16_t)(lps331ap_read_temp((const lps331ap_t *)dev) / 10);
     res->unit = UNIT_TEMP_C;
     /* above division by ten leads to °C * 10^-2*/

@@ -24,8 +24,10 @@
 #include "saul.h"
 #include "grove_ledbar.h"
 
-static int set_ledbar(const void *dev, phydat_t *res)
+static int set_ledbar(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     uint8_t lvl = (uint8_t)res->val[0];
     grove_ledbar_set((grove_ledbar_t *)dev, lvl);
     return 1;

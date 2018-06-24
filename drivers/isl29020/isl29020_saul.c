@@ -23,8 +23,10 @@
 #include "saul.h"
 #include "isl29020.h"
 
-static int read(const void *dev, phydat_t *res)
+static int read(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     res->val[0] = (int16_t)isl29020_read((const isl29020_t *)dev);
     memset(&(res->val[1]), 0, 2 * sizeof(int16_t));
     res->unit = UNIT_CD;

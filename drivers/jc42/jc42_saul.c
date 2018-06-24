@@ -25,8 +25,10 @@
 
 
 
-static int read_temperature(const void *dev, phydat_t *res)
+static int read_temperature(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     int16_t temperature;
 
     jc42_get_temperature((const jc42_t *)dev, &temperature);

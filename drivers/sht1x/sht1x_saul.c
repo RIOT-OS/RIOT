@@ -52,8 +52,10 @@ static int read(const sht1x_dev_t *dev, int16_t *temp, int16_t *hum)
     return -1;
 }
 
-static int read_temp(const void *dev, phydat_t *res)
+static int read_temp(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (read(dev, &res->val[0], NULL) == 0) {
         res->unit = UNIT_TEMP_C;
         res->scale = -2;
@@ -63,8 +65,10 @@ static int read_temp(const void *dev, phydat_t *res)
     return -ECANCELED;
 }
 
-static int read_hum(const void *dev, phydat_t *res)
+static int read_hum(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (read(dev, NULL, &res->val[0]) == 0) {
         res->unit = UNIT_PERCENT;
         res->scale = -2;

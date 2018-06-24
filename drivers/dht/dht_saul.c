@@ -53,13 +53,17 @@ static int check_and_read(const void *dev, phydat_t *res, int16_t *val, uint8_t 
     return 1;
 }
 
-static int read_temp(const void *dev, phydat_t *res)
+static int read_temp(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     return check_and_read(dev, res, &temp, UNIT_TEMP_C);
 }
 
-static int read_hum(const void *dev, phydat_t *res)
+static int read_hum(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     return check_and_read(dev, res, &hum, UNIT_PERCENT);
 }
 

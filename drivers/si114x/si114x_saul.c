@@ -23,8 +23,10 @@
 #include "si114x.h"
 #include "xtimer.h"
 
-static int read_uv(const void *dev, phydat_t *res)
+static int read_uv(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     si114x_t *d = (si114x_t *)dev;
 
     res->val[0] = si114x_read_uv(d);
@@ -33,8 +35,10 @@ static int read_uv(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int read_ir(const void *dev, phydat_t *res)
+static int read_ir(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     si114x_t *d = (si114x_t *)dev;
 
     res->val[0] = si114x_read_ir(d);
@@ -43,8 +47,10 @@ static int read_ir(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int read_visible(const void *dev, phydat_t *res)
+static int read_visible(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     si114x_t *d = (si114x_t *)dev;
 
     res->val[0] = si114x_read_visible(d);
@@ -53,8 +59,10 @@ static int read_visible(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int read_distance(const void *dev, phydat_t *res)
+static int read_distance(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     si114x_t *d = (si114x_t *)dev;
 
     res->val[0] = si114x_read_distance(d);

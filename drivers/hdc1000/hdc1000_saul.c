@@ -23,8 +23,10 @@
 #include "saul.h"
 #include "hdc1000.h"
 
-static int read_temp(const void *dev, phydat_t *res)
+static int read_temp(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (hdc1000_read_cached((const hdc1000_t *)dev, &(res->val[0]), NULL) != HDC1000_OK) {
         return -ECANCELED;
     }
@@ -35,8 +37,10 @@ static int read_temp(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int read_hum(const void *dev, phydat_t *res)
+static int read_hum(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (hdc1000_read_cached((const hdc1000_t *)dev, NULL, &(res->val[0])) != HDC1000_OK) {
         return -ECANCELED;
     }

@@ -25,8 +25,10 @@
 #include "saul.h"
 #include "mma8x5x.h"
 
-static int read_acc(const void *dev, phydat_t *res)
+static int read_acc(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     mma8x5x_read((const mma8x5x_t *)dev, (mma8x5x_data_t *)res);
 
     res->unit = UNIT_G;

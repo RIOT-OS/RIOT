@@ -24,8 +24,10 @@
 #include "veml6070.h"
 #include "xtimer.h"
 
-static int read_uv(const void *dev, phydat_t *res)
+static int read_uv(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     res->val[0] = veml6070_read_uv((const veml6070_t *)dev);
     res->unit = UNIT_NONE;
     res->scale = -1;

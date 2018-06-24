@@ -23,8 +23,10 @@
 #include "saul.h"
 #include "lis3mdl.h"
 
-static int read_mag(const void *dev, phydat_t *res)
+static int read_mag(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     const lis3mdl_t *d = (const lis3mdl_t *)dev;
 
     lis3mdl_read_mag(d, (lis3mdl_3d_data_t *)res);

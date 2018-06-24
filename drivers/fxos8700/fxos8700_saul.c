@@ -23,8 +23,10 @@
 #include "saul.h"
 #include "fxos8700.h"
 
-static int read_mag(const void *dev, phydat_t *res)
+static int read_mag(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (fxos8700_read_cached(dev, NULL, (fxos8700_measurement_t *)res)
         != FXOS8700_OK) {
         /* Read failure */
@@ -35,8 +37,10 @@ static int read_mag(const void *dev, phydat_t *res)
     return 3;
 }
 
-static int read_acc(const void *dev, phydat_t *res)
+static int read_acc(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (fxos8700_read_cached(dev, (fxos8700_measurement_t *)res, NULL)
         != FXOS8700_OK) {
         /* Read failure */

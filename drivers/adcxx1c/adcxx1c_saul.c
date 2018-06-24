@@ -24,8 +24,10 @@
 #include "saul.h"
 #include "adcxx1c.h"
 
-static int read_adc(const void *dev, phydat_t *res)
+static int read_adc(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     adcxx1c_read_raw((const adcxx1c_t *)dev, res->val);
 
     res->unit = UNIT_NONE;

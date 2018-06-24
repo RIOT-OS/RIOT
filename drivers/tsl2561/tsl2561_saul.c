@@ -23,8 +23,10 @@
 #include "tsl2561.h"
 #include "xtimer.h"
 
-static int read_illuminance(const void *dev, phydat_t *res)
+static int read_illuminance(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     res->val[0] = tsl2561_read_illuminance((const tsl2561_t *)dev);
     res->unit = UNIT_LUX;
     res->scale = 0;

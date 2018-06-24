@@ -23,7 +23,9 @@
 #include "saul.h"
 #include "pir.h"
 
-static int read_occup(const void *dev, phydat_t *res) {
+static int read_occup(const void *dev, const uint8_t ctxt, phydat_t *res) {
+    (void)ctxt;
+
     pir_t *d = (pir_t *)dev;
     if (pir_get_occupancy(d, &(res->val[0]))) {
         /* Read failure */

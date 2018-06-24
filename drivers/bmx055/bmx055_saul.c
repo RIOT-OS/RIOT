@@ -22,8 +22,10 @@
 #include "saul.h"
 #include "bmx055.h"
 
-static int read_mag(const void *dev, phydat_t *res)
+static int read_mag(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (bmx055_mag_read((bmx055_t *)dev, (int16_t *)res) != BMX055_OK) {
         return 0;
     }
@@ -32,8 +34,10 @@ static int read_mag(const void *dev, phydat_t *res)
     return 3;
 }
 
-static int read_acc(const void *dev, phydat_t *res)
+static int read_acc(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (bmx055_acc_read((bmx055_t *)dev, (int16_t *)res) != BMX055_OK) {
         return 0;
     }
@@ -42,8 +46,10 @@ static int read_acc(const void *dev, phydat_t *res)
     return 3;
 }
 
-static int read_gyro(const void *dev, phydat_t *res)
+static int read_gyro(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     if (bmx055_gyro_read((bmx055_t *)dev, (int16_t *)res) != BMX055_OK) {
         return 0;
     }

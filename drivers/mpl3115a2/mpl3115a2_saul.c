@@ -25,8 +25,10 @@
 #include "saul.h"
 #include "mpl3115a2.h"
 
-static int read_pressure(const void *dev, phydat_t *res)
+static int read_pressure(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     uint8_t state;
     uint32_t pressure;
     if (mpl3115a2_read_pressure((const mpl3115a2_t *)dev,
@@ -42,8 +44,10 @@ static int read_pressure(const void *dev, phydat_t *res)
     return 1;
 }
 
-static int read_temperature(const void *dev, phydat_t *res)
+static int read_temperature(const void *dev, const uint8_t ctxt, phydat_t *res)
 {
+    (void)ctxt;
+
     int16_t temperature;
     if (mpl3115a2_read_temp((const mpl3115a2_t *)dev, &temperature) != MPL3115A2_OK) {
         LOG_ERROR("[SAUL] mpl3115a2_read_temp failed!\n");
