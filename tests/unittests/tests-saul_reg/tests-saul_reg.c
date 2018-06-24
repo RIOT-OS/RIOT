@@ -30,10 +30,10 @@ static const saul_driver_t s1_dri = { NULL, NULL, SAUL_SENSE_TEMP };
 static const saul_driver_t s2_dri = { NULL, NULL, SAUL_SENSE_LIGHT };
 static const saul_driver_t s3_dri = { NULL, NULL, SAUL_ACT_LED_RGB };
 
-static saul_reg_t s0 = { NULL, NULL, "S0", &s0_dri };
-static saul_reg_t s1 = { NULL, NULL, "S1", &s1_dri };
-static saul_reg_t s2 = { NULL, NULL, "S2", &s2_dri };
-static saul_reg_t s3 = { NULL, NULL, "S3", &s3_dri };
+static saul_reg_t s0 = { NULL, NULL, "S0", &s0_dri, 0 };
+static saul_reg_t s1 = { NULL, NULL, "S1", &s1_dri, 0 };
+static saul_reg_t s2 = { NULL, NULL, "S2", &s2_dri, 0 };
+static saul_reg_t s3 = { NULL, NULL, "S3", &s3_dri, 0 };
 
 
 static int count(void)
@@ -104,15 +104,17 @@ static void test_reg_add(void)
 
 static void test_reg_find_nth(void)
 {
-    saul_reg_t *dev = saul_reg_find_nth(0);
+    saul_ctxt_ptr_t ctxt_ptr;
+
+    saul_reg_t *dev = saul_reg_find_nth(&ctxt_ptr, 0);
     TEST_ASSERT_NOT_NULL(dev);
     TEST_ASSERT_EQUAL_STRING("S0", dev->name);
 
-    dev = saul_reg_find_nth(2);
+    dev = saul_reg_find_nth(&ctxt_ptr, 2);
     TEST_ASSERT_NOT_NULL(dev);
     TEST_ASSERT_EQUAL_STRING("S2", dev->name);
 
-    dev = saul_reg_find_nth(17);
+    dev = saul_reg_find_nth(&ctxt_ptr, 17);
     TEST_ASSERT_NULL(dev);
 }
 

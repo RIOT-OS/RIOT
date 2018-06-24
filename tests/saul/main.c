@@ -45,7 +45,7 @@ int main(void)
         }
 
         while (dev) {
-            int dim = saul_reg_read(dev, &res);
+            int dim = saul_reg_read(dev, 0, &res);
             printf("\nDev: %s\tType: %s\n", dev->name,
                    saul_class_to_str(dev->driver->type));
             phydat_dump(&res, dim);
