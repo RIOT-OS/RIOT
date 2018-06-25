@@ -220,24 +220,31 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
     assert(i2c != NULL);
 
     int ret = 0;
-
     if (!(flags & I2C_NOSTART)) {
         DEBUG("[i2c] read_bytes: Send Slave address and wait for ADDR == 1\n");
         ret = _start(i2c, address, I2C_FLAG_READ, flags);
         if (ret < 0) {
             return ret;
         }
+        _clear_addr(i2c);
+        if (length == 1 && !(flags & I2C_NOSTOP)) {
+            DEBUG("[i2c] read_bytes: Set ACK = 0\n");
+            i2c->CR1 &= ~(I2C_CR1_ACK);
+        }
+        else {
+            i2c->CR1 |= I2C_CR1_ACK;
+        }
+        _clear_addr(i2c);
     }
-
-    if (length == 1) {
-        DEBUG("[i2c] read_bytes: Set ACK = 0\n");
-        i2c->CR1 &= ~(I2C_CR1_ACK);
+    else{
+        if (length == 1 && !(flags & I2C_NOSTOP)) {
+            DEBUG("[i2c] read_bytes: Set ACK = 0\n");
+            i2c->CR1 &= ~(I2C_CR1_ACK);
+        }
+        else {
+            i2c->CR1 |= I2C_CR1_ACK;
+        }
     }
-    else {
-        i2c->CR1 |= I2C_CR1_ACK;
-    }
-
-    _clear_addr(i2c);
 
     while (n--) {
         /* wait for reception to complete */
@@ -247,7 +254,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
             }
         }
 
-        if (n == 1) {
+        if (n == 1 && !(flags & I2C_NOSTOP)) {
             /* disable ACK */
             i2c->CR1 &= ~(I2C_CR1_ACK);
         }
@@ -267,7 +274,6 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
             }
         }
     }
-
     return ret;
 }
 
@@ -430,6 +436,7 @@ static int _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag, uint8_t fl
     /* Wait for ADDR flag to be set */
     while (!(i2c->SR1 & I2C_SR1_ADDR) && tick--) {
         if ((i2c->SR1 & ERROR_FLAG) || !tick) {
+            i2c->CR1 |= I2C_CR1_STOP;
             return -ETIMEDOUT;
         }
     }
@@ -494,7 +501,7 @@ static inline int _wait_ready(I2C_TypeDef *i2c)
     while ((i2c->SR2 & I2C_SR2_BUSY) && tick--) {
         if (!tick) {
             DEBUG("[i2c] wait_ready: timeout\n");
-            return -3;
+            return -ETIMEDOUT;
         }
     }
 
