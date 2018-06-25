@@ -74,6 +74,18 @@ void test_distributions(uint32_t samples);
 void test_dump(uint32_t samples);
 
 /**
+ * @brief   Test for dumping random number r with a <= r < b. Each number
+ *          is printed on a separate line as an unsigned 32-bit number.
+ *
+ * @param[in] samples   Number of samples to print.
+ * @param[in] a         Minimum for random number
+ * @param[in] b         Upper bound for random number
+ *
+ * @pre     a < b
+ */
+void test_dump_range(uint32_t samples, uint32_t a, uint32_t b);
+
+/**
  * @brief   Run the FIPS 140-2 battery of test.
  *
  * The FIPS 140-2 tests are four statistical tests that will test 20000 bits
@@ -103,6 +115,18 @@ void test_entropy(uint32_t samples);
  * @param[in] duration  Test duration (in seconds)
  */
 void test_speed(uint32_t duration);
+
+/**
+ * @brief   Run the speed test for random numbers r with a <= r < b and a given duration.
+ *          It utillizes xtimer for setting an alarm.
+ *
+ * @param[in] duration  Test duration (in seconds)
+ * @param[in] a         Minimum for random number
+ * @param[in] b         Upper bound for random number
+ *
+ * @pre     a < b
+ */
+void test_speed_range(uint32_t duration, uint32_t a, uint32_t b);
 
 #ifdef __cplusplus
 }

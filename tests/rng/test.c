@@ -104,6 +104,27 @@ static inline uint32_t test_get_uint32(void)
 }
 
 /**
+ * @brief   Retrieve a 32-bit number of the source RNG on [a,b)-interval
+ */
+static inline uint32_t test_get_uint32_range(uint32_t a, uint32_t b)
+{
+    if (source == RNG_PRNG) {
+        return random_uint32_range(a, b);
+    }
+#ifdef MODULE_PERIPH_HWRNG
+    else if (source == RNG_HWRNG) {
+        puts("Range feature not supported by HWRNG");
+    }
+#endif
+    else if (source == RNG_CONSTANT) {
+        /* use the seed as the constant value */
+        return seed;
+    }
+
+    return 0;
+}
+
+/**
  * @brief   Helper for printing `passed` or `failed` depending on condition
  *
  * @param[in] condition     The test condition.
@@ -189,6 +210,15 @@ void test_dump(uint32_t samples)
 
     while (samples--) {
         printf("%" PRIu32 "\n", test_get_uint32());
+    }
+}
+
+void test_dump_range(uint32_t samples, uint32_t low_thresh, uint32_t high_thresh)
+{
+    test_init("dump range");
+
+    while (samples--) {
+        printf("%" PRIu32 "\n", test_get_uint32_range(low_thresh, high_thresh));
     }
 }
 
@@ -370,6 +400,30 @@ void test_speed(uint32_t duration)
 
     while (xtimer_now_usec64() < timeout) {
         test_get_uint32();
+        samples++;
+    }
+
+    /* print results */
+    fmt_u64_dec(tmp1, samples);
+    fmt_u64_dec(tmp2, (samples * 4 / 1024) / duration);
+    printf("Collected %s samples in %" PRIu32 " seconds (%s KiB/s).\n", tmp1, duration, tmp2);
+}
+
+void test_speed_range(uint32_t duration, uint32_t low_thresh, uint32_t high_thresh)
+{
+    char tmp1[16] = { 0 }, tmp2[16] = { 0 };
+
+    uint64_t timeout = 0;
+    uint64_t samples = 0;
+
+    /* initialize test */
+    test_init("speed range");
+
+    /* collect samples as long as timer has not expired */
+    timeout = xtimer_now_usec64() + (duration * US_PER_SEC);
+
+    while (xtimer_now_usec64() < timeout) {
+        test_get_uint32_range(low_thresh, high_thresh);
         samples++;
     }
 
