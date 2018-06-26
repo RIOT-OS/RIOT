@@ -71,12 +71,34 @@ extern "C" {
 #define BTN0_PIN            GPIO_PIN(0, 28)
 #define BTN0_MODE           GPIO_IN_PU
 /** @} */
+/**
+ * @name    RFCTL pin definitions and handlers
+ * @{
+ */
+#define RFCTL1_PIN            GPIO_PIN(0, 9)
+#define RFCTL2_PIN            GPIO_PIN(0, 12)
+
+#define RFCTL_PORT            PORT->Group[0]
+#define RFCTL1_MASK           (1 << 9)
+#define RFCTL2_MASK           (1 << 12)
+
+#define RFCTL1_ON             (RFCTL_PORT.OUTCLR.reg = RFCTL1_MASK)
+#define RFCTL1_OFF            (RFCTL_PORT.OUTSET.reg = RFCTL1_MASK)
+#define RFCTL1_TOGGLE         (RFCTL_PORT.OUTTGL.reg = RFCTL1_MASK)
+#define RFCTL2_ON             (RFCTL_PORT.OUTCLR.reg = RFCTL2_MASK)
+#define RFCTL2_OFF            (RFCTL_PORT.OUTSET.reg = RFCTL2_MASK)
+#define RFCTL2_TOGGLE         (RFCTL_PORT.OUTTGL.reg = RFCTL2_MASK)
+/** @} */
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
 
+/**
+ * @brief  controls whether antenna 1 or 2 is used
+ */
+int board_choose_antenna(uint8_t antenna);
 #ifdef __cplusplus
 }
 #endif
