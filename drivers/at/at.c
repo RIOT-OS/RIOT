@@ -266,3 +266,52 @@ out:
     }
     return res;
 }
+
+#ifdef MODULE_AT_URC
+void at_add_urc(at_dev_t *dev, at_urc_t *urc)
+{
+    assert(urc);
+    assert(urc->code);
+    assert(strlen(urc->code) != 0);
+    assert(urc->cb);
+
+    clist_rpush(&dev->urc_list, &urc->list_node);
+}
+
+void at_remove_urc(at_dev_t *dev, at_urc_t *urc)
+{
+    clist_remove(&dev->urc_list, &urc->list_node);
+}
+
+static int _check_urc(clist_node_t *node, void *arg)
+{
+    const char *buf = arg;
+    at_urc_t *urc = container_of(node, at_urc_t, list_node);
+
+    DEBUG("Trying to match with %s\n", urc->code);
+
+    if (strncmp(buf, urc->code, strlen(urc->code)) == 0) {
+        urc->cb(urc->arg, buf);
+        return 1;
+    }
+
+    return 0;
+}
+
+void at_process_urc(at_dev_t *dev, uint32_t timeout)
+{
+    char buf[AT_BUF_SIZE];
+
+    DEBUG("Processing URC (timeout=%" PRIu32 "us)\n", timeout);
+
+    ssize_t res;
+    /* keep reading while received data are shorter than EOL */
+    while ((res = at_readline(dev, buf, sizeof(buf), true, timeout)) <
+           (ssize_t)sizeof(AT_RECV_EOL_1 AT_RECV_EOL_2) - 1) {
+        if (res < 0) {
+            return;
+        }
+    }
+    clist_foreach(&dev->urc_list, _check_urc, buf);
+}
+#endif
