@@ -68,6 +68,15 @@ int netdev_ieee802154_send(netdev_t *dev, const iolist_t *list)
         DEBUG("netdev_ieee802154: Error preperaring frame\n");
         return -EINVAL;
     }
+
+#ifdef MODULE_NETSTATS_L2
+    if (data->dst_len == 2 && data->dst[0] == 0xff && data->dst[1] == 0xff) {
+        dev->stats.tx_mcast_count++;
+    }
+    else {
+        dev->stats.tx_unicast_count++;
+    }
+#endif
     /* prepare iolist for netdev / mac layer */
     iolist_t iolist = {
         .iol_next = list->iol_next,

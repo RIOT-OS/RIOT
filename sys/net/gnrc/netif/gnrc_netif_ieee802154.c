@@ -192,15 +192,6 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     l2data_hdr.src_len = src_len;
     memcpy(&l2data_hdr.src, src, l2data_hdr.src_len);
 
-#ifdef MODULE_NETSTATS_L2
-    if (netif_hdr->flags &
-            (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        netif->dev->stats.tx_mcast_count++;
-    }
-    else {
-        netif->dev->stats.tx_unicast_count++;
-    }
-#endif
     /* prepare iolist for netdev / mac layer */
     iolist_t iolist = {
         .iol_next = (iolist_t *)pkt->next,

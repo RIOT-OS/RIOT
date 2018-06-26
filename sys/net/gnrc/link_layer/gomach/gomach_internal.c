@@ -92,15 +92,6 @@ int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         .iol_len = sizeof(l2data_hdr)
     };
 
-#ifdef MODULE_NETSTATS_L2
-    if (netif_hdr->flags &
-            (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        netif->dev->stats.tx_mcast_count++;
-    }
-    else {
-        netif->dev->stats.tx_unicast_count++;
-    }
-#endif
 #ifdef MODULE_GNRC_MAC
     if (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_CSMA_ENABLED) {
         res = csma_sender_csma_ca_send(dev, &iolist, &netif->mac.csma_conf);
