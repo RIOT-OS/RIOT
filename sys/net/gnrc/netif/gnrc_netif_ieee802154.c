@@ -47,18 +47,19 @@ gnrc_netif_t *gnrc_netif_ieee802154_create(char *stack, int stacksize,
                              &ieee802154_ops);
 }
 
-static gnrc_pktsnip_t *_make_netif_hdr(netdev_ieee802154_mac_t *mac)
+static gnrc_pktsnip_t *_make_netif_hdr(netdev_ieee802154_data_t *l2data)
 {
     gnrc_pktsnip_t *snip;
     /* allocate space for header */
-    snip = gnrc_netif_hdr_build(mac->src, (size_t)mac->src_len,
-            mac->dst, (size_t)mac->dst_len);
+    snip = gnrc_netif_hdr_build(l2data->src, (size_t)l2data->src_len,
+            l2data->dst, (size_t)l2data->dst_len);
     if (snip == NULL) {
         DEBUG("_make_netif_hdr: no space left in packet buffer\n");
         return NULL;
     }
     /* set broadcast flag for broadcast destination */
-    if ((mac->dst_len == 2) && (mac->dst[0] == 0xff) && (mac->dst[1] == 0xff)) {
+    if ((l2data->dst_len == 2) && (l2data->dst[0] == 0xff) &&
+            (l2data->dst[1] == 0xff)) {
         gnrc_netif_hdr_t *hdr = snip->data;
         hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
     }
@@ -93,9 +94,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 #if ENABLE_DEBUG
             char src_str[GNRC_NETIF_HDR_L2ADDR_PRINT_LEN];
 #endif
-            nread -= sizeof(netdev_ieee802154_mac_t);
+            nread -= sizeof(netdev_ieee802154_data_t);
             /* mark IEEE 802.15.4 header */
-            ieee802154_hdr = gnrc_pktbuf_mark(pkt, sizeof(netdev_ieee802154_mac_t),
+            ieee802154_hdr = gnrc_pktbuf_mark(pkt, sizeof(netdev_ieee802154_data_t),
                     GNRC_NETTYPE_UNDEF);
             if (ieee802154_hdr == NULL) {
                 DEBUG("_recv_ieee802154: no space left in packet buffer\n");
@@ -156,7 +157,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     gnrc_netif_hdr_t *netif_hdr;
     int res = 0;
     const uint8_t *dst, *src;
-    netdev_ieee802154_mac_t mac_info;
+    netdev_ieee802154_data_t l2data;
 
     if (pkt == NULL) {
         DEBUG("_send_ieee802154: pkt was NULL\n");
@@ -171,13 +172,13 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     if (netif_hdr->flags & /* If any of these flags is set assume broadcast */
         (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
         dst = ieee802154_addr_bcast;
-        mac_info.dst_len = IEEE802154_ADDR_BCAST_LEN;
+        l2data.dst_len = IEEE802154_ADDR_BCAST_LEN;
     }
     else {
         dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
-        mac_info.dst_len = netif_hdr->dst_l2addr_len;
+        l2data.dst_len = netif_hdr->dst_l2addr_len;
     }
-    memcpy(&mac_info.dst, dst, mac_info.dst_len);
+    memcpy(&l2data.dst, dst, l2data.dst_len);
 
     /* prepare source address */
     uint8_t src_len = netif_hdr->src_l2addr_len;
@@ -188,8 +189,8 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         src_len = netif->l2addr_len;
         src = netif->l2addr;
     }
-    mac_info.src_len = src_len;
-    memcpy(&mac_info.src, src, mac_info.src_len);
+    l2data.src_len = src_len;
+    memcpy(&l2data.src, src, l2data.src_len);
 
 #ifdef MODULE_NETSTATS_L2
     if (netif_hdr->flags &
@@ -203,8 +204,8 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     /* prepare iolist for netdev / mac layer */
     iolist_t iolist = {
         .iol_next = (iolist_t *)pkt->next,
-        .iol_base = &mac_info,
-        .iol_len = sizeof(mac_info)
+        .iol_base = &l2data,
+        .iol_len = sizeof(l2data)
     };
 
 #ifdef MODULE_GNRC_MAC
