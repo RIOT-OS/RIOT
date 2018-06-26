@@ -45,7 +45,7 @@ typedef uint16_t gpio_t;
  * @brief   Mandatory function for defining a GPIO pins
  * @{
  */
-#define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0xff))))
+#define GPIO_PIN(x, y)      ((gpio_t)(((x & 0xff) << 8) | (1 << (y & 0x07))))
 
 /**
  * @brief   No support for HW chip select...
