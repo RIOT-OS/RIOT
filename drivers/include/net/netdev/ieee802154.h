@@ -131,7 +131,7 @@ typedef struct {
     uint8_t dst[IEEE802154_LONG_ADDRESS_LEN]; /**< Destination address */
     uint8_t src_len;                          /**< Source address length */
     uint8_t dst_len;                          /**< Destination address length */
-} netdev_ieee802154_data_t;
+} netdev_ieee802154_data_hdr_t;
 
 /**
  * @brief   Receive function for netdev IEEE 802.15.4 devices.

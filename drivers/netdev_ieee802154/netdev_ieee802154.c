@@ -54,7 +54,7 @@ static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
 int netdev_ieee802154_send(netdev_t *dev, const iolist_t *list)
 {
     netdev_ieee802154_t *netdev = (netdev_ieee802154_t *)dev;
-    netdev_ieee802154_data_t *data = list->iol_base;
+    netdev_ieee802154_data_hdr_t *data = list->iol_base;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     uint8_t flags = (uint8_t)(netdev->flags & NETDEV_IEEE802154_SEND_MASK);
     int res = 0;
@@ -82,8 +82,8 @@ int netdev_ieee802154_recv(netdev_t *dev, void *buf, size_t len, void *info)
     /* Leave space for the generic data header */
     netdev_ieee802154_t *netdev = (netdev_ieee802154_t *)dev;
     /* If buf is NULL, pdu_start should also be NULL */
-    uint8_t *pdu_start = (buf) ? buf + sizeof(netdev_ieee802154_data_t) : buf;
-    netdev_ieee802154_data_t *l2data = buf;
+    uint8_t *pdu_start = (buf) ? buf + sizeof(netdev_ieee802154_data_hdr_t) : buf;
+    netdev_ieee802154_data_hdr_t *l2data_hdr = buf;
     int res = dev->driver->recv(dev, pdu_start, len, info);
     if (res < 0) {
         return res;
@@ -93,19 +93,19 @@ int netdev_ieee802154_recv(netdev_t *dev, void *buf, size_t len, void *info)
             int dst_len, src_len;
             le_uint16_t _pan_tmp;
             size_t mhr_len = ieee802154_get_frame_hdr_len(pdu_start);
-            dst_len = ieee802154_get_dst(pdu_start, l2data->dst, &_pan_tmp);
-            src_len = ieee802154_get_src(pdu_start, l2data->src, &_pan_tmp);
+            dst_len = ieee802154_get_dst(pdu_start, l2data_hdr->dst, &_pan_tmp);
+            src_len = ieee802154_get_src(pdu_start, l2data_hdr->src, &_pan_tmp);
             if ((dst_len < 0) || (src_len < 0)) {
                 DEBUG("netdev_ieee802154: unable to get addresses\n");
                 return -EINVAL;
             }
-            l2data->src_len = src_len;
-            l2data->dst_len = dst_len;
+            l2data_hdr->src_len = src_len;
+            l2data_hdr->dst_len = dst_len;
             /* Remove the ieee802154 frame header */
             memmove(pdu_start, pdu_start+mhr_len, res - mhr_len);
             res -= mhr_len;
         }
-        res += sizeof(netdev_ieee802154_data_t);
+        res += sizeof(netdev_ieee802154_data_hdr_t);
     }
     return res;
 }
