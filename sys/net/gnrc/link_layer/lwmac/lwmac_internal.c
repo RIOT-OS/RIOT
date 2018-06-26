@@ -35,16 +35,11 @@
 int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     netdev_t *dev = netif->dev;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
     gnrc_netif_hdr_t *netif_hdr;
     const uint8_t *src, *dst = NULL;
     int res = 0;
-    size_t src_len, dst_len;
-    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
-    uint8_t flags = (uint8_t)(state->flags & NETDEV_IEEE802154_SEND_MASK);
-    le_uint16_t dev_pan = byteorder_btols(byteorder_htons(state->pan));
+    netdev_ieee802154_data_hdr_t l2data_hdr;
 
-    flags |= IEEE802154_FCF_TYPE_DATA;
     if (pkt == NULL) {
         DEBUG("_send_ieee802154: pkt was NULL\n");
         return -EINVAL;
@@ -58,13 +53,15 @@ int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     if (netif_hdr->flags & /* If any of these flags is set assume broadcast */
         (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
         dst = ieee802154_addr_bcast;
-        dst_len = IEEE802154_ADDR_BCAST_LEN;
+        l2data_hdr.dst_len = IEEE802154_ADDR_BCAST_LEN;
     }
     else {
         dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
-        dst_len = netif_hdr->dst_l2addr_len;
+        l2data_hdr.dst_len = netif_hdr->dst_l2addr_len;
     }
-    src_len = netif_hdr->src_l2addr_len;
+    memcpy(&l2data_hdr.dst, dst, l2data_hdr.dst_len);
+
+    uint8_t src_len = netif_hdr->src_l2addr_len;
     if (src_len > 0) {
         src = gnrc_netif_hdr_get_src_addr(netif_hdr);
     }
@@ -72,19 +69,14 @@ int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         src_len = netif->l2addr_len;
         src = netif->l2addr;
     }
-    /* fill MAC header, seq should be set by device */
-    if ((res = ieee802154_set_frame_hdr(mhr, src, src_len,
-                                        dst, dst_len, dev_pan,
-                                        dev_pan, flags, state->seq++)) == 0) {
-        DEBUG("_send_ieee802154: Error preperaring frame\n");
-        return -EINVAL;
-    }
+    l2data_hdr.src_len = src_len;
+    memcpy(&l2data_hdr.src, src, l2data_hdr.src_len);
 
     /* prepare packet for sending */
     iolist_t iolist = {
         .iol_next = (iolist_t *)pkt->next,
-        .iol_base = mhr,
-        .iol_len = (size_t)res
+        .iol_base = &l2data_hdr,
+        .iol_len = sizeof(l2data_hdr)
     };
 
 #ifdef MODULE_NETSTATS_L2
@@ -101,10 +93,10 @@ int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         res = csma_sender_csma_ca_send(dev, &iolist, &netif->mac.csma_conf);
     }
     else {
-        res = dev->driver->send(dev, &iolist);
+        res = netdev_ieee802154_send(dev, &iolist);
     }
 #else
-    res = dev->driver->send(dev, &iolist);
+    res = netdev_ieee802154_send(dev, &iolist);
 #endif
 
     /* release old data */
