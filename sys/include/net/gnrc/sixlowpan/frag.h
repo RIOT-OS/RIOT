@@ -74,26 +74,45 @@ typedef struct {
  */
 typedef struct {
     gnrc_pktsnip_t *pkt;    /**< Pointer to the IPv6 packet to be fragmented */
-    size_t datagram_size;   /**< Length of just the IPv6 packet to be fragmented */
+    size_t datagram_size;   /**< Length of just the (uncompressed) IPv6 packet to be fragmented */
     uint16_t offset;        /**< Offset of the Nth fragment from the beginning of the
                              *   payload datagram */
     kernel_pid_t pid;       /**< PID of the interface */
 } gnrc_sixlowpan_msg_frag_t;
 
 /**
- * @brief   Sends a packet fragmented.
+ * @brief   Allocates a @ref gnrc_sixlowpan_msg_frag_t object
  *
- * @param[in] fragment_msg    Message containing status of the 6LoWPAN
- *                            fragmentation progress
+ * @return  A @ref gnrc_sixlowpan_msg_frag_t if available
+ * @return  NULL, otherwise
  */
-void gnrc_sixlowpan_frag_send(gnrc_sixlowpan_msg_frag_t *fragment_msg);
+gnrc_sixlowpan_msg_frag_t *gnrc_sixlowpan_msg_frag_get(void);
 
 /**
- * @brief   Handles a packet containing a fragment header.
+ * @brief   Sends a packet fragmented
  *
- * @param[in] pkt   The packet to handle.
+ * @pre `ctx != NULL`
+ * @pre gnrc_sixlowpan_msg_frag_t::pkt of @p ctx is equal to @p pkt or
+ *      `pkt == NULL`.
+ *
+ * @param[in] pkt       A packet. May be NULL.
+ * @param[in] ctx       Message containing status of the 6LoWPAN fragmentation
+ *                      progress. Expected to be of type
+ *                      @ref gnrc_sixlowpan_msg_frag_t, with
+ *                      gnrc_sixlowpan_msg_frag_t set to @p pkt. Must not be
+ *                      NULL.
+ * @param[in] page      Current 6Lo dispatch parsing page.
  */
-void gnrc_sixlowpan_frag_handle_pkt(gnrc_pktsnip_t *pkt);
+void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
+
+/**
+ * @brief   Handles a packet containing a fragment header
+ *
+ * @param[in] pkt       The packet to handle
+ * @param[in] ctx       Context for the packet. May be NULL.
+ * @param[in] page      Current 6Lo dispatch parsing page.
+ */
+void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 
 #ifdef __cplusplus
 }

@@ -34,10 +34,6 @@
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 
-#ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-static gnrc_sixlowpan_msg_frag_t fragment_msg = {NULL, 0, 0, KERNEL_PID_UNDEF};
-#endif
-
 #if ENABLE_DEBUG
 static char _stack[GNRC_SIXLOWPAN_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 #else
@@ -164,7 +160,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
     else if (sixlowpan_frag_is((sixlowpan_frag_t *)dispatch)) {
         DEBUG("6lo: received 6LoWPAN fragment\n");
-        gnrc_sixlowpan_frag_handle_pkt(pkt);
+        gnrc_sixlowpan_frag_recv(pkt, NULL, 0);
         return;
     }
 #endif
@@ -305,27 +301,24 @@ static void _send(gnrc_pktsnip_t *pkt)
         return;
     }
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
-    else if (fragment_msg.pkt != NULL) {
-        DEBUG("6lo: Fragmentation already ongoing. Dropping packet\n");
-        gnrc_pktbuf_release(pkt2);
-        return;
-    }
     else if (datagram_size <= SIXLOWPAN_FRAG_MAX_LEN) {
         DEBUG("6lo: Send fragmented (%u > %" PRIu8 ")\n",
               (unsigned int)datagram_size, iface->sixlo.max_frag_size);
-        msg_t msg;
+        gnrc_sixlowpan_msg_frag_t *fragment_msg;
 
-        fragment_msg.pid = hdr->if_pid;
-        fragment_msg.pkt = pkt2;
-        fragment_msg.datagram_size = datagram_size;
+        fragment_msg = gnrc_sixlowpan_msg_frag_get();
+        if (fragment_msg == NULL) {
+            DEBUG("6lo: Not enough resources to fragment packet. Dropping packet\n");
+            gnrc_pktbuf_release(pkt2);
+            return;
+        }
+        fragment_msg->pid = hdr->if_pid;
+        fragment_msg->pkt = pkt2;
+        fragment_msg->datagram_size = datagram_size;
         /* Sending the first fragment has an offset==0 */
-        fragment_msg.offset = 0;
+        fragment_msg->offset = 0;
 
-        /* set the outgoing message's fields */
-        msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
-        msg.content.ptr = &fragment_msg;
-        /* send message to self */
-        msg_send_to_self(&msg);
+        gnrc_sixlowpan_frag_send(pkt2, fragment_msg, 0);
     }
     else {
         DEBUG("6lo: packet too big (%u > %" PRIu16 ")\n",
@@ -380,7 +373,7 @@ static void *_event_loop(void *args)
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG
             case GNRC_SIXLOWPAN_MSG_FRAG_SND:
                 DEBUG("6lo: send fragmented event received\n");
-                gnrc_sixlowpan_frag_send(msg.content.ptr);
+                gnrc_sixlowpan_frag_send(NULL, msg.content.ptr, 0);
                 break;
 #endif
 
