@@ -16,7 +16,8 @@ configured to create interrupts.
 Compile and flash this test application like:
 
     export BOARD=your_board
-    export PIR_GPIO=name_of_your_pin
+    export PIR_PARAM_GPIO=name_of_your_pin
+    export PIR_PARAM_ACTIVE_HIGH=if_gpio_pin_is_high_or_low_when_pir_is_active
     make clean
     make all-interrupt
     make flash
@@ -40,7 +41,8 @@ Connect the sensor's "out" pin to any GPIO pin of you board.
 Compile and flash this test application like:
 
     export BOARD=your_board
-    export PIR_GPIO=name_of_your_pin
+    export PIR_PARAM_GPIO=name_of_your_pin
+    export PIR_PARAM_ACTIVE_HIGH=if_gpio_pin_is_high_or_low_when_pir_is_active
     make clean
     make all-polling
     make flash

@@ -186,6 +186,10 @@ ifneq (,$(filter pcd8544,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/pcd8544/include
 endif
 
+ifneq (,$(filter pir,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/pir/include
+endif
+
 ifneq (,$(filter pulse_counter,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/pulse_counter/include
 endif

@@ -279,6 +279,11 @@ ifneq (,$(filter pcd8544,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter pir,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter rgbled,$(USEMODULE)))
   USEMODULE += color
 endif
