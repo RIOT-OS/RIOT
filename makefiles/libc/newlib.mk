@@ -70,6 +70,8 @@ else
       # newlib-nano overrides newlib.h and its include dir
       # should therefore go before the other newlib includes.
       NEWLIB_INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(NEWLIB_INCLUDES)
+    else
+      $(warning Could not find newlib nano include dir, using normal newlib)
     endif
   endif
 endif
