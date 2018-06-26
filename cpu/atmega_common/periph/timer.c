@@ -29,18 +29,18 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /**
  * @brief   All timers have three channels
  */
-#define CHANNELS                (3)
+#define CHANNELS (3)
 
 /**
  * @brief   We have 5 possible prescaler values
  */
-#define PRESCALE_NUMOF          (5U)
+#define PRESCALE_NUMOF (5U)
 
 /**
  * @brief   Possible prescaler values, encoded as 2 ^ val
@@ -51,13 +51,13 @@ static const uint8_t prescalers[] = { 0, 3, 6, 8, 10 };
  * @brief   Timer state context
  */
 typedef struct {
-    mega_timer_t *dev;          /**< timer device */
-    volatile uint8_t *mask;     /**< address of interrupt mask register */
-    volatile uint8_t *flag;     /**< address of interrupt flag register */
-    timer_cb_t cb;              /**< interrupt callback */
-    void *arg;                  /**< interrupt callback argument */
-    uint8_t mode;               /**< remember the configured mode */
-    uint8_t isrs;               /**< remember the interrupt state */
+    mega_timer_t *dev;      /**< timer device */
+    volatile uint8_t *mask; /**< address of interrupt mask register */
+    volatile uint8_t *flag; /**< address of interrupt flag register */
+    timer_cb_t cb;          /**< interrupt callback */
+    void *arg;              /**< interrupt callback argument */
+    uint8_t mode;           /**< remember the configured mode */
+    uint8_t isrs;           /**< remember the interrupt state */
 } ctx_t;
 
 /**
@@ -109,8 +109,8 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     ctx[tim].dev->CNT = 0;
 
     /* save interrupt context and timer mode */
-    ctx[tim].cb   = cb;
-    ctx[tim].arg  = arg;
+    ctx[tim].cb = cb;
+    ctx[tim].arg = arg;
     ctx[tim].mode = (pre + 1);
 
     /* enable timer with calculated prescaler */
@@ -128,7 +128,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
     ctx[tim].dev->OCR[channel] = (uint16_t)value;
     *ctx[tim].flag &= ~(1 << (channel + OCF1A));
-    *ctx[tim].mask |=  (1 << (channel + OCIE1A));
+    *ctx[tim].mask |= (1 << (channel + OCIE1A));
 
     return 1;
 }
@@ -167,11 +167,6 @@ static inline void _isr(tim_t tim, int chan)
     *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
     ctx[tim].cb(ctx[tim].arg, chan);
 
-    if (sched_context_switch_request) {
-        thread_yield();
-        thread_yield_isr();
-    }
-
     __exit_isr();
 }
 #endif
@@ -192,8 +187,8 @@ ISR(TIMER_0_ISRC, ISR_BLOCK)
 {
     _isr(0, 2);
 }
-#endif /* TIMER_0_ISRC */
-#endif /* TIMER_0 */
+#endif  /* TIMER_0_ISRC */
+#endif  /* TIMER_0 */
 
 #ifdef TIMER_1
 ISR(TIMER_1_ISRA, ISR_BLOCK)
@@ -211,8 +206,8 @@ ISR(TIMER_1_ISRC, ISR_BLOCK)
 {
     _isr(1, 2);
 }
-#endif /* TIMER_1_ISRC */
-#endif /* TIMER_1 */
+#endif  /* TIMER_1_ISRC */
+#endif  /* TIMER_1 */
 
 #ifdef TIMER_2
 ISR(TIMER_2_ISRA, ISR_BLOCK)

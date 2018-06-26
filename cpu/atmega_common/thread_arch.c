@@ -28,7 +28,6 @@
 #include "cpu.h"
 #include "board.h"
 
-
 /*
  * local function declarations  (prefixed with __)
  */
@@ -69,7 +68,7 @@ static void __enter_thread_mode(void);
  * if task_func returns sched_task_exit gets popped into the PC
  */
 char *thread_stack_init(thread_task_func_t task_func, void *arg,
-                             void *stack_start, int stack_size)
+                        void *stack_start, int stack_size)
 {
     uint16_t tmp_adress;
     uint8_t *stk;
@@ -79,59 +78,58 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
 
     /* put marker on stack */
     stk--;
-    *stk = (uint8_t) 0xAF;
+    *stk = (uint8_t)0xAF;
     stk--;
-    *stk = (uint8_t) 0xFE;
+    *stk = (uint8_t)0xFE;
 
     /* save sched_task_exit */
     stk--;
-    tmp_adress = (uint16_t) sched_task_exit;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    tmp_adress = (uint16_t)sched_task_exit;
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
     stk--;
     tmp_adress >>= 8;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
 
 #if FLASHEND > 0x1ffff
     /* Devices with more than 128kb FLASH use a 17 bit PC, we set whole the top byte forcibly to 0 */
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 #endif
 
     /* save address to task_func in place of the program counter */
     stk--;
-    tmp_adress = (uint16_t) task_func;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    tmp_adress = (uint16_t)task_func;
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
     stk--;
     tmp_adress >>= 8;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
 
 #if FLASHEND > 0x1ffff
     /* Devices with more than 128kb FLASH use a 17 bit PC, we set whole the top byte forcibly to 0 */
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 #endif
-
 
     /* r0 */
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 
     /* status register (with interrupts enabled) */
     stk--;
-    *stk = (uint8_t) 0x80;
+    *stk = (uint8_t)0x80;
 
 #if defined(EIND)
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 #endif
 #if defined(RAMPZ)
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
 #endif
 
     /* r1 - has always to be 0 */
     stk--;
-    *stk = (uint8_t) 0x00;
+    *stk = (uint8_t)0x00;
     /*
      * Space for registers r2 -r23
      *
@@ -140,9 +138,9 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
 
     int i;
 
-    for (i = 2; i <= 23 ; i++) {
+    for (i = 2; i <= 23; i++) {
         stk--;
-        *stk = (uint8_t) 0;
+        *stk = (uint8_t)0;
     }
 
     /*
@@ -150,22 +148,22 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
      * r24 and r25
      * */
     stk--;
-    tmp_adress = (uint16_t) arg;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    tmp_adress = (uint16_t)arg;
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
     stk--;
     tmp_adress >>= 8;
-    *stk = (uint8_t)(tmp_adress & (uint16_t) 0x00ff);
+    *stk = (uint8_t)(tmp_adress & (uint16_t)0x00ff);
 
     /*
      * Space for registers r26-r31
      */
     for (i = 26; i <= 31; i++) {
         stk--;
-        *stk = (uint8_t) i;
+        *stk = (uint8_t)i;
     }
 
     stk--;
-    return (char *) stk;
+    return (char *)stk;
 }
 
 /**
@@ -178,7 +176,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg,
  */
 void thread_stack_print(void)
 {
-    uint8_t  found_marker = 1;
+    uint8_t found_marker = 1;
     uint8_t *sp = (uint8_t *)sched_active_thread->sp;
     uint16_t size = 0;
 
@@ -193,8 +191,7 @@ void thread_stack_print(void)
         if ((*sp == 0xFE) && (*(sp + 1) == 0xAF)) {
             found_marker = 0;
         }
-    }
-    while (found_marker == 1);
+    } while (found_marker == 1);
 
     printf("stack size: %u bytes\n", size);
 }
@@ -209,41 +206,41 @@ void cpu_switch_context_exit(void)
 /**
  * @brief Set the MCU into Thread-Mode and load the initial task from the stack and run it
  */
-
 void NORETURN __enter_thread_mode(void) __attribute__((naked));
 void NORETURN __enter_thread_mode(void)
 {
     irq_enable();
     __context_restore();
-    __asm__ volatile("ret");
+    __asm__ volatile ("ret");
 
     UNREACHABLE();
 }
 
-void thread_yield_higher(void) {
+void thread_yield_higher(void)
+{
     if (irq_is_in() == 0) {
         __context_save();
         sched_run();
         __context_restore();
-        __asm__ volatile("ret");
-    } else {
+        __asm__ volatile ("ret");
+    }
+    else {
         sched_context_switch_request = 1;
     }
 }
 
-void thread_yield_isr(void) {
+void thread_yield_isr(void)
+{
     __context_save();
     sched_run();
     __context_restore();
 
-    __exit_isr();
-
-    __asm__ volatile("reti");
+    __asm__ volatile ("reti");
 }
 
 __attribute__((always_inline)) static inline void __context_save(void)
 {
-    __asm__ volatile(
+    __asm__ volatile (
         "push __tmp_reg__                    \n\t"
         "in   __tmp_reg__, __SREG__          \n\t"
         "cli                                 \n\t"
@@ -293,14 +290,12 @@ __attribute__((always_inline)) static inline void __context_save(void)
         "in   __tmp_reg__, __SP_L__          \n\t"
         "st   x+, __tmp_reg__                \n\t"
         "in   __tmp_reg__, __SP_H__          \n\t"
-        "st   x+, __tmp_reg__                \n\t"
-    );
-
+        "st   x+, __tmp_reg__                \n\t");
 }
 
 __attribute__((always_inline)) static inline void __context_restore(void)
 {
-    __asm__ volatile(
+    __asm__ volatile (
         "lds  r26, sched_active_thread       \n\t"
         "lds  r27, sched_active_thread + 1   \n\t"
         "ld   r28, x+                        \n\t"
@@ -348,6 +343,5 @@ __attribute__((always_inline)) static inline void __context_restore(void)
 #endif
         "pop  __tmp_reg__                    \n\t"
         "out  __SREG__, __tmp_reg__          \n\t"
-        "pop  __tmp_reg__                    \n\t"
-    );
+        "pop  __tmp_reg__                    \n\t");
 }
