@@ -145,7 +145,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         gnrc_pktbuf_realloc_data(pkt, nread);
     } else if (bytes_expected > 0) {
         DEBUG("_recv_ieee802154: received frame is too short\n");
-        dev->driver->recv(dev, NULL, bytes_expected, NULL);
+        netdev_ieee802154_recv(dev, NULL, bytes_expected, NULL);
     }
 
     return pkt;

@@ -28,6 +28,7 @@
 #include "net/netopt.h"
 
 #include "net/csma_sender.h"
+#include "net/netdev/ieee802154.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
