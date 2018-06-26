@@ -16,6 +16,7 @@
  * @brief   Definitions for netdev common IEEE 802.15.4 code
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Koen Zandberg <koen@bergzand.net>
  */
 #ifndef NET_NETDEV_IEEE802154_H
 #define NET_NETDEV_IEEE802154_H
@@ -120,6 +121,46 @@ typedef struct {
  * @brief   Received packet status information for IEEE 802.15.4 radios
  */
 typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
+
+typedef struct {
+    uint8_t src[IEEE802154_LONG_ADDRESS_LEN];
+    uint8_t dst[IEEE802154_LONG_ADDRESS_LEN];
+    uint8_t src_len;
+    uint8_t dst_len;
+} netdev_ieee802154_mac_t;
+
+/**
+ * @brief   Receive function for netdev IEEE 802.15.4 devices.
+ *
+ * Reformats the ieee802.15.4 mac frame to a generic
+ * @ref netdev_ieee802154_mac_t header using the frame content.
+ *
+ * @param[in]   dev     network device descriptor
+ * @param[out]  buf     buffer to write into or NULL
+ * @param[in]   len     maximum number of bytes to read
+ * @param[out] info     status information for the received packet. Might
+ *                      be of different type for different netdev devices.
+ *                      May be NULL if not needed or applicable.
+ *
+ * @return `< 0` on error
+ * @return number of bytes read if buf != NULL
+ * @return packet size if buf == NULL
+ */
+int netdev_ieee802154_recv(netdev_t *dev, void *buf, size_t len, void *info);
+
+/**
+ * @brief   Send function for netdev IEEE 802.15.4 devices.
+ *
+ * Reformats the generic @ref netdev_ieee802154_mac_t to a real ieee802154 mac
+ * header using the device specific information.
+ *
+ * @param[in]   dev     network device descriptor
+ * @param[in] iolist    io vector list to send
+ *
+ * @return              Number of bytes send
+ * @return              <0 on error
+ */
+int netdev_ieee802154_send(netdev_t *dev, const iolist_t *list);
 
 /**
  * @brief   Fallback function for netdev IEEE 802.15.4 devices' _get function
