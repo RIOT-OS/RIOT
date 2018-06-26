@@ -48,16 +48,11 @@
 int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     netdev_t *dev = netif->dev;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
     gnrc_netif_hdr_t *netif_hdr;
     const uint8_t *src, *dst = NULL;
     int res = 0;
-    size_t src_len, dst_len;
-    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
-    uint8_t flags = (uint8_t)(state->flags & NETDEV_IEEE802154_SEND_MASK);
-    le_uint16_t dev_pan = byteorder_btols(byteorder_htons(state->pan));
+    netdev_ieee802154_data_hdr_t l2data_hdr;
 
-    flags |= IEEE802154_FCF_TYPE_DATA;
     if (pkt == NULL) {
         DEBUG("_send_ieee802154: pkt was NULL\n");
         return -EINVAL;
@@ -71,13 +66,15 @@ int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     if (netif_hdr->flags & /* If any of these flags is set assume broadcast */
         (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
         dst = ieee802154_addr_bcast;
-        dst_len = IEEE802154_ADDR_BCAST_LEN;
+        l2data_hdr.dst_len = IEEE802154_ADDR_BCAST_LEN;
     }
     else {
         dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
-        dst_len = netif_hdr->dst_l2addr_len;
+        l2data_hdr.dst_len = netif_hdr->dst_l2addr_len;
     }
-    src_len = netif_hdr->src_l2addr_len;
+    memcpy(&l2data_hdr.dst, dst, l2data_hdr.dst_len);
+
+    uint8_t src_len = netif_hdr->src_l2addr_len;
     if (src_len > 0) {
         src = gnrc_netif_hdr_get_src_addr(netif_hdr);
     }
@@ -85,19 +82,14 @@ int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         src_len = netif->l2addr_len;
         src = netif->l2addr;
     }
-    /* fill MAC header, seq should be set by device */
-    if ((res = ieee802154_set_frame_hdr(mhr, src, src_len,
-                                        dst, dst_len, dev_pan,
-                                        dev_pan, flags, state->seq++)) == 0) {
-        DEBUG("_send_ieee802154: Error preperaring frame\n");
-        return -EINVAL;
-    }
+    l2data_hdr.src_len = src_len;
+    memcpy(&l2data_hdr.src, src, l2data_hdr.src_len);
 
     /* prepare packet for sending */
     iolist_t iolist = {
         .iol_next = (iolist_t *)pkt->next,
-        .iol_base = mhr,
-        .iol_len = (size_t)res
+        .iol_base = &l2data_hdr,
+        .iol_len = sizeof(l2data_hdr)
     };
 
 #ifdef MODULE_NETSTATS_L2
@@ -114,10 +106,10 @@ int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         res = csma_sender_csma_ca_send(dev, &iolist, &netif->mac.csma_conf);
     }
     else {
-        res = dev->driver->send(dev, &iolist);
+        res = netdev_ieee802154_send(dev, &iolist);
     }
 #else
-    res = dev->driver->send(dev, &iolist);
+    res = netdev_ieee802154_send(dev, &iolist);
 #endif
 
     /* release old data */
@@ -125,27 +117,19 @@ int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     return res;
 }
 
-static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
+static gnrc_pktsnip_t *_make_netif_hdr(netdev_ieee802154_data_hdr_t *l2data_hdr)
 {
     gnrc_pktsnip_t *snip;
-    uint8_t src[IEEE802154_LONG_ADDRESS_LEN], dst[IEEE802154_LONG_ADDRESS_LEN];
-    int src_len, dst_len;
-    le_uint16_t _pan_tmp;   /* TODO: hand-up PAN IDs to GNRC? */
-
-    dst_len = ieee802154_get_dst(mhr, dst, &_pan_tmp);
-    src_len = ieee802154_get_src(mhr, src, &_pan_tmp);
-    if ((dst_len < 0) || (src_len < 0)) {
-        DEBUG("_make_netif_hdr: unable to get addresses\n");
-        return NULL;
-    }
     /* allocate space for header */
-    snip = gnrc_netif_hdr_build(src, (size_t)src_len, dst, (size_t)dst_len);
+    snip = gnrc_netif_hdr_build(l2data_hdr->src, l2data_hdr->src_len,
+            l2data_hdr->dst, l2data_hdr->dst_len);
     if (snip == NULL) {
         DEBUG("_make_netif_hdr: no space left in packet buffer\n");
         return NULL;
     }
     /* set broadcast flag for broadcast destination */
-    if ((dst_len == 2) && (dst[0] == 0xff) && (dst[1] == 0xff)) {
+    if ((l2data_hdr->dst_len == 2) && (l2data_hdr->dst[0] == 0xff) &&
+            (l2data_hdr->dst[1] == 0xff)) {
         gnrc_netif_hdr_t *hdr = snip->data;
         hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
     }
