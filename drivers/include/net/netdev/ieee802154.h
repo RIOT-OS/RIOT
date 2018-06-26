@@ -142,7 +142,7 @@ typedef struct {
  * @param[in]   dev     network device descriptor
  * @param[out]  buf     buffer to write into or NULL
  * @param[in]   len     maximum number of bytes to read
- * @param[out] info     status information for the received packet. Might
+ * @param[out]  info    status information for the received packet. Might
  *                      be of different type for different netdev devices.
  *                      May be NULL if not needed or applicable.
  *
