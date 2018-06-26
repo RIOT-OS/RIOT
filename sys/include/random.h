@@ -92,10 +92,7 @@ void random_bytes(uint8_t *buf, size_t size);
  *
  * @return  a random number on [a,b)-interval
  */
-static inline uint32_t random_uint32_range(uint32_t a, uint32_t b)
-{
-    return (random_uint32() % (b - a)) + a;
-}
+uint32_t random_uint32_range(uint32_t a, uint32_t b);
 
 #if PRNG_FLOAT
 /* These real versions are due to Isaku Wada, 2002/01/09 added */

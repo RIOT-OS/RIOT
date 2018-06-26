@@ -3,12 +3,14 @@ Test application for the RNG sourcs.
 
 ## Supported commands
 * distributions [N] — Take N samples and print a bit distribution graph on the terminal.
-* dump [N] — Take N samples and print them on the terminal.
+* dump [N][A B] — Take N samples and print them on the terminal. If A and B are
+set, the PRNG returns values in the [A,B)-interval.
 * fips — Run the FIPS 140-2 random number tests.
 * entropy [N] — Calculate Shannon's entropy from N samples.
 * seed [N] — Set the random seed to use.
 * source [N] — Select the RNG source, or list them all.
-* speed [N] — Run a PRNG for N seconds and print the number of KiB/sec afterwards.
+* speed [N][A B] — Run a PRNG for N seconds and print the number of KiB/sec
+afterwards. If A and B are set, the PRNG returns values in the [A,B)-interval.
 
 ## Sources
 The following sources are supported:
