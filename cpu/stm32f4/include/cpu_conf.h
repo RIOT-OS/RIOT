@@ -38,7 +38,8 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #if defined(CPU_LINE_STM32F401xE)
 #define CPU_IRQ_NUMOF                   (85U)
-#elif defined(CPU_LINE_STM32F407xx) || defined(CPU_LINE_STM32F415xx)
+#elif defined(CPU_LINE_STM32F405xx) || defined(CPU_LINE_STM32F407xx) \
+    || defined(CPU_LINE_STM32F415xx)
 #define CPU_IRQ_NUMOF                   (82U)
 #elif defined(CPU_LINE_STM32F410Rx)
 #define CPU_IRQ_NUMOF                   (98U)
