@@ -122,12 +122,16 @@ typedef struct {
  */
 typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
 
+/**
+ * @brief   Data structure for communicating IEEE 802.15.4 send and receive
+ *          call data to upper network layers.
+ */
 typedef struct {
-    uint8_t src[IEEE802154_LONG_ADDRESS_LEN];
-    uint8_t dst[IEEE802154_LONG_ADDRESS_LEN];
-    uint8_t src_len;
-    uint8_t dst_len;
-} netdev_ieee802154_mac_t;
+    uint8_t src[IEEE802154_LONG_ADDRESS_LEN]; /**< source address */
+    uint8_t dst[IEEE802154_LONG_ADDRESS_LEN]; /**< Destination address */
+    uint8_t src_len;                          /**< Source address length */
+    uint8_t dst_len;                          /**< Destination address length */
+} netdev_ieee802154_data_t;
 
 /**
  * @brief   Receive function for netdev IEEE 802.15.4 devices.
