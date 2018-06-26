@@ -7,7 +7,7 @@ Description
 This application shows a simple use case of LoRaWAN with RIOT.
 
 By using the real time clock and low-power capabilities of a board, this
-application shows how to program a LoRaWAN Class A devices using RIOT.
+application shows how to program a LoRaWAN Class A device using RIOT.
 
 This application is using the Over-The-Air Activation procedure.
 
@@ -26,7 +26,7 @@ to your hardware setup and region of use:
 - `REGION` can be `EU868`, `US915`, etc (see LoRaWAN regional parameters for
   details).
 
-ST Nucleo-64 can be used with an mbed LoRa shield: there's one based on
+ST Nucleo-64 can be used with mbed LoRa shields: there's one based on
 [the sx1276 radio](https://os.mbed.com/components/SX1276MB1xAS/) and one based
 on the [the sx1272 radio](https://os.mbed.com/components/SX1272MB2xAS/).
 
