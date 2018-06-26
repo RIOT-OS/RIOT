@@ -127,7 +127,7 @@ typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
  *          call data to upper network layers.
  */
 typedef struct {
-    uint8_t src[IEEE802154_LONG_ADDRESS_LEN]; /**< source address */
+    uint8_t src[IEEE802154_LONG_ADDRESS_LEN]; /**< Source address */
     uint8_t dst[IEEE802154_LONG_ADDRESS_LEN]; /**< Destination address */
     uint8_t src_len;                          /**< Source address length */
     uint8_t dst_len;                          /**< Destination address length */
@@ -159,7 +159,7 @@ int netdev_ieee802154_recv(netdev_t *dev, void *buf, size_t len, void *info);
  * header using the device specific information.
  *
  * @param[in]   dev     network device descriptor
- * @param[in] iolist    io vector list to send
+ * @param[in]   iolist  io vector list to send
  *
  * @return              Number of bytes send
  * @return              <0 on error

@@ -70,7 +70,7 @@ int netdev_ieee802154_send(netdev_t *dev, const iolist_t *list)
     }
     /* prepare iolist for netdev / mac layer */
     iolist_t iolist = {
-        .iol_next = (iolist_t *)list->iol_next,
+        .iol_next = list->iol_next,
         .iol_base = mhr,
         .iol_len = res
     };
