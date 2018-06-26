@@ -106,7 +106,7 @@ static int send_if_cca(netdev_t *device, iolist_t *iolist)
     /* if medium is clear, send the packet and return */
     if (hwfeat == NETOPT_ENABLE) {
         DEBUG("csma: Radio medium available: sending packet.\n");
-        return device->driver->send(device, iolist);
+        return netdev_ieee802154_send(device, iolist);
     }
 
     /* if we arrive here, medium was not available for transmission */
