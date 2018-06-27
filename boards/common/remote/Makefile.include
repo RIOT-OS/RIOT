@@ -12,6 +12,7 @@ ifeq ($(PROGRAMMER),cc2538-bsl)
   else ifeq ($(OS),Darwin)
     PORT_BSL ?= $(PORT_DARWIN)
   endif
+  export RESET = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py -p "$(PORT_BSL)"
   export FLASHER = $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py
   export FFLAGS  = -p "$(PORT_BSL)" -e -w -v -b 115200 $(HEXFILE)
 else ifeq ($(PROGRAMMER),jlink)
@@ -20,12 +21,12 @@ else ifeq ($(PROGRAMMER),jlink)
   export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
   export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
   export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+  export RESET_FLAGS = $(BINDIR)
 endif
 
 OFLAGS = --gap-fill 0xff
 HEXFILE = $(BINFILE)
 export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-export RESET_FLAGS = $(BINDIR)
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # include common remote includes
