@@ -3,3 +3,7 @@ include $(RIOTBOARD)/common/msba2/Makefile.dep
 ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += cc110x
 endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += sht11
+endif

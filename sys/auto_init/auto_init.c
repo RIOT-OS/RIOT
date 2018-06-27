@@ -20,10 +20,6 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_SHT11
-#include "sht11.h"
-#endif
-
 #ifdef MODULE_MCI
 #include "diskio.h"
 #endif
@@ -100,10 +96,6 @@ void auto_init(void)
 #ifdef MODULE_XTIMER
     DEBUG("Auto init xtimer module.\n");
     xtimer_init();
-#endif
-#ifdef MODULE_SHT11
-    DEBUG("Auto init SHT11 module.\n");
-    sht11_init();
 #endif
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
@@ -275,6 +267,12 @@ void auto_init(void)
 #endif
 
 /* initialize sensors and actuators */
+#ifdef MODULE_SHT1X
+    DEBUG("Auto init SHT1X module (SHT10/SHT11/SHT15 sensor driver).\n");
+    extern void auto_init_sht1x(void);
+    auto_init_sht1x();
+#endif
+
 #ifdef MODULE_AUTO_INIT_SAUL
     DEBUG("auto_init SAUL\n");
 

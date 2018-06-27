@@ -25,6 +25,3 @@ export DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor 
 
 # export common msb-430 includes
 export INCLUDES += -I$(RIOTBOARD)/common/msb-430/include
-export INCLUDES += -I$(RIOTBOARD)/common/msb-430/drivers/include
-
-USEMODULE += boards_common_msb-430-drivers
