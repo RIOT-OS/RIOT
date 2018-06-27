@@ -81,7 +81,7 @@ int ata8520e_sigfox_cmd(int argc, char **argv)
         else {
             if (strlen(argv[2]) > SIGFOX_MAX_TX_LENGTH) {
                 printf("Message length cannot exceeds %d characters length, your "
-                       "message length is %d", SIGFOX_MAX_TX_LENGTH, strlen(argv[2]));
+                       "message length is %u", SIGFOX_MAX_TX_LENGTH, (unsigned)strlen(argv[2]));
                 return 1;
             }
             if (ata8520e_send_frame(&dev,
@@ -100,7 +100,7 @@ int ata8520e_sigfox_cmd(int argc, char **argv)
         }
         if (strlen(argv[2]) > SIGFOX_MAX_TX_LENGTH) {
             printf("Message length cannot exceeds %d characters length, your "
-                   "message length is %d", SIGFOX_MAX_TX_LENGTH, strlen(argv[2]));
+                   "message length is %u", SIGFOX_MAX_TX_LENGTH, (unsigned)strlen(argv[2]));
             return 1;
         }
         uint8_t rx_buf[SIGFOX_RX_LENGTH];
