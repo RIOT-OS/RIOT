@@ -17,6 +17,7 @@
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  *
  * @}
  */
@@ -30,11 +31,6 @@
 
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
-
-/**
- * @brief   Per default use normal speed on the I2C bus
- */
-#define BUS_SPEED           (I2C_SPEED_NORMAL)
 
 /**
  * @brief   SRF02 register addresses
@@ -61,17 +57,13 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
 {
     dev->i2c = i2c;
     dev->addr = (addr >> 1);    /* internally we right align the 7-bit addr */
-    uint8_t rev;
+    uint8_t rev = 0;
 
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
-    /* initialize i2c interface */
-    if (i2c_init_master(dev->i2c, BUS_SPEED) < 0) {
-        DEBUG("[srf02] error initializing I2C bus\n");
-        return -1;
-    }
+
     /* try to read the software revision (read the CMD reg) from the device */
-    i2c_read_reg(i2c, dev->addr, REG_CMD, &rev);
+    i2c_read_reg(i2c, dev->addr, REG_CMD, &rev, 0);
     if (rev == 0 || rev == 255) {
         i2c_release(dev->i2c);
         DEBUG("[srf02] error reading the devices software revision\n");
@@ -86,22 +78,24 @@ int srf02_init(srf02_t *dev, i2c_t i2c, uint8_t addr)
     return 0;
 }
 
-void srf02_trigger(const srf02_t *dev, srf02_mode_t mode)
+int srf02_trigger(const srf02_t *dev, srf02_mode_t mode)
 {
+    int status;
     /* trigger a new measurement by writing the mode to the CMD register */
     DEBUG("[srf02] trigger new reading\n");
     i2c_acquire(dev->i2c);
-    i2c_write_reg(dev->i2c, dev->addr, REG_CMD, mode);
+    status = i2c_write_reg(dev->i2c, dev->addr, REG_CMD, mode, 0);
     i2c_release(dev->i2c);
+    return status;
 }
 
 uint16_t srf02_read(const srf02_t *dev)
 {
-    uint8_t res[2];
+    uint8_t res[2] = {0xFF, 0xFF};
 
     /* read the results */
     i2c_acquire(dev->i2c);
-    i2c_read_regs(dev->i2c, dev->addr, REG_HIGH, res, 2);
+    i2c_read_regs(dev->i2c, dev->addr, REG_HIGH, res, 2, 0);
     i2c_release(dev->i2c);
     DEBUG("[srf02] result - high: 0x%02x low: 0x%02x\n", res[0], res[1]);
 
@@ -119,20 +113,39 @@ uint16_t srf02_get_distance(const srf02_t *dev, srf02_mode_t mode)
     return srf02_read(dev);
 }
 
-void srf02_set_addr(srf02_t *dev, uint8_t new_addr)
+int srf02_set_addr(srf02_t *dev, uint8_t new_addr)
 {
+    int status;
     /* get access to the bus */
     i2c_acquire(dev->i2c);
 
     DEBUG("[srf02] reprogramming device address to 0x%02x\n", (int)new_addr);
 
     /* write the new address, for this we need to follow a certain sequence */
-    i2c_write_reg(dev->i2c, dev->addr, REG_CMD, CMD_ADDR_SEQ1);
-    i2c_write_reg(dev->i2c, dev->addr, REG_CMD, CMD_ADDR_SEQ2);
-    i2c_write_reg(dev->i2c, dev->addr, REG_CMD, CMD_ADDR_SEQ3);
-    i2c_write_reg(dev->i2c, dev->addr, REG_CMD, new_addr);
+    status = i2c_write_reg(dev->i2c, dev->addr, REG_CMD, CMD_ADDR_SEQ1, 0);
+    if (status != 0) {
+        i2c_release(dev->i2c);
+        return status;
+    }
+    status = i2c_write_reg(dev->i2c, dev->addr, REG_CMD, CMD_ADDR_SEQ2, 0);
+    if (status != 0) {
+        i2c_release(dev->i2c);
+        return status;
+    }
+    status = i2c_write_reg(dev->i2c, dev->addr, REG_CMD, CMD_ADDR_SEQ3, 0);
+    if (status != 0) {
+        i2c_release(dev->i2c);
+        return status;
+    }
+    status = i2c_write_reg(dev->i2c, dev->addr, REG_CMD, new_addr, 0);
+    if (status != 0) {
+        i2c_release(dev->i2c);
+        return status;
+    }
+
     dev->addr = (new_addr >> 1);
 
     /* release the bus */
     i2c_release(dev->i2c);
+    return status;
 }
