@@ -33,7 +33,9 @@
 
 int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr, i2c_speed_t speed)
 {
-    int status;
+    int status = 0;
+    (void)speed;
+    (void)status;
 
     dev->i2c = i2c;
     dev->addr = addr;
@@ -41,7 +43,7 @@ int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr, i2c_speed_t speed)
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
     /* initialize i2c interface */
-    status = i2c_init_master(dev->i2c, speed);
+    i2c_init(dev->i2c);
     /* Release the bus for other threads. */
     i2c_release(dev->i2c);
 
@@ -69,7 +71,7 @@ int srf08_set_max_range(const srf08_t *dev, uint8_t max_range)
 
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_RANGE_REG, max_range);
+    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_RANGE_REG, max_range, 0);
     /* Release the bus for other threads. */
     i2c_release(dev->i2c);
 
@@ -83,7 +85,7 @@ int srf08_set_max_gain(const srf08_t *dev, uint8_t gain)
 
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_GAIN_REG, gain);
+    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_GAIN_REG, gain, 0);
     /* Release the bus for other threads. */
     i2c_release(dev->i2c);
 
@@ -102,7 +104,7 @@ int srf08_get_distances(const srf08_t *dev, uint16_t *range_array, int num_echos
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
     /* set ranging mode */
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_COMMAND_REG, ranging_mode);
+    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_COMMAND_REG, ranging_mode, 0);
     /* Release the bus for other threads. */
     i2c_release(dev->i2c);
 
@@ -125,7 +127,7 @@ int srf08_get_distances(const srf08_t *dev, uint16_t *range_array, int num_echos
         /* Acquire exclusive access to the bus. */
         i2c_acquire(dev->i2c);
         /* read the echo bytes */
-        status = i2c_read_regs(dev->i2c, dev->addr, register_location, range_bytes, sizeof(range_bytes));
+        status = i2c_read_regs(dev->i2c, dev->addr, register_location, range_bytes, sizeof(range_bytes), 0);
         /* Release the bus for other threads. */
         i2c_release(dev->i2c);
 
