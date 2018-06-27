@@ -48,6 +48,9 @@ static rbuf_t rbuf[RBUF_SIZE];
 
 static char l2addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
 
+static xtimer_t _gc_timer;
+static msg_t _gc_timer_msg = { .type = GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF };
+
 /* ------------------------------------
  * internal function definitions
  * ------------------------------------*/
@@ -59,8 +62,6 @@ static rbuf_int_t *_rbuf_int_get_free(void);
 static void _rbuf_rem(rbuf_t *entry);
 /* update interval buffer of entry */
 static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size);
-/* checks timeouts and removes entries if necessary (oldest if full) */
-static void _rbuf_gc(void);
 /* gets an entry identified by its tupel */
 static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                          const void *dst, size_t dst_len,
@@ -78,7 +79,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     rbuf_int_t *ptr;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
 
-    _rbuf_gc();
+    rbuf_gc();
     entry = _rbuf_get(gnrc_netif_hdr_get_src_addr(netif_hdr), netif_hdr->src_l2addr_len,
                       gnrc_netif_hdr_get_dst_addr(netif_hdr), netif_hdr->dst_l2addr_len,
                       byteorder_ntohs(frag->disp_size) & SIXLOWPAN_FRAG_SIZE_MASK,
@@ -246,7 +247,7 @@ static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size)
     return true;
 }
 
-static void _rbuf_gc(void)
+void rbuf_gc(void)
 {
     uint32_t now_usec = xtimer_now_usec();
     unsigned int i;
@@ -269,6 +270,11 @@ static void _rbuf_gc(void)
             _rbuf_rem(&(rbuf[i]));
         }
     }
+}
+
+static inline void _set_rbuf_timeout(void)
+{
+    xtimer_set_msg(&_gc_timer, RBUF_TIMEOUT, &_gc_timer_msg, sched_active_pid);
 }
 
 static rbuf_t *_rbuf_get(const void *src, size_t src_len,
@@ -295,6 +301,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
                                          l2addr_str),
                   (unsigned)rbuf[i].super.pkt->size, rbuf[i].super.tag);
             rbuf[i].arrival = now_usec;
+            _set_rbuf_timeout();
             return &(rbuf[i]);
         }
 
@@ -346,6 +353,8 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
           gnrc_netif_addr_to_str(res->super.dst, res->super.dst_len,
                                  l2addr_str), (unsigned)res->super.pkt->size,
           res->super.tag);
+
+    _set_rbuf_timeout();
 
     return res;
 }

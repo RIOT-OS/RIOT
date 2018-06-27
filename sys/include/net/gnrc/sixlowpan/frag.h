@@ -39,9 +39,19 @@ extern "C" {
 #endif
 
 /**
+ * @name    Message types
+ * @{
+ */
+/**
  * @brief   Message type for passing one 6LoWPAN fragment down the network stack
  */
-#define GNRC_SIXLOWPAN_MSG_FRAG_SND    (0x0225)
+#define GNRC_SIXLOWPAN_MSG_FRAG_SND         (0x0225)
+
+/**
+ * @brief   Message type for triggering garbage collection reassembly buffer
+ */
+#define GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF     (0x0226)
+/** @} */
 
 /**
  * @brief   An entry in the 6LoWPAN reassembly buffer.
@@ -113,6 +123,11 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
  * @param[in] page      Current 6Lo dispatch parsing page.
  */
 void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
+
+/**
+ * @brief   Garbage collect reassembly buffer.
+ */
+void gnrc_sixlowpan_frag_gc_rbuf(void);
 
 #ifdef __cplusplus
 }

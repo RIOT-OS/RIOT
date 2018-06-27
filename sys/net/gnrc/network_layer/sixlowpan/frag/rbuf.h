@@ -85,6 +85,11 @@ typedef struct {
 void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
               size_t frag_size, size_t offset);
 
+/**
+ * @brief   Checks timeouts and removes entries if necessary
+ */
+void rbuf_gc(void);
+
 #ifdef __cplusplus
 }
 #endif
