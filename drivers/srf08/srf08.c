@@ -17,6 +17,7 @@
  *
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  *
  * @}
  */
@@ -27,29 +28,19 @@
 #include "srf08.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 
-int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr, i2c_speed_t speed)
+int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr)
 {
     int status = 0;
-    (void)speed;
     (void)status;
+    (void)addr;
+    (void)i2c;
 
     dev->i2c = i2c;
     dev->addr = addr;
-
-    /* Acquire exclusive access to the bus. */
-    i2c_acquire(dev->i2c);
-    /* initialize i2c interface */
-    i2c_init(dev->i2c);
-    /* Release the bus for other threads. */
-    i2c_release(dev->i2c);
-
-    if(status < 0) {
-        return -1;
-    }
 
     /* set the maximum range */
     if (srf08_set_max_range(dev, SRF08_MAX_RANGE_6M) < 0) {
@@ -93,7 +84,8 @@ int srf08_set_max_gain(const srf08_t *dev, uint8_t gain)
 }
 
 
-int srf08_get_distances(const srf08_t *dev, uint16_t *range_array, int num_echos, srf08_mode_t ranging_mode)
+int srf08_get_distances(const srf08_t *dev, uint16_t *range_array,
+                        int num_echos, srf08_mode_t ranging_mode)
 {
     int status;
     int echo_number = 0;
@@ -104,11 +96,12 @@ int srf08_get_distances(const srf08_t *dev, uint16_t *range_array, int num_echos
     /* Acquire exclusive access to the bus. */
     i2c_acquire(dev->i2c);
     /* set ranging mode */
-    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_COMMAND_REG, ranging_mode, 0);
+    status = i2c_write_reg(dev->i2c, dev->addr, SRF08_COMMAND_REG,
+                           ranging_mode, 0);
     /* Release the bus for other threads. */
     i2c_release(dev->i2c);
 
-    if (!status) {
+    if (status != 0) {
         DEBUG("Write the ranging command to the i2c-interface is failed\n");
         return -1;
     }
@@ -127,11 +120,12 @@ int srf08_get_distances(const srf08_t *dev, uint16_t *range_array, int num_echos
         /* Acquire exclusive access to the bus. */
         i2c_acquire(dev->i2c);
         /* read the echo bytes */
-        status = i2c_read_regs(dev->i2c, dev->addr, register_location, range_bytes, sizeof(range_bytes), 0);
+        status = i2c_read_regs(dev->i2c, dev->addr, register_location,
+                               range_bytes, sizeof(range_bytes), 0);
         /* Release the bus for other threads. */
         i2c_release(dev->i2c);
 
-        if (!status) {
+        if (status != 0) {
             DEBUG("Read the echo bytes from the i2c-interface is failed\n");
             return -3;
         }
