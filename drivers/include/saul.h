@@ -96,6 +96,7 @@ enum {
     SAUL_SENSE_DISTANCE = 0x8e,     /**< sensor: distance */
     SAUL_SENSE_CO2      = 0x8f,     /**< sensor: CO2 Gas */
     SAUL_SENSE_TVOC     = 0x90,     /**< sensor: TVOC Gas */
+    SAUL_SENSE_OCCUP    = 0x91,     /**< sensor: occupancy */
     SAUL_CLASS_ANY      = 0xff      /**< any device - wildcard */
     /* extend this list as needed... */
 };

@@ -330,6 +330,10 @@ auto_init_mpu9150();
     extern void auto_init_grove_ledbar(void);
     auto_init_grove_ledbar();
 #endif
+#ifdef MODULE_PIR
+    extern void auto_init_pir(void);
+    auto_init_pir();
+#endif
 #ifdef MODULE_SI70XX
     extern void auto_init_si70xx(void);
     auto_init_si70xx();

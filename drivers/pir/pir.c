@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2018 UC Berkeley
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,13 +15,16 @@
  * @brief       Device driver implementation for the PIR motion sensor
  *
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author      Hyung-Sin Kim <hs.kim@cs.berkeley.edu>
  *
  * @}
  */
 
 #include "pir.h"
+#include "irq.h"
 #include "thread.h"
 #include "msg.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -37,16 +41,56 @@ static void pir_send_msg(pir_t *dev, pir_event_t event);
  * public API implementation
  **********************************************************************/
 
-int pir_init(pir_t *dev, gpio_t gpio)
+int pir_init(pir_t *dev, const pir_params_t *params)
 {
-    dev->gpio_dev = gpio;
+    dev->p.gpio = params->gpio;
+    dev->p.active_high = params->active_high;
     dev->msg_thread_pid = KERNEL_PID_UNDEF;
-    return gpio_init(dev->gpio_dev, GPIO_IN);
+
+    dev->active = false;
+    dev->accum_active_time = 0;
+    dev->start_active_time = 0;
+    dev->last_read_time = xtimer_now_usec64();
+
+    gpio_mode_t gpio_mode;
+    if (dev->p.active_high) {
+        gpio_mode = GPIO_IN_PD;
+    }
+    else {
+        gpio_mode = GPIO_IN_PU;
+    }
+
+    if (gpio_init_int(dev->p.gpio, gpio_mode, GPIO_BOTH, pir_callback, dev)) {
+        return PIR_NOGPIO;
+    }
+    return PIR_OK;
 }
 
 pir_event_t pir_get_status(const pir_t *dev)
 {
-    return ((gpio_read(dev->gpio_dev) == 0) ? PIR_STATUS_LO : PIR_STATUS_HI);
+    return (((gpio_read(dev->p.gpio) > 0) == dev->p.active_high) ?
+            PIR_STATUS_ACTIVE : PIR_STATUS_INACTIVE);
+}
+
+int pir_get_occupancy(pir_t *dev, int16_t *occup) {
+    int irq_state = irq_disable();
+    uint64_t now = xtimer_now_usec64();
+    uint64_t total_time = now - dev->last_read_time;
+    if (total_time == 0) {
+        irq_restore(irq_state);
+        return PIR_TIMEERR;
+    }
+
+    /* We were busy counting */
+    if (dev->active) {
+        dev->accum_active_time += (now - dev->start_active_time);
+        dev->start_active_time = now;
+    }
+    *occup = (int16_t)((dev->accum_active_time * 10000) / total_time);
+    dev->last_read_time = now;
+    dev->accum_active_time = 0;
+    irq_restore(irq_state);
+    return PIR_OK;
 }
 
 int pir_register_thread(pir_t *dev)
@@ -54,20 +98,20 @@ int pir_register_thread(pir_t *dev)
     if (dev->msg_thread_pid != KERNEL_PID_UNDEF) {
         if (dev->msg_thread_pid != thread_getpid()) {
             DEBUG("pir_register_thread: already registered to another thread\n");
-            return -2;
+            return PIR_NOTHREAD;
         }
     }
     else {
         DEBUG("pir_register_thread: activating interrupt for %p..\n", (void *)dev);
-        if (pir_activate_int(dev) != 0) {
+        if (pir_activate_int(dev) != PIR_OK) {
             DEBUG("\tfailed\n");
-            return -1;
+            return PIR_NOGPIO;
         }
         DEBUG("\tsuccess\n");
     }
     dev->msg_thread_pid = thread_getpid();
 
-    return 0;
+    return PIR_OK;
 }
 
 /**********************************************************************
@@ -100,6 +144,23 @@ static void pir_callback(void *arg)
 {
     DEBUG("pir_callback: %p\n", arg);
     pir_t *dev = (pir_t*) arg;
+    bool pin_now = gpio_read(dev->p.gpio);
+    uint64_t now = xtimer_now_usec64();
+
+    /* We were busy counting */
+    if (dev->active) {
+        /* Add into accumulation */
+        dev->accum_active_time += (now - dev->start_active_time);
+    }
+    /* Pin is rising */
+    if (pin_now == dev->p.active_high) {
+        dev->start_active_time = now;
+        dev->active = true;
+    /* Pin is falling */
+    } else {
+        dev->active = false;
+    }
+
     if (dev->msg_thread_pid != KERNEL_PID_UNDEF) {
         pir_send_msg(dev, pir_get_status(dev));
     }
@@ -107,5 +168,16 @@ static void pir_callback(void *arg)
 
 static int pir_activate_int(pir_t *dev)
 {
-    return gpio_init_int(dev->gpio_dev, GPIO_IN, GPIO_BOTH, pir_callback, dev);
+    gpio_mode_t gpio_mode;
+    if (dev->p.active_high) {
+        gpio_mode = GPIO_IN_PD;
+    }
+    else {
+        gpio_mode = GPIO_IN_PU;
+    }
+
+    if (gpio_init_int(dev->p.gpio, gpio_mode, GPIO_BOTH, pir_callback, dev)) {
+        return PIR_NOGPIO;
+    }
+    return PIR_OK;
 }
