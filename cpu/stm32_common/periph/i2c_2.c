@@ -226,7 +226,6 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
         if (ret < 0) {
             return ret;
         }
-        _clear_addr(i2c);
         if (length == 1 && !(flags & I2C_NOSTOP)) {
             DEBUG("[i2c] read_bytes: Set ACK = 0\n");
             i2c->CR1 &= ~(I2C_CR1_ACK);
