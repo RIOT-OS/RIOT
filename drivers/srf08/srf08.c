@@ -28,17 +28,12 @@
 #include "srf08.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 
 int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr)
 {
-    int status = 0;
-    (void)status;
-    (void)addr;
-    (void)i2c;
-
     dev->i2c = i2c;
     dev->addr = addr;
 
