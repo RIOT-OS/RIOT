@@ -87,6 +87,14 @@ extern "C"
 /** @} */
 
 /**
+ * @name    FXOS8700CQ 3-axis accelerometer and magnetometer bus configuration
+ * @{
+ */
+#define FXOS8700_PARAM_I2C          I2C_DEV(1)
+#define FXOS8700_PARAM_ADDR         0x1F
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and standard I/O
  */
 void board_init(void);
