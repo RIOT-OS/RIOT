@@ -37,6 +37,9 @@ extern "C" {
 #ifndef LIS3DH_PARAM_CS
 #define LIS3DH_PARAM_CS             (GPIO_PIN(0, 0))
 #endif
+#ifndef LIS3DH_PARAM_CLK
+#define LIS3DH_PARAM_CLK            (SPI_CLK_5MHZ)
+#endif
 #ifndef LIS3DH_PARAM_INT1
 #define LIS3DH_PARAM_INT1           (GPIO_PIN(0, 1))
 #endif
@@ -51,6 +54,7 @@ extern "C" {
 #endif
 
 #define LIS3DH_PARAMS_DEFAULT       { .spi   = LIS3DH_PARAM_SPI, \
+                                      .clk   = LIS3DH_PARAM_CLK, \
                                       .cs    = LIS3DH_PARAM_CS, \
                                       .int1  = LIS3DH_PARAM_INT1, \
                                       .int2  = LIS3DH_PARAM_INT2, \
