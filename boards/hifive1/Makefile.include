@@ -5,6 +5,13 @@ export CPU_MODEL = fe310
 # Uses UART0 for stdio input/output (comment out to disable)
 USEMODULE += uart_stdio
 
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB1
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
