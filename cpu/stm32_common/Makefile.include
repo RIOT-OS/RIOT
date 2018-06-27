@@ -21,12 +21,25 @@ LINKER_SCRIPT ?= stm32_common.ld
 # export the common include directory
 export INCLUDES += -I$(RIOTCPU)/stm32_common/include
 
+# Compute ROM_LEN and RAM_LEN
 include $(RIOTCPU)/stm32_common/stm32_mem_lengths.mk
+KB := 1024
+LEN := $(shell echo $(ROM_LEN) | sed 's/K//')
+FLASHSIZE := $(shell echo $$(( $(LEN) * $(KB) )) )
+
+# Get CPU_LINE_ variable
+-include $(RIOTCPU)/$(CPU)/stm32_line.mk
+CPU_LINE ?= $(shell echo $(CPU_MODEL) | cut -c -9 | tr 'a-z-' 'A-Z_')xx
+
+# Set CFLAGS
+export CFLAGS += -D$(CPU_LINE) -DCPU_LINE_$(CPU_LINE)
+export CFLAGS += -DSTM32_FLASHSIZE=$(FLASHSIZE)U
 
 info-stm32:
 	@$(COLOR_ECHO) "CPU: $(CPU_MODEL)"
+	@$(COLOR_ECHO) "\tLine: $(CPU_LINE)"
 	@$(COLOR_ECHO) "\tPin count:\t$(STM32_PINCOUNT)"
-	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN)"
+	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN) ($(FLASHSIZE) Bytes)"
 	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN)"
 
 ifneq (,$(CCMRAM_LEN))
