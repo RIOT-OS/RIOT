@@ -33,7 +33,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define _ALIGNMENT_MASK    (sizeof(void *) - 1)
+#define _ALIGNMENT_MASK    (sizeof(_unused_t) - 1)
 
 typedef struct _unused {
     struct _unused *next;
