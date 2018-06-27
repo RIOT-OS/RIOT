@@ -385,50 +385,73 @@ void test_entropy(uint32_t samples)
     printf("Calculated %02f bits of entropy from %" PRIu32 " samples.\n", (double) entropy, samples);
 }
 
+void cb_speed_timeout(void *arg)
+{
+    unsigned *running = arg;
+    *running = 0;
+}
+
 void test_speed(uint32_t duration)
 {
-    char tmp1[16] = { 0 }, tmp2[16] = { 0 };
+    char tmp1[16] = { 0 }, tmp2[16] = { 0 }, tmp3[16] = { 0 };
 
-    uint64_t timeout = 0;
     uint64_t samples = 0;
 
     /* initialize test */
     test_init("speed");
+    printf("Running speed test for %" PRIu32 " seconds\n", duration);
 
     /* collect samples as long as timer has not expired */
-    timeout = xtimer_now_usec64() + (duration * US_PER_SEC);
-
-    while (xtimer_now_usec64() < timeout) {
+    unsigned running = 1;
+    xtimer_t xt = {
+        .target = 0,
+        .long_target = 0,
+        .callback = cb_speed_timeout,
+        .arg = &running,
+    };
+    uint32_t start_usec = xtimer_now_usec();
+    xtimer_set(&xt, duration * US_PER_SEC);
+    while (running) {
         test_get_uint32();
         samples++;
     }
+    uint32_t actual_duration_usec = xtimer_now_usec() - start_usec;
 
     /* print results */
     fmt_u64_dec(tmp1, samples);
-    fmt_u64_dec(tmp2, (samples * 4 / 1024) / duration);
-    printf("Collected %s samples in %" PRIu32 " seconds (%s KiB/s).\n", tmp1, duration, tmp2);
+    fmt_u64_dec(tmp2, (samples * 4000000 / 1024) / actual_duration_usec);
+    fmt_s32_dfp(tmp3, actual_duration_usec, -6);
+    printf("Collected %s samples in %s seconds (%s KiB/s).\n", tmp1, tmp3, tmp2);
 }
 
 void test_speed_range(uint32_t duration, uint32_t low_thresh, uint32_t high_thresh)
 {
-    char tmp1[16] = { 0 }, tmp2[16] = { 0 };
+    char tmp1[16] = { 0 }, tmp2[16] = { 0 }, tmp3[16] = { 0 };
 
-    uint64_t timeout = 0;
     uint64_t samples = 0;
 
     /* initialize test */
     test_init("speed range");
 
     /* collect samples as long as timer has not expired */
-    timeout = xtimer_now_usec64() + (duration * US_PER_SEC);
-
-    while (xtimer_now_usec64() < timeout) {
+    unsigned running = 1;
+    xtimer_t xt = {
+        .target = 0,
+        .long_target = 0,
+        .callback = cb_speed_timeout,
+        .arg = &running,
+    };
+    uint32_t start_usec = xtimer_now_usec();
+    xtimer_set(&xt, duration * US_PER_SEC);
+    while (running) {
         test_get_uint32_range(low_thresh, high_thresh);
         samples++;
     }
+    uint32_t actual_duration_usec = xtimer_now_usec() - start_usec;
 
     /* print results */
     fmt_u64_dec(tmp1, samples);
-    fmt_u64_dec(tmp2, (samples * 4 / 1024) / duration);
-    printf("Collected %s samples in %" PRIu32 " seconds (%s KiB/s).\n", tmp1, duration, tmp2);
+    fmt_u64_dec(tmp2, (samples * 4000000 / 1024) / actual_duration_usec);
+    fmt_s32_dfp(tmp3, actual_duration_usec, -6);
+    printf("Collected %s samples in %s seconds (%s KiB/s).\n", tmp1, tmp3, tmp2);
 }
