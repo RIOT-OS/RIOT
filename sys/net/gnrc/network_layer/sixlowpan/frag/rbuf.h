@@ -89,6 +89,8 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
  */
 void rbuf_gc(void);
 
+void rbuf_rm(rbuf_t *rbuf);
+
 #ifdef __cplusplus
 }
 #endif
