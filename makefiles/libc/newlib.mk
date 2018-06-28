@@ -82,7 +82,7 @@ ifeq (1,$(USE_NEWLIB_NANO))
     # but removes the error on non existing directory
     $(warning $(lastword $(MAKEFILE_LIST)) could not correctly find include path to newlib-nano headers.)
     $(warning It was set to "$(NEWLIB_NANO_INCLUDE_DIR)" which does not exist on your system.)
-    $(warning The non newlib-nano newlib.h may be used)
+    $(warning The regular non-nano newlib.h configuration header may be used instead, with unknown side effects.)
   else
     INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
   endif
