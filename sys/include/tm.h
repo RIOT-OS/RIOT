@@ -84,7 +84,11 @@ int tm_doomsday(int year) CONST;
  * @param[out]      wday   Returns the day of the week.
  * @param[out]      yday   Returns the day of the year (Jan 1st is 0).
  */
+#ifndef ATMEGA_INCOMPATIBLE_TIME_H
 void tm_get_wyday(int year, int mon, int mday, int *wday, int *yday);
+#else
+void tm_get_wyday(int year, int mon, int mday, int8_t *wday, int16_t *yday);
+#endif
 
 /**
  * @brief               Fills in `struct tm::tm_wday` and `struct tm::tm_yday` given a date.

@@ -18,7 +18,7 @@ export USEMODULE += periph_common
 export USEMODULE += uart_stdio
 
 # include module specific includes
-export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/avr-libc-extra
+export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/include/vendor
 
 ifeq ($(LTO),1)
   # avr-gcc <4.8.3 has a bug when using LTO which causes a warning to be printed always:
