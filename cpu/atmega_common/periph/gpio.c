@@ -150,6 +150,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 {
     int8_t int_num = _int_num(pin);
 
+    /* mode not supported */
     if ((mode != GPIO_IN) && (mode != GPIO_IN_PU)) {
         return -1;
     }
@@ -159,18 +160,19 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         return -1;
     }
 
+    /* flank not supported */
+    if (flank > GPIO_RISING) {
+        return -1;
+    }
+
     gpio_init(pin, mode);
 
     /* clear global interrupt flag */
     cli();
 
     /* enable interrupt number int_num */
+    EIFR |= (1 << int_num);
     EIMSK |= (1 << int_num);
-
-    /* configure the flank */
-    if (flank > GPIO_RISING) {
-        return -1;
-    }
 
     /* apply flank to interrupt number int_num */
     if (int_num < 4) {
@@ -196,6 +198,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
+    EIFR |= (1 << _int_num(pin));
     EIMSK |= (1 << _int_num(pin));
 }
 
