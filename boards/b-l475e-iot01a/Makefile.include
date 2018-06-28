@@ -9,8 +9,8 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
+# this board has an on-board ST-link adapter
 export DEBUG_ADAPTER ?= stlink
-export STLINK_VERSION ?= 2-1
 
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk
