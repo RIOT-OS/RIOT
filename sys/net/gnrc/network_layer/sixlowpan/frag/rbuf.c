@@ -69,9 +69,6 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
               size_t offset, unsigned page)
 {
     rbuf_t *entry;
-    /* cppcheck-suppress variableScope
-     * (reason: cppcheck is clearly wrong here) */
-    unsigned int data_offset = 0;
     sixlowpan_frag_t *frag = pkt->data;
     rbuf_int_t *ptr;
     uint8_t *data = ((uint8_t *)pkt->data) + sizeof(sixlowpan_frag_t);
@@ -96,27 +93,6 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         if (data[0] == SIXLOWPAN_UNCOMP) {
             frag_size--;
         }
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-        else if (sixlowpan_iphc_is(data)) {
-            size_t iphc_len, nh_len = 0;
-            iphc_len = gnrc_sixlowpan_iphc_decode(&entry->super.pkt, pkt,
-                                                  entry->super.pkt->size,
-                                                  sizeof(sixlowpan_frag_t),
-                                                  &nh_len);
-            if (iphc_len == 0) {
-                DEBUG("6lo rfrag: could not decode IPHC dispatch\n");
-                gnrc_pktbuf_release(entry->super.pkt);
-                rbuf_rm(entry);
-                return;
-            }
-            data += iphc_len;       /* take remaining data as data */
-            frag_size -= iphc_len;  /* and reduce frag size by IPHC dispatch length */
-            /* but add IPv6 header + next header lengths */
-            frag_size += sizeof(ipv6_hdr_t) + nh_len;
-            /* start copying after IPv6 header and next headers */
-            data_offset += sizeof(ipv6_hdr_t) + nh_len;
-        }
-#endif
     }
     else {
         frag_size = pkt->size - sizeof(sixlowpan_frag_n_t);
@@ -153,11 +129,30 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     if (_rbuf_update_ints(entry, offset, frag_size)) {
         DEBUG("6lo rbuf: add fragment data\n");
         entry->super.current_size += (uint16_t)frag_size;
-        memcpy(((uint8_t *)entry->super.pkt->data) + offset + data_offset, data,
-               frag_size - data_offset);
+        if (offset == 0) {
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
+            if (sixlowpan_iphc_is(data)) {
+                gnrc_pktsnip_t *frag_hdr = gnrc_pktbuf_mark(pkt,
+                        sizeof(sixlowpan_frag_t), GNRC_NETTYPE_SIXLOWPAN);
+                if (frag_hdr == NULL) {
+                    gnrc_pktbuf_release(entry->super.pkt);
+                    rbuf_rm(entry);
+                    return;
+                }
+                gnrc_sixlowpan_iphc_recv(pkt, &entry->super, 0);
+                return;
+            }
+            else
+#endif
+            if (data[0] == SIXLOWPAN_UNCOMP) {
+                data++;
+            }
+        }
+        memcpy(((uint8_t *)entry->super.pkt->data) + offset, data,
+               frag_size);
     }
-
     gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(&entry->super, netif_hdr);
+    gnrc_pktbuf_release(pkt);
 }
 
 static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end)

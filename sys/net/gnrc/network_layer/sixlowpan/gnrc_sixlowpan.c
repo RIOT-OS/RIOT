@@ -211,32 +211,9 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
     else if (sixlowpan_iphc_is(dispatch)) {
-        size_t dispatch_size, nh_len;
-        gnrc_pktsnip_t *sixlowpan;
-        gnrc_pktsnip_t *dec_hdr = gnrc_pktbuf_add(NULL, NULL, sizeof(ipv6_hdr_t),
-                                                  GNRC_NETTYPE_IPV6);
-        if ((dec_hdr == NULL) ||
-            (dispatch_size = gnrc_sixlowpan_iphc_decode(&dec_hdr, pkt, 0, 0,
-                                                        &nh_len)) == 0) {
-            DEBUG("6lo: error on IPHC decoding\n");
-            if (dec_hdr != NULL) {
-                gnrc_pktbuf_release(dec_hdr);
-            }
-            gnrc_pktbuf_release(pkt);
-            return;
-        }
-        sixlowpan = gnrc_pktbuf_mark(pkt, dispatch_size, GNRC_NETTYPE_SIXLOWPAN);
-        if (sixlowpan == NULL) {
-            DEBUG("6lo: error on marking IPHC dispatch\n");
-            gnrc_pktbuf_release(dec_hdr);
-            gnrc_pktbuf_release(pkt);
-            return;
-        }
-
-        /* Remove IPHC dispatches */
-        /* Insert decoded header instead */
-        pkt = gnrc_pktbuf_replace_snip(pkt, sixlowpan, dec_hdr);
-        payload->type = GNRC_NETTYPE_UNDEF;
+        DEBUG("6lo: received 6LoWPAN IPHC comressed datagram\n");
+        gnrc_sixlowpan_iphc_recv(pkt, NULL, 0);
+        return;
     }
 #endif
     else {

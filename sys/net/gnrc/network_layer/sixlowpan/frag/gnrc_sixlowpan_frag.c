@@ -312,8 +312,6 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     }
 
     rbuf_add(hdr, pkt, offset, page);
-
-    gnrc_pktbuf_release(pkt);
 }
 
 void gnrc_sixlowpan_frag_rbuf_gc(void)
