@@ -136,7 +136,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     }
     if (local != NULL) {
         /* listen only with local given */
-        gnrc_sock_create(&sock->reg, GNRC_NETTYPE_UDP, local->port);
+        gnrc_sock_create(&sock->reg, GNRC_NETTYPE_UDP, sock->local.port);
     }
     sock->flags = flags;
     return 0;
