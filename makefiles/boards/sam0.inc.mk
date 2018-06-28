@@ -8,7 +8,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # settings.
 ifneq (,$(SERIAL))
   EDBG_ARGS += --serial $(SERIAL)
-  SERIAL_TTY = $(firstword $(shell $(RIOTBASE)/dist/tools/usb-serial/find-tty.sh $(SERIAL)))
+  SERIAL_TTY = $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh $(SERIAL)))
   ifeq (,$(SERIAL_TTY))
     $(error Did not find a device with serial $(SERIAL))
   endif
