@@ -34,17 +34,19 @@ the overall validity of the PR.
     Is the problem that the PR intends to solve clearly stated?
 2.  Is the solution presented in the PR as simple as possible to satisfy the
     requirements, but no simpler?
-3.  Is the solution well designed on a high level?
-4.  Do the concepts used by the PR make sense?
-5.  Does the PR break with existing concepts?
-6.  Is the structure of the PR itself valid?
-7.  Are there clear and adequate instructions on how to test the PR? \
+3.  Is the PR functionally atomic? Does it address a single issue or should
+    it be split into multiple individual PRs?
+4.  Is the solution well designed on a high level?
+5.  Do the concepts used by the PR make sense?
+6.  Does the PR break with existing concepts?
+7.  Is the structure of the PR itself valid?
+8.  Are there clear and adequate instructions on how to test the PR? \
     This may or may not include implemented tests as part of the PR.
-8.  Does the code compile and run?
-9.  Does this PR respect the rights of previous authors, either through
+9.  Does the code compile and run?
+10. Does this PR respect the rights of previous authors, either through
     retaining their commits or by retaining their copyrights in the boilerplate
     headers?
-10. Is the PR a duplicate of another PR?
+11. Is the PR a duplicate of another PR?
 
 
 ### 2. - Review the design of the code
