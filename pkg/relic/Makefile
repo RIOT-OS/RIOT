@@ -20,7 +20,7 @@ $(PKG_BUILDDIR)/Makefile: $(TOOLCHAIN_FILE)
 		  -DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off -Wno-dev $(RELIC_CONFIG_FLAGS) .
 
 $(TOOLCHAIN_FILE): git-download
-	$(RIOTBASE)/dist/tools/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
+	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
 
 clean::
 	@rm -rf $(BINDIR)/$(PKG_NAME).a
