@@ -312,6 +312,32 @@ static void test_sock_udp_recv__socketed_with_remote(void)
     assert(_check_net());
 }
 
+static void test_sock_udp_recv__socketed_with_port0(void)
+{
+    static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR_REMOTE };
+    static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR_LOCAL };
+    static sock_udp_ep_t local = { .family = AF_INET6, .port = 0 };
+    static const sock_udp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR_REMOTE },
+                                          .family = AF_INET6,
+                                          .port = _TEST_PORT_REMOTE };
+    sock_udp_ep_t result;
+
+    assert(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    assert(0 == sock_udp_get_local(&_sock, &local));
+    assert(0 != local.port);
+    assert(_inject_packet(&src_addr, &dst_addr, _TEST_PORT_REMOTE,
+                          local.port, "ABCD", sizeof("ABCD"),
+                          _TEST_NETIF));
+    assert(sizeof("ABCD") == sock_udp_recv(&_sock, _test_buffer,
+                                           sizeof(_test_buffer),
+                                           SOCK_NO_TIMEOUT, &result));
+    assert(AF_INET6 == result.family);
+    assert(memcmp(&result.addr, &src_addr, sizeof(result.addr)) == 0);
+    assert(_TEST_PORT_REMOTE == result.port);
+    assert(_TEST_NETIF == result.netif);
+    assert(_check_net());
+}
+
 static void test_sock_udp_recv__unsocketed(void)
 {
     static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR_REMOTE };
@@ -693,6 +719,7 @@ int main(void)
     CALL(test_sock_udp_recv__ETIMEDOUT());
     CALL(test_sock_udp_recv__socketed());
     CALL(test_sock_udp_recv__socketed_with_remote());
+    CALL(test_sock_udp_recv__socketed_with_port0());
     CALL(test_sock_udp_recv__unsocketed());
     CALL(test_sock_udp_recv__unsocketed_with_remote());
     CALL(test_sock_udp_recv__with_timeout());
