@@ -554,6 +554,14 @@ typedef enum {
      */
     NETOPT_PHY_BUSY,
 
+    /**
+     * @brief   (@ref netdev_ieee802154_t) ieee802154 netdev struct
+     *
+     * Internal get function for gnrc to retrieve the @ref netdev_ieee802154_t
+     * struct.
+     */
+    NETOPT_NETDEV802154_PTR,
+
     /* add more options if needed */
 
     /**
