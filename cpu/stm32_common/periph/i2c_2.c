@@ -500,7 +500,7 @@ static inline int _wait_ready(I2C_TypeDef *i2c)
     while ((i2c->SR2 & I2C_SR2_BUSY) && tick--) {
         if (!tick) {
             DEBUG("[i2c] wait_ready: timeout\n");
-            return -ETIMEDOUT;
+            return -EIO;
         }
     }
 
