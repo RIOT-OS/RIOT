@@ -1,1 +1,2 @@
 USEMODULE += nanocoap
+USEMODULE += nanocoap_options_sort

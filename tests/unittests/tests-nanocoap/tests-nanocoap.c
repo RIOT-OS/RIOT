@@ -14,10 +14,12 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "embUnit.h"
 
 #include "net/nanocoap.h"
+#include "net/nanocoap_opt_sort.h"
 
 #include "unittests-constants.h"
 #include "tests-nanocoap.h"
@@ -144,6 +146,108 @@ static void test_nanocoap__get_multi_path(void)
     TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
 }
 
+#ifdef MODULE_NANOCOAP_OPTIONS_SORT
+/*
+ * Builds on put_req test, to test resorting options in option number order.
+ * Also verifies coap_opt_sorted().
+ */
+static void test_nanocoap__put_opt_sort(void)
+{
+    uint8_t buf[128];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char path[] = "/ab/cd";
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_PUT, msgid);
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+
+    /* out of order; 12, 11 */
+    coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_TEXT);
+    coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+
+    TEST_ASSERT(!coap_opt_sorted(&pkt));
+
+    len = coap_opt_finish(&pkt, COAP_OPT_FINISH_SORT);
+
+    TEST_ASSERT(coap_opt_sorted(&pkt));
+
+    memset(&pkt, 0, sizeof(coap_pkt_t));
+    int res = coap_parse(&pkt, &buf[0], len);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    /* value is "/" on failure; implicit path when Uri-Path absent */
+    char uri[10] = {0};
+    coap_get_uri(&pkt, (uint8_t *)&uri[0]);
+    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+
+    TEST_ASSERT_EQUAL_INT(COAP_FORMAT_TEXT, coap_get_content_type(&pkt));
+}
+
+/*
+ * Builds on put_opt_sort test, to test resorting options already in order.
+ */
+static void test_nanocoap__put_opt_sort_presorted(void)
+{
+    uint8_t buf[128];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char path[] = "/ab";
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_PUT, msgid);
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+
+    coap_opt_add_uint(&pkt, COAP_OPT_OBSERVE, 0);
+    coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_TEXT);
+    len = coap_opt_finish(&pkt, COAP_OPT_FINISH_SORT);
+
+    memset(&pkt, 0, sizeof(coap_pkt_t));
+    int res = coap_parse(&pkt, &buf[0], len);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    /* no API to retrieve observe option value */
+
+    /* value is "/" on failure; implicit path when Uri-Path absent */
+    char uri[10] = {0};
+    coap_get_uri(&pkt, (uint8_t *)&uri[0]);
+    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+
+    TEST_ASSERT_EQUAL_INT(COAP_FORMAT_TEXT, coap_get_content_type(&pkt));
+}
+
+/*
+ * Builds on put_opt_sort test, to test no-op case with a single option.
+ */
+static void test_nanocoap__put_opt_sort_1opt(void)
+{
+    uint8_t buf[128];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char path[] = "/ab";
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_PUT, msgid);
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+
+    coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    len = coap_opt_finish(&pkt, COAP_OPT_FINISH_SORT);
+
+    memset(&pkt, 0, sizeof(coap_pkt_t));
+    int res = coap_parse(&pkt, &buf[0], len);
+    TEST_ASSERT_EQUAL_INT(0, res);
+
+    /* value is "/" on failure; implicit path when Uri-Path absent */
+    char uri[10] = {0};
+    coap_get_uri(&pkt, (uint8_t *)&uri[0]);
+    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+}
+#endif
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -151,6 +255,11 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_req),
         new_TestFixture(test_nanocoap__put_req),
         new_TestFixture(test_nanocoap__get_multi_path),
+#ifdef MODULE_NANOCOAP_OPTIONS_SORT
+        new_TestFixture(test_nanocoap__put_opt_sort),
+        new_TestFixture(test_nanocoap__put_opt_sort_presorted),
+        new_TestFixture(test_nanocoap__put_opt_sort_1opt),
+#endif
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
