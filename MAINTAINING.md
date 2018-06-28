@@ -15,7 +15,9 @@ Notes:
     might be more efficient to give the contributor some broader comments for
     improvement before further review.
 -   This is a working document and any changes, additions, or other discussions
-    are encouraged, via PRs raised against the document.
+    are encouraged, via PRs raised against the document. Changes to this
+    document should however have at least two ACKs, to ensure these guidelines
+    are well thought out, and that they reflect community consensus.
 
 The [list of maintainers] gives information on the current maintainers and the
 areas of RIOT they each maintain.
