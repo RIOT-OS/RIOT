@@ -37,6 +37,9 @@ extern "C" {
 #ifndef LIS3DH_PARAM_CS
 #define LIS3DH_PARAM_CS             (GPIO_PIN(0, 0))
 #endif
+#ifndef LIS3DH_PARAM_CLK
+#define LIS3DH_PARAM_CLK            (SPI_CLK_5MHZ)
+#endif
 #ifndef LIS3DH_PARAM_INT1
 #define LIS3DH_PARAM_INT1           (GPIO_PIN(0, 1))
 #endif
@@ -50,12 +53,18 @@ extern "C" {
 #define LIS3DH_PARAM_ODR            (LIS3DH_ODR_100Hz)
 #endif
 
-#define LIS3DH_PARAMS_DEFAULT       { .spi   = LIS3DH_PARAM_SPI, \
-                                      .cs    = LIS3DH_PARAM_CS, \
-                                      .int1  = LIS3DH_PARAM_INT1, \
-                                      .int2  = LIS3DH_PARAM_INT2, \
+#ifndef LIS3DH_PARAMS
+#define LIS3DH_PARAMS               { .spi   = LIS3DH_PARAM_SPI,   \
+                                      .cs    = LIS3DH_PARAM_CS,    \
+                                      .clk   = LIS3DH_PARAM_CLK,   \
+                                      .int1  = LIS3DH_PARAM_INT1,  \
+                                      .int2  = LIS3DH_PARAM_INT2,  \
                                       .scale = LIS3DH_PARAM_SCALE, \
                                       .odr   = LIS3DH_PARAM_ODR }
+#endif
+#ifndef LIS3DH_SAUL_INFO
+#define LIS3DH_SAUL_INFO            { .name = "lis3dh" }
+#endif
 /**@}*/
 
 /**
@@ -63,11 +72,7 @@ extern "C" {
  */
 static const lis3dh_params_t lis3dh_params[] =
 {
-#ifdef LIS3DH_PARAMS_CUSTOM
-    LIS3DH_PARAMS_CUSTOM,
-#else
-    LIS3DH_PARAMS_DEFAULT,
-#endif
+    LIS3DH_PARAMS
 };
 
 /**
@@ -75,7 +80,7 @@ static const lis3dh_params_t lis3dh_params[] =
  */
 static const saul_reg_info_t lis3dh_saul_info[] =
 {
-    { .name = "lis3dh" }
+    LIS3DH_SAUL_INFO
 };
 
 #ifdef __cplusplus
