@@ -78,7 +78,7 @@ ifeq ($(TOOLCHAIN),llvm)
   # for the system being built.
   # We also add -nostdinc to avoid including the host system headers by mistake
   # in case some header is missing from the cross tool chain
-  NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR) -nostdinc
+  NEWLIB_INCLUDES := $(addprefix -isystem ,$(NEWLIB_INCLUDE_DIR)) -nostdinc
   NEWLIB_INCLUDES += $(addprefix -isystem ,$(realpath $(wildcard $(dir $(NEWLIB_INCLUDE_DIR))/usr/include)))
 
   # Newlib includes should go before GCC includes. This is especially important
@@ -95,5 +95,5 @@ ifeq (1,$(USE_NEWLIB_NANO))
                                                     $(NEWLIB_INCLUDE_DIR)/nano))
   # newlib-nano overrides newlib.h and its include dir should therefore go before
   # the regular system include dirs.
-  INCLUDES := -isystem $(NEWLIB_NANO_INCLUDE_DIR) $(INCLUDES)
+  INCLUDES := $(addprefix -isystem ,$(NEWLIB_NANO_INCLUDE_DIR)) $(INCLUDES)
 endif
