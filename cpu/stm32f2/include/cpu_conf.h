@@ -23,15 +23,7 @@
 
 #include "cpu_conf_common.h"
 
-#if defined(CPU_MODEL_STM32F205RG)
-#include "vendor/stm32f205xx.h"
-#elif defined(CPU_MODEL_STM32F207ZG)
-#include "vendor/stm32f207xx.h"
-#elif defined(CPU_MODEL_STM32F215RG) || defined(CPU_MODEL_STM32F215VG) || defined(CPU_MODEL_STM32F215VE)
-#include "vendor/stm32f215xx.h"
-#elif defined(CPU_MODEL_STM32F217ZG)
-#include "vendor/stm32f217xx.h"
-#endif
+#include "vendor/stm32f2xx.h"
 
 #ifdef __cplusplus
 extern "C" {
