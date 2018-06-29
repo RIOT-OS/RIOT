@@ -114,6 +114,20 @@ typedef uint16_t gpio_t;
  */
 #define PM_NUM_MODES    (1U)
 
+#ifdef RTC
+/* All Kinetis CPUs have exactly one RTC hardware module, except for the KL02
+ * family which don't have an RTC at all */
+/**
+ * @name RTT and RTC configuration
+ * @{
+ */
+#define RTT_NUMOF                    (1U)
+#define RTC_NUMOF                    (1U)
+#define RTT_FREQUENCY                (1)
+#define RTT_MAX_VALUE                (0xffffffff)
+/** @} */
+#endif
+
 #ifndef DOXYGEN
 /**
  * @name    GPIO pin modes
@@ -293,6 +307,10 @@ typedef struct {
 typedef struct {
     /** LPTMR device base pointer */
     LPTMR_Type *dev;
+    /** Input clock frequency */
+    uint32_t base_freq;
+    /** Clock source setting */
+    uint8_t src;
     /** IRQn interrupt number */
     uint8_t irqn;
 } lptmr_conf_t;
@@ -312,6 +330,41 @@ typedef struct {
     uint8_t ftm_num;        /**< FTM number used */
 } pwm_conf_t;
 #endif
+
+#ifndef DOXYGEN
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       =   10000ul, /**< low speed mode:     ~10 kbit/s */
+    I2C_SPEED_NORMAL    =  100000ul, /**< normal mode:       ~100 kbit/s */
+    I2C_SPEED_FAST      =  400000ul, /**< fast mode:         ~400 kbit/s */
+    I2C_SPEED_FAST_PLUS = 1000000ul, /**< fast plus mode:   ~1000 kbit/s */
+    /* High speed is not supported without external hardware hacks */
+    I2C_SPEED_HIGH      = 3400000ul, /**< high speed mode:  ~3400 kbit/s */
+} i2c_speed_t;
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+/** @} */
+#endif /* !defined(DOXYGEN) */
+
+/**
+ * @brief   I2C configuration structure
+ */
+typedef struct {
+    I2C_Type *i2c;          /**< Pointer to hardware module registers */
+    gpio_t scl_pin;         /**< SCL GPIO pin */
+    gpio_t sda_pin;         /**< SDA GPIO pin */
+    uint32_t freq;          /**< I2C module clock frequency, usually CLOCK_BUSCLOCK or CLOCK_CORECLOCK */
+    i2c_speed_t speed;      /**< Configured bus speed, actual speed may be lower but never higher */
+    IRQn_Type irqn;         /**< IRQ number for this module */
+    uint32_t scl_pcr;       /**< PORT module PCR setting for the SCL pin */
+    uint32_t sda_pcr;       /**< PORT module PCR setting for the SDA pin */
+} i2c_conf_t;
 
 /**
  * @brief   SPI module configuration options
