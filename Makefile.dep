@@ -659,6 +659,14 @@ ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   FEATURES_REQUIRED += cpp
 endif
 
+ifneq (,$(filter asymcute,$(USEMODULE)))
+  USEMODULE += sock_udp
+  USEMODULE += sock_util
+  USEMODULE += random
+  USEMODULE += event_timeout
+  USEMODULE += event_callback
+endif
+
 ifneq (,$(filter emcute,$(USEMODULE)))
   USEMODULE += core_thread_flags
   USEMODULE += sock_udp
