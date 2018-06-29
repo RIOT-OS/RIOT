@@ -236,56 +236,31 @@ static const spi_conf_t spi_config[] = {
 * @name I2C configuration
 * @{
 */
-/* This CPU has I2C0 clocked by the bus clock and I2C1 clocked by the system
- * clock. This causes trouble with the current implementation in kinetis
- * which only supports one set of frequency dividers at a time */
-/* The current configuration sets the dividers so that the I2C0 bus will run at
- * half the requested speed, to avoid exceeding the requested speed on I2C1 with
- * the same configuration */
-#define I2C_NUMOF                    (2U)
-#define I2C_0_EN                     1
-/* Disabled while waiting for a rewritten i2c driver which supports different
- * clock sources for each i2c module */
-#define I2C_1_EN                     1
-/* Low (10 kHz): MUL = 2, SCL divider = 1792, total: 3584 */
-#define KINETIS_I2C_F_ICR_LOW        (0x3A)
-#define KINETIS_I2C_F_MULT_LOW       (1)
-/* Normal (100 kHz): MUL = 1, SCL divider = 320, total: 320 */
-#define KINETIS_I2C_F_ICR_NORMAL     (0x25)
-#define KINETIS_I2C_F_MULT_NORMAL    (0)
-/* Fast (400 kHz): MUL = 1, SCL divider = 80, total: 80 */
-#define KINETIS_I2C_F_ICR_FAST       (0x14)
-#define KINETIS_I2C_F_MULT_FAST      (0)
-/* Fast plus (1000 kHz): MUL = 1, SCL divider = 32, total: 32 */
-#define KINETIS_I2C_F_ICR_FAST_PLUS  (0x09)
-#define KINETIS_I2C_F_MULT_FAST_PLUS (0)
-
-/* I2C 0 device configuration */
-#define I2C_0_DEV                    I2C0
-#define I2C_0_CLKEN()                (bit_set32(&SIM->SCGC4, SIM_SCGC4_I2C0_SHIFT))
-#define I2C_0_CLKDIS()               (bit_clear32(&SIM->SCGC4, SIM_SCGC4_I2C0_SHIFT))
-#define I2C_0_IRQ                    I2C0_IRQn
-#define I2C_0_IRQ_HANDLER            isr_i2c0
-/* I2C 0 pin configuration */
-#define I2C_0_PORT                   PORTB
-#define I2C_0_PORT_CLKEN()           (bit_set32(&SIM->SCGC5, SIM_SCGC5_PORTB_SHIFT))
-#define I2C_0_PIN_AF                 3
-#define I2C_0_SDA_PIN                1
-#define I2C_0_SCL_PIN                0
-#define I2C_0_PORT_CFG               (PORT_PCR_MUX(I2C_0_PIN_AF))
-/* I2C 1 device configuration */
-#define I2C_1_DEV                    I2C1
-#define I2C_1_CLKEN()                (bit_set32(&SIM->SCGC4, SIM_SCGC4_I2C1_SHIFT))
-#define I2C_1_CLKDIS()               (bit_clear32(&SIM->SCGC4, SIM_SCGC4_I2C1_SHIFT))
-#define I2C_1_IRQ                    I2C1_IRQn
-#define I2C_1_IRQ_HANDLER            isr_i2c1
-/* I2C 1 pin configuration */
-#define I2C_1_PORT                   PORTC
-#define I2C_1_PORT_CLKEN()           (bit_set32(&SIM->SCGC5, SIM_SCGC5_PORTC_SHIFT))
-#define I2C_1_PIN_AF                 3
-#define I2C_1_SDA_PIN                3
-#define I2C_1_SCL_PIN                2
-#define I2C_1_PORT_CFG               (PORT_PCR_MUX(I2C_0_PIN_AF))
+static const i2c_conf_t i2c_config[] = {
+    {
+        .i2c = I2C0,
+        .scl_pin = GPIO_PIN(PORT_B, 0),
+        .sda_pin = GPIO_PIN(PORT_B, 1),
+        .freq = CLOCK_BUSCLOCK,
+        .speed = I2C_SPEED_FAST,
+        .irqn = I2C0_IRQn,
+        .scl_pcr = (PORT_PCR_MUX(3)),
+        .sda_pcr = (PORT_PCR_MUX(3)),
+    },
+    {
+        .i2c = I2C1,
+        .scl_pin = GPIO_PIN(PORT_C, 2),
+        .sda_pin = GPIO_PIN(PORT_C, 3),
+        .freq = CLOCK_CORECLOCK,
+        .speed = I2C_SPEED_FAST,
+        .irqn = I2C1_IRQn,
+        .scl_pcr = (PORT_PCR_MUX(3)),
+        .sda_pcr = (PORT_PCR_MUX(3)),
+    },
+};
+#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_0_ISR           (isr_i2c0)
+#define I2C_1_ISR           (isr_i2c1)
 /** @} */
 
 /**
