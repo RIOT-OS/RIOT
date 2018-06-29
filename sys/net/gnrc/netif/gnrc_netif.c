@@ -1226,6 +1226,22 @@ static void _init_from_device(gnrc_netif_t *netif)
     _update_l2addr_from_dev(netif);
 }
 
+static void _configure_netdev(netdev_t *dev)
+{
+    /* Enable RX- and TX-complete interrupts */
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+    int res = dev->driver->set(dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
+    if (res < 0) {
+        LOG_ERROR("gnrc_netif: enable NETOPT_RX_END_IRQ failed: %d\n", res);
+    }
+#ifdef MODULE_NETSTATS_L2
+    res = dev->driver->set(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
+    if (res < 0) {
+        LOG_ERROR("gnrc_netif: enable NETOPT_TX_END_IRQ failed: %d\n", res);
+    }
+#endif
+}
+
 static void *_gnrc_netif_thread(void *args)
 {
     gnrc_netapi_opt_t *opt;
@@ -1247,6 +1263,7 @@ static void *_gnrc_netif_thread(void *args)
     dev->context = netif;
     /* initialize low-level driver */
     dev->driver->init(dev);
+    _configure_netdev(dev);
     _init_from_device(netif);
     netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
 #ifdef MODULE_GNRC_IPV6_NIB
