@@ -331,6 +331,41 @@ typedef struct {
 } pwm_conf_t;
 #endif
 
+#ifndef DOXYGEN
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       =   10000ul, /**< low speed mode:     ~10 kbit/s */
+    I2C_SPEED_NORMAL    =  100000ul, /**< normal mode:       ~100 kbit/s */
+    I2C_SPEED_FAST      =  400000ul, /**< fast mode:         ~400 kbit/s */
+    I2C_SPEED_FAST_PLUS = 1000000ul, /**< fast plus mode:   ~1000 kbit/s */
+    /* High speed is not supported without external hardware hacks */
+    I2C_SPEED_HIGH      = 3400000ul, /**< high speed mode:  ~3400 kbit/s */
+} i2c_speed_t;
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+/** @} */
+#endif /* !defined(DOXYGEN) */
+
+/**
+ * @brief   I2C configuration structure
+ */
+typedef struct {
+    I2C_Type *i2c;          /**< Pointer to hardware module registers */
+    gpio_t scl_pin;         /**< SCL GPIO pin */
+    gpio_t sda_pin;         /**< SDA GPIO pin */
+    uint32_t freq;          /**< I2C module clock frequency, usually CLOCK_BUSCLOCK or CLOCK_CORECLOCK */
+    i2c_speed_t speed;      /**< Configured bus speed, actual speed may be lower but never higher */
+    IRQn_Type irqn;         /**< IRQ number for this module */
+    uint32_t scl_pcr;       /**< PORT module PCR setting for the SCL pin */
+    uint32_t sda_pcr;       /**< PORT module PCR setting for the SDA pin */
+} i2c_conf_t;
+
 /**
  * @brief   SPI module configuration options
  */
