@@ -436,7 +436,7 @@ static int _start(I2C_TypeDef *i2c, uint8_t address, uint8_t rw_flag, uint8_t fl
     while (!(i2c->SR1 & I2C_SR1_ADDR) && tick--) {
         if ((i2c->SR1 & ERROR_FLAG) || !tick) {
             i2c->CR1 |= I2C_CR1_STOP;
-            return -ETIMEDOUT;
+            return -EIO;
         }
     }
 
@@ -500,7 +500,7 @@ static inline int _wait_ready(I2C_TypeDef *i2c)
     while ((i2c->SR2 & I2C_SR2_BUSY) && tick--) {
         if (!tick) {
             DEBUG("[i2c] wait_ready: timeout\n");
-            return -EIO;
+            return -ETIMEDOUT;
         }
     }
 
