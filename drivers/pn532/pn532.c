@@ -80,7 +80,7 @@
 
 #if ENABLE_DEBUG
 #define PRINTBUFF printbuff
-static void printbuff(char *buff, unsigned len)
+static void printbuff(uint8_t *buff, unsigned len)
 {
     while (len) {
         len--;
