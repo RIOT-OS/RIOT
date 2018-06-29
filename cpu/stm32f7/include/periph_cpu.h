@@ -30,7 +30,7 @@ extern "C" {
 /**
  * @name    Starting address of the CPU ID
  */
-#ifdef CPU_MODEL_STM32F722ZE
+#ifdef CPU_LINE_STM32F722xx
 #define CPUID_ADDR          (0x1ff07a10)
 #else
 #define CPUID_ADDR          (0x1ff0f420)
