@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,11 +8,14 @@
  */
 
 /**
- * @ingroup net_sock_util
+ * @ingroup     net_sock_util
  * @{
+ *
  * @file
- * @brief   sock utility functions implementation
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @brief       sock utility functions implementation
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @}
  */
 
@@ -180,4 +184,27 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
     }
 #endif
     return -EINVAL;
+}
+
+bool sock_udp_ep_equal(const sock_udp_ep_t *a, const sock_udp_ep_t *b)
+{
+    assert(a && b);
+
+    /* compare family and port */
+    if ((a->family != b->family) || (a->port != b->port)) {
+        return false;
+    }
+
+    /* compare addresses */
+    switch (a->family) {
+#ifdef SOCK_HAS_IPV6
+        case AF_INET6:
+            return (memcmp(a->addr.ipv6, b->addr.ipv6, 16) == 0);
+
+#endif
+        case AF_INET:
+            return (memcmp(a->addr.ipv4, b->addr.ipv4, 4) == 0);
+        default:
+            return false;
+    }
 }
