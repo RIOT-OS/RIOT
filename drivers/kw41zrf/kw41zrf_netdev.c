@@ -277,10 +277,18 @@ static int kw41zrf_netdev_send(netdev_t *netdev, const iolist_t *iolist)
 
 static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
+    kw41zrf_t *dev = (kw41zrf_t *)netdev;
+    if (kw41zrf_is_dsm()) {
+        /* bring the device out of DSM, sleep will be restored before returning */
+        kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
+    }
     /* get size of the received packet */
     uint8_t pkt_len = (ZLL->IRQSTS & ZLL_IRQSTS_RX_FRAME_LENGTH_MASK) >> ZLL_IRQSTS_RX_FRAME_LENGTH_SHIFT;
-    kw41zrf_t *dev = (kw41zrf_t *)netdev;
     if (pkt_len < IEEE802154_FCS_LEN) {
+        if (kw41zrf_can_switch_to_idle(dev)) {
+            kw41zrf_abort_sequence(dev);
+            kw41zrf_set_sequence(dev, dev->idle_seq);
+        }
         return -EAGAIN;
     }
     /* skip FCS */
@@ -290,13 +298,16 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
     /* just return length when buf == NULL */
     if (buf == NULL) {
         if (len > 0) {
-            /* discard what we have stored in the buffer, go back to RX mode */
+            /* discard what we have stored in the buffer, unblock RX */
             dev->recv_blocked = false;
             if (kw41zrf_can_switch_to_idle(dev)) {
                 kw41zrf_abort_sequence(dev);
                 kw41zrf_set_sequence(dev, dev->idle_seq);
             }
         }
+        /* No set_sequence(idle_seq) here, keep transceiver turned on if the
+         * buffer was not discarded, we expect the higher layer to call again
+         * shortly with a proper buffer */
         return pkt_len;
     }
 
@@ -314,6 +325,10 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
 
     if (pkt_len > len) {
         /* not enough space in buf */
+        if (kw41zrf_can_switch_to_idle(dev)) {
+            kw41zrf_abort_sequence(dev);
+            kw41zrf_set_sequence(dev, dev->idle_seq);
+        }
         return -ENOBUFS;
     }
     memcpy(buf, (const void *)&ZLL->PKT_BUFFER_RX[0], pkt_len);
