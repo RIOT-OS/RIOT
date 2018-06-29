@@ -31,8 +31,7 @@ ifneq ($(BOARD),native)
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=9092
 endif
 
-# Add the package for Jerryscript
-USEPKG += jerryscript
+USEMODULE += js
 
 include $(RIOTBASE)/Makefile.include
 
