@@ -1,0 +1,7 @@
+INCLUDES += -I$(PKGDIRBASE)/monocypher/src
+INCLUDES += -I$(PKGDIRBASE)/monocypher/src/optional
+
+ifneq (,$(filter monocypher_sha512,$(USEMODULE)))
+  CFLAGS += -DED25519_SHA512
+  DIRS += $(PKGDIRBASE)/monocypher/src/optional
+endif
