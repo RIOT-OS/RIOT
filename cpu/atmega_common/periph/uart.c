@@ -33,6 +33,7 @@
 #include <avr/power.h>
 
 #include "cpu.h"
+#include "irq.h"
 #include "sched.h"
 #include "thread.h"
 
@@ -219,6 +220,8 @@ int uart_break_init(uart_break_cb_t break_cb, void *arg)
 
 void uart_poweron(uart_t uart)
 {
+    unsigned state = irq_disable();
+
     switch (uart) {
         case 0: power_usart0_enable();
 #if (UART_NUMOF == 2)
@@ -234,10 +237,24 @@ void uart_poweron(uart_t uart)
 
     /* bring UART to its state prior to sleeping */
     _apply_settings(uart);
+
+    /* flush 2 bytes from input buffer */
+    volatile uint8_t tmp;
+    tmp = dev[uart]->DR;
+    tmp = dev[uart]->DR;
+    (void)tmp;
+
+    irq_restore(state);
 }
 
 void uart_poweroff(uart_t uart)
 {
+    unsigned state = irq_disable();
+
+    /* disable and reset UART */
+    dev[uart]->CSRB = 0;
+    dev[uart]->CSRA = 0;
+
     switch (uart) {
         case 0: power_usart0_disable();
 #if (UART_NUMOF == 2)
@@ -250,18 +267,22 @@ void uart_poweroff(uart_t uart)
         case 3: power_usart3_disable();
 #endif
     }
+
+    irq_restore(state);
 }
 
 static inline void isr_handler(int num)
 {
     __enter_isr();
 
+    /* reg access must be in this order */
     volatile uint8_t frame_err = (dev[num]->CSRA >> FE0) & 0x1;
     volatile uint8_t byte = dev[num]->DR;
 
-    if (frame_err && (byte == 0x0)) {
-        /* break condition detected */
-        if (break_ctx.break_cb != NULL) {
+    /* check for valid byte */
+    if (frame_err) {
+        /* check for break condition */
+        if ((byte == 0x0) && (break_ctx.break_cb != NULL)) {
             break_ctx.break_cb(num, break_ctx.arg);
         }
     }
