@@ -7,7 +7,7 @@
  *
  */
 
-/*
+/**
  * @ingroup sys_auto_init_gnrc_netif
  * @{
  *
@@ -29,6 +29,9 @@
 #include "net/gnrc/gomach/gomach.h"
 #endif
 #include "net/gnrc.h"
+#ifdef MODULE_CONTIKIMAC
+#include "net/contikimac.h"
+#endif /* MODULE_CONTIKIMAC */
 
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
@@ -46,6 +49,9 @@
 
 static at86rf2xx_t at86rf2xx_devs[AT86RF2XX_NUM];
 static char _at86rf2xx_stacks[AT86RF2XX_NUM][AT86RF2XX_MAC_STACKSIZE];
+#ifdef MODULE_CONTIKIMAC
+static contikimac_t contikimac_devs[AT86RF2XX_NUM];
+#endif /* MODULE_CONTIKIMAC */
 
 void auto_init_at86rf2xx(void)
 {
@@ -63,6 +69,12 @@ void auto_init_at86rf2xx(void)
                                 AT86RF2XX_MAC_STACKSIZE,
                                 AT86RF2XX_MAC_PRIO, "at86rf2xx-lwmac",
                                 (netdev_t *)&at86rf2xx_devs[i]);
+#elif defined(MODULE_CONTIKIMAC)
+        contikimac_setup(&contikimac_devs[i], &at86rf2xx_devs[i].netdev.netdev);
+        gnrc_netif_ieee802154_create(_at86rf2xx_stacks[i],
+                                     AT86RF2XX_MAC_STACKSIZE,
+                                     AT86RF2XX_MAC_PRIO, "at86rf2xx-contikimac",
+                                     (netdev_t *)&contikimac_devs[i]);
 #else
         gnrc_netif_ieee802154_create(_at86rf2xx_stacks[i],
                                      AT86RF2XX_MAC_STACKSIZE,
