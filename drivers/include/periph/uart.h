@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014-2015 Freie Universität Berlin
+ *               2018 Acutam Automation, LLC
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -40,6 +41,7 @@
  * @brief       Low-level UART peripheral driver interface definition
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  */
 
 #ifndef PERIPH_UART_H
@@ -51,6 +53,8 @@
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
+#include "periph/gpio.h"
+
 /* TODO: remove once all platforms are ported to this interface */
 #include "periph/dev_enums.h"
 
@@ -80,12 +84,29 @@ typedef unsigned int uart_t;
 #endif
 
 /**
+ * @brief   Default wake pins for each UART
+ *
+ * This is only required to be defined if uart_break_sleep is used
+ */
+#ifndef UART_WAKE_PINS
+#define UART_WAKE_PINS(x)    (GPIO_UNDEF)
+#endif
+
+/**
  * @brief   Signature for receive interrupt callback
  *
  * @param[in] arg           context to the callback (optional)
  * @param[in] data          the byte that was received
  */
 typedef void(*uart_rx_cb_t)(void *arg, uint8_t data);
+
+/**
+ * @brief   Signature for break condition interrupt callback
+ *
+ * @param[in] uart          the UART device
+ * @param[in] arg           context to the callback (optional)
+ */
+typedef void(*uart_break_cb_t)(uart_t uart, void *arg);
 
 /**
  * @brief   Interrupt context for a UART device
@@ -95,6 +116,16 @@ typedef struct {
     uart_rx_cb_t rx_cb;     /**< data received interrupt callback */
     void *arg;              /**< argument to both callback routines */
 } uart_isr_ctx_t;
+#endif
+
+/**
+ * @brief   Interrupt context for UART break detection
+ */
+#ifndef HAVE_UART_BREAK_CTX_T
+typedef struct {
+    uart_break_cb_t break_cb;    /**< break callback */
+    void *arg;                   /**< argument to callback routine */
+} uart_break_ctx_t;
 #endif
 
 /**
@@ -149,7 +180,55 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
 void uart_write(uart_t uart, const uint8_t *data, size_t len);
 
 /**
+ * @brief   Initialize callback for break condition detection
+ *
+ * This callback is executed when a null character is recieved along with a
+ * frame error (no stop bit). This occurs when RX is pulled low, and may be
+ * used along with a pull-down resistor to detect the absence of a transmitter
+ * attached to the RX line. If the break condition is being used to sleep the
+ * UART, it is recommended to use uart_break_sleep instead.
+ *
+ * @param[in] break_cb      break callback
+ * @param[in] arg           optional context passed to the callback function
+ *
+ * @return                  UART_OK on success
+ * @return                  UART_INTERR on other errors
+ */
+int uart_break_init(uart_break_cb_t break_cb, void *arg);
+
+/**
+ * @brief   Sleep UART on break condition helper
+ *
+ * This will register a callback to sleep on the selected UART when a break
+ * condition is received. Prior to sleeping, it will register a GPIO interrupt
+ * to wake the UART on a rising edge. This allows the selected UART to sleep
+ * and wake depending on the presence or absence of a transmitter on the RX
+ * line. The function may utilize uart_break_init and the break callback should
+ * be considered unavailable while sleeping is enabled.
+ *
+ * @param[in] uart          the UART device to initialize sleeping
+ *
+ * @return                  UART_OK on success
+ * @return                  UART_NODEV on invalid UART device
+ * @return                  UART_INTERR on other errors
+ */
+int uart_break_sleep_init(uart_t uart);
+
+/**
+ * @brief   Enable break condition sleeping
+ */
+void uart_break_sleep_enable(void);
+
+/**
+ * @brief   Disable break condition sleeping
+ */
+void uart_break_sleep_disable(void);
+
+/**
  * @brief   Power on the given UART device
+ *
+ * This function is expected to bring the UART back to the state it was in
+ * prior to sleeping.
  *
  * @param[in] uart          the UART device to power on
  */

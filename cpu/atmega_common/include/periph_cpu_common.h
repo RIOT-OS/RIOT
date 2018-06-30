@@ -61,6 +61,13 @@ typedef enum {
 /** @} */
 
 /**
+ * @brief   Use some common UART functions
+ * @{
+ */
+#define PERIPH_UART_NEEDS_BREAK_SLEEP
+/** @} */
+
+/**
  * @brief   SPI mode select macro
  *
  * The polarity is determined by bit 3 in the configuration register, the phase
