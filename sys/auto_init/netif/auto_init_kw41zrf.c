@@ -7,7 +7,7 @@
  *
  */
 
-/*
+/**
  * @ingroup auto_init_gnrc_netif
  * @{
  *
@@ -27,15 +27,16 @@
 #include "kw41zrf.h"
 
 /**
- * @brief   Define stack parameters for the MAC layer thread
+ * @name    Stack parameters for the MAC layer thread
  * @{
  */
-#ifndef KW41ZRF_MAC_STACKSIZE
-#define KW41ZRF_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+#ifndef KW41ZRF_NETIF_STACKSIZE
+#define KW41ZRF_NETIF_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
 #endif
-#ifndef KW41ZRF_MAC_PRIO
-#define KW41ZRF_MAC_PRIO          (GNRC_NETIF_PRIO)
+#ifndef KW41ZRF_NETIF_PRIO
+#define KW41ZRF_NETIF_PRIO          (GNRC_NETIF_PRIO)
 #endif
+/** @} */
 
 /* There is only one memory mapped transceiver in the supported SoCs, the driver
  * does not try to take into account multiple instances of the hardware module */
