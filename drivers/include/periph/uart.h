@@ -84,6 +84,15 @@ typedef unsigned int uart_t;
 #endif
 
 /**
+ * @brief   Default wake pins for each UART
+ *
+ * This is only required to be defined if uart_break_sleep is used
+ */
+#ifndef UART_WAKE_PINS
+#define UART_WAKE_PINS(x)    (GPIO_UNDEF)
+#endif
+
+/**
  * @brief   Signature for receive interrupt callback
  *
  * @param[in] arg           context to the callback (optional)
@@ -176,7 +185,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len);
  * This callback is executed when a null character is recieved along with a
  * frame error (no stop bit). This occurs when RX is pulled low, and may be
  * used along with a pull-down resistor to detect the absence of a transmitter
- * attached to the RX line.
+ * attached to the RX line. If the break condition is being used to sleep the
+ * UART, it is recommended to use uart_break_sleep instead.
  *
  * @param[in] break_cb      break callback
  * @param[in] arg           optional context passed to the callback function
@@ -196,14 +206,23 @@ int uart_break_init(uart_break_cb_t break_cb, void *arg);
  * line. The function may utilize uart_break_init and the break callback should
  * be considered unavailable while sleeping is enabled.
  *
- * @param[in] uart          the UART device to enable sleeping
- * @param[in] pin           pin to use for wake interrupt
+ * @param[in] uart          the UART device to initialize sleeping
  *
  * @return                  UART_OK on success
  * @return                  UART_NODEV on invalid UART device
  * @return                  UART_INTERR on other errors
  */
-int uart_break_sleep(uart_t uart, gpio_t pin);
+int uart_break_sleep_init(uart_t uart);
+
+/**
+ * @brief   Enable break condition sleeping
+ */
+void uart_break_sleep_enable(void);
+
+/**
+ * @brief   Disable break condition sleeping
+ */
+void uart_break_sleep_disable(void);
 
 /**
  * @brief   Power on the given UART device

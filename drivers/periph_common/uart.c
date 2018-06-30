@@ -21,6 +21,7 @@
 #include "irq.h"
 #include "periph/gpio.h"
 #include "periph/uart.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -28,24 +29,8 @@
 #ifdef UART_NUMOF
 
 #ifdef PERIPH_UART_NEEDS_BREAK_SLEEP
-#if (UART_NUMOF == 1)
-static gpio_t uart_sleep_pins[] = { GPIO_UNDEF };
-#elif (UART_NUMOF == 2)
-static gpio_t uart_sleep_pins[] = { GPIO_UNDEF, GPIO_UNDEF };
-#elif (UART_NUMOF == 3)
-static gpio_t uart_sleep_pins[] = { GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF };
-#elif (UART_NUMOF == 4)
-static gpio_t uart_sleep_pins[] = { GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF,
-                                    GPIO_UNDEF };
-#elif (UART_NUMOF == 5)
-static gpio_t uart_sleep_pins[] = { GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF,
-                                    GPIO_UNDEF, GPIO_UNDEF };
-#elif (UART_NUMOF == 6)
-static gpio_t uart_sleep_pins[] = { GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF,
-                                    GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF };
-#else
-#error "uart_sleep_pins definition not ready for so many UARTs"
-#endif
+
+#define UART_DEBOUNCE_DELAY (10000U)    /* 10ms */
 
 static void _break_sleep(uart_t uart, void *arg);
 static void _break_wake(void *arg);
@@ -62,7 +47,7 @@ static inline unsigned _uart_revlookup(uart_t uart)
     return (unsigned)(-1);
 }
 
-int uart_break_sleep(uart_t uart, gpio_t pin)
+int uart_break_sleep_init(uart_t uart)
 {
     /* make sure the device is valid */
     if (uart >= UART_NUMOF) {
@@ -74,6 +59,8 @@ int uart_break_sleep(uart_t uart, gpio_t pin)
     }
 
     unsigned state = irq_disable();
+
+    gpio_t pin = UART_WAKE_PINS(uartnum);
 
     /* register wake callback */
     if (gpio_init_int(pin, GPIO_IN_PD, GPIO_RISING,
@@ -88,9 +75,6 @@ int uart_break_sleep(uart_t uart, gpio_t pin)
             return UART_INTERR;
         }
     }
-
-    /* set uart sleep pin */
-    uart_sleep_pins[uartnum] = pin;
 
     /* register sleep callback */
     if (uart_break_init(_break_sleep, 0x0) != UART_OK) {
@@ -118,17 +102,30 @@ int uart_break_sleep(uart_t uart, gpio_t pin)
     return UART_OK;
 }
 
+void uart_break_sleep_enable(void)
+{
+    uart_break_init(_break_sleep, 0x0);
+}
+
+void uart_break_sleep_disable(void)
+{
+    uart_break_init(NULL, 0x0);
+}
+
 static void _break_sleep(uart_t uart, void *arg)
 {
     (void)arg;
 
     unsigned uartnum = _uart_revlookup(uart);
 
-    DEBUG("[uart] UART%i going to sleep\n", uartnum);
+    if (UART_WAKE_PINS(uartnum) != GPIO_UNDEF) {
+        DEBUG("[uart] UART%i going to sleep\n", uartnum);
 
-    if (uart_sleep_pins[uartnum] != GPIO_UNDEF) {
+        /* wait for contact bounce to quiet */
+        xtimer_usleep(UART_DEBOUNCE_DELAY);
+
         uart_poweroff(uart);
-        gpio_irq_enable(uart_sleep_pins[uartnum]);
+        gpio_irq_enable(UART_WAKE_PINS(uartnum));
     }
 }
 
@@ -136,11 +133,16 @@ static void _break_wake(void *arg)
 {
     unsigned uartnum = (unsigned)(uintptr_t)arg;
 
-    gpio_irq_disable(uart_sleep_pins[uartnum]);
+    gpio_irq_disable(UART_WAKE_PINS(uartnum));
+
+    /* wait for contact bounce to quiet */
+    xtimer_usleep(UART_DEBOUNCE_DELAY);
+
     uart_poweron(UART_DEV(uartnum));
 
     DEBUG("[uart] UART%i waking up\n", uartnum);
 }
+
 #endif /* PERIPH_UART_NEEDS_BREAK_SLEEP */
 
 #endif /* UART_NUMOF */
