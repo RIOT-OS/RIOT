@@ -187,6 +187,10 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         return -EBADMSG;
     }
     netif_hdr = pkt->data;
+    if (netif_hdr->flags & GNRC_NETIF_HDR_FLAGS_MORE_DATA) {
+        /* Set frame pending field */
+        flags |= IEEE802154_FCF_FRAME_PEND;
+    }
     /* prepare destination address */
     if (netif_hdr->flags & /* If any of these flags is set assume broadcast */
         (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
