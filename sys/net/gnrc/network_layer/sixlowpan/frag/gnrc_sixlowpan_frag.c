@@ -117,6 +117,10 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
     hdr->disp_size.u8[0] |= SIXLOWPAN_FRAG_1_DISP;
     hdr->tag = byteorder_htons(_tag);
 
+    /* Tell the link layer that we will send more fragments */
+    gnrc_netif_hdr_t *netif_hdr = frag->data;
+    netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
+
     pkt = pkt->next;    /* don't copy netif header */
 
     while (pkt != NULL) {
@@ -182,6 +186,13 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
 
             memcpy(data, ((uint8_t *)pkt->data) + pkt_offset, clen);
             local_offset = clen;
+            if (local_offset == max_frag_size) {
+                if ((clen < (pkt->size - pkt_offset)) || (pkt->next != NULL)) {
+                    /* Tell the link layer that we will send more fragments */
+                    gnrc_netif_hdr_t *netif_hdr = frag->data;
+                    netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
+                }
+            }
             pkt = pkt->next;
             break;
         }
@@ -197,6 +208,11 @@ static uint16_t _send_nth_fragment(gnrc_netif_t *iface, gnrc_pktsnip_t *pkt,
             local_offset += clen;
 
             if (local_offset == max_frag_size) {
+                if ((clen < pkt->size) || (pkt->next != NULL)) {
+                    /* Tell the link layer that we will send more fragments */
+                    gnrc_netif_hdr_t *netif_hdr = frag->data;
+                    netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MORE_DATA;
+                }
                 break;
             }
 
