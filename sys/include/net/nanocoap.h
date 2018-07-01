@@ -7,9 +7,49 @@
  */
 
 /**
- * @defgroup    net_nanocoap nanocoap small CoAP library
+ * @defgroup    net_nanocoap Nanocoap, small CoAP library
  * @ingroup     net
  * @brief       Provides CoAP functionality optimized for minimal resource usage
+ *
+ * nanocoap includes both server-side response generation and client-side
+ * request generation.
+ *
+ * ## Write Options and Payload ##
+ *
+ * For both server responses and client requests, CoAP uses an Option mechanism
+ * to encode message metadata that is not required for each message. For
+ * example, the resource URI path is required only for a request, and is encoded
+ * as the Uri-Path option.
+ *
+ * nanocoap provides two APIs for writing CoAP options:
+ *
+ * A **minimal** API that requires only a reference to the buffer. However, the
+ * caller must remember and provide the last option number written, as well
+ * as the buffer position. The minimal API always is available.
+ *
+ * A convenient **struct-based** API that uses a coap_pkt_t struct to track each
+ * option as it is written. Activate this API by use of the `nanocoap_opt2`
+ * submodule.
+ *
+ * For either API, the caller *must* write options in order by option number
+ * (see "CoAP option numbers", below).
+ *
+ * ### Higher-level, struct-based API ###
+ *
+ * Before starting, ensure the buffer and CoAP header have been initialized.
+ * For a request, use `coap_build_hdr()`. For a response, update the header
+ * attributes from the request buffer as needed.
+ *
+ * Use `coap_pkt_init()` to initialize the coap_pkt_t struct, including the
+ * array of options.
+ *
+ * Next, use the `coap_opt_add_xxx()` functions to write each option, like
+ * `coap_opt_add_uint()`. When all options have been added, use
+ * `coap_opt_finish()`.
+ *
+ * Finally, write any message payload at the coap_pkt_t payload pointer
+ * attribute. The `payload_len` attribute provides the available length in the
+ * buffer.
  *
  * @{
  *
@@ -403,6 +443,7 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
                        size_t token_len, unsigned code, uint16_t id);
 
+#ifdef MODULE_NANOCOAP_OPT2
 /**
  * @brief   Initialize a packet struct, to build a message buffer
  *
@@ -418,6 +459,7 @@ ssize_t coap_build_hdr(coap_hdr_t *hdr, unsigned type, uint8_t *token,
  * @param[in]    header_len length of header in buf, including token
  */
 void coap_pkt_init(coap_pkt_t *pkt, uint8_t *buf, size_t len, size_t header_len);
+#endif
 
 /**
  * @brief   Insert a CoAP option into buffer
@@ -528,6 +570,7 @@ size_t coap_put_option_block1(uint8_t *buf, uint16_t lastonum, unsigned blknum, 
  */
 size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t lastonum);
 
+#ifdef MODULE_NANOCOAP_OPT2
 /**
  * @brief   Encode the given string as option(s) into pkt
  *
@@ -573,6 +616,7 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
  * @return        total number of bytes written to buffer
  */
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
+#endif   /* MODULE_NANOCOAP_OPT2 */
 
 /**
  * @brief   Get content type from packet
