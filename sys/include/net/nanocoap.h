@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016-17 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2018 Ken Bannister <kb2ma@runbox.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -31,8 +32,10 @@
  * option as it is written. Activate this API by use of the `nanocoap_opt2`
  * submodule.
  *
- * For either API, the caller *must* write options in order by option number
- * (see "CoAP option numbers", below).
+ * For either API, by default the caller *must* write options in order by option
+ * number (see "CoAP option numbers", below). However, the struct-based API
+ * supports use of the `nanocoap_opt2_sort` module. This module allows the user
+ * to enter options in any order, and then sorts them in coap_opt_finish().
  *
  * ### Higher-level, struct-based API ###
  *
