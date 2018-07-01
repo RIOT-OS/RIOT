@@ -1,1 +1,2 @@
 USEMODULE += nanocoap
+USEMODULE += nanocoap_opt2

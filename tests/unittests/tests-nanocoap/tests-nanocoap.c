@@ -46,6 +46,7 @@ static void test_nanocoap__hdr(void)
     TEST_ASSERT_EQUAL_STRING((char *)path, (char *)path_tmp);
 }
 
+#ifdef MODULE_NANOCOAP_OPT2
 /*
  * Client GET request with simple path. Test request generation.
  * Request /time resource from libcoap example
@@ -218,17 +219,20 @@ static void test_nanocoap__get_path_too_long(void)
     int get_len = coap_get_uri(&pkt, (uint8_t *)&uri[0]);
     TEST_ASSERT_EQUAL_INT(-ENOSPC, get_len);
 }
+#endif    /* MODULE_NANOCOAP_OPT2 */
 
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_nanocoap__hdr),
+#ifdef MODULE_NANOCOAP_OPT2
         new_TestFixture(test_nanocoap__get_req),
         new_TestFixture(test_nanocoap__put_req),
         new_TestFixture(test_nanocoap__get_multi_path),
         new_TestFixture(test_nanocoap__get_root_path),
         new_TestFixture(test_nanocoap__get_max_path),
         new_TestFixture(test_nanocoap__get_path_too_long),
+#endif
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
