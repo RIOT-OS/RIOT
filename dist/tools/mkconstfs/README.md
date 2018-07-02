@@ -14,3 +14,8 @@ structures that can be mounted using constfs.
     [...]
 
     vfs_mount((vfs_mount_t *)&_constfs);
+
+# mkconstfs2
+
+This is an alternative tool that takes a list of files instead of a whole
+directory.
