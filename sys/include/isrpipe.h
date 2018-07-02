@@ -35,8 +35,8 @@ extern "C" {
  * @brief   Context structure for isrpipe
  */
 typedef struct {
-    mutex_t mutex;      /**< isrpipe mutex */
     tsrb_t tsrb;        /**< isrpipe thread safe ringbuffer */
+    mutex_t mutex;      /**< isrpipe mutex */
 } isrpipe_t;
 
 /**
