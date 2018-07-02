@@ -1,0 +1,497 @@
+From 542105cafbba381ef40c414a4025ea25d20371a2 Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Mon, 14 May 2018 15:19:14 +0200
+Subject: [PATCH 6/8] Cleanup test module.
+
+This patch makes several improvements to the test module intended
+to allow testing inside embedded environments:
+
+- It does not rely in the standalone intepreter (lua.c).
+- Removes all global variables from the test code.
+- It allows the user to use the state's extra space (the vanilla
+  ltest does not reserve any space for the user).
+- Makes the instrumented test allocator use the user supply
+  allocator instead of malloc/free.
+- The user must provide a panic function. ltests.c no longer sets
+  it's own panic function.
+- Loading of the test modules is controlled by the LUA_DEBUG
+  macro.
+
+This changes should enable heavily customized lua deployments
+(such as would be found in an embedded microprocessor) to be
+tested with minimal modifications.
+---
+ linit.c  |   4 ++-
+ ltests.c |  89 ++++++++++++++++++++++++++--------------------
+ ltests.h | 105 ++++++++++++++++++++++++++++++++++++-------------------
+ lua.c    |  36 +++++++++++++++++--
+ lua.h    |   7 +++-
+ 5 files changed, 163 insertions(+), 78 deletions(-)
+
+diff --git a/linit.c b/linit.c
+index 897ae352..c7ecd387 100644
+--- a/linit.c
++++ b/linit.c
+@@ -50,7 +50,9 @@ static const luaL_Reg loadedlibs[] = {
+   {LUA_MATHLIBNAME, luaopen_math},
+   {LUA_UTF8LIBNAME, luaopen_utf8},
+   {LUA_DBLIBNAME, luaopen_debug},
+-#if defined(LUA_COMPAT_BITLIB)
++#if defined(LUA_DEBUG)
++  {LUA_TESTLIBNAME, luaB_opentests},
++#elif defined(LUA_COMPAT_BITLIB) /* No COMPAT and DEBUG at the same time */
+   {LUA_BITLIBNAME, luaopen_bit32},
+ #endif
+   {NULL, NULL}
+diff --git a/ltests.c b/ltests.c
+index 6dba514a..3ca77d2c 100644
+--- a/ltests.c
++++ b/ltests.c
+@@ -4,7 +4,6 @@
+ ** See Copyright Notice in lua.h
+ */
+ 
+-#define ltests_c
+ #define LUA_CORE
+ 
+ #include "lprefix.h"
+@@ -40,12 +39,6 @@
+ #if defined(LUA_DEBUG)
+ 
+ 
+-void *l_Trick = 0;
+-
+-
+-int islocked = 0;
+-
+-
+ #define obj_at(L,k)	(L->ci->func + (k))
+ 
+ 
+@@ -64,14 +57,6 @@ static void pushobject (lua_State *L, const TValue *o) {
+   api_incr_top(L);
+ }
+ 
+-
+-static int tpanic (lua_State *L) {
+-  fprintf(stderr, "PANIC: unprotected error in call to Lua API (%s)\n",
+-                   lua_tostring(L, -1));
+-  return (exit(EXIT_FAILURE), 0);  /* do not return to Lua */
+-}
+-
+-
+ /*
+ ** {======================================================================
+ ** Controlled version for realloc.
+@@ -103,11 +88,6 @@ typedef union Header {
+ 
+ #endif
+ 
+-
+-Memcontrol l_memcontrol =
+-  {0L, 0L, 0L, 0L, {0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L}};
+-
+-
+ static void freeblock (Memcontrol *mc, Header *block) {
+   if (block) {
+     size_t size = block->d.size;
+@@ -116,16 +96,17 @@ static void freeblock (Memcontrol *mc, Header *block) {
+       lua_assert(*(cast(char *, block + 1) + size + i) == MARK);
+     mc->objcount[block->d.type]--;
+     fillmem(block, sizeof(Header) + size + MARKSIZE);  /* erase block */
+-    free(block);  /* actually free block */
++    mc->alloc_f(mc->alloc_ud, block, size, 0);  /* actually free block */
+     mc->numblocks--;  /* update counts */
+     mc->total -= size;
+   }
+ }
+ 
+ 
+-void *debug_realloc (void *ud, void *b, size_t oldsize, size_t size) {
++static void *debug_realloc (void *ud, void *b, size_t oldsize, size_t size) {
+   Memcontrol *mc = cast(Memcontrol *, ud);
+   Header *block = cast(Header *, b);
++
+   int type;
+   if (mc->memlimit == 0) {  /* first time? */
+     char *limit = getenv("MEMLIMIT");  /* initialize memory limit */
+@@ -152,7 +133,9 @@ void *debug_realloc (void *ud, void *b, size_t oldsize, size_t size) {
+     size_t commonsize = (oldsize < size) ? oldsize : size;
+     size_t realsize = sizeof(Header) + size + MARKSIZE;
+     if (realsize < size) return NULL;  /* arithmetic overflow! */
+-    newblock = cast(Header *, malloc(realsize));  /* alloc a new block */
++    /* alloc a new block */
++    newblock = cast(Header *, mc->alloc_f(mc->alloc_ud, NULL, oldsize, realsize));
++
+     if (newblock == NULL) return NULL;  /* really out of memory? */
+     if (block) {
+       memcpy(newblock + 1, block + 1, commonsize);  /* copy old contents */
+@@ -578,18 +561,26 @@ static int get_limits (lua_State *L) {
+   return 1;
+ }
+ 
++static Memcontrol *get_memcontrol(lua_State *L)
++{
++  void *ud;
++
++  lua_getallocf(L, &ud);
++
++  return (Memcontrol *)ud;
++}
+ 
+ static int mem_query (lua_State *L) {
+   if (lua_isnone(L, 1)) {
+-    lua_pushinteger(L, l_memcontrol.total);
+-    lua_pushinteger(L, l_memcontrol.numblocks);
+-    lua_pushinteger(L, l_memcontrol.maxmem);
++    lua_pushinteger(L, get_memcontrol(L)->total);
++    lua_pushinteger(L, get_memcontrol(L)->numblocks);
++    lua_pushinteger(L, get_memcontrol(L)->maxmem);
+     return 3;
+   }
+   else if (lua_isnumber(L, 1)) {
+     unsigned long limit = cast(unsigned long, luaL_checkinteger(L, 1));
+     if (limit == 0) limit = ULONG_MAX;
+-    l_memcontrol.memlimit = limit;
++    get_memcontrol(L)->memlimit = limit;
+     return 0;
+   }
+   else {
+@@ -597,7 +588,7 @@ static int mem_query (lua_State *L) {
+     int i;
+     for (i = LUA_NUMTAGS - 1; i >= 0; i--) {
+       if (strcmp(t, ttypename(i)) == 0) {
+-        lua_pushinteger(L, l_memcontrol.objcount[i]);
++        lua_pushinteger(L, get_memcontrol(L)->objcount[i]);
+         return 1;
+       }
+     }
+@@ -608,9 +599,9 @@ static int mem_query (lua_State *L) {
+ 
+ static int settrick (lua_State *L) {
+   if (ttisnil(obj_at(L, 1)))
+-    l_Trick = NULL;
++    gettrick(L) = NULL;
+   else
+-    l_Trick = gcvalue(obj_at(L, 1));
++    gettrick(L) = gcvalue(obj_at(L, 1));
+   return 0;
+ }
+ 
+@@ -827,13 +818,22 @@ static int num2int (lua_State *L) {
+   return 1;
+ }
+ 
++/* ugly way of getting the panic function without changing it.
++ */
++static lua_CFunction lua_getpanic (lua_State *L)
++{
++  lua_CFunction panicf = lua_atpanic(L, NULL);
++  lua_atpanic(L, panicf);
++
++  return panicf;
++}
+ 
+ static int newstate (lua_State *L) {
+   void *ud;
+   lua_Alloc f = lua_getallocf(L, &ud);
+   lua_State *L1 = lua_newstate(f, ud);
+   if (L1) {
+-    lua_atpanic(L1, tpanic);
++    lua_atpanic(L1, lua_getpanic(L));
+     lua_pushlightuserdata(L, L1);
+   }
+   else
+@@ -1549,19 +1549,32 @@ static const struct luaL_Reg tests_funcs[] = {
+ };
+ 
+ 
+-static void checkfinalmem (void) {
+-  lua_assert(l_memcontrol.numblocks == 0);
+-  lua_assert(l_memcontrol.total == 0);
++void luaB_init_memcontrol(Memcontrol *mc, lua_Alloc f, void *ud)
++{
++  memset(mc, 0, sizeof(*mc));
++
++  mc->alloc_f = f;
++  mc->alloc_ud = ud;
++}
++
++lua_State * luaB_newstate(Memcontrol *mc)
++{
++  return lua_newstate(debug_realloc, mc);
+ }
+ 
++void luaB_close(lua_State *L)
++{
++  Memcontrol * l_memcontrol = get_memcontrol(L);
++
++  lua_close(L);
++
++  lua_assert(l_memcontrol->numblocks == 0);
++  lua_assert(l_memcontrol->total == 0);
++}
+ 
+ int luaB_opentests (lua_State *L) {
+   void *ud;
+-  lua_atpanic(L, &tpanic);
+-  atexit(checkfinalmem);
+   lua_assert(lua_getallocf(L, &ud) == debug_realloc);
+-  lua_assert(ud == cast(void *, &l_memcontrol));
+-  lua_setallocf(L, lua_getallocf(L, NULL), ud);
+   luaL_newlib(L, tests_funcs);
+   return 1;
+ }
+diff --git a/ltests.h b/ltests.h
+index 9d26fcb0..8e10670b 100644
+--- a/ltests.h
++++ b/ltests.h
+@@ -4,12 +4,18 @@
+ ** See Copyright Notice in lua.h
+ */
+ 
++
+ #ifndef ltests_h
+ #define ltests_h
+ 
++/*
++** The whole module only makes sense with LUA_DEBUG on
++*/
++#if defined(LUA_DEBUG)
+ 
+ #include <stdlib.h>
+ 
++
+ /* test Lua with no compatibility code */
+ #undef LUA_COMPAT_MATHLIB
+ #undef LUA_COMPAT_IPAIRS
+@@ -24,9 +30,6 @@
+ #undef LUA_COMPAT_MODULE
+ 
+ 
+-#define LUA_DEBUG
+-
+-
+ /* turn on assertions */
+ #undef NDEBUG
+ #include <assert.h>
+@@ -48,6 +51,9 @@
+ 
+ /* memory-allocator control variables */
+ typedef struct Memcontrol {
++  lua_Alloc alloc_f;
++  void * alloc_ud;
++
+   unsigned long numblocks;
+   unsigned long total;
+   unsigned long maxmem;
+@@ -55,16 +61,6 @@ typedef struct Memcontrol {
+   unsigned long objcount[LUA_NUMTAGS];
+ } Memcontrol;
+ 
+-LUA_API Memcontrol l_memcontrol;
+-
+-
+-/*
+-** generic variable for debug tricks
+-*/
+-extern void *l_Trick;
+-
+-
+-
+ /*
+ ** Function to traverse and check all memory used by Lua
+ */
+@@ -74,38 +70,72 @@ int lua_checkmemory (lua_State *L);
+ /* test for lock/unlock */
+ 
+ struct L_EXTRA { int lock; int *plock; };
++
++enum {LUA_OLDEXTRASPACE = LUA_EXTRASPACE };
+ #undef LUA_EXTRASPACE
+-#define LUA_EXTRASPACE	sizeof(struct L_EXTRA)
+-#define getlock(l)	cast(struct L_EXTRA*, lua_getextraspace(l))
++
++struct COMP_L_EXTRA {
++  char user_extraspace[LUA_OLDEXTRASPACE];
++  struct L_EXTRA debug_extraspace;
++  void *l_Trick;   /* generic variable for debug tricks */
++};
++
++#define LUA_EXTRASPACE	sizeof(struct COMP_L_EXTRA)
++
++#define getlock(l) \
++  (cast(struct COMP_L_EXTRA*, lua_getextraspace(l))->debug_extraspace)
++
++#define gettrick(l) \
++  (cast(struct COMP_L_EXTRA*, lua_getextraspace(l))->l_Trick)
++
+ #define luai_userstateopen(l)  \
+-	(getlock(l)->lock = 0, getlock(l)->plock = &(getlock(l)->lock))
++	(gettrick(l) = 0, getlock(l).lock = 0, getlock(l).plock = &(getlock(l).lock))
+ #define luai_userstateclose(l)  \
+-  lua_assert(getlock(l)->lock == 1 && getlock(l)->plock == &(getlock(l)->lock))
++  lua_assert(getlock(l).lock == 1 && getlock(l).plock == &(getlock(l).lock))
+ #define luai_userstatethread(l,l1) \
+-  lua_assert(getlock(l1)->plock == getlock(l)->plock)
++  lua_assert(getlock(l1).plock == getlock(l).plock)
+ #define luai_userstatefree(l,l1) \
+-  lua_assert(getlock(l)->plock == getlock(l1)->plock)
+-#define lua_lock(l)     lua_assert((*getlock(l)->plock)++ == 0)
+-#define lua_unlock(l)   lua_assert(--(*getlock(l)->plock) == 0)
++  lua_assert(getlock(l).plock == getlock(l1).plock)
++#define lua_lock(l)     lua_assert((*getlock(l).plock)++ == 0)
++#define lua_unlock(l)   lua_assert(--(*getlock(l).plock) == 0)
+ 
+ 
+ 
++/* Load the test library and assert that the intepreter is correctly set up
++ * for testing.
++ */
+ LUA_API int luaB_opentests (lua_State *L);
+ 
+-LUA_API void *debug_realloc (void *ud, void *block,
+-                             size_t osize, size_t nsize);
+-
+-#if defined(lua_c)
+-#define luaL_newstate()		lua_newstate(debug_realloc, &l_memcontrol)
+-#define luaL_openlibs(L)  \
+-  { (luaL_openlibs)(L); \
+-     luaL_requiref(L, "T", luaB_opentests, 1); \
+-     lua_pop(L, 1); }
+-#endif
+-
+-
+-
+-/* change some sizes to give some bugs a chance */
++/* Initialize the control block for the test allocator.
++ * The test allocator is a wrapper around the user supplied allocator that
++ * records diagnostic and debug information.
++ *
++ * It uses a Memcontrol structure as the "ud" userdata pointer. Inside this
++ * structure the "real" allocator is stored and will be called to perform the
++ * actual memory operations.
++ *
++ * Set f and ud to your application's allocator.
++ */
++LUA_API void luaB_init_memcontrol(Memcontrol *mc, lua_Alloc f, void *ud);
++
++/* Create a new state with a specially instrumented allocator.
++ *
++ * You must supply a properly initialized Memcontrol structure.
++ * */
++LUA_API lua_State * luaB_newstate(Memcontrol *mc);
++
++/* Close the lua state and check that all memory has been freed.
++ */
++LUA_API void luaB_close(lua_State *L);
++
++#define LUA_TESTLIBNAME "T"
++
++/* Change some sizes to give some bugs a chance
++ * Activate this macro to make tests harder.
++ * This is not enabled my default because the user may want only the
++ * functionality of the test module.
++ */
++#ifdef DEBUG_OVERRIDE_SIZES
+ 
+ #undef LUAL_BUFFERSIZE
+ #define LUAL_BUFFERSIZE		23
+@@ -125,5 +155,8 @@ LUA_API void *debug_realloc (void *ud, void *block,
+ #define STRCACHE_N	23
+ #define STRCACHE_M	5
+ 
+-#endif
++#endif /* DEBUG_OVERRIDE_SIZES */
++
++#endif /* LUA_DEBUG */
+ 
++#endif /* ltests_h */
+diff --git a/lua.c b/lua.c
+index 62de0f58..a41cd305 100644
+--- a/lua.c
++++ b/lua.c
+@@ -592,21 +592,53 @@ static int pmain (lua_State *L) {
+   return 1;
+ }
+ 
++static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
++  (void)ud; (void)osize;  /* not used */
++  if (nsize == 0) {
++    free(ptr);
++    return NULL;
++  }
++  else
++    return realloc(ptr, nsize);
++}
++
++static int panic (lua_State *L) {
++  lua_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
++                        lua_tostring(L, -1));
++  return 0;  /* return to Lua to abort */
++}
+ 
+ int main (int argc, char **argv) {
+   int status, result;
+-  lua_State *L = luaL_newstate();  /* create state */
++  lua_State *L;
++
++  #ifdef LUA_DEBUG
++    Memcontrol mc;
++    luaB_init_memcontrol(&mc, l_alloc, NULL);
++    L = luaB_newstate(&mc);
++  #else
++    L = lua_newstate(l_alloc, NULL);
++  #endif /* LUA_DEBUG */
++
+   if (L == NULL) {
+     l_message(argv[0], "cannot create state: not enough memory");
+     return EXIT_FAILURE;
+   }
++
++  lua_atpanic(L, &panic);
+   lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
+   lua_pushinteger(L, argc);  /* 1st argument */
+   lua_pushlightuserdata(L, argv); /* 2nd argument */
+   status = lua_pcall(L, 2, 1, 0);  /* do the call */
+   result = lua_toboolean(L, -1);  /* get result */
+   report(L, status);
+-  lua_close(L);
++
++  #ifdef LUA_DEBUG
++    luaB_close(L);
++  #else
++    lua_close(L);
++  #endif /* LUA_DEBUG */
++
+   return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
+ }
+ 
+diff --git a/lua.h b/lua.h
+index fc4e2388..b40f0d5c 100644
+--- a/lua.h
++++ b/lua.h
+@@ -124,7 +124,6 @@ typedef int (*lua_Writer) (lua_State *L, const void *p, size_t sz, void *ud);
+ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
+ 
+ 
+-
+ /*
+ ** generic extra include file
+ */
+@@ -132,6 +131,12 @@ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
+ #include LUA_USER_H
+ #endif
+ 
++/* (optional) test module
++ *
++ * Note that the ltests.h file will do nothing if LUA_DEBUG is not defined.
++ * This is done this way to avoid having a conditional dependency.
++ */
++#include "ltests.h"
+ 
+ /*
+ ** RCS ident string
+-- 
+2.17.1
+

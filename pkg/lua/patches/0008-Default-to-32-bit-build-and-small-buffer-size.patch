@@ -1,0 +1,41 @@
+From a3bb3e20c12dd7436fe4c3ec4c4f09b98ed0c443 Mon Sep 17 00:00:00 2001
+From: Juan Carrano <j.carrano@fu-berlin.de>
+Date: Tue, 29 May 2018 11:55:49 +0200
+Subject: [PATCH 8/8] Default to 32 bit build and small buffer size.
+
+Set the word length and buffer size in luaconf.h so that it doesn't have to
+be specified in the compiler's command line each time.
+
+LUAL_BUFFERSIZE can still be overrriden by -DLUAL_BUFFERSIZE=xxxx.
+To force a 64 bit build, define LUA_64BIT.
+---
+ luaconf.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/luaconf.h b/luaconf.h
+index e816db00..8093833d 100644
+--- a/luaconf.h
++++ b/luaconf.h
+@@ -33,7 +33,9 @@
+ ** ensure that all software connected to Lua will be compiled with the
+ ** same configuration.
+ */
+-/* #define LUA_32BITS */
++#ifndef LUA_64BITS
++#define LUA_32BITS
++#endif
+ 
+ 
+ /*
+@@ -753,7 +755,7 @@
+ #if LUA_FLOAT_TYPE == LUA_FLOAT_LONGDOUBLE
+ #define LUAL_BUFFERSIZE		8192
+ #else
+-#define LUAL_BUFFERSIZE   ((int)(0x80 * sizeof(void*) * sizeof(lua_Integer)))
++#define LUAL_BUFFERSIZE   64
+ #endif
+ 
+ #endif
+-- 
+2.17.1
+

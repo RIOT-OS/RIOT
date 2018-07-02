@@ -1,4 +1,4 @@
-APPLICATION = lua
+APPLICATION = lua_basic
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -29,12 +29,10 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-USEMODULE += ps
-
 ifneq ($(BOARD),native)
   # This stack size is large enough to run Lua print() functions of
   # various lengths. Other functions untested.
-  CFLAGS += -DTHREAD_STACKSIZE_MAIN=4096
+  CFLAGS += -DTHREAD_STACKSIZE_MAIN='(THREAD_STACKSIZE_DEFAULT+2048)'
 endif
 
 USEPKG += lua
@@ -61,6 +59,6 @@ $(LUA_PATH)/:
 $(LUA_H): | $(LUA_PATH)/
 $(LUA_H): $(LUA_PATH)/%.lua.h: %.lua
 
-	xxd -i $< | sed 's/^unsigned/const/g' > $@
+	xxd -i $< | sed 's/^unsigned/const unsigned/g' > $@
 
 $(RIOTBUILD_CONFIG_HEADER_C): $(LUA_H)
