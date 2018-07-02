@@ -1,0 +1,33 @@
+From a8f8636c0b72d32a931c743d611bba4291a10eb5 Mon Sep 17 00:00:00 2001
+From: Koen Zandberg <koen@bergzand.net>
+Date: Fri, 29 Jun 2018 15:33:52 +0200
+Subject: [PATCH] Monocypher: add riot makefiles
+
+---
+ src/Makefile          | 3 +++
+ src/optional/Makefile | 3 +++
+ 2 files changed, 6 insertions(+)
+ create mode 100644 src/Makefile
+ create mode 100644 src/optional/Makefile
+
+diff --git a/src/Makefile b/src/Makefile
+new file mode 100644
+index 0000000..c0f8d6c
+--- /dev/null
++++ b/src/Makefile
+@@ -0,0 +1,3 @@
++MODULE := monocypher
++
++include $(RIOTBASE)/Makefile.base
+diff --git a/src/optional/Makefile b/src/optional/Makefile
+new file mode 100644
+index 0000000..784d588
+--- /dev/null
++++ b/src/optional/Makefile
+@@ -0,0 +1,3 @@
++MODULE := monocypher_sha512
++
++include $(RIOTBASE)/Makefile.base
+-- 
+2.16.4
+
