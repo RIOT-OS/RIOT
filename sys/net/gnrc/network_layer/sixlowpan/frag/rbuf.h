@@ -65,7 +65,6 @@ typedef struct {
     rbuf_int_t *ints;                   /**< intervals of the fragment */
     uint32_t arrival;                   /**< time in microseconds of arrival of
                                          *   last received fragment */
-    uint16_t cur_size;                  /**< the datagram's current size */
 } rbuf_t;
 
 /**

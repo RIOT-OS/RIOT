@@ -152,12 +152,12 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 
     if (_rbuf_update_ints(entry, offset, frag_size)) {
         DEBUG("6lo rbuf: add fragment data\n");
-        entry->cur_size += (uint16_t)frag_size;
+        entry->super.current_size += (uint16_t)frag_size;
         memcpy(((uint8_t *)entry->super.pkt->data) + offset + data_offset, data,
                frag_size - data_offset);
     }
 
-    if (entry->cur_size == entry->super.pkt->size) {
+    if (entry->super.current_size == entry->super.pkt->size) {
         gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(entry->super.src,
                                                      entry->super.src_len,
                                                      entry->super.dst,
@@ -337,7 +337,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
     res->super.src_len = src_len;
     res->super.dst_len = dst_len;
     res->super.tag = tag;
-    res->cur_size = 0;
+    res->super.current_size = 0;
 
     DEBUG("6lo rfrag: entry %p (%s, ", (void *)res,
           gnrc_netif_addr_to_str(res->super.src, res->super.src_len,

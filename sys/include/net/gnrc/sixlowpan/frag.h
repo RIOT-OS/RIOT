@@ -67,6 +67,10 @@ typedef struct {
     uint8_t src_len;                            /**< length of gnrc_sixlowpan_rbuf_t::src */
     uint8_t dst_len;                            /**< length of gnrc_sixlowpan_rbuf_t::dst */
     uint16_t tag;                               /**< the datagram's tag */
+    /**
+     * @brief   The number of bytes currently received of the complete datagram
+     */
+    uint16_t current_size;
 } gnrc_sixlowpan_rbuf_t;
 
 /**
