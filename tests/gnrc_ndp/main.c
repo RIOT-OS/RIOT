@@ -79,7 +79,9 @@ static void set_up(void)
 static void fill_pktbuf(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL,
-                                          GNRC_PKTBUF_SIZE - sizeof(gnrc_pktsnip_t),
+                                          /* 24 = sizeof(gnrc_pktsnip_t) +
+                                           * potential alignment */
+                                          GNRC_PKTBUF_SIZE - 24U,
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(pkt);
     TEST_ASSERT(gnrc_pktbuf_is_sane());
