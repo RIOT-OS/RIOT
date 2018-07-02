@@ -128,8 +128,8 @@ static const uart_conf_t uart_config[] = {
     {
         .dev    = UART0,
         .freq   = CLOCK_CORECLOCK,
-        .pin_rx = GPIO_PIN(PORT_A, 14),
-        .pin_tx = GPIO_PIN(PORT_A, 15),
+        .pin_rx = GPIO_PIN(PORT_A, 15),
+        .pin_tx = GPIO_PIN(PORT_A, 14),
         .pcr_rx = PORT_PCR_MUX(3),
         .pcr_tx = PORT_PCR_MUX(3),
         .irqn   = UART0_RX_TX_IRQn,
