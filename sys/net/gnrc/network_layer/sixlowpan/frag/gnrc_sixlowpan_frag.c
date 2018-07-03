@@ -294,18 +294,14 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     gnrc_netif_hdr_t *hdr = pkt->next->data;
     sixlowpan_frag_t *frag = pkt->data;
     uint16_t offset = 0;
-    size_t frag_size;
 
     (void)ctx;
-    (void)page;
     switch (frag->disp_size.u8[0] & SIXLOWPAN_FRAG_DISP_MASK) {
         case SIXLOWPAN_FRAG_1_DISP:
-            frag_size = (pkt->size - sizeof(sixlowpan_frag_t));
             break;
 
         case SIXLOWPAN_FRAG_N_DISP:
             offset = (((sixlowpan_frag_n_t *)frag)->offset * 8);
-            frag_size = (pkt->size - sizeof(sixlowpan_frag_n_t));
             break;
 
         default:
@@ -315,7 +311,7 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
             return;
     }
 
-    rbuf_add(hdr, pkt, frag_size, offset);
+    rbuf_add(hdr, pkt, offset, page);
 
     gnrc_pktbuf_release(pkt);
 }
