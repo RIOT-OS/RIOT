@@ -54,15 +54,6 @@ int lc709203f_init(lc709203f_t *dev, const lc709203f_params_t *params)
     dev->bus = params->bus;
     dev->addr = params->addr;
     gpio_init_int(dev->params.alarm_pin, GPIO_IN, GPIO_FALLING, dev->cb, dev->arg);
-    i2c_acquire(dev->bus);
-    if (i2c_init_master(dev->bus, I2C_SPEED_FAST)) {
-        i2c_release(dev->bus);
-        return LC709203F_NOI2C;
-    }
-    i2c_release(dev->bus);
-    if (!lc709203f_get_id(dev)) {
-        return LC709203F_NOI2C;
-    }
     return LC709203F_OK;
 }
 
@@ -71,9 +62,9 @@ int16_t lc709203f_get_voltage(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_CELL_VOLTAGE, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_CELL_VOLTAGE, rec_buf, 3, 0);
     i2c_release(dev->bus);
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_voltage(): Error  reading or writing\n");
         return 0;
     }
@@ -90,10 +81,10 @@ int16_t lc709203f_get_rsoc(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_RSOC, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_RSOC, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_rsoc(): Error  reading\n");
         return 0;
     }
@@ -110,10 +101,10 @@ int16_t lc709203f_get_ite(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_ITE, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_ITE, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_rsoc(): Error reading\n");
         return 0;
     }
@@ -130,10 +121,10 @@ int16_t lc709203f_get_id(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_ID, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_ID, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_id(): Error reading\n");
         return 0;
     }
@@ -150,9 +141,9 @@ int16_t lc709203f_get_cell_temp(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_CELL_TEMP, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_CELL_TEMP, rec_buf, 3, 0);
     i2c_release(dev->bus);
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_cell_temp(): Error reading\n");
         return 0;
     }
@@ -169,10 +160,10 @@ lc709203f_temp_obtaining_mode_t lc709203f_get_status_bit(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_STATUS, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_STATUS, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_status_bit(): Error reading\n");
         return 0;
     }
@@ -189,10 +180,10 @@ lc709203f_power_mode_t lc709203f_get_power_mode(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_POWER_MODE, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_POWER_MODE, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_power_mode(): Error reading\n");
         return 0;
     }
@@ -209,10 +200,10 @@ int16_t lc709203f_get_alarm_low_voltage(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_ALARM_VOLTAGE, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_ALARM_VOLTAGE, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_alarm_low_voltage(): Error reading\n");
         return 0;
     }
@@ -229,10 +220,10 @@ int16_t lc709203f_get_alarm_low_rsoc(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_ALARM_RSOC, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_ALARM_RSOC, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_alarm_low_rsoc(): Error reading\n");
         return 0;
     }
@@ -249,10 +240,10 @@ int16_t lc709203f_get_change_of_parameter(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_CHANGE_PARAMETER, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_CHANGE_PARAMETER, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_change_of_parameter(): Error reading\n");
         return 0;
     }
@@ -269,10 +260,10 @@ int16_t lc709203f_get_apt(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_APT, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_APT, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_apt(): Error reading\n");
         return 0;
     }
@@ -289,10 +280,10 @@ int16_t lc709203f_get_apa(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_APA, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_APA, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_apa(): Error reading\n");
         return 0;
     }
@@ -309,10 +300,10 @@ lc709203f_current_direction_t lc709203f_get_current_direction(const lc709203f_t 
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_CURRENT_DIRECTION, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_CURRENT_DIRECTION, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_current_direction(): Error reading\n");
         return 0;
     }
@@ -329,10 +320,10 @@ int16_t lc709203f_get_thermistor_b(const lc709203f_t *dev)
     assert(dev);
     uint8_t rec_buf[3];
     i2c_acquire(dev->bus);
-    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_THERMISTOR, rec_buf, 3);
+    int8_t control = i2c_read_regs(dev->bus, dev->addr, LC709203F_REG_THERMISTOR, rec_buf, 3, 0);
     i2c_release(dev->bus);
 
-    if (control != 3) {
+    if (control != 0) {
         DEBUG("get_thermistor_b(): Error reading\n");
         return 0;
     }
@@ -351,7 +342,7 @@ void lc709203f_set_rsoc_before(const lc709203f_t *dev)
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -361,7 +352,7 @@ void lc709203f_set_thermistor_b(const lc709203f_t *dev, const unsigned int value
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -372,7 +363,7 @@ void lc709203f_set_rsoc_initial(const lc709203f_t *dev)
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -386,7 +377,7 @@ int8_t lc709203f_set_cell_temp(const lc709203f_t *dev, const unsigned int value)
     uint8_t crc_buf[4] = { dev->addr << 1, LC709203F_REG_CELL_TEMP, value, value << 8 };
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
     i2c_acquire(dev->bus);
-    int8_t ret_val = i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    int8_t ret_val = i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
     return ret_val;
 }
@@ -398,7 +389,7 @@ void lc709203f_set_current_direction(const lc709203f_t *dev, const lc709203f_cur
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -409,7 +400,7 @@ void lc709203f_set_apa(const lc709203f_t *dev, const uint8_t value)
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -420,7 +411,7 @@ void lc709203f_set_apt(const lc709203f_t *dev, const unsigned int value)
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -431,7 +422,7 @@ void lc709203f_set_change_of_parameter(const lc709203f_t *dev, const lc709203f_b
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -442,7 +433,7 @@ void lc709203f_set_alarm_low_rsoc(const lc709203f_t *dev, const uint8_t value)
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -453,7 +444,7 @@ void lc709203f_set_alarm_low_cell_voltage(const lc709203f_t *dev, const unsigned
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -464,7 +455,7 @@ void lc709203f_set_power_mode(const lc709203f_t *dev, const lc709203f_power_mode
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
 
@@ -475,6 +466,6 @@ void lc709203f_set_status_bit(const lc709203f_t *dev, const lc709203f_temp_obtai
     uint8_t send_buf[3] = { crc_buf[2], crc_buf[3], _get_crc(crc_buf, 4) };
 
     i2c_acquire(dev->bus);
-    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3);
+    i2c_write_regs(dev->bus, dev->addr, crc_buf[1], send_buf, 3, 0);
     i2c_release(dev->bus);
 }
