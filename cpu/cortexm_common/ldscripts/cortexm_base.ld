@@ -108,6 +108,7 @@ SECTIONS
     /* stack section */
     .stack (NOLOAD):
     {
+        KEEP (*(.puf))
         . = ALIGN(8);
         _sstack = .;
         KEEP (*(.isr_stack))

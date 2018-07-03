@@ -31,6 +31,9 @@
 #include "mpu.h"
 #include "panic.h"
 #include "vectors_cortexm.h"
+#ifdef MODULE_PUF_SRAM
+#include "puf_sram.h"
+#endif
 
 #ifndef SRAM_BASE
 #define SRAM_BASE 0
@@ -76,6 +79,10 @@ void reset_handler_default(void)
 {
     uint32_t *dst;
     uint32_t *src = &_etext;
+
+#ifdef MODULE_PUF_SRAM
+    puf_sram_init((uint8_t *)&_srelocate, SEED_RAM_LEN);
+#endif
 
     pre_startup();
 

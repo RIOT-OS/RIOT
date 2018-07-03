@@ -616,6 +616,12 @@ ifneq (,$(filter conn_can,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter puf_sram,$(USEMODULE)))
+  USEMODULE += hashes
+  USEMODULE += random
+  FEATURES_REQUIRED += puf_sram
+endif
+
 ifneq (,$(filter random,$(USEMODULE)))
   USEMODULE += prng
   # select default prng
