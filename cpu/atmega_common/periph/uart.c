@@ -241,12 +241,6 @@ void uart_poweron(uart_t uart)
 
 void uart_poweroff(uart_t uart)
 {
-    unsigned state = irq_disable();
-
-    /* disable and reset UART */
-    dev[uart]->CSRB = 0;
-    dev[uart]->CSRA = 0;
-
     switch (uart) {
         case 0: power_usart0_disable();
 #if (UART_NUMOF == 2)
@@ -261,8 +255,6 @@ void uart_poweroff(uart_t uart)
 #endif
         default: return;
     }
-
-    irq_restore(state);
 }
 
 static inline void isr_handler(int num)
