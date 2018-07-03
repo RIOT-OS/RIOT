@@ -128,6 +128,11 @@ This could include:
     review
 -   Usage of GitHub functionality, for example "Reviewers" and "Assignees" lists
 
+#### Github etiquette
+
+-   If there are multiple maintainers reviewing a PR, always give the other
+    maintainers reasonable time to ACK before dismissing their review.
+
 [list of maintainers]: https://github.com/RIOT-OS/RIOT/wiki/Maintainers
 [Best Practices]: https://github.com/RIOT-OS/RIOT/wiki/Best-Practice-for-RIOT-Programming
 [Comparing build sizes]: https://github.com/RIOT-OS/RIOT/wiki/Comparing-build-sizes
