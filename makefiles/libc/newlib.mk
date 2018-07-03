@@ -74,7 +74,7 @@ endif
 # the current PATH and use a relative path for the includes
 ifeq (,$(NEWLIB_INCLUDE_DIR))
   GCC_RELATIVE_INCLUDE_PATH := $(dir $(shell command -v $(PREFIX)gcc 2>/dev/null))/../$(TARGET_ARCH)/include
-  NEWLIB_INCLUDE_DIR := $(realpath $(wildcard $(GCC_RELATIVE_INCLUDE_PATH)))
+  NEWLIB_INCLUDE_DIR := $(call dir_contains_newlib_h, $(GCC_RELATIVE_INCLUDE_PATH))
 endif
 
 ifeq ($(TOOLCHAIN),llvm)
@@ -100,7 +100,7 @@ ifeq (1,$(USE_NEWLIB_NANO))
     $(NEWLIB_INCLUDE_DIR)/newlib/nano \
     $(NEWLIB_INCLUDE_DIR)/nano \
     #
-  NEWLIB_NANO_INCLUDE_DIR ?= $(firstword $(wildcard $(NEWLIB_NANO_INCLUDE_PATTERNS)))
+  NEWLIB_NANO_INCLUDE_DIR ?= $(firstword $(call dir_contains_newlib_h, $(NEWLIB_NANO_INCLUDE_PATTERNS)))
 
   # newlib-nano overrides newlib.h and its include dir should therefore go before
   # the regular system include dirs.
