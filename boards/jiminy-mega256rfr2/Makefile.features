@@ -4,5 +4,7 @@ include $(RIOTBOARD)/common/arduino-atmega/Makefile.features
 # Put defined MCU peripherals here (in alphabetical order)
 # Peripherals are defined in common/arduino-atmega/Makefile.features
 # Add only additional Peripherals
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtt
 
 -include $(RIOTCPU)/atmega256rfr2/Makefile.features
