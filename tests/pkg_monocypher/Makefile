@@ -9,7 +9,6 @@ USEMODULE += embunit
 USEMODULE += random
 USEPKG += monocypher
 
-TEST_ON_CI_WHITELIST += all
 include $(RIOTBASE)/Makefile.include
 
 test:
