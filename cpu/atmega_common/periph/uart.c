@@ -220,7 +220,8 @@ void uart_poweron(uart_t uart)
         case 2: power_usart2_enable();
 #endif
 #if (UART_NUMOF == 4)
-        case 3: power_usart3_enable();
+        /* workaround missing library function */
+        case 3: PRR1 &= ~(1 << PRUSART3);
 #endif
     }
 
@@ -254,7 +255,8 @@ void uart_poweroff(uart_t uart)
         case 2: power_usart2_disable();
 #endif
 #if (UART_NUMOF == 4)
-        case 3: power_usart3_disable();
+        /* workaround missing library function */
+        case 3: PRR1 |= (1 << PRUSART3);
 #endif
     }
 
