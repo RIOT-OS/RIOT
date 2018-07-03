@@ -223,6 +223,7 @@ void uart_poweron(uart_t uart)
         /* workaround missing library function */
         case 3: PRR1 &= ~(1 << PRUSART3);
 #endif
+        default: return;
     }
 
     /* bring UART to its state prior to sleeping */
@@ -258,6 +259,7 @@ void uart_poweroff(uart_t uart)
         /* workaround missing library function */
         case 3: PRR1 |= (1 << PRUSART3);
 #endif
+        default: return;
     }
 
     irq_restore(state);
