@@ -123,6 +123,11 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
         }
 
         _add_timer_to_long_list(&long_list_head, timer);
+        /* No timer scheduled in this timer period
+         * schedule callback on next overflow */
+        if (!timer_list_head) {
+            _lltimer_set(_xtimer_lltimer_mask(0xFFFFFFFF));
+        }
         irq_restore(state);
         DEBUG("xtimer_set64(): added longterm timer (long_target=%" PRIu32 " target=%" PRIu32 ")\n",
                 timer->long_target, timer->target);
@@ -200,11 +205,21 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
     if ( (timer->long_target > _long_cnt) || !_this_high_period(target) ) {
         DEBUG("xtimer_set_absolute(): the timer doesn't fit into the low-level timer's mask.\n");
         _add_timer_to_long_list(&long_list_head, timer);
+        /* No timer scheduled in this timer period
+         * schedule callback on next overflow */
+        if (!timer_list_head) {
+            _lltimer_set(_xtimer_lltimer_mask(0xFFFFFFFF));
+        }
     }
     else {
         if (_xtimer_lltimer_mask(now) >= target) {
             DEBUG("xtimer_set_absolute(): the timer will expire in the next timer period\n");
             _add_timer_to_list(&overflow_list_head, timer);
+            /* No timer scheduled in this timer period
+             * schedule callback on next overflow */
+            if (!timer_list_head) {
+                _lltimer_set(_xtimer_lltimer_mask(0xFFFFFFFF));
+            }
         }
         else {
             DEBUG("timer_set_absolute(): timer will expire in this timer period.\n");
@@ -260,16 +275,18 @@ static int _remove_timer_from_list(xtimer_t **list_head, xtimer_t *timer)
 static void _remove(xtimer_t *timer)
 {
     if (timer_list_head == timer) {
-        uint32_t next;
         timer_list_head = timer->next;
         if (timer_list_head) {
             /* schedule callback on next timer target time */
-            next = timer_list_head->target - XTIMER_OVERHEAD;
+            _lltimer_set(timer_list_head->target - XTIMER_OVERHEAD);
+        }
+        else if (overflow_list_head || long_list_head) {
+            /* schedule callback on next overflow */
+            _lltimer_set(_xtimer_lltimer_mask(0xFFFFFFFF));
         }
         else {
-            next = _xtimer_lltimer_mask(0xFFFFFFFF);
+            /* zero ongoing timer, no callback schedule */
         }
-        _lltimer_set(next);
     }
     else {
         if (!_remove_timer_from_list(&timer_list_head, timer)) {
@@ -505,11 +522,13 @@ overflow:
         if (next_target < (_xtimer_lltimer_now() + XTIMER_ISR_BACKOFF)) {
             goto overflow;
         }
+
+        _in_handler = 0;
+        /* set low level timer */
+        _lltimer_set(next_target);
     }
     else {
         /* there's no timer planned for this timer period */
-        /* schedule callback on next overflow */
-        next_target = _xtimer_lltimer_mask(0xFFFFFFFF);
         uint32_t now = _xtimer_lltimer_now();
 
         /* check for overflow again */
@@ -528,10 +547,16 @@ overflow:
                 goto overflow;
             }
         }
+
+        _in_handler = 0;
+
+        if (overflow_list_head || long_list_head) {
+            /* some timers are scheduled for the future timer periods */
+            /* schedule callback on next overflow */
+            _lltimer_set(_xtimer_lltimer_mask(0xFFFFFFFF));
+        }
+        else {
+            /* zero ongoing timer, no callback schedule */
+        }
     }
-
-    _in_handler = 0;
-
-    /* set low level timer */
-    _lltimer_set(next_target);
 }
