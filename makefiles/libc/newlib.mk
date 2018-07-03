@@ -23,7 +23,11 @@ export LINKFLAGS += -lc
 
 # Try to search for newlib in the standard search path of the compiler for includes
 ifeq (,$(NEWLIB_INCLUDE_DIR))
-  COMPILER_INCLUDE_PATHS := $(shell $(PREFIX)gcc -v -x c -E /dev/null 2>&1 | grep '^\s' | tr -d '\n')
+  COMPILER_INCLUDE_PATHS := $(shell $(PREFIX)gcc -v -x c -E /dev/null 2>&1 | \
+                              sed \
+                              -e '1,/\#include <...> search starts here:/d' \
+                              -e '/End of search list./,$$d' \
+                              -e 's/^ *//')
   NEWLIB_INCLUDE_DIR := $(firstword $(dir $(wildcard $(addsuffix /newlib.h, $(COMPILER_INCLUDE_PATHS)))))
 endif
 
