@@ -12,6 +12,7 @@
  *
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Koen Zandberg <koen@bergzand.net>
  */
 
 #include <assert.h>
@@ -48,6 +49,74 @@ static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
     ieee802154_get_iid(value, addr, addr_len);
 
     return sizeof(eui64_t);
+}
+
+int netdev_ieee802154_send(netdev_t *dev, const iolist_t *list)
+{
+    netdev_ieee802154_t *netdev = (netdev_ieee802154_t *)dev;
+    netdev_ieee802154_data_hdr_t *data = list->iol_base;
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
+    uint8_t flags = (uint8_t)(netdev->flags & NETDEV_IEEE802154_SEND_MASK);
+    int res = 0;
+    le_uint16_t dev_pan = byteorder_btols(byteorder_htons(netdev->pan));
+    flags |= IEEE802154_FCF_TYPE_DATA;
+    /* fill MAC header, seq should be set by device */
+    if ((res = ieee802154_set_frame_hdr(mhr, data->src, data->src_len,
+                                        data->dst, data->dst_len,
+                                        dev_pan, dev_pan,
+                                        flags, netdev->seq++)) == 0) {
+        DEBUG("netdev_ieee802154: Error preperaring frame\n");
+        return -EINVAL;
+    }
+
+#ifdef MODULE_NETSTATS_L2
+    if (data->dst_len == 2 && data->dst[0] == 0xff && data->dst[1] == 0xff) {
+        dev->stats.tx_mcast_count++;
+    }
+    else {
+        dev->stats.tx_unicast_count++;
+    }
+#endif
+    /* prepare iolist for netdev / mac layer */
+    iolist_t iolist = {
+        .iol_next = list->iol_next,
+        .iol_base = mhr,
+        .iol_len = res
+    };
+    return dev->driver->send(dev, &iolist);
+}
+
+int netdev_ieee802154_recv(netdev_t *dev, void *buf, size_t len, void *info)
+{
+    /* Leave space for the generic data header */
+    netdev_ieee802154_t *netdev = (netdev_ieee802154_t *)dev;
+    /* If buf is NULL, pdu_start should also be NULL */
+    uint8_t *pdu_start = (buf) ? buf + sizeof(netdev_ieee802154_data_hdr_t) : buf;
+    netdev_ieee802154_data_hdr_t *l2data_hdr = buf;
+    int res = dev->driver->recv(dev, pdu_start, len, info);
+    if (res < 0) {
+        return res;
+    }
+    if (!(netdev->flags & NETDEV_IEEE802154_RAW)) {
+        if (buf) {
+            int dst_len, src_len;
+            le_uint16_t _pan_tmp;
+            size_t mhr_len = ieee802154_get_frame_hdr_len(pdu_start);
+            dst_len = ieee802154_get_dst(pdu_start, l2data_hdr->dst, &_pan_tmp);
+            src_len = ieee802154_get_src(pdu_start, l2data_hdr->src, &_pan_tmp);
+            if ((dst_len < 0) || (src_len < 0)) {
+                DEBUG("netdev_ieee802154: unable to get addresses\n");
+                return -EINVAL;
+            }
+            l2data_hdr->src_len = src_len;
+            l2data_hdr->dst_len = dst_len;
+            /* Remove the ieee802154 frame header */
+            memmove(pdu_start, pdu_start+mhr_len, res - mhr_len);
+            res -= mhr_len;
+        }
+        res += sizeof(netdev_ieee802154_data_hdr_t);
+    }
+    return res;
 }
 
 int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
