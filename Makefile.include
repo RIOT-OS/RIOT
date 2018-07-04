@@ -228,8 +228,6 @@ export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 
 # Add standard include directories
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/$(BOARD)/include))
 
 # process provided features
 -include $(RIOTBOARD)/$(BOARD)/Makefile.features
@@ -237,7 +235,11 @@ INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/$(BOARD)/include))
 # mandatory includes!
 include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
+
+# Include Board and CPU configuration
+INCLUDES += $(addprefix -I,$(wildcard $(RIOTBOARD)/$(BOARD)/include))
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
 # Import all toolchain settings
