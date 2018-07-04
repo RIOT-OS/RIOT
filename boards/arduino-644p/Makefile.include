@@ -1,0 +1,15 @@
+# define the cpu used by the Mega Xplained board
+export CPU = atmega644p
+
+# configure the terminal program
+export PORT_LINUX ?= /dev/ttyACM0
+export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+export PROGRAMMER_SPEED ?= 115200
+
+export FFLAGS += -p m644p
+
+# PROGRAMMER defaults to arduino which is the internal flasher via USB. Can be
+# overridden for debugging (which requires changes that require to use an ISP)
+export PROGRAMMER ?= arduino
+
+include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

@@ -1,0 +1,10 @@
+/**
+ * @defgroup        cpu_atmega644p Atmel ATmega644p
+ * @ingroup         cpu
+ * @brief           Implementation of Atmel's ATmega644p MCU
+ */
+
+/**
+ * @defgroup        cpu_atmega644p_definitions Atmel ATmega1284p Definitions
+ * @ingroup         cpu_atmega644p
+ */
