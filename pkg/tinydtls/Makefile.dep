@@ -3,7 +3,8 @@ ifneq (,$(filter tinydtls,$(USEPKG)))
 endif
 
 ifneq (,$(filter tinydtls,$(USEMODULE)))
+  USEMODULE += memarray
+  USEMODULE += hashes
   USEMODULE += tinydtls_aes
   USEMODULE += tinydtls_ecc
-  USEMODULE += tinydtls_sha2
 endif

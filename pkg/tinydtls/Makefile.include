@@ -6,14 +6,43 @@ ifeq ($(TOOLCHAIN), llvm)
   CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function
 endif
 
+ifneq (,$(filter tinydtls,$(USEMODULE)))
+  INCLUDES += -I$(PKG_BUILDDIR)
+  # Mandatory for tinyDTLS
+  CFLAGS += -DDTLSv12 -DWITH_SHA256
+
+  # Dependencies partially under control of the App's requirements
+
+  # The configuration for socket overrides Sock
+  ifeq (,$(filter WITH_RIOT_SOCKETS,$(CFLAGS)))
+    CFLAGS += -DWITH_RIOT_GNRC
+  endif
+
+  # NOTE: PSK should be enabled by default BUT if the user define any other cipher
+  #       suite(s) it should not be enabled.
+  # TODO: Create the flag DTLS_CIPHERS with keywords PSK, ECC (and future)
+  ifeq (,$(filter -DDTLS_PSK,$(CFLAGS)))
+    ifeq (,$(filter -DDTLS_ECC,$(CFLAGS)))
+      CFLAGS += -DDTLS_PSK
+    endif
+  endif
+
+  # Handles the verbosity of tinyDTLS. Default: Minimum or just error messages.
+  ifeq (,$(filter -DTINYDTLS_DEBUG,$(CFLAGS)))
+    ifeq ( , $(TINYDTLS_LOG))
+      CFLAGS += -DTINYDTLS_LOG_LVL=0
+    else
+      CFLAGS += -DTINYDTLS_LOG_LVL=$(TINYDTLS_LOG)
+    endif
+  else
+    CFLAGS += -DTINYDTLS_LOG_LVL=6
+  endif
+endif
+
 ifneq (,$(filter tinydtls_aes,$(USEMODULE)))
   DIRS += $(PKG_BUILDDIR)/aes
 endif
 
 ifneq (,$(filter tinydtls_ecc,$(USEMODULE)))
   DIRS += $(PKG_BUILDDIR)/ecc
-endif
-
-ifneq (,$(filter tinydtls_sha2,$(USEMODULE)))
-  DIRS += $(PKG_BUILDDIR)/sha2
 endif
