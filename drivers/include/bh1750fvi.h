@@ -69,7 +69,6 @@ typedef struct {
 typedef struct {
     i2c_t i2c;          /**< I2C bus the device is connected to */
     uint8_t addr;       /**< slave address of the device */
-    i2c_speed_t clk;    /**< clock speed to use on the I2C bus */
 } bh1750fvi_params_t;
 
 /**
