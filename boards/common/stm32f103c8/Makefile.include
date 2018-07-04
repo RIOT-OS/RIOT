@@ -2,6 +2,8 @@
 export CPU = stm32f1
 export CPU_MODEL = stm32f103c8
 
+INCLUDES += -I$(RIOTBOARD)/common/stm32f103c8/include
+
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
@@ -24,11 +26,9 @@ ifeq ($(PROGRAMMER),dfu-util)
   export FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D "$(HEXFILE)"
 else
 
-# this board uses openocd by default
-export DEBUG_ADAPTER ?= stlink
-export STLINK_VERSION ?= 2
+  # this board uses openocd by default
+  export DEBUG_ADAPTER ?= stlink
+  export STLINK_VERSION ?= 2
 
-include $(RIOTMAKE)/tools/openocd.inc.mk
-
-INCLUDES += -I$(RIOTBOARD)/common/stm32f103c8/include
+  include $(RIOTMAKE)/tools/openocd.inc.mk
 endif
