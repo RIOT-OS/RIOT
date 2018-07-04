@@ -28,7 +28,6 @@
 
 #include <stdint.h>
 
-#include "saul.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
@@ -81,11 +80,6 @@ enum {
     TCS37727_NOBUS  = -1,   /**< access to the configured I2C bus failed */
     TCS37727_NODEV  = -2    /**< no TCS37727 device found on the bus */
 };
-
-/**
- * @brief   Export the sensor's SAUL interface
- */
-extern const saul_driver_t tcs37727_saul_driver;
 
 /**
  * @brief   Initialize the given TCS37727 sensor
