@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/arduino-atmega-common/Makefile.features
