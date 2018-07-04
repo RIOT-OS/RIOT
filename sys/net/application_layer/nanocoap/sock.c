@@ -25,7 +25,7 @@
 #include "net/nanocoap.h"
 #include "net/sock/udp.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #ifdef MODULE_SOCK_SECURE
@@ -39,7 +39,8 @@
 sock_secure_session_t secure_session = { .flag=0, .cb=NULL};
 uint8_t *ext_buf;
 size_t  ext_bufsize;
-static void _dtls_data_app_handler(uint8_t *buf, size_t bufsize, void *sock)
+
+static void _dtls_server_data_app_handler(uint8_t *buf, size_t bufsize, void *sock)
 {
     (void) sock;
     coap_pkt_t pkt;
@@ -58,6 +59,23 @@ static void _dtls_data_app_handler(uint8_t *buf, size_t bufsize, void *sock)
     }
 }
 
+static coap_pkt_t client_pkt;
+
+static void _dtls_client_data_app_handler(uint8_t *buf, size_t bufsize, void *sock)
+{
+    (void) sock;
+
+    // size_t pdu_len = (client_pkt.payload - (uint8_t *)client_pkt.hdr) + client_pkt.payload_len;
+    if (coap_parse(&client_pkt, buf, bufsize) < 0)  {
+        DEBUG("nanocoap: error parsing packet\n");
+        return;
+    }
+    /* FIXME */
+    DEBUG("%s: CoAPS Hex raw bytes: \n", __func__);
+    od_hex_dump(buf, bufsize, OD_WIDTH_DEFAULT);
+}
+
+
 #endif /* MODULE_SOCK_SECURE */
 
 ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *remote, size_t len)
@@ -68,8 +86,25 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
     sock_udp_t sock;
 
     if (!remote->port) {
-        remote->port = COAP_PORT;
+#ifdef MODULE_SOCK_SECURE
+      local->port = COAP_PORT +1; /* CoAPS default port 5684 */
+#else
+      local->port = COAP_PORT;
+#endif
     }
+
+#ifdef MODULE_SOCK_SECURE
+    secure_session.flag = TLSMAN_FLAG_STACK_DTLS | TLSMAN_FLAG_SIDE_CLIENT;
+    uint16_t ciphers[] = SECURE_CIPHER_LIST;
+    /*  FIXME (This should be called only one time!) */
+    res = sock_secure_load_stack(&secure_session, ciphers, sizeof(ciphers));
+    if (res) {
+      puts("ERROR: Unable to load (D)TLS stack ");
+      return -1;
+    }
+    // ext_buf = buf;
+    // ext_bufsize = bufsize;
+#endif /* MODULE_SOCK_SECURE */
 
     res = sock_udp_create(&sock, local, remote, 0);
     if (res < 0) {
@@ -80,6 +115,41 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
      * ACK_RANDOM_FACTOR) */
     uint32_t timeout = COAP_ACK_TIMEOUT * (1000000U);
     int tries = 0;
+#ifdef MODULE_SOCK_SECURE
+
+    res = sock_secure_initialized(&secure_session,
+                                  _dtls_client_data_app_handler,
+                                  (void *)&sock,
+                                  (sock_secure_ep_t*)local,
+                                  (sock_secure_ep_t *)remote);
+
+    if (res != 0) {
+        puts("ERROR: Unable to init sock_secure!");
+        return -1;
+    }
+
+    /* NOTE: This start the dtls handhsake. */
+    sock_secure_update(&secure_session);
+
+    (void) tries;
+    (void) timeout;
+    (void) len;
+
+    /* FIXME Upgrade sock_secure for supporting */
+    while (tries++ < 1) {
+      if (!tries) {
+          DEBUG("nanocoap: maximum retries reached.\n");
+          res = -ETIMEDOUT;
+          goto out;
+      }
+      /* TODO sock_secure_[write|read]() must accept custom timeouts */
+      /* TODO sock_secure_[write|read]() should return written bytes? */
+      sock_secure_write(&secure_session, buf, pdu_len);
+      sock_secure_read(&secure_session);
+
+    }
+    goto out;
+#else /* MODULE_SOCK_SECURE */
     while (tries++ < COAP_MAX_RETRANSMIT) {
         if (!tries) {
             DEBUG("nanocoap: maximum retries reached.\n");
@@ -112,8 +182,11 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
             break;
         }
     }
-
+#endif /* MODULE_SOCK_SECURE */
 out:
+#ifdef MODULE_SOCK_SECURE
+    sock_secure_release(&secure_session);
+#endif
     sock_udp_close(&sock);
 
     return res;
@@ -180,7 +253,7 @@ int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize)
 
 #ifdef MODULE_SOCK_SECURE
     res = sock_secure_initialized(&secure_session,
-                                          _dtls_data_app_handler,
+                                          _dtls_server_data_app_handler,
                                           (void *)&sock,
                                           (sock_secure_ep_t*)&local,
                                           (sock_secure_ep_t *)&remote);
