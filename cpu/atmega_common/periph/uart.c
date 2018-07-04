@@ -94,16 +94,14 @@ static inline uint8_t _is_asleep(uart_t uart)
         return ((PRR0 >> PRUSART0) & 0x1);
     }
 
-#if defined(CPU_ATMEGA1284P)
     else if (uart == 1) {
+#if defined(CPU_ATMEGA1284P)
         /* ATmega1284P uses PRR0 instead of PRR1 */
         return ((PRR0 >> PRUSART1) & 0x1);
-    }
 #else
-    else if (uart == 1) {
         return ((PRR1 >> PRUSART1) & 0x1);
+#endif
     }
-#endif /* defined(CPU_ATMEGA1284P) */
 
 #if (UART_NUMOF > 2)
     else if (uart == 2) {
