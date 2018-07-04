@@ -39,6 +39,7 @@
 
 #include "isrpipe.h"
 #include "periph/uart.h"
+#include "clist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,12 +78,41 @@ extern "C" {
 #define AT_RECV_ERROR "ERROR"
 #endif
 
+#if defined(MODULE_AT_URC) || DOXYGEN
+#ifndef AT_BUF_SIZE
+/** Internal buffer size used to process unsolicited result code data */
+#define AT_BUF_SIZE (128)
+#endif
+
+/**
+ * @brief   Unsolicited result code callback
+ *
+ * @param[in]   arg     optional argument
+ * @param[in]   code    urc string received from the device
+ */
+typedef void (*at_urc_cb_t)(void *arg, const char *code);
+
+/**
+ * @brief   Unsolicited result code data structure
+ */
+typedef struct {
+    clist_node_t list_node; /**< node list */
+    at_urc_cb_t cb;         /**< callback */
+    const char *code;       /**< URC string which must match */
+    void *arg;              /**< optional argument */
+} at_urc_t;
+
+#endif /* MODULE_AT_URC */
+
 /**
  * @brief AT device structure
  */
 typedef struct {
     isrpipe_t isrpipe;      /**< isrpipe used for getting data from uart */
     uart_t uart;            /**< UART device where the AT device is attached */
+#ifdef MODULE_AT_URC
+    clist_node_t urc_list;  /**< list to keep track of all registered urc's */
+#endif
 } at_dev_t;
 
 /**
@@ -225,6 +255,32 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, ui
  * @param[in]   dev     device to operate on
  */
 void at_drain(at_dev_t *dev);
+
+#if defined(MODULE_AT_URC) || DOXYGEN
+/**
+ * @brief   Add a callback for an unsolicited response code
+ *
+ * @param[in]   dev     device to operate on
+ * @param[in]   urc     unsolicited result code to register
+ */
+void at_add_urc(at_dev_t *dev, at_urc_t *urc);
+
+/**
+ * @brief   Remove an unsolicited response code from the list
+ *
+ * @param[in]   dev     device to operate on
+ * @param[in]   urc     unsolicited result code to remove
+ */
+void at_remove_urc(at_dev_t *dev, at_urc_t *urc);
+
+/**
+ * @brief   Process out-of-band data received from the device
+ *
+ * @param[in]   dev     device to operate on
+ * @param[in]   timeout timeout (in usec)
+ */
+void at_process_urc(at_dev_t *dev, uint32_t timeout);
+#endif
 
 #ifdef __cplusplus
 }
