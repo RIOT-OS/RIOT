@@ -53,8 +53,19 @@ int main(void)
 #else
     sock_udp_ep_t local = { .port=COAP_PORT, .family=AF_INET6 };
 #endif
-    nanocoap_server(&local, buf, sizeof(buf));
 
+#if 0
+    (void) local;
+    sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
+    remote.port = 5684;
+    char addr_str[] = "fe80::ac9f:5dff:feb3:866e";
+    char path[] = "/riot/board";
+    ipv6_addr_from_str((ipv6_addr_t *)&remote.addr.ipv6, addr_str);
+
+    nanocoap_get(&remote, path, buf, COAP_INBUF_SIZE);
+#else
+    nanocoap_server(&local, buf, sizeof(buf));
+#endif
     /* should be never reached */
     return 0;
 }
