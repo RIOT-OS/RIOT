@@ -225,7 +225,7 @@ static inline uint32_t byteorder_swapl(uint32_t v);
 static inline uint64_t byteorder_swapll(uint64_t v);
 
 /**
- * @brief           Read a little endian encoded unsigned integer from a buffer
+ * @brief           Read a big endian encoded unsigned integer from a buffer
  *                  into host byte order encoded variable, 16-bit
  *
  * @note            This function is agnostic to the alignment of the target
@@ -235,10 +235,10 @@ static inline uint64_t byteorder_swapll(uint64_t v);
  *
  * @return          16-bit unsigned integer in host byte order
  */
-static inline uint16_t byteorder_lebuftohs(const uint8_t *buf);
+static inline uint16_t byteorder_bebuftohs(const uint8_t *buf);
 
 /**
- * @brief           Write a host byte order encoded unsigned integer as little
+ * @brief           Write a host byte order encoded unsigned integer as big
  *                  endian encoded value into a buffer, 16-bit
  *
  * @note            This function is alignment agnostic and works with any given
@@ -247,7 +247,7 @@ static inline uint16_t byteorder_lebuftohs(const uint8_t *buf);
  * @param[out] buf  target buffer, must be able to accept 2 bytes
  * @param[in]  val  value written to the buffer, in host byte order
  */
-static inline void byteorder_htolebufs(uint8_t *buf, uint16_t val);
+static inline void byteorder_htobebufs(uint8_t *buf, uint16_t val);
 
 /**
  * @brief          Convert from host byte order to network byte order, 16 bit.
@@ -443,7 +443,7 @@ static inline uint64_t ntohll(uint64_t v)
     return byteorder_ntohll(input);
 }
 
-static inline uint16_t byteorder_lebuftohs(const uint8_t *buf)
+static inline uint16_t byteorder_bebuftohs(const uint8_t *buf)
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     return (uint16_t)((buf[0] << 8) | buf[1]);
@@ -452,7 +452,7 @@ static inline uint16_t byteorder_lebuftohs(const uint8_t *buf)
 #endif
 }
 
-static inline void byteorder_htolebufs(uint8_t *buf, uint16_t val)
+static inline void byteorder_htobebufs(uint8_t *buf, uint16_t val)
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     buf[0] = (uint8_t)(val >> 8);
