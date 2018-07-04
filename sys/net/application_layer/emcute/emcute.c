@@ -68,7 +68,7 @@ static size_t set_len(uint8_t *buf, size_t len)
     }
     else {
         buf[0] = 0x01;
-        byteorder_htolebufs(&tbuf[1], (uint16_t)(len + 3));
+        byteorder_htobebufs(&tbuf[1], (uint16_t)(len + 3));
         return 3;
     }
 }
@@ -80,7 +80,7 @@ static size_t get_len(uint8_t *buf, uint16_t *len)
         return 1;
     }
     else {
-        *len = byteorder_lebuftohs(&buf[1]);
+        *len = byteorder_bebuftohs(&buf[1]);
         return 3;
     }
 }
@@ -133,12 +133,12 @@ static void on_disconnect(void)
 static void on_ack(uint8_t type, int id_pos, int ret_pos, int res_pos)
 {
     if ((waiton == type) &&
-        (!id_pos || (waitonid == byteorder_lebuftohs(&rbuf[id_pos])))) {
+        (!id_pos || (waitonid == byteorder_bebuftohs(&rbuf[id_pos])))) {
         if (!ret_pos || (rbuf[ret_pos] == ACCEPT)) {
             if (res_pos == 0) {
                 result = EMCUTE_OK;
             } else {
-                result = (int)byteorder_lebuftohs(&rbuf[res_pos]);
+                result = (int)byteorder_bebuftohs(&rbuf[res_pos]);
             }
         } else {
             result = EMCUTE_REJECT;
@@ -155,7 +155,7 @@ static void on_publish(size_t len, size_t pos)
     }
 
     emcute_sub_t *sub;
-    uint16_t tid = byteorder_lebuftohs(&rbuf[pos + 2]);
+    uint16_t tid = byteorder_bebuftohs(&rbuf[pos + 2]);
 
     /* allocate a response packet */
     uint8_t buf[7] = { 7, PUBACK, 0, 0, 0, 0, ACCEPT };
@@ -237,7 +237,7 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
     tbuf[1] = CONNECT;
     tbuf[2] = flags;
     tbuf[3] = PROTOCOL_VERSION;
-    byteorder_htolebufs(&tbuf[4], EMCUTE_KEEPALIVE);
+    byteorder_htobebufs(&tbuf[4], EMCUTE_KEEPALIVE);
     memcpy(&tbuf[6], cli_id, strlen(cli_id));
 
     /* configure 'state machine' and send the connection request */
@@ -311,8 +311,8 @@ int emcute_reg(emcute_topic_t *topic)
 
     tbuf[0] = (strlen(topic->name) + 6);
     tbuf[1] = REGISTER;
-    byteorder_htolebufs(&tbuf[2], 0);
-    byteorder_htolebufs(&tbuf[4], id_next);
+    byteorder_htobebufs(&tbuf[2], 0);
+    byteorder_htobebufs(&tbuf[4], id_next);
     waitonid = id_next++;
     memcpy(&tbuf[6], topic->name, strlen(topic->name));
 
@@ -347,9 +347,9 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
     len += (pos + 6);
     tbuf[pos++] = PUBLISH;
     tbuf[pos++] = flags;
-    byteorder_htolebufs(&tbuf[pos], topic->id);
+    byteorder_htobebufs(&tbuf[pos], topic->id);
     pos += 2;
-    byteorder_htolebufs(&tbuf[pos], id_next);
+    byteorder_htobebufs(&tbuf[pos], id_next);
     waitonid = id_next++;
     pos += 2;
     memcpy(&tbuf[pos], data, len);
@@ -381,7 +381,7 @@ int emcute_sub(emcute_sub_t *sub, unsigned flags)
     tbuf[0] = (strlen(sub->topic.name) + 5);
     tbuf[1] = SUBSCRIBE;
     tbuf[2] = flags;
-    byteorder_htolebufs(&tbuf[3], id_next);
+    byteorder_htobebufs(&tbuf[3], id_next);
     waitonid = id_next++;
     memcpy(&tbuf[5], sub->topic.name, strlen(sub->topic.name));
 
@@ -417,7 +417,7 @@ int emcute_unsub(emcute_sub_t *sub)
     tbuf[0] = (strlen(sub->topic.name) + 5);
     tbuf[1] = UNSUBSCRIBE;
     tbuf[2] = 0;
-    byteorder_htolebufs(&tbuf[3], id_next);
+    byteorder_htobebufs(&tbuf[3], id_next);
     waitonid = id_next++;
     memcpy(&tbuf[5], sub->topic.name, strlen(sub->topic.name));
 
