@@ -20,7 +20,7 @@ def expect_shell_prompt(child, sendline=True, *args, **kwargs):
                      shell prompt
     """
     if sendline:
-        child.sendline('')
+        child.sendline('help')
     child.expect(RIOT_PROMPT, *args, **kwargs)
 
 
@@ -41,7 +41,7 @@ def expect_working_shell_prompt(child, timeout=None, sendlinestep=0.5):
 
     # Wait until the shell answers
     while time.time() < (t_end - sendlinestep):
-        child.sendline('')
+        child.sendline('help')
         if 0 == child.expect([RIOT_PROMPT, pexpect.TIMEOUT], timeout=sendlinestep):
             return
 
