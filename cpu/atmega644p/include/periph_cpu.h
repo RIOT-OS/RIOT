@@ -35,7 +35,7 @@ extern "C" {
 #define GPIO_PIN(x, y)          ((x << 4) | y)
 
 /**
- * @brief   Available ports on the ATmega1284p family
+ * @brief   Available ports on the ATmega644p family
  */
 enum {
     PORT_A = 0,       /**< port A */
@@ -45,7 +45,7 @@ enum {
 };
 
 /**
- * @brief   Available external interrupt pins on the ATmega1284p family
+ * @brief   Available external interrupt pins on the ATmega644p family
  *
  * In order of their interrupt number
  */
