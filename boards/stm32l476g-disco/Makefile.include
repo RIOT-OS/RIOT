@@ -1,0 +1,15 @@
+# the cpu to build for
+export CPU = stm32l4
+export CPU_MODEL = stm32l476vg
+
+# define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+export DEBUG_ADAPTER ?= stlink
+
+# this board uses openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk

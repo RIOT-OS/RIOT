@@ -179,8 +179,9 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [USB_IRQn                ] = isr_usb,                  /* [67] USB event Interrupt */
     [CRS_IRQn                ] = isr_crs,                  /* [82] CRS global interrupt */
 #endif
-#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG) || \
-    defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L496ZG)
+#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG) || \
+    defined(CPU_MODEL_STM32L475VG) || defined(CPU_MODEL_STM32L452RE) || \
+    defined(CPU_MODEL_STM32L496ZG)
     [ADC1_2_IRQn             ] = isr_adc1_2,               /* [18] ADC1, ADC2 SAR global Interrupts */
     [TIM1_TRG_COM_TIM17_IRQn ] = isr_tim1_trg_com_tim17,   /* [26] TIM1 Trigger and Commutation Interrupt and TIM17 global interrupt */
     [TIM3_IRQn               ] = isr_tim3,                 /* [29] TIM3 global Interrupt */
@@ -193,7 +194,8 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [DFSDM1_FLT0_IRQn        ] = isr_dfsdm1_flt0,          /* [61] DFSDM1 Filter 0 global Interrupt */
     [DFSDM1_FLT1_IRQn        ] = isr_dfsdm1_flt1,          /* [62] DFSDM1 Filter 1 global Interrupt */
 #endif
-#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG)
+#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG) || \
+    defined(CPU_MODEL_STM32L475VG)
     [TIM4_IRQn               ] = isr_tim4,                 /* [30] TIM4 global Interrupt */
     [DFSDM1_FLT3_IRQn        ] = isr_dfsdm1_flt3,          /* [42] DFSDM1 Filter 3 global Interrupt */
     [TIM8_BRK_IRQn           ] = isr_tim8_brk,             /* [43] TIM8 Break Interrupt */
@@ -209,11 +211,12 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [SAI2_IRQn               ] = isr_sai2,                 /* [75] Serial Audio Interface 2 global interrupt */
 #endif
 #if defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L476RG) || \
-    defined(CPU_MODEL_STM32L475VG) || defined(CPU_MODEL_STM32L496ZG)
+    defined(CPU_MODEL_STM32L476VG) || defined(CPU_MODEL_STM32L475VG) || \
+    defined(CPU_MODEL_STM32L496ZG)
     [TIM7_IRQn               ] = isr_tim7,                 /* [55] TIM7 global interrupt */
     [SWPMI1_IRQn             ] = isr_swpmi1,               /* [76] Serial Wire Interface 1 global interrupt */
 #endif
-#if defined(CPU_MODEL_STM32L476RG)
+#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG)
     [LCD_IRQn                ] = isr_lcd,                  /* [78] LCD global interrupt */
 #endif
 #if defined(CPU_MODEL_STM32L496ZG)
