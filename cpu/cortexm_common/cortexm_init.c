@@ -31,8 +31,46 @@
  */
 extern const void *_isr_vectors;
 
+/* 0x41 is ARM */
+#define EXPECTED_CPUID_IMPLEMENTER 0x41
+#if (__CORTEX_M == 0)
+#define EXPECTED_CPUID_PARTNO 0xc20
+#elif (__CORTEX_M == 3)
+#define EXPECTED_CPUID_PARTNO 0xc23
+#elif (__CORTEX_M == 4)
+#define EXPECTED_CPUID_PARTNO 0xc24
+#elif (__CORTEX_M == 7)
+#define EXPECTED_CPUID_PARTNO 0xc27
+#else
+#error Unsupported Cortex-M core!
+#endif
+
+int cortexm_check_core(void)
+{
+    uint32_t cpuid = SCB->CPUID;
+    if ((cpuid & (SCB_CPUID_IMPLEMENTER_Msk | SCB_CPUID_PARTNO_Msk)) !=
+        ((EXPECTED_CPUID_IMPLEMENTER << SCB_CPUID_IMPLEMENTER_Pos) |
+         (EXPECTED_CPUID_PARTNO << SCB_CPUID_PARTNO_Pos))) {
+        return 1;
+    }
+    return 0;
+}
+
 void cortexm_init(void)
 {
+    /* Check that the core we are running on is the same kind as the one this
+     * binary was compiled for */
+    if (cortexm_check_core() != 0)
+    {
+        /* This binary was built for a different CPU, continuing on will not end
+         * well, so we reset */
+#if DEVELHELP
+        __asm__ volatile ("BKPT #34\n");
+        while(1) {}
+#else
+        NVIC_SystemReset();
+#endif
+    }
     /* initialize the FPU on Cortex-M4F CPUs */
 #if defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
     /* give full access to the FPU */
