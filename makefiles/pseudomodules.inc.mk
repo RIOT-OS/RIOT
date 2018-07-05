@@ -131,3 +131,5 @@ NO_PSEUDOMODULES += periph_common
 PSEUDOMODULES += auto_init_skald
 PSEUDOMODULES += skald_ibeacon
 PSEUDOMODULES += skald_eddystone
+
+# Packages may also add modules to PSEUDOMODULES in their `Makefile.include`.
