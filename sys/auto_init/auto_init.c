@@ -280,6 +280,10 @@ void auto_init(void)
     extern void auto_init_gpio(void);
     auto_init_gpio();
 #endif
+#ifdef MODULE_SAUL_PWM
+    extern void auto_init_pwm(void);
+    auto_init_pwm();
+#endif
 #ifdef MODULE_SAUL_ADC
     extern void auto_init_adc(void);
     auto_init_adc();

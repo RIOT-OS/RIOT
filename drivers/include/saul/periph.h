@@ -27,6 +27,10 @@
 #include "periph/adc.h"
 #endif /* MODULE_SAUL_ADC */
 
+#ifdef MODULE_SAUL_PWM
+#include "periph/pwm.h"
+#endif /* MODULE_SAUL_PWM */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -61,6 +65,20 @@ typedef struct {
     adc_t line;             /**< ADC line to initialize and expose */
     adc_res_t res;          /**< ADC resolution */
 } saul_adc_params_t;
+#endif /* MODULE_SAUL_ADC */
+
+#ifdef MODULE_SAUL_PWM
+/**
+ * @brief   Direct mapped PWM configuration values
+ */
+typedef struct {
+    const char *name;       /**< name of the device connected to this pin */
+    pwm_t line;             /**< PWM line to initialize and expose */
+    pwm_mode_t mode;        /**< PWM mode */
+    uint32_t freq;          /**< PWM frequency */
+    uint16_t res;           /**< PWM resolution */
+    uint8_t channel;        /**< PWM channel */
+} saul_pwm_params_t;
 #endif /* MODULE_SAUL_ADC */
 
 #ifdef __cplusplus

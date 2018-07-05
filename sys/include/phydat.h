@@ -107,7 +107,8 @@ enum {
     UNIT_PPB,       /**< part per billion */
     /* aggregate values */
     UNIT_TIME,      /**< the three dimensions contain sec, min, and hours */
-    UNIT_DATE       /**< the 3 dimensions contain days, months and years */
+    UNIT_DATE,      /**< the 3 dimensions contain days, months and years */
+    UNIT_PWM        /**< the 3 dimensions contain duty cycle, frequency and resolution */
     /* extend this list as needed */
 };
 
