@@ -88,6 +88,7 @@ extern "C" {
 #define NDP_OPT_PI                  (3)     /**< prefix information option */
 #define NDP_OPT_RH                  (4)     /**< redirected option */
 #define NDP_OPT_MTU                 (5)     /**< MTU option */
+#define NDP_OPT_RDNSS               (25)    /**< recursive DNS server option */
 #define NDP_OPT_AR                  (33)    /**< address registration option */
 #define NDP_OPT_6CTX                (34)    /**< 6LoWPAN context option */
 #define NDP_OPT_ABR                 (35)    /**< authoritative border router option */
@@ -119,6 +120,12 @@ extern "C" {
 #define NDP_OPT_PI_LEN              (4U)
 #define NDP_OPT_MTU_LEN             (1U)
 /** @} */
+
+/**
+ * @brief   Minimum length of a recursive DNS server option (in units of 8 bytes)
+ * @see     [RFC 8106, section 5.1](https://tools.ietf.org/html/rfc8106#section-5.1)
+ */
+#define NDP_OPT_RDNSS_MIN_LEN       (3U)
 
 /**
  * @{
@@ -314,6 +321,19 @@ typedef struct __attribute__((packed)) {
     network_uint32_t mtu;   /**< MTU */
 } ndp_opt_mtu_t;
 
+/**
+ * @brief   Recursive DNS server option format
+ * @extends ndp_opt_t
+ *
+ * @see     [RFC 8106, section 5.1](https://tools.ietf.org/html/rfc8106#section-5.1)
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t type;           /**< option type */
+    uint8_t len;            /**< length in units of 8 octets */
+    network_uint16_t resv;  /**< reserved field */
+    network_uint32_t ltime; /**< lifetime in seconds */
+    ipv6_addr_t addrs[];    /**< addresses of IPv6 recursive DNS servers */
+} ndp_opt_rdnss_t;
 
 #ifdef __cplusplus
 }

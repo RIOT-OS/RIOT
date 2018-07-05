@@ -251,6 +251,29 @@ gnrc_pktsnip_t *gnrc_ndp_opt_pi_build(const ipv6_addr_t *prefix,
 gnrc_pktsnip_t *gnrc_ndp_opt_mtu_build(uint32_t mtu, gnrc_pktsnip_t *next);
 
 /**
+ * @brief   Builts the recursive DNS server option
+ *
+ * @see [RFC 8106, section 5.1](https://tools.ietf.org/html/rfc8106#section-5.1)
+ * @pre `addrs != NULL`
+ * @pre `addrs_num > 0`
+ *
+ * @note    Should only be used with router advertisemnents. This is not checked
+ *          however, since nodes should silently ignore it in other NDP messages.
+ *
+ * @param[in] lifetime      The lifetime of the recursive DNS servers
+ * @param[in] addrs         The addresses of the recursive DNS servers
+ * @param[in] addrs_num     The number of addresses in @p addrs
+ * @param[in] next          More options in the packet. NULL, if there are none.
+ *
+ * @return  The packet snip list of options, on success
+ * @return  @p next, if RDNSS is not supported
+ * @return  NULL, if packet buffer is full
+ */
+gnrc_pktsnip_t *gnrc_ndp_opt_rdnss_build(uint32_t lifetime, ipv6_addr_t *addrs,
+                                         unsigned addrs_num,
+                                         gnrc_pktsnip_t *next);
+
+/**
  * @brief   Send pre-compiled neighbor solicitation depending on a given network
  *          interface.
  *

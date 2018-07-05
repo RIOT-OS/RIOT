@@ -31,13 +31,6 @@
 #define TEST_NAME   "example.org"
 #endif
 
-#ifndef DNS_SERVER
-#define DNS_SERVER  "[2001:db8::1]:53"
-#endif
-
-/* global DNS server UDP endpoint */
-sock_udp_ep_t sock_dns_server;
-
 /* import "ifconfig" shell command, used for printing addresses */
 
 extern int _gnrc_netif_config(int argc, char **argv);
@@ -45,8 +38,6 @@ extern int _gnrc_netif_config(int argc, char **argv);
 int main(void)
 {
     uint8_t addr[16] = {0};
-
-    sock_udp_str2ep(&sock_dns_server, DNS_SERVER);
 
     puts("waiting for router advertisement...");
     xtimer_usleep(1U*1000000);

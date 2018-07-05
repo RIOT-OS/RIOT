@@ -26,6 +26,9 @@
 #include "net/gnrc/sixlowpan/nd.h"
 #include "net/ndp.h"
 #include "net/sixlowpan/nd.h"
+#if GNRC_IPV6_NIB_CONF_DNS
+#include "net/sock/dns.h"
+#endif
 
 #include "_nib-internal.h"
 #include "_nib-arsm.h"
@@ -45,6 +48,10 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #if GNRC_IPV6_NIB_CONF_QUEUE_PKT
 static gnrc_pktqueue_t _queue_pool[GNRC_IPV6_NIB_NUMOF];
 #endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+
+#if GNRC_IPV6_NIB_CONF_DNS
+static evtimer_msg_event_t _rdnss_timeout;
+#endif
 
 /**
  * @internal
@@ -70,6 +77,9 @@ static void _handle_rtr_timeout(_nib_dr_entry_t *router);
 static void _handle_snd_na(gnrc_pktsnip_t *pkt);
 /* needs to be exported for 6LN's ARO handling */
 void _handle_search_rtr(gnrc_netif_t *netif);
+#if GNRC_IPV6_NIB_CONF_DNS
+static void _handle_rdnss_timeout(sock_udp_ep_t *dns_server);
+#endif
 /** @} */
 
 void gnrc_ipv6_nib_init(void)
@@ -355,6 +365,10 @@ void gnrc_ipv6_nib_handle_timer_event(void *ctx, uint16_t type)
         case GNRC_IPV6_NIB_VALID_ADDR:
             _handle_valid_addr(ctx);
             break;
+#if GNRC_IPV6_NIB_CONF_DNS
+        case GNRC_IPV6_NIB_RDNSS_TIMEOUT:
+            _handle_rdnss_timeout(ctx);
+#endif
         default:
             break;
     }
@@ -388,6 +402,10 @@ void gnrc_ipv6_nib_change_rtr_adv_iface(gnrc_netif_t *netif, bool enable)
  */
 static void _handle_mtuo(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
                          const ndp_opt_mtu_t *mtuo);
+#if GNRC_IPV6_NIB_CONF_DNS
+static uint32_t _handle_rdnsso(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
+                               const ndp_opt_rdnss_t *rdnsso);
+#endif
 #if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
 static uint32_t _handle_pio(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
                             const ndp_opt_pi_t *pio,
@@ -696,6 +714,14 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
                 break;
 #endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#if GNRC_IPV6_NIB_CONF_DNS
+            case NDP_OPT_RDNSS:
+                next_timeout = _min(_handle_rdnsso(netif,
+                                                   (icmpv6_hdr_t *)rtr_adv,
+                                                   (ndp_opt_rdnss_t *)opt),
+                                    next_timeout);
+                break;
+#endif
             default:
                 break;
         }
@@ -1225,6 +1251,13 @@ void _handle_search_rtr(gnrc_netif_t *netif)
     gnrc_netif_release(netif);
 }
 
+#if GNRC_IPV6_NIB_CONF_DNS
+static void _handle_rdnss_timeout(sock_udp_ep_t *dns_server)
+{
+    memset(dns_server, 0, sizeof(sock_udp_ep_t));
+}
+#endif
+
 static void _handle_mtuo(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
                          const ndp_opt_mtu_t *mtuo)
 {
@@ -1235,6 +1268,64 @@ static void _handle_mtuo(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
         netif->ipv6.mtu = byteorder_ntohl(mtuo->mtu);
     }
 }
+
+#if GNRC_IPV6_NIB_CONF_DNS
+static uint32_t _handle_rdnsso(gnrc_netif_t *netif, const icmpv6_hdr_t *icmpv6,
+                               const ndp_opt_rdnss_t *rdnsso)
+{
+    uint32_t ltime = UINT32_MAX;
+    const ipv6_addr_t *addr;
+
+    if ((rdnsso->len < NDP_OPT_RDNSS_MIN_LEN) ||
+        (icmpv6->type != ICMPV6_RTR_ADV)) {
+        return ltime;
+    }
+    /* select first if unassigned, search possible address otherwise */
+    addr = (sock_dns_server.port == 0) ? &rdnsso->addrs[0] : NULL;
+    if (addr == NULL) {
+        unsigned addrs_num = (rdnsso->len - 1) / 2;
+        for (unsigned i = 0; i < addrs_num; i++) {
+            if (memcmp(sock_dns_server.addr.ipv6,
+                       &rdnsso->addrs[i],
+                       sizeof(rdnsso->addrs[i])) == 0) {
+                addr = &rdnsso->addrs[i];
+                break;
+            }
+        }
+    }
+#if SOCK_HAS_IPV6
+    ltime = byteorder_ntohl(rdnsso->ltime);
+    if (addr != NULL) {
+        if (ltime > 0) {
+            sock_dns_server.port = SOCK_DNS_PORT;
+            sock_dns_server.family = AF_INET6;
+            sock_dns_server.netif = netif->pid;
+            memcpy(sock_dns_server.addr.ipv6, rdnsso->addrs,
+                   sizeof(sock_dns_server.addr.ipv6));
+
+            if (ltime < UINT32_MAX) {
+                /* the valid lifetime is given in seconds, but our timers work
+                 * in milliseconds, so we have to scale down to the smallest
+                 * possible value (UINT32_MAX - 1). This is however alright
+                 * since we ask for a new router advertisement before this
+                 * timeout expires */
+                ltime = (ltime > (UINT32_MAX / MS_PER_SEC)) ?
+                              (UINT32_MAX - 1) : ltime * MS_PER_SEC;
+                _evtimer_add(&sock_dns_server, GNRC_IPV6_NIB_RDNSS_TIMEOUT,
+                             &_rdnss_timeout, ltime);
+            }
+        }
+        else {
+            evtimer_del(&_nib_evtimer, &_rdnss_timeout.event);
+            _handle_rdnss_timeout(&sock_dns_server);
+        }
+    }
+#else
+    (void)addr;
+#endif
+    return ltime;
+}
+#endif
 
 static void _remove_prefix(const ipv6_addr_t *pfx, unsigned pfx_len)
 {

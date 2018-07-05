@@ -68,6 +68,10 @@ extern "C" {
 #define GNRC_IPV6_NIB_CONF_ROUTER       (1)
 #endif
 
+#ifdef MODULE_GNRC_IPV6_NIB_DNS
+#define GNRC_IPV6_NIB_CONF_DNS          (1)
+#endif
+
 /**
  * @name    Compile flags
  * @brief   Compile flags to (de-)activate certain features for NIB
@@ -169,6 +173,15 @@ extern "C" {
 #else
 #define GNRC_IPV6_NIB_CONF_DC           (0)
 #endif
+#endif
+
+/**
+ * @brief   Support for DNS configuration options
+ *
+ * @see [RFC 8106](https://tools.ietf.org/html/rfc8106)
+ */
+#ifndef GNRC_IPV6_NIB_CONF_DNS
+#define GNRC_IPV6_NIB_CONF_DNS          (0)
 #endif
 
 /**

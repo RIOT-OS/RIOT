@@ -28,6 +28,9 @@
 /* min domain name length is 1, so minimum record length is 7 */
 #define DNS_MIN_REPLY_LEN   (unsigned)(sizeof(sock_dns_hdr_t ) + 7)
 
+/* global DNS server UDP endpoint */
+sock_udp_ep_t sock_dns_server;
+
 static ssize_t _enc_domain_name(uint8_t *out, const char *domain_name)
 {
     /*
@@ -131,6 +134,10 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
 {
     uint8_t buf[SOCK_DNS_QUERYBUF_LEN];
     uint8_t reply_buf[512];
+
+    if (sock_dns_server.port == 0) {
+        return -ECONNREFUSED;
+    }
 
     if (strlen(domain_name) > SOCK_DNS_MAX_NAME_LEN) {
         return -ENOSPC;
