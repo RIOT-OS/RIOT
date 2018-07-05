@@ -31,7 +31,7 @@
 static int jc42_get_register(const jc42_t* dev, uint8_t reg, uint16_t* data)
 {
     i2c_acquire(dev->i2c);
-    if (i2c_read_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
+    if (i2c_read_regs(dev->i2c, dev->addr, reg, data, 2, 0) != 0) {
         DEBUG("[jc42] Problem reading register 0x%x\n", reg);
         i2c_release(dev->i2c);
         return JC42_NODEV;
@@ -43,7 +43,7 @@ static int jc42_get_register(const jc42_t* dev, uint8_t reg, uint16_t* data)
 static int jc42_set_register(const jc42_t* dev, uint8_t reg, uint16_t* data)
 {
     i2c_acquire(dev->i2c);
-    if (i2c_write_regs(dev->i2c, dev->addr, reg, data, 2) <= 0) {
+    if (i2c_write_regs(dev->i2c, dev->addr, reg, data, 2, 0) != 0) {
         DEBUG("[jc42] Problem writing to register 0x%x\n", reg);
         i2c_release(dev->i2c);
         return JC42_NODEV;
@@ -83,13 +83,6 @@ int jc42_init(jc42_t* dev, const jc42_params_t* params)
     uint16_t config;
     dev->i2c = params->i2c;
     dev->addr = params->addr;
-    i2c_acquire(dev->i2c);
-    if (i2c_init_master(dev->i2c, params->speed) != 0) {
-        DEBUG("[jc42] Problem initializing I2C master\n");
-        i2c_release(dev->i2c);
-        return JC42_NOI2C;
-    }
-    i2c_release(dev->i2c);
 
     /* Poll the device, fail if unavailable */
     if (jc42_get_config(dev, &config) != 0) {
