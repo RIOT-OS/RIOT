@@ -11,7 +11,7 @@ and enables stdio on platforms that do not have a UART.
 To use this module, add
 
 ```
-USEMODULE += rtt_stdio
+USEMODULE += stdio_rtt
 ```
 
 to your makefile. By default the module will drop bytes written to stdout if the
@@ -19,7 +19,7 @@ buffer is full. If you know for certain that the debugger is attached, you
 can obtain lossless stdout by adding
 
 ```
-CFLAGS += -DRTT_STDIO_ENABLE_BLOCKING_STDOUT
+CFLAGS += -DSTDIO_RTT_ENABLE_BLOCKING_STDOUT
 ```
 
 to your makefile. Note well that if you do NOT plug in the debugger and run
@@ -41,5 +41,5 @@ can increase the number of unnecessary wakeups from sleep. To disable stdin,
 add this to your makefile:
 
 ```
-CFLAGS += -DRTT_STDIO_DISABLE_STDIN
+CFLAGS += -DSTDIO_RTT_DISABLE_STDIN
 ```
