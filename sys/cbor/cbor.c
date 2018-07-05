@@ -968,7 +968,10 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
                 ++i;
             }
 
-            read_bytes += cbor_at_break(stream, offset);
+            if (is_indefinite) {
+                read_bytes += cbor_at_break(stream, offset);
+            }
+
             return read_bytes;
         }
 
@@ -1002,7 +1005,10 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
                 ++i;
             }
 
-            read_bytes += cbor_at_break(stream, offset);
+            if (is_indefinite) {
+                read_bytes += cbor_at_break(stream, offset);
+            }
+
             return read_bytes;
         }
 #ifdef MODULE_CBOR_SEMANTIC_TAGGING
