@@ -103,6 +103,9 @@ endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
   DIRS += net/application_layer/gcoap
 endif
+ifneq (,$(filter asymcute,$(USEMODULE)))
+  DIRS += net/application_layer/asymcute
+endif
 ifneq (,$(filter emcute,$(USEMODULE)))
   DIRS += net/application_layer/emcute
 endif

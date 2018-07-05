@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,18 +16,22 @@
  * @{
  *
  * @file
- * @brief   sock utility function definitions
+ * @brief       sock utility function definitions
  *
- * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef NET_SOCK_UTIL_H
 #define NET_SOCK_UTIL_H
 
+#include <stdbool.h>
+
+#include "net/sock/udp.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /**
  * @brief   Format UDP endpoint to string and port
@@ -72,6 +77,21 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath);
  * @returns     <0 otherwise
  */
 int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str);
+
+/**
+ * @brief   Compare the two given UDP endpoints
+ *
+ * The given endpoint identifiers are compared by checking their address family,
+ * their addresses, and their port value.
+ *
+ * @param[in] a     Endpoint A
+ * @param[in] b     Endpoint B
+ *
+ * @return  true if given endpoint identifiers point to the same destination
+ * @return  false if given endpoint identifiers do not point to the same
+ *          destination, or if the address family is unknown
+ */
+bool sock_udp_ep_equal(const sock_udp_ep_t *a, const sock_udp_ep_t *b);
 
 /**
  * @name helper definitions
