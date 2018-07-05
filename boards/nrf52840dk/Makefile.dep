@@ -1,1 +1,7 @@
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.dep
+
+ifeq (,$(filter nrfmin,$(USEMODULE)))
+  ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+    USEMODULE += nordic_softdevice_sixlowpan
+  endif
+endif

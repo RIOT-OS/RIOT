@@ -14,8 +14,8 @@ INCLUDES += -I$(NORDIC_SRCS)/components/libraries/experimental_section_vars
 INCLUDES += -I$(NORDIC_SRCS)/components/libraries/strerror
 INCLUDES += -I$(NORDIC_SRCS)/components/libraries/util
 INCLUDES += -I$(NORDIC_SRCS)/components/softdevice/common
-INCLUDES += -I$(NORDIC_SRCS)/components/softdevice/s132/headers
-INCLUDES += -I$(NORDIC_SRCS)/components/softdevice/s132/headers/nrf52
+INCLUDES += -I$(NORDIC_SRCS)/components/softdevice/$(NRF_SD_VERS)/headers
+INCLUDES += -I$(NORDIC_SRCS)/components/softdevice/$(NRF_SD_VERS)/headers/nrf52
 INCLUDES += -I$(NORDIC_SRCS)/modules/nrfx/mdk
 INCLUDES += -I$(NORDIC_SRCS)/config/$(CPU_MODEL_SHORT)/config
 
