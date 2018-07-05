@@ -27,7 +27,7 @@
 #include "thread.h"
 #include "irq.h"
 #include "cpu.h"
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 
 extern char _heap_start;            /* Heap markers from fe310.ld file */
 extern char _heap_end;
@@ -38,9 +38,9 @@ char *heap_top = &_heap_start + 4;
  */
 void nanostubs_init(void)
 {
-#if defined(MODULE_UART_STDIO)
+#if defined(MODULE_STDIO_UART)
     /* STDIO redirected to UART, no line buffering */
-    uart_stdio_init();
+    stdio_init();
     setvbuf(stdout, NULL, _IONBF, 0);
 #endif
 }
@@ -82,9 +82,9 @@ int _open(const char *name, int flags, int mode)
 
 _ssize_t _read(int fd, void *buffer, size_t count)
 {
-#if defined(MODULE_UART_STDIO)
+#if defined(MODULE_STDIO_UART)
     if (fd == STDIN_FILENO) {
-        return uart_stdio_read(buffer, count);
+        return stdio_read(buffer, count);
     }
     errno = EBADF;
     return -1;
@@ -99,9 +99,9 @@ _ssize_t _read(int fd, void *buffer, size_t count)
 
 _ssize_t _write(int fd, const void *data, size_t count)
 {
-#if defined(MODULE_UART_STDIO)
+#if defined(MODULE_STDIO_UART)
     if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
-        return uart_stdio_write(data, count);
+        return stdio_write(data, count);
     }
     errno = EBADF;
     return -1;

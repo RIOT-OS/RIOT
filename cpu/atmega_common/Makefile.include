@@ -14,8 +14,8 @@ export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -e r
 export USEMODULE += atmega_common_periph
 export USEMODULE += periph_common
 
-# the atmel port uses uart_stdio
-export USEMODULE += uart_stdio
+# the atmel port uses stdio_uart
+export USEMODULE += stdio_uart
 
 # include module specific includes
 export INCLUDES += -I$(RIOTCPU)/atmega_common/include -isystem$(RIOTCPU)/atmega_common/include/vendor

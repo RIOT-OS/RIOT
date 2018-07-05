@@ -18,8 +18,8 @@
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  *
  *
- * Support static BAUD rate calculation using UART_STDIO_BAUDRATE.
- * Set UART_STDIO_BAUDRATE to the desired baud rate and pass it as a -D argument
+ * Support static BAUD rate calculation using STDIO_UART_BAUDRATE.
+ * Set STDIO_UART_BAUDRATE to the desired baud rate and pass it as a -D argument
  * at compliation time (e.g. in the boards Makefile.include file).
  * UART_BAUD_TOL can be set to guarantee a BAUD rate tolerance at compile time or
  * to switch to double speed transmission (U2X) to achieve a lower tolerance.
@@ -48,9 +48,9 @@
 #define BAUD_TOL 2
 #endif
 
-#if defined(UART_STDIO_BAUDRATE)
+#if defined(STDIO_UART_BAUDRATE)
 /* BAUD and F_CPU are required by setbaud.h to calculated BRR */
-#define BAUD UART_STDIO_BAUDRATE
+#define BAUD STDIO_UART_BAUDRATE
 #define F_CPU CLOCK_CORECLOCK
 #include <util/setbaud.h>
 #endif
@@ -90,9 +90,9 @@ static void _set_brr(uart_t uart, uint32_t baudrate)
 {
     uint16_t brr;
 
-#if defined(UART_STDIO_BAUDRATE)
+#if defined(STDIO_UART_BAUDRATE)
     /* UBRR_VALUE and USE_2X are statically computed from <util/setbaud.h> */
-    if (baudrate == UART_STDIO_BAUDRATE) {
+    if (baudrate == STDIO_UART_BAUDRATE) {
         _update_brr(uart, UBRR_VALUE, USE_2X);
         return;
     }

@@ -28,7 +28,7 @@
 #include "msg.h"
 #include "ringbuffer.h"
 #include "periph/uart.h"
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 #include "xtimer.h"
 
 #define SHELL_BUFSIZE       (128U)
@@ -39,8 +39,8 @@
 
 #define POWEROFF_DELAY      (250U * US_PER_MS)      /* quarter of a second */
 
-#ifndef UART_STDIO_DEV
-#define UART_STDIO_DEV      (UART_UNDEF)
+#ifndef STDIO_UART_DEV
+#define STDIO_UART_DEV      (UART_UNDEF)
 #endif
 
 typedef struct {
@@ -60,7 +60,7 @@ static int parse_dev(char *arg)
         printf("Error: Invalid UART_DEV device specified (%u).\n", dev);
         return -1;
     }
-    else if (UART_DEV(dev) == UART_STDIO_DEV) {
+    else if (UART_DEV(dev) == STDIO_UART_DEV) {
         printf("Error: The selected UART_DEV(%u) is used for the shell!\n", dev);
         return -2;
     }
@@ -196,14 +196,14 @@ int main(void)
          "NOTE: all strings need to be '\\n' terminated!\n");
 
     /* do sleep test for UART used as STDIO. There is a possibility that the
-     * value given in UART_STDIO_DEV is not a numeral (depends on the CPU
+     * value given in STDIO_UART_DEV is not a numeral (depends on the CPU
      * implementation), so we rather break the output by printing a
      * non-numerical value instead of breaking the UART device descriptor */
-    sleep_test(UART_STDIO_DEV, UART_STDIO_DEV);
+    sleep_test(STDIO_UART_DEV, STDIO_UART_DEV);
 
     puts("\nUART INFO:");
     printf("Available devices:               %i\n", UART_NUMOF);
-    printf("UART used for STDIO (the shell): UART_DEV(%i)\n\n", UART_STDIO_DEV);
+    printf("UART used for STDIO (the shell): UART_DEV(%i)\n\n", STDIO_UART_DEV);
 
     /* initialize ringbuffers */
     for (unsigned i = 0; i < UART_NUMOF; i++) {

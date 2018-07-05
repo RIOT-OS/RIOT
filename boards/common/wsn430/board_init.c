@@ -23,7 +23,7 @@
 #include "cpu.h"
 #include "irq.h"
 #include "assert.h"
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 #include "periph_conf.h"
 
 enum {
@@ -98,5 +98,5 @@ void board_init(void)
     irq_restore(state);
 
     /* initialize STDIO over UART */
-    uart_stdio_init();
+    stdio_init();
 }

@@ -72,7 +72,7 @@ static ssize_t stdio_uart_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
     if (fd != STDIN_FILENO) {
         return -EBADF;
     }
-    return stdio_uart_read(dest, nbytes);
+    return stdio_read(dest, nbytes);
 }
 
 static ssize_t stdio_uart_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes)
@@ -81,7 +81,7 @@ static ssize_t stdio_uart_vfs_write(vfs_file_t *filp, const void *src, size_t nb
     if (fd == STDIN_FILENO) {
         return -EBADF;
     }
-    return stdio_uart_write(src, nbytes);
+    return stdio_write(src, nbytes);
 }
 #endif
 

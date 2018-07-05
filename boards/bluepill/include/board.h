@@ -54,7 +54,7 @@ void board_init(void);
 /**
  * @brief   Use the 2nd UART for STDIO on this board
  */
-#define UART_STDIO_DEV      UART_DEV(1)
+#define STDIO_UART_DEV      UART_DEV(1)
 
 /**
  * @name    xtimer configuration

@@ -40,8 +40,8 @@ extern "C" {
  *
  * @{
  */
-#ifndef UART_STDIO_BAUDRATE
-#define UART_STDIO_BAUDRATE (38400U)       /**< Sets Baudrate for e.g. Shell */
+#ifndef STDIO_UART_BAUDRATE
+#define STDIO_UART_BAUDRATE (38400U)       /**< Sets Baudrate for e.g. Shell */
 #endif
 /** @} */
 

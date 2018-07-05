@@ -26,7 +26,7 @@
 #include "net/gnrc/netif/ethernet.h"
 
 /**
- * @brief global ethos object, used by uart_stdio
+ * @brief global ethos object, used by stdio_uart
  */
 ethos_t ethos;
 
