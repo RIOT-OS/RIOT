@@ -133,7 +133,7 @@ typedef cb_mux_t gpio_int_t;
 #define GPIO_GET_ALLOC(n)    gpio_int_entry[n]
 #else
 /* no-op */
-#define GPIO_ALLOC_INT(n)    do {} while (0)
+#define GPIO_ALLOC_INT(n)    ;
 #define GPIO_GET_ALLOC(n)    (NULL)
 #endif
 
