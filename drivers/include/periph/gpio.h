@@ -123,15 +123,19 @@ typedef enum {
 typedef cb_mux_t gpio_int_t;
 
 /**
- * @brief   Tell users of periph/gpio.h to use new behavior
+ * @brief   Memory allocation for interrupt callback information
+ *
+ * This only enables memory allocation if periph_cpu.h enables it by defining
+ * GPIO_USE_INT_ENTRY, otherwise returns NULL.
  */
-#ifndef GPIO_USE_INT_ENTRY
-#ifdef MODULE_CB_MUX
-#define GPIO_USE_INT_ENTRY    (1)
-#else /* MODULE_CB_MUX */
-#define GPIO_USE_INT_ENTRY    (0)
-#endif /* MODULE_CB_MUX */
-#endif /* GPIO_USE_INT_ENTRY */
+#ifdef GPIO_USE_INT_ENTRY
+#define GPIO_ALLOC_INT(n)    static gpio_int_t gpio_int_entry[n]
+#define GPIO_GET_ALLOC(n)    gpio_int_entry[n]
+#else
+/* no-op */
+#define GPIO_ALLOC_INT(n)    do {} while (0)
+#define GPIO_GET_ALLOC(n)    (NULL)
+#endif
 
 /**
  * @brief   Signature of event callback functions triggered from interrupts
