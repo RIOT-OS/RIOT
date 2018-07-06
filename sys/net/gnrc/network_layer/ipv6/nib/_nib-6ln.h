@@ -53,6 +53,16 @@ static inline uint32_t _now_min(void)
 #define _ADDR_REG_STATUS_IGNORE         (4)
 
 /**
+ * @brief   Additional (local) status to ARO status values to signify that ARO
+ *          is not available in NA
+ *
+ * Can be assigned to the variable that receives the return value of
+ * @ref _handle_aro(), so that the case that an NA does not contain an ARO
+ * (e.g. because upstream router does not support it) can be dealt with.
+ */
+#define _ADDR_REG_STATUS_UNAVAIL        (255)
+
+/**
  * @brief   Resolves address statically from destination address using reverse
  *          translation of the IID
  *
