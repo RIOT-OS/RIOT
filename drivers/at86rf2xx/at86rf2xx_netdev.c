@@ -60,13 +60,8 @@ const netdev_driver_t at86rf2xx_driver = {
     .set = _set,
 };
 
-/* Interrupt struct for gpio_init_int */
-#if GPIO_USE_INT_ENTRY
-static gpio_int_t int_entry;
-#define INT_ENTRY (&int_entry)
-#else
-#define INT_ENTRY (NULL)
-#endif
+/* Memory allocation for GPIO interrupt entry (if enabled) */
+GPIO_ALLOC_INT(1);
 
 static void _irq_handler(void *arg)
 {
@@ -87,7 +82,7 @@ static int _init(netdev_t *netdev)
     gpio_clear(dev->params.sleep_pin);
     gpio_init(dev->params.reset_pin, GPIO_OUT);
     gpio_set(dev->params.reset_pin);
-    gpio_init_int(INT_ENTRY, dev->params.int_pin, GPIO_IN,
+    gpio_init_int(GPIO_GET_ALLOC(0), dev->params.int_pin, GPIO_IN,
                   GPIO_RISING, _irq_handler, dev);
 
     /* reset device to default values and put it into RX state */

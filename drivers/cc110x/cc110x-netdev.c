@@ -37,13 +37,8 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/* Interrupt struct for gpio_init_int */
-#if GPIO_USE_INT_ENTRY
-static gpio_int_t int_entry;
-#define INT_ENTRY (&int_entry)
-#else
-#define INT_ENTRY (NULL)
-#endif
+/* Memory allocation for GPIO interrupt entry (if enabled) */
+GPIO_ALLOC_INT(1);
 
 static int _send(netdev_t *dev, const iolist_t *iolist)
 {
@@ -208,7 +203,7 @@ static int _init(netdev_t *dev)
 
     cc110x_t *cc110x = &((netdev_cc110x_t*) dev)->cc110x;
 
-    gpio_init_int(INT_ENTRY, cc110x->params.gdo2, GPIO_IN,
+    gpio_init_int(GPIO_GET_ALLOC(0), cc110x->params.gdo2, GPIO_IN,
                   GPIO_BOTH, &_netdev_cc110x_isr, (void*)dev);
 
     gpio_set(cc110x->params.gdo2);
