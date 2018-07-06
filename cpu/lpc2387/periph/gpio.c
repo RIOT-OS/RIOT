@@ -97,9 +97,7 @@ int gpio_init_mux(unsigned pin, unsigned mux)
 int gpio_init_int(gpio_int_t *entry, gpio_t pin, gpio_mode_t mode,
                   gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
-    /* FIXME: utilize gpio.h/cb_mux API change */
     (void)entry;
-
     (void)mode;
 
     DEBUG("gpio_init_int(): pin %u\n", pin);
