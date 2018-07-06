@@ -27,13 +27,8 @@
 
 #define TEST_FLANK      GPIO_FALLING
 
-/* Interrupt struct for gpio_init_int */
-#if GPIO_USE_INT_ENTRY
-static gpio_int_t int_entry[4];
-#define INT_ENTRY(n)    (&(int_entry[n]))
-#else
-#define INT_ENTRY(n)    (NULL)
-#endif
+/* Memory allocation for GPIO interrupt entry (if enabled) */
+GPIO_ALLOC_INT(4);
 
 #ifdef BTN0_PIN /* assuming that first button is always BTN0 */
 static void cb(void *arg)
@@ -47,7 +42,7 @@ int main(void)
     int cnt = 0;
     /* get the number of available buttons and init interrupt handler */
 #ifdef BTN0_PIN
-    if (gpio_init_int(INT_ENTRY(0), BTN0_PIN, BTN0_MODE,
+    if (gpio_init_int(GPIO_GET_ALLOC(0), BTN0_PIN, BTN0_MODE,
                       TEST_FLANK, cb, (void *)cnt) < 0) {
         puts("[FAILED] init BTN0!");
         return 1;
@@ -55,7 +50,7 @@ int main(void)
     ++cnt;
 #endif
 #ifdef BTN1_PIN
-    if (gpio_init_int(INT_ENTRY(1), BTN1_PIN, BTN1_MODE,
+    if (gpio_init_int(GPIO_GET_ALLOC(1), BTN1_PIN, BTN1_MODE,
                       TEST_FLANK, cb, (void *)cnt) < 0) {
         puts("[FAILED] init BTN1!");
         return 1;
@@ -63,7 +58,7 @@ int main(void)
     ++cnt;
 #endif
 #ifdef BTN2_PIN
-    if (gpio_init_int(INT_ENTRY(2), BTN2_PIN, BTN2_MODE,
+    if (gpio_init_int(GPIO_GET_ALLOC(2), BTN2_PIN, BTN2_MODE,
                       TEST_FLANK, cb, (void *)cnt) < 0) {
         puts("[FAILED] init BTN2!");
         return 1;
@@ -71,7 +66,7 @@ int main(void)
     ++cnt;
 #endif
 #ifdef BTN3_PIN
-    if (gpio_init_int(INT_ENTRY(3), BTN3_PIN, BTN3_MODE,
+    if (gpio_init_int(GPIO_GET_ALLOC(3), BTN3_PIN, BTN3_MODE,
                       TEST_FLANK, cb, (void *)cnt) < 0) {
         puts("[FAILED] init BTN3!");
         return 1;

@@ -33,13 +33,8 @@
 
 static volatile int int1_count = 0;
 
-/* Interrupt struct for gpio_init_int */
-#if GPIO_USE_INT_ENTRY
-static gpio_int_t int_entry;
-#define INT_ENTRY (&int_entry)
-#else
-#define INT_ENTRY (NULL)
-#endif
+/* Memory allocation for GPIO interrupt entry (if enabled) */
+GPIO_ALLOC_INT(1);
 
 static void test_int1(void *arg)
 {
@@ -118,8 +113,8 @@ int main(void)
     }
 
     puts("Set INT1 callback");
-    if (gpio_init_int(INT_ENTRY, lis3dh_params[0].int1, GPIO_IN, GPIO_RISING,
-                      test_int1, (void*)&int1_count) == 0) {
+    if (gpio_init_int(GPIO_GET_ALLOC(0), lis3dh_params[0].int1, GPIO_IN,
+                      GPIO_RISING, test_int1, (void*)&int1_count) == 0) {
         puts("[OK]");
     }
     else {
