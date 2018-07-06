@@ -545,8 +545,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_CSMA_RETRIES:
             assert(len <= sizeof(uint8_t));
-            if (!(dev->netdev.flags & AT86RF2XX_OPT_CSMA ||
-                  (*((uint8_t *)val) > 5))) {
+            if (!(dev->netdev.flags & AT86RF2XX_OPT_CSMA) ||
+                (*((uint8_t *)val) > 5)) {
                 /* If CSMA is disabled, don't allow setting retries */
                 res = -EINVAL;
             }
