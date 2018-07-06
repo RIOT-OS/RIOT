@@ -131,8 +131,11 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     uint8_t phr;
     size_t pkt_len;
 
-    /* frame buffer protection will be unlocked as soon as at86rf2xx_fb_stop()
-     * is called*/
+    /* frame buffer protection will be unlocked as soon as at86rf2xx_fb_stop() is called,
+     * Set receiver to PLL_ON state to be able to free the SPI bus and avoid loosing data. */
+    at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
+
+    /* start frame buffer access */
     at86rf2xx_fb_start(dev);
 
     /* get the size of the received packet */
@@ -141,14 +144,27 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     /* ignore MSB (refer p.80) and substract length of FCS field */
     pkt_len = (phr & 0x7f) - 2;
 
-    /* just return length when buf == NULL */
+    /* return length when buf == NULL */
     if (buf == NULL) {
+        /* release SPI bus */
         at86rf2xx_fb_stop(dev);
+
+        /* drop packet, continue receiving */
+        if (len > 0) {
+            /* set device back in operation state which was used before last transmission.
+             * e.g RX_AACK_ON */
+            at86rf2xx_set_state(dev, dev->idle_state);
+        }
+
         return pkt_len;
     }
+
     /* not enough space in buf */
     if (pkt_len > len) {
         at86rf2xx_fb_stop(dev);
+        /* set device back in operation state which was used before last transmission.
+            * e.g RX_AACK_ON */
+        at86rf2xx_set_state(dev, dev->idle_state);
         return -ENOBUFS;
     }
 #ifdef MODULE_NETSTATS_L2
@@ -201,6 +217,10 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     else {
         at86rf2xx_fb_stop(dev);
     }
+
+    /* set device back in operation state which was used before last transmission.
+     * e.g RX_AACK_ON */
+    at86rf2xx_set_state(dev, dev->idle_state);
 
     return pkt_len;
 }
