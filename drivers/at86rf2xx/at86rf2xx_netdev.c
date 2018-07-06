@@ -153,10 +153,10 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         at86rf2xx_fb_stop(dev);
         return -ENOBUFS;
     }
-    #ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += pkt_len;
-    #endif
+#ifdef MODULE_NETSTATS_L2
+    netdev->stats.rx_count++;
+    netdev->stats.rx_bytes += pkt_len;
+#endif
     /* copy payload */
     at86rf2xx_fb_read(dev, (uint8_t *)buf, pkt_len);
 
@@ -332,7 +332,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     int res;
 
     if (((res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, val,
-                                       max_len)) >= 0) || (res != -ENOTSUP)) {
+                                      max_len)) >= 0) || (res != -ENOTSUP)) {
         return res;
     }
 
@@ -381,7 +381,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = sizeof(int8_t);
             break;
 
-        case NETOPT_AUTOACK :
+        case NETOPT_AUTOACK:
             assert(max_len >= sizeof(netopt_enable_t));
             uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__CSMA_SEED_1);
             *((netopt_enable_t *)val) = (tmp & AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK) ? false : true;
@@ -545,8 +545,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_CSMA_RETRIES:
             assert(len <= sizeof(uint8_t));
-            if( !(dev->netdev.flags & AT86RF2XX_OPT_CSMA ||
-                (*((uint8_t *)val) > 5)) ) {
+            if (!(dev->netdev.flags & AT86RF2XX_OPT_CSMA ||
+                  (*((uint8_t *)val) > 5))) {
                 /* If CSMA is disabled, don't allow setting retries */
                 res = -EINVAL;
             }
