@@ -45,6 +45,23 @@ enum {
     PORT_H = 7,             /**< port H */
 };
 
+/**
+ * @brief   Available number of ADC devices
+ */
+#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG)
+#define ADC_DEVS            (3U)
+#elif defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L432KC)
+#define ADC_DEVS            (1U)
+#endif
+
+#if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG) || \
+    defined(CPU_MODEL_STM32L452RE) || defined(CPU_MODEL_STM32L432KC)
+/**
+ * @brief   ADC voltage regulator start-up time [us]
+ */
+#define ADC_T_ADCVREG_STUP_US (20)
+#endif
+
 #ifndef DOXYGEN
 /**
  * @brief   Override ADC resolution values
@@ -52,22 +69,23 @@ enum {
  */
 #define HAVE_ADC_RES_T
 typedef enum {
-    ADC_RES_6BIT  = (0x3 << 3),     /**< ADC resolution: 6 bit */
-    ADC_RES_8BIT  = (0x2 << 3),     /**< ADC resolution: 8 bit */
-    ADC_RES_10BIT = (0x1 << 3),     /**< ADC resolution: 10 bit */
-    ADC_RES_12BIT = (0x0 << 3),     /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = (0xfe),         /**< not applicable */
-    ADC_RES_16BIT = (0xff)          /**< not applicable */
+    ADC_RES_6BIT  = (ADC_CFGR_RES),   /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = (ADC_CFGR_RES_1), /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = (ADC_CFGR_RES_0), /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = (0x0),            /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = (0x1),            /**< not applicable */
+    ADC_RES_16BIT = (0x2)             /**< not applicable */
 } adc_res_t;
 /** @} */
 #endif /* ndef DOXYGEN */
 
 /**
- * @brief   ADC line configuration values
+ * @brief   ADC channel configuration data
  */
 typedef struct {
-    gpio_t pin;             /**< pin to use */
-    uint8_t chan;           /**< internal channel the pin is connected to */
+    gpio_t pin;             /**< pin connected to the channel */
+    uint8_t dev;            /**< ADCx - 1 device used for the channel */
+    uint8_t chan;           /**< CPU ADC channel connected to the pin */
 } adc_conf_t;
 
 #ifdef __cplusplus

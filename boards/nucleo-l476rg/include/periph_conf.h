@@ -245,9 +245,20 @@ static const spi_conf_t spi_config[] = {
 
 /**
  * @name    ADC configuration
+ *
+ * configure only  ADC channels for the Arduino header pins A0-A5
+ *
  * @{
  */
-#define ADC_NUMOF           (0)
+#define ADC_NUMOF           (6U)
+#define ADC_CONFIG {             \
+    {GPIO_PIN(PORT_A, 0), 0, 5},  /*< ADC12_IN5 */   \
+    {GPIO_PIN(PORT_A, 1), 0, 6},  /*< ADC12_IN6 */   \
+    {GPIO_PIN(PORT_A, 4), 1, 9},  /*< ADC12_IN9 */   \
+    {GPIO_PIN(PORT_B, 0), 1, 15}, /*< ADC12_IN15 */  \
+    {GPIO_PIN(PORT_C, 1), 2, 2},  /*< ADC123_IN_2 */ \
+    {GPIO_PIN(PORT_C, 0), 2, 1},  /*< ADC123_IN_1 */ \
+}
 /** @} */
 
 /**
