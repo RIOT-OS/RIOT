@@ -332,6 +332,10 @@ auto_init_lis3mdl();
 extern void auto_init_mpu9150(void);
 auto_init_mpu9150();
 #endif
+#ifdef MODULE_MPU9250
+extern void auto_init_mpu9250(void);
+auto_init_mpu9250();
+#endif
 #ifdef MODULE_GROVE_LEDBAR
     extern void auto_init_grove_ledbar(void);
     auto_init_grove_ledbar();

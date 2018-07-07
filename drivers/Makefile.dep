@@ -239,6 +239,11 @@ ifneq (,$(filter mpu9150,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter mpu9250,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter mrf24j40,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += luid
