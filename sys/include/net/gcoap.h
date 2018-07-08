@@ -433,10 +433,10 @@ extern "C" {
  * @brief   A modular collection of resources for a server
  */
 typedef struct gcoap_listener {
-    coap_resource_t *resources;     /**< First element in the array of
-                                     *   resources; must order alphabetically */
-    size_t resources_len;           /**< Length of array */
-    struct gcoap_listener *next;    /**< Next listener in list */
+    const coap_resource_t *resources;   /**< First element in the array of
+                                         *   resources; must order alphabetically */
+    size_t resources_len;               /**< Length of array */
+    struct gcoap_listener *next;        /**< Next listener in list */
 } gcoap_listener_t;
 
 /**
@@ -480,7 +480,7 @@ typedef struct {
  */
 typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
-    coap_resource_t *resource;          /**< Entity being observed */
+    const coap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     unsigned token_len;                 /**< Actual length of token attribute */
 } gcoap_observe_memo_t;

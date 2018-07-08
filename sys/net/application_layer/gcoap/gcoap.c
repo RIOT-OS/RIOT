@@ -48,7 +48,7 @@ static void _expire_request(gcoap_request_memo_t *memo);
 static bool _endpoints_equal(const sock_udp_ep_t *ep1, const sock_udp_ep_t *ep2);
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
                            const sock_udp_ep_t *remote);
-static int _find_resource(coap_pkt_t *pdu, coap_resource_t **resource_ptr,
+static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
                                             gcoap_listener_t **listener_ptr);
 static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote);
 static int _find_obs_memo(gcoap_observe_memo_t **memo, sock_udp_ep_t *remote,
@@ -62,7 +62,7 @@ const coap_resource_t _default_resources[] = {
 };
 
 static gcoap_listener_t _default_listener = {
-    (coap_resource_t *)&_default_resources[0],
+    &_default_resources[0],
     sizeof(_default_resources) / sizeof(_default_resources[0]),
     NULL
 };
@@ -267,10 +267,10 @@ static void _listen(sock_udp_t *sock)
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                                          sock_udp_ep_t *remote)
 {
-    coap_resource_t *resource  = NULL;
-    gcoap_listener_t *listener = NULL;
-    sock_udp_ep_t *observer    = NULL;
-    gcoap_observe_memo_t *memo = NULL;
+    const coap_resource_t *resource     = NULL;
+    gcoap_listener_t *listener          = NULL;
+    sock_udp_ep_t *observer             = NULL;
+    gcoap_observe_memo_t *memo          = NULL;
     gcoap_observe_memo_t *resource_memo = NULL;
 
     switch (_find_resource(pdu, &resource, &listener)) {
@@ -382,7 +382,7 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  *        code didn't match and `GCOAP_RESOURCE_NO_PATH` if no matching
  *        resource was found.
  */
-static int _find_resource(coap_pkt_t *pdu, coap_resource_t **resource_ptr,
+static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
                                             gcoap_listener_t **listener_ptr)
 {
     int ret = GCOAP_RESOURCE_NO_PATH;
@@ -391,7 +391,7 @@ static int _find_resource(coap_pkt_t *pdu, coap_resource_t **resource_ptr,
     /* Find path for CoAP msg among listener resources and execute callback. */
     gcoap_listener_t *listener = _coap_state.listeners;
     while (listener) {
-        coap_resource_t *resource = listener->resources;
+        const coap_resource_t *resource = listener->resources;
         for (size_t i = 0; i < listener->resources_len; i++) {
             if (i) {
                 resource++;
@@ -1008,7 +1008,7 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
 
     /* write payload */
     while (listener) {
-        coap_resource_t *resource = listener->resources;
+        const coap_resource_t *resource = listener->resources;
 
         for (unsigned i = 0; i < listener->resources_len; i++) {
             size_t path_len = strlen(resource->path);
