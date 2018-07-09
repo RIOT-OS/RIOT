@@ -25,18 +25,7 @@
 
 #include "cpu_conf_common.h"
 
-#ifdef CPU_MODEL_STM32L073RZ
-#include "vendor/stm32l073xx.h"
-#endif
-#ifdef CPU_MODEL_STM32L072CZ
-#include "vendor/stm32l072xx.h"
-#endif
-#ifdef CPU_MODEL_STM32L053R8
-#include "vendor/stm32l053xx.h"
-#endif
-#ifdef CPU_MODEL_STM32L031K6
-#include "vendor/stm32l031xx.h"
-#endif
+#include "vendor/stm32l0xx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,7 +36,7 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
-#if defined(CPU_MODEL_STM32L031K6)
+#if defined(CPU_LINE_STM32L031xx)
 #define CPU_IRQ_NUMOF                   (30U)
 #else
 #define CPU_IRQ_NUMOF                   (32U)
