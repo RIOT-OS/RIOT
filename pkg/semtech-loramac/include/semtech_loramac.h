@@ -444,6 +444,41 @@ void semtech_loramac_set_rx2_dr(semtech_loramac_t *mac, uint8_t dr);
  */
 uint8_t semtech_loramac_get_rx2_dr(semtech_loramac_t *mac);
 
+#ifdef MODULE_PERIPH_EEPROM
+/**
+ * @brief   The magic number used to identify the LoRaWAN configuration
+ */
+#ifndef SEMTECH_LORAMAC_EEPROM_MAGIC
+#define SEMTECH_LORAMAC_EEPROM_MAGIC        {0x52, 0x49, 0x4F, 0x54} /* RIOT */
+#endif
+
+/**
+ * @brief   The magic number length used to identify the LoRaWAN configuration
+ */
+#ifndef SEMTECH_LORAMAC_EEPROM_MAGIC_LEN
+#define SEMTECH_LORAMAC_EEPROM_MAGIC_LEN    4
+#endif
+
+/**
+ * @brief   Start position of LoRaWAN configuration stored in eeprom
+ */
+#ifndef SEMTECH_LORAMAC_EEPROM_START
+#define SEMTECH_LORAMAC_EEPROM_START        (0)
+#endif
+
+/**
+ * @brief   Saves the current LoRaWAN configuration to the internal EEPROM
+ *
+ * @param[in] mac           Pointer to the mac
+ */
+void semtech_loramac_save_config(semtech_loramac_t *mac);
+
+/**
+ * @brief   Erases any stored LoRaWAN configuration from the internal EEPROM
+ */
+void semtech_loramac_erase_config(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
