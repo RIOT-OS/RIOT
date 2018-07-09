@@ -52,18 +52,12 @@ int bmp180_init(bmp180_t *dev, const bmp180_params_t *params)
         OVERSAMPLING = BMP180_ULTRAHIGHRES;
     }
 
-    /* Initialize I2C interface */
-    if (i2c_init_master(DEV_I2C, I2C_SPEED_NORMAL)) {
-        DEBUG("[Error] I2C device not enabled\n");
-        return -BMP180_ERR_NOI2C;
-    }
-
     /* Acquire exclusive access */
     i2c_acquire(DEV_I2C);
 
     /* Check sensor ID */
     uint8_t checkid;
-    i2c_read_reg(DEV_I2C, DEV_ADDR, BMP180_REGISTER_ID, &checkid);
+    i2c_read_reg(DEV_I2C, DEV_ADDR, BMP180_REGISTER_ID, &checkid, 0);
     if (checkid != 0x55) {
         DEBUG("[Error] Wrong device ID\n");
         i2c_release(DEV_I2C);
@@ -75,7 +69,8 @@ int bmp180_init(bmp180_t *dev, const bmp180_params_t *params)
 
     uint8_t buffer[22] = {0};
     /* Read calibration values, using contiguous register addresses */
-    if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_CALIBRATION_AC1, buffer, 22) < 0) {
+    if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_CALIBRATION_AC1,
+                      buffer, 22, 0) < 0) {
         DEBUG("[Error] Cannot read calibration registers.\n");
         i2c_release(DEV_I2C);
         return -BMP180_ERR_NOCAL;
@@ -191,9 +186,9 @@ static int _read_ut(const bmp180_t *dev, int32_t *output)
     /* Read UT (Uncompsensated Temperature value) */
     uint8_t ut[2] = {0};
     uint8_t control[2] = { BMP180_REGISTER_CONTROL, BMP180_TEMPERATURE_COMMAND };
-    i2c_write_bytes(DEV_I2C, DEV_ADDR, control, 2);
+    i2c_write_bytes(DEV_I2C, DEV_ADDR, control, 2, 0);
     xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
-    if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_REGISTER_DATA, ut, 2) < 0) {
+    if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_REGISTER_DATA, ut, 2, 0) < 0) {
         DEBUG("[Error] Cannot read uncompensated temperature.\n");
         i2c_release(DEV_I2C);
         return -1;
@@ -209,8 +204,9 @@ static int _read_up(const bmp180_t *dev, int32_t *output)
 {
     /* Read UP (Uncompsensated Pressure value) */
     uint8_t up[3] = {0};
-    uint8_t control[2] = { BMP180_REGISTER_CONTROL, BMP180_PRESSURE_COMMAND | (OVERSAMPLING & 0x3) << 6 };
-    i2c_write_bytes(DEV_I2C, DEV_ADDR, control, 2);
+    uint8_t control[2] = { BMP180_REGISTER_CONTROL,
+                           BMP180_PRESSURE_COMMAND | (OVERSAMPLING & 0x3) << 6 };
+    i2c_write_bytes(DEV_I2C, DEV_ADDR, control, 2, 0);
     switch (OVERSAMPLING) {
     case BMP180_ULTRALOWPOWER:
         xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
@@ -228,7 +224,7 @@ static int _read_up(const bmp180_t *dev, int32_t *output)
         xtimer_usleep(BMP180_ULTRALOWPOWER_DELAY);
         break;
     }
-    if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_REGISTER_DATA, up, 3) < 0) {
+    if (i2c_read_regs(DEV_I2C, DEV_ADDR, BMP180_REGISTER_DATA, up, 3, 0) < 0) {
         DEBUG("[Error] Cannot read uncompensated pressure.\n");
         i2c_release(DEV_I2C);
         return -1;
