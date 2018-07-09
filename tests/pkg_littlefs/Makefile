@@ -11,6 +11,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
                              nucleo-l053r8 \
                              nucleo-f030r8 \
                              stm32f0discovery \
+                             stm32l0538-disco \
 
 BOARD_BLACKLIST := chronos \
                    msb-430 \

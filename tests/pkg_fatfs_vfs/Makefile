@@ -46,7 +46,8 @@ BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove \
                    remote-revb samd21-xpro saml21-xpro samr21-xpro \
                    sensebox_samd21 sltb001a sodaq-autonomo sodaq-explorer \
                    spark-core stm32f0discovery stm32f3discovery \
-                   stm32f4discovery udoo waspmote-pro yunjia-nrf51822 native
+                   stm32f4discovery stm32l0538-disco udoo waspmote-pro \
+                   yunjia-nrf51822 native
 
 TEST_DEPS += image
 

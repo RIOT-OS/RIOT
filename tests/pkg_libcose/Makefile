@@ -9,7 +9,8 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
 
 BOARD_INSUFFICIENT_MEMORY := i-nucleo-lrwan1 \
                              nucleo-f030r8 nucleo-f031k6 nucleo-f042k6 \
-                             nucleo-l031k6 nucleo-l053r8 stm32f0discovery
+                             nucleo-l031k6 nucleo-l053r8 stm32f0discovery \
+                             stm32l0538-disco
 
 TEST_ON_CI_WHITELIST += native
 

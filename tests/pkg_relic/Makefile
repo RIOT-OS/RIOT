@@ -30,6 +30,7 @@ BOARD_INSUFFICIENT_MEMORY :=    i-nucleo-lrwan1 \
                                 nucleo-f042k6 \
                                 nucleo-l031k6 \
                                 nucleo-l053r8 \
+                                stm32l0538-disco \
                                 #
 
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(5*THREAD_STACKSIZE_DEFAULT\)

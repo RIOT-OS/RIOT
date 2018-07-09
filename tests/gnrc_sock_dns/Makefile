@@ -8,7 +8,8 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo \
                              mega-xplained msb-430 msb-430h \
                              nucleo-f042k6 nucleo-f031k6 \
                              nucleo-f030r8 nucleo-f303k8 nucleo-l053r8 \
-                             nucleo-l031k6 stm32f0discovery thingy52 telosb \
+                             nucleo-l031k6 stm32f0discovery stm32l0538-disco \
+                             thingy52 telosb \
                              waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
 # chronos, hamilton mips-malta, and ruuvitag boards don't support ethos
 BOARD_BLACKLIST := chronos hamilton mips-malta ruuvitag
