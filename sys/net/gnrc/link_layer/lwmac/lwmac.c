@@ -86,8 +86,6 @@ gnrc_netif_t *gnrc_netif_lwmac_create(char *stack, int stacksize,
 
 static void *_bootstrap(void *args)
 {
-    gnrc_netif_t *netif = args;
-    netif->hwdev = netif->dev;
     return gnrc_netif_thread(args);
 }
 
@@ -122,7 +120,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     netdev_ieee802154_rx_info_t rx_info;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->hwdev;
+    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
     gnrc_pktsnip_t *pkt = NULL;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
 
