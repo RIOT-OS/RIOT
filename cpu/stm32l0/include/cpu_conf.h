@@ -58,18 +58,9 @@ extern "C" {
  * @name    Flash page configuration
  * @{
  */
-#if defined(CPU_MODEL_STM32L073RZ) || defined(CPU_MODEL_STM32L072CZ) || \
-    defined(CPU_MODEL_STM32L053R8) || defined(CPU_MODEL_STM32L031K6)
 #define FLASHPAGE_SIZE      (128U)
-#endif
 
-#if defined(CPU_MODEL_STM32L073RZ) || defined(CPU_MODEL_STM32L072CZ)
-#define FLASHPAGE_NUMOF     (1536U)
-#elif defined(CPU_MODEL_STM32L053R8)
-#define FLASHPAGE_NUMOF     (512U)
-#elif defined(CPU_MODEL_STM32L031K6)
-#define FLASHPAGE_NUMOF     (256U)
-#endif
+#define FLASHPAGE_NUMOF     (STM32_FLASHSIZE / FLASHPAGE_SIZE)
 
 /* The minimum block size which can be written is 4B. However, the erase
  * block is always FLASHPAGE_SIZE.
