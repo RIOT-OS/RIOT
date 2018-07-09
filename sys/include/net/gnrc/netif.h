@@ -71,7 +71,6 @@ typedef thread_task_func_t gnrc_netif_bootstrap_t;
 typedef struct {
     const gnrc_netif_ops_t *ops;            /**< Operations of the network interface */
     netdev_t *dev;                          /**< Network device of the network interface */
-    netdev_t *hwdev;                        /**< Hardware layer of the network device */
     rmutex_t mutex;                         /**< Mutex of the interface */
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
@@ -489,13 +488,6 @@ char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
  * @return  0, on failure.
  */
 size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out);
-
-/**
- * @brief   gnrc netif thread event handler.
- *
- * @param[in] args   The network interface
- */
-void *gnrc_netif_thread(void *args);
 
 #ifdef __cplusplus
 }

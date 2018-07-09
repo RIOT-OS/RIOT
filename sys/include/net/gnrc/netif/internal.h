@@ -415,6 +415,13 @@ static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
 #define gnrc_netif_is_6lbr(netif)               (false)
 #endif
 
+/**
+ * @brief   gnrc netif thread event handler.
+ *
+ * @param[in] args   The network interface
+ */
+void *gnrc_netif_thread(void *args);
+
 #ifdef __cplusplus
 }
 #endif
