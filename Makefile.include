@@ -327,7 +327,15 @@ $(info $(USEPKG:%=$(RIOTPKG)/%/Makefile.include))
 .PHONY: $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
-USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a[$$0]++' | tr '\n' ' ')
+# Deduplicate includes without sorting them
+# see https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting
+define uniq =
+  $(eval seen :=)
+  $(foreach _,$1,$(if $(filter $_,$(seen)),,$(eval seen += $_)))
+  $(seen)
+endef
+
+USEMODULE_INCLUDES_ = $(strip $(call uniq,$(USEMODULE_INCLUDES)))
 
 INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
