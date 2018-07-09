@@ -38,6 +38,20 @@
  */
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
 
+/**
+ * @brief   Check whether device is a using a WTIMER device (32-bit)
+ */
+static inline bool _is_wtimer(timer_t dev)
+{
+#if defined(WTIMER_COUNT) && WTIMER_COUNT > 0
+    return ((uint32_t) timer_config[dev].timer.dev) >= WTIMER0_BASE;
+#else
+    (void) dev;
+
+    return false;
+#endif
+}
+
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t callback, void *arg)
 {
     TIMER_TypeDef *pre, *tim;
@@ -82,7 +96,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t callback, void *arg)
         freq_timer / TIMER_Prescaler2Div(init_pre.prescale) / freq) - 1;
 
     TIMER_TopSet(pre, top);
-    TIMER_TopSet(tim, 0xffff);
+    TIMER_TopSet(tim, _is_wtimer(dev) ? 0xffffffff : 0xffff);
 
     /* enable interrupts for the channels */
     TIMER_IntClear(tim, TIMER_IFC_CC0 | TIMER_IFC_CC1 | TIMER_IFC_CC2);
@@ -106,12 +120,13 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         return -1;
     }
 
-    if (value > 0xffff) {
+    /* this accounts for some timer being 16-bit and others 32-bit */
+    if (value > TIMER_TopGet(timer_config[dev].timer.dev)) {
         return -1;
     }
 
     tim = timer_config[dev].timer.dev;
-    tim->CC[channel].CCV = (uint16_t)value;
+    tim->CC[channel].CCV = (uint32_t) value;
     tim->CC[channel].CTRL = TIMER_CC_CTRL_MODE_OUTPUTCOMPARE;
 
     return 0;
