@@ -81,8 +81,6 @@ gnrc_netif_t *gnrc_netif_gomach_create(char *stack, int stacksize,
 
 static void *_bootstrap(void *args)
 {
-    gnrc_netif_t *netif = args;
-    netif->hwdev = netif->dev;
     return gnrc_netif_thread(args);
 }
 
@@ -90,7 +88,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     netdev_ieee802154_rx_info_t rx_info;
-    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->hwdev;
+    netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
     gnrc_pktsnip_t *pkt = NULL;
     int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
 
@@ -541,7 +539,7 @@ static void gomach_t2k_trans_in_cp(gnrc_netif_t *netif)
     /* If we are retransmitting the packet, use the same sequence number for the
      * packet to avoid duplicate packet reception at the receiver side. */
     if ((netif->mac.tx.no_ack_counter > 0) || (netif->mac.tx.tx_busy_count > 0)) {
-        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         device_state->seq = netif->mac.tx.tx_seq;
     }
 
@@ -634,7 +632,7 @@ static bool _cp_tx_busy(gnrc_netif_t *netif)
         /* Store the TX sequence number for this packet. Always use the same
          * sequence number for sending the same packet, to avoid duplicated
          * packet reception at the receiver. */
-        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         netif->mac.tx.tx_seq = device_state->seq - 1;
 
         netif->mac.tx.t2k_state = GNRC_GOMACH_T2K_TRANS_IN_CP;
@@ -652,7 +650,7 @@ static void _cp_tx_default(gnrc_netif_t *netif)
 
     /* This packet will be retried. Store the TX sequence number for this packet.
      * Always use the same sequence number for sending the same packet. */
-    netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+    netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
     netif->mac.tx.tx_seq = device_state->seq - 1;
 
     /* If no_ack_counter reaches the threshold, regarded as phase-lock failed. So
@@ -675,7 +673,7 @@ static void gomach_t2k_wait_cp_txfeedback(gnrc_netif_t *netif)
         /* No TX-ISR, go to sleep. */
         netif->mac.tx.no_ack_counter++;
 
-        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         netif->mac.tx.tx_seq = device_state->seq - 1;
 
         /* Here, we don't queue the packet again, but keep it in tx.packet. */
@@ -805,7 +803,7 @@ static void gomach_t2k_trans_in_slots(gnrc_netif_t *netif)
 {
     /* If this packet is being retransmitted, use the same recorded MAC sequence number. */
     if (netif->mac.tx.no_ack_counter > 0) {
-        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         device_state->seq = netif->mac.tx.tx_seq;
     }
 
@@ -873,7 +871,7 @@ static void _t2k_wait_vtdma_tx_default(gnrc_netif_t *netif)
      *  the following cycle. */
     netif->mac.tx.no_ack_counter = 1;
 
-    netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+    netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
     netif->mac.tx.tx_seq = device_state->seq - 1;
 
     /* Do not release the packet here, continue sending the same packet. ***/
@@ -897,7 +895,7 @@ static void gomach_t2k_wait_vtdma_transfeedback(gnrc_netif_t *netif)
         /* No TX-ISR, go to sleep. */
         netif->mac.tx.no_ack_counter++;
 
-        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         netif->mac.tx.tx_seq = device_state->seq - 1;
 
         /* Here, we don't queue the packet again, but keep it in tx.packet. */
@@ -1258,7 +1256,7 @@ static void gomach_t2u_send_data(gnrc_netif_t *netif)
 {
     /* If we are retrying to send the data, reload its original MAC sequence. */
     if (netif->mac.tx.no_ack_counter > 0) {
-        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         device_state->seq = netif->mac.tx.tx_seq;
     }
 
@@ -1333,7 +1331,7 @@ static void _t2u_data_tx_fail(gnrc_netif_t *netif)
     else {
         /* Record the MAC sequence of the data, retry t2u in next cycle. */
         netif->mac.tx.no_ack_counter = GNRC_GOMACH_REPHASELOCK_THRESHOLD;
-        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         netif->mac.tx.tx_seq = device_state->seq - 1;
 
         LOG_DEBUG("[GOMACH] t2u send data failed on channel %d.\n",
@@ -1352,7 +1350,7 @@ static void gomach_t2u_wait_tx_feedback(gnrc_netif_t *netif)
         netif->mac.tx.t2u_retry_counter++;
 
         netif->mac.tx.no_ack_counter = GNRC_GOMACH_REPHASELOCK_THRESHOLD;
-        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+        netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         netif->mac.tx.tx_seq = device_state->seq - 1;
 
         gnrc_gomach_set_quit_cycle(netif, true);
@@ -2178,7 +2176,7 @@ static void _gomach_init(gnrc_netif_t *netif)
     netif->mac.rx.check_dup_pkt.queue_head = 0;
     netif->mac.tx.last_tx_neighbor_id = 0;
 
-    netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->hwdev;
+    netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
     device_state->seq = netif->l2addr[netif->l2addr_len - 1];
 
     /* Initialize GoMacH's duplicate-check scheme. */
