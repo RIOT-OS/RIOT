@@ -58,13 +58,7 @@ extern "C" {
 #define FLASHPAGE_SIZE      (2048U)
 #endif
 
-#if defined(CPU_MODEL_STM32F103C8)
-#define FLASHPAGE_NUMOF     (64U)
-#elif defined(CPU_MODEL_STM32F103CB) || defined(CPU_MODEL_STM32F103RB)
-#define FLASHPAGE_NUMOF     (128U)
-#elif defined(CPU_MODEL_STM32F103RE) || defined(CPU_MODEL_STM32F103ZE)
-#define FLASHPAGE_NUMOF     (256U)
-#endif
+#define FLASHPAGE_NUMOF     (STM32_FLASHSIZE / FLASHPAGE_SIZE)
 
 /* The minimum block size which can be written is 2B. However, the erase
  * block is always FLASHPAGE_SIZE.
