@@ -14,7 +14,7 @@ BOARD_INSUFFICIENT_MEMORY := blackpill bluepill calliope-mini cc2650-launchpad \
                              nucleo-f103rb nucleo-f302r8 nucleo-f303k8 \
                              nucleo-f334r8 nucleo-f410rb nucleo-l031k6 \
                              nucleo-l053r8 opencm904 saml10-xpro saml11-xpro \
-                             spark-core stm32f0discovery
+                             spark-core stm32f0discovery stm32l0538-disco
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-leonardo \
                    arduino-mega2560 arduino-nano \
