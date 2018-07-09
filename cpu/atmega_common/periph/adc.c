@@ -111,7 +111,7 @@ int adc_sample(adc_t line, adc_res_t res)
     _prep();
 
     /* set conversion channel */
-#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P)
+#if defined(CPU_ATMEGA328P) || defined(CPU_ATMEGA1281) || defined(CPU_ATMEGA1284P) || defined(CPU_ATMEGA644P)
     ADMUX &= 0xf0;
     ADMUX |= line;
 #elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA256RFR2)

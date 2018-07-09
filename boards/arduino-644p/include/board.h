@@ -2,15 +2,15 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2016 Laurent Navet <laurent.navet@gmail.com>
  *               2018 Matthew Blue <matthew.blue.neuro@gmail.com>
- *
+ *               2018 Alan Antoine
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
 /*
- * @ingroup     boards_mega-xplained
- * @brief       Support for the Mega Xplained board.
+ * @ingroup     boards_arduino-644p
+ * @brief       Support for the 644P board.
  * @{
  *
  * @file
@@ -19,6 +19,7 @@
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
+ * @author      Alan Antoine <alan.antoine@free.fr>
  */
 
 #ifndef BOARD_H
@@ -26,7 +27,6 @@
 
 #include "cpu.h"
 #include "periph_cpu.h"
-#include "644p_pinmap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,9 +45,9 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Use the UART 1 for STDIO on this board
+ * @brief   Use the UART 0 for STDIO on this board
  */
-#define UART_STDIO_DEV       (UART_DEV(1))
+#define UART_STDIO_DEV       (UART_DEV(0))
 
 /**
  * @name    xtimer configuration values
@@ -62,42 +62,6 @@ extern "C" {
 #define XTIMER_BACKOFF              (40)
 /** @} */
 
-/**
- * @name    LED pin definitions
- * @{
- */
-/* LED0,2 currently unsupported due to lack of GPIO_OD support */
-#define LED1_PIN     GPIO_PIN(PORT_B, 3)
-#define LED1_MODE    GPIO_OUT
-
-#define LED3_PIN     GPIO_PIN(PORT_B, 2)
-#define LED3_MODE    GPIO_OUT
-/** @} */
-
-/**
- * @name    Macros for controlling the on-board LEDs
- * @{
- */
-/* LED0,2 currently unsupported due to lack of GPIO_OD support */
-#define LED1_ENABLE_PORT    DDRB  |=  LED1_PIN
-#define LED1_ON             PORTB |=  LED1_PIN
-#define LED1_OFF            PORTB &= ~LED1_PIN
-#define LED1_TOGGLE         PORTB ^=  LED1_PIN
-
-#define LED3_ENABLE_PORT    DDRB  |=  LED3_PIN
-#define LED3_ON             PORTB |=  LED3_PIN
-#define LED3_OFF            PORTB &= ~LED3_PIN
-#define LED3_TOGGLE         PORTB ^=  LED3_PIN
-/** @} */
-
-/**
- * @name    Button pin configuration
- * @{
- */
-
-/* BTN2 currently unsupported due to lack of GPIO_OD support */
-
-/** @} */
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO

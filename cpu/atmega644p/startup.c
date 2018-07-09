@@ -1,14 +1,14 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2018 Matthew Blue
- *
+ *               2018 Alan Antoine
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
 /**
- * @ingroup     cpu_atmega1284p
+ * @ingroup     cpu_atmega644p
  * @{
  *
  * @file
@@ -16,7 +16,7 @@
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
- *
+ * @author      Alan Antoine <alan.antoine@free.fr>
  * @}
  */
 

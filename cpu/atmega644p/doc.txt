@@ -5,6 +5,6 @@
  */
 
 /**
- * @defgroup        cpu_atmega644p_definitions Atmel ATmega1284p Definitions
+ * @defgroup        cpu_atmega644p_definitions Atmel ATmega644p Definitions
  * @ingroup         cpu_atmega644p
  */

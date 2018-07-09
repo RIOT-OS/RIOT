@@ -57,7 +57,7 @@ void spi_init_pins(spi_t bus)
 #if defined (CPU_ATMEGA328P)
     DDRB |= ((1 << DDB2) | (1 << DDB3) | (1 << DDB5));
 #endif
-#if defined (CPU_ATMEGA1284P)
+#if defined (CPU_ATMEGA1284P) || defined(CPU_ATMEGA644P)
     DDRB |= ((1 << DDB4) | (1 << DDB5) | (1 << DDB7));
 #endif
 #if defined (CPU_ATMEGA256RFR2)

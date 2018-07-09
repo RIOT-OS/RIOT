@@ -2,6 +2,7 @@
  * Copyright (C) 2015 HAW Hamburg
  *               2016 Freie Universität Berlin
  *               2018 Matthew Blue
+ *               2018 Alan Antoine
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -18,6 +19,7 @@
  * @author          René Herthel <rene-herthel@outlook.de>
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Matthew Blue <matthew.blue.neuro@gmail.com>
+ * @author          Alan Antoine <alan.antoine@free.fr>
  */
 
 #ifndef PERIPH_CPU_H

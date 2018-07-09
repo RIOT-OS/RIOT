@@ -20,7 +20,7 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Laurent Navet <laurent.navet@gmail.com>
  * @author      Matthew Blue <matthew.blu.neuro@gmail.com>
- *
+ * @author      Alan Antoie <alan.antoine@free.fr>
  * @}
  */
 
@@ -28,11 +28,5 @@
 
 void led_init(void)
 {
-    /* LED0,2 currently unsupported due to lack of GPIO_OD support */
 
-    LED1_ENABLE_PORT;
-    LED1_OFF;
-
-    LED3_ENABLE_PORT;
-    LED3_OFF;
 }

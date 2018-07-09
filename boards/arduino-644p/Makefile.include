@@ -1,15 +1,26 @@
-# define the cpu used by the Mega Xplained board
-export CPU = atmega644p
+export BAUD ?= 9600
+include $(RIOTMAKE)/tools/serial.inc.mk
 
-# configure the terminal program
-export PORT_LINUX ?= /dev/ttyACM0
+export PORT_LINUX ?= /dev/ttyUSB0
 export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 export PROGRAMMER_SPEED ?= 115200
-
-export FFLAGS += -p m644p
-
-# PROGRAMMER defaults to arduino which is the internal flasher via USB. Can be
-# overridden for debugging (which requires changes that require to use an ISP)
+export CPU = atmega644p
 export PROGRAMMER ?= arduino
+export FLASHER = avrdude
+export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
+export DEBUGSERVER_PORT = 4242
+export DEBUGSERVER = $(DIST_PATH)/debug_srv.sh
+export DEBUGSERVER_FLAGS = "-g -j usb :$(DEBUGSERVER_PORT)"
+export DEBUGGER_FLAGS = "-x $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)"
+export DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBUGSERVER_PORT)
 
-include $(RIOTBOARD)/common/arduino-atmega/Makefile.include
+export PROGRAMMER_FLAGS = -P $(PORT) -b $(PROGRAMMER_SPEED) -p m644p
+
+OFLAGS += -j .text -j .data
+export FFLAGS += -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -D -U flash:w:$(HEXFILE)
+
+
+
+
+
+

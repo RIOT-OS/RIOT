@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_atmega1284p
+ * @ingroup     cpu_atmega644p
  * @{
  *
  * @file
@@ -16,6 +16,7 @@
  *
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
+ * @author      Alan Antoine <alan.antoine@free.fr>
  * @}
  */
 
