@@ -52,9 +52,9 @@ enum {
     || defined(CPU_LINE_STM32F411xE) || defined(CPU_LINE_STM32F412Zx) \
     || defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx)
 #define ADC_DEVS            (1U)
-#elif defined(CPU_LINE_STM32F407xx) || defined(CPU_LINE_STM32F415xx) \
-    || defined(CPU_LINE_STM32F429xx) || defined(CPU_LINE_STM32F437xx) \
-    || defined(CPU_LINE_STM32F446xx)
+#elif defined(CPU_LINE_STM32F405xx)  || defined(CPU_LINE_STM32F407xx) \
+    || defined(CPU_LINE_STM32F415xx) || defined(CPU_LINE_STM32F429xx) \
+    || defined(CPU_LINE_STM32F437xx) || defined(CPU_LINE_STM32F446xx)
 #define ADC_DEVS            (3U)
 #endif
 
