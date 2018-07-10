@@ -179,6 +179,7 @@ bool at86rf2xx_cca(at86rf2xx_t *dev)
     uint8_t old_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_TRX_OFF);
     /* Disable RX path */
     uint8_t rx_syn = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
+
     reg = rx_syn | AT86RF2XX_RX_SYN__RX_PDT_DIS;
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, reg);
     /* Manually triggered CCA is only possible in RX_ON (basic operating mode) */
