@@ -22,6 +22,7 @@
 
 #define NOTIFY_VALUE    (0x01)
 #define NOTIFY_POLARITY (0x02)
+#define NOTIFY_APP_TYPE (0x03)
 
 typedef struct _actuator_data_t {
     struct _actuator_data_t *next;  /* matches lwm2m_list_t::next */
@@ -30,6 +31,7 @@ typedef struct _actuator_data_t {
     uint8_t notify;                 /* Bitmask for observer notifications */
     bool value;                     /* Digitial output state (RW) */
     bool polarity;                  /* 0 = Normal, 1= Reversed (RW) */
+    char *app_type;                 /* Application type (RW) */
 } actuator_data_t;
 
 typedef struct notification_tuple {
@@ -65,11 +67,21 @@ static bool prv_actuator_read_bool(actuator_data_t *target)
     return (ret.val[0]) ? !target->polarity : target->polarity;
 }
 
+static void priv_update_actuator_value(actuator_data_t *target)
+{
+    bool old_value = target->value;
+    target->value = prv_actuator_read_bool(target);
+    if (target->value != old_value) {
+        target->notify |= NOTIFY_VALUE;
+    }
+}
+
 static void prv_init_instance(actuator_data_t *actuator_instance, saul_reg_t *dev)
 {
     actuator_instance->dev = dev;
     actuator_instance->polarity = false;
     actuator_instance->value = prv_actuator_read_bool(actuator_instance);
+    actuator_instance->app_type = lwm2m_strdup(dev->name);
 }
 
 
@@ -81,6 +93,9 @@ static uint8_t prv_get_value(lwm2m_data_t *data, actuator_data_t *target)
             return COAP_205_CONTENT;
         case LWM2M_DOUTPUT_POLARITY_ATTR:
             lwm2m_data_encode_bool(target->polarity, data);
+            return COAP_205_CONTENT;
+        case LWM2M_APP_TYPE_ATTR:
+            lwm2m_data_encode_string(target->app_type, data);
             return COAP_205_CONTENT;
     }
     return COAP_404_NOT_FOUND;
@@ -103,6 +118,7 @@ static uint8_t prv_bool_read(uint16_t instance_id, int *num_data,
     if (*num_data == 0) {
         uint16_t res_list[] = {
             LWM2M_DOUTPUT_ATTR, LWM2M_DOUTPUT_POLARITY_ATTR,
+            LWM2M_APP_TYPE_ATTR,
         };
         int nb_res = sizeof(res_list) / sizeof(uint16_t);
 
@@ -160,6 +176,30 @@ static uint8_t prv_bool_write(uint16_t instance_id, int num_data,
                     result = COAP_204_CHANGED;
                 }
                 break;
+            case LWM2M_APP_TYPE_ATTR:
+                if (data_array[i].value.asBuffer.length == 0) {
+                    if (target->app_type != NULL) {
+                        lwm2m_free(target->app_type);
+                    }
+                    target->app_type = NULL;
+                    target->notify |= NOTIFY_APP_TYPE;
+                    result = COAP_204_CHANGED;
+                } else {
+                    char *new = lwm2m_malloc(data_array[i].value.asBuffer.length+1);
+                    if (new == NULL) {
+                        result = COAP_500_INTERNAL_SERVER_ERROR;
+                    } else {
+                        memset(new, '\0', data_array[i].value.asBuffer.length+1);
+                        memcpy(new, (char*)data_array[i].value.asBuffer.buffer, data_array[i].value.asBuffer.length);
+                        if (target->app_type != NULL) {
+                            lwm2m_free(target->app_type);
+                        }
+                        target->app_type = new;
+                        target->notify |= NOTIFY_APP_TYPE;
+                        result = COAP_204_CHANGED;
+                    }
+                }
+                break;
             default:
                 result = COAP_404_NOT_FOUND;
                 break;
@@ -182,6 +222,7 @@ static uint8_t prv_bool_execute(uint16_t instance_id, uint16_t resource_id,
     switch (resource_id) {
         case LWM2M_DOUTPUT_POLARITY_ATTR:
         case LWM2M_DOUTPUT_ATTR:
+        case LWM2M_APP_TYPE_ATTR:
             return COAP_405_METHOD_NOT_ALLOWED;
     }
     return COAP_404_NOT_FOUND;
@@ -202,7 +243,8 @@ static uint8_t prv_bool_discover(uint16_t instance_id, int *num_data,
     /* Server is asking for everything. */
     if (*num_data == 0) {
         uint16_t res_list[] = {
-            LWM2M_DOUTPUT_POLARITY_ATTR, LWM2M_DOUTPUT_ATTR
+            LWM2M_DOUTPUT_POLARITY_ATTR, LWM2M_DOUTPUT_ATTR,
+            LWM2M_APP_TYPE_ATTR,
         };
         int nb_res = sizeof(res_list) / sizeof(uint16_t);
 
@@ -220,6 +262,7 @@ static uint8_t prv_bool_discover(uint16_t instance_id, int *num_data,
             switch ((*data_array)[i].id) {
                 case LWM2M_DOUTPUT_POLARITY_ATTR:
                 case LWM2M_DOUTPUT_ATTR:
+                case LWM2M_APP_TYPE_ATTR:
                     break;
                 default:
                     result = COAP_404_NOT_FOUND;
@@ -362,7 +405,9 @@ void lwm2m_poll_bool_actuators(lwm2m_context_t *lwm2mH)
                 notification_tuple_t notify_array[] = {
                     {NOTIFY_VALUE, LWM2M_DOUTPUT_ATTR},
                     {NOTIFY_POLARITY, LWM2M_DOUTPUT_POLARITY_ATTR},
+                    {NOTIFY_APP_TYPE, LWM2M_DOUTPUT_ATTR},
                 };
+                priv_update_actuator_value(instance);
 
                 for (i = 0; i < sizeof(notify_array) / sizeof(notification_tuple_t); i++) {
                     if (instance->notify & notify_array[i].mask) {

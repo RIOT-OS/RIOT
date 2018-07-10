@@ -195,7 +195,7 @@ char *lwm2m_strdup(const char *str)
         return NULL;
     }
 
-    return (char *)memcpy(new, str, len);
+    return strncpy(new, str, len);
 }
 
 #endif /* LWM2M_MEMORY_TRACE */
