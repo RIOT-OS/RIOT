@@ -49,9 +49,7 @@ int cc2420_init(cc2420_t *dev)
     uint16_t reg;
     uint8_t addr[8];
 
-    /* reset options and sequence number */
-    dev->netdev.seq = 0;
-    dev->netdev.flags = 0;
+    netdev_ieee802154_reset(&dev->netdev);
 
     /* set default address, channel, PAN ID, and TX power */
     luid_get(addr, sizeof(addr));
@@ -72,12 +70,6 @@ int cc2420_init(cc2420_t *dev)
 
 #ifdef MODULE_NETSTATS_L2
     cc2420_set_option(dev, CC2420_OPT_TELL_RX_END, true);
-#endif
-    /* set default protocol*/
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
-#elif MODULE_GNRC
-    dev->netdev.proto = GNRC_NETTYPE_UNDEF;
 #endif
 
     /* change default RX bandpass filter to 1.3uA (as recommended) */
