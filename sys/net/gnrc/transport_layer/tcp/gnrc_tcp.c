@@ -19,7 +19,9 @@
 
 #include <errno.h>
 #include <utlist.h>
+#include <string.h>
 #include "net/af.h"
+#include "net/gnrc.h"
 #include "net/gnrc/tcp.h"
 #include "internal/common.h"
 #include "internal/fsm.h"
@@ -151,6 +153,9 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
                 return -EINVAL;
             }
         }
+#else
+        /* Supress Compiler Warnings */
+        (void) target_addr;
 #endif
         /* Set port number to listen on */
         tcb->local_port = local_port;
