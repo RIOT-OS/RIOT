@@ -18,6 +18,18 @@
  * @}
  */
 
+/*
+ * When compiling this file for nRF52 with the SoftDevice,
+ * do not override NVIC_SetPriority as we do elsewhere, since
+ * here we want to set also PendSV_IRQn and SVCall_IRQn.
+ *
+ * Not overriding is safe here, since the SoftDevice will be
+ * initialised only later in cpu.c
+ */
+#if defined(CPU_NRF52) && defined(SOFTDEVICE_PRESENT) && defined(NRF_SDH_ENABLED)
+#define DONT_OVERRIDE_NVIC 1
+#endif
+
 #include "cpu.h"
 
 /**

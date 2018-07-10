@@ -78,11 +78,91 @@ extern "C" {
  * @{
  */
 #ifdef SOFTDEVICE_PRESENT
+/*
+ * BLE callbacks may take place in the IDLE stack
+ */
+#if defined(THREAD_STACKSIZE_IDLE) && THREAD_STACKSIZE_IDLE < THREAD_STACKSIZE_DEFAULT
+#undef  THREAD_STACKSIZE_IDLE
+#endif
+#define THREAD_STACKSIZE_IDLE THREAD_STACKSIZE_DEFAULT
+
+/*
+ * All NVIC calls should go through the SD wrappers.
+ *
+ * See `cpu/cortexm_common/cortexm_init.c` for DONT_OVERRIDE_NVIC
+ */
 #ifndef DONT_OVERRIDE_NVIC
 #include "nrf_soc.h"
 #include "nrf_nvic.h"
-#undef NVIC_SetPriority
-#define NVIC_SetPriority    sd_nvic_SetPriority
+#undef  NVIC_EnableIRQ
+#define NVIC_EnableIRQ       nrf5_sd_nvic_EnableIRQ
+#undef  NVIC_DisableIRQ
+#define NVIC_DisableIRQ      nrf5_sd_nvic_DisableIRQ
+#undef  NVIC_GetPendingIRQ
+#define NVIC_GetPendingIRQ   nrf5_sd_nvic_GetPendingIRQ
+#undef  NVIC_SetPendingIRQ
+#define NVIC_SetPendingIRQ   nrf5_sd_nvic_SetPendingIRQ
+#undef  NVIC_ClearPendingIRQ
+#define NVIC_ClearPendingIRQ nrf5_sd_nvic_ClearPendingIRQ
+#undef  NVIC_SetPriority
+#define NVIC_SetPriority     nrf5_sd_nvic_SetPriority
+#undef  NVIC_GetPriority
+#define NVIC_GetPriority     nrf5_sd_nvic_GetPriority
+
+/**
+ * Call @core_panic.  Defined in `cpu.c`.
+ */
+#ifdef __GNUC__
+/* Note that NORETURN may be still undefined */
+__attribute__((noreturn))
+#endif
+void nrf5_sd_nvic_panic(unsigned int);
+
+/*
+ * Note that the sd_nvic_* functions are also inline,
+ * meaning that with constant arguments the compiler
+ * is often able to optimise away these calls.
+ */
+
+static inline void nrf5_sd_nvic_EnableIRQ(IRQn_Type IRQn) {
+    const unsigned int err_code = sd_nvic_EnableIRQ(IRQn);
+    if (NRF_SUCCESS != err_code) nrf5_sd_nvic_panic(err_code);
+}
+
+static inline void nrf5_sd_nvic_DisableIRQ(IRQn_Type IRQn) {
+    const unsigned int err_code = sd_nvic_DisableIRQ(IRQn);
+    if (NRF_SUCCESS != err_code) nrf5_sd_nvic_panic(err_code);
+}
+
+static inline uint32_t nrf52_sd_nvic_GetPendingIRQ(IRQn_Type IRQn) {
+    uint32_t pending_irq;
+    const unsigned int err_code = sd_nvic_GetPendingIRQ(IRQn, &pending_irq);
+    if (NRF_SUCCESS != err_code) nrf5_sd_nvic_panic(err_code);
+    return pending_irq;
+}
+
+static inline void nrf5_sd_nvic_SetPendingIRQ(IRQn_Type IRQn) {
+    const unsigned int err_code = sd_nvic_SetPendingIRQ(IRQn);
+    if (NRF_SUCCESS != err_code) nrf5_sd_nvic_panic(err_code);
+}
+
+static inline void nrf5_sd_nvic_ClearPendingIRQ(IRQn_Type IRQn) {
+    const unsigned int err_code = sd_nvic_ClearPendingIRQ(IRQn);
+    if (NRF_SUCCESS != err_code) nrf5_sd_nvic_panic(err_code);
+}
+
+static inline void nrf52_sd_nvic_SetPriority(IRQn_Type IRQn, uint32_t priority) {
+    const unsigned int err_code = sd_nvic_SetPriority(IRQn, priority);
+    if (NRF_SUCCESS != err_code) nrf5_sd_nvic_panic(err_code);
+}
+
+static inline uint32_t nrf52_sd_nvic_GetPriority(IRQn_Type IRQn) {
+    uint32_t priority;
+    const unsigned int err_code = sd_nvic_GetPriority(IRQn, &priority);
+    if (NRF_SUCCESS != err_code) nrf5_sd_nvic_panic(err_code);
+    return priority;
+}
+
 #endif /* DONT_OVERRIDE_NVIC */
 #endif /* SOFTDEVICE_PRESENT */
 /** @} */

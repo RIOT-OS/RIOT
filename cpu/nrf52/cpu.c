@@ -32,6 +32,15 @@ static bool ftpan_36(void);
 
 #ifdef SOFTDEVICE_PRESENT
 #include "nrf_sdh.h"
+#include "nrf_nvic.h"
+
+/**
+ * @brief   Call core_panic
+ */
+void nrf5_sd_nvic_panic(unsigned int nrf5_err_code) {
+    core_panic(PANIC_ASSERT_FAIL, "NRF5 SD NVIC call failed");
+}
+
 #endif
 
 /**
@@ -75,11 +84,11 @@ void cpu_init(void)
     /* fixup swi0 (used as softdevice PendSV trampoline) */
     const ret_code_t err_code3 = sd_nvic_SetPriority(SWI0_EGU0_IRQn, 6);
     if (NRF_SUCCESS != err_code3) {
-	core_panic(PANIC_SOFT_REBOOT, "cpu: unable to set SW0 interrupts priority with nRF SoftDevice");
+        core_panic(PANIC_SOFT_REBOOT, "cpu: unable to set SW0 interrupts priority with nRF SoftDevice");
     }
     const ret_code_t err_code2 = sd_nvic_EnableIRQ(SWI0_EGU0_IRQn);
     if (NRF_SUCCESS != err_code2) {
-	core_panic(PANIC_SOFT_REBOOT, "cpu: unable to enable SW0 interrupts with nRF SoftDevice");
+        core_panic(PANIC_SOFT_REBOOT, "cpu: unable to enable SW0 interrupts with nRF SoftDevice");
     }
 #endif
     /* finalise the Cortex-M specific configuration and initialisation */
