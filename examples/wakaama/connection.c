@@ -132,7 +132,6 @@ static char *security_get_key(lwm2m_object_t *obj, int key_type, int instance_id
 
 static int send_data(lwm2m_connection_t *conn, uint8_t *buffer, size_t length)
 {
-    xtimer_usleep(200);
     ssize_t bytes_sent = sock_udp_send(&(conn->sock), buffer, length, NULL);
 
     /* TODO Error handling */
@@ -531,7 +530,7 @@ static int connection_send(lwm2m_connection_t *conn, uint8_t *buffer, size_t len
         }
         DEBUG("dtls_write(%d)\n", length);
         bw = dtls_write(conn->dtls_context, conn->dtls_session, buffer, length);
-        if (bw < 0) {
+        if (bw <= 0) {
             DEBUG("dtls_write() failed (%d)\n", bw);
             return -1;
         }
