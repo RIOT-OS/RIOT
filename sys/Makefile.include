@@ -6,6 +6,10 @@ ifneq (,$(filter cbor,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/cbor/include
 endif
 
+ifneq (,$(filter eepreg,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/eepreg/include
+endif
+
 ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
