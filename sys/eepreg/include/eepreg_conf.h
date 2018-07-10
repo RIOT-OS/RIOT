@@ -22,6 +22,8 @@
 #ifndef EEPREG_CONF_H
 #define EEPREG_CONF_H
 
+#include <stdint.h>
+
 #include "eepreg.h"
 
 #ifdef __cplusplus
@@ -42,12 +44,13 @@ extern "C" {
 enum {
     FOO_EEPREG_NUM,
     BAR_EEPREG_NUM,
+    EEPREG_MAX_ENTRY_NUM,
 };
 
 /**
  * @brief   Example sizes array
  */
-static const eepreg_t eepreg_sizes[] =
+static const uint32_t eepreg_sizes[] =
 {
     FOO_EEPREG_SIZE,
     BAR_EEPREG_SIZE,
@@ -56,7 +59,7 @@ static const eepreg_t eepreg_sizes[] =
 /**
  * @brief   Example eepreg names (used as magic numbers)
  */
-static const char *eepreg_names[] =
+static const uint8_t *eepreg_names[] =
 {
     "FOO",
     "BAR",

@@ -23,15 +23,10 @@
 #ifndef EEPREG_H
 #define EEPREG_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef HAVE_EEPREG_SIZE_T
-/**
- * @brief   type for EEPROM locations and sizes
- */
-typedef int eepreg_t;
 #endif
 
 /**
@@ -45,9 +40,9 @@ typedef int eepreg_t;
  * @param[in] num   number of the entry in the registry
  *
  * @return          location in eeprom on success
- * @return          < 0 on error
+ * @return          UINT_MAX on error
  */
-eepreg_t eepreg_addr(unsigned num);
+uint32_t eepreg_addr(unsigned num);
 
 /**
  * @brief   Check to ensure that the name is written at the correct location
