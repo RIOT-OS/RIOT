@@ -50,6 +50,19 @@ static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
     return sizeof(eui64_t);
 }
 
+void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
+{
+    dev->seq = 0;
+    dev->flags = 0;
+
+    /* set default protocol */
+#ifdef MODULE_GNRC_SIXLOWPAN
+    dev->proto = GNRC_NETTYPE_SIXLOWPAN;
+#elif MODULE_GNRC
+    dev->proto = GNRC_NETTYPE_UNDEF;
+#endif
+}
+
 int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
                            size_t max_len)
 {
