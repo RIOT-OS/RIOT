@@ -1232,12 +1232,12 @@ static void _configure_netdev(netdev_t *dev)
     static const netopt_enable_t enable = NETOPT_ENABLE;
     int res = dev->driver->set(dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
     if (res < 0) {
-        LOG_ERROR("gnrc_netif: enable NETOPT_RX_END_IRQ failed: %d\n", res);
+        DEBUG("gnrc_netif: enable NETOPT_RX_END_IRQ failed: %d\n", res);
     }
 #ifdef MODULE_NETSTATS_L2
     res = dev->driver->set(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
     if (res < 0) {
-        LOG_ERROR("gnrc_netif: enable NETOPT_TX_END_IRQ failed: %d\n", res);
+        DEBUG("gnrc_netif: enable NETOPT_TX_END_IRQ failed: %d\n", res);
     }
 #endif
 }
