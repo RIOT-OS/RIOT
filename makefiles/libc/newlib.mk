@@ -19,6 +19,13 @@ endif
 
 export LINKFLAGS += -lc
 
+# Note on `realpath` vs `abspath`
+#
+# `realpath` is used instead of `abspath` to support Mingw32
+# It fixes issues when using windows formatted paths like in the gcc output
+# It does leave the trailing `/` on windows though
+
+
 # Search for Newlib include directories
 
 # Try to search for newlib in the standard search path of the compiler for includes
@@ -62,7 +69,7 @@ endif
 # If nothing was found we will try to fall back to searching for a cross-gcc in
 # the current PATH and use a relative path for the includes
 ifeq (,$(NEWLIB_INCLUDE_DIR))
-  NEWLIB_INCLUDE_DIR := $(abspath $(wildcard $(dir $(shell command -v $(PREFIX)gcc 2>/dev/null))/../$(TARGET_ARCH)/include))
+  NEWLIB_INCLUDE_DIR := $(realpath $(wildcard $(dir $(shell command -v $(PREFIX)gcc 2>/dev/null))/../$(TARGET_ARCH)/include))
 endif
 
 ifeq ($(TOOLCHAIN),llvm)
@@ -72,7 +79,7 @@ ifeq ($(TOOLCHAIN),llvm)
   # We also add -nostdinc to avoid including the host system headers by mistake
   # in case some header is missing from the cross tool chain
   NEWLIB_INCLUDES := -isystem $(NEWLIB_INCLUDE_DIR) -nostdinc
-  NEWLIB_INCLUDES += $(addprefix -isystem ,$(abspath $(wildcard $(dir $(NEWLIB_INCLUDE_DIR))/usr/include)))
+  NEWLIB_INCLUDES += $(addprefix -isystem ,$(realpath $(wildcard $(dir $(NEWLIB_INCLUDE_DIR))/usr/include)))
 
   # Newlib includes should go before GCC includes. This is especially important
   # when using Clang, because Clang will yield compilation errors on some GCC-
