@@ -329,7 +329,7 @@ $(info $(USEPKG:%=$(RIOTPKG)/%/Makefile.include))
 
 # Deduplicate includes without sorting them
 # see https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting
-define uniq =
+define uniq
   $(eval seen :=)
   $(foreach _,$1,$(if $(filter $_,$(seen)),,$(eval seen += $_)))
   $(seen)
