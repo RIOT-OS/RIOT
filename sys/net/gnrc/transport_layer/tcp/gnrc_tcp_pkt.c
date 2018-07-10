@@ -21,7 +21,7 @@
 #include <errno.h>
 #include "byteorder.h"
 #include "net/inet_csum.h"
-#include "net/gnrc/pktbuf.h"
+#include "net/gnrc.h"
 #include "internal/common.h"
 #include "internal/option.h"
 #include "internal/pkt.h"

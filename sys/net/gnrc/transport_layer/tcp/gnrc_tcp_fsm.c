@@ -17,8 +17,11 @@
  * @}
  */
 
+#include <utlist.h>
+#include <errno.h>
 #include "random.h"
 #include "net/af.h"
+#include "net/gnrc.h"
 #include "internal/common.h"
 #include "internal/pkt.h"
 #include "internal/option.h"

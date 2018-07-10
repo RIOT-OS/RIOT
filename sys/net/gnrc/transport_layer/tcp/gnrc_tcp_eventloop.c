@@ -21,6 +21,7 @@
 #include <errno.h>
 #include "net/af.h"
 #include "net/tcp.h"
+#include "net/gnrc.h"
 #include "internal/common.h"
 #include "internal/pkt.h"
 #include "internal/fsm.h"
