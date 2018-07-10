@@ -12,7 +12,7 @@ $(RIOTTOOLS)/bossa/bossac:
 	@make -C $(RIOTTOOLS)/bossa
 	@echo "[INFO] bossac binary successfully build!"
 
-$(RIOTTOOLS)/edbg/edbg:
+$(RIOTTOOLS)/edbg/edbg: $(RIOTTOOLS)/edbg/Makefile
 	@echo "[INFO] edbg binary not found - building it from source now"
 	CC= CFLAGS= make -C $(RIOTTOOLS)/edbg
 	@echo "[INFO] edbg binary successfully build!"
