@@ -98,7 +98,8 @@ static const i2c_conf_t i2c_config[] = {
         .loc = I2C_ROUTELOC0_SDALOC_LOC16 |
                I2C_ROUTELOC0_SCLLOC_LOC14,
         .cmu = cmuClock_I2C0,
-        .irq = I2C0_IRQn
+        .irq = I2C0_IRQn,
+        .speed = I2C_SPEED_NORMAL
     }
 };
 
