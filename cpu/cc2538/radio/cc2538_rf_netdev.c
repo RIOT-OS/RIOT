@@ -367,6 +367,8 @@ static int _init(netdev_t *netdev)
     uint16_t addr_short = cc2538_get_addr_short();
     uint64_t addr_long = cc2538_get_addr_long();
 
+    netdev_ieee802154_reset(&dev->netdev);
+
     /* Initialise netdev_ieee802154_t struct */
     netdev_ieee802154_set((netdev_ieee802154_t *)netdev, NETOPT_NID, &pan,
                           sizeof(pan));
@@ -379,12 +381,6 @@ static int _init(netdev_t *netdev)
 
     cc2538_set_state(dev, NETOPT_STATE_IDLE);
 
-    /* set default protocol */
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
-#elif MODULE_GNRC
-    dev->netdev.proto = GNRC_NETTYPE_UNDEF;
-#endif
 #ifdef MODULE_NETSTATS_L2
     memset(&netdev->stats, 0, sizeof(netstats_t));
 #endif
