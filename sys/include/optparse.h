@@ -16,29 +16,43 @@
  */
 
 /**
- * @{
  * @defgroup sys_optparse   Command line option parser.
  * @ingroup sys
- * @file
- * @brief  Command-line parser
- * @author Juan I Carrano <j.carrano@fu-berlin.de>
+ * @{
  *
- * Terminology:
+ * This module provides a generic way of describing and parsing command line
+ * arguments. Features:
+ *
+ * - Supports both short form ("-k") and long form ("--key") options.
+ * - Built-in parsers for most common options.
+ * - Automatically formats and prints a help string.
+ * - Supports custom parsers via callbacks.
+ *
+ * # Usage
+ *
+ * Initialize the required ::opt_conf_t and ::opt_rule_t structures and call
+ * optparse_cmd().
+ *
+ * # Terminology
  *
  * option: Optional value. Consists of a key an possibly a value. Each type of
  *         options has a predefined number of arguments it takes, and that may
  *         be either 0 or 1. Example:
  *              -v --number 5 -k hello
  *         Options (key, value): (v, none), (number, 5), (k, hello)
+ *
  * switch: An option taking 0 values.
+ *
  * argument: A value without a key. For example, in "-c 3 abcd", abcd is an
  *          argument.
+ *
  * short-option: Starts with a single dash and consists of a single character.
+ *
  * long-option: Starts with two dashes and consists of one or more characters
  *          (i.e. a string).
  *
  *
- * Tips for defining rules:
+ * # Tips for defining rules:
  *
  * 1. Make an enum with the name of the parameters:
  *    enum {HEIGHT, WIDTH, VERBOSE, ETC, .... , N_PARAMETERS }
@@ -57,6 +71,12 @@
  *      rules[HEIGHT] = (struct optparse){ .short_id = 'a', .long_id= ....etc ....};
  *      ```
  * 4. If none of those options is adequate, initializer functions are provided.
+ *
+ * @{
+ * @file
+ * @brief  Command-line parser
+ * @author Juan I Carrano <j.carrano@fu-berlin.de>
+ * @}
  */
 
 #ifndef OPTPARSE_H
@@ -75,8 +95,12 @@ extern "C" {
  */
 #define OPTPARSE_NO_SHORT '\0'
 
-/* Este es el idioma de generic_parser y amigos, y los callback deben usarlos
- * para indicar su exito o fracaso */
+/**
+ * Error codes used by optparse_cmd.
+ *
+ * User callbacks should use the same error codes. On error, a negative code
+ * is returned.
+ */
 enum OPTPARSE_RESULT {
     OPTPARSE_OK,            /**< Parsing suceeded */
     OPTPARSE_NOMEM,         /**< Not enough memory. Only OPTPARSE_STR or a
@@ -93,8 +117,8 @@ enum OPTPARSE_ACTIONS {
     OPTPARSE_IGNORE_SWITCH, /**< Ignore a switch. Takes 0 arguments */
     OPTPARSE_IGNORE,        /**< Ignore a key and its value. Takes 1 argument. */
 
-    OPTPARSE_SET_BOOL,      /**< Set opt_rule::data::d_bool to true. Takes 0 arguments.*/
-    OPTPARSE_UNSET_BOOL,    /**< Set opt_rule::data::d_bool to false. Takes 0 arguments.*/
+    OPTPARSE_SET_BOOL,      /**< Set *opt_rule.data.d_bool to true. Takes 0 arguments.*/
+    OPTPARSE_UNSET_BOOL,    /**< Set *opt_rule.data.d_bool to false. Takes 0 arguments.*/
     OPTPARSE_COUNT,         /**< Count the number of occurences. Increments data::d_int
                              *  each time the option is found. */
 
@@ -135,7 +159,6 @@ typedef struct opt_rule {
     const char *long_id;    /**< Long style option name ("--width") . Can be NULL */
     const char *desc;       /**< Help description. Can be NULL */
     int action;             /**< Parsing type/action. See OPTPARSE_ACTIONS. */
-    /** The parse results will be placed in this union depending on action */
     union {
         int *d_int;
         bool *d_bool;
@@ -158,7 +181,7 @@ typedef struct opt_rule {
             void *data;
             int (*callback)(const char *, const char *, void *, const char **);
         } d_custom;
-    } data;
+    } data; /**< The parse results will be placed in this union depending on action */
 } opt_rule_t;
 
 /**
@@ -176,7 +199,7 @@ enum OPTPARSE_TUNABLES {
 /** Should arguments be ignored if arg_parser is NULL? */
 #define OPTPARSE_NULL_ARGPARSER (1 << OPTPARSE_NULL_ARGPARSER_b)
 
-typedef uint16_t optparse_tune; /*! Option bitfield */
+typedef uint16_t optparse_tune; /**< Option bitfield */
 
 /**
  * Configuration for the command line parser.
@@ -235,17 +258,19 @@ int optparse_cmd(struct opt_conf *config, int argc, const char * const argv[]);
  *
  */
 
+/** Set general parser options */
 void opt_conf_init(struct opt_conf *conf,
                    struct opt_rule *rules, size_t n_rules,
                    char *helpstr, optparse_tune tune,
                    int (*arg_parser)(int, const char *, void *),
                    void *arg_parser_data);
 
-
-
+/** Set common options for a rule */
 void set_parse_meta(struct opt_rule *rule, char short_id,
                     const char *long_id, const char *desc);
 
+
+/** @{ */
 void set_parse_ignore(struct opt_rule *rule);
 void set_parse_ignore_sw(struct opt_rule *rule);
 void set_parse_help(struct opt_rule *rule);
@@ -262,7 +287,7 @@ void set_parse_double(struct opt_rule *rule, double *data);
 void set_parse_float(struct opt_rule *rule, float *data);
 void set_parse_str(struct opt_rule *rule, char **data);
 void set_parse_str_nocopy(struct opt_rule *rule, const char **data);
-
+/** @} */
 
 /** @} */
 
