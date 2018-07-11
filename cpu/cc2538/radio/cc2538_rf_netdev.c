@@ -370,13 +370,13 @@ static int _init(netdev_t *netdev)
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Initialise netdev_ieee802154_t struct */
-    netdev_ieee802154_set((netdev_ieee802154_t *)netdev, NETOPT_NID, &pan,
-                          sizeof(pan));
-    netdev_ieee802154_set((netdev_ieee802154_t *)netdev, NETOPT_CHANNEL, &chan,
-                          sizeof(chan));
-    netdev_ieee802154_set((netdev_ieee802154_t *)netdev, NETOPT_ADDRESS,
+    netdev_ieee802154_set(&dev->netdev, NETOPT_NID,
+                          &pan, sizeof(pan));
+    netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL,
+                          &chan, sizeof(chan));
+    netdev_ieee802154_set(&dev->netdev, NETOPT_ADDRESS,
                           &addr_short, sizeof(addr_short));
-    netdev_ieee802154_set((netdev_ieee802154_t *)netdev, NETOPT_ADDRESS_LONG,
+    netdev_ieee802154_set(&dev->netdev, NETOPT_ADDRESS_LONG,
                           &addr_long, sizeof(addr_long));
 
     cc2538_set_state(dev, NETOPT_STATE_IDLE);
