@@ -91,11 +91,11 @@ static void *printer(void *arg)
         uart_t dev = (uart_t)msg.content.value;
         char c;
 
-        printf("UART_DEV(%i) RX: ", dev);
+        printf("Success: UART_DEV(%i) RX: [", dev);
         do {
             c = (int)ringbuffer_get_one(&(ctx[dev].rx_buf));
             if (c == '\n') {
-                puts("\\n");
+                puts("]\\n");
             }
             else if (c >= ' ' && c <= '~') {
                 printf("%c", c);
@@ -145,7 +145,7 @@ static int cmd_init(int argc, char **argv)
         puts("Error: Unable to initialize UART device\n");
         return 1;
     }
-    printf("Successfully initialized UART_DEV(%i)\n", dev);
+    printf("Success: Successfully initialized UART_DEV(%i)\n", dev);
 
     /* also test if poweron() and poweroff() work (or at least don't break
      * anything) */
