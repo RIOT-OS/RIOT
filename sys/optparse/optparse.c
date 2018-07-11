@@ -317,7 +317,7 @@ int optparse_cmd(opt_conf_t *config, int argc, const char * const argv[])
         }
         else {
             P_ERR("Argument %s missing key\n", argv[i] );
-            if (config->tune & OPTPARSE_NULL_ARGPARSER) {
+            if (!(config->tune & OPTPARSE_NULL_ARGPARSER)) {
                 error = -OPTPARSE_BADSYNTAX; /* BYE! <===========> */
             }
         }
