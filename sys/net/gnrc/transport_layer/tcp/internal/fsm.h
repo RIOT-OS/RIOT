@@ -23,7 +23,7 @@
 #define FSM_H
 
 #include <stdint.h>
-#include "net/gnrc/pkt.h"
+#include "net/gnrc.h"
 #include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus

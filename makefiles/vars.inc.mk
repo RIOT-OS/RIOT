@@ -17,6 +17,7 @@ export USEMODULE             # Sys Module dependencies of the application. Set i
 export USEPKG                # Pkg dependencies (third party modules) of the application. Set in the application's Makefile.
 export DISABLE_MODULE        # Used in the application's Makefile to suppress DEFAULT_MODULEs.
 export APPDEPS               # Files / Makefile targets that need to be created before the application can be build. Set in the application's Makefile.
+# BUILDDEPS                  # Files / Makefile targets that need to be created before starting to build.
 
 export RIOTBASE              # The root folder of RIOT. The folder where this very file lives in.
 export RIOTCPU               # For third party CPUs this folder is the base of the CPUs.

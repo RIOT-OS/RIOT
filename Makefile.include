@@ -323,11 +323,18 @@ include $(RIOTBASE)/drivers/Makefile.include
 $(RIOTPKG)/%/Makefile.include::
 	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
 
-$(info $(USEPKG:%=$(RIOTPKG)/%/Makefile.include))
 .PHONY: $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
-USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a[$$0]++' | tr '\n' ' ')
+# Deduplicate includes without sorting them
+# see https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting
+define uniq
+  $(eval seen :=)
+  $(foreach _,$1,$(if $(filter $_,$(seen)),,$(eval seen += $_)))
+  $(seen)
+endef
+
+USEMODULE_INCLUDES_ = $(strip $(call uniq,$(USEMODULE_INCLUDES)))
 
 INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
@@ -364,6 +371,11 @@ LINKFLAGPREFIX ?= -Wl,
 
 DIRS += $(EXTERNAL_MODULE_DIRS)
 
+# Define dependencies required for building (headers, downloading source files,)
+BUILDDEPS += $(RIOTBUILD_CONFIG_HEADER_C)
+BUILDDEPS += pkg-prepare
+BUILDDEPS += $(APPDEPS)
+
 # Save value to verify it is not modified later
 _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 
@@ -387,7 +399,7 @@ endif # RIOTNOLINK
 $(ELFFILE): $(BASELIBS)
 	$(Q)$(_LINK) -o $@
 
-$(BINDIR)/$(APPLICATION_MODULE).a: $(RIOTBUILD_CONFIG_HEADER_C) $(USEPKG:%=$(BINDIR)/%.a) $(APPDEPS)
+$(BINDIR)/$(APPLICATION_MODULE).a: $(USEPKG:%=$(BINDIR)/%.a) $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 $(BINDIR)/$(APPLICATION_MODULE).a: FORCE
 
@@ -425,14 +437,14 @@ endef
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(RIOTBUILD_CONFIG_HEADER_C) pkg-prepare: clean
+    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(BUILDDEPS): clean
 endif
 
 .PHONY: pkg-prepare $(USEPKG:%=$(BINDIR)/%.a)
 pkg-prepare:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i prepare ; done
 
-$(USEPKG:%=$(BINDIR)/%.a): $(RIOTBUILD_CONFIG_HEADER_C) pkg-prepare
+$(USEPKG:%=$(BINDIR)/%.a): $(BUILDDEPS)
 	@mkdir -p $(BINDIR)
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst $(BINDIR)/%.a,%,$@)
 

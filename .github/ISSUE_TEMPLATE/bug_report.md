@@ -1,3 +1,9 @@
+---
+name: Bug report
+about: Create a report to help us improve
+
+---
+
 <!--
 If your issue is a usage question, please submit it to the user mailing-list
 users@riot-os.org or to the developer mailing-list devel@riot-os.org.

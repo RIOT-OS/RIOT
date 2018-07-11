@@ -19,7 +19,9 @@
 
 #include "cpu.h"
 #include "periph/init.h"
+#ifdef MODULE_PERIPH_MCG
 #include "mcg.h"
+#endif
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
@@ -33,8 +35,10 @@ void cpu_init(void)
     /* Note: This register can only be written once after each reset, so we must
      * enable all power modes that we wish to use. */
     SMC->PMPROT |= SMC_PMPROT_ALLS_MASK | SMC_PMPROT_AVLP_MASK;
+#ifdef MODULE_PERIPH_MCG
     /* initialize the CPU clocking provided by the MCG module */
     kinetis_mcg_init();
+#endif
     /* trigger static peripheral initialization */
     periph_init();
 }
