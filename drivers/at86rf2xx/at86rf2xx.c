@@ -161,7 +161,7 @@ void at86rf2xx_tx_exec(const at86rf2xx_t *dev)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
                         AT86RF2XX_TRX_STATE__TX_START);
     if (netdev->event_callback &&
-        (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
+        (dev->flags & AT86RF2XX_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
 }

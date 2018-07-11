@@ -337,8 +337,8 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
     DEBUG("set option %i to %i\n", option, state);
 
     /* set option field */
-    dev->netdev.flags = (state) ? (dev->netdev.flags |  option)
-                                : (dev->netdev.flags & ~option);
+    dev->flags = (state) ? (dev->flags |  option)
+                         : (dev->flags & ~option);
     /* trigger option specific actions */
     switch (option) {
         case AT86RF2XX_OPT_CSMA:
