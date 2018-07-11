@@ -1,13 +1,18 @@
 /*
- *      optparse.h
+ * optparse.h
  *
- *      Copyright 2010 Juan I Carrano <juan@carrano.com.ar>
- *      Copyright 2018 Freie Universität Berlin
+ * Copyright 2010 Juan I Carrano <juan@carrano.com.ar>
+ * Copyright 2018 Freie Universität Berlin
  *
- *      This program is free software; you can redistribute it and/or modify
- *      it under the terms of the GNU General Public License as published by
- *      the Free Software Foundation; either version 2 of the License, or
- *      (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 /**
@@ -60,6 +65,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Used to indicate that an option has no short (i.e. single character) variant.
@@ -121,7 +130,7 @@ enum OPTPARSE_ACTIONS {
 /**
  * Configuration rules for a single command line option.
  */
-struct opt_rule {
+typedef struct opt_rule {
     char short_id;          /**< Short style option name ("-w"). Can be OPTPARSE_NO_SHORT.*/
     const char *long_id;    /**< Long style option name ("--width") . Can be NULL */
     const char *desc;       /**< Help description. Can be NULL */
@@ -148,7 +157,7 @@ struct opt_rule {
             int (*callback)(char *, char *, void *, const char **);
         } d_custom;
     } data;
-};
+} opt_rule_t;
 
 /**
  * Options that control the behavior of the option parser.
@@ -170,9 +179,9 @@ typedef uint16_t optparse_tune; /*! Option bitfield */
 /**
  * Configuration for the command line parser.
  */
-struct opt_conf {
+typedef struct opt_conf {
     char *helpstr;          /**< Program's description and general help string. */
-    struct opt_rule *rules; /**< Array of options. */
+    opt_rule_t *rules; /**< Array of options. */
     int n_rules;            /**< Number of elements in rules. */
     optparse_tune tune;     /**< Option bitfield. */
 
@@ -187,7 +196,7 @@ struct opt_conf {
      */
     int (*arg_parser)(int, char *, void *);
     void *arg_parser_data; /**< Callback data for arg_parser. */
-};
+} opt_conf_t;
 
 /**
  * Main interface to the option parser.
@@ -211,7 +220,7 @@ struct opt_conf {
  * @return  non-negative on sucess
  * @return  A negative error code from OPTPARSE_RESULT on error.
  */
-extern int optparse_cmd(struct opt_conf *config, int argc, char *argv[]);
+int optparse_cmd(struct opt_conf *config, int argc, char *argv[]);
 
 /**
  * @defgroup sys_optparse_initializers  Optparse initializers
@@ -224,7 +233,7 @@ extern int optparse_cmd(struct opt_conf *config, int argc, char *argv[]);
  *
  */
 
-extern void opt_conf_init(struct opt_conf *conf,
+void opt_conf_init(struct opt_conf *conf,
                           struct opt_rule *rules, size_t n_rules,
                           char *helpstr, optparse_tune tune,
                           int (*arg_parser)(int, char *, void *),
@@ -232,26 +241,24 @@ extern void opt_conf_init(struct opt_conf *conf,
 
 
 
-extern void set_parse_meta(struct opt_rule *rule, char short_id,
-                           const char *long_id, const char *desc);
+void set_parse_meta(struct opt_rule *rule, char short_id,
+                    const char *long_id, const char *desc);
 
-extern void set_parse_ignore(struct opt_rule *rule);
-extern void set_parse_ignore_sw(struct opt_rule *rule);
-extern void set_parse_help(struct opt_rule *rule);
+void set_parse_ignore(struct opt_rule *rule);
+void set_parse_ignore_sw(struct opt_rule *rule);
+void set_parse_help(struct opt_rule *rule);
 
-extern void set_parse_custom(struct opt_rule *rule,
+void set_parse_custom(struct opt_rule *rule,
                              int (*callback)(char *, char *, void *, const char **),
                              void *data);
 
-/* set_parse_*( struct opt_rule *rule, <type> *data) */
-
-extern void set_parse_int(struct opt_rule *rule, int *data);
-extern void set_parse_bool(struct opt_rule *rule, bool *data);
-extern void set_parse_bool_unset(struct opt_rule *rule, bool *data);
-extern void set_parse_double(struct opt_rule *rule, double *data);
-extern void set_parse_float(struct opt_rule *rule, float *data);
-extern void set_parse_str(struct opt_rule *rule, char * *data);
-extern void set_parse_str_nocopy(struct opt_rule *rule, char * *data);
+void set_parse_int(struct opt_rule *rule, int *data);
+void set_parse_bool(struct opt_rule *rule, bool *data);
+void set_parse_bool_unset(struct opt_rule *rule, bool *data);
+void set_parse_double(struct opt_rule *rule, double *data);
+void set_parse_float(struct opt_rule *rule, float *data);
+void set_parse_str(struct opt_rule *rule, char * *data);
+void set_parse_str_nocopy(struct opt_rule *rule, char * *data);
 
 /** @} */
 

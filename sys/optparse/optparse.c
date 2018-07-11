@@ -1,13 +1,27 @@
 /*
- *      optparse.c
+ * optparse.c
  *
- *      Copyright 2010 Juan I Carrano <juan@carrano.com.ar>
- *		Copyright 2018 Freie Universität Berlin
+ * Copyright 2010 Juan I Carrano <juan@carrano.com.ar>
+ * Copyright 2018 Freie Universität Berlin
  *
- *      This program is free software; you can redistribute it and/or modify
- *      it under the terms of the GNU General Public License as published by
- *      the Free Software Foundation; either version 2 of the License, or
- *      (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+/**
+ * @ingroup  sys_optparse
+ * @{
+ * @file
+ *
+ * @brief   Command line parser implementation.
+ * @author  Juan Carrano <j.carrano@fu-berlin.de>
+ *
  */
 
 #include <stdio.h>
@@ -15,32 +29,44 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "../optparse.h"
+#include "optparse.h"
 
-#define TERM '\0'
-#define ERROR 0
-#define OPT '-'
+#define TERM '\0'   /**< String terminator character */
+#define OPT '-'     /**< The character that marks an option */
 
 #define P_ERR(...) fprintf(stderr, __VA_ARGS__)
 #define STR_ERR(s) fputs(s, stderr)
 
-#ifndef DEBUG
+#ifndef DEVELHELP
 
 #define P_DEBUG(...)
 #define LOAD_VAR(var, value) do { if ((var) != NULL) { *(var) = value; } } while (0)
 
-#else /* DEBUG */
+#else /* DEVELHELP */
 
 #define P_DEBUG P_ERR
 #define LOAD_VAR(var, value) do { if ((var) != NULL) { *(var) = value; } \
                                   else { P_DEBUG("Warning! NULL pointer:" #var "%c\n", ' '); } } while (0)
 
-#endif /*DEBUG */
+#endif /*DEVELHELP */
 
 #define HELP_STREAM stdout /* TODO: remove this */
 
-#define SAFE_FPUTS(str, stream) (((str) != NULL) ? fputs(str, stream) : 0)
-#define SAFE_FPUTC(c, stream) ((c != TERM) ? fputc(c, stream) : 0)
+/**
+ * Like fputs, but the string can be null.
+ */
+static int safe_fputs(const char *s, FILE *stream)
+{
+    return (s != NULL) ? fputs(s, stream) : 0;
+}
+
+/**
+ * Like fputc, but nothing is printed if the character is the terminator.
+ */
+static int safe_fputc(int c, FILE *stream)
+{
+    return (c != TERM) ? fputc(c, stream) : 0;
+}
 
 #if (_XOPEN_SOURCE >= 500) || (_POSIX_C_SOURCE > 200809L)
 #define my_strdup strdup
@@ -93,20 +119,21 @@ static bool str_notempty(char *str)
 }
 
 /* TODO: make help stream into an argument */
-static void do_help(const struct opt_conf *config)
+static void do_help(const opt_conf_t *config)
 {
     int rule_i;
 
-    SAFE_FPUTS(config->helpstr, HELP_STREAM);
-    SAFE_FPUTC('\n', HELP_STREAM);
+    safe_fputs(config->helpstr, HELP_STREAM);
+    safe_fputc('\n', HELP_STREAM);
+
     for (rule_i = 0; rule_i < config->n_rules; rule_i++) {
-        SAFE_FPUTC('-', HELP_STREAM);
-        SAFE_FPUTC(config->rules[rule_i].short_id, HELP_STREAM);
-        SAFE_FPUTS("\t--", HELP_STREAM);
-        SAFE_FPUTS(config->rules[rule_i].long_id, HELP_STREAM);
-        SAFE_FPUTC('\t', HELP_STREAM);
-        SAFE_FPUTS(config->rules[rule_i].desc, HELP_STREAM);
-        SAFE_FPUTC('\n', HELP_STREAM);
+        safe_fputc('-', HELP_STREAM);
+        safe_fputc(config->rules[rule_i].short_id, HELP_STREAM);
+        safe_fputs("\t--", HELP_STREAM);
+        safe_fputs(config->rules[rule_i].long_id, HELP_STREAM);
+        safe_fputc('\t', HELP_STREAM);
+        safe_fputs(config->rules[rule_i].desc, HELP_STREAM);
+        safe_fputc('\n', HELP_STREAM);
     }
 }
 
@@ -117,9 +144,9 @@ static void do_help(const struct opt_conf *config)
  * value is only used for commands that need it.
  * This assumes key and value are not null if they should not be.
  *
- * @return	An exit code from OPTPARSE_RESULT.
+ * @return  An exit code from OPTPARSE_RESULT.
  */
-static int do_action(struct opt_rule *rule, char *key, char *value)
+static int do_action(opt_rule_t *rule, char *key, char *value)
 {
     int ret = OPTPARSE_OK;
     char *copied_str = NULL;
@@ -188,8 +215,8 @@ static int do_action(struct opt_rule *rule, char *key, char *value)
  *
  * A short id of 0 never matches. A NULL long id never matches.
  */
-static struct opt_rule *find_rule(struct opt_conf *config, char *long_id,
-                                  char short_id)
+static opt_rule_t *find_rule(opt_conf_t *config, char *long_id,
+                             char short_id)
 {
     int rule_i;
 
@@ -205,7 +232,7 @@ static struct opt_rule *find_rule(struct opt_conf *config, char *long_id,
     return NULL;
 }
 
-int optparse_cmd(struct opt_conf *config, int argc, char *argv[])
+int optparse_cmd(opt_conf_t *config, int argc, char *argv[])
 {
     int error = 0, i, no_more_options = 0;
     /* Used for handling combined switches like -axf (equivalent to -a -x -f)
@@ -222,7 +249,7 @@ int optparse_cmd(struct opt_conf *config, int argc, char *argv[])
                 || str_notempty(key = strip_dash(argv[i])))) {
 
             bool is_long;
-            struct opt_rule *curr_rule;
+            opt_rule_t *curr_rule;
 
             if (pending_opt == NULL) {
                 char *tmp_key;
@@ -303,10 +330,8 @@ parse_loop_end:
     return error;
 }
 
-/* SETTERS : Should not be fed null arguments*/
-
-void opt_conf_init(struct opt_conf *conf,
-                   struct opt_rule *rules, size_t n_rules, char *helpstr,
+void opt_conf_init(opt_conf_t *conf,
+                   opt_rule_t *rules, size_t n_rules, char *helpstr,
                    optparse_tune tune, int (*arg_parser)(int, char *, void *),
                    void *arg_parser_data)
 {
@@ -318,7 +343,7 @@ void opt_conf_init(struct opt_conf *conf,
     conf->arg_parser_data = arg_parser_data;
 }
 
-void set_parse_meta(struct opt_rule *rule, char short_id, const char *long_id,
+void set_parse_meta(opt_rule_t *rule, char short_id, const char *long_id,
                     const char *desc)
 {
     rule->short_id = short_id;
@@ -328,17 +353,17 @@ void set_parse_meta(struct opt_rule *rule, char short_id, const char *long_id,
 
 #define SET_ACTION(rule, action_) (rule)->action = (action_)
 #define MK_SETTER1(name, action, type, var) \
-    void name(struct opt_rule *rule, type *data) { \
+    void name(opt_rule_t * rule, type * data) { \
         SET_ACTION(rule, action); \
         rule->data.var = data; \
     }
 
 #define MK_SETTER0(name, action) \
-    void name(struct opt_rule *rule) { \
+    void name(opt_rule_t * rule) { \
         SET_ACTION(rule, action); \
     }
 
-void set_parse_custom(struct opt_rule *rule,
+void set_parse_custom(opt_rule_t *rule,
                       int (*callback)(char *, char *, void *, const char **), void *data)
 {
     SET_ACTION(rule, OPTPARSE_CUSTOM_ACTION);
@@ -358,3 +383,5 @@ MK_SETTER1(set_parse_bool_unset, OPTPARSE_UNSET_BOOL, bool, d_bool)
 MK_SETTER1(set_parse_count, OPTPARSE_COUNT, int, d_int)
 MK_SETTER1(set_parse_str, OPTPARSE_STR, char *, d_str)
 MK_SETTER1(set_parse_str_nocopy, OPTPARSE_STR_NOCOPY, char *, d_str)
+
+/** @} */
