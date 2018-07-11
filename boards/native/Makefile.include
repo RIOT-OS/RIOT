@@ -47,7 +47,11 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-export CFLAGS += -Wall -Wextra -pedantic -std=gnu99
+export CFLAGS += -Wall -Wextra -pedantic
+# default std set to gnu99 of not overwritten by user
+ifeq (,$(filter -std=%, $(CFLAGS)))
+  export CFLAGS += -std=gnu99
+endif
 
 ifeq ($(shell uname -m),x86_64)
   export CFLAGS += -m32
