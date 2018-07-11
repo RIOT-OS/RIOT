@@ -100,9 +100,9 @@ const uint16_t need_value_mask = _MSK(OPTPARSE_IGNORE)
  *
  * If it does not start with a dash, returns null.
  */
-static char *strip_dash(char stri[])
+static const char *strip_dash(const char stri[])
 {
-    char *ret = NULL;
+    const char *ret = NULL;
 
     if (stri[0] == OPT) {
         ret = &stri[1];
@@ -113,7 +113,7 @@ static char *strip_dash(char stri[])
 /**
  * Return true if the string is not null and not empty.
  */
-static bool str_notempty(char *str)
+static bool str_notempty(const char *str)
 {
     return str != NULL && str[0] != TERM;
 }
@@ -146,7 +146,7 @@ static void do_help(const opt_conf_t *config)
  *
  * @return  An exit code from OPTPARSE_RESULT.
  */
-static int do_action(opt_rule_t *rule, char *key, char *value)
+static int do_action(opt_rule_t *rule, const char *key, const char *value)
 {
     int ret = OPTPARSE_OK;
     char *copied_str = NULL;
@@ -165,7 +165,7 @@ static int do_action(opt_rule_t *rule, char *key, char *value)
             LOAD_VAR(rule->data.d_float, strtof(value, NULL));
             break;
         case OPTPARSE_STR_NOCOPY:
-            LOAD_VAR(rule->data.d_str, value);
+            LOAD_VAR(rule->data.d_cstr, value);
             break;
         case OPTPARSE_SET_BOOL:
             LOAD_VAR(rule->data.d_bool, true);
@@ -215,7 +215,7 @@ static int do_action(opt_rule_t *rule, char *key, char *value)
  *
  * A short id of 0 never matches. A NULL long id never matches.
  */
-static opt_rule_t *find_rule(opt_conf_t *config, char *long_id,
+static opt_rule_t *find_rule(opt_conf_t *config, const char *long_id,
                              char short_id)
 {
     int rule_i;
@@ -232,17 +232,17 @@ static opt_rule_t *find_rule(opt_conf_t *config, char *long_id,
     return NULL;
 }
 
-int optparse_cmd(opt_conf_t *config, int argc, char *argv[])
+int optparse_cmd(opt_conf_t *config, int argc, const char * const argv[])
 {
     int error = 0, i, no_more_options = 0;
     /* Used for handling combined switches like -axf (equivalent to -a -x -f)
      * Instead of advancing argv, we keep reading from the string*/
-    char *pending_opt = NULL;
+    const char *pending_opt = NULL;
 
     i = (config->tune & OPTPARSE_IGNORE_ARGV0) ? 1 : 0;
 
     while (error >= OPTPARSE_OK && i < argc) {
-        char *key, *value;
+        const char *key, *value;
 
         if (!no_more_options
             && ((pending_opt != NULL)
@@ -252,7 +252,7 @@ int optparse_cmd(opt_conf_t *config, int argc, char *argv[])
             opt_rule_t *curr_rule;
 
             if (pending_opt == NULL) {
-                char *tmp_key;
+                const char *tmp_key;
                 is_long = (tmp_key = strip_dash(key)) != NULL;
 
                 if (is_long) {
@@ -332,7 +332,7 @@ parse_loop_end:
 
 void opt_conf_init(opt_conf_t *conf,
                    opt_rule_t *rules, size_t n_rules, char *helpstr,
-                   optparse_tune tune, int (*arg_parser)(int, char *, void *),
+                   optparse_tune tune, int (*arg_parser)(int, const char *, void *),
                    void *arg_parser_data)
 {
     conf->helpstr = helpstr;
@@ -364,7 +364,7 @@ void set_parse_meta(opt_rule_t *rule, char short_id, const char *long_id,
     }
 
 void set_parse_custom(opt_rule_t *rule,
-                      int (*callback)(char *, char *, void *, const char **), void *data)
+                      int (*callback)(const char *, const char *, void *, const char **), void *data)
 {
     SET_ACTION(rule, OPTPARSE_CUSTOM_ACTION);
     rule->data.d_custom.callback = callback;
@@ -382,6 +382,6 @@ MK_SETTER1(set_parse_bool, OPTPARSE_SET_BOOL, bool, d_bool)
 MK_SETTER1(set_parse_bool_unset, OPTPARSE_UNSET_BOOL, bool, d_bool)
 MK_SETTER1(set_parse_count, OPTPARSE_COUNT, int, d_int)
 MK_SETTER1(set_parse_str, OPTPARSE_STR, char *, d_str)
-MK_SETTER1(set_parse_str_nocopy, OPTPARSE_STR_NOCOPY, char *, d_str)
+MK_SETTER1(set_parse_str_nocopy, OPTPARSE_STR_NOCOPY, const char *, d_cstr)
 
 /** @} */

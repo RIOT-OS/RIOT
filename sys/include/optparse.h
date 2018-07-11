@@ -111,7 +111,7 @@ enum OPTPARSE_ACTIONS {
                              *  in *opt_rule.data.d_str. The string must be deallocated with free()
                              */
 
-    OPTPARSE_STR_NOCOPY,    /*! Place a pointer to the value string in data::d_str.
+    OPTPARSE_STR_NOCOPY,    /*! Place a pointer to the value string in data::d_cstr.
                              * In contrast with OPTPARSE_STR, this does NOT make a
                              * copy of the string. It should not be used if the
                              * strings will be modified.
@@ -141,12 +141,14 @@ typedef struct opt_rule {
         bool *d_bool;
         double *d_double;
         float *d_float;
-        char **d_str;       /**< Pointer to a user-defined pointer */
+        char **d_str;              /**< Pointer to a user-defined pointer */
+        const char **d_cstr;       /**< Pointer to a user-defined pointer, constant variant */
         /**
          * Callback for user defined actions.
          *
          * Prototype:
-         *  int callback(char *key, char *value, void *data, const char **msg)
+         *  int callback(const char *key, const char *value,
+         *               void *data, const char **msg)
          *
          * The callback must return a non-negative value to indicate success.
          * The callback can place a message into msg and it will get printed to
@@ -154,7 +156,7 @@ typedef struct opt_rule {
          */
         struct {
             void *data;
-            int (*callback)(char *, char *, void *, const char **);
+            int (*callback)(const char *, const char *, void *, const char **);
         } d_custom;
     } data;
 } opt_rule_t;
@@ -186,7 +188,7 @@ typedef struct opt_conf {
     optparse_tune tune;     /**< Option bitfield. */
 
     /**
-     * int arg_parser(int current_index, char *valor, void *userdata)
+     * int arg_parser(int current_index, const char *value, void *userdata)
      *
      * This function will be called each time an value without a key (i.e.
      * an argument) is found. The first parameter (current_index) indicates the
@@ -194,7 +196,7 @@ typedef struct opt_conf {
      * arg_parser can be NULL. In that case, finding an argument will generate
      * an error, unless OPTPARSE_NULL_ARGPARSER is set.
      */
-    int (*arg_parser)(int, char *, void *);
+    int (*arg_parser)(int, const char *, void *);
     void *arg_parser_data; /**< Callback data for arg_parser. */
 } opt_conf_t;
 
@@ -220,7 +222,7 @@ typedef struct opt_conf {
  * @return  non-negative on sucess
  * @return  A negative error code from OPTPARSE_RESULT on error.
  */
-int optparse_cmd(struct opt_conf *config, int argc, char *argv[]);
+int optparse_cmd(struct opt_conf *config, int argc, const char * const argv[]);
 
 /**
  * @defgroup sys_optparse_initializers  Optparse initializers
@@ -234,10 +236,10 @@ int optparse_cmd(struct opt_conf *config, int argc, char *argv[]);
  */
 
 void opt_conf_init(struct opt_conf *conf,
-                          struct opt_rule *rules, size_t n_rules,
-                          char *helpstr, optparse_tune tune,
-                          int (*arg_parser)(int, char *, void *),
-                          void *arg_parser_data);
+                   struct opt_rule *rules, size_t n_rules,
+                   char *helpstr, optparse_tune tune,
+                   int (*arg_parser)(int, const char *, void *),
+                   void *arg_parser_data);
 
 
 
@@ -249,16 +251,18 @@ void set_parse_ignore_sw(struct opt_rule *rule);
 void set_parse_help(struct opt_rule *rule);
 
 void set_parse_custom(struct opt_rule *rule,
-                             int (*callback)(char *, char *, void *, const char **),
-                             void *data);
+                      int (*callback)(const char *, const char *, void *, const char **),
+                      void *data);
 
 void set_parse_int(struct opt_rule *rule, int *data);
 void set_parse_bool(struct opt_rule *rule, bool *data);
 void set_parse_bool_unset(struct opt_rule *rule, bool *data);
+void set_parse_count(struct opt_rule *rule, int *data);
 void set_parse_double(struct opt_rule *rule, double *data);
 void set_parse_float(struct opt_rule *rule, float *data);
-void set_parse_str(struct opt_rule *rule, char * *data);
-void set_parse_str_nocopy(struct opt_rule *rule, char * *data);
+void set_parse_str(struct opt_rule *rule, char **data);
+void set_parse_str_nocopy(struct opt_rule *rule, const char **data);
+
 
 /** @} */
 
