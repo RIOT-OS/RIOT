@@ -174,6 +174,7 @@ int openthread_netdev_init(char *stack, int stacksize, char priority,
 
     netopt_enable_t enable = NETOPT_ENABLE;
     netdev->driver->set(netdev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
+    netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
 
     _pid = thread_create(stack, stacksize,
                          priority, THREAD_CREATE_STACKTEST,
