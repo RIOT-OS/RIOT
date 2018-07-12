@@ -523,7 +523,7 @@ def main():
     try:
         bpt = BptIf.from_autodetect(baud=9600)
     except Exception as ex:
-        pass
+        logging.debug("Failed to autodetect BptIf: " + str(ex))
     bpt = BptIf.from_autodetect()
     bpt2 = BptIf.copy_driver(bpt)
     bpt.execute_changes()
