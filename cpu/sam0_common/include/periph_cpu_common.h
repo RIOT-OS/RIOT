@@ -253,7 +253,8 @@ typedef enum {
 } i2c_flag_t;
 
 /**
- * @brief   Override I2C clock speed values
+ * @name    Override I2C clock speed values
+ * @{
  */
 #define HAVE_I2C_SPEED_T
 typedef enum {
@@ -263,6 +264,7 @@ typedef enum {
     I2C_SPEED_FAST_PLUS = 1000000U,    /**< fast plus mode:    ~1Mbit/s */
     I2C_SPEED_HIGH      = 3400000U,    /**< high speed mode:   ~3.4Mbit/s */
 } i2c_speed_t;
+/** @} */
 
 /**
  * @brief   I2C device configuration
