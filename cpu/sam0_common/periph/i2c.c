@@ -127,8 +127,8 @@ void i2c_init(i2c_t dev)
     /* Set sercom module to operate in I2C master mode and run in Standby
     if user requests it */
     bus(dev)->CTRLA.reg = SERCOM_I2CM_CTRLA_MODE_I2C_MASTER |
-                          (i2c_config[dev].flags & I2C_FLAG_RUN_STANDBY ?
-                              SERCOM_I2CM_CTRLA_RUNSTDBY : 0);
+                          ((i2c_config[dev].flags & I2C_FLAG_RUN_STANDBY) ?
+                           SERCOM_I2CM_CTRLA_RUNSTDBY : 0);
 
     /* Enable Smart Mode (ACK is sent when DATA.DATA is read) */
     bus(dev)->CTRLB.reg = SERCOM_I2CM_CTRLB_SMEN;
