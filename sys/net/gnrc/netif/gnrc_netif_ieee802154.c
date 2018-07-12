@@ -88,6 +88,8 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         pkt = gnrc_pktbuf_add(NULL, NULL, bytes_expected, GNRC_NETTYPE_UNDEF);
         if (pkt == NULL) {
             DEBUG("_recv_ieee802154: cannot allocate pktsnip.\n");
+            /* Discard packet on netdev device */
+            dev->driver->recv(dev, NULL, bytes_expected, NULL);
             return NULL;
         }
         nread = dev->driver->recv(dev, pkt->data, bytes_expected, &rx_info);
