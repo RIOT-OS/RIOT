@@ -169,6 +169,8 @@ static uint8_t i2c_find_divider(unsigned freq, unsigned speed)
 
 static inline void i2c_clear_irq_flags(I2C_Type *i2c)
 {
+    /* cppcheck-suppress selfAssignment
+     * reason: intentional self assignment to clear all pending IRQs */
     i2c->S = i2c->S;
 }
 
