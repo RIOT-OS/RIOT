@@ -60,6 +60,16 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 static void *_event_loop(void *arg);
 
+static void _configure_netdev(netdev_t *dev)
+{
+    /* Enable RX-complete interrupts */
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+    int res = dev->driver->set(dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
+    if (res < 0) {
+        DEBUG("lwip_netdev: enable NETOPT_RX_END_IRQ failed: %d\n", res);
+    }
+}
+
 err_t lwip_netdev_init(struct netif *netif)
 {
     LWIP_ASSERT("netif != NULL", (netif != NULL));
@@ -81,6 +91,7 @@ err_t lwip_netdev_init(struct netif *netif)
     /* initialize netdev and netif */
     netdev = (netdev_t *)netif->state;
     netdev->driver->init(netdev);
+    _configure_netdev(netdev);
     netdev->event_callback = _event_cb;
     if (netdev->driver->get(netdev, NETOPT_DEVICE_TYPE, &dev_type,
                             sizeof(dev_type)) < 0) {
