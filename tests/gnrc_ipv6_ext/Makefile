@@ -25,8 +25,6 @@ CFLAGS += -DGNRC_NETIF_IPV6_ADDRS_NUMOF=3
 
 TEST_ON_CI_WHITELIST += all
 
-include $(RIOTBASE)/Makefile.include
+# Note: The test can check more things with ENABLE_DEBUG set to 1 in gnrc_ipv6.c
 
-# The test can check more things with ENABLE_DEBUG set to 1 in gnrc_ipv6.c
-test:
-	tests/01-run.py
+include $(RIOTBASE)/Makefile.include

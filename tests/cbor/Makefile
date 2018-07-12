@@ -19,6 +19,3 @@ USEMODULE += cbor_float
 USEMODULE += cbor_semantic_tagging
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	tests/01-run.py

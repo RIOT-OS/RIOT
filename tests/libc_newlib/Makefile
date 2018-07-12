@@ -41,7 +41,3 @@ test-newlib: $(ELFFILE)
 	fi
 
 compile-test: $(COMPILE_TESTS)
-
-
-test:
-	tests/01-run.py

@@ -269,6 +269,3 @@ ifeq (, $(UNIT_TESTS))
 else
   CFLAGS += -DTEST_SUITES='$(subst $() $(),$(charCOMMA),$(UNIT_TESTS:tests-%=%))'
 endif
-
-test:
-	./tests/01-run.py
