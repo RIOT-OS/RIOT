@@ -1,6 +1,6 @@
 PKG_NAME=edbg
 PKG_URL=https://github.com/ataradov/edbg
-PKG_VERSION=76f85abdea212ba23760723cce15e00ca4ae4b76
+PKG_VERSION=a59b16ea18ea095135362035dcfd990ca1dd3af2
 PKG_LICENSE=BSD-3-Clause
 PKG_BUILDDIR=$(CURDIR)/bin
 
