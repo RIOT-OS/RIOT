@@ -16,7 +16,7 @@
  * different kind of register addressing schemes.
  *
  *
- * @section   sec_usage Usage
+ * @section   sec_i2c_usage Usage
  *
  * Example for reading a 8-bit register on a device, using a 10-bit device
  * address and 8-bit register addresses and using a RESTART condition (CAUTION:
@@ -54,7 +54,7 @@
  * @endcode
  *
  *
- * @section   sec_pull Pull Resistors
+ * @section   sec_i2c_pull Pull Resistors
  *
  * The I2C signal lines SDA/SCL need external pull-up resistors which connect
  * the lines to the positive voltage supply Vcc. The I2C driver implementation
@@ -86,7 +86,7 @@
  * http://www.nxp.com/documents/user_manual/UM10204.pdf
  *
  *
- * @section   sec_pm (Low-) power implications
+ * @section   sec_i2c_pm (Low-) power implications
  *
  * The I2C interface realizes a transaction-based access scheme to the bus. From
  * a power management perspective, we can leverage this by only powering on the
