@@ -19,3 +19,8 @@ structures that can be mounted using constfs.
 
 This is an alternative tool that takes a list of files instead of a whole
 directory.
+
+File generation can be customized via a INI file containing template
+fragments. Note that the INI parser has comments disabled (to allow for
+literal ";" and "#" characters). Also, leading whitespace is removed,
+requiring the use of escape sequences.
