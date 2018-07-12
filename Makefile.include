@@ -536,6 +536,13 @@ reset:
 	$(call check_cmd,$(RESET),Reset program)
 	$(RESET) $(RESET_FLAGS)
 
+TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*),\
+                        $(shell test -f $(file) -a -x $(file) && echo $(file)))
+test: $(TEST_DEPS)
+	$(Q) for t in $(TESTS); do \
+		$$t || exit 1; \
+	done
+
 # Default OBJDUMPFLAGS for platforms which do not specify it:
 OBJDUMPFLAGS ?= -S -D -h
 
