@@ -91,11 +91,8 @@ typedef enum {
  * @param[in] dev           device descriptor of an SRF08 sensor
  * @param[in] i2c           I2C device the sensor is connected to
  * @param[in] addr          I2C address of the sensor
- * @param[in] speed         I2C speed mode
  *
  * @return                  0 on successful initialization
- * @return                  -1 on undefined device given
- * @return                  -2 on unsupported speed value
  * @return                  -3 on max. range error
  * @return                  -4 on max. gain error
  *
