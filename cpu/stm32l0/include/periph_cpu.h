@@ -71,18 +71,6 @@ typedef struct {
 } adc_conf_t;
 
 /**
- * @brief   I2C configuration data structure
- */
-typedef struct {
-    I2C_TypeDef *dev;       /**< i2c device */
-    gpio_t scl;             /**< scl pin number */
-    gpio_t sda;             /**< sda pin number */
-    gpio_mode_t pin_mode;   /**< with or without pull resistor */
-    gpio_af_t af;           /**< I2C alternate function value */
-    uint8_t ev_irqn;        /**< event IRQ */
-} i2c_conf_t;
-
-/**
  * @brief   Override the default initial PM blocker
  * @todo   we block all modes per default, until PM is cleanly implemented
  */

@@ -52,18 +52,12 @@ int8_t si114x_init(si114x_t *dev, const si114x_params_t *params)
     /* wait before sensor is ready */
     xtimer_usleep(SI114X_STARTUP_TIME);
 
-    /* initialize I2C interface */
-    if (i2c_init_master(DEV_I2C, I2C_SPEED_NORMAL)) {
-        DEBUG("[Error] I2C device not enabled\n");
-        return -SI114X_ERR_I2C;
-    }
-
     /* acquire exclusive access */
     i2c_acquire(DEV_I2C);
 
     /* check sensor ID */
     char checkid = 0;
-    i2c_read_reg(DEV_I2C, SI114X_ADDR, SI114X_REG_PART_ID, &checkid);
+    i2c_read_reg(DEV_I2C, SI114X_ADDR, SI114X_REG_PART_ID, &checkid, 0);
     if ((checkid != SI1145_ID) && (checkid != SI1146_ID) && (checkid != SI1147_ID)) {
         DEBUG("[Error] The given i2c is not enabled.\n");
         i2c_release(DEV_I2C);
@@ -89,7 +83,7 @@ uint16_t si114x_read_uv(si114x_t *dev)
 
     uint8_t buffer[2];
     i2c_read_regs(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_UV_INDEX0, &buffer, 2);
+                  SI114X_REG_UV_INDEX0, &buffer, 2, 0);
 
     /* release I2C device */
     i2c_release(DEV_I2C);
@@ -104,7 +98,7 @@ uint16_t si114x_read_ir(si114x_t *dev)
 
     uint8_t buffer[2];
     i2c_read_regs(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_ALS_IR_DATA0, &buffer, 2);
+                  SI114X_REG_ALS_IR_DATA0, &buffer, 2, 0);
 
     /* release I2C device */
     i2c_release(DEV_I2C);
@@ -119,7 +113,7 @@ uint16_t si114x_read_visible(si114x_t *dev)
 
     uint8_t buffer[2];
     i2c_read_regs(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_ALS_VIS_DATA0, &buffer, 2);
+                  SI114X_REG_ALS_VIS_DATA0, &buffer, 2, 0);
 
     /* release I2C device */
     i2c_release(DEV_I2C);
@@ -134,7 +128,7 @@ uint16_t si114x_read_distance(si114x_t *dev)
 
     uint8_t buffer[2];
     i2c_read_regs(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_PS1_DATA0, &buffer, 2);
+                  SI114X_REG_PS1_DATA0, &buffer, 2, 0);
 
     /* release I2C device */
     i2c_release(DEV_I2C);
@@ -149,7 +143,7 @@ uint8_t si114x_read_response(si114x_t *dev)
 
     uint8_t buffer[1];
     i2c_read_regs(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_RESPONSE, &buffer, 1);
+                  SI114X_REG_RESPONSE, &buffer, 1, 0);
 
     /* release I2C device */
     i2c_release(DEV_I2C);
@@ -167,28 +161,28 @@ void _reset(si114x_t *dev)
 
     /* write configuration values */
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_MEAS_RATE0, 0);
+                  SI114X_REG_MEAS_RATE0, 0, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_MEAS_RATE1, 0);
+                  SI114X_REG_MEAS_RATE1, 0, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_IRQ_ENABLE, 0);
+                  SI114X_REG_IRQ_ENABLE, 0, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_IRQ_MODE1, 0);
+                  SI114X_REG_IRQ_MODE1, 0, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_IRQ_MODE2, 0);
+                  SI114X_REG_IRQ_MODE2, 0, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_INT_CFG, 0);
+                  SI114X_REG_INT_CFG, 0, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_IRQ_STATUS, 0xFF);
+                  SI114X_REG_IRQ_STATUS, 0xFF, 0);
 
     /* perform RESET command */
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_COMMAND, SI114X_RESET);
+                  SI114X_REG_COMMAND, SI114X_RESET, 0);
     xtimer_usleep(SI114X_WAIT_10MS);
 
     /* write HW_KEY for proper operation */
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_HW_KEY, SI114X_INIT_VALUE);
+                  SI114X_REG_HW_KEY, SI114X_INIT_VALUE, 0);
     xtimer_usleep(SI114X_WAIT_10MS);
 }
 
@@ -199,13 +193,13 @@ void _initialize(si114x_t *dev)
 
     /* set default UV measurement coefs */
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_UCOEF0, SI114X_UCOEF0_DEFAULT);
+                  SI114X_REG_UCOEF0, SI114X_UCOEF0_DEFAULT, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_UCOEF1, SI114X_UCOEF1_DEFAULT);
+                  SI114X_REG_UCOEF1, SI114X_UCOEF1_DEFAULT, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_UCOEF2, SI114X_UCOEF2_DEFAULT);
+                  SI114X_REG_UCOEF2, SI114X_UCOEF2_DEFAULT, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_UCOEF3, SI114X_UCOEF3_DEFAULT);
+                  SI114X_REG_UCOEF3, SI114X_UCOEF3_DEFAULT, 0);
 
     /* enable measures */
     _set_param(dev, SI114X_PARAM_CHLIST,
@@ -214,13 +208,13 @@ void _initialize(si114x_t *dev)
 
     /* enable interrupt on every sample */
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_INT_CFG, SI114X_INTCFG_INTOE);
+                  SI114X_REG_INT_CFG, SI114X_INTCFG_INTOE, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_IRQ_ENABLE, SI114X_EN_ALS_IE | SI114X_EN_PS1_IE);
+                  SI114X_REG_IRQ_ENABLE, SI114X_EN_ALS_IE | SI114X_EN_PS1_IE, 0);
 
     /* active LED current */
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_PS_LED21, dev->params.led_current);
+                  SI114X_REG_PS_LED21, dev->params.led_current, 0);
 
     _set_param(dev, SI114X_PARAM_PS1ADCMUX, SI114X_PARAM_ADCMUX_LARGEIR);
 
@@ -250,23 +244,23 @@ void _initialize(si114x_t *dev)
     _set_param(dev, SI114X_PARAM_ALSVISADCMISC,
                SI114X_PARAM_ALSVISADCMISC_VISRANGE);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_MEAS_RATE0, 0xFF);
+                  SI114X_REG_MEAS_RATE0, 0xFF, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_MEAS_RATE1, 0x00);
+                  SI114X_REG_MEAS_RATE1, 0x00, 0);
 
     /* auto-run */
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_COMMAND, SI114X_PS_ALS_AUTO);
+                  SI114X_REG_COMMAND, SI114X_PS_ALS_AUTO, 0);
 }
 
 void _set_param(si114x_t *dev, uint8_t param, uint8_t value)
 {
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_PARAM_WR, value);
+                  SI114X_REG_PARAM_WR, value, 0);
     i2c_write_reg(DEV_I2C, SI114X_ADDR,
-                  SI114X_REG_COMMAND, param | SI114X_PARAM_SET);
+                  SI114X_REG_COMMAND, param | SI114X_PARAM_SET, 0);
 
     uint8_t ret;
     i2c_read_reg(DEV_I2C, SI114X_ADDR,
-                 SI114X_REG_PARAM_RD, &ret);
+                 SI114X_REG_PARAM_RD, &ret, 0);
 }
