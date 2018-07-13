@@ -217,8 +217,8 @@ static const i2c_conf_t i2c_config[] = {
     {
         .dev      = &(SERCOM2->I2CM),
         .speed    = I2C_SPEED_NORMAL,
-        .sda_pin  = GPIO_PIN(PA, 12),
         .scl_pin  = GPIO_PIN(PA, 13),
+        .sda_pin  = GPIO_PIN(PA, 12),
         .mux      = GPIO_MUX_C,
         .gclk_src = GCLK_CLKCTRL_GEN_GCLK0,
         .flags    = I2C_FLAG_NONE
