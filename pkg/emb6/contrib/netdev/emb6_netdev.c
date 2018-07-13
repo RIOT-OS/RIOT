@@ -108,6 +108,16 @@ static void _emb6_netdev_callback(c_event_t c_event, p_data_t p_data)
     }
 }
 
+static void _configure_netdev(void)
+{
+    /* Enable RX-complete interrupts */
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+    int res = _dev->driver->set(_dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
+    if (res < 0) {
+        DEBUG("emb6: enable NETOPT_RX_END_IRQ failed: %d\n", res);
+    }
+}
+
 int emb6_netdev_setup(netdev_t *dev)
 {
     if (_dev == NULL) {
@@ -127,6 +137,7 @@ static int8_t _netdev_init(s_ns_t *p_ns)
                sizeof(mac_phy_config.mac_address));
         _dev->driver->get(_dev, NETOPT_NID, &mac_phy_config.pan_id,
                           sizeof(mac_phy_config.pan_id));
+        _configure_netdev();
         linkaddr_set_node_addr((linkaddr_t *)&uip_lladdr);
         _lowmac = p_ns->lmac;
         evproc_regCallback(EVENT_TYPE_PCK_LL, _emb6_netdev_callback);
