@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 HAW Hamburg
+ *               2018 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,13 +8,14 @@
  */
 
 /**
- * @ingroup     boards_bluepill
+ * @ingroup     boards_stm32mindev
  * @{
  *
  * @file
  * @brief       Board specific configuration of direct mapped GPIOs
  *
  * @author      Sebastian Meiling <s@mlng.net>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  */
 
 #ifndef GPIO_PARAMS_H
