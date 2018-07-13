@@ -122,6 +122,17 @@ typedef struct {
 typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
 
 /**
+ * @brief   Reset function for ieee802154 common fields
+ *
+ * Supposed to be used by netdev drivers to reset the ieee802154 fields when
+ * resetting the device
+ *
+ * @param[in]   dev     network device descriptor
+ */
+void netdev_ieee802154_reset(netdev_ieee802154_t *dev);
+
+
+/**
  * @brief   Fallback function for netdev IEEE 802.15.4 devices' _get function
  *
  * Supposed to be used by netdev drivers as default case.
