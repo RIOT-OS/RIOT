@@ -15,9 +15,7 @@
  * dynamic memory allocation.
  *
  * This file system can be used for temporary file-like storage, everything is
- * removed when unmounting. This uses dynamic memory allocation and default
- * @p malloc and @p free functions can be overwritten with @p TMPFS_MALLOC and
- * @p TMPFS_FREE defines.
+ * removed when unmounting. This uses dynamic pool memory allocation with memarray.
  *
  * The file system is composed of a chained list of files. Each file is a chained
  * list of file buffer.
@@ -40,14 +38,23 @@ extern "C" {
 #endif
 
 #ifndef TMPFS_MAX_FILES
+/**
+ * @brief   Maximum number of files that can be allocated on the tmpfs
+ */
 #define TMPFS_MAX_FILES     (16)
 #endif
 
 #ifndef TMPFS_BUF_SIZE
+/**
+ * @brief   Size of a file chunk that is allocated
+ */
 #define TMPFS_BUF_SIZE      (128)
 #endif
 
 #ifndef TMPFS_MAX_BUF
+/**
+ * @brief   Maximum number of chunks that can be allocated
+ */
 #define TMPFS_MAX_BUF       (128)
 #endif
 
