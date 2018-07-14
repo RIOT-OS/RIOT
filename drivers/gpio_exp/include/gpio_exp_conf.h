@@ -32,8 +32,10 @@ extern "C" {
 
 /**
  * @brief   GPIO expansion default notsup driver
+ *
+ * Normally this would be provided with the driver implementation
  */
-static const gpio_exp_driver_t gpio_exp_def_driver = {
+static const gpio_exp_driver_t gpio_exp_notsup_driver = {
     .init = &gpio_exp_init_notsup,
     .init_int = &gpio_exp_init_int_notsup,
     .irq = &gpio_exp_irq_notsup,
@@ -47,7 +49,7 @@ static const gpio_exp_driver_t gpio_exp_def_driver = {
 static const gpio_exp_t gpio_exp_list[] =
 {
     {
-        .driver = &gpio_exp_def_driver,
+        .driver = &gpio_exp_notsup_driver,
         .dev = NULL
     }
 };
