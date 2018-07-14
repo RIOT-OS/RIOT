@@ -108,21 +108,23 @@ def generate_pcap(port, out):
 
 
 def connect(args):
-    connType = args.conn_type
-
     conn = None
-    if connType == "serial":
+    if args.conn.startswith("/dev/tty") or args.conn.startswith("COM"):
         # open serial port
         try:
-            conn = Serial(args.tty, args.baudrate, dsrdtr=0, rtscts=0,
+            conn = Serial(args.conn, args.baudrate, dsrdtr=0, rtscts=0,
                           timeout=1)
         except IOError:
-            print("error opening serial port", file=sys.stderr)
+            print("error opening serial port %s" % args.conn, file=sys.stderr)
             sys.exit(2)
-    elif connType == "socket":
-        host = args.host
-        port = args.port
-
+    else:
+        try:
+            port = args.conn.split(":")[-1]
+            host = args.conn[:-(len(port)+1)]
+            port = int(port)
+        except (IndexError, ValueError):
+            print("Can't parse host:port pair %s" % args.conn, file=sys.stderr)
+            sys.exit(2)
         try:
             sock = socket.socket()
             sock.connect((host, port))
@@ -130,11 +132,8 @@ def connect(args):
         except IOError:
             print("error connecting to %s:%s" % (host, port), file=sys.stderr)
             sys.exit(2)
-    else:
-        print("error: unsupported connection type. Use \"serial\" or \"socket\"")
-        sys.exit(2)
-
     return conn
+
 
 def main():
     if sys.version_info > (3,):
@@ -142,21 +141,12 @@ def main():
     else:
         default_outfile = sys.stdout
     p = argparse.ArgumentParser()
-    sp = p.add_subparsers(dest="conn_type")
-    serial_p = sp.add_parser("serial",
-                             help="Parse output of sniffer application "
-                                  "connected via serial line")
-    serial_p.add_argument("tty", type=str,
-                          help="Serial port to board with sniffer application")
-    serial_p.add_argument("-b", "--baudrate", type=int, default=112500,
-                          nargs="?", help="Baudrate of the serial port")
-    socket_p = sp.add_parser("socket",
-                             help="Parse output of a TCP-connected sniffer "
-                                  "application")
-    socket_p.add_argument("host", type=str,
-                          help="Host of the TCP-based sniffer application")
-    socket_p.add_argument("port", type=int,
-                          help="Port of the TCP-based sniffer application")
+    p.add_argument("-b", "--baudrate", type=int, default=112500,
+                   help="Baudrate of the serial port (only evaluated "
+                        "for non TCP-terminal)")
+    p.add_argument("conn", metavar="tty/host:port", type=str,
+                   help="Serial port or TCP (host, port) tuple to "
+                        "terminal with sniffer application")
     p.add_argument("channel", type=int, help="Channel to sniff on")
     p.add_argument("outfile", type=argparse.FileType("w+b"),
                    default=default_outfile, nargs="?",
