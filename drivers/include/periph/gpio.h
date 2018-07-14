@@ -140,9 +140,7 @@ typedef struct {
 /**
  * @brief   Low-level versions of the GPIO functions
  *
- * These are for implementation in cpu/*/periph/gpio.c and should not be
- * called directly.
- *
+ * These are for cpu gpio.c implementation and should not be called directly.
  * @{
  */
 int gpio_init_ll(gpio_t pin, gpio_mode_t mode);
