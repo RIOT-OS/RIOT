@@ -337,7 +337,11 @@
     || COLL_TEST(PORT_H)
 
 #else
-#error "[driver_gpio_exp_coll] CPU model number not recognized"
+
+/* unknown CPU (default to simpler, less thorough test) */
+#define COLL_TEST_PORTS \
+    COLL_TEST(0)
+
 #endif /* defined(CPU) */
 
 #define COLL_RES (!(COLL_TEST_PORTS))
