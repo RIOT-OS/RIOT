@@ -410,8 +410,10 @@ typedef struct {
     i2c_speed_t speed;      /**< i2c bus speed */
     gpio_t scl_pin;         /**< scl pin number */
     gpio_t sda_pin;         /**< sda pin number */
+#ifndef CPU_FAM_STM32F1
     gpio_af_t scl_af;       /**< scl pin alternate function value */
     gpio_af_t sda_af;       /**< sda pin alternate function value */
+#endif
     uint8_t bus;            /**< APB bus */
     uint32_t rcc_mask;      /**< bit in clock enable register */
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
