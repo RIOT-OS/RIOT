@@ -22,7 +22,7 @@
 #include <errno.h>
 
 #include "gpio_exp.h"
-#include "gpio_exp_reg.h"
+#include "gpio_exp_conf.h"
 #include "periph/gpio.h"
 
 #define ENABLE_DEBUG (0)
@@ -98,15 +98,15 @@ gpio_exp_t *gpio_exp_entry(gpio_t gpio)
 
     num = (uint8_t)((gpio >> GPIO_EXP_DEV_LOC) & GPIO_EXP_MAXDEVMASK);
 
-    /* device is greater than number of registry entries */
-    if (num > (sizeof(gpio_exp_reg) / sizeof(gpio_exp_reg[0]))) {
+    /* device is greater than number of listed entries */
+    if (num > (sizeof(gpio_exp_list) / sizeof(gpio_exp_list[0]))) {
         return NULL;
     }
 
-    DEBUG("[gpio_exp] returning reg entry %u\n", num);
+    DEBUG("[gpio_exp] returning list entry %u\n", num);
 
     /* Cast to discard const */
-    return (gpio_exp_t *)&(gpio_exp_reg[num]);
+    return (gpio_exp_t *)&(gpio_exp_list[num]);
 }
 
 gpio_t gpio_exp_pin(gpio_t gpio)

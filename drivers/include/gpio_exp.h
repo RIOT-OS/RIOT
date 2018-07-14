@@ -15,7 +15,7 @@
  * code using the GPIO pin API (periph/gpio.h). This is accomplished by
  * reserving part of the range of values of gpio_t. When a call to the GPIO API
  * uses a pin that falls within this range, it is parsed into a device ID that
- * is looked up in the GPIO expansion registery and the call is redirected to
+ * is looked up in the list of GPIO expanders and the call is redirected to
  * the corresponding device.
  *
  * @{
@@ -70,7 +70,7 @@ extern "C" {
 /**
  * @brief   Convert (device, pin) tuple to @c gpio_t value
  *
- * @note    Device number is determined by its position in gpio_exp_reg,
+ * @note    Device number is determined by its position in gpio_exp_list,
  *          defined in gpio_exp_params.h
  */
 #define GPIO_EXP_PIN(x, y) \
@@ -137,7 +137,7 @@ typedef struct gpio_exp_driver {
 } gpio_exp_driver_t;
 
 /**
- * @brief   GPIO expansion registry entry
+ * @brief   GPIO expansion list entry
  */
 typedef struct gpio_exp {
     gpio_exp_driver_t const *driver;    /**< pointer to driver */
@@ -145,12 +145,12 @@ typedef struct gpio_exp {
 } gpio_exp_t;
 
 /**
- * @brief   Find an entry in the registry by GPIO pin number
+ * @brief   Find an entry in the list of expanders by GPIO pin number
  *
  * @param[in] gpio    GPIO to look up
  *
- * @return      pointer to the registry entry
- * @return      NULL if no device is registered
+ * @return      pointer to the list entry
+ * @return      NULL if no device is listed
  */
 gpio_exp_t *gpio_exp_entry(gpio_t gpio);
 

@@ -12,15 +12,15 @@
  * @{
  *
  * @file
- * @brief       GPIO expansion default registry
+ * @brief       GPIO expansion default list of expanders
  *
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  *
  * @}
  */
 
-#ifndef GPIO_EXP_REG_H
-#define GPIO_EXP_REG_H
+#ifndef GPIO_EXP_CONF_H
+#define GPIO_EXP_CONF_H
 
 #include <stddef.h>
 
@@ -42,9 +42,9 @@ static const gpio_exp_driver_t gpio_exp_def_driver = {
 };
 
 /**
- * @brief   GPIO expansion registry default if not defined
+ * @brief   GPIO expansion default list if not defined
  */
-static const gpio_exp_t gpio_exp_reg[] =
+static const gpio_exp_t gpio_exp_list[] =
 {
     {
         .driver = &gpio_exp_def_driver,
@@ -56,5 +56,5 @@ static const gpio_exp_t gpio_exp_reg[] =
 }
 #endif
 
-#endif /* GPIO_EXP_REG_H */
+#endif /* GPIO_EXP_CONF_H */
 /** @} */
