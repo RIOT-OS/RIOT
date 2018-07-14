@@ -61,7 +61,7 @@ def configure_interface(port, channel):
             print("Application has no network interface defined",
                   file=sys.stderr)
             sys.exit(2)
-        match = re.search(r'^Iface +(\d+)', line.decode())
+        match = re.search(r'^Iface +(\d+)', line.decode(errors="ignore"))
         if match is not None:
             iface = int(match.group(1))
             break
@@ -86,7 +86,7 @@ def generate_pcap(port, out):
         line = port.readline().rstrip()
 
         pkt_header = re.match(r">? *rftest-rx --- len 0x(\w\w).*",
-                              line.decode())
+                              line.decode(errors="ignore"))
         if pkt_header:
             now = time()
             sec = int(now)
@@ -98,9 +98,9 @@ def generate_pcap(port, out):
             sys.stderr.write("RX: %i\r" % count)
             continue
 
-        pkt_data = re.match(r"(0x\w\w )+", line.decode())
+        pkt_data = re.match(r"(0x\w\w )+", line.decode(errors="ignore"))
         if pkt_data:
-            for part in line.decode().split(' '):
+            for part in line.decode(errors="ignore").split(' '):
                 byte = re.match(r"0x(\w\w)", part)
                 if byte:
                     out.write(pack('<B', int(byte.group(1), 16)))
