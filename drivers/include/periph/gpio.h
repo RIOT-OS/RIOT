@@ -134,6 +134,26 @@ typedef struct {
 #endif
 
 /**
+ * @brief   Low-level versions of the GPIO functions
+ *
+ * These are for implementation in cpu/*/periph/gpio.c and should not be
+ * called directly.
+ *
+ * @{
+ */
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode);
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg);
+void gpio_irq_enable_ll(gpio_t pin);
+void gpio_irq_disable_ll(gpio_t pin);
+int gpio_read_ll(gpio_t pin);
+void gpio_set_ll(gpio_t pin);
+void gpio_clear_ll(gpio_t pin);
+void gpio_toggle_ll(gpio_t pin);
+void gpio_write_ll(gpio_t pin, int value);
+/** @} */
+
+/**
  * @brief   Initialize the given pin as general purpose input or output
  *
  * When configured as output, the pin state after initialization is undefined.
@@ -146,7 +166,10 @@ typedef struct {
  * @return              0 on success
  * @return              -1 on error
  */
-int gpio_init(gpio_t pin, gpio_mode_t mode);
+inline int gpio_init(gpio_t pin, gpio_mode_t mode)
+{
+    return gpio_init_ll(pin, mode);
+}
 
 /**
  * @brief   Initialize a GPIO pin for external interrupt usage
@@ -165,22 +188,31 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  * @return              0 on success
  * @return              -1 on error
  */
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg);
+inline int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                         gpio_cb_t cb, void *arg)
+{
+    return gpio_init_int_ll(pin, mode, flank, cb, arg);
+}
 
 /**
  * @brief   Enable pin interrupt if configured as interrupt source
  *
  * @param[in] pin       the pin to enable the interrupt for
  */
-void gpio_irq_enable(gpio_t pin);
+inline void gpio_irq_enable(gpio_t pin)
+{
+    gpio_irq_enable_ll(pin);
+}
 
 /**
  * @brief   Disable the pin interrupt if configured as interrupt source
  *
  * @param[in] pin       the pin to disable the interrupt for
  */
-void gpio_irq_disable(gpio_t pin);
+inline void gpio_irq_disable(gpio_t pin)
+{
+    gpio_irq_disable_ll(pin);
+}
 
 /**
  * @brief   Get the current value of the given pin
@@ -190,28 +222,40 @@ void gpio_irq_disable(gpio_t pin);
  * @return              0 when pin is LOW
  * @return              >0 for HIGH
  */
-int gpio_read(gpio_t pin);
+inline int gpio_read(gpio_t pin)
+{
+    return gpio_read_ll(pin);
+}
 
 /**
  * @brief   Set the given pin to HIGH
  *
  * @param[in] pin       the pin to set
  */
-void gpio_set(gpio_t pin);
+inline void gpio_set(gpio_t pin)
+{
+    gpio_set_ll(pin);
+}
 
 /**
  * @brief   Set the given pin to LOW
  *
  * @param[in] pin       the pin to clear
  */
-void gpio_clear(gpio_t pin);
+inline void gpio_clear(gpio_t pin)
+{
+    gpio_clear_ll(pin);
+}
 
 /**
  * @brief   Toggle the value of the given pin
  *
  * @param[in] pin       the pin to toggle
  */
-void gpio_toggle(gpio_t pin);
+inline void gpio_toggle(gpio_t pin)
+{
+    gpio_toggle_ll(pin);
+}
 
 /**
  * @brief   Set the given pin to the given value
@@ -219,7 +263,10 @@ void gpio_toggle(gpio_t pin);
  * @param[in] pin       the pin to set
  * @param[in] value     value to set the pin to, 0 for LOW, HIGH otherwise
  */
-void gpio_write(gpio_t pin, int value);
+inline void gpio_write(gpio_t pin, int value)
+{
+    gpio_write_ll(pin, value);
+}
 
 #ifdef __cplusplus
 }
