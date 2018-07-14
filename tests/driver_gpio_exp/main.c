@@ -21,6 +21,30 @@
 
 #include "gpio_exp.h"
 
+/* GPIO expansion test functions */
+int test_gpio_exp_init(void *dev, gpio_t pin, gpio_mode_t mode);
+int test_gpio_exp_init_int(void *dev, gpio_t pin, gpio_mode_t mode,
+                           gpio_flank_t flank, gpio_cb_t cb, void *arg);
+void test_gpio_exp_irq(void *dev, gpio_t pin, int state);
+int test_gpio_exp_read(void *dev, gpio_t pin);
+void test_gpio_exp_write(void *dev, gpio_t pin, int value);
+
+/* GPIO expansion test drivers */
+const gpio_exp_driver_t test_gpio_exp_test_driver = {
+    .init = &test_gpio_exp_init,
+    .init_int = &test_gpio_exp_init_int,
+    .irq = &test_gpio_exp_irq,
+    .read = &test_gpio_exp_read,
+    .write = &test_gpio_exp_write
+};
+const gpio_exp_driver_t test_gpio_exp_notsup_driver = {
+    .init = &gpio_exp_init_notsup,
+    .init_int = &gpio_exp_init_int_notsup,
+    .irq = &gpio_exp_irq_notsup,
+    .read = &gpio_exp_read_notsup,
+    .write = &gpio_exp_write_notsup
+};
+
 int test_gpio_exp_init(void *dev, gpio_t pin, gpio_mode_t mode)
 {
     (void)mode;

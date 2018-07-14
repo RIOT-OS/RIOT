@@ -31,32 +31,13 @@ extern "C" {
 #endif
 
 /**
- * @brief   GPIO expansion test functions
+ * @brief   Reference the driver structs
+ *
+ * @{
  */
-int test_gpio_exp_init(void *dev, gpio_t pin, gpio_mode_t mode);
-int test_gpio_exp_init_int(void *dev, gpio_t pin, gpio_mode_t mode,
-                           gpio_flank_t flank, gpio_cb_t cb, void *arg);
-void test_gpio_exp_irq(void *dev, gpio_t pin, int state);
-int test_gpio_exp_read(void *dev, gpio_t pin);
-void test_gpio_exp_write(void *dev, gpio_t pin, int value);
-
-/**
- * @brief   GPIO expansion test drivers
- */
-static const gpio_exp_driver_t test_gpio_exp_driver0 = {
-    .init = &test_gpio_exp_init,
-    .init_int = &test_gpio_exp_init_int,
-    .irq = &test_gpio_exp_irq,
-    .read = &test_gpio_exp_read,
-    .write = &test_gpio_exp_write
-};
-static const gpio_exp_driver_t test_gpio_exp_driver1 = {
-    .init = &gpio_exp_init_notsup,
-    .init_int = &gpio_exp_init_int_notsup,
-    .irq = &gpio_exp_irq_notsup,
-    .read = &gpio_exp_read_notsup,
-    .write = &gpio_exp_write_notsup
-};
+extern gpio_exp_driver_t test_gpio_exp_test_driver;
+extern gpio_exp_driver_t test_gpio_exp_notsup_driver;
+/** @} */
 
 /**
  * @brief   GPIO expansion test list
@@ -64,11 +45,11 @@ static const gpio_exp_driver_t test_gpio_exp_driver1 = {
 static const gpio_exp_t gpio_exp_list[] =
 {
     {
-        .driver = &test_gpio_exp_driver0,
+        .driver = &test_gpio_exp_test_driver,
         .dev = (void *)0xbeef
     },
     {
-        .driver = &test_gpio_exp_driver1,
+        .driver = &test_gpio_exp_notsup_driver,
         .dev = NULL
     }
 };
