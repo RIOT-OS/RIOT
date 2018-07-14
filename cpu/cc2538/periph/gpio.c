@@ -24,7 +24,6 @@
 #include <stdint.h>
 
 #include "cpu.h"
-#include "gpio_exp.h"
 #include "periph/gpio.h"
 
 #define ENABLE_DEBUG (0)
@@ -96,8 +95,6 @@ static inline uint8_t _pp_num(gpio_t pin)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    GPIO_INTERCEPT_INIT(pin, mode);
-
     /* check if mode is valid */
     if (mode == MODE_NOTSUP) {
         return -1;
@@ -124,8 +121,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
-
     if (gpio_init(pin, mode) != 0) {
         return -1;
     }
@@ -170,50 +165,36 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_ENABLE(pin);
-
     gpio(pin)->IE |= _pin_mask(pin);
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_DISABLE(pin);
-
     gpio(pin)->IE &= ~_pin_mask(pin);
 }
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_INTERCEPT_READ(pin);
-
     return (int)(gpio(pin)->DATA & _pin_mask(pin));
 }
 
 void gpio_set(gpio_t pin)
 {
-    GPIO_INTERCEPT_SET(pin);
-
     gpio(pin)->DATA |= _pin_mask(pin);
 }
 
 void gpio_clear(gpio_t pin)
 {
-    GPIO_INTERCEPT_CLEAR(pin);
-
     gpio(pin)->DATA &= ~_pin_mask(pin);
 }
 
 void gpio_toggle(gpio_t pin)
 {
-    GPIO_INTERCEPT_TOGGLE(pin);
-
     gpio(pin)->DATA ^= _pin_mask(pin);
 }
 
 void gpio_write(gpio_t pin, int value)
 {
-    GPIO_INTERCEPT_WRITE(pin, value);
-
     if (value) {
         gpio(pin)->DATA |= _pin_mask(pin);
     }

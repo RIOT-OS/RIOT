@@ -24,7 +24,6 @@
 
 #include "cpu.h"
 #include "cpu_conf.h"
-#include "gpio_exp.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
@@ -96,8 +95,6 @@ static gpio_state_t gpio_config[NUM_OF_PORT][NUM_OF_PINS];
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    GPIO_INTERCEPT_INIT(pin, mode);
-
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
     const uint8_t pin_num = _pin_num(pin);
@@ -167,8 +164,6 @@ void isr_gpio_portf(void){
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
-
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
     const uint32_t icr_reg_addr = port_addr + GPIO_ICR_R_OFF;
@@ -209,8 +204,6 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_ENABLE(pin);
-
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
     const uint32_t im_reg_addr =  port_addr + GPIO_IM_R_OFF;
@@ -222,8 +215,6 @@ void gpio_irq_enable(gpio_t pin)
 
 void gpio_irq_disable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_DISABLE(pin);
-
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
     const uint32_t im_reg_addr =  port_addr + GPIO_IM_R_OFF;
@@ -236,8 +227,6 @@ void gpio_irq_disable(gpio_t pin)
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_INTERCEPT_READ(pin);
-
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
     const uint8_t pin_num = _pin_num(pin);
@@ -247,8 +236,6 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
-    GPIO_INTERCEPT_SET(pin);
-
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
     const uint8_t pin_num = _pin_num(pin);
@@ -259,8 +246,6 @@ void gpio_set(gpio_t pin)
 
 void gpio_clear(gpio_t pin)
 {
-    GPIO_INTERCEPT_CLEAR(pin);
-
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
     const uint8_t pin_num = _pin_num(pin);
@@ -270,8 +255,6 @@ void gpio_clear(gpio_t pin)
 
 void gpio_toggle(gpio_t pin)
 {
-    GPIO_INTERCEPT_TOGGLE(pin);
-
     if (gpio_read(pin)) {
         gpio_clear(pin);
     }
@@ -282,8 +265,6 @@ void gpio_toggle(gpio_t pin)
 
 void gpio_write(gpio_t pin, int value)
 {
-    GPIO_INTERCEPT_WRITE(pin, value);
-
     if (value) {
         gpio_set(pin);
     }

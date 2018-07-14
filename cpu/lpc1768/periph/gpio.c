@@ -19,7 +19,6 @@
  */
 
 #include "cpu.h"
-#include "gpio_exp.h"
 #include "periph/gpio.h"
 
 /**
@@ -93,8 +92,6 @@ static inline void _configure_flank(gpio_t pin, gpio_flank_t flank)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    GPIO_INTERCEPT_INIT(pin, mode);
-
     /* check for valid pin */
     if (pin == GPIO_UNDEF) {
         return -1;
@@ -133,8 +130,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
-
     /* only certain pins can be used as interrupt pins */
     if (_port(pin) != 0 && _port(pin) != 2) {
         return -1;
@@ -166,8 +161,6 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_ENABLE(pin);
-
     assert(_port(pin) == 0 || _port(pin) == 2);
 
     _configure_flank(pin, isr_state[_port(pin) >> 1][_pin(pin)]);
@@ -175,8 +168,6 @@ void gpio_irq_enable(gpio_t pin)
 
 void gpio_irq_disable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_DISABLE(pin);
-
     assert(_port(pin) == 0 || _port(pin) == 2);
 
     if (_port(pin) == 0) {
@@ -191,8 +182,6 @@ void gpio_irq_disable(gpio_t pin)
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_INTERCEPT_READ(pin);
-
     LPC_GPIO_TypeDef *base = _base(pin);
 
     return (base->FIOPIN & (1 << _pin(pin))) ? 1 : 0;
@@ -200,8 +189,6 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
-    GPIO_INTERCEPT_SET(pin);
-
     LPC_GPIO_TypeDef *base = _base(pin);
 
     base->FIOSET = (1 << _pin(pin));
@@ -209,8 +196,6 @@ void gpio_set(gpio_t pin)
 
 void gpio_clear(gpio_t pin)
 {
-    GPIO_INTERCEPT_CLEAR(pin);
-
     LPC_GPIO_TypeDef *base = _base(pin);
 
     base->FIOCLR = (1 << _pin(pin));
@@ -218,8 +203,6 @@ void gpio_clear(gpio_t pin)
 
 void gpio_toggle(gpio_t pin)
 {
-    GPIO_INTERCEPT_TOGGLE(pin);
-
     LPC_GPIO_TypeDef *base = _base(pin);
 
     base->FIOPIN ^= (1 << _pin(pin));
@@ -227,8 +210,6 @@ void gpio_toggle(gpio_t pin)
 
 void gpio_write(gpio_t pin, int value)
 {
-    GPIO_INTERCEPT_WRITE(pin, value);
-
     LPC_GPIO_TypeDef *base = _base(pin);
 
     if (value) {

@@ -29,7 +29,6 @@
 #include <avr/interrupt.h>
 
 #include "cpu.h"
-#include "gpio_exp.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
@@ -129,8 +128,6 @@ static inline int8_t _int_num(gpio_t pin)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    GPIO_INTERCEPT_INIT(pin, mode);
-
     switch (mode) {
         case GPIO_OUT:
             _SFR_MEM8(_ddr_addr(pin)) |= (1 << _pin_num(pin));
@@ -152,8 +149,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
-
     int8_t int_num = _int_num(pin);
 
     /* mode not supported */
@@ -204,44 +199,32 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_ENABLE(pin);
-
     EIFR |= (1 << _int_num(pin));
     EIMSK |= (1 << _int_num(pin));
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_DISABLE(pin);
-
     EIMSK &= ~(1 << _int_num(pin));
 }
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_INTERCEPT_READ(pin);
-
     return (_SFR_MEM8(_pin_addr(pin)) & (1 << _pin_num(pin)));
 }
 
 void gpio_set(gpio_t pin)
 {
-    GPIO_INTERCEPT_SET(pin);
-
     _SFR_MEM8(_port_addr(pin)) |= (1 << _pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
-    GPIO_INTERCEPT_CLEAR(pin);
-
     _SFR_MEM8(_port_addr(pin)) &= ~(1 << _pin_num(pin));
 }
 
 void gpio_toggle(gpio_t pin)
 {
-    GPIO_INTERCEPT_TOGGLE(pin);
-
     if (gpio_read(pin)) {
         gpio_clear(pin);
     }
@@ -252,8 +235,6 @@ void gpio_toggle(gpio_t pin)
 
 void gpio_write(gpio_t pin, int value)
 {
-    GPIO_INTERCEPT_WRITE(pin, value);
-
     if (value) {
         gpio_set(pin);
     }

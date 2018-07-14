@@ -25,7 +25,6 @@
 #include <string.h>
 
 #include "irq.h"
-#include "gpio_exp.h"
 #include "periph/gpio.h"
 #include "bitfield.h"
 
@@ -66,8 +65,6 @@ static int _isr_map_entry(gpio_t pin) {
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    GPIO_INTERCEPT_INIT(pin, mode);
-
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
     FIO_PORT_t *_port = &FIO_PORTS[port];
@@ -100,8 +97,6 @@ int gpio_init_mux(unsigned pin, unsigned mux)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
-
     (void)mode;
 
     DEBUG("gpio_init_int(): pin %u\n", pin);
@@ -205,8 +200,6 @@ static void _gpio_configure(gpio_t pin, unsigned rising, unsigned falling)
 
 void gpio_irq_enable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_ENABLE(pin);
-
     int isr_map_entry =_isr_map_entry(pin);
     int _state_index = _gpio_isr_map[isr_map_entry];
 
@@ -222,15 +215,11 @@ void gpio_irq_enable(gpio_t pin)
 
 void gpio_irq_disable(gpio_t dev)
 {
-    GPIO_INTERCEPT_IRQ_DISABLE(dev);
-
     _gpio_configure(dev, 0, 0);
 }
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_INTERCEPT_READ(pin);
-
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
     FIO_PORT_t *_port = &FIO_PORTS[port];
@@ -239,8 +228,6 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
-    GPIO_INTERCEPT_SET(pin);
-
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
     FIO_PORT_t *_port = &FIO_PORTS[port];
@@ -249,8 +236,6 @@ void gpio_set(gpio_t pin)
 
 void gpio_clear(gpio_t pin)
 {
-    GPIO_INTERCEPT_CLEAR(pin);
-
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
     FIO_PORT_t *_port = &FIO_PORTS[port];
@@ -259,8 +244,6 @@ void gpio_clear(gpio_t pin)
 
 void gpio_toggle(gpio_t dev)
 {
-    GPIO_INTERCEPT_TOGGLE(dev);
-
     if (gpio_read(dev)) {
         gpio_clear(dev);
     }
@@ -271,8 +254,6 @@ void gpio_toggle(gpio_t dev)
 
 void gpio_write(gpio_t dev, int value)
 {
-    GPIO_INTERCEPT_WRITE(dev, value);
-
     if (value) {
         gpio_set(dev);
     }

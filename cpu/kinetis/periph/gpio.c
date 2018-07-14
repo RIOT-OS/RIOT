@@ -29,7 +29,6 @@
 #include <stdint.h>
 #include "cpu.h"
 #include "bit.h"
-#include "gpio_exp.h"
 #include "periph/gpio.h"
 
 #ifndef PORT_PCR_ODE_MASK
@@ -182,8 +181,6 @@ static void ctx_clear(int port, int pin)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    GPIO_INTERCEPT_INIT(pin, mode);
-
     /* set pin to analog mode while configuring it */
     gpio_init_port(pin, GPIO_AF_ANALOG);
 
@@ -203,8 +200,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
-
     if (gpio_init(pin, mode) < 0) {
         return -1;
     }
@@ -251,16 +246,12 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
 
 void gpio_irq_enable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_ENABLE(pin);
-
     int ctx = get_ctx(port_num(pin), pin_num(pin));
     port(pin)->PCR[pin_num(pin)] |= isr_ctx[ctx].state;
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_DISABLE(pin);
-
     int ctx = get_ctx(port_num(pin), pin_num(pin));
     isr_ctx[ctx].state = port(pin)->PCR[pin_num(pin)] & PORT_PCR_IRQC_MASK;
     port(pin)->PCR[pin_num(pin)] &= ~(PORT_PCR_IRQC_MASK);
@@ -268,8 +259,6 @@ void gpio_irq_disable(gpio_t pin)
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_INTERCEPT_READ(pin);
-
     if (gpio(pin)->PDDR & (1 << pin_num(pin))) {
         return (gpio(pin)->PDOR & (1 << pin_num(pin))) ? 1 : 0;
     }
@@ -280,29 +269,21 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
-    GPIO_INTERCEPT_SET(pin);
-
     gpio(pin)->PSOR = (1 << pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
-    GPIO_INTERCEPT_CLEAR(pin);
-
     gpio(pin)->PCOR = (1 << pin_num(pin));
 }
 
 void gpio_toggle(gpio_t pin)
 {
-    GPIO_INTERCEPT_TOGGLE(pin);
-
     gpio(pin)->PTOR = (1 << pin_num(pin));
 }
 
 void gpio_write(gpio_t pin, int value)
 {
-    GPIO_INTERCEPT_WRITE(pin, value);
-
     if (value) {
         gpio(pin)->PSOR = (1 << pin_num(pin));
     }

@@ -23,7 +23,6 @@
  */
 
 #include "cpu.h"
-#include "gpio_exp.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
@@ -148,8 +147,6 @@ static void _ctx_clear(int port, int pin)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    GPIO_INTERCEPT_INIT(pin, mode);
-
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
@@ -197,8 +194,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
-
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
@@ -259,22 +254,16 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
 
 void gpio_irq_enable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_ENABLE(pin);
-
     NVIC_EnableIRQ((1 << (_port_num(pin) + PIOA_IRQn)));
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_DISABLE(pin);
-
     NVIC_DisableIRQ((1 << (_port_num(pin) + PIOA_IRQn)));
 }
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_INTERCEPT_READ(pin);
-
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
 
@@ -288,22 +277,16 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
-    GPIO_INTERCEPT_SET(pin);
-
     _port(pin)->PIO_SODR = (1 << _pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
-    GPIO_INTERCEPT_CLEAR(pin);
-
     _port(pin)->PIO_CODR = (1 << _pin_num(pin));
 }
 
 void gpio_toggle(gpio_t pin)
 {
-    GPIO_INTERCEPT_TOGGLE(pin);
-
     if (gpio_read(pin)) {
         _port(pin)->PIO_CODR = (1 << _pin_num(pin));
     } else {
@@ -313,8 +296,6 @@ void gpio_toggle(gpio_t pin)
 
 void gpio_write(gpio_t pin, int value)
 {
-    GPIO_INTERCEPT_WRITE(pin, value);
-
     if (value) {
         _port(pin)->PIO_SODR = (1 << _pin_num(pin));
     } else {

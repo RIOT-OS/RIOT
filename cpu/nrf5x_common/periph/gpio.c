@@ -27,7 +27,6 @@
  */
 
 #include "cpu.h"
-#include "gpio_exp.h"
 #include "periph/gpio.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -70,8 +69,6 @@ static inline int pin_num(gpio_t pin)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
-    GPIO_INTERCEPT_INIT(pin, mode);
-
     switch (mode) {
         case GPIO_IN:
         case GPIO_IN_PD:
@@ -90,8 +87,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
-    GPIO_INTERCEPT_INIT_INT(pin, mode, flank, cb, arg);
-
     /* disable external interrupt in case one is active */
     NRF_GPIOTE->INTENSET &= ~(GPIOTE_INTENSET_IN0_Msk);
     /* save callback */
@@ -115,24 +110,18 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void gpio_irq_enable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_ENABLE(pin);
-
     (void) pin;
     NRF_GPIOTE->INTENSET |= GPIOTE_INTENSET_IN0_Msk;
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    GPIO_INTERCEPT_IRQ_DISABLE(pin);
-
     (void) pin;
     NRF_GPIOTE->INTENCLR |= GPIOTE_INTENSET_IN0_Msk;
 }
 
 int gpio_read(gpio_t pin)
 {
-    GPIO_INTERCEPT_READ(pin);
-
     if (port(pin)->DIR & (1 << pin)) {
         return (port(pin)->OUT & (1 << pin)) ? 1 : 0;
     }
@@ -143,29 +132,21 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
-    GPIO_INTERCEPT_SET(pin);
-
     port(pin)->OUTSET = (1 << pin);
 }
 
 void gpio_clear(gpio_t pin)
 {
-    GPIO_INTERCEPT_CLEAR(pin);
-
     port(pin)->OUTCLR = (1 << pin);
 }
 
 void gpio_toggle(gpio_t pin)
 {
-    GPIO_INTERCEPT_TOGGLE(pin);
-
     port(pin)->OUT ^= (1 << pin);
 }
 
 void gpio_write(gpio_t pin, int value)
 {
-    GPIO_INTERCEPT_WRITE(pin, value);
-
     if (value) {
         port(pin)->OUTSET = (1 << pin);
     } else {
