@@ -126,7 +126,7 @@ static inline int8_t _int_num(gpio_t pin)
     return -1;
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     switch (mode) {
         case GPIO_OUT:
@@ -146,7 +146,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     int8_t int_num = _int_num(pin);
@@ -166,7 +166,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         return -1;
     }
 
-    gpio_init(pin, mode);
+    gpio_init_ll(pin, mode);
 
     /* clear global interrupt flag */
     cli();
@@ -197,49 +197,49 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     EIFR |= (1 << _int_num(pin));
     EIMSK |= (1 << _int_num(pin));
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     EIMSK &= ~(1 << _int_num(pin));
 }
 
-int gpio_read(gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     return (_SFR_MEM8(_pin_addr(pin)) & (1 << _pin_num(pin)));
 }
 
-void gpio_set(gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     _SFR_MEM8(_port_addr(pin)) |= (1 << _pin_num(pin));
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     _SFR_MEM8(_port_addr(pin)) &= ~(1 << _pin_num(pin));
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
-    if (gpio_read(pin)) {
-        gpio_clear(pin);
+    if (gpio_read_ll(pin)) {
+        gpio_clear_ll(pin);
     }
     else {
-        gpio_set(pin);
+        gpio_set_ll(pin);
     }
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     if (value) {
-        gpio_set(pin);
+        gpio_set_ll(pin);
     }
     else {
-        gpio_clear(pin);
+        gpio_clear_ll(pin);
     }
 }
 

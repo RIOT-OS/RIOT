@@ -61,7 +61,7 @@ void gpio_isr(int num)
     }
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     /* Check for valid pin */
     if (pin >= GPIO_NUMOF) {
@@ -99,11 +99,11 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
     /* Configure pin */
-    if (gpio_init(pin, mode) != 0) {
+    if (gpio_init_ll(pin, mode) != 0) {
         return -1;
     }
 
@@ -116,7 +116,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     PLIC_set_priority(INT_GPIO_BASE + pin, GPIO_INTR_PRIORITY);
 
     /*  Configure the active flank(s) */
-    gpio_irq_enable(pin);
+    gpio_irq_enable_ll(pin);
 
     /* Save callback */
     isr_ctx[pin].cb = cb;
@@ -129,7 +129,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     /* Check for valid pin */
     if (pin >= GPIO_NUMOF) {
@@ -156,7 +156,7 @@ void gpio_irq_enable(gpio_t pin)
     }
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     /* Check for valid pin */
     if (pin >= GPIO_NUMOF) {
@@ -183,27 +183,27 @@ void gpio_irq_disable(gpio_t pin)
     }
 }
 
-int gpio_read(gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     return (GPIO_REG(GPIO_INPUT_VAL) & (1 << pin)) ? 1 : 0;
 }
 
-void gpio_set(gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     GPIO_REG(GPIO_OUTPUT_VAL) |= (1 << pin);
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     GPIO_REG(GPIO_OUTPUT_VAL) &= ~(1 << pin);
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
     GPIO_REG(GPIO_OUTPUT_VAL) ^= (1 << pin);
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     if (value) {
         GPIO_REG(GPIO_OUTPUT_VAL) |= (1 << pin);

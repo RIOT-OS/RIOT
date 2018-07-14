@@ -55,7 +55,7 @@ static inline int _pin_mask(gpio_t pin)
     return (1 << _pin_pos(pin));
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     GPIO_P_TypeDef *port = _port(pin);
     uint32_t pin_pos = _pin_pos(pin);
@@ -80,13 +80,13 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                    gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
     uint32_t pin_pos = _pin_pos(pin);
 
     /* configure as input */
-    gpio_init(pin, mode);
+    gpio_init_ll(pin, mode);
 
     /* just in case, disable interrupt for this channel */
     GPIO->IEN &= ~(1 << pin_pos);
@@ -107,37 +107,37 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     GPIO->IEN |= _pin_mask(pin);
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     GPIO->IEN &= ~(_pin_mask(pin));
 }
 
-int gpio_read(gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     return _port(pin)->DIN & _pin_mask(pin);
 }
 
-void gpio_set(gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     _port(pin)->DOUTSET = _pin_mask(pin);
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     _port(pin)->DOUTCLR = _pin_mask(pin);
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
     _port(pin)->DOUTTGL = _pin_mask(pin);
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     if (value) {
         _port(pin)->DOUTSET = _pin_mask(pin);

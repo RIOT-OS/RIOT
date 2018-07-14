@@ -93,7 +93,7 @@ typedef struct {
 
 static gpio_state_t gpio_config[NUM_OF_PORT][NUM_OF_PINS];
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
@@ -161,8 +161,8 @@ void isr_gpio_portf(void){
     _isr_gpio(5);
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
@@ -194,7 +194,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     HWREG(port_addr+GPIO_DEN_R_OFF) |= pin_bit;
     HWREG(port_addr+GPIO_LOCK_R_OFF) = 0;
 
-    gpio_irq_enable(pin);
+    gpio_irq_enable_ll(pin);
     ROM_IntEnable(int_num);
 
     ROM_IntMasterEnable();
@@ -202,7 +202,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
@@ -213,7 +213,7 @@ void gpio_irq_enable(gpio_t pin)
     HWREG(im_reg_addr) |= pin_bit;
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
@@ -225,7 +225,7 @@ void gpio_irq_disable(gpio_t pin)
 }
 
 
-int gpio_read(gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
@@ -234,7 +234,7 @@ int gpio_read(gpio_t pin)
     return HWREG(port_addr + ((1<<pin_num) << 2)) != 0;
 }
 
-void gpio_set(gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
@@ -244,7 +244,7 @@ void gpio_set(gpio_t pin)
     ROM_GPIOPinWrite(port_addr, 1<<pin_num, 1<<pin_num);
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     const uint8_t port_num = _port_num(pin);
     const uint32_t port_addr = _port_base[port_num];
@@ -253,22 +253,22 @@ void gpio_clear(gpio_t pin)
     HWREG(port_addr + ((1<<pin_num) << 2)) = 0;
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
-    if (gpio_read(pin)) {
-        gpio_clear(pin);
+    if (gpio_read_ll(pin)) {
+        gpio_clear_ll(pin);
     }
     else {
-        gpio_set(pin);
+        gpio_set_ll(pin);
     }
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     if (value) {
-        gpio_set(pin);
+        gpio_set_ll(pin);
     }
     else {
-        gpio_clear(pin);
+        gpio_clear_ll(pin);
     }
 }

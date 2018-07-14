@@ -31,7 +31,7 @@
  */
 static gpio_isr_ctx_t gpio_chan[GPIO_ISR_CHAN_NUMOF];
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     if ((unsigned int)pin > 31)
         return -1;
@@ -51,10 +51,10 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                   gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
-    int init = gpio_init(pin, mode);
+    int init = gpio_init_ll(pin, mode);
     if (init != 0)
         return init;
 
@@ -68,22 +68,22 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* clears the interrupt flag */
     GPIO->EVFLAGS |= (1 << pin);
 
-    gpio_irq_enable(pin);
+    gpio_irq_enable_ll(pin);
 
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     IOC->CFG[pin] |= IOCFG_EDGEIRQ_ENABLE;
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     IOC->CFG[pin] &= ~IOCFG_EDGEIRQ_ENABLE;
 }
 
-int gpio_read(gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     if (GPIO->DOE & (1 << pin)) {
         return (GPIO->DOUT >> pin) & 1;
@@ -93,22 +93,22 @@ int gpio_read(gpio_t pin)
     }
 }
 
-void gpio_set(gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     GPIO->DOUTSET = (1 << pin);
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     GPIO->DOUTCLR = (1 << pin);
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
     GPIO->DOUTTGL = (1 << pin);
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     if (value) {
         GPIO->DOUTSET = (1 << pin);

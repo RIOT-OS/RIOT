@@ -93,7 +93,7 @@ static inline uint8_t _pp_num(gpio_t pin)
     return (uint8_t)((_port_num(pin) * GPIO_BITS_PER_PORT) + _pin_num(pin));
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     /* check if mode is valid */
     if (mode == MODE_NOTSUP) {
@@ -118,10 +118,10 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
-    if (gpio_init(pin, mode) != 0) {
+    if (gpio_init_ll(pin, mode) != 0) {
         return -1;
     }
 
@@ -163,37 +163,37 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     gpio(pin)->IE |= _pin_mask(pin);
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     gpio(pin)->IE &= ~_pin_mask(pin);
 }
 
-int gpio_read(gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     return (int)(gpio(pin)->DATA & _pin_mask(pin));
 }
 
-void gpio_set(gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     gpio(pin)->DATA |= _pin_mask(pin);
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     gpio(pin)->DATA &= ~_pin_mask(pin);
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
     gpio(pin)->DATA ^= _pin_mask(pin);
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     if (value) {
         gpio(pin)->DATA |= _pin_mask(pin);

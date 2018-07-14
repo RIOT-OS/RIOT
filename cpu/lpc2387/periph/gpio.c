@@ -63,7 +63,7 @@ static int _isr_map_entry(gpio_t pin) {
     return _pin;
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -94,8 +94,8 @@ int gpio_init_mux(unsigned pin, unsigned mux)
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
     (void)mode;
 
@@ -198,7 +198,7 @@ static void _gpio_configure(gpio_t pin, unsigned rising, unsigned falling)
     irq_restore(state);
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     int isr_map_entry =_isr_map_entry(pin);
     int _state_index = _gpio_isr_map[isr_map_entry];
@@ -213,12 +213,12 @@ void gpio_irq_enable(gpio_t pin)
             bf_isset(_gpio_falling, _state_index));
 }
 
-void gpio_irq_disable(gpio_t dev)
+void gpio_irq_disable_ll(gpio_t dev)
 {
     _gpio_configure(dev, 0, 0);
 }
 
-int gpio_read(gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -226,7 +226,7 @@ int gpio_read(gpio_t pin)
     return (_port->PIN & (1 << _pin)) != 0;
 }
 
-void gpio_set(gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -234,7 +234,7 @@ void gpio_set(gpio_t pin)
     _port->SET = 1 << _pin;
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -242,23 +242,23 @@ void gpio_clear(gpio_t pin)
     _port->CLR = 1 << _pin;
 }
 
-void gpio_toggle(gpio_t dev)
+void gpio_toggle_ll(gpio_t dev)
 {
-    if (gpio_read(dev)) {
-        gpio_clear(dev);
+    if (gpio_read_ll(dev)) {
+        gpio_clear_ll(dev);
     }
     else {
-        gpio_set(dev);
+        gpio_set_ll(dev);
     }
 }
 
-void gpio_write(gpio_t dev, int value)
+void gpio_write_ll(gpio_t dev, int value)
 {
     if (value) {
-        gpio_set(dev);
+        gpio_set_ll(dev);
     }
     else {
-        gpio_clear(dev);
+        gpio_clear_ll(dev);
     }
 }
 
