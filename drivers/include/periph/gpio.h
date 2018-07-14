@@ -58,6 +58,10 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
+#ifdef MODULE_GPIO_EXP
+#include "gpio_exp.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -168,6 +172,18 @@ void gpio_write_ll(gpio_t pin, int value);
  */
 inline int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
+#ifdef MODULE_GPIO_EXP
+    /* check to see if the pin is on a GPIO expander */
+    if (pin > GPIO_EXP_THRESH) {
+        gpio_exp_t *exp_entry = gpio_exp_entry(pin);
+        if (exp_entry == NULL) {
+            return -1;
+        }
+        return exp_entry->driver->init(exp_entry->dev,
+                                       gpio_exp_pin(pin), mode);
+    }
+#endif
+
     return gpio_init_ll(pin, mode);
 }
 
@@ -191,6 +207,18 @@ inline int gpio_init(gpio_t pin, gpio_mode_t mode)
 inline int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                          gpio_cb_t cb, void *arg)
 {
+#ifdef MODULE_GPIO_EXP
+    /* check to see if the pin is on a GPIO expander */
+    if (pin > GPIO_EXP_THRESH) {
+        gpio_exp_t *exp_entry = gpio_exp_entry(pin);
+        if (exp_entry == NULL) {
+            return -1;
+        }
+        return exp_entry->driver->init_int(exp_entry->dev,
+                   gpio_exp_pin(pin), mode, flank, cb, arg);
+    }
+#endif
+
     return gpio_init_int_ll(pin, mode, flank, cb, arg);
 }
 
@@ -201,6 +229,18 @@ inline int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
  */
 inline void gpio_irq_enable(gpio_t pin)
 {
+#ifdef MODULE_GPIO_EXP
+    /* check to see if the pin is on a GPIO expander */
+    if (pin > GPIO_EXP_THRESH) {
+        gpio_exp_t *exp_entry = gpio_exp_entry(pin);
+        if (exp_entry == NULL) {
+            return;
+        }
+        exp_entry->driver->irq(exp_entry->dev, gpio_exp_pin(pin), 1);
+        return;
+    }
+#endif
+
     gpio_irq_enable_ll(pin);
 }
 
@@ -211,6 +251,18 @@ inline void gpio_irq_enable(gpio_t pin)
  */
 inline void gpio_irq_disable(gpio_t pin)
 {
+#ifdef MODULE_GPIO_EXP
+    /* check to see if the pin is on a GPIO expander */
+    if (pin > GPIO_EXP_THRESH) {
+        gpio_exp_t *exp_entry = gpio_exp_entry(pin);
+        if (exp_entry == NULL) {
+            return;
+        }
+        exp_entry->driver->irq(exp_entry->dev, gpio_exp_pin(pin), 0);
+        return;
+    }
+#endif
+
     gpio_irq_disable_ll(pin);
 }
 
@@ -224,6 +276,17 @@ inline void gpio_irq_disable(gpio_t pin)
  */
 inline int gpio_read(gpio_t pin)
 {
+#ifdef MODULE_GPIO_EXP
+    /* check to see if the pin is on a GPIO expander */
+    if (pin > GPIO_EXP_THRESH) {
+        gpio_exp_t *exp_entry = gpio_exp_entry(pin);
+        if (exp_entry == NULL) {
+            return 0;
+        }
+        return exp_entry->driver->read(exp_entry->dev, gpio_exp_pin(pin));
+    }
+#endif
+
     return gpio_read_ll(pin);
 }
 
@@ -234,6 +297,14 @@ inline int gpio_read(gpio_t pin)
  */
 inline void gpio_set(gpio_t pin)
 {
+#ifdef MODULE_GPIO_EXP
+    /* check to see if the pin is on a GPIO expander */
+    if (pin > GPIO_EXP_THRESH) {
+        gpio_write(pin, 1);
+        return;
+    }
+#endif
+
     gpio_set_ll(pin);
 }
 
@@ -244,6 +315,14 @@ inline void gpio_set(gpio_t pin)
  */
 inline void gpio_clear(gpio_t pin)
 {
+#ifdef MODULE_GPIO_EXP
+    /* check to see if the pin is on a GPIO expander */
+    if (pin > GPIO_EXP_THRESH) {
+        gpio_write(pin, 0);
+        return;
+    }
+#endif
+
     gpio_clear_ll(pin);
 }
 
@@ -254,6 +333,19 @@ inline void gpio_clear(gpio_t pin)
  */
 inline void gpio_toggle(gpio_t pin)
 {
+#ifdef MODULE_GPIO_EXP
+    /* check to see if the pin is on a GPIO expander */
+    if (pin > GPIO_EXP_THRESH) {
+        if (gpio_read(pin)) {
+            gpio_write(pin, 1);
+        }
+        else {
+            gpio_write(pin, 0);
+        }
+        return;
+    }
+#endif
+
     gpio_toggle_ll(pin);
 }
 
@@ -265,6 +357,18 @@ inline void gpio_toggle(gpio_t pin)
  */
 inline void gpio_write(gpio_t pin, int value)
 {
+#ifdef MODULE_GPIO_EXP
+    /* check to see if the pin is on a GPIO expander */
+    if (pin > GPIO_EXP_THRESH) {
+        gpio_exp_t *exp_entry = gpio_exp_entry(pin);
+        if (exp_entry == NULL) {
+            return;
+        }
+        exp_entry->driver->write(exp_entry->dev, gpio_exp_pin(pin), value);
+        return;
+    }
+#endif
+
     gpio_write_ll(pin, value);
 }
 
