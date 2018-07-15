@@ -104,11 +104,7 @@ static void _update_hwaddr_from_dev(netif_t netif, netdev_t *dev)
     if (tmp == sizeof(eui64_t)) {
         opt = NETOPT_ADDRESS_LONG;
     }
-    res = dev->driver->get(dev, opt, netif->hwaddr,
-                           sizeof(netif->hwaddr));
-    if (res > 0) {
-        netif->hwaddr_len = res;
-    }
+    dev->driver->get(dev, opt, netif->hwaddr, sizeof(netif->hwaddr));
 }
 
 int netif_set_opt(netif_t netif, netopt_t opt, uint16_t context,
