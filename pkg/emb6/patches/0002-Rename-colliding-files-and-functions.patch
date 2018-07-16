@@ -1,7 +1,7 @@
 From 4e6d1640adde2828f10320d39f8996c6e89f82ac Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mail@martine-lenders.eu>
 Date: Thu, 4 Feb 2016 22:15:23 +0100
-Subject: [PATCH 2/2] Rename colliding files and functions
+Subject: [PATCH 2/3] Rename colliding files and functions
 
 Co-authored-by: Koen Zandberg <koen@bergzand.net>
 ---
