@@ -1,8 +1,9 @@
-From 4a74cf7e617a7e684dc0a5b5534e26f9d3cb5817 Mon Sep 17 00:00:00 2001
+From 4e6d1640adde2828f10320d39f8996c6e89f82ac Mon Sep 17 00:00:00 2001
 From: Martine Lenders <mail@martine-lenders.eu>
 Date: Thu, 4 Feb 2016 22:15:23 +0100
-Subject: [PATCH 2/4] Rename colliding files and functions
+Subject: [PATCH 2/3] Rename colliding files and functions
 
+Co-authored-by: Koen Zandberg <koen@bergzand.net>
 ---
  emb6/emb6.c                                    |  2 +-
  emb6/inc/apl/rest-engine/rest-engine.h         |  2 +-
@@ -10,30 +11,30 @@ Subject: [PATCH 2/4] Rename colliding files and functions
  emb6/inc/net/rpl/rpl-private.h                 |  2 +-
  emb6/inc/net/rpl/rpl.h                         |  2 +-
  emb6/src/apl/er-coap/er-coap-observe.c         |  4 ++--
- emb6/src/apl/er-coap/er-coap-transactions.c    |  6 +++---
- emb6/src/apl/er-coap/er-coap.c                 |  2 +-
+ emb6/src/apl/er-coap/er-coap-transactions.c    |  8 ++++----
+ emb6/src/apl/er-coap/er-coap.c                 |  4 ++--
  emb6/src/apl/rest-engine/rest-engine.c         |  4 ++--
- emb6/src/mac/framer-802154.c                   |  2 +-
- emb6/src/mac/sicslowmac.c                      |  2 +-
- emb6/src/net/ipv6/multicast/roll-tm.c          |  2 +-
- emb6/src/net/ipv6/multicast/smrf.c             |  2 +-
+ emb6/src/mac/framer-802154.c                   |  4 ++--
+ emb6/src/mac/sicslowmac.c                      |  4 ++--
+ emb6/src/net/ipv6/multicast/roll-tm.c          |  4 ++--
+ emb6/src/net/ipv6/multicast/smrf.c             |  4 ++--
  emb6/src/net/ipv6/multicast/uip-mcast6-route.c |  6 +++---
  emb6/src/net/ipv6/nbr-table.c                  |  6 +++---
  emb6/src/net/ipv6/uip-ds6-nbr.c                |  2 +-
  emb6/src/net/ipv6/uip-ds6-route.c              | 16 ++++++++--------
- emb6/src/net/ipv6/uip-ds6.c                    |  6 +++---
+ emb6/src/net/ipv6/uip-ds6.c                    | 16 ++++++++--------
  emb6/src/net/ipv6/uip-icmp6.c                  |  6 +++---
  emb6/src/net/ipv6/uip-nameserver.c             |  8 ++++----
  emb6/src/net/ipv6/uip-nd6.c                    |  2 +-
  emb6/src/net/rpl/rpl-dag.c                     |  2 +-
- emb6/src/net/rpl/rpl-timers.c                  |  2 +-
+ emb6/src/net/rpl/rpl-timers.c                  |  8 ++++----
  emb6/src/net/sicslowpan/sicslowpan.c           |  2 +-
  emb6/src/tport/tcp-socket.c                    |  6 +++---
  emb6/src/tport/udp-socket.c                    |  2 +-
- target/bsp/bsp.c                               |  2 +-
+ target/bsp/bsp.c                               |  6 +++---
  target/if/at86rf212b/at86rf212b.c              |  2 +-
  utils/inc/{clist.h => emb6_clist.h}            | 10 +++++-----
- utils/inc/{random.h => emb6_random.h}          |  2 +-
+ utils/inc/{random.h => emb6_random.h}          |  6 +++---
  utils/inc/{ringbuffer.h => emb6_ringbuffer.h}  |  0
  utils/inc/timer.h                              |  4 ++--
  utils/src/ctimer.c                             | 16 ++++++++--------
@@ -42,12 +43,12 @@ Subject: [PATCH 2/4] Rename colliding files and functions
  utils/src/list.c                               | 10 +++++-----
  utils/src/mmem.c                               |  6 +++---
  utils/src/queuebuf.c                           |  6 +++---
- utils/src/random.c                             |  2 +-
+ utils/src/random.c                             |  6 +++---
  utils/src/ringbuffer.c                         |  2 +-
  utils/src/timer.c                              |  6 +++---
- 41 files changed, 91 insertions(+), 91 deletions(-)
+ 41 files changed, 111 insertions(+), 111 deletions(-)
  rename utils/inc/{clist.h => emb6_clist.h} (94%)
- rename utils/inc/{random.h => emb6_random.h} (97%)
+ rename utils/inc/{random.h => emb6_random.h} (93%)
  rename utils/inc/{ringbuffer.h => emb6_ringbuffer.h} (100%)
 
 diff --git a/emb6/emb6.c b/emb6/emb6.c
@@ -138,7 +139,7 @@ index 57754ac8..84659a9e 100644
  /*---------------------------------------------------------------------------*/
  int
 diff --git a/emb6/src/apl/er-coap/er-coap-transactions.c b/emb6/src/apl/er-coap/er-coap-transactions.c
-index e40f4c96..7cbf2543 100644
+index e40f4c96..eab66380 100644
 --- a/emb6/src/apl/er-coap/er-coap-transactions.c
 +++ b/emb6/src/apl/er-coap/er-coap-transactions.c
 @@ -43,7 +43,7 @@
@@ -159,6 +160,15 @@ index e40f4c96..7cbf2543 100644
    }
  
    return t;
+@@ -105,7 +105,7 @@ coap_send_transaction(coap_transaction_t *t)
+ 
+       if(t->retrans_counter == 0) {
+         t->retrans_timer.timer.interval =
+-          COAP_RESPONSE_TIMEOUT_TICKS + (random_rand()
++          COAP_RESPONSE_TIMEOUT_TICKS + (emb6_random_rand()
+                                          %
+                                          (clock_time_t)
+                                          COAP_RESPONSE_TIMEOUT_BACKOFF_MASK);
 @@ -148,7 +148,7 @@ coap_clear_transaction(coap_transaction_t *t)
      PRINTF("Freeing transaction %u: %p\n\r", t->mid, t);
  
@@ -169,7 +179,7 @@ index e40f4c96..7cbf2543 100644
    }
  }
 diff --git a/emb6/src/apl/er-coap/er-coap.c b/emb6/src/apl/er-coap/er-coap.c
-index 40f68748..a8125a2e 100644
+index 40f68748..c173c5e9 100644
 --- a/emb6/src/apl/er-coap/er-coap.c
 +++ b/emb6/src/apl/er-coap/er-coap.c
 @@ -39,7 +39,7 @@
@@ -181,6 +191,15 @@ index 40f68748..a8125a2e 100644
  
  #include "er-coap.h"
  #include "er-coap-transactions.h"
+@@ -290,7 +290,7 @@ coap_init_connection(uint16_t port, udp_socket_input_callback_t pf_coap_receive)
+            uip_ntohs(pst_udp_socket->udp_conn->lport));
+ 
+     /* initialize transaction ID */
+-    current_mid = random_rand();
++    current_mid = emb6_random_rand();
+ }
+ /*---------------------------------------------------------------------------*/
+ uint16_t
 diff --git a/emb6/src/apl/rest-engine/rest-engine.c b/emb6/src/apl/rest-engine/rest-engine.c
 index fd8d1ba3..818f3266 100644
 --- a/emb6/src/apl/rest-engine/rest-engine.c
@@ -204,7 +223,7 @@ index fd8d1ba3..818f3266 100644
  
    for(periodic_resource =
 diff --git a/emb6/src/mac/framer-802154.c b/emb6/src/mac/framer-802154.c
-index f99486dc..359ee6b5 100644
+index f99486dc..e1ad9e24 100644
 --- a/emb6/src/mac/framer-802154.c
 +++ b/emb6/src/mac/framer-802154.c
 @@ -45,7 +45,7 @@
@@ -216,8 +235,17 @@ index f99486dc..359ee6b5 100644
  
  
  
+@@ -103,7 +103,7 @@ static int8_t create_frame(int type, int do_create)
+ 
+   if(!initialized) {
+     initialized = 1;
+-    mac_dsn = random_rand() & 0xff;
++    mac_dsn = emb6_random_rand() & 0xff;
+   }
+ 
+   /* Build the FCF. */
 diff --git a/emb6/src/mac/sicslowmac.c b/emb6/src/mac/sicslowmac.c
-index 7219fa8c..c741131e 100644
+index 7219fa8c..58949f0e 100644
 --- a/emb6/src/mac/sicslowmac.c
 +++ b/emb6/src/mac/sicslowmac.c
 @@ -51,7 +51,7 @@
@@ -229,8 +257,17 @@ index 7219fa8c..c741131e 100644
  
  #define DEBUG DEBUG_NONE
  
+@@ -256,7 +256,7 @@ static int8_t off(int keep_radio_on)
+ /*---------------------------------------------------------------------------*/
+ static void init(s_ns_t* p_netStack)
+ {
+-    mac_dsn = random_rand() % 256;
++    mac_dsn = emb6_random_rand() % 256;
+ 
+     if ((p_netStack != NULL) && (p_netStack->inif != NULL)) {
+         p_ns = p_netStack;
 diff --git a/emb6/src/net/ipv6/multicast/roll-tm.c b/emb6/src/net/ipv6/multicast/roll-tm.c
-index 8fb1717a..8b363009 100644
+index 8fb1717a..c1504726 100644
 --- a/emb6/src/net/ipv6/multicast/roll-tm.c
 +++ b/emb6/src/net/ipv6/multicast/roll-tm.c
 @@ -51,7 +51,7 @@
@@ -242,8 +279,17 @@ index 8fb1717a..8b363009 100644
  //#include "dev/watchdog.h"
  //#include <string.h>
  
+@@ -494,7 +494,7 @@ random_interval(clock_time_t i_min, uint8_t d)
+   VERBOSE_PRINTF("ROLL TM: Random [%lu, %lu)\n", (unsigned long)min,
+                  (unsigned long)(TRICKLE_TIME(i_min, d)));
+ 
+-  return min + (random_rand() % (TRICKLE_TIME(i_min, d) - 1 - min));
++  return min + (emb6_random_rand() % (TRICKLE_TIME(i_min, d) - 1 - min));
+ }
+ /*---------------------------------------------------------------------------*/
+ /* Called at the end of the current interval for timer ptr */
 diff --git a/emb6/src/net/ipv6/multicast/smrf.c b/emb6/src/net/ipv6/multicast/smrf.c
-index 474c41d4..9b4a3a51 100644
+index 474c41d4..abe22355 100644
 --- a/emb6/src/net/ipv6/multicast/smrf.c
 +++ b/emb6/src/net/ipv6/multicast/smrf.c
 @@ -52,7 +52,7 @@
@@ -255,6 +301,15 @@ index 474c41d4..9b4a3a51 100644
  //#include "net/netstack.h"
  
  #define DEBUG DEBUG_NONE
+@@ -170,7 +170,7 @@ in()
+         fwd_spread = SMRF_MAX_SPREAD;
+       }
+       if(fwd_spread) {
+-        fwd_delay = fwd_delay * (1 + ((random_rand() >> 11) % fwd_spread));
++        fwd_delay = fwd_delay * (1 + ((emb6_random_rand() >> 11) % fwd_spread));
+       }
+ 
+       memcpy(&mcast_buf, uip_buf, uip_len);
 diff --git a/emb6/src/net/ipv6/multicast/uip-mcast6-route.c b/emb6/src/net/ipv6/multicast/uip-mcast6-route.c
 index aa0caff8..995ff0c9 100644
 --- a/emb6/src/net/ipv6/multicast/uip-mcast6-route.c
@@ -406,7 +461,7 @@ index c732f78c..e54a18fe 100644
        ANNOTATE("#L %u 0\n\r", defrt->ipaddr.u8[sizeof(uip_ipaddr_t) - 1]);
  #if UIP_DS6_NOTIFICATIONS
 diff --git a/emb6/src/net/ipv6/uip-ds6.c b/emb6/src/net/ipv6/uip-ds6.c
-index 0e2f16ae..ad3f4cd0 100644
+index 0e2f16ae..de23f3e2 100644
 --- a/emb6/src/net/ipv6/uip-ds6.c
 +++ b/emb6/src/net/ipv6/uip-ds6.c
 @@ -49,7 +49,7 @@
@@ -418,15 +473,26 @@ index 0e2f16ae..ad3f4cd0 100644
  #include "uip-nd6.h"
  #include "uip-ds6.h"
  #include "uip-packetqueue.h"
-@@ -343,7 +343,7 @@ uip_ds6_addr_add(uip_ipaddr_t *ipaddr, unsigned long vlifetime, uint8_t type)
+@@ -136,7 +136,7 @@ uip_ds6_init(void)
+ #endif /* UIP_ND6_SEND_RA */
+ #else /* UIP_CONF_ROUTER */
+   etimer_set(&uip_ds6_timer_rs,
+-             random_rand() % (UIP_ND6_MAX_RTR_SOLICITATION_DELAY *
++             emb6_random_rand() % (UIP_ND6_MAX_RTR_SOLICITATION_DELAY *
+                      bsp_get(E_BSP_GET_TRES)), tcpip_gethandler());
+ #endif /* UIP_CONF_ROUTER */
+   etimer_set(&uip_ds6_timer_periodic, UIP_DS6_PERIOD, (pfn_callback_t) tcpip_gethandler());
+@@ -343,8 +343,8 @@ uip_ds6_addr_add(uip_ipaddr_t *ipaddr, unsigned long vlifetime, uint8_t type)
      }
  #if UIP_ND6_DEF_MAXDADNS > 0
      locaddr->state = ADDR_TENTATIVE;
 -    timer_set(&locaddr->dadtimer,
+-              random_rand() % (UIP_ND6_MAX_RTR_SOLICITATION_DELAY *
 +    timer_emb6_set(&locaddr->dadtimer,
-               random_rand() % (UIP_ND6_MAX_RTR_SOLICITATION_DELAY *
++              emb6_random_rand() % (UIP_ND6_MAX_RTR_SOLICITATION_DELAY *
                        bsp_get(E_BSP_GET_TRES)));
      locaddr->dadnscount = 0;
+ #else /* UIP_ND6_DEF_MAXDADNS > 0 */
 @@ -591,7 +591,7 @@ uip_ds6_dad(uip_ds6_addr_t *addr)
    if(addr->dadnscount < uip_ds6_if.maxdadns) {
      uip_nd6_ns_output(NULL, NULL, &addr->ipaddr);
@@ -436,6 +502,26 @@ index 0e2f16ae..ad3f4cd0 100644
                uip_ds6_if.retrans_timer / 1000 * bsp_get(E_BSP_GET_TRES));
      return;
    }
+@@ -661,7 +661,7 @@ uip_ds6_send_ra_periodic(void)
+     PRINTF("Sending periodic RA\n\r");
+   }
+ 
+-  rand_time = UIP_ND6_MIN_RA_INTERVAL + random_rand() %
++  rand_time = UIP_ND6_MIN_RA_INTERVAL + emb6_random_rand() %
+     (uint16_t) (UIP_ND6_MAX_RA_INTERVAL - UIP_ND6_MIN_RA_INTERVAL);
+   PRINTF("Random time 1 = %u\n\r", rand_time);
+ 
+@@ -704,8 +704,8 @@ uip_ds6_compute_reachable_time(void)
+ {
+   return (uint32_t) (UIP_ND6_MIN_RANDOM_FACTOR
+                      (uip_ds6_if.base_reachable_time)) +
+-    ((uint16_t) (random_rand() << 8) +
+-     (uint16_t) random_rand()) %
++    ((uint16_t) (emb6_random_rand() << 8) +
++     (uint16_t) emb6_random_rand()) %
+     (uint32_t) (UIP_ND6_MAX_RANDOM_FACTOR(uip_ds6_if.base_reachable_time) -
+                 UIP_ND6_MIN_RANDOM_FACTOR(uip_ds6_if.base_reachable_time));
+ }
 diff --git a/emb6/src/net/ipv6/uip-icmp6.c b/emb6/src/net/ipv6/uip-icmp6.c
 index 00828a3d..2d8b4858 100644
 --- a/emb6/src/net/ipv6/uip-icmp6.c
@@ -533,7 +619,7 @@ index cc11eab7..4a85b708 100644
  #include "ctimer.h"
  
 diff --git a/emb6/src/net/rpl/rpl-timers.c b/emb6/src/net/rpl/rpl-timers.c
-index 9b235d4c..439b45d9 100644
+index 9b235d4c..d349123d 100644
 --- a/emb6/src/net/rpl/rpl-timers.c
 +++ b/emb6/src/net/rpl/rpl-timers.c
 @@ -47,7 +47,7 @@
@@ -545,6 +631,33 @@ index 9b235d4c..439b45d9 100644
  #include "ctimer.h"
  
  #define DEBUG DEBUG_NONE
+@@ -97,7 +97,7 @@ new_dio_interval(rpl_instance_t *instance)
+   instance->dio_next_delay = ticks;
+ 
+   /* random number between I/2 and I */
+-  ticks = ticks / 2 + (ticks / 2 * (uint32_t)random_rand()) / RANDOM_RAND_MAX;
++  ticks = ticks / 2 + (ticks / 2 * (uint32_t)emb6_random_rand()) / RANDOM_RAND_MAX;
+ 
+   /*
+    * The intervals must be equally long among the nodes for Trickle to
+@@ -177,7 +177,7 @@ void
+ rpl_reset_periodic_timer(void)
+ {
+   next_dis = RPL_DIS_INTERVAL / 2 +
+-    ((uint32_t)RPL_DIS_INTERVAL * (uint32_t)random_rand()) / RANDOM_RAND_MAX -
++    ((uint32_t)RPL_DIS_INTERVAL * (uint32_t)emb6_random_rand()) / RANDOM_RAND_MAX -
+     RPL_DIS_START_DELAY;
+   ctimer_set(&periodic_timer, bsp_get(E_BSP_GET_TRES), handle_periodic_timer, NULL);
+ }
+@@ -294,7 +294,7 @@ schedule_dao(rpl_instance_t *instance, clock_time_t latency)
+   } else {
+       if(latency != 0) {
+           expiration_time = latency / 2 +
+-                  (random_rand() % (latency));
++                  (emb6_random_rand() % (latency));
+       } else {
+           expiration_time = 0;
+       }
 diff --git a/emb6/src/net/sicslowpan/sicslowpan.c b/emb6/src/net/sicslowpan/sicslowpan.c
 index 8c909cfa..79afefed 100644
 --- a/emb6/src/net/sicslowpan/sicslowpan.c
@@ -603,9 +716,18 @@ index be27a5f3..545f6bde 100644
  #include "emb6_conf.h"
  #include "tcpip.h"
 diff --git a/target/bsp/bsp.c b/target/bsp/bsp.c
-index 85c99769..bf266b80 100644
+index 85c99769..f86199f4 100644
 --- a/target/bsp/bsp.c
 +++ b/target/bsp/bsp.c
+@@ -45,7 +45,7 @@
+ /*============================================================================*/
+ /*! \file   bsp.c
+ 
+-    \author Artem Yushev, 
++    \author Artem Yushev,
+ 
+     \brief  Board support package implementation.
+ 
 @@ -63,7 +63,7 @@
  #include "board_conf.h"
  
@@ -615,6 +737,15 @@ index 85c99769..bf266b80 100644
  #include "evproc.h"
  /*==============================================================================
                                       MACROS
+@@ -132,7 +132,7 @@ uint8_t bsp_init (s_ns_t * ps_ns)
+     if (!board_conf(ps_ns))
+         return 0;
+ 
+-    random_init(hal_getrand());
++    emb6_random_init(hal_getrand());
+ 
+     /* Normal exit*/
+     return 1;
 diff --git a/target/if/at86rf212b/at86rf212b.c b/target/if/at86rf212b/at86rf212b.c
 index aba87d59..c059568e 100644
 --- a/target/if/at86rf212b/at86rf212b.c
@@ -668,10 +799,10 @@ index 0e26be8d..a104f29e 100644
  int    list_length(list_t list);
  
 diff --git a/utils/inc/random.h b/utils/inc/emb6_random.h
-similarity index 97%
+similarity index 93%
 rename from utils/inc/random.h
 rename to utils/inc/emb6_random.h
-index 3bab9348..e59a5005 100644
+index 3bab9348..29cd792a 100644
 --- a/utils/inc/random.h
 +++ b/utils/inc/emb6_random.h
 @@ -28,7 +28,7 @@
@@ -683,6 +814,23 @@ index 3bab9348..e59a5005 100644
   */
  /**
   * \file
+@@ -41,14 +41,14 @@
+  * Initialize the pseudo-random generator.
+  *
+  */
+-void random_init(unsigned short seed);
++void emb6_random_init(unsigned short seed);
+ 
+ /*
+  * Calculate a pseudo random number between 0 and 65535.
+  *
+  * \return A pseudo-random number between 0 and 65535.
+  */
+-unsigned short random_rand(void);
++unsigned short emb6_random_rand(void);
+ 
+ /* In gcc int rand() uses RAND_MAX and long random() uses RANDOM_MAX */
+ /* Since random_rand casts to unsigned short, we'll use this maxmimum */
 diff --git a/utils/inc/ringbuffer.h b/utils/inc/emb6_ringbuffer.h
 similarity index 100%
 rename from utils/inc/ringbuffer.h
@@ -944,10 +1092,10 @@ index 7a9f13f2..809e9c1c 100644
    } else if(memb_inmemb(&refbufmem, buf)) {
      memb_free(&refbufmem, buf);
 diff --git a/utils/src/random.c b/utils/src/random.c
-index 72f5d12a..00aed184 100644
+index 72f5d12a..a884a204 100644
 --- a/utils/src/random.c
 +++ b/utils/src/random.c
-@@ -36,7 +36,7 @@
+@@ -36,19 +36,19 @@
   */
  
  
@@ -956,6 +1104,20 @@ index 72f5d12a..00aed184 100644
  
  #include <stdlib.h>
  
+ /*---------------------------------------------------------------------------*/
+ void
+-random_init(unsigned short seed)
++emb6_random_init(unsigned short seed)
+ {
+   srand(seed);
+ }
+ /*---------------------------------------------------------------------------*/
+ unsigned short
+-random_rand(void)
++emb6_random_rand(void)
+ {
+ /* In gcc int rand() uses RAND_MAX and long random() uses RANDOM_MAX=0x7FFFFFFF */
+ /* RAND_MAX varies depending on the architecture */
 diff --git a/utils/src/ringbuffer.c b/utils/src/ringbuffer.c
 index 5736f8f9..52216c5b 100644
 --- a/utils/src/ringbuffer.c
@@ -1001,5 +1163,5 @@ index 95c84261..a774c092 100644
   *
   * \note A periodic timer will drift if this function is used to reset
 -- 
-2.16.1
+2.16.4
 
