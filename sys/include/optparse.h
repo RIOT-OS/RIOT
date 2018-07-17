@@ -132,7 +132,10 @@ enum OPTPARSE_ACTIONS {
     OPTPARSE_FLOAT,         /**< Parse the value as float and store it in *opt_rule.data.d_float */
 
     OPTPARSE_STR,           /**< Make a copy of the value string with strdup() and place it
-                             *  in *opt_rule.data.d_str. The string must be deallocated with free()
+                             *  in *opt_rule.data.d_str. The string must be deallocated with free().
+                             * It is suggested that the default value for this option is
+                             * NULL, so that it is easier to know afterwards if the pointer
+                             * should be freed.
                              */
 
     OPTPARSE_STR_NOCOPY,    /*! Place a pointer to the value string in data::d_cstr.
