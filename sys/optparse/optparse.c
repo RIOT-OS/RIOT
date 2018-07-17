@@ -40,12 +40,12 @@
 #ifndef DEVELHELP
 
 #define P_DEBUG(...)
-#define LOAD_VAR(var, value) do { if ((var) != NULL) { *(var) = value; } } while (0)
+#define LAZY_LOAD(var, value) do { if ((var) != NULL) { *(var) = (value); } } while (0)
 
 #else /* DEVELHELP */
 
 #define P_DEBUG P_ERR
-#define LOAD_VAR(var, value) do { if ((var) != NULL) { *(var) = value; } \
+#define LAZY_LOAD(var, value) do { if ((var) != NULL) { *(var) = (value); } \
                                   else { P_DEBUG("Warning! NULL pointer:" #var "%c\n", ' '); } } while (0)
 
 #endif /*DEVELHELP */
@@ -149,40 +149,38 @@ static void do_help(const opt_conf_t *config)
 static int do_action(opt_rule_t *rule, const char *key, const char *value)
 {
     int ret = OPTPARSE_OK;
-    char *copied_str = NULL;
-    const char *custom_message = NULL;
 
     switch (rule->action) {
         case OPTPARSE_IGNORE: case OPTPARSE_IGNORE_SWITCH:
             break;
         case OPTPARSE_INT:
-            LOAD_VAR(rule->data.d_int, strtol(value, NULL, 0));
+            LAZY_LOAD(rule->data.d_int, strtol(value, NULL, 0));
             break;
         case OPTPARSE_DOUBLE:
-            LOAD_VAR(rule->data.d_double, strtod(value, NULL));
+            LAZY_LOAD(rule->data.d_double, strtod(value, NULL));
             break;
         case OPTPARSE_FLOAT:
-            LOAD_VAR(rule->data.d_float, strtof(value, NULL));
+            LAZY_LOAD(rule->data.d_float, strtof(value, NULL));
             break;
         case OPTPARSE_STR_NOCOPY:
-            LOAD_VAR(rule->data.d_cstr, value);
+            LAZY_LOAD(rule->data.d_cstr, value);
             break;
         case OPTPARSE_SET_BOOL:
-            LOAD_VAR(rule->data.d_bool, true);
+            LAZY_LOAD(rule->data.d_bool, true);
             break;
         case OPTPARSE_UNSET_BOOL:
-            LOAD_VAR(rule->data.d_bool, false);
+            LAZY_LOAD(rule->data.d_bool, false);
             break;
         case OPTPARSE_COUNT:
-            LOAD_VAR(rule->data.d_int, *rule->data.d_int + 1);
+            LAZY_LOAD(rule->data.d_int, *rule->data.d_int + 1);
             break;
         case OPTPARSE_STR:
-            if (rule->data.d_str != NULL && (copied_str = my_strdup(value)) != NULL) {
-                *rule->data.d_str = copied_str;
-            }
-            else {
+        {
+            char *copied_str = NULL;
+            LAZY_LOAD(rule->data.d_str, (copied_str = my_strdup(value)));
+            if (copied_str == NULL) {
                 P_DEBUG("OPTPARSE_STR failed: d_str: %p,", (void *)rule->data.d_str);
-                P_DEBUG(" copied_str %p\n", copied_str);
+                P_DEBUG(" copied_str %p\n", (void *)copied_str);
                 if (rule->data.d_str == NULL) {
                     ret = -OPTPARSE_BADCONFIG;
                 }
@@ -190,17 +188,21 @@ static int do_action(opt_rule_t *rule, const char *key, const char *value)
                     ret = -OPTPARSE_NOMEM;
                 }
             }
-            break;
+        }
+        break;
         case OPTPARSE_DO_HELP:
             P_DEBUG("do_action found OPTPARSE_DO_HELP\n");
             break; /*this is a meta-action and has to be implemented in generic_parser*/
         case OPTPARSE_CUSTOM_ACTION:
+        {
+            const char *custom_message = NULL;
             ret = rule->data.d_custom.callback(key, value,
                                                rule->data.d_custom.data, &custom_message);
             if (custom_message != NULL) {
                 STR_ERR(custom_message);
             }
-            break;
+        }
+        break;
         default:
             P_DEBUG("Unknown action: %d\n", rule->action);
             ret = -OPTPARSE_BADCONFIG;
