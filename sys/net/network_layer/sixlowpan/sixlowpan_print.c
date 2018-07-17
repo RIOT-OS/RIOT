@@ -201,15 +201,15 @@ void sixlowpan_print(uint8_t *data, size_t size)
                         puts("reserved");
                         break;
 
-                    case 0x10:
+                    case 0x01:
                         puts("64 bits inline");
                         break;
 
-                    case 0x20:
+                    case 0x02:
                         puts("16 bits inline");
                         break;
 
-                    case 0x30:
+                    case 0x03:
                         puts("elided (use L2 address)");
                         break;
                 }
@@ -222,15 +222,15 @@ void sixlowpan_print(uint8_t *data, size_t size)
                         puts("128 bits inline");
                         break;
 
-                    case 0x10:
+                    case 0x01:
                         puts("64 bits inline");
                         break;
 
-                    case 0x20:
+                    case 0x02:
                         puts("16 bits inline");
                         break;
 
-                    case 0x30:
+                    case 0x03:
                         puts("elided (use L2 address)");
                         break;
                 }
