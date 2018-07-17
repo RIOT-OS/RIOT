@@ -315,3 +315,13 @@ void at_process_urc(at_dev_t *dev, uint32_t timeout)
     clist_foreach(&dev->urc_list, _check_urc, buf);
 }
 #endif
+
+void at_dev_poweron(at_dev_t *dev)
+{
+    uart_poweron(dev->uart);
+}
+
+void at_dev_poweroff(at_dev_t *dev)
+{
+    uart_poweroff(dev->uart);
+}

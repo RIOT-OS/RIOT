@@ -256,6 +256,20 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, ui
  */
 void at_drain(at_dev_t *dev);
 
+/**
+ * @brief   Power device on
+ *
+ * @param[in]   dev     device to power on
+ */
+void at_dev_poweron(at_dev_t *dev);
+
+/**
+ * @brief   Power device off
+ *
+ * @param[in]   dev     device to power off
+ */
+void at_dev_poweroff(at_dev_t *dev);
+
 #if defined(MODULE_AT_URC) || DOXYGEN
 /**
  * @brief   Add a callback for an unsolicited response code
