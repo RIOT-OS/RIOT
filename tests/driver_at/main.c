@@ -115,6 +115,30 @@ static int drain(int argc, char **argv)
     return 0;
 }
 
+static int power_on(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    at_dev_poweron(&at_dev);
+
+    puts("Powered on");
+
+    return 0;
+}
+
+static int power_off(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    at_dev_poweroff(&at_dev);
+
+    puts("Powered off");
+
+    return 0;
+}
+
 #ifdef MODULE_AT_URC
 #ifndef MAX_URC_NB
 #define MAX_URC_NB  5
@@ -205,6 +229,8 @@ static const shell_command_t shell_commands[] = {
     { "send_ok", "Send a command and wait OK", send_ok },
     { "send_lines", "Send a command and wait lines", send_lines },
     { "drain", "Drain AT device", drain },
+    { "power_on", "Power on AT device", power_on },
+    { "power_off", "Power off AT device", power_off },
 #ifdef MODULE_AT_URC
     { "add_urc", "Register an URC", add_urc },
     { "remove_urc", "De-register an URC", remove_urc },
