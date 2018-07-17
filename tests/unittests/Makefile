@@ -58,6 +58,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              samd21-xpro \
                              samr21-xpro \
                              seeeduino_arch-pro \
+                             sensebox_samd21 \
                              slstk3401a \
                              sltb001a \
                              slwstk6220a \
