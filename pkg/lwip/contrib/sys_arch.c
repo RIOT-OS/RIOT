@@ -178,19 +178,46 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
     }
 }
 
+/**
+ * @brief   parameters to _lwip_thread_wrapper
+ */
+typedef struct {
+    mutex_t sync;
+    lwip_thread_fn thread;
+    void *arg;
+} _lwip_thread_params_t;
+
+static void *_lwip_thread_wrapper(void *params_ptr)
+{
+    _lwip_thread_params_t *params = params_ptr;
+    lwip_thread_fn thread = params->thread;
+    void *arg = params->arg;
+    mutex_unlock(&params->sync);
+    thread(arg);
+    /* TODO: free stack? */
+    return NULL;
+}
+
 sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg,
                             int stacksize, int prio)
 {
     kernel_pid_t res;
     char *stack = mem_malloc((size_t)stacksize);
+    _lwip_thread_params_t params = {
+        .sync = MUTEX_INIT_LOCKED,
+        .thread = thread,
+        .arg = arg,
+    };
 
     if (stack == NULL) {
         return ERR_MEM;
     }
     if ((res = thread_create(stack, stacksize, prio, THREAD_CREATE_STACKTEST,
-                             (thread_task_func_t)thread, arg, name)) <= KERNEL_PID_UNDEF) {
+                             _lwip_thread_wrapper, &params,
+                             name)) <= KERNEL_PID_UNDEF) {
         abort();
     }
+    mutex_lock(&params.sync);
     sched_switch((char)prio);
     return res;
 }
