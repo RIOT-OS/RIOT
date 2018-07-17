@@ -59,6 +59,7 @@ endif
 
 ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += ieee802154
+  USEMODULE += random
 endif
 
 ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
