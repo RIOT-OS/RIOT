@@ -116,9 +116,9 @@ void *worker_thread(void *arg)
             expected = last + TEST_HZ * TEST_INTERVAL;
             int32_t jitter = now - expected;
             printf("now=%" PRIu32 ".%06" PRIu32 " (0x%08" PRIx32 " ticks), ",
-                    sec, us, ticks.ticks32);
+                   sec, us, ticks.ticks32);
             printf("drift=%" PRId32 " us, jitter=%" PRId32 " us\n",
-                    drift, jitter);
+                   drift, jitter);
             last = now;
         }
         ++loop_counter;
