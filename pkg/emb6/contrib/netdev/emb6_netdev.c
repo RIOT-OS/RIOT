@@ -19,6 +19,7 @@
 
 #include "msg.h"
 #include "net/netdev.h"
+#include "net/ieee802154.h"
 
 #include "evproc.h"
 #include "emb6.h"
@@ -115,6 +116,24 @@ static void _configure_netdev(void)
     int res = _dev->driver->set(_dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
     if (res < 0) {
         DEBUG("emb6: enable NETOPT_RX_END_IRQ failed: %d\n", res);
+    }
+    if (IEEE802154_DEFAULT_ENABLE_ACK_REQ) {
+        res = _dev->driver->set(_dev, NETOPT_ACK_REQ, &enable, sizeof(enable));
+        if (res < 0) {
+            DEBUG("gnrc_netif: enable ACK requests failed: %d\n", res);
+        }
+    }
+    if (IEEE802154_DEFAULT_ENABLE_AUTOACK) {
+        res = _dev->driver->set(_dev, NETOPT_AUTOACK, &enable, sizeof(enable));
+        if (res < 0) {
+            DEBUG("gnrc_netif: enable auto ACK failed: %d\n", res);
+        }
+    }
+    if (IEEE802154_DEFAULT_ENABLE_CSMA) {
+        res = _dev->driver->set(_dev, NETOPT_CSMA, &enable, sizeof(enable));
+        if (res < 0) {
+            DEBUG("gnrc_netif: enable CSMA failed: %d\n", res);
+        }
     }
 }
 
