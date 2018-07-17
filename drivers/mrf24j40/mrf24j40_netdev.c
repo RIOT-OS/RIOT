@@ -207,6 +207,16 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
+        case NETOPT_AUTOACK:
+            if (dev->netdev.flags & MRF24J40_OPT_AUTOACK) {
+                *((netopt_enable_t *)val) = NETOPT_ENABLE;
+            }
+            else {
+                *((netopt_enable_t *)val) = NETOPT_DISABLE;
+            }
+            res = sizeof(netopt_enable_t);
+            break;
+
         case NETOPT_PRELOADING:
             if (dev->netdev.flags & MRF24J40_OPT_PRELOADING) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
@@ -441,9 +451,9 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             break;
 
         case NETOPT_AUTOACK:
-            mrf24j40_set_option(dev, NETDEV_IEEE802154_ACK_REQ,
+            mrf24j40_set_option(dev, MRF24J40_OPT_AUTOACK,
                                 ((const bool *)val)[0]);
-            /* don't set res to set netdev_ieee802154_t::flags */
+            res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_PRELOADING:

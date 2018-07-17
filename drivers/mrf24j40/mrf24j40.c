@@ -66,7 +66,7 @@ void mrf24j40_reset(mrf24j40_t *dev)
     /* set default options */
     mrf24j40_set_option(dev, IEEE802154_FCF_PAN_COMP, true);
     mrf24j40_set_option(dev, NETDEV_IEEE802154_SRC_MODE_LONG, true);
-    mrf24j40_set_option(dev, NETDEV_IEEE802154_ACK_REQ, true);
+    mrf24j40_set_option(dev, MRF24J40_OPT_AUTOACK, true);
     mrf24j40_set_option(dev, MRF24J40_OPT_CSMA, true);
 
     /* go into RX state */

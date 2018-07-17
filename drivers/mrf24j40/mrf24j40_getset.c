@@ -351,7 +351,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                 tmp &= ~MRF24J40_RXMCR_ERRPKT;
                 mrf24j40_reg_write_short(dev, MRF24J40_REG_RXMCR, tmp);
                 break;
-            case NETDEV_IEEE802154_ACK_REQ:
+            case MRF24J40_OPT_AUTOACK:
                 DEBUG("[mrf24j40] opt: enabling auto ACKs\n");
                 tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);
                 tmp &= ~MRF24J40_RXMCR_NOACKRSP;
@@ -383,12 +383,12 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                 tmp &= ~MRF24J40_RXMCR_PROMI;
                 tmp &= ~MRF24J40_RXMCR_ERRPKT;
                 /* re-enable AUTOACK only if the option is set */
-                if (dev->netdev.flags & NETDEV_IEEE802154_ACK_REQ) {
+                if (dev->flags & MRF24J40_OPT_AUTOACK) {
                     tmp &= ~(MRF24J40_RXMCR_NOACKRSP);
                     mrf24j40_reg_write_short(dev, MRF24J40_REG_RXMCR, tmp);
                 }
                 break;
-            case NETDEV_IEEE802154_ACK_REQ:
+            case MRF24J40_OPT_AUTOACK:
                 DEBUG("[mrf24j40] opt: disabling auto ACKs\n");
                 tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_RXMCR);
                 tmp |= MRF24J40_RXMCR_NOACKRSP;
