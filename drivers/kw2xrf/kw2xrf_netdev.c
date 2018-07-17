@@ -103,7 +103,7 @@ static size_t kw2xrf_tx_load(uint8_t *pkt_buf, uint8_t *buf, size_t len, size_t 
 
 static void kw2xrf_tx_exec(kw2xrf_t *dev)
 {
-    if ((dev->netdev.flags & KW2XRF_OPT_AUTOACK) &&
+    if ((dev->netdev.flags & KW2XRF_OPT_ACK_REQ) &&
         (_send_last_fcf & IEEE802154_FCF_ACK_REQ)) {
         kw2xrf_set_sequence(dev, XCVSEQ_TX_RX);
     }
