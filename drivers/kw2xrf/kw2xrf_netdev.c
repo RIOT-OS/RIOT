@@ -275,6 +275,16 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             *((netopt_state_t *)value) = _get_state(dev);
             return sizeof(netopt_state_t);
 
+        case NETOPT_AUTOACK:
+            if (dev->netdev.flags & KW2XRF_OPT_AUTOACK) {
+                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            }
+            else {
+                *((netopt_enable_t *)value) = NETOPT_DISABLE;
+            }
+            return sizeof(netopt_enable_t);
+
+
         case NETOPT_PRELOADING:
             if (dev->netdev.flags & KW2XRF_OPT_PRELOADING) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
@@ -452,6 +462,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             /* Set up HW generated automatic ACK after Receive */
             kw2xrf_set_option(dev, KW2XRF_OPT_AUTOACK,
                               ((bool *)value)[0]);
+            res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_ACK_REQ:
