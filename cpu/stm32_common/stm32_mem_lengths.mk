@@ -235,6 +235,7 @@ else ifeq ($(STM32_TYPE), L)
       RAM_LEN = 64K
     else ifeq ($(STM32_MODEL2), 7)
       RAM_LEN = 96K
+      RAM2_LEN = 32K
     else ifeq ($(STM32_MODEL2), 5)
       RAM_LEN = 160K
     else ifeq ($(STM32_MODEL2), 9)
