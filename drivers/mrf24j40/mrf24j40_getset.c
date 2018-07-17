@@ -331,7 +331,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
 
     /* set option field */
     if (state) {
-        dev->netdev.flags |= option;
+        dev->flags |= option;
         /* trigger option specific actions */
         switch (option) {
             case MRF24J40_OPT_CSMA:
@@ -364,7 +364,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
     }
     /* clear option field */
     else {
-        dev->netdev.flags &= ~(option);
+        dev->flags &= ~(option);
         /* trigger option specific actions */
         switch (option) {
             case MRF24J40_OPT_CSMA:

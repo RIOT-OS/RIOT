@@ -97,7 +97,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     }
 
     /* send data out directly if pre-loading is disabled */
-    if (!(dev->netdev.flags & MRF24J40_OPT_PRELOADING)) {
+    if (!(dev->flags & MRF24J40_OPT_PRELOADING)) {
         mrf24j40_tx_exec(dev);
     }
     /* return the number of bytes that were actually send out */
@@ -208,7 +208,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_AUTOACK:
-            if (dev->netdev.flags & MRF24J40_OPT_AUTOACK) {
+            if (dev->flags & MRF24J40_OPT_AUTOACK) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -218,7 +218,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_PRELOADING:
-            if (dev->netdev.flags & MRF24J40_OPT_PRELOADING) {
+            if (dev->flags & MRF24J40_OPT_PRELOADING) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -228,7 +228,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_PROMISCUOUSMODE:
-            if (dev->netdev.flags & MRF24J40_OPT_PROMISCUOUS) {
+            if (dev->flags & MRF24J40_OPT_PROMISCUOUS) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -239,31 +239,31 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_RX_START_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_START);
+                !!(dev->flags & MRF24J40_OPT_TELL_RX_START);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_RX_END_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END);
+                !!(dev->flags & MRF24J40_OPT_TELL_RX_END);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_TX_START_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_TX_START);
+                !!(dev->flags & MRF24J40_OPT_TELL_TX_START);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_TX_END_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_TX_END);
+                !!(dev->flags & MRF24J40_OPT_TELL_TX_END);
             res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_CSMA:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_CSMA);
+                !!(dev->flags & MRF24J40_OPT_CSMA);
             res = sizeof(netopt_enable_t);
             break;
 
@@ -344,7 +344,7 @@ static int _set_state(mrf24j40_t *dev, netopt_state_t state)
             mrf24j40_set_state(dev, MRF24J40_PSEUDO_STATE_IDLE);
             break;
         case NETOPT_STATE_TX:
-            if (dev->netdev.flags & MRF24J40_OPT_PRELOADING) {
+            if (dev->flags & MRF24J40_OPT_PRELOADING) {
                 mrf24j40_tx_exec(dev);
             }
             break;
@@ -503,7 +503,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 (*((const uint8_t *)val) > 5)) {
                 res = -EOVERFLOW;
             }
-            else if (dev->netdev.flags & MRF24J40_OPT_CSMA) {
+            else if (dev->flags & MRF24J40_OPT_CSMA) {
                 /* only set if CSMA is enabled */
                 mrf24j40_set_csma_max_retries(dev, *((const uint8_t *)val));
                 res = sizeof(uint8_t);
@@ -542,7 +542,7 @@ static void _isr(netdev_t *netdev)
         dev->pending &= ~(MRF24J40_TASK_TX_READY);
         DEBUG("[mrf24j40] EVT - TX_END\n");
 #ifdef MODULE_NETSTATS_L2
-        if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
+        if (netdev->event_callback && (dev->flags & MRF24J40_OPT_TELL_TX_END)) {
             uint8_t txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
             dev->tx_retries = (txstat >> MRF24J40_TXSTAT_MAX_FRAME_RETRIES_SHIFT);
             /* transmision failed */
@@ -567,7 +567,7 @@ static void _isr(netdev_t *netdev)
     /* Receive interrupt occured */
     if (dev->pending & MRF24J40_TASK_RX_READY) {
         DEBUG("[mrf24j40] EVT - RX_END\n");
-        if ((dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
+        if ((dev->flags & MRF24J40_OPT_TELL_RX_END)) {
             netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         }
         dev->pending &= ~(MRF24J40_TASK_RX_READY);

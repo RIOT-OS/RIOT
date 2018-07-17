@@ -132,6 +132,7 @@ typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
     /*  device specific fields  */
     mrf24j40_params_t params;               /**< parameters for initialization */
+    uint16_t flags;                         /**< Internal device flags */
     uint8_t state;                          /**< current state of the radio */
     uint8_t idle_state;                     /**< state to return to after sending */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */

@@ -48,6 +48,7 @@ void mrf24j40_reset(mrf24j40_t *dev)
 
     netdev_ieee802154_reset(&dev->netdev);
 
+    dev->flags = 0;
     /* get an 8-byte unique ID to use as hardware address */
     luid_get(addr_long.uint8, IEEE802154_LONG_ADDRESS_LEN);
     addr_long.uint8[0] &= ~(0x01);
@@ -148,7 +149,7 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
     else {
         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNTRIG);
     }
-    if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START)) {
+    if (netdev->event_callback && (dev->flags & MRF24J40_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
 }
