@@ -9,7 +9,7 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := chronos msb-430 msb-430h nucleo-f031k6 nucleo-f042k6 \
                              nucleo-l031k6 nucleo-f030r8 nucleo-l053r8 stm32f0discovery \
-                             telosb z1
+                             telosb z1 nucleo-f303k8
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
