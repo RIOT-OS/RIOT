@@ -105,8 +105,10 @@ static char* _find_hoststart(const char *url)
 
 static char* _find_pathstart(const char *url)
 {
+    size_t remaining = SOCK_HOSTPORT_MAXLEN;
     char *urlpos = (char*)url;
-    while(*urlpos) {
+    while(*urlpos && remaining) {
+        remaining--;
         if (*urlpos == '/') {
             return urlpos;
         }
