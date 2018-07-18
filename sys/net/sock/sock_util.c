@@ -32,9 +32,6 @@
 #include "fmt.h"
 #endif
 
-#define SOCK_HOST_MAXLEN    (64U)   /**< maximum length of host part for
-                                         sock_udp_str2ep() */
-
 int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *port)
 {
     void *addr_ptr;
@@ -152,7 +149,7 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
     char *hoststart = (char*)str;
     char *hostend = hoststart;
 
-    char hostbuf[SOCK_HOST_MAXLEN];
+    char hostbuf[SOCK_HOSTPORT_MAXLEN];
 
     memset(ep_out, 0, sizeof(sock_udp_ep_t));
 
@@ -160,15 +157,15 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
         brackets_flag = 1;
         for (hostend = ++hoststart; *hostend && *hostend != ']';
                 hostend++);
-        if (! *hostend) {
+        if (! *hostend || ((size_t)(hostend - hoststart) >= sizeof(hostbuf))) {
             /* none found, bail out */
             return -EINVAL;
         }
     }
     else {
         brackets_flag = 0;
-        for (hostend = hoststart; *hostend && *hostend != ':';
-                hostend++);
+        for (hostend = hoststart; *hostend && (*hostend != ':') && \
+                ((size_t)(hostend - hoststart) < sizeof(hostbuf)); hostend++) {}
     }
 
     size_t hostlen = hostend - hoststart;
