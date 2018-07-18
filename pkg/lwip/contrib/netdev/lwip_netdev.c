@@ -60,9 +60,10 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 static void *_event_loop(void *arg);
 
+#ifdef MODULE_LWIP_SIXLOWPAN
 static void _configure_netdev_802154(netdev_t *dev)
 {
-    netopt_enable_t enable = NETOPT_ENABLE;
+    static const netopt_enable_t enable = NETOPT_ENABLE;
     if (IEEE802154_DEFAULT_ENABLE_ACK_REQ) {
         int res = dev->driver->set(dev, NETOPT_ACK_REQ, &enable, sizeof(enable));
         if (res < 0) {
@@ -82,6 +83,7 @@ static void _configure_netdev_802154(netdev_t *dev)
         }
     }
 }
+#endif /* MODULE_LWIP_SIXLOWPAN */
 
 static void _configure_netdev(netdev_t *dev)
 {
