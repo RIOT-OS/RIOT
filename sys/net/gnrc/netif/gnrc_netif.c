@@ -1281,9 +1281,10 @@ static void _init_from_device(gnrc_netif_t *netif)
     _update_l2addr_from_dev(netif);
 }
 
+#ifdef MODULE_NETDEV_IEEE802154
 static void _configure_netdev_802154(netdev_t *dev)
 {
-    netopt_enable_t enable = NETOPT_ENABLE;
+    static const netopt_enable_t enable = NETOPT_ENABLE;
     if (IEEE802154_DEFAULT_ENABLE_ACK_REQ) {
         int res = dev->driver->set(dev, NETOPT_ACK_REQ, &enable, sizeof(enable));
         if (res < 0) {
@@ -1303,6 +1304,7 @@ static void _configure_netdev_802154(netdev_t *dev)
         }
     }
 }
+#endif /* MODULE_NETDEV_IEEE802154 */
 
 static void _configure_netdev(netdev_t *dev)
 {
@@ -1324,9 +1326,11 @@ static void _configure_netdev(netdev_t *dev)
     assert(res == sizeof(dev_type));
 
     switch(dev_type) {
+#ifdef MODULE_NETDEV_IEEE802154
         case NETDEV_TYPE_IEEE802154:
             _configure_netdev_802154(dev);
             break;
+#endif /* MODULE_NETDEV_IEEE802154 */
     }
 }
 
