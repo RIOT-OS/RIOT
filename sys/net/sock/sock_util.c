@@ -171,11 +171,21 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
                 hostend++);
     }
 
+    size_t hostlen = hostend - hoststart;
     if (*(hostend + brackets_flag) == ':') {
-        ep_out->port = atoi(hostend + brackets_flag + 1);
+        char *portstart = hostend + brackets_flag + 1;
+        /* Checks here verify that the supplied port number is up to 5 (random)
+         * chars in size and result is smaller or equal to UINT16_MAX. */
+        if (strlen(portstart) > 5) {
+            return -EINVAL;
+        }
+        uint32_t port = atol(portstart);
+        if (port > UINT16_MAX) {
+            return -EINVAL;
+        }
+        ep_out->port = (uint16_t)port;
     }
 
-    size_t hostlen = hostend - hoststart;
     if (hostlen >= sizeof(hostbuf)) {
         return -EINVAL;
     }
