@@ -114,7 +114,7 @@ static char* _find_pathstart(const char *url)
         }
         urlpos++;
     }
-    return NULL;
+    return urlpos;
 }
 
 int sock_urlsplit(const char *url, char *hostport, char *urlpath)
@@ -125,9 +125,6 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
     }
 
     char *pathstart = _find_pathstart(hoststart);
-    if(!pathstart) {
-        return -EINVAL;
-    }
 
     memcpy(hostport, hoststart, pathstart - hoststart);
 
@@ -135,9 +132,7 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
     if (pathlen) {
         memcpy(urlpath, pathstart, pathlen);
     }
-    else {
-        *urlpath = '\0';
-    }
+    *(urlpath + pathlen) = '\0';
     return 0;
 }
 
