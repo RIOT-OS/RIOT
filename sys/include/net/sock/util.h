@@ -53,8 +53,9 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
  * "host.name:1234" and "/url/path".
  *
  * @note Caller has to make sure hostport and urlpath can hold the results!
- *       Make sure to provide space for SOCK_HOSTPORT_MAXLEN respectively
- *       SOCK_URLPATH_MAXLEN bytes.
+ *       Make sure to provide space for @ref SOCK_HOSTPORT_MAXLEN respectively
+ *       @ref SOCK_URLPATH_MAXLEN bytes.
+ *       Scheme part of the URL is limited to @ref SOCK_SCHEME_MAXLEN length.
  *
  * @param[in]   url         URL to split
  * @param[out]  hostport    where to write host:port
@@ -98,6 +99,9 @@ bool sock_udp_ep_equal(const sock_udp_ep_t *a, const sock_udp_ep_t *b);
  * @name helper definitions
  * @{
  */
+#define SOCK_SCHEME_MAXLEN      (16U)   /**< maximum length of the scheme part
+                                             for sock_urlsplit. Ensures a hard
+                                             limit on the string iterator */
 #define SOCK_HOSTPORT_MAXLEN    (64U)   /**< maximum length of host:port part for
                                              sock_urlsplit() */
 #define SOCK_URLPATH_MAXLEN     (64U)   /**< maximum length path for
