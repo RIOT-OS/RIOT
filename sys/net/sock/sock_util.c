@@ -69,7 +69,7 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
         char *tmp = addr_str + strlen(addr_str);
         *tmp++ = '%';
         tmp += fmt_u16_dec(tmp, endpoint->netif);
-        *tmp = '0';
+        *tmp = '\0';
 #else
         sprintf(addr_str + strlen(addr_str), "%%%4u", endpoint->netif);
 #endif
