@@ -26,6 +26,7 @@
 #define NET_SOCK_UTIL_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "net/sock/udp.h"
 
