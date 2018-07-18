@@ -133,6 +133,7 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
         return -EOVERFLOW;
     }
     memcpy(hostport, hoststart, hostlen);
+    *(hostport + hostlen) = '\0';
 
     size_t pathlen = strlen(pathstart);
     if (pathlen) {
