@@ -137,6 +137,9 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
 
     size_t pathlen = strlen(pathstart);
     if (pathlen) {
+        if (pathlen > SOCK_URLPATH_MAXLEN - 1) {
+            return -EOVERFLOW;
+        }
         memcpy(urlpath, pathstart, pathlen);
     }
     *(urlpath + pathlen) = '\0';
