@@ -40,6 +40,7 @@
 static gnrc_netif_t _netifs[GNRC_NETIF_NUMOF];
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
+static void _configure_netdev(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
@@ -325,6 +326,11 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                 case NETOPT_ADDR_LEN:
                 case NETOPT_SRC_LEN:
                     _update_l2addr_from_dev(netif);
+                    break;
+                case NETOPT_STATE:
+                    if (*((netopt_state_t *)opt->data) == NETOPT_STATE_RESET) {
+                        _configure_netdev(netif->dev);
+                    }
                     break;
                 default:
                     break;
