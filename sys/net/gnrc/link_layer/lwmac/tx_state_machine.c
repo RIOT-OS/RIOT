@@ -461,7 +461,8 @@ static bool _send_data(gnrc_netif_t *netif)
     /* Packet has been released by netdev, so drop pointer */
     netif->mac.tx.packet = NULL;
 
-    DEBUG("[LWMAC-tx]: spent %lu WR in TX\n", netif->mac.tx.wr_sent);
+    DEBUG("[LWMAC-tx]: spent %lu WR in TX\n",
+          (unsigned long)netif->mac.tx.wr_sent);
 
 #if (LWMAC_ENABLE_DUTYCYLE_RECORD == 1)
     netif->mac.prot.lwmac.pkt_start_sending_time_ticks =
