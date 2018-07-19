@@ -34,7 +34,6 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-
 #define SPI_CONF            SPI_MODE_0
 #define RMSR_DEFAULT_VALUE  (0x55)
 
@@ -285,14 +284,21 @@ static void isr(netdev_t *netdev)
     uint8_t ir;
     w5100_t *dev = (w5100_t *)netdev;
 
-    /* we only react on RX events, and if we see one, we read from the RX buffer
-     * until it is empty */
+    /* read interrupt register */
     spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
     ir = rreg(dev, S0_IR);
     spi_release(dev->p.spi);
+
+    /* we only react on RX events, and if we see one, we read from the RX buffer
+     * until it is empty */
     while (ir & IR_RECV) {
         DEBUG("[w5100] netdev RX complete\n");
         netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+
+        /* reread interrupt register */
+        spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
+        ir = rreg(dev, S0_IR);
+        spi_release(dev->p.spi);
     }
 }
 
