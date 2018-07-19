@@ -91,7 +91,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     mutex_init(&sock->mutex);
     mutex_lock(&sock->mutex);
     mbox_init(&sock->mbox, sock->mbox_queue, SOCK_MBOX_SIZE);
-    atomic_flag_clear(&sock->receivers);
+    atomic_init(&sock->receivers, 0);
     if ((res = _reg(&sock->sock, sock, _input_callback, local, remote)) < 0) {
         sock->sock.input_callback = NULL;
     }
