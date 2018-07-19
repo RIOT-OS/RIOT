@@ -22,3 +22,6 @@ $(TOOLCHAIN_FILE): git-download
 	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
 
 include $(RIOTBASE)/pkg/pkg.mk
+ifneq (,$(filter -Wformat-nonliteral -Wformat=2, $(CFLAGS)))
+  CFLAGS += -Wno-format-nonliteral
+endif
