@@ -1281,31 +1281,6 @@ static void _init_from_device(gnrc_netif_t *netif)
     _update_l2addr_from_dev(netif);
 }
 
-#ifdef MODULE_NETDEV_IEEE802154
-static void _configure_netdev_802154(netdev_t *dev)
-{
-    static const netopt_enable_t enable = NETOPT_ENABLE;
-    if (IEEE802154_DEFAULT_ENABLE_ACK_REQ) {
-        int res = dev->driver->set(dev, NETOPT_ACK_REQ, &enable, sizeof(enable));
-        if (res < 0) {
-            DEBUG("gnrc_netif: enable ACK requests failed: %d\n", res);
-        }
-    }
-    if (IEEE802154_DEFAULT_ENABLE_AUTOACK) {
-        int res = dev->driver->set(dev, NETOPT_AUTOACK, &enable, sizeof(enable));
-        if (res < 0) {
-            DEBUG("gnrc_netif: enable auto ACK failed: %d\n", res);
-        }
-    }
-    if (IEEE802154_DEFAULT_ENABLE_CSMA) {
-        int res = dev->driver->set(dev, NETOPT_CSMA, &enable, sizeof(enable));
-        if (res < 0) {
-            DEBUG("gnrc_netif: enable CSMA failed: %d\n", res);
-        }
-    }
-}
-#endif /* MODULE_NETDEV_IEEE802154 */
-
 static void _configure_netdev(netdev_t *dev)
 {
     /* Enable RX- and TX-complete interrupts */
@@ -1320,18 +1295,6 @@ static void _configure_netdev(netdev_t *dev)
         DEBUG("gnrc_netif: enable NETOPT_TX_END_IRQ failed: %d\n", res);
     }
 #endif
-
-    uint16_t dev_type;
-    res = dev->driver->get(dev, NETOPT_DEVICE_TYPE, &dev_type, sizeof(dev_type));
-    assert(res == sizeof(dev_type));
-
-    switch(dev_type) {
-#ifdef MODULE_NETDEV_IEEE802154
-        case NETDEV_TYPE_IEEE802154:
-            _configure_netdev_802154(dev);
-            break;
-#endif /* MODULE_NETDEV_IEEE802154 */
-    }
 }
 
 static void *_gnrc_netif_thread(void *args)

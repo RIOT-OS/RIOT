@@ -29,10 +29,12 @@
 #endif
 
 #ifdef MODULE_NETDEV_IEEE802154
+static void _init(gnrc_netif_t *netif);
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
 static const gnrc_netif_ops_t ieee802154_ops = {
+    .init = _init,
     .send = _send,
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,
@@ -72,6 +74,31 @@ static gnrc_pktsnip_t *_make_netif_hdr(uint8_t *mhr)
         hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
     }
     return snip;
+}
+
+static void _init(gnrc_netif_t *netif)
+{
+    /* Enable compile time default settings in the driver */
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+    netdev_t *dev = netif->dev;
+    if (IEEE802154_DEFAULT_ENABLE_ACK_REQ) {
+        int res = dev->driver->set(dev, NETOPT_ACK_REQ, &enable, sizeof(enable));
+        if (res < 0) {
+            DEBUG("gnrc_netif: enable ACK requests failed: %d\n", res);
+        }
+    }
+    if (IEEE802154_DEFAULT_ENABLE_AUTOACK) {
+        int res = dev->driver->set(dev, NETOPT_AUTOACK, &enable, sizeof(enable));
+        if (res < 0) {
+            DEBUG("gnrc_netif: enable auto ACK failed: %d\n", res);
+        }
+    }
+    if (IEEE802154_DEFAULT_ENABLE_CSMA) {
+        int res = dev->driver->set(dev, NETOPT_CSMA, &enable, sizeof(enable));
+        if (res < 0) {
+            DEBUG("gnrc_netif: enable CSMA failed: %d\n", res);
+        }
+    }
 }
 
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
