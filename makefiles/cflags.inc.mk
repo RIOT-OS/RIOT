@@ -28,7 +28,7 @@ endif
 # Template for testing a compiler flag and adding it to CFLAGS (errors usually
 # happens when using older toolchains which do not support the given flags)
 define cflags_test_and_add
-  ifeq ($(shell $(CC) $(1) -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+  ifeq ($(shell $(CC) -Werror $(1) -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
     CFLAGS += $(1)
   endif
 endef
