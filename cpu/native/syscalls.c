@@ -265,6 +265,9 @@ int puts(const char *s)
     return r;
 }
 
+/* Solve 'format string is not a string literal' as it is validly used in this
+ * function */
+__attribute__((__format__ (__printf__, 1, 0)))
 char *make_message(const char *format, va_list argp)
 {
     int size = 100;
