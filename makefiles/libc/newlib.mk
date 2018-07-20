@@ -102,7 +102,7 @@ ifeq (1,$(USE_NEWLIB_NANO))
   # the regular system include dirs.
   INCLUDES := $(addprefix -isystem ,$(NEWLIB_NANO_INCLUDE_DIR)) $(INCLUDES)
 
-  ifneq (,$(filter 1, $(ASSERT_NEWLIB_NANO_HEADER) $(RIOT_CI_BUILD)))
+  ifneq (,$(filter 1, $(ASSERT_NEWLIB_NANO_HEADER)))
     # Add a check to assert newlib-nano is used
     INCLUDES += -include '$(RIOTMAKE)/libc/assert_newlib_nano_included.h'
   endif
