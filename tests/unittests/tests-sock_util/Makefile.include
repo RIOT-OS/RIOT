@@ -1,0 +1,6 @@
+USEMODULE += sock_util
+USEMODULE += gnrc_sock
+USEMODULE += gnrc_ipv6
+USEMODULE += ipv4_addr
+USEMODULE += ipv6_addr
+USEMODULE += posix
