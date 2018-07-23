@@ -451,11 +451,11 @@ ifneq (, $(filter clean, $(MAKECMDGOALS)))
     all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(BUILDDEPS): clean
 endif
 
-.PHONY: pkg-prepare $(USEPKG:%=$(BINDIR)/%.a)
+.PHONY: pkg-prepare
 pkg-prepare:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i prepare ; done
 
-$(USEPKG:%=$(BINDIR)/%.a): $(BUILDDEPS)
+$(USEPKG:%=$(BINDIR)/%.a): $(BUILDDEPS) FORCE
 	@mkdir -p $(BINDIR)
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst $(BINDIR)/%.a,%,$@)
 
