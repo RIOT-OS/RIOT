@@ -27,6 +27,22 @@ error() {
     exit 1
 }
 
+# if MURDOCK_HOOK is set, this function will execute it and pass on all it's
+# parameters. should the hook script exit with negative exit code, hook() makes
+# this script exit with error, too.
+# hook() will be called from different locations of this script.
+# currently, the only caller is "run_test", which calls "hook run_test_pre".
+# More hooks will be added as needed.
+hook() {
+    if [ -n "${MURDOCK_HOOK}" ]; then
+        echo "- executing hook $1"
+        "${MURDOCK_HOOK}" "$@" || {
+            error "$0: hook \"${MURDOCK_HOOK} $@\" failed!"
+        }
+        echo "- hook $1 finished"
+    fi
+}
+
 # true if word "$1" is in list of words "$2", false otherwise
 # uses grep -w, thus only alphanum and "_" count as word bounderies
 # (word "def" matches "abc-def")
@@ -175,6 +191,7 @@ run_test() {
     local board=$2
     print_worker
     echo "-- executing tests for $appdir on $board:"
+    hook run_test_pre
     BOARD=$board make -C$appdir flash-only test
 }
 
