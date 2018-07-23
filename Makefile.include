@@ -323,7 +323,7 @@ include $(RIOTBASE)/drivers/Makefile.include
 $(RIOTPKG)/%/Makefile.include::
 	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
 
-.PHONY: $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
+$(USEPKG:%=$(RIOTPKG)/%/Makefile.include): FORCE
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
 # Deduplicate includes without sorting them
