@@ -349,9 +349,20 @@ include $(RIOTMAKE)/modules.inc.mk
 .PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile binfile hexfile
 .PHONY: ..in-docker-container
-# Target can depend on FORCE to always rebuild but still let make use file
-# modification timestamp (contrary to .PHONY).
-# Use it for goals that may keep outputs unchanged when executed.
+
+# Targets that depend on FORCE will always be rebuilt. Contrary to a .PHONY
+# target, they are considered real files and the modification timestamp is taken
+# into account.
+#
+# FORCE is useful for goals that may keep outputs unchanged (for example, if it
+# depends on environment or configuration variables). If the goal were .PHONY, it
+# would trigger a rebuild of all its dependents regardless of file modification.
+#
+# As general rule, use .PHONY only for non-file targets.
+#
+# For more information, see:
+# https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
+# https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
 .PHONY: FORCE
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
