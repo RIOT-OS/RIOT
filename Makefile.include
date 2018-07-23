@@ -642,10 +642,9 @@ endif
 include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 
 # Build a header file with all common macro definitions and undefinitions
-# make it phony to force re-run of the script every time even if the file exists
+# make it depend on FORCE to re-run of the script every time even if the file exists
 # The script will only touch the file if anything has changed since last time.
-.PHONY: $(RIOTBUILD_CONFIG_HEADER_C)
-$(RIOTBUILD_CONFIG_HEADER_C):
+$(RIOTBUILD_CONFIG_HEADER_C): FORCE
 	@mkdir -p '$(dir $@)'
 	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' '$@' $(CFLAGS_WITH_MACROS)
 
