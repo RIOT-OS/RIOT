@@ -64,7 +64,7 @@ static int _init(int argc, char** argv)
         puts("\t\t1: right aligned\n");
         puts("\t\t2: center aligned\n");
         puts("\tfrequency: desired frequency in Hz\n");
-        printf("\tresolution: number between 2 and %" PRIu16 "\n", UINT16_MAX);
+        puts("\tresolution: number between 2 and 65535");
         return 1;
     }
 
