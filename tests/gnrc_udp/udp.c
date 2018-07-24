@@ -170,6 +170,7 @@ static void start_server(char *port_str)
         return;
     }
     if (server_pid <= KERNEL_PID_UNDEF) {
+        /* start server */
         server_pid = thread_create(server_stack, sizeof(server_stack), SERVER_PRIO,
                                    THREAD_CREATE_STACKTEST, _eventloop, NULL, "UDP server");
         if (server_pid <= KERNEL_PID_UNDEF) {
@@ -177,7 +178,7 @@ static void start_server(char *port_str)
             return;
         }
     }
-    /* start server (which means registering pktdump for the chosen port) */
+    /* register server to receive messages from given port */
     gnrc_netreg_entry_init_pid(&server, port, server_pid);
     gnrc_netreg_register(GNRC_NETTYPE_UDP, &server);
     printf("Success: started UDP server on port %" PRIu16 "\n", port);
