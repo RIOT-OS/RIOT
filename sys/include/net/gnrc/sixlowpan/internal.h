@@ -54,9 +54,6 @@ void gnrc_sixlowpan_dispatch_send(gnrc_pktsnip_t *pkt, void *context,
  *
  * @param[in] pkt                   The packet to fit. Must not be NULL.
  * @param[in] orig_datagram_size    The original (uncompressed) datagram size.
- *                                  Must be greater or equal to the length of
- *                                  @p pkt as of `pkt->next` (i.e. without
- *                                  the @ref gnrc_netif_hdr_t).
  * @param[in] netif                 The interface to fit @p pkt over. Must not
  *                                  be NULL.
  * @param[in] page                  Current 6Lo dispatch parsing page
