@@ -58,8 +58,6 @@ static msg_t _gc_timer_msg = { .type = GNRC_SIXLOWPAN_MSG_FRAG_GC_RBUF };
 static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end);
 /* gets a free entry from interval buffer */
 static rbuf_int_t *_rbuf_int_get_free(void);
-/* remove entry from reassembly buffer */
-static void _rbuf_rem(rbuf_t *entry);
 /* update interval buffer of entry */
 static bool _rbuf_update_ints(rbuf_t *entry, uint16_t offset, size_t frag_size);
 /* gets an entry identified by its tupel */
@@ -108,7 +106,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
             if (iphc_len == 0) {
                 DEBUG("6lo rfrag: could not decode IPHC dispatch\n");
                 gnrc_pktbuf_release(entry->super.pkt);
-                _rbuf_rem(entry);
+                rbuf_rm(entry);
                 return;
             }
             data += iphc_len;       /* take remaining data as data */
@@ -128,7 +126,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
     if ((offset + frag_size) > entry->super.pkt->size) {
         DEBUG("6lo rfrag: fragment too big for resulting datagram, discarding datagram\n");
         gnrc_pktbuf_release(entry->super.pkt);
-        _rbuf_rem(entry);
+        rbuf_rm(entry);
         return;
     }
 
@@ -139,7 +137,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         if (_rbuf_int_overlap_partially(ptr, offset, offset + frag_size - 1)) {
             DEBUG("6lo rfrag: overlapping intervals, discarding datagram\n");
             gnrc_pktbuf_release(entry->super.pkt);
-            _rbuf_rem(entry);
+            rbuf_rm(entry);
 
             /* "A fresh reassembly may be commenced with the most recently
              * received link fragment"
@@ -159,32 +157,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                frag_size - data_offset);
     }
 
-    if (entry->super.current_size == entry->super.pkt->size) {
-        gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(entry->super.src,
-                                                     entry->super.src_len,
-                                                     entry->super.dst,
-                                                     entry->super.dst_len);
-
-        if (netif == NULL) {
-            DEBUG("6lo rbuf: error allocating netif header\n");
-            gnrc_pktbuf_release(entry->super.pkt);
-            _rbuf_rem(entry);
-            return;
-        }
-
-        /* copy the transmit information of the latest fragment into the newly
-         * created header to have some link_layer information. The link_layer
-         * info of the previous fragments is discarded.
-         */
-        gnrc_netif_hdr_t *new_netif_hdr = netif->data;
-        new_netif_hdr->if_pid = netif_hdr->if_pid;
-        new_netif_hdr->flags = netif_hdr->flags;
-        new_netif_hdr->lqi = netif_hdr->lqi;
-        new_netif_hdr->rssi = netif_hdr->rssi;
-        LL_APPEND(entry->super.pkt, netif);
-        gnrc_sixlowpan_dispatch_recv(entry->super.pkt, NULL, 0);
-        _rbuf_rem(entry);
-    }
+    gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(&entry->super, netif_hdr);
 }
 
 static inline bool _rbuf_int_overlap_partially(rbuf_int_t *i, uint16_t start, uint16_t end)
@@ -205,7 +178,7 @@ static rbuf_int_t *_rbuf_int_get_free(void)
     return NULL;
 }
 
-static void _rbuf_rem(rbuf_t *entry)
+void rbuf_rm(rbuf_t *entry)
 {
     while (entry->ints != NULL) {
         rbuf_int_t *next = entry->ints->next;
@@ -268,7 +241,7 @@ void rbuf_gc(void)
                   (unsigned)rbuf[i].super.pkt->size, rbuf[i].super.tag);
 
             gnrc_pktbuf_release(rbuf[i].super.pkt);
-            _rbuf_rem(&(rbuf[i]));
+            rbuf_rm(&(rbuf[i]));
         }
     }
 }
@@ -325,7 +298,7 @@ static rbuf_t *_rbuf_get(const void *src, size_t src_len,
         assert(oldest->super.pkt != NULL);
         DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
         gnrc_pktbuf_release(oldest->super.pkt);
-        _rbuf_rem(oldest);
+        rbuf_rm(oldest);
         res = oldest;
     }
 
