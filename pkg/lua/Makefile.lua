@@ -10,3 +10,6 @@ CFLAGS += -DLUA_MAXCAPTURES=16 -DL_MAXLENNUM=50
 #          -Wstack-usage=128 -Wno-error=stack-usage=128
 
 include $(RIOTBASE)/Makefile.base
+ifneq (,$(filter -Wformat-nonliteral -Wformat=2, $(CFLAGS)))
+  CFLAGS += -Wno-format-nonliteral
+endif

@@ -87,6 +87,7 @@
 
 /* Array size */
 #define MAX_TIMESTRING_LENGTH   (21)
+#define TIMESTRING_FORMAT "%Y-%m-%dT%H:%M:%SZ"
 
 #ifndef INFINITY
 #define INFINITY (1.0/0.0)
@@ -767,9 +768,8 @@ size_t cbor_deserialize_date_time(const cbor_stream_t *stream, size_t offset, st
     char buffer[21];
     offset++;  /* skip tag byte to decode date_time */
     size_t read_bytes = cbor_deserialize_unicode_string(stream, offset, buffer, sizeof(buffer));
-    const char *format = "%Y-%m-%dT%H:%M:%SZ";
 
-    if (strptime(buffer, format, val) == 0) {
+    if (strptime(buffer, TIMESTRING_FORMAT, val) == 0) {
         return 0;
     }
 
@@ -787,9 +787,8 @@ size_t cbor_serialize_date_time(cbor_stream_t *stream, struct tm *val)
     CBOR_ENSURE_SIZE(stream, MAX_TIMESTRING_LENGTH + 1); /* + 1 tag byte */
 
     char time_str[MAX_TIMESTRING_LENGTH];
-    const char *format = "%Y-%m-%dT%H:%M:%SZ";
 
-    if (strftime(time_str, sizeof(time_str), format, val) == 0) { /* struct tm to string */
+    if (strftime(time_str, sizeof(time_str), TIMESTRING_FORMAT, val) == 0) { /* struct tm to string */
         return 0;
     }
 
@@ -1017,7 +1016,7 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
                     char buf[64];
                     struct tm timeinfo;
                     size_t read_bytes = cbor_deserialize_date_time(stream, offset, &timeinfo);
-                    strftime(buf, sizeof(buf), "%c", &timeinfo);
+                    strftime(buf, sizeof(buf), TIMESTRING_FORMAT, &timeinfo);
                     printf("(tag: %u, date/time string: \"%s\")\n", tag, buf);
                     return read_bytes;
                 }
