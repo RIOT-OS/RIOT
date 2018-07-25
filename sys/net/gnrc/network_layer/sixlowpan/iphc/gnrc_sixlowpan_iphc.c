@@ -23,6 +23,7 @@
 #include "net/ipv6/hdr.h"
 #include "net/gnrc.h"
 #include "net/gnrc/sixlowpan/ctx.h"
+#include "net/gnrc/sixlowpan/internal.h"
 #include "net/sixlowpan.h"
 #include "utlist.h"
 #include "net/gnrc/nettype.h"
@@ -581,20 +582,25 @@ static inline size_t iphc_nhc_udp_encode(gnrc_pktsnip_t *udp, ipv6_hdr_t *ipv6_h
 }
 #endif
 
-bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
+void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
 {
+    assert(pkt != NULL);
     gnrc_netif_hdr_t *netif_hdr = pkt->data;
     ipv6_hdr_t *ipv6_hdr = pkt->next->data;
     uint8_t *iphc_hdr;
-    uint16_t inline_pos = SIXLOWPAN_IPHC_HDR_LEN;
-    bool addr_comp = false, nhc_comp = false;
     gnrc_sixlowpan_ctx_t *src_ctx = NULL, *dst_ctx = NULL;
     gnrc_pktsnip_t *dispatch = gnrc_pktbuf_add(NULL, NULL, pkt->next->size,
                                                GNRC_NETTYPE_SIXLOWPAN);
+    bool addr_comp = false, nhc_comp = false;
+    /* datagram size before compression */
+    size_t orig_datagram_size = gnrc_pkt_len(pkt->next);
+    uint16_t inline_pos = SIXLOWPAN_IPHC_HDR_LEN;
 
+    (void)ctx;
     if (dispatch == NULL) {
         DEBUG("6lo iphc: error allocating dispatch space\n");
-        return false;
+        gnrc_pktbuf_release(pkt);
+        return;
     }
 
     iphc_hdr = dispatch->data;
@@ -892,7 +898,9 @@ bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt)
     dispatch->next = pkt->next;
     pkt->next = dispatch;
 
-    return true;
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(netif_hdr->if_pid);
+    assert(netif != NULL);
+    gnrc_sixlowpan_multiplex_by_size(pkt, orig_datagram_size, netif, page);
 }
 
 /** @} */

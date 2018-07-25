@@ -53,13 +53,15 @@ size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
 /**
  * @brief   Compresses a 6LoWPAN for IPHC.
  *
- * @param[in,out] pkt   A 6LoWPAN frame with an uncompressed IPv6 header to
- *                      send. Will be translated to an 6LoWPAN IPHC frame.
+ * @pre (pkt != NULL)
  *
- * @return  true, on success
- * @return  false, on error.
+ * @param[in] pkt   A 6LoWPAN frame with an uncompressed IPv6 header to send.
+ *                  Will be translated to an 6LoWPAN IPHC frame.
+ * @param[in] ctx   Context for the packet. May be NULL.
+ * @param[in] page  Current 6Lo dispatch parsing page.
+ *
  */
-bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt);
+void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 
 #ifdef __cplusplus
 }
