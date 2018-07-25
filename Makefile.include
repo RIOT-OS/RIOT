@@ -323,7 +323,7 @@ include $(RIOTBASE)/drivers/Makefile.include
 $(RIOTPKG)/%/Makefile.include::
 	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
 
-.PHONY: $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
+$(USEPKG:%=$(RIOTPKG)/%/Makefile.include): FORCE
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
 # Deduplicate includes without sorting them
@@ -349,9 +349,20 @@ include $(RIOTMAKE)/modules.inc.mk
 .PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile binfile hexfile
 .PHONY: ..in-docker-container
-# Target can depend on FORCE to always rebuild but still let make use file
-# modification timestamp (contrary to .PHONY).
-# Use it for goals that may keep outputs unchanged when executed.
+
+# Targets that depend on FORCE will always be rebuilt. Contrary to a .PHONY
+# target, they are considered real files and the modification timestamp is taken
+# into account.
+#
+# FORCE is useful for goals that may keep outputs unchanged (for example, if it
+# depends on environment or configuration variables). If the goal were .PHONY, it
+# would trigger a rebuild of all its dependents regardless of file modification.
+#
+# As general rule, use .PHONY only for non-file targets.
+#
+# For more information, see:
+# https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
+# https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
 .PHONY: FORCE
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
@@ -440,11 +451,11 @@ ifneq (, $(filter clean, $(MAKECMDGOALS)))
     all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(BUILDDEPS): clean
 endif
 
-.PHONY: pkg-prepare $(USEPKG:%=$(BINDIR)/%.a)
+.PHONY: pkg-prepare
 pkg-prepare:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i prepare ; done
 
-$(USEPKG:%=$(BINDIR)/%.a): $(BUILDDEPS)
+$(USEPKG:%=$(BINDIR)/%.a): $(BUILDDEPS) FORCE
 	@mkdir -p $(BINDIR)
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst $(BINDIR)/%.a,%,$@)
 
@@ -514,11 +525,11 @@ objdump:
 
 # Generate an XML file containing all macro definitions and include paths for
 # use in Eclipse CDT
-.PHONY: eclipsesym eclipsesym.xml $(CURDIR)/eclipsesym.xml
+.PHONY: eclipsesym eclipsesym.xml
 eclipsesym: $(CURDIR)/eclipsesym.xml
 eclipsesym.xml: $(CURDIR)/eclipsesym.xml
 
-$(CURDIR)/eclipsesym.xml:
+$(CURDIR)/eclipsesym.xml: FORCE
 	$(Q)printf "%s\n" $(CC) $(CFLAGS_WITH_MACROS) $(INCLUDES) | \
 		$(RIOTTOOLS)/eclipsesym/cmdline2xml.sh > $@
 
@@ -631,10 +642,9 @@ endif
 include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 
 # Build a header file with all common macro definitions and undefinitions
-# make it phony to force re-run of the script every time even if the file exists
+# make it depend on FORCE to re-run of the script every time even if the file exists
 # The script will only touch the file if anything has changed since last time.
-.PHONY: $(RIOTBUILD_CONFIG_HEADER_C)
-$(RIOTBUILD_CONFIG_HEADER_C):
+$(RIOTBUILD_CONFIG_HEADER_C): FORCE
 	@mkdir -p '$(dir $@)'
 	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' '$@' $(CFLAGS_WITH_MACROS)
 
