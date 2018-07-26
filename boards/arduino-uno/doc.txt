@@ -1,0 +1,42 @@
+/**
+@defgroup    boards_arduino-uno Arduino Uno
+@ingroup     boards
+@brief       Support for the Arduino Uno board
+
+## Overview
+
+The Arduino Uno is one of the cheapest board to start and discover with
+electronics and embedded coding. It is based on Atmel's AVR architecture and
+sports an ATmega328p MCU. It is like many Arduinos extensible by using shields.
+
+### MCU
+| MCU        | ATmega328p        |
+|:------------- |:--------------------- |
+| Family | AVR/ATmega    |
+| Vendor | Atmel |
+| RAM        | 2Kb   |
+| Flash      | 32Kb          |
+| Frequency  | 16MHz |
+| Timers | 3 (2x 8bit, 1x 16bit) |
+| ADCs       | 6 analog input pins |
+| UARTs      | 1                 |
+| SPIs       | 1 |
+| I2Cs       | 1 (called TWI)    |
+| Vcc        | 5.0V          |
+| Datasheet / Reference Manual   | [Datasheet and Reference Manual](http://www.atmel.com/images/atmel-8271-8-bit-avr-microcontroller-atmega48a-48pa-88a-88pa-168a-168pa-328-328p_datasheet_complete.pdf) |
+| Board Manual   | [Board Manual](https://www.arduino.cc/en/Main/ArduinoBoardUno)|
+
+## Flashing the device
+Flashing RIOT on the Arduino Uno is quite straight forward, just connect your
+Arduino Uno using the programming port to your host computer and type:
+
+`make BOARD=arduino-uno flash`
+
+This should take care of everything!
+
+We use the open `avrdude` tool to write the new code into the ATmega328p's
+flash
+
+##Caution
+Don't expect having a working network stack due to very limited resources.
+ */
