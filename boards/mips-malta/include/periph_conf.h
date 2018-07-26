@@ -9,9 +9,7 @@
  */
 
 /**
- * @defgroup    boards_mips-malta MIPS MALTA
- * @ingroup     boards
- * @brief       peripheral configuration for the MIPS Malta FPGA system
+ * @ingroup     boards_mips-malta
  * @{
  *
  * @file
