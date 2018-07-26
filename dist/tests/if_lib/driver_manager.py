@@ -7,8 +7,8 @@
 This module assigns the drivers to the devices.
 """
 import logging
-from serial_driver import SerialDriver
-from riot_driver import RiotDriver
+from .serial_driver import SerialDriver
+from .riot_driver import RiotDriver
 
 
 def driver_from_config(dev_type='serial', *args, **kwargs):

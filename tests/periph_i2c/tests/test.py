@@ -10,12 +10,12 @@
 A test that can be used for now but should be adapted to a framework.
 TODO: REMOVE and adapt to a proper testing platform
 """
-import sys
-import os
 import argparse
 import time
 import logging
 
+import periph_i2c_if
+from if_lib import bpt_if
 
 BPT_ADDR = 85
 BPT_USER_REG = 152
@@ -319,10 +319,6 @@ def print_results(test_list):
 
 
 def main():
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'tools'))
-    print(sys.path)
-    import periph_i2c_if
-    import bpt_if
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--log", help='Set the log level (DEBUG, INFO, WARN)')

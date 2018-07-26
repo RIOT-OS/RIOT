@@ -10,7 +10,7 @@ This module handles functions for a low level shell interface.
 import logging
 import errno
 import os
-from base_device import BaseDevice
+from .base_device import BaseDevice
 
 
 class LLShell(BaseDevice):

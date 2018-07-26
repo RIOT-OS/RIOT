@@ -8,7 +8,7 @@ This module provice the base interface for a device to a driver.
 
 """
 import logging
-import driver_manager
+from . import driver_manager
 
 
 class BaseDevice:

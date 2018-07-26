@@ -7,7 +7,8 @@
 This module handles parsing of information from RIOT periph_i2c test.
 """
 import logging
-from dut_shell import DutShell
+
+from if_lib.dut_shell import DutShell
 
 
 class PeriphI2CIf(DutShell):
