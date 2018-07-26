@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_msba2 MSB-A2
- * @ingroup     boards
- * @brief       Support for the ScatterWeb MSB-A2 board
+ * @ingroup     boards_msba2
  * @{
  *
  * @file

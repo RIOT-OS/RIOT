@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_native Native Board
- * @ingroup     boards
- * @brief       Board emulation for the native port
+ * @ingroup     boards_native
  *
  * The native board uses call level hardware simulation
  *

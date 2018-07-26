@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_sodaq-autonomo SODAQ Autonomo
- * @ingroup     boards
- * @brief       Support for the SODAQ Autonomo board.
+ * @ingroup     boards_sodaq-autonomo
  * @{
  *
  * @file

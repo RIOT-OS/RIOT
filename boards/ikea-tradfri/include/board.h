@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_ikea-tradfri IKEA TRÅDFRI modules
- * @ingroup     boards
- * @brief       Support for the IKEA TRÅDFRI modules
+ * @ingroup     boards_ikea-tradfri
  * @{
  *
  * @file

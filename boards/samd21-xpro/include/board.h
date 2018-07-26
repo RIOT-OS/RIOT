@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_samd21-xpro Atmel SAM D21 Xplained Pro
- * @ingroup     boards
- * @brief       Support for the Atmel SAM D21 Xplained Pro board.
+ * @ingroup     boards_samd21-xpro
  * @{
  *
  * @file

@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_chronos Chronos
- * @ingroup     boards
- * @brief       Support for the chronos board
+ * @ingroup     boards_chronos
  * @{
  *
  * @file

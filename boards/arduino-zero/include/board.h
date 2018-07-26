@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_arduino-zero Arduino Zero
- * @ingroup     boards
- * @brief       Support for the Arduino Zero board.
+ * @ingroup     boards_arduino-zero
  * @{
  *
  * @file

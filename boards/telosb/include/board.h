@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_telosb TelosB
- * @ingroup     boards
- * @brief       Support for the TelosB board
+ * @ingroup     boards_telosb
  *
  * <h2>Compontents</h2>
  * \li MSP430

@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_waspmote-pro Waspmote PRO v1.2
- * @ingroup     boards
- * @brief       Support for the Waspmote PRO v1.2 board.
+ * @ingroup     boards_waspmote-pro
  * @{
  *
  * @file
