@@ -36,13 +36,13 @@ static const coap_resource_t resources_second[] = {
 };
 
 static gcoap_listener_t listener = {
-    .resources     = (coap_resource_t *)&resources[0],
+    .resources     = &resources[0],
     .resources_len = (sizeof(resources) / sizeof(resources[0])),
     .next          = NULL
 };
 
 static gcoap_listener_t listener_second = {
-    .resources     = (coap_resource_t *)&resources_second[0],
+    .resources     = &resources_second[0],
     .resources_len = (sizeof(resources_second) / sizeof(resources_second[0])),
     .next          = NULL
 };

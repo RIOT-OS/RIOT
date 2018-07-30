@@ -57,7 +57,7 @@ static const coap_resource_t resources[] = {
 };
 
 static gcoap_listener_t listener = {
-    .resources     = (coap_resource_t *)&resources[0],
+    .resources     = &resources[0],
     .resources_len = sizeof(resources) / sizeof(resources[0]),
     .next          = NULL
 };
