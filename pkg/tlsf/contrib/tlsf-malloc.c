@@ -31,7 +31,9 @@
 static tlsf_t gheap = NULL;
 
 /* TODO: Add defines for other compilers */
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)    /* Clang supports __GNUC__ but
+                                                 * not the alloc_size()
+                                                 * attribute */
 
 #define ATTR_MALLOC  __attribute__((malloc, alloc_size(1)))
 #define ATTR_CALLOC  __attribute__((malloc, alloc_size(1,2)))
