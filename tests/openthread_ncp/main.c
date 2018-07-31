@@ -19,12 +19,6 @@
 
 int main(void)
 {
-    puts("This a test for OpenThread");
-    /* Example of how to call OpenThread stack functions */
-    puts("Get PANID ");
-    uint16_t panid = 0;
-    uint8_t res = ot_call_command("panid", NULL, (void*)&panid);
-    printf("Current panid: 0x%x (res:%x)\n", panid, res);
-
+    /* Run wpantund to interact with NCP */
     return 0;
 }
