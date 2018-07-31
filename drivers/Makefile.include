@@ -249,3 +249,6 @@ endif
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/xbee/include
 endif
+ifneq (,$(filter sht2x,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sht2x/include
+endif
