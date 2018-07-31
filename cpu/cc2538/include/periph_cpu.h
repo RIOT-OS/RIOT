@@ -61,6 +61,10 @@ typedef uint32_t gpio_t;
 #define GPIO_UNDEF          (0xffffffff)
 
 /**
+ * @brief Do not set or change GPIO select when using gpio_init_af
+ */
+#define GPIO_SEL_NONE       (-1)
+/**
  * @brief   Define a custom GPIO_PIN macro
  *
  * For the CC2538, we use OR the gpio ports base register address with the
@@ -166,7 +170,7 @@ typedef struct {
  * @{
  */
 typedef struct {
-    cc2538_ssi_t *dev;      /**< SSI device */
+    uint8_t num;            /**< SSI device number [0,1] */
     gpio_t mosi_pin;        /**< pin used for MOSI */
     gpio_t miso_pin;        /**< pin used for MISO */
     gpio_t sck_pin;         /**< pin used for SCK */
