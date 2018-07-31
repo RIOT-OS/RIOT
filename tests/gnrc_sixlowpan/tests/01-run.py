@@ -17,7 +17,7 @@ def testfunc(child):
     child.expect_exact("~~ SNIP  0 - size:  74 byte, type: NETTYPE_SIXLOWPAN (1)")
     child.expect_exact("Fragmentation Header (first)")
     child.expect_exact("datagram size: 148")
-    child.expect_exact("tag: 0x1")
+    child.expect_exact("tag: 0x0001")
     child.expect_exact("IPHC dispatch")
     child.expect_exact("TF: traffic class and flow label elided")
     child.expect_exact("NH: LOWPAN_NHC")
@@ -30,8 +30,8 @@ def testfunc(child):
     child.expect_exact("~~ SNIP  0 - size:  57 byte, type: NETTYPE_SIXLOWPAN (1)")
     child.expect_exact("Fragmentation Header (subsequent)")
     child.expect_exact("datagram size: 148")
-    child.expect_exact("tag: 0x1")
-    child.expect_exact("offset: 0x12")
+    child.expect_exact("tag: 0x0001")
+    child.expect_exact("offset: 12")
 
     # IPv6
     child.expect_exact("PKTDUMP: data received:")
