@@ -29,12 +29,59 @@
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
+#include "net/gnrc/netif/conf.h"
+#include "net/gnrc/netif/ieee802154.h"
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pktdump.h"
+#include "net/netdev_test.h"
+#include "xtimer.h"
+
+#define IEEE802154_MAX_FRAG_SIZE    (102)
+
+static char _netif_stack[THREAD_STACKSIZE_SMALL];
+static netdev_test_t _ieee802154_dev;
+
+static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len)
+{
+    assert(max_len == sizeof(uint16_t));
+    (void)netdev;
+
+    *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
+    return sizeof(uint16_t);
+}
+
+static int _get_netdev_max_packet_size(netdev_t *netdev, void *value,
+                                       size_t max_len)
+{
+    assert(max_len == sizeof(uint16_t));
+    (void)netdev;
+
+    *((uint16_t *)value) = IEEE802154_MAX_FRAG_SIZE;
+    return sizeof(uint16_t);
+}
+
+static int _get_netdev_src_len(netdev_t *netdev, void *value, size_t max_len)
+{
+    (void)netdev;
+    assert(max_len == sizeof(uint16_t));
+    *((uint16_t *)value) = sizeof(eui64_t);
+    return sizeof(uint16_t);
+}
 
 static void _init_interface(void)
 {
-    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
+    gnrc_netif_t *netif;
+
+    netdev_test_setup(&_ieee802154_dev, NULL);
+    netdev_test_set_get_cb(&_ieee802154_dev, NETOPT_DEVICE_TYPE,
+                           _get_netdev_device_type);
+    netdev_test_set_get_cb(&_ieee802154_dev, NETOPT_MAX_PACKET_SIZE,
+                           _get_netdev_max_packet_size);
+    netdev_test_set_get_cb(&_ieee802154_dev, NETOPT_SRC_LEN,
+                           _get_netdev_src_len);
+    netif = gnrc_netif_ieee802154_create(
+            _netif_stack, THREAD_STACKSIZE_SMALL, GNRC_NETIF_PRIO,
+            "dummy_netif", (netdev_t *)&_ieee802154_dev);
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
 
     /* fd01::01 */
@@ -42,6 +89,7 @@ static void _init_interface(void)
     addr.u8[1] = 0x01;
     addr.u8[15] = 0x01;
 
+    xtimer_usleep(500); /* wait for thread to start */
     if (gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR, 64U << 8U, &addr,
                         sizeof(addr)) < 0) {
         printf("error: unable to add IPv6 address fd01::1/64 to interface %u\n",
