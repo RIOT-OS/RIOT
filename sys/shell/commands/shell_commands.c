@@ -44,11 +44,6 @@ extern int _get_weather_handler(int argc, char **argv);
 extern int _sht_config_handler(int argc, char **argv);
 #endif
 
-#ifdef MODULE_LTC4150
-extern int _get_current_handler(int argc, char **argv);
-extern int _reset_current_handler(int argc, char **argv);
-#endif
-
 #ifdef MODULE_AT30TSE75X
 extern int _at30tse75x_handler(int argc, char **argv);
 #endif
@@ -162,10 +157,6 @@ const shell_command_t _shell_command_list[] = {
     {"hum", "Prints measured humidity.", _get_humidity_handler},
     {"weather", "Prints measured humidity and temperature.", _get_weather_handler},
     {"sht-config", "Get/set SHT10/11/15 sensor configuration.", _sht_config_handler},
-#endif
-#ifdef MODULE_LTC4150
-    {"cur", "Prints current and average power consumption.", _get_current_handler},
-    {"rstcur", "Resets coulomb counter.", _reset_current_handler},
 #endif
 #ifdef MODULE_AT30TSE75X
     {"at30tse75x", "Test AT30TSE75X temperature sensor", _at30tse75x_handler},
