@@ -14,6 +14,7 @@ RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTTOOLS)/git/git-cache
+GIT_CACHE_DIR  ?= $(HOME)/.gitcache
 APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
