@@ -99,6 +99,8 @@ enum {
     SAUL_SENSE_OCCUP    = 0x91,     /**< sensor: occupancy */
     SAUL_SENSE_PROXIMITY= 0x92,     /**< sensor: proximity */
     SAUL_SENSE_RSSI     = 0x93,     /**< sensor: RSSI */
+    SAUL_SENSE_CHARGE   = 0x94,     /**< sensor: coulomb counter */
+    SAUL_SENSE_CURRENT  = 0x95,     /**< sensor: ammeter */
     SAUL_CLASS_ANY      = 0xff      /**< any device - wildcard */
     /* extend this list as needed... */
 };
