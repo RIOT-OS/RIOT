@@ -187,31 +187,55 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [I2S0_Rx_IRQn    ] = isr_i2s0_rx,         /* I2S0 receive interrupt */
 #endif
 #ifdef UART0
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART0_IRQn] = isr_uart0,     /* UART0 interrupt */
+#else
 #ifdef UART_RPL_RPL_MASK
     [UART0_LON_IRQn  ] = isr_uart0_lon,       /* UART0 LON interrupt */
 #endif
     [UART0_RX_TX_IRQn] = isr_uart0_rx_tx,     /* UART0 Receive/Transmit interrupt */
     [UART0_ERR_IRQn  ] = isr_uart0_err,       /* UART0 Error interrupt */
 #endif
+#endif
 #ifdef UART1
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART1_IRQn] = isr_uart1,     /* UART1 interrupt */
+#else
     [UART1_RX_TX_IRQn] = isr_uart1_rx_tx,     /* UART1 Receive/Transmit interrupt */
     [UART1_ERR_IRQn  ] = isr_uart1_err,       /* UART1 Error interrupt */
 #endif
+#endif
 #ifdef UART2
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART2_IRQn] = isr_uart2,     /* UART2 interrupt */
+#else
     [UART2_RX_TX_IRQn] = isr_uart2_rx_tx,     /* UART2 Receive/Transmit interrupt */
     [UART2_ERR_IRQn  ] = isr_uart2_err,       /* UART2 Error interrupt */
 #endif
+#endif
 #ifdef UART3
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART3_IRQn] = isr_uart3,     /* UART3 interrupt */
+#else
     [UART3_RX_TX_IRQn] = isr_uart3_rx_tx,     /* UART3 Receive/Transmit interrupt */
     [UART3_ERR_IRQn  ] = isr_uart3_err,       /* UART3 Error interrupt */
 #endif
+#endif
 #ifdef UART4
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART4_IRQn] = isr_uart4,     /* UART4 interrupt */
+#else
     [UART4_RX_TX_IRQn] = isr_uart4_rx_tx,     /* UART4 Receive/Transmit interrupt */
     [UART4_ERR_IRQn  ] = isr_uart4_err,       /* UART4 Error interrupt */
 #endif
+#endif
 #ifdef UART5
+#ifdef KINETIS_SINGLE_UART_IRQ
+    [UART5_IRQn] = isr_uart5,     /* UART5 interrupt */
+#else
     [UART5_RX_TX_IRQn] = isr_uart5_rx_tx,     /* UART5 Receive/Transmit interrupt */
     [UART5_ERR_IRQn  ] = isr_uart5_err,       /* UART5 Error interrupt */
+#endif
 #endif
 #ifdef ADC0
     [ADC0_IRQn       ] = isr_adc0,            /* ADC0 interrupt */
@@ -251,11 +275,18 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #endif
 #ifdef RTC
     [RTC_IRQn        ] = isr_rtc,             /* RTC interrupt */
+#  ifndef KINETIS_SERIES_EA
     [RTC_Seconds_IRQn] = isr_rtc_seconds,     /* RTC seconds interrupt */
+#  endif
 #endif
 #ifdef PIT
 #ifdef KINETIS_CORE_Z
+#  ifdef KINETIS_SERIES_EA
+    [PIT0_IRQn        ] = isr_pit0,             /* PIT timer channel 0 interrupt */
+    [PIT1_IRQn        ] = isr_pit1,             /* PIT timer channel 1 interrupt */
+#  else
     [PIT_IRQn        ] = isr_pit,             /* PIT any channel interrupt */
+#endif
 #else
     [PIT0_IRQn       ] = isr_pit0,            /* PIT timer channel 0 interrupt */
     [PIT1_IRQn       ] = isr_pit1,            /* PIT timer channel 1 interrupt */
@@ -323,6 +354,10 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [CAN1_Tx_Warning_IRQn] = isr_can1_tx_warning, /* CAN1 Tx warning interrupt */
     [CAN1_Rx_Warning_IRQn] = isr_can1_rx_warning, /* CAN1 Rx warning interrupt */
     [CAN1_Wake_Up_IRQn] = isr_can1_wake_up,    /* CAN1 wake up interrupt */
+#endif
+#ifdef MSCAN
+    [MSCAN_RX_IRQn] = isr_mscan_rx, /* MSCAN RX interrupt */
+    [MSCAN_TX_IRQn] = isr_mscan_tx, /* MSCAN TX/Err/Wake-up interrupt */
 #endif
 #ifdef SDHC
     [SDHC_IRQn       ] = isr_sdhc,            /* SDHC interrupt */

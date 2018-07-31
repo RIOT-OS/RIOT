@@ -30,6 +30,26 @@
 extern "C" {
 #endif
 
+#ifdef PORT_PCR_MUX
+#  define KINETIS_HAVE_PCR
+#endif
+
+#ifdef SIM_PINSEL_REG
+#  define KINETIS_HAVE_PINSEL
+#endif
+
+#ifdef ADC_CFG1_MODE_MASK
+#  define KINETIS_HAVE_ADC_K
+#endif
+
+#ifdef SPI_CTAR_CPHA_MASK
+#  define KINETIS_HAVE_MK_SPI
+#endif
+
+#ifdef LPTMR_CSR_TEN_MASK
+#  define KINETIS_HAVE_LPTMR
+#endif
+
 /**
  * @name    CPU specific gpio_t type definition
  * @{
@@ -145,6 +165,7 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 
+#ifdef KINETIS_HAVE_PCR
 /**
  * @brief   PORT control register bitmasks
  *
@@ -165,18 +186,21 @@ typedef enum {
     GPIO_PCR_PD    = (PORT_PCR_PE_MASK),    /**< enable pull-down */
     GPIO_PCR_PU    = (PORT_PCR_PE_MASK | PORT_PCR_PS_MASK)  /**< enable PU */
 } gpio_pcr_t;
+#endif /* KINETIS_HAVE_PCR */
 
 #ifndef DOXYGEN
 /**
  * @name    GPIO flank configuration values
  * @{
  */
+#ifdef KINETIS_HAVE_PCR
 #define HAVE_GPIO_FLANK_T
 typedef enum {
     GPIO_RISING  = PORT_PCR_IRQC(0x9),  /**< emit interrupt on rising flank */
     GPIO_FALLING = PORT_PCR_IRQC(0xa),  /**< emit interrupt on falling flank */
     GPIO_BOTH    = PORT_PCR_IRQC(0xb),  /**< emit interrupt on both flanks */
 } gpio_flank_t;
+#endif /* KINETIS_HAVE_PCR */
 /** @} */
 #endif /* ndef DOXYGEN */
 
@@ -202,6 +226,7 @@ enum {
  * @{
  */
 #define HAVE_ADC_RES_T
+#ifdef KINETIS_HAVE_ADC_K
 typedef enum {
     ADC_RES_6BIT  = (0xfe),             /**< not supported */
     ADC_RES_8BIT  = ADC_CFG1_MODE(0),   /**< ADC resolution: 8 bit */
@@ -210,6 +235,7 @@ typedef enum {
     ADC_RES_14BIT = (0xff),             /**< ADC resolution: 14 bit */
     ADC_RES_16BIT = ADC_CFG1_MODE(3)    /**< ADC resolution: 16 bit */
 } adc_res_t;
+#endif /* KINETIS_HAVE_ADC_K */
 /** @} */
 
 #if defined(FTM_CnSC_MSB_MASK)
@@ -260,6 +286,8 @@ typedef enum {
  * @name    SPI mode bitmasks
  * @{
  */
+
+#ifdef KINETIS_HAVE_MK_SPI
 #define HAVE_SPI_MODE_T
 typedef enum {
     SPI_MODE_0 = 0,                                         /**< CPOL=0, CPHA=0 */
@@ -268,6 +296,7 @@ typedef enum {
     SPI_MODE_3 = (SPI_CTAR_CPOL_MASK | SPI_CTAR_CPHA_MASK)  /**< CPOL=1, CPHA=1 */
 } spi_mode_t;
 /** @} */
+#endif /* KINETIS_HAVE_MK_SPI */
 #endif /* ndef DOXYGEN */
 
 /**
@@ -329,6 +358,7 @@ typedef struct {
     uint8_t count_ch;
 } pit_conf_t;
 
+#ifdef KINETIS_HAVE_LPTMR
 /**
  * @brief   CPU specific timer LPTMR module configuration
  */
@@ -342,6 +372,7 @@ typedef struct {
     /** IRQn interrupt number */
     uint8_t irqn;
 } lptmr_conf_t;
+#endif /* KINETIS_HAVE_LPTMR */
 
 #ifdef FTM_CnSC_MSB_MASK
 /**
@@ -356,6 +387,11 @@ typedef struct {
     } chan[PWM_CHAN_MAX];   /**< logical channel configuration */
     uint8_t chan_numof;     /**< number of actually configured channels */
     uint8_t ftm_num;        /**< FTM number used */
+#ifdef KINETIS_HAVE_PINSEL
+    volatile uint32_t *pinsel;
+    uint32_t pinsel_mask;
+    uint32_t pinsel_val;
+#endif
 } pwm_conf_t;
 #endif
 
@@ -403,7 +439,14 @@ typedef struct {
     gpio_t pin_mosi;                    /**< MOSI pin used */
     gpio_t pin_clk;                     /**< CLK pin used */
     gpio_t pin_cs[SPI_HWCS_NUMOF];      /**< pins used for HW cs lines */
+#ifdef KINETIS_HAVE_PCR
     gpio_pcr_t pcr;                     /**< alternate pin function values */
+#endif /* KINETIS_HAVE_PCR */
+#ifdef KINETIS_HAVE_PINSEL
+    volatile uint32_t *pinsel;
+    uint32_t pinsel_mask;
+    uint32_t pinsel_val;
+#endif
     uint32_t simmask;                   /**< bit in the SIM register */
 } spi_conf_t;
 
@@ -412,7 +455,9 @@ typedef struct {
  */
 enum {
     TIMER_PIT,              /**< PIT */
+#ifdef KINETIS_HAVE_LPTMR
     TIMER_LPTMR,            /**< LPTMR */
+#endif /* KINETIS_HAVE_LPTMR */
 };
 
 /**
@@ -421,8 +466,10 @@ enum {
  */
 /** @brief  Timers using PIT backend */
 #define TIMER_PIT_DEV(x)   (TIMER_DEV(0 + (x)))
+#ifdef KINETIS_HAVE_LPTMR
 /** @brief  Timers using LPTMR backend */
 #define TIMER_LPTMR_DEV(x) (TIMER_DEV(PIT_NUMOF + (x)))
+#endif /* KINETIS_HAVE_LPTMR */
 /** @} */
 
 /**
@@ -441,8 +488,15 @@ typedef struct {
     uint32_t freq;                /**< Module clock frequency, usually CLOCK_CORECLOCK or CLOCK_BUSCLOCK */
     gpio_t pin_rx;                /**< RX pin, GPIO_UNDEF disables RX */
     gpio_t pin_tx;                /**< TX pin */
+#ifdef KINETIS_HAVE_PCR
     uint32_t pcr_rx;              /**< Pin configuration register bits for RX */
     uint32_t pcr_tx;              /**< Pin configuration register bits for TX */
+#endif
+#ifdef KINETIS_HAVE_PINSEL
+    volatile uint32_t *pinsel;
+    uint32_t pinsel_mask;
+    uint32_t pinsel_val;
+#endif
     IRQn_Type irqn;               /**< IRQ number for this module */
     volatile uint32_t *scgc_addr; /**< Clock enable register, in SIM module */
     uint8_t scgc_bit;             /**< Clock enable bit, within the register */
@@ -461,6 +515,7 @@ typedef struct {
 #endif
 #endif /* !defined(KINETIS_HAVE_PLL) */
 
+#ifdef MODULE_PERIPH_MCG
 /**
  * @brief Kinetis possible MCG modes
  */
@@ -707,7 +762,7 @@ typedef struct {
     uint8_t pll_vdiv;
 #endif /* KINETIS_HAVE_PLL */
 } clock_config_t;
-
+#endif /* MODULE_PERIPH_MCG */
 /**
  * @brief   CPU internal function for initializing PORTs
  *
