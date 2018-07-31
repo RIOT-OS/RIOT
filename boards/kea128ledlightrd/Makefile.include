@@ -1,0 +1,8 @@
+# define the cpu used by the KEA128LEDLIGHTRD board
+export CPU = kinetis
+export CPU_MODEL = s9keaz128aclh48
+
+DEBUG_ADAPTER ?= arm-jtag-swd
+OPENOCD_CONFIG ?= ${RIOTBOARD}/kea128ledlightrd/dist/openocd.cfg
+
+include ${RIOTMAKE}/tools/openocd.inc.mk

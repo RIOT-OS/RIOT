@@ -1,0 +1,6 @@
+USEMODULE += stdio_rtt
+
+# setup clock to run at 40MHz
+CFLAGS += -DCLOCK_SETUP=1
+
+include $(RIOTCPU)/kinetis/Makefile.dep
