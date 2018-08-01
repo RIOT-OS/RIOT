@@ -63,12 +63,20 @@ but not limited to:
 * RPL (storing mode, P2P mode)
 * CoAP
 * CCN-Lite
+* Sigfox
+* LoRaWAN (Experimental)
 
 
 ## GETTING STARTED
-* You want to start the RIOT? Just follow our [quickstart guide](http://doc.riot-os.org/index.html#the-quickest-start) or try this [tutorial](https://github.com/RIOT-OS/Tutorials/blob/master/README.md). For specific toolchain installation, follow instructions in the [getting started](http://doc.riot-os.org/getting-started.html) page.
+* You want to start the RIOT? Just follow our
+[quickstart guide](http://doc.riot-os.org/index.html#the-quickest-start) or
+try this
+[tutorial](https://github.com/RIOT-OS/Tutorials/blob/master/README.md).
+For specific toolchain installation, follow instructions in the
+[getting started](http://doc.riot-os.org/getting-started.html) page.
 * The RIOT API itself can be built from the code using doxygen. The latest
-  version of the documentation is uploaded daily to [riot-os.org/api](http://riot-os.org/api).
+  version of the documentation is uploaded daily to
+  [riot-os.org/api](http://riot-os.org/api).
 
 ### USING THE NATIVE PORT WITH NETWORKING
 If you compile RIOT for the native cpu and include the `netdev_tap` module,
