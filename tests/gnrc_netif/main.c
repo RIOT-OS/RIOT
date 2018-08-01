@@ -523,7 +523,7 @@ static void test_ipv6_group_join__ENOMEM(void)
 {
     ipv6_addr_t addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
 
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF;
+    for (unsigned i = 0; i < GNRC_NETIF_IPV6_GROUPS_NUMOF;
          i++, addr.u16[7].u16++) {
         TEST_ASSERT(0 <= gnrc_netif_ipv6_group_join_internal(netifs[0], &addr));
     }
