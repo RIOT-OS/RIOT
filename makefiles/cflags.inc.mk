@@ -59,7 +59,7 @@ CFLAGS += -fno-common
 # Enable all default warnings and all extra warnings
 CFLAGS += -Wall -Wextra
 # Enable additional checks for printf/scanf format strings
-$(foreach flag,-Wformat=2 -Wformat-overflow -Wformat-truncation,$(eval $(call cflags_test_and_add,$(flag))))
+$(foreach flag,-Wformat -Wformat-security -Wformat-y2k -Wformat-overflow -Wformat-truncation,$(eval $(call cflags_test_and_add,$(flag))))
 
 # Warn if a user-supplied include directory does not exist.
 CFLAGS += -Wmissing-include-dirs
