@@ -437,6 +437,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
              * original packet by other subscriber */
             return -ENOMEM;
         }
+        payload = tmp;
         prev->next = payload;
         prev = payload;
     } while (_is_ipv6_hdr(payload));
