@@ -81,11 +81,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* set default options */
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_START, false);
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_END, true);
-#ifdef MODULE_NETSTATS_L2
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END, true);
-#endif
 
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
