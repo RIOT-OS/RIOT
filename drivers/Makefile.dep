@@ -226,6 +226,10 @@ ifneq (,$(filter mag3110,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter mma7660,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter mma8x5x,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
