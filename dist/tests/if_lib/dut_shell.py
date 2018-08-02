@@ -7,7 +7,7 @@
 This module handles parsing of information from RIOT shell base tests.
 """
 import logging
-from base_device import BaseDevice
+from .base_device import BaseDevice
 
 
 class DutShell(BaseDevice):
