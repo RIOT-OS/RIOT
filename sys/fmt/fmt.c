@@ -142,7 +142,6 @@ size_t fmt_hex_bytes(uint8_t *out, const char *hex)
     size_t len = fmt_strlen(hex);
 
     if (len & 1) {
-        out = NULL;
         return 0;
     }
 
