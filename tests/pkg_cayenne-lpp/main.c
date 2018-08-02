@@ -24,7 +24,9 @@
 #include "cayenne_lpp.h"
 
 #define TEST_BUFFER1 { 0x03, 0x67, 0x01, 0x10, 0x05, 0x67, 0x00, 0xff }
-#ifdef BOARD_NATIVE
+#if defined(BOARD_NATIVE) && !defined(__clang__)    /* clang uses same floating
+                                                     * point handling as GCC
+                                                     * with cross compiling */
 #define TEST_BUFFER2 { 0x01, 0x67, 0xFF, 0xD8, \
                        0x06, 0x71, 0x04, 0xD1, 0xFB, 0x2F, 0x00, 0x00 }
 #else
