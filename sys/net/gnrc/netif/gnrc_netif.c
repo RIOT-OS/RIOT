@@ -460,21 +460,38 @@ static int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 /**
- * @brief   Matches an address by prefix to an address on the interface
+ * @brief   Matches an address by prefix to an address on the interface and
+ *          return length of the best match
+ *
+ * @param[in] netif     the network interface
+ * @param[in] addr      the address to match
+ *
+ * @return  bits up to which the best match matches @p addr
+ * @return  0, if no match was found
+ *
+ * @pre `netif != NULL` and `addr != NULL`
+ */
+static unsigned _match_to_len(const gnrc_netif_t *netif,
+                              const ipv6_addr_t *addr);
+
+/**
+ * @brief   Matches an address by prefix to an address on the interface and
+ *          return index of the best match
  *
  * @param[in] netif     the network interface
  * @param[in] addr      the address to match
  * @param[in] filter    a bitfield with the bits at the position equal to the
  *                      indexes of the addresses you want to include in the
  *                      search set to one. NULL for all addresses
- * @param[out] idx      index of the best match. -1 if no match was found.
  *
- * @return  bits up to which the best match matches @p addr
- * @return  0, if no match was found
+ * @return  index of the best match for @p addr
+ * @return  -1 if no match was found
+ *
+ * @pre `netif != NULL` and `addr != NULL`
  */
-static unsigned _match(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
-                       const uint8_t *filter, int *idx);
-
+static int _match_to_idx(const gnrc_netif_t *netif,
+                        const ipv6_addr_t *addr,
+                        const uint8_t *filter);
 /**
  * @brief Determines the scope of the given address.
  *
@@ -661,11 +678,9 @@ int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
 int gnrc_netif_ipv6_addr_match(gnrc_netif_t *netif,
                                const ipv6_addr_t *addr)
 {
-    int idx;
-
     assert((netif != NULL) && (addr != NULL));
     gnrc_netif_acquire(netif);
-    _match(netif, addr, NULL, &idx);
+    int idx = _match_to_idx(netif, addr, NULL);
     gnrc_netif_release(netif);
     return idx;
 }
@@ -717,9 +732,8 @@ gnrc_netif_t *gnrc_netif_get_by_prefix(const ipv6_addr_t *prefix)
 
     while ((netif = gnrc_netif_iter(netif))) {
         unsigned match;
-        int idx;
 
-        if (((match = _match(netif, prefix, NULL, &idx)) > 0) &&
+        if (((match = _match_to_len(netif, prefix)) > 0) &&
             (match > best_match)) {
             best_match = match;
             best_netif = netif;
@@ -871,13 +885,23 @@ static int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
     return -1;
 }
 
-static unsigned _match(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
-                       const uint8_t *filter, int *idx)
+static unsigned _match_to_len(const gnrc_netif_t *netif,
+                              const ipv6_addr_t *addr)
 {
-    unsigned best_match = 0;
+    assert((netif != NULL) && (addr != NULL));
 
-    assert(idx != NULL);
-    *idx = -1;
+    int n = _match_to_idx(netif, addr, NULL);
+    return (n >= 0) ? ipv6_addr_match_prefix(&(netif->ipv6.addrs[n]), addr) : 0;
+}
+
+static int _match_to_idx(const gnrc_netif_t *netif,
+                         const ipv6_addr_t *addr,
+                         const uint8_t *filter)
+{
+    assert((netif != NULL) && (addr != NULL));
+
+    int idx = -1;
+    unsigned best_match = 0;
     for (int i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
         unsigned match;
 
@@ -890,15 +914,13 @@ static unsigned _match(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
         match = ipv6_addr_match_prefix(&(netif->ipv6.addrs[i]), addr);
         if (((match > 64U) || !ipv6_addr_is_link_local(&(netif->ipv6.addrs[i]))) &&
             (match >= best_match)) {
-            if (idx != NULL) {
-                *idx = i;
-            }
+            idx = i;
             best_match = match;
         }
     }
-    if (*idx >= 0) {
+    if (idx != -1) {
         DEBUG("gnrc_netif: Found %s on interface %" PRIkernel_pid " matching ",
-              ipv6_addr_to_str(addr_str, &netif->ipv6.addrs[*idx],
+              ipv6_addr_to_str(addr_str, &netif->ipv6.addrs[idx],
                                sizeof(addr_str)),
               netif->pid);
         DEBUG("%s by %u bits (used as source address = %s)\n",
@@ -913,7 +935,7 @@ static unsigned _match(const gnrc_netif_t *netif, const ipv6_addr_t *addr,
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               (filter != NULL) ? "true" : "false");
     }
-    return best_match;
+    return idx;
 }
 
 static uint8_t _get_scope(const ipv6_addr_t *addr)
@@ -1104,9 +1126,8 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
         }
     }
     /* otherwise apply rule 8: Use longest matching prefix. */
-    int res;
-    _match(netif, dst, candidate_set, &res);
-    return (res < 0) ? NULL : &netif->ipv6.addrs[res];
+    int idx = _match_to_idx(netif, dst, candidate_set);
+    return (idx < 0) ? NULL : &netif->ipv6.addrs[idx];
 }
 
 static int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr)
