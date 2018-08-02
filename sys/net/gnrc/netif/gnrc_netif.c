@@ -588,7 +588,7 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
     ipv6_addr_set_solicited_nodes(&sol_nodes, addr);
     res = gnrc_netif_ipv6_group_join_internal(netif, &sol_nodes);
     if (res < 0) {
-        DEBUG("nib: Can't join solicited-nodes of %s on interface %u\n",
+        DEBUG("gnrc_netif: Can't join solicited-nodes of %s on interface %" PRIkernel_pid "\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               netif->pid);
         return res;
@@ -666,7 +666,7 @@ int gnrc_netif_ipv6_addr_idx(gnrc_netif_t *netif,
     int idx;
 
     assert((netif != NULL) && (addr != NULL));
-    DEBUG("gnrc_netif: get index of %s from inteface %i\n",
+    DEBUG("gnrc_netif: get index of %s from interface %" PRIkernel_pid "\n",
           ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
           netif->pid);
     gnrc_netif_acquire(netif);
@@ -694,6 +694,8 @@ ipv6_addr_t *gnrc_netif_ipv6_addr_best_src(gnrc_netif_t *netif,
     BITFIELD(candidate_set, GNRC_NETIF_IPV6_ADDRS_NUMOF);
 
     assert((netif != NULL) && (dst != NULL));
+    DEBUG("gnrc_netif: get best source address for %s\n",
+          ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
     memset(candidate_set, 0, sizeof(candidate_set));
     gnrc_netif_acquire(netif);
     int first_candidate = _create_candidate_set(netif, dst, ll_only,
@@ -981,7 +983,7 @@ static int _create_candidate_set(const gnrc_netif_t *netif,
 {
     int res = -1;
 
-    DEBUG("gathering candidates\n");
+    DEBUG("gathering source address candidates\n");
     /* currently this implementation supports only addresses as source address
      * candidates assigned to this interface. Thus we assume all addresses to be
      * on interface @p netif */
