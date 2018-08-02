@@ -123,7 +123,7 @@ uint32_t sx127x_get_channel(const sx127x_t *dev)
 
 void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
 {
-    DEBUG("[sx127x] Set channel: %lu\n", channel);
+    DEBUG("[sx127x] Set channel: %" PRIu32 "\n", channel);
 
     /* Save current operating mode */
     dev->settings.channel = channel;
@@ -814,14 +814,14 @@ void sx127x_set_preamble_length(sx127x_t *dev, uint16_t preamble)
 
 void sx127x_set_rx_timeout(sx127x_t *dev, uint32_t timeout)
 {
-    DEBUG("[sx127x] Set RX timeout: %lu\n", timeout);
+    DEBUG("[sx127x] Set RX timeout: %" PRIu32 "\n", timeout);
 
     dev->settings.lora.rx_timeout = timeout;
 }
 
 void sx127x_set_tx_timeout(sx127x_t *dev, uint32_t timeout)
 {
-    DEBUG("[sx127x] Set TX timeout: %lu\n", timeout);
+    DEBUG("[sx127x] Set TX timeout: %" PRIu32 "\n", timeout);
 
     dev->settings.lora.tx_timeout = timeout;
 }

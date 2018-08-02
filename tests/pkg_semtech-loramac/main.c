@@ -18,6 +18,7 @@
  */
 
 #include <string.h>
+#include <inttypes.h>
 
 #include "msg.h"
 #include "shell.h"
@@ -144,13 +145,13 @@ static int _cmd_loramac(int argc, char **argv)
                    semtech_loramac_get_public_network(&loramac) ? "on" : "off");
         }
         else if (strcmp("netid", argv[2]) == 0) {
-            printf("NetID: %lu\n", semtech_loramac_get_netid(&loramac));
+            printf("NetID: %" PRIu32 "\n", semtech_loramac_get_netid(&loramac));
         }
         else if (strcmp("tx_power", argv[2]) == 0) {
             printf("TX power index: %d\n", semtech_loramac_get_tx_power(&loramac));
         }
         else if (strcmp("rx2_freq", argv[2]) == 0) {
-            printf("RX2 freq: %lu\n", semtech_loramac_get_rx2_freq(&loramac));
+            printf("RX2 freq: %" PRIu32 "\n", semtech_loramac_get_rx2_freq(&loramac));
         }
         else if (strcmp("rx2_dr", argv[2]) == 0) {
             printf("RX2 dr: %d\n", semtech_loramac_get_rx2_dr(&loramac));

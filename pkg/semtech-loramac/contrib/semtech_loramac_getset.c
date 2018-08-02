@@ -18,6 +18,7 @@
  */
 
 #include <string.h>
+#include <inttypes.h>
 
 #include "mutex.h"
 
@@ -188,7 +189,7 @@ bool semtech_loramac_get_public_network(semtech_loramac_t *mac)
 void semtech_loramac_set_netid(semtech_loramac_t *mac, uint32_t netid)
 {
     mutex_lock(&mac->lock);
-    DEBUG("[semtech-loramac] set NetID %lu\n", netid);
+    DEBUG("[semtech-loramac] set NetID %" PRIu32 "\n", netid);
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_NET_ID;
     mibReq.Param.NetID = netid;
@@ -272,7 +273,7 @@ static void _semtech_loramac_set_rx2_params(semtech_loramac_channel_params_t par
 void semtech_loramac_set_rx2_freq(semtech_loramac_t *mac, uint32_t freq)
 {
     mutex_lock(&mac->lock);
-    DEBUG("[semtech-loramac] setting RX2 freq to %lu\n", freq);
+    DEBUG("[semtech-loramac] setting RX2 freq to %" PRIu32" \n", freq);
     Rx2ChannelParams_t p;
     MibRequestConfirm_t mibReq;
     mibReq.Type = MIB_RX2_DEFAULT_CHANNEL;
