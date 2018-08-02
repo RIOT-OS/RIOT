@@ -256,6 +256,8 @@ static void _on_req_timeout(void *arg)
         mutex_unlock(&req->lock);
         mutex_unlock(&con->lock);
         con->user_cb(req, ret);
+        /* clear request for further use */
+        req->con = NULL;
     }
 }
 
