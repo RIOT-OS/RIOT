@@ -1,0 +1,25 @@
+From 9bf864033dfe765f0e06603e273c4665af777a1a Mon Sep 17 00:00:00 2001
+From: Jose Alamos <jose.alamos@haw-hamburg.de>
+Date: Tue, 24 Jul 2018 11:47:59 +0200
+Subject: [PATCH] fix uninitialized variable
+
+---
+ src/mac/LoRaMac.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/mac/LoRaMac.c b/src/mac/LoRaMac.c
+index 4cb2c50..46f7661 100644
+--- a/src/mac/LoRaMac.c
++++ b/src/mac/LoRaMac.c
+@@ -3266,6 +3266,8 @@ LoRaMacStatus_t LoRaMacMcpsRequest( McpsReq_t *mcpsRequest )
+             break;
+         }
+         default:
++            /* Shouldn't happen */
++            datarate = 0;
+             break;
+     }
+ 
+-- 
+2.16.0
+
