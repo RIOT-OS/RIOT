@@ -36,14 +36,6 @@ extern "C" {
 #define LPS331AP_DEFAULT_ADDRESS        (0x5c)
 
 /**
- * @brief   Device descriptor for LPS331AP sensors
- */
-typedef struct {
-    i2c_t i2c;                  /**< I2C device the sensor is connected to */
-    uint8_t address;            /**< I2C bus address of the sensor */
-} lps331ap_t;
-
-/**
  * @brief   Possible sampling rates for LPS331AP sensors
  */
 typedef enum {
@@ -63,17 +55,22 @@ typedef struct {
 } lps331ap_params_t;
 
 /**
+ * @brief   Device descriptor for LPS331AP sensors
+ */
+typedef struct {
+    lps331ap_params_t params;   /**< device initialization parameters */
+} lps331ap_t;
+
+/**
  * @brief   Initialize a given LPS331AP pressure sensor
  *
  * @param[out] dev      device descriptor of the sensor
- * @param[in]  i2c      I2C bus the sensor is connected to
- * @param[in]  address  the sensor's address on the I2C bus
- * @param[in]  rate     internal sampling rate of the sensor
+ * @param[in]  params   initialization parameters
  *
  * @return              0 on success
  * @return              -1 on error
  */
-int lps331ap_init(lps331ap_t *dev, i2c_t i2c, uint8_t address, lps331ap_rate_t rate);
+int lps331ap_init(lps331ap_t *dev, const lps331ap_params_t * params);
 
 /**
  * @brief   Read a temperature value from the given sensor, returned in m°C
@@ -99,7 +96,7 @@ int lps331ap_read_pres(const lps331ap_t *dev);
  * @param[in] dev       device descriptor of sensor to enable
  *
  * @return              0 on success
- * @return              -1 on error
+ * @return              <0 on error
  */
 int lps331ap_enable(const lps331ap_t *dev);
 
@@ -109,7 +106,7 @@ int lps331ap_enable(const lps331ap_t *dev);
  * @param[in] dev       device descriptor of sensor to disable
  *
  * @return              0 on success
- * @return              -1 on error
+ * @return              <0 on error
  */
 int lps331ap_disable(const lps331ap_t *dev);
 

@@ -107,23 +107,17 @@ static const uart_conf_t uart_config[] = {
  * @name    I2C configuration
  * @{
  */
-#define I2C_NUMOF               1
-#define I2C_0_EN                1
 #define I2C_IRQ_PRIO            1
 
-/* I2C 0 device configuration */
-#define I2C_0_DEV               0
-#define I2C_0_IRQ               I2C_IRQn
-#define I2C_0_IRQ_HANDLER       isr_i2c
-#define I2C_0_SCL_PIN           GPIO_PB3 /* OpenBattery */
-#define I2C_0_SDA_PIN           GPIO_PB4 /* OpenBattery */
-
-static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+static const i2c_conf_t i2c_config[] = {
     {
-        .scl_pin = GPIO_PB3, /* OpenBattery */
-        .sda_pin = GPIO_PB4, /* OpenBattery */
+        .speed = I2C_SPEED_FAST,    /**< bus speed */
+        .scl_pin = GPIO_PIN(1, 3),  /**< GPIO_PB3, OpenBattery */
+        .sda_pin = GPIO_PIN(1, 4)   /**< GPIO_PB4, OpenBattery */
     },
 };
+
+#define I2C_NUMOF               (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
 
 /**

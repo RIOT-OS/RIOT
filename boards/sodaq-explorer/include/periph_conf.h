@@ -196,34 +196,28 @@ static const spi_conf_t spi_config[] = {
  * @name I2C configuration
  * @{
  */
-#define I2C_NUMOF          (2U)
-#define I2C_0_EN            1
-#define I2C_1_EN            1
-#define I2C_2_EN            0
-#define I2C_3_EN            0
-#define I2C_IRQ_PRIO        1
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev      = &(SERCOM1->I2CM),
+        .speed    = I2C_SPEED_NORMAL,
+        .scl_pin  = GPIO_PIN(PA, 17),
+        .sda_pin  = GPIO_PIN(PA, 16),
+        .mux      = GPIO_MUX_C,
+        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0,
+        .flags    = I2C_FLAG_NONE,
+    },
+    {
+        .dev      = &(SERCOM2->I2CM),
+        .speed    = I2C_SPEED_NORMAL,
+        .scl_pin  = GPIO_PIN(PA, 9),
+        .sda_pin  = GPIO_PIN(PA, 8),
+        .mux      = GPIO_MUX_C,
+        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0,
+        .flags    = I2C_FLAG_NONE
+    }
+};
+#define I2C_NUMOF          (sizeof(i2c_config) / sizeof(i2c_config[0]))
 
-#define I2C_0_DEV           SERCOM1->I2CM
-#define I2C_0_IRQ           SERCOM1_IRQn
-#define I2C_0_ISR           isr_sercom1
-/* I2C 0 GCLK */
-#define I2C_0_GCLK_ID       SERCOM1_GCLK_ID_CORE
-#define I2C_0_GCLK_ID_SLOW  SERCOM1_GCLK_ID_SLOW
-/* I2C 0 pin configuration */
-#define I2C_0_SDA           GPIO_PIN(PA, 16)
-#define I2C_0_SCL           GPIO_PIN(PA, 17)
-#define I2C_0_MUX           GPIO_MUX_C
-
-#define I2C_1_DEV           SERCOM2->I2CM
-#define I2C_1_IRQ           SERCOM2_IRQn
-#define I2C_1_ISR           isr_sercom2
-/* I2C 1 GCLK */
-#define I2C_1_GCLK_ID       SERCOM2_GCLK_ID_CORE
-#define I2C_1_GCLK_ID_SLOW  SERCOM2_GCLK_ID_SLOW
-/* I2C 1 pin configuration */
-#define I2C_1_SDA           GPIO_PIN(PA, 8)
-#define I2C_1_SCL           GPIO_PIN(PA, 9)
-#define I2C_1_MUX           GPIO_MUX_C
 /** @} */
 
 /**

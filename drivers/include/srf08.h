@@ -22,6 +22,7 @@
  *
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  */
 
 #ifndef SRF08_H
@@ -79,9 +80,9 @@ typedef enum {
     SRF08_MODE_INCH =          0x50,      /**< result in inches */
     SRF08_MODE_CM =            0x51,      /**< result in centimeters */
     SRF08_MODE_MICRO_SEC =     0x52,      /**< result in centimeters */
-    SRF08_ANN_MODE_INCH =      0x53,      /**< synchronous measurement in inches */
-    SRF08_ANN_MODE_CM =        0x54,      /**< synchronous measurement in centimeters */
-    SRF08_ANN_MODE_MICRO_SEC = 0x55       /**< synchronous measurement in microseconds */
+    SRF08_ANN_MODE_INCH =      0x53,      /**< synchronous measurement in inch */
+    SRF08_ANN_MODE_CM =        0x54,      /**< synchronous measurement in cm */
+    SRF08_ANN_MODE_MICRO_SEC = 0x55       /**< synchronous measurement in us */
 }srf08_mode_t;
 
 /**
@@ -90,16 +91,13 @@ typedef enum {
  * @param[in] dev           device descriptor of an SRF08 sensor
  * @param[in] i2c           I2C device the sensor is connected to
  * @param[in] addr          I2C address of the sensor
- * @param[in] speed         I2C speed mode
  *
  * @return                  0 on successful initialization
- * @return                  -1 on undefined device given
- * @return                  -2 on unsupported speed value
  * @return                  -3 on max. range error
  * @return                  -4 on max. gain error
  *
  */
-int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr, i2c_speed_t speed);
+int srf08_init(srf08_t *dev, i2c_t i2c, uint8_t addr);
 
 /**
  * @brief   Set the maximum range of the SRF08.
@@ -119,9 +117,9 @@ int srf08_set_max_range(const srf08_t *dev, uint8_t max_range);
  * @brief   Set the maximum of the analog stages.
  *
  * @ note
- * This value is just a limitation of the maximum amplification and not the actual.
- * While measuing, this value starts at its minimum and increases approx. each 75 us
- * until the maximum value is reached.
+ * This value is just a limitation of the maximum amplification and not the
+ * actual. While measuring, this value starts at its minimum and increases
+ * approx. each 75 us until the maximum value is reached.
  *
  * @param[in] dev           device descriptor of an SRF08 sensor
  * @param[in] max_gain  the maximal gain value.
