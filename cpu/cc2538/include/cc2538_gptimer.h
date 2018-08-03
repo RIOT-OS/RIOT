@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Loci Controls Inc.
+ *               2018 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @brief           CC2538 General Purpose Timer (GPTIMER) driver
  *
  * @author          Ian Martin <ian@locicontrols.com>
+ * @author          Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef CC2538_GPTIMER_H
@@ -28,15 +30,18 @@
 extern "C" {
 #endif
 
-#define GPTIMER_NUMOF            4          /**< The CC2538 has four general-purpose timer units. */
-#define NUM_CHANNELS_PER_GPTIMER 2          /**< Each G.P. timer unit has two channels: A and B. */
-
+/**
+ * @brief Timer modes
+ */
 enum {
     GPTIMER_ONE_SHOT_MODE = 1,              /**< GPTIMER one-shot mode */
     GPTIMER_PERIODIC_MODE = 2,              /**< GPTIMER periodic mode */
     GPTIMER_CAPTURE_MODE  = 3,              /**< GPTIMER capture mode */
 };
 
+/**
+ * @brief Timer width configuration
+ */
 enum {
     GPTMCFG_32_BIT_TIMER           = 0,     /**< 32-bit timer configuration */
     GPTMCFG_32_BIT_REAL_TIME_CLOCK = 1,     /**< 32-bit real-time clock */
@@ -48,95 +53,12 @@ enum {
  */
 typedef struct {
     cc2538_reg_t CFG;                       /**< GPTIMER Configuration */
-
-    /**
-     * @brief Timer A
-     */
-    union {
-        cc2538_reg_t TAMR;                  /**< GPTIMER Timer A mode */
-        struct {
-            cc2538_reg_t TAMR2     :  2;    /**< GPTM Timer A mode */
-            cc2538_reg_t TACMR     :  1;    /**< GPTM Timer A capture mode */
-            cc2538_reg_t TAAMS     :  1;    /**< GPTM Timer A alternate mode */
-            cc2538_reg_t TACDIR    :  1;    /**< GPTM Timer A count direction */
-            cc2538_reg_t TAMIE     :  1;    /**< GPTM Timer A match interrupt enable */
-            cc2538_reg_t TAWOT     :  1;    /**< GPTM Timer A wait-on-trigger */
-            cc2538_reg_t TASNAPS   :  1;    /**< GPTM Timer A snap shot mode */
-            cc2538_reg_t TAILD     :  1;    /**< GPTM Timer A interval load write */
-            cc2538_reg_t TAPWMIE   :  1;    /**< GPTM Timer A PWM interrupt enable */
-            cc2538_reg_t TAMRSU    :  1;    /**< Timer A match register update mode */
-            cc2538_reg_t TAPLO     :  1;    /**< Legacy PWM operation */
-            cc2538_reg_t RESERVED5 : 20;    /**< Reserved bits */
-        } TAMRbits;
-    } cc2538_gptimer_tamr;
-
-    /**
-     * @brief Timer B
-     */
-    union {
-        cc2538_reg_t TBMR;                  /**< GPTIMER Timer B mode */
-        struct {
-            cc2538_reg_t TBMR2     :  2;    /**< GPTM Timer B mode */
-            cc2538_reg_t TBCMR     :  1;    /**< GPTM Timer B capture mode */
-            cc2538_reg_t TBAMS     :  1;    /**< GPTM Timer B alternate mode */
-            cc2538_reg_t TBCDIR    :  1;    /**< GPTM Timer B count direction */
-            cc2538_reg_t TBMIE     :  1;    /**< GPTM Timer B match interrupt enable */
-            cc2538_reg_t TBWOT     :  1;    /**< GPTM Timer B wait-on-trigger */
-            cc2538_reg_t TBSNAPS   :  1;    /**< GPTM Timer B snap shot mode */
-            cc2538_reg_t TBILD     :  1;    /**< GPTM Timer B interval load write */
-            cc2538_reg_t TBPWMIE   :  1;    /**< GPTM Timer B PWM interrupt enable */
-            cc2538_reg_t TBMRSU    :  1;    /**< Timer B match register update mode */
-            cc2538_reg_t TBPLO     :  1;    /**< Legacy PWM operation */
-            cc2538_reg_t RESERVED6 : 20;    /**< Reserved bits */
-        } TBMRbits;
-    } cc2538_gptimer_tbmr;
-
-    /**
-     * @brief Timer Control
-     */
-    union {
-        cc2538_reg_t CTL;                   /**< GPTIMER Control */
-        struct {
-            cc2538_reg_t TAEN      :  1;    /**< GPTM Timer A enable */
-            cc2538_reg_t TASTALL   :  1;    /**< GPTM Timer A stall enable */
-            cc2538_reg_t TAEVENT   :  1;    /**< GPTM Timer A event mode */
-            cc2538_reg_t RESERVED1 :  1;    /**< Reserved bits */
-            cc2538_reg_t TAOTE     :  1;    /**< GPTM Timer A PWM output trigger enable */
-            cc2538_reg_t TAPWML    :  1;    /**< GPTM Timer A PWM output level */
-            cc2538_reg_t RESERVED2 :  1;    /**< Reserved bits */
-            cc2538_reg_t TBEN      :  1;    /**< GPTM Timer B enable */
-            cc2538_reg_t TBSTALL   :  1;    /**< GPTM Timer B stall enable */
-            cc2538_reg_t TBEVENT   :  1;    /**< GPTM Timer B event mode */
-            cc2538_reg_t RESERVED3 :  1;    /**< Reserved bits */
-            cc2538_reg_t TBOTE     :  1;    /**< GPTM Timer B PWM output trigger enable */
-            cc2538_reg_t TBPWML    :  1;    /**< GPTM Timer B PWM output level */
-            cc2538_reg_t RESERVED4 : 17;    /**< Reserved bits */
-        } CTLbits;
-    } cc2538_gptimer_ctl;
-
+    cc2538_reg_t TAMR;                      /**< GPTIMER Timer A mode */
+    cc2538_reg_t TBMR;                      /**< GPTIMER Timer B mode */
+    cc2538_reg_t CTL;                       /**< GPTIMER Control */
     cc2538_reg_t SYNC;                      /**< GPTIMER Synchronize */
     cc2538_reg_t RESERVED2;                 /**< Reserved word */
-
-    /**
-     * @brief Interrupt mask control
-     */
-    union {
-        cc2538_reg_t IMR;                   /**< GPTIMER Interrupt Mask */
-        struct {
-            cc2538_reg_t TATOIM    :  1;    /**< GPTM Timer A time-out interrupt mask */
-            cc2538_reg_t CAMIM     :  1;    /**< GPTM Timer A capture match interrupt mask */
-            cc2538_reg_t CAEIM     :  1;    /**< GPTM Timer A capture event interrupt mask */
-            cc2538_reg_t RESERVED1 :  1;    /**< Reserved bits */
-            cc2538_reg_t TAMIM     :  1;    /**< GPTM Timer A match interrupt mask */
-            cc2538_reg_t RESERVED2 :  3;    /**< Reserved bits */
-            cc2538_reg_t TBTOIM    :  1;    /**< GPTM Timer B time-out interrupt mask */
-            cc2538_reg_t CBMIM     :  1;    /**< GPTM Timer B capture match interrupt mask */
-            cc2538_reg_t CBEIM     :  1;    /**< GPTM Timer B capture event interrupt mask */
-            cc2538_reg_t TBMIM     :  1;    /**< GPTM Timer B match interrupt mask */
-            cc2538_reg_t RESERVED3 : 20;    /**< Reserved bits */
-        } IMRbits;
-    } cc2538_gptimer_imr;
-
+    cc2538_reg_t IMR;                       /**< GPTIMER Interrupt Mask */
     cc2538_reg_t RIS;                       /**< GPTIMER Raw Interrupt Status */
     cc2538_reg_t MIS;                       /**< GPTIMER Masked Interrupt Status */
     cc2538_reg_t ICR;                       /**< GPTIMER Interrupt Clear */
@@ -161,25 +83,6 @@ typedef struct {
     cc2538_reg_t PP;                        /**< GPTIMER Peripheral Properties */
     cc2538_reg_t RESERVED4[15];             /**< Reserved */
 } cc2538_gptimer_t;
-
-/**
- * @brief   Base address of general-purpose timers (GPT)
- */
-#define GPTIMER_BASE    (0x40030000)
-
-#define GPTIMER0 ( (cc2538_gptimer_t*)0x40030000 )       /**< GPTIMER0 Instance */
-#define GPTIMER1 ( (cc2538_gptimer_t*)0x40031000 )       /**< GPTIMER1 Instance */
-#define GPTIMER2 ( (cc2538_gptimer_t*)0x40032000 )       /**< GPTIMER2 Instance */
-#define GPTIMER3 ( (cc2538_gptimer_t*)0x40033000 )       /**< GPTIMER3 Instance */
-
-void isr_timer0_chan0(void);                /**< RIOT Timer 0 Channel 0 Interrupt Service Routine */
-void isr_timer0_chan1(void);                /**< RIOT Timer 0 Channel 1 Interrupt Service Routine */
-void isr_timer1_chan0(void);                /**< RIOT Timer 1 Channel 0 Interrupt Service Routine */
-void isr_timer1_chan1(void);                /**< RIOT Timer 1 Channel 1 Interrupt Service Routine */
-void isr_timer2_chan0(void);                /**< RIOT Timer 2 Channel 0 Interrupt Service Routine */
-void isr_timer2_chan1(void);                /**< RIOT Timer 2 Channel 1 Interrupt Service Routine */
-void isr_timer3_chan0(void);                /**< RIOT Timer 3 Channel 0 Interrupt Service Routine */
-void isr_timer3_chan1(void);                /**< RIOT Timer 3 Channel 1 Interrupt Service Routine */
 
 #ifdef __cplusplus
 } /* end extern "C" */
