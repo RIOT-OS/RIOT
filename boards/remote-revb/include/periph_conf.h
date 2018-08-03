@@ -54,18 +54,18 @@ static const i2c_conf_t i2c_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SSI0,
-        .mosi_pin = GPIO_PB1,
-        .miso_pin = GPIO_PB3,
-        .sck_pin  = GPIO_PB2,
-        .cs_pin   = GPIO_PB5
+        .num      = 0,
+        .mosi_pin = GPIO_PIN(1, 1),
+        .miso_pin = GPIO_PIN(1, 3),
+        .sck_pin  = GPIO_PIN(1, 2),
+        .cs_pin   = GPIO_PIN(1, 5)
     },
     {
-        .dev      = SSI1,
-        .mosi_pin = GPIO_PC5,
-        .miso_pin = GPIO_PC6,
-        .sck_pin  = GPIO_PC4,
-        .cs_pin   = GPIO_PA7
+        .num      = 1,
+        .mosi_pin = GPIO_PIN(2, 5),
+        .miso_pin = GPIO_PIN(2, 6),
+        .sck_pin  = GPIO_PIN(2, 4),
+        .cs_pin   = GPIO_PIN(0, 7)
     }
 };
 #define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))

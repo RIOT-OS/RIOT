@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "cpu.h"
+#include "vendor/hw_ssi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -221,7 +222,7 @@ static const spi_clk_conf_t spi_clk_config[] = {
  * @{
  */
 typedef struct {
-    cc2538_ssi_t *dev;      /**< SSI device */
+    uint8_t num;            /**< number of SSI device, i.e. 0 or 1 */
     gpio_t mosi_pin;        /**< pin used for MOSI */
     gpio_t miso_pin;        /**< pin used for MISO */
     gpio_t sck_pin;         /**< pin used for SCK */

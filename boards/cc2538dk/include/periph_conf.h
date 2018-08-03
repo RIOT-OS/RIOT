@@ -103,11 +103,11 @@ static const i2c_conf_t i2c_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SSI0,
-        .mosi_pin = GPIO_PA4,
-        .miso_pin = GPIO_PA5,
-        .sck_pin  = GPIO_PA2,
-        .cs_pin   = GPIO_PD0
+        .num      = 0,
+        .mosi_pin = GPIO_PIN(0, 4),
+        .miso_pin = GPIO_PIN(0, 5),
+        .sck_pin  = GPIO_PIN(0, 2),
+        .cs_pin   = GPIO_PIN(3, 0)
     }
 };
 
