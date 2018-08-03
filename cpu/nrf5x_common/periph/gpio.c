@@ -55,18 +55,6 @@ static inline NRF_GPIO_Type* port(gpio_t pin)
 #endif
 }
 
-/**
- * @brief   Get a pin's offset
- */
-static inline int pin_num(gpio_t pin)
-{
-#ifdef CPU_MODEL_NRF52840XXAA
-    return (pin & PIN_MASK);
-#else
-    return (int)pin;
-#endif
-}
-
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     switch (mode) {
