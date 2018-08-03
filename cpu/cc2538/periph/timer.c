@@ -22,6 +22,9 @@
 #include <assert.h>
 #include <stdint.h>
 
+#include "vendor/hw_gptimer.h"
+#include "vendor/hw_memmap.h"
+
 #include "board.h"
 #include "cpu.h"
 #include "periph/timer.h"
@@ -30,24 +33,18 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define LOAD_VALUE               (0xffff)
+#define LOAD_VALUE              (0xffff)
 
-#define TIMER_A_IRQ_MASK         (0x000000ff)
-#define TIMER_B_IRQ_MASK         (0x0000ff00)
+#define TIMER_A_IRQ_MASK        (0x000000ff)
+#define TIMER_B_IRQ_MASK        (0x0000ff00)
 
-#define BIT(n)                   ( 1UL << (n) )
+/* GPTIMER_CTL Bits */
+#define TBEN                    GPTIMER_CTL_TBEN
+#define TAEN                    GPTIMER_CTL_TAEN
 
-/* GPTIMER_CTL Bits: */
-#define TBEN                     BIT(8)
-#define TAEN                     BIT(0)
-
-/* GPTIMER_TnMR Bits: */
-#define TnCMIE                   BIT(5)
-#define TnCDIR                   BIT(4)
-
-/* GPTIMER_IMR Bits: */
-#define TBMIM                    BIT(11)
-#define TAMIM                    BIT(4)
+/* GPTIMER_TnMR Bits */
+#define TNMIE                   GPTIMER_TAMR_TAMIE
+#define TNCDIR                  GPTIMER_TAMR_TACDIR
 
 typedef struct {
     uint16_t mask;
@@ -55,15 +52,8 @@ typedef struct {
 } _isr_cfg_t;
 
 static const _isr_cfg_t chn_isr_cfg[] = {
-    { .mask = TIMER_A_IRQ_MASK, .flag = TAMIM },
-    { .mask = TIMER_B_IRQ_MASK, .flag = TBMIM }
-};
-
-static const int irqn_cfg[] = {
-    GPTIMER_0A_IRQn,
-    GPTIMER_1A_IRQn,
-    GPTIMER_2A_IRQn,
-    GPTIMER_3A_IRQn
+    { .mask = TIMER_A_IRQ_MASK, .flag = GPTIMER_IMR_TAMIM },
+    { .mask = TIMER_B_IRQ_MASK, .flag = GPTIMER_IMR_TBMIM }
 };
 
 /**
@@ -77,7 +67,7 @@ static inline void _irq_enable(tim_t tim)
     DEBUG("%s(%u)\n", __FUNCTION__, tim);
 
     if (tim < TIMER_NUMOF) {
-        IRQn_Type irqn = irqn_cfg[tim];
+        IRQn_Type irqn = GPTIMER_0A_IRQn + (2 * tim);
 
         NVIC_SetPriority(irqn, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(irqn);
@@ -94,7 +84,7 @@ static inline cc2538_gptimer_t *dev(tim_t tim)
 {
     assert(tim < TIMER_NUMOF);
 
-    return ((cc2538_gptimer_t *)(GPTIMER_BASE | (((uint32_t)tim) << 12)));
+    return ((cc2538_gptimer_t *)(GPTIMER0_BASE | (((uint32_t)tim) << 12)));
 }
 
 /**
@@ -110,21 +100,20 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     }
 
     /* Save the callback function: */
-    assert(tim < TIMER_NUMOF);
     isr_ctx[tim].cb  = cb;
     isr_ctx[tim].arg = arg;
 
     /* Enable the clock for this timer: */
-    SYS_CTRL_RCGCGPT |= (1 << tim);
+    SYS_CTRL->RCGCGPT |= (1 << tim);
 
     /* Disable this timer before configuring it: */
     dev(tim)->cc2538_gptimer_ctl.CTL = 0;
 
     uint32_t prescaler = 0;
-    uint32_t chan_mode = TnCMIE | GPTIMER_PERIODIC_MODE;
+    uint32_t chan_mode = TNMIE | GPTIMER_PERIODIC_MODE;
     if (timer_config[tim].cfg == GPTMCFG_32_BIT_TIMER) {
         /* Count up in periodic mode */
-        chan_mode |= TnCDIR ;
+        chan_mode |= TNCDIR ;
 
         if (timer_config[tim].chn > 1) {
             DEBUG("Invalid timer_config. Multiple channels are available only in 16-bit mode.");
