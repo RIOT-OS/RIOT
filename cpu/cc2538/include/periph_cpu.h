@@ -61,6 +61,10 @@ typedef uint32_t gpio_t;
 #define GPIO_UNDEF          (0xffffffff)
 
 /**
+ * @brief Custom value to indicate unused parameter in gpio_init_mux
+ */
+#define GPIO_MUX_NONE       (0xff)
+/**
  * @brief   Define a custom GPIO_PIN macro
  *
  * For the CC2538, we use OR the gpio ports base register address with the
