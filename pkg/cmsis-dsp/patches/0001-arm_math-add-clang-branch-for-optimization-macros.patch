@@ -1,0 +1,33 @@
+From 1d862f709c9da0d59e54ea5ff9eb7417b1db92a4 Mon Sep 17 00:00:00 2001
+From: Martine Lenders <m.lenders@fu-berlin.de>
+Date: Tue, 7 Aug 2018 12:34:16 +0200
+Subject: [PATCH] arm_math: add clang branch for optimization macros
+
+---
+ include/arm_math.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/include/arm_math.h b/include/arm_math.h
+index e4b2f62..65973f6 100644
+--- a/include/arm_math.h
++++ b/include/arm_math.h
+@@ -7516,6 +7516,16 @@ void arm_rfft_fast_f32(
+ //Exit low optimization region - place directly after end of function definition
+   #define IAR_ONLY_LOW_OPTIMIZATION_EXIT
+ 
++#elif defined(__clang__)
++
++  #define LOW_OPTIMIZATION_ENTER __attribute__(( optnone ))
++
++  #define LOW_OPTIMIZATION_EXIT
++
++  #define IAR_ONLY_LOW_OPTIMIZATION_ENTER
++
++  #define IAR_ONLY_LOW_OPTIMIZATION_EXIT
++
+ #elif defined(__GNUC__)
+ 
+   #define LOW_OPTIMIZATION_ENTER __attribute__(( optimize("-O1") ))
+-- 
+2.7.4
+
