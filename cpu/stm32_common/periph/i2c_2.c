@@ -507,6 +507,7 @@ static inline int _wait_ready(I2C_TypeDef *i2c)
     return 0;
 }
 
+#if I2C_0_ISR || I2C_1_ISR
 static inline void irq_handler(i2c_t dev)
 {
     assert(dev < I2C_NUMOF);
@@ -541,6 +542,7 @@ static inline void irq_handler(i2c_t dev)
     }
     core_panic(PANIC_GENERAL_ERROR, "I2C FAULT");
 }
+#endif
 
 #if I2C_0_ISR
 void I2C_0_ISR(void)
