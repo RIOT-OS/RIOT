@@ -76,6 +76,8 @@ int gnrc_udp_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr);
  * @return  pointer to the newly created (and allocated) header
  * @return  NULL on `src == NULL`, `dst == NULL`, `src_len != 2`, `dst_len != 2`
  *          or on allocation error
+ *
+ * @pre     `src > 0` and `dst > 0`
  */
 gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src,
                                    uint16_t dst);
