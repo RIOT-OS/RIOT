@@ -280,6 +280,8 @@ int gnrc_udp_calc_csum(gnrc_pktsnip_t *hdr, gnrc_pktsnip_t *pseudo_hdr)
 gnrc_pktsnip_t *gnrc_udp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src,
                                    uint16_t dst)
 {
+    assert((src > 0) && (dst > 0));
+
     gnrc_pktsnip_t *res;
     udp_hdr_t *hdr;
 
