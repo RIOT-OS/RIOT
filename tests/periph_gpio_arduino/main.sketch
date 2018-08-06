@@ -25,7 +25,9 @@
 #include "shell.h"
 #include "periph/gpio.h"
 
-static int get_digital_pin(const char* pinstring, int* pin)
+#define ARDUINO_PIN_NUMOF ((int)(sizeof(arduino_pinmap)/sizeof(arduino_pinmap[0])))
+
+static int get_digital_pin(const char* pinstring)
 {
     int arduino_pin = -1;
     char *endptr  = NULL;
@@ -37,12 +39,11 @@ static int get_digital_pin(const char* pinstring, int* pin)
 
     arduino_pin = strtol(pinstring, &endptr, 0);
 
-    if (*endptr != '\0' || arduino_pin == -1 || arduino_pin > (int)(sizeof(arduino_pinmap)/sizeof(arduino_pinmap[0]))) {
+    if ((*endptr != '\0') || (arduino_pin == -1) || (arduino_pin > ARDUINO_PIN_NUMOF)) {
         return -1;
     }
 
-    *pin = arduino_pin;
-    return 0;
+    return arduino_pin;
 }
 
 static int init_pin(int argc, char **argv, int mode)
@@ -54,7 +55,8 @@ static int init_pin(int argc, char **argv, int mode)
         return 1;
     }
 
-    if (get_digital_pin(argv[1], &pin) != 0) {
+    pin = get_digital_pin(argv[1]);
+    if (pin < 0) {
         printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
@@ -88,7 +90,8 @@ static int read(int argc, char **argv)
         return 1;
     }
 
-    if (get_digital_pin(argv[1], &pin) != 0) {
+    pin = get_digital_pin(argv[1]);
+    if (pin < 0) {
         printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
@@ -112,11 +115,11 @@ static int set(int argc, char **argv)
         return 1;
     }
 
-    if (get_digital_pin(argv[1], &pin) != 0) {
+    pin = get_digital_pin(argv[1]);
+    if (pin < 0) {
         printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
-
 
     digitalWrite(pin, 1);
 
@@ -132,11 +135,11 @@ static int clear(int argc, char **argv)
         return 1;
     }
 
-    if (get_digital_pin(argv[1], &pin) != 0) {
+    pin = get_digital_pin(argv[1]);
+    if (pin < 0) {
         printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
-
 
     digitalWrite(pin, 0);
 
@@ -152,12 +155,13 @@ static int toggle(int argc, char **argv)
         return 1;
     }
 
-    if (get_digital_pin(argv[1], &pin) != 0) {
+    pin = get_digital_pin(argv[1]);
+    if (pin < 0) {
         printf("Could not map Arduino pin %s to a gpio.\nExpected numeric pin number.\n", argv[1]);
         return 1;
     }
 
-    // not thread safe but Arduino doesn't promise such things
+    /* not thread safe but Arduino doesn't promise such things */
     if (digitalRead(pin)) {
         digitalWrite(pin, 0);
     }
@@ -181,11 +185,7 @@ static const shell_command_t shell_commands[] = {
 
 void setup(void)
 {
-    puts("Arduino GPIO peripheral driver test\n"
-         "In this test, pins are specified by integer pin numbers.\n"
-         "It uses a single integer to indicate the arduino digital pin.\n"
-         "NOTE: make sure the values you use exist on your platform! The\n"
-         "      behavior for not existing ports/pins is not defined!");
+    puts("Arduino GPIO peripheral driver test. ? for help");
 
     /* start the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
