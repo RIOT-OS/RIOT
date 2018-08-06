@@ -43,10 +43,10 @@ static void _sd_card_cid(void)
     printf("PNM: %c%c%c%c%c\n",
            dev.sdcard.cid.PNM[0], dev.sdcard.cid.PNM[1], dev.sdcard.cid.PNM[2],
            dev.sdcard.cid.PNM[3], dev.sdcard.cid.PNM[4]);
-    printf("PRV: %d\n", dev.sdcard.cid.PRV);
-    printf("PSN: %lu\n", dev.sdcard.cid.PSN);
-    printf("MDT: %d\n", dev.sdcard.cid.MDT);
-    printf("CRC: %d\n", dev.sdcard.cid.CID_CRC);
+    printf("PRV: %u\n", dev.sdcard.cid.PRV);
+    printf("PSN: %" PRIu32 "\n", dev.sdcard.cid.PSN);
+    printf("MDT: %u\n", dev.sdcard.cid.MDT);
+    printf("CRC: %u\n", dev.sdcard.cid.CID_CRC);
     puts("+----------------------------------------+\n");
 }
 
