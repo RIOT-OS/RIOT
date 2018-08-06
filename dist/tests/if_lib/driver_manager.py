@@ -13,20 +13,20 @@ from .riot_driver import RiotDriver
 
 def driver_from_config(dev_type='serial', *args, **kwargs):
     """Returns driver instance given configuration"""
-    if dev_type is 'serial':
+    if dev_type == 'serial':
         return SerialDriver(*args, **kwargs)
-    elif dev_type is 'riot':
+    elif dev_type == 'riot':
         return RiotDriver(*args, **kwargs)
-    elif dev_type is 'driver':
+    elif dev_type == 'driver':
         return kwargs['driver']
     raise NotImplementedError()
 
 
 def available_configs(dev_type='serial', *args, **kwargs):
     """Returns possible configurations to attempt to connect to."""
-    if dev_type is 'serial':
+    if dev_type == 'serial':
         return SerialDriver.get_configs(*args, **kwargs)
-    elif dev_type is 'riot':
+    elif dev_type == 'riot':
         return RiotDriver.get_configs(*args, **kwargs)
     raise NotImplementedError()
 
