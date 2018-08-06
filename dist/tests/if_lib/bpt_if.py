@@ -16,9 +16,6 @@ class BptIf(LLShell):
     """Getters and setters for the memory map."""
     DEVICE_NUM = 0x42A5
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def is_connected_to_board(self):
         """Checks if board is connected."""
         return self.get_sys_device_num()["data"] == self.DEVICE_NUM

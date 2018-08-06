@@ -20,9 +20,6 @@ class DutShell(BaseDevice):
     RESULT_ERROR = 'Error'
     RESULT_TIMEOUT = 'Timeout'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     @staticmethod
     def _try_parse_data(data):
         if ('[' in data) and (']' in data):
