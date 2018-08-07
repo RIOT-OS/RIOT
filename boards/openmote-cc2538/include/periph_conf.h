@@ -121,21 +121,6 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
- *
- * Calculated with (CPSR * (SCR + 1)) = (CLOCK_CORECLOCK / bus_freq), where
- * 1 < CPSR < 255 and
- * 0 < SCR  < 256
- */
-static const spi_clk_conf_t spi_clk_config[] = {
-    { .cpsr = 10, .scr = 31 },  /* 100khz */
-    { .cpsr =  2, .scr = 39 },  /* 400khz */
-    { .cpsr =  2, .scr = 15 },  /* 1MHz */
-    { .cpsr =  2, .scr =  2 },  /* ~4.5MHz */
-    { .cpsr =  2, .scr =  1 }   /* ~10.7MHz */
-};
-
-/**
  * @name    SPI configuration
  * @{
  */
