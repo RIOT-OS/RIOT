@@ -29,6 +29,9 @@
 #include "assert.h"
 #include "periph/spi.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 /**
  * @brief   Array holding one pre-initialized mutex for each SPI device
  */
@@ -56,6 +59,8 @@ static inline void poweroff(spi_t bus)
 
 void spi_init(spi_t bus)
 {
+    DEBUG("%s: bus=%u\n", __FUNCTION__, bus);
+
     assert(bus < SPI_NUMOF);
 
     /* init mutex for given bus */
@@ -75,6 +80,7 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
+    DEBUG("%s: bus=%u\n", __FUNCTION__, bus);
     /* select values according to SPI device */
     cc2538_ioc_sel_t txd = spi_config[bus].num ? SSI1_TXD : SSI0_TXD;
     cc2538_ioc_sel_t clk = spi_config[bus].num ? SSI1_CLK_OUT : SSI0_CLK_OUT;
@@ -89,6 +95,7 @@ void spi_init_pins(spi_t bus)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+    DEBUG("%s: bus=%u\n", __FUNCTION__, bus);
     (void) cs;
     /* lock the bus */
     mutex_lock(&locks[bus]);
@@ -106,6 +113,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
 void spi_release(spi_t bus)
 {
+    DEBUG("%s: bus=%u\n", __FUNCTION__, bus);
     /* disable and power off device */
     dev(bus)->CR1 = 0;
     poweroff(bus);
@@ -116,6 +124,8 @@ void spi_release(spi_t bus)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
+    DEBUG("%s: bus=%u, len=%u\n", __FUNCTION__, bus, (unsigned)len);
+
     const uint8_t *out_buf = out;
     uint8_t *in_buf = in;
 
