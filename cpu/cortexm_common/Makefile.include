@@ -15,6 +15,7 @@ ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
 endif
 
+TOOLCHAINS_SUPPORTED = gnu llvm
 
 # Only define the linker symbol if the variable is set
 # The variable can be set using target specific variable thanks to lazy evaluation
