@@ -2,16 +2,11 @@
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
-ifneq (,$(SERIAL))
-  # The SERIAL setting is only available for backwards compatibility with older
-  # settings.
-  # Use DEBUG_ADAPTER_ID to specify the programmer serial number to use:
-  # export DEBUG_ADAPTER_ID=<serial number>
-  export DEBUG_ADAPTER_ID ?= $(SERIAL)
-endif
-
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
+
+# Include SERIAL variable compatibility code here
+include $(RIOTMAKE)/tools/serial_compat.inc.mk
 
 # Default for these boards is to use a CMSIS-DAP programmer
 export DEBUG_ADAPTER ?= dap
