@@ -195,6 +195,23 @@ typedef struct {
     uint8_t scr;            /**< SCR clock divider */
 } spi_clk_conf_t;
 
+#ifndef BOARD_HAS_SPI_CLK_CONF
+/**
+ * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
+ *
+ * SPI bus frequency =  CLOCK_CORECLOCK / (CPSR * (SCR + 1)), with
+ * CPSR = 2..254 and even,
+ *  SCR = 0..255
+ */
+static const spi_clk_conf_t spi_clk_config[] = {
+    { .cpsr = 64, .scr =  4 },  /* 100khz */
+    { .cpsr = 16, .scr =  4 },  /* 400khz */
+    { .cpsr = 32, .scr =  0 },  /* 1.0MHz */
+    { .cpsr =  2, .scr =  2 },  /* 5.3MHz */
+    { .cpsr =  2, .scr =  1 }   /* 8.0MHz */
+};
+#endif /* BOARD_HAS_SPI_CLK_CONF */
+
 /**
  * @name    SPI configuration data structure
  * @{
