@@ -5,9 +5,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-# Include SERIAL variable compatibility code here
-include $(RIOTMAKE)/tools/serial_compat.inc.mk
-
 # Default for these boards is to use a CMSIS-DAP programmer
 export DEBUG_ADAPTER ?= dap
 
