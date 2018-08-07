@@ -22,7 +22,7 @@ BOARD_INSUFFICIENT_MEMORY := bluepill calliope-mini cc2650-launchpad \
                              remote-pa remote-reva remote-revb samd21-xpro \
                              saml21-xpro samr21-xpro seeeduino_arch-pro \
                              slstk3401a sltb001a slwstk6220a sodaq-autonomo \
-                             sodaq-explorer  stk3600  stm32f3discovery \
+                             sodaq-explorer sodaq-one stk3600  stm32f3discovery \
                              yunjia-nrf51822
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno \
