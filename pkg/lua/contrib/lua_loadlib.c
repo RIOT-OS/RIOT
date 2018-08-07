@@ -79,8 +79,8 @@ static int searcher_builtin_lua(lua_State *L)
         case LUA_OK:
             return 2; /* there are two elements in the stack */
         case LUAR_MODULE_NOTFOUND:
-            return luaL_error(L, "Module '%s' not found in Lua-builtins",
-                              lua_tostring(L, 1));
+            lua_pushliteral(L, "\n\tModule not found in Lua-builtins");
+            return 1;
         default:
             return luaL_error(L, "error loading module '%s' from Lua-builtins: \n%s",
                               lua_tostring(L, 1), lua_tostring(L, 2));
@@ -119,8 +119,8 @@ static int searcher_builtin_c(lua_State *L)
         return 2;
     }
     else {
-        return luaL_error(L, "Module '%s' not found in C-builtins",
-                          lua_tostring(L, 1));
+        lua_pushliteral(L, "\n\tModule not found in C-builtins");
+        return 1;
     }
 }
 
