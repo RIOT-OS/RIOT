@@ -186,6 +186,11 @@ ifeq (,$(UNZIP_HERE))
   endif
 endif
 
+# Tool saving stdin to a file only on content update.
+# It keeps the file timestamp if it would end up the same.
+LAZYSPONGE ?= $(RIOTTOOLS)/lazysponge/lazysponge.py
+LAZYSPONGE_FLAGS ?= $(if $(filter 1,$(QUIET)),,--verbose)
+
 ifeq (, $(APPLICATION))
     $(error An application name must be specified as APPLICATION.)
 endif
