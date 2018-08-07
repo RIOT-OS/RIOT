@@ -1,6 +1,7 @@
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
+TEST_ON_CI_WHITELIST += all
 USEPKG += cmsis-dsp
 
 BOARD_WHITELIST := \
@@ -35,3 +36,6 @@ BOARD_WHITELIST := \
   #
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	$(CURDIR)/tests/01-run.py
