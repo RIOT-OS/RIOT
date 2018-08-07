@@ -88,9 +88,10 @@ typedef enum {
  * @brief   Parameters needed for device initialization
  */
 typedef struct {
-    i2c_t i2c;              /**< bus the device is connected to */
-    uint8_t addr;           /**< address on that bus */
-    hdc1000_res_t res;      /**< resolution used for sampling temp and hum */
+    i2c_t i2c;               /**< bus the device is connected to */
+    uint8_t addr;            /**< address on that bus */
+    hdc1000_res_t res;       /**< resolution used for sampling temp and hum */
+    uint32_t renew_interval; /**< interval for cache renewal */
 } hdc1000_params_t;
 
 /**
