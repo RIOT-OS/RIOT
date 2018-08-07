@@ -49,6 +49,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              opencm904 \
                              openmote \
                              openmote-cc2538 \
+                             openmote-b \
                              pba-d-01-kw2x \
                              remote-pa \
                              remote-reva \
