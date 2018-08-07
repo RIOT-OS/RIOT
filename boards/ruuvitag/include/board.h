@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_ruuvitag RuuviTag
- * @ingroup     boards
- * @brief       Support for the RuuviTag board
+ * @ingroup     boards_ruuvitag
  * @{
  *
  * @file

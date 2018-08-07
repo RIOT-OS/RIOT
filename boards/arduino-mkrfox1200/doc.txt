@@ -1,34 +1,34 @@
 /**
- * @defgroup    boards_arduino-mkrfox1200 Arduino MKRFOX1200
- * @ingroup     boards
- * @brief       Support for the Arduino MKRFOX1200 board.
- *
- * ### General information
- *
- * The [Arduino MKRFOX1200](https://www.arduino.cc/en/Main.ArduinoBoardMKRFox1200) board is
- * a learning and development board that provides Sigfox connectivity and is
- * powered by an Atmel SAMD21 microcontroller.
- *
- * ### Pinout
- *
- * <img src="https://www.arduino.cc/en/uploads/Main/MKR1000_pinout.png"
- *      alt="Arduino MKRFOX1200 pinout" style="height:800px;"/>
- *
- * ### Flash the board
- *
- * 1. Put the board in bootloader mode by double tapping the reset button.<br/>
- *    When the board is in bootloader mode, the user led (green) oscillates
- *    smoothly.
- *
- *
- * 2. Use `BOARD=arduino-mkrfox1200` with the `make` command.<br/>
- *    Example with `hello-world` application:
- * ```
- *      make BOARD=arduino-mkrfox1200 -C examples/hello-world flash
- * ```
- *
- * ### Accessing STDIO via UART
- *
- * To access the STDIO of RIOT, a FTDI to USB converter needs to be plugged to
- * the RX/TX pins on the board.
+@defgroup    boards_arduino-mkrfox1200 Arduino MKRFOX1200
+@ingroup     boards
+@brief       Support for the Arduino MKRFOX1200 board.
+
+### General information
+
+The [Arduino MKRFOX1200](https://www.arduino.cc/en/Main.ArduinoBoardMKRFox1200) board is
+a learning and development board that provides Sigfox connectivity and is
+powered by an Atmel SAMD21 microcontroller.
+
+### Pinout
+
+<img src="https://www.arduino.cc/en/uploads/Main/MKR1000_pinout.png"
+     alt="Arduino MKRFOX1200 pinout" style="height:800px;"/>
+
+### Flash the board
+
+1. Put the board in bootloader mode by double tapping the reset button.<br/>
+   When the board is in bootloader mode, the user led (green) oscillates
+   smoothly.
+
+
+2. Use `BOARD=arduino-mkrfox1200` with the `make` command.<br/>
+   Example with `hello-world` application:
+```
+     make BOARD=arduino-mkrfox1200 -C examples/hello-world flash
+```
+
+### Accessing STDIO via UART
+
+To access the STDIO of RIOT, a FTDI to USB converter needs to be plugged to
+the RX/TX pins on the board.
  */

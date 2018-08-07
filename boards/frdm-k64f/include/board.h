@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_frdm-k64f NXP FRDM-K64F Board
- * @ingroup     boards
- * @brief       Support for the NXP FRDM-K64F
+ * @ingroup     boards_frdm-k64f
  * @{
  *
  * @file

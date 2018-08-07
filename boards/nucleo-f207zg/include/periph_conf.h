@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nucleo-f207zg STM32 Nucleo-F207ZG
- * @ingroup     boards_common_nucleo144
- * @brief       Support for the STM32 Nucleo-F207ZG
+ * @ingroup     boards_nucleo-f207zg
  * @{
  *
  * @file

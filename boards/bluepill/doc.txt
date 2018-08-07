@@ -1,0 +1,133 @@
+/**
+@defgroup    boards_bluepill Bluepill board
+@ingroup     boards
+@brief       Support for the stm32f103c8 based bluepill board.
+
+## Overview
+
+The bluepill is an STM32F103 based board which can be bought for around
+2€ on sides like AliExpress, eBay and others. Although the STM32F130C8
+MCU nominally has 64 KB flash, most [actually have 128 KB
+flash][Flashsize].
+
+
+## Hardware
+
+![bluepill](https://camo.githubusercontent.com/8df2fb54f87527bdd57fe007352d72c1f377d08f/687474703a2f2f77696b692e73746d33326475696e6f2e636f6d2f696d616765732f7468756d622f312f31392f53544d33325f426c75655f50696c6c5f746f702e6a70672f38303070782d53544d33325f426c75655f50696c6c5f746f702e6a7067)
+
+### MCU
+
+| MCU       | STM32F103C8            |
+|:----------|:-----------------------|
+| Family    | ARM Cortex-M3          |
+| Vendor    | STMicroelectronics     |
+| RAM       | 20 KB                  |
+| Flash     | 64 KB / 128 KB         |
+| Frequency | up to 72 MHz           |
+| Timer     | 3x 16-Bit              |
+| ADC       | 2x 12-bit, 10 channels |
+| UART      | 3                      |
+| SPI       | 2                      |
+| I2C       | 2                      |
+| CAN       | 1                      |
+| Vcc       | 2.0 to 3.6 V           |
+| Datasheet | [Datasheet][Datasheet] |
+
+
+## Implementation Status
+
+| ID    | Supported |
+|:----- |:--------- |
+| GPIO  | yes       |
+| PWM   | yes       |
+| UART  | yes       |
+| ADC   | yes       |
+| I2C   | no        |
+| SPI   | yes       |
+| USB   | no        |
+| Timer | yes       |
+| CAN   | no        |
+
+
+## Flashing
+
+To program and debug the board you need a SWD capable debugger. The
+easiest way is using [OpenOCD][OpenOCD]. If you have OpenOCD installed,
+you can flash the device with:
+
+    $ make BOARD=bluepill flash
+
+### Additional Flash
+
+To make use of the entire 128 KB flash, compile your application with:
+
+    $ make BOARD=bluepill CPU_MODEL=stm32f103cb
+
+This sets the `CPU_MODEL` make variable to `stm32f103cb`, the default
+value is `stm32f103c8`. These two CPU models basically only have one
+major difference, the latter has 128 KB flash while the former has 64
+KB.
+
+If you want to flash a binary compiled this way you either need to
+figure out how to adjust the OpenOCD configuration to make it use 128 KB
+flash or use this [stlink fork][caboStlink] which has a
+[patch][caboPatch] to make use of the entire 128 KB flash using:
+
+    $ C8T6HACK=1 st-flash write /dev/sgX $pathToHexFile 0x8000000
+
+
+## Connecting via Serial
+
+The default UART port used is UART2, which uses pins A2 (TX) and A3 (RX).
+
+## Using PWM
+
+PWM is available at pins A8 to A11.
+
+## Known Issues
+
+### USB connector
+
+The Micro-USB port is sometimes not soldered properly. Also, it is
+usually equipped with an incorrect resistor. [This can be fixed multiple
+ways][USB].
+
+### Flashing abortion
+
+Some boards have problems to flash on the first try. It may help, to press
+the reset-button, start the flashing and release it while doing so.
+
+
+## Where to buy
+
+The board is sold under different names. On some sites it is called
+`bluepill` or `blue pill`. On others you might find it by searching for
+`stm32f103c8` or `stm32f103c8t6`.
+
+Try [eBay][eBay] or [AliExpress][AliExpress].
+
+
+## Further reading
+
+* http://wiki.stm32duino.com/index.php?title=Blue_Pill
+* http://wiki.stm32duino.com/index.php?title=Maple_Mini#Clones
+* http://www.st.com/content/st_com/en/products/microcontrollers/stm32-32-bit-
+arm-cortex-mcus/stm32-mainstream-mcus/stm32f1-series/stm32f103/stm32f103c8.html
+
+[Datasheet]: http://www.st.com/content/ccc/resource/technical/document/datash
+eet/33/d4/6f/1d/df/0b/4c/6d/CD00161566.pdf/files/CD00161566.pdf/jcr:content/tran
+slations/en.CD00161566.pdf
+[Flashsize]:
+http://wiki.stm32duino.com/index.php?title=Blue_Pill#128_KB_flash_on_C8_version
+[eBay]: https://www.ebay.com/sch/i.html?_nkw=stm32f103c8
+[AliExpress]: https://www.aliexpress.com/wholesale?SearchText=STM32F103C8T6
+[OpenOCD]: https://github.com/RIOT-OS/RIOT/wiki/OpenOCD
+[USB]:
+http://wiki.stm32duino.com/index.php?title=Blue_Pill#Hardware_installation
+[imgTop]:
+http://wiki.stm32duino.com/images/thumb/1/19/STM32_Blue_Pill_top.jpg/800px-
+STM32_Blue_Pill_top.jpg
+[caboStlink]: https://github.com/cabo/stlink
+[caboPatch]:
+https://github.com/cabo/stlink/commit/e2ff1710ca6caeb55b5b99f7bd8a29181ccf533d
+ */

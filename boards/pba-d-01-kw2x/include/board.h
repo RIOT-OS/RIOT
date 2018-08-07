@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_pba-d-01-kw2x phyWAVE-KW22 Board
- * @ingroup     boards
- * @brief       Support for the phyWAVE evaluation board
+ * @ingroup     boards_pba-d-01-kw2x
  * @{
  *
  * @file

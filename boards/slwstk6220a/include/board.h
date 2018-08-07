@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_wstk6220 Silicon Labs WSTK6220 Eval Kit
- * @ingroup     boards
- * @brief       Support for the Silicon Labs WSTK6220 evaluation kit
+ * @ingroup     boards_slwstk6220a
  * @{
  *
  * @file

@@ -1,0 +1,88 @@
+/**
+@defgroup    boards_nucleo-f091rc STM32 Nucleo-F091RC
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 Nucleo-F091RC
+
+## Overview
+
+The Nucleo-F091 is a board from ST's Nucleo family supporting a ARM Cortex-M0
+STM32F091 microcontroller with 32Kb of RAM and 256Kb of ROM.
+
+## Hardware
+
+![STM32F3discovery image](http://media.digikey.com/Photos/STMicro%20Photos/MFG_NUCLEO.jpg)
+![nucleo-f091 pinout](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/nucleo-f091_pinout.png)
+
+
+### MCU
+| MCU        | STM32F091RC       |
+|:------------- |:--------------------- |
+| Family | ARM Cortex-M0     |
+| Vendor | ST Microelectronics   |
+| RAM        | 32Kb |
+| Flash      | 256Kb             |
+| Frequency  | up to 48MHz (using the on-board 8MHz Oszillator of the ST-Link) |
+| FPU        | no                |
+| Timers | 9 (8x 16-bit, 1x 32-bit [TIM2])   |
+| ADCs       | 1x 12-bit         |
+| UARTs      | 8                 |
+| SPIs       | 2                 |
+| I2Cs       | 2                 |
+| Vcc        | 2.0V - 3.6V           |
+| Datasheet  | [Datasheet](http://www.st.com/web/en/resource/technical/document/datasheet/DM00115237.pdf) |
+| Reference Manual | [Reference Manual](http://www.st.com/web/en/resource/technical/document/reference_manual/DM00031936.pdf) |
+| Programming Manual | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/DM00051352.pdf) |
+| Board Manual   | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00105823.pdf)|
+
+### RIOT static pin mapping
+please refer to [this](https://docs.google.com/spreadsheets/d/1gnxsux5WpFrn-33Ivb9nGgTBqooqgDYxRkhZms-cvsc/edit?usp=sharing)
+document for the pin mapping as implemenented in `boards/nucleo-f091/include/periph_conf.h`
+
+### User Interface
+1 Button:
+
+| NAME   | USER  |
+|:----- |:----- |
+| Pin    | PC13  |
+
+1 LEDs:
+
+| NAME   | LED_GREEN |
+| -----  | ------------- |
+| Color  | orange    |
+| Pin    | PA5           |
+
+
+## Implementation Status
+| Device | ID        | Supported | Comments  |
+|:------------- |:------------- |:------------- |:------------- |
+| MCU        | STM32F091RC   | partly    | Energy saving modes not fully utilized |
+| Low-level driver | GPIO    | no        | |
+|        | PWM       | no        | |
+|        | UART      | full      | |
+|        | I2C       | no        | |
+|        | SPI       | no        | |
+|        | USB       | no        | |
+|        | Timer     | full      | |
+
+
+## Flashing the device
+The ST Nucleo-F091 board includes an on-board ST-LINK V2 programmer. The
+easiest way to program the board is to use OpenOCD. Once you have installed
+OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
+installation instructions), you can flash the board simply by typing
+
+```
+make BOARD=nucleo-f091 flash
+```
+and debug via GDB by simply typing
+```
+make BOARD=nucleo-f091 debug
+```
+
+
+## Supported Toolchains
+For using the ST Nucleo-F091 board we strongly recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+ */

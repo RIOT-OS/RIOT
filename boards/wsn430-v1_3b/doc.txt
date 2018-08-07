@@ -1,0 +1,5 @@
+/**
+@defgroup    boards_wsn430-v1_3b WSN430 v1.3b
+@ingroup     boards
+@brief       Support for the WSN430 V1 Rev 3b
+ */

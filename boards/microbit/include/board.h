@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_microbit BBC micro:bit
- * @ingroup     boards
- * @brief       Support for the BBC micro:bit
+ * @ingroup     boards_microbit
  * @{
  *
  * @file

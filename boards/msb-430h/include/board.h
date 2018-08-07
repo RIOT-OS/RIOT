@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_msb430h MSB-430H
- * @ingroup     boards
- * @brief       Support for the ScatterWeb MSB-430H board
+ * @ingroup     boards_msb430h
  * @{
  *
  * @file

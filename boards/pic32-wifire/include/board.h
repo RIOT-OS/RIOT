@@ -9,9 +9,7 @@
  */
 
 /**
- * @defgroup    boards_pic32-wifire Digilent PIC32 WiFire
- * @ingroup     boards
- * @brief       Support for the Digilent PIC32 WiFire
+ * @ingroup     boards_pic32-wifire
  * @details
  * See:
  * http://store.digilentinc.com/chipkit-wi-fire-wifi-enabled-mz-microcontroller-board/

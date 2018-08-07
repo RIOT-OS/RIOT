@@ -11,9 +11,7 @@
 #define BOARD_H
 
 /**
- * @defgroup    boards_z1 Zolertia Z1
- * @ingroup     boards
- * @brief       Support for the Zolertia Z1 board.
+ * @ingroup     boards_z1
  *
 <h2>Components</h2>
 \li MSP430F2617

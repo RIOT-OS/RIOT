@@ -9,9 +9,7 @@
  */
 
 /**
- * @defgroup    boards_pic32-wifire Digilent PIC32 WiFire
- * @ingroup     boards
- * @brief       peripheral configuration for the Digilent PIC32 WiFire
+ * @ingroup     boards_pic32-wifire
  * @{
  *
  * @file

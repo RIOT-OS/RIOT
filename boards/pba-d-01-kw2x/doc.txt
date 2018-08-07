@@ -1,0 +1,59 @@
+/**
+@defgroup    boards_pba-d-01-kw2x phyWAVE-KW22 Board
+@ingroup     boards
+@brief       Support for the phyWAVE evaluation board
+
+## Manufacturer
+Designed and produced by PHYTEC Messtechnik GmbH, D-55129 Mainz.
+[Homepage](http://www.phytec.de) | Ordering information via mail at
+contact@phytec.de
+
+## Overview
+The [Phytec IoT wiki](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki)
+describes the phyWAVE module and the phyNODE board more
+detailed. The links below will guide you directly to the corresponding chapter:
+ * [Overview](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/)
+ * [Introduction](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/Introduction)
+ * Hardware descriptions for the
+[phyWAVE](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/phyWAVE-KW2x-Characteristics)
+and the
+[phyNODE](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/phyNODE-Characteristics)
+ * [Toolchain, build and debug Information](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/RIOT-getting-started#toolchain-summary)
+ * [A detailed step-by-step Guide that explains how to set up the Environment](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/RIOT-getting-started#step-by-step-installation-guide)
+The implementation status of the phyWAVE and phyNODE peripherals are listed
+below. You can find links to the corresponding Pull Requests which may give you
+a code reference.
+
+<img src="https://raw.githubusercontent.com/jremmert-phytec-iot/Pictures_Phytec_IOT/master/EvalBoard_3.png" width="800" />
+phyNODE board with equipped phyWAVE-KW2x processor/radio-module.
+
+### Details
+The PCB-pieces with the mounted sensors can be separated from the evaluation
+board to capture sensor values from specific spatial points.
+
+[Pinout reference](https://github.com/PHYTEC-Messtechnik-GmbH/phynode-riot-examples/wiki/Interfaces)
+
+## Implementation Status
+
+| Device | ID        | Supported | Comments  |
+|:------------- |:------------- |:------------- |:------------- |
+| MCU        | [MKW22D512](http://www.freescale.com/webapp/sps/site/prod_summary.jsp?code=KW2x) | yes | [mainline](https://github.com/RIOT-OS/RIOT/pull/2265) |
+| phyWAVE board support | [phyWAVE](http://www.phytec.de/de/produkte/internet-of-things/phywave.html) | yes | [mainline](https://github.com/RIOT-OS/RIOT/pull/2059) |
+| Low-level driver | GPIO    | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2265)|
+|        | PWM       | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2265)|
+|        | UART      | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2265)|
+|        | I2C       | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2265)|
+|        | SPI       | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2265) |
+|        | USB-Device    | yes       | [WIP](https://github.com/RIOT-OS/RIOT/pull/3890)|
+|        | RTT       | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2265) |
+|        | RNG       | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2265) |
+|        | Timer     | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2265) |
+| Radio Chip | integrated    | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2756) |
+| Humidity Sensor    | [HDC1000](http://www.ti.com/lit/ds/symlink/hdc1000.pdf)   | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2070) |
+| Pressure Sensor    | [MPL3115A2](http://www.nxp.com/products/sensors/pressure-sensors/barometric-pressure-15-to-115-kpa/20-to-110kpa-absolute-digital-pressure-sensor:MPL3115A2?) | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2123) |
+| Tri-axis Accelerometer | [MMA8652FC](http://www.nxp.com/products/sensors/accelerometers/3-axis-accelerometers/2g-4g-8g-low-g-12-bit-digital-accelerometer:MMA8652FC)   | yes | [mainline](https://github.com/RIOT-OS/RIOT/pull/2119) |
+| Magnetometer   | [MAG3110FCR1](http://www.nxp.com/products/sensors/magnetometers/sample-data-sets-for-inertial-and-magnetic-sensors/freescale-high-accuracy-3d-magnetometer:MAG3110)   | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2121) |
+| Light Sensor   | [TCS3772](https://ams.com/jpn/content/download/291143/1065677/file/TCS3772_Datasheet_EN_v1.pdf)   | yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/3135) |
+| IR-Termopile Sensor    | [TMP006](http://www.ti.com/product/TMP006)    |yes       | [mainline](https://github.com/RIOT-OS/RIOT/pull/2148) |
+| Capacitive Button  | PCB   | no        | planned |
+ */

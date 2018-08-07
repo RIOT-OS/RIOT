@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_mbed_lpc1768 mbed LPC1768 development kit
- * @ingroup     boards
- * @brief       Support for the mbed LPC1762 board
+ * @ingroup     boards_mbed_lpc1768
  * @{
  *
  * @file

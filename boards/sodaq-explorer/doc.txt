@@ -1,29 +1,29 @@
 /**
- * @defgroup    boards_sodaq-explorer SODAQ ExpLoRer
- * @ingroup     boards
- * @brief       Support for the SODAQ ExpLoRer board
- *
- * ### General information
- *
- * General information about this board can be found on the
- * [SODAQ support](http://support.sodaq.com/sodaq-one/explorer/) website.
- *
- * ### Flash the board
- *
- * 1. Put the board in bootloader mode by double tapping the reset button.<br/>
- *    When the board is in bootloader mode, the user led (blue) oscillates
- *    smoothly.
- *
- *
- * 2. Use `BOARD=sodaq-explorer` with the `make` command.<br/>
- *    Example with `hello-world` application:
- * ```
- *      make BOARD=sodaq-explorer -C examples/hello-world flash
- * ```
- *
- * ### Accessing STDIO via UART
- *
- * To access the STDIO of RIOT, a FTDI to USB converter needs to be plugged to
- * the RX/TX pins on the board.
- *
+@defgroup    boards_sodaq-explorer SODAQ ExpLoRer
+@ingroup     boards
+@brief       Support for the SODAQ ExpLoRer board
+
+### General information
+
+General information about this board can be found on the
+[SODAQ support](http://support.sodaq.com/sodaq-one/explorer/) website.
+
+### Flash the board
+
+1. Put the board in bootloader mode by double tapping the reset button.<br/>
+   When the board is in bootloader mode, the user led (blue) oscillates
+   smoothly.
+
+
+2. Use `BOARD=sodaq-explorer` with the `make` command.<br/>
+   Example with `hello-world` application:
+```
+     make BOARD=sodaq-explorer -C examples/hello-world flash
+```
+
+### Accessing STDIO via UART
+
+To access the STDIO of RIOT, a FTDI to USB converter needs to be plugged to
+the RX/TX pins on the board.
+
  */
