@@ -1227,6 +1227,7 @@ static void _handle_rtr_timeout(_nib_dr_entry_t *router)
 
 void _handle_search_rtr(gnrc_netif_t *netif)
 {
+#if !GNRC_IPV6_NIB_CONF_NO_RTR_SOL
     gnrc_netif_acquire(netif);
     if (!(gnrc_netif_is_rtr_adv(netif)) || gnrc_netif_is_6ln(netif)) {
         uint32_t next_rs = _evtimer_lookup(netif, GNRC_IPV6_NIB_SEARCH_RTR);
@@ -1249,6 +1250,9 @@ void _handle_search_rtr(gnrc_netif_t *netif)
         }
     }
     gnrc_netif_release(netif);
+#else
+    (void)netif;
+#endif /* !GNRC_IPV6_NIB_CONF_NO_RTR_SOL */
 }
 
 #if GNRC_IPV6_NIB_CONF_DNS
