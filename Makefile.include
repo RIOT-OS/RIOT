@@ -245,6 +245,9 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
+# Assume GCC/GNU as supported toolchain if CPU's Makefile.include doesn't
+# provide this macro
+TOOLCHAINS_SUPPORTED ?= gnu
 # Import all toolchain settings
 include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 
@@ -588,6 +591,20 @@ ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   ifneq (, $(BOARD_BLACKLIST))
     ifneq (, $(filter $(BOARD_BLACKLIST), $(BOARD)))
       $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=$(BOARD) is blacklisted:$(COLOR_RESET) $(BOARD_BLACKLIST)" 1>&2)
+      EXPECT_ERRORS := 1
+    endif
+  endif
+
+  #  test if toolchain is supported.
+  ifeq (,$(filter $(TOOLCHAIN),$(TOOLCHAINS_SUPPORTED)))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected TOOLCHAIN=$(TOOLCHAIN) is not supported.$(COLOR_RESET)\nSupported toolchains: $(TOOLCHAINS_SUPPORTED)" 1>&2)
+    EXPECT_ERRORS := 1
+  endif
+
+  # If there is a blacklist, then test if the board is blacklisted.
+  ifneq (,$(TOOLCHAINS_BLACKLIST))
+    ifneq (,$(filter $(TOOLCHAIN),$(TOOLCHAINS_BLACKLIST)))
+      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected TOOLCHAIN=$(TOOLCHAIN) is blacklisted:$(COLOR_RESET) $(TOOLCHAINS_BLACKLIST)" 1>&2)
       EXPECT_ERRORS := 1
     endif
   endif
