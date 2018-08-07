@@ -20,3 +20,13 @@ else ifeq ($(RIOT_TERMINAL),picocom)
     export TERMPROG  ?= picocom
     export TERMFLAGS ?= --nolock --imap lfcrlf --echo --baud "$(BAUD)" "$(PORT)"
 endif
+
+# The SERIAL setting is only available for backwards compatibility with older
+# settings.
+ifneq (,$(SERIAL))
+  SERIAL_TTY = $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh $(SERIAL)))
+  ifeq (,$(SERIAL_TTY))
+    $(error Did not find a device with serial $(SERIAL))
+  endif
+  PORT_LINUX := $(SERIAL_TTY)
+endif

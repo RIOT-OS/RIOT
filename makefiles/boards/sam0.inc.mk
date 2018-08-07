@@ -1,18 +1,12 @@
 # set default port depending on operating system
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-# Use DEBUG_ADAPTER_ID to specify the programmer serial number to use:
-# export DEBUG_ADAPTER_ID="ATML..."
 
-# The SERIAL setting is only available for backwards compatibility with older
-# settings.
 ifneq (,$(SERIAL))
-  EDBG_ARGS += --serial $(SERIAL)
-  SERIAL_TTY = $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh $(SERIAL)))
-  ifeq (,$(SERIAL_TTY))
-    $(error Did not find a device with serial $(SERIAL))
-  endif
-  PORT_LINUX := $(SERIAL_TTY)
+  # The SERIAL setting is only available for backwards compatibility with older
+  # settings.
+  # Use DEBUG_ADAPTER_ID to specify the programmer serial number to use:
+  # export DEBUG_ADAPTER_ID=<serial number>
   export DEBUG_ADAPTER_ID ?= $(SERIAL)
 endif
 
