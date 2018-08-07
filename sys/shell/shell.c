@@ -298,3 +298,15 @@ void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
         print_prompt();
     }
 }
+
+int shell_call(const shell_command_t *shell_commands, int argc, char **argv)
+{
+    shell_command_handler_t handler;
+
+    if (argc < 1 || (handler = find_handler(shell_commands, argv[0])) == NULL) {
+        return -1;
+    }
+    else {
+        return handler(argc, argv);
+    }
+}
