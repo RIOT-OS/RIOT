@@ -1,0 +1,6 @@
+## the cpu to build for
+export CPU = stm32l1
+export CPU_MODEL = stm32l151cb
+
+# add the common header files to the include path
+INCLUDES  += -I$(RIOTBOARD)/lorabox/include

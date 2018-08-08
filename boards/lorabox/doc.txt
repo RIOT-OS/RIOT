@@ -1,0 +1,70 @@
+/**
+@defgroup    boards_nucleo-l152re STM32 Nucleo-L152RE
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 Nucleo-L152RE
+
+## Hardware
+
+![st-nucleo-l1](https://cloud.githubusercontent.com/assets/56618/5190201/f87455ae-74e3-11e4-9d24-21a334e01858.png)
+
+
+### MCU
+| MCU        | STM32L152RE |
+|:------------- |:--------------------- |
+| Family | ARM Cortex-M3     |
+| Vendor | ST Microelectronics   |
+| RAM        | 80Kb  |
+| Flash      | 512Kb             |
+| Frequency  | 32MHz (no external oscilator connected) |
+| FPU        | no                |
+| Timers | 8 (8x 16-bit, 1x 32-bit [TIM5])   |
+| ADCs       | 1x 42-channel 12-bit          |
+| UARTs      | 3                 |
+| SPIs       | 2                 |
+| I2Cs       | 2                 |
+| Vcc        | 1.65V - 3.6V          |
+| Datasheet  | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00098321.pdf) |
+| Reference Manual | [Reference Manual](http://www.st.com/resource/en/reference_manual/cd00240193.pdf) |
+| Programming Manual | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/CD00228163.pdf) |
+| Board Manual   | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00105823.pdf)|
+
+### User Interface
+
+2 Button:
+
+| NAME   | USER  | RESET     |
+|:----- |:----- |:--------- |
+| Pin    | PC13 (IN) | NRST  |
+
+1 LEDs:
+
+| NAME   | LD2   |
+| -----  | ----- |
+| Color  | green |
+| Pin    | PA5   |
+
+
+## Supported Toolchains
+
+For using the st-nucleo-l1 board we strongly recommend the usage of the [GNU
+Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+
+### OpenOCD
+
+Please use an OpenOCD version checked out after Jan. 26th 2015. Building
+instructions can be found [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD).
+
+## Using UART
+
+Using the UART isn't too stable right now. For some using the USB interface
+just works, others have to connect the USB interface to a active USB hub and
+others again can only transmit over the USB interface and receive using an
+external UART adapter.
+
+#### Connecting an external UART adapter
+
+1. connect your usb tty to the st-link header as marked
+![st-link-header](https://cloud.githubusercontent.com/assets/56618/5190200/f36aafe0-74e3-11e4-96bd-f755dd2a8b01.png)
+2. done
+ */
