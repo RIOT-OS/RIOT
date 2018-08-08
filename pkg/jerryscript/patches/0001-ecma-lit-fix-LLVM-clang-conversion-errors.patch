@@ -1,0 +1,85 @@
+From eb9b5ed94acf49a6c9fd01ec7513ff0479ff5986 Mon Sep 17 00:00:00 2001
+From: Martine Lenders <m.lenders@fu-berlin.de>
+Date: Wed, 8 Aug 2018 08:15:40 +0200
+Subject: [PATCH] ecma/lit: fix LLVM/clang conversion errors
+
+---
+ jerry-core/ecma/builtin-objects/ecma-builtins.c | 8 ++++----
+ jerry-core/ecma/operations/ecma-objects.c       | 2 +-
+ jerry-core/lit/lit-magic-strings.c              | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/jerry-core/ecma/builtin-objects/ecma-builtins.c b/jerry-core/ecma/builtin-objects/ecma-builtins.c
+index 0854ae7..afd9077 100644
+--- a/jerry-core/ecma/builtin-objects/ecma-builtins.c
++++ b/jerry-core/ecma/builtin-objects/ecma-builtins.c
+@@ -709,12 +709,12 @@ ecma_builtin_try_to_instantiate_property (ecma_object_t *object_p, /**< object *
+     }
+     case ECMA_BUILTIN_PROPERTY_STRING:
+     {
+-      value = ecma_make_magic_string_value (curr_property_p->value);
++      value = ecma_make_magic_string_value ((lit_magic_string_id_t)curr_property_p->value);
+       break;
+     }
+     case ECMA_BUILTIN_PROPERTY_OBJECT:
+     {
+-      value = ecma_make_object_value (ecma_builtin_get (curr_property_p->value));
++      value = ecma_make_object_value (ecma_builtin_get ((ecma_builtin_id_t)curr_property_p->value));
+       break;
+     }
+     case ECMA_BUILTIN_PROPERTY_ROUTINE:
+@@ -852,14 +852,14 @@ ecma_builtin_list_lazy_property_names (ecma_object_t *object_p, /**< a built-in
+         index = 0;
+       }
+ 
+-      ecma_string_t *name_p = ecma_get_magic_string (curr_property_p->magic_string_id);
++      ecma_string_t *name_p = ecma_get_magic_string ((lit_magic_string_id_t)curr_property_p->magic_string_id);
+ 
+       uint32_t bit_for_index = (uint32_t) 1u << index;
+ 
+       if (!(*bitset_p & bit_for_index) || ecma_op_object_has_own_property (object_p, name_p))
+       {
+         ecma_append_to_values_collection (for_non_enumerable_p,
+-                                          ecma_make_magic_string_value (curr_property_p->magic_string_id),
++                                          ecma_make_magic_string_value ((lit_magic_string_id_t)curr_property_p->magic_string_id),
+                                           0);
+       }
+ 
+diff --git a/jerry-core/ecma/operations/ecma-objects.c b/jerry-core/ecma/operations/ecma-objects.c
+index cbba525..3e7d284 100644
+--- a/jerry-core/ecma/operations/ecma-objects.c
++++ b/jerry-core/ecma/operations/ecma-objects.c
+@@ -1781,7 +1781,7 @@ ecma_object_get_class_name (ecma_object_t *obj_p) /**< object */
+     case ECMA_OBJECT_TYPE_CLASS:
+     {
+       ecma_extended_object_t *ext_object_p = (ecma_extended_object_t *) obj_p;
+-      return ext_object_p->u.class_prop.class_id;
++      return (lit_magic_string_id_t)ext_object_p->u.class_prop.class_id;
+     }
+     case ECMA_OBJECT_TYPE_PSEUDO_ARRAY:
+     {
+diff --git a/jerry-core/lit/lit-magic-strings.c b/jerry-core/lit/lit-magic-strings.c
+index 78d1098..afd6bb2 100644
+--- a/jerry-core/lit/lit-magic-strings.c
++++ b/jerry-core/lit/lit-magic-strings.c
+@@ -198,7 +198,7 @@ lit_is_utf8_string_magic (const lit_utf8_byte_t *string_p, /**< utf-8 string */
+   while (first < last)
+   {
+     lit_utf8_size_t middle = ((first + last) / 2); /**< mid point of search */
+-    int compare = memcmp (lit_get_magic_string_utf8 (middle), string_p, string_size);
++    int compare = memcmp (lit_get_magic_string_utf8 ((lit_magic_string_id_t)middle), string_p, string_size);
+ 
+     if (compare == 0)
+     {
+@@ -243,7 +243,7 @@ lit_is_utf8_string_pair_magic (const lit_utf8_byte_t *string1_p, /**< first utf-
+   while (first < last)
+   {
+     lit_utf8_size_t middle = ((first + last) / 2); /**< mid point of search */
+-    const lit_utf8_byte_t *middle_string_p = lit_get_magic_string_utf8 (middle);
++    const lit_utf8_byte_t *middle_string_p = lit_get_magic_string_utf8 ((lit_magic_string_id_t)middle);
+ 
+     int compare = memcmp (middle_string_p, string1_p, string1_size);
+ 
+-- 
+2.7.4
+
