@@ -200,6 +200,7 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
             netdev_ieee802154_rx_info_t *radio_info = info;
             radio_info->rssi = CC2420_RSSI_OFFSET + rssi;
             radio_info->lqi = crc_corr & CC2420_CRCCOR_COR_MASK;
+            radio_info->crc_ok = (uint16_t) ((crc_corr & ~CC2420_CRCCOR_COR_MASK)>>7);
         }
 
         /* finally flush the FIFO */
