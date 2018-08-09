@@ -1009,7 +1009,7 @@ uint64_t sdcard_spi_get_capacity(sdcard_spi_t *card)
         return blocknr * block_len;
     }
     else if (card->csd_structure == SD_CSD_V2) {
-        return (card->csd.v2.C_SIZE + 1) * (uint64_t)(SD_HC_BLOCK_SIZE << 10);
+        return (card->csd.v2.C_SIZE + 1) * (((uint64_t)SD_HC_BLOCK_SIZE) << 10);
     }
     return 0;
 }
