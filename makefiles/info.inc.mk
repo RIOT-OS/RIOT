@@ -23,6 +23,7 @@ info-buildsize:
 
 info-build:
 	@echo 'APPLICATION: $(APPLICATION)'
+	@echo 'APPDIR:      $(APPDIR)'
 	@echo ''
 	@echo 'supported boards:'
 	@echo $$($(MAKE) info-boards-supported)
