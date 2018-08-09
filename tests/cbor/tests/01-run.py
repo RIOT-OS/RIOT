@@ -52,4 +52,4 @@ def testfunc(child):
 if __name__ == "__main__":
     sys.path.append(os.path.join(os.environ['RIOTTOOLS'], 'testrunner'))
     from testrunner import run
-    sys.exit(run(testfunc, echo=False))
+    sys.exit(run(testfunc))
