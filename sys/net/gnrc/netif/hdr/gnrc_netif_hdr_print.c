@@ -24,7 +24,8 @@ void gnrc_netif_hdr_print(gnrc_netif_hdr_t *hdr)
 
     printf("if_pid: %u  ", (unsigned) hdr->if_pid);
     printf("rssi: %d  ", (signed) hdr->rssi);
-    printf("lqi: %u\n", (unsigned) hdr->lqi);
+    printf("lqi: %u  ", (unsigned) hdr->lqi);
+    printf("crc_ok: %u\n", (unsigned) hdr->crc_ok);
     printf("flags: ");
 
     if (hdr->flags) {
