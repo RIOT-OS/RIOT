@@ -132,6 +132,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     uint8_t phr;
     size_t pkt_len;
+    uint16_t fcs;
 
     /* frame buffer protection will be unlocked as soon as at86rf2xx_fb_stop()
      * is called*/
@@ -159,12 +160,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 #endif
     /* copy payload */
     at86rf2xx_fb_read(dev, (uint8_t *)buf, pkt_len);
-
-    /* Ignore FCS but advance fb read - we must give a temporary buffer here,
-     * as we are not allowed to issue SPI transfers without any buffer */
-    uint8_t tmp[2];
-    at86rf2xx_fb_read(dev, tmp, 2);
-    (void)tmp;
+    /* copy fcs */
+    at86rf2xx_fb_read(dev, (uint8_t *)&fcs, sizeof(uint16_t));
 
     if (info != NULL) {
         uint8_t rssi = 0;
@@ -187,6 +184,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 #endif
         radio_info->rssi = RSSI_BASE_VAL + rssi;
         radio_info->crc_ok = crc_ok;
+        radio_info->fcs = fcs;
         (void)crc_ok;
     }
     else {
