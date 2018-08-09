@@ -56,6 +56,15 @@ extern "C" {
 #define LA7 (0xfdU)
 #define LA8 (0x0aU)
 
+#define ULA1 (0xfdU)
+#define ULA2 (0x01U)
+#define ULA3 (0x0dU)
+#define ULA4 (0xb8U)
+#define ULA5 (0x00U)
+#define ULA6 (0x00U)
+#define ULA7 (0x5aU)
+#define ULA8 (0x1aU)
+
 #define TEST_IEEE802154_MAX_FRAG_SIZE   (102)
 
 #define ETHERNET_SRC        { LA1, LA2, LA3, LA6, LA7, LA8 }
@@ -71,6 +80,8 @@ extern "C" {
                               LA1 ^ 0x2, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
 #define NETIF0_SRC          { LA1, LA2 + 1, LA3, LA4, LA5, LA6, LA7, LA8 }
 #define NETIF0_IPV6_LL      { LP1, LP2, LP3, LP4, LP5, LP6, LP7, LP8, \
+                              LA1 ^ 0x2, LA2 + 1, LA3, LA4, LA5, LA6, LA7, LA8 }
+#define NETIF0_IPV6_ULA     { ULA1, ULA2, ULA3, ULA4, ULA5, ULA6, ULA7, ULA8, \
                               LA1 ^ 0x2, LA2 + 1, LA3, LA4, LA5, LA6, LA7, LA8 }
 #define NETIF0_IPV6_G       { GP1, GP2, GP3, GP4, GP5, GP6, GP7, GP8, \
                               LA1 ^ 0x2, LA2 + 1, LA3, LA4, LA5, LA6, LA7, LA8 }
