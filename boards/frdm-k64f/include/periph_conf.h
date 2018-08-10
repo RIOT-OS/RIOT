@@ -120,12 +120,12 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_B, 10), .chan = 14 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_B, 11), .chan = 15 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_C, 11), .chan =  7 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_C, 10), .chan =  6 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  8), .chan =  4 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  9), .chan =  5 }
+    [ 0] = { .dev = ADC1, .pin = GPIO_PIN(PORT_B, 10), .chan = 14 }, /* PTB10 */
+    [ 1] = { .dev = ADC1, .pin = GPIO_PIN(PORT_B, 11), .chan = 15 }, /* PTB11 */
+    [ 2] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 11), .chan =  7 }, /* PTC11 */
+    [ 3] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 10), .chan =  6 }, /* PTC10 */
+    [ 4] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  8), .chan =  4 }, /* PTC8 */
+    [ 5] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  9), .chan =  5 }, /* PTC9 */
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
