@@ -38,6 +38,10 @@ static int get_digital_pin(const char* pinstring)
     }
 
     arduino_pin = strtol(pinstring, &endptr, 0);
+    // strtol returns 0 on error, manual check for pin 0, works for 0 but not
+    // 00 etc, this will have to be acceptable
+    if (arduino_pin == 0 && (pinstring[0] != '0' || pinstring[1] != '\0'))
+        arduino_pin = -1;
 
     if ((*endptr != '\0') || (arduino_pin == -1) || (arduino_pin > ARDUINO_PIN_NUMOF)) {
         return -1;

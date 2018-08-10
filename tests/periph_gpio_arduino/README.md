@@ -9,9 +9,6 @@ It uses a single integer to indicate the arduino digital pin.
 
 At this point the Analog pins are not supported.
 
-NOTE: make sure the values you use exist on your platform! The
-      behavior for not existing ports/pins is not defined!
-
 ## Commands
 
 `init_out <pin>`

@@ -1,4 +1,3 @@
-APPLICATION = periph_gpio_arduino
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_gpio 
