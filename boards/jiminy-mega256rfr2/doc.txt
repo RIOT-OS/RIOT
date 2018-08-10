@@ -1,0 +1,5 @@
+/**
+ * @defgroup    boards_jiminy-mega256rfr2 Jiminy- Mega256rfr2
+ * @ingroup     boards
+ * @brief       Support for the Jiminy Mega 256rfr2 board
+ */
