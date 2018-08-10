@@ -264,13 +264,13 @@ void gpio_init_mux(gpio_t pin, uint8_t over, uint8_t sel, uint8_t func)
 {
     assert(pin != GPIO_UNDEF);
     /* configure pin function and multiplexing */
-    if (over != MODE_NOTSUP) {
+    if (over != GPIO_MUX_NONE) {
         IOC->OVER[_pp_num(pin)] = over;
     }
-    if (sel != MODE_NOTSUP) {
+    if (sel != GPIO_MUX_NONE) {
         IOC->SEL[_pp_num(pin)] = sel;
     }
-    if (func != MODE_NOTSUP) {
+    if (func != GPIO_MUX_NONE) {
         IOC->PINS[func] = _pp_num(pin);
     }
     /* enable alternative function mode */
