@@ -53,7 +53,6 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTTOOLS'], 'testrunner'))
     import testrunner
 
     os.environ['TERMFLAGS'] = "-z [%s]:%d,[%s]:%d" % (
