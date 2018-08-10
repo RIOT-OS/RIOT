@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+from testrunner import run
 
 
 def testfunc(child):
@@ -12,5 +13,4 @@ def testfunc(child):
 if __name__ == "__main__":
     # This test can take some time to complete when testing on hardware (e.g
     # on samr21-xpro) and the default timeout (10s) is not enough.
-    from testrunner import run
     sys.exit(run(testfunc, timeout=60))

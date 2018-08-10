@@ -7,6 +7,7 @@
 # directory for more details.
 
 import sys
+from testrunner import run
 
 EXPECTED_STDOUT = (
     'ucg: UCG_MSG_DRAW_PIXEL (128)',
@@ -60,5 +61,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    from testrunner import run
     sys.exit(run(testfunc))

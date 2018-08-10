@@ -8,6 +8,8 @@
 # directory for more details.
 
 import sys
+from testrunner import run
+
 
 thread_prio = {
         3:  6,
@@ -30,5 +32,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    from testrunner import run
     sys.exit(run(testfunc))

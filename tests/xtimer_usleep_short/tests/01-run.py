@@ -8,6 +8,7 @@
 
 import sys
 import pexpect
+from testrunner import run
 
 
 def testfunc(child):
@@ -28,5 +29,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    from testrunner import run
     sys.exit(run(testfunc))

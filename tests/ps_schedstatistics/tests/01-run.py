@@ -7,6 +7,7 @@
 # directory for more details.
 
 import sys
+from testrunner import run
 
 PS_EXPECTED = (
     ('\tpid | name                 | state    Q | pri | stack  ( used) | '
@@ -61,5 +62,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    from testrunner import run
     sys.exit(run(testfunc))

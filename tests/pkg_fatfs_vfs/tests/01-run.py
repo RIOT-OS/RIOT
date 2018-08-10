@@ -7,6 +7,7 @@
 # directory for more details.
 
 import sys
+from testrunner import run
 
 
 class TestFailed(Exception):
@@ -30,5 +31,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    import testrunner
-    sys.exit(testrunner.run(testfunc))
+    sys.exit(run(testfunc))

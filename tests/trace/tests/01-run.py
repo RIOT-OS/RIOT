@@ -7,6 +7,7 @@
 # directory for more details.
 
 import sys
+from testrunner import run
 
 
 def testfunc(child):
@@ -19,5 +20,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    import testrunner
-    sys.exit(testrunner.run(testfunc, timeout=1, echo=True, traceback=True))
+    sys.exit(run(testfunc, timeout=1, echo=True, traceback=True))

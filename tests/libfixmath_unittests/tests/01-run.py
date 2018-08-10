@@ -7,6 +7,7 @@
 # directory for more details.
 
 import sys
+from testrunner import run
 
 # Float and print operations are slow on boards
 # Got 80 iotlab-m3 and 250 on samr21-xpro
@@ -18,5 +19,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    from testrunner import run
     sys.exit(run(testfunc))

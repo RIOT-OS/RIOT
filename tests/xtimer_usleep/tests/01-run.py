@@ -11,6 +11,8 @@
 
 import sys
 import time
+from testrunner import run
+
 
 US_PER_SEC = 1000000
 INTERNAL_JITTER = 0.05
@@ -56,5 +58,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    from testrunner import run
     sys.exit(run(testfunc))

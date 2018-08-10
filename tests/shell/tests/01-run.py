@@ -7,6 +7,8 @@
 # directory for more details.
 
 import sys
+from testrunner import run
+
 
 EXPECTED_HELP = (
     'Command              Description',
@@ -55,5 +57,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    from testrunner import run
     sys.exit(run(testfunc))

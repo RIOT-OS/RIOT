@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+from testrunner import run
 
 
 def _check_test_output(child):
@@ -35,5 +36,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    from testrunner import run
     sys.exit(run(testfunc))

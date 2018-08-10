@@ -2,6 +2,7 @@
 
 import sys
 import math
+from testrunner import run
 
 FACTORIAL_PARAM = 6
 
@@ -17,5 +18,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    from testrunner import run
     sys.exit(run(testfunc))
