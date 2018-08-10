@@ -1015,6 +1015,9 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #if GNRC_IPV6_NIB_CONF_ARSM
         bool tl2ao_avail = false;
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#if GNRC_IPV6_NIB_CONF_6LN
+        uint8_t aro_status = _ADDR_REG_STATUS_UNAVAIL;
+#endif
 
         tmp_len = icmpv6_len - sizeof(ndp_nbr_adv_t);
         FOREACH_OPT(nbr_adv, opt, tmp_len) {
@@ -1027,8 +1030,10 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
 #if GNRC_IPV6_NIB_CONF_6LN
                 case NDP_OPT_AR:
-                    _handle_aro(netif, ipv6, (const icmpv6_hdr_t *)nbr_adv,
-                                (const sixlowpan_nd_opt_ar_t *)opt, opt, nce);
+                    aro_status = _handle_aro(netif, ipv6,
+                                             (const icmpv6_hdr_t *)nbr_adv,
+                                             (const sixlowpan_nd_opt_ar_t *)opt,
+                                             opt, nce);
                     break;
 #endif  /* GNRC_IPV6_NIB_CONF_6LN */
                 default:
@@ -1046,6 +1051,16 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             _handle_adv_l2(netif, nce, (icmpv6_hdr_t *)nbr_adv, NULL);
         }
 #endif  /* GNRC_IPV6_NIB_CONF_ARSM */
+#if GNRC_IPV6_NIB_CONF_SLAAC && GNRC_IPV6_NIB_CONF_6LN
+        /* 6Lo-ND duplicate address detection (DAD) was ignored by neighbor, try
+         * traditional DAD */
+        if ((aro_status == _ADDR_REG_STATUS_UNAVAIL) &&
+            gnrc_netif_is_6ln(netif)) {
+            _handle_dad(&ipv6->dst);
+        }
+#elif GNRC_IPV6_NIB_CONF_6LN
+        (void)aro_status;
+#endif
     }
 }
 
