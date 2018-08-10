@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_jiminy-mega256rfr2 Jiminy- Mega256rfr2
- * @ingroup     boards
- * @brief       Board specific files for the Jiminy Mega 256rfr2 board.
+ * @ingroup     boards_jiminy-mega256rfr2
  * @{
  *
  * @file

@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_frdm-kw41z Freescale FRDM-KW41Z Board
- * @ingroup     boards
- * @brief       Board specific implementations for the FRDM-KW41Z
+ * @ingroup     boards_frdm-kw41z
  * @{
  *
  * @file
