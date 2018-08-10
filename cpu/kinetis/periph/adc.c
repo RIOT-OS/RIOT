@@ -197,10 +197,9 @@ int adc_init(adc_t line)
     dev(line)->CFG2 = ADC_CFG2_MUXSEL_MASK | ADC_CFG2_ADLSTS(0);
     /* select software trigger, external ref pins */
     dev(line)->SC2 = ADC_SC2_REFSEL(ADC_REF_SETTING);
-    /* select hardware average over 32 samples */
-    dev(line)->SC3 = ADC_SC3_AVGE_MASK | ADC_SC3_AVGS(3);
-    /* set an (arbitrary) input channel, single-ended mode */
-    dev(line)->SC1[0] = ADC_SC1_ADCH(0);
+    /* set an arbitrary input channel configuration */
+    dev(line)->SC3 = 0;
+    dev(line)->SC1[0] = ADC_SC1_ADCH(31);
 
     /* perform calibration routine */
     int res = kinetis_adc_calibrate(dev(line));
@@ -223,6 +222,8 @@ int adc_sample(adc_t line, adc_res_t res)
     /* set resolution */
     dev(line)->CFG1 &= ~(ADC_CFG1_MODE_MASK);
     dev(line)->CFG1 |=  (res);
+    /* set the chosen hardware averaging setting for this channel */
+    dev(line)->SC3 = adc_config[line].avg;
     /* select the channel that is sampled */
     dev(line)->SC1[0] = adc_config[line].chan;
     /* wait until conversion is complete */

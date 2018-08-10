@@ -135,12 +135,12 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 2), .chan =  1 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 3), .chan =  1 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_D, 7), .chan = 22 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_D, 5), .chan =  6 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 0), .chan = 10 },
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 1), .chan = 11 }
+    [ 0] = { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 2), .chan =  1, .avg = ADC_AVG_MAX },
+    [ 1] = { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 3), .chan =  1, .avg = ADC_AVG_MAX },
+    [ 2] = { .dev = ADC0, .pin = GPIO_PIN(PORT_D, 7), .chan = 22, .avg = ADC_AVG_MAX },
+    [ 3] = { .dev = ADC0, .pin = GPIO_PIN(PORT_D, 5), .chan =  6, .avg = ADC_AVG_MAX },
+    [ 4] = { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 0), .chan = 10, .avg = ADC_AVG_MAX },
+    [ 5] = { .dev = ADC0, .pin = GPIO_PIN(PORT_E, 1), .chan = 11, .avg = ADC_AVG_MAX }
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
