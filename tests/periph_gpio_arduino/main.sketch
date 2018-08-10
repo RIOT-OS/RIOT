@@ -33,13 +33,13 @@ static int get_digital_pin(const char* pinstring)
     char *endptr  = NULL;
 
     if (*pinstring == 'A') {
-        // TODO : add analogInputToDigitalPin macro to arduino_board.h for all boards
+        /* TODO : add analogInputToDigitalPin macro to arduino_board.h for all boards */
         return -1;
     }
 
     arduino_pin = strtol(pinstring, &endptr, 0);
-    // strtol returns 0 on error, manual check for pin 0, works for 0 but not
-    // 00 etc, this will have to be acceptable
+    /* strtol returns 0 on error, manual check for pin 0, works for 0 but not
+       00 etc, this will have to be acceptable */
     if (arduino_pin == 0 && (pinstring[0] != '0' || pinstring[1] != '\0'))
         arduino_pin = -1;
 
