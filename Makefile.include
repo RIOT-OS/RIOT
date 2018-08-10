@@ -289,6 +289,9 @@ endif
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
 include $(RIOTMAKE)/cflags.inc.mk
 
+# Include VERSION for releases
+-include $(RIOTBASE)/VERSION
+
 # make the RIOT version available to the program
 ifeq ($(origin RIOT_VERSION), undefined)
   GIT_STRING := $(shell git --git-dir="$(RIOTBASE)/.git" describe --always --abbrev=4 --dirty=-`hostname` 2> /dev/null)
