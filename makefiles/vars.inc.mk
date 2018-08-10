@@ -31,6 +31,8 @@ export BINDIR                # This is the folder where the application should b
 export APPDIR                # The base folder containing the application
 export PKGDIRBASE            # The base folder for building packages
 
+export PYTHONPATH            # Python default search path for module filesi, with RIOT specific packages
+
 export FEATURES_REQUIRED     # List of required features by the application
 export FEATURES_PROVIDED     # List of provided features by the board
 export FEATURES_OPTIONAL     # List of nice to have features
