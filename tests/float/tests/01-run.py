@@ -6,7 +6,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
 
 # It takes 35 seconds on wsn430, so add some margin

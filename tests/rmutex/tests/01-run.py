@@ -8,7 +8,6 @@
 
 # Author: Martin Elshuber <martin.elshuber@theobroma-systems.com>
 
-import os
 import sys
 
 thread_prio = {

@@ -7,7 +7,6 @@
 # directory for more details.
 
 import sys
-import os
 import re
 
 

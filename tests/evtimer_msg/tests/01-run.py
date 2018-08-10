@@ -7,7 +7,6 @@
 # directory for more details.
 
 from __future__ import print_function
-import os
 import sys
 
 ACCEPTED_ERROR = 20
