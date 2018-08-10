@@ -120,12 +120,12 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const adc_conf_t adc_config[] = {
-    [ 0] = { .dev = ADC1, .pin = GPIO_PIN(PORT_B, 10), .chan = 14 }, /* PTB10 */
-    [ 1] = { .dev = ADC1, .pin = GPIO_PIN(PORT_B, 11), .chan = 15 }, /* PTB11 */
-    [ 2] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 11), .chan =  7 }, /* PTC11 */
-    [ 3] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 10), .chan =  6 }, /* PTC10 */
-    [ 4] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  8), .chan =  4 }, /* PTC8 */
-    [ 5] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  9), .chan =  5 }, /* PTC9 */
+    [ 0] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  2), .chan = 12 }, /* PTB2 (Arduino A0) */
+    [ 1] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  3), .chan = 13 }, /* PTB3 (Arduino A1) */
+    [ 2] = { .dev = ADC1, .pin = GPIO_PIN(PORT_B, 10), .chan = 14 }, /* PTB10 (Arduino A2) */
+    [ 3] = { .dev = ADC1, .pin = GPIO_PIN(PORT_B, 11), .chan = 15 }, /* PTB11 (Arduino A3) */
+    [ 4] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 11), .chan =  7 }, /* PTC11 (Arduino A4) */
+    [ 5] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 10), .chan =  6 }, /* PTC10 (Arduino A5) */
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
