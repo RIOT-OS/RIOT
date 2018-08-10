@@ -70,6 +70,9 @@ BUILDRELPATH ?= $(CURDIR:$(RIOTPROJECT)/%=%)/
 # get host operating system
 OS := $(shell uname)
 
+# set python path, e.g. for tests
+PYTHONPATH := $(RIOTBASE)/dist/pythonlibs/:$(PYTHONPATH)
+
 # Include Docker settings near the top because we need to build the environment
 # command line before some of the variable origins are overwritten below when
 # using abspath, strip etc.
