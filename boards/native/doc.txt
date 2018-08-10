@@ -1,6 +1,7 @@
 /**
 @defgroup    boards_native Native Board
 @ingroup     boards
+@brief       Support for running RIOT in native
 
 [Family: native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
 
