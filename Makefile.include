@@ -248,6 +248,16 @@ include $(RIOTCPU)/$(CPU)/Makefile.include
 # Import all toolchain settings
 include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 
+# Tell ccache to pass the original file to the compiler, instead of passing the
+# preprocessed code. Without this setting, the compilation will fail with
+# -Wimplicit-fallthrough warnings even when the fall through case is properly
+# commented because the preprocessor has stripped the comments from the code.
+# This also fixes some other false warnings when compiling with LLVM/Clang.
+# The environment variable only affects builds with ccache (e.g. on CI/Murdock).
+# Non cached builds are not affected in any way.
+# For more information, see http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
+export CCACHE_CPP2=yes
+
 # get number of interfaces straight before resolving dependencies
 GNRC_NETIF_NUMOF ?= 1
 
