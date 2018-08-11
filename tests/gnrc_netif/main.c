@@ -1043,7 +1043,7 @@ static void test_netif_iter(void)
 
 static void test_netif_get_name(void)
 {
-    char exp_name[NETIF_NAMELENMAX];
+    char exp_name[NETIF_NAMELENMAX + 1];
     char name[NETIF_NAMELENMAX];
     int res;
     netif_t netif = netif_iter(NETIF_INVALID);
