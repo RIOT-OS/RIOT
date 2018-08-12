@@ -36,6 +36,8 @@ export PYTHONPATH            # Python default search path for module filesi, wit
 export FEATURES_REQUIRED     # List of required features by the application
 export FEATURES_PROVIDED     # List of provided features by the board
 export FEATURES_OPTIONAL     # List of nice to have features
+# TOOLCHAINS_SUPPORTED       # List of supported toolchains by an MCU (gnu/llvm/...).
+# TOOLCHAINS_BLACKLISTED     # List of unspported toolchains for a module or an application.
 
 export TARGET_ARCH           # The target platform name, in GCC triple notation, e.g. "arm-none-eabi", "i686-elf", "avr"
 export PREFIX                # The prefix of the toolchain commands, usually "$(TARGET_ARCH)-", e.g. "arm-none-eabi-" or "msp430-".
