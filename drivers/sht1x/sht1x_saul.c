@@ -41,6 +41,7 @@ static int read(const sht1x_dev_t *dev, int16_t *temp, int16_t *hum)
                 continue;
             case -ECANCELED:
                 puts("[sht1x] Measurement times out");
+                /* falls through */
             default:
                 /* Other failure, cannot recover so giving up */
                 return -1;
