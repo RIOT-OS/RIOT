@@ -110,7 +110,7 @@ int _ccnl_content(int argc, char **argv)
 
     arg_len = strlen(buf);
 
-    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, NULL);
+    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL);
     int offs = CCNL_MAX_PACKET_SIZE;
     arg_len = ccnl_ndntlv_prependContent(prefix, (unsigned char*) buf, arg_len, NULL, NULL, &offs, _out);
 
@@ -167,7 +167,7 @@ static struct ccnl_face_s *_intern_face_get(char *addr_str)
 static int _intern_fib_add(char *pfx, char *addr_str)
 {
     int suite = CCNL_SUITE_NDNTLV;
-    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(pfx, suite, NULL, 0);
+    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(pfx, suite, NULL);
     if (!prefix) {
         puts("Error: prefix could not be created!");
         return -1;
@@ -210,7 +210,7 @@ int _ccnl_interest(int argc, char **argv)
 
     memset(_int_buf, '\0', BUF_SIZE);
 
-    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL, 0);
+    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL);
     int res = ccnl_send_interest(prefix, _int_buf, BUF_SIZE, NULL);
     ccnl_prefix_free(prefix);
 
@@ -239,7 +239,7 @@ int _ccnl_fib(int argc, char **argv)
     else if ((argc == 3) && (strncmp(argv[1], "del", 3) == 0)) {
         int suite = CCNL_SUITE_NDNTLV;
         if (strchr(argv[2], '/')) {
-            struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[2], suite, NULL, 0);
+            struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[2], suite, NULL);
             if (!prefix) {
                 puts("Error: prefix could not be created!");
                 return -1;
