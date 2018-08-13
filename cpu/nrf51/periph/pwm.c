@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "periph/gpio.h"
 #include "periph/pwm.h"
@@ -113,7 +114,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* start pwm with value '0' */
     pwm_set(dev, 0, 0);
 
-    DEBUG("Timer frequency is set to %ld\n", timer_freq);
+    DEBUG("Timer frequency is set to %" PRIu32 "\n", timer_freq);
 
     return (uint32_t)(timer_freq / res);
 }
