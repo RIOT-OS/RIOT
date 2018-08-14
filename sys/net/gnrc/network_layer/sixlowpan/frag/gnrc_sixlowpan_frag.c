@@ -259,7 +259,7 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     }
 #endif
 
-    /* Check weater to send the first or an Nth fragment */
+    /* Check whether to send the first or an Nth fragment */
     if (fragment_msg->offset == 0) {
         /* increment tag for successive, fragmented datagrams */
         _tag++;
