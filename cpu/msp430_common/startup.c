@@ -24,7 +24,7 @@
 #include "irq.h"
 #include "log.h"
 
-#include "board.h"
+extern void board_init(void);
 
 __attribute__((constructor)) static void startup(void)
 {
