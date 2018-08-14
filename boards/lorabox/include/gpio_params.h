@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_common_nucleo
+ * @ingroup     boards_lorabox
  * @{
  *
  * @file

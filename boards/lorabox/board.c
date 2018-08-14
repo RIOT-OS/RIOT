@@ -11,11 +11,11 @@
  */
 
 /**
- * @ingroup     boards_common_nucleo
+ * @ingroup     boards_lorabox
  * @{
  *
  * @file
- * @brief       Board initialization code for all Nucleo boards
+ * @brief       Board initialization code for LoraBox
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

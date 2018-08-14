@@ -1,47 +1,41 @@
 /**
-@defgroup    boards_nucleo-l152re STM32 Nucleo-L152RE
-@ingroup     boards_common_nucleo64
-@brief       Support for the STM32 Nucleo-L152RE
+@defgroup    boards_lorabox
+@ingroup     boards_lorabox
+@brief       Support for the Lobaro LoraBox with stm32l151cb
 
 ## Hardware
 
-![st-nucleo-l1](https://cloud.githubusercontent.com/assets/56618/5190201/f87455ae-74e3-11e4-9d24-21a334e01858.png)
+![LoraBox](https://www.lobaro.com/wp/wp-content/uploads/2017/03/Lobaro_wMBUS_LoRaWAN_Bridge.jpg)
 
 
 ### MCU
-| MCU        | STM32L152RE |
+| MCU        | STM32L151cb |
 |:------------- |:--------------------- |
 | Family | ARM Cortex-M3     |
 | Vendor | ST Microelectronics   |
-| RAM        | 80Kb  |
-| Flash      | 512Kb             |
+| RAM        | 16Kb  |
+| Flash      | 128Kb             |
 | Frequency  | 32MHz (no external oscilator connected) |
 | FPU        | no                |
-| Timers | 8 (8x 16-bit, 1x 32-bit [TIM5])   |
-| ADCs       | 1x 42-channel 12-bit          |
+| Timers | 10 (8x 16-bit, 5x 32-bit [TIM5])   |
+| ADCs       | 1x 24-channel 12-bit          |
 | UARTs      | 3                 |
 | SPIs       | 2                 |
 | I2Cs       | 2                 |
 | Vcc        | 1.65V - 3.6V          |
-| Datasheet  | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00098321.pdf) |
-| Reference Manual | [Reference Manual](http://www.st.com/resource/en/reference_manual/cd00240193.pdf) |
-| Programming Manual | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/CD00228163.pdf) |
-| Board Manual   | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00105823.pdf)|
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l151cb.pdf) |
+| Reference Manual | [Reference Manual](https://www.st.com/content/ccc/resource/technical/document/reference_manual/cc/f9/93/b2/f0/82/42/57/CD00240193.pdf/files/CD00240193.pdf/jcr:content/translations/en.CD00240193.pdf) |
+| Programming Manual | [Programming Manual](https://www.st.com/content/ccc/resource/technical/document/programming_manual/5b/ca/8d/83/56/7f/40/08/CD00228163.pdf/files/CD00228163.pdf/jcr:content/translations/en.CD00228163.pdf) |
+| Board Manual   | [Board Manual](https://www.lobaro.com/download/7250/)|
 
 ### User Interface
 
-2 Button:
-
-| NAME   | USER  | RESET     |
-|:----- |:----- |:--------- |
-| Pin    | PC13 (IN) | NRST  |
-
 1 LEDs:
 
-| NAME   | LD2   |
+| NAME   | LED0   |
 | -----  | ----- |
 | Color  | green |
-| Pin    | PA5   |
+| Pin    | P1   |
 
 
 ## Supported Toolchains
