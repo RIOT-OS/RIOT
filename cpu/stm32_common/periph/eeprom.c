@@ -39,7 +39,7 @@ uint8_t eeprom_read_byte(uint32_t pos)
 {
     assert(pos < EEPROM_SIZE);
 
-    DEBUG("Reading data from EEPROM at pos %lu\n", pos);
+    DEBUG("Reading data from EEPROM at pos %" PRIu32 "\n", pos);
     return *(uint8_t *)(EEPROM_START_ADDR + pos);
 }
 
@@ -47,7 +47,7 @@ void eeprom_write_byte(uint32_t pos, uint8_t data)
 {
     assert(pos < EEPROM_SIZE);
 
-    DEBUG("Writing data '%c' to EEPROM at pos %lu\n", data, pos);
+    DEBUG("Writing data '%c' to EEPROM at pos %" PRIu32 "\n", data, pos);
     _unlock();
     *(uint8_t *)(EEPROM_START_ADDR + pos) = data;
     _lock();
