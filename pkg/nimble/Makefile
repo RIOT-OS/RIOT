@@ -9,6 +9,12 @@ PDIR = $(PKG_BUILDDIR)
 # As of now, NimBLE does not build without warnings for -Wextra, so we disable
 # that flag for this package. Will hopefully be fixed some time in the future.
 CFLAGS += -Wno-extra
+# the static function `ble_ll_adv_active_chanset_is_sec()` in
+# `nimble/controller/src/ble_ll_adv.c` isn't used in our compilation path, so
+# tell LLVM/clang not to be so pedantic with this.
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-unused-function
+endif
 
 .PHONY: all
 
