@@ -85,13 +85,28 @@ bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority)
     }
 }
 
-__attribute__((naked,noreturn)) void arm_reset(void)
+void arm_reset(void)
 {
+    /*
+     * We abuse the watchdog timer for a reset.
+     */
     irq_disable();
-    WDTC = 0x0FFFF;
-    WDMOD = 0x03;
-    WDFEED= 0xAA;
-    WDFEED= 0x55;
+    /* Set the watchdog timeout constant to 0xFFFF */
+    WDTC   = 0xFFFF;
+    /*
+     * Enable watchdog interrupt and enable reset on watchdog timeout.
+     * (The reset on watchdog timeout flag is ignored, if interrupt on watchdog
+     * timeout is not set. Thus, we set both. The reset takes precedence over
+     * the interrupt, anyway.)
+     */
+    WDMOD  = 0x03;
+    /*
+     * Feed the watchdog by writing 0xAA followed by 0x55:
+     * Reload the watchdog timer with the value in WDTC (0xFFFF)
+     */
+    WDFEED = 0xAA;
+    WDFEED = 0x55;
+    /* Wait for the watchdog timer to expire, thus performing a reset */
     while(1) {}
 }
 
