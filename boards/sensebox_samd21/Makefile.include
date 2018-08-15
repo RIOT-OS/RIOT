@@ -1,0 +1,26 @@
+# define the cpu used by SenseBox board
+export CPU = samd21
+export CPU_MODEL = samd21g18a
+
+#export needed for flash rule
+export PORT_LINUX ?= /dev/ttyACM0
+export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# setup the flash tool used
+ifeq ($(PROGRAMMER),jlink)
+  # in case J-Link is attached to SWD pins, use a plain CPU memory model
+  export JLINK_DEVICE := atsamd21
+  include $(RIOTMAKE)/tools/jlink.inc.mk
+else
+  # by default, we use BOSSA to flash this board to take into account the
+  # pre-flashed Arduino bootloader. ROM_OFFSET skips the space taken by
+  # such bootloader.
+  ROM_OFFSET ?= 0x2000
+  include $(RIOTMAKE)/tools/bossa.inc.mk
+endif
+
+# setup the boards dependencies
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
