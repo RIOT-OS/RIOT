@@ -32,10 +32,8 @@
 #include "winc1500_internal.h"
 #include "xtimer.h"
 
-#include "net/netdev.h"
-#include "net/netdev/eth.h"
-#include "net/eui64.h"
 #include "net/ethernet.h"
+#include "net/netdev/eth.h"
 #include "net/netstats.h"
 
 #define ENABLE_DEBUG (0)
@@ -47,7 +45,7 @@ static void winc1500_isr(void *arg);
 /** netdev interface */
 static void _isr(netdev_t *dev);
 static int _init(netdev_t *dev);
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count);
+static int _send(netdev_t *netdev, const iolist_t *iolist);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
 
@@ -132,16 +130,16 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
+static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     winc1500_t * dev = (winc1500_t *) netdev;
     _lock_bus(dev);
 
     /* Copy packet */
     size_t len = 0;
-    for (int i = 0; i < count; i++) {
-        memcpy(dev->frame_buf + len, vector[i].iov_base, vector[i].iov_len);
-        len += vector[i].iov_len;
+    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
+        memcpy(dev->frame_buf + len, iol->iol_base, iol->iol_len);
+        len += iol->iol_len;
         /* TODO: what if the module's buffer full? */
     }
     /* Send Packet */

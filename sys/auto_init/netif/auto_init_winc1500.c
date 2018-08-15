@@ -23,8 +23,7 @@
 #include "debug.h"
 #include "winc1500.h"
 #include "winc1500_params.h"
-#include "net/gnrc/netdev.h"
-#include "net/gnrc/netdev/eth.h"
+#include "net/gnrc/netif/ethernet.h"
 
 /**
 * @name   Define stack parameters for the MAC layer thread
@@ -32,14 +31,13 @@
 */
 #define WINC1500_MAC_STACKSIZE    (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #ifndef WINC1500_MAC_PRIO
-#define WINC1500_MAC_PRIO         (GNRC_NETDEV_MAC_PRIO)
+#define WINC1500_MAC_PRIO         (GNRC_NETIF_PRIO)
 #endif
 /** @} */
 
 extern winc1500_t winc1500; /** Located in winc1500.c */
 
-static char _netdev_eth_stack[WINC1500_MAC_STACKSIZE];
-static gnrc_netdev_t _gnrc_adpt;
+static char _netdev_eth_stack[WINC1500_MAC_STACKSIZE + 2048 * 2];
 
 void auto_init_winc1500(void)
 {
@@ -48,13 +46,10 @@ void auto_init_winc1500(void)
    /* setup netdev device */
    winc1500_setup(&winc1500, &winc1500_params[0]);
 
-   /* initialize netdev<->gnrc adapter state */
-   gnrc_netdev_eth_init(&_gnrc_adpt, (netdev_t*)&winc1500);
-
    /* start gnrc netdev thread */
-   gnrc_netdev_init(_netdev_eth_stack, WINC1500_MAC_STACKSIZE,
-                    WINC1500_MAC_PRIO, "gnrc_winc1500",
-                    &_gnrc_adpt);
+   gnrc_netif_ethernet_create(_netdev_eth_stack, WINC1500_MAC_STACKSIZE,
+                    WINC1500_MAC_PRIO, "winc1500",
+                    (netdev_t*)&winc1500);
 }
 
 #else

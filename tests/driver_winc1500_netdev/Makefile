@@ -6,13 +6,13 @@ BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo32-f031 nucleo32-f042 \
                              weio z1
 
 USEMODULE += winc1500
+
+## Comment out when you don't need GNRC. Basic shell commands
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
 # Comment out when you don't need GNRC.
-USEMODULE += gnrc_netdev
-USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_icmpv6_echo

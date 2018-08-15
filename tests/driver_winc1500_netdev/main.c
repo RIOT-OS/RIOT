@@ -46,6 +46,9 @@ static const shell_command_t shell_commands[] = {
 
 static int _init(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
 #ifdef MODULE_NETDEV_ETH
     puts("winc1500_init() won't have any effect if GNRC(NETDEV_ETH) is enabled.");
 #endif
@@ -67,6 +70,9 @@ static int _init(int argc, char **argv)
 
 static int _scan(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+    
     int result = winc1500_scan();
     if (result < 0) {
         puts("[Scanning error]");
@@ -135,6 +141,9 @@ static int _connect(int argc, char **argv)
 
 static int _disconnect(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+    
     int result = winc1500_disconnect();
     if (result == WINC1500_OK) {
         puts("[OK]");
@@ -147,6 +156,9 @@ static int _disconnect(int argc, char **argv)
 
 static int _info(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
     char ssid[WINC1500_MAX_SSID_LEN];
     uint8_t mac[6];
     winc1500_ap_t ap = {.ssid = ssid};

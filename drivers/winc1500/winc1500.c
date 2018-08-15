@@ -204,6 +204,8 @@ int winc1500_init(const winc1500_params_t *params)
 #ifdef MODULE_NETDEV_ETH
     /* When NETDEV enabled _init() in @ref winc1500_netdev.c will actually
      * initialize the device. So this function will be a dummy */
+    (void)params;
+    
     return WINC1500_OK;
 #else
     winc1500_t *dev = &winc1500;
@@ -357,6 +359,8 @@ done:
 
 int winc1500_connect_list(const winc1500_ap_t ap_info[])
 {
+    (void)ap_info;
+
     /* TODO: Implement later */
     return -1;
 }
