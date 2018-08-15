@@ -40,7 +40,14 @@ const char cc110x_default_pa_table[8] = {
     0xC3    /*< +10 dBm */
 };
 
-const char cc110x_default_base_freq[3] = { 0x21, 0x71, 0x7F };
+const char cc110x_base_freqs[3][3] = {
+    /* 0x10a81f * 26MHz / 65536 = 433.0748 MHz (Channel 1 LPD433) */
+    { 0x10, 0xA8, 0x1F, },
+    /* 0x21717a * 26MHz / 65536 = 869.5250 MHz base frequency */
+    { 0x21, 0x71, 0x7A, },
+    /* 0x22bbdd * 26MHz / 65536 = 903.0799 MHz (LoRa 900 Channel 0) */
+    { 0x22, 0xBB, 0xDD, },
+};
 
 /**
  * @brief cc110x default settings
@@ -65,12 +72,16 @@ const char cc110x_default_conf[] = {
     0x00, /* CHANNR */
     0x0F, /* FSCTRL1 */
     0x00, /* FSCTRL0 */
+    /* 0x21717a * 26MHz / 65536 = 869.5250 MHz base frequency */
     0x21, /* FREQ2 */
     0x71, /* FREQ1 */
     0x7A, /* FREQ0 */
+    /* 58.04kHz channel filter bandwidth, 149.96 kBaud symbol rate */
     0x7C, /* MDMCFG4 */
     0x7A, /* MDMCFG3 */
+    /* DC blocking filter on, 2-FSK modulation, no manchester code, use 16 bit sync word */
     0x06, /* MDMCFG2 */
+    /* FEC enabled, 8 preamble bytes, 49.99 kHz channel width */
     0xC0, /* MDMCFG1 */
     0xF8, /* MDMCFG0 */
     0x44, /* DEVIATN */

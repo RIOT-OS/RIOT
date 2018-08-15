@@ -38,6 +38,8 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+static const char *cc110x_band_name[] = { "433", "868", "900" };
+
 /* Internal function prototypes */
 #ifndef CC110X_DONT_RESET
 static void _reset(cc110x_t *dev);
@@ -75,7 +77,7 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     cc110x_writeburst_reg(dev, CC110X_PATABLE, CC110X_DEFAULT_PATABLE, 8);
 
     /* set base frequency */
-    cc110x_set_base_freq_raw(dev, CC110X_DEFAULT_FREQ);
+    cc110x_set_band(dev, dev->params.band);
 
     /* Set default channel number */
     cc110x_set_channel(dev, CC110X_DEFAULT_CHANNEL);
@@ -85,9 +87,10 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     luid_get(&addr, 1);
     cc110x_set_address(dev, addr);
 
-    LOG_INFO("cc110x: initialized with address=%u and channel=%i\n",
+    LOG_INFO("cc110x: initialized with address=%u and channel=%i @ %sMHz\n",
             (unsigned)dev->radio_address,
-            dev->radio_channel);
+            dev->radio_channel,
+            cc110x_band_name[dev->params.band]);
 
     return 0;
 }
@@ -107,16 +110,13 @@ uint8_t cc110x_set_address(cc110x_t *dev, uint8_t address)
     return 0;
 }
 
-void cc110x_set_base_freq_raw(cc110x_t *dev, const char* freq_array)
+void cc110x_set_band(cc110x_t *dev, cc110x_band_t band)
 {
 #if ENABLE_DEBUG == 1
-    uint8_t _tmp[] = { freq_array[2], freq_array[1], freq_array[0], 0x00};
-    uint32_t *FREQ = (uint32_t*) _tmp;
 
-    DEBUG("cc110x_set_base_freq_raw(): setting base frequency to %uHz\n",
-            (26000000>>16) * (unsigned)(*FREQ));
+    DEBUG("cc110x_set_band(): Setting band to %sMHz\n", cc110x_band_name[band]);
 #endif
-    cc110x_writeburst_reg(dev, CC110X_FREQ2, freq_array, 3);
+    cc110x_writeburst_reg(dev, CC110X_FREQ2, cc110x_base_freqs[band], 3);
 }
 
 void cc110x_set_monitor(cc110x_t *dev, uint8_t mode)

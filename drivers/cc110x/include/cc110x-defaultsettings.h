@@ -33,10 +33,8 @@ extern "C" {
 extern const char cc110x_default_pa_table[8];
 #endif
 
-#ifndef CC110X_DEFAULT_FREQ
-#define CC110X_DEFAULT_FREQ cc110x_default_base_freq
-extern const char cc110x_default_base_freq[3];
-#endif
+extern const char cc110x_base_freqs[3][3];
+extern const char cc110x_channel_widths[3][2];
 
 #ifdef __cplusplus
 }

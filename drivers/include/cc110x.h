@@ -30,6 +30,15 @@ extern "C" {
 #include "net/gnrc/nettype.h"
 
 /**
+ * @brief   Enum over supported frequency bands
+ */
+typedef enum {
+    CC110X_BAND_433MHZ = 0, /**< 433MHz frequency band */
+    CC110X_BAND_868MHZ = 1, /**< 868MHz frequency band */
+    CC110X_BAND_900MHZ = 2, /**< 900MHz frequency band */
+} cc110x_band_t;
+
+/**
  * @brief   Struct for holding cc110x IO parameters
  */
 typedef struct cc110x_params {
@@ -38,6 +47,8 @@ typedef struct cc110x_params {
     gpio_t gdo0;        /**< GPIO connected to the GDO0 pin of the CC110x */
     gpio_t gdo1;        /**< GPIO connected to the GDO1 pin of the CC110x */
     gpio_t gdo2;        /**< GPIO connected to the GDO2 pin of the CC110x */
+    spi_clk_t spi_clk;  /**< SPI clock frequency to use */
+    cc110x_band_t band; /**< Frequency band to operate in */
 } cc110x_params_t;
 
 /**

@@ -51,13 +51,23 @@ extern "C" {
 #define CC110X_PARAM_GDO2           GPIO_PIN(0, 28)
 #endif
 
+#ifndef CC110X_PARAM_SPI_CLK
+#define CC110X_PARAM_SPI_CLK        SPI_CLK_5MHZ
+#endif
+
+#ifndef CC110X_PARAM_BAND
+#define CC110X_PARAM_BAND           CC110X_BAND_868MHZ
+#endif
+
 #ifndef CC110X_PARAMS
 #define CC110X_PARAMS               { \
-                                        .spi  = CC110X_PARAM_SPI,  \
-                                        .cs   = CC110X_PARAM_CS,   \
-                                        .gdo0 = CC110X_PARAM_GDO0, \
-                                        .gdo1 = CC110X_PARAM_GDO1, \
-                                        .gdo2 = CC110X_PARAM_GDO2, \
+                                        .spi     = CC110X_PARAM_SPI,  \
+                                        .cs      = CC110X_PARAM_CS,   \
+                                        .gdo0    = CC110X_PARAM_GDO0, \
+                                        .gdo1    = CC110X_PARAM_GDO1, \
+                                        .gdo2    = CC110X_PARAM_GDO2, \
+                                        .spi_clk = CC110X_PARAM_SPI_CLK, \
+                                        .band    = CC110X_PARAM_BAND, \
                                     }
 
 #endif
