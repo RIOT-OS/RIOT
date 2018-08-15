@@ -26,3 +26,8 @@ ifeq ($(LTO),1)
   # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396
   export LINKFLAGS += -Wno-error
 endif
+
+# Use ROM_LEN and RAM_LEN during link
+# It is made optional until all boards are updated
+LINKFLAGS += $(if $(ROM_LEN),$(LINKFLAGPREFIX)--defsym=__TEXT_REGION_LENGTH__=$(ROM_LEN))
+LINKFLAGS += $(if $(RAM_LEN),$(LINKFLAGPREFIX)--defsym=__DATA_REGION_LENGTH__=$(RAM_LEN))
