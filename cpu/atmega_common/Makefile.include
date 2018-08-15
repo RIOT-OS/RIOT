@@ -31,3 +31,8 @@ endif
 # It is made optional until all boards are updated
 LINKFLAGS += $(if $(ROM_LEN),$(LINKFLAGPREFIX)--defsym=__TEXT_REGION_LENGTH__=$(ROM_LEN))
 LINKFLAGS += $(if $(RAM_LEN),$(LINKFLAGPREFIX)--defsym=__DATA_REGION_LENGTH__=$(RAM_LEN))
+
+# Use newer linker script to have ROM/RAM configuration symbols in binutils<2.26
+LDSCRIPT_COMPAT = $(if $(shell $(TARGET_ARCH)-ld --verbose | grep __TEXT_REGION_LENGTH__),,\
+                    -T$(RIOTCPU)/$(CPU)/ldscripts_compat/avr_2.26.ld)
+LINKFLAGS += $(LDSCRIPT_COMPAT)
