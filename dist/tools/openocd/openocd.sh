@@ -197,6 +197,16 @@ do_flash() {
         fi
     fi
 
+    # In case of binary file, IMAGE_OFFSET should include the flash base address
+    # This allows flashing normal binary files without env configuration
+    if _is_binfile "${IMAGE_FILE}" "${IMAGE_TYPE}"; then
+        # hardwritten to use the first bank
+        FLASH_ADDR=$(_flash_address 1)
+        echo "Binfile detected, adding ROM base address: ${FLASH_ADDR}"
+        IMAGE_TYPE=bin
+        IMAGE_OFFSET=$(printf "0x%08x\n" "$((${IMAGE_OFFSET} + ${FLASH_ADDR}))")
+    fi
+
     if [ "${IMAGE_OFFSET}" != "0" ]; then
         echo "Flashing with IMAGE_OFFSET: ${IMAGE_OFFSET}"
     fi
