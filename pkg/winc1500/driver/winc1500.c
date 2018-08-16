@@ -58,7 +58,7 @@ static tenuM2mSecType sec_driver2module(winc1500_sec_flags_t sec);
 /* -------------------------------------------------------------------------- */
 #ifndef MODULE_NETDEV_ETH
 /*
- * @brief Event handler thread. 
+ * @brief Event handler thread.
  *        This handler is not used when NETDEV is enabled
  */
 static void *event_handler(void *arg)
@@ -205,7 +205,7 @@ int winc1500_init(const winc1500_params_t *params)
     /* When NETDEV enabled _init() in @ref winc1500_netdev.c will actually
      * initialize the device. So this function will be a dummy */
     (void)params;
-    
+
     return WINC1500_OK;
 #else
     winc1500_t *dev = &winc1500;
@@ -246,6 +246,7 @@ int winc1500_init(const winc1500_params_t *params)
         return WINC1500_ERR;
     }
 
+    m2m_wifi_get_mac_address(dev->mac_addr);
     dev->state = 0 | WINC1500_STATE_INIT;
     dev->state |= WINC1500_STATE_IDLE;
 

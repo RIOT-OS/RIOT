@@ -1,1 +1,3 @@
 INCLUDES += -I$(PKGDIRBASE)/winc1500/winc1500
+INCLUDES += -I$(RIOTBASE)/pkg/winc1500/include
+INCLUDES += -I$(RIOTBASE)/pkg/winc1500/driver/include

@@ -1,8 +1,22 @@
 ifneq (,$(filter winc1500,$(USEPKG)))
-  USEMODULE += winc1500_common
-  USEMODULE += winc1500_bsp
-  USEMODULE += winc1500_bus_wrapper
+  # Modules inside of this package
   USEMODULE += winc1500_driver
-  USEMODULE += winc1500_socket
-  USEMODULE += winc1500_spi_flash
+  USEMODULE += winc1500_pkg_common
+  USEMODULE += winc1500_pkg_bsp
+  USEMODULE += winc1500_pkg_bus_wrapper
+  USEMODULE += winc1500_pkg_driver
+  USEMODULE += winc1500_pkg_socket
+  USEMODULE += winc1500_pkg_spi_flash
+
+  # Dependancies
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
+  USEMODULE += xtimer
+  USEMODULE += core_mbox
+  # This Wi-Fi driver can be used without GNRC, so NETDEV_ETH is optional
+  ifneq (,$(filter gnrc,$(USEMODULE)))
+    # TODO: Test if it works without luid
+    USEMODULE += luid
+    USEMODULE += netdev_eth
+  endif
 endif

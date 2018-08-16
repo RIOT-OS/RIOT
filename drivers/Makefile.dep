@@ -402,18 +402,3 @@ ifneq (,$(filter tsl2561,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
-
-ifneq (,$(filter winc1500,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
-  FEATURES_REQUIRED += periph_spi
-  USEMODULE += xtimer
-  USEMODULE += core_mbox
-  # Import WINC1500 API package from Atmel
-  USEPKG += winc1500
-  # This Wi-Fi driver can be used without GNRC, so NETDEV_ETH is optional
-  ifneq (,$(filter gnrc,$(USEMODULE)))
-    # TODO: Test if it works without luid
-    USEMODULE += luid
-    USEMODULE += netdev_eth
-  endif
-endif
