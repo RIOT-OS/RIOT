@@ -145,6 +145,20 @@ test_imagefile() {
     fi
 }
 
+_has_bin_extension() {
+    # The regex need to be without quotes
+    local firmware=$1
+    [[ "${firmware}" =~ ^.*\.bin$ ]]
+}
+
+# Return 0 if given file should be considered a binary
+_is_binfile() {
+    local firmware="$1"
+    local firmware_type="$2"
+    [[ "${firmware_type}" = "bin" ]] || { \
+        [[ -z "${firmware_type}" ]] && _has_bin_extension "${firmware}"; }
+}
+
 #
 # now comes the actual actions
 #
