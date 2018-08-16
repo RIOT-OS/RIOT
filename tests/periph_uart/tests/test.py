@@ -17,7 +17,7 @@ import random
 import string
 
 from periph_uart_if import PeriphUartIf
-from if_lib import bpt_if
+from testif import bpt_if
 
 
 def kwexpect(val1, val2, level="WARN"):

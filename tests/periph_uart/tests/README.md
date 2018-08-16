@@ -11,8 +11,8 @@ Information for BPT setup can be found [here](https://github.com/MrKevinWeiss/Te
 3. Connect the BPT to the DUT</br>
 (DUT RX/PA12 <=> BPT TX3/PB10)</br>
 (DUT TX/PA11 <=> BPT RX3/PB11)</br>
-4. `test.py` requires the path to `$RIOTBASE/dist/tests` to be added to `PYTHONPATH` environment variable. Either modify `PYTHONPATH` permanently in the `.bashrc` or modify it temporary before invocation:</br>
-`PYTHONPATH=$PYTHONPATH:$RIOTBASE/dist/tests python3 test.py`
+4. `test.py` requires the path to `$RIOTBASE/dist/pythonlibs` to be added to `PYTHONPATH` environment variable. Either modify `PYTHONPATH` permanently in the `.bashrc` or modify it temporary before invocation:</br>
+`PYTHONPATH=$PYTHONPATH:$RIOTBASE/dist/pythonlibs python3 test.py`
 5. Run the `test.py` from the `periph_uart/tests` directory (with various options)</br>
 `python3 test.py` for python 3</br>
 `python3 test.py --log=DEBUG` to see all debug messages</br>

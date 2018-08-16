@@ -15,7 +15,7 @@ import time
 import logging
 
 import periph_i2c_if
-from if_lib import bpt_if
+from testif import bpt_if
 
 BPT_ADDR = 85
 BPT_USER_REG = 152
