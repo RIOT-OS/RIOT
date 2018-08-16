@@ -8,8 +8,9 @@
 
 # Author: Martin Elshuber <martin.elshuber@theobroma-systems.com>
 
-import os
 import sys
+from testrunner import run
+
 
 thread_prio = {
         3:  6,
@@ -45,6 +46,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTTOOLS'], 'testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc))

@@ -7,8 +7,8 @@
 # directory for more details.
 
 import sys
-import os
 import re
+from testrunner import run
 
 
 def testfunc(child):
@@ -66,6 +66,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ["RIOTTOOLS"], "testrunner"))
-    from testrunner import run
     sys.exit(run(testfunc))
