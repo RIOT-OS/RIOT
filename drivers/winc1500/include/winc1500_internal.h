@@ -73,7 +73,7 @@ typedef enum {
     /* From M2M_WIFI_RESP_SCAN_RESULT */
     WINC1500_EVENT_SCAN_RESULT =            (1<<4), /**< Scan result request done */
     /* From M2M_WIFI_RESP_CURRENT_RSSI */
-    WINC1500_EVENT_CURRENT_RSSI =           (1<<5), /**< Request for Current 
+    WINC1500_EVENT_CURRENT_RSSI =           (1<<5), /**< Request for Current
                                                         connected RSSI done */
     /* From M2M_WIFI_RESP_CONN_INFO */
     WINC1500_EVENT_CONN_INFO =              (1<<6) /**< Request for the Connected
