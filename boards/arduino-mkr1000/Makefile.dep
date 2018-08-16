@@ -1,1 +1,5 @@
+ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+  USEPKG += winc1500
+endif
+
 include $(RIOTBOARD)/common/arduino-mkr/Makefile.dep
