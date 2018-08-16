@@ -10,6 +10,10 @@ HEXFILE = $(BINFILE)
 ifneq (,$(DEBUG_ADAPTER_ID))
   EDBG_ARGS += --serial $(DEBUG_ADAPTER_ID)
 endif
+
+# Set offset according to IMAGE_OFFSET if it's defined
+EDBG_ARGS += $(addprefix --offset ,$(IMAGE_OFFSET))
+
 FFLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE) -b -v -p -f $(HEXFILE)
 
 ifeq ($(RIOT_EDBG),$(FLASHER))
