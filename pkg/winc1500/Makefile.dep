@@ -1,0 +1,8 @@
+ifneq (,$(filter winc1500,$(USEPKG)))
+  USEMODULE += winc1500_common
+  USEMODULE += winc1500_bsp
+  USEMODULE += winc1500_bus_wrapper
+  USEMODULE += winc1500_driver
+  USEMODULE += winc1500_socket
+  USEMODULE += winc1500_spi_flash
+endif

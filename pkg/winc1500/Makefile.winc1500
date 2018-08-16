@@ -1,0 +1,12 @@
+WINC1500_SUBDIR = common bsp bus_wrapper driver socket spi_flash
+
+# Include source files in pkg/
+DIRS += $(addprefix , $(addsuffix /source, $(WINC1500_SUBDIR)))
+CFLAGS += -I$(CURDIR)
+
+ifneq (,$(filter netdev_eth,$(USEMODULE)))
+  # In case we use GNRC the ethernet bypass mode should be enabled.
+  CFLAGS += -DETH_MODE
+endif
+
+include $(RIOTBASE)/Makefile.base
