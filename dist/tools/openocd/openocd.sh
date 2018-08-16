@@ -159,6 +159,29 @@ _is_binfile() {
         [[ -z "${firmware_type}" ]] && _has_bin_extension "${firmware}"; }
 }
 
+# Outputs bank info on different lines without the '{}'
+_flash_list() {
+    # Openocd output for 'flash list' is
+    # ....
+    # {name nrf51 base 0 size 0 bus_width 1 chip_width 1} {name nrf51 base 268439552 size 0 bus_width 1 chip_width 1}
+    # ....
+    sh -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
+            -c 'flash list' \
+            -c 'shutdown'" 2>&1 | sed -n '/^{.*}$/ {s/\} /\}\n/g;s/[{}]//g;p}'
+}
+
+# Print flash address for 'bank_num' num defaults to 1
+# _flash_address  [bank_num:1]
+_flash_address() {
+    bank_num=${1:-1}
+
+    # extract 'base' value and print as hexadecimal
+    # name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
+    _flash_list | awk "NR==${bank_num}"'{printf "0x%08x\n", $4}'
+}
+
 #
 # now comes the actual actions
 #
