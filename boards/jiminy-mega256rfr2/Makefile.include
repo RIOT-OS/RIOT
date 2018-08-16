@@ -21,4 +21,8 @@ export BAUD = 38400
 # overridden for debugging (which requires changes that require to use an ISP)
 export PROGRAMMER ?= wiring
 
+# From current fuse configuration
+BOOTLOADER_SIZE ?= 4K
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include
