@@ -178,7 +178,7 @@ do_flash() {
             ${OPENOCD_PRE_FLASH_CMDS} \
             -c 'flash write_image erase \"${IMAGE_FILE}\" ${IMAGE_OFFSET} ${IMAGE_TYPE}' \
             ${OPENOCD_PRE_VERIFY_CMDS} \
-            -c 'verify_image \"${IMAGE_FILE}\"' \
+            -c 'verify_image \"${IMAGE_FILE}\" ${IMAGE_OFFSET}' \
             -c 'reset run' \
             -c 'shutdown'" &&
     echo 'Done flashing'
