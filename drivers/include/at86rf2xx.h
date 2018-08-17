@@ -129,29 +129,24 @@ extern "C" {
 
 /**
  * @name    Internal device option flags
- *
- * `0x00ff` is reserved for general IEEE 802.15.4 flags
- * (see @ref netdev_ieee802154_t)
- *
  * @{
  */
-#define AT86RF2XX_OPT_SRC_ADDR_LONG  (NETDEV_IEEE802154_SRC_MODE_LONG)  /**< legacy define */
-#define AT86RF2XX_OPT_RAWDUMP        (NETDEV_IEEE802154_RAW)            /**< legacy define */
-#define AT86RF2XX_OPT_AUTOACK        (NETDEV_IEEE802154_ACK_REQ)        /**< legacy define */
-#define AT86RF2XX_OPT_ACK_PENDING    (NETDEV_IEEE802154_FRAME_PEND)     /**< legacy define */
-
-#define AT86RF2XX_OPT_CSMA           (0x0100)       /**< CSMA active */
-#define AT86RF2XX_OPT_PROMISCUOUS    (0x0200)       /**< promiscuous mode
+#define AT86RF2XX_OPT_TELL_TX_START  (0x0001)       /**< notify MAC layer on TX
+                                                     *   start */
+#define AT86RF2XX_OPT_TELL_TX_END    (0x0002)       /**< notify MAC layer on TX
+                                                     *   finished */
+#define AT86RF2XX_OPT_TELL_RX_START  (0x0004)       /**< notify MAC layer on RX
+                                                     *   start */
+#define AT86RF2XX_OPT_TELL_RX_END    (0x0008)       /**< notify MAC layer on RX
+                                                     *   finished */
+#define AT86RF2XX_OPT_CSMA           (0x0010)       /**< CSMA active */
+#define AT86RF2XX_OPT_PROMISCUOUS    (0x0020)       /**< promiscuous mode
                                                      *   active */
-#define AT86RF2XX_OPT_PRELOADING     (0x0400)       /**< preloading enabled */
-#define AT86RF2XX_OPT_TELL_TX_START  (0x0800)       /**< notify MAC layer on TX
-                                                     *   start */
-#define AT86RF2XX_OPT_TELL_TX_END    (0x1000)       /**< notify MAC layer on TX
-                                                     *   finished */
-#define AT86RF2XX_OPT_TELL_RX_START  (0x2000)       /**< notify MAC layer on RX
-                                                     *   start */
-#define AT86RF2XX_OPT_TELL_RX_END    (0x4000)       /**< notify MAC layer on RX
-                                                     *   finished */
+#define AT86RF2XX_OPT_PRELOADING     (0x0040)       /**< preloading enabled */
+#define AT86RF2XX_OPT_AUTOACK        (0x0080)       /**< Auto ACK active */
+#define AT86RF2XX_OPT_ACK_PENDING    (0x0100)       /**< ACK frames with data
+                                                     *   pending */
+
 /** @} */
 
 /**
@@ -175,6 +170,7 @@ typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
     /* device specific fields */
     at86rf2xx_params_t params;              /**< parameters for initialization */
+    uint16_t flags;                         /**< Device specific flags */
     uint8_t state;                          /**< current state of the radio */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
 #ifdef MODULE_AT86RF212B

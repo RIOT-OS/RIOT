@@ -119,7 +119,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     }
 
     /* send data out directly if pre-loading id disabled */
-    if (!(dev->netdev.flags & AT86RF2XX_OPT_PRELOADING)) {
+    if (!(dev->flags & AT86RF2XX_OPT_PRELOADING)) {
         at86rf2xx_tx_exec(dev);
     }
     /* return the number of bytes that were actually loaded into the frame
@@ -199,7 +199,7 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
             at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
             break;
         case NETOPT_STATE_TX:
-            if (dev->netdev.flags & AT86RF2XX_OPT_PRELOADING) {
+            if (dev->flags & AT86RF2XX_OPT_PRELOADING) {
                 /* The netdev driver ISR switches the transceiver back to the
                  * previous idle state after a completed TX. If the user tries
                  * to initiate another transmission (retransmitting the same data)
@@ -274,7 +274,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return sizeof(netopt_state_t);
 
         case NETOPT_PRELOADING:
-            if (dev->netdev.flags & AT86RF2XX_OPT_PRELOADING) {
+            if (dev->flags & AT86RF2XX_OPT_PRELOADING) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -283,7 +283,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return sizeof(netopt_enable_t);
 
         case NETOPT_PROMISCUOUSMODE:
-            if (dev->netdev.flags & AT86RF2XX_OPT_PROMISCUOUS) {
+            if (dev->flags & AT86RF2XX_OPT_PROMISCUOUS) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -293,27 +293,27 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_RX_START_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_START);
+                !!(dev->flags & AT86RF2XX_OPT_TELL_RX_START);
             return sizeof(netopt_enable_t);
 
         case NETOPT_RX_END_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END);
+                !!(dev->flags & AT86RF2XX_OPT_TELL_RX_END);
             return sizeof(netopt_enable_t);
 
         case NETOPT_TX_START_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START);
+                !!(dev->flags & AT86RF2XX_OPT_TELL_TX_START);
             return sizeof(netopt_enable_t);
 
         case NETOPT_TX_END_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END);
+                !!(dev->flags & AT86RF2XX_OPT_TELL_TX_END);
             return sizeof(netopt_enable_t);
 
         case NETOPT_CSMA:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_CSMA);
+                !!(dev->flags & AT86RF2XX_OPT_CSMA);
             return sizeof(netopt_enable_t);
 
 /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
@@ -545,7 +545,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_CSMA_RETRIES:
             assert(len <= sizeof(uint8_t));
-            if (!(dev->netdev.flags & AT86RF2XX_OPT_CSMA) ||
+            if (!(dev->flags & AT86RF2XX_OPT_CSMA) ||
                 (*((uint8_t *)val) > 5)) {
                 /* If CSMA is disabled, don't allow setting retries */
                 res = -EINVAL;
@@ -609,7 +609,7 @@ static void _isr(netdev_t *netdev)
         if ((state == AT86RF2XX_STATE_RX_AACK_ON)
             || (state == AT86RF2XX_STATE_BUSY_RX_AACK)) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");
-            if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
+            if (!(dev->flags & AT86RF2XX_OPT_TELL_RX_END)) {
                 return;
             }
             netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
@@ -632,7 +632,7 @@ static void _isr(netdev_t *netdev)
 
             DEBUG("[at86rf2xx] EVT - TX_END\n");
 
-            if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+            if (netdev->event_callback && (dev->flags & AT86RF2XX_OPT_TELL_TX_END)) {
                 switch (trac_status) {
 #ifdef MODULE_OPENTHREAD
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
