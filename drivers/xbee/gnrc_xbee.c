@@ -153,10 +153,10 @@ static int xbee_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
 #ifdef MODULE_NETSTATS_L2
     if (hdr->flags & BCAST) {
-        netif->dev->stats.tx_mcast_count++;
+        netif->stats.tx_mcast_count++;
     }
     else {
-        netif->dev->stats.tx_unicast_count++;
+        netif->stats.tx_unicast_count++;
     }
 #endif
     DEBUG("[xbee-gnrc] send: triggering the drivers send function\n");

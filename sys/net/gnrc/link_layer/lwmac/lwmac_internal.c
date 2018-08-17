@@ -90,10 +90,10 @@ int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #ifdef MODULE_NETSTATS_L2
     if (netif_hdr->flags &
             (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        netif->dev->stats.tx_mcast_count++;
+        netif->stats.tx_mcast_count++;
     }
     else {
-        netif->dev->stats.tx_unicast_count++;
+        netif->stats.tx_unicast_count++;
     }
 #endif
 #ifdef MODULE_GNRC_MAC
