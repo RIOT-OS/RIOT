@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Freie Universität Berlin
+ * Copyright (C) 2015-2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -51,6 +51,11 @@ extern "C" {
 #else
 #define GPIO_PIN(x,y)       ((x & 0) | y)
 #endif
+
+/**
+ * @brief   Override GPIO_UNDEF value
+ */
+#define GPIO_UNDEF          (UINT_MAX)
 
 /**
  * @brief   Generate GPIO mode bitfields
