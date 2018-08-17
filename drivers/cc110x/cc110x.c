@@ -89,10 +89,9 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     luid_get(&addr, 1);
     cc110x_set_address(dev, addr);
 
-    LOG_INFO("cc110x: initialized with address=%u and channel=%i @ %sMHz\n",
+    LOG_INFO("cc110x: initialized with address=%u and channel=%i\n",
             (unsigned)dev->radio_address,
-            dev->radio_channel,
-            cc110x_band_name[dev->params.band]);
+            dev->radio_channel);
 
     return 0;
 }
