@@ -254,10 +254,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
         _continue_reading(dev);
 
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += nread;
-#endif
         return nread;
     }
     else if (nread == -1) {
@@ -284,14 +280,10 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     struct iovec iov[iolist_count(iolist)];
 
     unsigned n;
-    size_t bytes = iolist_to_iovec(iolist, iov, &n);
+    iolist_to_iovec(iolist, iov, &n);
 
     int res = _native_writev(dev->tap_fd, iov, n);
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += bytes;
-#else
-    (void)bytes;
-#endif
+
     if (netdev->event_callback) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     }
@@ -392,9 +384,6 @@ static int _init(netdev_t *netdev)
     native_async_read_setup();
     native_async_read_add_handler(dev->tap_fd, netdev, _tap_isr);
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
     DEBUG("gnrc_tapnet: initialized.\n");
     return 0;
 }

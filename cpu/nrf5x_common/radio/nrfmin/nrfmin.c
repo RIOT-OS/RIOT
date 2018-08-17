@@ -178,9 +178,6 @@ void nrfmin_setup(void)
     nrfmin_dev.driver = &nrfmin_netdev;
     nrfmin_dev.event_callback = NULL;
     nrfmin_dev.context = NULL;
-#ifdef MODULE_NETSTATS_L2
-    memset(&nrfmin_dev.stats, 0, sizeof(netstats_t));;
-#endif
 }
 
 uint16_t nrfmin_get_addr(void)

@@ -103,11 +103,10 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     socket_zep_t *dev = (socket_zep_t *)netdev;
     unsigned n = iolist_count(iolist);
     struct iovec v[n + 2];
-    size_t bytes;
     int res;
 
     assert((dev != NULL) && (dev->sock_fd != 0));
-    bytes = _prep_vector(dev, iolist, n, v);
+    _prep_vector(dev, iolist, n, v);
     DEBUG("socket_zep::send(%p, %p, %u)\n", (void *)netdev, (void *)iolist, n);
     /* simulate TX_STARTED interrupt */
     if (netdev->event_callback) {
@@ -126,11 +125,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         netdev->event_callback(netdev, NETDEV_EVENT_ISR);
         thread_yield();
     }
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += bytes;
-#else
-    (void)bytes;
-#endif
 
     return res - v[0].iov_len - v[n + 1].iov_len;
 }
@@ -258,10 +252,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         }
     }
     _continue_reading(dev);
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += size;
-#endif
+
     return size;
 }
 
@@ -404,9 +395,6 @@ void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
     dev->netdev.short_addr[1] = dev->netdev.long_addr[7];
     native_async_read_setup();
     native_async_read_add_handler(dev->sock_fd, dev, _socket_isr);
-#ifdef MODULE_NETSTATS_L2
-    memset(&dev->netdev.netdev.stats, 0, sizeof(netstats_t));
-#endif
 }
 
 void socket_zep_cleanup(socket_zep_t *dev)

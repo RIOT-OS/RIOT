@@ -299,10 +299,6 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
     /* set last transmission time for timeout handling */
     dev->tx_time = xtimer_now_usec();
 
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += c;
-#endif
-
     mutex_unlock(&dev->lock);
     return c;
 }
@@ -340,10 +336,6 @@ static int nd_recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
           (int)size, (int)next, buf, max_len);
 
     if (buf != NULL) {
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += size;
-#endif
         /* read packet content into the supplied buffer */
         if (size <= max_len) {
             cmd_rbm(dev, (uint8_t *)buf, size);
@@ -454,9 +446,6 @@ static int nd_init(netdev_t *netdev)
     /* allow receiving bytes from now on */
     cmd_bfs(dev, REG_ECON1, -1, ECON1_RXEN);
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
     mutex_unlock(&dev->lock);
     return 0;
 }

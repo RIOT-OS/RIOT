@@ -466,10 +466,6 @@ static int _init(netdev_t *netdev)
 {
     DEBUG("%s: %p\n", __func__, netdev);
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0x00, sizeof(netstats_t));
-#endif
-
     return 0;
 }
 
@@ -542,9 +538,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         while (_esp_now_sending > 0) {
             thread_yield_higher();
         }
-
 #ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_bytes += data_len;
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
 #endif
 
@@ -552,10 +546,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         return data_len;
     } else {
         _esp_now_sending = 0;
-
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_failed++;
-#endif
     }
 
     mutex_unlock(&dev->dev_lock);
@@ -608,12 +598,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         _esp_now_add_peer(mac, esp_now_params.channel, esp_now_params.key);
     }
 #endif
-
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += size;
-#endif
-
     return size;
 }
 
@@ -661,14 +645,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             memcpy(val, dev->addr, sizeof(dev->addr));
             res = sizeof(dev->addr);
             break;
-
-#ifdef MODULE_NETSTATS_L2
-        case NETOPT_STATS:
-            CHECK_PARAM_RET(max_len == sizeof(uintptr_t), -EOVERFLOW);
-            *((netstats_t **)val) = &netdev->stats;
-            res = sizeof(uintptr_t);
-            break;
-#endif
 
         default:
             DEBUG("%s: %s not supported\n", __func__, netopt2str(opt));

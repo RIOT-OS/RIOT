@@ -230,9 +230,6 @@ netdev_t *nrfble_setup(void)
     _nrfble_dev.driver = &netdev_driver;
     _nrfble_dev.event_callback = NULL;
     _nrfble_dev.context = NULL;
-#ifdef MODULE_NETSTATS_L2
-    memset(&_nrfble_dev.stats, 0, sizeof(netstats_t));;
-#endif
     return &_nrfble_dev;
 }
 

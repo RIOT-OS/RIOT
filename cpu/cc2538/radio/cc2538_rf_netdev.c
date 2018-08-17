@@ -283,10 +283,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         rfcore_write_fifo(iol->iol_base, iol->iol_len);
     }
 
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += pkt_len;
-#endif
-
     /* Set first byte of TX FIFO to the packet length */
     rfcore_poke_tx_fifo(0, pkt_len + CC2538_AUTOCRC_LEN);
 
@@ -333,10 +329,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         pkt_len = len;
     }
 
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += pkt_len;
-#endif
     rfcore_read_fifo(buf, pkt_len);
 
     if (info != NULL && RFCORE->XREG_RSSISTATbits.RSSI_VALID) {
@@ -396,10 +388,6 @@ static int _init(netdev_t *netdev)
                           &addr_long, sizeof(addr_long));
 
     cc2538_set_state(dev, NETOPT_STATE_IDLE);
-
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
 
     return 0;
 }
