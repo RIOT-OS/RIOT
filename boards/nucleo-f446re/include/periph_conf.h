@@ -68,20 +68,6 @@ static const uart_conf_t uart_config[] = {
 #endif
     },
     {
-        .dev        = USART3,
-        .rcc_mask   = RCC_APB1ENR_USART3EN,
-        .rx_pin     = GPIO_PIN(PORT_C, 11),
-        .tx_pin     = GPIO_PIN(PORT_C, 10),
-        .rx_af      = GPIO_AF7,
-        .tx_af      = GPIO_AF7,
-        .bus        = APB1,
-        .irqn       = USART3_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 5,
-        .dma_chan   = 4
-#endif
-    },
-    {
         .dev        = USART1,
         .rcc_mask   = RCC_APB2ENR_USART1EN,
         .rx_pin     = GPIO_PIN(PORT_A, 10),
@@ -95,14 +81,28 @@ static const uart_conf_t uart_config[] = {
         .dma_chan   = 4
 #endif
     },
+    {
+        .dev        = USART3,
+        .rcc_mask   = RCC_APB1ENR_USART3EN,
+        .rx_pin     = GPIO_PIN(PORT_C, 11),
+        .tx_pin     = GPIO_PIN(PORT_C, 10),
+        .rx_af      = GPIO_AF7,
+        .tx_af      = GPIO_AF7,
+        .bus        = APB1,
+        .irqn       = USART3_IRQn,
+#ifdef UART_USE_DMA
+        .dma_stream = 5,
+        .dma_chan   = 4
+#endif
+    },
 };
 
 #define UART_0_ISR          (isr_usart2)
 #define UART_0_DMA_ISR      (isr_dma1_stream6)
-#define UART_1_ISR          (isr_usart3)
-#define UART_1_DMA_ISR      (isr_dma1_stream5)
-#define UART_2_ISR          (isr_usart1)
-#define UART_2_DMA_ISR      (isr_dma1_stream4)
+#define UART_1_ISR          (isr_usart1)
+#define UART_1_DMA_ISR      (isr_dma1_stream4)
+#define UART_2_ISR          (isr_usart3)
+#define UART_2_DMA_ISR      (isr_dma1_stream5)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
