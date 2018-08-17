@@ -38,7 +38,9 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#if ENABLE_DEBUG == 1
 static const char *cc110x_band_name[] = { "433", "868", "900" };
+#endif
 
 /* Internal function prototypes */
 #ifndef CC110X_DONT_RESET
@@ -113,7 +115,6 @@ uint8_t cc110x_set_address(cc110x_t *dev, uint8_t address)
 void cc110x_set_band(cc110x_t *dev, cc110x_band_t band)
 {
 #if ENABLE_DEBUG == 1
-
     DEBUG("cc110x_set_band(): Setting band to %sMHz\n", cc110x_band_name[band]);
 #endif
     cc110x_writeburst_reg(dev, CC110X_FREQ2, cc110x_base_freqs[band], 3);

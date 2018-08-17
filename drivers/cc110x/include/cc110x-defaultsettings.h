@@ -34,7 +34,6 @@ extern const char cc110x_default_pa_table[8];
 #endif
 
 extern const char cc110x_base_freqs[3][3];
-extern const char cc110x_channel_widths[3][2];
 
 #ifdef __cplusplus
 }
