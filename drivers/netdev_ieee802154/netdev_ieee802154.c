@@ -143,13 +143,6 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
         case NETOPT_IPV6_IID:
             res = _get_iid(dev, value, max_len);
             break;
-#ifdef MODULE_NETSTATS_L2
-        case NETOPT_STATS:
-            assert(max_len == sizeof(uintptr_t));
-            *((netstats_t **)value) = &dev->netdev.stats;
-            res = sizeof(uintptr_t);
-            break;
-#endif
 #ifdef MODULE_L2FILTER
         case NETOPT_L2FILTER:
             assert(max_len >= sizeof(l2filter_t **));
