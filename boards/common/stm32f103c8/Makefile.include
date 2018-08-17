@@ -23,7 +23,9 @@ ifeq ($(PROGRAMMER),dfu-util)
   export RESET = # dfu-util has no support for resetting the device
 
   HEXFILE = $(BINFILE)
-  export FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D "$(HEXFILE)"
+  export FFLAGS = -d 1eaf:0003 -a 2 -D "$(HEXFILE)"
+  # for older bootloader versions use this:
+  #export FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D "$(HEXFILE)"
 else
 
   # this board uses openocd by default
