@@ -321,7 +321,7 @@ bool _check_4packet(uint32_t src, uint32_t dst, uint8_t proto,
                     void *data, size_t data_len, uint16_t netif)
 {
 #if LWIP_IPV4
-    msg_t msg;
+    msg_t msg = { .content = { .value = 0 } };
 
     (void)netif;
     while (data_len != (msg.content.value - sizeof(struct ip_hdr))) {
@@ -349,7 +349,7 @@ bool _check_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
                     uint8_t proto, void *data, size_t data_len, uint16_t netif)
 {
 #if LWIP_IPV6
-    msg_t msg;
+    msg_t msg = { .content = { .value = 0 } };
 
     (void)netif;
     while (data_len != (msg.content.value - sizeof(ipv6_hdr_t))) {
