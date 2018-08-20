@@ -24,11 +24,14 @@
 #include "saul/periph.h"
 #include "phydat.h"
 #include "periph/adc.h"
+#if MODULE_ANALOG_UTIL
+#include "analog_util.h"
+#endif
 
-
+/* Unscaled version of sampling driver */
 static int read_adc(const void *dev, phydat_t *res)
 {
-    const saul_adc_params_t *params = *((const saul_adc_params_t **)dev);
+    const saul_adc_params_t *params = (const saul_adc_params_t *)dev;
     res->val[0] = adc_sample(params->line, params->res);
     memset(&(res->val[1]), 0, 2 * sizeof(res->val[1]));
     /* Raw ADC reading has no unit */
@@ -42,3 +45,31 @@ const saul_driver_t adc_saul_driver = {
     .write = saul_notsup,
     .type = SAUL_SENSE_ANALOG,
 };
+
+/* Scaling version of sampling driver */
+#if MODULE_ANALOG_UTIL
+static int read_adc_scaled(const void *dev, phydat_t *res)
+{
+    const saul_adc_params_t *params = (const saul_adc_params_t *)dev;
+    int raw = adc_sample(params->line, params->res);
+    int32_t value = adc_util_map(raw, params->res, params->val_min, params->val_max);
+    res->val[0] = value;
+    memset(&(res->val[1]), 0, 2 * sizeof(res->val[1]));
+    res->unit = params->unit;
+    res->scale = params->scale;
+    return 1;
+}
+
+/**
+ * @brief   SAUL driver template
+ */
+#define ADC_SAUL_DRIVER_INSTANCE(saul_type, name) \
+    const saul_driver_t adc_saul_ ## name ## _driver = { \
+    .read = read_adc_scaled, \
+    .write = saul_notsup, \
+    .type = saul_type, \
+}
+
+ADC_SAUL_DRIVER_INSTANCE(SAUL_SENSE_TEMP, temp);
+ADC_SAUL_DRIVER_INSTANCE(SAUL_SENSE_ANALOG, analog);
+#endif

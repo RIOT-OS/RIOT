@@ -33,34 +33,57 @@
 #define SAUL_ADC_NUMOF    (sizeof(saul_adc_params)/sizeof(saul_adc_params[0]))
 
 /**
- * @brief   Allocate memory for pointers to the ADC parameter structs
- *
- * We use this extra level of indirection to be able to keep the saul_adc_params
- * array const and residing in ROM.
- */
-static const saul_adc_params_t *saul_adcs[SAUL_ADC_NUMOF];
-
-/**
  * @brief   Memory for the registry entries
  */
 static saul_reg_t saul_reg_entries[SAUL_ADC_NUMOF];
 
 /**
- * @brief   Reference the driver struct
+ * @name    driver struct references
+ * @{
  */
 extern saul_driver_t adc_saul_driver;
+#if MODULE_ANALOG_UTIL
+extern saul_driver_t adc_saul_temp_driver;
+extern saul_driver_t adc_saul_analog_driver;
+#endif /* MODULE_ANALOG_UTIL */
+/** @} */
 
 void auto_init_adc(void)
 {
     for (unsigned i = 0; i < SAUL_ADC_NUMOF; i++) {
         const saul_adc_params_t *p = &saul_adc_params[i];
-        saul_adcs[i] = p;
 
         LOG_DEBUG("[auto_init_saul] initializing direct ADC #%u\n", i);
 
-        saul_reg_entries[i].dev = &saul_adcs[i];
+        /* discarding const qualifier of target type, the driver must only use
+         * it as if it is const though. */
+        saul_reg_entries[i].dev = (void *)p;
         saul_reg_entries[i].name = p->name;
+#if MODULE_ANALOG_UTIL
+        if (p->val_min != p->val_max) {
+            /* Apply scaling */
+            switch (p->unit) {
+                /* Pick the correct sensor type based on the unit */
+                case UNIT_TEMP_C:
+                case UNIT_TEMP_F:
+                case UNIT_TEMP_K:
+                    saul_reg_entries[i].driver = &adc_saul_temp_driver;
+                    break;
+                case UNIT_A:
+                case UNIT_V:
+                default:
+                    /* Fall back: use sensor type SAUL_SENSE_ANALOG */
+                    saul_reg_entries[i].driver = &adc_saul_analog_driver;
+                    break;
+            }
+        }
+        else {
+            /* Unscaled raw values */
+            saul_reg_entries[i].driver = &adc_saul_driver;
+        }
+#else /* MODULE_ANALOG_UTIL */
         saul_reg_entries[i].driver = &adc_saul_driver;
+#endif /* MODULE_ANALOG_UTIL */
         /* initialize the ADC line */
         adc_init(p->line);
         /* add to registry */

@@ -60,6 +60,10 @@ typedef struct {
     const char *name;       /**< name of the device connected to this pin */
     adc_t line;             /**< ADC line to initialize and expose */
     adc_res_t res;          /**< ADC resolution */
+    int32_t val_min;        /**< value corresponding to an ADC raw value of 0 */
+    int32_t val_max;        /**< value corresponding to the maximum ADC reading */
+    uint8_t unit;           /**< phydat unit */
+    int8_t  scale;          /**< phydat scale */
 } saul_adc_params_t;
 #endif /* MODULE_SAUL_ADC */
 
