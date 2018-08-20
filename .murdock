@@ -155,7 +155,7 @@ compile() {
 
     # compile
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
-        make -C${appdir} clean all -j${JOBS:-4}
+        make --output-sync=target -C${appdir} clean all -j${JOBS:-4}
     RES=$?
 
     # run tests
