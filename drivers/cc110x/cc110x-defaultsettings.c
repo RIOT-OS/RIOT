@@ -70,7 +70,7 @@ const char cc110x_default_conf[] = {
     0x45, /* PKTCTRL0 (variable packet length) */
     0xFF, /* ADDR */
     0x00, /* CHANNR */
-    /* Intermediate frequency: 0x0f * 26MHz / 1024 = 380.9kHz */
+    /* Intermediate frequency: 0x0F * 26MHz / 1024 = 380.9kHz */
     0x0F, /* FSCTRL1 */
     0x00, /* FSCTRL0 */
     /* 0x21717a * 26MHz / 65536 = 869.5250 MHz base frequency */
@@ -85,6 +85,7 @@ const char cc110x_default_conf[] = {
     /* FEC enabled, 8 preamble bytes, 25.39 kHz channel width */
     0xC0, /* MDMCFG1 */
     0x00, /* MDMCFG0 */
+    /* Deviation: +- 38.09kHz in 2-FSK/4-FSK/GFSK */
     0x44, /* DEVIATN */
     0x07, /* MCSM2 */
     0x03, /* MCSM1 */
