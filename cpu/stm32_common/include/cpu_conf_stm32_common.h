@@ -31,6 +31,14 @@ extern "C" {
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4)
 
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#define I2C_CLOCK_SRC_REG (RCC->CFGR3)
+#elif defined(CPU_FAM_STM32L4)
+#define I2C_CLOCK_SRC_REG (RCC->CCIPR)
+#elif defined(CPU_FAM_STM32F7)
+#define I2C_CLOCK_SRC_REG (RCC->DCKCFGR2)
+#endif
+
 /**
  * @brief   Timing register settings
  *

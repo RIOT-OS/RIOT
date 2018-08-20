@@ -82,9 +82,10 @@ void i2c_init(i2c_t dev)
     NVIC_SetPriority(i2c_config[dev].irqn, I2C_IRQ_PRIO);
     NVIC_EnableIRQ(i2c_config[dev].irqn);
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
-    /* Set I2CSW bits to enable I2C clock source */
-    RCC->CFGR3 |= i2c_config[dev].rcc_sw_mask;
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
+    /* select I2C clock source */
+    I2C_CLOCK_SRC_REG |= i2c_config[dev].rcc_sw_mask;
 #endif
 
     DEBUG("[i2c] init: configuring pins\n");
