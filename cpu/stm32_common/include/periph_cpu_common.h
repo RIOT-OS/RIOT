@@ -416,7 +416,8 @@ typedef struct {
 #endif
     uint8_t bus;            /**< APB bus */
     uint32_t rcc_mask;      /**< bit in clock enable register */
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
     uint32_t rcc_sw_mask;   /**< bit to switch I2C clock */
 #endif
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
