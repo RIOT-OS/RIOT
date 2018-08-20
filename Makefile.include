@@ -186,6 +186,11 @@ ifeq (,$(UNZIP_HERE))
   endif
 endif
 
+# Tool saving stdin to a file only on content update.
+# It keeps the file timestamp if it would end up the same.
+LAZYSPONGE ?= $(RIOTTOOLS)/lazysponge/lazysponge.py
+LAZYSPONGE_FLAGS ?= $(if $(filter 1,$(QUIET)),,--verbose)
+
 ifeq (, $(APPLICATION))
     $(error An application name must be specified as APPLICATION.)
 endif
@@ -675,7 +680,8 @@ include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 # The script will only touch the file if anything has changed since last time.
 $(RIOTBUILD_CONFIG_HEADER_C): FORCE
 	@mkdir -p '$(dir $@)'
-	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' '$@' $(CFLAGS_WITH_MACROS)
+	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' $(CFLAGS_WITH_MACROS) \
+		| '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
 
 CFLAGS_WITH_MACROS := $(CFLAGS)
 
