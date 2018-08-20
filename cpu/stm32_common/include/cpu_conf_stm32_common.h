@@ -45,8 +45,7 @@ extern "C" {
  * @ref i2c_timing_param_t
  */
 static const i2c_timing_param_t timing_params[] = {
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32F7)
+#if defined(CPU_FAM_STM32F0)
     [ I2C_SPEED_NORMAL ]    = {
         .presc  = 0xB,
         .scll   = 0x13,     /* t_SCLL   = 5.0us  */
@@ -67,6 +66,28 @@ static const i2c_timing_param_t timing_params[] = {
         .sclh =   0x1,      /* t_SCLH   = 250ns */
         .sdadel = 0x0,      /* t_SDADEL = 0ns   */
         .scldel = 0x1,      /* t_SCLDEL = 250ns */
+    }
+#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
+    [ I2C_SPEED_NORMAL ]    = {
+        .presc  = 3,
+        .scll   = 0x13,     /* t_SCLL   = 5.0us  */
+        .sclh   = 0xF,      /* t_SCLH   = 4.0us  */
+        .sdadel = 0x2,      /* t_SDADEL = 500ns  */
+        .scldel = 0x4,      /* t_SCLDEL = 1250ns */
+    },
+    [ I2C_SPEED_FAST ]      = {
+        .presc  = 1,
+        .scll   = 0x9,      /* t_SCLL   = 1250ns */
+        .sclh   = 0x3,      /* t_SCLH   = 500ns  */
+        .sdadel = 0x2,      /* t_SDADEL = 250ns  */
+        .scldel = 0x3,      /* t_SCLDEL = 500ns  */
+    },
+    [ I2C_SPEED_FAST_PLUS ] = {
+        .presc =  0,
+        .scll =   0x4,      /* t_SCLL   = 312.5ns */
+        .sclh =   0x2,      /* t_SCLH   = 187.5ns */
+        .sdadel = 0x0,      /* t_SDADEL = 0ns     */
+        .scldel = 0x2,      /* t_SCLDEL = 187.5ns */
     }
 #elif defined(CPU_FAM_STM32F3)
     [ I2C_SPEED_NORMAL ]    = {
