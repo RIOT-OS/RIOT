@@ -32,43 +32,38 @@ extern "C" {
 static const  saul_adc_params_t saul_adc_params[] =
 {
     {
-        .name = "coretemp",
+        .name = "ADC0_DP-DM",
         .line = ADC_LINE(0),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "corebandgap",
+        .name = "ADC0_DP",
         .line = ADC_LINE(1),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "corevrefh",
+        .name = "PTB2",
         .line = ADC_LINE(2),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "corevrefl",
+        .name = "PTB3",
         .line = ADC_LINE(3),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "dcdcvbat",
+        .name = "coretemp",
         .line = ADC_LINE(4),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "ADC0_DP-DM",
+        .name = "corebandgap",
         .line = ADC_LINE(5),
         .res  = ADC_RES_16BIT,
     },
     {
-        .name = "ADC0_SE2",
+        .name = "dcdcvbat",
         .line = ADC_LINE(6),
-        .res  = ADC_RES_16BIT,
-    },
-    {
-        .name = "ADC0_SE3",
-        .line = ADC_LINE(7),
         .res  = ADC_RES_16BIT,
     },
 };
