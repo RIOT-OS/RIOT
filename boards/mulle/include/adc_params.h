@@ -32,9 +32,16 @@ extern "C" {
 static const  saul_adc_params_t saul_adc_params[] =
 {
     {
-        .name = "k60temp",
-        .line = ADC_LINE(0),
-        .res  = ADC_RES_16BIT,
+        .name = "coretemp", .line = ADC_LINE(0), .res  = ADC_RES_16BIT,
+        .unit = UNIT_TEMP_C, .scale = -1,
+        /* Scaling the temperature sensor voltage to units of 0.1 Celsius, this
+         * depends on several numbers found in the data sheet as well as the
+         * analog reference voltage (VREFH), which is 3.3 V on FRDM-K64F.
+         * These numbers yield a full range of -1570..466 Cel, which is
+         * unrealistic, but because of the physical limits, the sensor will ever
+         * only use a small range of that interval. */
+        .val_min = (int32_t)(250 - ((   0 - 716) / 1.62) * 10),
+        .val_max = (int32_t)(250 - ((3300 - 716) / 1.62) * 10),
     },
     {
         .name = "k60vrefsh",
@@ -65,11 +72,17 @@ static const  saul_adc_params_t saul_adc_params[] =
         .name = "Vbat",
         .line = MULLE_VBAT_ADC_LINE,
         .res  = ADC_RES_16BIT,
+        .unit = UNIT_V, .scale = -3,
+        .val_min = 0,
+        .val_max = (3300 * 2), /* Compensate for the ADC input connected to Vbat/2 */
     },
     {
         .name = "Vchr",
         .line = MULLE_VCHR_ADC_LINE,
         .res  = ADC_RES_16BIT,
+        .unit = UNIT_V, .scale = -3,
+        .val_min = 0,
+        .val_max = (3300 * 2), /* Compensate for the ADC input connected to Vchr/2 */
     },
     {
         .name = "PGA0_DP",
