@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Freie Universität Berlin
+ * Copyright (C) 2016-2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -107,6 +107,19 @@ static const i2c_conf_t i2c_config[] = {
 };
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
 /** @} */
+
+#if defined(BOARD_NRF52DK) || defined(BOARD_NRF52840DK)
+/**
+ * @name   PWM configuration
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    { NRF_PWM0, { 28, 29, 30, 31 } }
+};
+#define PWM_NUMOF           (sizeof(pwm_config) / sizeof(pwm_config[0]))
+/** @} */
+
+#endif
 
 #ifdef __cplusplus
 }
