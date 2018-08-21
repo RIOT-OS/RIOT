@@ -3,7 +3,7 @@
         info-features-provided info-features-required \
         info-features-used \
         info-debug-variable-% info-toolchains-supported \
-        check-toolchain-supported
+        info-sizebars check-toolchain-supported
 
 info-objsize:
 	@case "$(SORTROW)" in \
@@ -22,6 +22,9 @@ info-objsize:
 
 info-buildsize:
 	@$(SIZE) -d -B $(ELFFILE) || echo ''
+
+info-sizebars:
+	@$(RIOTTOOLS)/sizebars.py --cmd $(SIZE) $(SIZEBAR_FLAGS) $(ELFFILE)
 
 info-build:
 	@echo 'APPLICATION: $(APPLICATION)'

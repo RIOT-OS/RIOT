@@ -407,7 +407,7 @@ include $(RIOTMAKE)/modules.inc.mk
 
 
 .PHONY: all link clean flash flash-only termdeps term doc debug debug-server reset objdump help info-modules
-.PHONY: print-size elffile binfile hexfile flashfile
+.PHONY: print-size print-sizebars elffile binfile hexfile flashfile
 .PHONY: ..in-docker-container
 
 # Targets that depend on FORCE will always be rebuilt. Contrary to a .PHONY
@@ -492,6 +492,19 @@ $(_SUBMAKE_LIBS): $(BINDIR)/$(APPLICATION_MODULE).a pkg-build
 # 'print-size' triggers a rebuild. Use 'info-buildsize' if you do not need to rebuild.
 print-size: $(ELFFILE)
 	$(Q)$(SIZE) $(SIZEFLAGS) $<
+
+ifneq (,$(ROM_LEN))
+  SIZEBAR_FLAGS += --rom $(ROM_LEN)
+endif
+ifneq (,$(BOOTLOADER_SIZE))
+  SIZEBAR_FLAGS += --bootloader_size $(BOOTLOADER_SIZE)
+endif
+ifneq (,$(RAM_LEN))
+  SIZEBAR_FLAGS += --ram $(RAM_LEN)
+endif
+
+print-sizebars: $(ELFFILE)
+	@$(RIOTTOOLS)/sizebars.py --cmd $(SIZE) $(SIZEBAR_FLAGS) $(ELFFILE)
 
 %.hex: %.elf
 	$(Q)$(OBJCOPY) $(OFLAGS) -Oihex $< $@
