@@ -34,6 +34,7 @@
 #include <errno.h>
 
 #include "cpu.h"
+#include "stmclk.h"
 #include "mutex.h"
 
 #include "cpu_conf_stm32_common.h"
@@ -89,6 +90,10 @@ void i2c_init(i2c_t dev)
 
     NVIC_SetPriority(i2c_config[dev].irqn, I2C_IRQ_PRIO);
     NVIC_EnableIRQ(i2c_config[dev].irqn);
+
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
+    stmclk_enable_hsi();
+#endif
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7)
