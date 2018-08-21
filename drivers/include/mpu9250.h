@@ -48,6 +48,14 @@ extern "C" {
  */
 #define MPU9250_INT_EN_CFG          (0x12)
 #define MPU9250_INT_EN              (0x01)
+#define MPU9250_INT_WOM				(0x40)
+
+ /**
+ * @name    Interrupt status register macros
+ * @{
+ */
+#define MPU9250_INT_STATUS_RAW      (0x01)
+#define MPU9250_INT_STATUS_WOM      (0x40)
 
 /** @} */
 
@@ -57,6 +65,7 @@ extern "C" {
  */
 #define MPU9250_PWR_WAKEUP          (0x00)
 #define MPU9250_PWR_PLL             (0x01)
+#define MPU9250_PWR_CYCLE			(0x20)
 #define MPU9250_PWR_RESET           (0x80)
 /** @} */
 
@@ -87,6 +96,14 @@ extern "C" {
 #define MPU9250_COMP_SELF_TEST      (0x08)
 #define MPU9250_COMP_FUSE_ROM       (0x0F)
 #define MPU9250_COMP_WHOAMI_ANSWER  (0x48)
+/** @} */
+
+/**
+* @name    MPU-9250 Wake on Motion reg values
+* @{
+*/
+#define MPU9250_ACCEL_CFG_WOM		(0x09)
+#define MPU9250_ACCEL_INTEL_CFG		(0xC0)
 /** @} */
 
 /**
@@ -148,6 +165,23 @@ typedef enum {
 } mpu9250_lpf_t;
 
 /**
+* @brief   Possible low power wake up freguency values
+*/
+typedef enum {
+	MPU9250_WOM_0_24HZ = 0x00,
+	MPU9250_WOM_0_49HZ = 0x01,
+	MPU9250_WOM_0_98HZ = 0x02,
+	MPU9250_WOM_1_95HZ = 0x03,
+	MPU9250_WOM_3_91HZ = 0x04,
+	MPU9250_WOM_7_81HZ = 0x05,
+	MPU9250_WOM_15_63HZ = 0x06,
+	MPU9250_WOM_31_25HZ = 0x07,
+	MPU9250_WOM_62_50HZ = 0x08,
+	MPU9250_WOM_125HZ = 0x09,
+	MPU9250_WOM_250HZ = 0x0A,
+	MPU9250_WOM_500HZ = 0x0B,
+} mpu9250_wom_lp_t;
+/**
  * @brief   MPU-9250 result vector struct
  */
 typedef struct {
@@ -155,6 +189,15 @@ typedef struct {
     int16_t y_axis;             /**< Y-Axis measurement result */
     int16_t z_axis;             /**< Z-Axis measurement result */
 } mpu9250_results_t;
+
+/**
+* @brief   MPU-9250 interrupt result vector struct
+*/
+typedef struct {
+	uint8_t wom;				/**< 0 if no wom interrupt, 1 otherwise */
+	uint8_t raw;				/**< 0 if no raw data, 1 otherwise */
+
+} mpu9250_int_results_t;
 
 /**
  * @brief   Configuration struct for the MPU-9250 sensor
@@ -200,6 +243,13 @@ typedef struct {
  * @return                  -1 if given I2C is not enabled in board config
  */
 int mpu9250_init(mpu9250_t *dev, const mpu9250_params_t *params);
+
+/**
+* @brief   Reset and reinitialize the given MPU9250 device
+*
+* @param[out] dev          Initialized device descriptor of MPU9250 device
+*/
+int mpu9250_reset_and_init(mpu9250_t *dev);
 
 /**
  * @brief   Enable or disable accelerometer power
@@ -350,17 +400,39 @@ int mpu9250_set_sample_rate(mpu9250_t *dev, uint16_t rate);
  */
 int mpu9250_set_compass_sample_rate(mpu9250_t *dev, uint8_t rate);
 
-/*
+/**
  * @brief   Enable or disable mpu9250 interrupt pin.
  *
  * @param[in] dev           Device descriptor of MPU9250 device
  * @param[in] enable        1 to enable interrupts, 0 to disable
  *
  * @return                  0 on success
- * @return                  -1 on failure
+ * @return                  -1 on if device's I2C is not enabled in board config
  */
 int mpu9250_set_interrupt(mpu9250_t *dev, uint8_t enable);
 
+/**
+ * @brief   Enables wake on motion for the MPU.
+ *
+ * @param[in] dev           Device descriptor of MPU9250 device
+ * @param[in] wom_threshold Value between 0 and 255 that defines WoM threshold
+ * @param[in] wake_up_freq  Enum that defines WoM low power wake up frequency
+ *
+ * @return                  0 on success
+ * @return                  -1 on if device's I2C is not enabled in board config
+ */
+int mpu9250_enable_wom(mpu9250_t *dev, uint8_t wom_threshold, mpu9250_wom_lp_t wake_up_freq);
+
+/**
+ * @brief   Reads the interrupt status register.
+ *
+ * @param[in] dev           Device descriptor of MPU9250 device
+ * @param[in] status		Pointer to a interrupt status structure
+ *
+ * @return                  0 on success
+ * @return                  -1 on if device's I2C is not enabled in board config
+ */
+int mpu9250_read_int_status(mpu9250_t *dev, mpu9250_int_results_t *status);
 #ifdef __cplusplus
 }
 #endif

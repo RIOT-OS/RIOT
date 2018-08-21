@@ -21,7 +21,7 @@
  *
  * @}
  */
-
+#include <string.h>
 #include "mpu9250.h"
 #include "mpu9250-regs.h"
 #include "periph/i2c.h"
@@ -64,8 +64,6 @@ int mpu9250_init(mpu9250_t *dev, const mpu9250_params_t *params)
 {
     dev->params = *params;
 
-    uint8_t temp;
-
     dev->conf = DEFAULT_STATUS;
 
     /* Initialize I2C interface */
@@ -73,46 +71,53 @@ int mpu9250_init(mpu9250_t *dev, const mpu9250_params_t *params)
         DEBUG("[Error] I2C device not enabled\n");
         return -1;
     }
+	/* Perform the MPU initialization */
+	int retval = mpu9250_reset_and_init(dev);
 
-    /* Acquire exclusive access */
-    i2c_acquire(DEV_I2C);
+    return retval;
+}
 
-    /* Reset MPU9250 registers and afterwards wake up the chip */
-    i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_1_REG, MPU9250_PWR_RESET);
-    xtimer_usleep(MPU9250_RESET_SLEEP_US);
-    i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_1_REG, MPU9250_PWR_WAKEUP);
+int mpu9250_reset_and_init(mpu9250_t *dev)
+{
+	uint8_t temp;
 
-    /* Release the bus, it is acquired again inside each function */
-    i2c_release(DEV_I2C);
+	/* Acquire exclusive access */
+	i2c_acquire(DEV_I2C);
 
-    /* Set default full scale ranges and sample rate */
-    mpu9250_set_gyro_fsr(dev, MPU9250_GYRO_FSR_2000DPS);
-    mpu9250_set_accel_fsr(dev, MPU9250_ACCEL_FSR_2G);
-    mpu9250_set_sample_rate(dev, dev->params.sample_rate);
+	/* Reset MPU9250 registers and afterwards wake up the chip */
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_1_REG, MPU9250_PWR_RESET);
+	xtimer_usleep(MPU9250_RESET_SLEEP_US);
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_1_REG, MPU9250_PWR_WAKEUP);
 
-    /* Disable interrupt generation */
-    i2c_acquire(DEV_I2C);
-    i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_INT_ENABLE_REG, REG_RESET);
+	/* Release the bus, it is acquired again inside each function */
+	i2c_release(DEV_I2C);
 
+	/* Set default full scale ranges and sample rate */
+	mpu9250_set_gyro_fsr(dev, MPU9250_GYRO_FSR_2000DPS);
+	mpu9250_set_accel_fsr(dev, MPU9250_ACCEL_FSR_2G);
+	mpu9250_set_sample_rate(dev, dev->params.sample_rate);
 
-    /* Initialize magnetometer */
-    if (compass_init(dev)) {
-        i2c_release(DEV_I2C);
-        return -2;
-    }
-    /* Release the bus, it is acquired again inside each function */
-    i2c_release(DEV_I2C);
-    mpu9250_set_compass_sample_rate(dev, 10);
-    /* Enable all sensors */
-    i2c_acquire(DEV_I2C);
-    i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_1_REG, MPU9250_PWR_PLL);
-    i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_2_REG, &temp);
-    temp &= ~(MPU9250_PWR_ACCEL | MPU9250_PWR_GYRO);
-    i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_2_REG, temp);
-    i2c_release(DEV_I2C);
-    xtimer_usleep(MPU9250_PWR_CHANGE_SLEEP_US);
+	/* Disable interrupt generation */
+	i2c_acquire(DEV_I2C);
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_INT_ENABLE_REG, REG_RESET);
 
-    return 0;
+	/* Initialize magnetometer */
+	if (compass_init(dev)) {
+		i2c_release(DEV_I2C);
+		return -2;
+	}
+	/* Release the bus, it is acquired again inside each function */
+	i2c_release(DEV_I2C);
+	mpu9250_set_compass_sample_rate(dev, 10);
+	/* Enable all sensors */
+	i2c_acquire(DEV_I2C);
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_1_REG, MPU9250_PWR_PLL);
+	i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_2_REG, &temp);
+	temp &= ~(MPU9250_PWR_ACCEL | MPU9250_PWR_GYRO);
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_2_REG, temp);
+	i2c_release(DEV_I2C);
+	xtimer_usleep(MPU9250_PWR_CHANGE_SLEEP_US);
+	return 0;
 }
 
 int mpu9250_set_accel_power(mpu9250_t *dev, mpu9250_pwr_t pwr_conf)
@@ -496,10 +501,62 @@ int mpu9250_set_compass_sample_rate(mpu9250_t *dev, uint8_t rate)
     return 0;
 }
 
+int mpu9250_enable_wom(mpu9250_t *dev, uint8_t wom_threshold, mpu9250_wom_lp_t wake_up_freq)
+{
+	uint8_t temp;
+
+	if (i2c_acquire(DEV_I2C)) {
+		return -1;
+	}
+	/* Step 1: Turn off compass */
+	/* Enable Bypass Mode to speak to compass directly */
+	conf_bypass(dev, 1);
+	i2c_write_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_CNTL_REG, MPU9250_COMP_POWER_DOWN);
+	//xtimer_usleep(MPU9250_COMP_MODE_SLEEP_US);
+	conf_bypass(dev, 0);
+
+	/* Step 2: Reset MPU */
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_1_REG, MPU9250_PWR_RESET);
+	xtimer_usleep(MPU9250_RESET_SLEEP_US);
+
+	/* Step 2: Turn on MPU */
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_1_REG, MPU9250_PWR_WAKEUP);
+	
+	/* Step 3: Enable accelerometer, disable gyro */
+	i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_2_REG, &temp);
+	temp &= ~(MPU9250_PWR_ACCEL | (~MPU9250_PWR_GYRO));
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_2_REG, temp);
+
+	/* Step 4: Set accel bandwidth to 184 and fchoice_b to 1 */
+	i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9250_ACCEL_CFG_REG2, &temp);
+	temp &= ~0x0F;
+	temp |= MPU9250_ACCEL_CFG_WOM;
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_ACCEL_CFG_REG2, temp);
+	
+	/* Step 5: Enable WoM interrupt */
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_INT_ENABLE_REG, MPU9250_INT_WOM);
+
+	/* Step 6: Enable Accel Hardware Intelligence */
+	i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9250_MOT_DETECT_CTRL_REG, &temp);
+	temp &= ~MPU9250_ACCEL_INTEL_CFG;
+	temp |= MPU9250_ACCEL_INTEL_CFG;
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_MOT_DETECT_CTRL_REG, temp);
+
+	/* Step 7: Set WoM threshold */
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_WOM_THR_REG, wom_threshold);
+
+	/* Step 8: Set wake-up frequency */
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_LP_ACCEL_ODR_REG, wake_up_freq);
+
+	/* Step 9: */
+	i2c_write_reg(DEV_I2C, DEV_ADDR, MPU9250_PWR_MGMT_1_REG, MPU9250_PWR_CYCLE);
+
+	i2c_release(DEV_I2C);
+	return 0;
+}
+
 int mpu9250_set_interrupt(mpu9250_t *dev, uint8_t enable)
 {
-    if (enable != 0 && enable != 1)
-        return -1;
     if (i2c_acquire(DEV_I2C)) {
         return -1;
     }
@@ -518,9 +575,28 @@ int mpu9250_set_interrupt(mpu9250_t *dev, uint8_t enable)
     }
 }
 
+int mpu9250_read_int_status(mpu9250_t *dev, mpu9250_int_results_t *status)
+{
+	memset(status, 0, sizeof(mpu9250_int_results_t));
+	if (i2c_acquire(DEV_I2C)) {
+		return -1;
+	}
+    uint8_t temp;
+	i2c_read_reg(DEV_I2C, DEV_ADDR, MPU9250_INT_STATUS_REG, &temp);
+	if (temp & MPU9250_INT_STATUS_WOM) {
+		status->wom = 1;
+	}
+	if (temp & MPU9250_INT_STATUS_RAW) {
+		status->raw = 1;
+	}
+	i2c_release(DEV_I2C);
+	return 0;
+}
+
 /*------------------------------------------------------------------------------------*/
 /*                                Internal functions                                  */
 /*------------------------------------------------------------------------------------*/
+
 
 /**
  * Initialize compass
