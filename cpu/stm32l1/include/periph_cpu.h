@@ -73,6 +73,18 @@ typedef enum {
 } adc_res_t;
 /** @} */
 
+/**
+ * @name    EEPROM configuration
+ * @{
+ */
+#define EEPROM_START_ADDR          (0x08080000)
+#if defined(CPU_MODEL_STM32L152RE)
+#define EEPROM_SIZE                (16384UL)  /* 16kB */
+#elif defined(CPU_MODEL_STM32L151RC)
+#define EEPROM_SIZE                (8192U)    /* 8kB */
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

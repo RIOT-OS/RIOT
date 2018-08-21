@@ -77,6 +77,13 @@ enum {
 #endif
 /** @}*/
 
+/**
+ * @name    EEPROM configuration
+ * @{
+ */
+#define EEPROM_SIZE                (8192U)  /* 8kB */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

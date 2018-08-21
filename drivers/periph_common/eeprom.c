@@ -19,7 +19,8 @@
  */
 
 #include <string.h>
-#include "cpu.h"
+
+#include "periph_cpu.h"
 #include "assert.h"
 
 /* guard this file, must be done before including periph/eeprom.h */
