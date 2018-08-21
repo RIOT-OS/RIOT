@@ -54,6 +54,14 @@
 #define CLEAR_FLAG              (I2C_ICR_NACKCF | I2C_ICR_ARLOCF | I2C_ICR_BERRCF)
 #define ERROR_FLAG              (I2C_ISR_NACKF | I2C_ISR_ARLO | I2C_ISR_BERR)
 
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
+#define I2C_CLOCK_SRC_REG       (RCC->CFGR3)
+#elif defined(CPU_FAM_STM32L4)
+#define I2C_CLOCK_SRC_REG       (RCC->CCIPR)
+#elif defined(CPU_FAM_STM32F7)
+#define I2C_CLOCK_SRC_REG       (RCC->DCKCFGR2)
+#endif
+
 /* static function definitions */
 static inline void _i2c_init(I2C_TypeDef *i2c, uint32_t timing);
 static inline int _start(I2C_TypeDef *dev, uint16_t address, size_t length,
