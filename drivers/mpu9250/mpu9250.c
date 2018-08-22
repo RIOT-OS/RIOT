@@ -512,7 +512,7 @@ int mpu9250_enable_wom(mpu9250_t *dev, uint8_t wom_threshold, mpu9250_wom_lp_t w
 	/* Enable Bypass Mode to speak to compass directly */
 	conf_bypass(dev, 1);
 	i2c_write_reg(DEV_I2C, DEV_COMP_ADDR, COMPASS_CNTL_REG, MPU9250_COMP_POWER_DOWN);
-	//xtimer_usleep(MPU9250_COMP_MODE_SLEEP_US);
+	xtimer_usleep(MPU9250_COMP_MODE_SLEEP_US);
 	conf_bypass(dev, 0);
 
 	/* Step 2: Reset MPU */
