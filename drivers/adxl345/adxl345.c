@@ -29,8 +29,8 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-#define BUS                 (dev->i2c)
-#define ADDR                (dev->addr)
+#define BUS                 (dev->params->i2c)
+#define ADDR                (dev->params->addr)
 
 int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
 {
