@@ -127,16 +127,18 @@ static inline int8_t _int_num(gpio_t pin)
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
+    uint8_t pin_mask = (1 << _pin_num(pin));
     switch (mode) {
         case GPIO_OUT:
-            _SFR_MEM8(_ddr_addr(pin)) |= (1 << _pin_num(pin));
+            _SFR_MEM8(_ddr_addr(pin)) |= pin_mask;
             break;
         case GPIO_IN:
-            _SFR_MEM8(_ddr_addr(pin)) &= ~(1 << _pin_num(pin));
-            _SFR_MEM8(_port_addr(pin)) &= ~(1 << _pin_num(pin));
+            _SFR_MEM8(_ddr_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(_port_addr(pin)) &= ~pin_mask;
             break;
         case GPIO_IN_PU:
-            _SFR_MEM8(_port_addr(pin)) |= (1 << _pin_num(pin));
+            _SFR_MEM8(_ddr_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(_port_addr(pin)) |= pin_mask;
             break;
         default:
             return -1;
