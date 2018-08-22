@@ -20,11 +20,11 @@ doc: html
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
-html: src/css/riot.css src/changelog.md
+html: git-lfs src/css/riot.css src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
 
 .PHONY: man
-man: src/changelog.md
+man: git-lfs src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
 
 ifneq (,$(LESSC))
@@ -40,8 +40,19 @@ src/changelog.md: src/changelog.md.tmp ../../release-notes.txt
 	@./generate-changelog.py $+ $@
 
 .PHONY:
-latex: src/changelog.md
+latex: git-lfs src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
+
+RED=\033[0;31m
+NC=\033[0m
+
+git-lfs: git-lfs-check git-lfs-install
+
+git-lfs-check:
+	@git lfs --version > /dev/null 2>&1 || (echo -e "$(RED)Please install git lfs.$(NC)" && exit 1)
+
+git-lfs-install:
+	@git config --list | grep lfs > /dev/null || git lfs install --local
 
 clean:
 	-@rm -rf latex man html doxygen_objdb_*.tmp doxygen_entrydb_*.tmp src/changelog.md
