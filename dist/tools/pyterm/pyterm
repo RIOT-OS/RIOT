@@ -105,7 +105,7 @@ class SerCmd(cmd.Cmd):
     def __init__(self, port=None, baudrate=None, toggle=None, tcp_serial=None,
                  confdir=None, conffile=None, host=None, run_name=None,
                  log_dir_name=None, newline=None, formatter=None,
-                 serprompt=None):
+                 set_rts=None, set_dtr=None, serprompt=None):
         """Constructor.
 
         Args:
@@ -124,6 +124,8 @@ class SerCmd(cmd.Cmd):
         self.port = port
         self.baudrate = baudrate
         self.toggle = toggle
+        self.set_rts = set_rts
+        self.set_dtr = set_dtr
         self.tcp_serial = tcp_serial
         self.configdir = confdir
         self.configfile = conffile
@@ -602,9 +604,16 @@ class SerCmd(cmd.Cmd):
     def serial_connect(self):
         self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0)
         self.ser.baudrate = self.baudrate
+
         if self.toggle:
             self.ser.setDTR(0)
             self.ser.setRTS(0)
+
+        if self.set_rts == 1 or self.set_rts == 0:
+            self.ser.setRTS(self.set_rts)
+
+        if self.set_dtr == 1 or self.set_dtr == 0:
+            self.ser.setDTR(self.set_dtr)
 
     def reader(self):
         """Serial or TCP reader.
@@ -729,6 +738,18 @@ if __name__ == "__main__":
                         action="store_true",
                         help="toggles the DTR and RTS pin of the serial line "
                         "when connecting, default is not toggling the pins")
+    parser.add_argument("-sr", "--set-rts",
+                        dest="set_rts",
+                        type=int,
+                        action="store",
+                        default=None,
+                        help="Specifies the value of RTS pin")
+    parser.add_argument("-sd", "--set-dtr",
+                        dest="set_dtr",
+                        type=int,
+                        action="store",
+                        default=None,
+                        help="Specifies the value of DTR pin")
     parser.add_argument('-d', '--directory',
                         help="Specify the Pyterm directory, default is %s"
                         % defaultdir,
@@ -772,7 +793,8 @@ if __name__ == "__main__":
         args.format = ""
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
                      args.directory, args.config, args.host, args.run_name,
-                     args.log_dir_name, args.newline, args.format, args.prompt)
+                     args.log_dir_name, args.newline, args.format,
+                     args.set_rts, args.set_dtr, args.prompt)
     myshell.prompt = ''
 
     try:
