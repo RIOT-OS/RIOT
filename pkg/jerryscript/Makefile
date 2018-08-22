@@ -14,6 +14,6 @@ endif
 
 all: git-download
 	@cp Makefile.jerryscript $(PKG_BUILDDIR)/Makefile
-	"$(MAKE)" -C $(PKG_BUILDDIR)
+	"$(MAKE)" -C $(PKG_BUILDDIR) all
 
 include $(RIOTBASE)/pkg/pkg.mk
