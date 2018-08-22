@@ -16,7 +16,7 @@ all: git-download
 	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.jerryscript
 
 clean::
-	test ! -d $(PKG_BUILDDIR) || "$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.jerryscript clean
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.jerryscript clean
 
 
 include $(RIOTBASE)/pkg/pkg.mk
