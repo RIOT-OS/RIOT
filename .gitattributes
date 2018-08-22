@@ -5,3 +5,4 @@
 # when the heading is exactly 7 characters long.
 *.md conflict-marker-size=100
 *.txt conflict-marker-size=100
+boards/*/doc/* filter=lfs diff=lfs merge=lfs -text
