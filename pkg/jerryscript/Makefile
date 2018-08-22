@@ -9,7 +9,7 @@ CFLAGS += -Wno-implicit-fallthrough
 
 # disable warnings when compiling with LLVM for board native
 ifeq ($(TOOLCHAIN)_$(BOARD),llvm_native)
-export CFLAGS += -Wno-macro-redefined -Wno-gnu-folding-constant
+  CFLAGS += -Wno-macro-redefined -Wno-gnu-folding-constant
 endif
 
 all: git-download
