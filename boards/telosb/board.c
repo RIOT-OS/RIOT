@@ -9,7 +9,7 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 
 void uart_init(void);
 
@@ -122,8 +122,8 @@ void board_init(void)
     telosb_ports_init();
     msp430_init_dco();
 
-    /* initialize STDIO over UART */
-    uart_stdio_init();
+    /* initialize STDIO */
+    stdio_init();
 
     /* enable interrupts */
     __bis_SR_register(GIE);

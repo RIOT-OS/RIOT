@@ -373,8 +373,8 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
   endif
-  ifeq (,$(filter rtt_stdio,$(USEMODULE)))
-    USEMODULE += uart_stdio
+  ifeq (,$(filter stdio_rtt,$(USEMODULE)))
+    USEMODULE += stdio_uart
   endif
 endif
 
@@ -386,11 +386,11 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter rtt_stdio,$(USEMODULE)))
+ifneq (,$(filter stdio_rtt,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter uart_stdio,$(USEMODULE)))
+ifneq (,$(filter stdio_uart,$(USEMODULE)))
   USEMODULE += isrpipe
   FEATURES_REQUIRED += periph_uart
 endif

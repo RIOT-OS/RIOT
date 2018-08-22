@@ -67,10 +67,8 @@
  * @file
  * @brief SEGGER RTT stdio implementation
  *
- * This file implements UART read/write functions, but it
- * is actually a virtual UART backed by a ringbuffer that
- * complies with SEGGER RTT. It is designed to shadow
- * uart_stdio that is used by newlib.
+ * This file implements RIOTs STDIO interface and works with a ringbuffer that
+ * complies with SEGGER RTT.
  *
  * @author      Michael Andersen <m.andersen@cs.berkeley.edu>
  *
@@ -84,8 +82,8 @@
 #include <fcntl.h>
 #endif
 #include <string.h>
-#include <rtt_stdio.h>
 
+#include "stdio_rtt.h"
 #include "thread.h"
 #include "mutex.h"
 #include "xtimer.h"
@@ -319,12 +317,12 @@ static ssize_t rtt_stdio_vfs_write(vfs_file_t *filp, const void *src, size_t nby
 
 #endif
 
-void uart_stdio_init(void) {
-    #ifndef RTT_STDIO_DISABLE_STDIN
+void stdio_init(void) {
+    #ifndef STDIO_RTT_DISABLE_STDIN
     stdin_enabled = 1;
     #endif
 
-    #ifdef RTT_STDIO_ENABLE_BLOCKING_STDOUT
+    #ifdef STDIO_RTT_ENABLE_BLOCKING_STDOUT
     blocking_stdout = 1;
     #endif
 
@@ -363,8 +361,8 @@ void rtt_stdio_enable_blocking_stdout(void) {
    actually have an RTT console (because we are deployed on
    a battery somewhere) then we REALLY don't want to poll
    especially since we are not expecting to EVER get input. */
-int uart_stdio_read(char* buffer, int count) {
-    int res = rtt_read(buffer, count);
+ssize_t stdio_read(void* buffer, size_t count) {
+    int res = rtt_read((void *)buffer, (uint16_t)count);
     if (res == 0) {
         if (!stdin_enabled) {
             mutex_lock(&_rx_mutex);
@@ -379,15 +377,16 @@ int uart_stdio_read(char* buffer, int count) {
                 return res;
         }
     }
-    return res;
+    return (ssize_t)res;
 }
 
-int uart_stdio_write(const char* buffer, int len) {
-    int written = rtt_write(buffer, len);
+ssize_t stdio_write(const void* in, size_t len) {
+    const char *buffer = (const char *)in;
+    int written = rtt_write(buffer, (unsigned)len);
     xtimer_ticks32_t last_wakeup = xtimer_now();
-    while (blocking_stdout && written < len) {
+    while (blocking_stdout && ((size_t)written < len)) {
         xtimer_periodic_wakeup(&last_wakeup, STDIO_POLL_INTERVAL);
         written += rtt_write(&buffer[written], len-written);
     }
-    return written;
+    return (ssize_t)written;
 }

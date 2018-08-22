@@ -871,7 +871,7 @@ static inline int _allocate_fd(int fd)
             if ((fd == STDIN_FILENO) || (fd == STDOUT_FILENO) || (fd == STDERR_FILENO)) {
                 /* Do not auto-allocate the stdio file descriptor numbers to
                  * avoid conflicts between normal file system users and stdio
-                 * drivers such as uart_stdio, rtt_stdio which need to be able
+                 * drivers such as stdio_uart, stdio_rtt which need to be able
                  * to bind to these specific file descriptor numbers. */
                 continue;
             }

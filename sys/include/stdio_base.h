@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,63 +8,42 @@
  */
 
 /**
- * @defgroup    sys_uart_stdio UART stdio
+ * @defgroup    sys_stdio STDIO abstraction
  * @ingroup     sys
  *
- * @brief       stdio init/read/write functions for UARTs
+ * @brief       Simple standard input/output (STDIO) abstraction for RIOT
  *
  * @{
  * @file
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-#ifndef UART_STDIO_H
-#define UART_STDIO_H
 
-/* Boards may override the default STDIO UART device */
-#include <stdint.h>
-#include "board.h"
+#ifndef STDIO_BASE_H
+#define STDIO_BASE_H
+
+#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef UART_STDIO_DEV
-/**
- * @brief UART device to use for STDIO
- */
-#define UART_STDIO_DEV           UART_DEV(0)
-#endif
-
-#ifndef UART_STDIO_BAUDRATE
-/**
- * @brief Baudrate for STDIO
- */
-#define UART_STDIO_BAUDRATE      (115200)
-#endif
-
-#ifndef UART_STDIO_RX_BUFSIZE
-/**
- * @brief Buffer size for STDIO
- */
-#define UART_STDIO_RX_BUFSIZE    (64)
-#endif
-
 /**
  * @brief initialize the module
  */
-void uart_stdio_init(void);
+void stdio_init(void);
 
 /**
  * @brief read @p len bytes from stdio uart into @p buffer
  *
  * @param[out]  buffer  buffer to read into
- * @param[in]   len     nr of bytes to read
+ * @param[in]   max_len nr of bytes to read
  *
  * @return nr of bytes read
  * @return <0 on error
  */
-int uart_stdio_read(char* buffer, int len);
+ssize_t stdio_read(void* buffer, size_t max_len);
 
 /**
  * @brief write @p len bytes from @p buffer into uart
@@ -74,10 +54,10 @@ int uart_stdio_read(char* buffer, int len);
  * @return nr of bytes written
  * @return <0 on error
  */
-int uart_stdio_write(const char* buffer, int len);
+ssize_t stdio_write(const void* buffer, size_t len);
 
 #ifdef __cplusplus
 }
 #endif
 /** @} */
-#endif /* UART_STDIO_H */
+#endif /* STDIO_BASE_H */

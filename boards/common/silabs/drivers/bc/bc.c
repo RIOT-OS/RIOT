@@ -20,7 +20,7 @@
 
 #include "bc.h"
 
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 
 #include "periph/gpio.h"
 #include "periph/uart.h"
@@ -35,14 +35,14 @@
 /**
  * @brief   Ensure that the correct UART is used.
  */
-#if ((UART_STDIO_DEV) != (UART_DEV(0)))
+#if ((STDIO_UART_DEV) != (UART_DEV(0)))
 #error "The BC requires UART_DEV(0)."
 #endif
 
 /**
  * @brief   Ensure that the correct baud rate is used.
  */
-#if ((UART_STDIO_BAUDRATE) != 115200)
+#if ((STDIO_UART_BAUDRATE) != 115200)
 #error "The BC requires a baud rate of 115200."
 #endif
 

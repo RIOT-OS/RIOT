@@ -9,7 +9,7 @@ module to your board:
 - GND
 
 NOTE: when you use an Arduino Xbee shield, the Xbee module is connected to the
-same UART as RIOTs standard out. In this case you must redefine UART_STDIO_DEV to
+same UART as RIOTs standard out. In this case you must redefine STDIO_UART_DEV to
 another UART interface in the board.h and connect a UART-to-USB adapter to that
 UART.
 

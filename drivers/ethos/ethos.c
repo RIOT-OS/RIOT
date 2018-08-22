@@ -34,9 +34,9 @@
 #include "net/ethernet.h"
 
 #ifdef USE_ETHOS_FOR_STDIO
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 #include "isrpipe.h"
-extern isrpipe_t uart_stdio_isrpipe;
+extern isrpipe_t stdio_uart_isrpipe;
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -102,7 +102,7 @@ static void _handle_char(ethos_t *dev, char c)
 #ifdef USE_ETHOS_FOR_STDIO
         case ETHOS_FRAME_TYPE_TEXT:
             dev->framesize++;
-            isrpipe_write_one(&uart_stdio_isrpipe, c);
+            isrpipe_write_one(&stdio_uart_isrpipe, c);
 #endif
     }
 }

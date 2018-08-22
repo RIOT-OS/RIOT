@@ -66,14 +66,14 @@ extern "C" {
 /**
  * @brief Use the USART2 for STDIO on this board
  */
-#define UART_STDIO_DEV      UART_DEV(0)
+#define STDIO_UART_DEV      UART_DEV(0)
 
 /**
  * @name Override with ROBOTIS Bluetooth antenna baudrate for STDIO
  * @{
  */
-#ifndef UART_STDIO_BAUDRATE
-#define UART_STDIO_BAUDRATE (921600UL)
+#ifndef STDIO_UART_BAUDRATE
+#define STDIO_UART_BAUDRATE (921600UL)
 #endif
 /** @} */
 

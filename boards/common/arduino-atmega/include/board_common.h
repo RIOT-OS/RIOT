@@ -37,7 +37,7 @@ extern "C" {
  * baudrate to 9600 for this board
  * @{
  */
-#define UART_STDIO_BAUDRATE (9600U)
+#define STDIO_UART_BAUDRATE (9600U)
 /** @} */
 
 /**

@@ -31,7 +31,7 @@ extern "C" {
 * @brief   As the CPU is too slow to handle 115200 baud, we set the default
 *          baudrate to 9600 for this board
 */
-#define UART_STDIO_BAUDRATE  (9600U)
+#define STDIO_UART_BAUDRATE  (9600U)
 
 /**
  * @brief   Use the UART 0 for STDIO on this board, if the XBee socket is not
@@ -39,9 +39,9 @@ extern "C" {
  */
 #ifdef XBEE_UART
 #if XBEE_UART == 0
-#define UART_STDIO_DEV       (UART_DEV(1))
+#define STDIO_UART_DEV       (UART_DEV(1))
 #else
-#define UART_STDIO_DEV       (UART_DEV(0))
+#define STDIO_UART_DEV       (UART_DEV(0))
 #endif
 #endif
 

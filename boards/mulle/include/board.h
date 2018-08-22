@@ -35,7 +35,7 @@
 /**
  * @brief Use the UART1 for STDIO on this board
  */
-#define UART_STDIO_DEV      UART_DEV(1)
+#define STDIO_UART_DEV      UART_DEV(1)
 
 /**
  * @name    xtimer configuration

@@ -21,7 +21,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 
 /**
  * @brief   Get one character from STDIO - used by the libc
@@ -29,7 +29,7 @@
 int getchar(void)
 {
     char c;
-    uart_stdio_read(&c, 1);
+    stdio_read(&c, 1);
     return c;
 }
 
@@ -40,7 +40,7 @@ int getchar(void)
 int putchar(int c)
 {
     char _c = c;
-    return uart_stdio_write(&_c, 1);
+    return stdio_write(&_c, 1);
 }
 
 /**
@@ -49,7 +49,7 @@ int putchar(int c)
 ssize_t write(int fildes, const void *buf, size_t nbyte)
 {
     if (fildes == STDOUT_FILENO) {
-        return uart_stdio_write(buf, nbyte);
+        return stdio_write(buf, nbyte);
     }
     else {
         return -1;
