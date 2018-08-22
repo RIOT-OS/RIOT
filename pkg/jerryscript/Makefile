@@ -13,7 +13,6 @@ export CFLAGS += -Wno-macro-redefined -Wno-gnu-folding-constant
 endif
 
 all: git-download
-	@cp Makefile.jerryscript $(PKG_BUILDDIR)/Makefile
-	"$(MAKE)" -C $(PKG_BUILDDIR) all
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.jerryscript all
 
 include $(RIOTBASE)/pkg/pkg.mk
