@@ -1,4 +1,4 @@
-BUILD_DIR  ?= $(CURDIR)/riot
+BUILD_DIR  ?= $(BINDIR)/jerryscript
 
 JERRYHEAP  ?= 16
 
