@@ -66,6 +66,10 @@ ifneq (,$(filter ds1307,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ds1307/include
 endif
 
+ifneq (,$(filter ds3234,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ds3234/include
+endif
+
 ifneq (,$(filter dsp0401,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dsp0401/include
 endif
