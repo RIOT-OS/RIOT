@@ -1,0 +1,50 @@
+/**
+@defgroup    boards_nrf52840-mdk nRF52840-MDK
+@ingroup     boards
+@brief       Support for the nRF52840-MDK
+
+### General information
+
+The Makerdiary [nRF52840-MDK](https://github.com/makerdiary/nrf52840-mdk) board
+is an opensource, micro development kit using the nRF52840 SoC.
+This board provides 802.15.4 and BLE connectivity.
+
+### Pinout
+
+<img src="https://github.com/makerdiary/nrf52840-mdk/blob/master/docs/images/nrf52840-mdk-pinout.jpg"
+     alt="pinout" style="height:800px;"/>
+
+### Flash the board
+
+By default, the board is flashed with PyOCD programmer via a DAPLink.
+
+PyOCD can be installed using Python package manager:
+```
+    pip install pyocd --user -U
+```
+
+To flash the board `BOARD=nrf52840-mdk` with the `make` command.<br/>
+Example with `hello-world` application:
+```
+    make BOARD=nrf52840-mdk -C examples/hello-world flash
+```
+
+OpenOCD can also be used. For the moment, the latest stable version of OpenOCD
+(0.10) doesn't contain any support for nrf52 but versions built against the
+actual development version can be used.
+
+To flash the board with OpenOCD, use the `PROGRAMMER` variable:
+```
+    PROGRAMMER=openocd make BOARD=nrf52840-mdk -C examples/hello-world flash
+```
+
+### Accessing STDIO via UART
+
+The STDIO is directly accessible via the USB port. On a Linux host, it's
+generally mapped to `/dev/ttyACM0`.
+
+Use the `term` target to connect to the board serial port<br/>
+```
+    make BOARD=nrf52840-mdk -C examples/hello-world term
+```
+ */
