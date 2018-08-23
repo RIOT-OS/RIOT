@@ -445,22 +445,13 @@ static inline uint64_t ntohll(uint64_t v)
 
 static inline uint16_t byteorder_bebuftohs(const uint8_t *buf)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    return (uint16_t)((buf[0] << 8) | buf[1]);
-#else
-    return (uint16_t)((buf[1] << 8) | buf[0]);
-#endif
+    return (uint16_t)((buf[0] << 8) | (buf[1] << 0));
 }
 
 static inline void byteorder_htobebufs(uint8_t *buf, uint16_t val)
 {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     buf[0] = (uint8_t)(val >> 8);
-    buf[1] = (uint8_t)(val & 0xff);
-#else
-    buf[0] = (uint8_t)(val & 0xff);
-    buf[1] = (uint8_t)(val >> 8);
-#endif
+    buf[1] = (uint8_t)(val >> 0);
 }
 
 #ifdef __cplusplus
