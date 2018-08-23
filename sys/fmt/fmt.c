@@ -53,6 +53,16 @@ static inline int _is_digit(char c)
     return (c >= '0' && c <= '9');
 }
 
+static inline int _is_upper(char c)
+{
+    return (c >= 'A' && c <= 'Z');
+}
+
+static inline char _to_lower(char c)
+{
+    return 'a' + (c - 'A');
+}
+
 size_t fmt_byte_hex(char *out, uint8_t byte)
 {
     if (out) {
@@ -403,6 +413,27 @@ size_t fmt_lpad(char *out, size_t in_len, size_t pad_len, char pad_char)
     }
 
     return pad_len;
+}
+
+{
+size_t fmt_to_lower(char *out, const char *str)
+{
+    size_t len = 0;
+
+    while (str && *str) {
+        if (_is_upper(*str)) {
+            if (out) {
+                *out++ = _to_lower(*str);
+            }
+        }
+        else if (out) {
+            *out++ = *str;
+        }
+        str++;
+        len++;
+    }
+
+    return len;
 }
 
 uint32_t scn_u32_dec(const char *str, size_t n)

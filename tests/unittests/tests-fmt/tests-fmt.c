@@ -749,6 +749,16 @@ static void test_fmt_str(void)
     TEST_ASSERT_EQUAL_STRING(string1, &string2[0]);
 }
 
+static void test_fmt_to_lower(void)
+{
+    const char string_up[]  = "AbCdeFGHijkLM";
+    char string[]           = "zzzzzzzzzzzzzzz";
+
+    TEST_ASSERT_EQUAL_INT(fmt_strlen(string_up), fmt_to_lower(string, string_up));
+    string[fmt_strlen(string_up)] = '\0';
+    TEST_ASSERT_EQUAL_STRING("abcdefghijklm", &string[0]);
+}
+
 static void test_scn_u32_dec(void)
 {
     const char *string1 = "123456789";
@@ -817,6 +827,7 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_strlen),
         new_TestFixture(test_fmt_strnlen),
         new_TestFixture(test_fmt_str),
+        new_TestFixture(test_fmt_to_lower),
         new_TestFixture(test_scn_u32_dec),
         new_TestFixture(test_fmt_lpad),
     };

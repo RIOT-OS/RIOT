@@ -344,6 +344,14 @@ size_t fmt_strnlen(const char *str, size_t maxlen);
 size_t fmt_str(char *out, const char *str);
 
 /**
+ * @brief   Copy null-terminated string to a lowercase string (excluding terminating \0)
+ *
+ * @param[out]  out     Pointer to output buffer, or NULL
+ * @param[in]   str     Pointer to null-terminated source string
+ */
+size_t fmt_to_lower(char *out, const char *str);
+
+/**
  * @brief Convert digits to uint32
  *
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
