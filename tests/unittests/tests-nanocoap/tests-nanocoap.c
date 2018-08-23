@@ -30,20 +30,27 @@ static void test_nanocoap__hdr(void)
     uint8_t buf[128];
     uint16_t msgid = 0xABCD;
     char path[] = "/test/abcd/efgh";
+    char loc_path[] = "/foo/bar";
     unsigned char path_tmp[64] = {0};
 
     uint8_t *pktpos = &buf[0];
-    pktpos += coap_build_hdr((coap_hdr_t *)pktpos, COAP_REQ, NULL, 0, COAP_METHOD_GET, msgid);
-    pktpos += coap_put_option_uri(pktpos, 0, path, COAP_OPT_URI_PATH);
+    pktpos += coap_build_hdr((coap_hdr_t *)pktpos, COAP_REQ, NULL, 0,
+                             COAP_METHOD_GET, msgid);
+    pktpos += coap_opt_put_location_path(pktpos, 0, loc_path);
+    pktpos += coap_opt_put_uri_path(pktpos, COAP_OPT_LOCATION_PATH, path);
 
     coap_pkt_t pkt;
     coap_parse(&pkt, &buf[0], pktpos - &buf[0]);
 
     TEST_ASSERT_EQUAL_INT(msgid, coap_get_id(&pkt));
 
-    int res = coap_get_uri(&pkt, path_tmp);
+    int res = coap_get_uri_path(&pkt, path_tmp);
     TEST_ASSERT_EQUAL_INT(sizeof(path), res);
     TEST_ASSERT_EQUAL_STRING((char *)path, (char *)path_tmp);
+
+    res = coap_get_location_path(&pkt, path_tmp, 64);
+    TEST_ASSERT_EQUAL_INT(sizeof(loc_path), res);
+    TEST_ASSERT_EQUAL_STRING((char *)loc_path, (char *)path_tmp);
 }
 
 /*
@@ -76,7 +83,7 @@ static void test_nanocoap__get_req(void)
     TEST_ASSERT_EQUAL_INT(total_opt_len, len);
 
     char uri[10] = {0};
-    coap_get_uri(&pkt, (uint8_t *)&uri[0]);
+    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
     TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
 
     len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
@@ -140,7 +147,7 @@ static void test_nanocoap__get_multi_path(void)
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
     char uri[10] = {0};
-    coap_get_uri(&pkt, (uint8_t *)&uri[0]);
+    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
     TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
 }
 
@@ -162,7 +169,7 @@ static void test_nanocoap__get_root_path(void)
     coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
 
     char uri[10] = {0};
-    coap_get_uri(&pkt, (uint8_t *)&uri[0]);
+    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
     TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
 }
 
@@ -188,13 +195,13 @@ static void test_nanocoap__get_max_path(void)
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
     char uri[NANOCOAP_URI_MAX] = {0};
-    coap_get_uri(&pkt, (uint8_t *)&uri[0]);
+    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
     TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
 }
 
 /*
  * Builds on get_req test, to test path longer than NANOCOAP_URI_MAX. We
- * expect coap_get_uri() to return -ENOSPC.
+ * expect coap_get_uri_path() to return -ENOSPC.
  */
 static void test_nanocoap__get_path_too_long(void)
 {
@@ -215,7 +222,7 @@ static void test_nanocoap__get_path_too_long(void)
     TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
 
     char uri[NANOCOAP_URI_MAX] = {0};
-    int get_len = coap_get_uri(&pkt, (uint8_t *)&uri[0]);
+    int get_len = coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
     TEST_ASSERT_EQUAL_INT(-ENOSPC, get_len);
 }
 
