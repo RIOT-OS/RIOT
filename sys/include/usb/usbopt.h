@@ -1,0 +1,104 @@
+/*
+ * Copyright (C) 2018 Koen Zandberg <koen@bergzand.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for
+ * more details.
+ */
+/**
+ * @defgroup    usb_usbopt   usbopt - Configuration options for USB APIs
+ * @ingroup     usb
+ * @brief       List of available configuration options for the
+ *              @ref drivers_usbdev_api
+ * @{
+ *
+ * @file
+ * @brief       Definition of global configuration options
+ *
+ * @author      Koen Zandberg <koen@bergzand.net>
+ */
+
+#ifndef USB_USBOPT_H
+#define USB_USBOPT_H
+
+#ifdef __cplusplus
+extern "c" {
+#endif
+
+#include <stdint.h>
+
+/**
+ * @brief   List of configuration settings for USB peripherals
+ *
+ * The data type specified in parentheses for each individual option is the
+ * data type to use for the argument when getting/setting the value of the option.
+ */
+typedef enum {
+    /**
+     * @brief   (uint8_t) USB device address
+     */
+    USBOPT_ADDRESS,
+    /**
+     * @brief   (usbopt_enable_t) Attach/detach USB peripheral to host
+     *
+     * In practice this happens by enabling or disabling the pull-up resistor
+     * on one of the data lines.
+     */
+    USBOPT_ATTACH,
+    /**
+     * @brief   (usb_version_t) Highest USB version supported by peripheral
+     *
+     * Setting this option must return -ENOTSUP
+     */
+    USBOPT_MAX_VERSION,
+    /**
+     * @brief   (usb_version_t) Highest USB speed supported by peripheral
+     *
+     * Setting this option must return -ENOTSUP
+     */
+    USBOPT_MAX_SPEED,
+    /* expand list if required */
+} usbopt_t;
+
+/**
+ * @brief   List of configuration settings for USB peripheral endpoints
+ *
+ * The data type specified in parentheses for each individual option is the
+ * data type to use for the argument when getting/setting the value of the option.
+ */
+typedef enum {
+    /**
+     * @brief   (usbopt_enable_t) Enable or disable the endpoint
+     */
+    USBOPT_EP_ENABLE,
+    /**
+     * @brief   (uint8_t*) Configure the endpoint buffer address
+     */
+    USBOPT_EP_BUF_ADDR,
+    /**
+     * @brief   (size_t) Configure the endpoint buffer size
+     */
+    USBOPT_EP_BUF_SIZE,
+    /**
+     * @brief   (usbopt_enable_t) Enable or disable stall replies for endpoint
+     */
+    USBOPT_EP_STALL,
+    /* expand list if required */
+} usbopt_ep_t;
+
+/**
+ * @brief   Binary parameter for enabling and disabling options
+ */
+typedef enum
+{
+    USBOPT_DISABLE = 0,         /**< disable a given option */
+    USBOPT_ENABLE = 1,          /**< enable a given option */
+} usbopt_enable_t;
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* USB_H */
+/** @} */
