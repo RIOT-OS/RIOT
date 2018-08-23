@@ -413,6 +413,10 @@ void auto_init(void)
     extern void auto_init_lsm6dsl(void);
     auto_init_lsm6dsl();
 #endif
+#ifdef MODULE_LTC4150
+    extern void auto_init_ltc4150(void);
+    auto_init_ltc4150();
+ #endif
 #ifdef MODULE_MAG3110
     extern void auto_init_mag3110(void);
     auto_init_mag3110();

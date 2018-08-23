@@ -21,6 +21,7 @@
 
 #include "board.h"
 #include "ltc4150.h"
+#include "saul_reg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,11 +62,30 @@ extern "C" {
 /**@}*/
 
 /**
+ * @name    Set default SAUL info text for the LTC4150
+ * @{
+ */
+#ifndef LTC4150_SAULINFO
+#define LTC4150_SAULINFO              { .name = "LTC4150 charge" }, \
+                                      { .name = "LTC4150 average current" }
+#endif
+
+/**@}*/
+
+/**
  * @brief   Configure LTC4150 devices
  */
 static const ltc4150_params_t ltc4150_params[] =
 {
     LTC4150_PARAMS
+};
+
+/**
+ * @brief   Allocate and configure entries to the SAUL registry
+ */
+static const saul_reg_info_t ltc4150_saul_info[] =
+{
+    LTC4150_SAULINFO
 };
 
 #ifdef __cplusplus
