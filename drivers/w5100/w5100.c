@@ -26,6 +26,7 @@
 #include "assert.h"
 
 #include "net/ethernet.h"
+#include "net/netdev_driver_glue.h"
 #include "net/netdev/eth.h"
 
 #include "w5100.h"
@@ -271,6 +272,7 @@ static int recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 wreg(dev, S0_IR, IR_RECV);
             }
         }
+        /* FIXME: else if (len > 0): Drop frame */
     }
 
     /* release the SPI bus again */
@@ -326,6 +328,8 @@ static int get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 static const netdev_driver_t netdev_driver_w5100 = {
     .send = send,
     .recv = recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = init,
     .isr = isr,
     .get = get,

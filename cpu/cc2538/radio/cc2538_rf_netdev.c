@@ -23,6 +23,7 @@
 
 #include "net/gnrc.h"
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 
 #include "cc2538_rf.h"
 #include "cc2538_rf_netdev.h"
@@ -393,6 +394,8 @@ const netdev_driver_t cc2538_rf_driver = {
     .set  = _set,
     .send = _send,
     .recv = _recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .isr  = _isr,
     .init = _init,
 };

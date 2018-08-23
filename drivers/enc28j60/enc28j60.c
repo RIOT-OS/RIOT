@@ -26,6 +26,7 @@
 #include "xtimer.h"
 #include "assert.h"
 #include "net/ethernet.h"
+#include "net/netdev_driver_glue.h"
 #include "net/netdev/eth.h"
 
 #include "enc28j60.h"
@@ -527,6 +528,8 @@ static int nd_set(netdev_t *netdev, netopt_t opt, const void *value, size_t valu
 static const netdev_driver_t netdev_driver_enc28j60 = {
     .send = nd_send,
     .recv = nd_recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = nd_init,
     .isr = nd_isr,
     .get = nd_get,

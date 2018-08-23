@@ -381,6 +381,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
         reg_set(dev, ENC_ERXTAIL, dev->rx_next_ptr - 2);
     }
+    /* FIXME: Dropping frame not handled */
 
     unlock(dev);
 

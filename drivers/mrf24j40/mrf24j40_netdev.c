@@ -27,6 +27,7 @@
 #include "net/eui64.h"
 #include "net/ieee802154.h"
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 #include "net/netdev/ieee802154.h"
 
 #include "mrf24j40.h"
@@ -568,6 +569,8 @@ static void _isr(netdev_t *netdev)
 const netdev_driver_t mrf24j40_driver = {
     .send = _send,
     .recv = _recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = _init,
     .isr = _isr,
     .get = _get,

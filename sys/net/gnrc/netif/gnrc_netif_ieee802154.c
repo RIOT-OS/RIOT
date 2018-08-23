@@ -80,7 +80,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     netdev_ieee802154_rx_info_t rx_info;
     netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
     gnrc_pktsnip_t *pkt = NULL;
-    int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
+    int bytes_expected = dev->driver->size(dev);
 
     if (bytes_expected >= (int)IEEE802154_MIN_FRAME_LEN) {
         int nread;
@@ -89,7 +89,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         if (pkt == NULL) {
             DEBUG("_recv_ieee802154: cannot allocate pktsnip.\n");
             /* Discard packet on netdev device */
-            dev->driver->recv(dev, NULL, bytes_expected, NULL);
+            dev->driver->drop(dev);
             return NULL;
         }
         nread = dev->driver->recv(dev, pkt->data, bytes_expected, &rx_info);
@@ -159,7 +159,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         gnrc_pktbuf_realloc_data(pkt, nread);
     } else if (bytes_expected > 0) {
         DEBUG("_recv_ieee802154: received frame is too short\n");
-        dev->driver->recv(dev, NULL, bytes_expected, NULL);
+        dev->driver->drop_frame(dev);
     }
 
     return pkt;

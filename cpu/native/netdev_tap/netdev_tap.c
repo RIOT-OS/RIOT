@@ -55,6 +55,7 @@
 #include "iolist.h"
 #include "net/eui64.h"
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 #include "net/netdev/eth.h"
 #include "net/ethernet.h"
 #include "net/ethernet/hdr.h"
@@ -158,6 +159,8 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
 static netdev_driver_t netdev_driver_tap = {
     .send = _send,
     .recv = _recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = _init,
     .isr = _isr,
     .get = _get,

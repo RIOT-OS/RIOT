@@ -40,6 +40,7 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
+  USEMODULE += netdev_driver_glue
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
 endif
@@ -75,6 +76,7 @@ ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += luid
   USEMODULE += xtimer
+  USEMODULE += netdev_driver_glue
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
     USEMODULE += gnrc_cc110x
   endif
@@ -87,6 +89,7 @@ ifneq (,$(filter cc2420,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
+  USEMODULE += netdev_driver_glue
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
 endif
@@ -116,6 +119,7 @@ ifneq (,$(filter enc28j60,$(USEMODULE)))
   USEMODULE += netdev_eth
   USEMODULE += xtimer
   USEMODULE += luid
+  USEMODULE += netdev_driver_glue
 endif
 
 ifneq (,$(filter encx24j600,$(USEMODULE)))
@@ -123,6 +127,7 @@ ifneq (,$(filter encx24j600,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += xtimer
+  USEMODULE += netdev_driver_glue
 endif
 
 ifneq (,$(filter ethos,$(USEMODULE)))
@@ -131,6 +136,7 @@ ifneq (,$(filter ethos,$(USEMODULE)))
   USEMODULE += netdev_eth
   USEMODULE += random
   USEMODULE += tsrb
+  USEMODULE += netdev_driver_glue
 endif
 
 ifneq (,$(filter feetech,$(USEMODULE)))
@@ -186,6 +192,7 @@ ifneq (,$(filter kw2xrf,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
   USEMODULE += core_thread_flags
+  USEMODULE += netdev_driver_glue
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -249,6 +256,7 @@ ifneq (,$(filter mrf24j40,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
+  USEMODULE += netdev_driver_glue
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
 endif
@@ -331,6 +339,7 @@ endif
 
 ifneq (,$(filter slipdev,$(USEMODULE)))
   USEMODULE += tsrb
+  USEMODULE += netdev_driver_glue
   FEATURES_REQUIRED += periph_uart
 endif
 
@@ -355,6 +364,7 @@ ifneq (,$(filter sx127%,$(USEMODULE)))
   USEMODULE += sx127x
   USEMODULE += netif
   USEMODULE += lora
+  USEMODULE += netdev_driver_glue
 endif
 
 ifneq (,$(filter tcs37727,$(USEMODULE)))
@@ -380,12 +390,14 @@ ifneq (,$(filter w5100,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += luid
+  USEMODULE += netdev_driver_glue
 endif
 
 ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += xtimer
   USEMODULE += netif
+  USEMODULE += netdev_driver_glue
 endif
 
 ifneq (,$(filter lis3mdl,$(USEMODULE)))

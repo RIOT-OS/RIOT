@@ -168,6 +168,7 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 
     /* without a provided buffer, only readout the length and return it */
     if (buf == NULL) {
+        /* FIXME: Dropping frame not handled */
         /* get the packet length (without dropping it) (first byte in RX FIFO) */
         cc2420_ram_read(dev, CC2420_RAM_RXFIFO, &len, 1);
         len -= 2;   /* subtract RSSI and FCF */

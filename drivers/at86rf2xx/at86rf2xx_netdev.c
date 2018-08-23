@@ -32,6 +32,7 @@
 #include "net/eui64.h"
 #include "net/ieee802154.h"
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 #include "net/netdev/ieee802154.h"
 
 #include "at86rf2xx.h"
@@ -54,6 +55,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len);
 const netdev_driver_t at86rf2xx_driver = {
     .send = _send,
     .recv = _recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = _init,
     .isr = _isr,
     .get = _get,
@@ -145,6 +148,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     /* just return length when buf == NULL */
     if (buf == NULL) {
+        /* FIXME: Dropping frame handled? */
         at86rf2xx_fb_stop(dev);
         return pkt_len;
     }

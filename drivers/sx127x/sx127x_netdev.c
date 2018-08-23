@@ -23,6 +23,7 @@
 
 #include "net/netopt.h"
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 #include "net/lora.h"
 
 #include "sx127x_registers.h"
@@ -182,6 +183,8 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
             size = sx127x_reg_read(dev, SX127X_REG_LR_RXNBBYTES);
             if (buf == NULL) {
+                /* FIXME: Dropping packet not handled? Also: Code could be
+                 * better structured ;-) */
                 return size;
             }
 
@@ -704,6 +707,8 @@ void _on_dio3_irq(void *arg)
 const netdev_driver_t sx127x_driver = {
     .send = _send,
     .recv = _recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = _init,
     .isr = _isr,
     .get = _get,

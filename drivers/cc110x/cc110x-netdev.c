@@ -32,6 +32,7 @@
 
 #include "periph/gpio.h"
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 #include "net/gnrc/nettype.h"
 
 #define ENABLE_DEBUG    (0)
@@ -49,6 +50,7 @@ static int _send(netdev_t *dev, const iolist_t *iolist)
 
 static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 {
+    /* FIXME: This code doesn't handle the size and the drop case */
     DEBUG("%s:%u\n", __func__, __LINE__);
 
     cc110x_t *cc110x = &((netdev_cc110x_t*) dev)->cc110x;
@@ -213,12 +215,14 @@ static int _init(netdev_t *dev)
 }
 
 const netdev_driver_t netdev_cc110x_driver = {
-    .send=_send,
-    .recv=_recv,
-    .init=_init,
-    .get=_get,
-    .set=_set,
-    .isr=_isr
+    .send = _send,
+    .recv = _recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
+    .init = _init,
+    .get  = _get,
+    .set  = _set,
+    .isr  = _isr
 };
 
 int netdev_cc110x_setup(netdev_cc110x_t *netdev_cc110x, const cc110x_params_t *params)

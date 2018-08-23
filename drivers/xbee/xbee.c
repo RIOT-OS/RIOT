@@ -28,6 +28,7 @@
 #include "xtimer.h"
 #include "net/eui64.h"
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 #include "net/ieee802154.h"
 #ifdef MODULE_GNRC
 #include "net/gnrc.h"
@@ -823,6 +824,8 @@ static int xbee_set(netdev_t *ndev, netopt_t opt, const void *value, size_t len)
 const netdev_driver_t xbee_driver = {
     .send = xbee_send,
     .recv = xbee_recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = xbee_init,
     .isr  = xbee_isr,
     .get  = xbee_get,

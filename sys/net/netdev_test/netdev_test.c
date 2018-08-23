@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include "net/netdev_test.h"
+#include "net/netdev_driver_glue.h"
 
 void netdev_test_reset(netdev_test_t *dev)
 {
@@ -117,6 +118,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
 static const netdev_driver_t _driver = {
     .send   = _send,
     .recv   = _recv,
+    .size   = netdev_driver_glue_size,
+    .drop   = netdev_driver_glue_drop,
     .init   = _init,
     .isr    = _isr,
     .get    = _get,

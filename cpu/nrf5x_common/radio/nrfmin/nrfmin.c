@@ -30,6 +30,7 @@
 
 #include "nrfmin.h"
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 
 #ifdef MODULE_GNRC_SIXLOWPAN
 #include "net/gnrc/nettype.h"
@@ -556,6 +557,8 @@ static int nrfmin_set(netdev_t *dev, netopt_t opt, const void *val, size_t len)
 const netdev_driver_t nrfmin_netdev = {
     .send = nrfmin_send,
     .recv = nrfmin_recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = nrfmin_init,
     .isr  = nrfmin_isr,
     .get  = nrfmin_get,

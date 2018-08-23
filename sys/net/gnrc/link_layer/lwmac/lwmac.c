@@ -116,13 +116,14 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     netdev_ieee802154_rx_info_t rx_info;
     netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
     gnrc_pktsnip_t *pkt = NULL;
-    int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
+    int bytes_expected = dev->driver->expected_bytes(dev);
 
     if (bytes_expected > 0) {
         int nread;
 
         pkt = gnrc_pktbuf_add(NULL, NULL, bytes_expected, GNRC_NETTYPE_UNDEF);
         if (pkt == NULL) {
+            /* FIXME: Is it correct to not drop the frame here!?! */
             DEBUG("_recv_ieee802154: cannot allocate pktsnip.\n");
             return NULL;
         }

@@ -121,6 +121,15 @@ ifneq (,$(filter netdev_tap,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += netdev_eth
   USEMODULE += iolist
+  USEMODULE += netdev_driver_glue
+endif
+
+ifneq (,$(filter socket_zep,$(USEMODULE)))
+  USEMODULE += netdev_driver_glue
+endif
+
+ifneq (,$(filter cc2538_rf,$(USEMODULE)))
+  USEMODULE += netdev_driver_glue
 endif
 
 ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
@@ -147,6 +156,10 @@ endif
 
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
+endif
+
+ifneq (,$(filter nrfmin,$(USEMODULE)))
+  USEMODULE += netdev_driver_glue
 endif
 
 ifneq (,$(filter ieee802154 nrfmin,$(USEMODULE)))

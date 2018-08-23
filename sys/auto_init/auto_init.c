@@ -19,6 +19,7 @@
 #include <stdio.h>
 
 #include "auto_init.h"
+#include "log.h"
 
 #ifdef MODULE_MCI
 #include "diskio.h"
@@ -171,6 +172,10 @@ void auto_init(void)
 #ifdef MODULE_ASYMCUTE
     DEBUG("Auto init Asymcute\n");
     asymcute_handler_run();
+#endif
+
+#ifdef MODULE_NETDEV_DRIVER_GLUE
+    LOG_WARNING("Legacy netdev_driver API is used\n");
 #endif
 
 /* initialize network devices */

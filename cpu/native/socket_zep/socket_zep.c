@@ -31,6 +31,8 @@
 
 #include "socket_zep.h"
 
+#include "net/netdev_driver_glue.h"
+
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
@@ -332,6 +334,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
 static const netdev_driver_t socket_zep_driver = {
     .send = _send,
     .recv = _recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = _init,
     .isr = _isr,
     .get = _get,

@@ -29,6 +29,7 @@
 #include "net/eui64.h"
 #include "net/ieee802154.h"
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 #include "net/netdev/ieee802154.h"
 
 #include "kw2xrf.h"
@@ -193,6 +194,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     /* just return length when buf == NULL */
     if (buf == NULL) {
+        /* FIXME: Dropping frame not implemented? */
         return pkt_len + 1;
     }
 
@@ -815,6 +817,8 @@ const netdev_driver_t kw2xrf_driver = {
     .init = _init,
     .send = _send,
     .recv = _recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .get = _get,
     .set = _set,
     .isr = _isr,

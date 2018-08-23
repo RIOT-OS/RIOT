@@ -315,21 +315,50 @@ typedef struct netdev_driver {
      * Supposed to be called from
      * @ref netdev_t::event_callback "netdev->event_callback()"
      *
-     * If buf == NULL and len == 0, returns the packet size without dropping it.
-     * If buf == NULL and len > 0, drops the packet and returns the packet size.
-     *
      * @param[in]   dev     network device descriptor
-     * @param[out]  buf     buffer to write into or NULL
+     * @param[out]  buf     buffer to write into
      * @param[in]   len     maximum number of bytes to read
      * @param[out] info     status information for the received packet. Might
      *                      be of different type for different netdev devices.
      *                      May be NULL if not needed or applicable.
      *
+     * @return The size of the received frame stored into @p buf
      * @return `< 0` on error
-     * @return number of bytes read if buf != NULL
-     * @return packet size if buf == NULL
      */
     int (*recv)(netdev_t *dev, void *buf, size_t len, void *info);
+
+    /**
+     * @brief Get the expected size of the received frame
+     *
+     * @pre `(dev != NULL)`
+     * @post The frame obtained by a subsequent call to
+     *       @ref netdev_driver::recv "netdev_driver_t->receive()"
+     *       must be equal in size or smaller than the returned size, or fail
+     *
+     * Supposed to be called from
+     * @ref netdev_t::event_callback "netdev->event_callback()"
+     *
+     * @param[in]   dev     network device descriptor
+     *
+     * @return The size of the received frame
+     * @return `< 0` on error
+     */
+    int (*size)(netdev_t *dev);
+
+    /**
+     * @brief Drop the received frame
+     *
+     * @pre `(dev != NULL)`
+     *
+     * Supposed to be called from
+     * @ref netdev_t::event_callback "netdev->event_callback()"
+     *
+     * The frame that could have been obtained by calling
+     * @ref netdev_driver::recv "netdev_driver_t->receive()" must be dropped
+     *
+     * @param[in]   dev     network device descriptor
+     */
+    void (*drop)(netdev_t *dev);
 
     /**
      * @brief the driver's initialization function

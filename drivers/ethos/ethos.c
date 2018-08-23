@@ -29,6 +29,7 @@
 #include "irq.h"
 
 #include "net/netdev.h"
+#include "net/netdev_driver_glue.h"
 #include "net/netdev/eth.h"
 #include "net/eui64.h"
 #include "net/ethernet.h"
@@ -314,6 +315,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void* info)
         return (int)len;
     }
     else {
+        /* FIXME: Dropping frame unhandled? */
         return dev->last_framesize;
     }
 }
@@ -344,6 +346,8 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 static const netdev_driver_t netdev_driver_ethos = {
     .send = _send,
     .recv = _recv,
+    .size = netdev_driver_glue_size,
+    .drop = netdev_driver_glue_drop,
     .init = _init,
     .isr = _isr,
     .get = _get,

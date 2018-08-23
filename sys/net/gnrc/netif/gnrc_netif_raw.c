@@ -50,7 +50,7 @@ static inline uint8_t _get_version(uint8_t *data)
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
-    int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
+    int bytes_expected = dev->driver->size(dev);
     gnrc_pktsnip_t *pkt = NULL;
 
     if (bytes_expected > 0) {
@@ -61,7 +61,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         if (!pkt) {
             DEBUG("gnrc_netif_raw: cannot allocate pktsnip.\n");
             /* drop packet */
-            dev->driver->recv(dev, NULL, bytes_expected, NULL);
+            dev->driver->drop(dev);
             return pkt;
         }
         nread = dev->driver->recv(dev, pkt->data, bytes_expected, NULL);
