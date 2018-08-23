@@ -153,6 +153,11 @@ size_t fmt_hex_bytes(uint8_t *out, const char *hex)
     return final_len;
 }
 
+size_t fmt_u16_hex(char *out, uint16_t val)
+{
+    return fmt_bytes_hex_reverse(out, (uint8_t*) &val, 2);
+}
+
 size_t fmt_u32_hex(char *out, uint32_t val)
 {
     return fmt_bytes_hex_reverse(out, (uint8_t*) &val, 4);

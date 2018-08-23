@@ -120,6 +120,20 @@ uint8_t fmt_hex_byte(const char *hex);
 size_t fmt_hex_bytes(uint8_t *out, const char *hex);
 
 /**
+ * @brief   Convert a uint16 value to hex string.
+ *
+ * Will write 4 bytes to @p out.
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      4
+ */
+size_t fmt_u16_hex(char *out, uint16_t val);
+
+/**
  * @brief Convert a uint32 value to hex string.
  *
  * Will write 8 bytes to @p out.
