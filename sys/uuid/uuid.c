@@ -23,6 +23,7 @@
 #include "hashes/sha1.h"
 #include "random.h"
 #include "uuid.h"
+#include "fmt.h"
 
 const uuid_t uuid_namespace_dns = { /* 6ba7b810-9dad-11d1-80b4-00c04fd430c8 */
     .time_low.u8 =      { 0x6b, 0xa7, 0xb8, 0x10 },
@@ -109,4 +110,21 @@ void uuid_v5(uuid_t *uuid, const uuid_t *ns, const uint8_t *name, size_t len)
 
     _set_version(uuid, UUID_V5);
     _set_reserved(uuid);
+}
+
+void uuid_to_string(const uuid_t *uuid, char *str)
+{
+    char *p = str;
+    p += fmt_u32_hex(p, byteorder_ntohl(uuid->time_low));
+    p += fmt_char(p, '-');
+    p += fmt_u16_hex(p, byteorder_ntohs(uuid->time_mid));
+    p += fmt_char(p, '-');
+    p += fmt_u16_hex(p, byteorder_ntohs(uuid->time_hi));
+    p += fmt_char(p, '-');
+    p += fmt_byte_hex(p, uuid->clk_seq_hi_res);
+    p += fmt_byte_hex(p, uuid->clk_seq_low);
+    p += fmt_char(p, '-');
+    p += fmt_bytes_hex(p, uuid->node, UUID_NODE_LEN);
+    *p = '\0';
+    fmt_to_lower(str, str);
 }

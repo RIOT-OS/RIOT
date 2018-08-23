@@ -780,6 +780,7 @@ endif
 ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += random
+  USEMODULE += fmt
 endif
 
 # Enable periph_gpio when periph_gpio_irq is enabled
