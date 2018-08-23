@@ -1,0 +1,3 @@
+MODULE = lora-serialization
+
+include $(RIOTBASE)/Makefile.base
