@@ -1,0 +1,14 @@
+/**
+@defgroup    sys_lora_serialization Lora serialization library
+@ingroup     sys
+@brief       Utility functions for Lora serialization format.
+
+             This tests were adapted from the lora-serialization
+             library.
+
+@see         https://github.com/thesolarnomad/lora-serialization
+
+
+The lora-serialization format is a simple encoder for LoRaWAN that can be integrated with platform like The Things Network or OpenSenseMap.
+
+*/
