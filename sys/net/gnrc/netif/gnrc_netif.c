@@ -1417,6 +1417,8 @@ static void *_gnrc_netif_thread(void *args)
 
     while (1) {
         msg_t msg;
+        /* msg will be filled by _process_events_await_msg.
+         * The function will not return until a message has been received. */
         _process_events_await_msg(netif, &msg);
 
         /* dispatch netdev, MAC and gnrc_netapi messages */
