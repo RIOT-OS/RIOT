@@ -22,6 +22,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <string.h>
+#include <errno.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,7 +70,7 @@ void lora_serialization_reset(lora_serialization_t *serialization);
  * @param[in] serialization     lora serialization descriptor
  * @param[in] unixtime          the unix time value
  */
-void lora_serialization_write_unix_time(lora_serialization_t *serialization,
+int lora_serialization_write_unix_time(lora_serialization_t *serialization,
                                         uint32_t unixtime);
 
 /**
@@ -79,26 +80,26 @@ void lora_serialization_write_unix_time(lora_serialization_t *serialization,
  * @param[in] latitude          latitude value
  * @param[in] longitude         longitude value
  */
-void lora_serialization_write_coordinates(lora_serialization_t *serialization,
+int lora_serialization_write_coordinates(lora_serialization_t *serialization,
                                           double latitude, double longitude);
 
 /**
  * @brief Adds an unsigned 16 bits integer to the buffer
  *
  * @param[in] serialization     lora serialization descriptor
- * @param[in] i                 integer value
+ * @param[in] value             integer value
  */
-void lora_serialization_write_uint16(lora_serialization_t *serialization,
-                                     uint16_t i);
+int lora_serialization_write_uint16(lora_serialization_t *serialization,
+                                     uint16_t value);
 
 /**
  * @brief Adds an unsigned 8 bits integer to the buffer
  *
  * @param[in] serialization     lora serialization descriptor
- * @param[in] i                 integer value
+ * @param[in] value             integer value
  */
-void lora_serialization_write_uint8(lora_serialization_t *serialization,
-                                    uint8_t i);
+int lora_serialization_write_uint8(lora_serialization_t *serialization,
+                                    uint8_t value);
 
 /**
  * @brief Adds encoded humidity value to the buffer
@@ -106,7 +107,7 @@ void lora_serialization_write_uint8(lora_serialization_t *serialization,
  * @param[in] serialization     lora serialization descriptor
  * @param[in] humidity          humidity value
  */
-void lora_serialization_write_humidity(lora_serialization_t *serialization,
+int lora_serialization_write_humidity(lora_serialization_t *serialization,
                                        float humidity);
 
 /**
@@ -115,7 +116,7 @@ void lora_serialization_write_humidity(lora_serialization_t *serialization,
  * @param[in] serialization     lora serialization descriptor
  * @param[in] temperature       temperature value
  */
-void lora_serialization_write_temperature(lora_serialization_t *serialization,
+int lora_serialization_write_temperature(lora_serialization_t *serialization,
                                           float temperature);
 
 /**
@@ -131,7 +132,7 @@ void lora_serialization_write_temperature(lora_serialization_t *serialization,
  * @param[in] g                 flag g value
  * @param[in] h                 flag h value
  */
-void lora_serialization_write_bitmap(lora_serialization_t *serialization,
+int lora_serialization_write_bitmap(lora_serialization_t *serialization,
                                      bool a, bool b, bool c, bool d, bool e,
                                      bool f, bool g, bool h);
 
