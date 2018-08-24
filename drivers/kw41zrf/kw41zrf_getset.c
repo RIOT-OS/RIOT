@@ -102,7 +102,6 @@ void kw41zrf_set_pan(kw41zrf_t *dev, uint16_t pan)
         ZLL_MACSHORTADDRS0_MACPANID0(pan);
 
     LOG_DEBUG("[kw41zrf] set pan to: 0x%x\n", pan);
-    dev->netdev.pan = pan;
 }
 
 void kw41zrf_set_addr_short(kw41zrf_t *dev, uint16_t addr)

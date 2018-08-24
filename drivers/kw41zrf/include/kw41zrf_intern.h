@@ -130,6 +130,7 @@ static inline void kw41zrf_abort_sequence(kw41zrf_t *dev)
         ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_SHIFT) != XCVSEQ_IDLE) {}
 
     /* Clear interrupt flags */
+    /* cppcheck-suppress selfAssignment */
     ZLL->IRQSTS = ZLL->IRQSTS;
 }
 
