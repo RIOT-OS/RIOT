@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    sys_matstat Matstat - Integer mathematical statistics library
- * @ingroup     sys
- * @brief       Library for computing 1-pass statistics
+ * @ingroup     sys_matstat
  *
  * The Matstat library uses single pass algorithms to compute statistic measures
  * such as mean and variance over many values. The values can be immediately
