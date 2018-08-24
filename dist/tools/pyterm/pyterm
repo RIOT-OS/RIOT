@@ -55,9 +55,9 @@ try:
     from twisted.internet.protocol import Protocol, \
         ReconnectingClientFactory
 except ImportError:
-    logging.getLogger("").warn("Twisted not available, please install "
-                               "it if you want to use pyterm's JSON "
-                               "capabilities")
+    logging.getLogger("").warning("Twisted not available, please install "
+                                  "it if you want to use pyterm's JSON "
+                                  "capabilities")
 
     class Protocol():
         def __init__(self):
@@ -206,8 +206,8 @@ class SerCmd(cmd.Cmd):
                 host = self.tcp_serial.split(':')[0]
                 port = self.tcp_serial.split(':')[1]
             else:
-                self.logger.warn("Host name for TCP connection is "
-                                 "missing, defaulting to \"localhost\"")
+                self.logger.warning("Host name for TCP connection is "
+                                    "missing, defaulting to \"localhost\"")
                 host = "localhost"
                 port = self.tcp_serial
             self.logger.info("Connect to %s:%s"
@@ -489,7 +489,7 @@ class SerCmd(cmd.Cmd):
     def load_config(self):
         """Internal function to laod configuration from file.
         """
-        self.config = configparser.SafeConfigParser()
+        self.config = configparser.ConfigParser()
         cf = os.path.join(self.configdir, self.configfile)
         self.config.read(cf)
         logging.getLogger("").info("Reading file: %s" % cf)
@@ -629,13 +629,13 @@ class SerCmd(cmd.Cmd):
                 c = sr.read(1)
             # try to re-open it with a timeout of 1s otherwise
             except (serial.SerialException, ValueError):
-                self.logger.warn("Serial port disconnected, waiting to "
-                                 "get reconnected...")
+                self.logger.warning("Serial port disconnected, waiting to "
+                                    "get reconnected...")
                 self.ser.close()
                 time.sleep(1)
                 if os.path.exists(self.port):
-                    self.logger.warn("Try to reconnect to %s again..."
-                                     % (self.port))
+                    self.logger.warning("Try to reconnect to %s again..."
+                                        % (self.port))
                     try:
                         self.serial_connect()
                         self.logger.info("Reconnected to serial port %s" % self.port)
@@ -712,8 +712,8 @@ class fdsocket(socket.socket):
         try:
             return self.sendall(string)
         except socket.error as e:
-            logging.getLogger("").warn("Error in TCP connection (%s), "
-                                       "closing down" % str(e))
+            logging.getLogger("").warning("Error in TCP connection (%s), "
+                                          "closing down" % str(e))
             self.close()
             sys.exit(0)
 
