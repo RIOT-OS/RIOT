@@ -1318,6 +1318,51 @@ static void _event_handler_isr(event_t *evp)
 }
 #endif /* MODULE_GNRC_NETIF_EVENTS */
 
+/**
+ * @brief   Process any pending events and wait for IPC messages
+ *
+ * This function will block until an IPC message is received. Events posted to
+ * the event queue will be processed while waiting for messages.
+ *
+ * @param[in]   netif   gnrc_netif instance to operate on
+ * @param[out]  msg     pointer to message buffer to write the first received message
+ *
+ * @return >0 if msg contains a new message
+ */
+static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
+{
+#ifdef MODULE_GNRC_NETIF_EVENTS
+    while (1) {
+        /* Using messages for external IPC, and events for internal events */
+
+        /* First drain the queues before blocking the thread */
+        /* Events will be handled before messages */
+        DEBUG("gnrc_netif: handling events\n");
+        event_t *evp;
+        /* We can not use event_loop() or event_wait() because then we would not
+         * wake up when a message arrives */
+        while ((evp = event_get(&netif->evq))) {
+            DEBUG("gnrc_netif: event %p\n", (void *)evp);
+            if (evp->handler) {
+                evp->handler(evp);
+            }
+        }
+        /* non-blocking msg check */
+        int msg_waiting = msg_try_receive(msg);
+        if (msg_waiting > 0) {
+            return;
+        }
+        DEBUG("gnrc_netif: waiting for events\n");
+        /* Block the thread until something interesting happens */
+        thread_flags_wait_any(THREAD_FLAG_MSG_WAITING | THREAD_FLAG_EVENT);
+    }
+#else /* MODULE_GNRC_NETIF_EVENTS */
+    /* Only messages used for event handling */
+    DEBUG("gnrc_netif: waiting for incoming messages\n");
+    msg_receive(msg);
+#endif /* MODULE_GNRC_NETIF_EVENTS */
+}
+
 static void *_gnrc_netif_thread(void *args)
 {
     gnrc_netapi_opt_t *opt;
@@ -1325,7 +1370,7 @@ static void *_gnrc_netif_thread(void *args)
     netdev_t *dev;
     int res;
     msg_t reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
-    msg_t msg, msg_queue[_NETIF_NETAPI_MSG_QUEUE_SIZE];
+    msg_t msg_queue[_NETIF_NETAPI_MSG_QUEUE_SIZE];
 
     DEBUG("gnrc_netif: starting thread %i\n", sched_active_pid);
     netif = args;
@@ -1371,93 +1416,65 @@ static void *_gnrc_netif_thread(void *args)
     gnrc_netif_release(netif);
 
     while (1) {
-        int msg_waiting = 0;
-#ifdef MODULE_GNRC_NETIF_EVENTS
-        /* Using messages for external IPC, and events for internal events */
-        DEBUG("gnrc_netif: waiting for events\n");
-        /* We can not use event_loop() or event_wait() because then we would not
-         * wake up when a message arrives */
-        thread_flags_t flags = thread_flags_wait_any(
-            THREAD_FLAG_MSG_WAITING | THREAD_FLAG_EVENT);
-        /* Events will be handled before messages */
-        if (flags & THREAD_FLAG_EVENT) {
-            DEBUG("gnrc_netif: handling events\n");
-            event_t *evp;
-            while ((evp = event_get(&netif->evq))) {
-                DEBUG("gnrc_netif: event %p\n", (void *)evp);
-                if (evp->handler) {
-                    evp->handler(evp);
+        msg_t msg;
+        _process_events_await_msg(netif, &msg);
+
+        /* dispatch netdev, MAC and gnrc_netapi messages */
+        DEBUG("gnrc_netif: message %u\n", (unsigned)msg.type);
+        switch (msg.type) {
+            case NETDEV_MSG_TYPE_EVENT:
+                DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_EVENT received\n");
+                dev->driver->isr(dev);
+                break;
+            case GNRC_NETAPI_MSG_TYPE_SND:
+                DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
+                res = netif->ops->send(netif, msg.content.ptr);
+                if (res < 0) {
+                    DEBUG("gnrc_netif: error sending packet %p (code: %u)\n",
+                          msg.content.ptr, res);
                 }
-            }
-        }
-        if (flags & THREAD_FLAG_MSG_WAITING) {
-            /* non-blocking msg check */
-            msg_waiting = msg_try_receive(&msg);
-        }
-#else /* MODULE_GNRC_NETIF_EVENTS */
-        /* Only messages used for event handling */
-        DEBUG("gnrc_netif: waiting for incoming messages\n");
-        msg_waiting = msg_receive(&msg);
-#endif /* MODULE_GNRC_NETIF_EVENTS */
-        while (msg_waiting > 0) {
-            /* dispatch netdev, MAC and gnrc_netapi messages */
-            DEBUG("gnrc_netif: message %u\n", (unsigned)msg.type);
-            switch (msg.type) {
-                case NETDEV_MSG_TYPE_EVENT:
-                    DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_EVENT received\n");
-                    dev->driver->isr(dev);
-                    break;
-                case GNRC_NETAPI_MSG_TYPE_SND:
-                    DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
-                    res = netif->ops->send(netif, msg.content.ptr);
-                    if (res < 0) {
-                        DEBUG("gnrc_netif: error sending packet %p (code: %u)\n",
-                              msg.content.ptr, res);
-                    }
-                    break;
-                case GNRC_NETAPI_MSG_TYPE_SET:
-                    opt = msg.content.ptr;
+                break;
+            case GNRC_NETAPI_MSG_TYPE_SET:
+                opt = msg.content.ptr;
 #ifdef MODULE_NETOPT
-                    DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received. opt=%s\n",
-                          netopt2str(opt->opt));
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received. opt=%s\n",
+                      netopt2str(opt->opt));
 #else
-                    DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received. opt=%d\n",
-                          opt->opt);
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_SET received. opt=%d\n",
+                      opt->opt);
 #endif
-                    /* set option for device driver */
-                    res = netif->ops->set(netif, opt);
-                    DEBUG("gnrc_netif: response of netif->ops->set(): %i\n", res);
-                    reply.content.value = (uint32_t)res;
-                    msg_reply(&msg, &reply);
-                    break;
-                case GNRC_NETAPI_MSG_TYPE_GET:
-                    opt = msg.content.ptr;
+                /* set option for device driver */
+                res = netif->ops->set(netif, opt);
+                DEBUG("gnrc_netif: response of netif->ops->set(): %i\n", res);
+                reply.content.value = (uint32_t)res;
+                msg_reply(&msg, &reply);
+                break;
+            case GNRC_NETAPI_MSG_TYPE_GET:
+                opt = msg.content.ptr;
 #ifdef MODULE_NETOPT
-                    DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received. opt=%s\n",
-                          netopt2str(opt->opt));
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received. opt=%s\n",
+                      netopt2str(opt->opt));
 #else
-                    DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received. opt=%d\n",
-                          opt->opt);
+                DEBUG("gnrc_netif: GNRC_NETAPI_MSG_TYPE_GET received. opt=%d\n",
+                      opt->opt);
 #endif
-                    /* get option from device driver */
-                    res = netif->ops->get(netif, opt);
-                    DEBUG("gnrc_netif: response of netif->ops->get(): %i\n", res);
-                    reply.content.value = (uint32_t)res;
-                    msg_reply(&msg, &reply);
-                    break;
-                default:
-                    if (netif->ops->msg_handler) {
-                        DEBUG("gnrc_netif: delegate message of type 0x%04x to "
-                              "netif->ops->msg_handler()\n", msg.type);
-                        netif->ops->msg_handler(netif, &msg);
-                    }
-                    else {
-                        DEBUG("gnrc_netif: unknown message type 0x%04x"
-                              "(no message handler defined)\n", msg.type);
-                    }
-                    break;
-            }
-            msg_waiting = msg_try_receive(&msg);
+                /* get option from device driver */
+                res = netif->ops->get(netif, opt);
+                DEBUG("gnrc_netif: response of netif->ops->get(): %i\n", res);
+                reply.content.value = (uint32_t)res;
+                msg_reply(&msg, &reply);
+                break;
+            default:
+                if (netif->ops->msg_handler) {
+                    DEBUG("gnrc_netif: delegate message of type 0x%04x to "
+                          "netif->ops->msg_handler()\n", msg.type);
+                    netif->ops->msg_handler(netif, &msg);
+                }
+                else {
+                    DEBUG("gnrc_netif: unknown message type 0x%04x"
+                          "(no message handler defined)\n", msg.type);
+                }
+                break;
         }
     }
     /* never reached */
