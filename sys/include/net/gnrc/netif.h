@@ -84,15 +84,15 @@ typedef struct {
      */
     event_queue_t evq;
     /**
-     * @brief   Pointer to event instance table
+     * @brief   Pointer to ISR event
      *
-     * This pointer gives a way to allocate events on the stack of each
+     * This pointer gives a way to allocate ISR events on the stack of each
      * gnrc_netif thread, instead of having a single global instance which will
      * not work if the system has more than one network interface.
      * The _event_cb function of gnrc_netif.c uses this pointer to be able to
      * post events from interrupt context.
      */
-    void *events;
+    void *event_isr; /* void * to keep implementation details private to gnrc_netif.c */
 #endif /* MODULE_GNRC_NETIF_EVENTS */
 #if (GNRC_NETIF_L2ADDR_MAXLEN > 0)
     /**
