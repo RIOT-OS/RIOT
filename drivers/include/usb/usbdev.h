@@ -72,7 +72,14 @@ extern "C" {
 #include "usb.h"
 #include "usb/usbopt.h"
 
+/**
+ * @brief forward declaration for the usbdev struct
+ */
 typedef struct usbdev usbdev_t;
+
+/**
+ * @brief forward declaration for the usbdev endpoint struct
+ */
 typedef struct usbdev_ep usbdev_ep_t;
 
 /**
@@ -153,13 +160,13 @@ typedef void (*usbdev_ep_event_cb_t)(usbdev_ep_t *ep, usbdev_event_t event);
  * @brief usbdev endpoint descriptor
  */
 struct usbdev_ep {
-    const struct usbdev_ep_driver *driver;  /**< Endpoint driver struct     */
+    const struct usbdev_ep_driver *driver;  /**< Endpoint driver struct       */
     usbdev_ep_event_cb_t cb;                /**< Endpoint event callback for
-                                              *  upper layer                */
-    usb_ep_dir_t dir;                       /**< Endpoint direction         */ 
-    usb_ep_type_t type;                     /**< Endpoint type              */
-    uint8_t num;                            /**< Endpoint number            */
-    void *context;                          /**< Ptr to the thread context  */
+                                              *  upper layer                  */
+    usb_ep_dir_t dir;                       /**< Endpoint direction           */
+    usb_ep_type_t type;                     /**< Endpoint type                */
+    uint8_t num;                            /**< Endpoint number              */
+    void *context;                          /**< Ptr to the USB stack context */
 };
 
 typedef struct usbdev_driver {
