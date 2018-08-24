@@ -1291,7 +1291,17 @@ static void *_gnrc_netif_thread(void *args)
     dev->event_callback = _event_cb;
     dev->context = netif;
     /* initialize low-level driver */
-    dev->driver->init(dev);
+    res = dev->driver->init(dev);
+    if (res < 0) {
+        LOG_ERROR("gnrc_netif: netdev init failed: %d\n", res);
+        /* unregister this netif instance */
+        netif->ops = NULL;
+        netif->pid = KERNEL_PID_UNDEF;
+        netif->dev = NULL;
+        dev->event_callback = NULL;
+        dev->context = NULL;
+        return NULL;
+    }
     _configure_netdev(dev);
     _init_from_device(netif);
     netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
