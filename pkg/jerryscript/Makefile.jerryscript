@@ -33,5 +33,3 @@ libjerry:
 	cp $(BUILD_DIR)/lib/libjerry-core.a $(BINDIR)/jerryscript.a
 	cp $(BUILD_DIR)/lib/libjerry-ext.a $(BINDIR)/jerryscript-ext.a
 	cp $(BUILD_DIR)/lib/libjerry-port-default-minimal.a $(BINDIR)/jerryport-minimal.a
-
-include $(RIOTBASE)/Makefile.base
