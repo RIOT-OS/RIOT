@@ -140,6 +140,13 @@ extern const mtd_desc_t mtd_spi_nor_driver;
  * sensible for default values. */
 extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default;
 
+/**
+ * @brief   Default 4-byte addresses opcodes
+ *
+ * Commands for 4-byte addresses chips (above 128Mb)
+ */
+extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default_4bytes;
+
 #ifdef __cplusplus
 }
 #endif
