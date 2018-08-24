@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    sys_base64 base64 encoder decoder
- * @ingroup     sys
+ * @ingroup     sys_serialization
  * @brief       base64 encoder and decoder
  * @{
  *
