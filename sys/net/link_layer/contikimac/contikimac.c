@@ -782,9 +782,6 @@ static void contikimac_periodic_handler(contikimac_t *ctx)
     }
     /* Set timeout in case we only detected noise */
     TRACE("L");
-    netopt_state_t state;
-    res = lower->driver->get(lower, NETOPT_STATE, &state, sizeof(state));
-    DEBUG("S:%u\n", (unsigned)state);
     contikimac_set_timeout(ctx, ctx->params->listen_timeout);
 }
 
