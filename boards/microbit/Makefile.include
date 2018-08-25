@@ -19,6 +19,8 @@ ifeq (fscopy,$(PROGRAMMER))
 else ifeq (openocd,$(PROGRAMMER))
   # this board uses a daplink adapter by default
   DEBUG_ADAPTER = dap
+else ifeq (pyocd, $(PROGRAMMER))
+  include $(RIOTMAKE)/tools/pyocd.inc.mk
 endif
 
 # include nrf51 boards common configuration
