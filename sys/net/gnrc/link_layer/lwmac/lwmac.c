@@ -116,7 +116,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     netdev_ieee802154_rx_info_t rx_info;
     netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
     gnrc_pktsnip_t *pkt = NULL;
-    int bytes_expected = dev->driver->expected_bytes(dev);
+    int bytes_expected = dev->driver->size(dev);
 
     if (bytes_expected > 0) {
         int nread;
