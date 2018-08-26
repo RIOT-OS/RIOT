@@ -231,10 +231,6 @@ ifneq (,$(filter lis3dh,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
 endif
 
-ifneq (,$(filter lm75a,$(USEMODULE)))
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter lpd8808,$(USEMODULE)))
   USEMODULE += color
   FEATURES_REQUIRED += periph_gpio
