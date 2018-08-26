@@ -318,6 +318,8 @@ ifneq (,$(filter nvram_spi,$(USEMODULE)))
 endif
 
 ifneq (,$(filter pcd8544,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
   USEMODULE += xtimer
 endif
 
