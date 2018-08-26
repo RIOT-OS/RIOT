@@ -270,6 +270,10 @@ ifneq (,$(filter mpu9150,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter mq3,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
 ifneq (,$(filter mrf24j40,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += luid
