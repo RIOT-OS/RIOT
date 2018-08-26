@@ -167,6 +167,7 @@ endif
 
 ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_i2c
 endif
 
 ifneq (,$(filter hts221,$(USEMODULE)))
