@@ -312,6 +312,7 @@ ifneq (,$(filter nrf24l01p,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nvram_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
   USEMODULE += nvram
   USEMODULE += xtimer
 endif
