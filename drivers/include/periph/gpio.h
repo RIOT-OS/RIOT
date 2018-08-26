@@ -148,6 +148,7 @@ typedef struct {
  */
 int gpio_init(gpio_t pin, gpio_mode_t mode);
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Initialize a GPIO pin for external interrupt usage
  *
@@ -167,6 +168,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  */
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg);
+
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief   Enable pin interrupt if configured as interrupt source

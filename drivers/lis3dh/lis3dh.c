@@ -20,7 +20,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "periph/gpio.h"
 #include "periph/spi.h"
 #include "lis3dh.h"
 
