@@ -240,6 +240,10 @@ ifneq (,$(filter lps331ap,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter lsm6dsl,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
