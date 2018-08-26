@@ -305,6 +305,12 @@ ifneq (,$(filter nrfmin,$(USEMODULE)))
   USEMODULE += netif
 endif
 
+ifneq (,$(filter nrf24l01p,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter nvram_spi,$(USEMODULE)))
   USEMODULE += nvram
   USEMODULE += xtimer
