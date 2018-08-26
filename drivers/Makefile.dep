@@ -189,6 +189,10 @@ ifneq (,$(filter isl29020,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter isl29125,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter jc42,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
