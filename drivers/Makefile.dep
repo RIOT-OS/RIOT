@@ -429,6 +429,8 @@ ifneq (,$(filter w5100,$(USEMODULE)))
 endif
 
 ifneq (,$(filter xbee,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  FEATURES_REQUIRED += periph_gpio
   USEMODULE += ieee802154
   USEMODULE += xtimer
   USEMODULE += netif
