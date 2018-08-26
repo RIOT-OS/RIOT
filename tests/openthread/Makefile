@@ -26,8 +26,8 @@ ifneq (,$(filter iotlab-m3 fox iotlab-a8-m3,$(BOARD)))
 endif
 
 ifneq (,$(filter at86rf2%,$(DRIVER)))
-  FEATURES_REQUIRED = periph_spi
-  FEATURES_REQUIRED = periph_gpio
+  FEATURES_REQUIRED += periph_spi
+  FEATURES_REQUIRED += periph_gpio
 endif
 
 USEMODULE += $(DRIVER)
