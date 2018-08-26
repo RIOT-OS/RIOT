@@ -13,6 +13,10 @@ ifneq (,$(filter ads101%,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter adt7310,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+endif
+
 ifneq (,$(filter adxl345,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
