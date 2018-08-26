@@ -1357,6 +1357,7 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
         thread_flags_wait_any(THREAD_FLAG_MSG_WAITING | THREAD_FLAG_EVENT);
     }
 #else /* MODULE_GNRC_NETIF_EVENTS */
+    (void) netif;
     /* Only messages used for event handling */
     DEBUG("gnrc_netif: waiting for incoming messages\n");
     msg_receive(msg);
