@@ -3,8 +3,6 @@ BOARD ?= samr21-xpro
 
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED = periph_i2c
-
 USEMODULE += isl29125
 USEMODULE += xtimer
 
