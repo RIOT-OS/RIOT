@@ -10,9 +10,12 @@
 /**
  * @defgroup   drivers_ads101x ADS101x/111x ADC device driver
  * @ingroup    drivers_sensors
+ * @ingroup    drivers_saul
  * @brief      I2C Analog-to-Digital Converter device driver
  *
- *             This driver works with ADS1013-5 and ADS1113-5.
+ * This driver works with ADS1013-5 and ADS1113-5.
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

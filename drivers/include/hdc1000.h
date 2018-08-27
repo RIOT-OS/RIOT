@@ -10,6 +10,7 @@
 /**
  * @defgroup    drivers_hdc1000 HDC1000 Humidity and Temperature Sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the TI HDC1000 Humidity and Temperature Sensor
  *
  * The driver will initialize the sensor for best resolution (14 bit). Currently
@@ -25,6 +26,8 @@
  *
  * @note        The driver does currently not support using the devices heating
  *              unit.
+ *
+ * This driver provides @ref drivers_saul capabilities.
  *
  * @{
  *

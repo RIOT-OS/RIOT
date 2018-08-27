@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_bmp180 BMP180 temperature and pressure sensor
  * @ingroup     drivers_sensors
- * @brief       Device driver interface for the BMP180 sensor.
+ * @ingroup     drivers_saul
+ * @brief       Device driver interface for the BMP180 sensor
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

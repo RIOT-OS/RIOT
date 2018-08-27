@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_bmx055 BMX055 9-axis sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the Bosch BMX055 9-axis sensor
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

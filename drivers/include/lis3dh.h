@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_lis3dh LIS3DH accelerometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for the LIS3DH accelerometer
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

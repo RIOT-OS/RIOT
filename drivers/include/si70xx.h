@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_si70xx Si7006/13/20/21 temperature and humidity sensors
  * @ingroup     drivers_sensors
- * @brief       Driver for the Si7006/13/20/21 temperature and humidity sensor.
+ * @ingroup     drivers_saul
+ * @brief       Driver for the Si7006/13/20/21 temperature and humidity sensor
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

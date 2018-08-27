@@ -9,6 +9,7 @@
 /**
  * @defgroup    drivers_io1_xplained Atmel IO1 Xplained Extension board
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver interface for the Atmel IO1 Xplained extension.
  *
  * This board contains several sensors and actuators:
@@ -27,6 +28,7 @@
  * (http://www.atmel.com/images/atmel-42078-io1-xplained-pro_user-guide.pdf)
  * for more information
  *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
