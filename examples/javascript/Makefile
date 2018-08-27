@@ -7,6 +7,10 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+# allow board aliases for this example (needed because we use the BOARD
+# variable in this Makefile)
+include $(RIOTBASE)/makefiles/boards/alias.inc.mk
+
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini \
                              cc2650-launchpad cc2650stk hifive1 maple-mini \
                              microbit nrf51dongle nrf6310 nucleo-f030r8 nucleo-f070rb \

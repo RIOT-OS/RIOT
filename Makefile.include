@@ -4,6 +4,9 @@
 # include Makefile.local if it exists
 -include Makefile.local
 
+# map given board name to actual board folder (resolve potential alias)
+include $(RIOTBASE)/makefiles/boards/alias.inc.mk
+
 # set undefined variables
 RIOTBASE       ?= $(dir $(lastword $(MAKEFILE_LIST)))
 CCACHE_BASEDIR ?= $(RIOTBASE)
@@ -463,7 +466,11 @@ endef
 	$(call check_cmd,$(CC),Compiler)
 
 ..build-message:
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".$(COLOR_RESET)'
+ifeq (,$(ALIAS))
+	@$(COLOR_ECHO) '${COLOR_GREEN}Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".${COLOR_RESET}'
+else
+	@$(COLOR_ECHO) '${COLOR_GREEN}Building application "$(APPLICATION)" for "$(ALIAS) -> $(BOARD)" with MCU "$(MCU)".${COLOR_RESET}'
+endif
 	@$(COLOR_ECHO)
 
 # The `clean` needs to be serialized before everything else.

@@ -7,6 +7,10 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+# allow board aliases for this example (needed because we use the BOARD
+# variable in this Makefile)
+include $(RIOTBASE)/makefiles/boards/alias.inc.mk
+
 # Uncomment these lines if you want to use platform support from external
 # repositories:
 #RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
