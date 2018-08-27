@@ -1,6 +1,9 @@
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   DIRS += net/link_layer/csma_sender
 endif
+ifneq (,$(filter eepreg,$(USEMODULE)))
+  DIRS += eepreg
+endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   DIRS += posix/semaphore
 endif

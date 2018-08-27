@@ -1,3 +1,7 @@
+ifneq (,$(filter eepreg,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_eeprom
+endif
+
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
   CFLAGS += -DCRYPTO_AES
 endif
