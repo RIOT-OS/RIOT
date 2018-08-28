@@ -36,3 +36,21 @@
  * * SHA-256
  *
  */
+
+/**
+ * @defgroup    sys_hashes_non_crypto Non-cryptographic hash functions
+ * @ingroup     sys_hashes
+ * @brief       A collection of non-cryptographic hash algorithms.
+ */
+
+/**
+ * @defgroup    sys_hashes_unkeyed Unkeyed cryptographic hash functions
+ * @ingroup     sys_hashes
+ * @brief       A collection of unkeyed cryptographic hash algorithms.
+ */
+
+/**
+ * @defgroup    sys_hashes_keyed Keyed cryptographic hash functions
+ * @ingroup     sys_hashes
+ * @brief       A collection of keyed cryptographic hash algorithms.
+ */
