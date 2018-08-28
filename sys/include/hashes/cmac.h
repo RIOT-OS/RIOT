@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    sys_hashes_cmac AES_CMAC
- * @ingroup     sys_hashes
+ * @ingroup     sys_hashes_keyed
  * @brief       Implementation of the AES CMAC hashing function
 
  * @{
