@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "periph/timer.h"
+#include "xtimer.h"
 
 #ifndef TEST_BLOCKSIZE
 #define TEST_BLOCKSIZE       128
@@ -48,24 +48,24 @@ static uint64_t buf[TEST_BLOCKSIZE];
 #define TEST_FUNC_VARIABLE(func, T, op) \
     uint32_t test_ ## T ## _ ## func ## _var(T *buf, size_t nelem) \
     { \
-        unsigned time_start = timer_read(TIM_REF_DEV); \
+        xtimer_ticks32_t time_start = xtimer_now(); \
         for (unsigned k = 0; k < (nelem - 1); ++k) { \
             buf[k] op (buf[k + 1]); \
         } \
-        unsigned time_end = timer_read(TIM_REF_DEV); \
-        return (time_end - time_start); \
+        xtimer_ticks32_t time_end = xtimer_now(); \
+        return xtimer_usec_from_ticks(xtimer_diff(time_end, time_start)); \
     }
 
 /* template for test function with compile-time constant right operand */
 #define TEST_FUNC_CCONST(func, T, op, constant) \
     uint32_t test_ ## T ## _ ## func ## _cconst(T *buf, size_t nelem) \
     { \
-        unsigned time_start = timer_read(TIM_REF_DEV); \
+        xtimer_ticks32_t time_start = xtimer_now(); \
         for (unsigned k = 0; k < (nelem - 1); ++k) { \
             buf[k] op constant; \
         } \
-        unsigned time_end = timer_read(TIM_REF_DEV); \
-        return (time_end - time_start); \
+        xtimer_ticks32_t time_end = xtimer_now(); \
+        return xtimer_usec_from_ticks(xtimer_diff(time_end, time_start)); \
     }
 
 /* template for test function with run-time constant right operand */
@@ -74,12 +74,12 @@ static uint64_t buf[TEST_BLOCKSIZE];
 #define TEST_FUNC_RCONST(func, T, op) \
     uint32_t test_ ## T ## _ ## func ## _rconst(T *buf, size_t nelem, const T constant) \
     { \
-        unsigned time_start = timer_read(TIM_REF_DEV); \
+        xtimer_ticks32_t time_start = xtimer_now(); \
         for (unsigned k = 0; k < (nelem - 1); ++k) { \
             buf[k] op constant; \
         } \
-        unsigned time_end = timer_read(TIM_REF_DEV); \
-        return (time_end - time_start); \
+        xtimer_ticks32_t time_end = xtimer_now(); \
+        return xtimer_usec_from_ticks(xtimer_diff(time_end, time_start)); \
     }
 
 /* Instancing all three above variants with one macro */
