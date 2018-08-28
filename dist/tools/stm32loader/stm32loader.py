@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # -*- coding: utf-8 -*-
 # vim: sw=4:ts=4:si:et:enc=utf-8
@@ -126,13 +126,13 @@ class CommandInterface(object):
         stop = time.time() + 5.0
 
         while time.time() <= stop:
-            self.sp.write('\x7f')
+            self.sp.write(bytes([0x7f]))
 
             got = self.sp.read()
 
             # The chip will ACK a sync the very first time and
             # NACK it every time afterwards
-            if got and got in '\x79\x1f':
+            if got and got in bytes([0x79,0x1f]):
                 # Synced up
                 return
 
@@ -147,8 +147,10 @@ class CommandInterface(object):
         self.reset()
 
     def cmdGeneric(self, cmd):
-        self.sp.write(chr(cmd))
-        self.sp.write(chr(cmd ^ 0xFF)) # Control byte
+        cmdByte = bytes([cmd])
+        ctrlByte = bytes([cmd ^ 0xFF])
+        self.sp.write(cmdByte)
+        self.sp.write(ctrlByte) # Control byte
         return self._wait_for_ack(hex(cmd))
 
     def cmdGet(self):
@@ -192,7 +194,7 @@ class CommandInterface(object):
         byte1 = (addr >> 16) & 0xFF
         byte0 = (addr >> 24) & 0xFF
         crc = byte0 ^ byte1 ^ byte2 ^ byte3
-        return (chr(byte0) + chr(byte1) + chr(byte2) + chr(byte3) + chr(crc))
+        return [byte0, byte1, byte2, byte3, crc]
 
 
     def cmdReadMemory(self, addr, lng):
@@ -203,9 +205,9 @@ class CommandInterface(object):
             self._wait_for_ack("0x11 address failed")
             N = (lng - 1) & 0xFF
             crc = N ^ 0xFF
-            self.sp.write(chr(N) + chr(crc))
+            self.sp.write(bytes([N, crc]))
             self._wait_for_ack("0x11 length failed")
-            return map(lambda c: ord(c), self.sp.read(lng))
+            return self.sp.read(lng)
         else:
             raise CmdException("ReadMemory (0x11) failed")
 
@@ -223,26 +225,26 @@ class CommandInterface(object):
         assert(len(data) <= 256)
         if self.cmdGeneric(0x31):
             mdebug(10, "*** Write memory command")
-            self.sp.write(self._encode_addr(addr))
+            self.sp.write(bytes(self._encode_addr(addr)))
             self._wait_for_ack("0x31 address failed")
             #map(lambda c: hex(ord(c)), data)
             lng = (len(data)-1) & 0xFF
             mdebug(10, "    %s bytes to write" % [lng+1]);
-            self.sp.write(chr(lng)) # len really
+            self.sp.write(bytes([lng])) # len really
             crc = 0xFF
             try:
-              datastr = ""
+              dataBytes = []
               for c in data:
                   crc = crc ^ c
-                  datastr = datastr+chr(c)
-              datastr = datastr + chr(crc)
-              self.sp.write(datastr)
+                  dataBytes.append(c)
+              dataBytes.append(crc)
+              self.sp.write(bytes(dataBytes))
               self._wait_for_ack("0x31 programming failed")
               mdebug(10, "    Write memory done")
             except:
               mdebug(5, "    WRITE FAIL - try and recover")
               for c in data:
-                self.sp.write(chr(255))
+                self.sp.write(bytes([255]))
               mdebug(5, "    WRITE FAIL - wait")
               stop = time.time() + 1
               while time.time() < stop:
@@ -315,7 +317,7 @@ class CommandInterface(object):
                 data.append(crc)
 
                 for b in data:
-                    self.sp.write(chr(b))
+                    self.sp.write(bytes([b]))
 
             self._wait_for_ack("0x44 erasing failed", timeout=self.GLOBAL_ERASE_TIMEOUT_SECONDS)
             mdebug(10, "    Erase memory done")
@@ -368,7 +370,7 @@ class CommandInterface(object):
 # Complex commands section
 
     def readMemory(self, addr, lng):
-        data = []
+        data = bytes([])
         if usepbar:
             widgets = ['Reading: ', Percentage(),', ', ETA(), ' ', Bar()]
             pbar = ProgressBar(widgets=widgets,maxval=lng, term_width=79).start()
@@ -378,7 +380,7 @@ class CommandInterface(object):
                 pbar.update(pbar.maxval-lng)
             else:
                 mdebug(5, "Read %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
-            data = data + self.cmdReadMemory(addr, 256)
+            data += self.cmdReadMemory(addr, 256)
             addr = addr + 256
             lng = lng - 256
         if usepbar:
@@ -386,7 +388,7 @@ class CommandInterface(object):
             pbar.finish()
         else:
             mdebug(5, "Read %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
-        data = data + self.cmdReadMemory(addr, lng)
+        data += self.cmdReadMemory(addr, lng)
         return data
 
     def writeMemory(self, addr, data):
@@ -414,7 +416,7 @@ class CommandInterface(object):
             pbar.finish()
         else:
             mdebug(5, "Write %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
-        self.cmdWriteMemory(addr, data[offs:offs+lng] + ([0xFF] * (256-lng)) )
+        self.cmdWriteMemory(addr, data[offs:offs+lng] + bytes([0xFF] * (256-lng)) )
 
     def PCLKHack(self):
         RCC_CFGR = 0x40021004
@@ -484,7 +486,7 @@ def read(filename):
     with open(filename, 'rb') as f:
         bytes = f.read()
 
-    if bytes.startswith('\x7FELF'):
+    if bytes.startswith(b'\x7FELF'):
         # Actually an ELF file.  Convert to binary
         handle, path = tempfile.mkstemp(suffix='.bin', prefix='stm32loader')
 
@@ -506,7 +508,7 @@ def read(filename):
             # Remove the temporary file
             os.unlink(path)
     else:
-        return [ord(x) for x in bytes]
+        return bytes
 
 if __name__ == "__main__":
 
@@ -616,7 +618,7 @@ if __name__ == "__main__":
 
         chip_id = cmd.cmdGetID()
         assert len(chip_id) == 2, "Unreasonable chip id: %s" % repr(chip_id)
-        chip_id_num = (ord(chip_id[0]) << 8) | ord(chip_id[1])
+        chip_id_num = (chip_id[0] << 8) | chip_id[1]
         chip_id_str = CHIP_ID_STRS.get(chip_id_num, None)
 
         if chip_id_str is None:
@@ -647,7 +649,7 @@ if __name__ == "__main__":
             else:
                 print("Verification FAILED")
                 print(str(len(data)) + ' vs ' + str(len(verify)))
-                for i in xrange(0, len(data)):
+                for i in range(0, len(data)):
                     if data[i] != verify[i]:
                         print(hex(i) + ': ' + hex(data[i]) + ' vs ' + hex(verify[i]))
                 had_error = True
