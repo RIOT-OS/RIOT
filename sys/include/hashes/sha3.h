@@ -13,7 +13,7 @@
 
 /**
  * @defgroup    sys_hashes_sha3 SHA-3
- * @ingroup     sys_hashes
+ * @ingroup     sys_hashes_unkeyed
  * @brief       Implementation of the SHA-3 hashing function
  * @{
  *
