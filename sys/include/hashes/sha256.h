@@ -31,7 +31,9 @@
 
 
 /**
+ * @defgroup    sys_hashes_sha256 SHA-256
  * @ingroup     sys_hashes
+ * @brief       Implementation of the SHA-256 hashing function
  * @{
  *
  * @file
