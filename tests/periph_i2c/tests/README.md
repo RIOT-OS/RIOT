@@ -13,12 +13,11 @@ Connect the DUT (device under test) I2C0 to the BPT (bluepill tester).  Informat
 (DUT NRST <=> BPT PB1)</br>
 4. `test.py` requires the path to `$RIOTBASE/dist/pythonlibs` to be added to `PYTHONPATH` environment variable. Either modify `PYTHONPATH` permanently in the `.bashrc` or modify it temporary before invocation:</br>
 `PYTHONPATH=$PYTHONPATH:$RIOTBASE/dist/pythonlibs python3 test.py`
-5. Run the test.py from the periph_i2c/tests directory (with various options)</br>
-`python test.py` for basic tests with autoconnect</br>
+5. Run the `test.py` from the `periph_i2c/tests` directory (with various options)</br>
 `python3 test.py` for python 3</br>
-`python test.py --log=DEBUG` to see all debug messages</br>
-`python test.py --dut_port="/dev/ttyACM0"` to specify the port</br>
-`python test.py --log=DEBUG --dut_port="/dev/ttyACM0" --dut_baud=9600 --bpt_port="/dev/ttyACM1" > nucleo-f401_test.txt` for all the fix'ns</br>
+`python3 test.py --log=DEBUG` to see all debug messages</br>
+`python3 test.py --dut_port="/dev/ttyACM0"` to specify the port</br>
+`python3 test.py --log=DEBUG --dut_port="/dev/ttyACM0" --dut_uart=6 --bpt_port="/dev/ttyACM1" > nucleo-f401_test.txt` for all the fix'ns</br>
 
 Flags
 ==========
