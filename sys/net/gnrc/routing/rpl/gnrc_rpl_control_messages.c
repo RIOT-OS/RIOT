@@ -54,6 +54,110 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define GNRC_RPL_PRF_MASK                   (0x7)
 #define GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT    (1 << 6)
 
+/**
+ * @brief   Checks validity of DIO control messages
+ *
+ * @param[in]   dio         The DIO control message
+ * @param[in]   len         Length of the DIO control message
+ *
+ * @return  true, if @p dio is valid
+ * @return  false, otherwise
+ */
+static inline bool gnrc_rpl_validation_DIO(gnrc_rpl_dio_t *dio, uint16_t len)
+{
+    uint16_t expected_len = sizeof(*dio) + sizeof(icmpv6_hdr_t);
+
+    if (expected_len <= len) {
+        return true;
+    }
+
+    DEBUG("RPL: wrong DIO len: %d, expected: %d\n", len, expected_len);
+
+    return false;
+}
+
+/**
+ * @brief   Checks validity of DIS control messages
+ *
+ * @param[in]   dis     The DIS control message
+ * @param[in]   len     Length of the DIS control message
+ *
+ * @return  true, if @p dis is valid
+ * @return  false, otherwise
+ */
+static inline bool gnrc_rpl_validation_DIS(gnrc_rpl_dis_t *dis, uint16_t len)
+{
+    uint16_t expected_len = sizeof(*dis) + sizeof(icmpv6_hdr_t);
+
+    if (expected_len <= len) {
+        return true;
+    }
+
+    DEBUG("RPL: wrong DIS len: %d, expected: %d\n", len, expected_len);
+
+    return false;
+}
+
+/**
+ * @brief   Checks validity of DAO control messages
+ *
+ * @param[in]   dao         The DAO control message
+ * @param[in]   len         Length of the DAO control message
+ *
+ * @return  true, if @p dao is valid
+ * @return  false, otherwise
+ */
+static inline bool gnrc_rpl_validation_DAO(gnrc_rpl_dao_t *dao, uint16_t len)
+{
+    uint16_t expected_len = sizeof(*dao) + sizeof(icmpv6_hdr_t);
+
+    if ((dao->k_d_flags & GNRC_RPL_DAO_D_BIT)) {
+        expected_len += sizeof(ipv6_addr_t);
+    }
+
+    if (expected_len <= len) {
+        return true;
+    }
+
+    DEBUG("RPL: wrong DAO len: %d, expected: %d\n", len, expected_len);
+
+    return false;
+}
+
+/**
+ * @brief   Checks validity of DAO-ACK control messages
+ *
+ * @param[in]   dao_ack     The DAO-ACK control message
+ * @param[in]   len         Length of the DAO-ACK control message
+ * @param[in]   dst         Pointer to the destination address of the IPv6 packet.
+ *
+ * @return  true, if @p dao_ack is valid
+ * @return  false, otherwise
+ */
+static inline bool gnrc_rpl_validation_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack,
+                                               uint16_t len,
+                                               ipv6_addr_t *dst)
+{
+    uint16_t expected_len = sizeof(*dao_ack) + sizeof(icmpv6_hdr_t);
+
+    if (ipv6_addr_is_multicast(dst)) {
+        DEBUG("RPL: received DAO-ACK on multicast address\n");
+        return false;
+    }
+
+    if ((dao_ack->d_reserved & GNRC_RPL_DAO_ACK_D_BIT)) {
+        expected_len += sizeof(ipv6_addr_t);
+    }
+
+    if (expected_len == len) {
+        return true;
+    }
+
+    DEBUG("RPL: wrong DAO-ACK len: %d, expected: %d\n", len, expected_len);
+
+    return false;
+}
+
 static gnrc_netif_t *_find_interface_with_rpl_mcast(void)
 {
     gnrc_netif_t *netif = NULL;
