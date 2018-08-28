@@ -32,7 +32,7 @@
 
 /**
  * @defgroup    sys_hashes_sha256 SHA-256
- * @ingroup     sys_hashes
+ * @ingroup     sys_hashes_unkeyed
  * @brief       Implementation of the SHA-256 hashing function
  * @{
  *
