@@ -606,8 +606,9 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
             if (gnrc_rpl_instances[i].state != 0) {
 
                 uint32_t included_opts = 0;
+                size_t opt_len = len - sizeof(gnrc_rpl_dis_t) - sizeof(icmpv6_hdr_t);
                 if(!_parse_options(GNRC_RPL_ICMPV6_CODE_DIS, &gnrc_rpl_instances[i],
-                                   (gnrc_rpl_opt_t *)(dis + 1), len, src, &included_opts)) {
+                                   (gnrc_rpl_opt_t *)(dis + 1), opt_len, src, &included_opts)) {
                     DEBUG("RPL: DIS option parsing error - skip processing the DIS\n");
                     continue;
                 }
