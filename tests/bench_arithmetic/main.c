@@ -90,23 +90,23 @@ static uint64_t buf[TEST_BLOCKSIZE];
 
 /* Further instancing all operations with one macro */
 #define TEST_FUNC_INSTANCES(T, constant) \
-    TEST_FUNC_OP_INSTANCES(set, T,   =, constant); \
-    TEST_FUNC_OP_INSTANCES(add, T,  +=, constant); \
-    TEST_FUNC_OP_INSTANCES(sub, T,  -=, constant); \
-    TEST_FUNC_OP_INSTANCES(mul, T,  *=, constant); \
-    TEST_FUNC_OP_INSTANCES(div, T,  /=, constant); \
-    TEST_FUNC_OP_INSTANCES(lsh, T, <<=, (sizeof(T) * 8 - 1) & (constant)); \
-    TEST_FUNC_OP_INSTANCES(rsh, T, >>=, (sizeof(T) * 8 - 1) & (constant)); \
-    TEST_FUNC_OP_INSTANCES( or, T,  |=, constant); \
-    TEST_FUNC_OP_INSTANCES(and, T,  &=, constant); \
-    TEST_FUNC_OP_INSTANCES(xor, T,  ^=, constant); \
+    TEST_FUNC_OP_INSTANCES(set, T,   =, constant) \
+    TEST_FUNC_OP_INSTANCES(add, T,  +=, constant) \
+    TEST_FUNC_OP_INSTANCES(sub, T,  -=, constant) \
+    TEST_FUNC_OP_INSTANCES(mul, T,  *=, constant) \
+    TEST_FUNC_OP_INSTANCES(div, T,  /=, constant) \
+    TEST_FUNC_OP_INSTANCES(lsh, T, <<=, (sizeof(T) * 8 - 1) & (constant)) \
+    TEST_FUNC_OP_INSTANCES(rsh, T, >>=, (sizeof(T) * 8 - 1) & (constant)) \
+    TEST_FUNC_OP_INSTANCES( or, T,  |=, constant) \
+    TEST_FUNC_OP_INSTANCES(and, T,  &=, constant) \
+    TEST_FUNC_OP_INSTANCES(xor, T,  ^=, constant) \
 
 #define TEST_FUNC_FLOAT_INSTANCES(T, constant) \
-    TEST_FUNC_OP_INSTANCES(set, T,   =, constant); \
-    TEST_FUNC_OP_INSTANCES(add, T,  +=, constant); \
-    TEST_FUNC_OP_INSTANCES(sub, T,  -=, constant); \
-    TEST_FUNC_OP_INSTANCES(mul, T,  *=, constant); \
-    TEST_FUNC_OP_INSTANCES(div, T,  /=, constant);
+    TEST_FUNC_OP_INSTANCES(set, T,   =, constant) \
+    TEST_FUNC_OP_INSTANCES(add, T,  +=, constant) \
+    TEST_FUNC_OP_INSTANCES(sub, T,  -=, constant) \
+    TEST_FUNC_OP_INSTANCES(mul, T,  *=, constant) \
+    TEST_FUNC_OP_INSTANCES(div, T,  /=, constant)
 
 /* Run one (op,T) test */
 #define RUN_TEST(func, T, op, rconst, fill_func) \
@@ -114,31 +114,31 @@ static uint64_t buf[TEST_BLOCKSIZE];
     time_cconst = 0; \
     time_rconst = 0; \
     for (unsigned j = 0; j < TEST_ITERATIONS; ++j) { \
-        fill_func(buf, ARRAY_LEN(buf), seed); \
+        fill_func((T *)buf, ARRAY_LEN(buf), seed); \
         time_var += test_ ## T ## _ ## func ## _var((T *)buf, ARRAY_LEN(buf)); \
     } \
     for (unsigned j = 0; j < TEST_ITERATIONS; ++j) { \
-        fill_func(buf, ARRAY_LEN(buf), seed); \
+        fill_func((T *)buf, ARRAY_LEN(buf), seed); \
         time_cconst += test_ ## T ## _ ## func ## _cconst((T *)buf, ARRAY_LEN(buf)); \
     } \
     for (unsigned j = 0; j < TEST_ITERATIONS; ++j) { \
-        fill_func(buf, ARRAY_LEN(buf), seed); \
+        fill_func((T *)buf, ARRAY_LEN(buf), seed); \
         time_rconst += test_ ## T ## _ ## func ## _rconst((T *)buf, ARRAY_LEN(buf), rconst); \
     } \
     printf("%8s, %3s: %7" PRIu32 " %7" PRIu32 " %7" PRIu32 "\n", #T, #op, time_var, time_cconst, time_rconst) \
 
 /* Run all tests for the given type T */
 #define RUN_TESTS(T, rconst) \
-    RUN_TEST(set, T,   =, rconst, fill_buf); \
-    RUN_TEST(add, T,  +=, rconst, fill_buf); \
-    RUN_TEST(sub, T,  -=, rconst, fill_buf); \
-    RUN_TEST(mul, T,  *=, rconst, fill_buf); \
-    RUN_TEST(div, T,  /=, rconst, fill_buf); \
-    RUN_TEST(lsh, T, <<=, (sizeof(T) * 8 - 1) & (rconst), fill_buf); \
-    RUN_TEST(rsh, T, >>=, (sizeof(T) * 8 - 1) & (rconst), fill_buf); \
-    RUN_TEST( or, T,  |=, rconst, fill_buf); \
-    RUN_TEST(and, T,  &=, rconst, fill_buf); \
-    RUN_TEST(xor, T,  ^=, rconst, fill_buf);
+    RUN_TEST(set, T,   =, rconst, fill_buf_ ## T); \
+    RUN_TEST(add, T,  +=, rconst, fill_buf_ ## T); \
+    RUN_TEST(sub, T,  -=, rconst, fill_buf_ ## T); \
+    RUN_TEST(mul, T,  *=, rconst, fill_buf_ ## T); \
+    RUN_TEST(div, T,  /=, rconst, fill_buf_ ## T); \
+    RUN_TEST(lsh, T, <<=, (sizeof(T) * 8 - 1) & (rconst), fill_buf_ ## T); \
+    RUN_TEST(rsh, T, >>=, (sizeof(T) * 8 - 1) & (rconst), fill_buf_ ## T); \
+    RUN_TEST( or, T,  |=, rconst, fill_buf_ ## T); \
+    RUN_TEST(and, T,  &=, rconst, fill_buf_ ## T); \
+    RUN_TEST(xor, T,  ^=, rconst, fill_buf_ ## T);
 
 #define RUN_DOUBLE_TESTS(T, rconst) \
     RUN_TEST(set, T,   =, rconst, fill_buf_double); \
@@ -177,21 +177,36 @@ TEST_FUNC_INSTANCES( int64_t,  6576191449585486549ll) \
 TEST_FUNC_FLOAT_INSTANCES( float, 4.81047738097f) \
 TEST_FUNC_FLOAT_INSTANCES(double, 1.31083249443)
 
-/* Basic LCG */
-void fill_buf(uint64_t *buf, size_t nelem, uint64_t seed)
+static uint64_t lcg64(uint64_t seed)
 {
-    for (unsigned k = 0; k < nelem; ++k) {
-        do {
-            seed = 6364136223846793005ull * seed + 1;
-        } while (seed == 0); /* to avoid division by zero later */
-        buf[k] = seed;
-    }
+    return 6364136223846793005ull * seed + 1;
 }
 
+/* Basic filler function template */
+#define FILLER_FUNC(T, shift) \
+    void fill_buf_ ## T (T *buf, size_t nelem, uint64_t seed) \
+    { \
+        for (unsigned k = 0; k < nelem; ++k) { \
+            do { \
+                seed = lcg64(seed); \
+                buf[k] = (T)(seed / (1ull << shift)); /* Upper bits have better entropy */ \
+            } while (buf[k] == 0); /* to avoid division by zero later */ \
+        } \
+    }
+
+FILLER_FUNC( uint8_t, 56)
+FILLER_FUNC(uint16_t, 48)
+FILLER_FUNC(uint32_t, 32)
+FILLER_FUNC(uint64_t,  0)
+
+FILLER_FUNC(  int8_t, 56)
+FILLER_FUNC( int16_t, 48)
+FILLER_FUNC( int32_t, 32)
+FILLER_FUNC( int64_t,  0)
+
 /* A simple floating point variation of the above filler function */
-void fill_buf_double(uint64_t *uint_buf, size_t nelem, uint64_t seed)
+void fill_buf_double(double *buf, size_t nelem, uint64_t seed)
 {
-    double *buf = (double *)uint_buf;
     for (unsigned k = 0; k < nelem; ++k) {
         do {
             seed = 6364136223846793005ull * seed + 1;
@@ -200,9 +215,8 @@ void fill_buf_double(uint64_t *uint_buf, size_t nelem, uint64_t seed)
     }
 }
 
-void fill_buf_float(uint64_t *uint_buf, size_t nelem, uint64_t seed)
+void fill_buf_float(float *buf, size_t nelem, uint64_t seed)
 {
-    float *buf = (float *)uint_buf;
     for (unsigned k = 0; k < nelem; ++k) {
         do {
             seed = 6364136223846793005ull * seed + 1;
