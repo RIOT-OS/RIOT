@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_slstk3402a Silicon Labs SLSTK3402A starter kit
- * @ingroup     boards
- * @brief       Support for the Silicon Labs SLSTK3402A starter kit
+ * @ingroup     boards_slstk3402a
  * @{
  *
  * @file
