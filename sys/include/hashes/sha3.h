@@ -12,7 +12,9 @@
  */
 
 /**
+ * @defgroup    sys_hashes_sha3 SHA-3
  * @ingroup     sys_hashes
+ * @brief       Implementation of the SHA-3 hashing function
  * @{
  *
  * @file
