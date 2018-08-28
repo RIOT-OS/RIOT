@@ -54,6 +54,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Length of SHA256 digests in bytes
+ */
 #define SHA256_DIGEST_LENGTH 32
 
 /**
