@@ -204,7 +204,7 @@ void gpio_write_redir(gpio_t pin, int value);
  * @return              0 on success
  * @return              -1 on error
  */
-inline int gpio_init(gpio_t pin, gpio_mode_t mode)
+static inline int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
 #ifdef MODULE_GPIO_EXT
     if (pin > GPIO_EXT_THRESH) {
@@ -236,8 +236,8 @@ inline int gpio_init(gpio_t pin, gpio_mode_t mode)
  * @return              0 on success
  * @return              -1 on error
  */
-inline int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                         gpio_cb_t cb, void *arg)
+static inline int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t
+                                flank, gpio_cb_t cb, void *arg)
 {
 #ifdef MODULE_GPIO_EXT
     if (pin > GPIO_EXT_THRESH) {
@@ -256,7 +256,7 @@ inline int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
  *
  * @param[in] pin       the pin to enable the interrupt for
  */
-inline void gpio_irq_enable(gpio_t pin)
+static inline void gpio_irq_enable(gpio_t pin)
 {
 #ifdef MODULE_GPIO_EXT
     if (pin > GPIO_EXT_THRESH) {
@@ -276,7 +276,7 @@ inline void gpio_irq_enable(gpio_t pin)
  *
  * @param[in] pin       the pin to disable the interrupt for
  */
-inline void gpio_irq_disable(gpio_t pin)
+static inline void gpio_irq_disable(gpio_t pin)
 {
 #ifdef MODULE_GPIO_EXT
     if (pin > GPIO_EXT_THRESH) {
@@ -298,7 +298,7 @@ inline void gpio_irq_disable(gpio_t pin)
  * @return              0 when pin is LOW
  * @return              >0 for HIGH
  */
-inline int gpio_read(gpio_t pin)
+static inline int gpio_read(gpio_t pin)
 {
 #ifdef MODULE_GPIO_EXT
     if (pin > GPIO_EXT_THRESH) {
@@ -314,7 +314,7 @@ inline int gpio_read(gpio_t pin)
  *
  * @param[in] pin       the pin to set
  */
-inline void gpio_set(gpio_t pin)
+static inline void gpio_set(gpio_t pin)
 {
 #ifdef MODULE_GPIO_EXT
     if (pin > GPIO_EXT_THRESH) {
@@ -331,7 +331,7 @@ inline void gpio_set(gpio_t pin)
  *
  * @param[in] pin       the pin to clear
  */
-inline void gpio_clear(gpio_t pin)
+static inline void gpio_clear(gpio_t pin)
 {
 #ifdef MODULE_GPIO_EXT
     if (pin > GPIO_EXT_THRESH) {
@@ -348,7 +348,7 @@ inline void gpio_clear(gpio_t pin)
  *
  * @param[in] pin       the pin to toggle
  */
-inline void gpio_toggle(gpio_t pin)
+static inline void gpio_toggle(gpio_t pin)
 {
 #ifdef MODULE_GPIO_EXT
     if (pin > GPIO_EXT_THRESH) {
@@ -366,7 +366,7 @@ inline void gpio_toggle(gpio_t pin)
  * @param[in] pin       the pin to set
  * @param[in] value     value to set the pin to, 0 for LOW, HIGH otherwise
  */
-inline void gpio_write(gpio_t pin, int value)
+static inline void gpio_write(gpio_t pin, int value)
 {
 #ifdef MODULE_GPIO_EXT
     if (pin > GPIO_EXT_THRESH) {
