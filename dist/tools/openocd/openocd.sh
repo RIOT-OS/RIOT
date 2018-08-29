@@ -159,6 +159,11 @@ do_flash() {
             exit $RETVAL
         fi
     fi
+
+    if [ "${IMAGE_OFFSET}" != "0" ]; then
+        echo "Flashing with IMAGE_OFFSET: ${IMAGE_OFFSET}"
+    fi
+
     # flash device
     sh -c "${OPENOCD} \
             ${OPENOCD_ADAPTER_INIT} \
