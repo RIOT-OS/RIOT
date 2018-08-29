@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys_hashes
+ * @ingroup     sys_hashes_non_crypto
  * @{
  *
  * @file
