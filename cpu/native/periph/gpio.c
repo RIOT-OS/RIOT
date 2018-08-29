@@ -19,33 +19,56 @@
 
 #include "periph/gpio.h"
 
-int gpio_init(gpio_t pin, gpio_mode_t mode) {
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode) {
   (void) pin;
   (void) mode;
 
   return -1;
 }
 
-int gpio_read(gpio_t pin) {
+int gpio_read_ll(gpio_t pin) {
   (void) pin;
 
   return 0;
 }
 
-void gpio_set(gpio_t pin) {
+void gpio_set_ll(gpio_t pin) {
   (void) pin;
 }
 
-void gpio_clear(gpio_t pin) {
+void gpio_clear_ll(gpio_t pin) {
   (void) pin;
 }
 
-void gpio_toggle(gpio_t pin) {
+void gpio_toggle_ll(gpio_t pin) {
   (void) pin;
 }
 
-void gpio_write(gpio_t pin, int value) {
+void gpio_write_ll(gpio_t pin, int value) {
   (void) pin;
   (void) value;
 }
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
+{
+    (void)pin;
+    (void)mode;
+    (void)flank;
+    (void)cb;
+    (void)arg;
+}
+#endif    /* MODULE_PERIPH_GPIO_IRQ */
+
+void gpio_irq_enable_ll(gpio_t pin)
+{
+    (void)pin;
+}
+
+void gpio_irq_disable_ll(gpio_t pin)
+{
+    (void)pin;
+}
+
 /** @} */

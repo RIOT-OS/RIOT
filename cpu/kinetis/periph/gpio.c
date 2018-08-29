@@ -184,7 +184,7 @@ static inline void clk_en(gpio_t pin)
     bit_set32(&SIM->SCGC5, SIM_SCGC5_PORTA_SHIFT + port_num(pin));
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     /* set pin to analog mode while configuring it */
     gpio_init_port(pin, GPIO_AF_ANALOG);
@@ -225,7 +225,7 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 }
 
-int gpio_read(gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     if (gpio(pin)->PDDR & (1 << pin_num(pin))) {
         return (gpio(pin)->PDOR & (1 << pin_num(pin))) ? 1 : 0;
@@ -235,22 +235,22 @@ int gpio_read(gpio_t pin)
     }
 }
 
-void gpio_set(gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     gpio(pin)->PSOR = (1 << pin_num(pin));
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     gpio(pin)->PCOR = (1 << pin_num(pin));
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
     gpio(pin)->PTOR = (1 << pin_num(pin));
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     if (value) {
         gpio(pin)->PSOR = (1 << pin_num(pin));
@@ -261,10 +261,10 @@ void gpio_write(gpio_t pin, int value)
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
-    if (gpio_init(pin, mode) < 0) {
+    if (gpio_init_ll(pin, mode) < 0) {
         return -1;
     }
 
@@ -291,13 +291,13 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     int ctx = get_ctx(port_num(pin), pin_num(pin));
     port(pin)->PCR[pin_num(pin)] |= isr_ctx[ctx].state;
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     int ctx = get_ctx(port_num(pin), pin_num(pin));
     isr_ctx[ctx].state = port(pin)->PCR[pin_num(pin)] & PORT_PCR_IRQC_MASK;

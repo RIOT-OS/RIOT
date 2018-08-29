@@ -42,6 +42,11 @@ typedef uint8_t gpio_t;
 #define GPIO_PIN(port, pin)     (gpio_t)((port << 5) | pin)
 
 /**
+ * @brief   Custom device location in gpio_t for extensions
+ */
+#define GPIO_EXP_DEV_LOC    (4U)
+
+/**
  * @name    Override the default GPIO mode values
  * @{
  */

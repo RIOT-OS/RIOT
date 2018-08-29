@@ -67,7 +67,7 @@ static inline msp_port_isr_t *_isr_port(gpio_t pin)
     return NULL;
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     msp_port_t *port = _port(pin);
 
@@ -111,7 +111,7 @@ void gpio_periph_mode(gpio_t pin, bool enable)
     }
 }
 
-int gpio_read(gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     msp_port_t *port = _port(pin);
     if (port->DIR & _pin(pin)) {
@@ -122,22 +122,22 @@ int gpio_read(gpio_t pin)
     }
 }
 
-void gpio_set(gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     _port(pin)->OD |= _pin(pin);
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     _port(pin)->OD &= ~(_pin(pin));
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
     _port(pin)->OD ^= _pin(pin);
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     if (value) {
         _port(pin)->OD |= _pin(pin);
@@ -159,8 +159,8 @@ static int _ctx(gpio_t pin)
     return (_port(pin) == PORT_1) ? i : (i + 8);
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                    gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
     msp_port_isr_t *port = _isr_port(pin);
 
@@ -172,7 +172,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* disable any activated interrupt */
     port->IE &= ~(_pin(pin));
     /* configure as input */
-    if (gpio_init(pin, mode) < 0) {
+    if (gpio_init_ll(pin, mode) < 0) {
         return -1;
     }
     /* save ISR context */
@@ -183,11 +183,11 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     port->IES |= (flank & _pin(pin));
     /* clear pending interrupts and enable the IRQ */
     port->IFG &= ~(_pin(pin));
-    gpio_irq_enable(pin);
+    gpio_irq_enable_ll(pin);
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     msp_port_isr_t *port = _isr_port(pin);
     if (port) {
@@ -195,7 +195,7 @@ void gpio_irq_enable(gpio_t pin)
     }
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     msp_port_isr_t *port = _isr_port(pin);
     if (port) {
