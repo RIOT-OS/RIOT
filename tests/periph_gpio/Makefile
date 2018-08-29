@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_gpio
+FEATURES_REQUIRED = periph_gpio_irq
 
 USEMODULE += shell
 USEMODULE += benchmark

@@ -1,13 +1,13 @@
 # driver dependencies (in alphabetical order)
 
 ifneq (,$(filter adc%1c,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += adcxx1c
 endif
 
 ifneq (,$(filter ads101%,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += ads101x
   USEMODULE += xtimer
@@ -45,6 +45,7 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -52,6 +53,7 @@ ifneq (,$(filter ata8520e,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += fmt
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -82,6 +84,8 @@ ifneq (,$(filter cc110x,$(USEMODULE)))
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
     USEMODULE += gnrc_cc110x
   endif
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -92,6 +96,7 @@ ifneq (,$(filter cc2420,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -116,6 +121,7 @@ endif
 
 ifneq (,$(filter enc28j60,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += xtimer
@@ -123,7 +129,7 @@ ifneq (,$(filter enc28j60,$(USEMODULE)))
 endif
 
 ifneq (,$(filter encx24j600,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += xtimer
@@ -160,11 +166,6 @@ ifneq (,$(filter hdc1000,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
-ifneq (,$(filter pulse_counter,$(USEMODULE)))
-  USEMODULE += xtimer
-  FEATURES_REQUIRED += periph_gpio
-endif
-
 ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
@@ -190,6 +191,7 @@ ifneq (,$(filter isl29020,$(USEMODULE)))
 endif
 
 ifneq (,$(filter isl29125,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_i2c
 endif
 
@@ -205,6 +207,7 @@ ifneq (,$(filter kw2xrf,$(USEMODULE)))
   USEMODULE += core_thread_flags
   FEATURES_REQUIRED += periph_spi
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
 endif
 
 ifneq (,$(filter l3g4200d,$(USEMODULE)))
@@ -213,7 +216,7 @@ endif
 
 ifneq (,$(filter lc709203f,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
-  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
 endif
 
 ifneq (,$(filter lis2dh12%,$(USEMODULE)))
@@ -281,6 +284,7 @@ ifneq (,$(filter mrf24j40,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -307,6 +311,7 @@ endif
 
 ifneq (,$(filter nrf24l01p,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
   USEMODULE += xtimer
 endif
@@ -325,7 +330,18 @@ endif
 
 ifneq (,$(filter pir,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter pn532,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
+ifneq (,$(filter pulse_counter,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_gpio_irq
 endif
 
 ifneq (,$(filter rgbled,$(USEMODULE)))
@@ -395,6 +411,7 @@ endif
 
 ifneq (,$(filter sx127%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
   USEMODULE += iolist
   USEMODULE += xtimer
@@ -423,6 +440,7 @@ ifneq (,$(filter veml6070,$(USEMODULE)))
 endif
 
 ifneq (,$(filter w5100,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += luid
