@@ -31,8 +31,6 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-#define _MAX_MHR_OVERHEAD   (25)
-
 /* Reference pointer for the IRQ handler */
 static netdev_t *_dev;
 
@@ -87,13 +85,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 
         case NETOPT_IS_WIRED:
             return -ENOTSUP;
-
-        case NETOPT_MAX_PACKET_SIZE:
-            if (max_len < sizeof(int16_t)) {
-                return -EOVERFLOW;
-            }
-            *((uint16_t *)value) = CC2538_RF_MAX_DATA_LEN - _MAX_MHR_OVERHEAD;
-            return sizeof(uint16_t);
 
         case NETOPT_PROMISCUOUSMODE:
             if (cc2538_get_monitor()) {

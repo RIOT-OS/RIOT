@@ -31,9 +31,6 @@
 extern "C" {
 #endif
 
-/* 127 - 25 as in at86rf2xx */
-#define SOCKET_ZEP_FRAME_PAYLOAD_LEN    (102)   /**< maximum possible payload size */
-
 /**
  * @brief   ZEP device state
  */

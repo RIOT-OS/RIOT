@@ -37,8 +37,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define _MAX_MHR_OVERHEAD   (25)
-
 static void _irq_handler(void *arg)
 {
     netdev_t *dev = (netdev_t *) arg;
@@ -183,16 +181,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             else {
                 ((uint8_t *)val)[1] = 0;
                 ((uint8_t *)val)[0] = 0;
-                res = sizeof(uint16_t);
-            }
-            break;
-
-        case NETOPT_MAX_PACKET_SIZE:
-            if (max_len < sizeof(int16_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                *((uint16_t *)val) = IEEE802154_FRAME_LEN_MAX - _MAX_MHR_OVERHEAD;
                 res = sizeof(uint16_t);
             }
             break;
