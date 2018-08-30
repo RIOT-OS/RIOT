@@ -9,9 +9,9 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6 nucleo-f042k6 nucleo-l031k6
 
-DEVEUI ?= 00D3F4AD4593A522
-APPEUI ?= 70B3D57ED0011B7E
-APPKEY ?= 732F384BB2D75B243C4FCD83FECEB229
+DEVEUI ?= 0000000000000000
+APPEUI ?= 0000000000000000
+APPKEY ?= 00000000000000000000000000000000
 
 # Default radio driver is Semtech SX1276 (used by the B-L072Z-LRWAN1 board)
 DRIVER ?= sx1276
@@ -25,8 +25,8 @@ USEPKG += semtech-loramac
 USEMODULE += $(DRIVER)
 USEMODULE += fmt
 
-# Add the lora serialization module
-USEMODULE += lora_serialization
+# Add the lora serialization package
+USEPKG += lora-serialization
 
 FEATURES_REQUIRED += periph_rtc
 
