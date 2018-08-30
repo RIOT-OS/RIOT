@@ -28,3 +28,9 @@
  * @ingroup     sys
  * @brief       Provides math libraries and utilities for RIOT
  */
+
+/**
+ * @defgroup    sys_memory_management Memory management
+ * @ingroup     sys
+ * @brief       Provides memory management implementations and utilities
+ */
