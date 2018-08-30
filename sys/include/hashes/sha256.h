@@ -31,7 +31,9 @@
 
 
 /**
- * @ingroup     sys_hashes
+ * @defgroup    sys_hashes_sha256 SHA-256
+ * @ingroup     sys_hashes_unkeyed
+ * @brief       Implementation of the SHA-256 hashing function
  * @{
  *
  * @file
@@ -52,6 +54,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Length of SHA256 digests in bytes
+ */
 #define SHA256_DIGEST_LENGTH 32
 
 /**
