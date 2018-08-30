@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    oneway_malloc Oneway malloc
- * @ingroup     sys
+ * @ingroup     sys_memory_management
  *
  * @brief       A malloc implementation without free for boards where the
  *              toolchain does not implement dynamic memory allocation.
