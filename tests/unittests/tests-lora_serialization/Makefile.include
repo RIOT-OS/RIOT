@@ -1,1 +1,1 @@
-USEMODULE += lora_serialization
+USEPKG += lora-serialization
