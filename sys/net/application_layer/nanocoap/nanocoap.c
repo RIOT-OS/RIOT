@@ -603,7 +603,9 @@ size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
 
         part_len = (uint8_t *)uripos - part_start;
 
-        if (part_len) {
+        /* Creates empty option if part for Uri-Path or Uri-Location contains only *
+         * a trailing slash, except for root path ("/"). */
+        if (part_len || ((separator == '/') && (lastonum == optnum))) {
             bufpos += coap_put_option(bufpos, lastonum, optnum, part_start, part_len);
             lastonum = optnum;
         }
@@ -658,7 +660,9 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
 
         part_len = (uint8_t *)uripos - part_start;
 
-        if (part_len) {
+        /* Creates empty option if part for Uri-Path or Uri-Location contains
+         * only a trailing slash, except for root path ("/"). */
+        if (part_len || ((separator == '/') && write_len)) {
             if (pkt->options_len == NANOCOAP_NOPTS_MAX) {
                 return -ENOSPC;
             }
