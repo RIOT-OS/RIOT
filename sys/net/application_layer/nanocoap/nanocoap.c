@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016-18 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Nanocoap implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -117,7 +119,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     }
 
 #ifdef MODULE_GCOAP
-    coap_get_uri(pkt, pkt->url);
+    coap_get_uri_path(pkt, pkt->url);
     pkt->content_type = coap_get_content_type(pkt);
 
     if (coap_get_option_uint(pkt, COAP_OPT_OBSERVE, &pkt->observe_value) != 0) {
@@ -133,9 +135,9 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     return 0;
 }
 
-uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
+uint8_t *coap_find_option(const coap_pkt_t *pkt, unsigned opt_num)
 {
-    coap_optpos_t *optpos = pkt->options;
+    const coap_optpos_t *optpos = pkt->options;
     unsigned opt_count = pkt->options_len;
 
     while (opt_count--) {
@@ -147,7 +149,8 @@ uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
     return NULL;
 }
 
-static uint8_t *_parse_option(coap_pkt_t *pkt, uint8_t *pkt_pos, uint16_t *delta, int *opt_len)
+static uint8_t *_parse_option(const coap_pkt_t *pkt,
+                              uint8_t *pkt_pos, uint16_t *delta, int *opt_len)
 {
     uint8_t *hdr_end = pkt->payload;
 
@@ -188,7 +191,8 @@ int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target)
     return -1;
 }
 
-uint8_t *coap_iterate_option(coap_pkt_t *pkt, uint8_t **optpos, int *opt_len, int first)
+uint8_t *coap_iterate_option(const coap_pkt_t *pkt, uint8_t **optpos,
+                             int *opt_len, int first)
 {
     uint8_t *data_start;
 
@@ -226,25 +230,29 @@ unsigned coap_get_content_type(coap_pkt_t *pkt)
     return content_type;
 }
 
-int coap_get_uri(coap_pkt_t *pkt, uint8_t *target)
+ssize_t coap_opt_get_string(const coap_pkt_t *pkt, uint16_t optnum,
+                            uint8_t *target, size_t max_len, char separator)
 {
-    uint8_t *opt_pos = coap_find_option(pkt, COAP_OPT_URI_PATH);
+    assert(pkt && target && (max_len > 1));
+
+    uint8_t *opt_pos = coap_find_option(pkt, optnum);
     if (!opt_pos) {
-        *target++ = '/';
+        *target++ = (uint8_t)separator;
         *target = '\0';
         return 2;
     }
 
-    unsigned left = NANOCOAP_URI_MAX - 1;
+    unsigned left = max_len - 1;
     uint8_t *part_start = NULL;
     do {
         int opt_len;
-        part_start = coap_iterate_option(pkt, &opt_pos, &opt_len, part_start==NULL);
+        part_start = coap_iterate_option(pkt, &opt_pos, &opt_len,
+                                         (part_start == NULL));
         if (part_start) {
             if (left < (unsigned)(opt_len + 1)) {
                 return -ENOSPC;
             }
-            *target++ = '/';
+            *target++ = (uint8_t)separator;
             memcpy(target, part_start, opt_len);
             target += opt_len;
             left -= (opt_len + 1);
@@ -253,7 +261,7 @@ int coap_get_uri(coap_pkt_t *pkt, uint8_t *target)
 
     *target = '\0';
 
-    return NANOCOAP_URI_MAX - left;
+    return (int)(max_len - left);
 }
 
 int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsigned *szx)
@@ -296,7 +304,7 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
     uint8_t *uri = pkt->url;
 #else
     uint8_t uri[NANOCOAP_URI_MAX];
-    if (coap_get_uri(pkt, uri) <= 0) {
+    if (coap_get_uri_path(pkt, uri) <= 0) {
         return -EBADMSG;
     }
 #endif
@@ -569,24 +577,24 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
     }
 }
 
-size_t coap_put_option_uri(uint8_t *buf, uint16_t lastonum, const char *uri, uint16_t optnum)
+size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
+                           const char *string, char separator)
 {
-    char separator = (optnum == COAP_OPT_URI_PATH) ? '/' : '&';
-    size_t uri_len = strlen(uri);
+    size_t len = strlen(string);
 
-    if (uri_len == 0) {
+    if (len == 0) {
         return 0;
     }
 
     uint8_t *bufpos = buf;
-    char *uripos = (char *)uri;
+    char *uripos = (char *)string;
 
-    while (uri_len) {
+    while (len) {
         size_t part_len;
         uripos++;
         uint8_t *part_start = (uint8_t *)uripos;
 
-        while (uri_len--) {
+        while (len--) {
             if ((*uripos == separator) || (*uripos == '\0')) {
                 break;
             }
