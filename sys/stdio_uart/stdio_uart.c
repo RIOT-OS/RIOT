@@ -27,12 +27,6 @@
  * @}
  */
 
-#include <stdio.h>
-#if MODULE_VFS
-#include <unistd.h>
-#include <errno.h>
-#include <fcntl.h>
-#endif
 #include "stdio_uart.h"
 
 #include "board.h"
@@ -51,39 +45,9 @@ extern ethos_t ethos;
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+
 static char _rx_buf_mem[STDIO_UART_RX_BUFSIZE];
 isrpipe_t stdio_uart_isrpipe = ISRPIPE_INIT(_rx_buf_mem);
-
-#if MODULE_VFS
-static ssize_t stdio_uart_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes);
-static ssize_t stdio_uart_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes);
-
-/**
- * @brief VFS file operation table for stdin/stdout/stderr
- */
-static vfs_file_ops_t stdio_uart_vfs_ops = {
-    .read = stdio_uart_vfs_read,
-    .write = stdio_uart_vfs_write,
-};
-
-static ssize_t stdio_uart_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
-{
-    int fd = filp->private_data.value;
-    if (fd != STDIN_FILENO) {
-        return -EBADF;
-    }
-    return stdio_read(dest, nbytes);
-}
-
-static ssize_t stdio_uart_vfs_write(vfs_file_t *filp, const void *src, size_t nbytes)
-{
-    int fd = filp->private_data.value;
-    if (fd == STDIN_FILENO) {
-        return -EBADF;
-    }
-    return stdio_write(src, nbytes);
-}
-#endif
 
 void stdio_init(void)
 {
@@ -93,19 +57,7 @@ void stdio_init(void)
     uart_init(ETHOS_UART, ETHOS_BAUDRATE, (uart_rx_cb_t) isrpipe_write_one, &stdio_uart_isrpipe);
 #endif
 #if MODULE_VFS
-    int fd;
-    fd = vfs_bind(STDIN_FILENO, O_RDONLY, &stdio_uart_vfs_ops, (void *)STDIN_FILENO);
-    if (fd < 0) {
-        /* How to handle errors on init? */
-    }
-    fd = vfs_bind(STDOUT_FILENO, O_WRONLY, &stdio_uart_vfs_ops, (void *)STDOUT_FILENO);
-    if (fd < 0) {
-        /* How to handle errors on init? */
-    }
-    fd = vfs_bind(STDERR_FILENO, O_WRONLY, &stdio_uart_vfs_ops, (void *)STDERR_FILENO);
-    if (fd < 0) {
-        /* How to handle errors on init? */
-    }
+    vfs_bind_stdio();
 #endif
 }
 

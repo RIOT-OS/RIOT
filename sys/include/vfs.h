@@ -562,6 +562,15 @@ struct vfs_file_system_ops {
 };
 
 /**
+ * @brief   Allocate and bind file descriptors for  STDIN, STDERR, and STDOUT
+ *
+ * This function is meant to be called once during system initialization time.
+ * It is typically called from the initialization of the selected STDIO
+ * implementation.
+ */
+void vfs_bind_stdio(void);
+
+/**
  * @brief Close an open file
  *
  * @param[in]  fd    fd number to close
