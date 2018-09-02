@@ -299,7 +299,8 @@ static inline int sercom_id(void *sercom)
 #if defined(CPU_FAM_SAMD21)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
 #elif defined(CPU_FAM_SAML21)
-    return ((((uint32_t)sercom) >> 10) & 0x7);
+    /* Left side handles SERCOM0-4 while right side handles unaligned address of SERCOM5 */
+    return ((((uint32_t)sercom) >> 10) & 0x7) + ((((uint32_t)sercom) >> 22) & 0x04);
 #endif
 }
 
