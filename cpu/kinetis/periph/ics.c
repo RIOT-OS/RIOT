@@ -165,11 +165,12 @@ void SystemCoreClockUpdate(void)
 {
 
     uint32_t ICSOUTClock;                                                      /* Variable to store output clock frequency of the ICS module */
-    uint8_t Divider;
 
     if ((ICS->C1 & ICS_C1_CLKS_MASK) == 0x0u) {
         /* Output of FLL is selected */
         if ((ICS->C1 & ICS_C1_IREFS_MASK) == 0x0u) {
+            uint8_t Divider;
+
             /* External reference clock is selected */
             ICSOUTClock = CPU_XTAL_CLK_HZ;          /* System oscillator drives ICS clock */
             Divider = (uint8_t)(1u << ((ICS->C1 & ICS_C1_RDIV_MASK) >> ICS_C1_RDIV_SHIFT));
