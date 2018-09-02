@@ -352,8 +352,13 @@ static inline void sercom_set_gen(void *sercom, uint32_t gclk)
                          (SERCOM0_GCLK_ID_CORE + sercom_id(sercom)));
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 #elif defined(CPU_FAM_SAML21)
-    GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom_id(sercom)].reg =
+    if (sercom_id(sercom) < 5) {
+        GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom_id(sercom)].reg =
                                                     (GCLK_PCHCTRL_CHEN | gclk);
+    } else {
+        GCLK->PCHCTRL[SERCOM5_GCLK_ID_CORE].reg =
+                                                    (GCLK_PCHCTRL_CHEN | gclk);
+    }
 #endif
 }
 
