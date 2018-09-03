@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#include <string.h>
+
 #include "embUnit.h"
 
 #include "byteorder.h"
@@ -78,6 +80,26 @@ static void test_byteorder_host_to_network_64(void)
     TEST_ASSERT_EQUAL_INT(host, byteorder_ntohll(network));
 }
 
+static void test_byteorder_bebuftohs(void)
+{
+    static const uint8_t bebuf[2] = { 0xAA, 0xBB };
+    static const uint16_t host = 0xAABB;
+
+    TEST_ASSERT_EQUAL_INT(host, byteorder_bebuftohs(bebuf));
+}
+
+static void test_byteorder_htobebufs(void)
+{
+    static const uint8_t bebuf[2] = { 0xAA, 0xBB };
+    static const uint16_t host = 0xAABB;
+
+    uint8_t tmp[2] = {0};
+
+    byteorder_htobebufs(tmp, host);
+
+    TEST_ASSERT_EQUAL_INT(0, memcmp(bebuf, tmp, sizeof(tmp)));
+}
+
 Test *tests_core_byteorder_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -90,6 +112,8 @@ Test *tests_core_byteorder_tests(void)
         new_TestFixture(test_byteorder_host_to_network_16),
         new_TestFixture(test_byteorder_host_to_network_32),
         new_TestFixture(test_byteorder_host_to_network_64),
+        new_TestFixture(test_byteorder_bebuftohs),
+        new_TestFixture(test_byteorder_htobebufs),
     };
 
     EMB_UNIT_TESTCALLER(core_byteorder_tests, NULL, NULL, fixtures);
