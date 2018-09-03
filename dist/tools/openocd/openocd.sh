@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Unified OpenOCD script for RIOT
 #
