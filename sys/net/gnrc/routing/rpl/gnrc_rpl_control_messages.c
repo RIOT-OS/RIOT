@@ -314,7 +314,6 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination,
                        gnrc_rpl_internal_opt_t **options, size_t num_opts)
 {
     gnrc_pktsnip_t *pkt = NULL, *tmp;
-    icmpv6_hdr_t *icmp;
     gnrc_rpl_dis_t *dis;
 
     /* No options provided to be attached to the DIS, so we PadN 2 bytes */
@@ -358,6 +357,9 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination,
         return;
     }
     pkt = tmp;
+    dis = (gnrc_rpl_dis_t *)pkt->data;
+    dis->flags = 0;
+    dis->reserved = 0;
 
     if ((tmp = gnrc_icmpv6_build(pkt, ICMPV6_RPL_CTRL, GNRC_RPL_ICMPV6_CODE_DIS,
                                  sizeof(icmpv6_hdr_t))) == NULL) {
@@ -366,12 +368,6 @@ void gnrc_rpl_send_DIS(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination,
         return;
     }
     pkt = tmp;
-
-    icmp = (icmpv6_hdr_t *)pkt->data;
-    dis = (gnrc_rpl_dis_t *)(icmp + 1);
-    dis->flags = 0;
-    dis->reserved = 0;
-
 #ifdef MODULE_NETSTATS_RPL
     gnrc_rpl_netstats_tx_DIS(&gnrc_rpl_netstats, gnrc_pkt_len(pkt),
                              (destination && !ipv6_addr_is_multicast(destination)));
