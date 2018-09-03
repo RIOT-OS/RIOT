@@ -131,7 +131,7 @@ extern "C" {
 
 #define SX127X_PARAM_DIOMULTI               XBEE1_INT_PIN       /* D24 */
 
-#define SX127X_PARAM_PASELECT               (SX127X_PA_RFO)
+#define SX127X_PARAM_PASELECT               (SX127X_PA_BOOST)
 
 #define SX127X_PARAMS                     { .spi       = SX127X_PARAM_SPI,     \
                                             .nss_pin   = SX127X_PARAM_SPI_NSS, \
