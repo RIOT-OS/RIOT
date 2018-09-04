@@ -8,8 +8,6 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
 
 DISABLE_MODULE = auto_init
 
-FEATURES_REQUIRED += periph_timer # xtimer required for this application
-
 USEMODULE += gnrc
 USEMODULE += gnrc_neterr
 USEMODULE += gnrc_netif
