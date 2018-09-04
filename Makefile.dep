@@ -466,6 +466,9 @@ ifneq (,$(filter lwip,$(USEMODULE)))
   ifeq (,$(filter lwip_tcp lwip_udp lwip_udplite,$(USEMODULE)))
     USEMODULE += lwip_raw
   endif
+  ifneq (,$(filter netdev_eth,$(USEMODULE)))
+    USEMODULE += lwip_ethernet
+  endif
 endif
 
 ifneq (,$(filter lwip_ppp,$(USEMODULE)))
