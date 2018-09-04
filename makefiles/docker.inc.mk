@@ -85,6 +85,9 @@ DOCKER_OVERRIDE_CMDLINE := $(strip $(DOCKER_OVERRIDE_CMDLINE))
 # Overwrite if you want to use `docker` with sudo
 DOCKER ?= docker
 
+
+DOCKER_APPDIR = $(DOCKER_BUILD_ROOT)/riotproject/$(BUILDRELPATH)
+
 # Mounted volumes and exported environment variables
 
 # Add GIT_CACHE_DIR if the directory exists
@@ -129,5 +132,5 @@ ETC_LOCALTIME = $(realpath /etc/localtime)
 	    -e 'RIOTPROJECT=$(DOCKER_BUILD_ROOT)/riotproject' \
 	    $(DOCKER_VOLUMES_AND_ENV) \
 	    $(DOCKER_ENVIRONMENT_CMDLINE) \
-	    -w '$(DOCKER_BUILD_ROOT)/riotproject/$(BUILDRELPATH)' \
+	    -w '$(DOCKER_APPDIR)' \
 	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)
