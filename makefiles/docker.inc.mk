@@ -90,6 +90,57 @@ DOCKER ?= docker
 ETC_LOCALTIME = $(realpath /etc/localtime)
 
 
+# # # # # # # # # # # # # # # #
+# Directory mapping functions #
+# # # # # # # # # # # # # # # #
+
+# Test if a directory is a subdirectory of `RIOTBASE`
+#
+#   dir_is_outside_riotbase <directory>
+#
+# $1 = directory
+# Returns: a non empty value if it is True
+#
+# From env:
+#  * RIOTBASE
+#
+# The terminating '/' in patsubst is important to match $1 == $(RIOTBASE)
+# It also handles relative directories
+
+define dir_is_outside_riotbase
+$(filter $(abspath $1)/,$(patsubst $(RIOTBASE)/%,%,$(abspath $1)/))
+endef
+
+
+# Mapping of directores inside docker
+#
+# Return the path of directories from the host within the container
+#
+#   path_in_docker <directories> <map base directory|> <mapname|>
+#
+# $1 = directories (can be a list of relative directories)
+# $2 = docker remap base directory (defaults to DOCKER_BUILD_ROOT)
+# $3 = mapname (defaults to each directory name).
+#      If provided $1 must only contain one directory.
+# Returns: the path the directory would have in docker
+#
+# For each directory:
+#  * if inside $(RIOTBASE), returns $(DOCKER_RIOTBASE)/<relative_path_in_riotbase>
+#  * if outside $(RIOTBASE), returns <docker remapbase>/<mapname>
+#
+# From env:
+#  * RIOTBASE
+#  * DOCKER_RIOTBASE
+#  * DOCKER_BUILD_ROOT
+
+path_in_docker = $(foreach d,$1,$(strip $(call _dir_path_in_docker,$d,$2,$3)))
+define _dir_path_in_docker
+      $(if $(call dir_is_outside_riotbase,$1),\
+        $(if $2,$2,$(DOCKER_BUILD_ROOT))/$(if $3,$3,$(notdir $(abspath $1))),\
+        $(patsubst %/,%,$(patsubst $(RIOTBASE)/%,$(DOCKER_RIOTBASE)/%,$(abspath $1)/)))
+endef
+
+
 DOCKER_APPDIR = $(DOCKER_BUILD_ROOT)/riotproject/$(BUILDRELPATH)
 
 # Directory mapping in docker and directories environment variable configuration
