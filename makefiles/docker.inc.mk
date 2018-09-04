@@ -140,6 +140,42 @@ define _dir_path_in_docker
         $(patsubst %/,%,$(patsubst $(RIOTBASE)/%,$(DOCKER_RIOTBASE)/%,$(abspath $1)/)))
 endef
 
+# Volume mapping and environment arguments
+#
+# Docker arguments for mapping directories:
+#
+# * volume mapping for each directory not in RIOT
+# * remap environment variable directories to the docker ones
+#
+#
+#   docker_volume_and_env  <path_in_docker_args|...>
+#     docker_volumes_mapping and docker_environ_mapping on different lines
+#
+#   docker_volumes_mapping <path_in_docker_args|...>
+#     Command line argument for mapping volumes, if it should be mounted
+#       -v directory:docker_directory
+#
+#   docker_environ_mapping <path_in_docker_args|...>
+#     Command line argument for mapping environment variables
+#       -e variable=docker_directory
+#
+#   docker_cmdline_mapping <path_in_docker_args|...>
+#     Command line argument for mapping environment variables
+#       variable=docker_directory
+#
+# Arguments are the same as 'path_in_docker'
+# If the 'directories' variable is empty, it will not be exported to docker
+
+docker_volume_and_env = $(strip $(call _docker_volume_and_env,$1,$2,$3))
+define _docker_volume_and_env
+  $(call docker_volumes_mapping,$($1),$2,$3)
+  $(call docker_environ_mapping,$1,$2,$3)
+endef
+docker_volumes_mapping = $(foreach d,$1,$(call _docker_volume_mapping,$d,$2,$3))
+_docker_volume_mapping = $(if $1,$(if $(call dir_is_outside_riotbase,$1), -v '$(abspath $1):$(call path_in_docker,$1,$2,$3)'))
+docker_environ_mapping = $(addprefix -e ,$(call docker_cmdline_mapping,$1,$2,$3))
+docker_cmdline_mapping = $(if $($1),'$1=$(call path_in_docker,$($1),$2,$3)')
+
 
 DOCKER_APPDIR = $(DOCKER_BUILD_ROOT)/riotproject/$(BUILDRELPATH)
 
