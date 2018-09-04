@@ -191,13 +191,9 @@ DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,BUILD_DIR,,build)
 
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTPROJECT,,riotproject)
-
-DOCKER_VOLUMES_AND_ENV += -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu'
-DOCKER_VOLUMES_AND_ENV += -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu'
-DOCKER_VOLUMES_AND_ENV += -v '$(RIOTBOARD):$(DOCKER_BUILD_ROOT)/riotboard'
-DOCKER_VOLUMES_AND_ENV += -e 'RIOTBOARD=$(DOCKER_BUILD_ROOT)/riotboard'
-DOCKER_VOLUMES_AND_ENV += -v '$(RIOTMAKE):$(DOCKER_BUILD_ROOT)/riotmake'
-DOCKER_VOLUMES_AND_ENV += -e 'RIOTMAKE=$(DOCKER_BUILD_ROOT)/riotmake'
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTCPU,,riotcpu)
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTBOARD,,riotboard)
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume_and_env,RIOTMAKE,,riotmake)
 
 # Add GIT_CACHE_DIR if the directory exists
 DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-v $(GIT_CACHE_DIR):$(DOCKER_BUILD_ROOT)/gitcache)
