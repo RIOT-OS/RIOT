@@ -137,7 +137,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev(bus)->CTRLA.reg = (SERCOM_SPI_CTRLA_MODE(0x3) |     /* 0x3 -> master */
                            SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad) |
                            SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad) |
-                           (mode <<  SERCOM_SPI_CTRLA_CPOL_Pos));
+                           (mode <<  SERCOM_SPI_CTRLA_CPHA_Pos));
     /* also no synchronization needed here, as CTRLA is write-synchronized */
 
     /* finally enable the device */
