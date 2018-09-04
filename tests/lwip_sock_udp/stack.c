@@ -39,7 +39,7 @@
 #include "constants.h"
 #include "stack.h"
 
-#define _MSG_QUEUE_SIZE         (1)
+#define _MSG_QUEUE_SIZE         (4)
 #define _SEND_DONE              (0x92d7)
 #define _NETDEV_BUFFER_SIZE     (128)
 
