@@ -21,10 +21,6 @@ USEMODULE += ps
 USEMODULE += od
 USEMODULE += netdev_default
 
-ifeq ($(BOARD),native)
-  USEMODULE += lwip_ethernet
-endif
-
 include $(RIOTBASE)/Makefile.include
 
 # Test only implemented for native
