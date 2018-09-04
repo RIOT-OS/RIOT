@@ -1,5 +1,6 @@
 export DOCKER_IMAGE ?= riot/riotbuild:latest
 export DOCKER_BUILD_ROOT ?= /data/riotbuild
+DOCKER_RIOTBASE ?= $(DOCKER_BUILD_ROOT)/riotbase
 export DOCKER_FLAGS ?= --rm
 # List of Docker-enabled make goals
 export DOCKER_MAKECMDGOALS_POSSIBLE = \
@@ -111,14 +112,14 @@ ETC_LOCALTIME = $(realpath /etc/localtime)
 	@# HACK: Handle directory creation here until it is provided globally
 	$(Q)mkdir -p $(BUILD_DIR)
 	$(DOCKER) run $(DOCKER_FLAGS) -t -u "$$(id -u)" \
-	    -v '$(RIOTBASE):$(DOCKER_BUILD_ROOT)/riotbase' \
+	    -v '$(RIOTBASE):$(DOCKER_RIOTBASE)' \
 	    -v '$(BUILD_DIR):$(DOCKER_BUILD_ROOT)/build' \
 	    -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu' \
 	    -v '$(RIOTBOARD):$(DOCKER_BUILD_ROOT)/riotboard' \
 	    -v '$(RIOTMAKE):$(DOCKER_BUILD_ROOT)/riotmake' \
 	    -v '$(RIOTPROJECT):$(DOCKER_BUILD_ROOT)/riotproject' \
 	    -v '$(ETC_LOCALTIME):/etc/localtime:ro' \
-	    -e 'RIOTBASE=$(DOCKER_BUILD_ROOT)/riotbase' \
+	    -e 'RIOTBASE=$(DOCKER_RIOTBASE)' \
 	    -e 'BUILD_DIR=$(DOCKER_BUILD_ROOT)/build' \
 	    -e 'CCACHE_BASEDIR=$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu' \
