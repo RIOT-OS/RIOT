@@ -151,6 +151,23 @@ static bool _addr_on_netif(int family, int netif_num, const ip_addr_t *addr)
     p = (ep)->port;
 #endif
 
+static void _convert_ip_addr(ip_addr_t *lwip_addr, int family,
+                             const void *sock_addr, size_t sock_addr_size)
+{
+    memcpy(lwip_addr, sock_addr, sock_addr_size);
+#if LWIP_IPV6 && LWIP_IPV4
+    if (family == AF_INET6) {
+        ip6_addr_clear_zone(&lwip_addr->u_addr.ip6);
+    }
+    lwip_addr->type = lwip_af_to_ip_addr_type(family);
+#elif LWIP_IPV6
+    (void)family;
+    ip6_addr_clear_zone(lwip_addr);
+#else
+    (void)family;
+#endif
+}
+
 static int _sock_ep_to_netconn_pars(const struct _sock_tl_ep *local,
                                     const struct _sock_tl_ep *remote,
                                     ip_addr_t *local_addr, u16_t *local_port,
@@ -193,10 +210,8 @@ static int _sock_ep_to_netconn_pars(const struct _sock_tl_ep *local,
             netif = remote->netif;
         }
         family = remote->family;
-        memcpy(remote_addr, &remote->addr, sizeof(remote->addr));
-#if LWIP_IPV6 && LWIP_IPV4
-        remote_addr->type = lwip_af_to_ip_addr_type(family);
-#endif
+        _convert_ip_addr(remote_addr, family, &remote->addr,
+                         sizeof(remote->addr));
         if (ip_addr_isany(remote_addr)) {
             return -EINVAL;
         }
@@ -224,7 +239,8 @@ static int _sock_ep_to_netconn_pars(const struct _sock_tl_ep *local,
         /* case (local == NULL) is included in _ep_isany() */
         /* cast to ip_addr_t alright, since type field is never used */
         else if (_addr_on_netif(family, netif, (ip_addr_t *)&local->addr)) {
-            memcpy(local_addr, &local->addr, sizeof(local->addr));
+            _convert_ip_addr(local_addr, family, &local->addr,
+                             sizeof(local->addr));
             res = 1;
         }
         else {
@@ -232,14 +248,9 @@ static int _sock_ep_to_netconn_pars(const struct _sock_tl_ep *local,
         }
     }
     else if (local != NULL) {
-        memcpy(local_addr, &local->addr, sizeof(local->addr));
+        _convert_ip_addr(local_addr, family, &local->addr, sizeof(local->addr));
         res = 1;
     }
-#if LWIP_IPV6 && LWIP_IPV4
-    if (local_addr != NULL) {
-        local_addr->type = lwip_af_to_ip_addr_type(family);
-    }
-#endif
 
     return res;
 }
