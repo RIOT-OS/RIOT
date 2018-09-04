@@ -89,6 +89,7 @@ then
         run ./dist/tools/doccheck/check.sh
         run ./dist/tools/externc/check.sh
         run ./dist/tools/cppcheck/check.sh
+        run ./dist/tools/vera++/check.sh
         run ./dist/tools/pr_check/pr_check.sh ${CI_BASE_BRANCH}
         run ./dist/tools/coccinelle/check.sh
         run ./dist/tools/flake8/check.sh
