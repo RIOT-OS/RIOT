@@ -8,6 +8,7 @@ BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove
 
 USEMODULE += posix
 USEMODULE += pthread
+USEMODULE += pthread_tls
 
 TEST_ON_CI_WHITELIST += all
 

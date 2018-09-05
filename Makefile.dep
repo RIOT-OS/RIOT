@@ -562,6 +562,10 @@ ifneq (,$(filter pthread,$(USEMODULE)))
   USEMODULE += timex
 endif
 
+ifneq (,$(filter pthread_tls,$(USEMODULE)))
+  USEMODULE += pthread
+endif
+
 ifneq (,$(filter schedstatistics,$(USEMODULE)))
   USEMODULE += xtimer
 endif
