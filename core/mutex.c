@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2015 Kaspar Schleiser <kaspar@schleiser.de>
- *               2013 Freie Universität Berlin
+ *               2013-2017 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +16,7 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -34,6 +35,7 @@
 
 int _mutex_lock(mutex_t *mutex, int blocking)
 {
+    thread_t *me = (thread_t*)sched_active_thread;
     unsigned irqstate = irq_disable();
 
     DEBUG("PID[%" PRIkernel_pid "]: Mutex in use.\n", sched_active_pid);
@@ -43,11 +45,15 @@ int _mutex_lock(mutex_t *mutex, int blocking)
         mutex->queue.next = MUTEX_LOCKED;
         DEBUG("PID[%" PRIkernel_pid "]: mutex_wait early out.\n",
               sched_active_pid);
+
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+        mutex->owner = me->pid;
+        mutex->prio_before = THREAD_PRIORITY_UNDEF;
+#endif
         irq_restore(irqstate);
         return 1;
     }
     else if (blocking) {
-        thread_t *me = (thread_t*)sched_active_thread;
         DEBUG("PID[%" PRIkernel_pid "]: Adding node to mutex queue: prio: %"
               PRIu32 "\n", sched_active_pid, (uint32_t)me->priority);
         sched_set_status(me, STATUS_MUTEX_BLOCKED);
@@ -58,6 +64,19 @@ int _mutex_lock(mutex_t *mutex, int blocking)
         else {
             thread_add_to_list(&mutex->queue, me);
         }
+
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+        thread_t *owner = (thread_t *)thread_get(mutex->owner);
+        /* if my priority is higher than the priority of the current mutex
+         * owner, I lend my priority to the current owner */
+        if (me->priority < owner->priority) {
+            DEBUG("PID[%" PRIkernel_pid "]: changing priority from %i -> %i\n",
+                  owner->pid, owner->priority, me->priority);
+            mutex->prio_before = owner->priority;
+            sched_change_priority(owner, me->priority);
+        }
+#endif
+
         irq_restore(irqstate);
         thread_yield_higher();
         /* We were woken up by scheduler. Waker removed us from queue.
@@ -83,6 +102,16 @@ void mutex_unlock(mutex_t *mutex)
         return;
     }
 
+
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+    thread_t *owner = (thread_t *)thread_get(mutex->owner);
+    /* restore the priority of the releasing thread */
+    if (mutex->prio_before != THREAD_PRIORITY_UNDEF) {
+        sched_change_priority(owner, mutex->prio_before);
+        mutex->prio_before = THREAD_PRIORITY_UNDEF;
+    }
+#endif
+
     if (mutex->queue.next == MUTEX_LOCKED) {
         mutex->queue.next = NULL;
         /* the mutex was locked and no thread was waiting for it */
@@ -91,8 +120,12 @@ void mutex_unlock(mutex_t *mutex)
     }
 
     list_node_t *next = list_remove_head(&mutex->queue);
-
     thread_t *process = container_of((clist_node_t*)next, thread_t, rq_entry);
+
+#ifdef MODULE_CORE_PRIORITY_INHERITANCE
+    /* set context for next mutex owner */
+    mutex->owner = process->pid;
+#endif
 
     DEBUG("mutex_unlock: waking up waiting thread %" PRIkernel_pid "\n",
           process->pid);
