@@ -14,4 +14,7 @@ export FFLAGS += -p m328p
 # overridden for debugging (which requires changes that require to use an ISP)
 export PROGRAMMER ?= arduino
 
+BOOTLOADER_SIZE ?= 2K
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

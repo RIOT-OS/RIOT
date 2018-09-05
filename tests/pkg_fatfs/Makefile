@@ -2,6 +2,8 @@ include ../Makefile.tests_common
 
 BOARD ?= native
 
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
+
 FEATURES_OPTIONAL += periph_rtc
 
 # this list is composed of boards that support spi/gpio + native

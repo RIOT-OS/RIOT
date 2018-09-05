@@ -25,7 +25,8 @@ else
   USEMODULE += mtd_sdcard
 endif
 
-BOARD_INSUFFICIENT_MEMORY := msb-430 msb-430h nucleo-f031k6 telosb \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
+                             msb-430 msb-430h nucleo-f031k6 telosb \
                              wsn430-v1_3b wsn430-v1_4 z1
 
 # this list is composed of boards with sufficient memory and support spi/gpio + native

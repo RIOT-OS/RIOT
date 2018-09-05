@@ -8,5 +8,8 @@ export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
 #   Without this the interrupt vectors will not be linked correctly!
 export UNDEF += $(BINDIR)/cpu/startup.o
 
+RAM_LEN = 8K
+ROM_LEN = 128K
+
 # CPU depends on the atmega common module, so include it
 include $(ATMEGA_COMMON)Makefile.include

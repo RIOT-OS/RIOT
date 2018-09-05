@@ -7,10 +7,12 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := chronos hifive1 msb-430 msb-430h nucleo-f030r8 nucleo-l053r8 \
-                             nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 \
-                             stm32f0discovery telosb wsn430-v1_3b wsn430-v1_4 \
-                             z1 nucleo-f303k8 nucleo-f334r8
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
+                             chronos hifive1 msb-430 msb-430h nucleo-f030r8 \
+                             nucleo-l053r8 nucleo-f031k6 nucleo-f042k6 \
+                             nucleo-f303k8 nucleo-f334r8 nucleo-l031k6 \
+                             stm32f0discovery telosb waspmote-pro \
+                             wsn430-v1_3b wsn430-v1_4 z1
 
 # Enable GNRC networking
 USEMODULE += gnrc_netdev_default

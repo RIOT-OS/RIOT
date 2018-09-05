@@ -9,12 +9,14 @@ RIOTBASE ?= $(CURDIR)/../..
 
 # Not all boards have enough memory to build the default configuration of this
 # example...
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos hifive1 microbit msb-430 \
-                             msb-430h nrf51dongle nrf6310 nucleo-f030r8 \
-                             nucleo-f031k6 nucleo-f042k6 nucleo-f070rb \
-                             nucleo-f072rb nucleo-f303k8 nucleo-f334r8 \
-                             nucleo-l031k6 nucleo-l053r8 stm32f0discovery \
-                             telosb wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
+                             arduino-uno chronos hifive1 mega-xplained \
+                             microbit msb-430  msb-430h nrf51dongle nrf6310 \
+                             nucleo-f030r8 nucleo-f031k6 nucleo-f042k6 \
+                             nucleo-f070rb nucleo-f072rb nucleo-f303k8 \
+                             nucleo-f334r8 nucleo-l031k6 nucleo-l053r8 \
+                             stm32f0discovery telosb waspmote-pro \
+                             wsn430-v1_3b wsn430-v1_4 yunjia-nrf51822 z1
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
