@@ -34,6 +34,10 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#define SPI_BUS         (dev->p.spi)
+#define CS_PIN          (dev->p.cs_pin)
+#define INT_PIN         (dev->p.int_pin)
+#define RST_PIN         (dev->p.rst_pin)
 /**
  * @brief   Amount of time to hold the reset pin low on reset
  */
@@ -90,9 +94,9 @@ static void switch_bank(enc28j60_t *dev, int8_t bank)
         return;
     }
     /* clear old value */
-    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_BFC | REG_ECON1), 0x03);
+    spi_transfer_reg(SPI_BUS, CS_PIN, (CMD_BFC | REG_ECON1), 0x03);
     /* set new value */
-    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_BFS | REG_ECON1), bank);
+    spi_transfer_reg(SPI_BUS, CS_PIN, (CMD_BFS | REG_ECON1), bank);
     /* remember active bank */
     dev->bank = bank;
 }
@@ -102,13 +106,13 @@ static uint8_t cmd_rcr(enc28j60_t *dev, uint8_t reg, int8_t bank)
     uint8_t res;
 
     /* start transaction */
-    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+    spi_acquire(SPI_BUS, CS_PIN, SPI_MODE_0, SPI_CLK);
 
     switch_bank(dev, bank);
-    res = spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_RCR | reg), 0);
+    res = spi_transfer_reg(SPI_BUS, CS_PIN, (CMD_RCR | reg), 0);
 
     /* finish SPI transaction */
-    spi_release(dev->spi);
+    spi_release(SPI_BUS);
 
     return res;
 }
@@ -118,13 +122,13 @@ static uint8_t cmd_rcr_miimac(enc28j60_t *dev, uint8_t reg, int8_t bank)
     char res[2];
 
     /* start transaction */
-    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+    spi_acquire(SPI_BUS, CS_PIN, SPI_MODE_0, SPI_CLK);
 
     switch_bank(dev, bank);
-    spi_transfer_regs(dev->spi, dev->cs_pin, (CMD_RCR | reg), NULL, res, 2);
+    spi_transfer_regs(SPI_BUS, CS_PIN, (CMD_RCR | reg), NULL, res, 2);
 
     /* finish SPI transaction */
-    spi_release(dev->spi);
+    spi_release(SPI_BUS);
 
     return (uint8_t)res[1];
 }
@@ -132,37 +136,37 @@ static uint8_t cmd_rcr_miimac(enc28j60_t *dev, uint8_t reg, int8_t bank)
 static void cmd_wcr(enc28j60_t *dev, uint8_t reg, int8_t bank, uint8_t value)
 {
     /* start transaction */
-    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+    spi_acquire(SPI_BUS, CS_PIN, SPI_MODE_0, SPI_CLK);
 
     switch_bank(dev, bank);
-    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_WCR | reg), value);
+    spi_transfer_reg(SPI_BUS, CS_PIN, (CMD_WCR | reg), value);
 
     /* finish SPI transaction */
-    spi_release(dev->spi);
+    spi_release(SPI_BUS);
 }
 
 static void cmd_bfs(enc28j60_t *dev, uint8_t reg, int8_t bank, uint8_t mask)
 {
     /* start transaction */
-    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+    spi_acquire(SPI_BUS, CS_PIN, SPI_MODE_0, SPI_CLK);
 
     switch_bank(dev, bank);
-    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_BFS | reg), mask);
+    spi_transfer_reg(SPI_BUS, CS_PIN, (CMD_BFS | reg), mask);
 
     /* finish SPI transaction */
-    spi_release(dev->spi);
+    spi_release(SPI_BUS);
 }
 
 static void cmd_bfc(enc28j60_t *dev, uint8_t reg, int8_t bank, uint8_t mask)
 {
     /* start transaction */
-    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+    spi_acquire(SPI_BUS, CS_PIN, SPI_MODE_0, SPI_CLK);
 
     switch_bank(dev, bank);
-    spi_transfer_reg(dev->spi, dev->cs_pin, (CMD_BFC | reg), mask);
+    spi_transfer_reg(SPI_BUS, CS_PIN, (CMD_BFC | reg), mask);
 
     /* finish SPI transaction */
-    spi_release(dev->spi);
+    spi_release(SPI_BUS);
 }
 
 static uint16_t cmd_r_addr(enc28j60_t *dev, uint8_t addr)
@@ -205,21 +209,21 @@ static void cmd_w_phy(enc28j60_t *dev, uint8_t reg, uint16_t val)
 static void cmd_rbm(enc28j60_t *dev, uint8_t *data, size_t len)
 {
     /* start transaction */
-    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+    spi_acquire(SPI_BUS, CS_PIN, SPI_MODE_0, SPI_CLK);
     /* transfer data */
-    spi_transfer_regs(dev->spi, dev->cs_pin, CMD_RBM, NULL, data, len);
+    spi_transfer_regs(SPI_BUS, CS_PIN, CMD_RBM, NULL, data, len);
     /* finish SPI transaction */
-    spi_release(dev->spi);
+    spi_release(SPI_BUS);
 }
 
 static void cmd_wbm(enc28j60_t *dev, uint8_t *data, size_t len)
 {
     /* start transaction */
-    spi_acquire(dev->spi, dev->cs_pin, SPI_MODE_0, SPI_CLK);
+    spi_acquire(SPI_BUS, CS_PIN, SPI_MODE_0, SPI_CLK);
     /* transfer data */
-    spi_transfer_regs(dev->spi, dev->cs_pin, CMD_WBM, data, NULL, len);
+    spi_transfer_regs(SPI_BUS, CS_PIN, CMD_WBM, data, NULL, len);
     /* finish SPI transaction */
-    spi_release(dev->spi);
+    spi_release(SPI_BUS);
 }
 
 static void mac_get(enc28j60_t *dev, uint8_t *mac)
@@ -254,7 +258,7 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
     uint8_t ctrl = 0;
     int c = 0;
 
-    mutex_lock(&dev->devlock);
+    mutex_lock(&dev->lock);
 
     if (cmd_rcr(dev, REG_ECON1, -1) & ECON1_TXRTS) {
         /* there is already a transmission in progress */
@@ -271,7 +275,7 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
              * otherwise we suppose that the transmission is still in progress
              * and return EBUSY
              */
-            mutex_unlock(&dev->devlock);
+            mutex_unlock(&dev->lock);
             return -EBUSY;
         }
     }
@@ -297,7 +301,7 @@ static int nd_send(netdev_t *netdev, const iolist_t *iolist)
     netdev->stats.tx_bytes += c;
 #endif
 
-    mutex_unlock(&dev->devlock);
+    mutex_unlock(&dev->lock);
     return c;
 }
 
@@ -319,7 +323,7 @@ static int nd_recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
     uint16_t next;
 
     (void)info;
-    mutex_lock(&dev->devlock);
+    mutex_lock(&dev->lock);
 
     /* set read pointer to RX read address */
     uint16_t rx_rd_ptr = cmd_r_addr(dev, ADDR_RX_READ);
@@ -347,7 +351,7 @@ static int nd_recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
         cmd_bfs(dev, REG_ECON2, -1, ECON2_PKTDEC);
     }
 
-    mutex_unlock(&dev->devlock);
+    mutex_unlock(&dev->lock);
     return (int)size;
 }
 
@@ -358,21 +362,21 @@ static int nd_init(netdev_t *netdev)
     uint8_t tmp;
 
     /* get exclusive access of the device */
-    mutex_lock(&dev->devlock);
+    mutex_lock(&dev->lock);
 
     /* setup the low-level interfaces */
-    gpio_init(dev->reset_pin, GPIO_OUT);
-    gpio_clear(dev->reset_pin);     /* this puts the device into reset state */
-    res = spi_init_cs(dev->spi, dev->cs_pin);
+    gpio_init(RST_PIN, GPIO_OUT);
+    gpio_clear(RST_PIN);     /* this puts the device into reset state */
+    res = spi_init_cs(SPI_BUS, CS_PIN);
     if (res != SPI_OK) {
         DEBUG("[enc28j60] init: error initializing the CS pin [%i]\n", res);
         return -1;
     }
-    gpio_init_int(dev->int_pin, GPIO_IN, GPIO_FALLING, on_int, (void *)dev);
+    gpio_init_int(INT_PIN, GPIO_IN, GPIO_FALLING, on_int, (void *)dev);
 
     /* wait at least 1ms and then release device from reset state */
     xtimer_usleep(DELAY_RESET);
-    gpio_set(dev->reset_pin);
+    gpio_set(RST_PIN);
 
     /* wait for oscillator to be stable before proceeding */
     res = 0;
@@ -442,7 +446,7 @@ static int nd_init(netdev_t *netdev)
 #ifdef MODULE_NETSTATS_L2
     memset(&netdev->stats, 0, sizeof(netstats_t));
 #endif
-    mutex_unlock(&dev->devlock);
+    mutex_unlock(&dev->lock);
     return 0;
 }
 
@@ -536,11 +540,8 @@ static const netdev_driver_t netdev_driver_enc28j60 = {
 void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params)
 {
     dev->netdev.driver = &netdev_driver_enc28j60;
-    dev->spi = params->spi;
-    dev->cs_pin = params->cs_pin;
-    dev->int_pin = params->int_pin;
-    dev->reset_pin = params->reset_pin;
-    mutex_init(&dev->devlock);
     dev->bank = 99;                         /* mark as invalid */
+    dev->p = *params;
+    mutex_init(&dev->lock);
     dev->tx_time = 0;
 }
