@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/common/esp8266/Makefile.dep

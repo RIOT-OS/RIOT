@@ -1,0 +1,6 @@
+# MCU defined features that are provided independent on board definitions
+
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_timer
