@@ -36,14 +36,13 @@ the overall validity of the PR.
     Is the problem that the PR intends to solve clearly stated?
 2.  Is the solution presented in the PR as simple as possible to satisfy the
     requirements, but no simpler?
-3.  Is the PR a manageable size for you to handle? As a general rule of thumb,
-    if the PR is likely to take more than a full day for one person to review,
-    then it may need to be broken down, at your discretion.
+3.  Is the PR a manageable size? It should be confined to a single explainable
+    change, and be runnable on its own.
 4.  Is the solution well designed on a high level?
 5.  Do the concepts used by the PR make sense?
 6.  Does the PR break with existing concepts?
 7.  Is there a clean commit history in the pulled branch? The commit history
-    should show a clear breakdown of the work that has been done.
+    should group the code differences cleanly.
 8.  Are there clear and adequate instructions on how to test the PR? \
     This may or may not include implemented tests as part of the PR.
 9.  Does the code compile and run?
