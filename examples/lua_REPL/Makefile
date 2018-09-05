@@ -23,7 +23,8 @@ BOARD_INSUFFICIENT_MEMORY := bluepill calliope-mini cc2650-launchpad \
                              saml21-xpro samr21-xpro seeeduino_arch-pro \
                              sensebox_samd21 slstk3401a sltb001a slwstk6220a \
                              sodaq-autonomo sodaq-explorer sodaq-one stk3600 \
-                             stm32f3discovery yunjia-nrf51822
+                             stm32f3discovery yunjia-nrf51822 \
+                             esp8266-esp-12x esp8266-olimex-mod esp8266-sparkfun-thing
 
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno \
                    chronos hifive1 jiminy-mega256rfr2 mega-xplained mips-malta \
