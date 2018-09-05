@@ -89,16 +89,15 @@
 
 static void switch_bank(enc28j60_t *dev, int8_t bank)
 {
-    /* only switch bank if needed */
-    if ((bank < 0) || (dev->bank == bank)) {
+    assert(bank < 0x04);
+
+    if (bank < 0) {
         return;
     }
     /* clear old value */
     spi_transfer_reg(SPI_BUS, CS_PIN, (CMD_BFC | REG_ECON1), 0x03);
     /* set new value */
     spi_transfer_reg(SPI_BUS, CS_PIN, (CMD_BFS | REG_ECON1), bank);
-    /* remember active bank */
-    dev->bank = bank;
 }
 
 static uint8_t cmd_rcr(enc28j60_t *dev, uint8_t reg, int8_t bank)
@@ -540,7 +539,6 @@ static const netdev_driver_t netdev_driver_enc28j60 = {
 void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params)
 {
     dev->netdev.driver = &netdev_driver_enc28j60;
-    dev->bank = 99;                         /* mark as invalid */
     dev->p = *params;
     mutex_init(&dev->lock);
     dev->tx_time = 0;

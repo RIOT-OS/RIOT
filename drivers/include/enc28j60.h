@@ -47,7 +47,6 @@ typedef struct {
  */
 typedef struct {
     netdev_t netdev;        /**< pull in the netdev fields */
-    int8_t bank;            /**< remember the active register bank */
     enc28j60_params_t p;    /**< SPI and pin confiuration */
     mutex_t lock;           /**< lock the device on access */
     uint32_t tx_time;       /**< last transmission time for timeout handling */
