@@ -69,3 +69,21 @@ then
     echo "${UNDEFINED_GROUPS_PRINT}"
     exit 2
 fi
+
+: "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
+. "${RIOTTOOLS}"/ci/changed_files.sh
+
+FILES=$(FILEREGEX='doc.txt|README|LICENSE' changed_files)
+
+ERR_CODE=0
+for file in $FILES;
+do
+    #Ignore Doxygen tables (starting with `|`)
+    LINEREGEX="^[^\|]" $RIOTBASE/dist/tools/linelencheck/check.sh $RIOTBASE/$file
+    if [ $? -ne 0 ]
+    then
+        ERR_CODE=1
+    fi
+done
+
+exit $ERR_CODE
