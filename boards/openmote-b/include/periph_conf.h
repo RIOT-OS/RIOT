@@ -71,7 +71,7 @@ static const timer_conf_t timer_config[] = {
  * @name ADC configuration
  * @{
  */
-#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+#define SOC_ADC_ADCCON3_EREF  SOC_ADC_ADCCON3_EREF_AVDD5
 
 static const adc_conf_t adc_config[] = {
     GPIO_PIN(1, 0), /**< GPIO_PB0 = GPIO0_PIN */

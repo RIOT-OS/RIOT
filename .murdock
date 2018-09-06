@@ -72,9 +72,8 @@ _greplist() {
 
 # get list of all app directories
 get_apps() {
-    find tests/ examples/ \
-        -mindepth 2 -maxdepth 2 -name Makefile -type f \
-        | xargs dirname | $(_greplist $APPS) | sort
+    make -f makefiles/app_dirs.inc.mk info-applications \
+        | $(_greplist $APPS) | sort
 }
 
 # take app dir as parameter, print all boards that are supported
