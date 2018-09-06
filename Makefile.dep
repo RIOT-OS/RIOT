@@ -782,6 +782,14 @@ ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
   USEPKG += tlsf
 endif
 
+# HACK for test Remove me
+# Module that adds FEATURES_REQUIRED after 'cpu/stm32_common/Makefile.include'
+PSEUDOMODULES += trigger_periph_flashpage_include
+ifneq (,$(filter trigger_periph_flashpage_include,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_flashpage
+endif
+# HACK for test Remove me
+
 ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += random
