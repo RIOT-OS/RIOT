@@ -453,6 +453,21 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
                           : (tmp & ~AT86RF2XX_CSMA_SEED_1__AACK_SET_PD);
             at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
             break;
+        case AT86RF2XX_OPT_ANT_DIV:
+            DEBUG("[at86rf2xx] opt: %s antenna diversity\n",
+                  (state ? "enable" : "disable"));
+            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_CTRL);
+            tmp &= ~AT86RF2XX_RX_CTRL_MASK__PDT_THRES;
+            tmp = (state) ? (tmp | AT86RF2XX_RX_CTRL_PDT_THRES__ANT_DIV_THRES)
+                          : (tmp | AT86RF2XX_RX_CTRL_PDT_THRES__NO_ANT_DIV_THRES);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_CTRL, tmp);
+            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__ANT_DIV);
+            tmp &= ~AT86RF2XX_ANT_DIV_MASK__ANT_CTRL;
+            tmp = (state) ? (tmp | AT86RF2XX_ANT_DIV_MASK__ANT_DIV_EN
+                             | AT86RF2XX_ANT_DIV_MASK__ANT_EXT_SW_EN)
+                          : (tmp & ~AT86RF2XX_ANT_DIV_MASK__ANT_DIV_EN
+                             & ~AT86RF2XX_ANT_DIV_MASK__ANT_EXT_SW_EN);
+            at86rf2xx_reg_write(dev, AT86RF2XX_REG__ANT_DIV, tmp);
         default:
             /* do nothing */
             break;

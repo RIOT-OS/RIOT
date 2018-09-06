@@ -81,6 +81,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
 
+    /* set antena diversity */
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_ANT_DIV, AT86RF2XX_DEFAULT_ANT_DIV);
+
     static const netopt_enable_t enable = NETOPT_ENABLE;
     netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
                           &enable, sizeof(enable));
