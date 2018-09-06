@@ -21,11 +21,14 @@
 
 from __future__ import print_function
 
+from collections import defaultdict
 from itertools import groupby
-from os import devnull, environ, listdir
+from os import devnull, environ
 from os.path import abspath, dirname, isfile, join
 from subprocess import CalledProcessError, check_call, check_output, PIPE, Popen
-from sys import exit, stdout, argv
+from sys import argv, exit, stdout
+
+
 try:
     # Python 2.x
     from StringIO import StringIO
@@ -86,12 +89,33 @@ def get_results_and_output_from(fd):
             output.write(line)
 
 
+def get_app_dirs():
+    return check_output(["make", "-f", "makefiles/app_dirs.inc.mk", "info-applications"]) \
+            .decode("utf-8", errors="ignore")\
+            .split()
+
+
+def split_apps_by_dir(app_dirs):
+    """ creates a dictionary as follows:
+    { "examples": ["hello_world", "gnrc_networking" ],
+      "tests": ["minimal", "fmt_print" ]
+      }
+    """
+    res = defaultdict(list)
+    for app_dir in app_dirs:
+        folder, app = app_dir.split("/", 1)
+        res[folder].append(app)
+
+    return res
+
+
 def build_all():
     riotbase = environ.get('RIOTBASE') or abspath(join(dirname(abspath(__file__)), '../' * 3))
-    for folder in ('examples', 'tests'):
+    app_folders = split_apps_by_dir(get_app_dirs())
+    for folder in sorted(app_folders):
         print('Building all applications in: {}'.format(colorize_str(folder, Termcolor.blue)))
 
-        applications = listdir(join(riotbase, folder))
+        applications = app_folders[folder]
         applications = filter(lambda app: is_tracked(join(riotbase, folder, app)), applications)
         applications = sorted(applications)
 
