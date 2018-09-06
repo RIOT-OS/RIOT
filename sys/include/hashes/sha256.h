@@ -49,7 +49,7 @@
 #define HASHES_SHA256_H
 
 #include <inttypes.h>
-#include <unistd.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
