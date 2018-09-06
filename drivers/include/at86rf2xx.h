@@ -80,6 +80,13 @@ extern "C" {
 #define AT86RF2XX_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)
 
 /**
+ * @brief   Default antenna diversity enable
+ */
+#ifndef AT86RF2XX_DEFAULT_ANT_DIV
+#define AT86RF2XX_DEFAULT_ANT_DIV       (0)
+#endif
+
+/**
  * @brief   Base (minimal) RSSI value in dBm
  */
 #if MODULE_AT86RF233
@@ -146,6 +153,8 @@ extern "C" {
 #define AT86RF2XX_OPT_AUTOACK        (0x0080)       /**< Auto ACK active */
 #define AT86RF2XX_OPT_ACK_PENDING    (0x0100)       /**< ACK frames with data
                                                      *   pending */
+#define AT86RF2XX_OPT_ANT_DIV        (0x0200)       /**< Antenna diversity
+                                                     *   active */
 
 /** @} */
 

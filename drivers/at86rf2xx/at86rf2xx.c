@@ -82,6 +82,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
 
+    /* set antena diversity */
+    at86rf2xx_set_option(dev, AT86RF2XX_OPT_ANT_DIV, AT86RF2XX_DEFAULT_ANT_DIV);
+
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
                         AT86RF2XX_TRX_CTRL_2_MASK__RX_SAFE_MODE);

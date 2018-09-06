@@ -375,6 +375,38 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @name    Bitfield definitions for the RX_CTRL register
+ * @{
+ */
+
+/* TODO: Check other radio device datasheets and check wether this register exists in those. */
+
+#define AT86RF2XX_RX_CTRL_MASK__PEL_SHIFT_VALUES                (0xC0)
+#define AT86RF2XX_RX_CTRL_MASK__PDT_THRES                       (0x0F)
+
+#define AT86RF2XX_RX_CTRL_PDT_THRES__NO_ANT_DIV_THRES           (0x07)
+#define AT86RF2XX_RX_CTRL_PDT_THRES__ANT_DIV_THRES              (0x03)
+
+/** @} */
+
+/**
+ * @name    Bitfield definitions for the ANT_DIV register
+ * @{
+ */
+
+/* TODO: Check other radio device datasheets and check wether this register exists in those. */
+
+#define AT86RF2XX_ANT_DIV_MASK__ANT_SEL                         (0x80)
+#define AT86RF2XX_ANT_DIV_MASK__ANT_DIV_EN                      (0x08)
+#define AT86RF2XX_ANT_DIV_MASK__ANT_EXT_SW_EN                   (0x04)
+#define AT86RF2XX_ANT_DIV_MASK__ANT_CTRL                        (0x03)
+
+#define AT86RF2XX_ANT_DIV_ANT_CTRL__ANT_0                       (0x01)
+#define AT86RF2XX_ANT_DIV_ANT_CTRL__ANT_1                       (0x02)
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
