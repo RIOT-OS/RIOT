@@ -1,0 +1,19 @@
+# define the cpu used by the atsamr21-breakout board
+export CPU = samd21
+export CPU_MODEL = samr21g18a
+
+# export needed for flash rule
+export PORT_LINUX ?= /dev/ttyACM0
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# we use BOSSA to flash this board and take into account the preinstalled
+# Arduino bootloader. ROM_OFFSET skips the space taken by such bootloader.
+ROM_OFFSET ?= 0x2000
+include $(RIOTMAKE)/tools/bossa.inc.mk
+
+# enable antenna diversity for this board.
+CFLAGS += -DAT86RF2XX_DEFAULT_ANT_DIV=\(1\)
+
+include $(RIOTMAKE)/boards/sam0.inc.mk
