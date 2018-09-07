@@ -4,5 +4,3 @@ export INCLUDES += -I$(RIOTCPU)/mips_pic32_common/include
 
 USEMODULE += mips_pic32_common
 USEMODULE += mips_pic32_common_periph
-
-USEMODULE += periph_common

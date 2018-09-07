@@ -2,9 +2,6 @@
 FAM = $(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
 export CFLAGS += -DCPU_FAM_$(FAM)
 
-# use common periph functions
-USEMODULE += periph_common
-
 # include nrf5x common periph drivers
 USEMODULE += nrf5x_common_periph
 
