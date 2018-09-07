@@ -96,6 +96,15 @@ unsigned int timer_read(tim_t tim)
     return (unsigned int)dev(tim)->CNT;
 }
 
+unsigned int timer_diff(tim_t tim, unsigned int begin, unsigned int until)
+{
+    unsigned int diff = 0;
+    if (tim < TIMER_NUMOF) {
+        diff = ((until - begin) & timer_config[tim].max);
+    }
+    return diff;
+}
+
 void timer_start(tim_t tim)
 {
     dev(tim)->CR1 |= TIM_CR1_CEN;

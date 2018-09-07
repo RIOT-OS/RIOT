@@ -291,6 +291,11 @@ typedef struct {
 } timer_conf_t;
 
 /**
+ * @brief Timer implementation provides custom timer_diff function
+ */
+#define PERIPH_TIMER_PROVIDES_DIFF
+
+/**
  * @brief   PWM channel
  */
 typedef struct {
