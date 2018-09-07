@@ -213,6 +213,18 @@ unsigned int timer_read(tim_t tim)
     }
 }
 
+unsigned int timer_diff(tim_t tim, unsigned int begin, unsigned int until)
+{
+    unsigned int diff = 0;
+    if (tim < TIMER_NUMOF) {
+        diff = (until - begin);
+        if (timer_config[tim].cfg == GPTMCFG_16_BIT_TIMER) {
+            diff &= 0xffff;
+        }
+    }
+    return diff;
+}
+
 /*
  * For stopping the counting of all channels.
  */
