@@ -147,6 +147,22 @@ int timer_clear(tim_t dev, int channel);
 unsigned int timer_read(tim_t dev);
 
 /**
+ * @brief Compare two timer values and return the difference
+ *
+ * Depending on the timer configuration the difference of two time values cannot
+ * be calculated by simple substraction, but needs to consider the max value the
+ * timer can reach. For instance, if the timer is set to 16-Bits running on a
+ * 32-Bits platform.
+ *
+ * @param[in] dev           the timer to compare values for
+ * @param[in] begin         first time value
+ * @param[in] until         second time value
+ *
+ * @return                  time difference, i.e., `until - begin`
+ */
+unsigned int timer_diff(tim_t dev, unsigned int begin, unsigned int until);
+
+/**
  * @brief Start the given timer
  *
  * This function is only needed if the timer was stopped manually before.

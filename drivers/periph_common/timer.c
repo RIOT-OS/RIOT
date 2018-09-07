@@ -26,3 +26,11 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
     return timer_set_absolute(dev, channel, timer_read(dev) + timeout);
 }
 #endif
+
+#ifndef PERIPH_TIMER_PROVIDES_DIFF
+unsigned int timer_diff(tim_t dev, unsigned int begin, unsigned int until)
+{
+    (void) dev;
+    return (until - begin);
+}
+#endif
