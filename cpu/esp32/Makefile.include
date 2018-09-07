@@ -69,7 +69,6 @@ USEMODULE += log
 USEMODULE += newlib_syscalls_default
 USEMODULE += periph
 USEMODULE += periph_adc_ctrl
-USEMODULE += periph_common
 USEMODULE += periph_hwrng
 USEMODULE += periph_flash
 USEMODULE += periph_rtc

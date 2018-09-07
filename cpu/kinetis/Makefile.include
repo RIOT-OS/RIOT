@@ -36,9 +36,6 @@ LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
 # add the CPU specific flash configuration field for the linker
 export UNDEF += $(BINDIR)/cpu/fcfield.o
 
-# include common periph drivers
-USEMODULE += periph_common
-
 # select kinetis periph drivers
 ifeq (EA,$(KINETIS_SERIES))
 USEMODULE += periph_ics

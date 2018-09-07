@@ -20,9 +20,6 @@ USEMODULE += cpu_$(EFM32_FAMILY)
 # vectors.o is provided by 'cpu_$(EFM32_FAMILY)' and not by 'cpu'
 VECTORS_O := $(BINDIR)/cpu_$(EFM32_FAMILY)/vectors.o
 
-# include common periph module
-USEMODULE += periph_common
-
 # include layered power management
 USEMODULE += pm_layered
 

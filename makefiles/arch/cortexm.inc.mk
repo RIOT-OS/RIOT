@@ -34,7 +34,6 @@ export USEMODULE += cortexm_common
 # Export the peripheral drivers to be linked into the final binary:
 export USEMODULE += periph
 # include common periph code
-export USEMODULE += periph_common
 export USEMODULE += cortexm_common_periph
 
 # all cortex MCU's use newlib as libc
