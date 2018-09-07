@@ -251,6 +251,24 @@ unsigned int timer_read(tim_t dev)
 
 }
 
+unsigned int timer_diff(tim_t dev, unsigned int begin, unsigned int until)
+{
+    unsigned int diff=0;
+    switch (dev) {
+#if TIMER_0_EN
+    case TIMER_0:
+        diff = ((until - begin) & TIMER_0_MAX_VALUE);
+        break;
+#endif
+#if TIMER_1_EN
+    case TIMER_1:
+        diff = ((until - begin) & TIMER_1_MAX_VALUE);
+        break;
+#endif
+    }
+    return diff;
+}
+
 void timer_stop(tim_t dev)
 {
     switch (dev) {

@@ -107,6 +107,12 @@ typedef enum {
     ADC_RES_16BIT = 0xfd                        /**< not supported */
 } adc_res_t;
 /** @} */
+
+/**
+ * @brief Timer implementation provides custom timer_diff function
+ */
+#define PERIPH_TIMER_PROVIDES_DIFF
+
 #ifdef __cplusplus
 }
 #endif
