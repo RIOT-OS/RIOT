@@ -211,6 +211,18 @@ unsigned int timer_read(tim_t tim)
     return LOAD_VALUE - (dev(tim)->TAV & 0xFFFF);
 }
 
+unsigned int timer_diff(tim_t tim, unsigned int begin, unsigned int until)
+{
+    unsigned int diff = 0;
+    if (tim < TIMER_NUMOF) {
+        diff = (until - begin);
+        if (timer_config[tim].cfg == GPT_CFG_16T) {
+            diff &= 0xffff;
+        }
+    }
+    return diff;
+}
+
 void timer_stop(tim_t tim)
 {
     DEBUG("timer_stop(%u)\n", tim);

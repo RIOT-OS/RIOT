@@ -76,6 +76,11 @@ typedef struct {
     uint8_t     chn;    /**< number of channels [1,2] */
 } timer_conf_t;
 
+/**
+ * @brief Timer implementation provides custom timer_diff function
+ */
+#define PERIPH_TIMER_PROVIDES_DIFF
+
 #endif /* ifndef DOXYGEN */
 
 #ifdef __cplusplus
