@@ -834,6 +834,7 @@ EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */sys/include/embUnit/* \
                          */sys/random/fortuna/* \
                          */sys/random/tinymt32/* \
+                         */staging/* \
                          */toolchain/* \
                          */vendor/* \
 

@@ -37,7 +37,7 @@ else
 fi
 
 exclude_filter() {
-    grep -v -e vendor -e examples -e tests -e "\<dist/tools\>"
+    grep -v -e vendor -e examples -e tests -e "\<dist/tools\>" -e staging
 }
 
 # Check groups are correctly defined (e.g. no undefined groups and no group
