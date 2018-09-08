@@ -1,0 +1,3 @@
+include $(RIOTBASE)/staging/staging.mk
+
+-include $(STAGING_DIRS:%=%/Makefile.include)
