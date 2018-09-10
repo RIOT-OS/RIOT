@@ -234,7 +234,7 @@ export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 
 # process provided features
--include $(RIOTBOARD)/$(BOARD)/Makefile.features
+include $(RIOTBOARD)/$(BOARD)/Makefile.features
 
 # mandatory includes!
 include $(RIOTMAKE)/pseudomodules.inc.mk
