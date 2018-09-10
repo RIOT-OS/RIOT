@@ -8,6 +8,3 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
 TEST_ON_CI_WHITELIST += all
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	tests/01-run.py

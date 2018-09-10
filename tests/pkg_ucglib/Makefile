@@ -43,6 +43,3 @@ CFLAGS += -DTEST_DISPLAY=$(TEST_DISPLAY)
 CFLAGS += -DTEST_DISPLAY_EXT=$(TEST_DISPLAY_EXT)
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	tests/01-run.py

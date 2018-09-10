@@ -42,6 +42,3 @@ CFLAGS += -DLWIP_NETIF_LOOPBACK=1
 CFLAGS += -DLWIP_HAVE_LOOPIF=1
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	./tests/01-run.py

@@ -39,6 +39,3 @@ CFLAGS += -DSO_REUSE
 CFLAGS += -DLWIP_SO_RCVTIMEO
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	./tests/01-run.py

@@ -11,6 +11,3 @@ TEST_ON_CI_WHITELIST += all
 #CFLAGS += -DSLEEP_PORT=PORT_F
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	./tests/01-run.py
