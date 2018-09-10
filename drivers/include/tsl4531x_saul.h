@@ -18,24 +18,14 @@
  * @}
  */
 
+#ifndef TSL4531x_SAUL_H
+#define TSL4531x_SAUL_H
+
 #include "saul.h"
-#include "tsl4531x.h"
 
-static int _read(const void *dev, phydat_t *res)
-{
-    int nvals;
-    uint16_t lux;
+/** SAUL-compatible structure for illuminance sensor
+ */
+const saul_driver_t tsl4531x_saul_driver;
 
-    nvals = (tsl4531x_read(dev, &lux) >= 0)? 1 : 0;
+#endif /* TSL4531x_SAUL_H */
 
-    res->val[0] = lux;
-    res->unit = UNIT_LUX;
-    res->scale = 0;
-    return nvals;
-}
-
-const saul_driver_t tsl4531x_saul_driver = {
-    .read = _read,
-    .write = saul_notsup,
-    .type = SAUL_SENSE_LIGHT
-};
