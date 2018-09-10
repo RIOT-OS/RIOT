@@ -468,3 +468,7 @@ ifneq (,$(filter tsl2561,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
+
+ifneq (,$(filter tsl4531x,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
