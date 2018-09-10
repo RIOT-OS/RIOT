@@ -159,6 +159,12 @@ typedef enum {
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
 
 #endif /* MODULE_PERIPH_SPI */
+
+/**
+ * @brief   Prevent shared timer functions from being used
+ */
+#define PERIPH_TIMER_PROVIDES_SET
+
 /** @} */
 
 #ifdef __cplusplus
