@@ -34,7 +34,7 @@ static int _read(const void *dev, phydat_t *res)
     return nvals;
 }
 
-const saul_driver_t tsl2561_illuminance_saul_driver = {
+const saul_driver_t tsl4531x_saul_driver = {
     .read = _read,
     .write = saul_notsup,
     .type = SAUL_SENSE_LIGHT
