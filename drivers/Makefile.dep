@@ -475,3 +475,7 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += netif
 endif
+
+ifneq (,$(filter tsl4531x,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
