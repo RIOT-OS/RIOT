@@ -5,12 +5,8 @@ OLD_USEPKG := $(sort $(USEPKG))
 # include board dependencies
 -include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
-# Transitional conditional include until all boards define 'CPU' in
-# Makefile.features
-ifneq (,$(CPU))
-  # include cpu dependencies
-  -include $(RIOTCPU)/$(CPU)/Makefile.dep
-endif
+# include cpu dependencies
+-include $(RIOTCPU)/$(CPU)/Makefile.dep
 
 # include external modules dependencies
 # processed before RIOT ones to be evaluated before the 'default' rules.
