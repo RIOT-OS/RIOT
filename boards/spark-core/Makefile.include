@@ -14,8 +14,6 @@ export RESET = # dfu-util has no support for resetting the device
 HEXFILE = $(BINFILE)
 export FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D "$(HEXFILE)"
 
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
-
 # Skip the space needed by the embedded bootloader
 export ROM_OFFSET ?= 0x5000
 

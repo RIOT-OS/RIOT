@@ -5,6 +5,3 @@ ifeq ($(PROGRAMMER),jlink)
 endif
 
 include $(RIOTBOARD)/common/arduino-mkr/Makefile.include
-
-# add arduino-mkr1000 include path
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
