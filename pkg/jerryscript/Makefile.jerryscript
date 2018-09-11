@@ -1,15 +1,14 @@
-BUILD_DIR  ?= $(CURDIR)/riot
+BUILD_DIR  ?= $(BINDIR)/jerryscript
 
 JERRYHEAP  ?= 16
 
 EXT_CFLAGS :=-D__TARGET_RIOT
 
-.PHONY: libjerry riot-jerry flash clean
+.PHONY: all libjerry
 
-# all: libjerry riot-jerry
+all: libjerry
 
 libjerry:
-	mkdir -p $(BUILD_DIR)
 	cmake -B$(BUILD_DIR) -H./ \
 	 -DCMAKE_SYSTEM_NAME=RIOT \
 	 -DCMAKE_SYSTEM_PROCESSOR="$(MCPU)" \
@@ -22,12 +21,10 @@ libjerry:
 	 -DJERRY_LIBM=OFF \
 	 -DJERRY_CMDLINE=OFF \
 	 -DHAVE_TIME_H=0 \
-	 -DEXTERNAL_COMPILE_FLAGS="$(EXT_CFLAGS)" \
+	 -DEXTERNAL_COMPILE_FLAGS="$(INCLUDES) $(EXT_CFLAGS)" \
 	 -DMEM_HEAP_SIZE_KB=$(JERRYHEAP)
 
-	"$(MAKE)" -C $(BUILD_DIR) jerry-core jerry-ext jerry-port-default-minimal
+	"$(MAKE)" -C $(BUILD_DIR) jerry-core jerry-ext jerry-port-default-minimal VERBOSE=1
 	cp $(BUILD_DIR)/lib/libjerry-core.a $(BINDIR)/jerryscript.a
 	cp $(BUILD_DIR)/lib/libjerry-ext.a $(BINDIR)/jerryscript-ext.a
 	cp $(BUILD_DIR)/lib/libjerry-port-default-minimal.a $(BINDIR)/jerryport-minimal.a
-
-include $(RIOTBASE)/Makefile.base
