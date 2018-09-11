@@ -9,4 +9,3 @@ The application will initialize the BME680 device and displays all data every
 For more information, see the following links and its datasheet [2]:
 [1]: https://github.com/BoschSensortec/BME680_driver
 [2]: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME680-DS001-00.pdf
-

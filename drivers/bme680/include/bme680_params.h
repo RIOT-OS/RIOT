@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_bme680
+ * @defgroup     drivers_bme680
  *
  * @{
  * @file
