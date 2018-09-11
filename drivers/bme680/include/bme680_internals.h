@@ -41,8 +41,8 @@
  *
  */
 
-#ifndef BME680_DEFS_H_
-#define BME680_DEFS_H_
+#ifndef BME680_INTERNALS_H
+#define BME680_INTERNALS_H
 
 /* header includes */
 #include <stdint.h>
@@ -314,6 +314,8 @@ typedef struct {
     uint16_t heatr_dur;     /**< Duration profile value */
 } bme680_gas_sett_t;
 
-#endif /* BME680_DEFS_H_ */
-/** @}*/
-/** @}*/
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* BME680_INTERNALS_H */
