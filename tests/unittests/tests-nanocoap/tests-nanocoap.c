@@ -152,6 +152,30 @@ static void test_nanocoap__get_multi_path(void)
 }
 
 /*
+ * Builds on get_req test, to test path with trailing slash.
+ */
+static void test_nanocoap__get_path_trailing_slash(void)
+{
+    uint8_t buf[128];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char path[] = "/time/";
+    size_t uri_opt_len = 6;
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_GET, msgid);
+
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    TEST_ASSERT_EQUAL_INT(uri_opt_len, len);
+
+    char uri[10] = {0};
+    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
+    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+}
+/*
  * Builds on get_req test, to test '/' path. This path is the default when
  * otherwise not specified.
  */
@@ -233,6 +257,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_req),
         new_TestFixture(test_nanocoap__put_req),
         new_TestFixture(test_nanocoap__get_multi_path),
+        new_TestFixture(test_nanocoap__get_path_trailing_slash),
         new_TestFixture(test_nanocoap__get_root_path),
         new_TestFixture(test_nanocoap__get_max_path),
         new_TestFixture(test_nanocoap__get_path_too_long),
