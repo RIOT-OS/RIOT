@@ -27,7 +27,7 @@
 #include "xtimer.h"
 
 #define MAINLOOP_DELAY  (15 * 1000 * 1000u)
-#define HEATR_DUR	    2000
+#define HEATR_DUR        2000
 #define AMB_TEMP        25
 #define HEATER_TEMP     200
 
@@ -54,11 +54,11 @@ int main(void)
 
     printf("Initialization successful\n\n");
     dev.tph_sett.os_hum = BME680_OS_1X;
-	dev.tph_sett.os_pres = BME680_OS_16X;
-	dev.tph_sett.os_temp = BME680_OS_2X;
+    dev.tph_sett.os_pres = BME680_OS_16X;
+    dev.tph_sett.os_temp = BME680_OS_2X;
     /* Set the remaining gas sensor settings and link the heating profile */
-	dev.gas_sett.run_gas = BME680_ENABLE_GAS_MEAS;
-	dev.gas_sett.heatr_dur = HEATR_DUR;
+    dev.gas_sett.run_gas = BME680_ENABLE_GAS_MEAS;
+    dev.gas_sett.heatr_dur = HEATR_DUR;
     dev.amb_temp = AMB_TEMP;
 
     dev.gas_sett.heatr_temp = HEATER_TEMP;
@@ -66,7 +66,7 @@ int main(void)
     bme680_get_profile_dur(&dev, &duration);
     duration += dev.gas_sett.heatr_dur * US_PER_MS;
     printf("measurement duration %lu [ms]\n", duration / 1000 );
-    bme680_set_sensor_settings(&dev, BME680_OST_SEL | BME680_OSP_SEL | 
+    bme680_set_sensor_settings(&dev, BME680_OST_SEL | BME680_OSP_SEL |
                                BME680_OSH_SEL | BME680_GAS_SENSOR_SEL);
     printf("Prepare measurement...\n");
     while(1) {
@@ -84,5 +84,5 @@ int main(void)
     printf("Gas:%lu[Ohms]\n\n", data.gas_resistance);
     xtimer_usleep(MAINLOOP_DELAY);
     }
-  
+
 }
