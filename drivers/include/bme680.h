@@ -41,8 +41,8 @@
  *
  */
 
-#ifndef BME680_H_
-#define BME680_H_
+#ifndef BME680_H
+#define BME680_H
 
 /** CPP guard */
 #ifdef __cplusplus
@@ -270,9 +270,9 @@ int8_t bme680_set_sensor_settings(bme680_t *dev, uint16_t flags);
  * @return                 -BME680_COM_FAIL when I2C communication fails
  */
 int8_t bme680_get_sensor_settings(bme680_t *dev);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BME680_H_ */
-/** @}*/
+#endif /* BME680_H */
