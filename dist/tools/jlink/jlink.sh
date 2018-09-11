@@ -66,12 +66,6 @@ _JLINK_TERMFLAGS="-ts 19021"
 # a couple of tests for certain configuration options
 #
 test_config() {
-    if [ -z "${HEXFILE}" ]; then
-        echo "no hexfile"
-    else
-        echo "HEXFILE found"
-    fi
-
     if [ -z "${JLINK}" ]; then
         JLINK=${_JLINK}
     fi
