@@ -24,6 +24,9 @@
 
 #include "periph/timer.h"
 #include "cpu.h"
+#include "board.h"
+#include "kernel_types.h"
+#include "print_results.h"
 #if TEST_XTIMER
 #include "xtimer.h"
 #endif
@@ -95,11 +98,6 @@ extern "C" {
 #define TIM_TEST_TO_REF(x) (x)
 #endif
 
-/* Longest timer timeout tested (TUT ticks)*/
-/* Reduce this if RAM usage is too high */
-#ifndef TEST_MAX
-#define TEST_MAX 128
-#endif
 /* Shortest timer timeout tested (TUT ticks) */
 #ifndef TEST_MIN
 #if TEST_XTIMER
@@ -113,7 +111,8 @@ extern "C" {
  * processing delays */
 #define TEST_MIN 16
 #endif
-#endif
+#endif /* !defined(TEST_MIN) */
+
 /* Minimum delay for relative timers, should usually work with any value */
 #ifndef TEST_MIN_REL
 #if TEST_XTIMER
@@ -122,6 +121,13 @@ extern "C" {
 #define TEST_MIN_REL (0)
 #endif
 #endif
+
+/* Longest timer timeout tested (TUT ticks)*/
+/* Reduce this if RAM usage is too high */
+#ifndef TEST_MAX
+#define TEST_MAX (TEST_MIN + 127)
+#endif
+
 /* Number of test values */
 #define TEST_NUM ((TEST_MAX) - (TEST_MIN) + 1)
 /* 2-logarithm of TEST_NUM, not possible to compute automatically by the
@@ -242,10 +248,41 @@ extern "C" {
 #define ESTIMATE_CPU_ITERATIONS 2048
 
 #if TEST_XTIMER
-#define READ_TUT() _xtimer_now()
+#define TEST_VARIANT_NUMOF 8
+#define TUT_RUN test_xtimer_run
+#define TUT_PRESENTATION test_xtimer_presentation
+#define TUT_READ() _xtimer_now()
 #else
-#define READ_TUT() timer_read(TIM_TEST_DEV)
+#define TEST_VARIANT_NUMOF 6
+#define TUT_RUN test_periph_timer_run
+#define TUT_PRESENTATION test_periph_timer_presentation
+#define TUT_READ() timer_read(TIM_TEST_DEV)
+#define TUT_INIT test_periph_timer_init
 #endif
+
+/* Thread flag used for signaling from ISR to main thread */
+#ifndef THREAD_FLAG_TEST
+#define THREAD_FLAG_TEST (1 << 0)
+#endif
+
+/* Test state element */
+typedef struct {
+    matstat_state_t *ref_state; /* timer_set error statistics state */
+    matstat_state_t *int_state; /* timer_read error statistics state */
+    unsigned int target_ref; /* Target time in reference timer */
+    unsigned int target_tut; /* Target time in timer under test */
+    kernel_pid_t pid; /* PID of main thread */
+} test_ctx_t;
+
+/**
+ * @brief   Callback function for the timer target
+ *
+ * @param[in]   arg     pointer to test_ctx_t context for the test
+ */
+void bench_timers_cb(void *arg);
+
+extern stat_limits_t bench_timers_ref_limits;
+extern stat_limits_t bench_timers_int_limits;
 
 #ifdef __cplusplus
 }

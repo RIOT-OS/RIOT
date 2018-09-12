@@ -23,17 +23,14 @@
 #include <string.h>
 
 #include "bitarithm.h"
+#include "thread_flags.h"
 #include "fmt.h"
-#include "mutex.h"
 #include "random.h"
 #include "div.h"
 #include "matstat.h"
 #include "thread.h"
 #ifdef MODULE_PERIPH_RTT
 #include "periph/rtt.h"
-#endif
-#if TEST_XTIMER
-#include "xtimer.h"
 #endif
 
 #include "board.h"
@@ -55,30 +52,6 @@
  * will be inserted between each step to avoid phase locking the benchmark to
  * unobservable timer internals.
  */
-#if TEST_XTIMER
-enum test_variants {
-    TEST_XTIMER_SET             = 0,
-    TEST_PARALLEL               = 1,
-    TEST_XTIMER_SET_ABSOLUTE    = 2,
-    TEST_XTIMER_PERIODIC_WAKEUP = 4,
-    TEST_XTIMER_SPIN            = 6,
-    TEST_VARIANT_NUMOF          = 8,
-};
-#else /* TEST_XTIMER */
-/*
- * Results will be grouped by function, rescheduling yes/no, start/stop.
- * functions: timer_set, timer_set_absolute
- * reschedule: yes/no, when yes: first set one target time, before that time has
- *             passed, set the real target time
- * start/stop: if stop: call timer_stop before setting the target time, then call timer_start
- */
-enum test_variants {
-    TEST_RESCHEDULE         = 1,
-    TEST_STOPPED            = 2,
-    TEST_ABSOLUTE           = 4,
-    TEST_VARIANT_NUMOF      = 8,
-};
-#endif /* else TEST_XTIMER */
 
 /* Benchmark processing overhead, results will be compensated for this to make
  * the results easier to understand */
@@ -87,17 +60,6 @@ static int32_t overhead_read;
 
 /* Seed for initializing the random module */
 static uint32_t seed = 123;
-
-/* Mutex used for signalling between main thread and ISR callback */
-static mutex_t mtx_cb = MUTEX_INIT_LOCKED;
-
-/* Test state element */
-typedef struct {
-    matstat_state_t *ref_state; /* timer_set error statistics state */
-    matstat_state_t *int_state; /* timer_read error statistics state */
-    unsigned int target_ref; /* Target time in reference timer */
-    unsigned int target_tut; /* Target time in timer under test */
-} test_ctx_t;
 
 static test_ctx_t test_context;
 
@@ -119,83 +81,8 @@ static matstat_state_t ref_states[TEST_VARIANT_NUMOF];
 static matstat_state_t int_states[TEST_VARIANT_NUMOF];
 
 /* Limits for the mean and variance, to compare the results against expectation */
-static stat_limits_t ref_limits;
-static stat_limits_t int_limits;
-
-#if TEST_XTIMER
-static const result_presentation_t presentation = {
-    .groups = (const result_group_t[1]) {
-        {
-            .label = "xtimer",
-            .sub_labels = (const char *[]){
-                [TEST_XTIMER_SET] = "_xt_set",
-                [TEST_XTIMER_SET | TEST_PARALLEL] = "_xt_set race",
-                [TEST_XTIMER_SET_ABSOLUTE] = "_xt_set_abs",
-                [TEST_XTIMER_SET_ABSOLUTE | TEST_PARALLEL] = "_xt_set_abs race",
-                [TEST_XTIMER_PERIODIC_WAKEUP] = "_xt_periodic",
-                [TEST_XTIMER_PERIODIC_WAKEUP | TEST_PARALLEL] = "_xt_periodic race",
-                [TEST_XTIMER_SPIN] = "_xt_spin",
-                [TEST_XTIMER_SPIN | TEST_PARALLEL] = "_xt_spin race",
-            },
-            .num_sub_labels = TEST_VARIANT_NUMOF,
-        },
-    },
-    .num_groups = 1,
-    .ref_limits = &ref_limits,
-    .int_limits = &int_limits,
-    .offsets = (const unsigned[]) {
-        [TEST_XTIMER_SET]                               = TEST_MIN_REL,
-        [TEST_XTIMER_SET | TEST_PARALLEL]               = TEST_MIN_REL,
-        [TEST_XTIMER_SET_ABSOLUTE]                      = TEST_MIN,
-        [TEST_XTIMER_SET_ABSOLUTE | TEST_PARALLEL]      = TEST_MIN,
-        [TEST_XTIMER_PERIODIC_WAKEUP]                   = TEST_MIN_REL,
-        [TEST_XTIMER_PERIODIC_WAKEUP | TEST_PARALLEL]   = TEST_MIN_REL,
-        [TEST_XTIMER_SPIN]                              = TEST_MIN_REL,
-        [TEST_XTIMER_SPIN | TEST_PARALLEL]              = TEST_MIN_REL,
-    },
-};
-#else /* TEST_XTIMER */
-/* Number of variant groups, used when printing results */
-#define TEST_VARIANT_GROUPS 2
-
-static const result_presentation_t presentation = {
-    .groups = (const result_group_t[TEST_VARIANT_GROUPS]) {
-        {
-            .label = "timer_set",
-            .sub_labels = (const char *[]){
-                [0] = "running",
-                [TEST_RESCHEDULE] = "resched",
-                [TEST_STOPPED] = "stopped",
-                [TEST_STOPPED | TEST_RESCHEDULE] = "stopped, resched",
-            },
-            .num_sub_labels = (TEST_VARIANT_NUMOF / TEST_VARIANT_GROUPS),
-        },
-        {
-            .label = "timer_set_absolute",
-            .sub_labels = (const char *[]){
-                [0] = "running",
-                [TEST_RESCHEDULE] = "resched",
-                [TEST_STOPPED] = "stopped",
-                [TEST_STOPPED | TEST_RESCHEDULE] = "stopped, resched",
-            },
-            .num_sub_labels = (TEST_VARIANT_NUMOF / TEST_VARIANT_GROUPS),
-        },
-    },
-    .num_groups = TEST_VARIANT_GROUPS,
-    .ref_limits = &ref_limits,
-    .int_limits = &int_limits,
-    .offsets = (const unsigned[]) {
-        [0] =                                               TEST_MIN_REL,
-        [TEST_RESCHEDULE] =                                 TEST_MIN_REL,
-        [TEST_STOPPED] =                                    TEST_MIN_REL,
-        [TEST_STOPPED | TEST_RESCHEDULE] =                  TEST_MIN_REL,
-        [TEST_ABSOLUTE] =                                   TEST_MIN,
-        [TEST_ABSOLUTE | TEST_RESCHEDULE] =                 TEST_MIN,
-        [TEST_ABSOLUTE | TEST_STOPPED] =                    TEST_MIN,
-        [TEST_ABSOLUTE | TEST_STOPPED | TEST_RESCHEDULE] =  TEST_MIN,
-    },
-};
-#endif /* else TEST_XTIMER */
+stat_limits_t bench_timers_ref_limits;
+stat_limits_t bench_timers_int_limits;
 
 #ifdef MODULE_PERIPH_RTT
 static uint32_t rtt_begin;
@@ -209,15 +96,15 @@ static unsigned int tut_begin;
  */
 static void set_limits(void)
 {
-    ref_limits.mean_low = -(TEST_UNEXPECTED_MEAN);
-    ref_limits.mean_high = (TEST_UNEXPECTED_MEAN);
-    ref_limits.variance_low = 0;
-    ref_limits.variance_high = (TEST_UNEXPECTED_STDDEV) * (TEST_UNEXPECTED_STDDEV);
+    bench_timers_ref_limits.mean_low = -(TEST_UNEXPECTED_MEAN);
+    bench_timers_ref_limits.mean_high = (TEST_UNEXPECTED_MEAN);
+    bench_timers_ref_limits.variance_low = 0;
+    bench_timers_ref_limits.variance_high = (TEST_UNEXPECTED_STDDEV) * (TEST_UNEXPECTED_STDDEV);
 
-    int_limits.mean_low = -(TEST_UNEXPECTED_MEAN);
-    int_limits.mean_high = TEST_UNEXPECTED_MEAN;
-    int_limits.variance_low = 0;
-    int_limits.variance_high = (TEST_UNEXPECTED_STDDEV) * (TEST_UNEXPECTED_STDDEV);
+    bench_timers_int_limits.mean_low = -(TEST_UNEXPECTED_MEAN);
+    bench_timers_int_limits.mean_high = TEST_UNEXPECTED_MEAN;
+    bench_timers_int_limits.variance_low = 0;
+    bench_timers_int_limits.variance_high = (TEST_UNEXPECTED_STDDEV) * (TEST_UNEXPECTED_STDDEV);
 
     /* The quantization errors should be uniformly distributed within +/- 0.5
      * test timer ticks of the reference time */
@@ -229,14 +116,14 @@ static void set_limits(void)
     uint32_t conversion_variance = ((TIM_TEST_TO_REF(10) - TIM_TEST_TO_REF(0)) *
         (TIM_TEST_TO_REF(11) - TIM_TEST_TO_REF(1))) / 1200;
     if (TIM_REF_FREQ > TIM_TEST_FREQ) {
-        ref_limits.variance_low = ((TIM_TEST_TO_REF(10) - TIM_TEST_TO_REF(0) - 10 * (TEST_UNEXPECTED_STDDEV)) *
+        bench_timers_ref_limits.variance_low = ((TIM_TEST_TO_REF(10) - TIM_TEST_TO_REF(0) - 10 * (TEST_UNEXPECTED_STDDEV)) *
             (TIM_TEST_TO_REF(11) - TIM_TEST_TO_REF(1) - 10 * (TEST_UNEXPECTED_STDDEV))) / 1200;
-        ref_limits.variance_high = ((TIM_TEST_TO_REF(10) - TIM_TEST_TO_REF(0) + 10 * (TEST_UNEXPECTED_STDDEV)) *
+        bench_timers_ref_limits.variance_high = ((TIM_TEST_TO_REF(10) - TIM_TEST_TO_REF(0) + 10 * (TEST_UNEXPECTED_STDDEV)) *
             (TIM_TEST_TO_REF(11) - TIM_TEST_TO_REF(1) + 10 * (TEST_UNEXPECTED_STDDEV))) / 1200;
         /* The limits of the mean should account for the conversion error as well */
         /* rounded towards positive infinity */
         int32_t mean_error = (TIM_TEST_TO_REF(128) - TIM_TEST_TO_REF(0) + 127) / 128;
-        ref_limits.mean_high += mean_error;
+        bench_timers_ref_limits.mean_high += mean_error;
     }
 
     print_str("Expected error variance due to truncation in tick conversion: ");
@@ -245,9 +132,9 @@ static void set_limits(void)
 }
 
 /* Callback for the timeout */
-static void cb(void *arg)
+void bench_timers_cb(void *arg)
 {
-    unsigned int now_tut = READ_TUT();
+    unsigned int now_tut = TUT_READ();
     unsigned int now_ref = timer_read(TIM_REF_DEV);
     if (arg == NULL) {
         print_str("cb: Warning! arg = NULL\n");
@@ -285,14 +172,7 @@ static void cb(void *arg)
         matstat_add(ctx->int_state, diff);
     }
 
-    mutex_unlock(&mtx_cb);
-}
-
-/* Wrapper for periph_timer callbacks */
-static void cb_timer_periph(void *arg, int chan)
-{
-    (void)chan;
-    cb(arg);
+    thread_flags_set((thread_t *)thread_get(ctx->pid), THREAD_FLAG_TEST);
 }
 
 /**
@@ -363,154 +243,6 @@ static uint32_t derive_interval(uint32_t num)
     return interval;
 }
 
-#if TEST_XTIMER
-static void nop(void *arg)
-{
-    (void)arg;
-}
-
-static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
-{
-    interval += TEST_MIN;
-    unsigned int interval_ref = TIM_TEST_TO_REF(interval);
-    xtimer_t xt = {
-        .target = 0,
-        .long_target = 0,
-        .callback = cb,
-        .arg = ctx,
-    };
-    xtimer_t xt_parallel = {
-        .target = 0,
-        .long_target = 0,
-        .callback = nop,
-        .arg = NULL,
-    };
-    if (TEST_TRACE) {
-        switch (variant & ~TEST_PARALLEL) {
-            case TEST_XTIMER_SET:
-                print_str("rel ");
-                break;
-            case TEST_XTIMER_SET_ABSOLUTE:
-                print_str("abs ");
-                break;
-            case TEST_XTIMER_PERIODIC_WAKEUP:
-                print_str("per ");
-                break;
-            case TEST_XTIMER_SPIN:
-                print_str("spn ");
-                break;
-            default:
-                break;
-        }
-        if (variant & TEST_PARALLEL) {
-            print_str("= ");
-        }
-        else {
-            print_str("- ");
-        }
-        print_u32_dec(interval);
-        print("\n", 1);
-    }
-
-    spin_random_delay();
-    if (variant & TEST_PARALLEL) {
-        _xtimer_set(&xt_parallel, interval);
-        //~ interval += XTIMER_BACKOFF;
-        spin_random_delay();
-    }
-    ctx->target_ref = timer_read(TIM_REF_DEV) + interval_ref;
-    uint32_t now = READ_TUT();
-    ctx->target_tut = now + interval;
-    switch (variant & ~TEST_PARALLEL) {
-        case TEST_XTIMER_SET:
-            _xtimer_set(&xt, interval);
-            break;
-        case TEST_XTIMER_SET_ABSOLUTE:
-            now = READ_TUT();
-            ctx->target_tut = now + interval;
-            _xtimer_set_absolute(&xt, ctx->target_tut);
-            break;
-        case TEST_XTIMER_PERIODIC_WAKEUP:
-            _xtimer_periodic_wakeup(&now, interval);
-            /* xtimer_periodic_wakeup sleeps the thread, no automatic callback */
-            cb(xt.arg);
-            break;
-        case TEST_XTIMER_SPIN:
-            _xtimer_spin(interval);
-            /* xtimer_spin sleeps the thread, no automatic callback */
-            cb(xt.arg);
-            break;
-        default:
-            break;
-    }
-    mutex_lock(&mtx_cb);
-    xtimer_remove(&xt_parallel);
-    xtimer_remove(&xt);
-}
-#else /* TEST_XTIMER */
-static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
-{
-    if (variant & TEST_ABSOLUTE) {
-        interval += TEST_MIN;
-    }
-    else {
-        interval += TEST_MIN_REL;
-    }
-    unsigned int interval_ref = TIM_TEST_TO_REF(interval);
-
-    if (TEST_TRACE) {
-        if (variant & TEST_ABSOLUTE) {
-            print_str("A");
-        }
-        else {
-            print_str("_");
-        }
-        if (variant & TEST_RESCHEDULE) {
-            print_str("R");
-        }
-        else {
-            print_str("_");
-        }
-        if (variant & TEST_STOPPED) {
-            print_str("S ");
-        }
-        else {
-            print_str("_ ");
-        }
-        print_u32_dec(interval);
-        print_str("   ");
-        print_u64_hex(READ_TUT());
-        print("\n", 1);
-    }
-
-    spin_random_delay();
-    if (variant & TEST_RESCHEDULE) {
-        timer_set(TIM_TEST_DEV, TIM_TEST_CHAN, interval + RESCHEDULE_MARGIN);
-        spin_random_delay();
-    }
-    if (variant & TEST_STOPPED) {
-        timer_stop(TIM_TEST_DEV);
-        spin_random_delay();
-    }
-    ctx->target_ref = timer_read(TIM_REF_DEV) + interval_ref;
-    ctx->target_tut = READ_TUT() + interval;
-    if (variant & TEST_ABSOLUTE) {
-        timer_set_absolute(TIM_TEST_DEV, TIM_TEST_CHAN, ctx->target_tut);
-    }
-    else {
-        timer_set(TIM_TEST_DEV, TIM_TEST_CHAN, interval);
-    }
-    if (variant & TEST_STOPPED) {
-        spin_random_delay();
-        /* do not update ctx->target_tut, because TUT should have been stopped
-         * and not incremented during spin_random_delay */
-        ctx->target_ref = timer_read(TIM_REF_DEV) + interval_ref;
-        timer_start(TIM_TEST_DEV);
-    }
-    mutex_lock(&mtx_cb);
-}
-#endif /* TEST_XTIMER */
-
 static int test_timer(void)
 {
     uint32_t time_last = timer_read(TIM_REF_DEV);
@@ -528,7 +260,9 @@ static int test_timer(void)
             continue;
         }
         assign_state_ptr(&test_context, variant, interval);
-        run_test(&test_context, interval, variant);
+        thread_flags_clear(THREAD_FLAG_TEST);
+        extern void TUT_RUN(test_ctx_t *ctx, uint32_t interval, unsigned int variant);
+        TUT_RUN(&test_context, interval, variant);
         uint32_t now = timer_read(TIM_REF_DEV);
         if (now >= time_last) {
             /* Account for reference timer possibly overflowing before 30 seconds have passed */
@@ -541,7 +275,7 @@ static int test_timer(void)
     } while(time_elapsed < TEST_PRINT_INTERVAL_TICKS);
 
     uint32_t ref_now = timer_read(TIM_REF_DEV);
-    uint32_t tut_now = READ_TUT();
+    uint32_t tut_now = TUT_READ();
 #ifdef MODULE_PERIPH_RTT
     uint32_t rtt_now = rtt_get_counter();
 #endif
@@ -557,7 +291,8 @@ static int test_timer(void)
     print_u32_dec((rtt_now - rtt_begin) / RTT_FREQUENCY);
     print_str("\n");
 #endif
-    print_results(&presentation, &ref_states[0], &int_states[0]);
+    extern result_presentation_t TUT_PRESENTATION;
+    print_results(&TUT_PRESENTATION, &ref_states[0], &int_states[0]);
 
     return 0;
 }
@@ -576,15 +311,15 @@ static void estimate_cpu_overhead(void)
     matstat_state_t int_state = MATSTAT_STATE_INIT;
     ctx->ref_state = &ref_state;
     ctx->int_state = &int_state;
+    ctx->pid = thread_getpid();
     for (unsigned int k = 0; k < ESTIMATE_CPU_ITERATIONS; ++k) {
         unsigned int interval_ref = TIM_TEST_TO_REF(interval);
         spin_random_delay();
-        ctx->target_tut = READ_TUT() + interval - 1;
+        ctx->target_tut = TUT_READ() + interval - 1;
         ctx->target_ref = timer_read(TIM_REF_DEV) + interval_ref - 1;
         /* call yield to simulate a context switch to isr and back */
         thread_yield_higher();
-        cb_timer_periph(ctx, TIM_TEST_CHAN);
-        mutex_lock(&mtx_cb);
+        bench_timers_cb(ctx);
     }
     overhead_target = matstat_mean(&ref_state);
     overhead_read = matstat_mean(&int_state);
@@ -612,6 +347,14 @@ static void estimate_cpu_overhead(void)
         print_str("This is expected on native when other processes are running\n");
 #endif
     }
+}
+
+static void cb_ref(void *arg, int chan)
+{
+    (void) arg;
+    print_str("Warning! Spurious interrupt on TIM_REF, chan=");
+    print_s32_dec(chan);
+    print_str("\n");
 }
 
 int main(void)
@@ -710,23 +453,33 @@ int main(void)
         }
 
     }
-    int res = timer_init(TIM_REF_DEV, TIM_REF_FREQ, cb_timer_periph, NULL);
-    if (res < 0) {
-        print_str("Error ");
-        print_s32_dec(res);
-        print_str(" intializing reference timer\n");
-        return res;
-    }
+    test_context.pid = thread_getpid();
+#if (!TEST_XTIMER) || (TIM_REF_DEV != XTIMER_DEV)
+    do {
+        int res = timer_init(TIM_REF_DEV, TIM_REF_FREQ, cb_ref, NULL);
+        if (res < 0) {
+            print_str("Error ");
+            print_s32_dec(res);
+            print_str(" intializing reference timer\n");
+            return res;
+        }
+    } while(0);
+#else
+    (void) cb_ref;
+#endif
     random_init(seed);
 
-#if !(TEST_XTIMER)
-    res = timer_init(TIM_TEST_DEV, TIM_TEST_FREQ, cb_timer_periph, &test_context);
-    if (res < 0) {
-        print_str("Error ");
-        print_s32_dec(res);
-        print_str(" intializing timer under test\n");
-        return res;
-    }
+#ifdef TUT_INIT
+    do {
+        extern int TUT_INIT(test_ctx_t *ctx);
+        int res = TUT_INIT(&test_context);
+        if (res < 0) {
+            print_str("Error ");
+            print_s32_dec(res);
+            print_str(" intializing timer under test\n");
+            return res;
+        }
+    } while(0);
 #endif
 
     set_limits();
@@ -741,7 +494,7 @@ int main(void)
     rtt_begin = rtt_get_counter();
 #endif
     ref_begin = timer_read(TIM_REF_DEV);
-    tut_begin = READ_TUT();
+    tut_begin = TUT_READ();
     while(1) {
         test_timer();
     }

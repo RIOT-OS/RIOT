@@ -22,6 +22,7 @@ FEATURES_REQUIRED = periph_timer
 # Use RTT as a wall clock reference, if available
 FEATURES_OPTIONAL = periph_rtt
 
+USEMODULE += core_thread_flags
 USEMODULE += random
 USEMODULE += fmt
 USEMODULE += matstat
