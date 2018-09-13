@@ -70,18 +70,25 @@ static const clock_config_t clock_config = {
  * @{
  */
 #define PIT_NUMOF               (2U)
-#define PIT_CONFIG {                 \
-        {                            \
-            .prescaler_ch = 0,       \
-            .count_ch = 1,           \
-        },                           \
-        {                            \
-            .prescaler_ch = 2,       \
-            .count_ch = 3,           \
-        },                           \
+#define PIT_CONFIG {            \
+        {                       \
+            .prescaler_ch = 0,  \
+            .count_ch = 1,      \
+        },                      \
+        {                       \
+            .prescaler_ch = 2,  \
+            .count_ch = 3,      \
+        },                      \
     }
-#define LPTMR_NUMOF             (0U)
-#define LPTMR_CONFIG {}
+#define LPTMR_NUMOF             (1U)
+#define LPTMR_CONFIG {          \
+    {                           \
+        .dev = LPTMR0,          \
+        .irqn = LPTMR0_IRQn,    \
+        .src = 2,               \
+        .base_freq = 32768u,    \
+    },                          \
+}
 #define TIMER_NUMOF             ((PIT_NUMOF) + (LPTMR_NUMOF))
 
 #define PIT_BASECLOCK           (CLOCK_BUSCLOCK)
