@@ -45,9 +45,10 @@
  *
  * gcoap allows an application to specify a collection of request resource paths
  * it wants to be notified about. Create an array of resources (coap_resource_t
- * structs). Note that the elements must be ordered alphabetically with respect
- * to the resource path. Use gcoap_register_listener() at application startup
- * to pass in these resources, wrapped in a gcoap_listener_t.
+ * structs) ordered by the resource path, specifically the ASCII encoding of
+ * the path characters (digit and capital precede lower case). Use
+ * gcoap_register_listener() at application startup to pass in these resources,
+ * wrapped in a gcoap_listener_t.
  *
  * gcoap itself defines a resource for `/.well-known/core` discovery, which
  * lists all of the registered paths.
