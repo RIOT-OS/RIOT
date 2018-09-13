@@ -65,7 +65,7 @@ int main(void)
 
     bme680_get_profile_dur(&dev, &duration);
     duration += dev.gas_sett.heatr_dur * US_PER_MS;
-    printf("measurement duration %lu [ms]\n", duration / 1000 );
+    printf("measurement duration %u [ms]\n", (unsigned int)duration / 1000 );
     bme680_set_sensor_settings(&dev, BME680_OST_SEL | BME680_OSP_SEL |
                                BME680_OSH_SEL | BME680_GAS_SENSOR_SEL);
     printf("Prepare measurement...\n");

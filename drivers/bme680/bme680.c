@@ -191,8 +191,11 @@ int8_t bme680_get_regs(bme680_t *dev, uint8_t reg_addr, uint8_t *reg_data,
                        uint16_t len )
 {
     uint8_t ret;
+
+    i2c_acquire(dev);
     ret = i2c_read_regs(dev->params->i2c_dev, dev->params->i2c_addr, reg_addr,
                         (void*) reg_data, (uint16_t) len, 0);
+    i2c_release(dev);
     if(ret != 0) {
         DEBUG("[bme680]: Comm error\n");
         return -BME680_COM_FAIL;
@@ -211,8 +214,10 @@ int8_t bme680_set_regs(bme680_t *dev, const uint8_t reg_addr,
 {
     uint8_t ret;
 
+    i2c_acquire(dev);
     ret = i2c_write_regs(dev->params->i2c_dev, dev->params->i2c_addr, reg_addr,
                           reg_data, (2 * len) , 0);
+    i2c_release(dev);
     if(ret != 0) {
         DEBUG("[bme680]: Comm error\n");
         return -BME680_COM_FAIL;
@@ -759,12 +764,12 @@ static uint8_t calc_heater_res(bme680_t *dev, uint16_t temp)
  */
 static uint8_t calc_heater_dur(uint16_t dur)
 {
-    uint8_t factor = 0;
     uint8_t durval;
 
     if (dur >= 0xfc0) {
         durval = 0xff; /* Max duration*/
     } else {
+        uint8_t factor = 0;
         while (dur > 0x3F) {
             dur = dur / 4;
             factor += 1;
@@ -780,16 +785,16 @@ static uint8_t calc_heater_dur(uint16_t dur)
  */
 static int8_t read_field_data(bme680_t *dev, bme680_data_t *data)
 {
-    int8_t ret;
     uint8_t buff[BME680_FIELD_LENGTH] = { 0 };
-    uint8_t gas_range;
-    uint32_t adc_temp;
-    uint32_t adc_pres;
-    uint16_t adc_hum;
-    uint16_t adc_gas_res;
     uint8_t tries = 10;
 
     do {
+        int8_t ret;
+        uint8_t gas_range;
+        uint32_t adc_temp;
+        uint32_t adc_pres;
+        uint16_t adc_hum;
+        uint16_t adc_gas_res;
         ret = bme680_get_regs(dev, ((uint8_t) (BME680_FIELD0_ADDR)), buff,
                               (uint16_t) BME680_FIELD_LENGTH);
 
