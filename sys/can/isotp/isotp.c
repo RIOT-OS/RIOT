@@ -646,6 +646,10 @@ static int _isotp_tx_send(struct isotp *isotp, struct can_frame *frame)
         return _isotp_dispatch_tx(isotp, isotp->tx.tx_handle);
     }
 
+    if (isotp->opt.flags & CAN_ISOTP_TX_DONT_WAIT) {
+      _isotp_tx_tx_conf(isotp);
+    }
+
     return 0;
 }
 
