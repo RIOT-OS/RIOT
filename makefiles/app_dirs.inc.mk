@@ -3,16 +3,40 @@
 # fallback so empty RIOTBASE won't lead to "/examples/"
 RIOTBASE ?= .
 
+# Define the list of tests sudirectories that contain application directories
+TEST_APPLICATIONS_SUBDIRS :=  \
+    arch                      \
+    bench                     \
+    boards                    \
+    bootloaders               \
+    build_system              \
+    core                      \
+    cpp                       \
+    drivers                   \
+    periph                    \
+    pkg                       \
+    sys                       \
+    sys/net                   \
+    #
+TEST_APPLICATIONS_SUBDIRS := $(addprefix tests/,$(TEST_APPLICATIONS_SUBDIRS))
+
+# Prepare the list of application directories
+APPLICATION_DIRS :=                   \
+    fuzzing                           \
+    bootloaders                       \
+    examples                          \
+    tests                             \
+    $(TEST_APPLICATIONS_SUBDIRS)      \
+    #
+
+APPLICATION_DIRS := $(addprefix $(RIOTBASE)/,$(APPLICATION_DIRS))
+APPLICATION_DIRS := $(addsuffix /*/Makefile,$(APPLICATION_DIRS))
+
 # 1. use wildcard to find Makefiles
 # 2. use patsubst to drop trailing "/"
 # 3. use patsubst to drop possible leading "./"
 # 4. sort
-APPLICATION_DIRS := $(sort $(patsubst ./%,%,$(patsubst %/,%,$(dir $(wildcard \
-	$(RIOTBASE)/fuzzing/*/Makefile     \
-	$(RIOTBASE)/bootloaders/*/Makefile \
-	$(RIOTBASE)/examples/*/Makefile    \
-	$(RIOTBASE)/tests/*/Makefile       \
-	)))))
+APPLICATION_DIRS := $(sort $(patsubst ./%,%,$(patsubst %/,%,$(dir $(wildcard $(APPLICATION_DIRS))))))
 
 info-applications:
 	@for dir in $(APPLICATION_DIRS); do echo $$dir; done
