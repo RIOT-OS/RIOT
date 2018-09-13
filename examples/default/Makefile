@@ -61,11 +61,7 @@ endif
 
 FEATURES_OPTIONAL += periph_rtc
 
-ifneq (,$(filter msb-430,$(BOARD)))
-  USEMODULE += sht11
-endif
 ifneq (,$(filter msba2,$(BOARD)))
-  USEMODULE += sht11
   USEMODULE += mci
   USEMODULE += random
 endif
