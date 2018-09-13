@@ -77,11 +77,11 @@ int main(void)
         printf("[Error] fail retrieve value:%d", result);
     }
 
-    printf("Temperature:%d.%d[°C]\nHumidity:%lu[%%]\nPressure:%lu[Pa]\n",
-           data.temperature / 100, data.temperature % 100 ,data.humidity / 1000,
-           data.pressure);
+    printf("Temperature:%i.%i[°C]\nHumidity:%i[%%]\nPressure:%i[Pa]\n",
+           (int)data.temperature / 100, (int)data.temperature % 100 ,
+           (int)data.humidity / 1000, (int)data.pressure);
 
-    printf("Gas:%lu[Ohms]\n\n", data.gas_resistance);
+    printf("Gas:%i[Ohms]\n\n", (int)data.gas_resistance);
     xtimer_usleep(MAINLOOP_DELAY);
     }
 
