@@ -40,6 +40,10 @@
 #include "cpu.h"
 #include "fsl_xcvr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!
 * @addtogroup xcvr
 * @{
@@ -128,7 +132,7 @@ void DCOC_DAC_INIT_Cal(uint8_t standalone_operation);
 
 /* @} */
 
-#if defined(__cplusplus)
+#ifdef __cplusplus
 }
 #endif
 
