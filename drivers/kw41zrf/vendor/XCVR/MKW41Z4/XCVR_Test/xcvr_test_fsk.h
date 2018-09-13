@@ -32,6 +32,10 @@
 #ifndef __XCVR_TEST_FSK_H__
 #define __XCVR_TEST_FSK_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! *********************************************************************************
 *************************************************************************************
 * Public type definitions
@@ -75,7 +79,7 @@ extern void XcvrFskModTx(void);
 *
 * \ingroup TestFunctions
 *
-* \details 
+* \details
 *
 ***********************************************************************************/
 extern void XcvrFskNoModTx(void);
@@ -87,7 +91,7 @@ extern void XcvrFskNoModTx(void);
 *
 * \ingroup TestFunctions
 *
-* \details 
+* \details
 *
 ***********************************************************************************/
 extern void XcvrFskIdle(void);
@@ -111,7 +115,7 @@ extern void XcvrFskTxRand(void);
 *
 * \ingroup TestFunctions
 *
-* \details 
+* \details
 *
 ***********************************************************************************/
 extern void XcvrFskLoadPattern(uint32_t u32Pattern);
@@ -123,7 +127,7 @@ extern void XcvrFskLoadPattern(uint32_t u32Pattern);
 *
 * \ingroup TestFunctions
 *
-* \details 
+* \details
 *
 ***********************************************************************************/
 extern void XcvrFskSetTxPower(uint8_t u8TxPow);
@@ -135,7 +139,7 @@ extern void XcvrFskSetTxPower(uint8_t u8TxPow);
 *
 * \ingroup TestFunctions
 *
-* \details 
+* \details
 *
 ***********************************************************************************/
 extern void XcvrFskSetTxChannel(uint8_t u8TxChan);
@@ -153,5 +157,8 @@ extern void XcvrFskSetTxChannel(uint8_t u8TxChan);
 ***********************************************************************************/
 extern void XcvrFskRestoreTXControl(void);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif

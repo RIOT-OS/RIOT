@@ -875,7 +875,7 @@ extern const xcvr_mode_datarate_config_t xcvr_MSK_250kbps_config;
  * API
  ******************************************************************************/
 
-#if defined(__cplusplus)
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -1237,7 +1237,7 @@ xcvrStatus_t XCVR_CoexistenceSaveRestoreTimings(uint8_t saveTimings);
 
 /* @} */
 
-#if defined(__cplusplus)
+#ifdef __cplusplus
 }
 #endif
 

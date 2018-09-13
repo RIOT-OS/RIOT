@@ -40,6 +40,10 @@
 
 #include "fsl_xcvr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!
  * @addtogroup xcvr
  * @{
@@ -201,7 +205,7 @@ dbgRamStatus_t dbg_ram_capture(uint8_t dbg_page, uint16_t buffer_sz_bytes, void 
 
 /* @} */
 
-#if defined(__cplusplus)
+#ifdef __cplusplus
 }
 #endif
 

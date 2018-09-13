@@ -40,6 +40,10 @@
 #ifndef _FSL_OS_ABSTRACTION_CONFIG_H_
 #define _FSL_OS_ABSTRACTION_CONFIG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef osNumberOfSemaphores
 #define osNumberOfSemaphores 5
 #endif
@@ -66,4 +70,9 @@
 #ifndef gTaskMultipleInstancesManagement_c
 #define gTaskMultipleInstancesManagement_c  0
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* _FSL_OS_ABSTRACTION_CONFIG_H_ */

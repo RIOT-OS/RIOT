@@ -41,6 +41,10 @@
 #include <stdint.h>
 #include "fsl_xcvr.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!
  * @addtogroup xcvr
  * @{
@@ -181,5 +185,9 @@ uint32_t handle_ifr_die_kw_type(void);
  * @param num_entries the number of entries that can be stored in the dump table.
  */
 void dump_ifr(uint32_t * dump_tbl, uint8_t num_entries);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*__IFR_RADIO_H__ */
