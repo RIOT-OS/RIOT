@@ -192,10 +192,10 @@ int8_t bme680_get_regs(bme680_t *dev, uint8_t reg_addr, uint8_t *reg_data,
 {
     uint8_t ret;
 
-    i2c_acquire(dev);
+    i2c_acquire(dev->params->i2c_dev);
     ret = i2c_read_regs(dev->params->i2c_dev, dev->params->i2c_addr, reg_addr,
                         (void*) reg_data, (uint16_t) len, 0);
-    i2c_release(dev);
+    i2c_release(dev->params->i2c_dev);
     if(ret != 0) {
         DEBUG("[bme680]: Comm error\n");
         return -BME680_COM_FAIL;
@@ -214,10 +214,10 @@ int8_t bme680_set_regs(bme680_t *dev, const uint8_t reg_addr,
 {
     uint8_t ret;
 
-    i2c_acquire(dev);
+    i2c_acquire(dev->params->i2c_dev);
     ret = i2c_write_regs(dev->params->i2c_dev, dev->params->i2c_addr, reg_addr,
                           reg_data, (2 * len) , 0);
-    i2c_release(dev);
+    i2c_release(dev->params->i2c_dev);
     if(ret != 0) {
         DEBUG("[bme680]: Comm error\n");
         return -BME680_COM_FAIL;
