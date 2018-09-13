@@ -13,7 +13,8 @@
  * @{
  *
  * @file
- * @brief       Definition of global configuration options
+ * @brief       Definition of global USB peripheral and USB peripheral endpoint
+ *              configuration options.
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  */
@@ -35,7 +36,7 @@ extern "c" {
  */
 typedef enum {
     /**
-     * @brief   (uint8_t) USB device address
+     * @brief   (uint8_t) USB device address, limited to 7 bit by the protocol
      */
     USBOPT_ADDRESS,
     /**
@@ -71,18 +72,31 @@ typedef enum {
      * @brief   (usbopt_enable_t) Enable or disable the endpoint
      */
     USBOPT_EP_ENABLE,
+
     /**
      * @brief   (uint8_t*) Configure the endpoint buffer address
      */
     USBOPT_EP_BUF_ADDR,
+
     /**
      * @brief   (size_t) Configure the endpoint buffer size
      */
     USBOPT_EP_BUF_SIZE,
+
     /**
      * @brief   (usbopt_enable_t) Enable or disable stall replies for endpoint
      */
     USBOPT_EP_STALL,
+
+    /**
+     * @brief   (usbopt_enable_t) Signal data ready or not ready anymore
+     */
+    USBOPT_EP_DATA_READY,
+
+    /**
+     * @brief   (size_t) Retrieve number of bytes available on endpoint.
+     */
+    USBOPT_EP_AVAILABLE,
     /* expand list if required */
 } usbopt_ep_t;
 
