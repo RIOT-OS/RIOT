@@ -802,6 +802,7 @@ ifneq (,$(RIOTBOOT_SLOT0_SIZE))
 endif
 
 ifneq (,$(filter ota_coap,$(USEMODULE)))
+  USEMODULE += ota
   USEMODULE += firmware
   USEMODULE += nanocoap
 endif
@@ -814,6 +815,7 @@ endif
 ifneq (,$(filter firmware,$(USEMODULE)))
   USEMODULE += checksum
   USEMODULE += hashes
+  USEPKG += tweetnacl
   FEATURES_REQUIRED += riotboot
   FEATURES_REQUIRED += periph_flashpage
 endif

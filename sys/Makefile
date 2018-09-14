@@ -136,8 +136,9 @@ endif
 ifneq (,$(filter ota_suit,$(USEMODULE)))
   DIRS += net/application_layer/ota_suit
 endif
-
-
+ifneq (,$(filter ota,$(USEMODULE)))
+  DIRS += net/application_layer/ota
+endif
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))
 
 include $(RIOTBASE)/Makefile.base
