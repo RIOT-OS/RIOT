@@ -6,14 +6,14 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := bluepill calliope-mini cc2650-launchpad \
+BOARD_INSUFFICIENT_MEMORY := blackpill bluepill calliope-mini cc2650-launchpad \
                              cc2650stk maple-mini microbit nrf51dongle \
                              nucleo-f030r8 nucleo-f031k6 nucleo-f042k6 \
                              nucleo-f070rb nucleo-f072rb nucleo-f103rb \
                              nucleo-f302r8 nucleo-f303k8 nucleo-f334r8 \
                              nucleo-f410rb nucleo-l031k6 nucleo-l053r8 \
                              opencm904 spark-core stm32f0discovery \
-                             stm32mindev airfy-beacon  arduino-mkr1000 \
+                             airfy-beacon  arduino-mkr1000 \
                              arduino-mkrfox1200 arduino-mkrzero arduino-zero \
                              b-l072z-lrwan1  cc2538dk ek-lm4f120xl  feather-m0 \
                              ikea-tradfri limifrog-v1 lobaro-lorabox \

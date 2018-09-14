@@ -9,11 +9,11 @@
  */
 
 /**
- * @ingroup     boards_stm32mindev
+ * @ingroup     boards_blackpill
  * @{
  *
  * @file
- * @brief       Board specific implementations for the STM32 Minimum Development
+ * @brief       Board specific implementations for the Black Pill
  *              Board
  *
  * @author      Víctor Ariño <victor.arino@triagnosys.com>

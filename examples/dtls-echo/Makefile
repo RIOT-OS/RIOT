@@ -12,13 +12,13 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
                    jiminy-mega256rfr2 mega-xplained msb-430 msb-430h telosb \
                    waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
 
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 bluepill calliope-mini \
+BOARD_INSUFFICIENT_MEMORY := airfy-beacon b-l072z-lrwan1 blackpill bluepill calliope-mini \
                              cc2650-launchpad cc2650stk hifive1 maple-mini \
                              microbit nrf51dongle nrf6310 nucleo-f031k6 \
                              nucleo-f042k6 nucleo-f303k8 nucleo-l031k6 nucleo-f030r8 \
                              nucleo-f070rb nucleo-f072rb nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \
                              nucleo-l053r8 nucleo-l073rz opencm904 \
-                             spark-core stm32f0discovery stm32mindev yunjia-nrf51822
+                             spark-core stm32f0discovery yunjia-nrf51822
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present

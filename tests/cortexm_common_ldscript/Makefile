@@ -11,11 +11,11 @@ BOARD_WHITELIST += samr21-xpro
 BOARD_WHITELIST += arduino-mkr1000
 BOARD_WHITELIST += arduino-mkrfox1200
 BOARD_WHITELIST += arduino-mkrzero
+BOARD_WHITELIST += blackpill
 BOARD_WHITELIST += bluepill
 BOARD_WHITELIST += feather-m0
 BOARD_WHITELIST += opencm904
 BOARD_WHITELIST += spark-core
-BOARD_WHITELIST += stm32mindev
 
 include $(RIOTBASE)/Makefile.include
 
