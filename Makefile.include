@@ -475,9 +475,9 @@ endif
 pkg-prepare:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i prepare ; done
 
-$(USEPKG:%=$(BINDIR)/%.a): $(BUILDDEPS) FORCE
+$(USEPKG:%=$(BINDIR)/%.a): $(BINDIR)/%.a: $(BUILDDEPS) FORCE
 	@mkdir -p $(BINDIR)
-	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$(patsubst $(BINDIR)/%.a,%,$@)
+	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$*
 
 clean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i clean ; done
