@@ -1,0 +1,64 @@
+/**
+@defgroup    boards_lorabox
+@ingroup     boards_lorabox
+@brief       Support for the Lobaro LoraBox with stm32l151cb
+
+## Hardware
+
+![LoraBox](https://www.lobaro.com/wp/wp-content/uploads/2017/03/Lobaro_wMBUS_LoRaWAN_Bridge.jpg)
+
+
+### MCU
+| MCU        | STM32L151cb |
+|:------------- |:--------------------- |
+| Family | ARM Cortex-M3     |
+| Vendor | ST Microelectronics   |
+| RAM        | 16Kb  |
+| Flash      | 128Kb             |
+| Frequency  | 32MHz (no external oscilator connected) |
+| FPU        | no                |
+| Timers | 10 (8x 16-bit, 5x 32-bit [TIM5])   |
+| ADCs       | 1x 24-channel 12-bit          |
+| UARTs      | 3                 |
+| SPIs       | 2                 |
+| I2Cs       | 2                 |
+| Vcc        | 1.65V - 3.6V          |
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l151cb.pdf) |
+| Reference Manual | [Reference Manual](https://www.st.com/content/ccc/resource/technical/document/reference_manual/cc/f9/93/b2/f0/82/42/57/CD00240193.pdf/files/CD00240193.pdf/jcr:content/translations/en.CD00240193.pdf) |
+| Programming Manual | [Programming Manual](https://www.st.com/content/ccc/resource/technical/document/programming_manual/5b/ca/8d/83/56/7f/40/08/CD00228163.pdf/files/CD00228163.pdf/jcr:content/translations/en.CD00228163.pdf) |
+| Board Manual   | [Board Manual](https://www.lobaro.com/download/7250/)|
+
+### User Interface
+
+1 LEDs:
+
+| NAME   | LED0   |
+| -----  | ----- |
+| Color  | green |
+| Pin    | P1   |
+
+
+## Supported Toolchains
+
+For using the st-nucleo-l1 board we strongly recommend the usage of the [GNU
+Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+
+### OpenOCD
+
+Please use an OpenOCD version checked out after Jan. 26th 2015. Building
+instructions can be found [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD).
+
+## Using UART
+
+Using the UART isn't too stable right now. For some using the USB interface
+just works, others have to connect the USB interface to a active USB hub and
+others again can only transmit over the USB interface and receive using an
+external UART adapter.
+
+#### Connecting an external UART adapter
+
+1. connect your usb tty to the st-link header as marked
+![st-link-header](https://cloud.githubusercontent.com/assets/56618/5190200/f36aafe0-74e3-11e4-96bd-f755dd2a8b01.png)
+2. done
+ */
