@@ -99,6 +99,10 @@ riotboot/flash-slot1: IMAGE_FILE=$(BINDIR)/$(APPLICATION)-slot1.signed.bin
 riotboot/flash-slot1: $(BINDIR)/$(APPLICATION)-slot1.signed.bin riotboot/flash-bootloader
 	$(FLASHER) $(FFLAGS)
 
+# Targets for updates
+riotboot/slot1: $(BINDIR)/$(APPLICATION)-slot1.signed.bin
+riotboot/slot2: $(BINDIR)/$(APPLICATION)-slot2.signed.bin
+
 riotboot/flash-slot2: IMAGE_OFFSET=$$(($(RIOTBOOT_SLOT0_SIZE) + $(RIOTBOOT_FW_SLOT_SIZE)))
 # edbg
 riotboot/flash-slot2: HEXFILE=$(BINDIR)/$(APPLICATION)-slot2.signed.bin
