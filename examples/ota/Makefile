@@ -1,7 +1,7 @@
-# name of your application
 APPLICATION = ota_example
 
-# If no BOARD is found in the environment, use this default:
+# This is the board we have tested so far, it might not work with
+# all supported boards
 BOARD ?= samr21-xpro
 
 # This has to be the absolute path to the RIOT base directory:
@@ -13,6 +13,7 @@ CFLAGS += "-DTHREAD_STACKSIZE_MAIN=((6*THREAD_STACKSIZE_DEFAULT)+THREAD_EXTRA_ST
 # include ota modules
 USEMODULE += ota_coap
 USEMODULE += firmware
+USEMODULE += firmware_simple
 
 # include CoAP server
 USEMODULE += nanocoap_sock
