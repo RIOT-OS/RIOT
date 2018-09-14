@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the FRDM-KW41Z
+ * @name        Peripheral MCU configuration for KW41Z-based boards
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */

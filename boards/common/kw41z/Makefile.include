@@ -1,0 +1,11 @@
+export CPU = kinetis
+
+# OpenOCD v0.10.0-dev (current development version) or later is required for
+# flashing KW41Z devices
+# See http://openocd.zylin.com/#/c/4104/ for the upstreaming process
+export USE_OLD_OPENOCD ?= 0
+
+# Check the flash configuration field before flashing
+export PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield-elf.sh
+
+INCLUDES += -I$(RIOTBOARD)/common/kw41z/include

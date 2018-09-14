@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup   boards_frdm-kw41z
+ * @ingroup   boards_common_kw41z
  * @{
  *
  * @file
