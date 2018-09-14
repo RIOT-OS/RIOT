@@ -12,4 +12,4 @@ FEATURES_REQUIRED = periph_dac periph_spi
 
 TEST_ON_CI_WHITELIST += all
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

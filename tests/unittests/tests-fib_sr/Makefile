@@ -1,3 +1,3 @@
 MODULE = tests-fib_sr
 
-include $(RIOTBASE)/Makefile.base
+include $(TESTBASE)/../Makefile.base

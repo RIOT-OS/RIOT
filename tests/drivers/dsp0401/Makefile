@@ -5,4 +5,4 @@ USEMODULE += dsp0401
 LOOPS ?= 3
 CFLAGS += -DLOOPS=$(LOOPS)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

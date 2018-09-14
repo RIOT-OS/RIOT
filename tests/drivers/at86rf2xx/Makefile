@@ -27,4 +27,4 @@ DRIVER ?= at86rf231
 # include the selected driver
 USEMODULE += $(DRIVER)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

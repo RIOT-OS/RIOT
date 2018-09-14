@@ -7,4 +7,4 @@ USEMODULE += bmx055
 # include xtimer for polling
 USEMODULE += xtimer
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

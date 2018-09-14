@@ -27,4 +27,4 @@ TEST_ON_CI_WHITELIST += all
 
 # Note: The test can check more things with ENABLE_DEBUG set to 1 in gnrc_ipv6.c
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

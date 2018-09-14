@@ -15,4 +15,4 @@ DRIVER ?= sx1276
 # use SX1276 by default
 USEMODULE += $(DRIVER)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

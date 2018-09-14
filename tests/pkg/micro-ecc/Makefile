@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
 
@@ -7,4 +7,4 @@ USEPKG += micro-ecc
 
 TEST_ON_CI_WHITELIST += all
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

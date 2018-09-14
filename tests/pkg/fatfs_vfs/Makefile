@@ -1,5 +1,5 @@
 APPLICATION = pkg_fatfs_vfs
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 USEMODULE += fatfs_vfs
 FEATURES_OPTIONAL += periph_rtc
@@ -49,7 +49,7 @@ BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove arduino-mega2560
 
 TEST_DEPS += image
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include
 
 image:
 	@tar -xjf riot_fatfs_disk.tar.gz -C ./bin/

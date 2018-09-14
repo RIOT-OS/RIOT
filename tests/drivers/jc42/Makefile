@@ -13,4 +13,4 @@ CFLAGS += -DTEST_I2C=$(TEST_I2C)
 CFLAGS += -DTEST_I2C_ADDR=$(TEST_I2C_ADDR)
 CFLAGS += -DTEST_I2C_SPEED=$(TEST_I2C_SPEED)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

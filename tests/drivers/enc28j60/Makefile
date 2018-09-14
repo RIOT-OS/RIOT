@@ -36,4 +36,4 @@ CFLAGS += -DENC28J60_PARAM_RESET=$(ENC_RST)
 # make sure we read the local enc28j60 params file
 CFLAGS += -I$(CURDIR)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

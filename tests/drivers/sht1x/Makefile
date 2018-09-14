@@ -11,4 +11,4 @@ USEMODULE += saul_default
 USEMODULE += shell_commands
 USEMODULE += ps
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

@@ -10,4 +10,4 @@ TEST_ALTITUDE ?= 158 # altitude in Polytechnique School campus
 # export altitude parameter
 CFLAGS += -DTEST_ALTITUDE=$(TEST_ALTITUDE)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

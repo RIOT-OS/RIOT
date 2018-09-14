@@ -35,4 +35,4 @@ USEMODULE += gnrc_tcp
 # include this for IP address manipulation
 USEMODULE += shell_commands
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

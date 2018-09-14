@@ -15,4 +15,4 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += shell
 USEMODULE += shell_commands
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

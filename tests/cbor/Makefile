@@ -18,4 +18,4 @@ USEMODULE += cbor_ctime
 USEMODULE += cbor_float
 USEMODULE += cbor_semantic_tagging
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

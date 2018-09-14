@@ -5,4 +5,4 @@ DRIVER ?= bme280
 USEMODULE += $(DRIVER)
 USEMODULE += xtimer
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

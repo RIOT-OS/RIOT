@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
                              chronos msb-430 msb-430h nucleo-f031k6 \
@@ -22,4 +22,4 @@ CFLAGS += -DPROBLEM=$(PROBLEM)
 
 TEST_ON_CI_WHITELIST += all
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 # Modules that will have an impact on the size of the TCB (thread_t):
 #
@@ -14,4 +14,4 @@ endif
 
 TEST_ON_CI_WHITELIST += all
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

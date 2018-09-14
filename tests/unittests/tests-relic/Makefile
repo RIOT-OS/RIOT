@@ -6,4 +6,4 @@ BOARD_BLACKLIST := arduino-mega2560 chronos f4vi1 mega-xplained msb-430 \
                    stm32f3discovery telosb wsn430-v1_3b wsn430-v1_4 z1 \
                    waspmote-pro
 
-include $(RIOTBASE)/Makefile.base
+include $(TESTBASE)/../Makefile.base

@@ -4,4 +4,4 @@ USEMODULE += apa102
 USEMODULE += color
 USEMODULE += xtimer
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

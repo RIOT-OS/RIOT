@@ -12,4 +12,4 @@ CFLAGS += -DDEVELHELP
 
 TERMFLAGS ?= -z [::1]:17754
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

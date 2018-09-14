@@ -19,4 +19,4 @@ CFLAGS += -DGNRC_PKTBUF_SIZE=512
 # That way xbee_params.h get's included and auto configuration can pick it up.
 CFLAGS += -I$(CURDIR)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

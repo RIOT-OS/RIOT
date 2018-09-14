@@ -5,4 +5,4 @@ USEMODULE += saul_default
 
 USEMODULE += xtimer
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

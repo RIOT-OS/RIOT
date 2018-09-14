@@ -11,4 +11,4 @@ TEST_INA220_ADDR ?= 0x40
 CFLAGS += -DTEST_INA220_I2C=$(TEST_INA220_I2C)
 CFLAGS += -DTEST_INA220_ADDR=$(TEST_INA220_ADDR)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

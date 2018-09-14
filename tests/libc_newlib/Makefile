@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 TEST_ON_CI_WHITELIST += all
 USEMODULE += embunit
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include
 
 # Compile time tests
 .PHONY: compile-test test-newlib-nano

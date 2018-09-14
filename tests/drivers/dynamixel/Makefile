@@ -11,4 +11,4 @@ BOARD_BLACKLIST += mips-malta
 USEMODULE += dynamixel
 USEMODULE += shell
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

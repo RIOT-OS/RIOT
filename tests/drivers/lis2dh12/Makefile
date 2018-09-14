@@ -7,4 +7,4 @@ USEMODULE += fmt
 USEMODULE += xtimer
 USEMODULE += $(DRIVER)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

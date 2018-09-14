@@ -11,4 +11,4 @@ else
   TESTS=$(APPDIR)/tests/02-run.py
 endif
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

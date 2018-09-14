@@ -8,4 +8,4 @@ USEMODULE += auto_init_storage
 USEMODULE += fmt
 USEMODULE += shell
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

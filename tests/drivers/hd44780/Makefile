@@ -8,4 +8,4 @@ FEATURES_REQUIRED += arduino
 
 USEMODULE += hd44780
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

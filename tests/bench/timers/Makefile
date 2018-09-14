@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
 
@@ -53,4 +53,4 @@ test-kinetis-lptmr: all
 # Reset the default goal.
 .DEFAULT_GOAL :=
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

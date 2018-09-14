@@ -14,4 +14,4 @@ TEST_MODE      ?= SRF02_MODE_REAL_CM
 CFLAGS += -DTEST_SRF02_I2C=$(TEST_SRF02_I2C)
 CFLAGS += -DTEST_MODE=$(TEST_MODE)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

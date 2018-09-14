@@ -6,4 +6,4 @@ FEATURES_REQUIRED = periph_pwm
 USEMODULE += xtimer
 USEMODULE += shell
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

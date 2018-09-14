@@ -26,4 +26,4 @@ ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
               -DNRC_IPV6_NIB_OFFL_NUMOF=1
 endif
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

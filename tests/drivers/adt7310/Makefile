@@ -15,4 +15,4 @@ TEST_ADT7310_CS  ?= GPIO_PIN\(0,0\)
 CFLAGS += -DTEST_ADT7310_SPI=$(TEST_ADT7310_SPI)
 CFLAGS += -DTEST_ADT7310_CS=$(TEST_ADT7310_CS)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

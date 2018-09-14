@@ -4,4 +4,4 @@ USEMODULE += lc709203f
 USEMODULE += xtimer
 CFLAGS += -DDEVELHELP
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

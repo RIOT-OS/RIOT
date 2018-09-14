@@ -8,7 +8,7 @@ FEATURES_REQUIRED = periph_gpio_irq
 USEMODULE += shell
 USEMODULE += benchmark
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include
 
 bench:
 	tests/02-bench.py

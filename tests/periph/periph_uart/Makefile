@@ -7,4 +7,4 @@ FEATURES_REQUIRED = periph_uart
 USEMODULE += shell
 USEMODULE += xtimer
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

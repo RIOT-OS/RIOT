@@ -15,4 +15,4 @@ CFLAGS += -DTEST_SRF08_SPEED=$(TEST_SRF08_SPEED)
 CFLAGS += -DTEST_MODE=$(TEST_MODE)
 CFLAGS += -DTEST_NUM_ECHOS=$(TEST_NUM_ECHOS)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

@@ -29,4 +29,4 @@ CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
 # That way slip_params.h get's included and auto configuration can pick it up.
 CFLAGS += -I$(CURDIR)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

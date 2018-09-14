@@ -38,4 +38,4 @@ CFLAGS += -DENCX24J600_INT=$(ENC_INT)
 # make sure we read the local encx24j600 params file
 CFLAGS += -I$(CURDIR)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

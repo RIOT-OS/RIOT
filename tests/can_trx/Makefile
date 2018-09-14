@@ -15,4 +15,4 @@ ifneq (,$(filter tja1042,$(TRX_TO_BUILD)))
     USEMODULE += tja1042
 endif
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

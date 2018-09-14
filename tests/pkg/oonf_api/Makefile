@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 BOARD_WHITELIST := native
 
@@ -8,4 +8,4 @@ USEMODULE += oonf_common
 USEMODULE += oonf_rfc5444
 USEPKG += oonf_api
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

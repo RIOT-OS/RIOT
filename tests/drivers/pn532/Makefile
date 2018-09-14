@@ -33,4 +33,4 @@ endif
 
 CFLAGS += -I$(CURDIR)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

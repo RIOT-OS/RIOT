@@ -7,4 +7,4 @@ BOARD_WHITELIST := calliope-mini
 # We want to test the Calliope mini support module
 USEMODULE += mini
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

@@ -17,7 +17,7 @@ BOARD_WHITELIST += opencm904
 BOARD_WHITELIST += spark-core
 BOARD_WHITELIST += stm32mindev
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #

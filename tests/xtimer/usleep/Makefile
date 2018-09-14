@@ -10,4 +10,4 @@ TEST_ON_CI_WHITELIST += all
 #CFLAGS += -DSLEEP_PIN=7
 #CFLAGS += -DSLEEP_PORT=PORT_F
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

@@ -4,4 +4,4 @@ USEMODULE += hdc1000
 USEMODULE += xtimer
 USEMODULE += fmt
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

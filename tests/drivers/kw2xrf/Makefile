@@ -16,4 +16,4 @@ DRIVER ?= kw2xrf
 # finally include the actual chosen driver
 USEMODULE += $(DRIVER)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

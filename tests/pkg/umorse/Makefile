@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 USEMODULE += xtimer
 
@@ -9,4 +9,4 @@ CFLAGS += -DUMORSE_DELAY_DIT=$(UMORSE_DELAY_DIT)
 
 TEST_ON_CI_WHITELIST += all
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 # tinycrypt works for 32-bit architectures only. The nrf52dk is chosen as a
 # placeholder for all Cortex-M4 boards.
@@ -9,4 +9,4 @@ TEST_ON_CI_WHITELIST += all
 USEPKG += tinycrypt
 USEMODULE = fmt
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

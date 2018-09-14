@@ -29,4 +29,4 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_tcp
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

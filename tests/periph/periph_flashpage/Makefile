@@ -6,4 +6,4 @@ FEATURES_OPTIONAL += periph_flashpage_raw
 
 USEMODULE += shell
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

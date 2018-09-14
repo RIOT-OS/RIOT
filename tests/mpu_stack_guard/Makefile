@@ -41,7 +41,7 @@ BOARD_WHITELIST += udoo             # cortex-m3
 
 USEMODULE += mpu_stack_guard
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include
 
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-infinite-recursion

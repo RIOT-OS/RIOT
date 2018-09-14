@@ -13,4 +13,4 @@ BOARD_WHITELIST := ikea-tradfri \
 # see cpu/efm32/efm32-features.mk for the supported flags
 EFM32_UART_MODES = 1
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

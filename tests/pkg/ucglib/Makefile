@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              waspmote-pro
@@ -42,4 +42,4 @@ CFLAGS += -DTEST_PIN_RESET=$(TEST_PIN_RESET)
 CFLAGS += -DTEST_DISPLAY=$(TEST_DISPLAY)
 CFLAGS += -DTEST_DISPLAY_EXT=$(TEST_DISPLAY_EXT)
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

@@ -1,4 +1,4 @@
-include ../Makefile.tests_common
+include ../../Makefile.tests_common
 
 # lwIP's memory management doesn't seem to work on non 32-bit platforms at the
 # moment.
@@ -30,4 +30,4 @@ ifneq ($(BOARD),native)
   TESTS=
 endif
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

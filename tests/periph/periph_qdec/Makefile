@@ -5,4 +5,4 @@ FEATURES_REQUIRED = periph_qdec
 
 USEMODULE += xtimer
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

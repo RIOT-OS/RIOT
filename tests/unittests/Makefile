@@ -239,13 +239,15 @@ endif
 
 DISABLE_MODULE += auto_init
 
+RIOTBASE := $(TESTBASE)/..
+
 # Pull in `Makefile.include`s from the test suites:
--include $(UNIT_TESTS:%=$(RIOTBASE)/tests/unittests/%/Makefile.include)
+-include $(UNIT_TESTS:%=$(TESTBASE)//unittests/%/Makefile.include)
 
 DIRS += $(UNIT_TESTS)
 BASELIBS += $(UNIT_TESTS:%=$(BINDIR)/%.a)
 
-INCLUDES += -I$(RIOTBASE)/tests/unittests/common
+INCLUDES += -I$(TESTBASE)/unittests/common
 
 # list of boards to run CI tests on
 TEST_ON_CI_WHITELIST += all

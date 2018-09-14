@@ -5,4 +5,4 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
 
 USEMODULE += xtimer
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

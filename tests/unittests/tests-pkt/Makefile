@@ -1,1 +1,1 @@
-include $(RIOTBASE)/Makefile.base
+include $(TESTBASE)/../Makefile.base

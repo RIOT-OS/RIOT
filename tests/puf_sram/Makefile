@@ -4,4 +4,4 @@ include ../Makefile.tests_common
 
 USEMODULE += puf_sram
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include

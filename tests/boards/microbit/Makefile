@@ -8,4 +8,4 @@ BOARD_WHITELIST := microbit
 # We want to test the microbit support module
 USEMODULE += microbit
 
-include $(RIOTBASE)/Makefile.include
+include $(TESTBASE)/../Makefile.include
