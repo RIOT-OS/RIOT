@@ -1,0 +1,5 @@
+/**
+ * @defgroup    boards_kw41z-mini kw41z-mini Board
+ * @ingroup     boards
+ * @brief       Support for the kw41z-mini
+ */

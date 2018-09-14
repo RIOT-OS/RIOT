@@ -1,0 +1,12 @@
+export CPU_MODEL = mkw41z256vht4
+
+USEMODULE += boards_common_kw41z
+include $(RIOTBOARD)/common/kw41z/Makefile.include
+
+# no on-board programming capabilities. default to stlink
+export DEBUG_ADAPTER ?= stlink
+export STLINK_VERSION ?= 2
+
+# this board uses openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk
+
