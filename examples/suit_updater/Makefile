@@ -1,7 +1,7 @@
-# name of your application
 APPLICATION = suit_updater
 
-# If no BOARD is found in the environment, use this default:
+# This is the board we have tested so far, it might not work with
+# all supported boards
 BOARD ?= samr21-xpro
 
 # This has to be the absolute path to the RIOT base directory:
@@ -13,33 +13,26 @@ BOARD_INSUFFICIENT_MEMORY := calliope-mini chronos microbit msb-430 msb-430h \
                              nucleo-f334 nucleo-l053 spark-core stm32f0discovery telosb \
                              wsn430-v1_3b wsn430-v1_4 z1
 
-CFLAGS += -I$(CURDIR)
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_router_default
-# Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-# Add also the shell, some shell commands
-#USEMODULE += shell
-#USEMODULE += shell_commands
+USEMODULE += gnrc_sock_udp
+
+# Modules used for this example
 USEMODULE += ps
 USEMODULE += ota_suit
 USEMODULE += libcose_crypt_tweetnacl
 USEMODULE += nanocoap_sock
 USEMODULE += suit
-USEMODULE += gnrc_udp
-USEMODULE += gnrc_sock_udp
-USEMODULE += fmt
 USEMODULE += hashes
 USEMODULE += ps
 USEPKG += libcose
 
-# include this for printing IP addresses
-#USEMODULE += shell_commands
-
+# This application requires the RIOT bootlaoder
 FEATURES_REQUIRED += riotboot
 
 # Comment this out to disable code in RIOT that does safety checking
@@ -47,21 +40,12 @@ FEATURES_REQUIRED += riotboot
 # development process:
 DEVELHELP ?= 1
 
-# Uncomment the following 2 lines to specify static link lokal IPv6 address
-# this might be useful for testing, in cases where you cannot or do not want to
-# run a shell with ifconfig to get the real link lokal address.
-#IPV6_STATIC_LLADDR ?= '"fe80::cafe:cafe:cafe:1"'
-#CFLAGS += -DGNRC_IPV6_STATIC_LLADDR=$(IPV6_STATIC_LLADDR)
-
-# Uncomment this to join RPL DODAGs even if DIOs do not contain
-# DODAG Configuration Options (see the doc for more info)
-# CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
-
-
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-include $(RIOTBASE)/Makefile.include
+# We need a header file with the public key on it
+BUILDDEPS += keys.h
+CFLAGS += -I$(CURDIR)
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
@@ -77,8 +61,9 @@ else
   endif
 endif
 
+include $(RIOTBASE)/Makefile.include
+
 # TODO keys should be generated in `bin` not here
-BUILDDEPS += keys.h
 keys.h: $(RIOTTOOLS)/firmware/pub.key
 	cp $< pubkey
 	xxd -i pubkey $@
