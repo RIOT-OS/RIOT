@@ -66,7 +66,7 @@ static ssize_t fetch_time_block(unsigned num, sock_udp_ep_t *local)
     uint8_t *pktpos = buf;
     pkt.hdr = (coap_hdr_t*)buf;
     pktpos += coap_build_hdr(pkt.hdr, COAP_REQ, NULL, 0, COAP_METHOD_GET, num);
-    pktpos += coap_put_option_uri(pktpos, 0, FIRMWARE_MANIFEST_TIME_URL, COAP_OPT_URI_PATH);
+    pktpos += coap_opt_put_uri_path(pktpos, 0, FIRMWARE_MANIFEST_TIME_URL);
     pktpos += coap_put_option_block2(pktpos, COAP_OPT_URI_PATH, num, 2, 0);
     pkt.payload = pktpos;
     pkt.payload_len = 0;
@@ -307,7 +307,7 @@ static ssize_t fetch_block(firmware_manifest_t *state, unsigned num, sock_udp_ep
     uint8_t *pktpos = buf;
     pkt.hdr = (coap_hdr_t*)buf;
     pktpos += coap_build_hdr(pkt.hdr, COAP_REQ, NULL, 0, COAP_METHOD_GET, num);
-    pktpos += coap_put_option_uri(pktpos, 0, state->path, COAP_OPT_URI_PATH);
+    pktpos += coap_opt_put_uri_path(pktpos, 0, state->path);
     pktpos += coap_put_option_block2(pktpos, COAP_OPT_URI_PATH, num, 2, 0);
     pkt.payload = pktpos;
     pkt.payload_len = 0;
