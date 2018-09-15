@@ -8,7 +8,7 @@ BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
 BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6 nucleo-f042k6
 
 # required for Monocypher (as described in the package documentation)
-CFLAGS += "-DTHREAD_STACKSIZE_MAIN=(3072 + THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)"
+CFLAGS += "-DTHREAD_STACKSIZE_MAIN=(4096 + THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)"
 
 USEMODULE += embunit
 USEMODULE += random
