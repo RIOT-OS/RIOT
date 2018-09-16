@@ -52,8 +52,8 @@ ifeq ($(strip $(ASSMSRC))$(NO_AUTO_SRC),)
   ASSMSRC := $(wildcard *.S)
 endif
 
-# include makefile snippets that modify GENSRC here:
-#include foo/bar.inc.mk
+# include makefile snippets for packages in $(USEPKG) that modify GENSRC:
+-include $(USEPKG:%=$(RIOTPKG)/%/Makefile.gensrc)
 
 GENOBJC     := $(GENSRC:%.c=%.o)
 OBJC_LTO    := $(SRC:%.c=$(BINDIR)/$(MODULE)/%.o)
