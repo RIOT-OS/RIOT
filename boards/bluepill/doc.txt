@@ -79,6 +79,7 @@ flash or use this [stlink fork][caboStlink] which has a
 ## Connecting via Serial
 
 The default UART port used is UART2, which uses pins A2 (TX) and A3 (RX).
+To use it, configure your UART to operate at a baudrate of 115200/8N1.
 
 ## Using PWM
 
