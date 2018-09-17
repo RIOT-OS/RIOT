@@ -13,7 +13,7 @@ FIRMWARE_TOOL ?= $(RIOTBASE)/dist/tools/firmware/bin/firmware
 RIOTBOOT_HDR_LEN ?= 0x100
 # TODO 'firmware' should be rebuilt here at the same time with the same
 # compilation options
-CFLAGS += -DFIRMWARE_METATADA_SIZE=$(RIOTBOOT_HDR_LEN)
+CFLAGS += -DFIRMWARE_METADATA_SIZE=$(RIOTBOOT_HDR_LEN)
 
 # export variables for 'firmware'
 export RIOTBOOT_SLOT0_SIZE
