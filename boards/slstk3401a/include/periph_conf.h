@@ -55,6 +55,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DC-DC configuration
+ * @{
+ */
+#ifdef EMU_DCDCINIT_OFF
+#error "This option will soft-brick your board. Please remove it."
+#endif
+/** @} */
+
+/**
  * @name    ADC configuration
  * @{
  */
