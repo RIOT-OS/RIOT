@@ -86,6 +86,10 @@ ifneq (,$(filter fxos8700,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/fxos8700/include
 endif
 
+ifneq (,$(filter extend_gpio,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/extend/include
+endif
+
 ifneq (,$(filter grove_ledbar,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/grove_ledbar/include
 endif
