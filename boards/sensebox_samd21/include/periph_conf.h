@@ -186,6 +186,38 @@ static const i2c_conf_t i2c_config[] = {
 
 /** @} */
 
+/**
+ * @name    ADC configuration
+ * @{
+ */
+#define ADC_0_EN                           1
+/* ADC 0 device configuration */
+#define ADC_0_DEV                          ADC
+#define ADC_0_IRQ                          ADC_IRQn
+
+/* ADC 0 Default values */
+#define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
+#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV512
+
+#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
+#define ADC_0_GAIN_FACTOR_DEFAULT          ADC_INPUTCTRL_GAIN_1X
+#define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
+
+/* Digital pins (1 to 6) on the board can be configured as analog inputs */
+static const adc_conf_chan_t adc_channels[] = {
+    /* port, pin, muxpos */
+    { GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4 },     /* Digital 1 */
+    { GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5 },     /* Digital 2 */
+    { GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS_PIN6 },     /* Digital 3 */
+    { GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS_PIN7 },     /* Digital 4 */
+    { GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS_PIN1 },     /* Digital 5 */
+    { GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0 },     /* Digital 6 */
+};
+
+#define ADC_0_CHANNELS                     (6U)
+#define ADC_NUMOF                          ADC_0_CHANNELS
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
