@@ -112,6 +112,7 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
     _init_iface_router(netif);
 #if GNRC_IPV6_NIB_CONF_6LN
     netif->ipv6.rs_sent = 0;
+#endif  /* GNRC_IPV6_NIB_CONF_6LN */
     if (netif->device_type == NETDEV_TYPE_IEEE802154) {
         /* see https://tools.ietf.org/html/rfc6775#section-5.2 */
         uint16_t src_len = IEEE802154_LONG_ADDRESS_LEN;
@@ -123,7 +124,6 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
          * directly everything else would deadlock anyway */
         netif->ops->set(netif, &opt);
     }
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
     netif->ipv6.na_sent = 0;
     if (gnrc_netif_ipv6_group_join_internal(netif,
                                             &ipv6_addr_all_nodes_link_local) < 0) {

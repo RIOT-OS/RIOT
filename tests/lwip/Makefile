@@ -21,10 +21,13 @@ USEMODULE += ps
 USEMODULE += od
 USEMODULE += netdev_default
 
-include $(RIOTBASE)/Makefile.include
+ifeq ($(BOARD),native)
+  USEMODULE += lwip_ethernet
+endif
 
 # Test only implemented for native
-ifeq ($(BOARD),native)
-test:
-	./tests/01-run.py
+ifneq ($(BOARD),native)
+  TESTS=
 endif
+
+include $(RIOTBASE)/Makefile.include

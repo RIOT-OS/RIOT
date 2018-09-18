@@ -27,7 +27,7 @@ extern "C" {
 /**
  * @brief   Prevent shared timer functions from being used
  */
-#define PERIPH_TIMER_PROVIDES_SET   1
+#define PERIPH_TIMER_PROVIDES_SET
 
 #ifdef __cplusplus
 }

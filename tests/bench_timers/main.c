@@ -403,10 +403,10 @@ static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
                 break;
         }
         if (variant & TEST_PARALLEL) {
-            print_str("- ");
+            print_str("= ");
         }
         else {
-            print_str("= ");
+            print_str("- ");
         }
         print_u32_dec(interval);
         print("\n", 1);

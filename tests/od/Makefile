@@ -5,11 +5,10 @@ USEMODULE += od
 
 TEST_ON_CI_WHITELIST += all
 
-include $(RIOTBASE)/Makefile.include
-
-test:
 ifeq (,$(filter od_string,$(USEMODULE)))
-	tests/01-run.py
+  TESTS=$(APPDIR)/tests/01-run.py
 else
-	tests/02-run.py
+  TESTS=$(APPDIR)/tests/02-run.py
 endif
+
+include $(RIOTBASE)/Makefile.include

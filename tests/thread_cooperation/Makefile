@@ -22,7 +22,4 @@ CFLAGS += -DPROBLEM=$(PROBLEM)
 
 TEST_ON_CI_WHITELIST += all
 
-test:
-	./tests/01-run.py
-
 include $(RIOTBASE)/Makefile.include

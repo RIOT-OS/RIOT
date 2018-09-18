@@ -51,7 +51,7 @@ void color_rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv)
     }
 
     /* find the saturation from value and delta */
-    hsv->s = (hsv->v != 0.0f) ? (delta / hsv->v) : 0x0f;
+    hsv->s = (hsv->v != 0.0f) ? (delta / hsv->v) : 0.0f;
 
     /* compute hue */
     hsv->h = 0.0f;
