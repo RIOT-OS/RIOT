@@ -61,12 +61,13 @@ static inline int _is_set(xtimer_t *timer)
     return (timer->target || timer->long_target);
 }
 
-static inline void xtimer_spin_until(uint32_t target) {
+static inline void xtimer_spin_until(uint32_t target)
+{
 #if XTIMER_MASK
     target = _xtimer_lltimer_mask(target);
 #endif
-    while (_xtimer_lltimer_now() > target);
-    while (_xtimer_lltimer_now() < target);
+    while (_xtimer_lltimer_now() > target) {}
+    while (_xtimer_lltimer_now() < target) {}
 }
 
 void xtimer_init(void)
@@ -88,7 +89,7 @@ static void _xtimer_now_internal(uint32_t *short_term, uint32_t *long_term)
         long_value = _long_cnt;
         after = _xtimer_now();
 
-    } while(before > after);
+    } while (before > after);
 
     *short_term = after;
     *long_term = long_value;
@@ -97,9 +98,10 @@ static void _xtimer_now_internal(uint32_t *short_term, uint32_t *long_term)
 uint64_t _xtimer_now64(void)
 {
     uint32_t short_term, long_term;
+
     _xtimer_now_internal(&short_term, &long_term);
 
-    return ((uint64_t)long_term<<32) + short_term;
+    return ((uint64_t)long_term << 32) + short_term;
 }
 
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
@@ -107,7 +109,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
     DEBUG(" _xtimer_set64() offset=%" PRIu32 " long_offset=%" PRIu32 "\n", offset, long_offset);
     if (!long_offset) {
         /* timer fits into the short timer */
-        _xtimer_set(timer, (uint32_t) offset);
+        _xtimer_set(timer, (uint32_t)offset);
     }
     else {
         int state = irq_disable();
@@ -125,7 +127,7 @@ void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset)
         _add_timer_to_long_list(&long_list_head, timer);
         irq_restore(state);
         DEBUG("xtimer_set64(): added longterm timer (long_target=%" PRIu32 " target=%" PRIu32 ")\n",
-                timer->long_target, timer->target);
+              timer->long_target, timer->target);
     }
 }
 
@@ -197,7 +199,7 @@ int _xtimer_set_absolute(xtimer_t *timer, uint32_t target)
         timer->long_target++;
     }
 
-    if ( (timer->long_target > _long_cnt) || !_this_high_period(target) ) {
+    if ((timer->long_target > _long_cnt) || !_this_high_period(target)) {
         DEBUG("xtimer_set_absolute(): the timer doesn't fit into the low-level timer's mask.\n");
         _add_timer_to_long_list(&long_list_head, timer);
     }
@@ -235,8 +237,8 @@ static void _add_timer_to_list(xtimer_t **list_head, xtimer_t *timer)
 static void _add_timer_to_long_list(xtimer_t **list_head, xtimer_t *timer)
 {
     while (*list_head
-        && (((*list_head)->long_target < timer->long_target)
-        || (((*list_head)->long_target == timer->long_target) && ((*list_head)->target <= timer->target)))) {
+           && (((*list_head)->long_target < timer->long_target)
+           || (((*list_head)->long_target == timer->long_target) && ((*list_head)->target <= timer->target)))) {
         list_head = &((*list_head)->next);
     }
 
@@ -283,6 +285,7 @@ static void _remove(xtimer_t *timer)
 void xtimer_remove(xtimer_t *timer)
 {
     int state = irq_disable();
+
     if (_is_set(timer)) {
         _remove(timer);
     }
@@ -305,7 +308,8 @@ static uint32_t _time_left(uint32_t target, uint32_t reference)
     }
 }
 
-static inline int _this_high_period(uint32_t target) {
+static inline int _this_high_period(uint32_t target)
+{
 #if XTIMER_MASK
     return (target & XTIMER_MASK) == _xtimer_high_cnt;
 #else
@@ -338,7 +342,7 @@ static xtimer_t *_merge_lists(xtimer_t *head_a, xtimer_t *head_b)
     xtimer_t *result_head = _compare(head_a, head_b);
     xtimer_t *pos = result_head;
 
-    while(1) {
+    while (1) {
         head_a = head_a->next;
         head_b = head_b->next;
         if (!head_a) {
