@@ -46,7 +46,7 @@
  * * STM32L1XX_XL: Ultra Low Power XL-density devices: STM32L151xExx,
  *   STM32L152xExx and STM32L162xExx
  */
-#if defined(CPU_MODEL_STM32L151RBA)
+#if defined(CPU_MODEL_STM32L151RBA) || defined(CPU_MODEL_STM32L151CB)
 #define STM32L1XX_MD (1U)
 #elif defined(CPU_MODEL_STM32L151RC)
 #define STM32L1XX_MDP (1U)
@@ -64,7 +64,7 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
-#if defined(CPU_MODEL_STM32L151RBA)
+#if defined(CPU_MODEL_STM32L151RBA) || defined(CPU_MODEL_STM32L151CB)
 #define CPU_IRQ_NUMOF                   (45U)
 #else
 #define CPU_IRQ_NUMOF                   (57U)
@@ -76,13 +76,16 @@ extern "C" {
  * @name   Flash page configuration
  * @{
  */
-#if defined(CPU_MODEL_STM32L152RE) || defined(CPU_MODEL_STM32L151RC)
+#if defined(CPU_MODEL_STM32L152RE) || defined(CPU_MODEL_STM32L151RC) || defined(CPU_MODEL_STM32L151CB)
 #define FLASHPAGE_SIZE             (256U)
 #if defined(CPU_MODEL_STM32L152RE)
 #define FLASHPAGE_NUMOF            (2048U)    /* 512KB */
 #endif
 #if defined(CPU_MODEL_STM32L151RC)
 #define FLASHPAGE_NUMOF            (1024U)    /* 256KB */
+#endif
+#if defined(CPU_MODEL_STM32L151CB)
+#define FLASHPAGE_NUMOF            (512U)     /* 128KB */
 #endif
 #endif
 /* The minimum block size which can be written is 4B. However, the erase
