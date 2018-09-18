@@ -49,6 +49,16 @@ int tsrb_get(tsrb_t *rb, char *dst, size_t n)
     return (n - tmp);
 }
 
+int tsrb_drop(tsrb_t *rb, size_t n)
+{
+    size_t tmp = n;
+    while (tmp && !tsrb_empty(rb)) {
+        _pop(rb);
+        tmp--;
+    }
+    return (n - tmp);
+}
+
 int tsrb_add_one(tsrb_t *rb, char c)
 {
     if (!tsrb_full(rb)) {
