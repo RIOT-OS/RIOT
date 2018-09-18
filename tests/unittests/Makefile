@@ -21,6 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              feather-m0 \
                              ikea-tradfri \
                              limifrog-v1 maple-mini \
+                             lobaro-lorabox \
                              mbed_lpc1768 \
                              mega-xplained \
                              microbit \
