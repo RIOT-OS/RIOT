@@ -12,7 +12,7 @@ ifneq (,$(DEBUG_ADAPTER_ID))
 endif
 
 # Set offset according to IMAGE_OFFSET if it's defined
-EDBG_ARGS += $(addprefix --offset ,$(IMAGE_OFFSET))
+EDBG_ARGS += $(if $(IMAGE_OFFSET),--offset $(IMAGE_OFFSET))
 
 FFLAGS ?= $(EDBG_ARGS) -t $(EDBG_DEVICE_TYPE) -b -v -p -f $(HEXFILE)
 
