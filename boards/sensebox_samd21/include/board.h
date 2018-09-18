@@ -129,18 +129,17 @@ extern "C" {
 
 #define SX127X_PARAM_RESET                  GPIO_UNDEF
 
-#define SX127X_PARAM_DIOMULTI               XBEE1_INT_PIN       /* D24 */
+#define SX127X_PARAM_DIO0                   GPIO_UNDEF
+
+#define SX127X_PARAM_DIO1                   GPIO_UNDEF
+
+#define SX127X_PARAM_DIO2                   GPIO_UNDEF
+
+#define SX127X_PARAM_DIO3                   GPIO_UNDEF
+
+#define SX127X_PARAM_DIO_MULTI              XBEE1_INT_PIN       /* D24 */
 
 #define SX127X_PARAM_PASELECT               (SX127X_PA_BOOST)
-
-#define SX127X_PARAMS                     { .spi       = SX127X_PARAM_SPI,     \
-                                            .nss_pin   = SX127X_PARAM_SPI_NSS, \
-                                            .reset_pin = SX127X_PARAM_RESET,   \
-                                            .dio0_pin  = SX127X_PARAM_DIOMULTI,\
-                                            .dio1_pin  = SX127X_PARAM_DIO1,    \
-                                            .dio2_pin  = SX127X_PARAM_DIO2,    \
-                                            .dio3_pin  = SX127X_PARAM_DIO3,    \
-                                            .paselect  = SX127X_PARAM_PASELECT }
 /** @} */
 
 /**
