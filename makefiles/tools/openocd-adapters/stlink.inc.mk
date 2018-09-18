@@ -13,7 +13,7 @@ endif
 export OPENOCD_ADAPTER_INIT
 
 # call a 'reset halt' command before starting the debugger
-export OPENOCD_DBG_START_CMD = -c 'reset halt'
+export OPENOCD_DBG_START_CMD ?= -c reset halt
 
 # if no openocd specific configuration file, check for default locations:
 # 1. Using the default dist/openocd.cfg (automatically set by openocd.sh)
