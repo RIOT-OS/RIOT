@@ -9,22 +9,21 @@
  */
 
 /**
- * @defgroup    boards_stm32mindev STM32 Minimum System Development Board
+ * @defgroup    boards_blackpill Black pill
  * @ingroup     boards
- * @brief       Support for the stm32f103c8 based STM32 Minimum System
- *              Development Board.
+ * @brief       Support for the stm32f103c8 based Black pill.
  *
  * This board can be bought very cheaply on sides like eBay or
  * AliExpress. Although the MCU nominally has 64 KiB ROM, most of them
  * have 128 KiB ROM. This board is almost identical to the bluepill board,
  * except for the pin layout and the on board LED is connected to PB12 instead
  * of PC13. For more information see:
- * http://wiki.stm32duino.com/index.php?title=Blue_Pill
+ * http://wiki.stm32duino.com/index.php?title=Black_Pill
  *
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the stm32mindev board
+ * @brief       Peripheral MCU configuration for the Black Pill board
  *
  * @author      Víctor Ariño <victor.arino@triagnosys.com>
  * @author      Sören Tempel <tempel@uni-bremen.de>

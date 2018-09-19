@@ -11,6 +11,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-zero \
                              avsextrem \
                              b-l072z-lrwan1 \
+                             blackpill \
                              bluepill \
                              calliope-mini \
                              cc2538dk \
@@ -21,6 +22,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              feather-m0 \
                              ikea-tradfri \
                              limifrog-v1 maple-mini \
+                             lobaro-lorabox \
                              mbed_lpc1768 \
                              mega-xplained \
                              microbit \
@@ -69,7 +71,6 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              stk3600 \
                              stm32f0discovery \
                              stm32f3discovery \
-                             stm32mindev \
                              teensy31 \
                              telosb \
                              waspmote-pro \

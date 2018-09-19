@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017 HAW Hamburg
- *               2018 Otto-von-Guericke-Universität Magdeburg
+ * Copyright (C) 2018 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,14 +7,13 @@
  */
 
 /**
- * @ingroup     boards_stm32mindev
+ * @ingroup     boards_lobaro_lorabox
  * @{
  *
  * @file
  * @brief       Board specific configuration of direct mapped GPIOs
  *
- * @author      Sebastian Meiling <s@mlng.net>
- * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
 #ifndef GPIO_PARAMS_H
@@ -33,12 +31,13 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
+#ifdef AUTO_INIT_LED0
     {
-        .name = "LED",
+        .name = "LED(green)",
         .pin = LED0_PIN,
-        .mode = GPIO_OUT,
-        .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR)
+        .mode = GPIO_OUT
     },
+#endif
 };
 
 #ifdef __cplusplus

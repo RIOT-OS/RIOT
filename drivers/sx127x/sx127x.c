@@ -48,11 +48,14 @@ static void _on_tx_timeout(void *arg);
 static void _on_rx_timeout(void *arg);
 
 /* SX127X DIO interrupt handlers initialization */
+#ifndef SX127X_USE_DIO_MULTI
 static void sx127x_on_dio0_isr(void *arg);
 static void sx127x_on_dio1_isr(void *arg);
 static void sx127x_on_dio2_isr(void *arg);
 static void sx127x_on_dio3_isr(void *arg);
-
+#else
+static void sx127x_on_dio_multi_isr(void *arg);
+#endif
 
 void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params)
 {
@@ -61,7 +64,7 @@ void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params)
     memcpy(&dev->params, params, sizeof(sx127x_params_t));
 }
 
-void sx127x_reset(const sx127x_t *dev)
+int sx127x_reset(const sx127x_t *dev)
 {
     /*
      * This reset scheme complies with 7.2 chapter of the SX1272/1276 datasheet
@@ -72,6 +75,13 @@ void sx127x_reset(const sx127x_t *dev)
      * 2. Set NReset in Hi-Z state
      * 3. Wait at least 5 milliseconds
      */
+
+    /* Check if the reset pin is defined */
+    if (dev->params.reset_pin == GPIO_UNDEF) {
+        DEBUG("[sx127x] error: No reset pin defined.\n");
+        return -SX127X_ERR_GPIOS;
+    }
+
     gpio_init(dev->params.reset_pin, GPIO_OUT);
 
     /* Set reset pin to 0 */
@@ -85,6 +95,8 @@ void sx127x_reset(const sx127x_t *dev)
 
     /* Wait 10 ms */
     xtimer_usleep(1000 * 10);
+
+    return 0;
 }
 
 int sx127x_init(sx127x_t *dev)
@@ -187,6 +199,7 @@ static void sx127x_on_dio_isr(sx127x_t *dev, sx127x_flags_t flag)
     sx127x_isr((netdev_t *)dev);
 }
 
+#ifndef SX127X_USE_DIO_MULTI
 static void sx127x_on_dio0_isr(void *arg)
 {
     sx127x_on_dio_isr((sx127x_t*) arg, SX127X_IRQ_DIO0);
@@ -206,37 +219,81 @@ static void sx127x_on_dio3_isr(void *arg)
 {
     sx127x_on_dio_isr((sx127x_t*) arg, SX127X_IRQ_DIO3);
 }
+#else
+static void sx127x_on_dio_multi_isr(void *arg)
+{
+    sx127x_on_dio_isr((sx127x_t*) arg, SX127X_IRQ_DIO_MULTI);
+}
+#endif
 
 /* Internal event handlers */
 static int _init_gpios(sx127x_t *dev)
 {
-    int res = gpio_init_int(dev->params.dio0_pin, GPIO_IN, GPIO_RISING,
-                            sx127x_on_dio0_isr, dev);
-    if (res < 0) {
-        DEBUG("[sx127x] error: failed to initialize DIO0 pin\n");
-        return res;
+    int res;
+
+#ifndef SX127X_USE_DIO_MULTI
+    /* Check if DIO0 pin is defined */
+    if (dev->params.dio0_pin != GPIO_UNDEF) {
+        res = gpio_init_int(dev->params.dio0_pin, GPIO_IN, GPIO_RISING,
+                                sx127x_on_dio0_isr, dev);
+        if (res < 0) {
+            DEBUG("[sx127x] error: failed to initialize DIO0 pin\n");
+            return res;
+        }
+    }
+    else {
+        DEBUG("[sx127x] error: no DIO0 pin defined\n");
+        DEBUG("[sx127x] error: at least one interrupt should be defined\n");
+        return SX127X_ERR_GPIOS;
     }
 
-    res = gpio_init_int(dev->params.dio1_pin, GPIO_IN, GPIO_RISING,
-                         sx127x_on_dio1_isr, dev);
-    if (res < 0) {
-        DEBUG("[sx127x] error: failed to initialize DIO1 pin\n");
-        return res;
+    /* Check if DIO1 pin is defined */
+    if (dev->params.dio1_pin != GPIO_UNDEF) {
+        res = gpio_init_int(dev->params.dio1_pin, GPIO_IN, GPIO_RISING,
+                                sx127x_on_dio1_isr, dev);
+        if (res < 0) {
+            DEBUG("[sx127x] error: failed to initialize DIO1 pin\n");
+            return res;
+        }
     }
 
-    res = gpio_init_int(dev->params.dio2_pin, GPIO_IN, GPIO_RISING,
-                        sx127x_on_dio2_isr, dev);
-    if (res < 0) {
-        DEBUG("[sx127x] error: failed to initialize DIO2 pin\n");
-        return res;
+    /* check if DIO2 pin is defined */
+    if (dev->params.dio2_pin != GPIO_UNDEF) {
+        res = gpio_init_int(dev->params.dio2_pin, GPIO_IN, GPIO_RISING,
+                            sx127x_on_dio2_isr, dev);
+        if (res < 0) {
+            DEBUG("[sx127x] error: failed to initialize DIO2 pin\n");
+            return res;
+        }
     }
 
-    res = gpio_init_int(dev->params.dio3_pin, GPIO_IN, GPIO_RISING,
-                        sx127x_on_dio3_isr, dev);
-    if (res < 0) {
-        DEBUG("[sx127x] error: failed to initialize DIO3 pin\n");
-        return res;
+    /* check if DIO3 pin is defined */
+    if (dev->params.dio3_pin != GPIO_UNDEF) {
+        res = gpio_init_int(dev->params.dio3_pin, GPIO_IN, GPIO_RISING,
+                            sx127x_on_dio3_isr, dev);
+        if (res < 0) {
+            DEBUG("[sx127x] error: failed to initialize DIO3 pin\n");
+            return res;
+        }
     }
+#else
+    if (dev->params.dio_multi_pin != GPIO_UNDEF) {
+        DEBUG("[sx127x] info: Trying to initialize DIO MULTI pin\n");
+        res = gpio_init_int(dev->params.dio_multi_pin, GPIO_IN, GPIO_RISING,
+                                sx127x_on_dio_multi_isr, dev);
+        if (res < 0) {
+            DEBUG("[sx127x] error: failed to initialize DIO MULTI pin\n");
+            return res;
+        }
+
+        DEBUG("[sx127x] info: DIO MULTI pin initialized successfully\n");
+    }
+    else {
+        DEBUG("[sx127x] error: no DIO MULTI pin defined\n");
+        DEBUG("[sx127x] error at least one interrupt should be defined\n");
+        return SX127X_ERR_GPIOS;
+    }
+#endif
 
     return res;
 }
