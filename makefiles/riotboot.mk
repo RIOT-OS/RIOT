@@ -87,7 +87,7 @@ $(BINDIR)/$(APPLICATION)-slot1-combined.bin: $(BOOTLOADER_BIN)/riotboot.extended
 # edbg
 riotboot/flash-combined-slot1: HEXFILE=$(BINDIR)/$(APPLICATION)-slot1-combined.bin
 # openocd
-riotboot/flash-combined-slot1: IMAGE_FILE=$(BINDIR)/$(APPLICATION)-slot1-combined.bin
+riotboot/flash-combined-slot1: export IMAGE_FILE=$(BINDIR)/$(APPLICATION)-slot1-combined.bin
 riotboot/flash-combined-slot1: $(BINDIR)/$(APPLICATION)-slot1-combined.bin
 	$(FLASHER) $(FFLAGS)
 
