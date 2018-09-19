@@ -52,7 +52,7 @@ avr_libc_version() {
     fi
 }
 
-printf "%s\n" "Installed compiler toolchains "
+printf "%s\n" "Installed compiler toolchains"
 printf "%s\n" "-----------------------------"
 printf "%23s: %s\n" "native gcc" "$(get_cmd_version gcc)"
 for p in arm-none-eabi avr mips-mti-elf msp430 riscv-none-embed; do
