@@ -1,0 +1,33 @@
+From b301d4f8ce49d7a2daddadffb771f985d8375d3d Mon Sep 17 00:00:00 2001
+From: Joksan Alvarado <joksan.alvarado@gmail.com>
+Date: Wed, 19 Sep 2018 15:52:41 -0600
+Subject: [PATCH] Enabled support for ATSAMR21G18.
+
+---
+ src/Samba.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/Samba.cpp b/src/Samba.cpp
+index 88aefcc..09145db 100644
+--- a/src/Samba.cpp
++++ b/src/Samba.cpp
+@@ -187,7 +187,7 @@ Samba::init()
+     }
+     // Check for supported M0+ processor
+     // NOTE: 0x1001000a is a ATSAMD21E18A, 0x1001001c is ATSAMR21E18A
+-	else if (cid == 0x10010000 || cid == 0x10010100 || cid == 0x10010005 || cid == 0x1001000a || cid == 0x1001001c)
++	else if (cid == 0x10010000 || cid == 0x10010100 || cid == 0x10010005 || cid == 0x1001000a || cid == 0x1001001c || cid == 0x10010019)
+     {
+         return true;
+     }
+@@ -685,6 +685,7 @@ Samba::reset(void)
+     case 0x10010005:
+     case 0x1001000a:
+     case 0x1001001c:
++    case 0x10010019:
+         // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0484c/index.html
+         writeWord(0xE000ED0C, 0x05FA0004);
+         break;
+-- 
+2.18.0
+
