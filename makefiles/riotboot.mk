@@ -103,7 +103,8 @@ riotboot/flash-slot1: $(BINDIR)/$(APPLICATION)-slot1.signed.bin riotboot/flash-b
 riotboot/slot1: $(BINDIR)/$(APPLICATION)-slot1.signed.bin
 riotboot/slot2: $(BINDIR)/$(APPLICATION)-slot2.signed.bin
 
-riotboot/flash-slot2: export IMAGE_OFFSET=$$(($(RIOTBOOT_SLOT0_SIZE) + $(RIOTBOOT_FW_SLOT_SIZE)))
+# export does not work properly with variables using '$((  ))' so evaluate it in a shell
+riotboot/flash-slot2: export IMAGE_OFFSET=$(shell echo $$(($(RIOTBOOT_SLOT0_SIZE) + $(RIOTBOOT_FW_SLOT_SIZE))))
 # edbg
 riotboot/flash-slot2: HEXFILE=$(BINDIR)/$(APPLICATION)-slot2.signed.bin
 # openocd
