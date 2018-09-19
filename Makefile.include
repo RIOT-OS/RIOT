@@ -567,7 +567,7 @@ include $(RIOTMAKE)/vars.inc.mk
 include $(RIOTMAKE)/tools/targets.inc.mk
 
 # Warn if the selected board and drivers don't provide all needed features:
-ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
+ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   EXPECT_ERRORS :=
   EXPECT_CONFLICT :=
 
