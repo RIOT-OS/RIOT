@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_stm32mindev
+ * @ingroup     boards_blackpill
  * @{
  *
  * @file
