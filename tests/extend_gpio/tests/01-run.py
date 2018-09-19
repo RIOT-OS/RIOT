@@ -12,7 +12,7 @@ import sys
 
 def testfunc(child):
     child.expect_exact("gpio extension test routine")
-    for i in range(4):
+    for _ in range(4):
         child.expect('Running gpio.h functions on pin \d+')
         child.expect('init on dev 0xbeef with pin \d+')
         child.expect('init_int on dev 0xbeef with pin \d+')
@@ -25,7 +25,7 @@ def testfunc(child):
         child.expect('write on dev 0xbeef with pin \d+')
     child.expect_exact("Running notsup functions")
     child.expect_exact("(they should not print output)")
-    for i in range(4):
+    for _ in range(4):
         child.expect('Running notsup gpio.h functions on pin \d+')
     child.expect_exact("Checking that all pins in range have init error using notsup")
     child.expect_exact("(lack of init error implies improper redirection)")
