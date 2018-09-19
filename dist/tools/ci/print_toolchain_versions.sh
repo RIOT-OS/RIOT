@@ -34,6 +34,24 @@ get_define() {
     printf "%s" "$line"
 }
 
+get_kernel_info() {
+    uname -mprs
+}
+
+get_os_info() {
+    local os="$(uname -s)"
+    local osname="unknown"
+    local osvers="unknown"
+    if [ "$os" = "Linux" ]; then
+        osname="$(cat /etc/os-release | grep ^NAME= | awk -F'=' '{print $2}')"
+        osvers="$(cat /etc/os-release | grep ^VERSION= | awk -F'=' '{print $2}')"
+    elif [ "$os" = "Darwin" ]; then
+        osname="$(sw_vers -productName)"
+        osvers="$(sw_vers -productVersion)"
+    fi
+    printf "%s %s" "$osname" "$osvers"
+}
+
 newlib_version() {
     if [ -z "$1" ]; then
         printf "%s" "error"
@@ -51,6 +69,14 @@ avr_libc_version() {
         printf "%s (%s)" "$(get_define "$cc" avr/version.h __AVR_LIBC_VERSION_STRING__)" "$(get_define "$cc" avr/version.h __AVR_LIBC_DATE_STRING__)"
     fi
 }
+
+printf "\n"
+# print operating system information
+printf "%s\n" "Operating System Environment"
+printf "%s\n" "-----------------------------"
+printf "%23s: %s\n" "Operating System" "$(get_os_info)"
+printf "%23s: %s\n" "Kernel" "$(get_kernel_info)"
+printf "\n"
 
 printf "%s\n" "Installed compiler toolchains"
 printf "%s\n" "-----------------------------"
