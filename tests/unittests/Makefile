@@ -21,7 +21,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              ek-lm4f120xl \
                              feather-m0 \
                              ikea-tradfri \
-                             limifrog-v1 maple-mini \
+                             limifrog-v1 \
+                             maple-mini \
                              lobaro-lorabox \
                              mbed_lpc1768 \
                              mega-xplained \
@@ -76,7 +77,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              waspmote-pro \
                              wsn430-v1_3b \
                              wsn430-v1_4 \
-                             yunjia-nrf51822 z1
+                             yunjia-nrf51822 \
+                             z1
 
 USEMODULE += embunit
 

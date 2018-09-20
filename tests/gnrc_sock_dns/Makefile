@@ -2,10 +2,20 @@ include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             chronos telosb nucleo-f042k6 nucleo-f031k6 \
-                             nucleo-f030r8 nucleo-f303k8 nucleo-l053r8 \
-                             nucleo-l031k6 stm32f0discovery waspmote-pro z1
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
+                             arduino-mega2560 \
+                             arduino-uno \
+                             chronos \
+                             telosb \
+                             nucleo-f042k6 \
+                             nucleo-f031k6 \
+                             nucleo-f030r8 \
+                             nucleo-f303k8 \
+                             nucleo-l053r8 \
+                             nucleo-l031k6 \
+                             stm32f0discovery \
+                             waspmote-pro \
+                             z1
 
 USEMODULE += sock_dns
 USEMODULE += gnrc_sock_udp
