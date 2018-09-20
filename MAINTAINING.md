@@ -141,8 +141,17 @@ simple approving ACK might suffice.
 
 #### Github etiquette
 
--   If there are multiple maintainers reviewing a PR, always give the other
-    maintainers reasonable time to ACK before dismissing their review.
+It is good etiquette to describe what you reviewed, even if you gave the PR a
+full review and gave your approval. This way the contributor and other
+maintainers are able to follow your thought process.
+
+Maintainers should only assign themselves to PRs and shouldn't assign other
+maintainers. You can however request reviews from other maintainers or
+contributors, either by mentioning them in a comment or selecting them in
+GitHub's review sidebar.
+
+If there are multiple maintainers reviewing a PR, always give the other
+maintainers reasonable time to ACK before dismissing their review.
 
 [list of maintainers]: https://github.com/RIOT-OS/RIOT/wiki/Maintainers
 [Best Practices]: https://github.com/RIOT-OS/RIOT/wiki/Best-Practice-for-RIOT-Programming
