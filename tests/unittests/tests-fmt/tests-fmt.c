@@ -749,6 +749,16 @@ static void test_fmt_str(void)
     TEST_ASSERT_EQUAL_STRING(string1, &string2[0]);
 }
 
+static void test_fmt_char(void)
+{
+    char string[] = "zzzzzzzzz";
+
+    TEST_ASSERT_EQUAL_INT(1, fmt_char(NULL, 'c'));
+    TEST_ASSERT_EQUAL_INT(1, fmt_char(string, 'c'));
+    string[1] = '\0';
+    TEST_ASSERT_EQUAL_STRING("c", &string[0]);
+}
+
 static void test_fmt_to_lower(void)
 {
     const char string_up[]  = "AbCdeFGHijkLM";
@@ -827,6 +837,7 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_strlen),
         new_TestFixture(test_fmt_strnlen),
         new_TestFixture(test_fmt_str),
+        new_TestFixture(test_fmt_char),
         new_TestFixture(test_fmt_to_lower),
         new_TestFixture(test_scn_u32_dec),
         new_TestFixture(test_fmt_lpad),

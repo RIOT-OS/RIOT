@@ -311,6 +311,19 @@ size_t fmt_s32_dfp(char *out, int32_t val, int fp_digits);
 size_t fmt_float(char *out, float f, unsigned precision);
 
 /**
+ * @brief   Copy @p in char to string (without terminating '\0')
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out]  out     string to write to (or NULL)
+ * @param[in]   c       char value to append
+ *
+ * @return      nr of bytes the function did or would write to out
+ */
+size_t fmt_char(char *out, char c);
+
+/**
  * @brief Count characters until '\0' (exclusive) in @p str
  *
  * @param[in]   str  Pointer to string
