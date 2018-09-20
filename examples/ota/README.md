@@ -12,7 +12,7 @@ CoAP.
 
 - flash image and bootloader
 
-    $ "BOARD=samr21-xpro APP_VER=$(date +%s) make -j4 riotboot/flash
+    $ BOARD=samr21-xpro APP_VER=$(date +%s) make -j4 riotboot/flash
 
 - recompile using
 
