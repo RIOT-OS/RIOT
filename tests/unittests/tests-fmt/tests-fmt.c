@@ -779,6 +779,17 @@ static void test_scn_u32_dec(void)
     TEST_ASSERT_EQUAL_INT(val2, scn_u32_dec(string1, 5));
 }
 
+static void test_scn_u32_hex(void)
+{
+    const char *string1 = "aB12cE4F";
+    uint32_t val1 = 0xab12ce4f;
+    uint32_t val2 = 0xab1;
+
+    TEST_ASSERT_EQUAL_INT(val1, scn_u32_hex(string1, 8));
+    TEST_ASSERT_EQUAL_INT(val2, scn_u32_hex(string1, 3));
+    TEST_ASSERT_EQUAL_INT(val1, scn_u32_hex(string1, 9));
+}
+
 static void test_fmt_lpad(void)
 {
     const char base[] = "abcd";
@@ -840,6 +851,7 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_char),
         new_TestFixture(test_fmt_to_lower),
         new_TestFixture(test_scn_u32_dec),
+        new_TestFixture(test_scn_u32_hex),
         new_TestFixture(test_fmt_lpad),
     };
 

@@ -460,6 +460,30 @@ uint32_t scn_u32_dec(const char *str, size_t n)
     return res;
 }
 
+uint32_t scn_u32_hex(const char *str, size_t n)
+{
+    uint32_t res = 0;
+
+    while (n--) {
+        char c = *str++;
+        if (!_is_digit(c)) {
+            if (_is_upper(c)) {
+                c = _to_lower(c);
+            }
+            if (c == '\0' || c > 'f') {
+                break;
+            }
+            res <<= 4;
+            res |= c - 'a' + 0xa;
+        }
+        else {
+            res <<= 4;
+            res |= c - '0';
+        }
+    }
+    return res;
+}
+
 void print(const char *s, size_t n)
 {
 #ifdef __WITH_AVRLIBC__
