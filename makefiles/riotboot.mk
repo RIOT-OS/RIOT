@@ -34,7 +34,7 @@ $(BINDIR)/$(APPLICATION)-slot1.elf: ROM_OFFSET=$(SLOT1_OFFSET)
 $(BINDIR)/$(APPLICATION)-slot2.elf: ROM_OFFSET=$(SLOT2_OFFSET)
 
 # create signed binary target
-%.signed.bin: %.sig %.bin
+$(BINDIR)/$(APPLICATION)-slot1.signed.bin $(BINDIR)/$(APPLICATION)-slot2.signed.bin: %.signed.bin: %.sig %.bin
 	@echo "creating $@..."
 	cat $^ > $@
 
