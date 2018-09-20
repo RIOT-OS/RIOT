@@ -113,6 +113,19 @@ void test_uuid_str(void)
     const char x500[] = "6ba7b814-9dad-11d1-80b4-00c04fd430c8";
     uuid_to_string(&uuid_namespace_x500, str);
     TEST_ASSERT_EQUAL_INT(0, memcmp(x500, str, sizeof(dns)));
+
+    uuid_t uuid;
+    TEST_ASSERT_EQUAL_INT(0, uuid_from_string(&uuid, dns));
+    TEST_ASSERT_EQUAL_INT(true, uuid_equal(&uuid, &uuid_namespace_dns));
+
+    TEST_ASSERT_EQUAL_INT(0, uuid_from_string(&uuid, url));
+    TEST_ASSERT_EQUAL_INT(true, uuid_equal(&uuid, &uuid_namespace_url));
+
+    TEST_ASSERT_EQUAL_INT(0, uuid_from_string(&uuid, iso));
+    TEST_ASSERT_EQUAL_INT(true, uuid_equal(&uuid, &uuid_namespace_iso));
+
+    TEST_ASSERT_EQUAL_INT(0, uuid_from_string(&uuid, x500));
+    TEST_ASSERT_EQUAL_INT(true, uuid_equal(&uuid, &uuid_namespace_x500));
 }
 
 Test *tests_uuid_all(void)

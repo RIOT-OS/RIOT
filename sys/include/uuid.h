@@ -122,7 +122,7 @@ void uuid_v5(uuid_t *uuid, const uuid_t *ns, const uint8_t *name, size_t len);
  *
  * @return              Version number
  */
-static inline unsigned uuid_version(uuid_t *uuid)
+static inline unsigned uuid_version(const uuid_t *uuid)
 {
     uint16_t time_hi_vers = byteorder_ntohs(uuid->time_hi);
 
@@ -137,7 +137,7 @@ static inline unsigned uuid_version(uuid_t *uuid)
  *
  * @return              True when equal
  */
-static inline bool uuid_equal(uuid_t *uuid1, uuid_t *uuid2)
+static inline bool uuid_equal(const uuid_t *uuid1, const uuid_t *uuid2)
 {
     return (memcmp(uuid1, uuid2, sizeof(uuid_t)) == 0);
 }
@@ -149,6 +149,16 @@ static inline bool uuid_equal(uuid_t *uuid1, uuid_t *uuid2)
  * @param[out]  str     null-terminated UUID string, must be at least UUID_STR_LEN + 1 bytes
  */
 void uuid_to_string(const uuid_t *uuid, char *str);
+
+/**
+ * @brief   Populate an UUID structure from an UUID string
+ *
+ * @param[out]  uuid    out UUID
+ * @param[in]   str     null-terminated input UUID string, must be UUID_STR_LEN bytes
+ *
+ * @return 0 on succes, < 0 if @p str is not valid
+ */
+int uuid_from_string(uuid_t *uuid, const char *str);
 
 #ifdef __cplusplus
 }
