@@ -172,20 +172,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
-{
-    (void)pin;
-    (void)mode;
-    (void)flank;
-    (void)cb;
-    (void)arg;
-
-    /* TODO: Not implemented yet */
-
-    return -1;
-}
-
 int gpio_read(gpio_t pin)
 {
     assert(check_valid_port(GPIO_PORT(pin)));
