@@ -91,6 +91,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
+ */
+#define LED_PANIC           LED1_ON
+/** @} */
+
+/**
  * @name    Button pin configuration
  * @{
  */

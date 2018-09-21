@@ -79,6 +79,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
+ */
+#define LED_PANIC            LED_RED_ON
+/** @} */
+
+/**
  * @name    Macros for controlling the on-board MUXes.
  * @{
  */

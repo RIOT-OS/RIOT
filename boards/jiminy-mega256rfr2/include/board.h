@@ -74,6 +74,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name   White LED light is used to signal ERROR.
+ * @{
+ */
+#define LED_PANIC           (LED_PORT |= LED2_MASK | LED1_MASK | LED0_MASK)
+/** @} */
+
+/**
  * @name xtimer configuration values
  * @{
  */
