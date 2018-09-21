@@ -191,7 +191,7 @@ serial_to_tun(FILE *inslip, int outfd)
     } uip;
     static unsigned int inbufptr = 0;
     /* cppcheck-suppress variableScope
-     * rationale: cannot be reduced if built on linux */
+     * (reason: cannot be reduced if built on linux) */
     int ret;
     unsigned char c;
 
