@@ -151,6 +151,41 @@ static int init_int(int argc, char **argv)
 
     return 0;
 }
+
+static int enable_int(int argc, char **argv)
+{
+    int po, pi;
+    int status;
+
+    if (argc < 4) {
+        printf("usage: %s <port> <pin> <status>\n", argv[0]);
+        puts("\tstatus:\n"
+             "\t0: disable\n"
+             "\t1: enable\n");
+        return 1;
+    }
+
+    po = atoi(argv[1]);
+    pi = atoi(argv[2]);
+
+    status = atoi(argv[3]);
+
+    switch (status) {
+        case 0:
+            puts("disabling GPIO interrupt");
+            gpio_irq_disable(GPIO_PIN(po, pi));
+            break;
+        case 1:
+            puts("enabling GPIO interrupt");
+            gpio_irq_enable(GPIO_PIN(po, pi));
+            break;
+        default:
+            puts("error: invalid status");
+            return 1;
+    }
+
+    return 0;
+}
 #endif
 
 static int read(int argc, char **argv)
@@ -244,6 +279,7 @@ static const shell_command_t shell_commands[] = {
     { "init_od_pu", "init as output (open-drain with pull-up)", init_od_pu },
 #ifdef MODULE_PERIPH_GPIO_IRQ
     { "init_int", "init as external INT w/o pull resistor", init_int },
+    { "enable_int", "enable or disable gpio interrupt", enable_int },
 #endif
     { "read", "read pin status", read },
     { "set", "set pin to HIGH", set },
