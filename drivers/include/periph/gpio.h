@@ -148,7 +148,7 @@ typedef struct {
  */
 int gpio_init(gpio_t pin, gpio_mode_t mode);
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
+#if defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
 /**
  * @brief   Initialize a GPIO pin for external interrupt usage
  *
@@ -156,6 +156,9 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
  * time the defined flank(s) are detected.
  *
  * The interrupt is activated automatically after the initialization.
+ *
+ * @note    You have to add the module `periph_gpio_irq` to your project to
+ *          enable this function
  *
  * @param[in] pin       pin to initialize
  * @param[in] mode      mode of the pin, see @c gpio_mode_t
@@ -174,12 +177,18 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 /**
  * @brief   Enable pin interrupt if configured as interrupt source
  *
+ * @note    You have to add the module `periph_gpio_irq` to your project to
+ *          enable this function
+ *
  * @param[in] pin       the pin to enable the interrupt for
  */
 void gpio_irq_enable(gpio_t pin);
 
 /**
  * @brief   Disable the pin interrupt if configured as interrupt source
+ *
+ * @note    You have to add the module `periph_gpio_irq` to your project to
+ *          enable this function
  *
  * @param[in] pin       the pin to disable the interrupt for
  */
