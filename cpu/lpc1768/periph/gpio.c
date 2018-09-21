@@ -21,6 +21,7 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Number of external interrupt lines.
  */
@@ -32,6 +33,7 @@
 static gpio_isr_ctx_t isr_ctx[NUMOF_IRQS];
 
 static gpio_flank_t isr_state[2][32];
+#endif
 
 #define PIN_MASK        (0x1f)
 #define PORT_SHIFT      (5U)
@@ -49,45 +51,6 @@ static inline int _port(gpio_t pin)
 static inline LPC_GPIO_TypeDef *_base(gpio_t pin)
 {
     return (LPC_GPIO_TypeDef *) (LPC_GPIO_BASE + (_port(pin) * 0x20));
-}
-
-static inline void _configure_flank(gpio_t pin, gpio_flank_t flank)
-{
-    switch (flank) {
-        case GPIO_RISING:
-            if (_port(pin) == 0) {
-                LPC_GPIOINT->IO0IntEnF &= ~(1 << _pin(pin));
-                LPC_GPIOINT->IO0IntEnR |= (1 << _pin(pin));
-            }
-            else {
-                LPC_GPIOINT->IO2IntEnF &= ~(1 << _pin(pin));
-                LPC_GPIOINT->IO2IntEnR |= (1 << _pin(pin));
-            }
-
-            break;
-        case GPIO_FALLING:
-            if (_port(pin) == 0) {
-                LPC_GPIOINT->IO0IntEnF |= (1 << _pin(pin));
-                LPC_GPIOINT->IO0IntEnR &= ~(1 << _pin(pin));
-            }
-            else {
-                LPC_GPIOINT->IO2IntEnF |= (1 << _pin(pin));
-                LPC_GPIOINT->IO2IntEnR &= ~(1 << _pin(pin));
-            }
-
-            break;
-        case GPIO_BOTH:
-            if (_port(pin) == 0) {
-                LPC_GPIOINT->IO0IntEnF |= 1 << _pin(pin);
-                LPC_GPIOINT->IO0IntEnR |= 1 << _pin(pin);
-            }
-            else {
-                LPC_GPIOINT->IO2IntEnF |= 1 << _pin(pin);
-                LPC_GPIOINT->IO2IntEnR |= 1 << _pin(pin);
-            }
-
-            break;
-    }
 }
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
@@ -125,6 +88,86 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     ((uint32_t *) &LPC_PINCON->PINMODE_OD0)[_port(pin)] |= (((mode >> 3) & 0x01) << _pin(pin));
 
     return 0;
+}
+
+int gpio_read(gpio_t pin)
+{
+    LPC_GPIO_TypeDef *base = _base(pin);
+
+    return (base->FIOPIN & (1 << _pin(pin))) ? 1 : 0;
+}
+
+void gpio_set(gpio_t pin)
+{
+    LPC_GPIO_TypeDef *base = _base(pin);
+
+    base->FIOSET = (1 << _pin(pin));
+}
+
+void gpio_clear(gpio_t pin)
+{
+    LPC_GPIO_TypeDef *base = _base(pin);
+
+    base->FIOCLR = (1 << _pin(pin));
+}
+
+void gpio_toggle(gpio_t pin)
+{
+    LPC_GPIO_TypeDef *base = _base(pin);
+
+    base->FIOPIN ^= (1 << _pin(pin));
+}
+
+void gpio_write(gpio_t pin, int value)
+{
+    LPC_GPIO_TypeDef *base = _base(pin);
+
+    if (value) {
+        base->FIOSET = (1 << _pin(pin));
+    }
+    else {
+        base->FIOCLR = (1 << _pin(pin));
+    }
+}
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+static inline void _configure_flank(gpio_t pin, gpio_flank_t flank)
+{
+    switch (flank) {
+        case GPIO_RISING:
+            if (_port(pin) == 0) {
+                LPC_GPIOINT->IO0IntEnF &= ~(1 << _pin(pin));
+                LPC_GPIOINT->IO0IntEnR |= (1 << _pin(pin));
+            }
+            else {
+                LPC_GPIOINT->IO2IntEnF &= ~(1 << _pin(pin));
+                LPC_GPIOINT->IO2IntEnR |= (1 << _pin(pin));
+            }
+
+            break;
+        case GPIO_FALLING:
+            if (_port(pin) == 0) {
+                LPC_GPIOINT->IO0IntEnF |= (1 << _pin(pin));
+                LPC_GPIOINT->IO0IntEnR &= ~(1 << _pin(pin));
+            }
+            else {
+                LPC_GPIOINT->IO2IntEnF |= (1 << _pin(pin));
+                LPC_GPIOINT->IO2IntEnR &= ~(1 << _pin(pin));
+            }
+
+            break;
+        case GPIO_BOTH:
+            if (_port(pin) == 0) {
+                LPC_GPIOINT->IO0IntEnF |= 1 << _pin(pin);
+                LPC_GPIOINT->IO0IntEnR |= 1 << _pin(pin);
+            }
+            else {
+                LPC_GPIOINT->IO2IntEnF |= 1 << _pin(pin);
+                LPC_GPIOINT->IO2IntEnR |= 1 << _pin(pin);
+            }
+
+            break;
+    }
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
@@ -180,46 +223,6 @@ void gpio_irq_disable(gpio_t pin)
     }
 }
 
-int gpio_read(gpio_t pin)
-{
-    LPC_GPIO_TypeDef *base = _base(pin);
-
-    return (base->FIOPIN & (1 << _pin(pin))) ? 1 : 0;
-}
-
-void gpio_set(gpio_t pin)
-{
-    LPC_GPIO_TypeDef *base = _base(pin);
-
-    base->FIOSET = (1 << _pin(pin));
-}
-
-void gpio_clear(gpio_t pin)
-{
-    LPC_GPIO_TypeDef *base = _base(pin);
-
-    base->FIOCLR = (1 << _pin(pin));
-}
-
-void gpio_toggle(gpio_t pin)
-{
-    LPC_GPIO_TypeDef *base = _base(pin);
-
-    base->FIOPIN ^= (1 << _pin(pin));
-}
-
-void gpio_write(gpio_t pin, int value)
-{
-    LPC_GPIO_TypeDef *base = _base(pin);
-
-    if (value) {
-        base->FIOSET = (1 << _pin(pin));
-    }
-    else {
-        base->FIOCLR = (1 << _pin(pin));
-    }
-}
-
 void isr_eint3(void)
 {
     /* combine all interrupts */
@@ -238,3 +241,4 @@ void isr_eint3(void)
 
     cortexm_isr_end();
 }
+#endif
