@@ -35,14 +35,9 @@
 #define MM_SYSCALL         (0x8B7C0000)
 #define MM_SYSCALL_MASK    (0xfffffc00)
 
-/* For backwards compatibility with mips-mti-elf toolchain release 2016.05-03
- * This macro definition mimics the definition in newer toolchains */
+/* For backwards compatibility with mips-mti-elf toolchain release 2016.05-03 */
 #if !defined(_MIPS_HAL_NOMIPS16)
-#ifdef __mips16
-# define _MIPS_HAL_NOMIPS16 __attribute__((nomips16))
-#else
-# define _MIPS_HAL_NOMIPS16
-#endif
+#define _MIPS_HAL_NOMIPS16 __attribute__((nomips16))
 #endif /* !defined(_MIPS_HAL_NOMIPS16) */
 
 #ifdef MIPS_HARD_FLOAT
