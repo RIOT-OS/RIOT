@@ -6,6 +6,7 @@ BOARD_BLACKLIST := arduino-uno \
                    arduino-duemilanove \
                    arduino-mega2560 \
                    chronos \
+                   jiminy-mega256rfr2 \
                    mega256rfr2 \
                    mega-xplained \
                    msb-430 \
