@@ -26,6 +26,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Number of external interrupt lines
  */
@@ -34,6 +35,7 @@
  * @brief   Hold one interrupt context per interrupt line
  */
 static gpio_isr_ctx_t isr_ctx[NUMOF_IRQS];
+#endif
 
 static inline int _port_num(gpio_t pin)
 {
@@ -80,6 +82,37 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
+int gpio_read(gpio_t pin)
+{
+    return _port(pin)->DIN & _pin_mask(pin);
+}
+
+void gpio_set(gpio_t pin)
+{
+    _port(pin)->DOUTSET = _pin_mask(pin);
+}
+
+void gpio_clear(gpio_t pin)
+{
+    _port(pin)->DOUTCLR = _pin_mask(pin);
+}
+
+void gpio_toggle(gpio_t pin)
+{
+    _port(pin)->DOUTTGL = _pin_mask(pin);
+}
+
+void gpio_write(gpio_t pin, int value)
+{
+    if (value) {
+        _port(pin)->DOUTSET = _pin_mask(pin);
+    } else {
+        _port(pin)->DOUTCLR = _pin_mask(pin);
+    }
+}
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                     gpio_cb_t cb, void *arg)
 {
@@ -117,35 +150,6 @@ void gpio_irq_disable(gpio_t pin)
     GPIO->IEN &= ~(_pin_mask(pin));
 }
 
-int gpio_read(gpio_t pin)
-{
-    return _port(pin)->DIN & _pin_mask(pin);
-}
-
-void gpio_set(gpio_t pin)
-{
-    _port(pin)->DOUTSET = _pin_mask(pin);
-}
-
-void gpio_clear(gpio_t pin)
-{
-    _port(pin)->DOUTCLR = _pin_mask(pin);
-}
-
-void gpio_toggle(gpio_t pin)
-{
-    _port(pin)->DOUTTGL = _pin_mask(pin);
-}
-
-void gpio_write(gpio_t pin, int value)
-{
-    if (value) {
-        _port(pin)->DOUTSET = _pin_mask(pin);
-    } else {
-        _port(pin)->DOUTCLR = _pin_mask(pin);
-    }
-}
-
 /**
  * @brief   External interrupt handler
  */
@@ -159,3 +163,5 @@ void isr_gpio_even(void)
     }
     cortexm_isr_end();
 }
+
+#endif
