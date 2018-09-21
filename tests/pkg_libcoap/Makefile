@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 # msp430 and avr have problems with int width and libcoaps usage of :x notation in structs
 BOARD_BLACKLIST := arduino-duemilanove \
                    arduino-mega2560 \
-                   arduino-uno
+                   arduino-uno \
                    chronos \
                    jiminy-mega256rfr2 \
                    mega-xplained \
