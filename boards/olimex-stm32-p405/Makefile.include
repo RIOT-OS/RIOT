@@ -1,0 +1,20 @@
+# define the cpu used by the olimex-stm32-p405 board
+export CPU = stm32f4
+export CPU_MODEL = stm32f405rg
+
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
+# set default port depending on operating system
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# export DEBUG_ADAPTER ?= stlink
+# export STLINK_VERSION ?= 2
+
+# this board uses openocd
+include $(RIOTMAKE)/tools/openocd.inc.mk
+

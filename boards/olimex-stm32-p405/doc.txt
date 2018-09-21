@@ -1,0 +1,66 @@
+/**
+@defgroup    boards_olimex-stm32-p405 Olimex STM32-P405
+@ingroup     boards
+@brief       Support for the Olimex STM32-P405
+
+## Overview
+
+The STM32-P405 is a board from Olimex supporting a ARM Cortex-M4
+STM32F405RG microcontroller with 192Kb of SRAM and 1024Kb of ROM Flash.
+
+## Hardware
+
+![Olimex STM32-P405](https://www.olimex.com/Products/ARM/ST/STM32-P405/images/STM32-P405-1.jpg)
+
+### MCU
+
+| MCU        | STM32F405RG       |
+|:------------- |:--------------------- |
+| Family | ARM Cortex-M4     |
+| Vendor | ST Microelectronics   |
+| RAM        | 192Kb |
+| Flash      | 1024Kb            |
+| Frequency  | up to 168MHz |
+| FPU        | yes               |
+| Timers | 14 (12x 16bit, 2x 32bit [TIM2 + TIM5])    |
+| ADCs       | 3x 16 channel 6 to 12-bit         |
+| UARTs      | 6                 |
+| SPIs       | 3                 |
+| I2Cs       | 3                 |
+| Vcc        | 2.0V - 3.6V           |
+| Datasheet  | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f405rg.pdf) |
+| Reference Manual | [Reference Manual](http://www.st.com/web/en/resource/technical/document/reference_manual/DM00031936.pdf) |
+| Programming Manual | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00046982.pdf) |
+| Board Manual   | [Board Manual](https://www.olimex.com/Products/ARM/ST/STM32-P405/resources/STM32-P405_UM.pdf)|
+
+## Implementation Status
+
+| Device | ID        | Supported | Comments  |
+|:------------- |:------------- |:------------- |:------------- |
+| MCU        | STM32F405RG   | partly    | Energy saving modes not fully utilized |
+| Low-level driver | GPIO    | yes       | |
+|        | UART      | 2 UARTs       | USART2 via RS232_2 and USART1 on UEXT connector |
+|        | USB       | no        | |
+|        | Timer     | 2 32 bit timers       | |
+
+## Flashing the device
+
+For flashing the board, I use an Olimex ARM-USB-OCB-H.
+The easiest way to program the board is to use OpenOCD. Once you have installed
+OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
+installation instructions), you can flash the board simply by typing
+
+```
+make BOARD=olimex-stm32-p405 flash
+```
+and debug via GDB by simply typing
+```
+make BOARD=olimex-stm32-p405 debug
+```
+
+## Supported Toolchains
+
+For using the Olimex STM32-P405 board we strongly recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-
+embedded)
+toolchain.
