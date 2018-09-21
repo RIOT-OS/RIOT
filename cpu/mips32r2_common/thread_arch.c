@@ -35,6 +35,15 @@
 #define MM_SYSCALL         (0x8B7C0000)
 #define MM_SYSCALL_MASK    (0xfffffc00)
 
+/* For backwards compatibility with mips-mti-elf toolchain release 2016.05-03
+ * This macro definition mimics the definition in newer toolchains */
+#if !defined(_MIPS_HAL_NOMIPS16)
+#ifdef __mips16
+# define _MIPS_HAL_NOMIPS16 __attribute__((nomips16))
+#else
+# define _MIPS_HAL_NOMIPS16
+#endif
+#endif /* !defined(_MIPS_HAL_NOMIPS16) */
 
 #ifdef MIPS_HARD_FLOAT
 /* pointer to the current and old fpu context for lazy context switching */
@@ -182,11 +191,8 @@ mem_rw(const void *vaddr)
 extern int _dsp_save(struct dspctx *ctx);
 extern int _dsp_load(struct dspctx *ctx);
 #endif
-/*
- * The nomips16 attribute should not really be needed, it works around a toolchain
- * issue in 2016.05-03.
- */
-void __attribute__((nomips16))
+
+void _MIPS_HAL_NOMIPS16
 _mips_handle_exception(struct gpctx *ctx, int exception)
 {
     unsigned int syscall_num = 0;
