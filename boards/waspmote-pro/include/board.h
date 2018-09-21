@@ -151,6 +151,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name CPU clock scale for waspmote-pro
+ *
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
+/** @} */
+
+/**
  * @name    xtimer configuration values
  * @{
  */
