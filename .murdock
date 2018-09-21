@@ -166,7 +166,7 @@ compile() {
                     BOARD=$board make -C${appdir} test
                     RES=$?
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
-                    BOARD=$board make -C${appdir} test-murdock
+                    BOARD=$board TOOLCHAIN=$toolchain make -C${appdir} test-murdock
                     RES=$?
                 fi
             fi
