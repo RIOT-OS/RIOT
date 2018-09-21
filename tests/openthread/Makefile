@@ -3,7 +3,10 @@ APPLICATION = openthread
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
 
-BOARD_WHITELIST := samr21-xpro iotlab-m3 fox iotlab-a8-m3
+BOARD_WHITELIST := samr21-xpro \
+                   iotlab-m3 \
+                   fox \
+                   iotlab-a8-m3
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
