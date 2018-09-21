@@ -76,6 +76,11 @@ typedef struct {
     uint8_t     chn;    /**< number of channels [1,2] */
 } timer_conf_t;
 
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+
 #endif /* ifndef DOXYGEN */
 
 #ifdef __cplusplus
