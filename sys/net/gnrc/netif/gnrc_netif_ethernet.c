@@ -15,6 +15,8 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <string.h>
+
 #ifdef MODULE_NETDEV_ETH
 #include "net/ethernet/hdr.h"
 #include "net/gnrc.h"

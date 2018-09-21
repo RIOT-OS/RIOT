@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdatomic.h>
+#include <string.h>
 
 #include "assert.h"
 #include "net/gcoap.h"
