@@ -27,6 +27,7 @@
 
 #include "em_gpio.h"
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   Number of external interrupt lines.
  */
@@ -36,6 +37,7 @@
  * @brief   Hold one interrupt context per interrupt line
  */
 static gpio_isr_ctx_t isr_ctx[NUMOF_IRQS];
+#endif
 
 static inline GPIO_Port_TypeDef _port_num(gpio_t pin)
 {
@@ -45,11 +47,6 @@ static inline GPIO_Port_TypeDef _port_num(gpio_t pin)
 static inline uint32_t _pin_num(gpio_t pin)
 {
     return (pin & 0x0f);
-}
-
-static inline uint32_t _pin_mask(gpio_t pin)
-{
-    return (1 << _pin_num(pin));
 }
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
@@ -70,6 +67,42 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 #endif
 
     return 0;
+}
+
+int gpio_read(gpio_t pin)
+{
+    return GPIO_PinInGet(_port_num(pin), _pin_num(pin));
+}
+
+void gpio_set(gpio_t pin)
+{
+    GPIO_PinOutSet(_port_num(pin), _pin_num(pin));
+}
+
+void gpio_clear(gpio_t pin)
+{
+    GPIO_PinOutClear(_port_num(pin), _pin_num(pin));
+}
+
+void gpio_toggle(gpio_t pin)
+{
+    GPIO_PinOutToggle(_port_num(pin), _pin_num(pin));
+}
+
+void gpio_write(gpio_t pin, int value)
+{
+    if (value) {
+        GPIO_PinOutSet(_port_num(pin), _pin_num(pin));
+    }
+    else {
+        GPIO_PinOutClear(_port_num(pin), _pin_num(pin));
+    }
+}
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+static inline uint32_t _pin_mask(gpio_t pin)
+{
+    return (1 << _pin_num(pin));
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
@@ -111,36 +144,6 @@ void gpio_irq_disable(gpio_t pin)
     GPIO_IntDisable(_pin_mask(pin));
 }
 
-int gpio_read(gpio_t pin)
-{
-    return GPIO_PinInGet(_port_num(pin), _pin_num(pin));
-}
-
-void gpio_set(gpio_t pin)
-{
-    GPIO_PinOutSet(_port_num(pin), _pin_num(pin));
-}
-
-void gpio_clear(gpio_t pin)
-{
-    GPIO_PinOutClear(_port_num(pin), _pin_num(pin));
-}
-
-void gpio_toggle(gpio_t pin)
-{
-    GPIO_PinOutToggle(_port_num(pin), _pin_num(pin));
-}
-
-void gpio_write(gpio_t pin, int value)
-{
-    if (value) {
-        GPIO_PinOutSet(_port_num(pin), _pin_num(pin));
-    }
-    else {
-        GPIO_PinOutClear(_port_num(pin), _pin_num(pin));
-    }
-}
-
 /**
  * @brief   Actual interrupt handler for both even and odd pin index numbers.
  */
@@ -170,3 +173,4 @@ void isr_gpio_odd(void)
 {
     gpio_irq();
 }
+#endif
