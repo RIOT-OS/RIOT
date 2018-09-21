@@ -31,10 +31,23 @@ BOARD_INSUFFICIENT_MEMORY := blackpill \
                              spark-core \
                              stm32f0discovery
 
-BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno \
-                   chronos hifive1 jiminy-mega256rfr2 mega-xplained mips-malta \
-                   msb-430 msb-430h pic32-clicker pic32-wifire telosb \
-                   waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
+BOARD_BLACKLIST := arduino-duemilanove \
+                   arduino-mega2560 \
+                   arduino-uno \
+                   chronos \
+                   hifive1 \
+                   jiminy-mega256rfr2 \
+                   mega-xplained \
+                   mips-malta \
+                   msb-430 \
+                   msb-430h \
+                   pic32-clicker \
+                   pic32-wifire \
+                   telosb \
+                   waspmote-pro \
+                   wsn430-v1_3b \
+                   wsn430-v1_4 \
+                   z1
 
 
 # Comment this out to disable code in RIOT that does safety checking
