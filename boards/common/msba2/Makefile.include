@@ -1,8 +1,5 @@
 BOARDS_COMMON_MSBA2_DIR := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
-## the cpu to build for
-export CPU = lpc2387
-
 # Compile `lpc2k_pgm` when required
 # It is still compiling in `boards` as it was the case before introducing the
 # rule to autobuild

@@ -1,3 +1,6 @@
+CPU = sam3
+CPU_MODEL = sam3x8e
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dac
@@ -9,5 +12,3 @@ FEATURES_PROVIDED += periph_uart
 
 # Various other features (if any)
 FEATURES_PROVIDED += arduino
-
-include $(RIOTCPU)/sam3/Makefile.features

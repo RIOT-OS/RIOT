@@ -1,1 +1,1 @@
-include $(RIOTCPU)/lpc2387/Makefile.features
+CPU = lpc2387
