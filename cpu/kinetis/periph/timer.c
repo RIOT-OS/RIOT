@@ -379,38 +379,26 @@ static inline uint16_t lptmr_read(uint8_t dev)
 }
 
 /**
- * @brief Reload the timer with the given timeout, or spin if timeout is too small
+ * @brief Reload the timer with the given timeout
  *
  * @pre IRQs masked, timer running
  */
-static inline void lptmr_reload_or_spin(uint8_t dev, uint16_t timeout)
+static inline void lptmr_reload(uint8_t dev, uint16_t timeout)
 {
     LPTMR_Type *hw = lptmr_config[dev].dev;
     /* Disable timer and set target, 1 to 2 ticks will be dropped by the
      * hardware during the disable-enable cycle */
     /* Disable the timer interrupt first */
     hw->CSR = LPTMR_CSR_TEN_MASK | LPTMR_CSR_TFC_MASK;
-    if (timeout <= LPTMR_RELOAD_OVERHEAD) {
-        /* we spin if the timeout is too short to reload the timer */
-        hw->CNR = 0;
-        uint16_t cnr_begin = hw->CNR;
-        while ((hw->CNR - cnr_begin) <= timeout) {
-            hw->CNR = 0;
-        }
-        /* Emulate IRQ handler behaviour */
-        lptmr[dev].running = 0;
-        if (lptmr[dev].isr_ctx.cb != NULL) {
-            lptmr[dev].isr_ctx.cb(lptmr[dev].isr_ctx.arg, 0);
-        }
-        thread_yield_higher();
-        return;
+    if (timeout >= LPTMR_RELOAD_OVERHEAD) {
+        timeout -= LPTMR_RELOAD_OVERHEAD;
     }
     /* Update reference */
     hw->CNR = 0;
     lptmr[dev].cnr += hw->CNR + LPTMR_RELOAD_OVERHEAD;
     /* Disable timer */
     hw->CSR = 0;
-    hw->CMR = timeout - LPTMR_RELOAD_OVERHEAD;
+    hw->CMR = timeout;
     /* Enable timer and IRQ */
     hw->CSR = LPTMR_CSR_TEN_MASK | LPTMR_CSR_TFC_MASK | LPTMR_CSR_TIE_MASK;
 }
@@ -431,7 +419,7 @@ static inline int lptmr_set(uint8_t dev, uint16_t timeout)
             lptmr[dev].cmr = 0;
         }
     }
-    else if (hw->CSR & LPTMR_CSR_TCF_MASK) {
+    else if ((timeout > 0) && (hw->CSR & LPTMR_CSR_TCF_MASK)) {
         /* TCF is set, safe to update CMR live */
         hw->CNR = 0;
         hw->CMR = timeout + hw->CNR;
@@ -442,7 +430,7 @@ static inline int lptmr_set(uint8_t dev, uint16_t timeout)
         hw->CSR = LPTMR_CSR_TEN_MASK | LPTMR_CSR_TFC_MASK | LPTMR_CSR_TIE_MASK;
     }
     else {
-        lptmr_reload_or_spin(dev, timeout);
+        lptmr_reload(dev, timeout);
     }
     irq_restore(mask);
     return 1;
@@ -476,7 +464,7 @@ static inline int lptmr_set_absolute(uint8_t dev, uint16_t target)
     }
     else {
         uint16_t timeout = target - lptmr_read(dev);
-        lptmr_reload_or_spin(dev, timeout);
+        lptmr_reload(dev, timeout);
     }
     irq_restore(mask);
     return 1;
