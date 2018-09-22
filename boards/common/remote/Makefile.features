@@ -1,0 +1,1 @@
+include $(RIOTCPU)/cc2538/Makefile.features
