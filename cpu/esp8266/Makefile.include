@@ -29,7 +29,6 @@ endif
 
 # regular Makefile
 
-export CPU ?= esp8266
 export TARGET_ARCH ?= xtensa-lx106-elf
 
 # ESP8266 pseudomodules
