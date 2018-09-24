@@ -41,7 +41,11 @@ void pm_set(unsigned mode)
             default: /* Falls through */
             case 2:
                 DEBUG("pm_set(): setting IDLE mode.\n");
+#ifdef CPU_MODEL_SAMR30G18A
+                _mode = PM_SLEEPCFG_SLEEPMODE_IDLE;
+#else
                 _mode = PM_SLEEPCFG_SLEEPMODE_IDLE2;
+#endif
                 break;
         }
 
