@@ -1192,6 +1192,11 @@ static void _update_l2addr_from_dev(gnrc_netif_t *netif)
     if (res != -ENOTSUP) {
         netif->flags |= GNRC_NETIF_FLAGS_HAS_L2ADDR;
     }
+    else {
+        /* If no address is provided but still an address length given above,
+         * we are in an invalid state */
+        assert(netif->l2addr_len == 0);
+    }
     if (res > 0) {
         netif->l2addr_len = res;
     }
