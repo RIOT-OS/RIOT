@@ -391,7 +391,14 @@ endif
 
 ifneq (,$(filter stdio_uart,$(USEMODULE)))
   USEMODULE += isrpipe
-  FEATURES_REQUIRED += periph_uart
+  ifneq (,$(filter newlib_syscalls_mips_uhi,$(USEMODULE)))
+    # The periph_uart driver is optional when using MIPS UHI syscalls (debug
+    # UART is used on PIC32 boards, but not on mips-malta)
+    FEATURES_OPTIONAL += periph_uart
+  else
+    # All other UART implementations require the periph_uart driver.
+    FEATURES_REQUIRED += periph_uart
+  endif
 endif
 
 ifneq (,$(filter isrpipe,$(USEMODULE)))
