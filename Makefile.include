@@ -434,6 +434,11 @@ else
   _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
 
+# include bootloaders support. When trying to overwrite one variable
+# like HEXFILE, the value will already have been evaluated when declaring
+# the link target. Therefore, it must be placed before `link`.
+include $(RIOTMAKE)/boot/riotboot.mk
+
 ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
