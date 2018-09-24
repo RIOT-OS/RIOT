@@ -121,14 +121,16 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
     size_t bytes_left = len - 1;
     char *pos = resp_buf;
 
-    memset(resp_buf, '\0', len);
-
     at_drain(dev);
 
     res = at_send_cmd(dev, command, timeout);
     if (res) {
         goto out;
     }
+
+    /* only clear the response buffer after sending the command,
+     * so the same buffer can be used for command and response */
+    memset(resp_buf, '\0', len);
 
     while (1) {
         res = at_readline(dev, pos, bytes_left, keep_eol, timeout);
