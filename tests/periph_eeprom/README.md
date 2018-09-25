@@ -10,6 +10,9 @@ internal EEPROM memory.
     # Write HelloWorld starting from the 10th position in the eeprom
     > write 10 HelloWorld
 
+    # Test EEPROM access speed (TEST_BUFFER_SIZE bytes starting from 0)
+    > test
+
 Background
 ==========
 

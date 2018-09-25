@@ -25,9 +25,14 @@
 #include "shell.h"
 
 #include "periph/eeprom.h"
+#include "xtimer.h"
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE     (42U)
+#endif
+
+#ifndef TEST_BUFFER_SIZE
+#define TEST_BUFFER_SIZE    (256U)
 #endif
 
 static char buffer[BUFFER_SIZE + 1];
@@ -98,10 +103,49 @@ static int cmd_write(int argc, char **argv)
     return 0;
 }
 
+static int cmd_test(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    uint8_t bytes[TEST_BUFFER_SIZE] = { 0 };
+    eeprom_write(0, bytes, TEST_BUFFER_SIZE);
+    uint32_t start, stop;
+
+    for (uint32_t i = 0; i < TEST_BUFFER_SIZE; i ++) {
+        bytes[i] = i;
+    }
+
+    printf("Writing %u bytes to clean EEPROM: ", TEST_BUFFER_SIZE);
+    start = xtimer_now_usec();
+    eeprom_write(0, bytes, TEST_BUFFER_SIZE);
+    stop = xtimer_now_usec();
+    printf("%" PRIu32 " usec\n", stop - start);
+
+    for (uint32_t i = 0; i < TEST_BUFFER_SIZE; i ++) {
+        bytes[i] = TEST_BUFFER_SIZE - i;
+    }
+
+    printf("Writing %u bytes to dirty EEPROM: ", TEST_BUFFER_SIZE);
+    start = xtimer_now_usec();
+    eeprom_write(0, bytes, TEST_BUFFER_SIZE);
+    stop = xtimer_now_usec();
+    printf("%" PRIu32 " usec\n", stop - start);
+
+    printf("Reading %u bytes from EEPROM: ", TEST_BUFFER_SIZE);
+    start = xtimer_now_usec();
+    eeprom_read(0, bytes, TEST_BUFFER_SIZE);
+    stop = xtimer_now_usec();
+    printf("%" PRIu32 " usec\n", stop - start);
+
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "info", "Print information about eeprom", cmd_info },
     { "read", "Read bytes from eeprom", cmd_read },
     { "write", "Write bytes to eeprom", cmd_write},
+    { "test", "Test write and read speed", cmd_test},
     { NULL, NULL, NULL }
 };
 
