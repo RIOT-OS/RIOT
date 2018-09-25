@@ -191,7 +191,7 @@ serial_to_tun(FILE *inslip, int outfd)
     } uip;
     static unsigned int inbufptr = 0;
     /* cppcheck-suppress variableScope
-     * rationale: cannot be reduced if built on linux */
+     * (reason: cannot be reduced if built on linux) */
     int ret;
     unsigned char c;
 
@@ -651,7 +651,7 @@ devopen(const char *dev, int flags)
     char t[1024];
     strcpy(t, "/dev/");
     /* cppcheck-suppress bufferAccessOutOfBounds
-     * reason: seems to be a cppcheck bug */
+     * (reason: seems to be a bug in cppcheck 1.7x) */
     strncat(t, dev, sizeof(t) - 5);
     return open(t, flags);
 }

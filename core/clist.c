@@ -78,6 +78,8 @@ clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
             for (i = 0; i < insize; i++) {
                 psize++;
                 q = (q->next == oldhead) ? NULL : q->next;
+                /* cppcheck-suppress nullPointer
+                 * (reason: possible bug in cppcheck 1.6x) */
                 if (!q) {
                     break;
                 }
@@ -134,7 +136,8 @@ clist_node_t *_clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
             p = q;
         }
 
-        /* cppcheck-suppress nullPointer */
+        /* cppcheck-suppress nullPointer
+         * (reason: tail cannot be NULL at this point, because list != NULL) */
         tail->next = list;
 
         /* If we have done only one merge, we're finished. */

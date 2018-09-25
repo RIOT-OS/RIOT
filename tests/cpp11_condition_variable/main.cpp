@@ -53,7 +53,7 @@ int main() {
     {
       lock_guard<mutex> lk(m);
       /* cppcheck-suppress unreadVariable
-       * (reason variable is read in the thread created above) */
+       * (reason: variable is read in the thread created above) */
       ready = true;
       cv.notify_one();
     }

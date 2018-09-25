@@ -218,8 +218,8 @@ float adt7310_read_float(const adt7310_t *dev)
 {
     int16_t raw = adt7310_read_raw(dev);
     if (raw == INT16_MIN) {
-        /* ignore cppcheck: we want to create a NaN here */
-        /* cppcheck-suppress duplicateExpression */
+        /* cppcheck-suppress duplicateExpression
+         * (reason: we want to create a NaN here) */
         return (0.0f / 0.0f); /* return NaN */
     }
     if (!dev->high_res) {
