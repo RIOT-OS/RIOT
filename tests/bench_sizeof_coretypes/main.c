@@ -100,11 +100,12 @@ int main(void)
     P(msg_queue);
     P(msg_array);
 #endif
-#ifdef DEVELHELP
-    P(name);
-#endif
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
     P(stack_start);
+#endif
+#ifdef DEVELHELP
+    P(name);
+    P(stack_size);
 #endif
 
     puts("\n[SUCCESS]");
