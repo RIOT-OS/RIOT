@@ -69,8 +69,8 @@ void TimerSetValue(TimerEvent_t *obj, uint32_t value)
 
 TimerTime_t TimerGetCurrentTime(void)
 {
-    uint64_t CurrentTime = xtimer_now_usec64();
-    return (TimerTime_t)CurrentTime / US_PER_MS;
+    uint64_t CurrentTime = xtimer_now_usec64() / US_PER_MS;
+    return (TimerTime_t)CurrentTime;
 }
 
 TimerTime_t TimerGetElapsedTime(TimerTime_t savedTime)
