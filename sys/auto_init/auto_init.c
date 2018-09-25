@@ -428,6 +428,10 @@ auto_init_mpu9150();
     extern void auto_init_mma7660(void);
     auto_init_mma7660();
 #endif
+#ifdef MODULE_CCS811
+    extern void auto_init_ccs811(void);
+    auto_init_ccs811();
+#endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
 
