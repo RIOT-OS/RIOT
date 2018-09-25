@@ -1,7 +1,7 @@
 #!/bin/sh
 
 : ${TEST_BOARDS_AVAILABLE:="samr21-xpro"}
-: ${TEST_BOARDS_LLVM_COMPILE:="native"}
+: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 
 export RIOT_CI_BUILD=1
 export STATIC_TESTS=${STATIC_TESTS:-1}
@@ -166,7 +166,7 @@ compile() {
                     BOARD=$board make -C${appdir} test
                     RES=$?
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
-                    BOARD=$board make -C${appdir} test-murdock
+                    BOARD=$board TOOLCHAIN=$toolchain make -C${appdir} test-murdock
                     RES=$?
                 fi
             fi
