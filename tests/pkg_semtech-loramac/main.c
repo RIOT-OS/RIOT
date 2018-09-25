@@ -353,11 +353,17 @@ static int _cmd_loramac(int argc, char **argv)
         }
 
         switch (semtech_loramac_join(&loramac, join_type)) {
-            case SEMTECH_LORAMAC_RESTRICTED:
-                puts("Cannot join: all channels are blocked (duty cycle)!");
+            case SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED:
+                puts("Cannot join: dutycycle restriction");
+                return 1;
+            case SEMTECH_LORAMAC_BUSY:
+                puts("Cannot join: mac is busy");
                 return 1;
             case SEMTECH_LORAMAC_JOIN_FAILED:
                 puts("Join procedure failed!");
+                return 1;
+            case SEMTECH_LORAMAC_ALREADY_JOINED:
+                puts("Warning: already joined!");
                 return 1;
             case SEMTECH_LORAMAC_JOIN_SUCCEEDED:
                 puts("Join procedure succeeded!");
@@ -420,9 +426,17 @@ static int _cmd_loramac(int argc, char **argv)
                        (char *)loramac.rx_data.payload, loramac.rx_data.port);
                 break;
 
-            case SEMTECH_LORAMAC_TX_CNF_FAILED:
-                puts("Confirmable TX failed");
-                break;
+            case SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED:
+                puts("Cannot send: dutycycle restriction");
+                return 1;
+
+            case SEMTECH_LORAMAC_BUSY:
+                puts("Cannot send: MAC is busy");
+                return 1;
+
+            case SEMTECH_LORAMAC_TX_ERROR:
+                puts("Cannot send: error");
+                return 1;
 
             case SEMTECH_LORAMAC_TX_DONE:
                 puts("TX complete, no data received");
