@@ -83,7 +83,7 @@ def main():
                       res_locals['input'], res_locals['result'],
                       res_locals['expected'], abs_error, ABS_ERROR_LIMIT))
                 errors += 1
-        except:
+        except:  # noqa: E722
             errors += 1
             print('ERROR {}'.format(line))
 
