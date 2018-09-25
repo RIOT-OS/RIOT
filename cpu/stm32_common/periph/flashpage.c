@@ -52,6 +52,7 @@
 
 extern void _lock(void);
 extern void _unlock(void);
+extern void _wait_for_pending_operations(void);
 
 static void _unlock_flash(void)
 {
@@ -67,17 +68,6 @@ static void _unlock_flash(void)
         }
     }
 #endif
-}
-
-static void _wait_for_pending_operations(void)
-{
-    DEBUG("[flashpage] waiting for any pending operation to finish\n");
-    while (FLASH->SR & FLASH_SR_BSY) {}
-
-    /* Clear 'end of operation' bit in status register */
-    if (FLASH->SR & FLASH_SR_EOP) {
-        FLASH->SR &= ~(FLASH_SR_EOP);
-    }
 }
 
 static void _erase_page(void *page_addr)
