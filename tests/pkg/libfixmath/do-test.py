@@ -75,14 +75,13 @@ def main():
             res_locals['input'], res_locals['expected'] = map(str.strip, line.split('='))
             exec('result = {}'.format(res_locals['input']), FUNS, res_locals)
 
-            abs_error = abs(res_locals['result'] -
-                    float(res_locals['expected']))
+            abs_error = (abs(res_locals['result'] -
+                         float(res_locals['expected'])))
             res_locals['result'] = '{:.4f}'.format(res_locals['result'])
             if abs_error > ABS_ERROR_LIMIT:
                 print('{}: {} != {}, {:.4f} > {}'.format(
-                    res_locals['input'], res_locals['result'],
-                    res_locals['expected'], abs_error, ABS_ERROR_LIMIT)
-                    )
+                      res_locals['input'], res_locals['result'],
+                      res_locals['expected'], abs_error, ABS_ERROR_LIMIT))
                 errors += 1
         except:
             errors += 1
