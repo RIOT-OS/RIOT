@@ -36,17 +36,15 @@ extern "C" {
  * @name    Definitions for messages exchanged between the MAC and call threads
  * @{
  */
-#define MSG_TYPE_ISR                   (0x3456)  /**< radio device ISR */
-#define MSG_TYPE_RX_TIMEOUT            (0x3457)  /**< radio driver RX timeout */
-#define MSG_TYPE_TX_TIMEOUT            (0x3458)  /**< radio driver TX timeout */
-#define MSG_TYPE_MAC_TIMEOUT           (0x3459)  /**< MAC timers timeout */
-#define MSG_TYPE_LORAMAC_CMD           (0x3460)  /**< Command sent to the MAC */
-#define MSG_TYPE_LORAMAC_JOIN          (0x3461)  /**< MAC join event */
-#define MSG_TYPE_LORAMAC_TX_DONE       (0x3462)  /**< MAC TX completes */
-#define MSG_TYPE_LORAMAC_RX            (0x3463)  /**< Some data received */
-#define MSG_TYPE_LORAMAC_LINK_CHECK    (0x3464)  /**< Link check info received */
-#define MSG_TYPE_LORAMAC_TX_CNF_FAILED (0x3465)  /**< MAC TX confirmed failed */
-#define MSG_TYPE_LORAMAC_TX_SCHEDULE   (0x3466)  /**< MAC TX schedule */
+#define MSG_TYPE_ISR                   (0x3456) /**< radio device ISR */
+#define MSG_TYPE_RX_TIMEOUT            (0x3457) /**< radio driver RX timeout */
+#define MSG_TYPE_TX_TIMEOUT            (0x3458) /**< radio driver TX timeout */
+#define MSG_TYPE_MAC_TIMEOUT           (0x3459) /**< MAC timers timeout */
+#define MSG_TYPE_LORAMAC_CMD           (0x3460) /**< Command sent to the MAC */
+#define MSG_TYPE_LORAMAC_JOIN          (0x3461) /**< MAC join event */
+#define MSG_TYPE_LORAMAC_TX_STATUS     (0x3462) /**< MAC TX status */
+#define MSG_TYPE_LORAMAC_RX            (0x3463) /**< Some data received */
+#define MSG_TYPE_LORAMAC_LINK_CHECK    (0x3464) /**< Link check info received */
 /** @} */
 
 /**
@@ -58,15 +56,18 @@ extern "C" {
  * @brief   LoRaMAC return status
  */
 enum {
-    SEMTECH_LORAMAC_JOIN_SUCCEEDED,              /**< Join procedure succeeded */
-    SEMTECH_LORAMAC_JOIN_FAILED,                 /**< Join procedure failed */
-    SEMTECH_LORAMAC_NOT_JOINED,                  /**< MAC is not joined */
-    SEMTECH_LORAMAC_TX_SCHEDULED,                /**< TX data scheduled */
-    SEMTECH_LORAMAC_TX_DONE,                     /**< Transmission completed */
-    SEMTECH_LORAMAC_TX_CNF_FAILED,               /**< Confirmable transmission failed */
-    SEMTECH_LORAMAC_DATA_RECEIVED,               /**< Data received */
-    SEMTECH_LORAMAC_BUSY,                /**< Internal MAC is busy */
-    SEMTECH_LORAMAC_RESTRICTED           /**< Restricted access to channels */
+    SEMTECH_LORAMAC_JOIN_SUCCEEDED,             /**< Join procedure succeeded */
+    SEMTECH_LORAMAC_JOIN_FAILED,                /**< Join procedure failed */
+    SEMTECH_LORAMAC_NOT_JOINED,                 /**< MAC is not joined */
+    SEMTECH_LORAMAC_ALREADY_JOINED,             /**< MAC is already joined */
+    SEMTECH_LORAMAC_TX_OK,                      /**< Transmission is in progress */
+    SEMTECH_LORAMAC_TX_SCHEDULE,                /**< TX needs reschedule */
+    SEMTECH_LORAMAC_TX_DONE,                    /**< Transmission completed */
+    SEMTECH_LORAMAC_TX_CNF_FAILED,              /**< Confirmable transmission failed */
+    SEMTECH_LORAMAC_TX_ERROR,                   /**< Error in TX (invalid param, unknown service) */
+    SEMTECH_LORAMAC_DATA_RECEIVED,              /**< Data received */
+    SEMTECH_LORAMAC_BUSY,                       /**< Internal MAC is busy */
+    SEMTECH_LORAMAC_DUTYCYCLE_RESTRICTED        /**< Restricted access to channels */
 };
 
 /**
@@ -108,7 +109,6 @@ typedef struct {
  */
 typedef struct {
     mutex_t lock;                                /**< loramac access lock */
-    uint8_t state;                               /**< internal loramac state */
     uint8_t caller_pid;                          /**< pid of caller thread */
     uint8_t port;                                /**< application TX port */
     uint8_t cnf;                                 /**< enable/disable confirmable messages */
