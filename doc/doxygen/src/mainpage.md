@@ -36,13 +36,13 @@ RIOT is developed by an open community that anyone is welcome to join:
    here](https://lists.riot-os.org/pipermail/users/).
  - [Subscribe](http://lists.riot-os.org/mailman/listinfo/devel) to
    devel@riot-os.org to follow and discuss kernel and network stack
-   developement, or hardware support. An archive of this list [is available
+   development, or hardware support. An archive of this list [is available
    here](https://lists.riot-os.org/pipermail/devel/).
  - Follow us on [Twitter](https://twitter.com/RIOT_OS) for news from the RIOT
    community.
  - Regarding critical vulnerabilities we would appreciate if you give us a
    90-days head-start by reporting to security@riot-os.org, before making your
-   information publically available
+   information publicly available
  - Contact us on IRC for live support and discussions:
    [irc.freenode.org \#riot-os](irc://irc.freenode.org/riot-os)
 
@@ -67,7 +67,7 @@ make term
 
 ... and you are in the RIOT shell!
 Type `help` to discover available commands. For further information see the
-[README of the `default` example](https://github.com/RIOT-OS/RIOT/tree/).
+[README of the `default` example](https://github.com/RIOT-OS/RIOT/tree/master/examples/default).
 
 To use RIOT directly on your embedded platform, and for more hands-on details
 with RIOT, see @ref getting-started.
@@ -150,7 +150,7 @@ scheme. Examples for this is code shared across architectures (e.g.
 `cortexm_common`, `msp430_comon`) or code shared among vendors (e.g.
 `stm32_common`).
 
-See @ref cpu for more detailed informtation.
+See @ref cpu for more detailed information.
 
 drivers
 -------
