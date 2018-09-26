@@ -71,6 +71,10 @@ extern "C" {
 /* TODO: Make this value overall MTU dependent */
 #   define GNRC_PKTBUF_SIZE                 (2560)
 #endif
+
+#ifndef GNRC_IPV6_STACK_SIZE
+#   define GNRC_IPV6_STACK_SIZE             (512)
+#endif
 /** @} */
 
 #ifdef __cplusplus
