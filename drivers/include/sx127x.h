@@ -173,8 +173,8 @@ typedef struct {
     uint8_t coderate;                  /**< Error coding rate */
     uint8_t freq_hop_period;           /**< Frequency hop period */
     uint8_t flags;                     /**< Boolean flags */
-    uint32_t rx_timeout;               /**< RX timeout in symbols */
-    uint32_t tx_timeout;               /**< TX timeout in symbols */
+    uint32_t rx_timeout;               /**< RX timeout in microseconds */
+    uint32_t tx_timeout;               /**< TX timeout in microseconds */
 } sx127x_lora_settings_t;
 
 /**

@@ -4,4 +4,6 @@ SRCS := utilities.c
 
 CFLAGS += -Wno-sign-compare
 
+INCLUDES += -I$(PKGDIRBASE)/semtech-loramac/src/boards
+
 include $(RIOTBASE)/Makefile.base

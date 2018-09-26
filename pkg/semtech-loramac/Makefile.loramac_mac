@@ -2,4 +2,7 @@ MODULE := semtech_loramac_mac
 
 CFLAGS += -Wno-sign-compare
 
+INCLUDES += -I$(PKGDIRBASE)/semtech-loramac/src/boards \
+            -I$(PKGDIRBASE)/semtech-loramac/src/radio
+
 include $(RIOTBASE)/Makefile.base
