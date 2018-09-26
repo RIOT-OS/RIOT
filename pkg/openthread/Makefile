@@ -1,7 +1,7 @@
 PKG_NAME=openthread
 PKG_URL=https://github.com/openthread/openthread.git
 PKG_VERSION=fbfd76a990b81f007957e1bd774e51bce742e53e
-PKG_BUILDDIR ?= $(BINDIRBASE)/pkg/$(BOARD)/$(PKG_NAME)
+PKG_BUILDDIR ?= $(PKGDIRBASE)/$(PKG_NAME)
 
 $(info Compile OpenThread for FTD device)
 OPENTHREAD_ARGS+= --enable-cli-app=ftd --enable-application-coap

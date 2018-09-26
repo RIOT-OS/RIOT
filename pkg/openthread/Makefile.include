@@ -1,8 +1,8 @@
 OPENTHREAD_DIR = $(RIOTBASE)/pkg/openthread
 
 INCLUDES += -I$(OPENTHREAD_DIR)/include \
-            -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/output/include \
-            -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include/openthread \
+            -I$(PKGDIRBASE)/openthread/output/include \
+            -I$(PKGDIRBASE)/openthread/include/openthread \
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   DIRS += $(OPENTHREAD_DIR)/contrib
