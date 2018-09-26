@@ -647,7 +647,6 @@ typedef struct gcoap_listener {
 
 /**
  * @brief   Forward declaration of the request memo type
- *
  */
 typedef struct gcoap_request_memo gcoap_request_memo_t;
 
@@ -684,6 +683,7 @@ struct gcoap_request_memo {
                                              supports resending message */
     sock_udp_ep_t remote_ep;            /**< Remote endpoint */
     gcoap_resp_handler_t resp_handler;  /**< Callback for the response */
+    void *context;                      /**< ptr to user defined context data */
     xtimer_t response_timer;            /**< Limits wait for response */
     msg_t timeout_msg;                  /**< For response timer */
 };
@@ -782,13 +782,14 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @param[in] len           Length of the buffer
  * @param[in] remote        Destination for the packet
  * @param[in] resp_handler  Callback when response received, may be NULL
+ * @param[in] context       User defined context passed to the response handler
  *
  * @return  length of the packet
  * @return  0 if cannot send
  */
 size_t gcoap_req_send(const uint8_t *buf, size_t len,
                       const sock_udp_ep_t *remote,
-                      gcoap_resp_handler_t resp_handler);
+                      gcoap_resp_handler_t resp_handler, void *context);
 
 /**
  * @brief   Sends a buffer containing a CoAP request to the provided endpoint
@@ -800,15 +801,17 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
  * @param[in] len           Length of the buffer
  * @param[in] remote        Destination for the packet
  * @param[in] resp_handler  Callback when response received, may be NULL
+ * @param[in] context       User defined context passed to the response handler
  *
  * @return  length of the packet
  * @return  0 if cannot send
  */
 static inline size_t gcoap_req_send2(const uint8_t *buf, size_t len,
                                      const sock_udp_ep_t *remote,
-                                     gcoap_resp_handler_t resp_handler)
+                                     gcoap_resp_handler_t resp_handler,
+                                     void *context)
 {
-    return gcoap_req_send(buf, len, remote, resp_handler);
+    return gcoap_req_send(buf, len, remote, resp_handler, context);
 }
 
 /**
