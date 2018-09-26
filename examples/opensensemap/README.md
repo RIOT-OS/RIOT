@@ -102,8 +102,8 @@ SenseBox configuration!**
 
     /* Write data to serialization. Replace with your sensors measurements. */
     lora_serialization_write_temperature(&serialization, 25.3);
-    lora_serialization_write_humidity(&serialization, 50.2);
     lora_serialization_write_uint8(&serialization, 82);
+    lora_serialization_write_humidity(&serialization, 50.2);
 ```
 
 ### Build and Flash
