@@ -94,17 +94,20 @@ int main(void)
     P(flags);
 #endif
     P(rq_entry);
-#ifdef MODULE_CORE_MSG
+#if defined(MODULE_CORE_MSG) || defined(MODULE_CORE_THREAD_FLAGS) || defined(MODULE_CORE_MBOX)
     P(wait_data);
+#endif
+#ifdef MODULE_CORE_MSG
     P(msg_waiters);
     P(msg_queue);
     P(msg_array);
 #endif
-#ifdef DEVELHELP
-    P(name);
-#endif
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) || defined(MODULE_MPU_STACK_GUARD)
     P(stack_start);
+#endif
+#ifdef DEVELHELP
+    P(name);
+    P(stack_size);
 #endif
 
     puts("\n[SUCCESS]");
