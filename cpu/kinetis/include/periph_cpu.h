@@ -274,11 +274,39 @@ typedef enum {
  * @brief   CPU specific ADC configuration
  */
 typedef struct {
-    ADC_Type *dev;          /**< ADC device */
-    gpio_t pin;             /**< pin to use, set to GPIO_UNDEF for internal
-                             *   channels */
-    uint8_t chan;           /**< ADC channel */
+    /**
+     * @brief   ADC module
+     */
+    ADC_Type *dev;
+    /**
+     * @brief   pin to use
+     *
+     * Use GPIO_UNDEF non-muxed ADC pins, e.g. ADC0_DP, or for internal channels, e.g. Bandgap
+     */
+    gpio_t pin;
+    /**
+     * @brief   ADC channel
+     *
+     * Written as-is to ADCx_SC1x before conversion. This also decides
+     * single-ended or differential sampling, see CPU reference manual for ADCx_SC1x
+     */
+    uint8_t chan;
+    /**
+     * @brief   Hardware averaging configuration
+     *
+     * Written as-is to ADCx_SC3 before conversion, use @ref ADC_AVG_NONE and
+     * @ref ADC_AVG_MAX as a shorthand notation in the board configuration */
+    uint8_t avg;
 } adc_conf_t;
+
+/**
+ * @brief   Disable hardware averaging
+ */
+#define ADC_AVG_NONE    (0)
+/**
+ * @brief   Maximum hardware averaging (32 samples)
+ */
+#define ADC_AVG_MAX     (ADC_SC3_AVGE_MASK | ADC_SC3_AVGS(3))
 
 #if defined(DAC0_BASE) && (DAC0_BASE != This_symbol_has_been_deprecated)
 /**

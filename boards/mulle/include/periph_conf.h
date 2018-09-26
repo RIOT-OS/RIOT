@@ -165,39 +165,41 @@ static const uart_conf_t uart_config[] = {
  */
 static const adc_conf_t adc_config[] = {
     /* internal: temperature sensor */
-    [ 0] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 26 },
+    /* The temperature sensor has a very high output impedance, it must not be
+     * sampled using hardware averaging, or the sampled values will be garbage */
+    [ 0] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 26, .avg = ADC_AVG_NONE },
     /* internal: band gap */
-    [ 1] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 27 },
+    [ 1] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 27, .avg = ADC_AVG_MAX },
     /* internal: V_REFSH */
-    [ 2] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 29 },
+    [ 2] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 29, .avg = ADC_AVG_MAX },
     /* internal: V_REFSL */
-    [ 3] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 30 },
+    [ 3] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 30, .avg = ADC_AVG_MAX },
     /* internal: DAC0 module output level */
-    [ 4] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 23 },
+    [ 4] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 23, .avg = ADC_AVG_MAX },
     /* internal: VREF module output level */
-    [ 5] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 18 },
-     /* on board connection to Mulle Vbat/2 on PGA1_DP pin */
-    [ 6] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan =  0 },
+    [ 5] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 18, .avg = ADC_AVG_MAX },
+    /* on board connection to Mulle Vbat/2 on PGA1_DP pin */
+    [ 6] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan =  0, .avg = ADC_AVG_MAX },
     /* on board connection to Mulle Vchr/2 on PGA1_DM pin */
-    [ 7] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 19 },
+    [ 7] = { .dev = ADC1, .pin = GPIO_UNDEF,           .chan = 19, .avg = ADC_AVG_MAX },
     /* expansion port PGA0_DP pin */
-    [ 8] = { .dev = ADC0, .pin = GPIO_UNDEF,           .chan =  0 },
+    [ 8] = { .dev = ADC0, .pin = GPIO_UNDEF,           .chan =  0, .avg = ADC_AVG_MAX },
     /* expansion port PGA0_DM pin */
-    [ 9] = { .dev = ADC0, .pin = GPIO_UNDEF,           .chan = 19 },
+    [ 9] = { .dev = ADC0, .pin = GPIO_UNDEF,           .chan = 19, .avg = ADC_AVG_MAX },
     /* expansion port PTA17 */
-    [10] = { .dev = ADC1, .pin = GPIO_PIN(PORT_A, 17), .chan = 17 },
+    [10] = { .dev = ADC1, .pin = GPIO_PIN(PORT_A, 17), .chan = 17, .avg = ADC_AVG_MAX },
     /* expansion port PTB0  */
-    [11] = { .dev = ADC1, .pin = GPIO_PIN(PORT_B,  0), .chan =  8 },
+    [11] = { .dev = ADC1, .pin = GPIO_PIN(PORT_B,  0), .chan =  8, .avg = ADC_AVG_MAX },
     /* expansion port PTC0  */
-    [12] = { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  0), .chan = 14 },
+    [12] = { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  0), .chan = 14, .avg = ADC_AVG_MAX },
     /* expansion port PTC8  */
-    [13] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  8), .chan =  4 },
+    [13] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  8), .chan =  4, .avg = ADC_AVG_MAX },
     /* expansion port PTC9  */
-    [14] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  9), .chan =  5 },
+    [14] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C,  9), .chan =  5, .avg = ADC_AVG_MAX },
     /* expansion port PTC10 */
-    [15] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 10), .chan =  6 },
+    [15] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 10), .chan =  6, .avg = ADC_AVG_MAX },
     /* expansion port PTC11 */
-    [16] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 11), .chan =  7 }
+    [16] = { .dev = ADC1, .pin = GPIO_PIN(PORT_C, 11), .chan =  7, .avg = ADC_AVG_MAX },
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
