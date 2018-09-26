@@ -1,0 +1,1997 @@
+From b8dc64684fb4e39d29cbfcb9a23b6e7807d251a0 Mon Sep 17 00:00:00 2001
+From: Oleg Artamonov <oleg@unwds.com>
+Date: Mon, 6 Aug 2018 21:43:54 +0300
+Subject: [PATCH 2/2] Add RU864 LoRaWAN region
+
+---
+ src/mac/LoRaMac.h            |    4 +
+ src/mac/region/Region.c      |   75 +++
+ src/mac/region/Region.h      |   28 +
+ src/mac/region/RegionRU864.c | 1018 ++++++++++++++++++++++++++++++++++
+ src/mac/region/RegionRU864.h |  459 +++++++++++++++
+ 5 files changed, 1584 insertions(+)
+ create mode 100644 src/mac/region/RegionRU864.c
+ create mode 100644 src/mac/region/RegionRU864.h
+
+diff --git a/src/mac/LoRaMac.h b/src/mac/LoRaMac.h
+index 8df8f9e..0067419 100644
+--- a/src/mac/LoRaMac.h
++++ b/src/mac/LoRaMac.h
+@@ -1739,6 +1739,10 @@ typedef enum eLoRaMacRegion_t
+      * North american band on 915MHz
+      */
+     LORAMAC_REGION_US915,
++    /*!
++     * Russian band on 864MHz
++     */
++    LORAMAC_REGION_RU864,
+     /*!
+      * North american band on 915MHz with a maximum of 16 channels
+      */
+diff --git a/src/mac/region/Region.c b/src/mac/region/Region.c
+index ae3ff77..7463051 100644
+--- a/src/mac/region/Region.c
++++ b/src/mac/region/Region.c
+@@ -551,6 +551,58 @@
+ #define US915_HYBRID_APPLY_DR_OFFSET( )
+ #endif
+ 
++#ifdef REGION_RU864
++#include "RegionRU864.h"
++#define RU864_CASE                                 case LORAMAC_REGION_RU864:
++#define RU864_IS_ACTIVE( )                         RU864_CASE { return true; }
++#define RU864_GET_PHY_PARAM( )                     RU864_CASE { return RegionRU864GetPhyParam( getPhy ); }
++#define RU864_SET_BAND_TX_DONE( )                  RU864_CASE { RegionRU864SetBandTxDone( txDone ); break; }
++#define RU864_INIT_DEFAULTS( )                     RU864_CASE { RegionRU864InitDefaults( type ); break; }
++#define RU864_VERIFY( )                            RU864_CASE { return RegionRU864Verify( verify, phyAttribute ); }
++#define RU864_APPLY_CF_LIST( )                     RU864_CASE { RegionRU864ApplyCFList( applyCFList ); break; }
++#define RU864_CHAN_MASK_SET( )                     RU864_CASE { return RegionRU864ChanMaskSet( chanMaskSet ); }
++#define RU864_ADR_NEXT( )                          RU864_CASE { return RegionRU864AdrNext( adrNext, drOut, txPowOut, adrAckCounter ); }
++#define RU864_COMPUTE_RX_WINDOW_PARAMETERS( )      RU864_CASE { RegionRU864ComputeRxWindowParameters( datarate, minRxSymbols, rxError, rxConfigParams ); break; }
++#define RU864_RX_CONFIG( )                         RU864_CASE { return RegionRU864RxConfig( rxConfig, datarate ); }
++#define RU864_TX_CONFIG( )                         RU864_CASE { return RegionRU864TxConfig( txConfig, txPower, txTimeOnAir ); }
++#define RU864_LINK_ADR_REQ( )                      RU864_CASE { return RegionRU864LinkAdrReq( linkAdrReq, drOut, txPowOut, nbRepOut, nbBytesParsed ); }
++#define RU864_RX_PARAM_SETUP_REQ( )                RU864_CASE { return RegionRU864RxParamSetupReq( rxParamSetupReq ); }
++#define RU864_NEW_CHANNEL_REQ( )                   RU864_CASE { return RegionRU864NewChannelReq( newChannelReq ); }
++#define RU864_TX_PARAM_SETUP_REQ( )                RU864_CASE { return RegionRU864TxParamSetupReq( txParamSetupReq ); }
++#define RU864_DL_CHANNEL_REQ( )                    RU864_CASE { return RegionRU864DlChannelReq( dlChannelReq ); }
++#define RU864_ALTERNATE_DR( )                      RU864_CASE { return RegionRU864AlternateDr( currentDr ); }
++#define RU864_CALC_BACKOFF( )                      RU864_CASE { RegionRU864CalcBackOff( calcBackOff ); break; }
++#define RU864_NEXT_CHANNEL( )                      RU864_CASE { return RegionRU864NextChannel( nextChanParams, channel, time, aggregatedTimeOff ); }
++#define RU864_CHANNEL_ADD( )                       RU864_CASE { return RegionRU864ChannelAdd( channelAdd ); }
++#define RU864_CHANNEL_REMOVE( )                    RU864_CASE { return RegionRU864ChannelsRemove( channelRemove ); }
++#define RU864_SET_CONTINUOUS_WAVE( )               RU864_CASE { RegionRU864SetContinuousWave( continuousWave ); break; }
++#define RU864_APPLY_DR_OFFSET( )                   RU864_CASE { return RegionRU864ApplyDrOffset( downlinkDwellTime, dr, drOffset ); }
++#else
++#define RU864_IS_ACTIVE( )
++#define RU864_GET_PHY_PARAM( )
++#define RU864_SET_BAND_TX_DONE( )
++#define RU864_INIT_DEFAULTS( )
++#define RU864_VERIFY( )
++#define RU864_APPLY_CF_LIST( )
++#define RU864_CHAN_MASK_SET( )
++#define RU864_ADR_NEXT( )
++#define RU864_COMPUTE_RX_WINDOW_PARAMETERS( )
++#define RU864_RX_CONFIG( )
++#define RU864_TX_CONFIG( )
++#define RU864_LINK_ADR_REQ( )
++#define RU864_RX_PARAM_SETUP_REQ( )
++#define RU864_NEW_CHANNEL_REQ( )
++#define RU864_TX_PARAM_SETUP_REQ( )
++#define RU864_DL_CHANNEL_REQ( )
++#define RU864_ALTERNATE_DR( )
++#define RU864_CALC_BACKOFF( )
++#define RU864_NEXT_CHANNEL( )
++#define RU864_CHANNEL_ADD( )
++#define RU864_CHANNEL_REMOVE( )
++#define RU864_SET_CONTINUOUS_WAVE( )
++#define RU864_APPLY_DR_OFFSET( )
++#endif
++
+ bool RegionIsActive( LoRaMacRegion_t region )
+ {
+     switch( region )
+@@ -564,6 +616,7 @@ bool RegionIsActive( LoRaMacRegion_t region )
+         KR920_IS_ACTIVE( );
+         IN865_IS_ACTIVE( );
+         US915_IS_ACTIVE( );
++        RU864_IS_ACTIVE( );
+         US915_HYBRID_IS_ACTIVE( );
+         default:
+         {
+@@ -586,6 +639,7 @@ PhyParam_t RegionGetPhyParam( LoRaMacRegion_t region, GetPhyParams_t* getPhy )
+         KR920_GET_PHY_PARAM( );
+         IN865_GET_PHY_PARAM( );
+         US915_GET_PHY_PARAM( );
++        RU864_GET_PHY_PARAM( );
+         US915_HYBRID_GET_PHY_PARAM( );
+         default:
+         {
+@@ -607,6 +661,7 @@ void RegionSetBandTxDone( LoRaMacRegion_t region, SetBandTxDoneParams_t* txDone
+         KR920_SET_BAND_TX_DONE( );
+         IN865_SET_BAND_TX_DONE( );
+         US915_SET_BAND_TX_DONE( );
++        RU864_SET_BAND_TX_DONE( );
+         US915_HYBRID_SET_BAND_TX_DONE( );
+         default:
+         {
+@@ -628,6 +683,7 @@ void RegionInitDefaults( LoRaMacRegion_t region, InitType_t type )
+         KR920_INIT_DEFAULTS( );
+         IN865_INIT_DEFAULTS( );
+         US915_INIT_DEFAULTS( );
++        RU864_INIT_DEFAULTS( );
+         US915_HYBRID_INIT_DEFAULTS( );
+         default:
+         {
+@@ -649,6 +705,7 @@ bool RegionVerify( LoRaMacRegion_t region, VerifyParams_t* verify, PhyAttribute_
+         KR920_VERIFY( );
+         IN865_VERIFY( );
+         US915_VERIFY( );
++        RU864_VERIFY( );
+         US915_HYBRID_VERIFY( );
+         default:
+         {
+@@ -670,6 +727,7 @@ void RegionApplyCFList( LoRaMacRegion_t region, ApplyCFListParams_t* applyCFList
+         KR920_APPLY_CF_LIST( );
+         IN865_APPLY_CF_LIST( );
+         US915_APPLY_CF_LIST( );
++        RU864_APPLY_CF_LIST( );
+         US915_HYBRID_APPLY_CF_LIST( );
+         default:
+         {
+@@ -691,6 +749,7 @@ bool RegionChanMaskSet( LoRaMacRegion_t region, ChanMaskSetParams_t* chanMaskSet
+         KR920_CHAN_MASK_SET( );
+         IN865_CHAN_MASK_SET( );
+         US915_CHAN_MASK_SET( );
++        RU864_CHAN_MASK_SET( );
+         US915_HYBRID_CHAN_MASK_SET( );
+         default:
+         {
+@@ -712,6 +771,7 @@ bool RegionAdrNext( LoRaMacRegion_t region, AdrNextParams_t* adrNext, int8_t* dr
+         KR920_ADR_NEXT( );
+         IN865_ADR_NEXT( );
+         US915_ADR_NEXT( );
++        RU864_ADR_NEXT( );
+         US915_HYBRID_ADR_NEXT( );
+         default:
+         {
+@@ -733,6 +793,7 @@ void RegionComputeRxWindowParameters( LoRaMacRegion_t region, int8_t datarate, u
+         KR920_COMPUTE_RX_WINDOW_PARAMETERS( );
+         IN865_COMPUTE_RX_WINDOW_PARAMETERS( );
+         US915_COMPUTE_RX_WINDOW_PARAMETERS( );
++        RU864_COMPUTE_RX_WINDOW_PARAMETERS( );
+         US915_HYBRID_COMPUTE_RX_WINDOW_PARAMETERS( );
+         default:
+         {
+@@ -754,6 +815,7 @@ bool RegionRxConfig( LoRaMacRegion_t region, RxConfigParams_t* rxConfig, int8_t*
+         KR920_RX_CONFIG( );
+         IN865_RX_CONFIG( );
+         US915_RX_CONFIG( );
++        RU864_RX_CONFIG( );
+         US915_HYBRID_RX_CONFIG( );
+         default:
+         {
+@@ -775,6 +837,7 @@ bool RegionTxConfig( LoRaMacRegion_t region, TxConfigParams_t* txConfig, int8_t*
+         KR920_TX_CONFIG( );
+         IN865_TX_CONFIG( );
+         US915_TX_CONFIG( );
++        RU864_TX_CONFIG( );
+         US915_HYBRID_TX_CONFIG( );
+         default:
+         {
+@@ -796,6 +859,7 @@ uint8_t RegionLinkAdrReq( LoRaMacRegion_t region, LinkAdrReqParams_t* linkAdrReq
+         KR920_LINK_ADR_REQ( );
+         IN865_LINK_ADR_REQ( );
+         US915_LINK_ADR_REQ( );
++        RU864_LINK_ADR_REQ( );
+         US915_HYBRID_LINK_ADR_REQ( );
+         default:
+         {
+@@ -817,6 +881,7 @@ uint8_t RegionRxParamSetupReq( LoRaMacRegion_t region, RxParamSetupReqParams_t*
+         KR920_RX_PARAM_SETUP_REQ( );
+         IN865_RX_PARAM_SETUP_REQ( );
+         US915_RX_PARAM_SETUP_REQ( );
++        RU864_RX_PARAM_SETUP_REQ( );
+         US915_HYBRID_RX_PARAM_SETUP_REQ( );
+         default:
+         {
+@@ -838,6 +903,7 @@ uint8_t RegionNewChannelReq( LoRaMacRegion_t region, NewChannelReqParams_t* newC
+         KR920_NEW_CHANNEL_REQ( );
+         IN865_NEW_CHANNEL_REQ( );
+         US915_NEW_CHANNEL_REQ( );
++        RU864_NEW_CHANNEL_REQ( );
+         US915_HYBRID_NEW_CHANNEL_REQ( );
+         default:
+         {
+@@ -859,6 +925,7 @@ int8_t RegionTxParamSetupReq( LoRaMacRegion_t region, TxParamSetupReqParams_t* t
+         KR920_TX_PARAM_SETUP_REQ( );
+         IN865_TX_PARAM_SETUP_REQ( );
+         US915_TX_PARAM_SETUP_REQ( );
++        RU864_TX_PARAM_SETUP_REQ( );
+         US915_HYBRID_TX_PARAM_SETUP_REQ( );
+         default:
+         {
+@@ -880,6 +947,7 @@ uint8_t RegionDlChannelReq( LoRaMacRegion_t region, DlChannelReqParams_t* dlChan
+         KR920_DL_CHANNEL_REQ( );
+         IN865_DL_CHANNEL_REQ( );
+         US915_DL_CHANNEL_REQ( );
++        RU864_DL_CHANNEL_REQ( );
+         US915_HYBRID_DL_CHANNEL_REQ( );
+         default:
+         {
+@@ -901,6 +969,7 @@ int8_t RegionAlternateDr( LoRaMacRegion_t region, int8_t currentDr )
+         KR920_ALTERNATE_DR( );
+         IN865_ALTERNATE_DR( );
+         US915_ALTERNATE_DR( );
++        RU864_ALTERNATE_DR( );
+         US915_HYBRID_ALTERNATE_DR( );
+         default:
+         {
+@@ -922,6 +991,7 @@ void RegionCalcBackOff( LoRaMacRegion_t region, CalcBackOffParams_t* calcBackOff
+         KR920_CALC_BACKOFF( );
+         IN865_CALC_BACKOFF( );
+         US915_CALC_BACKOFF( );
++        RU864_CALC_BACKOFF( );
+         US915_HYBRID_CALC_BACKOFF( );
+         default:
+         {
+@@ -943,6 +1013,7 @@ LoRaMacStatus_t RegionNextChannel( LoRaMacRegion_t region, NextChanParams_t* nex
+         KR920_NEXT_CHANNEL( );
+         IN865_NEXT_CHANNEL( );
+         US915_NEXT_CHANNEL( );
++        RU864_NEXT_CHANNEL( );
+         US915_HYBRID_NEXT_CHANNEL( );
+         default:
+         {
+@@ -964,6 +1035,7 @@ LoRaMacStatus_t RegionChannelAdd( LoRaMacRegion_t region, ChannelAddParams_t* ch
+         KR920_CHANNEL_ADD( );
+         IN865_CHANNEL_ADD( );
+         US915_CHANNEL_ADD( );
++        RU864_CHANNEL_ADD( );
+         US915_HYBRID_CHANNEL_ADD( );
+         default:
+         {
+@@ -985,6 +1057,7 @@ bool RegionChannelsRemove( LoRaMacRegion_t region, ChannelRemoveParams_t* channe
+         KR920_CHANNEL_REMOVE( );
+         IN865_CHANNEL_REMOVE( );
+         US915_CHANNEL_REMOVE( );
++        RU864_CHANNEL_REMOVE( );
+         US915_HYBRID_CHANNEL_REMOVE( );
+         default:
+         {
+@@ -1006,6 +1079,7 @@ void RegionSetContinuousWave( LoRaMacRegion_t region, ContinuousWaveParams_t* co
+         KR920_SET_CONTINUOUS_WAVE( );
+         IN865_SET_CONTINUOUS_WAVE( );
+         US915_SET_CONTINUOUS_WAVE( );
++        RU864_SET_CONTINUOUS_WAVE( );
+         US915_HYBRID_SET_CONTINUOUS_WAVE( );
+         default:
+         {
+@@ -1027,6 +1101,7 @@ uint8_t RegionApplyDrOffset( LoRaMacRegion_t region, uint8_t downlinkDwellTime,
+         KR920_APPLY_DR_OFFSET( );
+         IN865_APPLY_DR_OFFSET( );
+         US915_APPLY_DR_OFFSET( );
++        RU864_APPLY_DR_OFFSET( );
+         US915_HYBRID_APPLY_DR_OFFSET( );
+         default:
+         {
+diff --git a/src/mac/region/Region.h b/src/mac/region/Region.h
+index a1a14c3..71f7580 100644
+--- a/src/mac/region/Region.h
++++ b/src/mac/region/Region.h
+@@ -45,6 +45,7 @@
+  *              - #define REGION_KR920
+  *              - #define REGION_IN865
+  *              - #define REGION_US915
++ *              - #define REGION_RU864
+  *              - #define REGION_US915_HYBRID
+  *
+  * \{
+@@ -73,6 +74,7 @@
+  * IN865        | SF12 - BW125
+  * KR920        | SF12 - BW125
+  * US915        | SF10 - BW125
++ * RU864        | SF12 - BW125
+  * US915_HYBRID | SF10 - BW125
+  */
+ #define DR_0                                        0
+@@ -89,6 +91,7 @@
+  * IN865        | SF11 - BW125
+  * KR920        | SF11 - BW125
+  * US915        | SF9  - BW125
++ * RU864        | SF11 - BW125
+  * US915_HYBRID | SF9  - BW125
+  */
+ #define DR_1                                        1
+@@ -105,6 +108,7 @@
+  * IN865        | SF10 - BW125
+  * KR920        | SF10 - BW125
+  * US915        | SF8  - BW125
++ * RU864        | SF10 - BW125
+  * US915_HYBRID | SF8  - BW125
+  */
+ #define DR_2                                        2
+@@ -121,6 +125,7 @@
+  * IN865        | SF9  - BW125
+  * KR920        | SF9  - BW125
+  * US915        | SF7  - BW125
++ * RU864        | SF9  - BW125
+  * US915_HYBRID | SF7  - BW125
+  */
+ #define DR_3                                        3
+@@ -137,6 +142,7 @@
+  * IN865        | SF8  - BW125
+  * KR920        | SF8  - BW125
+  * US915        | SF8  - BW500
++ * RU864        | SF8  - BW125
+  * US915_HYBRID | SF8  - BW500
+  */
+ #define DR_4                                        4
+@@ -153,6 +159,7 @@
+  * IN865        | SF7  - BW125
+  * KR920        | SF7  - BW125
+  * US915        | RFU
++ * RU864        | SF7  - BW125
+  * US915_HYBRID | RFU
+  */
+ #define DR_5                                        5
+@@ -169,6 +176,7 @@
+  * IN865        | SF7  - BW250
+  * KR920        | RFU
+  * US915        | RFU
++ * RU864        | SF7  - BW250
+  * US915_HYBRID | RFU
+  */
+ #define DR_6                                        6
+@@ -185,6 +193,7 @@
+  * IN865        | FSK
+  * KR920        | RFU
+  * US915        | RFU
++ * RU864        | FSK
+  * US915_HYBRID | RFU
+  */
+ #define DR_7                                        7
+@@ -201,6 +210,7 @@
+  * IN865        | RFU
+  * KR920        | RFU
+  * US915        | SF12 - BW500
++ * RU864        | RFU
+  * US915_HYBRID | SF12 - BW500
+  */
+ #define DR_8                                        8
+@@ -217,6 +227,7 @@
+  * IN865        | RFU
+  * KR920        | RFU
+  * US915        | SF11 - BW500
++ * RU864        | RFU
+  * US915_HYBRID | SF11 - BW500
+  */
+ #define DR_9                                        9
+@@ -233,6 +244,7 @@
+  * IN865        | RFU
+  * KR920        | RFU
+  * US915        | SF10 - BW500
++ * RU864        | RFU
+  * US915_HYBRID | SF10 - BW500
+  */
+ #define DR_10                                       10
+@@ -249,6 +261,7 @@
+  * IN865        | RFU
+  * KR920        | RFU
+  * US915        | SF9  - BW500
++ * RU864        | RFU
+  * US915_HYBRID | SF9  - BW500
+  */
+ #define DR_11                                       11
+@@ -265,6 +278,7 @@
+  * IN865        | RFU
+  * KR920        | RFU
+  * US915        | SF8  - BW500
++ * RU864        | RFU
+  * US915_HYBRID | SF8  - BW500
+  */
+ #define DR_12                                       12
+@@ -281,6 +295,7 @@
+  * IN865        | RFU
+  * KR920        | RFU
+  * US915        | SF7  - BW500
++ * RU864        | RFU
+  * US915_HYBRID | SF7  - BW500
+  */
+ #define DR_13                                       13
+@@ -297,6 +312,7 @@
+  * IN865        | RFU
+  * KR920        | RFU
+  * US915        | RFU
++ * RU864        | RFU
+  * US915_HYBRID | RFU
+  */
+ #define DR_14                                       14
+@@ -313,6 +329,7 @@
+  * IN865        | RFU
+  * KR920        | RFU
+  * US915        | RFU
++ * RU864        | RFU
+  * US915_HYBRID | RFU
+  */
+ #define DR_15                                       15
+@@ -331,6 +348,7 @@
+  * IN865        | Max EIRP
+  * KR920        | Max EIRP
+  * US915        | Max ERP
++ * RU864        | Max EIRP
+  * US915_HYBRID | Max ERP
+  */
+ #define TX_POWER_0                                  0
+@@ -347,6 +365,7 @@
+  * IN865        | Max EIRP - 2
+  * KR920        | Max EIRP - 2
+  * US915        | Max ERP - 2
++ * RU864        | Max EIRP - 2
+  * US915_HYBRID | Max ERP - 2
+  */
+ #define TX_POWER_1                                  1
+@@ -363,6 +382,7 @@
+  * IN865        | Max EIRP - 4
+  * KR920        | Max EIRP - 4
+  * US915        | Max ERP - 4
++ * RU864        | Max EIRP - 4
+  * US915_HYBRID | Max ERP - 4
+  */
+ #define TX_POWER_2                                  2
+@@ -379,6 +399,7 @@
+  * IN865        | Max EIRP - 6
+  * KR920        | Max EIRP - 6
+  * US915        | Max ERP - 6
++ * RU864        | Max EIRP - 6
+  * US915_HYBRID | Max ERP - 6
+  */
+ #define TX_POWER_3                                  3
+@@ -395,6 +416,7 @@
+  * IN865        | Max EIRP - 8
+  * KR920        | Max EIRP - 8
+  * US915        | Max ERP - 8
++ * RU864        | Max EIRP - 8
+  * US915_HYBRID | Max ERP - 8
+  */
+ #define TX_POWER_4                                  4
+@@ -411,6 +433,7 @@
+  * IN865        | Max EIRP - 10
+  * KR920        | Max EIRP - 10
+  * US915        | Max ERP - 10
++ * RU864        | Max EIRP - 10
+  * US915_HYBRID | Max ERP - 10
+  */
+ #define TX_POWER_5                                  5
+@@ -427,6 +450,7 @@
+  * IN865        | Max EIRP - 12
+  * KR920        | Max EIRP - 12
+  * US915        | Max ERP - 12
++ * RU864        | Max EIRP - 12
+  * US915_HYBRID | Max ERP - 12
+  */
+ #define TX_POWER_6                                  6
+@@ -443,6 +467,7 @@
+  * IN865        | Max EIRP - 14
+  * KR920        | Max EIRP - 14
+  * US915        | Max ERP - 14
++ * RU864        | Max EIRP - 14
+  * US915_HYBRID | Max ERP - 14
+  */
+ #define TX_POWER_7                                  7
+@@ -459,6 +484,7 @@
+  * IN865        | Max EIRP - 16
+  * KR920        | -
+  * US915        | Max ERP - 16
++ * RU864        | -
+  * US915_HYBRID | Max ERP -16
+  */
+ #define TX_POWER_8                                  8
+@@ -475,6 +501,7 @@
+  * IN865        | Max EIRP - 18
+  * KR920        | -
+  * US915        | Max ERP - 16
++ * RU864        | -
+  * US915_HYBRID | Max ERP - 16
+  */
+ #define TX_POWER_9                                  9
+@@ -491,6 +518,7 @@
+  * IN865        | Max EIRP - 20
+  * KR920        | -
+  * US915        | Max ERP - 10
++ * RU864        | -
+  * US915_HYBRID | Max ERP - 10
+  */
+ #define TX_POWER_10                                 10
+diff --git a/src/mac/region/RegionRU864.c b/src/mac/region/RegionRU864.c
+new file mode 100644
+index 0000000..5286e32
+--- /dev/null
++++ b/src/mac/region/RegionRU864.c
+@@ -0,0 +1,1018 @@
++/*!
++ * \file      RegionRU864.c
++ *
++ * \brief     Region implementation for RU864
++ *
++ * \copyright Revised BSD License, see section \ref LICENSE.
++ *
++ * \code
++ *                ______                              _
++ *               / _____)             _              | |
++ *              ( (____  _____ ____ _| |_ _____  ____| |__
++ *               \____ \| ___ |    (_   _) ___ |/ ___)  _ \
++ *               _____) ) ____| | | || |_| ____( (___| | | |
++ *              (______/|_____)_|_|_| \__)_____)\____)_| |_|
++ *              (C)2013-2017 Semtech
++ *
++ *               ___ _____ _   ___ _  _____ ___  ___  ___ ___
++ *              / __|_   _/_\ / __| |/ / __/ _ \| _ \/ __| __|
++ *              \__ \ | |/ _ \ (__| ' <| _| (_) |   / (__| _|
++ *              |___/ |_/_/ \_\___|_|\_\_| \___/|_|_\\___|___|
++ *              embedded.connectivity.solutions===============
++ *
++ * \endcode
++ *
++ * \author    Miguel Luis ( Semtech )
++ *
++ * \author    Gregory Cristian ( Semtech )
++ *
++ * \author    Daniel Jaeckle ( STACKFORCE )
++*/
++#include "boards/utilities.h"
++
++#include "RegionCommon.h"
++#include "RegionRU864.h"
++
++// Definitions
++#define CHANNELS_MASK_SIZE              1
++
++// Global attributes
++/*!
++ * LoRaMAC channels
++ */
++static ChannelParams_t Channels[RU864_MAX_NB_CHANNELS];
++
++/*!
++ * LoRaMac bands
++ */
++static Band_t Bands[RU864_MAX_NB_BANDS] =
++{
++    RU864_BAND0,
++};
++
++/*!
++ * LoRaMac channels mask
++ */
++static uint16_t ChannelsMask[CHANNELS_MASK_SIZE];
++
++/*!
++ * LoRaMac channels default mask
++ */
++static uint16_t ChannelsDefaultMask[CHANNELS_MASK_SIZE];
++
++// Static functions
++static int8_t GetNextLowerTxDr( int8_t dr, int8_t minDr )
++{
++    uint8_t nextLowerDr = 0;
++
++    if( dr == minDr )
++    {
++        nextLowerDr = minDr;
++    }
++    else
++    {
++        nextLowerDr = dr - 1;
++    }
++    return nextLowerDr;
++}
++
++static uint32_t GetBandwidth( uint32_t drIndex )
++{
++    switch( BandwidthsRU864[drIndex] )
++    {
++        default:
++        case 125000:
++            return 0;
++        case 250000:
++            return 1;
++        case 500000:
++            return 2;
++    }
++}
++
++static int8_t LimitTxPower( int8_t txPower, int8_t maxBandTxPower, int8_t datarate, uint16_t* channelsMask )
++{
++    int8_t txPowerResult = txPower;
++
++    // Limit tx power to the band max
++    txPowerResult =  MAX( txPower, maxBandTxPower );
++
++    return txPowerResult;
++}
++
++static bool VerifyTxFreq( uint32_t freq, uint8_t *band )
++{
++    // Check radio driver support
++    if( Radio.CheckRfFrequency( freq ) == false )
++    {
++        return false;
++    }
++
++    // Check frequency bands
++    if( ( freq >= 864000000 ) && ( freq <= 870000000 ) )
++    {
++        *band = 0;
++    }
++    else
++    {
++        return false;
++    }
++    return true;
++}
++
++static uint8_t CountNbOfEnabledChannels( bool joined, uint8_t datarate, uint16_t* channelsMask, ChannelParams_t* channels, Band_t* bands, uint8_t* enabledChannels, uint8_t* delayTx )
++{
++    uint8_t nbEnabledChannels = 0;
++    uint8_t delayTransmission = 0;
++
++    for( uint8_t i = 0, k = 0; i < RU864_MAX_NB_CHANNELS; i += 16, k++ )
++    {
++        for( uint8_t j = 0; j < 16; j++ )
++        {
++            if( ( channelsMask[k] & ( 1 << j ) ) != 0 )
++            {
++                if( channels[i + j].Frequency == 0 )
++                { // Check if the channel is enabled
++                    continue;
++                }
++                if( joined == false )
++                {
++                    if( ( RU864_JOIN_CHANNELS & ( 1 << j ) ) == 0 )
++                    {
++                        continue;
++                    }
++                }
++                if( RegionCommonValueInRange( datarate, channels[i + j].DrRange.Fields.Min,
++                                              channels[i + j].DrRange.Fields.Max ) == false )
++                { // Check if the current channel selection supports the given datarate
++                    continue;
++                }
++                if( bands[channels[i + j].Band].TimeOff > 0 )
++                { // Check if the band is available for transmission
++                    delayTransmission++;
++                    continue;
++                }
++                enabledChannels[nbEnabledChannels++] = i + j;
++            }
++        }
++    }
++
++    *delayTx = delayTransmission;
++    return nbEnabledChannels;
++}
++
++PhyParam_t RegionRU864GetPhyParam( GetPhyParams_t* getPhy )
++{
++    PhyParam_t phyParam = { 0 };
++
++    switch( getPhy->Attribute )
++    {
++        case PHY_MIN_RX_DR:
++        {
++            phyParam.Value = RU864_RX_MIN_DATARATE;
++            break;
++        }
++        case PHY_MIN_TX_DR:
++        {
++            phyParam.Value = RU864_TX_MIN_DATARATE;
++            break;
++        }
++        case PHY_DEF_TX_DR:
++        {
++            phyParam.Value = RU864_DEFAULT_DATARATE;
++            break;
++        }
++        case PHY_NEXT_LOWER_TX_DR:
++        {
++            phyParam.Value = GetNextLowerTxDr( getPhy->Datarate, RU864_TX_MIN_DATARATE );
++            break;
++        }
++        case PHY_DEF_TX_POWER:
++        {
++            phyParam.Value = RU864_DEFAULT_TX_POWER;
++            break;
++        }
++        case PHY_MAX_PAYLOAD:
++        {
++            phyParam.Value = MaxPayloadOfDatarateRU864[getPhy->Datarate];
++            break;
++        }
++        case PHY_MAX_PAYLOAD_REPEATER:
++        {
++            phyParam.Value = MaxPayloadOfDatarateRepeaterRU864[getPhy->Datarate];
++            break;
++        }
++        case PHY_DUTY_CYCLE:
++        {
++            phyParam.Value = RU864_DUTY_CYCLE_ENABLED;
++            break;
++        }
++        case PHY_MAX_RX_WINDOW:
++        {
++            phyParam.Value = RU864_MAX_RX_WINDOW;
++            break;
++        }
++        case PHY_RECEIVE_DELAY1:
++        {
++            phyParam.Value = RU864_RECEIVE_DELAY1;
++            break;
++        }
++        case PHY_RECEIVE_DELAY2:
++        {
++            phyParam.Value = RU864_RECEIVE_DELAY2;
++            break;
++        }
++        case PHY_JOIN_ACCEPT_DELAY1:
++        {
++            phyParam.Value = RU864_JOIN_ACCEPT_DELAY1;
++            break;
++        }
++        case PHY_JOIN_ACCEPT_DELAY2:
++        {
++            phyParam.Value = RU864_JOIN_ACCEPT_DELAY2;
++            break;
++        }
++        case PHY_MAX_FCNT_GAP:
++        {
++            phyParam.Value = RU864_MAX_FCNT_GAP;
++            break;
++        }
++        case PHY_ACK_TIMEOUT:
++        {
++            phyParam.Value = ( RU864_ACKTIMEOUT + randr( -RU864_ACK_TIMEOUT_RND, RU864_ACK_TIMEOUT_RND ) );
++            break;
++        }
++        case PHY_DEF_DR1_OFFSET:
++        {
++            phyParam.Value = RU864_DEFAULT_RX1_DR_OFFSET;
++            break;
++        }
++        case PHY_DEF_RX2_FREQUENCY:
++        {
++            phyParam.Value = RU864_RX_WND_2_FREQ;
++            break;
++        }
++        case PHY_DEF_RX2_DR:
++        {
++            phyParam.Value = RU864_RX_WND_2_DR;
++            break;
++        }
++        case PHY_CHANNELS_MASK:
++        {
++            phyParam.ChannelsMask = ChannelsMask;
++            break;
++        }
++        case PHY_CHANNELS_DEFAULT_MASK:
++        {
++            phyParam.ChannelsMask = ChannelsDefaultMask;
++            break;
++        }
++        case PHY_MAX_NB_CHANNELS:
++        {
++            phyParam.Value = RU864_MAX_NB_CHANNELS;
++            break;
++        }
++        case PHY_CHANNELS:
++        {
++            phyParam.Channels = Channels;
++            break;
++        }
++        case PHY_DEF_UPLINK_DWELL_TIME:
++        case PHY_DEF_DOWNLINK_DWELL_TIME:
++        {
++            phyParam.Value = 0;
++            break;
++        }
++        case PHY_DEF_MAX_EIRP:
++        {
++            phyParam.fValue = RU864_DEFAULT_MAX_EIRP;
++            break;
++        }
++        case PHY_DEF_ANTENNA_GAIN:
++        {
++            phyParam.fValue = RU864_DEFAULT_ANTENNA_GAIN;
++            break;
++        }
++        default:
++        {
++            break;
++        }
++    }
++
++    return phyParam;
++}
++
++void RegionRU864SetBandTxDone( SetBandTxDoneParams_t* txDone )
++{
++    RegionCommonSetBandTxDone( txDone->Joined, &Bands[Channels[txDone->Channel].Band], txDone->LastTxDoneTime );
++}
++
++void RegionRU864InitDefaults( InitType_t type )
++{
++    switch( type )
++    {
++        case INIT_TYPE_INIT:
++        {
++            // Channels
++            Channels[0] = ( ChannelParams_t ) RU864_LC1;
++            Channels[1] = ( ChannelParams_t ) RU864_LC2;
++
++            // Initialize the channels default mask
++            ChannelsDefaultMask[0] = LC( 1 ) + LC( 2 );
++            // Update the channels mask
++            RegionCommonChanMaskCopy( ChannelsMask, ChannelsDefaultMask, 1 );
++            break;
++        }
++        case INIT_TYPE_RESTORE:
++        {
++            // Restore channels default mask
++            ChannelsMask[0] |= ChannelsDefaultMask[0];
++            break;
++        }
++        case INIT_TYPE_APP_DEFAULTS:
++        {
++            // Update the channels mask defaults
++            RegionCommonChanMaskCopy( ChannelsMask, ChannelsDefaultMask, 1 );
++            break;
++        }
++        default:
++        {
++            break;
++        }
++    }
++}
++
++bool RegionRU864Verify( VerifyParams_t* verify, PhyAttribute_t phyAttribute )
++{
++    switch( phyAttribute )
++    {
++        case PHY_TX_DR:
++        {
++            return RegionCommonValueInRange( verify->DatarateParams.Datarate, RU864_TX_MIN_DATARATE, RU864_TX_MAX_DATARATE );
++        }
++        case PHY_DEF_TX_DR:
++        {
++            return RegionCommonValueInRange( verify->DatarateParams.Datarate, DR_0, DR_5 );
++        }
++        case PHY_RX_DR:
++        {
++            return RegionCommonValueInRange( verify->DatarateParams.Datarate, RU864_RX_MIN_DATARATE, RU864_RX_MAX_DATARATE );
++        }
++        case PHY_DEF_TX_POWER:
++        case PHY_TX_POWER:
++        {
++            // Remark: switched min and max!
++            return RegionCommonValueInRange( verify->TxPower, RU864_MAX_TX_POWER, RU864_MIN_TX_POWER );
++        }
++        case PHY_DUTY_CYCLE:
++        {
++            return RU864_DUTY_CYCLE_ENABLED;
++        }
++        default:
++            return false;
++    }
++}
++
++void RegionRU864ApplyCFList( ApplyCFListParams_t* applyCFList )
++{
++    ChannelParams_t newChannel;
++    ChannelAddParams_t channelAdd;
++    ChannelRemoveParams_t channelRemove;
++
++    // Setup default datarate range
++    newChannel.DrRange.Value = ( DR_5 << 4 ) | DR_0;
++
++    // Size of the optional CF list
++    if( applyCFList->Size != 16 )
++    {
++        return;
++    }
++
++    // Last byte is RFU, don't take it into account
++    for( uint8_t i = 0, chanIdx = RU864_NUMB_DEFAULT_CHANNELS; chanIdx < RU864_MAX_NB_CHANNELS; i+=3, chanIdx++ )
++    {
++        if( chanIdx < ( RU864_NUMB_CHANNELS_CF_LIST + RU864_NUMB_DEFAULT_CHANNELS ) )
++        {
++            // Channel frequency
++            newChannel.Frequency = (uint32_t) applyCFList->Payload[i];
++            newChannel.Frequency |= ( (uint32_t) applyCFList->Payload[i + 1] << 8 );
++            newChannel.Frequency |= ( (uint32_t) applyCFList->Payload[i + 2] << 16 );
++            newChannel.Frequency *= 100;
++
++            // Initialize alternative frequency to 0
++            newChannel.Rx1Frequency = 0;
++        }
++        else
++        {
++            newChannel.Frequency = 0;
++            newChannel.DrRange.Value = 0;
++            newChannel.Rx1Frequency = 0;
++        }
++
++        if( newChannel.Frequency != 0 )
++        {
++            channelAdd.NewChannel = &newChannel;
++            channelAdd.ChannelId = chanIdx;
++
++            // Try to add all channels
++            RegionRU864ChannelAdd( &channelAdd );
++        }
++        else
++        {
++            channelRemove.ChannelId = chanIdx;
++
++            RegionRU864ChannelsRemove( &channelRemove );
++        }
++    }
++}
++
++bool RegionRU864ChanMaskSet( ChanMaskSetParams_t* chanMaskSet )
++{
++    switch( chanMaskSet->ChannelsMaskType )
++    {
++        case CHANNELS_MASK:
++        {
++            RegionCommonChanMaskCopy( ChannelsMask, chanMaskSet->ChannelsMaskIn, 1 );
++            break;
++        }
++        case CHANNELS_DEFAULT_MASK:
++        {
++            RegionCommonChanMaskCopy( ChannelsDefaultMask, chanMaskSet->ChannelsMaskIn, 1 );
++            break;
++        }
++        default:
++            return false;
++    }
++    return true;
++}
++
++bool RegionRU864AdrNext( AdrNextParams_t* adrNext, int8_t* drOut, int8_t* txPowOut, uint32_t* adrAckCounter )
++{
++    bool adrAckReq = false;
++    int8_t datarate = adrNext->Datarate;
++    int8_t txPower = adrNext->TxPower;
++    GetPhyParams_t getPhy;
++    PhyParam_t phyParam;
++
++    // Report back the adr ack counter
++    *adrAckCounter = adrNext->AdrAckCounter;
++
++    if( adrNext->AdrEnabled == true )
++    {
++        if( datarate == RU864_TX_MIN_DATARATE )
++        {
++            *adrAckCounter = 0;
++            adrAckReq = false;
++        }
++        else
++        {
++            if( adrNext->AdrAckCounter >= RU864_ADR_ACK_LIMIT )
++            {
++                adrAckReq = true;
++                txPower = RU864_MAX_TX_POWER;
++            }
++            else
++            {
++                adrAckReq = false;
++            }
++            if( adrNext->AdrAckCounter >= ( RU864_ADR_ACK_LIMIT + RU864_ADR_ACK_DELAY ) )
++            {
++                if( ( adrNext->AdrAckCounter % RU864_ADR_ACK_DELAY ) == 1 )
++                {
++                    // Decrease the datarate
++                    getPhy.Attribute = PHY_NEXT_LOWER_TX_DR;
++                    getPhy.Datarate = datarate;
++                    getPhy.UplinkDwellTime = adrNext->UplinkDwellTime;
++                    phyParam = RegionRU864GetPhyParam( &getPhy );
++                    datarate = phyParam.Value;
++
++                    if( datarate == RU864_TX_MIN_DATARATE )
++                    {
++                        // We must set adrAckReq to false as soon as we reach the lowest datarate
++                        adrAckReq = false;
++                        if( adrNext->UpdateChanMask == true )
++                        {
++                            // Re-enable default channels
++                            ChannelsMask[0] |= LC( 1 ) + LC( 2 ) + LC( 3 );
++                        }
++                    }
++                }
++            }
++        }
++    }
++
++    *drOut = datarate;
++    *txPowOut = txPower;
++    return adrAckReq;
++}
++
++void RegionRU864ComputeRxWindowParameters( int8_t datarate, uint8_t minRxSymbols, uint32_t rxError, RxConfigParams_t *rxConfigParams )
++{
++    double tSymbol = 0.0;
++
++    // Get the datarate, perform a boundary check
++    rxConfigParams->Datarate = MIN( datarate, RU864_RX_MAX_DATARATE );
++    rxConfigParams->Bandwidth = GetBandwidth( rxConfigParams->Datarate );
++
++    if( rxConfigParams->Datarate == DR_7 )
++    { // FSK
++        tSymbol = RegionCommonComputeSymbolTimeFsk( DataratesRU864[rxConfigParams->Datarate] );
++    }
++    else
++    { // LoRa
++        tSymbol = RegionCommonComputeSymbolTimeLoRa( DataratesRU864[rxConfigParams->Datarate], BandwidthsRU864[rxConfigParams->Datarate] );
++    }
++
++    RegionCommonComputeRxWindowParameters( tSymbol, minRxSymbols, rxError, Radio.GetWakeupTime( ), &rxConfigParams->WindowTimeout, &rxConfigParams->WindowOffset );
++}
++
++bool RegionRU864RxConfig( RxConfigParams_t* rxConfig, int8_t* datarate )
++{
++    RadioModems_t modem;
++    int8_t dr = rxConfig->Datarate;
++    uint8_t maxPayload = 0;
++    int8_t phyDr = 0;
++    uint32_t frequency = rxConfig->Frequency;
++
++    if( Radio.GetStatus( ) != RF_IDLE )
++    {
++        return false;
++    }
++
++    if( rxConfig->RxSlot == RX_SLOT_WIN_1 )
++    {
++        // Apply window 1 frequency
++        frequency = Channels[rxConfig->Channel].Frequency;
++        // Apply the alternative RX 1 window frequency, if it is available
++        if( Channels[rxConfig->Channel].Rx1Frequency != 0 )
++        {
++            frequency = Channels[rxConfig->Channel].Rx1Frequency;
++        }
++    }
++
++    // Read the physical datarate from the datarates table
++    phyDr = DataratesRU864[dr];
++
++    Radio.SetChannel( frequency );
++
++    // Radio configuration
++    if( dr == DR_7 )
++    {
++        modem = MODEM_FSK;
++        Radio.SetRxConfig( modem, 50000, phyDr * 1000, 0, 83333, 5, rxConfig->WindowTimeout, false, 0, true, 0, 0, false, rxConfig->RxContinuous );
++    }
++    else
++    {
++        modem = MODEM_LORA;
++        Radio.SetRxConfig( modem, rxConfig->Bandwidth, phyDr, 1, 0, 8, rxConfig->WindowTimeout, false, 0, false, 0, 0, true, rxConfig->RxContinuous );
++    }
++
++    if( rxConfig->RepeaterSupport == true )
++    {
++        maxPayload = MaxPayloadOfDatarateRepeaterRU864[dr];
++    }
++    else
++    {
++        maxPayload = MaxPayloadOfDatarateRU864[dr];
++    }
++
++    Radio.SetMaxPayloadLength( modem, maxPayload + LORA_MAC_FRMPAYLOAD_OVERHEAD );
++
++    *datarate = (uint8_t) dr;
++    return true;
++}
++
++bool RegionRU864TxConfig( TxConfigParams_t* txConfig, int8_t* txPower, TimerTime_t* txTimeOnAir )
++{
++    RadioModems_t modem;
++    int8_t phyDr = DataratesRU864[txConfig->Datarate];
++    int8_t txPowerLimited = LimitTxPower( txConfig->TxPower, Bands[Channels[txConfig->Channel].Band].TxMaxPower, txConfig->Datarate, ChannelsMask );
++    uint32_t bandwidth = GetBandwidth( txConfig->Datarate );
++    int8_t phyTxPower = 0;
++
++    // Calculate physical TX power
++    phyTxPower = RegionCommonComputeTxPower( txPowerLimited, txConfig->MaxEirp, txConfig->AntennaGain );
++
++    // Setup the radio frequency
++    Radio.SetChannel( Channels[txConfig->Channel].Frequency );
++
++    if( txConfig->Datarate == DR_7 )
++    { // High Speed FSK channel
++        modem = MODEM_FSK;
++        Radio.SetTxConfig( modem, phyTxPower, 25000, bandwidth, phyDr * 1000, 0, 5, false, true, 0, 0, false, 3000 );
++    }
++    else
++    {
++        modem = MODEM_LORA;
++        Radio.SetTxConfig( modem, phyTxPower, 0, bandwidth, phyDr, 1, 8, false, true, 0, 0, false, 3000 );
++    }
++
++    // Setup maximum payload lenght of the radio driver
++    Radio.SetMaxPayloadLength( modem, txConfig->PktLen );
++    // Get the time-on-air of the next tx frame
++    *txTimeOnAir = Radio.TimeOnAir( modem, txConfig->PktLen );
++
++    *txPower = txPowerLimited;
++    return true;
++}
++
++uint8_t RegionRU864LinkAdrReq( LinkAdrReqParams_t* linkAdrReq, int8_t* drOut, int8_t* txPowOut, uint8_t* nbRepOut, uint8_t* nbBytesParsed )
++{
++    uint8_t status = 0x07;
++    RegionCommonLinkAdrParams_t linkAdrParams;
++    uint8_t nextIndex = 0;
++    uint8_t bytesProcessed = 0;
++    uint16_t chMask = 0;
++    GetPhyParams_t getPhy;
++    PhyParam_t phyParam;
++    RegionCommonLinkAdrReqVerifyParams_t linkAdrVerifyParams;
++
++    while( bytesProcessed < linkAdrReq->PayloadSize )
++    {
++        // Get ADR request parameters
++        nextIndex = RegionCommonParseLinkAdrReq( &( linkAdrReq->Payload[bytesProcessed] ), &linkAdrParams );
++
++        if( nextIndex == 0 )
++            break; // break loop, since no more request has been found
++
++        // Update bytes processed
++        bytesProcessed += nextIndex;
++
++        // Revert status, as we only check the last ADR request for the channel mask KO
++        status = 0x07;
++
++        // Setup temporary channels mask
++        chMask = linkAdrParams.ChMask;
++
++        // Verify channels mask
++        if( ( linkAdrParams.ChMaskCtrl == 0 ) && ( chMask == 0 ) )
++        {
++            status &= 0xFE; // Channel mask KO
++        }
++        else if( ( ( linkAdrParams.ChMaskCtrl >= 1 ) && ( linkAdrParams.ChMaskCtrl <= 5 )) ||
++                ( linkAdrParams.ChMaskCtrl >= 7 ) )
++        {
++            // RFU
++            status &= 0xFE; // Channel mask KO
++        }
++        else
++        {
++            for( uint8_t i = 0; i < RU864_MAX_NB_CHANNELS; i++ )
++            {
++                if( linkAdrParams.ChMaskCtrl == 6 )
++                {
++                    if( Channels[i].Frequency != 0 )
++                    {
++                        chMask |= 1 << i;
++                    }
++                }
++                else
++                {
++                    if( ( ( chMask & ( 1 << i ) ) != 0 ) &&
++                        ( Channels[i].Frequency == 0 ) )
++                    {// Trying to enable an undefined channel
++                        status &= 0xFE; // Channel mask KO
++                    }
++                }
++            }
++        }
++    }
++
++    // Get the minimum possible datarate
++    getPhy.Attribute = PHY_MIN_TX_DR;
++    getPhy.UplinkDwellTime = linkAdrReq->UplinkDwellTime;
++    phyParam = RegionRU864GetPhyParam( &getPhy );
++
++    linkAdrVerifyParams.Status = status;
++    linkAdrVerifyParams.AdrEnabled = linkAdrReq->AdrEnabled;
++    linkAdrVerifyParams.Datarate = linkAdrParams.Datarate;
++    linkAdrVerifyParams.TxPower = linkAdrParams.TxPower;
++    linkAdrVerifyParams.NbRep = linkAdrParams.NbRep;
++    linkAdrVerifyParams.CurrentDatarate = linkAdrReq->CurrentDatarate;
++    linkAdrVerifyParams.CurrentTxPower = linkAdrReq->CurrentTxPower;
++    linkAdrVerifyParams.CurrentNbRep = linkAdrReq->CurrentNbRep;
++    linkAdrVerifyParams.NbChannels = RU864_MAX_NB_CHANNELS;
++    linkAdrVerifyParams.ChannelsMask = &chMask;
++    linkAdrVerifyParams.MinDatarate = ( int8_t )phyParam.Value;
++    linkAdrVerifyParams.MaxDatarate = RU864_TX_MAX_DATARATE;
++    linkAdrVerifyParams.Channels = Channels;
++    linkAdrVerifyParams.MinTxPower = RU864_MIN_TX_POWER;
++    linkAdrVerifyParams.MaxTxPower = RU864_MAX_TX_POWER;
++
++    // Verify the parameters and update, if necessary
++    status = RegionCommonLinkAdrReqVerifyParams( &linkAdrVerifyParams, &linkAdrParams.Datarate, &linkAdrParams.TxPower, &linkAdrParams.NbRep );
++
++    // Update channelsMask if everything is correct
++    if( status == 0x07 )
++    {
++        // Set the channels mask to a default value
++        memset1( ( uint8_t* )ChannelsMask, 0, sizeof( ChannelsMask ) );
++        // Update the channels mask
++        ChannelsMask[0] = chMask;
++    }
++
++    // Update status variables
++    *drOut = linkAdrParams.Datarate;
++    *txPowOut = linkAdrParams.TxPower;
++    *nbRepOut = linkAdrParams.NbRep;
++    *nbBytesParsed = bytesProcessed;
++
++    return status;
++}
++
++uint8_t RegionRU864RxParamSetupReq( RxParamSetupReqParams_t* rxParamSetupReq )
++{
++    uint8_t status = 0x07;
++
++    // Verify radio frequency
++    if( Radio.CheckRfFrequency( rxParamSetupReq->Frequency ) == false )
++    {
++        status &= 0xFE; // Channel frequency KO
++    }
++
++    // Verify datarate
++    if( RegionCommonValueInRange( rxParamSetupReq->Datarate, RU864_RX_MIN_DATARATE, RU864_RX_MAX_DATARATE ) == false )
++    {
++        status &= 0xFD; // Datarate KO
++    }
++
++    // Verify datarate offset
++    if( RegionCommonValueInRange( rxParamSetupReq->DrOffset, RU864_MIN_RX1_DR_OFFSET, RU864_MAX_RX1_DR_OFFSET ) == false )
++    {
++        status &= 0xFB; // Rx1DrOffset range KO
++    }
++
++    return status;
++}
++
++uint8_t RegionRU864NewChannelReq( NewChannelReqParams_t* newChannelReq )
++{
++    uint8_t status = 0x03;
++    ChannelAddParams_t channelAdd;
++    ChannelRemoveParams_t channelRemove;
++
++    if( newChannelReq->NewChannel->Frequency == 0 )
++    {
++        channelRemove.ChannelId = newChannelReq->ChannelId;
++
++        // Remove
++        if( RegionRU864ChannelsRemove( &channelRemove ) == false )
++        {
++            status &= 0xFC;
++        }
++    }
++    else
++    {
++        channelAdd.NewChannel = newChannelReq->NewChannel;
++        channelAdd.ChannelId = newChannelReq->ChannelId;
++
++        switch( RegionRU864ChannelAdd( &channelAdd ) )
++        {
++            case LORAMAC_STATUS_OK:
++            {
++                break;
++            }
++            case LORAMAC_STATUS_FREQUENCY_INVALID:
++            {
++                status &= 0xFE;
++                break;
++            }
++            case LORAMAC_STATUS_DATARATE_INVALID:
++            {
++                status &= 0xFD;
++                break;
++            }
++            case LORAMAC_STATUS_FREQ_AND_DR_INVALID:
++            {
++                status &= 0xFC;
++                break;
++            }
++            default:
++            {
++                status &= 0xFC;
++                break;
++            }
++        }
++    }
++
++    return status;
++}
++
++int8_t RegionRU864TxParamSetupReq( TxParamSetupReqParams_t* txParamSetupReq )
++{
++    return -1;
++}
++
++uint8_t RegionRU864DlChannelReq( DlChannelReqParams_t* dlChannelReq )
++{
++    uint8_t status = 0x03;
++    uint8_t band = 0;
++
++    // Verify if the frequency is supported
++    if( VerifyTxFreq( dlChannelReq->Rx1Frequency, &band ) == false )
++    {
++        status &= 0xFE;
++    }
++
++    // Verify if an uplink frequency exists
++    if( Channels[dlChannelReq->ChannelId].Frequency == 0 )
++    {
++        status &= 0xFD;
++    }
++
++    // Apply Rx1 frequency, if the status is OK
++    if( status == 0x03 )
++    {
++        Channels[dlChannelReq->ChannelId].Rx1Frequency = dlChannelReq->Rx1Frequency;
++    }
++
++    return status;
++}
++
++int8_t RegionRU864AlternateDr( int8_t currentDr )
++{
++    return currentDr;
++}
++
++void RegionRU864CalcBackOff( CalcBackOffParams_t* calcBackOff )
++{
++    RegionCommonCalcBackOffParams_t calcBackOffParams;
++
++    calcBackOffParams.Channels = Channels;
++    calcBackOffParams.Bands = Bands;
++    calcBackOffParams.LastTxIsJoinRequest = calcBackOff->LastTxIsJoinRequest;
++    calcBackOffParams.Joined = calcBackOff->Joined;
++    calcBackOffParams.DutyCycleEnabled = calcBackOff->DutyCycleEnabled;
++    calcBackOffParams.Channel = calcBackOff->Channel;
++    calcBackOffParams.ElapsedTime = calcBackOff->ElapsedTime;
++    calcBackOffParams.TxTimeOnAir = calcBackOff->TxTimeOnAir;
++
++    RegionCommonCalcBackOff( &calcBackOffParams );
++}
++
++LoRaMacStatus_t RegionRU864NextChannel( NextChanParams_t* nextChanParams, uint8_t* channel, TimerTime_t* time, TimerTime_t* aggregatedTimeOff )
++{
++    uint8_t nbEnabledChannels = 0;
++    uint8_t delayTx = 0;
++    uint8_t enabledChannels[RU864_MAX_NB_CHANNELS] = { 0 };
++    TimerTime_t nextTxDelay = 0;
++
++    if( RegionCommonCountChannels( ChannelsMask, 0, 1 ) == 0 )
++    { // Reactivate default channels
++        ChannelsMask[0] |= LC( 1 ) + LC( 2 ) + LC( 3 );
++    }
++
++    if( nextChanParams->AggrTimeOff <= TimerGetElapsedTime( nextChanParams->LastAggrTx ) )
++    {
++        // Reset Aggregated time off
++        *aggregatedTimeOff = 0;
++
++        // Update bands Time OFF
++        nextTxDelay = RegionCommonUpdateBandTimeOff( nextChanParams->Joined, nextChanParams->DutyCycleEnabled, Bands, RU864_MAX_NB_BANDS );
++
++        // Search how many channels are enabled
++        nbEnabledChannels = CountNbOfEnabledChannels( nextChanParams->Joined, nextChanParams->Datarate,
++                                                      ChannelsMask, Channels,
++                                                      Bands, enabledChannels, &delayTx );
++    }
++    else
++    {
++        delayTx++;
++        nextTxDelay = nextChanParams->AggrTimeOff - TimerGetElapsedTime( nextChanParams->LastAggrTx );
++    }
++
++    if( nbEnabledChannels > 0 )
++    {
++        // We found a valid channel
++        *channel = enabledChannels[randr( 0, nbEnabledChannels - 1 )];
++
++        *time = 0;
++        return LORAMAC_STATUS_OK;
++    }
++    else
++    {
++        if( delayTx > 0 )
++        {
++            // Delay transmission due to AggregatedTimeOff or to a band time off
++            *time = nextTxDelay;
++            return LORAMAC_STATUS_DUTYCYCLE_RESTRICTED;
++        }
++        // Datarate not supported by any channel, restore defaults
++        ChannelsMask[0] |= LC( 1 ) + LC( 2 ) + LC( 3 );
++        *time = 0;
++        return LORAMAC_STATUS_NO_CHANNEL_FOUND;
++    }
++}
++
++LoRaMacStatus_t RegionRU864ChannelAdd( ChannelAddParams_t* channelAdd )
++{
++    uint8_t band = 0;
++    bool drInvalid = false;
++    bool freqInvalid = false;
++    uint8_t id = channelAdd->ChannelId;
++
++    if( id >= RU864_MAX_NB_CHANNELS )
++    {
++        return LORAMAC_STATUS_PARAMETER_INVALID;
++    }
++
++    // Validate the datarate range
++    if( RegionCommonValueInRange( channelAdd->NewChannel->DrRange.Fields.Min, RU864_TX_MIN_DATARATE, RU864_TX_MAX_DATARATE ) == false )
++    {
++        drInvalid = true;
++    }
++    if( RegionCommonValueInRange( channelAdd->NewChannel->DrRange.Fields.Max, RU864_TX_MIN_DATARATE, RU864_TX_MAX_DATARATE ) == false )
++    {
++        drInvalid = true;
++    }
++    if( channelAdd->NewChannel->DrRange.Fields.Min > channelAdd->NewChannel->DrRange.Fields.Max )
++    {
++        drInvalid = true;
++    }
++
++    // Default channels don't accept all values
++    if( id < RU864_NUMB_DEFAULT_CHANNELS )
++    {
++        // Validate the datarate range for min: must be DR_0
++        if( channelAdd->NewChannel->DrRange.Fields.Min > DR_0 )
++        {
++            drInvalid = true;
++        }
++        // Validate the datarate range for max: must be DR_5 <= Max <= TX_MAX_DATARATE
++        if( RegionCommonValueInRange( channelAdd->NewChannel->DrRange.Fields.Max, DR_5, RU864_TX_MAX_DATARATE ) == false )
++        {
++            drInvalid = true;
++        }
++        // We are not allowed to change the frequency
++        if( channelAdd->NewChannel->Frequency != Channels[id].Frequency )
++        {
++            freqInvalid = true;
++        }
++    }
++
++    // Check frequency
++    if( freqInvalid == false )
++    {
++        if( VerifyTxFreq( channelAdd->NewChannel->Frequency, &band ) == false )
++        {
++            freqInvalid = true;
++        }
++    }
++
++    // Check status
++    if( ( drInvalid == true ) && ( freqInvalid == true ) )
++    {
++        return LORAMAC_STATUS_FREQ_AND_DR_INVALID;
++    }
++    if( drInvalid == true )
++    {
++        return LORAMAC_STATUS_DATARATE_INVALID;
++    }
++    if( freqInvalid == true )
++    {
++        return LORAMAC_STATUS_FREQUENCY_INVALID;
++    }
++
++    memcpy1( ( uint8_t* )( Channels + id ), ( uint8_t* )channelAdd->NewChannel, sizeof( Channels[id] ) );
++    Channels[id].Band = band;
++    ChannelsMask[0] |= ( 1 << id );
++    return LORAMAC_STATUS_OK;
++}
++
++bool RegionRU864ChannelsRemove( ChannelRemoveParams_t* channelRemove  )
++{
++    uint8_t id = channelRemove->ChannelId;
++
++    if( id < RU864_NUMB_DEFAULT_CHANNELS )
++    {
++        return false;
++    }
++
++    // Remove the channel from the list of channels
++    Channels[id] = ( ChannelParams_t ){ 0, 0, { 0 }, 0 };
++
++    return RegionCommonChanDisable( ChannelsMask, id, RU864_MAX_NB_CHANNELS );
++}
++
++void RegionRU864SetContinuousWave( ContinuousWaveParams_t* continuousWave )
++{
++    int8_t txPowerLimited = LimitTxPower( continuousWave->TxPower, Bands[Channels[continuousWave->Channel].Band].TxMaxPower, continuousWave->Datarate, ChannelsMask );
++    int8_t phyTxPower = 0;
++    uint32_t frequency = Channels[continuousWave->Channel].Frequency;
++
++    // Calculate physical TX power
++    phyTxPower = RegionCommonComputeTxPower( txPowerLimited, continuousWave->MaxEirp, continuousWave->AntennaGain );
++
++    Radio.SetTxContinuousWave( frequency, phyTxPower, continuousWave->Timeout );
++}
++
++uint8_t RegionRU864ApplyDrOffset( uint8_t downlinkDwellTime, int8_t dr, int8_t drOffset )
++{
++    int8_t datarate = dr - drOffset;
++
++    if( datarate < 0 )
++    {
++        datarate = DR_0;
++    }
++    return datarate;
++}
+diff --git a/src/mac/region/RegionRU864.h b/src/mac/region/RegionRU864.h
+new file mode 100644
+index 0000000..5f47a7e
+--- /dev/null
++++ b/src/mac/region/RegionRU864.h
+@@ -0,0 +1,459 @@
++/*!
++ * \file      RegionRU864.h
++ *
++ * \brief     Region definition for RU864
++ *
++ * \copyright Revised BSD License, see section \ref LICENSE.
++ *
++ * \code
++ *                ______                              _
++ *               / _____)             _              | |
++ *              ( (____  _____ ____ _| |_ _____  ____| |__
++ *               \____ \| ___ |    (_   _) ___ |/ ___)  _ \
++ *               _____) ) ____| | | || |_| ____( (___| | | |
++ *              (______/|_____)_|_|_| \__)_____)\____)_| |_|
++ *              (C)2013-2017 Semtech
++ *
++ *               ___ _____ _   ___ _  _____ ___  ___  ___ ___
++ *              / __|_   _/_\ / __| |/ / __/ _ \| _ \/ __| __|
++ *              \__ \ | |/ _ \ (__| ' <| _| (_) |   / (__| _|
++ *              |___/ |_/_/ \_\___|_|\_\_| \___/|_|_\\___|___|
++ *              embedded.connectivity.solutions===============
++ *
++ * \endcode
++ *
++ * \author    Miguel Luis ( Semtech )
++ *
++ * \author    Gregory Cristian ( Semtech )
++ *
++ * \author    Daniel Jaeckle ( STACKFORCE )
++ *
++ * \defgroup  REGIONRU864 Region RU864
++ *            Implementation according to LoRaWAN Specification v1.0.2.
++ * \{
++ */
++#ifndef __REGION_RU864_H__
++#define __REGION_RU864_H__
++
++#include "LoRaMac.h"
++
++/*!
++ * LoRaMac maximum number of channels
++ */
++#define RU864_MAX_NB_CHANNELS                       8
++
++/*!
++ * Number of default channels
++ */
++#define RU864_NUMB_DEFAULT_CHANNELS                 2
++
++/*!
++ * Number of channels to apply for the CF list
++ */
++#define RU864_NUMB_CHANNELS_CF_LIST                 5
++
++/*!
++ * Minimal datarate that can be used by the node
++ */
++#define RU864_TX_MIN_DATARATE                       DR_0
++
++/*!
++ * Maximal datarate that can be used by the node
++ */
++#define RU864_TX_MAX_DATARATE                       DR_7
++
++/*!
++ * Minimal datarate that can be used by the node
++ */
++#define RU864_RX_MIN_DATARATE                       DR_0
++
++/*!
++ * Maximal datarate that can be used by the node
++ */
++#define RU864_RX_MAX_DATARATE                       DR_7
++
++/*!
++ * Default datarate used by the node
++ */
++#define RU864_DEFAULT_DATARATE                      DR_0
++
++/*!
++ * Minimal Rx1 receive datarate offset
++ */
++#define RU864_MIN_RX1_DR_OFFSET                     0
++
++/*!
++ * Maximal Rx1 receive datarate offset
++ */
++#define RU864_MAX_RX1_DR_OFFSET                     5
++
++/*!
++ * Default Rx1 receive datarate offset
++ */
++#define RU864_DEFAULT_RX1_DR_OFFSET                 0
++
++/*!
++ * Minimal Tx output power that can be used by the node
++ */
++#define RU864_MIN_TX_POWER                          TX_POWER_7
++
++/*!
++ * Maximal Tx output power that can be used by the node
++ */
++#define RU864_MAX_TX_POWER                          TX_POWER_0
++
++/*!
++ * Default Tx output power used by the node
++ */
++#define RU864_DEFAULT_TX_POWER                      TX_POWER_0
++
++/*!
++ * Default Max EIRP
++ */
++#define RU864_DEFAULT_MAX_EIRP                      16.0f
++
++/*!
++ * Default antenna gain
++ */
++#define RU864_DEFAULT_ANTENNA_GAIN                  2.15f
++
++/*!
++ * ADR Ack limit
++ */
++#define RU864_ADR_ACK_LIMIT                         64
++
++/*!
++ * ADR Ack delay
++ */
++#define RU864_ADR_ACK_DELAY                         32
++
++/*!
++ * Enabled or disabled the duty cycle
++ */
++#define RU864_DUTY_CYCLE_ENABLED                    1
++
++/*!
++ * Maximum RX window duration
++ */
++#define RU864_MAX_RX_WINDOW                         3000
++
++/*!
++ * Receive delay 1
++ */
++#define RU864_RECEIVE_DELAY1                        1000
++
++/*!
++ * Receive delay 2
++ */
++#define RU864_RECEIVE_DELAY2                        2000
++
++/*!
++ * Join accept delay 1
++ */
++#define RU864_JOIN_ACCEPT_DELAY1                    5000
++
++/*!
++ * Join accept delay 2
++ */
++#define RU864_JOIN_ACCEPT_DELAY2                    6000
++
++/*!
++ * Maximum frame counter gap
++ */
++#define RU864_MAX_FCNT_GAP                          16384
++
++/*!
++ * Ack timeout
++ */
++#define RU864_ACKTIMEOUT                            2000
++
++/*!
++ * Random ack timeout limits
++ */
++#define RU864_ACK_TIMEOUT_RND                       1000
++
++#if ( RU864_DEFAULT_DATARATE > DR_5 )
++#error "A default DR higher than DR_5 may lead to connectivity loss."
++#endif
++
++/*!
++ * Second reception window channel frequency definition.
++ */
++#define RU864_RX_WND_2_FREQ                         869100000
++
++/*!
++ * Second reception window channel datarate definition.
++ */
++#define RU864_RX_WND_2_DR                           DR_0
++
++/*!
++ * Maximum number of bands
++ */
++#define RU864_MAX_NB_BANDS                          1
++
++/*!
++ * Band 0 definition
++ * { DutyCycle, TxMaxPower, LastJoinTxDoneTime, LastTxDoneTime, TimeOff }
++ */
++#define RU864_BAND0                                 { 1 , RU864_MAX_TX_POWER, 0, 0, 0 } //  100 %
++
++/*!
++ * LoRaMac default channel 1
++ * Channel = { Frequency [Hz], RX1 Frequency [Hz], { ( ( DrMax << 4 ) | DrMin ) }, Band }
++ */
++#define RU864_LC1                                   { 868900000, 0, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
++
++/*!
++ * LoRaMac default channel 2
++ * Channel = { Frequency [Hz], RX1 Frequency [Hz], { ( ( DrMax << 4 ) | DrMin ) }, Band }
++ */
++#define RU864_LC2                                   { 869100000, 0, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
++
++/*!
++ * LoRaMac channels which are allowed for the join procedure
++ */
++#define RU864_JOIN_CHANNELS                         ( uint16_t )( LC( 1 ) | LC( 2 ) )
++
++/*!
++ * Data rates table definition
++ */
++static const uint8_t DataratesRU864[]  = { 12, 11, 10,  9,  8,  7,  7, 50 };
++
++/*!
++ * Bandwidths table definition in Hz
++ */
++static const uint32_t BandwidthsRU864[] = { 125000, 125000, 125000, 125000, 125000, 125000, 250000, 0 };
++
++/*!
++ * Maximum payload with respect to the datarate index. Cannot operate with repeater.
++ */
++static const uint8_t MaxPayloadOfDatarateRU864[] = { 51, 51, 51, 115, 242, 242, 242, 242 };
++
++/*!
++ * Maximum payload with respect to the datarate index. Can operate with repeater.
++ */
++static const uint8_t MaxPayloadOfDatarateRepeaterRU864[] = { 51, 51, 51, 115, 222, 222, 222, 222 };
++
++/*!
++ * \brief The function gets a value of a specific phy attribute.
++ *
++ * \param [IN] getPhy Pointer to the function parameters.
++ *
++ * \retval Returns a structure containing the PHY parameter.
++ */
++PhyParam_t RegionRU864GetPhyParam( GetPhyParams_t* getPhy );
++
++/*!
++ * \brief Updates the last TX done parameters of the current channel.
++ *
++ * \param [IN] txDone Pointer to the function parameters.
++ */
++void RegionRU864SetBandTxDone( SetBandTxDoneParams_t* txDone );
++
++/*!
++ * \brief Initializes the channels masks and the channels.
++ *
++ * \param [IN] type Sets the initialization type.
++ */
++void RegionRU864InitDefaults( InitType_t type );
++
++/*!
++ * \brief Verifies a parameter.
++ *
++ * \param [IN] verify Pointer to the function parameters.
++ *
++ * \param [IN] type Sets the initialization type.
++ *
++ * \retval Returns true, if the parameter is valid.
++ */
++bool RegionRU864Verify( VerifyParams_t* verify, PhyAttribute_t phyAttribute );
++
++/*!
++ * \brief The function parses the input buffer and sets up the channels of the
++ *        CF list.
++ *
++ * \param [IN] applyCFList Pointer to the function parameters.
++ */
++void RegionRU864ApplyCFList( ApplyCFListParams_t* applyCFList );
++
++/*!
++ * \brief Sets a channels mask.
++ *
++ * \param [IN] chanMaskSet Pointer to the function parameters.
++ *
++ * \retval Returns true, if the channels mask could be set.
++ */
++bool RegionRU864ChanMaskSet( ChanMaskSetParams_t* chanMaskSet );
++
++/*!
++ * \brief Calculates the next datarate to set, when ADR is on or off.
++ *
++ * \param [IN] adrNext Pointer to the function parameters.
++ *
++ * \param [OUT] drOut The calculated datarate for the next TX.
++ *
++ * \param [OUT] txPowOut The TX power for the next TX.
++ *
++ * \param [OUT] adrAckCounter The calculated ADR acknowledgement counter.
++ *
++ * \retval Returns true, if an ADR request should be performed.
++ */
++bool RegionRU864AdrNext( AdrNextParams_t* adrNext, int8_t* drOut, int8_t* txPowOut, uint32_t* adrAckCounter );
++
++/*!
++ * Computes the Rx window timeout and offset.
++ *
++ * \param [IN] datarate     Rx window datarate index to be used
++ *
++ * \param [IN] minRxSymbols Minimum required number of symbols to detect an Rx frame.
++ *
++ * \param [IN] rxError      System maximum timing error of the receiver. In milliseconds
++ *                          The receiver will turn on in a [-rxError : +rxError] ms
++ *                          interval around RxOffset
++ *
++ * \param [OUT]rxConfigParams Returns updated WindowTimeout and WindowOffset fields.
++ */
++void RegionRU864ComputeRxWindowParameters( int8_t datarate, uint8_t minRxSymbols, uint32_t rxError, RxConfigParams_t *rxConfigParams );
++
++/*!
++ * \brief Configuration of the RX windows.
++ *
++ * \param [IN] rxConfig Pointer to the function parameters.
++ *
++ * \param [OUT] datarate The datarate index which was set.
++ *
++ * \retval Returns true, if the configuration was applied successfully.
++ */
++bool RegionRU864RxConfig( RxConfigParams_t* rxConfig, int8_t* datarate );
++
++/*!
++ * \brief TX configuration.
++ *
++ * \param [IN] txConfig Pointer to the function parameters.
++ *
++ * \param [OUT] txPower The tx power index which was set.
++ *
++ * \param [OUT] txTimeOnAir The time-on-air of the frame.
++ *
++ * \retval Returns true, if the configuration was applied successfully.
++ */
++bool RegionRU864TxConfig( TxConfigParams_t* txConfig, int8_t* txPower, TimerTime_t* txTimeOnAir );
++
++/*!
++ * \brief The function processes a Link ADR Request.
++ *
++ * \param [IN] linkAdrReq Pointer to the function parameters.
++ *
++ * \retval Returns the status of the operation, according to the LoRaMAC specification.
++ */
++uint8_t RegionRU864LinkAdrReq( LinkAdrReqParams_t* linkAdrReq, int8_t* drOut, int8_t* txPowOut, uint8_t* nbRepOut, uint8_t* nbBytesParsed );
++
++/*!
++ * \brief The function processes a RX Parameter Setup Request.
++ *
++ * \param [IN] rxParamSetupReq Pointer to the function parameters.
++ *
++ * \retval Returns the status of the operation, according to the LoRaMAC specification.
++ */
++uint8_t RegionRU864RxParamSetupReq( RxParamSetupReqParams_t* rxParamSetupReq );
++
++/*!
++ * \brief The function processes a Channel Request.
++ *
++ * \param [IN] newChannelReq Pointer to the function parameters.
++ *
++ * \retval Returns the status of the operation, according to the LoRaMAC specification.
++ */
++uint8_t RegionRU864NewChannelReq( NewChannelReqParams_t* newChannelReq );
++
++/*!
++ * \brief The function processes a TX ParamSetup Request.
++ *
++ * \param [IN] txParamSetupReq Pointer to the function parameters.
++ *
++ * \retval Returns the status of the operation, according to the LoRaMAC specification.
++ *         Returns -1, if the functionality is not implemented. In this case, the end node
++ *         shall not process the command.
++ */
++int8_t RegionRU864TxParamSetupReq( TxParamSetupReqParams_t* txParamSetupReq );
++
++/*!
++ * \brief The function processes a DlChannel Request.
++ *
++ * \param [IN] dlChannelReq Pointer to the function parameters.
++ *
++ * \retval Returns the status of the operation, according to the LoRaMAC specification.
++ */
++uint8_t RegionRU864DlChannelReq( DlChannelReqParams_t* dlChannelReq );
++
++/*!
++ * \brief Alternates the datarate of the channel for the join request.
++ *
++ * \param [IN] currentDr Current datarate.
++ *
++ * \retval Datarate to apply.
++ */
++int8_t RegionRU864AlternateDr( int8_t currentDr );
++
++/*!
++ * \brief Calculates the back-off time.
++ *
++ * \param [IN] calcBackOff Pointer to the function parameters.
++ */
++void RegionRU864CalcBackOff( CalcBackOffParams_t* calcBackOff );
++
++/*!
++ * \brief Searches and set the next random available channel
++ *
++ * \param [OUT] channel Next channel to use for TX.
++ *
++ * \param [OUT] time Time to wait for the next transmission according to the duty
++ *              cycle.
++ *
++ * \param [OUT] aggregatedTimeOff Updates the aggregated time off.
++ *
++ * \retval Function status [1: OK, 0: Unable to find a channel on the current datarate]
++ */
++LoRaMacStatus_t RegionRU864NextChannel( NextChanParams_t* nextChanParams, uint8_t* channel, TimerTime_t* time, TimerTime_t* aggregatedTimeOff );
++
++/*!
++ * \brief Adds a channel.
++ *
++ * \param [IN] channelAdd Pointer to the function parameters.
++ *
++ * \retval Status of the operation.
++ */
++LoRaMacStatus_t RegionRU864ChannelAdd( ChannelAddParams_t* channelAdd );
++
++/*!
++ * \brief Removes a channel.
++ *
++ * \param [IN] channelRemove Pointer to the function parameters.
++ *
++ * \retval Returns true, if the channel was removed successfully.
++ */
++bool RegionRU864ChannelsRemove( ChannelRemoveParams_t* channelRemove  );
++
++/*!
++ * \brief Sets the radio into continuous wave mode.
++ *
++ * \param [IN] continuousWave Pointer to the function parameters.
++ */
++void RegionRU864SetContinuousWave( ContinuousWaveParams_t* continuousWave );
++
++/*!
++ * \brief Computes new datarate according to the given offset
++ *
++ * \param [IN] downlinkDwellTime Downlink dwell time configuration. 0: No limit, 1: 400ms
++ *
++ * \param [IN] dr Current datarate
++ *
++ * \param [IN] drOffset Offset to be applied
++ *
++ * \retval newDr Computed datarate.
++ */
++uint8_t RegionRU864ApplyDrOffset( uint8_t downlinkDwellTime, int8_t dr, int8_t drOffset );
++
++/*! \} defgroup REGIONRU864 */
++
++#endif // __REGION_RU864_H__
+-- 
+2.17.1
+
