@@ -12,7 +12,7 @@
  * @brief       An open source implementation of Thread stack
  * @see         https://github.com/openthread/openthread
  *
- * Thread if a mesh oriented network stack running for IEEE802.15.4 networks.
+ * Thread is a mesh oriented network stack running for IEEE802.15.4 networks.
  * @{
  *
  * @file
