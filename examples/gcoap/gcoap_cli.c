@@ -145,7 +145,8 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
             block.blknum++;
             coap_opt_add_block2_control(pdu, &block);
             int len = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
-            gcoap_req_send((uint8_t *)pdu->hdr, len, remote, _resp_handler);
+            gcoap_req_send((uint8_t *)pdu->hdr, len, remote,
+                           _resp_handler, memo->context);
         }
         else {
             puts("--- blockwise complete ---");
@@ -258,7 +259,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
         return 0;
     }
 
-    bytes_sent = gcoap_req_send(buf, len, &remote, _resp_handler);
+    bytes_sent = gcoap_req_send(buf, len, &remote, _resp_handler, NULL);
     if (bytes_sent > 0) {
         req_count++;
     }
