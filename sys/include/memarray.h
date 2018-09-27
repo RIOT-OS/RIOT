@@ -7,7 +7,7 @@
  */
 /**
  * @defgroup    sys_memarray memory array allocator
- * @ingroup     sys
+ * @ingroup     sys_memory_management
  * @brief       memory array allocator
  * @{
  *
