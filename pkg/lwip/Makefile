@@ -1,6 +1,7 @@
 PKG_NAME=lwip
 PKG_URL=git://git.savannah.nongnu.org/lwip.git
-PKG_VERSION=STABLE-2_0_3_RELEASE
+# lwIP v2.1.0
+PKG_VERSION=e6a8415df332ee34d7af02255b2aa1e8ee74348f
 PKG_LICENSE=BSD-3-Clause
 
 LWIP_MODULES         = lwip_api lwip_core lwip_ipv4 lwip_ipv6 \
