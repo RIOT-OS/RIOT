@@ -40,15 +40,20 @@ void eeprom_write_byte(uint32_t pos, uint8_t byte)
     eeprom_write(pos, &byte, 1);
 }
 
-size_t eeprom_clear(uint32_t pos, size_t len)
+size_t eeprom_set(uint32_t pos, uint8_t val, size_t len)
 {
     assert(pos + len <= EEPROM_SIZE);
 
     for (size_t i = 0; i < len; i++) {
-        eeprom_write_byte(pos++, 0);
+        eeprom_write_byte(pos++, val);
     }
 
     return len;
+}
+
+size_t eeprom_clear(uint32_t pos, size_t len)
+{
+    return eeprom_set(pos, EEPROM_CLEAR_BYTE, len);
 }
 
 size_t eeprom_erase(void)
