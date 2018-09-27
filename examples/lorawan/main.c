@@ -32,8 +32,7 @@
 #include "net/loramac.h"
 #include "semtech_loramac.h"
 
-/* Messages are sent every 20s to respect the duty cycle on each channel */
-#define PERIOD              (20U)
+#include "app_config.h"
 
 #define SENDER_PRIO         (THREAD_PRIORITY_MAIN - 1)
 static kernel_pid_t sender_pid;
@@ -59,7 +58,7 @@ static void _prepare_next_alarm(void)
     struct tm time;
     rtc_get_time(&time);
     /* set initial alarm */
-    time.tm_sec += PERIOD;
+    time.tm_sec += CONFIG_LORAWAN_EXAMPLE_PERIOD;
     mktime(&time);
     rtc_set_alarm(&time, rtc_cb, NULL);
 }
@@ -101,9 +100,9 @@ int main(void)
     puts("=====================================");
 
     /* Convert identifiers and application key */
-    fmt_hex_bytes(deveui, DEVEUI);
-    fmt_hex_bytes(appeui, APPEUI);
-    fmt_hex_bytes(appkey, APPKEY);
+    fmt_hex_bytes(deveui, CONFIG_DEVEUI);
+    fmt_hex_bytes(appeui, CONFIG_APPEUI);
+    fmt_hex_bytes(appkey, CONFIG_APPKEY);
 
     /* Initialize the loramac stack */
     semtech_loramac_init(&loramac);

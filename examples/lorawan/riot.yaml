@@ -1,0 +1,36 @@
+version: 0.1.0
+name: lorawan-example
+authors:
+- name: Alexandre Abadie
+  email: alexandre.abadie@inria.fr
+license: LGPL-2.1
+copyright: [2018 Inria]
+configuration:
+- group:
+    name: lorawan
+    parameters:
+    - name: appkey
+      macro: APPKEY
+      description: LoRaWAN Application Key
+      value: 0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      type: byte
+      properties:
+        size: 16
+    - name: appeui
+      macro: APPEUI
+      description: LoRaWAN Application EUI
+      value: 0xBBBBBBBBBBBBBBBB
+      type: byte
+      properties:
+        size: 8
+    - name: deveui
+      macro: DEVEUI
+      description: LoRaWAN Device EUI
+      value: 0xCCCCCCCCCCCCCCCC
+      type: byte
+      properties:
+        size: 8
+- name: period
+  description: Seconds to wait between messages
+  type: int
+  value: 20

@@ -9,10 +9,6 @@ RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6 nucleo-f042k6 nucleo-l031k6
 
-DEVEUI ?= 0000000000000000
-APPEUI ?= 0000000000000000
-APPKEY ?= 00000000000000000000000000000000
-
 # Default radio driver is Semtech SX1276 (used by the B-L072Z-LRWAN1 board)
 DRIVER ?= sx1276
 
@@ -38,3 +34,12 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+RIOT_CONFIG_FILE = riot.yaml
+
+APP_H = app_config.h
+
+$(APP_H): $(RIOT_CONFIG_FILE)
+	$(RIOTTOOLS)/config_generator/config_generator.py $(RIOT_CONFIG_FILE) $(APP_H)
+
+$(RIOTBUILD_CONFIG_HEADER_C): $(APP_H)
