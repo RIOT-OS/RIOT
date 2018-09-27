@@ -139,6 +139,34 @@ static int cmd_write_byte(int argc, char **argv)
     return 0;
 }
 
+static int cmd_set(int argc, char **argv)
+{
+    if (argc < 4) {
+        printf("usage: %s <pos> <char> <count>\n", argv[0]);
+        return 1;
+    }
+
+    uint32_t pos = atoi(argv[1]);
+    uint32_t count = atoi(argv[3]);
+
+    if (strlen(argv[2]) != 1) {
+        puts("Failed: char must a single digit");
+        return 1;
+    }
+
+    uint8_t c = (uint8_t)argv[2][0];
+
+    if (pos + count > EEPROM_SIZE) {
+        puts("Failed: cannot clear out of eeprom bounds");
+        return 1;
+    }
+
+    size_t ret = eeprom_set(pos, c, count);
+    printf("%d bytes set to %c in EEPROM\n", (int)ret, c);
+
+    return 0;
+}
+
 static int cmd_clear(int argc, char **argv)
 {
     if (argc < 3) {
@@ -227,6 +255,7 @@ static const shell_command_t shell_commands[] = {
     { "write", "Write bytes to eeprom", cmd_write },
     { "read_byte", "Read a single byte from eeprom", cmd_read_byte },
     { "write_byte", "Write a single byte to eeprom", cmd_write_byte },
+    { "set", "Set bytes to eeprom", cmd_set},
     { "clear", "Clear bytes to eeprom", cmd_clear},
     { "erase", "Erase whole eeprom", cmd_erase},
     { "test", "Test the EEPROM implementation", cmd_test },
