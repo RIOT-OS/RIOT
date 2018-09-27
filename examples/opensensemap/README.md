@@ -31,7 +31,7 @@ hardware (you can choose either of them). Under _Manual configuration_ you can
 add sensors to your box. For this application we added 3 sensors:
 
 1. **Temperature**
-    - Phenomenom: 'Temperature'
+    - Phenomenon: 'Temperature'
     - Unit: 'C'
     - Type: 'temperature'
 2. **Battery**
@@ -39,11 +39,11 @@ add sensors to your box. For this application we added 3 sensors:
     - Unit: '%'
     - Type: 'uint8'
 3. **Humidity**
-    - Phenomenom: 'Humidity'
+    - Phenomenon: 'Humidity'
     - Unit: '%'
     - Type: 'humidity'
 
-Phenomenom can be any representative string, but type needs to be one of the
+Phenomenon can be any representative string, but type needs to be one of the
 accepted types
 [documented here](https://github.com/sensebox/ttn-osem-integration).
 
@@ -53,7 +53,9 @@ Once the box is created go to the dashboard and click the 'Edit' button. On the
 - **Decoding Profile**: LoRa serialization
 - **TTN application ID**: (found on the 'Application Overview' section)
 - **TTN device ID**: (found on the 'Device Overview' section as Device ID)
-- **Port**: (LoRa port where the data is being sent to The Things Network)
+- **Port**: (LoRa port where the data is being sent to The Things Network. Found
+in Application -> [your application] -> Devices -> [your device] -> Data -> 
+Port column)
 - **Decoder Options**:
 ```json
 [
