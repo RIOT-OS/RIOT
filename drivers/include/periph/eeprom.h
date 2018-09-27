@@ -79,6 +79,25 @@ void eeprom_write_byte(uint32_t pos, uint8_t data);
  */
 size_t eeprom_write(uint32_t pos, const uint8_t *data, size_t len);
 
+/**
+ * @brief   Clear @p len bytes from the given position @p pos
+ *
+ * Clearing a byte in EEPROM simply consists in setting it to 0
+ *
+ * @param[in] pos       start position in eeprom
+ * @param[in] len       the number of bytes to clear
+ *
+ * @return the number of bytes cleared
+ */
+size_t eeprom_clear(uint32_t pos, size_t len);
+
+/**
+ * @brief   Erase the whole EEPROM content
+ *
+ * @return the EEPROM_SIZE
+ */
+size_t eeprom_erase(void);
+
 #ifdef __cplusplus
 }
 #endif
