@@ -38,6 +38,10 @@ ifneq (,$(filter bmx280,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bmx280/include
 endif
 
+ifneq (,$(filter bme680,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bme680/include
+endif
+
 ifneq (,$(filter cc110x,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x/include
 endif
