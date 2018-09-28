@@ -72,3 +72,40 @@ void cortexm_init(void)
     cortexm_init_isr_priorities();
     cortexm_init_misc();
 }
+
+static const uint32_t BFARVALID_MASK = (0x80 << SCB_CFSR_BUSFAULTSR_Pos);
+
+bool cpu_check_address(volatile const char *address)
+{
+#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
+    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
+    bool is_valid = true;
+
+    /* Clear BFARVALID flag */
+    SCB->CFSR |= BFARVALID_MASK;
+
+    /* Ignore BusFault by enabling BFHFNMIGN */
+    SCB->CCR |= SCB_CCR_BFHFNMIGN_Msk;
+    __disable_fault_irq();
+
+    *address;
+    /* Check BFARVALID flag */
+    if ((SCB->CFSR & BFARVALID_MASK) != 0)
+    {
+        /* Bus Fault occured reading the address */
+        is_valid = false;
+    }
+
+    __enable_fault_irq();
+    /* Reenable BusFault by clearing  BFHFNMIGN */
+    SCB->CCR &= ~SCB_CCR_BFHFNMIGN_Msk;
+
+    return is_valid;
+#else
+    /* Cortex-M0 doesn't have BusFault */
+    (void) address;
+
+    printf("[warning] %s: Cortex-M0 doesn't have BusFault\n", __func__);
+    return true;
+#endif
+}
