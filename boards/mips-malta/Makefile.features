@@ -4,4 +4,4 @@ FEATURES_PROVIDED += periph_timer
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = mips32r2
 
--include $(RIOTCPU)/mips32r2_generic/Makefile.features
+include $(RIOTCPU)/mips32r2_generic/Makefile.features
