@@ -55,7 +55,7 @@ void color_rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv)
 
     /* compute hue */
     hsv->h = 0.0f;
-    if (hsv->s != 0.0) {
+    if (hsv->s != 0.0f) {
         float rc, gc, bc;
 
         rc = (hsv->v - rd) / delta;
@@ -73,7 +73,7 @@ void color_rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv)
         }
         hsv->h *= 60.0f;
         if (hsv->h < 0.0f) {
-            hsv->h += 360.0;
+            hsv->h += 360.0f;
         }
     }
 }
@@ -90,7 +90,7 @@ void color_hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb)
         return;
     }
 
-    h = (hsv->h == 360.0f) ? 0.0 : hsv->h;
+    h = (hsv->h == 360.0f) ? 0.0f : hsv->h;
     h /= 60.0f;
     i = (int)h;
     f = h - i;
