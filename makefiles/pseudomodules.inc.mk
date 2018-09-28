@@ -116,6 +116,11 @@ PSEUDOMODULES += si7021
 PSEUDOMODULES += rn2483
 PSEUDOMODULES += rn2903
 
+# include variants of VCNL40x0 drivers as pseudo modules
+PSEUDOMODULES += vcnl4010
+PSEUDOMODULES += vcnl4020
+PSEUDOMODULES += vcnl4040
+
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
 
