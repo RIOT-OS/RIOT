@@ -81,6 +81,9 @@ PSEUDOMODULES += adc081c
 PSEUDOMODULES += adc101c
 PSEUDOMODULES += adc121c
 
+# full featured version of CCS811 driver as pseudo module
+PSEUDOMODULES += ccs811_full
+
 # include variants of SX127X drivers as pseudo modules
 PSEUDOMODULES += sx1272
 PSEUDOMODULES += sx1276
