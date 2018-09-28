@@ -1,0 +1,38 @@
+From ae1128a138dbf7b14886853bd149757b03859cdb Mon Sep 17 00:00:00 2001
+From: Martine Lenders <m.lenders@fu-berlin.de>
+Date: Thu, 27 Sep 2018 21:21:18 +0200
+Subject: [PATCH] lowpan6.c: Fix IEEE 802.15.4 address setting
+
+Reverts a regression introduced in
+3a8af612b3b818a89de5846cc9b046756af184cc:
+
+Use hardware address fetched from neighbor cache *not* the hardware
+address of the interface as destination address.
+---
+ src/netif/lowpan6.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/netif/lowpan6.c b/src/netif/lowpan6.c
+index 5769522..7f0d276 100644
+--- a/src/netif/lowpan6.c
++++ b/src/netif/lowpan6.c
+@@ -630,11 +630,11 @@ lowpan6_output(struct netif *netif, struct pbuf *q, const ip6_addr_t *ip6addr)
+   }
+ 
+   /* Send out the packet using the returned hardware address. */
+-  result = lowpan6_hwaddr_to_addr(netif, &dest);
+-  if (result != ERR_OK) {
+-    MIB2_STATS_NETIF_INC(netif, ifoutdiscards);
+-    return result;
+-  }
++  dest.addr_len = netif->hwaddr_len;
++  /* XXX: Inferring the length of the source address from the destination address
++   * is not correct for IEEE 802.15.4, but currently we don't get this information
++   * from the neighbor cache */
++  SMEMCPY(dest.addr, hwaddr, netif->hwaddr_len);
+   MIB2_STATS_NETIF_INC(netif, ifoutucastpkts);
+   return lowpan6_frag(netif, q, &src, &dest);
+ }
+-- 
+2.7.4
+
