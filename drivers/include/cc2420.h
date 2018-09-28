@@ -41,7 +41,7 @@ extern "C" {
 /**
  * @brief   PAN ID configuration
  */
-#define CC2420_PANID_DEFAULT    (IEEE802154_DEFAULT_PANID)
+#define CC2420_PANID_DEFAULT    (CONFIG_IEEE802154_DEFAULT_PANID)
 
 /**
   * @name    Channel configuration
@@ -49,7 +49,7 @@ extern "C" {
   */
 #define CC2420_CHAN_MIN         (IEEE802154_CHANNEL_MIN)
 #define CC2420_CHAN_MAX         (IEEE802154_CHANNEL_MAX)
-#define CC2420_CHAN_DEFAULT     (IEEE802154_DEFAULT_CHANNEL)
+#define CC2420_CHAN_DEFAULT     (CONFIG_IEEE802154_DEFAULT_CHANNEL)
 /** @} */
 
 /**
@@ -58,7 +58,7 @@ extern "C" {
  */
 #define CC2420_TXPOWER_MIN      (-25)
 #define CC2420_TXPOWER_MAX      (0)
-#define CC2420_TXPOWER_DEFAULT  (IEEE802154_DEFAULT_TXPOWER)
+#define CC2420_TXPOWER_DEFAULT  (CONFIG_IIEEE802154_DEFAULT_TXPOWER)
 /** @} */
 
 /**

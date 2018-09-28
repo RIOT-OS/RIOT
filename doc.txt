@@ -1,4 +1,9 @@
 /**
+* @defgroup configurations Configurations
+* @brief List of macros for configuring RIOT.
+*/
+
+/**
  * @defgroup utils Utilities
  * @brief Utilities and helper functionality
  *
