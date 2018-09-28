@@ -28,6 +28,7 @@
 #include "luid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
+#include "ieee802154_config.h"
 #include "net/gnrc.h"
 #include "at86rf2xx_registers.h"
 #include "at86rf2xx_internal.h"

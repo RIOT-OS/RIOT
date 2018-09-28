@@ -28,6 +28,7 @@
 #include "checksum/ucrc16.h"
 #include "native_internal.h"
 #include "random.h"
+#include "ieee802154_config.h"
 
 #include "socket_zep.h"
 

@@ -31,6 +31,7 @@
 #include "periph/gpio.h"
 #include "net/netdev.h"
 #include "net/ieee802154.h"
+#include "ieee802154_config.h"
 #include "net/gnrc/nettype.h"
 
 #ifdef __cplusplus

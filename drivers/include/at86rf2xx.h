@@ -37,6 +37,7 @@
 #include "periph/gpio.h"
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
+#include "ieee802154_config.h"
 #include "net/gnrc/nettype.h"
 
 #ifdef __cplusplus
@@ -77,7 +78,7 @@ extern "C" {
 /**
  * @brief   Default TX power (0dBm)
  */
-#define AT86RF2XX_DEFAULT_TXPOWER       (CONFIG_IIEEE802154_DEFAULT_TXPOWER)
+#define AT86RF2XX_DEFAULT_TXPOWER       (CONFIG_IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Base (minimal) RSSI value in dBm

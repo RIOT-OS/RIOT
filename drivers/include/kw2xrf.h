@@ -30,6 +30,7 @@
 #include "periph/gpio.h"
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
+#include "ieee802154_config.h"
 #include "net/gnrc/nettype.h"
 #include "thread.h"
 
@@ -69,7 +70,7 @@ extern "C" {
 /**
  * @brief   Default TX_POWER in dbm used after initialization
  */
-#define KW2XRF_DEFAULT_TX_POWER         (CONFIG_IIEEE802154_DEFAULT_TXPOWER)
+#define KW2XRF_DEFAULT_TX_POWER         (CONFIG_IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Maximum output power of the kw2x device in dBm

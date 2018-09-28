@@ -112,32 +112,6 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 /** @} */
 
 /**
- * @{
- * @name    Default values
- * @brief   Default values for devices to choose
- */
-#ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL
-#define CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL   (5U)
-#endif
-
-#ifndef CONFIG_IEEE802154_DEFAULT_CHANNEL
-#define CONFIG_IEEE802154_DEFAULT_CHANNEL          (26U)
-#endif
-
-#ifndef CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE
-#define CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE      (2U)
-#endif
-
-#ifndef CONFIG_IEEE802154_DEFAULT_PANID
-#define CONFIG_IEEE802154_DEFAULT_PANID            (0x0023U)
-#endif
-
-#ifndef CONFIG_IIEEE802154_DEFAULT_TXPOWER
-#define CONFIG_IIEEE802154_DEFAULT_TXPOWER          (0) /* in dBm */
-#endif
-/** @} */
-
-/**
  * @brief   Initializes an IEEE 802.15.4 MAC frame header in @p buf.
  *
  * @pre Resulting header must fit in memory allocated at @p buf.

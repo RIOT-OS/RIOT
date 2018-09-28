@@ -47,8 +47,8 @@
 * @brief   Tranmission power in dBm
 * @{
 */
-#ifndef CONFIG_IIEEE802154_DEFAULT_TXPOWER
-#define CONFIG_IIEEE802154_DEFAULT_TXPOWER          (0) /* in dBm */
+#ifndef CONFIG_IEEE802154_DEFAULT_TXPOWER
+#define CONFIG_IEEE802154_DEFAULT_TXPOWER          (0) /* in dBm */
 #endif
 /** @} */
 /** @} */

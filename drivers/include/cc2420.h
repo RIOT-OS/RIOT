@@ -28,6 +28,7 @@
 
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
+#include "ieee802154_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +59,7 @@ extern "C" {
  */
 #define CC2420_TXPOWER_MIN      (-25)
 #define CC2420_TXPOWER_MAX      (0)
-#define CC2420_TXPOWER_DEFAULT  (CONFIG_IIEEE802154_DEFAULT_TXPOWER)
+#define CC2420_TXPOWER_DEFAULT  (CONFIG_IEEE802154_DEFAULT_TXPOWER)
 /** @} */
 
 /**

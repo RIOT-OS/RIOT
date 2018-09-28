@@ -27,6 +27,7 @@
 #include "net/ieee802154.h"
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
+#include "ieee802154_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +56,7 @@ extern "C" {
 #define CC2538_MIN_FREQ             (2394)
 #define CC2538_MAX_FREQ             (2507)
 
-#define CC2538_RF_POWER_DEFAULT     (CONFIG_IIEEE802154_DEFAULT_TXPOWER)    /**< Default output power in dBm */
+#define CC2538_RF_POWER_DEFAULT     (CONFIG_IEEE802154_DEFAULT_TXPOWER)    /**< Default output power in dBm */
 #define CC2538_RF_CHANNEL_DEFAULT   (CONFIG_IEEE802154_DEFAULT_CHANNEL)
 #define CC2538_RF_PANID_DEFAULT     (CONFIG_IEEE802154_DEFAULT_PANID)
 

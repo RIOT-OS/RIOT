@@ -27,6 +27,7 @@
 #include "mrf24j40_internal.h"
 #include "mrf24j40_netdev.h"
 #include "xtimer.h"
+#include "ieee802154_config.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
