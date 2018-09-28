@@ -195,13 +195,16 @@ void gnrc_ipv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *current,
 
 ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
 {
-    ipv6_hdr_t *hdr = NULL;
     gnrc_pktsnip_t *tmp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
-    if ((tmp != NULL) && (tmp->data != NULL) && ipv6_hdr_is(tmp->data)) {
-        hdr = ((ipv6_hdr_t*) tmp->data);
+    if (tmp == NULL) {
+        return NULL;
     }
 
-    return hdr;
+    assert(tmp->data != NULL);
+    assert(tmp->size >= sizeof(ipv6_hdr_t));
+    assert(ipv6_hdr_is(tmp->data));
+
+    return ((ipv6_hdr_t*) tmp->data);
 }
 
 /* internal functions */
