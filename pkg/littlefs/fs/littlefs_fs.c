@@ -184,6 +184,11 @@ static int _format(vfs_mount_t *mountp)
 
 static int _mount(vfs_mount_t *mountp)
 {
+    /* if one of the lines below fail to compile you probably need to adjust
+       vfs buffer sizes ;) */
+    BUILD_BUG_ON(VFS_DIR_BUFFER_SIZE < sizeof(lfs_dir_t));
+    BUILD_BUG_ON(VFS_FILE_BUFFER_SIZE < sizeof(lfs_file_t));
+
     littlefs_desc_t *fs = mountp->private_data;
 
     DEBUG("littlefs: mount: mountp=%p\n", (void *)mountp);
