@@ -811,3 +811,7 @@ USEPKG := $(sort $(USEPKG))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
   include $(RIOTBASE)/Makefile.dep
 endif
+
+ifneq (,$(filter ecc_%,$(USEMODULE)))
+  USEMODULE += ecc
+endif

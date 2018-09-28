@@ -82,9 +82,6 @@ endif
 ifneq (,$(filter tcp,$(USEMODULE)))
   DIRS += net/transport_layer/tcp
 endif
-ifneq (,$(filter hamming256,$(USEMODULE)))
-  DIRS += ecc/hamming256
-endif
 ifneq (,$(filter uhcpc,$(USEMODULE)))
   DIRS += net/application_layer/uhcp
 endif

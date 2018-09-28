@@ -1,1 +1,1 @@
-USEMODULE += hamming256
+USEMODULE += ecc_hamming256
