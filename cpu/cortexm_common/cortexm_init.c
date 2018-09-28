@@ -84,9 +84,10 @@ bool cpu_check_address(volatile const char *address)
     /* Clear BFARVALID flag */
     SCB->CFSR |= BFARVALID_MASK;
 
-    /* Ignore BusFault by enabling BFHFNMIGN */
-    SCB->CCR |= SCB_CCR_BFHFNMIGN_Msk;
+    /* Ignore BusFault by enabling BFHFNMIGN and disabling interrupts */
+    uint32_t mask = __get_FAULTMASK();
     __disable_fault_irq();
+    SCB->CCR |= SCB_CCR_BFHFNMIGN_Msk;
 
     *address;
     /* Check BFARVALID flag */
@@ -96,9 +97,9 @@ bool cpu_check_address(volatile const char *address)
         is_valid = false;
     }
 
-    __enable_fault_irq();
     /* Reenable BusFault by clearing  BFHFNMIGN */
     SCB->CCR &= ~SCB_CCR_BFHFNMIGN_Msk;
+    __set_FAULTMASK(mask);
 
     return is_valid;
 #else
