@@ -49,6 +49,20 @@ void cpu_init(void)
     periph_clk_en(APB1, BIT_APB_PWREN);
     /* initialize the system clock as configured in the periph_conf.h */
     stmclk_init_sysclk();
+
+#if defined(CPU_FAM_STM32L1)
+    /* switch all GPIOs to AIN mode to minimize power consumption */
+    /* can't be more than 12 ports on STM32L1 */
+    for (int i = 0; i < 12; i++) {
+        GPIO_TypeDef *port;
+        port = (GPIO_TypeDef *)(GPIOA_BASE + i*(GPIOB_BASE - GPIOA_BASE));
+        if (cpu_check_address((char *)port))
+            port->MODER = 0xffffffff;
+        else
+            break;
+    }
+#endif
+
 #ifdef MODULE_PERIPH_DMA
     /*  initialize DMA streams */
     dma_init();
