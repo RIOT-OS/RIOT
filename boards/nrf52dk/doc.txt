@@ -90,6 +90,15 @@ board](https://github.com/d00616/temp/raw/master/nrf52-minidev.jpg)
 
 **Caution**: NFC is not usable with this board.
 
+### RESET pin configuration
+
+On many (all?) nrf52dk boards, the reset pin is not configured out-of-the box.
+This means, that simply nothing happens if the RESET pin is pressed. To change
+this, RIOT provides a little tool in `dist/tools/nrf52_resetpin_cfg`.
+
+Simply compile, flash, and run that tool on your board, and the reset pin should
+work for the time being.
+
 ## Current measurement:
 
 There are two pins for current measurement on board. Don't connect these pins
