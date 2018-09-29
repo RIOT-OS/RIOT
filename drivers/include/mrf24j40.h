@@ -92,19 +92,19 @@ extern "C" {
  *
  * @{
  */
-#define MRF24J40_OPT_CSMA               (0x0100)    /**< CSMA active */
-#define MRF24J40_OPT_PROMISCUOUS        (0x0200)    /**< promiscuous mode
+#define MRF24J40_OPT_CSMA               (0x01)      /**< CSMA active */
+#define MRF24J40_OPT_PROMISCUOUS        (0x02)      /**< promiscuous mode
                                                      *   active */
-#define MRF24J40_OPT_PRELOADING         (0x0400)    /**< preloading enabled */
-#define MRF24J40_OPT_TELL_TX_START      (0x0800)    /**< notify MAC layer on TX
+#define MRF24J40_OPT_PRELOADING         (0x04)      /**< preloading enabled */
+#define MRF24J40_OPT_TELL_TX_START      (0x08)      /**< notify MAC layer on TX
                                                      *   start */
-#define MRF24J40_OPT_TELL_TX_END        (0x1000)    /**< notify MAC layer on TX
+#define MRF24J40_OPT_TELL_TX_END        (0x10)      /**< notify MAC layer on TX
                                                      *   finished */
-#define MRF24J40_OPT_TELL_RX_START      (0x2000)    /**< notify MAC layer on RX
+#define MRF24J40_OPT_TELL_RX_START      (0x20)      /**< notify MAC layer on RX
                                                      *   start */
-#define MRF24J40_OPT_TELL_RX_END        (0x4000)    /**< notify MAC layer on RX
+#define MRF24J40_OPT_TELL_RX_END        (0x40)      /**< notify MAC layer on RX
                                                      *   finished */
-#define MRF24J40_OPT_AUTOACK            (0x8000)    /**< Auto ack RX frames */
+#define MRF24J40_OPT_AUTOACK            (0x80)      /**< Auto ack RX frames */
 /** @} */
 
 
@@ -132,7 +132,7 @@ typedef struct {
     netdev_ieee802154_t netdev;             /**< netdev parent struct */
     /*  device specific fields  */
     mrf24j40_params_t params;               /**< parameters for initialization */
-    uint16_t flags;                         /**< Internal device flags */
+    uint8_t flags;                          /**< Internal device flags */
     uint8_t state;                          /**< current state of the radio */
     uint8_t idle_state;                     /**< state to return to after sending */
     uint8_t tx_frame_len;                   /**< length of the current TX frame */
