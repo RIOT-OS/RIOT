@@ -21,14 +21,15 @@
  * This module provides porting information for libraries and applications to use
  * with RIOT (to build an external module). If you'd like to add a package to RIOT
  * you need to add a directory with the name of your package to this directory.
- * This directory should contain at least two files:
+ * This directory should contain at least one file:
  *
- *  * **Zero or more patch files**: Your patches of the upstream application of
- *    the package to make it build with RIOT.
  *  * **Makefile**: A Makefile describing how to get the upstream application,
  *    apply the patch and how to build the package as a RIOT module.
  *    A rough template for several methods of acquiring a package is provided in
  *    `pkg/Makefile.git`, `pkg/Makefile.http`, and `pkg/Makefile.svn`
+ *
+ * Patch files can be included in a `patches` directory in the package dir.
+ * These are applied to the upstream package to make it build with RIOT.
  *
  * Creating a patch with git
  * -------------------------
@@ -39,6 +40,6 @@
  *  * conduct necessary changes (e.g. edit, add, or remove some files)
  *  * commit your changes using `git commit`
  *  * create the patch files using `git format-patch -n riot-port`
- *  * move the resulting patch files to the corresponding subfolder of pkg
+ *  * move the resulting patch files to the patches directory of your package.
  * @}
  */

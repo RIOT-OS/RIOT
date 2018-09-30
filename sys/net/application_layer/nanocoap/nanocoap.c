@@ -30,6 +30,15 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+/**
+ * @name    Internally used CoAP packet types
+ * @{
+ */
+#define COAP_REQ                (0)
+#define COAP_RESP               (2)
+#define COAP_RST                (3)
+/** @} */
+
 static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end);
 int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target);
 static uint32_t _decode_uint(uint8_t *pkt_pos, unsigned nbytes);

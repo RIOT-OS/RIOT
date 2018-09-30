@@ -15,6 +15,8 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
+#include <string.h>
+
 #include "bitfield.h"
 #include "net/ethernet.h"
 #include "net/ipv6.h"

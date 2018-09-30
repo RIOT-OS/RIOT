@@ -36,12 +36,13 @@ the overall validity of the PR.
     Is the problem that the PR intends to solve clearly stated?
 2.  Is the solution presented in the PR as simple as possible to satisfy the
     requirements, but no simpler?
-3.  Is the PR functionally atomic? Does it address a single issue or should
-    it be split into multiple individual PRs?
+3.  Is the PR a manageable size? It should be confined to a single explainable
+    change, and be runnable on its own.
 4.  Is the solution well designed on a high level?
 5.  Do the concepts used by the PR make sense?
 6.  Does the PR break with existing concepts?
-7.  Is the structure of the PR itself valid?
+7.  Is there a clean commit history in the pulled branch? The commit history
+    should group the code differences cleanly.
 8.  Are there clear and adequate instructions on how to test the PR? \
     This may or may not include implemented tests as part of the PR.
 9.  Does the code compile and run?
@@ -82,9 +83,9 @@ skipping some/all tests.
 
 Check that the code follows the [Coding Conventions]. This can be aided (but not
 replaced) by Uncrustify, using the uncrustify-riot.cfg file found in the base
-directory. Note the difference between personal coding style, which is
-subjective and is allowed subject to the other guidelines, and the coding
-conventions, which are absolute and must always be followed.
+directory. Note the difference between personal coding style, which is allowed
+subject to the other guidelines, and the coding conventions, which are absolute
+and must always be followed.
 
 
 ### 5. - Review the documentation
@@ -105,7 +106,7 @@ complete that no input from the original developer or maintainer is required.
 
 -   Be responsive. Even if you are too busy to review the contribution, try to
     add a note fairly soon after the PR is submitted, thanking them for their
-    awesome contribution and saying that you will review it in due course. Once
+    valuable contribution and saying that you will review it in due course. Once
     the contributor has made their changes, ensure you reply to them in a
     reasonable timeframe. Acknowledge their replies to concerns if you're happy
     with their argument.
@@ -113,8 +114,9 @@ complete that no input from the original developer or maintainer is required.
     help the contributor. This can include code snippets, links to
     code/issues/wiki entries/web pages, or anything else. Educating contributors
     means we are investing in our community.
--   Be friendly. Be objective in your review, and of course, follow the
-    [Code of Conduct].
+-   Be friendly. Respect the original author, bearing in mind that their coding
+    style or their design may be just as valid as the way you would have done
+    it. And of course, always follow the [Code of Conduct].
 
 
 ### Organisation of reviewing between maintainers

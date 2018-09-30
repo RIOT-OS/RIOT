@@ -55,7 +55,8 @@ static int _send(gnrc_pktsnip_t *pkt)
 
     /* Search for TCP header */
     LL_SEARCH_SCALAR(pkt, tcp, type, GNRC_NETTYPE_TCP);
-    /* cppcheck-suppress knownConditionTrueFalse */
+    /* cppcheck-suppress knownConditionTrueFalse
+     * (reason: tcp *can* be != NULL after LL_SEARCH_SCALAR) */
     if (tcp == NULL) {
         DEBUG("gnrc_tcp_eventloop : _send() : tcp header missing.\n");
         gnrc_pktbuf_release(pkt);

@@ -31,7 +31,9 @@
 
 #define MODE_NOTSUP         (0xff)
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 static gpio_isr_ctx_t isr_ctx[4][8];
+#endif
 
 /**
  * @brief Access GPIO low-level device
@@ -118,6 +120,37 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
+int gpio_read(gpio_t pin)
+{
+    return (int)(gpio(pin)->DATA & _pin_mask(pin));
+}
+
+void gpio_set(gpio_t pin)
+{
+    gpio(pin)->DATA |= _pin_mask(pin);
+}
+
+void gpio_clear(gpio_t pin)
+{
+    gpio(pin)->DATA &= ~_pin_mask(pin);
+}
+
+void gpio_toggle(gpio_t pin)
+{
+    gpio(pin)->DATA ^= _pin_mask(pin);
+}
+
+void gpio_write(gpio_t pin, int value)
+{
+    if (value) {
+        gpio(pin)->DATA |= _pin_mask(pin);
+    }
+    else {
+        gpio(pin)->DATA &= ~_pin_mask(pin);
+    }
+}
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
@@ -173,36 +206,6 @@ void gpio_irq_disable(gpio_t pin)
     gpio(pin)->IE &= ~_pin_mask(pin);
 }
 
-int gpio_read(gpio_t pin)
-{
-    return (int)(gpio(pin)->DATA & _pin_mask(pin));
-}
-
-void gpio_set(gpio_t pin)
-{
-    gpio(pin)->DATA |= _pin_mask(pin);
-}
-
-void gpio_clear(gpio_t pin)
-{
-    gpio(pin)->DATA &= ~_pin_mask(pin);
-}
-
-void gpio_toggle(gpio_t pin)
-{
-    gpio(pin)->DATA ^= _pin_mask(pin);
-}
-
-void gpio_write(gpio_t pin, int value)
-{
-    if (value) {
-        gpio(pin)->DATA |= _pin_mask(pin);
-    }
-    else {
-        gpio(pin)->DATA &= ~_pin_mask(pin);
-    }
-}
-
 static inline void handle_isr(uint8_t port_num)
 {
     cc2538_gpio_t *port  = ((cc2538_gpio_t *)GPIO_BASE) + port_num;
@@ -242,6 +245,7 @@ void isr_gpiod(void)
 {
     handle_isr(3);
 }
+#endif
 
 /* CC2538 specific add-on GPIO functions */
 

@@ -11,15 +11,17 @@
  * @brief
  * @{
  *
- * @brief       Tests for Hamming Code implementation
+ * @brief       Tests for Error Correction Codes
+ *
  * @author      Lucas Jenß <lucas@x3ro.de>
+ * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 #include <string.h>
 #include "embUnit.h"
 
 #include "ecc/hamming256.h"
 
-static void test_single(void)
+static void test_hamming256_single(void)
 {
     uint8_t data[256];
     uint8_t ecc[3];
@@ -46,7 +48,7 @@ static void test_single(void)
     TEST_ASSERT_EQUAL_INT(Hamming_ERROR_ECC, result);
 }
 
-static void test_padding(void)
+static void test_hamming256_padding(void)
 {
     uint8_t data[203];
     uint8_t ecc[3];
@@ -76,11 +78,11 @@ static void test_padding(void)
 TestRef test_all(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
-        new_TestFixture(test_single),
-        new_TestFixture(test_padding),
+        new_TestFixture(test_hamming256_single),
+        new_TestFixture(test_hamming256_padding),
     };
 
-    EMB_UNIT_TESTCALLER(EccTest, 0, 0, fixtures);
+    EMB_UNIT_TESTCALLER(EccTest, NULL, NULL, fixtures);
     return (TestRef) & EccTest;
 }
 

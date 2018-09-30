@@ -222,9 +222,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             }
             */
 
-            static uint8_t buf[ETHERNET_FRAME_LEN];
+            static uint8_t nullbuf[ETHERNET_FRAME_LEN];
 
-            real_read(dev->tap_fd, buf, sizeof(buf));
+            real_read(dev->tap_fd, nullbuf, sizeof(nullbuf));
 
             _continue_reading(dev);
         }

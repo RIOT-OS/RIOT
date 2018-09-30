@@ -158,6 +158,11 @@ extern "C" {
 #define TSL2561_PARAM_ADDR           TSL2561_ADDR_LOW
 
 /**
+ * @brief    BMP280 Pressure and temperature sensor
+ */
+#define BMX280_PARAM_I2C_ADDR        (0x76)
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);

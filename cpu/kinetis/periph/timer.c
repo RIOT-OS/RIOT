@@ -436,7 +436,7 @@ static inline int lptmr_set(uint8_t dev, uint16_t timeout)
         hw->CNR = 0;
         hw->CMR = timeout + hw->CNR;
         /* cppcheck-suppress selfAssignment
-         * Clear IRQ flags */
+         * (reason: intentional self assignment to clear all pending IRQs) */
         hw->CSR = hw->CSR;
         /* Enable timer and IRQ */
         hw->CSR = LPTMR_CSR_TEN_MASK | LPTMR_CSR_TFC_MASK | LPTMR_CSR_TIE_MASK;
@@ -469,7 +469,7 @@ static inline int lptmr_set_absolute(uint8_t dev, uint16_t target)
         /* TCF is set, safe to update CMR live */
         hw->CMR = target - lptmr[dev].cnr;
         /* cppcheck-suppress selfAssignment
-         * Clear IRQ flags */
+         * (reason: intentional self assignment to clear all pending IRQs) */
         hw->CSR = hw->CSR;
         /* Enable timer and IRQ */
         hw->CSR = LPTMR_CSR_TEN_MASK | LPTMR_CSR_TFC_MASK | LPTMR_CSR_TIE_MASK;

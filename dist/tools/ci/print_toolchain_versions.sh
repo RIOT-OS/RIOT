@@ -8,6 +8,10 @@ get_cmd_version() {
     local cmd="$1"
     if command -v "$cmd" 2>&1 >/dev/null; then
         ver=$("$cmd" --version 2> /dev/null | head -n 1)
+        # some tools (eg. openocd) print version info to stderr
+        if [ -z "$ver" ]; then
+            ver=$("$cmd" --version 2>&1 | head -n 1)
+        fi
         if [ -z "$ver" ]; then
             ver="error"
         fi
@@ -30,6 +34,24 @@ get_define() {
     printf "%s" "$line"
 }
 
+get_kernel_info() {
+    uname -mprs
+}
+
+get_os_info() {
+    local os="$(uname -s)"
+    local osname="unknown"
+    local osvers="unknown"
+    if [ "$os" = "Linux" ]; then
+        osname="$(cat /etc/os-release | grep ^NAME= | awk -F'=' '{print $2}')"
+        osvers="$(cat /etc/os-release | grep ^VERSION= | awk -F'=' '{print $2}')"
+    elif [ "$os" = "Darwin" ]; then
+        osname="$(sw_vers -productName)"
+        osvers="$(sw_vers -productVersion)"
+    fi
+    printf "%s %s" "$osname" "$osvers"
+}
+
 newlib_version() {
     if [ -z "$1" ]; then
         printf "%s" "error"
@@ -48,7 +70,15 @@ avr_libc_version() {
     fi
 }
 
-printf "%s\n" "Installed compiler toolchains "
+printf "\n"
+# print operating system information
+printf "%s\n" "Operating System Environment"
+printf "%s\n" "-----------------------------"
+printf "%23s: %s\n" "Operating System" "$(get_os_info)"
+printf "%23s: %s\n" "Kernel" "$(get_kernel_info)"
+printf "\n"
+
+printf "%s\n" "Installed compiler toolchains"
 printf "%s\n" "-----------------------------"
 printf "%23s: %s\n" "native gcc" "$(get_cmd_version gcc)"
 for p in arm-none-eabi avr mips-mti-elf msp430 riscv-none-embed; do
@@ -68,7 +98,7 @@ printf "%23s: %s\n" "avr-libc" "$(avr_libc_version avr-gcc)"
 printf "\n"
 printf "%s\n" "Installed development tools"
 printf "%s\n" "---------------------------"
-for c in cmake cppcheck doxygen flake8 git; do
+for c in cmake cppcheck doxygen flake8 git openocd python python2 python3; do
     printf "%23s: %s\n" "$c" "$(get_cmd_version $c)"
 done
 printf "%23s: %s\n" "coccinelle" "$(get_cmd_version spatch)"

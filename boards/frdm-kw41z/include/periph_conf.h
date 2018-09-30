@@ -129,21 +129,23 @@ static const uart_conf_t uart_config[] = {
 static const adc_conf_t adc_config[] = {
     /* dev, pin, channel */
     /* ADC0_DP-ADC0_DM differential reading (Arduino A5 - A0) */
-    [ 0] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan =  0 | ADC_SC1_DIFF_MASK },
+    [ 0] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan =  0 | ADC_SC1_DIFF_MASK, .avg = ADC_AVG_MAX },
     /* ADC0_DP single ended reading (Arduino A5) */
-    [ 1] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan =  0 },
+    [ 1] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan =  0, .avg = ADC_AVG_MAX },
     /* PTB2 (Arduino A2) */
-    [ 2] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  2), .chan =  3 },
+    [ 2] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  2), .chan =  3, .avg = ADC_AVG_MAX },
     /* PTB3 (Arduino A3) */
-    [ 3] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  3), .chan =  2 },
+    [ 3] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  3), .chan =  2, .avg = ADC_AVG_MAX },
     /* internal: temperature sensor */
-    [ 4] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 26 },
+    /* The temperature sensor has a very high output impedance, it must not be
+     * sampled using hardware averaging, or the sampled values will be garbage */
+    [ 4] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 26, .avg = ADC_AVG_NONE },
     /* Note: the band gap buffer uses a bit of current and is turned off by default,
      * Set PMC->REGSC |= PMC_REGSC_BGBE_MASK before reading or the input will be floating */
     /* internal: band gap */
-    [ 5] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 27 },
+    [ 5] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 27, .avg = ADC_AVG_MAX },
     /* internal: DCDC divided battery level */
-    [ 6] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 23 },
+    [ 6] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 23, .avg = ADC_AVG_MAX },
 };
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))
 /*

@@ -1,3 +1,5 @@
 MODULE := semtech_loramac_crypto
 
+INCLUDES += -I$(PKGDIRBASE)/semtech-loramac/src/boards
+
 include $(RIOTBASE)/Makefile.base

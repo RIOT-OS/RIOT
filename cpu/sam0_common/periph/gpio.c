@@ -32,16 +32,18 @@
 #include "debug.h"
 
 /**
- * @brief   Number of external interrupt lines
- */
-#define NUMOF_IRQS                  (16U)
-
-/**
  * @brief   Mask to get PINCFG reg value from mode value
  */
 #define MODE_PINCFG_MASK            (0x06)
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
+/**
+ * @brief   Number of external interrupt lines
+ */
+#define NUMOF_IRQS                  (16U)
+
 static gpio_isr_ctx_t gpio_config[NUMOF_IRQS];
+#endif
 
 static inline PortGroup *_port(gpio_t pin)
 {
@@ -56,16 +58,6 @@ static inline int _pin_pos(gpio_t pin)
 static inline int _pin_mask(gpio_t pin)
 {
     return (1 << _pin_pos(pin));
-}
-
-static int _exti(gpio_t pin)
-{
-    int port_num = ((pin >> 7) & 0x03);
-
-    if (port_num > 1) {
-        return -1;
-    }
-    return exti_config[port_num][_pin_pos(pin)];
 }
 
 void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
@@ -109,6 +101,54 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     }
 
     return 0;
+}
+
+int gpio_read(gpio_t pin)
+{
+    PortGroup *port = _port(pin);
+    int mask = _pin_mask(pin);
+
+    if (port->DIR.reg & mask) {
+        return (port->OUT.reg & mask) ? 1 : 0;
+    }
+    else {
+        return (port->IN.reg & mask) ? 1 : 0;
+    }
+}
+
+void gpio_set(gpio_t pin)
+{
+    _port(pin)->OUTSET.reg = _pin_mask(pin);
+}
+
+void gpio_clear(gpio_t pin)
+{
+    _port(pin)->OUTCLR.reg = _pin_mask(pin);
+}
+
+void gpio_toggle(gpio_t pin)
+{
+    _port(pin)->OUTTGL.reg = _pin_mask(pin);
+}
+
+void gpio_write(gpio_t pin, int value)
+{
+    if (value) {
+        _port(pin)->OUTSET.reg = _pin_mask(pin);
+    } else {
+        _port(pin)->OUTCLR.reg = _pin_mask(pin);
+    }
+}
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+static int _exti(gpio_t pin)
+{
+    int port_num = ((pin >> 7) & 0x03);
+
+    if (port_num > 1) {
+        return -1;
+    }
+    return exti_config[port_num][_pin_pos(pin)];
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
@@ -183,43 +223,6 @@ void gpio_irq_disable(gpio_t pin)
     EIC->INTENCLR.reg = (1 << exti);
 }
 
-int gpio_read(gpio_t pin)
-{
-    PortGroup *port = _port(pin);
-    int mask = _pin_mask(pin);
-
-    if (port->DIR.reg & mask) {
-        return (port->OUT.reg & mask) ? 1 : 0;
-    }
-    else {
-        return (port->IN.reg & mask) ? 1 : 0;
-    }
-}
-
-void gpio_set(gpio_t pin)
-{
-    _port(pin)->OUTSET.reg = _pin_mask(pin);
-}
-
-void gpio_clear(gpio_t pin)
-{
-    _port(pin)->OUTCLR.reg = _pin_mask(pin);
-}
-
-void gpio_toggle(gpio_t pin)
-{
-    _port(pin)->OUTTGL.reg = _pin_mask(pin);
-}
-
-void gpio_write(gpio_t pin, int value)
-{
-    if (value) {
-        _port(pin)->OUTSET.reg = _pin_mask(pin);
-    } else {
-        _port(pin)->OUTCLR.reg = _pin_mask(pin);
-    }
-}
-
 void isr_eic(void)
 {
     for (unsigned i = 0; i < NUMOF_IRQS; i++) {
@@ -230,3 +233,4 @@ void isr_eic(void)
     }
     cortexm_isr_end();
 }
+#endif

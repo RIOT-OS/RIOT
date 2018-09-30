@@ -18,8 +18,9 @@
  */
 
 #include <errno.h>
-#include <utlist.h>
 #include <string.h>
+#include <utlist.h>
+
 #include "net/af.h"
 #include "net/gnrc.h"
 #include "net/gnrc/tcp.h"
