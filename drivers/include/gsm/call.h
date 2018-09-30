@@ -26,6 +26,11 @@
 
 #include "gsm.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   GSM default PPP number
  */
@@ -71,4 +76,9 @@ int gsm_call_switch_to_command_mode(gsm_t *dev);
  */
 int gsm_call_switch_to_data_mode(gsm_t *dev);
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* GSM_CALL_H */
+/** @} */

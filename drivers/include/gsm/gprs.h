@@ -99,6 +99,7 @@ int gsm_grps_deactivate_context(gsm_t *dev, uint8_t ctx);
  * @brief   Gets device address
  *
  * @param[in] dev   Device to operate on
+ * @param[in] ctx   Context of the requested IP address
  *
  * @return  ipv4 address
  */
@@ -119,3 +120,4 @@ int gsm_gprs_get_registration(gsm_t *dev);
 #endif
 
 #endif /* GSM_GPRS_H */
+/** @} */

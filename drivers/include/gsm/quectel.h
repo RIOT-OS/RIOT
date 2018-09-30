@@ -60,6 +60,9 @@ extern "C" {
 #define QUECTEL_RESET_TIME_US                   (500 * US_PER_MS)
 #endif
 
+/**
+ * @brief Quectel gsm device parameters
+ */
 typedef struct gsm_quectel_params {
     gsm_params_t base;              /**< gsm base parameters */
     gpio_t      power_pin;          /**< quectel power pin*/
@@ -72,10 +75,16 @@ typedef struct gsm_quectel_params {
     gpio_t      dcd_pin;            /**< quectel dcd pin (modem output) */
 } quectel_params_t;
 
+/**
+ * @brief Quectel gsm device context
+ */
 typedef struct quectel {
     gsm_t base;                     /**< gsm base driver */
 } quectel_t;
 
+/**
+ * @brief exported gsm api for the Quectel device
+ */
 extern const gsm_driver_t quectel_driver;
 
 #ifdef __cplusplus
@@ -83,3 +92,4 @@ extern const gsm_driver_t quectel_driver;
 #endif
 
 #endif /* GSM_QUECTEL_H */
+/** @} */

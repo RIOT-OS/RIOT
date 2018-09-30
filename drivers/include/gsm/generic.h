@@ -37,3 +37,4 @@ extern const gsm_generic_driver_t gsm_generic_driver;
 #endif
 
 #endif /* GSM_GENERIC_H */
+/** @} */

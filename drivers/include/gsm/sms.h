@@ -54,8 +54,8 @@ typedef void (*gsm_sms_cb_t)(void *arg, char *sms, char *sender, char *date);
  */
 typedef struct gsm_sms {
     gsm_t *base;            /**< Pointer to the base driver */
-    gsm_sms_cb_t callback;  /**< */
-    void *callback_args;    /**< */
+    gsm_sms_cb_t callback;  /**< SMS callback */
+    void *callback_args;    /**< SMS callback arguments */
 } gsm_sms_t;
 
 /**
@@ -109,3 +109,4 @@ int gsm_sms_enable_reception(gsm_sms_t * sms, gsm_sms_cb_t cb, void *arg);
 #endif
 
 #endif /* GSM_SMS_H */
+/** @} */

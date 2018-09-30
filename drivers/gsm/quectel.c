@@ -317,4 +317,3 @@ int gsm_signal_to_rssi(unsigned signal)
 
     return rssi;
 }
-

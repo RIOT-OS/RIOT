@@ -123,6 +123,9 @@ typedef struct gsm_params {
     gpio_t      ri_pin;     /**< ring indicator */
 } gsm_params_t;
 
+/**
+ * @brief   gsm device context
+ */
 typedef struct gsm {
     const gsm_driver_t  *driver;                    /**< gsm driver */
     const gsm_params_t  *params;                    /**< gsm parameters */
@@ -138,6 +141,9 @@ typedef struct gsm {
     char            buffer[GSM_UART_BUFSIZE];       /**< at buffer */
 } gsm_t;
 
+/**
+ * @brief gsm api
+ */
 struct gsm_driver {
 
     /**
@@ -370,7 +376,9 @@ ssize_t gsm_get_simcard_identification(gsm_t *dev, char *outbuf, size_t len);
 /**
  * @brief   Gets modem identification
  *
- * @param[in] dev   Device to write to
+ * @param[in]  dev  Device to write to
+ * @param[out] buf  Buffer to write identication in
+ * @param[in]  len  Maximum length of @p buf
  *
  * @return  Length of data written into @p buf.
  * @return  < 0 for failure
@@ -451,3 +459,4 @@ void gsm_register_urc_callback(gsm_t *dev, at_urc_t *urc);
 #endif
 
 #endif /* GSM_H */
+/** @} */

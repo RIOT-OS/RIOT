@@ -163,7 +163,7 @@ void gsm_poweroff(gsm_t *dev)
         int err = -EINVAL;
         gsm_lock(dev);
 
-        err = at_send_cmd_wait_ok(&dev->at_dev, "AT+CFUN=0", GSM_SERIAL_TIMEOUT_US * 3);
+        at_send_cmd_wait_ok(&dev->at_dev, "AT+CFUN=0", GSM_SERIAL_TIMEOUT_US * 3);
 
         if ((dev->driver) && (dev->driver->power_off)) {
             err = dev->driver->power_off(dev);

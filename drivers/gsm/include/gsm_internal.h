@@ -56,3 +56,4 @@ int gsm_signal_to_rssi(unsigned signal);
 #endif
 
 #endif /* GSM_INTERNAL_H */
+/** @} */

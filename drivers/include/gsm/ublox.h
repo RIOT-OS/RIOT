@@ -95,3 +95,4 @@ extern const gsm_driver_t ublox_driver;
 #endif
 
 #endif /* GSM_UBLOX_H */
+/** @} */
