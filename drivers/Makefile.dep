@@ -156,6 +156,17 @@ ifneq (,$(filter grove_ledbar,$(USEMODULE)))
   USEMODULE += my9221
 endif
 
+ifneq (,$(filter gsm,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  USEMODULE += at
+  USEMODULE += fmt
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter gsm_gprs,$(USEMODULE)))
+  USEMODULE += ipv4_addr
+endif
+
 ifneq (,$(filter hd44780,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer
