@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "embUnit.h"
 
@@ -22,12 +23,15 @@
 #include "unittests-constants.h"
 #include "tests-nanocoap.h"
 
+
+#define _BUF_SIZE (128U)
+
 /*
  * Validates encoded message ID byte order and put/get URI option.
  */
 static void test_nanocoap__hdr(void)
 {
-    uint8_t buf[128];
+    uint8_t buf[_BUF_SIZE];
     uint16_t msgid = 0xABCD;
     char path[] = "/test/abcd/efgh";
     char loc_path[] = "/foo/bar";
@@ -59,7 +63,7 @@ static void test_nanocoap__hdr(void)
  */
 static void test_nanocoap__get_req(void)
 {
-    uint8_t buf[128];
+    uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
     uint16_t msgid = 0xABCD;
     uint8_t token[2] = {0xDA, 0xEC};
@@ -95,7 +99,7 @@ static void test_nanocoap__get_req(void)
  */
 static void test_nanocoap__put_req(void)
 {
-    uint8_t buf[128];
+    uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
     uint16_t msgid = 0xABCD;
     uint8_t token[2] = {0xDA, 0xEC};
@@ -123,7 +127,7 @@ static void test_nanocoap__put_req(void)
     len = coap_opt_finish(&pkt, COAP_OPT_FINISH_PAYLOAD);
     TEST_ASSERT_EQUAL_INT(total_hdr_len + uri_opt_len + fmt_opt_len + 1, len);
     TEST_ASSERT_EQUAL_INT(0xFF, *(pkt.payload - 1));
-    TEST_ASSERT_EQUAL_INT(&buf[0] + 128 - pkt.payload, pkt.payload_len);
+    TEST_ASSERT_EQUAL_INT(&buf[0] + _BUF_SIZE - pkt.payload, pkt.payload_len);
 }
 
 /*
@@ -131,7 +135,7 @@ static void test_nanocoap__put_req(void)
  */
 static void test_nanocoap__get_multi_path(void)
 {
-    uint8_t buf[128];
+    uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
     uint16_t msgid = 0xABCD;
     uint8_t token[2] = {0xDA, 0xEC};
@@ -156,7 +160,7 @@ static void test_nanocoap__get_multi_path(void)
  */
 static void test_nanocoap__get_path_trailing_slash(void)
 {
-    uint8_t buf[128];
+    uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
     uint16_t msgid = 0xABCD;
     uint8_t token[2] = {0xDA, 0xEC};
@@ -181,7 +185,7 @@ static void test_nanocoap__get_path_trailing_slash(void)
  */
 static void test_nanocoap__get_root_path(void)
 {
-    uint8_t buf[128];
+    uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
     uint16_t msgid = 0xABCD;
     uint8_t token[2] = {0xDA, 0xEC};
@@ -202,7 +206,7 @@ static void test_nanocoap__get_root_path(void)
  */
 static void test_nanocoap__get_max_path(void)
 {
-    uint8_t buf[128];
+    uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
     uint16_t msgid = 0xABCD;
     uint8_t token[2] = {0xDA, 0xEC};
@@ -229,7 +233,7 @@ static void test_nanocoap__get_max_path(void)
  */
 static void test_nanocoap__get_path_too_long(void)
 {
-    uint8_t buf[128];
+    uint8_t buf[_BUF_SIZE];
     coap_pkt_t pkt;
     uint16_t msgid = 0xABCD;
     uint8_t token[2] = {0xDA, 0xEC};
@@ -250,6 +254,110 @@ static void test_nanocoap__get_path_too_long(void)
     TEST_ASSERT_EQUAL_INT(-ENOSPC, get_len);
 }
 
+/*
+ * Helper for server_get tests below.
+ * GET Request for nanocoap server example /riot/value resource.
+ * Includes 2-byte token; non-confirmable.
+ * Generated with libcoap.
+ */
+static int _read_riot_value_req(coap_pkt_t *pkt, uint8_t *buf)
+{
+    uint8_t pkt_data[] = {
+        0x52, 0x01, 0x9e, 0x6b, 0x35, 0x61, 0xb4, 0x72,
+        0x69, 0x6f, 0x74, 0x05, 0x76, 0x61, 0x6c, 0x75,
+        0x65
+    };
+    memcpy(buf, pkt_data, sizeof(pkt_data));
+
+    return coap_parse(pkt, buf, sizeof(pkt_data));
+}
+
+/* Server GET request success case. */
+static void test_nanocoap__server_get_req(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    coap_pkt_t pkt;
+    char path[] = "/riot/value";
+
+    int res = _read_riot_value_req(&pkt, &buf[0]);
+
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(2, coap_get_token_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(4 + 2, coap_get_total_hdr_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pkt));
+    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
+
+    char uri[64] = {0};
+    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
+    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+}
+
+/* Response for server GET request using coap_reply_simple(). */
+static void test_nanocoap__server_reply_simple(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    coap_pkt_t pkt;
+    char *payload = "0";
+
+    int res = _read_riot_value_req(&pkt, &buf[0]);
+
+    coap_reply_simple(&pkt, COAP_CODE_CONTENT, buf, _BUF_SIZE,
+                      COAP_FORMAT_TEXT, (uint8_t *)payload, 1);
+
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(COAP_CODE_CONTENT, coap_get_code_raw(&pkt));
+    TEST_ASSERT_EQUAL_INT(2, coap_get_token_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(4 + 2, coap_get_total_hdr_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_TYPE_NON, coap_get_type(&pkt));
+}
+
+/*
+ * Helper for server_get tests below.
+ * GET request for nanocoap server example /riot/value resource.
+ * Includes 2-byte token; confirmable.
+ * Generated with libcoap.
+ */
+static int _read_riot_value_req_con(coap_pkt_t *pkt, uint8_t *buf)
+{
+    uint8_t pkt_data[] = {
+        0x42, 0x01, 0xbe, 0x16, 0x35, 0x61, 0xb4, 0x72,
+        0x69, 0x6f, 0x74, 0x05, 0x76, 0x61, 0x6c, 0x75,
+        0x65
+    };
+    memcpy(buf, pkt_data, sizeof(pkt_data));
+
+    return coap_parse(pkt, buf, sizeof(pkt_data));
+}
+
+/* Builds on test_nanocoap__server_get_req to test confirmable request. */
+static void test_nanocoap__server_get_req_con(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    coap_pkt_t pkt;
+
+    int res = _read_riot_value_req_con(&pkt, &buf[0]);
+
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(COAP_METHOD_GET, coap_get_code(&pkt));
+    TEST_ASSERT_EQUAL_INT(COAP_TYPE_CON, coap_get_type(&pkt));
+}
+
+/* Builds on test_nanocoap__server_reply_simple to test confirmable request. */
+static void test_nanocoap__server_reply_simple_con(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    coap_pkt_t pkt;
+    char *payload = "0";
+
+    _read_riot_value_req_con(&pkt, &buf[0]);
+
+    coap_reply_simple(&pkt, COAP_CODE_CONTENT, buf, _BUF_SIZE,
+                      COAP_FORMAT_TEXT, (uint8_t *)payload, 1);
+
+    TEST_ASSERT_EQUAL_INT(COAP_TYPE_ACK, coap_get_type(&pkt));
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -261,6 +369,10 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_root_path),
         new_TestFixture(test_nanocoap__get_max_path),
         new_TestFixture(test_nanocoap__get_path_too_long),
+        new_TestFixture(test_nanocoap__server_get_req),
+        new_TestFixture(test_nanocoap__server_reply_simple),
+        new_TestFixture(test_nanocoap__server_get_req_con),
+        new_TestFixture(test_nanocoap__server_reply_simple_con),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
