@@ -53,10 +53,10 @@ enum {
  * @brief   Define ADXL345 sensitivity
  */
 enum {
-    ADXL345_RANGE_2G    = 1,     /**< +/- 2 g Full Scale Range */
-    ADXL345_RANGE_4G    = 2,     /**< +/- 4 g Full Scale Range */
-    ADXL345_RANGE_8G    = 4,     /**< +/- 8 g Full Scale Range */
-    ADXL345_RANGE_16G   = 8      /**< +/- 16 g Full Scale Range */
+    ADXL345_RANGE_2G    = 0,     /**< +/- 2 g Full Scale Range */
+    ADXL345_RANGE_4G    = 1,     /**< +/- 4 g Full Scale Range */
+    ADXL345_RANGE_8G    = 2,     /**< +/- 8 g Full Scale Range */
+    ADXL345_RANGE_16G   = 3      /**< +/- 16 g Full Scale Range */
 };
 
 /**
