@@ -22,11 +22,10 @@
 #include <assert.h>
 
 #include "cpu.h"
+#include "periph/eeprom.h"
 
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
-
-#include "periph/eeprom.h"
 
 extern void _lock(void);
 extern void _unlock(void);
@@ -35,20 +34,35 @@ extern void _unlock(void);
 #error "periph/eeprom: EEPROM_START_ADDR is not defined"
 #endif
 
-uint8_t eeprom_read_byte(uint32_t pos)
+size_t eeprom_read(uint32_t pos, uint8_t *data, size_t len)
 {
-    assert(pos < EEPROM_SIZE);
+    assert(pos + len <= EEPROM_SIZE);
 
-    DEBUG("Reading data from EEPROM at pos %" PRIu32 "\n", pos);
-    return *(uint8_t *)(EEPROM_START_ADDR + pos);
+    uint8_t *p = data;
+
+    DEBUG("Reading data from EEPROM at pos %" PRIu32 ": ", pos);
+    for (size_t i = 0; i < len; i++) {
+        *p++ = *(uint8_t *)(EEPROM_START_ADDR + pos++);
+        DEBUG("0x%02X ", *p);
+    }
+    DEBUG("\n");
+
+    return len;
 }
 
-void eeprom_write_byte(uint32_t pos, uint8_t data)
+size_t eeprom_write(uint32_t pos, const uint8_t *data, size_t len)
 {
-    assert(pos < EEPROM_SIZE);
+    assert(pos + len <= EEPROM_SIZE);
 
-    DEBUG("Writing data '%c' to EEPROM at pos %" PRIu32 "\n", data, pos);
+    uint8_t *p = (uint8_t *)data;
+
     _unlock();
-    *(uint8_t *)(EEPROM_START_ADDR + pos) = data;
+
+    for (size_t i = 0; i < len; i++) {
+        *(uint8_t *)(EEPROM_START_ADDR + pos++) = *p++;
+    }
+
     _lock();
+
+    return len;
 }

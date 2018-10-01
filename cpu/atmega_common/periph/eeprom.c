@@ -24,37 +24,52 @@
 #include "cpu.h"
 #include "periph/eeprom.h"
 
-uint8_t eeprom_read_byte(uint32_t pos)
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
+size_t eeprom_read(uint32_t pos, uint8_t *data, size_t len)
 {
-    assert(pos < EEPROM_SIZE);
+    assert(pos + len <= EEPROM_SIZE);
 
-    /* Wait for completion of previous operation */
-    while (EECR & (1 << EEPE)) {}
+    uint8_t *p = data;
 
-    /* Set up address register */
-    EEAR = pos;
+    DEBUG("Reading data from EEPROM at pos %" PRIu32 ": ", pos);
+    for (size_t i = 0; i < len; i++) {
+        while (EECR & (1 << EEPE)) {}
 
-    /* Start eeprom read by writing EERE */
-    EECR |= (1 << EERE);
+        /* Set up address register */
+        EEAR = pos++;
 
-    /* Return data from Data Register */
-    return EEDR;
+        /* Start eeprom read by writing EERE */
+        EECR |= (1 << EERE);
+        *p++ = (uint8_t)EEDR;
+        DEBUG("0x%02X ", EEDR);
+    }
+    DEBUG("\n");
+
+    return len;
 }
 
-void eeprom_write_byte(uint32_t pos, uint8_t data)
+size_t eeprom_write(uint32_t pos, const uint8_t *data, size_t len)
 {
-    assert(pos < EEPROM_SIZE);
+    assert(pos + len <= EEPROM_SIZE);
 
-    /* Wait for completion of previous operation */
-    while (EECR & (1 << EEPE)) {}
+    uint8_t *p = (uint8_t *)data;
 
-    /* Set up address and Data Registers */
-    EEAR = pos;
-    EEDR = data;
+    for (size_t i = 0; i < len; i++) {
+        /* Wait for completion of previous operation */
+        while (EECR & (1 << EEPE)) {}
 
-    /* Write logical one to EEMPE */
-    EECR |= (1 << EEMPE);
+        /* Set up address and Data Registers */
+        EEAR = pos++;
+        EEDR = *p++;
 
-    /* Start eeprom write by setting EEPE */
-    EECR |= (1 << EEPE);
+        /* Write logical one to EEMPE */
+        EECR |= (1 << EEMPE);
+
+        /* Start eeprom write by setting EEPE */
+        EECR |= (1 << EEPE);
+    }
+
+    return len;
 }
