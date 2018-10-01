@@ -124,6 +124,8 @@ extern "C" {
   #include "vendor/samd21/include/samd21j15b.h"
 #elif defined(CPU_MODEL_SAMD21J16B)
   #include "vendor/samd21/include/samd21j16b.h"
+#elif defined(CPU_MODEL_SAMR30G18A)
+  #include "vendor/samr30/include/samr30g18a.h"
 
 #else
   #error "Unsupported SAM0 variant."

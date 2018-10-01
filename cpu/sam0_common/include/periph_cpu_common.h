@@ -298,7 +298,7 @@ static inline int sercom_id(void *sercom)
 {
 #if defined(CPU_FAM_SAMD21)
     return ((((uint32_t)sercom) >> 10) & 0x7) - 2;
-#elif defined(CPU_FAM_SAML21)
+#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     /* Left side handles SERCOM0-4 while right side handles unaligned address of SERCOM5 */
     return ((((uint32_t)sercom) >> 10) & 0x7) + ((((uint32_t)sercom) >> 22) & 0x04);
 #endif
@@ -313,7 +313,7 @@ static inline void sercom_clk_en(void *sercom)
 {
 #if defined(CPU_FAM_SAMD21)
     PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom_id(sercom));
-#elif defined(CPU_FAM_SAML21)
+#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     if (sercom_id(sercom) < 5) {
         MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
     } else {
@@ -331,7 +331,7 @@ static inline void sercom_clk_dis(void *sercom)
 {
 #if defined(CPU_FAM_SAMD21)
     PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom_id(sercom));
-#elif defined(CPU_FAM_SAML21)
+#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     if (sercom_id(sercom) < 5) {
         MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(sercom));
     } else {
@@ -352,7 +352,7 @@ static inline void sercom_set_gen(void *sercom, uint32_t gclk)
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | gclk |
                          (SERCOM0_GCLK_ID_CORE + sercom_id(sercom)));
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-#elif defined(CPU_FAM_SAML21)
+#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     if (sercom_id(sercom) < 5) {
         GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom_id(sercom)].reg =
                                                     (GCLK_PCHCTRL_CHEN | gclk);

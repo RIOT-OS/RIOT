@@ -59,6 +59,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              saml21-xpro \
                              samd21-xpro \
                              samr21-xpro \
+                             samr30-xpro \
                              seeeduino_arch-pro \
                              sensebox_samd21 \
                              slstk3401a \
@@ -167,6 +168,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        samd21-xpro \
                        saml21-xpro \
                        samr21-xpro \
+                       samr30-xpro \
                        seeeduino_arch-pro \
                        slstk3401a \
                        slstk3402a \

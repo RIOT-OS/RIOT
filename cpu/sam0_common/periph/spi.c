@@ -50,7 +50,7 @@ static inline void poweron(spi_t bus)
 {
 #if defined(CPU_FAM_SAMD21)
     PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#elif defined(CPU_FAM_SAML21)
+#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
 #endif
 }
@@ -59,7 +59,7 @@ static inline void poweroff(spi_t bus)
 {
 #if defined(CPU_FAM_SAMD21)
     PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
-#elif defined(CPU_FAM_SAML21)
+#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << sercom_id(dev(bus)));
 #endif
 }
@@ -88,7 +88,7 @@ void spi_init(spi_t bus)
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 |
                          (SERCOM0_GCLK_ID_CORE + sercom_id(dev(bus))));
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-#elif defined(CPU_FAM_SAML21)
+#elif defined(CPU_FAM_SAML21) || defined(CPU_FAM_SAMR30)
     GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + sercom_id(dev(bus))].reg =
                                 (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0);
 #endif
