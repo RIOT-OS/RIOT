@@ -23,45 +23,44 @@
 
 #include "ccs811.h"
 
-static uint16_t _iaq_tvoc = 0;
-static uint16_t _iaq_eco2 = 0;
+static bool _data_ready = false;
 
-static int read(const ccs811_t *dev)
+static int read(const ccs811_t *dev, uint16_t *iaq_tvoc, uint16_t *iaq_eco2)
 {
-    /* check whether new data can be read */
-    int res = ccs811_data_ready((ccs811_t *)dev);
-
-    if (res != CCS811_OK) {
-        return res;
+    if (!_data_ready) {
+        /* if no data were ready yet, test for new data */
+        if (ccs811_data_ready((ccs811_t *)dev) == CCS811_OK) {
+            _data_ready = true;
+        }
+        else {
+            return -ECANCELED;
+        }
     }
 
-    /* read new data and save them to local storage */
-    return ccs811_read_iaq((ccs811_t *)dev, &_iaq_tvoc, &_iaq_eco2, 0, 0);
+    int res = ccs811_read_iaq((ccs811_t *)dev, iaq_tvoc, iaq_eco2, NULL, NULL);
+
+    /* in case of CCS811_ERROR_NO_NEW_DATA last valid data are returned */
+    return (res == CCS811_OK ||
+            res == -CCS811_ERROR_NO_NEW_DATA) ? 0 : -ECANCELED;
 }
 
 static int read_tvoc(const void *dev, phydat_t *res)
 {
-    /* read new data if available */
-    read(dev);
-
-    /* fill data from local storage */
-    res->val[0] = _iaq_tvoc;
+    if (read(dev, (uint16_t*)&res->val[0], NULL) != 0) {
+        return -ECANCELED;
+    }
     res->unit = UNIT_PPB;
     res->scale = 0;
-
     return 1;
 }
 
 static int read_eco2(const void *dev, phydat_t *res)
 {
-    /* read new data if available */
-    read(dev);
-
-    /* fill data from local storage */
-    res->val[0] = _iaq_eco2;
+    if (read(dev, NULL, (uint16_t*)&res->val[0]) != 0) {
+        return -ECANCELED;
+    }
     res->unit = UNIT_PPM;
     res->scale = 0;
-
     return 1;
 }
 
