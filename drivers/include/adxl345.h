@@ -159,7 +159,7 @@ typedef struct {
 typedef struct {
     adxl345_params_t *params;       /**< Device configuration */
     adxl345_interrupt_t interrupt;  /**< Interrupts configuration  */
-    float scale_factor;             /**< Scale factor for converting value to mg */
+    int16_t scale_factor;           /**< Scale factor for converting value to mg */
 } adxl345_t;
 
 /**
