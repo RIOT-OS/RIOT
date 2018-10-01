@@ -121,19 +121,39 @@ complete that no input from the original developer or maintainer is required.
 
 ### Organisation of reviewing between maintainers
 
-This section is a placeholder for further discussion around making the review
-process more efficient and effective when multiple maintainers are involved.
-This could include:
+#### Partial review
 
--   Usage of labels
--   Division of review responsibilities, e.g. with ACKs for different areas of
-    review
--   Usage of GitHub functionality, for example "Reviewers" and "Assignees" lists
+You can review a PR partially. This would involve reviewing all points in one or
+more sections outlined in the [technical guidelines](#technical-guidelines).
+In that case, please do not "approve" the PR to prevent accidental merges.
+Rather, give your verbal ACK and describe what you reviewed. In addition, if you
+processed or reasonably stepped over a whole section, mark the PR with the
+according label from the "Reviewed:" category. If you set a label by stepping
+over a section, please articulate your reasoning for this clearly, as noted in
+the [introduction](#introduction). This will help other maintainers help to
+better understand your line of thought. If you disagree with the assessment of
+a previous review, you may remove a certain "Reviewed:" label. Please state your
+reasoning in this case as well.
+
+When all "Reviewed:" labels are set you may give your approval for the PR.
+
+As everything in this document this is a "CAN", not a "MUST": It might help
+other maintainers to track your work, but if the overhead isn't justified, a
+simple approving ACK might suffice.
 
 #### Github etiquette
 
--   If there are multiple maintainers reviewing a PR, always give the other
-    maintainers reasonable time to ACK before dismissing their review.
+It is good etiquette to describe what you reviewed, even if you gave the PR a
+full review and gave your approval. This way the contributor and other
+maintainers are able to follow your thought process.
+
+Maintainers should only assign themselves to PRs and shouldn't assign other
+maintainers. You can however request reviews from other maintainers or
+contributors, either by mentioning them in a comment or selecting them in
+GitHub's review sidebar.
+
+If there are multiple maintainers reviewing a PR, always give the other
+maintainers reasonable time to ACK before dismissing their review.
 
 [list of maintainers]: https://github.com/RIOT-OS/RIOT/wiki/Maintainers
 [Best Practices]: https://github.com/RIOT-OS/RIOT/wiki/Best-Practice-for-RIOT-Programming
