@@ -1,0 +1,62 @@
+*** Settings ***
+Library           Process
+Library           OperatingSystem
+Library           String
+Library           Collections
+
+*** Variables ***
+${RIOTTOOLS}            %{RIOTBASE}/dist/tools
+${RIOTTESTS}            %{RIOTBASE}/tests
+
+*** Keywords ***
+Get Number of Lines Matching Pattern
+    [Documentation]     Returns the number of lines in `RESULT.stdout``
+    ...                 matching a given pattern.
+    [Arguments]         ${pattern}
+    ${lines} =          Get Lines Matching Pattern  ${RESULT.stdout}  ${pattern}
+    ${count} =          Get Line Count  ${lines}
+    [return]            ${count}
+
+Get Sum From List
+    [Documentation]     Returns the sum of a given ``list`` of integers
+    [Arguments]         @{list}
+    ${sum}=   Set Variable    0
+    : FOR  ${elem}  IN   @{list}
+    \    ${int}=    Convert To Integer  ${elem}
+    \    ${sum}=    Evaluate            ${sum}+${int}
+    [return]    ${sum}
+
+Get All Lines Matching Regexp Group
+    [Documentation]     Returns all matching lines in ``RESULT.stdout`` for the
+    ...                 first group in a given regex.
+    [Arguments]         ${regex}
+    #RESULT             CMD                 STING             REGEXP    GROUP
+    @{groups}=          Get Regexp Matches  ${RESULT.stdout}  ${regex}  1
+    [return]            @{groups}
+
+Get First Line Matching Regexp Group
+    [Documentation]     Returns the first matching line in ``RESULT.stdout`` for
+    ...                 the first group in a given regex.
+    [Arguments]         ${regex}
+    @{groups}=          Get All Lines Matching Regexp Group  ${regex}
+    ${group}=           Set Variable  @{groups}[0]
+    [return]            ${group}
+
+Result Should Contain
+    [Documentation]     Fails if the given pattern is not in ``RESULT.stdout``.
+    [Arguments]         ${pattern}
+    Should Contain      ${RESULT.stdout}  ${pattern}
+
+Verify Lines Matching Pattern Equal
+    [Documentation]     Fails if the number lines matching a given pattern is
+    ...                 not equal to the given ``number``.
+    [Arguments]         ${pattern}  ${number}
+    ${count} =          Get Number of Lines Matching Pattern  ${pattern}
+    Should Be Equal As Integers  ${count}  ${number}
+
+Verify Lines Matching Pattern Greater
+    [Documentation]     Fails if the number of lines matching a given pattern
+    ...                 is not greater than the given ``number``.
+    [Arguments]         ${pattern}  ${number}
+    ${count} =          Get Number of Lines Matching Pattern  ${pattern}
+    Should Be True      ${count} > ${number}

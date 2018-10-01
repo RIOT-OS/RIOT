@@ -1,0 +1,51 @@
+*** Settings ***
+Library     Process
+Library     OperatingSystem
+Library     String
+Library     Collections
+
+*** Variables ***
+${RIOTTOOLS}            %{RIOTBASE}/dist/tools
+
+*** Keywords ***
+Binary Should Exist
+    [Documentation]     Fails if test binary does not exist.
+    File Should Exist   %{ELFFILE}
+
+Log System and Build Environment
+    ${result}=          Run Process  ${RIOTTOOLS}/ci/print_toolchain_versions.sh  shell=True
+    Log Many            Toolchain Versions  ${result.stdout}
+    ${commit}=          Run Process  git  rev-parse  HEAD  shell=True
+    Log Many            Commit Hash  ${commit.stdout}
+    Log Many            Test Application    %{APPLICATION}
+    Log Many            Test Device         %{BOARD}
+
+Log Keyword Output
+    [Documentation]     Execute the given keyword and log its output.
+    [Arguments]         ${keyword}  @{args}  &{kwargs}
+    ${result}=          Run Keyword  ${keyword}  @{args}  &{kwargs}
+    Log Many            Keyword Output  ${result}
+
+Reset Application
+    [Documentation]     Reset the test application
+    Sleep               3
+    Run Process         make reset  shell=True  cwd=%{APPDIR}
+    Sleep               3
+
+Run Application
+    [Documentation]     Run a test application, wait for completion or timeout.
+    [Arguments]         ${timeout}=30 secs
+    ${ptest}=           Start Process       make term  shell=True  cwd=%{APPDIR}
+    Process Should Be Running  ${ptest}
+    Reset Application
+    Wait For Process    handle=${ptest}  timeout=${timeout}  on_timeout=kill
+    ${RESULT} =         Get Process Result
+    Log Many            stdout: ${RESULT.stdout}    stderr: ${RESULT.stderr}
+    Set Test Variable   ${RESULT}
+
+Run Static Test
+    [Documentation]     Run a static test script.
+    [Arguments]         ${static_test}=${RIOTTOOLS}/${TEST NAME}/check.sh
+    ${result} =         Run Process    ${static_test}
+    Log Many            stdout: ${result.stdout}    stderr: ${result.stderr}
+    Should Be Equal As Integers    ${result.rc}    0
