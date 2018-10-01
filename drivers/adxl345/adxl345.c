@@ -42,7 +42,7 @@ int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
     dev->params = (adxl345_params_t*)params;
 
     /* get scale_factor from full_res and range parameters */
-    dev->scale_factor = (dev->params->full_res ? 4 : (dev->params->range * 4));
+    dev->scale_factor = (dev->params->full_res ? 4 : (4 << dev->params->range));
 
     /* Acquire exclusive access */
     i2c_acquire(BUS);
