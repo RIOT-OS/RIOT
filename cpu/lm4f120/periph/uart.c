@@ -26,125 +26,145 @@
 #include "periph/uart.h"
 #include "periph_conf.h"
 
+
+/**
+ * @brief UART module size
+ */
+ #define UART_MOD_SIZE  (UART1_BASE - UART0_BASE)
+
+ /**
+  * @brief UART base depending on dev
+  */
+ #define GET_UART_BASE(x) (UART0_BASE + (x * UART_MOD_SIZE))
+
+ /**
+  * @brief UART_IM_R register address depending on dev
+  */
+ #define GET_UART_IM_R(x) (&UART0_IM_R + (x * UART_MOD_SIZE))
+
 /**
  * @brief UART device configurations
  */
 static uart_isr_ctx_t config[UART_NUMOF];
-
-static int init_base(uart_t uart, uint32_t baudrate);
 
 /**
  * Configuring the UART console
  */
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
+    assert(uart < UART_NUMOF);
     /* Check the arguments */
-    assert(uart == 0);
+
+    /* Derive UART parameters based off dev */
+    unsigned long uart_base = GET_UART_BASE(uart_config[uart].dev);
+    volatile unsigned long * uart_im_r = GET_UART_IM_R(uart_config[uart].dev);
+    unsigned long uart_sysctl = SYSCTL_PERIPH_UART0 | (1<<uart_config[uart].dev);
+
     /* Check to make sure the UART peripheral is present */
-    if(!ROM_SysCtlPeripheralPresent(SYSCTL_PERIPH_UART0)){
+    if(!ROM_SysCtlPeripheralPresent(uart_sysctl)){
         return UART_NODEV;
     }
 
-    int res = init_base(uart, baudrate);
-    if(res != UART_OK){
-        return res;
+    ROM_SysCtlPeripheralEnable(uart_sysctl);
+    ROM_SysCtlPeripheralEnable(uart_config[uart].gpio_sysctl);
+
+    /* Configure the Rx and Tx pins. If no callback function is defined,
+     * the UART should be initialised in Tx only mode.
+     */
+    if (rx_cb) {
+        ROM_GPIOPinConfigure(uart_config[uart].pins.rx);
+        ROM_GPIOPinTypeUART(uart_config[uart].gpio_port,
+          uart_config[uart].pins.mask_tx | uart_config[uart].pins.mask_rx );
+        /* save callbacks */
+        config[uart].rx_cb = rx_cb;
+        config[uart].arg = arg;
     }
-
-/* save callbacks */
-    config[uart].rx_cb = rx_cb;
-    config[uart].arg = arg;
-
-/*  ulBase = g_ulUARTBase[uart]; */
-    switch (uart){
-#if UART_0_EN
-        case UART_0:
-            ROM_UARTTxIntModeSet(UART0_BASE, UART_TXINT_MODE_EOT);
-            ROM_UARTFIFOLevelSet(UART0_BASE, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
-            ROM_UARTFIFOEnable(UART0_BASE);
-
-            /* Enable the UART interrupt */
-            NVIC_EnableIRQ(UART_0_IRQ_CHAN);
-            /* Enable RX interrupt */
-            UART0_IM_R = UART_IM_RXIM | UART_IM_RTIM;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            /* Enable the UART interrupt */
-            NVIC_EnableIRQ(UART_1_IRQ_CHAN);
-            break;
-#endif
+    else {
+        ROM_GPIOPinTypeUART(uart_config[uart].gpio_port,
+          uart_config[uart].pins.mask_tx);
     }
+    ROM_GPIOPinConfigure(uart_config[uart].pins.tx);
+
+    ROM_UARTDisable(uart_base);
+    ROM_UARTConfigSetExpClk(uart_base, ROM_SysCtlClockGet(), baudrate,
+            (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
+             UART_CONFIG_WLEN_8));
+
+    ROM_UARTEnable(uart_base);
+
+    ROM_UARTTxIntModeSet(uart_base, uart_config[uart].uart_txint_mode);
+    ROM_UARTFIFOLevelSet(uart_base,uart_config[uart].uart_fifo_tx,
+        uart_config[uart].uart_fifo_rx);
+    ROM_UARTFIFOEnable(uart_base);
+
+    /* Enable the UART interrupt */
+    NVIC_EnableIRQ(uart_config[uart].uart_irq_chan);
+
+    /* Enable RX interrupt */
+    (*uart_im_r) = (UART_IM_RXIM | UART_IM_RTIM);
+
     return UART_OK;
 }
 
-static int init_base(uart_t uart, uint32_t baudrate)
-{
-    switch(uart){
-#if UART_0_EN
-        case UART_0:
-            ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-            ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-            ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-            ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-            ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-            ROM_UARTDisable(UART0_BASE);
-            ROM_UARTConfigSetExpClk(UART0_BASE,ROM_SysCtlClockGet(), baudrate,
-                    (UART_CONFIG_PAR_NONE | UART_CONFIG_STOP_ONE |
-                     UART_CONFIG_WLEN_8));
-
-
-            ROM_UARTEnable(UART0_BASE);
-            break;
-#endif
-        default:
-            return UART_NODEV;
-        }
-    return UART_OK;
-}
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    (void) uart;
+    assert(uart < UART_NUMOF);
 
     for (size_t i = 0; i < len; i++) {
-        ROM_UARTCharPut(UART0_BASE, (char)data[i]);
+        ROM_UARTCharPut(GET_UART_BASE(uart_config[uart].dev), (char)data[i]);
     }
 }
 
 void uart_poweron(uart_t uart)
 {
-    (void) uart;
+    assert(uart < UART_NUMOF);
 
-    ROM_UARTEnable(UART0_BASE);
+    ROM_UARTEnable(GET_UART_BASE(uart_config[uart].dev));
 }
 
 void uart_poweroff(uart_t uart)
 {
-    (void) uart;
+    assert(uart < UART_NUMOF);
 
-    ROM_UARTDisable(UART0_BASE);
+    ROM_UARTDisable(GET_UART_BASE(uart_config[uart].dev));
 }
 
 /**
  * The UART interrupt handler.
  */
-void isr_uart0(void)
+void irq_handler(uart_t uart)
 {
+    assert(uart < UART_NUMOF);
+
     unsigned long ulStatus;
 
-    ulStatus = ROM_UARTIntStatus(UART0_BASE, true);
-    ROM_UARTIntClear(UART0_BASE, ulStatus);
+    ulStatus = ROM_UARTIntStatus(GET_UART_BASE(uart_config[uart].dev), true);
+    ROM_UARTIntClear(GET_UART_BASE(uart_config[uart].dev), ulStatus);
 
     /* Are we interrupted due to a recieved character */
     if(ulStatus & (UART_INT_RX | UART_INT_RT))
     {
-        while(ROM_UARTCharsAvail(UART0_BASE))
+        while(ROM_UARTCharsAvail(GET_UART_BASE(uart_config[uart].dev)))
         {
-            long lchar = ROM_UARTCharGetNonBlocking(UART0_BASE);
-            config[UART_0].rx_cb(config[UART_0].arg, (uint8_t)lchar);
+            long lchar = ROM_UARTCharGetNonBlocking(GET_UART_BASE(uart_config[uart].dev));
+            config[uart].rx_cb(config[uart].arg, (uint8_t)lchar);
         }
     }
     cortexm_isr_end();
+}
+
+void UART_0_ISR(void)
+{
+    irq_handler((uart_t)0);
+}
+
+void UART_1_ISR(void)
+{
+    irq_handler((uart_t)1);
+}
+
+void UART_2_ISR(void)
+{
+    irq_handler((uart_t)2);
 }
