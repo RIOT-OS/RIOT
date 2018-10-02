@@ -87,7 +87,7 @@ def generate_pcap(port, out):
     while True:
         line = port.readline().rstrip()
 
-        pkt_header = re.match(r">? *rftest-rx --- len 0x(\w\w).*",
+        pkt_header = re.match(r">? *rftest-rx --- len (\w+).*",
                               line.decode(errors="ignore"))
         if pkt_header:
             now = time()
@@ -100,10 +100,10 @@ def generate_pcap(port, out):
             sys.stderr.write("RX: %i\r" % count)
             continue
 
-        pkt_data = re.match(r"(0x\w\w )+", line.decode(errors="ignore"))
+        pkt_data = re.match(r"(\w\w )+", line.decode(errors="ignore"))
         if pkt_data:
             for part in line.decode(errors="ignore").split(' '):
-                byte = re.match(r"0x(\w\w)", part)
+                byte = re.match(r"(\w\w)", part)
                 if byte:
                     out.write(pack('<B', int(byte.group(1), 16)))
             out.flush()
