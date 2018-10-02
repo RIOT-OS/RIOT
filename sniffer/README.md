@@ -1,7 +1,7 @@
 About
 =====
 
-This application is build to run together with the script `RIOTBASE/dist/tools/sniffer/sniffer.py` as sniffer for (wireless) data traffic. This application works with any board with any network device that supports the gnrc network stack (or precisely the gnrc parts up to the link-layer). Further the network device (and it's driver) needs to support promiscuous and raw mode for usable output. Finally the board needs to include auto-initialization code for the targeted network device.
+This application is build to run together with the script `./tools/sniffer.py` as sniffer for (wireless) data traffic. This application works with any board with any network device that supports the gnrc network stack (or precisely the gnrc parts up to the link-layer). Further the network device (and it's driver) needs to support promiscuous and raw mode for usable output. Finally the board needs to include auto-initialization code for the targeted network device.
 
 
 Usage

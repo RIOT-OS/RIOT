@@ -50,6 +50,8 @@ SIG = 0
 SNAPLEN = 0xffff
 NETWORK = 230       # 802.15.4 no FCS
 
+DEFAULT_BAUDRATE = 115200
+
 
 def configure_interface(port, channel):
     line = ""
@@ -141,16 +143,17 @@ def main():
     else:
         default_outfile = sys.stdout
     p = argparse.ArgumentParser()
-    p.add_argument("-b", "--baudrate", type=int, default=115200,
+    p.add_argument("-b", "--baudrate", type=int, default=DEFAULT_BAUDRATE,
                    help="Baudrate of the serial port (only evaluated "
-                        "for non TCP-terminal)")
+                        "for non TCP-terminal, default: %d)" %
+                        DEFAULT_BAUDRATE)
     p.add_argument("conn", metavar="tty/host:port", type=str,
                    help="Serial port or TCP (host, port) tuple to "
                         "terminal with sniffer application")
     p.add_argument("channel", type=int, help="Channel to sniff on")
     p.add_argument("outfile", type=argparse.FileType("w+b"),
                    default=default_outfile, nargs="?",
-                   help="PCAP file to output to")
+                   help="PCAP file to output to (default: stdout)")
     args = p.parse_args()
 
     conn = connect(args)
