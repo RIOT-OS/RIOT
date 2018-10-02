@@ -12,6 +12,7 @@ RIOTBOARD      ?= $(RIOTBASE)/boards
 RIOTMAKE       ?= $(RIOTBASE)/makefiles
 RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
+PYLIBS         ?= $(RIOTBASE)/dist/pythonlibs
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTTOOLS)/git/git-cache
 APPDIR         ?= $(CURDIR)
@@ -28,6 +29,7 @@ __DIRECTORY_VARIABLES := \
   RIOTMAKE \
   RIOTPKG \
   RIOTTOOLS \
+  PYLIBS \
   RIOTPROJECT \
   APPDIR \
   BINDIRBASE \
@@ -46,6 +48,7 @@ override RIOTBOARD      := $(abspath $(RIOTBOARD))
 override RIOTMAKE       := $(abspath $(RIOTMAKE))
 override RIOTPKG        := $(abspath $(RIOTPKG))
 override RIOTTOOLS      := $(abspath $(RIOTTOOLS))
+override PYLIBS         := $(abspath $(PYLIBS))
 override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
 override GITCACHE       := $(abspath $(GITCACHE))
 override APPDIR         := $(abspath $(APPDIR))
@@ -71,7 +74,7 @@ BUILDRELPATH ?= $(CURDIR:$(RIOTPROJECT)/%=%)/
 OS := $(shell uname)
 
 # set python path, e.g. for tests
-PYTHONPATH := $(RIOTBASE)/dist/pythonlibs/:$(PYTHONPATH)
+PYTHONPATH := $(PYLIBS)/:$(PYTHONPATH)
 
 # Include Docker settings near the top because we need to build the environment
 # command line before some of the variable origins are overwritten below when
@@ -542,6 +545,9 @@ test: $(TEST_DEPS)
 	$(Q) for t in $(TESTS); do \
 		$$t || exit 1; \
 	done
+
+get_pylibs:
+	$(QQ)"$(MAKE)" -C $(PYLIBS)
 
 # Default OBJDUMPFLAGS for platforms which do not specify it:
 OBJDUMPFLAGS ?= -S -D -h
