@@ -5,7 +5,7 @@ APPLICATION = spectrum-scanner
 BOARD ?= samr21-xpro
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../RIOT
+RIOTBASE ?= $(CURDIR)/../RIOT
 
 # Define modules that are used
 USEMODULE += gnrc
