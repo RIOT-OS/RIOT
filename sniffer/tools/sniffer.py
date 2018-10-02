@@ -141,7 +141,7 @@ def main():
     else:
         default_outfile = sys.stdout
     p = argparse.ArgumentParser()
-    p.add_argument("-b", "--baudrate", type=int, default=112500,
+    p.add_argument("-b", "--baudrate", type=int, default=115200,
                    help="Baudrate of the serial port (only evaluated "
                         "for non TCP-terminal)")
     p.add_argument("conn", metavar="tty/host:port", type=str,
