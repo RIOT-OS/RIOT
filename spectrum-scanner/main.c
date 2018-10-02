@@ -72,9 +72,9 @@ void spectrum_scanner(unsigned long interval_us)
      * no-op (baseline) | 83 (but the measurements are useless)
      */
 
-    while(1) {
+    while (1) {
         /* Stack optimization, statically allocate this buffer */
-        static float ed_average[GNRC_NETIF_NUMOF][IEEE802154_CHANNEL_MAX+1];
+        static float ed_average[GNRC_NETIF_NUMOF][IEEE802154_CHANNEL_MAX + 1];
 
         memset(ed_average, 0, sizeof(ed_average));
 
@@ -115,7 +115,7 @@ void spectrum_scanner(unsigned long interval_us)
             }
             ++count;
             thread_yield();
-        } while(xtimer_now_usec64() < target);
+        } while (xtimer_now_usec64() < target);
         for (unsigned int k = 0; k < netif_numof; ++k) {
             print("[", 1);
             print_u32_dec(k);
