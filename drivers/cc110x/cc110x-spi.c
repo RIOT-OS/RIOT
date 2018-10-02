@@ -35,7 +35,6 @@
 #include "xtimer.h"
 #include "irq.h"
 
-#define SPI_CLK         SPI_CLK_5MHZ
 #define SPI_MODE        SPI_MODE_0
 
 /**********************************************************************
@@ -44,7 +43,7 @@
 
 static inline void lock(cc110x_t *dev)
 {
-    spi_acquire(dev->params.spi, dev->params.cs, SPI_MODE, SPI_CLK);
+    spi_acquire(dev->params.spi, dev->params.cs, SPI_MODE, dev->params.spi_clk);
 }
 
 void cc110x_cs(cc110x_t *dev)
