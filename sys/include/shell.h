@@ -69,10 +69,8 @@ typedef struct shell_command_t {
  * @param[in]       commands    ptr to array of command structs
  * @param[in]       line_buf    Buffer that will be used for reading a line
  * @param[in]       len         nr of bytes that fit in line_buf
- *
- * @returns         This function does not return.
  */
-void shell_run(const shell_command_t *commands, char *line_buf, int len) NORETURN;
+void shell_run(const shell_command_t *commands, char *line_buf, int len);
 
 #ifdef __cplusplus
 }
