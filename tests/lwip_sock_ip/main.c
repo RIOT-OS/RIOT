@@ -66,7 +66,7 @@ static void test_sock_ip_create4__EINVAL_addr(void)
 static void test_sock_ip_create4__EINVAL_netif(void)
 {
     static const sock_ip_ep_t local = { .family = AF_INET, .netif = _TEST_NETIF };
-    const sock_ip_ep_t remote = { .family = AF_INET,
+    static const sock_ip_ep_t remote = { .family = AF_INET,
                                          .netif = (_TEST_NETIF + 1),
                                          .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE } };
 
@@ -122,7 +122,7 @@ static void test_sock_ip_create4__only_local_reuse_ep(void)
 
 static void test_sock_ip_create4__only_remote(void)
 {
-    const sock_ip_ep_t remote = { .family = AF_INET,
+    static const sock_ip_ep_t remote = { .family = AF_INET,
                                          .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE } };
     sock_ip_ep_t ep;
 
@@ -139,7 +139,7 @@ static void test_sock_ip_create4__only_remote(void)
 static void test_sock_ip_create4__full(void)
 {
     static const sock_ip_ep_t local = { .family = AF_INET, .netif = _TEST_NETIF };
-    const sock_ip_ep_t remote = { .family = AF_INET,
+    static const sock_ip_ep_t remote = { .family = AF_INET,
                                          .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE } };
     sock_ip_ep_t ep;
 
@@ -205,7 +205,7 @@ static void test_sock_ip_recv4__ETIMEDOUT(void)
 static void test_sock_ip_recv4__socketed(void)
 {
     static const sock_ip_ep_t local = { .family = AF_INET };
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
 
     assert(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
@@ -220,7 +220,7 @@ static void test_sock_ip_recv4__socketed(void)
 static void test_sock_ip_recv4__socketed_with_remote(void)
 {
     static const sock_ip_ep_t local = { .family = AF_INET };
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
     sock_ip_ep_t result;
 
@@ -238,7 +238,7 @@ static void test_sock_ip_recv4__socketed_with_remote(void)
 
 static void test_sock_ip_recv4__unsocketed(void)
 {
-    const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
+    static const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
                                         .family = AF_INET };
 
     assert(0 == sock_ip_create(&_sock, &local, NULL, _TEST_PROTO,
@@ -304,7 +304,7 @@ static void test_sock_ip_recv4__non_blocking(void)
 
 static void test_sock_ip_send4__EAFNOSUPPORT(void)
 {
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_UNSPEC };
 
     assert(-EAFNOSUPPORT == sock_ip_send(NULL, "ABCD", sizeof("ABCD"),
@@ -314,7 +314,7 @@ static void test_sock_ip_send4__EAFNOSUPPORT(void)
 
 static void test_sock_ip_send4__EINVAL_addr(void)
 {
-    const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
+    static const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
                                         .family = AF_INET,
                                         .netif = _TEST_NETIF };
     static const sock_ip_ep_t remote = { .family = AF_INET,
@@ -329,10 +329,10 @@ static void test_sock_ip_send4__EINVAL_addr(void)
 
 static void test_sock_ip_send4__EINVAL_netif(void)
 {
-    const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
+    static const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
                                         .family = AF_INET,
                                         .netif = _TEST_NETIF };
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET,
                                          .netif = _TEST_NETIF + 1 };
 
@@ -345,7 +345,7 @@ static void test_sock_ip_send4__EINVAL_netif(void)
 
 static void test_sock_ip_send4__EHOSTUNREACH(void)
 {
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_WRONG },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_WRONG },
                                          .family = AF_INET };
 
     assert(-EHOSTUNREACH == sock_ip_send(NULL, "ABCD", sizeof("ABCD"), _TEST_PROTO,
@@ -363,7 +363,7 @@ static void test_sock_ip_send4__ENOTCONN(void)
 
 static void test_sock_ip_send4__socketed_no_local_no_netif(void)
 {
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
 
     assert(0 == sock_ip_create(&_sock, NULL, &remote, _TEST_PROTO,
@@ -378,9 +378,9 @@ static void test_sock_ip_send4__socketed_no_local_no_netif(void)
 
 static void test_sock_ip_send4__socketed_no_netif(void)
 {
-    const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
+    static const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
                                         .family = AF_INET };
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
 
     assert(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
@@ -395,7 +395,7 @@ static void test_sock_ip_send4__socketed_no_netif(void)
 
 static void test_sock_ip_send4__socketed_no_local(void)
 {
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET,
                                          .netif = _TEST_NETIF };
 
@@ -411,10 +411,10 @@ static void test_sock_ip_send4__socketed_no_local(void)
 
 static void test_sock_ip_send4__socketed(void)
 {
-    const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
+    static const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
                                         .family = AF_INET,
                                         .netif = _TEST_NETIF };
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
 
     assert(0 == sock_ip_create(&_sock, &local, &remote, _TEST_PROTO,
@@ -429,12 +429,12 @@ static void test_sock_ip_send4__socketed(void)
 
 static void test_sock_ip_send4__socketed_other_remote(void)
 {
-    const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
+    static const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
                                         .family = AF_INET,
                                         .netif = _TEST_NETIF };
-    const sock_ip_ep_t sock_remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_WRONG },
+    static const sock_ip_ep_t sock_remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_WRONG },
                                               .family = AF_INET };
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
 
     assert(0 == sock_ip_create(&_sock, &local, &sock_remote, _TEST_PROTO,
@@ -449,7 +449,7 @@ static void test_sock_ip_send4__socketed_other_remote(void)
 
 static void test_sock_ip_send4__unsocketed_no_local_no_netif(void)
 {
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
 
     assert(0 == sock_ip_create(&_sock, NULL, NULL, _TEST_PROTO,
@@ -464,9 +464,9 @@ static void test_sock_ip_send4__unsocketed_no_local_no_netif(void)
 
 static void test_sock_ip_send4__unsocketed_no_netif(void)
 {
-    const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
+    static const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
                                         .family = AF_INET };
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
 
     assert(0 == sock_ip_create(&_sock, &local, NULL, _TEST_PROTO,
@@ -481,7 +481,7 @@ static void test_sock_ip_send4__unsocketed_no_netif(void)
 
 static void test_sock_ip_send4__unsocketed_no_local(void)
 {
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET,
                                          .netif = _TEST_NETIF };
 
@@ -497,10 +497,10 @@ static void test_sock_ip_send4__unsocketed_no_local(void)
 
 static void test_sock_ip_send4__unsocketed(void)
 {
-    const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
+    static const sock_ip_ep_t local = { .addr = { .ipv4_u32 = _TEST_ADDR4_LOCAL },
                                         .family = AF_INET,
                                         .netif = _TEST_NETIF };
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
 
     assert(0 == sock_ip_create(&_sock, &local, NULL, _TEST_PROTO,
@@ -515,7 +515,7 @@ static void test_sock_ip_send4__unsocketed(void)
 
 static void test_sock_ip_send4__no_sock_no_netif(void)
 {
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET };
 
     assert(sizeof("ABCD") == sock_ip_send(NULL, "ABCD", sizeof("ABCD"),
@@ -528,7 +528,7 @@ static void test_sock_ip_send4__no_sock_no_netif(void)
 
 static void test_sock_ip_send4__no_sock(void)
 {
-    const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
+    static const sock_ip_ep_t remote = { .addr = { .ipv4_u32 = _TEST_ADDR4_REMOTE },
                                          .family = AF_INET,
                                          .netif = _TEST_NETIF };
 
