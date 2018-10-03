@@ -299,10 +299,11 @@ typedef struct netdev_driver {
      *
      * @pre `(dev != NULL) && (iolist != NULL`
      *
-     * @param[in] dev       network device descriptor
+     * @param[in] dev       Network device descriptor. Must not be NULL.
      * @param[in] iolist    io vector list to send
      *
-     * @return number of bytes sent, or `< 0` on error
+     * @return negative errno on error
+     * @return number of bytes sent
      */
     int (*send)(netdev_t *dev, const iolist_t *iolist);
 
@@ -315,17 +316,22 @@ typedef struct netdev_driver {
      * Supposed to be called from
      * @ref netdev_t::event_callback "netdev->event_callback()"
      *
-     * If buf == NULL and len == 0, returns the packet size without dropping it.
-     * If buf == NULL and len > 0, drops the packet and returns the packet size.
+     * If @p buf == NULL and @p len == 0, returns the packet size without
+     * dropping it.
+     * If @p buf == NULL and @p len > 0, drops the packet and returns the packet
+     * size.
      *
-     * @param[in]   dev     network device descriptor
-     * @param[out]  buf     buffer to write into or NULL
-     * @param[in]   len     maximum number of bytes to read
+     * @param[in]   dev     network device descriptor. Must not be NULL.
+     * @param[out]  buf     buffer to write into or NULL to return the packet
+     *                      size.
+     * @param[in]   len     maximum number of bytes to read. If @p buf is NULL
+     *                      the currently buffered packet is dropped when
+     *                      @p len > 0. Must not be 0 when @p buf != NULL.
      * @param[out] info     status information for the received packet. Might
      *                      be of different type for different netdev devices.
      *                      May be NULL if not needed or applicable.
      *
-     * @return `< 0` on error
+     * @return `-ENOBUFS` if supplied buffer is too small
      * @return number of bytes read if buf != NULL
      * @return packet size if buf == NULL
      */
@@ -336,7 +342,10 @@ typedef struct netdev_driver {
      *
      * @pre `(dev != NULL)`
      *
-     * @return `< 0` on error, 0 on success
+     * @param[in]   dev     network device descriptor. Must not be NULL.
+     *
+     * @return `< 0` on error
+     * @return 0 on success
      */
     int (*init)(netdev_t *dev);
 
@@ -354,7 +363,7 @@ typedef struct netdev_driver {
      *
      * See receive packet flow description for details.
      *
-     * @param[in]   dev     network device descriptor
+     * @param[in]   dev     network device descriptor. Must not be NULL.
      */
     void (*isr)(netdev_t *dev);
 
@@ -362,6 +371,11 @@ typedef struct netdev_driver {
      * @brief   Get an option value from a given network device
      *
      * @pre `(dev != NULL)`
+     * @pre for scalar types of @ref netopt_t @p max_len must be of exactly that
+     *      length (see [netopt documentation](@ref net_netopt) for type)
+     * @pre for array types of @ref netopt_t @p max_len must greater or equal the
+     *      required length (see [netopt documentation](@ref net_netopt) for
+     *      type)
      *
      * @param[in]   dev     network device descriptor
      * @param[in]   opt     option type
@@ -369,7 +383,7 @@ typedef struct netdev_driver {
      * @param[in]   max_len maximal amount of byte that fit into @p value
      *
      * @return              number of bytes written to @p value
-     * @return              `< 0` on error, 0 on success
+     * @return              `-ENOTSUP` if @p opt is not provided by the device
      */
     int (*get)(netdev_t *dev, netopt_t opt,
                void *value, size_t max_len);
@@ -378,14 +392,22 @@ typedef struct netdev_driver {
      * @brief   Set an option value for a given network device
      *
      * @pre `(dev != NULL)`
+     * @pre for scalar types of @ref netopt_t @p value_len must be of exactly
+     *      that length (see [netopt documentation](@ref net_netopt) for type)
+     * @pre for array types of @ref netopt_t @p value_len must lesser or equal
+     *      the required length (see [netopt documentation](@ref net_netopt) for
+     *      type)
      *
      * @param[in] dev       network device descriptor
      * @param[in] opt       option type
      * @param[in] value     value to set
      * @param[in] value_len the length of @p value
      *
-     * @return              number of bytes used from @p value
-     * @return              `< 0` on error, 0 on success
+     * @return              number of bytes written to @p value
+     * @return              `-ENOTSUP` if @p opt is not configurable for the
+     *                      device
+     * @return              `-EINVAL` if @p value is an invalid value with
+     *                      regards to @p opt
      */
     int (*set)(netdev_t *dev, netopt_t opt,
                const void *value, size_t value_len);
