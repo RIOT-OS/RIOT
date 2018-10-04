@@ -24,6 +24,7 @@ from serial import Serial
 import numpy as np
 import matplotlib.pylab as plt
 
+
 class rssi_plot(object):
 
     def plot_rssi(self, port):
@@ -37,7 +38,7 @@ class rssi_plot(object):
         # Therefore, remove the last value from the Z array.
         Z = Z[:, :-1]
         logging.debug("Creating figure")
-        fig = plt.figure()
+        plt.figure()
         pcm = plt.pcolormesh(X, Y, Z, vmin=-128, vmax=0, cmap=plt.cm.get_cmap('jet'))
         plt.xlim([0, self.tlen])
         plt.ylim([0, 26])
@@ -65,7 +66,7 @@ class rssi_plot(object):
                     tidx = int(timestamp / (self.dt * 1000000)) % (Z.shape[1])
                 except ValueError:
                     continue
-                logging.debug("data: tidx=%d if=%d t=%d", tidx, iface_id, timestamp)
+                logging.debug("data: tidx=%d if=%d cnt=%d t=%d", tidx, iface_id, count, timestamp)
                 raw = pkt_data.group(4)
                 resize = False
                 for ch_ed in raw.split(","):
@@ -82,17 +83,16 @@ class rssi_plot(object):
                         Z[ch, tidx] = ed
                     except (ValueError, IndexError):
                         continue
-                    #print("ch: %d ed: %d" % (ch, ed))
                 if resize:
                     logging.debug("resize: %d %d" % (ch_min, ch_max))
                     plt.ylim([ch_min - .5, ch_max + .5])
                 if now > last_update + 1:
                     last_update = now
-                    #pcm = plt.pcolormesh(X, Y, Z)
                     pcm.set_array(Z.ravel())
                     pcm.autoscale()
                     pcm.changed()
             plt.pause(0.01)
+
 
 def main(argv):
     loglevels = [logging.CRITICAL, logging.ERROR, logging.WARN, logging.INFO, logging.DEBUG]
@@ -121,6 +121,7 @@ def main(argv):
     except KeyboardInterrupt:
         port.close()
         sys.exit(2)
+
 
 if __name__ == "__main__":
     main(sys.argv)
