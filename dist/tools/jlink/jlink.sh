@@ -234,12 +234,12 @@ do_term() {
     # don't trapon Ctrl+C, because JLink keeps running
     trap '' INT
     # start Jlink as RTT server
-    setsid sh -c "${JLINK} ${JLINK_SERIAL} \
+    sh -c "${JLINK} ${JLINK_SERIAL} \
             -device '${JLINK_DEVICE}' \
             -speed '${JLINK_SPEED}' \
             -if '${JLINK_IF}' \
             -jtagconf -1,-1 \
-            -commandfile '${RIOTTOOLS}/jlink/term.seg' & \
+            -commandfile '${RIOTTOOLS}/jlink/term.seg' >/dev/null & \
             echo  \$! > $JLINK_PIDFILE" &
 
     sh -c "${JLINK_TERMPROG} ${JLINK_TERMFLAGS}"
