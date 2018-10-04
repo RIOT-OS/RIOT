@@ -380,6 +380,10 @@ auto_init_mpu9150();
     extern void auto_init_hts221(void);
     auto_init_hts221();
 #endif
+#ifdef MODULE_HTU21D
+    extern void auto_init_htu21d(void);
+    auto_init_htu21d();
+#endif
 #ifdef MODULE_DHT
     extern void auto_init_dht(void);
     auto_init_dht();
