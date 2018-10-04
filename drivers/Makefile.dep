@@ -175,6 +175,10 @@ ifneq (,$(filter hts221,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter htu21d,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter ina220,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
