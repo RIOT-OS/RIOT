@@ -141,6 +141,7 @@ endif
 
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
+  USEMODULE += fmt
 endif
 
 ifneq (,$(filter ieee802154 nrfmin,$(USEMODULE)))
