@@ -56,8 +56,7 @@
  */
 void spectrum_scanner(unsigned long interval_us)
 {
-    kernel_pid_t ifs[GNRC_NETIF_NUMOF];
-    size_t netif_numof = gnrc_netif_get(ifs);
+    size_t netif_numof = gnrc_netif_numof();
 
     /* Using expf(x) (natural exponent) gives quicker computations on Cortex-M0+,
      * compared to using powf(10, x). */
@@ -84,23 +83,23 @@ void spectrum_scanner(unsigned long interval_us)
          * interval time */
         unsigned int count = 0;
         do {
-            for (unsigned int k = 0; k < netif_numof; ++k) {
-                kernel_pid_t dev = ifs[k];
+            gnrc_netif_t *netif = NULL;
+            for (unsigned int k = 0; (netif = gnrc_netif_iter(netif)); k++) {
                 for (unsigned int ch = IEEE802154_CHANNEL_MIN; ch <= IEEE802154_CHANNEL_MAX; ++ch) {
                     uint16_t tmp_ch = ch;
                     int res;
-                    res = gnrc_netapi_set(dev, NETOPT_CHANNEL, 0, &tmp_ch, sizeof(uint16_t));
+                    res = gnrc_netapi_set(netif->pid, NETOPT_CHANNEL, 0, &tmp_ch, sizeof(uint16_t));
                     if (res < 0) {
                         continue;
                     }
                     netopt_enable_t tmp;
                     /* Perform CCA to update ED level */
-                    res = gnrc_netapi_get(dev, NETOPT_IS_CHANNEL_CLR, 0, &tmp, sizeof(netopt_enable_t));
+                    res = gnrc_netapi_get(netif->pid, NETOPT_IS_CHANNEL_CLR, 0, &tmp, sizeof(netopt_enable_t));
                     if (res < 0) {
                         continue;
                     }
                     int8_t level = 0;
-                    res = gnrc_netapi_get(dev, NETOPT_LAST_ED_LEVEL, 0, &level, sizeof(int8_t));
+                    res = gnrc_netapi_get(netif->pid, NETOPT_LAST_ED_LEVEL, 0, &level, sizeof(int8_t));
                     if (res < 0) {
                         continue;
                     }
