@@ -108,13 +108,25 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 #define ADC_CONFIG {              \
+    {GPIO_PIN(PORT_A, 0), 0, 0},  \
     {GPIO_PIN(PORT_A, 1), 0, 1},  \
+    {GPIO_PIN(PORT_A, 2), 0, 2},  \
+    {GPIO_PIN(PORT_A, 3), 0, 3},  \
     {GPIO_PIN(PORT_A, 4), 0, 4},  \
-    {GPIO_PIN(PORT_C, 1), 1, 11}, \
-    {GPIO_PIN(PORT_C, 2), 1, 12}  \
+    {GPIO_PIN(PORT_A, 5), 0, 5},  \
+    {GPIO_PIN(PORT_A, 6), 0, 6},  \
+    {GPIO_PIN(PORT_A, 7), 0, 7},  \
+    {GPIO_PIN(PORT_B, 0), 0, 8},  \
+    {GPIO_PIN(PORT_B, 1), 0, 9},  \
+    {GPIO_PIN(PORT_C, 0), 0, 10},  \
+    {GPIO_PIN(PORT_C, 1), 0, 11},  \
+    {GPIO_PIN(PORT_C, 2), 0, 12},  \
+    {GPIO_PIN(PORT_C, 3), 0, 13},  \
+    {GPIO_PIN(PORT_C, 4), 0, 14},  \
+    {GPIO_PIN(PORT_C, 5), 0, 15},  \
 }
 
-#define ADC_NUMOF           (4)
+#define ADC_NUMOF           (16)
 /** @} */
 
 /**
