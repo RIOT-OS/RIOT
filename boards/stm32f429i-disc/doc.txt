@@ -1,0 +1,36 @@
+/**
+ * @defgroup    boards_stm32f429i-disc STM32F429I-DISCO and -DISC1
+ * @ingroup     boards
+ * @brief       Support for the `STM32F429-DISCO` and `STM32F429-DISC1` boards.
+
+
+
+
+### Differences between -DISCO and -DISC1
+
+The `DISC1` version of this board added the following USB features:
+
+- Virtual COM port (UART)
+- Mass storage
+- ST-LINK/V2-B
+
+
+
+### Using the -DISC1 variant
+
+UART and flashing should work out of the box with this version of the board.
+
+
+
+### Using the -DISCO variant
+
+There's two additional things you'll need to do if your board is of the `-DISCO`
+variant:
+
+1. Set the environment variable `STLINK_VERSION=2` when flashing
+2. Connect a USB-to-UART converter
+	* On this board, `PA9` is the `TX` pin and `PA10` is the `RX` pin. Connect
+	these two pins to the opposite pins on the USB-to-UART converter
+	(e.g. `TX` to `RX`). Don't forget to also connect GND.
+
+ */

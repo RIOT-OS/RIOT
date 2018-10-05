@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_stm32f429i-disc1
+ * @ingroup     boards_stm32f429i-disc
  * @{
  *
  * @file
- * @name        Peripheral MCU configuration for the STM32F429I-DISC1 board
+ * @brief        Peripheral MCU configuration for the STM32F429I-DISC family of evaluation boards
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */

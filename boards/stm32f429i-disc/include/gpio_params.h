@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup   boards_stm32f429i-disc1
+ * @ingroup     boards_stm32f429i-disc
  * @{
  *
  * @file
- * @brief     Board specific configuration of direct mapped GPIOs
+ * @brief       Board specific configuration of direct mapped GPIOs
  *
- * @author    Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
 #ifndef GPIO_PARAMS_H
