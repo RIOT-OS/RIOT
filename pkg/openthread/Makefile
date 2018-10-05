@@ -43,6 +43,5 @@ ifneq (,$(filter openthread-cli-mtd,$(USEMODULE)))
 	cp $(PKG_BUILDDIR)/output/lib/libopenthread-mtd.a ${BINDIR}/openthread-mtd.a
 	cp $(PKG_BUILDDIR)/output/lib/libopenthread-cli-mtd.a ${BINDIR}/openthread-cli-mtd.a
 endif
-	sed -ie 's/BASE/_BASE/g' $(PKG_BUILDDIR)/output/include/openthread/types.h
 
 include $(RIOTBASE)/pkg/pkg.mk
