@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "uart_stdio.h"
+#include "stdio_uart.h"
 #include "periph/uart.h"
 #include "openthread/types.h"
 #include "openthread/platform/uart.h"
@@ -71,21 +71,21 @@ otError otPlatUartEnable(void)
         gSerialMessage[i].serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
     }
 
-    uart_init(UART_STDIO_DEV, UART_STDIO_BAUDRATE, (uart_rx_cb_t) uart_handler, NULL);
+    uart_init(STDIO_UART_DEV, STDIO_UART_BAUDRATE, (uart_rx_cb_t) uart_handler, NULL);
     return OT_ERROR_NONE;
 }
 
 /* OpenThread will call this for disabling UART */
 otError otPlatUartDisable(void)
 {
-    uart_poweroff(UART_STDIO_DEV);
+    uart_poweroff(STDIO_UART_DEV);
     return OT_ERROR_NONE;
 }
 
 /* OpenThread will call this for sending data through UART */
 otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
 {
-    uart_write(UART_STDIO_DEV, aBuf, aBufLength);
+    uart_write(STDIO_UART_DEV, aBuf, aBufLength);
 
     /* Tell OpenThread the sending of UART is done */
     otPlatUartSendDone();
