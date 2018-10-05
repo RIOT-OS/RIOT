@@ -39,12 +39,12 @@ if [ -n "${SQUASH_COMMITS}" ]; then
 fi
 
 if [ -n "$TRAVIS_PULL_REQUEST" -o -n "$CI_PULL_NR" ]; then
-    if check_gh_label "NEEDS SQUASHING"; then
+    if check_gh_label "CI: needs squashing"; then
         echo -e "${CERROR}Pull request needs squashing according to its labels set on GitHub${CRESET}"
         EXIT_CODE=1
     fi
 
-    if check_gh_label "Waiting For Other PR"; then
+    if check_gh_label "State: waiting for other PR"; then
         echo -e "${CERROR}Pull request is waiting for another pull request according to its labels set on GitHub${CRESET}"
         EXIT_CODE=1
     fi
