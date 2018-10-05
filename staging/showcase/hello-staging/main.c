@@ -20,9 +20,11 @@
 
 #include <stdio.h>
 
+#include "showcase.h"
+
 int main(void)
 {
-    printf("Hello Staging!\n");
+    printf("Hello %s!\n", showcase_string);
 
     return 0;
 }

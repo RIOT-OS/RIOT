@@ -16,6 +16,6 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 ENABLE_STAGING=1
-USEMODULE += test
+USEMODULE += showcase
 
 include $(RIOTBASE)/Makefile.include

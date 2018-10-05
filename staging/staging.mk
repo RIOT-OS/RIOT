@@ -7,8 +7,8 @@
 # In order to mark a module as broken, add it to the "BROKEN" variable.
 # That way, it's dependees will be marked broken implicitly.
 #
-#STAGING_MODULES += test
-#BROKEN += test    # (broken due to change in X, see #12345)
+STAGING_MODULES += showcase
+#BROKEN += showcase    # (broken due to change in X, see #12345)
 
 #
 # list of staging applications
@@ -16,7 +16,7 @@
 # In order to mark a staging application as "broken", turn it's
 # line into a comment (and add a note).
 #
-STAGING_APPS += broken/application/example
+STAGING_APPS += showcase/hello-staging
 
 #
 # housekeeping
