@@ -21,6 +21,7 @@
 
 #ifdef MODULE_HDC1000
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "hdc1000.h"

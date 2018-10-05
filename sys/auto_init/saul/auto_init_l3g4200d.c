@@ -21,6 +21,7 @@
 
 #ifdef MODULE_L3G4200D
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "l3g4200d.h"

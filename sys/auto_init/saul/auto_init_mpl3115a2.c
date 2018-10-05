@@ -21,6 +21,7 @@
 
 #ifdef MODULE_MPL3115A2
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 

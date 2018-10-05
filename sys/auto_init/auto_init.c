@@ -284,41 +284,105 @@ void auto_init(void)
 #ifdef MODULE_AUTO_INIT_SAUL
     DEBUG("auto_init SAUL\n");
 
-#ifdef MODULE_SAUL_GPIO
-    extern void auto_init_gpio(void);
-    auto_init_gpio();
-#endif
 #ifdef MODULE_SAUL_ADC
     extern void auto_init_adc(void);
     auto_init_adc();
 #endif
-#ifdef MODULE_LSM303DLHC
-    extern void auto_init_lsm303dlhc(void);
-    auto_init_lsm303dlhc();
+#ifdef MODULE_SAUL_GPIO
+    extern void auto_init_gpio(void);
+    auto_init_gpio();
 #endif
-#ifdef MODULE_LPS331AP
-    extern void auto_init_lps331ap(void);
-    auto_init_lps331ap();
+#ifdef MODULE_ADCXX1C
+    extern void auto_init_adcxx1c(void);
+    auto_init_adcxx1c();
+#endif
+#ifdef MODULE_ADS101X
+    extern void auto_init_ads101x(void);
+    auto_init_ads101x();
+#endif
+#ifdef MODULE_ADXL345
+    extern void auto_init_adxl345(void);
+    auto_init_adxl345();
+#endif
+#ifdef MODULE_BMP180
+    extern void auto_init_bmp180(void);
+    auto_init_bmp180();
+#endif
+#if defined(MODULE_BME280) || defined(MODULE_BMP280)
+    extern void auto_init_bmx280(void);
+    auto_init_bmx280();
+#endif
+#ifdef MODULE_BMX055
+    extern void auto_init_bmx055(void);
+    auto_init_bmx055();
+#endif
+#ifdef MODULE_DHT
+    extern void auto_init_dht(void);
+    auto_init_dht();
+#endif
+#ifdef MODULE_FXOS8700
+    extern void auto_init_fxos8700(void);
+    auto_init_fxos8700();
+#endif
+#ifdef MODULE_GROVE_LEDBAR
+    extern void auto_init_grove_ledbar(void);
+    auto_init_grove_ledbar();
+#endif
+#ifdef MODULE_HDC1000
+    extern void auto_init_hdc1000(void);
+    auto_init_hdc1000();
+#endif
+#ifdef MODULE_HTS221
+    extern void auto_init_hts221(void);
+    auto_init_hts221();
+#endif
+#ifdef MODULE_IO1_XPLAINED
+    extern void auto_init_io1_xplained(void);
+    auto_init_io1_xplained();
 #endif
 #ifdef MODULE_ISL29020
     extern void auto_init_isl29020(void);
     auto_init_isl29020();
 #endif
+#ifdef MODULE_JC42
+    extern void auto_init_jc42(void);
+    auto_init_jc42();
+#endif
 #ifdef MODULE_L3G4200D
     extern void auto_init_l3g4200d(void);
     auto_init_l3g4200d();
+#endif
+#ifdef MODULE_LIS2DH12
+    extern void auto_init_lis2dh12(void);
+    auto_init_lis2dh12();
 #endif
 #ifdef MODULE_LIS3DH
     extern void auto_init_lis3dh(void);
     auto_init_lis3dh();
 #endif
 #ifdef MODULE_LIS3MDL
-extern void auto_init_lis3mdl(void);
-auto_init_lis3mdl();
+    extern void auto_init_lis3mdl(void);
+    auto_init_lis3mdl();
+#endif
+#ifdef MODULE_LPS331AP
+    extern void auto_init_lps331ap(void);
+    auto_init_lps331ap();
+#endif
+#ifdef MODULE_LSM303DLHC
+    extern void auto_init_lsm303dlhc(void);
+    auto_init_lsm303dlhc();
+#endif
+#ifdef MODULE_LSM6DSL
+    extern void auto_init_lsm6dsl(void);
+    auto_init_lsm6dsl();
 #endif
 #ifdef MODULE_MAG3110
     extern void auto_init_mag3110(void);
     auto_init_mag3110();
+#endif
+#ifdef MODULE_MMA7660
+    extern void auto_init_mma7660(void);
+    auto_init_mma7660();
 #endif
 #ifdef MODULE_MMA8X5X
     extern void auto_init_mma8x5x(void);
@@ -329,104 +393,44 @@ auto_init_lis3mdl();
     auto_init_mpl3115a2();
 #endif
 #ifdef MODULE_MPU9150
-extern void auto_init_mpu9150(void);
-auto_init_mpu9150();
-#endif
-#ifdef MODULE_GROVE_LEDBAR
-    extern void auto_init_grove_ledbar(void);
-    auto_init_grove_ledbar();
+    extern void auto_init_mpu9150(void);
+    auto_init_mpu9150();
 #endif
 #ifdef MODULE_PIR
     extern void auto_init_pir(void);
     auto_init_pir();
 #endif
-#ifdef MODULE_SI70XX
-    extern void auto_init_si70xx(void);
-    auto_init_si70xx();
-#endif
-#ifdef MODULE_BMP180
-    extern void auto_init_bmp180(void);
-    auto_init_bmp180();
-#endif
-#ifdef MODULE_BMX055
-    extern void auto_init_bmx055(void);
-    auto_init_bmx055();
-#endif
-#if defined(MODULE_BME280) || defined(MODULE_BMP280)
-    extern void auto_init_bmx280(void);
-    auto_init_bmx280();
-#endif
-#ifdef MODULE_JC42
-    extern void auto_init_jc42(void);
-    auto_init_jc42();
-#endif
-#ifdef MODULE_TSL2561
-    extern void auto_init_tsl2561(void);
-    auto_init_tsl2561();
-#endif
 #ifdef MODULE_PULSE_COUNTER
     extern void auto_init_pulse_counter(void);
     auto_init_pulse_counter();
 #endif
-#ifdef MODULE_HDC1000
-    extern void auto_init_hdc1000(void);
-    auto_init_hdc1000();
-#endif
-#ifdef MODULE_FXOS8700
-    extern void auto_init_fxos8700(void);
-    auto_init_fxos8700();
-#endif
-#ifdef MODULE_HTS221
-    extern void auto_init_hts221(void);
-    auto_init_hts221();
-#endif
-#ifdef MODULE_DHT
-    extern void auto_init_dht(void);
-    auto_init_dht();
-#endif
-#ifdef MODULE_TMP006
-    extern void auto_init_tmp006(void);
-    auto_init_tmp006();
-#endif
-#ifdef MODULE_TCS37727
-    extern void auto_init_tcs37727(void);
-    auto_init_tcs37727();
-#endif
-#ifdef MODULE_VEML6070
-    extern void auto_init_veml6070(void);
-    auto_init_veml6070();
-#endif
-#ifdef MODULE_IO1_XPLAINED
-    extern void auto_init_io1_xplained(void);
-    auto_init_io1_xplained();
-#endif
-#ifdef MODULE_ADXL345
-    extern void auto_init_adxl345(void);
-    auto_init_adxl345();
-#endif
-#ifdef MODULE_LSM6DSL
-    extern void auto_init_lsm6dsl(void);
-    auto_init_lsm6dsl();
-#endif
-#ifdef MODULE_ADCXX1C
-    extern void auto_init_adcxx1c(void);
-    auto_init_adcxx1c();
-#endif
-#ifdef MODULE_ADS101X
-    extern void auto_init_ads101x(void);
-    auto_init_ads101x();
-#endif
-#ifdef MODULE_LIS2DH12
-    extern void auto_init_lis2dh12(void);
-    auto_init_lis2dh12();
+#ifdef MODULE_SHT1X
+    extern void auto_init_sht1x(void);
+    auto_init_sht1x();
 #endif
 #ifdef MODULE_SI114X
     extern void auto_init_si114x(void);
     auto_init_si114x();
 #endif
-#ifdef MODULE_MMA7660
-    extern void auto_init_mma7660(void);
-    auto_init_mma7660();
+#ifdef MODULE_SI70XX
+    extern void auto_init_si70xx(void);
+    auto_init_si70xx();
+#endif
+#ifdef MODULE_TCS37727
+    extern void auto_init_tcs37727(void);
+    auto_init_tcs37727();
+#endif
+#ifdef MODULE_TMP006
+    extern void auto_init_tmp006(void);
+    auto_init_tmp006();
+#endif
+#ifdef MODULE_TSL2561
+    extern void auto_init_tsl2561(void);
+    auto_init_tsl2561();
+#endif
+#ifdef MODULE_VEML6070
+    extern void auto_init_veml6070(void);
+    auto_init_veml6070();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */

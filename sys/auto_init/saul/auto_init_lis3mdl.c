@@ -21,6 +21,7 @@
 
 #ifdef MODULE_LIS3MDL
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "lis3mdl.h"

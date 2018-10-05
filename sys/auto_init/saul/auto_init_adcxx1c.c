@@ -21,6 +21,7 @@
 
 #ifdef MODULE_ADCXX1C
 
+#include "assert.h"
 #include "log.h"
 
 #include "saul_reg.h"
