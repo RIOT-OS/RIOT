@@ -94,9 +94,8 @@ To create a bridge and two (or `count` at your option) tap interfaces:
 
 ## CONTRIBUTE
 
-To contribute something to RIOT, please refer to the [development
-procedures](https://github.com/RIOT-OS/RIOT/wiki/Development-procedures) and
-read all notes for best practice.
+To contribute something to RIOT, please refer to our
+[contributing document](CONTRIBUTING.md).
 
 ## MAILING LISTS
 * RIOT OS kernel developers list
