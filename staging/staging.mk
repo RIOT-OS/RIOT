@@ -39,9 +39,7 @@ STAGING_MODULES_USED_NOTBROKEN := \
 #  a) manually called "make" issue a warning
 #  b) "make info-boards-supported" skip any dependee, effectively disabling the CI
 #
-ifneq (, $(STAGING_MODULES_USED_BROKEN))
-  FEATURES_REQUIRED += $(patsubst %,broken-staging-module-%,$(STAGING_MODULES_USED_BROKEN))
-endif
+FEATURES_REQUIRED += $(patsubst %,broken-staging-module-%,$(STAGING_MODULES_USED_BROKEN))
 
 # list of folders with staging modules that are used and not broken
 STAGING_DIRS := $(sort $(wildcard $(STAGING_MODULES_USED_NOTBROKEN:%=$(RIOTBASE)/staging/%)))
