@@ -11,12 +11,12 @@
 #BROKEN += test    # (broken due to change in X, see #12345)
 
 #
-# list of stating applications
+# list of staging applications
 #
 # In order to mark a staging application as "broken", turn it's
 # line into a comment (and add a note).
 #
-#STAGING_APPS += broken/application/example # (intentionally broken by design)
+STAGING_APPS += broken/application/example
 
 #
 # housekeeping
