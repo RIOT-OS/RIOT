@@ -6,7 +6,6 @@ BOARD_BLACKLIST := arduino-duemilanove \
                    jiminy-mega256rfr2 \
                    mega-xplained \
                    waspmote-pro
-
 # arduino-mega2560: builds locally but breaks travis (possibly because of
 # differences in the toolchain)
 # The MSP boards don't feature round(), exp(), and log(), which are used in the unittests
