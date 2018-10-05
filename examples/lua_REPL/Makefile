@@ -55,6 +55,7 @@ BOARD_INSUFFICIENT_MEMORY := blackpill \
                              samd21-xpro \
                              saml21-xpro \
                              samr21-xpro \
+							 samr30-xpro \
                              seeeduino_arch-pro \
                              sensebox_samd21 \
                              slstk3401a \
