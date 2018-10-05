@@ -290,6 +290,58 @@ static int cmd_test(int argc, char **argv)
     return 0;
 }
 
+/**
+ * @brief   Does a write and verify test on last page available
+ *
+ * @note    Since every hardware can have different flash layouts for
+ *          automated testing we always write to the last page available
+ *          so we are independent of the size or layout
+ */
+static int cmd_test_last(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+    char fill = 'a';
+
+    for (unsigned i = 0; i < sizeof(page_mem); i++) {
+        page_mem[i] = (uint8_t)fill++;
+        if (fill > 'z') {
+            fill = 'a';
+        }
+    }
+
+    if (flashpage_write_and_verify((int)FLASHPAGE_NUMOF - 2, page_mem) != FLASHPAGE_OK) {
+        puts("error verifying the content of last page");
+        return 1;
+    }
+
+    puts("wrote local page buffer to last flash page");
+    return 0;
+}
+
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+/**
+ * @brief   Does a short raw write on last page available
+ *
+ * @note    Since every hardware can have different flash layouts for
+ *          automated testing we always write to the last page available
+ *          so we are independent of the size or layout
+ */
+static int cmd_test_last_raw(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    /* try to align */
+    memcpy(raw_buf, "test12344321tset", 16);
+
+    flashpage_write_raw((void*) ((int)CPU_FLASH_BASE + (int)FLASHPAGE_SIZE * ((int)FLASHPAGE_NUMOF - 2)), raw_buf, strlen(raw_buf));
+
+    puts("wrote raw short buffer to last flash page");
+    return 0;
+}
+#endif
+
 static const shell_command_t shell_commands[] = {
     { "info", "Show information about pages", cmd_info },
     { "dump", "Dump the selected page to STDOUT", cmd_dump },
@@ -302,6 +354,10 @@ static const shell_command_t shell_commands[] = {
     { "erase", "Erase the given page buffer", cmd_erase },
     { "edit", "Write bytes to the local page buffer", cmd_edit },
     { "test", "Write and verify test pattern", cmd_test },
+    { "test_last", "Write and verify test pattern on last page available", cmd_test_last },
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+    { "test_last_raw", "Write and verify raw short write on last page available", cmd_test_last_raw },
+#endif
     { NULL, NULL, NULL }
 };
 

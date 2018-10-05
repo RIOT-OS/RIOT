@@ -127,14 +127,22 @@ static const uart_conf_t uart_config[] = {
  */
 static const adc_conf_t adc_config[] = {
     /* dev, pin, channel */
-    { .dev = ADC0, .pin = GPIO_UNDEF          , .chan =  0 }, /* ADC0_DP0 */
-    { .dev = ADC0, .pin = GPIO_UNDEF          , .chan = 19 }, /* ADC0_DM0 */
-    { .dev = ADC1, .pin = GPIO_UNDEF          , .chan =  0 }, /* ADC1_DP0 */
-    { .dev = ADC1, .pin = GPIO_UNDEF          , .chan = 19 }, /* ADC1_DM0 */
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  0), .chan =  8 }, /* PTB0 (Arduino A0) */
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  1), .chan =  9 }, /* PTB1 (Arduino A1) */
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  1), .chan = 15 }, /* PTC1 (Arduino A2) */
-    { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  2), .chan =  4 }, /* PTC2 (Arduino A3) */
+    [ 0] = { .dev = ADC0, .pin = GPIO_UNDEF          , .chan =  0, .avg = ADC_AVG_MAX }, /* ADC0_DP0 */
+    [ 1] = { .dev = ADC0, .pin = GPIO_UNDEF          , .chan = 19, .avg = ADC_AVG_MAX }, /* ADC0_DM0 */
+    [ 2] = { .dev = ADC1, .pin = GPIO_UNDEF          , .chan =  0, .avg = ADC_AVG_MAX }, /* ADC1_DP0 */
+    [ 3] = { .dev = ADC1, .pin = GPIO_UNDEF          , .chan = 19, .avg = ADC_AVG_MAX }, /* ADC1_DM0 */
+    [ 4] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  0), .chan =  8, .avg = ADC_AVG_MAX }, /* PTB0 (Arduino A0) */
+    [ 5] = { .dev = ADC0, .pin = GPIO_PIN(PORT_B,  1), .chan =  9, .avg = ADC_AVG_MAX }, /* PTB1 (Arduino A1) */
+    [ 6] = { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  1), .chan = 15, .avg = ADC_AVG_MAX }, /* PTC1 (Arduino A2) */
+    [ 7] = { .dev = ADC0, .pin = GPIO_PIN(PORT_C,  2), .chan =  4, .avg = ADC_AVG_MAX }, /* PTC2 (Arduino A3) */
+    /* internal: temperature sensor */
+    /* The temperature sensor has a very high output impedance, it must not be
+     * sampled using hardware averaging, or the sampled values will be garbage */
+    [ 8] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 26, .avg = ADC_AVG_NONE },
+    /* internal: band gap */
+    /* Note: the band gap buffer uses a bit of current and is turned off by default,
+     * Set PMC->REGSC |= PMC_REGSC_BGBE_MASK before reading or the input will be floating */
+    [ 9] = { .dev = ADC0, .pin = GPIO_UNDEF, .chan = 27, .avg = ADC_AVG_MAX },
 };
 
 #define ADC_NUMOF           (sizeof(adc_config) / sizeof(adc_config[0]))

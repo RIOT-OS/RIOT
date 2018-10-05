@@ -9,12 +9,6 @@ OLD_USEPKG := $(sort $(USEPKG))
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
 
-ifneq (,$(filter cbor_ctime,$(USEMODULE)))
-  ifneq (,$(filter newlib,$(USEMODULE)))
-    USEMODULE += newlib_gnu_source
-  endif
-endif
-
 ifneq (,$(filter ndn-riot,$(USEPKG)))
   USEMODULE += gnrc
   USEMODULE += xtimer
@@ -147,6 +141,7 @@ endif
 
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
+  USEMODULE += fmt
 endif
 
 ifneq (,$(filter ieee802154 nrfmin,$(USEMODULE)))
@@ -816,4 +811,8 @@ USEMODULE := $(sort $(USEMODULE))
 USEPKG := $(sort $(USEPKG))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
   include $(RIOTBASE)/Makefile.dep
+endif
+
+ifneq (,$(filter ecc_%,$(USEMODULE)))
+  USEMODULE += ecc
 endif

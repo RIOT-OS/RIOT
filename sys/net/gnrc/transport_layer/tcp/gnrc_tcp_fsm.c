@@ -482,7 +482,8 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                 if (ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
                     gnrc_pktsnip_t *tmp = NULL;
                     LL_SEARCH_SCALAR(in_pkt, tmp, type, GNRC_NETTYPE_NETIF);
-                    /* cppcheck-suppress knownConditionTrueFalse */
+                    /* cppcheck-suppress knownConditionTrueFalse
+                     * (reason: tmp *can* be != NULL after LL_SEARCH_SCALAR) */
                     if (tmp == NULL) {
                         DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() :\
                                incomming packet had no netif header\n");

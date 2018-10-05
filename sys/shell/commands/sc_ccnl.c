@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <string.h>
+
 #include "random.h"
 #include "sched.h"
 #include "net/gnrc/netif.h"

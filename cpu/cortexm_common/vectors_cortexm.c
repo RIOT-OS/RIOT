@@ -237,7 +237,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
      * Fixes wrong compiler warning by gcc < 6.0. */
     uint32_t pc = 0;
     /* cppcheck-suppress variableScope
-     * variable used in assembly-code below */
+     * (reason: used within __asm__ which cppcheck doesn't pick up) */
     uint32_t* orig_sp = NULL;
 
     /* Check if the ISR stack overflowed previously. Not possible to detect

@@ -15,6 +15,7 @@ class BaseDevice:
     """Instance for devices to connect and untilize drivers."""
 
     def __init__(self, *args, **kwargs):
+        logging.warning("deprecated, moving library to RIOT-OS/if_lib")
         self._driver = driver_manager.driver_from_config(*args, **kwargs)
 
     def close(self):

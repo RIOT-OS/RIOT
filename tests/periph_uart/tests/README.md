@@ -1,3 +1,5 @@
+*deprecated: BPT is renamed to PHiLIP, more information found [here](https://github.com/MrKevinWeiss/PHiLIP)*
+
 How To Run
 ==========
 Connect the DUT (device under test) UART6 to the BPT (bluepill tester).

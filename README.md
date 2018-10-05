@@ -64,7 +64,7 @@ but not limited to:
 * CoAP
 * CCN-Lite
 * Sigfox
-* LoRaWAN (Experimental)
+* LoRaWAN
 
 
 ## GETTING STARTED

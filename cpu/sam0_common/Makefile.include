@@ -2,7 +2,7 @@
 CFLAGS += -DCPU_FAM_$(shell echo $(CPU_FAM) | tr 'a-z-' 'A-Z_')
 
 # Set ROM and RAM lengths according to CPU model
-ifneq (,$(filter samd21g18a samd21j18a saml21j18b saml21j18a samr21g18a,$(CPU_MODEL)))
+ifneq (,$(filter samd21g18a samd21j18a saml21j18b saml21j18a samr21g18a samr30g18a,$(CPU_MODEL)))
   ROM_LEN ?= 0x40000
   RAM_LEN ?= 0x8000
 endif

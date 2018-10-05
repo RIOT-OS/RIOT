@@ -15,6 +15,8 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
+#include <string.h>
+
 #include "bitfield.h"
 #include "net/ethernet.h"
 #include "net/ipv6.h"
@@ -26,6 +28,7 @@
 #ifdef MODULE_NETSTATS_IPV6
 #include "net/netstats.h"
 #endif
+#include "fmt.h"
 #include "log.h"
 #include "sched.h"
 
@@ -313,6 +316,18 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+        case NETOPT_RAWMODE:
+            if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
+                netif->flags |= GNRC_NETIF_FLAGS_RAWMODE;
+            }
+            else {
+                netif->flags &= ~GNRC_NETIF_FLAGS_RAWMODE;
+            }
+            /* Also propagate to the netdev device */
+            netif->dev->driver->set(netif->dev, NETOPT_RAWMODE, opt->data,
+                                      opt->data_len);
+            res = sizeof(netopt_enable_t);
+            break;
         default:
             break;
     }
@@ -353,11 +368,6 @@ gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid)
     return NULL;
 }
 
-static inline char _half_byte_to_char(uint8_t half_byte)
-{
-    return (half_byte < 10) ? ('0' + half_byte) : ('a' + (half_byte - 10));
-}
-
 char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out)
 {
     char *res = out;
@@ -365,8 +375,7 @@ char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out)
     assert((out != NULL) && ((addr != NULL) || (addr_len == 0U)));
     out[0] = '\0';
     for (size_t i = 0; i < addr_len; i++) {
-        *(out++) = _half_byte_to_char(*(addr) >> 4);
-        *(out++) = _half_byte_to_char(*(addr++) & 0xf);
+        out += fmt_byte_hex((out), *(addr++));
         *(out++) = (i == (addr_len - 1)) ? '\0' : ':';
     }
     return res;

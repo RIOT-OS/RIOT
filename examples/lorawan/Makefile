@@ -7,7 +7,9 @@ BOARD ?= b-l072z-lrwan1
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6 nucleo-f042k6 nucleo-l031k6
+BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6 \
+                             nucleo-f042k6 \
+                             nucleo-l031k6
 
 DEVEUI ?= 0000000000000000
 APPEUI ?= 0000000000000000
@@ -28,6 +30,7 @@ FEATURES_REQUIRED += periph_rtc
 
 CFLAGS += -DREGION_$(REGION)
 CFLAGS += -DDEVEUI=\"$(DEVEUI)\" -DAPPEUI=\"$(APPEUI)\" -DAPPKEY=\"$(APPKEY)\"
+CFLAGS += -DLORAMAC_ACTIVE_REGION=LORAMAC_REGION_$(REGION)
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the

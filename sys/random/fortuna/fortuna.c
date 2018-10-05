@@ -5,6 +5,8 @@
  * for more information.
  */
 
+#include <string.h>
+
 #include "fortuna.h"
 
 /**

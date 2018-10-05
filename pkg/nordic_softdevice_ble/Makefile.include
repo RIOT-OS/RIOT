@@ -31,3 +31,6 @@ DIRS += \
 		$(NORDIC_SRCS)/components/softdevice/common/softdevice_handler \
 		$(NORDIC_SRCS)/components/ble/common \
 		$(NORDIC_SRCS)/components/iot/ble_ipsp
+
+# LLVM ARM assembler has massive problems digesting this
+TOOLCHAINS_BLACKLIST += llvm

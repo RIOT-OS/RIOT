@@ -194,7 +194,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             }
 
             xtimer_remove(&dev->_internal.rx_timeout_timer);
-
             /* Read the last packet from FIFO */
             uint8_t last_rx_addr = sx127x_reg_read(dev, SX127X_REG_LR_FIFORXCURRENTADDR);
             sx127x_reg_write(dev, SX127X_REG_LR_FIFOADDRPTR, last_rx_addr);

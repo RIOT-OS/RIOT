@@ -158,6 +158,8 @@ void gnrc_ipv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *current,
  *
  *          This function may be used with e.g. a pointer to a (full) UDP datagram.
  *
+ * @pre Any @ref GNRC_NETTYPE_IPV6 snip in pkt is contains a full IPv6 header.
+ *
  * @param[in] pkt    The pointer to the first @ref gnrc_pktsnip_t of the
  *                   packet.
  *
