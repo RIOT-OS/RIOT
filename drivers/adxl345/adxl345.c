@@ -23,6 +23,7 @@
 
 #include "assert.h"
 #include "periph/i2c.h"
+#include "byteorder.h"
 #include "adxl345.h"
 #include "adxl345_regs.h"
 #include "adxl345_params.h"
@@ -83,9 +84,11 @@ void adxl345_read(const adxl345_t *dev, adxl345_data_t *data)
     i2c_read_regs(ADXL345_BUS, ADXL345_ADDR, ADXL345_DATA_X0, (void *)result, 6, 0);
     i2c_release(ADXL345_BUS);
 
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    /* ADXL345 returns value in little endian, so swap is needed on big endian
+     * platforms. See Analog Devices ADXL345 datasheet page 27. */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     for (int i = 0; i < 3; i++) {
-        result[i] = ((result[i] & 0xFF) << 8 | (result[i] >> 8));
+        result[i] = byteorder_swaps((uint16_t)result[i]);
     }
 #endif
 
