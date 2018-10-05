@@ -21,6 +21,7 @@
 
 #ifdef MODULE_PULSE_COUNTER
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "pulse_counter_params.h"

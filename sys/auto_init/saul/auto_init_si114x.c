@@ -21,6 +21,7 @@
 
 #ifdef MODULE_SI114X
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "si114x.h"

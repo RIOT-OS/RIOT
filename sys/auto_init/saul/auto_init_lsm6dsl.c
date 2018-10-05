@@ -21,6 +21,7 @@
 
 #ifdef MODULE_LSM6DSL
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "lsm6dsl.h"

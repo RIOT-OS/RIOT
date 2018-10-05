@@ -20,6 +20,7 @@
 
 #ifdef MODULE_TSL2561
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "tsl2561.h"

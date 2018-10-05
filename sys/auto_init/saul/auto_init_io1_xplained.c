@@ -20,6 +20,7 @@
 
 #ifdef MODULE_IO1_XPLAINED
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "io1_xplained.h"

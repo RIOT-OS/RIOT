@@ -21,6 +21,7 @@
 
 #ifdef MODULE_TMP006
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 

@@ -20,6 +20,7 @@
 
 #ifdef MODULE_BMP180
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "bmp180.h"

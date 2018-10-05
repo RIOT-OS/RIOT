@@ -21,6 +21,7 @@
 
 #ifdef MODULE_LPS331AP
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "lps331ap.h"

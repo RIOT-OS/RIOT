@@ -21,6 +21,7 @@
 
 #ifdef MODULE_MMA7660
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "mma7660.h"
