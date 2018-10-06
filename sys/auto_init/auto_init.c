@@ -248,11 +248,6 @@ void auto_init(void)
     auto_init_slipdev();
 #endif
 
-#ifdef MODULE_CC110X
-    extern void auto_init_cc110x(void);
-    auto_init_cc110x();
-#endif
-
 #ifdef MODULE_CC2538_RF
     extern void auto_init_cc2538_rf(void);
     auto_init_cc2538_rf();
