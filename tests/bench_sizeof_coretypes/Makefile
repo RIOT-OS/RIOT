@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # Modules that will have an impact on the size of the TCB (thread_t):
 #
 # disabled by default, enable on demand:
@@ -14,4 +12,5 @@ endif
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

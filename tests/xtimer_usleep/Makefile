@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEMODULE += xtimer
 
 TEST_ON_CI_WHITELIST += all
@@ -10,4 +8,5 @@ TEST_ON_CI_WHITELIST += all
 #CFLAGS += -DSLEEP_PIN=7
 #CFLAGS += -DSLEEP_PORT=PORT_F
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

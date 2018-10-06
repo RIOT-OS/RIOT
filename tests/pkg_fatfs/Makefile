@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD ?= native
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
@@ -50,4 +48,5 @@ image:
 compressed-image:
 	@./create_fat_image_file.sh $(FATFS_IMAGE_FILE_SIZE_MIB)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

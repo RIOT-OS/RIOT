@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \
 	nrf6310 pba-d-01-kw2x samd21-xpro saml21-xpro samr21-xpro spark-core \
 	yunjia-nrf51822
@@ -15,4 +13,5 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += netstats_l2
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

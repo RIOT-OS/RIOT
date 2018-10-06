@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
 
 USEMODULE += shell
@@ -17,4 +15,5 @@ CFLAGS += -DTEST_PCD8544_CS=$(TEST_PCD8544_CS)
 CFLAGS += -DTEST_PCD8544_RESET=$(TEST_PCD8544_RESET)
 CFLAGS += -DTEST_PCD8544_MODE=$(TEST_PCD8544_MODE)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

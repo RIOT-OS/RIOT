@@ -1,5 +1,4 @@
 # name of your application
-include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              chronos hifive1 msb-430 msb-430h nucleo-f030r8 \
@@ -21,4 +20,5 @@ USEMODULE += gnrc_pktdump
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

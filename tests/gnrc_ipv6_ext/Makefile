@@ -1,5 +1,4 @@
 # name of your application
-include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              chronos msb-430 msb-430h nucleo-f030r8 \
@@ -27,4 +26,5 @@ TEST_ON_CI_WHITELIST += all
 
 # Note: The test can check more things with ENABLE_DEBUG set to 1 in gnrc_ipv6.c
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

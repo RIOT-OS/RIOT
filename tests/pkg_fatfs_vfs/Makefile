@@ -1,5 +1,4 @@
 APPLICATION = pkg_fatfs_vfs
-include ../Makefile.tests_common
 
 USEMODULE += fatfs_vfs
 FEATURES_OPTIONAL += periph_rtc
@@ -49,6 +48,7 @@ BOARD_WHITELIST := airfy-beacon arduino-due arduino-duemilanove arduino-mega2560
 
 TEST_DEPS += image
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
 
 image:

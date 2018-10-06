@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-mega2560 \
                              mega-xplained \
                              waspmote-pro
@@ -15,4 +13,5 @@ TEST_ADT7310_CS  ?= GPIO_PIN\(0,0\)
 CFLAGS += -DTEST_ADT7310_SPI=$(TEST_ADT7310_SPI)
 CFLAGS += -DTEST_ADT7310_CS=$(TEST_ADT7310_CS)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

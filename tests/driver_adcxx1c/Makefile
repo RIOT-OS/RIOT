@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEMODULE += adc081c
 USEMODULE += xtimer
 
@@ -15,4 +13,5 @@ CFLAGS += -DADCXX1C_PARAM_HIGH_LIMIT=$(TEST_ADCXX1C_HIGH_LIMIT)
 CFLAGS += -DADCXX1C_PARAM_HYSTERESIS=$(TEST_ADCXX1C_HYSTERESIS)
 CFLAGS += -DADCXX1C_PARAM_CYCLES=$(TEST_ADCXX1C_CYCLE_TIME)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

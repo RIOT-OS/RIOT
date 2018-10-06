@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD = sltb001a
 
 BOARD_WHITELIST := ikea-tradfri \
@@ -13,4 +11,5 @@ BOARD_WHITELIST := ikea-tradfri \
 # see cpu/efm32/efm32-features.mk for the supported flags
 EFM32_UART_MODES = 1
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEPKG += minmea
 
 # The MSP-430 toolchain lacks mktime and NAN
@@ -15,4 +13,5 @@ BOARD_BLACKLIST += arduino-duemilanove \
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # ROM is overflowing for these boards when using
 # gcc-arm-none-eabi-4.9.3.2015q2-1trusty1 from ppa:terry.guo/gcc-arm-embedded
 # (Travis is using this PPA currently, 2015-06-23)
@@ -18,4 +16,5 @@ USEMODULE += timex
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

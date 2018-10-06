@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := airfy-beacon arduino-duemilanove arduino-mega2560 \
                              arduino-uno b-l072z-lrwan1 blackpill bluepill calliope-mini \
                              cc2650-launchpad cc2650stk chronos hifive1 \
@@ -36,4 +34,5 @@ CFLAGS += -DTEST_SUITES
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

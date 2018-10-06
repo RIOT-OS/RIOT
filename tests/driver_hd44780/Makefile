@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # the stm32f4discovery does not have the arduino pinout
 BOARD_BLACKLIST := stm32f4discovery jiminy-mega256rfr2
 
@@ -8,4 +6,5 @@ FEATURES_REQUIRED += arduino
 
 USEMODULE += hd44780
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

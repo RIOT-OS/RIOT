@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
 PORT ?= tap1
@@ -29,4 +27,5 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_tcp
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

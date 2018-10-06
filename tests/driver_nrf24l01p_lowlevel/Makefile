@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # exclude boards with insufficient memory
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
 
@@ -21,4 +19,5 @@ CFLAGS += -DCE_PIN=$(CE_PIN)
 CFLAGS += -DCS_PIN=$(CS_PIN)
 CFLAGS += -DIRQ_PIN=$(IRQ_PIN)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

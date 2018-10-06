@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # exclude boards with insufficient memory
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
 
@@ -27,4 +25,5 @@ DRIVER ?= at86rf231
 # include the selected driver
 USEMODULE += $(DRIVER)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

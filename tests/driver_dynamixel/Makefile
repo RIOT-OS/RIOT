@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
 
 # chronos : USART_1 undeclared
@@ -11,4 +9,5 @@ BOARD_BLACKLIST += mips-malta
 USEMODULE += dynamixel
 USEMODULE += shell
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

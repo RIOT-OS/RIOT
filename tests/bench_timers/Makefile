@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
 
 # These boards only have a single timer in their periph_conf.h, needs special
@@ -53,4 +51,5 @@ test-kinetis-lptmr: all
 # Reset the default goal.
 .DEFAULT_GOAL :=
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

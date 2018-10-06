@@ -1,6 +1,5 @@
 # overwrite board, do not set native as default
 BOARD ?= samr21-xpro
-include ../Makefile.tests_common
 
 # MSP-430 doesn't support C11's atomic functionality yet
 BOARD_BLACKLIST := msb-430 msb-430h pic32-clicker pic32-wifire \
@@ -41,4 +40,5 @@ USEMODULE += $(DRIVER)
 CFLAGS += -Wno-unused-parameter -Wno-unused-function -Wno-type-limits
 CFLAGS += -Wno-sign-compare -Wno-missing-field-initializers
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

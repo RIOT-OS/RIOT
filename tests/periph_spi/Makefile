@@ -1,5 +1,4 @@
 BOARD ?= samr21-xpro
-include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
 
@@ -9,4 +8,5 @@ USEMODULE += xtimer
 USEMODULE += shell
 USEMODULE += shell_commands
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

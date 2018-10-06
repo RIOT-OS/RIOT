@@ -1,5 +1,4 @@
 BOARD ?= samr21-xpro
-include ../Makefile.tests_common
 
 USEPKG += cmsis-dsp
 
@@ -34,4 +33,5 @@ BOARD_WHITELIST := \
   nrf6310 \
   #
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

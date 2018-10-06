@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              calliope-mini chronos hifive1 mega-xplained \
                              microbit msb-430 msb-430h \
@@ -22,6 +20,7 @@ USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed

@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # No 8 bit and 16 bit support
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno chronos \
         jiminy-mega256rfr2 mega-xplained msb-430 msb-430h telosb \
@@ -15,4 +13,5 @@ USEMODULE += random
 USEPKG += monocypher
 
 TEST_ON_CI_WHITELIST += all
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

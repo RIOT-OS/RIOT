@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD ?= native
 
 USEMODULE += soft_spi
@@ -12,4 +10,5 @@ TEST_CS_PIN ?= GPIO_PIN\(0,2\)
 CFLAGS += -DTEST_SOFT_SPI_DEV=$(TEST_SOFT_SPI_DEV)
 CFLAGS += -DTEST_CS_PIN=$(TEST_CS_PIN)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # exclude boards with insufficient memory
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
 
@@ -8,4 +6,5 @@ USEMODULE += auto_init_storage
 USEMODULE += fmt
 USEMODULE += shell
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEMODULE += hih6130
 USEMODULE += xtimer
 
@@ -11,4 +9,5 @@ TEST_HIH6130_ADDR ?= 0x27
 CFLAGS += -DTEST_HIH6130_I2C=$(TEST_HIH6130_I2C)
 CFLAGS += -DTEST_HIH6130_ADDR=$(TEST_HIH6130_ADDR)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

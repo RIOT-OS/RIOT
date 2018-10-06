@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEMODULE += ina220
 USEMODULE += xtimer
 
@@ -11,4 +9,5 @@ TEST_INA220_ADDR ?= 0x40
 CFLAGS += -DTEST_INA220_I2C=$(TEST_INA220_I2C)
 CFLAGS += -DTEST_INA220_ADDR=$(TEST_INA220_ADDR)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

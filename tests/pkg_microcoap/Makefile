@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              chronos msb-430 msb-430h nucleo-f031k6 \
                              nucleo-f042k6 nucleo-f303k8 nucleo-l031k6 \
@@ -36,4 +34,5 @@ ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   USEMODULE += prng_minstd
 endif
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

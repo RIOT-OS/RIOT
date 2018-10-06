@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEMODULE += my9221
 
 # set default device parameters in case they are undefined
@@ -15,4 +13,5 @@ CFLAGS += -DTEST_MY9221_DAT=$(TEST_MY9221_DAT)
 CFLAGS += -DTEST_MY9221_DIR=$(TEST_MY9221_DIR)
 CFLAGS += -DTEST_MY9221_NUM=$(TEST_MY9221_NUM)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

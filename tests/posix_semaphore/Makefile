@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
                              chronos mbed_lpc1768 msb-430 msb-430h nrf6310 \
                              nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 \
@@ -14,4 +12,5 @@ DISABLE_MODULE += auto_init
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

@@ -1,8 +1,7 @@
-include ../Makefile.tests_common
-
 TEST_ON_CI_WHITELIST += all
 USEMODULE += embunit
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
 
 # Compile time tests

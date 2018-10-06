@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              msb-430 msb-430h nucleo-f334r8 nucleo-l053r8 \
                              nucleo-f031k6 nucleo-f042k6 nucleo-f303k8 \
@@ -36,4 +34,5 @@ CFLAGS += -DENC28J60_PARAM_RESET=$(ENC_RST)
 # make sure we read the local enc28j60 params file
 CFLAGS += -I$(CURDIR)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

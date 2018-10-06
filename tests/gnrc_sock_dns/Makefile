@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 RIOTBASE ?= $(CURDIR)/../..
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
@@ -26,4 +24,5 @@ ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
               -DNRC_IPV6_NIB_OFFL_NUMOF=1
 endif
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

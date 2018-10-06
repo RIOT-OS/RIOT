@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove \
                    jiminy-mega256rfr2 mega-xplained
 # arduino-mega2560: builds locally but breaks travis (possibly because of
@@ -19,4 +17,5 @@ USEMODULE += printf_float
 
 TEST_ON_CI_WHITELIST += native
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove \
                    jiminy-mega256rfr2 mega-xplained
 # arduino mega2560 uno duemilanove : unknown type name: clockid_t
@@ -15,4 +13,5 @@ BOARD_INSUFFICIENT_MEMORY += chronos msb-430 msb-430h nucleo-f031k6 \
                              nucleo-f303k8 nucleo-f334r8 nucleo-l053r8 \
                              stm32f0discovery
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

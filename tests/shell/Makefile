@@ -1,5 +1,4 @@
 DEVELHELP=0
-include ../Makefile.tests_common
 
 USEMODULE += shell
 USEMODULE += shell_commands
@@ -12,4 +11,5 @@ BOARD_BLACKLIST += chronos
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

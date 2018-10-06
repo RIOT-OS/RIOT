@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 FEATURES_REQUIRED = periph_i2c periph_gpio
 
 USEMODULE += xtimer
@@ -33,4 +31,5 @@ endif
 
 CFLAGS += -I$(CURDIR)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

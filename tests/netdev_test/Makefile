@@ -2,7 +2,6 @@
 # testing this netdev simulating framework, so I it's better if the assert is
 # ignored.
 CFLAGS += -DNDEBUG
-include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
 
@@ -19,4 +18,5 @@ CFLAGS += -DGNRC_PKTBUF_SIZE=200
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

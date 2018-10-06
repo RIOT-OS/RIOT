@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_BLACKLIST := arduino-mega2560 chronos msb-430 msb-430h telosb \
                    wsn430-v1_3b wsn430-v1_4 z1 waspmote-pro arduino-uno \
                    arduino-duemilanove jiminy-mega256rfr2 mega-xplained
@@ -13,4 +11,5 @@ USEMODULE += nhdp
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

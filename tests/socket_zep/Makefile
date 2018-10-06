@@ -1,5 +1,4 @@
 APPLICATION = socket_zep
-include ../Makefile.tests_common
 
 BOARD_WHITELIST = native    # socket_zep is only available on native
 
@@ -12,4 +11,5 @@ CFLAGS += -DDEVELHELP
 
 TERMFLAGS ?= -z [::1]:17754
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

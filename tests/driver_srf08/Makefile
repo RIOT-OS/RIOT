@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEMODULE += xtimer
 USEMODULE += srf08
 
@@ -15,4 +13,5 @@ CFLAGS += -DTEST_SRF08_SPEED=$(TEST_SRF08_SPEED)
 CFLAGS += -DTEST_MODE=$(TEST_MODE)
 CFLAGS += -DTEST_NUM_ECHOS=$(TEST_NUM_ECHOS)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

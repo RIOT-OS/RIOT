@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              msb-430 msb-430h \
                              nucleo-l053r8 nucleo-f031k6 nucleo-f042k6 \
@@ -38,4 +36,5 @@ CFLAGS += -DENCX24J600_INT=$(ENC_INT)
 # make sure we read the local encx24j600 params file
 CFLAGS += -I$(CURDIR)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEMODULE += nvram_spi
 USEMODULE += xtimer
 
@@ -15,4 +13,5 @@ CFLAGS += -DTEST_NVRAM_SPI_CS=$(TEST_NVRAM_SPI_CS)
 CFLAGS += -DTEST_NVRAM_SPI_SIZE=$(TEST_NVRAM_SPI_SIZE)
 CFLAGS += -DTEST_NVRAM_SPI_ADDRESS_COUNT=$(TEST_NVRAM_SPI_ADDRESS_COUNT)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

@@ -1,6 +1,5 @@
 BOARD ?= b-l072z-lrwan1
 
-include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
                              nucleo-f031k6 nucleo-f042k6 nucleo-l031k6
@@ -21,4 +20,5 @@ USEMODULE += fmt
 CFLAGS += -DREGION_$(LORA_REGION)
 CFLAGS += -DLORAMAC_ACTIVE_REGION=LORAMAC_REGION_$(LORA_REGION)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

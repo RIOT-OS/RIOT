@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEMODULE += od
 # USEMODULE += od_string
 
@@ -11,4 +9,5 @@ else
   TESTS=$(APPDIR)/tests/02-run.py
 endif
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

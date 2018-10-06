@@ -1,5 +1,4 @@
 BOARD ?= samr21-xpro
-include ../Makefile.tests_common
 
 
 # Normally all boards using `cortexm_common/ldscripts/cortexm.ld` linkerscript
@@ -17,6 +16,7 @@ BOARD_WHITELIST += feather-m0
 BOARD_WHITELIST += opencm904
 BOARD_WHITELIST += spark-core
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
 
 

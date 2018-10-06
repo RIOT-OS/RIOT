@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              chronos nucleo-f030r8 nucleo-l053r8 nucleo-f031k6 \
                              nucleo-l031k6 nucleo-f042k6 stm32f0discovery \
@@ -20,4 +18,5 @@ CFLAGS += -DTEST_SUITES
 
 TEST_ON_CI_WHITELIST += all
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

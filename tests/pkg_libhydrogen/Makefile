@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # AVR boards: require avr-gcc >= 7.0 (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60040)
 # MSP430 boards: invalid alignment of 'hydro_random_context'
 BOARD_BLACKLIST := arduino-duemilanove arduino-mega2560 arduino-uno \
@@ -11,4 +9,5 @@ TEST_ON_CI_WHITELIST += all
 USEPKG += libhydrogen
 USEMODULE += embunit
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

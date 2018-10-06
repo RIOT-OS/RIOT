@@ -1,5 +1,4 @@
 BOARD ?= samr21-xpro
-include ../Makefile.tests_common
 
 BOARD_WHITELIST += arduino-due      # cortex-m3
 BOARD_WHITELIST += arduino-zero     # cortex-m0plus
@@ -41,6 +40,7 @@ BOARD_WHITELIST += udoo             # cortex-m3
 
 USEMODULE += mpu_stack_guard
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
 
 ifeq (llvm,$(TOOLCHAIN))

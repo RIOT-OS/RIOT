@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 # lwIP's memory management doesn't seem to work on non 32-bit platforms at the
 # moment.
 BOARD_BLACKLIST := arduino-uno arduino-duemilanove arduino-mega2560 chronos \
@@ -30,4 +28,5 @@ ifneq ($(BOARD),native)
   TESTS=
 endif
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

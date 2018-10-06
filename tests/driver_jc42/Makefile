@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 USEMODULE += jc42
 USEMODULE += xtimer
 
@@ -13,4 +11,5 @@ CFLAGS += -DTEST_I2C=$(TEST_I2C)
 CFLAGS += -DTEST_I2C_ADDR=$(TEST_I2C_ADDR)
 CFLAGS += -DTEST_I2C_SPEED=$(TEST_I2C_SPEED)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

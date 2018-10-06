@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6 \
                              nucleo-f042k6 nucleo-f030r8 nucleo-f334r8 \
                              stm32f0discovery
@@ -19,4 +17,5 @@ CFLAGS += -DGNRC_PKTBUF_SIZE=512
 # That way xbee_params.h get's included and auto configuration can pick it up.
 CFLAGS += -I$(CURDIR)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

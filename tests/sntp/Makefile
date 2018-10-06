@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              chronos msb-430 msb-430h nucleo-f031k6 \
                              nucleo-f042k6 nucleo-l031k6 nucleo-f030r8 \
@@ -15,4 +13,5 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += shell
 USEMODULE += shell_commands
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include

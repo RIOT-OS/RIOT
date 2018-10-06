@@ -1,5 +1,3 @@
-include ../Makefile.tests_common
-
 BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
                              nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 \
                              nucleo-f334r8 nucleo-l053r8 stm32f0discovery \
@@ -16,4 +14,5 @@ DRIVER ?= kw2xrf
 # finally include the actual chosen driver
 USEMODULE += $(DRIVER)
 
+include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
