@@ -7,14 +7,34 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             calliope-mini chronos hifive1 mega-xplained \
-                             microbit msb-430 msb-430h nucleo-f031k6 \
-                             nucleo-f042k6 nucleo-f303k8 nucleo-l031k6 \
-                             nucleo-f030r8 nucleo-f070rb nucleo-f072rb \
-                             nucleo-f103rb nucleo-f302r8 nucleo-f334r8 \
-                             nucleo-l053r8 spark-core stm32f0discovery telosb \
-                             waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
+                             arduino-mega2560 \
+                             arduino-uno \
+                             calliope-mini \
+                             chronos \
+                             hifive1 \
+                             mega-xplained \
+                             microbit \
+                             msb-430 \
+                             msb-430h \
+                             nucleo-f031k6 \
+                             nucleo-f042k6 \
+                             nucleo-f303k8 \
+                             nucleo-l031k6 \
+                             nucleo-f030r8 \
+                             nucleo-f070rb \
+                             nucleo-f072rb \
+                             nucleo-f103rb \
+                             nucleo-f302r8 \
+                             nucleo-f334r8 \
+                             nucleo-l053r8 \
+                             spark-core \
+                             stm32f0discovery \
+                             telosb \
+                             waspmote-pro \
+                             wsn430-v1_3b \
+                             wsn430-v1_4 \
+                             z1
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present

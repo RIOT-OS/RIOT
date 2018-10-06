@@ -7,7 +7,9 @@ BOARD ?= b-l072z-lrwan1
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6 nucleo-f042k6 nucleo-l031k6
+BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6 \
+                             nucleo-f042k6 \
+                             nucleo-l031k6
 
 DEVEUI ?= 0000000000000000
 APPEUI ?= 0000000000000000

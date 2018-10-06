@@ -5,7 +5,8 @@ APPLICATION = nimble_gatt
 BOARD ?= nrf52dk
 
 # So far, NimBLE only works on nRF52 based platforms
-BOARD_WHITELIST := nrf52dk nrf52840dk
+BOARD_WHITELIST := nrf52dk \
+                   nrf52840dk
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..

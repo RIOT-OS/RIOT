@@ -6,7 +6,9 @@ include ../Makefile.tests_common
 # Debian jessie libstdc++-arm-none-eabi-newlib-4.8.3-9+4 works fine, though.
 # Remove this line if Travis is upgraded to a different toolchain which does
 # not pull in all C++ locale code whenever exceptions are used.
-BOARD_INSUFFICIENT_MEMORY := nucleo-f334r8 spark-core stm32f0discovery
+BOARD_INSUFFICIENT_MEMORY := nucleo-f334r8 \
+                             spark-core \
+                             stm32f0discovery
 
 # If you want to add some extra flags when compile c++ files, add these flags
 # to CXXEXFLAGS variable

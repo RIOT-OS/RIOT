@@ -1,7 +1,11 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6 \
-                             nucleo-f042k6 nucleo-f030r8 nucleo-f334r8 \
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
+                             arduino-uno \
+                             nucleo-f031k6 \
+                             nucleo-f042k6 \
+                             nucleo-f030r8 \
+                             nucleo-f334r8 \
                              stm32f0discovery
 
 USEMODULE += xbee
