@@ -12,6 +12,7 @@
     1. [Toolchain Usage](#esp8266_toolchain_usage)
     2. [Compile Options](#esp8266_compile_options)
     3. [Flash Modes](#esp8266_flash_modes)
+    4. [Erasing the Device](#esp8266_erasing)
 5. [Peripherals](#esp8266_peripherals)
     1. [GPIO pins](#esp8266_gpio_pins)
     2. [ADC Channels](#esp8266_adc_channels)
@@ -77,7 +78,7 @@ Technical Reference | [Technical Reference](https://www.espressif.com/sites/defa
 
 </center><br>
 
-@note ESP8285 is simply an ESP8266 SoC with 1 MB built-in flash. Therefore, the documentation also applies to the SoC ESP8285, even if only the ESP8266 SoC is described below.
+**Please note:** ESP8285 is simply an ESP8266 SoC with 1 MB built-in flash. Therefore, the documentation also applies to the SoC ESP8285, even if only the ESP8266 SoC is described below.
 
 # <a name="esp8266_toolchain"> Toolchain</a> &nbsp;[[TOC](#esp8266_toc)]
 
@@ -145,7 +146,7 @@ Once a Docker image has been created, it can be started with the following comma
 cd /path/to/RIOT
 docker run -i -t --privileged -v /dev:/dev -u $UID -v $(pwd):/data/riotbuild riotbuild
 ```
-@note RIOT's root directory ```/path/to/RIOT``` becomes visible as the home directory of the ```riotbuild``` user in the Docker image. That is, the output of compilations performed in RIOT Docker is also accessible on the host system.
+**Please note:** RIOT's root directory ```/path/to/RIOT``` becomes visible as the home directory of the ```riotbuild``` user in the Docker image. That is, the output of compilations performed in RIOT Docker is also accessible on the host system.
 
 Please refer the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki/Use-Docker-to-build-RIOT) on how to use the Docker image to compile RIOT OS.
 
@@ -175,7 +176,7 @@ make BOARD=esp8266-esp-12x -C tests/shell ...
 ```
 This will generate a RIOT binary in ELF format.
 
-@note You can't use the ```flash``` target inside the Docker image.
+**Please note:** You can't use the ```flash``` target inside the Docker image.
 
 The RIOT binary has to be flash outside docker on the host system. Since the Docker image was stared while in RIOT's root directory, the output of the compilations is also accessible on the host system. On the host system, the ```flash-only``` target can then be used to flash the binary.
 ```
@@ -187,7 +188,7 @@ make flash-only BOARD=esp8266-esp-12x -C tests/shell
 
 You can get a precompiled version of the whole toolchain from the GIT repository [RIOT-Xtensa-ESP8266-toolchain](https://github.com/gschorcht/RIOT-Xtensa-ESP8266-toolchain). This repository contains the precompiled toolchain including all libraries that are necessary to compile RIOT-OS for ESP8266.
 
-@note To use the precompiled toolchain the following packages (Debian/Ubuntu) have to be installed:<br> ```cppcheck``` ```coccinelle``` ```curl``` ```doxygen``` ```git``` ```graphviz``` ```make``` ```pcregrep``` ```python``` ```python-serial``` ```python3``` ```python3-flake8``` ```unzip``` ```wget```
+**Please note:** To use the precompiled toolchain the following packages (Debian/Ubuntu) have to be installed:<br> ```cppcheck``` ```coccinelle``` ```curl``` ```doxygen``` ```git``` ```graphviz``` ```make``` ```pcregrep``` ```python``` ```python-serial``` ```python3``` ```python3-flake8``` ```unzip``` ```wget```
 
 To install the toolchain use the following commands:
 ```
@@ -217,7 +218,7 @@ If you have used ```/opt/esp``` as installation directory, it is not necessary t
 
 The most difficult way to install the toolchain is the manual installation of required components as described below.
 
-@note Manual toolchain installation requires that the following packages (Debian/Ubuntu) are installed: ```autoconf``` ```automake``` ```bash``` ```bison``` ```build-essential``` ```bzip2``` ```coccinelle``` ```cppcheck``` ```curl``` ```doxygen``` ```g++``` ```gperf``` ```gawk``` ```gcc``` ```git``` ```graphviz``` ```help2man``` ```flex``` ```libexpat-dev``` ```libtool``` ```libtool-bin``` ```make``` ```ncurses-dev``` ```pcregrep``` ```python``` ```python-dev``` ```python-serial``` ```python3``` ```python3-flake8``` ```sed``` ```texinfo``` ```unrar-free``` ```unzip wget```
+**Please note:** Manual toolchain installation requires that the following packages (Debian/Ubuntu) are installed: ```autoconf``` ```automake``` ```bash``` ```bison``` ```build-essential``` ```bzip2``` ```coccinelle``` ```cppcheck``` ```curl``` ```doxygen``` ```g++``` ```gperf``` ```gawk``` ```gcc``` ```git``` ```graphviz``` ```help2man``` ```flex``` ```libexpat-dev``` ```libtool``` ```libtool-bin``` ```make``` ```ncurses-dev``` ```pcregrep``` ```python``` ```python-dev``` ```python-serial``` ```python3``` ```python3-flake8``` ```sed``` ```texinfo``` ```unrar-free``` ```unzip wget```
 
 ### <a name="esp8266_installation_of_esp_open_sdk"> Installation of esp-open-sdk </a> &nbsp;[[TOC](#esp8266_toc)]
 
@@ -360,7 +361,35 @@ The flash mode determines whether 2 data lines (```dio``` and ```dout```) or 4 d
 
 For more information about these flash modes, refer the documentation of [esptool.py](https://github.com/espressif/esptool/wiki/SPI-Flash-Modes).
 
-@note While ESP8266 modules can be flashed with ```qio```, ```qout```, ```dio``` and ```dout```, ESP8285 modules have to be always flashed in ```dout``` mode. The default flash mode is ```dout```.
+**Please note:** While ESP8266 modules can be flashed with ```qio```, ```qout```, ```dio``` and ```dout```, ESP8285 modules have to be always flashed in ```dout``` mode. The default flash mode is ```dout```.
+
+
+## <a name="esp8266_erasing"> Erasing the Device </a> &nbsp;[[TOC](#esp8266_toc)]
+
+The flash memory of ESP8266 can be erased completely with following command:
+```
+esptool.py erase_flash
+```
+
+**Please note:** After deleting the flash, the default init data must be rewritten. In a non-SDK version, this will happen automatically when RIOT is started for the first time after flashing the image. In the SDK version, this must be done explicitly. There are two possible approaches to rewriting standard initialization data:
+
+- Flash and start a non-SDK image before the SDK version is flashed.
+- Use the esptool.py file to update the default init data as following.
+
+```
+esptool.py write_flash <address> $RIOTBASE/cpu/esp8266/bin/esp_init_data_default.bin
+```
+
+where ```address``` depends on ESP8266 chip version.
+
+Chip version | ```address``` | Module examples
+------------ | ------------- | ----------------
+512 kByte | 0x07c000 | ESP-01, ESP-03, ESP-07, etc.
+1 MByte   | 0x0fc000 | ESP8285-based modules like Wemos D1 mini lite, PSF-A85, some ESP-01, ESP-03 etc.
+2 MByte   | 0x1fc000 | |
+4 MByte   | 0x3fc000 | ESP-12E, NodeMCU devkit 1.0, WeMos D1 mini
+8 MByte   | 0x7fc000 | |
+16 MByte  | 0xffc000 | WeMos D1 mini pro (USE 0x07c000!)
 
 
 # <a name="esp8266_peripherals"> Peripherals </a> &nbsp;[[TOC](#esp8266_toc)]
@@ -409,7 +438,7 @@ GPIO0 | GPIO2 | GPIO15 (MTDO) | Mode
 
 ESP8266 has **one dedicated ADC** pin with a resolution of 10 bits. This ADC pin can measure voltages in the range of **0 V ... 1.1 V**.
 
-@note Some boards have voltage dividers to scale this range to a maximum of 3.3 V. For more information, see the hardware manual for the board.
+**Please note:** Some boards have voltage dividers to scale this range to a maximum of 3.3 V. For more information, see the hardware manual for the board.
 
 ## <a name="esp8266_spi_interfaces"> SPI Interfaces </a> &nbsp;[[TOC](#esp8266_toc)]
 
@@ -470,7 +499,7 @@ All these configurations can be overridden by an [application-specific board con
 
 The hardware implementation of ESP8266 PWM supports only frequencies as power of two. Therefore, a **software implementation** of **one PWM device** (```PWM_DEV(0)```) with up to **8 PWM channels** (```PWM_CHANNEL_NUM_MAX```) is used.
 
-@note The minimum PWM period that can be realized with this software implementation is 10 us or 100.000 PWM clock cycles per second. Therefore, the product of frequency and resolution should not be greater than 100.000. Otherwise the frequency is scaled down automatically.
+**Please note:** The minimum PWM period that can be realized with this software implementation is 10 us or 100.000 PWM clock cycles per second. Therefore, the product of frequency and resolution should not be greater than 100.000. Otherwise the frequency is scaled down automatically.
 
 GPIOs that can be used as channels of the PWM device ```PWM_DEV(0)``` are defined by ```PWM0_CHANNEL_GPIOS```. By default, GPIOs 2, 4 and 5 are defined as PWM channels. As long as these channels are not started with function ```pwm_set```, they can be used as normal GPIOs for other purposes.
 
@@ -495,7 +524,7 @@ When the SDK version of the RIOT port (```USE_SDK=1```) is used, the **software 
 
 The software timer uses SDK's software timers to implement the timer channels. Although these SDK timers usually have a precision of a few microseconds, they can deviate up to 500 microseconds. So if you need a timer with high accuracy, you'll need to use the hardware timer with only one timer channel.
 
-@note When module ```esp_sw_timer``` is used, the SDK version is automatically compiled (```USE_SDK=1```).
+**Please note:** When module ```esp_sw_timer``` is used, the SDK version is automatically compiled (```USE_SDK=1```).
 
 ## <a name="esp8266_spiffs_device"> SPIFFS Device </a> &nbsp;[[TOC](#esp8266_toc)]
 
@@ -540,7 +569,7 @@ To use MRF24J40 based IEEE 802.15.4 modules as network device, module ```mrf24j4
 USEMODULE += mrf24j40
 ```
 
-@note If module ```netdev_default``` is used (which is usually the case in all networking applications), module ```mrf24j40``` is added automatically.
+**Please note:** If module ```netdev_default``` is used (which is usually the case in all networking applications), module ```mrf24j40``` is added automatically.
 
 Module ```mrf24j40``` uses the following interface parameters by default:
 
@@ -689,7 +718,7 @@ Interrupt service routines do not process interrupts directly but use the ```ets
 
 In the RIOT port, the task management of the SDK is replaced by the task management of the RIOT. To handle SDK tasks with pending events so that the SDK functions work and the system keeps alive, the ROM functions ```ets_run``` and ```ets_post``` are overwritten. The ```ets_run``` function performs all SDK tasks with pending events exactly once. It is executed at the end of the ```ets_post``` function and thus usually at the end of an SDK interrupt service routine or before the system goes into the lowest power mode.
 
-@note Since the non-SDK version of RIOT is much smaller and faster than the SDK version, you should always compile your application without the SDK (```USE_SDK=0```, the default) if you don't need the built-in WiFi module.
+**Please note:** Since the non-SDK version of RIOT is much smaller and faster than the SDK version, you should always compile your application without the SDK (```USE_SDK=0```, the default) if you don't need the built-in WiFi module.
 
 # <a name="esp8266_qemu_mode_and_gdb"> QEMU Mode and GDB </a> &nbsp;[[TOC](#esp8266_toc)]
 

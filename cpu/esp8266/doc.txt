@@ -1,5 +1,5 @@
 /**
-@defgroup        cpu_esp8266 ESP8266 / ESP8285 MCU
+@defgroup        cpu_esp8266 ESP8266 / ESP8285
 @ingroup         cpu
 @brief           RIOT-OS port for Espressif's ESP8266 / ESP8285 MCUs
 
@@ -17,6 +17,7 @@
     1. [Toolchain Usage](#esp8266_toolchain_usage)
     2. [Compile Options](#esp8266_compile_options)
     3. [Flash Modes](#esp8266_flash_modes)
+    4. [Erasing the Device](#esp8266_erasing)
 5. [Peripherals](#esp8266_peripherals)
     1. [GPIO pins](#esp8266_gpio_pins)
     2. [ADC Channels](#esp8266_adc_channels)
@@ -366,6 +367,33 @@ The flash mode determines whether 2 data lines (```dio``` and ```dout```) or 4 d
 For more information about these flash modes, refer the documentation of [esptool.py](https://github.com/espressif/esptool/wiki/SPI-Flash-Modes).
 
 @note While ESP8266 modules can be flashed with ```qio```, ```qout```, ```dio``` and ```dout```, ESP8285 modules have to be always flashed in ```dout``` mode. The default flash mode is ```dout```.
+
+## <a name="esp8266_erasing"> Erasing the Device </a> &nbsp;[[TOC](#esp8266_toc)]
+
+The flash memory of ESP8266 can be erased completely with following command:
+```
+esptool.py erase_flash
+```
+
+@note After deleting the flash, the default init data must be rewritten. In a non-SDK version, this will happen automatically when RIOT is started for the first time after flashing the image. In the SDK version, this must be done explicitly. There are two possible approaches to rewriting standard initialization data:
+
+- Flash and start a non-SDK image before the SDK version is flashed.
+- Use the esptool.py file to update the default init data as following.
+
+```
+esptool.py write_flash <address> $RIOTBASE/cpu/esp8266/bin/esp_init_data_default.bin
+```
+
+where ```address``` depends on ESP8266 chip version.
+
+Chip version | ```address``` | Module examples
+------------ | ------------- | ----------------
+512 kByte | 0x07c000 | ESP-01, ESP-03, ESP-07, etc.
+1 MByte   | 0x0fc000 | ESP8285-based modules like Wemos D1 mini lite, PSF-A85, some ESP-01, ESP-03 etc.
+2 MByte   | 0x1fc000 | |
+4 MByte   | 0x3fc000 | ESP-12E, NodeMCU devkit 1.0, WeMos D1 mini
+8 MByte   | 0x7fc000 | |
+16 MByte  | 0xffc000 | WeMos D1 mini pro (USE 0x07c000!)
 
 
 # <a name="esp8266_peripherals"> Peripherals </a> &nbsp;[[TOC](#esp8266_toc)]
