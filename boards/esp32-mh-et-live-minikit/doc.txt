@@ -1,0 +1,173 @@
+/*
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    boards_esp32_mh-et-live-minikit MH-ET LIVE MiniKit
+ * @ingroup     boards_esp32
+ * @brief       Support for MH-ET LIVE MiniKit for ESP32
+ * @author      Gunar Schorcht <gunar@schorcht.net>
+
+## <a name="toc"> Table of Contents </a>
+
+1. [Overview](#overview)
+2. [Hardware](#hardware)
+    1. [MCU](#mcu)
+    2. [Board Configuration](#board_configuration)
+    3. [Board Pinout](#pinout)
+    4. [Optional Hardware Configurations](#optional_hardware)
+3. [Flashing the Device](#flashing)
+
+## <a name="overview"> Overview </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The MH-ET LIVE MiniKit for ESP32 uses the ESP32-WROOM-32 module. It is a very interesting development kit as it uses in the stackable Wemos D1 Mini format. Thus, all [shields for Wemos D1 mini](https://wiki.wemos.cc/products:d1_mini_shields) for ESP8266 can also be used with ESP32. Examples for such shields are:
+
+- Micro SD-Card Shield
+- MRF24J40 IEEE 802.15.4 radio Shield
+- Button Shield
+- RGB LED Shield
+- ...
+
+This makes it possible to create different hardware configurations without the need for a soldering iron or a breadboard.
+
+MH-ET LIVE MiniKit for ESP32 belongs to the class of general purpose boards where most ESP32 pins are broken out for easier access.
+
+\htmlonly<style>div.image img[src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_2.png?inline=false"]{width:250px;}</style>\endhtmlonly
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_2.png?inline=false" "MH-ET LIVE MiniKit for ESP32"
+
+This stackable plattform was tested in an RIOT application with:
+
+- [Micro SD-Card Shield](https://wiki.wemos.cc/products:d1_mini_shields:micro_sd_card_shield)
+- MRF24J40 IEEE 802.15.4 radio Shield (contact gunar@schorcht.net for more information)
+- BMP180 Pressure Sensor Shield
+
+This application is a good example how easy it is with this board to create different hardware applications.
+
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_5.png?inline=false" "RIOT application with SD-Card, MRF24J40 Radio, and BMP180 Pressure Sensor"
+
+## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+This section describes
+
+- the [MCU](#mcu),
+- the default [board configuration](#board_configuration),
+- [optional hardware configurations](#optional_hardware),
+- the [board pinout](#pinout).
+
+### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Most features of the board are provided by the ESP32 SoC. The following table summarizes these features and gives an overview of which of these features are supported by RIOT. For detailed information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
+
+<center>
+MCU         | ESP32     | Supported by RIOT
+------------|-----------|------------------
+Vendor      | Espressif | |
+Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
+FPU         | yes (ULP - Ultra low power co-processor) | no
+RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
+ROM         | 520 kByte | yes
+Flash       | 512 kByte ... 16 MByte |  yes
+Frequency   | 240 MHz, 160 MHz, 80 MHz | yes
+Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> no
+Timers      | 4 x 64 bit | yes
+ADCs        | 2 x SAR-ADC with up to 18 x 12 bit channels total | yes
+DACs        | 2 x DAC with 8 bit | yes
+GPIOs       | 34 (6 of them are only inputs) | yes
+I2Cs        | 2 | yes
+SPIs        | 4 | yes
+UARTs       | 3 | yes
+WiFi        | IEEE 802.11 b/g/n built in | yes
+Bluetooth   | v4.2 BR/EDR and BLE | no
+Ethernet    | MAC interface with dedicated DMA and IEEE 1588 support | yes
+CAN         | version 2.0 | no
+IR          | up to 8 channels TX/RX | no
+Motor PWM   | 2 devices x 6 channels | yes
+LED PWM     | 16 channels | no
+Crypto      | Hardware acceleration of AES, SHA-2, RSA, ECC, RNG | no
+Vcc         | 2.5 - 3.6 V | |
+Documents   | [Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) <br> [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf) | |
+</center>
+
+### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by an \ref esp32_app_spec_conf "application-specific configuration".
+
+<center>
+\anchor esp32_mh-et-live-minikit_table_board_configuration
+Pin    | Default Configuration<b>*</b> | Optional Modules<b>*</b> | Remarks / Prerequisites | Configuration
+:------|:-------------------------|:--------------------------|:--------|:------
+GPIO2  | PWM_DEV(0):0 / LED blue  | | | \ref esp32_pwm_channels "PWM Channels"
+GPIO0  | PWM_DEV(0):1             | | | \ref esp32_pwm_channels "PWM Channels"
+GPIO4  | PWM_DEV(0):2             | | | \ref esp32_pwm_channels "PWM Channels"
+GPIO15 | PWM_DEV(0):3             | | | \ref esp32_pwm_channels "PWM Channels"
+GPIO22 | I2C_DEV(0):SCL           | | | \ref esp32_i2c_interfaces "I2C Interfaces"
+GPIO21 | I2C_DEV(0):SDA           | | | \ref esp32_i2c_interfaces "I2C Interfaces"
+GPIO18 | SPI_DEV(0):SCK           | | | \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO19 | SPI_DEV(0):MISO          | | | \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO23 | SPI_DEV(0):MOSI          | | | \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO5  | SPI_DEV(0):CS0           | SD Card CS | when module [sdcard_spi](https://riot-os.org/api/group__drivers__sdcard__spi.html) is used |  \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO1  | UART_DEV(0):TxD          | | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
+GPIO3  | UART_DEV(0):RxD          | | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
+GPIO9  | UART_DEV(1):TxD          | | | \ref esp32_uart_interfaces "UART interfaces"
+GPIO10 | UART_DEV(1):RxD          | | | \ref esp32_uart_interfaces "UART interfaces"
+GPIO34 | ADC_LINE(0)              | | | \ref esp32_adc_channels "ADC Channels"
+GPIO35 | ADC_LINE(1)              | | | \ref esp32_adc_channels "ADC Channels"
+GPIO36 | ADC_LINE(2)              | | | \ref esp32_adc_channels "ADC Channels"
+GPIO39 | ADC_LINE(3)              | | | \ref esp32_adc_channels "ADC Channels"
+GPIO25 | DAC_LINE(0)              | | | \ref esp32_dac_channels "DAC Channels"
+GPIO13 | -   | | | |
+GPIO12 | -   | | | |
+GPIO14 | -   | | | |
+GPIO16 | -   | MRF24J40 RESET | when module [mrf24j40](https://riot-os.org/api/group__drivers__mrf24j40.html) is used | |
+GPIO17 | -   | MRF24J40 INT   | when module [mrf24j40](https://riot-os.org/api/group__drivers__mrf24j40.html) is used | |
+GPIO26 | -   | MRF24J40 CS    | when module [mrf24j40](https://riot-os.org/api/group__drivers__mrf24j40.html) is used | |
+GPIO27 | -   | | | |
+GPIO32 | -   | | | |
+GPIO33 | -   | | | |
+</center>
+
+<b>*</b> Default configuration cannot be used or is not available at all when the the optional hardware is used.
+
+@note
+- GPIO9 and GIOP10 can only be used in **dout** and **dio** \ref esp32_flash_modes "flash modes".
+- The **RESET** signal of MRF24J40 shield can be connected to the RST **pin** of the board (see \ref esp32_mh-et-live-minikit "pinout") to keep the configured GPIO free for other purposes.
+
+For detailed information about the configuration of ESP32 boards, see section \ref esp32_comm_periph "Common Peripherals".
+
+### <a name="optional_hardware"> Optional Hardware Configurations </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_app_spec_conf "application-specific configuration" to use such a module:
+
+```
+#if MODULE_ENC28J80 && BOARD_ESP32_MH_ET_LIVE_MINIKIT
+#define ENC28J80_PARAM_CS       GPIO14      /* ENC28J80 CS signal    */
+#define ENC28J80_PARAM_INT      GPIO33      /* ENC28J80 INT signal   */
+#define ENC28J80_PARAM_RESET    GPIO12      /* ENC28J80 RESET signal */
+#endif
+```
+For **ENC28J80_PARAM_SPI** the default parameter defined by the driver can be used.
+
+@note The **RESET** signal of ENC28J60 based modules can also be connected to the **RST** pin of the board (see \ref esp32_mh-et-live-minikit "pinout") to keep the configured GPIO free for other purposes.
+
+### <a name="pinout"> Board Pinout </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The following picture shows the pinout of MH-ET LIVE MiniKit for ESP32 board as defined by the default board configuration. The light green GPIOs are not used by configured on-board hardware components and can be used for any purpose. However, if optional off-board hardware modules are used, these GPIOs may also be occupied, see \ref esp32_mh-et-live-minikit_table_board_configuration "optional functions" in table board configuration.
+
+The corresponding board schematic can be found [here](https://i.imgur.com/EpE4dGj.jpg)
+
+\anchor esp32_mh-et-live-minikit
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/MH-ET_LIVE_D1_mini_ESP32_pinout.png?inline=false" "MH-ET LIVE MiniKit for ESP32 pinout"
+
+## <a name="flashing"> Flashing the Device </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Flashing RIOT is quite easy. The board has a Micro-USB connector with a reset/boot/flash logic. Just connect the board to your host computer using the programming port and type:
+```
+make flash BOARD=esp32-mh-et-live-minikit ...
+```
+For detailed information about ESP32 as well as configuring and compiling RIOT for ESP32 boards, see \ref esp32_riot.
+
+*/
