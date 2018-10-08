@@ -344,9 +344,9 @@ git checkout -q 534a9b14101af90231d40a4f94924d67bc848d5f
 
 @note Please take care to checkout correct branches which were used for the port. Newer versions might also work but were not tested.
 
-Since we only use a few header files, ESP-IDF does not need to be compiled in any way. To use the installed ESP-IDF, just set the variable ```SDK_DIR``` accordingly.
+Since we only use a few header files, ESP-IDF does not need to be compiled in any way. To use the installed ESP-IDF, just set the variable ```ESP32_SDK_DIR``` accordingly.
 ```
-export SDK_DIR=$HOME/esp/esp-idf
+export ESP32_SDK_DIR=$HOME/esp/esp-idf
 ```
 
 
@@ -364,7 +364,7 @@ Once you have installed all required components, you should have the following d
 To use the toolchain and optionally the SDK, please check that your environment variables are set correctly to
 
 ```
-export SDK_DIR=/path/to/esp/esp-idf
+export ESP32_SDK_DIR=/path/to/esp/esp-idf
 export PATH=$PATH:/path/to/esp/xtensa-esp32-elf/bin
 ```
 
