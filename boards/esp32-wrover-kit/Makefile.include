@@ -1,0 +1,5 @@
+PSEUDOMODULES += esp32_wrover_kit_camera
+
+USEMODULE += boards_common_esp32
+
+include $(RIOTBOARD)/common/esp32/Makefile.include
