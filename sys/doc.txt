@@ -34,3 +34,9 @@
  * @ingroup     sys
  * @brief       Provides memory management implementations and utilities
  */
+
+/**
+ * @defgroup    sys_serialization Serialization
+ * @ingroup     sys
+ * @brief       Utilities for data serialization
+ */
