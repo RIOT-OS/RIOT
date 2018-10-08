@@ -44,6 +44,7 @@ class BoardList:
 		return boards
 
 	def __str__(self):
+		self.boards.sort()
 		prefix = "%s %s " % (self.target_variable, self.variable_operation)
 		spacing = len(prefix) * ' '
 		return prefix + (" \\\n" + spacing).join(self.boards)
