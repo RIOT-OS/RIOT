@@ -367,47 +367,60 @@ static inline le_uint64_t byteorder_btolll(be_uint64_t v)
 }
 
 /**
- * @brief Swaps the byteorder according to the endianess
+ * @brief Adapts a big endian value to the endianess of the platform
+ * by swapping the bytes, if needed.
  */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#   define _byteorder_swap(V, T) (byteorder_swap##T((V)))
+#   define byteorder_from_be(V, T) (byteorder_swap##T((V)))
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#   define _byteorder_swap(V, T) (V)
+#   define byteorder_from_be(V, T) (V)
+#else
+#   error "Byte order is neither little nor big!"
+#endif
+
+/**
+ * @brief Adapts a little endian value to the endianess of the platform by
+ * swapping the bytes, if needed.
+ */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#   define byteorder_from_le(V, T) (V)
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#   define byteorder_from_le(V, T) (byteorder_swap##T((V)))
 #else
 #   error "Byte order is neither little nor big!"
 #endif
 
 static inline network_uint16_t byteorder_htons(uint16_t v)
 {
-    network_uint16_t result = { _byteorder_swap(v, s) };
+    network_uint16_t result = { byteorder_from_be(v, s) };
     return result;
 }
 
 static inline network_uint32_t byteorder_htonl(uint32_t v)
 {
-    network_uint32_t result = { _byteorder_swap(v, l) };
+    network_uint32_t result = { byteorder_from_be(v, l) };
     return result;
 }
 
 static inline network_uint64_t byteorder_htonll(uint64_t v)
 {
-    network_uint64_t result = { _byteorder_swap(v, ll) };
+    network_uint64_t result = { byteorder_from_be(v, ll) };
     return result;
 }
 
 static inline uint16_t byteorder_ntohs(network_uint16_t v)
 {
-    return _byteorder_swap(v.u16, s);
+    return byteorder_from_be(v.u16, s);
 }
 
 static inline uint32_t byteorder_ntohl(network_uint32_t v)
 {
-    return _byteorder_swap(v.u32, l);
+    return byteorder_from_be(v.u32, l);
 }
 
 static inline uint64_t byteorder_ntohll(network_uint64_t v)
 {
-    return _byteorder_swap(v.u64, ll);
+    return byteorder_from_be(v.u64, ll);
 }
 
 static inline uint16_t htons(uint16_t v)
