@@ -36,11 +36,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#if defined(MODULE_MSP430_COMMON)
-#   include "msp430_types.h"
-#elif !defined(__linux__)
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {
