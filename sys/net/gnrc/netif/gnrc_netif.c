@@ -863,6 +863,18 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
                 _create_iid_from_short(netif, eui64);
                 return 0;
 #endif
+#if defined(MODULE_ESP_NOW)
+            case NETDEV_TYPE_RAW:
+                eui64->uint8[0] = netif->l2addr[0] ^ 0x02;
+                eui64->uint8[1] = netif->l2addr[1];
+                eui64->uint8[2] = netif->l2addr[2];
+                eui64->uint8[3] = 0xff;
+                eui64->uint8[4] = 0xfe;
+                eui64->uint8[5] = netif->l2addr[3];
+                eui64->uint8[6] = netif->l2addr[4];
+                eui64->uint8[7] = netif->l2addr[5];
+                return 0;
+#endif
             default:
                 (void)eui64;
                 break;

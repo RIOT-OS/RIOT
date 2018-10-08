@@ -53,4 +53,9 @@ void auto_init_candev(void)
     extern void auto_init_can_native(void);
     auto_init_can_native();
 #endif
+
+#ifdef MODULE_ESP_CAN
+    extern void auto_init_esp_can(void);
+    auto_init_esp_can();
+#endif
 }

@@ -1,0 +1,1 @@
+The files in this directory are originally from the [ESP-IDF](https://github.com/espressif/esp-idf) and modified for RIOT-OS. All these files are under the copyright of their respective ownwers and licensed under the Apache License, Version 2.0, [see](https://github.com/espressif/esp-idf/blob/master/LICENSE).

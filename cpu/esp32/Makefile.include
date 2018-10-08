@@ -1,0 +1,191 @@
+# check some environment variables first
+ifndef ESP32_SDK_DIR
+    $(info ESP32_SDK_DIR should be defined as /path/to/esp-idf directory)
+    $(info ESP32_SDK_DIR is set by default to /opt/esp/esp-idf)
+    export ESP32_SDK_DIR=/opt/esp/esp-idf
+endif
+
+# DEFAULT compile configuration
+
+# FLASH_MODE=[ dout | dio | qout | qio ]
+# use flash mode dout by default to keep GPIO9 and GPIO10 free for use
+export FLASH_MODE ?= dout
+
+# enable GDBSTUP for debugging on exceptions
+ifeq ($(ENABLE_GDBSTUB), 1)
+    USEMODULE += esp_gdbstub
+endif
+
+# enable GDB for compilation with debug info
+ifeq ($(ENABLE_GDB), 1)
+    USEMODULE += esp_gdb
+endif
+
+# enable modules at command line for testing
+ifneq ($(USE_MODULES), )
+    USEMODULE += $(USE_MODULES)
+endif
+
+# SPECIAL module dependencies
+# cannot be done in Makefile.dep since Makefile.dep is included too late
+
+ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
+    USEMODULE += esp_gdb
+endif
+
+ifneq (,$(filter esp_now,$(USEMODULE)))
+    USEMODULE += esp_wifi_any
+endif
+
+ifneq (,$(filter esp_wifi,$(USEMODULE)))
+    USEMODULE += esp_wifi_any
+endif
+
+# ESP32 pseudomodules
+PSEUDOMODULES += esp_eth_hw
+PSEUDOMODULES += esp_gdb
+PSEUDOMODULES += esp_gdbstub
+PSEUDOMODULES += esp_hw_counter
+PSEUDOMODULES += esp_i2c_sw
+PSEUDOMODULES += esp_i2c_hw
+PSEUDOMODULES += esp_idf_newlib
+PSEUDOMODULES += esp_spi_ram
+PSEUDOMODULES += esp_spiffs
+PSEUDOMODULES += esp_wifi_any
+
+export CPU ?= esp32
+export TARGET_ARCH ?= xtensa-esp32-elf
+export ESPTOOL ?= $(ESP32_SDK_DIR)/components/esptool_py/esptool/esptool.py
+
+USEMODULE += core_thread_flags
+USEMODULE += esp_idf
+USEMODULE += esp_idf_driver
+USEMODULE += esp_idf_esp32
+USEMODULE += esp_idf_soc
+USEMODULE += esp_idf_spi_flash
+USEMODULE += log
+USEMODULE += mtd
+USEMODULE += periph
+USEMODULE += periph_common
+USEMODULE += pthread
+USEMODULE += ps
+USEMODULE += random
+USEMODULE += xtensa
+
+INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/
+INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/esp32
+INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/heap
+INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/spi_flash
+INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/tcpip_adapter
+INCLUDES += -I$(ESP32_SDK_DIR)/components/
+INCLUDES += -I$(ESP32_SDK_DIR)/components/driver/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/esp32/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/heap/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/esp32/include
+INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
+INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)
+
+CFLAGS  += -DRIOT_OS
+CFLAGS  += -DSCHED_PRIO_LEVELS=32
+CFLAGS  += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
+CFLAGS  += -DLOG_TAG_IN_BRACKETS
+CFLAGS  += -Wno-unused-parameter -Wformat=0
+CFLAGS  += -mlongcalls -mtext-section-literals -fstrict-volatile-bitfields
+CFLAGS  += -fdata-sections -fzero-initialized-in-bss
+ASFLAGS += --longcalls --text-section-literals
+
+ifneq ($(CONFIGS),)
+    CFLAGS += $(CONFIGS)
+endif
+
+# if any WiFi interface is used,  the number of priority levels has to be 32
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+    CFLAGS += -DSCHED_PRIO_LEVELS=32
+endif
+
+ifneq (,$(filter esp_gdb,$(USEMODULE)))
+    CFLAGS += -Og -ggdb -g3
+else
+    CFLAGS += -Os
+endif
+
+ifeq ($(QEMU), 1)
+    CFLAGS += -DQEMU
+endif
+
+# LINKFLAGS += -Wl,--verbose
+
+LINKFLAGS += -L$(ESP32_SDK_DIR)/components/esp32
+LINKFLAGS += -L$(ESP32_SDK_DIR)/components/esp32/lib
+LINKFLAGS += -Wl,--start-group
+
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+    LINKFLAGS += $(BINDIR)/cpu.a
+    LINKFLAGS += $(BINDIR)/esp_idf.a
+    LINKFLAGS += $(BINDIR)/esp_idf_esp32.a
+    LINKFLAGS += $(BINDIR)/esp_idf_nvs_flash.a
+    LINKFLAGS += $(BINDIR)/esp_idf_spi_flash.a
+    LINKFLAGS += $(BINDIR)/riot_freertos.a
+    LINKFLAGS += -lcore -lrtc -lnet80211 -lpp -lsmartconfig -lcoexist
+    LINKFLAGS += -lwps -lwpa -lwpa2 -lespnow -lmesh -lphy -lstdc++
+endif
+
+ifneq (,$(filter pthread,$(USEMODULE)))
+    LINKFLAGS += $(BINDIR)/core.a
+    LINKFLAGS += $(BINDIR)/pthread.a
+endif
+
+LINKFLAGS += -lhal -lc -lg
+LINKFLAGS += -Wl,--end-group
+LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/
+LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.ld
+LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.common.ld
+LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.peripherals.ld
+LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.ld
+LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
+LINKFLAGS += -nostdlib -lgcc -u putchar -Wl,-gc-sections
+LINKFLAGS += -Wl,--warn-unresolved-symbols
+
+# configure preflasher to convert .elf to .bin before flashing
+FLASH_MODE ?= dout  # FIX configuration, DO NOT CHANGE
+FLASH_FREQ  = 40m   # FIX configuration, DO NOT CHANGE
+FLASH_SIZE ?= 16m
+export PREFLASHER = $(ESPTOOL)
+export PREFFLAGS  = --chip esp32 elf2image
+export PREFFLAGS += -fm $(FLASH_MODE) -fs $(FLASH_SIZE) -ff $(FLASH_FREQ)
+export PREFFLAGS += -o $(ELFFILE).bin $(ELFFILE);
+export PREFFLAGS += echo "" > $(BINDIR)/partitions.csv;
+export PREFFLAGS += echo "nvs, data, nvs, 0x9000, 0x6000" >> $(BINDIR)/partitions.csv;
+export PREFFLAGS += echo "phy_init, data, phy, 0xf000, 0x1000" >> $(BINDIR)/partitions.csv;
+export PREFFLAGS += echo -n "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv;
+export PREFFLAGS += ls -l $(ELFFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
+
+export PREFFLAGS += python $(RIOTCPU)/$(CPU)/gen_esp32part.py --disable-sha256sum
+export PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
+export FLASHDEPS  = preflash
+
+# flasher configuration
+ifeq ($(QEMU), 1)
+    export FLASHER = dd
+    export FFLAGS += if=/dev/zero bs=1M count=4  | tr "\\000" "\\377" > tmp.bin && cat tmp.bin |
+    export FFLAGS += head -c $$((0x1000)) |
+    export FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/bootloader.bin tmp.bin |
+    export FFLAGS += head -c $$((0x8000)) |
+    export FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
+    export FFLAGS += head -c $$((0x10000)) |
+    export FFLAGS += cat - $(ELFFILE).bin tmp.bin |
+    export FFLAGS += head -c $$((0x400000)) > $(BINDIR)/esp32flash.bin && rm tmp.bin &&
+    export FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin &&
+    export FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
+else
+    export PROGRAMMER_SPEED ?= 460800
+    export FLASHER = $(ESPTOOL)
+    export FFLAGS += --chip esp32 -p $(PORT) -b $(PROGRAMMER_SPEED)
+    export FFLAGS += --before default_reset --after hard_reset write_flash
+    export FFLAGS += -z -fm $(FLASH_MODE) -fs detect -ff $(FLASH_FREQ)
+    export FFLAGS += 0x1000 $(RIOTCPU)/$(CPU)/bin/bootloader.bin
+    export FFLAGS += 0x8000 $(BINDIR)/partitions.bin
+    export FFLAGS += 0x10000 $(ELFFILE).bin
+endif
