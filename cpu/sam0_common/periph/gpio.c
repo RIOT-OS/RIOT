@@ -43,7 +43,7 @@
 #define NUMOF_IRQS                  (16U)
 
 static gpio_isr_ctx_t gpio_config[NUMOF_IRQS];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 static inline PortGroup *_port(gpio_t pin)
 {
@@ -233,4 +233,4 @@ void isr_eic(void)
     }
     cortexm_isr_end();
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
