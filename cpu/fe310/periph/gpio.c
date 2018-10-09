@@ -35,7 +35,7 @@
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static gpio_flank_t isr_flank[GPIO_NUMOF];
 static gpio_isr_ctx_t isr_ctx[GPIO_NUMOF];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
@@ -215,4 +215,4 @@ void gpio_irq_disable(gpio_t pin)
             break;
     }
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
