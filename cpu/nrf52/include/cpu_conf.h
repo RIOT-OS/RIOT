@@ -22,6 +22,51 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+/**
+ * @brief   SoftDevice settings
+ * @{
+ */
+#ifdef SOFTDEVICE_PRESENT
+/*
+ * BLE callbacks may take place in the IDLE stack
+ */
+#ifndef THREAD_STACKSIZE_DEFAULT
+#define THREAD_STACKSIZE_DEFAULT (2048)
+#endif
+#ifndef THREAD_STACKSIZE_IDLE
+#define THREAD_STACKSIZE_IDLE THREAD_STACKSIZE_DEFAULT
+#endif
+#endif /* SOFTDEVICE_PRESENT */
+/** @} */
+
+/**
+ * @name    ARM Cortex-M specific CPU configuration
+ * @{
+ */
+#if defined(SOFTDEVICE_PRESENT) || defined(DOXYGEN)
+
+/**
+ * @brief Enable Cortex-M subpriorities for nRF52 with SoftDevice
+ *
+ * On NRF52, when the SoftDevice is used, we use Cortex-M
+ * subpriorities to set the "normal" RIOT
+ */
+#define CPU_CORTEXM_PRIORITY_GROUPING   (1U)
+
+/**
+ * @brief Defines PendSV priority for nRF52 with SoftDevice
+ *
+ * On NRF52, when the SoftDevice is present, PendSV *must* run at the
+ * and of any interrupt chain, or otherwise we will experience
+ * occasional hard faults.  To run PendSV as the last interrupt, we
+ * set NVIC priority grouping to 1 bit and PendSV priority to a lower
+ * supriority.
+ */
+#define CPU_CORTEXM_PENDSV_IRQ_PRIO     (CPU_DEFAULT_IRQ_PRIO+1U)
+
+#endif /* SOFTDEVICE_PRESENT || DOXYGEN */
+/** @} */
+
 #include "cpu_conf_common.h"
 
 #ifdef CPU_MODEL_NRF52832XXAA
@@ -42,11 +87,30 @@ extern "C" {
  * @name    ARM Cortex-M specific CPU configuration
  * @{
  */
-#ifdef SOFTDEVICE_PRESENT
+
+/**
+ * @brief Define the default interrupt priority
+ *
+ * With the SoftDevice, the application has access to the interrupt
+ * levels 2, 3, and 5-7.  The SD API calls and non-time critical
+ * processing is run on interrupt level 4.  If the RIOT default IRQ
+ * priority is lower than this, the system seems to become unstable.
+ * Hence, with the SD, the priorities available for RIOT interrupts
+ * are basically 5-7.  As we want to run PENDSV on a lower priority,
+ * with priority grouping (see below), we set the default IRQ priority
+ * to 6.  You may run your high priority interruts are priorites 2 or
+ * 3, but you have to be very careful not to block and not to process
+ * for too long.
+ *
+ * Handlers running at the priority levels 2 or 3 have no access to
+ * SoftDevice functions.
+ */
+#if defined(SOFTDEVICE_PRESENT)
 #define CPU_DEFAULT_IRQ_PRIO            (6U)
 #else
 #define CPU_DEFAULT_IRQ_PRIO            (2U)
-#endif
+#endif /* not SOFTDEVICE */
+
 #define CPU_FLASH_BASE                  (0x00000000)
 #ifdef CPU_MODEL_NRF52832XXAA
 #define CPU_IRQ_NUMOF                   (38U)
@@ -56,7 +120,8 @@ extern "C" {
 /** @} */
 
 /**
- * Enables the cpu_init subfunctions in cpu/cortexm_common
+ * Enables the cpu_init subfunctions in
+ * cpu/cortexm_common/cortexm_init.c
  */
 #define CPU_CORTEXM_INIT_SUBFUNCTIONS 1
 
@@ -77,20 +142,13 @@ extern "C" {
  * @brief   SoftDevice settings
  * @{
  */
-#ifdef SOFTDEVICE_PRESENT
-/*
- * BLE callbacks may take place in the IDLE stack
- */
-#if defined(THREAD_STACKSIZE_IDLE) && THREAD_STACKSIZE_IDLE < THREAD_STACKSIZE_DEFAULT
-#undef  THREAD_STACKSIZE_IDLE
-#endif
-#define THREAD_STACKSIZE_IDLE THREAD_STACKSIZE_DEFAULT
 
 /*
  * All NVIC calls should go through the SD wrappers.
  *
  * See `cpu/cortexm_common/cortexm_init.c` for DONT_OVERRIDE_NVIC
  */
+#ifdef SOFTDEVICE_PRESENT
 #ifndef DONT_OVERRIDE_NVIC
 #include "nrf_soc.h"
 #include "nrf_nvic.h"
@@ -110,7 +168,9 @@ extern "C" {
 #define NVIC_GetPriority     nrf5_sd_nvic_GetPriority
 
 /**
- * Call @core_panic.  Defined in `cpu.c`.
+ * @brief Calls core_panic()
+ *
+ * Calls core_panic() with suitable arguments.  Defined in `cpu.c`.
  */
 #ifdef __GNUC__
 /* Note that NORETURN may be still undefined */
