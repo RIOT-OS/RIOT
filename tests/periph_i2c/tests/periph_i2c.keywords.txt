@@ -1,0 +1,18 @@
+*** Settings ***
+Library             I2Cdevice  port=%{PORT}  baudrate=%{BAUD}  timeout=${10}
+
+Resource            riot_base.keywords.txt
+Resource            riot_util.keywords.txt
+Resource            api_shell.keywords.txt
+Resource            philip.keywords.txt
+
+*** Keywords ***
+DUT Must Have Periph I2C Application
+    Repeat API Call on Timeout  I2C Get ID
+    Should Contain              ${RESULT['msg']}  periph_i2c
+
+I2C Write Bytes To Register Should Succeed
+    [Arguments]                 ${reg}  ${data}  ${len}
+    API Call Should Succeed     I2C Write Regs  reg=${reg}  data=${data}
+    API Call Should Succeed     I2C Read Bytes  leng=${len}
+    Should Be Equal             ${RESULT['data']}  ${data}

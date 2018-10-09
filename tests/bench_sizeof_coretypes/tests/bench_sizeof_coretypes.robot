@@ -11,7 +11,7 @@ Resource            riot_util.keywords.txt
 Variables           test_vars.py
 
 *** Test Cases ***
-Compare Thread_t Fields
+Thread_t Fields Should be Equal
     [Documentation]     Verify size of thread_t by string comparison of its fields.
     [Tags]              core
     Run Application     timeout=3 secs
