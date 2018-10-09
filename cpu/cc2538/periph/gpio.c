@@ -33,7 +33,7 @@
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static gpio_isr_ctx_t isr_ctx[4][8];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief Access GPIO low-level device
@@ -245,7 +245,7 @@ void isr_gpiod(void)
 {
     handle_isr(3);
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /* CC2538 specific add-on GPIO functions */
 
