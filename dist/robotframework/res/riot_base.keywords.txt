@@ -12,7 +12,6 @@ Binary Should Exist
     [Documentation]     Fails if test binary does not exist.
     File Should Exist   %{ELFFILE}
 
-====================================================================================================
 Log System and Build Environment
     ${result}=          Run Process  ${RIOTTOOLS}/ci/print_toolchain_versions.sh  shell=True
     Log Many            Toolchain Versions  ${result.stdout}
