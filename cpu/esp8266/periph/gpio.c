@@ -164,6 +164,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 static gpio_isr_ctx_t gpio_isr_ctx_table [GPIO_PIN_NUMOF] = { };
 static bool gpio_int_enabled_table [GPIO_PIN_NUMOF] = { };
 
@@ -225,6 +226,7 @@ void gpio_irq_disable (gpio_t pin)
 
     gpio_int_enabled_table [pin] = false;
 }
+#endif
 
 int gpio_read (gpio_t pin)
 {
