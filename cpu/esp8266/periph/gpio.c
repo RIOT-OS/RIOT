@@ -226,7 +226,7 @@ void gpio_irq_disable (gpio_t pin)
 
     gpio_int_enabled_table [pin] = false;
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 int gpio_read (gpio_t pin)
 {
