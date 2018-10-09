@@ -34,6 +34,7 @@
 /* this implementation is not valid for the stm32f1 */
 #ifndef CPU_FAM_STM32F1
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /**
  * @brief   The STM32F0 family has 16 external interrupt lines
  */
@@ -43,6 +44,7 @@
  * @brief   Allocate memory for one callback and argument per EXTI channel
  */
 static gpio_isr_ctx_t isr_ctx[EXTI_NUMOF];
+#endif
 
 /**
  * @brief   Extract the port base address from the given pin identifier
@@ -98,65 +100,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     port->OTYPER |=  (((mode >> 4) & 0x1) << pin_num);
     /* set pin speed to maximum */
     port->OSPEEDR |= (3 << (2 * pin_num));
-
-    return 0;
-}
-
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
-{
-    int pin_num = _pin_num(pin);
-    int port_num = _port_num(pin);
-
-    /* set callback */
-    isr_ctx[pin_num].cb = cb;
-    isr_ctx[pin_num].arg = arg;
-
-    /* enable clock of the SYSCFG module for EXTI configuration */
-#ifdef CPU_FAN_STM32F0
-    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
-#else
-    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
-#endif
-
-    /* initialize pin as input */
-    gpio_init(pin, mode);
-
-    /* enable global pin interrupt */
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
-    if (pin_num < 2) {
-        NVIC_EnableIRQ(EXTI0_1_IRQn);
-    }
-    else if (pin_num < 4) {
-        NVIC_EnableIRQ(EXTI2_3_IRQn);
-    }
-    else {
-        NVIC_EnableIRQ(EXTI4_15_IRQn);
-    }
-#else
-    if (pin_num < 5) {
-        NVIC_EnableIRQ(EXTI0_IRQn + pin_num);
-    }
-    else if (pin_num < 10) {
-        NVIC_EnableIRQ(EXTI9_5_IRQn);
-    }
-    else {
-        NVIC_EnableIRQ(EXTI15_10_IRQn);
-    }
-#endif
-    /* configure the active flank */
-    EXTI->RTSR &= ~(1 << pin_num);
-    EXTI->RTSR |=  ((flank & 0x1) << pin_num);
-    EXTI->FTSR &= ~(1 << pin_num);
-    EXTI->FTSR |=  ((flank >> 1) << pin_num);
-    /* enable specific pin as exti sources */
-    SYSCFG->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 4));
-    SYSCFG->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 4));
-
-    /* clear any pending requests */
-    EXTI->PR = (1 << pin);
-    /* unmask the pins interrupt channel */
-    EXTI->IMR |= (1 << pin);
 
     return 0;
 }
@@ -234,6 +177,65 @@ void gpio_write(gpio_t pin, int value)
     }
 }
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                  gpio_cb_t cb, void *arg)
+{
+    int pin_num = _pin_num(pin);
+    int port_num = _port_num(pin);
+
+    /* set callback */
+    isr_ctx[pin_num].cb = cb;
+    isr_ctx[pin_num].arg = arg;
+
+    /* enable clock of the SYSCFG module for EXTI configuration */
+#ifdef CPU_FAN_STM32F0
+    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
+#else
+    periph_clk_en(APB2, RCC_APB2ENR_SYSCFGEN);
+#endif
+
+    /* initialize pin as input */
+    gpio_init(pin, mode);
+
+    /* enable global pin interrupt */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
+    if (pin_num < 2) {
+        NVIC_EnableIRQ(EXTI0_1_IRQn);
+    }
+    else if (pin_num < 4) {
+        NVIC_EnableIRQ(EXTI2_3_IRQn);
+    }
+    else {
+        NVIC_EnableIRQ(EXTI4_15_IRQn);
+    }
+#else
+    if (pin_num < 5) {
+        NVIC_EnableIRQ(EXTI0_IRQn + pin_num);
+    }
+    else if (pin_num < 10) {
+        NVIC_EnableIRQ(EXTI9_5_IRQn);
+    }
+    else {
+        NVIC_EnableIRQ(EXTI15_10_IRQn);
+    }
+#endif
+    /* configure the active flank */
+    EXTI->RTSR &= ~(1 << pin_num);
+    EXTI->RTSR |=  ((flank & 0x1) << pin_num);
+    EXTI->FTSR &= ~(1 << pin_num);
+    EXTI->FTSR |=  ((flank >> 1) << pin_num);
+    /* enable specific pin as exti sources */
+    SYSCFG->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 4));
+    SYSCFG->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 4));
+
+    /* clear any pending requests */
+    EXTI->PR = (1 << pin);
+    /* unmask the pins interrupt channel */
+    EXTI->IMR |= (1 << pin);
+
+    return 0;
+}
 void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */
@@ -246,6 +248,7 @@ void isr_exti(void)
     }
     cortexm_isr_end();
 }
+#endif
 
 #else
 typedef int dont_be_pedantic;
