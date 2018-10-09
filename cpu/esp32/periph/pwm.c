@@ -419,7 +419,7 @@ static bool _pwm_configuration(void)
         for (unsigned j = 0; j < pwm_dev_num; j++) {
             if (i != j) {
                 for (unsigned k = 0; k < _pwm_hw[i].gpio_num >> 2; k++) {
-                    for (unsigned l = 0; l < _pwm_hw[i].gpio_num >> 2; l++) {
+                    for (unsigned l = 0; l < _pwm_hw[j].gpio_num >> 2; l++) {
                         if (_pwm_hw[i].gpios[k] == _pwm_hw[j].gpios[l]) {
                             LOG_TAG_ERROR("pwm", "GPIO%d is used multiple times in "
                                           "PWM devices %d and %d\n",
