@@ -14,6 +14,22 @@
 
 #include "tests-core.h"
 
+static void test_byteorder_adapt_le(void)
+{
+    le_uint16_t data = { .u8 = { 0x34, 0x12 } };
+    static const uint16_t host = 0x1234;
+
+    TEST_ASSERT_EQUAL_INT(host, byteorder_from_le(data.u16, s));
+}
+
+static void test_byteorder_adapt_be(void)
+{
+    be_uint16_t data = { .u8 = { 0x12, 0x34 } };
+    static const uint16_t host = 0x1234;
+
+    TEST_ASSERT_EQUAL_INT(host, byteorder_from_be(data.u16, s));
+}
+
 static void test_byteorder_little_to_big_16(void)
 {
     le_uint16_t little = { .u8 = { 0x12, 0x34 } };
@@ -103,6 +119,8 @@ static void test_byteorder_htobebufs(void)
 Test *tests_core_byteorder_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_byteorder_adapt_le),
+        new_TestFixture(test_byteorder_adapt_be),
         new_TestFixture(test_byteorder_little_to_big_16),
         new_TestFixture(test_byteorder_big_to_little_16),
         new_TestFixture(test_byteorder_little_to_big_32),
