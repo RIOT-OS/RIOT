@@ -107,7 +107,7 @@ static void _ctx_clear(int port, int pin)
         _write_map(port, pin, CTX_NUMOF);
     }
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief Extract the pin's port base address from the given pin identifier
@@ -165,7 +165,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     port->PIO_IDR = (1 << pin_num);
 #ifdef MODULE_PERIPH_GPIO_IRQ
     _ctx_clear(port_num, pin_num);
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
      /* give the PIO module the power over the corresponding pin */
     port->PIO_PER = (1 << pin_num);
@@ -341,4 +341,4 @@ void isr_piod(void)
 {
     isr_handler(PIOD, PD);
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
