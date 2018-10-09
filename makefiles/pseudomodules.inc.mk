@@ -122,6 +122,9 @@ PSEUDOMODULES += cc1100
 PSEUDOMODULES += cc1100e
 PSEUDOMODULES += cc1101
 
+# interrupt variant of the ITG320X driver as pseudo module
+PSEUDOMODULES += itg320x_int
+
 # include variants of MPU9X50 drivers as pseudo modules
 PSEUDOMODULES += mpu9150
 PSEUDOMODULES += mpu9250
