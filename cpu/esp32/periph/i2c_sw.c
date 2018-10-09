@@ -105,26 +105,16 @@ const unsigned i2c_bus_num = sizeof(_i2c_bus) / sizeof(_i2c_bus[0]);
 
 static const uint32_t _i2c_delays[][3] =
 {
-    #if 1
     /* values specify one half-period and are only valid for -O2 option     */
     /* value = [period - 0.25 us (240 MHz) / 0.5us(160MHz) / 1.0us(80MHz)]  */
     /*         * cycles per second / 2                                      */
     /* 1 us = 48 cycles (240) / 32 cycles (160 MHz) / 16 cycles (80 MHz)    */
     /* values for             240,  160,  80 MHz                            */
-    [I2C_SPEED_LOW]       = {2380, 1590, 785}, /*   10 kbps (period 100 us) */
-    [I2C_SPEED_NORMAL]    = { 220,  148,  68}, /*  100 kbps (period 10 us)  */
-    [I2C_SPEED_FAST]      = {  40,   25,   8}, /*  400 kbps (period 2.5 us) */
-    [I2C_SPEED_FAST_PLUS] = {   0,    0,   0}, /*    1 Mbps (period 1 us)   */
+    [I2C_SPEED_LOW]       = {2390, 1590, 790}, /*   10 kbps (period 100 us) */
+    [I2C_SPEED_NORMAL]    = { 230,  150,  70}, /*  100 kbps (period 10 us)  */
+    [I2C_SPEED_FAST]      = {  51,   31,  11}, /*  400 kbps (period 2.5 us) */
+    [I2C_SPEED_FAST_PLUS] = {  15,    7,   0}, /*    1 Mbps (period 1 us)   */
     [I2C_SPEED_HIGH]      = {   0,    0,   0}  /*  3.4 Mbps (period 0.3 us) not working */
-    #else
-    /* values specify one half-period and are only valid for -Os option     */
-    /* values for             240,  160,  80 MHz                            */
-    [I2C_SPEED_LOW]       = {2375, 1585, 780}, /*   10 kbps (period 100 us) */
-    [I2C_SPEED_NORMAL]    = { 220,  137,  62}, /*  100 kbps (period 10 us)  */
-    [I2C_SPEED_FAST]      = {  38,   20,   0}, /*  400 kbps (period 2.5 us) */
-    [I2C_SPEED_FAST_PLUS] = {   0,    0,   0}, /*    1 Mbps (period 1 us)   */
-    [I2C_SPEED_HIGH]      = {   0,    0,   0}  /*  3.4 Mbps (period 0.3 us) not working */
-    #endif
 };
 
 /* forward declaration of internal functions */
