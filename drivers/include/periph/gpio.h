@@ -172,8 +172,6 @@ int gpio_init(gpio_t pin, gpio_mode_t mode);
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg);
 
-#endif /* MODULE_PERIPH_GPIO_IRQ */
-
 /**
  * @brief   Enable pin interrupt if configured as interrupt source
  *
@@ -193,6 +191,8 @@ void gpio_irq_enable(gpio_t pin);
  * @param[in] pin       the pin to disable the interrupt for
  */
 void gpio_irq_disable(gpio_t pin);
+
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief   Get the current value of the given pin
