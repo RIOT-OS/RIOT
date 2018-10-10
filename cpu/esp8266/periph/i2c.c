@@ -98,14 +98,17 @@ static _i2c_bus_t _i2c_bus[] =
   #endif
 };
 
+/* to ensure that I2C is always optimized with -O2 to use the defined delays */
+#pragma GCC optimize ("O2")
+
 static const uint32_t _i2c_delays[][2] =
 {
     /* values specify one half-period and are only valid for -O2 option */
     /* value = [period - 0.5us(160MHz) or 1.0us(80MHz)] * cycles per second / 2 */
     /* cycles per us = ca. 20 (80 MHz) / ca. 40 (160 MHz) */
-    [I2C_SPEED_LOW]       = {1990, 990}, /*   10 kbps (period 100 us) */
-    [I2C_SPEED_NORMAL]    = { 190,  90}, /*  100 kbps (period 10 us) */
-    [I2C_SPEED_FAST]      = {  40,  17}, /*  400 kbps (period 2.5 us) */
+    [I2C_SPEED_LOW]       = {1990, 989}, /*   10 kbps (period 100 us) */
+    [I2C_SPEED_NORMAL]    = { 190,  89}, /*  100 kbps (period 10 us) */
+    [I2C_SPEED_FAST]      = {  40,  16}, /*  400 kbps (period 2.5 us) */
     [I2C_SPEED_FAST_PLUS] = {  13,   0}, /*    1 Mbps (period 1 us) */
     [I2C_SPEED_HIGH]      = {   0,   0}  /*  3.4 Mbps (period 0.3 us) is not working */
 };
@@ -115,12 +118,12 @@ static mutex_t i2c_bus_lock[I2C_NUMOF] = { MUTEX_INIT };
 /* forward declaration of internal functions */
 
 static inline void _i2c_delay (_i2c_bus_t* bus);
-static inline bool _i2c_read_scl (_i2c_bus_t* bus);
-static inline bool _i2c_read_sda (_i2c_bus_t* bus);
-static inline void _i2c_set_scl (_i2c_bus_t* bus);
-static inline void _i2c_clear_scl (_i2c_bus_t* bus);
-static inline void _i2c_set_sda (_i2c_bus_t* bus);
-static inline void _i2c_clear_sda (_i2c_bus_t* bus);
+static inline bool _i2c_scl_read (_i2c_bus_t* bus);
+static inline bool _i2c_sda_read (_i2c_bus_t* bus);
+static inline void _i2c_scl_high (_i2c_bus_t* bus);
+static inline void _i2c_scl_low (_i2c_bus_t* bus);
+static inline void _i2c_sda_high (_i2c_bus_t* bus);
+static inline void _i2c_sda_low (_i2c_bus_t* bus);
 static int _i2c_start_cond (_i2c_bus_t* bus);
 static int _i2c_stop_cond (_i2c_bus_t* bus);
 static int _i2c_write_bit (_i2c_bus_t* bus, bool bit);
@@ -129,6 +132,7 @@ static int _i2c_write_byte (_i2c_bus_t* bus, uint8_t byte);
 static int _i2c_read_byte (_i2c_bus_t* bus, uint8_t* byte, bool ack);
 static int _i2c_arbitration_lost (_i2c_bus_t* bus, const char* func);
 static void _i2c_abort (_i2c_bus_t* bus, const char* func);
+static void _i2c_clear (_i2c_bus_t* bus);
 
 /* implementation of i2c interface */
 void i2c_init(i2c_t dev)
@@ -159,13 +163,30 @@ void i2c_init(i2c_t dev)
     DEBUG ("%s: scl=%d sda=%d speed=%d\n", __func__,
            _i2c_bus[dev].scl, _i2c_bus[dev].sda, _i2c_bus[dev].speed);
 
-    /* configure SDA and SCL pin as GPIO in open-drain mode with enabled pull-ups */
-    gpio_init (_i2c_bus[dev].scl, GPIO_OD_PU);
-    gpio_init (_i2c_bus[dev].sda, GPIO_OD_PU);
+    /*
+     * Configure and initialize SDA and SCL pin.
+     * Note: Due to critical timing required by the I2C software
+     * implementation, the ESP8266 GPIOs can not be used directly in GPIO_OD_PU
+     * mode. Instead, the GPIOs are configured in GPIO_IN_PU mode with
+     * open-drain output driver. Signal levels are then realized as following:
+     *
+     * - HIGH: The GPIO is used in the configured GPIO_IN_PU mode. In this
+     *         mode, the output driver is in open-drain mode and pulled-up.
+     * - LOW : The GPIO is temporarily switched to GPIO_OD_PU mode. In this
+     *         mode, the output value 0, which is written during
+     *         initialization, actively drives the output to low.
+     */
+    gpio_init (_i2c_bus[dev].scl, GPIO_IN_PU);
+    gpio_init (_i2c_bus[dev].sda, GPIO_IN_PU);
+    gpio_clear (_i2c_bus[dev].scl);
+    gpio_clear (_i2c_bus[dev].sda);
 
     /* set SDA and SCL to be floating and pulled-up to high */
-    _i2c_set_sda (&_i2c_bus[dev]);
-    _i2c_set_scl (&_i2c_bus[dev]);
+    _i2c_sda_high (&_i2c_bus[dev]);
+    _i2c_scl_high (&_i2c_bus[dev]);
+
+    /* clear the bus if necessary (SDA is driven permanently low) */
+    _i2c_clear (&_i2c_bus[dev]);
 
     i2c_release (dev);
 
@@ -243,7 +264,7 @@ int /* IRAM */ i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, 
 
     /* send STOP condition if I2C_NOSTOP flag is not set */
     if (!(flags & I2C_NOSTOP)) {
-        _i2c_stop_cond (bus);
+        res = _i2c_stop_cond (bus);
     }
 
     return res;
@@ -304,7 +325,7 @@ int /* IRAM */ i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_
 
     /* send STOP condition if I2C_NOSTOP flag is not set */
     if (!(flags & I2C_NOSTOP)) {
-        return _i2c_stop_cond (bus);
+        res = _i2c_stop_cond (bus);
     }
 
     return res;
@@ -337,51 +358,98 @@ static inline void _i2c_delay (_i2c_bus_t* bus)
 }
 
 /*
- * Please note: SDA and SDL pins are used in GPIO_OD_PU mode
- *              (open-drain with pull-ups).
+ * Note: Due to critical timing required by the I2C software implementation,
+ * the ESP8266 GPIOs can not be used directly in GPIO_OD_PU mode. Instead,
+ * the GPIOs are configured in GPIO_IN_PU mode with open-drain output driver.
+ * Signal levels are then realized as following:
  *
- * Setting a pin which is in open-drain mode leaves the pin floating and
- * the signal is pulled up to high. The signal can then be actively driven
- * to low by a slave. A read operation returns the current signal at the pin.
- *
- * Clearing a pin which is in open-drain mode actively drives the signal to
- * low.
+ * - HIGH: The GPIO is used in the configured GPIO_IN_PU mode. In this mode,
+ *         the output driver is in open-drain mode and pulled-up.
+ * - LOW : The GPIO is temporarily switched to GPIO_OD_PU mode. In this mode,
+ *         the output value 0, which is written during initialization,
+ *         actively drives the output to low.
  */
 
-static inline bool _i2c_read_scl(_i2c_bus_t* bus)
+static inline bool _i2c_scl_read(_i2c_bus_t* bus)
 {
-    /* read SCL status (pin is in open-drain mode and set) */
+    /* read SCL status */
     return GPIO.IN & bus->scl_bit;
 }
 
-static inline bool _i2c_read_sda(_i2c_bus_t* bus)
+static inline bool _i2c_sda_read(_i2c_bus_t* bus)
 {
-    /* read SDA status (pin is in open-drain mode and set) */
+    /* read SDA status */
     return GPIO.IN & bus->sda_bit;
 }
 
-static inline void _i2c_set_scl(_i2c_bus_t* bus)
+static inline void _i2c_scl_low(_i2c_bus_t* bus)
 {
-    /* set SCL signal high (pin is in open-drain mode and pulled-up) */
-    GPIO.OUT_SET = bus->scl_bit;
+    /*
+     * set SCL signal low (switch temporarily to GPIO_OD_PU where the
+     * written output value 0 drives the pin actively to low)
+     */
+    GPIO.ENABLE_OUT_SET = bus->scl_bit;
 }
 
-static inline void _i2c_clear_scl(_i2c_bus_t* bus)
+static inline void _i2c_scl_high(_i2c_bus_t* bus)
 {
-    /* set SCL signal low (actively driven to low) */
-    GPIO.OUT_CLEAR = bus->scl_bit;
+    /*
+     * set SCL signal high (switch back to GPIO_IN_PU mode, that is the pin is
+     * in open-drain mode and pulled-up to high)
+     */
+    GPIO.ENABLE_OUT_CLEAR = bus->scl_bit;
 }
 
-static inline void _i2c_set_sda(_i2c_bus_t* bus)
+static inline void _i2c_sda_low(_i2c_bus_t* bus)
 {
-    /* set SDA signal high (pin is in open-drain mode and pulled-up) */
-    GPIO.OUT_SET = bus->sda_bit;
+    /*
+     * set SDA signal low (switch temporarily to GPIO_OD_PU where the
+     * written output value 0 drives the pin actively to low)
+     */
+    GPIO.ENABLE_OUT_SET = bus->sda_bit;
 }
 
-static inline void _i2c_clear_sda(_i2c_bus_t* bus)
+static inline void _i2c_sda_high(_i2c_bus_t* bus)
 {
-    /* set SDA signal low (actively driven to low) */
-    GPIO.OUT_CLEAR = bus->sda_bit;
+    /*
+     * set SDA signal high (switch back to GPIO_IN_PU mode, that is the pin is
+     * in open-drain mode and pulled-up to high)
+     */
+    GPIO.ENABLE_OUT_CLEAR = bus->sda_bit;
+}
+
+static void _i2c_clear(_i2c_bus_t* bus)
+{
+    DEBUG("%s: dev=%u\n", __func__, bus->dev);
+
+    /**
+     * Sometimes a slave blocks and drives the SDA line permanently low.
+     * Send some clock pulses in that case (10 at maximum)
+     */
+
+    /*
+     * If SDA is low while SCL is high for 10 half cycles, it is not an
+     * arbitration lost but a bus lock.
+     */
+    int count = 10;
+    while (!_i2c_sda_read (bus) && _i2c_scl_read (bus) && count) {
+        count--;
+        _i2c_delay (bus);
+    }
+
+    if (count) {
+        /* was not a bus lock */
+        return;
+    }
+
+    /* send 10 clock pulses in case of bus lock */
+    count = 10;
+    while (!_i2c_sda_read (bus) && count--) {
+        _i2c_scl_low (bus);
+        _i2c_delay (bus);
+        _i2c_scl_high (bus);
+        _i2c_delay (bus);
+    }
 }
 
 static void _i2c_abort(_i2c_bus_t* bus, const char* func)
@@ -389,11 +457,14 @@ static void _i2c_abort(_i2c_bus_t* bus, const char* func)
     DEBUG("%s: dev=%u\n", func, bus->dev);
 
     /* reset SCL and SDA to passive HIGH (floating and pulled-up) */
-    _i2c_set_sda (bus);
-    _i2c_set_scl (bus);
+    _i2c_sda_high (bus);
+    _i2c_scl_high (bus);
 
     /* reset repeated start indicator */
     bus->started = false;
+
+    /* clear the bus if necessary (SDA is driven permanently low) */
+    _i2c_clear(bus);
 }
 
 static /* IRAM */ int _i2c_arbitration_lost (_i2c_bus_t* bus, const char* func)
@@ -401,11 +472,14 @@ static /* IRAM */ int _i2c_arbitration_lost (_i2c_bus_t* bus, const char* func)
     DEBUG("%s: arbitration lost dev=%u\n", func, bus->dev);
 
     /* reset SCL and SDA to passive HIGH (floating and pulled-up) */
-    _i2c_set_sda (bus);
-    _i2c_set_scl (bus);
+    _i2c_sda_high (bus);
+    _i2c_scl_high (bus);
 
     /* reset repeated start indicator */
     bus->started = false;
+
+    /* clear the bus if necessary (SDA is driven permanently low) */
+    _i2c_clear(bus);
 
     return -EAGAIN;
 }
@@ -424,17 +498,19 @@ static /* IRAM */ int _i2c_start_cond(_i2c_bus_t* bus)
         /* prepare the repeated start condition */
 
         /* SDA = passive HIGH (floating and pulled-up) */
-        _i2c_set_sda (bus);
+        _i2c_sda_high (bus);
 
         /* t_VD;DAT not neccessary */
         /* _i2c_delay (bus); */
 
         /* SCL = passive HIGH (floating and pulled-up) */
-        _i2c_set_scl (bus);
+        _i2c_scl_high (bus);
 
         /* clock stretching, wait as long as clock is driven to low by the slave */
         uint32_t stretch = I2C_CLOCK_STRETCH;
-        while (!_i2c_read_scl (bus) && stretch--) {}
+        while (stretch && !_i2c_scl_read (bus)) {
+            stretch--;
+        }
         if (stretch == 0) {
             DEBUG("%s: clock stretching timeout dev=%u\n", __func__, bus->dev);
             res = -ETIMEDOUT;
@@ -446,12 +522,12 @@ static /* IRAM */ int _i2c_start_cond(_i2c_bus_t* bus)
     }
 
     /* if SDA is low, arbitration is lost and someone else is driving the bus */
-    if (!_i2c_read_sda (bus)) {
+    if (!_i2c_sda_read (bus)) {
         return _i2c_arbitration_lost (bus, __func__);
     }
 
     /* begin the START condition: SDA = active LOW */
-    _i2c_clear_sda (bus);
+    _i2c_sda_low (bus);
 
     /* wait t_HD;STA - hold time (repeated) START condition, */
     /* max none */
@@ -459,7 +535,7 @@ static /* IRAM */ int _i2c_start_cond(_i2c_bus_t* bus)
     _i2c_delay (bus);
 
     /* complete the START condition: SCL = active LOW */
-    _i2c_clear_scl (bus);
+    _i2c_scl_low (bus);
 
     /* needed for repeated start condition */
     bus->started = true;
@@ -478,18 +554,20 @@ static /* IRAM */ int _i2c_stop_cond(_i2c_bus_t* bus)
     int res = 0;
 
     /* begin the STOP condition: SDA = active LOW */
-    _i2c_clear_sda (bus);
+    _i2c_sda_low (bus);
 
     /* wait t_LOW - LOW period of SCL clock */
     /* min. in us: 4.7 (SM), 1.3 (FM), 0.5 (FPM), 0.16 (HSM); no max. */
     _i2c_delay (bus);
 
     /* SCL = passive HIGH (floating and pulled up) while SDA = active LOW */
-    _i2c_set_scl (bus);
+    _i2c_scl_high (bus);
 
     /* clock stretching, wait as long as clock is driven to low by the slave */
     uint32_t stretch = I2C_CLOCK_STRETCH;
-    while (!_i2c_read_scl (bus) && stretch--) {}
+    while (stretch && !_i2c_scl_read (bus)) {
+        stretch--;
+    }
     if (stretch == 0) {
         DEBUG("%s: clock stretching timeout dev=%u\n", __func__, bus->dev);
         res = -ETIMEDOUT;
@@ -500,7 +578,7 @@ static /* IRAM */ int _i2c_stop_cond(_i2c_bus_t* bus)
     _i2c_delay (bus);
 
     /* complete the STOP condition: SDA = passive HIGH (floating and pulled up) */
-    _i2c_set_sda (bus);
+    _i2c_sda_high (bus);
 
     /* reset repeated start indicator */
     bus->started = false;
@@ -512,7 +590,7 @@ static /* IRAM */ int _i2c_stop_cond(_i2c_bus_t* bus)
     _i2c_delay (bus);
 
     /* if SDA is low, arbitration is lost and someone else is driving the bus */
-    if (_i2c_read_sda (bus) == 0) {
+    if (_i2c_sda_read (bus) == 0) {
         return _i2c_arbitration_lost (bus, __func__);
     }
 
@@ -531,10 +609,10 @@ static /* IRAM */ int _i2c_write_bit (_i2c_bus_t* bus, bool bit)
 
     /* SDA = bit */
     if (bit) {
-        _i2c_set_sda (bus);
+        _i2c_sda_high (bus);
     }
     else {
-        _i2c_clear_sda (bus);
+        _i2c_sda_low (bus);
     }
 
     /* wait t_VD;DAT - data valid time (time until data are valid) */
@@ -542,7 +620,7 @@ static /* IRAM */ int _i2c_write_bit (_i2c_bus_t* bus, bool bit)
     _i2c_delay (bus);
 
     /* SCL = passive HIGH (floating and pulled-up), SDA value is available */
-    _i2c_set_scl (bus);
+    _i2c_scl_high (bus);
 
     /* wait t_HIGH - time for the slave to read SDA */
     /* min. in us: 4 (SM), 0.6 (FM), 0.26 (FPM), 0.09 (HSM); no max. */
@@ -550,7 +628,9 @@ static /* IRAM */ int _i2c_write_bit (_i2c_bus_t* bus, bool bit)
 
     /* clock stretching, wait as long as clock is driven low by the slave */
     uint32_t stretch = I2C_CLOCK_STRETCH;
-    while (!_i2c_read_scl (bus) && stretch--) {}
+    while (stretch && !_i2c_scl_read (bus)) {
+        stretch--;
+    }
     if (stretch == 0) {
         DEBUG("%s: clock stretching timeout dev=%u\n", __func__, bus->dev);
         res = -ETIMEDOUT;
@@ -558,12 +638,12 @@ static /* IRAM */ int _i2c_write_bit (_i2c_bus_t* bus, bool bit)
 
     /* if SCL is high, now data is valid */
     /* if SDA is high, check that nobody else is driving SDA low */
-    if (bit && !_i2c_read_sda(bus)) {
+    if (bit && !_i2c_sda_read(bus)) {
         return _i2c_arbitration_lost (bus, __func__);
     }
 
     /* SCL = active LOW to allow next SDA change */
-    _i2c_clear_scl(bus);
+    _i2c_scl_low(bus);
 
     return res;
 }
@@ -578,18 +658,20 @@ static /* IRAM */ int _i2c_read_bit (_i2c_bus_t* bus, bool* bit)
     int res = 0;
 
     /* SDA = passive HIGH (floating and pulled-up) to let the slave drive data */
-    _i2c_set_sda (bus);
+    _i2c_sda_high (bus);
 
     /* wait t_VD;DAT - data valid time (time until data are valid) */
     /* max. in us: 3.45 (SM), 0.9 (FM), 0.45 (FPM); no min */
     _i2c_delay (bus);
 
     /* SCL = passive HIGH (floating and pulled-up), SDA value is available */
-    _i2c_set_scl (bus);
+    _i2c_scl_high (bus);
 
     /* clock stretching, wait as long as clock is driven to low by the slave */
     uint32_t stretch = I2C_CLOCK_STRETCH;
-    while (!_i2c_read_scl (bus) && stretch--) {}
+    while (stretch && !_i2c_scl_read (bus)) {
+        stretch--;
+    }
     if (stretch == 0) {
         DEBUG("%s: clock stretching timeout dev=%u\n", __func__, bus->dev);
         res = -ETIMEDOUT;
@@ -600,10 +682,10 @@ static /* IRAM */ int _i2c_read_bit (_i2c_bus_t* bus, bool* bit)
     _i2c_delay (bus);
 
     /* SCL is high, read out bit */
-    *bit = _i2c_read_sda (bus);
+    *bit = _i2c_sda_read (bus);
 
     /* SCL = active LOW to allow next SDA change */
-    _i2c_clear_scl(bus);
+    _i2c_scl_low(bus);
 
     return res;
 }
