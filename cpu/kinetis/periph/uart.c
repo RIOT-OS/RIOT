@@ -591,15 +591,12 @@ static inline void irq_handler_lpuart(uart_t uart)
     if (stat & LPUART_STAT_RDRF_MASK) {
         /* RDRF flag will be cleared when LPUART_DATA is read */
         uint8_t data = dev->DATA;
-        if (stat & (LPUART_STAT_FE_MASK | LPUART_STAT_PF_MASK | LPUART_STAT_NF_MASK)) {
+        if (stat & (LPUART_STAT_FE_MASK | LPUART_STAT_PF_MASK)) {
             if (stat & LPUART_STAT_FE_MASK) {
                 DEBUG("LPUART framing error %08" PRIx32 "\n", stat);
             }
             if (stat & LPUART_STAT_PF_MASK) {
                 DEBUG("LPUART parity error %08" PRIx32 "\n", stat);
-            }
-            if (stat & LPUART_STAT_NF_MASK) {
-                DEBUG("LPUART noise flag %08" PRIx32 "\n", stat);
             }
             /* FE is set whenever the next character to be read from LPUART_DATA
              * was received with logic 0 detected where a stop bit was expected. */
