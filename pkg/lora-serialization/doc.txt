@@ -1,7 +1,7 @@
 /**
  * @defgroup pkg_lora-serialization Lora Serialization
  * @ingroup  pkg
- * @ingroup  sys
+ * @ingroup  sys_serialization
  * @brief    Provides a RIOT support for Lora Serialization format
  *
  * For more details on the format see
