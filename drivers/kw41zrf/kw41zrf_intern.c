@@ -209,13 +209,8 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
         seq = XCVSEQ_IDLE;
     }
     assert((ZLL->PHY_CTRL & ZLL_PHY_CTRL_XCVSEQ_MASK) == XCVSEQ_IDLE);
-    while ((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_SEQ_IDLE_MASK) == 0) {
-        kw41zrf_abort_sequence(dev);
-    }
+    kw41zrf_abort_sequence(dev);
 
-    /* Clear interrupt flags, sometimes the sequence complete flag is immediately set */
-    /* cppcheck-suppress selfAssignment */
-    ZLL->IRQSTS = ZLL->IRQSTS;
     ZLL->PHY_CTRL = (ZLL->PHY_CTRL & ~(ZLL_PHY_CTRL_XCVSEQ_MASK | ZLL_PHY_CTRL_SEQMSK_MASK)) | seq;
     while (((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_MASK) >>
         ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_SHIFT) != (ZLL_PHY_CTRL_XCVSEQ_MASK & seq)) {}

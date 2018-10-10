@@ -184,22 +184,21 @@ static void kw41zrf_wait_idle(kw41zrf_t *dev)
 {
     /* make sure any ongoing T or TR sequence is finished */
     if (kw41zrf_can_switch_to_idle(dev) == 0) {
-        DEBUG("[kw41zrf] TX already in progress\n");
+        DEBUG("[kw41zrf] waiting for idle\n");
         num_irqs_handled = num_irqs_queued;
         spinning_for_irq = 1;
-        thread_flags_clear(KW41ZRF_THREAD_FLAG_ISR);
         pm_block(KINETIS_PM_LLS);
         while (1) {
-            /* TX in progress */
-            /* Handle any outstanding IRQ first */
+            /* TX or CCA in progress */
+            /* Block until we get an IRQ */
+            thread_flags_wait_any(KW41ZRF_THREAD_FLAG_ISR);
+            /* Handle the IRQ */
             kw41zrf_netdev_isr((netdev_t *)dev);
             /* kw41zrf_netdev_isr() will switch the transceiver back to idle after
              * handling the TX complete IRQ */
             if (kw41zrf_can_switch_to_idle(dev)) {
                 break;
             }
-            /* Block until we get another IRQ */
-            thread_flags_wait_any(KW41ZRF_THREAD_FLAG_ISR);
             DEBUG("[kw41zrf] waited ISR\n");
         }
         pm_unblock(KINETIS_PM_LLS);
@@ -1202,12 +1201,14 @@ static void kw41zrf_netdev_isr(netdev_t *netdev)
     kw41zrf_t *dev = (kw41zrf_t *)netdev;
     if (!spinning_for_irq) {
         num_irqs_handled = num_irqs_queued;
+        thread_flags_clear(KW41ZRF_THREAD_FLAG_ISR);
     }
 
     /* ZLL register access requires that the transceiver is not in deep sleep mode */
     if (kw41zrf_is_dsm()) {
         /* Transceiver is sleeping, the IRQ must have occurred before entering
          * sleep, discard the call */
+        DEBUG("kw41zrf: unexpected IRQ while sleeping\n");
         return;
     }
     uint32_t irqsts = ZLL->IRQSTS;

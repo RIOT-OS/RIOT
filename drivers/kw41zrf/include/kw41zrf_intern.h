@@ -126,11 +126,11 @@ static inline void kw41zrf_abort_sequence(kw41zrf_t *dev)
         ZLL_PHY_CTRL_XCVSEQ(XCVSEQ_IDLE) | ZLL_PHY_CTRL_SEQMSK_MASK;
     /* Spin until the sequence manager has acknowledged the sequence abort, this
      * should not take many cycles */
-    while (((ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_MASK) >>
-        ZLL_SEQ_CTRL_STS_XCVSEQ_ACTUAL_SHIFT) != XCVSEQ_IDLE) {}
+    while (!(ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_SEQ_IDLE_MASK)) {}
 
     /* Clear interrupt flags */
-    /* cppcheck-suppress selfAssignment */
+    /* cppcheck-suppress selfAssignment
+     * (reason: IRQ flags are write-1-to-clear) */
     ZLL->IRQSTS = ZLL->IRQSTS;
 }
 
