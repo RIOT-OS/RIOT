@@ -122,7 +122,7 @@ int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
     dev->rx_warmup_time = (dev->rx_warmup_time + 15) / 16;
     dev->tx_warmup_time = (dev->tx_warmup_time + 15) / 16;
 
-    /* Configre Radio IRQ */
+    /* Configure Radio IRQ */
     kw41zrf_set_irq_callback(cb, dev);
     NVIC_ClearPendingIRQ(Radio_1_IRQn);
     NVIC_EnableIRQ(Radio_1_IRQn);
@@ -189,7 +189,7 @@ void kw41zrf_reset_phy(kw41zrf_t *dev)
 
     /* Set CCA threshold to -75 dBm */
     ZLL->CCA_LQI_CTRL = (ZLL->CCA_LQI_CTRL & ~ZLL_CCA_LQI_CTRL_CCA1_THRESH_MASK) |
-        ZLL_CCA_LQI_CTRL_CCA1_THRESH(0xB5);
+        ZLL_CCA_LQI_CTRL_CCA1_THRESH(-75);
 
     /* Adjust ACK delay to fulfill the 802.15.4 turnaround requirements */
     ZLL->ACKDELAY = (ZLL->ACKDELAY & ~ZLL_ACKDELAY_ACKDELAY_MASK) | ZLL_ACKDELAY_ACKDELAY(-8);
