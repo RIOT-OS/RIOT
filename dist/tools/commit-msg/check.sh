@@ -35,11 +35,15 @@ ERROR="$(git log \
         msg_length=$(echo "${msg}" | awk '{print length($0)}')
 
         if [ ${msg_length} -gt ${MSG_MAX_LENGTH} ]; then
-            echo "Commit message is longer than ${MSG_MAX_LENGTH} characters:" >&2
-            echo "    \"${msg}\"" >&2
             if [ ${msg_length} -gt ${MSG_STRETCH_LENGTH} ]; then
+                MSG="Error: Commit message is longer than ${MSG_STRETCH_LENGTH} characters:"
                 echo "error"
+            else
+                MSG="Warning: Commit message is longer than ${MSG_MAX_LENGTH}"
+                MSG="${MSG} (but < ${MSG_STRETCH_LENGTH}) characters:"
             fi
+            echo "${MSG}" >&2
+            echo "    \"${msg}\"" >&2
         fi
     done)"
 
