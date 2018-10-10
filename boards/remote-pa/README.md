@@ -1,7 +1,7 @@
 Zolertia RE-Mote platform
 ============================================
 
-<a href="url"><img src="http://goo.gl/3AGZkI" align="center" height="320" ></a>
+<a href="url"><img src="https://zolertia.io/wp-content/uploads/2017/06/Untitled-design-12.png" align="center" height="320" ></a>
 
 The RE-Mote platform (prototype A) is a IoT Hardware development platform based
 on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KB
