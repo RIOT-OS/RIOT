@@ -27,10 +27,10 @@ STAGING_APPS := $(sort $(STAGING_APPS))
 
 BROKEN := $(sort $(BROKEN))
 
-STAGING_MODULES_USED_BROKEN := \
+STAGING_MODULES_USED_BROKEN = \
   $(sort $(filter $(BROKEN), $(STAGING_MODULES_USED)))
 
-STAGING_MODULES_USED_NOTBROKEN := \
+STAGING_MODULES_USED_NOTBROKEN = \
   $(sort $(filter-out $(BROKEN), $(STAGING_MODULES_USED)))
 
 # turn dependencies to broken staging modules into unsatisfied feature
@@ -42,10 +42,10 @@ STAGING_MODULES_USED_NOTBROKEN := \
 FEATURES_REQUIRED += $(patsubst %,broken-staging-module-%,$(STAGING_MODULES_USED_BROKEN))
 
 # list of folders with staging modules that are used and not broken
-STAGING_DIRS := $(sort $(wildcard $(STAGING_MODULES_USED_NOTBROKEN:%=$(RIOTBASE)/staging/%)))
+STAGING_DIRS = $(sort $(wildcard $(STAGING_MODULES_USED_NOTBROKEN:%=$(RIOTBASE)/staging/%)))
 
 # create app make file list to be consumed by makefiles/app_dirs.inc.mk
-STAGING_APPLICATION_MAKEFILES := \
+STAGING_APPLICATION_MAKEFILES = \
     $(sort \
         $(wildcard \
             $(patsubst %,$(RIOTBASE)/staging/%/Makefile,$(STAGING_APPS)) \
