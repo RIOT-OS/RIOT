@@ -874,6 +874,9 @@ FEATURES_USED := $(sort $(FEATURES_REQUIRED) $(filter $(FEATURES_OPTIONAL),$(FEA
 # all periph features correspond to a periph submodule
 USEMODULE += $(filter periph_%,$(FEATURES_USED))
 
+# select cpu_check_address pseudomodule if the corresponding feature is used
+USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))
+
 # recursively catch transitive dependencies
 USEMODULE := $(sort $(USEMODULE))
 USEPKG := $(sort $(USEPKG))
