@@ -6,7 +6,10 @@
 """@package PyToAPI
 This module handles parsing of information from RIOT periph_uart test.
 """
-from if_lib.dut_shell import DutShell
+try:
+    from riot_pal import DutShell
+except ImportError:
+    raise ImportError('Cannot find riot_pal, try "pip install riot_pal"')
 
 
 class PeriphUartIf(DutShell):
