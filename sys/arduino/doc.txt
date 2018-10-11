@@ -112,6 +112,12 @@
  * @endcode
  *   This links to the third entry in the `arduino_pinmap` array.
  *
+ * - a define `ARDUINO_UART_DEV` that defines the UART to use as the Arduino
+ *   primary serial port (default UART_DEV(0)):
+ * @code{c}
+ *  #define ARDUINO_UART_DEV         (UART_DEV(3))
+ * @endcode
+ *
  * In addition, you have to add the 'arduino' feature to the board. For this,
  * just add `FEATURES_PROVIDED += arduino` to the 'other features' section in
  * your board's `Makefile.features'.

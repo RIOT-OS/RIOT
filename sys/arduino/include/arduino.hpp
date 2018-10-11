@@ -45,10 +45,17 @@ enum {
     HIGH = 1            /**< pin is set */
 };
 
+#ifndef ARDUINO_UART_DEV
 /**
- * @brief   Primary serial port (mapped to UART_DEV(0))
+ * @brief UART device to use for Arduino serial
  */
-static SerialPort Serial(UART_DEV(0));
+#define ARDUINO_UART_DEV        UART_DEV(0)
+#endif
+
+/**
+ * @brief   Primary serial port (mapped to ARDUINO_UART_DEV)
+ */
+static SerialPort Serial(ARDUINO_UART_DEV);
 
 /**
  * @brief   Configure a pin as either input or output
