@@ -228,6 +228,17 @@ static inline uint32_t cpu_get_image_baseaddr(void)
 }
 #endif
 
+/**
+ * @brief   Checks is memory address valid or not
+ *
+ * This function can be used to check for memory size,
+ * peripherals availability, etc.
+ *
+ * @param[in]	address     Address to check
+ * @return                  true if address is valid
+ */
+bool cpu_check_address(volatile const char *address);
+
 #ifdef __cplusplus
 }
 #endif

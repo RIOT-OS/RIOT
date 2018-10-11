@@ -1,2 +1,3 @@
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += cpu_check_address
