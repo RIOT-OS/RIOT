@@ -9,4 +9,10 @@ ifneq (,$(filter periph_i2c,$(USEMODULE)))
   endif
 endif
 
+# flashpage and eeprom periph implementations share flash lock/unlock functions
+# defined in flash_common.c
+ifneq (,$(filter periph_flashpage periph_eeprom,$(USEMODULE)))
+  SRC += flash_common.c
+endif
+
 include $(RIOTMAKE)/periph.mk
