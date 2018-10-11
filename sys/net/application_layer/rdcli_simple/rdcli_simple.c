@@ -60,7 +60,7 @@ int rdcli_simple_register(void)
         return RDCLI_SIMPLE_ERROR;
     }
     /* finish, we don't have any payload */
-    ssize_t len = gcoap_finish(&pkt, 0, COAP_FORMAT_LINK);
+    ssize_t len = gcoap_finish(&pkt, 0, COAP_FORMAT_NONE);
     if (gcoap_req_send2(buf, len, &remote, NULL) == 0) {
         return RDCLI_SIMPLE_ERROR;
     }
