@@ -86,7 +86,7 @@ int analogRead(int arduino_pin)
     }
 
     /* Read the ADC channel */
-    adc_value = adc_sample(arduino_analog_map[arduino_pin], ADC_RES_10BIT);
+    adc_value = (int)adc_sample(arduino_analog_map[arduino_pin], ADC_RES_10BIT);
 
     return adc_value;
 }

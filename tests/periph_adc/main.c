@@ -32,7 +32,7 @@
 int main(void)
 {
     xtimer_ticks32_t last = xtimer_now();
-    int sample = 0;
+    int32_t sample = 0;
 
     puts("\nRIOT ADC peripheral driver test\n");
     puts("This test will sample all available ADC lines once every 100ms with\n"
@@ -54,7 +54,7 @@ int main(void)
             if (sample < 0) {
                 printf("ADC_LINE(%u): 10-bit resolution not applicable\n", i);
             } else {
-                printf("ADC_LINE(%u): %i\n", i, sample);
+                printf("ADC_LINE(%u): %" PRIi32 "\n", i, sample);
             }
         }
         xtimer_periodic_wakeup(&last, DELAY);

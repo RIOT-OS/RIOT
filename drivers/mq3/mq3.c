@@ -30,7 +30,7 @@ int mq3_init(mq3_t *dev, adc_t adc_line)
     return adc_init(dev->adc_line);
 }
 
-int mq3_read_raw(const mq3_t *dev)
+int32_t mq3_read_raw(const mq3_t *dev)
 {
     return adc_sample(dev->adc_line, PRECISION);
 }

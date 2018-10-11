@@ -62,7 +62,7 @@ int mq3_init(mq3_t *dev, adc_t adc_line);
  *
  * @return              the raw sensor value, between 0 and MQ3_MAX_RAW_VALUE
  */
-int mq3_read_raw(const mq3_t *dev);
+int32_t mq3_read_raw(const mq3_t *dev);
 
 /**
  * @brief   Read the scaled sensor value of PPM of alcohol

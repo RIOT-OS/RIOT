@@ -99,7 +99,7 @@ int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params)
 
 int io1_xplained_read_light_level(uint16_t *light)
 {
-    int sample = adc_sample(IO1_LIGHT_ADC_LINE, IO1_LIGHT_ADC_RES);
+    int32_t sample = adc_sample(IO1_LIGHT_ADC_LINE, IO1_LIGHT_ADC_RES);
 
     if (sample < 0) {
         DEBUG("[io1_xplained] Light sensor read failed\n");
