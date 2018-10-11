@@ -27,7 +27,7 @@
 static int _read(const void *dev, phydat_t *data)
 {
     memset(data, 0, sizeof(phydat_t));
-    data->val[0] = tsl4531x_simple_read((const tsl4531x_t *)dev);
+    data->val[0] = tsl4531x_simple_read(*(tsl4531x_t * const*)dev);
     data->unit = UNIT_LUX;
     data->scale = 0;
     return 1;
