@@ -62,6 +62,16 @@ void delay(unsigned long msec)
     xtimer_usleep(1000 * msec);
 }
 
+void delayMicroseconds(unsigned long usec)
+{
+    xtimer_usleep(usec);
+}
+
+unsigned int micros()
+{
+    return xtimer_now_usec();
+}
+
 /*
  * Bitfield for the state of the ADC-channels.
  * 0: Not initialized

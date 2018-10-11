@@ -83,6 +83,20 @@ int digitalRead(int pin);
 void delay(unsigned long msec);
 
 /**
+ * @brief   Sleep for a given amount of time [microseconds]
+ *
+ * @param[in] usec      number of microseconds to sleep
+ */
+void delayMicroseconds(unsigned long usec);
+
+/**
+ * @brief   Returns the number of microseconds since start
+ *
+ * @return value of microseconds since start
+ */
+unsigned long micros();
+
+/**
  * @brief   Read the current value of the given analog pin
  *
  * @param[in] pin       pin to read
