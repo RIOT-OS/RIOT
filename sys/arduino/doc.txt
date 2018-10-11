@@ -105,6 +105,16 @@
  *  };
  * @endcode
  *
+ * - a mapping of ADC lines to Arduino analogs pins named `arduino_analog_map`, e.g.
+ * @code{c}
+ *  static const adc_t arduino_analog_map[] = {
+ *      ADC_LINE(3),
+ *      ADC_LINE(2),
+ *      ADC_LINE(1),
+ *      ...
+ *  };
+ * @endcode
+ *
  * - a define `ARDUINO_LED` that is mapped to an Arduino pin number connected to
  *   any on-board LED, or to pin 0 in case no LED is defined:
  * @code{c}
