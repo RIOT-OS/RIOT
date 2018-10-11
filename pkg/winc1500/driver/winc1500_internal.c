@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_winc1500
+ * @ingroup     drivers_winc1500
  * @{
  *
  * @file
@@ -96,22 +96,21 @@ void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr)
             recv_size = sizeof (event_info.prng_result);
             break;
 #ifdef MODULE_NETDEV_ETH
-        case M2M_WIFI_RESP_ETHERNET_RX_PACKET: {
-            _unlock_bus(dev);
+        case M2M_WIFI_RESP_ETHERNET_RX_PACKET:
             dev->rx_addr = addr;
             dev->netdev.event_callback(&dev->netdev, NETDEV_EVENT_RX_COMPLETE);
-            _lock_bus(dev);
-            return;
-        }
+            goto end;
+            break;
 #endif
         default:
             DEBUG("Unhandled event: %d\n", opcode);
-            return;
+            goto end;
+            break;
     }
 
-    /* Get data from the module */
-    if (hif_receive(addr, (uint8_t *) &event_info, recv_size,
-                        is_done) == M2M_SUCCESS) {
+    /* Get data from the module and then pass it to _process_event() */
+    int8_t ret = hif_receive(addr, (uint8_t *) &event_info, recv_size, is_done);
+    if (ret == M2M_SUCCESS) {
         if (M2M_WIFI_RESP_GET_PRNG != opcode) {
             _process_event(opcode, &event_info);
         }
@@ -119,12 +118,24 @@ void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr)
             addr += sizeof(event_info.prng_result);
             recv_size = event_info.prng_result.u16PrngSize;
             is_done = 1;
-            if (hif_receive(addr, event_info.prng_result.pu8RngBuff,
-                            recv_size, is_done) == M2M_SUCCESS) {
+            ret = hif_receive(addr, event_info.prng_result.pu8RngBuff, 
+                                recv_size, is_done);
+            if (ret == M2M_SUCCESS) {
                 _process_event(opcode, &event_info);
+            }
+            else {
+                goto error;
             }
         }
     }
+    else {
+        goto error;
+    }
+end:
+    return;
+error:
+    DEBUG("hif_receive() error: %d\n", ret);
+    return;
 }
 
 /**

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     driver_winc1500
+ * @ingroup     drivers_winc1500
  * @{
  *
  * @file
@@ -36,7 +36,7 @@
 #include "net/netdev/eth.h"
 #include "net/netstats.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 /** ISR for netdev */
@@ -62,8 +62,6 @@ static void winc1500_isr(void *arg)
 {
     winc1500_t *dev = (winc1500_t *) arg;
 
-    m2m_hif_isr();
-
     /* call netdev hook */
     dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_ISR);
 }
@@ -82,9 +80,8 @@ static int _init(netdev_t *netdev)
 {
     winc1500_t *dev = (winc1500_t *) netdev;
 
-    DEBUG("winc1500: starting initialization...\n");
+    DEBUG("winc1500_netdev: starting initialization...\n");
     /* Set SPI first */
-    dev->rx_size = -1;
     spi_init(dev->params.spi);
     _lock_bus(dev);
 
@@ -119,6 +116,7 @@ static int _init(netdev_t *netdev)
     mutex_init(&dev->mutex);
     mbox_init(&dev->event_mbox, _mbox_msgs, WINC1500_EVENT_MBOX_LEN);
 
+    m2m_wifi_get_mac_address((uint8_t *)&dev->mac_addr);
     dev->state = 0 | WINC1500_STATE_INIT;
     dev->state |= WINC1500_STATE_IDLE;
 
@@ -158,51 +156,46 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     winc1500_t * dev = (winc1500_t *) netdev;
 
     (void)info;
-    _lock_bus(dev);
+    /* Device locking & unlocking will be managed by _isr() */
 
-    int size;
-    uint16_t data_size;
-    uint8_t rx_done;
     winc1500_event_info_t event_info;
+    int8_t ret;
 
-    if (dev->rx_size == -1) {
-        if (hif_receive(dev->rx_addr, (uint8_t *) &event_info,
-                    sizeof(event_info.recv_pkt), 0) == M2M_SUCCESS) {
+    /* Get the expected byte size to receive */
+    if ((buf == NULL) && (len == 0)) {
+        ret = hif_receive(dev->rx_addr, (uint8_t *) &event_info,
+                                sizeof(tstrM2mIpRsvdPkt), 0);
+        if (ret == M2M_SUCCESS) {
             dev->rx_offset = event_info.recv_pkt.u16PktOffset;
-            dev->rx_rem_size = event_info.recv_pkt.u16PktSz;
-            dev->rx_size = event_info.recv_pkt.u16PktSz;
+            return event_info.recv_pkt.u16PktSz;
+        }
+        else {
+            DEBUG("winc1500_netdev: Error getting recv packet length: %d\n", ret);
+            return 0;
         }
     }
-    size = dev->rx_size;
-    if (buf != NULL) {
+    /* Copy the recv packet */
+    if ((buf != NULL) && (len > 0)) {
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;
         netdev->stats.rx_bytes += len;
 #endif
-        /* Then get the rest of it */
-        do {
-            rx_done = 1;
-            if(dev->rx_rem_size > len) {
-                rx_done = 0;
-                data_size = len;
-            }
-            else {
-                data_size = dev->rx_rem_size;
-            }
-
-            if(hif_receive(dev->rx_addr + dev->rx_offset, buf, data_size, rx_done) == M2M_SUCCESS) {
-                dev->rx_rem_size -= data_size;
-                dev->rx_offset += data_size;
-                buf += data_size;
-            }
-            else {
-                break;
-            }
-        } while (dev->rx_rem_size > 0);
-        dev->rx_size = -1;
+        ret = hif_receive(dev->rx_addr + dev->rx_offset, buf, len, 1);
+        if (ret == M2M_SUCCESS) {
+            return len;
+        }
+        else {
+            DEBUG("winc1500_netdev: Error copying recv packet: %d\n", ret);
+            return 0;
+        }
     }
-    _unlock_bus(dev);
-    return size;
+    else if ((buf == NULL) && (len > 0)) {
+        /* Upper layer wants to drop the packet */
+        hif_receive(0, NULL, 0, 1);
+        return 0;
+    }
+    DEBUG("winc1500_netdev: Unexpected recv() case\n");
+    return 0;
 }
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
