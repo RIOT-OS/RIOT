@@ -1,0 +1,3 @@
+MODULE = winc1500_pkg_bus_wrapper
+
+include $(RIOTBASE)/Makefile.base

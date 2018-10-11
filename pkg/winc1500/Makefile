@@ -10,23 +10,12 @@ MODULE_MAKEFILE := $(CURDIR)/Makefile.module
 
 all: git-download
 	# Copy Makefiles for each modules
-	echo 'MODULE = winc1500_pkg_common' > $(VCS_DIR)/common/source/Makefile
-	cat $(MODULE_MAKEFILE) >> $(VCS_DIR)/common/source/Makefile
-
-	echo 'MODULE = winc1500_pkg_bsp' > $(VCS_DIR)/bsp/source/Makefile
-	cat $(MODULE_MAKEFILE) >> $(VCS_DIR)/bsp/source/Makefile
-
-	echo 'MODULE = winc1500_pkg_bus_wrapper' > $(VCS_DIR)/bus_wrapper/source/Makefile
-	cat $(MODULE_MAKEFILE) >> $(VCS_DIR)/bus_wrapper/source/Makefile
-
-	echo 'MODULE = winc1500_pkg_driver' > $(VCS_DIR)/driver/source/Makefile
-	cat $(MODULE_MAKEFILE) >> $(VCS_DIR)/driver/source/Makefile
-
-	echo 'MODULE = winc1500_pkg_socket' > $(VCS_DIR)/socket/source/Makefile
-	cat $(MODULE_MAKEFILE) >> $(VCS_DIR)/socket/source/Makefile
-
-	echo 'MODULE = winc1500_pkg_spi_flash' > $(VCS_DIR)/spi_flash/source/Makefile
-	cat $(MODULE_MAKEFILE) >> $(VCS_DIR)/spi_flash/source/Makefile
+	@cp Makefile.common $(VCS_DIR)/common/source/Makefile
+	@cp Makefile.bsp $(VCS_DIR)/bsp/source/Makefile
+	@cp Makefile.bus_wrapper $(VCS_DIR)/bus_wrapper/source/Makefile
+	@cp Makefile.driver $(VCS_DIR)/driver/source/Makefile
+	@cp Makefile.socket $(VCS_DIR)/socket/source/Makefile
+	@cp Makefile.spi_flash $(VCS_DIR)/spi_flash/source/Makefile
 
 	# Lastly, call Makefile
 	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.winc1500

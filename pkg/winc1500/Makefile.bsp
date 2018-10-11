@@ -1,0 +1,3 @@
+MODULE = winc1500_pkg_bsp
+
+include $(RIOTBASE)/Makefile.base

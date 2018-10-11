@@ -1,0 +1,3 @@
+MODULE = winc1500_pkg_spi_flash
+
+include $(RIOTBASE)/Makefile.base
