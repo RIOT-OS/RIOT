@@ -27,6 +27,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "arduino_pinmap.h"
 
 #include "periph/gpio.h"
 #include "sdk_conf.h"
