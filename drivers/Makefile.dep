@@ -446,6 +446,11 @@ ifneq (,$(filter tsl2561,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter tsl4531x,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_uart
@@ -474,8 +479,4 @@ ifneq (,$(filter xbee,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += xtimer
   USEMODULE += netif
-endif
-
-ifneq (,$(filter tsl4531x,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_i2c
 endif

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016 Inria
  * Copyright (C) 2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -11,15 +12,13 @@
  * @{
  *
  * @file
- * @brief       Device driver for the TSL4531 Luminosity sensor.
+ * @brief       Device driver for the TSL4531x Luminosity sensor.
  *
+ * @author      Daniel Petry <daniel.petry@fu-berlin.de>
  * @author      Juan I Carrano <j.carrano@fu-berlin.de>
+ * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  *
- * This driver was derived from the one for TSL2561.
- *
- * @todo    The i2c address is hardcoded
- * @todo    The only operating mode is "Normal Operation"
- * @todo    PowerSave is not supported
+ * This driver was derived from the TSL2561 driver.
  *
  * @}
  */
@@ -28,113 +27,202 @@
 
 #include "log.h"
 #include "tsl4531x.h"
+#include "tsl4531x_internals.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-static const uint16_t TSL4531_Addr = 0x29;
-static const uint16_t TSL4531_PARTNO = 0xA; /* 0b1010 */
+#define _DATALOW 0
+#define _DATAHIGH 1
 
-static const uint16_t Control_Reg = 0x0;
-static const uint16_t Configuration_Reg = 0x01;
-static const uint16_t ALSData1_Reg = 0x04;  /* contains DATALOW */
-static const uint16_t ALSData2_Reg = 0x05;  /* contains DATAHIGH */
-static const uint16_t ID_Reg = 0x0A;
-
-static const uint16_t TSL4531x_MODE_Normal = 0x03; /* 0b11 */
-
-/* Assemble the Command register */
-#define TSL4531_COMMAND(addr)   ((1<<7)|(addr))
-
-/* Assemble the Configuration register */
-#define TSL4531_CONFIG(psaveskip, tcntrl)  (((!!(psaveskip)) << 3) | (tcntrl))
-
-/* Assemble the Control register */
-#define TSL4531_CONTROL(mode)  (mode)
-
-#define TSL4531_GET_PARTNO(id_reg)  ((id_reg) >> 4)
-
-/* Apply the multiplier corresponding to the active integration time */
-/* From the manual:
- *      MULTIPLIER = 1 for TCNTRL = 00 (Tint = 400 ms),
- *      MULTIPLIER = 2 for TCNTRL = 01 (Tint = 200 ms), and
- *      MULTIPLIER = 4 for TCNTRL = 10 (Tint = 100 ms), and
- */
-#define MULTIPLY_DATA(data_raw, integration_time) ((data_raw) << (integration_time))
-
-int tsl4531x_init(tsl4531x_t *dev, i2c_t i2c_dev, uint8_t integration_time)
+int tsl4531x_init(tsl4531x_t *dev, const tsl4531x_params_t *params)
 {
     int r;
     uint8_t id;
 
-    dev->i2c_dev = i2c_dev;
-    dev->integration_time = integration_time;
-
-    if ((r = i2c_acquire(dev->i2c_dev)) < 0) {
-        DEBUG("[Error] Cannot acquire device: %d\n", r);
-        goto acquire_error;
+    /* Initialise I2C bus */
+    if ((r = i2c_acquire(params->i2c_dev)) < 0) {
+        DEBUG("I2C_dev is: %d.", params->i2c_dev);
+        DEBUG("[Error] Cannot acquire device. I2C error: %d\n", r);
+        return -ENODEV;
     }
 
-    /* Verify sensor ID */
-    if ((r = i2c_read_reg(dev->i2c_dev, TSL4531_Addr, TSL4531_COMMAND(ID_Reg),
+    /* Test for connectivity - verify ID and compare against stored value */
+    if ((r = i2c_read_reg(params->i2c_dev,
+                          params->i2c_addr,
+                          TSL4531X_COMMAND(TSL4531X_ID_REG),
                           &id, 0)) < 0) {
-        DEBUG("[Error] Cannot read ID register: %d\n", r);
-        goto init_error;
-    }
-    DEBUG("[Info] ID ? %d\n", id);
-    if (TSL4531_GET_PARTNO(id) != TSL4531_PARTNO) {
-        DEBUG("[Error] not a TSL4531 sensor\n");
-        r = -ENOTSUP;
-        goto init_error;
+        DEBUG("[Error] Cannot read ID register. I2C error: %d\n", r);
+        i2c_release(params->i2c_dev);
+        return -ENXIO;
     }
 
-    /* configure device */
-    if (((r = i2c_write_reg(dev->i2c_dev , TSL4531_Addr, TSL4531_COMMAND(Control_Reg),
-                  TSL4531_CONTROL(TSL4531x_MODE_Normal), 0)) < 0)
-         ||
-         ((r = i2c_write_reg(dev->i2c_dev , TSL4531_Addr, TSL4531_COMMAND(Configuration_Reg),
-                  TSL4531_CONFIG(1, integration_time), 0)) < 0)) {
-        DEBUG("[Error] Cannot configure device %d\n", r);
-        goto init_error;
+    DEBUG("[Info] tsl4531x sensor ID ? %d\n", id);
+
+    if (TSL4531X_GET_PARTNO(id) != params->part_number) {
+        DEBUG("[Error] not a TSL4531 sensor.\n");
+        i2c_release(params->i2c_dev);
+        return -ENOTSUP;
     }
 
-init_error:
-    /* ignore errors on device release */
-    i2c_release(dev->i2c_dev);
+    /* Configure device. In low power mode, we initially power the sensor down. */
+    if (((r = i2c_write_reg(params->i2c_dev,
+                            params->i2c_addr,
+                            TSL4531X_COMMAND(TSL4531X_CONTROL_REG),
+                            TSL4531X_CONTROL(TSL4531X_POWER_MODE(params->low_power_mode)),
+                            0)) < 0)
+        ||
+        ((r = i2c_write_reg(params->i2c_dev,
+                            params->i2c_addr,
+                            TSL4531X_COMMAND(TSL4531X_CONFIGURATION_REG),
+                            TSL4531X_CONFIG(TSL4531X_PSAVESKIP_ON, params->integration_time),
+                            0)) < 0)) {
 
-acquire_error:
+        DEBUG("[Error] Cannot configure device. I2C error: %d\n", r);
+        i2c_release(params->i2c_dev);
+        return -ENXIO;
+    }
 
-    return r;
+    /* If device was configured correctly, initialise the device descriptor */
+    dev->i2c_dev = params->i2c_dev;
+    dev->i2c_addr = params->i2c_addr;
+    dev->integration_time = params->integration_time;
+    dev->low_power_mode = params->low_power_mode;
+    dev->high_power_mode_started_up = false;
+    dev->sample_start_time = 0; /* Device assumed to start up at same time as
+                                   microcontroller - i.e. when it hits this line */
+
+    i2c_release(params->i2c_dev);
+
+    return 0;
 }
 
-#define _DATALOW 0
-#define _DATAHIGH 1
-
-int tsl4531x_read(const tsl4531x_t *dev, uint16_t *result_lux)
+int tsl4531x_set_low_power_mode(tsl4531x_t *dev, uint8_t low_power_mode)
 {
+    assert(dev);
+
+    int r;
+
+    dev->low_power_mode = low_power_mode;
+
+    if ((r = i2c_acquire(dev->i2c_dev)) < 0) {
+        DEBUG("[Error] Cannot acquire device. I2C error: %d\n", r);
+        return -ENODEV;
+    }
+
+    if ((r = i2c_write_reg(dev->i2c_dev,
+                           dev->i2c_addr,
+                           TSL4531X_COMMAND(TSL4531X_CONTROL_REG),
+                           TSL4531X_CONTROL(TSL4531X_POWER_MODE(low_power_mode)),
+                           0)) < 0) {
+        DEBUG("[Error] Cannot write power mode. I2C error: %d\n", r);
+        i2c_release(dev->i2c_dev);
+        return -ENXIO;
+    }
+
+    i2c_release(dev->i2c_dev);
+
+    /* In high power mode only, we restart the sample ready timer, because only
+       in this mode it's used to indicate readiness after startup. */
+    if (!dev->low_power_mode) {
+        dev->sample_start_time = xtimer_now_usec();
+    }
+
+    return 0;
+}
+
+int tsl4531x_start_sample(tsl4531x_t *dev)
+{
+    assert(dev);
+
+    /* Don't change the mode to one-shot if the device is in high power mode. */
+    if (dev->low_power_mode) {
+
+        int r;
+
+        if ((r = i2c_acquire(dev->i2c_dev)) < 0) {
+            DEBUG("[Error] Cannot acquire device. I2C error: %d\n", r);
+            return -ENODEV;
+        }
+
+        if ((r = i2c_write_reg(dev->i2c_dev,
+                               dev->i2c_addr,
+                               TSL4531X_COMMAND(TSL4531X_CONTROL_REG),
+                               TSL4531X_CONTROL(TSL4531X_MODE_SINGLE_ADC_CYCLE),
+                               0)) < 0) {
+            DEBUG("[Error] Cannot write power mode. I2C error: %d\n", r);
+            i2c_release(dev->i2c_dev);
+            return -ENXIO;
+        }
+
+        i2c_release(dev->i2c_dev);
+
+        dev->sample_start_time = xtimer_now_usec();
+    }
+
+    return 0;
+}
+
+uint32_t tsl4531x_time_until_sample_ready(tsl4531x_t *dev)
+{
+    assert(dev);
+
+    uint32_t t = TSL4531X_GET_INTEGRATION_TIME_USEC(dev->integration_time, TSL4531X_PSAVESKIP_ON) -
+                 (xtimer_now_usec() - dev->sample_start_time);
+
+    /* Clamp t at zero */
+    t = (t <= TSL4531X_GET_INTEGRATION_TIME_USEC(dev->integration_time, TSL4531X_PSAVESKIP_ON) ?
+         t : 0);
+
+    if (!dev->low_power_mode) {
+        if (t == 0) {
+            dev->high_power_mode_started_up = true;
+        }
+        if (dev->high_power_mode_started_up) {
+            return 0;
+        }
+    }
+
+    return t;
+}
+
+int tsl4531x_get_sample(const tsl4531x_t *dev)
+{
+    assert(dev);
+
     int r;
     uint8_t als_data[2]; /* = {[DATALOW], [DATAHIGH]} */
 
     if ((r = i2c_acquire(dev->i2c_dev)) < 0) {
-        DEBUG("[Error] Cannot acquire device: %d\n", r);
-        goto read_acquire_error;
+        DEBUG("[Error] Cannot acquire device. I2C error: %d\n", r);
+        return -ENODEV;
     }
 
-    if ((r = i2c_read_regs(dev->i2c_dev, TSL4531_Addr, TSL4531_COMMAND(ALSData1_Reg),
-                  als_data, 2, 0)) < 0) {
-        (void)ALSData2_Reg; /* suppress warning */
-        DEBUG("[Error] Cannot read device: %d\n", r);
-        goto read_error;
+    if ((r = i2c_read_regs(dev->i2c_dev,
+                           dev->i2c_addr,
+                           TSL4531X_COMMAND(TSL4531X_ALSDATA1_REG),
+                           als_data, 2, 0)) < 0) {
+        DEBUG("[Error] Cannot read data register. I2C error: %d\n", r);
+        i2c_release(dev->i2c_dev);
+        return -ENXIO;
     }
 
-    *result_lux = MULTIPLY_DATA((((uint16_t)als_data[_DATAHIGH]) << 8)
-                            + als_data[_DATALOW], dev->integration_time);
-
-read_error:
-    /* ignore errors on device release */
     i2c_release(dev->i2c_dev);
 
-read_acquire_error:
-    return r;
+    return MULTIPLY_DATA((((uint16_t)als_data[_DATAHIGH]) << 8)
+                         + als_data[_DATALOW], dev->integration_time);
 }
 
+int tsl4531x_simple_read(tsl4531x_t *dev)
+{
+    assert(dev);
+
+    if (dev->low_power_mode) {
+        tsl4531x_start_sample(dev);
+    }
+
+    xtimer_usleep(tsl4531x_time_until_sample_ready(dev));
+
+    return tsl4531x_get_sample(dev);
+}

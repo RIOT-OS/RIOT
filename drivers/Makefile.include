@@ -242,6 +242,10 @@ ifneq (,$(filter tsl2561,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tsl2561/include
 endif
 
+ifneq (,$(filter tsl4531x,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tsl4531x/include
+endif
+
 ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/uart_half_duplex/include
 endif
