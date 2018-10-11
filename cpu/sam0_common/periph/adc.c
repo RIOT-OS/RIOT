@@ -159,7 +159,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     if (line >= ADC_NUMOF) {
         DEBUG("adc: line arg not applicable\n");
@@ -182,7 +182,7 @@ int adc_sample(adc_t line, adc_res_t res)
     ADC_0_DEV->SWTRIG.reg = ADC_SWTRIG_START;
     /* Wait for the result */
     while (!(ADC_0_DEV->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
-    int result = ADC_0_DEV->RESULT.reg;
+    int32_t result = ADC_0_DEV->RESULT.reg;
     _adc_poweroff();
     _done();
     return result;

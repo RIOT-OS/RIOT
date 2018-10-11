@@ -111,9 +111,9 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
-    int sample;
+    int32_t sample;
 
     /* check if resolution is applicable */
     if (res < 0xff) {
@@ -130,7 +130,7 @@ int adc_sample(adc_t line, adc_res_t res)
     dev(line)->CR2 |= ADC_CR2_SWSTART;
     while (!(dev(line)->SR & ADC_SR_EOC)) {}
     /* finally read sample and reset the STRT bit in the status register */
-    sample = (int)dev(line)->DR;
+    sample = (int32_t)dev(line)->DR;
 
     /* power off and unlock device again */
     done(line);

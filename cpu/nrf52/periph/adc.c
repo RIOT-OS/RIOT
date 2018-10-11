@@ -103,7 +103,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     assert(line < ADC_NUMOF);
 
@@ -142,5 +142,5 @@ int adc_sample(adc_t line, adc_res_t res)
      * connected via jumper wire a the board's GND pin. There seems to be a
      * slight difference between the internal CPU GND and the board's GND
      * voltage levels?! (observed on nrf52dk and nrf52840dk) */
-    return (result < 0) ? 0 : (int)result;
+    return (result < 0) ? 0 : (int32_t)result;
 }

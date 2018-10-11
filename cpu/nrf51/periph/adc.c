@@ -55,9 +55,9 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
-    int val;
+    int32_t val;
 
     /* check if resolution is valid */
     if (res > 2) {
@@ -77,7 +77,7 @@ int adc_sample(adc_t line, adc_res_t res)
     /* wait for conversion to be complete */
     while (NRF_ADC->BUSY == 1) {}
     /* get result */
-    val = (int)NRF_ADC->RESULT;
+    val = (int32_t)NRF_ADC->RESULT;
 
     /* free device */
     done();

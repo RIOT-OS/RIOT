@@ -179,9 +179,9 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
-    int sample;
+    int32_t sample;
 
     /* check if resolution is applicable */
     if (res & 0x3) {
@@ -205,7 +205,7 @@ int adc_sample(adc_t line, adc_res_t res)
     while (!(dev(line)->ISR & ADC_ISR_EOC)) {}
 
     /* read the sample */
-    sample = (int)dev(line)->DR;
+    sample = (int32_t)dev(line)->DR;
 
     /* free the device again */
     done(line);

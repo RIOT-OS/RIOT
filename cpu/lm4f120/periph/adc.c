@@ -100,9 +100,9 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
-    int value[2];
+    int32_t value[2];
 
     if ((res != ADC_RES_10BIT) && (res != ADC_RES_12BIT)) {
         return -1;
@@ -114,7 +114,7 @@ int adc_sample(adc_t line, adc_res_t res)
     ROM_ADCSequenceConfigure(ADC0_BASE, SEQ, ADC_TRIGGER_PROCESSOR, 0);
     ROM_ADCSequenceStepConfigure(ADC0_BASE, SEQ, 0, line | ADC_CTL_IE | ADC_CTL_END);
     /* set resolution */
-    ROM_ADCResolutionSet(ADC0_BASE, (unsigned long)res);
+    ROM_ADCResolutionSet(ADC0_BASE, (uint32_t)res);
 
     /* start conversion and wait for results */
     ROM_ADCSequenceEnable(ADC0_BASE, SEQ);
@@ -123,7 +123,7 @@ int adc_sample(adc_t line, adc_res_t res)
     while (!ROM_ADCIntStatus(ADC0_BASE, SEQ, false)) {}
 
     /* get results */
-    ROM_ADCSequenceDataGet(ADC0_BASE, SEQ, (unsigned long *) value);
+    ROM_ADCSequenceDataGet(ADC0_BASE, SEQ, (uint32_t *) value);
 
     /* disable device again */
     ROM_ADCSequenceDisable(ADC0_BASE, SEQ);

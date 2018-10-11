@@ -68,7 +68,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     assert(line < ADC_NUMOF);
 
@@ -89,7 +89,7 @@ int adc_sample(adc_t line, adc_res_t res)
     /* wait for result */
     while (!(ADC->ADC_ISR & ADC_ISR_DRDY)) {}
     /* read result */
-    int sample = (int)(ADC->ADC_LCDR & ADC_LCDR_LDATA_Msk);
+    int32_t sample = (int32_t)(ADC->ADC_LCDR & ADC_LCDR_LDATA_Msk);
 
     /* disable channel */
     ADC->ADC_CHDR = (1 << line);

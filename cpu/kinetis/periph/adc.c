@@ -207,9 +207,9 @@ int adc_init(adc_t line)
     return res;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
-    int sample;
+    int32_t sample;
 
     /* check if resolution is applicable */
     if (res > 0xf0) {
@@ -229,7 +229,7 @@ int adc_sample(adc_t line, adc_res_t res)
     /* wait until conversion is complete */
     while (!(dev(line)->SC1[0] & ADC_SC1_COCO_MASK)) {}
     /* read and return result */
-    sample = (int)dev(line)->R[0];
+    sample = (int32_t)dev(line)->R[0];
 
     /* power off and unlock the device */
     done(line);
