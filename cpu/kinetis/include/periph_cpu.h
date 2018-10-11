@@ -208,7 +208,11 @@ typedef enum {
     ADC_RES_10BIT = ADC_CFG1_MODE(2),   /**< ADC resolution: 10 bit */
     ADC_RES_12BIT = ADC_CFG1_MODE(1),   /**< ADC resolution: 12 bit */
     ADC_RES_14BIT = (0xff),             /**< ADC resolution: 14 bit */
-    ADC_RES_16BIT = ADC_CFG1_MODE(3)    /**< ADC resolution: 16 bit */
+    ADC_RES_16BIT = ADC_CFG1_MODE(3),   /**< ADC resolution: 16 bit */
+    ADC_RES_18BIT = (0xff),             /**< not supported */
+    ADC_RES_20BIT = (0xff),             /**< not supported */
+    ADC_RES_22BIT = (0xff),             /**< not supported */
+    ADC_RES_24BIT = (0xff),             /**< not supported */
 } adc_res_t;
 /** @} */
 

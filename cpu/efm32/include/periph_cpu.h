@@ -71,6 +71,10 @@ typedef enum {
     ADC_RES_12BIT = ADC_MODE(adcRes12Bit, 0),   /**< ADC resolution: 12 bit */
     ADC_RES_14BIT = ADC_MODE_UNDEF(0),          /**< ADC resolution: 14 bit (unsupported) */
     ADC_RES_16BIT = ADC_MODE_UNDEF(1),          /**< ADC resolution: 16 bit (unsupported) */
+    ADC_RES_18BIT = ADC_MODE_UNDEF(2),          /**< ADC resolution: 18 bit (unsupported) */
+    ADC_RES_20BIT = ADC_MODE_UNDEF(3),          /**< ADC resolution: 20 bit (unsupported) */
+    ADC_RES_22BIT = ADC_MODE_UNDEF(4),          /**< ADC resolution: 22 bit (unsupported) */
+    ADC_RES_24BIT = ADC_MODE_UNDEF(5),          /**< ADC resolution: 24 bit (unsupported) */
 } adc_res_t;
 /** @} */
 #endif /* ndef DOXYGEN */

@@ -249,14 +249,18 @@ typedef struct {
  */
 #define HAVE_ADC_RES_T
 typedef enum {
-    ADC_RES_6BIT  =             (0xa00),    /**< not supported by hardware */
+    ADC_RES_6BIT  =             (0x0a00),    /**< not supported by hardware */
     ADC_RES_7BIT  =             (0 << 4),   /**< ADC resolution: 7 bit */
-    ADC_RES_8BIT  =             (0xb00),    /**< not supported by hardware */
+    ADC_RES_8BIT  =             (0x0b00),    /**< not supported by hardware */
     ADC_RES_9BIT  =             (1 << 4),   /**< ADC resolution: 9 bit */
     ADC_RES_10BIT =             (2 << 4),   /**< ADC resolution: 10 bit */
     ADC_RES_12BIT =             (3 << 4),   /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT =             (0xc00),    /**< not supported by hardware */
-    ADC_RES_16BIT =             (0xd00),    /**< not supported by hardware */
+    ADC_RES_14BIT =             (0x0c00),    /**< not supported by hardware */
+    ADC_RES_16BIT =             (0x0d00),    /**< not supported by hardware */
+    ADC_RES_18BIT =             (0x0e00),    /**< not supported by hardware */
+    ADC_RES_20BIT =             (0x0f00),    /**< not supported by hardware */
+    ADC_RES_22BIT =             (0x1000),    /**< not supported by hardware */
+    ADC_RES_24BIT =             (0x1100),    /**< not supported by hardware */
 } adc_res_t;
 /** @} */
 

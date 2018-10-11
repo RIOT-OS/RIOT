@@ -99,12 +99,16 @@ static inline int _sercom_id(SercomUsart *sercom)
  */
 #define HAVE_ADC_RES_T
 typedef enum {
-    ADC_RES_6BIT  = 0xff,                       /**< not supported */
+    ADC_RES_6BIT  = 0x0f,                       /**< not supported */
     ADC_RES_8BIT  = ADC_CTRLB_RESSEL_8BIT,      /**< ADC resolution: 8 bit */
     ADC_RES_10BIT = ADC_CTRLB_RESSEL_10BIT,     /**< ADC resolution: 10 bit */
     ADC_RES_12BIT = ADC_CTRLB_RESSEL_12BIT,     /**< ADC resolution: 12 bit */
-    ADC_RES_14BIT = 0xfe,                       /**< not supported */
-    ADC_RES_16BIT = 0xfd                        /**< not supported */
+    ADC_RES_14BIT = 0x09,                       /**< not supported */
+    ADC_RES_16BIT = 0x0a,                       /**< not supported */
+    ADC_RES_18BIT = 0x0b,                       /**< not supported */
+    ADC_RES_20BIT = 0x0c,                       /**< not supported */
+    ADC_RES_22BIT = 0x0d,                       /**< not supported */
+    ADC_RES_24BIT = 0x0e,                       /**< not supported */
 } adc_res_t;
 /** @} */
 #ifdef __cplusplus

@@ -187,7 +187,11 @@ typedef enum {
     ADC_RES_10BIT = ADC_MR_LOWRES_BITS_10,  /**< ADC resolution: 10 bit */
     ADC_RES_12BIT = ADC_MR_LOWRES_BITS_12,  /**< ADC resolution: 12 bit */
     ADC_RES_14BIT = 0x4,                    /**< not applicable */
-    ADC_RES_16BIT = 0x8                     /**< not applicable */
+    ADC_RES_16BIT = 0x8,                    /**< not applicable */
+    ADC_RES_18BIT = 0x9,                    /**< not applicable */
+    ADC_RES_20BIT = 0xa,                    /**< not applicable */
+    ADC_RES_22BIT = 0xb,                    /**< not applicable */
+    ADC_RES_24BIT = 0xc,                    /**< not applicable */
 } adc_res_t;
 /** @} */
 
