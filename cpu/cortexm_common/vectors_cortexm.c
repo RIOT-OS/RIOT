@@ -165,6 +165,7 @@ __attribute__((naked)) void hard_fault_default(void)
     /* Get stack pointer where exception stack frame lies */
     __asm__ volatile
     (
+        ".syntax unified                    \n"
         /* Check that msp is valid first because we want to stack all the
          * r4-r11 registers so that we can use r0, r1, r2, r3 for other things. */
         "mov r0, sp                         \n" /* r0 = msp                   */
@@ -189,6 +190,22 @@ __attribute__((naked)) void hard_fault_default(void)
         "mrs r0, psp                        \n" /*   r0 = psp                 */
         " out:                              \n" /* }                          */
 #if (__CORTEX_M == 0)
+        /* catch intended HardFaults on Cortex-M0 to probe memory addresses */
+        "ldr     r1, [r0, #0x04]            \n" /* read R1 from the stack        */
+        "ldr     r2, =0xDEADF00D            \n" /* magic number to be found      */
+        "cmp     r1, r2                     \n" /* compare with the magic number */
+        "bne     regular_handler            \n" /* no magic -> handle as usual   */
+        "ldr     r1, [r0, #0x08]            \n" /* read R2 from the stack        */
+        "ldr     r2, =0xCAFEBABE            \n" /* 2nd magic number to be found  */
+        "cmp     r1, r2                     \n" /* compare with 2nd magic number */
+        "bne     regular_handler            \n" /* no magic -> handle as usual   */
+        "ldr     r1, [r0, #0x18]            \n" /* read PC from the stack        */
+        "adds    r1, r1, #2                 \n" /* move to the next instruction  */
+        "str     r1, [r0, #0x18]            \n" /* modify PC in the stack        */
+        "ldr     r5, =0                     \n" /* set R5 to indicate HardFault  */
+        "bx      lr                         \n" /* exit the exception handler    */
+        " regular_handler:                  \n"
+
         "push {r4-r7}                       \n" /* save r4..r7 to the stack   */
         "mov r3, r8                         \n" /*                            */
         "mov r4, r9                         \n" /*                            */
