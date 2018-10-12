@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2017-2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief
+ * @brief       CoRE RD Client static configuration default values
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
@@ -42,10 +42,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default client update interval (default is half the lifetime)
+ * @brief   Default client update interval (default is 3/4 the lifetime)
  */
 #ifndef RDCLI_UPDATE_INTERVAL
-#define RDCLI_UPDATE_INTERVAL   (RDCLI_LT / 2)
+#define RDCLI_UPDATE_INTERVAL   ((RDCLI_LT / 4) * 3)
 #endif
 
 /**
