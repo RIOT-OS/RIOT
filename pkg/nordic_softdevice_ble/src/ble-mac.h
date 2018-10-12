@@ -55,6 +55,10 @@ typedef enum {
 
 #define IPV6_IID_FLIP_VALUE         (0x02)
 
+#ifndef BLE_MAC_MAX_INBUF_NUM
+#define BLE_MAC_MAX_INBUF_NUM (2U) /**< Maximum number of queued packets */
+#endif
+
 #include "net/eui64.h"
 
 /**
@@ -119,8 +123,8 @@ int ble_mac_send(uint8_t dest[8], void *data, size_t len);
 
 extern volatile int ble_mac_busy_tx;    /**< Flag is set to 1 when the driver
                                              is busy transmitting a packet. */
-extern volatile int ble_mac_busy_rx;    /**< Flag is set to 1 when there is a
-                                             received packet pending. */
+extern volatile int ble_mac_busy_rx;    /**< Bitfield, bit set to 1 when there is a
+                                             received packet pending on that inbuf. */
 
 #ifdef __cplusplus
 }

@@ -53,17 +53,24 @@
                                              connection to master devices */
 #endif
 
+#define CONN_HANDLE_INVALID ((uint16_t)-1)
+
 typedef struct {
   uint8_t peer_addr[8];
   ble_ipsp_handle_t handle;
 } ble_mac_interface_t;
+
+static const ble_mac_interface_t BLE_MAC_INTERFACE_UNUSED = {
+    .peer_addr = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    .handle = { .conn_handle = CONN_HANDLE_INVALID, .cid = 0, },
+};
 
 static ble_mac_interface_t interfaces[BLE_MAC_MAX_INTERFACE_NUM];
 
 volatile int ble_mac_busy_tx;
 volatile int ble_mac_busy_rx;
 
-static ble_mac_inbuf_t inbuf;
+static ble_mac_inbuf_t ble_mac_inbuf[BLE_MAC_MAX_INBUF_NUM];
 static ble_mac_callback_t _callback;
 
 /**
@@ -103,9 +110,11 @@ static ble_mac_interface_t *ble_mac_interface_add(uint8_t peer[8],
 {
     DEBUG("ble_mac_interface_add()\n");
     for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
-        if (interfaces[i].handle.conn_handle == 0 && interfaces[i].handle.cid == 0) {
+        if (interfaces[i].handle.conn_handle == CONN_HANDLE_INVALID && interfaces[i].handle.cid == 0) {
             memcpy(&interfaces[i].handle, handle, sizeof(ble_ipsp_handle_t));
             memcpy(&interfaces[i].peer_addr, peer, 8);
+            DEBUG("ble_mac_inferface_add(): %d: [handle:%d, CID 0x%04X]\n",
+                  i, interfaces[i].handle.conn_handle, interfaces[i].handle.cid);
 
             /* notify handler thread */
             /* msg_t m = { .type = BLE_IFACE_ADDED, .content.ptr = &interfaces[i] }; */
@@ -124,7 +133,7 @@ static ble_mac_interface_t *ble_mac_interface_add(uint8_t peer[8],
 static void ble_mac_interface_delete(ble_mac_interface_t *interface)
 {
     DEBUG("ble_mac_interface_delete()\n");
-    memset(interface, 0, sizeof(ble_mac_interface_t));
+    *interface = BLE_MAC_INTERFACE_UNUSED;
 }
 
 /**
@@ -152,7 +161,7 @@ static ble_ipsp_handle_t *_find_handle(const uint8_t *addr)
  */
 static int _send_to_peer(ble_ipsp_handle_t *handle, void *data, size_t len)
 {
-  DEBUG("ble-mac: sending packet[GAP handle:%d CID:0x%04X]\n",
+  DEBUG("ble-mac: sending packet [handle:%d CID 0x%04X]\n",
           handle->conn_handle, handle->cid);
   return ble_ipsp_send(handle, data, len);
 }
@@ -183,7 +192,9 @@ int ble_mac_send(uint8_t dest[8], void *data, size_t len)
     if ((!dest) || _is_broadcast(dest)) {
         DEBUG("broadcast\n");
         for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
-            if (interfaces[i].handle.cid != 0 && interfaces[i].handle.conn_handle != 0) {
+            DEBUG("ble_mac_send(): interface %d: [handle:%d, CID 0x%04X]\n",
+                  i, interfaces[i].handle.conn_handle, interfaces[i].handle.cid);
+            if (interfaces[i].handle.cid != 0 && interfaces[i].handle.conn_handle != CONN_HANDLE_INVALID) {
                 ret = _send_to_peer(&interfaces[i].handle, data, len);
                 DEBUG("ret=%i\n", ret);
             }
@@ -205,6 +216,24 @@ int ble_mac_send(uint8_t dest[8], void *data, size_t len)
         DEBUG("ble-mac: send error: %i\n", ret);
         return -1;
     }
+}
+
+static ble_mac_inbuf_t *get_inbuf(unsigned int *indexp)
+{
+#define BLE_MAC_ALL_INBUFS_BUSY (~(((unsigned int)-1) << BLE_MAC_MAX_INBUF_NUM))
+    if (ble_mac_busy_rx == BLE_MAC_ALL_INBUFS_BUSY) {
+        return NULL;
+    }
+    for (int i = 0; i < BLE_MAC_MAX_INBUF_NUM; i++) {
+        const unsigned int mask = 1 << i;
+        if (ble_mac_busy_rx & mask)
+            continue;
+        /* Found an empty one */
+        ble_mac_busy_rx |= mask;
+        *indexp = i;
+        return ble_mac_inbuf + i;
+    }
+    core_panic(PANIC_SOFT_REBOOT, "ble-mac: could not find free inbuf: scheduling conflict?");
 }
 
 static uint32_t ble_mac_ipsp_evt_handler_irq(ble_ipsp_handle_t const *p_handle, ble_ipsp_evt_t const *p_evt)
@@ -248,28 +277,31 @@ static uint32_t ble_mac_ipsp_evt_handler_irq(ble_ipsp_handle_t const *p_handle, 
         }
 
         case BLE_IPSP_EVT_CHANNEL_DATA_RX: {
-            DEBUG("ble-mac: data received\n");
             if (p_instance != NULL) {
-                if (ble_mac_busy_rx) {
-                    DEBUG("ble-mac: packet dropped as input buffer is busy\n");
+                const uint32_t len = p_evt->p_evt_param->p_l2cap_evt->params.rx.sdu_buf.len;
+
+                DEBUG("ble-mac: data received, len=%d\n", len);
+
+                unsigned int index; // Buffer index
+                ble_mac_inbuf_t *const inbuf = get_inbuf(&index);
+                if (!inbuf) {
+                    DEBUG("ble-mac: packet dropped as input buffers are busy\n");
                     break;
                 }
 
-                if (p_evt->p_evt_param->p_l2cap_evt->params.rx.sdu_len > BLE_SIXLOWPAN_MTU) {
+                if (len > BLE_SIXLOWPAN_MTU) {
                     DEBUG("ble-mac: packet buffer is too small!\n");
                     break;
                 }
 
-                ble_mac_busy_rx = 1;
-
-                inbuf.len = p_evt->p_evt_param->p_l2cap_evt->params.rx.sdu_buf.len;
-                memcpy(inbuf.payload,
+                inbuf->len = len;
+                memcpy(inbuf->payload,
                        p_evt->p_evt_param->p_l2cap_evt->params.rx.sdu_buf.p_data,
-                       inbuf.len);
-                memcpy(inbuf.src, p_instance->peer_addr, 8);
-                sd_ble_gap_rssi_get(p_handle->conn_handle, &inbuf.rssi, &inbuf.ch_index);
+                       inbuf->len);
+                memcpy(inbuf->src, p_instance->peer_addr, 8);
+                sd_ble_gap_rssi_get(p_handle->conn_handle, &inbuf->rssi, &inbuf->ch_index);
 
-                _callback(BLE_EVENT_RX_DONE, &inbuf);
+                _callback(BLE_EVENT_RX_DONE + index, inbuf);
             }
             else {
                 DEBUG("ble-mac: got data to unknown interface!\n");
@@ -302,6 +334,10 @@ void ble_mac_init(ble_mac_callback_t callback)
     };
 
     _callback = callback;
+
+    for (int i = 0; i < BLE_MAC_MAX_INTERFACE_NUM; i++) {
+        interfaces[i] = BLE_MAC_INTERFACE_UNUSED;
+    }
 
     res = ble_ipsp_init(&ipsp_init_params);
     DEBUG("ble_ipsp_init() res = %" PRIu32 "\n", res);

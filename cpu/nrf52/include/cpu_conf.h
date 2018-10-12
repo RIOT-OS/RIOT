@@ -237,6 +237,21 @@ static inline void nrf52_sleep(void)
     __asm("nop");
 }
 
+/*
+ * Linux BLE sends up to 1280 bytes long packets and we need
+ * to be able to buffer at least three of them.
+ *
+ * XXX TODO: Find the appropriate spec and document.
+ */
+#ifndef BLE_MAC_MIN_PKTBUF_SIZE
+// #define BLE_MAC_MIN_PKTBUF_SIZE ((4*1280)+256)
+#define BLE_MAC_MIN_PKTBUF_SIZE 20000    // XXX: FIXME
+#endif
+#if (defined(GNRC_PKTBUF_SIZE)) && (GNRC_PKTBUF_SIZE < BLE_MAC_MIN_PKTBUF_SIZE)
+#   undef  GNRC_PKTBUF_SIZE
+#   define GNRC_PKTBUF_SIZE     BLE_MAC_MIN_PKTBUF_SIZE
+#endif
+
 #ifdef __cplusplus
 }
 #endif

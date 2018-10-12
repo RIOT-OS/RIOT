@@ -255,14 +255,11 @@ static gnrc_pktsnip_t *_netif_recv(gnrc_netif_t *netif)
 
 static void _netif_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 {
-    switch (msg->type) {
-        case BLE_EVENT_RX_DONE:
-            {
-                DEBUG("ble rx:\n");
-                _handle_raw_sixlowpan(msg->content.ptr);
-                ble_mac_busy_rx = 0;
-                break;
-            }
+    if (msg->type >= BLE_EVENT_RX_DONE && msg->type < BLE_EVENT_RX_DONE + BLE_MAC_MAX_INBUF_NUM) {
+        const unsigned int inbufnum = msg->type - BLE_EVENT_RX_DONE;
+        DEBUG("_netif_msg_handler: ble rx: i=%d\n", inbufnum);
+        _handle_raw_sixlowpan(msg->content.ptr);
+        ble_mac_busy_rx &= ~(1 << inbufnum);
     }
 }
 
