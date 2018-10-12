@@ -67,7 +67,7 @@ void delayMicroseconds(unsigned long usec)
     xtimer_usleep(usec);
 }
 
-unsigned int micros()
+unsigned long micros()
 {
     return xtimer_now_usec();
 }
