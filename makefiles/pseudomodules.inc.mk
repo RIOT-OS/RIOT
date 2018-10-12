@@ -111,6 +111,9 @@ PSEUDOMODULES += si7013
 PSEUDOMODULES += si7020
 PSEUDOMODULES += si7021
 
+# include variants of VCNL40x0 drivers as pseudo modules
+PSEUDOMODULES += vcnl40x0_full
+
 # include variants of RN2XX3 drivers as pseudo modules
 PSEUDOMODULES += rn2483
 PSEUDOMODULES += rn2903
