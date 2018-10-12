@@ -250,6 +250,10 @@ ifneq (,$(filter veml6070,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/veml6070/include
 endif
 
+ifneq (,$(filter vcnl40x0,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/vcnl40x0/include
+endif
+
 ifneq (,$(filter w5100,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/w5100/include
 endif

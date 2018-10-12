@@ -452,6 +452,15 @@ ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter vcnl40x0,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter vcnl40x0_full,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += vcnl40x0
+endif
+
 ifneq (,$(filter veml6070,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
