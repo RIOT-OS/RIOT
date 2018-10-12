@@ -12,4 +12,4 @@ FEATURES_PROVIDED += periph_uart
 FEATURES_MCU_GROUP = cortex_m0_2
 
 # samr30 is a specific flavor of saml21
--include $(RIOTCPU)/saml21/Makefile.features
+include $(RIOTCPU)/saml21/Makefile.features

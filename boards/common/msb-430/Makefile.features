@@ -1,1 +1,1 @@
--include $(RIOTCPU)/msp430fxyz/Makefile.features
+include $(RIOTCPU)/msp430fxyz/Makefile.features
