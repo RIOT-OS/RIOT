@@ -74,7 +74,7 @@ int chacha_init(chacha_ctx *ctx,
  * @details If you want to seek inside the cipher steam, then you have to
  *          update the clock in `ctx->state[13]:ctx->state[12]` manually.
  *
- * @warning You need to re-initialized the context with a new nonce after 2^64
+ * @warning You need to re-initialize the context with a new nonce after 2^64
  *          encrypted blocks, or the keystream will repeat!
  *
  * @param[in,out] ctx The ChaCha context
@@ -88,7 +88,7 @@ void chacha_keystream_bytes(chacha_ctx *ctx, void *x);
  * @details @p m is always the input regardless if it is the plaintext or ciphertext,
  *          and @p c vice verse.
  *
- * @warning You need to re-initialized the context with a new nonce after 2^64
+ * @warning You need to re-initialize the context with a new nonce after 2^64
  *          encrypted blocks, or the keystream will repeat!
  *
  * @param[in,out] ctx The ChaCha context.
