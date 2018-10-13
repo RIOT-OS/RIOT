@@ -60,8 +60,8 @@ typedef struct
  * @param[in]  keylen  Length (in bytes) of @p key. Must be 16 or 32.
  * @param[in]  nonce   IV / nonce to use.
  *
- * @returns `== 0` on success.
- * @returns `< 0` if an illegal value for @p rounds or @p keylen was suppplied.
+ * @return     `== 0` on success.
+ * @return     `< 0` if an illegal value for @p rounds or @p keylen was suppplied.
  */
 int chacha_init(chacha_ctx *ctx,
                 unsigned rounds,
@@ -130,6 +130,8 @@ void chacha_prng_seed(const void *data, size_t bytes);
  *
  * @warning After you have read 2^68 numbers you have to re-seed the PRNG.
  *          Otherwise the sequence will repeat.
+ *
+ * @return The random value
  */
 uint32_t chacha_prng_next(void);
 
