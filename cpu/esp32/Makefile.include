@@ -29,6 +29,10 @@ endif
 # SPECIAL module dependencies
 # cannot be done in Makefile.dep since Makefile.dep is included too late
 
+ifneq (,$(findstring core_thread_flags,$(USEMODULE)))
+    USEMODULE += pthread
+endif
+
 ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
     USEMODULE += esp_gdb
 endif
@@ -57,18 +61,13 @@ export CPU ?= esp32
 export TARGET_ARCH ?= xtensa-esp32-elf
 export ESPTOOL ?= $(ESP32_SDK_DIR)/components/esptool_py/esptool/esptool.py
 
-USEMODULE += core_thread_flags
 USEMODULE += esp_idf
 USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32
 USEMODULE += esp_idf_soc
-USEMODULE += esp_idf_spi_flash
 USEMODULE += log
-USEMODULE += mtd
 USEMODULE += periph
 USEMODULE += periph_common
-USEMODULE += pthread
-USEMODULE += ps
 USEMODULE += random
 USEMODULE += xtensa
 
@@ -137,7 +136,7 @@ ifneq (,$(filter pthread,$(USEMODULE)))
     LINKFLAGS += $(BINDIR)/pthread.a
 endif
 
-LINKFLAGS += -lhal -lc -lg
+LINKFLAGS += -lhal -lg -lc -lg
 LINKFLAGS += -Wl,--end-group
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.ld

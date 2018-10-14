@@ -52,6 +52,7 @@ endif
 
 # each device has SPI flash memory, but must be explicitly enabled
 ifneq (,$(filter esp_spiffs,$(USEMODULE)))
+    USEMODULE += esp_idf_spi_flash
     USEMODULE += spiffs
     USEMODULE += vfs
     export SPIFFS_STD_OPTION = -std=c99
@@ -70,6 +71,7 @@ endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
+    USEMODULE += ps
     USEMODULE += xtimer
 endif
 

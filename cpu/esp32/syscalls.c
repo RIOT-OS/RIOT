@@ -113,6 +113,22 @@ int IRAM printf(const char* format, ...)
     return ret;
 }
 
+#ifndef MODULE_PTHREAD
+
+#define PTHREAD_CANCEL_DISABLE 1
+/*
+ * This is a dummy function to avoid undefined references when linking
+ * against newlib and module pthread is not used.
+ */
+int pthread_setcancelstate(int state, int *oldstate)
+{
+    if (oldstate) {
+        *oldstate = PTHREAD_CANCEL_DISABLE;
+    }
+    return 0;
+}
+#endif /*  MODULE_PTHREAD*/
+
 /**
  * @name Locking functions
  *
