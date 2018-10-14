@@ -199,6 +199,12 @@ ifneq (,$(filter hts221,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter il3829,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+  FEATURES_REQUIRED += periph_gpio
+  USEMODULE += spi_display
+endif
+
 ifneq (,$(filter ina220,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
