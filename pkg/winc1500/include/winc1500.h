@@ -63,6 +63,7 @@
 #include "net/netdev.h"
 #include "net/ethernet.h"
 #endif
+#include "winc1500_internal_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -146,11 +147,13 @@ typedef struct {
     /** TODO: Try to remove this */
     uint8_t  frame_buf[ETHERNET_FRAME_LEN]; /**< Frame buffer to send */
 #endif
-    winc1500_params_t params;   /**< Configuration parameters */
-    mbox_t event_mbox;          /**< Message from the event handler */
-    uint32_t ip_addr;           /**< Device's local IPv4 address */
-    uint8_t  state;             /**< current state of the radio */
-    kernel_pid_t pid;           /**< pid of the event handler thread */
+    winc1500_params_t params;     /**< Configuration parameters */
+    mbox_t event_mbox;            /**< Message from the event handler */
+    uint32_t ip_addr;             /**< Device's local IPv4 address */
+    uint8_t mac_addr[6];          /**< The device's mac address */
+    uint8_t  state;               /**< current state of the radio */
+    kernel_pid_t pid;             /**< pid of the event handler thread */
+    winc1500_internal_t internal; /**< Struct used for Atmel's driver. */
 } winc1500_t;
 
 /**
