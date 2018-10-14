@@ -247,6 +247,13 @@ void  thread_yield_higher(void)
     }
     #endif
 
+    /*
+     * Instruction fetch synchronize: Waits for all previously fetched load,
+     * store, cache, and special register write instructions that affect
+     * instruction fetch to be performed before fetching the next instruction.
+     */
+    __asm__("isync");
+
     return;
 }
 
