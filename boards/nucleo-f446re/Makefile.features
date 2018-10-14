@@ -8,6 +8,9 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_qdec
 
+# Various other features (if any)
+FEATURES_PROVIDED += motor_driver
+
 # load the common Makefile.features for Nucleo boards
 include $(RIOTBOARD)/common/nucleo64/Makefile.features
 
