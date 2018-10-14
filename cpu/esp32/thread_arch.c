@@ -335,15 +335,18 @@ static bool _initial_exit = true;
  */
 NORETURN void task_exit(void)
 {
-    DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n", sched_active_thread->pid);
+    DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
+          sched_active_thread ? sched_active_thread->pid : KERNEL_PID_UNDEF);
 
     (void) irq_disable();
 
-    /* remove old task from scheduling */
-    sched_threads[sched_active_pid] = NULL;
-    sched_num_threads--;
-    sched_set_status((thread_t *)sched_active_thread, STATUS_STOPPED);
-    sched_active_thread = NULL;
+    /* remove old task from scheduling if it is not already done */
+    if (sched_active_thread) {
+        sched_threads[sched_active_pid] = NULL;
+        sched_num_threads--;
+        sched_set_status((thread_t *)sched_active_thread, STATUS_STOPPED);
+        sched_active_thread = NULL;
+    }
 
     /* determine the new running task */
     sched_run();
@@ -370,6 +373,8 @@ NORETURN void task_exit(void)
 
 NORETURN void cpu_switch_context_exit(void)
 {
+    DEBUG("%s\n", __func__);
+
     /* Switch context to the highest priority ready task without context save */
     if (_initial_exit) {
         _initial_exit = false;
