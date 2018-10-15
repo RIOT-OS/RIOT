@@ -1,3 +1,5 @@
+MODULE = rdcli_simple
+
 SRC = rdcli_simple.c
 
 ifneq (,$(filter rdcli_simple_standalone,$(USEMODULE)))

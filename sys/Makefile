@@ -128,13 +128,13 @@ ifneq (,$(filter skald,$(USEMODULE)))
   DIRS += net/skald
 endif
 ifneq (,$(filter rdcli_common,$(USEMODULE)))
-  DIRS += net/application_layer/rdcli_common
+  DIRS += net/application_layer/cord/common
 endif
 ifneq (,$(filter rdcli_simple,$(USEMODULE)))
-    DIRS += net/application_layer/rdcli_simple
+    DIRS += net/application_layer/cord/epsim
 endif
 ifneq (,$(filter rdcli,$(USEMODULE)))
-    DIRS += net/application_layer/rdcli
+    DIRS += net/application_layer/cord/ep
 endif
 
 
