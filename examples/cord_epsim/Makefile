@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = rdcli_simple
+APPLICATION = cord_epsim
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -40,8 +40,8 @@ RD_LT ?= 60
 RD_ADDR ?= \"ff02::1\"
 RD_PORT ?= 5683
 
-CFLAGS += -DRDCLI_LT=$(RD_LT)
-CFLAGS += -DRDCLI_SERVER_ADDR=$(RD_ADDR)
-CFLAGS += -DRDCLI_SERVER_PORT=$(RD_PORT)
+CFLAGS += -DCORD_LT=$(RD_LT)
+CFLAGS += -DCORD_SERVER_ADDR=$(RD_ADDR)
+CFLAGS += -DCORD_SERVER_PORT=$(RD_PORT)
 
 include $(RIOTBASE)/Makefile.include

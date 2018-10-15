@@ -1,15 +1,15 @@
-CoRE Resource Directory: Simple Registration Example
-====================================================
+CoRE Resource Directory: Simple Endpoint Example
+================================================
 
 This example shows how a node can register with a CoRE resource directory using
-the simple registration process as described in
-draft-ietf-core-resource-directory-11, section 5.3.2.
+the simple registration procedure as described in
+draft-ietf-core-resource-directory-15, section 5.3.1.
 
 The registration process needs an endpoint name as well as a lifetime for the
-registry entry. You can edit these values by overriding `RDCLI_EP` and
-`RDCLI_LT`:
+registry entry. These are statically defined during compile time and you can
+edit these values by overriding `CORD_EP` and `CORD_LT`:
 ```
-CFLAGS="-DRDCLI_LT=\"7200\" -DRDCLI_EP=\"MyNode\"" make all
+CFLAGS="-DCORD_LT=\"7200\" -DCORD_EP=\"MyNode\"" make all
 ```
 
 Per default, the node is looking for the CoRE RD at the all nodes link-local
