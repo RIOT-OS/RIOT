@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Gilles DOFFE <gdoffe@gmail.com>
+ * Copyright (C) 2017 Gilles DOFFE <g.doffe@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,7 +14,7 @@
  * @file
  * @brief       Low-level QDEC driver implementation
  *
- * @author      Gilles DOFFE <gilles.doffe@gmail.com>
+ * @author      Gilles DOFFE <g.doffe@gmail.com>
  *
  * @}
  */
