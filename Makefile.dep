@@ -749,14 +749,14 @@ ifneq (,$(filter skald,$(USEMODULE)))
   USEMODULE += random
 endif
 
-ifneq (,$(filter rdcli_simple_standalone,$(USEMODULE)))
-  USEMODULE += rdcli_simple
+ifneq (,$(filter cord_epsim_standalone,$(USEMODULE)))
+  USEMODULE += cord_epsim
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter rdcli_simple,$(USEMODULE)))
+ifneq (,$(filter cord_epsim,$(USEMODULE)))
   USEMODULE += cord_common
-  USEMODULE += fmt
+  USEMODULE += gcoap
 endif
 
 ifneq (,$(filter rdcli_standalone,$(USEMODULE)))
@@ -776,7 +776,6 @@ endif
 
 ifneq (,$(filter cord_common,$(USEMODULE)))
   USEMODULE += fmt
-  USEMODULE += gcoap
   USEMODULE += luid
 endif
 

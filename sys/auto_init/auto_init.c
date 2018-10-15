@@ -168,10 +168,10 @@ void auto_init(void)
     extern void rdcli_standalone_run(void);
     rdcli_standalone_run();
 #endif
-#ifdef MODULE_RDCLI_SIMPLE_STANDALONE
-    DEBUG("Auto init rdcli_simple module\n");
-    extern void rdcli_simple_run(void);
-    rdcli_simple_run();
+#ifdef MODULE_CORD_EPSIM_STANDALONE
+    DEBUG("Auto init cord_epsim module\n");
+    extern void cord_epsim_run(void);
+    cord_epsim_run();
 #endif
 #ifdef MODULE_ASYMCUTE
     DEBUG("Auto init Asymcute\n");

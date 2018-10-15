@@ -20,7 +20,7 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 
 # Run the simple CoRE resource directory
-USEMODULE += rdcli_simple_standalone
+USEMODULE += cord_epsim_standalone
 
 # Include the shell for testing purposes
 USEMODULE += shell
