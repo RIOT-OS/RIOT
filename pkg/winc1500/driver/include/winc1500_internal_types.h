@@ -139,10 +139,10 @@ typedef struct winc1500_internal {
 #if	!defined(MODULE_NETDEV_ETH)
     /**< Used in socket.c in Atmel driver */
     volatile sint8 gsockerrno;
-    volatile tstrSocket gastrSockets[MAX_SOCKET];
+    volatile struct tstrSocket gastrSockets[MAX_SOCKET];
     volatile uint8 gu8OpCode;
     volatile uint16 gu16BufferSize;
-    volatile uint16 gu16SessionID       /**< Should be initialized as 0 */
+    volatile uint16 gu16SessionID;      /**< Should be initialized as 0 */
 
     volatile tpfAppSocketCb gpfAppSocketCb;
     volatile tpfAppResolveCb gpfAppResolveCb;

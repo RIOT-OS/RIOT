@@ -23,9 +23,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
-/* From pkg/winc1500 */
-#include "driver/source/m2m_hif.h"
-#include "bsp/include/nm_bsp.h"
 
 #include "mutex.h"
 #include "winc1500.h"
@@ -35,6 +32,10 @@
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
 #include "net/netstats.h"
+
+/* From pkg/winc1500 */
+#include "driver/source/m2m_hif.h"
+#include "bsp/include/nm_bsp.h"
 
 #define ENABLE_DEBUG (1)
 #include "debug.h"
@@ -72,7 +73,7 @@ static void _isr(netdev_t *netdev)
 
     _lock_bus(dev);
     /* Handling events will be done in the callback */
-    m2m_wifi_handle_events(NULL);
+    m2m_wifi_handle_events(dev, NULL);
     _unlock_bus(dev);
 }
 
@@ -87,8 +88,9 @@ static int _init(netdev_t *netdev)
 
     /* Initialize the WINC1500 BSP. */
     dev->pid = thread_getpid();
-    nm_bsp_init();
-    nm_bsp_register_isr(winc1500_isr);
+    _init_internal(&dev->internal);
+    nm_bsp_init(dev);
+    nm_bsp_register_isr(dev, winc1500_isr);
 
     tstrWifiInitParam wifi_param;
     memset((uint8_t *)&wifi_param, 0, sizeof(tstrWifiInitParam));
@@ -103,20 +105,20 @@ static int _init(netdev_t *netdev)
     wifi_param.strEthInitParam.u16ethRcvBufSize = 0;
     wifi_param.strEthInitParam.pfAppEthCb = NULL;
 
-    if (M2M_SUCCESS != m2m_wifi_init(&wifi_param)) {
+    if (M2M_SUCCESS != m2m_wifi_init(dev, &wifi_param)) {
         return WINC1500_ERR;
     }
 
     /* Register WINC1500's internal wifi callback instead of the driver's callback
      *  for RIOT GNRC
      */
-    hif_register_cb(M2M_REQ_GROUP_WIFI, _wifi_cb);
+    hif_register_cb(dev, M2M_REQ_GROUP_WIFI, _wifi_cb);
 
     /* Initialize winc1500 struct */
     mutex_init(&dev->mutex);
-    mbox_init(&dev->event_mbox, _mbox_msgs, WINC1500_EVENT_MBOX_LEN);
+    mbox_init(&dev->event_mbox, dev->event_mbox_queue, WINC1500_EVENT_MBOX_LEN);
 
-    m2m_wifi_get_mac_address((uint8_t *)&dev->mac_addr);
+    m2m_wifi_get_mac_address(dev, (uint8_t *)&dev->mac_addr);
     dev->state = 0 | WINC1500_STATE_INIT;
     dev->state |= WINC1500_STATE_IDLE;
 
@@ -141,7 +143,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         /* TODO: what if the module's buffer full? */
     }
     /* Send Packet */
-    m2m_wifi_send_ethernet_pkt(dev->frame_buf, len);
+    m2m_wifi_send_ethernet_pkt(dev, dev->frame_buf, len);
 
 #ifdef MODULE_NETSTATS_L2
     netdev->stats.tx_bytes += len;
@@ -163,7 +165,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     /* Get the expected byte size to receive */
     if ((buf == NULL) && (len == 0)) {
-        ret = hif_receive(dev->rx_addr, (uint8_t *) &event_info,
+        ret = hif_receive(dev, dev->rx_addr, (uint8_t *) &event_info,
                                 sizeof(tstrM2mIpRsvdPkt), 0);
         if (ret == M2M_SUCCESS) {
             dev->rx_offset = event_info.recv_pkt.u16PktOffset;
@@ -180,7 +182,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         netdev->stats.rx_count++;
         netdev->stats.rx_bytes += len;
 #endif
-        ret = hif_receive(dev->rx_addr + dev->rx_offset, buf, len, 1);
+        ret = hif_receive(dev, dev->rx_addr + dev->rx_offset, buf, len, 1);
         if (ret == M2M_SUCCESS) {
             return len;
         }
@@ -191,7 +193,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     }
     else if ((buf == NULL) && (len > 0)) {
         /* Upper layer wants to drop the packet */
-        hif_receive(0, NULL, 0, 1);
+        hif_receive(dev, 0, NULL, 0, 1);
         return 0;
     }
     DEBUG("winc1500_netdev: Unexpected recv() case\n");
@@ -200,7 +202,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
-    /* winc1500_t *dev = (winc1500_t *) netdev; */
+    winc1500_t *dev = (winc1500_t *) netdev;
     int res = 0;
 
     switch (opt) {
@@ -209,7 +211,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
                 res = -EINVAL;
             }
             else {
-                winc1500_get_mac_addr((uint8_t*)value);
+                winc1500_get_mac_addr(dev, (uint8_t*)value);
                 res = ETHERNET_ADDR_LEN;
             }
             break;

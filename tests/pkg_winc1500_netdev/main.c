@@ -35,6 +35,15 @@ static int _info(int argc, char **argv);
 #define MAIN_QUEUE_SIZE     (8U)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
+#ifdef MODULE_NETDEV_ETH
+/* Import winc1500 objects from auto_init_winc1500.c */
+extern winc1500_t winc1500_devs[];
+winc1500_t *winc1500_dev = &winc1500_devs[0];
+#else
+winc1500_t winc1500;
+winc1500_t *winc1500_dev = &winc1500;
+#endif
+
 static const shell_command_t shell_commands[] = {
     { "init", "initializes WINC1500 module", _init },
     { "scan", "Scan for Access Points available", _scan },
@@ -52,9 +61,9 @@ static int _init(int argc, char **argv)
 #ifdef MODULE_NETDEV_ETH
     puts("winc1500_init() won't have any effect if GNRC(NETDEV_ETH) is enabled.");
 #endif
-    if (WINC1500_OK == winc1500_init(&winc1500_params[0])) {
+    if (WINC1500_OK == winc1500_init(winc1500_dev, &winc1500_params[0])) {
         uint8_t mac[6];
-        winc1500_get_mac_addr(mac);
+        winc1500_get_mac_addr(winc1500_dev, mac);
         printf("MAC Address : ");
         printf("%02X:%02X:%02X:%02X:%02X:%02X\n",
             mac[0], mac[1],
@@ -73,7 +82,7 @@ static int _scan(int argc, char **argv)
     (void)argc;
     (void)argv;
     
-    int result = winc1500_scan();
+    int result = winc1500_scan(winc1500_dev);
     if (result < 0) {
         puts("[Scanning error]");
         return 1;
@@ -83,7 +92,7 @@ static int _scan(int argc, char **argv)
     char ssid[WINC1500_MAX_SSID_LEN];
     winc1500_ap_t ap = {.ssid = ssid};
     for (int i = 0; i < result; i++) {
-        winc1500_read_ap(&ap, i);
+        winc1500_read_ap(winc1500_dev, &ap, i);
         printf("[%d] %s %d dBm ", i, ssid, ap.rssi);
         if (ap.sec & WINC1500_SEC_FLAGS_ENTERPRISE) {
             puts("WPA_Enterprise");
@@ -128,7 +137,7 @@ static int _connect(int argc, char **argv)
         ap.sec = WINC1500_SEC_FLAGS_WPA2;
     }
 
-    int result = winc1500_connect(&ap);
+    int result = winc1500_connect(winc1500_dev, &ap);
     if (result == WINC1500_OK) {
         puts("[OK]");
         return 0;
@@ -144,7 +153,7 @@ static int _disconnect(int argc, char **argv)
     (void)argc;
     (void)argv;
     
-    int result = winc1500_disconnect();
+    int result = winc1500_disconnect(winc1500_dev);
     if (result == WINC1500_OK) {
         puts("[OK]");
         return 0;
@@ -163,7 +172,7 @@ static int _info(int argc, char **argv)
     uint8_t mac[6];
     winc1500_ap_t ap = {.ssid = ssid};
     
-    int result = winc1500_connection_info(&ap, mac);
+    int result = winc1500_connection_info(winc1500_dev, &ap, mac);
     if (result < 0) {
         puts("Wi-Fi is not connected yet.");
         puts("[Failed]");

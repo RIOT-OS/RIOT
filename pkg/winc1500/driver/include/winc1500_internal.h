@@ -34,15 +34,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name WINC1500 driver configuration
- * @{
- */
-#define WINC1500_STACKSIZE       (256 + 512)
-#define WINC1500_EVENT_QUEUE_LEN       (1)
-#define WINC1500_EVENT_MBOX_LEN        (1)
-/** @} */
-
-/**
  * @name   Flags for device internal states (see datasheet)
  * @{
  */
@@ -78,25 +69,23 @@ typedef enum {
                                                         WiFi information done */
 } winc1500_cb_msg_t;
 
-extern winc1500_t winc1500; /**< winc1500 object */
-
 /**
  * @name   Message queue and data to be passed to the caller
  *          from the event handler
  * @{
  */
-extern msg_t _queue[WINC1500_EVENT_QUEUE_LEN];
-extern msg_t _mbox_msgs[WINC1500_EVENT_MBOX_LEN];
-
-extern char _ssid[WINC1500_MAX_SSID_LEN + 1];
-extern winc1500_ap_t _ap;
 extern uint8_t *_mac_addr;
 /** @} */
 
 /**
  * @brief   A callback function when a Wi-Fi event received.
  */
-void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr);
+void _wifi_cb(winc1500_t *dev, uint8_t opcode, uint16_t size, uint32_t addr);
+
+/**
+ * @brief   Initialize internal structure.
+ */
+void _init_internal(winc1500_internal_t *internal);
 
 /**
  * @brief   Prevent other threads from entering the function concurrently.

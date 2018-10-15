@@ -17,25 +17,22 @@
  *
  * @}
  */
-/* From pkg/winc1500 */
-#include "driver/include/m2m_wifi.h"
-#include "driver/source/m2m_hif.h"
-
 #include "winc1500.h"
 #include "winc1500_internal.h"
 #include <string.h>
 
+/* From pkg/winc1500 */
+#include "driver/include/m2m_wifi.h"
+#include "driver/source/m2m_hif.h"
+
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
-static void _process_event(uint8_t msg_type, void *payload);
+static void _process_event(winc1500_t *dev, uint8_t msg_type, void *payload);
 
 
-void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr)
+void _wifi_cb(winc1500_t *dev, uint8_t opcode, uint16_t size, uint32_t addr)
 {
-#ifdef MODULE_NETDEV_ETH
-    winc1500_t *dev = &winc1500;
-#endif
     /**
      * The code is originally from m2m_wifi_cb() in m2m_wifi.c. The code is
      * modified for GNRC.
@@ -43,6 +40,7 @@ void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr)
      * _process_event().
      */
     (void) size; /* This one is originally used when CONF_MGMT is set */
+	winc1500_internal_t *internal = &dev->internal;
     winc1500_event_info_t event_info;
     uint16_t recv_size = 0;
     uint8_t is_done = 0;
@@ -70,8 +68,7 @@ void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr)
             recv_size = sizeof (event_info.ip_conflicted);
             break;
         case M2M_WIFI_RESP_SCAN_DONE: {
-            extern uint8_t gu8scanInProgress;
-            gu8scanInProgress = 0;
+            internal->gu8scanInProgress = 0;
             recv_size = sizeof (event_info.scan_done);
             break;
         }
@@ -109,19 +106,20 @@ void _wifi_cb(uint8_t opcode, uint16_t size, uint32_t addr)
     }
 
     /* Get data from the module and then pass it to _process_event() */
-    int8_t ret = hif_receive(addr, (uint8_t *) &event_info, recv_size, is_done);
+    int8_t ret = hif_receive(dev, addr, (uint8_t *) &event_info,
+                             recv_size, is_done);
     if (ret == M2M_SUCCESS) {
         if (M2M_WIFI_RESP_GET_PRNG != opcode) {
-            _process_event(opcode, &event_info);
+            _process_event(dev, opcode, &event_info);
         }
         else {
             addr += sizeof(event_info.prng_result);
             recv_size = event_info.prng_result.u16PrngSize;
             is_done = 1;
-            ret = hif_receive(addr, event_info.prng_result.pu8RngBuff, 
+            ret = hif_receive(dev, addr, event_info.prng_result.pu8RngBuff,
                                 recv_size, is_done);
             if (ret == M2M_SUCCESS) {
-                _process_event(opcode, &event_info);
+                _process_event(dev, opcode, &event_info);
             }
             else {
                 goto error;
@@ -142,9 +140,8 @@ error:
  *  @brief  Change the device's state or pass data to the event messaging queue
  *          according to event type and event data(payload)
  */
-static void _process_event(uint8_t msg_type, void *payload)
+static void _process_event(winc1500_t *dev, uint8_t msg_type, void *payload)
 {
-    winc1500_t *dev = &winc1500;
     msg_t msg;
     msg.type = WINC1500_EVENT_NOTHING;
     msg.content.value = 0;
@@ -189,14 +186,14 @@ static void _process_event(uint8_t msg_type, void *payload)
         case M2M_WIFI_RESP_CONN_INFO:
             DEBUG("M2M_WIFI_RESP_CONN_INFO\n");
             /* Copy result */
-            _ap.rssi = event->conn_info.s8RSSI;
-            _ap.sec = event->conn_info.u8SecType;
-            strncpy(_ssid, (char *)event->conn_info.acSSID, WINC1500_MAX_SSID_LEN);
-            _ap.ssid = _ssid;
-            memcpy(_mac_addr, event->conn_info.au8MACAddress, 6);
+            dev->event_ap.rssi = event->conn_info.s8RSSI;
+            dev->event_ap.sec = event->conn_info.u8SecType;
+            strncpy(dev->event_ssid, (char *)event->conn_info.acSSID, WINC1500_MAX_SSID_LEN);
+            dev->event_ap.ssid = dev->event_ssid;
+            memcpy(dev->event_mac_addr, event->conn_info.au8MACAddress, 6);
             /* set message */
             msg.type = WINC1500_EVENT_CONN_INFO;
-            msg.content.ptr = &_ap;
+            msg.content.ptr = &dev->event_ap;
             break;
         case M2M_WIFI_REQ_DHCP_CONF: {
             DEBUG("M2M_WIFI_REQ_DHCP_CONF\n");
@@ -224,13 +221,13 @@ static void _process_event(uint8_t msg_type, void *payload)
             /* Called by m2m_wifi_req_scan_result() */
             DEBUG("M2M_WIFI_RESP_SCAN_RESULT\n");
             /* Copy result */
-            _ap.rssi = event->scan_result.s8rssi;
-            _ap.sec = event->scan_result.u8AuthType;
-            strncpy(_ssid, (char *)event->scan_result.au8SSID, WINC1500_MAX_SSID_LEN);
-            _ap.ssid = _ssid;
+            dev->event_ap.rssi = event->scan_result.s8rssi;
+            dev->event_ap.sec = event->scan_result.u8AuthType;
+            strncpy(dev->event_ssid, (char *)event->scan_result.au8SSID, WINC1500_MAX_SSID_LEN);
+            dev->event_ap.ssid = dev->event_ssid;
             /* set message */
             msg.type = WINC1500_EVENT_SCAN_RESULT;
-            msg.content.ptr = &_ap;
+            msg.content.ptr = &dev->event_ap;
 
             /* display founded AP. */
             DEBUG("SSID:%s\n", event->scan_result.au8SSID);
@@ -264,4 +261,31 @@ static void _process_event(uint8_t msg_type, void *payload)
             break;
     }
     mbox_put(&dev->event_mbox, &msg);
+}
+
+/**
+ * @brief   Initialize the internal structure used in Atmel driver.
+ *          Refer winc1500_internal_types.h for reference.
+ */
+void _init_internal(winc1500_internal_t *internal)
+{
+    internal->gpfOtaUpdateCb = NULL;
+    internal->gpfOtaNotifCb = NULL;
+    internal->gu8scanInProgress = 0;
+    internal->gpfAppWifiCb = NULL;
+#ifdef ETH_MODE
+    internal->gpfAppEthCb = NULL;
+    internal->gau8ethRcvBuf = NULL;
+#endif
+#ifdef CONF_MGMT
+    internal->gpfAppMonCb = NULL;
+    internal->gstrMgmtCtrl = {NULL, 0 , 0};
+#endif
+    internal->gu8Crc_off = 0;
+#if	!defined(MODULE_NETDEV_ETH)
+    internal->gu16SessionID = 0;
+    internal->gbSocketInit = 0;
+    internal->gpfAppSSLCb = NULL;
+    internal->gu32HIFAddr = 0;
+#endif
 }

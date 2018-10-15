@@ -1,7 +1,7 @@
-From 15057d19aaccc363046748c44af5798584a03971 Mon Sep 17 00:00:00 2001
+From bd6be01de8d0f6e4bfb1b28d802eb7206bb1858b Mon Sep 17 00:00:00 2001
 From: Bumsik Kim <kbumsik@gmail.com>
 Date: Mon, 2 Oct 2017 07:56:55 -0400
-Subject: [PATCH 2/3] Fixed for RIOT driver  port. Fixed print formatting issue
+Subject: [PATCH 2/4] Fixed for RIOT driver  port. Fixed print formatting issue
 
 ---
  winc1500/common/include/nm_debug.h | 12 ++++++-----
@@ -51,7 +51,7 @@ index a710f6c..6268ad4 100644
  #endif /*M2M_LOG_REQ*/
  #endif /*M2M_LOG_INFO*/
 diff --git a/winc1500/driver/source/m2m_hif.c b/winc1500/driver/source/m2m_hif.c
-index f907964..41e2035 100644
+index f907964..72a0db3 100644
 --- a/winc1500/driver/source/m2m_hif.c
 +++ b/winc1500/driver/source/m2m_hif.c
 @@ -67,12 +67,12 @@
@@ -90,7 +90,7 @@ index f907964..41e2035 100644
  {
  	m2m_memset((uint8*)&gstrHifCxt,0,sizeof(tstrHifContext));
 -	nm_bsp_register_isr(isr);
-+#if defined(MODULE_GNRC_NETDEV)
++#if defined(MODULE_NETDEV_ETH)
 +	/** The isr will be registered in _init() in winc1500_netdev.c
 +	 * 	when you use GNRC.
 +	 */
@@ -361,5 +361,5 @@ index 66c7a2b..a23e418 100644
  			if(u8Flags & SOCKET_FLAGS_SSL)
  			{
 -- 
-2.18.0
+2.19.1
 
