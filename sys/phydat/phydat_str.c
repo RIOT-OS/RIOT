@@ -98,6 +98,7 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_PPB:      return "ppb";
         case UNIT_CD:       return "cd";
         case UNIT_PERCENT:  return "%";
+        case UNIT_CTS:      return "cts";
         default:            return "";
     }
 }
