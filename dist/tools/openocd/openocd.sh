@@ -170,7 +170,14 @@ _split_banks() {
     #   name nrf51 base 0 size 0 bus_width 1 chip_width 1
     #   name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
 
-    sed -n '/^{.*}$/ {s/\} /\}\n/g;s/[{}]//g;p}'
+    # The following command needs specific osx handling (non gnu):
+    # * Same commands for a pattern should be on different lines
+    sed -n '
+    /^{.*}$/ {
+        s/\} /\}\n/g
+        s/[{}]//g
+        p
+    }'
 }
 
 # Outputs bank info on different lines without the '{}'
