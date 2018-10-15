@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = rdcli
+APPLICATION = cord_ep
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -32,7 +32,7 @@ USEMODULE += fmt
 CFLAGS += -DDEVELHELP
 
 # For debugging and demonstration purposes, we limit the lifetime to 60s
-CFLAGS += -DRDCLI_LT=60
+CFLAGS += -DCORD_LT=60
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

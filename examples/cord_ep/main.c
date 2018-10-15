@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       CoRE Resource Directory client (rdcli) example application
+ * @brief       CoRE Resource Directory endpoint (cord_ep) example
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -30,18 +30,18 @@
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
-/* we will use a custom event handler for dumping rdcli_standalone events */
-static void _on_rdcli_event(cord_ep_standalone_event_t event)
+/* we will use a custom event handler for dumping cord_ep events */
+static void _on_ep_event(cord_ep_standalone_event_t event)
 {
     switch (event) {
         case CORD_EP_REGISTERED:
-            puts("rdcli event: now registered with a RD");
+            puts("RD endpoint event: now registered with a RD");
             break;
         case CORD_EP_DEREGISTERED:
-            puts("rdcli event: dropped client registration");
+            puts("RD endpoint event: dropped client registration");
             break;
         case CORD_EP_UPDATED:
-            puts("rdcli event: successfully updated client registration");
+            puts("RD endpoint event: successfully updated client registration");
             break;
     }
 }
@@ -95,11 +95,11 @@ int main(void)
     gcoap_register_listener(&_listener);
 
     /* register event callback with cord_ep_standalone */
-    cord_ep_standalone_reg_cb(_on_rdcli_event);
+    cord_ep_standalone_reg_cb(_on_ep_event);
 
     puts("Client information:");
     printf("  ep: %s\n", cord_common_get_ep());
-    printf("  lt: %is\n", (int)RDCLI_LT);
+    printf("  lt: %is\n", (int)CORD_LT);
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
