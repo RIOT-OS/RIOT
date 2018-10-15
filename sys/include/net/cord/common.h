@@ -21,7 +21,7 @@
 #ifndef NET_CORD_COMMON_H
 #define NET_CORD_COMMON_H
 
-#include "net/rdcli_config.h"
+#include "net/cord/config.h"
 
 #ifdef __cplusplus
 extern "C" {

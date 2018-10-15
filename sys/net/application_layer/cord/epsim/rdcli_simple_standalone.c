@@ -21,7 +21,7 @@
 #include "log.h"
 #include "thread.h"
 #include "xtimer.h"
-#include "net/rdcli_config.h"
+#include "net/cord/config.h"
 #include "net/rdcli_simple.h"
 
 #define STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
@@ -35,7 +35,7 @@ static void *reg_runner(void *arg)
     (void)arg;
 
     /* wait some seconds to give the address configuration some time to settle */
-    xtimer_sleep(RDCLI_STARTUP_DELAY);
+    xtimer_sleep(CORD_STARTUP_DELAY);
 
     while (1) {
         if (rdcli_simple_register() != RDCLI_SIMPLE_OK) {
@@ -44,7 +44,7 @@ static void *reg_runner(void *arg)
             LOG_ERROR("[rdcli_simple] error: unable to send registration\n");
             break;
         }
-        xtimer_sleep(RDCLI_UPDATE_INTERVAL);
+        xtimer_sleep(CORD_UPDATE_INTERVAL);
     }
 
     return NULL;

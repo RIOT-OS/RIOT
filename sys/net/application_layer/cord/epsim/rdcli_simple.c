@@ -22,7 +22,7 @@
 
 #include "fmt.h"
 #include "net/gcoap.h"
-#include "net/rdcli_config.h"
+#include "net/cord/config.h"
 #include "net/cord/common.h"
 #include "net/rdcli_simple.h"
 #include "net/ipv6/addr.h"
@@ -39,7 +39,7 @@ int rdcli_simple_register(void)
     sock_udp_ep_t remote = {
         .family    = AF_INET6,
         .netif     = SOCK_ADDR_ANY_NETIF,
-        .port      = RDCLI_SERVER_PORT,
+        .port      = CORD_SERVER_PORT,
     };
 
     /* parse RD server address */

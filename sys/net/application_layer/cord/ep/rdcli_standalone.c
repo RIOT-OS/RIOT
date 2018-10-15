@@ -25,7 +25,7 @@
 #include "thread.h"
 #include "xtimer.h"
 #include "net/rdcli.h"
-#include "net/rdcli_config.h"
+#include "net/cord/config.h"
 #include "net/rdcli_standalone.h"
 
 #define ENABLE_DEBUG    (0)
@@ -38,7 +38,7 @@
 
 #define UPDATE_TIMEOUT      (0xe537)
 
-#define TIMEOUT_US          ((uint64_t)(RDCLI_UPDATE_INTERVAL * US_PER_SEC))
+#define TIMEOUT_US          ((uint64_t)(CORD_UPDATE_INTERVAL * US_PER_SEC))
 
 static char _stack[STACKSIZE];
 

@@ -28,7 +28,7 @@
 #include "net/ipv6/addr.h"
 #include "net/rdcli.h"
 #include "net/cord/common.h"
-#include "net/rdcli_config.h"
+#include "net/cord/config.h"
 
 #ifdef MODULE_RDCLI_STANDALONE
 #include "net/rdcli_standalone.h"
@@ -356,7 +356,7 @@ void rdcli_dump_status(void)
 
         printf("RD address: coap://[%s]:%i\n", addr, (int)_rd_remote.port);
         printf("   ep name: %s\n", cord_common_get_ep());
-        printf("  lifetime: %is\n", (int)RDCLI_LT);
+        printf("  lifetime: %is\n", (int)CORD_LT);
         printf("    reg if: %s\n", _rd_regif);
         printf("  location: %s\n", _rd_loc);
     }

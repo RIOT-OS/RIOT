@@ -24,7 +24,7 @@
 #include "net/rdcli.h"
 #include "net/nanocoap.h"
 #include "net/sock/util.h"
-#include "net/rdcli_config.h"
+#include "net/cord/config.h"
 
 static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
 {
@@ -35,7 +35,7 @@ static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
     ep->family  = AF_INET6;
     ep->netif   = SOCK_ADDR_ANY_NETIF;
     if (ep->port == 0) {
-        ep->port = RDCLI_SERVER_PORT;
+        ep->port = CORD_SERVER_PORT;
     }
     return 0;
 }
