@@ -41,6 +41,10 @@
 #include "LoRaMac.h"
 #include "region/Region.h"
 
+#ifdef MODULE_PERIPH_EEPROM
+#include "periph/eeprom.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -297,6 +301,119 @@ static void mlme_indication(MlmeIndication_t *indication)
     }
 }
 
+#ifdef MODULE_PERIPH_EEPROM
+static inline void _set_uplink_counter(semtech_loramac_t *mac, uint8_t *counter)
+{
+    uint32_t counter4 = ((uint32_t)counter[0] << 24 |
+                         (uint32_t)counter[1] << 16 |
+                         (uint32_t)counter[2] << 8 |
+                         counter[3]);
+
+    DEBUG("[semtech-loramac] uplink counter: %" PRIu32 " \n", counter4);
+
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_UPLINK_COUNTER;
+    mibReq.Param.UpLinkCounter = counter4;
+    LoRaMacMibSetRequestConfirm(&mibReq);
+    mutex_unlock(&mac->lock);
+}
+
+static inline void _read_loramac_config(semtech_loramac_t *mac)
+{
+    DEBUG("[semtech-loramac] reading configuration from EEPROM\n");
+
+    uint8_t magic[SEMTECH_LORAMAC_EEPROM_MAGIC_LEN] = {0};
+    size_t pos = SEMTECH_LORAMAC_EEPROM_START;
+
+    pos += eeprom_read(pos, magic, SEMTECH_LORAMAC_EEPROM_MAGIC_LEN);
+    if (strncmp((char*)magic, "RIOT", SEMTECH_LORAMAC_EEPROM_MAGIC_LEN) != 0) {
+        DEBUG("[semtech-loramac] no configuration present on EEPROM "
+              "(invalid magic '%s')\n", magic);
+        return;
+    }
+
+    /* LoRaWAN EUIs, Keys and device address */
+    pos += eeprom_read(pos, mac->deveui, LORAMAC_DEVEUI_LEN);
+    pos += eeprom_read(pos, mac->appeui, LORAMAC_APPEUI_LEN);
+    pos += eeprom_read(pos, mac->appkey, LORAMAC_APPKEY_LEN);
+    pos += eeprom_read(pos, mac->appskey, LORAMAC_APPSKEY_LEN);
+    pos += eeprom_read(pos, mac->nwkskey, LORAMAC_NWKSKEY_LEN);
+    pos += eeprom_read(pos, mac->devaddr, LORAMAC_DEVADDR_LEN);
+
+    /* uplink counter, mainly used for ABP activation */
+    uint8_t counter[4] = { 0 };
+    pos += eeprom_read(pos, counter, 4);
+    _set_uplink_counter(mac, counter);
+}
+
+static inline void _save_uplink_counter(semtech_loramac_t *mac)
+{
+    size_t pos = SEMTECH_LORAMAC_EEPROM_START +
+                 SEMTECH_LORAMAC_EEPROM_MAGIC_LEN +
+                 LORAMAC_DEVEUI_LEN + LORAMAC_APPEUI_LEN +
+                 LORAMAC_APPKEY_LEN + LORAMAC_APPSKEY_LEN +
+                 LORAMAC_NWKSKEY_LEN + LORAMAC_DEVADDR_LEN;
+
+    uint8_t counter[4];
+    mutex_lock(&mac->lock);
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_UPLINK_COUNTER;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    counter[0] = (uint8_t)(mibReq.Param.UpLinkCounter >> 24);
+    counter[1] = (uint8_t)(mibReq.Param.UpLinkCounter >> 16);
+    counter[2] = (uint8_t)(mibReq.Param.UpLinkCounter >> 8);
+    counter[3] = (uint8_t)(mibReq.Param.UpLinkCounter);
+    mutex_unlock(&mac->lock);
+    pos += eeprom_write(pos, counter, 4);
+}
+
+void semtech_loramac_save_config(semtech_loramac_t *mac)
+{
+    DEBUG("[semtech-loramac] saving configuration on EEPROM\n");
+
+    uint8_t magic[] = SEMTECH_LORAMAC_EEPROM_MAGIC;
+    size_t pos = SEMTECH_LORAMAC_EEPROM_START;
+    pos += eeprom_write(pos, magic, SEMTECH_LORAMAC_EEPROM_MAGIC_LEN);
+
+    /* Store EUIs, Keys and device address */
+    pos += eeprom_write(pos, mac->deveui, LORAMAC_DEVEUI_LEN);
+    pos += eeprom_write(pos, mac->appeui, LORAMAC_APPEUI_LEN);
+    pos += eeprom_write(pos, mac->appkey, LORAMAC_APPKEY_LEN);
+    pos += eeprom_write(pos, mac->appskey, LORAMAC_APPSKEY_LEN);
+    pos += eeprom_write(pos, mac->nwkskey, LORAMAC_NWKSKEY_LEN);
+    pos += eeprom_write(pos, mac->devaddr, LORAMAC_DEVADDR_LEN);
+
+    /* save uplink counter, mainly used for ABP activation */
+    _save_uplink_counter(mac);
+}
+
+void semtech_loramac_erase_config(void)
+{
+    DEBUG("[semtech-loramac] erasing configuration on EEPROM\n");
+
+    uint8_t magic[SEMTECH_LORAMAC_EEPROM_MAGIC_LEN];
+    size_t pos = SEMTECH_LORAMAC_EEPROM_START;
+    eeprom_read(pos, magic, SEMTECH_LORAMAC_EEPROM_MAGIC_LEN);
+    if (strcmp((char*)magic, "RIOT") != 0) {
+        DEBUG("[semtech-loramac] no configuration present on EEPROM\n");
+        return;
+    }
+
+    MibRequestConfirm_t mibReq;
+    size_t uplink_counter_len = sizeof(mibReq.Param.UpLinkCounter);
+
+    size_t end = (pos + SEMTECH_LORAMAC_EEPROM_MAGIC_LEN +
+                  LORAMAC_DEVEUI_LEN + LORAMAC_APPEUI_LEN +
+                  LORAMAC_APPKEY_LEN + LORAMAC_APPSKEY_LEN +
+                  LORAMAC_NWKSKEY_LEN + LORAMAC_DEVADDR_LEN +
+                  uplink_counter_len);
+    for (size_t p = pos; p < end; p++) {
+        eeprom_write_byte(p, 0);
+    }
+}
+#endif /* MODULE_PERIPH_EEPROM */
+
 void _init_loramac(semtech_loramac_t *mac,
                    LoRaMacPrimitives_t * primitives, LoRaMacCallback_t *callbacks)
 {
@@ -317,6 +434,9 @@ void _init_loramac(semtech_loramac_t *mac,
     semtech_loramac_set_tx_port(mac, LORAMAC_DEFAULT_TX_PORT);
     semtech_loramac_set_tx_mode(mac, LORAMAC_DEFAULT_TX_MODE);
     mac->link_chk.available = false;
+#ifdef MODULE_PERIPH_EEPROM
+    _read_loramac_config(mac);
+#endif
 }
 
 static void _join_otaa(semtech_loramac_t *mac)
@@ -434,6 +554,12 @@ static void _send(semtech_loramac_t *mac, void *arg)
         msg.content.value = (uint8_t)status;
         msg_send(&msg, semtech_loramac_pid);
     }
+#ifdef MODULE_PERIPH_EEPROM
+    else {
+        /* save the uplink counter */
+        _save_uplink_counter(mac);
+    }
+#endif
 }
 
 static void _semtech_loramac_call(semtech_loramac_func_t func, void *arg)

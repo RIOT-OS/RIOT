@@ -35,7 +35,11 @@ static char print_buf[LORAMAC_APPKEY_LEN * 2 + 1];
 
 static void _loramac_usage(void)
 {
-    puts("Usage: loramac <get|set|join|tx|link_check>");
+    puts("Usage: loramac <get|set|join|tx|link_check"
+#ifdef MODULE_PERIPH_EEPROM
+         "|save|erase"
+#endif
+         ">");
 }
 
 static void _loramac_join_usage(void)
@@ -462,6 +466,24 @@ static int _cmd_loramac(int argc, char **argv)
         semtech_loramac_request_link_check(&loramac);
         puts("Link check request scheduled");
     }
+#ifdef MODULE_PERIPH_EEPROM
+    else if (strcmp(argv[1], "save") == 0) {
+        if (argc > 2) {
+            _loramac_usage();
+            return 1;
+        }
+
+        semtech_loramac_save_config(&loramac);
+    }
+    else if (strcmp(argv[1], "erase") == 0) {
+        if (argc > 2) {
+            _loramac_usage();
+            return 1;
+        }
+
+        semtech_loramac_erase_config();
+    }
+#endif
     else {
         _loramac_usage();
         return 1;
