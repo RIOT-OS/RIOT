@@ -1,9 +1,9 @@
-MODULE = rdcli
+MODULE = cord_ep
 
-SRC = rdcli.c
+SRC = cord_ep.c
 
-ifneq (,$(filter rdcli_standalone,$(USEMODULE)))
-  SRC += rdcli_standalone.c
+ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
+  SRC += cord_ep_standalone.c
 endif
 
 include $(RIOTBASE)/Makefile.base

@@ -25,22 +25,22 @@
 #include "net/ipv6/addr.h"
 #include "net/gcoap.h"
 #include "net/cord/common.h"
-#include "net/rdcli_standalone.h"
+#include "net/cord/ep_standalone.h"
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 /* we will use a custom event handler for dumping rdcli_standalone events */
-static void _on_rdcli_event(rdcli_standalone_event_t event)
+static void _on_rdcli_event(cord_ep_standalone_event_t event)
 {
     switch (event) {
-        case RDCLI_REGISTERED:
+        case CORD_EP_REGISTERED:
             puts("rdcli event: now registered with a RD");
             break;
-        case RDCLI_DEREGISTERED:
+        case CORD_EP_DEREGISTERED:
             puts("rdcli event: dropped client registration");
             break;
-        case RDCLI_UPDATED:
+        case CORD_EP_UPDATED:
             puts("rdcli event: successfully updated client registration");
             break;
     }
@@ -94,8 +94,8 @@ int main(void)
     /* setup CoAP resources */
     gcoap_register_listener(&_listener);
 
-    /* register event callback with rdcli_standalone */
-    rdcli_standalone_reg_cb(_on_rdcli_event);
+    /* register event callback with cord_ep_standalone */
+    cord_ep_standalone_reg_cb(_on_rdcli_event);
 
     puts("Client information:");
     printf("  ep: %s\n", cord_common_get_ep());

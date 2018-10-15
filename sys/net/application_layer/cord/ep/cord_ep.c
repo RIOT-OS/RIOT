@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     net_rdcli
+ * @ingroup     net_cord_ep
  * @{
  *
  * @file
- * @brief       CoRE Resource Directory client implementation
+ * @brief       CoRE Resource Directory endpoint implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -20,18 +20,18 @@
 
 #include <string.h>
 
-#include "fmt.h"
 #include "mutex.h"
+#include "assert.h"
 #include "thread_flags.h"
 
 #include "net/gcoap.h"
 #include "net/ipv6/addr.h"
-#include "net/rdcli.h"
+#include "net/cord/ep.h"
 #include "net/cord/common.h"
 #include "net/cord/config.h"
 
-#ifdef MODULE_RDCLI_STANDALONE
-#include "net/rdcli_standalone.h"
+#ifdef MODULE_CORD_EP_STANDALONE
+#include "net/cord/ep_standalone.h"
 #endif
 
 #define ENABLE_DEBUG        (0)
@@ -68,16 +68,16 @@ static int _sync(void)
     thread_flags_t flags = thread_flags_wait_any(FLAG_MASK);
 
     if (flags & FLAG_ERR) {
-        return RDCLI_ERR;
+        return CORD_EP_ERR;
     }
     else if (flags & FLAG_TIMEOUT) {
-        return RDCLI_TIMEOUT;
+        return CORD_EP_TIMEOUT;
     }
     else if (flags & FLAG_OVERFLOW) {
-        return RDCLI_OVERFLOW;
+        return CORD_EP_OVERFLOW;
     }
     else {
-        return RDCLI_OK;
+        return CORD_EP_OK;
     }
 }
 
@@ -137,13 +137,13 @@ static int _update_remove(unsigned code, gcoap_resp_handler_t handle)
     coap_pkt_t pkt;
 
     if (_rd_loc[0] == 0) {
-        return RDCLI_NORD;
+        return CORD_EP_NORD;
     }
 
     /* build CoAP request packet */
     int res = gcoap_req_init(&pkt, buf, sizeof(buf), code, _rd_loc);
     if (res < 0) {
-        return RDCLI_ERR;
+        return CORD_EP_ERR;
     }
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
     ssize_t pkt_len = gcoap_finish(&pkt, 0, COAP_FORMAT_NONE);
@@ -158,7 +158,7 @@ static int _update_remove(unsigned code, gcoap_resp_handler_t handle)
 static void _on_discover(unsigned req_state, coap_pkt_t *pdu,
                          sock_udp_ep_t *remote)
 {
-    thread_flags_t flag = RDCLI_NORD;
+    thread_flags_t flag = CORD_EP_NORD;
     (void)remote;
 
     if (req_state == GCOAP_MEMO_RESP) {
@@ -216,19 +216,19 @@ static int _discover_internal(const sock_udp_ep_t *remote,
     int res = gcoap_req_init(&pkt, buf, sizeof(buf), COAP_METHOD_GET,
                              "/.well-known/core");
     if (res < 0) {
-        return RDCLI_ERR;
+        return CORD_EP_ERR;
     }
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
     gcoap_add_qstring(&pkt, "rt", "core.rd");
     size_t pkt_len = gcoap_finish(&pkt, 0, COAP_FORMAT_NONE);
     res = gcoap_req_send2(buf, pkt_len, remote, _on_discover);
     if (res < 0) {
-        return RDCLI_ERR;
+        return CORD_EP_ERR;
     }
     return _sync();
 }
 
-int rdcli_discover_regif(const sock_udp_ep_t *remote, char *regif, size_t maxlen)
+int cord_ep_discover_regif(const sock_udp_ep_t *remote, char *regif, size_t maxlen)
 {
     assert(remote && regif);
 
@@ -238,7 +238,7 @@ int rdcli_discover_regif(const sock_udp_ep_t *remote, char *regif, size_t maxlen
     return res;
 }
 
-int rdcli_register(const sock_udp_ep_t *remote, const char *regif)
+int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
 {
     assert(remote);
 
@@ -253,13 +253,13 @@ int rdcli_register(const sock_udp_ep_t *remote, const char *regif)
      * discovery for it first (see section 5.2) */
     if (regif == NULL) {
         retval = _discover_internal(remote, _rd_regif, sizeof(_rd_regif));
-        if (retval != RDCLI_OK) {
+        if (retval != CORD_EP_OK) {
             goto end;
         }
     }
     else {
         if (strlen(_rd_regif) >= sizeof(_rd_regif)) {
-            retval = RDCLI_OVERFLOW;
+            retval = CORD_EP_OVERFLOW;
             goto end;
         }
         strncpy(_rd_regif, regif, sizeof(_rd_regif));
@@ -268,7 +268,7 @@ int rdcli_register(const sock_udp_ep_t *remote, const char *regif)
     /* build and send CoAP POST request to the RD's registration interface */
     res = gcoap_req_init(&pkt, buf, sizeof(buf), COAP_METHOD_POST, _rd_regif);
     if (res < 0) {
-        retval = RDCLI_ERR;
+        retval = CORD_EP_ERR;
         goto end;
     }
     /* set some packet options and write query string */
@@ -279,7 +279,7 @@ int rdcli_register(const sock_udp_ep_t *remote, const char *regif)
     res = gcoap_get_resource_list(pkt.payload, pkt.payload_len,
                                   COAP_FORMAT_LINK);
     if (res < 0) {
-        retval = RDCLI_ERR;
+        retval = CORD_EP_ERR;
         goto end;
     }
 
@@ -289,19 +289,19 @@ int rdcli_register(const sock_udp_ep_t *remote, const char *regif)
     /* send out the request */
     res = gcoap_req_send2(buf, pkt_len, remote, _on_register);
     if (res < 0) {
-        retval = RDCLI_ERR;
+        retval = CORD_EP_ERR;
         goto end;
     }
     retval = _sync();
 
 end:
-    /* if we encountered any error, we mark the client as not connected */
-    if (retval != RDCLI_OK) {
+    /* if we encountered any error, we mark the endpoint as not connected */
+    if (retval != CORD_EP_OK) {
         _rd_loc[0] = '\0';
     }
-#ifdef MODULE_RDCLI_STANDALONE
+#ifdef MODULE_CORD_EP_STANDALONE
     else {
-        rdcli_standalone_signal(true);
+        cord_ep_standalone_signal(true);
     }
 #endif
 
@@ -309,14 +309,14 @@ end:
     return retval;
 }
 
-int rdcli_update(void)
+int cord_ep_update(void)
 {
     _lock();
     int res = _update_remove(COAP_METHOD_POST, _on_update);
-    if (res != RDCLI_OK) {
+    if (res != CORD_EP_OK) {
         /* in case we are not able to reach the RD, we drop the association */
-#ifdef MODULE_RDCLI_STANDALONE
-        rdcli_standalone_signal(false);
+#ifdef MODULE_CORD_EP_STANDALONE
+        cord_ep_standalone_signal(false);
 #endif
         _rd_loc[0] = '\0';
     }
@@ -324,25 +324,25 @@ int rdcli_update(void)
     return res;
 }
 
-int rdcli_remove(void)
+int cord_ep_remove(void)
 {
     _lock();
     if (_rd_loc[0] == '\0') {
         mutex_unlock(&_mutex);
-        return RDCLI_NORD;
+        return CORD_EP_NORD;
     }
-#ifdef MODULE_RDCLI_STANDALONE
-    rdcli_standalone_signal(false);
+#ifdef MODULE_CORD_EP_STANDALONE
+    cord_ep_standalone_signal(false);
 #endif
     _update_remove(COAP_METHOD_DELETE, _on_remove);
     /* we actually do not care about the result, we drop the RD local RD entry
      * in any case */
     _rd_loc[0] = '\0';
     mutex_unlock(&_mutex);
-    return RDCLI_OK;
+    return CORD_EP_OK;
 }
 
-void rdcli_dump_status(void)
+void cord_ep_dump_status(void)
 {
     puts("CoAP RD connection status:");
 

@@ -759,16 +759,15 @@ ifneq (,$(filter cord_epsim,$(USEMODULE)))
   USEMODULE += gcoap
 endif
 
-ifneq (,$(filter rdcli_standalone,$(USEMODULE)))
-  USEMODULE += rdcli
+ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
+  USEMODULE += cord_ep
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter rdcli,$(USEMODULE)))
+ifneq (,$(filter cord_ep,$(USEMODULE)))
   USEMODULE += cord_common
   USEMODULE += core_thread_flags
   USEMODULE += gcoap
-  USEMODULE += fmt
   ifneq (,$(filter shell_commands,$(USEMODULE)))
     USEMODULE += sock_util
   endif

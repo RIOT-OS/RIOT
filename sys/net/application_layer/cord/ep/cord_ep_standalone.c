@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     net_rdcli_simple
+ * @ingroup     net_cord_ep_standalone
  * @{
  *
  * @file
- * @brief       Standalone extension for the simple RD registration client
+ * @brief       Standalone extension for the CoRE RD endpoint implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -24,9 +24,9 @@
 #include "assert.h"
 #include "thread.h"
 #include "xtimer.h"
-#include "net/rdcli.h"
+#include "net/cord/ep.h"
 #include "net/cord/config.h"
-#include "net/rdcli_standalone.h"
+#include "net/cord/ep_standalone.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -34,7 +34,7 @@
 /* stack configuration */
 #define STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
 #define PRIO                (THREAD_PRIORITY_MAIN - 1)
-#define TNAME               "rdcli"
+#define TNAME               "cord_ep"
 
 #define UPDATE_TIMEOUT      (0xe537)
 
@@ -46,14 +46,14 @@ static xtimer_t _timer;
 static kernel_pid_t _runner_pid;
 static msg_t _msg;
 
-static rdcli_standalone_cb_t _cb = NULL;
+static cord_ep_standalone_cb_t _cb = NULL;
 
 static void _set_timer(void)
 {
     xtimer_set_msg64(&_timer, TIMEOUT_US, &_msg, _runner_pid);
 }
 
-static void _notify(rdcli_standalone_event_t event)
+static void _notify(cord_ep_standalone_event_t event)
 {
     if (_cb) {
         _cb(event);
@@ -70,16 +70,14 @@ static void *_reg_runner(void *arg)
     _msg.type = UPDATE_TIMEOUT;
 
     while (1) {
-        DEBUG("rd stand: waiting for message\n");
         msg_receive(&in);
         if (in.type == UPDATE_TIMEOUT) {
-            if (rdcli_update() == RDCLI_OK) {
-                DEBUG("rd stand: update ok\n");
+            if (cord_ep_update() == CORD_EP_OK) {
                 _set_timer();
-                _notify(RDCLI_UPDATED);
+                _notify(CORD_EP_UPDATED);
             }
             else {
-                _notify(RDCLI_DEREGISTERED);
+                _notify(CORD_EP_DEREGISTERED);
             }
         }
     }
@@ -87,25 +85,25 @@ static void *_reg_runner(void *arg)
     return NULL;    /* should never be reached */
 }
 
-void rdcli_standalone_run(void)
+void cord_ep_standalone_run(void)
 {
     thread_create(_stack, sizeof(_stack), PRIO, 0, _reg_runner, NULL, TNAME);
 }
 
-void rdcli_standalone_signal(bool connected)
+void cord_ep_standalone_signal(bool connected)
 {
     /* clear timer in any case */
     xtimer_remove(&_timer);
     /* reset the update timer in case a connection was established or updated */
     if (connected) {
         _set_timer();
-        _notify(RDCLI_REGISTERED);
+        _notify(CORD_EP_REGISTERED);
     } else {
-        _notify(RDCLI_DEREGISTERED);
+        _notify(CORD_EP_DEREGISTERED);
     }
 }
 
-void rdcli_standalone_reg_cb(rdcli_standalone_cb_t cb)
+void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb)
 {
     /* Note: we do not allow re-setting the callback (via passing cb := NULL),
      *       as this would mean additional complexity for synchronizing the

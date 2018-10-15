@@ -19,7 +19,7 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_echo
 
-USEMODULE += rdcli_standalone
+USEMODULE += cord_ep_standalone
 
 USEMODULE += shell
 USEMODULE += shell_commands

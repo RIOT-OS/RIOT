@@ -133,7 +133,7 @@ endif
 ifneq (,$(filter cord_epsim,$(USEMODULE)))
     DIRS += net/application_layer/cord/epsim
 endif
-ifneq (,$(filter rdcli,$(USEMODULE)))
+ifneq (,$(filter cord_ep,$(USEMODULE)))
     DIRS += net/application_layer/cord/ep
 endif
 

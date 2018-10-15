@@ -163,10 +163,10 @@ void auto_init(void)
     extern void cord_common_init(void);
     cord_common_init();
 #endif
-#ifdef MODULE_RDCLI_STANDALONE
-    DEBUG("Auto init rdcli_standalone\n");
-    extern void rdcli_standalone_run(void);
-    rdcli_standalone_run();
+#ifdef MODULE_CORD_EP_STANDALONE
+    DEBUG("Auto init cord_ep_standalone\n");
+    extern void cord_ep_standalone_run(void);
+    cord_ep_standalone_run();
 #endif
 #ifdef MODULE_CORD_EPSIM_STANDALONE
     DEBUG("Auto init cord_epsim module\n");
