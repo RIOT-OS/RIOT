@@ -158,10 +158,10 @@ void auto_init(void)
     DEBUG("Auto init Skald\n");
     skald_init();
 #endif
-#ifdef MODULE_RDCLI_COMMON
-    DEBUG("Auto init rdcli_common module\n");
-    extern void rdcli_common_init(void);
-    rdcli_common_init();
+#ifdef MODULE_CORD_COMMON
+    DEBUG("Auto init cord_common module\n");
+    extern void cord_common_init(void);
+    cord_common_init();
 #endif
 #ifdef MODULE_RDCLI_STANDALONE
     DEBUG("Auto init rdcli_standalone\n");

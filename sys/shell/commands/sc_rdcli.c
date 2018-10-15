@@ -25,7 +25,6 @@
 #include "net/nanocoap.h"
 #include "net/sock/util.h"
 #include "net/rdcli_config.h"
-#include "net/rdcli_common.h"
 
 static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
 {

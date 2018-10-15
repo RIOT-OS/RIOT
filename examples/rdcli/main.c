@@ -24,7 +24,7 @@
 #include "shell.h"
 #include "net/ipv6/addr.h"
 #include "net/gcoap.h"
-#include "net/rdcli_common.h"
+#include "net/cord/common.h"
 #include "net/rdcli_standalone.h"
 
 #define MAIN_QUEUE_SIZE     (8)
@@ -98,7 +98,7 @@ int main(void)
     rdcli_standalone_reg_cb(_on_rdcli_event);
 
     puts("Client information:");
-    printf("  ep: %s\n", rdcli_common_get_ep());
+    printf("  ep: %s\n", cord_common_get_ep());
     printf("  lt: %is\n", (int)RDCLI_LT);
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];

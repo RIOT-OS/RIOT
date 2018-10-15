@@ -23,7 +23,7 @@
 #include "fmt.h"
 #include "net/gcoap.h"
 #include "net/rdcli_config.h"
-#include "net/rdcli_common.h"
+#include "net/cord/common.h"
 #include "net/rdcli_simple.h"
 #include "net/ipv6/addr.h"
 
@@ -56,7 +56,7 @@ int rdcli_simple_register(void)
     /* make packet confirmable */
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
     /* add Uri-Query options */
-    if (rdcli_common_add_qstring(&pkt) < 0) {
+    if (cord_common_add_qstring(&pkt) < 0) {
         return RDCLI_SIMPLE_ERROR;
     }
     /* finish, we don't have any payload */

@@ -1,3 +1,3 @@
-MODULE = rdcli_common
+MODULE = cord_common
 
 include $(RIOTBASE)/Makefile.base

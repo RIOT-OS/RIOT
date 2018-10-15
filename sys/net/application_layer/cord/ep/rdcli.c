@@ -27,7 +27,7 @@
 #include "net/gcoap.h"
 #include "net/ipv6/addr.h"
 #include "net/rdcli.h"
-#include "net/rdcli_common.h"
+#include "net/cord/common.h"
 #include "net/rdcli_config.h"
 
 #ifdef MODULE_RDCLI_STANDALONE
@@ -273,7 +273,7 @@ int rdcli_register(const sock_udp_ep_t *remote, const char *regif)
     }
     /* set some packet options and write query string */
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
-    rdcli_common_add_qstring(&pkt);
+    cord_common_add_qstring(&pkt);
 
     /* add the resource description as payload */
     res = gcoap_get_resource_list(pkt.payload, pkt.payload_len,
@@ -355,7 +355,7 @@ void rdcli_dump_status(void)
         ipv6_addr_to_str(addr, (ipv6_addr_t *)&_rd_remote.addr, sizeof(addr));
 
         printf("RD address: coap://[%s]:%i\n", addr, (int)_rd_remote.port);
-        printf("   ep name: %s\n", rdcli_common_get_ep());
+        printf("   ep name: %s\n", cord_common_get_ep());
         printf("  lifetime: %is\n", (int)RDCLI_LT);
         printf("    reg if: %s\n", _rd_regif);
         printf("  location: %s\n", _rd_loc);

@@ -755,7 +755,7 @@ ifneq (,$(filter rdcli_simple_standalone,$(USEMODULE)))
 endif
 
 ifneq (,$(filter rdcli_simple,$(USEMODULE)))
-  USEMODULE += rdcli_common
+  USEMODULE += cord_common
   USEMODULE += fmt
 endif
 
@@ -765,7 +765,7 @@ ifneq (,$(filter rdcli_standalone,$(USEMODULE)))
 endif
 
 ifneq (,$(filter rdcli,$(USEMODULE)))
-  USEMODULE += rdcli_common
+  USEMODULE += cord_common
   USEMODULE += core_thread_flags
   USEMODULE += gcoap
   USEMODULE += fmt
@@ -774,7 +774,7 @@ ifneq (,$(filter rdcli,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter rdcli_common,$(USEMODULE)))
+ifneq (,$(filter cord_common,$(USEMODULE)))
   USEMODULE += fmt
   USEMODULE += gcoap
   USEMODULE += luid

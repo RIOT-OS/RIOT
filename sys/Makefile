@@ -127,7 +127,7 @@ endif
 ifneq (,$(filter skald,$(USEMODULE)))
   DIRS += net/skald
 endif
-ifneq (,$(filter rdcli_common,$(USEMODULE)))
+ifneq (,$(filter cord_common,$(USEMODULE)))
   DIRS += net/application_layer/cord/common
 endif
 ifneq (,$(filter rdcli_simple,$(USEMODULE)))
