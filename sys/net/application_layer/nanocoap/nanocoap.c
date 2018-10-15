@@ -842,7 +842,7 @@ ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
     coap_block2_init(pkt, &slicer);
     uint8_t *payload = buf + coap_get_total_hdr_len(pkt);
     uint8_t *bufpos = payload;
-    bufpos += coap_put_option_ct(bufpos, 0, COAP_CT_LINK_FORMAT);
+    bufpos += coap_put_option_ct(bufpos, 0, COAP_FORMAT_LINK);
     bufpos += coap_opt_put_block2(bufpos, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
 
     *bufpos++ = 0xff;
