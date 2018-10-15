@@ -13,7 +13,7 @@ info-objsize:
 	  "") SORTROW=4 ;; \
 	  *) echo "Usage: $(MAKE) info-objsize SORTROW=[text|data|bss|dec]" ; return ;; \
 	esac; \
-	echo -e '   text\t   data\t    bss\t    dec\t    hex\tfilename'; \
+	printf '   text\t   data\t    bss\t    dec\t    hex\tfilename\n'; \
 	$(SIZE) -d -B $(BASELIBS) | \
 	  tail -n+2 | \
 	  sed -e 's#$(BINDIR)##' | \
