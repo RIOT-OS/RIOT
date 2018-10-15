@@ -39,7 +39,7 @@
  * @brief   Place to store the interrupt context
  */
 static gpio_isr_ctx_t exti_chan;
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief   Get the port's base address
@@ -153,4 +153,4 @@ void isr_gpiote(void)
     }
     cortexm_isr_end();
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */

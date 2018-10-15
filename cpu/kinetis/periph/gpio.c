@@ -115,7 +115,7 @@ static isr_ctx_t isr_ctx[CTX_NUMOF];
 static uint32_t isr_map[ISR_MAP_SIZE];
 
 static const uint8_t port_irqs[] = PORT_IRQS;
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 static inline PORT_Type *port(gpio_t pin)
 {
@@ -176,7 +176,7 @@ static void ctx_clear(int port, int pin)
     int ctx = get_ctx(port, pin);
     write_map(port, pin, ctx);
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 static inline void clk_en(gpio_t pin)
 {
@@ -211,7 +211,7 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
      * need to free its interrupt context. We to this only after we
      * re-configured the pin in case an event is happening just in between... */
     uint32_t isr_state = port(pin)->PCR[pin_num(pin)];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
     /* set new PCR value */
     port(pin)->PCR[pin_num(pin)] = pcr;
@@ -221,7 +221,7 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
     if (isr_state & PORT_PCR_IRQC_MASK) {
         ctx_clear(port_num(pin), pin_num(pin));
     }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 }
 
 int gpio_read(gpio_t pin)

@@ -59,7 +59,7 @@
 #endif
 
 static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief     Extract the pin number of the given pin
@@ -306,4 +306,4 @@ ISR(INT7_vect, ISR_BLOCK)
 }
 #endif
 
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */

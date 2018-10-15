@@ -192,7 +192,7 @@ void gpio_irq_enable(gpio_t pin);
  */
 void gpio_irq_disable(gpio_t pin);
 
-#endif /* MODULE_PERIPH_GPIO_IRQ */
+#endif /* defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN) */
 
 /**
  * @brief   Get the current value of the given pin

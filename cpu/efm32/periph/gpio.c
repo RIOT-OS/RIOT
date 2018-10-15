@@ -37,7 +37,7 @@
  * @brief   Hold one interrupt context per interrupt line
  */
 static gpio_isr_ctx_t isr_ctx[NUMOF_IRQS];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 static inline GPIO_Port_TypeDef _port_num(gpio_t pin)
 {
@@ -173,4 +173,4 @@ void isr_gpio_odd(void)
 {
     gpio_irq();
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */

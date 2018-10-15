@@ -58,13 +58,13 @@ static int _isr_map_entry(gpio_t pin) {
 
     return _pin;
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 void gpio_init_ports(void) {
     SCS |= 0x1; /* set GPIO ports 0 and 1 to FIO mode (3.7.2) */
 #ifdef MODULE_PERIPH_GPIO_IRQ
     memset(&_gpio_isr_map[0], 0xff, 64);
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 }
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
@@ -312,4 +312,4 @@ void GPIO_IRQHandler(void)
 
     VICVectAddr = 0;                                /* Acknowledge Interrupt */
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */

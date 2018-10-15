@@ -45,7 +45,7 @@
  * @brief   Allocate memory for one callback and argument per EXTI channel
  */
 static gpio_isr_ctx_t exti_ctx[GPIO_ISR_CHAN_NUMOF];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief   Extract the pin's port base address from the given pin identifier
@@ -230,4 +230,4 @@ void isr_exti(void)
     }
     cortexm_isr_end();
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */

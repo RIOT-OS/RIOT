@@ -33,7 +33,7 @@
 static gpio_isr_ctx_t isr_ctx[NUMOF_IRQS];
 
 static gpio_flank_t isr_state[2][32];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 #define PIN_MASK        (0x1f)
 #define PORT_SHIFT      (5U)
@@ -241,4 +241,4 @@ void isr_eint3(void)
 
     cortexm_isr_end();
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */

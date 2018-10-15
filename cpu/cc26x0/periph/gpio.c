@@ -31,7 +31,7 @@
  * @brief   static callback memory
  */
 static gpio_isr_ctx_t gpio_chan[GPIO_ISR_CHAN_NUMOF];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
@@ -131,4 +131,4 @@ void isr_edge(void)
     }
     cortexm_isr_end();
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */

@@ -93,7 +93,7 @@ typedef struct {
 } gpio_state_t;
 
 static gpio_state_t gpio_config[NUM_OF_PORT][NUM_OF_PINS];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
@@ -275,4 +275,4 @@ void gpio_irq_disable(gpio_t pin)
 
     HWREG(im_reg_addr) &= ~(pin_bit);
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
