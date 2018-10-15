@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2017-2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Shell commands for the rdcli module
+ * @brief       Shell commands for the cord_ep module
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "net/rdcli.h"
+#include "net/cord/ep.h"
 #include "net/nanocoap.h"
 #include "net/sock/util.h"
 #include "net/cord/config.h"
@@ -40,7 +40,7 @@ static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
     return 0;
 }
 
-int _rdcli_handler(int argc, char **argv)
+int _cord_ep_handler(int argc, char **argv)
 {
     int res;
 
@@ -60,12 +60,12 @@ int _rdcli_handler(int argc, char **argv)
             regif = argv[3];
         }
         puts("Registering with RD now, this may take a short while...");
-        if (rdcli_register(&remote, regif) != RDCLI_OK) {
+        if (cord_ep_register(&remote, regif) != CORD_EP_OK) {
             puts("error: registration failed");
         }
         else {
             puts("registration successful\n");
-            rdcli_dump_status();
+            cord_ep_dump_status();
         }
     }
     else if ((argc > 1) && (strcmp(argv[1], "discover") == 0)) {
@@ -79,7 +79,7 @@ int _rdcli_handler(int argc, char **argv)
             printf("error: unable to parse address\n");
             return 1;
         }
-        if (rdcli_discover_regif(&remote, regif, sizeof(regif)) == RDCLI_OK) {
+        if (cord_ep_discover_regif(&remote, regif, sizeof(regif)) == CORD_EP_OK) {
             printf("the registration interface is '%s'\n", regif);
         }
         else {
@@ -87,14 +87,14 @@ int _rdcli_handler(int argc, char **argv)
         }
     }
     else if ((argc > 1) && (strcmp(argv[1], "update") == 0)) {
-        res = rdcli_update();
-        if (res == RDCLI_OK) {
+        res = cord_ep_update();
+        if (res == CORD_EP_OK) {
             puts("RD update successful");
         }
-        else if (res == RDCLI_NORD) {
+        else if (res == CORD_EP_NORD) {
             puts("error: not associated with any RD");
         }
-        else if (res == RDCLI_TIMEOUT) {
+        else if (res == CORD_EP_TIMEOUT) {
             puts("error: unable to reach RD - dropped association");
         }
         else {
@@ -102,14 +102,14 @@ int _rdcli_handler(int argc, char **argv)
         }
     }
     else if ((argc > 1) && (strcmp(argv[1], "remove") == 0)) {
-        res = rdcli_remove();
-        if (res == RDCLI_OK) {
+        res = cord_ep_remove();
+        if (res == CORD_EP_OK) {
             puts("node successfully removed from RD");
         }
-        else if (res == RDCLI_NORD) {
+        else if (res == CORD_EP_NORD) {
             puts("error: not associated with any RD");
         }
-        else if (res == RDCLI_TIMEOUT) {
+        else if (res == CORD_EP_TIMEOUT) {
             puts("error: unable to reach RD - remove association only locally");
         }
         else {
@@ -117,7 +117,7 @@ int _rdcli_handler(int argc, char **argv)
         }
     }
     else if ((argc > 1) && (strcmp(argv[1], "info") == 0)) {
-        rdcli_dump_status();
+        cord_ep_dump_status();
     }
     else {
         printf("usage: %s <register|discover|update|remove|info>\n",
