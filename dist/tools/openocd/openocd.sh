@@ -172,9 +172,12 @@ _split_banks() {
 
     # The following command needs specific osx handling (non gnu):
     # * Same commands for a pattern should be on different lines
+    # * Cannot use '\n' in the replacement string
+    local sed_escaped_newline=\\$'\n'
+
     sed -n '
     /^{.*}$/ {
-        s/\} /\}\n/g
+        s/\} /\}'"${sed_escaped_newline}"'/g
         s/[{}]//g
         p
     }'
