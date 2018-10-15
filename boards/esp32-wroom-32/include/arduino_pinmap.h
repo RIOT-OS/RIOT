@@ -44,7 +44,7 @@ extern "C" {
 
 #define ARDUINO_PIN_10  GPIO5       /**< Arduino Uno pin 10 (CS0 / PWM)  */
 #define ARDUINO_PIN_11  GPIO23      /**< Arduino Uno pin 11 (MOSI / PWM) */
-#define ARDUINO_PIN_12  GPI19O      /**< Arduino Uno pin 12 (MISO) */
+#define ARDUINO_PIN_12  GPIO19      /**< Arduino Uno pin 12 (MISO) */
 #define ARDUINO_PIN_13  GPIO18      /**< Arduino Uno pin 13 (SCK)  */
 
 #define ARDUINO_PIN_A0  GPIO25      /**< Arduino Uno pin A0 */
