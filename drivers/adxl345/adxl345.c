@@ -34,6 +34,8 @@
 #define ADXL345_BUS                 (dev->params->i2c)
 #define ADXL345_ADDR                (dev->params->addr)
 
+#define ADXL345_PARAM_SCALE_FACTOR  (4)
+
 int adxl345_init(adxl345_t *dev, const adxl345_params_t* params)
 {
     uint8_t reg;
