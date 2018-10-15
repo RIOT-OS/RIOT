@@ -133,6 +133,20 @@ the next uplink:
 ```
 
 ### Other shell commands
+
+* Save the device LoRaWAN configuration (EUIs and keys) in EEPROM (if provided
+  by the microcontroller):
+
+      > loramac save
+
+  On the next device reboot, these parameters will be automatically re-read
+  from the EEPROM non-volatile storage and thus you can join directly the
+  network without entering them again from the command line.
+
+* Remove previously stored LoRaWAN configuration:
+
+      > loramac erase
+
 * Switch the default datarate index (from 0 to 16). 5 is for SF7, BW125:
 ```
     > loramac set dr 5
