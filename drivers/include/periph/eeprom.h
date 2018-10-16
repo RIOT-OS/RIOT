@@ -46,6 +46,9 @@ uint8_t eeprom_read_byte(uint32_t pos);
 /**
  * @brief   Read @p len bytes from the given position
  *
+ * This function must be implemented by each CPU that provides an internal
+ * EEPROM.
+ *
  * @param[in]  pos      start position in eeprom
  * @param[out] data     output byte array to write to
  * @param[in]  len      the number of bytes to read
@@ -64,6 +67,9 @@ void eeprom_write_byte(uint32_t pos, uint8_t data);
 
 /**
  * @brief   Write @p len bytes at the given position
+ *
+ * This function must be implemented by each CPU that provides an internal
+ * EEPROM.
  *
  * @param[in] pos       start position in eeprom
  * @param[in] data      input byte array to read into
