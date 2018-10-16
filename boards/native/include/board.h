@@ -24,6 +24,9 @@
 
 #include <stdint.h>
 
+/* RIOT includes */
+#include <motor_driver.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -123,6 +126,19 @@ extern mtd_dev_t *mtd0;
 #endif
 /** @} */
 #endif
+
+/**
+ * @brief Simulate QDEC on motor_set() calls
+ *
+ * @param[in] motor_driver      motor driver to which motor is attached
+ * @param[in] motor_id          motor ID on driver
+ * @param[in] pwm_duty_cycle    Signed PWM duty_cycle to set motor speed and direction
+ *
+ * @return                      0 on success
+ */
+void native_motor_driver_qdec_simulation( \
+    const motor_driver_t motor_driver, uint8_t motor_id, \
+    int32_t pwm_duty_cycle);
 
 #ifdef __cplusplus
 }
