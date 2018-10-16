@@ -47,6 +47,13 @@
  *
  * @endcode
  *
+ * Some aspects of the AES implementation can be fine tuned by pseudo-modules:
+ *  * crypto_aes_precalculated: Use pre-calculated T-tables. This improved
+ *       speed at the expense of increased program size. The default is to
+ *       calculate most tables on the fly.
+ *  * crypto_aes_unroll: enable manually-unrolled loops. The default is to not
+ *       have them unrolled.
+ *
  * If you need to encrypt data of arbitrary size take a look at the different
  * operation modes like: CBC, CTR or CCM.
  *
