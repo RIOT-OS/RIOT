@@ -37,6 +37,10 @@ typedef uint32_t u32;
 typedef uint16_t u16;
 typedef uint8_t u8;
 
+/* This controls AES table calculation on the fly */
+#ifndef AES_CALCULATE_TABLES
+#define AES_CALCULATE_TABLES
+#endif
 
 /* This controls loop-unrolling in aes_core.c */
 #undef FULL_UNROLL
