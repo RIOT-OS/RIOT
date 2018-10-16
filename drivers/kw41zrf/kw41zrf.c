@@ -188,6 +188,7 @@ void kw41zrf_reset_phy(kw41zrf_t *dev)
     kw41zrf_timer_init(dev, KW41ZRF_TIMEBASE_62500HZ);
 
     /* Set CCA threshold to -75 dBm */
+    /* The hardware default for this register is +75 dBm (0x4b), which is nonsense */
     ZLL->CCA_LQI_CTRL = (ZLL->CCA_LQI_CTRL & ~ZLL_CCA_LQI_CTRL_CCA1_THRESH_MASK) |
         ZLL_CCA_LQI_CTRL_CCA1_THRESH(-75);
 
