@@ -160,7 +160,8 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
              * to be constant at 2 DSM ticks */
             while (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_DSM_ZIG_FINISHED_MASK) {}
             /* Clear IRQ flags */
-            /* cppcheck-suppress selfAssignment */
+            /* cppcheck-suppress selfAssignment
+             * (reason: IRQ flags are write-1-to-clear) */
             RSIM->DSM_CONTROL = RSIM->DSM_CONTROL;
             /* Enable timer triggered sleep */
             ZLL->DSM_CTRL |= ZLL_DSM_CTRL_ZIGBEE_SLEEP_EN_MASK;
