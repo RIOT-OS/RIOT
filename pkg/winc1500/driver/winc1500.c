@@ -310,9 +310,16 @@ int winc1500_get_mac_addr(winc1500_t *dev, uint8_t *addr)
     if (!(dev->state & WINC1500_STATE_INIT)) {
         return WINC1500_ERR;
     }
-    for (int i = 0; i < 6; i++) {
-        addr[i] = dev->mac_addr[i];
-    }
+    _lock(dev);
+
+    /* Get MAC Address. */
+    m2m_wifi_get_mac_address(dev, addr);
+    DEBUG("MAC Address : ");
+    DEBUG("%02X:%02X:%02X:%02X:%02X:%02X\n",
+            addr[0], addr[1],
+            addr[2], addr[3],
+            addr[4], addr[5]);
+    _unlock(dev);
     return result;
 }
 

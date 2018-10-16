@@ -93,16 +93,17 @@ void _wifi_cb(winc1500_t *dev, uint8_t opcode, uint16_t size, uint32_t addr)
             recv_size = sizeof (event_info.prng_result);
             break;
 #ifdef MODULE_NETDEV_ETH
-        case M2M_WIFI_RESP_ETHERNET_RX_PACKET:
+        case M2M_WIFI_RESP_ETHERNET_RX_PACKET: {
+            _unlock_bus(dev);
             dev->rx_addr = addr;
             dev->netdev.event_callback(&dev->netdev, NETDEV_EVENT_RX_COMPLETE);
-            goto end;
-            break;
+            _lock_bus(dev);
+            return;
+        }
 #endif
         default:
             DEBUG("Unhandled event: %d\n", opcode);
-            goto end;
-            break;
+            return;
     }
 
     /* Get data from the module and then pass it to _process_event() */
@@ -116,24 +117,14 @@ void _wifi_cb(winc1500_t *dev, uint8_t opcode, uint16_t size, uint32_t addr)
             addr += sizeof(event_info.prng_result);
             recv_size = event_info.prng_result.u16PrngSize;
             is_done = 1;
+
             ret = hif_receive(dev, addr, event_info.prng_result.pu8RngBuff,
                                 recv_size, is_done);
             if (ret == M2M_SUCCESS) {
                 _process_event(dev, opcode, &event_info);
             }
-            else {
-                goto error;
-            }
         }
     }
-    else {
-        goto error;
-    }
-end:
-    return;
-error:
-    DEBUG("hif_receive() error: %d\n", ret);
-    return;
 }
 
 /**
