@@ -157,7 +157,7 @@ struct winc1500 {
     mutex_t  mutex;       /**< Mutex used for locking concurrent sends */
     uint32_t rx_addr;     /**< The module's base addresss of the received buffer */
     uint16_t rx_offset;   /**< The module's addresss offset to the received buffer */
-    int      rx_size;     /**< The module's size of the received buffer */
+    int32_t  rx_size;     /**< The module's size of the received buffer */
     uint16_t rx_rem_size; /**< The module's remaining size of the received buffer */
     /** TODO: Try to remove this */
     uint8_t  frame_buf[ETHERNET_FRAME_LEN]; /**< Frame buffer to send */

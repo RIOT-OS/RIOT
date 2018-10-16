@@ -163,49 +163,58 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     (void)info;
     _lock_bus(dev);
 
-    int size;
-    uint16_t data_size;
-    uint8_t rx_done;
+    int8_t ret;
+    int pkt_size;
+    uint8_t drop_pkt = 0;
     winc1500_event_info_t event_info;
 
+    /* A new packet waiting in the module's buffer, copy packet information. */
     if (dev->rx_size == -1) {
-        if (hif_receive(dev, dev->rx_addr, (uint8_t *) &event_info,
-                    sizeof(event_info.recv_pkt), 0) == M2M_SUCCESS) {
+        ret = hif_receive(dev, dev->rx_addr, (uint8_t *) &event_info,
+                            sizeof(event_info.recv_pkt), 0);
+        if (ret == M2M_SUCCESS) {
             dev->rx_offset = event_info.recv_pkt.u16PktOffset;
             dev->rx_rem_size = event_info.recv_pkt.u16PktSz;
             dev->rx_size = event_info.recv_pkt.u16PktSz;
         }
     }
-    size = dev->rx_size;
-    if (buf != NULL) {
+    pkt_size = dev->rx_size;
+
+    if (buf == NULL) {
+        /* len == 0: keep the packet. len > 0: drop the packet, */
+        drop_pkt = (len > 0) ? 1 : 0;
+        goto done;
+    }
+    else if (buf != NULL) {
+        if ((size_t) pkt_size > len) {
+            DEBUG("Buffer size is too small.\n");
+            pkt_size = -ENOBUFS;
+            goto done;
+        }
 #ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += len;
+        netdev->stats.rx_bytes += pkt_size;
 #endif
-        /* Then get the rest of it */
-        do {
-            rx_done = 1;
-            if(dev->rx_rem_size > len) {
-                rx_done = 0;
-                data_size = len;
-            }
-            else {
-                data_size = dev->rx_rem_size;
-            }
-
-            if(hif_receive(dev, dev->rx_addr + dev->rx_offset, buf, data_size, rx_done) == M2M_SUCCESS) {
-                dev->rx_rem_size -= data_size;
-                dev->rx_offset += data_size;
-                buf += data_size;
-            }
-            else {
-                break;
-            }
-        } while (dev->rx_rem_size > 0);
+        /* Drop the packet whatever happens after copyting packet */
+        /* TODO: check if FCS exists in the packet */
+        drop_pkt = 1;
+        ret = hif_receive(dev, dev->rx_addr + dev->rx_offset, buf, pkt_size, 0);
+        if (ret == M2M_SUCCESS) {
+            goto done;
+        }
+        else {
+            DEBUG("Error copying recv packet: %d\n", ret);
+            pkt_size = 0;
+            goto done;
+        }
+    }
+done:
+    if (drop_pkt) {
+        hif_receive(dev, 0, NULL, 0, drop_pkt);
         dev->rx_size = -1;
     }
     _unlock_bus(dev);
-    return size;
+    return pkt_size;
 }
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
