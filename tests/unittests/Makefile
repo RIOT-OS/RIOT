@@ -20,6 +20,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              chronos \
                              ek-lm4f120xl \
                              feather-m0 \
+                             firefly \
                              ikea-tradfri \
                              limifrog-v1 maple-mini \
                              lobaro-lorabox \
@@ -109,6 +110,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        ek-lm4f120xl \
                        f4vi1 \
                        feather-m0 \
+                       firefly \
                        fox \
                        frdm-k22f \
                        frdm-k64f \
