@@ -42,8 +42,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define _MAX_MHR_OVERHEAD   (25)
-
 static int _send(netdev_t *netdev, const iolist_t *iolist);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
@@ -282,11 +280,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             assert(max_len >= sizeof(uint16_t));
             ((uint8_t *)val)[1] = 0;
             ((uint8_t *)val)[0] = at86rf2xx_get_page(dev);
-            return sizeof(uint16_t);
-
-        case NETOPT_MAX_PACKET_SIZE:
-            assert(max_len >= sizeof(int16_t));
-            *((uint16_t *)val) = AT86RF2XX_MAX_PKT_LENGTH - _MAX_MHR_OVERHEAD;
             return sizeof(uint16_t);
 
         case NETOPT_STATE:
