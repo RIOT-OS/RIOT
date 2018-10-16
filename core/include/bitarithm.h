@@ -115,11 +115,26 @@ static inline unsigned bitarithm_lsb(unsigned v);
 
 /**
  * @brief   Returns the number of bits set in a value
- * @param[in]   v   Input value
+ * @param[in]   v   Input value with platform-dependent word size
  * @return          Number of set bits
  *
  */
 unsigned bitarithm_bits_set(unsigned v);
+
+/**
+ * @brief   Returns the (uint32_t version) number of bits set in a value
+ * @param[in]   v   Input value with 32 bit size
+ * @return          Number of set bits
+ *
+ */
+#if ARCH_32_BIT
+static inline uint8_t bitarithm_bits_set_u32(uint32_t v)
+{
+    return bitarithm_bits_set(v);
+}
+#else
+uint8_t bitarithm_bits_set_u32(uint32_t v);
+#endif
 
 /* implementations */
 
