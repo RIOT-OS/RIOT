@@ -39,7 +39,7 @@
 #include "constants.h"
 #include "stack.h"
 
-#define _MSG_QUEUE_SIZE         (1)
+#define _MSG_QUEUE_SIZE         (4)
 #define _SEND_DONE              (0x92d7)
 #define _NETDEV_BUFFER_SIZE     (128)
 
@@ -237,6 +237,8 @@ void _prepare_send_checks(void)
         if (nc->state == ND6_NO_ENTRY) {
             nc->state = ND6_REACHABLE;
             memcpy(&nc->next_hop_address, remote6, sizeof(ip6_addr_t));
+            ip6_addr_assign_zone(&nc->next_hop_address,
+                                 IP6_UNICAST, &netif);
             memcpy(&nc->lladdr, mac, 6);
             nc->netif = &netif;
             nc->counter.reachable_time = UINT32_MAX;

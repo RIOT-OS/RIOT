@@ -131,7 +131,7 @@ err_t lwip_netdev_init(struct netif *netif)
         case NETDEV_TYPE_IEEE802154:
         {
             u16_t val;
-            ipv6_addr_t *addr;
+            ip6_addr_t *addr;
             if (netdev->driver->get(netdev, NETOPT_NID, &val,
                                     sizeof(val)) < 0) {
                 return ERR_IF;
@@ -154,11 +154,13 @@ err_t lwip_netdev_init(struct netif *netif)
             }
             /* netif_create_ip6_linklocal_address() does weird byte-swapping
              * with full IIDs, so let's do it ourselves */
-            addr = (ipv6_addr_t *)&(netif->ip6_addr[0]);
-            if (netdev->driver->get(netdev, NETOPT_IPV6_IID, &addr->u8[8], sizeof(eui64_t)) < 0) {
+            addr = &(netif->ip6_addr[0]);
+            /* addr->addr is a uint32_t array */
+            if (netdev->driver->get(netdev, NETOPT_IPV6_IID, &addr->addr[2], sizeof(eui64_t)) < 0) {
                 return ERR_IF;
             }
-            ipv6_addr_set_link_local_prefix(addr);
+            ipv6_addr_set_link_local_prefix((ipv6_addr_t *)&addr->addr[0]);
+            ip6_addr_assign_zone(addr, IP6_UNICAST, netif);
             /* Set address state. */
 #if LWIP_IPV6_DUP_DETECT_ATTEMPTS
             /* Will perform duplicate address detection (DAD). */
