@@ -32,7 +32,7 @@ extern "C" {
 /**
  * @brief    winc1500 configuration
  */
-#define WINC1500_PARAMS_BOARD    {.spi = SPI_DEV(1), \
+#define WINC1500_PARAMS    {.spi = SPI_DEV(1), \
     .cs_pin =    GPIO_PIN(PA, 14), \
     .int_pin =   GPIO_PIN(PB, 9), \
     .reset_pin = GPIO_PIN(PA, 27), /* Internally pulled-down */ \
