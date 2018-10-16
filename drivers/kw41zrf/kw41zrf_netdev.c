@@ -891,11 +891,11 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
             break;
 
         case NETOPT_CHANNEL:
-            if (len != sizeof(const uint8_t)) {
+            if (len != sizeof(const uint16_t)) {
                 res = -EOVERFLOW;
                 break;
             }
-            if (kw41zrf_set_channel(dev, *((const uint8_t *)value))) {
+            if (kw41zrf_set_channel(dev, *((const uint16_t *)value))) {
                 res = -EINVAL;
                 break;
             }
