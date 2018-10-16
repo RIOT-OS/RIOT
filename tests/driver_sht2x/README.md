@@ -3,7 +3,7 @@ This is a manual test application for the SHT2x humidity/temperature sensor driv
 
 # Usage
 This test application will initialize the SHT2x sensor with the following parameters:
- - default device type: SHT25
+ - default device type: SHT21
  - 14-bit temperature resolution
  - 12-bit humidity resolution
 
@@ -15,4 +15,4 @@ CFLAGS=-DSHT2X_PARAM_RESOLUTION=SHT2x_RES_8_12BIT make ...
 See RIOT/drivers/sht2x_params.h for the default configuration.
 
 After initialization, the sensor reads the temperature and humidity values every
-one second and prints them to STDOUT.
+one second and prints them to STDOUT. The chip-heater of the SHTX will be turned on in the beginning, so the temperature shoud rise over time and the humidity should decrease.
