@@ -93,6 +93,28 @@ ETC_LOCALTIME = $(realpath /etc/localtime)
 # # # # # # # # # # # # # # # #
 # Directory mapping functions #
 # # # # # # # # # # # # # # # #
+#
+# This part handles mapping and mounting directories variables from the
+# host system in the docker container.
+#
+# In the container all directories are mapped in subdirectories of
+# `DOCKER_BUILD_ROOT` (`/data/riotbuild` by default).
+#
+#
+# The RIOT directory `RIOTBASE` is mounted to `DOCKER_RIOTBASE`
+# (`DOCKER_BUILD_ROOT/riotbase` by default).
+#
+# For other directories variables:
+#
+# * if the directory is contained within the `RIOT` repository,
+#   the variable is mapped to a path inside `DOCKER_RIOTBASE` in the container.
+#
+# * if the directory is not contained in the `RIOT` repository,
+#   the directory must be mounted in the countainer.
+#   The variable and directory are mapped to a path outside `DOCKER_RIOTBASE`.
+#   Some variables have hardwritten mapping directories (`RIOTCPU` for example),
+#   and other have a mapping directory based on their directory name.
+
 
 # Test if a directory is a subdirectory of `RIOTBASE`
 #
