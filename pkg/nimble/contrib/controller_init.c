@@ -39,7 +39,8 @@ void nimble_riot_controller_init(void)
      * Create task where NimBLE LL will run. This one is required as LL has its
      * own event queue and should have highest priority.
      */
-    thread_create(stack, sizeof(stack), NIMBLE_CONTROLLER_PRIO, 0,
-                  (thread_task_func_t)nimble_port_ll_task_func,
-                  NULL, "nimble_ctrl");
+    thread_create(stack, sizeof(stack), NIMBLE_CONTROLLER_PRIO,
+                  THREAD_CREATE_STACKTEST,
+                  (thread_task_func_t)nimble_port_ll_task_func, NULL,
+                  "nimble_ctrl");
 }
