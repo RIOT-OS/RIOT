@@ -21,6 +21,6 @@ HEXFILE = $(BINFILE)
 # -u: use sector by sector erase
 # -S: swap RTS and DTR
 # -l 0x1ff: amount of sectors to erase
-FFLAGS += -e -u -S -l 0x1ff -w $(BINFILE)
+FFLAGS += -p $(PORT) -e -u -S -l 0x1ff -w $(BINFILE)
 
 TERMFLAGS +=  --set-rts 0
