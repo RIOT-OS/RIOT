@@ -80,7 +80,7 @@ int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
  * @param input_len        length of the input data
  * @param output           pointer to allocated memory for decrypted data. It
  *                         has to be of size data_len - mac_length.
- * 
+ *
  * @return                 Length of the decrypted data on a successful decryption
  * @return                 A negative error code if something went wrong
  */
