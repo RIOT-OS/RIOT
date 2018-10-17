@@ -236,7 +236,6 @@ ifneq (, $(filter $(AVR_BOARDS), $(BOARD)))
 endif
 
 LARGE_STACK_TESTS += tests-hacl
-LARGE_STACK_TESTS += tests-libcose
 LARGE_STACK_TESTS += tests-tweetnacl
 ifneq (,$(filter $(LARGE_STACK_TESTS), $(UNIT_TESTS)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF\)

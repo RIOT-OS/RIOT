@@ -12,7 +12,7 @@
  * @{
  *
  * @file
- * @brief      Unit tests for pkg libcose
+ * @brief      Tests for pkg libcose
  *
  * @author     Koen Zandberg <koen@bergzand.net>
  */
@@ -30,8 +30,6 @@
 #include "embUnit.h"
 #include "memarray.h"
 #include "random.h"
-
-#include "tests-libcose.h"
 
 /* Example payload */
 static char payload[] = "Input string";
@@ -196,7 +194,7 @@ static void test_libcose_03(void)
     TEST_ASSERT_EQUAL_INT(plaintext_len, sizeof(payload) - 1);
 }
 
-Test *tests_libcose_all(void)
+Test *tests_libcose(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_libcose_01),
@@ -208,9 +206,10 @@ Test *tests_libcose_all(void)
     return (Test *)&libcose_tests;
 }
 
-void tests_libcose(void)
+int main(void)
 {
-    printf("Starting libcose test, performing multiple signature operations.\n");
-    printf("This can take a while (up to 2 minutes on the samr21-xpro)\n");
-    TESTS_RUN(tests_libcose_all());
+    TESTS_START();
+    TESTS_RUN(tests_libcose());
+    TESTS_END();
+    return 0;
 }
