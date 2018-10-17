@@ -200,16 +200,16 @@ static size_t iolist_count_total(const iolist_t *iolist)
 
 static void _write_escaped(uart_t uart, uint8_t c)
 {
-    uint8_t *out;
+    const uint8_t *out;
     int n;
 
     switch(c) {
         case ETHOS_FRAME_DELIMITER:
-            out = (uint8_t*)_esc_delim;
+            out = _esc_delim;
             n = 2;
             break;
         case ETHOS_ESC_CHAR:
-            out = (uint8_t*)_esc_esc;
+            out = _esc_esc;
             n = 2;
             break;
         default:
@@ -244,7 +244,7 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
 
     /* send frame content */
     while(len--) {
-        _write_escaped(dev->uart, *(uint8_t*)data++);
+        _write_escaped(dev->uart, *data++);
     }
 
     /* end of frame */
