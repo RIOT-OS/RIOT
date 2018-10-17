@@ -1,2 +1,0 @@
-USEMODULE += random
-USEPKG += qDSA
