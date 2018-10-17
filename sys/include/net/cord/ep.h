@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    net_rdcli CoRE RD Endpoint Library
- * @ingroup     net
+ * @defgroup    net_cord_ep CoRE RD Endpoint
+ * @ingroup     net_cord
  * @brief       Library for using RIOT as CoRE Resource Directory endpoint
  *
  * This module implements a CoRE Resource Directory endpoint library, that
@@ -17,14 +17,10 @@
  * draft-ietf-core-resource-directory-15.
  * @see https://tools.ietf.org/html/draft-ietf-core-resource-directory-15
  *
- * @note        As the name of this library (`rdcli`) can be misleading in
- *              context of the RD draft (endpoint vs client), this library
- *              will most likely undergo a name change in the near future...
- *
  * # Design Decisions
  * - all operations provided by this module are fully synchronous, meaning that
  *   the functions will block until an operation is successful or will time out
- * - the implementation limits the client to be registered with a single RD at
+ * - the implementation limits the endpoint to be registered with a single RD at
  *   any point in time
  *
  * @{
@@ -35,8 +31,8 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifndef NET_RDCLI_H
-#define NET_RDCLI_H
+#ifndef NET_CORD_EP_H
+#define NET_CORD_EP_H
 
 #include "net/sock/udp.h"
 
@@ -48,11 +44,11 @@ extern "C" {
  * @brief   Return values and error codes used by this module
  */
 enum {
-    RDCLI_OK        =  0,   /**< everything went as expected */
-    RDCLI_TIMEOUT   = -1,   /**< no response from the network */
-    RDCLI_ERR       = -2,   /**< internal error or invalid reply */
-    RDCLI_NORD      = -3,   /**< not connected to an RD */
-    RDCLI_OVERFLOW  = -4,   /**< internal buffers can not handle input */
+    CORD_EP_OK        =  0,     /**< everything went as expected */
+    CORD_EP_TIMEOUT   = -1,     /**< no response from the network */
+    CORD_EP_ERR       = -2,     /**< internal error or invalid reply */
+    CORD_EP_NORD      = -3,     /**< not connected to an RD */
+    CORD_EP_OVERFLOW  = -4,     /**< internal buffers can not handle input */
 };
 
 /**
@@ -62,19 +58,19 @@ enum {
  * @param[out] regif    the registration interface is written to this buffer
  * @param[in] maxlen    size of @p regif
  *
- * @return  RDCLI_OK on success
- * @return  RDCLI_TIMEOUT if the discovery request times out
- * @return  RDCLI_NORD if addressed endpoint is not a RD
- * @return  RDCLI_ERR on any other internal error
+ * @return  CORD_EP_OK on success
+ * @return  CORD_EP_TIMEOUT if the discovery request times out
+ * @return  CORD_EP_NORD if addressed endpoint is not a RD
+ * @return  CORD_EP_ERR on any other internal error
  */
-int rdcli_discover_regif(const sock_udp_ep_t *remote,
-                         char *regif, size_t maxlen);
+int cord_ep_discover_regif(const sock_udp_ep_t *remote,
+                           char *regif, size_t maxlen);
 
 /**
  * @brief   Initiate the node registration by sending an empty push
  *
  * - if registration fails (e.g. timeout), we are not associated with any RD
- *   anymore (even if we have been before we called rdcli_register)
+ *   anymore (even if we have been before we called cord_ep_register)
  *
  * @note    In case a multicast address is given, the @p regif parameter MUST be
  *          NULL. The first RD responding to the request will be chosen and all
@@ -84,40 +80,40 @@ int rdcli_discover_regif(const sock_udp_ep_t *remote,
  * @param[in] regif     registration interface resource of the RD, it will be
  *                      discovered automatically when set to NULL
  *
- * @return  RDCLI_OK on success
- * @return  RDCLI_TIMEOUT on registration timeout
- * @return  RDCLI_NORD if addressed endpoint is not a RD
- * @return  RDCLI_OVERFLOW if @p regif does not fit into internal buffer
- * @return  RDCLI_ERR on any other internal error
+ * @return  CORD_EP_OK on success
+ * @return  CORD_EP_TIMEOUT on registration timeout
+ * @return  CORD_EP_NORD if addressed endpoint is not a RD
+ * @return  CORD_EP_OVERFLOW if @p regif does not fit into internal buffer
+ * @return  CORD_EP_ERR on any other internal error
  */
-int rdcli_register(const sock_udp_ep_t *remote, const char *regif);
+int cord_ep_register(const sock_udp_ep_t *remote, const char *regif);
 
 /**
  * @brief   Update our current entry at the RD
  *
- * @return  RDCLI_OK on success
- * @return  RDCLI_TIMEOUT if the update request times out
- * @return  RDCLI_ERR on any other internal error
+ * @return  CORD_EP_OK on success
+ * @return  CORD_EP_TIMEOUT if the update request times out
+ * @return  CORD_EP_ERR on any other internal error
  */
-int rdcli_update(void);
+int cord_ep_update(void);
 
 /**
  * @brief   Unregister from a given RD server
  *
- * @return  RDCLI_OK on success
- * @return  RDCLI_TIMEOUT if the remove request times out
- * @return  RDCLI_ERR on any other internal error
+ * @return  CORD_EP_OK on success
+ * @return  CORD_EP_TIMEOUT if the remove request times out
+ * @return  CORD_EP_ERR on any other internal error
  */
-int rdcli_remove(void);
+int cord_ep_remove(void);
 
 /**
  * @brief   Dump the current RD connection status to STDIO (for debugging)
  */
-void rdcli_dump_status(void);
+void cord_ep_dump_status(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_RDCLI_H */
+#endif /* NET_CORD_EP_H */
 /** @} */

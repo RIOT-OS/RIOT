@@ -142,8 +142,8 @@ extern int _ls_handler(int argc, char **argv);
 extern int _can_handler(int argc, char **argv);
 #endif
 
-#ifdef MODULE_RDCLI
-extern int _rdcli_handler(int argc, char **argv);
+#ifdef MODULE_CORD_EP
+extern int _cord_ep_handler(int argc, char **argv);
 #endif
 
 const shell_command_t _shell_command_list[] = {
@@ -237,8 +237,8 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_CONN_CAN
     {"can", "CAN commands", _can_handler},
 #endif
-#ifdef MODULE_RDCLI
-    {"rdcli", "CoAP RD client commands", _rdcli_handler },
+#ifdef MODULE_CORD_EP
+    {"cord_ep", "Resource directory endpoint commands", _cord_ep_handler },
 #endif
     {NULL, NULL, NULL}
 };

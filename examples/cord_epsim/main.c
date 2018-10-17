@@ -23,7 +23,7 @@
 
 #include "shell.h"
 #include "net/gcoap.h"
-#include "net/rdcli_common.h"
+#include "net/cord/common.h"
 
 #define BUFSIZE             (64U)
 
@@ -68,17 +68,17 @@ int main(void)
 
     /* fill riot info */
     sprintf(riot_info, "{\"ep\":\"%s\",\"lt\":%u}",
-            rdcli_common_get_ep(), RDCLI_LT);
+            cord_common_get_ep(), CORD_LT);
 
     /* register resource handlers with gcoap */
     gcoap_register_listener(&listener);
 
     /* print RD client information */
     puts("RD client information:");
-    printf(" RD addr: %s\n", RDCLI_SERVER_ADDR);
-    printf(" RD port: %u\n", (unsigned)RDCLI_SERVER_PORT);
-    printf("      ep: %s\n", rdcli_common_get_ep());
-    printf("      lt: %is\n", (int)RDCLI_LT);
+    printf(" RD addr: %s\n", CORD_SERVER_ADDR);
+    printf(" RD port: %u\n", (unsigned)CORD_SERVER_PORT);
+    printf("      ep: %s\n", cord_common_get_ep());
+    printf("      lt: %is\n", (int)CORD_LT);
 
     /* run the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
