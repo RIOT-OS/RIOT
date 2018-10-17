@@ -67,7 +67,7 @@
 
 #define INVALID_SPEED_MASK  (0x0f)
 
-static mutex_t lock = MUTEX_INIT;
+static mutex_t lock[I2C_NUMOF];
 
 void isr_i2c(void)
 {
@@ -217,6 +217,10 @@ void i2c_init(i2c_t dev)
 {
     DEBUG("%s (%i)\n", __FUNCTION__, (int)dev);
     assert(dev < I2C_NUMOF);
+
+    /* initialize lock */
+    mutex_init(&lock[dev]);
+
     /* enable i2c clock */
     _i2c_clock_enable(true);
     /* reset i2c periph */
@@ -235,7 +239,7 @@ int i2c_acquire(i2c_t dev)
 {
     DEBUG("%s\n", __FUNCTION__);
     if (dev < I2C_NUMOF) {
-        mutex_lock(&lock);
+        mutex_lock(&lock[dev]);
         return 0;
     }
     return -1;
@@ -245,7 +249,7 @@ int i2c_release(i2c_t dev)
 {
     DEBUG("%s\n", __FUNCTION__);
     if (dev < I2C_NUMOF) {
-        mutex_unlock(&lock);
+        mutex_unlock(&lock[dev]);
         return 0;
     }
     return -1;
