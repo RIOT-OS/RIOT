@@ -12,15 +12,23 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @file
  *
- * The test application demonstrates the use of the CCS811 using
+ * The test application demonstrates the use of the CCS811 and pseudomodule
+ * ```ccs811_full``` using
  *
- * - data-ready status function ```ccs811_data_ready``` to wait for
- *   new data and
+ * - data-ready interrupt ```CCS811_INT_DATA_READY``` and
  * - default configuration parameters, that is, the measurement mode
  *   ```CCS811_MODE_1S``` with one measurement per second.
  *
- * Please refer ```$(RIOTBASE)/tests/driver_ccs811_full``` to learn how
- * to use the CCS811 with interrupts.
+ * The default configuration parameter for the interrupt pin has to be
+ * overridden according to the hardware configuration by defining
+ * ```CCS811_PARAM_INT_PIN``` before ```ccs811_params.h``` is included, e.g.,
+ * ```
+ * #define CCS811_PARAM_INT_PIN     (GPIO_PIN(0, 7))
+ * ```
+ * or via the CFLAGS variable in the make command.
+ * ```
+ * CFLAGS="-DCCS811_PARAM_INT_PIN=\(GPIO_PIN\(0,7\)\)" make -C tests/driver_ccs811 BOARD=...
+ * ```
  */
 
 #include <stdio.h>
@@ -31,6 +39,15 @@
 
 #include "ccs811.h"
 #include "ccs811_params.h"
+
+kernel_pid_t p_main;
+
+static void ccs811_isr (void *arg)
+{
+    /* send a message to trigger main thread to handle the interrupt */
+    msg_t msg;
+    msg_send(&msg, p_main);
+}
 
 int main(void)
 {
@@ -46,19 +63,33 @@ int main(void)
         return 1;
     }
 
+    /* initialize the interrupt pin */
+    gpio_init_int (ccs811_params[0].int_pin, GPIO_IN, GPIO_FALLING,
+                   ccs811_isr, 0);
+
+    /* activate data ready interrupt */
+    if (ccs811_set_int_mode (&sensor, CCS811_INT_DATA_READY) != CCS811_OK) {
+        puts("Activating interrupt failed\n");
+        return 1;
+    }
+
+    /* save the pid of main thread */
+    p_main = sched_active_pid;
+
     printf("\n+--------Starting Measurements--------+\n");
 
     while (1) {
+
         uint16_t tvoc;
         uint16_t eco2;
 
-        /* wait and check for for new data every 10 ms */
-        while (ccs811_data_ready (&sensor) != CCS811_OK) {
-            xtimer_usleep(10000);
-        }
+        /* wait for data ready interrupt */
+        msg_t msg;
+        msg_receive(&msg);
 
-        /* read the data and print them on success */
+        /* read the data */
         if (ccs811_read_iaq(&sensor, &tvoc, &eco2, 0, 0) != CCS811_OK) {
+            /* print values */
             printf("TVOC [ppb]: %d\neCO2 [ppm]: %d\n", tvoc, eco2);
             puts("+-------------------------------------+");
         }
