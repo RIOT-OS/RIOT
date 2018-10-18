@@ -73,7 +73,7 @@ class RSSIPlot(object):
         # X and Y are the bounds, so Z should be the value *inside* those bounds.
         # Therefore, remove the last row and column from the Z array.
         self.Z = Z[:-1, :-1]
-        self.pcm = self.ax.pcolormesh(self.X, self.Y, self.Z, vmin=-128, vmax=0, cmap=plt.cm.get_cmap('jet'))
+        self.pcm = self.ax.pcolormesh(self.X, self.Y, self.Z, vmin=-100, vmax=-20, cmap=plt.cm.get_cmap('jet'))
         self.ax.get_figure().colorbar(self.pcm, label="Measured signal level [dB]")
         self.ax.set_ylabel("Channel number")
         self.ax.set_xlabel("Time [s]")
