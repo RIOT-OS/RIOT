@@ -197,7 +197,9 @@ TestRef test_cn_cbor(void)
     return (TestRef) & tests_cn_cbor;
 }
 
-void tests_cn_cbor(void)
+int main(void)
 {
+    TESTS_START();
     TESTS_RUN(test_cn_cbor());
+    TESTS_END();
 }
