@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    boards_wsn430-v1_4 WSN430 v1.4
- * @ingroup     boards
+ * @ingroup     boards_wsn430-v1_4
  * @brief       Support for the Senslab WSN430 v1.4 board
  *
  * @{
