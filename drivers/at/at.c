@@ -58,6 +58,24 @@ void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len)
     uart_write(dev->uart, (const uint8_t *)bytes, len);
 }
 
+ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
+{
+    char *resp_pos = bytes;
+
+    while (len) {
+        int read_res;
+        if ((read_res = isrpipe_read_timeout(&dev->isrpipe, resp_pos, 1, timeout)) == 1) {
+            resp_pos += read_res;
+            len -= read_res;
+        }
+        else if (read_res == -ETIMEDOUT) {
+            break;
+        }
+    }
+
+    return (resp_pos - bytes);
+}
+
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
 {
     size_t cmdlen = strlen(command);
