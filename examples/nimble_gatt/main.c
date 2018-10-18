@@ -90,6 +90,7 @@ static void start_advertise(void)
     rc = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER,
                            &advp, gap_event_cb, NULL);
     assert(rc == 0);
+    (void)rc;
 }
 
 static void app_ble_sync_cb(void)
@@ -101,6 +102,7 @@ static void app_ble_sync_cb(void)
 
     rc = ble_hs_id_infer_auto(0, &own_addr_type);
     assert(rc == 0);
+    (void)rc;
 
     /* generate the advertising data */
     update_ad();
