@@ -145,13 +145,23 @@ extern "C" {
  * @anchor  net_coap_format
  * @{
  */
-#define COAP_FORMAT_TEXT         (0)
-#define COAP_FORMAT_LINK        (40)
-#define COAP_FORMAT_XML         (41)
-#define COAP_FORMAT_OCTET       (42)
-#define COAP_FORMAT_EXI         (47)
-#define COAP_FORMAT_JSON        (50)
-#define COAP_FORMAT_CBOR        (60)
+#define COAP_FORMAT_TEXT                      (0)
+#define COAP_FORMAT_LINK                     (40)
+#define COAP_FORMAT_XML                      (41)
+#define COAP_FORMAT_OCTET                    (42)
+#define COAP_FORMAT_EXI                      (47)
+#define COAP_FORMAT_JSON                     (50)
+#define COAP_FORMAT_JSON_PATCH_JSON          (51)
+#define COAP_FORMAT_MERGE_PATCH_JSON         (52)
+#define COAP_FORMAT_CBOR                     (60)
+#define COAP_FORMAT_SENML_JSON              (110)
+#define COAP_FORMAT_SENSML_JSON             (111)
+#define COAP_FORMAT_SENML_CBOR              (112)
+#define COAP_FORMAT_SENSML_CBOR             (113)
+#define COAP_FORMAT_SENML_EXI               (114)
+#define COAP_FORMAT_SENSML_EXI              (115)
+#define COAP_FORMAT_SENML_XML               (310)
+#define COAP_FORMAT_SENSML_XML              (311)
 /** @} */
 
 /**
