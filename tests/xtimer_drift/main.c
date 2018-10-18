@@ -72,9 +72,8 @@ void *slacker_thread(void *arg)
     (void) arg;
     timex_t now;
 
-#ifdef SLACKER_THREAD_PIN
-    printf("Debug worker thread port 0x%02x pin %d\n",  SLACKER_THREAD_PORT, SLACKER_THREAD_PIN);
-    gpio_t slacker_pin = GPIO_PIN(SLACKER_THREAD_PORT, SLACKER_THREAD_PIN);
+#if defined(SLACKER_THREAD_PIN)
+    gpio_t slacker_pin = SLACKER_THREAD_PIN;
     gpio_init(slacker_pin, GPIO_OUT);
 #endif
 
@@ -90,7 +89,7 @@ void *slacker_thread(void *arg)
         struct timer_msg *tmsg = m.content.ptr;
         xtimer_now_timex(&now);
         xtimer_usleep(TEST_MSG_RX_USLEEP);
-#ifdef SLACKER_THREAD_PIN
+#if defined(SLACKER_THREAD_PIN)
         gpio_set(slacker_pin);
         gpio_clear(slacker_pin);
 #endif
@@ -105,9 +104,8 @@ void *worker_thread(void *arg)
 {
     (void) arg;
 
-#ifdef PRINT_THREAD_PIN
-    printf("Debug worker thread port 0x%02x pin %d\n",  PRINT_THREAD_PORT, PRINT_THREAD_PIN);
-    gpio_t print_pin = GPIO_PIN(PRINT_THREAD_PORT, PRINT_THREAD_PIN);
+#if defined(PRINT_THREAD_PIN)
+    gpio_t print_pin = PRINT_THREAD_PIN;
     gpio_init(print_pin, GPIO_OUT);
 #endif
 
@@ -133,7 +131,7 @@ void *worker_thread(void *arg)
             last = start;
         }
         else if ((loop_counter % TEST_HZ) == 0) {
-#ifdef SLACKER_THREAD_PIN
+#if defined(PRINT_THREAD_PIN)
             gpio_set(print_pin);
             gpio_clear(print_pin);
 #endif
@@ -155,9 +153,8 @@ void *worker_thread(void *arg)
 
 int main(void)
 {
-#ifdef MAIN_THREAD_PIN
-    printf("Debug main thread port 0x%02x pin %d\n", MAIN_THREAD_PORT, MAIN_THREAD_PIN);
-    gpio_t main_pin = GPIO_PIN(MAIN_THREAD_PORT, MAIN_THREAD_PIN);
+#if defined(MAIN_THREAD_PIN)
+    gpio_t main_pin = MAIN_THREAD_PIN;
     gpio_init(main_pin, GPIO_OUT);
 #endif
 
@@ -200,11 +197,11 @@ int main(void)
     puts("[START]\n");
     xtimer_ticks32_t last_wakeup = xtimer_now();
     while (1) {
-#ifdef MAIN_THREAD_PIN
+#if defined(MAIN_THREAD_PIN)
         gpio_set(main_pin);
 #endif
         xtimer_periodic_wakeup(&last_wakeup, TEST_INTERVAL);
-#ifdef MAIN_THREAD_PIN
+#if defined(MAIN_THREAD_PIN)
         gpio_clear(main_pin);
 #endif
         msg_try_send(&m, pid3);
