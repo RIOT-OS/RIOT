@@ -314,7 +314,14 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void* info)
         return (int)len;
     }
     else {
-        return dev->last_framesize;
+        if (len) {
+            int dropsize = dev->last_framesize;
+            dev->last_framesize = 0;
+            return tsrb_drop(&dev->inbuf, dropsize);
+        }
+        else {
+            return dev->last_framesize;
+        }
     }
 }
 
