@@ -887,8 +887,19 @@ static void contikimac_send(contikimac_t *ctx, int broadcast)
      * wake-up interval boundary, plus yet one more frame for the actual
      * transmission in the worst case scenario. */
     uint32_t tx_strobe_timeout = ctx->channel_check_period + 2 * ctx->params->cca_cycle_period;
+
     /* TX aborts listening mode */
     contikimac_cancel_timers(ctx);
+
+#ifdef MODULE_NETSTATS_L2
+    if (broadcast) {
+        ++lower->stats.tx_mcast_count;
+    }
+    else {
+        ++lower->stats.tx_unicast_count;
+    }
+#endif
+
     /* Check that the channel is clear before starting strobe */
     /* This check avoids problems where a reply sent in response to a broadcast
      * transmission interrupts the broadcasting node and prevents other nodes
