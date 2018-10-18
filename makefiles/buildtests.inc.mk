@@ -2,9 +2,6 @@
 
 BUILDTEST_MAKE_REDIRECT ?= >/dev/null 2>&1
 
-# Do not propagate already BOARD specific BINDIR and PKGDIRBASE
-buildtest: MAKEOVERRIDES := $(filter-out BINDIR=% PKGDIRBASE=%, $(MAKEOVERRIDES))
-
 ifeq ($(BUILD_IN_DOCKER),1)
 buildtest: ..in-docker-container
 else
