@@ -65,6 +65,9 @@ extern "C" {
 #define COAP_METHOD_POST        (2)
 #define COAP_METHOD_PUT         (3)
 #define COAP_METHOD_DELETE      (4)
+#define COAP_METHOD_FETCH       (5)
+#define COAP_METHOD_PATCH       (6)
+#define COAP_METHOD_IPATCH      (7)
 /** @} */
 
 /**
@@ -104,9 +107,11 @@ extern "C" {
 #define COAP_CODE_METHOD_NOT_ALLOWED         ((4 << 5) | 5)
 #define COAP_CODE_NOT_ACCEPTABLE             ((4 << 5) | 6)
 #define COAP_CODE_REQUEST_ENTITY_INCOMPLETE  ((4 << 5) | 8)
+#define COAP_CODE_CONFLICT                   ((4 << 5) | 9)
 #define COAP_CODE_PRECONDITION_FAILED        ((4 << 5) | 12)
 #define COAP_CODE_REQUEST_ENTITY_TOO_LARGE   ((4 << 5) | 13)
 #define COAP_CODE_UNSUPPORTED_CONTENT_FORMAT ((4 << 5) | 15)
+#define COAP_CODE_UNPROCESSABLE_ENTITY       ((4 << 5) | 22)
 /** @} */
 
 /**
