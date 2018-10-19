@@ -177,6 +177,11 @@ void auto_init(void)
     DEBUG("Auto init Asymcute\n");
     asymcute_handler_run();
 #endif
+#ifdef MODULE_NIMBLE
+    DEBUG("Auto init NimBLE\n");
+    extern void nimble_riot_init(void);
+    nimble_riot_init();
+#endif
 
 /* initialize network devices */
 #ifdef MODULE_AUTO_INIT_GNRC_NETIF
