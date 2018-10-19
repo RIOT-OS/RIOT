@@ -21,9 +21,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "embUnit/embUnit.h"
-
-#include "tests-littlefs.h"
+#include "embUnit.h"
 
 /* Define MTD_0 in board.h to use the board mtd if any */
 #ifdef MTD_0
@@ -404,7 +402,7 @@ static void tests_littlefs_statvfs(void)
     TEST_ASSERT(stat1.f_bavail > stat2.f_bavail);
 }
 
-Test *tests_littlefs_tests(void)
+Test *tests_littlefs(void)
 {
 #ifndef MTD_0
     memset(dummy_memory, 0xff, sizeof(dummy_memory));
@@ -426,8 +424,11 @@ Test *tests_littlefs_tests(void)
     return (Test *)&littlefs_tests;
 }
 
-void tests_littlefs(void)
+int main(void)
 {
-    TESTS_RUN(tests_littlefs_tests());
+    TESTS_START();
+    TESTS_RUN(tests_littlefs());
+    TESTS_END();
+    return 0;
 }
 /** @} */
