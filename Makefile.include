@@ -570,6 +570,16 @@ define check_cmd
 	    exit 1;}
 endef
 
+# Check if setsid command is available on the system for debug target
+# This is not the case on MacOSX, so it must be built on the fly
+ifneq (,$(filter debug, $(MAKECMDGOALS)))
+  ifneq (0,$(shell which setsid 2>&1 > /dev/null ; echo $$?))
+    SETSID = $(RIOTTOOLS)/setsid/setsid
+    $(call target-export-variables,debug,$(SETSID))
+    DEBUGDEPS += $(SETSID)
+  endif
+endif
+
 ..compiler-check:
 	$(call check_cmd,$(CC),Compiler)
 
@@ -643,7 +653,7 @@ list-ttys:
 doc:
 	make -BC $(RIOTBASE) doc
 
-debug:
+debug: $(DEBUGDEPS)
 	$(call check_cmd,$(DEBUGGER),Debug program)
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
