@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     unittests
+ * @ingroup     tests
  * @{
  * @file
  * @brief       Tests for the heatshrink compression library package
@@ -106,7 +106,7 @@ static void test_heatshrink(void)
     TEST_ASSERT_EQUAL_INT(_comp_uncomp((const uint8_t*)_data, strlen(_data)), 0);
 }
 
-TestRef test_heatshrink_all(void)
+TestRef tests_heatshrink(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_heatshrink),
@@ -116,7 +116,11 @@ TestRef test_heatshrink_all(void)
     return (TestRef) & HeatshrinkTest;
 }
 
-void tests_heatshrink(void)
+int main(void)
 {
-    TESTS_RUN(test_heatshrink_all());
+    TESTS_START();
+    TESTS_RUN(tests_heatshrink());
+    TESTS_END();
+
+    return 0;
 }
