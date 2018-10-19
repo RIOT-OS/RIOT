@@ -966,14 +966,14 @@ static inline unsigned coap_get_total_hdr_len(coap_pkt_t *pkt)
 /**
  * @brief   Encode given code class and code detail to raw code
  *
- * @param[in]   class   message code class
+ * @param[in]   cls     message code class
  * @param[in]   detail  message code detail
  *
  * @returns     raw message code
  */
-static inline uint8_t coap_code(unsigned class, unsigned detail)
+static inline uint8_t coap_code(unsigned cls, unsigned detail)
 {
-    return (class << 5) | detail;
+    return (cls << 5) | detail;
 }
 
 /**
