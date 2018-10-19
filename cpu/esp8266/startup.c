@@ -170,8 +170,8 @@ void IRAM user_init (void)
     syscalls_init ();
     thread_isr_stack_init ();
 
-    /* run system in high performance mode */
-    system_update_cpu_freq(160);
+    /* set system frequency */
+    system_update_cpu_freq(ESP8266_CPU_FREQUENCY);
 
     /* reinit system timer as microsecond timer */
     system_timer_reinit ();
@@ -191,6 +191,7 @@ void IRAM user_init (void)
 #include "esp/dport_regs.h"
 #include "esp/phy_info.h"
 #include "esp/spiflash.h"
+#include "user_config.h"
 
 /**
  * @brief   Defines the structure of the file header in SPI flash
@@ -661,8 +662,8 @@ void __attribute__((noreturn)) IRAM cpu_user_start (void)
 
     /** }@ */
 
-    /* run system in high performance mode */
-    /* TODO system_update_cpu_freq(160); */
+    /* set system frequency */
+    system_update_cpu_freq(ESP8266_CPU_FREQUENCY);
 
     /* PHASE 3: start RIOT-OS kernel */
 
