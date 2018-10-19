@@ -129,6 +129,19 @@ void system_restart(void)
     __asm__ volatile (" call0 0x40000080 ");
 }
 
+extern bool system_update_cpu_freq(uint8 freq)
+{
+    if (freq == 160) {
+        DPORT.CPU_CLOCK |= DPORT_CPU_CLOCK_X2;
+        ets_update_cpu_frequency(160);
+    }
+    else {
+        DPORT.CPU_CLOCK &= ~DPORT_CPU_CLOCK_X2;
+        ets_update_cpu_frequency(80);
+    }
+    return true;
+}
+
 /**
  * Following code is completly or at least partially from
  * https://github.com/pvvx/esp8266web
