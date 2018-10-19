@@ -1,6 +1,6 @@
 PKG_NAME    = nimble
 PKG_URL     = https://github.com/apache/mynewt-nimble.git
-PKG_VERSION = 050a7108cf56546554b4162f0600ab3b2d7e173f
+PKG_VERSION = ef58876024218e488dcbc15c8631db016241ab1f
 PKG_LICENSE = Apache-2.0
 
 TDIR = $(RIOTPKG)/$(PKG_NAME)
@@ -20,7 +20,6 @@ endif
 
 all: git-download
 	"$(MAKE)" -C $(PDIR)/ext/tinycrypt/src/ -f $(TDIR)/ext.tinycrypt.mk
-	"$(MAKE)" -C $(PDIR)/nimble/src -f $(TDIR)/nimble.mk
 	"$(MAKE)" -C $(PDIR)/nimble/host/src/ -f $(TDIR)/nimble.host.mk
 	"$(MAKE)" -C $(PDIR)/nimble/host/services/gap/src/ -f $(TDIR)/service.gap.mk
 	"$(MAKE)" -C $(PDIR)/nimble/host/services/gatt/src/ -f $(TDIR)/service.gatt.mk
