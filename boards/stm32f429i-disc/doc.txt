@@ -4,8 +4,6 @@
  * @brief       Support for the `STM32F429-DISCO` and `STM32F429-DISC1` boards.
 
 
-
-
 ### Differences between -DISCO and -DISC1
 
 The `DISC1` version of this board added the following USB features:
@@ -15,11 +13,9 @@ The `DISC1` version of this board added the following USB features:
 - ST-LINK/V2-B
 
 
-
 ### Using the -DISC1 variant
 
 UART and flashing should work out of the box with this version of the board.
-
 
 
 ### Using the -DISCO variant
