@@ -1,0 +1,3 @@
+ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
+  USEMODULE += libfixmath
+endif

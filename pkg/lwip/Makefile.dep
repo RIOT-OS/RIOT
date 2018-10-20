@@ -1,0 +1,65 @@
+ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
+  USEMODULE += lwip_ipv6_autoconfig
+  USEMODULE += l2util
+endif
+
+ifneq (,$(filter lwip_ipv6_autoconfig lwip_ipv6_mld,$(USEMODULE)))
+  USEMODULE += lwip_ipv6
+endif
+
+ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
+  USEMODULE += random
+endif
+
+ifneq (,$(filter lwip_udplite,$(USEMODULE)))
+  USEMODULE += lwip_udp
+endif
+
+ifneq (,$(filter lwip_sock_%,$(USEMODULE)))
+  USEMODULE += lwip_sock
+endif
+
+ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
+  USEMODULE += lwip_raw
+  USEMODULE += sock_ip
+endif
+
+ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
+  USEMODULE += lwip_tcp
+  USEMODULE += sock_tcp
+endif
+
+ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
+  USEMODULE += lwip_udp
+  USEMODULE += sock_udp
+endif
+
+ifneq (,$(filter lwip_%,$(USEMODULE)))
+  USEMODULE += lwip
+endif
+
+ifneq (,$(filter lwip,$(USEMODULE)))
+  USEMODULE += core_mbox
+  USEMODULE += lwip_api
+  USEMODULE += lwip_contrib
+  USEMODULE += lwip_core
+  USEMODULE += lwip_netif
+  ifeq (,$(filter lwip_ipv4 lwip_ipv6,$(USEMODULE)))
+    USEMODULE += lwip_ipv4
+  endif
+  ifeq (,$(filter lwip_tcp lwip_udp lwip_udplite,$(USEMODULE)))
+    USEMODULE += lwip_raw
+  endif
+  ifneq (,$(filter netdev_eth,$(USEMODULE)))
+    USEMODULE += lwip_ethernet
+  endif
+endif
+
+ifneq (,$(filter lwip_ppp,$(USEMODULE)))
+  USEMODULE += lwip_polarssl
+endif
+
+ifneq (,$(filter lwip_contrib,$(USEMODULE)))
+  USEMODULE += sema
+  USEMODULE += xtimer
+endif

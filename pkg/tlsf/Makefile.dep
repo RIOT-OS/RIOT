@@ -1,0 +1,3 @@
+ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
+  USEMODULE += tlsf
+endif

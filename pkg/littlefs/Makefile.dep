@@ -1,0 +1,5 @@
+ifneq (,$(filter littlefs,$(USEMODULE)))
+  USEMODULE += vfs
+  USEMODULE += littlefs_fs
+  USEMODULE += mtd
+endif

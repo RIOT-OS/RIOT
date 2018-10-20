@@ -1,0 +1,10 @@
+ifneq (,$(filter nordic_softdevice_ble,$(USEMODULE)))
+  FEATURES_REQUIRED += ble_nordic_softdevice
+  USEMODULE += softdevice_handler
+  USEMODULE += ble_common
+  USEMODULE += ble_6lowpan
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_iphc
+  USEMODULE += gnrc_ipv6_nib_6ln
+  USEMODULE += gnrc_ipv6_default
+endif

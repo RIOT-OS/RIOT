@@ -1,0 +1,7 @@
+ifneq (,$(filter ndn-riot,$(USEMODULE)))
+  USEMODULE += gnrc
+  USEMODULE += xtimer
+  USEMODULE += random
+  USEMODULE += hashes
+  USEMODULE += micro-ecc
+endif

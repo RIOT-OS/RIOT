@@ -1,3 +1,8 @@
+ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
+  USEMODULE += fatfs
+  USEMODULE += vfs
+endif
+
 ifneq (,$(filter fatfs,$(USEMODULE)))
   USEMODULE += fatfs_diskio_mtd
   USEMODULE += auto_init_storage

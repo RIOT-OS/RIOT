@@ -1,0 +1,5 @@
+ifneq (,$(filter spiffs,$(USEMODULE)))
+  USEMODULE += vfs
+  USEMODULE += spiffs_fs
+  USEMODULE += mtd
+endif
