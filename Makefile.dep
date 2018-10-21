@@ -368,7 +368,7 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   ifeq (,$(filter newlib_syscalls_%,$(USEMODULE)))
     USEMODULE += newlib_syscalls_default
   endif
-  ifeq (,$(filter stdio_rtt,$(USEMODULE)))
+  ifeq (,$(filter stdio_,$(USEMODULE)))
     USEMODULE += stdio_uart
   endif
 endif
@@ -381,7 +381,7 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter stdio_rtt,$(USEMODULE)))
+ifneq (,$(filter stdio_,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
