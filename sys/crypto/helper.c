@@ -19,7 +19,7 @@ void crypto_block_inc_ctr(uint8_t block[16], int L)
     }
 }
 
-int crypto_equals(uint8_t *a, uint8_t *b, size_t len)
+int crypto_equals(const uint8_t *a, const uint8_t *b, size_t len)
 {
     uint8_t diff = 0;
     for (size_t i = 0; i < len; ++i, ++a, ++b) {
