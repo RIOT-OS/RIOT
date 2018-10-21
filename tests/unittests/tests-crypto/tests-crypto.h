@@ -48,6 +48,8 @@ Test *tests_crypto_chacha_tests(void);
 
 Test *tests_crypto_poly1305_tests(void);
 
+Test *tests_crypto_chacha20poly1305_tests(void);
+
 static inline int compare(const uint8_t *a, const uint8_t *b, uint8_t len)
 {
     int result = 1;
