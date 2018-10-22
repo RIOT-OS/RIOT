@@ -255,6 +255,81 @@ static void test_nanocoap__get_path_too_long(void)
 }
 
 /*
+ * Builds on get_req test, to test Uri-Query option.
+ */
+static void test_nanocoap__get_query(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char path[] = "/time";
+    size_t path_opt_len = 5;
+    char qs[] = "ab=cde";
+    size_t query_opt_len = 7;
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_GET, msgid);
+
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_PATH, &path[0], '/');
+    TEST_ASSERT_EQUAL_INT(path_opt_len, len);
+
+    uint8_t *query_pos = &pkt.payload[0];
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_QUERY, &qs[0], '&');
+    TEST_ASSERT_EQUAL_INT(query_opt_len, len);
+
+    char uri[10] = {0};
+    coap_get_uri_path(&pkt, (uint8_t *)&uri[0]);
+    TEST_ASSERT_EQUAL_STRING((char *)path, (char *)uri);
+
+    char query[10] = {0};
+    coap_get_uri_query(&pkt, (uint8_t *)&query[0]);
+    /* skip initial '&' from coap_get_uri_query() */
+    TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+
+    /* overwrite query to test buffer-based put */
+    coap_opt_put_uri_query(query_pos, COAP_OPT_URI_PATH, qs);
+    coap_get_uri_query(&pkt, (uint8_t *)&query[0]);
+    /* skip initial '&' from coap_get_uri_query() */
+    TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+}
+
+/*
+ * Builds on get_query test, to test multiple Uri-Query options.
+ */
+static void test_nanocoap__get_multi_query(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char qs[] = "ab=cde&f=gh";
+    size_t query_opt_len = 13;    /* first opt header is 2 bytes long */
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_GET, msgid);
+
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+
+    uint8_t *query_pos = &pkt.payload[0];
+    len = coap_opt_add_string(&pkt, COAP_OPT_URI_QUERY, &qs[0], '&');
+    TEST_ASSERT_EQUAL_INT(query_opt_len, len);
+
+    char query[20] = {0};
+    coap_get_uri_query(&pkt, (uint8_t *)&query[0]);
+    /* skip initial '&' from coap_get_uri_query() */
+    TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+
+    /* overwrite query to test buffer-based put */
+    coap_opt_put_uri_query(query_pos, COAP_OPT_URI_PATH, qs);
+    coap_get_uri_query(&pkt, (uint8_t *)&query[0]);
+    /* skip initial '&' from coap_get_uri_query() */
+    TEST_ASSERT_EQUAL_STRING((char *)qs, &query[1]);
+}
+
+/*
  * Helper for server_get tests below.
  * GET Request for nanocoap server example /riot/value resource.
  * Includes 2-byte token; non-confirmable.
@@ -369,6 +444,8 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__get_root_path),
         new_TestFixture(test_nanocoap__get_max_path),
         new_TestFixture(test_nanocoap__get_path_too_long),
+        new_TestFixture(test_nanocoap__get_query),
+        new_TestFixture(test_nanocoap__get_multi_query),
         new_TestFixture(test_nanocoap__server_get_req),
         new_TestFixture(test_nanocoap__server_reply_simple),
         new_TestFixture(test_nanocoap__server_get_req_con),
