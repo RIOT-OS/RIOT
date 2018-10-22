@@ -53,7 +53,6 @@ enum _rules {
     KEY,
     HELP_OPT,
     FLOATTHING,
-    DOUBLETHING,
     INTTHING,
     IGNORED1,
     IGNORED2,
@@ -92,7 +91,7 @@ static void test_optparse_actions(void)
     int parse_result;
     static const char *argv1[] = { "test", "-c", "3", "--key", "hello", "-vf5.5",
                                    "-qpasted", "-vv9", "--verbose", "-i", "-v", /* this -v is an argument to -i */
-                                   "-s", "-u", "-", "--d", "8.5", "quack", "--124",
+                                   "-s", "-u", "-", "quack", "--124",
                                    "--", "-qwerty" };
     static const char *argv_help[] = { "test", "-c", "3", "-h", "--invalid-option" };
     argparser_data_t adata = { 0 };
@@ -104,7 +103,6 @@ static void test_optparse_actions(void)
     const char *q = "nothing";
     int vlevel = 0;
     bool flag_s = false, flag_u = true;
-    double d = -1.0;
 
     set_parse_meta(rules + VERBOSITY, 'v', "verbose", "Verbosity level (can be specified multiple times");
     set_parse_count(rules + VERBOSITY, &vlevel);
@@ -124,8 +122,6 @@ static void test_optparse_actions(void)
     /* (-f, --q) and (-k, --d), just to add some confusion! */
     set_parse_meta(rules + FLOATTHING, 'f', "q", "Set a float");
     set_parse_float(rules + FLOATTHING, &f);
-    set_parse_meta(rules + DOUBLETHING, 'k', "d", "Set a double");
-    set_parse_double(rules + DOUBLETHING, &d);
 
     set_parse_meta(rules + INTTHING, 'c', NULL, "Set an integer");
     set_parse_int(rules + INTTHING, &c);
@@ -153,7 +149,6 @@ static void test_optparse_actions(void)
     TEST_ASSERT_EQUAL_STRING("hello", key);
     TEST_ASSERT_EQUAL_STRING("pasted", q);
     TEST_ASSERT(f == 5.5f);
-    TEST_ASSERT(d == 8.5);
     TEST_ASSERT(flag_s);
     TEST_ASSERT(!flag_u);
 

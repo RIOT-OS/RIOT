@@ -128,7 +128,6 @@ enum OPTPARSE_ACTIONS {
                              * opt_rule::data::d_custom
                              */
     OPTPARSE_INT,           /**< Parse the value as an int and store it in *opt_rule.data.d_int */
-    OPTPARSE_DOUBLE,        /**< Parse the value as double and store it in *opt_rule.data.d_double */
     OPTPARSE_FLOAT,         /**< Parse the value as float and store it in *opt_rule.data.d_float */
 
     OPTPARSE_STR,           /**< Make a copy of the value string with strdup() and place it
@@ -165,7 +164,6 @@ typedef struct opt_rule {
     union {
         int *d_int;
         bool *d_bool;
-        double *d_double;
         float *d_float;
         char **d_str;              /**< Pointer to a user-defined pointer */
         const char **d_cstr;       /**< Pointer to a user-defined pointer, constant variant */
@@ -286,7 +284,6 @@ void set_parse_int(struct opt_rule *rule, int *data);
 void set_parse_bool(struct opt_rule *rule, bool *data);
 void set_parse_bool_unset(struct opt_rule *rule, bool *data);
 void set_parse_count(struct opt_rule *rule, int *data);
-void set_parse_double(struct opt_rule *rule, double *data);
 void set_parse_float(struct opt_rule *rule, float *data);
 void set_parse_str(struct opt_rule *rule, char **data);
 void set_parse_str_nocopy(struct opt_rule *rule, const char **data);

@@ -89,7 +89,7 @@ char *my_strdup(const char *s)
 #define _MSK(x) (1 << (x))
 const uint16_t need_value_mask = _MSK(OPTPARSE_IGNORE)
                                  | _MSK(OPTPARSE_CUSTOM_ACTION) | _MSK(OPTPARSE_INT)
-                                 | _MSK(OPTPARSE_DOUBLE) | _MSK(OPTPARSE_FLOAT)
+                                 | _MSK(OPTPARSE_FLOAT)
                                  | _MSK(OPTPARSE_STR) | _MSK(OPTPARSE_STR_NOCOPY);
 
 #define NEEDS_VALUE(rule) (!!(_MSK((rule)->action) & need_value_mask))
@@ -155,9 +155,6 @@ static int do_action(opt_rule_t *rule, const char *key, const char *value)
             break;
         case OPTPARSE_INT:
             LAZY_LOAD(rule->data.d_int, strtol(value, NULL, 0));
-            break;
-        case OPTPARSE_DOUBLE:
-            LAZY_LOAD(rule->data.d_double, strtod(value, NULL));
             break;
         case OPTPARSE_FLOAT:
             LAZY_LOAD(rule->data.d_float, strtof(value, NULL));
@@ -378,7 +375,6 @@ MK_SETTER0(set_parse_ignore_sw, OPTPARSE_IGNORE_SWITCH)
 MK_SETTER0(set_parse_help, OPTPARSE_DO_HELP)
 
 MK_SETTER1(set_parse_int, OPTPARSE_INT, int, d_int)
-MK_SETTER1(set_parse_double, OPTPARSE_DOUBLE, double, d_double)
 MK_SETTER1(set_parse_float, OPTPARSE_FLOAT, float, d_float)
 MK_SETTER1(set_parse_bool, OPTPARSE_SET_BOOL, bool, d_bool)
 MK_SETTER1(set_parse_bool_unset, OPTPARSE_UNSET_BOOL, bool, d_bool)
