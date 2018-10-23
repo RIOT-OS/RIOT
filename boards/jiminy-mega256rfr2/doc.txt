@@ -133,4 +133,44 @@ This should take care of everything!
 
 RIOT's Makefile are configured to flash the jiminy using AVRDUDE. The bootloader automatically matches
 to the configured baud rate which is set for AVRDUDE. Rates of up to 500kBaud can be used.
+
+# Fuse Settings
+Reading out the fuses can be done with
+`avrdude -c wiring -p m256rfr2 -P /dev/ttyACM0 -b 0010005 -v`
+
+The last line should read
+`avrdude: safemode: Fuses OK (E:FE, H:D0, L:E2)`
+
+Which describes the fuses as follows:
+E: extended fuse = FE
+H: high fuse     = D0
+L: low fuse      = E2
+
+To program the fuses an JTAG programer (Atmel-ICE, Dragon) is needed, they can not be set with the bootloader.
+Connect the programmer JTAG pins with the board pins F4 JTAG TCK, F5 JTAG TMS, F6 JTAG TDO, F7 JTAG TDI,
+GND and VDD with V+ m256rfr2. Alternatively use a pogo pin connector ( e.g. SparkFun ISP Pogo Adapter)
+on the backside of the board.
+
+To program the fuses default setting execute following line
+`avrdude -c atmelice -p m256rfr2 -U lfuse:w:0xe2:m -U hfuse:w:0xd0:m -U efuse:w:0xfe:m`
+
+Attention: the default setting above has brown-out detection enabled,
+see troubleshooting when using the board with 1.8V supply.
+
+# Troubleshooting
+
+## Using 1.8V as board Voltage
+
+Setting the TPS6274x output voltage to 1.8V may lead to an undervoltage and thus triggers the brown-out reset.
+Disabling the brown-out detection by setting the extended fuse bit is recommended when a 1.8V supply is used.
+
+`avrdude -c atmelice -p m256rfr2 -U efuse:w:0xff:m`
+
+## Using the external crystal oscillator (Transceiver Crystal Oscillator) and deep sleep
+
+When the external crystal oscillator is used as system clock and the device is put into deep sleep mode it seems that
+the clocks for all peripherals are enabled and set to the smallest divider (highest frequency). This leads to a higher
+power consumption. When the device should be put into deep sleep it is recommended to use the internal RC oscillator
+as system clock source.
+
  */
