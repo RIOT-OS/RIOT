@@ -18,14 +18,14 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/ipv6.h"
+#include "net/gnrc/ipv6/ext/rh.h"
 
 #include "net/gnrc/ipv6/ext.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#ifdef MODULE_GNRC_RPL_SRH
-
+#ifdef MODULE_GNRC_IPV6_EXT_RH
 enum gnrc_ipv6_ext_demux_status {
     GNRC_IPV6_EXT_OK,
     GNRC_IPV6_EXT_FORWARDED,
@@ -65,13 +65,13 @@ static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_
         hdr = ipv6->data;
     }
 
-    switch (ipv6_ext_rh_process(hdr, (ipv6_ext_rh_t *)ext)) {
-        case EXT_RH_CODE_ERROR:
+    switch (gnrc_ipv6_ext_rh_process(hdr, (ipv6_ext_rh_t *)ext)) {
+        case GNRC_IPV6_EXT_RH_ERROR:
             /* TODO: send ICMPv6 error codes */
             gnrc_pktbuf_release(pkt);
             return GNRC_IPV6_EXT_ERROR;
 
-        case EXT_RH_CODE_FORWARD:
+        case GNRC_IPV6_EXT_RH_FORWARDED:
             /* forward packet */
             if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
                 DEBUG("ipv6: could not dispatch packet to the ipv6 thread\n");
@@ -79,7 +79,7 @@ static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_
             }
             return GNRC_IPV6_EXT_FORWARDED;
 
-        case EXT_RH_CODE_OK:
+        case GNRC_IPV6_EXT_RH_OK:
             /* this should not happen since we checked seg_left early */
             gnrc_pktbuf_release(pkt);
             return GNRC_IPV6_EXT_ERROR;
@@ -87,8 +87,7 @@ static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_
 
     return GNRC_IPV6_EXT_OK;
 }
-
-#endif
+#endif  /* MODULE_GNRC_IPV6_EXT_RH */
 
 /**
  * @brief marks IPv6 extension header if needed.
@@ -183,7 +182,7 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
 
         switch (nh) {
             case PROTNUM_IPV6_EXT_RH:
-#ifdef MODULE_GNRC_RPL_SRH
+#ifdef MODULE_GNRC_IPV6_EXT_RH
                 /* if current != pkt, size is already checked */
                 if (current == pkt && !_has_valid_size(pkt, nh)) {
                     DEBUG("ipv6_ext: invalid size\n");
@@ -215,7 +214,7 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                 }
 
                 break;
-#endif
+#endif  /* MODULE_GNRC_IPV6_EXT_RH */
 
             case PROTNUM_IPV6_EXT_HOPOPT:
             case PROTNUM_IPV6_EXT_DST:
