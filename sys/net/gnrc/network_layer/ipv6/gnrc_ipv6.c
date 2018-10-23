@@ -717,7 +717,7 @@ static inline bool _pkt_not_for_me(gnrc_netif_t **netif, ipv6_hdr_t *hdr)
 static void _receive(gnrc_pktsnip_t *pkt)
 {
     gnrc_netif_t *netif = NULL;
-    gnrc_pktsnip_t *ipv6, *netif_hdr, *first_ext;
+    gnrc_pktsnip_t *ipv6, *netif_hdr;
     ipv6_hdr_t *hdr;
 
     assert(pkt != NULL);
@@ -734,64 +734,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #endif
     }
 
-    first_ext = pkt;
-
-    for (ipv6 = pkt; ipv6 != NULL; ipv6 = ipv6->next) { /* find IPv6 header if already marked */
-        if ((ipv6->type == GNRC_NETTYPE_IPV6) && (ipv6->size == sizeof(ipv6_hdr_t)) &&
-            (ipv6->data != NULL) && (ipv6_hdr_is(ipv6->data))) {
-            break;
-        }
-
-        first_ext = ipv6;
-    }
-
-    if (ipv6 == NULL) {
-        if ((pkt->data == NULL) || !ipv6_hdr_is(pkt->data)) {
-            DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
-            gnrc_pktbuf_release(pkt);
-            return;
-        }
-#ifdef MODULE_GNRC_IPV6_WHITELIST
-        if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
-            DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
-            gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
-            gnrc_pktbuf_release(pkt);
-            return;
-        }
-#endif
-#ifdef MODULE_GNRC_IPV6_BLACKLIST
-        if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
-            DEBUG("ipv6: Source address blacklisted, dropping packet\n");
-            gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
-            gnrc_pktbuf_release(pkt);
-            return;
-        }
-#endif
-        /* seize ipv6 as a temporary variable */
-        ipv6 = gnrc_pktbuf_start_write(pkt);
-
-        if (ipv6 == NULL) {
-            DEBUG("ipv6: unable to get write access to packet, drop it\n");
-            gnrc_pktbuf_release(pkt);
-            return;
-        }
-
-        pkt = ipv6;     /* reset pkt from temporary variable */
-
-        ipv6 = gnrc_pktbuf_mark(pkt, sizeof(ipv6_hdr_t), GNRC_NETTYPE_IPV6);
-
-        first_ext = pkt;
-        pkt->type = GNRC_NETTYPE_UNDEF; /* snip is no longer IPv6 */
-
-        if (ipv6 == NULL) {
-            DEBUG("ipv6: error marking IPv6 header, dropping packet\n");
-            gnrc_pktbuf_release(pkt);
-            return;
-        }
+    if ((pkt->data == NULL) || (pkt->size < sizeof(ipv6_hdr_t)) ||
+        !ipv6_hdr_is(pkt->data)) {
+        DEBUG("ipv6: Received packet was not IPv6, dropping packet\n");
+        gnrc_pktbuf_release(pkt);
+        return;
     }
 #ifdef MODULE_GNRC_IPV6_WHITELIST
-    else if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
-        /* if ipv6 header already marked*/
+    else if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
         DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
         gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
         gnrc_pktbuf_release(pkt);
@@ -799,15 +749,33 @@ static void _receive(gnrc_pktsnip_t *pkt)
     }
 #endif
 #ifdef MODULE_GNRC_IPV6_BLACKLIST
-    else if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
-        /* if ipv6 header already marked*/
+    else if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
         DEBUG("ipv6: Source address blacklisted, dropping packet\n");
         gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
         gnrc_pktbuf_release(pkt);
         return;
     }
 #endif
+    /* seize ipv6 as a temporary variable */
+    ipv6 = gnrc_pktbuf_start_write(pkt);
 
+    if (ipv6 == NULL) {
+        DEBUG("ipv6: unable to get write access to packet, drop it\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+
+    pkt = ipv6;     /* reset pkt from temporary variable */
+
+    ipv6 = gnrc_pktbuf_mark(pkt, sizeof(ipv6_hdr_t), GNRC_NETTYPE_IPV6);
+
+    pkt->type = GNRC_NETTYPE_UNDEF; /* snip is no longer IPv6 */
+
+    if (ipv6 == NULL) {
+        DEBUG("ipv6: error marking IPv6 header, dropping packet\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
     /* extract header */
     hdr = (ipv6_hdr_t *)ipv6->data;
 
@@ -909,7 +877,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     }
 
     /* IPv6 internal demuxing (ICMPv6, Extension headers etc.) */
-    gnrc_ipv6_demux(netif, first_ext, pkt, hdr->nh);
+    gnrc_ipv6_demux(netif, pkt, pkt, hdr->nh);
 }
 
 static void _decapsulate(gnrc_pktsnip_t *pkt)
