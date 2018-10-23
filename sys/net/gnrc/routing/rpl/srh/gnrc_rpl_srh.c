@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
+ * Copyright (C) 2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +11,8 @@
  * @{
  *
  * @file
+ * @author Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
 
 #include <string.h>
@@ -28,17 +31,19 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
 {
+    ipv6_addr_t addr = ipv6->dst, tmp;
+    uint8_t *addr_vec = (uint8_t *) (rh + 1);
+    bool found = false;
+    uint8_t n;
+    uint8_t i, pref_elided, tmp_pref_elided, addr_len, compri_addr_len, tmp_addr_len, found_pos = 0;
+
     if (rh->seg_left == 0) {
         return GNRC_IPV6_EXT_RH_AT_DST;
     }
 
-    uint8_t n = (((rh->len * 8) - GNRC_RPL_SRH_PADDING(rh->pad_resv) -
-                 (16 - GNRC_RPL_SRH_COMPRE(rh->compr))) /
-                 (16 - GNRC_RPL_SRH_COMPRI(rh->compr))) + 1;
-    ipv6_addr_t addr = ipv6->dst, tmp;
-    uint8_t i, pref_elided, tmp_pref_elided, addr_len, compri_addr_len, tmp_addr_len, found_pos = 0;
-    uint8_t *addr_vec = (uint8_t *) (rh + 1);
-    bool found = false;
+    n = (((rh->len * 8) - GNRC_RPL_SRH_PADDING(rh->pad_resv) -
+        (16 - GNRC_RPL_SRH_COMPRE(rh->compr))) /
+        (16 - GNRC_RPL_SRH_COMPRI(rh->compr))) + 1;
 
     DEBUG("RPL SRH: %u addresses in the routing header\n", (unsigned) n);
 
