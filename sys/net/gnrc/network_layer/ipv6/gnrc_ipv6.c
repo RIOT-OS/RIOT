@@ -93,58 +93,48 @@ kernel_pid_t gnrc_ipv6_init(void)
 static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
                                   uint8_t nh, bool interested);
 
-/*
- *         current                 pkt
- *         |                       |
- *         v                       v
- * IPv6 <- IPv6_EXT <- IPv6_EXT <- UNDEF
- */
 void gnrc_ipv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *current,
                      gnrc_pktsnip_t *pkt, uint8_t nh)
 {
-    bool interested = false;
+    bool interested;
 
-    current->type = gnrc_nettype_from_protnum(nh);
-
-    switch (nh) {
-#ifdef MODULE_GNRC_ICMPV6
-        case PROTNUM_ICMPV6:
-            assert(current == pkt);
-            interested = true;
-            break;
-#endif
 #ifdef MODULE_GNRC_IPV6_EXT
-        case PROTNUM_IPV6_EXT_HOPOPT:
-        case PROTNUM_IPV6_EXT_DST:
-        case PROTNUM_IPV6_EXT_RH:
-        case PROTNUM_IPV6_EXT_FRAG:
-        case PROTNUM_IPV6_EXT_AH:
-        case PROTNUM_IPV6_EXT_ESP:
-        case PROTNUM_IPV6_EXT_MOB:
-            interested = true;
+    bool is_ext = true;
 
-            break;
-#endif
-        default:
-            (void)netif;
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC_NHC
-            /* second statement is true for small 6LoWPAN NHC decompressed frames
-             * since in this case it looks like
-             *
-             * * GNRC_NETTYPE_UNDEF <- pkt
-             * v
-             * * GNRC_NETTYPE_UDP <- current
-             * v
-             * * GNRC_NETTYPE_EXT
-             * v
-             * * GNRC_NETTYPE_IPV6
-             */
-            assert((current == pkt) || (current == pkt->next));
-#else
-            assert(current == pkt);
-#endif
-            break;
+    while (is_ext) {
+        switch (nh) {
+            case PROTNUM_IPV6_EXT_HOPOPT:
+            case PROTNUM_IPV6_EXT_DST:
+            case PROTNUM_IPV6_EXT_RH:
+            case PROTNUM_IPV6_EXT_FRAG:
+            case PROTNUM_IPV6_EXT_AH:
+            case PROTNUM_IPV6_EXT_ESP:
+            case PROTNUM_IPV6_EXT_MOB: {
+                ipv6_ext_t *ext_hdr;
+
+                DEBUG("ipv6: handle extension header (nh = %u)\n", nh);
+                ext_hdr = pkt->data;
+                if ((pkt = gnrc_ipv6_ext_demux(pkt, nh)) == NULL) {
+                    DEBUG("ipv6: packet was consumed by extension header "
+                          "handling\n");
+                    return;
+                }
+                nh = ext_hdr->nh;
+                break;
+            }
+            default:
+                is_ext = false;
+                break;
+        }
     }
+#endif /* MODULE_GNRC_IPV6_EXT */
+
+#ifdef MODULE_GNRC_ICMPV6
+    interested = (nh == PROTNUM_ICMPV6);
+#else  /* MODULE_GNRC_ICMPV6 */
+    interested = false;
+#endif /* MODULE_GNRC_ICMPV6 */
+    current->type = gnrc_nettype_from_protnum(nh);
 
     _dispatch_next_header(current, pkt, nh, interested);
 
@@ -158,21 +148,7 @@ void gnrc_ipv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *current,
             DEBUG("ipv6: handle ICMPv6 packet (nh = %u)\n", nh);
             gnrc_icmpv6_demux(netif, pkt);
             return;
-#endif
-#ifdef MODULE_GNRC_IPV6_EXT
-        case PROTNUM_IPV6_EXT_HOPOPT:
-        case PROTNUM_IPV6_EXT_DST:
-        case PROTNUM_IPV6_EXT_RH:
-        case PROTNUM_IPV6_EXT_FRAG:
-        case PROTNUM_IPV6_EXT_AH:
-        case PROTNUM_IPV6_EXT_ESP:
-        case PROTNUM_IPV6_EXT_MOB:
-            DEBUG("ipv6: handle extension header (nh = %u)\n", nh);
-
-            gnrc_ipv6_ext_demux(netif, current, pkt, nh);
-
-            return;
-#endif
+#endif /* MODULE_GNRC_ICMPV6 */
         default:
             assert(false);
             break;
