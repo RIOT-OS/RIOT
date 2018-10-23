@@ -93,8 +93,8 @@ kernel_pid_t gnrc_ipv6_init(void)
 static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
                                   uint8_t nh, bool interested);
 
-void gnrc_ipv6_demux(gnrc_netif_t *netif, gnrc_pktsnip_t *current,
-                     gnrc_pktsnip_t *pkt, uint8_t nh)
+static void _demux(gnrc_netif_t *netif, gnrc_pktsnip_t *current,
+                   gnrc_pktsnip_t *pkt, uint8_t nh)
 {
     bool interested;
 
@@ -848,8 +848,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #endif /* MODULE_GNRC_IPV6_ROUTER */
     }
 
-    /* IPv6 internal demuxing (ICMPv6, Extension headers etc.) */
-    gnrc_ipv6_demux(netif, pkt, pkt, hdr->nh);
+    _demux(netif, pkt, pkt, hdr->nh);
 }
 
 /** @} */
