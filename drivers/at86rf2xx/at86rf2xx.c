@@ -94,6 +94,18 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
 
+    /* configure smart idle listening feature */
+#if AT86RF2XX_SMART_IDLE_LISTENING
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_RPC);
+    tmp |= (AT86RF2XX_TRX_RPC_MASK__RX_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__PDT_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__PLL_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__XAH_TX_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_RPC, tmp);
+    at86rf2xx_set_rxsensitivity(dev, RSSI_BASE_VAL);
+#endif
+
     /* disable clock output to save power */
     tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_0);
     tmp &= ~(AT86RF2XX_TRX_CTRL_0_MASK__CLKM_CTRL);
