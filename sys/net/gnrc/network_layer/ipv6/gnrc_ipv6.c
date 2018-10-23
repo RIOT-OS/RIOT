@@ -90,11 +90,10 @@ kernel_pid_t gnrc_ipv6_init(void)
     return gnrc_ipv6_pid;
 }
 
-static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
-                                  uint8_t nh, bool interested);
+static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
+                                  bool interested);
 
-static void _demux(gnrc_netif_t *netif, gnrc_pktsnip_t *current,
-                   gnrc_pktsnip_t *pkt, uint8_t nh)
+static void _demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, unsigned nh)
 {
     bool interested;
 
@@ -134,27 +133,18 @@ static void _demux(gnrc_netif_t *netif, gnrc_pktsnip_t *current,
 #else  /* MODULE_GNRC_ICMPV6 */
     interested = false;
 #endif /* MODULE_GNRC_ICMPV6 */
-    current->type = gnrc_nettype_from_protnum(nh);
-
-    _dispatch_next_header(current, pkt, nh, interested);
-
-    if (!interested) {
-        return;
-    }
-
+    pkt->type = gnrc_nettype_from_protnum(nh);
+    _dispatch_next_header(pkt, nh, interested);
     switch (nh) {
 #ifdef MODULE_GNRC_ICMPV6
         case PROTNUM_ICMPV6:
             DEBUG("ipv6: handle ICMPv6 packet (nh = %u)\n", nh);
             gnrc_icmpv6_demux(netif, pkt);
-            return;
+            break;
 #endif /* MODULE_GNRC_ICMPV6 */
         default:
-            assert(false);
             break;
     }
-
-    assert(false);
 }
 
 ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
@@ -172,36 +162,26 @@ ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
 }
 
 /* internal functions */
-static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
-                                  uint8_t nh, bool interested)
+static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
+                                  bool interested)
 {
-#ifdef MODULE_GNRC_IPV6_EXT
-    const bool should_dispatch_current_type = ((current->type != GNRC_NETTYPE_IPV6_EXT) ||
-                                               (current->next->type == GNRC_NETTYPE_IPV6));
-#else
-    const bool should_dispatch_current_type = (current->next->type == GNRC_NETTYPE_IPV6);
-#endif
+    const bool should_release = (gnrc_netreg_num(GNRC_NETTYPE_IPV6, nh) == 0) &&
+                                (!interested);
 
     DEBUG("ipv6: forward nh = %u to other threads\n", nh);
 
-    /* dispatch IPv6 extension header only once */
-    if (should_dispatch_current_type) {
-        bool should_release = (!gnrc_netreg_lookup(GNRC_NETTYPE_IPV6, nh)) &&
-                              (!interested);
-
-        if (!should_release) {
-            gnrc_pktbuf_hold(pkt, 1);   /* don't remove from packet buffer in
-                                         * next dispatch */
-        }
-        if (gnrc_netapi_dispatch_receive(current->type,
-                                         GNRC_NETREG_DEMUX_CTX_ALL,
-                                         pkt) == 0) {
-            gnrc_pktbuf_release(pkt);
-        }
-
-        if (should_release) {
-            return;
-        }
+    if (!should_release) {
+        gnrc_pktbuf_hold(pkt, 1);   /* don't remove from packet buffer in
+                                     * next dispatch */
+    }
+    if (gnrc_netapi_dispatch_receive(pkt->type,
+                                     GNRC_NETREG_DEMUX_CTX_ALL,
+                                     pkt) == 0) {
+        gnrc_pktbuf_release(pkt);
+    }
+    if (should_release) {
+        /* we should exit early. pkt was already released above */
+        return;
     }
     if (interested) {
         gnrc_pktbuf_hold(pkt, 1);   /* don't remove from packet buffer in
@@ -848,7 +828,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #endif /* MODULE_GNRC_IPV6_ROUTER */
     }
 
-    _demux(netif, pkt, pkt, hdr->nh);
+    _demux(netif, pkt, hdr->nh);
 }
 
 /** @} */
