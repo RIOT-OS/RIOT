@@ -31,7 +31,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
 {
-    ipv6_addr_t addr = ipv6->dst, tmp;
+    ipv6_addr_t addr, tmp;
     uint8_t *addr_vec = (uint8_t *) (rh + 1);
     bool found = false;
     uint8_t n;
@@ -55,6 +55,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
     pref_elided = rh->seg_left ? GNRC_RPL_SRH_COMPRI(rh->compr) : GNRC_RPL_SRH_COMPRE(rh->compr);
     compri_addr_len = sizeof(ipv6_addr_t) - GNRC_RPL_SRH_COMPRI(rh->compr);
     addr_len = sizeof(ipv6_addr_t) - pref_elided;
+    memcpy(&addr, &ipv6->dst, pref_elided);
     memcpy(&addr.u8[pref_elided], &addr_vec[(i - 1) * compri_addr_len], addr_len);
 
     if (ipv6_addr_is_multicast(&ipv6->dst) || ipv6_addr_is_multicast(&addr)) {
@@ -66,7 +67,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
     /* check if multiple addresses of my interface exist */
     tmp_pref_elided = GNRC_RPL_SRH_COMPRI(rh->compr);
     tmp_addr_len = sizeof(ipv6_addr_t) - tmp_pref_elided;
-    tmp = ipv6->dst;
+    memcpy(&tmp, &ipv6->dst, tmp_pref_elided);
     for (uint8_t k = 0; k < n; k++) {
         if (k == n - 1) {
             tmp_pref_elided = GNRC_RPL_SRH_COMPRE(rh->compr);
@@ -89,7 +90,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
     DEBUG("RPL SRH: Next hop: %s at position %d\n",
           ipv6_addr_to_str(addr_str, &addr, sizeof(addr_str)), i);
 
-    ipv6->dst = addr;
+    memcpy(&ipv6->dst, &addr, sizeof(ipv6->dst));
 
     return GNRC_IPV6_EXT_RH_FORWARDED;
 }
