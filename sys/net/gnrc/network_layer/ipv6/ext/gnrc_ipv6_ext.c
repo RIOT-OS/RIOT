@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2015 Cenk Gündoğan <cnkgndgn@gmail.com>
+ * Copyright (C) 2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +11,8 @@
  * @{
  *
  * @file
+ * @author Cenk Gündoğan <cnkgndgn@gmail.com>
+ * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
 
 #include <errno.h>
@@ -63,38 +66,17 @@ static void _forward_pkt(gnrc_pktsnip_t *pkt, ipv6_hdr_t *hdr)
 static int _handle_rh(gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *ipv6;
-    gnrc_pktsnip_t *current = pkt;
-    ipv6_ext_t *ext = (ipv6_ext_t *) current->data;
-    size_t current_offset;
+    ipv6_ext_t *ext = (ipv6_ext_t *)pkt->data;
     ipv6_hdr_t *hdr;
     int res;
 
-    /* check seg_left early to avoid duplicating the packet */
+    /* check seg_left early to to exit quickly */
     if (((ipv6_ext_rh_t *)ext)->seg_left == 0) {
         return GNRC_IPV6_EXT_RH_AT_DST;
     }
-
-    /* We cannot use `gnrc_pktbuf_start_write` since it duplicates only
-       the head. `ipv6_ext_rh_process` modifies the IPv6 header as well as
-       the extension header */
-
-    current_offset = gnrc_pkt_len_upto(current->next, GNRC_NETTYPE_IPV6);
-
-    if (pkt->users != 1) {
-        if ((ipv6 = gnrc_pktbuf_duplicate_upto(pkt, GNRC_NETTYPE_IPV6)) == NULL) {
-            DEBUG("ipv6: could not get a copy of pkt\n");
-            gnrc_pktbuf_release(pkt);
-            return GNRC_IPV6_EXT_RH_ERROR;
-        }
-        pkt = ipv6;
-        hdr = ipv6->data;
-        ext = (ipv6_ext_t *)(((uint8_t *)ipv6->data) + current_offset);
-    }
-    else {
-        ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
-        hdr = ipv6->data;
-    }
-
+    ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
+    assert(ipv6 != NULL);
+    hdr = ipv6->data;
     switch ((res = gnrc_ipv6_ext_rh_process(hdr, (ipv6_ext_rh_t *)ext))) {
         case GNRC_IPV6_EXT_RH_ERROR:
             /* TODO: send ICMPv6 error codes */
