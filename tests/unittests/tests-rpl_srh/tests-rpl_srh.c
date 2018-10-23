@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Cenk Gündoğan <mail@cgundogan.de>
+ * Copyright (C) 2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,6 +11,8 @@
  * @{
  *
  * @file
+ * @author Cenk Gündoğan <mail@cgundogan.de>
+ * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +39,10 @@
                                0x00, 0x00, 0x00, 0x00, \
                                0x00, 0x00, 0x00, 0x00, \
                                0x00, 0x00, 0x00, 0x03 }}
+#define IPV6_MCAST_ADDR     {{ 0xff, 0x05, 0xab, 0xcd, \
+                               0x00, 0x00, 0x00, 0x00, \
+                               0x00, 0x00, 0x00, 0x00, \
+                               0x00, 0x00, 0x00, 0x03 }}
 
 #define IPV6_ADDR1_ELIDED   { 0x00, 0x00, 0x02 }
 #define IPV6_ADDR2_ELIDED   { 0x00, 0x00, 0x03 }
@@ -59,6 +66,60 @@ static inline void _init_hdrs(gnrc_rpl_srh_t **srh, uint8_t **vec,
     *srh = (gnrc_rpl_srh_t *)buf;
     *vec = (uint8_t *)(*srh + 1);
     memcpy(&hdr.dst, dst, sizeof(hdr.dst));
+}
+
+static void test_rpl_srh_dst_multicast(void)
+{
+    static const ipv6_addr_t a1 = IPV6_ADDR1, a2 = IPV6_ADDR2;
+    static const ipv6_addr_t mcast = IPV6_MCAST_ADDR;
+    gnrc_rpl_srh_t *srh;
+    uint8_t *vec;
+    int res;
+
+    _init_hdrs(&srh, &vec, &mcast);
+    srh->len = (2 * sizeof(ipv6_addr_t)) / 8;
+    srh->seg_left = SRH_SEG_LEFT;
+    memcpy(vec, &a1, sizeof(a1));
+    memcpy(vec + sizeof(a1), &a2, sizeof(a2));
+
+    res = gnrc_rpl_srh_process(&hdr, srh);
+    TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_ERROR);
+}
+
+static void test_rpl_srh_route_multicast(void)
+{
+    static const ipv6_addr_t a1 = IPV6_ADDR1;
+    static const ipv6_addr_t mcast = IPV6_MCAST_ADDR;
+    static const ipv6_addr_t dst = IPV6_DST;
+    gnrc_rpl_srh_t *srh;
+    uint8_t *vec;
+    int res;
+
+    _init_hdrs(&srh, &vec, &dst);
+    srh->len = (2 * sizeof(ipv6_addr_t)) / 8;
+    srh->seg_left = SRH_SEG_LEFT;
+    memcpy(vec, &mcast, sizeof(mcast));
+    memcpy(vec + sizeof(mcast), &a1, sizeof(a1));
+
+    res = gnrc_rpl_srh_process(&hdr, srh);
+    TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_ERROR);
+}
+
+static void test_rpl_srh_too_many_seg_left(void)
+{
+    static const ipv6_addr_t a1 = IPV6_ADDR1;
+    static const ipv6_addr_t dst = IPV6_DST;
+    gnrc_rpl_srh_t *srh;
+    uint8_t *vec;
+    int res;
+
+    _init_hdrs(&srh, &vec, &dst);
+    srh->len = sizeof(ipv6_addr_t) / 8;
+    srh->seg_left = SRH_SEG_LEFT;
+    memcpy(vec, &a1, sizeof(a1));
+
+    res = gnrc_rpl_srh_process(&hdr, srh);
+    TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_ERROR);
 }
 
 static void test_rpl_srh_nexthop_no_prefix_elided(void)
@@ -122,6 +183,9 @@ static void test_rpl_srh_nexthop_prefix_elided(void)
 Test *tests_rpl_srh_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
+        new_TestFixture(test_rpl_srh_dst_multicast),
+        new_TestFixture(test_rpl_srh_route_multicast),
+        new_TestFixture(test_rpl_srh_too_many_seg_left),
         new_TestFixture(test_rpl_srh_nexthop_no_prefix_elided),
         new_TestFixture(test_rpl_srh_nexthop_prefix_elided),
     };
