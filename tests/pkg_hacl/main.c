@@ -22,8 +22,8 @@
 
 #include <string.h>
 #include <haclnacl.h>
+#include "random.h"
 #include "embUnit.h"
-#include "tests-hacl.h"
 
 static const char message[] = "0123456789abcdef";
 static char r[sizeof(message)];
@@ -74,7 +74,7 @@ static void test_hacl_01(void)
     TEST_ASSERT_EQUAL_STRING((const char*)message, (const char*)r);
 }
 
-Test *tests_hacl_all(void)
+Test *tests_hacl(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_hacl_01)
@@ -84,7 +84,10 @@ Test *tests_hacl_all(void)
     return (Test*)&hacl_tests;
 }
 
-void tests_hacl(void)
+int main(void)
 {
-    TESTS_RUN(tests_hacl_all());
+    TESTS_START();
+    TESTS_RUN(tests_hacl());
+    TESTS_END();
+    return 0;
 }
