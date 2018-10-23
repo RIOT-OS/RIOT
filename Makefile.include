@@ -353,6 +353,9 @@ $(RIOTPKG)/%/Makefile.include::
 $(USEPKG:%=$(RIOTPKG)/%/Makefile.include): FORCE
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
+# include external modules configuration
+-include $(EXTERNAL_MODULE_DIRS:%=%/Makefile.include)
+
 # Deduplicate includes without sorting them
 # see https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting
 define uniq
