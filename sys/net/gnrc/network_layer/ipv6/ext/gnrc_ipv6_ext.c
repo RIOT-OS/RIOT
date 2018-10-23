@@ -26,6 +26,39 @@
 #include "debug.h"
 
 #ifdef MODULE_GNRC_IPV6_EXT_RH
+/* unchecked precondition: hdr is gnrc_pktsnip_t::data of the
+ * GNRC_NETTYPE_IPV6 snip within pkt */
+static void _forward_pkt(gnrc_pktsnip_t *pkt, ipv6_hdr_t *hdr)
+{
+    gnrc_pktsnip_t *netif_snip;
+
+    if (--(hdr->hl) == 0) {
+        DEBUG("ipv6_ext_rh: hop limit reached 0: drop packet\n");
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
+    /* remove L2 headers around IPV6 */
+    netif_snip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
+    if (netif_snip != NULL) {
+        pkt = gnrc_pktbuf_remove_snip(pkt, netif_snip);
+    }
+    /* reverse packet into send order */
+    pkt = gnrc_pktbuf_reverse_snips(pkt);
+    if (pkt == NULL) {
+        DEBUG("ipv6_ext_rh: can't reverse snip order in packet");
+        /* gnrc_pktbuf_reverse_snips() releases pkt on error */
+        return;
+    }
+    /* forward packet */
+    if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
+                                   GNRC_NETREG_DEMUX_CTX_ALL,
+                                   pkt)) {
+        DEBUG("ipv6_ext_rh: could not dispatch packet to the IPv6 "
+              "thread\n");
+        gnrc_pktbuf_release(pkt);
+    }
+}
+
 static int _handle_rh(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *ipv6;
@@ -67,11 +100,7 @@ static int _handle_rh(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt)
             break;
 
         case GNRC_IPV6_EXT_RH_FORWARDED:
-            /* forward packet */
-            if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
-                DEBUG("ipv6: could not dispatch packet to the ipv6 thread\n");
-                gnrc_pktbuf_release(pkt);
-            }
+            _forward_pkt(pkt, hdr);
             break;
 
         case GNRC_IPV6_EXT_RH_AT_DST:
