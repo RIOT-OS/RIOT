@@ -29,13 +29,48 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #define GNRC_RPL_SRH_COMPRE(X)      (X & 0x0F)
 #define GNRC_RPL_SRH_COMPRI(X)      ((X & 0xF0) >> 4)
 
-int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
+/* checks if multiple addresses within the source routing header exist on my
+ * interfaces */
+static bool _contains_multiple_of_my_addr(const ipv6_addr_t *dst,
+                                          const gnrc_rpl_srh_t *rh,
+                                          unsigned num_addr,
+                                          unsigned compri_addr_len)
 {
-    ipv6_addr_t addr, tmp;
+    ipv6_addr_t addr;
     uint8_t *addr_vec = (uint8_t *) (rh + 1);
     bool found = false;
+    uint8_t pref_elided = GNRC_RPL_SRH_COMPRI(rh->compr);
+    uint8_t addr_len = compri_addr_len;
+    uint8_t found_pos = 0;
+
+    memcpy(&addr, dst, pref_elided);
+    for (unsigned i = 0; i < num_addr; i++) {
+        if (i == num_addr - 1) {
+            pref_elided = GNRC_RPL_SRH_COMPRE(rh->compr);
+            addr_len = sizeof(ipv6_addr_t) - pref_elided;
+        }
+        memcpy(&addr.u8[pref_elided], &addr_vec[i * compri_addr_len], addr_len);
+        if (gnrc_netif_get_by_ipv6_addr(&addr) != NULL) {
+            if (found && ((i - found_pos) > 1)) {
+                DEBUG("RPL SRH: found multiple addresses that belong to me - "
+                      "discard\n");
+                /* TODO send an ICMP Parameter Problem (Code 0) and
+                 * discard the packet */
+                return true;
+            }
+            found_pos = i;
+            found = true;
+        }
+    }
+    return false;
+}
+
+int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
+{
+    ipv6_addr_t addr;
+    uint8_t *addr_vec = (uint8_t *) (rh + 1);
     uint8_t n;
-    uint8_t i, pref_elided, tmp_pref_elided, addr_len, compri_addr_len, tmp_addr_len, found_pos = 0;
+    uint8_t i, pref_elided, addr_len, compri_addr_len;
     const uint8_t new_seg_left = rh->seg_left - 1;
 
     assert(rh->seg_left > 0);
@@ -65,24 +100,9 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
     }
 
     /* check if multiple addresses of my interface exist */
-    tmp_pref_elided = GNRC_RPL_SRH_COMPRI(rh->compr);
-    tmp_addr_len = sizeof(ipv6_addr_t) - tmp_pref_elided;
-    memcpy(&tmp, &ipv6->dst, tmp_pref_elided);
-    for (uint8_t k = 0; k < n; k++) {
-        if (k == n - 1) {
-            tmp_pref_elided = GNRC_RPL_SRH_COMPRE(rh->compr);
-            tmp_addr_len = sizeof(ipv6_addr_t) - tmp_pref_elided;
-        }
-        memcpy(&tmp.u8[tmp_pref_elided], &addr_vec[k * compri_addr_len], tmp_addr_len);
-        if (gnrc_netif_get_by_ipv6_addr(&tmp) != NULL) {
-            if (found && ((k - found_pos) > 1)) {
-                DEBUG("RPL SRH: found multiple addresses that belong to me - discard\n");
-                /* TODO send an ICMP Parameter Problem (Code 0) and discard the packet */
-                return GNRC_IPV6_EXT_RH_ERROR;
-            }
-            found_pos = k;
-            found = true;
-        }
+    if (_contains_multiple_of_my_addr(&ipv6->dst, rh, num_addr,
+                                      compri_addr_len)) {
+        return GNRC_IPV6_EXT_RH_ERROR;
     }
     rh->seg_left = new_seg_left;
     memcpy(&addr_vec[(i - 1) * compri_addr_len], &ipv6->dst.u8[pref_elided], addr_len);
