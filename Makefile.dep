@@ -245,11 +245,11 @@ ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
-  USEMODULE += ipv6_ext_rh
+  USEMODULE += gnrc_ipv6_ext_rh
 endif
 
-ifneq (,$(filter ipv6_ext_rh,$(USEMODULE)))
-  USEMODULE += ipv6_ext
+ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ext
 endif
 
 ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
