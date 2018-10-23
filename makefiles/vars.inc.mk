@@ -67,6 +67,7 @@ export UNDEF                 # Object files that the linker must include in the 
 export WERROR                # Treat all compiler warnings as errors if set to 1 (see -Werror flag in GCC manual)
 
 export GITCACHE              # path to git-cache executable
+export GIT_CACHE_DIR         # path to git-cache cache directory
 export FLASHER               # The command to call on "make flash".
 export FFLAGS                # The parameters to supply to FLASHER.
 export FLASH_ADDR            # Define an offset to flash code into ROM memory.
