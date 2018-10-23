@@ -26,22 +26,17 @@
 #include "debug.h"
 
 #ifdef MODULE_GNRC_IPV6_EXT_RH
-enum gnrc_ipv6_ext_demux_status {
-    GNRC_IPV6_EXT_OK,
-    GNRC_IPV6_EXT_FORWARDED,
-    GNRC_IPV6_EXT_ERROR,
-};
-
-static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt)
+static int _handle_rh(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *ipv6;
     ipv6_ext_t *ext = (ipv6_ext_t *) current->data;
     size_t current_offset;
     ipv6_hdr_t *hdr;
+    int res;
 
     /* check seg_left early to avoid duplicating the packet */
     if (((ipv6_ext_rh_t *)ext)->seg_left == 0) {
-        return GNRC_IPV6_EXT_OK;
+        return GNRC_IPV6_EXT_RH_AT_DST;
     }
 
     /* We cannot use `gnrc_pktbuf_start_write` since it duplicates only
@@ -54,7 +49,7 @@ static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_
         if ((ipv6 = gnrc_pktbuf_duplicate_upto(pkt, GNRC_NETTYPE_IPV6)) == NULL) {
             DEBUG("ipv6: could not get a copy of pkt\n");
             gnrc_pktbuf_release(pkt);
-            return GNRC_IPV6_EXT_ERROR;
+            return GNRC_IPV6_EXT_RH_ERROR;
         }
         pkt = ipv6;
         hdr = ipv6->data;
@@ -65,11 +60,11 @@ static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_
         hdr = ipv6->data;
     }
 
-    switch (gnrc_ipv6_ext_rh_process(hdr, (ipv6_ext_rh_t *)ext)) {
+    switch ((res = gnrc_ipv6_ext_rh_process(hdr, (ipv6_ext_rh_t *)ext))) {
         case GNRC_IPV6_EXT_RH_ERROR:
             /* TODO: send ICMPv6 error codes */
             gnrc_pktbuf_release(pkt);
-            return GNRC_IPV6_EXT_ERROR;
+            break;
 
         case GNRC_IPV6_EXT_RH_FORWARDED:
             /* forward packet */
@@ -77,15 +72,15 @@ static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_
                 DEBUG("ipv6: could not dispatch packet to the ipv6 thread\n");
                 gnrc_pktbuf_release(pkt);
             }
-            return GNRC_IPV6_EXT_FORWARDED;
+            break;
 
         case GNRC_IPV6_EXT_RH_AT_DST:
             /* this should not happen since we checked seg_left early */
             gnrc_pktbuf_release(pkt);
-            return GNRC_IPV6_EXT_ERROR;
+            break;
     }
 
-    return GNRC_IPV6_EXT_OK;
+    return res;
 }
 #endif  /* MODULE_GNRC_IPV6_EXT_RH */
 
@@ -191,7 +186,7 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                 }
 
                 switch (_handle_rh(current, pkt)) {
-                    case GNRC_IPV6_EXT_OK:
+                    case GNRC_IPV6_EXT_RH_AT_DST:
                         /* We are the final destination. So proceeds like normal packet. */
                         nh = ext->nh;
                         DEBUG("ipv6_ext: next header = %" PRIu8 "\n", nh);
@@ -204,11 +199,11 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
 
                         return;
 
-                    case GNRC_IPV6_EXT_ERROR:
+                    case GNRC_IPV6_EXT_RH_ERROR:
                         /* already released by _handle_rh, so no release here */
                         return;
 
-                    case GNRC_IPV6_EXT_FORWARDED:
+                    case GNRC_IPV6_EXT_RH_FORWARDED:
                         /* the packet is forwarded and released. finish processing */
                         return;
                 }
