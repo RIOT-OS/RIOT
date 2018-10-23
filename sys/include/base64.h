@@ -50,7 +50,7 @@ extern "C" {
             BASE64_ERROR_DATA_IN if `data_in` equals NULL,
             BASE64_ERROR_DATA_IN_SIZE if `data_in_size` is less then 1.
  */
-int base64_encode(unsigned char *data_in, size_t data_in_size, \
+int base64_encode(const void *data_in, size_t data_in_size,
                   unsigned char *base64_out, size_t *base64_out_size);
 
 /**
@@ -71,8 +71,8 @@ int base64_encode(unsigned char *data_in, size_t data_in_size, \
             BASE64_ERROR_DATA_IN if `base64_in` equals NULL,
             BASE64_ERROR_DATA_IN_SIZE if `base64_in_size` is less then 4.
  */
-int base64_decode(unsigned char *base64_in, size_t base64_in_size, \
-                  unsigned char *data_out, size_t *data_out_size);
+int base64_decode(const unsigned char *base64_in, size_t base64_in_size,
+                  void *data_out, size_t *data_out_size);
 
 #ifdef __cplusplus
 }
