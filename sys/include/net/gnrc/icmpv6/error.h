@@ -90,7 +90,8 @@ static inline void gnrc_icmpv6_error_dst_unr_send(uint8_t code, gnrc_pktsnip_t *
     gnrc_pktsnip_t *pkt = gnrc_icmpv6_error_dst_unr_build(code, orig_pkt);
 
     if (pkt != NULL) {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
+        gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
+                                  pkt);
     }
 #ifdef MODULE_GNRC_PKTBUF
     gnrc_pktbuf_release_error(orig_pkt, EHOSTUNREACH);
@@ -110,7 +111,8 @@ static inline void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu, gnrc_pktsnip
     gnrc_pktsnip_t *pkt = gnrc_icmpv6_error_pkt_too_big_build(mtu, orig_pkt);
 
     if (pkt != NULL) {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
+        gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
+                                  pkt);
     }
 #ifdef MODULE_GNRC_PKTBUF
     gnrc_pktbuf_release_error(orig_pkt, EMSGSIZE);
@@ -130,7 +132,8 @@ static inline void gnrc_icmpv6_error_time_exc_send(uint8_t code, gnrc_pktsnip_t 
     gnrc_pktsnip_t *pkt = gnrc_icmpv6_error_time_exc_build(code, orig_pkt);
 
     if (pkt != NULL) {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
+        gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
+                                  pkt);
     }
 #ifdef MODULE_GNRC_PKTBUF
     gnrc_pktbuf_release_error(orig_pkt, ETIMEDOUT);
@@ -152,7 +155,8 @@ static inline void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
     gnrc_pktsnip_t *pkt = gnrc_icmpv6_error_param_prob_build(code, ptr, orig_pkt);
 
     if (pkt != NULL) {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
+        gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
+                                  pkt);
     }
 #ifdef MODULE_GNRC_PKTBUF
     gnrc_pktbuf_release_error(orig_pkt, EINVAL);
