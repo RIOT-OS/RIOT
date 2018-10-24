@@ -896,7 +896,10 @@ static void _decapsulate(gnrc_pktsnip_t *pkt)
 
     pkt->type = GNRC_NETTYPE_IPV6;
 
-    _receive(pkt);
+    if (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6,
+                                     GNRC_NETREG_DEMUX_CTX_ALL, pkt) == 0) {
+        gnrc_pktbuf_release(pkt);
+    }
 }
 
 /** @} */
