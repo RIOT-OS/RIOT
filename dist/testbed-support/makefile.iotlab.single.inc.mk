@@ -67,9 +67,12 @@ IOTLAB_NODE_AUTO_NUM ?= 1
 # board-archi mapping
 IOTLAB_ARCHI_arduino-zero   = arduino-zero:xbee
 IOTLAB_ARCHI_b-l072z-lrwan1 = st-lrwan1:sx1276
+IOTLAB_ARCHI_b-l475e-iot01a = st-iotnode:multi
 IOTLAB_ARCHI_iotlab-a8-m3   = a8:at86rf231
 IOTLAB_ARCHI_iotlab-m3      = m3:at86rf231
+IOTLAB_ARCHI_nrf52dk        = nrf52dk:ble
 IOTLAB_ARCHI_samr21-xpro    = samr21:at86rf233
+IOTLAB_ARCHI_samr30-xpro    = samr30:at86rf215
 IOTLAB_ARCHI_wsn430-v1_3b   = wsn430:cc1101
 IOTLAB_ARCHI_wsn430-v1_4    = wsn430:cc2420
 IOTLAB_ARCHI := $(IOTLAB_ARCHI_$(BOARD))
