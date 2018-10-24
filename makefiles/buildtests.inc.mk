@@ -20,7 +20,7 @@ buildtest:
 				$(COLOR_ECHO) "$(COLOR_RED)failed!$(COLOR_RESET)" ; \
 				RESULT=false ; \
 			fi ; \
-			$(MAKE) clean-intermediates >/dev/null 2>&1 || true; \
+			BOARD=$${board} $(MAKE) clean-intermediates >/dev/null 2>&1 || true; \
 		fi; \
 	done ; \
 	$${RESULT}
