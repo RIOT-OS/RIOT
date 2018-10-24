@@ -148,75 +148,6 @@ static bool _duplicate_hopopt(gnrc_pktsnip_t *pkt, unsigned protnum)
     return false;
 }
 
-#ifdef MODULE_GNRC_IPV6_EXT_RH
-/* unchecked precondition: hdr is gnrc_pktsnip_t::data of the
- * GNRC_NETTYPE_IPV6 snip within pkt */
-static void _forward_pkt(gnrc_pktsnip_t *pkt, ipv6_hdr_t *hdr)
-{
-    gnrc_pktsnip_t *netif_snip;
-
-    if (--(hdr->hl) == 0) {
-        DEBUG("ipv6_ext_rh: hop limit reached 0: drop packet\n");
-        gnrc_pktbuf_release(pkt);
-        return;
-    }
-    /* remove L2 headers around IPV6 */
-    netif_snip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
-    if (netif_snip != NULL) {
-        pkt = gnrc_pktbuf_remove_snip(pkt, netif_snip);
-    }
-    /* reverse packet into send order */
-    pkt = gnrc_pktbuf_reverse_snips(pkt);
-    if (pkt == NULL) {
-        DEBUG("ipv6_ext_rh: can't reverse snip order in packet");
-        /* gnrc_pktbuf_reverse_snips() releases pkt on error */
-        return;
-    }
-    /* forward packet */
-    if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
-                                   GNRC_NETREG_DEMUX_CTX_ALL,
-                                   pkt)) {
-        DEBUG("ipv6_ext_rh: could not dispatch packet to the IPv6 "
-              "thread\n");
-        gnrc_pktbuf_release(pkt);
-    }
-}
-
-/* handle routing header at pkt->data */
-static int _handle_rh(gnrc_pktsnip_t *pkt)
-{
-    gnrc_pktsnip_t *ipv6;
-    ipv6_ext_t *ext = (ipv6_ext_t *)pkt->data;
-    ipv6_hdr_t *hdr;
-    int res;
-
-    /* check seg_left early to to exit quickly */
-    if (((ipv6_ext_rh_t *)ext)->seg_left == 0) {
-        return GNRC_IPV6_EXT_RH_AT_DST;
-    }
-    ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
-    assert(ipv6 != NULL);
-    hdr = ipv6->data;
-    switch ((res = gnrc_ipv6_ext_rh_process(hdr, (ipv6_ext_rh_t *)ext))) {
-        case GNRC_IPV6_EXT_RH_ERROR:
-            /* TODO: send ICMPv6 error codes */
-            gnrc_pktbuf_release(pkt);
-            break;
-
-        case GNRC_IPV6_EXT_RH_FORWARDED:
-            _forward_pkt(pkt, hdr);
-            break;
-
-        case GNRC_IPV6_EXT_RH_AT_DST:
-            /* this should not happen since we checked seg_left early */
-            gnrc_pktbuf_release(pkt);
-            break;
-    }
-
-    return res;
-}
-#endif  /* MODULE_GNRC_IPV6_EXT_RH */
-
 /**
  * @brief       Marks an IPv6 extension header according to the length field
  *              provided by the extension header itself.
@@ -297,8 +228,8 @@ static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned protnum)
     }
     switch (protnum) {
         case PROTNUM_IPV6_EXT_RH:
-#ifdef MODULE_GNRC_RPL_SRH
-            switch (_handle_rh(pkt)) {
+#ifdef MODULE_GNRC_IPV6_EXT_RH
+            switch (gnrc_ipv6_ext_rh_process(pkt)) {
                 case GNRC_IPV6_EXT_RH_AT_DST:
                     /* We are the final destination of the route laid out in
                      * the routing header. So proceeds like normal packet. */
@@ -314,14 +245,15 @@ static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned protnum)
                     gnrc_pktbuf_release(pkt);
                     /* Intentionally falls through */
                 case GNRC_IPV6_EXT_RH_ERROR:
-                    /* already released by _handle_rh, so no release here */
+                    /* already released by gnrc_ipv6_ext_rh_process, so no
+                     * release here */
                 case GNRC_IPV6_EXT_RH_FORWARDED:
                     /* the packet is forwarded and released. finish processing */
                     return NULL;
             }
 
             break;
-#endif
+#endif  /* MODULE_GNRC_IPV6_EXT_RH */
 
         case PROTNUM_IPV6_EXT_HOPOPT:
         case PROTNUM_IPV6_EXT_DST:
@@ -384,6 +316,5 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_build(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *next,
 
     return snip;
 }
-
 
 /** @} */
