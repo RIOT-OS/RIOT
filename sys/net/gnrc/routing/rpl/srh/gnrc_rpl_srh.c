@@ -37,10 +37,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
     uint8_t n;
     uint8_t i, pref_elided, tmp_pref_elided, addr_len, compri_addr_len, tmp_addr_len, found_pos = 0;
 
-    if (rh->seg_left == 0) {
-        return GNRC_IPV6_EXT_RH_AT_DST;
-    }
-
+    assert(rh->seg_left > 0);
     n = (((rh->len * 8) - GNRC_RPL_SRH_PADDING(rh->pad_resv) -
         (16 - GNRC_RPL_SRH_COMPRE(rh->compr))) /
         (16 - GNRC_RPL_SRH_COMPRI(rh->compr))) + 1;
