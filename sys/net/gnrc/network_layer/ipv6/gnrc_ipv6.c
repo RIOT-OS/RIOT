@@ -732,6 +732,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
           ipv6_addr_to_str(addr_str, &(hdr->dst), sizeof(addr_str)),
           first_nh, byteorder_ntohs(hdr->len));
 
+    if ((pkt = gnrc_ipv6_ext_process_hopopt(pkt, &first_nh)) != NULL) {
+        ipv6 = pkt->next->next;
+    }
+    else {
+        DEBUG("ipv6: packet's extension header was errorneous or packet was "
+              "consumed due to it\n");
+        return;
+    }
     if (_pkt_not_for_me(&netif, hdr)) { /* if packet is not for me */
         DEBUG("ipv6: packet destination not this host\n");
 

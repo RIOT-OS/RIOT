@@ -20,6 +20,7 @@
 #include "utlist.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/pktbuf.h"
+#include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ipv6/ext/rh.h"
 
@@ -27,6 +28,56 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
+
+/**
+ * @brief   Checks if @p nh is a duplicate @ref PROTNUM_IPV6_EXT_HOPOPT.
+ *
+ * If @p nh is @ref PROTNUM_IPV6_EXT_HOPOPT, the function sends a parameter
+ * problem message (if @ref net_gnrc_icmpv6_error is available), releases the
+ * packet with error `EINVAL`, and returns `false`.
+ *
+ * @note    This function should only be called *after* the first hop-by-hop
+ *          option header in the packet was parsed (if it exists) or if the
+ *          first extension header wasn't a hop-by-hop option header.
+ *
+ * @param[in] pkt   A packet in receive order to be checked with the current
+ *                  extension header (of type @p nh) as its payload.
+ * @param[in] nh    The protocol number of the header in gnrc_pktsnip_t::data of
+ *                  @p pkt.
+ *
+ * @return  true, when @p nh == @ref PROTNUM_IPV6_EXT_HOPOPT.
+ * @return  false, when @p nh != @ref PROTNUM_IPV6_EXT_HOPOPT.
+ */
+static bool _duplicate_hopopt(gnrc_pktsnip_t *pkt, unsigned nh);
+
+gnrc_pktsnip_t *gnrc_ipv6_ext_process_hopopt(gnrc_pktsnip_t *pkt,
+                                             uint8_t *nh)
+{
+    if ((*nh == PROTNUM_IPV6_EXT_HOPOPT) && (pkt != NULL)) {
+        /* if a hop-by-hop options header is within the IPv6 packet it comes
+         * immediately after the IPv6 header and it must be processed before
+         * the packet is forwarded
+         * (see https://tools.ietf.org/html/rfc8200#section-4.1) */
+        if ((pkt = gnrc_ipv6_ext_demux(pkt, *nh)) == NULL) {
+            DEBUG("ipv6 ext: packet was consumed in extension header "
+                  "handling\n");
+            return NULL;
+        }
+        /* packet can only be unmarked (since we are the first one to
+         * process this packet and 6LoWPAN only provides packets unmarked)
+         *
+         * pkt -----------> pkt->next --------> pkt->next->next
+         *  v                     v                         v
+         * next header          hop-by-hop option       IPv6 header */
+        assert((pkt->next != NULL) && (pkt->next->next != NULL) &&
+               (pkt->next->next->type == GNRC_NETTYPE_IPV6));
+        *nh = ((ipv6_ext_t *)pkt->next->data)->nh;
+        if (_duplicate_hopopt(pkt, *nh)) {
+            return NULL;
+        }
+    }
+    return pkt;
+}
 
 gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
                                           uint8_t *nh)
@@ -50,6 +101,9 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
                     return NULL;
                 }
                 *nh = ext_hdr->nh;
+                if (_duplicate_hopopt(pkt, *nh)) {
+                    return NULL;
+                }
                 break;
             }
             default:
@@ -58,6 +112,22 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
         }
     }
     return pkt;
+}
+
+static bool _duplicate_hopopt(gnrc_pktsnip_t *pkt, unsigned nh)
+{
+    if (nh == PROTNUM_IPV6_EXT_HOPOPT) {
+        DEBUG("ipv6: duplicate Hop-by-Hop header\n");
+#ifdef MODULE_GNRC_ICMPV6_ERROR
+        gnrc_icmpv6_error_param_prob_send(
+                ICMPV6_ERROR_PARAM_PROB_NH,
+                &((ipv6_ext_t *)pkt->next->data)->nh, pkt
+            );
+#endif
+        gnrc_pktbuf_release_error(pkt, EINVAL);
+        return true;
+    }
+    return false;
 }
 
 #ifdef MODULE_GNRC_IPV6_EXT_RH
