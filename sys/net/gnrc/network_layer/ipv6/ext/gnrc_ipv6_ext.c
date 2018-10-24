@@ -28,6 +28,38 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
+                                          uint8_t *nh)
+{
+    bool is_ext = true;
+    while (is_ext) {
+        switch (*nh) {
+            case PROTNUM_IPV6_EXT_DST:
+            case PROTNUM_IPV6_EXT_RH:
+            case PROTNUM_IPV6_EXT_FRAG:
+            case PROTNUM_IPV6_EXT_AH:
+            case PROTNUM_IPV6_EXT_ESP:
+            case PROTNUM_IPV6_EXT_MOB: {
+                ipv6_ext_t *ext_hdr;
+
+                DEBUG("ipv6: handle extension header (nh = %u)\n", *nh);
+                ext_hdr = pkt->data;
+                if ((pkt = gnrc_ipv6_ext_demux(pkt, *nh)) == NULL) {
+                    DEBUG("ipv6: packet was consumed by extension header "
+                          "handling\n");
+                    return NULL;
+                }
+                *nh = ext_hdr->nh;
+                break;
+            }
+            default:
+                is_ext = false;
+                break;
+        }
+    }
+    return pkt;
+}
+
 #ifdef MODULE_GNRC_IPV6_EXT_RH
 /* unchecked precondition: hdr is gnrc_pktsnip_t::data of the
  * GNRC_NETTYPE_IPV6 snip within pkt */

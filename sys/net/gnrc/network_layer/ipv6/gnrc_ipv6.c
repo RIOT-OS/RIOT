@@ -93,48 +93,18 @@ kernel_pid_t gnrc_ipv6_init(void)
 static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
                                   bool interested);
 
+static inline bool _gnrc_ipv6_is_interested(unsigned nh) {
+#ifdef MODULE_GNRC_ICMPV6
+    return (nh == PROTNUM_ICMPV6);
+#else  /* MODULE_GNRC_ICMPV6 */
+    return false;
+#endif /* MODULE_GNRC_ICMPV6 */
+}
+
 static void _demux(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, unsigned nh)
 {
-    bool interested;
-
-#ifdef MODULE_GNRC_IPV6_EXT
-    bool is_ext = true;
-
-    while (is_ext) {
-        switch (nh) {
-            case PROTNUM_IPV6_EXT_HOPOPT:
-            case PROTNUM_IPV6_EXT_DST:
-            case PROTNUM_IPV6_EXT_RH:
-            case PROTNUM_IPV6_EXT_FRAG:
-            case PROTNUM_IPV6_EXT_AH:
-            case PROTNUM_IPV6_EXT_ESP:
-            case PROTNUM_IPV6_EXT_MOB: {
-                ipv6_ext_t *ext_hdr;
-
-                DEBUG("ipv6: handle extension header (nh = %u)\n", nh);
-                ext_hdr = pkt->data;
-                if ((pkt = gnrc_ipv6_ext_demux(pkt, nh)) == NULL) {
-                    DEBUG("ipv6: packet was consumed by extension header "
-                          "handling\n");
-                    return;
-                }
-                nh = ext_hdr->nh;
-                break;
-            }
-            default:
-                is_ext = false;
-                break;
-        }
-    }
-#endif /* MODULE_GNRC_IPV6_EXT */
-
-#ifdef MODULE_GNRC_ICMPV6
-    interested = (nh == PROTNUM_ICMPV6);
-#else  /* MODULE_GNRC_ICMPV6 */
-    interested = false;
-#endif /* MODULE_GNRC_ICMPV6 */
     pkt->type = gnrc_nettype_from_protnum(nh);
-    _dispatch_next_header(pkt, nh, interested);
+    _dispatch_next_header(pkt, nh, _gnrc_ipv6_is_interested(nh));
     switch (nh) {
 #ifdef MODULE_GNRC_ICMPV6
         case PROTNUM_ICMPV6:
@@ -661,6 +631,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     gnrc_netif_t *netif = NULL;
     gnrc_pktsnip_t *ipv6, *netif_hdr;
     ipv6_hdr_t *hdr;
+    uint8_t first_nh;
 
     assert(pkt != NULL);
 
@@ -732,8 +703,9 @@ static void _receive(gnrc_pktsnip_t *pkt)
     }
 
     uint16_t ipv6_len = byteorder_ntohs(hdr->len);
+    first_nh = hdr->nh;
 
-    if ((ipv6_len == 0) && (hdr->nh != PROTNUM_IPV6_NONXT)) {
+    if ((ipv6_len == 0) && (first_nh != PROTNUM_IPV6_NONXT)) {
         /* this doesn't even make sense */
         DEBUG("ipv6: payload length 0, but next header not NONXT\n");
         gnrc_pktbuf_release(pkt);
@@ -758,7 +730,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
           ipv6_addr_to_str(addr_str, &(hdr->src), sizeof(addr_str)));
     DEBUG("dst = %s, next header = %u, length = %" PRIu16 ")\n",
           ipv6_addr_to_str(addr_str, &(hdr->dst), sizeof(addr_str)),
-          hdr->nh, byteorder_ntohs(hdr->len));
+          first_nh, byteorder_ntohs(hdr->len));
 
     if (_pkt_not_for_me(&netif, hdr)) { /* if packet is not for me */
         DEBUG("ipv6: packet destination not this host\n");
@@ -827,8 +799,11 @@ static void _receive(gnrc_pktsnip_t *pkt)
         return;
 #endif /* MODULE_GNRC_IPV6_ROUTER */
     }
-
-    _demux(netif, pkt, hdr->nh);
+    if ((pkt = gnrc_ipv6_ext_process_all(pkt, &first_nh)) == NULL) {
+        DEBUG("ipv6: packet was consumed in extension header handling\n");
+        return;
+    }
+    _demux(netif, pkt, first_nh);
 }
 
 /** @} */

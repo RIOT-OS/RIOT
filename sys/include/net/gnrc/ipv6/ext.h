@@ -66,6 +66,33 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_demux(gnrc_pktsnip_t *pkt, unsigned nh);
 gnrc_pktsnip_t *gnrc_ipv6_ext_build(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *next,
                                     uint8_t nh, size_t size);
 
+#if     defined(MODULE_GNRC_IPV6_EXT) || defined(DOXYGEN)
+/**
+ * @brief   Processes a packet's extension headers.
+ *
+ * @param[in] pkt       An IPv6 packet in receive order.
+ * @param[in,out] nh    **In:** The @ref net_protnum of gnrc_pktsnip_t::data of
+ *                      @p pkt (i.e. the first extension header to be
+ *                      processed). <br />
+ *                      **Out:** The @ref net_protnum of header in
+ *                      gnrc_pktsnip_t::data of @p pkt. The extension headers
+ *                      are now marked, so their data can be found in
+ *                      gnrc_pktsnip_t::next of @p pkt and the following. <br />
+ *                      If the return value is NULL, the value of @p nh is
+ *                      undefined.
+ *
+ * @return  @p pkt with all extension headers marked until the first
+ *          non-extension header.
+ * @return  NULL, if packet was consumed by the extension header handling.
+ * @return  NULL, on error. @p pkt is released with EINVAL in that case.
+ */
+gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
+                                          uint8_t *nh);
+#else   /* defined(MODULE_GNRC_IPV6_EXT) || defined(DOXYGEN) */
+/* NOPs to make the usage code more readable */
+#define gnrc_ipv6_ext_process_all(pkt, first_nh)    (pkt);
+#endif  /* defined(MODULE_GNRC_IPV6_EXT) || defined(DOXYGEN) */
+
 #ifdef __cplusplus
 }
 #endif
