@@ -36,6 +36,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
     bool found = false;
     uint8_t n;
     uint8_t i, pref_elided, tmp_pref_elided, addr_len, compri_addr_len, tmp_addr_len, found_pos = 0;
+    const uint8_t new_seg_left = rh->seg_left - 1;
 
     assert(rh->seg_left > 0);
     n = (((rh->len * 8) - GNRC_RPL_SRH_PADDING(rh->pad_resv) -
@@ -50,9 +51,8 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
         return GNRC_IPV6_EXT_RH_ERROR;
     }
 
-    rh->seg_left--;
-    i = n - rh->seg_left;
-    pref_elided = rh->seg_left ? GNRC_RPL_SRH_COMPRI(rh->compr) : GNRC_RPL_SRH_COMPRE(rh->compr);
+    i = n - new_seg_left;
+    pref_elided = new_seg_left ? GNRC_RPL_SRH_COMPRI(rh->compr) : GNRC_RPL_SRH_COMPRE(rh->compr);
     compri_addr_len = sizeof(ipv6_addr_t) - GNRC_RPL_SRH_COMPRI(rh->compr);
     addr_len = sizeof(ipv6_addr_t) - pref_elided;
     memcpy(&addr, &ipv6->dst, pref_elided);
@@ -84,7 +84,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
             found = true;
         }
     }
-
+    rh->seg_left = new_seg_left;
     memcpy(&addr_vec[(i - 1) * compri_addr_len], &ipv6->dst.u8[pref_elided], addr_len);
 
     DEBUG("RPL SRH: Next hop: %s at position %d\n",
