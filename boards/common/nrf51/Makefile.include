@@ -1,0 +1,18 @@
+# define the used CPU
+export CPU = nrf51
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# include common nrf51 headers
+INCLUDES += -I$(RIOTBOARD)/common/nrf51/include
+
+ifeq ($(PROGRAMMER),openocd)
+  # use common openocd configuration for nrf51
+  export OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf51/dist/openocd.cfg
+  include $(RIOTMAKE)/tools/openocd.inc.mk
+else ifeq ($(PROGRAMMER),jlink)
+  # setup JLink for flashing
+  export JLINK_DEVICE := nrf51822
+  include $(RIOTMAKE)/tools/jlink.inc.mk
+endif
