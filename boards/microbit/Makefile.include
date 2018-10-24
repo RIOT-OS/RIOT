@@ -8,6 +8,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # this board supports flashing through plain fscopy, using JLink or using
 # openocd. Default programmer is fscopy
 PROGRAMMER ?= fscopy
+
 ifeq (fscopy,$(PROGRAMMER))
   export FFLAGS =
   export DEBUGGER_FLAGS =
@@ -15,6 +16,9 @@ ifeq (fscopy,$(PROGRAMMER))
   export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
   export DEBUGGER =
   export DEBUGSERVER =
+else ifeq (openocd,$(PROGRAMMER))
+  # this board uses a daplink adapter by default
+  DEBUG_ADAPTER = dap
 endif
 
 # include nrf51 boards common configuration
