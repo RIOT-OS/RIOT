@@ -7,13 +7,13 @@ export STRIP_FROM_INC_PATH_LIST=$(shell \
 
 # use lessc (http://lesscss.org/#using-less) for compiling CSS, alternatively
 # fall back to lesscpy (https://github.com/lesscpy/lesscpy)
-ifeq (,$(LESSC))
-  ifneq (,$(shell command -v lessc 2>/dev/null))
-    LESSC=lessc
-  else ifneq (,$(shell command -v lesscpy 2>/dev/null))
-    LESSC=lesscpy
-  endif
+ifneq (,$(shell command -v lessc 2>/dev/null))
+  LESSC_DEFAULT=lessc
+else ifneq (,$(shell command -v lesscpy 2>/dev/null))
+  LESSC_DEFAULT=lesscpy
 endif
+
+LESSC ?= $(LESSC_DEFAULT)
 
 .PHONY: doc
 doc: html
@@ -27,14 +27,12 @@ html: src/css/riot.css src/changelog.md
 man: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
 
-ifneq (,$(LESSC))
 src/css/riot.css: src/css/riot.less src/css/variables.less
 	@$(LESSC) $< $@
 
 src/css/variables.less: src/config.json
 	@grep "^\s*\"@" $< | sed -e 's/^\s*"//g' -e 's/":\s*"/: /g' \
 	  -e 's/",\?$$/;/g' -e 's/\\"/"/g' > $@
-endif
 
 src/changelog.md: src/changelog.md.tmp ../../release-notes.txt
 	@./generate-changelog.py $+ $@
