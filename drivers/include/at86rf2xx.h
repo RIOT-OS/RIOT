@@ -134,7 +134,9 @@ extern "C" {
  * @brief   Smart idle listening feature
  *
  * This feature optimizes radio operation in the listening mode, reducing
- * current consumption by ~50%. It is supported by only at86rf233.
+ * current consumption by ~50%. It is supported by only at86rf233. The reference
+ * manual recommends to disable this feature for RSSI measurements or random number
+ * generation (Section 8.4 and Section 11.2).
  */
 #ifdef MODULE_AT86RF233
 #ifndef AT86RF2XX_SMART_IDLE_LISTENING
