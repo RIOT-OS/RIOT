@@ -41,6 +41,9 @@ extern "C" {
 /**
  * @brief   Demultiplex an extension header according to @p nh.
  *
+ * This includes dispatching it to interested parties in the
+ * @ref net_gnrc_netreg.
+ *
  * @param[in] pkt       A packet with the first snip pointing to the extension
  *                      header to process.
  * @param[in] nh        Protocol number of @p pkt.

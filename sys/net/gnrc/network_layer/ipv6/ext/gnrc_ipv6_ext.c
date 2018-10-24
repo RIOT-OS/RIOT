@@ -19,6 +19,7 @@
 
 #include "utlist.h"
 #include "net/gnrc/netif.h"
+#include "net/gnrc/netreg.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/ipv6.h"
@@ -257,6 +258,24 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_demux(gnrc_pktsnip_t *pkt, unsigned nh)
         DEBUG("ipv6_ext: invalid size\n");
         gnrc_pktbuf_release(pkt);
         return NULL;
+    }
+    if (gnrc_netreg_num(GNRC_NETTYPE_IPV6, nh) > 0) {
+        gnrc_pktsnip_t *sub_pkt;
+
+        /* enforce duplication so we can dispatch packet to subscriber(s) and
+         * handle the packet */
+        gnrc_pktbuf_hold(pkt, 1);
+        sub_pkt = gnrc_pktbuf_start_write(pkt);
+        if (sub_pkt != NULL) {
+            /* check in case subscriber unregistered in the meantime */
+            if (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, nh, sub_pkt) == 0) {
+                gnrc_pktbuf_release(sub_pkt);
+            };
+        }
+        else {
+            gnrc_pktbuf_release(pkt);
+            /* try to keep handling, the sockets aren't *that* important anyway :-P */
+        }
     }
     switch (nh) {
         case PROTNUM_IPV6_EXT_RH:
