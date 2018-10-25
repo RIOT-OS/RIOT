@@ -23,7 +23,7 @@
 
 #include <tweetnacl.h>
 #include "embUnit.h"
-#include "tests-tweetnacl.h"
+#include "random.h"
 
 static const char message[] = "0123456789abcdef";
 static char r[sizeof(message)];
@@ -127,7 +127,7 @@ static void test_tweetnacl_03(void)
     TEST_ASSERT_EQUAL_INT(-1, res);
 }
 
-Test *tests_tweetnacl_all(void)
+Test *tests_tweetnacl(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_tweetnacl_01),
@@ -139,7 +139,10 @@ Test *tests_tweetnacl_all(void)
     return (Test*)&tweetnacl_tests;
 }
 
-void tests_tweetnacl(void)
+int main(void)
 {
-    TESTS_RUN(tests_tweetnacl_all());
+    TESTS_START();
+    TESTS_RUN(tests_tweetnacl());
+    TESTS_END();
+    return 0;
 }
