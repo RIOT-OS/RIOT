@@ -1,3 +1,3 @@
-MODULE = ipv6_ext
+MODULE = gnrc_ipv6_ext_rh
 
 include $(RIOTBASE)/Makefile.base

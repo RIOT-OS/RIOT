@@ -14,7 +14,7 @@
 
 #include <string.h>
 #include "net/gnrc/netif/internal.h"
-#include "net/ipv6/ext/rh.h"
+#include "net/gnrc/ipv6/ext/rh.h"
 #include "net/gnrc/rpl/srh.h"
 
 #define ENABLE_DEBUG    (0)
@@ -29,7 +29,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
 {
     if (rh->seg_left == 0) {
-        return EXT_RH_CODE_OK;
+        return GNRC_IPV6_EXT_RH_AT_DST;
     }
 
     uint8_t n = (((rh->len * 8) - GNRC_RPL_SRH_PADDING(rh->pad_resv) -
@@ -45,7 +45,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
     if (rh->seg_left > n) {
         DEBUG("RPL SRH: number of segments left > number of addresses - discard\n");
         /* TODO ICMP Parameter Problem - Code 0 */
-        return EXT_RH_CODE_ERROR;
+        return GNRC_IPV6_EXT_RH_ERROR;
     }
 
     rh->seg_left--;
@@ -58,7 +58,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
     if (ipv6_addr_is_multicast(&ipv6->dst) || ipv6_addr_is_multicast(&addr)) {
         DEBUG("RPL SRH: found a multicast address - discard\n");
         /* TODO discard the packet */
-        return EXT_RH_CODE_ERROR;
+        return GNRC_IPV6_EXT_RH_ERROR;
     }
 
     /* check if multiple addresses of my interface exist */
@@ -75,7 +75,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
             if (found && ((k - found_pos) > 1)) {
                 DEBUG("RPL SRH: found multiple addresses that belong to me - discard\n");
                 /* TODO send an ICMP Parameter Problem (Code 0) and discard the packet */
-                return EXT_RH_CODE_ERROR;
+                return GNRC_IPV6_EXT_RH_ERROR;
             }
             found_pos = k;
             found = true;
@@ -89,7 +89,7 @@ int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
 
     ipv6->dst = addr;
 
-    return EXT_RH_CODE_FORWARD;
+    return GNRC_IPV6_EXT_RH_FORWARDED;
 }
 
 /** @} */

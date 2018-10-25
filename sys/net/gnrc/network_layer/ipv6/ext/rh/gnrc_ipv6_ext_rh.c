@@ -16,10 +16,10 @@
 
 #include "net/protnum.h"
 #include "net/ipv6/ext.h"
-#include "net/ipv6/ext/rh.h"
+#include "net/gnrc/ipv6/ext/rh.h"
 #include "net/gnrc/rpl/srh.h"
 
-int ipv6_ext_rh_process(ipv6_hdr_t *hdr, ipv6_ext_rh_t *ext)
+int gnrc_ipv6_ext_rh_process(ipv6_hdr_t *hdr, ipv6_ext_rh_t *ext)
 {
     (void) hdr;
 
@@ -32,7 +32,7 @@ int ipv6_ext_rh_process(ipv6_hdr_t *hdr, ipv6_ext_rh_t *ext)
         default:
             break;
     }
-    return EXT_RH_CODE_ERROR;
+    return GNRC_IPV6_EXT_RH_ERROR;
 }
 
 /** @} */
