@@ -31,11 +31,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Type for source routing header.
- */
-#define GNRC_RPL_SRH_TYPE   (3U)
-
-/**
  * @brief   The RPL Source routing header.
  *
  * @see <a href="https://tools.ietf.org/html/rfc6554">
