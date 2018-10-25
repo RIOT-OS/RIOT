@@ -14,21 +14,20 @@ doc: html
 
 # by marking html as phony we force make to re-run Doxygen even if the directory exists.
 .PHONY: html
-html: src/css/riot.css src/changelog.md
+html: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
 
 .PHONY: man
 man: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
 
-ifneq (,$(LESSC))
-src/css/riot.css: src/css/riot.less src/css/variables.less
-	@$(LESSC) $< $@
+.PHONY: riot-css
+riot-css: src/css/riot.less src/css/variables.less
+	@$(LESSC) $< src/css/riot.css
 
 src/css/variables.less: src/config.json
 	@grep "^\s*\"@" $< | sed -e 's/^\s*"//g' -e 's/":\s*"/: /g' \
 	  -e 's/",\?$$/;/g' -e 's/\\"/"/g' > $@
-endif
 
 src/changelog.md: src/changelog.md.tmp ../../release-notes.txt
 	@./generate-changelog.py $+ $@
