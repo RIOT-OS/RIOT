@@ -111,7 +111,6 @@ for c in \
          cmake \
          cppcheck \
          doxygen \
-         flake8 \
          git \
          make \
          openocd \
@@ -121,6 +120,7 @@ for c in \
          ; do
     printf "%23s: %s\n" "$c" "$(get_cmd_version "${c}")"
 done
+printf "%23s: %s\n" "flake8" "$(get_cmd_version "python3 -Wignore -m flake8")"
 printf "%23s: %s\n" "coccinelle" "$(get_cmd_version spatch)"
 
 exit 0
