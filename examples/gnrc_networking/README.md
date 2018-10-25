@@ -46,10 +46,8 @@ RIOT console and run `ifconfig`:
                inet6 addr: fe80::ccf5:e1ff:fec5:f75a/64  scope: local
                inet6 addr: ff02::1:ffc5:f75a/128  scope: local [multicast]
 
-Copy the [link-local address] of the RIOT node (prefixed with `fe80`)
-and try to ping it **from the Linux node**:
-
-[link-local address]: https://gist.github.com/backenklee/dad5e80b764b3b3d0d3e
+Copy the link-local address of the RIOT node (prefixed with `fe80`) and
+try to ping it **from the Linux node**:
 
     ping6 fe80::ccf5:e1ff:fec5:f75a%tap0
 
@@ -96,10 +94,8 @@ Now, on the RIOT side, send a UDP packet using:
 
 You should see `testmessage` appear in netcat. Instead of using netcat,
 you can of course write your own software, but you may have to bind the
-socket to a specific interface (tap0 in this case). For an example that
-shows how to do so, see [here][tap-socket]
-
-[tap-socket]: (https://gist.github.com/backenklee/dad5e80b764b3b3d0d3e).
+socket to a specific interface (tap0 in this case). To do so, have a
+look at [setting the `SO_BINDTODEVICE` option using `setsocketopt()`][sso].
 
 ## Connecting two RIOT instances
 
@@ -159,3 +155,5 @@ In your first terminal, you should now see output that looks like this.
     src_l2addr: a2:8a:84:68:54:4f
     dst_l2addr: 62:fc:3c:5e:40:df
     ~~ PKT    -  4 snips, total size:  79 byte
+
+[sso]: https://stackoverflow.com/questions/14478167/bind-socket-to-network-interface#14478657
