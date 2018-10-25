@@ -211,7 +211,6 @@ typedef struct __attribute__((packed)) {
     uint8_t ver_t_tkl;          /**< version, token, token length           */
     uint8_t code;               /**< CoAP code (e.g.m 205)                  */
     uint16_t id;                /**< Req/resp ID                            */
-    uint8_t data[];             /**< convenience pointer to payload start   */
 } coap_hdr_t;
 
 /**
