@@ -32,8 +32,60 @@ information that can help you with your platform:
 * [Atmel ATmega](https://github.com/RIOT-OS/RIOT/wiki/Family%3A-ATmega)
 * [native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
 
-The build system                                            {#the-build-system}
-----------------
+Building and executing an example           {#building-and-executing-an-example}
+---------------------------------
+RIOT provides a number of examples in the `examples/` directory. Every example
+has a README that documents its usage and its purpose. You can build them by
+typing
+
+~~~~~~~~ {.sh}
+make BOARD=samr21-xpro
+~~~~~~~~
+
+or
+
+~~~~~~~~ {.sh}
+make all BOARD=samr21-xpro
+~~~~~~~~
+
+into your shell.
+
+To flash the application to a board just type
+
+~~~~~~~~ {.sh}
+make flash BOARD=samr21-xpro
+~~~~~~~~
+
+You can then access the board via the serial interface:
+
+~~~~~~~~ {.sh}
+make term BOARD=samr21-xpro
+~~~~~~~~
+
+If you are using multiple boards you can use the `PORT` macro to specify the
+serial interface:
+
+~~~~~~~~ {.sh}
+make term BOARD=samr21-xpro PORT=/dev/ttyACM1
+~~~~~~~~
+
+Note that the `PORT` macro has a slightly different semantic in `native`. Here
+it is used to provide the name of the TAP interface you want to use for the
+virtualized networking capabilities of RIOT.
+
+We use `pyterm` as the default terminal application. It is shipped with RIOT in
+the `dist/tools/pyterm/` directory. If you choose to use another terminal
+program you can set `TERMPROG` (and if need be the `TERMFLAGS`) macros:
+
+~~~~~~~~ {.sh}
+make -C examples/gnrc_networking/ term \
+    BOARD=samr21-xpro \
+    TERMPROG=gtkterm \
+    TERMFLAGS="-s 115200 -p /dev/ttyACM0 -e"
+~~~~~~~~
+
+The build system in detail                                  {#the-build-system}
+--------------------------
 RIOT uses [GNU make](https://www.gnu.org/software/make/) as build system. The
 simplest way to compile and link an application with RIOT, is to set up a
 Makefile providing at least the following variables:
@@ -88,55 +140,3 @@ hex file in the `bin` folder of your application directory.
 
 Learn more about the build system in the
 [Wiki](https://github.com/RIOT-OS/RIOT/wiki/The-Make-Build-System)
-
-Building and executing an example           {#building-and-executing-an-example}
----------------------------------
-RIOT provides a number of examples in the `examples/` directory. Every example
-has a README that documents its usage and its purpose. You can build them by
-typing
-
-~~~~~~~~ {.sh}
-make BOARD=samr21-xpro
-~~~~~~~~
-
-or
-
-~~~~~~~~ {.sh}
-make all BOARD=samr21-xpro
-~~~~~~~~
-
-into your shell.
-
-To flash the application to a board just type
-
-~~~~~~~~ {.sh}
-make flash BOARD=samr21-xpro
-~~~~~~~~
-
-You can then access the board via the serial interface:
-
-~~~~~~~~ {.sh}
-make term BOARD=samr21-xpro
-~~~~~~~~
-
-If you are using multiple boards you can use the `PORT` macro to specify the
-serial interface:
-
-~~~~~~~~ {.sh}
-make term BOARD=samr21-xpro PORT=/dev/ttyACM1
-~~~~~~~~
-
-Note that the `PORT` macro has a slightly different semantic in `native`. Here
-it is used to provide the name of the TAP interface you want to use for the
-virtualized networking capabilities of RIOT.
-
-We use `pyterm` as the default terminal application. It is shipped with RIOT in
-the `dist/tools/pyterm/` directory. If you choose to use another terminal
-program you can set `TERMPROG` (and if need be the `TERMFLAGS`) macros:
-
-~~~~~~~~ {.sh}
-make -C examples/gnrc_networking/ term \
-    BOARD=samr21-xpro \
-    TERMPROG=gtkterm \
-    TERMFLAGS="-s 115200 -p /dev/ttyACM0 -e"
-~~~~~~~~
