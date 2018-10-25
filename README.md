@@ -46,7 +46,6 @@ provided by RIOT, e.g. it is possible to link closed-source code with the
 LGPL code.
 
 ## FEATURES
-
 RIOT is based on a microkernel architecture, and provides features including,
 but not limited to:
 
@@ -66,7 +65,6 @@ but not limited to:
 * Sigfox
 * LoRaWAN
 
-
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our
 [quickstart guide](https://doc.riot-os.org/index.html#the-quickest-start) or
@@ -78,22 +76,7 @@ For specific toolchain installation, follow instructions in the
   version of the documentation is uploaded daily to
   [riot-os.org/api](https://riot-os.org/api).
 
-### USING THE NATIVE PORT WITH NETWORKING
-If you compile RIOT for the native cpu and include the `netdev_tap` module,
-you can specify a network interface like this: `PORT=tap0 make term`
-
-#### SETTING UP A TAP NETWORK
-There is a shell script in `RIOT/dist/tools/tapsetup` called `tapsetup` which
-you can use to create a network of tap interfaces.
-
-*USAGE*
-
-To create a bridge and two (or `count` at your option) tap interfaces:
-
-    ./dist/tools/tapsetup/tapsetup [-c [<count>]]
-
 ## CONTRIBUTE
-
 To contribute something to RIOT, please refer to our
 [contributing document](CONTRIBUTING.md).
 

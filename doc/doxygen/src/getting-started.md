@@ -84,6 +84,36 @@ make -C examples/gnrc_networking/ term \
     TERMFLAGS="-s 115200 -p /dev/ttyACM0 -e"
 ~~~~~~~~
 
+Using the native port with networking  {#using-the-native-port-with-networking}
+-------------------------------------
+RIOT provides a special [native port][native]
+with which you can run the complete RIOT stack in a process on your *NIX
+system. To enable networking between multiple native RIOT instances, you need
+to use tun/tap interfaces.
+
+First, you need to make sure that you're compiling RIOT for the native port
+and add tun/tap support. In the project Makefile, set `BOARD ?= native` and
+include the `netdev_tap` module by adding the line `USEMODULE += netdev_tap`.
+> **Note:** if you're using RIOTs default network stack, you should add
+> `gnrc_netdev_default` and `auto_init_gnrc_netif` instead, which have the
+> `netdev_tap` module included.
+
+Now, you can connect several native RIOT instances to each other or enable
+communication between a native RIOT instance and its (*NIX) host system.
+
+To connect multiple native RIOT instances to each other, use the shell script called `tapsetup` in `RIOT/dist/tools/tapsetup`.
+First, create a bridge and two (or `count` at your option) tap interfaces:
+
+     ./dist/tools/tapsetup/tapsetup [-c [<count>]]
+
+And follow the instructions of the script telling you to start RIOT instances on specific tap interfaces. To start a RIOT instance on a specific tap interface, run
+
+    PORT=<tap interface name> make term
+
+in the directory of your RIOT application.
+
+The [gnrc networking example][gnrc] explains how to do all of this in more detail.
+
 The build system in detail                                  {#the-build-system}
 --------------------------
 RIOT uses [GNU make](https://www.gnu.org/software/make/) as build system. The
@@ -140,3 +170,6 @@ hex file in the `bin` folder of your application directory.
 
 Learn more about the build system in the
 [Wiki](https://github.com/RIOT-OS/RIOT/wiki/The-Make-Build-System)
+
+[native]: https://github.com/RIOT-OS/RIOT/wiki/Family:-native
+[gnrc]:   https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_networking
