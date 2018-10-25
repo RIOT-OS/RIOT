@@ -952,6 +952,18 @@ static inline unsigned coap_get_id(coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Get the start of data after the header
+ *
+ * @param[in]   hdr   Header of CoAP packet in contiguous memory
+ *
+ * @returns     pointer to first byte after the header
+ */
+static inline uint8_t *coap_hdr_data_ptr(coap_hdr_t *hdr)
+{
+    return ((uint8_t *)hdr) + sizeof(coap_hdr_t);
+}
+
+/**
  * @brief   Get the total header length (4-byte header + token length)
  *
  * @param[in]   pkt   CoAP packet
