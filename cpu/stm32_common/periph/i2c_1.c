@@ -216,7 +216,7 @@ int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg, void *data,
 
     /* Check to see if the bus is busy */
     while ((i2c->ISR & I2C_ISR_BUSY) && tick--) {}
-    if ((i2c->ISR & ERROR_FLAG) || !tick) {
+    if (!tick) {
         return -ETIMEDOUT;
     }
 
@@ -308,7 +308,7 @@ int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg, const void *data,
 
     /* Check to see if the bus is busy */
     while ((i2c->ISR & I2C_ISR_BUSY) && tick--) {}
-    if ((i2c->ISR & ERROR_FLAG) || !tick) {
+    if (!tick) {
         return -ETIMEDOUT;
     }
 
@@ -387,17 +387,12 @@ static inline int _start(I2C_TypeDef *i2c, uint16_t address,
 
     /* Wait for the start followed by the address to be sent */
     uint16_t tick = TICK_TIMEOUT;
-    while (!(i2c->CR2 & I2C_CR2_START) && tick--) {}
+    while ((i2c->CR2 & I2C_CR2_START) && tick--) {}
     if (!tick) {
         return -ETIMEDOUT;
     }
 
-    int ret = _check_bus(i2c);
-    if (ret < 0) {
-        return ret;
-    }
-
-    return 0;
+    return _check_bus(i2c);
 }
 
 static inline int _read(I2C_TypeDef *i2c, uint8_t *data, size_t length)
@@ -420,12 +415,7 @@ static inline int _read(I2C_TypeDef *i2c, uint8_t *data, size_t length)
         DEBUG("[i2c] read: Read byte %i from DR\n", i);
     }
 
-    int ret = _check_bus(i2c);
-    if (ret < 0) {
-        return ret;
-    }
-
-    return 0;
+    return _check_bus(i2c);
 }
 
 static inline int _write(I2C_TypeDef *i2c, const uint8_t *data, size_t length)
@@ -445,6 +435,12 @@ static inline int _write(I2C_TypeDef *i2c, const uint8_t *data, size_t length)
         DEBUG("[i2c] write: Write byte %02X to DR\n", data[i]);
         i2c->TXDR = data[i];
         DEBUG("[i2c] write: Sending data\n");
+
+        tick = TICK_TIMEOUT;
+        while (!(i2c->ISR & I2C_ISR_TC) && tick--) {}
+        if (!tick) {
+            return -ETIMEDOUT;
+        }
 
         int ret = _check_bus(i2c);
         if (ret < 0) {
@@ -482,7 +478,7 @@ static inline int _stop(I2C_TypeDef *i2c)
 
     /* Wait for the stop to complete */
     tick = TICK_TIMEOUT;
-    while (!(i2c->CR2 & I2C_CR2_STOP) && tick--) {}
+    while ((i2c->CR2 & I2C_CR2_STOP) && tick--) {}
     if (!tick) {
         return -ETIMEDOUT;
     }
@@ -493,12 +489,6 @@ static inline int _stop(I2C_TypeDef *i2c)
 static inline int _check_bus(I2C_TypeDef *i2c)
 {
     assert(i2c != NULL);
-
-    int ret = 0;
-
-    /* wait a bit for any potential error to arrive */
-    uint16_t tick = TICK_TIMEOUT;
-    while (tick--) {}
 
     if (i2c->ISR & I2C_ISR_NACKF) {
         DEBUG("[i2c] check_bus: NACK received\n");
@@ -515,7 +505,7 @@ static inline int _check_bus(I2C_TypeDef *i2c)
         return -EIO;
     }
 
-    return ret;
+    return 0;
 }
 
 static inline void irq_handler(i2c_t dev)
