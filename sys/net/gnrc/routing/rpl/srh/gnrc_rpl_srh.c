@@ -29,7 +29,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh)
 {
     if (rh->seg_left == 0) {
-        return GNRC_IPV6_EXT_RH_OK;
+        return GNRC_IPV6_EXT_RH_AT_DST;
     }
 
     uint8_t n = (((rh->len * 8) - GNRC_RPL_SRH_PADDING(rh->pad_resv) -

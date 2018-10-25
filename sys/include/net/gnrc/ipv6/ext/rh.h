@@ -37,7 +37,7 @@ enum {
      * @brief   The routing header was successfully processed and this node
      *          is the destination (i.e. ipv6_ext_rh_t::seg_left == 0)
      */
-    GNRC_IPV6_EXT_RH_OK,
+    GNRC_IPV6_EXT_RH_AT_DST,
     /**
      * @brief   The routing header was successfully processed and the packet
      *          was forwarded to another node or should be forwarded to another
@@ -59,7 +59,7 @@ enum {
  * @param[in, out] ipv6     An IPv6 packet.
  * @param[in] ext           A routing header of @p ipv6.
  *
- * @return  @ref GNRC_IPV6_EXT_RH_OK, on success
+ * @return  @ref GNRC_IPV6_EXT_RH_AT_DST, on success
  * @return  @ref GNRC_IPV6_EXT_RH_FORWARDED, when @p pkt was forwarded
  * @return  @ref GNRC_IPV6_EXT_RH_ERROR, on error
  */

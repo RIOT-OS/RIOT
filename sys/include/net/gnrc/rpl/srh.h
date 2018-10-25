@@ -60,7 +60,7 @@ typedef struct __attribute__((packed)) {
  * @param[in,out] ipv6  The IPv6 header of the incoming packet.
  * @param[in] rh        A RPL source routing header.
  *
- * @return  @ref GNRC_IPV6_EXT_RH_OK, on success
+ * @return  @ref GNRC_IPV6_EXT_RH_AT_DST, on success
  * @return  @ref GNRC_IPV6_EXT_RH_FORWARDED, when @p pkt *should be* forwarded
  * @return  @ref GNRC_IPV6_EXT_RH_ERROR, on error
  */

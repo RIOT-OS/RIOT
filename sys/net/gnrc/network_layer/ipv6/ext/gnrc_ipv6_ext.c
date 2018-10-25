@@ -79,7 +79,7 @@ static enum gnrc_ipv6_ext_demux_status _handle_rh(gnrc_pktsnip_t *current, gnrc_
             }
             return GNRC_IPV6_EXT_FORWARDED;
 
-        case GNRC_IPV6_EXT_RH_OK:
+        case GNRC_IPV6_EXT_RH_AT_DST:
             /* this should not happen since we checked seg_left early */
             gnrc_pktbuf_release(pkt);
             return GNRC_IPV6_EXT_ERROR;
