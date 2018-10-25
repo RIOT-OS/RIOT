@@ -18,7 +18,9 @@ some packets to arrive at the application (they will however show up in Wireshar
 which can be confusing). So be sure to adjust your firewall rules, or turn it off
 (who needs security anyway).
 
-First, create a tap interface:
+First, make sure you've compiled the application by calling `make`.
+
+Now, create a tap interface:
 
     sudo ip tuntap add tap0 mode tap user ${USER}
     sudo ip link set tap0 up
