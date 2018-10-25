@@ -818,6 +818,43 @@ static void test_pktbuf_get_iovec__null(void)
     TEST_ASSERT_EQUAL_INT(0, len);
 }
 
+static void test_pktbuf_reverse_snips__too_full(void)
+{
+    gnrc_pktsnip_t *pkt, *pkt_next, *pkt_huge;
+    const size_t pkt_huge_size = GNRC_PKTBUF_SIZE - (3 * 8) -
+                                 (3 * sizeof(gnrc_pktsnip_t)) - 4;
+
+    pkt_next = gnrc_pktbuf_add(NULL, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt_next);
+    /* hold to enforce duplication */
+    gnrc_pktbuf_hold(pkt_next, 1);
+    pkt = gnrc_pktbuf_add(pkt_next, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt);
+    /* filling up rest of packet buffer */
+    pkt_huge = gnrc_pktbuf_add(NULL, NULL, pkt_huge_size, GNRC_NETTYPE_UNDEF);
+    TEST_ASSERT_NOT_NULL(pkt_huge);
+    TEST_ASSERT_NULL(gnrc_pktbuf_reverse_snips(pkt));
+    gnrc_pktbuf_release(pkt_huge);
+    /* release because of hold above */
+    gnrc_pktbuf_release(pkt_next);
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
+static void test_pktbuf_reverse_snips__success(void)
+{
+    gnrc_pktsnip_t *pkt, *pkt_next, *pkt_reversed;
+
+    pkt_next = gnrc_pktbuf_add(NULL, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt_next);
+    pkt = gnrc_pktbuf_add(pkt_next, TEST_STRING8, 8, GNRC_NETTYPE_TEST);
+    TEST_ASSERT_NOT_NULL(pkt);
+    pkt_reversed = gnrc_pktbuf_reverse_snips(pkt);
+    TEST_ASSERT(pkt_reversed == pkt_next);
+    TEST_ASSERT(pkt_reversed->next == pkt);
+    gnrc_pktbuf_release(pkt_reversed);
+    TEST_ASSERT(gnrc_pktbuf_is_empty());
+}
+
 Test *tests_pktbuf_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -870,6 +907,8 @@ Test *tests_pktbuf_tests(void)
         new_TestFixture(test_pktbuf_get_iovec__1_elem),
         new_TestFixture(test_pktbuf_get_iovec__3_elem),
         new_TestFixture(test_pktbuf_get_iovec__null),
+        new_TestFixture(test_pktbuf_reverse_snips__too_full),
+        new_TestFixture(test_pktbuf_reverse_snips__success),
     };
 
     EMB_UNIT_TESTCALLER(gnrc_pktbuf_tests, set_up, NULL, fixtures);

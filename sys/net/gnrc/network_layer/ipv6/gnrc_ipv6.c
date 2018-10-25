@@ -839,8 +839,6 @@ static void _receive(gnrc_pktsnip_t *pkt)
         }
         /* TODO: check if receiving interface is router */
         else if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
-            gnrc_pktsnip_t *reversed_pkt = NULL, *ptr = pkt;
-
             DEBUG("ipv6: forward packet to next hop\n");
 
             /* pkt might not be writable yet, if header was given above */
@@ -856,23 +854,14 @@ static void _receive(gnrc_pktsnip_t *pkt)
             if (netif_hdr != NULL) {
                 gnrc_pktbuf_remove_snip(pkt, netif_hdr);
             }
-
-            /* reverse packet snip list order */
-            while (ptr != NULL) {
-                gnrc_pktsnip_t *next;
-                ptr = gnrc_pktbuf_start_write(ptr);     /* duplicate if not already done */
-                if (ptr == NULL) {
-                    DEBUG("ipv6: unable to get write access to packet: dropping it\n");
-                    gnrc_pktbuf_release(reversed_pkt);
-                    gnrc_pktbuf_release(pkt);
-                    return;
-                }
-                next = ptr->next;
-                ptr->next = reversed_pkt;
-                reversed_pkt = ptr;
-                ptr = next;
+            pkt = gnrc_pktbuf_reverse_snips(pkt);
+            if (pkt != NULL) {
+                _send(pkt, false);
             }
-            _send(reversed_pkt, false);
+            else {
+                DEBUG("ipv6: unable to reverse pkt from receive order to send "
+                      "order; dropping it\n");
+            }
             return;
         }
         else {
