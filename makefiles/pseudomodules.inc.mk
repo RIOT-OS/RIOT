@@ -123,4 +123,7 @@ PSEUDOMODULES += auto_init_skald
 PSEUDOMODULES += skald_ibeacon
 PSEUDOMODULES += skald_eddystone
 
+# define optimized read function of DS18 driver as a pseudo module
+PSEUDOMODULES += ds18_optimized
+
 # Packages may also add modules to PSEUDOMODULES in their `Makefile.include`.
