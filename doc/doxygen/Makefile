@@ -33,7 +33,8 @@ endif
 src/changelog.md: src/changelog.md.tmp ../../release-notes.txt
 	@./generate-changelog.py $+ $@
 
-.PHONY:
+.PHONY: latex clean
+
 latex: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_LATEX= yes" ) | doxygen -
 
