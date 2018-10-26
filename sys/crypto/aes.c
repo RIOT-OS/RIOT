@@ -800,6 +800,11 @@ int aes_init(cipher_context_t *context, const uint8_t *key, uint8_t keySize)
 {
     uint8_t i;
 
+    /* This implementation only supports a single key size (defined in AES_KEY_SIZE) */
+    if (keySize != AES_KEY_SIZE) {
+        return CIPHER_ERR_INVALID_KEY_SIZE;
+    }
+
     /* Make sure that context is large enough. If this is not the case,
        you should build with -DAES */
     if (CIPHER_MAX_CONTEXT_SIZE < AES_KEY_SIZE) {
