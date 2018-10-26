@@ -22,10 +22,6 @@
 #include "thread.h"
 #include "kernel_types.h"
 
-#ifdef MODULE_SCHEDSTATISTICS
-#include "xtimer.h"
-#endif
-
 #ifdef MODULE_TLSF_MALLOC
 #include "tlsf.h"
 #include "tlsf-malloc.h"
