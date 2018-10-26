@@ -31,7 +31,7 @@ static void test_crypto_cipher_aes_encrypt(void)
 {
     cipher_t cipher;
     int err, cmp;
-    uint8_t data[16] = {0};
+    uint8_t data[16] = { 0 };
 
     err = cipher_init(&cipher, CIPHER_AES_128, TEST_KEY, 16);
     TEST_ASSERT_EQUAL_INT(1, err);
@@ -40,7 +40,7 @@ static void test_crypto_cipher_aes_encrypt(void)
     TEST_ASSERT_EQUAL_INT(1, err);
 
     cmp = compare(TEST_ENC_AES, data, 16);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong ciphertext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong ciphertext");
 }
 
 static void test_crypto_cipher_aes_decrypt(void)
@@ -56,10 +56,10 @@ static void test_crypto_cipher_aes_decrypt(void)
     TEST_ASSERT_EQUAL_INT(1, err);
 
     cmp = compare(TEST_INP, data, 16);
-    TEST_ASSERT_MESSAGE(1 == cmp , "wrong plaintext");
+    TEST_ASSERT_MESSAGE(1 == cmp, "wrong plaintext");
 }
 
-Test* tests_crypto_cipher_tests(void)
+Test *tests_crypto_cipher_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_cipher_aes_encrypt),
@@ -68,5 +68,5 @@ Test* tests_crypto_cipher_tests(void)
 
     EMB_UNIT_TESTCALLER(crypto_cipher_tests, NULL, NULL, fixtures);
 
-    return (Test*)&crypto_cipher_tests;
+    return (Test *)&crypto_cipher_tests;
 }

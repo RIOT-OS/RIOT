@@ -83,14 +83,14 @@ static void test_crypto_aes_decrypt(void)
     TEST_ASSERT_MESSAGE(1 == compare(TEST_1_INP, data, AES_BLOCK_SIZE), "wrong plaintext");
 }
 
-Test* tests_crypto_aes_tests(void)
+Test *tests_crypto_aes_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_crypto_aes_encrypt),
-                        new_TestFixture(test_crypto_aes_decrypt),
+        new_TestFixture(test_crypto_aes_decrypt),
     };
 
     EMB_UNIT_TESTCALLER(crypto_aes_tests, NULL, NULL, fixtures);
 
-    return (Test*)&crypto_aes_tests;
+    return (Test *)&crypto_aes_tests;
 }
