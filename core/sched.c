@@ -76,7 +76,7 @@ const uint8_t _tcb_name_offset = offsetof(thread_t, name);
 
 #ifdef MODULE_SCHEDSTATISTICS
 static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
-schedstat sched_pidlist[KERNEL_PID_LAST + 1];
+schedstat_t sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
 int __attribute__((used)) sched_run(void)
@@ -116,7 +116,7 @@ int __attribute__((used)) sched_run(void)
 #endif
 
 #ifdef MODULE_SCHEDSTATISTICS
-        schedstat *active_stat = &sched_pidlist[active_thread->pid];
+        schedstat_t *active_stat = &sched_pidlist[active_thread->pid];
         if (active_stat->laststart) {
             active_stat->runtime_ticks += now - active_stat->laststart;
         }
@@ -124,7 +124,7 @@ int __attribute__((used)) sched_run(void)
     }
 
 #ifdef MODULE_SCHEDSTATISTICS
-    schedstat *next_stat = &sched_pidlist[next_thread->pid];
+    schedstat_t *next_stat = &sched_pidlist[next_thread->pid];
     next_stat->laststart = now;
     next_stat->schedules++;
     if (sched_cb) {

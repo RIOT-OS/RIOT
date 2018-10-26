@@ -183,12 +183,12 @@ typedef struct {
                                   scheduled to run */
     unsigned int schedules;  /**< How often the thread was scheduled to run */
     uint64_t runtime_ticks;  /**< The total runtime of this thread in ticks */
-} schedstat;
+} schedstat_t;
 
 /**
  *  Thread statistics table
  */
-extern schedstat sched_pidlist[KERNEL_PID_LAST + 1];
+extern schedstat_t sched_pidlist[KERNEL_PID_LAST + 1];
 
 /**
  *  @brief  Register a callback that will be called on every scheduler run
