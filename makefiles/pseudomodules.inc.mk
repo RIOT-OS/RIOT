@@ -38,6 +38,7 @@ PSEUDOMODULES += lis2dh12_spi
 PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += lora
+PSEUDOMODULES += ltc4150_bidirectional
 PSEUDOMODULES += mpu_stack_guard
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
