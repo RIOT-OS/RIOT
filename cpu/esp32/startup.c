@@ -14,6 +14,7 @@
  * @brief       Implementation of the CPU initialization
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Jens Alfke <jens@mooseyard.com>
  * @}
  */
 
@@ -88,6 +89,7 @@ extern void esp_panic_wdt_stop (void);
 extern void spi_ram_init(void);
 extern void spi_ram_heap_init(void);
 extern uint32_t hwrand (void);
+extern void bootloader_clock_configure(void);
 
 /* forward declarations */
 static void system_init(void);
@@ -193,6 +195,12 @@ static void IRAM system_clk_init (void)
     /* first initialize RTC with default configuration */
     rtc_config_t rtc_cfg = RTC_CONFIG_DEFAULT();
     rtc_init_module(rtc_cfg);
+
+    /* configure main crystal frequency if necessary */
+    if (CONFIG_ESP32_XTAL_FREQ != RTC_XTAL_FREQ_AUTO
+            && CONFIG_ESP32_XTAL_FREQ != rtc_clk_xtal_freq_get()) {
+        bootloader_clock_configure();
+    }
 
     /* set FAST_CLK to internal low power clock of 8 MHz */
     rtc_clk_fast_freq_set(RTC_FAST_FREQ_8M);

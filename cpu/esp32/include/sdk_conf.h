@@ -66,6 +66,16 @@ extern "C" {
 #define CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ       80
 #endif
 
+/**
+ * ESP32 specific configuration
+ *
+ * Main clock crystal frequency (MHz). Zero means to auto-configure.
+ * This is configured at the board level, defaulting to 40.
+ */
+#ifndef CONFIG_ESP32_XTAL_FREQ
+#define CONFIG_ESP32_XTAL_FREQ                  ESP32_XTAL_FREQ
+#endif
+
 #define CONFIG_ESP32_RTC_XTAL_BOOTSTRAP_CYCLES  100
 #define CONFIG_ESP32_RTC_CLK_CAL_CYCLES         1024
 
