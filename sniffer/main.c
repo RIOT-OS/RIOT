@@ -55,10 +55,14 @@ static char rawdmp_stack[THREAD_STACKSIZE_SMALL];
 void dump_pkt(gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *snip = pkt;
-    gnrc_netif_hdr_t *netif_hdr = pkt->next->data;
-    uint8_t lqi = netif_hdr->lqi;
-
-    pkt = gnrc_pktbuf_remove_snip(pkt, pkt->next);
+    uint8_t lqi = 0;
+    if (pkt->next) {
+        if (pkt->next->type == GNRC_NETTYPE_NETIF) {
+            gnrc_netif_hdr_t *netif_hdr = pkt->next->data;
+            lqi = netif_hdr->lqi;
+            pkt = gnrc_pktbuf_remove_snip(pkt, pkt->next);
+        }
+    }
     uint64_t now_us = xtimer_usec_from_ticks64(xtimer_now64());
 
     print_str("rftest-rx --- len ");
