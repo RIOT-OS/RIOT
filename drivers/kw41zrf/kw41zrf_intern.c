@@ -198,7 +198,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
 void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
 {
     (void) dev;
-    DEBUG("[kw41zrf] set sequence to %u\n", (unsigned int)seq);
+    DEBUG("[kw41zrf] set sequence to %x\n", (unsigned)seq);
     bool back_to_sleep = false;
     if (seq == XCVSEQ_DSM_IDLE) {
         back_to_sleep = true;

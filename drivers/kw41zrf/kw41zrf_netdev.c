@@ -126,51 +126,54 @@ static void kw41zrf_tx_exec(kw41zrf_t *dev)
     /* Check FCF field in the TX buffer to see if the ACK_REQ flag was set in
      * the packet that is queued for transmission */
     uint8_t fcf = (len_fcf >> 8) & 0xff;
-    uint32_t backoff_delay;
+    uint32_t backoff_delay = 0;
     if (dev->netdev.flags & KW41ZRF_OPT_CSMA) {
         /* Use CSMA/CA random delay in the interval [0, 2**dev->csma_be) */
         backoff_delay = kw41zrf_csma_random_delay(dev);
     }
-    else {
-        /* No CSMA */
-        backoff_delay = 0;
-    }
-    if ((dev->netdev.flags & KW41ZRF_OPT_ACK_REQ) &&
-        (fcf & IEEE802154_FCF_ACK_REQ)) {
+    uint32_t tx_timeout = 0;
+    if ((fcf & IEEE802154_FCF_ACK_REQ) &&
+        (dev->netdev.flags & KW41ZRF_OPT_ACK_REQ)) {
         uint8_t payload_len = len_fcf & 0xff;
-        uint32_t tx_timeout = backoff_delay + dev->tx_warmup_time +
+        tx_timeout = backoff_delay + dev->tx_warmup_time +
             KW41ZRF_SHR_PHY_TIME + payload_len * KW41ZRF_PER_BYTE_TIME +
             KW41ZRF_ACK_WAIT_TIME;
+    }
+    if (backoff_delay > 0) {
+        /* Avoid risk of setting a timer in the past */
+        kw41zrf_timer_set(dev, &ZLL->T2CMP, ~0ul);
+        bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_TMRTRIGEN_SHIFT);
+    }
+    else {
+        bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_TMRTRIGEN_SHIFT);
+    }
+
+    /* This is quite timing sensitive, as interrupts may lead to setting a timer
+     * target which has already passed */
+    unsigned mask = irq_disable();
+    if (tx_timeout > 0) {
+        /* Set a long timeout to avoid timer races while setting up the TX sequence.
+         * By setting the timeout to now - 1 we get 267 seconds to set up everything
+         * before the timer rolls over */
+        kw41zrf_timer_set(dev, &ZLL->T3CMP, ~0ul);
         DEBUG("[kw41zrf] Start TR\n");
-        /* This is quite timing sensitive, as interrupts may lead to delays
-         * causing the timeout or trigger timers to expire before we have had a
-         * chance to write the new autosequence to the PHY_CTRL register. */
-        unsigned mask = irq_disable();
-        if (backoff_delay > 0) {
-            /* Avoid risk of setting a timer in the past */
-            /* Set trigger time for CSMA */
-            kw41zrf_timer_set(dev, &ZLL->T2CMP, backoff_delay);
-            bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_TMRTRIGEN_SHIFT);
-        }
-        /* Set timeout for RX ACK */
-        kw41zrf_timer_set(dev, &ZLL->T3CMP, tx_timeout);
         /* Initiate transmission, with timeout */
         kw41zrf_set_sequence(dev, XCVSEQ_TX_RX | ZLL_PHY_CTRL_TC3TMOUT_MASK);
-        irq_restore(mask);
     }
     else {
         DEBUG("[kw41zrf] Start T\n");
-        unsigned mask = irq_disable();
-        if (backoff_delay > 0) {
-            /* Avoid risk of setting a timer in the past */
-            /* Set trigger time for CSMA */
-            kw41zrf_timer_set(dev, &ZLL->T2CMP, backoff_delay);
-            bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_TMRTRIGEN_SHIFT);
-        }
         /* Initiate transmission */
         kw41zrf_set_sequence(dev, XCVSEQ_TRANSMIT);
-        irq_restore(mask);
     }
+    if (backoff_delay > 0) {
+        /* Set real trigger time for CSMA */
+        kw41zrf_timer_set(dev, &ZLL->T2CMP, backoff_delay);
+    }
+    if (tx_timeout > 0) {
+        /* Set real timeout for RX ACK */
+        kw41zrf_timer_set(dev, &ZLL->T3CMP, tx_timeout);
+    }
+    irq_restore(mask);
 }
 
 /**
