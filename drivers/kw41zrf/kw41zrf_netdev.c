@@ -1212,6 +1212,7 @@ static void kw41zrf_netdev_isr(netdev_t *netdev)
         /* Transceiver is sleeping, the IRQ must have occurred before entering
          * sleep, discard the call */
         DEBUG("kw41zrf: unexpected IRQ while sleeping\n");
+        kw41zrf_unmask_irqs();
         return;
     }
     uint32_t irqsts = ZLL->IRQSTS;
