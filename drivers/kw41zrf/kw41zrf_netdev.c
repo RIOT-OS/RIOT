@@ -1219,8 +1219,6 @@ static void kw41zrf_netdev_isr(netdev_t *netdev)
     /* Clear all IRQ flags now */
     ZLL->IRQSTS = irqsts;
 
-    kw41zrf_unmask_irqs();
-
     uint32_t handled_irqs = 0;
     DEBUG("[kw41zrf] CTRL %08" PRIx32 ", IRQSTS %08" PRIx32 ", FILTERFAIL %08" PRIx32 "\n",
           ZLL->PHY_CTRL, irqsts, ZLL->FILTERFAIL_CODE);
@@ -1265,10 +1263,12 @@ static void kw41zrf_netdev_isr(netdev_t *netdev)
 
     irqsts &= ~handled_irqs;
 
-    if (irqsts & 0x000f017f) {
+    if (irqsts & 0x000f017ful) {
         DEBUG("[kw41zrf] Unhandled IRQs: 0x%08"PRIx32"\n",
-              (irqsts & 0x000f017f));
+              (irqsts & 0x000f017ful));
     }
+
+    kw41zrf_unmask_irqs();
 }
 
 const netdev_driver_t kw41zrf_driver = {

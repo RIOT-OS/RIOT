@@ -138,8 +138,13 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
             ZLL->EVENT_TMR = ZLL_EVENT_TMR_EVENT_TMR_ADD_MASK |
                 ZLL_EVENT_TMR_EVENT_TMR(usec);
 
+            /* Clear IRQ flags */
+            uint32_t irqsts = ZLL->IRQSTS;
+            DEBUG("[kw41zrf] wake IRQSTS=%" PRIx32 "\n", irqsts);
+            ZLL->IRQSTS = irqsts;
+
             /* Disable DSM timer triggered sleep */
-            ZLL->DSM_CTRL &= ~ZLL_DSM_CTRL_ZIGBEE_SLEEP_EN_MASK;
+            ZLL->DSM_CTRL = 0;
 
             break;
         }
@@ -163,8 +168,13 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
             /* cppcheck-suppress selfAssignment
              * (reason: IRQ flags are write-1-to-clear) */
             RSIM->DSM_CONTROL = RSIM->DSM_CONTROL;
+            uint32_t irqsts = ZLL->IRQSTS;
+            DEBUG("[kw41zrf] sleep IRQSTS=%" PRIx32 "\n", irqsts);
+            ZLL->IRQSTS = irqsts;
+            NVIC_ClearPendingIRQ(Radio_1_IRQn);
+
             /* Enable timer triggered sleep */
-            ZLL->DSM_CTRL |= ZLL_DSM_CTRL_ZIGBEE_SLEEP_EN_MASK;
+            ZLL->DSM_CTRL = ZLL_DSM_CTRL_ZIGBEE_SLEEP_EN_MASK;
             /* The device will automatically wake up 8.5 minutes from now if not
              * awoken sooner by software */
             /* TODO handle automatic wake in the ISR if it becomes an issue */

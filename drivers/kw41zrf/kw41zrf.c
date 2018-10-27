@@ -123,9 +123,8 @@ int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
     dev->tx_warmup_time = (dev->tx_warmup_time + 15) / 16;
 
     /* Configure Radio IRQ */
+    kw41zrf_mask_irqs();
     kw41zrf_set_irq_callback(cb, dev);
-    NVIC_ClearPendingIRQ(Radio_1_IRQn);
-    NVIC_EnableIRQ(Radio_1_IRQn);
 
     kw41zrf_abort_sequence(dev);
     kw41zrf_unmask_irqs();
