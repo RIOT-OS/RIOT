@@ -82,6 +82,33 @@ void kw41zrf_setup(kw41zrf_t *dev)
     DEBUG("[kw41zrf] setup finished\n");
 }
 
+static int kw41zrf_xcvr_init(kw41zrf_t *dev)
+{
+    (void) dev;
+    uint8_t radio_id = ((RSIM->MISC & RSIM_MISC_RADIO_VERSION_MASK) >> RSIM_MISC_RADIO_VERSION_SHIFT);
+    switch (radio_id) {
+        case 0x3: /* KW41/31/21 v1 */
+        case 0xb: /* KW41/31/21 v1.1 */
+            break;
+        default:
+            return -ENODEV;
+    }
+
+    RSIM->RF_OSC_CTRL = (RSIM->RF_OSC_CTRL &
+        ~(RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_MASK)) | /* Set EXT_OSC_OVRD value to zero */
+        RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_EN_MASK; /* Enable over-ride with zero value */
+    bit_set32(&SIM->SCGC5, SIM_SCGC5_PHYDIG_SHIFT); /* Enable PHY clock gate */
+
+    /* We only use 802.15.4 mode in this driver */
+    xcvrStatus_t status = XCVR_Configure(&xcvr_common_config, &zgbe_mode_config,
+        &xcvr_ZIGBEE_500kbps_config, &xcvr_802_15_4_500kbps_config, 25, XCVR_FIRST_INIT);
+
+    if (status != gXcvrSuccess_c) {
+        return -EIO;
+    }
+    return 0;
+}
+
 int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
 {
     if (dev == NULL) {
@@ -100,18 +127,17 @@ int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
     while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
 
     timer_init(TIMER_PIT_DEV(0), 1000000ul, NULL, NULL);
-    uint32_t before = timer_read(TIMER_PIT_DEV(0));
     printf("[kw41zrf] start init\n");
-    xcvrStatus_t xcvrStatus = XCVR_Init(ZIGBEE_MODE, DR_500KBPS);
+    uint32_t before = timer_read(TIMER_PIT_DEV(0));
+    int res = kw41zrf_xcvr_init(dev);
     uint32_t after = timer_read(TIMER_PIT_DEV(0));
     printf("[kw41zrf] took %" PRIu32 " us\n", (after - before));
-    if (xcvrStatus != gXcvrSuccess_c) {
+    if (res < 0) {
         /* initialization error signaled from vendor driver */
         /* Restore saved RF_OSC_EN setting */
         RSIM->CONTROL = (RSIM->CONTROL & ~RSIM_CONTROL_RF_OSC_EN_MASK) | dev->rf_osc_en_idle;
-        return -EIO;
+        return res;
     }
-
     /* Software reset of most settings */
     kw41zrf_reset_phy(dev);
 
