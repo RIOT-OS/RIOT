@@ -38,6 +38,8 @@
 #include "fsl_xcvr.h"
 #include "fsl_xcvr_trim.h"
 #include "dbg_ram_capture.h"
+#include <inttypes.h>
+#include <stdio.h>
 
 /*******************************************************************************
 * Definitions
@@ -113,7 +115,6 @@ static const int8_t sweep_step_values2[NUM_SWEEP_STEP_ENTRIES2] =
  ***********************************************************************************/
 uint8_t rx_bba_dcoc_dac_trim_shortIQ(void)
 {
-    uint8_t i;
     float temp_mi = 0;
     float temp_mq = 0;
     float temp_pi = 0;
@@ -202,54 +203,75 @@ uint8_t rx_bba_dcoc_dac_trim_shortIQ(void)
 
     bbf_dcoc_step = (uint32_t)roundf(temp_step * 8U);
 
+    printf("temp_mi = %f\n", temp_mi);
+    printf("temp_mq = %f\n", temp_mq);
+    printf("temp_pi = %f\n", temp_pi);
+    printf("temp_pq = %f\n", temp_pq);
+    printf("temp_step = %f\n", temp_step);
+    printf("bbf_dcoc_step = %"PRIu32"\n", bbf_dcoc_step);
+
     if ((bbf_dcoc_step > 265) & (bbf_dcoc_step < 305))
     {
         bbf_dcoc_step_rcp = (uint32_t)roundf((float)0x8000U / temp_step);
+        printf("bbf_dcoc_step_rcp = %"PRIu32"\n", bbf_dcoc_step_rcp);
 
         /* Calculate TZA DCOC STEPS & RECIPROCALS and IQ_DC_GAIN_MISMATCH. */
-        for (i = TZA_STEP_N0; i <= TZA_STEP_N10; i++) /* Relying on enumeration ordering. */
+        for (unsigned i = TZA_STEP_N0; i <= TZA_STEP_N10; i++) /* Relying on enumeration ordering. */
         {
             /* Calculate TZA DCOC STEPSIZE & its RECIPROCAL. */
             switch(i){
             case TZA_STEP_N0:
                 temp_step = (bbf_dcoc_step >> 3U) / 3.6F;
+                printf("temp_step0 = %f\n", temp_step);
                 break;
             case TZA_STEP_N1:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_01_init >> 16)/(xcvr_common_config.dcoc_tza_step_00_init >> 16);
+                printf("temp_step1 = %f\n", temp_step);
                 break;
             case TZA_STEP_N2:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_02_init >> 16)/(xcvr_common_config.dcoc_tza_step_01_init >> 16);
+                printf("temp_step2 = %f\n", temp_step);
                 break;
             case TZA_STEP_N3:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_03_init >> 16)/(xcvr_common_config.dcoc_tza_step_02_init >> 16);
+                printf("temp_step3 = %f\n", temp_step);
                 break;
             case TZA_STEP_N4:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_04_init >> 16)/(xcvr_common_config.dcoc_tza_step_03_init >> 16);
+                printf("temp_step4 = %f\n", temp_step);
                 break;
             case TZA_STEP_N5:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_05_init >> 16)/(xcvr_common_config.dcoc_tza_step_04_init >> 16);
+                printf("temp_step5 = %f\n", temp_step);
                 break;
             case TZA_STEP_N6:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_06_init >> 16)/(xcvr_common_config.dcoc_tza_step_05_init >> 16);
+                printf("temp_step6 = %f\n", temp_step);
                 break;
             case TZA_STEP_N7:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_07_init >> 16)/(xcvr_common_config.dcoc_tza_step_06_init >> 16);
+                printf("temp_step7 = %f\n", temp_step);
                 break;
             case TZA_STEP_N8:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_08_init >> 16)/(xcvr_common_config.dcoc_tza_step_07_init >> 16);
+                printf("temp_step8 = %f\n", temp_step);
                 break;
             case TZA_STEP_N9:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_09_init >> 16)/(xcvr_common_config.dcoc_tza_step_08_init >> 16);
+                printf("temp_step9 = %f\n", temp_step);
                 break;
             case TZA_STEP_N10:
                 temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_10_init >> 16)/(xcvr_common_config.dcoc_tza_step_09_init >> 16);
+                printf("temp_step10 = %f\n", temp_step);
                 break;
             default:
                 break;
             }
 
             tza_dcoc_step[i-TZA_STEP_N0].dcoc_step = (uint32_t)roundf(temp_step * 8);
+            printf("tza_dcoc_step[%u].dcoc_step = %u\n", i-TZA_STEP_N0, (unsigned)tza_dcoc_step[i-TZA_STEP_N0].dcoc_step);
             tza_dcoc_step[i-TZA_STEP_N0].dcoc_step_rcp = (uint32_t)roundf((float)0x8000 / temp_step);
+            printf("tza_dcoc_step[%u].dcoc_step_rcp = %u\n", i-TZA_STEP_N0, (unsigned)tza_dcoc_step[i-TZA_STEP_N0].dcoc_step_rcp);
         }
 
         /* Make the trims active. */
@@ -682,12 +704,20 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
     temp_pi = calc_dcoc_dac_step(&measurement_tbl2[I_CHANNEL][BBF_POS], &measurement_tbl2[I_CHANNEL][NOMINAL2]);
     temp_pq = calc_dcoc_dac_step(&measurement_tbl2[Q_CHANNEL][BBF_POS], &measurement_tbl2[Q_CHANNEL][NOMINAL2]);
 
-	temp_step = (temp_mi + temp_pi + temp_mq + temp_pq) / 4;
+    temp_step = (temp_mi + temp_pi + temp_mq + temp_pq) / 4;
     bbf_dcoc_step = (uint32_t)roundf(temp_step * 8U);
+
+    printf("temp_mi = %f\n", temp_mi);
+    printf("temp_mq = %f\n", temp_mq);
+    printf("temp_pi = %f\n", temp_pi);
+    printf("temp_pq = %f\n", temp_pq);
+    printf("temp_step = %f\n", temp_step);
+    printf("bbf_dcoc_step = %"PRIu32"\n", bbf_dcoc_step);
 
     if ((bbf_dcoc_step > 265) & (bbf_dcoc_step < 305))
     {
         bbf_dcoc_step_rcp = (uint32_t)roundf((float)0x8000U / temp_step);
+        printf("bbf_dcoc_step_rcp = %"PRIu32"\n", bbf_dcoc_step_rcp);
 
         /* Calculate TZA DCOC STEPS & RECIPROCALS and IQ_DC_GAIN_MISMATCH */
         for (i = TZA_STEP_N0; i <= TZA_STEP_N10; i++)
@@ -695,44 +725,57 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
             /* Calculate TZA DCOC STEPSIZE & its RECIPROCAL */
             switch(i){
                 case TZA_STEP_N0:
-                    temp_step = (bbf_dcoc_step>>3U) / 3.6F;
+                    temp_step = (bbf_dcoc_step >> 3U) / 3.6F;
+                    printf("temp_step0 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N1:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_01_init >> 16) / (xcvr_common_config.dcoc_tza_step_00_init >> 16);
+                    printf("temp_step1 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N2:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_02_init >> 16) / (xcvr_common_config.dcoc_tza_step_01_init >> 16);
+                    printf("temp_step2 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N3:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_03_init >> 16) / (xcvr_common_config.dcoc_tza_step_02_init >> 16);
+                    printf("temp_step3 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N4:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_04_init >> 16) / (xcvr_common_config.dcoc_tza_step_03_init >> 16);
+                    printf("temp_step4 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N5:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_05_init >> 16) / (xcvr_common_config.dcoc_tza_step_04_init >> 16);
+                    printf("temp_step5 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N6:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_06_init >> 16) / (xcvr_common_config.dcoc_tza_step_05_init >> 16);
+                    printf("temp_step6 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N7:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_07_init >> 16) / (xcvr_common_config.dcoc_tza_step_06_init >> 16);
+                    printf("temp_step7 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N8:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_08_init >> 16) / (xcvr_common_config.dcoc_tza_step_07_init >> 16);
+                    printf("temp_step8 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N9:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_09_init >> 16) / (xcvr_common_config.dcoc_tza_step_08_init >> 16);
+                    printf("temp_step9 = %f\n", temp_step);
                     break;
                 case TZA_STEP_N10:
                     temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_10_init >> 16) / (xcvr_common_config.dcoc_tza_step_09_init >> 16);
+                    printf("temp_step10 = %f\n", temp_step);
                     break;
                 default:
                     break;
             }
 
             tza_dcoc_step[i-TZA_STEP_N0].dcoc_step = (uint32_t)roundf(temp_step * 8);
+            printf("tza_dcoc_step[%u].dcoc_step = %u\n", i-TZA_STEP_N0, (unsigned)tza_dcoc_step[i-TZA_STEP_N0].dcoc_step);
             tza_dcoc_step[i-TZA_STEP_N0].dcoc_step_rcp = (uint32_t)roundf((float)0x8000 / temp_step);
+            printf("tza_dcoc_step[%u].dcoc_step_rcp = %u\n", i-TZA_STEP_N0, (unsigned)tza_dcoc_step[i-TZA_STEP_N0].dcoc_step_rcp);
         }
 
         /* Make the trims active */
@@ -754,6 +797,7 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
     }
     else
     {
+        printf("!!! XCVR trim failed: bbf_dcoc_step = %"PRIu32"!\n", bbf_dcoc_step);
         status = 0; /* Failure */
     }
 

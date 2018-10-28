@@ -29,6 +29,7 @@
 #include "kw41zrf_getset.h"
 #include "kw41zrf_intern.h"
 #include "vendor/XCVR/MKW41Z4/fsl_xcvr.h"
+#include "periph/timer.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -98,8 +99,12 @@ int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
     /* Wait for oscillator ready signal */
     while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
 
+    timer_init(TIMER_PIT_DEV(0), 1000000ul, NULL, NULL);
+    uint32_t before = timer_read(TIMER_PIT_DEV(0));
+    printf("[kw41zrf] start init\n");
     xcvrStatus_t xcvrStatus = XCVR_Init(ZIGBEE_MODE, DR_500KBPS);
-
+    uint32_t after = timer_read(TIMER_PIT_DEV(0));
+    printf("[kw41zrf] took %" PRIu32 " us\n", (after - before));
     if (xcvrStatus != gXcvrSuccess_c) {
         /* initialization error signaled from vendor driver */
         /* Restore saved RF_OSC_EN setting */

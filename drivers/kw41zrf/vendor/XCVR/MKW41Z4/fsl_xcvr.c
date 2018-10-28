@@ -1094,7 +1094,7 @@ xcvrStatus_t XCVR_Configure(const xcvr_common_config_t *com_config,
         end_of_rx_wu = (temp & XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK) >> XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;
         while ((( XCVR_MISC->XCVR_STATUS & XCVR_CTRL_XCVR_STATUS_TSM_COUNT_MASK) >> XCVR_CTRL_XCVR_STATUS_TSM_COUNT_SHIFT ) != end_of_rx_wu) {};
 
-//        if (!rx_bba_dcoc_dac_trim_shortIQ())
+        //~ if (!rx_bba_dcoc_dac_trim_shortIQ())
         if (!rx_bba_dcoc_dac_trim_DCest())
         {
             config_status = gXcvrTrimFailure_c;
