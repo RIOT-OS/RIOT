@@ -1,3 +1,5 @@
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
   USEMODULE += nrfmin
 endif
+
+include $(RIOTBOARD)/common/nrf52/Makefile.dep

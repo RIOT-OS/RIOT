@@ -7,4 +7,4 @@ TERMPROG = $(RIOTTOOLS)/jlink/jlink.sh
 TERMFLAGS = term_rtt
 
 # use shared Makefile.include
-include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include
+include $(RIOTBOARD)/common/nrf52/Makefile.include
