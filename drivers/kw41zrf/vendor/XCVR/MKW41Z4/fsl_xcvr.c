@@ -396,34 +396,18 @@ xcvrStatus_t XCVR_Init(radio_mode_t radio_mode, data_rate_t data_rate)
 #endif /* ifndef SIMULATION */
 
     /* Perform the desired XCVR initialization and configuration */
-    status = XCVR_GetDefaultConfig(radio_mode, data_rate,
-                                   (const xcvr_common_config_t **)&radio_common_config,
-                                   (const xcvr_mode_config_t **)&radio_mode_cfg,
-                                   (const xcvr_mode_datarate_config_t **)&mode_datarate_config,
-                                   (const xcvr_datarate_config_t **)&datarate_config);
+    status = XCVR_GetDefaultConfig(radio_mode, data_rate, &radio_common_config,
+        &radio_mode_cfg, &mode_datarate_config, &datarate_config);
 
     if (status == gXcvrSuccess_c)
     {
-        status = XCVR_Configure((const xcvr_common_config_t *)radio_common_config,
-                                (const xcvr_mode_config_t *)radio_mode_cfg,
-                                (const xcvr_mode_datarate_config_t *)mode_datarate_config,
-                                (const xcvr_datarate_config_t *)datarate_config, 25, XCVR_FIRST_INIT);
+        status = XCVR_Configure(radio_common_config, radio_mode_cfg,
+            mode_datarate_config, datarate_config, 25, XCVR_FIRST_INIT);
         current_xcvr_config.radio_mode = radio_mode;
         current_xcvr_config.data_rate = data_rate;
     }
 
     return status;
-}
-
-void XCVR_Deinit(void)
-{
-#if RADIO_IS_GEN_3P0
-    rf_osc_shutdown();
-    RSIM->POWER |= RSIM_POWER_RSIM_STOP_MODE_MASK; /* Set radio stop mode to RVLLS */
-    RSIM->POWER &= ~RSIM_POWER_RSIM_RUN_REQUEST_MASK; /* Clear RUN request */
-#else
-
-#endif /* RADIO_IS_GEN_3P0 */
 }
 
 xcvrStatus_t XCVR_GetDefaultConfig(radio_mode_t radio_mode,
@@ -1502,11 +1486,13 @@ uint32_t XCVR_GetFreq ( void )
     uint32_t ref_clk = 32U;
 #endif /* RF_OSC_26MHZ == 1 */
 
+    printf("pll_num_unsigned = %08" PRIx32 "\n", pll_num_unsigned);
     /* Check if sign bit is asserted */
     if (pll_num_unsigned & 0x04000000U)
     {
         /* Sign extend the numerator */
         pll_num = (~pll_num_unsigned + 1) & 0x03FFFFFFU;
+        printf("pll_num = %" PRIu32 ", pll_denom = %" PRIu32 "\n", pll_num, pll_denom);
 
         /* Calculate the frequency in MHz */
         freq_float = (ref_clk * 2 * (pll_int - ((float)pll_num / pll_denom)));
@@ -1515,8 +1501,10 @@ uint32_t XCVR_GetFreq ( void )
     {
         /* Calculate the frequency in MHz */
         pll_num = pll_num_unsigned;
+        printf("pll_num = %" PRIu32 ", pll_denom = %" PRIu32 "\n", pll_num, pll_denom);
         freq_float = (ref_clk * 2 * (pll_int + ((float)pll_num / (float)pll_denom)));
     }
+    printf("freq_float = %f\n", freq_float);
 
     freq = (uint32_t)freq_float;
 
