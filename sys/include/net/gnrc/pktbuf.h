@@ -172,16 +172,16 @@ static inline void gnrc_pktbuf_release(gnrc_pktsnip_t *pkt)
 }
 
 /**
- * @brief   Must be called once before there is a write operation in a thread.
+ * @brief   Must be called once before there is a write operation on a
+ *          [packet snip](@ref gnrc_pktsnip_t) in a thread.
  *
- * @details This function duplicates a packet in the packet buffer if
+ * @details This function duplicates a packet snip in the packet buffer (both
+ *          the instance of the gnrc_pktsnip_t and its data) if
  *          gnrc_pktsnip_t::users of @p pkt > 1.
  *
- * @note    Do *not* call this function in a thread twice on the same packet.
+ * @param[in] pkt   The packet snip you want to write into.
  *
- * @param[in] pkt   The packet you want to write into.
- *
- * @return  The (new) pointer to the pkt.
+ * @return  The (new) pointer to the packet snip.
  * @return  NULL, if gnrc_pktsnip_t::users of @p pkt > 1 and if there is not
  *          enough space in the packet buffer.
  */
