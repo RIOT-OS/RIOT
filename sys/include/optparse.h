@@ -157,10 +157,10 @@ enum OPTPARSE_ACTIONS {
  * Configuration rules for a single command line option.
  */
 typedef struct opt_rule {
+    enum OPTPARSE_ACTIONS action;  /**< Parsing type/action. See OPTPARSE_ACTIONS. */
     char short_id;          /**< Short style option name ("-w"). Can be OPTPARSE_NO_SHORT.*/
     const char *long_id;    /**< Long style option name ("--width") . Can be NULL */
     const char *desc;       /**< Help description. Can be NULL */
-    int action;             /**< Parsing type/action. See OPTPARSE_ACTIONS. */
     union {
         int *d_int;
         bool *d_bool;
@@ -207,7 +207,7 @@ typedef uint16_t optparse_tune; /**< Option bitfield */
  */
 typedef struct opt_conf {
     char *helpstr;          /**< Program's description and general help string. */
-    opt_rule_t *rules; /**< Array of options. */
+    opt_rule_t *rules;      /**< Array of options. */
     int n_rules;            /**< Number of elements in rules. */
     optparse_tune tune;     /**< Option bitfield. */
 
