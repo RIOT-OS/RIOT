@@ -59,11 +59,11 @@
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-uint32_t read_another_ifr_word(void);
-uint32_t read_first_ifr_word(uint32_t read_addr);
+static uint32_t read_another_ifr_word(void);
+static uint32_t read_first_ifr_word(uint32_t read_addr);
 
 #if RADIO_IS_GEN_3P0
-uint64_t read_index_ifr(uint32_t read_addr);
+static uint64_t read_index_ifr(uint32_t read_addr);
 #else
 /*! *********************************************************************************
  * @brief  Reads a location in block 1 IFR for use by the radio.
@@ -75,13 +75,13 @@ uint64_t read_index_ifr(uint32_t read_addr);
  * @details This function wraps both the Gen2 read_resource command and the Gen2.1 and Gen3 read_index
 ***********************************************************************************/
 #if RADIO_IS_GEN_2P1
-uint64_t read_resource_ifr(uint32_t read_addr);
+static uint64_t read_resource_ifr(uint32_t read_addr);
 #else
-uint32_t read_resource_ifr(uint32_t read_addr);
+static uint32_t read_resource_ifr(uint32_t read_addr);
 #endif /* RADIO_IS_GEN_2P1 */
 #endif /* RADIO_IS_GEN_3P0 */
 
-void store_sw_trim(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries, uint32_t addr, uint32_t data);
+static void store_sw_trim(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries, uint32_t addr, uint32_t data);
 
 /*******************************************************************************
  * Variables
@@ -144,7 +144,7 @@ const uint32_t BLOCK_1_IFR[]=
  * \return 8 bytes of packed data containing radio trims only
  *
 ***********************************************************************************/
-uint32_t read_first_ifr_word(uint32_t read_addr)
+static uint32_t read_first_ifr_word(uint32_t read_addr)
 {
     ifr_read_addr = read_addr;
     return read_another_ifr_word();
@@ -161,7 +161,7 @@ uint32_t read_first_ifr_word(uint32_t read_addr)
  *  The function read_first_ifr_word() must have been called so that the ifr_read_addr variable is setup prior to use.
  *
 ***********************************************************************************/
-uint32_t read_another_ifr_word(void)
+static uint32_t read_another_ifr_word(void)
 {
     uint32_t packed_data;
 
@@ -199,7 +199,7 @@ uint32_t read_another_ifr_word(void)
  * \return 8 bytes of packed data containing radio trims only
  *
 ***********************************************************************************/
-uint64_t read_index_ifr(uint32_t read_addr)
+static uint64_t read_index_ifr(uint32_t read_addr)
 {
     uint8_t rdindex = read_addr;
     uint64_t read_data;
@@ -241,7 +241,7 @@ uint64_t read_index_ifr(uint32_t read_addr)
  *
 ***********************************************************************************/
 #if RADIO_IS_GEN_2P0
-uint32_t read_resource_ifr(uint32_t read_addr)
+static uint32_t read_resource_ifr(uint32_t read_addr)
 {
 
     uint32_t packed_data;
@@ -281,7 +281,7 @@ uint32_t read_resource_ifr(uint32_t read_addr)
     return packed_data;
 }
 #else
-uint64_t read_resource_ifr(uint32_t read_addr)
+static uint64_t read_resource_ifr(uint32_t read_addr)
 {
 
     uint64_t packed_data;
@@ -343,7 +343,7 @@ uint64_t read_resource_ifr(uint32_t read_addr)
  * \param data the value of the software trim
  *
 ***********************************************************************************/
-void store_sw_trim(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries, uint32_t addr, uint32_t data)
+static void store_sw_trim(IFR_SW_TRIM_TBL_ENTRY_T * sw_trim_tbl, uint16_t num_entries, uint32_t addr, uint32_t data)
 {
     uint16_t i;
 
