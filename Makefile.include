@@ -319,7 +319,7 @@ include $(RIOTMAKE)/cflags.inc.mk
 
 # make the RIOT version available to the program
 ifeq ($(origin RIOT_VERSION), undefined)
-  GIT_STRING := $(shell git --git-dir="$(RIOTBASE)/.git" describe --always --abbrev=4 --dirty=-`hostname` 2> /dev/null)
+  GIT_STRING := $(shell git --git-dir="$(RIOTBASE)/.git" describe --always --abbrev=4 2> /dev/null)
   ifneq (,$(GIT_STRING))
     GIT_BRANCH := $(shell git --git-dir="$(RIOTBASE)/.git" rev-parse --abbrev-ref HEAD)
     ifeq ($(strip $(GIT_BRANCH)),master)
