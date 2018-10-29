@@ -96,7 +96,23 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_pktbuf_release(pkt);
             return NULL;
         }
-        if (!(netif->flags & GNRC_NETIF_FLAGS_RAWMODE)) {
+        if (netif->flags & GNRC_NETIF_FLAGS_RAWMODE) {
+            /* Raw mode, skip packet processing, but provide rx_info via
+             * GNRC_NETTYPE_NETIF */
+            gnrc_pktsnip_t *netif_snip = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+            if (netif_snip == NULL) {
+                DEBUG("_recv_ieee802154: no space left in packet buffer\n");
+                gnrc_pktbuf_release(pkt);
+                return NULL;
+            }
+            gnrc_netif_hdr_t *hdr = netif_snip->data;
+            hdr->lqi = rx_info.lqi;
+            hdr->rssi = rx_info.rssi;
+            hdr->if_pid = thread_getpid();
+            LL_APPEND(pkt, netif_snip);
+        }
+        else {
+            /* Normal mode, try to parse the frame according to IEEE 802.15.4 */
             gnrc_pktsnip_t *ieee802154_hdr, *netif_hdr;
             gnrc_netif_hdr_t *hdr;
 #if ENABLE_DEBUG
