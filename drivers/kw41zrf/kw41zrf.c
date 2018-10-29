@@ -29,6 +29,7 @@
 #include "kw41zrf_getset.h"
 #include "kw41zrf_intern.h"
 #include "vendor/XCVR/MKW41Z4/fsl_xcvr.h"
+#include "vendor/XCVR/MKW41Z4/ifr_radio.h"
 #include "periph/timer.h"
 
 #define ENABLE_DEBUG    (0)
@@ -98,6 +99,27 @@ static int kw41zrf_xcvr_init(kw41zrf_t *dev)
         ~(RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_MASK)) | /* Set EXT_OSC_OVRD value to zero */
         RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_EN_MASK; /* Enable over-ride with zero value */
     bit_set32(&SIM->SCGC5, SIM_SCGC5_PHYDIG_SHIFT); /* Enable PHY clock gate */
+
+    /* Load IFR trim values */
+    IFR_SW_TRIM_TBL_ENTRY_T sw_trim_tbl[] =
+    {
+        {TRIM_STATUS, 0, 0}, /*< Fetch the trim status word if available.*/
+        {TRIM_VERSION, 0, 0} /*< Fetch the trim version number if available.*/
+    };
+    handle_ifr(&sw_trim_tbl[0], sizeof(sw_trim_tbl) / sizeof(sw_trim_tbl[0]));
+    DEBUG("[kw41zrf] sw_trim_tbl:\n");
+
+    for (unsigned k = 0; k < sizeof(sw_trim_tbl) / sizeof(sw_trim_tbl[0]); ++k) {
+        DEBUG("[kw41zrf] [%u] id=0x%04x ", k, (unsigned)sw_trim_tbl[k].trim_id);
+        if (sw_trim_tbl[k].trim_id == TRIM_STATUS) {
+            DEBUG("(TRIM_STATUS)  ");
+        }
+        else if (sw_trim_tbl[k].trim_id == TRIM_VERSION) {
+            DEBUG("(TRIM_VERSION) ");
+        }
+        DEBUG("value=%" PRIu32 ", valid=%u\n", sw_trim_tbl[k].trim_value,
+            (unsigned)sw_trim_tbl[k].valid);
+    }
 
     /* We only use 802.15.4 mode in this driver */
     xcvrStatus_t status = XCVR_Configure(&xcvr_common_config, &zgbe_mode_config,
