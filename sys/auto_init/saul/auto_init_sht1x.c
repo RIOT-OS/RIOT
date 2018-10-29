@@ -16,6 +16,11 @@
  *
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
+ * Please note that the sht1x differs from other sensor modules, as
+ * initialization is performed regardless of the use of SAUL. However, when
+ * the module `auto_init_saul` is *not* used, the SAUL registration is skipped
+ * and the initialization does *not* depend on SAUL in this case.
+ *
  * @}
  */
 
