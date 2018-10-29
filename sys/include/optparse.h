@@ -206,7 +206,7 @@ typedef uint16_t optparse_tune; /**< Option bitfield */
  * Configuration for the command line parser.
  */
 typedef struct opt_conf {
-    char *helpstr;          /**< Program's description and general help string. */
+    const char *helpstr;          /**< Program's description and general help string. */
     opt_rule_t *rules;      /**< Array of options. */
     int n_rules;            /**< Number of elements in rules. */
     optparse_tune tune;     /**< Option bitfield. */
