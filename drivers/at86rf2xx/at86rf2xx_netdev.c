@@ -133,7 +133,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     /* frame buffer protection will be unlocked as soon as at86rf2xx_fb_stop() is called,
      * Set receiver to PLL_ON state to be able to free the SPI bus and avoid loosing data. */
-    at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
+    dev->idle_state = at86rf2xx_set_state(dev, AT86RF2XX_STATE_PLL_ON);
 
     /* start frame buffer access */
     at86rf2xx_fb_start(dev);
