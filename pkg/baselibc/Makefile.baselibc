@@ -1,0 +1,5 @@
+MODULE = baselibc
+# enable long support in printf. Will probably be needed.
+CFLAGS += -Wno-error=unused-parameter -DPRINTF_LONG_SUPPORT -I ../include -I templates
+
+include $(RIOTBASE)/Makefile.base
