@@ -21,6 +21,39 @@
 
 #include <stdio.h>
 
+#if MODULE_BASELIBC
+
+#include "periph/uart.h"
+#include "stdio_uart.h"
+#include "isrpipe.h"
+
+extern isrpipe_t stdio_uart_isrpipe;
+
+size_t stdio_read2(FILE* dummy, char* buffer, size_t count)
+{
+    (void) dummy;
+
+    return (ssize_t)isrpipe_read(&stdio_uart_isrpipe, buffer, count);
+}
+
+size_t stdio_write2(FILE* dummy, const char* buffer, size_t len)
+{
+    (void) dummy;
+    uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
+
+    return len;
+}
+
+const struct File_methods _uart_methods = {
+    stdio_write2, stdio_read2
+};
+
+FILE _stdout_uart = {&_uart_methods};
+
+FILE* const stdout = &_stdout_uart;
+
+#endif
+
 int main(void)
 {
     puts("Hello World!");

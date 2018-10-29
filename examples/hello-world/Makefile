@@ -12,6 +12,9 @@ RIOTBASE ?= $(CURDIR)/../..
 # development process:
 DEVELHELP ?= 1
 
+
+USEPKG+=baselibc
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
