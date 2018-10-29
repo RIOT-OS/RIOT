@@ -897,14 +897,6 @@ extern "C" {
 xcvrStatus_t XCVR_Init(radio_mode_t radio_mode, data_rate_t data_rate);
 
 /*!
- * @brief  Deinitializes an XCVR instance.
- *
- * This function gate the XCVR module clock and set all register value to reset value.
- *
- */
-void XCVR_Deinit(void);
-
-/*!
  * @brief  Initializes XCVR configure structure.
  *
  * This function updates pointers to the XCVR configure structures with default values.

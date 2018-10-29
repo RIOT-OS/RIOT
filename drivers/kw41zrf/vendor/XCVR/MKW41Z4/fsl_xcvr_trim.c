@@ -39,21 +39,17 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#define ENABLE_DEBUG (1)
+#include "debug.h"
+
 /*******************************************************************************
 * Definitions
 ******************************************************************************/
-
-#ifndef MIN
-#define MIN(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a < _b ? _a : _b; })
-#endif
+#define DCOC_DAC_BBF_STEP (16)
 
 /*******************************************************************************
 * Prototypes
 ******************************************************************************/
-void DC_Measure_short(IQ_t chan, DAC_SWEEP_STEP2_t dcoc_init_val);
 float calc_dcoc_dac_step(GAIN_CALC_TBL_ENTRY2_T * meas_ptr, GAIN_CALC_TBL_ENTRY2_T * baseline_meas_ptr );
 extern float roundf (float);
 
@@ -62,40 +58,19 @@ extern float roundf (float);
 ******************************************************************************/
 const int8_t TsettleCal = 10;
 static GAIN_CALC_TBL_ENTRY2_T measurement_tbl2[NUM_I_Q_CHAN][NUM_SWEEP_STEP_ENTRIES2];
-static const int8_t sweep_step_values2[NUM_SWEEP_STEP_ENTRIES2] =
-{
-    0, /* Baseline entry is first and not used in this table */
-    -16,
-    +16,
-    -4,
-    -4,
-    -4,
-    -4,
-    -4,
-    -4,
-    -4,
-    -4,
-    -4,
-    -4,
-    -4,
-    +4,
-    +4,
-    +4,
-    +4,
-    +4,
-    +4,
-    +4,
-    +4,
-    +4,
-    +4,
-    +4
-};
 
 /*******************************************************************************
  * Macros
  ******************************************************************************/
 #define ISIGN(x) !((uint16_t)x & 0x8000)
 #define ABS(x) ((x) > 0 ? (x) : -(x))
+#ifndef MIN
+#define MIN(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
+#endif
+
 
 /*******************************************************************************
  * Code
@@ -125,6 +100,17 @@ float calc_dcoc_dac_step(GAIN_CALC_TBL_ENTRY2_T * meas_ptr, GAIN_CALC_TBL_ENTRY2
     return (float)dc_step / (1 << 16);
 }
 
+float calc_dcoc_dac_step2(int16_t meas, int16_t baseline)
+{
+    /* Normalize internal measurement */
+    int16_t norm_dc_code = meas - baseline;
+    int32_t dc_step = ((int32_t)norm_dc_code << 16) / DCOC_DAC_BBF_STEP;
+    if (dc_step < 0) {
+        dc_step = -dc_step;
+    }
+    return (float)dc_step / (1 << 16);
+}
+
 /*! *********************************************************************************
  * \brief  Temporary delay function
  *
@@ -141,6 +127,18 @@ void XcvrCalDelay(uint32_t time)
     {
         time--;
     }
+}
+
+void dump_measurement_tbl2(void)
+{
+    DEBUG("dump_measurement_tbl2:\n");
+    for (unsigned chan = 0; chan < NUM_I_Q_CHAN; ++chan) {
+        for (unsigned step = 0; step < NUM_SWEEP_STEP_ENTRIES2; ++step) {
+            const GAIN_CALC_TBL_ENTRY2_T *ptr = &measurement_tbl2[chan][step];
+            DEBUG("[%u][%u] %6d, %4d\n", chan, step, ptr->internal_measurement, ptr->step_value);
+        }
+    }
+    DEBUG("end of dump\n");
 }
 
 /*! *********************************************************************************
@@ -189,7 +187,6 @@ void rx_dc_est_average(int16_t * i_avg, int16_t * q_avg)
  ***********************************************************************************/
 uint8_t rx_bba_dcoc_dac_trim_DCest(void)
 {
-    uint8_t i;
     float temp_mi = 0;
     float temp_mq = 0;
     float temp_pi = 0;
@@ -201,25 +198,14 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
     TZAdcocstep_t tza_dcoc_step[11];
     uint8_t status = 0;
 
-    uint8_t bbf_dacinit_i, bbf_dacinit_q;
-    uint8_t tza_dacinit_i, tza_dacinit_q;
-    int16_t dc_meas_i;
-    int16_t dc_meas_q;
-    uint32_t dcoc_init_reg_value_dcgain = 0x80802020; /* Used in 2nd & 3rd Generation DCOC Trims only */
     uint32_t temp;
 
-    uint32_t dcoc_ctrl_0_stack;
-    uint32_t dcoc_ctrl_1_stack;
-    uint32_t agc_ctrl_1_stack;
-    uint32_t rx_dig_ctrl_stack;
-    uint32_t dcoc_cal_gain_state;
-
     /* Save register */
-    dcoc_ctrl_0_stack = XCVR_RX_DIG->DCOC_CTRL_0; /* Save state of DCOC_CTRL_0 for later restore */
-    dcoc_ctrl_1_stack = XCVR_RX_DIG->DCOC_CTRL_1; /* Save state of DCOC_CTRL_1 for later restore */
-    rx_dig_ctrl_stack =  XCVR_RX_DIG->RX_DIG_CTRL; /* Save state of RX_DIG_CTRL for later restore */
-    agc_ctrl_1_stack = XCVR_RX_DIG->AGC_CTRL_1; /* Save state of RX_DIG_CTRL for later restore */
-    dcoc_cal_gain_state = XCVR_RX_DIG->DCOC_CAL_GAIN; /* Save state of DCOC_CAL_GAIN for later restore */
+    uint32_t dcoc_ctrl_0_stack = XCVR_RX_DIG->DCOC_CTRL_0; /* Save state of DCOC_CTRL_0 for later restore */
+    uint32_t dcoc_ctrl_1_stack = XCVR_RX_DIG->DCOC_CTRL_1; /* Save state of DCOC_CTRL_1 for later restore */
+    uint32_t rx_dig_ctrl_stack =  XCVR_RX_DIG->RX_DIG_CTRL; /* Save state of RX_DIG_CTRL for later restore */
+    uint32_t agc_ctrl_1_stack = XCVR_RX_DIG->AGC_CTRL_1; /* Save state of RX_DIG_CTRL for later restore */
+    uint32_t dcoc_cal_gain_state = XCVR_RX_DIG->DCOC_CAL_GAIN; /* Save state of DCOC_CAL_GAIN for later restore */
 
     /* Register config */
     /* Ensure AGC, DCOC and RX_DIG_CTRL is in correct mode */
@@ -250,126 +236,79 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
     XcvrCalDelay(TsettleCal);
 
     /* Set default DCOC DAC INIT Value */
-    dcoc_init_reg_value_dcgain = XCVR_RX_DIG->DCOC_DAC_INIT; /* Store DCOC DAC INIT values */
-    bbf_dacinit_i = (dcoc_init_reg_value_dcgain & 0x000000FFU);
-    bbf_dacinit_q = (dcoc_init_reg_value_dcgain & 0x0000FF00U)>>8;
-    tza_dacinit_i = (dcoc_init_reg_value_dcgain & 0x00FF0000U)>>16;
-    tza_dacinit_q = dcoc_init_reg_value_dcgain >> 24;
+    uint32_t dcoc_init_reg_value_dcgain = XCVR_RX_DIG->DCOC_DAC_INIT; /* Store DCOC DAC INIT values */
+    uint8_t bbf_dacinit_i = (dcoc_init_reg_value_dcgain & 0x000000FFU);
+    uint8_t bbf_dacinit_q = (dcoc_init_reg_value_dcgain & 0x0000FF00U)>>8;
+    uint8_t tza_dacinit_i = (dcoc_init_reg_value_dcgain & 0x00FF0000U)>>16;
+    uint8_t tza_dacinit_q = dcoc_init_reg_value_dcgain >> 24;
 
+    int16_t dc_meas_i_nominal = 0;
+    int16_t dc_meas_q_nominal = 0;
     XcvrCalDelay(TsettleCal * 4);
-    rx_dc_est_average(&dc_meas_i, &dc_meas_q);
-    measurement_tbl2[I_CHANNEL][NOMINAL2].step_value = sweep_step_values2[NOMINAL2];
-    measurement_tbl2[Q_CHANNEL][NOMINAL2].step_value = sweep_step_values2[NOMINAL2];
-    measurement_tbl2[I_CHANNEL][NOMINAL2].internal_measurement = dc_meas_i;
-    measurement_tbl2[Q_CHANNEL][NOMINAL2].internal_measurement = dc_meas_q;
+    rx_dc_est_average(&dc_meas_i_nominal, &dc_meas_q_nominal);
 
     /* SWEEP I/Q CHANNEL */
+    int16_t dc_meas_i = 0;
+    int16_t dc_meas_q = 0;
     /* BBF NEG STEP */
-    XCVR_RX_DIG->DCOC_DAC_INIT = XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_I(bbf_dacinit_i - 16) |
-                                 XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(bbf_dacinit_q - 16) |
+    XCVR_RX_DIG->DCOC_DAC_INIT = XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_I(bbf_dacinit_i - DCOC_DAC_BBF_STEP) |
+                                 XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(bbf_dacinit_q - DCOC_DAC_BBF_STEP) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_I(tza_dacinit_i) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_Q(tza_dacinit_q);
     XcvrCalDelay(TsettleCal * 2);
 
     rx_dc_est_average(&dc_meas_i, &dc_meas_q);
-    measurement_tbl2[I_CHANNEL][BBF_NEG].step_value = -16;
-    measurement_tbl2[Q_CHANNEL][BBF_NEG].step_value = -16;
-    measurement_tbl2[I_CHANNEL][BBF_NEG].internal_measurement = dc_meas_i;
-    measurement_tbl2[Q_CHANNEL][BBF_NEG].internal_measurement = dc_meas_q;
+    temp_mi = calc_dcoc_dac_step2(dc_meas_i, dc_meas_i_nominal);
+    temp_mq = calc_dcoc_dac_step2(dc_meas_q, dc_meas_q_nominal);
 
 
     /* BBF POS STEP */
-    XCVR_RX_DIG->DCOC_DAC_INIT = XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_I(bbf_dacinit_i + 16) |
-                                 XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(bbf_dacinit_q + 16) |
+    XCVR_RX_DIG->DCOC_DAC_INIT = XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_I(bbf_dacinit_i + DCOC_DAC_BBF_STEP) |
+                                 XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(bbf_dacinit_q + DCOC_DAC_BBF_STEP) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_I(tza_dacinit_i) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_Q(tza_dacinit_q);
     XcvrCalDelay(TsettleCal * 2);
     rx_dc_est_average(&dc_meas_i, &dc_meas_q);
-    measurement_tbl2[I_CHANNEL][BBF_POS].step_value = +16;
-    measurement_tbl2[Q_CHANNEL][BBF_POS].step_value = +16;
-    measurement_tbl2[I_CHANNEL][BBF_POS].internal_measurement = dc_meas_i;
-    measurement_tbl2[Q_CHANNEL][BBF_POS].internal_measurement = dc_meas_q;
+    temp_pi = calc_dcoc_dac_step2(dc_meas_i, dc_meas_i_nominal);
+    temp_pq = calc_dcoc_dac_step2(dc_meas_q, dc_meas_q_nominal);
 
     XCVR_RX_DIG->DCOC_DAC_INIT = dcoc_init_reg_value_dcgain; /* Return DAC setting to initial */
 
     /* Calculate BBF DCOC STEPS, RECIPROCALS */
-    temp_mi = calc_dcoc_dac_step(&measurement_tbl2[I_CHANNEL][BBF_NEG], &measurement_tbl2[I_CHANNEL][NOMINAL2]);
-    temp_mq = calc_dcoc_dac_step(&measurement_tbl2[Q_CHANNEL][BBF_NEG], &measurement_tbl2[Q_CHANNEL][NOMINAL2]);
-    temp_pi = calc_dcoc_dac_step(&measurement_tbl2[I_CHANNEL][BBF_POS], &measurement_tbl2[I_CHANNEL][NOMINAL2]);
-    temp_pq = calc_dcoc_dac_step(&measurement_tbl2[Q_CHANNEL][BBF_POS], &measurement_tbl2[Q_CHANNEL][NOMINAL2]);
-
     temp_step = (temp_mi + temp_pi + temp_mq + temp_pq) / 4;
     bbf_dcoc_step = (uint32_t)roundf(temp_step * 8U);
 
-    printf("temp_mi = %f\n", temp_mi);
-    printf("temp_mq = %f\n", temp_mq);
-    printf("temp_pi = %f\n", temp_pi);
-    printf("temp_pq = %f\n", temp_pq);
-    printf("temp_step = %f\n", temp_step);
-    printf("bbf_dcoc_step = %"PRIu32"\n", bbf_dcoc_step);
+    DEBUG("temp_mi = %f\n", temp_mi);
+    DEBUG("temp_mq = %f\n", temp_mq);
+    DEBUG("temp_pi = %f\n", temp_pi);
+    DEBUG("temp_pq = %f\n", temp_pq);
+    DEBUG("temp_step = %f\n", temp_step);
+    DEBUG("bbf_dcoc_step = %"PRIu32"\n", bbf_dcoc_step);
 
     if ((bbf_dcoc_step > 265) & (bbf_dcoc_step < 305))
     {
         bbf_dcoc_step_rcp = (uint32_t)roundf((float)0x8000U / temp_step);
-        printf("bbf_dcoc_step_rcp = %"PRIu32"\n", bbf_dcoc_step_rcp);
+        DEBUG("bbf_dcoc_step_rcp = %"PRIu32"\n", bbf_dcoc_step_rcp);
 
         /* Calculate TZA DCOC STEPS & RECIPROCALS and IQ_DC_GAIN_MISMATCH */
-        for (i = TZA_STEP_N0; i <= TZA_STEP_N10; i++)
+        temp_step = (bbf_dcoc_step >> 3U) / 3.6F;
+        DEBUG("temp_step0 = %f\n", temp_step);
+        tza_dcoc_step[0].dcoc_step = (uint32_t)roundf(temp_step * 8);
+        DEBUG("tza_dcoc_step[0].dcoc_step = %u\n", (unsigned)tza_dcoc_step[0].dcoc_step);
+        tza_dcoc_step[0].dcoc_step_rcp = (uint32_t)roundf((float)0x8000 / temp_step);
+        DEBUG("tza_dcoc_step[0].dcoc_step_rcp = %u\n", (unsigned)tza_dcoc_step[0].dcoc_step_rcp);
+        const uint32_t *dcoc_tza_step_ptr = &xcvr_common_config.dcoc_tza_step_00_init;
+        temp_step /= (dcoc_tza_step_ptr[0] >> XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_SHIFT);
+        for (unsigned k = 1; k < 11; ++k)
         {
+            float scratch = temp_step *
+                (dcoc_tza_step_ptr[k] >> XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_SHIFT);
+            DEBUG("temp_step%u = %f\n", k, scratch);
             /* Calculate TZA DCOC STEPSIZE & its RECIPROCAL */
-            switch(i){
-                case TZA_STEP_N0:
-                    temp_step = (bbf_dcoc_step >> 3U) / 3.6F;
-                    printf("temp_step0 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N1:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_01_init >> 16) / (xcvr_common_config.dcoc_tza_step_00_init >> 16);
-                    printf("temp_step1 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N2:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_02_init >> 16) / (xcvr_common_config.dcoc_tza_step_01_init >> 16);
-                    printf("temp_step2 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N3:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_03_init >> 16) / (xcvr_common_config.dcoc_tza_step_02_init >> 16);
-                    printf("temp_step3 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N4:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_04_init >> 16) / (xcvr_common_config.dcoc_tza_step_03_init >> 16);
-                    printf("temp_step4 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N5:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_05_init >> 16) / (xcvr_common_config.dcoc_tza_step_04_init >> 16);
-                    printf("temp_step5 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N6:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_06_init >> 16) / (xcvr_common_config.dcoc_tza_step_05_init >> 16);
-                    printf("temp_step6 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N7:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_07_init >> 16) / (xcvr_common_config.dcoc_tza_step_06_init >> 16);
-                    printf("temp_step7 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N8:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_08_init >> 16) / (xcvr_common_config.dcoc_tza_step_07_init >> 16);
-                    printf("temp_step8 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N9:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_09_init >> 16) / (xcvr_common_config.dcoc_tza_step_08_init >> 16);
-                    printf("temp_step9 = %f\n", temp_step);
-                    break;
-                case TZA_STEP_N10:
-                    temp_step = temp_step * (xcvr_common_config.dcoc_tza_step_10_init >> 16) / (xcvr_common_config.dcoc_tza_step_09_init >> 16);
-                    printf("temp_step10 = %f\n", temp_step);
-                    break;
-                default:
-                    break;
-            }
-
-            tza_dcoc_step[i-TZA_STEP_N0].dcoc_step = (uint32_t)roundf(temp_step * 8);
-            printf("tza_dcoc_step[%u].dcoc_step = %u\n", i-TZA_STEP_N0, (unsigned)tza_dcoc_step[i-TZA_STEP_N0].dcoc_step);
-            tza_dcoc_step[i-TZA_STEP_N0].dcoc_step_rcp = (uint32_t)roundf((float)0x8000 / temp_step);
-            printf("tza_dcoc_step[%u].dcoc_step_rcp = %u\n", i-TZA_STEP_N0, (unsigned)tza_dcoc_step[i-TZA_STEP_N0].dcoc_step_rcp);
+            tza_dcoc_step[k].dcoc_step = (uint32_t)roundf(scratch * 8);
+            DEBUG("tza_dcoc_step[%u].dcoc_step = %u\n", k, (unsigned)tza_dcoc_step[k].dcoc_step);
+            tza_dcoc_step[k].dcoc_step_rcp = (uint32_t)roundf((float)0x8000 / scratch);
+            DEBUG("tza_dcoc_step[%u].dcoc_step_rcp = %u\n", k, (unsigned)tza_dcoc_step[k].dcoc_step_rcp);
         }
 
         /* Make the trims active */
@@ -391,7 +330,7 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
     }
     else
     {
-        printf("!!! XCVR trim failed: bbf_dcoc_step = %"PRIu32"!\n", bbf_dcoc_step);
+        DEBUG("!!! XCVR trim failed: bbf_dcoc_step = %"PRIu32"!\n", bbf_dcoc_step);
         status = 0; /* Failure */
     }
 
@@ -402,7 +341,7 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
     XCVR_RX_DIG->DCOC_CAL_GAIN = dcoc_cal_gain_state; /* Restore DCOC_CAL_GAIN state to prior setting */
     XCVR_RX_DIG->AGC_CTRL_1 = agc_ctrl_1_stack; /* Save state of RX_DIG_CTRL for later restore */
 
-   return status;
+    return status;
 }
 
 /*! *********************************************************************************

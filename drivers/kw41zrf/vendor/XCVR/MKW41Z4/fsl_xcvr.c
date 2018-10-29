@@ -391,6 +391,13 @@ xcvrStatus_t XCVR_Init(radio_mode_t radio_mode, data_rate_t data_rate)
 
     /* Load IFR trim values */
     handle_ifr(&sw_trim_tbl[0], NUM_TRIM_TBL_ENTRIES);
+    printf("sw_trim_tbl:\n");
+    for (unsigned k = 0; k < NUM_TRIM_TBL_ENTRIES; ++k) {
+        printf("[%u] id=0x%04x, trim=%" PRIu32 ", valid=%u\n", k,
+            (unsigned)sw_trim_tbl[k].trim_id,
+            sw_trim_tbl[k].trim_value,
+            (unsigned)sw_trim_tbl[k].valid);
+    }
 #endif /* RADIO_IS_GEN_3P0 */
 
 #endif /* ifndef SIMULATION */
