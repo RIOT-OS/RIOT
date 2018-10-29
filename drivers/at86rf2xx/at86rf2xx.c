@@ -44,6 +44,7 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     netdev->driver = &at86rf2xx_driver;
     /* initialize device descriptor */
     memcpy(&dev->params, params, sizeof(at86rf2xx_params_t));
+    /* State to return after receiving or transmitting */
     dev->idle_state = AT86RF2XX_STATE_TRX_OFF;
     /* radio state is P_ON when first powered-on */
     dev->state = AT86RF2XX_STATE_P_ON;
@@ -123,6 +124,8 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* clear interrupt flags */
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
+    /* State to return after receiving or transmitting */
+    dev->idle_state = AT86RF2XX_STATE_RX_AACK_ON;
     /* go into RX state */
     at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
 
