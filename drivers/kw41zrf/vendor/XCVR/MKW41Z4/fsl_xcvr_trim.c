@@ -50,14 +50,11 @@
 /*******************************************************************************
 * Prototypes
 ******************************************************************************/
-float calc_dcoc_dac_step(GAIN_CALC_TBL_ENTRY2_T * meas_ptr, GAIN_CALC_TBL_ENTRY2_T * baseline_meas_ptr );
-extern float roundf (float);
 
 /*******************************************************************************
 * Variables
 ******************************************************************************/
 const int8_t TsettleCal = 10;
-static GAIN_CALC_TBL_ENTRY2_T measurement_tbl2[NUM_I_Q_CHAN][NUM_SWEEP_STEP_ENTRIES2];
 
 /*******************************************************************************
  * Macros
@@ -82,25 +79,10 @@ static GAIN_CALC_TBL_ENTRY2_T measurement_tbl2[NUM_I_Q_CHAN][NUM_SWEEP_STEP_ENTR
  * \param[in] meas_ptr - pointer to the structure containing the measured data from internal measurement.
  * \param[in] baseline_meas_ptr - pointer to the structure containing the baseline measured data from internal measurement.
  *
- * \return Q15.16 result of the calculation, the measurement DCOC DAC step value for this measurement point.
+ * \return Q16 result of the calculation, the measurement DCOC DAC step value for this measurement point.
  *
  ***********************************************************************************/
-float calc_dcoc_dac_step(GAIN_CALC_TBL_ENTRY2_T * meas_ptr, GAIN_CALC_TBL_ENTRY2_T * baseline_meas_ptr )
-{
-    int32_t norm_dc_code;
-    float dc_step;
-
-    /* Normalize internal measurement */
-    norm_dc_code = (int32_t)meas_ptr->internal_measurement - baseline_meas_ptr->internal_measurement;
-    dc_step = (norm_dc_code << 16) / meas_ptr->step_value;
-    if (dc_step < 0) {
-        dc_step = -dc_step;
-    }
-
-    return (float)dc_step / (1 << 16);
-}
-
-float calc_dcoc_dac_step2(int16_t meas, int16_t baseline)
+uint32_t calc_dcoc_dac_step2(int16_t meas, int16_t baseline)
 {
     /* Normalize internal measurement */
     int16_t norm_dc_code = meas - baseline;
@@ -108,7 +90,15 @@ float calc_dcoc_dac_step2(int16_t meas, int16_t baseline)
     if (dc_step < 0) {
         dc_step = -dc_step;
     }
-    return (float)dc_step / (1 << 16);
+    return dc_step;
+}
+
+void calc_tza_step_rcp_reg(TZAdcocstep_t *out, uint32_t base_step, uint16_t gain, uint16_t gain0)
+{
+    uint32_t step = (base_step * gain + (gain0 >> 1)) / gain0;
+    /* Calculate TZA DCOC STEPSIZE & its RECIPROCAL */
+    out->dcoc_step = (step + (1u << 12)) >> 13;
+    out->dcoc_step_rcp = (0x80000000ul + (step >> 1)) / step;
 }
 
 /*! *********************************************************************************
@@ -129,18 +119,6 @@ void XcvrCalDelay(uint32_t time)
     }
 }
 
-void dump_measurement_tbl2(void)
-{
-    DEBUG("dump_measurement_tbl2:\n");
-    for (unsigned chan = 0; chan < NUM_I_Q_CHAN; ++chan) {
-        for (unsigned step = 0; step < NUM_SWEEP_STEP_ENTRIES2; ++step) {
-            const GAIN_CALC_TBL_ENTRY2_T *ptr = &measurement_tbl2[chan][step];
-            DEBUG("[%u][%u] %6d, %4d\n", chan, step, ptr->internal_measurement, ptr->step_value);
-        }
-    }
-    DEBUG("end of dump\n");
-}
-
 /*! *********************************************************************************
  * rx_dc_est_average : Get DC EST values and return the Average
  ***********************************************************************************/
@@ -159,11 +137,11 @@ void rx_dc_est_average(int16_t * i_avg, int16_t * q_avg)
     {
         uint32_t dc_temp = XCVR_RX_DIG->DCOC_DC_EST;
         int16_t dc_meas_i = (dc_temp & XCVR_RX_DIG_DCOC_DC_EST_DC_EST_I_MASK) >> XCVR_RX_DIG_DCOC_DC_EST_DC_EST_I_SHIFT;
-        dc_meas_i |= ((dc_meas_i & 0x800U) ? 0xF000U : 0x0U); /* Sign extend from 12 to 16 bits. */
+        dc_meas_i = (int16_t)(dc_meas_i << 4) / 16; /* Sign extend from 12 to 16 bits. */
         avg_i += dc_meas_i;
 
         int16_t dc_meas_q = (dc_temp & XCVR_RX_DIG_DCOC_DC_EST_DC_EST_Q_MASK) >> XCVR_RX_DIG_DCOC_DC_EST_DC_EST_Q_SHIFT;
-        dc_meas_q |= ((dc_meas_q & 0x800U) ? 0xF000U : 0x0U); /* Sign extend from 12 to 16 bits. */
+        dc_meas_q = (int16_t)(dc_meas_q << 4) / 16; /* Sign extend from 12 to 16 bits. */
         avg_q += dc_meas_q;
     }
 
@@ -187,14 +165,6 @@ void rx_dc_est_average(int16_t * i_avg, int16_t * q_avg)
  ***********************************************************************************/
 uint8_t rx_bba_dcoc_dac_trim_DCest(void)
 {
-    float temp_mi = 0;
-    float temp_mq = 0;
-    float temp_pi = 0;
-    float temp_pq = 0;
-    float temp_step = 0;
-
-    uint32_t bbf_dcoc_step;
-    uint32_t bbf_dcoc_step_rcp;
     TZAdcocstep_t tza_dcoc_step[11];
     uint8_t status = 0;
 
@@ -238,8 +208,8 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
     /* Set default DCOC DAC INIT Value */
     uint32_t dcoc_init_reg_value_dcgain = XCVR_RX_DIG->DCOC_DAC_INIT; /* Store DCOC DAC INIT values */
     uint8_t bbf_dacinit_i = (dcoc_init_reg_value_dcgain & 0x000000FFU);
-    uint8_t bbf_dacinit_q = (dcoc_init_reg_value_dcgain & 0x0000FF00U)>>8;
-    uint8_t tza_dacinit_i = (dcoc_init_reg_value_dcgain & 0x00FF0000U)>>16;
+    uint8_t bbf_dacinit_q = (dcoc_init_reg_value_dcgain & 0x0000FF00U) >> 8;
+    uint8_t tza_dacinit_i = (dcoc_init_reg_value_dcgain & 0x00FF0000U) >> 16;
     uint8_t tza_dacinit_q = dcoc_init_reg_value_dcgain >> 24;
 
     int16_t dc_meas_i_nominal = 0;
@@ -255,11 +225,11 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
                                  XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(bbf_dacinit_q - DCOC_DAC_BBF_STEP) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_I(tza_dacinit_i) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_Q(tza_dacinit_q);
-    XcvrCalDelay(TsettleCal * 2);
+    XcvrCalDelay(TsettleCal * 4);
 
     rx_dc_est_average(&dc_meas_i, &dc_meas_q);
-    temp_mi = calc_dcoc_dac_step2(dc_meas_i, dc_meas_i_nominal);
-    temp_mq = calc_dcoc_dac_step2(dc_meas_q, dc_meas_q_nominal);
+    uint32_t temp_mi = calc_dcoc_dac_step2(dc_meas_i, dc_meas_i_nominal);
+    uint32_t temp_mq = calc_dcoc_dac_step2(dc_meas_q, dc_meas_q_nominal);
 
 
     /* BBF POS STEP */
@@ -269,52 +239,67 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_Q(tza_dacinit_q);
     XcvrCalDelay(TsettleCal * 2);
     rx_dc_est_average(&dc_meas_i, &dc_meas_q);
-    temp_pi = calc_dcoc_dac_step2(dc_meas_i, dc_meas_i_nominal);
-    temp_pq = calc_dcoc_dac_step2(dc_meas_q, dc_meas_q_nominal);
+    uint32_t temp_pi = calc_dcoc_dac_step2(dc_meas_i, dc_meas_i_nominal);
+    uint32_t temp_pq = calc_dcoc_dac_step2(dc_meas_q, dc_meas_q_nominal);
 
     XCVR_RX_DIG->DCOC_DAC_INIT = dcoc_init_reg_value_dcgain; /* Return DAC setting to initial */
 
     /* Calculate BBF DCOC STEPS, RECIPROCALS */
-    temp_step = (temp_mi + temp_pi + temp_mq + temp_pq) / 4;
-    bbf_dcoc_step = (uint32_t)roundf(temp_step * 8U);
+    /* calc_dcoc_dac_step2 divides by 16 internally, no risk of overflow, temp_xy < (1 << 28) */
+    uint32_t meas_sum = (temp_mi + temp_pi + temp_mq + temp_pq);
+    float temp_step = ((float)meas_sum / 4) / (1 << 16);
+    /* rounded result, (temp_step * 8) == (meas_sum * 2) */
+    uint32_t bbf_dcoc_step = (meas_sum + (1u << 14)) >> 15;
 
-    DEBUG("temp_mi = %f\n", temp_mi);
-    DEBUG("temp_mq = %f\n", temp_mq);
-    DEBUG("temp_pi = %f\n", temp_pi);
-    DEBUG("temp_pq = %f\n", temp_pq);
-    DEBUG("temp_step = %f\n", temp_step);
+    DEBUG("temp_mi = %f\n", (float)temp_mi / (1 << 16));
+    DEBUG("temp_mq = %f\n", (float)temp_mq / (1 << 16));
+    DEBUG("temp_pi = %f\n", (float)temp_pi / (1 << 16));
+    DEBUG("temp_pq = %f\n", (float)temp_pq / (1 << 16));
+    DEBUG("temp_step = %f\n", (float)temp_step);
     DEBUG("bbf_dcoc_step = %"PRIu32"\n", bbf_dcoc_step);
+
 
     if ((bbf_dcoc_step > 265) & (bbf_dcoc_step < 305))
     {
-        bbf_dcoc_step_rcp = (uint32_t)roundf((float)0x8000U / temp_step);
+        /* rounded result, (0x8000 / temp_step) */
+        uint32_t bbf_dcoc_step_rcp = (0x80000000ul + (meas_sum >> 3)) / (meas_sum >> 2);
         DEBUG("bbf_dcoc_step_rcp = %"PRIu32"\n", bbf_dcoc_step_rcp);
 
         /* Calculate TZA DCOC STEPS & RECIPROCALS and IQ_DC_GAIN_MISMATCH */
-        temp_step = (bbf_dcoc_step >> 3U) / 3.6F;
+        /* (bbf_dcoc_step >> 3U) / 3.6F */
+        uint32_t base_step = (((bbf_dcoc_step * 5u) << 13) / 18u);
+        temp_step = (float)base_step / (1u << 16);
         DEBUG("temp_step0 = %f\n", temp_step);
-        tza_dcoc_step[0].dcoc_step = (uint32_t)roundf(temp_step * 8);
+        /* rounded result, (temp_step * 8) */
+        tza_dcoc_step[0].dcoc_step = (base_step + (1u << 12)) >> 13;
         DEBUG("tza_dcoc_step[0].dcoc_step = %u\n", (unsigned)tza_dcoc_step[0].dcoc_step);
-        tza_dcoc_step[0].dcoc_step_rcp = (uint32_t)roundf((float)0x8000 / temp_step);
+        /* rounded result, (0x8000 / temp_step) */
+        tza_dcoc_step[0].dcoc_step_rcp = (0x80000000ul + (base_step >> 1)) / base_step;
         DEBUG("tza_dcoc_step[0].dcoc_step_rcp = %u\n", (unsigned)tza_dcoc_step[0].dcoc_step_rcp);
         const uint32_t *dcoc_tza_step_ptr = &xcvr_common_config.dcoc_tza_step_00_init;
-        temp_step /= (dcoc_tza_step_ptr[0] >> XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_SHIFT);
+        uint16_t gain0 = (dcoc_tza_step_ptr[0] >> XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_SHIFT);
+        temp_step /= gain0;
+        DEBUG("base step = %" PRIx32 " %f\n", base_step, temp_step);
         for (unsigned k = 1; k < 11; ++k)
         {
-            float scratch = temp_step *
-                (dcoc_tza_step_ptr[k] >> XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_SHIFT);
-            DEBUG("temp_step%u = %f\n", k, scratch);
+            uint16_t gain = (dcoc_tza_step_ptr[k] >> XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_SHIFT);
+            calc_tza_step_rcp_reg(&tza_dcoc_step[k], base_step, gain, gain0);
+            //~ uint32_t step = (base_step * gain);
+            //~ DEBUG("[%u] gain=%u, step=%"PRIu32"\n", k, (unsigned)gain, step);
+            //~ step /= gain0;
+            //~ float scratch = temp_step *
+                //~ (dcoc_tza_step_ptr[k] >> XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_SHIFT);
+            //~ DEBUG("temp_step%u = %f\n", k, scratch);
             /* Calculate TZA DCOC STEPSIZE & its RECIPROCAL */
-            tza_dcoc_step[k].dcoc_step = (uint32_t)roundf(scratch * 8);
+            //~ tza_dcoc_step[k].dcoc_step = (step + (1u << 12)) >> 13;
             DEBUG("tza_dcoc_step[%u].dcoc_step = %u\n", k, (unsigned)tza_dcoc_step[k].dcoc_step);
-            tza_dcoc_step[k].dcoc_step_rcp = (uint32_t)roundf((float)0x8000 / scratch);
+            //~ tza_dcoc_step[k].dcoc_step_rcp = (0x80000000ul + (step >> 1)) / step;
             DEBUG("tza_dcoc_step[%u].dcoc_step_rcp = %u\n", k, (unsigned)tza_dcoc_step[k].dcoc_step_rcp);
         }
 
         /* Make the trims active */
         XCVR_RX_DIG->DCOC_BBA_STEP = XCVR_RX_DIG_DCOC_BBA_STEP_BBA_DCOC_STEP(bbf_dcoc_step) | XCVR_RX_DIG_DCOC_BBA_STEP_BBA_DCOC_STEP_RECIP(bbf_dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_0 = XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0(tza_dcoc_step[0].dcoc_step*10) |
-                                       XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_RCP_0(tza_dcoc_step[0].dcoc_step_rcp/10) ;
+        XCVR_RX_DIG->DCOC_TZA_STEP_0 = XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0(tza_dcoc_step[0].dcoc_step) | XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_RCP_0(tza_dcoc_step[0].dcoc_step_rcp) ;
         XCVR_RX_DIG->DCOC_TZA_STEP_1 = XCVR_RX_DIG_DCOC_TZA_STEP_1_DCOC_TZA_STEP_GAIN_1(tza_dcoc_step[1].dcoc_step) | XCVR_RX_DIG_DCOC_TZA_STEP_1_DCOC_TZA_STEP_RCP_1(tza_dcoc_step[1].dcoc_step_rcp);
         XCVR_RX_DIG->DCOC_TZA_STEP_2 = XCVR_RX_DIG_DCOC_TZA_STEP_2_DCOC_TZA_STEP_GAIN_2(tza_dcoc_step[2].dcoc_step) | XCVR_RX_DIG_DCOC_TZA_STEP_2_DCOC_TZA_STEP_RCP_2(tza_dcoc_step[2].dcoc_step_rcp);
         XCVR_RX_DIG->DCOC_TZA_STEP_3 = XCVR_RX_DIG_DCOC_TZA_STEP_3_DCOC_TZA_STEP_GAIN_3(tza_dcoc_step[3].dcoc_step) | XCVR_RX_DIG_DCOC_TZA_STEP_3_DCOC_TZA_STEP_RCP_3(tza_dcoc_step[3].dcoc_step_rcp);
