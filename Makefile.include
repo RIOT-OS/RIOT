@@ -1,3 +1,6 @@
+# 'Makefile.include' directory, must be evaluated before other 'include'
+_riotbase := $(dir $(lastword $(MAKEFILE_LIST)))
+
 # Globally set default goal to `all`
 .DEFAULT_GOAL := all
 
@@ -5,7 +8,7 @@
 -include Makefile.local
 
 # set undefined variables
-RIOTBASE       ?= $(dir $(lastword $(MAKEFILE_LIST)))
+RIOTBASE       ?= $(_riotbase)
 CCACHE_BASEDIR ?= $(RIOTBASE)
 RIOTCPU        ?= $(RIOTBASE)/cpu
 RIOTBOARD      ?= $(RIOTBASE)/boards
