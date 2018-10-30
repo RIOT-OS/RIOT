@@ -25,7 +25,7 @@
 #include "net/gnrc/ipv6/ext/rh.h"
 
 #include "unittests-constants.h"
-#include "tests-rpl_srh.h"
+#include "tests-gnrc_rpl_srh.h"
 
 #define IPV6_DST            {{ 0x20, 0x01, 0xab, 0xcd, \
                                0x00, 0x00, 0x00, 0x00, \
@@ -195,7 +195,7 @@ Test *tests_rpl_srh_tests(void)
     return (Test *)&rpl_srh_tests;
 }
 
-void tests_rpl_srh(void)
+void tests_gnrc_rpl_srh(void)
 {
     TESTS_RUN(tests_rpl_srh_tests());
 }
