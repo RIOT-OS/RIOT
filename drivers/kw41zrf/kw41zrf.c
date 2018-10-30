@@ -17,6 +17,7 @@
  */
 #include <stdint.h>
 #include <string.h>
+#include <errno.h>
 
 #include "log.h"
 #include "msg.h"
@@ -34,22 +35,6 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
-
-enum {
-    KW41Z_CCA_ED,
-    KW41Z_CCA_MODE1,
-    KW41Z_CCA_MODE2,
-    KW41Z_CCA_MODE3
-};
-
-enum {
-    KW41Z_STATE_IDLE,
-    KW41Z_STATE_RX,
-    KW41Z_STATE_TX,
-    KW41Z_STATE_CCA,
-    KW41Z_STATE_TXRX,
-    KW41Z_STATE_CCCA
-};
 
 static void kw41zrf_set_address(kw41zrf_t *dev)
 {
@@ -83,53 +68,7 @@ void kw41zrf_setup(kw41zrf_t *dev)
     DEBUG("[kw41zrf] setup finished\n");
 }
 
-static int kw41zrf_xcvr_init(kw41zrf_t *dev)
-{
-    (void) dev;
-    uint8_t radio_id = ((RSIM->MISC & RSIM_MISC_RADIO_VERSION_MASK) >> RSIM_MISC_RADIO_VERSION_SHIFT);
-    switch (radio_id) {
-        case 0x3: /* KW41/31/21 v1 */
-        case 0xb: /* KW41/31/21 v1.1 */
-            break;
-        default:
-            return -ENODEV;
-    }
-
-    RSIM->RF_OSC_CTRL = (RSIM->RF_OSC_CTRL &
-        ~(RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_MASK)) | /* Set EXT_OSC_OVRD value to zero */
-        RSIM_RF_OSC_CTRL_RADIO_EXT_OSC_OVRD_EN_MASK; /* Enable over-ride with zero value */
-    bit_set32(&SIM->SCGC5, SIM_SCGC5_PHYDIG_SHIFT); /* Enable PHY clock gate */
-
-    /* Load IFR trim values */
-    IFR_SW_TRIM_TBL_ENTRY_T sw_trim_tbl[] =
-    {
-        {TRIM_STATUS, 0, 0}, /*< Fetch the trim status word if available.*/
-        {TRIM_VERSION, 0, 0} /*< Fetch the trim version number if available.*/
-    };
-    handle_ifr(&sw_trim_tbl[0], sizeof(sw_trim_tbl) / sizeof(sw_trim_tbl[0]));
-    DEBUG("[kw41zrf] sw_trim_tbl:\n");
-
-    for (unsigned k = 0; k < sizeof(sw_trim_tbl) / sizeof(sw_trim_tbl[0]); ++k) {
-        DEBUG("[kw41zrf] [%u] id=0x%04x ", k, (unsigned)sw_trim_tbl[k].trim_id);
-        if (sw_trim_tbl[k].trim_id == TRIM_STATUS) {
-            DEBUG("(TRIM_STATUS)  ");
-        }
-        else if (sw_trim_tbl[k].trim_id == TRIM_VERSION) {
-            DEBUG("(TRIM_VERSION) ");
-        }
-        DEBUG("value=%" PRIu32 ", valid=%u\n", sw_trim_tbl[k].trim_value,
-            (unsigned)sw_trim_tbl[k].valid);
-    }
-
-    /* We only use 802.15.4 mode in this driver */
-    xcvrStatus_t status = XCVR_Configure(&xcvr_common_config, &zgbe_mode_config,
-        &xcvr_ZIGBEE_500kbps_config, &xcvr_802_15_4_500kbps_config, 25, XCVR_FIRST_INIT);
-
-    if (status != gXcvrSuccess_c) {
-        return -EIO;
-    }
-    return 0;
-}
+int kw41zrf_xcvr_init(kw41zrf_t *dev);
 
 int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
 {
