@@ -165,12 +165,12 @@ ipv6_hdr_t *gnrc_ipv6_get_header(gnrc_pktsnip_t *pkt)
 static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
                                   bool interested)
 {
-    const bool should_release = (gnrc_netreg_num(GNRC_NETTYPE_IPV6, nh) == 0) &&
-                                (!interested);
+    const bool has_nh_subs = (gnrc_netreg_num(GNRC_NETTYPE_IPV6, nh) > 0) ||
+                             interested;
 
     DEBUG("ipv6: forward nh = %u to other threads\n", nh);
 
-    if (!should_release) {
+    if (has_nh_subs) {
         gnrc_pktbuf_hold(pkt, 1);   /* don't remove from packet buffer in
                                      * next dispatch */
     }
@@ -179,7 +179,7 @@ static void _dispatch_next_header(gnrc_pktsnip_t *pkt, unsigned nh,
                                      pkt) == 0) {
         gnrc_pktbuf_release(pkt);
     }
-    if (should_release) {
+    if (!has_nh_subs) {
         /* we should exit early. pkt was already released above */
         return;
     }
