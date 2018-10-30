@@ -163,7 +163,6 @@ static inline uint32_t calc_div_rounded(uint32_t num, uint32_t den)
 uint8_t rx_bba_dcoc_dac_trim_DCest(void)
 {
     /* Estimate the actual gain by measuring three points and approximating a line */
-    TZAdcocstep_t tza_dcoc_step[11];
     uint8_t status = 0;
 
     /* Save register */
@@ -273,58 +272,29 @@ uint8_t rx_bba_dcoc_dac_trim_DCest(void)
          * for better numeric precision */
         /* rounded result, Q9.3 number */
         bbf_dcoc_gain_default *= (4u * RX_DC_EST_SAMPLES / (1u << 3));
-        const uint32_t *dcoc_tza_step_ptr = &xcvr_common_config.dcoc_tza_step_00_init;
-        for (unsigned k = 0; k <= 10; ++k)
-        {
-            /* Calculate TZA DCOC STEPSIZE & its RECIPROCAL */
-            uint16_t tza_gain_default =
-                (dcoc_tza_step_ptr[k] &
-                    XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_MASK) >>
-                XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_SHIFT;
-            /* Using meas_sum for higher precision */
-            tza_dcoc_step[k].dcoc_step = calc_div_rounded(tza_gain_default * meas_sum, bbf_dcoc_gain_default);
-            tza_dcoc_step[k].dcoc_step_rcp = calc_div_rounded(0x8000ul * bbf_dcoc_gain_default, tza_gain_default * meas_sum);
-            DEBUG("tza_dcoc_step[%u].dcoc_step = %u\n", k, (unsigned)tza_dcoc_step[k].dcoc_step);
-            DEBUG("tza_dcoc_step[%u].dcoc_step_rcp = %u\n", k, (unsigned)tza_dcoc_step[k].dcoc_step_rcp);
-        }
         /* Make the trims active */
         XCVR_RX_DIG->DCOC_BBA_STEP =
             XCVR_RX_DIG_DCOC_BBA_STEP_BBA_DCOC_STEP(bbf_dcoc_gain_measured) |
             XCVR_RX_DIG_DCOC_BBA_STEP_BBA_DCOC_STEP_RECIP(bbf_dcoc_gain_measured_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_0 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0(tza_dcoc_step[0].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_RCP_0(tza_dcoc_step[0].dcoc_step_rcp) ;
-        XCVR_RX_DIG->DCOC_TZA_STEP_1 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_1_DCOC_TZA_STEP_GAIN_1(tza_dcoc_step[1].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_1_DCOC_TZA_STEP_RCP_1(tza_dcoc_step[1].dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_2 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_2_DCOC_TZA_STEP_GAIN_2(tza_dcoc_step[2].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_2_DCOC_TZA_STEP_RCP_2(tza_dcoc_step[2].dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_3 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_3_DCOC_TZA_STEP_GAIN_3(tza_dcoc_step[3].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_3_DCOC_TZA_STEP_RCP_3(tza_dcoc_step[3].dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_4 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_4_DCOC_TZA_STEP_GAIN_4(tza_dcoc_step[4].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_4_DCOC_TZA_STEP_RCP_4(tza_dcoc_step[4].dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_5 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_5_DCOC_TZA_STEP_GAIN_5(tza_dcoc_step[5].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_5_DCOC_TZA_STEP_RCP_5(tza_dcoc_step[5].dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_6 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_6_DCOC_TZA_STEP_GAIN_6(tza_dcoc_step[6].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_6_DCOC_TZA_STEP_RCP_6(tza_dcoc_step[6].dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_7 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_7_DCOC_TZA_STEP_GAIN_7(tza_dcoc_step[7].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_7_DCOC_TZA_STEP_RCP_7(tza_dcoc_step[7].dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_8 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_8_DCOC_TZA_STEP_GAIN_8(tza_dcoc_step[8].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_8_DCOC_TZA_STEP_RCP_8(tza_dcoc_step[8].dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_9 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_9_DCOC_TZA_STEP_GAIN_9(tza_dcoc_step[9].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_9_DCOC_TZA_STEP_RCP_9(tza_dcoc_step[9].dcoc_step_rcp);
-        XCVR_RX_DIG->DCOC_TZA_STEP_10 =
-            XCVR_RX_DIG_DCOC_TZA_STEP_10_DCOC_TZA_STEP_GAIN_10(tza_dcoc_step[10].dcoc_step) |
-            XCVR_RX_DIG_DCOC_TZA_STEP_10_DCOC_TZA_STEP_RCP_10(tza_dcoc_step[10].dcoc_step_rcp);
-
+        const uint32_t *dcoc_tza_step_config_ptr = &xcvr_common_config.dcoc_tza_step_00_init;
+        /* All tza_step_* configuration registers use sequential memory addresses */
+        volatile uint32_t *xcvr_rx_dig_dcoc_tza_step_ptr = &XCVR_RX_DIG->DCOC_TZA_STEP_0;
+        for (unsigned k = 0; k <= 10; ++k)
+        {
+            /* Calculate TZA DCOC STEPSIZE & its RECIPROCAL */
+            uint16_t tza_gain_default =
+                (dcoc_tza_step_config_ptr[k] &
+                    XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_MASK) >>
+                XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0_SHIFT;
+            /* Using meas_sum for higher precision */
+            uint32_t dcoc_step = calc_div_rounded(tza_gain_default * meas_sum, bbf_dcoc_gain_default);
+            uint32_t dcoc_step_rcp = calc_div_rounded(0x8000ul * bbf_dcoc_gain_default, tza_gain_default * meas_sum);
+            DEBUG("tza_dcoc_step[%u].dcoc_step = %u\n", k, (unsigned)dcoc_step);
+            DEBUG("tza_dcoc_step[%u].dcoc_step_rcp = %u\n", k, (unsigned)dcoc_step_rcp);
+            xcvr_rx_dig_dcoc_tza_step_ptr[k] =
+                XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_GAIN_0(dcoc_step) |
+                XCVR_RX_DIG_DCOC_TZA_STEP_0_DCOC_TZA_STEP_RCP_0(dcoc_step_rcp) ;
+        }
         status = 1; /* Success */
     }
     else
@@ -435,58 +405,46 @@ void DCOC_DAC_INIT_Cal(uint8_t standalone_operation)
         rx_dc_est_samples(&dc_meas_i, &dc_meas_q, RX_DC_EST_SAMPLES);
         dc_meas_i /= RX_DC_EST_SAMPLES;
         dc_meas_q /= RX_DC_EST_SAMPLES;
-    } while ((ABS(dc_meas_i) > 1900) | (ABS(dc_meas_q) > 1900));
+    } while ((ABS(dc_meas_i) > 1900) || (ABS(dc_meas_q) > 1900));
 
     for (i = 0; i < 0x0F; i++)
     {
         /* I channel :  */
-        if (!TZA_I_OK)
-        {
-            if ((ISIGN(dc_meas_i) != ISIGN(dc_meas_i_p)) && (i > 0))
-            {
-                if (ABS(dc_meas_i) != MIN(ABS(dc_meas_i), ABS(dc_meas_i_p)))
-                {
+        if (!TZA_I_OK) {
+            if ((i > 0) && (ISIGN(dc_meas_i) != ISIGN(dc_meas_i_p))) {
+                if (ABS(dc_meas_i) != MIN(ABS(dc_meas_i), ABS(dc_meas_i_p))) {
                     curr_tza_dac_i = p_tza_dac_i;
                 }
 
                 TZA_I_OK = 1;
             }
-            else
-            {
+            else {
                 p_tza_dac_i = curr_tza_dac_i;
 
-                if (ISIGN(dc_meas_i)) /* If positif */
-                {
+                if (dc_meas_i > 0) {
                     curr_tza_dac_i--;
                 }
-                else
-                {
+                else {
                     curr_tza_dac_i++;
                 }
             }
         }
-        else /* Sweep BBA I */
-        {
-            if (!BBA_I_OK)
-            {
-                if ((ISIGN(dc_meas_i) != ISIGN(dc_meas_i_p)) && (curr_bba_dac_i != 0x20))
-                {
-                    if (ABS(dc_meas_i) != MIN(ABS(dc_meas_i), ABS(dc_meas_i_p)))
-                    {
+        else {
+            /* Sweep BBA I */
+            if (!BBA_I_OK) {
+                if ((curr_bba_dac_i != 0x20) && (ISIGN(dc_meas_i) != ISIGN(dc_meas_i_p))) {
+                    if (ABS(dc_meas_i) != MIN(ABS(dc_meas_i), ABS(dc_meas_i_p))) {
                         curr_bba_dac_i = p_bba_dac_i;
                     }
 
                     BBA_I_OK = 1;
                 }
-                else
-                {
+                else {
                     p_bba_dac_i = curr_bba_dac_i;
-                    if (ISIGN(dc_meas_i)) /* If positif */
-                    {
+                    if (dc_meas_i > 0) {
                         curr_bba_dac_i--;
                     }
-                    else
-                    {
+                    else {
                         curr_bba_dac_i++;
                     }
                 }
@@ -494,53 +452,41 @@ void DCOC_DAC_INIT_Cal(uint8_t standalone_operation)
         }
 
         /* Q channel : */
-        if (!TZA_Q_OK)
-        {
-            if ((ISIGN(dc_meas_q) != ISIGN(dc_meas_q_p)) && (i > 0))
-            {
-                if (ABS(dc_meas_q) != MIN(ABS(dc_meas_q), ABS(dc_meas_q_p)))
-                {
+        if (!TZA_Q_OK) {
+            if ((i > 0) && (ISIGN(dc_meas_q) != ISIGN(dc_meas_q_p))) {
+                if (ABS(dc_meas_q) != MIN(ABS(dc_meas_q), ABS(dc_meas_q_p))) {
                     curr_tza_dac_q = p_tza_dac_q;
                 }
                 TZA_Q_OK = 1;
             }
-            else
-            {
+            else {
                 p_tza_dac_q = curr_tza_dac_q;
-                if (ISIGN(dc_meas_q)) /* If positif */
-                {
+                if (dc_meas_q > 0) {
                     curr_tza_dac_q--;
                 }
-                else
-                {
+                else {
                     curr_tza_dac_q++;
                 }
             }
         }
-        else  /* Sweep BBA Q */
-        {
-            if (!BBA_Q_OK)
-            {
-                if ((ISIGN(dc_meas_q) != ISIGN(dc_meas_q_p)) && (curr_bba_dac_q != 0x20))
-                {
-                    if (ABS(dc_meas_q) != MIN(ABS(dc_meas_q), ABS(dc_meas_q_p)))
-                    {
+        else {
+            /* Sweep BBA Q */
+            if (!BBA_Q_OK) {
+                if ((curr_bba_dac_q != 0x20) && (ISIGN(dc_meas_q) != ISIGN(dc_meas_q_p))) {
+                    if (ABS(dc_meas_q) != MIN(ABS(dc_meas_q), ABS(dc_meas_q_p))) {
                         curr_bba_dac_q = p_bba_dac_q;
                     }
                     BBA_Q_OK = 1;
-                 }
-                 else
-                 {
-                     p_bba_dac_q = curr_bba_dac_q;
-                     if (ISIGN(dc_meas_q)) /* If positif */
-                     {
-                       curr_bba_dac_q--;
-                     }
-                     else
-                     {
-                         curr_bba_dac_q++;
-                     }
-                 }
+                }
+                else {
+                    p_bba_dac_q = curr_bba_dac_q;
+                    if (dc_meas_q > 0) {
+                      curr_bba_dac_q--;
+                    }
+                    else {
+                        curr_bba_dac_q++;
+                    }
+                }
             }
         }
 
