@@ -55,11 +55,11 @@ static void set_up(void)
 
 static void test_rpl_srh_nexthop_no_prefix_elided(void)
 {
-    int res;
+    static const ipv6_addr_t a1 = IPV6_ADDR1, a2 = IPV6_ADDR2, dst = IPV6_DST;
+    static const ipv6_addr_t expected1 = IPV6_ADDR1, expected2 = IPV6_ADDR2;
     gnrc_rpl_srh_t *srh = (gnrc_rpl_srh_t *) buf;
     uint8_t *vec = (uint8_t *) (srh + 1);
-    ipv6_addr_t a1 = IPV6_ADDR1, a2 = IPV6_ADDR2, dst = IPV6_DST,
-                     expected1 = IPV6_ADDR1, expected2 = IPV6_ADDR2;
+    int res;
 
     hdr.dst = dst;
 
@@ -83,12 +83,13 @@ static void test_rpl_srh_nexthop_no_prefix_elided(void)
 
 static void test_rpl_srh_nexthop_prefix_elided(void)
 {
-    uint8_t a1[3] = IPV6_ADDR1_ELIDED;
-    uint8_t a2[3] = IPV6_ADDR2_ELIDED;
-    int res;
+    static const ipv6_addr_t dst = IPV6_DST;
+    static const ipv6_addr_t expected1 = IPV6_ADDR1, expected2 = IPV6_ADDR2;
     gnrc_rpl_srh_t *srh = (gnrc_rpl_srh_t *) buf;
     uint8_t *vec = (uint8_t *) (srh + 1);
-    ipv6_addr_t dst = IPV6_DST, expected1 = IPV6_ADDR1, expected2 = IPV6_ADDR2;
+    int res;
+    static const uint8_t a1[3] = IPV6_ADDR1_ELIDED;
+    static const uint8_t a2[3] = IPV6_ADDR2_ELIDED;
 
     hdr.dst = dst;
 
