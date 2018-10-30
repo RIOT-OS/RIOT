@@ -42,11 +42,19 @@
 #define IPV6_ELIDED_PREFIX  (13)
 
 #define SRH_SEG_LEFT        (2)
+#define MAX_BUF_SIZE        ((sizeof(gnrc_rpl_srh_t) + 2) + sizeof(ipv6_addr_t))
+
+static ipv6_hdr_t hdr;
+static uint8_t buf[MAX_BUF_SIZE];
+
+static void set_up(void)
+{
+    memset(&hdr, 0, sizeof(hdr));
+    memset(buf, 0, sizeof(buf));
+}
 
 static void test_rpl_srh_nexthop_no_prefix_elided(void)
 {
-    ipv6_hdr_t hdr;
-    uint8_t buf[sizeof(gnrc_rpl_srh_t) + 2 * sizeof(ipv6_addr_t)] = { 0 };
     int res;
     gnrc_rpl_srh_t *srh = (gnrc_rpl_srh_t *) buf;
     uint8_t *vec = (uint8_t *) (srh + 1);
@@ -75,10 +83,8 @@ static void test_rpl_srh_nexthop_no_prefix_elided(void)
 
 static void test_rpl_srh_nexthop_prefix_elided(void)
 {
-    ipv6_hdr_t hdr;
     uint8_t a1[3] = IPV6_ADDR1_ELIDED;
     uint8_t a2[3] = IPV6_ADDR2_ELIDED;
-    uint8_t buf[sizeof(gnrc_rpl_srh_t) + sizeof(a1) + sizeof(a2)] = { 0 };
     int res;
     gnrc_rpl_srh_t *srh = (gnrc_rpl_srh_t *) buf;
     uint8_t *vec = (uint8_t *) (srh + 1);
@@ -113,7 +119,7 @@ Test *tests_rpl_srh_tests(void)
         new_TestFixture(test_rpl_srh_nexthop_prefix_elided),
     };
 
-    EMB_UNIT_TESTCALLER(rpl_srh_tests, NULL, NULL, fixtures);
+    EMB_UNIT_TESTCALLER(rpl_srh_tests, set_up, NULL, fixtures);
 
     return (Test *)&rpl_srh_tests;
 }
