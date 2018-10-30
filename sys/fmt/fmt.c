@@ -53,6 +53,16 @@ static inline int _is_digit(char c)
     return (c >= '0' && c <= '9');
 }
 
+static inline int _is_upper(char c)
+{
+    return (c >= 'A' && c <= 'Z');
+}
+
+static inline char _to_lower(char c)
+{
+    return 'a' + (c - 'A');
+}
+
 size_t fmt_byte_hex(char *out, uint8_t byte)
 {
     if (out) {
@@ -151,6 +161,11 @@ size_t fmt_hex_bytes(uint8_t *out, const char *hex)
     }
 
     return final_len;
+}
+
+size_t fmt_u16_hex(char *out, uint16_t val)
+{
+    return fmt_bytes_hex_reverse(out, (uint8_t*) &val, 2);
 }
 
 size_t fmt_u32_hex(char *out, uint32_t val)
@@ -400,6 +415,35 @@ size_t fmt_lpad(char *out, size_t in_len, size_t pad_len, char pad_char)
     return pad_len;
 }
 
+size_t fmt_char(char *out, char c)
+{
+    if (out) {
+        *out = c;
+    }
+
+    return 1;
+}
+
+size_t fmt_to_lower(char *out, const char *str)
+{
+    size_t len = 0;
+
+    while (str && *str) {
+        if (_is_upper(*str)) {
+            if (out) {
+                *out++ = _to_lower(*str);
+            }
+        }
+        else if (out) {
+            *out++ = *str;
+        }
+        str++;
+        len++;
+    }
+
+    return len;
+}
+
 uint32_t scn_u32_dec(const char *str, size_t n)
 {
     uint32_t res = 0;
@@ -411,6 +455,30 @@ uint32_t scn_u32_dec(const char *str, size_t n)
         else {
             res *= 10;
             res += (c - '0');
+        }
+    }
+    return res;
+}
+
+uint32_t scn_u32_hex(const char *str, size_t n)
+{
+    uint32_t res = 0;
+
+    while (n--) {
+        char c = *str++;
+        if (!_is_digit(c)) {
+            if (_is_upper(c)) {
+                c = _to_lower(c);
+            }
+            if (c == '\0' || c > 'f') {
+                break;
+            }
+            res <<= 4;
+            res |= c - 'a' + 0xa;
+        }
+        else {
+            res <<= 4;
+            res |= c - '0';
         }
     }
     return res;

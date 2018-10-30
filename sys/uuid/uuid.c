@@ -23,6 +23,7 @@
 #include "hashes/sha1.h"
 #include "random.h"
 #include "uuid.h"
+#include "fmt.h"
 
 const uuid_t uuid_namespace_dns = { /* 6ba7b810-9dad-11d1-80b4-00c04fd430c8 */
     .time_low.u8 =      { 0x6b, 0xa7, 0xb8, 0x10 },
@@ -109,4 +110,60 @@ void uuid_v5(uuid_t *uuid, const uuid_t *ns, const uint8_t *name, size_t len)
 
     _set_version(uuid, UUID_V5);
     _set_reserved(uuid);
+}
+
+void uuid_to_string(const uuid_t *uuid, char *str)
+{
+    char *p = str;
+    p += fmt_u32_hex(p, byteorder_ntohl(uuid->time_low));
+    p += fmt_char(p, '-');
+    p += fmt_u16_hex(p, byteorder_ntohs(uuid->time_mid));
+    p += fmt_char(p, '-');
+    p += fmt_u16_hex(p, byteorder_ntohs(uuid->time_hi));
+    p += fmt_char(p, '-');
+    p += fmt_byte_hex(p, uuid->clk_seq_hi_res);
+    p += fmt_byte_hex(p, uuid->clk_seq_low);
+    p += fmt_char(p, '-');
+    p += fmt_bytes_hex(p, uuid->node, UUID_NODE_LEN);
+    *p = '\0';
+    fmt_to_lower(str, str);
+}
+
+int uuid_from_string(uuid_t *uuid, const char *str)
+{
+    uint32_t tmp;
+    if (fmt_strlen(str) < UUID_STR_LEN) {
+        return -1;
+    }
+    tmp = scn_u32_hex(str, 8);
+    uuid->time_low = byteorder_htonl(tmp);
+    str += 8;
+    if (*str++ != '-') {
+        return -2;
+    }
+    tmp = scn_u32_hex(str, 4);
+    uuid->time_mid = byteorder_htons(tmp);
+    str += 4;
+    if (*str++ != '-') {
+        return -2;
+    }
+    tmp = scn_u32_hex(str, 4);
+    uuid->time_hi = byteorder_htons(tmp);
+    str += 4;
+    if (*str++ != '-') {
+        return -2;
+    }
+    uuid->clk_seq_hi_res = scn_u32_hex(str, 2);
+    str += 2;
+    uuid->clk_seq_low = scn_u32_hex(str, 2);
+    str += 2;
+    if (*str++ != '-') {
+        return -2;
+    }
+    for (unsigned i = 0; i < UUID_NODE_LEN; i++) {
+        uuid->node[i] = scn_u32_hex(str, 2);
+        str += 2;
+    }
+
+    return 0;
 }
