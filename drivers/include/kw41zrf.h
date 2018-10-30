@@ -160,11 +160,14 @@ void kw41zrf_setup(kw41zrf_t *dev);
 int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb);
 
 /**
- * @brief   Configure radio with default values
+ * @brief   Reset radio hardware and restore default settings
  *
  * @param[in] dev           device to reset
+ *
+ * @return 0 on success
+ * @return <0 on initialization failure
  */
-void kw41zrf_reset_phy(kw41zrf_t *dev);
+int kw41zrf_reset(kw41zrf_t *dev);
 
 #ifdef __cplusplus
 }

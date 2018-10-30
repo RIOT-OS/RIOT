@@ -79,13 +79,6 @@ static inline void kw41zrf_unmask_irqs(void)
 void kw41zrf_set_irq_callback(void (*cb)(void *arg), void *arg);
 
 /**
- * @brief   Disable all interrupts on transceiver
- *
- * @param[in] dev       kw41zrf device descriptor
- */
-void kw41zrf_disable_interrupts(kw41zrf_t *dev);
-
-/**
  * @brief   Set power mode for device
  *
  * @param[in] dev       kw41zrf device descriptor

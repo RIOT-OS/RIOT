@@ -78,7 +78,29 @@ int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
 
     /* Save a copy of the RF_OSC_EN setting to use when the radio is in deep sleep */
     dev->rf_osc_en_idle = RSIM->CONTROL & RSIM_CONTROL_RF_OSC_EN_MASK;
+    kw41zrf_mask_irqs();
+    kw41zrf_set_irq_callback(cb, dev);
 
+    /* Perform clean reset of the radio modules. */
+    int res = kw41zrf_reset(dev);
+    if (res < 0) {
+        /* initialization error signaled from vendor driver */
+        /* Restore saved RF_OSC_EN setting */
+        RSIM->CONTROL = (RSIM->CONTROL & ~RSIM_CONTROL_RF_OSC_EN_MASK) | dev->rf_osc_en_idle;
+        return res;
+    }
+    /* Radio is now on and idle */
+
+    /* Allow radio interrupts */
+    kw41zrf_unmask_irqs();
+
+    DEBUG("[kw41zrf] init finished\n");
+
+    return 0;
+}
+
+int kw41zrf_reset_hardware(kw41zrf_t *dev)
+{
     /* Enable RSIM oscillator in RUN and WAIT modes, in order to be able to
      * access the XCVR and ZLL registers when using the internal reference clock
      * for the CPU core */
@@ -87,67 +109,31 @@ int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
     /* Wait for oscillator ready signal */
     while((RSIM->CONTROL & RSIM_CONTROL_RF_OSC_READY_MASK) == 0) {}
 
+    /* Assert radio software reset */
+    RSIM->CONTROL |= RSIM_CONTROL_RADIO_RESET_BIT_MASK;
+    /* De-assert radio software reset twice to follow recommendations in the
+     * reference manual */
+    RSIM->CONTROL &= ~RSIM_CONTROL_RADIO_RESET_BIT_MASK;
+    RSIM->CONTROL &= ~RSIM_CONTROL_RADIO_RESET_BIT_MASK;
+
     timer_init(TIMER_PIT_DEV(0), 1000000ul, NULL, NULL);
-    printf("[kw41zrf] start init\n");
+    DEBUG("[kw41zrf] start xcvr init\n");
     uint32_t before = timer_read(TIMER_PIT_DEV(0));
     int res = kw41zrf_xcvr_init(dev);
     uint32_t after = timer_read(TIMER_PIT_DEV(0));
-    printf("[kw41zrf] took %" PRIu32 " us\n", (after - before));
+    DEBUG("[kw41zrf] took %" PRIu32 " us\n", (after - before));
     if (res < 0) {
-        /* initialization error signaled from vendor driver */
-        /* Restore saved RF_OSC_EN setting */
-        RSIM->CONTROL = (RSIM->CONTROL & ~RSIM_CONTROL_RF_OSC_EN_MASK) | dev->rf_osc_en_idle;
+        /* Most likely a calibration failure in XCVR driver */
         return res;
     }
-    /* Software reset of most settings */
-    kw41zrf_reset_phy(dev);
-
-    /* Compute warmup times (scaled to 16us) */
-    dev->rx_warmup_time =
-        (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK) >>
-        XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;
-    dev->tx_warmup_time =
-        (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_MASK) >>
-        XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_SHIFT;
-
-    /* divide by 16 and round up */
-    dev->rx_warmup_time = (dev->rx_warmup_time + 15) / 16;
-    dev->tx_warmup_time = (dev->tx_warmup_time + 15) / 16;
-
-    /* Configure Radio IRQ */
-    kw41zrf_mask_irqs();
-    kw41zrf_set_irq_callback(cb, dev);
-
-    kw41zrf_abort_sequence(dev);
-    kw41zrf_unmask_irqs();
-
-    DEBUG("[kw41zrf] init finished\n");
-
-    return 0;
-}
-
-void kw41zrf_reset_phy(kw41zrf_t *dev)
-{
-    /* reset options and sequence number */
-    dev->netdev.seq = 0;
-    dev->netdev.flags = 0;
-
-    /* set default protocol */
-#ifdef MODULE_GNRC_SIXLOWPAN
-    dev->netdev.proto = GNRC_NETTYPE_SIXLOWPAN;
-#elif MODULE_GNRC
-    dev->netdev.proto = GNRC_NETTYPE_UNDEF;
-#endif
 
     /* Configure DSM exit oscillator stabilization delay */
     uint32_t tmp = (RSIM->RF_OSC_CTRL & RSIM_RF_OSC_CTRL_BB_XTAL_READY_COUNT_SEL_MASK) >>
         RSIM_RF_OSC_CTRL_BB_XTAL_READY_COUNT_SEL_SHIFT;
     /* Stabilization time is 1024 * 2^x radio crystal clocks, 0 <= x <= 3 */
-    RSIM->DSM_OSC_OFFSET = (1024ul << tmp) / (CLOCK_RADIOXTAL / 32768) + 1; /* round up */
+    RSIM->DSM_OSC_OFFSET = (1024ul << tmp) / (CLOCK_RADIOXTAL / 32768u) + 1u; /* round up */
 
-    /* Bring the device out of low power mode */
-    kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
-
+    /* Clear and disable all interrupts */
     /* Reset PHY_CTRL to the default value of mask all interrupts and all other
      * settings disabled */
     ZLL->PHY_CTRL =
@@ -164,8 +150,24 @@ void kw41zrf_reset_phy(kw41zrf_t *dev)
         ZLL_PHY_CTRL_SEQMSK_MASK |
         ZLL_PHY_CTRL_XCVSEQ(XCVSEQ_IDLE);
 
-    /* Clear and disable all interrupts */
-    kw41zrf_disable_interrupts(dev);
+    /* Mask all timer interrupts and clear all interrupt flags */
+    ZLL->IRQSTS =
+        ZLL_IRQSTS_TMR1MSK_MASK |
+        ZLL_IRQSTS_TMR2MSK_MASK |
+        ZLL_IRQSTS_TMR3MSK_MASK |
+        ZLL_IRQSTS_TMR4MSK_MASK |
+        ZLL_IRQSTS_TMR1IRQ_MASK |
+        ZLL_IRQSTS_TMR2IRQ_MASK |
+        ZLL_IRQSTS_TMR3IRQ_MASK |
+        ZLL_IRQSTS_TMR4IRQ_MASK |
+        ZLL_IRQSTS_WAKE_IRQ_MASK |
+        ZLL_IRQSTS_PLL_UNLOCK_IRQ_MASK |
+        ZLL_IRQSTS_FILTERFAIL_IRQ_MASK |
+        ZLL_IRQSTS_RXWTRMRKIRQ_MASK |
+        ZLL_IRQSTS_CCAIRQ_MASK |
+        ZLL_IRQSTS_RXIRQ_MASK |
+        ZLL_IRQSTS_TXIRQ_MASK |
+        ZLL_IRQSTS_SEQIRQ_MASK;
 
     /* Clear source address cache */
     ZLL->SAM_TABLE |= ZLL_SAM_TABLE_INVALIDATE_ALL_MASK;
@@ -178,23 +180,54 @@ void kw41zrf_reset_phy(kw41zrf_t *dev)
     /* Set prescaler to obtain 1 symbol (16us) timebase */
     kw41zrf_timer_init(dev, KW41ZRF_TIMEBASE_62500HZ);
 
-    /* Set CCA threshold to -75 dBm */
+    /* Set CCA threshold to -70 dBm */
     /* The hardware default for this register is +75 dBm (0x4b), which is nonsense */
     ZLL->CCA_LQI_CTRL = (ZLL->CCA_LQI_CTRL & ~ZLL_CCA_LQI_CTRL_CCA1_THRESH_MASK) |
-        ZLL_CCA_LQI_CTRL_CCA1_THRESH(-75);
+        ZLL_CCA_LQI_CTRL_CCA1_THRESH(-70);
 
-    /* Adjust ACK delay to fulfill the 802.15.4 turnaround requirements */
-    ZLL->ACKDELAY = (ZLL->ACKDELAY & ~ZLL_ACKDELAY_ACKDELAY_MASK) | ZLL_ACKDELAY_ACKDELAY(-8);
+    /* IEEE 802.15.4 requires that ACK transmission commences 12 symbol periods
+     * (192 us) after the reception of the last octet of the frame being acknowledged. */
+    //~ ZLL->ACKDELAY = (ZLL->ACKDELAY & ~ZLL_ACKDELAY_ACKDELAY_MASK) | ZLL_ACKDELAY_ACKDELAY(-8);
 
-    /* Adjust LQI compensation */
+    /* Set default LQI compensation */
     /* Hardware reset default is 102 */
     ZLL->CCA_LQI_CTRL = (ZLL->CCA_LQI_CTRL & ~ZLL_CCA_LQI_CTRL_LQI_OFFSET_COMP_MASK) |
-        ZLL_CCA_LQI_CTRL_LQI_OFFSET_COMP(96);
+        ZLL_CCA_LQI_CTRL_LQI_OFFSET_COMP(102);
 
     /* set defaults */
     ZLL->SEQ_CTRL_STS = ZLL_SEQ_CTRL_STS_EVENT_TMR_DO_NOT_LATCH_MASK;
 
+    return 0;
+}
+
+int kw41zrf_reset(kw41zrf_t *dev)
+{
+    kw41zrf_mask_irqs();
+
+    int res = kw41zrf_reset_hardware(dev);
+    if (res < 0) {
+        /* Most likely a calibration failure in XCVR driver */
+        kw41zrf_unmask_irqs();
+        return res;
+    }
+
+    /* Compute warmup times (scaled to 16us) */
+    dev->rx_warmup_time =
+        (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK) >>
+        XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;
+    dev->tx_warmup_time =
+        (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_MASK) >>
+        XCVR_TSM_END_OF_SEQ_END_OF_TX_WU_SHIFT;
+
+    /* divide by 16 and round up */
+    dev->rx_warmup_time = (dev->rx_warmup_time + 15) / 16;
+    dev->tx_warmup_time = (dev->tx_warmup_time + 15) / 16;
+
+    /* Reset software link layer driver state */
+    netdev_ieee802154_reset(&dev->netdev);
+
     dev->tx_power = KW41ZRF_DEFAULT_TX_POWER;
+    dev->idle_seq = XCVSEQ_RECEIVE;
     kw41zrf_set_tx_power(dev, dev->tx_power);
 
     kw41zrf_set_channel(dev, KW41ZRF_DEFAULT_CHANNEL);
@@ -213,11 +246,12 @@ void kw41zrf_reset_phy(kw41zrf_t *dev)
     kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
     kw41zrf_set_sequence(dev, dev->idle_seq);
 
-    kw41zrf_set_option(dev, KW41ZRF_OPT_TELL_RX_START, true);
-    kw41zrf_set_option(dev, KW41ZRF_OPT_TELL_RX_END, true);
-    kw41zrf_set_option(dev, KW41ZRF_OPT_TELL_TX_END, true);
     bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_SEQMSK_SHIFT);
 
-    DEBUG("[kw41zrf] reset PHY and (re)set to channel %d and pan %d.\n",
+    kw41zrf_abort_sequence(dev);
+    kw41zrf_unmask_irqs();
+
+    DEBUG("[kw41zrf] reset radio and set to channel %d and pan %d.\n",
           KW41ZRF_DEFAULT_CHANNEL, KW41ZRF_DEFAULT_PANID);
+    return 0;
 }

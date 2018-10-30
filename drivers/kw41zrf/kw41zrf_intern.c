@@ -53,43 +53,6 @@ void kw41zrf_set_irq_callback(void (*cb)(void *arg), void *arg)
     irq_restore(mask);
 }
 
-void kw41zrf_disable_interrupts(kw41zrf_t *dev)
-{
-    (void) dev;
-    DEBUG("[kw41zrf] disable interrupts\n");
-    /* Clear and disable all interrupts */
-    ZLL->PHY_CTRL |=
-        ZLL_PHY_CTRL_TSM_MSK_MASK |
-        ZLL_PHY_CTRL_WAKE_MSK_MASK |
-        ZLL_PHY_CTRL_CRC_MSK_MASK |
-        ZLL_PHY_CTRL_PLL_UNLOCK_MSK_MASK |
-        ZLL_PHY_CTRL_FILTERFAIL_MSK_MASK |
-        ZLL_PHY_CTRL_RX_WMRK_MSK_MASK |
-        ZLL_PHY_CTRL_CCAMSK_MASK |
-        ZLL_PHY_CTRL_RXMSK_MASK |
-        ZLL_PHY_CTRL_TXMSK_MASK |
-        ZLL_PHY_CTRL_SEQMSK_MASK;
-
-    /* Mask all timer interrupts and clear all interrupt flags */
-    ZLL->IRQSTS =
-        ZLL_IRQSTS_TMR1MSK_MASK |
-        ZLL_IRQSTS_TMR2MSK_MASK |
-        ZLL_IRQSTS_TMR3MSK_MASK |
-        ZLL_IRQSTS_TMR4MSK_MASK |
-        ZLL_IRQSTS_TMR1IRQ_MASK |
-        ZLL_IRQSTS_TMR2IRQ_MASK |
-        ZLL_IRQSTS_TMR3IRQ_MASK |
-        ZLL_IRQSTS_TMR4IRQ_MASK |
-        ZLL_IRQSTS_WAKE_IRQ_MASK |
-        ZLL_IRQSTS_PLL_UNLOCK_IRQ_MASK |
-        ZLL_IRQSTS_FILTERFAIL_IRQ_MASK |
-        ZLL_IRQSTS_RXWTRMRKIRQ_MASK |
-        ZLL_IRQSTS_CCAIRQ_MASK |
-        ZLL_IRQSTS_RXIRQ_MASK |
-        ZLL_IRQSTS_TXIRQ_MASK |
-        ZLL_IRQSTS_SEQIRQ_MASK;
-}
-
 void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
 {
     DEBUG("[kw41zrf] set power mode to %u\n", pm);

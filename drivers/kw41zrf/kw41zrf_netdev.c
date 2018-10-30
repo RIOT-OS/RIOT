@@ -84,7 +84,7 @@ static int kw41zrf_netdev_init(netdev_t *netdev)
     kw41zrf_t *dev = (kw41zrf_t *)netdev;
     dev->thread = (thread_t *)thread_get(thread_getpid());
 
-    /* initialise SPI and GPIOs */
+    /* initialize hardware */
     if (kw41zrf_init(dev, kw41zrf_irq_handler)) {
         LOG_ERROR("[kw41zrf] unable to initialize device\n");
         return -1;
@@ -93,9 +93,6 @@ static int kw41zrf_netdev_init(netdev_t *netdev)
 #ifdef MODULE_NETSTATS_L2
     memset(&netdev->stats, 0, sizeof(netstats_t));
 #endif
-
-    /* reset device to default values and put it into RX state */
-    kw41zrf_reset_phy(dev);
 
     return 0;
 }
@@ -399,7 +396,7 @@ static int kw41zrf_netdev_set_state(kw41zrf_t *dev, netopt_state_t state)
             }
             break;
         case NETOPT_STATE_RESET:
-            kw41zrf_reset_phy(dev);
+            kw41zrf_reset(dev);
             break;
         default:
             return -ENOTSUP;
