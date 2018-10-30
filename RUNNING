@@ -1,0 +1,7 @@
+I ran this from the Release-Specs repository
+
+
+my 'sudo_docker' is a script that is in my sudoers as NOPASSWD
+I am using a specific docker image `riot/bionic` because I am testing it.
+
+BUILD_IN_DOCKER=1 DOCKER="sudo ${HOME}/.bin/sudo_docker" DOCKER_IMAGE=riot/bionic:latest BUILDTEST_MAKE_REDIRECT= 01-ci/task01.py  ~/work/git/riot_release
