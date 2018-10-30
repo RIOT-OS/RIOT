@@ -53,16 +53,23 @@ static void set_up(void)
     memset(buf, 0, sizeof(buf));
 }
 
+static inline void _init_hdrs(gnrc_rpl_srh_t **srh, uint8_t **vec,
+                              const ipv6_addr_t *dst)
+{
+    *srh = (gnrc_rpl_srh_t *)buf;
+    *vec = (uint8_t *)(*srh + 1);
+    memcpy(&hdr.dst, dst, sizeof(hdr.dst));
+}
+
 static void test_rpl_srh_nexthop_no_prefix_elided(void)
 {
     static const ipv6_addr_t a1 = IPV6_ADDR1, a2 = IPV6_ADDR2, dst = IPV6_DST;
     static const ipv6_addr_t expected1 = IPV6_ADDR1, expected2 = IPV6_ADDR2;
-    gnrc_rpl_srh_t *srh = (gnrc_rpl_srh_t *) buf;
-    uint8_t *vec = (uint8_t *) (srh + 1);
+    gnrc_rpl_srh_t *srh;
+    uint8_t *vec;
     int res;
 
-    hdr.dst = dst;
-
+    _init_hdrs(&srh, &vec, &dst);
     srh->len = (2 * sizeof(ipv6_addr_t)) / 8;
     srh->seg_left = SRH_SEG_LEFT;
     memcpy(vec, &a1, sizeof(a1));
@@ -85,14 +92,13 @@ static void test_rpl_srh_nexthop_prefix_elided(void)
 {
     static const ipv6_addr_t dst = IPV6_DST;
     static const ipv6_addr_t expected1 = IPV6_ADDR1, expected2 = IPV6_ADDR2;
-    gnrc_rpl_srh_t *srh = (gnrc_rpl_srh_t *) buf;
-    uint8_t *vec = (uint8_t *) (srh + 1);
+    gnrc_rpl_srh_t *srh;
+    uint8_t *vec;
     int res;
     static const uint8_t a1[3] = IPV6_ADDR1_ELIDED;
     static const uint8_t a2[3] = IPV6_ADDR2_ELIDED;
 
-    hdr.dst = dst;
-
+    _init_hdrs(&srh, &vec, &dst);
     srh->len = (sizeof(a1) + sizeof(a2) + 2) / 8;
     srh->seg_left = SRH_SEG_LEFT;
     srh->compr = (IPV6_ELIDED_PREFIX << 4) | IPV6_ELIDED_PREFIX;
