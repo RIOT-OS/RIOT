@@ -228,7 +228,7 @@ static int readline(char *buf, size_t size)
 
         int c = getchar();
         if (c < 0) {
-            return 1;
+            return EOF;
         }
 
         /* We allow Unix linebreaks (\n), DOS linebreaks (\r\n), and Mac linebreaks (\r). */
@@ -286,6 +286,10 @@ void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
 
     while (1) {
         int res = readline(line_buf, len);
+
+        if (res == EOF) {
+            break;
+        }
 
         if (!res) {
             handle_input_line(shell_commands, line_buf);
