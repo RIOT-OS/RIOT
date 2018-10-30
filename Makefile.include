@@ -123,6 +123,16 @@ else
 
 all: link
 
+
+BINDIRSIZEOUTPUT = $(RIOTBASE)/output/bindirsize
+BINDIRFILENAMEBASE = $(BINDIRSIZEOUTPUT)/$(APPLICATION).$(BOARD)
+.PHONY: du
+du: all
+	mkdir -p $(BINDIRSIZEOUTPUT)
+	du --all $(BINDIR) > $(BINDIRFILENAMEBASE).bin.bindirsize
+	{ test -d $(PKGDIRBASE) && du --all $(PKGDIRBASE) || true ;} > $(BINDIRFILENAMEBASE).pkg.bindirsize
+
+
 include $(RIOTMAKE)/info.inc.mk
 
 # Static code analysis tools provided by LLVM
