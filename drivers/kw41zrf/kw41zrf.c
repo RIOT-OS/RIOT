@@ -33,7 +33,7 @@
 #include "vendor/XCVR/MKW41Z4/ifr_radio.h"
 #include "periph/timer.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 static void kw41zrf_set_address(kw41zrf_t *dev)

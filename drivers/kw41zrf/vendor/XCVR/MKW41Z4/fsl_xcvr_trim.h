@@ -122,7 +122,6 @@ typedef struct
 void rx_dc_sample_average(int16_t * i_avg, int16_t * q_avg);
 void rx_dc_sample_average_long(int16_t * i_avg, int16_t * q_avg);
 uint8_t rx_bba_dcoc_dac_trim_shortIQ(void);
-void XcvrCalDelay(uint32_t time);
 void rx_dc_est_average(int16_t *i_avg, int16_t *q_avg);
 uint8_t rx_bba_dcoc_dac_trim_DCest(void);
 void DCOC_DAC_INIT_Cal(uint8_t standalone_operation);
