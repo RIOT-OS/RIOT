@@ -240,11 +240,11 @@ int kw41zrf_reset(kw41zrf_t *dev)
     kw41zrf_set_option(dev, KW41ZRF_OPT_CSMA, true);
 
     kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
-    kw41zrf_set_sequence(dev, dev->idle_seq);
-
-    bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_SEQMSK_SHIFT);
 
     kw41zrf_abort_sequence(dev);
+    bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_SEQMSK_SHIFT);
+
+    kw41zrf_set_sequence(dev, dev->idle_seq);
     kw41zrf_unmask_irqs();
 
     DEBUG("[kw41zrf] reset radio and set to channel %d and pan %d.\n",
