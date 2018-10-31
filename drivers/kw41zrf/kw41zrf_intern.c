@@ -128,10 +128,9 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
              * to be constant at 2 DSM ticks */
             while (RSIM->DSM_CONTROL & RSIM_DSM_CONTROL_DSM_ZIG_FINISHED_MASK) {}
             /* Clear IRQ flags */
-            /* cppcheck-suppress selfAssignment
-             * (reason: IRQ flags are write-1-to-clear) */
-            RSIM->DSM_CONTROL = RSIM->DSM_CONTROL;
-            uint32_t irqsts = ZLL->IRQSTS;
+            uint32_t irqsts = RSIM->DSM_CONTROL;
+            RSIM->DSM_CONTROL = irqsts;
+            irqsts = ZLL->IRQSTS;
             DEBUG("[kw41zrf] sleep IRQSTS=%" PRIx32 "\n", irqsts);
             ZLL->IRQSTS = irqsts;
             NVIC_ClearPendingIRQ(Radio_1_IRQn);
