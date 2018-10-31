@@ -31,7 +31,6 @@
 #include "kw41zrf_intern.h"
 #include "vendor/XCVR/MKW41Z4/fsl_xcvr.h"
 #include "vendor/XCVR/MKW41Z4/ifr_radio.h"
-#include "periph/timer.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -116,12 +115,8 @@ int kw41zrf_reset_hardware(kw41zrf_t *dev)
     RSIM->CONTROL &= ~RSIM_CONTROL_RADIO_RESET_BIT_MASK;
     RSIM->CONTROL &= ~RSIM_CONTROL_RADIO_RESET_BIT_MASK;
 
-    timer_init(TIMER_PIT_DEV(0), 1000000ul, NULL, NULL);
     DEBUG("[kw41zrf] start xcvr init\n");
-    uint32_t before = timer_read(TIMER_PIT_DEV(0));
     int res = kw41zrf_xcvr_init(dev);
-    uint32_t after = timer_read(TIMER_PIT_DEV(0));
-    DEBUG("[kw41zrf] took %" PRIu32 " us\n", (after - before));
     if (res < 0) {
         /* Most likely a calibration failure in XCVR driver */
         return res;
