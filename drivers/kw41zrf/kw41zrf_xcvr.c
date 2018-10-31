@@ -61,12 +61,20 @@
  * of preprocessor conditionals. */
 
 #define TsettleCal 10
-#define DCOC_DAC_BBF_STEP (16u)
-#define RX_DC_EST_SAMPLES (64u)
-#define RX_DC_EST_TOTAL_SAMPLES (2u * (RX_DC_EST_SAMPLES))
+#define DCOC_DAC_BBF_STEP (16)
+#define RX_DC_EST_SAMPLES (64)
+#define RX_DC_EST_TOTAL_SAMPLES (2 * (RX_DC_EST_SAMPLES))
+#define ISIGN(x) !((uint16_t)x & 0x8000)
+#define ABS(x) ((x) > 0 ? (x) : -(x))
+#ifndef MIN
+#define MIN(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
+#endif
 
 /* dumb spin delay used in the calibration functions */
-static void XcvrCalDelay(uint32_t time)
+static void kw41zrf_xcvr_spin(uint32_t time)
 {
     time *= 32; /* Time delay is roughly in uSec. */
     while(time > 0)
@@ -156,7 +164,7 @@ int kw41zrf_rx_bba_dcoc_dac_trim_DCest(void)
     /* Store DCOC_DAC_INIT value */
     uint32_t dcoc_init_reg_value_dcgain = XCVR_RX_DIG->DCOC_DAC_INIT;
 
-    XcvrCalDelay(TsettleCal * 2);
+    kw41zrf_xcvr_spin(TsettleCal * 2);
 
     uint32_t meas_sum = 0;
     /* SWEEP I/Q CHANNEL */
@@ -165,7 +173,7 @@ int kw41zrf_rx_bba_dcoc_dac_trim_DCest(void)
                                  XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(bbf_dacinit_q - DCOC_DAC_BBF_STEP) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_I(tza_dacinit_i) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_Q(tza_dacinit_q);
-    XcvrCalDelay(TsettleCal * 4);
+    kw41zrf_xcvr_spin(TsettleCal * 4);
 
     int32_t dc_meas_im = 0;
     int32_t dc_meas_qm = 0;
@@ -176,7 +184,7 @@ int kw41zrf_rx_bba_dcoc_dac_trim_DCest(void)
                                  XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(bbf_dacinit_q + DCOC_DAC_BBF_STEP) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_I(tza_dacinit_i) |
                                  XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_Q(tza_dacinit_q);
-    XcvrCalDelay(TsettleCal * 4);
+    kw41zrf_xcvr_spin(TsettleCal * 4);
     int32_t dc_meas_ip = 0;
     int32_t dc_meas_qp = 0;
     rx_dc_est_samples(&dc_meas_ip, &dc_meas_qp, RX_DC_EST_SAMPLES);
@@ -265,6 +273,191 @@ int kw41zrf_rx_bba_dcoc_dac_trim_DCest(void)
     XCVR_RX_DIG->AGC_CTRL_1 = agc_ctrl_1_stack; /* Save state of RX_DIG_CTRL for later restore */
 
     return status;
+}
+
+static void kw41zrf_dcoc_dac_init_cal(void)
+{
+    uint8_t p_tza_dac_i = 0, p_tza_dac_q = 0;
+    uint8_t p_bba_dac_i = 0, p_bba_dac_q = 0;
+    uint8_t i = 0;
+    uint8_t bba_gain = 11;
+    bool TZA_I_OK = 0, TZA_Q_OK = 0, BBA_I_OK = 0, BBA_Q_OK = 0;
+
+    uint32_t temp;
+
+    /* Save registers */
+    uint32_t dcoc_ctrl_0_stack = XCVR_RX_DIG->DCOC_CTRL_0; /* Save state of DCOC_CTRL_0 for later restore */
+    uint32_t dcoc_ctrl_1_stack = XCVR_RX_DIG->DCOC_CTRL_1; /* Save state of DCOC_CTRL_1 for later restore */
+    uint32_t rx_dig_ctrl_stack =  XCVR_RX_DIG->RX_DIG_CTRL; /* Save state of RX_DIG_CTRL for later restore */
+    uint32_t agc_ctrl_1_stack = XCVR_RX_DIG->AGC_CTRL_1; /* Save state of RX_DIG_CTRL for later restore */
+    uint32_t dcoc_cal_gain_state = XCVR_RX_DIG->DCOC_CAL_GAIN; /* Save state of DCOC_CAL_GAIN for later restore */
+
+    /* Register config */
+    /* Ensure AGC, DCOC and RX_DIG_CTRL is in correct mode */
+    temp = XCVR_RX_DIG->RX_DIG_CTRL;
+    temp &= ~XCVR_RX_DIG_RX_DIG_CTRL_RX_AGC_EN_MASK; /* Turn OFF AGC */
+    temp &= ~XCVR_RX_DIG_RX_DIG_CTRL_RX_DCOC_CAL_EN_MASK; /* Disable for SW control of DCOC */
+    temp &= ~XCVR_RX_DIG_RX_DIG_CTRL_RX_DC_RESID_EN_MASK; /* Disable for SW control of DCOC */
+    XCVR_RX_DIG->RX_DIG_CTRL = temp;
+
+    XCVR_RX_DIG->AGC_CTRL_1 = XCVR_RX_DIG_AGC_CTRL_1_USER_LNA_GAIN_EN(1) | /* Enable LNA Manual Gain */
+                              XCVR_RX_DIG_AGC_CTRL_1_USER_BBA_GAIN_EN(1) | /* Enable BBA Manual Gain */
+                              XCVR_RX_DIG_AGC_CTRL_1_LNA_USER_GAIN(0x0) | /* Set LNA Manual Gain */
+                              XCVR_RX_DIG_AGC_CTRL_1_BBA_USER_GAIN(0x0); /* Set BBA Manual Gain */
+
+    /* DCOC_CTRL_0 @ 4005_C02C -- Define default DCOC DAC settings in manual mode */
+    temp = XCVR_RX_DIG->DCOC_CTRL_0;
+    temp |= XCVR_RX_DIG_DCOC_CTRL_0_DCOC_MAN(1); /* Enable  Manual DCOC */
+    temp |= XCVR_RX_DIG_DCOC_CTRL_0_DCOC_CORRECT_SRC(1); /* Ensure DCOC Tracking is enabled */
+    temp |= XCVR_RX_DIG_DCOC_CTRL_0_DCOC_TRK_EST_OVR(1); /* Enable DC Estimator */
+    temp |= XCVR_RX_DIG_DCOC_CTRL_0_DCOC_CORRECT_EN(1); /* Ensure DC correction is enabled */
+    XCVR_RX_DIG->DCOC_CTRL_0 = temp;
+
+    kw41zrf_xcvr_spin(TsettleCal);
+
+    /* Set default DCOC DAC INIT Value */
+    /* LNA and BBA DAC Sweep */
+    uint8_t curr_bba_dac_i = 0x20;
+    uint8_t curr_bba_dac_q = 0x20;
+    uint8_t curr_tza_dac_i = 0x80;
+    uint8_t curr_tza_dac_q = 0x80;
+
+    /* Perform a first DC measurement to ensure that measurement is not clipping */
+    XCVR_RX_DIG->DCOC_DAC_INIT = XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_I(curr_bba_dac_i) |
+                                 XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(curr_bba_dac_q) |
+                                 XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_I(curr_tza_dac_i) |
+                                 XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_Q(curr_tza_dac_q);
+
+    int32_t dc_meas_i = 2000, dc_meas_i_p = 2000;
+    int32_t dc_meas_q = 2000, dc_meas_q_p = 2000;
+    do {
+        bba_gain--;
+        /* Set DAC user gain */
+        XCVR_RX_DIG->AGC_CTRL_1 = XCVR_RX_DIG_AGC_CTRL_1_USER_LNA_GAIN_EN(1) |
+                                  XCVR_RX_DIG_AGC_CTRL_1_LNA_USER_GAIN(0) | /* 2 */
+                                  XCVR_RX_DIG_AGC_CTRL_1_USER_BBA_GAIN_EN(1) |
+                                  XCVR_RX_DIG_AGC_CTRL_1_BBA_USER_GAIN(bba_gain) ; /* 10 */
+        kw41zrf_xcvr_spin(TsettleCal * 2);
+        rx_dc_est_samples(&dc_meas_i, &dc_meas_q, RX_DC_EST_SAMPLES);
+        DEBUG("rx i=%d q=%d\n", (int)dc_meas_i, (int)dc_meas_q);
+        dc_meas_i /= RX_DC_EST_SAMPLES;
+        dc_meas_q /= RX_DC_EST_SAMPLES;
+        DEBUG("rx i=%d q=%d\n", (int)dc_meas_i, (int)dc_meas_q);
+        DEBUG("[kw41zrf] bba_gain=%u, meas I=%" PRId32 ", Q=%" PRId32 "\n", (unsigned)bba_gain, dc_meas_i, dc_meas_q);
+    } while ((ABS(dc_meas_i) > 1900) || (ABS(dc_meas_q) > 1900));
+
+    for (i = 0; i < 0x0F; i++)
+    {
+        /* I channel :  */
+        if (!TZA_I_OK) {
+            if ((i > 0) && (ISIGN(dc_meas_i) != ISIGN(dc_meas_i_p))) {
+                if (ABS(dc_meas_i) != MIN(ABS(dc_meas_i), ABS(dc_meas_i_p))) {
+                    curr_tza_dac_i = p_tza_dac_i;
+                }
+
+                TZA_I_OK = 1;
+            }
+            else {
+                p_tza_dac_i = curr_tza_dac_i;
+
+                if (dc_meas_i > 0) {
+                    curr_tza_dac_i--;
+                }
+                else {
+                    curr_tza_dac_i++;
+                }
+            }
+        }
+        else {
+            /* Sweep BBA I */
+            if (!BBA_I_OK) {
+                if ((curr_bba_dac_i != 0x20) && (ISIGN(dc_meas_i) != ISIGN(dc_meas_i_p))) {
+                    if (ABS(dc_meas_i) != MIN(ABS(dc_meas_i), ABS(dc_meas_i_p))) {
+                        curr_bba_dac_i = p_bba_dac_i;
+                    }
+
+                    BBA_I_OK = 1;
+                }
+                else {
+                    p_bba_dac_i = curr_bba_dac_i;
+                    if (dc_meas_i > 0) {
+                        curr_bba_dac_i--;
+                    }
+                    else {
+                        curr_bba_dac_i++;
+                    }
+                }
+            }
+        }
+
+        /* Q channel : */
+        if (!TZA_Q_OK) {
+            if ((i > 0) && (ISIGN(dc_meas_q) != ISIGN(dc_meas_q_p))) {
+                if (ABS(dc_meas_q) != MIN(ABS(dc_meas_q), ABS(dc_meas_q_p))) {
+                    curr_tza_dac_q = p_tza_dac_q;
+                }
+                TZA_Q_OK = 1;
+            }
+            else {
+                p_tza_dac_q = curr_tza_dac_q;
+                if (dc_meas_q > 0) {
+                    curr_tza_dac_q--;
+                }
+                else {
+                    curr_tza_dac_q++;
+                }
+            }
+        }
+        else {
+            /* Sweep BBA Q */
+            if (!BBA_Q_OK) {
+                if ((curr_bba_dac_q != 0x20) && (ISIGN(dc_meas_q) != ISIGN(dc_meas_q_p))) {
+                    if (ABS(dc_meas_q) != MIN(ABS(dc_meas_q), ABS(dc_meas_q_p))) {
+                        curr_bba_dac_q = p_bba_dac_q;
+                    }
+                    BBA_Q_OK = 1;
+                }
+                else {
+                    p_bba_dac_q = curr_bba_dac_q;
+                    if (dc_meas_q > 0) {
+                      curr_bba_dac_q--;
+                    }
+                    else {
+                        curr_bba_dac_q++;
+                    }
+                }
+            }
+        }
+
+        /* DC OK break : */
+        if (TZA_I_OK && TZA_Q_OK && BBA_I_OK && BBA_Q_OK) {
+            break;
+        }
+
+        dc_meas_i_p = dc_meas_i; /* Store as previous value */
+        dc_meas_q_p = dc_meas_q; /* Store as previous value */
+        XCVR_RX_DIG->DCOC_DAC_INIT = XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_I(curr_bba_dac_i) |
+                                     XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(curr_bba_dac_q) |
+                                     XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_I(curr_tza_dac_i) |
+                                     XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_Q(curr_tza_dac_q);
+        kw41zrf_xcvr_spin(TsettleCal * 2);
+        rx_dc_est_samples(&dc_meas_i, &dc_meas_q, RX_DC_EST_SAMPLES);
+        dc_meas_i /= RX_DC_EST_SAMPLES;
+        dc_meas_q /= RX_DC_EST_SAMPLES;
+    }
+
+    /* Apply optimized DCOC DAC INIT : */
+    XCVR_RX_DIG->DCOC_DAC_INIT = XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_I(curr_bba_dac_i) |
+                                 XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(curr_bba_dac_q) |
+                                 XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_I(curr_tza_dac_i) |
+                                 XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_Q(curr_tza_dac_q);
+
+    /* Restore register */
+    XCVR_RX_DIG->DCOC_CTRL_0 = dcoc_ctrl_0_stack; /* Restore DCOC_CTRL_0 state to prior settings */
+    XCVR_RX_DIG->DCOC_CTRL_1 = dcoc_ctrl_1_stack; /* Restore DCOC_CTRL_1 state to prior settings */
+    XCVR_RX_DIG->RX_DIG_CTRL = rx_dig_ctrl_stack; /* Restore RX_DIG_CTRL state to prior settings */
+    XCVR_RX_DIG->DCOC_CAL_GAIN = dcoc_cal_gain_state; /* Restore DCOC_CAL_GAIN state to prior setting */
+    XCVR_RX_DIG->AGC_CTRL_1 = agc_ctrl_1_stack; /* Save state of RX_DIG_CTRL for later restore */
 }
 
 static int kw41zrf_xcvr_configure(kw41zrf_t *dev,
@@ -656,19 +849,22 @@ static int kw41zrf_xcvr_configure(kw41zrf_t *dev,
 
     XCVR_TX_DIG->GFSK_CTRL = mode_config->tx_gfsk_ctrl;
 
-    uint32_t end_of_rx_wu = 0;
-    XCVR_ForceRxWu();
+    /* Force receiver warmup */
+    bit_set32(&XCVR_TSM->CTRL, XCVR_TSM_CTRL_FORCE_RX_EN_SHIFT);
     /* Wait for TSM to reach the end of warmup (unless you want to capture some samples during DCOC cal phase) */
-    temp = XCVR_TSM->END_OF_SEQ;
-    end_of_rx_wu = (temp & XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK) >> XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT;
-    while ((( XCVR_MISC->XCVR_STATUS & XCVR_CTRL_XCVR_STATUS_TSM_COUNT_MASK) >> XCVR_CTRL_XCVR_STATUS_TSM_COUNT_SHIFT ) != end_of_rx_wu) {};
+    uint32_t end_of_rx_wu = XCVR_CTRL_XCVR_STATUS_TSM_COUNT(
+        (XCVR_TSM->END_OF_SEQ & XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_MASK) >>
+            XCVR_TSM_END_OF_SEQ_END_OF_RX_WU_SHIFT);
+    while ((XCVR_MISC->XCVR_STATUS & XCVR_CTRL_XCVR_STATUS_TSM_COUNT_MASK) != end_of_rx_wu) {};
 
     int res = kw41zrf_rx_bba_dcoc_dac_trim_DCest();
     if (res < 0) {
         config_status = res;
     }
-    DCOC_DAC_INIT_Cal(0);
-    XCVR_ForceRxWd();
+    //~ DCOC_DAC_INIT_Cal(0);
+    kw41zrf_dcoc_dac_init_cal();
+    /* Force receiver warmdown */
+    bit_clear32(&XCVR_TSM->CTRL, XCVR_TSM_CTRL_FORCE_RX_EN_SHIFT);
 
     return config_status;
 }
