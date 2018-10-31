@@ -194,7 +194,7 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
             case KW41ZRF_OPT_CSMA:
             case KW41ZRF_OPT_PROMISCUOUS:
             case KW41ZRF_OPT_AUTOACK:
-            case KW41ZRF_OPT_ACK_REQ:
+            case NETDEV_IEEE802154_ACK_REQ:
             case KW41ZRF_OPT_TELL_RX_START:
                 LOG_ERROR("[kw41zrf] Attempt to modify option %04x while radio is sleeping\n", (unsigned) option);
                 return;
@@ -225,11 +225,6 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
             case KW41ZRF_OPT_AUTOACK:
                 LOG_DEBUG("[kw41zrf] enable: AUTOACK\n");
                 bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_AUTOACK_SHIFT);
-                break;
-
-            case KW41ZRF_OPT_ACK_REQ:
-                LOG_DEBUG("[kw41zrf] enable: ACK_REQ\n");
-                bit_set32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_RXACKRQD_SHIFT);
                 break;
 
             case KW41ZRF_OPT_TELL_RX_START:
@@ -271,11 +266,6 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
             case KW41ZRF_OPT_AUTOACK:
                 LOG_DEBUG("[kw41zrf] disable: AUTOACK\n");
                 bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_AUTOACK_SHIFT);
-                break;
-
-            case KW41ZRF_OPT_ACK_REQ:
-                LOG_DEBUG("[kw41zrf] disable: ACK_REQ\n");
-                bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_RXACKRQD_SHIFT);
                 break;
 
             case KW41ZRF_OPT_TELL_RX_START:

@@ -86,10 +86,6 @@ extern "C" {
  * @{
  */
 enum kw41zrf_opt {
-    KW41ZRF_OPT_SRC_ADDR_LONG = NETDEV_IEEE802154_SRC_MODE_LONG, /**< legacy define */
-    KW41ZRF_OPT_RAWDUMP = NETDEV_IEEE802154_RAW,                 /**< legacy define */
-    KW41ZRF_OPT_ACK_REQ = NETDEV_IEEE802154_ACK_REQ,             /**< legacy define */
-
     KW41ZRF_OPT_CSMA          = (0x0100), /**< use CSMA/CA algorithm for sending */
     KW41ZRF_OPT_PROMISCUOUS   = (0x0200), /**< promiscuous mode active */
     KW41ZRF_OPT_PRELOADING    = (0x0400), /**< preloading enabled */

@@ -122,9 +122,8 @@ static inline void kw41zrf_abort_sequence(kw41zrf_t *dev)
     while (!(ZLL->SEQ_CTRL_STS & ZLL_SEQ_CTRL_STS_SEQ_IDLE_MASK)) {}
 
     /* Clear interrupt flags */
-    /* cppcheck-suppress selfAssignment
-     * (reason: IRQ flags are write-1-to-clear) */
-    ZLL->IRQSTS = ZLL->IRQSTS;
+    uint32_t irqsts = ZLL->IRQSTS;
+    ZLL->IRQSTS = irqsts;
 }
 
 /**

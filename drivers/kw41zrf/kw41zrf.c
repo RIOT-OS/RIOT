@@ -129,8 +129,8 @@ int kw41zrf_reset_hardware(kw41zrf_t *dev)
     RSIM->DSM_OSC_OFFSET = (1024ul << tmp) / (CLOCK_RADIOXTAL / 32768u) + 1u; /* round up */
 
     /* Clear and disable all interrupts */
-    /* Reset PHY_CTRL to the default value of mask all interrupts and all other
-     * settings disabled */
+    /* Reset PHY_CTRL to the default values, mask all interrupts,
+     * enable RXACKRQD, we only use TR mode for receiving acknowledgements */
     ZLL->PHY_CTRL =
         ZLL_PHY_CTRL_CCATYPE(1) |
         ZLL_PHY_CTRL_TSM_MSK_MASK |
@@ -143,6 +143,7 @@ int kw41zrf_reset_hardware(kw41zrf_t *dev)
         ZLL_PHY_CTRL_RXMSK_MASK |
         ZLL_PHY_CTRL_TXMSK_MASK |
         ZLL_PHY_CTRL_SEQMSK_MASK |
+        ZLL_PHY_CTRL_RXACKRQD_MASK |
         ZLL_PHY_CTRL_XCVSEQ(XCVSEQ_IDLE);
 
     /* Mask all timer interrupts and clear all interrupt flags */
@@ -235,7 +236,7 @@ int kw41zrf_reset(kw41zrf_t *dev)
     kw41zrf_set_rx_watermark(dev, 1);
 
     kw41zrf_set_option(dev, KW41ZRF_OPT_AUTOACK, true);
-    kw41zrf_set_option(dev, KW41ZRF_OPT_ACK_REQ, true);
+    kw41zrf_set_option(dev, NETDEV_IEEE802154_ACK_REQ, true);
     kw41zrf_set_option(dev, KW41ZRF_OPT_CSMA, true);
 
     kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);

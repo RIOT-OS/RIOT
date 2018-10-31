@@ -130,7 +130,7 @@ static void kw41zrf_tx_exec(kw41zrf_t *dev)
     }
     uint32_t tx_timeout = 0;
     if ((fcf & IEEE802154_FCF_ACK_REQ) &&
-        (dev->netdev.flags & KW41ZRF_OPT_ACK_REQ)) {
+        (dev->netdev.flags & NETDEV_IEEE802154_ACK_REQ)) {
         uint8_t payload_len = len_fcf & 0xff;
         tx_timeout = backoff_delay + dev->tx_warmup_time +
             KW41ZRF_SHR_PHY_TIME + payload_len * KW41ZRF_PER_BYTE_TIME +
@@ -828,7 +828,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
                 res = -EOVERFLOW;
                 break;
             }
-            kw41zrf_set_option(dev, KW41ZRF_OPT_ACK_REQ,
+            kw41zrf_set_option(dev, NETDEV_IEEE802154_ACK_REQ,
                                *((const netopt_enable_t *)value));
             /* don't set res to set netdev_ieee802154_t::flags */
             break;
@@ -1118,9 +1118,7 @@ static uint32_t _isr_event_seq_tr(kw41zrf_t *dev, uint32_t irqsts)
     if (irqsts & ZLL_IRQSTS_TXIRQ_MASK) {
         DEBUG("[kw41zrf] finished TX (TR)\n");
         handled_irqs |= ZLL_IRQSTS_TXIRQ_MASK;
-        if (ZLL->PHY_CTRL & ZLL_PHY_CTRL_RXACKRQD_MASK) {
-            DEBUG("[kw41zrf] wait for RX ACK\n");
-        }
+        DEBUG("[kw41zrf] wait for RX ACK\n");
     }
 
     if (irqsts & ZLL_IRQSTS_RXIRQ_MASK) {
