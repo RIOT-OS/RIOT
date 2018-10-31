@@ -64,14 +64,10 @@
 #define DCOC_DAC_BBF_STEP (16)
 #define RX_DC_EST_SAMPLES (64)
 #define RX_DC_EST_TOTAL_SAMPLES (2 * (RX_DC_EST_SAMPLES))
-#define ISIGN(x) !((uint16_t)x & 0x8000)
+
+/* Macros used by the calibration routine */
+#define SAME_SIGN(a, b) (((a) ^ (b)) >= 0)
 #define ABS(x) ((x) > 0 ? (x) : -(x))
-#ifndef MIN
-#define MIN(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a < _b ? _a : _b; })
-#endif
 
 /* dumb spin delay used in the calibration functions */
 static void kw41zrf_xcvr_spin(uint32_t time)
@@ -348,10 +344,11 @@ static void kw41zrf_dcoc_dac_init_cal(void)
 
     for (i = 0; i < 0x0F; i++)
     {
+        DEBUG("rx i=%d q=%d\n", (int)dc_meas_i, (int)dc_meas_q);
         /* I channel :  */
         if (!TZA_I_OK) {
-            if ((i > 0) && (ISIGN(dc_meas_i) != ISIGN(dc_meas_i_p))) {
-                if (ABS(dc_meas_i) != MIN(ABS(dc_meas_i), ABS(dc_meas_i_p))) {
+            if ((i > 0) && (!SAME_SIGN(dc_meas_i, dc_meas_i_p))) {
+                if (ABS(dc_meas_i) > ABS(dc_meas_i_p)) {
                     curr_tza_dac_i = p_tza_dac_i;
                 }
 
@@ -368,32 +365,30 @@ static void kw41zrf_dcoc_dac_init_cal(void)
                 }
             }
         }
-        else {
+        else if (!BBA_I_OK) {
             /* Sweep BBA I */
-            if (!BBA_I_OK) {
-                if ((curr_bba_dac_i != 0x20) && (ISIGN(dc_meas_i) != ISIGN(dc_meas_i_p))) {
-                    if (ABS(dc_meas_i) != MIN(ABS(dc_meas_i), ABS(dc_meas_i_p))) {
-                        curr_bba_dac_i = p_bba_dac_i;
-                    }
+            if ((curr_bba_dac_i != 0x20) && (!SAME_SIGN(dc_meas_i, dc_meas_i_p))) {
+                if (ABS(dc_meas_i) > ABS(dc_meas_i_p)) {
+                    curr_bba_dac_i = p_bba_dac_i;
+                }
 
-                    BBA_I_OK = 1;
+                BBA_I_OK = 1;
+            }
+            else {
+                p_bba_dac_i = curr_bba_dac_i;
+                if (dc_meas_i > 0) {
+                    curr_bba_dac_i--;
                 }
                 else {
-                    p_bba_dac_i = curr_bba_dac_i;
-                    if (dc_meas_i > 0) {
-                        curr_bba_dac_i--;
-                    }
-                    else {
-                        curr_bba_dac_i++;
-                    }
+                    curr_bba_dac_i++;
                 }
             }
         }
 
         /* Q channel : */
         if (!TZA_Q_OK) {
-            if ((i > 0) && (ISIGN(dc_meas_q) != ISIGN(dc_meas_q_p))) {
-                if (ABS(dc_meas_q) != MIN(ABS(dc_meas_q), ABS(dc_meas_q_p))) {
+            if ((i > 0) && (!SAME_SIGN(dc_meas_q, dc_meas_q_p))) {
+                if (ABS(dc_meas_q) > ABS(dc_meas_q_p)) {
                     curr_tza_dac_q = p_tza_dac_q;
                 }
                 TZA_Q_OK = 1;
@@ -408,23 +403,21 @@ static void kw41zrf_dcoc_dac_init_cal(void)
                 }
             }
         }
-        else {
+        else if (!BBA_Q_OK) {
             /* Sweep BBA Q */
-            if (!BBA_Q_OK) {
-                if ((curr_bba_dac_q != 0x20) && (ISIGN(dc_meas_q) != ISIGN(dc_meas_q_p))) {
-                    if (ABS(dc_meas_q) != MIN(ABS(dc_meas_q), ABS(dc_meas_q_p))) {
-                        curr_bba_dac_q = p_bba_dac_q;
-                    }
-                    BBA_Q_OK = 1;
+            if ((curr_bba_dac_q != 0x20) && (!SAME_SIGN(dc_meas_q, dc_meas_q_p))) {
+                if (ABS(dc_meas_q) > ABS(dc_meas_q_p)) {
+                    curr_bba_dac_q = p_bba_dac_q;
+                }
+                BBA_Q_OK = 1;
+            }
+            else {
+                p_bba_dac_q = curr_bba_dac_q;
+                if (dc_meas_q > 0) {
+                    curr_bba_dac_q--;
                 }
                 else {
-                    p_bba_dac_q = curr_bba_dac_q;
-                    if (dc_meas_q > 0) {
-                      curr_bba_dac_q--;
-                    }
-                    else {
-                        curr_bba_dac_q++;
-                    }
+                    curr_bba_dac_q++;
                 }
             }
         }
@@ -436,6 +429,8 @@ static void kw41zrf_dcoc_dac_init_cal(void)
 
         dc_meas_i_p = dc_meas_i; /* Store as previous value */
         dc_meas_q_p = dc_meas_q; /* Store as previous value */
+        DEBUG("curr_bba_dac i=%d q=%d\n", (int)curr_bba_dac_i, (int)curr_bba_dac_q);
+        DEBUG("curr_tza_dac i=%d q=%d\n", (int)curr_tza_dac_i, (int)curr_tza_dac_q);
         XCVR_RX_DIG->DCOC_DAC_INIT = XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_I(curr_bba_dac_i) |
                                      XCVR_RX_DIG_DCOC_DAC_INIT_BBA_DCOC_INIT_Q(curr_bba_dac_q) |
                                      XCVR_RX_DIG_DCOC_DAC_INIT_TZA_DCOC_INIT_I(curr_tza_dac_i) |

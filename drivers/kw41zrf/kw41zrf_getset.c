@@ -24,7 +24,7 @@
 #include "kw41zrf_intern.h"
 #include "kw41zrf_getset.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define KW41ZRF_NUM_CHANNEL      (KW41ZRF_MAX_CHANNEL - KW41ZRF_MIN_CHANNEL + 1)
