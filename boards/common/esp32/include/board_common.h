@@ -37,6 +37,23 @@
 #endif
 
 /**
+ * @name   External clock crystal frequency (MHz)
+ *
+ * Most boards use a 40MHz crystal, including all those based on Espressif's
+ * WROOM-32 and WROVER-32 modules. Those that don't, like the SparkFun ESP32
+ * Thing (26MHz), must define ESP32_XTAL_FREQ appropriately in their board
+ * configuration.
+ *
+ * An obvious side effect of a mismatch is that the UART won't sync and the
+ * development terminal will show garbage instead of log output.
+ * @{
+ */
+#ifndef ESP32_XTAL_FREQ
+#define ESP32_XTAL_FREQ             (40)
+#endif
+/** @} */
+
+/**
  * @name   LED configuration (three predefined LEDs at maximum)
  *
  * @note LEDx_ACTIVE value must be declared in board configuration.
