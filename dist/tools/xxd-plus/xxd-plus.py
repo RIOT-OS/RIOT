@@ -20,7 +20,7 @@ def _relpath_p(path, start):
                              pathlib.Path(os.path.abspath(start)).as_posix())
 
 
-def mkconstfs(templates, files, root_path, mount_point, constfs_name):
+def xxd(templates, files, root_path, mount_point, constfs_name):
     """Generate a C file containing a constant file system
 
     Return
@@ -109,14 +109,17 @@ def main():
     default_templates = os.path.join(this_script_dir, 'default.ini')
 
     parser = argparse.ArgumentParser(
-            description="Embed files into a constant file system. "
+            description="Embed files into a C arrays and structures. "
+            "By default this generates a vfs_mount_t structure for a constant file "
+            "system (constfs), but that can be changed via templates. "
             "See %s to learn how to customize the generator." % default_templates)
 
     parser.add_argument("-m", '--mount', metavar="mountpoint",
                         help="Where to mount the resulting fs", default="/")
 
     parser.add_argument("-t", '--template', metavar="ini_file",
-                        help="Configuration file containing template chunks",
+                        help="Configuration file containing template chunks. "
+                             "The default template will generate a constfs-compatible structure.",
                         type=argparse.FileType(),
                         default=default_templates)
 
@@ -127,22 +130,22 @@ def main():
 
     parser.add_argument("-r", '--root', metavar="root_base_path",
                         type=pathlib.Path,
-                        help="Paths on the constf will be generated for the real "
+                        help="Paths on the C code will be generated from the real "
                         "path of the files by considering this path to be the root "
                         "By default the current directory (.) is used",
                         default=pathlib.Path())
 
-    parser.add_argument("name", help="Name for the vfs_mount_t structure")
+    parser.add_argument("name", help="Name for the main data structure")
 
     parser.add_argument("files", nargs="+", type=pathlib.Path,
                         help="Files to be included.")
 
     ns = parser.parse_args()
 
-    template = configparser.ConfigParser(comment_prefixes=())
+    template = configparser.ConfigParser(comment_prefixes=("--",))
     template.read_file(ns.template)
 
-    f_chunks = mkconstfs(template, ns.files, ns.root, ns.mount, ns.name)
+    f_chunks = xxd(template, ns.files, ns.root, ns.mount, ns.name)
 
     if ns.output:
         tmp_out = io.StringIO()
