@@ -69,7 +69,8 @@ endif
 MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
 
 # Path to the current directory relative to RIOTPROJECT
-BUILDRELPATH ?= $(CURDIR:$(RIOTPROJECT)/%=%)/
+# trailing '/' is important when RIOTPROJECT == CURDIR
+BUILDRELPATH ?= $(patsubst $(RIOTPROJECT)/%,%,$(CURDIR)/)
 
 # get host operating system
 OS := $(shell uname)
