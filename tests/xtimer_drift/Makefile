@@ -16,8 +16,8 @@ USEMODULE += xtimer
 # Port number should be found in port enum e.g in cpu/include/periph_cpu.h
 #FEATURES_REQUIRED += periph_gpio
 # Jiminy probing Pins
-#CFLAGS += -DSLACKER_THREAD_PIN=GPIO_PIN\(PORT_F,7\)
-#CFLAGS += -DMAIN_THREAD_PIN=GPIO_PIN\(PORT_F,6\)
-#CFLAGS += -DPRINT_THREAD_PIN=GPIO_PIN\(PORT_F,5\)
+#CFLAGS += -DSLACKER_THREAD_PIN=GPIO_PIN\(5,7\)
+#CFLAGS += -DMAIN_THREAD_PIN=GPIO_PIN\(5,6\)
+#CFLAGS += -DPRINT_THREAD_PIN=GPIO_PIN\(5,5\)
 
 include $(RIOTBASE)/Makefile.include
