@@ -177,6 +177,66 @@ static void kinetis_mcg_init_mcgirclk(void)
 }
 
 /**
+ * @brief   Internal helper for performing the actual auto-trim of the reference oscillators
+ *
+ * This is called internally by @ref kinetis_mcg_auto_trim_irc
+ */
+static int kinetis_mcg_auto_trim_exec(unsigned fast_irc)
+{
+    uint32_t expected_count = (CLOCK_BUSCLOCK * 21u);
+    if (fast_irc) {
+        bit_set8(&MCG->SC, MCG_SC_ATMS_SHIFT);
+        /* Fast IRC is expected to run at 4 MHz */
+        /* The 64 bit multiplication will be optimized away and replaced by a constant */
+        expected_count = ((uint64_t)expected_count * 128) / 4000000ul;
+    }
+    else {
+        bit_clear8(&MCG->SC, MCG_SC_ATMS_SHIFT);
+        expected_count /= 32768;
+    }
+    if (expected_count > 0xffff) {
+        /* Something is very wrong with the configuration */
+        return -2;
+    }
+    /* Load expected counts */
+    MCG->ATCVL = expected_count & 0xff;
+    MCG->ATCVH = (expected_count >> 8) & 0xff;
+    /* initiate auto trim procedure */
+    bit_set8(&MCG->SC, MCG_SC_ATME_SHIFT);
+    /* ATME bit will de-assert automatically when the procedure completes */
+    while (MCG->SC & MCG_SC_ATME_MASK) {}
+    if (MCG->SC & MCG_SC_ATMF_MASK) {
+        /* auto trim failure */
+        return -1;
+    }
+    return 0;
+}
+
+/**
+ * @brief   Perform auto-trim of the internal reference oscillators
+ *
+ * This requires that an external crystal or clock is being used to drive the
+ * bus clock, i.e. the current clock mode must be one of FBE, FEE, BLPE, PBE, PEE
+ *
+ * The accuracy of the internal reference oscillators may be better after
+ * performing this calibration. This may be extra useful when clocking
+ * peripherals from the MCGIRCLK, e.g. LPUART.
+ */
+static void kinetis_mcg_auto_trim_irc(void)
+{
+    /* Try to auto-trim the internal oscillators */
+    /* Trim the 32768 Hz slow IRC */
+    int res = kinetis_mcg_auto_trim_exec(0);
+    if (res < 0) {
+        /* Trimming failed, abort */
+        return;
+    }
+    /* Trim the fast IRC after trimming the slow IRC since the trim of the slow
+     * IRC will affect the frequency of the fast IRC */
+    kinetis_mcg_auto_trim_exec(1);
+}
+
+/**
  * @brief Initialize the FLL Engaged Internal Mode.
  *
  * MCGOUTCLK is derived from the FLL clock.
@@ -496,6 +556,23 @@ void kinetis_mcg_init(void)
 
     /* Switch to the selected MCG mode */
     kinetis_mcg_set_mode(clock_config.default_mode);
+    switch (clock_config.default_mode) {
+        case KINETIS_MCG_MODE_BLPE:
+        case KINETIS_MCG_MODE_FBE:
+        case KINETIS_MCG_MODE_FEE:
+#if KINETIS_HAVE_PLL
+        case KINETIS_MCG_MODE_PBE:
+        case KINETIS_MCG_MODE_PEE:
+#endif /* KINETIS_HAVE_PLL */
+            /* Perform auto-trim of the internal reference oscillator if there
+             * is an external reference available */
+            kinetis_mcg_auto_trim_irc();
+            break;
+        default:
+            /* It is not possible to use the auto-trim functionality without
+             * using an external clock source for the bus clock */
+            break;
+    }
     irq_restore(mask);
 }
 
