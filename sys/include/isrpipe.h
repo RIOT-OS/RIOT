@@ -65,6 +65,13 @@ void isrpipe_init(isrpipe_t *isrpipe, char *buf, size_t bufsize);
 int isrpipe_write_one(isrpipe_t *isrpipe, char c);
 
 /**
+ * @brief   Wrapper around isrpipe_write_one() to make it compatible with uart_rx_cb_t.
+ *
+ * The parameters are the same as isrpipe_write_one().
+ */
+void isrpipe_write_uartcb(void *_isrpipe, uint8_t data);
+
+/**
  * @brief   Read data from isrpipe (blocking)
  *
  * @param[in]   isrpipe    isrpipe object to operate on

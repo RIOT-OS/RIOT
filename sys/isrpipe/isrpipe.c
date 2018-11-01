@@ -17,6 +17,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include "isrpipe.h"
 
 void isrpipe_init(isrpipe_t *isrpipe, char *buf, size_t bufsize)
@@ -35,6 +36,11 @@ int isrpipe_write_one(isrpipe_t *isrpipe, char c)
     mutex_unlock(&isrpipe->mutex);
 
     return res;
+}
+
+void isrpipe_write_uartcb(void *_isrpipe, uint8_t data)
+{
+    isrpipe_write_one(_isrpipe, (char)data);
 }
 
 int isrpipe_read(isrpipe_t *isrpipe, char *buffer, size_t count)

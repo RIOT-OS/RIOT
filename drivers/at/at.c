@@ -22,17 +22,12 @@
 #define AT_PRINT_INCOMING (0)
 #endif
 
-static void _isrpipe_write_one_wrapper(void *_isrpipe, uint8_t data)
-{
-    isrpipe_write_one(_isrpipe, (char)data);
-}
-
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize)
 {
     dev->uart = uart;
     isrpipe_init(&dev->isrpipe, buf, bufsize);
 
-    return uart_init(uart, baudrate, _isrpipe_write_one_wrapper,
+    return uart_init(uart, baudrate, isrpipe_write_uartcb,
                      &dev->isrpipe);
 }
 

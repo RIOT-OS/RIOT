@@ -58,7 +58,7 @@ void stdio_init(void)
     void *arg;
 
 #ifdef MODULE_STDIO_UART_RX
-    cb = (uart_rx_cb_t) isrpipe_write_one;
+    cb = isrpipe_write_uartcb;
     arg = &stdio_uart_isrpipe;
 #else
 #ifdef USE_ETHOS_FOR_STDIO
