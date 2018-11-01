@@ -34,9 +34,9 @@ static const clock_config_t clock_config = {
     /*
      * This configuration results in the system running with the internal clock
      * with the following clock frequencies:
-     * Core:  48 MHz
-     * Bus:   24 MHz
-     * Flash: 24 MHz
+     * Core:  41.94 MHz
+     * Bus:   20.97 MHz
+     * Flash: 20.97 MHz
      */
     .clkdiv1            = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV4(1),
     /* unsure if this RTC load cap configuration is correct, but it matches the
@@ -61,13 +61,13 @@ static const clock_config_t clock_config = {
     .oscsel             = MCG_C7_OSCSEL(0), /* Use RSIM for external clock */
     .fcrdiv             = MCG_SC_FCRDIV(0), /* Fast IRC divide by 1 => 4 MHz */
     .fll_frdiv          = MCG_C1_FRDIV(0b101), /* Divide by 1024 */
-    .fll_factor_fei     = KINETIS_MCG_FLL_FACTOR_1464, /* FEI FLL freq = 48 MHz */
+    .fll_factor_fei     = KINETIS_MCG_FLL_FACTOR_1280, /* FEI FLL freq = 41.94 MHz */
     .fll_factor_fee     = KINETIS_MCG_FLL_FACTOR_1280, /* FEE FLL freq = 40 MHz */
 };
 /* Radio xtal frequency, either 32 MHz or 26 MHz */
 #define CLOCK_RADIOXTAL              (32000000ul)
 /* CPU core clock, the MCG clock output frequency */
-#define CLOCK_CORECLOCK              (48000000ul)
+#define CLOCK_CORECLOCK              (32768 * 1280)
 #define CLOCK_BUSCLOCK               (CLOCK_CORECLOCK / 2)
 #define CLOCK_MCGIRCLK               (4000000ul)
 /** @} */
