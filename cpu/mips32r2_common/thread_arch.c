@@ -35,7 +35,12 @@
 #define MM_SYSCALL         (0x8B7C0000)
 #define MM_SYSCALL_MASK    (0xfffffc00)
 
-/* For backwards compatibility with mips-mti-elf toolchain release 2016.05-03 */
+/* For backwards compatibility with mips-mti-elf toolchain release 2016.05-03.
+ * Newer toolchains use the _MIPS_HAL_NOMIPS16 macro to set attributes on
+ * functions declared in <mips/hal.h>. The attributes of the functions defined
+ * below must match the attributes in the header declarations, or we will get
+ * compilation errors such as:
+ * error: ‘_mips_handle_exception’ redeclared with conflicting ‘nomips16’ attributes  */
 #if !defined(_MIPS_HAL_NOMIPS16)
 #define _MIPS_HAL_NOMIPS16 __attribute__((nomips16))
 #endif /* !defined(_MIPS_HAL_NOMIPS16) */
