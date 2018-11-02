@@ -76,6 +76,10 @@ void pm_set(unsigned mode)
             PM_LED(0, ON);
             PM_LED(2, ON);
             /* Enable LLWU interrupt, or else we can never resume from LLS */
+            /* Clear pending flag first, the LLWU has no purpose in RUN mode, so
+             * if the flag is set then it must be a remainder from handling the
+             * previous wakeup. */
+            NVIC_ClearPendingIRQ(LLWU_IRQn);
             NVIC_EnableIRQ(LLWU_IRQn);
             break;
     }
