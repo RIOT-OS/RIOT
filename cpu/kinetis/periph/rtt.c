@@ -31,6 +31,9 @@
 #include "cpu.h"
 #include "bit.h"
 #include "periph/rtt.h"
+#ifdef MODULE_PERIPH_LLWU
+#include "llwu.h"
+#endif
 #include "periph_conf.h"
 
 #define ENABLE_DEBUG (0)
@@ -65,7 +68,7 @@ void rtt_init(void)
         /* Time Invalid Flag is set, clear TIF by writing TSR */
 
         /* Stop counter to make TSR writable */
-        bit_clear32(&RTC->SR, RTC_SR_TCE_SHIFT);
+        rtt_poweroff();
 
         RTC->TSR = 0;
     }
@@ -76,6 +79,10 @@ void rtt_init(void)
     /* Enable RTC interrupts */
     NVIC_EnableIRQ(RTC_IRQn);
 
+#ifdef MODULE_PERIPH_LLWU
+    /* Enable RTC wake from LLS */
+    llwu_wakeup_module_enable(LLWU_WAKEUP_MODULE_RTC_ALARM);
+#endif
     rtt_poweron();
 }
 
