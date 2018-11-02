@@ -75,6 +75,8 @@ void pm_set(unsigned mode)
             pm_stopm(SMC_PMCTRL_STOPM_LLS);
             PM_LED(0, ON);
             PM_LED(2, ON);
+            /* Enable LLWU interrupt, or else we can never resume from LLS */
+            NVIC_EnableIRQ(LLWU_IRQn);
             break;
     }
     DEBUG("pm_set(%u)\n", mode);

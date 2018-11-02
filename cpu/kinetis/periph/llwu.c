@@ -28,29 +28,28 @@
 struct {
     gpio_cb_t cb;
     void *arg;
-} config[LLWU_WAKEUP_PIN_NUMOF];
+} llwu_pin_config[LLWU_WAKEUP_PIN_NUMOF];
 
 void llwu_init(void)
 {
     /* Setup Low Leakage Wake-up Unit (LLWU) */
 #ifdef SIM_SCGC4_LLWU_SHIFT
     /* Only the first generation Kinetis K CPUs have a clock gate for the LLWU,
-     * for all others the LLWU is always on */
+     * for all others the LLWU clock is always on */
     bit_set32(&SIM->SCGC4, SIM_SCGC4_LLWU_SHIFT);   /* Enable LLWU clock gate */
 #endif
 
-    /* Enable LLWU interrupt, or else we can never resume from LLS */
-    NVIC_EnableIRQ(LLWU_IRQn);
-    /* LLWU needs to have the lowest possible priority, or it will block the
-     * other modules from performing their IRQ handling */
-    NVIC_SetPriority(LLWU_IRQn, 0xff);
+    /* LLWU needs to have a priority which is equal to or more urgent than the
+     * PORT module to avoid races between the LLWU pin detect interrupt and the
+     * PORT pin detect interrupt */
+    NVIC_SetPriority(LLWU_IRQn, 0);
 }
 
 void llwu_wakeup_pin_set(llwu_wakeup_pin_t pin, llwu_wakeup_edge_t edge, gpio_cb_t cb, void *arg)
 {
     assert(pin < LLWU_WAKEUP_PIN_NUMOF);
-    config[pin].cb = cb;
-    config[pin].arg = arg;
+    llwu_pin_config[pin].cb = cb;
+    llwu_pin_config[pin].arg = arg;
 
     /* The fields are two bits per pin, and the setting registers are 8 bits wide */
     if(pin < 4) {
@@ -87,17 +86,24 @@ void isr_llwu(void)
         while (flags) {
             if (flags & 1) {
                 DEBUG("llwu: wakeup pin %u\n", pin);
-                if (config[pin].cb != NULL) {
-                    config[pin].cb(config[pin].arg);
+                gpio_cb_t cb = llwu_pin_config[pin].cb;
+                if (cb) {
+                    cb(llwu_pin_config[pin].arg);
                 }
+                /* Clear PORT interrupt flag to avoid spurious duplicates */
+                DEBUG("PORT ISFR: %08" PRIx32 "\n", llwu_wakeup_pin_to_port[pin].port->ISFR);
+                llwu_wakeup_pin_to_port[pin].port->ISFR = llwu_wakeup_pin_to_port[pin].isfr_mask;
             }
             flags >>= 1;
             ++pin;
         }
     }
-    DEBUG("llwu: F3 = %02x\n", LLWU->F3);
     /* Read only register F3, the flag will need to be cleared in the peripheral
      * instead of writing a 1 to the MWUFx bit. */
+    DEBUG("llwu: F3 = %02x\n", LLWU->F3);
+    /* Mask the LLWU IRQ until the module interrupt handlers have had a chance
+     * to run and clear the F3 flags */
+    NVIC_DisableIRQ(LLWU_IRQn);
 
     cortexm_isr_end();
 }
