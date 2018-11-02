@@ -94,6 +94,7 @@ enum {
     UNIT_A,         /**< Ampere */
     UNIT_V,         /**< Volts */
     UNIT_GS,        /**< gauss */
+    UNIT_DBM,       /**< decibel-milliwatts */
     /* pressure */
     UNIT_BAR,       /**< Beer? */
     UNIT_PA,        /**< Pascal */
