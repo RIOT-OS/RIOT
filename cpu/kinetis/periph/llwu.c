@@ -83,14 +83,16 @@ void isr_llwu(void)
         /* Clear pin interrupt flags */
         *(&LLWU->F1 + reg) = flags;
         DEBUG("llwu: F%u = %02x\n", reg + 1, (unsigned) flags);
-        for (unsigned i = 0; i < 8; ++i) {
+        unsigned pin = reg * 8;
+        while (flags) {
             if (flags & 1) {
-                DEBUG("llwu: pin %u\n", reg * 8 + i);
-                if (config[i].cb != NULL) {
-                    config[i].cb(config[i].arg);
+                DEBUG("llwu: wakeup pin %u\n", pin);
+                if (config[pin].cb != NULL) {
+                    config[pin].cb(config[pin].arg);
                 }
             }
             flags >>= 1;
+            ++pin;
         }
     }
     DEBUG("llwu: F3 = %02x\n", LLWU->F3);
