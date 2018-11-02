@@ -75,7 +75,6 @@ static void *_server_thread(void *args)
 static int udp_send(char *addr_str, char *port_str, char *data, unsigned int num,
                     unsigned int delay)
 {
-    uint8_t byte_data[strlen(data) / 2];
     sock_udp_ep_t dst = { .family = AF_INET6 };
     size_t data_len;
 
@@ -86,9 +85,9 @@ static int udp_send(char *addr_str, char *port_str, char *data, unsigned int num
     }
     /* parse port */
     dst.port = atoi(port_str);
-    data_len = hex2ints(byte_data, data);
+    data_len = strlen(data);
     for (unsigned int i = 0; i < num; i++) {
-        if (sock_udp_send(NULL, byte_data, data_len, &dst) < 0) {
+        if (sock_udp_send(NULL, data, data_len, &dst) < 0) {
             puts("could not send");
         }
         else {
@@ -121,7 +120,7 @@ int udp_cmd(int argc, char **argv)
         uint32_t num = 1;
         uint32_t delay = 1000000;
         if (argc < 5) {
-            printf("usage: %s send <addr> <port> <hex data> [<num> [<delay in us>]]\n",
+            printf("usage: %s send <addr> <port> <data> [<num> [<delay in us>]]\n",
                    argv[0]);
             return 1;
         }
