@@ -135,12 +135,40 @@ KINETIS_UART_WRITE_INLINE void uart_write_lpuart(uart_t uart, const uint8_t *dat
 #endif
 #endif
 
+#ifdef MODULE_PERIPH_LLWU
+/**
+ * @brief   LLWU callback for UART RX pin
+ *
+ * This function is called only when the CPU is in LLS mode and a falling edge
+ * occurs on the RX pin.
+ */
+static void uart_llwu_cb(void *arg)
+{
+    uart_t uart = (uart_t)arg;
+    if (!config[uart].active) {
+        config[uart].active = 1;
+        /* Keep CPU on until we are finished with RX */
+        DEBUG("LLS UART\n");
+        PM_BLOCK(KINETIS_PM_STOP);
+    }
+}
+#endif
+
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     assert(uart < UART_NUMOF);
 
-    if (config[uart].rx_cb) {
+    if (config[uart].rx_cb && config[uart].enabled) {
+        /* Re-initialization of an already configured UART instance */
+        /* Release PM blocker from previous run */
+#ifdef MODULE_PERIPH_LLWU
+        /* LLS was only blocked before if not using an LLWU pin for RX */
+        if (uart_config[uart].llwu_rx == LLWU_WAKEUP_PIN_UNDEF) {
+            PM_UNBLOCK(KINETIS_PM_LLS);
+        }
+#else /* MODULE_PERIPH_LLWU */
         PM_UNBLOCK(KINETIS_PM_LLS);
+#endif /* MODULE_PERIPH_LLWU */
     }
 
     /* remember callback addresses */
@@ -181,10 +209,10 @@ void uart_poweron(uart_t uart)
         unsigned state = irq_disable();
         if (!config[uart].enabled) {
             config[uart].enabled = 1;
-#if MODULE_PERIPH_LLWU
+#ifdef MODULE_PERIPH_LLWU
             if (uart_config[uart].llwu_rx != LLWU_WAKEUP_PIN_UNDEF) {
                 /* Configure the RX pin for LLWU wakeup to be able to use RX in LLS mode */
-                llwu_wakeup_pin_set(uart_config[uart].llwu_rx, LLWU_WAKEUP_EDGE_FALLING, NULL, NULL);
+                llwu_wakeup_pin_set(uart_config[uart].llwu_rx, LLWU_WAKEUP_EDGE_FALLING, uart_llwu_cb, (void*)uart);
             }
             else
 #endif
@@ -220,7 +248,7 @@ void uart_poweroff(uart_t uart)
         unsigned state = irq_disable();
         if (config[uart].enabled) {
             config[uart].enabled = 0;
-#if MODULE_PERIPH_LLWU
+#ifdef MODULE_PERIPH_LLWU
             if (uart_config[uart].llwu_rx != LLWU_WAKEUP_PIN_UNDEF) {
                 /* Disable LLWU wakeup for the RX pin */
                 llwu_wakeup_pin_set(uart_config[uart].llwu_rx, LLWU_WAKEUP_EDGE_NONE, NULL, NULL);
@@ -585,7 +613,7 @@ static inline void irq_handler_lpuart(uart_t uart)
             config[uart].active = 1;
             /* Keep CPU on until we are finished with RX */
             DEBUG("LPUART ACTIVE\n");
-            PM_BLOCK(KINETIS_PM_LLS);
+            PM_BLOCK(KINETIS_PM_STOP);
         }
     }
     if (stat & LPUART_STAT_RDRF_MASK) {
@@ -618,7 +646,7 @@ static inline void irq_handler_lpuart(uart_t uart)
         if (config[uart].active) {
             config[uart].active = 0;
             /* Let the CPU sleep when idle */
-            PM_UNBLOCK(KINETIS_PM_LLS);
+            PM_UNBLOCK(KINETIS_PM_STOP);
             DEBUG("LPUART IDLE\n");
         }
     }
