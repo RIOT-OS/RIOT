@@ -7,14 +7,15 @@
  */
 
 /**
- * @ingroup     cpu_atmega328p
+ * @ingroup     cpu_atmega_common
  * @{
  *
  * @file
  * @brief       Startup code and interrupt vector definition
  *
- * @author     Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
- *
+ * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+ * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @}
  */
 
@@ -24,7 +25,6 @@
 
 /* For Catchall-Loop */
 #include "board.h"
-
 
 /**
  * @brief functions for initializing the board, std-lib and kernel
@@ -43,19 +43,19 @@ extern void __libc_init_array(void);
  * which should never be reached but just in case jumps to exit.
  * This way there should be no way to call main directly.
  */
-void init7_ovr(void) __attribute__((naked)) __attribute__((section(".init7")));
-void init8_ovr(void) __attribute__((naked)) __attribute__((section(".init8")));
+void init7_ovr(void) __attribute__((section(".init7")));
+void init8_ovr(void) __attribute__((section(".init8")));
 
-
-void init7_ovr(void)
+__attribute__((used, naked)) void init7_ovr(void)
 {
-    __asm__("call reset_handler");
+    __asm__ ("call reset_handler");
 }
 
-void init8_ovr(void)
+__attribute__((used, naked)) void init8_ovr(void)
 {
-    __asm__("jmp exit");
+    __asm__ ("jmp exit");
 }
+
 /**
  * @brief This function is the entry point after a system reset
  *
@@ -63,7 +63,7 @@ void init8_ovr(void)
  * 1. initialize the board (sync clock, setup std-IO)
  * 2. initialize and start RIOTs kernel
  */
-void reset_handler(void)
+__attribute__((used)) void reset_handler(void)
 {
     /* initialize the board and startup the kernel */
     board_init();

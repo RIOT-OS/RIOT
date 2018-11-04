@@ -60,6 +60,20 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
+ */
+#define LED_PANIC           LED0_ON
+/** @} */
+
+/**
+ * @name CPU clock scale for arduino boards
+ *
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
+/** @} */
+
+/**
  * @name    xtimer configuration values
  * @{
  */
