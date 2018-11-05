@@ -18,15 +18,26 @@ static struct {
 
     uint32_t current;
 
-    void (*post_step_cb)(uint32_t current);
+    void (*post_read_cb)(uint32_t current);
 } mock_timer;
 
+static void _timer_mock_step_one(void);
 
-void timer_mock_set_post_step_cb(void (*post_step_cb)(uint32_t current))
+
+void timer_mock_set_post_read_cb(void (*post_read_cb)(uint32_t current))
 {
-    mock_timer.post_step_cb = post_step_cb;
+    mock_timer.post_read_cb = post_read_cb;
 }
 
+uint32_t timer_mock_step(uint32_t ticks)
+{
+    DEBUG("timer_mock_step(%" PRIu32 ") from %" PRIu32 "\n",
+          ticks, mock_timer.current);
+    for (uint32_t i = 0; i < ticks; i++) {
+        _timer_mock_step_one();
+    }
+    return mock_timer.current;
+}
 
 static void _timer_mock_step_one(void)
 {
@@ -38,24 +49,6 @@ static void _timer_mock_step_one(void)
     }
 }
 
-
-uint32_t timer_mock_step(uint32_t ticks)
-{
-    DEBUG("timer_mock_step(%" PRIu32 ") from %" PRIu32 "\n", ticks, mock_timer.current);
-    for (uint32_t i = 0; i < ticks; i++) {
-        _timer_mock_step_one();
-    }
-
-    uint32_t now = mock_timer.current;
-
-
-    if (mock_timer.post_step_cb) {
-        mock_timer.post_step_cb(mock_timer.current);
-    }
-
-    return now;
-}
-
 void timer_mock_set(uint32_t ticks)
 {
     DEBUG("timer_mock_set(%" PRIu32 ")\n", ticks);
@@ -64,13 +57,15 @@ void timer_mock_set(uint32_t ticks)
     mock_timer.current = ticks;
 }
 
-
-static void timer_cb_mock(void *arg, int channel)
+static void _timer_cb_mock(void *arg, int channel)
 {
     (void)arg;
     (void)channel;
 }
 
+/*
+ * Mock of the original functions
+ */
 int timer_init_mock(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
     DEBUG("timer_init_mock(%u): %" PRIu32 ", %p, %p\n", dev, freq, cb, arg);
@@ -83,18 +78,23 @@ int timer_init_mock(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
     mock_timer.current = 0;
 
-    mock_timer.post_step_cb = NULL;
+    mock_timer.post_read_cb = NULL;
 
-    (void)timer_cb_mock;
+    (void)_timer_cb_mock;
 
     return 0;
 }
 
-
 unsigned int timer_read_mock(tim_t dev)
 {
     DEBUG("timer_read_mock(%u)\n", dev);
-    return timer_mock_step(1);
+    uint32_t now = timer_mock_step(1);
+
+    if (mock_timer.post_read_cb) {
+        mock_timer.post_read_cb(now);
+    }
+
+    return now;
 }
 
 int timer_set_absolute_mock(tim_t dev, int channel, unsigned int value)

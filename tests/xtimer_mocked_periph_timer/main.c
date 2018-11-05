@@ -82,7 +82,7 @@ static void _simulate_deschedule_in_timer_set(uint32_t now)
 static void test_show_xtimer_set_call_target_in_the_past(void)
 {
     xtimer_init();
-    timer_mock_set_post_step_cb(_simulate_deschedule_in_timer_set);
+    timer_mock_set_post_read_cb(_simulate_deschedule_in_timer_set);
 
     xtimer_t timer_low_offset = {.callback = test_timer_cb};
 
@@ -150,7 +150,7 @@ static void _simulate_deschedule_in_set_absolute(uint32_t now)
 static void test_show_xtimer_set_does_not_handle_overhead(void)
 {
     xtimer_init();
-    timer_mock_set_post_step_cb(_simulate_deschedule_in_set_absolute);
+    timer_mock_set_post_read_cb(_simulate_deschedule_in_set_absolute);
 
     xtimer_t timer_low_offset = {.callback = test_timer_cb};
 

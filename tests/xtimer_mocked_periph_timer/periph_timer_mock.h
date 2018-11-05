@@ -16,10 +16,8 @@ void timer_mock_set(uint32_t ticks);
 
 /*
  * This simulates a function that would be called after the value of
- * `xtimer_now` is calculated
- *
- * And so deschedule after xtimer_now.
+ * `timer_read` is calculated. It is executed after evaluating the return value.
  */
-void timer_mock_set_post_step_cb(void (*post_step_cb)(uint32_t current));
+void timer_mock_set_post_read_cb(void (*post_read_cb)(uint32_t current));
 
 #endif /* PERIPH_TIMER_MOCK_H */
