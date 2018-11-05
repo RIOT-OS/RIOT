@@ -42,8 +42,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define _MAX_MHR_OVERHEAD           (25)
-
 #define _MACACKWAITDURATION         (864 / 16) /* 864us * 62500Hz */
 
 #define KW2XRF_THREAD_FLAG_ISR      (1 << 8)
@@ -103,7 +101,7 @@ static size_t kw2xrf_tx_load(uint8_t *pkt_buf, uint8_t *buf, size_t len, size_t 
 
 static void kw2xrf_tx_exec(kw2xrf_t *dev)
 {
-    if ((dev->netdev.flags & KW2XRF_OPT_AUTOACK) &&
+    if ((dev->netdev.flags & KW2XRF_OPT_ACK_REQ) &&
         (_send_last_fcf & IEEE802154_FCF_ACK_REQ)) {
         kw2xrf_set_sequence(dev, XCVSEQ_TX_RX);
     }
@@ -260,20 +258,22 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     }
 
     switch (opt) {
-        case NETOPT_MAX_PACKET_SIZE:
-            if (len < sizeof(int16_t)) {
-                return -EOVERFLOW;
-            }
-
-            *((uint16_t *)value) = KW2XRF_MAX_PKT_LENGTH - _MAX_MHR_OVERHEAD;
-            return sizeof(uint16_t);
-
         case NETOPT_STATE:
             if (len < sizeof(netopt_state_t)) {
                 return -EOVERFLOW;
             }
             *((netopt_state_t *)value) = _get_state(dev);
             return sizeof(netopt_state_t);
+
+        case NETOPT_AUTOACK:
+            if (dev->netdev.flags & KW2XRF_OPT_AUTOACK) {
+                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            }
+            else {
+                *((netopt_enable_t *)value) = NETOPT_DISABLE;
+            }
+            return sizeof(netopt_enable_t);
+
 
         case NETOPT_PRELOADING:
             if (dev->netdev.flags & KW2XRF_OPT_PRELOADING) {
@@ -452,6 +452,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             /* Set up HW generated automatic ACK after Receive */
             kw2xrf_set_option(dev, KW2XRF_OPT_AUTOACK,
                               ((bool *)value)[0]);
+            res = sizeof(netopt_enable_t);
             break;
 
         case NETOPT_ACK_REQ:

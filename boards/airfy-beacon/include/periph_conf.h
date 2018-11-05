@@ -101,13 +101,15 @@ static const i2c_conf_t i2c_config[] = {
         .dev     = NRF_TWI0,
         .pin_scl = 7,
         .pin_sda = 8,
-        .ppi     = 0
+        .ppi     = 0,
+        .speed   = I2C_SPEED_NORMAL,
     },
     {
         .dev     = NRF_TWI1,
         .pin_scl = 9,
         .pin_sda = 10,
-        .ppi     = 1
+        .ppi     = 1,
+        .speed   = I2C_SPEED_NORMAL,
     }
 };
 

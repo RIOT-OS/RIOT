@@ -17,7 +17,7 @@
  */
 
 /**
- * @ingroup     sys
+ * @ingroup     sys_ubjson
  * @{
  * @file
  * @brief       Universal Binary JSON deserializer

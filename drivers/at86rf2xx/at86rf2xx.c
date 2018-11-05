@@ -81,11 +81,10 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* set default options */
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
     at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_START, false);
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_END, true);
-#ifdef MODULE_NETSTATS_L2
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END, true);
-#endif
+
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+    netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
+                          &enable, sizeof(enable));
 
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
@@ -98,6 +97,18 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
     tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
+
+    /* configure smart idle listening feature */
+#if AT86RF2XX_SMART_IDLE_LISTENING
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_RPC);
+    tmp |= (AT86RF2XX_TRX_RPC_MASK__RX_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__PDT_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__PLL_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__XAH_TX_RPC_EN |
+            AT86RF2XX_TRX_RPC_MASK__IPAN_RPC_EN);
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_RPC, tmp);
+    at86rf2xx_set_rxsensitivity(dev, RSSI_BASE_VAL);
+#endif
 
     /* disable clock output to save power */
     tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_0);
@@ -161,7 +172,7 @@ void at86rf2xx_tx_exec(const at86rf2xx_t *dev)
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
                         AT86RF2XX_TRX_STATE__TX_START);
     if (netdev->event_callback &&
-        (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START)) {
+        (dev->flags & AT86RF2XX_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
 }

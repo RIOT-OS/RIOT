@@ -28,6 +28,7 @@
  *
  * @}
  */
+#include <errno.h>
 #include "cpu.h"
 #include "mutex.h"
 #include "assert.h"
@@ -43,199 +44,192 @@
 #define INVALID_SPEED_MASK  (0x0f)
 
 /**
- * @brief   Initialized bus locks (we have a maximum of two devices...)
+ * @brief   Initialized bus locks
  */
-static mutex_t locks[] = {
-    MUTEX_INIT,
-    MUTEX_INIT
-};
+static mutex_t locks[I2C_NUMOF];
 
-static inline NRF_TWI_Type *dev(i2c_t bus)
+static inline NRF_TWI_Type *i2c(i2c_t dev)
 {
-    return i2c_config[bus].dev;
+    return i2c_config[dev].dev;
 }
 
-static int error(i2c_t bus)
+static int error(i2c_t dev)
 {
-    DEBUG("[i2c] error 0x%02x\n", (int)dev(bus)->ERRORSRC);
-    dev(bus)->ERRORSRC = (TWI_ERRORSRC_DNACK_Clear |
-                          TWI_ERRORSRC_ANACK_Clear |
-                          TWI_ERRORSRC_OVERRUN_Clear);
-    dev(bus)->EVENTS_ERROR = 0;
-    return -1;
+    i2c(dev)->EVENTS_ERROR = 0;
+    DEBUG("[i2c] error 0x%02x\n", (int)i2c(dev)->ERRORSRC);
+    if (i2c(dev)->ERRORSRC & TWI_ERRORSRC_ANACK_Msk) {
+        i2c(dev)->ERRORSRC = TWI_ERRORSRC_ANACK_Msk;
+        DEBUG("[i2c] check_error: NACK on address byte\n");
+        return -ENXIO;
+    }
+    if (i2c(dev)->ERRORSRC & TWI_ERRORSRC_DNACK_Msk) {
+        i2c(dev)->ERRORSRC = TWI_ERRORSRC_DNACK_Msk;
+        DEBUG("[i2c] check_error: NACK on data byte\n");
+        return -EIO;
+    }
+
+    return 0;
 }
 
-static int write(i2c_t bus, uint8_t addr, const void *data, int len, int stop)
+static int write(i2c_t dev, uint16_t addr, const void *data, int len,
+                 uint8_t flags)
 {
     assert(len > 0);
-    if (!(bus < I2C_NUMOF)) {
-        return -1;
-    }
+    assert(dev < I2C_NUMOF);
 
     uint8_t *buf = (uint8_t *)data;
 
-    DEBUG("i2c: writing %i byte to the bus\n", len);
+    DEBUG("[i2c] writing %i byte to the bus\n", len);
 
-    dev(bus)->ADDRESS = (addr & 0x7f);
+    i2c(dev)->ADDRESS = (addr & 0x7f);
 
     for (int i = 0; i < len; i++) {
-        dev(bus)->TXD = *buf++;
-        dev(bus)->EVENTS_TXDSENT = 0;
-        dev(bus)->TASKS_STARTTX = 1;
-        while (!(dev(bus)->EVENTS_TXDSENT) && !(dev(bus)->EVENTS_ERROR)) {}
-        if (dev(bus)->EVENTS_ERROR) {
-            return error(bus);
+        i2c(dev)->TXD = *buf++;
+        i2c(dev)->EVENTS_TXDSENT = 0;
+        i2c(dev)->TASKS_STARTTX = 1;
+        while (!(i2c(dev)->EVENTS_TXDSENT) && !(i2c(dev)->EVENTS_ERROR)) {}
+        if (i2c(dev)->EVENTS_ERROR) {
+            return error(dev);
         }
     }
 
-    if (stop) {
-        dev(bus)->EVENTS_STOPPED = 0;
-        dev(bus)->TASKS_STOP = 1;
-        while (!(dev(bus)->EVENTS_STOPPED) && !(dev(bus)->EVENTS_ERROR)) {}
-        if (dev(bus)->EVENTS_ERROR) {
-            return error(bus);
+    if (!(flags & I2C_NOSTOP)) {
+        i2c(dev)->EVENTS_STOPPED = 0;
+        i2c(dev)->TASKS_STOP = 1;
+        while (!(i2c(dev)->EVENTS_STOPPED) && !(i2c(dev)->EVENTS_ERROR)) {}
+        if (i2c(dev)->EVENTS_ERROR) {
+            return error(dev);
         }
     }
 
     return len;
 }
 
-int i2c_init_master(i2c_t bus, i2c_speed_t speed)
+void i2c_init(i2c_t dev)
 {
-    if (!(bus < I2C_NUMOF)) {
-        return -1;
-    }
-    if (speed & INVALID_SPEED_MASK) {
-        return -2;
-    }
+    assert(dev < I2C_NUMOF);
+
+    /* Initialize mutex */
+    mutex_init(&locks[dev]);
 
     /* power on the bus */
-    dev(bus)->POWER = TWI_POWER_POWER_Enabled;
+    i2c(dev)->POWER = TWI_POWER_POWER_Enabled;
 
     /* pin configuration */
-    NRF_GPIO->PIN_CNF[i2c_config[bus].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
-    NRF_GPIO->PIN_CNF[i2c_config[bus].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
+    NRF_GPIO->PIN_CNF[i2c_config[dev].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
+    NRF_GPIO->PIN_CNF[i2c_config[dev].pin_scl] = (GPIO_PIN_CNF_DRIVE_S0D1 << GPIO_PIN_CNF_DRIVE_Pos);
 
-    dev(bus)->PSELSCL = i2c_config[bus].pin_scl;
-    dev(bus)->PSELSDA = i2c_config[bus].pin_sda;
+    i2c(dev)->PSELSCL = i2c_config[dev].pin_scl;
+    i2c(dev)->PSELSDA = i2c_config[dev].pin_sda;
 
-    NRF_PPI->CHENCLR = (1 << i2c_config[bus].ppi);
-    NRF_PPI->CH[i2c_config[bus].ppi].EEP = (uint32_t)&dev(bus)->EVENTS_BB;
+    NRF_PPI->CHENCLR = (1 << i2c_config[dev].ppi);
+    NRF_PPI->CH[i2c_config[dev].ppi].EEP = (uint32_t)&i2c(dev)->EVENTS_BB;
 
     /* bus clock speed configuration */
-    dev(bus)->FREQUENCY = speed;
+    i2c(dev)->FREQUENCY = i2c_config[dev].speed;
     /* enable the device */
-    dev(bus)->ENABLE = TWI_ENABLE_ENABLE_Enabled;
+    i2c(dev)->ENABLE = TWI_ENABLE_ENABLE_Enabled;
+}
 
+int i2c_acquire(i2c_t dev)
+{
+    assert(dev < I2C_NUMOF);
+
+    mutex_lock(&locks[dev]);
     return 0;
 }
 
-int i2c_acquire(i2c_t bus)
+int i2c_release(i2c_t dev)
 {
-    if (!(bus < I2C_NUMOF)) {
-        return -1;
-    }
-    mutex_lock(&locks[bus]);
+    assert(dev < I2C_NUMOF);
+
+    mutex_unlock(&locks[dev]);
     return 0;
 }
 
-int i2c_release(i2c_t bus)
-{
-    if (!(bus < I2C_NUMOF)) {
-        return -1;
-    }
-    mutex_unlock(&locks[bus]);
-    return 0;
-}
-
-int i2c_read_byte(i2c_t bus, uint8_t address, void *data)
-{
-    return i2c_read_bytes(bus, address, data, 1);
-}
-
-int i2c_read_bytes(i2c_t bus, uint8_t address, void *data, int length)
+int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
+                   uint8_t flags)
 {
     assert(length > 0);
-    if (!(bus < I2C_NUMOF)) {
-        return -1;
+    assert(dev < I2C_NUMOF);
+
+    if (flags & (I2C_NOSTART | I2C_REG16 | I2C_ADDR10)) {
+        return -EOPNOTSUPP;
     }
+
     uint8_t *in_buf = (uint8_t *)data;
 
     DEBUG("[i2c] reading %i byte from the bus\n", length);
 
     /* set the client address */
-    dev(bus)->ADDRESS = (address & 0x7f);
+    i2c(dev)->ADDRESS = (address & 0x7f);
 
     /* setup PPI channel as alternative to the broken SHORTS
      * -> see PAN notice #36: "Shortcuts described in nRF51 Reference Manual are
      *                         not functional." */
     if (length == 1) {
-        NRF_PPI->CH[i2c_config[bus].ppi].TEP = (uint32_t)&dev(bus)->TASKS_STOP;
+        NRF_PPI->CH[i2c_config[dev].ppi].TEP = (uint32_t)&i2c(dev)->TASKS_STOP;
     }
     else {
-        NRF_PPI->CH[i2c_config[bus].ppi].TEP = (uint32_t)&dev(bus)->TASKS_SUSPEND;
+        NRF_PPI->CH[i2c_config[dev].ppi].TEP = (uint32_t)&i2c(dev)->TASKS_SUSPEND;
     }
-    NRF_PPI->CHENSET = (1 << i2c_config[bus].ppi);
+    NRF_PPI->CHENSET = (1 << i2c_config[dev].ppi);
 
-    dev(bus)->EVENTS_RXDREADY = 0;
-    dev(bus)->EVENTS_STOPPED = 0;
-    dev(bus)->TASKS_STARTRX = 1;
+    i2c(dev)->EVENTS_RXDREADY = 0;
+    i2c(dev)->EVENTS_STOPPED = 0;
+    i2c(dev)->TASKS_STARTRX = 1;
 
     for (int i = (length - 1); i >= 0; i--) {
-        while (!(dev(bus)->EVENTS_RXDREADY) && !(dev(bus)->EVENTS_ERROR)) {}
-        if (dev(bus)->EVENTS_ERROR) {
-            return error(bus);
+        while (!(i2c(dev)->EVENTS_RXDREADY) && !(i2c(dev)->EVENTS_ERROR)) {}
+        if (i2c(dev)->EVENTS_ERROR) {
+            return error(dev);
         }
 
-        *in_buf++ = (uint8_t)dev(bus)->RXD;
+        *in_buf++ = (uint8_t)i2c(dev)->RXD;
 
         if (i == 1) {
-            NRF_PPI->CH[i2c_config[bus].ppi].TEP = (uint32_t)&dev(bus)->TASKS_STOP;
+            NRF_PPI->CH[i2c_config[dev].ppi].TEP = (uint32_t)&i2c(dev)->TASKS_STOP;
         }
 
-        dev(bus)->EVENTS_RXDREADY = 0;
-        dev(bus)->TASKS_RESUME = 1;
+        i2c(dev)->EVENTS_RXDREADY = 0;
+        i2c(dev)->TASKS_RESUME = 1;
     }
 
     /* wait for the device to finish up */
-    while (dev(bus)->EVENTS_STOPPED == 0) {}
-    NRF_PPI->CHENCLR = (1 << i2c_config[bus].ppi);
+    while (i2c(dev)->EVENTS_STOPPED == 0) {}
+    NRF_PPI->CHENCLR = (1 << i2c_config[dev].ppi);
 
     return length;
 }
 
-int i2c_read_reg(i2c_t bus, uint8_t address, uint8_t reg, void *data)
+int i2c_read_regs(i2c_t dev, uint16_t address, uint16_t reg,
+                  void *data, size_t length, uint8_t flags)
 {
-    write(bus, address, &reg, 1, 0);
-    return i2c_read_bytes(bus, address, data, 1);
+    if (flags & (I2C_NOSTART | I2C_REG16 | I2C_ADDR10)) {
+        return -EOPNOTSUPP;
+    }
+
+    write(dev, address, &reg, 1, flags | I2C_NOSTOP);
+    return i2c_read_bytes(dev, address, data, length, flags);
 }
 
-int i2c_read_regs(i2c_t bus, uint8_t address, uint8_t reg,
-                  void *data, int length)
+int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data, size_t length,
+                    uint8_t flags)
 {
-    write(bus, address, &reg, 1, 0);
-    return i2c_read_bytes(bus, address, data, length);
+    if (flags & (I2C_NOSTART | I2C_REG16 | I2C_ADDR10)) {
+        return -EOPNOTSUPP;
+    }
+
+    return write(dev, address, data, length, flags);
 }
 
-int i2c_write_byte(i2c_t bus, uint8_t address, uint8_t data)
+int i2c_write_regs(i2c_t dev, uint16_t address, uint16_t reg,
+                   const void *data, size_t length, uint8_t flags)
 {
-    return write(bus, address, &data, 1, 1);
-}
+    if (flags & (I2C_NOSTART | I2C_REG16 | I2C_ADDR10)) {
+        return -EOPNOTSUPP;
+    }
 
-int i2c_write_bytes(i2c_t bus, uint8_t address, const void *data, int length)
-{
-    return write(bus, address, data, length, 1);
-}
-
-int i2c_write_reg(i2c_t bus, uint8_t address, uint8_t reg, uint8_t data)
-{
-    write(bus, address, &reg, 1, 0);
-    return write(bus, address, &data, 1, 1);
-}
-
-int i2c_write_regs(i2c_t bus, uint8_t address, uint8_t reg,
-                   const void *data, int length)
-{
-    write(bus, address, &reg, 1, 0);
-    return write(bus, address, data, length, 1);
+    write(dev, address, &reg, 1, flags | I2C_NOSTOP);
+    return write(dev, address, data, length, flags);
 }

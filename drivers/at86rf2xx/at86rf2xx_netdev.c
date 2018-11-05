@@ -42,8 +42,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define _MAX_MHR_OVERHEAD   (25)
-
 static int _send(netdev_t *netdev, const iolist_t *iolist);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
@@ -119,7 +117,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     }
 
     /* send data out directly if pre-loading id disabled */
-    if (!(dev->netdev.flags & AT86RF2XX_OPT_PRELOADING)) {
+    if (!(dev->flags & AT86RF2XX_OPT_PRELOADING)) {
         at86rf2xx_tx_exec(dev);
     }
     /* return the number of bytes that were actually loaded into the frame
@@ -166,18 +164,39 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     at86rf2xx_fb_read(dev, tmp, 2);
     (void)tmp;
 
+    /* at86rf212  RSSI_BASE_VAL +3.1*RSSI, base varies for diff. modulation and datarates
+     * at86RF232  RSSI_BASE_VAL +3.0*RSSI, base -91dBm
+     * at86RF233  RSSI_BASE_VAL +3.0*RSSI, base -94dBm
+     * at86RF231  RSSI_BASE_VAL +3.0*(RSSI-1), base -91dBm
+     * at***RFR2  RSSI_BASE_VAL +3.0*(RSSI-1), base -90dBm
+     *
+     * AT86RF231 MAN. p.89 8.3.2 Reading RSSI
+     * AT86RF232 MAN. p.88 8.3.2 Reading RSSI
+     * AT86RF233 MAN. p.99 8.4.2 Reading RSSI
+     * "It is not recommended reading the RSSI value when using the Extended
+     * Operating Modes, use ED instead"
+     * at86RF231  RSSI_BASE_VAL +ED, base -90dBm
+     * at86RF232  RSSI_BASE_VAL +ED, base -91dBm
+     * at86RF233  RSSI_BASE_VAL +ED, base -94dBm
+     * at***RFR2  RSSI_BASE_VAL +ED, base -90dBm
+     */
     if (info != NULL) {
         uint8_t rssi = 0;
         netdev_ieee802154_rx_info_t *radio_info = info;
+
+#if defined(MODULE_AT86RF231) || defined(MODULE_AT86RF232) || defined(MODULE_AT86RF233)
         at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
-#ifndef MODULE_AT86RF231
-        at86rf2xx_fb_read(dev, &(rssi), 1);
-        at86rf2xx_fb_stop(dev);
-#else
         at86rf2xx_fb_stop(dev);
         rssi = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
+#else
+        at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
+        at86rf2xx_fb_read(dev, &(rssi), 1);
+        at86rf2xx_fb_stop(dev);
+        rssi = 3 * rssi;
 #endif
         radio_info->rssi = RSSI_BASE_VAL + rssi;
+        DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or"
+              "too much interference.\n", radio_info->lqi, radio_info->rssi);
     }
     else {
         at86rf2xx_fb_stop(dev);
@@ -199,7 +218,7 @@ static int _set_state(at86rf2xx_t *dev, netopt_state_t state)
             at86rf2xx_set_state(dev, AT86RF2XX_STATE_RX_AACK_ON);
             break;
         case NETOPT_STATE_TX:
-            if (dev->netdev.flags & AT86RF2XX_OPT_PRELOADING) {
+            if (dev->flags & AT86RF2XX_OPT_PRELOADING) {
                 /* The netdev driver ISR switches the transceiver back to the
                  * previous idle state after a completed TX. If the user tries
                  * to initiate another transmission (retransmitting the same data)
@@ -263,18 +282,13 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             ((uint8_t *)val)[0] = at86rf2xx_get_page(dev);
             return sizeof(uint16_t);
 
-        case NETOPT_MAX_PACKET_SIZE:
-            assert(max_len >= sizeof(int16_t));
-            *((uint16_t *)val) = AT86RF2XX_MAX_PKT_LENGTH - _MAX_MHR_OVERHEAD;
-            return sizeof(uint16_t);
-
         case NETOPT_STATE:
             assert(max_len >= sizeof(netopt_state_t));
             *((netopt_state_t *)val) = _get_state(dev);
             return sizeof(netopt_state_t);
 
         case NETOPT_PRELOADING:
-            if (dev->netdev.flags & AT86RF2XX_OPT_PRELOADING) {
+            if (dev->flags & AT86RF2XX_OPT_PRELOADING) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -283,7 +297,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return sizeof(netopt_enable_t);
 
         case NETOPT_PROMISCUOUSMODE:
-            if (dev->netdev.flags & AT86RF2XX_OPT_PROMISCUOUS) {
+            if (dev->flags & AT86RF2XX_OPT_PROMISCUOUS) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -293,27 +307,27 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_RX_START_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_START);
+                !!(dev->flags & AT86RF2XX_OPT_TELL_RX_START);
             return sizeof(netopt_enable_t);
 
         case NETOPT_RX_END_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END);
+                !!(dev->flags & AT86RF2XX_OPT_TELL_RX_END);
             return sizeof(netopt_enable_t);
 
         case NETOPT_TX_START_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_START);
+                !!(dev->flags & AT86RF2XX_OPT_TELL_TX_START);
             return sizeof(netopt_enable_t);
 
         case NETOPT_TX_END_IRQ:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END);
+                !!(dev->flags & AT86RF2XX_OPT_TELL_TX_END);
             return sizeof(netopt_enable_t);
 
         case NETOPT_CSMA:
             *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & AT86RF2XX_OPT_CSMA);
+                !!(dev->flags & AT86RF2XX_OPT_CSMA);
             return sizeof(netopt_enable_t);
 
 /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
@@ -545,7 +559,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_CSMA_RETRIES:
             assert(len <= sizeof(uint8_t));
-            if (!(dev->netdev.flags & AT86RF2XX_OPT_CSMA) ||
+            if (!(dev->flags & AT86RF2XX_OPT_CSMA) ||
                 (*((uint8_t *)val) > 5)) {
                 /* If CSMA is disabled, don't allow setting retries */
                 res = -EINVAL;
@@ -609,7 +623,7 @@ static void _isr(netdev_t *netdev)
         if ((state == AT86RF2XX_STATE_RX_AACK_ON)
             || (state == AT86RF2XX_STATE_BUSY_RX_AACK)) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");
-            if (!(dev->netdev.flags & AT86RF2XX_OPT_TELL_RX_END)) {
+            if (!(dev->flags & AT86RF2XX_OPT_TELL_RX_END)) {
                 return;
             }
             netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
@@ -632,7 +646,7 @@ static void _isr(netdev_t *netdev)
 
             DEBUG("[at86rf2xx] EVT - TX_END\n");
 
-            if (netdev->event_callback && (dev->netdev.flags & AT86RF2XX_OPT_TELL_TX_END)) {
+            if (netdev->event_callback && (dev->flags & AT86RF2XX_OPT_TELL_TX_END)) {
                 switch (trac_status) {
 #ifdef MODULE_OPENTHREAD
                     case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:

@@ -67,8 +67,15 @@ their dependencies.
 Modules outside of RIOTBASE                      {#modules-outside-of-riotbase}
 ===========================
 Modules can be defined outside `RIOTBASE`. In addition to add it to `USEMODULE`
-the user needs to add the path to the module to `EXTERNAL_MODULE_DIRS` and add
-the include path to the API definitions to `INCLUDES`.
+the user needs to add the module path to `EXTERNAL_MODULE_DIRS`.
+
+The external module can optionally define the following files:
+* `Makefile.include` file to set global build configuration like `CFLAGS` or add
+  API headers include paths to the `USEMODULE_INCLUDES` variable.
+* `Makefile.dep` file to set module dependencies
+
+An example can be found in
+[`tests/external_module_dirs`](https://github.com/RIOT-OS/RIOT/tree/master/tests/external_module_dirs)
 
 Pseudomodules                                                  {#pseudomodules}
 =============

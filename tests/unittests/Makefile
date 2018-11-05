@@ -11,6 +11,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              arduino-zero \
                              avsextrem \
                              b-l072z-lrwan1 \
+                             blackpill \
                              bluepill \
                              calliope-mini \
                              cc2538dk \
@@ -19,8 +20,10 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              chronos \
                              ek-lm4f120xl \
                              feather-m0 \
+                             firefly \
                              ikea-tradfri \
                              limifrog-v1 maple-mini \
+                             lobaro-lorabox \
                              mbed_lpc1768 \
                              mega-xplained \
                              microbit \
@@ -49,6 +52,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              opencm904 \
                              openmote \
                              openmote-cc2538 \
+                             openmote-b \
                              pba-d-01-kw2x \
                              remote-pa \
                              remote-reva \
@@ -56,17 +60,19 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              saml21-xpro \
                              samd21-xpro \
                              samr21-xpro \
+                             samr30-xpro \
                              seeeduino_arch-pro \
+                             sensebox_samd21 \
                              slstk3401a \
                              sltb001a \
                              slwstk6220a \
                              sodaq-autonomo \
                              sodaq-explorer \
+                             sodaq-one \
                              spark-core \
                              stk3600 \
                              stm32f0discovery \
                              stm32f3discovery \
-                             stm32mindev \
                              teensy31 \
                              telosb \
                              waspmote-pro \
@@ -104,6 +110,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        ek-lm4f120xl \
                        f4vi1 \
                        feather-m0 \
+                       firefly \
                        fox \
                        frdm-k22f \
                        frdm-k64f \
@@ -163,6 +170,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        samd21-xpro \
                        saml21-xpro \
                        samr21-xpro \
+                       samr30-xpro \
                        seeeduino_arch-pro \
                        slstk3401a \
                        slstk3402a \
@@ -171,6 +179,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        slwstk6220a \
                        sodaq-autonomo \
                        sodaq-explorer \
+                       sodaq-one \
                        spark-core \
                        stk3600 \
                        stk3700 \
@@ -226,9 +235,6 @@ ifneq (, $(filter $(AVR_BOARDS), $(BOARD)))
   LARGE_STACK_TESTS += tests-qDSA
 endif
 
-LARGE_STACK_TESTS += tests-hacl
-LARGE_STACK_TESTS += tests-libcose
-LARGE_STACK_TESTS += tests-tweetnacl
 ifneq (,$(filter $(LARGE_STACK_TESTS), $(UNIT_TESTS)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF\)
 endif
@@ -265,6 +271,3 @@ ifeq (, $(UNIT_TESTS))
 else
   CFLAGS += -DTEST_SUITES='$(subst $() $(),$(charCOMMA),$(UNIT_TESTS:tests-%=%))'
 endif
-
-test:
-	./tests/01-run.py

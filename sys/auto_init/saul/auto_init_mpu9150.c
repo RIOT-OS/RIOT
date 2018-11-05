@@ -21,6 +21,7 @@
 
 #ifdef MODULE_MPU9150
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "mpu9150.h"

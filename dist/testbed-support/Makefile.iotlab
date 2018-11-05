@@ -72,7 +72,8 @@ iotlab-stop: $(IOTLAB_AUTH) iotlab-check-exp
 	$(Q)iotlab-experiment stop -i $(IOTLAB_EXP_ID)
 
 iotlab-term: iotlab-check-exp
-	$(Q)ssh -t $(IOTLAB_AUTHORITY) "test -f ~/.iotlabrc || iotlab-auth -u $(IOTLAB_USER)"
+	$(Q)ssh -t $(IOTLAB_AUTHORITY) "iotlab-experiment get -r > /dev/null || \
+	                                iotlab-auth -u $(IOTLAB_USER)"
 
 	$(Q)ssh -t $(IOTLAB_AUTHORITY) \
 	"tmux attach -t riot-$(IOTLAB_EXP_ID) || tmux new -s riot-$(IOTLAB_EXP_ID) \

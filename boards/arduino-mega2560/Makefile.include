@@ -14,4 +14,7 @@ export FFLAGS += -p m2560
 # overridden for debugging (which requires changes that require to use an ISP)
 export PROGRAMMER ?= stk500v2
 
+BOOTLOADER_SIZE ?= 8K
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

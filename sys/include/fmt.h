@@ -92,6 +92,17 @@ size_t fmt_bytes_hex(char *out, const uint8_t *ptr, size_t n);
 size_t fmt_bytes_hex_reverse(char *out, const uint8_t *ptr, size_t n);
 
 /**
+ * @brief Converts a sequence of two hex characters to a byte
+ *
+ * The hex characters sequence must contain valid hexadecimal characters
+ * otherwise the result is undefined.
+ *
+ * @param[in]  hex  Pointer to input buffer
+ * @returns    byte based on hex string
+ */
+uint8_t fmt_hex_byte(const char *hex);
+
+/**
  * @brief Converts a sequence of hex bytes to an array of bytes
  *
  * The sequence of hex characters must have an even length:

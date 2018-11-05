@@ -49,6 +49,16 @@ extern "C"
 #endif
 
 /**
+ * @name    Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REGS
+/** @} */
+
+/**
  * @brief global in-ISR state variable
  */
 extern volatile uint8_t __in_isr;

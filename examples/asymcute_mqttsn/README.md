@@ -7,9 +7,9 @@ of topics, and publishing of data.
 ## Setup
 For this application to do anything useful, a running MQTT-SN gateway is needed.
 If you don't have access to one, RIOT provides a simple way to start one locally
-by providing a dedicated `rsmb` make target, type:
+by providing a dedicated `mosquitto_rsmb` make target, type:
 ```
-make rsmb
+make mosquitto_rsmb
 ```
 
 This will download, build, and run the Eclipse Mosquitto.rsmb 'Really Small

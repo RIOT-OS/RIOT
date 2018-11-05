@@ -1,6 +1,20 @@
 INCLUDES += -I$(RIOTBASE)/pkg/lwip/include \
             -I$(PKGDIRBASE)/lwip/src/include
 
+PSEUDOMODULES += lwip_arp
+PSEUDOMODULES += lwip_autoip
+PSEUDOMODULES += lwip_dhcp
+PSEUDOMODULES += lwip_ethernet
+PSEUDOMODULES += lwip_igmp
+PSEUDOMODULES += lwip_ipv6_autoconfig
+PSEUDOMODULES += lwip_ipv6_mld
+PSEUDOMODULES += lwip_raw
+PSEUDOMODULES += lwip_sixlowpan
+PSEUDOMODULES += lwip_stats
+PSEUDOMODULES += lwip_tcp
+PSEUDOMODULES += lwip_udp
+PSEUDOMODULES += lwip_udplite
+
 ifneq (,$(filter lwip_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib
 endif

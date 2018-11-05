@@ -47,7 +47,7 @@ void crypto_block_inc_ctr(uint8_t block[16], int L);
  *
  * @returns 0 iff the blocks are non-equal.
  */
-int crypto_equals(uint8_t *a, uint8_t *b, size_t len);
+int crypto_equals(const uint8_t *a, const uint8_t *b, size_t len);
 
 #ifdef __cplusplus
 }

@@ -10,9 +10,10 @@
 /**
  * @defgroup    drivers_tcs37727 TCS37727 RGB Light Sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the AMS TCS37727 Color Light-To-Digital Converter
  *
- *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
@@ -28,7 +29,6 @@
 
 #include <stdint.h>
 
-#include "saul.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
@@ -81,11 +81,6 @@ enum {
     TCS37727_NOBUS  = -1,   /**< access to the configured I2C bus failed */
     TCS37727_NODEV  = -2    /**< no TCS37727 device found on the bus */
 };
-
-/**
- * @brief   Export the sensor's SAUL interface
- */
-extern const saul_driver_t tcs37727_saul_driver;
 
 /**
  * @brief   Initialize the given TCS37727 sensor

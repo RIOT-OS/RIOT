@@ -32,22 +32,26 @@ extern "C" {
  * @{
  */
 #ifndef HDC1000_PARAM_I2C
-#define HDC1000_PARAM_I2C           I2C_DEV(0)
+#define HDC1000_PARAM_I2C            I2C_DEV(0)
 #endif
 #ifndef HDC1000_PARAM_ADDR
-#define HDC1000_PARAM_ADDR          (HDC1000_I2C_ADDRESS)
+#define HDC1000_PARAM_ADDR           (HDC1000_I2C_ADDRESS)
 #endif
 #ifndef HDC1000_PARAM_RES
-#define HDC1000_PARAM_RES           HDC1000_14BIT
+#define HDC1000_PARAM_RES            HDC1000_14BIT
+#endif
+#ifndef HDC1000_PARAM_RENEW_INTERVAL
+#define HDC1000_PARAM_RENEW_INTERVAL (1000000ul)
 #endif
 
 #ifndef HDC1000_PARAMS
-#define HDC1000_PARAMS              { .i2c  = HDC1000_PARAM_I2C,  \
-                                      .addr = HDC1000_PARAM_ADDR, \
-                                      .res  = HDC1000_PARAM_RES }
+#define HDC1000_PARAMS               { .i2c  = HDC1000_PARAM_I2C,  \
+                                       .addr = HDC1000_PARAM_ADDR, \
+                                       .res  = HDC1000_PARAM_RES, \
+                                       .renew_interval = HDC1000_PARAM_RENEW_INTERVAL }
 #endif
 #ifndef HDC1000_SAUL_INFO
-#define HDC1000_SAUL_INFO           { .name = "hdc1000" }
+#define HDC1000_SAUL_INFO            { .name = "hdc1000" }
 #endif
 /**@}*/
 

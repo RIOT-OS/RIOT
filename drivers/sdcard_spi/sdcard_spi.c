@@ -426,7 +426,7 @@ char sdcard_spi_send_cmd(sdcard_spi_t *card, char sd_cmd_idx, uint32_t argument,
     char echo[sizeof(cmd_data)];
 
     do {
-        DEBUG("sdcard_spi_send_cmd: CMD%02d (0x%08lx) (retry %d)\n", sd_cmd_idx, argument, try_cnt);
+        DEBUG("sdcard_spi_send_cmd: CMD%02d (0x%08" PRIx32 ") (retry %d)\n", sd_cmd_idx, argument, try_cnt);
 
         if (!_wait_for_not_busy(card, SD_WAIT_FOR_NOT_BUSY_CNT)) {
             DEBUG("sdcard_spi_send_cmd: timeout while waiting for bus to be not busy!\n");
@@ -475,7 +475,7 @@ char sdcard_spi_send_acmd(sdcard_spi_t *card, char sd_cmd_idx, uint32_t argument
     char r1_resu;
 
     do {
-        DEBUG("sdcard_spi_send_acmd: CMD%02d (0x%08lx)(retry %d)\n", sd_cmd_idx, argument, err_cnt);
+        DEBUG("sdcard_spi_send_acmd: CMD%02d (0x%08" PRIx32 ")(retry %d)\n", sd_cmd_idx, argument, err_cnt);
         r1_resu = sdcard_spi_send_cmd(card, SD_CMD_55, SD_CMD_NO_ARG, 0);
         if (R1_VALID(r1_resu) && !R1_ERROR(r1_resu)) {
             r1_resu = sdcard_spi_send_cmd(card, sd_cmd_idx, argument, 0);
@@ -1009,7 +1009,7 @@ uint64_t sdcard_spi_get_capacity(sdcard_spi_t *card)
         return blocknr * block_len;
     }
     else if (card->csd_structure == SD_CSD_V2) {
-        return (card->csd.v2.C_SIZE + 1) * (uint64_t)(SD_HC_BLOCK_SIZE << 10);
+        return (card->csd.v2.C_SIZE + 1) * (((uint64_t)SD_HC_BLOCK_SIZE) << 10);
     }
     return 0;
 }

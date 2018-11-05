@@ -41,7 +41,6 @@ int io1_xplained_init(io1_xplained_t *dev, const io1_xplained_params_t *params)
     /* Initialize I2C interface */
     if (at30tse75x_init(&dev->temp,
                         I2C_DEV(0),
-                        I2C_SPEED_NORMAL,
                         (IO1_TEMPERATURE_BASE_ADDR | dev->params.addr)) < 0) {
         DEBUG("[io1_xplained] Cannot initialize temperature sensor.\n");
         return -IO1_XPLAINED_NOTEMP;

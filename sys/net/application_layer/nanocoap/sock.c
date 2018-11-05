@@ -94,8 +94,8 @@ ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, uint8_t *buf, size
     uint8_t *pktpos = buf;
 
     pkt.hdr = (coap_hdr_t*)buf;
-    pktpos += coap_build_hdr(pkt.hdr, COAP_REQ, NULL, 0, COAP_METHOD_GET, 1);
-    pktpos += coap_put_option_uri(pktpos, 0, path, COAP_OPT_URI_PATH);
+    pktpos += coap_build_hdr(pkt.hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET, 1);
+    pktpos += coap_opt_put_uri_path(pktpos, 0, path);
     pkt.payload = pktpos;
     pkt.payload_len = 0;
 

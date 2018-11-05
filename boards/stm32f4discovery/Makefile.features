@@ -1,7 +1,7 @@
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dac
-FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_rtc
@@ -19,4 +19,4 @@ FEATURES_MCU_GROUP = cortex_m4_2
 FEATURES_CONFLICT += periph_spi:periph_dac
 FEATURES_CONFLICT_MSG += "On stm32f4discovery boards there are the same pins for the DAC and/or SPI_0."
 
--include $(RIOTCPU)/stm32f4/Makefile.features
+include $(RIOTCPU)/stm32f4/Makefile.features

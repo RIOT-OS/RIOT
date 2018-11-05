@@ -242,6 +242,8 @@ KINETIS_UART_WRITE_INLINE void uart_write_uart(uart_t uart, const uint8_t *data,
     }
 }
 
+#if defined(UART_0_ISR) || defined(UART_1_ISR) || defined(UART_2_ISR) || \
+    defined(UART_3_ISR) || defined(UART_4_ISR)
 static inline void irq_handler_uart(uart_t uart)
 {
     UART_Type *dev = uart_config[uart].dev;
@@ -273,6 +275,7 @@ static inline void irq_handler_uart(uart_t uart)
 
     cortexm_isr_end();
 }
+#endif
 
 #ifdef UART_0_ISR
 void UART_0_ISR(void)
@@ -358,6 +361,8 @@ KINETIS_UART_WRITE_INLINE void uart_write_lpuart(uart_t uart, const uint8_t *dat
     }
 }
 
+#if defined(LPUART_0_ISR) || defined(LPUART_1_ISR) || defined(LPUART_2_ISR) || \
+    defined(LPUART_3_ISR) || defined(LPUART_4_ISR)
 static inline void irq_handler_lpuart(uart_t uart)
 {
     LPUART_Type *dev = uart_config[uart].dev;
@@ -394,6 +399,7 @@ static inline void irq_handler_lpuart(uart_t uart)
 
     cortexm_isr_end();
 }
+#endif
 
 #ifdef LPUART_0_ISR
 void LPUART_0_ISR(void)

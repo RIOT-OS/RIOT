@@ -274,11 +274,39 @@ typedef enum {
  * @brief   CPU specific ADC configuration
  */
 typedef struct {
-    ADC_Type *dev;          /**< ADC device */
-    gpio_t pin;             /**< pin to use, set to GPIO_UNDEF for internal
-                             *   channels */
-    uint8_t chan;           /**< ADC channel */
+    /**
+     * @brief   ADC module
+     */
+    ADC_Type *dev;
+    /**
+     * @brief   pin to use
+     *
+     * Use GPIO_UNDEF non-muxed ADC pins, e.g. ADC0_DP, or for internal channels, e.g. Bandgap
+     */
+    gpio_t pin;
+    /**
+     * @brief   ADC channel
+     *
+     * Written as-is to ADCx_SC1x before conversion. This also decides
+     * single-ended or differential sampling, see CPU reference manual for ADCx_SC1x
+     */
+    uint8_t chan;
+    /**
+     * @brief   Hardware averaging configuration
+     *
+     * Written as-is to ADCx_SC3 before conversion, use @ref ADC_AVG_NONE and
+     * @ref ADC_AVG_MAX as a shorthand notation in the board configuration */
+    uint8_t avg;
 } adc_conf_t;
+
+/**
+ * @brief   Disable hardware averaging
+ */
+#define ADC_AVG_NONE    (0)
+/**
+ * @brief   Maximum hardware averaging (32 samples)
+ */
+#define ADC_AVG_MAX     (ADC_SC3_AVGE_MASK | ADC_SC3_AVGS(3))
 
 #if defined(DAC0_BASE) && (DAC0_BASE != This_symbol_has_been_deprecated)
 /**
@@ -330,6 +358,41 @@ typedef struct {
     uint8_t ftm_num;        /**< FTM number used */
 } pwm_conf_t;
 #endif
+
+#ifndef DOXYGEN
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       =   10000ul, /**< low speed mode:     ~10 kbit/s */
+    I2C_SPEED_NORMAL    =  100000ul, /**< normal mode:       ~100 kbit/s */
+    I2C_SPEED_FAST      =  400000ul, /**< fast mode:         ~400 kbit/s */
+    I2C_SPEED_FAST_PLUS = 1000000ul, /**< fast plus mode:   ~1000 kbit/s */
+    /* High speed is not supported without external hardware hacks */
+    I2C_SPEED_HIGH      = 3400000ul, /**< high speed mode:  ~3400 kbit/s */
+} i2c_speed_t;
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+/** @} */
+#endif /* !defined(DOXYGEN) */
+
+/**
+ * @brief   I2C configuration structure
+ */
+typedef struct {
+    I2C_Type *i2c;          /**< Pointer to hardware module registers */
+    gpio_t scl_pin;         /**< SCL GPIO pin */
+    gpio_t sda_pin;         /**< SDA GPIO pin */
+    uint32_t freq;          /**< I2C module clock frequency, usually CLOCK_BUSCLOCK or CLOCK_CORECLOCK */
+    i2c_speed_t speed;      /**< Configured bus speed, actual speed may be lower but never higher */
+    IRQn_Type irqn;         /**< IRQ number for this module */
+    uint32_t scl_pcr;       /**< PORT module PCR setting for the SCL pin */
+    uint32_t sda_pcr;       /**< PORT module PCR setting for the SDA pin */
+} i2c_conf_t;
 
 /**
  * @brief   SPI module configuration options

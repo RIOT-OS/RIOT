@@ -71,22 +71,24 @@ typedef struct {
 } adc_conf_t;
 
 /**
- * @brief   I2C configuration data structure
- */
-typedef struct {
-    I2C_TypeDef *dev;       /**< i2c device */
-    gpio_t scl;             /**< scl pin number */
-    gpio_t sda;             /**< sda pin number */
-    gpio_mode_t pin_mode;   /**< with or without pull resistor */
-    gpio_af_t af;           /**< I2C alternate function value */
-    uint8_t ev_irqn;        /**< event IRQ */
-} i2c_conf_t;
-
-/**
  * @brief   Override the default initial PM blocker
  * @todo   we block all modes per default, until PM is cleanly implemented
  */
 #define PM_BLOCKER_INITIAL  { .val_u32 = 0x01010101 }
+
+/**
+ * @name    EEPROM configuration
+ * @{
+ */
+#define EEPROM_START_ADDR          (0x08080000)
+#if defined(CPU_MODEL_STM32L073RZ) || defined(CPU_MODEL_STM32L072CZ)
+#define EEPROM_SIZE                (6144U)  /* 6kB */
+#elif defined(CPU_MODEL_STM32L053R8)
+#define EEPROM_SIZE                (2048U)  /* 2kB */
+#elif defined(CPU_MODEL_STM32L031K6)
+#define EEPROM_SIZE                (1024U)  /* 1kB */
+#endif
+/** @} */
 
 #ifdef __cplusplus
 }

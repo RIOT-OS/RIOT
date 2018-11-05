@@ -162,6 +162,10 @@ ifneq (,$(filter mag3110,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mag3110/include
 endif
 
+ifneq (,$(filter mma7660,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mma7660/include
+endif
+
 ifneq (,$(filter mma8x5x,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/mma8x5x/include
 endif
@@ -210,12 +214,20 @@ ifneq (,$(filter si114x,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/si114x/include
 endif
 
+ifneq (,$(filter ds18,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ds18/include
+endif
+
 ifneq (,$(filter si70xx,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/si70xx/include
 endif
 
 ifneq (,$(filter soft_spi,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/soft_spi/include
+endif
+
+ifneq (,$(filter srf04,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/srf04/include
 endif
 
 ifneq (,$(filter sx127x,$(USEMODULE)))
@@ -234,8 +246,16 @@ ifneq (,$(filter tsl2561,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tsl2561/include
 endif
 
+ifneq (,$(filter tsl4531x,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/tsl4531x/include
+endif
+
 ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/uart_half_duplex/include
+endif
+
+ifneq (,$(filter vcnl40x0,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/vcnl40x0/include
 endif
 
 ifneq (,$(filter veml6070,$(USEMODULE)))

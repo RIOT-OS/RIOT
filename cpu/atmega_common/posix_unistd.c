@@ -22,8 +22,8 @@
 #ifdef MODULE_VFS
 #include <fcntl.h>
 #include "vfs.h"
-#elif defined(MODULE_UART_STDIO)
-#include "uart_stdio.h"
+#elif defined(MODULE_STDIO_UART)
+#include "stdio_uart.h"
 #endif
 
 int open(const char *name, int flags, ...)
@@ -136,9 +136,9 @@ ssize_t read(int fd, void *dest, size_t count)
         return -1;
     }
     return res;
-#elif defined(MODULE_UART_STDIO)
+#elif defined(MODULE_STDIO_UART)
     if (fd == 0) {
-        return uart_stdio_read(dest, count);
+        return stdio_read(dest, count);
     }
     errno = EBADF;
     return -1;
@@ -160,9 +160,9 @@ ssize_t write(int fd, const void *src, size_t count)
         return -1;
     }
     return res;
-#elif defined(MODULE_UART_STDIO)
+#elif defined(MODULE_STDIO_UART)
     if (fd == 0) {
-        return uart_stdio_write(src, count);
+        return stdio_write(src, count);
     }
     errno = EBADF;
     return -1;

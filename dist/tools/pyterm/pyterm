@@ -55,9 +55,9 @@ try:
     from twisted.internet.protocol import Protocol, \
         ReconnectingClientFactory
 except ImportError:
-    logging.getLogger("").warn("Twisted not available, please install "
-                               "it if you want to use pyterm's JSON "
-                               "capabilities")
+    logging.getLogger("").warning("Twisted not available, please install "
+                                  "it if you want to use pyterm's JSON "
+                                  "capabilities")
 
     class Protocol():
         def __init__(self):
@@ -105,7 +105,7 @@ class SerCmd(cmd.Cmd):
     def __init__(self, port=None, baudrate=None, toggle=None, tcp_serial=None,
                  confdir=None, conffile=None, host=None, run_name=None,
                  log_dir_name=None, newline=None, formatter=None,
-                 serprompt=None):
+                 set_rts=None, set_dtr=None, serprompt=None):
         """Constructor.
 
         Args:
@@ -124,6 +124,8 @@ class SerCmd(cmd.Cmd):
         self.port = port
         self.baudrate = baudrate
         self.toggle = toggle
+        self.set_rts = set_rts
+        self.set_dtr = set_dtr
         self.tcp_serial = tcp_serial
         self.configdir = confdir
         self.configfile = conffile
@@ -204,8 +206,8 @@ class SerCmd(cmd.Cmd):
                 host = self.tcp_serial.split(':')[0]
                 port = self.tcp_serial.split(':')[1]
             else:
-                self.logger.warn("Host name for TCP connection is "
-                                 "missing, defaulting to \"localhost\"")
+                self.logger.warning("Host name for TCP connection is "
+                                    "missing, defaulting to \"localhost\"")
                 host = "localhost"
                 port = self.tcp_serial
             self.logger.info("Connect to %s:%s"
@@ -285,6 +287,12 @@ class SerCmd(cmd.Cmd):
         node.
         """
         self.ser.write("help\n".encode("utf-8"))
+
+    def do_EOF(self, line):
+        """Handle EOF (Ctrl+D) nicely."""
+        self.logger.debug("Received EOF")
+        self.do_PYTERM_exit("")
+        sys.exit(0)
 
     def complete_date(self, text, line, begidx, endidm):
         """Auto completion for date string.
@@ -487,7 +495,7 @@ class SerCmd(cmd.Cmd):
     def load_config(self):
         """Internal function to laod configuration from file.
         """
-        self.config = configparser.SafeConfigParser()
+        self.config = configparser.ConfigParser()
         cf = os.path.join(self.configdir, self.configfile)
         self.config.read(cf)
         logging.getLogger("").info("Reading file: %s" % cf)
@@ -602,9 +610,16 @@ class SerCmd(cmd.Cmd):
     def serial_connect(self):
         self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0)
         self.ser.baudrate = self.baudrate
+
         if self.toggle:
             self.ser.setDTR(0)
             self.ser.setRTS(0)
+
+        if self.set_rts == 1 or self.set_rts == 0:
+            self.ser.setRTS(self.set_rts)
+
+        if self.set_dtr == 1 or self.set_dtr == 0:
+            self.ser.setDTR(self.set_dtr)
 
     def reader(self):
         """Serial or TCP reader.
@@ -620,13 +635,13 @@ class SerCmd(cmd.Cmd):
                 c = sr.read(1)
             # try to re-open it with a timeout of 1s otherwise
             except (serial.SerialException, ValueError):
-                self.logger.warn("Serial port disconnected, waiting to "
-                                 "get reconnected...")
+                self.logger.warning("Serial port disconnected, waiting to "
+                                    "get reconnected...")
                 self.ser.close()
                 time.sleep(1)
                 if os.path.exists(self.port):
-                    self.logger.warn("Try to reconnect to %s again..."
-                                     % (self.port))
+                    self.logger.warning("Try to reconnect to %s again..."
+                                        % (self.port))
                     try:
                         self.serial_connect()
                         self.logger.info("Reconnected to serial port %s" % self.port)
@@ -703,8 +718,8 @@ class fdsocket(socket.socket):
         try:
             return self.sendall(string)
         except socket.error as e:
-            logging.getLogger("").warn("Error in TCP connection (%s), "
-                                       "closing down" % str(e))
+            logging.getLogger("").warning("Error in TCP connection (%s), "
+                                          "closing down" % str(e))
             self.close()
             sys.exit(0)
 
@@ -729,6 +744,18 @@ if __name__ == "__main__":
                         action="store_true",
                         help="toggles the DTR and RTS pin of the serial line "
                         "when connecting, default is not toggling the pins")
+    parser.add_argument("-sr", "--set-rts",
+                        dest="set_rts",
+                        type=int,
+                        action="store",
+                        default=None,
+                        help="Specifies the value of RTS pin")
+    parser.add_argument("-sd", "--set-dtr",
+                        dest="set_dtr",
+                        type=int,
+                        action="store",
+                        default=None,
+                        help="Specifies the value of DTR pin")
     parser.add_argument('-d', '--directory',
                         help="Specify the Pyterm directory, default is %s"
                         % defaultdir,
@@ -772,7 +799,8 @@ if __name__ == "__main__":
         args.format = ""
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
                      args.directory, args.config, args.host, args.run_name,
-                     args.log_dir_name, args.newline, args.format, args.prompt)
+                     args.log_dir_name, args.newline, args.format,
+                     args.set_rts, args.set_dtr, args.prompt)
     myshell.prompt = ''
 
     try:

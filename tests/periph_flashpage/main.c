@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -27,24 +28,27 @@
 
 #define LINE_LEN            (16)
 
-/**
- * @brief   Allocate space for 1 flash page in RAM
- */
-static uint8_t page_mem[FLASHPAGE_SIZE];
-
+/* When writing raw bytes on flash, data must be correctly aligned. */
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
+#define ALIGNMENT_ATTR __attribute__ ((aligned (FLASHPAGE_RAW_ALIGNMENT)))
+
 /*
  * @brief   Allocate an aligned buffer for raw writings
  */
-static char raw_buf[64] __attribute__ ((aligned (FLASHPAGE_RAW_ALIGNMENT)));
-
-static uint32_t getaddr(const char *str)
-{
-    uint32_t addr = strtol(str, NULL, 16);
-
-    return addr;
-}
+static char raw_buf[64] ALIGNMENT_ATTR;
+#else
+#define ALIGNMENT_ATTR
 #endif
+
+/**
+ * @brief   Allocate space for 1 flash page in RAM
+ *
+ * @note    The flash page in RAM must be correctly aligned, even in RAM, when
+ *          using flashpage_raw. This is because some architecture uses
+ *          32 bit alignment implicitly and there are cases (stm32l4) that
+ *          requires 64 bit alignment.
+ */
+static uint8_t page_mem[FLASHPAGE_SIZE] ALIGNMENT_ATTR;
 
 static int getpage(const char *str)
 {
@@ -179,6 +183,13 @@ static int cmd_write(int argc, char **argv)
 }
 
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
+static uint32_t getaddr(const char *str)
+{
+    uint32_t addr = strtol(str, NULL, 16);
+
+    return addr;
+}
+
 static int cmd_write_raw(int argc, char **argv)
 {
     uint32_t addr;
@@ -195,7 +206,7 @@ static int cmd_write_raw(int argc, char **argv)
 
     flashpage_write_raw((void*)addr, raw_buf, strlen(raw_buf));
 
-    printf("wrote local data to flash address %#lx of len %u\n",
+    printf("wrote local data to flash address %#" PRIx32 " of len %u\n",
            addr, strlen(raw_buf));
     return 0;
 }
@@ -279,6 +290,58 @@ static int cmd_test(int argc, char **argv)
     return 0;
 }
 
+/**
+ * @brief   Does a write and verify test on last page available
+ *
+ * @note    Since every hardware can have different flash layouts for
+ *          automated testing we always write to the last page available
+ *          so we are independent of the size or layout
+ */
+static int cmd_test_last(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+    char fill = 'a';
+
+    for (unsigned i = 0; i < sizeof(page_mem); i++) {
+        page_mem[i] = (uint8_t)fill++;
+        if (fill > 'z') {
+            fill = 'a';
+        }
+    }
+
+    if (flashpage_write_and_verify((int)FLASHPAGE_NUMOF - 2, page_mem) != FLASHPAGE_OK) {
+        puts("error verifying the content of last page");
+        return 1;
+    }
+
+    puts("wrote local page buffer to last flash page");
+    return 0;
+}
+
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+/**
+ * @brief   Does a short raw write on last page available
+ *
+ * @note    Since every hardware can have different flash layouts for
+ *          automated testing we always write to the last page available
+ *          so we are independent of the size or layout
+ */
+static int cmd_test_last_raw(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    /* try to align */
+    memcpy(raw_buf, "test12344321tset", 16);
+
+    flashpage_write_raw((void*) ((int)CPU_FLASH_BASE + (int)FLASHPAGE_SIZE * ((int)FLASHPAGE_NUMOF - 2)), raw_buf, strlen(raw_buf));
+
+    puts("wrote raw short buffer to last flash page");
+    return 0;
+}
+#endif
+
 static const shell_command_t shell_commands[] = {
     { "info", "Show information about pages", cmd_info },
     { "dump", "Dump the selected page to STDOUT", cmd_dump },
@@ -291,6 +354,10 @@ static const shell_command_t shell_commands[] = {
     { "erase", "Erase the given page buffer", cmd_erase },
     { "edit", "Write bytes to the local page buffer", cmd_edit },
     { "test", "Write and verify test pattern", cmd_test },
+    { "test_last", "Write and verify test pattern on last page available", cmd_test_last },
+#ifdef MODULE_PERIPH_FLASHPAGE_RAW
+    { "test_last_raw", "Write and verify raw short write on last page available", cmd_test_last_raw },
+#endif
     { NULL, NULL, NULL }
 };
 

@@ -12,7 +12,9 @@
  */
 
 /**
- * @ingroup     sys_hashes
+ * @defgroup    sys_hashes_sha3 SHA-3
+ * @ingroup     sys_hashes_unkeyed
+ * @brief       Implementation of the SHA-3 hashing function
  * @{
  *
  * @file
@@ -31,8 +33,19 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Length of SHA256 digests in bytes
+ */
 #define SHA3_256_DIGEST_LENGTH 32
+
+/**
+ * @brief   Length of SHA384 digests in bytes
+ */
 #define SHA3_384_DIGEST_LENGTH 48
+
+/**
+ * @brief   Length of SHA512 digests in bytes
+ */
 #define SHA3_512_DIGEST_LENGTH 64
 
 /**

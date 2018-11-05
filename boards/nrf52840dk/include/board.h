@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_nrf52840dk nRF52840 DK
- * @ingroup     boards
- * @brief       Support for the nRF52840 DK
+ * @ingroup     boards_nrf52840dk
  * @{
  *
  * @file

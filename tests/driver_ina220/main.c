@@ -48,10 +48,6 @@ int main(void)
     int16_t val;
 
     puts("INA220 sensor driver test application\n");
-    printf("Initializing I2C_%i... ", TEST_INA220_I2C);
-    if (i2c_init_master(TEST_INA220_I2C, I2C_SPEED_FAST) < 0) {
-        return -1;
-    }
 
     printf("Initializing INA220 sensor at I2C_%i, address 0x%02x... ",
         TEST_INA220_I2C, TEST_INA220_ADDR);

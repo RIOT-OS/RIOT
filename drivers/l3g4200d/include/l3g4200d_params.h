@@ -50,12 +50,17 @@ extern "C" {
 #define L3G4200D_PARAM_SCALE        (L3G4200D_SCALE_500DPS)
 #endif
 
-#define L3G4200D_PARAMS_DEFAULT     { .i2c      = L3G4200D_PARAM_I2C, \
-                                      .addr     = L3G4200D_PARAM_ADDR, \
-                                      .int1_pin = L3G4200D_PARAM_INT1, \
-                                      .int2_pin = L3G4200D_PARAM_INT2, \
-                                      .mode     = L3G4200D_PARAM_MODE, \
-                                      .scale    = L3G4200D_PARAM_SCALE }
+#ifndef L3G4200D_PARAMS
+#define L3G4200D_PARAMS             { .i2c   = L3G4200D_PARAM_I2C,  \
+                                      .addr  = L3G4200D_PARAM_ADDR, \
+                                      .int1  = L3G4200D_PARAM_INT1, \
+                                      .int2  = L3G4200D_PARAM_INT2, \
+                                      .mode  = L3G4200D_PARAM_MODE, \
+                                      .scale = L3G4200D_PARAM_SCALE }
+#endif
+#ifndef L3G4200D_SAUL_INFO
+#define L3G4200D_SAUL_INFO          { .name = "l3g4200d" }
+#endif
 /**@}*/
 
 /**
@@ -63,11 +68,7 @@ extern "C" {
  */
 static const l3g4200d_params_t l3g4200d_params[] =
 {
-#ifdef L3G4200D_PARAMS_CUSTOM
-    L3G4200D_PARAMS_CUSTOM,
-#else
-    L3G4200D_PARAMS_DEFAULT,
-#endif
+    L3G4200D_PARAMS
 };
 
 /**
@@ -75,7 +76,7 @@ static const l3g4200d_params_t l3g4200d_params[] =
  */
 static const saul_reg_info_t l3g4200d_saul_info[] =
 {
-    { .name = "l3g4200d" }
+    L3G4200D_SAUL_INFO
 };
 
 #ifdef __cplusplus

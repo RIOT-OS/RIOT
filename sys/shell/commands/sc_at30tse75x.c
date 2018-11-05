@@ -57,7 +57,7 @@ int _at30tse75x_handler(int argc, char **argv)
             }
         }
 
-        error = at30tse75x_init(&dev, i2c_dev, I2C_SPEED_NORMAL, addr);
+        error = at30tse75x_init(&dev, i2c_dev, addr);
         if (error) {
             printf("Error initializing AT30TSE75x sensor on I2C #%u @ 0x%x\n", i2c_dev, addr);
             initialized = false;

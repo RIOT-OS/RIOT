@@ -1,6 +1,9 @@
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   DIRS += net/link_layer/csma_sender
 endif
+ifneq (,$(filter eepreg,$(USEMODULE)))
+  DIRS += eepreg
+endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   DIRS += posix/semaphore
 endif
@@ -82,9 +85,6 @@ endif
 ifneq (,$(filter tcp,$(USEMODULE)))
   DIRS += net/transport_layer/tcp
 endif
-ifneq (,$(filter hamming256,$(USEMODULE)))
-  DIRS += ecc/hamming256
-endif
 ifneq (,$(filter uhcpc,$(USEMODULE)))
   DIRS += net/application_layer/uhcp
 endif
@@ -130,12 +130,16 @@ endif
 ifneq (,$(filter skald,$(USEMODULE)))
   DIRS += net/skald
 endif
-ifneq (,$(filter rdcli_common,$(USEMODULE)))
-  DIRS += net/application_layer/rdcli_common
+ifneq (,$(filter cord_common,$(USEMODULE)))
+  DIRS += net/application_layer/cord/common
 endif
-ifneq (,$(filter rdcli_simple,$(USEMODULE)))
-    DIRS += net/application_layer/rdcli_simple
+ifneq (,$(filter cord_epsim,$(USEMODULE)))
+    DIRS += net/application_layer/cord/epsim
 endif
+ifneq (,$(filter cord_ep,$(USEMODULE)))
+    DIRS += net/application_layer/cord/ep
+endif
+
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))
 

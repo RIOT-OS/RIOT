@@ -118,6 +118,31 @@ static void test_fmt_bytes_hex_reverse(void)
     TEST_ASSERT_EQUAL_STRING("zz", &out[9]);
 }
 
+static void test_fmt_hex_byte(void)
+{
+    char hex[3] = "00";
+    uint8_t byte;
+
+    byte = fmt_hex_byte(hex);
+    TEST_ASSERT_EQUAL_INT(0x00, byte);
+
+    memcpy(hex, "12", 2);
+    byte = fmt_hex_byte(hex);
+    TEST_ASSERT_EQUAL_INT(0x12, byte);
+
+    memcpy(hex, "AB", 2);
+    byte = fmt_hex_byte(hex);
+    TEST_ASSERT_EQUAL_INT(0xAB, byte);
+
+    memcpy(hex, "CD", 2);
+    byte = fmt_hex_byte(hex);
+    TEST_ASSERT_EQUAL_INT(0xCD, byte);
+
+    memcpy(hex, "EF", 2);
+    byte = fmt_hex_byte(hex);
+    TEST_ASSERT_EQUAL_INT(0xEF, byte);
+}
+
 static void test_fmt_hex_bytes(void)
 {
     uint8_t val = 0;
@@ -772,6 +797,7 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_byte_hex),
         new_TestFixture(test_fmt_bytes_hex),
         new_TestFixture(test_fmt_bytes_hex_reverse),
+        new_TestFixture(test_fmt_hex_byte),
         new_TestFixture(test_fmt_hex_bytes),
         new_TestFixture(test_fmt_u32_hex),
         new_TestFixture(test_fmt_u64_hex),

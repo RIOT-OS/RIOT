@@ -120,15 +120,7 @@ int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
     gpio_init(dev->conf->reset, GPIO_OUT);
     gpio_set(dev->conf->reset);
     dev->mode = mode;
-    if (mode == PN532_I2C) {
-#ifdef PN532_SUPPORT_I2C
-        if (i2c_init_master(dev->conf->i2c, I2C_SPEED_FAST) != 0) {
-            DEBUG("pn532: initialization of I2C bus failed\n");
-            return -1;
-        }
-#endif
-    }
-    else {
+    if (mode == PN532_SPI) {
 #ifdef PN532_SUPPORT_SPI
         /* we handle the CS line manually... */
         gpio_init(dev->conf->nss, GPIO_OUT);
@@ -172,15 +164,19 @@ static int _write(const pn532_t *dev, uint8_t *buff, unsigned len)
     (void)buff;
     (void)len;
 
-    if (dev->mode == PN532_I2C) {
+    switch (dev->mode) {
 #ifdef PN532_SUPPORT_I2C
+    case PN532_I2C:
         i2c_acquire(dev->conf->i2c);
-        ret = i2c_write_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len);
+        ret = i2c_write_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len, 0);
+        if (ret == 0) {
+            ret = (int)len;
+        }
         i2c_release(dev->conf->i2c);
+        break;
 #endif
-    }
-    else {
 #ifdef PN532_SUPPORT_SPI
+    case PN532_SPI:
         spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
         xtimer_usleep(SPI_WRITE_DELAY_US);
@@ -190,7 +186,10 @@ static int _write(const pn532_t *dev, uint8_t *buff, unsigned len)
         gpio_set(dev->conf->nss);
         spi_release(dev->conf->spi);
         ret = (int)len;
+        break;
 #endif
+    default:
+        DEBUG("pn532: invalid mode (%i)!\n", dev->mode);
     }
     DEBUG("pn532: -> ");
     PRINTBUFF(buff, len);
@@ -204,16 +203,20 @@ static int _read(const pn532_t *dev, uint8_t *buff, unsigned len)
     (void)buff;
     (void)len;
 
-    if (dev->mode == PN532_I2C) {
+    switch (dev->mode) {
 #ifdef PN532_SUPPORT_I2C
+    case PN532_I2C:
         i2c_acquire(dev->conf->i2c);
         /* len+1 for RDY after read is accepted */
-        ret = i2c_read_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len + 1);
+        ret = i2c_read_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len + 1, 0);
+        if (ret == 0) {
+            ret = (int)len + 1;
+        }
         i2c_release(dev->conf->i2c);
+        break;
 #endif
-    }
-    else {
 #ifdef PN532_SUPPORT_SPI
+    case PN532_SPI:
         spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
         spi_transfer_byte(dev->conf->spi, SPI_CS_UNDEF, true, SPI_DATA_READ);
@@ -224,10 +227,15 @@ static int _read(const pn532_t *dev, uint8_t *buff, unsigned len)
         buff[0] = 0x80;
         reverse(buff, len);
         ret = (int)len + 1;
+        break;
 #endif
+    default:
+        DEBUG("pn532: invalid mode (%i)!\n", dev->mode);
     }
-    DEBUG("pn532: <- ");
-    PRINTBUFF(buff, len);
+    if (ret > 0) {
+        DEBUG("pn532: <- ");
+        PRINTBUFF(buff, len);
+    }
     return ret;
 }
 

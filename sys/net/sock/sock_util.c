@@ -22,6 +22,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "net/sock/udp.h"
@@ -30,9 +31,6 @@
 #ifdef RIOT_VERSION
 #include "fmt.h"
 #endif
-
-#define SOCK_HOST_MAXLEN    (64U)   /**< maximum length of host part for
-                                         sock_udp_str2ep() */
 
 int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *port)
 {
@@ -68,7 +66,7 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
         char *tmp = addr_str + strlen(addr_str);
         *tmp++ = '%';
         tmp += fmt_u16_dec(tmp, endpoint->netif);
-        *tmp = '0';
+        *tmp = '\0';
 #else
         sprintf(addr_str + strlen(addr_str), "%%%4u", endpoint->netif);
 #endif
@@ -84,8 +82,13 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
 
 static char* _find_hoststart(const char *url)
 {
+    /* Increment SOCK_SCHEME_MAXLEN due to comparison with the colon after the
+     * scheme part
+     */
+    size_t remaining = SOCK_SCHEME_MAXLEN + 1;
     char *urlpos = (char*)url;
-    while(*urlpos) {
+    while(*urlpos && remaining) {
+        remaining--;
         if (*urlpos++ == ':') {
             if (strncmp(urlpos, "//", 2) == 0) {
                 return urlpos + 2;
@@ -99,14 +102,16 @@ static char* _find_hoststart(const char *url)
 
 static char* _find_pathstart(const char *url)
 {
+    size_t remaining = SOCK_HOSTPORT_MAXLEN;
     char *urlpos = (char*)url;
-    while(*urlpos) {
+    while(*urlpos && remaining) {
+        remaining--;
         if (*urlpos == '/') {
             return urlpos;
         }
         urlpos++;
     }
-    return NULL;
+    return urlpos;
 }
 
 int sock_urlsplit(const char *url, char *hostport, char *urlpath)
@@ -117,19 +122,24 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
     }
 
     char *pathstart = _find_pathstart(hoststart);
-    if(!pathstart) {
-        return -EINVAL;
-    }
 
-    memcpy(hostport, hoststart, pathstart - hoststart);
+    size_t hostlen = pathstart - hoststart;
+    /* hostlen must be smaller SOCK_HOSTPORT_MAXLEN to have space for the null
+     * terminator */
+    if (hostlen > SOCK_HOSTPORT_MAXLEN - 1) {
+        return -EOVERFLOW;
+    }
+    memcpy(hostport, hoststart, hostlen);
+    *(hostport + hostlen) = '\0';
 
     size_t pathlen = strlen(pathstart);
     if (pathlen) {
+        if (pathlen > SOCK_URLPATH_MAXLEN - 1) {
+            return -EOVERFLOW;
+        }
         memcpy(urlpath, pathstart, pathlen);
     }
-    else {
-        *urlpath = '\0';
-    }
+    *(urlpath + pathlen) = '\0';
     return 0;
 }
 
@@ -139,7 +149,7 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
     char *hoststart = (char*)str;
     char *hostend = hoststart;
 
-    char hostbuf[SOCK_HOST_MAXLEN];
+    char hostbuf[SOCK_HOSTPORT_MAXLEN];
 
     memset(ep_out, 0, sizeof(sock_udp_ep_t));
 
@@ -147,22 +157,32 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
         brackets_flag = 1;
         for (hostend = ++hoststart; *hostend && *hostend != ']';
                 hostend++);
-        if (! *hostend) {
+        if (! *hostend || ((size_t)(hostend - hoststart) >= sizeof(hostbuf))) {
             /* none found, bail out */
             return -EINVAL;
         }
     }
     else {
         brackets_flag = 0;
-        for (hostend = hoststart; *hostend && *hostend != ':';
-                hostend++);
-    }
-
-    if (*(hostend + brackets_flag) == ':') {
-        ep_out->port = atoi(hostend + brackets_flag + 1);
+        for (hostend = hoststart; *hostend && (*hostend != ':') && \
+                ((size_t)(hostend - hoststart) < sizeof(hostbuf)); hostend++) {}
     }
 
     size_t hostlen = hostend - hoststart;
+    if (*(hostend + brackets_flag) == ':') {
+        char *portstart = hostend + brackets_flag + 1;
+        /* Checks here verify that the supplied port number is up to 5 (random)
+         * chars in size and result is smaller or equal to UINT16_MAX. */
+        if (strlen(portstart) > 5) {
+            return -EINVAL;
+        }
+        uint32_t port = atol(portstart);
+        if (port > UINT16_MAX) {
+            return -EINVAL;
+        }
+        ep_out->port = (uint16_t)port;
+    }
+
     if (hostlen >= sizeof(hostbuf)) {
         return -EINVAL;
     }

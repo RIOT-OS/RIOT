@@ -31,7 +31,9 @@
 
 
 /**
- * @ingroup     sys_hashes
+ * @defgroup    sys_hashes_sha256 SHA-256
+ * @ingroup     sys_hashes_unkeyed
+ * @brief       Implementation of the SHA-256 hashing function
  * @{
  *
  * @file
@@ -47,11 +49,15 @@
 #define HASHES_SHA256_H
 
 #include <inttypes.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @brief   Length of SHA256 digests in bytes
+ */
 #define SHA256_DIGEST_LENGTH 32
 
 /**

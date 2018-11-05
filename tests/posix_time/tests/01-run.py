@@ -8,9 +8,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
 import time
+from testrunner import run
 
 US_PER_SEC = 1000000
 EXTERNAL_JITTER = 0.15
@@ -46,6 +46,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTTOOLS'], 'testrunner'))
-    from testrunner import run
     sys.exit(run(testfunc))

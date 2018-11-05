@@ -155,7 +155,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
     return res;
 }
 
-static netdev_driver_t netdev_driver_tap = {
+static const netdev_driver_t netdev_driver_tap = {
     .send = _send,
     .recv = _recv,
     .init = _init,
@@ -222,9 +222,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             }
             */
 
-            static uint8_t buf[ETHERNET_FRAME_LEN];
+            static uint8_t nullbuf[ETHERNET_FRAME_LEN];
 
-            real_read(dev->tap_fd, buf, sizeof(buf));
+            real_read(dev->tap_fd, nullbuf, sizeof(nullbuf));
 
             _continue_reading(dev);
         }

@@ -35,11 +35,7 @@ int main(void)
 
     printf("+------------Initializing------------+\n");
     result = bmp180_init(&dev, &bmp180_params[0]);
-    if (result == -BMP180_ERR_NOI2C) {
-        puts("[Error] The given i2c is not enabled");
-        return 1;
-    }
-    else if (result == -BMP180_ERR_NODEV) {
+    if (result == -BMP180_ERR_NODEV) {
         puts("[Error] The sensor did not answer correctly on the given address");
         return 1;
     }

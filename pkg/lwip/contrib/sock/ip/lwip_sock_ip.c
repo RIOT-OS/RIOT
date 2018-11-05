@@ -92,7 +92,7 @@ static uint16_t _ip6_addr_to_netif(const ip6_addr_p_t *_addr)
     ip6_addr_t addr;
 
     assert(_addr != NULL);
-    ip6_addr_copy(addr, *_addr);
+    ip6_addr_copy_from_packed(addr, *_addr);
     if (!ip6_addr_isany_val(addr)) {
         for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
             if (netif_get_ip6_addr_match(netif, &addr) >= 0) {

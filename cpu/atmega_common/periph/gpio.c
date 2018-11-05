@@ -37,6 +37,7 @@
 #define GPIO_OFFSET_PIN_PORT    (0x02)
 #define GPIO_OFFSET_PIN_PIN     (0x03)
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 /*
  * @brief     Define GPIO interruptions for an specific atmega CPU, by default
  *            2 (for small atmega CPUs)
@@ -58,6 +59,7 @@
 #endif
 
 static gpio_isr_ctx_t config[GPIO_EXT_INT_NUMOF];
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief     Extract the pin number of the given pin
@@ -110,6 +112,64 @@ static inline uint16_t _pin_addr(gpio_t pin)
     return (_port_addr(pin) - 0x02);
 }
 
+int gpio_init(gpio_t pin, gpio_mode_t mode)
+{
+    uint8_t pin_mask = (1 << _pin_num(pin));
+    switch (mode) {
+        case GPIO_OUT:
+            _SFR_MEM8(_ddr_addr(pin)) |= pin_mask;
+            break;
+        case GPIO_IN:
+            _SFR_MEM8(_ddr_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(_port_addr(pin)) &= ~pin_mask;
+            break;
+        case GPIO_IN_PU:
+            _SFR_MEM8(_ddr_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(_port_addr(pin)) |= pin_mask;
+            break;
+        default:
+            return -1;
+    }
+
+    return 0;
+}
+
+int gpio_read(gpio_t pin)
+{
+    return (_SFR_MEM8(_pin_addr(pin)) & (1 << _pin_num(pin)));
+}
+
+void gpio_set(gpio_t pin)
+{
+    _SFR_MEM8(_port_addr(pin)) |= (1 << _pin_num(pin));
+}
+
+void gpio_clear(gpio_t pin)
+{
+    _SFR_MEM8(_port_addr(pin)) &= ~(1 << _pin_num(pin));
+}
+
+void gpio_toggle(gpio_t pin)
+{
+    if (gpio_read(pin)) {
+        gpio_clear(pin);
+    }
+    else {
+        gpio_set(pin);
+    }
+}
+
+void gpio_write(gpio_t pin, int value)
+{
+    if (value) {
+        gpio_set(pin);
+    }
+    else {
+        gpio_clear(pin);
+    }
+}
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
 static inline int8_t _int_num(gpio_t pin)
 {
     uint8_t num;
@@ -123,26 +183,6 @@ static inline int8_t _int_num(gpio_t pin)
     }
 
     return -1;
-}
-
-int gpio_init(gpio_t pin, gpio_mode_t mode)
-{
-    switch (mode) {
-        case GPIO_OUT:
-            _SFR_MEM8(_ddr_addr(pin)) |= (1 << _pin_num(pin));
-            break;
-        case GPIO_IN:
-            _SFR_MEM8(_ddr_addr(pin)) &= ~(1 << _pin_num(pin));
-            _SFR_MEM8(_port_addr(pin)) &= ~(1 << _pin_num(pin));
-            break;
-        case GPIO_IN_PU:
-            _SFR_MEM8(_port_addr(pin)) |= (1 << _pin_num(pin));
-            break;
-        default:
-            return -1;
-    }
-
-    return 0;
 }
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
@@ -207,41 +247,6 @@ void gpio_irq_disable(gpio_t pin)
     EIMSK &= ~(1 << _int_num(pin));
 }
 
-int gpio_read(gpio_t pin)
-{
-    return (_SFR_MEM8(_pin_addr(pin)) & (1 << _pin_num(pin)));
-}
-
-void gpio_set(gpio_t pin)
-{
-    _SFR_MEM8(_port_addr(pin)) |= (1 << _pin_num(pin));
-}
-
-void gpio_clear(gpio_t pin)
-{
-    _SFR_MEM8(_port_addr(pin)) &= ~(1 << _pin_num(pin));
-}
-
-void gpio_toggle(gpio_t pin)
-{
-    if (gpio_read(pin)) {
-        gpio_clear(pin);
-    }
-    else {
-        gpio_set(pin);
-    }
-}
-
-void gpio_write(gpio_t pin, int value)
-{
-    if (value) {
-        gpio_set(pin);
-    }
-    else {
-        gpio_clear(pin);
-    }
-}
-
 static inline void irq_handler(uint8_t int_num)
 {
     __enter_isr();
@@ -300,3 +305,5 @@ ISR(INT7_vect, ISR_BLOCK)
     irq_handler(7); /**< predefined interrupt pin */
 }
 #endif
+
+#endif /* MODULE_PERIPH_GPIO_IRQ */

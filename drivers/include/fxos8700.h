@@ -9,11 +9,13 @@
 /**
  * @defgroup    drivers_fxos8700 FXOS8700 3-axis accelerometer/magnetometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the FXOS8700 3-axis accelerometer/magnetometer
  *
  * The connection between the MCU and the FXOS8700 is based on the
  * I2C-interface.
  *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

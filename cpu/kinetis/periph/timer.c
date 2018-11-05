@@ -114,12 +114,14 @@ static inline unsigned int _lptmr_index(tim_t dev) {
     return ((unsigned int)dev) - TIMER_DEV(0) - PIT_NUMOF;
 }
 
+#if defined(LPTMR_ISR_0) || defined(LPTMR_ISR_1)
 /**
  * @brief  Get TIMER_x enum value from LPTMR device index
  */
 static inline tim_t _lptmr_tim_t(uint8_t dev) {
     return (tim_t)(((unsigned int)TIMER_DEV(0)) + PIT_NUMOF + dev);
 }
+#endif /* defined(LPTMR_ISR_0) || defined(LPTMR_ISR_1) */
 
 /* ****** PIT module functions ****** */
 
@@ -294,7 +296,9 @@ static inline int lptmr_clear(uint8_t dev);
 static inline uint16_t lptmr_read(uint8_t dev);
 static inline void lptmr_start(uint8_t dev);
 static inline void lptmr_stop(uint8_t dev);
+#if defined(LPTMR_ISR_0) || defined(LPTMR_ISR_1)
 static inline void lptmr_irq_handler(tim_t tim);
+#endif
 
 static inline void _lptmr_set_cb_config(uint8_t dev, timer_cb_t cb, void *arg)
 {
@@ -432,7 +436,7 @@ static inline int lptmr_set(uint8_t dev, uint16_t timeout)
         hw->CNR = 0;
         hw->CMR = timeout + hw->CNR;
         /* cppcheck-suppress selfAssignment
-         * Clear IRQ flags */
+         * (reason: intentional self assignment to clear all pending IRQs) */
         hw->CSR = hw->CSR;
         /* Enable timer and IRQ */
         hw->CSR = LPTMR_CSR_TEN_MASK | LPTMR_CSR_TFC_MASK | LPTMR_CSR_TIE_MASK;
@@ -465,7 +469,7 @@ static inline int lptmr_set_absolute(uint8_t dev, uint16_t target)
         /* TCF is set, safe to update CMR live */
         hw->CMR = target - lptmr[dev].cnr;
         /* cppcheck-suppress selfAssignment
-         * Clear IRQ flags */
+         * (reason: intentional self assignment to clear all pending IRQs) */
         hw->CSR = hw->CSR;
         /* Enable timer and IRQ */
         hw->CSR = LPTMR_CSR_TEN_MASK | LPTMR_CSR_TFC_MASK | LPTMR_CSR_TIE_MASK;
@@ -558,6 +562,7 @@ static inline void lptmr_stop(uint8_t dev)
     irq_restore(mask);
 }
 
+#if defined(LPTMR_ISR_0) || defined(LPTMR_ISR_1)
 static inline void lptmr_irq_handler(tim_t tim)
 {
     uint8_t dev = _lptmr_index(tim);
@@ -575,6 +580,7 @@ static inline void lptmr_irq_handler(tim_t tim)
 
     cortexm_isr_end();
 }
+#endif /* defined(LPTMR_ISR_0) || defined(LPTMR_ISR_1) */
 
 /* ****** Common timer API functions ****** */
 

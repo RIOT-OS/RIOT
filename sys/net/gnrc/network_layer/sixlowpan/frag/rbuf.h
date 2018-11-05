@@ -76,18 +76,20 @@ typedef struct {
  *                          gnrc_netif_hdr_t::if_pid and its source and
  *                          destination address set.
  * @param[in] frag          The fragment to add.
- * @param[in] frag_size     The fragment's size.
  * @param[in] offset        The fragment's offset.
+ * @param[in] page          Current 6Lo dispatch parsing page.
  *
  * @internal
  */
 void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *frag,
-              size_t frag_size, size_t offset);
+              size_t offset, unsigned page);
 
 /**
  * @brief   Checks timeouts and removes entries if necessary
  */
 void rbuf_gc(void);
+
+void rbuf_rm(rbuf_t *rbuf);
 
 #ifdef __cplusplus
 }

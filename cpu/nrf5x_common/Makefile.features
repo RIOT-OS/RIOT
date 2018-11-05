@@ -5,5 +5,6 @@ FEATURES_PROVIDED += periph_hwrng
 
 # Various other features (if any)
 FEATURES_PROVIDED += radio_nrfmin
+FEATURES_PROVIDED += puf_sram
 
 -include $(RIOTCPU)/cortexm_common/Makefile.features

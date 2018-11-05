@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_acd52832 ACD52832
- * @ingroup     boards
- * @brief       Support for the aconno™ ACD52832
+ * @ingroup     boards_acd52832
  *
  * For more information: http://aconno.de/acd52832/
  *

@@ -20,6 +20,7 @@
 
 #ifdef MODULE_VEML6070
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "veml6070.h"
@@ -28,17 +29,17 @@
 /**
  * @brief   Define the number of configured sensors
  */
-#define VEML6070_NUMOF    (sizeof(veml6070_params) / sizeof(veml6070_params[0]))
+#define VEML6070_NUM    (sizeof(veml6070_params) / sizeof(veml6070_params[0]))
 
 /**
  * @brief   Allocation of memory for device descriptors
  */
-static veml6070_t veml6070_devs[VEML6070_NUMOF];
+static veml6070_t veml6070_devs[VEML6070_NUM];
 
 /**
  * @brief   Memory for the SAUL registry entries
  */
-static saul_reg_t saul_entries[VEML6070_NUMOF];
+static saul_reg_t saul_entries[VEML6070_NUM];
 
 /**
  * @brief   Define the number of saul info
@@ -54,7 +55,7 @@ void auto_init_veml6070(void)
 {
     assert(VEML6070_NUM == VEML6070_INFO_NUM);
 
-    for (unsigned i = 0; i < VEML6070_NUMOF; i++) {
+    for (unsigned i = 0; i < VEML6070_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing veml6070 #%u\n", i);
 
         if (veml6070_init(&veml6070_devs[i],

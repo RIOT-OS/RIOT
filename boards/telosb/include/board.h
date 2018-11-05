@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup    boards_telosb TelosB
- * @ingroup     boards
- * @brief       Support for the TelosB board
+ * @ingroup     boards_telosb
  *
  * <h2>Compontents</h2>
  * \li MSP430
@@ -45,8 +43,8 @@ extern "C" {
  * @name    Override default baudrate for STDIO
  * @{
  */
-#ifndef UART_STDIO_BAUDRATE
-#define UART_STDIO_BAUDRATE         (9600)
+#ifndef STDIO_UART_BAUDRATE
+#define STDIO_UART_BAUDRATE         (9600)
 #endif
 /** @} */
 

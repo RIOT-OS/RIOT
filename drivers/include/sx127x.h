@@ -92,6 +92,9 @@ extern "C" {
 #define SX127X_IRQ_DIO3                  (1<<3)  /**< DIO3 IRQ */
 #define SX127X_IRQ_DIO4                  (1<<4)  /**< DIO4 IRQ */
 #define SX127X_IRQ_DIO5                  (1<<5)  /**< DIO5 IRQ */
+#ifdef SX127X_USE_DIO_MULTI
+#define SX127X_IRQ_DIO_MULTI             (1<<6)  /**< DIO MULTI IRQ */
+#endif
 /** @} */
 
 /**
@@ -170,8 +173,8 @@ typedef struct {
     uint8_t coderate;                  /**< Error coding rate */
     uint8_t freq_hop_period;           /**< Frequency hop period */
     uint8_t flags;                     /**< Boolean flags */
-    uint32_t rx_timeout;               /**< RX timeout in symbols */
-    uint32_t tx_timeout;               /**< TX timeout in symbols */
+    uint32_t rx_timeout;               /**< RX timeout in microseconds */
+    uint32_t tx_timeout;               /**< TX timeout in microseconds */
 } sx127x_lora_settings_t;
 
 /**
@@ -208,6 +211,9 @@ typedef struct {
     gpio_t dio3_pin;                   /**< Interrupt line DIO3 (CAD done) */
     gpio_t dio4_pin;                   /**< Interrupt line DIO4 (not used) */
     gpio_t dio5_pin;                   /**< Interrupt line DIO5 (not used) */
+#ifdef SX127X_USE_DIO_MULTI
+    gpio_t dio_multi_pin;              /**< Interrupt line for multiple IRQs */
+#endif
     uint8_t paselect;                  /**< Power amplifier mode (RFO or PABOOST) */
 } sx127x_params_t;
 
@@ -246,7 +252,7 @@ void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params);
  *
  * @param[in] dev                      The sx127x device descriptor
  */
-void sx127x_reset(const sx127x_t *dev);
+int sx127x_reset(const sx127x_t *dev);
 
 /**
  * @brief   Initializes the transceiver.

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2017 OTA keys S.A.
- *               2018 Matthew Blue <matthew.blue.neuro@gmail.com>
+ *               2018 Acutam Automation, LLC
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level

@@ -19,7 +19,8 @@
  */
 
 #include <string.h>
-#include "cpu.h"
+
+#include "periph_cpu.h"
 #include "assert.h"
 
 /* guard this file, must be done before including periph/eeprom.h */
@@ -27,26 +28,16 @@
 
 #include "periph/eeprom.h"
 
-size_t eeprom_read(uint32_t pos, uint8_t *data, size_t len)
+uint8_t eeprom_read_byte(uint32_t pos)
 {
-    assert(pos + len < EEPROM_SIZE);
-
-    for (size_t i = 0; i < len; i++) {
-        data[i] = eeprom_read_byte(pos++);
-    }
-
-    return len;
+    uint8_t byte;
+    eeprom_read(pos, &byte, 1);
+    return byte;
 }
 
-size_t eeprom_write(uint32_t pos, const uint8_t *data, size_t len)
+void eeprom_write_byte(uint32_t pos, uint8_t byte)
 {
-    assert(pos + len < EEPROM_SIZE);
-
-    for (size_t i = 0; i < len; i++) {
-        eeprom_write_byte(pos++, data[i]);
-    }
-
-    return len;
+    eeprom_write(pos, &byte, 1);
 }
 
 #endif

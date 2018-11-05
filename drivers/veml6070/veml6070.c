@@ -40,17 +40,11 @@ int veml6070_init(veml6070_t *dev, const veml6070_params_t * params)
 {
     dev->params = *params;
 
-    /* Initialize I2C interface */
-    if (i2c_init_master(dev->params.i2c_dev, I2C_SPEED_NORMAL)) {
-        DEBUG("[Error] I2C device not enabled\n");
-        return -VEML6070_ERR_I2C;
-    }
-
     /* Acquire exclusive access */
     i2c_acquire(dev->params.i2c_dev);
 
     i2c_write_byte(dev->params.i2c_dev, VEML6070_ADDRL,
-                   (uint8_t)(dev->params.itime << 2) | 0x02);
+                   (uint8_t)(dev->params.itime << 2) | 0x02, 0);
 
     /* Release I2C device */
     i2c_release(dev->params.i2c_dev);
@@ -64,8 +58,8 @@ uint16_t veml6070_read_uv(const veml6070_t *dev)
     i2c_acquire(dev->params.i2c_dev);
 
     uint8_t buffer[2];
-    i2c_read_byte(dev->params.i2c_dev, VEML6070_ADDRL, &buffer[0]);
-    i2c_read_byte(dev->params.i2c_dev, VEML6070_ADDRH, &buffer[1]);
+    i2c_read_byte(dev->params.i2c_dev, VEML6070_ADDRL, &buffer[0], 0);
+    i2c_read_byte(dev->params.i2c_dev, VEML6070_ADDRH, &buffer[1], 0);
 
     uint16_t uv = (uint16_t)(buffer[1] << 8) | buffer[0];
 

@@ -59,14 +59,77 @@ extern "C" {
 #define PROVIDES_PM_SET_LOWEST
 
 /**
+ * @brief   Pattern to write into the co-processor Access Control Register to
+ *          allow full FPU access
+ *
+ * Used in the @ref cortexm_init_fpu inline function below.
+ */
+#define CORTEXM_SCB_CPACR_FPU_ACCESS_FULL         (0x00f00000)
+
+/**
  * @brief   Initialization of the CPU
  */
 void cpu_init(void);
 
 /**
  * @brief   Initialize Cortex-M specific core parts of the CPU
+ *
+ * @ref cortexm_init calls, in a default order, @ref cortexm_init_fpu,
+ * @ref cortexm_init_isr_priorities, and @ref cortexm_init_misc.  Also
+ * performs other default initialisations, including ones which you
+ * may or may not want.
+ *
+ * Unless you have special requirements (like nRF52 with SD has), it
+ * is sufficient to call just @ref cortexm_init and the `cortexm_init_*`
+ * functions do not need to (and should not) be called separately.
+ * If you have conflicting requirements, you may want to have a look
+ * `cpu/nrft/cpu.c` for an example of a non-default approach.
  */
 void cortexm_init(void);
+
+/**
+ * @brief   Initialize Cortex-M FPU
+ *
+ * Called from `cpu/nrf52/cpu.c`, since it cannot use the
+ * whole @ref cortexm_init due to conflicting requirements.
+ *
+ * Defined here as a static inline function to allow all
+ * callers to optimise this away if the FPU is not used.
+ */
+static inline void cortexm_init_fpu(void)
+{
+    /* initialize the FPU on Cortex-M4F CPUs */
+#if defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
+    /* give full access to the FPU */
+    SCB->CPACR |= (uint32_t)CORTEXM_SCB_CPACR_FPU_ACCESS_FULL;
+#endif
+}
+
+#if defined(CPU_CORTEXM_INIT_SUBFUNCTIONS) || defined(DOXYGEN)
+
+/**
+ * @brief   Initialize Cortex-M interrupt priorities
+ *
+ * Called from `cpu/nrf52/cpu.c`, since it cannot use the
+ * whole @ref cortexm_init due to conflicting requirements.
+ *
+ * Define `CPU_CORTEXM_INIT_SUBFUNCTIONS` to make this function
+ * publicly available.
+ */
+void cortexm_init_isr_priorities(void);
+
+/**
+ * @brief   Initialize Cortex-M misc functions
+ *
+ * Called from `cpu/nrf52/cpu.c`, since it cannot use the
+ * whole @ref cortexm_init due to conflicting requirements.
+ *
+ * Define `CPU_CORTEXM_INIT_SUBFUNCTIONS` to make this function
+ * publicly available.
+ */
+void cortexm_init_misc(void);
+
+#endif /* defined(CPU_CORTEXM_INIT_SUBFUNCTIONS) || defined(DOXYGEN) */
 
 /**
  * @brief   Prints the current content of the link register (lr)

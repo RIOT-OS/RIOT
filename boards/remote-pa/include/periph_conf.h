@@ -32,39 +32,18 @@
  * @name    I2C configuration
  * @{
  */
-#define I2C_NUMOF               1
-#define I2C_0_EN                1
 #define I2C_IRQ_PRIO            1
 
-/* I2C 0 device configuration */
-#define I2C_0_DEV               0
-#define I2C_0_IRQ               I2C_IRQn
-#define I2C_0_IRQ_HANDLER       isr_i2c
-#define I2C_0_SCL_PIN           GPIO_PB1
-#define I2C_0_SDA_PIN           GPIO_PB0
-
-static const i2c_conf_t i2c_config[I2C_NUMOF] = {
+static const i2c_conf_t i2c_config[] = {
     {
-        .scl_pin = I2C_0_SCL_PIN,
-        .sda_pin = I2C_0_SDA_PIN,
+        .speed = I2C_SPEED_FAST,    /**< bus speed */
+        .scl_pin = GPIO_PIN(1, 1),  /**< GPIO_PB1 */
+        .sda_pin = GPIO_PIN(1, 0)   /**< GPIO_PB0 */
     },
 };
-/** @} */
 
-/**
- * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
- *
- * Calculated with (CPSR * (SCR + 1)) = (CLOCK_CORECLOCK / bus_freq), where
- * 1 < CPSR < 255 and
- * 0 < SCR  < 256
- */
-static const spi_clk_conf_t spi_clk_config[] = {
-    { .cpsr = 10, .scr = 31 },  /* 100khz */
-    { .cpsr =  2, .scr = 39 },  /* 400khz */
-    { .cpsr =  2, .scr = 15 },  /* 1MHz */
-    { .cpsr =  2, .scr =  2 },  /* ~4.5MHz */
-    { .cpsr =  2, .scr =  1 }   /* ~10.7MHz */
-};
+#define I2C_NUMOF               (sizeof(i2c_config) / sizeof(i2c_config[0]))
+/** @} */
 
 /**
  * @name    SPI configuration
@@ -72,17 +51,17 @@ static const spi_clk_conf_t spi_clk_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SSI0,
-        .mosi_pin = GPIO_PD0,
-        .miso_pin = GPIO_PC4,
-        .sck_pin  = GPIO_PD1,
-        .cs_pin   = GPIO_PD3
+        .num      = 0,
+        .mosi_pin = GPIO_PIN(3, 0),
+        .miso_pin = GPIO_PIN(2, 4),
+        .sck_pin  = GPIO_PIN(3, 1),
+        .cs_pin   = GPIO_PIN(3, 3)
     },
     {
-        .dev      = SSI1,
-        .mosi_pin = GPIO_PC7,
-        .miso_pin = GPIO_PA4,
-        .sck_pin  = GPIO_PB5,
+        .num      = 1,
+        .mosi_pin = GPIO_PIN(2, 7),
+        .miso_pin = GPIO_PIN(0, 4),
+        .sck_pin  = GPIO_PIN(1 ,5),
         .cs_pin   = GPIO_UNDEF
     }
 };
@@ -94,7 +73,7 @@ static const spi_conf_t spi_config[] = {
  * @name ADC configuration
  * @{
  */
-#define SOC_ADC_ADCCON_REF  SOC_ADC_ADCCON_REF_AVDD5
+#define SOC_ADC_ADCCON3_EREF  SOC_ADC_ADCCON3_EREF_AVDD5
 
 static const adc_conf_t adc_config[] = {
     GPIO_PIN(0, 6), /**< GPIO_PA6 = ADC2_PIN */

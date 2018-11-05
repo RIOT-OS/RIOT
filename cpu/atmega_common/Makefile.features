@@ -1,2 +1,2 @@
-FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_eeprom
+FEATURES_PROVIDED += periph_pm

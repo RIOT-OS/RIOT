@@ -24,7 +24,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "vendor/hw_soc_adc.h"
+
 #include "cpu.h"
+#include "vendor/hw_ssi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,6 +64,10 @@ typedef uint32_t gpio_t;
 #define GPIO_UNDEF          (0xffffffff)
 
 /**
+ * @brief Custom value to indicate unused parameter in gpio_init_mux
+ */
+#define GPIO_MUX_NONE       (0xff)
+/**
  * @brief   Define a custom GPIO_PIN macro
  *
  * For the CC2538, we use OR the gpio ports base register address with the
@@ -79,9 +86,43 @@ typedef uint32_t gpio_t;
 void gpio_init_af(gpio_t pin, uint8_t sel, uint8_t over);
 
 /**
+ * @brief   Configure an alternate function for the given pin
+ *
+ * @param[in] pin   gpio pin
+ * @param[in] over  Override pin configuration
+ * @param[in] sel   Set peripheral function for pin (output)
+ * @param[in] func  Set pin for peripheral function (input)
+ */
+void gpio_init_mux(gpio_t pin, uint8_t over, uint8_t sel, uint8_t func);
+
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+/** @} */
+
+/**
+ * @name   Override I2C clock speed values
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       = 0x01,     /**< not supported */
+    I2C_SPEED_NORMAL    = 100000U,  /**< normal mode:   ~100kbit/s */
+    I2C_SPEED_FAST      = 400000U,  /**< fast mode:     ~400kbit/s */
+    I2C_SPEED_FAST_PLUS = 0x02,     /**< not supported */
+    I2C_SPEED_HIGH      = 0x03,     /**< not supported */
+} i2c_speed_t;
+/** @} */
+/**
  * @brief   I2C configuration options
  */
 typedef struct {
+    i2c_speed_t speed;      /**< baudrate used for the bus */
     gpio_t scl_pin;         /**< pin used for SCL */
     gpio_t sda_pin;         /**< pin used for SDA */
 } i2c_conf_t;
@@ -161,12 +202,29 @@ typedef struct {
     uint8_t scr;            /**< SCR clock divider */
 } spi_clk_conf_t;
 
+#ifndef BOARD_HAS_SPI_CLK_CONF
+/**
+ * @brief   Pre-calculated clock divider values based on a CLOCK_CORECLOCK (32MHz)
+ *
+ * SPI bus frequency =  CLOCK_CORECLOCK / (CPSR * (SCR + 1)), with
+ * CPSR = 2..254 and even,
+ *  SCR = 0..255
+ */
+static const spi_clk_conf_t spi_clk_config[] = {
+    { .cpsr = 64, .scr =  4 },  /* 100khz */
+    { .cpsr = 16, .scr =  4 },  /* 400khz */
+    { .cpsr = 32, .scr =  0 },  /* 1.0MHz */
+    { .cpsr =  2, .scr =  2 },  /* 5.3MHz */
+    { .cpsr =  2, .scr =  1 }   /* 8.0MHz */
+};
+#endif /* BOARD_HAS_SPI_CLK_CONF */
+
 /**
  * @name    SPI configuration data structure
  * @{
  */
 typedef struct {
-    cc2538_ssi_t *dev;      /**< SSI device */
+    uint8_t num;            /**< number of SSI device, i.e. 0 or 1 */
     gpio_t mosi_pin;        /**< pin used for MOSI */
     gpio_t miso_pin;        /**< pin used for MISO */
     gpio_t sck_pin;         /**< pin used for SCK */
@@ -208,36 +266,13 @@ typedef enum {
 typedef gpio_t adc_conf_t;
 
 /**
- * @name SOC_ADC_ADCCON3 register bit masks
+ * @name SOC_ADC_ADCCON3_EREF registers field values
  * @{
  */
-#define SOC_ADC_ADCCON3_EREF    (0x000000C0) /**< Reference voltage for extra */
-#define SOC_ADC_ADCCON3_EDIV    (0x00000030) /**< Decimation rate for extra */
-#define SOC_ADC_ADCCON3_ECH     (0x0000000F) /**< Single channel select */
-/** @} */
-
-/**
- * @name SOC_ADC_ADCCONx registers field values
- * @{
- */
-#define SOC_ADC_ADCCON_REF_INT      (0 << 6)    /**< Internal reference */
-#define SOC_ADC_ADCCON_REF_EXT      (1 << 6)    /**< External reference on AIN7 pin */
-#define SOC_ADC_ADCCON_REF_AVDD5    (2 << 6)    /**< AVDD5 pin */
-#define SOC_ADC_ADCCON_REF_DIFF     (3 << 6)    /**< External reference on AIN6-AIN7 differential input */
-#define SOC_ADC_ADCCON_CH_GND       (0xC)       /**< GND */
-/** @} */
-
-/**
- * @brief Mask to check end-of-conversion (EOC) bit
- */
-#define SOC_ADC_ADCCON1_EOC_MASK    (0x80)
-
-/**
- * @name Masks for ADC raw data
- * @{
- */
-#define SOC_ADC_ADCL_MASK       (0x000000FC)
-#define SOC_ADC_ADCH_MASK       (0x000000FF)
+#define SOC_ADC_ADCCON3_EREF_INT      (0 << SOC_ADC_ADCCON3_EREF_S)    /**< Internal reference */
+#define SOC_ADC_ADCCON3_EREF_EXT      (1 << SOC_ADC_ADCCON3_EREF_S)    /**< External reference on AIN7 pin */
+#define SOC_ADC_ADCCON3_EREF_AVDD5    (2 << SOC_ADC_ADCCON3_EREF_S)    /**< AVDD5 pin */
+#define SOC_ADC_ADCCON3_EREF_DIFF     (3 << SOC_ADC_ADCCON3_EREF_S)    /**< External reference on AIN6-AIN7 differential input */
 /** @} */
 
 /**

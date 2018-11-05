@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_spark-core Spark-Core
- * @ingroup     boards
- * @brief       Support for the spark-core board
+ * @ingroup     boards_spark-core
  * @{
  *
  * @file

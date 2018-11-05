@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_microbit BBC micro:bit
- * @ingroup     boards
- * @brief       Support for the BBC micro:bit
+ * @ingroup     boards_microbit
  * @{
  *
  * @file
@@ -69,8 +67,9 @@ extern "C" {
  * @name    MMA8653 accelerometer configuration
  * @{
  */
-#define MMA8653_PARAM_I2C           I2C_DEV(0)
-#define MMA8653_PARAM_ADDR          0x1d
+#define MMA8X5X_PARAM_I2C           I2C_DEV(0)
+#define MMA8X5X_PARAM_ADDR          0x1d
+#define MMA8X5X_PARAM_TYPE          0x5a
 /** @} */
 
 /**

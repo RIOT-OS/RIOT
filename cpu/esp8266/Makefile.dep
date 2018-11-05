@@ -1,0 +1,47 @@
+# additional modules dependencies
+
+ifneq (, $(filter lua, $(USEPKG)))
+    USEMODULE += newlib_syscalls_default
+    USEMODULE += xtimer
+endif
+
+ifneq (, $(filter lwip%, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+endif
+
+ifneq (,$(filter ndn-riot,$(USEPKG)))
+    USEMODULE += crypto
+    USEMODULE += cipher_modes
+endif
+
+ifneq (, $(filter posix%, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+endif
+
+ifneq (, $(filter shell, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+    USEMODULE += xtimer
+endif
+
+ifneq (, $(filter xtimer, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+endif
+
+ifneq (, $(filter vfs, $(USEMODULE)))
+    USEMODULE += newlib_syscalls_default
+    USEMODULE += xtimer
+endif
+
+ifneq (, $(filter newlib_syscalls_default, $(USEMODULE)))
+    USEMODULE += stdio_uart
+endif
+
+# network interface dependencies
+ifneq (, $(filter netdev_default, $(USEMODULE)))
+    # if NETDEV_DEFAULT is empty, we use module mrf24j40 as default network device
+    ifndef NETDEV_DEFAULT
+        USEMODULE += mrf24j40
+    else
+        USEMODULE += $(NETDEV_DEFAULT)
+    endif
+endif

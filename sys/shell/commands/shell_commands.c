@@ -142,6 +142,10 @@ extern int _ls_handler(int argc, char **argv);
 extern int _can_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_CORD_EP
+extern int _cord_ep_handler(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -232,6 +236,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_CONN_CAN
     {"can", "CAN commands", _can_handler},
+#endif
+#ifdef MODULE_CORD_EP
+    {"cord_ep", "Resource directory endpoint commands", _cord_ep_handler },
 #endif
     {NULL, NULL, NULL}
 };

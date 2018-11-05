@@ -1,6 +1,11 @@
 # define the cpu used by the Mega Xplained board
 export CPU = atmega1284p
 
+# Found by checking fuse settings (2048 words so 4KB)
+# https://www.microchip.com/DevelopmentTools/ProductDetails/atmega1284p-xpld
+BOOTLOADER_SIZE ?= 4K
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+
 # configure the terminal program
 export PORT_LINUX  ?= /dev/ttyACM0
 export PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))

@@ -132,18 +132,22 @@ static uint8_t _hex_nib(uint8_t nib)
     return _byte_mod25((nib & 0x1f) + 9);
 }
 
+uint8_t fmt_hex_byte(const char *hex)
+{
+    return (_hex_nib(hex[0]) << 4) | _hex_nib(hex[1]);
+}
+
 size_t fmt_hex_bytes(uint8_t *out, const char *hex)
 {
     size_t len = fmt_strlen(hex);
 
     if (len & 1) {
-        out = NULL;
         return 0;
     }
 
     size_t final_len = len >> 1;
     for (size_t i = 0, j = 0; j < final_len; i += 2, j++) {
-        out[j] = (_hex_nib(hex[i]) << 4) | _hex_nib(hex[i+1]);
+        out[j] = fmt_hex_byte(hex + i);
     }
 
     return final_len;

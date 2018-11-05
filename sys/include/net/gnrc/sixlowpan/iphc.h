@@ -32,34 +32,30 @@ extern "C" {
 /**
  * @brief   Decompresses a received 6LoWPAN IPHC frame.
  *
- * @pre (dec_hdr != NULL) && (*dec_hdr != NULL) && ((*dec_hdr)->size >= sizeof(gnrc_ipv6_hdr_t))
+ * @pre (pkt != NULL)
  *
- * @param[out] dec_hdr      A pre-allocated IPv6 header. Will not be inserted into
- *                          @p pkt. May change due to next headers being added in NHC.
- * @param[in] pkt           A received 6LoWPAN IPHC frame. IPHC dispatch will not
- *                          be marked.
- * @param[in] datagram_size Size of the full uncompressed IPv6 datagram. May be 0, if @p pkt
- *                          contains the full (unfragmented) IPv6 datagram.
- * @param[in] offset        Offset of the IPHC dispatch in 6LoWPaN frame.
- * @param[in, out] nh_len   Pointer to next header length
- *
- * @return  length of the HC dispatches + inline values on success.
- * @return  0 on error.
+ * @param[in] pkt           A received 6LoWPAN IPHC frame. The first snip is to
+ *                          be expected to start with the IPHC dispatch.
+ * @param[in,out] ctx       Context for the packet. May be NULL. If not NULL it
+ *                          is expected to be of type
+ *                          @ref gnrc_sixlowpan_rbuf_t. This function might
+ *                          change the content of that.
+ * @param[in] page          Current 6Lo dispatch parsing page.
  */
-size_t gnrc_sixlowpan_iphc_decode(gnrc_pktsnip_t **dec_hdr, gnrc_pktsnip_t *pkt,
-                                  size_t datagram_size, size_t offset,
-                                  size_t *nh_len);
+void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 
 /**
  * @brief   Compresses a 6LoWPAN for IPHC.
  *
- * @param[in,out] pkt   A 6LoWPAN frame with an uncompressed IPv6 header to
- *                      send. Will be translated to an 6LoWPAN IPHC frame.
+ * @pre (pkt != NULL)
  *
- * @return  true, on success
- * @return  false, on error.
+ * @param[in] pkt   A 6LoWPAN frame with an uncompressed IPv6 header to send.
+ *                  Will be translated to an 6LoWPAN IPHC frame.
+ * @param[in] ctx   Context for the packet. May be NULL.
+ * @param[in] page  Current 6Lo dispatch parsing page.
+ *
  */
-bool gnrc_sixlowpan_iphc_encode(gnrc_pktsnip_t *pkt);
+void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 
 #ifdef __cplusplus
 }

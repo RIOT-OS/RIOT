@@ -69,7 +69,7 @@ int main(void)
 
     puts("On-board button test\n");
     /* cppcheck-suppress knownConditionTrueFalse
-     * rationale: board-dependent ifdefs */
+     * (reason: board-dependent ifdefs) */
     if (cnt == 0) {
         puts("[FAILED] no buttons available!");
         return 2;

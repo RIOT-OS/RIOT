@@ -29,10 +29,19 @@ extern "C" {
 #define _TEST_PORT_REMOTE   (0xa615)
 #define _TEST_NETIF         (1)
 #define _TEST_TIMEOUT       (1000000U)
-#define _TEST_ADDR4_LOCAL   (0xc0a84f96U)   /* 192.168.79.150 */
-#define _TEST_ADDR4_REMOTE  (0x7f000001U)   /* 127.0.0.1 */
-#define _TEST_ADDR4_WRONG   (0x254c6b4cU)
-#define _TEST_ADDR4_MASK    (0xffffff00U)   /* 255.255.255.0 */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+# define _TEST_ADDR4_LOCAL  (0x964fa8c0U)   /* 192.168.79.150 */
+# define _TEST_ADDR4_REMOTE (0x0100007fU)   /* 127.0.0.1 */
+# define _TEST_ADDR4_WRONG  (0x4c6b4c25U)
+# define _TEST_ADDR4_MASK   (0x00ffffffU)   /* 255.255.255.0 */
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+# define _TEST_ADDR4_LOCAL  (0xc0a84f96U)   /* 192.168.79.150 */
+# define _TEST_ADDR4_REMOTE (0x7f000001U)   /* 127.0.0.1 */
+# define _TEST_ADDR4_WRONG  (0x254c6b4cU)
+# define _TEST_ADDR4_MASK   (0xffffff00U)   /* 255.255.255.0 */
+#else
+# error "Byte order is neither little nor big!"
+#endif
 #define _TEST_ADDR4_GW      (0UL)           /* so we can test unreachability */
 #define _TEST_ADDR6_LOCAL   { 0x2f, 0xc4, 0x11, 0x5a, 0xe6, 0x91, 0x8d, 0x5d, \
                               0x8c, 0xd1, 0x47, 0x07, 0xb7, 0x6f, 0x9b, 0x48 }

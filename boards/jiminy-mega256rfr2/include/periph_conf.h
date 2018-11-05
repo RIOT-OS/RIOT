@@ -116,6 +116,7 @@ extern "C" {
  * @name    I2C configuration
  * @{
  */
+#define I2C_BUS_SPEED       I2C_SPEED_FAST
 #define I2C_NUMOF           (1U)
 /** @} */
 

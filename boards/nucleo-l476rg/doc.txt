@@ -1,0 +1,28 @@
+/**
+@defgroup    boards_nucleo-l476rg STM32 Nucleo-L476RG
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 Nucleo-L476RG
+
+### MCU
+
+
+| MCU        |       |
+|:------------- |:--------------------- |
+| Family | ARM Cortex-M4     |
+| Vendor | ST Microelectronics   |
+| RAM        |  |
+| Flash      | |
+| Frequency  | |
+| FPU        | |
+| Timers | |
+| ADCs       | |
+| UARTs      | |
+| SPIs       | |
+| I2Cs       | |
+| RTC        | |
+| Vcc        | |
+| Datasheet  | |
+| Reference Manual | [Reference Manual](http://www.st.com/content/ccc/resource/technical/document/reference_manual/02/35/09/0c/4f/f7/40/03/DM00083560.pdf/files/DM00083560.pdf/jcr:content/translations/en.DM00083560.pdf) |
+| Programming Manual | [Programming Manual](http://www.st.com/content/ccc/resource/technical/document/programming_manual/6c/3a/cb/e7/e4/ea/44/9b/DM00046982.pdf/files/DM00046982.pdf/jcr:content/translations/en.DM00046982.pdf) |
+| Board Manual   | |
+ */

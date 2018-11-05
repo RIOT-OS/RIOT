@@ -1,0 +1,28 @@
+/*
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    cpu_esp32_esp_can ESP32 CAN device driver
+ * @ingroup     cpu_esp32
+ * @brief       CAN device driver implementation for ESP32
+ * @author      Gunar Schorcht <gunar@schorcht.net>
+
+The ESP32 intregates a CAN controller which is compatible with the NXP SJA1000 CAN controller. Thus, it is CAN 2.0B specification compliant and supports two message formats:
+
+- Base frame format (11-bit ID)
+- Extended frame format (29-bit ID)
+
+@note
+- ESP32 CAN does not support CAN-FD and is not CAN-FD tolerant.
+- ESP32 CAN does not support SJA1000's sleep mode and wake-up functionality.
+
+As with the SJA1000, the ESP32 CAN controller provides only the data link layer and physical layer signaling sublayer. Therefore, depending on the physical layer requirements, an external transceiver module is required which converts the CAN-RX and CAN-TX signals of the ESP32 into CAN_H and CAN_L bus signals, e.g., the MCP2551 or SN65HVD23X transceiver for compatibility with ISO 11898-2.
+
+The ```esp_can``` module realizes a low-level CAN driver interface for the ESP32 CAN controller and provides a CAN DLL device that can be used in RIOT's CAN protocol stack. It uses the ESP32 CAN controller in SJA1000 PeliCAN mode. Please refer the [SJA1000 Datasheet](https://www.nxp.com/documents/data_sheet/SJA1000.pdf) for detailed information about the CAN controller and its programming.
+
+ */

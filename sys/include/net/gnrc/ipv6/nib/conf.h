@@ -217,6 +217,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Disable router solicitations
+ *
+ * @warning Only do this if you know what you're doing
+ */
+#ifndef GNRC_IPV6_NIB_CONF_NO_RTR_SOL
+#define GNRC_IPV6_NIB_CONF_NO_RTR_SOL       (0)
+#endif
+
+/**
  * @brief   Maximum link-layer address length (aligned)
  */
 #ifndef GNRC_IPV6_NIB_L2ADDR_MAX_LEN

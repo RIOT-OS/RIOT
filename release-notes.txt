@@ -1,3 +1,289 @@
+RIOT-2018.07 - Release Notes
+============================
+RIOT is a multi-threading operating system which enables soft real-time
+capabilities and comes with support for a range of devices that are typically
+found in the Internet of Things: 8-bit and 16-bit microcontrollers as well as
+light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency, soft
+real-time capabilities, small memory footprint, modularity, and uniform API
+access, independent of the underlying hardware (with partial POSIX compliance).
+
+RIOT is developed by an international open-source community which is
+independent of specific vendors (e.g. similarly to the Linux community) and is
+licensed with a non-viral copyleft license (LGPLv2.1), which allows indirect
+business models around the free open-source software platform provided by RIOT.
+
+
+About this release:
+===================
+
+The 2018.07 release includes new features, like NimBLE (ble stack),
+a MQTT-SN client, SHA-1 based PRNG, an UUID implementation. The RISC-V CPU
+architecture support used by the hifive1 board.
+Effort was done on refactoring, documentation, test improvements and bug fixes.
+
+During the last release, maintainers contributed by running the automated test
+suites on their boards. This gave valuable feedback on the board support state,
+test reliability and where to focus effort to make testing easier and more
+reliable.
+
+About 380 pull requests with about 675 commits have been merged since the last
+release and about 27 issues have been solved. 45 people contributed with code
+in 93 days. Approximately 1678 files have been touched with 147122 insertions
+and 16060 deletions.
+
+
+Notations used below:
+=====================
+    + means new feature/item
+    * means modified feature/item
+    - means removed feature/item
+
+New features and changes
+========================
+
+Community
+---------
+    + Maintainers guidelines have been written and added to the repository
+
+Documentation
+-------------
+    + Fix undefined doxygen groups and add a dedicated static check
+    + Extend `auto_init` documentation
+
+Core
+----
+    + core: clist_foreach() now returns break-causing node
+
+System libraries
+----------------
+    + puf_sram: SRAM PUF feature to seed PRNGs cortex-m platforms
+    + random: SHA-1 based PRNG
+    + matstat: Integer mathematical statistics library
+    + UUID: [RFC4122](https://tools.ietf.org/html/rfc4122) Unique ID library
+    * analog_util: Refactor, add unit test
+    - cbor: Deprecation of this module, use cn-cbor or tinycbor package
+      instead
+
+Networking
+----------
+    + asymcute: an asynchronous MQTT-SN client
+    + gnrc_ipv6: full duplicate address detection support according to
+      [RFC4862](https://tools.ietf.org/html/rfc4862)
+    + gnrc_ipv6: support to handle RDNSS option in neighbor discovery
+    + netif.h: a network-stack agnostic API to network interfaces
+    + lorawan: add example application of autonomous class A device
+    * sock_udp: allocate ephemeral port on sock creation when port is 0
+    * gnrc_netif: Enable RX and TX complete events after netdev initialization
+    * net/gcoap: Refine Observe re-registration
+    * net/nanocoap: Build message with coap_pkt_t
+
+Packages
+--------
+    + NimBLE: Bluetooth Low Energy stack used in mynewt
+    + TLSF: re-enable original API to have different pools
+    + LUA: Add an example with the shell
+    + semtech-loramac: add support for link_check MAC command
+    * libcose: Use RIOT random_bytes instead of randombytes
+    * tweetnacl: Use RIOT random_bytes instead of randombytes
+    * hacl: Use RIOT random_bytes instead of randombytes
+
+Boards
+------
+    + Nucleo boards use their marketing names
+    + HiFive1 (RISC-V)
+    + slstk3402a
+    + stm32f429i-disc1
+    + stm32l476-disco
+    + nucleo-l496zg
+    + stm32mindev
+    + frdm-k22f, frdm-k64f, frdm-kw41z: Add bus configuration for onboard FXOS8700CQ sensor
+    * mulle: Fix mixed up RX TX pins on UART0
+
+CPU
+---
+    + E310 (RISC-V)
+    * kinetis: GPIO: Enable the correct IRQn on CM0+
+    * kinetis: Refactor PIT timer driver implementation
+    * kinetis: Refactor RTT driver
+    * kinetis: Refactor clock initialization code
+    * kinetis: Refactor LPTMR timer implementation
+    * kinetis: Clean up SPI module power handling
+    * kinetis: Conditionally enable MCG
+
+Device Drivers
+--------------
+    + periph_eeprom API with support for STM32 L0/L1 and AVR
+    + AT commands parser
+    + Fix periph_flashpage for iotlab-a8-m3/iotlab-m3/fox boards
+    + IO1 Xplained extension: add support for light sensor and SD card, fix
+      GPIOs initialization and SAUL support
+    + tests/bench_timers: A comprehensive benchmark for periph_timer
+
+Build System / Tooling
+----------------------
+    + Correctly set the RIOT_VERSION on release archives
+    + iotlab-m3/iotlab-a8-m3: fix boards flashing
+    + Fix use of non completely initialized BASELIBS variable
+    + newlib.mk: extract gcc include search directories for newlib-nano support
+    + llvm: many compatibilities issues have been resolved
+    * testbed-support: use new iot-lab command names
+
+Testing
+-------
+    + Address some of the failing tests
+    + New tests enabled by default in CI
+    + Improve testing automation for release testing
+
+Known Issues
+============
+
+Networking related issues
+-------------------------
+
+#4527: gnrc_ipv6: Multicast is not forwarded if routing node listens to the
+       address
+#5016: gnrc_rpl: Rejoining RPL instance as root after reboot messes up rooting
+#5051: Forwarding a packet back to its link layer source should not be allowed
+#5230: gnrc_ipv6: multicast packes are not dispatched to the upper layers
+#5748: gnrc: nodes crashing with too small packet buffer
+#6123: gnrc: crash with (excessive) traffic in native
+#7474: 6lo: gnrc fragmentation expects driver to block on TX
+#7737: pkg: libcoap is partially broken and outdated
+#8086: gnrc_rpl_p2p: not compiling
+#8130: gcoap: can't build witth network stacks other than gnrc
+#8172: gnrc_netif, gnrc_uhcpc: Replacing prefix on border router results in no
+       configured prefix
+#8271: app/netdev: application stops working after receiving frames with
+       assertion or completely without error
+#9616: at86rf2xx: can not correctly set channel after `NETOPT_STATE_RESET`
+#9656: gnrc/netif: various problems after resetting interface a second time
+#9573: pkg/lwip: assert on samr21-xpro
+#9584: drivers/cc2420: add netopt NETOPT_MAX_PACKET_SIZE
+
+Timer related issues
+--------------------
+
+#5103: xtimer: weird behavior of tests/xtimer_drift
+#5338: xtimer: xtimer_now() is not ISR safe
+#6052: tests: xtimer_drift_gets_stuck
+#7114: xtimer: adds items to the wrong list if the timer overflows between
+       _xtimer_now() and irq_disable()
+#7347: xtimer_usleep stuck for small values
+#8251: telosb: timer config wrong when running o a tmote sky
+#9052: misc issues with tests/trickle
+
+Native related issues
+---------------------
+
+#495: native not float safe
+#5796 native: tlsf: early malloc will lead to a crash
+#6442: cpu/native: timer interrupt issue
+#7206: native: race-condition in IPC
+
+Other platforms related issues
+------------------------------
+
+#4512: pkg: tests: RELIC unittests fail on iotlab-m3
+#4612: pkg: TLSF does not build for 16 bit platforms
+#4872: at86rf2xx: Simultaneous use of different transceiver types is not
+       supported
+#4954: chronos: compiling with -O0 breaks
+#4866: periph: GPIO drivers are not thread tafe
+#5009: RIOT is saw-toothing in energy consumption (even when idling)
+#5128: some use of asm keyword might be missing volatile
+#5486: at86rf2xx: lost interrupts
+#5774: cpu: cortexm_common: context switching code breaks when compiling with
+       LTO
+#5848: arduino: Race condition in sys/arduino/Makefile.include
+#6018: nRF52: gnrc 6lowpan ble memory leak
+#6437: periph/spi: Leftovers from SPI rework in #4780
+#6567: periph/spi: Switching between CPOL=0,1 problems on Kinetis with software
+       CS
+#6650: GPIO Port shift in cc2538 is unconsistent
+#6838: Issuing a reboot on ATmega328p makes the board loop-reboot
+#6874: SAMD21: possible CMSIS bug
+#7020: isr_rfcoreerrors while pinging between CC2538DKs
+#7667: sam0 flashpage_write issues
+#7846: stm32f1: I2C read functions return bogus values with unconnected devices
+#8028: diskio: failed assertion in send_cmd() on lpc2387
+#8045: stm32/periph/uart: extra byte transmitted on first transmission
+#8436: Kinetis PhyNode: failed to flash binary > 256K
+#8444: tests/thread_priority_inversion hangup
+#9616: ATmega platform issues.
+
+Other issues
+------------
+
+#1263: sys: the TLSF implementation contains (a) read-before-write error(s)
+#4053: macros: RIOT_FILE_RELATIVE printing wrong file name for headers
+#4488: making the newlib thread-safe
+#5561: C++11 extensions in header files
+#5776: make: Predefining CFLAGS are parsed weirdly
+#5863: OSX+SAMR21-xpro: shell cannot handle command inputs larger than 64 chars
+#6120: Windows AVR Mega development makefile Error
+#7220: sys/fmt: Missing tests for fmt_float,fmt_lpad
+#7877: SPI connection can't read 16bit size register
+#8107: crypto/ccm: bugs in the implementation of CCM mode
+#9548: Many i2c bugs found with the i2c api rework but did not reach the release
+#9709: examples: failed assertion in dtls-echo example
+
+Fixed Issues from the last release (2018.04)
+============================================
+
+#8112 crypto/ccm: fix input_len checking with length_encoding
+#8532 kinetis: timer_set_absolute randomly misses its target
+#8778 sys/random: random_uint32_range is only uniform if range is a power of 2
+      bug quality defect
+#9065 flashpage_write broken on iotlab-m3
+#9154 cpu/lpc2387: Fixed broken SPI driver
+#9451 Makefile.include: fully define BASELIBS before using its value
+#9579 stm32_common: fix ram length for MCUs with non-contiguous ram regions
+#9675 tests: gnrc_netif: fix group join iteration macro
+
+
+You can get the complete detail in the git history and in the release milestone
+[Release 2018.07](https://github.com/RIOT-OS/RIOT/milestone/23?closed=1).
+
+
+Acknowledgements
+================
+We would like to thank all companies (vendors) that provided us with (their)
+hardware for porting and testing RIOT-OS. Further thanks go to companies and
+institutions that directly sponsored development time. And finally, big thanks
+to all of you contributing in so many different ways to make RIOT worthwhile!
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+IRC
+---
+* Join the RIOT IRC channel at: irc.freenode.net, #riot-os
+
+License
+=======
+* The code developed by the RIOT community is licensed under the GNU Lesser
+  General Public License (LGPL) version 2.1 as published by the Free Software
+  Foundation.
+* Some external sources and packages are published under a separate license.
+
+All code files contain licensing information.
+
+
+
 RIOT-2018.04 - Release Notes
 ============================
 RIOT is a multi-threading operating system which enables soft real-time

@@ -9,6 +9,7 @@
 /**
  * @defgroup    drivers_lis2dh12 LIS2DH12 Accelerometer
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the STM LIS2DH12 accelerometer
  *
  * This device driver provides a minimal interface to LIS2DH12 devices. As of
@@ -22,6 +23,8 @@
  * via SPI. The driver is however written in a way, that adding I2C interface
  * support is quite simple, as all bus related functions (acquire, release,
  * read, write) are cleanly separated in the code.
+ *
+ * This driver provides @ref drivers_saul capabilities.
  *
  * @{
  * @file

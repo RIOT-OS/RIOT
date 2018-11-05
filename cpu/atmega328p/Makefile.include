@@ -4,5 +4,8 @@ USEMODULE += atmega_common
 # define path to atmega common module, which is needed for this CPU
 export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
 
+RAM_LEN = 2K
+ROM_LEN = 32K
+
 # CPU depends on the atmega common module, so include it
 include $(ATMEGA_COMMON)Makefile.include

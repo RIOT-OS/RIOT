@@ -1,7 +1,5 @@
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED = periph_spi periph_gpio
-
 USEMODULE += nvram_spi
 USEMODULE += xtimer
 

@@ -128,6 +128,14 @@ int tsrb_get_one(tsrb_t *rb);
 int tsrb_get(tsrb_t *rb, char *dst, size_t n);
 
 /**
+ * @brief       Drop bytes from ringbuffer
+ * @param[in]   rb  Ringbuffer to operate on
+ * @param[in]   n   max number of bytes to drop
+ * @return      nr of bytes dropped
+ */
+int tsrb_drop(tsrb_t *rb, size_t n);
+
+/**
  * @brief       Add a byte to ringbuffer
  * @param[in]   rb  Ringbuffer to operate on
  * @param[in]   c   Character to add to ringbuffer

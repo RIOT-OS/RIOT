@@ -119,7 +119,7 @@ static void dtls_handle_read(dtls_context_t *ctx)
     /* session requires the remote socket (IPv6:UDP) address and netif  */
     session.size = sizeof(uint8_t) * 16 + sizeof(unsigned short);
     session.port = remote.port;
-    if (&remote.netif ==  SOCK_ADDR_ANY_NETIF) {
+    if (remote.netif == SOCK_ADDR_ANY_NETIF) {
         session.ifindex = SOCK_ADDR_ANY_NETIF;
     }
     else {

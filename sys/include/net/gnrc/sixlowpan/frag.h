@@ -31,6 +31,7 @@
 #include "byteorder.h"
 #include "kernel_types.h"
 #include "net/gnrc/pkt.h"
+#include "net/gnrc/netif/hdr.h"
 #include "net/ieee802154.h"
 #include "net/sixlowpan.h"
 
@@ -131,7 +132,39 @@ void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
 /**
  * @brief   Garbage collect reassembly buffer.
  */
-void gnrc_sixlowpan_frag_gc_rbuf(void);
+void gnrc_sixlowpan_frag_rbuf_gc(void);
+
+#if defined(MODULE_GNRC_SIXLOWPAN_FRAG) || defined(DOXYGEN)
+/**
+ * @brief   Removes an entry from the reassembly buffer
+ *
+ * @pre `rbuf != NULL`
+ *
+ * @param[in] rbuf  A reassembly buffer entry. Must not be NULL.
+ */
+void gnrc_sixlowpan_frag_rbuf_remove(gnrc_sixlowpan_rbuf_t *rbuf);
+
+/**
+ * @brief   Checks if a reassembly buffer entry is complete and dispatches it
+ *          to the next layer if that is the case
+ *
+ * @pre `rbuf != NULL`
+ * @pre `netif != NULL`
+ *
+ * @param[in] rbuf  A reassembly buffer entry. Must not be NULL.
+ * @param[in] netif Original @ref gnrc_netif_hdr_t of the last received frame.
+ *                  Used to construct the @ref gnrc_netif_hdr_t of the completed
+ *                  datagram. Must not be NULL.
+ */
+void gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(gnrc_sixlowpan_rbuf_t *rbuf,
+                                                     gnrc_netif_hdr_t *netif);
+#else
+/* NOPs to be used with gnrc_sixlowpan_iphc if gnrc_sixlowpan_frag is not
+ * compiled in */
+#define gnrc_sixlowpan_frag_rbuf_remove(rbuf)       (void)(rbuf)
+#define gnrc_sixlowpan_frag_rbuf_dispatch_when_complete(rbuf, netif) \
+    (void)(rbuf); (void)(netif)
+#endif
 
 #ifdef __cplusplus
 }

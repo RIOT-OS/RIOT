@@ -162,7 +162,6 @@ typedef struct {
  *
  * @param[out] dev          device descriptor
  * @param[in] i2c           I2C bus the device is connected to
- * @param[in] speed         I2C speed to use
  * @param[in] addr          I2C address of the device
  *
  * The valid address range is 0x48 - 0x4f depending on the configuration of the
@@ -172,7 +171,7 @@ typedef struct {
  * @return                  -1 on error
  * @return                  -2 on invalid address
  */
-int at30tse75x_init(at30tse75x_t* dev, i2c_t i2c, i2c_speed_t speed, uint8_t addr);
+int at30tse75x_init(at30tse75x_t* dev, i2c_t i2c, uint8_t addr);
 
 /**
  * @brief   Save configuration register to non-volatile backup register

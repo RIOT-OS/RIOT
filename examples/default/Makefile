@@ -7,6 +7,8 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
+BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
+
 # Uncomment these lines if you want to use platform support from external
 # repositories:
 #RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
@@ -59,11 +61,7 @@ endif
 
 FEATURES_OPTIONAL += periph_rtc
 
-ifneq (,$(filter msb-430,$(BOARD)))
-  USEMODULE += sht11
-endif
 ifneq (,$(filter msba2,$(BOARD)))
-  USEMODULE += sht11
   USEMODULE += mci
   USEMODULE += random
 endif

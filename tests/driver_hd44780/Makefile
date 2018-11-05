@@ -8,7 +8,4 @@ FEATURES_REQUIRED += arduino
 
 USEMODULE += hd44780
 
-test:
-	tests/01-run.py
-
 include $(RIOTBASE)/Makefile.include

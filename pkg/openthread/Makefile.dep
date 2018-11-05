@@ -1,0 +1,10 @@
+ifneq (,$(filter openthread,$(USEPKG)))
+  USEMODULE += openthread_contrib
+  USEMODULE += mbedcrypto
+endif
+
+ifneq (,$(filter openthread_contrib,$(USEMODULE)))
+  USEMODULE += openthread_contrib_netdev
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += cpp
+endif

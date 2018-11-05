@@ -31,7 +31,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define BUS_CLK         (I2C_SPEED_FAST)
 #define BUS             (dev->p.i2c)
 #define ADDR_MAG        (dev->p.addr_mag)
 #define ADDR_ACC        (dev->p.addr_acc)
@@ -57,46 +56,48 @@ int bmx055_init(bmx055_t *dev, const bmx055_params_t *params)
 
     memcpy(&dev->p, params, sizeof(bmx055_params_t));
 
-    /* init i2c Bus */
-    if (i2c_init_master(dev->p.i2c, BUS_CLK) != 0) {
-        DEBUG("[bmx055] error: unable to init i2c bus\n");
-        return BMX055_NOBUS;
-    }
-
     /* bring magnetometer from suspend mode to sleep mode just in case
      * and try to read magnetometer id
      * NOTE: this is necessary because the module id is 0x00 in suspend mode
      */
-    if (i2c_write_reg(BUS, ADDR_MAG, REG_MAG_PWRCTRL, BIT_MAG_PWRCTRL_VAL) != 1) {
+    i2c_acquire(BUS);
+    if (i2c_write_reg(BUS, ADDR_MAG, REG_MAG_PWRCTRL, BIT_MAG_PWRCTRL_VAL, 0x0) < 0) {
         DEBUG("[bmx055] error: no connection to magnetometer\n");
+        i2c_release(BUS);
         return BMX055_NODEV;
     }
-    if (i2c_read_reg(BUS, ADDR_MAG, REG_MAG_CHIPID, &tmp) != 1) {
+    if (i2c_read_reg(BUS, ADDR_MAG, REG_MAG_CHIPID, &tmp, 0x0) < 0) {
         DEBUG("[bmx055] error: no connection to magnetometer\n");
+        i2c_release(BUS);
         return BMX055_NODEV;
     }
     if (tmp != REG_MAG_CHIPID_VAL) {
         DEBUG("[bmx055] error: no connection to magnetometer\n");
+        i2c_release(BUS);
         return BMX055_NODEV;
     }
 
     /* try to read accelerometer id */
-    if (i2c_read_reg(BUS, ADDR_ACC, REG_ACC_CHIPID, &tmp) != 1) {
+    if (i2c_read_reg(BUS, ADDR_ACC, REG_ACC_CHIPID, &tmp, 0x0) < 0) {
         DEBUG("[bmx055] error: no connection to accelerometer\n");
+        i2c_release(BUS);
         return BMX055_NODEV;
     }
     if (tmp != REG_ACC_CHIPID_VAL) {
         DEBUG("[bmx055] error: no connection to accelerometer\n");
+        i2c_release(BUS);
         return BMX055_NODEV;
     }
 
     /* try to read gyroscope id */
-    if (i2c_read_reg(BUS, ADDR_GYRO, REG_GYRO_CHIPID, &tmp) != 1) {
+    if (i2c_read_reg(BUS, ADDR_GYRO, REG_GYRO_CHIPID, &tmp, 0x0) < 0) {
         DEBUG("[bmx055] error: no connection to gyroscope\n");
+        i2c_release(BUS);
         return BMX055_NODEV;
     }
     if (tmp != REG_GYRO_CHIPID_VAL) {
         DEBUG("[bmx055] error: no connection to gyroscope\n");
+        i2c_release(BUS);
         return BMX055_NODEV;
     }
 
@@ -105,8 +106,9 @@ int bmx055_init(bmx055_t *dev, const bmx055_params_t *params)
      * set magnetometer to normal mode (Bits 1 & 2 = 0x00)
      * and set magnetometer sample rate (Bits 3 to 5)
      */
-    if (i2c_write_reg(BUS, ADDR_MAG, REG_MAG_OPMODE, (dev->p.mag_rate << 3)) != 1) {
+    if (i2c_write_reg(BUS, ADDR_MAG, REG_MAG_OPMODE, (dev->p.mag_rate << 3), 0x0) < 0) {
         DEBUG("[bmx055] error: setting magnetometer opmode\n");
+        i2c_release(BUS);
         return BMX055_NOWRITE;
     }
 
@@ -114,20 +116,23 @@ int bmx055_init(bmx055_t *dev, const bmx055_params_t *params)
      *
      * softreset to bring module to normal mode
      */
-    if (i2c_write_reg(BUS, ADDR_ACC, 0x14, 0xB6) != 1) {
+    if (i2c_write_reg(BUS, ADDR_ACC, 0x14, 0xB6, 0x0) < 0) {
         DEBUG("[bmx055] erro: setting accelerometer opmode\n");
+        i2c_release(BUS);
         return BMX055_NOWRITE;
     }
 
     /* setting acc range */
-    if (i2c_write_reg(BUS, ADDR_ACC, REG_ACC_RANGE, acc_ranges[dev->p.acc_range]) != 1) {
+    if (i2c_write_reg(BUS, ADDR_ACC, REG_ACC_RANGE, acc_ranges[dev->p.acc_range], 0x0) < 0) {
         DEBUG("[bmx055] error: setting accelerometer range\n");
+        i2c_release(BUS);
         return BMX055_NOWRITE;
     }
 
     /* enable acc shadowing */
-    if (i2c_write_reg(BUS, ADDR_ACC, REG_ACC_SHDW, REG_ACC_SHDW_ENABLE) != 1) {
+    if (i2c_write_reg(BUS, ADDR_ACC, REG_ACC_SHDW, REG_ACC_SHDW_ENABLE, 0x0) < 0) {
         DEBUG("[bmx055] error: writing accelerometer shadowing bit\n");
+        i2c_release(BUS);
         return BMX055_NOWRITE;
     }
 
@@ -138,23 +143,27 @@ int bmx055_init(bmx055_t *dev, const bmx055_params_t *params)
      * deadlocks it. Hence it is not the way to go and normal mode is entered
      * by writing into power mode control register.
      */
-    if (i2c_write_reg(BUS, ADDR_GYRO, REG_GYRO_PWRMD, REG_GYRO_PWRMD_NORM) != 1) {
+    if (i2c_write_reg(BUS, ADDR_GYRO, REG_GYRO_PWRMD, REG_GYRO_PWRMD_NORM, 0x0) < 0) {
         DEBUG("[bmx055] error: setting gyroscope opmode\n");
+        i2c_release(BUS);
         return BMX055_NOWRITE;
     }
 
     /* setting gyro scale */
-    if (i2c_write_reg(BUS, ADDR_GYRO, REG_GYRO_SCALE, dev->p.gyro_scale) != 1) {
+    if (i2c_write_reg(BUS, ADDR_GYRO, REG_GYRO_SCALE, dev->p.gyro_scale, 0x0) < 0) {
         DEBUG("[bmx055] error: setting gyroscope scale\n");
+        i2c_release(BUS);
         return BMX055_NOWRITE;
     }
 
     /* enable gyro shadowing */
-    if (i2c_write_reg(BUS, ADDR_GYRO, REG_GYRO_SHDW, REG_GYRO_SHDW_EN) != 1) {
+    if (i2c_write_reg(BUS, ADDR_GYRO, REG_GYRO_SHDW, REG_GYRO_SHDW_EN, 0x0) < 0) {
         DEBUG("[bmx055] error: setting gyroscope shadowing bit\n");
+        i2c_release(BUS);
         return BMX055_NOWRITE;
     }
 
+    i2c_release(BUS);
     return BMX055_OK;
 }
 
@@ -165,10 +174,13 @@ int bmx055_mag_read(const bmx055_t *dev, int16_t *data)
     uint8_t tmp[7];
 
     /* reading magnetometer data */
-    if (i2c_read_regs(BUS, ADDR_MAG, REG_MAG_DATA, &tmp, 7) != 7) {
+    i2c_acquire(BUS);
+    if (i2c_read_regs(BUS, ADDR_MAG, REG_MAG_DATA, &tmp, 7, 0x0) < 0) {
         DEBUG("[bmx055] error: reading magnetometer data\n");
+        i2c_release(BUS);
         return BMX055_NOREAD;
     }
+    i2c_release(BUS);
 
     /* checking if new data was available */
     if ((tmp[6] & BIT_MAG_DATARDY) != 1) {
@@ -190,10 +202,13 @@ int bmx055_acc_read(const bmx055_t *dev, int16_t *data)
     uint8_t tmp[7];
 
     /* reading accelerometer data */
-    if (i2c_read_regs(BUS, ADDR_ACC, REG_ACC_DATA, &tmp, 7) != 7) {
+    i2c_acquire(BUS);
+    if (i2c_read_regs(BUS, ADDR_ACC, REG_ACC_DATA, &tmp, 7, 0x0) < 0) {
         DEBUG("[bmx055] error: reading accelerometer data\n");
+        i2c_release(BUS);
         return BMX055_NOREAD;
     }
+    i2c_release(BUS);
 
     if (((tmp[0] & 1) == 0) || ((tmp[2] & 1) == 0) || ((tmp[4] & 1) == 0)) {
         DEBUG("[bmx055] error: no acceleration data ready\n");
@@ -222,10 +237,13 @@ int bmx055_gyro_read(const bmx055_t *dev, int16_t *data)
     scale = (GYRO_2000_DPS / pow(2, dev->p.gyro_scale));
 
     /* reading gyroscope data */
-    if (i2c_read_regs(BUS, ADDR_GYRO, REG_GYRO_DATA, &tmp, 6) != 6) {
+    i2c_acquire(BUS);
+    if (i2c_read_regs(BUS, ADDR_GYRO, REG_GYRO_DATA, &tmp, 6, 0x0) < 0) {
         DEBUG("[bmx055] error: reading gyroscope data\n");
+        i2c_release(BUS);
         return BMX055_NOREAD;
     }
+    i2c_release(BUS);
 
     for (int i = 0; i < 3; i++) {
         /* shifting and casting register data */

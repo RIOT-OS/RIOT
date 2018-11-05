@@ -1,16 +1,20 @@
 # driver dependencies (in alphabetical order)
 
 ifneq (,$(filter adc%1c,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += adcxx1c
 endif
 
 ifneq (,$(filter ads101%,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += ads101x
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter adt7310,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
 endif
 
 ifneq (,$(filter adxl345,$(USEMODULE)))
@@ -41,6 +45,7 @@ ifneq (,$(filter at86rf2%,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -48,6 +53,7 @@ ifneq (,$(filter ata8520e,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += fmt
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -78,6 +84,8 @@ ifneq (,$(filter cc110x,$(USEMODULE)))
   ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
     USEMODULE += gnrc_cc110x
   endif
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -88,6 +96,7 @@ ifneq (,$(filter cc2420,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -110,8 +119,14 @@ ifneq (,$(filter dynamixel,$(USEMODULE)))
   USEMODULE += uart_half_duplex
 endif
 
+ifneq (,$(filter ds18,$(USEMODULE)))
+    USEMODULE += xtimer
+    FEATURES_REQUIRED += periph_gpio
+endif
+
 ifneq (,$(filter enc28j60,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += xtimer
@@ -119,7 +134,7 @@ ifneq (,$(filter enc28j60,$(USEMODULE)))
 endif
 
 ifneq (,$(filter encx24j600,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += xtimer
@@ -156,16 +171,16 @@ ifneq (,$(filter hdc1000,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
-ifneq (,$(filter pulse_counter,$(USEMODULE)))
-  USEMODULE += xtimer
-  FEATURES_REQUIRED += periph_gpio
-endif
-
 ifneq (,$(filter hih6130,$(USEMODULE)))
   USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_i2c
 endif
 
 ifneq (,$(filter hts221,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter ina220,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
@@ -174,6 +189,15 @@ ifneq (,$(filter io1_xplained,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc
   USEMODULE += at30tse75x
   USEMODULE += sdcard_spi
+endif
+
+ifneq (,$(filter isl29020,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter isl29125,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_i2c
 endif
 
 ifneq (,$(filter jc42,$(USEMODULE)))
@@ -187,10 +211,17 @@ ifneq (,$(filter kw2xrf,$(USEMODULE)))
   USEMODULE += netdev_ieee802154
   USEMODULE += core_thread_flags
   FEATURES_REQUIRED += periph_spi
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
 endif
 
 ifneq (,$(filter l3g4200d,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter lc709203f,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  FEATURES_REQUIRED += periph_gpio_irq
 endif
 
 ifneq (,$(filter lis2dh12%,$(USEMODULE)))
@@ -208,7 +239,8 @@ ifneq (,$(filter lis3dh,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
 endif
 
-ifneq (,$(filter lm75a,$(USEMODULE)))
+ifneq (,$(filter lis3mdl,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
 
@@ -217,12 +249,24 @@ ifneq (,$(filter lpd8808,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
+ifneq (,$(filter lps331ap,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter lsm6dsl,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
 
 ifneq (,$(filter mag3110,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
+ifneq (,$(filter mma7660,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
@@ -239,6 +283,10 @@ ifneq (,$(filter mpu9150,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter mq3,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
 ifneq (,$(filter mrf24j40,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += luid
@@ -246,6 +294,7 @@ ifneq (,$(filter mrf24j40,$(USEMODULE)))
   USEMODULE += ieee802154
   USEMODULE += netdev_ieee802154
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
 endif
 
@@ -270,18 +319,39 @@ ifneq (,$(filter nrfmin,$(USEMODULE)))
   USEMODULE += netif
 endif
 
+ifneq (,$(filter nrf24l01p,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_spi
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter nvram_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
   USEMODULE += nvram
   USEMODULE += xtimer
 endif
 
 ifneq (,$(filter pcd8544,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_spi
   USEMODULE += xtimer
 endif
 
 ifneq (,$(filter pir,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter pn532,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
+ifneq (,$(filter pulse_counter,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_gpio_irq
 endif
 
 ifneq (,$(filter rgbled,$(USEMODULE)))
@@ -336,15 +406,24 @@ ifneq (,$(filter soft_spi,$(USEMODULE)))
 endif
 
 ifneq (,$(filter srf02,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter srf04,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
 ifneq (,$(filter srf08,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
 
 ifneq (,$(filter sx127%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
   USEMODULE += iolist
   USEMODULE += xtimer
@@ -357,7 +436,22 @@ ifneq (,$(filter tcs37727,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter tja1042,$(USEMODULE)))
+  USEMODULE += can_trx
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 ifneq (,$(filter tmp006,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter tsl2561,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter tsl4531x,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   USEMODULE += xtimer
 endif
@@ -368,28 +462,26 @@ ifneq (,$(filter uart_half_duplex,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter vcnl40%0,$(USEMODULE)))
+  USEMODULE += vcnl40x0
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter veml6070,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
 ifneq (,$(filter w5100,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi
   USEMODULE += netdev_eth
   USEMODULE += luid
 endif
 
 ifneq (,$(filter xbee,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  FEATURES_REQUIRED += periph_gpio
   USEMODULE += ieee802154
   USEMODULE += xtimer
   USEMODULE += netif
-endif
-
-ifneq (,$(filter lis3mdl,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_i2c
-  USEMODULE += xtimer
-endif
-
-ifneq (,$(filter tja1042,$(USEMODULE)))
-  USEMODULE += can_trx
-  FEATURES_REQUIRED += periph_gpio
 endif

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys_hashes
+ * @ingroup     sys_hashes_non_crypto
  * @{
  *
  * @file
@@ -28,7 +28,9 @@ extern "C" {
 #endif
 
 /**
- * @brief djb2
+ * @defgroup sys_hashes_djb2 Bernstein hash djb2
+ * @ingroup sys_hashes_non_crypto
+ * @brief djb2 hash algorithm.
  *
  * HISTORY
  * This algorithm (k=33) was first reported by Dan Bernstein many years
@@ -47,7 +49,9 @@ extern "C" {
 uint32_t djb2_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief sdbm
+ * @defgroup sys_hashes_sdbm sdbm
+ * @ingroup sys_hashes_non_crypto
+ * @brief sdbm hash algorithm.
  *
  * HISTORY
  * This algorithm was created for sdbm (a public-domain reimplementation
@@ -72,7 +76,9 @@ uint32_t djb2_hash(const uint8_t *buf, size_t len);
 uint32_t sdbm_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief Kernighan and Ritchie
+ * @defgroup sys_hashes_kr Kernighan and Ritchie
+ * @ingroup sys_hashes_non_crypto
+ * @brief Kernighan and Ritchie hash algorithm.
  *
  * HISTORY
  * This hash function appeared in K&R (1st ed) but at least the reader
@@ -97,7 +103,9 @@ uint32_t sdbm_hash(const uint8_t *buf, size_t len);
 uint32_t kr_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief Shift, Add, XOR
+ * @defgroup sys_hashes_sax Shift, Add, XOR
+ * @ingroup sys_hashes_non_crypto
+ * @brief Shift, Add, XOR hash algorithm.
  *
  * @param buf input buffer to hash
  * @param len length of buffer
@@ -106,7 +114,9 @@ uint32_t kr_hash(const uint8_t *buf, size_t len);
 uint32_t sax_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief Donald E. Knuth
+ * @defgroup sys_hashes_dek Donald E. Knuth
+ * @ingroup sys_hashes_non_crypto
+ * @brief Donald E. Knuth hash algorithm.
  *
  * HISTORY
  * Proposed by Donald E. Knuth in The Art Of Computer Programming Vol. 3,
@@ -119,7 +129,9 @@ uint32_t sax_hash(const uint8_t *buf, size_t len);
 uint32_t dek_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief Fowler–Noll–Vo
+ * @defgroup sys_hashes_fnv Fowler–Noll–Vo
+ * @ingroup sys_hashes_non_crypto
+ * @brief Fowler–Noll–Vo hash algorithm.
  *
  * NOTE
  * For a more fully featured and modern version of this hash, see fnv32.c
@@ -132,7 +144,9 @@ uint32_t fnv_hash(const uint8_t *buf, size_t len);
 
 
 /**
- * @brief Rotating
+ * @defgroup sys_hashes_rotating Rotating
+ * @ingroup sys_hashes_non_crypto
+ * @brief Rotating hash algorithm.
  *
  * found on
  * http://burtleburtle.net/bob/hash/doobs.html
@@ -144,7 +158,9 @@ uint32_t fnv_hash(const uint8_t *buf, size_t len);
 uint32_t rotating_hash(const uint8_t *buf, size_t len);
 
 /**
- * @brief One at a time
+ * @defgroup sys_hashes_one_at_a_time One at a time
+ * @ingroup sys_hashes_non_crypto
+ * @brief One at a time hash algorithm.
  *
  * found on
  * http://burtleburtle.net/bob/hash/doobs.html

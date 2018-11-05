@@ -60,7 +60,7 @@ static inline int hih6130_measurement_request(const hih6130_t *dev)
     i2c_acquire(dev->i2c);
 
     /* An empty write request triggers a new measurement */
-    if (i2c_write_bytes(dev->i2c, dev->addr, NULL, 0) < 0) {
+    if (i2c_write_bytes(dev->i2c, dev->addr, NULL, 0, 0) < 0) {
         i2c_release(dev->i2c);
         return -1;
     }
@@ -84,7 +84,7 @@ static inline int hih6130_get_humidity_temperature_raw(const hih6130_t *dev, uin
 
     i2c_acquire(dev->i2c);
 
-    if (i2c_read_bytes(dev->i2c, dev->addr, &buf[0], sizeof(buf)) != sizeof(buf)) {
+    if (i2c_read_bytes(dev->i2c, dev->addr, &buf[0], sizeof(buf), 0) < 0) {
         i2c_release(dev->i2c);
         return -1;
     }

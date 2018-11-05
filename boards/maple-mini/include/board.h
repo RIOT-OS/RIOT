@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_maple-mini maple-mini
- * @ingroup     boards
- * @brief       Support for the maple-mini board
+ * @ingroup     boards_maple-mini
  * @{
  *
  * @file
@@ -59,7 +57,7 @@ extern "C" {
 /**
  * @brief Use the USART1 for STDIO on this board
  */
-#define UART_STDIO_DEV      UART_DEV(1)
+#define STDIO_UART_DEV      UART_DEV(1)
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO

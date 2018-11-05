@@ -17,7 +17,5 @@ HEXFILE = $(BINFILE)
 export FFLAGS = -d $(ID) -a 0 -s 0x08000000:leave -D "$(HEXFILE)"
 export TERMFLAGS = -p $(PORT)
 
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
-
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk

@@ -30,7 +30,7 @@ extern "C" {
 /**
  * @name    Starting address of the CPU ID
  */
-#ifdef CPU_MODEL_STM32L151RBA
+#if defined(CPU_MODEL_STM32L151RBA) || defined(CPU_MODEL_STM32L151CB)
 #define CPUID_ADDR          (0x1ff80050)
 #else
 #define CPUID_ADDR          (0x1ff800d0)
@@ -74,17 +74,18 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   I2C configuration data structure
+ * @name    EEPROM configuration
+ * @{
  */
-typedef struct {
-    I2C_TypeDef *dev;       /**< i2c device */
-    gpio_t scl;             /**< scl pin number */
-    gpio_t sda;             /**< sda pin number */
-    gpio_mode_t pin_mode;   /**< with or without pull resistor */
-    gpio_af_t af;           /**< I2C alternate function value */
-    uint8_t er_irqn;        /**< error IRQ */
-    uint8_t ev_irqn;        /**< event IRQ */
-} i2c_conf_t;
+#define EEPROM_START_ADDR          (0x08080000)
+#if defined(CPU_MODEL_STM32L152RE)
+#define EEPROM_SIZE                (16384UL)  /* 16kB */
+#elif defined(CPU_MODEL_STM32L151RC)
+#define EEPROM_SIZE                (8192U)    /* 8kB */
+#elif defined(CPU_MODEL_STM32L151CB)
+#define EEPROM_SIZE                (4096U)    /* 4kB */
+#endif
+/** @} */
 
 #ifdef __cplusplus
 }

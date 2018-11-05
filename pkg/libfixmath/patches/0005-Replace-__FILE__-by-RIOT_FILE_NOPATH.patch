@@ -1,0 +1,31 @@
+From 8d0c6f21ba52fb0b00e95a218fd60a4f16b7ccde Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABtan=20Harter?= <gaetan.harter@fu-berlin.de>
+Date: Thu, 26 Jul 2018 17:47:59 +0200
+Subject: [PATCH 5/5] Replace __FILE__ by RIOT_FILE_NOPATH
+
+The binary file size changes when the RIOT directory is moved.
+This caused the `libfixmath_unittests` to fail on my computer.
+
+I used RIOT_FILE_NOPATH instead of RIOT_FILE_RELATIVE as 'TEST' is used a lot
+and it would allow more boards to be tested, full path is not that important.
+
+---
+ unittests/libfixmath-unittests.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/unittests/libfixmath-unittests.h b/unittests/libfixmath-unittests.h
+index a72d025..52ad7cb 100644
+--- a/unittests/libfixmath-unittests.h
++++ b/unittests/libfixmath-unittests.h
+@@ -5,7 +5,7 @@
+ #define STR2(x) STR(x)
+ #define TEST(x) \
+     if (!(x)) { \
+-        printf( "\033[31;1mFAILED:\033[22;39m " __FILE__ ":" STR2(__LINE__) " " #x "\n"); \
++        printf( "\033[31;1mFAILED:\033[22;39m " RIOT_FILE_NOPATH ":" STR2(__LINE__) " " #x "\n"); \
+         status = 1; \
+     } else { \
+         printf("\033[32;1mOK:\033[22;39m " #x "\n"); \
+--
+2.7.4
+

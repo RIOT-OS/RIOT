@@ -1,6 +1,8 @@
 #!/bin/sh
 
-export TEST_BOARDS_AVAILABLE=${TEST_BOARDS_AVAILABLE:-"samr21-xpro"}
+: ${TEST_BOARDS_AVAILABLE:="samr21-xpro"}
+: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+
 export RIOT_CI_BUILD=1
 export STATIC_TESTS=${STATIC_TESTS:-1}
 export CFLAGS_DBG=""
@@ -25,6 +27,22 @@ check_label() {
 error() {
     echo "$@"
     exit 1
+}
+
+# if MURDOCK_HOOK is set, this function will execute it and pass on all it's
+# parameters. should the hook script exit with negative exit code, hook() makes
+# this script exit with error, too.
+# hook() will be called from different locations of this script.
+# currently, the only caller is "run_test", which calls "hook run_test_pre".
+# More hooks will be added as needed.
+hook() {
+    if [ -n "${MURDOCK_HOOK}" ]; then
+        echo "- executing hook $1"
+        "${MURDOCK_HOOK}" "$@" || {
+            error "$0: hook \"${MURDOCK_HOOK} $@\" failed!"
+        }
+        echo "- hook $1 finished"
+    fi
 }
 
 # true if word "$1" is in list of words "$2", false otherwise
@@ -54,9 +72,8 @@ _greplist() {
 
 # get list of all app directories
 get_apps() {
-    find tests/ examples/ \
-        -mindepth 2 -maxdepth 2 -name Makefile -type f \
-        | xargs dirname | $(_greplist $APPS) | sort
+    make -f makefiles/app_dirs.inc.mk info-applications \
+        | $(_greplist $APPS) | sort
 }
 
 # take app dir as parameter, print all boards that are supported
@@ -76,21 +93,36 @@ get_supported_boards() {
     done | $(_greplist $BOARDS)
 }
 
-# given an app dir as parameter, print "$appdir board" for each supported
-# board. Only print for boards in $BOARDS.
-get_app_board_pairs() {
+get_supported_toolchains() {
+    local appdir=$1
+    local board=$2
+    local toolchains="gnu"
+
+    if is_in_list "${board}" "${TEST_BOARDS_LLVM_COMPILE}"; then
+        toolchains="$(make -s --no-print-directory -C${appdir} BOARD=${board} \
+                      info-toolchains-supported 2> /dev/null | grep -o -e "llvm" -e "gnu")"
+    fi
+    echo "${toolchains}"
+}
+
+# given an app dir as parameter, print "$appdir $board:$toolchain" for each
+# supported board and toolchain. Only print for boards in $BOARDS.
+get_app_board_toolchain_pairs() {
     local appdir=$1
     for board in $(get_supported_boards $appdir)
     do
-        echo $appdir $board
+        for toolchain in $(get_supported_toolchains $appdir $board)
+        do
+            echo $appdir $board:$toolchain
+        done
     done | $(_greplist $BOARDS)
 }
 
-# use dwqc to create full "appdir board" compile job list
+# use dwqc to create full "appdir board toolchain" compile job list
 get_compile_jobs() {
     get_apps | \
         dwqc ${DWQ_ENV} -s \
-        "$0 get_app_board_pairs \${1}" \
+        "$0 get_app_board_toolchain_pairs \${1}" \
         | xargs '-d\n' -n 1 echo $0 compile
 }
 
@@ -99,10 +131,11 @@ print_worker() {
         echo "-- running on worker ${DWQ_WORKER} thread ${DWQ_WORKER_THREAD}, build number $DWQ_WORKER_BUILDNUM."
 }
 
-# compile one app for one board. delete intermediates.
+# compile one app for one board with one toolchain. delete intermediates.
 compile() {
     local appdir=$1
-    local board=$2
+    local board=$(echo $2 | cut -f 1 -d':')
+    local toolchain=$(echo $2 | cut -f 2 -d':')
 
     [ "$board" = "makefile_broken" ] && error "$0: Makefile in \"$appdir\" seems to be broken!"
 
@@ -116,12 +149,12 @@ compile() {
     print_worker
 
     # sanity checks
-    [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board)"
+    [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
     [ ! -d "boards/$board" ] && error "$0: compile: error: board directory \"boards/$board\" doesn't exist"
 
     # compile
-    CCACHE_BASEDIR="$(pwd)" BOARD=$board RIOT_CI_BUILD=1 \
+    CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} clean all -j${JOBS:-4}
     RES=$?
 
@@ -133,7 +166,7 @@ compile() {
                     BOARD=$board make -C${appdir} test
                     RES=$?
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
-                    BOARD=$board make -C${appdir} test-murdock
+                    BOARD=$board TOOLCHAIN=$toolchain make -C${appdir} test-murdock
                     RES=$?
                 fi
             fi
@@ -153,7 +186,8 @@ compile() {
 
 test_job() {
     local appdir=$1
-    local board=$2
+    local board=$(echo $2 | cut -f 1 -d':')
+    local toolchain=$(echo $2 | cut -f 2 -d':')
     local flashfile="$3"
 
     [ ! -f "$flashfile" ] && {
@@ -167,15 +201,17 @@ test_job() {
         --file $flashfile:$appdir/bin/${board}/$(basename $flashfile) \
         --queue ${TEST_QUEUE:-$board} \
         --maxfail 1 \
-        "./.murdock run_test $appdir $board"
+        "./.murdock run_test $appdir $board:$toolchain"
 }
 
 run_test() {
     local appdir=$1
-    local board=$2
+    local board=$(echo $2 | cut -f 1 -d':')
+    local toolchain=$(echo $2 | cut -f 2 -d':')
     print_worker
-    echo "-- executing tests for $appdir on $board:"
-    BOARD=$board make -C$appdir flash-only test
+    echo "-- executing tests for $appdir on $board (compiled with $toolchain toolchain):"
+    hook run_test_pre
+    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only test
 }
 
 # execute static tests

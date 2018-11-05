@@ -252,7 +252,16 @@ typedef struct {
     uint32_t loc;           /**< location of I2C pins */
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
     IRQn_Type irq;          /**< the devices base IRQ channel */
+    uint32_t speed;         /**< the bus speed */
 } i2c_conf_t;
+
+/**
+ * @brief   Declare needed generic I2C functions.
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_WRITE_REG
+/** @} */
 
 #ifndef DOXYGEN
 /**

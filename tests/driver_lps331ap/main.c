@@ -18,30 +18,21 @@
  * @}
  */
 
-#ifndef TEST_LPS331AP_I2C
-#error "TEST_LPS331AP_I2C not defined"
-#endif
-#ifndef TEST_LPS331AP_ADDR
-#error "TEST_LPS331AP_ADDR not defined"
-#endif
-
 #include <stdio.h>
 
 #include "xtimer.h"
 #include "lps331ap.h"
+#include "lps331ap_params.h"
 
-#define RATE        LPS331AP_RATE_7HZ
 #define SLEEP       (250 * 1000U)
 
 int main(void)
 {
     lps331ap_t dev;
-    int temp, pres;
-    int temp_abs, pres_abs;
 
     puts("LPS331AP pressure sensor test application\n");
-    printf("Initializing LPS331AP sensor at I2C_%i... ", TEST_LPS331AP_I2C);
-    if (lps331ap_init(&dev, TEST_LPS331AP_I2C, TEST_LPS331AP_ADDR, RATE) == 0) {
+    puts("Initializing LPS331AP sensor");
+    if (lps331ap_init(&dev, &lps331ap_params[0]) == 0) {
         puts("[OK]\n");
     }
     else {
@@ -50,12 +41,12 @@ int main(void)
     }
 
     while (1) {
-        pres = lps331ap_read_pres(&dev);
-        temp = lps331ap_read_temp(&dev);
+        int pres = lps331ap_read_pres(&dev);
+        int temp = lps331ap_read_temp(&dev);
 
-        pres_abs = pres / 1000;
+        int pres_abs = pres / 1000;
         pres -= pres_abs * 1000;
-        temp_abs = temp / 1000;
+        int temp_abs = temp / 1000;
         temp -= temp_abs * 1000;
 
         printf("Pressure value: %2i.%03i bar - Temperature: %2i.%03i °C\n",

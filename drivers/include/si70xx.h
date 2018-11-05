@@ -9,7 +9,10 @@
 /**
  * @defgroup    drivers_si70xx Si7006/13/20/21 temperature and humidity sensors
  * @ingroup     drivers_sensors
- * @brief       Driver for the Si7006/13/20/21 temperature and humidity sensor.
+ * @ingroup     drivers_saul
+ * @brief       Driver for the Si7006/13/20/21 temperature and humidity sensor
+ *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file
@@ -32,7 +35,6 @@ extern "C" {
  */
 enum {
     SI70XX_OK,                 /**< All OK */
-    SI70XX_ERR_NOI2C,          /**< An error occurred when initializing I2C bus */
     SI70XX_ERR_NODEV,          /**< No valid device found on I2C bus */
     SI70XX_ERR_I2C,            /**< An error occured when reading/writing on I2C bus */
 };

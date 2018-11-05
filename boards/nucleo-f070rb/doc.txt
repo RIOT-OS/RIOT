@@ -1,0 +1,74 @@
+/**
+@defgroup    boards_nucleo-f070rb STM32 Nucleo-F070RB
+@ingroup     boards_common_nucleo64
+@brief       Support for the STM32 Nucleo-F070RB
+
+## Overview
+
+The Nucleo-F070 is a board from ST's Nucleo family supporting a ARM Cortex-M0
+STM32F070RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
+
+## Hardware
+
+![Nucleo64 F070](http://www.open-electronics.org/wp-
+content/uploads/2015/08/Figura2-500x467.png)
+
+
+
+### MCU
+| MCU        | STM32F070RB           |
+|:------------- |:--------------------- |
+| Family | ARM Cortex-M0     |
+| Vendor | ST Microelectronics   |
+| RAM        | 16Kb |
+| Flash      | 128Kb             |
+| Frequency  | up to 48MHz) |
+| FPU        | yes               |
+| Timers | 11 (2x watchdog, 1 SysTick, 8x 16-bit)    |
+| ADCs       | 1x 12-bit         |
+| UARTs      | 4                 |
+| SPIs       | 2                 |
+| I2Cs       | 2                 |
+| RTC        | 1                 |
+| Vcc        | 2.0V - 3.6V           |
+| Datasheet  | [Datasheet](http://www.st.com/en/evaluation-tools/nucleo-f070rb.html) |
+| Reference Manual | [Reference Manual](http://www.st.com/resource/en/datasheet/stm32f070rb.pdf) |
+| Programming Manual | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00051352.pdf) |
+| Board Manual   | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf)|
+
+
+
+## Implementation Status
+| Device | ID        | Supported | Comments  |
+|:------------- |:------------- |:------------- |:------------- |
+| MCU        | STM32F070RB   | partly    | Energy saving modes not fully utilized |
+| Low-level driver | GPIO    | yes       | |
+|        | PWM       | yes (4 pins available)    |  |
+|        | UART      | 3 UARTs       | USART2 via STLink/USB or D0(RX)/D1(TX), USART1 on PA10(RX)/PA09(TX) and USART3 on PC11(RX)/PC10(TX) |
+|        | ADC       | 6 pins        | |
+|        | I2C       | no        | |
+|        | SPI       | no        | |
+|        | USB       | no        | |
+|        | Timer     | 3 16 bit timers       | |
+
+
+## Flashing the device
+The ST Nucleo-F070 board includes an on-board ST-LINK V2 programmer. The
+easiest way to program the board is to use OpenOCD. Once you have installed
+OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
+installation instructions), you can flash the board simply by typing
+
+```
+make BOARD=nucleo-f070 flash
+```
+and debug via GDB by simply typing
+```
+make BOARD=nucleo-f070 debug
+```
+
+
+## Supported Toolchains
+For using the ST Nucleo-F070 board we strongly recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+ */

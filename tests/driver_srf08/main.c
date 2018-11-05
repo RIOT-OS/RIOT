@@ -15,6 +15,7 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @author      Kevin Weiss <kevin.weiss@haw-hamburg.de>
  *
  * @}
  */
@@ -49,7 +50,7 @@ int main(void)
     int res;
     uint16_t range_array[TEST_NUM_ECHOS];
 
-    res = srf08_init(&srf08_0, TEST_SRF08_I2C, SRF08_DEFAULT_ADDR, TEST_SRF08_SPEED);
+    res = srf08_init(&srf08_0, TEST_SRF08_I2C, SRF08_DEFAULT_ADDR);
 
     if (res < 0) {
         printf("[Failed]");
@@ -61,11 +62,13 @@ int main(void)
 
         while(1) {
 
-            int echo_number = srf08_get_distances(&srf08_0, range_array, TEST_NUM_ECHOS, TEST_MODE);
+            int echo_number = srf08_get_distances(&srf08_0, range_array,
+                                                  TEST_NUM_ECHOS, TEST_MODE);
 
             if (echo_number > 0) {
                 for (int i = 0; i < echo_number; i++) {
-                    printf("stored distance = %i cm , echo%i\n", range_array[i], i + 1);
+                    printf("stored distance = %i cm , echo%i\n",
+                           range_array[i], i + 1);
                 }
                 puts("--------------------------------------------");
             }

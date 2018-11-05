@@ -44,10 +44,15 @@ extern "C" {
 #define TSL2561_PARAM_INTEGRATION     TSL2561_INTEGRATIONTIME_402MS
 #endif
 
-#define TSL2561_PARAMS_DEFAULT        { .i2c_dev     = TSL2561_PARAM_I2C_DEV, \
+#ifndef TSL2561_PARAMS
+#define TSL2561_PARAMS                { .i2c_dev     = TSL2561_PARAM_I2C_DEV, \
                                         .addr        = TSL2561_PARAM_ADDR,    \
                                         .gain        = TSL2561_PARAM_GAIN,    \
                                         .integration = TSL2561_PARAM_INTEGRATION }
+#endif
+#ifndef TSL2561_SAUL_INFO
+#define TSL2561_SAUL_INFO             { .name= "tsl2561" }
+#endif
 /**@}*/
 
 /**
@@ -55,19 +60,15 @@ extern "C" {
  */
 static const tsl2561_params_t tsl2561_params[] =
 {
-#ifdef TSL2561_PARAMS_CUSTOM
-    TSL2561_PARAMS_CUSTOM,
-#else
-    TSL2561_PARAMS_DEFAULT,
-#endif
+    TSL2561_PARAMS
 };
 
 /**
  * @brief   Allocate and configure entries to the SAUL registry
  */
-saul_reg_info_t tsl2561_saul_reg_info[] =
+saul_reg_info_t tsl2561_saul_info[] =
 {
-    { .name= "tsl2561" }
+    TSL2561_SAUL_INFO
 };
 
 #ifdef __cplusplus

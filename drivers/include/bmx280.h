@@ -10,6 +10,7 @@
 /**
  * @defgroup    drivers_bmx280 BMP280/BME280 temperature, pressure and humidity sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver interface for the Bosch BMP280 and BME280 sensors.
  *
  * BMP280 and BME280 measure temperature in centi °C and pressure in Pa. BME280
@@ -18,6 +19,26 @@
  * For more information, see the datasheets:
  * * [BMP280](https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001-18.pdf)
  * * [BME280](https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME280_DS001-11.pdf)
+ *
+ * This driver provides @ref drivers_saul capabilities.
+ *
+ * ## Usage
+ *
+ * Add the following to your makefile:
+ *
+ * ```make
+ * # For BME280
+ * USEMODULE += bme280
+ *
+ * # When using I2C, specify the default I2C device to use,
+ * # and the BME280's address (see datasheet).
+ * # The values below are the defaults:
+ * CFLAGS += -DBMX280_PARAM_I2C_DEV=I2C_DEV\(0\)
+ * CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x77
+ * ```
+ *
+ * This allows initialisation with the default parameters in `BMX280_PARAMS_DEFAULT`
+ * from `bmx280_params.h`.
  *
  * @{
  * @file
@@ -29,7 +50,7 @@
  *              values by changing the oversampling settings.  The driver is
  *              written in such a way that a measurement is only started from
  *              the function that reads the temperature.  In other words, you
- *              always have to call bme280_read_temperature, and then optionally
+ *              always have to call bmx280_read_temperature, and then optionally
  *              you can call the other two.
  *
  * @author      Kees Bakker <kees@sodaq.com>
@@ -164,9 +185,8 @@ typedef struct {
  */
 enum {
     BMX280_OK           =  0,     /**< everything was fine */
-    BMX280_ERR_I2C      = -1,     /**< error initializing the I2C bus */
-    BMX280_ERR_NODEV    = -2,     /**< did not detect BME280 or BMP280 */
-    BMX280_ERR_NOCAL    = -3,     /**< could not read calibration data */
+    BMX280_ERR_NODEV    = -1,     /**< did not detect BME280 or BMP280 */
+    BMX280_ERR_NOCAL    = -2,     /**< could not read calibration data */
 };
 
 /**
@@ -204,7 +224,7 @@ int16_t bmx280_read_temperature(const bmx280_t* dev);
  */
 uint32_t bmx280_read_pressure(const bmx280_t *dev);
 
-#if defined(MODULE_BME280)
+#if defined(MODULE_BME280) || defined(DOXYGEN)
 /**
  * @brief   Read humidity value from the given BME280 device, returned in centi %RH
  *

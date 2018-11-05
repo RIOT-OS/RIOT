@@ -196,19 +196,19 @@ static void test_addr_to_str(void)
     TEST_ASSERT_EQUAL_STRING("", &out[0]);
     TEST_ASSERT(out == gnrc_netif_addr_to_str(ethernet_l2addr,
                                               sizeof(ethernet_l2addr), out));
-    TEST_ASSERT_EQUAL_STRING("3e:e6:b5:22:fd:0a", &out[0]);
+    TEST_ASSERT_EQUAL_STRING("3E:E6:B5:22:FD:0A", &out[0]);
     TEST_ASSERT(out == gnrc_netif_addr_to_str(ieee802154_l2addr_long,
                                               sizeof(ieee802154_l2addr_long),
                                               out));
-    TEST_ASSERT_EQUAL_STRING("3e:e6:b5:0f:19:22:fd:0a", &out[0]);
+    TEST_ASSERT_EQUAL_STRING("3E:E6:B5:0F:19:22:FD:0A", &out[0]);
     TEST_ASSERT(out == gnrc_netif_addr_to_str(ieee802154_l2addr_short,
                                               sizeof(ieee802154_l2addr_short),
                                               out));
-    TEST_ASSERT_EQUAL_STRING("fd:0a", &out[0]);
+    TEST_ASSERT_EQUAL_STRING("FD:0A", &out[0]);
     TEST_ASSERT(out == gnrc_netif_addr_to_str(netif0_l2addr,
                                               sizeof(netif0_l2addr),
                                               out));
-    TEST_ASSERT_EQUAL_STRING("3e:e7:b5:0f:19:22:fd:0a", &out[0]);
+    TEST_ASSERT_EQUAL_STRING("3E:E7:B5:0F:19:22:FD:0A", &out[0]);
 }
 
 static void test_addr_from_str(void)
@@ -220,16 +220,16 @@ static void test_addr_from_str(void)
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_addr_from_str("", out));
     TEST_ASSERT_EQUAL_INT(sizeof(ethernet_l2addr),
-                          gnrc_netif_addr_from_str("3e:e6:b5:22:fd:0a", out));
+                          gnrc_netif_addr_from_str("3E:E6:B5:22:FD:0A", out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ethernet_l2addr, out,
                                     sizeof(ethernet_l2addr)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_long),
-                          gnrc_netif_addr_from_str("3e:e6:b5:0f:19:22:fd:0a",
+                          gnrc_netif_addr_from_str("3E:E6:B5:0F:19:22:FD:0A",
                                                    out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_long, out,
                                     sizeof(ieee802154_l2addr_long)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_short),
-                          gnrc_netif_addr_from_str("fd:0a", out));
+                          gnrc_netif_addr_from_str("FD:0A", out));
     TEST_ASSERT_EQUAL_INT(0, memcmp(ieee802154_l2addr_short, out,
                                     sizeof(ieee802154_l2addr_short)));
 }
@@ -450,6 +450,28 @@ static void test_ipv6_addr_best_src__other_subnet(void)
     TEST_ASSERT(!ipv6_addr_is_unspecified(out));
 }
 
+static void test_ipv6_addr_best_src__ula_src_dst(void)
+{
+    static const ipv6_addr_t ula_src = { .u8 = NETIF0_IPV6_ULA };
+    static const ipv6_addr_t ula_dst = { .u8 = { ULA1, ULA2, ULA3, ULA4,
+                                                 ULA5, ULA6, ULA7, ULA8,
+                                                 0, 0, 0, 0, 0, 0, 0, 1 } };
+    ipv6_addr_t *out = NULL;
+    int idx;
+
+    test_ipv6_addr_add__success();
+    TEST_ASSERT(0 <= (idx = gnrc_netif_ipv6_addr_add_internal(netifs[0], &ula_src, 64U,
+                                                     GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)));
+    TEST_ASSERT_EQUAL_INT(GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID,
+                          netifs[0]->ipv6.addrs_flags[idx]);
+    TEST_ASSERT(ipv6_addr_equal(&ula_src, &netifs[0]->ipv6.addrs[idx]));
+
+    TEST_ASSERT_NOT_NULL((out = gnrc_netif_ipv6_addr_best_src(netifs[0],
+                                                              &ula_dst,
+                                                              false)));
+    TEST_ASSERT(ipv6_addr_equal(&ula_src, out));
+}
+
 static void test_get_by_ipv6_addr__empty(void)
 {
     static const ipv6_addr_t addr = { .u8 = NETIF0_IPV6_LL };
@@ -523,7 +545,7 @@ static void test_ipv6_group_join__ENOMEM(void)
 {
     ipv6_addr_t addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
 
-    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF;
+    for (unsigned i = 0; i < GNRC_NETIF_IPV6_GROUPS_NUMOF;
          i++, addr.u16[7].u16++) {
         TEST_ASSERT(0 <= gnrc_netif_ipv6_group_join_internal(netifs[0], &addr));
     }
@@ -1043,7 +1065,7 @@ static void test_netif_iter(void)
 
 static void test_netif_get_name(void)
 {
-    char exp_name[NETIF_NAMELENMAX];
+    char exp_name[NETIF_NAMELENMAX + 1];
     char name[NETIF_NAMELENMAX];
     int res;
     netif_t netif = netif_iter(NETIF_INVALID);
@@ -1469,6 +1491,7 @@ static Test *embunit_tests_gnrc_netif(void)
         new_TestFixture(test_ipv6_addr_best_src__multicast_input),
         new_TestFixture(test_ipv6_addr_best_src__unspecified_addr),
         new_TestFixture(test_ipv6_addr_best_src__other_subnet),
+        new_TestFixture(test_ipv6_addr_best_src__ula_src_dst),
         new_TestFixture(test_get_by_ipv6_addr__empty),
         new_TestFixture(test_get_by_ipv6_addr__unspecified_addr),
         new_TestFixture(test_get_by_ipv6_addr__success),

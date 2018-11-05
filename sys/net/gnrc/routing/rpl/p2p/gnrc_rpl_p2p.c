@@ -14,6 +14,8 @@
  * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
+#include <string.h>
+
 #include "net/icmpv6.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/icmpv6.h"

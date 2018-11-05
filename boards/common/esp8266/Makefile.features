@@ -1,0 +1,13 @@
+# MCU defined features that are provided independent on board definitions
+
+include $(RIOTCPU)/esp8266/Makefile.features
+
+# MCU defined peripheral features provided by all boards in alphabetical order
+
+FEATURES_PROVIDED += periph_adc
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_gpio_irq
+FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_spi
+FEATURES_PROVIDED += periph_uart

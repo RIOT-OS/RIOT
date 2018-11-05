@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016-18 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2018 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Nanocoap implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -27,6 +29,15 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+
+/**
+ * @name    Internally used CoAP packet types
+ * @{
+ */
+#define COAP_REQ                (0)
+#define COAP_RESP               (2)
+#define COAP_RST                (3)
+/** @} */
 
 static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end);
 int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target);
@@ -117,7 +128,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     }
 
 #ifdef MODULE_GCOAP
-    coap_get_uri(pkt, pkt->url);
+    coap_get_uri_path(pkt, pkt->url);
     pkt->content_type = coap_get_content_type(pkt);
 
     if (coap_get_option_uint(pkt, COAP_OPT_OBSERVE, &pkt->observe_value) != 0) {
@@ -133,9 +144,9 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     return 0;
 }
 
-uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
+uint8_t *coap_find_option(const coap_pkt_t *pkt, unsigned opt_num)
 {
-    coap_optpos_t *optpos = pkt->options;
+    const coap_optpos_t *optpos = pkt->options;
     unsigned opt_count = pkt->options_len;
 
     while (opt_count--) {
@@ -147,7 +158,8 @@ uint8_t *coap_find_option(coap_pkt_t *pkt, unsigned opt_num)
     return NULL;
 }
 
-static uint8_t *_parse_option(coap_pkt_t *pkt, uint8_t *pkt_pos, uint16_t *delta, int *opt_len)
+static uint8_t *_parse_option(const coap_pkt_t *pkt,
+                              uint8_t *pkt_pos, uint16_t *delta, int *opt_len)
 {
     uint8_t *hdr_end = pkt->payload;
 
@@ -188,7 +200,8 @@ int coap_get_option_uint(coap_pkt_t *pkt, unsigned opt_num, uint32_t *target)
     return -1;
 }
 
-uint8_t *coap_iterate_option(coap_pkt_t *pkt, uint8_t **optpos, int *opt_len, int first)
+uint8_t *coap_iterate_option(const coap_pkt_t *pkt, uint8_t **optpos,
+                             int *opt_len, int first)
 {
     uint8_t *data_start;
 
@@ -226,25 +239,29 @@ unsigned coap_get_content_type(coap_pkt_t *pkt)
     return content_type;
 }
 
-int coap_get_uri(coap_pkt_t *pkt, uint8_t *target)
+ssize_t coap_opt_get_string(const coap_pkt_t *pkt, uint16_t optnum,
+                            uint8_t *target, size_t max_len, char separator)
 {
-    uint8_t *opt_pos = coap_find_option(pkt, COAP_OPT_URI_PATH);
+    assert(pkt && target && (max_len > 1));
+
+    uint8_t *opt_pos = coap_find_option(pkt, optnum);
     if (!opt_pos) {
-        *target++ = '/';
+        *target++ = (uint8_t)separator;
         *target = '\0';
         return 2;
     }
 
-    unsigned left = NANOCOAP_URI_MAX - 1;
+    unsigned left = max_len - 1;
     uint8_t *part_start = NULL;
     do {
         int opt_len;
-        part_start = coap_iterate_option(pkt, &opt_pos, &opt_len, part_start==NULL);
+        part_start = coap_iterate_option(pkt, &opt_pos, &opt_len,
+                                         (part_start == NULL));
         if (part_start) {
             if (left < (unsigned)(opt_len + 1)) {
                 return -ENOSPC;
             }
-            *target++ = '/';
+            *target++ = (uint8_t)separator;
             memcpy(target, part_start, opt_len);
             target += opt_len;
             left -= (opt_len + 1);
@@ -253,7 +270,7 @@ int coap_get_uri(coap_pkt_t *pkt, uint8_t *target)
 
     *target = '\0';
 
-    return NANOCOAP_URI_MAX - left;
+    return (int)(max_len - left);
 }
 
 int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsigned *szx)
@@ -296,7 +313,7 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
     uint8_t *uri = pkt->url;
 #else
     uint8_t uri[NANOCOAP_URI_MAX];
-    if (coap_get_uri(pkt, uri) <= 0) {
+    if (coap_get_uri_path(pkt, uri) <= 0) {
         return -EBADMSG;
     }
 #endif
@@ -353,8 +370,16 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
         return -ENOSPC;
     }
 
-    /* if code is COAP_CODE_EMPTY (zero), use RST as type, else RESP */
-    unsigned type = code ? COAP_RESP : COAP_RST;
+    /* if code is COAP_CODE_EMPTY (zero), assume Reset (RST) type */
+    unsigned type = COAP_TYPE_RST;
+    if (code) {
+        if (coap_get_type(pkt) == COAP_TYPE_CON) {
+            type = COAP_TYPE_ACK;
+        }
+        else {
+            type = COAP_TYPE_NON;
+        }
+    }
 
     coap_build_hdr((coap_hdr_t *)rbuf, type, pkt->token, tkl, code,
                    ntohs(pkt->hdr->id));
@@ -529,11 +554,39 @@ size_t coap_put_option_ct(uint8_t *buf, uint16_t lastonum, uint16_t content_type
     }
 }
 
+static unsigned _size2szx(size_t size)
+{
+    unsigned szx = 0;
+    assert(size <= 1024);
+
+    while (size) {
+        size = size >> 1;
+        szx++;
+    }
+    /* Size exponent + 1 */
+    assert(szx >= 5);
+    return szx - 5;
+}
+
+static unsigned _slicer_blknum(coap_block_slicer_t *slicer)
+{
+    size_t blksize = slicer->end - slicer->start;
+    size_t start = slicer->start;
+    unsigned blknum = 0;
+
+    while (start > 0) {
+        start -= blksize;
+        blknum++;
+    }
+    return blknum;
+}
+
 static size_t coap_put_option_block(uint8_t *buf, uint16_t lastonum, unsigned blknum, unsigned szx, int more, uint16_t option)
 {
     uint32_t blkopt = (blknum << 4) | szx | (more ? 0x8 : 0);
     size_t olen = _encode_uint(&blkopt);
-    return coap_put_option(buf, lastonum, option, (uint8_t*)&blkopt, olen);
+
+    return coap_put_option(buf, lastonum, option, (uint8_t *)&blkopt, olen);
 }
 
 size_t coap_put_option_block1(uint8_t *buf, uint16_t lastonum, unsigned blknum, unsigned szx, int more)
@@ -545,6 +598,7 @@ int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block1)
 {
     uint32_t blknum;
     unsigned szx;
+
     block1->more = coap_get_blockopt(pkt, COAP_OPT_BLOCK1, &blknum, &szx);
     if (block1->more >= 0) {
         block1->offset = blknum << (szx + 4);
@@ -559,6 +613,13 @@ int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block1)
     return (block1->more >= 0);
 }
 
+int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block2)
+{
+    block2->more = coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &block2->blknum,
+                                     &block2->szx);
+    return (block2->more >= 0);
+}
+
 size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t lastonum)
 {
     if (block1->more >= 1) {
@@ -569,24 +630,33 @@ size_t coap_put_block1_ok(uint8_t *pkt_pos, coap_block1_t *block1, uint16_t last
     }
 }
 
-size_t coap_put_option_uri(uint8_t *buf, uint16_t lastonum, const char *uri, uint16_t optnum)
+size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer, bool more)
 {
-    char separator = (optnum == COAP_OPT_URI_PATH) ? '/' : '&';
-    size_t uri_len = strlen(uri);
+    unsigned szx = _size2szx(slicer->end - slicer->start);
+    unsigned blknum = _slicer_blknum(slicer);
 
-    if (uri_len == 0) {
+    slicer->opt = buf;
+    return coap_put_option_block(buf, lastonum, blknum, szx, more, COAP_OPT_BLOCK2);
+}
+
+size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
+                           const char *string, char separator)
+{
+    size_t len = strlen(string);
+
+    if (len == 0) {
         return 0;
     }
 
     uint8_t *bufpos = buf;
-    char *uripos = (char *)uri;
+    char *uripos = (char *)string;
 
-    while (uri_len) {
+    while (len) {
         size_t part_len;
         uripos++;
         uint8_t *part_start = (uint8_t *)uripos;
 
-        while (uri_len--) {
+        while (len--) {
             if ((*uripos == separator) || (*uripos == '\0')) {
                 break;
             }
@@ -595,7 +665,9 @@ size_t coap_put_option_uri(uint8_t *buf, uint16_t lastonum, const char *uri, uin
 
         part_len = (uint8_t *)uripos - part_start;
 
-        if (part_len) {
+        /* Creates empty option if part for Uri-Path or Uri-Location contains only *
+         * a trailing slash, except for root path ("/"). */
+        if (part_len || ((separator == '/') && (lastonum == optnum))) {
             bufpos += coap_put_option(bufpos, lastonum, optnum, part_start, part_len);
             lastonum = optnum;
         }
@@ -650,7 +722,9 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
 
         part_len = (uint8_t *)uripos - part_start;
 
-        if (part_len) {
+        /* Creates empty option if part for Uri-Path or Uri-Location contains
+         * only a trailing slash, except for root path ("/"). */
+        if (part_len || ((separator == '/') && write_len)) {
             if (pkt->options_len == NANOCOAP_NOPTS_MAX) {
                 return -ENOSPC;
             }
@@ -683,32 +757,118 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
     return pkt->payload - (uint8_t *)pkt->hdr;
 }
 
+void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer)
+{
+    uint32_t blknum;
+    unsigned szx;
+
+    /* Retrieve the block2 option from the client request */
+    if (coap_get_blockopt(pkt, COAP_OPT_BLOCK2, &blknum, &szx) >= 0) {
+        /* Use the client requested block size if it is smaller than our own
+         * maximum block size */
+        if (NANOCOAP_BLOCK_SIZE_EXP_MAX - 4 < szx) {
+            szx = NANOCOAP_BLOCK_SIZE_EXP_MAX - 4;
+        }
+    }
+    slicer->start = blknum * coap_szx2size(szx);
+    slicer->end = slicer->start + coap_szx2size(szx);
+    slicer->cur = 0;
+}
+
+void coap_block2_finish(coap_block_slicer_t *slicer)
+{
+    assert(slicer->opt);
+
+    /* The third parameter for _decode_value() points to the end of the header.
+     * We don't know this position, but we know we can read the option because
+     * it's already in the buffer. So just point past the option. */
+    uint8_t *pos = slicer->opt + 1;
+    uint16_t delta = _decode_value(*slicer->opt >> 4, &pos, slicer->opt + 3);
+    int more = (slicer->cur > slicer->end) ? 1 : 0;
+
+    coap_opt_put_block2(slicer->opt, COAP_OPT_BLOCK2 - delta, slicer, more);
+}
+
+ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
+                                uint8_t *rbuf, unsigned rlen, unsigned payload_len,
+                                coap_block_slicer_t *slicer)
+{
+    /* Check if the generated data filled the requested block */
+    if (slicer->cur < slicer->start) {
+        return coap_build_reply(pkt, COAP_CODE_BAD_OPTION, rbuf, rlen, 0);
+    }
+    coap_block2_finish(slicer);
+    return coap_build_reply(pkt, code, rbuf, rlen, payload_len);
+}
+
+size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, char c)
+{
+    /* Only copy the char if it is within the window */
+    if ((slicer->start <= slicer->cur) && (slicer->cur < slicer->end)) {
+        *bufpos = c;
+        slicer->cur++;
+        return 1;
+    }
+    slicer->cur++;
+    return 0;
+}
+
+size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
+                                const uint8_t *c, size_t len)
+{
+    size_t str_len = 0;    /* Length of the string to copy */
+
+    /* Calculate start offset of the supplied string */
+    size_t str_offset = (slicer->start > slicer->cur)
+                        ? slicer->start - slicer->cur
+                        : 0;
+
+    /* Check for string before or beyond window */
+    if ((slicer->cur >= slicer->end) || (str_offset > len)) {
+        slicer->cur += len;
+        return 0;
+    }
+    /* Check if string is over the end of the window */
+    if ((slicer->cur + len) >= slicer->end) {
+        str_len = slicer->end - (slicer->cur + str_offset);
+    }
+    else {
+        str_len = len - str_offset;
+    }
+
+    /* Only copy the relevant part of the string to the buffer */
+    memcpy(bufpos, c + str_offset, str_len);
+    slicer->cur += len;
+    return str_len;
+}
+
 ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
                                              size_t len, void *context)
 {
     (void)context;
-
+    coap_block_slicer_t slicer;
+    coap_block2_init(pkt, &slicer);
     uint8_t *payload = buf + coap_get_total_hdr_len(pkt);
-
     uint8_t *bufpos = payload;
+    bufpos += coap_put_option_ct(bufpos, 0, COAP_FORMAT_LINK);
+    bufpos += coap_opt_put_block2(bufpos, COAP_OPT_CONTENT_FORMAT, &slicer, 1);
 
-    bufpos += coap_put_option_ct(bufpos, 0, COAP_CT_LINK_FORMAT);
     *bufpos++ = 0xff;
 
     for (unsigned i = 0; i < coap_resources_numof; i++) {
         if (i) {
-            *bufpos++ = ',';
+            bufpos += coap_blockwise_put_char(&slicer, bufpos, ',');
         }
-        *bufpos++ = '<';
+        bufpos += coap_blockwise_put_char(&slicer, bufpos, '<');
         unsigned url_len = strlen(coap_resources[i].path);
-        memcpy(bufpos, coap_resources[i].path, url_len);
-        bufpos += url_len;
-        *bufpos++ = '>';
+        bufpos += coap_blockwise_put_bytes(&slicer, bufpos,
+                (uint8_t*)coap_resources[i].path, url_len);
+        bufpos += coap_blockwise_put_char(&slicer, bufpos, '>');
     }
 
     unsigned payload_len = bufpos - payload;
-
-    return coap_build_reply(pkt, COAP_CODE_205, buf, len, payload_len);
+    return coap_block2_build_reply(pkt, COAP_CODE_205, buf, len, payload_len,
+                                   &slicer);
 }
 
 unsigned coap_get_len(coap_pkt_t *pkt)

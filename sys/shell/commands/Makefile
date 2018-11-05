@@ -66,6 +66,9 @@ endif
 ifneq (,$(filter conn_can,$(USEMODULE)))
   SRC += sc_can.c
 endif
+ifneq (,$(filter cord_ep,$(USEMODULE)))
+  SRC += sc_cord_ep.c
+endif
 
 ifneq (,$(filter periph_rtc,$(FEATURES_PROVIDED)))
   SRC += sc_rtc.c

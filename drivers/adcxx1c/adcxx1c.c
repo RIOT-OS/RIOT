@@ -27,8 +27,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define I2C_SPEED I2C_SPEED_FAST
-
 #define I2C (dev->params.i2c)
 #define ADDR (dev->params.addr)
 
@@ -44,17 +42,11 @@ int adcxx1c_init(adcxx1c_t *dev, const adcxx1c_params_t *params)
     dev->cb = NULL;
 
     i2c_acquire(I2C);
-    if (i2c_init_master(I2C, I2C_SPEED) < 0) {
-        i2c_release(I2C);
-        DEBUG("[adcxx1c] init - error: unable to initialize I2C bus\n");
-        return ADCXX1C_NOI2C;
-    }
-
     uint8_t reg = 0;
 
     /* Test communication write and read configuration register */
-    i2c_write_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, CONF_TEST_VALUE);
-    i2c_read_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, &reg);
+    i2c_write_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, CONF_TEST_VALUE, 0);
+    i2c_read_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, &reg, 0);
 
     if (reg != CONF_TEST_VALUE) {
         i2c_release(I2C);
@@ -63,7 +55,7 @@ int adcxx1c_init(adcxx1c_t *dev, const adcxx1c_params_t *params)
     }
 
     reg = dev->params.cycle << 5;
-    i2c_write_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, reg);
+    i2c_write_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, reg, 0);
     i2c_release(I2C);
 
     adcxx1c_set_alert_parameters(dev, dev->params.low_limit,
@@ -79,9 +71,9 @@ int adcxx1c_read_raw(const adcxx1c_t *dev, int16_t *raw)
     int status;
 
     i2c_acquire(I2C);
-    status = i2c_read_regs(I2C, ADDR, ADCXX1C_CONV_RES_ADDR, buf, 2);
+    status = i2c_read_regs(I2C, ADDR, ADCXX1C_CONV_RES_ADDR, buf, 2, 0);
     i2c_release(I2C);
-    if (status < 2) {
+    if (status < 0) {
         return ADCXX1C_NOI2C;
     }
 
@@ -104,10 +96,10 @@ int adcxx1c_enable_alert(adcxx1c_t *dev, adcxx1c_cb_t cb, void *arg)
     uint8_t reg;
 
     i2c_acquire(I2C);
-    i2c_read_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, &reg);
+    i2c_read_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, &reg, 0);
     reg |= (dev->params.alert_pin != GPIO_UNDEF ? ADCXX1C_CONF_ALERT_PIN_EN : 0)
             | ADCXX1C_CONF_ALERT_FLAG_EN;
-    i2c_write_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, reg);
+    i2c_write_reg(I2C, ADDR, ADCXX1C_CONF_ADDR, reg, 0);
     i2c_release(I2C);
 
     if (dev->params.alert_pin != GPIO_UNDEF) {
@@ -130,17 +122,17 @@ int adcxx1c_set_alert_parameters(const adcxx1c_t *dev, int16_t low_limit,
     low_limit <<= (12 - dev->params.bits);
     buf[0] = low_limit >> 8;
     buf[1] = low_limit & 0xFF;
-    i2c_write_regs(I2C, ADDR, ADCXX1C_LOW_LIMIT_ADDR, buf, 2);
+    i2c_write_regs(I2C, ADDR, ADCXX1C_LOW_LIMIT_ADDR, buf, 2, 0);
 
     high_limit <<= (12 - dev->params.bits);
     buf[0] = high_limit >> 8;
     buf[1] = high_limit & 0xFF;
-    i2c_write_regs(I2C, ADDR, ADCXX1C_HIGH_LIMIT_ADDR, buf, 2);
+    i2c_write_regs(I2C, ADDR, ADCXX1C_HIGH_LIMIT_ADDR, buf, 2, 0);
 
     hysteresis <<= (12 - dev->params.bits);
     buf[0] = hysteresis >> 8;
     buf[1] = hysteresis & 0xFF;
-    i2c_write_regs(I2C, ADDR, ADCXX1C_HYSTERESIS_ADDR, buf, 2);
+    i2c_write_regs(I2C, ADDR, ADCXX1C_HYSTERESIS_ADDR, buf, 2, 0);
 
     i2c_release(I2C);
 

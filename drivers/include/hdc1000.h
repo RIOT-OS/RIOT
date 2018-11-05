@@ -10,6 +10,7 @@
 /**
  * @defgroup    drivers_hdc1000 HDC1000 Humidity and Temperature Sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the TI HDC1000 Humidity and Temperature Sensor
  *
  * The driver will initialize the sensor for best resolution (14 bit). Currently
@@ -25,6 +26,8 @@
  *
  * @note        The driver does currently not support using the devices heating
  *              unit.
+ *
+ * This driver provides @ref drivers_saul capabilities.
  *
  * @{
  *
@@ -88,9 +91,10 @@ typedef enum {
  * @brief   Parameters needed for device initialization
  */
 typedef struct {
-    i2c_t i2c;              /**< bus the device is connected to */
-    uint8_t addr;           /**< address on that bus */
-    hdc1000_res_t res;      /**< resolution used for sampling temp and hum */
+    i2c_t i2c;               /**< bus the device is connected to */
+    uint8_t addr;            /**< address on that bus */
+    hdc1000_res_t res;       /**< resolution used for sampling temp and hum */
+    uint32_t renew_interval; /**< interval for cache renewal */
 } hdc1000_params_t;
 
 /**

@@ -22,6 +22,7 @@
 
 #ifdef MODULE_MMA8X5X
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "mma8x5x.h"

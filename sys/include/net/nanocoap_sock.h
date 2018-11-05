@@ -44,7 +44,7 @@ extern "C" {
 int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize);
 
 /**
- * @brief   Simple synchronous CoAP get
+ * @brief   Simple synchronous CoAP (confirmable) get
  *
  * @param[in]   remote  remote UDP endpoint
  * @param[in]   path    remote path

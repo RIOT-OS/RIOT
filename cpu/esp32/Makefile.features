@@ -1,0 +1,6 @@
+# Features that are provided by CPU independent on the board
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_timer

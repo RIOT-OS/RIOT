@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_jiminy-mega256rfr2 Jiminy- Mega256rfr2
- * @ingroup     boards
- * @brief       Board specific files for the Jiminy Mega 256rfr2 board.
+ * @ingroup     boards_jiminy-mega256rfr2
  * @{
  *
  * @file
@@ -42,8 +40,8 @@ extern "C" {
  *
  * @{
  */
-#ifndef UART_STDIO_BAUDRATE
-#define UART_STDIO_BAUDRATE (38400U)       /**< Sets Baudrate for e.g. Shell */
+#ifndef STDIO_UART_BAUDRATE
+#define STDIO_UART_BAUDRATE (38400U)       /**< Sets Baudrate for e.g. Shell */
 #endif
 /** @} */
 

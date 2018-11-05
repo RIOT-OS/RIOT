@@ -1,10 +1,15 @@
 OPENTHREAD_DIR = $(RIOTBASE)/pkg/openthread
 
 INCLUDES += -I$(OPENTHREAD_DIR)/include \
-            -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/output/include \
-            -I$(BINDIRBASE)/pkg/$(BOARD)/openthread/include/openthread \
+            -I$(PKGDIRBASE)/openthread/include
 
 ifneq (,$(filter openthread_contrib,$(USEMODULE)))
   DIRS += $(OPENTHREAD_DIR)/contrib
   DIRS += $(OPENTHREAD_DIR)/contrib/netdev
+endif
+
+ifneq (,$(filter cortex-m0% cortex-m3%,$(CPU_ARCH)))
+  # There are problem with unused `-mcpu...` arguments in clang and with
+  # ranlib + LLVM/clang in this package with Cortex-M0 and M3
+  TOOLCHAINS_BLACKLIST += llvm
 endif

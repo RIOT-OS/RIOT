@@ -36,12 +36,13 @@ the overall validity of the PR.
     Is the problem that the PR intends to solve clearly stated?
 2.  Is the solution presented in the PR as simple as possible to satisfy the
     requirements, but no simpler?
-3.  Is the PR functionally atomic? Does it address a single issue or should
-    it be split into multiple individual PRs?
+3.  Is the PR a manageable size? It should be confined to a single explainable
+    change, and be runnable on its own.
 4.  Is the solution well designed on a high level?
 5.  Do the concepts used by the PR make sense?
 6.  Does the PR break with existing concepts?
-7.  Is the structure of the PR itself valid?
+7.  Is there a clean commit history in the pulled branch? The commit history
+    should group the code differences cleanly.
 8.  Are there clear and adequate instructions on how to test the PR? \
     This may or may not include implemented tests as part of the PR.
 9.  Does the code compile and run?
@@ -82,9 +83,9 @@ skipping some/all tests.
 
 Check that the code follows the [Coding Conventions]. This can be aided (but not
 replaced) by Uncrustify, using the uncrustify-riot.cfg file found in the base
-directory. Note the difference between personal coding style, which is
-subjective and is allowed subject to the other guidelines, and the coding
-conventions, which are absolute and must always be followed.
+directory. Note the difference between personal coding style, which is allowed
+subject to the other guidelines, and the coding conventions, which are absolute
+and must always be followed.
 
 
 ### 5. - Review the documentation
@@ -105,7 +106,7 @@ complete that no input from the original developer or maintainer is required.
 
 -   Be responsive. Even if you are too busy to review the contribution, try to
     add a note fairly soon after the PR is submitted, thanking them for their
-    awesome contribution and saying that you will review it in due course. Once
+    valuable contribution and saying that you will review it in due course. Once
     the contributor has made their changes, ensure you reply to them in a
     reasonable timeframe. Acknowledge their replies to concerns if you're happy
     with their argument.
@@ -113,25 +114,46 @@ complete that no input from the original developer or maintainer is required.
     help the contributor. This can include code snippets, links to
     code/issues/wiki entries/web pages, or anything else. Educating contributors
     means we are investing in our community.
--   Be friendly. Be objective in your review, and of course, follow the
-    [Code of Conduct].
+-   Be friendly. Respect the original author, bearing in mind that their coding
+    style or their design may be just as valid as the way you would have done
+    it. And of course, always follow the [Code of Conduct].
 
 
 ### Organisation of reviewing between maintainers
 
-This section is a placeholder for further discussion around making the review
-process more efficient and effective when multiple maintainers are involved.
-This could include:
+#### Partial review
 
--   Usage of labels
--   Division of review responsibilities, e.g. with ACKs for different areas of
-    review
--   Usage of GitHub functionality, for example "Reviewers" and "Assignees" lists
+You can review a PR partially. This would involve reviewing all points in one or
+more sections outlined in the [technical guidelines](#technical-guidelines).
+In that case, please do not "approve" the PR to prevent accidental merges.
+Rather, give your verbal ACK and describe what you reviewed. In addition, if you
+processed or reasonably stepped over a whole section, mark the PR with the
+according label from the "Reviewed:" category. If you set a label by stepping
+over a section, please articulate your reasoning for this clearly, as noted in
+the [introduction](#introduction). This will help other maintainers help to
+better understand your line of thought. If you disagree with the assessment of
+a previous review, you may remove a certain "Reviewed:" label. Please state your
+reasoning in this case as well.
+
+When all "Reviewed:" labels are set you may give your approval for the PR.
+
+As everything in this document this is a "CAN", not a "MUST": It might help
+other maintainers to track your work, but if the overhead isn't justified, a
+simple approving ACK might suffice.
 
 #### Github etiquette
 
--   If there are multiple maintainers reviewing a PR, always give the other
-    maintainers reasonable time to ACK before dismissing their review.
+It is good etiquette to describe what you reviewed, even if you gave the PR a
+full review and gave your approval. This way the contributor and other
+maintainers are able to follow your thought process.
+
+Maintainers should only assign themselves to PRs and shouldn't assign other
+maintainers. You can however request reviews from other maintainers or
+contributors, either by mentioning them in a comment or selecting them in
+GitHub's review sidebar.
+
+If there are multiple maintainers reviewing a PR, always give the other
+maintainers reasonable time to ACK before dismissing their review.
 
 [list of maintainers]: https://github.com/RIOT-OS/RIOT/wiki/Maintainers
 [Best Practices]: https://github.com/RIOT-OS/RIOT/wiki/Best-Practice-for-RIOT-Programming

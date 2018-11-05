@@ -21,19 +21,12 @@
  * @}
  */
 
-#ifndef TEST_ISL29125_I2C
-#error "TEST_ISL29125_I2C not defined"
-#endif
-
-#ifndef TEST_ISL29125_IRQ_PIN
-#error "ISL29125_IRQ_PIN not defined"
-#endif
-
 #include <stdio.h>
 #include <string.h>
 
 #include "xtimer.h"
 #include "isl29125.h"
+#include "isl29125_params.h"
 
 #define SLEEP       (250 * 1000U)
 
@@ -55,10 +48,8 @@ int main(void)
     uint16_t higher_threshold = 8000;
 
     puts("ISL29125 light sensor test application\n");
-    printf("Initializing ISL29125 sensor at I2C_%i... ", TEST_ISL29125_I2C);
-    if (isl29125_init(&dev, TEST_ISL29125_I2C, TEST_ISL29125_IRQ_PIN,
-                ISL29125_MODE_RGB, ISL29125_RANGE_10K,
-                ISL29125_RESOLUTION_16) == 0) {
+    printf("Initializing ISL29125 sensor at I2C_%i... ", isl29125_params[0].i2c);
+    if (isl29125_init(&dev, &isl29125_params[0]) == 0) {
         puts("[OK]\n");
     }
     else {
@@ -85,7 +76,7 @@ int main(void)
         "ISL29125_MODE_R", "ISL29125_MODE_G", "ISL29125_MODE_B",
         "ISL29125_MODE_RG", "ISL29125_MODE_GB"};
 
-    for (size_t i = 0; i < sizeof(modes); i++) {
+    for (size_t i = 0; i < sizeof(modes) / sizeof(modes[0]); i++) {
         printf("Setting mode %s\n", mode_names[i]);
         isl29125_set_mode(&dev, modes[i]);
         xtimer_usleep(SLEEP);

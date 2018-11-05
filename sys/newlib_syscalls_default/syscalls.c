@@ -45,7 +45,7 @@
 #include "vfs.h"
 #endif
 
-#include "uart_stdio.h"
+#include "stdio_base.h"
 
 #include <sys/times.h>
 
@@ -69,7 +69,7 @@ char *heap_top = &_sheap + 4;
  */
 void _init(void)
 {
-    uart_stdio_init();
+    stdio_init();
 }
 
 /**
@@ -389,7 +389,7 @@ int _unlink_r(struct _reent *r, const char *path)
 /*
  * Fallback read function
  *
- * All input is read from uart_stdio regardless of fd number. The function will
+ * All input is read from stdio_uart regardless of fd number. The function will
  * block until a byte is actually read.
  *
  * Note: the read function does not buffer - data will be lost if the function is not
@@ -399,20 +399,20 @@ _ssize_t _read_r(struct _reent *r, int fd, void *buffer, size_t count)
 {
     (void)r;
     (void)fd;
-    return uart_stdio_read(buffer, count);
+    return stdio_read(buffer, count);
 }
 
 /*
  * Fallback write function
  *
- * All output is directed to uart_stdio, independent of the given file descriptor.
+ * All output is directed to stdio_uart, independent of the given file descriptor.
  * The write call will further block until the byte is actually written to the UART.
  */
 _ssize_t _write_r(struct _reent *r, int fd, const void *data, size_t count)
 {
     (void) r;
     (void) fd;
-    return uart_stdio_write(data, count);
+    return stdio_write(data, count);
 }
 
 /* Stubs to avoid linking errors, these functions do not have any effect */

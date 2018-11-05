@@ -68,11 +68,6 @@ void mrf24j40_reset(mrf24j40_t *dev)
     mrf24j40_set_option(dev, NETDEV_IEEE802154_SRC_MODE_LONG, true);
     mrf24j40_set_option(dev, NETDEV_IEEE802154_ACK_REQ, true);
     mrf24j40_set_option(dev, MRF24J40_OPT_CSMA, true);
-    mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_START, false);
-    mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_END, true);
-#ifdef MODULE_NETSTATS_L2
-    mrf24j40_set_option(dev, MRF24J40_OPT_TELL_TX_END, true);
-#endif
 
     /* go into RX state */
     mrf24j40_reset_tasks(dev);

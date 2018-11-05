@@ -45,9 +45,10 @@
  *
  * gcoap allows an application to specify a collection of request resource paths
  * it wants to be notified about. Create an array of resources (coap_resource_t
- * structs). Note that the elements must be ordered alphabetically with respect
- * to the resource path. Use gcoap_register_listener() at application startup
- * to pass in these resources, wrapped in a gcoap_listener_t.
+ * structs) ordered by the resource path, specifically the ASCII encoding of
+ * the path characters (digit and capital precede lower case). Use
+ * gcoap_register_listener() at application startup to pass in these resources,
+ * wrapped in a gcoap_listener_t.
  *
  * gcoap itself defines a resource for `/.well-known/core` discovery, which
  * lists all of the registered paths.
@@ -433,10 +434,10 @@ extern "C" {
  * @brief   A modular collection of resources for a server
  */
 typedef struct gcoap_listener {
-    coap_resource_t *resources;     /**< First element in the array of
-                                     *   resources; must order alphabetically */
-    size_t resources_len;           /**< Length of array */
-    struct gcoap_listener *next;    /**< Next listener in list */
+    const coap_resource_t *resources;   /**< First element in the array of
+                                         *   resources; must order alphabetically */
+    size_t resources_len;               /**< Length of array */
+    struct gcoap_listener *next;        /**< Next listener in list */
 } gcoap_listener_t;
 
 /**
@@ -480,7 +481,7 @@ typedef struct {
  */
 typedef struct {
     sock_udp_ep_t *observer;            /**< Client endpoint; unused if null */
-    coap_resource_t *resource;          /**< Entity being observed */
+    const coap_resource_t *resource;    /**< Entity being observed */
     uint8_t token[GCOAP_TOKENLEN_MAX];  /**< Client token for notifications */
     unsigned token_len;                 /**< Actual length of token attribute */
 } gcoap_observe_memo_t;

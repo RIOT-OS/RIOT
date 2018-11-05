@@ -10,6 +10,7 @@
 /**
  * @defgroup    drivers_tmp006 TI TMP006 Infrared Thermopile Sensor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Driver for the Texas Instruments TMP006 sensor.
  *
  * The TI TMP006 (Infrared Thermopile Contactless Temperature Sensor) measures
@@ -65,6 +66,7 @@
  *
  * The calculation and constants are wrapped from TI TMP006 User's Guide SBOU107.
  *
+ * This driver provides @ref drivers_saul capabilities.
  * @{
  *
  * @file

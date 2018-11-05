@@ -36,13 +36,13 @@ static const coap_resource_t resources_second[] = {
 };
 
 static gcoap_listener_t listener = {
-    .resources     = (coap_resource_t *)&resources[0],
+    .resources     = &resources[0],
     .resources_len = (sizeof(resources) / sizeof(resources[0])),
     .next          = NULL
 };
 
 static gcoap_listener_t listener_second = {
-    .resources     = (coap_resource_t *)&resources_second[0],
+    .resources     = &resources_second[0],
     .resources_len = (sizeof(resources_second) / sizeof(resources_second[0])),
     .next          = NULL
 };
@@ -264,15 +264,15 @@ static void test_gcoap__server_get_resource_list(void)
     gcoap_register_listener(&listener);
     gcoap_register_listener(&listener_second);
 
-    size = gcoap_get_resource_list(NULL, 0, COAP_CT_LINK_FORMAT);
+    size = gcoap_get_resource_list(NULL, 0, COAP_FORMAT_LINK);
     TEST_ASSERT_EQUAL_INT(strlen(resource_list_str), size);
 
     res[0] = 'A';
-    size = gcoap_get_resource_list(res, 0, COAP_CT_LINK_FORMAT);
+    size = gcoap_get_resource_list(res, 0, COAP_FORMAT_LINK);
     TEST_ASSERT_EQUAL_INT(0, size);
     TEST_ASSERT_EQUAL_INT((int)'A', (int)res[0]);
 
-    size = gcoap_get_resource_list(res, 127, COAP_CT_LINK_FORMAT);
+    size = gcoap_get_resource_list(res, 127, COAP_FORMAT_LINK);
     res[size] = '\0';
     TEST_ASSERT_EQUAL_INT(strlen(resource_list_str), size);
     TEST_ASSERT_EQUAL_STRING(resource_list_str, (char *)res);

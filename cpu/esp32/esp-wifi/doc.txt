@@ -1,0 +1,18 @@
+/*
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup        cpu_esp32_esp_wifi ESP WiFi netdev interface
+ * @ingroup         cpu_esp32
+ * @brief           WiFi AP-based network device driver
+ *
+ * This module realizes a netdev interface using the built-in
+ * WiFi module and AP infrastructure.
+ *
+ * @author      Gunar Schorcht <gunar@schorcht.net>
+ */

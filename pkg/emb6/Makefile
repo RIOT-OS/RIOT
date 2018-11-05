@@ -26,3 +26,8 @@ emb6_%: git-download
 	"$(MAKE)" -C $(dir $(shell grep -lR "MODULE.*=.*\<$@\>" $(PKG_BUILDDIR)))
 
 include $(RIOTBASE)/pkg/pkg.mk
+
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-tautological-compare
+  CFLAGS += -Wno-parentheses-equality
+endif

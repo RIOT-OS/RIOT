@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_sltb001a Silicon Labs SLTB001A starter kit
- * @ingroup     boards
- * @brief       Support for the Silicon Labs SLTB001A starter kit
+ * @ingroup     boards_sltb001a
  * @{
  *
  * @file

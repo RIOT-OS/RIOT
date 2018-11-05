@@ -22,6 +22,7 @@
 #include "sdcard_spi_internal.h"
 #include "sdcard_spi_params.h"
 #include "fmt.h"
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -68,10 +69,10 @@ static int _cid(int argc, char **argv)
     printf("OID: %c%c\n", card->cid.OID[0], card->cid.OID[1]);
     printf("PNM: %c%c%c%c%c\n", card->cid.PNM[0], card->cid.PNM[1], card->cid.PNM[2],
                                 card->cid.PNM[3], card->cid.PNM[4]);
-    printf("PRV: %d\n", card->cid.PRV);
-    printf("PSN: %lu\n", card->cid.PSN);
-    printf("MDT: %d\n", card->cid.MDT);
-    printf("CRC: %d\n", card->cid.CID_CRC);
+    printf("PRV: %u\n", card->cid.PRV);
+    printf("PSN: %" PRIu32 "\n", card->cid.PSN);
+    printf("MDT: %u\n", card->cid.MDT);
+    printf("CRC: %u\n", card->cid.CID_CRC);
     puts("----------------------------------------");
     return 0;
 }
@@ -192,7 +193,8 @@ static int _size(int argc, char **argv)
 
     puts("\nCard size: ");
     print_u64_dec( bytes );
-    printf(" bytes (%lu,%03lu GiB | %lu,%03lu GB)\n", gib_int, gib_frac, gb_int, gb_frac);
+    printf(" bytes (%" PRIu32 ",%03" PRIu32 " GiB | %" PRIu32 ",%03" PRIu32 " GB)\n", gib_int,
+           gib_frac, gb_int, gb_frac);
     return 0;
 }
 
@@ -352,7 +354,8 @@ static int _sector_count(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    printf("available sectors on card: %li\n", sdcard_spi_get_sector_count(card));
+    printf("available sectors on card: %" PRIu32 "\n",
+           sdcard_spi_get_sector_count(card));
     return 0;
 }
 

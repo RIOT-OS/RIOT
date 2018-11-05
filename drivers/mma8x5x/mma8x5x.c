@@ -34,30 +34,23 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-#define I2C_SPEED           I2C_SPEED_FAST
-
 #define BUS                 (dev->params.i2c)
 #define ADDR                (dev->params.addr)
 
 int mma8x5x_init(mma8x5x_t *dev, const mma8x5x_params_t *params)
 {
-    uint8_t reg;
+    uint8_t reg = 0;
 
     assert(dev && params);
 
     /* write device descriptor */
     memcpy(dev, params, sizeof(mma8x5x_params_t));
 
-    /* initialize the I2C bus */
+    /* acquire the I2C bus */
     i2c_acquire(BUS);
-    if (i2c_init_master(BUS, I2C_SPEED) < 0) {
-        i2c_release(BUS);
-        DEBUG("[mma8x5x] init - error: unable to initialize I2C bus\n");
-        return MMA8X5X_NOI2C;
-    }
 
     /* test if the target device responds */
-    i2c_read_reg(BUS, ADDR, MMA8X5X_WHO_AM_I, &reg);
+    i2c_read_reg(BUS, ADDR, MMA8X5X_WHO_AM_I, &reg, 0);
     if (reg != dev->params.type) {
         i2c_release(BUS);
         DEBUG("[mma8x5x] init - error: invalid WHO_AM_I value [0x%02x]\n",
@@ -66,18 +59,18 @@ int mma8x5x_init(mma8x5x_t *dev, const mma8x5x_params_t *params)
     }
 
     /* reset the device */
-    i2c_write_reg(BUS, ADDR, MMA8X5X_CTRL_REG2, MMA8X5X_CTRL_REG2_RST);
+    i2c_write_reg(BUS, ADDR, MMA8X5X_CTRL_REG2, MMA8X5X_CTRL_REG2_RST, 0);
     do {
-        i2c_read_reg(BUS, ADDR, MMA8X5X_CTRL_REG2, &reg);
+        i2c_read_reg(BUS, ADDR, MMA8X5X_CTRL_REG2, &reg, 0);
     } while (reg & MMA8X5X_CTRL_REG2_RST);
     /* configure the user offset */
-    i2c_write_regs(BUS, ADDR, MMA8X5X_OFF_X, dev->params.offset, 3);
+    i2c_write_regs(BUS, ADDR, MMA8X5X_OFF_X, dev->params.offset, 3, 0);
     /* configure range, rate, and activate the device */
     reg = (dev->params.range & MMA8X5X_XYZ_DATA_CFG_FS_MASK);
-    i2c_write_reg(BUS, ADDR, MMA8X5X_XYZ_DATA_CFG, reg);
+    i2c_write_reg(BUS, ADDR, MMA8X5X_XYZ_DATA_CFG, reg, 0);
     reg = ((dev->params.rate & MMA8X5X_CTRL_REG1_DR_MASK) |
            MMA8X5X_CTRL_REG1_ACTIVE);
-    i2c_write_reg(BUS, ADDR, MMA8X5X_CTRL_REG1, reg);
+    i2c_write_reg(BUS, ADDR, MMA8X5X_CTRL_REG1, reg, 0);
 
     /* finally release the bus */
     i2c_release(BUS);
@@ -101,7 +94,7 @@ void mma8x5x_set_user_offset(const mma8x5x_t *dev, int8_t x, int8_t y, int8_t z)
           (int)x, (int)y, (int)z);
 
     i2c_acquire(BUS);
-    i2c_write_regs(BUS, ADDR, MMA8X5X_OFF_X, buf, 3);
+    i2c_write_regs(BUS, ADDR, MMA8X5X_OFF_X, buf, 3, 0);
     i2c_release(BUS);
 }
 
@@ -114,7 +107,7 @@ static int _get_reg(const mma8x5x_t *dev, uint8_t addr)
     DEBUG("[mma8x5x] getting reg 0x%02x\n", (unsigned)addr);
 
     i2c_acquire(BUS);
-    i2c_read_reg(BUS, ADDR, addr, &reg);
+    i2c_read_reg(BUS, ADDR, addr, &reg, 0);
     i2c_release(BUS);
 
     DEBUG("[mma8x5x] reg 0x%02x=0x%02x\n", (unsigned)addr, (unsigned)reg);
@@ -128,11 +121,11 @@ static void _reg_setbits(const mma8x5x_t *dev, uint8_t reg, uint8_t val)
     assert(dev);
 
     i2c_acquire(BUS);
-    i2c_read_reg(BUS, ADDR, reg, &tmp);
+    i2c_read_reg(BUS, ADDR, reg, &tmp, 0);
     DEBUG("[mma8x5x] 0x%02x: 0x%02x | 0x%02x = 0x%02x\n",
             (unsigned)reg, (unsigned)tmp, (unsigned)val, (unsigned) tmp | val);
     tmp |= val;
-    i2c_write_reg(BUS, ADDR, reg, tmp);
+    i2c_write_reg(BUS, ADDR, reg, tmp, 0);
     i2c_release(BUS);
 }
 
@@ -143,11 +136,11 @@ static void _reg_clearbits(const mma8x5x_t *dev, uint8_t reg, uint8_t val)
     assert(dev);
 
     i2c_acquire(BUS);
-    i2c_read_reg(BUS, ADDR, reg, &tmp);
+    i2c_read_reg(BUS, ADDR, reg, &tmp, 0);
     DEBUG("[mma8x5x] 0x%02x: 0x%02x &= ~0x%02x = 0x%02x\n",
             (unsigned)reg, (unsigned)tmp, (unsigned)val, (unsigned) tmp & ~val);
     tmp &= ~val;
-    i2c_write_reg(BUS, ADDR, reg, tmp);
+    i2c_write_reg(BUS, ADDR, reg, tmp, 0);
     i2c_release(BUS);
 }
 
@@ -221,7 +214,7 @@ void mma8x5x_read(const mma8x5x_t *dev, mma8x5x_data_t *data)
     assert(dev);
 
     i2c_acquire(BUS);
-    i2c_read_regs(BUS, ADDR, MMA8X5X_STATUS, buf, 7);
+    i2c_read_regs(BUS, ADDR, MMA8X5X_STATUS, buf, 7, 0);
     i2c_release(BUS);
 
     data->x = ((int16_t)(buf[1] << 8 | buf[2])) / (16 >> dev->params.range);

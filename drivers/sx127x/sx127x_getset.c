@@ -123,7 +123,7 @@ uint32_t sx127x_get_channel(const sx127x_t *dev)
 
 void sx127x_set_channel(sx127x_t *dev, uint32_t channel)
 {
-    DEBUG("[sx127x] Set channel: %lu\n", channel);
+    DEBUG("[sx127x] Set channel: %" PRIu32 "\n", channel);
 
     /* Save current operating mode */
     dev->settings.channel = channel;
@@ -312,6 +312,7 @@ void sx127x_set_rx(sx127x_t *dev)
     if (dev->settings.lora.rx_timeout != 0) {
         xtimer_set(&(dev->_internal.rx_timeout_timer), dev->settings.lora.rx_timeout);
     }
+
 
     if (dev->settings.lora.flags & SX127X_RX_CONTINUOUS_FLAG) {
         sx127x_set_op_mode(dev, SX127X_RF_LORA_OPMODE_RECEIVER);
@@ -814,14 +815,14 @@ void sx127x_set_preamble_length(sx127x_t *dev, uint16_t preamble)
 
 void sx127x_set_rx_timeout(sx127x_t *dev, uint32_t timeout)
 {
-    DEBUG("[sx127x] Set RX timeout: %lu\n", timeout);
+    DEBUG("[sx127x] Set RX timeout: %" PRIu32 "\n", timeout);
 
     dev->settings.lora.rx_timeout = timeout;
 }
 
 void sx127x_set_tx_timeout(sx127x_t *dev, uint32_t timeout)
 {
-    DEBUG("[sx127x] Set TX timeout: %lu\n", timeout);
+    DEBUG("[sx127x] Set TX timeout: %" PRIu32 "\n", timeout);
 
     dev->settings.lora.tx_timeout = timeout;
 }
@@ -830,13 +831,11 @@ void sx127x_set_symbol_timeout(sx127x_t *dev, uint16_t timeout)
 {
     DEBUG("[sx127x] Set symbol timeout: %d\n", timeout);
 
-    dev->settings.lora.rx_timeout = timeout;
-
     uint8_t config2_reg = sx127x_reg_read(dev, SX127X_REG_LR_MODEMCONFIG2);
     config2_reg &= SX127X_RF_LORA_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK;
     config2_reg |= (timeout >> 8) & ~SX127X_RF_LORA_MODEMCONFIG2_SYMBTIMEOUTMSB_MASK;
     sx127x_reg_write(dev, SX127X_REG_LR_MODEMCONFIG2, config2_reg);
-    sx127x_reg_write(dev, SX127X_REG_LR_SYMBTIMEOUTLSB,timeout & 0xFF);
+    sx127x_reg_write(dev, SX127X_REG_LR_SYMBTIMEOUTLSB, timeout & 0xFF);
 }
 
 bool sx127x_get_iq_invert(const sx127x_t *dev)

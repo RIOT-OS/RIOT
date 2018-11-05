@@ -1,0 +1,71 @@
+/**
+@defgroup    boards_msba2 MSB-A2
+@ingroup     boards
+@brief       Support for the ScatterWeb MSB-A2 board
+
+## Overview
+
+![MSBA2 image](https://raw.githubusercontent.com/wiki/RIOT-
+OS/RIOT/images/MSBA2_photo.jpg)
+
+
+## Hardware
+
+| MCU: | LPC2387 ARM7-TDMI |
+|------|-------------------|
+| RAM: | 96kb |
+| Flash: | 512kb |
+
+
+# More info
+
+## Board Schematics
+![Board schematics](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/MSBA2_layout.png)
+
+## Circuit Diagrams
+![Circuit Diagram](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/MSBA2_circuit_front.png)
+
+![Circuit Diagram II](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/MSBA2_circuit_back.png)
+
+[MSB-A2 page @ Freie Universität Berlin/CST](http://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/Z_Finished_Projects/ScatterWeb/modules/mod_MSB-A2.html)
+
+
+## Toolchains
+
+See: [ARM](https://github.com/RIOT-OS/RIOT/wiki/Family:-ARM)
+
+Working:
+ - CodeSourcery 2013.11
+ - CodeSourcery 2014.05 (only hello-world tested)
+ - CodeSourcery 2008q3
+ - [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded) 5.2.1 20151202 (release) (only [`default`](https://github.com/RIOT-OS/RIOT/tree/master/examples/default) tested)
+
+Not Working:
+ - Arm launchpad 2013-2
+ - [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded) 4.8.4 2014q2 (release)
+
+
+## Programming and Debugging
+
+Currently the MSBA2 boards only work properly™ with a CodeSourcery toolchain.
+
+##### lpc2k_pgm
+
+In order to flash the MSBA2 board you also need the `lpc2k_pgm` tool. You can
+build it by navigating to the `boards/msba2-common/tools` directory and then
+running `make`. The tool will be created inside the `bin/` sub-directory and has
+to be copied to a directory inside the `$PATH`.
+
+##### flashing/debugging
+
+Build using the following set of commands:
+
+ BOARD=msba2 make flash
+ BOARD=msba2 make term
+
+
+
+## Known Issues
+
+None
+ */

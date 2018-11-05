@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_mulle Eistec Mulle
- * @ingroup     boards
- * @brief       Support for Eistec Mulle IoT boards
+ * @ingroup     boards_mulle
  * @{
  *
  * @file
@@ -37,7 +35,7 @@
 /**
  * @brief Use the UART1 for STDIO on this board
  */
-#define UART_STDIO_DEV      UART_DEV(1)
+#define STDIO_UART_DEV      UART_DEV(1)
 
 /**
  * @name    xtimer configuration
@@ -104,8 +102,10 @@ void board_init(void);
 
 /**
  * @name Define the interface to the AT86RF212B radio
- *
- * @todo Work around missing RESET pin on Mulle v0.6x
+ * @{
+ */
+
+ /** @todo Work around missing RESET pin on Mulle v0.6x
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}
  * @{

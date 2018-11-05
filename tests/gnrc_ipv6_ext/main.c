@@ -23,31 +23,66 @@
 
 #include "shell.h"
 #include "msg.h"
+#include "net/ethernet.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netreg.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
+#include "net/gnrc/netif/conf.h"
+#include "net/gnrc/netif/ethernet.h"
 #include "net/gnrc/netif/hdr.h"
+#include "net/netdev_test.h"
+
+static char _netif_stack[THREAD_STACKSIZE_SMALL];
+static netdev_test_t _dev;
+
+static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len)
+{
+    assert(max_len == sizeof(uint16_t));
+    (void)netdev;
+
+    *((uint16_t *)value) = NETDEV_TYPE_ETHERNET;
+    return sizeof(uint16_t);
+}
+
+static int _get_netdev_max_packet_size(netdev_t *netdev, void *value,
+                                       size_t max_len)
+{
+    assert(max_len == sizeof(uint16_t));
+    (void)netdev;
+
+    *((uint16_t *)value) = ETHERNET_DATA_LEN;
+    return sizeof(uint16_t);
+}
 
 static void _init_interface(void)
 {
-    gnrc_netif_t *iface;
+    gnrc_netif_t *netif;
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
 
-    iface = gnrc_netif_iter(NULL);
+    netdev_test_setup(&_dev, NULL);
+    netdev_test_set_get_cb(&_dev, NETOPT_DEVICE_TYPE,
+                           _get_netdev_device_type);
+    netdev_test_set_get_cb(&_dev, NETOPT_MAX_PACKET_SIZE,
+                           _get_netdev_max_packet_size);
+    netif = gnrc_netif_ethernet_create(
+            _netif_stack, THREAD_STACKSIZE_SMALL, GNRC_NETIF_PRIO,
+            "dummy_netif", (netdev_t *)&_dev);
 
     addr.u8[0] = 0xfd;
     addr.u8[1] = 0x01;
     addr.u8[15] = 0x02;
+
+    xtimer_usleep(500); /* wait for thread to start */
     /* add addresses fd01::02/64 and fd01::3/64 to interface */
     for (uint8_t i = 0x2; i <= 0x3; i++) {
         addr.u8[15] = i;
-        if (gnrc_netapi_set(iface->pid, NETOPT_IPV6_ADDR, 64U << 8U, &addr,
+        if (gnrc_netapi_set(netif->pid, NETOPT_IPV6_ADDR, 64U << 8U, &addr,
                             sizeof(addr)) < 0) {
             printf("error: unable to add IPv6 address fd01::%x/64 to interface %u\n",
-                   addr.u8[15], iface->pid);
+                   addr.u8[15], netif->pid);
         }
     }
 }

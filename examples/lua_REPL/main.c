@@ -46,7 +46,7 @@ const size_t lua_riot_builtin_lua_table_len = 1;
 int main(void)
 {
     printf("Using memory range for Lua heap: %p - %p, %zu bytes\n",
-           lua_memory, lua_memory + MAIN_LUA_MEM_SIZE, sizeof(void *));
+           (void *)lua_memory, (void *)(lua_memory + MAIN_LUA_MEM_SIZE), sizeof(void *));
 
     while (1) {
         int status, value;

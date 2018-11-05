@@ -32,13 +32,9 @@ extern "C" {
 #ifndef DS1307_PARAM_I2C
 #define DS1307_PARAM_I2C        (I2C_DEV(0))
 #endif
-#ifndef DS1307_PARAM_I2C_CLK
-#define DS1307_PARAM_I2C_CLK    (DS1307_I2C_MAX_CLK)
-#endif
 
 #ifndef DS1307_PARAMS
-#define DS1307_PARAMS           {   .i2c = DS1307_PARAM_I2C, \
-                                    .clk = DS1307_PARAM_I2C_CLK }
+#define DS1307_PARAMS           { .i2c = DS1307_PARAM_I2C }
 #endif
 /** @} */
 

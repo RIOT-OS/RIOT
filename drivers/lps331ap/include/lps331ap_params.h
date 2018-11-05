@@ -41,9 +41,14 @@ extern "C" {
 #define LPS331AP_PARAM_RATE             (LPS331AP_RATE_7HZ)
 #endif
 
-#define LPS331AP_PARAMS_DEFAULT         { .i2c  = LPS331AP_PARAM_I2C,  \
+#ifndef LPS331AP_PARAMS
+#define LPS331AP_PARAMS                 { .i2c  = LPS331AP_PARAM_I2C,  \
                                           .addr = LPS331AP_PARAM_ADDR, \
                                           .rate = LPS331AP_PARAM_RATE }
+#endif
+#ifndef LPS331AP_SAUL_INFO
+#define LPS331AP_SAUL_INFO              { .name = "lps331ap" }
+#endif
 /**@}*/
 
 /**
@@ -51,11 +56,7 @@ extern "C" {
  */
 static const lps331ap_params_t lps331ap_params[] =
 {
-#ifdef LPS331AP_PARAMS_CUSTOM
-    LPS331AP_PARAMS_CUSTOM,
-#else
-    LPS331AP_PARAMS_DEFAULT,
-#endif
+    LPS331AP_PARAMS
 };
 
 /**
@@ -63,7 +64,7 @@ static const lps331ap_params_t lps331ap_params[] =
  */
 static const saul_reg_info_t lps331ap_saul_info[] =
 {
-    { .name = "lps331ap" }
+    LPS331AP_SAUL_INFO
 };
 
 #ifdef __cplusplus

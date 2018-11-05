@@ -10,5 +10,8 @@ export UNDEF += $(BINDIR)/cpu/startup.o
 #include periph module
 USEMODULE += periph
 
+RAM_LEN = 32K
+ROM_LEN = 256K
+
 # CPU depends on the atmega common module, so include it
 include $(ATMEGA_COMMON)Makefile.include
