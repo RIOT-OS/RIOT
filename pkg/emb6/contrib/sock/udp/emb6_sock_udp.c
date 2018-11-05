@@ -187,7 +187,7 @@ int sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
             if (remote != NULL) {
                 remote->family = AF_INET6;
                 remote->netif = SOCK_ADDR_ANY_NETIF;
-                memcpy(&remote->addr, &sock->recv_info.src, sizeof(ipv6_addr_t));
+                memcpy(&remote->addr, sock->recv_info.src, sizeof(ipv6_addr_t));
                 remote->port = sock->recv_info.src_port;
             }
             res = (int)sock->recv_info.datalen;
