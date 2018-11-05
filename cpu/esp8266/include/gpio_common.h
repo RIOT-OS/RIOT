@@ -8,7 +8,6 @@
 
 /**
  * @ingroup     cpu_esp8266
- * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file
