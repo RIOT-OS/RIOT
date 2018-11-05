@@ -31,36 +31,37 @@
 #define FIRST_ROUND     (5)
 #define SECOND_ROUND    (12)
 
-static uint32_t prev_now = 0, prev_diff = 0;
+static uint32_t old_t = 0;
 static bool error = false;
+
+static void callback(void *args);
+
+static trickle_t trickle = { .callback = { .func = &callback,
+                                           .args = NULL } };
 
 static void callback(void *args)
 {
     (void) args;
     uint32_t now = xtimer_now_usec();
-    uint32_t diff = (uint32_t) (now - prev_now);
 
-    printf("now = %" PRIu32 ", prev_now = %" PRIu32 ", diff = %" PRIu32
-           "\n", now, prev_now, diff);
+    printf("now = %" PRIu32 ", t = %" PRIu32 "\n", now, trickle.t);
 
-    if (prev_diff >= diff) {
+    /* previous `t` is chosen from a smaller interval [I/2, I).
+     * Current `t` is chosen from interval [I, 2*I).
+     * Hence, `old_t` must be smaller than current `t` */
+    if (old_t >= trickle.t) {
         error = true;
     }
 
-    prev_now = now;
-    prev_diff = diff;
+    old_t = trickle.t;
 
     return;
 }
-
-static trickle_t trickle = { .callback = { .func = &callback,
-                                           .args = NULL } };
 
 int main(void)
 {
     msg_t msg;
     unsigned counter = 0;
-    prev_now = xtimer_now_usec();
 
     trickle_start(sched_active_pid, &trickle, TRICKLE_MSG, TR_IMIN,
                   TR_IDOUBLINGS, TR_REDCONST);
@@ -69,7 +70,7 @@ int main(void)
 
     while (!error) {
         if (counter == FIRST_ROUND) {
-            prev_diff = 0;
+            old_t = 0;
             trickle_reset_timer(&trickle);
             puts("[TRICKLE_RESET]");
         }
