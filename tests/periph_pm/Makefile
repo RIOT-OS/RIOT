@@ -6,6 +6,8 @@ BOARD_BLACKLIST := chronos msb-430h msb-430 telosb wsn430-v1_3b wsn430-v1_4 z1
 
 FEATURES_OPTIONAL += periph_rtc
 
+CFLAGS += -DPM_PRINT
+
 USEMODULE += shell
 
 include $(RIOTBASE)/Makefile.include

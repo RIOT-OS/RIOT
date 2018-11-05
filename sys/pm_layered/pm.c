@@ -19,6 +19,7 @@
  */
 
 #include "irq.h"
+#include "log.h"
 #include "periph/pm.h"
 #include "pm_layered.h"
 
@@ -69,21 +70,35 @@ void pm_set_lowest(void)
     irq_restore(state);
 }
 
+#ifndef PM_PRINT
 void pm_block(unsigned mode)
+#else
+void _pm_block(unsigned mode, const char *caller)
+#endif
 {
     assert(pm_blocker.val_u8[mode] != 255);
 
     unsigned state = irq_disable();
     pm_blocker.val_u8[mode]++;
+#ifdef PM_PRINT
+    LOG_INFO("pm_block %s mode: %d, value:%d\n", caller, mode, pm_blocker.val_u8[mode]);
+#endif
     irq_restore(state);
 }
 
+#ifndef PM_PRINT
 void pm_unblock(unsigned mode)
+#else
+void _pm_unblock(unsigned mode, const char *caller)
+#endif
 {
     assert(pm_blocker.val_u8[mode] > 0);
 
     unsigned state = irq_disable();
     pm_blocker.val_u8[mode]--;
+#ifdef PM_PRINT
+    LOG_INFO("pm_unblock %s mode: %d, value:%d\n", caller, mode, pm_blocker.val_u8[mode]);
+#endif
     irq_restore(state);
 }
 
