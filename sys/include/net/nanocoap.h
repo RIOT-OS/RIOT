@@ -211,7 +211,6 @@ typedef struct __attribute__((packed)) {
     uint8_t ver_t_tkl;          /**< version, token, token length           */
     uint8_t code;               /**< CoAP code (e.g.m 205)                  */
     uint16_t id;                /**< Req/resp ID                            */
-    uint8_t data[];             /**< convenience pointer to payload start   */
 } coap_hdr_t;
 
 /**
@@ -949,6 +948,18 @@ static inline unsigned coap_get_code(coap_pkt_t *pkt)
 static inline unsigned coap_get_id(coap_pkt_t *pkt)
 {
     return ntohs(pkt->hdr->id);
+}
+
+/**
+ * @brief   Get the start of data after the header
+ *
+ * @param[in]   hdr   Header of CoAP packet in contiguous memory
+ *
+ * @returns     pointer to first byte after the header
+ */
+static inline uint8_t *coap_hdr_data_ptr(coap_hdr_t *hdr)
+{
+    return ((uint8_t *)hdr) + sizeof(coap_hdr_t);
 }
 
 /**
