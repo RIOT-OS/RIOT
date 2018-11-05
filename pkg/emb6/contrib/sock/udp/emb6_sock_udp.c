@@ -290,7 +290,7 @@ static void _input_callback(struct udp_socket *c, void *ptr,
     (void)dst_port;
     mutex_lock(&sock->mutex);
     sock->recv_info.src_port = src_port;
-    sock->recv_info.src = (const ipv6_addr_t *)src_addr;
+    memcpy(&sock->recv_info.src, src_addr, sizeof(sock->recv_info.src));
     sock->recv_info.data = data;
     sock->recv_info.datalen = datalen - sizeof(ipv6_hdr_t);
     mutex_unlock(&sock->mutex);

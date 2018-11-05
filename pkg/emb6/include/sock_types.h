@@ -51,7 +51,7 @@ struct sock_udp {
     msg_t mbox_queue[SOCK_MBOX_SIZE];   /**< queue for mbox */
     atomic_int receivers;               /**< current number of recv calls */
     struct {
-        const ipv6_addr_t *src;         /**< source address */
+        ipv6_addr_t src;                /**< source address */
         const void *data;               /**< data of received packet */
         size_t datalen;                 /**< length of received packet data */
         uint16_t src_port;              /**< source port */
