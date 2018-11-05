@@ -296,6 +296,10 @@ void auto_init(void)
 
 /* initialize sensors and actuators */
 #ifdef MODULE_SHT1X
+    /* The sht1x module needs to be initialized regardless of SAUL being used,
+     * as the shell commands rely on auto-initialization. auto_init_sht1x also
+     * performs SAUL registration, but only if module auto_init_saul is used.
+     */
     DEBUG("Auto init SHT1X module (SHT10/SHT11/SHT15 sensor driver).\n");
     extern void auto_init_sht1x(void);
     auto_init_sht1x();
@@ -427,10 +431,6 @@ void auto_init(void)
 #ifdef MODULE_PULSE_COUNTER
     extern void auto_init_pulse_counter(void);
     auto_init_pulse_counter();
-#endif
-#ifdef MODULE_SHT1X
-    extern void auto_init_sht1x(void);
-    auto_init_sht1x();
 #endif
 #ifdef MODULE_SI114X
     extern void auto_init_si114x(void);
