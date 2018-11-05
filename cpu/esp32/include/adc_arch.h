@@ -8,11 +8,10 @@
 
 /**
  * @ingroup     cpu_esp32
- * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file
- * @brief       Architecture specific ADC functions ESP32
+ * @brief       Architecture specific ADC functions for ESP32
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
