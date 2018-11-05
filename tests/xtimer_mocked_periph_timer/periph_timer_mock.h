@@ -10,7 +10,7 @@ uint32_t timer_mock_step(uint32_t ticks);
 
 /*
  * Set the internal timer without handling any callbacks
- * Should fit the internal precisiong
+ * Should fit the internal precision
  */
 void timer_mock_set(uint32_t ticks);
 
