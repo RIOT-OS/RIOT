@@ -115,8 +115,12 @@ static const uart_conf_t uart_config[] = {
         .scgc_bit = SIM_SCGC5_LPUART0_SHIFT,
         .mode   = UART_MODE_8N1,
         .type   = KINETIS_LPUART,
-        /* Using LLWU requires using lower baud rates */
-        /* LLWU_WAKEUP_PIN_PTC6 is the correct setting on this dev board if using LLWU */
+        /* Undocumented behavior: LPUART fails to detect the START bit at wake up
+         * with LLWU sometimes. This seem to be related to using the builtin
+         * DCDC for powering the MCU. */
+        /* LLWU_WAKEUP_PIN_PTC6 is the correct setting on this dev board if you
+         * want to try using LLS mode, or if it does not matter that the UART RX
+         * byte is sometimes is corrupt */
         .llwu_rx = LLWU_WAKEUP_PIN_UNDEF,
     },
 };
