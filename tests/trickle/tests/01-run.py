@@ -14,12 +14,12 @@ def testfunc(child):
     child.expect_exact("[START]")
 
     for i in range(5):
-        child.expect(u"now = \d+, prev_now = \d+, diff = \d+")
+        child.expect(u"now = \\d+, t = \\d+")
 
     child.expect_exact("[TRICKLE_RESET]")
 
     for i in range(7):
-        child.expect(u"now = \d+, prev_now = \d+, diff = \d+")
+        child.expect(u"now = \\d+, t = \\d+")
 
     child.expect_exact("[SUCCESS]")
 
