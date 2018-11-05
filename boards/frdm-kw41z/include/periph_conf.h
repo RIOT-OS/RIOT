@@ -91,7 +91,7 @@ static const clock_config_t clock_config = {
             .llwu = LLWU_WAKEUP_MODULE_LPTMR0, \
             .src = 2, \
             .irqn = LPTMR0_IRQn, \
-        } \
+        }, \
     }
 #define TIMER_NUMOF             ((PIT_NUMOF) + (LPTMR_NUMOF))
 #define PIT_BASECLOCK           (CLOCK_BUSCLOCK)
