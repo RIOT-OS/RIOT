@@ -1,6 +1,11 @@
 ## the cpu to build for
 export CPU = stm32f1
-export CPU_MODEL = stm32f103c8
+STM32F103C8_FLASH_HACK ?= 0
+ifneq ($(STM32F103C8_FLASH_HACK),0)
+  export CPU_MODEL = stm32f103cb
+else
+  export CPU_MODEL = stm32f103c8
+endif
 
 INCLUDES += -I$(RIOTBOARD)/common/stm32f103c8/include
 
