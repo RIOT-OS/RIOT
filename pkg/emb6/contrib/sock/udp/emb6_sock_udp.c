@@ -236,10 +236,10 @@ int sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
         return -ENOTCONN;
     }
     /* cppcheck-suppress nullPointerRedundantCheck
-     * remote == NULL implies that sock != NULL (see assert at start of
+     * (reason: remote == NULL implies that sock != NULL (see assert at start of
      * function) * that's why it is okay in the if-statement above to check
      * sock->... without checking (sock != NULL) first => this check afterwards
-     * isn't redundant */
+     * isn't redundant) */
     if (sock == NULL) {
         int res;
         if ((res = _reg(&tmp, NULL, NULL, NULL, NULL)) < 0) {
