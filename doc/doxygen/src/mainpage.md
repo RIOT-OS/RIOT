@@ -30,11 +30,11 @@ RIOT is developed by an open community that anyone is welcome to join:
    [GitHub](https://github.com/RIOT-OS/RIOT). You can read about how to
    contribute [in our GitHub
    Wiki](https://github.com/RIOT-OS/RIOT/wiki/Contributing-to-RIOT).
- - [Subscribe](http://lists.riot-os.org/mailman/listinfo/users) to
+ - [Subscribe](https://lists.riot-os.org/mailman/listinfo/users) to
    users@riot-os.org to ask for help using RIOT or writing an application for
    RIOT (or to just stay in the loop). An archive of this list [is available
    here](https://lists.riot-os.org/pipermail/users/).
- - [Subscribe](http://lists.riot-os.org/mailman/listinfo/devel) to
+ - [Subscribe](https://lists.riot-os.org/mailman/listinfo/devel) to
    devel@riot-os.org to follow and discuss kernel and network stack
    development, or hardware support. An archive of this list [is available
    here](https://lists.riot-os.org/pipermail/devel/).

@@ -35,7 +35,7 @@ welcome:
 	@echo "Please see our Quick Start Guide at:"
 	@echo "    https://doc.riot-os.org/getting-started.html"
 	@echo "Or ask questions on our mailing list:"
-	@echo "    users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)"
+	@echo "    users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)"
 
 include makefiles/app_dirs.inc.mk
 

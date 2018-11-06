@@ -527,8 +527,8 @@ The ESP8266 port of RIOT has been tested with several common external devices th
 
 RIOT provides a number of driver modules for different types of network devices, e.g., IEEE 802.15.4 radio modules and Ethernet modules. The RIOT ESP8266 port has been tested with the following network devices and is preconfigured to create RIOT network applications with these devices:
 
-- [mrf24j40](http://riot-os.org/api/group__drivers__mrf24j40.html) (driver for Microchip MRF24j40 based IEEE 802.15.4
-- [enc28j60](http://riot-os.org/api/group__drivers__enc28j60.html) (driver for Microchip ENC28J60 based Ethernet modules)
+- [mrf24j40](https://riot-os.org/api/group__drivers__mrf24j40.html) (driver for Microchip MRF24j40 based IEEE 802.15.4
+- [enc28j60](https://riot-os.org/api/group__drivers__enc28j60.html) (driver for Microchip ENC28J60 based Ethernet modules)
 
 If the RIOT network application uses a default network device (module ```netdev_default```), the ```NETDEV_DEFAULT``` make command variable can be used to define the device that will be used as the default network device. The value of this variable must match the name of the driver module for this network device. If ```NETDEV_DEFAULT``` is not defined, the ```mrf24j40```  module is used as default network device.
 
@@ -596,7 +596,7 @@ make flash BOARD=esp8266-esp-12x -C examples/gnrc_networking NETDEV_DEFAULT=enc2
 
 ## <a name="esp8266_sd_card_device"> SD-Card Device </a> &nbsp;[[TOC](#esp8266_toc)]
 
-ESP8266 port of RIOT is preconfigured for RIOT applications that use the [SPI SD-Card driver](http://riot-os.org/api/group__drivers__sdcard__spi.html). To use SPI SD-Card driver, the ```sdcard_spi``` module has to be added to a makefile:
+ESP8266 port of RIOT is preconfigured for RIOT applications that use the [SPI SD-Card driver](https://riot-os.org/api/group__drivers__sdcard__spi.html). To use SPI SD-Card driver, the ```sdcard_spi``` module has to be added to a makefile:
 
 ```
 USEMODULE += sdcard_spi

@@ -5,7 +5,7 @@
 
 ## Hardware
 
-![ScatterWeb MSB-430H](http://riot-os.org/images/msb-430h_2.png)
+![ScatterWeb MSB-430H](https://riot-os.org/images/msb-430h_2.png)
 
 ## MCU
 | MCU        | TI MSP430F1612        |

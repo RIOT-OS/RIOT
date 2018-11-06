@@ -10,6 +10,6 @@ setup(name="pyterm",
       description="Python-based terminal emulator for serial communication",
       author="Oliver Hahm",
       author_email="ohahm@fu-berlin.de",
-      url="http://riot-os.org/",
+      url="https://riot-os.org/",
       install_requires=["pyserial"],
       scripts=["pyterm"])

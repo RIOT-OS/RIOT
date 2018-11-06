@@ -256,18 +256,18 @@ to all of you contributing in so many different ways to make RIOT worthwhile!
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+  devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+  users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
-  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
-  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+  notifications@riot-os.org (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 ---
@@ -385,18 +385,18 @@ to all of you contributing in so many different ways to make RIOT worthwhile!
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+  devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+  users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
-  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
-  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+  notifications@riot-os.org (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 ---
@@ -592,18 +592,18 @@ to all of you contributing in so many different ways to make RIOT worthwhile!
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+  devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+  users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
-  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
-  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+  notifications@riot-os.org (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 ---
@@ -850,18 +850,18 @@ OpenThread integration and Semtech LoRa drivers.
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+  devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+  users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
-  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
-  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+  notifications@riot-os.org (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 ---
@@ -999,18 +999,18 @@ OpenThread integration and Semtech LoRa drivers.
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+  devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+  users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
-  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
-  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+  notifications@riot-os.org (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 ---
@@ -1116,18 +1116,18 @@ sponsored development time: Cisco Systems, Eistec, Ell-i, Enigeering Spirit, Nor
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+  devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+  users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
-  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
-  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+  notifications@riot-os.org (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 ---
@@ -1400,18 +1400,18 @@ sponsored development time: Cisco Systems, Eistec, Ell-i, Enigeering Spirit, Nor
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+  devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+  users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
-  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
-  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+  notifications@riot-os.org (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 ---
@@ -1710,18 +1710,18 @@ Spirit, Nordic, FreshTemp LLC, OTAkeys and Phytec.
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
-  devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+  devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
-  users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+  users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
-  commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
-  notifications@riot-os.org (http://lists.riot-os.org/mailman/listinfo/notifications)
+  notifications@riot-os.org (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 ---
@@ -1919,18 +1919,18 @@ Eistec, Ell-i, Enigeering Spirit, Nordic, FreshTemp LLC, and Phytec.
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
- * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+ * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
- * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+ * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
  * RIOT commits
-  * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
- * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+ * notifications@riot-os.org  (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 ---
@@ -2144,18 +2144,18 @@ Cisco Systems, Eistec, Ell-i, Enigeering Spirit, FreshTemp LLC, and Phytec.
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
- * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+ * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
- * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+ * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
  * RIOT commits
-  * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+  * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
- * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+ * notifications@riot-os.org  (https://lists.riot-os.org/mailman/listinfo/notifications)
 
  IRC
  -----
@@ -2195,7 +2195,7 @@ This release is mostly a clean-up and bug-fixing release. Besides that, it intro
 the [S]ensor [A]ctuator [U]ber [L]ayer, which offers a unified API to interact with all
 different types of sensors and actuators on RIOT supported hardware. Furthermore, it re-enables
 the support for ICN by integrating CCN-Lite as a package. A lot of new overall documentation was
-added and existing documentation was improved (http://riot-os.org/api/). In addition,
+added and existing documentation was improved (https://riot-os.org/api/). In addition,
 a Vagrant (https://www.vagrantup.com/) configuration file was added to the RIOT repository in
 order to create reproducible and portable environments that contain all necessary toolchains.
 
@@ -2371,18 +2371,18 @@ Cisco Systems, Google, Eistec, Ell-i, Engineering Spirit, FreshTemp LLC, and Phy
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
- * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+ * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
- * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+ * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
- * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+ * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
- * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+ * notifications@riot-os.org  (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 -----
@@ -2663,18 +2663,18 @@ Ell-i, FreshTemp LLC, and Phytec.
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
- * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+ * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
- * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+ * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
- * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+ * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
- * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+ * notifications@riot-os.org  (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 IRC
 -----
@@ -2900,18 +2900,18 @@ We like to give our special thanks to all the companies that provided us with th
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
- * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+ * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
- * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+ * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
- * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+ * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
- * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+ * notifications@riot-os.org  (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 License
 =======
@@ -3094,18 +3094,18 @@ https://github.com/RIOT-OS/RIOT/issues
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
- * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+ * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
- * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+ * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
- * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+ * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
- * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+ * notifications@riot-os.org  (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 License
 =======
@@ -3255,18 +3255,18 @@ Hardware Support
 
 More information
 ================
-http://www.riot-os.org
+https://www.riot-os.org
 
 Mailing lists
 -------------
 * RIOT OS kernel developers list
- * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+ * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
 * RIOT OS users list
- * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+ * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits
- * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+ * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications
- * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+ * notifications@riot-os.org  (https://lists.riot-os.org/mailman/listinfo/notifications)
 
 License
 =======
