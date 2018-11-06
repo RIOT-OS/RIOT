@@ -25,7 +25,7 @@ int gnrc_ipv6_ext_rh_process(ipv6_hdr_t *hdr, ipv6_ext_rh_t *ext)
 
     switch (ext->type) {
 #ifdef MODULE_GNRC_RPL_SRH
-        case GNRC_RPL_SRH_TYPE:
+        case IPV6_EXT_RH_TYPE_RPL_SRH:
             return gnrc_rpl_srh_process(hdr, (gnrc_rpl_srh_t *)ext);
 #endif
 

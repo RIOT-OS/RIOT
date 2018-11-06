@@ -33,6 +33,34 @@ extern "C" {
 #endif
 
 /**
+ * @name Routing header types
+ * @see [IANA, IPv6 parameters](https://www.iana.org/assignments/ipv6-parameters/ipv6-parameters.xhtml#ipv6-parameters-3)
+ * @{
+ */
+/**
+ * @brief   Type 0 routing header (deprecated)
+ */
+#define IPV6_EXT_RH_TYPE_0          (0U)
+
+/**
+ * @brief   Nimrod routing header (deprecated)
+ */
+#define IPV6_EXT_RH_TYPE_NIMROD     (1U)
+
+/**
+ * @brief   Type 2 routing header
+ * @see     [RFC 6275, section 6.4](https://tools.ietf.org/html/rfc6275#section-6.4)
+ */
+#define IPV6_EXT_RH_TYPE_2          (2U)
+
+/**
+ * @brief   RPL source routing header
+ * @see     [RFC 6554](https://tools.ietf.org/html/rfc6554)
+ */
+#define IPV6_EXT_RH_TYPE_RPL_SRH    (3U)
+/** @} */
+
+/**
  * @brief   IPv6 routing extension header.
  *
  * @see [RFC 8200](https://tools.ietf.org/html/rfc8200#section-4.4)
