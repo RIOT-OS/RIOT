@@ -187,7 +187,7 @@ int sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
             if (remote != NULL) {
                 remote->family = AF_INET6;
                 remote->netif = SOCK_ADDR_ANY_NETIF;
-                memcpy(&remote->addr, &sock->recv_info.src, sizeof(ipv6_addr_t));
+                memcpy(&remote->addr, sock->recv_info.src, sizeof(ipv6_addr_t));
                 remote->port = sock->recv_info.src_port;
             }
             res = (int)sock->recv_info.datalen;
@@ -235,11 +235,11 @@ int sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
     else if (sock->sock.udp_conn->rport == 0) {
         return -ENOTCONN;
     }
-    /* cppcheck-supress nullPointerRedundantCheck
-     * remote == NULL implies that sock != NULL (see assert at start of
+    /* cppcheck-suppress nullPointerRedundantCheck
+     * (reason: remote == NULL implies that sock != NULL (see assert at start of
      * function) * that's why it is okay in the if-statement above to check
      * sock->... without checking (sock != NULL) first => this check afterwards
-     * isn't redundant */
+     * isn't redundant) */
     if (sock == NULL) {
         int res;
         if ((res = _reg(&tmp, NULL, NULL, NULL, NULL)) < 0) {
