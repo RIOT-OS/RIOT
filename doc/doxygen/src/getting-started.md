@@ -32,7 +32,7 @@ information that can help you with your platform:
 * [Atmel ATmega](https://github.com/RIOT-OS/RIOT/wiki/Family%3A-ATmega)
 * [native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
 
-Building and executing an example           {#building-and-executing-an-example}
+Building and executing an example        {#building-and-executing-an-example}
 ---------------------------------
 RIOT provides a number of examples in the `examples/` directory. Every example
 has a README that documents its usage and its purpose. You can build them by
@@ -101,18 +101,22 @@ include the `netdev_tap` module by adding the line `USEMODULE += netdev_tap`.
 Now, you can connect several native RIOT instances to each other or enable
 communication between a native RIOT instance and its (*NIX) host system.
 
-To connect multiple native RIOT instances to each other, use the shell script called `tapsetup` in `RIOT/dist/tools/tapsetup`.
+To connect multiple native RIOT instances to each other, use the shell script
+called `tapsetup` in `RIOT/dist/tools/tapsetup`.
 First, create a bridge and two (or `count` at your option) tap interfaces:
 
      ./dist/tools/tapsetup/tapsetup [-c [<count>]]
 
-And follow the instructions of the script telling you to start RIOT instances on specific tap interfaces. To start a RIOT instance on a specific tap interface, run
+And follow the instructions of the script telling you to start RIOT instances
+on specific tap interfaces. To start a RIOT instance on a specific tap
+interface, run
 
     PORT=<tap interface name> make term
 
 in the directory of your RIOT application.
 
-The [gnrc networking example][gnrc] explains how to do all of this in more detail.
+The [gnrc networking example][gnrc] explains how to do all of this in more
+detail.
 
 The build system in detail                                  {#the-build-system}
 --------------------------
