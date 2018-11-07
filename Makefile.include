@@ -357,10 +357,6 @@ include $(RIOTBASE)/sys/Makefile.include
 include $(RIOTBASE)/drivers/Makefile.include
 
 # include Makefile.includes for packages in $(USEPKG)
-$(RIOTPKG)/%/Makefile.include::
-	$(Q)"$(MAKE)" -C $(RIOTPKG)/$* Makefile.include
-
-$(USEPKG:%=$(RIOTPKG)/%/Makefile.include): FORCE
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
 # include external modules configuration
@@ -488,7 +484,7 @@ endef
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    all $(BASELIBS) $(USEPKG:%=$(RIOTPKG)/%/Makefile.include) $(BUILDDEPS) ..in-docker-container: clean
+    all $(BASELIBS) $(BUILDDEPS) ..in-docker-container: clean
 endif
 
 .PHONY: pkg-prepare pkg-build pkg-build-%
