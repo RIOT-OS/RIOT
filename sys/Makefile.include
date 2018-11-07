@@ -43,17 +43,7 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
 endif
 
 ifneq (,$(filter embunit,$(USEMODULE)))
-  ifeq ($(OUTPUT),XML)
-    CFLAGS += -DOUTPUT=OUTPUT_XML
-  else ifeq ($(OUTPUT),TEXT)
-    CFLAGS += -DOUTPUT=OUTPUT_TEXT
-  else ifeq ($(OUTPUT),COMPILER)
-    CFLAGS += -DOUTPUT=OUTPUT_COMPILER
-  else ifeq ($(OUTPUT),COLORTEXT)
-    CFLAGS += -DOUTPUT=OUTPUT_COLORTEXT
-  else ifeq ($(OUTPUT),COLOR)
-    CFLAGS += -DOUTPUT=OUTPUT_COLOR
-  endif
+  include $(RIOTBASE)/sys/embunit/Makefile.include
 endif
 
 ifneq (,$(filter log_%,$(USEMODULE)))
