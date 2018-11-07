@@ -323,13 +323,13 @@ static inline void irq_handler(PORT_Type *port, int port_num)
             }
         }
     }
-    cortexm_isr_end();
 }
 
 #ifdef PORTA_BASE
 void isr_porta(void)
 {
     irq_handler(PORTA, 0);
+    cortexm_isr_end();
 }
 #endif /* PORTA_BASE */
 
@@ -337,6 +337,7 @@ void isr_porta(void)
 void isr_portb(void)
 {
     irq_handler(PORTB, 1);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_B */
 
@@ -344,6 +345,7 @@ void isr_portb(void)
 void isr_portc(void)
 {
     irq_handler(PORTC, 2);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_C */
 
@@ -351,6 +353,7 @@ void isr_portc(void)
 void isr_portd(void)
 {
     irq_handler(PORTD, 3);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_D */
 
@@ -358,6 +361,7 @@ void isr_portd(void)
 void isr_porte(void)
 {
     irq_handler(PORTE, 4);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_E */
 
@@ -365,6 +369,7 @@ void isr_porte(void)
 void isr_portf(void)
 {
     irq_handler(PORTF, 5);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_F */
 
@@ -372,6 +377,7 @@ void isr_portf(void)
 void isr_portg(void)
 {
     irq_handler(PORTG, 6);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_G */
 
@@ -381,6 +387,7 @@ void isr_portb_portc(void)
 {
     irq_handler(PORTB, 1);
     irq_handler(PORTC, 2);
+    cortexm_isr_end();
 }
 #endif
 #endif /* MODULE_PERIPH_GPIO_IRQ */
