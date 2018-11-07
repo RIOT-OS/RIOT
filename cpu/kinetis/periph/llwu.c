@@ -25,10 +25,12 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-struct {
+typedef struct {
     gpio_cb_t cb;
     void *arg;
-} llwu_pin_config[LLWU_WAKEUP_PIN_NUMOF];
+} llwu_pin_config_t;
+
+static llwu_pin_config_t llwu_pin_config[LLWU_WAKEUP_PIN_NUMOF];
 
 void llwu_init(void)
 {
@@ -51,23 +53,13 @@ void llwu_wakeup_pin_set(llwu_wakeup_pin_t pin, llwu_wakeup_edge_t edge, gpio_cb
     llwu_pin_config[pin].cb = cb;
     llwu_pin_config[pin].arg = arg;
 
-    /* The fields are two bits per pin, and the setting registers are 8 bits wide */
-    if(pin < 4) {
-        unsigned field_offset = pin * 2;
-        LLWU->PE1 = (LLWU->PE1 & (~(0b11 << field_offset))) | (edge << field_offset);
-    }
-    else if(pin < 8) {
-        unsigned field_offset = (pin - 4) * 2;
-        LLWU->PE2 = (LLWU->PE2 & (~(0b11 << field_offset))) | (edge << field_offset);
-    }
-    else if(pin < 12) {
-        unsigned field_offset = (pin - 8) * 2;
-        LLWU->PE3 = (LLWU->PE3 & (~(0b11 << field_offset))) | (edge << field_offset);
-    }
-    else {
-        unsigned field_offset = (pin - 12) * 2;
-        LLWU->PE4 = (LLWU->PE4 & (~(0b11 << field_offset))) | (edge << field_offset);
-    }
+    /* The fields are two bits per pin, and the setting registers are 8 bits
+     * wide, hence 4 pins per register. */
+    unsigned field_offset = (pin & 0x03) << 1;
+    unsigned reg_offset = pin >> 2;
+    (&LLWU->PE1)[reg_offset] = ((&LLWU->PE1)[reg_offset] &
+        (~(0b11 << field_offset))) |
+        (edge << field_offset);
 }
 
 void isr_llwu(void)
@@ -75,27 +67,32 @@ void isr_llwu(void)
     DEBUG("LLWU IRQ\n");
 
     for (unsigned reg = 0; reg < ((LLWU_WAKEUP_PIN_NUMOF + 7) / 8); ++reg) {
-        uint8_t flags = *(&LLWU->F1 + reg);
-        if (flags == 0) {
-            continue;
-        }
+        uint8_t status = *(&LLWU->F1 + reg);
         /* Clear pin interrupt flags */
-        *(&LLWU->F1 + reg) = flags;
-        DEBUG("llwu: F%u = %02x\n", reg + 1, (unsigned) flags);
-        unsigned pin = reg * 8;
-        while (flags) {
-            if (flags & 1) {
-                DEBUG("llwu: wakeup pin %u\n", pin);
-                gpio_cb_t cb = llwu_pin_config[pin].cb;
-                if (cb) {
-                    cb(llwu_pin_config[pin].arg);
-                }
-                /* Clear PORT interrupt flag to avoid spurious duplicates */
-                DEBUG("PORT ISFR: %08" PRIx32 "\n", llwu_wakeup_pin_to_port[pin].port->ISFR);
-                llwu_wakeup_pin_to_port[pin].port->ISFR = llwu_wakeup_pin_to_port[pin].isfr_mask;
+        *(&LLWU->F1 + reg) = status;
+        DEBUG("llwu: F%u = %02x\n", reg + 1, (unsigned) status);
+
+        while (status) {
+            unsigned pin = bitarithm_lsb(status);
+            status &= ~(1 << pin);
+            pin += reg * 8;
+            DEBUG("llwu: wakeup pin %u\n", pin);
+            gpio_cb_t cb = llwu_pin_config[pin].cb;
+            if (cb) {
+                cb(llwu_pin_config[pin].arg);
             }
-            flags >>= 1;
-            ++pin;
+            /* Clear PORT interrupt flag to avoid spurious duplicates. */
+            /* In essence, this behavior is similar to a software debounce. Even
+             * very quick contact bounces after the LLWU has begun to wake the
+             * CPU may cause the PORT module to pick up the same trigger event,
+             * which may lead to duplicate software events when using the same
+             * callback for gpio_init_int and llwu_wakeup_pin_set. The bounces
+             * would normally be ignored because of the processing delay in the
+             * interrupt handling before the interrupt flag is cleared, but
+             * since there are two interrupt flags, one in the LLWU module and
+             * one in the PORT module, we can get two events. */
+            DEBUG("PORT ISFR: %08" PRIx32 "\n", llwu_wakeup_pin_to_port[pin].port->ISFR);
+            llwu_wakeup_pin_to_port[pin].port->ISFR = llwu_wakeup_pin_to_port[pin].isfr_mask;
         }
     }
     /* Read only register F3, the flag will need to be cleared in the peripheral

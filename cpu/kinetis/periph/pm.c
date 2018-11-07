@@ -79,6 +79,8 @@ void pm_set(unsigned mode)
             /* Clear pending flag first, the LLWU has no purpose in RUN mode, so
              * if the flag is set then it must be a remainder from handling the
              * previous wakeup. */
+            LLWU->F1 = 0xffu;
+            LLWU->F2 = 0xffu;
             NVIC_ClearPendingIRQ(LLWU_IRQn);
             NVIC_EnableIRQ(LLWU_IRQn);
             break;
