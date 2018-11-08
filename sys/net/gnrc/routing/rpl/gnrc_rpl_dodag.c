@@ -305,7 +305,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent)
 static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *dodag)
 {
     gnrc_rpl_parent_t *old_best = dodag->parents;
-    gnrc_rpl_parent_t *new_best = old_best;
+    gnrc_rpl_parent_t *new_best;
     uint16_t old_rank = dodag->my_rank;
     gnrc_rpl_parent_t *elt = NULL;
     gnrc_rpl_parent_t *tmp = NULL;
