@@ -29,7 +29,6 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
                          const ipv6_addr_t *pfx, unsigned pfx_len,
                          uint32_t valid_ltime, uint32_t pref_ltime)
 {
-    int res = 0;
     _nib_offl_entry_t *dst;
     ipv6_addr_t tmp = IPV6_ADDR_UNSPECIFIED;
 
@@ -47,7 +46,8 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     dst = _nib_pl_add(iface, pfx, pfx_len, valid_ltime,
                       pref_ltime);
     if (dst == NULL) {
-        res = -ENOMEM;
+        mutex_unlock(&_nib_mutex);
+        return -ENOMEM;
     }
 #ifdef MODULE_GNRC_NETIF
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
@@ -55,7 +55,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
 
     if (netif == NULL) {
         mutex_unlock(&_nib_mutex);
-        return res;
+        return 0;
     }
     gnrc_netif_acquire(netif);
     if (!gnrc_netif_is_6ln(netif) &&
@@ -83,7 +83,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     /* update prefixes down-stream */
     _handle_snd_mc_ra(netif);
 #endif
-    return res;
+    return 0;
 }
 
 void gnrc_ipv6_nib_pl_del(unsigned iface,
