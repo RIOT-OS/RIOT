@@ -213,9 +213,11 @@ static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
 {
 #ifdef MODULE_GNRC_IPV6_EXT
     const bool should_dispatch_current_type = ((current->type != GNRC_NETTYPE_IPV6_EXT) ||
-                                               (current->next->type == GNRC_NETTYPE_IPV6));
+                                               (current->next->type == GNRC_NETTYPE_IPV6)) &&
+                                              (current->type != GNRC_NETTYPE_IPV6);
 #else
-    const bool should_dispatch_current_type = (current->next->type == GNRC_NETTYPE_IPV6);
+    const bool should_dispatch_current_type = (current->next->type == GNRC_NETTYPE_IPV6) &&
+                                              (current->type != GNRC_NETTYPE_IPV6);
 #endif
 
     DEBUG("ipv6: forward nh = %u to other threads\n", nh);
@@ -896,7 +898,10 @@ static void _decapsulate(gnrc_pktsnip_t *pkt)
 
     pkt->type = GNRC_NETTYPE_IPV6;
 
-    _receive(pkt);
+    if (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6,
+                                     GNRC_NETREG_DEMUX_CTX_ALL, pkt) == 0) {
+        gnrc_pktbuf_release(pkt);
+    }
 }
 
 /** @} */
