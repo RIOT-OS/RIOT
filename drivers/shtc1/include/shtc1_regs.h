@@ -25,14 +25,14 @@
 extern "C" {
 #endif
 
-#define SHTC1_CRC                                   0x31    /* crc polynomial */
-#define SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_HIGH    0x7C
-#define SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_LOW     0xA2
-#define SHTC1_COMMAND_RESET_HIGH                    0x80
-#define SHTC1_COMMAND_RESET_LOW                     0x5D
-#define SHTC1_COMMAND_ID_HIGH                       0xEF
-#define SHTC1_COMMAND_ID_LOW                        0xC8
-#define SHTC1_ID                                    0x07    /* ID Mask */
+#define SHTC1_CRC                                   (0x31)    /* crc polynomial */
+#define SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_HIGH    (0x7C)
+#define SHTC1_MEASURE_CLOCK_STRETCHING_TEMP_LOW     (0xA2)
+#define SHTC1_COMMAND_RESET_HIGH                    (0x80)
+#define SHTC1_COMMAND_RESET_LOW                     (0x5D)
+#define SHTC1_COMMAND_ID_HIGH                       (0xEF)
+#define SHTC1_COMMAND_ID_LOW                        (0xC8)
+#define SHTC1_ID                                    (0x07)    /* ID Mask */
 
 #ifdef __cplusplus
 }

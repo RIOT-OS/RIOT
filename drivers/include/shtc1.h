@@ -35,13 +35,13 @@ typedef enum {
 } shtc1_crc_type_t;
 
 /**
- * @brief   value struct, where all results obtained from the sensor will be saved
+ * @brief   value struct, where all results obtained from the sensor will be saved.
  * @{
  */
 typedef struct {
-    float temp;         /**< Temperature after an according call to the measurement function */
-    float rel_humidity; /**< Relative humidity after an according call to the measuerment funtion*/
-    unsigned int id;    /**< ID read from the sensor, only available after shtc1_id() was called */
+    float temp;         /**< Temperature after an according call to the measurement function. */
+    float rel_humidity; /**< Relative humidity after an according call to the measuerment funtion. */
+    unsigned int id;    /**< ID read from the sensor, only available after shtc1_id() was called. */
 } shtc1_values_t;
 /** @} */
 
@@ -50,9 +50,9 @@ typedef struct {
  * @{
  */
 typedef struct {
-    i2c_t bus;  /**< I2C bus descriptor */
-    uint8_t addr;   /**< I2C address of the sensor */
-    shtc1_crc_type_t crc;   /**< crc check enabled or disabled (CRC_ENABLED/CRC_DISABLED) */
+    i2c_t bus;              /**< I2C bus descriptor. */
+    uint8_t addr;           /**< I2C address of the sensor. */
+    shtc1_crc_type_t crc;   /**< crc check enabled or disabled (CRC_ENABLED/CRC_DISABLED). */
 } shtc1_params_t;
 /** @} */
 
@@ -61,8 +61,8 @@ typedef struct {
  * @{
  */
 typedef struct {
-    shtc1_values_t values;  /**< Values struct, where all read data will be stored */
-    shtc1_params_t params;  /**< Paramteres struct with all settings set */
+    shtc1_values_t values;  /**< Values struct, where all read data will be stored. */
+    shtc1_params_t params;  /**< Paramteres struct with all settings set. */
 } shtc1_t;
 /** @} */
 
@@ -72,48 +72,50 @@ enum {
 };
 
 /**
- * @brief Initializes the sensor and I2C
+ * @brief Initializes the sensor and I2C.
  *
- * @param[in] dev       I2C device descriptor
- * @param[in] params    SHTC1 parameters to be used
+ * @param[in] dev       I2C device descriptor.
+ * @param[in] params    SHTC1 parameters to be used.
  *
- * @return              SHTC1_OK on a working initialization
- * @return              SHTC1_ERROR on error
+ * @return              SHTC1_OK on a working initialization.
+ * @return              SHTC1_ERROR on error.
  */
 int8_t shtc1_init(shtc1_t* const dev, const shtc1_params_t* params);
 
 /**
- * @brief Reads temperature and humidity values
- * @details The values wil be saved in the device descriptor (values struct). The temperature is in °C and the humidity in %
+ * @brief Reads temperature and humidity values.
+ * @details The values will be saved in the device descriptor (values struct).
+ * The temperature is in °C and the humidity in %.
  *
- * @param[in] dev       The I2C device descriptor
+ * @param[in] dev       The I2C device descriptor.
  *
- * @return              SHTC1_OK if a measurement completed. The values will be stored in the values struct. Temperature in °C and humidity in %
- * @return              SHTC1_ERROR on checksum error
+ * @return              SHTC1_OK if a measurement completed. The values will be stored
+ *                      in the values struct. Temperature in °C and humidity in %.
+ * @return              SHTC1_ERROR on checksum error.
  */
 int8_t shtc1_measure(shtc1_t* const dev);
 
 /**
  * @brief Reads the ID and saves it in the device descriptor
  *
- * @details             When working correctly ID should equal xxxx'xxxx'xx00'0111 where x is unspecified
+ * @details             When working correctly ID should equal xxxx'xxxx'xx00'0111 where x is unspecified.
  *
- * @param[in] dev       The I2C device descriptor
+ * @param[in] dev       The I2C device descriptor.
  *
- * @return              SHTC1_OK on everything done
- * @return              SHTC1_ERROR on error
+ * @return              SHTC1_OK on everything done.
+ * @return              SHTC1_ERROR on error.
  */
 int8_t shtc1_id(shtc1_t* const dev);
 
 /**
  * @brief Resets sensor
  *
- * This will reset all internal state machines and reload calibration data from the memory
+ * This will reset all internal state machines and reload calibration data from the memory.
  *
- * @param[in] dev       The I2C device descriptor
+ * @param[in] dev       The I2C device descriptor.
  *
- * @return              SHTC1_OK on everything done
- * @return              SHTC1_ERROR on error
+ * @return              SHTC1_OK on everything done.
+ * @return              SHTC1_ERROR on error.
  */
 int8_t shtc1_reset(const shtc1_t* const dev);
 

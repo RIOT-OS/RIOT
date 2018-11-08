@@ -73,6 +73,11 @@ int8_t shtc1_measure(shtc1_t *const dev)
         return SHTC1_ERROR;
     }
     /* Receive the measurement */
+    /* 16 bit Temperature 
+     * 8 bit  CRC temp
+     * 16 Bit Absolute Humidity
+     * 8 bit CRC Hum
+    */
     uint8_t received[6];
     if(i2c_read_bytes(dev->params.bus, dev->params.addr, received, 6, 0)) {
         return SHTC1_ERROR;
