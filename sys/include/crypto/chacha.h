@@ -45,10 +45,9 @@ extern "C" {
  * @brief A ChaCha cipher stream context.
  * @details Initialize with chacha_init().
  */
-typedef struct
-{
+typedef struct {
     uint32_t state[16]; /**< The current state of the stream. */
-    uint8_t rounds; /**< Number of iterations. */
+    uint8_t rounds;     /**< Number of iterations. */
 } chacha_ctx;
 
 /**
