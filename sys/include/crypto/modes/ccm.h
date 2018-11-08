@@ -54,7 +54,8 @@ extern "C" {
  * @param input_len        length of the input data
  * @param output           pointer to allocated memory for encrypted data. It
  *                         has to be of size data_len + mac_length.
- * @return                 length of encrypted data or error code
+ * @return                 Length of encrypted data on a successful encryption
+ * @return                 A negative error code if something went wrong
  */
 int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
                        uint32_t auth_data_len, uint8_t mac_length,
@@ -79,7 +80,9 @@ int cipher_encrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
  * @param input_len        length of the input data
  * @param output           pointer to allocated memory for decrypted data. It
  *                         has to be of size data_len - mac_length.
- * @return                 length of encrypted data or error code
+ *
+ * @return                 Length of the decrypted data on a successful decryption
+ * @return                 A negative error code if something went wrong
  */
 int cipher_decrypt_ccm(cipher_t* cipher, uint8_t* auth_data,
                        uint32_t auth_data_len, uint8_t mac_length,
