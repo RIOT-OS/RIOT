@@ -23,11 +23,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "nimble_riot.h"
-
-#include "nimble/nimble_port.h"
 #include "host/ble_hs.h"
 #include "host/util/util.h"
+#include "host/ble_gatt.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
@@ -93,13 +91,26 @@ static void start_advertise(void)
     (void)rc;
 }
 
-static void app_ble_sync_cb(void)
+int main(void)
 {
-    int rc;
+    puts("NimBLE GATT Server Example");
 
-    rc = ble_hs_util_ensure_addr(0);
+    /* set the device name */
+    ble_svc_gap_device_name_set(device_name);
+
+    /* initialize the GAP and GATT services */
+    ble_svc_gap_init();
+    ble_svc_gatt_init();
+    /* XXX: seems to be needed to apply the added services */
+    ble_gatts_start();
+
+    /* make sure synchronization of host and controller is done, this should
+     * always be the case */
+    while (!ble_hs_synced()) {}
+
+    /* configure device address */
+    int rc = ble_hs_util_ensure_addr(0);
     assert(rc == 0);
-
     rc = ble_hs_id_infer_auto(0, &own_addr_type);
     assert(rc == 0);
     (void)rc;
@@ -107,31 +118,8 @@ static void app_ble_sync_cb(void)
     /* generate the advertising data */
     update_ad();
 
+    /* start to advertise this node */
     start_advertise();
-}
-
-int main(void)
-{
-    puts("NimBLE GATT Server Example");
-
-    /* initialize NimBLE's controller */
-    nimble_riot_controller_init();
-
-    /* register the synchronization callback that is triggered once the host has
-     * finished its initialization */
-    ble_hs_cfg.sync_cb = app_ble_sync_cb;
-
-    /* initialize NimBLE porting layer and the default GATT and GAP services*/
-    nimble_port_init();
-    ble_svc_gap_init();
-    ble_svc_gatt_init();
-
-    /* set the device name */
-    ble_svc_gap_device_name_set(device_name);
-
-    /* and finally run NimBLE's host event loop. The event loop contains a pre-
-     * configured event which will trigger the hosts initialization */
-    nimble_port_run();
 
     return 0;
 }
