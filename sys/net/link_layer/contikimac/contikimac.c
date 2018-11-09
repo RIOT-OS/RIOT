@@ -32,7 +32,7 @@
 /* Set ENABLE_TRACE to 1 to print single character status bytes over stderr to
  * see algorithm events, useful for debugging */
 #define ENABLE_TRACE    (0)
-#define TRACE(msg)      if (ENABLE_TRACE) { LOG_ERROR(msg); }
+#define TRACE(...)      if (ENABLE_TRACE) { LOG_ERROR(__VA_ARGS__); }
 
 /* Set to 1 to enable debug prints of the time spent in radio ON modes */
 #define ENABLE_TIMING_INFO (0)
