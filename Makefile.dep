@@ -68,7 +68,7 @@ ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter uhcpc,$(USEMODULE)))
-  USEMODULE += posix
+  USEMODULE += posix_inet
 endif
 
 ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
@@ -388,7 +388,7 @@ ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += bitfield
   USEMODULE += random
   USEMODULE += vfs
-  USEMODULE += posix
+  USEMODULE += posix_headers
   USEMODULE += xtimer
 endif
 
@@ -407,17 +407,23 @@ endif
 
 ifneq (,$(filter shell_commands,$(USEMODULE)))
   ifneq (,$(filter fib,$(USEMODULE)))
-    USEMODULE += posix
+    USEMODULE += posix_inet
   endif
 endif
 
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   USEMODULE += sema
   USEMODULE += xtimer
+  USEMODULE += posix_headers
 endif
 
 ifneq (,$(filter posix_time,$(USEMODULE)))
   USEMODULE += xtimer
+  USEMODULE += posix_headers
+endif
+
+ifneq (,$(filter posix_inet,$(USEMODULE)))
+  USEMODULE += posix_headers
 endif
 
 ifneq (,$(filter lwip_sixlowpan,$(USEMODULE)))
@@ -499,6 +505,7 @@ endif
 ifneq (,$(filter fib,$(USEMODULE)))
   USEMODULE += universal_address
   USEMODULE += xtimer
+  USEMODULE += posix_headers
 endif
 
 ifneq (,$(filter oonf_rfc5444,$(USEMODULE)))
@@ -695,6 +702,7 @@ ifneq (,$(filter devfs,$(USEMODULE)))
 endif
 
 ifneq (,$(filter vfs,$(USEMODULE)))
+  USEMODULE += posix_headers
   ifeq (native, $(BOARD))
     USEMODULE += native_vfs
   endif
@@ -702,11 +710,11 @@ endif
 
 ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += sock_util
-  USEMODULE += posix
+  USEMODULE += posix_headers
 endif
 
 ifneq (,$(filter sock_util,$(USEMODULE)))
-  USEMODULE += posix
+  USEMODULE += posix_inet
   USEMODULE += fmt
   USEMODULE += sock_udp
 endif
