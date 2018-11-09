@@ -106,6 +106,8 @@ extern const contikimac_params_t contikimac_params_BPSK20;
 static const netopt_state_t state_standby = NETOPT_STATE_STANDBY;
 static const netopt_state_t state_listen  = NETOPT_STATE_IDLE;
 static const netopt_state_t state_tx      = NETOPT_STATE_TX;
+static const uint8_t cca_mode_sleep = NETDEV_IEEE802154_CCA_MODE_1; /* Energy above threshold */
+static const uint8_t cca_mode_active = NETDEV_IEEE802154_CCA_MODE_3; /* Carrier sense with energy above threshold */
 
 static uint32_t time_begin = 0;
 
@@ -820,9 +822,20 @@ static void contikimac_channel_check(contikimac_t *ctx)
         return;
     }
     CONTIKIMAC_LED_ON;
+    /* CCA mode 1 may require slightly less energy than CCA mode 2, 3 */
+    res = lower->driver->set(lower, NETOPT_CCA_MODE, &cca_mode_sleep, sizeof(cca_mode_sleep));
+    if (res < 0) {
+        DEBUG("contikimac(%d): set NETOPT_CCA_MODE=%x failed: %d\n",
+                  thread_getpid(), (unsigned)cca_mode_sleep, res);
+    }
     if (contikimac_channel_energy_detect(ctx)) {
         /* Set the radio to listen for incoming packets */
         DEBUG("contikimac(%d): Detected, looking for silence\n", thread_getpid());
+        res = lower->driver->set(lower, NETOPT_CCA_MODE, &cca_mode_active, sizeof(cca_mode_active));
+        if (res < 0) {
+            DEBUG("contikimac(%d): set NETOPT_CCA_MODE=%x failed: %d\n",
+                      thread_getpid(), (unsigned)cca_mode_active, res);
+        }
         /* Reset the periodic handler state */
         ctx->seen_silence = 0;
         event_post(ctx->evq, &ctx->events.periodic.super);
@@ -877,6 +890,7 @@ static void contikimac_send(contikimac_t *ctx, int broadcast)
     ctx->tx_status = CONTIKIMAC_TX_STARTED;
     int do_transmit = 1;
     uint32_t time_before = 0;
+    netdev_t *lower = ctx->dev.netdev.lower;
     (void) time_before;
     if (ENABLE_TIMING_INFO) {
         time_before = xtimer_now_usec();
@@ -907,6 +921,11 @@ static void contikimac_send(contikimac_t *ctx, int broadcast)
      * fail to receive the reply because it is still in strobe mode */
     /* We avoid using CSMA on the actual TX operations below because it will add
      * variable delays to the transmission and mess up the protocol timing */
+    int res = lower->driver->set(lower, NETOPT_CCA_MODE, &cca_mode_active, sizeof(cca_mode_active));
+    if (res < 0) {
+        DEBUG("contikimac(%d): set NETOPT_CCA_MODE=%x failed: %d\n",
+                  thread_getpid(), (unsigned)cca_mode_active, res);
+    }
     contikimac_set_timeout(ctx, tx_strobe_timeout + ctx->params->rx_timeout);
     while (contikimac_channel_energy_detect(ctx)) {
         DEBUG("contikimac(%d): wait for TX opportunity\n", thread_getpid());
@@ -919,7 +938,6 @@ static void contikimac_send(contikimac_t *ctx, int broadcast)
     contikimac_cancel_timers(ctx);
     /* Set timeout for TX strobe */
     contikimac_set_timeout(ctx, tx_strobe_timeout);
-    netdev_t *lower = ctx->dev.netdev.lower;
     unsigned tx_sequence = 2; /* counts down after the strobe timeout has happened */
     while(tx_sequence) {
         if (do_transmit) {
@@ -1032,6 +1050,11 @@ static void contikimac_configure_lower(netdev_t *dev)
                   thread_getpid(), res);
         LOG_ERROR("contikimac requires NETOPT_PRELOADING, this node will "
                   "likely not be able to communicate with other nodes!\n");
+    }
+    res = dev->driver->set(dev, NETOPT_CCA_MODE, &cca_mode_active, sizeof(cca_mode_active));
+    if (res < 0) {
+        DEBUG("contikimac(%d): set NETOPT_CCA_MODE=%x failed: %d\n",
+                  thread_getpid(), (unsigned)cca_mode_active, res);
     }
 }
 
