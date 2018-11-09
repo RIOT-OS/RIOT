@@ -4,4 +4,5 @@ ifneq (,$(filter ccn-lite,$(USEPKG)))
   USEMODULE += random
   USEMODULE += timex
   USEMODULE += tlsf-malloc
+  USEMODULE += posix_headers
 endif

@@ -8,7 +8,7 @@ BOARD_BLACKLIST := arduino-mega2560 waspmote-pro arduino-uno arduino-duemilanove
 
 BOARD_INSUFFICIENT_MEMORY := nucleo-f031k6
 
-USEMODULE += posix
+USEMODULE += posix_headers
 USEMODULE += pthread
 USEMODULE += xtimer
 

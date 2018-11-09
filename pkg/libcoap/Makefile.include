@@ -1,2 +1,1 @@
-INCLUDES += -I$(PKGDIRBASE)/libcoap \
-			-I$(RIOTBASE)/sys/posix/include
+INCLUDES += -I$(PKGDIRBASE)/libcoap

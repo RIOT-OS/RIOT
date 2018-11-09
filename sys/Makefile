@@ -4,6 +4,9 @@ endif
 ifneq (,$(filter eepreg,$(USEMODULE)))
   DIRS += eepreg
 endif
+ifneq (,$(filter posix_inet,$(USEMODULE)))
+  DIRS += posix/inet
+endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   DIRS += posix/semaphore
 endif

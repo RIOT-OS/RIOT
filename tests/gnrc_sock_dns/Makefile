@@ -16,7 +16,7 @@ USEMODULE += auto_init_gnrc_netif
 
 USEMODULE += shell_commands
 
-USEMODULE += posix
+USEMODULE += posix_inet
 
 LOW_MEMORY_BOARDS := nucleo-f334r8 msb-430 msb-430h
 
