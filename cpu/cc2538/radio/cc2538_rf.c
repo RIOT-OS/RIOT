@@ -53,7 +53,7 @@ static const init_pair_t init_table[] = {
     {&RFCORE_XREG_CSPT,      0xff                     },
     {&RFCORE_XREG_MDMCTRL0,  0x85                     },
     {&RFCORE_XREG_FSCTRL,    0x55                     },
-    {&RFCORE_XREG_FRMCTRL0,  AUTOCRC | AUTOACK        },
+    {&RFCORE_XREG_FRMCTRL0,  AUTOCRC                  },
     {&RFCORE_XREG_FRMCTRL1,  0x00                     },
     {&RFCORE_XREG_SRCMATCH,  0x00                     },
     {&RFCORE_XREG_FIFOPCTRL, CC2538_RF_MAX_DATA_LEN   },
