@@ -240,7 +240,7 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                 gnrc_netif_acquire(netif);
             }
             node = _nib_onl_get(&route.next_hop,
-                                (netif == NULL) ? netif->pid : 0);
+                                (netif != NULL) ? netif->pid : 0);
             if (_resolve_addr(&route.next_hop, netif, pkt, nce, node)) {
                 _call_route_info_cb(netif,
                                     GNRC_IPV6_NIB_ROUTE_INFO_TYPE_RN,
