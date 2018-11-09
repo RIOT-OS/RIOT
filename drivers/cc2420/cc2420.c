@@ -62,10 +62,6 @@ int cc2420_init(cc2420_t *dev)
     cc2420_set_chan(dev, CC2420_CHAN_DEFAULT);
     cc2420_set_txpower(dev, CC2420_TXPOWER_DEFAULT);
 
-    /* set default options */
-    cc2420_set_option(dev, CC2420_OPT_AUTOACK, true);
-    cc2420_set_option(dev, CC2420_OPT_CSMA, true);
-
     /* change default RX bandpass filter to 1.3uA (as recommended) */
     reg = cc2420_reg_read(dev, CC2420_REG_RXCTRL1);
     reg |= CC2420_RXCTRL1_RXBPF_LOCUR;
