@@ -79,13 +79,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_chan(dev, AT86RF2XX_DEFAULT_CHANNEL);
     /* set default TX power */
     at86rf2xx_set_txpower(dev, AT86RF2XX_DEFAULT_TXPOWER);
-    /* set default options */
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_AUTOACK, true);
-    at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA, true);
-
-    static const netopt_enable_t enable = NETOPT_ENABLE;
-    netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
-                          &enable, sizeof(enable));
 
     /* enable safe mode (protect RX FIFO until reading data starts) */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_2,
