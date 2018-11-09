@@ -59,6 +59,28 @@ void otTaskletsSignalPending(otInstance *aInstance) {
     (void) aInstance;
 }
 
+static void _configure_netdev_ieee802154(netdev_t *dev)
+{
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+
+    /* Always enable ACK_REQ and AUTOACK for Openthread */
+    int res = dev->driver->set(dev, NETOPT_ACK_REQ, &enable, sizeof(enable));
+    if (res < 0) {
+        DEBUG("gnrc_netif: enable ACK requests failed: %d\n", res);
+    }
+    res = dev->driver->set(dev, NETOPT_AUTOACK, &enable, sizeof(enable));
+    if (res < 0) {
+        DEBUG("gnrc_netif: enable auto ACK failed: %d\n", res);
+    }
+
+    if (IEEE802154_DEFAULT_ENABLE_CSMA) {
+        int res = dev->driver->set(dev, NETOPT_CSMA, &enable, sizeof(enable));
+        if (res < 0) {
+            DEBUG("gnrc_netif: enable CSMA failed: %d\n", res);
+        }
+    }
+}
+
 static void *_openthread_event_loop(void *arg) {
     (void)arg;
     _pid = thread_getpid();
@@ -169,6 +191,8 @@ int openthread_netdev_init(char *stack, int stacksize, char priority,
     netopt_enable_t enable = NETOPT_ENABLE;
     netdev->driver->set(netdev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
     netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
+
+    _configure_netdev_ieee802154(netdev);
 
     _pid = thread_create(stack, stacksize,
                          priority, THREAD_CREATE_STACKTEST,
