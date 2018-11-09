@@ -24,6 +24,7 @@
 #include "net/netdev/layer.h"
 #include "net/gnrc/netif.h"
 #include "thread.h" /* for thread_getpid */
+#include "board.h"
 
 #include "log.h"
 #define ENABLE_DEBUG    (0)
@@ -35,11 +36,11 @@
 #define TRACE(...)      if (ENABLE_TRACE) { LOG_ERROR(__VA_ARGS__); }
 
 /* Set to 1 to enable debug prints of the time spent in radio ON modes */
-#define ENABLE_TIMING_INFO (0)
+#define ENABLE_TIMING_INFO      (0)
 
 /* Set to 1 to use LED0_ON/LED0_OFF for a visual feedback of the radio power state */
 #ifndef CONTIKIMAC_DEBUG_LEDS
-#define CONTIKIMAC_DEBUG_LEDS 0
+#define CONTIKIMAC_DEBUG_LEDS   (0)
 #endif
 
 #if ENABLE_TIMING_INFO
@@ -815,19 +816,22 @@ static void contikimac_channel_check(contikimac_t *ctx)
     DEBUG("contikimac(%d): Checking channel\n", thread_getpid());
     /* Perform multiple CCA and check the results */
     /* Bring the radio out of sleep mode */
+    CONTIKIMAC_LED_ON;
     int res = lower->driver->set(lower, NETOPT_STATE, &state_standby, sizeof(state_standby));
+    CONTIKIMAC_LED_OFF;
     if (res < 0) {
         DEBUG("contikimac(%d): Failed setting NETOPT_STATE_STANDBY: %d\n",
             thread_getpid(), res);
         return;
     }
-    CONTIKIMAC_LED_ON;
+    //~ CONTIKIMAC_LED_ON;
     /* CCA mode 1 may require slightly less energy than CCA mode 2, 3 */
     res = lower->driver->set(lower, NETOPT_CCA_MODE, &cca_mode_sleep, sizeof(cca_mode_sleep));
     if (res < 0) {
         DEBUG("contikimac(%d): set NETOPT_CCA_MODE=%x failed: %d\n",
                   thread_getpid(), (unsigned)cca_mode_sleep, res);
     }
+    CONTIKIMAC_LED_OFF;
     if (contikimac_channel_energy_detect(ctx)) {
         /* Set the radio to listen for incoming packets */
         DEBUG("contikimac(%d): Detected, looking for silence\n", thread_getpid());
@@ -853,22 +857,27 @@ static void contikimac_channel_check(contikimac_t *ctx)
 
 static int contikimac_channel_energy_detect(contikimac_t *ctx)
 {
-    netdev_t *dev = &ctx->dev.netdev;
+    netdev_t *lower = ctx->dev.netdev.lower;
     xtimer_ticks32_t last_wakeup = xtimer_now();
     for (uint8_t cca = ctx->params->cca_count_max; cca > 0; --cca) {
         netopt_enable_t channel_clear;
-        int res = dev->driver->get(dev, NETOPT_IS_CHANNEL_CLR, &channel_clear, sizeof(channel_clear));
+        CONTIKIMAC_LED_ON;
+        int res = lower->driver->get(lower, NETOPT_IS_CHANNEL_CLR, &channel_clear, sizeof(channel_clear));
         if (res < 0) {
             DEBUG("contikimac(%d): Failed getting NETOPT_IS_CHANNEL_CLR: %d\n",
                 thread_getpid(), res);
             break;
         }
+        CONTIKIMAC_LED_OFF;
         if (!channel_clear) {
             /* Detected some radio energy on the channel */
             return 1;
         }
-        xtimer_periodic_wakeup(&last_wakeup, ctx->params->cca_cycle_period);
+        if (cca > 1) { /* Don't wait after the final CCA */
+            xtimer_periodic_wakeup(&last_wakeup, ctx->params->cca_cycle_period);
+        }
     }
+    CONTIKIMAC_LED_ON;
     return 0;
 }
 
@@ -876,6 +885,7 @@ static void contikimac_radio_sleep(netdev_t *dev)
 {
     static const netopt_state_t state_sleep = NETOPT_STATE_SLEEP;
     DEBUG("contikimac(%d): Going to sleep\n", thread_getpid());
+    CONTIKIMAC_LED_ON;
     int res = dev->driver->set(dev, NETOPT_STATE, &state_sleep, sizeof(state_sleep));
     if (res < 0) {
         DEBUG("contikimac(%d): Failed setting NETOPT_STATE_SLEEP: %d\n",
