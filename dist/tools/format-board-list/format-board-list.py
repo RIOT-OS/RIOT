@@ -7,8 +7,8 @@ from pprint import pprint
 from tempfile import NamedTemporaryFile
 import shutil
 
-
-MAKEFILE_LAST_LINE = 'include $(RIOTBASE)/Makefile.include'
+import lexer
+import writer
 
 def chdir_to_riot_root():
 	SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -73,77 +73,6 @@ def get_affected_filenames(target_variable):
 	return filenames
 
 
-def has_more_boards(line):
-	return line.rstrip().endswith('\\')
-
-def consume_until_board_list(source_file, target_file):
-	current_line = 'x'
-	previous_line = ''
-
-	# When we're moving things around within the Makefile, such as a board list
-	# or the base Makefile include, we need to skip newlines afterwards, since
-	# otherwise we'd have several newlines in a row, e.g.
-	#
-	# newline
-	# line that is moved to the end of the file
-	# newline
-	#
-	skip_newlines = True
-
-	# Write to the target_file unmodified until we reach a board list or EOF
-	while current_line is not '':
-		previous_line = current_line
-		current_line = source_file.readline()
-
-		if skip_newlines and current_line.strip() is '':
-			continue
-
-		skip_newlines = False
-
-		if current_line.strip() == MAKEFILE_LAST_LINE:
-			current_line = '\n'
-			skip_newlines = True
-			continue
-
-		for target_variable in TARGET_VARIABLES:
-			if target_variable.match(current_line) is not None:
-				return BoardList(target_variable, current_line), current_line, previous_line
-
-		target_file.write(current_line)
-
-	return None, current_line, previous_line
-
-def format_makefile_board_lists(source_file, target_file):
-	board_lists = []
-
-	previous_line = ''
-	while True:
-		board_list, current_line, previous_line = consume_until_board_list(source_file, target_file)
-
-		# If consume_until_board_list returns None we've reached the end of the file
-		if board_list is None:
-			break
-
-		while has_more_boards(current_line):
-			current_line = source_file.readline()
-			board_list.add_boards_from_line(current_line)
-
-		board_lists.append(board_list)
-		previous_line = current_line
-
-	if previous_line.strip() != '':
-		target_file.write('\n')
-
-	# Write the board list to formatted file
-	for board_list in board_lists:
-		target_file.write(str(board_list))
-		target_file.write('\n\n')
-
-	target_file.write(MAKEFILE_LAST_LINE)
-	target_file.write('\n')
-	target_file.flush()
-
-
 if len(sys.argv) != 2 or sys.argv[1] not in ['validate', 'format']:
 	print("Usage: format-board-list.py [validate | format]")
 	print("  In validation mode, the script will return a non-zero")
@@ -158,7 +87,8 @@ chdir_to_riot_root()
 filenames = []
 for target_variable in TARGET_VARIABLES:
 	filenames.extend(get_affected_filenames(target_variable))
-filenames = set(filenames)
+filenames = list(set(filenames))
+filenames.sort()
 
 formatting_errors = False
 for filename in filenames:
@@ -166,7 +96,9 @@ for filename in filenames:
 	temp_file = NamedTemporaryFile(mode='w+', prefix='formatted-makefile-', encoding="utf-8")
 
 	try:
-		format_makefile_board_lists(source_file, temp_file)
+		lexemes = lexer.lex(source_file, TARGET_VARIABLES)
+		writer.write(lexemes, temp_file)
+
 	except AssertionError as e:
 		print("Error in file %s: %s" % (source_file, e))
 		sys.exit(1)
