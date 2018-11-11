@@ -7,8 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
@@ -32,8 +30,6 @@ CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DGNRC_NETIF_IPV6_ADDRS_NUMOF=2 \
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-include $(RIOTBASE)/Makefile.include
-
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
   DEFAULT_CHANNEL ?= 0
@@ -47,3 +43,11 @@ else
     CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
   endif
 endif
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-uno \
+  nucleo-f031k6 \
+  #
+
+include $(RIOTBASE)/Makefile.include

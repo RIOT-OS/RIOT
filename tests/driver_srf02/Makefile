@@ -1,7 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
-
 USEMODULE += xtimer
 USEMODULE += srf02
 USEMODULE += shell
@@ -13,5 +11,10 @@ TEST_MODE      ?= SRF02_MODE_REAL_CM
 # export parameters
 CFLAGS += -DTEST_SRF02_I2C=$(TEST_SRF02_I2C)
 CFLAGS += -DTEST_MODE=$(TEST_MODE)
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-uno \
+  #
 
 include $(RIOTBASE)/Makefile.include

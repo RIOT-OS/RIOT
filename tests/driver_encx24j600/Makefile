@@ -1,11 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             msb-430 msb-430h \
-                             nucleo-l053r8 nucleo-f031k6 nucleo-f042k6 \
-                             nucleo-l031k6 stm32f0discovery telosb \
-                             waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += encx24j600
 USEMODULE += gnrc_ipv6_router_default
@@ -37,5 +31,23 @@ CFLAGS += -DENCX24J600_INT=$(ENC_INT)
 
 # make sure we read the local encx24j600 params file
 CFLAGS += -I$(CURDIR)
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-mega2560 \
+  arduino-uno \
+  msb-430 \
+  msb-430h \
+  nucleo-f031k6 \
+  nucleo-f042k6 \
+  nucleo-l031k6 \
+  nucleo-l053r8 \
+  stm32f0discovery \
+  telosb \
+  waspmote-pro \
+  wsn430-v1_3b \
+  wsn430-v1_4 \
+  z1 \
+  #
 
 include $(RIOTBASE)/Makefile.include

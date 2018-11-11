@@ -1,13 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             msb-430 msb-430h nucleo-f031k6 nucleo-f042k6 \
-                             nucleo-l031k6 nucleo-f030r8 nucleo-f303k8 \
-                             nucleo-f334r8 nucleo-l053r8 stm32f0discovery \
-                             waspmote-pro
-
-BOARD_BLACKLIST += mips-malta
-
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc
 USEMODULE += gnrc_pktdump
@@ -28,5 +20,26 @@ CFLAGS += -DSLIP_BAUDRATE=$(SLIP_BAUDRATE)
 # it go to the beginning, before the standard includes.
 # That way slip_params.h get's included and auto configuration can pick it up.
 CFLAGS += -I$(CURDIR)
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-mega2560 \
+  arduino-uno \
+  msb-430 \
+  msb-430h \
+  nucleo-f030r8 \
+  nucleo-f031k6 \
+  nucleo-f042k6 \
+  nucleo-f303k8 \
+  nucleo-f334r8 \
+  nucleo-l031k6 \
+  nucleo-l053r8 \
+  stm32f0discovery \
+  waspmote-pro \
+  #
+
+BOARD_BLACKLIST := \
+  mips-malta \
+  #
 
 include $(RIOTBASE)/Makefile.include

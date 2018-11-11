@@ -4,8 +4,6 @@
 CFLAGS += -DNDEBUG
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
-
 DISABLE_MODULE = auto_init
 
 USEMODULE += gnrc
@@ -18,5 +16,11 @@ USEMODULE += od
 CFLAGS += -DGNRC_PKTBUF_SIZE=200
 
 TEST_ON_CI_WHITELIST += all
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-uno \
+  nucleo-f031k6 \
+  #
 
 include $(RIOTBASE)/Makefile.include

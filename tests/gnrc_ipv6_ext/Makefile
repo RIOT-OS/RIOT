@@ -1,12 +1,6 @@
 # name of your application
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             chronos msb-430 msb-430h nucleo-f030r8 \
-                             nucleo-f031k6 nucleo-f042k6 nucleo-f303k8 \
-                             nucleo-f334r8 nucleo-l031k6 nucleo-l053r8 \
-                             stm32f0discovery waspmote-pro
-
 # use Ethernet as link-layer protocol
 USEMODULE += netdev_eth
 USEMODULE += netdev_test
@@ -26,5 +20,23 @@ CFLAGS += -DGNRC_NETIF_IPV6_ADDRS_NUMOF=3
 TEST_ON_CI_WHITELIST += all
 
 # Note: The test can check more things with ENABLE_DEBUG set to 1 in gnrc_ipv6.c
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-mega2560 \
+  arduino-uno \
+  chronos \
+  msb-430 \
+  msb-430h \
+  nucleo-f030r8 \
+  nucleo-f031k6 \
+  nucleo-f042k6 \
+  nucleo-f303k8 \
+  nucleo-f334r8 \
+  nucleo-l031k6 \
+  nucleo-l053r8 \
+  stm32f0discovery \
+  waspmote-pro \
+  #
 
 include $(RIOTBASE)/Makefile.include

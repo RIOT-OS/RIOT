@@ -7,8 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
-
 # Uncomment these lines if you want to use platform support from external
 # repositories:
 #RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
@@ -66,8 +64,6 @@ ifneq (,$(filter msba2,$(BOARD)))
   USEMODULE += random
 endif
 
-include $(RIOTBASE)/Makefile.include
-
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
   DEFAULT_CHANNEL ?= 0
@@ -81,3 +77,10 @@ else
     CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
   endif
 endif
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-uno \
+  #
+
+include $(RIOTBASE)/Makefile.include

@@ -9,13 +9,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             chronos mega-xplained msb-430 msb-430h \
-                             nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 \
-                             nucleo-f030r8 nucleo-f303k8 nucleo-f334r8 \
-                             nucleo-l053r8 stm32f0discovery telosb \
-                             waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-
 ## Uncomment to redefine port, for example use 61616 for RFC 6282 UDP compression.
 #GCOAP_PORT = 5683
 #CFLAGS += -DGCOAP_PORT=$(GCOAP_PORT)
@@ -49,5 +42,28 @@ DEVELHELP ?= 1
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-mega2560 \
+  arduino-uno \
+  chronos \
+  mega-xplained \
+  msb-430 \
+  msb-430h \
+  nucleo-f030r8 \
+  nucleo-f031k6 \
+  nucleo-f042k6 \
+  nucleo-f303k8 \
+  nucleo-f334r8 \
+  nucleo-l031k6 \
+  nucleo-l053r8 \
+  stm32f0discovery \
+  telosb \
+  waspmote-pro \
+  wsn430-v1_3b \
+  wsn430-v1_4 \
+  z1 \
+  #
 
 include $(RIOTBASE)/Makefile.include

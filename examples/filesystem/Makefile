@@ -5,18 +5,6 @@ APPLICATION = filesystem
 BOARD ?= native
 
 
-# Blacklisting msp430-based boards, as file syscalls are not supported
-BOARD_BLACKLIST :=  chronos \
-                    msb-430 \
-                    msb-430h \
-                    telosb \
-                    wsn430-v1_3b \
-                    wsn430-v1_4 \
-                    z1 \
-                    #
-
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
-
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
@@ -53,5 +41,22 @@ else ifneq (,$(filter spiffs, $(USEMODULE)))
     SPIFFS_NB_FD ?= 8
     CFLAGS += '-DSPIFFS_FS_FD_SPACE_SIZE=(32 * $(SPIFFS_NB_FD))'
 endif
+
+# Blacklisting msp430-based boards, as file syscalls are not supported
+BOARD_BLACKLIST := \
+  chronos \
+  msb-430 \
+  msb-430h \
+  telosb \
+  wsn430-v1_3b \
+  wsn430-v1_4 \
+  z1 \
+  #
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-uno \
+  nucleo-f031k6 \
+  #
 
 include $(RIOTBASE)/Makefile.include

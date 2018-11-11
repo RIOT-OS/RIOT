@@ -4,13 +4,6 @@ APPLICATION = gnrc_networking_mac
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
 
-# Currently, GoMacH has only been tested and evaluated through on samr21-xpro and iotlab-m3.
-# Once GoMacH has also been tested through on other boards, the whitelist should be
-# then accordingly extended.
-# Notably, for LWMAC, we have only evaluated it on samr21-xpro nodes. To this end, if
-# you are going to include LWMAC for testing, you should only run the example on samr21-xpro.
-BOARD_WHITELIST := samr21-xpro iotlab-m3
-
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
@@ -58,8 +51,18 @@ DEVELHELP ?= 1
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-include $(RIOTBASE)/Makefile.include
-
 # Set a custom channel
 DEFAULT_CHANNEL ?= 26
 CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+
+# Currently, GoMacH has only been tested and evaluated through on samr21-xpro and iotlab-m3.
+# Once GoMacH has also been tested through on other boards, the whitelist should be
+# then accordingly extended.
+# Notably, for LWMAC, we have only evaluated it on samr21-xpro nodes. To this end, if
+# you are going to include LWMAC for testing, you should only run the example on samr21-xpro.
+BOARD_WHITELIST := \
+  iotlab-m3 \
+  samr21-xpro \
+  #
+
+include $(RIOTBASE)/Makefile.include

@@ -1,8 +1,5 @@
 include ../Makefile.tests_common
 
-# exclude boards with insufficient memory
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno nucleo-f031k6
-
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
@@ -20,5 +17,12 @@ CFLAGS += -DSPI_PORT=$(SPI_PORT)
 CFLAGS += -DCE_PIN=$(CE_PIN)
 CFLAGS += -DCS_PIN=$(CS_PIN)
 CFLAGS += -DIRQ_PIN=$(IRQ_PIN)
+
+# exclude boards with insufficient memory
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-uno \
+  nucleo-f031k6 \
+  #
 
 include $(RIOTBASE)/Makefile.include

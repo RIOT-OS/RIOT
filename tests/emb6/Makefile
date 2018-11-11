@@ -2,15 +2,6 @@
 BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
-# MSP-430 doesn't support C11's atomic functionality yet
-BOARD_BLACKLIST := msb-430 msb-430h pic32-clicker pic32-wifire \
-                   telosb wsn430-v1_3b wsn430-v1_4 z1
-
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             msb-430 msb-430h nucleo-l031k6 nucleo-f031k6 \
-                             nucleo-f042k6 nucleo-l053r8 stm32f0discovery \
-                             telosb waspmote-pro wsn430-v1_3b wsn430-v1_4 z1
-
 USEPKG += emb6
 
 USEMODULE += emb6_router
@@ -40,5 +31,35 @@ USEMODULE += $(DRIVER)
 
 CFLAGS += -Wno-unused-parameter -Wno-unused-function -Wno-type-limits
 CFLAGS += -Wno-sign-compare -Wno-missing-field-initializers
+
+# MSP-430 doesn't support C11's atomic functionality yet
+BOARD_BLACKLIST := \
+  msb-430 \
+  msb-430h \
+  pic32-clicker \
+  pic32-wifire \
+  telosb \
+  wsn430-v1_3b \
+  wsn430-v1_4 \
+  z1 \
+  #
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-mega2560 \
+  arduino-uno \
+  msb-430 \
+  msb-430h \
+  nucleo-f031k6 \
+  nucleo-f042k6 \
+  nucleo-l031k6 \
+  nucleo-l053r8 \
+  stm32f0discovery \
+  telosb \
+  waspmote-pro \
+  wsn430-v1_3b \
+  wsn430-v1_4 \
+  z1 \
+  #
 
 include $(RIOTBASE)/Makefile.include

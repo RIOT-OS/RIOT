@@ -7,11 +7,6 @@ RIOTBASE ?= $(CURDIR)/../..
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
 
-# Currently, GoMacH has only been tested and evaluated through on samr21-xpro and iotlab-m3
-# nodes. Once GoMacH has also been tested through on other devices, the whitelist should
-# be then accordingly extended.
-BOARD_WHITELIST := samr21-xpro iotlab-m3
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
@@ -45,5 +40,13 @@ CFLAGS += -DGNRC_PKTBUF_SIZE=1024
 # Set a custom channel if needed
 DEFAULT_CHANNEL ?= 26
 CFLAGS += -DIEEE802154_DEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
+
+# Currently, GoMacH has only been tested and evaluated through on samr21-xpro and iotlab-m3
+# nodes. Once GoMacH has also been tested through on other devices, the whitelist should
+# be then accordingly extended.
+BOARD_WHITELIST := \
+  iotlab-m3 \
+  samr21-xpro \
+  #
 
 include $(RIOTBASE)/Makefile.include

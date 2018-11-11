@@ -4,6 +4,9 @@ include ../Makefile.tests_common
 TEST_ON_CI_WHITELIST += all
 USEPKG += cmsis-dsp
 
+test:
+	$(CURDIR)/tests/01-run.py
+
 BOARD_WHITELIST := \
   airfy-beacon \
   arduino-due \
@@ -14,6 +17,7 @@ BOARD_WHITELIST := \
   mbed_lpc1768 \
   msbiot \
   mulle \
+  nrf6310 \
   nucleo-f091rc \
   nucleo-f103rb \
   nucleo-f103rb \
@@ -32,10 +36,6 @@ BOARD_WHITELIST := \
   stm32f4discovery \
   udoo \
   yunjia-nrf51822 \
-  nrf6310 \
   #
 
 include $(RIOTBASE)/Makefile.include
-
-test:
-	$(CURDIR)/tests/01-run.py

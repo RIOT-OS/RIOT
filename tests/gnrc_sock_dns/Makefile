@@ -2,11 +2,6 @@ include ../Makefile.tests_common
 
 RIOTBASE ?= $(CURDIR)/../..
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-mega2560 arduino-uno \
-                             chronos telosb nucleo-f042k6 nucleo-f031k6 \
-                             nucleo-f030r8 nucleo-f303k8 nucleo-l053r8 \
-                             nucleo-l031k6 stm32f0discovery waspmote-pro z1
-
 USEMODULE += sock_dns
 USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_ipv6_default
@@ -25,5 +20,22 @@ ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
               -DGNRC_NETIF_IPV6_GROUPS_NUMOF=2 -DGNRC_IPV6_NIB_NUMOF=1 \
               -DNRC_IPV6_NIB_OFFL_NUMOF=1
 endif
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-mega2560 \
+  arduino-uno \
+  chronos \
+  nucleo-f030r8 \
+  nucleo-f031k6 \
+  nucleo-f042k6 \
+  nucleo-f303k8 \
+  nucleo-l031k6 \
+  nucleo-l053r8 \
+  stm32f0discovery \
+  telosb \
+  waspmote-pro \
+  z1 \
+  #
 
 include $(RIOTBASE)/Makefile.include

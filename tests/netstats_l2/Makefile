@@ -8,13 +8,17 @@ BOARD_PROVIDES_NETIF := airfy-beacon fox iotlab-m3 mulle native nrf51dongle \
 
 BOARDS ?= $(shell find $(RIOTBASE)/boards/* -maxdepth 0 -type d \! -name "common" -exec basename {} \;)
 
-BOARD_BLACKLIST := $(filter-out $(BOARD_PROVIDES_NETIF), $(BOARDS))
-
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += gnrc
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += netstats_l2
+
+BOARD_BLACKLIST := \
+  $(BOARDS)) \
+  $(BOARD_PROVIDES_NETIF), \
+  $(filter-out \
+  #
 
 include $(RIOTBASE)/Makefile.include

@@ -1,7 +1,5 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno
-
 USEMODULE += nvram_spi
 USEMODULE += xtimer
 
@@ -16,5 +14,10 @@ CFLAGS += -DTEST_NVRAM_SPI_DEV=$(TEST_NVRAM_SPI_DEV)
 CFLAGS += -DTEST_NVRAM_SPI_CS=$(TEST_NVRAM_SPI_CS)
 CFLAGS += -DTEST_NVRAM_SPI_SIZE=$(TEST_NVRAM_SPI_SIZE)
 CFLAGS += -DTEST_NVRAM_SPI_ADDRESS_COUNT=$(TEST_NVRAM_SPI_ADDRESS_COUNT)
+
+BOARD_INSUFFICIENT_MEMORY := \
+  arduino-duemilanove \
+  arduino-uno \
+  #
 
 include $(RIOTBASE)/Makefile.include

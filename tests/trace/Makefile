@@ -4,8 +4,10 @@ include ../Makefile.tests_common
 
 USEMODULE += trace
 
-BOARD_WHITELIST := native
-
 TEST_ON_CI_WHITELIST += all
+
+BOARD_WHITELIST := \
+  native \
+  #
 
 include $(RIOTBASE)/Makefile.include
