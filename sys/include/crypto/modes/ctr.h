@@ -45,7 +45,7 @@ extern "C" {
  * @return              A negative error code if something went wrong
  */
 int cipher_encrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, uint8_t* input, size_t length,
+                       uint8_t nonce_len, const uint8_t* input, size_t length,
                        uint8_t* output);
 
 
@@ -69,7 +69,7 @@ int cipher_encrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
  * @return              A negative error code if something went wrong
  */
 int cipher_decrypt_ctr(cipher_t* cipher, uint8_t nonce_counter[16],
-                       uint8_t nonce_len, uint8_t* input, size_t length,
+                       uint8_t nonce_len, const uint8_t* input, size_t length,
                        uint8_t* output);
 
 #ifdef __cplusplus
