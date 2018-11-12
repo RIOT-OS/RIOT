@@ -246,6 +246,10 @@ static void test_crypto_modes_ccm_check_len(void)
 
     ret = _test_ccm_len(cipher_decrypt_ccm, 8, einput, 16, 0);
     TEST_ASSERT_MESSAGE(ret > 0, "Decryption : failed with valid input_len");
+
+    /* ccm library does not support auth_data_len > 0xFEFF */
+    ret = _test_ccm_len(cipher_encrypt_ccm, 2, NULL, 0, 0xFEFF + 1);
+    TEST_ASSERT_EQUAL_INT(-1, ret);
 }
 
 
