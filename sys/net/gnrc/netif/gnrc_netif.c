@@ -345,6 +345,9 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                 case NETOPT_STATE:
                     if (*((netopt_state_t *)opt->data) == NETOPT_STATE_RESET) {
                         _configure_netdev(netif->dev);
+                        if (netif->ops->init) {
+                            netif->ops->init(netif);
+                        }
                     }
                     break;
                 default:
