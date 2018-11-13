@@ -353,7 +353,6 @@ static int _init(netdev_t *netdev)
     cc2538_rf_t *dev = (cc2538_rf_t *) netdev;
     _dev = netdev;
 
-    uint16_t pan = cc2538_get_pan();
     uint16_t chan = cc2538_get_chan();
     uint16_t addr_short = cc2538_get_addr_short();
     uint64_t addr_long = cc2538_get_addr_long();
@@ -361,8 +360,6 @@ static int _init(netdev_t *netdev)
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Initialise netdev_ieee802154_t struct */
-    netdev_ieee802154_set(&dev->netdev, NETOPT_NID,
-                          &pan, sizeof(pan));
     netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL,
                           &chan, sizeof(chan));
     netdev_ieee802154_set(&dev->netdev, NETOPT_ADDRESS,
