@@ -1137,20 +1137,22 @@ static uint32_t _isr_event_seq_tr(kw41zrf_t *dev, uint32_t irqsts)
         DEBUG("[kw41zrf] SEQIRQ (TR)\n");
 
         handled_irqs |= ZLL_IRQSTS_SEQIRQ_MASK;
+        if (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_TC3_ABORTED_MASK) {
+            if (dev->num_retrans < dev->max_retrans) {
+                /* Perform frame retransmission */
+                ++dev->num_retrans;
+                DEBUG("[kw41zrf] TX retry %u\n", (unsigned)dev->num_retrans);
+                /* Reset CSMA counters for backoff handling */
+                dev->csma_be = dev->csma_min_be;
+                dev->csma_num_backoffs = 0;
+                /* Resubmit the frame for transmission */
+                kw41zrf_tx_exec(dev);
+                return handled_irqs;
+            }
+        }
         if (dev->netdev.flags & KW41ZRF_OPT_TELL_TX_END) {
             if (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_TC3_ABORTED_MASK) {
                 DEBUG("[kw41zrf] RXACK timeout (TR)\n");
-                if (dev->num_retrans < dev->max_retrans) {
-                    /* Perform frame retransmission */
-                    ++dev->num_retrans;
-                    DEBUG("[kw41zrf] retry %u\n", (unsigned)dev->num_retrans);
-                    /* Reset CSMA counters for backoff handling */
-                    dev->csma_be = dev->csma_min_be;
-                    dev->csma_num_backoffs = 0;
-                    /* Resubmit the frame for transmission */
-                    kw41zrf_tx_exec(dev);
-                    return handled_irqs;
-                }
                 dev->netdev.netdev.event_callback(&dev->netdev.netdev, NETDEV_EVENT_TX_NOACK);
             }
             else if (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_PLL_ABORTED_MASK) {
