@@ -217,9 +217,11 @@ int kw41zrf_cca(kw41zrf_t *dev)
     }
     kw41zrf_abort_sequence(dev);
     kw41zrf_unmask_irqs();
+    LED_RX_ON;
     kw41zrf_set_sequence(dev, XCVSEQ_CCA);
     /* Wait for the CCA to finish, it will take exactly RX warmup time + 128 µs */
     kw41zrf_wait_idle(dev);
+    LED_RX_OFF;
     DEBUG("[kw41zrf] CCA: %u RSSI: %d\n", (unsigned)dev->cca_result,
           kw41zrf_get_ed_level(dev));
     return dev->cca_result;
@@ -1083,11 +1085,11 @@ static uint32_t _isr_event_seq_t(kw41zrf_t *dev, uint32_t irqsts)
         kw41zrf_abort_sequence(dev);
         DEBUG("[kw41zrf] SEQIRQ (T)\n");
         handled_irqs |= ZLL_IRQSTS_SEQIRQ_MASK;
+        LED_TX_OFF;
         if (dev->netdev.flags & KW41ZRF_OPT_TELL_TX_END) {
             dev->netdev.netdev.event_callback(&dev->netdev.netdev, NETDEV_EVENT_TX_COMPLETE);
         }
         /* Go back to being idle */
-        LED_TX_OFF;
         kw41zrf_set_sequence(dev, dev->idle_seq);
     }
 

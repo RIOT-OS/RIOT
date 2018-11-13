@@ -33,18 +33,24 @@
 /* For LED macros */
 #include "board.h"
 #ifdef LED0_ON
+#define LED_NDSM_ON   LED0_ON
+#define LED_NDSM_OFF  LED0_OFF
+#endif
+#ifdef LED1_ON
 #define LED_TX_ON   LED1_ON
 #define LED_TX_OFF  LED1_OFF
 #endif
-#ifdef LED1_ON
+#ifdef LED2_ON
 #define LED_RX_ON   LED2_ON
 #define LED_RX_OFF  LED2_OFF
 #endif
-#ifdef LED2_ON
+#ifdef LED3_ON
 #define LED_IRQ_ON  LED3_ON
 #define LED_IRQ_OFF LED3_OFF
 #endif
 #else /* ENABLE_LEDS */
+#define LED_NDSM_ON
+#define LED_NDSM_OFF
 #define LED_TX_ON
 #define LED_TX_OFF
 #define LED_RX_ON

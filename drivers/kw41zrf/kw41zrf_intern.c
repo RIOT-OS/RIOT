@@ -87,6 +87,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
                 /* Already awake */
                 break;
             }
+            LED_NDSM_ON;
             /* The wake target must be at least (4 + RSIM_DSM_OSC_OFFSET) ticks
              * into the future, to let the oscillator stabilize before switching
              * on the clocks */
@@ -150,6 +151,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
             RSIM->DSM_CONTROL = (RSIM_DSM_CONTROL_DSM_TIMER_EN_MASK |
                                 RSIM_DSM_CONTROL_ZIG_SYSCLK_REQUEST_EN_MASK);
             while (!(kw41zrf_is_dsm())) {}
+            LED_NDSM_OFF;
             /* Restore saved RF_OSC_EN bits (from kw41zrf_init)
              * This will disable the RF oscillator unless the system was
              * configured to use the RF oscillator before kw41zrf_init() was
