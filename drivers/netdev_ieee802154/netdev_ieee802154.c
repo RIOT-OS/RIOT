@@ -63,6 +63,10 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
 #elif MODULE_GNRC
     dev->proto = GNRC_NETTYPE_UNDEF;
 #endif
+
+    /* Initialize PAN ID and call netdev::set to propagate it */
+    dev->pan = IEEE802154_DEFAULT_PANID;
+    dev->netdev.driver->set(&dev->netdev, NETOPT_NID, &dev->pan, sizeof(dev->pan));
 }
 
 int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
