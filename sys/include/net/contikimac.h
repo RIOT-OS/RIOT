@@ -390,7 +390,7 @@ extern "C" {
  * throughput.
  */
 #ifndef CONTIKIMAC_DEFAULT_REPLY_DELAY
-#define CONTIKIMAC_DEFAULT_REPLY_DELAY          (1000000ul / 32)
+#define CONTIKIMAC_DEFAULT_REPLY_DELAY          (8192u)
 #endif
 
 /**
