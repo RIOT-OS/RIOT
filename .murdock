@@ -194,6 +194,11 @@ compile() {
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
     [ ! -d "boards/$board" ] && error "$0: compile: error: board directory \"boards/$board\" doesn't exist"
 
+    # Try removing PORT that should be already be set by murdock
+    #     https://github.com/RIOT-OS/RIOT/pull/7695#discussion_r180896514
+    # to let the auto-detection work and fail in murdock
+    unset PORT
+
     # compile
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} clean all test-input-hash -j${JOBS:-4}
