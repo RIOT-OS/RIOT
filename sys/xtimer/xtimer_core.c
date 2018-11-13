@@ -517,22 +517,6 @@ overflow:
         _shoot(timer);
     }
 
-    /* possibly executing all callbacks took enough
-     * time to overflow.  In that case we advance to
-     * next timer period and check again for expired
-     * timers.*/
-    /* check if the end of this period is very soon */
-    uint32_t now = _xtimer_lltimer_now() + XTIMER_ISR_BACKOFF;
-    if (now < reference) {
-        DEBUG("_timer_callback: overflowed while executing callbacks. %i\n",
-              timer_list_head != NULL);
-        _next_period();
-        /* wait till overflow */
-        while( reference < _xtimer_lltimer_now()){}
-        reference = 0;
-        goto overflow;
-    }
-
     if (timer_list_head) {
         /* schedule callback on next timer target time */
         next_target = timer_list_head->target - XTIMER_OVERHEAD;
@@ -546,24 +530,23 @@ overflow:
         /* there's no timer planned for this timer period */
         /* schedule callback on next overflow */
         next_target = _xtimer_lltimer_mask(0xFFFFFFFF);
-        uint32_t now = _xtimer_lltimer_now();
+    }
 
-        /* check for overflow again */
-        if (now < reference) {
-            _next_period();
-            reference = 0;
-            goto overflow;
-        }
-        else {
-            /* check if the end of this period is very soon */
-            if (_xtimer_lltimer_mask(now + XTIMER_ISR_BACKOFF) < now) {
-                /* spin until next period, then advance */
-                while (_xtimer_lltimer_now() >= now) {}
-                _next_period();
-                reference = 0;
-                goto overflow;
-            }
-        }
+    /* possibly executing all callbacks took enough
+     * time to overflow.  In that case we advance to
+     * next timer period and check again for expired
+     * timers.*/
+    /* check for overflow */
+    /* Or if the end of this period is very soon */
+    uint32_t now = _xtimer_lltimer_now();
+    if (now < reference || _xtimer_lltimer_mask(now + XTIMER_ISR_BACKOFF) < now) {
+        _next_period();
+        DEBUG("_timer_callback: overflowed while executing callbacks. %i\n",
+              timer_list_head != NULL);
+        /* wait till overflow */
+        while( reference < _xtimer_lltimer_now()){}
+        reference = 0;
+        goto overflow;
     }
 
     _in_handler = 0;
