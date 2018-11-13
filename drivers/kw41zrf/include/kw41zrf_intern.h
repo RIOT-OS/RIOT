@@ -27,6 +27,33 @@
 /* For ZLL CPU registers */
 #include "cpu.h"
 
+#define ENABLE_LEDS     (1)
+
+#if ENABLE_LEDS
+/* For LED macros */
+#include "board.h"
+#ifdef LED0_ON
+#define LED_TX_ON   LED1_ON
+#define LED_TX_OFF  LED1_OFF
+#endif
+#ifdef LED1_ON
+#define LED_RX_ON   LED2_ON
+#define LED_RX_OFF  LED2_OFF
+#endif
+#ifdef LED2_ON
+#define LED_IRQ_ON  LED3_ON
+#define LED_IRQ_OFF LED3_OFF
+#endif
+#else /* ENABLE_LEDS */
+#define LED_TX_ON
+#define LED_TX_OFF
+#define LED_RX_ON
+#define LED_RX_OFF
+#define LED_IRQ_ON
+#define LED_IRQ_OFF
+#endif /* ENABLE_LEDS */
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -66,6 +93,7 @@ static inline void kw41zrf_mask_irqs(void)
 static inline void kw41zrf_unmask_irqs(void)
 {
     NVIC_EnableIRQ(Radio_1_IRQn);
+    LED_IRQ_OFF;
 }
 
 /**

@@ -65,7 +65,7 @@ static void kw41zrf_irq_handler(void *arg)
 {
     netdev_t *netdev = arg;
     kw41zrf_t *dev = (kw41zrf_t *)netdev;
-
+    LED_IRQ_ON;
     kw41zrf_mask_irqs();
     /* Signal to the thread that an IRQ has arrived, if it is waiting */
     thread_flags_set(dev->thread, KW41ZRF_THREAD_FLAG_ISR);
@@ -148,6 +148,7 @@ static void kw41zrf_tx_exec(kw41zrf_t *dev)
     /* This is quite timing sensitive, as interrupts may lead to setting a timer
      * target which has already passed */
     unsigned mask = irq_disable();
+    LED_TX_ON;
     if (tx_timeout > 0) {
         /* Set a long timeout to avoid timer races while setting up the TX sequence.
          * By setting the timeout to now - 1 we get 267 seconds to set up everything
@@ -1004,6 +1005,7 @@ static uint32_t _isr_event_seq_r(kw41zrf_t *dev, uint32_t irqsts)
     uint32_t handled_irqs = 0;
 
     if (irqsts & ZLL_IRQSTS_RXWTRMRKIRQ_MASK) {
+        LED_RX_ON;
         DEBUG("[kw41zrf] RXWTRMRKIRQ (R)\n");
         handled_irqs |= ZLL_IRQSTS_RXWTRMRKIRQ_MASK;
         if (dev->netdev.flags & KW41ZRF_OPT_TELL_RX_START) {
@@ -1023,11 +1025,13 @@ static uint32_t _isr_event_seq_r(kw41zrf_t *dev, uint32_t irqsts)
             (unsigned int)((ZLL->IRQSTS & ZLL_IRQSTS_RX_FRAME_LENGTH_MASK) >>
             ZLL_IRQSTS_RX_FRAME_LENGTH_SHIFT));
         if (ZLL->PHY_CTRL & ZLL_PHY_CTRL_AUTOACK_MASK) {
+            LED_TX_ON;
             DEBUG("[kw41zrf] perform TXACK\n");
         }
     }
 
     if (irqsts & ZLL_IRQSTS_TXIRQ_MASK) {
+        LED_TX_OFF;
         DEBUG("[kw41zrf] finished TXACK\n");
         handled_irqs |= ZLL_IRQSTS_TXIRQ_MASK;
     }
@@ -1037,6 +1041,7 @@ static uint32_t _isr_event_seq_r(kw41zrf_t *dev, uint32_t irqsts)
         kw41zrf_abort_sequence(dev);
         DEBUG("[kw41zrf] SEQIRQ (R)\n");
         handled_irqs |= ZLL_IRQSTS_SEQIRQ_MASK;
+        LED_RX_OFF;
         if ((irqsts & ZLL_IRQSTS_CRCVALID_MASK) == 0) {
             LOG_ERROR("[kw41zrf] CRC failure (R)\n");
         }
@@ -1082,6 +1087,7 @@ static uint32_t _isr_event_seq_t(kw41zrf_t *dev, uint32_t irqsts)
             dev->netdev.netdev.event_callback(&dev->netdev.netdev, NETDEV_EVENT_TX_COMPLETE);
         }
         /* Go back to being idle */
+        LED_TX_OFF;
         kw41zrf_set_sequence(dev, dev->idle_seq);
     }
 
@@ -1116,12 +1122,14 @@ static uint32_t _isr_event_seq_tr(kw41zrf_t *dev, uint32_t irqsts)
 {
     uint32_t handled_irqs = 0;
     if (irqsts & ZLL_IRQSTS_TXIRQ_MASK) {
+        LED_RX_ON;
         DEBUG("[kw41zrf] finished TX (TR)\n");
         handled_irqs |= ZLL_IRQSTS_TXIRQ_MASK;
         DEBUG("[kw41zrf] wait for RX ACK\n");
     }
 
     if (irqsts & ZLL_IRQSTS_RXIRQ_MASK) {
+        LED_RX_OFF;
         DEBUG("[kw41zrf] got RX ACK\n");
         handled_irqs |= ZLL_IRQSTS_RXIRQ_MASK;
     }
@@ -1137,6 +1145,8 @@ static uint32_t _isr_event_seq_tr(kw41zrf_t *dev, uint32_t irqsts)
         DEBUG("[kw41zrf] SEQIRQ (TR)\n");
 
         handled_irqs |= ZLL_IRQSTS_SEQIRQ_MASK;
+        LED_TX_OFF;
+        LED_RX_OFF;
         if (seq_ctrl_sts & ZLL_SEQ_CTRL_STS_TC3_ABORTED_MASK) {
             if (dev->num_retrans < dev->max_retrans) {
                 /* Perform frame retransmission */
