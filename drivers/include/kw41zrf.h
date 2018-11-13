@@ -78,27 +78,6 @@ extern "C" {
 #define KW41ZRF_OUTPUT_POWER_MIN       (-19)
 
 /**
- * @brief   Internal device option flags
- *
- * `0x00ff` is reserved for general IEEE 802.15.4 flags
- * (see @ref netdev_ieee802154_t)
- *
- * @{
- */
-enum kw41zrf_opt {
-    KW41ZRF_OPT_CSMA          = (0x0100), /**< use CSMA/CA algorithm for sending */
-    KW41ZRF_OPT_PROMISCUOUS   = (0x0200), /**< promiscuous mode active */
-    KW41ZRF_OPT_PRELOADING    = (0x0400), /**< preloading enabled */
-    KW41ZRF_OPT_TELL_TX_START = (0x0800), /**< notify MAC layer on TX start */
-    KW41ZRF_OPT_TELL_TX_END   = (0x1000), /**< notify MAC layer on TX finished */
-    KW41ZRF_OPT_TELL_RX_START = (0x2000), /**< notify MAC layer on RX start */
-    KW41ZRF_OPT_TELL_RX_END   = (0x4000), /**< notify MAC layer on RX finished */
-    KW41ZRF_OPT_AUTOACK       = (0x8000), /**< enable automatic sending of
-                                           *   ACKs for incoming packet */
-};
-/** @} */
-
-/**
  * @brief ISR callback function type
  */
 typedef void (*kw41zrf_cb_t)(void *arg);
@@ -118,13 +97,14 @@ typedef struct {
     uint32_t tx_warmup_time;    /**< TX warmup time, in event timer ticks */
     uint32_t rx_warmup_time;    /**< RX warmup time, in event timer ticks */
     uint32_t rf_osc_en_idle;    /**< RF_OSC_EN bits setting when RF module is in standby */
+    int16_t tx_power;           /**< The current tx-power setting of the device */
+    uint8_t flags;              /**< Internal driver option flags */
     uint8_t max_retrans;        /**< Maximum number of frame retransmissions
                                  *   when no Ack frame is received (macMaxFrameRetries) */
     uint8_t csma_max_backoffs;  /**< Maximum number of CSMA backoffs when
                                  *   waiting for channel clear (macMaxCsmaBackoffs) */
     uint8_t csma_min_be;        /**< Minimum backoff exponent (macMinBe) */
     uint8_t csma_max_be;        /**< Maximum backoff exponent (macMaxBe) */
-    int16_t tx_power;           /**< The current tx-power setting of the device */
     uint8_t idle_seq;           /**< state to return to after sending */
     uint8_t cca_result;         /**< Used for passing CCA result from ISR to user */
     uint8_t csma_be;            /**< Counter used internally by send implementation */

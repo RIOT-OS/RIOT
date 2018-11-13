@@ -194,7 +194,6 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
             case KW41ZRF_OPT_CSMA:
             case KW41ZRF_OPT_PROMISCUOUS:
             case KW41ZRF_OPT_AUTOACK:
-            case NETDEV_IEEE802154_ACK_REQ:
             case KW41ZRF_OPT_TELL_RX_START:
                 LOG_ERROR("[kw41zrf] Attempt to modify option %04x while radio is sleeping\n", (unsigned) option);
                 return;
@@ -206,7 +205,7 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
 
     /* set option field */
     if (state) {
-        dev->netdev.flags |= option;
+        dev->flags |= option;
 
         /* trigger option specific actions */
         switch (option) {
@@ -249,7 +248,7 @@ void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
         }
     }
     else {
-        dev->netdev.flags &= ~(option);
+        dev->flags &= ~(option);
         /* trigger option specific actions */
         switch (option) {
             case KW41ZRF_OPT_CSMA:

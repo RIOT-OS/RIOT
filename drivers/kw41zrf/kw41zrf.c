@@ -224,6 +224,8 @@ int kw41zrf_reset(kw41zrf_t *dev)
 
     dev->tx_power = KW41ZRF_DEFAULT_TX_POWER;
     dev->idle_seq = XCVSEQ_RECEIVE;
+    kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
+    kw41zrf_abort_sequence(dev);
     kw41zrf_set_tx_power(dev, dev->tx_power);
 
     kw41zrf_set_channel(dev, KW41ZRF_DEFAULT_CHANNEL);
@@ -236,10 +238,11 @@ int kw41zrf_reset(kw41zrf_t *dev)
     kw41zrf_set_rx_watermark(dev, 1);
 
     kw41zrf_set_option(dev, KW41ZRF_OPT_AUTOACK, true);
-    kw41zrf_set_option(dev, NETDEV_IEEE802154_ACK_REQ, true);
     kw41zrf_set_option(dev, KW41ZRF_OPT_CSMA, true);
 
-    kw41zrf_set_power_mode(dev, KW41ZRF_POWER_IDLE);
+    static const netopt_enable_t enable = NETOPT_ENABLE;
+    netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,
+                          &enable, sizeof(enable));
 
     kw41zrf_abort_sequence(dev);
     bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_SEQMSK_SHIFT);
