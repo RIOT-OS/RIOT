@@ -38,20 +38,35 @@
 #define TEST_INTERVAL_MS        (100LU)
 #define TEST_TIMER_STACKSIZE    (THREAD_STACKSIZE_DEFAULT)
 
+#define TEST_SLEEP_TIME_1             (1000)
+#define TEST_SLEEP_TIME_2             (1100)
+
 char stack_timer1[TEST_TIMER_STACKSIZE];
 char stack_timer2[TEST_TIMER_STACKSIZE];
 
 void* timer_func(void* arg)
 {
-#if defined(WORKER_THREAD_PIN)
-    gpio_t worker_pin = WORKER_THREAD_PIN;
-    gpio_init(worker_pin, GPIO_OUT);
+#if defined(WORKER_THREAD_PIN_1)
+    gpio_t worker_pin_1 = WORKER_THREAD_PIN_1;
+    gpio_init(worker_pin_1, GPIO_OUT);
+#endif
+#if defined(WORKER_THREAD_PIN_2)
+    gpio_t worker_pin_2 = WORKER_THREAD_PIN_2;
+    gpio_init(worker_pin_2, GPIO_OUT);
 #endif
     LOG_DEBUG("run thread %" PRIkernel_pid "\n", thread_getpid());
+
+
     while(1) {
-#if defined(WORKER_THREAD_PIN)
-        gpio_set(worker_pin);
-        gpio_clear(worker_pin);
+#if defined(WORKER_THREAD_PIN_1) && defined(WORKER_THREAD_PIN_2)
+        if( *(uint32_t*)(arg) == TEST_SLEEP_TIME_1) {
+            gpio_set(worker_pin_1);
+            gpio_clear(worker_pin_1);
+        } 
+        else {
+            gpio_set(worker_pin_2);
+            gpio_clear(worker_pin_2);
+        }
 #endif
         xtimer_usleep(*(uint32_t *)(arg));
     }
@@ -65,8 +80,8 @@ int main(void)
 #endif
 
     LOG_DEBUG("[INIT]\n");
-    uint32_t sleep_timer1 = 1000;
-    uint32_t sleep_timer2 = 1100;
+    uint32_t sleep_timer1 = TEST_SLEEP_TIME_1;
+    uint32_t sleep_timer2 = TEST_SLEEP_TIME_2;
 
     thread_create(stack_timer1, TEST_TIMER_STACKSIZE,
                   2, THREAD_CREATE_STACKTEST,
