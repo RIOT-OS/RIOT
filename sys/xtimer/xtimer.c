@@ -73,27 +73,42 @@ void _xtimer_tsleep(uint32_t offset, uint32_t long_offset)
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
     xtimer_t timer;
     mutex_t mutex = MUTEX_INIT;
-
-    timer.callback = _callback_unlock_mutex;
-    timer.arg = (void*) &mutex;
+    uint32_t mult;
 
     uint32_t target = (*last_wakeup) + period;
     uint32_t now = _xtimer_now();
+
     /* make sure we're not setting a value in the past */
     if (now < (*last_wakeup)) {
-        /* base timer overflowed between last_wakeup and now */
-        if (!((now < target) && (target < (*last_wakeup)))) {
-            /* target time has already passed */
-            goto out;
+        /* last_wakeup < target, now overflowed but target not, target passed.
+         * now < last_wakeup < target */
+        /* target <= now , both overflowed, target passed.
+         * target < now < last_wakeup */
+        if ( (*last_wakeup < target) || (target <= now) ) {
+            /* now - target, will always be the difference. (modulo power of two) */
+            mult = ((uint32_t)(now - target)) / period;
+            /* Skip missed targets */
+            *last_wakeup = target + (mult * period);
+            return;
         }
     }
     else {
-        /* base timer did not overflow */
-        if ((((*last_wakeup) <= target) && (target <= now))) {
-            /* target time has already passed */
-            goto out;
+        /* last_wakeup < now, now did not overflow
+         * target <= now AND target did not overflow, target passed
+         * last_wakeup <= target <= now */
+        /* The special case (*last_wakeup) = target happens when a period smaller
+         * then the minimum resolution of the xtimer_hz is requested. */
+        if ( (target <= now) && ((*last_wakeup) <= target) ) {
+            /* now - target, will always be the difference. (modulo power of two) */
+            mult = ((uint32_t)(now - target))/ period;
+            /* Skip missed targets */
+            *last_wakeup = target + (mult * period);
+            return;
         }
     }
+
+    timer.callback = _callback_unlock_mutex;
+    timer.arg = (void*) &mutex;
 
     /*
      * For large offsets, set an absolute target time.
@@ -113,9 +128,13 @@ void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
      * tl;dr Don't return too early!
      */
     uint32_t offset = target - now;
-    DEBUG("xps, now: %9" PRIu32 ", tgt: %9" PRIu32 ", off: %9" PRIu32 "\n", now, target, offset);
-    if (offset < XTIMER_PERIODIC_SPIN) {
-        _xtimer_spin(offset);
+    DEBUG("xps, now: %9" PRIu32 ", tgt: %9" PRIu32 ", lst_wkp: %9" PRIu32 ", off: %9" PRIu32 "\n",
+           now, target, *last_wakeup, offset);
+    if (offset < XTIMER_PERIODIC_SPIN ) {
+        /* for short times skip */
+        if(offset != 0) {
+            _xtimer_spin(offset);
+        }
     }
     else {
         if (offset < XTIMER_PERIODIC_RELATIVE) {
@@ -131,7 +150,7 @@ void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period) {
         _xtimer_set_absolute(&timer, target);
         mutex_lock(&mutex);
     }
-out:
+
     *last_wakeup = target;
 }
 
