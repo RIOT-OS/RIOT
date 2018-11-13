@@ -59,7 +59,7 @@ static volatile unsigned int num_irqs_handled = 0;
 static unsigned int spinning_for_irq = 0;
 
 /* Set this to a flag bit that is not used by the MAC implementation */
-#define KW41ZRF_THREAD_FLAG_ISR (1 << 8)
+#define KW41ZRF_THREAD_FLAG_ISR (1u << 8)
 
 static void kw41zrf_irq_handler(void *arg)
 {

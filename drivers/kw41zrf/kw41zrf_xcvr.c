@@ -203,7 +203,7 @@ int kw41zrf_rx_bba_dcoc_dac_trim_DCest(void)
     /* meas_sum here is the average gain multiplied by (4 * RX_DC_EST_SAMPLES) */
     /* Compute the gain average as a Q6.3 number */
     /* rounded result, Q6.3 number */
-    uint16_t bbf_dcoc_gain_measured = calc_div_rounded(meas_sum, (RX_DC_EST_TOTAL_SAMPLES / (1 << 3)));
+    uint16_t bbf_dcoc_gain_measured = calc_div_rounded(meas_sum, (RX_DC_EST_TOTAL_SAMPLES / (1u << 3)));
 
     DEBUG("temp_step = %f\n", (float)meas_sum / RX_DC_EST_TOTAL_SAMPLES);
     DEBUG("bbf_dcoc_gain_measured = %u\n", (unsigned)bbf_dcoc_gain_measured);
