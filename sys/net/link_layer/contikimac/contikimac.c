@@ -73,14 +73,14 @@ enum {
 };
 
 /**
- * @brief   netdev option flag definitions
+ * @name    netdev option flag definitions
+ * @{
  */
-enum {
-    CONTIKIMAC_OPT_TELL_TX_START   = (1 <<  8),
-    CONTIKIMAC_OPT_TELL_TX_END     = (1 <<  9),
-    CONTIKIMAC_OPT_TELL_RX_START   = (1 << 10),
-    CONTIKIMAC_OPT_TELL_RX_END     = (1 << 11),
-};
+#define CONTIKIMAC_OPT_TELL_TX_START    (1u <<  8)
+#define CONTIKIMAC_OPT_TELL_TX_END      (1u <<  9)
+#define CONTIKIMAC_OPT_TELL_RX_START    (1u << 10)
+#define CONTIKIMAC_OPT_TELL_RX_END      (1u << 11)
+/** @} */
 
 /**
  * @brief Default timing settings for O-QPSK 250 kbit/s
