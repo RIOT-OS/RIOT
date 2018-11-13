@@ -407,7 +407,7 @@ typedef struct {
     /**
      * @brief (usec) interval to wait between each TX packet while strobing
      *
-     * This time counts from when the end of TX is signalled from the device
+     * This time counts from when the end of TX is signaled from the device
      * driver.
      *
      * \note This interval must be long enough to allow an Ack packet to arrive
