@@ -26,13 +26,41 @@
 #define ICMPV6_ERROR_SET_VALUE(data, value) \
     ((icmpv6_error_pkt_too_big_t *)(data))->mtu = byteorder_htonl(value)
 
-/* TODO: generalize and centralize (see https://github.com/RIOT-OS/RIOT/pull/3184) */
 #define MIN(a, b)   ((a) < (b)) ? (a) : (b)
 
-static inline size_t _fit(const gnrc_pktsnip_t *pkt)
+/**
+ * @brief   Get packet fit.
+ *
+ * Get's the minimum size for an ICMPv6 error message packet, based on the
+ * invoking packet's size and the interface the invoking packet came over.
+ *
+ * @param[in] orig_pkt  The invoking packet
+ *
+ * @return  The supposed size of the ICMPv6 error message.
+ */
+static size_t _fit(const gnrc_pktsnip_t *orig_pkt)
 {
-    /* TODO: replace IPV6_MIN_MTU with known path MTU? */
-    return MIN((gnrc_pkt_len(pkt) + ICMPV6_ERROR_SZ), IPV6_MIN_MTU);
+    /* discarding const qualifier is safe here */
+    gnrc_pktsnip_t *netif_hdr = gnrc_pktsnip_search_type(
+            (gnrc_pktsnip_t *)orig_pkt, GNRC_NETTYPE_NETIF
+        );
+    size_t pkt_len = gnrc_pkt_len(orig_pkt) + ICMPV6_ERROR_SZ +
+                     sizeof(ipv6_hdr_t);
+
+    if (netif_hdr) {
+        gnrc_netif_hdr_t *data = netif_hdr->data;
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(data->if_pid);
+
+        DEBUG("gnrc_icmpv6_error: fitting to MTU of iface %u (%u)\n",
+              netif->pid, netif->ipv6.mtu);
+        return MIN(pkt_len, netif->ipv6.mtu - sizeof(ipv6_hdr_t));
+    }
+    else {
+        /* packet does not have a netif header (most likely because it did not
+         * came from remote) => just assume pkt_len as ideal */
+        DEBUG("gnrc_icmpv6_error: copying whole packet\n");
+        return pkt_len;
+    }
 }
 
 /* Build a generic error message */
