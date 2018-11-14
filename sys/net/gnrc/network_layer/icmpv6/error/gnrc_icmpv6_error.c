@@ -12,11 +12,11 @@
  * @file
  */
 
+#include "net/ipv6.h"
+#include "net/gnrc/icmpv6.h"
 #include "net/gnrc/pktbuf.h"
 
-#include "net/ipv6.h"
 #include "net/gnrc/icmpv6/error.h"
-#include "net/gnrc/icmpv6.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
