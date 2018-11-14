@@ -12,12 +12,12 @@ import time
 
 class PufSram:
 
-    def __init__(self, port='/dev/ttyUSB0', baud=115200):
+    def __init__(self, port, baud):
         self.__dev = serial.Serial(port, baud, timeout=10)
         if(self.__dev.isOpen() is False):
             self.__dev.open()
 
-    def repower(self, shutdown_time=1):
+    def repower(self, shutdown_time):
         self.__dev.setRTS(True)
         time.sleep(shutdown_time)
         self.__dev.setRTS(False)
@@ -38,7 +38,7 @@ class PufSram:
                 return data
         return None
 
-    def get_seed_list(self, n=10000, off_time=1, allow_print=False):
+    def get_seed_list(self, n, off_time, allow_print):
         data = list()
         for i in range(0, n):
             self.repower(off_time)

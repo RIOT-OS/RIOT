@@ -7,8 +7,15 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+import argparse
 import puf_sram_if
 import numpy
+
+DEFAULT_POWER_CYCLES = 500
+DEFAULT_OFF_TIME = 1
+DEFAULT_BAUDRATE = 115200
+DEFAULT_PORT = '/dev/ttyUSB0'
+DEFAULT_INFO = True
 
 
 def min_erntropy(all_meas):
@@ -32,8 +39,22 @@ def min_erntropy(all_meas):
 
 
 def main_func():
-    puf_sram = puf_sram_if.PufSram()
-    seeds = puf_sram.get_seed_list(n=500, off_time=1, allow_print=True)
+    p = argparse.ArgumentParser()
+    p.add_argument("-n", "--number", type=int, default=DEFAULT_POWER_CYCLES,
+                   help="Number of iterations, default: %s" % DEFAULT_POWER_CYCLES)
+    p.add_argument("-t", "--off_time", type=int, default=DEFAULT_OFF_TIME,
+                   help="Off time, default: %s [s]" % DEFAULT_OFF_TIME)
+    p.add_argument("-p", "--port", type=str, default=DEFAULT_PORT,
+                   help="Serial port, default: %s" % DEFAULT_PORT)
+    p.add_argument("-b", "--baudrate", type=int, default=DEFAULT_BAUDRATE,
+                   help="Baudrate of the serial port, default: %d" % DEFAULT_BAUDRATE)
+    p.add_argument("-d", "--disable_output", default=DEFAULT_INFO, action='store_false',
+                   help="Disable verbose output")
+    args = p.parse_args()
+
+    puf_sram = puf_sram_if.PufSram(port=args.port, baud=args.baudrate)
+    seeds = puf_sram.get_seed_list(n=args.number, off_time=args.off_time,
+                                   allow_print=args.disable_output)
     seeds = [format(x, '0>32b') for x in seeds]
     H_min, H_min_rel = min_erntropy(seeds)
 
