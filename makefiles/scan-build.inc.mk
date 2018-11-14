@@ -53,13 +53,25 @@ ENVVARS := $(strip $(foreach varname, $(SCANBUILD_ENV_VARS), \
   '$(varname)=$(subst ','\'',$($(varname)))', \
   )))
 
-.PHONY: scan-build scan-build-analyze scan-build-view
-scan-build: scan-build-view scan-build-analyze
-scan-build-view: scan-build-analyze
+.PHONY: scan-build scan-build-analyze
+.PHONY: ..scan-build-view ..scan-build-analyze
+
+ifeq (1,$(INSIDE_DOCKER))
+# In the container just do the analysis, 'view' will be done by the host
+scan-build: ..scan-build-analyze
+else # INSIDE_DOCKER
+scan-build: ..scan-build-view
+endif # INSIDE_DOCKER
+
 ifeq ($(BUILD_IN_DOCKER),1)
+# It will trigger executing 'scan-build' or 'scan-build-analyze' with docker
 scan-build-analyze: ..in-docker-container
 else # BUILD_IN_DOCKER
-scan-build-analyze: clean
+scan-build-analyze: ..scan-build-analyze
+endif # BUILD_IN_DOCKER
+
+
+..scan-build-analyze: clean
 	@$(COLOR_ECHO) '$(COLOR_GREEN)Performing Clang static code analysis using toolchain "$(TOOLCHAIN)".$(COLOR_RESET)'
 # ccc-analyzer needs to be told the proper -target setting for best results,
 # otherwise false error reports about unknown register names etc will be produced.
@@ -72,12 +84,8 @@ scan-build-analyze: clean
 	$(Q)env -i $(ENVVARS) \
 	    scan-build -o '$(SCANBUILD_OUTPUTDIR)' $(SCANBUILD_ARGS) \
 	      make -C $(CURDIR) all $(strip $(CMDVARS)) FORCE_ASSERTS=1
-endif # BUILD_IN_DOCKER
 
-ifeq (1,$(INSIDE_DOCKER))
-scan-build-view:
-	@
-else
+..scan-build-view: scan-build-analyze
 	@echo "Showing most recent report in your web browser..."
 	@REPORT_FILE="$$(find '$(SCANBUILD_OUTPUTDIR)' -maxdepth 2 -mindepth 2 \
 	            -type f -name 'index.html' 2>/dev/null | sort | tail -n 1)"; \
@@ -87,4 +95,3 @@ else
 	  else \
 	    echo "No report found"; \
 	  fi
-endif
