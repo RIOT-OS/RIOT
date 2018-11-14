@@ -114,8 +114,8 @@ interface, run
 
 in the directory of your RIOT application.
 
-The [gnrc networking example][gnrc] explains how to do all of this in more
-detail.
+The [gnrc networking example][gnrc_networking] explains how to do all of this
+in more detail.
 
 The build system in detail                                  {#the-build-system}
 --------------------------
@@ -174,5 +174,6 @@ hex file in the `bin` folder of your application directory.
 Learn more about the build system in the
 [Wiki](https://github.com/RIOT-OS/RIOT/wiki/The-Make-Build-System)
 
-[native]: https://github.com/RIOT-OS/RIOT/wiki/Family:-native
-[gnrc]:   https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_networking
+[native]:            https://github.com/RIOT-OS/RIOT/wiki/Family:-native
+[gnrc_networking]:
+https://github.com/RIOT-OS/RIOT/tree/master/examples/gnrc_networking
