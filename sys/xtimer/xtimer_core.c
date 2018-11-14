@@ -320,20 +320,23 @@ void xtimer_remove(xtimer_t *timer)
     irq_restore(state);
 }
 
+/* target < reference < now */
 static uint32_t _time_left(uint32_t target, uint32_t reference)
 {
     uint32_t now = _xtimer_lltimer_now();
 
-    if (now < reference) {
-        return 0;
+    /* `target` is in next period
+     * AND `now` is at the end ot this period 
+     * OR `now` still smaller than target */
+    if( (target < XTIMER_OVERHEAD)
+             && ((reference < now) || (now < target))) {
+        return _xtimer_lltimer_mask(target-now);
     }
-
-    if (target > now) {
-        return target - now;
+    /* OR Target is still bigger than now */
+    else if ( (reference < now) && (now < target) ){
+                return target-now;
     }
-    else {
-        return 0;
-    }
+    return 0;
 }
 
 static inline int _this_high_period(uint32_t target)
@@ -520,7 +523,6 @@ overflow:
     if (timer_list_head) {
         /* schedule callback on next timer target time */
         next_target = timer_list_head->target - XTIMER_OVERHEAD;
-
         /* make sure we're not setting a time in the past */
         if (next_target < (_xtimer_now() + XTIMER_ISR_BACKOFF)) {
             goto overflow;
