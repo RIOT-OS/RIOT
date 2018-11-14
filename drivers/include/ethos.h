@@ -21,6 +21,8 @@
 #ifndef ETHOS_H
 #define ETHOS_H
 
+#include <stdbool.h>
+
 #include "kernel_types.h"
 #include "periph/uart.h"
 #include "net/netdev.h"
@@ -78,6 +80,7 @@ typedef struct {
     unsigned frametype;     /**< type of currently incoming frame */
     size_t last_framesize;  /**< size of last completed frame */
     mutex_t out_mutex;      /**< mutex used for locking concurrent sends */
+    bool accept_new;        /**< incoming frame can be stored or not */
 } ethos_t;
 
 /**

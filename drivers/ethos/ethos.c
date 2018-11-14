@@ -58,6 +58,7 @@ void ethos_setup(ethos_t *dev, const ethos_params_t *params)
     dev->framesize = 0;
     dev->frametype = 0;
     dev->last_framesize = 0;
+    dev->accept_new = true;
 
     tsrb_init(&dev->inbuf, (char*)params->buf, params->bufsize);
     mutex_init(&dev->out_mutex);
@@ -82,6 +83,7 @@ static void _reset_state(ethos_t *dev)
     dev->state = WAIT_FRAMESTART;
     dev->frametype = 0;
     dev->framesize = 0;
+    dev->accept_new = true;
 }
 
 static void _handle_char(ethos_t *dev, char c)
@@ -90,9 +92,12 @@ static void _handle_char(ethos_t *dev, char c)
         case ETHOS_FRAME_TYPE_DATA:
         case ETHOS_FRAME_TYPE_HELLO:
         case ETHOS_FRAME_TYPE_HELLO_REPLY:
-             if (tsrb_add_one(&dev->inbuf, c) == 0) {
-                dev->framesize++;
-            } else {
+            if (dev->accept_new) {
+                if (tsrb_add_one(&dev->inbuf, c) == 0) {
+                    dev->framesize++;
+                }
+            }
+            else {
                 //puts("lost frame");
                 dev->inbuf.reads = 0;
                 dev->inbuf.writes = 0;
@@ -112,6 +117,7 @@ static void _end_of_frame(ethos_t *dev)
     switch(dev->frametype) {
         case ETHOS_FRAME_TYPE_DATA:
             if (dev->framesize) {
+                assert(dev->last_framesize == 0);
                 dev->last_framesize = dev->framesize;
                 dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_ISR);
             }
@@ -137,6 +143,9 @@ static void ethos_isr(void *arg, uint8_t c)
         case WAIT_FRAMESTART:
             if (c == ETHOS_FRAME_DELIMITER) {
                 _reset_state(dev);
+                if (dev->last_framesize) {
+                    dev->accept_new = false;
+                }
                 dev->state = IN_FRAME;
             }
             break;
@@ -304,13 +313,14 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void* info)
         }
 
         len = dev->last_framesize;
-        dev->last_framesize = 0;
 
         if ((tsrb_get(&dev->inbuf, buf, len) != (int)len)) {
             DEBUG("ethos _recv(): inbuf doesn't contain enough bytes.\n");
+            dev->last_framesize = 0;
             return -1;
         }
 
+        dev->last_framesize = 0;
         return (int)len;
     }
     else {
