@@ -128,7 +128,12 @@ static gnrc_pktsnip_t *_param_prob_build(uint8_t code, void *ptr,
 static void _send(gnrc_pktsnip_t *pkt)
 {
     if (pkt != NULL) {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
+        if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
+                                       GNRC_NETREG_DEMUX_CTX_ALL,
+                                       pkt)) {
+            DEBUG("gnrc_icmpv6_error: No send handler found.\n");
+            gnrc_pktbuf_release(pkt);
+        }
     }
     else {
         DEBUG("gnrc_icmpv6_error: No space in packet buffer left\n");
