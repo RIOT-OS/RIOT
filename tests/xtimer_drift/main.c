@@ -163,7 +163,7 @@ int main(void)
 
     /* create and trigger worker thread */
     kernel_pid_t pid3 = thread_create(worker_stack, sizeof(worker_stack),
-                                      THREAD_PRIORITY_MAIN - 1,
+                                      THREAD_PRIORITY_MAIN - 2,
                                       THREAD_CREATE_STACKTEST,
                                       worker_thread, NULL, "worker");
 

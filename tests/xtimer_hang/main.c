@@ -29,7 +29,7 @@
 #include "thread.h"
 #include "log.h"
 
-#if defined(MAIN_THREAD_PIN) || defined(WORKER_THREAD_PIN)
+#if defined(MAIN_THREAD_PIN) || defined(WORKER_THREAD_PIN_1) || defined(WORKER_THREAD_PIN_2)
 #include "board.h"
 #include "periph/gpio.h"
 #endif
