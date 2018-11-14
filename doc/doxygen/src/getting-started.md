@@ -86,10 +86,9 @@ make -C examples/gnrc_networking/ term \
 
 Using the native port with networking  {#using-the-native-port-with-networking}
 -------------------------------------
-RIOT provides a special [native port][native]
-with which you can run the complete RIOT stack in a process on your *NIX
-system. To enable networking between multiple native RIOT instances, you need
-to use tun/tap interfaces.
+RIOT provides a special [native port][native] with which you can run the
+complete RIOT stack in a process on your *NIX system. To enable networking
+between multiple native RIOT instances, you need to use tun/tap interfaces.
 
 First, you need to make sure that you're compiling RIOT for the native port
 and add tun/tap support. In the project Makefile, set `BOARD ?= native` and
