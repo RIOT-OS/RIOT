@@ -14,6 +14,7 @@
 
 #include "net/ipv6.h"
 #include "net/gnrc/icmpv6.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc/pktbuf.h"
 
 #include "net/gnrc/icmpv6/error.h"
@@ -191,9 +192,39 @@ static gnrc_pktsnip_t *_param_prob_build(uint8_t code, void *ptr,
     return pkt;
 }
 
-static void _send(gnrc_pktsnip_t *pkt)
+static void _send(gnrc_pktsnip_t *pkt, const gnrc_pktsnip_t *orig_pkt)
 {
     if (pkt != NULL) {
+        /* discarding const qualifier is safe here */
+        gnrc_pktsnip_t *ipv6 = gnrc_pktsnip_search_type((gnrc_pktsnip_t *)orig_pkt,
+                                                        GNRC_NETTYPE_IPV6);
+        gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type((gnrc_pktsnip_t *)orig_pkt,
+                                                         GNRC_NETTYPE_NETIF);
+        assert(ipv6 != NULL);
+        ipv6_hdr_t *ipv6_hdr = ipv6->data;
+        ipv6 = gnrc_ipv6_hdr_build(pkt, NULL, &ipv6_hdr->src);
+        if (ipv6 == NULL) {
+            DEBUG("gnrc_icmpv6_error: No space in packet buffer left\n");
+            gnrc_pktbuf_release(pkt);
+            return;
+        }
+        pkt = ipv6;
+        if (netif) {
+            /* copy interface from original netif header to assure packet
+             * goes out where it came from */
+            gnrc_netif_hdr_t *netif_hdr = netif->data;
+            kernel_pid_t netif_pid = netif_hdr->if_pid;
+
+            netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+            if (netif == NULL) {
+                DEBUG("gnrc_icmpv6_error: No space in packet buffer left\n");
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
+            netif_hdr = netif->data;
+            netif_hdr->if_pid = netif_pid;
+            LL_PREPEND(pkt, netif);
+        }
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
                                        GNRC_NETREG_DEMUX_CTX_ALL,
                                        pkt)) {
@@ -211,7 +242,7 @@ void gnrc_icmpv6_error_dst_unr_send(uint8_t code, const gnrc_pktsnip_t *orig_pkt
     gnrc_pktsnip_t *pkt = _dst_unr_build(code, orig_pkt);
 
     DEBUG("gnrc_icmpv6_error: trying to send destination unreachable error\n");
-    _send(pkt);
+    _send(pkt, orig_pkt);
 }
 
 void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu,
@@ -220,7 +251,7 @@ void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu,
     gnrc_pktsnip_t *pkt = _pkt_too_big_build(mtu, orig_pkt);
 
     DEBUG("gnrc_icmpv6_error: trying to send packet too big error\n");
-    _send(pkt);
+    _send(pkt, orig_pkt);
 }
 
 void gnrc_icmpv6_error_time_exc_send(uint8_t code,
@@ -229,7 +260,7 @@ void gnrc_icmpv6_error_time_exc_send(uint8_t code,
     gnrc_pktsnip_t *pkt = _time_exc_build(code, orig_pkt);
 
     DEBUG("gnrc_icmpv6_error: trying to send time exceeded error\n");
-    _send(pkt);
+    _send(pkt, orig_pkt);
 }
 
 void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
@@ -238,7 +269,7 @@ void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
     gnrc_pktsnip_t *pkt = _param_prob_build(code, ptr, orig_pkt);
 
     DEBUG("gnrc_icmpv6_error: trying to send parameter problem error\n");
-    _send(pkt);
+    _send(pkt, orig_pkt);
 }
 
 /** @} */
