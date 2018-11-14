@@ -91,8 +91,10 @@ complete RIOT stack in a process on your *NIX system. To enable networking
 between multiple native RIOT instances, you need to use tun/tap interfaces.
 
 First, you need to make sure that you're compiling RIOT for the native port
-and add tun/tap support. In the project Makefile, set `BOARD ?= native` and
-include the `netdev_tap` module by adding the line `USEMODULE += netdev_tap`.
+and add tun/tap support. You can do this by compiling your project with the following environment variables:
+
+    BOARD=native USEMODULE+=netdev_tap make
+
 > **Note:** if you're using RIOTs default network stack, you should add
 > `gnrc_netdev_default` and `auto_init_gnrc_netif` instead, which have the
 > `netdev_tap` module included.
@@ -110,7 +112,7 @@ And follow the instructions of the script telling you to start RIOT instances
 on specific tap interfaces. To start a RIOT instance on a specific tap
 interface, run
 
-    PORT=<tap interface name> make term
+    BOARD=native USEMODULE+=netdev_tap PORT=<tap interface name> make term
 
 in the directory of your RIOT application.
 
