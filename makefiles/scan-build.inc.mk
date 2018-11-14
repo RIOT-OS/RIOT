@@ -34,11 +34,15 @@ SCANBUILD_ENV_VARS := \
   USER \
   #
 
+# Produce errors by default at the end of compilation when warning are found
+SCANBUILD_ERROR ?= $(if $(filter 1,$(WERROR)),--status-bugs)
+
 SCANBUILD_ARGS ?= \
   -analyze-headers \
   --use-cc=$(CC) \
   --use-c++=$(CXX) \
   -analyzer-config stable-report-filename=true \
+  $(SCANBUILD_ERROR) \
   #
 
 SCANBUILD_OUTPUTDIR = scan-build/$(BOARD)
@@ -62,6 +66,10 @@ scan-build: ..scan-build-analyze
 else # INSIDE_DOCKER
 scan-build: ..scan-build-view
 endif # INSIDE_DOCKER
+
+# Prevent 'analyze' from producing an error when doing 'scan-build' and
+# still show the webpage for interractive checking.
+scan-build: SCANBUILD_ERROR=
 
 ifeq ($(BUILD_IN_DOCKER),1)
 # It will trigger executing 'scan-build' or 'scan-build-analyze' with docker
