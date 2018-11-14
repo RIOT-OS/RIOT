@@ -64,6 +64,41 @@ static size_t _fit(const gnrc_pktsnip_t *orig_pkt)
     }
 }
 
+static inline bool _in_orig_pkt(const gnrc_pktsnip_t *orig_pkt)
+{
+    return (orig_pkt != NULL) && (orig_pkt->type != GNRC_NETTYPE_NETIF);
+}
+
+static size_t _copy_rcv_snip(gnrc_pktsnip_t *pkt,
+                             const gnrc_pktsnip_t *orig_snip)
+{
+    /* always skip ICMPv6 error header */
+    size_t offset = ICMPV6_ERROR_SZ;
+    const gnrc_pktsnip_t *ptr = orig_snip;
+
+    while (_in_orig_pkt(ptr->next)) {
+        offset += ptr->next->size;
+        ptr = ptr->next;
+    }
+
+    if (offset < pkt->size) {
+        uint8_t *data = pkt->data;
+
+        memcpy(data + offset, orig_snip->data,
+               MIN(pkt->size - offset, orig_snip->size));
+    }
+    return offset;
+}
+
+static inline bool _check_send_order(const gnrc_pktsnip_t *pkt)
+{
+    /* sent packets in IPv6 start either with netif header or
+     * with IPv6 header (but then the NETIF header doesn't follow) */
+    return (pkt->type == GNRC_NETTYPE_NETIF) ||
+           ((pkt->type == GNRC_NETTYPE_IPV6) &&
+            ((pkt->next == NULL) || (pkt->next->type != GNRC_NETTYPE_NETIF)));
+}
+
 /* Build a generic error message */
 static gnrc_pktsnip_t *_icmpv6_error_build(uint8_t type, uint8_t code,
                                            const gnrc_pktsnip_t *orig_pkt,
@@ -71,16 +106,30 @@ static gnrc_pktsnip_t *_icmpv6_error_build(uint8_t type, uint8_t code,
 {
     gnrc_pktsnip_t *pkt = gnrc_icmpv6_build(NULL, type, code, _fit(orig_pkt));
 
-    /* copy as much of the originating packet into error message as fits the message's size */
+    /* copy as much of the originating packet into error message as fits the
+     * message's size */
     if (pkt != NULL) {
-        size_t offset = ICMPV6_ERROR_SZ;
-        uint8_t *data = pkt->data;
-        ICMPV6_ERROR_SET_VALUE(data, value);
-        while ((orig_pkt != NULL) && (offset < pkt->size)) {
-            memcpy(data + offset, orig_pkt->data,
-                   MIN(pkt->size - offset, orig_pkt->size));
-            offset += MIN(pkt->size - offset, orig_pkt->size);
-            orig_pkt = orig_pkt->next;
+        ICMPV6_ERROR_SET_VALUE(pkt->data, value);
+        if (_check_send_order(orig_pkt)) {
+            const gnrc_pktsnip_t *ptr = (orig_pkt->type == GNRC_NETTYPE_NETIF)
+                                      ? orig_pkt->next
+                                      : orig_pkt;
+            size_t offset = ICMPV6_ERROR_SZ;
+
+            while ((ptr != NULL) && (offset < pkt->size)) {
+                uint8_t *data = pkt->data;
+
+                memcpy(data + offset, ptr->data, MIN(pkt->size - offset,
+                                                     ptr->size));
+                offset += ptr->size;
+                ptr = ptr->next;
+            }
+        }
+        else {
+            while (_in_orig_pkt(orig_pkt)) {
+                _copy_rcv_snip(pkt, orig_pkt);
+                orig_pkt = orig_pkt->next;
+            }
         }
     }
 
