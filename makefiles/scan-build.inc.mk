@@ -41,7 +41,7 @@ SCANBUILD_ARGS ?= \
   -analyzer-config stable-report-filename=true \
   #
 
-export SCANBUILD_OUTPUTDIR = $(CURDIR)/scan-build/
+SCANBUILD_OUTPUTDIR = scan-build/$(BOARD)
 
 # Find all variables given on the command line and recreate the command.
 CMDVARS := $(strip $(foreach varname, $(SCANBUILD_ENV_VARS), \
