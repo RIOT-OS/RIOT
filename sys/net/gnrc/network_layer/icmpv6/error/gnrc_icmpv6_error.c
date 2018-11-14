@@ -26,7 +26,7 @@
 /* TODO: generalize and centralize (see https://github.com/RIOT-OS/RIOT/pull/3184) */
 #define MIN(a, b)   ((a) < (b)) ? (a) : (b)
 
-static inline size_t _fit(gnrc_pktsnip_t *pkt)
+static inline size_t _fit(const gnrc_pktsnip_t *pkt)
 {
     /* TODO: replace IPV6_MIN_MTU with known path MTU? */
     return MIN((gnrc_pkt_len(pkt) + ICMPV6_ERROR_SZ), IPV6_MIN_MTU);
@@ -34,7 +34,8 @@ static inline size_t _fit(gnrc_pktsnip_t *pkt)
 
 /* Build a generic error message */
 static gnrc_pktsnip_t *_icmpv6_error_build(uint8_t type, uint8_t code,
-                                           gnrc_pktsnip_t *orig_pkt, uint32_t value)
+                                           const gnrc_pktsnip_t *orig_pkt,
+                                           uint32_t value)
 {
     gnrc_pktsnip_t *pkt = gnrc_icmpv6_build(NULL, type, code, _fit(orig_pkt));
 
@@ -55,19 +56,19 @@ static gnrc_pktsnip_t *_icmpv6_error_build(uint8_t type, uint8_t code,
 }
 
 static inline gnrc_pktsnip_t *_dst_unr_build(uint8_t code,
-                                             gnrc_pktsnip_t *orig_pkt)
+                                             const gnrc_pktsnip_t *orig_pkt)
 {
     return _icmpv6_error_build(ICMPV6_DST_UNR, code, orig_pkt, 0);
 }
 
 static inline gnrc_pktsnip_t *_pkt_too_big_build(uint32_t mtu,
-                                                 gnrc_pktsnip_t *orig_pkt)
+                                                 const gnrc_pktsnip_t *orig_pkt)
 {
     return _icmpv6_error_build(ICMPV6_PKT_TOO_BIG, 0, orig_pkt, mtu);
 }
 
 static inline gnrc_pktsnip_t *_time_exc_build(uint8_t code,
-                                              gnrc_pktsnip_t *orig_pkt)
+                                              const gnrc_pktsnip_t *orig_pkt)
 {
     return _icmpv6_error_build(ICMPV6_TIME_EXC, code, orig_pkt, 0);
 }
@@ -78,7 +79,7 @@ static inline bool _in_range(uint8_t *ptr, uint8_t *start, size_t sz)
 }
 
 static gnrc_pktsnip_t *_param_prob_build(uint8_t code, void *ptr,
-                                         gnrc_pktsnip_t *orig_pkt)
+                                         const gnrc_pktsnip_t *orig_pkt)
 {
     gnrc_pktsnip_t *pkt = gnrc_icmpv6_build(NULL, ICMPV6_PARAM_PROB, code,
                                             _fit(orig_pkt));
@@ -121,7 +122,7 @@ static gnrc_pktsnip_t *_param_prob_build(uint8_t code, void *ptr,
     return pkt;
 }
 
-void gnrc_icmpv6_error_dst_unr_send(uint8_t code, gnrc_pktsnip_t *orig_pkt)
+void gnrc_icmpv6_error_dst_unr_send(uint8_t code, const gnrc_pktsnip_t *orig_pkt)
 {
     gnrc_pktsnip_t *pkt = _dst_unr_build(code, orig_pkt);
 
@@ -130,7 +131,8 @@ void gnrc_icmpv6_error_dst_unr_send(uint8_t code, gnrc_pktsnip_t *orig_pkt)
     }
 }
 
-void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu, gnrc_pktsnip_t *orig_pkt)
+void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu,
+                                        const gnrc_pktsnip_t *orig_pkt)
 {
     gnrc_pktsnip_t *pkt = _pkt_too_big_build(mtu, orig_pkt);
 
@@ -139,7 +141,8 @@ void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu, gnrc_pktsnip_t *orig_pkt)
     }
 }
 
-void gnrc_icmpv6_error_time_exc_send(uint8_t code, gnrc_pktsnip_t *orig_pkt)
+void gnrc_icmpv6_error_time_exc_send(uint8_t code,
+                                     const gnrc_pktsnip_t *orig_pkt)
 {
     gnrc_pktsnip_t *pkt = _time_exc_build(code, orig_pkt);
 
@@ -149,7 +152,7 @@ void gnrc_icmpv6_error_time_exc_send(uint8_t code, gnrc_pktsnip_t *orig_pkt)
 }
 
 void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
-                                       gnrc_pktsnip_t *orig_pkt)
+                                       const gnrc_pktsnip_t *orig_pkt)
 {
     gnrc_pktsnip_t *pkt = _param_prob_build(code, ptr, orig_pkt);
 
