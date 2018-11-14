@@ -39,6 +39,7 @@ void hwrng_read(void *buf, unsigned int num)
 #ifdef CPU_FAM_NRF51
     NRF_RNG->POWER = 1;
 #endif
+    NRF_RNG->INTENSET = RNG_INTENSET_VALRDY_Msk;
     NRF_RNG->TASKS_START = 1;
 
     /* read the actual random data */
@@ -51,9 +52,11 @@ void hwrng_read(void *buf, unsigned int num)
         b[count++] = (uint8_t)NRF_RNG->VALUE;
         /* NRF51 PAN #21 -> read value before clearing VALRDY */
         NRF_RNG->EVENTS_VALRDY = 0;
+        NVIC_ClearPendingIRQ(RNG_IRQn);
     }
 
     /* power off RNG */
+    NRF_RNG->INTENCLR = RNG_INTENSET_VALRDY_Msk;
     NRF_RNG->TASKS_STOP = 1;
 #ifdef CPU_FAM_NRF51
     NRF_RNG->POWER = 0;
