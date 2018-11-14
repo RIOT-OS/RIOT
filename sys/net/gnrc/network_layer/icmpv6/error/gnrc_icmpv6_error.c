@@ -51,6 +51,7 @@ static size_t _fit(const gnrc_pktsnip_t *orig_pkt)
         gnrc_netif_hdr_t *data = netif_hdr->data;
         gnrc_netif_t *netif = gnrc_netif_get_by_pid(data->if_pid);
 
+        pkt_len -= netif_hdr->size;
         DEBUG("gnrc_icmpv6_error: fitting to MTU of iface %u (%u)\n",
               netif->pid, netif->ipv6.mtu);
         return MIN(pkt_len, netif->ipv6.mtu - sizeof(ipv6_hdr_t));
