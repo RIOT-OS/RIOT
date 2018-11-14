@@ -168,36 +168,24 @@ static gnrc_pktsnip_t *_param_prob_build(uint8_t code, void *ptr,
     /* copy as much of the originating packet into error message and
      * determine relative *ptr* offset */
     if (pkt != NULL) {
-        size_t offset = sizeof(icmpv6_error_param_prob_t);
-        uint8_t *data = pkt->data;
+        icmpv6_error_param_prob_t *hdr = pkt->data;
         uint32_t ptr_offset = 0U;
-        bool found_offset = false;
 
-        while (orig_pkt != NULL) {
-            /* copy as long as it fits into packet */
-            if (offset < pkt->size) {
-                memcpy(data + offset, orig_pkt->data,
-                       MIN(pkt->size - offset, orig_pkt->size));
-                offset += MIN(pkt->size - offset, orig_pkt->size);
-            }
+        while (_in_orig_pkt(orig_pkt)) {
+            /* copy as long as it fits into packet; parameter problem can only
+             * come from received packets */
+            size_t offset = _copy_rcv_snip(pkt, orig_pkt);
 
             if (_in_range(ptr, orig_pkt->data, orig_pkt->size)) {
-                ptr_offset += (uint32_t)(((uint8_t *)ptr) - ((uint8_t *)orig_pkt->data));
-                found_offset = true;
+                ptr_offset = (uint32_t)(((uint8_t *)ptr) -
+                                        ((uint8_t *)orig_pkt->data) +
+                                        (offset - ICMPV6_ERROR_SZ));
             }
-            else if (!found_offset) {
-                ptr_offset += (uint32_t)orig_pkt->size;
-            }
-
             orig_pkt = orig_pkt->next;
-
-            if ((offset < pkt->size) && found_offset) {
-                break;
-            }
         }
 
         /* set "pointer" field to relative pointer offset */
-        ((icmpv6_error_param_prob_t *)data)->ptr = byteorder_htonl(ptr_offset);
+        hdr->ptr = byteorder_htonl(ptr_offset);
     }
 
     return pkt;

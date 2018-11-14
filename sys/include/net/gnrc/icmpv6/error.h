@@ -62,6 +62,8 @@ void gnrc_icmpv6_error_time_exc_send(uint8_t code,
 /**
  * @brief   Sends an ICMPv6 parameter problem message for sending.
  *
+ * @pre @p orig_pkt is in receive order.
+ *
  * @param[in] code      The code for the message @see net/icmpv6.h.
  * @param[in] ptr       Pointer to the errorneous octet in @p orig_pkt.
  * @param[in] orig_pkt  The invoking packet.
