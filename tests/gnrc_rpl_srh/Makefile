@@ -37,6 +37,8 @@ USEMODULE += gnrc_pktbuf_cmd
 # IPv6 extension headers
 USEMODULE += gnrc_rpl_srh
 USEMODULE += od
+# Add unittest framework
+USEMODULE += embunit
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_commands
