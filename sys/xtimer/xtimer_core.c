@@ -487,17 +487,13 @@ static void _timer_callback(void)
         _next_period();
 
         reference = 0;
-
-        /* make sure the timer counter also arrived
-         * in the next timer period */
+        /* make sure the timer counter also arrived in the next timer period */
         while (_xtimer_lltimer_now() == _xtimer_lltimer_mask(0xFFFFFFFF)) {}
     }
     else {
-        /* we ended up in _timer_callback and there is
-         * a timer waiting.
-         */
-        /* set our period reference to the current time. */
-        reference = _xtimer_lltimer_now();
+        /* we ended up in _timer_callback and there is a timer waiting.
+         * set our period reference to the expected target. */
+        reference = _xtimer_lltimer_mask(timer_list_head->target - XTIMER_OVERHEAD);
     }
 
 overflow:
