@@ -18,6 +18,9 @@
 #include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/icmpv6.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 /* all error messages are basically the same size and format */
 #define ICMPV6_ERROR_SZ (sizeof(icmpv6_error_dst_unr_t))
 #define ICMPV6_ERROR_SET_VALUE(data, value) \
@@ -127,12 +130,16 @@ static void _send(gnrc_pktsnip_t *pkt)
     if (pkt != NULL) {
         gnrc_netapi_send(gnrc_ipv6_pid, pkt);
     }
+    else {
+        DEBUG("gnrc_icmpv6_error: No space in packet buffer left\n");
+    }
 }
 
 void gnrc_icmpv6_error_dst_unr_send(uint8_t code, const gnrc_pktsnip_t *orig_pkt)
 {
     gnrc_pktsnip_t *pkt = _dst_unr_build(code, orig_pkt);
 
+    DEBUG("gnrc_icmpv6_error: trying to send destination unreachable error\n");
     _send(pkt);
 }
 
@@ -141,6 +148,7 @@ void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu,
 {
     gnrc_pktsnip_t *pkt = _pkt_too_big_build(mtu, orig_pkt);
 
+    DEBUG("gnrc_icmpv6_error: trying to send packet too big error\n");
     _send(pkt);
 }
 
@@ -149,6 +157,7 @@ void gnrc_icmpv6_error_time_exc_send(uint8_t code,
 {
     gnrc_pktsnip_t *pkt = _time_exc_build(code, orig_pkt);
 
+    DEBUG("gnrc_icmpv6_error: trying to send time exceeded error\n");
     _send(pkt);
 }
 
@@ -157,6 +166,7 @@ void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
 {
     gnrc_pktsnip_t *pkt = _param_prob_build(code, ptr, orig_pkt);
 
+    DEBUG("gnrc_icmpv6_error: trying to send parameter problem error\n");
     _send(pkt);
 }
 
