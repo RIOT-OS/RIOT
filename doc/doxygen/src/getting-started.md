@@ -116,8 +116,7 @@ interface, run
 
 in the directory of your RIOT application.
 
-The [gnrc networking example][gnrc_networking] explains how to do all of this
-in more detail.
+The [gnrc_networking] example explains how to do all of this in more detail.
 
 The build system in detail                                  {#the-build-system}
 --------------------------
