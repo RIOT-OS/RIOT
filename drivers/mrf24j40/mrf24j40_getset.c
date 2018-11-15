@@ -122,7 +122,8 @@ static const uint8_t RSSI_value[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
 
 uint16_t mrf24j40_get_addr_short(mrf24j40_t *dev)
 {
-    return (dev->netdev.short_addr[0] << 8) | dev->netdev.short_addr[1];
+    return (mrf24j40_reg_read_short(dev, MRF24J40_REG_SADRL) << 8) |
+        mrf24j40_reg_read_short(dev, MRF24J40_REG_SADRH);
 }
 
 void mrf24j40_set_addr_short(mrf24j40_t *dev, uint16_t addr)
@@ -147,7 +148,7 @@ uint64_t mrf24j40_get_addr_long(mrf24j40_t *dev)
     uint8_t *ap = (uint8_t *)(&addr);
 
     for (int i = 0; i < 8; i++) {
-        ap[i] = dev->netdev.long_addr[i];
+        ap[7 - i] = mrf24j40_reg_read_short(dev, (MRF24J40_REG_EADR0 + i));
     }
     return addr;
 }
