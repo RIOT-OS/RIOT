@@ -1351,11 +1351,18 @@ static void *_gnrc_netif_thread(void *args)
                 break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
+                if (netif->flags & GNRC_NETIF_FLAGS_TX_PENDING) {
+                    DEBUG("gnrc_netif: still previous TX pending; "
+                          "requeuing packet %p\n", msg.content.ptr);
+                    msg_send_to_self(&msg);
+                    break;
+                }
                 res = netif->ops->send(netif, msg.content.ptr);
                 if (res < 0) {
                     DEBUG("gnrc_netif: error sending packet %p (code: %u)\n",
                           msg.content.ptr, res);
                 }
+                netif->flags |= GNRC_NETIF_FLAGS_TX_PENDING;
                 break;
             case GNRC_NETAPI_MSG_TYPE_SET:
                 opt = msg.content.ptr;
@@ -1437,16 +1444,19 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                     }
                 }
                 break;
+            case NETDEV_EVENT_TX_COMPLETE:
+                netif->flags &= ~GNRC_NETIF_FLAGS_TX_PENDING;
+#ifdef MODULE_NETSTATS_L2
+                /* we are the only ones supposed to touch this variable,
+                 * so no acquire necessary */
+                dev->stats.tx_success++;
+#endif
+                break;
 #ifdef MODULE_NETSTATS_L2
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
                 /* we are the only ones supposed to touch this variable,
                  * so no acquire necessary */
                 dev->stats.tx_failed++;
-                break;
-            case NETDEV_EVENT_TX_COMPLETE:
-                /* we are the only ones supposed to touch this variable,
-                 * so no acquire necessary */
-                dev->stats.tx_success++;
                 break;
 #endif
             default:

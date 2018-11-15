@@ -119,6 +119,11 @@ enum {
 #define GNRC_NETIF_FLAGS_6LO_BACKBONE              (0x00000800U)
 
 /**
+ * @brief   Network device did not return @ref NETDEV_EVENT_TX_COMPLETE yet
+ */
+#define GNRC_NETIF_FLAGS_TX_PENDING                (0x00001000U)
+
+/**
  * @brief   Mask for @ref gnrc_mac_tx_feedback_t
  */
 #define GNRC_NETIF_FLAGS_MAC_TX_FEEDBACK_MASK      (0x00006000U)
