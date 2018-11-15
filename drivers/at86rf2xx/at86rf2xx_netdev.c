@@ -110,9 +110,6 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
                   (unsigned)len + 2);
             return -EOVERFLOW;
         }
-#ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_bytes += len;
-#endif
         len = at86rf2xx_tx_load(dev, iol->iol_base, iol->iol_len, len);
     }
 
@@ -120,6 +117,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     if (!(dev->flags & AT86RF2XX_OPT_PRELOADING)) {
         at86rf2xx_tx_exec(dev);
     }
+
+#ifdef MODULE_NETSTATS_L2
+    netdev->stats.tx_bytes += len;
+#endif
+
     /* return the number of bytes that were actually loaded into the frame
      * buffer/send out */
     return (int)len;
