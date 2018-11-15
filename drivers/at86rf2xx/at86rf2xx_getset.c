@@ -27,6 +27,7 @@
 #include "at86rf2xx.h"
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_registers.h"
+#include "byteorder.h"
 #include "periph/spi.h"
 
 #define ENABLE_DEBUG (0)
@@ -132,7 +133,12 @@ static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
 uint16_t at86rf2xx_get_addr_short(const at86rf2xx_t *dev)
 {
-    return (dev->netdev.short_addr[0] << 8) | dev->netdev.short_addr[1];
+    network_uint16_t addr;
+
+    addr.u8[1] = at86rf2xx_reg_read(dev, AT86RF2XX_REG__SHORT_ADDR_0);
+    addr.u8[0] = at86rf2xx_reg_read(dev, AT86RF2XX_REG__SHORT_ADDR_1);
+
+    return addr.u16;
 }
 
 void at86rf2xx_set_addr_short(at86rf2xx_t *dev, uint16_t addr)
@@ -152,13 +158,12 @@ void at86rf2xx_set_addr_short(at86rf2xx_t *dev, uint16_t addr)
 
 uint64_t at86rf2xx_get_addr_long(const at86rf2xx_t *dev)
 {
-    uint64_t addr;
-    uint8_t *ap = (uint8_t *)(&addr);
+    network_uint64_t addr;
 
-    for (int i = 0; i < 8; i++) {
-        ap[i] = dev->netdev.long_addr[i];
+    for (unsigned i = 0; i < 8; i++) {
+        addr.u8[7 - i] = at86rf2xx_reg_read(dev, (AT86RF2XX_REG__IEEE_ADDR_0 + i));
     }
-    return addr;
+    return addr.u64;
 }
 
 void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr)
