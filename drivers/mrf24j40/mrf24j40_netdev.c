@@ -174,6 +174,26 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     int res;
     switch (opt) {
+        case NETOPT_ADDRESS:
+            if (max_len < sizeof(uint16_t)) {
+                res = -EOVERFLOW;
+            }
+            else {
+                *(uint16_t*)val = mrf24j40_get_addr_short(dev);
+                res = sizeof(uint16_t);
+            }
+            break;
+
+        case NETOPT_ADDRESS_LONG:
+            if (max_len < sizeof(uint64_t)) {
+                res = -EOVERFLOW;
+            }
+            else {
+                *(uint64_t*)val = mrf24j40_get_addr_long(dev);
+                res = sizeof(uint64_t);
+            }
+            break;
+
         case NETOPT_CHANNEL_PAGE:
             if (max_len < sizeof(uint16_t)) {
                 res = -EOVERFLOW;
