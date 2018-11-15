@@ -296,6 +296,16 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     /* getting these options doesn't require the transceiver to be responsive */
     switch (opt) {
+        case NETOPT_ADDRESS:
+            assert(max_len >= sizeof(uint16_t));
+            *((uint16_t*)val) = at86rf2xx_get_addr_short(dev);
+            return sizeof(uint16_t);
+
+        case NETOPT_ADDRESS_LONG:
+            assert(max_len >= sizeof(uint64_t));
+            *((uint64_t*)val) = at86rf2xx_get_addr_long(dev);
+            return sizeof(uint64_t);
+
         case NETOPT_CHANNEL_PAGE:
             assert(max_len >= sizeof(uint16_t));
             ((uint8_t *)val)[1] = 0;
