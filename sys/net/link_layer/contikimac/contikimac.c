@@ -564,6 +564,15 @@ static int contikimac_netdev_get(netdev_t *dev, netopt_t opt, void *value, size_
             *((netopt_enable_t *)value) = (ctx->no_sleep ? NETOPT_ENABLE : NETOPT_DISABLE);
             return sizeof(netopt_enable_t);
 
+        case NETOPT_PRELOADING:
+            /* We use NETOPT_PRELOADING on the lower driver, but we do not
+             * emulate that behavior towards the upper layers. */
+            if (len != sizeof(netopt_enable_t)) {
+                return -EOVERFLOW;
+            }
+            *((netopt_enable_t *)value) = NETOPT_DISABLE;
+            return sizeof(netopt_enable_t);
+
         default:
             break;
     }
