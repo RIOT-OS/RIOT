@@ -15,9 +15,9 @@ buildtest:
 				$(MAKE) clean all -j $(NPROC) $(BUILDTEST_MAKE_REDIRECT); \
 			RES=$$? ; \
 			if [ $$RES -eq 0 ]; then \
-				$(COLOR_ECHO) "$(COLOR_GREEN)success.$(COLOR_RESET)" ; \
+				$(COLOR_ECHO) "$(call c_green,success.)" ; \
 			else \
-				$(COLOR_ECHO) "$(COLOR_RED)failed!$(COLOR_RESET)" ; \
+				$(COLOR_ECHO) "$(call c_red,failed!)" ; \
 				RESULT=false ; \
 			fi ; \
 			BOARD=$${board} $(MAKE) clean-intermediates >/dev/null 2>&1 || true; \

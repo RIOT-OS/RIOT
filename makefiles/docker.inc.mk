@@ -102,7 +102,7 @@ DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):
 # The `flash`, `term`, `debugserver` etc. targets usually require access to
 # hardware which may not be reachable from inside the container.
 ..in-docker-container:
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Launching build container using image "$(DOCKER_IMAGE)".$(COLOR_RESET)'
+	@$(COLOR_ECHO) '$(call c_green,Launching build container using image "$(DOCKER_IMAGE)".)'
 	$(DOCKER) run $(DOCKER_FLAGS) -t -u "$$(id -u)" \
 	    -v '$(RIOTBASE):$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -v '$(RIOTCPU):$(DOCKER_BUILD_ROOT)/riotcpu' \

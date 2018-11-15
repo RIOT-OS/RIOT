@@ -470,7 +470,7 @@ endif # BUILD_IN_DOCKER
 define check_cmd
 	@command -v $1 >/dev/null 2>&1 || \
 	  { $(COLOR_ECHO) \
-	    '$(COLOR_RED)$2 $1 is required but not found in PATH.  Aborting.$(COLOR_RESET)'; \
+	    '$(call c_red,$2 $1 is required but not found in PATH.  Aborting.)'; \
 	    exit 1;}
 endef
 
@@ -478,7 +478,7 @@ endef
 	$(call check_cmd,$(CC),Compiler)
 
 ..build-message:
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".$(COLOR_RESET)'
+	@$(COLOR_ECHO) '$(call c_green,Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".)'
 	@$(COLOR_ECHO)
 
 # The `clean` needs to be serialized before everything else.
@@ -588,26 +588,26 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
   ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)Required modules were disabled using DISABLE_MODULE:$(COLOR_RESET)"\
-                          "$(sort $(filter $(DISABLE_MODULE), $(USEMODULE)))" 1>&2)
+    $(call color_info,"$(call c_red,Required modules were disabled using DISABLE_MODULE:)" \
+                          "$(sort $(filter $(DISABLE_MODULE), $(USEMODULE)))")
     USEMODULE := $(filter-out $(DISABLE_MODULE), $(USEMODULE))
     EXPECT_ERRORS := 1
   endif
 
   # Test if all feature requirements were met by the selected board.
   ifneq (, $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
-                          "$(sort $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))" 1>&2)
+    $(call color_info,"$(call c_red,There are unsatisfied feature requirements:)" \
+                          "$(sort $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))")
     EXPECT_ERRORS := 1
   endif
 
   # Test if any used feature conflict with another one.
   CONFLICT := $(foreach var,$(FEATURES_CONFLICT),$(if $(filter $(words $(subst :, ,$(var))),$(words $(filter $(FEATURES_USED),$(subst :, ,$(var))))),$(subst :, ,$(var))))
   ifneq (, $(strip $(CONFLICT)))
-    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)The following features may conflict:$(COLOR_RESET)"\
-                          "$(COLOR_GREEN)$(sort $(filter $(FEATURES_USED), $(CONFLICT)))$(COLOR_RESET)" 1>&2)
+    $(call color_info,"$(call c_red,The following features may conflict:)" \
+                          "$(call c_green,$(sort $(filter $(FEATURES_USED), $(CONFLICT))))")
     ifneq (, $(FEATURES_CONFLICT_MSG))
-        $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Rationale: $(COLOR_RESET)$(FEATURES_CONFLICT_MSG)" 1>&2)
+        $(call color_info,"$(call c_yellow,Rationale:) $(FEATURES_CONFLICT_MSG)")
     endif
     EXPECT_CONFLICT := 1
   endif
@@ -615,7 +615,7 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   # If there is a whitelist, then test if the board is whitelisted.
   ifneq (, $(BOARD_WHITELIST))
     ifeq (, $(filter $(BOARD_WHITELIST), $(BOARD)))
-      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=$(BOARD) is not whitelisted:$(COLOR_RESET) $(BOARD_WHITELIST)" 1>&2)
+      $(call color_info,"$(call c_red,The selected BOARD=$(BOARD) is not whitelisted:) $(BOARD_WHITELIST)")
       EXPECT_ERRORS := 1
     endif
   endif
@@ -623,31 +623,31 @@ ifneq (, $(filter all flash, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   # If there is a blacklist, then test if the board is blacklisted.
   ifneq (, $(BOARD_BLACKLIST))
     ifneq (, $(filter $(BOARD_BLACKLIST), $(BOARD)))
-      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=$(BOARD) is blacklisted:$(COLOR_RESET) $(BOARD_BLACKLIST)" 1>&2)
+      $(call color_info,"$(call c_red,The selected BOARD=$(BOARD) is blacklisted:) $(BOARD_BLACKLIST)")
       EXPECT_ERRORS := 1
     endif
   endif
 
   #  test if toolchain is supported.
   ifeq (,$(filter $(TOOLCHAIN),$(TOOLCHAINS_SUPPORTED)))
-    $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected TOOLCHAIN=$(TOOLCHAIN) is not supported.$(COLOR_RESET)\nSupported toolchains: $(TOOLCHAINS_SUPPORTED)" 1>&2)
+    $(call color_info,"$(call c_red,The selected TOOLCHAIN=$(TOOLCHAIN) is not supported.)\nSupported toolchains: $(TOOLCHAINS_SUPPORTED)")
     EXPECT_ERRORS := 1
   endif
 
   # If there is a blacklist, then test if the board is blacklisted.
   ifneq (,$(TOOLCHAINS_BLACKLIST))
     ifneq (,$(filter $(TOOLCHAIN),$(TOOLCHAINS_BLACKLIST)))
-      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected TOOLCHAIN=$(TOOLCHAIN) is blacklisted:$(COLOR_RESET) $(TOOLCHAINS_BLACKLIST)" 1>&2)
+      $(call color_info,"$(call c_red,The selected TOOLCHAIN=$(TOOLCHAIN) is blacklisted:) $(TOOLCHAINS_BLACKLIST)")
       EXPECT_ERRORS := 1
     endif
   endif
 
   ifneq (, $(EXPECT_CONFLICT))
-    $(shell $(COLOR_ECHO) "\n$(COLOR_YELLOW)EXPECT undesired behaviour!$(COLOR_RESET)" 1>&2)
+    $(call color_info,"\n$(call c_yellow,EXPECT undesired behaviour!)")
   endif
 
   ifneq (, $(EXPECT_ERRORS))
-    $(shell $(COLOR_ECHO) "\n\n$(COLOR_RED)EXPECT ERRORS!$(COLOR_RESET)\n\n" 1>&2)
+    $(call color_info,"\n\n$(call c_red,EXPECT ERRORS!)\n\n")
   endif
 
 endif
@@ -675,7 +675,7 @@ else # RIOT_VERSION
 	$(Q)cd $(RIOTBASE) && git archive --format=tar $(NUM_RIOT_VERSION) | ( cd $(@D) && tar x 1>&2 )
 
   ..delegate: $(BINDIR)/riot-version/$(NUM_RIOT_VERSION)/Makefile.include
-	@$(COLOR_ECHO) '$(COLOR_GREEN)Using RIOT_VERSION=$(NUM_RIOT_VERSION)$(COLOR_RESET)' 1>&2
+	@$(COLOR_ECHO) '$(call c_green,Using RIOT_VERSION=$(NUM_RIOT_VERSION))' 1>&2
 	@$(COLOR_ECHO)
 	$(MAKE) RIOTBASE=$(<D) $(filter-out clean, $(MAKECMDGOALS))
 

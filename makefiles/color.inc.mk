@@ -1,12 +1,6 @@
 # Set colored output control sequences if the terminal supports it and if
 # not disabled by the user
 
-COLOR_GREEN  :=
-COLOR_RED    :=
-COLOR_PURPLE :=
-COLOR_RESET  :=
-COLOR_ECHO   := /bin/echo
-
 ifeq ($(CC_NOCOLOR),)
   available_colors:=$(shell tput colors 2> /dev/null)
   ifeq ($(available_colors),)
@@ -32,4 +26,17 @@ ifeq ($(CC_NOCOLOR),0)
   else
     COLOR_ECHO   := /bin/echo -e
   endif
+else
+  COLOR_ECHO   := /bin/echo
 endif
+
+# Colorizer functions:
+#  These functions wrap a block of text in $(COLOR_X)...$(COLOR_RESET).
+#  Do not nest calls to this functions or the colors will be wrong.
+c_green = $(COLOR_GREEN)$(1)$(COLOR_RESET)
+c_red = $(COLOR_RED)$(1)$(COLOR_RESET)
+c_yellow = $(COLOR_YELLOW)$(1)$(COLOR_RESET)
+c_purple = $(COLOR_PURPLE)$(1)$(COLOR_RESET)
+
+# Output a color message to standard output.
+color_info = $(shell $(COLOR_ECHO) $(1) 1>&2)
