@@ -499,15 +499,13 @@ static int contikimac_netdev_send(netdev_t *dev, const iolist_t *iolist)
     else {
         /* The current RX cycle will have been disrupted by the TX,
          * switch back to sleep state */
-        if (!broadcast) {
-            /* If we sent a unicast message we trigger a channel check after a short
-             * delay to catch immediate replies from the other node. This should improve
-             * latency and reduce the energy usage of the other node by reducing the
-             * number of retries needed. */
-            /* TODO make this configurable */
-            xtimer_set(&ctx->timers.extra_channel_check, ctx->reply_delay);
-        }
-        contikimac_radio_sleep(lower);
+        /* We trigger an extra channel check outside of the normal schedule
+         * after a short delay to catch any immediate replies from the other
+         * node. This should improve latency and reduce the energy usage of the
+         * other node by reducing the number of retries needed. */
+        /* TODO make this configurable */
+        xtimer_set(&ctx->timers.extra_channel_check, ctx->reply_delay);
+        contikimac_radio_sleep(ctx);
         ctx->rx_in_progress = 0;
     }
     return 0;
