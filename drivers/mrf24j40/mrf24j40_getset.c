@@ -20,6 +20,7 @@
  * @}
  */
 
+#include "byteorder.h"
 #include "mrf24j40.h"
 #include "mrf24j40_internal.h"
 #include "mrf24j40_registers.h"
@@ -122,40 +123,48 @@ static const uint8_t RSSI_value[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
 
 uint16_t mrf24j40_get_addr_short(mrf24j40_t *dev)
 {
-    return (mrf24j40_reg_read_short(dev, MRF24J40_REG_SADRL) << 8) |
-        mrf24j40_reg_read_short(dev, MRF24J40_REG_SADRH);
+    network_uint16_t naddr;
+    naddr.u8[1] = mrf24j40_reg_read_short(dev, MRF24J40_REG_SADRL);
+    naddr.u8[0] = mrf24j40_reg_read_short(dev, MRF24J40_REG_SADRH);
+
+    return naddr.u16;
 }
 
 void mrf24j40_set_addr_short(mrf24j40_t *dev, uint16_t addr)
 {
+    network_uint16_t naddr;
+    naddr.u16 = addr;
+
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
-    addr &= 0xFF7F;
+    naddr.u8[0] &= 0x7F;
 #endif
+
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SADRL,
-                             (uint8_t)(addr >> 8));
+                             naddr.u8[1]);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SADRH,
-                             (uint8_t)addr);
+                             naddr.u8[0]);
 }
 
 uint64_t mrf24j40_get_addr_long(mrf24j40_t *dev)
 {
-    uint64_t addr;
-
-    uint8_t *ap = (uint8_t *)(&addr);
+    network_uint64_t naddr;
 
     for (int i = 0; i < 8; i++) {
-        ap[7 - i] = mrf24j40_reg_read_short(dev, (MRF24J40_REG_EADR0 + i));
+        naddr.u8[7 - i] = mrf24j40_reg_read_short(dev, (MRF24J40_REG_EADR0 + i));
     }
-    return addr;
+    return naddr.u64;
 }
 
 void mrf24j40_set_addr_long(mrf24j40_t *dev, uint64_t addr)
 {
+    network_uint64_t naddr;
+    naddr.u64 = addr;
+
     for (int i = 0; i < 8; i++) {
         mrf24j40_reg_write_short(dev, (MRF24J40_REG_EADR0 + i),
-                                 (addr >> ((7 - i) * 8)));
+                                 (naddr.u8[7 - i]));
     }
 }
 
