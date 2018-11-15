@@ -1032,6 +1032,7 @@ static uint32_t _isr_event_seq_r(kw41zrf_t *dev, uint32_t irqsts)
         kw41zrf_abort_sequence(dev);
         DEBUG("[kw41zrf] SEQIRQ (R)\n");
         handled_irqs |= ZLL_IRQSTS_SEQIRQ_MASK;
+        LED_TX_OFF;
         LED_RX_OFF;
         if ((irqsts & ZLL_IRQSTS_CRCVALID_MASK) == 0) {
             LOG_ERROR("[kw41zrf] CRC failure (R)\n");
