@@ -566,6 +566,14 @@ typedef struct {
      * @brief   TX progress, part of the TX algorithm state machine
      */
     uint8_t tx_status;
+    /**
+     * @brief   Emulated netdev state
+     *
+     * This is used when getting/setting the NETOPT_STATE value.
+     * Provides a way to disable the radio completely and suspend the channel
+     * check events when we need to conserve power.
+     */
+    uint8_t state;
 } contikimac_t;
 
 /**

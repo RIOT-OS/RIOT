@@ -146,9 +146,9 @@ static int contikimac_channel_energy_detect(contikimac_t *ctx);
 /**
  * @brief   Put the radio device to sleep immediately
  *
- * @param[in]   dev     device to put to sleep
+ * @param[in]   ctx         ContikiMAC context
  */
-static void contikimac_radio_sleep(netdev_t *dev);
+static void contikimac_radio_sleep(contikimac_t *ctx);
 
 /**
  * @brief  Transmit a packet until timeout or an Ack has been received
@@ -301,7 +301,7 @@ static void cb_netdev(netdev_t *lower, netdev_event_t ev)
                 ctx->dev.netdev.event_callback(&ctx->dev.netdev, NETDEV_EVENT_RX_COMPLETE);
             }
             else {
-                contikimac_radio_sleep(lower);
+                contikimac_radio_sleep(ctx);
             }
 
             break;
@@ -349,6 +349,7 @@ static int contikimac_netdev_init(netdev_t *dev)
     ctx->rx_in_progress = 0;
     ctx->timeout_flag = 0;
     ctx->no_sleep = 0;
+    ctx->state = NETOPT_STATE_IDLE;
     ctx->tx_status = CONTIKIMAC_TX_IDLE;
 
     static const netopt_enable_t enable = NETOPT_ENABLE;
@@ -490,9 +491,9 @@ static int contikimac_netdev_send(netdev_t *dev, const iolist_t *iolist)
     }
     ctx->tx_status = CONTIKIMAC_TX_IDLE;
     if (ctx->no_sleep) {
-        res = lower->driver->set(lower, NETOPT_STATE, &state_listen, sizeof(state_listen));
+        res = lower->driver->set(lower, NETOPT_STATE, &ctx->state, sizeof(ctx->state));
         if (res < 0) {
-            DEBUG("contikimac(%d): Failed setting NETOPT_STATE_IDLE: %d\n",
+            DEBUG("contikimac(%d): Error restoring NETOPT_STATE after TX: %d\n",
                   thread_getpid(), res);
         }
     }
@@ -533,7 +534,7 @@ static int contikimac_netdev_recv(netdev_t *dev, void *buf, size_t len, void *in
             /* TX in progress, don't touch the state */
             return res;
         }
-        if (ctx->no_sleep || expect_burst) {
+        if (expect_burst) {
             res = lower->driver->set(lower, NETOPT_STATE, &state_listen, sizeof(state_listen));
             if (res < 0) {
                 DEBUG("contikimac(%d): Failed setting NETOPT_STATE_IDLE: %d\n",
@@ -546,7 +547,7 @@ static int contikimac_netdev_recv(netdev_t *dev, void *buf, size_t len, void *in
         }
         else {
             /* We are done with this transaction, go back to sleep */
-            contikimac_radio_sleep(lower);
+            contikimac_radio_sleep(ctx);
         }
     }
     return res;
@@ -573,6 +574,22 @@ static int contikimac_netdev_get(netdev_t *dev, netopt_t opt, void *value, size_
             *((netopt_enable_t *)value) = NETOPT_DISABLE;
             return sizeof(netopt_enable_t);
 
+        case NETOPT_STATE:
+            if (len != sizeof(netopt_state_t)) {
+                return -EOVERFLOW;
+            }
+            netopt_state_t *state = value;
+            if (ctx->tx_status) {
+                *state = NETOPT_STATE_TX;
+            }
+            else if (ctx->rx_in_progress) {
+                *state = NETOPT_STATE_RX;
+            }
+            else {
+                *state = ctx->state;
+            }
+            return sizeof(netopt_state_t);
+
         default:
             break;
     }
@@ -594,6 +611,36 @@ static int contikimac_netopt_flag_change(contikimac_t *ctx, uint16_t flags,
         ctx->dev.flags |= flags;
     }
     return sizeof(const netopt_enable_t);
+}
+
+/**
+ * @brief   Update timers and events based on current state
+ *
+ * Call this after modifying contikimac_t::no_sleep, contikimac_t::state to
+ * ensure that the duty cycling loop is correctly initialized after a change of
+ * configuration.
+ */
+static void contikimac_refresh_state(contikimac_t *ctx)
+{
+    /* Reset the radio duty cycling state */
+    uint8_t wants_rdc = 0;
+    if (!ctx->no_sleep) {
+        if (ctx->state == NETOPT_STATE_IDLE) {
+            wants_rdc = 1;
+        }
+    }
+    if (wants_rdc) {
+        /* start the event loop by posting a channel check event */
+        cb_post_event(&ctx->events.channel_check);
+    }
+    else {
+        /* No periodic channel checks, cancel all timers and events */
+        xtimer_remove(&ctx->timers.channel_check);
+        contikimac_cancel_timers(ctx);
+        ctx->rx_in_progress = 0;
+        ctx->tx_status = 0;
+        ctx->seen_silence = 0;
+    }
 }
 
 static int contikimac_netdev_set(netdev_t *dev, netopt_t opt, const void *value, size_t len)
@@ -624,28 +671,35 @@ static int contikimac_netdev_set(netdev_t *dev, netopt_t opt, const void *value,
                 return -EOVERFLOW;
             }
             ctx->no_sleep = (*((const netopt_enable_t *)value) != NETOPT_DISABLE);
-            /* Reset the radio duty cycling state */
-            contikimac_cancel_timers(ctx);
-            ctx->rx_in_progress = 0;
-            ctx->seen_silence = 0;
-            if (ctx->no_sleep) {
-                /* switch the radio to listen state */
-                int res = dev->lower->driver->set(dev->lower, NETOPT_STATE, &state_listen, sizeof(state_listen));
-                if (res < 0) {
-                    DEBUG("contikimac(%d): Failed setting NETOPT_STATE_IDLE: %d\n",
-                          thread_getpid(), res);
-                }
-            }
-            else {
-                /* start the event loop by posting a channel check event */
-                cb_post_event(&ctx->events.channel_check);
-            }
+            /* Refresh the radio duty cycling state after changing settings */
+            contikimac_refresh_state(ctx);
             return sizeof(const netopt_enable_t);
 
         case NETOPT_STATE:
-            DEBUG("State: %u\n", *((unsigned *)value));
-            break;
-
+        {
+            netopt_state_t state = *((const netopt_state_t *)value);
+            LOG_ERROR("ContikiMAC state: %u\n", state);
+            switch (state) {
+                case NETOPT_STATE_IDLE:
+                case NETOPT_STATE_STANDBY:
+                case NETOPT_STATE_SLEEP:
+                case NETOPT_STATE_OFF:
+                    ctx->state = state;
+                    /* Refresh the radio duty cycling state after changing settings */
+                    contikimac_refresh_state(ctx);
+                    int res = dev->lower->driver->set(dev->lower, NETOPT_STATE, &ctx->state, sizeof(ctx->state));
+                    if (res < 0) {
+                        DEBUG("contikimac(%d): Failed setting NETOPT_STATE %u: %d\n",
+                              thread_getpid(), (unsigned)ctx->state, res);
+                    }
+                    break;
+                default:
+                    LOG_ERROR("contikimac(%d): Unsupported NETOPT_STATE %u\n",
+                        thread_getpid(), (unsigned)ctx->state);
+                    return -EINVAL;
+            }
+            return sizeof(const netopt_state_t);
+        }
         default:
             break;
     }
@@ -753,7 +807,7 @@ static void contikimac_periodic_handler(contikimac_t *ctx)
     if (contikimac_check_timeouts(ctx)) {
         /* Timeout has occurred */
         TRACE("T\n");
-        contikimac_radio_sleep(lower);
+        contikimac_radio_sleep(ctx);
         ctx->rx_in_progress = 0;
         return;
     }
@@ -858,7 +912,7 @@ static void contikimac_channel_check(contikimac_t *ctx)
         /* Nothing detected, immediately return to sleep */
         DEBUG("contikimac(%d): Nothing seen\n", thread_getpid());
         TRACE("d");
-        contikimac_radio_sleep(lower);
+        contikimac_radio_sleep(ctx);
     }
 }
 
@@ -888,15 +942,19 @@ static int contikimac_channel_energy_detect(contikimac_t *ctx)
     return 0;
 }
 
-static void contikimac_radio_sleep(netdev_t *dev)
+static void contikimac_radio_sleep(contikimac_t *ctx)
 {
-    static const netopt_state_t state_sleep = NETOPT_STATE_SLEEP;
+    netdev_t *lower = ctx->dev.netdev.lower;
     DEBUG("contikimac(%d): Going to sleep\n", thread_getpid());
     CONTIKIMAC_LED_ON;
-    int res = dev->driver->set(dev, NETOPT_STATE, &state_sleep, sizeof(state_sleep));
+    netopt_state_t state = ctx->state;
+    if ((state == NETOPT_STATE_IDLE) && !ctx->no_sleep) {
+        state = NETOPT_STATE_SLEEP;
+    }
+    int res = lower->driver->set(lower, NETOPT_STATE, &state, sizeof(state));
     if (res < 0) {
-        DEBUG("contikimac(%d): Failed setting NETOPT_STATE_SLEEP: %d\n",
-              thread_getpid(), res);
+        DEBUG("contikimac(%d): Failed setting NETOPT_STATE %u: %d\n",
+              thread_getpid(), (unsigned)ctx->state, res);
     }
     CONTIKIMAC_LED_OFF;
     TIMING_PRINTF("r: %lu\n", (unsigned long)xtimer_now_usec() - time_begin);
