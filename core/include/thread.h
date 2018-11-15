@@ -527,6 +527,26 @@ void thread_stack_print(void);
  */
 void thread_print_stack(void);
 
+/**
+ * @brief   Checks if a thread has an initialized message queue
+ *
+ * @see @ref msg_init_queue()
+ *
+ * @param[in] thread    The thread to check for
+ *
+ * @return  `== 0`, if @p thread has no initialized message queue
+ * @return  `!= 0`, if @p thread has its message queue initialized
+ */
+static inline int thread_has_msg_queue(const volatile struct _thread *thread)
+{
+#if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
+    return (thread->msg_array != NULL);
+#else
+    (void)thread;
+    return 0;
+#endif
+}
+
 #ifdef __cplusplus
 }
 #endif
