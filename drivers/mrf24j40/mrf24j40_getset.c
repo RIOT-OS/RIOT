@@ -131,14 +131,12 @@ void mrf24j40_set_addr_short(mrf24j40_t *dev, uint16_t addr)
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
-    dev->netdev.short_addr[0] &= 0x7F;
+    addr &= 0xFF7F;
 #endif
-    dev->netdev.short_addr[0] = (uint8_t)(addr);
-    dev->netdev.short_addr[1] = (uint8_t)(addr >> 8);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SADRL,
-                             dev->netdev.short_addr[1]);
+                             (uint8_t)(addr >> 8));
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SADRH,
-                             dev->netdev.short_addr[0]);
+                             (uint8_t)addr);
 }
 
 uint64_t mrf24j40_get_addr_long(mrf24j40_t *dev)
@@ -156,7 +154,6 @@ uint64_t mrf24j40_get_addr_long(mrf24j40_t *dev)
 void mrf24j40_set_addr_long(mrf24j40_t *dev, uint64_t addr)
 {
     for (int i = 0; i < 8; i++) {
-        dev->netdev.long_addr[i] = (uint8_t)(addr >> (i * 8));
         mrf24j40_reg_write_short(dev, (MRF24J40_REG_EADR0 + i),
                                  (addr >> ((7 - i) * 8)));
     }
