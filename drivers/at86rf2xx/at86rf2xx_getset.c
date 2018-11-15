@@ -143,17 +143,18 @@ uint16_t at86rf2xx_get_addr_short(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_addr_short(at86rf2xx_t *dev, uint16_t addr)
 {
-    dev->netdev.short_addr[0] = (uint8_t)(addr);
-    dev->netdev.short_addr[1] = (uint8_t)(addr >> 8);
+    /* addr is in network byte order */
+    network_uint16_t ap;
+    ap.u16 = addr;
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
-    dev->netdev.short_addr[0] &= 0x7F;
+    ap.u8[0] &= 0x7F;
 #endif
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_0,
-                        dev->netdev.short_addr[1]);
+                        ap.u8[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__SHORT_ADDR_1,
-                        dev->netdev.short_addr[0]);
+                        ap.u8[0]);
 }
 
 uint64_t at86rf2xx_get_addr_long(const at86rf2xx_t *dev)
@@ -168,10 +169,12 @@ uint64_t at86rf2xx_get_addr_long(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_addr_long(at86rf2xx_t *dev, uint64_t addr)
 {
-    for (int i = 0; i < 8; i++) {
-        dev->netdev.long_addr[i] = (uint8_t)(addr >> (i * 8));
+    network_uint64_t ap;
+    ap.u64 = addr;
+
+    for (unsigned i = 0; i < 8; i++) {
         at86rf2xx_reg_write(dev, (AT86RF2XX_REG__IEEE_ADDR_0 + i),
-                            (addr >> ((7 - i) * 8)));
+                            ap.u8[7 - i]);
     }
 }
 

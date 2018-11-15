@@ -294,6 +294,14 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         return -ENODEV;
     }
 
+    int res;
+
+    if (((res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, val,
+                                      max_len)) >= 0) || (res != -ENOTSUP)) {
+        return res;
+    }
+
+
     /* getting these options doesn't require the transceiver to be responsive */
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -371,13 +379,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
         default:
             /* Can still be handled in second switch */
             break;
-    }
-
-    int res;
-
-    if (((res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, val,
-                                      max_len)) >= 0) || (res != -ENOTSUP)) {
-        return res;
     }
 
     uint8_t old_state = at86rf2xx_get_status(dev);
@@ -467,13 +468,15 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_ADDRESS:
             assert(len <= sizeof(uint16_t));
             at86rf2xx_set_addr_short(dev, *((const uint16_t *)val));
-            /* don't set res to set netdev_ieee802154_t::short_addr */
+            res = sizeof(uint16_t);
             break;
+
         case NETOPT_ADDRESS_LONG:
             assert(len <= sizeof(uint64_t));
             at86rf2xx_set_addr_long(dev, *((const uint64_t *)val));
-            /* don't set res to set netdev_ieee802154_t::long_addr */
+            res = sizeof(uint64_t);
             break;
+
         case NETOPT_NID:
             assert(len <= sizeof(uint16_t));
             at86rf2xx_set_pan(dev, *((const uint16_t *)val));
