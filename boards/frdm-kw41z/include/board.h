@@ -88,7 +88,7 @@ extern "C"
  * @name    FXOS8700CQ 3-axis accelerometer and magnetometer bus configuration
  * @{
  */
-#define FXOS8700_PARAM_I2C          I2C_DEV(1)
+#define FXOS8700_PARAM_I2C          I2C_DEV(0)
 #define FXOS8700_PARAM_ADDR         0x1F
 /** @} */
 

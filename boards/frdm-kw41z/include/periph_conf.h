@@ -246,16 +246,6 @@ static const spi_conf_t spi_config[] = {
 */
 static const i2c_conf_t i2c_config[] = {
     {
-        .i2c = I2C0,
-        .scl_pin = GPIO_PIN(PORT_B, 0),
-        .sda_pin = GPIO_PIN(PORT_B, 1),
-        .freq = CLOCK_BUSCLOCK,
-        .speed = I2C_SPEED_FAST,
-        .irqn = I2C0_IRQn,
-        .scl_pcr = (PORT_PCR_MUX(3)),
-        .sda_pcr = (PORT_PCR_MUX(3)),
-    },
-    {
         .i2c = I2C1,
         .scl_pin = GPIO_PIN(PORT_C, 2),
         .sda_pin = GPIO_PIN(PORT_C, 3),
@@ -267,8 +257,7 @@ static const i2c_conf_t i2c_config[] = {
     },
 };
 #define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
-#define I2C_0_ISR           (isr_i2c0)
-#define I2C_1_ISR           (isr_i2c1)
+#define I2C_0_ISR           (isr_i2c1)
 /** @} */
 
 /**
