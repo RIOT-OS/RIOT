@@ -54,6 +54,20 @@ extern "C"
 /** @} */
 
 /**
+ * @name    Button pin definitions
+ * @{
+ */
+/* SW3, SW4 will short these pins to ground when pushed but there are no
+ * external pull resistors, use internal pull-ups on the pins */
+/* BTN0 is mapped to SW3 */
+#define BTN0_PIN            GPIO_PIN(PORT_C,  4)
+#define BTN0_MODE           GPIO_IN_PU
+/* BTN1 is mapped to SW4 */
+#define BTN1_PIN            GPIO_PIN(PORT_C,  5)
+#define BTN1_MODE           GPIO_IN_PU
+/** @} */
+
+/**
  * @name    xtimer configuration
  * @{
  */
