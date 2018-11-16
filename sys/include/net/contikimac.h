@@ -68,13 +68,12 @@
  * but it can also be used from the application layer if the application knows
  * that there will be more data immediately after the current.
  *
- * ### Expecting immediate unicast replies
+ * ### Expecting immediate replies
  *
- * When a unicast packet is successfully delivered, the next channel check of
- * the sender will be scheduled at a short interval from the reception of the
- * Ack frame in an attempt to catch an immediate reply from the other node. This
- * interval is currently hard-coded at 1/8 of the channel check interval, but
- * should be made configurable in a future enhancement.
+ * When a frame is successfully delivered, an extra channel check will be
+ * scheduled by the sender at a short time ahead in an attempt to catch an
+ * immediate reply from the other node. This interval is currently hard-coded at
+ * approximately 8 ms, but should be made configurable in a future enhancement.
  * This method should in theory reduce communication latency and reduce energy
  * consumption of the remote node by reducing the number of transmission retries
  * required. Experiments seem to indicate that this is theory works in real
@@ -89,6 +88,53 @@
  * unicast packet is directed to the same destination, the registered phase will
  * be used as a reference, and the tranmission will be started right before the
  * receiver is expected to wake up.
+ *
+ * # Supported netopt settings
+ *
+ * The ContikiMAC layer will behave slightly differently when certain NETOPT_xxx
+ * options are set on the interface. A summary of supported options is found
+ * below.
+ *
+ * ## NETOPT_STATE
+ *
+ * NETOPT_STATE will affect the duty cycling of the radio and can be set
+ * manually via the shell command `ifconfig x set state mystate`, where `x` is
+ * the interface id.
+ *
+ * A short description of each state follows:
+ *
+ * - NETOPT_STATE_IDLE - Normal duty cycled operation, the radio is brought out
+ *      of sleep mode at regular intervals to perform channel checks and will go
+ *      back to sleep after the channel check is done if no activity was detected.
+ *
+ * - NETOPT_STATE_SLEEP, NETOPT_STATE_STANDBY, NETOPT_STATE_OFF - Suspended
+ *      radio duty cycling, the radio will remain in the chosen state and will
+ *      not perform channel checks. Sending frames will wake the radio and
+ *      the extra channel checks introduced by the immediate reply optimization
+ *      will still be performed. This allows the node to send a message and
+ *      hopefully receive an immediate reply.
+ *
+ * ## NETOPT_MAC_NO_SLEEP
+ *
+ * The NETOPT_MAC_NO_SLEEP option will disable any duty cycling and cause the
+ * radio to remain on between frame receptions. Sending will still use strobing
+ * to be able to communicate with other ContikiMAC nodes with radio duty cycling
+ * enabled. This option is useful on border routers or other permanently powered
+ * devices because it can let other nodes in the network conserve power by
+ * reducing the number of retransmissions.
+ *
+ * ## NETOPT_TX_START_IRQ, NETOPT_TX_END_IRQ, NETOPT_RX_START_IRQ, NETOPT_RX_END_IRQ
+ *
+ * The ContikiMAC layer will filter IRQ events from the underlying device and
+ * only pass events to the upper layers when these flags are enabled. The events
+ * @ref NETDEV_EVENT_RX_STARTED, @ref NETDEV_EVENT_RX_COMPLETE are passed on
+ * whenever received if the @ref NETOPT_RX_START_IRQ and @ref NETOPT_RX_END_IRQ
+ * options are set. @ref NETDEV_EVENT_TX_STARTED, @ref NETDEV_EVENT_TX_COMPLETE
+ * are sent before the start of TX strobing and after the TX strobe has
+ * completed, respectively. This means that there will only be one
+ * @ref NETDEV_EVENT_TX_STARTED, and one @ref NETDEV_EVENT_TX_COMPLETE event,
+ * regardless of the number of MAC layer retransmissions, since retransmissions
+ * are an integral part of the ContikiMAC algorithm.
  *
  * # Implementation details
  *
@@ -163,11 +209,13 @@
  * on all received frames to determine whether to keep the radio on or to put it
  * back to sleep.
  *
- * ## Expecting immediate replies on unicast transmissions
+ * ## Expecting immediate replies after transmission
  *
- * When a unicast transmission is completed successfully (i.e. Ack received),
- * an extra channel check is scheduled outside of the regular schedule, in order
- * to catch quick replies from remote nodes.
+ * An extra channel check is scheduled outside of the regular schedule after a
+ * transmission is completed successfully (Ack received if acknowledgment was
+ * requested). This allows the sender to catch any immediate replies to the
+ * message which reduces latency in simple network scenarios at the cost of one
+ * more channel check.
  *
  * # ContikiMAC Timing constraints
  *
@@ -191,11 +239,11 @@
  *
  * The variables in the above conditions are described below:
  *
- * \f$T_a\f$ is the time between reception end and Ack TX begin.
+ * \f$T_a\f$ is the time between reception end and Ack TX begin
  *
- * \f$T_d\f$ is the time it takes for the transceiver to receive the Ack packet.
+ * \f$T_d\f$ is the time it takes for the transceiver to receive the Ack packet
  *
- * \f$T_i\f$ is the time between the end of transmission, and the start of retransmission
+ * \f$T_i\f$ is the time between the end of transmission and the start of retransmission
  *
  * \f$T_c\f$ is the time between CCA checks during CCA cycles
  *
@@ -220,6 +268,16 @@
  * constraint on minimum packet length, making it possible to eliminate the extra
  * frame padding completely, at the cost of additional CCA checks.
  *
+ * Remember that the software and hardware may create additional delays which
+ * need to be accounted for. In particular, the inter frame interval \f$T_i\f$
+ * may become longer than specified due to hardware TX warm up and other delays
+ * which means that the time that the software triggers a transmission is no the
+ * same time that a transmission can be detected by a remote node. The default
+ * timing configuration uses \f$n_c = 4\f$ to reduce the risk of failing to
+ * detect a transmission. Using 3 CCA checks seems fine on paper, but empirical
+ * results show that there is a significantly better rate of reception when
+ * using 4 CCA checks for the channel check event.
+ *
  * ## Fast sleep
  *
  * For fast sleep, some additional timing information is needed. \f$T_l\f$, the
@@ -236,7 +294,7 @@
  *
  * \f[T_a = 12~\mathrm{symbols} = 192~\mathrm{\mu{}s}\f]
  *
- * \f[T_a\f] is defined in IEEE 802.15.4 (AIFS = macSifsPeriod = aTurnaroundTime)
+ * \f$T_a\f$ is defined in IEEE 802.15.4 (AIFS = macSifsPeriod = aTurnaroundTime)
  *
  * \f[T_d = 5 + 1 + 5~\mathrm{bytes} = 352~\mathrm{\mu{}s}\f]
  *
@@ -245,11 +303,11 @@
  *
  * \f[T_r = 8~\mathrm{symbols} = 128~\mathrm{\mu{}s}\f]
  *
- * \f[T_r\f] is defined in IEEE 802.15.4 (aCcaTime)
+ * \f$T_r\f$ is defined in IEEE 802.15.4 (aCcaTime)
  *
  * \f[T_b = 2~\mathrm{symbols} = 32~\mathrm{\mu{}s}\f]
  *
- * \f[T_b\f] is derived from definitions in IEEE 802.15.4 (4 bits per symbol)
+ * \f$T_b\f$ is derived from definitions in IEEE 802.15.4 (4 bits per symbol)
  *
  * \f[T_l = T_b \cdot (5 + 1 + 127) = 4320~\mathrm{\mu{}s}\f]
  *
