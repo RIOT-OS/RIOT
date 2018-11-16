@@ -553,6 +553,10 @@ typedef struct {
         event_contikimac_t isr;
     } events;
     /**
+     * @brief   flags for some netopt options
+     */
+    uint8_t flags;
+    /**
      * @brief   Silence detected flag, part of the RX state machine
      */
     uint8_t seen_silence;
@@ -564,10 +568,6 @@ typedef struct {
      * @brief   Timeout flag, set by cb_timeout
      */
     uint8_t timeout_flag;
-    /**
-     * @brief   No sleep flag, set via NETOPT_MAC_NO_SLEEP
-     */
-    uint8_t no_sleep;
     /**
      * @brief   TX progress, part of the TX algorithm state machine
      */
