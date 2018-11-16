@@ -18,6 +18,7 @@
 
 #include "log.h"
 #include "net/ipv6/addr.h"
+#include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/nib.h"
@@ -203,6 +204,8 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                  * we also shouldn't release), but if netif is not defined we
                  * should release in any case. */
                 if (netif == NULL) {
+                    gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
+                                                   pkt);
                     gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
                 }
                 res = -EHOSTUNREACH;
@@ -225,6 +228,8 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                     memcpy(&route.next_hop, dst, sizeof(route.next_hop));
                 }
                 else {
+                    gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_NO_ROUTE,
+                                                   pkt);
                     res = -ENETUNREACH;
                     gnrc_pktbuf_release_error(pkt, ENETUNREACH);
                     break;
@@ -1168,9 +1173,13 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                 }
             }
             else {
+                gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
+                                               pkt);
                 gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
             }
 #else   /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
+            gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR,
+                                           pkt);
             gnrc_pktbuf_release_error(pkt, EHOSTUNREACH);
 #endif  /* GNRC_IPV6_NIB_CONF_QUEUE_PKT */
         }
