@@ -373,7 +373,10 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 #endif
         /* read packet (without 4 bytes checksum) */
         sram_op(dev, ENC_RRXDATA, 0xFFFF, buf, payload_len);
+    }
 
+    /* Frame was retrieved or drop was requested --> remove it from buffer */
+    if (buf || (len > 0)) {
         /* decrement available packet count */
         cmd(dev, ENC_SETPKTDEC);
 
