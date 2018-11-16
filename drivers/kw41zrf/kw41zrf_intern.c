@@ -64,7 +64,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
              * radio will be stuck in state retention mode. */
             if (!dev->pm_blocked) {
                 pm_block(KINETIS_PM_LLS);
-                dev->pm_blocked = true;
+                dev->pm_blocked = 1;
             }
             /* Restore saved RF oscillator settings, enable oscillator in RUN mode
              * to allow register access */
@@ -120,7 +120,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
             }
             if (dev->pm_blocked) {
                 pm_unblock(KINETIS_PM_LLS);
-                dev->pm_blocked = false;
+                dev->pm_blocked = 0;
             }
             /* Race condition: if sleep is re-triggered after wake before the
              * DSM_ZIG_FINISHED flag has been switched off, then the RSIM
@@ -173,9 +173,9 @@ void kw41zrf_set_sequence(kw41zrf_t *dev, uint32_t seq)
 {
     (void) dev;
     DEBUG("[kw41zrf] set sequence to %x\n", (unsigned)seq);
-    bool back_to_sleep = false;
+    unsigned back_to_sleep = 0;
     if (seq == XCVSEQ_DSM_IDLE) {
-        back_to_sleep = true;
+        back_to_sleep = 1;
         seq = XCVSEQ_IDLE;
     }
     else if ((seq == XCVSEQ_RECEIVE) && dev->recv_blocked) {

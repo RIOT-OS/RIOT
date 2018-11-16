@@ -277,7 +277,7 @@ static void kw41zrf_dcoc_dac_init_cal(void)
     uint8_t p_bba_dac_i = 0, p_bba_dac_q = 0;
     uint8_t i = 0;
     uint8_t bba_gain = 11;
-    bool TZA_I_OK = 0, TZA_Q_OK = 0, BBA_I_OK = 0, BBA_Q_OK = 0;
+    uint8_t TZA_I_OK = 0, TZA_Q_OK = 0, BBA_I_OK = 0, BBA_Q_OK = 0;
 
     uint32_t temp;
 

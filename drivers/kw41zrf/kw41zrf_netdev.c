@@ -17,7 +17,6 @@
  */
 
 #include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
@@ -277,6 +276,15 @@ static int kw41zrf_netdev_send(netdev_t *netdev, const iolist_t *iolist)
     return (int)len;
 }
 
+static inline void kw41zrf_unblock_rx(kw41zrf_t *dev)
+{
+    dev->recv_blocked = 0;
+    if (kw41zrf_can_switch_to_idle(dev)) {
+        kw41zrf_abort_sequence(dev);
+        kw41zrf_set_sequence(dev, dev->idle_seq);
+    }
+}
+
 static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     kw41zrf_t *dev = (kw41zrf_t *)netdev;
@@ -301,11 +309,7 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
     if (buf == NULL) {
         if (len > 0) {
             /* discard what we have stored in the buffer, unblock RX */
-            dev->recv_blocked = false;
-            if (kw41zrf_can_switch_to_idle(dev)) {
-                kw41zrf_abort_sequence(dev);
-                kw41zrf_set_sequence(dev, dev->idle_seq);
-            }
+            kw41zrf_unblock_rx(dev);
         }
         /* No set_sequence(idle_seq) here, keep transceiver turned on if the
          * buffer was not discarded, we expect the higher layer to call again
@@ -349,11 +353,7 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
     }
 
     /* Go back to RX mode */
-    dev->recv_blocked = false;
-    if (kw41zrf_can_switch_to_idle(dev)) {
-        kw41zrf_abort_sequence(dev);
-        kw41zrf_set_sequence(dev, dev->idle_seq);
-    }
+    kw41zrf_unblock_rx(dev);
 
     return pkt_len;
 }
@@ -579,7 +579,7 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     }
 
     /* The below settings require the transceiver to be powered on */
-    bool put_to_sleep_when_done = false;
+    unsigned put_to_sleep_when_done = 0;
     if (kw41zrf_is_dsm()) {
         /* Transceiver is in deep sleep mode */
         switch (opt) {
@@ -594,7 +594,7 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
 #else
                 DEBUG("[kw41zrf] Wake to get opt %d\n", (int)opt);
 #endif
-                put_to_sleep_when_done = true;
+                put_to_sleep_when_done = 1;
                 break;
 
             default:
@@ -782,7 +782,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
             break;
     }
 
-    bool put_to_sleep_when_done = false;
+    unsigned put_to_sleep_when_done = 0;
 
     if (kw41zrf_is_dsm()) {
         /* Transceiver is in deep sleep mode, check if setting the option
@@ -805,7 +805,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
 #else
                 DEBUG("[kw41zrf] Wake to set opt %d\n", (int)opt);
 #endif
-                put_to_sleep_when_done = true;
+                put_to_sleep_when_done = 1;
                 break;
 
             default:
@@ -1050,7 +1050,7 @@ static uint32_t _isr_event_seq_r(kw41zrf_t *dev, uint32_t irqsts)
             /* No error reported */
             DEBUG("[kw41zrf] success (R)\n");
             /* Block XCVSEQ_RECEIVE until netdev->recv has been called */
-            dev->recv_blocked = true;
+            dev->recv_blocked = 1;
             kw41zrf_set_sequence(dev, dev->idle_seq);
             if (dev->flags & KW41ZRF_OPT_TELL_RX_END) {
                 dev->netdev.netdev.event_callback(&dev->netdev.netdev, NETDEV_EVENT_RX_COMPLETE);

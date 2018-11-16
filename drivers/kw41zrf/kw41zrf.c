@@ -56,8 +56,8 @@ void kw41zrf_setup(kw41zrf_t *dev)
     netdev->driver = &kw41zrf_driver;
     /* initialize device descriptor */
     dev->idle_seq = XCVSEQ_RECEIVE;
-    dev->pm_blocked = false;
-    dev->recv_blocked = false;
+    dev->pm_blocked = 0;
+    dev->recv_blocked = 0;
     /* Set default parameters according to STD IEEE802.15.4-2015 */
     dev->csma_max_be = 5;
     dev->csma_min_be = 3;
@@ -237,8 +237,8 @@ int kw41zrf_reset(kw41zrf_t *dev)
 
     kw41zrf_set_rx_watermark(dev, 1);
 
-    kw41zrf_set_option(dev, KW41ZRF_OPT_AUTOACK, true);
-    kw41zrf_set_option(dev, KW41ZRF_OPT_CSMA, true);
+    kw41zrf_set_option(dev, KW41ZRF_OPT_AUTOACK, 1);
+    kw41zrf_set_option(dev, KW41ZRF_OPT_CSMA, 1);
 
     static const netopt_enable_t enable = NETOPT_ENABLE;
     netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ,

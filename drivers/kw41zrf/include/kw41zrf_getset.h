@@ -193,7 +193,7 @@ void kw41zrf_set_rx_watermark(kw41zrf_t *dev, uint8_t value);
  * @param[in] option    Netopt option type
  * @param[in] state     state
  */
-void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state);
+void kw41zrf_set_option(kw41zrf_t *dev, uint8_t option, uint8_t state);
 
 #ifdef __cplusplus
 }

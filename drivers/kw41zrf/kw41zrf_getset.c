@@ -182,7 +182,7 @@ int8_t kw41zrf_get_ed_level(kw41zrf_t *dev)
     return (ZLL->LQI_AND_RSSI & ZLL_LQI_AND_RSSI_CCA1_ED_FNL_MASK) >> ZLL_LQI_AND_RSSI_CCA1_ED_FNL_SHIFT;
 }
 
-void kw41zrf_set_option(kw41zrf_t *dev, uint16_t option, bool state)
+void kw41zrf_set_option(kw41zrf_t *dev, uint8_t option, uint8_t state)
 {
     DEBUG("[kw41zrf] set option 0x%04x to %x\n", option, state);
 
