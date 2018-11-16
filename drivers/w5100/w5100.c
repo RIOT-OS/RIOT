@@ -261,7 +261,10 @@ static int recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
             DEBUG("[w5100] recv: read %i byte from device (at 0x%04x)\n",
                   n, (int)rp);
+        }
 
+        /* if frame received OR drop requested, remove frame from RX buffer */
+        if (len > 0) {
             /* set the new read pointer address */
             waddr(dev, S0_RX_RD0, S0_RX_RD1, rp += psize);
             wreg(dev, S0_CR, CR_RECV);
