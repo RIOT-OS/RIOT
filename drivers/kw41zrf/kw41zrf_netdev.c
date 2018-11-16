@@ -286,10 +286,7 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
     /* get size of the received packet */
     uint8_t pkt_len = (ZLL->IRQSTS & ZLL_IRQSTS_RX_FRAME_LENGTH_MASK) >> ZLL_IRQSTS_RX_FRAME_LENGTH_SHIFT;
     if (pkt_len < IEEE802154_FCS_LEN) {
-        if (kw41zrf_can_switch_to_idle(dev)) {
-            kw41zrf_abort_sequence(dev);
-            kw41zrf_set_sequence(dev, dev->idle_seq);
-        }
+        kw41zrf_unblock_rx(dev);
         return -EAGAIN;
     }
     /* skip FCS */
