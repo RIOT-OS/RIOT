@@ -458,8 +458,8 @@ typedef struct {
  * @brief   Event type for asynchronous events used internally
  */
 typedef struct {
-    event_t super;
-    void *ctx;
+    event_t super;      /**< parent event class */
+    void *ctx;          /**< pointer to ContikiMAC context */
 } event_contikimac_t;
 
 /**
@@ -501,6 +501,9 @@ typedef struct {
      * at this interval after a unicast transmission has completed successfully.
      */
     uint32_t reply_delay;
+    /**
+     * @brief   Timers used internally to drive the radio duty cycle
+     */
     struct {
         /**
          * @brief   Regular channel check interval timer
@@ -528,6 +531,9 @@ typedef struct {
      * Used for timing inside the transmit loop
      */
     xtimer_ticks32_t last_irq;
+    /**
+     * @brief   Events used internally
+     */
     struct {
         /**
          * @brief   Channel check event
