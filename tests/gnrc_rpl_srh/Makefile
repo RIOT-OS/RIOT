@@ -14,6 +14,8 @@ BOARD_BLACKLIST := chronos mips-malta ruuvitag
 
 export TAP ?= tap0
 
+CFLAGS += -DOUTPUT=TEXT
+
 # use Ethernet as link-layer protocol
 ifeq (native,$(BOARD))
   USEMODULE += netdev_tap

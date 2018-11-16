@@ -331,7 +331,7 @@ def testfunc(child):
     tap = get_bridge(os.environ["TAP"])
 
     child.expect(r"OK \((\d+) tests\)")     # wait for and check result of unittests
-    print(".", end="", flush=True)
+    print("." * int(child.match.group(1)), end="", flush=True)
     lladdr_src = get_host_lladdr(tap)
     child.sendline("ifconfig")
     child.expect("HWaddr: (?P<hwaddr>[A-Fa-f:0-9]+)")
