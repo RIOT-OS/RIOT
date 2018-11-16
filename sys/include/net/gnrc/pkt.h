@@ -129,7 +129,7 @@ typedef struct gnrc_pktsnip {
  *
  * @return  length of the list of headers.
  */
-static inline size_t gnrc_pkt_len(gnrc_pktsnip_t *pkt)
+static inline size_t gnrc_pkt_len(const gnrc_pktsnip_t *pkt)
 {
     size_t len = 0;
 
@@ -149,7 +149,7 @@ static inline size_t gnrc_pkt_len(gnrc_pktsnip_t *pkt)
  *
  * @return  length of the list of headers.
  */
-static inline size_t gnrc_pkt_len_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
+static inline size_t gnrc_pkt_len_upto(const gnrc_pktsnip_t *pkt, gnrc_nettype_t type)
 {
     size_t len = 0;
 

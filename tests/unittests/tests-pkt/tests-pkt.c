@@ -92,6 +92,32 @@ static void test_pkt_len__3_elem(void)
     TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8) + sizeof(TEST_STRING12), gnrc_pkt_len(&snip2));
     TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8), gnrc_pkt_len(&snip1));
 }
+
+static void test_pkt_len_upto__NULL(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, gnrc_pkt_len_upto(NULL, GNRC_NETTYPE_TEST));
+}
+
+static void test_pkt_len_upto__not_in_list(void)
+{
+    gnrc_pktsnip_t snip1 = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
+    gnrc_pktsnip_t snip2 = _INIT_ELEM_STATIC_DATA(TEST_STRING12, &snip1);
+    gnrc_pktsnip_t snip3 = _INIT_ELEM(sizeof("a"), "a", &snip2);
+
+    TEST_ASSERT_EQUAL_INT(sizeof(TEST_STRING8) + sizeof(TEST_STRING12) + sizeof("a"),
+                          gnrc_pkt_len_upto(&snip3, GNRC_NETTYPE_TEST));
+}
+
+static void test_pkt_len_upto__in_list(void)
+{
+    gnrc_pktsnip_t snip1 = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
+    gnrc_pktsnip_t snip2 = _INIT_ELEM_STATIC_TYPE(GNRC_NETTYPE_TEST, &snip1);
+    gnrc_pktsnip_t snip3 = _INIT_ELEM(sizeof("a"), "a", &snip2);
+
+    TEST_ASSERT_EQUAL_INT(sizeof("a"),
+                          gnrc_pkt_len_upto(&snip3, GNRC_NETTYPE_TEST));
+}
+
 static void test_pkt_count__1_elem(void)
 {
     gnrc_pktsnip_t snip1 = _INIT_ELEM_STATIC_DATA(TEST_STRING8, NULL);
@@ -179,6 +205,9 @@ Test *tests_pkt_tests(void)
         new_TestFixture(test_pkt_len__2_elem),
         new_TestFixture(test_pkt_len__2_elem__overflow),
         new_TestFixture(test_pkt_len__3_elem),
+        new_TestFixture(test_pkt_len_upto__NULL),
+        new_TestFixture(test_pkt_len_upto__not_in_list),
+        new_TestFixture(test_pkt_len_upto__in_list),
         new_TestFixture(test_pkt_count__1_elem),
         new_TestFixture(test_pkt_count__5_elem),
         new_TestFixture(test_pkt_count__null),
