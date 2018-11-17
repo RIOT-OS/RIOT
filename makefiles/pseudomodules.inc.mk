@@ -128,6 +128,14 @@ PSEUDOMODULES += adc081c
 PSEUDOMODULES += adc101c
 PSEUDOMODULES += adc121c
 
+# include variants of APDS99XX drivers as pseudo modules
+PSEUDOMODULES += apds9900
+PSEUDOMODULES += apds9901
+PSEUDOMODULES += apds9930
+PSEUDOMODULES += apds9950
+PSEUDOMODULES += apds9960
+PSEUDOMODULES += apds99xx_full
+
 # full featured version of CCS811 driver as pseudo module
 PSEUDOMODULES += ccs811_full
 
