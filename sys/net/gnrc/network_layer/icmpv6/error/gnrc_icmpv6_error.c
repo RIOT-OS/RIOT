@@ -192,16 +192,16 @@ static gnrc_pktsnip_t *_param_prob_build(uint8_t code, void *ptr,
     return pkt;
 }
 
-static void _send(gnrc_pktsnip_t *pkt, const gnrc_pktsnip_t *orig_pkt)
+static void _send(gnrc_pktsnip_t *pkt, const gnrc_pktsnip_t *orig_pkt,
+                  gnrc_pktsnip_t *ipv6)
 {
     if (pkt != NULL) {
         /* discarding const qualifier is safe here */
-        gnrc_pktsnip_t *ipv6 = gnrc_pktsnip_search_type((gnrc_pktsnip_t *)orig_pkt,
-                                                        GNRC_NETTYPE_IPV6);
         gnrc_pktsnip_t *netif = gnrc_pktsnip_search_type((gnrc_pktsnip_t *)orig_pkt,
                                                          GNRC_NETTYPE_NETIF);
         assert(ipv6 != NULL);
         ipv6_hdr_t *ipv6_hdr = ipv6->data;
+        /* overwrite ipv6 parameter pointer ... we don't need it after this */
         ipv6 = gnrc_ipv6_hdr_build(pkt, NULL, &ipv6_hdr->src);
         if (ipv6 == NULL) {
             DEBUG("gnrc_icmpv6_error: No space in packet buffer left\n");
@@ -237,39 +237,70 @@ static void _send(gnrc_pktsnip_t *pkt, const gnrc_pktsnip_t *orig_pkt)
     }
 }
 
+static gnrc_pktsnip_t *_check_ipv6_hdr(const gnrc_pktsnip_t *orig_pkt)
+{
+    /* discarding const qualifier is safe here */
+    gnrc_pktsnip_t *ipv6 = gnrc_pktsnip_search_type((gnrc_pktsnip_t *)orig_pkt,
+                                                    GNRC_NETTYPE_IPV6);
+    assert(ipv6 != NULL);
+    const ipv6_hdr_t *ipv6_hdr = ipv6->data;
+
+    if (ipv6_addr_is_unspecified(&ipv6_hdr->src) ||
+        ipv6_addr_is_multicast(&ipv6_hdr->src)) {
+        ipv6 = NULL;
+    }
+    return ipv6;
+}
+
 void gnrc_icmpv6_error_dst_unr_send(uint8_t code, const gnrc_pktsnip_t *orig_pkt)
 {
-    gnrc_pktsnip_t *pkt = _dst_unr_build(code, orig_pkt);
+    gnrc_pktsnip_t *ipv6 = _check_ipv6_hdr(orig_pkt);
 
-    DEBUG("gnrc_icmpv6_error: trying to send destination unreachable error\n");
-    _send(pkt, orig_pkt);
+    if (ipv6 != NULL) {
+        gnrc_pktsnip_t *pkt = _dst_unr_build(code, orig_pkt);
+
+        DEBUG("gnrc_icmpv6_error: trying to send destination unreachable error\n");
+        _send(pkt, orig_pkt, ipv6);
+    }
 }
 
 void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu,
                                         const gnrc_pktsnip_t *orig_pkt)
 {
-    gnrc_pktsnip_t *pkt = _pkt_too_big_build(mtu, orig_pkt);
+    gnrc_pktsnip_t *ipv6 = _check_ipv6_hdr(orig_pkt);
 
-    DEBUG("gnrc_icmpv6_error: trying to send packet too big error\n");
-    _send(pkt, orig_pkt);
+    if (ipv6 != NULL) {
+        gnrc_pktsnip_t *pkt = _pkt_too_big_build(mtu, orig_pkt);
+
+        DEBUG("gnrc_icmpv6_error: trying to send packet too big error\n");
+        _send(pkt, orig_pkt, ipv6);
+    }
 }
 
 void gnrc_icmpv6_error_time_exc_send(uint8_t code,
                                      const gnrc_pktsnip_t *orig_pkt)
 {
-    gnrc_pktsnip_t *pkt = _time_exc_build(code, orig_pkt);
+    gnrc_pktsnip_t *ipv6 = _check_ipv6_hdr(orig_pkt);
 
-    DEBUG("gnrc_icmpv6_error: trying to send time exceeded error\n");
-    _send(pkt, orig_pkt);
+    if (ipv6 != NULL) {
+        gnrc_pktsnip_t *pkt = _time_exc_build(code, orig_pkt);
+
+        DEBUG("gnrc_icmpv6_error: trying to send time exceeded error\n");
+        _send(pkt, orig_pkt, ipv6);
+    }
 }
 
 void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
                                        const gnrc_pktsnip_t *orig_pkt)
 {
-    gnrc_pktsnip_t *pkt = _param_prob_build(code, ptr, orig_pkt);
+    gnrc_pktsnip_t *ipv6 = _check_ipv6_hdr(orig_pkt);
 
-    DEBUG("gnrc_icmpv6_error: trying to send parameter problem error\n");
-    _send(pkt, orig_pkt);
+    if (ipv6 != NULL) {
+        gnrc_pktsnip_t *pkt = _param_prob_build(code, ptr, orig_pkt);
+
+        DEBUG("gnrc_icmpv6_error: trying to send parameter problem error\n");
+        _send(pkt, orig_pkt, ipv6);
+    }
 }
 
 /** @} */
