@@ -50,6 +50,24 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     }
 
     switch (opt) {
+        case NETOPT_ADDRESS:
+            if (max_len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            else {
+                *(uint16_t*)value = cc2538_get_addr_short();
+            }
+            return sizeof(uint16_t);
+
+        case NETOPT_ADDRESS_LONG:
+            if (max_len < sizeof(uint64_t)) {
+                return -EOVERFLOW;
+            }
+            else {
+                *(uint64_t*)value = cc2538_get_addr_long();
+            }
+            return sizeof(uint64_t);
+
         case NETOPT_AUTOACK:
             if (RFCORE->XREG_FRMCTRL0bits.AUTOACK) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
