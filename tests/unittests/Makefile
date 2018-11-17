@@ -30,6 +30,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              msb-430 \
                              msb-430h \
                              msba2 \
+                             nrf51dk \
                              nrf51dongle \
                              nrf6310 \
                              nucleo-f031k6 \
@@ -125,6 +126,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        microbit \
                        msbiot \
                        mulle \
+                       nrf51dk \
                        nrf51dongle \
                        nrf52840dk \
                        nrf52dk \
