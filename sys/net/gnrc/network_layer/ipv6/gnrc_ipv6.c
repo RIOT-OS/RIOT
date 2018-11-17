@@ -392,11 +392,16 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
 
     /* check if e.g. extension header was not already marked */
     if (hdr->nh == PROTNUM_RESERVED) {
-        hdr->nh = gnrc_nettype_to_protnum(ipv6->next->type);
-
-        /* if still reserved: mark no next header */
-        if (hdr->nh == PROTNUM_RESERVED) {
+        if (ipv6->next == NULL) {
             hdr->nh = PROTNUM_IPV6_NONXT;
+        }
+        else {
+            hdr->nh = gnrc_nettype_to_protnum(ipv6->next->type);
+
+            /* if still reserved: mark no next header */
+            if (hdr->nh == PROTNUM_RESERVED) {
+                hdr->nh = PROTNUM_IPV6_NONXT;
+            }
         }
     }
 
@@ -442,7 +447,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
         }
         prev->next = payload;
         prev = payload;
-    } while (_is_ipv6_hdr(payload));
+    } while (_is_ipv6_hdr(payload) && (payload->next != NULL));
     DEBUG("ipv6: calculate checksum for upper header.\n");
     if ((res = gnrc_netreg_calc_csum(payload, ipv6)) < 0) {
         if (res != -ENOENT) {   /* if there is no checksum we are okay */
