@@ -157,6 +157,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
             }
             else {
                 cc2538_set_addr_short(*((const uint16_t*)value));
+                res = sizeof(uint16_t);
             }
             break;
 
@@ -166,6 +167,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
             }
             else {
                 cc2538_set_addr_long(*((const uint64_t*)value));
+                res = sizeof(uint64_t);
             }
             break;
 
