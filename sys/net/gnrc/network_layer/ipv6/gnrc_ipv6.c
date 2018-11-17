@@ -665,6 +665,12 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
         gnrc_pktbuf_release_error(pkt, EINVAL);
         return;
     }
+    if (ipv6_addr_is_unspecified(&((ipv6_hdr_t *)pkt->data)->dst)) {
+        DEBUG("ipv6: destination address is unspecified address (::), "
+              "dropping packet \n");
+        gnrc_pktbuf_release_error(pkt, EINVAL);
+        return;
+    }
     tmp_pkt = gnrc_pktbuf_start_write(pkt);
     if (tmp_pkt == NULL) {
         DEBUG("ipv6: unable to get write access to IPv6 header, dropping packet\n");
