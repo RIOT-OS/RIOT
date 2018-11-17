@@ -152,7 +152,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         /* drop packet, continue receiving */
         if (len > 0) {
             /* set device back in operation state which was used before last transmission.
-             * e.g RX_AACK_ON */
+             * This state is saved in at86rf2xx.c/at86rf2xx_tx_prepare() e.g RX_AACK_ON */
             at86rf2xx_set_state(dev, dev->idle_state);
         }
 
@@ -163,7 +163,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (pkt_len > len) {
         at86rf2xx_fb_stop(dev);
         /* set device back in operation state which was used before last transmission.
-            * e.g RX_AACK_ON */
+         * This state is saved in at86rf2xx.c/at86rf2xx_tx_prepare() e.g RX_AACK_ON */
         at86rf2xx_set_state(dev, dev->idle_state);
         return -ENOBUFS;
     }
@@ -219,7 +219,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     }
 
     /* set device back in operation state which was used before last transmission.
-     * e.g RX_AACK_ON */
+     * This state is saved in at86rf2xx.c/at86rf2xx_tx_prepare() e.g RX_AACK_ON */
     at86rf2xx_set_state(dev, dev->idle_state);
 
     return pkt_len;
