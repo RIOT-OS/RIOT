@@ -37,7 +37,10 @@ extern "C" {
 /**
  * @brief   Sends an ICMPv6 destination unreachable message for sending.
  *
- * @pre @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ * @pre     @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ *
+ * @note    Won't send if source address of @p orig_pkt is unspecified or
+ *          multicast
  *
  * @param[in] code      The [code for the message](@ref net_icmpv6_error_dst_unr_codes).
  * @param[in] orig_pkt  The invoking packet.
@@ -47,7 +50,10 @@ void gnrc_icmpv6_error_dst_unr_send(uint8_t code, const gnrc_pktsnip_t *orig_pkt
 /**
  * @brief   Sends an ICMPv6 packet too big message for sending.
  *
- * @pre @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ * @pre     @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ *
+ * @note    Won't send if source address of @p orig_pkt is unspecified or
+ *          multicast
  *
  * @param[in] mtu       The maximum transission unit of the next-hop link.
  * @param[in] orig_pkt  The invoking packet.
@@ -58,7 +64,10 @@ void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu,
 /**
  * @brief   Sends an ICMPv6 time exceeded message for sending.
  *
- * @pre @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ * @pre     @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ *
+ * @note    Won't send if source address of @p orig_pkt is unspecified or
+ *          multicast
  *
  * @param[in] code      The [code for the message](@ref net_icmpv6_error_time_exc_codes).
  * @param[in] orig_pkt  The invoking packet.
@@ -69,9 +78,11 @@ void gnrc_icmpv6_error_time_exc_send(uint8_t code,
 /**
  * @brief   Sends an ICMPv6 parameter problem message for sending.
  *
- * @pre @p orig_pkt is in receive order.
- * @pre @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ * @pre     @p orig_pkt is in receive order.
+ * @pre     @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
  *
+ * @note    Won't send if source address of @p orig_pkt is unspecified or
+ *          multicast
  *
  * @param[in] code      The [code for the message](@ref net_icmpv6_error_param_prob_codes).
  * @param[in] ptr       Pointer to the errorneous octet in @p orig_pkt.
