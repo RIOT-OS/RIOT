@@ -442,7 +442,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
         }
         prev->next = payload;
         prev = payload;
-    } while (_is_ipv6_hdr(payload));
+    } while (_is_ipv6_hdr(payload) && (payload->next != NULL));
     DEBUG("ipv6: calculate checksum for upper header.\n");
     if ((res = gnrc_netreg_calc_csum(payload, ipv6)) < 0) {
         if (res != -ENOENT) {   /* if there is no checksum we are okay */
