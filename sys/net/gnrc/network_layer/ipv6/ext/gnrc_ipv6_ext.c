@@ -51,6 +51,22 @@
  */
 static bool _duplicate_hopopt(gnrc_pktsnip_t *pkt, unsigned nh);
 
+/**
+ * @brief   Demultiplex an extension header according to @p nh.
+ *
+ * This includes dispatching it to interested parties in the
+ * @ref net_gnrc_netreg.
+ *
+ * @param[in] pkt       A packet with the first snip pointing to the extension
+ *                      header to process.
+ * @param[in] nh        Protocol number of @p pkt.
+ *
+ * @return  The packet for further processing.
+ * @return  NULL, on error or if packet was consumed (by e.g. forwarding via
+ *          a routing header). @p pkt is released in case of error.
+ */
+static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned nh);
+
 gnrc_pktsnip_t *gnrc_ipv6_ext_process_hopopt(gnrc_pktsnip_t *pkt,
                                              uint8_t *nh)
 {
@@ -59,7 +75,7 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_hopopt(gnrc_pktsnip_t *pkt,
          * immediately after the IPv6 header and it must be processed before
          * the packet is forwarded
          * (see https://tools.ietf.org/html/rfc8200#section-4.1) */
-        if ((pkt = gnrc_ipv6_ext_demux(pkt, *nh)) == NULL) {
+        if ((pkt = _demux(pkt, *nh)) == NULL) {
             DEBUG("ipv6 ext: packet was consumed in extension header "
                   "handling\n");
             return NULL;
@@ -96,7 +112,7 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_process_all(gnrc_pktsnip_t *pkt,
 
                 DEBUG("ipv6: handle extension header (nh = %u)\n", *nh);
                 ext_hdr = pkt->data;
-                if ((pkt = gnrc_ipv6_ext_demux(pkt, *nh)) == NULL) {
+                if ((pkt = _demux(pkt, *nh)) == NULL) {
                     DEBUG("ipv6: packet was consumed by extension header "
                           "handling\n");
                     return NULL;
@@ -251,7 +267,7 @@ static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t nh)
     }
 }
 
-gnrc_pktsnip_t *gnrc_ipv6_ext_demux(gnrc_pktsnip_t *pkt, unsigned nh)
+static gnrc_pktsnip_t *_demux(gnrc_pktsnip_t *pkt, unsigned nh)
 {
     DEBUG("ipv6_ext: next header = %u\n", nh);
     if (!_has_valid_size(pkt, nh)) {

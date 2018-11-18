@@ -39,22 +39,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Demultiplex an extension header according to @p nh.
- *
- * This includes dispatching it to interested parties in the
- * @ref net_gnrc_netreg.
- *
- * @param[in] pkt       A packet with the first snip pointing to the extension
- *                      header to process.
- * @param[in] nh        Protocol number of @p pkt.
- *
- * @return  The packet for further processing.
- * @return  NULL, on error or if packet was consumed (by e.g. forwarding via
- *          a routing header). @p pkt is released in case of error.
- */
-gnrc_pktsnip_t *gnrc_ipv6_ext_demux(gnrc_pktsnip_t *pkt, unsigned nh);
-
-/**
  * @brief   Builds an extension header for sending.
  *
  * @param[in] ipv6  The IPv6 header. Can be NULL.
