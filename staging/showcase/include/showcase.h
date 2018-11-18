@@ -15,16 +15,24 @@
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
- * @}
  */
 
 #ifndef SHOWCASE_H
 #define SHOWCASE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief   Staging showcase string
  */
 extern const char showcase_string[];
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* SHOWCASE_H */
+
+/** @} */
