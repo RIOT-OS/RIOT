@@ -37,4 +37,6 @@ USEMODULE += prng_xorshift
 
 USEPKG += ccn-lite
 
+STAGING_ALLOWED = ccn-lite
+
 include $(RIOTBASE)/Makefile.include

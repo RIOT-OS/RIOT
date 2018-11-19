@@ -5,3 +5,5 @@ ifneq (,$(filter ccn-lite,$(USEPKG)))
   USEMODULE += timex
   USEMODULE += tlsf-malloc
 endif
+
+STAGING_MODULES += ccn-lite
