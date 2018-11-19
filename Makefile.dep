@@ -818,6 +818,7 @@ USEMODULE += $(filter periph_%,$(FEATURES_USED))
 # recursively catch transitive dependencies
 USEMODULE := $(sort $(USEMODULE))
 USEPKG := $(sort $(USEPKG))
+STAGING_MODULES := $(sort $(STAGING_MODULES))
 ifneq ($(OLD_USEMODULE) $(OLD_USEPKG),$(USEMODULE) $(USEPKG))
   include $(RIOTBASE)/Makefile.dep
 endif

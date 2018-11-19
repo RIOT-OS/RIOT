@@ -437,9 +437,9 @@ ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
 ifeq (,$(RIOTNOLINK))
-link: ..compiler-check ..build-message $(ELFFILE) $(HEXFILE) print-size
+link: ..compiler-check ..build-message ..staging-check $(ELFFILE) $(HEXFILE) print-size
 else
-link: ..compiler-check ..build-message $(BASELIBS)
+link: ..compiler-check ..build-message ..staging-check $(BASELIBS)
 endif # RIOTNOLINK
 
 $(ELFFILE): $(BASELIBS)
@@ -473,6 +473,13 @@ define check_cmd
 	    '$(COLOR_RED)$2 $1 is required but not found in PATH.  Aborting.$(COLOR_RESET)'; \
 	    exit 1;}
 endef
+
+STAGING_USED=$(filter $(STAGING_MODULES),$(USEMODULE) $(USEPKG))
+STAGING_NOT_ALLOWED=$(filter-out $(STAGING_ALLOWED),$(STAGING_USED))
+STAGING_ERR_MSG=The following modules are in staging area but are not specifically enabled $(STAGING_NOT_ALLOWED)
+
+..staging-check:
+	$(if $(STAGING_NOT_ALLOWED),$(error $(STAGING_ERR_MSG)),$(info $(USEMODULE)))
 
 ..compiler-check:
 	$(call check_cmd,$(CC),Compiler)
