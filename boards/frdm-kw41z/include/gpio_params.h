@@ -62,13 +62,15 @@ static const  saul_gpio_params_t saul_gpio_params[] =
     },
     {
         .name = "SW3",
-        .pin = GPIO_PIN(PORT_C, 4),
-        .mode = GPIO_IN_PU
+        .pin = BTN0_PIN,
+        .mode = BTN0_MODE,
+        .flags = (SAUL_GPIO_INVERTED),
     },
     {
         .name = "SW4",
-        .pin = GPIO_PIN(PORT_C, 5),
-        .mode = GPIO_IN_PU
+        .pin = BTN1_PIN,
+        .mode = BTN1_MODE,
+        .flags = (SAUL_GPIO_INVERTED),
     },
 };
 
