@@ -21,6 +21,9 @@
  * @file
  * @brief       Generic interface to communicate with GNRC modules
  *
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ *
  * @defgroup    net_gnrc_netapi_mbox   Mailbox IPC extension
  * @ingroup     net_gnrc_netapi
  * @brief       @ref core_mbox "Mailbox IPC" extension for @ref net_gnrc_netapi
@@ -51,8 +54,6 @@
  * USEMODULE += gnrc_netapi_callbacks
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * @}
- * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef NET_GNRC_NETAPI_H
