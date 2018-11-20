@@ -180,7 +180,7 @@ static void test_rpl_srh_nexthop_prefix_elided(void)
     TEST_ASSERT(ipv6_addr_equal(&hdr.dst, &expected2));
 }
 
-Test *tests_rpl_srh_tests(void)
+static Test *tests_rpl_srh_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_rpl_srh_dst_multicast),
