@@ -204,7 +204,7 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 
 static inline void send_byte(uart_t uart, uint8_t byte)
 {
-    while (!(dev(uart)->ISR_REG & USART_ISR_TXE)) {}
+    while (!(dev(uart)->ISR_REG & ISR_TXE)) {}
     dev(uart)->TDR_REG = byte;
 }
 
