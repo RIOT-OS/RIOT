@@ -163,8 +163,10 @@ int gnrc_netapi_get(kernel_pid_t pid, netopt_t opt, uint16_t context,
 }
 
 int gnrc_netapi_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
-                    void *data, size_t data_len)
+                    const void *data, size_t data_len)
 {
+    /* disregard const pointer. This *should* be safe and any modification
+     * to `data` should be considered a bug */
     return _get_set(pid, GNRC_NETAPI_MSG_TYPE_SET, opt, context,
-                    data, data_len);
+                    (void *)data, data_len);
 }

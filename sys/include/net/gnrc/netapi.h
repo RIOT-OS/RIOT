@@ -204,7 +204,7 @@ int gnrc_netapi_get(kernel_pid_t pid, netopt_t opt, uint16_t context,
  *                      wrong.
  */
 int gnrc_netapi_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
-                    void *data, size_t data_len);
+                    const void *data, size_t data_len);
 
 #ifdef __cplusplus
 }
