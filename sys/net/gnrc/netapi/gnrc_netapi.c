@@ -27,20 +27,8 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/**
- * @brief   Unified function for getting and setting netapi options
- *
- * @param[in] pid       PID of the targeted thread
- * @param[in] type      specify if option is to be set or get
- * @param[in] opt       option to set or get
- * @param[in] data      data to set or pointer to buffer for reading options
- * @param[in] data_len  size of the given buffer
- *
- * @return              the value from the received ACK message
- */
-static inline int _get_set(kernel_pid_t pid, uint16_t type,
-                           netopt_t opt, uint16_t context,
-                           void *data, size_t data_len)
+int _gnrc_netapi_get_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
+                         void *data, size_t data_len, uint16_t type)
 {
     msg_t cmd;
     msg_t ack;
@@ -60,7 +48,7 @@ static inline int _get_set(kernel_pid_t pid, uint16_t type,
     return (int)ack.content.value;
 }
 
-static inline int _snd_rcv(kernel_pid_t pid, uint16_t type, gnrc_pktsnip_t *pkt)
+int _gnrc_netapi_send_recv(kernel_pid_t pid, gnrc_pktsnip_t *pkt, uint16_t type)
 {
     msg_t msg;
     /* set the outgoing message's fields */
@@ -106,7 +94,8 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
             int release = 0;
             switch (sendto->type) {
                 case GNRC_NETREG_TYPE_DEFAULT:
-                    if (_snd_rcv(sendto->target.pid, cmd, pkt) < 1) {
+                    if (_gnrc_netapi_send_recv(sendto->target.pid, pkt,
+                                               cmd) < 1) {
                         /* unable to dispatch packet */
                         release = 1;
                     }
@@ -133,7 +122,7 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
                 gnrc_pktbuf_release(pkt);
             }
 #else
-            if (_snd_rcv(sendto->target.pid, cmd, pkt) < 1) {
+            if (_gnrc_netapi_send_recv(sendto->target.pid, pkt, cmd) < 1) {
                 /* unable to dispatch packet */
                 gnrc_pktbuf_release(pkt);
             }
@@ -143,30 +132,4 @@ int gnrc_netapi_dispatch(gnrc_nettype_t type, uint32_t demux_ctx,
     }
 
     return numof;
-}
-
-int gnrc_netapi_send(kernel_pid_t pid, gnrc_pktsnip_t *pkt)
-{
-    return _snd_rcv(pid, GNRC_NETAPI_MSG_TYPE_SND, pkt);
-}
-
-int gnrc_netapi_receive(kernel_pid_t pid, gnrc_pktsnip_t *pkt)
-{
-    return _snd_rcv(pid, GNRC_NETAPI_MSG_TYPE_RCV, pkt);
-}
-
-int gnrc_netapi_get(kernel_pid_t pid, netopt_t opt, uint16_t context,
-                    void *data, size_t data_len)
-{
-    return _get_set(pid, GNRC_NETAPI_MSG_TYPE_GET, opt, context,
-                    data, data_len);
-}
-
-int gnrc_netapi_set(kernel_pid_t pid, netopt_t opt, uint16_t context,
-                    const void *data, size_t data_len)
-{
-    /* disregard const pointer. This *should* be safe and any modification
-     * to `data` should be considered a bug */
-    return _get_set(pid, GNRC_NETAPI_MSG_TYPE_SET, opt, context,
-                    (void *)data, data_len);
 }
