@@ -10,14 +10,14 @@ buildtest:
 	RESULT=true ; \
 	for board in $(BOARDS); do \
 		if BOARD=$${board} $(MAKE) check-toolchain-supported > /dev/null 2>&1; then \
-			$(COLOR_ECHO) -n "Building for $$board ... " ; \
+			echo "Building for $$board ... " ; \
 			BOARD=$${board} RIOT_CI_BUILD=1 RIOT_VERSION_OVERRIDE=buildtest \
 				$(MAKE) clean all -j $(NPROC) $(BUILDTEST_MAKE_REDIRECT); \
 			RES=$$? ; \
 			if [ $$RES -eq 0 ]; then \
-				$(COLOR_ECHO) "$(call c_green,success.)" ; \
+				echo -e "$(call c_green,success.)" ; \
 			else \
-				$(COLOR_ECHO) "$(call c_red,failed!)" ; \
+				echo -e "$(call c_red,failed!)" ; \
 				RESULT=false ; \
 			fi ; \
 			BOARD=$${board} $(MAKE) clean-intermediates >/dev/null 2>&1 || true; \

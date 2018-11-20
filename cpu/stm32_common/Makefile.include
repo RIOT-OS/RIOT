@@ -30,11 +30,11 @@ export CFLAGS += -D$(CPU_LINE) -DCPU_LINE_$(CPU_LINE)
 export CFLAGS += -DSTM32_FLASHSIZE=$(FLASHSIZE)U
 
 info-stm32:
-	@$(COLOR_ECHO) "CPU: $(CPU_MODEL)"
-	@$(COLOR_ECHO) "\tLine: $(CPU_LINE)"
-	@$(COLOR_ECHO) "\tPin count:\t$(STM32_PINCOUNT)"
-	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN) ($(FLASHSIZE) Bytes)"
-	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN)"
+	@echo -e "CPU: $(CPU_MODEL)"
+	@echo -e "\tLine: $(CPU_LINE)"
+	@echo -e "\tPin count:\t$(STM32_PINCOUNT)"
+	@echo -e "\tROM size:\t$(ROM_LEN) ($(FLASHSIZE) Bytes)"
+	@echo -e "\tRAM size:\t$(RAM_LEN)"
 
 ifneq (,$(CCMRAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)

@@ -80,13 +80,13 @@ endif # BUILD_IN_DOCKER
 
 
 ..scan-build-analyze: clean
-	@$(COLOR_ECHO) '$(call c_green,Performing Clang static code analysis using toolchain "$(TOOLCHAIN)".)'
+	@echo '$(call c_green,Performing Clang static code analysis using toolchain "$(TOOLCHAIN)".)'
 # ccc-analyzer needs to be told the proper -target setting for best results,
 # otherwise false error reports about unknown register names etc will be produced.
 # These kinds of errors can be safely ignored as long as they only come from LLVM
 	@if [ "$${TOOLCHAIN}" != "llvm" -a "$${BOARD}" != "native" ]; then \
-	  $(COLOR_ECHO) '$(call c_yellow,Recommend using TOOLCHAIN=llvm for best results.)'; \
-	  $(COLOR_ECHO) '$(call c_yellow,Ignore any "error: unknown register name '\''rX'\'' in asm" messages.)'; \
+	  echo '$(call c_yellow,Recommend using TOOLCHAIN=llvm for best results.)'; \
+	  echo '$(call c_yellow,Ignore any "error: unknown register name '\''rX'\'' in asm" messages.)'; \
 	fi
 	$(Q)mkdir -p '$(SCANBUILD_OUTPUTDIR)'
 	$(Q)env -i $(ENVVARS) \

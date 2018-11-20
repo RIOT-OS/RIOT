@@ -15,19 +15,12 @@ ifeq ($(CC_NOCOLOR),)
 endif
 
 ifeq ($(CC_NOCOLOR),0)
-  COLOR_GREEN  := \033[1;32m
-  COLOR_RED    := \033[1;31m
-  COLOR_YELLOW := \033[1;33m
-  COLOR_PURPLE := \033[1;35m
-  COLOR_RESET  := \033[0m
-  ifeq ($(OS),Darwin)
-    COLOR_ECHO   := echo -e
-    SHELL=bash
-  else
-    COLOR_ECHO   := /bin/echo -e
-  endif
-else
-  COLOR_ECHO   := /bin/echo
+  _COLOR_ECHO  = $(shell /bin/echo -e "$(1)")
+  COLOR_GREEN  := $(call _COLOR_ECHO,\033[1;32m)
+  COLOR_RED    := $(call _COLOR_ECHO,\033[1;31m)
+  COLOR_YELLOW := $(call _COLOR_ECHO,\033[1;33m)
+  COLOR_PURPLE := $(call _COLOR_ECHO,\033[1;35m)
+  COLOR_RESET  := $(call _COLOR_ECHO,\033[0m)
 endif
 
 # Colorizer functions:
@@ -38,5 +31,6 @@ c_red = $(COLOR_RED)$(1)$(COLOR_RESET)
 c_yellow = $(COLOR_YELLOW)$(1)$(COLOR_RESET)
 c_purple = $(COLOR_PURPLE)$(1)$(COLOR_RESET)
 
-# Output a color message to standard output.
-color_info = $(shell $(COLOR_ECHO) $(1) 1>&2)
+# Like Make's "warning" function, except the file and line number are not
+# printed, and backlash escapes are interpreted.
+warn = $(shell echo -e "$(1)" 1>&2)

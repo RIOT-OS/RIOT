@@ -62,8 +62,8 @@ info-buildsizes-diff:
 	    for I in 0 1 2 3; do \
 	      if [[ -n "$${NEW[I]}" && -n "$${OLD[I]}" ]]; then \
 	        DIFF=$$(($${NEW[I]} - $${OLD[I]})); \
-	        if [[ "$${DIFF}" -gt 0 ]]; then $(COLOR_ECHO) -n "$(COLOR_RED)"; fi; \
-	        if [[ "$${DIFF}" -lt 0 ]]; then $(COLOR_ECHO) -n "$(COLOR_GREEN)"; fi; \
+	        if [[ "$${DIFF}" -gt 0 ]]; then echo "$(COLOR_RED)"; fi; \
+	        if [[ "$${DIFF}" -lt 0 ]]; then echo "$(COLOR_GREEN)"; fi; \
 	      else \
 	        DIFF="$(COLOR_RED)ERR"; \
 	      fi; \
