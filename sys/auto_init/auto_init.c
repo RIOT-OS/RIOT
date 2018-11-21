@@ -429,6 +429,11 @@ auto_init_mpu9150();
     auto_init_mma7660();
 #endif
 
+#ifdef MODULE_SHT3X
+    extern void auto_init_sht3x(void);
+    auto_init_sht3x();
+#endif
+
 #endif /* MODULE_AUTO_INIT_SAUL */
 
 #ifdef MODULE_AUTO_INIT_GNRC_RPL
