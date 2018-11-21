@@ -195,6 +195,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "iolist.h"
 #include "net/netopt.h"
@@ -412,6 +413,47 @@ typedef struct netdev_driver {
     int (*set)(netdev_t *dev, netopt_t opt,
                const void *value, size_t value_len);
 } netdev_driver_t;
+
+/**
+ * @brief   Convenience function for declaring get() as not supported in general
+ *
+ * @param[in] dev           ignored
+ * @param[in] opt           ignored
+ * @param[in] value         ignored
+ * @param[in] max_len       ignored
+ *
+ * @return  always returns `-ENOTSUP`
+ */
+static inline int netdev_get_notsup(netdev_t *dev, netopt_t opt,
+                                    void *value, size_t max_len)
+{
+    (void)dev;
+    (void)opt;
+    (void)value;
+    (void)max_len;
+    return -ENOTSUP;
+}
+
+/**
+ * @brief   Convenience function for declaring set() as not supported in general
+ *
+ * @param[in] dev           ignored
+ * @param[in] opt           ignored
+ * @param[in] value         ignored
+ * @param[in] value_len     ignored
+ *
+ * @return  always returns `-ENOTSUP`
+ */
+static inline int netdev_set_notsup(netdev_t *dev, netopt_t opt,
+                                    const void *value, size_t value_len)
+{
+    (void)dev;
+    (void)opt;
+    (void)value;
+    (void)value_len;
+    return -ENOTSUP;
+}
+
 
 #ifdef __cplusplus
 }
