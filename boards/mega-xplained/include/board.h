@@ -91,6 +91,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
+ */
+#define LED_PANIC           LED1_ON
+/** @} */
+
+/**
  * @name    Button pin configuration
  * @{
  */
@@ -109,6 +116,13 @@ extern "C" {
 #define NTC_OUTPUT             GPIO_PIN(PORT_A, 5)
 #define LIGHT_SENSOR_OUTPUT    GPIO_PIN(PORT_A, 6)
 #define FILTER_OUTPUT          GPIO_PIN(PORT_A, 7)
+/** @} */
+
+/**
+ * @name CPU clock scale for mega-xplained
+ *
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */
 
 /**

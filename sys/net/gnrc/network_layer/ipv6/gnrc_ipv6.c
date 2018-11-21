@@ -213,9 +213,11 @@ static void _dispatch_next_header(gnrc_pktsnip_t *current, gnrc_pktsnip_t *pkt,
 {
 #ifdef MODULE_GNRC_IPV6_EXT
     const bool should_dispatch_current_type = ((current->type != GNRC_NETTYPE_IPV6_EXT) ||
-                                               (current->next->type == GNRC_NETTYPE_IPV6));
+                                               (current->next->type == GNRC_NETTYPE_IPV6)) &&
+                                              (current->type != GNRC_NETTYPE_IPV6);
 #else
-    const bool should_dispatch_current_type = (current->next->type == GNRC_NETTYPE_IPV6);
+    const bool should_dispatch_current_type = (current->next->type == GNRC_NETTYPE_IPV6) &&
+                                              (current->type != GNRC_NETTYPE_IPV6);
 #endif
 
     DEBUG("ipv6: forward nh = %u to other threads\n", nh);
@@ -319,7 +321,8 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     ((gnrc_netif_hdr_t *)pkt->data)->if_pid = netif->pid;
     if (gnrc_pkt_len(pkt->next) > netif->ipv6.mtu) {
         DEBUG("ipv6: packet too big\n");
-        gnrc_pktbuf_release(pkt);
+        gnrc_icmpv6_error_pkt_too_big_send(netif->ipv6.mtu, pkt);
+        gnrc_pktbuf_release_error(pkt, EMSGSIZE);
         return;
     }
 #ifdef MODULE_NETSTATS_IPV6
@@ -389,11 +392,16 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
 
     /* check if e.g. extension header was not already marked */
     if (hdr->nh == PROTNUM_RESERVED) {
-        hdr->nh = gnrc_nettype_to_protnum(ipv6->next->type);
-
-        /* if still reserved: mark no next header */
-        if (hdr->nh == PROTNUM_RESERVED) {
+        if (ipv6->next == NULL) {
             hdr->nh = PROTNUM_IPV6_NONXT;
+        }
+        else {
+            hdr->nh = gnrc_nettype_to_protnum(ipv6->next->type);
+
+            /* if still reserved: mark no next header */
+            if (hdr->nh == PROTNUM_RESERVED) {
+                hdr->nh = PROTNUM_IPV6_NONXT;
+            }
         }
     }
 
@@ -439,7 +447,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
         }
         prev->next = payload;
         prev = payload;
-    } while (_is_ipv6_hdr(payload));
+    } while (_is_ipv6_hdr(payload) && (payload->next != NULL));
     DEBUG("ipv6: calculate checksum for upper header.\n");
     if ((res = gnrc_netreg_calc_csum(payload, ipv6)) < 0) {
         if (res != -ENOENT) {   /* if there is no checksum we are okay */
@@ -657,6 +665,12 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
         gnrc_pktbuf_release_error(pkt, EINVAL);
         return;
     }
+    if (ipv6_addr_is_unspecified(&((ipv6_hdr_t *)pkt->data)->dst)) {
+        DEBUG("ipv6: destination address is unspecified address (::), "
+              "dropping packet \n");
+        gnrc_pktbuf_release_error(pkt, EINVAL);
+        return;
+    }
     tmp_pkt = gnrc_pktbuf_start_write(pkt);
     if (tmp_pkt == NULL) {
         DEBUG("ipv6: unable to get write access to IPv6 header, dropping packet\n");
@@ -740,6 +754,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_GNRC_IPV6_WHITELIST
         if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
             DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
+            gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
             gnrc_pktbuf_release(pkt);
             return;
         }
@@ -747,6 +762,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
 #ifdef MODULE_GNRC_IPV6_BLACKLIST
         if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(pkt->data))->src)) {
             DEBUG("ipv6: Source address blacklisted, dropping packet\n");
+            gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
             gnrc_pktbuf_release(pkt);
             return;
         }
@@ -777,6 +793,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     else if (!gnrc_ipv6_whitelisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
         /* if ipv6 header already marked*/
         DEBUG("ipv6: Source address not whitelisted, dropping packet\n");
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
         gnrc_pktbuf_release(pkt);
         return;
     }
@@ -785,6 +802,7 @@ static void _receive(gnrc_pktsnip_t *pkt)
     else if (gnrc_ipv6_blacklisted(&((ipv6_hdr_t *)(ipv6->data))->src)) {
         /* if ipv6 header already marked*/
         DEBUG("ipv6: Source address blacklisted, dropping packet\n");
+        gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_PROHIB, pkt);
         gnrc_pktbuf_release(pkt);
         return;
     }
@@ -810,7 +828,9 @@ static void _receive(gnrc_pktsnip_t *pkt)
         DEBUG("ipv6: invalid payload length: %d, actual: %d, dropping packet\n",
               (int) byteorder_ntohs(hdr->len),
               (int) (gnrc_pkt_len_upto(pkt, GNRC_NETTYPE_IPV6) - sizeof(ipv6_hdr_t)));
-        gnrc_pktbuf_release(pkt);
+        gnrc_icmpv6_error_param_prob_send(ICMPV6_ERROR_PARAM_PROB_HDR_FIELD,
+                                          &(hdr->len), pkt);
+        gnrc_pktbuf_release_error(pkt, EINVAL);
         return;
     }
 
@@ -834,13 +854,20 @@ static void _receive(gnrc_pktsnip_t *pkt)
         if ((ipv6_addr_is_link_local(&(hdr->src))) || (ipv6_addr_is_link_local(&(hdr->dst)))) {
             DEBUG("ipv6: do not forward packets with link-local source or"
                   " destination address\n");
+#ifdef MODULE_GNRC_ICMPV6_ERROR
+            if (ipv6_addr_is_link_local(&(hdr->src)) &&
+                !ipv6_addr_is_link_local(&(hdr->dst))) {
+                gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_SCOPE, pkt);
+            }
+            else if (!ipv6_addr_is_multicast(&(hdr->dst))) {
+                gnrc_icmpv6_error_dst_unr_send(ICMPV6_ERROR_DST_UNR_ADDR, pkt);
+            }
+#endif
             gnrc_pktbuf_release(pkt);
             return;
         }
         /* TODO: check if receiving interface is router */
         else if (--(hdr->hl) > 0) {  /* drop packets that *reach* Hop Limit 0 */
-            gnrc_pktsnip_t *reversed_pkt = NULL, *ptr = pkt;
-
             DEBUG("ipv6: forward packet to next hop\n");
 
             /* pkt might not be writable yet, if header was given above */
@@ -856,28 +883,20 @@ static void _receive(gnrc_pktsnip_t *pkt)
             if (netif_hdr != NULL) {
                 gnrc_pktbuf_remove_snip(pkt, netif_hdr);
             }
-
-            /* reverse packet snip list order */
-            while (ptr != NULL) {
-                gnrc_pktsnip_t *next;
-                ptr = gnrc_pktbuf_start_write(ptr);     /* duplicate if not already done */
-                if (ptr == NULL) {
-                    DEBUG("ipv6: unable to get write access to packet: dropping it\n");
-                    gnrc_pktbuf_release(reversed_pkt);
-                    gnrc_pktbuf_release(pkt);
-                    return;
-                }
-                next = ptr->next;
-                ptr->next = reversed_pkt;
-                reversed_pkt = ptr;
-                ptr = next;
+            pkt = gnrc_pktbuf_reverse_snips(pkt);
+            if (pkt != NULL) {
+                _send(pkt, false);
             }
-            _send(reversed_pkt, false);
+            else {
+                DEBUG("ipv6: unable to reverse pkt from receive order to send "
+                      "order; dropping it\n");
+            }
             return;
         }
         else {
             DEBUG("ipv6: hop limit reached 0: drop packet\n");
-            gnrc_pktbuf_release(pkt);
+            gnrc_icmpv6_error_time_exc_send(ICMPV6_ERROR_TIME_EXC_HL, pkt);
+            gnrc_pktbuf_release_error(pkt, ETIMEDOUT);
             return;
         }
 
@@ -907,7 +926,10 @@ static void _decapsulate(gnrc_pktsnip_t *pkt)
 
     pkt->type = GNRC_NETTYPE_IPV6;
 
-    _receive(pkt);
+    if (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6,
+                                     GNRC_NETREG_DEMUX_CTX_ALL, pkt) == 0) {
+        gnrc_pktbuf_release(pkt);
+    }
 }
 
 /** @} */

@@ -120,6 +120,20 @@ uint8_t fmt_hex_byte(const char *hex);
 size_t fmt_hex_bytes(uint8_t *out, const char *hex);
 
 /**
+ * @brief   Convert a uint16 value to hex string.
+ *
+ * Will write 4 bytes to @p out.
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out]  out  Pointer to output buffer, or NULL
+ * @param[in]   val  Value to convert
+ *
+ * @return      4
+ */
+size_t fmt_u16_hex(char *out, uint16_t val);
+
+/**
  * @brief Convert a uint32 value to hex string.
  *
  * Will write 8 bytes to @p out.
@@ -297,6 +311,19 @@ size_t fmt_s32_dfp(char *out, int32_t val, int fp_digits);
 size_t fmt_float(char *out, float f, unsigned precision);
 
 /**
+ * @brief   Copy @p in char to string (without terminating '\0')
+ *
+ * If @p out is NULL, will only return the number of bytes that would have
+ * been written.
+ *
+ * @param[out]  out     string to write to (or NULL)
+ * @param[in]   c       char value to append
+ *
+ * @return      nr of bytes the function did or would write to out
+ */
+size_t fmt_char(char *out, char c);
+
+/**
  * @brief Count characters until '\0' (exclusive) in @p str
  *
  * @param[in]   str  Pointer to string
@@ -330,6 +357,14 @@ size_t fmt_strnlen(const char *str, size_t maxlen);
 size_t fmt_str(char *out, const char *str);
 
 /**
+ * @brief   Copy null-terminated string to a lowercase string (excluding terminating \0)
+ *
+ * @param[out]  out     Pointer to output buffer, or NULL
+ * @param[in]   str     Pointer to null-terminated source string
+ */
+size_t fmt_to_lower(char *out, const char *str);
+
+/**
  * @brief Convert digits to uint32
  *
  * Will convert up to @p n digits. Stops at any non-digit or '\0' character.
@@ -340,6 +375,18 @@ size_t fmt_str(char *out, const char *str);
  * @return      converted uint32_t value
  */
 uint32_t scn_u32_dec(const char *str, size_t n);
+
+/**
+ * @brief Convert hexadecimal characters to uin32_t
+ *
+ * Will convert up to @p n char. Stop at any non-hexadecimal or '\0' character
+ *
+ * @param[in]   str Pointer to tring to read from
+ * @param[in]   n   Maximum number of characters to consider
+ *
+ * @return  converted uint32_t value
+ */
+uint32_t scn_u32_hex(const char *str, size_t n);
 
 /**
  * @brief Print string to stdout

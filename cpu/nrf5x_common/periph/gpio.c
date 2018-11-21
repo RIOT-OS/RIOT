@@ -39,12 +39,12 @@
  * @brief   Place to store the interrupt context
  */
 static gpio_isr_ctx_t exti_chan;
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 /**
  * @brief   Get the port's base address
  */
-static inline NRF_GPIO_Type* port(gpio_t pin)
+static inline NRF_GPIO_Type *port(gpio_t pin)
 {
 #if (CPU_FAM_NRF51)
     (void) pin;
@@ -57,6 +57,18 @@ static inline NRF_GPIO_Type* port(gpio_t pin)
 #endif
 }
 
+/**
+ * @brief   Get a pin's offset
+ */
+static inline int pin_num(gpio_t pin)
+{
+#ifdef CPU_MODEL_NRF52840XXAA
+    return (pin & PIN_MASK);
+#else
+    return (int)pin;
+#endif
+}
+
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
     switch (mode) {
@@ -65,7 +77,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
         case GPIO_IN_PU:
         case GPIO_OUT:
             /* configure pin direction, input buffer and pull resistor state */
-            port(pin)->PIN_CNF[pin] = mode;
+            port(pin)->PIN_CNF[pin_num(pin)] = mode;
             break;
         default:
             return -1;
@@ -76,35 +88,36 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
 int gpio_read(gpio_t pin)
 {
-    if (port(pin)->DIR & (1 << pin)) {
-        return (port(pin)->OUT & (1 << pin)) ? 1 : 0;
+    if (port(pin)->DIR & (1 << pin_num(pin))) {
+        return (port(pin)->OUT & (1 << pin_num(pin))) ? 1 : 0;
     }
     else {
-        return (port(pin)->IN & (1 << pin)) ? 1 : 0;
+        return (port(pin)->IN & (1 << pin_num(pin))) ? 1 : 0;
     }
 }
 
 void gpio_set(gpio_t pin)
 {
-    port(pin)->OUTSET = (1 << pin);
+    port(pin)->OUTSET = (1 << pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
-    port(pin)->OUTCLR = (1 << pin);
+    port(pin)->OUTCLR = (1 << pin_num(pin));
 }
 
 void gpio_toggle(gpio_t pin)
 {
-    port(pin)->OUT ^= (1 << pin);
+    port(pin)->OUT ^= (1 << pin_num(pin));
 }
 
 void gpio_write(gpio_t pin, int value)
 {
     if (value) {
-        port(pin)->OUTSET = (1 << pin);
-    } else {
-        port(pin)->OUTCLR = (1 << pin);
+        port(pin)->OUTSET = (1 << pin_num(pin));
+    }
+    else {
+        port(pin)->OUTCLR = (1 << pin_num(pin));
     }
 }
 
@@ -123,7 +136,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     NVIC_EnableIRQ(GPIOTE_IRQn);
     /* configure the GPIOTE channel: set even mode, pin and active flank */
     NRF_GPIOTE->CONFIG[0] = (GPIOTE_CONFIG_MODE_Event |
-                             (pin << GPIOTE_CONFIG_PSEL_Pos) |
+                             (pin_num(pin) << GPIOTE_CONFIG_PSEL_Pos) |
 #ifdef CPU_MODEL_NRF52840XXAA
                              ((pin & PORT_BIT) << 8) |
 #endif
@@ -153,4 +166,4 @@ void isr_gpiote(void)
     }
     cortexm_isr_end();
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */

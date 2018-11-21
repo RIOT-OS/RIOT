@@ -51,7 +51,8 @@ int main(void)
         my9221_set_led(&dev, i, MY9221_LED_OFF);
     }
     xtimer_usleep(TEST_WAIT);
-    for (unsigned i=dev.params.leds; i > 0 ; --i) {
+    for (unsigned j=dev.params.leds; j > 0 ; --j) {
+        unsigned i = j-1;
         my9221_set_led(&dev, i, MY9221_LED_ON);
         xtimer_usleep(TEST_WAIT);
         my9221_set_led(&dev, i, MY9221_LED_OFF);

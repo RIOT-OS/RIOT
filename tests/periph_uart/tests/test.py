@@ -17,7 +17,7 @@ import random
 import string
 
 from periph_uart_if import PeriphUartIf
-from if_lib import bpt_if
+from if_lib import PhilipIf
 
 
 def kwexpect(val1, val2, level="WARN"):
@@ -250,7 +250,7 @@ def main():
             raise ValueError('Invalid log level: %s' % loglevel)
         logging.basicConfig(level=loglevel)
 
-    bpt = bpt_if.BptIf(port=args.bpt_port)
+    bpt = PhilipIf(port=args.bpt_port)
     uart = PeriphUartIf(port=args.dut_port)
 
     print('Starting Test periph_uart')

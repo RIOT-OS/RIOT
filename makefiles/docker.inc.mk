@@ -83,6 +83,17 @@ DOCKER_OVERRIDE_CMDLINE := $(strip $(DOCKER_OVERRIDE_CMDLINE))
 # Overwrite if you want to use `docker` with sudo
 DOCKER ?= docker
 
+# Mounted volumes and exported environment variables
+
+# Add GIT_CACHE_DIR if the directory exists
+DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-v $(GIT_CACHE_DIR):$(DOCKER_BUILD_ROOT)/gitcache)
+DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e GIT_CACHE_DIR=$(DOCKER_BUILD_ROOT)/gitcache)
+
+# Handle worktree by mounting the git common dir in the same location
+_is_git_worktree = $(shell grep '^gitdir: ' $(RIOTBASE)/.git 2>/dev/null)
+GIT_WORKTREE_COMMONDIR = $(shell git rev-parse --git-common-dir)
+DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):$(GIT_WORKTREE_COMMONDIR))
+
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
 # We do not push the regular $(MAKECMDGOALS) to the container's make command in
 # order to only perform building inside the container and defer executing any
@@ -105,6 +116,7 @@ DOCKER ?= docker
 	    -e 'RIOTBOARD=$(DOCKER_BUILD_ROOT)/riotboard' \
 	    -e 'RIOTMAKE=$(DOCKER_BUILD_ROOT)/riotmake' \
 	    -e 'RIOTPROJECT=$(DOCKER_BUILD_ROOT)/riotproject' \
+	    $(DOCKER_VOLUMES_AND_ENV) \
 	    $(DOCKER_ENVIRONMENT_CMDLINE) \
 	    -w '$(DOCKER_BUILD_ROOT)/riotproject/$(BUILDRELPATH)' \
 	    '$(DOCKER_IMAGE)' make $(DOCKER_MAKECMDGOALS) $(DOCKER_OVERRIDE_CMDLINE)

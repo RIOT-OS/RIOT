@@ -20,6 +20,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              chronos \
                              ek-lm4f120xl \
                              feather-m0 \
+                             firefly \
                              ikea-tradfri \
                              limifrog-v1 maple-mini \
                              lobaro-lorabox \
@@ -59,6 +60,7 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon \
                              saml21-xpro \
                              samd21-xpro \
                              samr21-xpro \
+                             samr30-xpro \
                              seeeduino_arch-pro \
                              sensebox_samd21 \
                              slstk3401a \
@@ -108,6 +110,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        ek-lm4f120xl \
                        f4vi1 \
                        feather-m0 \
+                       firefly \
                        fox \
                        frdm-k22f \
                        frdm-k64f \
@@ -167,6 +170,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        samd21-xpro \
                        saml21-xpro \
                        samr21-xpro \
+                       samr30-xpro \
                        seeeduino_arch-pro \
                        slstk3401a \
                        slstk3402a \
@@ -231,9 +235,6 @@ ifneq (, $(filter $(AVR_BOARDS), $(BOARD)))
   LARGE_STACK_TESTS += tests-qDSA
 endif
 
-LARGE_STACK_TESTS += tests-hacl
-LARGE_STACK_TESTS += tests-libcose
-LARGE_STACK_TESTS += tests-tweetnacl
 ifneq (,$(filter $(LARGE_STACK_TESTS), $(UNIT_TESTS)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF\)
 endif

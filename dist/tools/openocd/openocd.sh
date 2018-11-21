@@ -159,6 +159,30 @@ _is_binfile() {
         [[ -z "${firmware_type}" ]] && _has_bin_extension "${firmware}"; }
 }
 
+# Split bank info on different lines without the '{}'
+_split_banks() {
+    # Input:
+    #   ...
+    #   {name nrf51 base 0 size 0 bus_width 1 chip_width 1} {name nrf51 base 268439552 size 0 bus_width 1 chip_width 1}
+    #   ...
+    #
+    # Output:
+    #   name nrf51 base 0 size 0 bus_width 1 chip_width 1
+    #   name nrf51 base 268439552 size 0 bus_width 1 chip_width 1
+
+    # The following command needs specific osx handling (non gnu):
+    # * Same commands for a pattern should be on different lines
+    # * Cannot use '\n' in the replacement string
+    local sed_escaped_newline=\\$'\n'
+
+    sed -n '
+    /^{.*}$/ {
+        s/\} /\}'"${sed_escaped_newline}"'/g
+        s/[{}]//g
+        p
+    }'
+}
+
 # Outputs bank info on different lines without the '{}'
 _flash_list() {
     # Openocd output for 'flash list' is
@@ -169,7 +193,7 @@ _flash_list() {
             ${OPENOCD_ADAPTER_INIT} \
             -f '${OPENOCD_CONFIG}' \
             -c 'flash list' \
-            -c 'shutdown'" 2>&1 | sed -n '/^{.*}$/ {s/\} /\}\n/g;s/[{}]//g;p}'
+            -c 'shutdown'" 2>&1 | _split_banks
 }
 
 # Print flash address for 'bank_num' num defaults to 1

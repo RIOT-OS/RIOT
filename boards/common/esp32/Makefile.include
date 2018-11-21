@@ -1,0 +1,11 @@
+# the cpu to build for
+export CPU ?= esp32
+export CPU_MODEL ?= esp32
+
+# configure the serial interface
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# reset tool configuration
+export RESET = esptool.py --before default_reset run

@@ -172,16 +172,16 @@ static inline void gnrc_pktbuf_release(gnrc_pktsnip_t *pkt)
 }
 
 /**
- * @brief   Must be called once before there is a write operation in a thread.
+ * @brief   Must be called once before there is a write operation on a
+ *          [packet snip](@ref gnrc_pktsnip_t) in a thread.
  *
- * @details This function duplicates a packet in the packet buffer if
+ * @details This function duplicates a packet snip in the packet buffer (both
+ *          the instance of the gnrc_pktsnip_t and its data) if
  *          gnrc_pktsnip_t::users of @p pkt > 1.
  *
- * @note    Do *not* call this function in a thread twice on the same packet.
+ * @param[in] pkt   The packet snip you want to write into.
  *
- * @param[in] pkt   The packet you want to write into.
- *
- * @return  The (new) pointer to the pkt.
+ * @return  The (new) pointer to the packet snip.
  * @return  NULL, if gnrc_pktsnip_t::users of @p pkt > 1 and if there is not
  *          enough space in the packet buffer.
  */
@@ -226,6 +226,24 @@ gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *sni
 gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *old, gnrc_pktsnip_t *add);
 
 /**
+ * @brief   Reverses snip order of a packet in a write-protected manner.
+ *
+ * This can be used to change the send/receive order of a packet (see
+ * @ref gnrc_pktsnip_t)
+ *
+ * @note    @p pkt is released on failure.
+ *
+ * @param[in] pkt   A packet. When this function fails (due to a full packet
+ *                  packet buffer) @p pkt will be released.
+ *
+ * @return  The reversed version of @p pkt on success
+ * @return  NULL, when there is not enough space in the packet buffer to reverse
+ *          the packet in a write-protected manner. @p pkt is released in that
+ *          case.
+ */
+gnrc_pktsnip_t *gnrc_pktbuf_reverse_snips(gnrc_pktsnip_t *pkt);
+
+/**
  * @brief Duplicates pktsnip chain upto (including) a snip with the given type
  *        as a continuous snip.
  *
@@ -266,6 +284,11 @@ gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *ol
  *              +---------------------------+                      .      .
  *
  *        The original snip is keeped as is except `users` decremented.
+ *
+ * @deprecated  This function breaks the abstraction of `gnrc_pktbuf` and its
+ *              only user within the RIOT code base `gnrc_ipv6_ext` is going to
+ *              be reworked so it isn't needed anymore.
+ *              It will be removed after the 2019.04 release.
  *
  * @param[in,out] pkt   The snip to duplicate.
  * @param[in]     type  The type of snip to stop duplication.

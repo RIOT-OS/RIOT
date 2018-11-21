@@ -130,6 +130,12 @@ enum {
 #define GNRC_NETIF_FLAGS_MAC_RX_STARTED            (0x00008000U)
 /** @} */
 
+/**
+ * @brief   Network interface is configured in raw mode
+ */
+#define GNRC_NETIF_FLAGS_RAWMODE                   (0x00010000U)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

@@ -6,4 +6,4 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 
--include $(RIOTCPU)/stm32l1/Makefile.features
+include $(RIOTCPU)/stm32l1/Makefile.features

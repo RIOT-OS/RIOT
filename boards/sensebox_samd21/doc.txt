@@ -53,4 +53,14 @@ The pin configuration for the mSD-Bee module radio on the
 *boards/sensebox_samd21/include/sdcard_spi_params.h** file assumes that it will be
 connected to the XBEE2 port. If a different configuraion is needed please
 modify this file.
+
+#### Limitations
+There is only one interrupt pin on the XBEE headers. This means that interrupt
+pins DIO0 and DIO1 from the LoRa Bee are multiplexed through an OR gate.
+
+This has the following limitations:
+
+- FSK mode is not possible
+- The interrupt pins can have different configurations, so caution is required
+when making changes.
  */

@@ -28,6 +28,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "cpu.h"
+#include "bitarithm.h"
 #include "bit.h"
 #include "periph/gpio.h"
 
@@ -115,7 +116,7 @@ static isr_ctx_t isr_ctx[CTX_NUMOF];
 static uint32_t isr_map[ISR_MAP_SIZE];
 
 static const uint8_t port_irqs[] = PORT_IRQS;
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 static inline PORT_Type *port(gpio_t pin)
 {
@@ -176,7 +177,7 @@ static void ctx_clear(int port, int pin)
     int ctx = get_ctx(port, pin);
     write_map(port, pin, ctx);
 }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 static inline void clk_en(gpio_t pin)
 {
@@ -211,7 +212,7 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
      * need to free its interrupt context. We to this only after we
      * re-configured the pin in case an event is happening just in between... */
     uint32_t isr_state = port(pin)->PCR[pin_num(pin)];
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
     /* set new PCR value */
     port(pin)->PCR[pin_num(pin)] = pcr;
@@ -221,7 +222,7 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
     if (isr_state & PORT_PCR_IRQC_MASK) {
         ctx_clear(port_num(pin), pin_num(pin));
     }
-#endif
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 }
 
 int gpio_read(gpio_t pin)
@@ -308,20 +309,27 @@ static inline void irq_handler(PORT_Type *port, int port_num)
     /* take interrupt flags only from pins which interrupt is enabled */
     uint32_t status = port->ISFR;
 
-    for (int i = 0; i < 32; i++) {
-        if ((status & (1u << i)) && (port->PCR[i] & PORT_PCR_IRQC_MASK)) {
-            port->ISFR = (1u << i);
-            int ctx = get_ctx(port_num, i);
-            isr_ctx[ctx].cb(isr_ctx[ctx].arg);
+    while (status) {
+        /* get position of first bit set in status */
+        unsigned pin = bitarithm_lsb(status);
+        /* clear it */
+        status &= ~(1 << pin);
+        if (port->PCR[pin] & PORT_PCR_IRQC_MASK) {
+            port->ISFR = (1u << pin);
+            int ctx = get_ctx(port_num, pin);
+            gpio_cb_t cb = isr_ctx[ctx].cb;
+            if (cb) {
+                cb(isr_ctx[ctx].arg);
+            }
         }
     }
-    cortexm_isr_end();
 }
 
 #ifdef PORTA_BASE
 void isr_porta(void)
 {
     irq_handler(PORTA, 0);
+    cortexm_isr_end();
 }
 #endif /* PORTA_BASE */
 
@@ -329,6 +337,7 @@ void isr_porta(void)
 void isr_portb(void)
 {
     irq_handler(PORTB, 1);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_B */
 
@@ -336,6 +345,7 @@ void isr_portb(void)
 void isr_portc(void)
 {
     irq_handler(PORTC, 2);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_C */
 
@@ -343,6 +353,7 @@ void isr_portc(void)
 void isr_portd(void)
 {
     irq_handler(PORTD, 3);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_D */
 
@@ -350,6 +361,7 @@ void isr_portd(void)
 void isr_porte(void)
 {
     irq_handler(PORTE, 4);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_E */
 
@@ -357,6 +369,7 @@ void isr_porte(void)
 void isr_portf(void)
 {
     irq_handler(PORTF, 5);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_F */
 
@@ -364,6 +377,7 @@ void isr_portf(void)
 void isr_portg(void)
 {
     irq_handler(PORTG, 6);
+    cortexm_isr_end();
 }
 #endif /* ISR_PORT_G */
 
@@ -373,6 +387,7 @@ void isr_portb_portc(void)
 {
     irq_handler(PORTB, 1);
     irq_handler(PORTC, 2);
+    cortexm_isr_end();
 }
 #endif
 #endif /* MODULE_PERIPH_GPIO_IRQ */

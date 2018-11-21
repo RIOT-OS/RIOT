@@ -1,0 +1,173 @@
+/*
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    boards_esp32_wroom-32 Generic ESP32-WROOM-32 boards
+ * @ingroup     boards_esp32
+ * @brief       Support for generic ESP32-WROOM-32 boards
+ * @author      Gunar Schorcht <gunar@schorcht.net>
+
+## <a name="toc"> Table of Contents </a>
+
+1. [Overview](#overview)
+2. [Hardware](#hardware)
+    1. [MCU](#mcu)
+    2. [Board Configuration](#board_configuration)
+    3. [Board Pinout](#pinout)
+    4. [Optional Hardware Configurations](#optional_hardware)
+3. [Flashing the Device](#flashing)
+
+## <a name="overview"> Overview </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+This board definition covers not just a single board, but rather a large set of generic boards that use an ESP32-WROOM-32 module and simply break out all GPIOs to external pads without having any special hardware or interfaces on-board. Examples are Espressif's ESP32-DevKitC or NodeMCU-ESP32S and a large number of clones.
+
+\htmlonly<style>div.image img[src="https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-devkitc-functional-overview1.jpg"]{width:600px;}</style>\endhtmlonly
+\image html "https://docs.espressif.com/projects/esp-idf/en/latest/_images/esp32-devkitc-functional-overview1.jpg" "Espressif ESP32-DevKitC V4"
+
+## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+This section describes
+
+- the [MCU](#mcu),
+- the default [board configuration](#board_configuration),
+- [optional hardware configurations](#optional_hardware),
+- the [board pinout](#pinout).
+
+### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Most features of ESP32 boards are provided by the ESP32 SoC. The following table summarizes these features and gives an overview of which of these features are supported by RIOT. For detailed information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
+
+<center>
+MCU         | ESP32     | Supported by RIOT
+------------|-----------|------------------
+Vendor      | Espressif | |
+Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
+FPU         | yes (ULP - Ultra low power co-processor) | no
+RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
+ROM         | 520 kByte | yes
+Flash       | 512 kByte ... 16 MByte |  yes
+Frequency   | 240 MHz, 160 MHz, 80 MHz | yes
+Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> no
+Timers      | 4 x 64 bit | yes
+ADCs        | 2 x SAR-ADC with up to 18 x 12 bit channels total | yes
+DACs        | 2 x DAC with 8 bit | yes
+GPIOs       | 34 (6 of them are only inputs) | yes
+I2Cs        | 2 | yes
+SPIs        | 4 | yes
+UARTs       | 3 | yes
+WiFi        | IEEE 802.11 b/g/n built in | yes
+Bluetooth   | v4.2 BR/EDR and BLE | no
+Ethernet    | MAC interface with dedicated DMA and IEEE 1588 support | yes
+CAN         | version 2.0 | no
+IR          | up to 8 channels TX/RX | no
+Motor PWM   | 2 devices x 6 channels | yes
+LED PWM     | 16 channels | no
+Crypto      | Hardware acceleration of AES, SHA-2, RSA, ECC, RNG | no
+Vcc         | 2.5 - 3.6 V | |
+Documents   | [Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) <br> [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf) | |
+</center>
+
+### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Generic ESP32-WROOM-32 boards do not have special hardware on board and all GPIOs are simply broken out for flexibility. Therefore, the board configuration is the most flexible one with provides:
+
+18 x ADC channels at maximum
+2 x DAC channels at maximum
+2 x SPI at maximum
+1 x I2C at maximum
+2 x UART
+
+Since all GPIOs have broken out, GPIOs can be used for different purposes in different applications. For flexibility, GPIOs can be listed in various peripheral configurations. For example, GPIO13 is used in the ADC channel definition and the definition of the MOSI signal of SPI_DEV(0).
+
+This is possible because GPIOs are only used for a specific peripheral interface when
+
+- the corresponding peripheral module is used, eg. periph_i2c, or
+- a corresponding init function is called z. adc_init, dac_init and pwm_init or
+- The corresponding peripheral interface is used for the first time, eg. spi_aqcuire.
+
+That is, the purpose for which a GPIO is used depends on which module or function is used first.
+
+For example, if module periph_i2c is not used, the GPIOs listed in I2C configuration can be used for the other purposes.
+
+The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by \ref esp32_app_spec_conf "application-specific configurations".
+
+<center>
+\anchor esp32_wroom_32_table_board_configuration
+Function        | GPIOs  | Remarks |Configuration
+:---------------|:-------|:--------|:----------------------------------
+BUTTON0         | GPIO0  | | |
+ADC             | GPIO0, GPIO2, GPIO4, GPIO12, GPIO13, <br> GPIO14, GPIO15, GPIO25, GPIO26, GPIO27, <br> GPIO32, GPIO33, GPIO34, GPIO35, GPIO36, <br> GPIO39 | | see \ref esp32_adc_channels "ADC Channels"
+DAC             | GPIO25, GPIO26 | | \ref esp32_dac_channels "refer"
+PWM_DEV(0)      | GPIO0, GPIO2, GPIO4, GPIO16, GPIO17 | - | \ref esp32_pwm_channels "DAC Channels"
+PWM_DEV(1)      | GPIO27, GPIO32, GPIO33 | - | \ref esp32_pwm_channels "PWM Channels"
+I2C_DEV(0):SDA  | GPIO21 | | \ref esp32_i2c_interfaces "I2C Interfaces"
+I2C_DEV(0):SCL  | GPIO22 | | \ref esp32_i2c_interfaces "I2C Interfaces"
+SPI_DEV(0):CLK  | GPIO18 | VSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0):MISO | GPIO19 | VSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0):MOSI | GPIO23 | VSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(0):CS0  | GPIO5  | VSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(1):CLK  | GPIO14 | HSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(1):MISO | GPIO12 | HSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(1):MOSI | GPIO13 | HSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
+SPI_DEV(1):CS0  | GPIO15 | HSPI is used | \ref esp32_spi_interfaces "SPI Interfaces"
+UART_DEV(0):TxD | GPIO1  | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
+UART_DEV(0):RxD | GPIO3  | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
+UART_DEV(1):TxD | GPIO10 | not available in **qout** and **qio** flash mode | \ref esp32_uart_interfaces "UART interfaces"
+UART_DEV(1):RxD | GPIO9  | not available in **qout** and **qio** flash mode | \ref esp32_uart_interfaces "UART interfaces"
+</center>
+
+@note
+- The configuration of ADC channels contains all ESP32 GPIOs that can be used as ADC channels.
+- The configuration of DAC channels contains all ESP32 GPIOs that can be used as DAC channels.
+- GPIO9 and GIOP10 can only be used in **dout** and **dio** \ref esp32_flash_modes "flash modes".
+
+For detailed information about the configuration of ESP32 boards, see section \ref esp32_comm_periph "Common Peripherals".
+
+### <a name="optional_hardware"> Optional Hardware Configurations </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_app_spec_conf "application-specific configuration" to use such modules:
+
+```
+#ifdef BOARD_ESP32_WROOM-32
+
+#if MODULE_MRF24J40
+#define MRF24J40_PARAM_CS       GPIO16      /* MRF24J40 CS signal    */
+#define MRF24J40_PARAM_RESET    GPIO17      /* MRF24J40 RESET signal */
+#define MRF24J40_PARAM_INT      GPIO34      /* MRF24J40 INT signal   */
+#endif
+
+#if MODULE_ENC28J80
+#define ENC28J80_PARAM_CS       GPIO32      /* ENC28J80 CS signal    */
+#define ENC28J80_PARAM_RESET    GPIO33      /* ENC28J80 RESET signal */
+#define ENC28J80_PARAM_INT      GPIO35      /* ENC28J80 INT signal   */
+endif
+
+#endif
+```
+For other parameters, the default values defined by the drivers can be used.
+
+@note The **RESET** signal of MRF24J40 and ENC28J60 based modules can also be connected to the **RST** pin of the board (see \ref esp32_wroom_32_pinout "pinout") to keep the configured GPIO free for other purposes.
+
+### <a name="pinout"> Board Pinout </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The following figure shows the pinout of the defined default configuration for the EPS32-DevKitC board as an example of generic ESP32-WROOM-32 boards. The light green GPIOs are not used by configured on-board hardware components and can be used for any purpose. However, if optional off-board hardware modules are used, these GPIOs may also be occupied, see \ref esp32_wroom_32_table_board_configuration "optional functions" in table board configuration.
+
+The corresponding board schematics can be found her [here](https://dl.espressif.com/dl/schematics/esp32_devkitc_v4-sch-20180607a.pdf)
+
+\anchor esp32_wroom_32_pinout
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/ESP32-WROOM-32_pinouts.png?inline=false" "EPS32-DevKitC V4 Pinout"
+
+## <a name="flashing"> Flashing the Device </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Flashing RIOT is quite easy. The board has a Micro-USB connector with reset/boot/flash logic. Just connect the board to your host computer and type using the programming port:
+```
+make flash BOARD=esp32-wroom-32 ...
+```
+For detailed information about ESP32 as well as configuring and compiling RIOT for ESP32 boards, see \ref esp32_riot.
+
+ */

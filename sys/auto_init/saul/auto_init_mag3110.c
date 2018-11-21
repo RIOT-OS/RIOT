@@ -21,6 +21,7 @@
 
 #ifdef MODULE_MAG3110
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 

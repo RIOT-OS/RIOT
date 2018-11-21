@@ -33,133 +33,74 @@
 extern "C" {
 #endif
 
-/**
- * @brief   Builds an ICMPv6 destination unreachable message for sending.
- *
- * @param[in] code      The code for the message @see net/icmpv6.h.
- * @param[in] orig_pkt  The invoking packet.
- *
- * @return  The destination unreachable message on success.
- * @return  NULL, on failure.
- */
-gnrc_pktsnip_t *gnrc_icmpv6_error_dst_unr_build(uint8_t code, gnrc_pktsnip_t *orig_pkt);
-
-/**
- * @brief   Builds an ICMPv6 packet too big message for sending.
- *
- * @param[in] mtu       The maximum transission unit of the next-hop link.
- * @param[in] orig_pkt  The invoking packet.
- *
- * @return  The packet too big message on success.
- * @return  NULL, on failure.
- */
-gnrc_pktsnip_t *gnrc_icmpv6_error_pkt_too_big_build(uint32_t mtu, gnrc_pktsnip_t *orig_pkt);
-
-/**
- * @brief   Builds an ICMPv6 time exceeded message for sending.
- *
- * @param[in] code      The code for the message @see net/icmpv6.h.
- * @param[in] orig_pkt  The invoking packet.
- *
- * @return  The time exceeded message on success.
- * @return  NULL, on failure.
- */
-gnrc_pktsnip_t *gnrc_icmpv6_error_time_exc_build(uint8_t code, gnrc_pktsnip_t *orig_pkt);
-
-/**
- * @brief   Builds an ICMPv6 parameter problem message for sending.
- *
- * @param[in] code      The code for the message @see net/icmpv6.h.
- * @param[in] ptr       Pointer to the errorneous octet in @p orig_pkt.
- * @param[in] orig_pkt  The invoking packet.
- *
- * @return  The parameter problem message on success.
- * @return  NULL, on failure.
- */
-gnrc_pktsnip_t *gnrc_icmpv6_error_param_prob_build(uint8_t code, void *ptr,
-                                                   gnrc_pktsnip_t *orig_pkt);
-
+#if defined(MODULE_GNRC_ICMPV6_ERROR) || defined(DOXYGEN)
 /**
  * @brief   Sends an ICMPv6 destination unreachable message for sending.
  *
- * @param[in] code      The code for the message @see net/icmpv6.h.
+ * @pre     @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ *
+ * @note    Won't send if source address of @p orig_pkt is unspecified or
+ *          multicast
+ *
+ * @param[in] code      The [code for the message](@ref net_icmpv6_error_dst_unr_codes).
  * @param[in] orig_pkt  The invoking packet.
  */
-static inline void gnrc_icmpv6_error_dst_unr_send(uint8_t code, gnrc_pktsnip_t *orig_pkt)
-{
-    gnrc_pktsnip_t *pkt = gnrc_icmpv6_error_dst_unr_build(code, orig_pkt);
-
-    if (pkt != NULL) {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
-    }
-#ifdef MODULE_GNRC_PKTBUF
-    gnrc_pktbuf_release_error(orig_pkt, EHOSTUNREACH);
-#else
-    (void)orig_pkt;
-#endif
-}
+void gnrc_icmpv6_error_dst_unr_send(uint8_t code, const gnrc_pktsnip_t *orig_pkt);
 
 /**
  * @brief   Sends an ICMPv6 packet too big message for sending.
  *
+ * @pre     @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ *
+ * @note    Won't send if source address of @p orig_pkt is unspecified or
+ *          multicast
+ *
  * @param[in] mtu       The maximum transission unit of the next-hop link.
  * @param[in] orig_pkt  The invoking packet.
  */
-static inline void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu, gnrc_pktsnip_t *orig_pkt)
-{
-    gnrc_pktsnip_t *pkt = gnrc_icmpv6_error_pkt_too_big_build(mtu, orig_pkt);
-
-    if (pkt != NULL) {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
-    }
-#ifdef MODULE_GNRC_PKTBUF
-    gnrc_pktbuf_release_error(orig_pkt, EMSGSIZE);
-#else
-    (void)orig_pkt;
-#endif
-}
+void gnrc_icmpv6_error_pkt_too_big_send(uint32_t mtu,
+                                        const gnrc_pktsnip_t *orig_pkt);
 
 /**
  * @brief   Sends an ICMPv6 time exceeded message for sending.
  *
- * @param[in] code      The code for the message @see net/icmpv6.h.
+ * @pre     @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ *
+ * @note    Won't send if source address of @p orig_pkt is unspecified or
+ *          multicast
+ *
+ * @param[in] code      The [code for the message](@ref net_icmpv6_error_time_exc_codes).
  * @param[in] orig_pkt  The invoking packet.
  */
-static inline void gnrc_icmpv6_error_time_exc_send(uint8_t code, gnrc_pktsnip_t *orig_pkt)
-{
-    gnrc_pktsnip_t *pkt = gnrc_icmpv6_error_time_exc_build(code, orig_pkt);
-
-    if (pkt != NULL) {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
-    }
-#ifdef MODULE_GNRC_PKTBUF
-    gnrc_pktbuf_release_error(orig_pkt, ETIMEDOUT);
-#else
-    (void)orig_pkt;
-#endif
-}
+void gnrc_icmpv6_error_time_exc_send(uint8_t code,
+                                     const gnrc_pktsnip_t *orig_pkt);
 
 /**
  * @brief   Sends an ICMPv6 parameter problem message for sending.
  *
- * @param[in] code      The code for the message @see net/icmpv6.h.
+ * @pre     @p orig_pkt is in receive order.
+ * @pre     @p orig_pkt contains a packet snip of type @ref GNRC_NETTYPE_IPV6
+ *
+ * @note    Won't send if source address of @p orig_pkt is unspecified or
+ *          multicast
+ *
+ * @param[in] code      The [code for the message](@ref net_icmpv6_error_param_prob_codes).
  * @param[in] ptr       Pointer to the errorneous octet in @p orig_pkt.
  * @param[in] orig_pkt  The invoking packet.
  */
-static inline void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
-                                                     gnrc_pktsnip_t *orig_pkt)
-{
-    gnrc_pktsnip_t *pkt = gnrc_icmpv6_error_param_prob_build(code, ptr, orig_pkt);
-
-    if (pkt != NULL) {
-        gnrc_netapi_send(gnrc_ipv6_pid, pkt);
-    }
-#ifdef MODULE_GNRC_PKTBUF
-    gnrc_pktbuf_release_error(orig_pkt, EINVAL);
-#else
-    (void)orig_pkt;
-#endif
-}
+void gnrc_icmpv6_error_param_prob_send(uint8_t code, void *ptr,
+                                       const gnrc_pktsnip_t *orig_pkt);
+#else   /* defined(MODULE_GNRC_ICMPV6_ERROR) || defined(DOXYGEN) */
+/* NOPs to make the usage code more readable */
+#define gnrc_icmpv6_error_dst_unr_send(code, orig_pkt) \
+        (void)code; (void)orig_pkt
+#define gnrc_icmpv6_error_pkt_too_big_send(mtu, orig_pkt) \
+        (void)mtu; (void)orig_pkt
+#define gnrc_icmpv6_error_time_exc_send(code, orig_pkt) \
+        (void)code; (void)orig_pkt
+#define gnrc_icmpv6_error_param_prob_send(code, ptr, orig_pkt) \
+        (void)code; (void)ptr, (void)orig_pkt
+#endif  /* defined(MODULE_GNRC_ICMPV6_ERROR) || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

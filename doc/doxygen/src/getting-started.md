@@ -39,7 +39,7 @@ simplest way to compile and link an application with RIOT, is to set up a
 Makefile providing at least the following variables:
 
  * `APPLICATION`: should contain the (unique) name of your application
- * `BOARD`: specifies the platform the application should be build for by
+ * `BOARD`: specifies the platform the application should be built for by
    default
  * `RIOTBASE`: specifies the path to your copy of the RIOT repository (note,
    that you may want to use `$(CURDIR)` here, to give a relative path)

@@ -17,9 +17,9 @@
  */
 
 /**
- * @defgroup    sys_ubjson Universal Binary JSON
- * @ingroup     sys
- * @brief       A library to read and write UBJSON serialized data.
+ * @defgroup sys_ubjson  Universal Binary JSON library
+ * @ingroup  sys_serialization
+ * @brief    Provides a library to read and write UBJSON serialized data
  * @{
  *
  * @file
@@ -36,11 +36,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#if defined(MODULE_MSP430_COMMON)
-#   include "msp430_types.h"
-#elif !defined(__linux__)
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {

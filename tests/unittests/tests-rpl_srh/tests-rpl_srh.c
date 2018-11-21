@@ -19,6 +19,7 @@
 #include "net/ipv6/ext.h"
 #include "net/ipv6/hdr.h"
 #include "net/gnrc/rpl/srh.h"
+#include "net/gnrc/ipv6/ext/rh.h"
 
 #include "unittests-constants.h"
 #include "tests-rpl_srh.h"
@@ -61,13 +62,13 @@ static void test_rpl_srh_nexthop_no_prefix_elided(void)
 
     /* first hop */
     res = gnrc_rpl_srh_process(&hdr, srh);
-    TEST_ASSERT_EQUAL_INT(res, EXT_RH_CODE_FORWARD);
+    TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_FORWARDED);
     TEST_ASSERT_EQUAL_INT(SRH_SEG_LEFT - 1, srh->seg_left);
     TEST_ASSERT(ipv6_addr_equal(&hdr.dst, &expected1));
 
     /* second hop */
     res = gnrc_rpl_srh_process(&hdr, srh);
-    TEST_ASSERT_EQUAL_INT(res, EXT_RH_CODE_FORWARD);
+    TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_FORWARDED);
     TEST_ASSERT_EQUAL_INT(SRH_SEG_LEFT - 2, srh->seg_left);
     TEST_ASSERT(ipv6_addr_equal(&hdr.dst, &expected2));
 }
@@ -94,13 +95,13 @@ static void test_rpl_srh_nexthop_prefix_elided(void)
 
     /* first hop */
     res = gnrc_rpl_srh_process(&hdr, srh);
-    TEST_ASSERT_EQUAL_INT(res, EXT_RH_CODE_FORWARD);
+    TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_FORWARDED);
     TEST_ASSERT_EQUAL_INT(SRH_SEG_LEFT - 1, srh->seg_left);
     TEST_ASSERT(ipv6_addr_equal(&hdr.dst, &expected1));
 
     /* second hop */
     res = gnrc_rpl_srh_process(&hdr, srh);
-    TEST_ASSERT_EQUAL_INT(res, EXT_RH_CODE_FORWARD);
+    TEST_ASSERT_EQUAL_INT(res, GNRC_IPV6_EXT_RH_FORWARDED);
     TEST_ASSERT_EQUAL_INT(SRH_SEG_LEFT - 2, srh->seg_left);
     TEST_ASSERT(ipv6_addr_equal(&hdr.dst, &expected2));
 }

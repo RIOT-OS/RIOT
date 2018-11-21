@@ -1,0 +1,27 @@
+From 0da72cf690b0d0f08fbd7df07b03a9b45e0e50a3 Mon Sep 17 00:00:00 2001
+From: Jose Alamos <jose.alamos@haw-hamburg.de>
+Date: Fri, 5 Oct 2018 15:56:03 +0200
+Subject: [PATCH] fix macro conflict
+
+---
+ include/openthread/types.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/openthread/types.h b/include/openthread/types.h
+index f84a7d5e..87afe7eb 100644
+--- a/include/openthread/types.h
++++ b/include/openthread/types.h
+@@ -61,8 +61,8 @@ extern "C" {
+ #define CONTAINING_RECORD(address, type, field) \
+     ((type *)((uint8_t*)(address) - offsetof(type, field)))
+ #pragma GCC diagnostic pop*/
+-#define BASE 0x1
+-#define myoffsetof(s,m) (((size_t)&(((s*)BASE)->m))-BASE)
++#define _BASE 0x1
++#define myoffsetof(s,m) (((size_t)&(((s*)_BASE)->m))-_BASE)
+ #define CONTAINING_RECORD(address, type, field) \
+     ((type *)((uint8_t*)(address) - myoffsetof(type, field)))
+ #endif /* CONTAINING_RECORD */
+-- 
+2.18.0
+

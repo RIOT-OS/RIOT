@@ -150,7 +150,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 
         case GPIO_IN_PU: iomux_conf |= IOMUX_PIN_PULLUP;
                          iomux_conf |= IOMUX_PIN_PULLUP_SLEEP;
-        case GPIO_IN:    GPIO.ENABLE_OUT_CLEAR = BIT(pin);
+        case GPIO_IN:    GPIO.CONF[pin] |= GPIO_CONF_OPEN_DRAIN;
+                         GPIO.ENABLE_OUT_CLEAR = BIT(pin);
                          break;
 
         case GPIO_IN_PD: LOG_ERROR("GPIO mode GPIO_IN_PD is not supported.\n");
@@ -164,6 +165,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 static gpio_isr_ctx_t gpio_isr_ctx_table [GPIO_PIN_NUMOF] = { };
 static bool gpio_int_enabled_table [GPIO_PIN_NUMOF] = { };
 
@@ -225,6 +227,7 @@ void gpio_irq_disable (gpio_t pin)
 
     gpio_int_enabled_table [pin] = false;
 }
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 int gpio_read (gpio_t pin)
 {

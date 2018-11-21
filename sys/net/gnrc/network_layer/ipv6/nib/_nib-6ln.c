@@ -69,6 +69,16 @@ static inline uint8_t _reverse_iid(const ipv6_addr_t *dst,
             l2addr[0] = dst->u8[15];
             return sizeof(uint8_t);
 #endif  /* MODULE_CC110X */
+#ifdef MODULE_ESP_NOW
+        case NETDEV_TYPE_RAW:
+            l2addr[0] = dst->u8[8] ^ 0x02;
+            l2addr[1] = dst->u8[9];
+            l2addr[2] = dst->u8[10];
+            l2addr[3] = dst->u8[13];
+            l2addr[4] = dst->u8[14];
+            l2addr[5] = dst->u8[15];
+            return ETHERNET_ADDR_LEN;
+#endif  /* MODULE_ESP_NOW */
         default:
             (void)dst;
             (void)l2addr;

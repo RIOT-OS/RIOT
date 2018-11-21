@@ -21,6 +21,7 @@
 
 #ifdef MODULE_GROVE_LEDBAR
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 

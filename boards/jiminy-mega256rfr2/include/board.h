@@ -74,6 +74,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name   White LED light is used to signal ERROR.
+ * @{
+ */
+#define LED_PANIC           (LED_PORT |= LED2_MASK | LED1_MASK | LED0_MASK)
+/** @} */
+
+/**
  * @name xtimer configuration values
  * @{
  */
@@ -81,6 +88,40 @@ extern "C" {
 #define XTIMER_CHAN         (0)
 #define XTIMER_WIDTH        (16)
 #define XTIMER_HZ           (125000UL)
+/** @} */
+
+/**
+ * @name Indicate Watchdog cleared in bootloader an
+ *
+ * AVR CPUs need to reset the Watchdog as fast as possible.
+ * This flag indicates that the watchdog is reseted in the bootloader
+ * and that the MCUSR value is stored in register 2 (r2)
+ * @{
+ */
+#define BOOTLOADER_CLEARS_WATCHDOG_AND_PASSES_MCUSR 1
+/** @} */
+
+/**
+ * @name Indicate Watchdog cleared in bootloader an
+ *
+ * AVR CPUs need to reset the Watchdog as fast as possible.
+ * This flag indicates that the watchdog is reseted in the bootloader
+ * and that the MCUSR value is stored in register 2 (r2)
+ * @{
+ */
+#define BOOTLOADER_CLEARS_WATCHDOG_AND_PASSES_MCUSR 1
+/** @} */
+
+/**
+ * @name CPU clock scale for jiminy-megarfr256rfr2
+ *
+ * The CPU can not be used with the external xtal oscillator if the core
+ * should be put in sleep while the transceiver is in rx mode.
+ *
+ * It seems the as teh peripheral clock divider is set to 1 and this all
+ * clocks of the timer, etc run with 16MHz increasing power consumption.
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */
 
 /**

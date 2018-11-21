@@ -1,3 +1,6 @@
+# 'Makefile.include' directory, must be evaluated before other 'include'
+_riotbase := $(dir $(lastword $(MAKEFILE_LIST)))
+
 # Globally set default goal to `all`
 .DEFAULT_GOAL := all
 
@@ -5,7 +8,7 @@
 -include Makefile.local
 
 # set undefined variables
-RIOTBASE       ?= $(dir $(lastword $(MAKEFILE_LIST)))
+RIOTBASE       ?= $(_riotbase)
 CCACHE_BASEDIR ?= $(RIOTBASE)
 RIOTCPU        ?= $(RIOTBASE)/cpu
 RIOTBOARD      ?= $(RIOTBASE)/boards
@@ -14,6 +17,7 @@ RIOTPKG        ?= $(RIOTBASE)/pkg
 RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
 RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 GITCACHE       ?= $(RIOTTOOLS)/git/git-cache
+GIT_CACHE_DIR  ?= $(HOME)/.gitcache
 APPDIR         ?= $(CURDIR)
 BINDIRBASE     ?= $(APPDIR)/bin
 BINDIR         ?= $(BINDIRBASE)/$(BOARD)
@@ -65,7 +69,8 @@ endif
 MAKEOVERRIDES += $(foreach v,$(__DIRECTORY_VARIABLES),$(v)=$($(v)))
 
 # Path to the current directory relative to RIOTPROJECT
-BUILDRELPATH ?= $(CURDIR:$(RIOTPROJECT)/%=%)/
+# trailing '/' is important when RIOTPROJECT == CURDIR
+BUILDRELPATH ?= $(patsubst $(RIOTPROJECT)/%,%,$(CURDIR)/)
 
 # get host operating system
 OS := $(shell uname)
@@ -246,6 +251,13 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
+# Sanity check
+# The check is only done after 'include $(RIOTBOARD)/$(BOARD)/Makefile.include'
+# because we need to have the 'CPU' variable defined
+ifeq (,$(filter $(RIOTCPU)/$(CPU)/Makefile.features,$(MAKEFILE_LIST)))
+  $(error $$(RIOTCPU)/$$(CPU)/Makefile.features must have been included by the board / board common Makefile.features)
+endif
+
 # Assume GCC/GNU as supported toolchain if CPU's Makefile.include doesn't
 # provide this macro
 TOOLCHAINS_SUPPORTED ?= gnu
@@ -311,7 +323,7 @@ include $(RIOTMAKE)/cflags.inc.mk
 
 # make the RIOT version available to the program
 ifeq ($(origin RIOT_VERSION), undefined)
-  GIT_STRING := $(shell git --git-dir="$(RIOTBASE)/.git" describe --always --abbrev=4 --dirty=-`hostname` 2> /dev/null)
+  GIT_STRING := $(shell git --git-dir="$(RIOTBASE)/.git" describe --always --abbrev=4 2> /dev/null)
   ifneq (,$(GIT_STRING))
     GIT_BRANCH := $(shell git --git-dir="$(RIOTBASE)/.git" rev-parse --abbrev-ref HEAD)
     ifeq ($(strip $(GIT_BRANCH)),master)
@@ -345,6 +357,9 @@ $(RIOTPKG)/%/Makefile.include::
 
 $(USEPKG:%=$(RIOTPKG)/%/Makefile.include): FORCE
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
+
+# include external modules configuration
+-include $(EXTERNAL_MODULE_DIRS:%=%/Makefile.include)
 
 # Deduplicate includes without sorting them
 # see https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting

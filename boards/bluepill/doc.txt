@@ -61,12 +61,12 @@ you can flash the device with:
 
 To make use of the entire 128 KB flash, compile your application with:
 
-    $ make BOARD=bluepill CPU_MODEL=stm32f103cb
+    $ make STM32F103C8_FLASH_HACK=1 BOARD=bluepill
 
 This sets the `CPU_MODEL` make variable to `stm32f103cb`, the default
 value is `stm32f103c8`. These two CPU models basically only have one
 major difference, the latter has 128 KB flash while the former has 64
-KB.
+KB. You may also set `STM32F103C8_FLASH_HACK` as environment variable.
 
 If you want to flash a binary compiled this way you either need to
 figure out how to adjust the OpenOCD configuration to make it use 128 KB
@@ -79,6 +79,7 @@ flash or use this [stlink fork][caboStlink] which has a
 ## Connecting via Serial
 
 The default UART port used is UART2, which uses pins A2 (TX) and A3 (RX).
+To use it, configure your UART to operate at a baudrate of 115200/8N1.
 
 ## Using PWM
 

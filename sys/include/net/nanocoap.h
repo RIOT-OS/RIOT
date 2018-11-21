@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016-17 Kaspar Schleiser <kaspar@schleiser.de>
  *               2018 Freie Universität Berlin
+ *               2018 Ken Bannister <kb2ma@runbox.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,9 +9,127 @@
  */
 
 /**
- * @defgroup    net_nanocoap nanocoap small CoAP library
+ * @defgroup    net_nanocoap Nanocoap small CoAP library
  * @ingroup     net
- * @brief       Provides CoAP functionality optimized for minimal resource usage
+ * @brief       CoAP library optimized for minimal resource usage
+ *
+ * nanocoap provides a granular, low-level interface for writing CoAP messages
+ * via RIOT's sock networking API.
+ *
+ * ## Server Operation ##
+ *
+ * See the nanocoap_server example, which is built on the nanocoap_server()
+ * function. A server must define an array of coap_resource_t resources for
+ * which it responds. See the declarations of `coap_resources` and
+ * `coap_resources_numof`. The array contents must be ordered by the resource
+ * path, specifically the ASCII encoding of the path characters (digit and
+ * capital precede lower case). nanocoap provides the
+ * COAP_WELL_KNOWN_CORE_DEFAULT_HANDLER entry for `/.well-known/core`.
+ *
+ * ### Handler functions ###
+ *
+ * For each resource, you must implement a ::coap_handler_t handler function.
+ * nanocoap provides functions to help implement the handler. If the handler
+ * is called via nanocoap_server(), the response buffer provided to the handler
+ * reuses the buffer for the request. So, your handler must read the request
+ * thoroughly before writing the response.
+ *
+ * To read the request, use the coap_get_xxx() functions to read the header and
+ * options. Use the coap_opt_get_xxx() functions to read an option generically
+ * by data type. If the pkt _payload_len_ attribute is a positive value, start
+ * to read it at the _payload_ pointer attribute.
+ *
+ * If a response does not require specific CoAP options, use
+ * coap_reply_simple(). If there is a payload, it writes a Content-Format
+ * option with the provided value.
+ *
+ * For a response with additional CoAP options, start by calling
+ * coap_build_reply(). Then choose either the minimal API or the struct-based
+ * API to write the rest of the response. See the instructions in the section
+ * _Write Options and Payload_ below.
+ *
+ * ## Client Operation ##
+ *
+ * Choose either the minimal API or the struct-based API to write a request.
+ * Follow the instructions in the section _Write Options and Payload_ below.
+ *
+ * To send the message and await the response, see nanocoap_request() as well
+ * as nanocoap_get(), which additionally copies the response payload to a user
+ * supplied buffer. Finally, read the response as described above in the server
+ * _Handler functions_ section for reading a request.
+ *
+ * ## Write Options and Payload ##
+ *
+ * For both server responses and client requests, CoAP uses an Option mechanism
+ * to encode message metadata that is not required for each message. For
+ * example, the resource URI path is required only for a request, and is encoded
+ * as the Uri-Path option.
+ *
+ * nanocoap provides two APIs for writing CoAP options:
+ *
+ * - **minimal API** requires only a reference to the buffer for the message.
+ * However, the caller must provide the last option number written as well as
+ * the buffer position.
+ *
+ * - **struct-based API** uses a coap_pkt_t struct to conveniently track each
+ * option as it is written and prepare for any payload.
+ *
+ * You must use one API exclusively for a given message. For either API, the
+ * caller must write options in order by option number (see "CoAP option
+ * numbers" in [CoAP defines](group__net__coap.html)).
+ *
+ * ### Minimal API ###
+ *
+ * Before starting, ensure the CoAP header has been initialized with
+ * coap_build_hdr(). For a response, coap_build_reply() includes a call to
+ * coap_build_hdr(). Use the returned length to track the next position in the
+ * buffer to write and remaining length.
+ *
+ * Next, use the coap_opt_put_xxx() and coap_put_xxx() functions to write each
+ * option. These functions require the position in the buffer to start writing,
+ * and return the number of bytes written.
+ *
+ * If there is a payload, append a payload marker (0xFF). Then write the
+ * payload to within the maximum length remaining in the buffer.
+ *
+ * ### Struct-based API ###
+ *
+ * As with the minimal API, first ensure the CoAP header has been initialized
+ * with coap_build_hdr(). Then use coap_pkt_init() to initialize the coap_pkt_t
+ * struct.
+ *
+ * Next, use the coap_opt_add_xxx() functions to write each option, like
+ * coap_opt_add_uint(). When all options have been added, call
+ * coap_opt_finish().
+ *
+ * Finally, write any message payload at the coap_pkt_t _payload_ pointer
+ * attribute. The _payload_len_ attribute provides the available length in the
+ * buffer. The option functions keep these values current as they are used.
+ *
+ * # Create a Block-wise Response (Block2)
+ *
+ * Block-wise is a CoAP extension (RFC 7959) to divide a large payload across
+ * multiple physical packets. This section describes how to write a block-wise
+ * payload for a response, and is known as Block2. (Block1 is for a block-wise
+ * payload in a request.) See _riot_board_handler() in the nanocoap_server
+ * example for an example handler implementation.
+ *
+ * Start with coap_block2_init() to read the client request and initialize a
+ * coap_slicer_t struct with the size and location for this slice of the
+ * overall payload. Then write the block2 option in the response with
+ * coap_opt_put_block2(). The option includes an indicator ("more") that a
+ * slice completes the overall payload transfer. You may not know the value for
+ * _more_ at this point, but you must initialize the space in the packet for
+ * the option before writing the payload. The option is rewritten later.
+ *
+ * Next, use the coap_blockwise_put_xxx() functions to write the payload
+ * content. These functions use the coap_block_slicer_t to enable or disable
+ * actually writing the content, depending on the current position within the
+ * overall payload transfer.
+ *
+ * Finally, use the convenience function coap_block2_build_reply(), which
+ * finalizes the packet and calls coap_block2_finish() internally to update
+ * the block2 option.
  *
  * @{
  *
@@ -62,8 +181,10 @@ extern "C" {
  * @name    Nanocoap specific maximum values
  * @{
  */
-#define NANOCOAP_NOPTS_MAX      (16)
-#define NANOCOAP_URI_MAX        (64)
+#define NANOCOAP_NOPTS_MAX          (16)
+#define NANOCOAP_URI_MAX            (64)
+#define NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)  /**< Maximum size for a blockwise
+                                            *  transfer as power of 2 */
 /** @} */
 
 #ifdef MODULE_GCOAP
@@ -90,7 +211,6 @@ typedef struct __attribute__((packed)) {
     uint8_t ver_t_tkl;          /**< version, token, token length           */
     uint8_t code;               /**< CoAP code (e.g.m 205)                  */
     uint16_t id;                /**< Req/resp ID                            */
-    uint8_t data[];             /**< convenience pointer to payload start   */
 } coap_hdr_t;
 
 /**
@@ -144,6 +264,16 @@ typedef struct {
     int more;                       /**< -1 for no option, 0 for last block,
                                           1 for more blocks coming          */
 } coap_block1_t;
+
+/**
+ * @brief Blockwise transfer helper struct
+ */
+typedef struct {
+    size_t start;                   /**< Start offset of the current block  */
+    size_t end;                     /**< End offset of the current block    */
+    size_t cur;                     /**< Offset of the generated content    */
+    uint8_t *opt;                   /**< Pointer to the placed option       */
+} coap_block_slicer_t;
 
 /**
  * @brief   Global CoAP resource list
@@ -412,6 +542,17 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsign
 int coap_get_block1(coap_pkt_t *pkt, coap_block1_t *block1);
 
 /**
+ * @brief    Block2 option getter
+ *
+ * @param[in]   pkt     pkt to work on
+ * @param[out]  block2  ptr to preallocated coap_block1_t structure
+ *
+ * @returns     0 if block2 option not present
+ * @returns     1 if structure has been filled
+ */
+int coap_get_block2(coap_pkt_t *pkt, coap_block1_t *block2);
+
+/**
  * @brief   Insert block1 option into buffer
  *
  * @param[out]  buf         buffer to write to
@@ -489,6 +630,23 @@ ssize_t coap_opt_add_uint(coap_pkt_t *pkt, uint16_t optnum, uint32_t value);
  * @return        total number of bytes written to buffer
  */
 ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags);
+
+/**
+ * @brief   Insert block2 option into buffer
+ *
+ * When calling this function to initialize a packet with a block2 option, the
+ * more flag must be set to prevent the creation of an option with a length too
+ * small to contain the size bit.
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          must be < 23
+ * @param[in]   slicer      coap blockwise slicer helper struct
+ * @param[in]   more        more flag (1 or 0)
+ *
+ * @returns     amount of bytes written to @p buf
+ */
+size_t coap_opt_put_block2(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *slicer, bool more);
 
 /**
  * @brief   Get content type from packet
@@ -605,6 +763,83 @@ static inline ssize_t coap_get_location_query(const coap_pkt_t *pkt,
 }
 
 /**
+ * @brief Initialize a block2 slicer struct for writing the payload
+ *
+ * This function determines the size of the response payload based on the
+ * size requested by the client in @p pkt.
+ *
+ * @param[in]   pkt         packet to work on
+ * @param[out]  slicer      Preallocated slicer struct to fill
+ */
+void coap_block2_init(coap_pkt_t *pkt, coap_block_slicer_t *slicer);
+
+/**
+ * @brief Finish a block2 response
+ *
+ * This function finalizes the block2 response header
+ *
+ * Checks whether the `more` bit should be set in the block2 option and
+ * sets/clears it if required.  Doesn't return the number of bytes as this
+ * overwrites bytes in the packet, it doesn't add new bytes to the packet.
+ *
+ * @param[inout]  slicer      Preallocated slicer struct to use
+ */
+void coap_block2_finish(coap_block_slicer_t *slicer);
+
+/**
+ * @brief   Build reply to CoAP block2 request
+ *
+ * This function can be used to create a reply to a CoAP block2 request
+ * packet. In addition to @ref coap_build_reply, this function checks the
+ * block2 option and returns an error message to the client if necessary.
+ *
+ * @param[in]   pkt         packet to reply to
+ * @param[in]   code        reply code (e.g., COAP_CODE_204)
+ * @param[out]  rbuf        buffer to write reply to
+ * @param[in]   rlen        size of @p rbuf
+ * @param[in]   payload_len length of payload
+ * @param[in]   slicer      slicer to use
+ *
+ * @returns     size of reply packet on success
+ * @returns     <0 on error
+ */
+ssize_t coap_block2_build_reply(coap_pkt_t *pkt, unsigned code,
+                                uint8_t *rbuf, unsigned rlen, unsigned payload_len,
+                                coap_block_slicer_t *slicer);
+
+/**
+ * @brief Add a single character to a block2 reply.
+ *
+ * This function is used to add single characters to a CoAP block2 reply. It
+ * checks whether the character should be added to the buffer and ignores it
+ * when the character is outside the current block2 request.
+ *
+ * @param[in]   slicer      slicer to use
+ * @param[in]   bufpos      pointer to the current payload buffer position
+ * @param[in]   c           character to write
+ *
+ * @returns     Number of bytes writen to @p bufpos
+ */
+size_t coap_blockwise_put_char(coap_block_slicer_t *slicer, uint8_t *bufpos, char c);
+
+/**
+ * @brief Add a byte array to a block2 reply.
+ *
+ * This function is used to add an array of bytes to a CoAP block2 reply. it
+ * checks which parts of the string should be added to the reply and ignores
+ * parts that are outside the current block2 request.
+ *
+ * @param[in]   slicer      slicer to use
+ * @param[in]   bufpos      pointer to the current payload buffer position
+ * @param[in]   c           byte array to copy
+ * @param[in]   len         length of the byte array
+ *
+ * @returns     Number of bytes writen to @p bufpos
+ */
+size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
+                                const uint8_t *c, size_t len);
+
+/**
  * @brief   Helper to decode SZX value to size in bytes
  *
  * @param[in]   szx     SZX value to decode
@@ -716,6 +951,18 @@ static inline unsigned coap_get_id(coap_pkt_t *pkt)
 }
 
 /**
+ * @brief   Get the start of data after the header
+ *
+ * @param[in]   hdr   Header of CoAP packet in contiguous memory
+ *
+ * @returns     pointer to first byte after the header
+ */
+static inline uint8_t *coap_hdr_data_ptr(coap_hdr_t *hdr)
+{
+    return ((uint8_t *)hdr) + sizeof(coap_hdr_t);
+}
+
+/**
  * @brief   Get the total header length (4-byte header + token length)
  *
  * @param[in]   pkt   CoAP packet
@@ -730,14 +977,14 @@ static inline unsigned coap_get_total_hdr_len(coap_pkt_t *pkt)
 /**
  * @brief   Encode given code class and code detail to raw code
  *
- * @param[in]   class   message code class
+ * @param[in]   cls     message code class
  * @param[in]   detail  message code detail
  *
  * @returns     raw message code
  */
-static inline uint8_t coap_code(unsigned class, unsigned detail)
+static inline uint8_t coap_code(unsigned cls, unsigned detail)
 {
-    return (class << 5) | detail;
+    return (cls << 5) | detail;
 }
 
 /**

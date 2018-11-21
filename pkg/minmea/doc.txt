@@ -1,7 +1,7 @@
 /**
  * @defgroup pkg_minmea   GPS parser library 
  * @ingroup  pkg
- * @ingroup  sys
+ * @ingroup  sys_serialization
  * @brief    Provides a GPS parser library to RIOT
  *
  * # Introduction

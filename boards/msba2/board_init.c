@@ -26,6 +26,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "periph/init.h"
 
 void bl_init_ports(void)
 {
@@ -41,6 +42,7 @@ void bl_init_ports(void)
 
     LED0_OFF;
     LED0_OFF;
+    periph_init();
 }
 
 void init_clks1(void)

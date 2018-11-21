@@ -5,6 +5,8 @@ PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
 PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += conn_can_isotp_multi
+PSEUDOMODULES += cord_ep_standalone
+PSEUDOMODULES += cord_epsim_standalone
 PSEUDOMODULES += core_%
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += emb6_router
@@ -36,19 +38,6 @@ PSEUDOMODULES += lis2dh12_spi
 PSEUDOMODULES += log
 PSEUDOMODULES += log_printfnoformat
 PSEUDOMODULES += lora
-PSEUDOMODULES += lwip_arp
-PSEUDOMODULES += lwip_autoip
-PSEUDOMODULES += lwip_dhcp
-PSEUDOMODULES += lwip_ethernet
-PSEUDOMODULES += lwip_igmp
-PSEUDOMODULES += lwip_ipv6_autoconfig
-PSEUDOMODULES += lwip_ipv6_mld
-PSEUDOMODULES += lwip_raw
-PSEUDOMODULES += lwip_sixlowpan
-PSEUDOMODULES += lwip_stats
-PSEUDOMODULES += lwip_tcp
-PSEUDOMODULES += lwip_udp
-PSEUDOMODULES += lwip_udplite
 PSEUDOMODULES += mpu_stack_guard
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
@@ -57,6 +46,7 @@ PSEUDOMODULES += netstats
 PSEUDOMODULES += netstats_l2
 PSEUDOMODULES += netstats_ipv6
 PSEUDOMODULES += netstats_rpl
+PSEUDOMODULES += nimble
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
@@ -65,7 +55,6 @@ PSEUDOMODULES += pktqueue
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += prng
 PSEUDOMODULES += prng_%
-PSEUDOMODULES += rdcli_simple_standalone
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_default
 PSEUDOMODULES += saul_gpio
@@ -115,6 +104,11 @@ PSEUDOMODULES += si7021
 PSEUDOMODULES += rn2483
 PSEUDOMODULES += rn2903
 
+# include variants of VCNL40x0 drivers as pseudo modules
+PSEUDOMODULES += vcnl4010
+PSEUDOMODULES += vcnl4020
+PSEUDOMODULES += vcnl4040
+
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
 
@@ -129,5 +123,13 @@ NO_PSEUDOMODULES += periph_common
 PSEUDOMODULES += auto_init_skald
 PSEUDOMODULES += skald_ibeacon
 PSEUDOMODULES += skald_eddystone
+
+# define optimized read function of DS18 driver as a pseudo module
+PSEUDOMODULES += ds18_optimized
+
+# By using this pseudomodule, T tables will be precalculated.
+PSEUDOMODULES += crypto_aes_precalculated
+# This pseudomodule causes a loop in AES to be unrolled (more flash, less CPU)
+PSEUDOMODULES += crypto_aes_unroll
 
 # Packages may also add modules to PSEUDOMODULES in their `Makefile.include`.

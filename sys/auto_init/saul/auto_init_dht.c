@@ -21,6 +21,7 @@
 
 #ifdef MODULE_DHT
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "dht_params.h"

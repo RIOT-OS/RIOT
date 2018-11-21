@@ -476,7 +476,7 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
         }
 
         if (coap_get_token_len(memo_pdu) == cmplen) {
-            memo_pdu->token = &memo_pdu->hdr->data[0];
+            memo_pdu->token = coap_hdr_data_ptr(memo_pdu->hdr);
             if ((memcmp(src_pdu->token, memo_pdu->token, cmplen) == 0)
                     && sock_udp_ep_equal(&memo->remote_ep, remote)) {
                 *memo_ptr = memo;
@@ -981,7 +981,7 @@ uint8_t gcoap_op_state(void)
 int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
 {
     (void)cf; /* only used in the assert below. */
-    assert(cf == COAP_CT_LINK_FORMAT);
+    assert(cf == COAP_FORMAT_LINK);
 
     /* skip the first listener, gcoap itself (we skip /.well-known/core) */
     gcoap_listener_t *listener = _coap_state.listeners->next;

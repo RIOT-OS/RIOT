@@ -79,6 +79,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Usage of LED to turn on when a kernel panic occurs.
+ * @{
+ */
+#define LED_PANIC            LED_RED_ON
+/** @} */
+
+/**
  * @name    Macros for controlling the on-board MUXes.
  * @{
  */
@@ -141,6 +148,13 @@ extern "C" {
 #define SET_MUX_SOCKET0              MUX_PW_ENABLE_PORT; MUX_PW_ON; \
                                      MUX_USB_XBEE_ENABLE_PORT; \
                                      MUX_USB_XBEE_ON
+/** @} */
+
+/**
+ * @name CPU clock scale for waspmote-pro
+ *
+ */
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
 /** @} */
 
 /**

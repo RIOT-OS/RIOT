@@ -32,7 +32,7 @@
 
 static inline void _command(const hd44780_t *dev, uint8_t value);
 static void _pulse(const hd44780_t *dev);
-static void _send(const hd44780_t *dev, uint8_t value, uint8_t mode);
+static void _send(const hd44780_t *dev, uint8_t value, hd44780_state_t state);
 static void _write_bits(const hd44780_t *dev, uint8_t bits, uint8_t value);
 
 /**

@@ -14,8 +14,8 @@ import argparse
 import time
 import logging
 
-import periph_i2c_if
-from if_lib import bpt_if
+from periph_i2c_if import PeriphI2CIf
+from if_lib import PhilipIf
 
 BPT_ADDR = 85
 BPT_USER_REG = 152
@@ -337,15 +337,8 @@ def main():
     if args.dut_baud is not None:
         baud = int(args.dut_baud, 0)
 
-    if args.bpt_port is None:
-        bpt = bpt_if.BptIf.from_autodetect()
-    else:
-        bpt = bpt_if.BptIf(port=args.bpt_port)
-
-    if args.dut_port is None:
-        i2c = periph_i2c_if.PeriphI2CIf.from_autodetect(baudrate=baud)
-    else:
-        i2c = periph_i2c_if.PeriphI2CIf(port=args.dut_port, baudrate=baud)
+    bpt = PhilipIf(port=args.bpt_port)
+    i2c = PeriphI2CIf(port=args.dut_port, baudrate=baud)
 
     print('Starting Test periph_i2c')
     test_list = []

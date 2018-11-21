@@ -21,6 +21,25 @@
  * * [BME280](https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME280_DS001-11.pdf)
  *
  * This driver provides @ref drivers_saul capabilities.
+ *
+ * ## Usage
+ *
+ * Add the following to your makefile:
+ *
+ * ```make
+ * # For BME280
+ * USEMODULE += bme280
+ *
+ * # When using I2C, specify the default I2C device to use,
+ * # and the BME280's address (see datasheet).
+ * # The values below are the defaults:
+ * CFLAGS += -DBMX280_PARAM_I2C_DEV=I2C_DEV\(0\)
+ * CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x77
+ * ```
+ *
+ * This allows initialisation with the default parameters in `BMX280_PARAMS_DEFAULT`
+ * from `bmx280_params.h`.
+ *
  * @{
  * @file
  * @brief       Device driver interface for the BMX280 sensors (BMP280 and BME280).
@@ -31,7 +50,7 @@
  *              values by changing the oversampling settings.  The driver is
  *              written in such a way that a measurement is only started from
  *              the function that reads the temperature.  In other words, you
- *              always have to call bme280_read_temperature, and then optionally
+ *              always have to call bmx280_read_temperature, and then optionally
  *              you can call the other two.
  *
  * @author      Kees Bakker <kees@sodaq.com>
@@ -205,7 +224,7 @@ int16_t bmx280_read_temperature(const bmx280_t* dev);
  */
 uint32_t bmx280_read_pressure(const bmx280_t *dev);
 
-#if defined(MODULE_BME280)
+#if defined(MODULE_BME280) || defined(DOXYGEN)
 /**
  * @brief   Read humidity value from the given BME280 device, returned in centi %RH
  *

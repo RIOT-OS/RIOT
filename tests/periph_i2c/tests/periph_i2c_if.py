@@ -7,8 +7,10 @@
 This module handles parsing of information from RIOT periph_i2c test.
 """
 import logging
-
-from if_lib.dut_shell import DutShell
+try:
+    from riot_pal import DutShell
+except ImportError:
+    raise ImportError('Cannot find riot_pal, try "pip install riot_pal"')
 
 
 class PeriphI2CIf(DutShell):
@@ -120,7 +122,7 @@ def main():
 
     logging.getLogger().setLevel(logging.DEBUG)
     try:
-        i2c = PeriphI2CIf.from_autodetect()
+        i2c = PeriphI2CIf()
         cmds = i2c.get_command_list()
         logging.debug("======================================================")
         for cmd in cmds:

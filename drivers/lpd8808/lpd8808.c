@@ -13,7 +13,7 @@
  * @file
  * @brief       LPD8808 based LED strip driver implementation
  *
- * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */

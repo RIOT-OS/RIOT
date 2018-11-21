@@ -1,4 +1,3 @@
-FEATURES_PROVIDED += periph_flash_common
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_raw
 

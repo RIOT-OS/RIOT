@@ -3,7 +3,7 @@
  * Joan Daemen, Michaël Peeters, Gilles Van Assche and Ronny Van Keer, hereby
  * denoted as "the implementer".
  *
- * RIOT-OS adaptaion by Mathias Tausig
+ * RIOT-OS adaptation by Mathias Tausig
  *
  * This software is released under the Creative Commons CC0 1.0 license.
  * To the extent possible under law, the implementer has waived all copyright

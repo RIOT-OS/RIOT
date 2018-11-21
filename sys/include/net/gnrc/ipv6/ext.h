@@ -31,6 +31,10 @@
 #include "net/gnrc/pkt.h"
 #include "net/ipv6/ext.h"
 
+#ifdef MODULE_GNRC_IPV6_EXT_RH
+#include "net/gnrc/ipv6/ext/rh.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

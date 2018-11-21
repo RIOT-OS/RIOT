@@ -749,6 +749,26 @@ static void test_fmt_str(void)
     TEST_ASSERT_EQUAL_STRING(string1, &string2[0]);
 }
 
+static void test_fmt_char(void)
+{
+    char string[] = "zzzzzzzzz";
+
+    TEST_ASSERT_EQUAL_INT(1, fmt_char(NULL, 'c'));
+    TEST_ASSERT_EQUAL_INT(1, fmt_char(string, 'c'));
+    string[1] = '\0';
+    TEST_ASSERT_EQUAL_STRING("c", &string[0]);
+}
+
+static void test_fmt_to_lower(void)
+{
+    const char string_up[]  = "AbCdeFGHijkLM";
+    char string[]           = "zzzzzzzzzzzzzzz";
+
+    TEST_ASSERT_EQUAL_INT(fmt_strlen(string_up), fmt_to_lower(string, string_up));
+    string[fmt_strlen(string_up)] = '\0';
+    TEST_ASSERT_EQUAL_STRING("abcdefghijklm", &string[0]);
+}
+
 static void test_scn_u32_dec(void)
 {
     const char *string1 = "123456789";
@@ -757,6 +777,17 @@ static void test_scn_u32_dec(void)
 
     TEST_ASSERT_EQUAL_INT(val1, scn_u32_dec(string1, 9));
     TEST_ASSERT_EQUAL_INT(val2, scn_u32_dec(string1, 5));
+}
+
+static void test_scn_u32_hex(void)
+{
+    const char *string1 = "aB12cE4F";
+    uint32_t val1 = 0xab12ce4f;
+    uint32_t val2 = 0xab1;
+
+    TEST_ASSERT_EQUAL_INT(val1, scn_u32_hex(string1, 8));
+    TEST_ASSERT_EQUAL_INT(val2, scn_u32_hex(string1, 3));
+    TEST_ASSERT_EQUAL_INT(val1, scn_u32_hex(string1, 9));
 }
 
 static void test_fmt_lpad(void)
@@ -817,7 +848,10 @@ Test *tests_fmt_tests(void)
         new_TestFixture(test_fmt_strlen),
         new_TestFixture(test_fmt_strnlen),
         new_TestFixture(test_fmt_str),
+        new_TestFixture(test_fmt_char),
+        new_TestFixture(test_fmt_to_lower),
         new_TestFixture(test_scn_u32_dec),
+        new_TestFixture(test_scn_u32_hex),
         new_TestFixture(test_fmt_lpad),
     };
 

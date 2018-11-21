@@ -31,11 +31,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Type for source routing header.
- */
-#define GNRC_RPL_SRH_TYPE   (3U)
-
-/**
  * @brief   The RPL Source routing header.
  *
  * @see <a href="https://tools.ietf.org/html/rfc6554">
@@ -60,9 +55,9 @@ typedef struct __attribute__((packed)) {
  * @param[in,out] ipv6  The IPv6 header of the incoming packet.
  * @param[in] rh        A RPL source routing header.
  *
- * @return  EXT_RH_CODE_ERROR
- * @return  EXT_RH_CODE_FORWARD
- * @return  EXT_RH_CODE_OK
+ * @return  @ref GNRC_IPV6_EXT_RH_AT_DST, on success
+ * @return  @ref GNRC_IPV6_EXT_RH_FORWARDED, when @p pkt *should be* forwarded
+ * @return  @ref GNRC_IPV6_EXT_RH_ERROR, on error
  */
 int gnrc_rpl_srh_process(ipv6_hdr_t *ipv6, gnrc_rpl_srh_t *rh);
 

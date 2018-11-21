@@ -29,6 +29,11 @@
 #include "thread.h"
 #include "log.h"
 
+#if defined(MAIN_THREAD_PIN) || defined(WORKER_THREAD_PIN)
+#include "board.h"
+#include "periph/gpio.h"
+#endif
+
 #define TEST_TIME_S             (10LU)
 #define TEST_INTERVAL_MS        (100LU)
 #define TEST_TIMER_STACKSIZE    (THREAD_STACKSIZE_DEFAULT)
@@ -38,14 +43,27 @@ char stack_timer2[TEST_TIMER_STACKSIZE];
 
 void* timer_func(void* arg)
 {
+#if defined(WORKER_THREAD_PIN)
+    gpio_t worker_pin = WORKER_THREAD_PIN;
+    gpio_init(worker_pin, GPIO_OUT);
+#endif
     LOG_DEBUG("run thread %" PRIkernel_pid "\n", thread_getpid());
     while(1) {
+#if defined(WORKER_THREAD_PIN)
+        gpio_set(worker_pin);
+        gpio_clear(worker_pin);
+#endif
         xtimer_usleep(*(uint32_t *)(arg));
     }
 }
 
 int main(void)
 {
+#if defined(MAIN_THREAD_PIN)
+    gpio_t main_pin = MAIN_THREAD_PIN;
+    gpio_init(main_pin, GPIO_OUT);
+#endif
+
     LOG_DEBUG("[INIT]\n");
     uint32_t sleep_timer1 = 1000;
     uint32_t sleep_timer2 = 1100;
@@ -63,7 +81,13 @@ int main(void)
     puts("[START]");
     while((now = xtimer_now_usec()) < until) {
         unsigned percent = (100 * (now - start)) / (until - start);
+#if defined(MAIN_THREAD_PIN)
+        gpio_set(main_pin);
+#endif
         xtimer_usleep(TEST_INTERVAL_MS * US_PER_MS);
+#if defined(MAIN_THREAD_PIN)
+        gpio_clear(main_pin);
+#endif
         printf("Testing (%3u%%)\n", percent);
     }
     puts("Testing (100%)");

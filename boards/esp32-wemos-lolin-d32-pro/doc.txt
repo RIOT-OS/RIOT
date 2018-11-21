@@ -1,0 +1,174 @@
+/*
+ * Copyright (C) 2018 Gunar Schorcht
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    boards_esp32_wemos-lolin-d32-pro Wemos LOLIN D32 Pro
+ * @ingroup     boards_esp32
+ * @brief       Support for Wemos LOLIN D32 Pro
+ * @author      Gunar Schorcht <gunar@schorcht.net>
+
+## <a name="toc"> Table of Contents </a>
+
+1. [Overview](#overview)
+2. [Hardware](#hardware)
+    1. [MCU](#mcu)
+    2. [Board Configuration](#board_configuration)
+    3. [Board Pinout](#pinout)
+    4. [Optional Hardware Configurations](#optional_hardware)
+3. [Flashing the Device](#flashing)
+
+## <a name="overview"> Overview </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Wemos LOLIN D32 Pro is a development board that uses the ESP32-WROVER module which has a built-in 4 MByte SPI RAM. Most important features of the board are
+
+- Micro-SD card interface
+- TFT display interface
+- SPI RAM 4 MByte
+
+Wemos LOLIN D32 Pro belongs to the class of general purpose boards where most ESP32 pins are broken out for easier access.
+
+\htmlonly<style>div.image img[src="https://wiki.wemos.cc/_media/products:d32:d32_pro_v2.0.0_1_16x9.jpg"]{width:600px;}</style>\endhtmlonly
+@image html "https://wiki.wemos.cc/_media/products:d32:d32_pro_v2.0.0_1_16x9.jpg" "Wemos LOLIN D32 PRO"
+
+## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+This section describes
+
+- the [MCU](#mcu),
+- the default [board configuration](#board_configuration),
+- [optional hardware configurations](#optional_hardware),
+- the [board pinout](#pinout).
+
+### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Most features of the board are provided by the ESP32 SoC. The following table summarizes these features and gives an overview of which of these features are supported by RIOT. For detailed information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
+
+<center>
+MCU         | ESP32     | Supported by RIOT
+------------|-----------|------------------
+Vendor      | Espressif | |
+Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
+FPU         | yes (ULP - Ultra low power co-processor) | no
+RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
+ROM         | 520 kByte | yes
+Flash       | 512 kByte ... 16 MByte |  yes
+Frequency   | 240 MHz, 160 MHz, 80 MHz | yes
+Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> no
+Timers      | 4 x 64 bit | yes
+ADCs        | 2 x SAR-ADC with up to 18 x 12 bit channels total | yes
+DACs        | 2 x DAC with 8 bit | yes
+GPIOs       | 34 (6 of them are only inputs) | yes
+I2Cs        | 2 | yes
+SPIs        | 4 | yes
+UARTs       | 3 | yes
+WiFi        | IEEE 802.11 b/g/n built in | yes
+Bluetooth   | v4.2 BR/EDR and BLE | no
+Ethernet    | MAC interface with dedicated DMA and IEEE 1588 support | yes
+CAN         | version 2.0 | no
+IR          | up to 8 channels TX/RX | no
+Motor PWM   | 2 devices x 6 channels | yes
+LED PWM     | 16 channels | no
+Crypto      | Hardware acceleration of AES, SHA-2, RSA, ECC, RNG | no
+Vcc         | 2.5 - 3.6 V | |
+Documents   | [Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) <br> [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf) | |
+</center>
+
+### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The board for the Wemos LOLIN D32 Pro has the following on-board components:
+
+- 1 x LED
+- 1 x Micro SD card interface
+- 1 x TFT display connector
+
+The following table shows the default board configuration, which is sorted according to the defined functionality of GPIOs. This configuration can be overridden by an \ref esp32_app_spec_conf "application-specific configuration".
+
+<center>
+\anchor esp32_wemos-lolin-d32-pro_table_board_configuration
+Pin    | Default Configuration<b>*</b> | Optional Configuration<b>*</b> | Remarks / Prerequisites | Configuration
+:------|:-----------------|:--------------------|:--------------|:-------------
+GPIO22 | I2C_DEV(0):SCL   | | | \ref esp32_i2c_interfaces "I2C Interfaces"
+GPIO21 | I2C_DEV(0):SDA   | | | \ref esp32_i2c_interfaces "I2C Interfaces"
+GPIO18 | SPI_DEV(0):SCK   | | | \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO19 | SPI_DEV(0):MISO  | | | \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO23 | SPI_DEV(0):MOSI  | | | \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO5  | SPI_DEV(0):CS0 / LED0 | | | \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO4  | SPI_DEV(0):CS1   | SD Card CS | when module [sdcard_spi](https://riot-os.org/api/group__drivers__sdcard__spi.html) is used | \ref esp32_spi_interfaces "SPI Interfaces"
+GPIO1  | UART_DEV(0):TxD  | | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
+GPIO3  | UART_DEV(0):RxD  | | Console (configuration is fixed) | \ref esp32_uart_interfaces "UART interfaces"
+GPIO36 | ADC_LINE(0) | | | \ref esp32_adc_channels "ADC Channels"
+GPIO39 | ADC_LINE(1) | | | \ref esp32_adc_channels "ADC Channels"
+GPIO34 | ADC_LINE(2) | | | \ref esp32_adc_channels "ADC Channels"
+GPIO35 | ADC_LINE(3) | | VBat measurement (GPIO is not broken out) | \ref esp32_adc_channels "ADC Channels"
+GPIO32 | ADC_LINE(4) | TFT_LED  | when TFT is connected | \ref esp32_adc_channels "ADC Channels"
+GPIO33 | ADC_LINE(5) | TFT_RESET| when TFT is connected | \ref esp32_adc_channels "ADC Channels"
+GPIO25 | DAC_LINE(0) | | | \ref esp32_dac_channels "DAC Channels"
+GPIO26 | DAC_LINE(1) | | | \ref esp32_dac_channels "DAC Channels"
+GPIO0  | PWM_DEV(0):0| MRF24J40/ENC28J60 RESET | when module [mrf24j40](https://riot-os.org/api/group__drivers__mrf24j40.html)/[enc2860](https://riot-os.org/api/group__drivers__enc28j60.html) is used | \ref esp32_pwm_channels "PWM Channels"
+GPIO2  | PWM_DEV(0):1| MRF24J40/ENC28J60 CS    | when module [mrf24j40](https://riot-os.org/api/group__drivers__mrf24j40.html)/[enc2860](https://riot-os.org/api/group__drivers__enc28j60.html) is used | \ref esp32_pwm_channels "PWM Channels"
+GPIO13 | -                 | MRF24J40/ENC28J60 INT   | when module [mrf24j40](https://riot-os.org/api/group__drivers__mrf24j40.html)/[enc2860](https://riot-os.org/api/group__drivers__enc28j60.html) is used | |
+GPIO15 | -  | | | |
+GPIO12 | -  | TS_CS  | when TFT is connected | |
+GPIO14 | -  | TFT_CS | when TFT is connected | |
+GPIO27 | -  | TFT_DC | when TFT is connected | |
+</center>
+
+<b>*</b> Default configuration cannot be used or is not available at all when optional configuration is used. For example, when the TFT is connected, GPIO32 is used as **TFT_LED** signal and ADC_LINE(4) is not available.
+
+@note When the TFT display is connected, add the following line to the makefile of the application to enable the according default board and peripheral configuration:<br>
+```
+USEMODULE += esp_lolin_tft
+```
+
+For detailed information about the configuration of ESP32 boards, see section \ref esp32_comm_periph "Common Peripherals".
+
+### <a name="optional_hardware"> Optional Hardware Configurations </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+MRF24J40-based IEEE 802.15.4 radio modules and ENC28J60-based Ethernet network interface modules have been tested with the board. You could use the following code in your \ref esp32_app_spec_conf "application-specific configuration" to use such modules:
+
+```
+#ifdef BOARD_ESP32_WEMOS_LOLIN_D32_PRO
+
+#if MODULE_MRF24J40
+#define MRF24J40_PARAM_CS       GPIO15      /* MRF24J40 CS signal    */
+#define MRF24J40_PARAM_RESET    GPIO2       /* MRF24J40 RESET signal */
+#define MRF24J40_PARAM_INT      GPIO13      /* MRF24J40 INT signal   */
+#endif
+
+#if MODULE_ENC28J80
+#define ENC28J80_PARAM_CS       GPIO15      /* ENC28J80 CS signal    */
+#define ENC28J80_PARAM_RESET    GPIO2       /* ENC28J80 RESET signal */
+#define ENC28J80_PARAM_INT      GPIO13      /* ENC28J80 INT signal   */
+endif
+
+#endif
+```
+For other parameters, the default values defined by the drivers can be used.
+
+@note
+- Only a few GPIOs are available for external hardware on the Wemos LOLIN D32 PRO. Therefore, MRF24J40 and ENC28J60 based modules use the same GPIOs and only one of these modules can be used simultaneously.
+- The **RESET** signal of MRF24J40 and ENC28J60 based modules can also be connected to the **RST** pin of the board (see \ref esp32_wemos-lolin-d32-pro_pinout "pinout") to keep the configured GPIO free for other purposes.
+
+### <a name="pinout"> Board Pinout </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The following picture shows the pinout of WEMOS LOLIN D32 PRO board as defined by the default board configuration. The light green GPIOs are not used by configured on-board hardware components and can be used for any purpose. However, if optional off-board hardware modules are used, these GPIOs may also be occupied, see \ref esp32_wemos-lolin-d32-pro_table_board_configuration "optional functions" in table board configuration.
+
+The corresponding board schematic can be found [here](https://wiki.wemos.cc/_media/products:d32:sch_d32_pro_v2.0.0.pdf).
+
+\anchor esp32_wemos-lolin-d32-pro_pinout
+@image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Wemos_LOLIN_D32_PRO_pinout.png?inline=false" "Wemos LOLIN D32 PRO pinout"
+
+## <a name="flashing"> Flashing the Device </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Flashing RIOT is quite easy. The board has a Micro-USB connector with reset/boot/flash logic. Just connect the board to your host computer using the programming port and type:
+```
+make flash BOARD=esp32-wemos-lolin-d32-pro ...
+```
+For detailed information about ESP32 as well as configuring and compiling RIOT for ESP32 boards, see \ref esp32_riot.
+
+*/

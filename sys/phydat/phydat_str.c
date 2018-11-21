@@ -42,6 +42,7 @@ void phydat_dump(phydat_t *data, uint8_t dim)
             case UNIT_PERCENT:
             case UNIT_TEMP_C:
             case UNIT_TEMP_F:
+            case UNIT_DBM:
                 /* no string conversion */
                 scale_prefix = '\0';
                 break;
@@ -91,6 +92,7 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_GR:       return "G";
         case UNIT_A:        return "A";
         case UNIT_V:        return "V";
+        case UNIT_DBM:      return "dBm";
         case UNIT_GS:       return "Gs";
         case UNIT_BAR:      return "Bar";
         case UNIT_PA:       return "Pa";
@@ -98,6 +100,7 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_PPB:      return "ppb";
         case UNIT_CD:       return "cd";
         case UNIT_PERCENT:  return "%";
+        case UNIT_CTS:      return "cts";
         default:            return "";
     }
 }

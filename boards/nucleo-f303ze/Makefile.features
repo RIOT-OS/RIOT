@@ -12,4 +12,4 @@ include $(RIOTBOARD)/common/nucleo144/Makefile.features
 # The board MPU family (used for grouping by the CI system)
 FEATURES_MCU_GROUP = cortex_m4_3
 
--include $(RIOTCPU)/stm32f3/Makefile.features
+include $(RIOTCPU)/stm32f3/Makefile.features

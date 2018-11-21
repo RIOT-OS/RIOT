@@ -5,6 +5,10 @@ OLD_USEPKG := $(sort $(USEPKG))
 # include board dependencies
 -include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 
+# include external modules dependencies
+# processed before RIOT ones to be evaluated before the 'default' rules.
+-include $(EXTERNAL_MODULE_DIRS:%=%/Makefile.dep)
+
 # pull dependencies from sys and drivers
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
@@ -141,6 +145,7 @@ endif
 
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
+  USEMODULE += fmt
 endif
 
 ifneq (,$(filter ieee802154 nrfmin,$(USEMODULE)))
@@ -240,11 +245,11 @@ ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
-  USEMODULE += ipv6_ext_rh
+  USEMODULE += gnrc_ipv6_ext_rh
 endif
 
-ifneq (,$(filter ipv6_ext_rh,$(USEMODULE)))
-  USEMODULE += ipv6_ext
+ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ext
 endif
 
 ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
@@ -444,10 +449,6 @@ ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
 endif
 
 ifneq (,$(filter lwip_%,$(USEMODULE)))
-  USEMODULE += lwip
-endif
-
-ifneq (,$(filter lwip,$(USEMODULE)))
   USEPKG += lwip
   USEMODULE += core_mbox
   USEMODULE += lwip_api
@@ -652,11 +653,6 @@ ifneq (,$(filter random,$(USEMODULE)))
   USEMODULE += luid
 endif
 
-ifneq (,$(filter openthread_contrib,$(USEMODULE)))
-  USEMODULE += openthread_contrib_netdev
-  FEATURES_REQUIRED += cpp
-endif
-
 ifneq (,$(filter asymcute,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_util
@@ -757,19 +753,32 @@ ifneq (,$(filter skald,$(USEMODULE)))
   USEMODULE += random
 endif
 
-ifneq (,$(filter rdcli_simple_standalone,$(USEMODULE)))
-  USEMODULE += rdcli_simple
+ifneq (,$(filter cord_epsim_standalone,$(USEMODULE)))
+  USEMODULE += cord_epsim
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter rdcli_simple,$(USEMODULE)))
-  USEMODULE += rdcli_common
-  USEMODULE += fmt
+ifneq (,$(filter cord_epsim,$(USEMODULE)))
+  USEMODULE += cord_common
+  USEMODULE += gcoap
 endif
 
-ifneq (,$(filter rdcli_common,$(USEMODULE)))
-  USEMODULE += fmt
+ifneq (,$(filter cord_ep_standalone,$(USEMODULE)))
+  USEMODULE += cord_ep
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter cord_ep,$(USEMODULE)))
+  USEMODULE += cord_common
+  USEMODULE += core_thread_flags
   USEMODULE += gcoap
+  ifneq (,$(filter shell_commands,$(USEMODULE)))
+    USEMODULE += sock_util
+  endif
+endif
+
+ifneq (,$(filter cord_common,$(USEMODULE)))
+  USEMODULE += fmt
   USEMODULE += luid
 endif
 
@@ -780,6 +789,7 @@ endif
 ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += random
+  USEMODULE += fmt
 endif
 
 # Enable periph_gpio when periph_gpio_irq is enabled

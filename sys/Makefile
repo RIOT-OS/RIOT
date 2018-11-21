@@ -1,6 +1,9 @@
 ifneq (,$(filter csma_sender,$(USEMODULE)))
   DIRS += net/link_layer/csma_sender
 endif
+ifneq (,$(filter eepreg,$(USEMODULE)))
+  DIRS += eepreg
+endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   DIRS += posix/semaphore
 endif
@@ -39,12 +42,6 @@ ifneq (,$(filter ipv4_addr,$(USEMODULE)))
 endif
 ifneq (,$(filter ipv6_addr,$(USEMODULE)))
   DIRS += net/network_layer/ipv6/addr
-endif
-ifneq (,$(filter ipv6_ext_rh,$(USEMODULE)))
-  DIRS += net/network_layer/ipv6/ext/rh
-endif
-ifneq (,$(filter ipv6_ext,$(USEMODULE)))
-  DIRS += net/network_layer/ipv6/ext
 endif
 ifneq (,$(filter ipv6_hdr,$(USEMODULE)))
   DIRS += net/network_layer/ipv6/hdr
@@ -127,12 +124,16 @@ endif
 ifneq (,$(filter skald,$(USEMODULE)))
   DIRS += net/skald
 endif
-ifneq (,$(filter rdcli_common,$(USEMODULE)))
-  DIRS += net/application_layer/rdcli_common
+ifneq (,$(filter cord_common,$(USEMODULE)))
+  DIRS += net/application_layer/cord/common
 endif
-ifneq (,$(filter rdcli_simple,$(USEMODULE)))
-    DIRS += net/application_layer/rdcli_simple
+ifneq (,$(filter cord_epsim,$(USEMODULE)))
+    DIRS += net/application_layer/cord/epsim
 endif
+ifneq (,$(filter cord_ep,$(USEMODULE)))
+    DIRS += net/application_layer/cord/ep
+endif
+
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))
 

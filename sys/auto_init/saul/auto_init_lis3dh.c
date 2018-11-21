@@ -21,6 +21,7 @@
 
 #ifdef MODULE_LIS3DH
 
+#include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
 #include "lis3dh.h"
