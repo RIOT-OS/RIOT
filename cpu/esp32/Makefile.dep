@@ -31,10 +31,22 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
     USEMODULE += esp_idf_wpa_supplicant_crypto
     USEMODULE += esp_idf_wpa_supplicant_port
     USEMODULE += esp_idf_nvs_flash
+    USEMODULE += riot_freertos
 
     # crypto and hashes produce symbol conflicts with esp_idf_wpa_supplicant_crypto
     DISABLE_MODULE += crypto
     DISABLE_MODULE += hashes
+endif
+
+ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
+    # add additional modules required by esp_idf_nvs_flash
+    USEMODULE += mtd
+    USEMODULE += pthread
+endif
+
+ifneq (,$(filter riot_freertos,$(USEMODULE)))
+    # add additional modules required by riot_freertos
+    USEMODULE += xtimer
 endif
 
 ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
@@ -52,12 +64,11 @@ endif
 
 # each device has SPI flash memory, but must be explicitly enabled
 ifneq (,$(filter esp_spiffs,$(USEMODULE)))
-    USEMODULE += esp_idf_spi_flash
     USEMODULE += spiffs
-    USEMODULE += vfs
-    export SPIFFS_STD_OPTION = -std=c99
-    INCLUDES += -I$(RIOTBASE)/sys/include
-    INCLUDES += -I$(RIOTBASE)/sys/posix/include
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+    USEMODULE += esp_idf_spi_flash
 endif
 
 ifneq (,$(filter ndn-riot,$(USEPKG)))

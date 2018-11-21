@@ -23,6 +23,9 @@
 #ifndef BOARD_COMMON_H
 #define BOARD_COMMON_H
 
+/* not required when compiling ESP32 vendor code parts */
+#ifndef ESP32_IDF_CODE
+
 #include <stdint.h>
 
 #include "cpu.h"
@@ -161,5 +164,6 @@ void print_board_config (void);
 } /* end extern "C" */
 #endif
 
+#endif /* ESP32_IDF_CODE */
 #endif /* BOARD_COMMON_H */
 /** @} */
