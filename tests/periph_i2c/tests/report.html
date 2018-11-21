@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <style>body {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 12px;
+	min-width: 1200px;
+	color: #999;
+}
+
+h1 {
+	font-size: 24px;
+	color: black;
+}
+
+h2 {
+	font-size: 16px;
+	color: black;
+}
+
+p {
+    color: black;
+}
+
+a {
+	color: #999;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+
+#environment td {
+	padding: 5px;
+	border: 1px solid #E6E6E6;
+}
+
+#environment tr:nth-child(odd) {
+	background-color: #f6f6f6;
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed, .passed .col-result {
+	color: green;
+}
+span.skipped, span.xfailed, span.rerun, .skipped .col-result, .xfailed .col-result, .rerun .col-result {
+	color: orange;
+}
+span.error, span.failed, span.xpassed, .error .col-result, .failed .col-result, .xpassed .col-result  {
+	color: red;
+}
+
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+
+#results-table {
+	border: 1px solid #e6e6e6;
+	color: #999;
+	font-size: 12px;
+	width: 100%
+}
+
+#results-table th, #results-table td {
+	padding: 5px;
+	border: 1px solid #E6E6E6;
+	text-align: left
+}
+#results-table th {
+	font-weight: bold
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+
+.log:only-child {
+	height: inherit
+}
+.log {
+	background-color: #e6e6e6;
+	border: 1px solid #e6e6e6;
+	color: black;
+	display: block;
+	font-family: "Courier New", Courier, monospace;
+	height: 230px;
+	overflow-y: scroll;
+	padding: 5px;
+	white-space: pre-wrap
+}
+div.image {
+	border: 1px solid #e6e6e6;
+	float: right;
+	height: 240px;
+	margin-left: 5px;
+	overflow: hidden;
+	width: 320px
+}
+div.image img {
+	width: 320px
+}
+.collapsed {
+	display: none;
+}
+.expander::after {
+	content: " (show details)";
+	color: #BBB;
+	font-style: italic;
+	cursor: pointer;
+}
+.collapser::after {
+	content: " (hide details)";
+	color: #BBB;
+	font-style: italic;
+	cursor: pointer;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.sortable {
+	cursor: pointer;
+}
+
+.sort-icon {
+	font-size: 0px;
+	float: left;
+	margin-right: 5px;
+	margin-top: 5px;
+	/*triangle*/
+	width: 0;
+	height: 0;
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+}
+
+.inactive .sort-icon {
+	/*finish triangle*/
+	border-top: 8px solid #E6E6E6;
+}
+
+.asc.active .sort-icon {
+	/*finish triangle*/
+	border-bottom: 8px solid #999;
+}
+
+.desc.active .sort-icon {
+	/*finish triangle*/
+	border-top: 8px solid #999;
+}
+</style></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function find_all(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
+    sort_table(elem, key(colIndex));
+}
+
+function show_all_extras() {
+    find_all('.col-result').forEach(show_extras);
+}
+
+function hide_all_extras() {
+    find_all('.col-result').forEach(hide_extras);
+}
+
+function show_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.remove("collapsed");
+    expandcollapse.classList.remove("expander");
+    expandcollapse.classList.add("collapser");
+}
+
+function hide_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.add("collapsed");
+    expandcollapse.classList.remove("collapser");
+    expandcollapse.classList.add("expander");
+}
+
+function show_filters() {
+    var filter_items = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_items.length; i++)
+        filter_items[i].hidden = false;
+}
+
+function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    find_all('.col-result').forEach(function(elem) {
+        var collapsed = get_query_parameter('collapsed') || 'Passed';
+        var extras = elem.parentNode.nextElementSibling;
+        var expandcollapse = document.createElement("span");
+        if (collapsed.includes(elem.innerHTML)) {
+            extras.classList.add("collapsed");
+            expandcollapse.classList.add("expander");
+        } else {
+            expandcollapse.classList.add("collapser");
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener("click", function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+                show_extras(event.currentTarget);
+            } else {
+                hide_extras(event.currentTarget);
+            }
+        });
+    })
+}
+
+function get_query_parameter(name) {
+    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
+function init () {
+    reset_sort_headers();
+
+    add_collapse();
+
+    show_filters();
+
+    toggle_sort_states(find('.initial-sort'));
+
+    find_all('.sortable').forEach(function(elem) {
+        elem.addEventListener("click",
+                              function(event) {
+                                  sort_column(elem);
+                              }, false)
+    });
+
+};
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = document.getElementById("results-table-head");
+    document.getElementById('results-table').remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName("BODY")[0].appendChild(parent);
+}
+
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+    var multiplier = reversed ? -1 : 1;
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+        return multiplier * (key_a >= key_b ? 1 : -1);
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function key_alpha(col_index) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+    };
+}
+
+function key_num(col_index) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function reset_sort_headers() {
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function is_all_rows_hidden(value) {
+  return value.hidden == false;
+}
+
+function filter_table(elem) {
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var outcome_rows = document.getElementsByClassName(class_outcome);
+
+    for(var i = 0; i < outcome_rows.length; i++){
+        outcome_rows[i].hidden = !elem.checked;
+    }
+
+    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var all_rows_hidden = rows.length == 0 ? true : false;
+    var not_found_message = document.getElementById("not-found-message");
+    not_found_message.hidden = !all_rows_hidden;
+}
+</script>
+    <h1>report.html</h1>
+    <p>Report generated on 21-Nov-2018 at 15:46:36 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.19.0</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>BOARD</td>
+        <td>nucleo-f303re</td></tr>
+      <tr>
+        <td>PHiLIP Firmware Revision</td>
+        <td>10009</td></tr>
+      <tr>
+        <td>PHiLIP Serial Number</td>
+        <td>72, 255, 114, 6, 120, 101, 73, 86, 25, 87, 8, 103</td></tr>
+      <tr>
+        <td>Packages</td>
+        <td>{&apos;py&apos;: &apos;1.6.0&apos;, &apos;pytest&apos;: &apos;4.0.0&apos;, &apos;pluggy&apos;: &apos;0.7.1&apos;}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Linux-4.15.0-39-generic-x86_64-with-Ubuntu-16.04-xenial</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{&apos;html&apos;: &apos;1.19.0&apos;, &apos;metadata&apos;: &apos;1.7.0&apos;, &apos;regtest&apos;: &apos;1.3.1&apos;, &apos;bdd&apos;: &apos;3.0.0&apos;}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.5.2</td></tr></table>
+    <h2>Summary</h2>
+    <p>9 tests ran in 17.59 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">8 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">1 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable numeric" col="duration">Duration</th>
+          <th>Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">test_01_i2c_periph_base.py::test_read_register_after_NACK_should_succeed</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">nodes = {&#x27;dut&#x27;: &lt;periph_i2c_if.PeriphI2CIf object at 0x7fb8b4d250b8&gt;, &#x27;phil&#x27;: &lt;riot_pal.ll_mem_map_if.LLMemMapIf object at 0x7fb8b4d25be0&gt;}<br/>cmd_collect = &lt;function cmd_collect.&lt;locals&gt;._collect at 0x7fb8b4d39c80&gt;<br/><br/>    def test_read_register_after_NACK_should_succeed(nodes, cmd_collect):<br/>        &quot;&quot;&quot;Forces a NACK then reads a register to see if recovered&quot;&quot;&quot;<br/>        res = cmd_collect(&#x27;dut&#x27;, nodes[&#x27;dut&#x27;].i2c_read_reg(0, 42, 0))<br/>        assert res[&#x27;result&#x27;] == &#x27;Error&#x27;<br/>        addr = nodes[&#x27;phil&#x27;].cmd_list[&#x27;i2c.slave_addr_1&#x27;][&#x27;default&#x27;]<br/>        reg = nodes[&#x27;phil&#x27;].cmd_list[&#x27;user_reg.64&#x27;][&#x27;offset&#x27;]<br/>        data = cmd_collect(&#x27;phil&#x27;, nodes[&#x27;phil&#x27;].read_reg(&#x27;user_reg.64&#x27;, size=1))<br/>        res = cmd_collect(&#x27;dut&#x27;, nodes[&#x27;dut&#x27;].i2c_read_reg(0, addr, reg))<br/>&gt;       assert res[&#x27;result&#x27;] == &#x27;Success&#x27;<br/><span class="error">E       AssertionError: assert &#x27;Error&#x27; == &#x27;Success&#x27;</span><br/><span class="error">E         - Error</span><br/><span class="error">E         + Success</span><br/><br/>test_01_i2c_periph_base.py:50: AssertionError<br/>---------------------------- Captured stdout setup -----------------------------<br/>test_name: test_read_register_after_NACK_should_succeed
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;,
+ &#x27;data&#x27;: [&#x27;periph_i2c&#x27;],
+ &#x27;msg&#x27;: &#x27;[periph_i2c]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+----------------------------- Captured stdout call -----------------------------<br/>{&#x27;cmd&#x27;: &#x27;i2c_read_reg(0, 0x2a, 0x00, 0x00)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;ENXIO [6]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Error&#x27;}
+{&#x27;cmd&#x27;: &#x27;rr 152 1&#x27;,
+ &#x27;data&#x27;: 0,
+ &#x27;msg&#x27;: &#x27;cmd=user_reg.64 response=EOK-command success [0]&#x27;,
+ &#x27;node&#x27;: &#x27;phil&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_read_reg(0, 0x55, 0x98, 0x00)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;ETIMEDOUT [116]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Error&#x27;}
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_01_i2c_periph_base.py::test_acquire_and_release_should_succeed</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stdout setup -----------------------------<br/>test_name: test_acquire_and_release_should_succeed
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;,
+ &#x27;data&#x27;: [&#x27;periph_i2c&#x27;],
+ &#x27;msg&#x27;: &#x27;[periph_i2c]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_01_i2c_periph_base.py::test_acquire_after_release_should_succeed</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stdout setup -----------------------------<br/>test_name: test_acquire_after_release_should_succeed
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;,
+ &#x27;data&#x27;: [&#x27;periph_i2c&#x27;],
+ &#x27;msg&#x27;: &#x27;[periph_i2c]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+----------------------------- Captured stdout call -----------------------------<br/>{&#x27;cmd&#x27;: &#x27;i2c_release(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 released&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_01_i2c_periph_base.py::test_double_acquire_should_timeout</td>
+          <td class="col-duration">1.05</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stdout setup -----------------------------<br/>test_name: test_double_acquire_should_timeout
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;,
+ &#x27;data&#x27;: [&#x27;periph_i2c&#x27;],
+ &#x27;msg&#x27;: &#x27;[periph_i2c]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+----------------------------- Captured stdout call -----------------------------<br/>{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_acquire(0)\n&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Timeout&#x27;}
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_01_i2c_periph_base.py::test_read_register_should_succeed</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stdout setup -----------------------------<br/>test_name: test_read_register_should_succeed
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;,
+ &#x27;data&#x27;: [&#x27;periph_i2c&#x27;],
+ &#x27;msg&#x27;: &#x27;[periph_i2c]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+----------------------------- Captured stdout call -----------------------------<br/>{&#x27;cmd&#x27;: &#x27;rr 152 1&#x27;,
+ &#x27;data&#x27;: 0,
+ &#x27;msg&#x27;: &#x27;cmd=user_reg.64 response=EOK-command success [0]&#x27;,
+ &#x27;node&#x27;: &#x27;phil&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_read_reg(0, 0x55, 0x98, 0x00)&#x27;,
+ &#x27;data&#x27;: [0],
+ &#x27;msg&#x27;: &#x27;i2c_0 read 1 byte(s) from reg 0x98 : [0x00]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_02_i2c_write_register.py::test_write_registers[write_data0]</td>
+          <td class="col-duration">0.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stdout setup -----------------------------<br/>test_name: test_write_registers[write_data0]
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;, &#x27;data&#x27;: None, &#x27;node&#x27;: &#x27;dut&#x27;, &#x27;result&#x27;: &#x27;Timeout&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;, &#x27;data&#x27;: None, &#x27;node&#x27;: &#x27;dut&#x27;, &#x27;result&#x27;: &#x27;Timeout&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;,
+ &#x27;data&#x27;: [&#x27;periph_i2c&#x27;],
+ &#x27;msg&#x27;: &#x27;[periph_i2c]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+----------------------------- Captured stdout call -----------------------------<br/>{&#x27;cmd&#x27;: &#x27;i2c_write_regs(0, 0x55, 0x98, 0x00, [0x29])&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 wrote 1 bytes to reg 0x98&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;rr 152 64&#x27;,
+ &#x27;data&#x27;: [41,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63],
+ &#x27;msg&#x27;: &#x27;cmd=user_reg.64 response=EOK-command success [0]&#x27;,
+ &#x27;node&#x27;: &#x27;phil&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_02_i2c_write_register.py::test_write_registers[write_data1]</td>
+          <td class="col-duration">0.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stdout setup -----------------------------<br/>test_name: test_write_registers[write_data1]
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;, &#x27;data&#x27;: None, &#x27;node&#x27;: &#x27;dut&#x27;, &#x27;result&#x27;: &#x27;Timeout&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;, &#x27;data&#x27;: None, &#x27;node&#x27;: &#x27;dut&#x27;, &#x27;result&#x27;: &#x27;Timeout&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;,
+ &#x27;data&#x27;: [&#x27;periph_i2c&#x27;],
+ &#x27;msg&#x27;: &#x27;[periph_i2c]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+----------------------------- Captured stdout call -----------------------------<br/>{&#x27;cmd&#x27;: &#x27;i2c_write_regs(0, 0x55, 0x98, 0x00, [0x2a, 0x2b])&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 wrote 2 bytes to reg 0x98&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;rr 152 64&#x27;,
+ &#x27;data&#x27;: [42,
+          43,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63],
+ &#x27;msg&#x27;: &#x27;cmd=user_reg.64 response=EOK-command success [0]&#x27;,
+ &#x27;node&#x27;: &#x27;phil&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_02_i2c_write_register.py::test_write_registers[write_data2]</td>
+          <td class="col-duration">0.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stdout setup -----------------------------<br/>test_name: test_write_registers[write_data2]
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;,
+ &#x27;data&#x27;: [&#x27;periph_i2c&#x27;],
+ &#x27;msg&#x27;: &#x27;[periph_i2c]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+----------------------------- Captured stdout call -----------------------------<br/>{&#x27;cmd&#x27;: &#x27;i2c_write_regs(0, 0x55, 0x98, 0x00, [0x2c, 0x2d, 0x2e])&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 wrote 3 bytes to reg 0x98&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;rr 152 64&#x27;,
+ &#x27;data&#x27;: [44,
+          45,
+          46,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63],
+ &#x27;msg&#x27;: &#x27;cmd=user_reg.64 response=EOK-command success [0]&#x27;,
+ &#x27;node&#x27;: &#x27;phil&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_02_i2c_write_register.py::test_write_registers[write_data3]</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stdout setup -----------------------------<br/>test_name: test_write_registers[write_data3]
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;, &#x27;data&#x27;: None, &#x27;node&#x27;: &#x27;dut&#x27;, &#x27;result&#x27;: &#x27;Timeout&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;, &#x27;data&#x27;: None, &#x27;node&#x27;: &#x27;dut&#x27;, &#x27;result&#x27;: &#x27;Timeout&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_get_id&#x27;,
+ &#x27;data&#x27;: [&#x27;periph_i2c&#x27;],
+ &#x27;msg&#x27;: &#x27;[periph_i2c]&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;i2c_acquire(0)&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 acquired&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+----------------------------- Captured stdout call -----------------------------<br/>{&#x27;cmd&#x27;: &#x27;i2c_write_regs(0, 0x55, 0x98, 0x00, [0x2f, 0x30, 0x31, 0x32, 0x33, &#x27;
+        &#x27;0x34, 0x35, 0x36, 0x37, 0x38])&#x27;,
+ &#x27;data&#x27;: None,
+ &#x27;msg&#x27;: &#x27;i2c_0 wrote 10 bytes to reg 0x98&#x27;,
+ &#x27;node&#x27;: &#x27;dut&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+{&#x27;cmd&#x27;: &#x27;rr 152 64&#x27;,
+ &#x27;data&#x27;: [47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63],
+ &#x27;msg&#x27;: &#x27;cmd=user_reg.64 response=EOK-command success [0]&#x27;,
+ &#x27;node&#x27;: &#x27;phil&#x27;,
+ &#x27;result&#x27;: &#x27;Success&#x27;}
+</div></td></tr></tbody></table></body></html>
