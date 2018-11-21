@@ -7,7 +7,10 @@ include $(RIOTBASE)/Makefile.include
 
 # Compile time tests
 .PHONY: compile-test test-newlib-nano
+# The tests should only be executed in build environment
+ifneq ($(BUILD_IN_DOCKER),1)
 all: compile-test
+endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
   COMPILE_TESTS += test-newlib
