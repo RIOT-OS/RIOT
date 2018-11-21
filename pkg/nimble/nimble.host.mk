@@ -26,6 +26,7 @@ SRC += ble_hs_mqueue.c
 SRC += ble_hs_misc.c
 SRC += ble_hs_pvcy.c
 SRC += ble_hs_startup.c
+SRC += ble_hs_stop.c
 SRC += ble_ibeacon.c
 SRC += ble_l2cap.c
 SRC += ble_l2cap_coc.c
