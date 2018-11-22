@@ -69,7 +69,6 @@ extern "C" {
  */
 #define MMA8X5X_PARAM_I2C           I2C_DEV(0)
 #define MMA8X5X_PARAM_ADDR          0x1d
-#define MMA8X5X_PARAM_TYPE          0x5a
 /** @} */
 
 /**
