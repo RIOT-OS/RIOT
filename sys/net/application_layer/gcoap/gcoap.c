@@ -38,6 +38,15 @@
 #define GCOAP_RESOURCE_WRONG_METHOD -1
 #define GCOAP_RESOURCE_NO_PATH -2
 
+/*
+ * Reduce payload length by this value for a request created with
+ * gcoap_req_init(), gcoap_resp_init(), and gcoap_obs_init(), respectively.
+ * Accommodates writing Content-Format option in gcoap_finish().
+ */
+#define GCOAP_REQ_OPTIONS_BUF   (4)
+#define GCOAP_RESP_OPTIONS_BUF  (4)
+#define GCOAP_OBS_OPTIONS_BUF   (4)
+
 /* Internal functions */
 static void *_event_loop(void *arg);
 static void _listen(sock_udp_t *sock);
