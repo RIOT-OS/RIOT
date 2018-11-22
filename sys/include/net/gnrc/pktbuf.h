@@ -305,35 +305,39 @@ gnrc_pktsnip_t *gnrc_pktbuf_duplicate_upto(gnrc_pktsnip_t *pkt, gnrc_nettype_t t
  * the data of all following packet snips into that reallocated space, and
  * removes the packet snip the data was copied from afterwards.
  *
- *          Example:
- *              Input:
- *                                                                  buffer
- *              +---------------------------+                      +------+
- *              | size = 8                  | data       +-------->|      |
- *              | type = NETTYPE_IPV6       |------------+         +------+
- *              +---------------------------+                      .      .
- *                    | next                                       .      .
- *                    v                                            .      .
- *              +---------------------------+                      +------+
- *              | size = 40                 | data    +----------->|      |
- *              | type = NETTYPE_UDP        |---------+            +------+
- *              +---------------------------+                      .      .
- *                    | next                                       .      .
- *                    v
- *              +---------------------------+                      +------+
- *              | size = 14                 | data +-------------->|      |
- *              | type = NETTYPE_UNDEF      |------+               +------+
- *              +---------------------------+                      .      .
+ * ### Example
+ * #### Input
+ *
+ *                                                         buffer
+ *     +---------------------------+                      +------+
+ *     | size = 8                  | data       +-------->|      |
+ *     | type = NETTYPE_IPV6       |------------+         +------+
+ *     +---------------------------+                      .      .
+ *           | next                                       .      .
+ *           v                                            .      .
+ *     +---------------------------+                      +------+
+ *     | size = 40                 | data    +----------->|      |
+ *     | type = NETTYPE_UDP        |---------+            +------+
+ *     +---------------------------+                      .      .
+ *           | next                                       .      .
+ *           v
+ *     +---------------------------+                      +------+
+ *     | size = 14                 | data +-------------->|      |
+ *     | type = NETTYPE_UNDEF      |------+               +------+
+ *     +---------------------------+                      .      .
  *
  *
- *              Output:
- *                                                                  buffer
- *              +---------------------------+                      +------+
- *              | size = 62                 | data       +-------->|      |
- *              | type = NETTYPE_IPV6       |------------+         |      |
- *              +---------------------------+                      |      |
- *                                                                 |      |
- *                                                                 +------+
+ * #### Output
+ *
+ *                                                         buffer
+ *     +---------------------------+                      +------+
+ *     | size = 62                 | data       +-------->|      |
+ *     | type = NETTYPE_IPV6       |------------+         |      |
+ *     +---------------------------+                      |      |
+ *                                                        |      |
+ *                                                        |      |
+ *                                                        |      |
+ *                                                        +------+
  *                                                                 .      .
  *
  * @warning @p pkt needs to write protected before calling this function.
