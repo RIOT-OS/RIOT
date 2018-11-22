@@ -2,7 +2,6 @@
 
 : ${TEST_BOARDS_AVAILABLE:="nrf52dk samr21-xpro"}
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
-: ${TEST_BOARDS_LLVM_COMPILE:="native"}
 : ${ENABLE_STAGING:=1}
 
 export RIOT_CI_BUILD=1
