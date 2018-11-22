@@ -653,10 +653,15 @@ size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
 
     while (len) {
         size_t part_len;
-        uripos++;
+        if (*uripos == separator) {
+            uripos++;
+        }
         uint8_t *part_start = (uint8_t *)uripos;
 
-        while (len--) {
+        while (len) {
+            /* must decrement separately from while loop test to ensure
+             * the value remains non-negative */
+            len--;
             if ((*uripos == separator) || (*uripos == '\0')) {
                 break;
             }
@@ -710,10 +715,15 @@ ssize_t coap_opt_add_string(coap_pkt_t *pkt, uint16_t optnum, const char *string
 
     while (unread_len) {
         size_t part_len;
-        uripos++;
+        if (*uripos == separator) {
+            uripos++;
+        }
         uint8_t *part_start = (uint8_t *)uripos;
 
-        while (unread_len--) {
+        while (unread_len) {
+            /* must decrement separately from while loop test to ensure
+             * the value remains non-negative */
+            unread_len--;
             if ((*uripos == separator) || (*uripos == '\0')) {
                 break;
             }
