@@ -59,13 +59,21 @@ event_t *event_get(event_queue_t *queue)
 
 event_t *event_wait(event_queue_t *queue)
 {
-    thread_flags_wait_any(THREAD_FLAG_EVENT);
-    unsigned state = irq_disable();
-    event_t *result = (event_t *) clist_lpop(&queue->event_list);
-    if (clist_rpeek(&queue->event_list)) {
-        queue->waiter->flags |= THREAD_FLAG_EVENT;
-    }
-    irq_restore(state);
+    event_t *result;
+    do {
+        thread_flags_wait_any(THREAD_FLAG_EVENT);
+        unsigned state = irq_disable();
+        result = (event_t *) clist_lpop(&queue->event_list);
+        if (clist_rpeek(&queue->event_list)) {
+            queue->waiter->flags |= THREAD_FLAG_EVENT;
+        }
+        irq_restore(state);
+        /* `result` will be NULL if all queued events are canceled after the
+         * thread flag has been set but before clist_lpop has been called. One
+         * example where this may occur is when using event_cancel from inside
+         * the handler of an earlier event in the same queue, or when using
+         * event_cancel from inside an interrupt handler. */
+    } while (!result);
     result->list_node.next = NULL;
     return result;
 }
