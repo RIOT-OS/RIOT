@@ -51,6 +51,11 @@ extern "C" {
 #define THREAD_STACKSIZE_IDLE      (128)
 /** @} */
 
+/**
+ * @brief   Attribute for memory sections required by SRAM PUF
+ */
+#define PUF_SRAM_ATTRIBUTES __attribute__((used, section(".noinit")))
+
 #ifdef __cplusplus
 }
 #endif

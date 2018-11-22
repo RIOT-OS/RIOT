@@ -25,6 +25,9 @@
 
 /* For Catchall-Loop */
 #include "board.h"
+#ifdef MODULE_PUF_SRAM
+#include "puf_sram.h"
+#endif
 
 /**
  * @brief functions for initializing the board, std-lib and kernel
@@ -65,6 +68,9 @@ __attribute__((used, naked)) void init8_ovr(void)
  */
 __attribute__((used)) void reset_handler(void)
 {
+#ifdef MODULE_PUF_SRAM
+    puf_sram_init((uint8_t *)RAMEND-SEED_RAM_LEN, SEED_RAM_LEN);
+#endif
     /* initialize the board and startup the kernel */
     board_init();
     /* startup the kernel */
