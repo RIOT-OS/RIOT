@@ -826,6 +826,14 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
 {
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
+        /* the device driver abstraction should be able to provide us with the
+         * IPV6_IID, so we try this first */
+        int res = netif->dev->driver->get(netif->dev, NETOPT_IPV6_IID,
+                                          eui64, sizeof(eui64_t));
+        if (res == sizeof(eui64_t)) {
+            return 0;
+        }
+
         switch (netif->device_type) {
 #ifdef MODULE_NETDEV_ETH
             case NETDEV_TYPE_ETHERNET:
@@ -887,7 +895,8 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
                 break;
         }
     }
-#endif
+#endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
+
     return -ENOTSUP;
 }
 
