@@ -118,28 +118,13 @@ endif
 
 LINKFLAGS += -L$(ESP32_SDK_DIR)/components/esp32
 LINKFLAGS += -L$(ESP32_SDK_DIR)/components/esp32/lib
-LINKFLAGS += -Wl,--start-group
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
-    LINKFLAGS += $(BINDIR)/cpu.a
-    LINKFLAGS += $(BINDIR)/esp_idf.a
-    LINKFLAGS += $(BINDIR)/esp_idf_esp32.a
-    LINKFLAGS += $(BINDIR)/esp_idf_nvs_flash.a
-    LINKFLAGS += $(BINDIR)/esp_idf_spi_flash.a
-    LINKFLAGS += $(BINDIR)/pthread.a
-    LINKFLAGS += $(BINDIR)/riot_freertos.a
-    LINKFLAGS += $(BINDIR)/xtimer.a
-    LINKFLAGS += -lcore -lrtc -lnet80211 -lpp -lsmartconfig -lcoexist
-    LINKFLAGS += -lwps -lwpa -lwpa2 -lespnow -lmesh -lphy -lstdc++
-endif
-
-ifneq (,$(filter pthread,$(USEMODULE)))
-    LINKFLAGS += $(BINDIR)/core.a
-    LINKFLAGS += $(BINDIR)/pthread.a
+    BASELIBS += -lcore -lrtc -lnet80211 -lpp -lsmartconfig -lcoexist
+    BASELIBS += -lwps -lwpa -lwpa2 -lespnow -lmesh -lphy -lstdc++
 endif
 
 LINKFLAGS += -lhal -lg -lc -lg
-LINKFLAGS += -Wl,--end-group
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.common.ld
