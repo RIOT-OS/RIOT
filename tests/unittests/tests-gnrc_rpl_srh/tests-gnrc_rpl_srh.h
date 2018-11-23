@@ -15,8 +15,8 @@
  *
  * @author      Cenk Gündoğan <mail@cgundogan.de>
  */
-#ifndef TESTS_RPL_SRH_H
-#define TESTS_RPL_SRH_H
+#ifndef TESTS_GNRC_RPL_SRH_H
+#define TESTS_GNRC_RPL_SRH_H
 
 #include "embUnit.h"
 
@@ -27,11 +27,11 @@ extern "C" {
 /**
  * @brief   The entry point of this test suite.
  */
-void tests_rpl_srh(void);
+void tests_gnrc_rpl_srh(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* TESTS_RPL_SRH_H */
+#endif /* TESTS_GNRC_RPL_SRH_H */
 /** @} */
