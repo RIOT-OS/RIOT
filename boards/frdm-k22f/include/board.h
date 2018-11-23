@@ -53,6 +53,20 @@ extern "C"
 /** @} */
 
 /**
+ * @name    Button pin definitions
+ * @{
+ */
+/* SW2, SW3 will short these pins to ground when pushed. Both pins have external
+ * pull-up resistors to VDD */
+/* BTN0 is mapped to SW2 */
+#define BTN0_PIN            GPIO_PIN(PORT_C,  1)
+#define BTN0_MODE           GPIO_IN
+/* BTN1 is mapped to SW3 */
+#define BTN1_PIN            GPIO_PIN(PORT_B, 17)
+#define BTN1_MODE           GPIO_IN
+/** @} */
+
+/**
  * @name    FXOS8700CQ 3-axis accelerometer and magnetometer bus configuration
  * @{
  */
