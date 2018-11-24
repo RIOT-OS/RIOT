@@ -75,7 +75,7 @@ _gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] =
    _GPIO    /* gpio16 */
 };
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     DEBUG("%s: %d %d\n", __func__, pin, mode);
 
@@ -169,7 +169,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 static gpio_isr_ctx_t gpio_isr_ctx_table [GPIO_PIN_NUMOF] = { };
 static bool gpio_int_enabled_table [GPIO_PIN_NUMOF] = { };
 
-void IRAM gpio_int_handler (void* arg)
+void IRAM gpio_int_handler_ll(void* arg)
 {
     irq_isr_enter();
 
@@ -189,8 +189,8 @@ void IRAM gpio_int_handler (void* arg)
     irq_isr_exit();
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
     if (gpio_init(pin, mode)) {
         return -1;
@@ -207,21 +207,21 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     GPIO.CONF[pin] = SET_FIELD(GPIO.CONF[pin], GPIO_CONF_INTTYPE, flank);
     if (flank != GPIO_NONE) {
         gpio_int_enabled_table [pin] = (gpio_isr_ctx_table[pin].cb != NULL);
-        ets_isr_attach (ETS_GPIO_INUM, gpio_int_handler, 0);
+        ets_isr_attach (ETS_GPIO_INUM, gpio_int_handler_ll, 0);
         ets_isr_unmask ((1 << ETS_GPIO_INUM));
     }
 
     return 0;
 }
 
-void gpio_irq_enable (gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
 
     gpio_int_enabled_table [pin] = true;
 }
 
-void gpio_irq_disable (gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
 
@@ -229,7 +229,7 @@ void gpio_irq_disable (gpio_t pin)
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
-int gpio_read (gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
 
@@ -241,7 +241,7 @@ int gpio_read (gpio_t pin)
     return (GPIO.IN & BIT(pin)) ? 1 : 0;
 }
 
-void gpio_write (gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     DEBUG("%s: %d %d\n", __func__, pin, value);
 
@@ -261,17 +261,17 @@ void gpio_write (gpio_t pin, int value)
     }
 }
 
-void gpio_set (gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
-    gpio_write (pin, 1);
+    gpio_write_ll(pin, 1);
 }
 
-void gpio_clear (gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
-    gpio_write (pin, 0);
+    gpio_write_ll(pin, 0);
 }
 
-void gpio_toggle (gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
     DEBUG("%s: %d\n", __func__, pin);
 
