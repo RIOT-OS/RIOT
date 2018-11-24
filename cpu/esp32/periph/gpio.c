@@ -245,7 +245,7 @@ const char* _gpio_pin_usage_str[] =
 #define GPIO_REG_BIT_XOR(l,h,b) if (b < 32) GPIO.l ^=  BIT(b); else GPIO.h.val ^=  BIT(b-32)
 #define REG_SET_CLR_BIT(c,r,f) if (c) REG_SET_BIT(r,f); else REG_CLR_BIT(r,f)
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
 {
     CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
 
@@ -388,7 +388,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
 static gpio_isr_ctx_t gpio_isr_ctx_table [GPIO_PIN_NUMOF] = { };
 static bool gpio_int_enabled_table [GPIO_PIN_NUMOF] = { };
 
-void IRAM gpio_int_handler (void* arg)
+void IRAM gpio_int_handler_ll (void* arg)
 {
     irq_isr_enter();
     (void)arg;
@@ -404,8 +404,8 @@ void IRAM gpio_int_handler (void* arg)
     irq_isr_exit();
 }
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                     gpio_cb_t cb, void *arg)
 {
     if (gpio_init(pin, mode)) {
         return -1;
@@ -420,21 +420,21 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         GPIO.pin[pin].int_ena = GPIO_PRO_CPU_INTR_ENA;
 
         intr_matrix_set(PRO_CPU_NUM, ETS_GPIO_INTR_SOURCE, CPU_INUM_GPIO);
-        xt_set_interrupt_handler(CPU_INUM_GPIO, gpio_int_handler, NULL);
+        xt_set_interrupt_handler(CPU_INUM_GPIO, gpio_int_handler_ll, NULL);
         xt_ints_on(BIT(CPU_INUM_GPIO));
     }
 
     return 0;
 }
 
-void gpio_irq_enable (gpio_t pin)
+void gpio_irq_enable_ll(gpio_t pin)
 {
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
 
     gpio_int_enabled_table [pin] = true;
 }
 
-void gpio_irq_disable (gpio_t pin)
+void gpio_irq_disable_ll(gpio_t pin)
 {
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
 
@@ -443,13 +443,13 @@ void gpio_irq_disable (gpio_t pin)
 
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
-int gpio_read (gpio_t pin)
+int gpio_read_ll(gpio_t pin)
 {
     CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
     return GPIO_REG_BIT_GET(in, in1, pin) ? 1 : 0;
 }
 
-void gpio_write (gpio_t pin, int value)
+void gpio_write_ll(gpio_t pin, int value)
 {
     DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
@@ -461,14 +461,14 @@ void gpio_write (gpio_t pin, int value)
     }
 }
 
-void gpio_set (gpio_t pin)
+void gpio_set_ll(gpio_t pin)
 {
     DEBUG("%s gpio=%u\n", __func__, pin);
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
     GPIO_PIN_SET(pin);
 }
 
-void gpio_clear (gpio_t pin)
+void gpio_clear_ll(gpio_t pin)
 {
     DEBUG("%s gpio=%u\n", __func__, pin);
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
@@ -476,7 +476,7 @@ void gpio_clear (gpio_t pin)
 
 }
 
-void gpio_toggle (gpio_t pin)
+void gpio_toggle_ll(gpio_t pin)
 {
     DEBUG("%s gpio=%u\n", __func__, pin);
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
