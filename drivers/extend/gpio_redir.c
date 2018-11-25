@@ -37,7 +37,7 @@ gpio_ext_t *gpio_ext_entry(gpio_t gpio)
     DEBUG("[gpio_ext_entry] list entry is %u\n", devnum);
 
     /* device is greater than number of listed entries */
-    if (devnum > (sizeof(gpio_ext_list) / sizeof(gpio_ext_list[0]))) {
+    if (devnum >= (sizeof(gpio_ext_list) / sizeof(gpio_ext_list[0]))) {
         return NULL;
     }
 
