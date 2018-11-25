@@ -21,16 +21,54 @@
 #include "slipdev.h"
 #include "slipdev_internal.h"
 
+/* XXX: BE CAREFUL ABOUT USING OUTPUT WITH MODULE_SLIPDEV_STDIO IN SENDING
+ * FUNCTIONALITY! MIGHT CAUSE DEADLOCK!!!1!! */
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
+
+#include "isrpipe.h"
+#include "mutex.h"
+#include "stdio_uart.h"
+
+static inline void slipdev_lock(void)
+{
+    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+        mutex_lock(&slipdev_mutex);
+    }
+}
+
+static inline void slipdev_unlock(void)
+{
+    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+        mutex_unlock(&slipdev_mutex);
+    }
+}
 
 static void _slip_rx_cb(void *arg, uint8_t byte)
 {
     slipdev_t *dev = arg;
 
+    if (IS_USED(MODULE_SLIPDEV_STDIO)) {
+        if (dev->state == SLIPDEV_STATE_STDIN) {
+            isrpipe_write_one(&slipdev_stdio_isrpipe, byte);
+            goto check_end;
+        }
+        else if ((byte == SLIPDEV_STDIO_START) &&
+            (dev->config.uart == STDIO_UART_DEV) &&
+            (dev->state == SLIPDEV_STATE_NONE)) {
+            dev->state = SLIPDEV_STATE_STDIN;
+            return;
+        }
+    }
+    dev->state = SLIPDEV_STATE_NET;
     tsrb_add_one(&dev->inbuf, byte);
-    if ((byte == SLIPDEV_END) && (dev->netdev.event_callback != NULL)) {
-        dev->netdev.event_callback((netdev_t *)dev, NETDEV_EVENT_ISR);
+check_end:
+    if (byte == SLIPDEV_END) {
+        if ((dev->state == SLIPDEV_STATE_NET) &&
+            (dev->netdev.event_callback != NULL)) {
+            dev->netdev.event_callback((netdev_t *)dev, NETDEV_EVENT_ISR);
+        }
+        dev->state = SLIPDEV_STATE_NONE;
     }
 }
 
@@ -112,12 +150,14 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     int bytes = 0;
 
     DEBUG("slipdev: sending iolist\n");
+    slipdev_lock();
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         uint8_t *data = iol->iol_base;
         slipdev_write_bytes(dev->config.uart, data, iol->iol_len);
         bytes += iol->iol_len;
     }
     slipdev_write_byte(dev->config.uart, SLIPDEV_END);
+    slipdev_unlock();
     return bytes;
 }
 
@@ -209,6 +249,7 @@ void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params)
 {
     /* set device descriptor fields */
     dev->config = *params;
+    dev->state = 0;
     dev->netdev.driver = &slip_driver;
 }
 
