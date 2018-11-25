@@ -119,8 +119,7 @@ void test_gpio_write(void *dev, gpio_t pin, int value)
 
 int main(void)
 {
-    uint16_t num;
-    gpio_t pin;
+    gpio_t num, pin;
 
     puts("gpio extension test routine");
 

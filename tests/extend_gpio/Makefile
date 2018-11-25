@@ -6,6 +6,8 @@ BOARD_BLACKLIST := chronos \
                    mips-malta \
                    native
 
+FEATURES_REQUIRED += periph_gpio_irq
+
 USEMODULE += extend_gpio
 
 TEST_ON_CI_WHITELIST += all
