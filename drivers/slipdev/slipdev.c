@@ -18,21 +18,17 @@
 
 #include "log.h"
 #include "slipdev.h"
+#include "slipdev_internal.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
-
-#define SLIP_END               (0xc0U)
-#define SLIP_ESC               (0xdbU)
-#define SLIP_END_ESC           (0xdcU)
-#define SLIP_ESC_ESC           (0xddU)
 
 static void _slip_rx_cb(void *arg, uint8_t byte)
 {
     slipdev_t *dev = arg;
 
     tsrb_add_one(&dev->inbuf, byte);
-    if ((byte == SLIP_END) && (dev->netdev.event_callback != NULL)) {
+    if ((byte == SLIPDEV_END) && (dev->netdev.event_callback != NULL)) {
         dev->netdev.event_callback((netdev_t *)dev, NETDEV_EVENT_ISR);
     }
 }
@@ -70,15 +66,15 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
         for (unsigned j = 0; j < iol->iol_len; j++, data++) {
             switch(*data) {
-                case SLIP_END:
+                case SLIPDEV_END:
                     /* escaping END byte*/
-                    _write_byte(dev, SLIP_ESC);
-                    _write_byte(dev, SLIP_END_ESC);
+                    _write_byte(dev, SLIPDEV_ESC);
+                    _write_byte(dev, SLIPDEV_END_ESC);
                     break;
-                case SLIP_ESC:
+                case SLIPDEV_ESC:
                     /* escaping ESC byte*/
-                    _write_byte(dev, SLIP_ESC);
-                    _write_byte(dev, SLIP_ESC_ESC);
+                    _write_byte(dev, SLIPDEV_ESC);
+                    _write_byte(dev, SLIPDEV_ESC_ESC);
                     break;
                 default:
                     _write_byte(dev, *data);
@@ -86,7 +82,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
             bytes++;
         }
     }
-    _write_byte(dev, SLIP_END);
+    _write_byte(dev, SLIPDEV_END);
     return bytes;
 }
 
@@ -101,7 +97,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             /* remove data */
             for (; len > 0; len--) {
                 int byte = tsrb_get_one(&dev->inbuf);
-                if ((byte == (int)SLIP_END) || (byte < 0)) {
+                if ((byte == (int)SLIPDEV_END) || (byte < 0)) {
                     /* end early if end of packet or ringbuffer is reached;
                      * len might be larger than the actual packet */
                     break;
@@ -122,23 +118,23 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                 return -EIO;
             }
             switch (byte) {
-                case SLIP_END:
+                case SLIPDEV_END:
                     break;
-                case SLIP_ESC:
+                case SLIPDEV_ESC:
                     dev->inesc = 1;
                     break;
-                case SLIP_END_ESC:
+                case SLIPDEV_END_ESC:
                     if (dev->inesc) {
-                        *(ptr++) = SLIP_END;
+                        *(ptr++) = SLIPDEV_END;
                         res++;
                         dev->inesc = 0;
                         break;
                     }
                     /* Intentionally falls through */
                     /* to default when !dev->inesc */
-                case SLIP_ESC_ESC:
+                case SLIPDEV_ESC_ESC:
                     if (dev->inesc) {
-                        *(ptr++) = SLIP_ESC;
+                        *(ptr++) = SLIPDEV_ESC;
                         res++;
                         dev->inesc = 0;
                         break;
@@ -151,13 +147,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                     break;
             }
             if ((unsigned)res > len) {
-                while (byte != SLIP_END) {
+                while (byte != SLIPDEV_END) {
                     /* clear out unreceived packet */
                     byte = tsrb_get_one(&dev->inbuf);
                 }
                 return -ENOBUFS;
             }
-        } while (byte != SLIP_END);
+        } while (byte != SLIPDEV_END);
     }
     return res;
 }
