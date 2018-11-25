@@ -59,6 +59,7 @@ int gpio_init_redir(gpio_t pin, gpio_mode_t mode)
     return entry->driver->init(entry->dev, pin, mode);
 }
 
+#ifdef MODULE_PERIPH_GPIO_IRQ
 int gpio_init_int_redir(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                         gpio_cb_t cb, void *arg)
 {
@@ -73,6 +74,7 @@ int gpio_init_int_redir(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
     return entry->driver->init_int(entry->dev, pin, mode, flank, cb, arg);
 }
+#endif /* MODULE_PERIPH_GPIO_IRQ */
 
 void gpio_irq_enable_redir(gpio_t pin)
 {
