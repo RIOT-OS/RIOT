@@ -413,6 +413,10 @@ void auto_init(void)
     extern void auto_init_mag3110(void);
     auto_init_mag3110();
 #endif
+#ifdef MODULE_MCP9808
+    extern void auto_init_mcp9808(void);
+    auto_init_mcp9808();
+#endif
 #ifdef MODULE_MMA7660
     extern void auto_init_mma7660(void);
     auto_init_mma7660();
