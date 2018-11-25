@@ -601,6 +601,12 @@ ifneq (,$(filter slipdev,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
 endif
 
+ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
+  USEMODULE += isrpipe
+  USEMODULE += slipdev
+  FEATURES_REQUIRED += periph_uart
+endif
+
 ifneq (,$(filter soft_spi,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer

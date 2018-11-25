@@ -22,7 +22,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "isrpipe.h"
 #include "periph/uart.h"
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +39,25 @@ extern "C" {
 #define SLIPDEV_ESC         (0xdbU)
 #define SLIPDEV_END_ESC     (0xdcU)
 #define SLIPDEV_ESC_ESC     (0xddU)
+
+/**
+ * @brief   Marker byte for beginning of stdio
+ * @see     taken from diagnostic transfer from
+ *          [SLIPMUX](https://tools.ietf.org/html/draft-bormann-t2trg-slipmux-02#section-4)
+ */
+#define SLIPDEV_STDIO_START (0x0aU)
 /** @} */
+
+/**
+ * @brief   ISR pipe to hand read bytes to stdin
+ */
+extern isrpipe_t slipdev_stdio_isrpipe;
+
+/**
+ * @brief   Mutex to synchronize write operations to the UART between stdio
+ *          sub-module and normal SLIP.
+ */
+extern mutex_t slipdev_mutex;
 
 /**
  * @brief   Writes one byte to UART
