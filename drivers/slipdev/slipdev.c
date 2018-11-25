@@ -14,6 +14,7 @@
  */
 
 #include <errno.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "log.h"
@@ -50,9 +51,59 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
-static inline void _write_byte(slipdev_t *dev, uint8_t byte)
+void slipdev_write_bytes(uart_t uart, const uint8_t *data, size_t len)
 {
-    uart_write(dev->config.uart, &byte, 1);
+    for (unsigned j = 0; j < len; j++, data++) {
+        switch (*data) {
+            case SLIPDEV_END:
+                /* escaping END byte*/
+                slipdev_write_byte(uart, SLIPDEV_ESC);
+                slipdev_write_byte(uart, SLIPDEV_END_ESC);
+                break;
+            case SLIPDEV_ESC:
+                /* escaping ESC byte*/
+                slipdev_write_byte(uart, SLIPDEV_ESC);
+                slipdev_write_byte(uart, SLIPDEV_ESC_ESC);
+                break;
+            default:
+                slipdev_write_byte(uart, *data);
+        }
+    }
+}
+
+static unsigned _copy_byte(uint8_t *buf, uint8_t byte, bool *escaped)
+{
+    *buf = byte;
+    *escaped = false;
+    return 1U;
+}
+
+unsigned slipdev_unstuff_readbyte(uint8_t *buf, uint8_t byte, bool *escaped)
+{
+    unsigned res = 0U;
+
+    switch (byte) {
+        case SLIPDEV_ESC:
+            *escaped = true;
+            /* Intentionally falls through */
+        case SLIPDEV_END:
+            break;
+        case SLIPDEV_END_ESC:
+            if (*escaped) {
+                return _copy_byte(buf, SLIPDEV_END, escaped);
+            }
+            /* Intentionally falls through */
+            /* to default when !(*escaped) */
+        case SLIPDEV_ESC_ESC:
+            if (*escaped) {
+                return _copy_byte(buf, SLIPDEV_ESC, escaped);
+            }
+            /* Intentionally falls through */
+            /* to default when !(*escaped) */
+        default:
+            return _copy_byte(buf, byte, escaped);
+    }
+    return res;
 }
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
@@ -63,26 +114,10 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     DEBUG("slipdev: sending iolist\n");
     for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
         uint8_t *data = iol->iol_base;
-
-        for (unsigned j = 0; j < iol->iol_len; j++, data++) {
-            switch(*data) {
-                case SLIPDEV_END:
-                    /* escaping END byte*/
-                    _write_byte(dev, SLIPDEV_ESC);
-                    _write_byte(dev, SLIPDEV_END_ESC);
-                    break;
-                case SLIPDEV_ESC:
-                    /* escaping ESC byte*/
-                    _write_byte(dev, SLIPDEV_ESC);
-                    _write_byte(dev, SLIPDEV_ESC_ESC);
-                    break;
-                default:
-                    _write_byte(dev, *data);
-            }
-            bytes++;
-        }
+        slipdev_write_bytes(dev->config.uart, data, iol->iol_len);
+        bytes += iol->iol_len;
     }
-    _write_byte(dev, SLIPDEV_END);
+    slipdev_write_byte(dev->config.uart, SLIPDEV_END);
     return bytes;
 }
 
@@ -110,42 +145,19 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     }
     else {
         int byte;
+        bool escaped = false;
         uint8_t *ptr = buf;
 
         do {
+            int tmp;
+
             if ((byte = tsrb_get_one(&dev->inbuf)) < 0) {
                 /* something went wrong, return error */
                 return -EIO;
             }
-            switch (byte) {
-                case SLIPDEV_END:
-                    break;
-                case SLIPDEV_ESC:
-                    dev->inesc = 1;
-                    break;
-                case SLIPDEV_END_ESC:
-                    if (dev->inesc) {
-                        *(ptr++) = SLIPDEV_END;
-                        res++;
-                        dev->inesc = 0;
-                        break;
-                    }
-                    /* Intentionally falls through */
-                    /* to default when !dev->inesc */
-                case SLIPDEV_ESC_ESC:
-                    if (dev->inesc) {
-                        *(ptr++) = SLIPDEV_ESC;
-                        res++;
-                        dev->inesc = 0;
-                        break;
-                    }
-                    /* Intentionally falls through */
-                    /* to default when !dev->inesc */
-                default:
-                    *(ptr++) = (uint8_t)byte;
-                    res++;
-                    break;
-            }
+            tmp = slipdev_unstuff_readbyte(ptr, byte, &escaped);
+            ptr += tmp;
+            res += tmp;
             if ((unsigned)res > len) {
                 while (byte != SLIPDEV_END) {
                     /* clear out unreceived packet */
