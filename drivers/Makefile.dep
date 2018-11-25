@@ -170,7 +170,6 @@ endif
 
 ifneq (,$(filter extend_gpio,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
-  FEATURES_REQUIRED += periph_gpio_irq
   USEMODULE += extend
 endif
 
