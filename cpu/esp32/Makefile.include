@@ -124,7 +124,7 @@ ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
     BASELIBS += -lwps -lwpa -lwpa2 -lespnow -lmesh -lphy -lstdc++
 endif
 
-LINKFLAGS += -lhal -lg -lc -lg
+LINKFLAGS += -lhal -lg -lc
 LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld/
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.common.ld
