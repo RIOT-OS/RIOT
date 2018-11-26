@@ -1,0 +1,17 @@
+# define the cpu used by the board
+export CPU = kinetis
+export CPU_MODEL = mkw41z512vht4
+
+# This board is factory flashed with a sniffer application which uses a
+# proprietary protocol (FSCI) over USB for transferring received data frames.
+# The user needs to replace the proprietary USB interface application with a
+# JLink OpenSDA application for the USB-KW41Z available at
+# https://www.segger.com/downloads/jlink#JLinkOpenSDABoardSpecificFirmwares
+# If you wish to recover the original sniffer function, follow the instructions
+# in the Quick start guide on the NXP website (go to "2.4 Programming USB-KW41Z
+# as Sniffer"):
+# https://www.nxp.com/products/wireless/bluetooth-low-energy-ble/bluetooth-low-energy-ieee-802.15.4-packet-sniffer-usb-dongle:USB-KW41Z?&tab=In-Depth_Tab&tid=van/usb-kw41z/startnow
+export DEBUG_ADAPTER ?= jlink
+
+# Include default FRDM board config
+include $(RIOTBOARD)/common/frdm/Makefile.include

@@ -1,0 +1,5 @@
+/**
+ * @defgroup    boards_usb-kw41z NXP USB-KW41Z Board
+ * @ingroup     boards
+ * @brief       Support for the USB-KW41Z
+ */
