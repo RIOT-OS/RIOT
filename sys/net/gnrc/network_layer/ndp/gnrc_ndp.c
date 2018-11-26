@@ -528,6 +528,9 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_CUR_HL) {
             cur_hl = netif->cur_hl;
         }
+#if GNRC_IPV6_NIB_CONF_ARSM
+        /* netif->ipv6.reach_time_base is only available with Address Resolution
+         * State Machine */
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_REACH_TIME) {
             if (netif->ipv6.reach_time_base > (3600 * MS_PER_SEC)) {
                 /* reach_time > 1 hour */
@@ -537,6 +540,7 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
                 reach_time = netif->ipv6.reach_time_base;
             }
         }
+#endif /* GNRC_IPV6_NIB_CONF_ARSM */
         if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_RETRANS_TIMER) {
             retrans_timer = netif->ipv6.retrans_time;
         }
