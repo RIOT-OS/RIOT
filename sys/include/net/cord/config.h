@@ -75,21 +75,6 @@ extern "C" {
 #endif
 /** @} */
 
-/**
- * @brief   Use ALL_NODES multicast address as default address when looking for
- *          a RD server
- */
-#ifndef CORD_SERVER_ADDR
-#define CORD_SERVER_ADDR        "ff02::1"
-#endif
-
-/**
- * @brief   Default Port to use when looking for RDs
- */
-#ifndef CORD_SERVER_PORT
-#define CORD_SERVER_PORT        COAP_PORT
-#endif
-
 #ifdef __cplusplus
 }
 #endif
