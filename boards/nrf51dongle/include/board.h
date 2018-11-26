@@ -19,20 +19,11 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "cpu.h"
-#include "periph_conf.h"
+#include "board_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Xtimer configuration
- * @{
- */
-#define XTIMER_WIDTH                (24)
-#define XTIMER_BACKOFF              (40)
-/** @} */
 
 /**
  * @name    LED pin definitions and handlers
@@ -58,11 +49,6 @@ extern "C" {
 #define LED2_OFF            (NRF_GPIO->OUTSET = LED2_MASK)
 #define LED2_TOGGLE         (NRF_GPIO->OUT   ^= LED2_MASK)
 /** @} */
-
-/**
- * @brief   Initialize the board, also triggers the CPU initialization
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }

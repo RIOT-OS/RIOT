@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_yunjia-nrf51822
+ * @ingroup     boards_common_nrf51
  * @{
  *
  * @file
- * @brief       Board specific implementations for the Yunjia NRF51822 board
+ * @brief       Board initialization for the nRF51 based boards
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
