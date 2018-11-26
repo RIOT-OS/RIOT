@@ -273,7 +273,10 @@ int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
     }
     /* set some packet options and write query string */
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
+    coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_LINK);
     cord_common_add_qstring(&pkt);
+
+    pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_PAYLOAD);
 
     /* add the resource description as payload */
     res = gcoap_get_resource_list(pkt.payload, pkt.payload_len,
@@ -282,9 +285,7 @@ int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
         retval = CORD_EP_ERR;
         goto end;
     }
-
-    /* finish up the packet */
-    pkt_len = gcoap_finish(&pkt, res, COAP_FORMAT_LINK);
+    pkt_len += res;
 
     /* send out the request */
     res = gcoap_req_send2(buf, pkt_len, remote, _on_register);
