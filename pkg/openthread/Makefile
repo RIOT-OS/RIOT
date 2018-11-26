@@ -32,7 +32,7 @@ all: git-download
 		-specs=nosys.specs -Wl,--gc-sections -Wl,-Map=map.map " \
 		./configure --disable-docs --host=$(TARGET_ARCH) --target=$(TARGET_ARCH) \
 		--prefix=/ --enable-default-logging $(OPENTHREAD_ARGS)
-	cd $(PKG_BUILDDIR) &&  DESTDIR=$(PKG_BUILDDIR)/output PREFIX=/ make -j4 --no-print-directory install
+	cd $(PKG_BUILDDIR) &&  DESTDIR=$(PKG_BUILDDIR)/output PREFIX=/ make --output-sync=none -j4 --no-print-directory install
 
 	cp $(PKG_BUILDDIR)/output/lib/libmbedcrypto.a ${BINDIR}/mbedcrypto.a
 ifneq (,$(filter openthread-cli-ftd,$(USEMODULE)))
