@@ -52,6 +52,10 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief   Process the RPL source routing header.
  *
+ * @pre `rh->seq_left > 0`; The 0 case means the destination is reached and
+ *      common among all routing headers, so it should be handled by an
+ *      external routing header handler.
+ *
  * @param[in,out] ipv6  The IPv6 header of the incoming packet.
  * @param[in] rh        A RPL source routing header.
  *
