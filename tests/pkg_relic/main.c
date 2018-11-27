@@ -130,7 +130,7 @@ static void tests_relic_ecdh(void)
 
 }
 
-TestRef tests_relic_all(void)
+TestRef tests_relic(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(tests_relic_ecdh)
@@ -140,7 +140,11 @@ TestRef tests_relic_all(void)
     return (TestRef)&RELICTest;
 }
 
-void tests_relic(void)
+int main(void)
 {
-    TESTS_RUN(tests_relic_all());
+    TESTS_START();
+    TESTS_RUN(tests_relic());
+    TESTS_END();
+
+    return 0;
 }

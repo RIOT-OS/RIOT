@@ -93,7 +93,7 @@ endif
 ARM7_BOARDS := avsextrem \
                msba2 \
                #
-DISABLE_TEST_FOR_ARM7 := tests-relic tests-cpp_%
+DISABLE_TEST_FOR_ARM7 := tests-cpp_%
 
 ARM_CORTEX_M_BOARDS := airfy-beacon \
                        arduino-due \
@@ -190,14 +190,14 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        udoo \
                        yunjia-nrf51822 \
                        #
-DISABLE_TEST_FOR_ARM_CORTEX_M := tests-relic
+DISABLE_TEST_FOR_ARM_CORTEX_M :=
 
 AVR_BOARDS := arduino-duemilanove \
               arduino-mega2560 \
               arduino-uno \
               waspmote-pro \
               #
-DISABLE_TEST_FOR_AVR := tests-relic tests-cpp_%
+DISABLE_TEST_FOR_AVR := tests-cpp_%
 
 MSP430_BOARDS := chronos \
                  msb-430 \
@@ -207,7 +207,7 @@ MSP430_BOARDS := chronos \
                  wsn430-v1_4 \
                  z1 \
                  #
-DISABLE_TEST_FOR_MSP430 := tests-relic tests-spiffs tests-cpp_%
+DISABLE_TEST_FOR_MSP430 := tests-spiffs tests-cpp_%
 
 ifneq (, $(filter $(ARM7_BOARDS), $(BOARD)))
   UNIT_TESTS := $(filter-out $(DISABLE_TEST_FOR_ARM7), $(UNIT_TESTS))
