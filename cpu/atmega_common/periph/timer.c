@@ -33,11 +33,6 @@
 #include "debug.h"
 
 /**
- * @brief   All timers have three channels
- */
-#define CHANNELS (3)
-
-/**
  * @brief   We have 5 possible prescaler values
  */
 #define PRESCALE_NUMOF (5U)
@@ -137,7 +132,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= CHANNELS) {
+    if (channel >= TIMER_CHANNELS) {
         return -1;
     }
 
@@ -150,7 +145,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= CHANNELS) {
+    if (channel >= TIMER_CHANNELS) {
         return -1;
     }
 

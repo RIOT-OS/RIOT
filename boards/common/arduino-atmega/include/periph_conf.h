@@ -49,7 +49,8 @@ extern "C" {
  * @{
  */
 #ifdef CPU_ATMEGA328P
-#define TIMER_NUMOF         (2U)
+#define TIMER_NUMOF         (1U)
+#define TIMER_CHANNELS      (2)
 
 #define TIMER_0             MEGA_TIMER1
 #define TIMER_0_MASK        &TIMSK1
@@ -60,6 +61,7 @@ extern "C" {
 
 #ifdef CPU_ATMEGA2560
 #define TIMER_NUMOF         (2U)
+#define TIMER_CHANNELS      (3)
 
 #define TIMER_0             MEGA_TIMER1
 #define TIMER_0_MASK        &TIMSK1
