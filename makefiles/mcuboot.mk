@@ -1,9 +1,14 @@
+.PHONY: mcuboot mcuboot-create-key mcuboot-flash-bootloader mcuboot-flash
+
 ifdef MCUBOOT_SLOT0_SIZE
 
 IMGTOOL ?= $(RIOTTOOLS)/mcuboot/imgtool.py
 
 SIGN_BINFILE = $(BINDIR)/signed-$(APPLICATION).bin
 MCUBOOT_KEYFILE ?= $(BINDIR)/key.pem
+
+MCUBOOT_ELF ?= $(ELFFILE:.elf=.mcuboot.elf)
+MCUBOOT_BIN ?= $(MCUBOOT_ELF:.elf=.bin)
 
 MCUBOOT_LOADER_BIN ?= $(BINDIR)/mcuboot.bin
 MCUBOOT_LOADER_BIN_URL ?= http://download.riot-os.org/mynewt.mcuboot.bin
@@ -21,24 +26,20 @@ $(MCUBOOT_KEYFILE):
 	$(Q)$(IMGTOOL) keygen -k $@ -t rsa-2048
 endif
 
-mcuboot: ROM_OFFSET=$$(($(MCUBOOT_SLOT0_SIZE) + $(IMAGE_HDR_SIZE)))
-mcuboot: mcuboot-create-key link
-	@$(COLOR_ECHO)
+$(MCUBOOT_ELF): ROM_OFFSET=$$(($(MCUBOOT_SLOT0_SIZE) + $(IMAGE_HDR_SIZE)))
+$(MCUBOOT_ELF): $(BASELIBS)
 	@$(COLOR_ECHO) '$(COLOR_PURPLE)Re-linking for MCUBoot at $(MCUBOOT_SLOT0_SIZE)...$(COLOR_RESET)'
-	@$(COLOR_ECHO)
-	$(Q)$(_LINK) -o $(ELFFILE) && \
-	$(OBJCOPY) $(OFLAGS) -Obinary $(ELFFILE) $(BINFILE) && \
-	$(IMGTOOL) sign --key $(MCUBOOT_KEYFILE) --version $(IMAGE_VERSION) --align \
-	$(MCUBOOT_IMAGE_ALIGN) -H $(IMAGE_HDR_SIZE) $(BINFILE) $(SIGN_BINFILE)
-	@$(COLOR_ECHO)
-	@$(COLOR_ECHO) '$(COLOR_PURPLE)Signed with $(MCUBOOT_KEYFILE) for version $(IMAGE_VERSION)\
-	$(COLOR_RESET)'
-	@$(COLOR_ECHO)
+	$(Q)$(_LINK) -o $@
+
+$(SIGN_BINFILE): $(MCUBOOT_BIN) $(MCUBOOT_KEYFILE)
+	@$(COLOR_ECHO) '$(COLOR_PURPLE)Signing with $(MCUBOOT_KEYFILE) for version $(IMAGE_VERSION)$(COLOR_RESET)'
+	$(Q)$(IMGTOOL) sign --key $(MCUBOOT_KEYFILE) --version $(IMAGE_VERSION) --align \
+	$(MCUBOOT_IMAGE_ALIGN) -H $(IMAGE_HDR_SIZE) $(MCUBOOT_BIN) $(SIGN_BINFILE)
+
+mcuboot: $(SIGN_BINFILE)
 
 $(MCUBOOT_LOADER_BIN):
 	$(Q)$(DLCACHE) $(MCUBOOT_LOADER_BIN_URL) $(MCUBOOT_LOADER_BIN_MD5) $@
-
-.PHONY: mcuboot-flash-bootloader mcuboot-flash
 
 mcuboot-flash-bootloader: FLASHFILE = $(MCUBOOT_LOADER_BIN)
 mcuboot-flash-bootloader: export FLASH_ADDR = 0x0
