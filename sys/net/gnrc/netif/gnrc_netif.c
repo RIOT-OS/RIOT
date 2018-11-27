@@ -1196,7 +1196,7 @@ static void _init_from_device(gnrc_netif_t *netif)
     _update_l2addr_from_dev(netif);
 }
 
-static void _init(gnrc_netif_t *netif)
+void gnrc_netif_default_init(gnrc_netif_t *netif)
 {
     _init_from_device(netif);
 #ifdef MODULE_GNRC_IPV6_NIB
@@ -1361,7 +1361,7 @@ static void *_gnrc_netif_thread(void *args)
     _test_options(netif);
 #endif
     netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
-    _init(netif);
+    gnrc_netif_default_init(netif);
     if (netif->ops->init) {
         netif->ops->init(netif);
     }

@@ -435,6 +435,15 @@ static inline int gnrc_netif_ipv6_group_leave(const gnrc_netif_t *netif,
 }
 
 /**
+ * @brief   Default operation for gnrc_netif_ops_t::init()
+ *
+ * @note    Can also be used to be called *before* a custom operation.
+ *
+ * @param[in] netif     The network interface.
+ */
+void gnrc_netif_default_init(gnrc_netif_t *netif);
+
+/**
  * @brief   Default operation for gnrc_netif_ops_t::get()
  *
  * @note    Can also be used to be called *after* a custom operation.
