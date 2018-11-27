@@ -258,7 +258,7 @@ static void _netif_msg_handler(gnrc_netif_t *netif, msg_t *msg)
 }
 
 static const gnrc_netif_ops_t _ble_ops = {
-    .init = NULL,
+    .init = gnrc_netif_default_init,
     .send = _netif_send,
     .recv = _netif_recv,
     .get = gnrc_netif_get_from_netdev,

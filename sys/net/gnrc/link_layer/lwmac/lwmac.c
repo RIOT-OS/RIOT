@@ -901,6 +901,7 @@ static void _lwmac_init(gnrc_netif_t *netif)
 {
     netdev_t *dev;
 
+    gnrc_netif_default_init(netif);
     dev = netif->dev;
     dev->event_callback = _lwmac_event_cb;
 

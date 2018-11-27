@@ -90,6 +90,7 @@ static void _netif_init(gnrc_netif_t *netif)
 {
     (void)netif;
 
+    gnrc_netif_default_init(netif);
     /* save the threads context pointer, so we can set its flags */
     _netif_thread = (thread_t *)thread_get(thread_getpid());
 

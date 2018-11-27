@@ -2108,6 +2108,7 @@ static void _gomach_init(gnrc_netif_t *netif)
 {
     netdev_t *dev;
 
+    gnrc_netif_default_init(netif);
     dev = netif->dev;
     dev->event_callback = _gomach_event_cb;
 

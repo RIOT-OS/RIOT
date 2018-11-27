@@ -1361,7 +1361,6 @@ static void *_gnrc_netif_thread(void *args)
     _test_options(netif);
 #endif
     netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
-    gnrc_netif_default_init(netif);
     if (netif->ops->init) {
         netif->ops->init(netif);
     }
