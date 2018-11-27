@@ -247,6 +247,9 @@ class SerCmd(cmd.Cmd):
                 self.logger.error("Cannot connect to serial port {}: {}"
                                   .format(self.port, e.strerror))
                 sys.exit(1)
+            except serial.SerialException as e:
+                self.logger.error("%s", e.strerror)
+                sys.exit(1)
 
         # wait until connection is established and fire startup
         # commands to the node
