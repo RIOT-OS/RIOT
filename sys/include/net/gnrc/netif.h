@@ -131,10 +131,13 @@ struct gnrc_netif_ops {
      *
      * @param[in] netif The network interface.
      *
-     * This is called after the default settings were set, right before the
-     * interface's thread starts receiving messages. It is not necessary to lock
-     * the interface's mutex gnrc_netif_t::mutex, since the thread will already
-     * lock it. Leave NULL if you do not need any special initialization.
+     * This is called after the network device's initial configuration, right
+     * before the interface's thread starts receiving messages. It is not
+     * necessary to lock the interface's mutex gnrc_netif_t::mutex, since it is
+     * already locked. Set to @ref gnrc_netif_default_init() if you do not need
+     * any special initialization. If you do need special initialization, it is
+     * recommended to call @ref gnrc_netif_default_init() at the start of the
+     * custom initialization function set here.
      */
     void (*init)(gnrc_netif_t *netif);
 
