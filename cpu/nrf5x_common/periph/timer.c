@@ -23,6 +23,8 @@
  * @}
  */
 
+#include <stdint.h>
+
 #include "periph/timer.h"
 
 #define F_TIMER             (16000000U)     /* the timer is clocked at 16MHz */
@@ -123,6 +125,15 @@ unsigned int timer_read(tim_t tim)
 {
     dev(tim)->TASKS_CAPTURE[timer_config[tim].channels] = 1;
     return dev(tim)->CC[timer_config[tim].channels];
+}
+
+unsigned int timer_max(tim_t tim)
+{
+    /* make sure the given timer is valid */
+    if (tim < TIMER_NUMOF) {
+        return UINT32_MAX;
+    }
+    return 0;
 }
 
 void timer_start(tim_t tim)

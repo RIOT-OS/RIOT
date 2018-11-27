@@ -22,6 +22,7 @@
 #include <mips/regdef.h>
 #include <mips/asm.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <periph/timer.h>
 #include "cpu_conf.h"
@@ -203,6 +204,15 @@ unsigned int timer_read(tim_t dev)
     (void)dev;
 
     return counter;
+}
+
+unsigned int timer_max(tim_t dev)
+{
+    assert(dev == 0);
+
+    (void)dev;
+
+    return UINT32_MAX;
 }
 
 void timer_start(tim_t dev)

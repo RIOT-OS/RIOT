@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "assert.h"
 #include "board.h"
@@ -209,6 +210,18 @@ unsigned int timer_read(tim_t tim)
         return dev(tim)->TAV;
     }
     return LOAD_VALUE - (dev(tim)->TAV & 0xFFFF);
+}
+
+unsigned int timer_max(tim_t tim)
+{
+    DEBUG("timer_max(%u)\n", tim);
+    if (tim >= TIMER_NUMOF) {
+        return 0;
+    }
+    if (timer_config[tim].cfg == GPT_CFG_32T) {
+        return UINT32_MAX;
+    }
+    return UINT16_MAX;
 }
 
 void timer_stop(tim_t tim)

@@ -20,6 +20,8 @@
  * @}
  */
 
+#include <stdint.h>
+
 #include "cpu.h"
 #include "log.h"
 #include "assert.h"
@@ -239,6 +241,12 @@ unsigned int timer_read(tim_t dev)
     else {
         return (unsigned int) TIMER_CounterGet(timer_config[dev].timer.dev);
     }
+}
+
+unsigned int timer_max(tim_t dev)
+{
+    (void)dev;
+    return UINT16_MAX;
 }
 
 void timer_stop(tim_t dev)

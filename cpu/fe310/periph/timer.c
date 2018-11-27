@@ -17,6 +17,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -131,6 +132,14 @@ unsigned int timer_read(tim_t dev)
 
     /* Read current timer value */
     return (unsigned int) lo;
+}
+
+unsigned int timer_max(tim_t dev)
+{
+    if (dev != 0) {
+        return 0;
+    }
+    return UINT32_MAX;
 }
 
 void timer_start(tim_t dev)

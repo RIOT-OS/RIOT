@@ -214,6 +214,14 @@ unsigned int timer_read(tim_t tim)
     return (unsigned int)(get_dev(tim)->TC);
 }
 
+unsigned int timer_max(tim_t tim)
+{
+    if (tim >= TIMER_NUMOF) {
+        return 0;
+    }
+    return UINT32_MAX;
+}
+
 void timer_start(tim_t tim)
 {
     get_dev(tim)->TCR = 1;

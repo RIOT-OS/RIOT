@@ -322,6 +322,20 @@ unsigned int timer_read(tim_t tim)
     }
 }
 
+unsigned int timer_max(tim_t tim)
+{
+    DEBUG("%s(%u)\n", __FUNCTION__, tim);
+
+    if (tim >= TIMER_NUMOF) {
+        return 0;
+    }
+
+    if (timer_config[tim].cfg == GPTMCFG_32_BIT_TIMER) {
+        return UINT32_MAX;
+    }
+    return UINT16_MAX;
+}
+
 /*
  * For stopping the counting of all channels.
  */

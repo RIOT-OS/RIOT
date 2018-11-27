@@ -22,6 +22,9 @@
  * WARNING! enable debugging will have timing side effects and can lead
  * to timer underflows, system crashes or system dead locks in worst case.
  */
+
+#include <stdint.h>
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -322,6 +325,12 @@ unsigned int IRAM timer_read(tim_t dev)
     #endif
 }
 
+unsigned int IRAM timer_max(tim_t dev)
+{
+    (void)dev;
+
+    return UINT32_MAX;
+}
 void IRAM timer_start(tim_t dev)
 {
     DEBUG("%s dev=%u @%u\n", __func__, dev, system_get_time());
@@ -518,6 +527,13 @@ unsigned int IRAM timer_read(tim_t dev)
     (void)dev;
 
     return system_get_time ();
+}
+
+unsigned int IRAM timer_max(tim_t dev)
+{
+    (void)dev;
+
+    return UINT32_MAX;
 }
 
 void IRAM timer_start(tim_t dev)

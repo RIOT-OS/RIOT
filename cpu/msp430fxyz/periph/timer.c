@@ -25,6 +25,8 @@
  * @}
  */
 
+#include <stdint.h>
+
 #include "cpu.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -92,6 +94,14 @@ unsigned int timer_read(tim_t dev)
 {
     (void)dev;
     return (unsigned int)TIMER_BASE->R;
+}
+
+unsigned int timer_max(tim_t dev)
+{
+    if (dev != 0) {
+        return 0;
+    }
+    return UINT16_MAX;
 }
 
 void timer_start(tim_t dev)

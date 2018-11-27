@@ -19,6 +19,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -147,6 +148,12 @@ int timer_clear(tim_t tim, int channel)
 unsigned int timer_read(tim_t tim)
 {
     return dev(tim)->TC_CHANNEL[0].TC_CV;
+}
+
+unsigned int timer_max(tim_t tim)
+{
+    (void)tim;
+    return UINT32_MAX;
 }
 
 void timer_start(tim_t tim)

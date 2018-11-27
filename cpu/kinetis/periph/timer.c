@@ -24,6 +24,7 @@
  * @}
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "cpu.h"
@@ -713,6 +714,23 @@ unsigned int timer_read(tim_t dev)
         case TIMER_LPTMR:
             return lptmr_read(_lptmr_index(dev));
 #endif
+        default:
+            return 0;
+    }
+}
+
+unsigned int timer_max(tim_t dev)
+{
+    if ((unsigned int)dev >= TIMER_NUMOF) {
+        /* invalid timer */
+        return 0;
+    }
+    /* demultiplex to handle two types of hardware timers */
+    switch (_timer_variant(dev)) {
+        case TIMER_PIT:
+            return UINT32_MAX;
+        case TIMER_LPTMR:
+            return UINT16_MAX;
         default:
             return 0;
     }

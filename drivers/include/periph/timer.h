@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014-2015 Freie Universität Berlin
+ *               2018 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -28,6 +29,7 @@
  * @brief       Low-level timer peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Sebastian Meiling <s@mlng.net>
  */
 
 #ifndef PERIPH_TIMER_H
@@ -197,6 +199,15 @@ int timer_clear(tim_t dev, int channel);
  */
 unsigned int timer_read(tim_t dev);
 
+/**
+ * @brief Get the timers maximal counter value.
+ *
+ * @param[in] dev           the timer to get the max value for
+ *
+ * @return                  the timers max value
+ * @return                  0 on error
+ */
+unsigned int timer_max(tim_t dev);
 /**
  * @brief Start the given timer
  *

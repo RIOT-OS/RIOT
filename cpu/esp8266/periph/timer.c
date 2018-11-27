@@ -199,6 +199,12 @@ unsigned int IRAM timer_read(tim_t dev)
     return phy_get_mactime ();
 }
 
+unsigned int /* IRAM */ timer_max(tim_t dev)
+{
+    (void)dev;
+    return HW_TIMER_DELTA_MAX;
+}
+
 void IRAM timer_start(tim_t dev)
 {
     DEBUG("%s dev=%u @%u\n", __func__, dev, phy_get_mactime());
@@ -462,6 +468,12 @@ unsigned int IRAM timer_read(tim_t dev)
     (void)dev;
 
     return phy_get_mactime ();
+}
+
+unsigned int /* IRAM */ timer_max(tim_t dev)
+{
+    (void)dev;
+    return OS_TIMER_DELTA_MAX;
 }
 
 void IRAM timer_start(tim_t dev)
