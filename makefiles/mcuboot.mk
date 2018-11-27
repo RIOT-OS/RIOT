@@ -2,7 +2,6 @@ ifdef MCUBOOT_SLOT0_SIZE
 
 IMGTOOL ?= $(RIOTTOOLS)/mcuboot/imgtool.py
 
-BINFILE ?= $(BINDIR)/$(APPLICATION).bin
 SIGN_BINFILE = $(BINDIR)/signed-$(APPLICATION).bin
 MCUBOOT_KEYFILE ?= $(BINDIR)/key.pem
 MCUBOOT_BIN ?= $(BINDIR)/mcuboot.bin
