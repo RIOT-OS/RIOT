@@ -20,7 +20,11 @@
 #include "assert.h"
 #include "periph/gpio.h"
 
-#if defined(CPU_MSP430FXYZ)
+#if defined(CPU_ESP32)
+#define COLL_PINMASK    (0x3f)
+#elif defined(CPU_ESP8266)
+#define COLL_PINMASK    (0x1f)
+#elif defined(CPU_MSP430FXYZ)
 #define COLL_PINMASK    (0x07)
 #else
 #define COLL_PINMASK    (0x0f)
@@ -155,6 +159,16 @@
 #endif
 /* Combination of all existent ports  */
 #define COLL_TEST_PORTS (COLL_TEST_PORTK)
+
+#elif defined(CPU_ESP32)
+/* CPU does not have port definitions */
+#define COLL_TEST_PORTS \
+    COLL_TEST(0)
+
+#elif defined(CPU_ESP8266)
+/* CPU does not have port definitions */
+#define COLL_TEST_PORTS \
+    COLL_TEST(0)
 
 #elif defined(CPU_EZR32WG)
 #define COLL_TEST_PORTS \
