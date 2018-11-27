@@ -9,6 +9,13 @@ ifneq (,$(filter fatfs_vfs,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_vfs
 endif
 
+#if periph_rtc is available use it. Otherwise use static timestamps
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=0
+else
+  CFLAGS += -DFATFS_FFCONF_OPT_FS_NORTC=1
+endif
+
 ifeq ($(shell uname -s),Darwin)
   CFLAGS += -Wno-empty-body
 endif
