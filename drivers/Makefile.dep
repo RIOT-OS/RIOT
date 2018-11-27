@@ -159,6 +159,11 @@ ifneq (,$(filter ethos,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
+ifneq (,$(filter extend_gpio,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  USEMODULE += extend
+endif
+
 ifneq (,$(filter feetech,$(USEMODULE)))
   USEMODULE += uart_half_duplex
 endif
@@ -166,11 +171,6 @@ endif
 ifneq (,$(filter fxos8700,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
-endif
-
-ifneq (,$(filter extend_gpio,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
-  USEMODULE += extend
 endif
 
 ifneq (,$(filter grove_ledbar,$(USEMODULE)))
