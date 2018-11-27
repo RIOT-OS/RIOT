@@ -19,6 +19,8 @@
  * @}
  */
 
+#if MODULE_EXTEND_GPIO
+
 #include "periph/gpio.h"
 #include "extend/gpio.h"
 
@@ -122,3 +124,5 @@ const gpio_ext_driver_t gpio_ext_notsup_driver = {
     .toggle = gpio_ext_toggle_notsup,
     .write = gpio_ext_write_notsup,
 };
+
+#endif /* MODULE_EXTEND_GPIO */

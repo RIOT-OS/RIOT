@@ -57,14 +57,14 @@ extern "C" {
 /**
  * @brief   Callback typedef for gpio_init
  *
- * @see @ref drivers_periph_gpio
+ * @see @ref #gpio_init
  */
 typedef int (*gpio_ext_init_t)(void *dev, gpio_t pin, gpio_mode_t mode);
 
 /**
  * @brief   Callback typedef for gpio_init_int
  *
- * @see @ref drivers_periph_gpio
+ * @see @ref #gpio_init_int
  */
 typedef int (*gpio_ext_init_int_t)(void *dev, gpio_t pin, gpio_mode_t mode,
                                    gpio_flank_t flank, gpio_cb_t cb, void *arg);
@@ -72,49 +72,49 @@ typedef int (*gpio_ext_init_int_t)(void *dev, gpio_t pin, gpio_mode_t mode,
 /**
  * @brief   Callback typedef for gpio_irq_enable
  *
- * @see @ref drivers_periph_gpio
+ * @see @ref #gpio_irq_enable
  */
 typedef void (*gpio_ext_irq_enable_t)(void *dev, gpio_t pin);
 
 /**
  * @brief   Callback typedef for gpio_irq_disable
  *
- * @see @ref drivers_periph_gpio
+ * @see @ref #gpio_irq_disable
  */
 typedef void (*gpio_ext_irq_disable_t)(void *dev, gpio_t pin);
 
 /**
  * @brief   Callback typedef for gpio_read
  *
- * @see @ref drivers_periph_gpio
+ * @see @ref #gpio_read
  */
 typedef int (*gpio_ext_read_t)(void *dev, gpio_t pin);
 
 /**
  * @brief   Callback typedef for gpio_set
  *
- * @see @ref drivers_periph_gpio
+ * @see @ref #gpio_set
  */
 typedef void (*gpio_ext_set_t)(void *dev, gpio_t pin);
 
 /**
  * @brief   Callback typedef for gpio_clear
  *
- * @see @ref drivers_periph_gpio
+ * @see @ref #gpio_clear
  */
 typedef void (*gpio_ext_clear_t)(void *dev, gpio_t pin);
 
 /**
  * @brief   Callback typedef for gpio_toggle
  *
- * @see @ref drivers_periph_gpio
+ * @see @ref #gpio_toggle
  */
 typedef void (*gpio_ext_toggle_t)(void *dev, gpio_t pin);
 
 /**
  * @brief   Callback typedef for gpio_write
  *
- * @see @ref drivers_periph_gpio
+ * @see @ref #gpio_write
  */
 typedef void (*gpio_ext_write_t)(void *dev, gpio_t pin, int value);
 

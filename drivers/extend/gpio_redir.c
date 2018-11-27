@@ -19,6 +19,8 @@
  * @}
  */
 
+#if MODULE_EXTEND_GPIO
+
 #include "periph/gpio.h"
 #include "extend/gpio.h"
 #include "gpio_ext_conf.h"
@@ -173,3 +175,5 @@ void gpio_write_redir(gpio_t pin, int value)
 
     entry->driver->write(entry->dev, pin, value);
 }
+
+#endif /* MODULE_EXTEND_GPIO */
