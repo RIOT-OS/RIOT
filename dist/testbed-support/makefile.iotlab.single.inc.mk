@@ -74,6 +74,7 @@ IOTLAB_ARCHI_iotlab-m3      = m3:at86rf231
 IOTLAB_ARCHI_microbit       = microbit:ble
 IOTLAB_ARCHI_nrf52dk        = nrf52dk:ble
 IOTLAB_ARCHI_nrf52840dk     = nrf52840dk:multi
+IOTLAB_ARCHI_pba-d-01-kw2x  = phynode:kw2xrf
 IOTLAB_ARCHI_samr21-xpro    = samr21:at86rf233
 IOTLAB_ARCHI_samr30-xpro    = samr30:at86rf212b
 IOTLAB_ARCHI_wsn430-v1_3b   = wsn430:cc1101
