@@ -91,15 +91,6 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @name    ADC configuration
- *
- * The configuration consists simply of a list of channels that should be used
- * @{
- */
-#define ADC_NUMOF          (0)
-/** @} */
-
-/**
  * @name    PWM configuration
  * @{
  */
