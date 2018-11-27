@@ -1196,6 +1196,14 @@ static void _init_from_device(gnrc_netif_t *netif)
     _update_l2addr_from_dev(netif);
 }
 
+static void _init(gnrc_netif_t *netif)
+{
+    _init_from_device(netif);
+#ifdef MODULE_GNRC_IPV6_NIB
+    gnrc_ipv6_nib_init_iface(netif);
+#endif
+}
+
 static void _configure_netdev(netdev_t *dev)
 {
     /* Enable RX- and TX-complete interrupts */
@@ -1349,14 +1357,11 @@ static void *_gnrc_netif_thread(void *args)
         return NULL;
     }
     _configure_netdev(dev);
-    _init_from_device(netif);
 #ifdef DEVELHELP
     _test_options(netif);
 #endif
     netif->cur_hl = GNRC_NETIF_DEFAULT_HL;
-#ifdef MODULE_GNRC_IPV6_NIB
-    gnrc_ipv6_nib_init_iface(netif);
-#endif
+    _init(netif);
     if (netif->ops->init) {
         netif->ops->init(netif);
     }
