@@ -231,10 +231,6 @@ ifneq (,$(filter tests-cpp_%, $(UNIT_TESTS)))
   export CPPMIX := 1
 endif
 
-ifneq (, $(filter $(AVR_BOARDS), $(BOARD)))
-  LARGE_STACK_TESTS += tests-qDSA
-endif
-
 ifneq (,$(filter $(LARGE_STACK_TESTS), $(UNIT_TESTS)))
   CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(4*THREAD_STACKSIZE_DEFAULT+THREAD_EXTRA_STACKSIZE_PRINTF\)
 endif

@@ -19,7 +19,6 @@
  */
 
 #include "embUnit.h"
-#include "tests-qDSA.h"
 
 #include "random.h"
 #include "sign.h"
@@ -64,7 +63,7 @@ static void test_qDSA_sign_verify(void)
     TEST_ASSERT_EQUAL_INT(1, verify(m_result, 0, sm, smlen, pk));
 }
 
-Test *tests_qDSA_all(void)
+Test *tests_qDSA(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_qDSA_sign_verify),
@@ -74,7 +73,10 @@ Test *tests_qDSA_all(void)
     return (Test*)&qDSA_tests;
 }
 
-void tests_qDSA(void)
+int main(void)
 {
-    TESTS_RUN(tests_qDSA_all());
+    TESTS_START();
+    TESTS_RUN(tests_qDSA());
+    TESTS_END();
+    return 0;
 }
