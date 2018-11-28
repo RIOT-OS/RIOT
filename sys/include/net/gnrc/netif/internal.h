@@ -496,6 +496,14 @@ static inline int gnrc_netif_get_eui64(gnrc_netif_t *netif, eui64_t *eui64)
     return -ENOTSUP;
 }
 
+/**
+ * @brief   Initializes an interface as 6LN according to RFC 6775 and according
+ *          to its gnrc_netif_t::device_type
+ *
+ * @param[in] netif The network interface to initialize as 6LN
+ */
+void gnrc_netif_init_6ln(gnrc_netif_t *netif);
+
 #if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
 /**
  * @brief   Initialize IPv6 MTU and other packet length related members of
