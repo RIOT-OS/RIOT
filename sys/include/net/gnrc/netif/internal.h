@@ -330,6 +330,22 @@ static inline bool gnrc_netif_is_rtr_adv(const gnrc_netif_t *netif)
 #endif
 
 /**
+ * @brief   Checks if the interface uses a protocol that requires 6Lo to run
+ *
+ * @attention   Requires prior locking
+ * @note        Assumed to be true, when @ref GNRC_NETIF_NUMOF == 1 and
+ *              @ref net_gnrc_sixlowpan module is included (and
+ *              @ref GNRC_IPV6_NIB_CONF_6LN is not 0, otherwise assumed to be
+ *              false).
+ *
+ * @param[in] netif the network interface
+ *
+ * @return  true, if the interface represents a 6LN
+ * @return  false, if the interface does not represent a 6LN
+ */
+#define gnrc_netif_is_6lo(netif)    gnrc_netif_is_6ln(netif)
+
+/**
  * @brief   Checks if the interface represents a 6Lo node (6LN) according to
  *          RFC 6775
  *
