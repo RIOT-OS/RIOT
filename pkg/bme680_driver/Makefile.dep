@@ -1,0 +1,1 @@
+USEMODULE += bme680_driver_contrib
