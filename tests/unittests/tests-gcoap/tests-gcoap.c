@@ -183,6 +183,32 @@ static void test_gcoap__client_get_query(void)
 }
 
 /*
+ * Builds on get_req test, to test use of NULL path with gcoap_req_init().
+ * Then separately add Uri-Path option later.
+ */
+static void test_gcoap__client_get_path_defer(void)
+{
+    uint8_t buf[GCOAP_PDU_BUF_SIZE];
+    coap_pkt_t pdu;
+    size_t len, optlen;
+    char path[] = "/time";
+
+    gcoap_req_init(&pdu, buf, GCOAP_PDU_BUF_SIZE, COAP_METHOD_GET, NULL);
+    coap_opt_add_uint(&pdu, COAP_OPT_OBSERVE, 0);
+    coap_opt_add_string(&pdu, COAP_OPT_URI_PATH, path, '/');
+    optlen = 6;
+
+    len = gcoap_finish(&pdu, 0, COAP_FORMAT_NONE);
+    TEST_ASSERT_EQUAL_INT(len, sizeof(coap_hdr_t) + GCOAP_TOKENLEN + optlen);
+
+    coap_parse(&pdu, buf, len);
+
+    char uri[NANOCOAP_URI_MAX] = {0};
+    coap_get_uri_path(&pdu, (uint8_t *)&uri[0]);
+    TEST_ASSERT_EQUAL_STRING(&path[0], &uri[0]);
+}
+
+/*
  * Helper for server_get tests below.
  * Request from libcoap example for gcoap_cli /cli/stats resource
  * Include 2-byte token and Uri-Host option.
@@ -346,6 +372,7 @@ Test *tests_gcoap_tests(void)
         new_TestFixture(test_gcoap__client_get_resp),
         new_TestFixture(test_gcoap__client_put_req),
         new_TestFixture(test_gcoap__client_get_query),
+        new_TestFixture(test_gcoap__client_get_path_defer),
         new_TestFixture(test_gcoap__server_get_req),
         new_TestFixture(test_gcoap__server_get_resp),
         new_TestFixture(test_gcoap__server_con_req),
