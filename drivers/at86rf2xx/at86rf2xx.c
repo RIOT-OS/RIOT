@@ -73,8 +73,6 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     at86rf2xx_set_addr_long(dev, ntohll(addr_long.uint64.u64));
     at86rf2xx_set_addr_short(dev, ntohs(addr_long.uint16[0].u16));
 
-    /* set default PAN id */
-    at86rf2xx_set_pan(dev, AT86RF2XX_DEFAULT_PANID);
     /* set default channel */
     at86rf2xx_set_chan(dev, AT86RF2XX_DEFAULT_CHANNEL);
     /* set default TX power */

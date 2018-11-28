@@ -255,14 +255,11 @@ void kw2xrf_set_sequence(kw2xrf_t *dev, kw2xrf_physeq_t seq)
 
 void kw2xrf_set_pan(kw2xrf_t *dev, uint16_t pan)
 {
-    dev->netdev.pan = pan;
-
     uint8_t val_ar[2];
     val_ar[1] = (pan >> 8);
     val_ar[0] = (uint8_t)pan;
     kw2xrf_write_iregs(dev, MKW2XDMI_MACPANID0_LSB, val_ar, 2);
     LOG_DEBUG("[kw2xrf] set pan to: 0x%x\n", pan);
-    dev->netdev.pan = pan;
 }
 
 void kw2xrf_set_addr_short(kw2xrf_t *dev, uint16_t addr)
