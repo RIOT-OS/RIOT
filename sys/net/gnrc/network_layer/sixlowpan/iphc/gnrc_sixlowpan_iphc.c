@@ -1011,7 +1011,7 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     dispatch->next = pkt->next;
     pkt->next = dispatch;
 
-    gnrc_netif_t *netif = gnrc_netif_get_by_pid(netif_hdr->if_pid);
+    gnrc_netif_t *netif = gnrc_netif_hdr_get_netif(netif_hdr);
     assert(netif != NULL);
     gnrc_sixlowpan_multiplex_by_size(pkt, orig_datagram_size, netif, page);
 }
