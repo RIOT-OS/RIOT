@@ -639,7 +639,7 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
          * higher layers wants to provide flags to the interface ) */
         const gnrc_netif_hdr_t *netif_hdr = pkt->data;
 
-        netif = gnrc_netif_get_by_pid(((gnrc_netif_hdr_t *)pkt->data)->if_pid);
+        netif = gnrc_netif_hdr_get_netif(pkt->data);
         /* discard broadcast and multicast flags because those could be
          * potentially wrong (dst is later checked to assure that multicast is
          * set if dst is a multicast address) */
