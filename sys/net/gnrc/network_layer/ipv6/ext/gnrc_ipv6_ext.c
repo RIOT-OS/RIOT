@@ -168,7 +168,8 @@ static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t nh)
 void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                          gnrc_pktsnip_t *current,
                          gnrc_pktsnip_t *pkt,
-                         uint8_t nh)
+                         uint8_t nh,
+                         bool is_for_me)
 {
     ipv6_ext_t *ext;
 
@@ -195,7 +196,7 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                             return;
                         }
 
-                        gnrc_ipv6_demux(netif, current, pkt, nh); /* demultiplex next header */
+                        gnrc_ipv6_demux(netif, current, pkt, nh, is_for_me); /* demultiplex next header */
 
                         return;
 
@@ -212,6 +213,26 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
 #endif  /* MODULE_GNRC_IPV6_EXT_RH */
 
             case PROTNUM_IPV6_EXT_HOPOPT:
+                /* if current != pkt, size is already checked */
+                if (current == pkt && !_has_valid_size(pkt, nh)) {
+                    DEBUG("ipv6_ext: invalid size\n");
+                    gnrc_pktbuf_release(pkt);
+                    return;
+                }
+
+                nh = ext->nh;
+                DEBUG("ipv6_ext: next header = %" PRIu8 "\n", nh);
+
+                if ((current = _mark_extension_header(current, &pkt)) == NULL) {
+                    return;
+                }
+
+                gnrc_pktbuf_hold(pkt, 1);   /* don't release on next dispatch */
+                if (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6, nh, pkt) == 0) {
+                    gnrc_pktbuf_release(pkt);
+                }
+
+                break;
             case PROTNUM_IPV6_EXT_DST:
             case PROTNUM_IPV6_EXT_FRAG:
             case PROTNUM_IPV6_EXT_AH:
@@ -241,7 +262,7 @@ void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
                 break;
 
             default:
-                gnrc_ipv6_demux(netif, current, pkt, nh); /* demultiplex next header */
+                gnrc_ipv6_demux(netif, current, pkt, nh, is_for_me); /* demultiplex next header */
                 return;
         }
     }
