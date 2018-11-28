@@ -4,13 +4,14 @@ IMGTOOL ?= $(RIOTTOOLS)/mcuboot/imgtool.py
 
 SIGN_BINFILE = $(BINDIR)/signed-$(APPLICATION).bin
 MCUBOOT_KEYFILE ?= $(BINDIR)/key.pem
-MCUBOOT_BIN ?= $(BINDIR)/mcuboot.bin
-MCUBOOT_BIN_URL ?= http://download.riot-os.org/mynewt.mcuboot.bin
-MCUBOOT_BIN_MD5 ?= 0c71a0589bd3709fc2d90f07a0035ce7
+
+MCUBOOT_LOADER_BIN ?= $(BINDIR)/mcuboot.bin
+MCUBOOT_LOADER_BIN_URL ?= http://download.riot-os.org/mynewt.mcuboot.bin
+MCUBOOT_LOADER_BIN_MD5 ?= 0c71a0589bd3709fc2d90f07a0035ce7
 
 IMAGE_HDR_SIZE ?= 512
 
-$(MCUBOOT_KEYFILE) $(MCUBOOT_BIN): $(filter clean, $(MAKECMDGOALS))
+$(MCUBOOT_KEYFILE) $(MCUBOOT_LOADER_BIN): $(filter clean, $(MAKECMDGOALS))
 
 mcuboot-create-key: $(MCUBOOT_KEYFILE)
 
@@ -34,14 +35,14 @@ mcuboot: mcuboot-create-key link
 	$(COLOR_RESET)'
 	@$(COLOR_ECHO)
 
-$(MCUBOOT_BIN):
-	$(Q)$(DLCACHE) $(MCUBOOT_BIN_URL) $(MCUBOOT_BIN_MD5) $@
+$(MCUBOOT_LOADER_BIN):
+	$(Q)$(DLCACHE) $(MCUBOOT_LOADER_BIN_URL) $(MCUBOOT_LOADER_BIN_MD5) $@
 
 .PHONY: mcuboot-flash-bootloader mcuboot-flash
 
-mcuboot-flash-bootloader: FLASHFILE = $(MCUBOOT_BIN)
+mcuboot-flash-bootloader: FLASHFILE = $(MCUBOOT_LOADER_BIN)
 mcuboot-flash-bootloader: export FLASH_ADDR = 0x0
-mcuboot-flash-bootloader: $(MCUBOOT_BIN) $(FLASHDEPS)
+mcuboot-flash-bootloader: $(MCUBOOT_LOADER_BIN) $(FLASHDEPS)
 	$(flash-recipe)
 
 mcuboot-flash: FLASHFILE = $(SIGN_BINFILE)
