@@ -12,6 +12,8 @@ MCUBOOT_BIN_MD5 ?= 0c71a0589bd3709fc2d90f07a0035ce7
 
 export IMAGE_HDR_SIZE ?= 512
 
+$(MCUBOOT_KEYFILE) $(MCUBOOT_BIN): $(filter clean, $(MAKECMDGOALS))
+
 mcuboot-create-key: $(MCUBOOT_KEYFILE)
 
 ifeq ($(BINDIR)/key.pem,$(MCUBOOT_KEYFILE))
