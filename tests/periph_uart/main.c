@@ -175,9 +175,18 @@ static int cmd_send(int argc, char **argv)
     return 0;
 }
 
+int cmd_i2c_get_id(int argc, char **argv)
+{
+    (void)argv;
+    (void)argc;
+    puts("Success: [periph_uart]");
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "init", "Initialize a UART device with a given baudrate", cmd_init },
     { "send", "Send a string through given UART device", cmd_send },
+    { "uart_get_id", "Get the id of the fw", cmd_i2c_get_id },
     { NULL, NULL, NULL }
 };
 

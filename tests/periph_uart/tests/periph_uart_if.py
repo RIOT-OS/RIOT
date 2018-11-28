@@ -14,11 +14,18 @@ except ImportError:
 
 class PeriphUartIf(DutShell):
     """Interface to the node with periph_uart firmware."""
+    FW_ID = 'periph_uart'
+    DEFAULT_DEV = 1
+    DEFAULT_BAUD = 115200
 
-    def uart_init(self, dev, baud):
+    def uart_init(self, dev=DEFAULT_DEV, baud=DEFAULT_BAUD):
         """Initialize DUT's UART."""
         return self.send_cmd("init {} {}".format(dev, baud))
 
-    def uart_send_string(self, dev, test_string):
+    def uart_send_string(self, test_string, dev=DEFAULT_DEV):
         """Send data via DUT's UART."""
         return self.send_cmd("send {} {}".format(dev, test_string))
+
+    def uart_get_id(self):
+        """Get the id of the fw."""
+        return self.send_cmd('uart_get_id')

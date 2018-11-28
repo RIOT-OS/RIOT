@@ -1,0 +1,17 @@
+*** Settings ***
+Library             UartDevice  port=%{PORT}  baudrate=%{BAUD}  timeout=${10}
+
+Resource            riot_base.keywords.txt
+Resource            riot_util.keywords.txt
+Resource            api_shell.keywords.txt
+Resource            philip.keywords.txt
+
+*** Keywords ***
+DUT Must Have Periph UART Application
+    Repeat API Call on Timeout  Uart Get ID
+    Should Contain              ${RESULT['msg']}  periph_uart
+
+DUT Should Match String
+    [Arguments]                 ${dev}  ${test_string}
+    API Call Should Succeed     Uart Send  dev=${dev}  test_string=${test_string}
+    Should Be Equal             ${RESULT['data']}  ${test_string}
