@@ -72,9 +72,12 @@ enum {
 
 /**
  * @brief   Default DAC access macro
+ *
+ * The macro should be used to obtain the DAC line for device x and channel y,
+ * where the channels of device 0 are normally the MCU channels.
  */
 #ifndef DAC_LINE
-#define DAC_LINE(x)         (x)
+#define DAC_LINE(x,y)        ((dac_t)((x & 0) | y))
 #endif
 
 /**
