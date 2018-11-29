@@ -136,8 +136,8 @@ extern "C" {
  * @name    Mapping of Arduino DAC pins to RIOT DAC lines
  * @{
  */
-#define ARDUINO_DAC0            DAC_LINE(0)
-#define ARDUINO_DAC1            DAC_LINE(1)
+#define ARDUINO_DAC0            DAC_LINE(0, 0)
+#define ARDUINO_DAC1            DAC_LINE(0, 1)
 /** @} */
 
 #ifdef __cplusplus
