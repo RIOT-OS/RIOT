@@ -495,9 +495,40 @@ static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid)
     (void)iid;
     return -ENOTSUP;
 }
+
+/**
+ * @brief   Derives the length of the link-layer address in an NDP link-layer
+ *          address option from that option's length field and the given device
+ *          type.
+ *
+ * @note    If an RFC exists that specifies how IPv6 operates over a link-layer,
+ *          this function usually implements the section "Unicast Address
+ *          Mapping".
+ *
+ * @see [RFC 4861, section 4.6.1](https://tools.ietf.org/html/rfc4861#section-4.6.1)
+ *
+ * @pre `netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR`
+ *
+ * @attention   When `NDEBUG` is not defined, the node fails with an assertion
+ *              instead of returning `-ENOTSUP`
+ *
+ * @param[in] netif The network interface @p opt was received on within an NDP
+ *                  message.
+ * @param[in] opt   An NDP source/target link-layer address option.
+ *
+ * @return  Length of the link-layer address in @p opt on success
+ * @return  `-ENOTSUP`, when implementation does not know how to derive the
+ *          length of the link-layer address from @p opt's length field based
+ *          on gnrc_netif_t::device_type of @p netif.
+ * @return  `-EINVAL` if `opt->len` was an invalid value for the given
+ *          gnrc_netif_t::device_type of @p netif.
+ */
+int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
+                                      const ndp_opt_t *opt);
 #else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
-#define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid) (-ENOTSUP)
-#define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)         (-ENOTSUP)
+#define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid)   (-ENOTSUP)
+#define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)               (-ENOTSUP)
+#define gnrc_netif_ndp_addr_len_from_l2ao(netif, opt)               (-ENOTSUP)
 #define gnrc_netif_ipv6_get_iid(netif, iid)                         (-ENOTSUP)
 #endif  /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
 /** @} */

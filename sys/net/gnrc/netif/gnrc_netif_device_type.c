@@ -148,6 +148,56 @@ int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif, const eui64_t *iid,
     }
     return -ENOTSUP;
 }
+
+int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
+                                      const ndp_opt_t *opt)
+{
+    assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
+    switch (netif->device_type) {
+#ifdef MODULE_CC110X
+        case NETDEV_TYPE_CC110X:
+            (void)opt;
+            return sizeof(uint8_t);
+#endif  /* MODULE_CC110X */
+#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
+        case NETDEV_TYPE_ETHERNET:
+        case NETDEV_TYPE_ESP_NOW:
+            /* see https://tools.ietf.org/html/rfc2464#section-6*/
+            if (opt->len == 1U) {
+                return ETHERNET_ADDR_LEN;
+            }
+            else {
+                return -EINVAL;
+            }
+#endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) */
+#ifdef MODULE_NRFMIN
+        case NETDEV_TYPE_NRFMIN:
+            (void)opt;
+            return sizeof(uint16_t);
+#endif  /* MODULE_NRFMIN */
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
+        case NETDEV_TYPE_IEEE802154:
+            /* see https://tools.ietf.org/html/rfc4944#section-8 */
+            switch (opt->len) {
+                case 1U:
+                    return IEEE802154_SHORT_ADDRESS_LEN;
+                case 2U:
+                    return IEEE802154_LONG_ADDRESS_LEN;
+                default:
+                    return -EINVAL;
+            }
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+        default:
+            (void)opt;
+#ifdef DEVELHELP
+            LOG_ERROR("gnrc_netif: can't get address length from NDP link-layer "
+                      "address option on interface %u\n", netif->pid);
+#endif
+            assert(false);
+            break;
+    }
+    return -ENOTSUP;
+}
 #endif /* MODULE_GNRC_IPV6 */
 
 /** @} */
