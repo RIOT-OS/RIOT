@@ -835,8 +835,9 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
         }
 
         switch (netif->device_type) {
-#ifdef MODULE_NETDEV_ETH
+#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
             case NETDEV_TYPE_ETHERNET:
+            case NETDEV_TYPE_ESP_NOW:
                 assert(netif->l2addr_len == ETHERNET_ADDR_LEN);
                 eui64->uint8[0] = netif->l2addr[0] ^ 0x02;
                 eui64->uint8[1] = netif->l2addr[1];
@@ -876,18 +877,6 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
             case NETDEV_TYPE_CC110X:
             case NETDEV_TYPE_NRFMIN:
                 _create_iid_from_short(netif, eui64);
-                return 0;
-#endif
-#if defined(MODULE_ESP_NOW)
-            case NETDEV_TYPE_ESP_NOW:
-                eui64->uint8[0] = netif->l2addr[0] ^ 0x02;
-                eui64->uint8[1] = netif->l2addr[1];
-                eui64->uint8[2] = netif->l2addr[2];
-                eui64->uint8[3] = 0xff;
-                eui64->uint8[4] = 0xfe;
-                eui64->uint8[5] = netif->l2addr[3];
-                eui64->uint8[6] = netif->l2addr[4];
-                eui64->uint8[7] = netif->l2addr[5];
                 return 0;
 #endif
             default:
