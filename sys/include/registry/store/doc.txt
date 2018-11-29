@@ -1,0 +1,16 @@
+/**
+ * @defgroup sys_registry_store Storage facilities for the RIOT Registry
+ * @ingroup sys_registry
+ *
+ * Storage facilities implement the
+ * @ref registry_store_itf_t "Storage interface" to allow the
+ * @ref sys_registry "RIOT Registry" to load, search and store configuration
+ * parameters during runtime.
+ * From the point of view of the Registry all parameters are key/value strings
+ * and it is responsibility of the storage facilities to transform that to the
+ * proper format for storage.
+ *
+ * A minimal setup for the Registry requires at least one source storage
+ * facility from which configurations are loaded and exactly one storage
+ * facility destination to which configurations are stored.
+ */
