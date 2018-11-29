@@ -42,9 +42,11 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
         switch (netif->device_type) {
-#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
+#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) || \
+    defined(MODULE_NORDIC_SOFTDEVICE_BLE)
             case NETDEV_TYPE_ETHERNET:
             case NETDEV_TYPE_ESP_NOW:
+            case NETDEV_TYPE_BLE:
                 if (addr_len == sizeof(eui48_t)) {
                     eui48_to_ipv6_iid(iid, (const eui48_t *)addr);
                     return sizeof(eui64_t);
@@ -62,17 +64,6 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
                     return -EINVAL;
                 }
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
-#ifdef MODULE_NORDIC_SOFTDEVICE_BLE
-            case NETDEV_TYPE_BLE:
-                if (addr_len == sizeof(eui64_t)) {
-                    memcpy(iid, addr, sizeof(eui64_t));
-                    iid->uint8[0] ^= 0x02;
-                    return sizeof(eui64_t);
-                }
-                else {
-                    return -EINVAL;
-                }
-#endif  /* MODULE_NORDIC_SOFTDEVICE_BLE */
 #if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
             case NETDEV_TYPE_CC110X:
             case NETDEV_TYPE_NRFMIN:
@@ -105,9 +96,11 @@ int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif, const eui64_t *iid,
 {
     assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
     switch (netif->device_type) {
-#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
+#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) || \
+    defined(MODULE_NORDIC_SOFTDEVICE_BLE)
         case NETDEV_TYPE_ETHERNET:
         case NETDEV_TYPE_ESP_NOW:
+        case NETDEV_TYPE_BLE:
             eui48_from_ipv6_iid((eui48_t *)addr, iid);
             return sizeof(eui48_t);
 #endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) */
@@ -125,12 +118,6 @@ int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif, const eui64_t *iid,
             addr[1] = iid->uint8[7];
             return sizeof(uint16_t);
 #endif  /* MODULE_NETDEV_IEEE802154 */
-#ifdef MODULE_NORDIC_SOFTDEVICE_BLE
-        case NETDEV_TYPE_BLE:
-            memcpy(addr, iid, sizeof(eui64_t));
-            addr[0] ^= 0x02;
-            return sizeof(eui64_t);
-#endif  /* MODULE_NORDIC_SOFTDEVICE_BLE */
 #ifdef MODULE_CC110X
         case NETDEV_TYPE_CC110X:
             addr[0] = iid->uint8[7];
