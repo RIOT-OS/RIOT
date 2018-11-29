@@ -33,32 +33,32 @@ static const  saul_adc_params_t saul_adc_params[] =
 {
     {
         .name = "k60temp",
-        .line = ADC_LINE(0),
+        .line = ADC_LINE(0, 0),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "k60vrefsh",
-        .line = ADC_LINE(2),
+        .line = ADC_LINE(0, 2),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "k60vrefsl",
-        .line = ADC_LINE(3),
+        .line = ADC_LINE(0, 3),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "k60bandgap",
-        .line = ADC_LINE(1),
+        .line = ADC_LINE(0, 1),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "DAC0feedback",
-        .line = ADC_LINE(4),
+        .line = ADC_LINE(0, 4),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "VREFfeedback",
-        .line = ADC_LINE(5),
+        .line = ADC_LINE(0, 5),
         .res  = ADC_RES_16BIT,
     },
     {
@@ -73,47 +73,47 @@ static const  saul_adc_params_t saul_adc_params[] =
     },
     {
         .name = "PGA0_DP",
-        .line = ADC_LINE(8),
+        .line = ADC_LINE(0, 8),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "PGA0_DM",
-        .line = ADC_LINE(9),
+        .line = ADC_LINE(0, 9),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "PTA17",
-        .line = ADC_LINE(10),
+        .line = ADC_LINE(0, 10),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "PTB0",
-        .line = ADC_LINE(11),
+        .line = ADC_LINE(0, 11),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "PTC0",
-        .line = ADC_LINE(12),
+        .line = ADC_LINE(0, 12),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "PTC8",
-        .line = ADC_LINE(13),
+        .line = ADC_LINE(0, 13),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "PTC9",
-        .line = ADC_LINE(14),
+        .line = ADC_LINE(0, 14),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "PTC10",
-        .line = ADC_LINE(15),
+        .line = ADC_LINE(0, 15),
         .res  = ADC_RES_16BIT,
     },
     {
         .name = "PTC11",
-        .line = ADC_LINE(16),
+        .line = ADC_LINE(0, 16),
         .res  = ADC_RES_16BIT,
     },
 };

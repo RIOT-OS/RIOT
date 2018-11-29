@@ -118,18 +118,18 @@ extern "C" {
  * @name    Mapping of Arduino analog pins to RIOT ADC lines
  * @{
  */
-#define ARDUINO_A0              ADC_LINE(7)
-#define ARDUINO_A1              ADC_LINE(6)
-#define ARDUINO_A2              ADC_LINE(5)
-#define ARDUINO_A3              ADC_LINE(4)
-#define ARDUINO_A4              ADC_LINE(3)
-#define ARDUINO_A5              ADC_LINE(2)
-#define ARDUINO_A6              ADC_LINE(1)
-#define ARDUINO_A7              ADC_LINE(0)
-#define ARDUINO_A8              ADC_LINE(10)
-#define ARDUINO_A9              ADC_LINE(11)
-#define ARDUINO_A10             ADC_LINE(12)
-#define ARDUINO_A11             ADC_LINE(13)
+#define ARDUINO_A0              ADC_LINE(0, 7)
+#define ARDUINO_A1              ADC_LINE(0, 6)
+#define ARDUINO_A2              ADC_LINE(0, 5)
+#define ARDUINO_A3              ADC_LINE(0, 4)
+#define ARDUINO_A4              ADC_LINE(0, 3)
+#define ARDUINO_A5              ADC_LINE(0, 2)
+#define ARDUINO_A6              ADC_LINE(0, 1)
+#define ARDUINO_A7              ADC_LINE(0, 0)
+#define ARDUINO_A8              ADC_LINE(0, 10)
+#define ARDUINO_A9              ADC_LINE(0, 11)
+#define ARDUINO_A10             ADC_LINE(0, 12)
+#define ARDUINO_A11             ADC_LINE(0, 13)
 /** @} */
 
 /**

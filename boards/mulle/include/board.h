@@ -166,8 +166,8 @@ extern mtd_dev_t *mtd0;
  * @name Mulle Vchr, Vbat ADC lines
  */
 /** @{ */
-#define MULLE_VBAT_ADC_LINE           ADC_LINE(6)
-#define MULLE_VCHR_ADC_LINE           ADC_LINE(7)
+#define MULLE_VBAT_ADC_LINE           ADC_LINE(0, 6)
+#define MULLE_VCHR_ADC_LINE           ADC_LINE(0, 7)
 /** @} */
 #endif /* BOARD_H */
 /** @} */

@@ -34,17 +34,17 @@ static const  saul_adc_params_t saul_adc_params[] =
 {
     {
         .name = "ADC1",
-        .line = ADC_LINE(0),
+        .line = ADC_LINE(0, 0),
         .res  = ADC_RES_12BIT,
     },
     {
         .name = "ADC2",
-        .line = ADC_LINE(1),
+        .line = ADC_LINE(0, 1),
         .res  = ADC_RES_12BIT,
     },
     {
         .name = "ADC3",
-        .line = ADC_LINE(2),
+        .line = ADC_LINE(0, 2),
         .res  = ADC_RES_12BIT,
     }
 };

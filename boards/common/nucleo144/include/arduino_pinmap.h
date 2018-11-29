@@ -80,12 +80,12 @@ extern "C" {
  * @name    Mapping of Arduino analog pins to RIOT ADC lines
  * @{
  */
-#define ARDUINO_A0              ADC_LINE(0)
-#define ARDUINO_A1              ADC_LINE(1)
-#define ARDUINO_A2              ADC_LINE(2)
-#define ARDUINO_A3              ADC_LINE(3)
-#define ARDUINO_A4              ADC_LINE(4)
-#define ARDUINO_A5              ADC_LINE(5)
+#define ARDUINO_A0              ADC_LINE(0, 0)
+#define ARDUINO_A1              ADC_LINE(0, 1)
+#define ARDUINO_A2              ADC_LINE(0, 2)
+#define ARDUINO_A3              ADC_LINE(0, 3)
+#define ARDUINO_A4              ADC_LINE(0, 4)
+#define ARDUINO_A5              ADC_LINE(0, 5)
 /** @} */
 
 #ifdef __cplusplus
