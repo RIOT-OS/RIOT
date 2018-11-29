@@ -6,4 +6,11 @@ FEATURES_REQUIRED = periph_timer
 
 TEST_ON_CI_WHITELIST += all
 
+ifneq (,$(filter arduino-duemilanove arduino-mega2560 arduino-uno waspmote-pro,$(BOARD)))
+  TIMER_SPEED ?= 250000
+endif
+
+TIMER_SPEED ?= 1000000
+
+CFLAGS += -DTIMER_SPEED=$(TIMER_SPEED)
 include $(RIOTBASE)/Makefile.include
