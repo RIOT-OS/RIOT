@@ -70,7 +70,7 @@ static inline uint8_t _reverse_iid(const ipv6_addr_t *dst,
             return sizeof(uint8_t);
 #endif  /* MODULE_CC110X */
 #ifdef MODULE_ESP_NOW
-        case NETDEV_TYPE_RAW:
+        case NETDEV_TYPE_ESP_NOW:
             l2addr[0] = dst->u8[8] ^ 0x02;
             l2addr[1] = dst->u8[9];
             l2addr[2] = dst->u8[10];

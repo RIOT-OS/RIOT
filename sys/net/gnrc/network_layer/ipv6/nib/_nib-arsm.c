@@ -205,7 +205,7 @@ static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
             }
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
 #ifdef MODULE_ESP_NOW
-        case NETDEV_TYPE_RAW:
+        case NETDEV_TYPE_ESP_NOW:
             (void)opt;
             return ETHERNET_ADDR_LEN;
 #endif  /* MODULE_ESP_NOW */

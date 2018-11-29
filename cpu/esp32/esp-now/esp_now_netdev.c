@@ -753,7 +753,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_DEVICE_TYPE:
             CHECK_PARAM_RET (max_len >= sizeof(uint16_t), -EOVERFLOW);
-            *((uint16_t *)val) = NETDEV_TYPE_RAW;
+            *((uint16_t *)val) = NETDEV_TYPE_ESP_NOW;
             res = sizeof(uint16_t);
             break;
 
