@@ -15,6 +15,7 @@ ifeq (llvm,$(TOOLCHAIN))
 # tell LLVM/clang not to be so pedantic with this.
   CFLAGS += -Wno-unused-function
   CFLAGS += -Wno-sometimes-uninitialized
+  CFLAGS += -Wno-address-of-packed-member
 else
   CFLAGS += -Wno-unused-but-set-variable
 endif
