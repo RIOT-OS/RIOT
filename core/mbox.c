@@ -45,6 +45,8 @@ static void _wait(list_node_t *wait_list, unsigned irqstate)
     DEBUG("mbox: Thread %"PRIkernel_pid" _wait(): going blocked.\n",
             sched_active_pid);
 
+    thread_block_legal_check();
+
     thread_t *me = (thread_t*) sched_active_thread;
     sched_set_status(me, STATUS_MBOX_BLOCKED);
     thread_add_to_list(wait_list, me);
