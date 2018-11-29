@@ -40,12 +40,12 @@ int main(void)
 
     /* initialize all DAC lines */
     for (unsigned i = 0; i < DAC_NUMOF; i++) {
-        if (dac_init(DAC_LINE(i)) < 0) {
-            printf("Error initializing DAC_LINE(%u)\n", i);
+        if (dac_init(DAC_LINE(0, i)) < 0) {
+            printf("Error initializing DAC_LINE(0, %u)\n", i);
             return 1;
         }
         else {
-            printf("Successfully initialized DAC_LINE(%u)\n", i);
+            printf("Successfully initialized DAC_LINE(0, %u)\n", i);
         }
     }
     puts("");
@@ -53,7 +53,7 @@ int main(void)
     /* create saw tooth signal */
     while (1) {
         for (unsigned i = 0; i < DAC_NUMOF; i++) {
-            dac_set(DAC_LINE(i), val);
+            dac_set(DAC_LINE(0, i), val);
         }
         val += step;
         xtimer_periodic_wakeup(&last, DELAY);
