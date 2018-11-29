@@ -2,6 +2,7 @@
 *.o
 # Documentation artifacts
 doc/doxygen/html
+doc/doxygen/xml
 doc/doxygen/latex
 doc/doxygen/man
 doc/doxygen/*.log

@@ -17,6 +17,10 @@ doc: html
 html: src/css/riot.css src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ) | doxygen -
 
+.PHONY: xml
+xml: src/css/riot.css src/changelog.md
+	( cat riot.doxyfile ; echo "GENERATE_XML = yes" ) | doxygen -
+
 .PHONY: man
 man: src/changelog.md
 	( cat riot.doxyfile ; echo "GENERATE_MAN = yes" ) | doxygen -
