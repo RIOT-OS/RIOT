@@ -32,7 +32,6 @@
 #endif
 
 #define MAX_CHANNELS        (10U)
-#define TIM_SPEED           (1000000ul) /* try to run with 1MHz */
 #define CHAN_OFFSET         (5000U)     /* fire every 5ms */
 #define COOKIE              (100U)      /* for checking if arg is passed */
 
@@ -61,7 +60,7 @@ static int test_timer(unsigned num)
     }
 
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), TIM_SPEED, cb, (void *)(COOKIE * num)) < 0) {
+    if (timer_init(TIMER_DEV(num), TIMER_SPEED, cb, (void *)(COOKIE * num)) < 0) {
         printf("TIMER_%u: ERROR on initialization - skipping\n\n", num);
         return 0;
     }
