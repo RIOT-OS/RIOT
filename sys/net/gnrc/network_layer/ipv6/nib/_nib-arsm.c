@@ -183,11 +183,12 @@ static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
             (void)opt;
             return sizeof(uint8_t);
 #endif  /* MODULE_CC110X */
-#ifdef MODULE_NETDEV_ETH
+#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
         case NETDEV_TYPE_ETHERNET:
+        case NETDEV_TYPE_ESP_NOW:
             (void)opt;
             return ETHERNET_ADDR_LEN;
-#endif  /* MODULE_NETDEV_ETH */
+#endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) */
 #ifdef MODULE_NRFMIN
         case NETDEV_TYPE_NRFMIN:
             (void)opt;
@@ -204,11 +205,6 @@ static inline unsigned _get_l2addr_len(gnrc_netif_t *netif,
                     return 0U;
             }
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
-#ifdef MODULE_ESP_NOW
-        case NETDEV_TYPE_ESP_NOW:
-            (void)opt;
-            return ETHERNET_ADDR_LEN;
-#endif  /* MODULE_ESP_NOW */
         default:
             (void)opt;
             return 0U;
