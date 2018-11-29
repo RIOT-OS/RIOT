@@ -68,9 +68,12 @@ typedef unsigned int adc_t;
 
 /**
  * @brief   Default ADC line access macro
+ *
+ * The macro should be used to obtain the ADC line for device x and channel y,
+ * where the channels of device 0 are normally the MCU channels.
  */
 #ifndef ADC_LINE
-#define ADC_LINE(x)          (x)
+#define ADC_LINE(x,y)       ((adc_t)((x & 0) | y))
 #endif
 
 /**
