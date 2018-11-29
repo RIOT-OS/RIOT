@@ -57,9 +57,7 @@ const char *thread_getname(kernel_pid_t pid)
 
 void thread_sleep(void)
 {
-    if (irq_is_in()) {
-        return;
-    }
+    thread_block_legal_check();
 
     unsigned state = irq_disable();
     sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
