@@ -9,16 +9,16 @@
 # @author       Johann Fischer <j.fischer@phytec.de>
 
 ELFFILE=$1
+ACTUAL_FCFIELD=$(arm-none-eabi-objdump -j.fcfield -s "${ELFFILE}"  | awk '/^ 0400 / {print $2 $3 $4 $5}')
+# Allow any FOPT flags configuration (".." in the pattern)
+EXPECTED_FCFIELD="^fffffffffffffffffffffffffe..ffff$"
 
-RETVAL=$(arm-none-eabi-readelf -x .fcfield $ELFFILE  | awk '/0x00000400/ {print $2 $3 $4 $5}')
-UNLOCKED_FCFIELD="fffffffffffffffffffffffffeffffff"
-
-if [ "$RETVAL" != "$UNLOCKED_FCFIELD" ]; then
+if ! printf '%s' "${ACTUAL_FCFIELD}" | grep -q "${EXPECTED_FCFIELD}" ; then
     echo "Danger of bricking the device during flash!"
-    echo "Flash configuration field of $ELFFILE:"
-    arm-none-eabi-readelf -x .fcfield $ELFFILE
+    echo "Flash configuration field of ${ELFFILE}:"
+    arm-none-eabi-objdump -j.fcfield -s "${ELFFILE}"
     echo "Abort flash procedure!"
     exit 1
 fi
-echo "$ELFFILE is fine."
+echo "${ELFFILE} is fine."
 exit 0
