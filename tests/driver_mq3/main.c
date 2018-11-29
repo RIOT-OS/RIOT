@@ -35,7 +35,7 @@ int main(void)
     int res;
 
     puts("MQ-3 alcohol sensor test application\n");
-    printf("Initializing MQ-3 sensor at ADC_LINE(%i)...   ", (int)MQ3_ADC_LINE);
+    printf("Initializing MQ-3 sensor at ADC_LINE(0, %i)...   ", (int)MQ3_ADC_LINE);
     res = mq3_init(&dev, MQ3_ADC_LINE);
     if (res == 0) {
         puts("[ok]\n");

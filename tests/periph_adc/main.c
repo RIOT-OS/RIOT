@@ -40,21 +40,21 @@ int main(void)
 
     /* initialize all available ADC lines */
     for (unsigned i = 0; i < ADC_NUMOF; i++) {
-        if (adc_init(ADC_LINE(i)) < 0) {
-            printf("Initialization of ADC_LINE(%u) failed\n", i);
+        if (adc_init(ADC_LINE(0, i)) < 0) {
+            printf("Initialization of ADC_LINE(0, %u) failed\n", i);
             return 1;
         } else {
-            printf("Successfully initialized ADC_LINE(%u)\n", i);
+            printf("Successfully initialized ADC_LINE(0, %u)\n", i);
         }
     }
 
     while (1) {
         for (unsigned i = 0; i < ADC_NUMOF; i++) {
-            sample = adc_sample(ADC_LINE(i), RES);
+            sample = adc_sample(ADC_LINE(0, i), RES);
             if (sample < 0) {
-                printf("ADC_LINE(%u): 10-bit resolution not applicable\n", i);
+                printf("ADC_LINE(0, %u): 10-bit resolution not applicable\n", i);
             } else {
-                printf("ADC_LINE(%u): %i\n", i, sample);
+                printf("ADC_LINE(0, %u): %i\n", i, sample);
             }
         }
         xtimer_periodic_wakeup(&last, DELAY);
