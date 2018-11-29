@@ -14,7 +14,6 @@ ifeq (llvm,$(TOOLCHAIN))
 # `nimble/controller/src/ble_ll_adv.c` isn't used in our compilation path, so
 # tell LLVM/clang not to be so pedantic with this.
   CFLAGS += -Wno-unused-function
-  CFLAGS += -Wno-sometimes-uninitialized
 else
   CFLAGS += -Wno-unused-but-set-variable
 endif
