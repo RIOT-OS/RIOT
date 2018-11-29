@@ -44,6 +44,7 @@
 #ifdef MODULE_GNRC_MAC
 #include "net/gnrc/netif/mac.h"
 #endif
+#include "net/ndp.h"
 #include "net/netdev.h"
 #include "rmutex.h"
 
