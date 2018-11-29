@@ -56,7 +56,7 @@ extern "C" {
  * @name    IO1 Xplained Light sensor ADC configuration
  * @{
  */
-#define IO1_LIGHT_ADC_LINE                 ADC_LINE(0)
+#define IO1_LIGHT_ADC_LINE                 ADC_LINE(0, 0)
 #define IO1_LIGHT_ADC_RES                  ADC_RES_10BIT
 /** @} */
 
