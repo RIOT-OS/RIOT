@@ -29,6 +29,7 @@
 #include "random.h"
 #include "periph/rtt.h"
 #include "net/gnrc/netif.h"
+#include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/netdev/ieee802154.h"
