@@ -879,7 +879,7 @@ int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64)
                 return 0;
 #endif
 #if defined(MODULE_ESP_NOW)
-            case NETDEV_TYPE_RAW:
+            case NETDEV_TYPE_ESP_NOW:
                 eui64->uint8[0] = netif->l2addr[0] ^ 0x02;
                 eui64->uint8[1] = netif->l2addr[1];
                 eui64->uint8[2] = netif->l2addr[2];
