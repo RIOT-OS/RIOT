@@ -37,6 +37,7 @@
 #endif
 
 const char assert_crash_message[] = "FAILED ASSERTION.";
+const char illegal_block_crash_message[] = "ILLEGAL BLOCK (IN ISR).";
 
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
