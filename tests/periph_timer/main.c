@@ -115,16 +115,6 @@ int main(void)
     int res = 0;
 
     puts("\nTest for peripheral TIMERs\n");
-    puts("This test will test all configured peripheral timers of the\n"
-         "targeted platform. For each timer, it will set each channel with\n"
-         "an incrementing timeout. CH0 set to 5ms, CH1 to 10ms, CH2 to 15ms\n"
-         "and so on.\n"
-         "In the output you should see that every channel fired, after an\n"
-         "evenly distributed amount of time -> the shown diff values should\n"
-         "be pretty much equal (to some jitter...)\n"
-         "This test does however NOT show, if the timeouts were correct in\n"
-         "relation to the expected real-time ~ use e.g. tests/xtimer_msg for\n"
-         "this.\n\n");
 
     printf("Available timers: %i\n", TIMER_NUMOF);
 
