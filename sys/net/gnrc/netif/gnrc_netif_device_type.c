@@ -21,6 +21,35 @@
 #include "net/eui48.h"
 #include "net/ieee802154.h"
 
+netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif)
+{
+    netopt_t res = NETOPT_ADDRESS;
+
+    switch (netif->device_type) {
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) || \
+    defined(MODULE_NORDIC_SOFTDEVICE_BLE)
+        case NETDEV_TYPE_IEEE802154:
+        case NETDEV_TYPE_BLE: {
+                netdev_t *dev = netif->dev;
+                int r;
+                uint16_t tmp;
+
+                r = dev->driver->get(dev, NETOPT_SRC_LEN, &tmp, sizeof(tmp));
+                assert(r == sizeof(tmp));
+                assert(r <= ((int)UINT8_MAX));
+                (void)r;
+                if (tmp == IEEE802154_LONG_ADDRESS_LEN) {
+                    res = NETOPT_ADDRESS_LONG;
+                }
+            }
+            break;
+#endif
+        default:
+            break;
+    }
+    return res;
+}
+
 #ifdef MODULE_GNRC_IPV6
 #if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
 static void _create_iid_from_short(const uint8_t *addr, size_t addr_len,

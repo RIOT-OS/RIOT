@@ -22,6 +22,7 @@
 #define NET_GNRC_NETIF_INTERNAL_H
 
 #include "net/gnrc/netif.h"
+#include "net/netopt.h"
 
 #ifdef MODULE_GNRC_IPV6_NIB
 #include "net/gnrc/ipv6/nib/conf.h"
@@ -414,6 +415,17 @@ static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
  *              need adaptions for your port
  * @{
  */
+/**
+ * @brief   Get the default link-layer address option for the given
+ *          gnrc_netif_t::device_type of a network interface
+ *
+ * @param[in] netif     The network interface to get the default link-layer
+ *                      address option for.
+ *
+ * @return  Either @ref NETOPT_ADDRESS or @ref NETOPT_ADDRESS_LONG.
+ */
+netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif);
+
 #if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
 /**
  * @brief   Converts a given hardware address to an IPv6 IID.

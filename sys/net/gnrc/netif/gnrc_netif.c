@@ -1109,27 +1109,8 @@ static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
     int res;
-    netopt_t opt = NETOPT_ADDRESS;
+    netopt_t opt = gnrc_netif_get_l2addr_opt(netif);
 
-    switch (netif->device_type) {
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) \
-    || defined(MODULE_NORDIC_SOFTDEVICE_BLE)
-        case NETDEV_TYPE_BLE:
-        case NETDEV_TYPE_IEEE802154: {
-                uint16_t tmp;
-
-                res = dev->driver->get(dev, NETOPT_SRC_LEN, &tmp, sizeof(tmp));
-                assert(res == sizeof(tmp));
-                netif->l2addr_len = (uint8_t)tmp;
-                if (tmp == IEEE802154_LONG_ADDRESS_LEN) {
-                    opt = NETOPT_ADDRESS_LONG;
-                }
-            }
-            break;
-#endif
-        default:
-            break;
-    }
     res = dev->driver->get(dev, opt, netif->l2addr,
                            sizeof(netif->l2addr));
     if (res != -ENOTSUP) {
