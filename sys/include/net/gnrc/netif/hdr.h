@@ -130,7 +130,7 @@ static inline void gnrc_netif_hdr_init(gnrc_netif_hdr_t *hdr, uint8_t src_l2addr
  * @return                  the size of the given header, including link layer
  *                          addresses
  */
-static inline size_t gnrc_netif_hdr_sizeof(gnrc_netif_hdr_t *hdr)
+static inline size_t gnrc_netif_hdr_sizeof(const gnrc_netif_hdr_t *hdr)
 {
     return sizeof(gnrc_netif_hdr_t) + hdr->src_l2addr_len + hdr->dst_l2addr_len;
 }
@@ -143,7 +143,7 @@ static inline size_t gnrc_netif_hdr_sizeof(gnrc_netif_hdr_t *hdr)
  * @return                  pointer to source address on success
  * @return                  NULL on error
  */
-static inline uint8_t *gnrc_netif_hdr_get_src_addr(gnrc_netif_hdr_t *hdr)
+static inline uint8_t *gnrc_netif_hdr_get_src_addr(const gnrc_netif_hdr_t *hdr)
 {
     return ((uint8_t *)(hdr + 1));
 }
@@ -174,7 +174,7 @@ static inline void gnrc_netif_hdr_set_src_addr(gnrc_netif_hdr_t *hdr, uint8_t *a
  * @return                  pointer to destination address on success
  * @return                  NULL on error
  */
-static inline uint8_t *gnrc_netif_hdr_get_dst_addr(gnrc_netif_hdr_t *hdr)
+static inline uint8_t *gnrc_netif_hdr_get_dst_addr(const gnrc_netif_hdr_t *hdr)
 {
     return (((uint8_t *)(hdr + 1)) + hdr->src_l2addr_len);
 }
