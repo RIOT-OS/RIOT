@@ -49,6 +49,21 @@ void crypto_block_inc_ctr(uint8_t block[16], int L);
  */
 int crypto_equals(const uint8_t *a, const uint8_t *b, size_t len);
 
+/**
+ * @brief   Secure wipe function.
+ *
+ * This wipe function zeros the supplied buffer in a way that the compiler is
+ * not allowed to optimize. This can be used to erase secrets from memory.
+ *
+ * Note that this function on its own could be insufficient against (data
+ * remanence) attacks. It is outside the scope of this function to thoroughly
+ * shred the memory area.
+ *
+ * @param[in]   buf     buffer to wipe
+ * @param[in]   len     size of the buffer in bytes
+ */
+void crypto_secure_wipe(void *buf, size_t len);
+
 #ifdef __cplusplus
 }
 #endif

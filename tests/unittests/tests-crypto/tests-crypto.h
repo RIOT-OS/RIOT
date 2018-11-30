@@ -34,6 +34,12 @@ extern "C" {
 void tests_crypto(void);
 
 /**
+ * @brief   Generates tests for helper functions
+ *
+ * @return  embUnit tests
+ */
+Test *tests_crypto_helper_tests(void);
+/**
  * @brief   Generates tests for crypto/chacha.h
  *
  * @return  embUnit tests if successful, NULL if not.
