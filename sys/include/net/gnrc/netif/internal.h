@@ -403,6 +403,17 @@ static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
 #define gnrc_netif_is_6lbr(netif)               (false)
 #endif
 
+/**
+ * @name    Device type based function
+ *
+ * These functions' behavior is based around the gnrc_netif_t::device_type of
+ * an interface.
+ *
+ * @attention   Special care needs to be taken for those functions when porting
+ *              a new network device type or link-layer protocol: They might
+ *              need adaptions for your port
+ * @{
+ */
 #if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
 /**
  * @brief   Converts a given hardware address to an IPv6 IID.
@@ -489,6 +500,7 @@ static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid)
 #define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)         (-ENOTSUP)
 #define gnrc_netif_ipv6_get_iid(netif, iid)                         (-ENOTSUP)
 #endif  /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+/** @} */
 
 #ifdef __cplusplus
 }
