@@ -1136,60 +1136,7 @@ static void _init_from_device(gnrc_netif_t *netif)
     (void)res;
     assert(res == sizeof(tmp));
     netif->device_type = (uint8_t)tmp;
-    switch (netif->device_type) {
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || \
-    defined(MODULE_XBEE) || defined(MODULE_ESP_NOW) || \
-    defined(MODULE_GNRC_SIXLOENC)
-        case NETDEV_TYPE_IEEE802154:
-        case NETDEV_TYPE_NRFMIN:
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
-#endif
-            /* intentionally falls through */
-        case NETDEV_TYPE_ESP_NOW:
-#ifdef MODULE_GNRC_IPV6
-            res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
-            assert(res == sizeof(tmp));
-#ifdef MODULE_GNRC_SIXLOWPAN
-            netif->ipv6.mtu = IPV6_MIN_MTU;
-            netif->sixlo.max_frag_size = tmp;
-#else
-            netif->ipv6.mtu = tmp;
-#endif
-#endif
-            break;
-#endif  /* MODULE_NETDEV_IEEE802154 */
-#ifdef MODULE_NETDEV_ETH
-        case NETDEV_TYPE_ETHERNET:
-#ifdef MODULE_GNRC_IPV6
-            netif->ipv6.mtu = ETHERNET_DATA_LEN;
-#endif
-#if defined(MODULE_GNRC_SIXLOWPAN_IPHC) && defined(MODULE_GNRC_SIXLOENC)
-            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
-#endif
-            break;
-#endif
-#ifdef MODULE_NORDIC_SOFTDEVICE_BLE
-        case NETDEV_TYPE_BLE:
-            netif->ipv6.mtu = IPV6_MIN_MTU;
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
-#endif
-            break;
-#endif
-        default:
-#ifdef MODULE_GNRC_IPV6
-            res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
-            if (res < 0) {
-                /* assume maximum possible transition unit */
-                netif->ipv6.mtu = UINT16_MAX;
-            }
-            else {
-                netif->ipv6.mtu = tmp;
-            }
-#endif
-            break;
-    }
+    gnrc_netif_ipv6_init_mtu(netif);
     _update_l2addr_from_dev(netif);
 }
 

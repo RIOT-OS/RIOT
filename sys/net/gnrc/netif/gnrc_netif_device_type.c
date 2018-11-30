@@ -17,8 +17,12 @@
 #include <errno.h>
 
 #include "log.h"
+#ifdef MODULE_GNRC_IPV6
+#include "net/ipv6.h"
+#endif
 #include "net/gnrc/netif.h"
 #include "net/eui48.h"
+#include "net/ethernet.h"
 #include "net/ieee802154.h"
 
 netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif)
@@ -51,6 +55,73 @@ netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif)
 }
 
 #ifdef MODULE_GNRC_IPV6
+void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
+{
+#ifdef MODULE_GNRC_IPV6
+    netdev_t *dev = netif->dev;
+    int res;
+    uint16_t tmp;
+
+    switch (netif->device_type) {
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || \
+    defined(MODULE_XBEE) || defined(MODULE_ESP_NOW) || \
+    defined(MODULE_GNRC_SIXLOENC)
+        case NETDEV_TYPE_IEEE802154:
+        case NETDEV_TYPE_NRFMIN:
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
+            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
+#endif
+            /* intentionally falls through */
+        case NETDEV_TYPE_ESP_NOW:
+            res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE,
+                                   &tmp, sizeof(tmp));
+            assert(res == sizeof(tmp));
+#ifdef MODULE_GNRC_SIXLOWPAN
+            netif->ipv6.mtu = IPV6_MIN_MTU;
+            netif->sixlo.max_frag_size = tmp;
+#else
+            netif->ipv6.mtu = tmp;
+#endif
+            break;
+#endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || \
+         * defined(MODULE_XBEE) || defined(MODULE_ESP_NOW) */
+#ifdef MODULE_NETDEV_ETH
+        case NETDEV_TYPE_ETHERNET:
+#ifdef MODULE_GNRC_IPV6
+            netif->ipv6.mtu = ETHERNET_DATA_LEN;
+#endif
+#if defined(MODULE_GNRC_SIXLOWPAN_IPHC) && defined(MODULE_GNRC_SIXLOENC)
+            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
+#endif
+            break;
+#endif
+#ifdef MODULE_NORDIC_SOFTDEVICE_BLE
+        case NETDEV_TYPE_BLE:
+            netif->ipv6.mtu = IPV6_MIN_MTU;
+#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
+            netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
+#endif
+            break;
+#endif
+        default:
+#ifdef DEVELHELP
+            LOG_DEBUG("gnrc_netif: getting MTU from device for interface %i\n",
+                      netif->pid);
+#endif
+            res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE,
+                                   &tmp, sizeof(tmp));
+            if (res < 0) {
+                /* assume maximum possible transition unit */
+                netif->ipv6.mtu = UINT16_MAX;
+            }
+            else {
+                netif->ipv6.mtu = tmp;
+            }
+            break;
+    }
+#endif
+}
+
 #if defined(MODULE_CC110X) || defined(MODULE_NRFMIN)
 static void _create_iid_from_short(const uint8_t *addr, size_t addr_len,
                                    eui64_t *iid)

@@ -428,6 +428,14 @@ netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif);
 
 #if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
 /**
+ * @brief   Initialize IPv6 MTU and other packet length related members of
+ *          @ref gnrc_netif_t based on gnrc_netif_t::device_type
+ *
+ * @param[in,out] netif The network interface to initialize the MTU for.
+ */
+void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif);
+
+/**
  * @brief   Converts a given hardware address to an IPv6 IID.
  *
  * @attention When the link-layer of the interface has link-layer addresses, and
@@ -538,6 +546,7 @@ static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid)
 int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
                                       const ndp_opt_t *opt);
 #else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+#define gnrc_netif_ipv6_init_mtu(netif)                             (void)netif
 #define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid)   (-ENOTSUP)
 #define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)               (-ENOTSUP)
 #define gnrc_netif_ndp_addr_len_from_l2ao(netif, opt)               (-ENOTSUP)
