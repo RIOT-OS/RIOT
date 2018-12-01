@@ -153,8 +153,8 @@ static int _adc_configure(adc_res_t res)
 int adc_init_ll(adc_t line)
 {
     _prep();
-    gpio_init(adc_channels[line].pin, GPIO_IN);
-    gpio_init_mux(adc_channels[line].pin, GPIO_MUX_B);
+    gpio_init(adc_config[line].pin, GPIO_IN);
+    gpio_init_mux(adc_config[line].pin, GPIO_MUX_B);
     _done();
     return 0;
 }
@@ -173,9 +173,9 @@ int adc_sample_ll(adc_t line, adc_res_t res)
     }
 #ifdef CPU_SAMD21
     ADC_0_DEV->INPUTCTRL.reg = ADC_0_GAIN_FACTOR_DEFAULT |
-                               adc_channels[line].muxpos | ADC_0_NEG_INPUT;
+                               adc_config[line].muxpos | ADC_0_NEG_INPUT;
 #else /* CPU_SAML21 */
-    ADC_0_DEV->INPUTCTRL.reg = adc_channels[line].muxpos | ADC_0_NEG_INPUT;
+    ADC_0_DEV->INPUTCTRL.reg = adc_config[line].muxpos | ADC_0_NEG_INPUT;
 #endif
     while (_adc_syncing()) {}
     /* Start the conversion */
