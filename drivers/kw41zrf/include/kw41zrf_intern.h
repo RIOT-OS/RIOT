@@ -32,6 +32,24 @@
 #if ENABLE_LEDS
 /* For LED macros */
 #include "board.h"
+#ifdef BOARD_USB_KW41Z
+/* Combine LED functions for this board */
+#ifdef LED0_ON
+#define LED_RX_ON   LED0_ON
+#define LED_RX_OFF  LED0_OFF
+#define LED_TX_ON   LED0_ON
+#define LED_TX_OFF  LED0_OFF
+#else
+#define LED_TX_ON
+#define LED_TX_OFF
+#define LED_RX_ON
+#define LED_RX_OFF
+#endif
+#define LED_NDSM_ON
+#define LED_NDSM_OFF
+#define LED_IRQ_ON
+#define LED_IRQ_OFF
+#else
 #ifdef LED0_ON
 #define LED_NDSM_ON   LED0_ON
 #define LED_NDSM_OFF  LED0_OFF
@@ -47,6 +65,7 @@
 #ifdef LED3_ON
 #define LED_IRQ_ON  LED3_ON
 #define LED_IRQ_OFF LED3_OFF
+#endif
 #endif
 #else /* ENABLE_LEDS */
 #define LED_NDSM_ON
