@@ -171,7 +171,7 @@ static bool _adc_conf_check(void);
 static void _adc_module_init(void);
 static bool _adc_module_initialized  = false;
 
-int adc_init(adc_t line)
+int adc_init_ll(adc_t line)
 {
     CHECK_PARAM_RET (line < adc_chn_num, -1)
 
@@ -274,7 +274,7 @@ int adc_init(adc_t line)
 }
 
 
-int adc_sample(adc_t line, adc_res_t res)
+int adc_sample_ll(adc_t line, adc_res_t res)
 {
     CHECK_PARAM_RET (line < adc_chn_num, -1)
     CHECK_PARAM_RET (res <= ADC_RES_12BIT, -1)
@@ -351,7 +351,7 @@ int adc_vref_to_gpio25 (void)
         return -1;
     }
 
-    if (adc_init(line) == 0)
+    if (adc_init_ll(line) == 0)
     {
         uint8_t rtcio = _gpio_rtcio_map[adc_pins[line]];
         RTCCNTL.bias_conf.dbg_atten = 0;

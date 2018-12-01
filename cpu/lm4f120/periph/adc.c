@@ -80,7 +80,7 @@ static inline void done(void)
     mutex_unlock(&lock);
 }
 
-int adc_init(adc_t line)
+int adc_init_ll(adc_t line)
 {
     /* make sure the given ADC line is valid */
     if (line >= ADC_NUMOF) {
@@ -100,7 +100,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int adc_sample_ll(adc_t line, adc_res_t res)
 {
     int value[2];
 

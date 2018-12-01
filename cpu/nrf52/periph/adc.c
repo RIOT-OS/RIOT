@@ -67,7 +67,7 @@ static inline void done(void)
     mutex_unlock(&lock);
 }
 
-int adc_init(adc_t line)
+int adc_init_ll(adc_t line)
 {
     if (line >= ADC_NUMOF) {
         return -1;
@@ -103,7 +103,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int adc_sample_ll(adc_t line, adc_res_t res)
 {
     assert(line < ADC_NUMOF);
 

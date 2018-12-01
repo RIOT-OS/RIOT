@@ -30,7 +30,7 @@
 
 static mutex_t adc_lock[ADC_DEV_NUMOF];
 
-int adc_init(adc_t line)
+int adc_init_ll(adc_t line)
 {
     /* check if line is valid */
     if (line >= ADC_NUMOF) {
@@ -59,7 +59,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int adc_sample_ll(adc_t line, adc_res_t res)
 {
     /* resolutions larger than 12 bits are not supported */
     if (res >= ADC_MODE_UNDEF(0)) {

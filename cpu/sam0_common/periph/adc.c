@@ -150,7 +150,7 @@ static int _adc_configure(adc_res_t res)
     return 0;
 }
 
-int adc_init(adc_t line)
+int adc_init_ll(adc_t line)
 {
     _prep();
     gpio_init(adc_channels[line].pin, GPIO_IN);
@@ -159,7 +159,7 @@ int adc_init(adc_t line)
     return 0;
 }
 
-int adc_sample(adc_t line, adc_res_t res)
+int adc_sample_ll(adc_t line, adc_res_t res)
 {
     if (line >= ADC_NUMOF) {
         DEBUG("adc: line arg not applicable\n");
