@@ -78,6 +78,65 @@ enum {
 #endif
 
 /**
+ * @brief   Default number of onboard DAC channels
+ *
+ * It has to be overridden by board definitions.
+ */
+#ifndef DAC_NUMOF
+#define DAC_NUMOF           (0U)
+#endif
+
+/**
+ * @brief   Set device ID location in dac_t when using extensions
+ */
+#ifndef DAC_EXT_DEV_LOC
+#define DAC_EXT_DEV_LOC     (8*sizeof(dac_t) - 8)
+#endif
+
+/**
+ * @brief   Line numbers greater than DAC_EXT_THRESH use extensions
+ */
+#ifndef DAC_EXT_THRESH
+#define DAC_EXT_THRESH      ((dac_t)(UINT_MAX) >> 1)
+#endif
+
+/**
+ * @brief   Convert (device, line) tuple to #dac_t value
+ */
+#ifndef DAC_EXT_LINE
+#define DAC_EXT_LINE(x, y) \
+    (dac_t)(~DAC_EXT_THRESH | (x << DAC_EXT_DEV_LOC) | DAC_LINE(y))
+#endif
+
+/**
+ * @brief   Low-level versions of the DAC functions
+ *
+ * These are for cpu dac.c implementation and should not be called directly.
+ * @{
+ */
+int8_t dac_init_ll(dac_t line);
+void dac_set_ll(dac_t line, uint16_t value);
+void dac_poweron_ll(dac_t line);
+void dac_poweroff_ll(dac_t line);
+unsigned int dac_channels_ll(void);
+/** @} */
+
+#if MODULE_EXTEND_DAC || DOXYGEN
+/**
+ * @brief   Redirecting versions of the DAC functions
+ *
+ * These are for the extension interface and should not be called directly.
+ * @{
+ */
+int8_t dac_init_redir(dac_t line);
+void dac_set_redir(dac_t line, uint16_t value);
+void dac_poweron_redir(dac_t line);
+void dac_poweroff_redir(dac_t line);
+unsigned int dac_channels_redir(dac_t line);
+/** @} */
+#endif /* MODULE_EXTEND_DAC || DOXYGEN */
+
+/**
  * @brief   Initialize the given DAC line
  *
  * After initialization, the corresponding DAC line is active and its output is
@@ -88,7 +147,18 @@ enum {
  * @return  DAC_OK on success
  * @return  DAC_NOLINE on invalid DAC line
  */
-int8_t dac_init(dac_t line);
+static inline int8_t dac_init(dac_t line)
+{
+#ifdef MODULE_EXTEND_DAC
+    if (line > DAC_EXT_THRESH) {
+        return dac_init_redir(line);
+    }
+#endif
+#ifdef MODULE_PERIPH_DAC
+    return dac_init_ll(line);
+#endif
+    return DAC_NOLINE;
+}
 
 /**
  * @brief   Write a value onto DAC Device on a given Channel
@@ -101,21 +171,77 @@ int8_t dac_init(dac_t line);
  * @param[in] line         DAC line to set
  * @param[in] value        value to set @p line to
  */
-void dac_set(dac_t line, uint16_t value);
+static inline void dac_set(dac_t line, uint16_t value)
+{
+#ifdef MODULE_EXTEND_DAC
+    if (line > DAC_EXT_THRESH) {
+        dac_set_redir(line, value);
+        return;
+    }
+#endif
+#ifdef MODULE_PERIPH_DAC
+    dac_set_ll(line, value);
+#endif
+}
 
 /**
  * @brief   Enable the given DAC line
  *
  * @param[in] line          DAC line to power on
  */
-void dac_poweron(dac_t line);
+static inline void dac_poweron(dac_t line)
+{
+#ifdef MODULE_EXTEND_DAC
+    if (line > DAC_EXT_THRESH) {
+        dac_poweron_redir(line);
+        return;
+    }
+#endif
+#ifdef MODULE_PERIPH_DAC
+    dac_poweron_ll(line);
+#endif
+}
 
 /**
  * @brief   Disable the given DAC line
  *
  * @param[in] line          DAC line to power off
  */
-void dac_poweroff(dac_t line);
+static inline void dac_poweroff(dac_t line)
+{
+#ifdef MODULE_EXTEND_DAC
+    if (line > DAC_EXT_THRESH) {
+        dac_poweroff_redir(line);
+        return;
+    }
+#endif
+#ifdef MODULE_PERIPH_DAC
+    dac_poweroff_ll(line);
+#endif
+}
+
+/**
+ * @brief   Returns the number of channels of the device
+ *
+ * This function returns the number of channels of the device that provides
+ * the channel identified by the line. If there is no device or no channel
+ * that corresponds to the line, the function returns 0
+ *
+ * @param[in] line  identifies the device
+ * @retval  the number of channels on success or 0 on error
+ */
+static inline unsigned int dac_channels(dac_t line)
+{
+#ifdef MODULE_EXTEND_DAC
+    if (line > DAC_EXT_THRESH) {
+        return dac_channels_redir(line);
+    }
+#endif
+#ifdef MODULE_PERIPH_DAC
+    return DAC_NUMOF;
+#endif
+    return 0;
+}
 
 
 #ifdef __cplusplus
