@@ -294,7 +294,7 @@ static const i2c_conf_t i2c_config[] = {
 #define ADC_0_GAIN_FACTOR_DEFAULT          ADC_INPUTCTRL_GAIN_1X
 #define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
 
-static const adc_conf_chan_t adc_channels[] = {
+static const adc_conf_chan_t adc_config[] = {
     /* port, pin, muxpos */
     {GPIO_PIN(PB, 0), ADC_INPUTCTRL_MUXPOS_PIN8},      /* EXT1, pin 3 */
     {GPIO_PIN(PB, 1), ADC_INPUTCTRL_MUXPOS_PIN9},      /* EXT1, pin 4 */

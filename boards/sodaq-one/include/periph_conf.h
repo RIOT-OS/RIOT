@@ -149,7 +149,7 @@ static const uart_conf_t uart_config[] = {
 #define ADC_0_GAIN_FACTOR_DEFAULT          ADC_INPUTCTRL_GAIN_1X
 #define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
 
-static const adc_conf_chan_t adc_channels[] = {
+static const adc_conf_chan_t adc_config[] = {
     /* port, pin, muxpos */
     {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},     /* A0 */
     {GPIO_PIN(PA, 3), ADC_INPUTCTRL_MUXPOS_PIN1},     /* A1 */

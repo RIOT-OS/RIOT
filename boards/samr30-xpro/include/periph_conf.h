@@ -135,7 +135,7 @@ static const i2c_conf_t i2c_config[] = {
 #define ADC_0_CLK_SOURCE                        0 /* GCLK_GENERATOR_0 */
 #define ADC_0_PRESCALER                         ADC_CTRLB_PRESCALER_DIV256
 
-static const adc_conf_chan_t adc_channels[] = {
+static const adc_conf_chan_t adc_config[] = {
     /* port, pin, muxpos */
     {GPIO_PIN(PA, 6), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN6)}, /* EXT1, pin 3 */
     {GPIO_PIN(PA, 7), ADC_INPUTCTRL_MUXPOS(ADC_INPUTCTRL_MUXPOS_AIN7)}, /* EXT1, pin 4 */

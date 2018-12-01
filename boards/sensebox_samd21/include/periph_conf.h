@@ -204,7 +204,7 @@ static const i2c_conf_t i2c_config[] = {
 #define ADC_0_REF_DEFAULT                  ADC_REFCTRL_REFSEL_INT1V
 
 /* Digital pins (1 to 6) on the board can be configured as analog inputs */
-static const adc_conf_chan_t adc_channels[] = {
+static const adc_conf_chan_t adc_config[] = {
     /* port, pin, muxpos */
     { GPIO_PIN(PA, 4), ADC_INPUTCTRL_MUXPOS_PIN4 },     /* Digital 1 */
     { GPIO_PIN(PA, 5), ADC_INPUTCTRL_MUXPOS_PIN5 },     /* Digital 2 */
