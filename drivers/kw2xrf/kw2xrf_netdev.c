@@ -406,7 +406,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             }
             else {
                 kw2xrf_set_addr_short(dev, *((uint16_t *)value));
-                /* don't set res to set netdev_ieee802154_t::short_addr */
+                res = sizeof(uint16_t);
             }
             break;
 
@@ -416,7 +416,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
             }
             else {
                 kw2xrf_set_addr_long(dev, *((uint64_t *)value));
-                /* don't set res to set netdev_ieee802154_t::short_addr */
+                res = sizeof(uint64_t);
             }
             break;
 
