@@ -70,7 +70,38 @@ typedef unsigned int adc_t;
  * @brief   Default ADC line access macro
  */
 #ifndef ADC_LINE
-#define ADC_LINE(x)          (x)
+#define ADC_LINE(x)         (x)
+#endif
+
+/**
+ * @brief   Default number of onboard ADC channels
+ *
+ * It has to be overridden by board definitions.
+ */
+#ifndef ADC_NUMOF
+#define ADC_NUMOF           (0U)
+#endif
+
+/**
+ * @brief   Set device ID location in adc_t when using extensions
+ */
+#ifndef ADC_EXT_DEV_LOC
+#define ADC_EXT_DEV_LOC     (8*sizeof(adc_t) - 8)
+#endif
+
+/**
+ * @brief   Line numbers greater than ADC_EXT_THRESH use extensions
+ */
+#ifndef ADC_EXT_THRESH
+#define ADC_EXT_THRESH    ((adc_t)(UINT_MAX) >> 1)
+#endif
+
+/**
+ * @brief   Convert (device, line) tuple to #adc_t value
+ */
+#ifndef ADC_EXT_LINE
+#define ADC_EXT_LINE(x, y) \
+    (adc_t)(~ADC_EXT_THRESH | (x << ADC_EXT_DEV_LOC) | ADC_LINE(y))
 #endif
 
 /**
@@ -88,6 +119,30 @@ typedef enum {
 #endif
 
 /**
+ * @brief   Low-level versions of the ADC functions
+ *
+ * These are for cpu adc.c implementation and should not be called directly.
+ * @{
+ */
+int adc_init_ll(adc_t line);
+int adc_sample_ll(adc_t line, adc_res_t res);
+unsigned int adc_channels_ll(void);
+/** @} */
+
+#if MODULE_EXTEND_ADC || DOXYGEN
+/**
+ * @brief   Redirecting versions of the ADC functions
+ *
+ * These are for the extension interface and should not be called directly.
+ * @{
+ */
+int adc_init_redir(adc_t line);
+int adc_sample_redir(adc_t line, adc_res_t res);
+unsigned int adc_channels_redir(adc_t line);
+/** @} */
+#endif /* MODULE_EXTEND_ADC || DOXYGEN */
+
+/**
  * @brief   Initialize the given ADC line
  *
  * The ADC line is initialized in synchronous, blocking mode.
@@ -97,7 +152,20 @@ typedef enum {
  * @return                  0 on success
  * @return                  -1 on invalid ADC line
  */
-int adc_init(adc_t line);
+
+static inline int adc_init(adc_t line)
+{
+#ifdef MODULE_EXTEND_ADC
+    if (line > ADC_EXT_THRESH) {
+        return adc_init_redir(line);
+    }
+#endif
+#ifdef MODULE_PERIPH_ADC
+    return adc_init_ll(line);
+#else
+    return -1;
+#endif
+}
 
 /**
  * @brief   Sample a value from the given ADC line
@@ -113,7 +181,42 @@ int adc_init(adc_t line);
  * @return                  the sampled value on success
  * @return                  -1 if resolution is not applicable
  */
-int adc_sample(adc_t line, adc_res_t res);
+static inline int adc_sample(adc_t line, adc_res_t res)
+{
+#ifdef MODULE_EXTEND_ADC
+    if (line > ADC_EXT_THRESH) {
+        return adc_sample_redir(line, res);
+    }
+#endif
+#ifdef MODULE_PERIPH_ADC
+    return adc_sample_ll(line, res);
+#else
+    return -1;
+#endif
+}
+
+/**
+ * @brief   Returns the number of channels of the device
+ *
+ * This function returns the number of channels of the device that provides
+ * the channel identified by the line. If there is no device or no channel
+ * that corresponds to the line, the function returns 0
+ *
+ * @param[in] line  identifies the device
+ * @retval  the number of channels on success or 0 on error
+ */
+static inline unsigned int adc_channels(adc_t line)
+{
+#ifdef MODULE_EXTEND_ADC
+    if (line > ADC_EXT_THRESH) {
+        return adc_channels_redir(line);
+    }
+#endif
+#if defined(MODULE_PERIPH_ADC)
+    return ADC_NUMOF;
+#endif
+    return 0;
+}
 
 #ifdef __cplusplus
 }
