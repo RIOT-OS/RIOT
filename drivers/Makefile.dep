@@ -148,6 +148,10 @@ ifneq (,$(filter ethos,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
+ifneq (,$(filter extend_dac,$(USEMODULE)))
+  USEMODULE += extend
+endif
+
 ifneq (,$(filter feetech,$(USEMODULE)))
   USEMODULE += uart_half_duplex
 endif
