@@ -266,12 +266,10 @@ void kw2xrf_set_addr_short(kw2xrf_t *dev, uint16_t addr)
     uint8_t val_ar[2];
     val_ar[0] = (addr >> 8);
     val_ar[1] = (uint8_t)addr;
-    dev->netdev.short_addr[0] = val_ar[1];
-    dev->netdev.short_addr[1] = val_ar[0];
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
-    dev->netdev.short_addr[1] &= 0x7F;
+    val_ar[0] &= 0x7F;
 #endif
     kw2xrf_write_iregs(dev, MKW2XDMI_MACSHORTADDRS0_LSB, val_ar,
                        IEEE802154_SHORT_ADDRESS_LEN);
@@ -283,7 +281,6 @@ void kw2xrf_set_addr_long(kw2xrf_t *dev, uint64_t addr)
     uint8_t *ap = (uint8_t *)(&tmp);
 
     for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
-        dev->netdev.long_addr[i] = (uint8_t)(addr >> (i * 8));
         ap[i] = (addr >> ((IEEE802154_LONG_ADDRESS_LEN - 1 - i) * 8));
     }
 
