@@ -258,6 +258,20 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     }
 
     switch (opt) {
+        case NETOPT_ADDRESS:
+            if (len < sizeof(uint16_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint16_t *)value) = kw2xrf_get_addr_short(dev);
+            return sizeof(uint16_t);
+
+        case NETOPT_ADDRESS_LONG:
+            if (len < sizeof(uint64_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint64_t *)value) = kw2xrf_get_addr_long(dev);
+            return sizeof(uint64_t);
+
         case NETOPT_STATE:
             if (len < sizeof(netopt_state_t)) {
                 return -EOVERFLOW;
