@@ -36,7 +36,7 @@ static inline DAC_Type *dev(dac_t line)
     return dac_config[line].dev;
 }
 
-int8_t dac_init(dac_t line)
+int8_t dac_init_ll(dac_t line)
 {
     if (line >= DAC_NUMOF) {
         return DAC_NOLINE;
@@ -57,7 +57,7 @@ int8_t dac_init(dac_t line)
     return DAC_OK;
 }
 
-void dac_set(dac_t line, uint16_t value)
+void dac_set_ll(dac_t line, uint16_t value)
 {
     assert(line < DAC_NUMOF);
 
@@ -68,14 +68,14 @@ void dac_set(dac_t line, uint16_t value)
     dev(line)->DAT[0].DATL = (value & 0xff);
 }
 
-void dac_poweron(dac_t line)
+void dac_poweron_ll(dac_t line)
 {
     assert(line < DAC_NUMOF);
 
     bit_set8(&dac_config[line].dev->C0, DAC_C0_DACEN_SHIFT);
 }
 
-void dac_poweroff(dac_t line)
+void dac_poweroff_ll(dac_t line)
 {
     assert(line < DAC_NUMOF);
 

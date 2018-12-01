@@ -29,7 +29,7 @@
 #include "em_dac.h"
 #endif
 
-int8_t dac_init(dac_t line)
+int8_t dac_init_ll(dac_t line)
 {
     /* check if device is valid */
     if (line >= DAC_NUMOF) {
@@ -60,7 +60,7 @@ int8_t dac_init(dac_t line)
     return 0;
 }
 
-void dac_set(dac_t line, uint16_t value)
+void dac_set_ll(dac_t line, uint16_t value)
 {
     uint8_t dev = dac_channel_config[line].dev;
 
@@ -69,14 +69,14 @@ void dac_set(dac_t line, uint16_t value)
                          value & 0xfff);
 }
 
-void dac_poweron(dac_t line)
+void dac_poweron_ll(dac_t line)
 {
     uint8_t dev = dac_channel_config[line].dev;
 
     CMU_ClockEnable(dac_config[dev].cmu, true);
 }
 
-void dac_poweroff(dac_t line)
+void dac_poweroff_ll(dac_t line)
 {
     uint8_t dev = dac_channel_config[line].dev;
 

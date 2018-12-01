@@ -32,7 +32,7 @@
 #define DAC_REFRESH         (DACC_MR_REFRESH(128))
 #endif
 
-int8_t dac_init(dac_t line)
+int8_t dac_init_ll(dac_t line)
 {
     assert(line < DAC_NUMOF);
 
@@ -53,14 +53,14 @@ int8_t dac_init(dac_t line)
     return 0;
 }
 
-void dac_set(dac_t line, uint16_t value)
+void dac_set_ll(dac_t line, uint16_t value)
 {
     assert(line < DAC_NUMOF);
 
     DACC->DACC_CDR = ((value >> 4) | (line << 12));
 }
 
-void dac_poweron(dac_t line)
+void dac_poweron_ll(dac_t line)
 {
     assert(line < DAC_NUMOF);
 
@@ -68,7 +68,7 @@ void dac_poweron(dac_t line)
     DACC->DACC_CHER = (1 << line);
 }
 
-void dac_poweroff(dac_t line)
+void dac_poweroff_ll(dac_t line)
 {
     assert(line < DAC_NUMOF);
 
