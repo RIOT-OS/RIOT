@@ -27,7 +27,7 @@
 #include "em_timer.h"
 #include "em_timer_utils.h"
 
-uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_ll(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     /* check if device is valid */
     if (dev >= PWM_NUMOF) {
@@ -88,13 +88,13 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return freq_timer / TIMER_Prescaler2Div(prescaler) / res;
 }
 
-uint8_t pwm_channels(pwm_t dev)
+uint8_t pwm_channels_ll(pwm_t dev)
 {
     assert(dev < PWM_NUMOF);
     return pwm_config[dev].channels;
 }
 
-void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
+void pwm_set_ll(pwm_t dev, uint8_t channel, uint16_t value)
 {
     assert(dev < PWM_NUMOF);
     TIMER_CompareBufSet(pwm_config[dev].dev,
@@ -114,13 +114,13 @@ void pwm_stop(pwm_t dev)
     TIMER_Enable(pwm_config[dev].dev, false);
 }
 
-void pwm_poweron(pwm_t dev)
+void pwm_poweron_ll(pwm_t dev)
 {
     assert(dev < PWM_NUMOF);
     CMU_ClockEnable(pwm_config[dev].cmu, true);
 }
 
-void pwm_poweroff(pwm_t dev)
+void pwm_poweroff_ll(pwm_t dev)
 {
     assert(dev < PWM_NUMOF);
     CMU_ClockEnable(pwm_config[dev].cmu, false);

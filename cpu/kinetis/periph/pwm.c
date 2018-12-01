@@ -58,7 +58,7 @@ static void poweron(pwm_t pwm)
 #endif
 }
 
-uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_ll(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint8_t pre = 0;
 
@@ -117,26 +117,26 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return (CLOCK_BUSCLOCK >> pre) / res;
 }
 
-uint8_t pwm_channels(pwm_t pwm)
+uint8_t pwm_channels_ll(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
     return pwm_config[pwm].chan_numof;
 }
 
-void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
+void pwm_set_ll(pwm_t pwm, uint8_t channel, uint16_t value)
 {
     assert((pwm < PWM_NUMOF) && (channel < pwm_config[pwm].chan_numof));
     ftm(pwm)->CONTROLS[pwm_config[pwm].chan[channel].ftm_chan].CnV = value;
 }
 
-void pwm_poweron(pwm_t pwm)
+void pwm_poweron_ll(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
     poweron(pwm);
     ftm(pwm)->SC |= FTM_SC_CLKS(1);
 }
 
-void pwm_poweroff(pwm_t pwm)
+void pwm_poweroff_ll(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
     int ftm_num = pwm_config[pwm].ftm_num;

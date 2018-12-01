@@ -49,7 +49,7 @@ static const uint32_t divtable[10] = {
 
 static uint32_t init_data[2];
 
-uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_ll(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     assert(dev == 0 && ((mode == PWM_LEFT) || (mode == PWM_RIGHT)));
 
@@ -119,7 +119,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return (uint32_t)(timer_freq / res);
 }
 
-void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
+void pwm_set_ll(pwm_t dev, uint8_t channel, uint16_t value)
 {
     assert((dev == 0) && (channel == 0));
 
@@ -190,13 +190,13 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
     PWM_TIMER->TASKS_START = 1;
 }
 
-uint8_t pwm_channels(pwm_t dev)
+uint8_t pwm_channels_ll(pwm_t dev)
 {
     assert(dev == 0);
     return 1;
 }
 
-void pwm_poweron(pwm_t dev)
+void pwm_poweron_ll(pwm_t dev)
 {
     assert(dev == 0);
 
@@ -216,7 +216,7 @@ void pwm_poweron(pwm_t dev)
 
 }
 
-void pwm_poweroff(pwm_t dev)
+void pwm_poweroff_ll(pwm_t dev)
 {
     assert(dev == 0);
 

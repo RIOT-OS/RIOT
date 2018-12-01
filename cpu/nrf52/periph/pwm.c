@@ -55,7 +55,7 @@ static inline NRF_PWM_Type *dev(pwm_t pwm)
 /**
  * @note Center mode is not supported. Use left or right aligned PWM modes.
  */
-uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_ll(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     /* check if given device is valid */
     if ((pwm >= PWM_NUMOF) || (res > MAX_RES)) {
@@ -135,7 +135,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return real_clk;
 }
 
-uint8_t pwm_channels(pwm_t pwm)
+uint8_t pwm_channels_ll(pwm_t pwm)
 {
     uint8_t channels = 0;
 
@@ -147,7 +147,7 @@ uint8_t pwm_channels(pwm_t pwm)
     return channels;
 }
 
-void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
+void pwm_set_ll(pwm_t pwm, uint8_t channel, uint16_t value)
 {
     if ((channel >= PWM_CHANNELS) || (value > MAX_RES)) {
         return;
@@ -179,12 +179,12 @@ void pwm_start(pwm_t pwm)
     dev(pwm)->TASKS_SEQSTART[0] = 1;
 }
 
-void pwm_poweron(pwm_t pwm)
+void pwm_poweron_ll(pwm_t pwm)
 {
     pwm_start(pwm);
 }
 
-void pwm_poweroff(pwm_t pwm)
+void pwm_poweroff_ll(pwm_t pwm)
 {
     pwm_stop(pwm);
 }

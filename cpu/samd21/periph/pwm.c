@@ -96,7 +96,7 @@ static void poweron(pwm_t dev)
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 }
 
-uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_ll(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint8_t prescaler;
     int scale = 1;
@@ -156,12 +156,12 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return f_real;
 }
 
-uint8_t pwm_channels(pwm_t dev)
+uint8_t pwm_channels_ll(pwm_t dev)
 {
     return sizeof(pwm_config[dev].chan) / sizeof(pwm_config[dev].chan[0]);
 }
 
-void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
+void pwm_set_ll(pwm_t dev, uint8_t channel, uint16_t value)
 {
     if ((channel >= PWM_MAX_CHANNELS) ||
         (pwm_config[dev].chan[channel].pin == GPIO_UNDEF)) {
@@ -171,13 +171,13 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
     while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << _chan(dev, channel))) {}
 }
 
-void pwm_poweron(pwm_t dev)
+void pwm_poweron_ll(pwm_t dev)
 {
     poweron(dev);
     _tcc(dev)->CTRLA.reg |= (TCC_CTRLA_ENABLE);
 }
 
-void pwm_poweroff(pwm_t dev)
+void pwm_poweroff_ll(pwm_t dev)
 {
     _tcc(dev)->CTRLA.reg &= ~(TCC_CTRLA_ENABLE);
 
