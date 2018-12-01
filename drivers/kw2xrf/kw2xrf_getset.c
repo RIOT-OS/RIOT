@@ -25,6 +25,7 @@
 #include "kw2xrf_reg.h"
 #include "kw2xrf_getset.h"
 #include "kw2xrf_intern.h"
+#include "byteorder.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -303,7 +304,8 @@ uint64_t kw2xrf_get_addr_long(kw2xrf_t *dev)
     kw2xrf_read_iregs(dev, MKW2XDMI_MACLONGADDRS0_0, ap,
                       IEEE802154_LONG_ADDRESS_LEN);
 
-    return addr;
+    /* Address is always read as little endian and API specifies big endian */
+    return byteorder_swapll(addr);
 }
 
 int8_t kw2xrf_get_cca_threshold(kw2xrf_t *dev)
