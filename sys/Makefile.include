@@ -86,3 +86,9 @@ endif
 ifneq (native,$(BOARD))
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
 endif
+
+ifneq (,$(filter owsn_sock,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/owsn/sock/include
+  # assume IPv6 required
+  CFLAGS += -DSOCK_HAS_IPV6
+endif

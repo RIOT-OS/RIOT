@@ -698,6 +698,11 @@ ifneq (,$(filter benchmark,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter owsn_sock,$(USEMODULE)))
+  USEMODULE += core_mbox
+  USEMODULE += sock
+endif
+
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 
