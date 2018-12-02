@@ -146,6 +146,11 @@ typedef struct {
 } pwm_conf_t;
 /** @} */
 
+/**
+ * @brief   EEPROM clear byte
+ */
+#define EEPROM_CLEAR_BYTE              (0xff)
+
 #ifdef __cplusplus
 }
 #endif
