@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     sys_net_nanocoap
+ * @ingroup     net_nanocoap
  *
  * @{
  *
@@ -44,18 +44,34 @@ extern "C" {
 int nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize);
 
 /**
- * @brief   Simple synchronous CoAP get
+ * @brief   Simple synchronous CoAP (confirmable) get
  *
  * @param[in]   remote  remote UDP endpoint
  * @param[in]   path    remote path
  * @param[out]  buf     buffer to write response to
  * @param[in]   len     length of @p buffer
  *
- * @returns     length of response on success
+ * @returns     length of response payload on success
  * @returns     <0 on error
  */
 ssize_t nanocoap_get(sock_udp_ep_t *remote, const char *path, uint8_t *buf,
                      size_t len);
+
+/**
+ * @brief   Simple synchronous CoAP request
+ *
+ * @param[in,out]   pkt     Packet struct containing the request. Is reused for
+ *                          the response
+ * @param[in]       local   Local UDP endpoint, may be NULL
+ * @param[in]       remote  remote UDP endpoint
+ * @param[in]       len     Total length of the buffer associated with the
+ *                          request
+ *
+ * @returns     length of response on success
+ * @returns     <0 on error
+ */
+ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local,
+                         sock_udp_ep_t *remote, size_t len);
 
 #ifdef __cplusplus
 }
