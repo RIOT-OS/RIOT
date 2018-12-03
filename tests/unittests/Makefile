@@ -188,6 +188,7 @@ ARM_CORTEX_M_BOARDS := airfy-beacon \
                        stm32f4discovery \
                        stm32f769i-disco \
                        udoo \
+                       usb-kw41z \
                        yunjia-nrf51822 \
                        #
 DISABLE_TEST_FOR_ARM_CORTEX_M :=
