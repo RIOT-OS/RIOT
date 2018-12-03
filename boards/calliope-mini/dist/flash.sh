@@ -18,6 +18,8 @@ OS=`uname`
 DID_MOUNT=false
 NAME="MINI"
 
+HEXFILE=$1
+
 # set the mount path depending on the OS
 if [ ${OS} = "Linux" ]
 then
