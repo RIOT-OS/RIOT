@@ -470,6 +470,11 @@ void auto_init(void)
     auto_init_veml6070();
 #endif
 
+#ifdef MODULE_SHT3X
+    extern void auto_init_sht3x(void);
+    auto_init_sht3x();
+#endif
+
 #endif /* MODULE_AUTO_INIT_SAUL */
 
 #ifdef MODULE_AUTO_INIT_GNRC_RPL
