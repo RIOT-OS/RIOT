@@ -427,8 +427,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
                     res = -EINVAL;
                     break;
                 }
-                dev->netdev.chan = chan;
-                /* don't set res to set netdev_ieee802154_t::chan */
+                res = sizeof(uint16_t);
             }
             break;
 
