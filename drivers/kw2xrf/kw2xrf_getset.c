@@ -135,8 +135,6 @@ int kw2xrf_set_channel(kw2xrf_t *dev, uint8_t channel)
     kw2xrf_write_dreg(dev, MKW2XDM_PLL_FRAC0_LSB, (uint8_t)pll_frac_lt[tmp]);
     kw2xrf_write_dreg(dev, MKW2XDM_PLL_FRAC0_MSB, (uint8_t)(pll_frac_lt[tmp] >> 8));
 
-    dev->netdev.chan = channel;
-
     if (old_seq) {
         kw2xrf_set_sequence(dev, old_seq);
     }
