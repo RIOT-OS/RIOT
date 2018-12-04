@@ -68,6 +68,7 @@ IOTLAB_NODE_AUTO_NUM ?= 1
 IOTLAB_ARCHI_arduino-zero   = arduino-zero:xbee
 IOTLAB_ARCHI_b-l072z-lrwan1 = st-lrwan1:sx1276
 IOTLAB_ARCHI_b-l475e-iot01a = st-iotnode:multi
+IOTLAB_ARCHI_firefly        = firefly
 IOTLAB_ARCHI_frdm-kw41z     = frdm-kw41z:multi
 IOTLAB_ARCHI_iotlab-a8-m3   = a8:at86rf231
 IOTLAB_ARCHI_iotlab-m3      = m3:at86rf231
