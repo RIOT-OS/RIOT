@@ -373,6 +373,12 @@ static void _netif_list_ipv6(ipv6_addr_t *addr, uint8_t flags)
             printf("  VAL");
             break;
     }
+    if (flags & GNRC_NETIF_IPV6_ADDRS_FLAGS_AUTO) {
+        printf(" (AUTO)");
+    }
+    else {
+        printf(" (MANUAL)");
+    }
     line_thresh = _newline(0U, line_thresh);
 }
 
