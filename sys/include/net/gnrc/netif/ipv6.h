@@ -68,6 +68,12 @@ extern "C" {
  * @brief   Address is an anycast address
  */
 #define GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST                (0x20U)
+
+/**
+ * @brief   Address was configured automatically and is based on the interface's
+ *          IID.
+ */
+#define GNRC_NETIF_IPV6_ADDRS_FLAGS_AUTO                   (0x40U)
 /** @} */
 
 /**
