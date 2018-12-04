@@ -85,7 +85,8 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
         return;
     }
 
-    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (64 << 8),
+    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR,
+                    (64 << 8) | GNRC_NETIF_IPV6_ADDRS_FLAGS_AUTO,
                     prefix, sizeof(ipv6_addr_t));
 #if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
     GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
