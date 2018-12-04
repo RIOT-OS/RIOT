@@ -206,10 +206,14 @@ typedef enum {
  */
 #define HAVE_ADC_RES_T
 typedef enum {
-    ADC_RES_9BIT = 0,       /**< ADC resolution: 9 bit */
-    ADC_RES_10BIT,          /**< ADC resolution: 10 bit */
-    ADC_RES_11BIT,          /**< ADC resolution: 11 bit */
-    ADC_RES_12BIT,          /**< ADC resolution: 12 bit */
+    ADC_RES_6BIT  = 0xf0,   /**< ADC resolution: 6 bit is not supported */
+    ADC_RES_8BIT  = 0xf1,   /**< ADC resolution: 8 bit is not supported  */
+    ADC_RES_9BIT  = 0,      /**< ADC resolution: 9 bit */
+    ADC_RES_10BIT = 1,      /**< ADC resolution: 10 bit */
+    ADC_RES_11BIT = 2,      /**< ADC resolution: 11 bit */
+    ADC_RES_12BIT = 3,      /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 0xf2,   /**< ADC resolution: 14 bit is not supported */
+    ADC_RES_16BIT = 0xf3,   /**< ADC resolution: 16 bit is not supported */
 } adc_res_t;
 /** @} */
 
