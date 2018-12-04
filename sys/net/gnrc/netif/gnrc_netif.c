@@ -46,6 +46,11 @@ static void _update_l2addr_from_dev(gnrc_netif_t *netif);
 static void _configure_netdev(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
+#ifdef MODULE_GNRC_IPV6
+static void _reset_auto_conf_ipv6(gnrc_netif_t *netif);
+#else   /* MODULE_GNRC_IPV6 */
+#define _reset_auto_conf_ipv6(netif)    (void)netif;
+#endif
 
 gnrc_netif_t *gnrc_netif_create(char *stack, int stacksize, char priority,
                                 const char *name, netdev_t *netdev,
@@ -341,10 +346,12 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                 case NETOPT_ADDR_LEN:
                 case NETOPT_SRC_LEN:
                     _update_l2addr_from_dev(netif);
+                    _reset_auto_conf_ipv6(netif);
                     break;
                 case NETOPT_STATE:
                     if (*((netopt_state_t *)opt->data) == NETOPT_STATE_RESET) {
                         _configure_netdev(netif->dev);
+                        _reset_auto_conf_ipv6(netif);
                     }
                     break;
                 default:
@@ -1161,6 +1168,18 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
     /* otherwise apply rule 8: Use longest matching prefix. */
     int idx = _match_to_idx(netif, dst, candidate_set);
     return (idx < 0) ? NULL : &netif->ipv6.addrs[idx];
+}
+
+static void _reset_auto_conf_ipv6(gnrc_netif_t *netif)
+{
+    for (unsigned i = 0; i < GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+        if (netif->ipv6.addrs_flags[i] & GNRC_NETIF_IPV6_ADDRS_FLAGS_AUTO) {
+            ipv6_addr_t *addr = &netif->ipv6.addrs[i];
+
+            gnrc_netif_ipv6_addr_remove_internal(netif, addr);
+        }
+    }
+    gnrc_ipv6_nib_init_iface(netif);
 }
 #endif  /* MODULE_GNRC_IPV6 */
 
