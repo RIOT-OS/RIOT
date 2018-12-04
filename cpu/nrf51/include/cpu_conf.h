@@ -44,7 +44,7 @@ extern "C" {
  */
 #define FLASHPAGE_SIZE          (1024U)
 
-#if defined(CPU_MODEL_NRF51X22XXAA)
+#if defined(CPU_MODEL_NRF51X22XXAA) || defined(CPU_MODEL_NRF51X22XXAC)
 #define FLASHPAGE_NUMOF         (256U)
 #elif defined(CPU_MODEL_NRF51X22XXAB)
 #define FLASHPAGE_NUMOF         (128U)
