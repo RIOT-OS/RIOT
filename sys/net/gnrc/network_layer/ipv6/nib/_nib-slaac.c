@@ -32,7 +32,8 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 {
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
     int idx;
-    uint8_t flags = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE;
+    uint8_t flags = GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_TENTATIVE | \
+                    GNRC_NETIF_IPV6_ADDRS_FLAGS_AUTO;
 
     DEBUG("nib: add address based on %s/%u automatically to interface %u\n",
           ipv6_addr_to_str(addr_str, pfx, sizeof(addr_str)),
