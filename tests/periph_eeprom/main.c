@@ -150,7 +150,7 @@ static int cmd_set(int argc, char **argv)
     uint32_t count = atoi(argv[3]);
 
     if (strlen(argv[2]) != 1) {
-        puts("Failed: char must a single digit");
+        puts("Failed: char must be a single digit");
         return 1;
     }
 
@@ -216,24 +216,25 @@ static int cmd_test(int argc, char **argv)
         return 1;
     }
 
-    const char *test = "test";
+    const char *expected = "test";
 
     /* test read/write function */
 
     /* read/write from beginning of EEPROM */
-    size_t ret = eeprom_write(0, (uint8_t *)test, 4);
+    size_t ret = eeprom_write(0, (uint8_t *)expected, 4);
     assert(ret == 4);
 
-    char *expected[4];
-    ret = eeprom_read(0, (uint8_t *)expected, 4);
-    assert(strncmp((const char *)expected, (const char *)test, 4) == 0);
+    char *result[4];
+    ret = eeprom_read(0, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, (const char *)expected, 4) == 0);
     assert(ret == 4);
 
     /* read/write at end of EEPROM */
-    ret = eeprom_write(EEPROM_SIZE - 4, (uint8_t *)test, 4);
+    ret = eeprom_write(EEPROM_SIZE - 4, (uint8_t *)expected, 4);
     assert(ret == 4);
-    ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)expected, 4);
-    assert(strncmp((const char *)expected, test, 4) == 0);
+    memset(result, 0, 4);
+    ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, expected, 4) == 0);
     assert(ret == 4);
 
     /* read/write single byte */
@@ -243,6 +244,30 @@ static int cmd_test(int argc, char **argv)
     assert(eeprom_read_byte(EEPROM_SIZE - 1) == 'A');
     eeprom_write_byte(EEPROM_SIZE / 2, 'A');
     assert(eeprom_read_byte(EEPROM_SIZE / 2) == 'A');
+
+    /* clear some bytes */
+    eeprom_clear(0, 4);
+    memset(result, 0, 4);
+    ret = eeprom_read(0, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, "", 4) == 0);
+    assert(ret == 4);
+
+    eeprom_clear(EEPROM_SIZE - 4, 4);
+    ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, "", 4) == 0);
+    assert(ret == 4);
+
+    /* set some bytes */
+    eeprom_set(0, 'A', 4);
+    ret = eeprom_read(0, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, "AAAA", 4) == 0);
+    assert(ret == 4);
+
+    memset(result, 0, 4);
+    eeprom_set(EEPROM_SIZE - 4, 'A', 4);
+    ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
+    assert(strncmp((const char *)result, "AAAA", 4) == 0);
+    assert(ret == 4);
 
     puts("SUCCESS");
     return 0;
