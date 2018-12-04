@@ -792,6 +792,11 @@ ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
+  USEMODULE += checksum
+  USEMODULE += riotboot
+endif
+
 # Enable periph_gpio when periph_gpio_irq is enabled
 ifneq (,$(filter periph_gpio_irq,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio

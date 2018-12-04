@@ -134,7 +134,6 @@ ifneq (,$(filter cord_ep,$(USEMODULE)))
     DIRS += net/application_layer/cord/ep
 endif
 
-
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))
 
 include $(RIOTBASE)/Makefile.base
