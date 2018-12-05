@@ -503,11 +503,9 @@ const char *thread_getname(kernel_pid_t pid);
  * problems by delaying a thread yield in an ISR.
  */
 static inline void thread_block_legal_check(void) {
-#ifndef NDEBUG
     if (irq_is_in()) {
         core_panic(PANIC_ILLEGAL_BLOCK, illegal_block_crash_message);
     }
-#endif
 }
 
 #ifdef DEVELHELP
