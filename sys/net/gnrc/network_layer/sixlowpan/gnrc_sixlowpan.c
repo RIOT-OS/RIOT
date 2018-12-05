@@ -246,7 +246,6 @@ static inline bool _add_uncompr_disp(gnrc_pktsnip_t *pkt)
 
 static void _send(gnrc_pktsnip_t *pkt)
 {
-    gnrc_netif_hdr_t *hdr;
     gnrc_pktsnip_t *tmp;
     gnrc_netif_t *netif;
     /* datagram_size: pure IPv6 packet without 6LoWPAN dispatches or compression */
@@ -272,8 +271,7 @@ static void _send(gnrc_pktsnip_t *pkt)
         return;
     }
     pkt = tmp;
-    hdr = pkt->data;
-    netif = gnrc_netif_get_by_pid(hdr->if_pid);
+    netif = gnrc_netif_hdr_get_netif(pkt->data);
     datagram_size = gnrc_pkt_len(pkt->next);
 
     if (netif == NULL) {

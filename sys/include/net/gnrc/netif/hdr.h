@@ -26,6 +26,7 @@
 
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
+#include "net/gnrc/netif.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -211,6 +212,23 @@ static inline void gnrc_netif_hdr_set_dst_addr(gnrc_netif_hdr_t *hdr, uint8_t *a
  * @return  NULL on error.
  */
 gnrc_pktsnip_t *gnrc_netif_hdr_build(uint8_t *src, uint8_t src_len, uint8_t *dst, uint8_t dst_len);
+
+/**
+ * @brief   Convenience function to get the corresponding interface struct for
+ *          a given interface header
+ *
+ * @pre `hdr != NULL`
+ *
+ * @param[in] hdr   Header to read interface from.
+ *
+ * @return  The @ref gnrc_netif_t representation of the interface on success
+ * @return  NULL, on error.
+ */
+static inline gnrc_netif_t *gnrc_netif_hdr_get_netif(const gnrc_netif_hdr_t *hdr)
+{
+    assert(hdr != NULL);
+    return gnrc_netif_get_by_pid(hdr->if_pid);
+}
 
 /**
  * @brief   Outputs a generic interface header to stdout.
