@@ -146,6 +146,12 @@ endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += fmt
+  ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
+    USEMODULE += gnrc_netif_ieee802154
+  endif
+  ifneq (,$(filter netdev_eth,$(USEMODULE)))
+    USEMODULE += gnrc_netif_ethernet
+  endif
 endif
 
 ifneq (,$(filter ieee802154 nrfmin,$(USEMODULE)))
