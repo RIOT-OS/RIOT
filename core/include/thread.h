@@ -124,8 +124,6 @@
 #include "msg.h"
 #include "cpu_conf.h"
 #include "sched.h"
-#include "irq.h"
-#include "panic.h"
 
 #ifdef MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
@@ -349,11 +347,6 @@ struct _thread {
 /** @} */
 
 /**
- * @brief   the string that is passed to panic in case of an illegal block
- */
-extern const char illegal_block_crash_message[];
-
-/**
  * @brief Creates a new thread.
  *
  * For an in-depth discussion of thread priorities, behavior and and flags,
@@ -495,18 +488,6 @@ void thread_add_to_list(list_node_t *list, thread_t *thread);
  * @return          `NULL` if pid is unknown
  */
 const char *thread_getname(kernel_pid_t pid);
-
-/**
- * @brief   Panic if blocking is currently illegal
- *
- * This ensures that RIOT crashes when it can't block, instead of causing odd
- * problems by delaying a thread yield in an ISR.
- */
-static inline void thread_block_legal_check(void) {
-    if (irq_is_in()) {
-        core_panic(PANIC_ILLEGAL_BLOCK, illegal_block_crash_message);
-    }
-}
 
 #ifdef DEVELHELP
 /**
