@@ -2,7 +2,8 @@ include ../Makefile.tests_common
 
 USEMODULE += xtimer
 
-TEST_ON_CI_WHITELIST += all
+# This test randomly fails on `native` so disable it from CI
+TEST_ON_CI_WHITELIST += samr21-xpro
 
 # Port and pin configuration for probing with oscilloscope
 # Port number should be found in port enum e.g in cpu/include/periph_cpu.h
