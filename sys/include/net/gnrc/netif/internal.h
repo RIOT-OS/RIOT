@@ -467,8 +467,8 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
 int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif, const eui64_t *iid,
                                 uint8_t *addr);
 #else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
-#define gnrc_netif_ipv6_iid_to_addr(netif, addr, addr_len, iid) (-ENOTSUP)
-#define gnrc_netif_ipv6_iid_from_addr(netif, iid, addr)         (-ENOTSUP)
+#define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid) (-ENOTSUP)
+#define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)         (-ENOTSUP)
 #endif  /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
 
 #ifdef __cplusplus
