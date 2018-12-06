@@ -36,6 +36,17 @@
  * to STDIO in RIOT which is used for standard input/output functions like
  * `printf()` or `puts()`.
  *
+ * # (Low-) Power Implications
+ *
+ * After initialization, the UART peripheral **should** be powered on and
+ * active. The UART can later be explicitly put to sleep and woken up by calling
+ * the uart_poweron() and uart_poweroff() functions. Once woken up using
+ * uart_poweron(), the UART **should** transparently continue it's previously
+ * configured operation.
+ *
+ * While the UART is active, the implementation might need to block certain
+ * power states.
+ *
  * @{
  *
  * @file
