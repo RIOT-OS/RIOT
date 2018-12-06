@@ -114,9 +114,23 @@ static const uart_conf_t uart_config[] = {
         .mode   = UART_MODE_8N1,
         .type   = KINETIS_UART,
     },
+    {
+        .dev    = UART0,
+        .freq   = CLOCK_CORECLOCK,
+        .pin_rx = GPIO_PIN(PORT_D, 6),
+        .pin_tx = GPIO_PIN(PORT_D, 7),
+        .pcr_rx = PORT_PCR_MUX(3),
+        .pcr_tx = PORT_PCR_MUX(3),
+        .irqn   = UART0_RX_TX_IRQn,
+        .scgc_addr = &SIM->SCGC4,
+        .scgc_bit = SIM_SCGC4_UART0_SHIFT,
+        .mode   = UART_MODE_8N1,
+        .type   = KINETIS_UART,
+    },
 };
 
 #define UART_0_ISR          (isr_uart1_rx_tx)
+#define UART_1_ISR          (isr_uart0_rx_tx)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
