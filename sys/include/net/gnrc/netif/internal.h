@@ -280,18 +280,6 @@ void gnrc_netif_ipv6_group_leave_internal(gnrc_netif_t *netif,
  */
 int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif,
                               const ipv6_addr_t *addr);
-
-/**
- * @brief   Gets interface identifier (IID) of an interface's link-layer address
- *
- * @param[in] netif     the network interface
- * @param[out] eui64    the IID
- *
- * @return  0, on success
- * @return  -ENOTSUP, if interface has no link-layer address or if
- *          gnrc_netif_t::device_type is not supported.
- */
-int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *eui64);
 #endif  /* MODULE_GNRC_IPV6 */
 
 /**
@@ -466,9 +454,40 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
  */
 int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif, const eui64_t *iid,
                                 uint8_t *addr);
+
+/**
+ * @brief   Converts an interface IID of an interface's hardware address
+ *
+ * @param[in] netif     The network interface @p iid came from
+ * @param[out] iid      The IID based on gnrc_netif_t::device_type
+ *
+ * @note    This wraps around @ref gnrc_netif_ipv6_iid_from_addr by using
+ *          by using gnrc_netif_t::l2addr and gnrc_netif_t::l2addr_len of
+ *          @p netif.
+ *
+ * @return  `sizeof(eui64_t)` on success.
+ * @return  `-ENOTSUP`, if interface has no link-layer address or if
+ *          gnrc_netif_t::device_type is not supported.
+ * @return  `-EINVAL`, when gnrc_netif_t::l2addr_len of @p netif is invalid for
+ *          the gnrc_netif_t::device_type of @p netif.
+ */
+static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid)
+{
+#if GNRC_NETIF_L2ADDR_MAXLEN > 0
+    if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
+        return gnrc_netif_ipv6_iid_from_addr(netif,
+                                             netif->l2addr, netif->l2addr_len,
+                                             iid);
+    }
+#endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
+    (void)netif;
+    (void)iid;
+    return -ENOTSUP;
+}
 #else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
 #define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid) (-ENOTSUP)
 #define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)         (-ENOTSUP)
+#define gnrc_netif_ipv6_get_iid(netif, iid)                         (-ENOTSUP)
 #endif  /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
 
 #ifdef __cplusplus
