@@ -792,11 +792,6 @@ ifneq (,$(filter bluetil_addr,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter cord_epsim_standalone,$(USEMODULE)))
-  USEMODULE += cord_epsim
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter cord_epsim,$(USEMODULE)))
   USEMODULE += cord_common
   USEMODULE += gcoap

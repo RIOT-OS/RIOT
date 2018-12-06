@@ -6,7 +6,6 @@ PSEUDOMODULES += can_raw
 PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += conn_can_isotp_multi
 PSEUDOMODULES += cord_ep_standalone
-PSEUDOMODULES += cord_epsim_standalone
 PSEUDOMODULES += core_%
 PSEUDOMODULES += cortexm_fpu
 PSEUDOMODULES += ecc_%
