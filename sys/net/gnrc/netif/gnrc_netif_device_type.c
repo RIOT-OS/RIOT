@@ -18,7 +18,7 @@
 
 #include "log.h"
 #include "net/gnrc/netif.h"
-#include "net/ethernet.h"
+#include "net/eui48.h"
 #include "net/ieee802154.h"
 
 #ifdef MODULE_GNRC_IPV6
@@ -45,8 +45,8 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
 #if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
             case NETDEV_TYPE_ETHERNET:
             case NETDEV_TYPE_ESP_NOW:
-                if (addr_len == ETHERNET_ADDR_LEN) {
-                    ethernet_get_iid(iid, (uint8_t *)addr);
+                if (addr_len == sizeof(eui48_t)) {
+                    eui48_to_ipv6_iid(iid, (const eui48_t *)addr);
                     return sizeof(eui64_t);
                 }
                 else {
@@ -108,13 +108,8 @@ int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif, const eui64_t *iid,
 #if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
         case NETDEV_TYPE_ETHERNET:
         case NETDEV_TYPE_ESP_NOW:
-            addr[0] = iid->uint8[0] ^ 0x02;
-            addr[1] = iid->uint8[1];
-            addr[2] = iid->uint8[2];
-            addr[3] = iid->uint8[5];
-            addr[4] = iid->uint8[6];
-            addr[5] = iid->uint8[7];
-            return ETHERNET_ADDR_LEN;
+            eui48_from_ipv6_iid((eui48_t *)addr, iid);
+            return sizeof(eui48_t);
 #endif  /* defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW) */
 #if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE)
         case NETDEV_TYPE_IEEE802154:
