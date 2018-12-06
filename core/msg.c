@@ -114,7 +114,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
                   __LINE__, target_pid);
             irq_restore(state);
             if (me->status == STATUS_REPLY_BLOCKED) {
-                thread_block_legal_check();
+                assert(!irq_is_in() && "ILLEGAL BLOCK (IN ISR)");
 
                 thread_yield_higher();
             }
@@ -131,7 +131,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
         DEBUG("msg_send: %" PRIkernel_pid ": going send blocked.\n",
               me->pid);
 
-        thread_block_legal_check();
+        assert(!irq_is_in() && "ILLEGAL BLOCK (IN ISR)");
 
         me->wait_data = (void*) m;
 
@@ -329,7 +329,7 @@ static int _msg_receive(msg_t *m, int block)
             DEBUG("_msg_receive(): %" PRIkernel_pid ": No msg in queue. Going blocked.\n",
                   sched_active_thread->pid);
 
-            thread_block_legal_check();
+            assert(!irq_is_in() && "ILLEGAL BLOCK (IN ISR)");
 
             sched_set_status(me, STATUS_RECEIVE_BLOCKED);
 
