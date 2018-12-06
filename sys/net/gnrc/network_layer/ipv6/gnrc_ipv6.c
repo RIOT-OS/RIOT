@@ -811,6 +811,16 @@ static void _receive(gnrc_pktsnip_t *pkt)
     /* extract header */
     hdr = (ipv6_hdr_t *)ipv6->data;
 
+    if (hdr->hl == 0) {
+        /* This is an illegal value in any case, not just in case of a
+         * forwarding step, so *do not* check it together with ((--hdr->hl) > 0)
+         * in forwarding code below */
+        DEBUG("ipv6: packet was received with hop-limit 0\n");
+        gnrc_icmpv6_error_time_exc_send(ICMPV6_ERROR_TIME_EXC_HL, pkt);
+        gnrc_pktbuf_release_error(pkt, ETIMEDOUT);
+        return;
+    }
+
     uint16_t ipv6_len = byteorder_ntohs(hdr->len);
 
     if ((ipv6_len == 0) && (hdr->nh != PROTNUM_IPV6_NONXT)) {
