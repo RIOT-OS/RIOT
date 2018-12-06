@@ -94,6 +94,11 @@ _is_git_worktree = $(shell grep '^gitdir: ' $(RIOTBASE)/.git 2>/dev/null)
 GIT_WORKTREE_COMMONDIR = $(shell git rev-parse --git-common-dir)
 DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):$(GIT_WORKTREE_COMMONDIR))
 
+# Resolve symlink of /etc/localtime to its real path
+# This is a workaround for docker on macOS, for more information see:
+# https://github.com/docker/for-mac/issues/2396
+ETC_LOCALTIME = $(realpath /etc/localtime)
+
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
 # We do not push the regular $(MAKECMDGOALS) to the container's make command in
 # order to only perform building inside the container and defer executing any
@@ -109,7 +114,7 @@ DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):
 	    -v '$(RIOTBOARD):$(DOCKER_BUILD_ROOT)/riotboard' \
 	    -v '$(RIOTMAKE):$(DOCKER_BUILD_ROOT)/riotmake' \
 	    -v '$(RIOTPROJECT):$(DOCKER_BUILD_ROOT)/riotproject' \
-	    -v /etc/localtime:/etc/localtime:ro \
+	    -v '$(ETC_LOCALTIME):/etc/localtime:ro' \
 	    -e 'RIOTBASE=$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -e 'CCACHE_BASEDIR=$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu' \
