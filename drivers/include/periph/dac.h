@@ -27,6 +27,18 @@
  * so that any particular bit-width configuration on this driver level would not
  * have much effect...
  *
+ * # (Low-) Power Implications
+ *
+ * The configured DAC peripherals are active (and consume power) from the point
+ * of initialization. When calling dac_poweroff(), the implementation **should**
+ * disable the given DAC line and put the DAC peripheral to sleep (e.g. through
+ * peripheral clock gating). When woken up again through dac_poweron(), the
+ * given DAC line **should** transparently continue it's previous operation.
+ *
+ * The DAC driver implementation may need to block (and free) certain power
+ * modes in the driver's dac_init(), dac_poweron(), and the dac_poweroff()
+ * functions.
+ *
  * @{
  * @file
  * @brief       DAC peripheral driver interface definition
