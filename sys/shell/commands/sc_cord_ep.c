@@ -35,7 +35,7 @@ static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
     ep->family  = AF_INET6;
     ep->netif   = SOCK_ADDR_ANY_NETIF;
     if (ep->port == 0) {
-        ep->port = CORD_SERVER_PORT;
+        ep->port = COAP_PORT;
     }
     return 0;
 }
