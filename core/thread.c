@@ -57,7 +57,13 @@ const char *thread_getname(kernel_pid_t pid)
 
 void thread_sleep(void)
 {
-    thread_block_legal_check();
+#ifdef DEVELHELP
+    assert(!irq_is_in() && "ILLEGAL BLOCK (IN ISR)");
+#else
+    if (irq_is_in()) {
+        return;
+    }
+#endif
 
     unsigned state = irq_disable();
     sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
