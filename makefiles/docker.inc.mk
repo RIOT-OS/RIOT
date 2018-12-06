@@ -94,7 +94,7 @@ DOCKER_OVERRIDE_CMDLINE := $(strip $(DOCKER_OVERRIDE_CMDLINE))
 	    -v '$(RIOTBOARD):$(DOCKER_BUILD_ROOT)/riotboard' \
 	    -v '$(RIOTMAKE):$(DOCKER_BUILD_ROOT)/riotmake' \
 	    -v '$(RIOTPROJECT):$(DOCKER_BUILD_ROOT)/riotproject' \
-	    -v /etc/localtime:/etc/localtime:ro \
+	    -v $(realpath /etc/localtime):/etc/localtime:ro \
 	    -e 'RIOTBASE=$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -e 'CCACHE_BASEDIR=$(DOCKER_BUILD_ROOT)/riotbase' \
 	    -e 'RIOTCPU=$(DOCKER_BUILD_ROOT)/riotcpu' \
