@@ -486,6 +486,10 @@ void auto_init(void)
     extern void auto_init_mpu9150(void);
     auto_init_mpu9150();
 #endif
+#ifdef MODULE_PCA9685
+    extern void auto_init_pca9685(void);
+    auto_init_pca9685();
+#endif
 #ifdef MODULE_PH_OEM
     extern void auto_init_ph_oem(void);
     auto_init_ph_oem();
