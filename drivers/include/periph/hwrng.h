@@ -20,6 +20,16 @@
  * @note    Refer to your platforms MCU reference manual for information on the
  *          quality of the used (pseudo) random number generator!
  *
+ * # (Low-) Power Implications
+ *
+ * The HWRNG implementation **should** consume no additional power while no read
+ * operation is in progress. This means, that the HWRNG peripheral should be
+ * disabled (e.g. through peripheral clock gating) after the initialization and
+ * that it **should** only be turned on while hwrng_read() is active.
+ *
+ * If the implementation puts the active thread to sleep during hwrng_read(), it
+ * might need to block certain power modes on some platforms during this time.
+ *
  * @{
  * @file
  * @brief       Hardware random number generator driver interface
