@@ -159,6 +159,10 @@ static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
             return GNRC_NETTYPE_NDN;
 #endif
 #endif
+#ifdef MODULE_GNRC_SIXLOENC
+        case ETHERTYPE_6LOENC:
+            return GNRC_NETTYPE_SIXLOWPAN;
+#endif
         default:
             return GNRC_NETTYPE_UNDEF;
     }
@@ -178,6 +182,10 @@ static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
 static inline uint16_t gnrc_nettype_to_ethertype(gnrc_nettype_t type)
 {
     switch (type) {
+#ifdef MODULE_GNRC_SIXLOENC
+        case GNRC_NETTYPE_SIXLOWPAN:
+            return ETHERTYPE_6LOENC;
+#endif
 #ifdef MODULE_GNRC_IPV6
         case GNRC_NETTYPE_IPV6:
             return ETHERTYPE_IPV6;
