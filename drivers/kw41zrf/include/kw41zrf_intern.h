@@ -27,6 +27,15 @@
 /* For ZLL CPU registers */
 #include "cpu.h"
 
+#ifdef MODULE_PM_LAYERED
+#include "pm_layered.h"
+#define PM_BLOCK(x) pm_block(x)
+#define PM_UNBLOCK(x) pm_unblock(x)
+#else
+#define PM_BLOCK(x)
+#define PM_UNBLOCK(x)
+#endif
+
 #define ENABLE_LEDS     (1)
 
 #if ENABLE_LEDS

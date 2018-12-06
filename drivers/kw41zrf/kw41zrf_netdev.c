@@ -28,7 +28,6 @@
 #include "net/ieee802154.h"
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
-#include "pm_layered.h"
 
 #include "kw41zrf.h"
 #include "kw41zrf_netdev.h"
@@ -187,7 +186,7 @@ static void kw41zrf_wait_idle(kw41zrf_t *dev)
         DEBUG("[kw41zrf] waiting for idle\n");
         num_irqs_handled = num_irqs_queued;
         spinning_for_irq = 1;
-        pm_block(KINETIS_PM_LLS);
+        PM_BLOCK(KINETIS_PM_LLS);
         while (1) {
             /* TX or CCA in progress */
             /* Block until we get an IRQ */
@@ -201,7 +200,7 @@ static void kw41zrf_wait_idle(kw41zrf_t *dev)
             }
             DEBUG("[kw41zrf] waited ISR\n");
         }
-        pm_unblock(KINETIS_PM_LLS);
+        PM_UNBLOCK(KINETIS_PM_LLS);
         spinning_for_irq = 0;
         DEBUG("[kw41zrf] previous TX done\n");
     }
