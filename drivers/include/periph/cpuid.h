@@ -13,6 +13,13 @@
  *
  * Provides access the CPU's serial number
  *
+ * # (Low-) Power Implications
+ *
+ * The implementation **should** make sure, that calling cpuid_get() does not
+ * introduce any long-term power usage penalties. If e.g. some peripheral has to
+ * be powered on for the CPU ID to be read, the implementation **should** take
+ * care to disable the peripheral again after the read is finished.
+ *
  * @{
  * @file
  * @brief       Low-level CPUID peripheral driver interface definitions
