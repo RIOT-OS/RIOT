@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-uno \
+BOARD_INSUFFICIENT_MEMORY := arduino-mega2560 arduino-duemilanove arduino-uno \
                              chronos nucleo-f031k6 nucleo-f042k6 nucleo-l031k6 \
                              waspmote-pro
 
