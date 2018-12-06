@@ -24,6 +24,16 @@
  *              around 10K times), so using this interface in some kind of loops
  *              can damage you MCU!
  *
+ * # (Low-) Power Implications
+ *
+ * The flashpage driver implementation **should** make sure, that the CPU uses
+ * no additional energy while the flashpage driver is inactive. This means, that
+ * any particular CPU peripherals used for reading and writing flash pages
+ * **should** be disabled before the read and write functions return.
+ *
+ * If an implementation puts the calling thread to sleep for a duration of time,
+ * the implementation might need to take care of blocking certain power modes.
+ *
  * @{
  * @file
  * @brief       Low-level flash page peripheral driver interface
