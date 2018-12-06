@@ -91,7 +91,7 @@ DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e GIT_CACHE_DIR=$(D
 
 # Handle worktree by mounting the git common dir in the same location
 _is_git_worktree = $(shell grep '^gitdir: ' $(RIOTBASE)/.git 2>/dev/null)
-GIT_WORKTREE_COMMONDIR = $(shell git rev-parse --git-common-dir)
+GIT_WORKTREE_COMMONDIR = $(abspath $(shell git rev-parse --git-common-dir))
 DOCKER_VOLUMES_AND_ENV += $(if $(_is_git_worktree),-v $(GIT_WORKTREE_COMMONDIR):$(GIT_WORKTREE_COMMONDIR))
 
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
