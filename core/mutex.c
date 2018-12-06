@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <inttypes.h>
 
@@ -47,7 +48,7 @@ int _mutex_lock(mutex_t *mutex, int blocking)
         return 1;
     }
     else if (blocking) {
-        thread_block_legal_check();
+        assert(!irq_is_in() && "ILLEGAL BLOCK (IN ISR)");
         thread_t *me = (thread_t*)sched_active_thread;
         DEBUG("PID[%" PRIkernel_pid "]: Adding node to mutex queue: prio: %"
               PRIu32 "\n", sched_active_pid, (uint32_t)me->priority);
