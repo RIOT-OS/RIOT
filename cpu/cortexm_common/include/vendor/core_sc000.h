@@ -1,7 +1,7 @@
 /**************************************************************************//**
- * @file     core_cm0plus.h
- * @brief    CMSIS Cortex-M0+ Core Peripheral Access Layer Header File
- * @version  V5.0.6
+ * @file     core_sc000.h
+ * @brief    CMSIS SC000 Core Peripheral Access Layer Header File
+ * @version  V5.0.5
  * @date     28. May 2018
  ******************************************************************************/
 /*
@@ -28,8 +28,8 @@
   #pragma clang system_header   /* treat file as system include file */
 #endif
 
-#ifndef __CORE_CM0PLUS_H_GENERIC
-#define __CORE_CM0PLUS_H_GENERIC
+#ifndef __CORE_SC000_H_GENERIC
+#define __CORE_SC000_H_GENERIC
 
 #include <stdint.h>
 
@@ -56,19 +56,19 @@
  *                 CMSIS definitions
  ******************************************************************************/
 /**
-  \ingroup Cortex-M0+
+  \ingroup SC000
   @{
  */
 
 #include "cmsis_version.h"
- 
-/*  CMSIS CM0+ definitions */
-#define __CM0PLUS_CMSIS_VERSION_MAIN (__CM_CMSIS_VERSION_MAIN)                  /*!< \deprecated [31:16] CMSIS HAL main version */
-#define __CM0PLUS_CMSIS_VERSION_SUB  (__CM_CMSIS_VERSION_SUB)                   /*!< \deprecated [15:0]  CMSIS HAL sub version */
-#define __CM0PLUS_CMSIS_VERSION      ((__CM0PLUS_CMSIS_VERSION_MAIN << 16U) | \
-                                       __CM0PLUS_CMSIS_VERSION_SUB           )  /*!< \deprecated CMSIS HAL version number */
 
-#define __CORTEX_M                   (0U)                                       /*!< Cortex-M Core */
+/*  CMSIS SC000 definitions */
+#define __SC000_CMSIS_VERSION_MAIN  (__CM_CMSIS_VERSION_MAIN)                /*!< \deprecated [31:16] CMSIS HAL main version */
+#define __SC000_CMSIS_VERSION_SUB   (__CM_CMSIS_VERSION_SUB)                 /*!< \deprecated [15:0]  CMSIS HAL sub version */
+#define __SC000_CMSIS_VERSION       ((__SC000_CMSIS_VERSION_MAIN << 16U) | \
+                                      __SC000_CMSIS_VERSION_SUB           )  /*!< \deprecated CMSIS HAL version number */
+
+#define __CORTEX_SC                 (000U)                                   /*!< Cortex secure core */
 
 /** __FPU_USED indicates whether an FPU is used or not.
     This core does not support an FPU at all
@@ -119,12 +119,12 @@
 }
 #endif
 
-#endif /* __CORE_CM0PLUS_H_GENERIC */
+#endif /* __CORE_SC000_H_GENERIC */
 
 #ifndef __CMSIS_GENERIC
 
-#ifndef __CORE_CM0PLUS_H_DEPENDANT
-#define __CORE_CM0PLUS_H_DEPENDANT
+#ifndef __CORE_SC000_H_DEPENDANT
+#define __CORE_SC000_H_DEPENDANT
 
 #ifdef __cplusplus
  extern "C" {
@@ -132,19 +132,14 @@
 
 /* check device defines and use defaults */
 #if defined __CHECK_DEVICE_DEFINES
-  #ifndef __CM0PLUS_REV
-    #define __CM0PLUS_REV             0x0000U
-    #warning "__CM0PLUS_REV not defined in device header file; using default!"
+  #ifndef __SC000_REV
+    #define __SC000_REV             0x0000U
+    #warning "__SC000_REV not defined in device header file; using default!"
   #endif
 
   #ifndef __MPU_PRESENT
     #define __MPU_PRESENT             0U
     #warning "__MPU_PRESENT not defined in device header file; using default!"
-  #endif
-
-  #ifndef __VTOR_PRESENT
-    #define __VTOR_PRESENT            0U
-    #warning "__VTOR_PRESENT not defined in device header file; using default!"
   #endif
 
   #ifndef __NVIC_PRIO_BITS
@@ -179,7 +174,7 @@
 #define     __OM     volatile            /*! Defines 'write only' structure member permissions */
 #define     __IOM    volatile            /*! Defines 'read / write' structure member permissions */
 
-/*@} end of group Cortex-M0+ */
+/*@} end of group SC000 */
 
 
 
@@ -298,7 +293,7 @@ typedef union
 {
   struct
   {
-    uint32_t nPRIV:1;                    /*!< bit:      0  Execution privilege in Thread mode */
+    uint32_t _reserved0:1;               /*!< bit:      0  Reserved */
     uint32_t SPSEL:1;                    /*!< bit:      1  Stack to be used */
     uint32_t _reserved1:30;              /*!< bit:  2..31  Reserved */
   } b;                                   /*!< Structure used for bit  access */
@@ -308,9 +303,6 @@ typedef union
 /* CONTROL Register Definitions */
 #define CONTROL_SPSEL_Pos                   1U                                            /*!< CONTROL: SPSEL Position */
 #define CONTROL_SPSEL_Msk                  (1UL << CONTROL_SPSEL_Pos)                     /*!< CONTROL: SPSEL Mask */
-
-#define CONTROL_nPRIV_Pos                   0U                                            /*!< CONTROL: nPRIV Position */
-#define CONTROL_nPRIV_Msk                  (1UL /*<< CONTROL_nPRIV_Pos*/)                 /*!< CONTROL: nPRIV Mask */
 
 /*@} end of group CMSIS_CORE */
 
@@ -356,17 +348,15 @@ typedef struct
 {
   __IM  uint32_t CPUID;                  /*!< Offset: 0x000 (R/ )  CPUID Base Register */
   __IOM uint32_t ICSR;                   /*!< Offset: 0x004 (R/W)  Interrupt Control and State Register */
-#if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
   __IOM uint32_t VTOR;                   /*!< Offset: 0x008 (R/W)  Vector Table Offset Register */
-#else
-        uint32_t RESERVED0;
-#endif
   __IOM uint32_t AIRCR;                  /*!< Offset: 0x00C (R/W)  Application Interrupt and Reset Control Register */
   __IOM uint32_t SCR;                    /*!< Offset: 0x010 (R/W)  System Control Register */
   __IOM uint32_t CCR;                    /*!< Offset: 0x014 (R/W)  Configuration Control Register */
-        uint32_t RESERVED1;
+        uint32_t RESERVED0[1U];
   __IOM uint32_t SHP[2U];                /*!< Offset: 0x01C (R/W)  System Handlers Priority Registers. [0] is RESERVED */
   __IOM uint32_t SHCSR;                  /*!< Offset: 0x024 (R/W)  System Handler Control and State Register */
+        uint32_t RESERVED1[154U];
+  __IOM uint32_t SFCR;                   /*!< Offset: 0x290 (R/W)  Security Features Control Register */
 } SCB_Type;
 
 /* SCB CPUID Register Definitions */
@@ -413,11 +403,9 @@ typedef struct
 #define SCB_ICSR_VECTACTIVE_Pos             0U                                            /*!< SCB ICSR: VECTACTIVE Position */
 #define SCB_ICSR_VECTACTIVE_Msk            (0x1FFUL /*<< SCB_ICSR_VECTACTIVE_Pos*/)       /*!< SCB ICSR: VECTACTIVE Mask */
 
-#if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
 /* SCB Interrupt Control State Register Definitions */
-#define SCB_VTOR_TBLOFF_Pos                 8U                                            /*!< SCB VTOR: TBLOFF Position */
-#define SCB_VTOR_TBLOFF_Msk                (0xFFFFFFUL << SCB_VTOR_TBLOFF_Pos)            /*!< SCB VTOR: TBLOFF Mask */
-#endif
+#define SCB_VTOR_TBLOFF_Pos                 7U                                            /*!< SCB VTOR: TBLOFF Position */
+#define SCB_VTOR_TBLOFF_Msk                (0x1FFFFFFUL << SCB_VTOR_TBLOFF_Pos)           /*!< SCB VTOR: TBLOFF Mask */
 
 /* SCB Application Interrupt and Reset Control Register Definitions */
 #define SCB_AIRCR_VECTKEY_Pos              16U                                            /*!< SCB AIRCR: VECTKEY Position */
@@ -457,6 +445,29 @@ typedef struct
 #define SCB_SHCSR_SVCALLPENDED_Msk         (1UL << SCB_SHCSR_SVCALLPENDED_Pos)            /*!< SCB SHCSR: SVCALLPENDED Mask */
 
 /*@} end of group CMSIS_SCB */
+
+
+/**
+  \ingroup  CMSIS_core_register
+  \defgroup CMSIS_SCnSCB System Controls not in SCB (SCnSCB)
+  \brief    Type definitions for the System Control and ID Register not in the SCB
+  @{
+ */
+
+/**
+  \brief  Structure type to access the System Control and ID Register not in the SCB.
+ */
+typedef struct
+{
+        uint32_t RESERVED0[2U];
+  __IOM uint32_t ACTLR;                  /*!< Offset: 0x008 (R/W)  Auxiliary Control Register */
+} SCnSCB_Type;
+
+/* Auxiliary Control Register Definitions */
+#define SCnSCB_ACTLR_DISMCYCINT_Pos         0U                                         /*!< ACTLR: DISMCYCINT Position */
+#define SCnSCB_ACTLR_DISMCYCINT_Msk        (1UL /*<< SCnSCB_ACTLR_DISMCYCINT_Pos*/)    /*!< ACTLR: DISMCYCINT Mask */
+
+/*@} end of group CMSIS_SCnotSCB */
 
 
 /**
@@ -530,8 +541,6 @@ typedef struct
   __IOM uint32_t RASR;                   /*!< Offset: 0x010 (R/W)  MPU Region Attribute and Size Register */
 } MPU_Type;
 
-#define MPU_TYPE_RALIASES                  1U
-
 /* MPU Type Register Definitions */
 #define MPU_TYPE_IREGION_Pos               16U                                            /*!< MPU TYPE: IREGION Position */
 #define MPU_TYPE_IREGION_Msk               (0xFFUL << MPU_TYPE_IREGION_Pos)               /*!< MPU TYPE: IREGION Mask */
@@ -604,8 +613,8 @@ typedef struct
 /**
   \ingroup  CMSIS_core_register
   \defgroup CMSIS_CoreDebug       Core Debug Registers (CoreDebug)
-  \brief    Cortex-M0+ Core Debug Registers (DCB registers, SHCSR, and DFSR) are only accessible over DAP and not via processor.
-            Therefore they are not covered by the Cortex-M0+ header file.
+  \brief    SC000 Core Debug Registers (DCB registers, SHCSR, and DFSR) are only accessible over DAP and not via processor.
+            Therefore they are not covered by the SC000 header file.
   @{
  */
 /*@} end of group CMSIS_CoreDebug */
@@ -650,6 +659,7 @@ typedef struct
 #define NVIC_BASE           (SCS_BASE +  0x0100UL)                    /*!< NVIC Base Address */
 #define SCB_BASE            (SCS_BASE +  0x0D00UL)                    /*!< System Control Block Base Address */
 
+#define SCnSCB              ((SCnSCB_Type    *)     SCS_BASE      )   /*!< System control Register not in SCB */
 #define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct */
 #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct */
 #define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struct */
@@ -690,15 +700,15 @@ typedef struct
   #endif
   #include CMSIS_NVIC_VIRTUAL_HEADER_FILE
 #else
-  #define NVIC_SetPriorityGrouping    __NVIC_SetPriorityGrouping
-  #define NVIC_GetPriorityGrouping    __NVIC_GetPriorityGrouping
+/*#define NVIC_SetPriorityGrouping    __NVIC_SetPriorityGrouping   not available for SC000 */
+/*#define NVIC_GetPriorityGrouping    __NVIC_GetPriorityGrouping   not available for SC000 */
   #define NVIC_EnableIRQ              __NVIC_EnableIRQ
   #define NVIC_GetEnableIRQ           __NVIC_GetEnableIRQ
   #define NVIC_DisableIRQ             __NVIC_DisableIRQ
   #define NVIC_GetPendingIRQ          __NVIC_GetPendingIRQ
   #define NVIC_SetPendingIRQ          __NVIC_SetPendingIRQ
   #define NVIC_ClearPendingIRQ        __NVIC_ClearPendingIRQ
-/*#define NVIC_GetActive              __NVIC_GetActive             not available for Cortex-M0+ */
+/*#define NVIC_GetActive              __NVIC_GetActive             not available for SC000 */
   #define NVIC_SetPriority            __NVIC_SetPriority
   #define NVIC_GetPriority            __NVIC_GetPriority
   #define NVIC_SystemReset            __NVIC_SystemReset
@@ -729,8 +739,6 @@ typedef struct
 #define _SHP_IDX(IRQn)           ( (((((uint32_t)(int32_t)(IRQn)) & 0x0FUL)-8UL) >>    2UL)      )
 #define _IP_IDX(IRQn)            (   (((uint32_t)(int32_t)(IRQn))                >>    2UL)      )
 
-#define __NVIC_SetPriorityGrouping(X) (void)(X)
-#define __NVIC_GetPriorityGrouping()  (0U)
 
 /**
   \brief   Enable Interrupt
@@ -884,74 +892,17 @@ __STATIC_INLINE uint32_t __NVIC_GetPriority(IRQn_Type IRQn)
 
 
 /**
-  \brief   Encode Priority
-  \details Encodes the priority for an interrupt with the given priority group,
-           preemptive priority value, and subpriority value.
-           In case of a conflict between priority grouping and available
-           priority bits (__NVIC_PRIO_BITS), the smallest possible priority group is set.
-  \param [in]     PriorityGroup  Used priority group.
-  \param [in]   PreemptPriority  Preemptive priority value (starting from 0).
-  \param [in]       SubPriority  Subpriority value (starting from 0).
-  \return                        Encoded priority. Value can be used in the function \ref NVIC_SetPriority().
- */
-__STATIC_INLINE uint32_t NVIC_EncodePriority (uint32_t PriorityGroup, uint32_t PreemptPriority, uint32_t SubPriority)
-{
-  uint32_t PriorityGroupTmp = (PriorityGroup & (uint32_t)0x07UL);   /* only values 0..7 are used          */
-  uint32_t PreemptPriorityBits;
-  uint32_t SubPriorityBits;
-
-  PreemptPriorityBits = ((7UL - PriorityGroupTmp) > (uint32_t)(__NVIC_PRIO_BITS)) ? (uint32_t)(__NVIC_PRIO_BITS) : (uint32_t)(7UL - PriorityGroupTmp);
-  SubPriorityBits     = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL) ? (uint32_t)0UL : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
-
-  return (
-           ((PreemptPriority & (uint32_t)((1UL << (PreemptPriorityBits)) - 1UL)) << SubPriorityBits) |
-           ((SubPriority     & (uint32_t)((1UL << (SubPriorityBits    )) - 1UL)))
-         );
-}
-
-
-/**
-  \brief   Decode Priority
-  \details Decodes an interrupt priority value with a given priority group to
-           preemptive priority value and subpriority value.
-           In case of a conflict between priority grouping and available
-           priority bits (__NVIC_PRIO_BITS) the smallest possible priority group is set.
-  \param [in]         Priority   Priority value, which can be retrieved with the function \ref NVIC_GetPriority().
-  \param [in]     PriorityGroup  Used priority group.
-  \param [out] pPreemptPriority  Preemptive priority value (starting from 0).
-  \param [out]     pSubPriority  Subpriority value (starting from 0).
- */
-__STATIC_INLINE void NVIC_DecodePriority (uint32_t Priority, uint32_t PriorityGroup, uint32_t* const pPreemptPriority, uint32_t* const pSubPriority)
-{
-  uint32_t PriorityGroupTmp = (PriorityGroup & (uint32_t)0x07UL);   /* only values 0..7 are used          */
-  uint32_t PreemptPriorityBits;
-  uint32_t SubPriorityBits;
-
-  PreemptPriorityBits = ((7UL - PriorityGroupTmp) > (uint32_t)(__NVIC_PRIO_BITS)) ? (uint32_t)(__NVIC_PRIO_BITS) : (uint32_t)(7UL - PriorityGroupTmp);
-  SubPriorityBits     = ((PriorityGroupTmp + (uint32_t)(__NVIC_PRIO_BITS)) < (uint32_t)7UL) ? (uint32_t)0UL : (uint32_t)((PriorityGroupTmp - 7UL) + (uint32_t)(__NVIC_PRIO_BITS));
-
-  *pPreemptPriority = (Priority >> SubPriorityBits) & (uint32_t)((1UL << (PreemptPriorityBits)) - 1UL);
-  *pSubPriority     = (Priority                   ) & (uint32_t)((1UL << (SubPriorityBits    )) - 1UL);
-}
-
-
-/**
   \brief   Set Interrupt Vector
   \details Sets an interrupt vector in SRAM based interrupt vector table.
            The interrupt number can be positive to specify a device specific interrupt,
            or negative to specify a processor exception.
            VTOR must been relocated to SRAM before.
-           If VTOR is not present address 0 must be mapped to SRAM.
   \param [in]   IRQn      Interrupt number
   \param [in]   vector    Address of interrupt handler function
  */
 __STATIC_INLINE void __NVIC_SetVector(IRQn_Type IRQn, uint32_t vector)
 {
-#if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
   uint32_t *vectors = (uint32_t *)SCB->VTOR;
-#else
-    uint32_t *vectors = (uint32_t *)0x0U;
-#endif
   vectors[(int32_t)IRQn + NVIC_USER_IRQ_OFFSET] = vector;
 }
 
@@ -966,13 +917,8 @@ __STATIC_INLINE void __NVIC_SetVector(IRQn_Type IRQn, uint32_t vector)
  */
 __STATIC_INLINE uint32_t __NVIC_GetVector(IRQn_Type IRQn)
 {
-#if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
   uint32_t *vectors = (uint32_t *)SCB->VTOR;
-#else
-  uint32_t *vectors = (uint32_t *)0x0U;
-#endif
   return vectors[(int32_t)IRQn + NVIC_USER_IRQ_OFFSET];
-
 }
 
 
@@ -996,13 +942,6 @@ __NO_RETURN __STATIC_INLINE void __NVIC_SystemReset(void)
 
 /*@} end of CMSIS_Core_NVICFunctions */
 
-/* ##########################  MPU functions  #################################### */
-
-#if defined (__MPU_PRESENT) && (__MPU_PRESENT == 1U)
-
-#include "mpu_armv7.h"
-
-#endif
 
 /* ##########################  FPU functions  #################################### */
 /**
@@ -1078,6 +1017,6 @@ __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
 }
 #endif
 
-#endif /* __CORE_CM0PLUS_H_DEPENDANT */
+#endif /* __CORE_SC000_H_DEPENDANT */
 
 #endif /* __CMSIS_GENERIC */
