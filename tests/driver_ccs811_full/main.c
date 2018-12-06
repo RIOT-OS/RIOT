@@ -44,6 +44,7 @@ kernel_pid_t p_main;
 
 static void ccs811_isr (void *arg)
 {
+    (void)arg;
     /* send a message to trigger main thread to handle the interrupt */
     msg_t msg;
     msg_send(&msg, p_main);

@@ -487,7 +487,7 @@ int ccs811_set_baseline(const ccs811_t *dev, uint16_t baseline)
 
 static int _reg_read(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
-    DEBUG_DEV("read %d bytes from sensor registers starting at addr %02x",
+    DEBUG_DEV("read %"PRIu32" bytes from sensor registers starting at addr %02x",
               dev, len, reg);
 
     int res = CCS811_OK;
@@ -529,7 +529,7 @@ static int _reg_read(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t l
         }
     }
     else {
-        DEBUG_DEV("could not read %d bytes from sensor registers "
+        DEBUG_DEV("could not read %"PRIu32" bytes from sensor registers "
                   "starting at addr %02x, reason %d (%s)",
                   dev, len, reg, res, strerror(res * -1));
         return -CCS811_ERROR_I2C;
@@ -540,7 +540,7 @@ static int _reg_read(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t l
 
 static int _reg_write(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t len)
 {
-    DEBUG_DEV("write %d bytes to sensor registers starting at addr %02x",
+    DEBUG_DEV("write %"PRIu32" bytes to sensor registers starting at addr %02x",
               dev, len, reg);
 
     int res = CCS811_OK;
@@ -586,8 +586,8 @@ static int _reg_write(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t 
 #endif
 
     if (res != CCS811_OK) {
-        DEBUG_DEV("could not write %d bytes to sensor registers "
-                  "starting at addr %02x, reason %d (%s)",
+        DEBUG_DEV("could not write %"PRIu32" bytes to sensor registers "
+                  "starting at addr %02x, reason %i (%s)",
                   dev, len, reg, res, strerror(res * -1));
         return -CCS811_ERROR_I2C;
     }
