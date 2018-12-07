@@ -1,6 +1,11 @@
 # 'Makefile.include' directory, must be evaluated before other 'include'
 _riotbase := $(dir $(lastword $(MAKEFILE_LIST)))
 
+# include RIOT_MAKEFILES_GLOBAL_PRE configuration files
+# allows setting user specific system wide configuration parsed before the body
+# of $(RIOTBASE)/Makefile.include
+include $(RIOT_MAKEFILES_GLOBAL_PRE)
+
 # Globally set default goal to `all`
 .DEFAULT_GOAL := all
 
@@ -730,3 +735,8 @@ ifneq ($(_BASELIBS_VALUE_BEFORE_USAGE),$(BASELIBS))
 endif
 
 endif # BOARD=none
+
+# include RIOT_MAKEFILES_GLOBAL_POST configuration files
+# allows setting user specific system wide configuration parsed after the body
+# of $(RIOTBASE)/Makefile.include
+include $(RIOT_MAKEFILES_GLOBAL_POST)
