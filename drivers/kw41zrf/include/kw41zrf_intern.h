@@ -36,46 +36,53 @@
 #define PM_UNBLOCK(x)
 #endif
 
+/* Set to 1 to use on board LEDs to show RX/TX activity */
 #define ENABLE_LEDS     (1)
 
 #if ENABLE_LEDS
 /* For LED macros */
 #include "board.h"
-#ifdef BOARD_USB_KW41Z
-/* Combine LED functions for this board */
-#ifdef LED0_ON
-#define LED_RX_ON   LED0_ON
-#define LED_RX_OFF  LED0_OFF
-#define LED_TX_ON   LED0_ON
-#define LED_TX_OFF  LED0_OFF
-#else
-#define LED_TX_ON
-#define LED_TX_OFF
+#if !defined(LED_RX_ON)
+#if defined(LED0_ON)
+#define LED_RX_ON       LED0_ON
+#define LED_RX_OFF      LED0_OFF
+#else /* defined(LED0_ON) */
 #define LED_RX_ON
 #define LED_RX_OFF
-#endif
+#endif /* defined(LED0_ON) */
+#endif /* !defined(LED_RX_ON) */
+#if !defined(LED_TX_ON)
+#if defined(LED1_ON)
+/* Separate TX LED */
+#define LED_TX_ON       LED1_ON
+#define LED_TX_OFF      LED1_OFF
+#elif defined(LED0_ON)
+/* Combined RX+TX in one LED */
+#define LED_TX_ON       LED0_ON
+#define LED_TX_OFF      LED0_OFF
+#else /* defined(LEDx_ON) */
+#define LED_TX_ON
+#define LED_TX_OFF
+#endif /* defined(LEDx_ON) */
+#endif /* !defined(LED_TX_ON) */
+#if !defined(LED_NDSM_ON)
+#if defined(LED2_ON)
+#define LED_NDSM_ON     LED2_ON
+#define LED_NDSM_OFF    LED2_OFF
+#else /* defined(LEDx_ON) */
 #define LED_NDSM_ON
 #define LED_NDSM_OFF
+#endif /* defined(LEDx_ON) */
+#endif /* !defined(LED_NDSM_ON) */
+#if !defined(LED_IRQ_ON)
+#if defined(LED3_ON)
+#define LED_IRQ_ON      LED3_ON
+#define LED_IRQ_OFF     LED3_OFF
+#else /* defined(LEDx_ON) */
 #define LED_IRQ_ON
 #define LED_IRQ_OFF
-#else
-#ifdef LED0_ON
-#define LED_NDSM_ON   LED0_ON
-#define LED_NDSM_OFF  LED0_OFF
-#endif
-#ifdef LED1_ON
-#define LED_TX_ON   LED1_ON
-#define LED_TX_OFF  LED1_OFF
-#endif
-#ifdef LED2_ON
-#define LED_RX_ON   LED2_ON
-#define LED_RX_OFF  LED2_OFF
-#endif
-#ifdef LED3_ON
-#define LED_IRQ_ON  LED3_ON
-#define LED_IRQ_OFF LED3_OFF
-#endif
-#endif
+#endif /* defined(LEDx_ON) */
+#endif /* !defined(LED_IRQ_ON) */
 #else /* ENABLE_LEDS */
 #define LED_NDSM_ON
 #define LED_NDSM_OFF
