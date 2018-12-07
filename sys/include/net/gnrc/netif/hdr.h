@@ -21,9 +21,11 @@
 #ifndef NET_GNRC_NETIF_HDR_H
 #define NET_GNRC_NETIF_HDR_H
 
+#include <errno.h>
 #include <string.h>
 #include <stdint.h>
 
+#include "net/gnrc/netif/internal.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif.h"
@@ -196,6 +198,65 @@ static inline void gnrc_netif_hdr_set_dst_addr(gnrc_netif_hdr_t *hdr, uint8_t *a
 
     memcpy(((uint8_t *)(hdr + 1)) + hdr->src_l2addr_len, addr, addr_len);
 }
+
+#if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
+/**
+ * @brief   Converts the source address of a given @ref net_gnrc_netif_hdr to
+ *          an IPv6 IID
+ *
+ * @note    @p netif is intentionally required to be provided so that the caller
+ *          needs to retrieve it from gnrc_netif_hdr_t::if_pid of @p hdr only
+ *          once instead of this function retrieving it at every call.
+ *
+ * @pre `netif->pid == hdr->if_pid`
+ *
+ * @param[in] netif A network interface. gnrc_netif_t::pid must be equal to
+ *                  gnrc_netif_hdr_t::if_pid of @p hdr.
+ * @param[in] hdr   Header to convert source address from.
+ * @param[out] iid  The IID based on gnrc_netif_t::device_type.
+ *
+ * @return  same as gnrc_netif_ipv6_iid_from_addr().
+ */
+static inline int gnrc_netif_hdr_ipv6_iid_from_src(const gnrc_netif_t *netif,
+                                                   const gnrc_netif_hdr_t *hdr,
+                                                   eui64_t *iid)
+{
+    return gnrc_netif_ipv6_iid_from_addr(netif,
+                                         gnrc_netif_hdr_get_src_addr(hdr),
+                                         hdr->src_l2addr_len,
+                                         iid);
+}
+
+/**
+ * @brief   Converts the destination address of a given @ref net_gnrc_netif_hdr
+ *          to an IPv6 IID
+ *
+ * @note    @p netif is intentionally required to be provided so that the caller
+ *          needs to retrieve it from gnrc_netif_hdr_t::if_pid of @p hdr only
+ *          once instead of this function retrieving it at every call.
+ *
+ * @pre `netif->pid == hdr->if_pid`
+ *
+ * @param[in] netif A network interface. gnrc_netif_t::pid must be equal to
+ *                  gnrc_netif_hdr_t::if_pid of @p hdr.
+ * @param[in] hdr   Header to convert destination address from.
+ * @param[out] iid  The IID based on gnrc_netif_t::device_type.
+ *
+ * @return  same as gnrc_netif_ipv6_iid_from_addr().
+ */
+static inline int gnrc_netif_hdr_ipv6_iid_from_dst(const gnrc_netif_t *netif,
+                                                   const gnrc_netif_hdr_t *hdr,
+                                                   eui64_t *iid)
+{
+    return gnrc_netif_ipv6_iid_from_addr(netif,
+                                         gnrc_netif_hdr_get_dst_addr(hdr),
+                                         hdr->dst_l2addr_len,
+                                         iid);
+}
+#else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+#define gnrc_netif_hdr_ipv6_iid_from_src(netif, hdr, iid)   (-ENOTSUP);
+#define gnrc_netif_hdr_ipv6_iid_from_dst(netif, hdr, iid)   (-ENOTSUP);
+#endif  /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
 
 /**
  * @brief   Builds a generic network interface header for sending and
