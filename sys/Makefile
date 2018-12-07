@@ -133,6 +133,9 @@ endif
 ifneq (,$(filter cord_ep,$(USEMODULE)))
     DIRS += net/application_layer/cord/ep
 endif
+ifneq (,$(filter bluetil_%,$(USEMODULE)))
+  DIRS += net/ble/bluetil
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(USEMODULE))))
 
