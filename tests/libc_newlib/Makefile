@@ -29,6 +29,7 @@ endif
 # https://github.com/32bitmicro/newlib-nano-1.0/blob/f157c994b9a2c4bd8d0cfe9fe8fdd9cd54f8c63b/newlib/README.nano#L32
 
 test-newlib: $(ELFFILE)
+	$(Q)test -f $^
 	$(Q)\
 	PRINTF_ADDR=$$($(NM) $^ | sed -n '/ printf$$/ s/ .*//p');\
 	IPRINTF_ADDR=$$($(NM) $^ | sed -n '/ iprintf$$/ s/ .*//p');\
