@@ -16,8 +16,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
-#ifdef MODULE_ESP_NOW
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 #include "log.h"
@@ -868,5 +866,4 @@ void auto_init_esp_now (void)
                                               (netdev_t *)&_esp_now_dev);
 }
 
-#endif /* MODULE_ESP_NOW */
 /** @} */
