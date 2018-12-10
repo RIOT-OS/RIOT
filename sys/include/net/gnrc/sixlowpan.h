@@ -68,8 +68,8 @@
  * set to a legal, 6LoWPAN compatible interface referred to as `netif` in the
  * following, otherwise the packet will be discarded.
  *
- * If @ref net_gnrc_sixlowpan_iphc is included and gnrc_sixlowpan_netif_t::iphc_enable of `netif`
- * is true the @ref GNRC_NETTYPE_IPV6 header will be compressed according to
+ * If @ref net_gnrc_sixlowpan_iphc is included and @ref GNRC_NETIF_FLAGS_6LO_HC is enabled for
+ * `netif` the @ref GNRC_NETTYPE_IPV6 header will be compressed according to
  * <a href="https://tools.ietf.org/html/rfc6282">RFC 6282</a>. If it is false the
  * @ref SIXLOWPAN_UNCOMP dispatch will be appended as a new @ref gnrc_pktsnip_t to the packet.
  * The false case also applies if @ref net_gnrc_sixlowpan_iphc is not included.
