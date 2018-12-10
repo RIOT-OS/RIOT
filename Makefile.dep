@@ -154,7 +154,7 @@ ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   endif
 endif
 
-ifneq (,$(filter ieee802154 nrfmin,$(USEMODULE)))
+ifneq (,$(filter ieee802154 nrfmin esp_now,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
   endif
