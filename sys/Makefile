@@ -121,6 +121,9 @@ endif
 ifneq (,$(filter l2filter,$(USEMODULE)))
   DIRS += net/link_layer/l2filter
 endif
+ifneq (,$(filter l2util,$(USEMODULE)))
+  DIRS += net/link_layer/l2util
+endif
 ifneq (,$(filter nanocoap,$(USEMODULE)))
   DIRS += net/application_layer/nanocoap
 endif
