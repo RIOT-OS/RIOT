@@ -77,7 +77,13 @@ int16_t kw41zrf_get_txpower(kw41zrf_t *dev)
 uint8_t kw41zrf_get_channel(kw41zrf_t *dev)
 {
     (void) dev;
-    return (ZLL->CHANNEL_NUM0 & ZLL_CHANNEL_NUM0_CHANNEL_NUM0_MASK);
+    return (ZLL->CHANNEL_NUM0 & ZLL_CHANNEL_NUM0_CHANNEL_NUM0_MASK) >> ZLL_CHANNEL_NUM0_CHANNEL_NUM0_SHIFT;
+}
+
+uint16_t kw41zrf_get_pan(kw41zrf_t *dev)
+{
+    (void) dev;
+    return (ZLL->MACSHORTADDRS0 & ZLL_MACSHORTADDRS0_MACPANID0_MASK) >> ZLL_MACSHORTADDRS0_MACPANID0_SHIFT;
 }
 
 int kw41zrf_set_channel(kw41zrf_t *dev, uint8_t channel)

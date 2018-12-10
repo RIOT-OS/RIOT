@@ -97,6 +97,15 @@ uint8_t kw41zrf_get_channel(kw41zrf_t *dev);
 void kw41zrf_set_pan(kw41zrf_t *dev, uint16_t pan);
 
 /**
+ * @brief   Get PAN ID of given device
+ *
+ * @param[in] dev       kw41zrf device descriptor
+ *
+ * @return              current PAN ID
+ */
+uint16_t kw41zrf_get_pan(kw41zrf_t *dev);
+
+/**
  * @brief   Set short address of a given device
  *
  * @param[in] dev       kw41zrf device descriptor

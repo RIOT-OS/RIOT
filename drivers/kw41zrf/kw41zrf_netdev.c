@@ -567,6 +567,10 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     if (kw41zrf_is_dsm()) {
         /* Transceiver is in deep sleep mode */
         switch (opt) {
+            case NETOPT_CHANNEL:
+            case NETOPT_NID:
+            case NETOPT_ADDRESS:
+            case NETOPT_ADDRESS_LONG:
             case NETOPT_TX_POWER:
             case NETOPT_IS_CHANNEL_CLR:
             case NETOPT_CCA_THRESHOLD:
@@ -594,6 +598,42 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
     int res = -ENOTSUP;
 
     switch (opt) {
+        case NETOPT_CHANNEL:
+            if (len != sizeof(uint16_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            *((uint16_t *)value) = (uint16_t)kw41zrf_get_channel(dev);
+            res = len;
+            break;
+
+        case NETOPT_NID:
+            if (len != sizeof(uint16_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            *((uint16_t *)value) = kw41zrf_get_pan(dev);
+            res = len;
+            break;
+
+        case NETOPT_ADDRESS:
+            if (len != sizeof(uint16_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            *((uint16_t *)value) = kw41zrf_get_addr_short(dev);
+            res = len;
+            break;
+
+        case NETOPT_ADDRESS_LONG:
+            if (len != sizeof(uint64_t)) {
+                res = -EOVERFLOW;
+                break;
+            }
+            *((uint64_t *)value) = kw41zrf_get_addr_long(dev);
+            res = len;
+            break;
+
         case NETOPT_TX_POWER:
             if (len != sizeof(int16_t)) {
                 res = -EOVERFLOW;
@@ -845,7 +885,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
                 break;
             }
             kw41zrf_set_addr_short(dev, *((const uint16_t *)value));
-            /* don't set res to set netdev_ieee802154_t::short_addr */
+            res = len;
             break;
 
         case NETOPT_ADDRESS_LONG:
@@ -854,7 +894,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
                 break;
             }
             kw41zrf_set_addr_long(dev, *((const uint64_t *)value));
-            /* don't set res to set netdev_ieee802154_t::short_addr */
+            res = len;
             break;
 
         case NETOPT_NID:
@@ -863,7 +903,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
                 break;
             }
             kw41zrf_set_pan(dev, *((const uint16_t *)value));
-            /* don't set res to set netdev_ieee802154_t::pan */
+            res = len;
             break;
 
         case NETOPT_CHANNEL:
@@ -875,7 +915,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
                 res = -EINVAL;
                 break;
             }
-            /* don't set res to set netdev_ieee802154_t::chan */
+            res = len;
             break;
 
         case NETOPT_TX_POWER:
