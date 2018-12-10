@@ -88,10 +88,6 @@ static int kw41zrf_netdev_init(netdev_t *netdev)
         return -1;
     }
 
-#ifdef MODULE_NETSTATS_L2
-    memset(&netdev->stats, 0, sizeof(netstats_t));
-#endif
-
     return 0;
 }
 
@@ -260,10 +256,6 @@ static int kw41zrf_netdev_send(netdev_t *netdev, const iolist_t *iolist)
     od_hex_dump((const uint8_t *)ZLL->PKT_BUFFER_TX, len, OD_WIDTH_DEFAULT);
 #endif
 
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += len;
-#endif
-
     /* send data out directly if pre-loading is disabled */
     if (!(dev->flags & KW41ZRF_OPT_PRELOADING)) {
         dev->csma_be = dev->csma_min_be;
@@ -319,13 +311,6 @@ static int kw41zrf_netdev_recv(netdev_t *netdev, void *buf, size_t len, void *in
 #if defined(MODULE_OD) && ENABLE_DEBUG
     DEBUG("[kw41zrf] recv:\n");
     od_hex_dump((const uint8_t *)ZLL->PKT_BUFFER_RX, pkt_len, OD_WIDTH_DEFAULT);
-#endif
-
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.rx_count++;
-    netdev->stats.rx_bytes += pkt_len;
-#else
-    (void)netdev;
 #endif
 
     if (pkt_len > len) {
