@@ -578,36 +578,21 @@ static void _send_multicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
 static void _send_to_self(gnrc_pktsnip_t *pkt, bool prep_hdr,
                           gnrc_netif_t *netif)
 {
-    uint8_t *rcv_data;
-    gnrc_pktsnip_t *ptr = pkt, *rcv_pkt;
-
-    if (!_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
-        return;
-    }
-    rcv_pkt = gnrc_pktbuf_add(NULL, NULL, gnrc_pkt_len(pkt), GNRC_NETTYPE_IPV6);
-
-    if (rcv_pkt == NULL) {
-        DEBUG("ipv6: error on generating loopback packet\n");
+    if (!_safe_fill_ipv6_hdr(netif, pkt, prep_hdr) ||
+        /* no netif header so we just merge the whole packet. */
+        (gnrc_pktbuf_merge(pkt) != 0)) {
+        DEBUG("ipv6: error looping packet to sender.\n");
         gnrc_pktbuf_release(pkt);
         return;
     }
 
-    rcv_data = rcv_pkt->data;
-
-    /* "reverse" packet (by making it one snip as if received from NIC) */
-    while (ptr != NULL) {
-        memcpy(rcv_data, ptr->data, ptr->size);
-        rcv_data += ptr->size;
-        ptr = ptr->next;
-    }
-
-    gnrc_pktbuf_release(pkt);
-
     DEBUG("ipv6: packet is addressed to myself => loopback\n");
 
-    if (gnrc_netapi_receive(gnrc_ipv6_pid, rcv_pkt) < 1) {
-        DEBUG("ipv6: unable to deliver packet\n");
-        gnrc_pktbuf_release(rcv_pkt);
+    if (gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6,
+                                     GNRC_NETREG_DEMUX_CTX_ALL,
+                                     pkt) == 0) {
+        DEBUG("ipv6: unable to deliver looped back packet\n");
+        gnrc_pktbuf_release(pkt);
     }
 }
 
