@@ -599,7 +599,7 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
                 res = -EOVERFLOW;
                 break;
             }
-            *((uint16_t *)value) = kw41zrf_get_txpower(dev);
+            *((int16_t *)value) = kw41zrf_get_txpower(dev);
             res = len;
             break;
 

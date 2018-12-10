@@ -69,7 +69,7 @@ void kw41zrf_set_tx_power(kw41zrf_t *dev, int16_t txpower_dbm)
     dev->tx_power = txpower_dbm;
 }
 
-uint16_t kw41zrf_get_txpower(kw41zrf_t *dev)
+int16_t kw41zrf_get_txpower(kw41zrf_t *dev)
 {
     return dev->tx_power;
 }
