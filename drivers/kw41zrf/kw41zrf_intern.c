@@ -62,7 +62,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
             /* Disable some CPU power management if we need to be active, otherwise the
              * radio will be stuck in state retention mode. */
             if (!dev->pm_blocked) {
-                PM_BLOCK(KINETIS_PM_LLS);
+                PM_BLOCK(KW41ZRF_PM_BLOCKER);
                 dev->pm_blocked = 1;
             }
             /* Restore saved RF oscillator settings, enable oscillator in RUN mode
@@ -118,7 +118,7 @@ void kw41zrf_set_power_mode(kw41zrf_t *dev, kw41zrf_powermode_t pm)
                 break;
             }
             if (dev->pm_blocked) {
-                PM_UNBLOCK(KINETIS_PM_LLS);
+                PM_UNBLOCK(KW41ZRF_PM_BLOCKER);
                 dev->pm_blocked = 0;
             }
             /* Race condition: if sleep is re-triggered after wake before the

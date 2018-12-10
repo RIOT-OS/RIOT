@@ -186,7 +186,7 @@ static void kw41zrf_wait_idle(kw41zrf_t *dev)
         DEBUG("[kw41zrf] waiting for idle\n");
         num_irqs_handled = num_irqs_queued;
         spinning_for_irq = 1;
-        PM_BLOCK(KINETIS_PM_LLS);
+        PM_BLOCK(KW41ZRF_PM_BLOCKER);
         while (1) {
             /* TX or CCA in progress */
             /* Block until we get an IRQ */
@@ -200,7 +200,7 @@ static void kw41zrf_wait_idle(kw41zrf_t *dev)
             }
             DEBUG("[kw41zrf] waited ISR\n");
         }
-        PM_UNBLOCK(KINETIS_PM_LLS);
+        PM_UNBLOCK(KW41ZRF_PM_BLOCKER);
         spinning_for_irq = 0;
         DEBUG("[kw41zrf] previous TX done\n");
     }
