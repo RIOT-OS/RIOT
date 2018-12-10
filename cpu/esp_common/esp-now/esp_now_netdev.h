@@ -58,9 +58,9 @@ typedef struct
 
     gnrc_netif_t* netif;             /**< reference to the corresponding netif */
 
-    #ifdef MODULE_GNRC
+#ifdef MODULE_GNRC
     gnrc_nettype_t proto;            /**< protocol for upper layer */
-    #endif
+#endif
 
     uint8_t peers_all;               /**< number of peers reachable */
     uint8_t peers_enc;               /**< number of encrypted peers */
