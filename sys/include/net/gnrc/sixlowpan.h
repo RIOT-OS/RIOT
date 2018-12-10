@@ -42,9 +42,9 @@
  *      to @ref GNRC_NETTYPE_IPV6 with demultiplex context @ref GNRC_NETREG_DEMUX_CTX_ALL
  *      immediately, but it will be checked first if @ref sixlowpan_iphc_is() is true for its
  *      payload. If false it will be send to the @ref GNRC_NETTYPE_IPV6 subscribers as usual. If
- *      true the IPHC dispatch will be decompressed to a full IPv6 header first. The IPv6 header
- *      will be included as a new @ref gnrc_pktsnip_t to the packet directly behind the payload.
- *      The IPHC dispatch will be removed. The resulting packet will then be issued to the
+ *      true the IPHC dispatch will be decompressed to a full IPv6 header first. The IPHC dispatch
+ *      will be replaced by the uncompressed IPHC header, any NHC dispatch will be replaced by their
+ *      respective uncompressed header. The resulting packet will then be issued to the
  *      @ref GNRC_NETTYPE_IPV6 subscribers as usual.
  *  3.  If both @ref net_gnrc_sixlowpan_frag and @ref net_gnrc_sixlowpan_iphc are included the
  *      and @ref sixlowpan_frag_is() is true for the packet, the fragmented datagram will be
