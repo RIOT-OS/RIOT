@@ -1,6 +1,7 @@
 Test for use of openwsn package as a sock implementation. Depends on #8570.
 
 Includes two applications for testing:
+
  1. server -- essentially the examples/nanocoap_server application
  1. client -- CLI for sending a CoAP request; based on examples/gcoap, but uses nanocoap.
 
