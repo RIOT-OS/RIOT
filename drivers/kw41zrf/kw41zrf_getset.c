@@ -82,13 +82,13 @@ uint8_t kw41zrf_get_channel(kw41zrf_t *dev)
 
 int kw41zrf_set_channel(kw41zrf_t *dev, uint8_t channel)
 {
+    (void) dev;
     if (channel < KW41ZRF_MIN_CHANNEL || channel > KW41ZRF_MAX_CHANNEL) {
         LOG_ERROR("[kw41zrf] Invalid channel %u\n", channel);
         return -EINVAL;
     }
 
     ZLL->CHANNEL_NUM0 = channel;
-    dev->netdev.chan = channel;
 
     LOG_DEBUG("[kw41zrf] set channel to %u\n", channel);
     return 0;
@@ -96,8 +96,7 @@ int kw41zrf_set_channel(kw41zrf_t *dev, uint8_t channel)
 
 void kw41zrf_set_pan(kw41zrf_t *dev, uint16_t pan)
 {
-    dev->netdev.pan = pan;
-
+    (void) dev;
     ZLL->MACSHORTADDRS0 = (ZLL->MACSHORTADDRS0 & ~ZLL_MACSHORTADDRS0_MACPANID0_MASK) |
         ZLL_MACSHORTADDRS0_MACPANID0(pan);
 
@@ -106,15 +105,12 @@ void kw41zrf_set_pan(kw41zrf_t *dev, uint16_t pan)
 
 void kw41zrf_set_addr_short(kw41zrf_t *dev, uint16_t addr)
 {
+    (void) dev;
 #ifdef MODULE_SIXLOWPAN
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
     addr &= 0x7fff;
 #endif
-    /* Network byte order */
-    /* TODO use byteorder.h */
-    dev->netdev.short_addr[0] = (addr & 0xff);
-    dev->netdev.short_addr[1] = (addr >> 8);
     ZLL->MACSHORTADDRS0 = (ZLL->MACSHORTADDRS0 & ~ZLL_MACSHORTADDRS0_MACSHORTADDRS0_MASK) |
         ZLL_MACSHORTADDRS0_MACSHORTADDRS0(addr);
 }
@@ -122,9 +118,6 @@ void kw41zrf_set_addr_short(kw41zrf_t *dev, uint16_t addr)
 void kw41zrf_set_addr_long(kw41zrf_t *dev, uint64_t addr)
 {
     (void) dev;
-    for (unsigned i = 0; i < IEEE802154_LONG_ADDRESS_LEN; i++) {
-        dev->netdev.long_addr[i] = (uint8_t)(addr >> (i * 8));
-    }
     /* Network byte order */
     addr = byteorder_swapll(addr);
     ZLL->MACLONGADDRS0_LSB = (uint32_t)addr;
