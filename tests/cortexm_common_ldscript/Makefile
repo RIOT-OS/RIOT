@@ -27,7 +27,10 @@ include $(RIOTBASE)/Makefile.include
 COMPILE_TESTS  = test-elffile-overflow test-elffile-fw_rom_length
 COMPILE_TESTS += tests-offsets tests-fw_rom_len tests-rom-overflow
 
+# The tests should only be executed in build environment
+ifneq ($(BUILD_IN_DOCKER),1)
 all: compile-tests
+endif
 
 compile-tests: $(COMPILE_TESTS)
 .PHONY: compile-tests $(COMPILE_TESTS)
