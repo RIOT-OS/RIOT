@@ -204,6 +204,13 @@ extern "C" {
 #include "net/l2filter.h"
 #endif
 
+/**
+ * @name        Network device types
+ * @anchor      net_netdev_type
+ * @attention   When implementing a new type that is able to carry IPv6, have
+ *              a look if you need to update @ref net_l2util as well.
+ * @{
+ */
 enum {
     NETDEV_TYPE_UNKNOWN,
     NETDEV_TYPE_TEST,
@@ -217,6 +224,7 @@ enum {
     NETDEV_TYPE_SLIP,
     NETDEV_TYPE_ESP_NOW,
 };
+/** @} */
 
 /**
  * @brief   Possible event types that are send from the device driver to the
