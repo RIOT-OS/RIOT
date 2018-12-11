@@ -10,8 +10,8 @@ import sys
 from testrunner import run
 
 # Float and print operations are slow on boards
-# Got 80 iotlab-m3 and 250 on samr21-xpro
-TIMEOUT = 300
+# Got 80 iotlab-m3, 250 on samr21-xpro and 640 on microbit
+TIMEOUT = 1000
 
 
 def testfunc(child):
