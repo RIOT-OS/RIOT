@@ -63,5 +63,5 @@ then
 fi
 
 echo ""
-echo "UPLOAD SUCCESFUL"
+echo "UPLOAD SUCCESSFUL"
 echo ""
