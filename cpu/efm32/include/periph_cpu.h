@@ -369,6 +369,30 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   Static timer number of the Low Energy Timer (LETIMER)
+ *
+ * @note    This timer is configured like any other tim_t, but needs no
+ *          configuration in timer_conf_t because there exists only one LETIMER
+ *          per device. The actual setup is rather limited in that there is no
+ *          arbitrary prescaler present that could help achieve any timer
+ *          frequency; LETIMER is (in this implementation) always driven from
+ *          the 32.768kHz LFA clock, and can only be run at this frequency --
+ *          that is limited, but sufficient to use TIMER_LETIMER as XTIMER_DEV
+ *          (with either XTIMER_CHAN, an XTIMER_HZ of 32768 and an XTIMER_WIDTH
+ *          of 16) and thus free up the other timers.
+ *
+ *          To use it as a timer, the board peripheral confiugration file needs
+ *          to `#define TIMER_USE_LETIMER` in order to build the LETIMER code
+ *          and to generate the timer interrupt handler for it.
+ *
+ * @{
+ */
+
+#define TIMER_LETIMER 0xffffffffu
+
+/** @} */
+
+/**
  * @brief   Internal macro for combining UART modes data bits (x), stop bits
  *          (y, in half bits) and parity (z).
  */
