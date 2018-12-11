@@ -903,7 +903,7 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
                 break;
             }
             kw41zrf_set_pan(dev, *((const uint16_t *)value));
-            res = len;
+            //~ res = len; /* uncomment this when the upper layer code is refactored to not need netdev_t::pan */
             break;
 
         case NETOPT_CHANNEL:
