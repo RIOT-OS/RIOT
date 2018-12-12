@@ -100,7 +100,7 @@ void gnrc_icmpv6_echo_req_handle(gnrc_netif_t *netif, ipv6_hdr_t *ipv6_hdr,
     }
 
     if (netif != NULL) {
-        ((gnrc_netif_hdr_t *)hdr->data)->if_pid = netif->pid;
+        gnrc_netif_hdr_set_netif(hdr->data, netif);
     }
     else {
         /* ipv6_hdr->dst is loopback address */
