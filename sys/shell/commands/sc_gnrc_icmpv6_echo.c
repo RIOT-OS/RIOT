@@ -298,15 +298,12 @@ static void _pinger(_ping_data_t *data)
     /* if data->hoplimit is unset (i.e. 0) gnrc_ipv6 will select hop limit */
     ipv6->hl = data->hoplimit;
     if (data->netif != NULL) {
-        gnrc_netif_hdr_t *netif;
-
         tmp = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
         if (tmp == NULL) {
             puts("error: packet buffer full");
             goto error_exit;
         }
-        netif = tmp->data;
-        netif->if_pid = data->netif->pid;
+        gnrc_netif_hdr_set_netif(tmp->data, data->netif);
         LL_PREPEND(pkt, tmp);
     }
     if (data->datalen >= sizeof(uint32_t)) {
