@@ -72,6 +72,15 @@ int saul_reg_add(saul_reg_t *dev);
 /**
  * @brief   Unregister a device from the SAUL registry
  *
+ * @warning   Removing the device at runtime can send applications that have
+ *            looked up that device into invalid states, and should thus be
+ *            avoided.
+ *
+ * @warning   This function must only be used by drivers that advise developers
+ *            using them on how to prevent race conditions when using SAUL.
+ *
+ * None of the SAUL drivers shipped with RIOT call this function.
+ *
  * @param[in] dev       pointer to a registry entry
  *
  * @return      0 on success
