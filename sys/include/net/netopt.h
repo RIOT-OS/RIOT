@@ -100,6 +100,9 @@ typedef enum {
      *          RFC 4291, section 2.5.1
      *      </a>
      *
+     * @deprecated  Do not implement this in a network device. Other APIs
+     *              utilizing [netopt](@ref net_netopt) may still implement it.
+     *
      * The generation of the interface identifier is dependent on the link-layer.
      * Please refer to the appropriate IPv6 over `<link>` specification for
      * further implementation details (such as
