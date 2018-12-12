@@ -25,6 +25,7 @@
 #include "net/ethernet/hdr.h"
 #include "net/ethertype.h"
 #include "net/ieee802154.h"
+#include "net/l2util.h"
 #include "net/netdev/ieee802154.h"
 #include "openthread/config.h"
 #include "openthread/openthread.h"
@@ -457,8 +458,13 @@ otError otPlatRadioEnergyScan(otInstance *aInstance, uint8_t aScanChannel, uint1
 
 void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeee64Eui64)
 {
-    (void) aInstance;
-    _dev->driver->get(_dev, NETOPT_IPV6_IID, aIeee64Eui64, sizeof(eui64_t));
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+
+    (void)aInstance;
+    _dev->driver->get(_dev, NETOPT_ADDRESS_LONG, addr, sizeof(addr));
+    l2util_ipv6_iid_from_addr(NETDEV_TYPE_IEEE802154,
+                              addr, sizeof(eui64_t),
+                              (eui64_t *)aIeee64Eui64);
 }
 
 int8_t otPlatRadioGetReceiveSensitivity(otInstance *aInstance)
