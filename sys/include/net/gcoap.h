@@ -618,10 +618,13 @@ typedef ssize_t (*gcoap_link_encoder_t)(const coap_resource_t *resource, char *b
 
 /**
  * @brief   A modular collection of resources for a server
+ * @note    Resources must be sorted.
  */
 typedef struct gcoap_listener {
     const coap_resource_t *resources;   /**< First element in the array of
-                                         *   resources; must order alphabetically */
+                                             resources; must order by the ASCII
+                                             encoding of the path characters
+                                             (digit and capital precede lower case) */
     size_t resources_len;               /**< Length of array */
     gcoap_link_encoder_t link_encoder;  /**< Writes a link for a resource */
     struct gcoap_listener *next;        /**< Next listener in list */
@@ -687,7 +690,7 @@ kernel_pid_t gcoap_init(void);
 /**
  * @brief   Starts listening for resource paths
  *
- * @param[in] listener  Listener containing the resources.
+ * @param[in] listener  Listener containing the sorted resources.
  */
 void gcoap_register_listener(gcoap_listener_t *listener);
 
