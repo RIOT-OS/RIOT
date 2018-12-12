@@ -243,7 +243,7 @@ static int _esp_eth_recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     mutex_lock(&dev->dev_lock);
 
-    uint8_t size = dev->rx_len;
+    int size = dev->rx_len;
 
     if (!buf && !len) {
         /* return the size without dropping received data */
