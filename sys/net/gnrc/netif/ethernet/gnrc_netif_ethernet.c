@@ -230,7 +230,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         gnrc_netif_hdr_init(netif_hdr->data, ETHERNET_ADDR_LEN, ETHERNET_ADDR_LEN);
         gnrc_netif_hdr_set_src_addr(netif_hdr->data, hdr->src, ETHERNET_ADDR_LEN);
         gnrc_netif_hdr_set_dst_addr(netif_hdr->data, hdr->dst, ETHERNET_ADDR_LEN);
-        ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = netif->pid;
+        gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
 
         DEBUG("gnrc_netif_ethernet: received packet from %02x:%02x:%02x:%02x:%02x:%02x "
               "of length %d\n",
