@@ -262,8 +262,8 @@ static int _esp_eth_recv(netdev_t *netdev, void *buf, size_t len, void *info)
         /* return the packet */
 
         if (dev->rx_len > len) {
-            LOG_TAG_ERROR("esp_eth", "Not enough space in receive buffer "
-                          "for %d byte\n", dev->rx_len);
+        /* buffer is smaller than the number of received bytes */
+        DEBUG("%s: Not enough space in receive buffer for %d bytes\n",
             mutex_unlock(&dev->dev_lock);
             return -ENOBUFS;
         }
