@@ -168,7 +168,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         gnrc_netif_hdr_set_dst_addr(netif_hdr->data, (uint8_t*)&cc110x_pkt->address, addr_len);
     }
 
-    ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = thread_getpid();
+    gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
     ((gnrc_netif_hdr_t *)netif_hdr->data)->lqi = cc110x->pkt_buf.lqi;
     ((gnrc_netif_hdr_t *)netif_hdr->data)->rssi = cc110x->pkt_buf.rssi;
 
