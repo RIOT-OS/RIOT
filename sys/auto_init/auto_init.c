@@ -437,6 +437,10 @@ void auto_init(void)
     extern void auto_init_pulse_counter(void);
     auto_init_pulse_counter();
 #endif
+#ifdef MODULE_SHT3X
+    extern void auto_init_sht3x(void);
+    auto_init_sht3x();
+#endif
 #ifdef MODULE_SI114X
     extern void auto_init_si114x(void);
     auto_init_si114x();
@@ -468,11 +472,6 @@ void auto_init(void)
 #ifdef MODULE_VEML6070
     extern void auto_init_veml6070(void);
     auto_init_veml6070();
-#endif
-
-#ifdef MODULE_SHT3X
-    extern void auto_init_sht3x(void);
-    auto_init_sht3x();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
