@@ -41,7 +41,7 @@
 #endif
 
 /* Set to 1 to use on board LEDs to show RX/TX activity */
-#define ENABLE_LEDS     (1)
+#define ENABLE_LEDS     (0)
 
 #if ENABLE_LEDS
 /* For LED macros */
