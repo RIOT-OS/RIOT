@@ -26,6 +26,22 @@
 
 #include "cpu.h"
 
+#if MODULE_PM_LAYERED
+#include "pm_layered.h"
+/**
+ * @brief   pm_block iff pm_layered is used
+ */
+#define PM_BLOCK(x) pm_block(x)
+/**
+ * @brief   pm_unblock iff pm_layered is used
+ */
+#define PM_UNBLOCK(x) pm_unblock(x)
+#else
+/* ignore these calls when not using pm_layered */
+#define PM_BLOCK(x)
+#define PM_UNBLOCK(x)
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

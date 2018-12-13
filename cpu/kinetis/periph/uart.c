@@ -31,14 +31,6 @@
 #if MODULE_PERIPH_LLWU
 #include "llwu.h"
 #endif
-#if MODULE_PM_LAYERED
-#include "pm_layered.h"
-#define PM_BLOCK(x) pm_block(x)
-#define PM_UNBLOCK(x) pm_unblock(x)
-#else
-#define PM_BLOCK(x)
-#define PM_UNBLOCK(x)
-#endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
