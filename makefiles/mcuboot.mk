@@ -19,7 +19,7 @@ mcuboot-create-key: $(MCUBOOT_KEYFILE)
 ifeq ($(BINDIR)/key.pem,$(MCUBOOT_KEYFILE))
 $(MCUBOOT_KEYFILE):
 	$(Q)mkdir -p $(BINDIR)
-	$(Q)$(IMGTOOL) keygen -k $@ -t rsa-2048
+	$(Q)$(IMGTOOL) keygen -k $@ -t ecdsa-p256
 endif
 
 mcuboot: mcuboot-create-key link
