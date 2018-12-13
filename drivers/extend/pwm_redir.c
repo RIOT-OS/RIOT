@@ -56,7 +56,7 @@ uint32_t pwm_init_redir(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     if (entry == NULL) {
         DEBUG("[%s] ext entry doesn't exist for dev %u\n", __func__, dev);
-        return -1;
+        return 0;
     }
 
     return entry->driver->init(entry->dev, mode, freq, res);
