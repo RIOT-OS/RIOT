@@ -18,6 +18,7 @@
 #define CCS811_H
 
 #include <stdint.h>
+#include "periph/gpio.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
