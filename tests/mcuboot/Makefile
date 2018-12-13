@@ -10,3 +10,10 @@ export IMAGE_VERSION = 1.1.1+1
 all: mcuboot
 
 include $(RIOTBASE)/Makefile.include
+
+# this is kind of ugly, but there is not IMGTOOL_FLAGS.
+IMGTOOL_DETERMINISTIC ?= $(RIOT_CI_BUILD)
+
+ifeq ($(IMGTOOL_DETERMINISTIC),1)
+	IMGTOOL += --seed RIOT-is-awesome
+endif
