@@ -1,0 +1,17 @@
+# define the cpu used by the board
+export CPU = kinetis
+export CPU_MODEL = mkw41z512vht4
+
+# use openocd by default to program this board
+PROGRAMMER ?= openocd
+
+# dap debug adapter is required for openocd
+ifeq (openocd,$(PROGRAMMER))
+DEBUG_ADAPTER = dap
+endif
+
+# Enable direct write to FCF (required for setting FOPT byte).
+export OPENOCD_PRE_FLASH_CMDS += "-c kinetis fcf_source write"
+
+# Include default FRDM board config
+include $(RIOTBOARD)/common/frdm/Makefile.include
