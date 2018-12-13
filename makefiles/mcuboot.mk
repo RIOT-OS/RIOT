@@ -1,7 +1,6 @@
 ifdef MCUBOOT_SLOT0_SIZE
 
 IMGTOOL ?= $(RIOTTOOLS)/mcuboot/imgtool.py
-override IMGTOOL := $(abspath $(IMGTOOL))
 
 BINFILE ?= $(BINDIR)/$(APPLICATION).bin
 SIGN_BINFILE = $(BINDIR)/signed-$(APPLICATION).bin
