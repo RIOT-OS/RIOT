@@ -7,9 +7,9 @@ from imgtool import version
 import sys
 
 def gen_rsa2048(args):
-    keys.RSA2048.generate().export_private(args.key)
+    keys.RSA2048.generate(args.prng_func).export_private(args.key)
 def gen_ecdsa_p256(args):
-    keys.ECDSA256P1.generate().export_private(args.key)
+    keys.ECDSA256P1.generate(args.prng_func).export_private(args.key)
 def gen_ecdsa_p224(args):
     print("TODO: p-224 not yet implemented")
 
@@ -36,7 +36,11 @@ def do_sign(args):
             header_size=args.header_size,
             included_header=args.included_header,
             pad=args.pad)
-    key = keys.load(args.key) if args.key else None
+
+    signing_seed = (args.prng_func(16) if args.prng_func else None)
+
+    key = (keys.load(args.key, deterministic_signature_seed=signing_seed)
+           if args.key else None)
     img.sign(key)
 
     if args.pad:
@@ -62,8 +66,22 @@ def intparse(text):
     Accepts 0x and other prefixes to allow other bases to be used."""
     return int(text, 0)
 
+def make_randfunc(text):
+    """Create a random generator from a seed."""
+
+    return keys.make_prng(bytes(text, encoding="utf-8"))
+
 def args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        epilog="Note: setting the --seed option will cause both key generation "
+        "and signing operations to be deterministic. This is COMPLETELY NEGATES "
+        "any security offered by the signature procedure. This feature is "
+        "provided ONLY for reproducible builds in a CI environment.")
+
+    parser.add_argument('--seed', metavar='bytes', help="Use a pseudo-random "
+                       "number generator with the provided seed. (ONLY USE FOR "
+                       "TEST BUILDS)", type=make_randfunc, dest="prng_func")
+
     subs = parser.add_subparsers(help='subcommand help', dest='subcmd')
 
     keygenp = subs.add_parser('keygen', help='Generate pub/private keypair')
