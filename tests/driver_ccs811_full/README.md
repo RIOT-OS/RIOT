@@ -1,16 +1,21 @@
-# About
+# AMS CCS811 device driver test application
+
+## About
 
 This is a manual test application for the CCS811 driver. It shows how the
-sensor can be used for periodic polling as well as with interrupts.
+sensor can be used with interrupts.
 
-# Usage
+**Please note:** The interrupt pin has to be defined for this test application.
+
+## Usage
 
 The test application demonstrates the use of the CCS811 and pseudomodule
 ```ccs811_full``` using
 
-- data-ready interrupt ```CCS811_INT_DATA_READY``` and
-- default configuration parameters, that is, the measurement mode
-  ```CCS811_MODE_1S``` with one measurement per second.
+  - data-ready interrupt ```CCS811_INT_DATA_READY``` and
+
+  - default configuration parameters, that is, the measurement mode
+    ```CCS811_MODE_1S``` with one measurement per second.
 
 The default configuration parameter for the interrupt pin has to be
 overridden according to the hardware configuration by defining
