@@ -382,9 +382,12 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
         volatile uint8_t dummy;
         dummy = i2c->D;
         ++dummy;
-        /* Wait until the ISR signals back */
         TRACE("i2c: read C1=%02x S=%02x\n", (unsigned)i2c->C1, (unsigned)i2c->S);
+        /* Keep module clock enabled by blocking low power modes */
+        PM_BLOCK(KINETIS_PM_STOP);
+        /* Wait until the ISR signals back */
         thread_flags_t tflg = thread_flags_wait_any(THREAD_FLAG_KINETIS_I2C | THREAD_FLAG_TIMEOUT);
+        PM_UNBLOCK(KINETIS_PM_STOP);
         TRACE("i2c: rx done, %u left, ret: %d\n",
             i2c_state[dev].rx.bytes_left, i2c_state[dev].retval);
         if (!(tflg & THREAD_FLAG_KINETIS_I2C)) {
@@ -432,8 +435,11 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
         /* Initiate transfer by writing the first byte, the remaining bytes will
          * be fed by the ISR */
         i2c->D = *((const uint8_t *)data);
+        /* Keep module clock enabled by blocking low power modes */
+        PM_BLOCK(KINETIS_PM_STOP);
         /* Wait until the ISR signals back */
         thread_flags_t tflg = thread_flags_wait_any(THREAD_FLAG_KINETIS_I2C | THREAD_FLAG_TIMEOUT);
+        PM_UNBLOCK(KINETIS_PM_STOP);
         TRACE("i2c: rx done, %u left, ret: %d\n",
             i2c_state[dev].rx.bytes_left, i2c_state[dev].retval);
         if (!(tflg & THREAD_FLAG_KINETIS_I2C)) {
