@@ -9,7 +9,7 @@ import sys
 def gen_rsa2048(args):
     keys.RSA2048.generate().export_private(args.key)
 def gen_ecdsa_p256(args):
-    keys.ecdsa256p1.generate().export_private(args.key)
+    keys.ECDSA256P1.generate().export_private(args.key)
 def gen_ecdsa_p224(args):
     print("TODO: p-224 not yet implemented")
 

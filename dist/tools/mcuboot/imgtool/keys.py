@@ -84,7 +84,7 @@ class ECDSA256P1():
 
     def export_private(self, path):
         with open(path, 'wb') as f:
-            f.write(key.to_pem())
+            f.write(self.key.to_pem())
 
     def emit_c(self):
         vk = self.key.get_verifying_key()
