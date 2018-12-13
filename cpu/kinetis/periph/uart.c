@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Eistec AB
+ * Copyright (C) 2017-2018 Eistec AB
  * Copyright (C) 2014 PHYTEC Messtechnik GmbH
  * Copyright (C) 2014 Freie Universität Berlin
  *
@@ -158,18 +158,15 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     assert(uart < UART_NUMOF);
 
-    if (config[uart].rx_cb && config[uart].enabled) {
-        /* Re-initialization of an already configured UART instance */
-        /* Release PM blocker from previous run */
-#ifdef MODULE_PERIPH_LLWU
-        /* LLS was only blocked before if not using an LLWU pin for RX */
-        if (uart_config[uart].llwu_rx == LLWU_WAKEUP_PIN_UNDEF) {
-            PM_UNBLOCK(KINETIS_PM_LLS);
-        }
-#else /* MODULE_PERIPH_LLWU */
-        PM_UNBLOCK(KINETIS_PM_LLS);
-#endif /* MODULE_PERIPH_LLWU */
-    }
+    /* disable interrupts from UART module */
+    NVIC_DisableIRQ(uart_config[uart].irqn);
+
+    /* Turn on module clock gate */
+    bit_set32(uart_config[uart].scgc_addr, uart_config[uart].scgc_bit);
+
+    /* Power off before messing with settings, this will ensure a consistent
+     * state if we are re-initializing an already initialized module */
+    uart_poweroff(uart);
 
     /* remember callback addresses */
     config[uart].rx_cb = rx_cb;
@@ -178,9 +175,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     config[uart].enabled = 0;
 
     uart_init_pins(uart);
-
-    /* Turn on module clock gate */
-    bit_set32(uart_config[uart].scgc_addr, uart_config[uart].scgc_bit);
 
     switch (uart_config[uart].type) {
 #if KINETIS_HAVE_UART
@@ -197,7 +191,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
             return UART_NODEV;
     }
 
+    /* Turn on module */
     uart_poweron(uart);
+
+    /* enable interrupts from UART module */
+    NVIC_EnableIRQ(uart_config[uart].irqn);
 
     return UART_OK;
 }
@@ -205,8 +203,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 void uart_poweron(uart_t uart)
 {
     assert(uart < UART_NUMOF);
+    unsigned state = irq_disable();
     if (config[uart].rx_cb) {
-        unsigned state = irq_disable();
         if (!config[uart].enabled) {
             config[uart].enabled = 1;
 #ifdef MODULE_PERIPH_LLWU
@@ -223,7 +221,6 @@ void uart_poweron(uart_t uart)
                 PM_BLOCK(KINETIS_PM_LLS);
             }
         }
-        irq_restore(state);
     }
     switch (uart_config[uart].type) {
 #if KINETIS_HAVE_UART
@@ -237,15 +234,16 @@ void uart_poweron(uart_t uart)
             break;
 #endif
         default:
-            return;
+            break;
     }
+    irq_restore(state);
 }
 
 void uart_poweroff(uart_t uart)
 {
     assert(uart < UART_NUMOF);
+    unsigned state = irq_disable();
     if (config[uart].rx_cb) {
-        unsigned state = irq_disable();
         if (config[uart].enabled) {
             config[uart].enabled = 0;
 #ifdef MODULE_PERIPH_LLWU
@@ -260,8 +258,13 @@ void uart_poweroff(uart_t uart)
                 DEBUG("uart: unblocking LLS\n");
                 PM_UNBLOCK(KINETIS_PM_LLS);
             }
+            if (config[uart].active) {
+                /* We were in the middle of a RX sequence, need to release that
+                 * PM blocker as well */
+                PM_UNBLOCK(KINETIS_PM_STOP);
+                config[uart].active = 0;
+            }
         }
-        irq_restore(state);
     }
     switch (uart_config[uart].type) {
 #if KINETIS_HAVE_UART
@@ -275,8 +278,9 @@ void uart_poweroff(uart_t uart)
             break;
 #endif
         default:
-            return;
+            break;
     }
+    irq_restore(state);
 }
 
 #if KINETIS_HAVE_UART && KINETIS_HAVE_LPUART
@@ -328,8 +332,8 @@ static inline void uart_init_uart(uart_t uart, uint32_t baudrate)
     /* calculate baudrate */
     ubd = (uint16_t)(clk / (baudrate * 16));
 
-    /* set baudrate, enable RX active edge detection */
-    dev->BDH = (uint8_t)UART_BDH_SBR(ubd >> 8) | UART_BDH_RXEDGIE_MASK;
+    /* set baudrate */
+    dev->BDH = (uint8_t)UART_BDH_SBR(ubd >> 8);
     dev->BDL = (uint8_t)UART_BDL_SBR(ubd);
 
 #if KINETIS_UART_ADVANCED
@@ -359,14 +363,14 @@ static inline void uart_init_uart(uart_t uart, uint32_t baudrate)
     dev->CFIFO = UART_CFIFO_RXFLUSH_MASK | UART_CFIFO_TXFLUSH_MASK;
 #endif /* KINETIS_UART_ADVANCED */
 
-    /* enable receiver + RX interrupt + IDLE interrupt */
     if (config[uart].rx_cb) {
-        dev->C2 = UART_C2_TE_MASK | UART_C2_RE_MASK | UART_C2_RIE_MASK | UART_C2_ILIE_MASK;
+        /* enable RX active edge interrupt */
+        bit_set8(&dev->BDH, UART_BDH_RXEDGIE_SHIFT);
+        /* enable receiver + RX interrupt + IDLE interrupt */
+        dev->C2 = UART_C2_RIE_MASK | UART_C2_ILIE_MASK;
         /* enable interrupts on failure flags */
         dev->C3 |= UART_C3_ORIE_MASK | UART_C3_PEIE_MASK | UART_C3_FEIE_MASK | UART_C3_NEIE_MASK;
     }
-    /* enable receive interrupt */
-    NVIC_EnableIRQ(uart_config[uart].irqn);
 }
 
 KINETIS_UART_WRITE_INLINE void uart_write_uart(uart_t uart, const uint8_t *data, size_t len)
@@ -548,21 +552,17 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 
     uint32_t sbr = clk / (best_osr * baudrate);
     /* set baud rate, enable RX active edge interrupt */
-    dev->BAUD = LPUART_BAUD_OSR(best_osr - 1) | LPUART_BAUD_SBR(sbr) | LPUART_BAUD_RXEDGIE_MASK;
-
-    /* Enable transmitter */
-    dev->CTRL |= LPUART_CTRL_TE_MASK;
+    dev->BAUD = LPUART_BAUD_OSR(best_osr - 1) | LPUART_BAUD_SBR(sbr);
 
     if (config[uart].rx_cb) {
-        /* enable receiver + RX interrupt + error interrupts */
-        dev->CTRL |= LPUART_CTRL_RE_MASK | LPUART_CTRL_RIE_MASK |
+        /* enable RX active edge interrupt */
+        bit_set32(&dev->BAUD, LPUART_BAUD_RXEDGIE_SHIFT);
+        /* enable RX interrupt + error interrupts */
+        dev->CTRL |= LPUART_CTRL_RIE_MASK |
             LPUART_CTRL_ILIE_MASK | LPUART_CTRL_IDLECFG(LPUART_IDLECFG) |
             LPUART_CTRL_ORIE_MASK | LPUART_CTRL_PEIE_MASK |
             LPUART_CTRL_FEIE_MASK | LPUART_CTRL_NEIE_MASK;
     }
-
-    /* enable interrupts from LPUART module */
-    NVIC_EnableIRQ(uart_config[uart].irqn);
 }
 
 KINETIS_UART_WRITE_INLINE void uart_write_lpuart(uart_t uart, const uint8_t *data, size_t len)
