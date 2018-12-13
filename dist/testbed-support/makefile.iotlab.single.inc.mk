@@ -73,6 +73,7 @@ IOTLAB_ARCHI_frdm-kw41z     = frdm-kw41z:multi
 IOTLAB_ARCHI_iotlab-a8-m3   = a8:at86rf231
 IOTLAB_ARCHI_iotlab-m3      = m3:at86rf231
 IOTLAB_ARCHI_microbit       = microbit:ble
+IOTLAB_ARCHI_nrf51dk        = nrf51dk:ble
 IOTLAB_ARCHI_nrf52dk        = nrf52dk:ble
 IOTLAB_ARCHI_nrf52840dk     = nrf52840dk:multi
 IOTLAB_ARCHI_pba-d-01-kw2x  = phynode:kw2xrf
