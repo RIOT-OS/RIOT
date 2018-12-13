@@ -71,6 +71,13 @@
 #endif
 
 /**
+ * @def   ARG_UNUSED
+ * @brief Tell the compiler that the given function argument is not used
+ *        in the scope of the function.
+ */
+#define ARG_UNUSED(x) (void)(x)
+
+/**
  * @def CONST
  * @brief A function declared as *CONST* is #PURE and also not allowed to
  *        examine global memory. I.e. a *CONST* function cannot even
