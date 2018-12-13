@@ -75,7 +75,6 @@ int ccs811_init(ccs811_t *dev, const ccs811_params_t *params)
 
     int res = CCS811_OK;
 
-#if MODULE_CCS811_FULL
     if (dev->params.reset_pin != GPIO_UNDEF &&
         gpio_init(dev->params.reset_pin, GPIO_OUT) == 0) {
         DEBUG_DEV("nRESET pin configured", dev);
@@ -88,20 +87,12 @@ int ccs811_init(ccs811_t *dev, const ccs811_params_t *params)
         /* t_START after reset is 1 ms, we wait 1 further ms */
         xtimer_usleep(1000);
     }
-    else {
-        dev->params.reset_pin = GPIO_UNDEF;
-        DEBUG_DEV("nRESET pin not configured or could not be used", dev);
-    }
 
     if (dev->params.wake_pin != GPIO_UNDEF &&
         gpio_init(dev->params.wake_pin, GPIO_OUT) == 0) {
+        gpio_clear(dev->params.wake_pin);
         DEBUG_DEV("nWAKE pin configured", dev);
     }
-    else {
-        dev->params.wake_pin = GPIO_UNDEF;
-        DEBUG_DEV("nWAKE pin not configured or could not be used", dev);
-    }
-#endif /* MODULE_CCS811_FULL */
 
     /* check whether sensor is available including the check of the hardware id */
     if ((res = _is_available(dev)) != CCS811_OK) {
@@ -370,14 +361,15 @@ int ccs811_power_down (ccs811_t *dev)
 {
     ASSERT_PARAM(dev != NULL);
 
-    if (dev->params.wake_pin == GPIO_UNDEF) {
-        DEBUG_DEV("nWAKE signal pin not configured", dev);
-        return CCS811_ERROR_NO_WAKE_PIN;
-    }
-
     ccs811_mode_t tmp_mode = dev->params.mode;
     int res = ccs811_set_mode(dev, CCS811_MODE_IDLE);
     dev->params.mode = tmp_mode;
+
+    if (dev->params.wake_pin != GPIO_UNDEF) {
+        DEBUG_DEV("Setting nWAKE pin high", dev);
+        gpio_set(dev->params.wake_pin);
+    }
+
     return res;
 }
 
@@ -385,9 +377,9 @@ int ccs811_power_up (ccs811_t *dev)
 {
     ASSERT_PARAM(dev != NULL);
 
-    if (dev->params.wake_pin == GPIO_UNDEF) {
-        DEBUG_DEV("nWAKE signal pin not configured", dev);
-        return CCS811_ERROR_NO_WAKE_PIN;
+    if (dev->params.wake_pin != GPIO_UNDEF) {
+        DEBUG_DEV("Setting nWAKE pin low", dev);
+        gpio_clear(dev->params.wake_pin);
     }
 
     return ccs811_set_mode(dev, dev->params.mode);

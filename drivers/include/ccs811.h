@@ -94,13 +94,13 @@ typedef struct {
 
     i2c_t   i2c_dev;            /**< I2C device, clock stretching required (default I2C_DEV(0)) */
     uint8_t i2c_addr;           /**< I2C address (default CCS811_I2C_ADDRESS_1) */
-
+    ccs811_mode_t mode;         /**< measurement mode used (default #CCS811_MODE_IDLE) */
+#if MODULE_CCS811_FULL || DOXYGEN
     gpio_t  int_pin;            /**< nINT signal pin (default GPIO_PIN(0, 0) */
+    ccs811_int_mode_t int_mode; /**< interrupt mode used (default #CCS811_INT_NONE) */
+#endif
     gpio_t  wake_pin;           /**< nWAKE signal pin (default GPIO_UNDEF) */
     gpio_t  reset_pin;          /**< nRESET signal pin (default GPIO_UNDEF) */
-
-    ccs811_mode_t mode;         /**< measurement mode used (default #CCS811_MODE_IDLE) */
-    ccs811_int_mode_t int_mode; /**< interrupt mode used (default #CCS811_INT_NONE) */
 } ccs811_params_t;
 
 /**
