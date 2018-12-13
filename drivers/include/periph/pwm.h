@@ -96,9 +96,7 @@ extern "C" {
  * @brief   Default number of PWM extension devices
  */
 #ifndef PWM_EXT_NUMOF
-#if MODULE_EXTEND_PWM
-#define PWM_EXT_NUMOF       (sizeof(pwm_ext_list) / sizeof(pwm_ext_list[0]))
-#else
+#if !MODULE_EXTEND_PWM
 #define PWM_EXT_NUMOF       (0U)
 #endif
 #endif
