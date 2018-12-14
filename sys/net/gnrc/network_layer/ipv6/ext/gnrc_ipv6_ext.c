@@ -150,7 +150,7 @@ static inline bool _has_valid_size(gnrc_pktsnip_t *pkt, uint8_t nh)
 
 gnrc_pktsnip_t *gnrc_ipv6_ext_demux(gnrc_pktsnip_t *pkt, unsigned nh)
 {
-    DEBUG("ipv6_ext: next header = %u", nh);
+    DEBUG("ipv6_ext: next header = %u\n", nh);
     if (!_has_valid_size(pkt, nh)) {
         DEBUG("ipv6_ext: invalid size\n");
         gnrc_pktbuf_release(pkt);
