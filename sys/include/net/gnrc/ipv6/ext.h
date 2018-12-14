@@ -27,7 +27,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "net/gnrc/netif.h"
 #include "net/gnrc/pkt.h"
 #include "net/ipv6/ext.h"
 
@@ -40,29 +39,17 @@ extern "C" {
 #endif
 
 /**
- * @brief   Demultiplex extension headers according to @p nh.
+ * @brief   Demultiplex an extension header according to @p nh.
  *
- * About `current` and `pkt`:
+ * @param[in] pkt       A packet with the first snip pointing to the extension
+ *                      header to process.
+ * @param[in] nh        Protocol number of @p pkt.
  *
- *                     current     pkt
- *                     |           |
- *                     v           v
- * IPv6 <- IPv6_EXT <- IPv6_EXT <- UNDEF
- *
- * This situation may happen when the packet has a source routing extension
- * header (RFC 6554), and the packet is forwarded from an interface to another.
- *
- * @internal
- *
- * @param[in] netif     The receiving interface.
- * @param[in] current   A snip to process.
- * @param[in] pkt       A packet.
- * @param[in] nh        A protocol number (see @ref net_protnum) of the current snip.
+ * @return  The packet for further processing.
+ * @return  NULL, on error or if packet was consumed (by e.g. forwarding via
+ *          a routing header). @p pkt is released in case of error.
  */
-void gnrc_ipv6_ext_demux(gnrc_netif_t *netif,
-                         gnrc_pktsnip_t *current,
-                         gnrc_pktsnip_t *pkt,
-                         uint8_t nh);
+gnrc_pktsnip_t *gnrc_ipv6_ext_demux(gnrc_pktsnip_t *pkt, unsigned nh);
 
 /**
  * @brief   Builds an extension header for sending.

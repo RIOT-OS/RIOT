@@ -286,8 +286,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_reverse_snips(gnrc_pktsnip_t *pkt);
  *        The original snip is keeped as is except `users` decremented.
  *
  * @deprecated  This function breaks the abstraction of `gnrc_pktbuf` and its
- *              only user within the RIOT code base `gnrc_ipv6_ext` is going to
- *              be reworked so it isn't needed anymore.
+ *              only user within the RIOT code base `gnrc_ipv6_ext` was reworked
+ *              so it isn't needed anymore.
  *              It will be removed after the 2019.04 release.
  *
  * @param[in,out] pkt   The snip to duplicate.
