@@ -363,6 +363,9 @@ static inline void uart_init_uart(uart_t uart, uint32_t baudrate)
         /* enable interrupts on failure flags */
         dev->C3 |= UART_C3_ORIE_MASK | UART_C3_PEIE_MASK | UART_C3_FEIE_MASK | UART_C3_NEIE_MASK;
     }
+    /* clear interrupt flags */
+    uint8_t s = dev->S2;
+    dev->S2 = s;
 }
 
 KINETIS_UART_WRITE_INLINE void uart_write_uart(uart_t uart, const uint8_t *data, size_t len)
@@ -555,6 +558,9 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
             LPUART_CTRL_ORIE_MASK | LPUART_CTRL_PEIE_MASK |
             LPUART_CTRL_FEIE_MASK | LPUART_CTRL_NEIE_MASK;
     }
+    /* clear interrupt flags */
+    uint32_t s = dev->STAT;
+    dev->STAT = s;
 }
 
 KINETIS_UART_WRITE_INLINE void uart_write_lpuart(uart_t uart, const uint8_t *data, size_t len)
