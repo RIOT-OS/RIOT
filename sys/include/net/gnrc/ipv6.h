@@ -46,6 +46,13 @@
 extern "C" {
 #endif
 
+
+/**
+ * @defgroup    net_gnrc_ipv6_conf  GNRC IPv6 compile configurations
+ * @ingroup     net_gnrc_ipv6
+ * @ingroup     config
+ * @{
+ */
 /**
  * @brief   Default stack size to use for the IPv6 thread
  */
@@ -85,6 +92,7 @@ extern "C" {
  */
 #define GNRC_IPV6_STATIC_LLADDR
 #endif /* DOXYGEN */
+/** @} */
 
 /**
  * @brief   The PID to the IPv6 thread.

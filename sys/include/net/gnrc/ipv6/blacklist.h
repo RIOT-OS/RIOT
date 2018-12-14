@@ -31,11 +31,18 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup    net_gnrc_ipv6_blacklist_conf GNRC IPv6 address blacklisting compile configurations
+ * @ingroup     net_gnrc_ipv6_blacklist
+ * @ingroup     config
+ * @{
+ */
+/**
  * Maximum size of the blacklist.
  */
 #ifndef GNRC_IPV6_BLACKLIST_SIZE
 #define GNRC_IPV6_BLACKLIST_SIZE    (8)
 #endif
+/** @} */
 
 /**
  * @brief   Adds an IPv6 address to the blacklist.
