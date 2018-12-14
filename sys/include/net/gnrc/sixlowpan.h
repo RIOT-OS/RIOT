@@ -70,16 +70,16 @@
  *
  * If @ref net_gnrc_sixlowpan_iphc is included and @ref GNRC_NETIF_FLAGS_6LO_HC is enabled for
  * `netif` the @ref GNRC_NETTYPE_IPV6 header will be compressed according to
- * [RFC 6282](https://tools.ietf.org/html/rfc6282). If it is false the @ref SIXLOWPAN_UNCOMP
- * dispatch will be appended as a new @ref gnrc_pktsnip_t to the packet. The false case also applies
- * if @ref net_gnrc_sixlowpan_iphc is not included.
+ * [RFC 6282, section 3](https://tools.ietf.org/html/rfc6282#section-3). If it is false the
+ * @ref SIXLOWPAN_UNCOMP dispatch will be appended as a new @ref gnrc_pktsnip_t to the packet.
+ * The false case also applies if @ref net_gnrc_sixlowpan_iphc is not included.
  *
  * If the packet without @ref GNRC_NETTYPE_NETIF header is shorter than
  * gnrc_netif_t::sixlo::max_frag_size of `netif` the packet will be send to the `netif`'s
  * thread. Otherwise if @ref net_gnrc_sixlowpan_frag is included the packet will be fragmented
- * according to [RFC 4944](https://tools.ietf.org/html/rfc4944) if the packet is without
- * @ref GNRC_NETTYPE_NETIF header shorter than @ref SIXLOWPAN_FRAG_MAX_LEN. If none of these cases
- * apply, the packet will be discarded silently.
+ * according to [RFC 4944, section 5.3](https://tools.ietf.org/html/rfc4944#section-5.3) if the
+ * packet is without @ref GNRC_NETTYPE_NETIF header shorter than @ref SIXLOWPAN_FRAG_MAX_LEN. If
+ * none of these cases apply, the packet will be discarded silently.
  *
  * ## `GNRC_NETAPI_MSG_TYPE_SET`
  *
