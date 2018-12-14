@@ -3,4 +3,8 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_adc
 endif
 
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+  USEMODULE += kw41zrf
+endif
+
 include $(RIOTCPU)/kinetis/Makefile.dep
