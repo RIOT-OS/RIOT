@@ -39,10 +39,12 @@ extern "C" {
  * @brief   Redefine some peripheral names to unify them between nRF51 and 52
  * @{
  */
-#define UART_IRQN           (UARTE0_UART0_IRQn)
 #define SPI_SCKSEL          (dev(bus)->PSEL.SCK)
 #define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)
 #define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
+#ifndef CPU_MODEL_NRF52840XXAA
+#define UART_IRQN           (UARTE0_UART0_IRQn)
+#endif
 /** @} */
 
 /**
@@ -155,6 +157,17 @@ typedef struct {
     uint32_t pin[PWM_CHANNELS];         /**< PWM out pins */
 } pwm_conf_t;
 
+#ifdef CPU_MODEL_NRF52840XXAA
+/**
+ * @brief   Structure for UART configuration data
+ */
+typedef struct {
+    NRF_UART_Type *dev;     /**< UART device base register address */
+    uint8_t rx_pin;         /**< RX pin */
+    uint8_t tx_pin;         /**< TX pin */
+    uint8_t irqn;           /**< IRQ channel */
+} uart_conf_t;
+#endif
 
 #ifdef __cplusplus
 }
