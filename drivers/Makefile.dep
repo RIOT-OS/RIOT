@@ -477,6 +477,14 @@ ifneq (,$(filter srf08,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter stm32_eth,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_eth
+  FEATURES_REQUIRED += periph_dma
+  USEMODULE += netdev_eth
+  USEMODULE += iolist
+  USEMODULE += luid
+endif
+
 ifneq (,$(filter sx127%,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_gpio_irq

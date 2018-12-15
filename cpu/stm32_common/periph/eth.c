@@ -17,31 +17,16 @@
  *
  * @}
  */
-
-#include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
-#include "periph_conf.h"
 #include "periph/gpio.h"
-
-#include "board.h"
-
-#include "net/netdev.h"
-#include "net/netdev/eth.h"
-#include "net/eui64.h"
+#include "luid.h"
 #include "net/ethernet.h"
-#include "net/netstats.h"
-#include "net/phy.h"
-
+#include "iolist.h"
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define SDEBUG(...) DEBUG("eth: " __VA_ARGS__)
-
 #include <string.h>
-
 #if ETH_NUMOF
-
 /* Set the value of the divider with the clock configured */
 #if !defined(CLOCK_CORECLOCK) || CLOCK_CORECLOCK < (20000000U)
 #error This peripheral requires a CORECLOCK of at least 20MHz
@@ -56,8 +41,6 @@
 #else /* CLOCK_CORECLOCK < (20000000U) */
 #define CLOCK_RANGE ETH_MACMIIAR_CR_Div102
 #endif /* CLOCK_CORECLOCK < (20000000U) */
-
-#define MIN(a, b) ((a < b) ? a : b)
 
 /* Internal flags for the DMA descriptors */
 #define DESC_OWN           (0x80000000)
@@ -94,17 +77,6 @@ static edma_desc_t *tx_curr;
 static char rx_buffer[ETH_RX_BUFFER_COUNT][ETH_RX_BUFFER_SIZE];
 static char tx_buffer[ETH_TX_BUFFER_COUNT][ETH_TX_BUFFER_SIZE];
 
-/* Mutex relying on interrupt */
-static mutex_t _tx = MUTEX_INIT;
-static mutex_t _rx = MUTEX_INIT;
-static mutex_t _dma_sync = MUTEX_INIT;
-
-/* Peripheral access exclusion mutex */
-static mutex_t send_lock = MUTEX_INIT;
-static mutex_t receive_lock = MUTEX_INIT;
-
-static netdev_t *_netdev;
-
 /** Read or write a phy register, to write the register ETH_MACMIIAR_MW is to
  * be passed as the higher nibble of the value */
 static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
@@ -112,7 +84,7 @@ static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
     unsigned tmp;
 
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) ;
-    SDEBUG("rw_phy %x (%x): %x\n", addr, reg, value);
+    DEBUG("stm32_eth: rw_phy %x (%x): %x\n", addr, reg, value);
 
     tmp = (ETH->MACMIIAR & ETH_MACMIIAR_CR) | ETH_MACMIIAR_MB;
     tmp |= (((addr & 0x1f) << 11) | ((reg & 0x1f) << 6));
@@ -122,31 +94,22 @@ static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
     ETH->MACMIIAR = tmp;
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) ;
 
-    SDEBUG("    %lx\n", ETH->MACMIIDR);
+    DEBUG("stm32_eth: %lx\n", ETH->MACMIIDR);
     return (ETH->MACMIIDR & 0x0000ffff);
 }
 
-int32_t eth_phy_read(uint16_t addr, uint8_t reg)
+int32_t stm32_eth_phy_read(uint16_t addr, uint8_t reg)
 {
     return _rw_phy(addr, reg, 0);
 }
 
-int32_t eth_phy_write(uint16_t addr, uint8_t reg, uint16_t value)
+int32_t stm32_eth_phy_write(uint16_t addr, uint8_t reg, uint16_t value)
 {
     _rw_phy(addr, reg, (value & 0xffff) | (ETH_MACMIIAR_MW << 16));
     return 0;
 }
 
-/** Set the mac address. The peripheral supports up to 4 MACs but only one is
- * implemented */
-static void set_mac(const char *mac)
-{
-    ETH->MACA0HR &= 0xffff0000;
-    ETH->MACA0HR |= ((mac[0] << 8) | mac[1]);
-    ETH->MACA0LR = ((mac[2] << 24) | (mac[3] << 16) | (mac[4] << 8) | mac[5]);
-}
-
-static void get_mac(char *out)
+void stm32_eth_get_mac(char *out)
 {
     unsigned t;
 
@@ -161,23 +124,35 @@ static void get_mac(char *out)
     out[5] = (t & 0xff);
 }
 
+/** Set the mac address. The peripheral supports up to 4 MACs but only one is
+ * implemented */
+void stm32_eth_set_mac(const char *mac)
+{
+    ETH->MACA0HR &= 0xffff0000;
+    ETH->MACA0HR |= ((mac[0] << 8) | mac[1]);
+    ETH->MACA0LR = ((mac[2] << 24) | (mac[3] << 16) | (mac[4] << 8) | mac[5]);
+}
+
 /** Initialization of the DMA descriptors to be used */
-static void _init_dma(void)
+static void _init_buffer(void)
 {
     int i;
-
     for (i = 0; i < ETH_RX_BUFFER_COUNT; i++) {
         rx_desc[i].status = DESC_OWN;
         rx_desc[i].control = RX_DESC_RCH | (ETH_RX_BUFFER_SIZE & 0x0fff);
         rx_desc[i].buffer_addr = &rx_buffer[i][0];
-        rx_desc[i].desc_next = &rx_desc[i + 1];
+        if((i+1) < ETH_RX_BUFFER_COUNT) {
+            rx_desc[i].desc_next = &rx_desc[i + 1];
+        }
     }
     rx_desc[i - 1].desc_next = &rx_desc[0];
 
     for (i = 0; i < ETH_TX_BUFFER_COUNT; i++) {
         tx_desc[i].status = TX_DESC_TCH | TX_DESC_CIC;
         tx_desc[i].buffer_addr = &tx_buffer[i][0];
-        tx_desc[i].desc_next = &tx_desc[i + 1];
+        if((i+1) < ETH_RX_BUFFER_COUNT) {
+            tx_desc[i].desc_next = &tx_desc[i + 1];
+        }
     }
     tx_desc[i - 1].desc_next = &tx_desc[0];
 
@@ -186,22 +161,11 @@ static void _init_dma(void)
 
     ETH->DMARDLAR = (uint32_t)rx_curr;
     ETH->DMATDLAR = (uint32_t)tx_curr;
-
-    /* initialize tx DMA */
-    DMA_Stream_TypeDef *stream = dma_stream(eth_config.dma_stream);
-
-    mutex_lock(&_dma_sync);
-    dma_poweron(eth_config.dma_stream);
-    dma_isr_enable(eth_config.dma_stream);
-    stream->CR = ((eth_config.dma_chan << 25) |
-                  DMA_SxCR_MINC | DMA_SxCR_PINC |
-                  DMA_SxCR_MBURST | DMA_SxCR_PBURST |
-                  DMA_SxCR_PL_1 | DMA_SxCR_DIR_1 | DMA_SxCR_TCIE);
-    stream->FCR = DMA_SxFCR_DMDIS | DMA_SxFCR_FTH;
 }
 
-int eth_init(void)
+int stm32_eth_init(void)
 {
+    char hwaddr[ETHERNET_ADDR_LEN];
     /* enable APB2 clock */
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
@@ -234,7 +198,7 @@ int eth_init(void)
 
     /* configure the PHY (standard for all PHY's) */
     /* if there's no PHY, this has no effect */
-    eth_phy_write(eth_config.phy_addr, PHY_BMCR, BMCR_RESET);
+    stm32_eth_phy_write(eth_config.phy_addr, PHY_BMCR, BMCR_RESET);
 
     /* speed from conf */
     ETH->MACCR |= (ETH_MACCR_ROD | ETH_MACCR_IPCO | ETH_MACCR_APCS |
@@ -253,9 +217,14 @@ int eth_init(void)
     ETH->DMABMR = ETH_DMABMR_DA | ETH_DMABMR_AAB | ETH_DMABMR_FB |
                   ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat | ETH_DMABMR_EDE;
 
-    set_mac(eth_config.mac);
+    if(eth_config.mac[0] != 0) {
+      stm32_eth_set_mac(eth_config.mac);
+    }  else {
+      luid_get(hwaddr, ETHERNET_ADDR_LEN);
+      stm32_eth_set_mac(hwaddr);
+    }
 
-    _init_dma();
+    _init_buffer();
 
     NVIC_EnableIRQ(ETH_IRQn);
     ETH->DMAIER |= ETH_DMAIER_NISE | ETH_DMAIER_TIE | ETH_DMAIER_RIE;
@@ -268,69 +237,57 @@ int eth_init(void)
     ETH->DMAOMR |= ETH_DMAOMR_ST;
     ETH->DMAOMR |= ETH_DMAOMR_SR;
 
-    /* configure speed, do it at the end so the PHY had time to 
+    /* configure speed, do it at the end so the PHY had time to
      * reset */
-    eth_phy_write(eth_config.phy_addr, PHY_BMCR, eth_config.speed);
+    stm32_eth_phy_write(eth_config.phy_addr, PHY_BMCR, eth_config.speed);
 
     return 0;
 }
 
-static int eth_send(const char *data, unsigned len)
+int stm32_eth_send(const struct iolist *iolist)
 {
-    DMA_Stream_TypeDef *stream = dma_stream(eth_config.dma_stream);
-    unsigned copy, count, sent = -1;
-    edma_desc_t *first = tx_curr;
-    edma_desc_t *last = tx_curr;
-
-    count = len / ETH_TX_BUFFER_SIZE;
-    count += (len - (count * ETH_TX_BUFFER_SIZE) > 0) ? 1 : 0;
+    unsigned len = iolist_size(iolist);
+    int ret = 0;
 
     /* safety check */
-    if (count > ETH_TX_BUFFER_COUNT) {
+    if (len > ETH_TX_BUFFER_SIZE) {
+        DEBUG("stm32_eth: Error iolist_size > ETH_TX_BUFFER_SIZE\n");
         return -1;
     }
 
-    while (count--) {
-        while (tx_curr->status & DESC_OWN) {
-            /* block until there's an available descriptor */
-            SDEBUG("not avail\n");
-            mutex_lock(&_tx);
-        }
-
-        /* clear status field */
-        tx_curr->status &= 0x0fffffff;
-
-        /* copy buffer */
-        copy = MIN(len, ETH_TX_BUFFER_SIZE);
-        stream->PAR = (uint32_t)data;
-        stream->M0AR = (uint32_t)tx_curr->buffer_addr;
-        stream->NDTR = (uint16_t)copy;
-        stream->CR |= DMA_SxCR_EN;
-        mutex_lock(&_dma_sync);
-
-        tx_curr->control = (copy & 0x1fff);
-        len -= copy;
-        sent += copy;
-
-        /* update pointers */
-        last = tx_curr;
-        tx_curr = tx_curr->desc_next;
+    /* block until there's an available descriptor */
+    while (tx_curr->status & DESC_OWN) {
+        DEBUG("stm32_eth: not avail\n");
     }
+
+    /* clear status field */
+    tx_curr->status &= 0x0fffffff;
+
+    dma_acquire(eth_config.dma);
+    for (; iolist; iolist = iolist->iol_next)
+    {
+        ret += dma_transfer(eth_config.dma, eth_config.dma_chan, iolist->iol_base,
+                            tx_curr->buffer_addr+ret, iolist->iol_len, DMA_MEM_TO_MEM, DMA_INC_BOTH_ADDR);
+    }
+
+    dma_release(eth_config.dma);
+    if (ret < 0) {
+        DEBUG("stm32_eth: Failure in dma_transfer\n");
+        return ret;
+    }
+    tx_curr->control = (len & 0x1fff);
 
     /* set flags for first and last frames */
-    first->status |= TX_DESC_FS;
-    last->status |= TX_DESC_LS | TX_DESC_IC;
+    tx_curr->status |= TX_DESC_FS;
+    tx_curr->status |= TX_DESC_LS | TX_DESC_IC;
 
     /* give the descriptors to the DMA */
-    while (first != tx_curr) {
-        first->status |= DESC_OWN;
-        first = first->desc_next;
-    }
+    tx_curr->status |= DESC_OWN;
+    tx_curr = tx_curr->desc_next;
 
     /* start tx */
     ETH->DMATPDR = 0;
-
-    return sent;
+    return ret;
 }
 
 static int _try_receive(char *data, int max_len, int block)
@@ -339,14 +296,11 @@ static int _try_receive(char *data, int max_len, int block)
     int copied = 0;
     int drop = (data || max_len > 0);
     edma_desc_t *p = rx_curr;
-
-    mutex_lock(&receive_lock);
     for (int i = 0; i < ETH_RX_BUFFER_COUNT && len == 0; i++) {
         /* try receiving, if the block is set, simply wait for the rest of
          * the packet to complete, otherwise just break */
         while (p->status & DESC_OWN) {
             if (block) {
-                mutex_lock(&_rx);
             }
             else {
                 break;
@@ -378,161 +332,27 @@ static int _try_receive(char *data, int max_len, int block)
         rx_curr = p;
     }
 
-    mutex_unlock(&receive_lock);
-
     return len;
 }
 
-int eth_try_receive(char *data, unsigned max_len)
+int stm32_eth_try_receive(char *data, unsigned max_len)
 {
     return _try_receive(data, max_len, 0);
 }
 
-int eth_receive_blocking(char *data, unsigned max_len)
+int stm32_eth_receive_blocking(char *data, unsigned max_len)
 {
     return _try_receive(data, max_len, 1);
 }
 
-static void _isr(netdev_t *netdev)
+int stm32_eth_get_rx_status_owned(void)
 {
-    /* if the next descriptor is owned by the CPU we can get it */
-    if (!(rx_curr->status & DESC_OWN)) {
-        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-    }
+    return (!(rx_curr->status & DESC_OWN));
 }
 
-void isr_eth(void)
-{
-    volatile unsigned tmp = ETH->DMASR;
-
-    if ((tmp & ETH_DMASR_TS)) {
-        ETH->DMASR = ETH_DMASR_TS | ETH_DMASR_NIS;
-        mutex_unlock(&_tx);
-    }
-
-    if ((tmp & ETH_DMASR_RS)) {
-        ETH->DMASR = ETH_DMASR_RS | ETH_DMASR_NIS;
-        mutex_unlock(&_rx);
-        if (_netdev) {
-            _netdev->event_callback(_netdev, NETDEV_EVENT_ISR);
-        }
-    }
-
-    /* printf("r:%x\n\n", tmp); */
-
-    cortexm_isr_end();
-}
-
-void isr_eth_wkup(void)
+void stm32_eth_isr_eth_wkup(void)
 {
     cortexm_isr_end();
-}
-
-void ETH_DMA_ISR(void)
-{
-    /* clear DMA done flag */
-    int stream = eth_config.dma_stream;
-    dma_base(stream)->IFCR[dma_hl(stream)] = dma_ifc(stream);
-    mutex_unlock(&_dma_sync);
-    cortexm_isr_end();
-}
-
-static int _send(netdev_t *netdev, const struct iovec *vector, unsigned count)
-{
-    (void)netdev;
-
-    int ret = 0, len = 0;
-    mutex_lock(&send_lock);
-    for (int i = 0; i < count && ret <= 0; i++) {
-        ret = eth_send(vector[i].iov_base, vector[i].iov_len);
-        len += ret;
-    }
-    SDEBUG("_send: %d %d\n", ret, len);
-    mutex_unlock(&send_lock);
-
-#ifdef MODULE_NETSTATS_L2
-    netdev->stats.tx_bytes += len;
-#endif
-
-    if (ret < 0) {
-        return ret;
-    }
-
-    return len;
-}
-
-static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
-{
-    (void)info;
-    (void)netdev;
-
-    int ret = _try_receive((char *)buf, len, 1);
-#ifdef MODULE_NETSTATS_L2
-    if (buf) {
-        netdev->stats.rx_count++;
-        netdev->stats.rx_bytes += len;
-    }
-#endif
-
-    SDEBUG("_recev: %d\n", ret);
-
-    return ret;
-}
-
-static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
-{
-    int res = -1;
-
-    switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(max_len >= ETHERNET_ADDR_LEN);
-            get_mac((char *)value);
-            res = ETHERNET_ADDR_LEN;
-            break;
-        default:
-            res = netdev_eth_get(dev, opt, value, max_len);
-            break;
-    }
-
-    return res;
-}
-
-static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t max_len)
-{
-    int res = -1;
-
-    switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(max_len >= ETHERNET_ADDR_LEN);
-            set_mac((char *)value);
-            res = ETHERNET_ADDR_LEN;
-            break;
-        default:
-            res = netdev_eth_set(dev, opt, value, max_len);
-            break;
-    }
-
-    return res;
-}
-
-static int _init(netdev_t *netdev)
-{
-    return eth_init();
-}
-
-const static netdev_driver_t netdev_driver_stm32f4eth = {
-    .send = _send,
-    .recv = _recv,
-    .init = _init,
-    .isr = _isr,
-    .get = _get,
-    .set = _set,
-};
-
-void eth_netdev_setup(netdev_t *netdev)
-{
-    _netdev = netdev;
-    netdev->driver = &netdev_driver_stm32f4eth;
 }
 
 #endif
