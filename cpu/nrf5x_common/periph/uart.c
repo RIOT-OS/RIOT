@@ -38,12 +38,25 @@
 #define UART_IRQN        uart_config[uart].irqn
 #define UART_PIN_RX      uart_config[uart].rx_pin
 #define UART_PIN_TX      uart_config[uart].tx_pin
+#define UART_PIN_RTS     uart_config[uart].rts_pin
+#define UART_PIN_CTS     uart_config[uart].cts_pin
+#define UART_HWFLOWCTRL  (uart_config[uart].rts_pin != GPIO_UNDEF && \
+                          uart_config[uart].cts_pin != GPIO_UNDEF)
 #else
 #define PSEL_RXD         dev(uart)->PSELRXD
 #define PSEL_TXD         dev(uart)->PSELTXD
 #define PSEL_RTS         dev(uart)->PSELRTS
 #define PSEL_CTS         dev(uart)->PSELCTS
 #define UART_0_ISR       isr_uart0
+#ifndef UART_PIN_RTS
+#define UART_PIN_RTS     GPIO_UNDEF
+#endif
+#ifndef UART_PIN_CTS
+#define UART_PIN_CTS     GPIO_UNDEF
+#endif
+#ifndef UART_HWFLOWCTRL
+#define UART_HWFLOWCTRL  0
+#endif
 #endif
 
 /**
@@ -88,18 +101,18 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     PSEL_TXD = UART_PIN_TX;
 
     /* enable HW-flow control if defined */
-#if UART_HWFLOWCTRL
-    /* set pin mode for RTS and CTS pins */
-    gpio_init(UART_PIN_RTS, GPIO_OUT);
-    gpio_init(UART_PIN_CTS, GPIO_IN);
-    /* configure RTS and CTS pins to use */
-    PSEL_RTS = UART_PIN_RTS;
-    PSEL_CTS = UART_PIN_CTS;
-    dev(uart)->CONFIG |= UART_CONFIG_HWFC_Msk;  /* enable HW flow control */
-#else
-    PSEL_RTS = 0xffffffff;            /* pin disconnected */
-    PSEL_CTS = 0xffffffff;            /* pin disconnected */
-#endif
+    if (UART_HWFLOWCTRL) {
+        /* set pin mode for RTS and CTS pins */
+        gpio_init(UART_PIN_RTS, GPIO_OUT);
+        gpio_init(UART_PIN_CTS, GPIO_IN);
+        /* configure RTS and CTS pins to use */
+        PSEL_RTS = UART_PIN_RTS;
+        PSEL_CTS = UART_PIN_CTS;
+        dev(uart)->CONFIG |= UART_CONFIG_HWFC_Msk;  /* enable HW flow control */
+    } else {
+        PSEL_RTS = 0xffffffff;            /* pin disconnected */
+        PSEL_CTS = 0xffffffff;            /* pin disconnected */
+    }
 
     /* select baudrate */
     switch (baudrate) {

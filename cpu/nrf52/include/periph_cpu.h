@@ -43,6 +43,9 @@ extern "C" {
 #define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)
 #define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
 #ifndef CPU_MODEL_NRF52840XXAA
+#define UART_PIN_RTS        GPIO_UNDEF
+#define UART_PIN_CTS        GPIO_UNDEF
+#define UART_HWFLOWCTRL     0
 #define UART_IRQN           (UARTE0_UART0_IRQn)
 #endif
 /** @} */
@@ -165,6 +168,8 @@ typedef struct {
     NRF_UART_Type *dev;     /**< UART device base register address */
     uint8_t rx_pin;         /**< RX pin */
     uint8_t tx_pin;         /**< TX pin */
+    uint8_t rts_pin;        /**< RTS pin - set to GPIO_UNDEF when not using HW flow control */
+    uint8_t cts_pin;        /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
     uint8_t irqn;           /**< IRQ channel */
 } uart_conf_t;
 #endif
