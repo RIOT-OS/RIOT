@@ -7,8 +7,9 @@
  */
 
 /**
- * @defgroup    net_gnrc_ipv6_nib_conf  Configuration macros
+ * @defgroup    net_gnrc_ipv6_nib_conf  GNRC IPv6 NIB compile configurations
  * @ingroup     net_gnrc_ipv6_nib
+ * @ingroup     config
  * @brief       Configuration macros for neighbor information base
  * @{
  *
