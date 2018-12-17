@@ -31,17 +31,26 @@ extern "C" {
  * @{
  */
 static const uart_conf_t uart_config[] = {
-    {
-        .dev        = NRF_UART0,
+    { /* Mapped to USB virtual COM port */
+        .dev        = NRF_UARTE0,
         .rx_pin     = GPIO_PIN(0,8),
         .tx_pin     = GPIO_PIN(0,6),
         .rts_pin    = GPIO_PIN(0,5),
         .cts_pin    = GPIO_PIN(0,7),
         .irqn       = UARTE0_UART0_IRQn,
     },
+    { /* Mapped to Arduino D0/D1 pins */
+        .dev        = NRF_UARTE1,
+        .rx_pin     = GPIO_PIN(1,1),
+        .tx_pin     = GPIO_PIN(1,2),
+        .rts_pin    = (uint8_t)GPIO_UNDEF,
+        .cts_pin    = (uint8_t)GPIO_UNDEF,
+        .irqn       = UARTE1_IRQn,
+    },
 };
 
 #define UART_0_ISR          (isr_uart0)
+#define UART_1_ISR          (isr_uart1)
 
 #define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
 /** @} */
