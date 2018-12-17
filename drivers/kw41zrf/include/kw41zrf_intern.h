@@ -32,7 +32,7 @@
 #define PM_BLOCK(x) pm_block(x)
 #define PM_UNBLOCK(x) pm_unblock(x)
 /* When the transceiver is not in DSM, this power mode will be blocked.
- * TODO: Change this to symbolic name KINETIS_PM_LLS when Kinetis power
+ * TODO: Change this to symbolic name KINETIS_PM_VLPS when Kinetis power
  * management is merged (https://github.com/RIOT-OS/RIOT/pull/7897) */
 #define KW41ZRF_PM_BLOCKER 0
 #else
