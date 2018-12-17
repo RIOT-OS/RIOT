@@ -1,3 +1,1 @@
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.features
-
-FEATURES_PROVIDED += periph_pwm
