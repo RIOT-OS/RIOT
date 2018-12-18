@@ -39,9 +39,9 @@ typedef enum {
  * @{
  */
 typedef struct {
-    float temp;         /**< Temperature after an according call to the measurement function. */
-    float rel_humidity; /**< Relative humidity after an according call to the measuerment funtion. */
-    unsigned int id;    /**< ID read from the sensor, only available after shtc1_id() was called. */
+    int16_t temp;          /**< Temperature in centi °C (2372 = 23.72) after an call to the measurement function. */
+    uint16_t rel_humidity; /**< Relative humidity in centi percent (9922 = 99.22) after an call to the measuerment funtion. */
+    unsigned int id;       /**< ID read from the sensor, only available after shtc1_id() was called. */
 } shtc1_values_t;
 /** @} */
 
@@ -85,12 +85,12 @@ int8_t shtc1_init(shtc1_t* const dev, const shtc1_params_t* params);
 /**
  * @brief Reads temperature and humidity values.
  * @details The values will be saved in the device descriptor (values struct).
- * The temperature is in °C and the humidity in %.
+ * The temperature is in centi °C and the humidity in centi %.
  *
  * @param[in] dev       The I2C device descriptor.
  *
  * @return              SHTC1_OK if a measurement completed. The values will be stored
- *                      in the values struct. Temperature in °C and humidity in %.
+ *                      in the values struct. Temperature in centi °C and humidity in centi %.
  * @return              SHTC1_ERROR on checksum error.
  */
 int8_t shtc1_measure(shtc1_t* const dev);

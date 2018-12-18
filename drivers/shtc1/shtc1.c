@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, RWTH-Aachen, Steffen Robertz, Josua Arndt
+ * Copyright (C) 2017 RWTH-Aachen
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,7 +11,8 @@
  * @{
  *
  * @file
- * @brief       Device driver implementation for the Sensirion SHTC1 temperature and humidity sensor
+ * @brief       Device driver implementation for the Sensirion SHTC1 temperature
+ *              and humidity sensor.
  *
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
@@ -20,10 +21,10 @@
 
 #include "shtc1.h"
 #include "shtc1_regs.h"
-#define ENABLE_DEBUG    (0)
+
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 #include "assert.h"
-
 
 /*
  * does a crc check and returns 0 for passed and -1 for failed
@@ -57,7 +58,7 @@ int8_t shtc1_init(shtc1_t *const dev, const shtc1_params_t *params)
     /* copy settings into the device descriptor */
     dev->params = *params;
     /* Verify the connection by reading the SHTC1's ID and checking its value */
-    if (shtc1_id(dev) != SHTC1_OK || ((dev->values.id & 0x3F) !=  SHTC1_ID)) {
+    if (shtc1_id(dev) != SHTC1_OK || ((dev->values.id & 0x3F) != SHTC1_ID)) {
         return SHTC1_ERROR;
     }
     return SHTC1_OK;
@@ -73,13 +74,13 @@ int8_t shtc1_measure(shtc1_t *const dev)
         return SHTC1_ERROR;
     }
     /* Receive the measurement */
-    /* 16 bit Temperature 
+    /* 16 bit Temperature
      * 8 bit  CRC temp
      * 16 Bit Absolute Humidity
      * 8 bit CRC Hum
-    */
+     */
     uint8_t received[6];
-    if(i2c_read_bytes(dev->params.bus, dev->params.addr, received, 6, 0)) {
+    if (i2c_read_bytes(dev->params.bus, dev->params.addr, received, 6, 0)) {
         return SHTC1_ERROR;
     }
     i2c_release(dev->params.bus);
@@ -94,9 +95,11 @@ int8_t shtc1_measure(shtc1_t *const dev)
         }
         DEBUG("CRC Passed! \n");
     }
-    /* calculate the relative humidity and convert the temperature to °C */
-    dev->values.temp = (175.0 * temp_f / 65536) - 45;
-    dev->values.rel_humidity = 100 * (abs_humidity / 65536.0);
+    /* calculate the relative humidity and convert the temperature to centi °C */
+    /* dev->values.temp = (175.0 * 100 * temp_f / 65536) - 45 ; */
+    dev->values.temp =  ((17500 * (uint32_t)temp_f ) >>16 ) - 4500;
+    /* dev->values.rel_humidity = 10000 * ( abs_humidity /65536) */
+    dev->values.rel_humidity = (10000 * (uint32_t)abs_humidity) >> 16;
 
     return SHTC1_OK;
 }
