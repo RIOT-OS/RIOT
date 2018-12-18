@@ -29,7 +29,8 @@ extern "C" {
 #endif
 
 /**
- * @name    LoRa modulation default values
+ * @defgroup net_lora_conf  LoRa modulation compile configurations
+ * @ingroup  config
  * @{
  */
 #ifndef LORA_FREQUENCY_RESOLUTION_DEFAULT
