@@ -87,6 +87,11 @@ void mrf24j40_init(mrf24j40_t *dev)
     mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG2, MRF25J40_BBREG2_CCAMODE1 );
     mrf24j40_reg_write_short(dev, MRF24J40_REG_CCAEDTH, 0x60);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, MRF24J40_BBREG6_RSSIMODE2 );
+#if MRF24J40_USE_EXT_PA_LNA
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_TESTMODE, (MRF24J40_TESTMODE_TESTMODE2 |
+                                                         MRF24J40_TESTMODE_TESTMODE1 |
+                                                         MRF24J40_TESTMODE_TESTMODE0));
+#endif
 
     /* Enable immediate sleep mode */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);
