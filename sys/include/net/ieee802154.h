@@ -112,9 +112,9 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 /** @} */
 
 /**
+ * @defgroup net_ieee802154_conf    IEEE802.15.4 compile configurations
+ * @ingroup  config
  * @{
- * @name    Default values
- * @brief   Default values for devices to choose
  */
 #ifndef IEEE802154_DEFAULT_SUBGHZ_CHANNEL
 #define IEEE802154_DEFAULT_SUBGHZ_CHANNEL   (5U)
