@@ -38,7 +38,7 @@ extern "C" {
 #define LORA_FREQUENCY_RESOLUTION_DEFAULT      (61.03515625)
 #endif
 #ifndef LORA_PREAMBLE_LENGTH_DEFAULT
-/**< @brief Preamble length, same for Tx and Rx */
+/** @brief Preamble length, same for Tx and Rx */
 #define LORA_PREAMBLE_LENGTH_DEFAULT           (8U)
 #endif
 #ifndef LORA_SYMBOL_TIMEOUT_DEFAULT
