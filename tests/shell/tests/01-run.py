@@ -73,7 +73,21 @@ def testfunc(child):
         child.crlf = '\n'
 
     # check startup message
-    child.expect('test_shell.')
+    child.expect('test_shell.\r\n')
+    child.sendline('')
+
+    child.sendline('bufsize')
+    child.expect('([0-9]+)\r\n')
+
+    bufsize = int(child.match[1])
+
+    child.expect(PROMPT)
+
+    # check a long line
+    child.sendline("_"*bufsize + "verylong")
+    # this is dirty hack to work around a bug in the uart (#10634)
+    child.sendline()
+    child.expect('shell: maximum line length exceeded')
 
     # test cancelling a line
     child.expect(PROMPT)

@@ -21,4 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove \
 
 APP_SHELL_FMT ?= NONE
 
+# needed to correctly test long lines
+RIOT_TERMINAL ?= socat
+
 include $(RIOTBASE)/Makefile.include
