@@ -29,6 +29,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <assert.h>
 #include "shell.h"
 #include "shell_commands.h"
 
@@ -51,6 +53,12 @@ static void flush_if_needed(void)
     fflush(stdout);
 #endif
 }
+/**
+ * Code indicating that the line buffer size was exceeded.
+ *
+ * This definition ensures there's no collision with EOF.
+ */
+#define READLINE_TOOLONG (-EOF + 1)
 
 static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
 {
@@ -227,14 +235,36 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
     }
 }
 
+/**
+ * Read a single line from standard input into a buffer.
+ *
+ * In addition to copying characters, this routine echoes the line back to
+ * stdout and also supports primitive line editing.
+ *
+ * If the input line is too long, the input will still be consumed until the end
+ * to prevent the next line from containing garbage.
+ *
+ * @param   buf     Buffer where the input will be placed.
+ * @param   size    Size of the buffer. The maximum line length will be one less
+ *                  than size, to accommodate for the null terminator.
+ *                  The minimum buffer size is 1.
+ *
+ * @return  length of the read line, excluding the terminator, if reading was
+ *          successful.
+ * @return  EOF, if the if the end of the input stream is reached.
+ * @return  -READLINE_TOOLONG if the buffer size was exceeded
+ */
 static int readline(char *buf, size_t size)
 {
-    char *line_buf_ptr = buf;
+    int curr_pos = 0;
+    bool length_exceeded = false;
+
+    assert((size_t)size > 0);
 
     while (1) {
-        if ((line_buf_ptr - buf) >= ((int) size) - 1) {
-            return -1;
-        }
+        /* At the start of the loop, cur_pos should point inside of
+         * buf. This ensures the terminator can always fit. */
+        assert((size_t)curr_pos < size);
 
         int c = getchar();
         if (c < 0) {
@@ -246,23 +276,27 @@ static int readline(char *buf, size_t size)
         /* DOS newlines are handled like hitting enter twice, but empty lines are ignored. */
         /* Ctrl-C cancels the current line. */
         if (c == '\r' || c == '\n' || c == ETX) {
-            *line_buf_ptr = '\0';
+            buf[curr_pos] = '\0';
 #ifndef SHELL_NO_ECHO
             _putchar('\r');
             _putchar('\n');
 #endif
 
-            /* return 1 if line is empty, 0 otherwise */
-            return c == ETX || line_buf_ptr == buf;
+            return (length_exceeded)? -READLINE_TOOLONG : curr_pos;
         }
+
         /* QEMU uses 0x7f (DEL) as backspace, while 0x08 (BS) is for most terminals */
-        else if (c == 0x08 || c == 0x7f) {
-            if (line_buf_ptr == buf) {
+        if (c == 0x08 || c == 0x7f) {
+            if (curr_pos == 0) {
                 /* The line is empty. */
                 continue;
             }
 
-            *--line_buf_ptr = '\0';
+            /* after we dropped characters do not edit the line, yet keep the
+             * visual effects */
+            if (!length_exceeded) {
+                buf[--curr_pos] = '\0';
+            }
             /* white-tape the character */
 #ifndef SHELL_NO_ECHO
             _putchar('\b');
@@ -271,7 +305,13 @@ static int readline(char *buf, size_t size)
 #endif
         }
         else {
-            *line_buf_ptr++ = c;
+            /* Always consume characters, but do not not always store them */
+            if ((size_t)curr_pos < size - 1) {
+                buf[curr_pos++] = c;
+            }
+            else {
+                length_exceeded = true;
+            }
 #ifndef SHELL_NO_ECHO
             _putchar(c);
 #endif
@@ -290,6 +330,8 @@ static inline void print_prompt(void)
     flush_if_needed();
 }
 
+#define TOOLONG_MESSAGE "shell: maximum line length exceeded"
+
 void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
 {
     print_prompt();
@@ -297,14 +339,22 @@ void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
     while (1) {
         int res = readline(line_buf, len);
 
-        if (res == EOF) {
-            break;
-        }
-
-        if (!res) {
-            handle_input_line(shell_commands, line_buf);
+        switch (res) {
+            case EOF:
+                goto shell_run_exit;
+            case -READLINE_TOOLONG:
+                puts(TOOLONG_MESSAGE);
+                break;
+            case 0:
+                break;
+            default:
+                handle_input_line(shell_commands, line_buf);
+                break;
         }
 
         print_prompt();
     }
+
+shell_run_exit:
+    return;
 }
