@@ -512,16 +512,19 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-# if make target != 'flash-only', add target 'all' to ensure build before flash
-ifeq (,$(filter flash-only, $(MAKECMDGOALS)))
-  BUILD_BEFORE_FLASH = all
-endif
+define flash-recipe
+  $(call check_cmd,$(FLASHER),Flash program)
+  $(FLASHER) $(FFLAGS)
+endef
 
-flash: $(BUILD_BEFORE_FLASH) $(FLASHDEPS)
-	$(call check_cmd,$(FLASHER),Flash program)
-	$(FLASHER) $(FFLAGS)
+# Do not add dependencies to "flash" directly, use FLASHDEPS, as this is shared
+# with flash-only too
 
-flash-only: flash
+flash: all $(FLASHDEPS)
+	$(flash-recipe)
+
+flash-only: $(FLASHDEPS)
+	$(flash-recipe)
 
 preflash: $(BUILD_BEFORE_FLASH)
 	$(PREFLASHER) $(PREFFLAGS)

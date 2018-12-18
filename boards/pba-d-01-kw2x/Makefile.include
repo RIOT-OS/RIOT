@@ -10,8 +10,7 @@ export CPU_MODEL ?= mkw21d256vha5
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
-.PHONY: flash
-flash: $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
+FLASHDEPS += $(RIOTCPU)/$(CPU)/dist/wdog-disable.bin
 
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
