@@ -44,6 +44,13 @@ static void _putchar(int c) {
 #endif
 #endif
 
+static void flush_if_needed(void)
+{
+#ifdef MODULE_NEWLIB
+    fflush(stdout);
+#endif
+}
+
 static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
 {
     const shell_command_t *command_lists[] = {
@@ -265,6 +272,7 @@ static int readline(char *buf, size_t size)
             _putchar(c);
 #endif
         }
+        flush_if_needed();
     }
 }
 
@@ -275,9 +283,7 @@ static inline void print_prompt(void)
     _putchar(' ');
 #endif
 
-#ifdef MODULE_NEWLIB
-    fflush(stdout);
-#endif
+    flush_if_needed();
 }
 
 void shell_run(const shell_command_t *shell_commands, char *line_buf, int len)
