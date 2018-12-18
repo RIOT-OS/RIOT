@@ -109,10 +109,13 @@ static esp_err_t IRAM_ATTR _eth_input_callback(void *buffer, uint16_t len, void 
     return ESP_OK;
 }
 
-#if EMAC_PHY_POWER_PIN != GPIO_UNDEF
 static void _esp_eth_phy_power_enable_gpio(bool enable)
 {
     assert(EMAC_ETHERNET_PHY_CONFIG.phy_power_enable);
+
+    if (EMAC_PHY_POWER_PIN == GPIO_UNDEF) {
+        return;
+    }
 
     if (!enable) {
         EMAC_ETHERNET_PHY_CONFIG.phy_power_enable(false);
@@ -127,7 +130,6 @@ static void _esp_eth_phy_power_enable_gpio(bool enable)
         EMAC_ETHERNET_PHY_CONFIG.phy_power_enable(true);
     }
 }
-#endif
 
 static int _esp_eth_init(netdev_t *netdev)
 {
@@ -146,13 +148,13 @@ static int _esp_eth_init(netdev_t *netdev)
     config.gpio_config = _eth_gpio_config_rmii;
     config.tcpip_input = _eth_input_callback;
 
-    #if EMAC_PHY_POWER_PIN != GPIO_UNDEF
     /*
      * Replace the default 'power enable' function with an example-specific
      * one that toggles a power GPIO.
      */
-    config.phy_power_enable = phy_device_power_enable_via_gpio;
-    #endif
+    if (EMAC_PHY_POWER_PIN != GPIO_UNDEF) {
+        config.phy_power_enable = _esp_eth_phy_power_enable_gpio;
+    }
 
     /* initialize EMAC with config */
     if (ret == ESP_OK && (ret = esp_eth_init(&config)) != ESP_OK) {
