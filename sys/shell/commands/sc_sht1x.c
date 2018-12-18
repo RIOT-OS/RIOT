@@ -20,8 +20,6 @@
  * @}
  */
 
-#ifdef MODULE_SHT1X
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -374,5 +372,3 @@ int _sht_config_handler(int argc, char **argv)
     print_config(&sht1x_devs[dev_num]);
     return 0;
 }
-
-#endif
