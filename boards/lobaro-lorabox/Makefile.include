@@ -13,14 +13,12 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 FLASHER = $(RIOTTOOLS)/stm32loader/stm32loader.py
-
-# needed for now so the build system generates the .bin file
-HEXFILE = $(BINFILE)
+FLASHFILE ?= $(BINFILE)
 
 # -e: erase
 # -u: use sector by sector erase
 # -S: swap RTS and DTR
 # -l 0x1ff: amount of sectors to erase
-FFLAGS += -p $(PORT) -e -u -S -l 0x1ff -w $(BINFILE)
+FFLAGS += -p $(PORT) -e -u -S -l 0x1ff -w $(FLASHFILE)
 
 TERMFLAGS +=  --set-rts 0
