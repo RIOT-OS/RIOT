@@ -29,12 +29,12 @@ firmware to expose APIs through the shell.
 
 _NOTE: It may not be applicable for every API call_
 
- # 2. Test Firmware Design
+# 2. Test Firmware Design
 
 The following guidelines are used when writing the C program to be flashed to
 the board.
 
- ## 2.1. Test Firmware Declarations
+## 2.1. Test Firmware Declarations
 
 - Tests should interact through a shell
 - Commands should be synchronous
@@ -59,23 +59,36 @@ API/function call with the variables or a descriptive name for a set of calls
 - [msg] if used, may be provided several times
 - [msg] should not be actionable and only contain debug/log
 information
+- [msg] should be anything that cannot be parsed or recognized
 - [data] should be optional
 - [data] if used, may be provided several times
-- [data] should be actionable and adhere to pythons
-ast.literal_eval formatting
-- [result] should only be provided once for each command
+- [data] should be actionable and adhere to standard JSON formatting
+- [result] must be provided exactly once for each command
 - [result] value should only be "SUCCESS" or "ERROR"
 - [result] should be the last value in the command response.
 
- ## 2.2. Expected Response Format From Commands In Firmware
+## 2.2.1 Expected Response Format From Commands In Firmware
 
-- [cmd] -> `printf("{'cmd': 'api_call(%i, %i, &input_data)'}\n", arg1, arg2)`
+- [cmd] -> `printf("{\"cmd\": \"api_call(%i, %i, &input_data)\"}\n", arg1, arg2)`
 - [msg] -> `printf("This is useful debug info, anything that has no
 structure will be saved as a [msg]\n")`
-- [data] -> `printf("{'data': %i}\n", data)`
-- [data] -> `printf("{'data': '%s'}\n", actionable_string)`
-- [result] -> `printf("{'result': 'SUCCESS'}\n")` or `printf("{'result':
-'ERROR'}\n")
+- [data] -> `printf("{\"data\": %i}\n", data)`
+- [data] -> `printf("{\"data\": [%i, %i]}\n", data[0], data[1])`
+- [data] -> `printf("{\"data\": \"%s\"}\n", actionable_string)`
+- [result] -> `printf("{\"result\": \"SUCCESS\"}\n")` or
+`printf("{\"result\": \"ERROR\"}\n")`
+
+## 2.2.2 Expected Response Format Grammar
+```
+command := "{\"cmd\":" STRING_WITH_QUOTES "}" EOL
+message := STRING EOL
+data := "{\"data\":" <json_compatible_data> "}" EOL
+result := "{\"result\":" RESULT_VALUE "}" EOL
+
+EOL := \"\n\"
+RESULT_VALUE := ("SUCCESS") | ("ERROR")
+STRING_WITH_QUOTES := /"(?:[^"\\]|\\.)*"/
+```
 
 ## 2.3.  Basic Real Example
 This example show how an real api call should be exposed.
@@ -84,18 +97,18 @@ int cmd_i2c_read_reg(int argc, char **argv)
 {
     // Do parsing
     ...
-    printf("{'cmd': 'i2c_read_reg(%i, 0x%02X, %02X, &data, 0x%02X)'}\n",
+    printf("{\"cmd\": \"i2c_read_reg(%i, 0x%02X, %02X, &data, 0x%02X)\"}\n",
            dev, addr, reg, flags);
     ret = i2c_read_reg(dev, addr, reg, &data, flags);
     if (ret == I2C_ACK) {
         printf("Successfully read from register\n");
-        printf("{'data': 0x%02X}\n", data);
-        printf("{'result': 'SUCCESS'}\n");
+        printf("{\"data\": 0x%02X}\n", data);
+        printf("{\"result\": \"SUCCESS\"}\n");
     }
     else {
         printf("Errorcode: %s\n", _get_error_code_string(ret));
-        printf("{'data': %i}\n", ret);
-        printf("{'result': 'ERROR'}\n");
+        printf("{\"data\": %i}\n", ret);
+        printf("{\"result\": \"ERROR\"}\n");
     }
     return ret;
 }
@@ -113,20 +126,21 @@ gives enough information to be able to reproduce.
  {
      // Do parsing
      ...
-     printf("{'cmd': 'get_data_api_command(get_data_arg=[0 to %i])'}\n",
+     printf("{\"cmd\": \"get_data_api_command(get_data_arg=[0 to %i])\"}\n",
             amount_of_api_calls)
      printf("Getting several values for the api command\n")
      for (i = 0; i < amount_of_api_calls; i++) {
          data = get_data_api_command(i);
-         prqintf("{'data': 0x%X}\n", data);
+         prqintf("{\"data\": 0x%X}\n", data);
      }
-     printf("{'result': 'SUCCESS'}\n");
+     printf("{\"result\": \"SUCCESS\"}\n");
  }
  ```
 
 ## Acknowledgements
 
-Thanks to Gaëtan Harter, Thomas C. Schmitt for their comments and suggestions.
+Thanks to Gaëtan Harter, Thomas C. Schmitt, Juan Carrano for their
+comments and suggestions.
 
 ## References
 
