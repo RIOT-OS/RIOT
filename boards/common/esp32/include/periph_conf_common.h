@@ -47,6 +47,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Static array with declared ADC channels
+ */
+static const gpio_t adc_channels[] = ADC_GPIOS;
+
+/**
  * @brief Number of GPIOs declared as ADC channels
  *
  * The number of GPIOs that are declared as ADC channels is determined from
@@ -54,7 +59,7 @@ extern "C" {
  *
  * @note ADC_NUMOF definition must not be changed.
  */
-#define ADC_NUMOF   (adc_chn_num)
+#define ADC_NUMOF   (sizeof(adc_channels) / sizeof(adc_channels[0]))
 /** @} */
 
 /**
@@ -74,6 +79,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Static array with declared DAC channels
+ */
+static const gpio_t dac_channels[] = DAC_GPIOS;
+
+/**
  * @brief Number of GPIOs declared as DAC channels
  *
  * The number of GPIOs that are declared as DAC channels is determined from
@@ -81,14 +91,33 @@ extern "C" {
  *
  * @note DAC_NUMOF definition must not be changed.
  */
-#define DAC_NUMOF   (dac_chn_num)
+#define DAC_NUMOF   (sizeof(dac_channels) / sizeof(dac_channels[0]))
 /** @} */
-
 
 /**
  * @name   I2C configuration
  * @{
  */
+
+/**
+ * @brief   Static array with configuration for declared I2C devices
+ */
+static const i2c_conf_t i2c_config[] = {
+    #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
+    {
+        .speed = I2C0_SPEED,
+        .scl = I2C0_SCL,
+        .sda = I2C0_SDA,
+    },
+    #endif
+    #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
+    {
+        .speed = I2C1_SPEED,
+        .scl = I2C1_SCL,
+        .sda = I2C1_SDA,
+    },
+    #endif
+};
 
 /**
  * @brief Number of I2C interfaces
