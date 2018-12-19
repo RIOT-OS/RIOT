@@ -214,7 +214,12 @@ static inline void wait_for_tx_complete(uart_t uart)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     assert(uart < UART_NUMOF);
-
+#if DEVELHELP
+    /* If tx is not enabled don't try to send */
+    if (!(dev(uart)->CR1 & USART_CR1_TE)) {
+        return;
+    }
+#endif
 #ifdef MODULE_PERIPH_DMA
     if (!len) {
         return;
