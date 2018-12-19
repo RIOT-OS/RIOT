@@ -91,7 +91,7 @@ int mcp9808_init(mcp9808_t *dev, const mcp9808_params_t *params);
  * @brief   Read temperature value from the given MCP9808 device, returned in d°C
  *
  * @param[in] dev           Device descriptor of MCP9808 device
- * @@param[out] temperature Temperature in d°C
+ * @param[out] temperature  Temperature in d°C
 
  * @return                  MCP9808_OK on success
  * @return                  -MCP9808_ERR_I2C if an error occured on I2C bus.
