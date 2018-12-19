@@ -95,33 +95,25 @@ struct i2c_hw_t {
     uint8_t signal_sda_out; /* SDA signal from the controller */
 };
 
-static const struct i2c_hw_t _i2c_hw[] = {
-    #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
+static struct i2c_hw_t _i2c_hw[] = {
     {
         .regs = &I2C0,
         .mod = PERIPH_I2C0_MODULE,
         .int_src = ETS_I2C_EXT0_INTR_SOURCE,
-        .pin_scl = I2C0_SCL,
-        .pin_sda = I2C0_SDA,
         .signal_scl_in = I2CEXT0_SCL_IN_IDX,
         .signal_scl_out = I2CEXT0_SCL_OUT_IDX,
         .signal_sda_in = I2CEXT0_SDA_IN_IDX,
         .signal_sda_out = I2CEXT0_SDA_OUT_IDX,
     },
-    #endif
-    #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
     {
         .regs = &I2C1,
         .mod = PERIPH_I2C1_MODULE,
         .int_src = ETS_I2C_EXT1_INTR_SOURCE,
-        .pin_scl = I2C1_SCL,
-        .pin_sda = I2C1_SDA,
         .signal_scl_in = I2CEXT1_SCL_IN_IDX,
         .signal_scl_out = I2CEXT1_SCL_OUT_IDX,
         .signal_sda_in = I2CEXT1_SDA_IN_IDX,
         .signal_sda_out = I2CEXT1_SDA_OUT_IDX,
     }
-    #endif
 };
 
 struct _i2c_bus_t
@@ -134,28 +126,7 @@ struct _i2c_bus_t
     uint32_t results;  /* results of a transfer */
 };
 
-static struct _i2c_bus_t _i2c_bus[] =
-{
-    #if defined(I2C0_SCL) && defined(I2C0_SDA) && defined(I2C0_SPEED)
-    {
-        .speed = I2C0_SPEED,
-        .cmd = 0,
-        .data = 0,
-        .lock = MUTEX_INIT
-    },
-    #endif
-    #if defined(I2C1_SCL) && defined(I2C1_SDA) && defined(I2C1_SPEED)
-    {
-        .speed = I2C1_SPEED,
-        .cmd = 0,
-        .data = 0,
-        .lock = MUTEX_INIT
-    },
-    #endif
-};
-
-/* the number of I2C bus devices used */
-const unsigned i2c_bus_num = sizeof(_i2c_bus) / sizeof(_i2c_bus[0]);
+static struct _i2c_bus_t _i2c_bus[I2C_NUMOF] = {};
 
 /* forward declaration of internal functions */
 
@@ -175,19 +146,25 @@ static inline void _i2c_delay (uint32_t delay);
 
 void i2c_init(i2c_t dev)
 {
-    CHECK_PARAM (dev < i2c_bus_num)
+    CHECK_PARAM (dev < I2C_NUMOF)
 
-    if (_i2c_bus[dev].speed == I2C_SPEED_FAST_PLUS ||
-        _i2c_bus[dev].speed == I2C_SPEED_HIGH) {
+    if (i2c_config[dev].speed == I2C_SPEED_FAST_PLUS ||
+        i2c_config[dev].speed == I2C_SPEED_HIGH) {
         LOG_TAG_INFO("i2c", "I2C_SPEED_FAST_PLUS and I2C_SPEED_HIGH "
                      "are not supported\n");
         return;
     }
 
+    mutex_init(&_i2c_bus[dev].lock);
+
     i2c_acquire (dev);
 
     _i2c_bus[dev].cmd = 0;
     _i2c_bus[dev].data = 0;
+    _i2c_bus[dev].speed = i2c_config[dev].speed;
+
+    _i2c_hw[dev].pin_scl = i2c_config[dev].scl;
+    _i2c_hw[dev].pin_sda = i2c_config[dev].sda;
 
     DEBUG ("%s scl=%d sda=%d speed=%d\n", __func__,
            _i2c_hw[dev].pin_scl, _i2c_hw[dev].pin_sda, _i2c_bus[dev].speed);
@@ -298,7 +275,7 @@ int i2c_acquire(i2c_t dev)
 {
     DEBUG ("%s\n", __func__);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -1)
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -1)
 
     mutex_lock(&_i2c_bus[dev].lock);
     _i2c_reset_hw(dev);
@@ -309,7 +286,7 @@ int i2c_release(i2c_t dev)
 {
     DEBUG ("%s\n", __func__);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -1)
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -1)
 
     _i2c_reset_hw (dev);
     mutex_unlock(&_i2c_bus[dev].lock);
@@ -341,7 +318,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr, void *data, size_t len, uint8_t fla
     DEBUG ("%s dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -EINVAL);
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
     CHECK_PARAM_RET (len > 0, -EINVAL);
     CHECK_PARAM_RET (data != NULL, -EINVAL);
 
@@ -428,7 +405,7 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len, uint
     DEBUG ("%s dev=%u addr=%02x data=%p len=%d flags=%01x\n",
            __func__, dev, addr, data, len, flags);
 
-    CHECK_PARAM_RET (dev < i2c_bus_num, -EINVAL);
+    CHECK_PARAM_RET (dev < I2C_NUMOF, -EINVAL);
     CHECK_PARAM_RET (len > 0, -EINVAL);
     CHECK_PARAM_RET (data != NULL, -EINVAL);
 
@@ -733,7 +710,7 @@ static void IRAM_ATTR _i2c_intr_handler (void *arg)
 
     /* all I2C peripheral interrupt sources are routed to the same interrupt,
        so we have to use the status register to distinguish interruptees */
-    for (unsigned dev = 0; dev < i2c_bus_num; dev++) {
+    for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
         /* test for transfer related interrupts */
         if (_i2c_hw[dev].regs->int_status.val & transfer_int_mask) {
             /* set transfer result */
@@ -851,7 +828,7 @@ static void _i2c_reset_hw (i2c_t dev)
 
 void i2c_print_config(void)
 {
-    for (unsigned bus = 0; bus < i2c_bus_num; bus++) {
+    for (unsigned bus = 0; bus < I2C_NUMOF; bus++) {
         ets_printf("\tI2C_DEV(%d)\tscl=%d sda=%d\n",
                    bus, _i2c_hw[bus].pin_scl, _i2c_hw[bus].pin_sda);
     }
