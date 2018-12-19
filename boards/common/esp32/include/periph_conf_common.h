@@ -127,7 +127,7 @@ static const i2c_conf_t i2c_config[] = {
  *
  * @note I2C_NUMOF definition must not be changed.
  */
-#define I2C_NUMOF   (i2c_bus_num)
+#define I2C_NUMOF   (sizeof(i2c_config) / sizeof(i2c_config[0]))
 
 /** @} */
 
