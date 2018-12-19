@@ -385,7 +385,7 @@ include $(RIOTMAKE)/modules.inc.mk
 
 
 .PHONY: all link clean flash flash-only term doc debug debug-server reset objdump help info-modules
-.PHONY: print-size elffile binfile hexfile
+.PHONY: print-size elffile binfile hexfile flashfile
 .PHONY: ..in-docker-container
 
 # Targets that depend on FORCE will always be rebuilt. Contrary to a .PHONY
@@ -411,6 +411,12 @@ BINFILE ?= $(ELFFILE:.elf=.bin)
 elffile: $(ELFFILE)
 hexfile: $(HEXFILE)
 binfile: $(BINFILE)
+# # # FLASHFILE Being introduced, only supported if bsp define FLASHFILE # # #
+# # # Not all boards use this file for the moment
+#
+# FLASHFILE is the file used by the flasher
+# (can be overwritten to $(HEXFILE), $(BINFILE))
+flashfile: $(FLASHFILE)
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
@@ -445,7 +451,7 @@ ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
 ifeq (,$(RIOTNOLINK))
-link: ..compiler-check ..build-message $(ELFFILE) $(HEXFILE) print-size
+link: ..compiler-check ..build-message $(ELFFILE) $(FLASHFILE) $(HEXFILE) print-size
 else
 link: ..compiler-check ..build-message $(BASELIBS)
 endif # RIOTNOLINK
