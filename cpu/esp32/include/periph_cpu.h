@@ -40,6 +40,21 @@ extern "C" {
 #define CPUID_LEN           (7U)
 
 /**
+ * @name   GPIO configuration
+ * @{
+ */
+
+/**
+ * @brief   Override the default gpio_t type definition
+ *
+ * This is required here to have gpio_t defined in this file.
+ * @{
+ */
+#define HAVE_GPIO_T
+typedef unsigned int gpio_t;
+/** @} */
+
+/**
  * @brief   Available ports on the ESP32
  * @{
  */
@@ -134,6 +149,7 @@ typedef enum {
     GPIO_IN_OD,     /**< input and open-drain output */
     GPIO_IN_OD_PU   /**< input and open-drain output */
 } gpio_mode_t;
+/** @} */
 /** @} */
 
 /**
