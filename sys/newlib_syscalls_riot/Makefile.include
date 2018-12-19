@@ -5,3 +5,11 @@ endif
 ifneq (,$(filter newlib_syscalls_riot_time,$(USEMODULE)))
   UNDEF += $(BINDIR)/newlib_syscalls_riot/time.o
 endif
+
+ifneq (,$(filter newlib_syscalls_riot_vfs,$(USEMODULE)))
+  UNDEF += $(BINDIR)/newlib_syscalls_riot/vfs.o
+endif
+
+ifneq (,$(filter newlib_syscalls_riot_serial_rw,$(USEMODULE)))
+  UNDEF += $(BINDIR)/newlib_syscalls_riot/serial_rw.o
+endif

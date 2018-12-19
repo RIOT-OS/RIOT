@@ -386,9 +386,21 @@ ifneq (,$(filter newlib,$(USEMODULE)))
       USEMODULE += newlib_syscalls_riot_time
     endif
   endif
+  ifeq (,$(filter newlib_stubs_fs,$(USEMODULE)))
+    ifneq (,$(filter vfs,$(USEMODULE)))
+      USEMODULE += newlib_syscalls_riot_vfs
+    endif
+  endif
+  ifeq (,$(filter vfs,$(USEMODULE)))
+      USEMODULE += newlib_syscalls_riot_serial_rw
+  endif
   ifeq (,$(filter stdio_rtt,$(USEMODULE)))
     USEMODULE += stdio_uart
   endif
+endif
+
+ifneq (,$(filter newlib_syscalls_riot_serial_rw,$(USEMODULE)))
+  USEMODULE += stdio_uart
 endif
 
 ifneq (,$(filter newlib_syscalls_riot_%,$(USEMODULE)))

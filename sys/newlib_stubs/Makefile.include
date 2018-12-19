@@ -5,3 +5,7 @@ endif
 ifneq (,$(filter newlib_stubs_time,$(USEMODULE)))
   UNDEF += $(BINDIR)/newlib_stubs/time.o
 endif
+
+ifneq (,$(filter newlib_stubs_fs,$(USEMODULE)))
+  UNDEF += $(BINDIR)/newlib_stubs/fs.o
+endif
