@@ -473,7 +473,7 @@ ifeq ($(BUILD_IN_DOCKER),1)
 link: ..in-docker-container
 else
 ifeq (,$(RIOTNOLINK))
-link: ..compiler-check ..build-message $(ELFFILE) $(FLASHFILE) $(HEXFILE) print-size
+link: ..compiler-check ..build-message $(ELFFILE) $(FLASHFILE) print-size
 else
 link: ..compiler-check ..build-message $(BASELIBS)
 endif # RIOTNOLINK
