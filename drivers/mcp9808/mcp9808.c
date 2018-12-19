@@ -34,8 +34,6 @@
 
 int _read16(const mcp9808_t *dev, uint8_t pointer, uint16_t *reg)
 {
-    /* Acquire exclusive access */
-    i2c_acquire(DEV_I2C);
     uint8_t buf[2];
     if (i2c_read_regs(DEV_I2C, DEV_ADDR, pointer, &buf, 2, 0) != 0) {
         DEBUG("[mcp9808] Error: cannot read register 0x%02X\n", pointer);
@@ -44,9 +42,6 @@ int _read16(const mcp9808_t *dev, uint8_t pointer, uint16_t *reg)
     }
 
     *reg = (buf[0] << 8) | buf[1];
-
-    /* Release I2C device */
-    i2c_release(DEV_I2C);
 
     return MCP9808_OK;
 }
@@ -61,9 +56,6 @@ int _write16(const mcp9808_t *dev, uint8_t pointer, uint16_t *reg)
         i2c_release(DEV_I2C);
         return -MCP9808_ERR_I2C;
     }
-
-    /* Release I2C device */
-    i2c_release(DEV_I2C);
 
     return MCP9808_OK;
 }
@@ -88,6 +80,7 @@ int mcp9808_init(mcp9808_t *dev, const mcp9808_params_t *params)
     uint16_t init = 0;
     if (_write16(dev, MCP9808_REG_CONFIG, &init) != MCP9808_OK) {
         DEBUG("[mcp9808] Error: cannot write config register\n");
+        i2c_release(DEV_I2C);
         return -MCP9808_ERR_I2C;
     }
 
@@ -109,11 +102,17 @@ int mcp9808_init(mcp9808_t *dev, const mcp9808_params_t *params)
 
 int mcp9808_read_temperature(const mcp9808_t *dev, int16_t *temperature)
 {
+    /* Acquire exclusive access */
+    i2c_acquire(DEV_I2C);
+
     uint16_t ta;
     if (_read16(dev, MCP9808_REG_T_AMBIENT, &ta) != MCP9808_OK) {
         DEBUG("[mcp9808] Error: cannot read ambient temperature register\n");
         return -MCP9808_ERR_I2C;
     }
+
+    /* Release I2C device */
+    i2c_release(DEV_I2C);
 
     /* convert temperature to d°C */
     uint8_t ub = (uint8_t)(ta >> 8) & 0x1f; /* clear flag bits */
@@ -133,6 +132,9 @@ int mcp9808_read_temperature(const mcp9808_t *dev, int16_t *temperature)
 
 int mcp9808_wakeup(const mcp9808_t *dev)
 {
+    /* Acquire exclusive access */
+    i2c_acquire(DEV_I2C);
+
     uint16_t config;
     if (_read16(dev, MCP9808_REG_CONFIG, &config) != MCP9808_OK) {
         DEBUG("[mcp9808] Error: cannot read config register\n");
@@ -146,11 +148,17 @@ int mcp9808_wakeup(const mcp9808_t *dev)
         return -MCP9808_ERR_I2C;
     }
 
+    /* Release I2C device */
+    i2c_release(DEV_I2C);
+
     return MCP9808_OK;
 }
 
 int mcp9808_shutdown(const mcp9808_t *dev)
 {
+    /* Acquire exclusive access */
+    i2c_acquire(DEV_I2C);
+
     uint16_t config;
     if (_read16(dev, MCP9808_REG_CONFIG, &config) != MCP9808_OK) {
         DEBUG("[mcp9808] Error: cannot read config register\n");
@@ -163,6 +171,9 @@ int mcp9808_shutdown(const mcp9808_t *dev)
         DEBUG("[mcp9808] Error: cannot write config register\n");
         return -MCP9808_ERR_I2C;
     }
+
+    /* Release I2C device */
+    i2c_release(DEV_I2C);
 
     return MCP9808_OK;
 }
