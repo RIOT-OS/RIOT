@@ -7,8 +7,8 @@ FLASHER = $(RIOTBOARD)/$(BOARD)/dist/robotis-loader.py
 DEBUGGER =
 DEBUGSERVER =
 
-HEXFILE = $(BINFILE)
-FFLAGS = $(PORT) $(HEXFILE)
+FLASHFILE ?= $(BINFILE)
+FFLAGS = $(PORT) $(FLASHFILE)
 DEBUGGER_FLAGS =
 
 # define the default port depending on the host OS
