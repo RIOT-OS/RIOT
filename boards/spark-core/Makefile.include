@@ -11,8 +11,8 @@ FLASHER = dfu-util
 DEBUGGER = # spark core has no debugger
 RESET ?= # dfu-util has no support for resetting the device
 
-HEXFILE = $(BINFILE)
-FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D "$(HEXFILE)"
+FLASHFILE ?= $(BINFILE)
+FFLAGS = -d 1d50:607f -a 0 -s 0x08005000:leave -D $(FLASHFILE)
 
 # Skip the space needed by the embedded bootloader
 export ROM_OFFSET ?= 0x5000

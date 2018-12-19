@@ -27,10 +27,10 @@ ifeq ($(PROGRAMMER),dfu-util)
   DEBUGGER = # no debugger
   RESET ?= # dfu-util has no support for resetting the device
 
-  HEXFILE = $(BINFILE)
-  FFLAGS = -d 1eaf:0003 -a 2 -D "$(HEXFILE)"
+  FLASHFILE ?= $(BINFILE)
+  FFLAGS = -d 1eaf:0003 -a 2 -D $(FLASHFILE)
   # for older bootloader versions use this:
-  # FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D "$(HEXFILE)"
+  # FFLAGS = -d 1d50:6017 -s 0x08002000:leave -D $(FLASHFILE)
 else
 
   # this board uses openocd by default
