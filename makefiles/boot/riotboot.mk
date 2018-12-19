@@ -97,30 +97,24 @@ $(RIOTBOOT_EXTENDED_BIN): $(RIOTBOOT_COMBINED_BIN)
 	$(Q)truncate -s $$(($(SLOT0_OFFSET) + $(SLOT0_LEN) + $(RIOTBOOT_HDR_LEN))) $@.tmp
 	$(Q)mv $@.tmp $@
 
-# Flashing rule for openocd to flash combined/extended binaries
-riotboot/flash-combined-slot0: ELFFILE=$(RIOTBOOT_COMBINED_BIN)
-riotboot/flash-extended-slot0: ELFFILE=$(RIOTBOOT_EXTENDED_BIN)
-
+# Flashing rule for combined binaries
 riotboot/flash-combined-slot0: FLASHFILE=$(RIOTBOOT_COMBINED_BIN)
 riotboot/flash-combined-slot0: $(RIOTBOOT_COMBINED_BIN) $(FLASHDEPS)
 	$(flash-recipe)
 
+# Flashing rule for extended binaries
 riotboot/flash-extended-slot0: FLASHFILE=$(RIOTBOOT_EXTENDED_BIN)
 riotboot/flash-extended-slot0: $(RIOTBOOT_EXTENDED_BIN) $(FLASHDEPS)
 	$(flash-recipe)
 
 # Flashing rule for slot 0
 riotboot/flash-slot0: export IMAGE_OFFSET=$(SLOT0_OFFSET)
-# openocd
-riotboot/flash-slot0: ELFFILE=$(SLOT0_RIOT_BIN)
 riotboot/flash-slot0: FLASHFILE=$(SLOT0_RIOT_BIN)
 riotboot/flash-slot0: $(SLOT0_RIOT_BIN) $(FLASHDEPS)
 	$(flash-recipe)
 
 # Flashing rule for slot 1
 riotboot/flash-slot1: export IMAGE_OFFSET=$(SLOT1_OFFSET)
-# openocd
-riotboot/flash-slot1: ELFFILE=$(SLOT1_RIOT_BIN)
 riotboot/flash-slot1: FLASHFILE=$(SLOT1_RIOT_BIN)
 riotboot/flash-slot1: $(SLOT1_RIOT_BIN) $(FLASHDEPS)
 	$(flash-recipe)
