@@ -24,7 +24,3 @@ FLASHFILE = $(RIOTBOOT_COMBINED_BIN)
 
 include ../Makefile.tests_common
 include $(RIOTBASE)/Makefile.include
-
-# This is currently hacky as the flasher are not using 'FLASHFILE'
-# openocd
-ELFFILE = $(FLASHFILE)
