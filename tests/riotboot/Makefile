@@ -28,5 +28,3 @@ include $(RIOTBASE)/Makefile.include
 # This is currently hacky as the flasher are not using 'FLASHFILE'
 # openocd
 ELFFILE = $(FLASHFILE)
-# edbg
-HEXFILE = $(FLASHFILE)
