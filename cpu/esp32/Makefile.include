@@ -140,6 +140,9 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
 LINKFLAGS += -nostdlib -lgcc -u putchar -Wl,-gc-sections
 LINKFLAGS += -Wl,--warn-unresolved-symbols
 
+# The ELFFILE is the base one used for flashing
+FLASHFILE ?= $(ELFFILE)
+
 # configure preflasher to convert .elf to .bin before flashing
 FLASH_MODE ?= dout  # FIX configuration, DO NOT CHANGE
 FLASH_FREQ  = 40m   # FIX configuration, DO NOT CHANGE
@@ -147,12 +150,12 @@ FLASH_SIZE ?= 2MB
 PREFLASHER = $(ESPTOOL)
 PREFFLAGS  = --chip esp32 elf2image
 PREFFLAGS += -fm $(FLASH_MODE) -fs $(FLASH_SIZE) -ff $(FLASH_FREQ)
-PREFFLAGS += -o $(ELFFILE).bin $(ELFFILE);
+PREFFLAGS += -o $(FLASHFILE).bin $(FLASHFILE);
 PREFFLAGS += echo "" > $(BINDIR)/partitions.csv;
 PREFFLAGS += echo "nvs, data, nvs, 0x9000, 0x6000" >> $(BINDIR)/partitions.csv;
 PREFFLAGS += echo "phy_init, data, phy, 0xf000, 0x1000" >> $(BINDIR)/partitions.csv;
 PREFFLAGS += echo -n "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv;
-PREFFLAGS += ls -l $(ELFFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
+PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
 
 PREFFLAGS += python $(RIOTCPU)/$(CPU)/gen_esp32part.py --disable-sha256sum
 PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
@@ -167,7 +170,7 @@ ifeq ($(QEMU), 1)
     FFLAGS += head -c $$((0x8000)) |
     FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
     FFLAGS += head -c $$((0x10000)) |
-    FFLAGS += cat - $(ELFFILE).bin tmp.bin |
+    FFLAGS += cat - $(FLASHFILE).bin tmp.bin |
     FFLAGS += head -c $$((0x400000)) > $(BINDIR)/esp32flash.bin && rm tmp.bin &&
     FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin &&
     FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
@@ -179,5 +182,5 @@ else
     FFLAGS += -z -fm $(FLASH_MODE) -fs detect -ff $(FLASH_FREQ)
     FFLAGS += 0x1000 $(RIOTCPU)/$(CPU)/bin/bootloader.bin
     FFLAGS += 0x8000 $(BINDIR)/partitions.bin
-    FFLAGS += 0x10000 $(ELFFILE).bin
+    FFLAGS += 0x10000 $(FLASHFILE).bin
 endif
