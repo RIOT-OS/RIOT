@@ -345,6 +345,10 @@ void auto_init(void)
     extern void auto_init_bmx055(void);
     auto_init_bmx055();
 #endif
+#ifdef MODULE_CCS811
+    extern void auto_init_ccs811(void);
+    auto_init_ccs811();
+#endif
 #ifdef MODULE_DHT
     extern void auto_init_dht(void);
     auto_init_dht();

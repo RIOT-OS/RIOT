@@ -100,6 +100,17 @@ ifneq (,$(filter cc2420,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
 endif
 
+ifneq (,$(filter ccs811_full,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += ccs811
+endif
+
+ifneq (,$(filter ccs811,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter dht,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_gpio
