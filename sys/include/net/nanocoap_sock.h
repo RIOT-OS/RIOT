@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <unistd.h>
 
+#include "net/nanocoap.h"
 #include "net/sock/udp.h"
 
 #ifdef __cplusplus
