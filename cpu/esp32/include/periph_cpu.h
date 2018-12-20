@@ -464,6 +464,14 @@ typedef struct {
  *
  * @{
  */
+
+/**
+ * @brief   UART configuration structure type
+ */
+typedef struct {
+    gpio_t txd;             /**< GPIO used as TxD pin */
+    gpio_t rxd;             /**< GPIO used as RxD pin */
+} uart_conf_t;
 /** @} */
 
 
