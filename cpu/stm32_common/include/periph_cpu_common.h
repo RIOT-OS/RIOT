@@ -159,6 +159,11 @@ typedef uint32_t gpio_t;
 #define PERIPH_I2C_NEED_READ_REG
 /** Use write reg function from periph common */
 #define PERIPH_I2C_NEED_WRITE_REG
+#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
+    defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F4)
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REGS
+#endif
 /** @} */
 
 /**
