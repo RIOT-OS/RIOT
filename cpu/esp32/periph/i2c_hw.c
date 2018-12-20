@@ -87,15 +87,13 @@ struct i2c_hw_t {
     i2c_dev_t* regs;        /* pointer to register data struct of the I2C device */
     uint8_t mod;            /* peripheral hardware module of the I2C interface */
     uint8_t int_src;        /* peripheral interrupt source used by the I2C device */
-    uint8_t pin_scl;        /* SCL pin */
-    uint8_t pin_sda;        /* SDA pin */
     uint8_t signal_scl_in;  /* SCL signal to the controller */
     uint8_t signal_scl_out; /* SCL signal from the controller */
     uint8_t signal_sda_in;  /* SDA signal to the controller */
     uint8_t signal_sda_out; /* SDA signal from the controller */
 };
 
-static struct i2c_hw_t _i2c_hw[] = {
+static const struct i2c_hw_t _i2c_hw[] = {
     {
         .regs = &I2C0,
         .mod = PERIPH_I2C0_MODULE,
@@ -163,11 +161,8 @@ void i2c_init(i2c_t dev)
     _i2c_bus[dev].data = 0;
     _i2c_bus[dev].speed = i2c_config[dev].speed;
 
-    _i2c_hw[dev].pin_scl = i2c_config[dev].scl;
-    _i2c_hw[dev].pin_sda = i2c_config[dev].sda;
-
     DEBUG ("%s scl=%d sda=%d speed=%d\n", __func__,
-           _i2c_hw[dev].pin_scl, _i2c_hw[dev].pin_sda, _i2c_bus[dev].speed);
+           i2c_config[dev].scl, i2c_config[dev].sda, _i2c_bus[dev].speed);
 
     /* enable (power on) the according I2C module */
     periph_module_enable(_i2c_hw[dev].mod);
@@ -477,38 +472,38 @@ static int _i2c_init_pins(i2c_t dev)
      * reset GPIO usage type if the pins were used already for I2C before to
      * make it possible to reinitialize I2C
      */
-    if (gpio_get_pin_usage(_i2c_hw[dev].pin_scl) == _I2C) {
-        gpio_set_pin_usage(_i2c_hw[dev].pin_scl, _GPIO);
+    if (gpio_get_pin_usage(i2c_config[dev].scl) == _I2C) {
+        gpio_set_pin_usage(i2c_config[dev].scl, _GPIO);
     }
-    if (gpio_get_pin_usage(_i2c_hw[dev].pin_sda) == _I2C) {
-        gpio_set_pin_usage(_i2c_hw[dev].pin_sda, _GPIO);
+    if (gpio_get_pin_usage(i2c_config[dev].sda) == _I2C) {
+        gpio_set_pin_usage(i2c_config[dev].sda, _GPIO);
     }
 
     /* try to configure SDA and SCL pin as GPIO in open-drain mode with enabled pull-ups */
-    if (gpio_init (_i2c_hw[dev].pin_scl, GPIO_IN_OD_PU) ||
-        gpio_init (_i2c_hw[dev].pin_sda, GPIO_IN_OD_PU)) {
+    if (gpio_init (i2c_config[dev].scl, GPIO_IN_OD_PU) ||
+        gpio_init (i2c_config[dev].sda, GPIO_IN_OD_PU)) {
         return -ENODEV;
     }
 
     /* bring signals to high */
-    gpio_set(_i2c_hw[dev].pin_scl);
-    gpio_set(_i2c_hw[dev].pin_sda);
+    gpio_set(i2c_config[dev].scl);
+    gpio_set(i2c_config[dev].sda);
 
     /* store the usage type in GPIO table */
-    gpio_set_pin_usage(_i2c_hw[dev].pin_scl, _I2C);
-    gpio_set_pin_usage(_i2c_hw[dev].pin_sda, _I2C);
+    gpio_set_pin_usage(i2c_config[dev].scl, _I2C);
+    gpio_set_pin_usage(i2c_config[dev].sda, _I2C);
 
     /* connect SCL and SDA pins to output signals through the GPIO matrix */
-    GPIO.func_out_sel_cfg[_i2c_hw[dev].pin_scl].func_sel = _i2c_hw[dev].signal_scl_out;
-    GPIO.func_out_sel_cfg[_i2c_hw[dev].pin_sda].func_sel = _i2c_hw[dev].signal_sda_out;
+    GPIO.func_out_sel_cfg[i2c_config[dev].scl].func_sel = _i2c_hw[dev].signal_scl_out;
+    GPIO.func_out_sel_cfg[i2c_config[dev].sda].func_sel = _i2c_hw[dev].signal_sda_out;
 
     /* connect SCL and SDA input signals to pins through the GPIO matrix */
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].sig_in_sel = 1;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].sig_in_inv = 0;
-    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].func_sel = _i2c_hw[dev].pin_scl;
+    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].func_sel = i2c_config[dev].scl;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].sig_in_sel = 1;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].sig_in_inv = 0;
-    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].func_sel = _i2c_hw[dev].pin_sda;
+    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].func_sel = i2c_config[dev].sda;
 
     return 0;
 }
@@ -738,37 +733,37 @@ static void IRAM_ATTR _i2c_intr_handler (void *arg)
 static void _i2c_clear_bus(i2c_t dev)
 {
     /* reset the usage type in GPIO table */
-    gpio_set_pin_usage(_i2c_hw[dev].pin_scl, _GPIO);
-    gpio_set_pin_usage(_i2c_hw[dev].pin_sda, _GPIO);
+    gpio_set_pin_usage(i2c_config[dev].scl, _GPIO);
+    gpio_set_pin_usage(i2c_config[dev].sda, _GPIO);
 
     /* configure SDA and SCL pin as GPIO in open-drain mode temporarily */
-    gpio_init (_i2c_hw[dev].pin_scl, GPIO_IN_OD_PU);
-    gpio_init (_i2c_hw[dev].pin_sda, GPIO_IN_OD_PU);
+    gpio_init (i2c_config[dev].scl, GPIO_IN_OD_PU);
+    gpio_init (i2c_config[dev].sda, GPIO_IN_OD_PU);
 
     /* master send some clock pulses to make the slave release the bus */
-    gpio_set (_i2c_hw[dev].pin_scl);
-    gpio_set (_i2c_hw[dev].pin_sda);
-    gpio_clear (_i2c_hw[dev].pin_sda);
+    gpio_set (i2c_config[dev].scl);
+    gpio_set (i2c_config[dev].sda);
+    gpio_clear (i2c_config[dev].sda);
     for (int i = 0; i < 20; i++) {
-        gpio_toggle(_i2c_hw[dev].pin_scl);
+        gpio_toggle(i2c_config[dev].scl);
     }
-    gpio_set(_i2c_hw[dev].pin_sda);
+    gpio_set(i2c_config[dev].sda);
 
     /* store the usage type in GPIO table */
-    gpio_set_pin_usage(_i2c_hw[dev].pin_scl, _I2C);
-    gpio_set_pin_usage(_i2c_hw[dev].pin_sda, _I2C);
+    gpio_set_pin_usage(i2c_config[dev].scl, _I2C);
+    gpio_set_pin_usage(i2c_config[dev].sda, _I2C);
 
     /* connect SCL and SDA pins to output signals through the GPIO matrix */
-    GPIO.func_out_sel_cfg[_i2c_hw[dev].pin_scl].func_sel = _i2c_hw[dev].signal_scl_out;
-    GPIO.func_out_sel_cfg[_i2c_hw[dev].pin_sda].func_sel = _i2c_hw[dev].signal_sda_out;
+    GPIO.func_out_sel_cfg[i2c_config[dev].scl].func_sel = _i2c_hw[dev].signal_scl_out;
+    GPIO.func_out_sel_cfg[i2c_config[dev].sda].func_sel = _i2c_hw[dev].signal_sda_out;
 
     /* connect SCL and SDA input signals to pins through the GPIO matrix */
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].sig_in_sel = 1;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].sig_in_inv = 0;
-    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].func_sel = _i2c_hw[dev].pin_scl;
+    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_scl_in].func_sel = i2c_config[dev].scl;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].sig_in_sel = 1;
     GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].sig_in_inv = 0;
-    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].func_sel = _i2c_hw[dev].pin_sda;
+    GPIO.func_in_sel_cfg[_i2c_hw[dev].signal_sda_in].func_sel = i2c_config[dev].sda;
 
     return;
 }
@@ -828,9 +823,9 @@ static void _i2c_reset_hw (i2c_t dev)
 
 void i2c_print_config(void)
 {
-    for (unsigned bus = 0; bus < I2C_NUMOF; bus++) {
+    for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
         ets_printf("\tI2C_DEV(%d)\tscl=%d sda=%d\n",
-                   bus, _i2c_hw[bus].pin_scl, _i2c_hw[bus].pin_sda);
+                   dev, i2c_config[dev].scl, i2c_config[dev].sda);
     }
 }
 

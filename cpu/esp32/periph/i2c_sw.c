@@ -699,9 +699,9 @@ static /* IRAM */ int _i2c_read_byte(_i2c_bus_t* bus, uint8_t *byte, bool ack)
 
 void i2c_print_config(void)
 {
-    for (unsigned bus = 0; bus < I2C_NUMOF; bus++) {
+    for (unsigned dev = 0; dev < I2C_NUMOF; dev++) {
         ets_printf("\tI2C_DEV(%d)\tscl=%d sda=%d\n",
-                   bus, _i2c_bus[bus].scl, _i2c_bus[bus].sda);
+                   dev, i2c_config[dev].scl, i2c_config[dev].sda);
     }
 }
 
