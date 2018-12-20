@@ -127,12 +127,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_set_pin_usage(uart_config[uart].rxd, _UART);
 
         /* connect TxD pin to the TxD output signal through the GPIO matrix */
-        GPIO.func_out_sel_cfg[uart_config[uart].txd].func_sel = __uarts[uart].signal_txd;
+        GPIO.func_out_sel_cfg[uart_config[uart].txd].func_sel = _uarts[uart].signal_txd;
 
         /* connect RxD input signal to the RxD pin through the GPIO matrix */
-        GPIO.func_in_sel_cfg[__uarts[uart].signal_rxd].sig_in_sel = 1;
-        GPIO.func_in_sel_cfg[__uarts[uart].signal_rxd].sig_in_inv = 0;
-        GPIO.func_in_sel_cfg[__uarts[uart].signal_rxd].func_sel = uart_config[uart].rxd;
+        GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_sel = 1;
+        GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_inv = 0;
+        GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].func_sel = uart_config[uart].rxd;
     }
     _uarts[uart].baudrate = baudrate;
 
