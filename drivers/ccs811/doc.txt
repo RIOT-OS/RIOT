@@ -12,22 +12,22 @@ The driver is for the usage with [RIOT-OS](https://github.com/RIOT-OS/RIOT).
 ## <a name="toc"> Table of contets </a>
 
 1. [Overview](#overview)
-    1. [About the sensor](#about)
-    2. [Supported features](#supported)
+  1. [About the sensor](#about)
+  2. [Supported features](#supported)
 2. [Measurement Process](#measurement_process)
-    1. [Sensor modes](#sensor_modes)
-    2. [Measurement results](#measurement_results)
+  1. [Sensor modes](#sensor_modes)
+  2. [Measurement results](#measurement_results)
 3. [Compensation](#compensation)
 4. [Negative Thermal Coefficient Thermistor (NTC)](#ntc)
 5. [Interrupts](#interrupts)
-    1. [Data ready interrupt](#data_ready_interrupt)
-    2. [Threshold interrupt](#threshold interrupt)
+  1. [Data ready interrupt](#data_ready_interrupt)
+  2. [Threshold interrupt](#threshold interrupt)
 6. [Power Saving](#power saving)
 7. [Baseline](#baseline)
 8. [Error Handling](#error_handling)
 19. [Configuration](#configuration)
-    1. [Hardware Configurations](#hardware_configuration)
-    2. [Driver Configuration Parameters](#driver_configuration)
+  1. [Hardware Configurations](#hardware_configuration)
+  2. [Driver Configuration Parameters](#driver_configuration)
 
 ## <a name="overview"> Overview </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -54,26 +54,26 @@ to get CCS811 working.
 
 ### <a name="supported"> Supported Features </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-@note There are two driver module versions, the ```ccs811``` module
-wich provides only basic functionality and the ```ccs811_full```
+@note There are two driver module versions, the `ccs811` module
+wich provides only basic functionality and the `ccs811_full`
 module with additional functionality.
 
-The ```ccs811_full``` module includes the ```ccs811``` module
-automatically. If code size is critical, the ```ccs811``` module can
-be used, otherwise using the ```ccs811_full``` module is recommended.
+The `ccs811_full` module includes the `ccs811` module
+automatically. If code size is critical, the `ccs811` module can
+be used, otherwise using the `ccs811_full` module is recommended.
 
-The driver supports the following features when modules ```ccs811```
-and ```ccs811_full``` are used.
+The driver supports the following features when modules `ccs811`
+and `ccs811_full` are used.
 
 Feature | Module
 --------|-------
-read raw and converted gas sensor data (eCO2, TVOC) | ```ccs811```
-poling for new sensor gas data | ```ccs811```
-power saving using sleep mode with wakeup | ```ccs811```
-data ready and threshold interrupt handling | ```ccs811_full```
-ambient temperatur calculation with NTC | ```ccs811_full```
-compensate gas readings using an external sensor | ```ccs811_full```
-manual baseline handling | ```ccs811_full```
+read raw and converted gas sensor data (eCO2, TVOC) | `ccs811`
+poling for new sensor gas data | `ccs811`
+power saving using sleep mode with wakeup | `ccs811`
+data ready and threshold interrupt handling | `ccs811_full`
+ambient temperatur calculation with NTC | `ccs811_full`
+compensate gas readings using an external sensor | `ccs811_full`
+manual baseline handling | `ccs811_full`
 
 ## <a name="measurement_process"> Measurement Process </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -108,12 +108,12 @@ raw data.
   for 48 hours in the selected mode of operation to ensure sensor
   performance is stable, see the data sheet for more details.
 - When the sensor operating mode is changed to a new mode with a lower
-  sample rate, e.g., from *Pulse Heating Mode* (#CCS811_MODE_10S) to
-  *Low Power Pulse Heating Mode* (#CCS811_MODE_60S), it should be placed
+  sample rate, e.g., from *Pulse Heating Mode* (#CCS811_MODE_10S)
+  to *Low Power Pulse Heating Mode* (#CCS811_MODE_60S), it should be placed
   in *Idle, Low Current  Mode* (#CCS811_MODE_IDLE) for at least 10 minutes
   before enabling the new mode. When the sensor operating mode is changed
-  to a new mode with a higher sample rate, e.g., from *Low Power Pulse
-  Heating Mode* (#CCS811_MODE_60S) to *Pulse Heating Mode*
+  to a new mode with a higher sample rate, e.g., from
+  *Low Power Pulse Heating Mode* (#CCS811_MODE_60S) to *Pulse Heating Mode*
   (#CCS811_MODE_10S), there is no requirement to wait before enabling
   the new mode.
 
@@ -129,7 +129,7 @@ application can change the measurement mode either
 Once the measurement mode is set, the user task can use function
 #ccs811_read_iaq to fetch the results. The function returns **raw data**
 as well as **Indoor Air Quality (IAQ)** values. If some of the results
-are not needed, the corresponding parameters can be set to ```NULL```.
+are not needed, the corresponding parameters can be set to `NULL`.
 
 While raw data represents simply the current through the sensor and the
 voltage across the sensor with the selected current, IAQ values are the
@@ -187,7 +187,7 @@ If information about the environment like temperature and humidity are
 available from another sensor, they can be used by CCS811 to compensate
 gas readings due to temperature and humidity changes.
 
-@note This feature can only be used with the ```ccs811_full``` module.
+@note This feature can only be used with the `ccs811_full` module.
 
 Function #ccs811_set_environmental_data can be used to set these environmental
 data. In the following example, the Sensirion SHT3x humidity and
@@ -209,7 +209,7 @@ CCS811 supports an external interface for connecting a negative thermal
 coefficient thermistor (R_NTC) to provide a cost effective and power
 efficient means of calculating the local ambient temperature.
 
-@note This feature can only be used with the ```ccs811_full``` module.
+@note This feature can only be used with the `ccs811_full` module.
 
 The sensor measures the voltage V_NTC across R_NTC as well as the voltage V_REF
 across a connected reference resistor (R_REF). Function #ccs811_read_ntc
@@ -217,7 +217,9 @@ can be used at any time to fetch the current resistance of R_NTC. It
 uses the resistance of R_REF and measured voltages V_REF and V_NTV with
 the following equation to determine R_NTC:
 
-          R_NTC = R_REF / V_REF * V_NTC
+```
+R_NTC = R_REF / V_REF * V_NTC
+```
 
 Using the data sheet of the NTC, the ambient temperature can be
 calculated. See application note AMS AN000372 for more details.
@@ -254,7 +256,7 @@ CCS811 supports two types of interrupts that can be used to fetch data:
 - threshold interrupt (#CCS811_INT_THRESHOLD)
 
 @note
-- Interrupts can only be used with the ```ccs811_full``` module.
+- Interrupts can only be used with the `ccs811_full` module.
 - It is not possible to use both interrupts at the same time.
 
 ### <a name="data_ready_interrupt"> Data ready interrupt </a> &nbsp;&nbsp; [[TOC](#toc)]
@@ -338,7 +340,7 @@ value can be saved before the sensor is powered down. This baseline
 can then be restored with function #ccs811_set_baseline after sensor
 is powered up again to continue the automatic baseline process.
 
-@note This feature can only be used with the ```ccs811_full``` module.
+@note This feature can only be used with the `ccs811_full` module.
 
 ## <a name="error_handling"> Error Handling </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -365,7 +367,7 @@ permanently pulled low, leaving the CCS811 and I2C constantly active.
   +--------+       +--------+
 ```
 If the interrupt signal **nINT** is used to fetch new data
-(only with ```ccs811_full``` module),
+(only with `ccs811_full` module),
 the interrupt pin has to be connected to a GPIO pin.
 
 ```
