@@ -393,8 +393,24 @@ extern const unsigned pwm_dev_num;
  * definitions of SPIn_*.
  */
 
-/** Number of SPI interfaces determined from SPI_* definitions */
-extern const unsigned spi_bus_num;
+/**
+ * @brief   SPI controller used for peripheral interfaces
+ */
+typedef enum {
+    HSPI = 2,         /**< HSPI interface controller */
+    VSPI = 3,         /**< VSPI interface controller */
+} spi_ctrl_t;
+
+/**
+ * @brief   SPI configuration structure type
+ */
+typedef struct {
+    spi_ctrl_t ctrl;        /**< SPI controller used for the interface */
+    gpio_t sck;             /**< GPIO used as SCK pin */
+    gpio_t mosi;            /**< GPIO used as MOSI pin */
+    gpio_t miso;            /**< GPIO used as MISO pin */
+    gpio_t cs;              /**< GPIO used as CS0 pin */
+} spi_conf_t;
 
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE  /**< requires function spi_transfer_byte */
 #define PERIPH_SPI_NEEDS_TRANSFER_REG   /**< requires function spi_transfer_reg */
