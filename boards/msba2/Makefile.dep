@@ -1,5 +1,9 @@
 include $(RIOTBOARD)/common/msba2/Makefile.dep
 
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+  USEMODULE += cc1100
+endif
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += ltc4150
   USEMODULE += sht11

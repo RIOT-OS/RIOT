@@ -1,3 +1,7 @@
+ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+  USEMODULE += cc1101
+endif
+
 # add support for LEDs and buttons as default saul devices
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
