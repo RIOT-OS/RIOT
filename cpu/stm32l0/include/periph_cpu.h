@@ -81,11 +81,11 @@ typedef struct {
  * @{
  */
 #define EEPROM_START_ADDR          (0x08080000)
-#if defined(CPU_MODEL_STM32L073RZ) || defined(CPU_MODEL_STM32L072CZ)
+#if defined(CPU_LINE_STM32L073xx) || defined(CPU_LINE_STM32L072xx)
 #define EEPROM_SIZE                (6144U)  /* 6kB */
-#elif defined(CPU_MODEL_STM32L053R8)
+#elif defined(CPU_LINE_STM32L053xx)
 #define EEPROM_SIZE                (2048U)  /* 2kB */
-#elif defined(CPU_MODEL_STM32L031K6)
+#elif defined(CPU_LINE_STM32L031xx)
 #define EEPROM_SIZE                (1024U)  /* 1kB */
 #endif
 /** @} */
