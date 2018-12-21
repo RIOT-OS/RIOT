@@ -78,13 +78,16 @@ int main(void)
     uint32_t now = 0;
     uint32_t start = xtimer_now_usec();
     uint32_t until = start + (TEST_TIME_S * US_PER_SEC);
+    uint32_t interval = TEST_INTERVAL_MS * US_PER_MS;
+    xtimer_ticks32_t last_wakeup = xtimer_now();
+
     puts("[START]");
     while((now = xtimer_now_usec()) < until) {
         unsigned percent = (100 * (now - start)) / (until - start);
 #if defined(MAIN_THREAD_PIN)
         gpio_set(main_pin);
 #endif
-        xtimer_usleep(TEST_INTERVAL_MS * US_PER_MS);
+        xtimer_periodic_wakeup(&last_wakeup, interval);
 #if defined(MAIN_THREAD_PIN)
         gpio_clear(main_pin);
 #endif
