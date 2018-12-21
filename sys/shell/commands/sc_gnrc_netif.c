@@ -980,6 +980,12 @@ static void _l2filter_usage(const char *cmd)
 }
 #endif
 
+static void _cca_usage(const char *cmd)
+{
+    printf("usage: %s <if_id> cca\n", cmd);
+    puts("       perform a clear channel assessment and print the result\n");
+}
+
 static void _usage(char *cmd)
 {
     printf("usage: %s\n", cmd);
@@ -987,6 +993,7 @@ static void _usage(char *cmd)
     _flag_usage(cmd);
     _add_usage(cmd);
     _del_usage(cmd);
+    _cca_usage(cmd);
 #ifdef MODULE_L2FILTER
     _l2filter_usage(cmd);
 #endif
@@ -1195,6 +1202,31 @@ static int _netif_del(kernel_pid_t iface, char *addr_str)
 #endif
 }
 
+static int _netif_cca(kernel_pid_t iface)
+{
+    netopt_enable_t cca;
+    int res;
+    res = gnrc_netapi_get(iface, NETOPT_IS_CHANNEL_CLR, 0, &cca, sizeof(cca));
+    if (res >= 0) {
+        int8_t ed = 0;
+        res = gnrc_netapi_get(iface, NETOPT_LAST_ED_LEVEL, 0, &ed, sizeof(ed));
+        printf(" %2d: CCA %u", iface, (unsigned)cca);
+        if (res >= 0) {
+            printf(", ED=%d", (int)ed);
+        }
+        puts("");
+    }
+    else {
+        if (res == -ENOTSUP) {
+            printf(" %2d: CCA not supported\n", iface);
+        }
+        else {
+            printf(" %2d: CCA failed: %d\n", iface, res);
+        }
+    }
+    return 0;
+}
+
 /* shell commands */
 #ifdef MODULE_GNRC_TXTSND
 int _gnrc_netif_send(int argc, char **argv)
@@ -1300,6 +1332,14 @@ int _gnrc_netif_config(int argc, char **argv)
                 }
 
                 return _netif_del((kernel_pid_t)iface, argv[3]);
+            }
+            else if (strcmp(argv[2], "cca") == 0) {
+                if (argc != 3) {
+                    _cca_usage(argv[0]);
+                    return 1;
+                }
+
+                return _netif_cca((kernel_pid_t)iface);
             }
 #ifdef MODULE_L2FILTER
             else if (strcmp(argv[2], "l2filter") == 0) {
