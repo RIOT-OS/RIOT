@@ -68,7 +68,7 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
             ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
 
     /* ensure the length doesn't exceed the actual flash size */
-    assert(((unsigned)target_addr + len) <
+    assert(((unsigned)target_addr + len) <=
            (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF)));
 
     uint32_t *dst = (uint32_t *)target_addr;
@@ -111,7 +111,9 @@ void flashpage_write(int page, const void *data)
          * The erasing is done once as a full row is always reased.
          */
         for (unsigned curpage = 0; curpage < FLASHPAGE_PAGES_PER_ROW; curpage++) {
-            flashpage_write_raw(page_addr + (curpage * NVMCTRL_PAGE_SIZE / 4), (void *) ((uint32_t *) data + (curpage * NVMCTRL_PAGE_SIZE / 4)), NVMCTRL_PAGE_SIZE);
+            flashpage_write_raw(page_addr + (curpage * NVMCTRL_PAGE_SIZE / 4),
+                                (void *) ((uint32_t *) data + (curpage * NVMCTRL_PAGE_SIZE / 4)),
+                                NVMCTRL_PAGE_SIZE);
         }
     }
 

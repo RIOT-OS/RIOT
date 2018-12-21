@@ -43,7 +43,9 @@ extern "C" {
  */
 /* a flashpage in RIOT is mapped to a flash row on the SAM0s */
 #define FLASHPAGE_SIZE             (256U)
-/* one SAM0 row contains 4 SAM0 pages, so 4 SAM0 pages contain the amount of a RIOT flashpage */
+/* one SAM0 row contains 4 SAM0 pages, so 4 SAM0 pages contain
+ * the amount of a RIOT flashpage
+ */
 #define FLASHPAGE_PAGES_PER_ROW    (4)
 /* number of RIOT flashpages on device */
 #define FLASHPAGE_NUMOF            (FLASH_NB_OF_PAGES / FLASHPAGE_PAGES_PER_ROW)
