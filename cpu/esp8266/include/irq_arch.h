@@ -38,7 +38,7 @@ extern uint32_t irq_interrupt_nesting;
 
 #if defined(MODULE_ESP_SDK_INT_HANDLING) || defined(DOXYGEN)
 /**
- * @brief   Macros that have to be used on entry into and reset from an ISR
+ * @brief   Macros that have to be used on entry into and exit from an ISR
  *
  * NOTE: since they use a local variable they can be used only in same function
  * @{
