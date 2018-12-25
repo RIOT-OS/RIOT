@@ -81,7 +81,7 @@ extern "C" {
  *      </a>
  */
 #define ICMPV6_ERROR_DST_UNR_NO_ROUTE   (0) /**< no route to destination */
-#define ICMPV6_ERROR_DST_UNR_PROHIB     (1) /**< communictation with
+#define ICMPV6_ERROR_DST_UNR_PROHIB     (1) /**< communication with
                                              *   destination administratively
                                              *   prohibited */
 #define ICMPV6_ERROR_DST_UNR_SCOPE      (2) /**< beyond scope of source address */
@@ -118,7 +118,7 @@ extern "C" {
  *          RFC 4443, section 3.4
  *      </a>
  */
-#define ICMPV6_ERROR_PARAM_PROB_HDR_FIELD   (0) /**< errorneous header field
+#define ICMPV6_ERROR_PARAM_PROB_HDR_FIELD   (0) /**< erroneous header field
                                                  *   encountered */
 #define ICMPV6_ERROR_PARAM_PROB_NH          (1) /**< unrecognized next header
                                                  *   field encountered */
