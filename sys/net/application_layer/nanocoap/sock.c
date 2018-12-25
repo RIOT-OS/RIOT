@@ -52,7 +52,7 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
 
         res = sock_udp_send(&sock, buf, pdu_len, NULL);
         if (res <= 0) {
-            DEBUG("nanocoap: error sending coap request\n");
+            DEBUG("nanocoap: error sending coap request, %d\n", (int)res);
             break;
         }
 
@@ -68,7 +68,7 @@ ssize_t nanocoap_request(coap_pkt_t *pkt, sock_udp_ep_t *local, sock_udp_ep_t *r
                 }
                 continue;
             }
-            DEBUG("nanocoap: error receiving coap request\n");
+            DEBUG("nanocoap: error receiving coap response, %d\n", (int)res);
             break;
         }
         else {
