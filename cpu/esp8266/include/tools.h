@@ -34,7 +34,12 @@ extern "C" {
  * @param[in]  width     format of the items
  * @param[in]  per_line  number of items per line
  */
-extern void esp_hexdump (const void* addr, uint32_t num, char width, uint8_t per_line);
+void esp_hexdump (const void* addr, uint32_t num, char width, uint8_t per_line);
+
+/**
+ * @brief  Print heap and system memory information
+ */
+void print_meminfo (void);
 
 #ifdef __cplusplus
 }
