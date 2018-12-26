@@ -9,10 +9,10 @@
  */
 
 /*
- * Internally, the SDK uses its own priority-based multitasking, the *ETS*,
- * to handle hardware components such as the WiFi interface, or to implement
- * event-driven functions such as software timers. ETS periodically executes
- * all ETS tasks with pending events in an infinite loop with the ROM
+ * Internally, the SDK uses its own priority-based multitasking system,
+ * the *ETS*, to handle hardware components such as the WiFi interface, or to
+ * implement event-driven functions such as software timers. ETS periodically
+ * executes all ETS tasks with pending events in an infinite loop with the ROM
  * function *ets_run*.
  *
  * ETS doesn't process interrupts directly in interrupt service routines.
@@ -20,8 +20,8 @@
  * ETS tasks, which then processes the interrupts asynchronously. Context
  * switches are not possible in interrupt service routines.
  *
- * To use SDK functions and keep the system alive, ETS tasks with pending have
- * to be handled. For that purpose
+ * To use SDK functions and keep the system alive, ETS tasks with pending
+ * events have to be handled. For that purpose
  *
  * - the *ets_task_func* RIOT thread with highest possible priority is used
  * - the ROM functions *ets_run* and *ets_post* are overwritten.
