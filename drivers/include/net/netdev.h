@@ -313,7 +313,6 @@ typedef struct netdev_driver {
      * @brief Get a received frame
      *
      * @pre `(dev != NULL)`
-     * @pre `(buf != NULL) && (len > 0)`
      *
      * Supposed to be called from
      * @ref netdev_t::event_callback "netdev->event_callback()"
