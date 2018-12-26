@@ -710,13 +710,43 @@ INCLUDES += -I$(APPDIR)
 
 # <a name="esp8266_sdk_task_handling"> SDK Task Handling </a> &nbsp;[[TOC](#esp8266_toc)]
 
-With make command variable ```USE_SDK=1``` the Espressif SDK is used. This is necessary, for example, if you want to use the built-in WLAN module. The SDK internally uses its own tasks (SDK tasks) and its own scheduling mechanism to realize event-driven SDK functions such as WiFi functions and software timers, and to keep the system alive. For this purpose, the SDK regularly executes SDK tasks with pending events in an endless loop using the ROM function ```ets_run```.
+With make command variable `USE_SDK=1`, the Espressif SDK is used. This is
+necessary, for example, if you want to use the built-in WLAN module. The
+SDK is also used automatically when software timers are used by activating
+the `esp_sw_timer` module.
 
-Interrupt service routines do not process interrupts directly but use the ```ets_post``` ROM function to send an event to one of these SDK tasks, which then processes the interrupts asynchronously. A context switch is not possible in the interrupt service routines.
+Internally, the SDK uses its own priority-based multitasking, the **ETS**,
+to handle hardware components such as the WiFi interface, or to implement
+event-driven functions such as software timers. ETS periodically executes
+all ETS tasks with pending events in an infinite loop with the ROM
+function `ets_run`.
 
-In the RIOT port, the task management of the SDK is replaced by the task management of the RIOT. To handle SDK tasks with pending events so that the SDK functions work and the system keeps alive, the ROM functions ```ets_run``` and ```ets_post``` are overwritten. The ```ets_run``` function performs all SDK tasks with pending events exactly once. It is executed at the end of the ```ets_post``` function and thus usually at the end of an SDK interrupt service routine or before the system goes into the lowest power mode.
+ETS doesn't process interrupts directly in interrupt service routines.
+Instead, they use the `ets_post` ROM function to send an event to one of the
+ETS tasks, which then processes the interrupts asynchronously. Context
+switches are not possible in interrupt service routines.
 
-@note Since the non-SDK version of RIOT is much smaller and faster than the SDK version, you should always compile your application without the SDK (```USE_SDK=0```, the default) if you don't need the built-in WiFi module.
+To use SDK functions and keep the system alive, ETS tasks with pending have to
+be handled. For that purpose
+
+- the `ets_task_func` RIOT thread with highest possible priority is used
+- the ROM functions `ets_run` and `ets_post` are overwritten.
+
+The `ets_task_func` RIOT thread is waiting for a thread flag, which is set
+by the `ets_post` function at the end of an ETS interrupt service routine.
+The flag indicates that there are ETS tasks with pending events that need
+to be executed. The `ets_task_func` RIOT thread then calls the `ets_run`
+function, which performs all ETS tasks with pending events exactly once.
+
+Thus, when a hardware component used by the SDK triggers an interrupt, e.g.
+the WiFi interface, the interrupt sevice routine posts an event to the ETS
+task by calling the `ets_post` function. The overwritten version of this
+function sets the thread flag of the `ets_task_func` thread. The thread
+then calls function `ets_run` to process pending events.
+
+@note Since the non-SDK version of RIOT is much smaller and faster than the
+SDK version, you should always compile your application without the SDK
+(```USE_SDK=0```, the default) if you don't need the built-in WiFi module.
 
 # <a name="esp8266_qemu_mode_and_gdb"> QEMU Mode and GDB </a> &nbsp;[[TOC](#esp8266_toc)]
 
