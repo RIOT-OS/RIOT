@@ -318,8 +318,8 @@ typedef struct netdev_driver {
      * Supposed to be called from
      * @ref netdev_t::event_callback "netdev->event_callback()"
      *
-     * If @p buf == NULL and @p len == 0, returns the packet size without
-     * dropping it.
+     * If @p buf == NULL and @p len == 0, returns the packet size -- or an upper
+     * bound estimation of the size -- without dropping the packet.
      * If @p buf == NULL and @p len > 0, drops the packet and returns the packet
      * size.
      *
@@ -342,7 +342,7 @@ typedef struct netdev_driver {
      *
      * @return `-ENOBUFS` if supplied buffer is too small
      * @return number of bytes read if buf != NULL
-     * @return packet size if buf == NULL
+     * @return packet size (or upper bound estimation) if buf == NULL
      */
     int (*recv)(netdev_t *dev, void *buf, size_t len, void *info);
 
