@@ -65,6 +65,14 @@ extern uint8_t _eheap;
 
 #include "sdk/ets_task.h"
 
+/* EST Task priority */
+#define ETS_TASK_PRIORITY   (1)
+
+/* stack for the ETS task */
+static char ets_task_stack[THREAD_STACKSIZE_DEFAULT];
+/* ETS task code */
+extern void *ets_task_func(void *arg);
+
 /**
  * @brief System main loop called by the ETS
  *
@@ -114,6 +122,12 @@ void ets_run(void)
     ets_isr_attach(ETS_SOFT_INUM, thread_yield_isr, NULL);
     ets_isr_unmask(BIT(ETS_SOFT_INUM));
     #endif
+
+    thread_create(ets_task_stack, sizeof(ets_task_stack),
+            ETS_TASK_PRIORITY,
+            THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+            ets_task_func, NULL, "ets");
+
 
     /* does not return */
     kernel_init();

@@ -35,10 +35,6 @@ void pm_set_lowest(void)
 {
     DEBUG ("%s\n", __func__);
 
-    /* execute all pending system tasks before going to sleep */
-    /* is it really necessary, the timer interrupt is thrown every some ms? */
-    ets_tasks_run ();
-
     #if !defined(QEMU)
     DEBUG ("%s enter to sleep @%u\n", __func__, phy_get_mactime());
 
@@ -47,13 +43,6 @@ void pm_set_lowest(void)
 
     DEBUG ("%s exit from sleep @%u\n", __func__, phy_get_mactime());
     #endif
-
-    /*
-     * We could execute all pending system tasks after an interrupt before
-     * continuing RIOT. However, to give RIOT tasks the highest priority,
-     * *ets_tasks_run* should be called only before going to sleep
-     */
-    ets_tasks_run ();
 }
 
 void pm_off(void)
