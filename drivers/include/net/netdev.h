@@ -310,7 +310,8 @@ typedef struct netdev_driver {
     int (*send)(netdev_t *dev, const iolist_t *iolist);
 
     /**
-     * @brief Get a received frame
+     * @brief Drop a received frame, **OR** get the length of a received frame,
+     *        **OR** get a received frame.
      *
      * @pre `(dev != NULL)`
      *
