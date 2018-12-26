@@ -323,6 +323,13 @@ typedef struct netdev_driver {
      * If @p buf == NULL and @p len > 0, drops the packet and returns the packet
      * size.
      *
+     * If called with @p buf != NULL and @p len is smaller than the received
+     * packet:
+     *  - The received packet is dropped
+     *  - The content in @p buf becomes invalid. (The driver may use the memory
+     *    to implement the dropping - or may not change it.)
+     *  - `-ENOBUFS` is returned
+     *
      * @param[in]   dev     network device descriptor. Must not be NULL.
      * @param[out]  buf     buffer to write into or NULL to return the packet
      *                      size.
