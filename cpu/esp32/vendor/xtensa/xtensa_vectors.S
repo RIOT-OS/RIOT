@@ -219,13 +219,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     movi    a3, XT_TIMER_INTEN              /* a3 = timer interrupt bit */
     wsr     a4, INTCLEAR                    /* clear sw or edge-triggered interrupt */
 
-    #ifndef RIOT_VERSION                         /* we use it as hardware timer in RIOT OS */
+    #ifndef RIOT_VERSION                    /* we use it as hardware timer in RIOT OS */
     beq     a3, a4, 7f                      /* if timer interrupt then skip table */
     #endif
 
     find_ms_setbit a3, a4, a3, 0            /* a3 = interrupt number */
 
-#if SDK_USED                                /* _xtos_interrupt_table is in reverse order */
+#if MODULE_ESP_SDK                          /* _xtos_interrupt_table is in reverse order */
     movi    a4, XCHAL_NUM_INTERRUPTS        /* intnum = XCHAL_NUM_INTERRUPTS - intnum */
     sub     a3, a4, a3
 #endif
