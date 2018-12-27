@@ -520,6 +520,13 @@ typedef enum {
     NETOPT_IQ_INVERT,
 
     /**
+     * @brief   (@ref netopt_enable_t) 6Lo support
+     *
+     * @see [RFC 4944](https://tools.ietf.org/html/rfc4944)
+     */
+    NETOPT_6LO,
+
+    /**
      * @brief   (@ref netopt_enable_t) header compression
      *
      * @see [RFC 6282](https://tools.ietf.org/html/rfc6282)
