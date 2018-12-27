@@ -15,6 +15,8 @@
  *
  * # NETAPI command documentation
  *
+ * This module handles the following @ref net_gnrc_netapi message types:
+ *
  * ## `GNRC_NETAPI_MSG_TYPE_RCV`
  *
  * @ref GNRC_NETAPI_MSG_TYPE_RCV expects a @ref net_gnrc_pkt (referred to as "packet" in the
