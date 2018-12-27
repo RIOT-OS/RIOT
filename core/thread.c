@@ -20,6 +20,9 @@
 
 #include <errno.h>
 #include <stdio.h>
+#ifdef MODULE_NEWLIB_THREAD_SAFE
+#include <string.h>
+#endif
 
 #include "assert.h"
 #include "thread.h"

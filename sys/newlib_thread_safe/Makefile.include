@@ -13,8 +13,8 @@ define __has_reent_small_test
 endef
 
 # compile the tests
-__has_reent := $(shell printf "$(__has_reent_test)" | $(CC) -E $(CFLAGS) $(INCLUDES) - > /dev/null 2>&1 ; echo $$?)
-__has_reent_small := $(shell printf "$(__has_reent_small_test)" | $(CC) -E $(CFLAGS) $(INCLUDES) - > /dev/null 2>&1 ; echo $$?)
+__has_reent = $(shell printf "$(__has_reent_test)" | $(CC) -E $(CFLAGS) $(INCLUDES) -Wno-missing-include-dirs - > /dev/null 2>&1 ; echo $$?)
+__has_reent_small = $(shell printf "$(__has_reent_small_test)" | $(CC) -E $(CFLAGS) $(INCLUDES) -Wno-missing-include-dirs - > /dev/null 2>&1 ; echo $$?)
 
 # check if we use REENT_SMALL
 ifeq (0, $(__has_reent))
