@@ -48,7 +48,7 @@ including any processor state added by user configuration options or TIE.
 NOERROR: .error "C preprocessor needed for this file: make sure its filename\
  ends in uppercase .S, or use xt-xcc's -x assembler-with-cpp option."
 
-//#include "xtensa_rtos.h"
+#include "xtensa_rtos.h"
 #include "xtensa_context.h"
 
 #ifdef XT_USE_OVLY
@@ -56,6 +56,7 @@ NOERROR: .error "C preprocessor needed for this file: make sure its filename\
 #endif
 
     .text
+    .literal_position
 
 /*******************************************************************************
 

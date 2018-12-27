@@ -429,8 +429,8 @@ _frxt_dispatch:
     /* Restore CPENABLE from task's co-processor save area. */
     movi    a3, pxCurrentTCB            /* cp_state =                       */
     l32i    a3, a3, 0
-    l32i    a2, a3, CP_TOPOFSTACK_OFFS     /* StackType_t                       *pxStack; */
-    l16ui    a3, a2, XT_CPENABLE         /* CPENABLE = cp_state->cpenable;   */
+    l32i    a2, a3, CP_TOPOFSTACK_OFFS  /* StackType_t            *pxStack; */
+    l16ui   a3, a2, XT_CPENABLE         /* CPENABLE = cp_state->cpenable;   */
     wsr     a3, CPENABLE
     #endif
 
@@ -526,7 +526,7 @@ vPortYield:
     movi    a3,  0
     wsr     a3,  CPENABLE
     beqz    a2,  1f
-    s16i     a3,  a2, XT_CPENABLE        /* clear saved cpenable             */
+    s16i    a3,  a2, XT_CPENABLE        /* clear saved cpenable             */
 1:
     #endif
 
@@ -568,7 +568,7 @@ vPortYieldFromInt:
     l32i    a2, a3, CP_TOPOFSTACK_OFFS
 
     rsr     a3, CPENABLE
-    s16i     a3, a2, XT_CPENABLE         /* cp_state->cpenable = CPENABLE;   */
+    s16i    a3, a2, XT_CPENABLE         /* cp_state->cpenable = CPENABLE;   */
     movi    a3, 0
     wsr     a3, CPENABLE                /* disable all co-processors        */
     #endif
