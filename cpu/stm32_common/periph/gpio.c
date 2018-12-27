@@ -85,6 +85,13 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
 #elif defined (CPU_FAM_STM32L4)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
+#ifdef PWR_CR2_IOSV
+    if (port == GPIOG) {
+        /* Port G requires external power supply */
+        periph_clk_en(APB1, RCC_APB1ENR1_PWREN);
+        PWR->CR2 |= PWR_CR2_IOSV;
+    }
+#endif /* PWR_CR2_IOSV */
 #else
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
 #endif
