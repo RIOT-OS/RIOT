@@ -26,8 +26,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   Also see xtensa_intr.c and xtensa_vectors.S.
 ******************************************************************************/
 
-#ifndef SDK_INT_HANDLING /* not needed in SDK version of RIOT */
-
 #include <xtensa/hal.h>
 #include <xtensa/config/core.h>
 
@@ -183,5 +181,3 @@ xt_ints_off:
     RET0
 
     .size   xt_ints_off, . - xt_ints_off
-
-#endif /* SDK_INT_HANDLING */
