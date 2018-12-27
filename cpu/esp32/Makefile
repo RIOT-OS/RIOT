@@ -2,6 +2,7 @@
 MODULE = cpu
 
 # Add a list of subdirectories, that should also be built:
+DIRS += $(RIOTCPU)/esp_common
 DIRS += periph
 DIRS += freertos
 DIRS += vendor
@@ -12,10 +13,6 @@ endif
 
 ifneq (, $(filter esp_eth, $(USEMODULE)))
     DIRS += esp-eth
-endif
-
-ifneq (, $(filter esp_now, $(USEMODULE)))
-    DIRS += esp-now
 endif
 
 ifneq (, $(filter esp_wifi, $(USEMODULE)))
