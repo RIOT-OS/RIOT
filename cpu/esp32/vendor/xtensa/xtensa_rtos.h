@@ -50,7 +50,7 @@ Should be included by all Xtensa generic and RTOS port-specific sources.
 
 #include    <xtensa/corebits.h>
 #include    <xtensa/config/system.h>
-#ifndef RIOT_OS
+#ifndef RIOT_VERSION
 #include    <xtensa/simcall.h>
 #endif
 #define XT_BOARD 1
@@ -58,7 +58,7 @@ Should be included by all Xtensa generic and RTOS port-specific sources.
 /*
 Include any RTOS specific definitions that are needed by this header.
 */
-#ifndef RIOT_OS
+#ifndef RIOT_VERSION
 #include    <FreeRTOSConfig.h>
 #endif
 
@@ -152,7 +152,7 @@ RTOS may optionally define XT_TICK_PER_SEC in its own way (eg. macro).
 */
 // void XT_RTOS_TIMER_INT(void)
 #define XT_RTOS_TIMER_INT   _frxt_timer_int
-#ifndef RIOT_OS
+#ifndef RIOT_VERSION
     #define XT_TICK_PER_SEC     configTICK_RATE_HZ
 #endif
 
