@@ -109,7 +109,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
         case NETOPT_6LO:
             assert(opt->data_len == sizeof(netopt_enable_t));
             *((netopt_enable_t *)opt->data) =
-                    (netopt_enable_t)gnrc_netif_is_6ln(netif);
+                    (netopt_enable_t)gnrc_netif_is_6lo(netif);
             res = sizeof(netopt_enable_t);
             break;
         case NETOPT_HOP_LIMIT:
