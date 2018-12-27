@@ -225,7 +225,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     find_ms_setbit a3, a4, a3, 0            /* a3 = interrupt number */
 
-#if MODULE_ESP_SDK                                /* _xtos_interrupt_table is in reverse order */
+#if MODULE_ESP_SDK                          /* _xtos_interrupt_table is in reverse order */
     movi    a4, XCHAL_NUM_INTERRUPTS        /* intnum = XCHAL_NUM_INTERRUPTS - intnum */
     sub     a3, a4, a3
 #endif
@@ -422,8 +422,8 @@ Double exceptions are not a normal occurrence. They indicate a bug of some kind.
 
     .begin      literal_prefix .DoubleExceptionVector
     .section    .DoubleExceptionVector.text, "ax"
-    .literal_position
     .global     _DoubleExceptionVector
+    .literal_position
     .align      4
 
 _DoubleExceptionVector:
@@ -446,8 +446,8 @@ Kernel Exception (including Level 1 Interrupt from kernel mode).
 
     .begin      literal_prefix .KernelExceptionVector
     .section    .KernelExceptionVector.text, "ax"
-    .literal_position
     .global     _KernelExceptionVector
+    .literal_position
     .align      4
 
 _KernelExceptionVector:
@@ -478,9 +478,9 @@ User Exception (including Level 1 Interrupt from user mode).
 
     .begin      literal_prefix .UserExceptionVector
     .section    .UserExceptionVector.text, "ax"
-    .literal_position
     .global     _UserExceptionVector
     .type       _UserExceptionVector,@function
+    .literal_position
     .align      4
 
 _UserExceptionVector:
@@ -1345,6 +1345,8 @@ _xt_lowint1:
     .section    .Level2InterruptVector.text, "ax"
     .global     _Level2Vector
     .type       _Level2Vector,@function
+    .literal_position
+
     .align      4
 _Level2Vector:
     wsr     a0, EXCSAVE_2                   /* preserve a0 */
@@ -1416,6 +1418,8 @@ _xt_medint2_exit:
     .section    .Level3InterruptVector.text, "ax"
     .global     _Level3Vector
     .type       _Level3Vector,@function
+    .literal_position
+
     .align      4
 _Level3Vector:
     wsr     a0, EXCSAVE_3                   /* preserve a0 */
@@ -1487,6 +1491,8 @@ _xt_medint3_exit:
     .section    .Level4InterruptVector.text, "ax"
     .global     _Level4Vector
     .type       _Level4Vector,@function
+    .literal_position
+
     .align      4
 _Level4Vector:
     wsr     a0, EXCSAVE_4                   /* preserve a0 */
@@ -1557,6 +1563,8 @@ _xt_medint4_exit:
     .section    .Level5InterruptVector.text, "ax"
     .global     _Level5Vector
     .type       _Level5Vector,@function
+    .literal_position
+
     .align      4
 _Level5Vector:
     wsr     a0, EXCSAVE_5                   /* preserve a0 */
@@ -1627,6 +1635,8 @@ _xt_medint5_exit:
     .section    .Level6InterruptVector.text, "ax"
     .global     _Level6Vector
     .type       _Level6Vector,@function
+    .literal_position
+
     .align      4
 _Level6Vector:
     wsr     a0, EXCSAVE_6                   /* preserve a0 */
@@ -1736,6 +1746,8 @@ documentation: "Microprocessor Programmer's Guide".
     .section    .Level2InterruptVector.text, "ax"
     .global     _Level2Vector
     .type       _Level2Vector,@function
+    .literal_position
+
     .align      4
 _Level2Vector:
     wsr     a0, EXCSAVE_2                   /* preserve a0 */
@@ -1775,6 +1787,8 @@ _xt_highint2:
     .section    .Level3InterruptVector.text, "ax"
     .global     _Level3Vector
     .type       _Level3Vector,@function
+    .literal_position
+
     .align      4
 _Level3Vector:
     wsr     a0, EXCSAVE_3                   /* preserve a0 */
@@ -1815,6 +1829,8 @@ _xt_highint3:
     .section    .Level4InterruptVector.text, "ax"
     .global     _Level4Vector
     .type       _Level4Vector,@function
+    .literal_position
+
     .align      4
 _Level4Vector:
     wsr     a0, EXCSAVE_4                   /* preserve a0 */
@@ -1855,6 +1871,8 @@ _xt_highint4:
     .section    .Level5InterruptVector.text, "ax"
     .global     _Level5Vector
     .type       _Level5Vector,@function
+    .literal_position
+
     .align      4
 _Level5Vector:
     wsr     a0, EXCSAVE_5                   /* preserve a0 */
@@ -1895,6 +1913,8 @@ _xt_highint5:
     .section    .Level6InterruptVector.text, "ax"
     .global     _Level6Vector
     .type       _Level6Vector,@function
+    .literal_position
+
     .align      4
 _Level6Vector:
     wsr     a0, EXCSAVE_6                   /* preserve a0 */
@@ -1933,9 +1953,10 @@ _xt_highint6:
 
     .begin      literal_prefix .NMIExceptionVector
     .section    .NMIExceptionVector.text, "ax"
-    .literal_position
     .global     _NMIExceptionVector
     .type       _NMIExceptionVector,@function
+    .literal_position
+
     .align      4
 _NMIExceptionVector:
     wsr     a0, EXCSAVE + XCHAL_NMILEVEL  _ /* preserve a0 */
