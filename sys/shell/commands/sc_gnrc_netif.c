@@ -53,6 +53,7 @@ static const struct {
     char *name;
     netopt_t opt;
 } flag_cmds[] = {
+    { "6lo", NETOPT_6LO },
     { "ack_req", NETOPT_ACK_REQ },
     { "autoack", NETOPT_AUTOACK },
     { "autocca", NETOPT_AUTOCCA },
