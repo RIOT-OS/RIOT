@@ -51,35 +51,18 @@ extern volatile uint32_t irq_interrupt_nesting;
 #define CPU_INUM_TIMER      19  /* level interrupt, medium priority = 2 */
 /** @} */
 
-#if defined(SDK_INT_HANDLING) || defined(DOXYGEN)
 /**
- * @brief   Macros that have to be used on entry into and reset from an ISR
- *
- * NOTE: since they use a local variable they can be used only in same function
- * @{
+ * @brief   Macros that have to be used on entry into and exit from an ISR
+ * In non-SDK interrupt handling all stuff is done in _frxt_int_enter
+ * and _frxt_int_exit. These macros do nothong and are kept only for source
+ * code compatibility.
  */
-/** Macro that has to be used at the entry point of an ISR */
-#define irq_isr_enter()    int _irq_state = irq_disable (); \
-                           irq_interrupt_nesting++;
-
-/** Macro that has to be used at the exit point of an ISR */
-#define irq_isr_exit()     if (irq_interrupt_nesting) \
-                               irq_interrupt_nesting--; \
-                           irq_restore (_irq_state); \
-                           if (sched_context_switch_request) \
-                               thread_yield();
-
-#else /* SDK_INT_HANDLING */
-
-/* in non SDK task handling all the stuff is done in _frxt_int_enter and _frxt_int_exit */
 #define irq_isr_enter() /* int _irq_state = irq_disable (); \
                            irq_interrupt_nesting++; */
 
 #define irq_isr_exit()  /* if (irq_interrupt_nesting) \
                                irq_interrupt_nesting--; \
                            irq_restore (_irq_state); */
-
-#endif /* SDK_INT_HANDLING */
 
 /**
  * @brief   Macros to enter and exit from critical region
