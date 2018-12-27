@@ -66,7 +66,7 @@ _xt_vpri_mask:     .word   0xFFFFFFFF    /* Virtual priority mask */
     in SDK we use _xtos_interrupt_table_ which is provided as symbol
     _xt_interrupt_table_ by ld script
 */
-#ifdef SDK_NOT_USED
+#ifndef MODULE_ESP_SDK
     .data
     .global _xt_interrupt_table
     .align  8
