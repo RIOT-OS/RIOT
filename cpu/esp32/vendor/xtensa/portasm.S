@@ -23,7 +23,7 @@
 //-----------------------------------------------------------------------------
 */
 
-#ifdef RIOT_OS
+#ifdef RIOT_VERSION
 #include "xtensa_conf.h"
 
 #define pxCurrentTCB            sched_active_thread
@@ -59,7 +59,7 @@ port_IntStack:
 port_IntStackTop:
     .word       0
 
-#ifndef RIOT_OS
+#ifndef RIOT_VERSION
 port_switch_flag:
     .word       0
 #endif

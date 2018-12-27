@@ -219,7 +219,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     movi    a3, XT_TIMER_INTEN              /* a3 = timer interrupt bit */
     wsr     a4, INTCLEAR                    /* clear sw or edge-triggered interrupt */
 
-    #ifndef RIOT_OS                         /* we use it as hardware timer in RIOT OS */
+    #ifndef RIOT_VERSION                         /* we use it as hardware timer in RIOT OS */
     beq     a3, a4, 7f                      /* if timer interrupt then skip table */
     #endif
 

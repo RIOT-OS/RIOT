@@ -19,9 +19,9 @@
  * cpu0 can access DPORT register. Currently, cpu1 will wait for cpu0 finish access and exit high-priority interrupt.
  */
 
-#ifdef RIOT_OS
+#ifdef RIOT_VERSION
 #include "esp_common.h"
-#endif /* RIOT_OS */
+#endif /* RIOT_VERSION */
 
 #include <stdint.h>
 #include <string.h>
