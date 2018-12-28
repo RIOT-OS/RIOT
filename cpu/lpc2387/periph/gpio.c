@@ -67,7 +67,7 @@ void gpio_init_ports(void) {
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 }
 
-int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
+int gpio_init_cpu(gpio_t pin, gpio_mode_t mode)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -98,7 +98,7 @@ int gpio_init_mux(unsigned pin, unsigned mux)
     return 0;
 }
 
-int gpio_read_ll(gpio_t pin)
+int gpio_read_cpu(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -106,7 +106,7 @@ int gpio_read_ll(gpio_t pin)
     return (_port->PIN & (1 << _pin)) != 0;
 }
 
-void gpio_set_ll(gpio_t pin)
+void gpio_set_cpu(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -114,7 +114,7 @@ void gpio_set_ll(gpio_t pin)
     _port->SET = 1 << _pin;
 }
 
-void gpio_clear_ll(gpio_t pin)
+void gpio_clear_cpu(gpio_t pin)
 {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
@@ -122,23 +122,23 @@ void gpio_clear_ll(gpio_t pin)
     _port->CLR = 1 << _pin;
 }
 
-void gpio_toggle_ll(gpio_t dev)
+void gpio_toggle_cpu(gpio_t dev)
 {
-    if (gpio_read_ll(dev)) {
-        gpio_clear_ll(dev);
+    if (gpio_read_cpu(dev)) {
+        gpio_clear_cpu(dev);
     }
     else {
-        gpio_set_ll(dev);
+        gpio_set_cpu(dev);
     }
 }
 
-void gpio_write_ll(gpio_t dev, int value)
+void gpio_write_cpu(gpio_t dev, int value)
 {
     if (value) {
-        gpio_set_ll(dev);
+        gpio_set_cpu(dev);
     }
     else {
-        gpio_clear_ll(dev);
+        gpio_clear_cpu(dev);
     }
 }
 
@@ -188,8 +188,8 @@ static void _gpio_configure(gpio_t pin, unsigned rising, unsigned falling)
     irq_restore(state);
 }
 
-int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                     gpio_cb_t cb, void *arg)
+int gpio_init_int_cpu(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
     (void)mode;
 
@@ -247,7 +247,7 @@ int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable_ll(gpio_t pin)
+void gpio_irq_enable_cpu(gpio_t pin)
 {
     int isr_map_entry =_isr_map_entry(pin);
     int _state_index = _gpio_isr_map[isr_map_entry];
@@ -262,7 +262,7 @@ void gpio_irq_enable_ll(gpio_t pin)
             bf_isset(_gpio_falling, _state_index));
 }
 
-void gpio_irq_disable_ll(gpio_t dev)
+void gpio_irq_disable_cpu(gpio_t dev)
 {
     _gpio_configure(dev, 0, 0);
 }

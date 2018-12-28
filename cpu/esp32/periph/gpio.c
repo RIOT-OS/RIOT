@@ -245,7 +245,7 @@ const char* _gpio_pin_usage_str[] =
 #define GPIO_REG_BIT_XOR(l,h,b) if (b < 32) GPIO.l ^=  BIT(b); else GPIO.h.val ^=  BIT(b-32)
 #define REG_SET_CLR_BIT(c,r,f) if (c) REG_SET_BIT(r,f); else REG_CLR_BIT(r,f)
 
-int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
+int gpio_init_cpu(gpio_t pin, gpio_mode_t mode)
 {
     CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
 
@@ -404,10 +404,10 @@ void IRAM gpio_int_handler (void* arg)
     irq_isr_exit();
 }
 
-int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                     gpio_cb_t cb, void *arg)
+int gpio_init_int_cpu(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
-    if (gpio_init_ll(pin, mode)) {
+    if (gpio_init_cpu(pin, mode)) {
         return -1;
     }
 
@@ -427,14 +427,14 @@ int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable_ll(gpio_t pin)
+void gpio_irq_enable_cpu(gpio_t pin)
 {
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
 
     gpio_int_enabled_table [pin] = true;
 }
 
-void gpio_irq_disable_ll(gpio_t pin)
+void gpio_irq_disable_cpu(gpio_t pin)
 {
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
 
@@ -443,13 +443,13 @@ void gpio_irq_disable_ll(gpio_t pin)
 
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
-int gpio_read_ll(gpio_t pin)
+int gpio_read_cpu(gpio_t pin)
 {
     CHECK_PARAM_RET(pin < GPIO_PIN_NUMOF, -1);
     return GPIO_REG_BIT_GET(in, in1, pin) ? 1 : 0;
 }
 
-void gpio_write_ll(gpio_t pin, int value)
+void gpio_write_cpu(gpio_t pin, int value)
 {
     DEBUG("%s gpio=%u val=%d\n", __func__, pin, value);
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
@@ -461,14 +461,14 @@ void gpio_write_ll(gpio_t pin, int value)
     }
 }
 
-void gpio_set_ll(gpio_t pin)
+void gpio_set_cpu(gpio_t pin)
 {
     DEBUG("%s gpio=%u\n", __func__, pin);
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
     GPIO_PIN_SET(pin);
 }
 
-void gpio_clear_ll(gpio_t pin)
+void gpio_clear_cpu(gpio_t pin)
 {
     DEBUG("%s gpio=%u\n", __func__, pin);
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
@@ -476,7 +476,7 @@ void gpio_clear_ll(gpio_t pin)
 
 }
 
-void gpio_toggle_ll(gpio_t pin)
+void gpio_toggle_cpu(gpio_t pin)
 {
     DEBUG("%s gpio=%u\n", __func__, pin);
     CHECK_PARAM(pin < GPIO_PIN_NUMOF);
@@ -527,5 +527,5 @@ int gpio_config_sleep_mode (gpio_t pin, bool mode, bool input)
 int gpio_set_direction(gpio_t pin, gpio_mode_t mode)
 {
     /* TODO implementation, for the moment we simply initialize the GPIO */
-    return gpio_init_ll(pin, mode);
+    return gpio_init_cpu(pin, mode);
 }

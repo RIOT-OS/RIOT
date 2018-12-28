@@ -73,7 +73,7 @@ static inline int _pin_num(gpio_t pin)
     return (pin & 0x0f);
 }
 
-int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
+int gpio_init_cpu(gpio_t pin, gpio_mode_t mode)
 {
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);
@@ -141,52 +141,52 @@ void gpio_init_analog(gpio_t pin)
     _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
 }
 
-void gpio_irq_enable_ll(gpio_t pin)
+void gpio_irq_enable_cpu(gpio_t pin)
 {
     EXTI->IMR |= (1 << _pin_num(pin));
 }
 
-void gpio_irq_disable_ll(gpio_t pin)
+void gpio_irq_disable_cpu(gpio_t pin)
 {
     EXTI->IMR &= ~(1 << _pin_num(pin));
 }
 
-int gpio_read_ll(gpio_t pin)
+int gpio_read_cpu(gpio_t pin)
 {
     return (_port(pin)->IDR & (1 << _pin_num(pin)));
 }
 
-void gpio_set_ll(gpio_t pin)
+void gpio_set_cpu(gpio_t pin)
 {
     _port(pin)->BSRR = (1 << _pin_num(pin));
 }
 
-void gpio_clear_ll(gpio_t pin)
+void gpio_clear_cpu(gpio_t pin)
 {
     _port(pin)->BSRR = (1 << (_pin_num(pin) + 16));
 }
 
-void gpio_toggle_ll(gpio_t pin)
+void gpio_toggle_cpu(gpio_t pin)
 {
-    if (gpio_read_ll(pin)) {
-        gpio_clear_ll(pin);
+    if (gpio_read_cpu(pin)) {
+        gpio_clear_cpu(pin);
     } else {
-        gpio_set_ll(pin);
+        gpio_set_cpu(pin);
     }
 }
 
-void gpio_write_ll(gpio_t pin, int value)
+void gpio_write_cpu(gpio_t pin, int value)
 {
     if (value) {
-        gpio_set_ll(pin);
+        gpio_set_cpu(pin);
     } else {
-        gpio_clear_ll(pin);
+        gpio_clear_cpu(pin);
     }
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                     gpio_cb_t cb, void *arg)
+int gpio_init_int_cpu(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
     int pin_num = _pin_num(pin);
     int port_num = _port_num(pin);
@@ -203,7 +203,7 @@ int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 #endif
 
     /* initialize pin as input */
-    gpio_init_ll(pin, mode);
+    gpio_init_cpu(pin, mode);
 
     /* enable global pin interrupt */
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)

@@ -49,7 +49,7 @@ static inline uint32_t _pin_num(gpio_t pin)
     return (pin & 0x0f);
 }
 
-int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
+int gpio_init_cpu(gpio_t pin, gpio_mode_t mode)
 {
     /* check for valid pin */
     if (pin == GPIO_UNDEF) {
@@ -69,27 +69,27 @@ int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read_ll(gpio_t pin)
+int gpio_read_cpu(gpio_t pin)
 {
     return GPIO_PinInGet(_port_num(pin), _pin_num(pin));
 }
 
-void gpio_set_ll(gpio_t pin)
+void gpio_set_cpu(gpio_t pin)
 {
     GPIO_PinOutSet(_port_num(pin), _pin_num(pin));
 }
 
-void gpio_clear_ll(gpio_t pin)
+void gpio_clear_cpu(gpio_t pin)
 {
     GPIO_PinOutClear(_port_num(pin), _pin_num(pin));
 }
 
-void gpio_toggle_ll(gpio_t pin)
+void gpio_toggle_cpu(gpio_t pin)
 {
     GPIO_PinOutToggle(_port_num(pin), _pin_num(pin));
 }
 
-void gpio_write_ll(gpio_t pin, int value)
+void gpio_write_cpu(gpio_t pin, int value)
 {
     if (value) {
         GPIO_PinOutSet(_port_num(pin), _pin_num(pin));
@@ -105,10 +105,10 @@ static inline uint32_t _pin_mask(gpio_t pin)
     return (1 << _pin_num(pin));
 }
 
-int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                     gpio_cb_t cb, void *arg)
+int gpio_init_int_cpu(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
-    int result = gpio_init_ll(pin, mode);
+    int result = gpio_init_cpu(pin, mode);
 
     if (result != 0) {
         return result;
@@ -134,12 +134,12 @@ int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable_ll(gpio_t pin)
+void gpio_irq_enable_cpu(gpio_t pin)
 {
     GPIO_IntEnable(_pin_mask(pin));
 }
 
-void gpio_irq_disable_ll(gpio_t pin)
+void gpio_irq_disable_cpu(gpio_t pin)
 {
     GPIO_IntDisable(_pin_mask(pin));
 }

@@ -147,7 +147,7 @@ static inline int _pin_num(gpio_t pin)
     return (pin & 0x1f);
 }
 
-int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
+int gpio_init_cpu(gpio_t pin, gpio_mode_t mode)
 {
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
@@ -206,26 +206,26 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
     _port(pin)->PIO_ABSR |=  (mux << _pin_num(pin));
 }
 
-void gpio_set_ll(gpio_t pin)
+void gpio_set_cpu(gpio_t pin)
 {
     _port(pin)->PIO_SODR = (1 << _pin_num(pin));
 }
 
-void gpio_clear_ll(gpio_t pin)
+void gpio_clear_cpu(gpio_t pin)
 {
     _port(pin)->PIO_CODR = (1 << _pin_num(pin));
 }
 
-void gpio_toggle_ll(gpio_t pin)
+void gpio_toggle_cpu(gpio_t pin)
 {
-    if (gpio_read_ll(pin)) {
+    if (gpio_read_cpu(pin)) {
         _port(pin)->PIO_CODR = (1 << _pin_num(pin));
     } else {
         _port(pin)->PIO_SODR = (1 << _pin_num(pin));
     }
 }
 
-void gpio_write_ll(gpio_t pin, int value)
+void gpio_write_cpu(gpio_t pin, int value)
 {
     if (value) {
         _port(pin)->PIO_SODR = (1 << _pin_num(pin));
@@ -234,17 +234,17 @@ void gpio_write_ll(gpio_t pin, int value)
     }
 }
 
-void gpio_irq_enable_ll(gpio_t pin)
+void gpio_irq_enable_cpu(gpio_t pin)
 {
     NVIC_EnableIRQ((1 << (_port_num(pin) + PIOA_IRQn)));
 }
 
-void gpio_irq_disable_ll(gpio_t pin)
+void gpio_irq_disable_cpu(gpio_t pin)
 {
     NVIC_DisableIRQ((1 << (_port_num(pin) + PIOA_IRQn)));
 }
 
-int gpio_read_ll(gpio_t pin)
+int gpio_read_cpu(gpio_t pin)
 {
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
@@ -258,8 +258,8 @@ int gpio_read_ll(gpio_t pin)
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                     gpio_cb_t cb, void *arg)
+int gpio_init_int_cpu(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
     Pio *port = _port(pin);
     int pin_num = _pin_num(pin);
@@ -271,7 +271,7 @@ int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     }
 
     /* configure pin as input */
-    gpio_init_ll(pin, mode);
+    gpio_init_cpu(pin, mode);
 
     /* try go grab a free spot in the context array */
     int ctx_num = _get_free_ctx();

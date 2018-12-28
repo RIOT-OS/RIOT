@@ -120,7 +120,7 @@ static inline int check_valid_port(uint8_t port)
         && base_address[port].gpio != NULL;
 }
 
-int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
+int gpio_init_cpu(gpio_t pin, gpio_mode_t mode)
 {
     uint8_t port = GPIO_PORT(pin);
     uint32_t pin_no = GPIO_PIN_NO(pin);
@@ -172,45 +172,45 @@ int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read_ll(gpio_t pin)
+int gpio_read_cpu(gpio_t pin)
 {
     assert(check_valid_port(GPIO_PORT(pin)));
 
     return PORTx(GPIO_PORT(pin)) & GPIO_PIN_NO(pin);
 }
 
-void gpio_set_ll(gpio_t pin)
+void gpio_set_cpu(gpio_t pin)
 {
     assert(check_valid_port(GPIO_PORT(pin)));
 
     LATxSET(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
 }
 
-void gpio_clear_ll(gpio_t pin)
+void gpio_clear_cpu(gpio_t pin)
 {
     assert(check_valid_port(GPIO_PORT(pin)));
 
     LATxCLR(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
 }
 
-void gpio_toggle_ll(gpio_t pin)
+void gpio_toggle_cpu(gpio_t pin)
 {
     assert(check_valid_port(GPIO_PORT(pin)));
 
     LATxINV(GPIO_PORT(pin)) = GPIO_PIN_NO(pin);
 }
 
-void gpio_write_ll(gpio_t pin, int value)
+void gpio_write_cpu(gpio_t pin, int value)
 {
     if (value)
-        gpio_set_ll(pin);
+        gpio_set_cpu(pin);
     else
-        gpio_clear_ll(pin);
+        gpio_clear_cpu(pin);
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                     gpio_cb_t cb, void *arg)
+int gpio_init_int_cpu(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
     (void)pin;
     (void)mode;
@@ -222,14 +222,14 @@ int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 }
 #endif    /* MODULE_PERIPH_GPIO_IRQ */
 
-void gpio_irq_enable_ll(gpio_t pin)
+void gpio_irq_enable_cpu(gpio_t pin)
 {
     (void)pin;
 
     /* TODO: Not implemented yet */
 }
 
-void gpio_irq_disable_ll(gpio_t pin)
+void gpio_irq_disable_cpu(gpio_t pin)
 {
     (void)pin;
 

@@ -19,39 +19,39 @@
 
 #include "periph/gpio.h"
 
-int gpio_init_ll(gpio_t pin, gpio_mode_t mode) {
+int gpio_init_cpu(gpio_t pin, gpio_mode_t mode) {
   (void) pin;
   (void) mode;
 
   return -1;
 }
 
-int gpio_read_ll(gpio_t pin) {
+int gpio_read_cpu(gpio_t pin) {
   (void) pin;
 
   return 0;
 }
 
-void gpio_set_ll(gpio_t pin) {
+void gpio_set_cpu(gpio_t pin) {
   (void) pin;
 }
 
-void gpio_clear_ll(gpio_t pin) {
+void gpio_clear_cpu(gpio_t pin) {
   (void) pin;
 }
 
-void gpio_toggle_ll(gpio_t pin) {
+void gpio_toggle_cpu(gpio_t pin) {
   (void) pin;
 }
 
-void gpio_write_ll(gpio_t pin, int value) {
+void gpio_write_cpu(gpio_t pin, int value) {
   (void) pin;
   (void) value;
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                     gpio_cb_t cb, void *arg)
+int gpio_init_int_cpu(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
     (void)pin;
     (void)mode;
@@ -61,12 +61,12 @@ int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 }
 #endif    /* MODULE_PERIPH_GPIO_IRQ */
 
-void gpio_irq_enable_ll(gpio_t pin)
+void gpio_irq_enable_cpu(gpio_t pin)
 {
     (void)pin;
 }
 
-void gpio_irq_disable_ll(gpio_t pin)
+void gpio_irq_disable_cpu(gpio_t pin)
 {
     (void)pin;
 }

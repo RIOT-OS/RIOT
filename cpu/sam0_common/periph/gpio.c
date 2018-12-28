@@ -70,7 +70,7 @@ void gpio_init_mux(gpio_t pin, gpio_mux_t mux)
     port->PMUX[pin_pos >> 1].reg |=  (mux << (4 * (pin_pos & 0x1)));
 }
 
-int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
+int gpio_init_cpu(gpio_t pin, gpio_mode_t mode)
 {
     PortGroup* port = _port(pin);
     int pin_pos = _pin_pos(pin);
@@ -103,7 +103,7 @@ int gpio_init_ll(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read_ll(gpio_t pin)
+int gpio_read_cpu(gpio_t pin)
 {
     PortGroup *port = _port(pin);
     int mask = _pin_mask(pin);
@@ -116,22 +116,22 @@ int gpio_read_ll(gpio_t pin)
     }
 }
 
-void gpio_set_ll(gpio_t pin)
+void gpio_set_cpu(gpio_t pin)
 {
     _port(pin)->OUTSET.reg = _pin_mask(pin);
 }
 
-void gpio_clear_ll(gpio_t pin)
+void gpio_clear_cpu(gpio_t pin)
 {
     _port(pin)->OUTCLR.reg = _pin_mask(pin);
 }
 
-void gpio_toggle_ll(gpio_t pin)
+void gpio_toggle_cpu(gpio_t pin)
 {
     _port(pin)->OUTTGL.reg = _pin_mask(pin);
 }
 
-void gpio_write_ll(gpio_t pin, int value)
+void gpio_write_cpu(gpio_t pin, int value)
 {
     if (value) {
         _port(pin)->OUTSET.reg = _pin_mask(pin);
@@ -151,8 +151,8 @@ static int _exti(gpio_t pin)
     return exti_config[port_num][_pin_pos(pin)];
 }
 
-int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                     gpio_cb_t cb, void *arg)
+int gpio_init_int_cpu(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg)
 {
     int exti = _exti(pin);
 
@@ -165,7 +165,7 @@ int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     gpio_config[exti].cb = cb;
     gpio_config[exti].arg = arg;
     /* configure pin as input and set MUX to peripheral function A */
-    gpio_init_ll(pin, mode);
+    gpio_init_cpu(pin, mode);
     gpio_init_mux(pin, GPIO_MUX_A);
 #ifdef CPU_FAM_SAMD21
     /* enable clocks for the EIC module */
@@ -205,7 +205,7 @@ int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable_ll(gpio_t pin)
+void gpio_irq_enable_cpu(gpio_t pin)
 {
     int exti = _exti(pin);
     if (exti == -1) {
@@ -214,7 +214,7 @@ void gpio_irq_enable_ll(gpio_t pin)
     EIC->INTENSET.reg = (1 << exti);
 }
 
-void gpio_irq_disable_ll(gpio_t pin)
+void gpio_irq_disable_cpu(gpio_t pin)
 {
     int exti = _exti(pin);
     if (exti == -1) {
