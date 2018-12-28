@@ -105,6 +105,25 @@ static int send_lines(int argc, char **argv)
     return 0;
 }
 
+static int send_recv_bytes(int argc, char **argv)
+{
+    char buffer[64];
+
+    if (argc < 3) {
+        printf("Usage: %s <command> <number of bytes>\n", argv[0]);
+        return 1;
+    }
+
+    sprintf(buffer, "%s%s", argv[1], AT_SEND_EOL);
+    at_send_bytes(&at_dev, buffer, strlen(buffer));
+
+    ssize_t len = at_recv_bytes(&at_dev, buffer, atoi(argv[2]), 10 * US_PER_SEC);
+
+    printf("Response (len=%d): %s\n", (int)len, buffer);
+
+    return 0;
+}
+
 static int drain(int argc, char **argv)
 {
     (void)argc;
@@ -228,6 +247,7 @@ static const shell_command_t shell_commands[] = {
     { "send", "Send a command and wait response", send },
     { "send_ok", "Send a command and wait OK", send_ok },
     { "send_lines", "Send a command and wait lines", send_lines },
+    { "send_recv_bytes", "Send a command and wait response as raw bytes", send_recv_bytes },
     { "drain", "Drain AT device", drain },
     { "power_on", "Power on AT device", power_on },
     { "power_off", "Power off AT device", power_off },

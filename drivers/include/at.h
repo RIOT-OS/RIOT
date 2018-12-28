@@ -221,6 +221,18 @@ int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout);
 void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len);
 
 /**
+ * @brief   Receive raw bytes from a device
+ *
+ * @param[in]   dev     device to operate on
+ * @param[in]   bytes   buffer where store received bytes
+ * @param[in]   len     maximum number of bytes to receive
+ * @param[in]   timeout timeout (in usec) of inactivity to finish read
+ *
+ * @returns     Number of bytes read, eventually zero if no bytes available
+ */
+ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout);
+
+/**
  * @brief   Send command to device
  *
  * @param[in]   dev     device to operate on
