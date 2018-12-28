@@ -429,10 +429,10 @@ _frxt_dispatch:
     /* Restore CPENABLE from task's co-processor save area. */
     movi    a3, pxCurrentTCB
     l32i    a3, a3, 0                   /* a3 = pxCurrentTCB                */
-    #if 0      /* TODO when architecture dependent thread data are possible */
-    l32i    a2, a3, CP_TOPOFSTACK_OFFS  /* StackType_t *pxStack;            */
+    #ifdef RIOT_VERSION
+    addi    a2, a3, -XT_CP_SIZE         /* a2 = pxCurrentTCB->cp_state      */
     #else
-    addi    a2, a3, -XT_CP_SIZE         /* a2 = cp_state                    */
+    l32i    a2, a3, CP_TOPOFSTACK_OFFS  /* StackType_t *pxStack;            */
     #endif
     l16ui   a3, a2, XT_CPENABLE         /* CPENABLE = cpenable;             */
     wsr     a3, CPENABLE
@@ -526,10 +526,10 @@ vPortYield:
 
     #if XCHAL_CP_NUM > 0
     /* Clear CPENABLE, also in task's co-processor state save area. */
-    #if 0      /* TODO when architecture dependent thread data are possible */
-    l32i    a2,  a2, CP_TOPOFSTACK_OFFS /* a2 = pxCurrentTCB->cp_state      */
+    #ifdef RIOT_VERSION
+    addi    a2,  a2, -XT_CP_SIZE        /* a2 = pxCurrentTCB->cp_state      */
     #else
-    addi    a2,  a2, -XT_CP_SIZE        /* a2 = cp_state                    */
+    l32i    a2,  a2, CP_TOPOFSTACK_OFFS /* a2 = pxCurrentTCB->cp_state      */
     #endif
     movi    a3,  0
     wsr     a3,  CPENABLE
@@ -573,10 +573,10 @@ vPortYieldFromInt:
     /* Save CPENABLE in task's co-processor save area, and clear CPENABLE.  */
     movi    a3, pxCurrentTCB
     l32i    a3, a3, 0                   /* a3 = pxCurrentTCB                */
-    #if 0      /* TODO when architecture dependent thread data are possible */
-    l32i    a2, a3, CP_TOPOFSTACK_OFFS
+    #ifdef RIOT_VERSION
+    addi    a2, a3, -XT_CP_SIZE         /* a2 = pxCurrentTCB->cp_state      */
     #else
-    addi    a2, a3, -XT_CP_SIZE         /* a2 = cp_state                    */
+    l32i    a2, a3, CP_TOPOFSTACK_OFFS  /* a2 = pxCurrentTCB->cp_state      */
     #endif
 
     rsr     a3, CPENABLE
@@ -623,10 +623,10 @@ _frxt_task_coproc_state:
     movi    a15, pxCurrentTCB
     l32i    a15, a15, 0                 /* && pxCurrentTCB != 0) {                 */
     beqz    a15, 2f
-    #if 0             /* TODO when architecture dependent thread data are possible */
-    l32i    a15, a15, CP_TOPOFSTACK_OFFS
+    #ifdef RIOT_VERSION
+    addi    a15, a15, -XT_CP_SIZE       /* a15 = pxCurrentTCB->cp_state            */
     #else
-    addi    a15, a15, -XT_CP_SIZE       /* cp_state                                */
+    l32i    a15, a15, CP_TOPOFSTACK_OFFS
     #endif
     ret
 
