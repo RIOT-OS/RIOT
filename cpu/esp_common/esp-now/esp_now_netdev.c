@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_esp32_esp_now
+ * @ingroup     cpu_esp_common_esp_now
  * @{
  *
  * @file

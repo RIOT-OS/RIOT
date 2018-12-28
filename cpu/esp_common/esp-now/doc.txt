@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    cpu_esp32_esp_now ESP-NOW netdev interface
- * @ingroup     cpu_esp32
+ * @defgroup    cpu_esp_common_esp_now ESP-NOW netdev interface
+ * @ingroup     cpu_esp_common
  * @brief       WiFi based ESP-NOW network device driver
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
