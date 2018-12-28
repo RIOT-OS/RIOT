@@ -161,18 +161,19 @@ typedef struct {
  * These are for cpu gpio.c implementation and should not be called directly.
  * @{
  */
-int gpio_init_ll(gpio_t pin, gpio_mode_t mode);
-int gpio_init_int_ll(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                     gpio_cb_t cb, void *arg);
-void gpio_irq_enable_ll(gpio_t pin);
-void gpio_irq_disable_ll(gpio_t pin);
-int gpio_read_ll(gpio_t pin);
-void gpio_set_ll(gpio_t pin);
-void gpio_clear_ll(gpio_t pin);
-void gpio_toggle_ll(gpio_t pin);
-void gpio_write_ll(gpio_t pin, int value);
+int gpio_init_cpu(gpio_t pin, gpio_mode_t mode);
+int gpio_init_int_cpu(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                      gpio_cb_t cb, void *arg);
+void gpio_irq_enable_cpu(gpio_t pin);
+void gpio_irq_disable_cpu(gpio_t pin);
+int gpio_read_cpu(gpio_t pin);
+void gpio_set_cpu(gpio_t pin);
+void gpio_clear_cpu(gpio_t pin);
+void gpio_toggle_cpu(gpio_t pin);
+void gpio_write_cpu(gpio_t pin, int value);
 /** @} */
 
+#if MODULE_EXTEND_ADC || DOXYGEN
 /**
  * @brief   Redirecting versions of the GPIO functions
  *
@@ -190,6 +191,7 @@ void gpio_clear_redir(gpio_t pin);
 void gpio_toggle_redir(gpio_t pin);
 void gpio_write_redir(gpio_t pin, int value);
 /** @} */
+#endif /* MODULE_EXTEND_ADC || DOXYGEN */
 
 /**
  * @brief   Initialize the given pin as general purpose input or output
@@ -212,7 +214,11 @@ static inline int gpio_init(gpio_t pin, gpio_mode_t mode)
     }
 #endif
 
-    return gpio_init_ll(pin, mode);
+#ifdef MODULE_PERIPH_GPIO
+    return gpio_init_cpu(pin, mode);
+#else
+    return -1;
+#endif
 }
 
 #if defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN)
@@ -245,7 +251,11 @@ static inline int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t
     }
 #endif
 
-    return gpio_init_int_ll(pin, mode, flank, cb, arg);
+#ifdef MODULE_PERIPH_GPIO
+    return gpio_init_int_cpu(pin, mode, flank, cb, arg);
+#else
+    return -1;
+#endif
 }
 
 /**
@@ -265,7 +275,9 @@ static inline void gpio_irq_enable(gpio_t pin)
     }
 #endif
 
-    gpio_irq_enable_ll(pin);
+#ifdef MODULE_PERIPH_GPIO
+    gpio_irq_enable_cpu(pin);
+#endif
 }
 
 /**
@@ -285,7 +297,9 @@ static inline void gpio_irq_disable(gpio_t pin)
     }
 #endif
 
-    gpio_irq_disable_ll(pin);
+#ifdef MODULE_PERIPH_GPIO
+    gpio_irq_disable_cpu(pin);
+#endif
 }
 
 #endif /* defined(MODULE_PERIPH_GPIO_IRQ) || defined(DOXYGEN) */
@@ -306,7 +320,11 @@ static inline int gpio_read(gpio_t pin)
     }
 #endif
 
-    return gpio_read_ll(pin);
+#ifdef MODULE_PERIPH_GPIO
+    return gpio_read_cpu(pin);
+#else
+    return 0;
+#endif
 }
 
 /**
@@ -323,7 +341,9 @@ static inline void gpio_set(gpio_t pin)
     }
 #endif
 
-    gpio_set_ll(pin);
+#ifdef MODULE_PERIPH_GPIO
+    gpio_set_cpu(pin);
+#endif
 }
 
 /**
@@ -340,7 +360,9 @@ static inline void gpio_clear(gpio_t pin)
     }
 #endif
 
-    gpio_clear_ll(pin);
+#ifdef MODULE_PERIPH_GPIO
+    gpio_clear_cpu(pin);
+#endif
 }
 
 /**
@@ -357,7 +379,9 @@ static inline void gpio_toggle(gpio_t pin)
     }
 #endif
 
-    gpio_toggle_ll(pin);
+#ifdef MODULE_PERIPH_GPIO
+    gpio_toggle_cpu(pin);
+#endif
 }
 
 /**
@@ -375,7 +399,9 @@ static inline void gpio_write(gpio_t pin, int value)
     }
 #endif
 
-    gpio_write_ll(pin, value);
+#ifdef MODULE_PERIPH_GPIO
+    gpio_write_cpu(pin, value);
+#endif
 }
 
 #ifdef __cplusplus
