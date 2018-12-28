@@ -231,11 +231,11 @@ void isr_eint3(void)
 
     /* invoke all handlers */
     for (int i = 0; i < NUMOF_IRQS; i++) {
-        if (status & (1 << i)) {
+        if (status & (1U << i)) {
             isr_ctx[i].cb(isr_ctx[i].arg);
 
-            LPC_GPIOINT->IO0IntClr |= (1 << i);
-            LPC_GPIOINT->IO2IntClr |= (1 << i);
+            LPC_GPIOINT->IO0IntClr |= (1U << i);
+            LPC_GPIOINT->IO2IntClr |= (1U << i);
         }
     }
 
