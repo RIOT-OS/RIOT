@@ -83,6 +83,12 @@ extern "C" {
 #define CHECK_PARAM(cond)         if (!(cond)) return;
 #endif
 
+
+#define LOG_TAG_ERROR(tag, fmt, ...)   LOG_ERROR("[%s] " fmt, tag, ##__VA_ARGS__)
+#define LOG_TAG_WARNING(tag, fmt, ...) LOG_WARNING("[%s] " fmt, tag, ##__VA_ARGS__)
+#define LOG_TAG_INFO(tag, fmt, ...)    LOG_INFO("[%s] " fmt, tag, ##__VA_ARGS__)
+#define LOG_TAG_DEBUG(tag, fmt, ...)   LOG_DEBUG("[%s] " fmt, tag, ##__VA_ARGS__)
+
 /** @} */
 
 #ifdef __cplusplus
