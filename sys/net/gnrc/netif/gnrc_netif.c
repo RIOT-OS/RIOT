@@ -1112,6 +1112,7 @@ bool gnrc_netif_is_6ln(const gnrc_netif_t *netif)
         case NETDEV_TYPE_CC110X:
         case NETDEV_TYPE_BLE:
         case NETDEV_TYPE_NRFMIN:
+        case NETDEV_TYPE_ESP_NOW:
             return true;
         default:
             return false;
@@ -1170,12 +1171,14 @@ static void _init_from_device(gnrc_netif_t *netif)
     assert(res == sizeof(tmp));
     netif->device_type = (uint8_t)tmp;
     switch (netif->device_type) {
-#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || defined(MODULE_XBEE)
+#if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || defined(MODULE_XBEE) || defined(MODULE_ESP_NOW)
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_NRFMIN:
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
             netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
 #endif
+            /* intentionally falls through */
+        case NETDEV_TYPE_ESP_NOW:
 #ifdef MODULE_GNRC_IPV6
             res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &tmp, sizeof(tmp));
             assert(res == sizeof(tmp));

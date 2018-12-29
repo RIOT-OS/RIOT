@@ -14,12 +14,9 @@
  * @brief       Netdev interface for the ESP-NOW WiFi P2P protocol
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Timo Rothenpieler <timo.rothenpieler@uni-bremen.de>
  */
 
-#ifdef MODULE_ESP_NOW
-
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 #include "log.h"
 #include "tools.h"
 
@@ -27,7 +24,6 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "net/gnrc/netif/raw.h"
 #include "net/gnrc.h"
 #include "xtimer.h"
 
@@ -38,19 +34,20 @@
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "irq_arch.h"
+#include "od.h"
 
 #include "nvs_flash/include/nvs_flash.h"
 
 #include "esp_now_params.h"
 #include "esp_now_netdev.h"
 
-#include "net/ipv6/hdr.h"
-#include "net/gnrc/ipv6/nib.h"
+#define ENABLE_DEBUG             (0)
+#include "debug.h"
 
-#define ESP_NOW_UNICAST          1
+#define ESP_NOW_UNICAST          (1)
 
-#define ESP_NOW_WIFI_STA         1
-#define ESP_NOW_WIFI_SOFTAP      2
+#define ESP_NOW_WIFI_STA         (1)
+#define ESP_NOW_WIFI_SOFTAP      (2)
 #define ESP_NOW_WIFI_STA_SOFTAP  (ESP_NOW_WIFI_STA + ESP_NOW_WIFI_SOFTAP)
 
 #define ESP_NOW_AP_PREFIX        "RIOT_ESP_"
@@ -62,34 +59,10 @@
  * not provide an argument that could be used as pointer to the ESP-NOW
  * device which triggers the interrupt.
  */
-static esp_now_netdev_t _esp_now_dev;
+static esp_now_netdev_t _esp_now_dev = { 0 };
 static const netdev_driver_t _esp_now_driver;
 
-/* device thread stack */
-static char _esp_now_stack[ESP_NOW_STACKSIZE];
-
-static inline int _get_mac_from_iid(uint8_t *iid, uint8_t *mac)
-{
-    CHECK_PARAM_RET (iid != NULL, -EINVAL);
-    CHECK_PARAM_RET (mac != NULL, -EINVAL);
-
-    /* interface id according to */
-    /* https://tools.ietf.org/html/rfc4291#section-2.5.1 */
-    mac[0] = iid[0] ^ 0x02; /* invert bit1 */
-    mac[1] = iid[1];
-    mac[2] = iid[2];
-    mac[3] = iid[5];
-    mac[4] = iid[6];
-    mac[5] = iid[7];
-
-    return 0;
-}
-
-#if ESP_NOW_UNICAST
-static xtimer_t _esp_now_scan_peers_timer;
-static bool _esp_now_scan_peers_done = false;
-
-static bool _esp_now_add_peer (uint8_t* bssid, uint8_t channel, uint8_t* key)
+static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, uint8_t* key)
 {
     if (esp_now_is_peer_exist(bssid)) {
         return false;
@@ -113,12 +86,27 @@ static bool _esp_now_add_peer (uint8_t* bssid, uint8_t channel, uint8_t* key)
     return (ret == ESP_OK);
 }
 
+#if ESP_NOW_UNICAST
+
+static xtimer_t _esp_now_scan_peers_timer;
+static bool _esp_now_scan_peers_done = false;
+
 #define ESP_NOW_APS_BLOCK_SIZE 8 /* has to be power of two */
 
 static wifi_ap_record_t* aps = NULL;
 static uint32_t aps_size = 0;
 
-static void IRAM_ATTR esp_now_scan_peers_done (void)
+static const wifi_scan_config_t scan_cfg = {
+        .ssid = NULL,
+        .bssid = NULL,
+        .channel = ESP_NOW_CHANNEL,
+        .show_hidden = true,
+        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
+        .scan_time.active.min = 0,
+        .scan_time.active.max = 120 /* TODO tune value */
+};
+
+static void IRAM_ATTR esp_now_scan_peers_done(void)
 {
     mutex_lock(&_esp_now_dev.dev_lock);
 
@@ -154,9 +142,8 @@ static void IRAM_ATTR esp_now_scan_peers_done (void)
         /* iterate over APs records */
         for (uint16_t i = 0; i < ap_num; i++) {
 
-            /* check whether the AP is an ESP_NOW node which is not already a peer */
-            if (strncmp((char*)aps[i].ssid, ESP_NOW_AP_PREFIX, ESP_NOW_AP_PREFIX_LEN) == 0 &&
-                !esp_now_is_peer_exist(aps[i].bssid)) {
+            /* check whether the AP is an ESP_NOW node */
+            if (strncmp((char*)aps[i].ssid, ESP_NOW_AP_PREFIX, ESP_NOW_AP_PREFIX_LEN) == 0) {
                 /* add the AP as peer */
                 _esp_now_add_peer(aps[i].bssid, aps[i].primary, esp_now_params.key);
             }
@@ -164,63 +151,38 @@ static void IRAM_ATTR esp_now_scan_peers_done (void)
         critical_exit_var(state);
     }
 
-    #if ENABLE_DEBUG
+#if ENABLE_DEBUG
     esp_now_peer_num_t peer_num;
-    esp_now_get_peer_num (&peer_num);
+    esp_now_get_peer_num(&peer_num);
     DEBUG("associated peers total=%d, encrypted=%d\n",
           peer_num.total_num, peer_num.encrypt_num);
-    #endif
+#endif
 
     _esp_now_scan_peers_done = true;
 
     /* set the time for next scan */
-    xtimer_set (&_esp_now_scan_peers_timer, esp_now_params.scan_period);
+    xtimer_set(&_esp_now_scan_peers_timer, esp_now_params.scan_period);
 
     mutex_unlock(&_esp_now_dev.dev_lock);
 }
 
-static void esp_now_scan_peers_start (void)
+static void esp_now_scan_peers_start(void)
 {
     DEBUG("%s\n", __func__);
-
-    wifi_scan_config_t scan_cfg = {
-        .ssid = NULL,
-        .bssid = NULL,
-        .channel = esp_now_params.channel,
-        .show_hidden = true,
-        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
-        .scan_time.active.min = 0,
-        .scan_time.active.max = 120 /* TODO tune value */
-    };
 
     esp_wifi_scan_start(&scan_cfg, false);
 }
 
-#define ESP_NOW_EVENT_SCAN_PEERS 1
-
-static kernel_pid_t esp_now_event_handler_pid;
-char esp_now_event_handler_stack [THREAD_STACKSIZE_DEFAULT];
-
-static void *esp_now_event_handler (void *arg)
-{
-    msg_t event;
-    while (1) {
-        msg_receive(&event);
-        switch (event.content.value) {
-            case ESP_NOW_EVENT_SCAN_PEERS:
-                esp_now_scan_peers_start ();
-                break;
-        }
-    }
-    return NULL;
-}
-
-static void IRAM_ATTR esp_now_scan_peers_timer_cb (void* arg)
+static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)
 {
     DEBUG("%s\n", __func__);
 
-    static msg_t event = { .content = { .value = ESP_NOW_EVENT_SCAN_PEERS } };
-    msg_send(&event, esp_now_event_handler_pid);
+    esp_now_netdev_t* dev = (esp_now_netdev_t*)arg;
+
+    if (dev->netdev.event_callback) {
+        dev->scan_event = true;
+        dev->netdev.event_callback((netdev_t*)dev, NETDEV_EVENT_ISR);
+    }
 }
 
 #else
@@ -229,44 +191,54 @@ static const uint8_t _esp_now_mac[6] = { 0x82, 0x73, 0x79, 0x84, 0x79, 0x83 }; /
 
 #endif /* ESP_NOW_UNICAST */
 
-static IRAM_ATTR void esp_now_recv_cb (const uint8_t *mac, const uint8_t *data, int len)
+static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, int len)
 {
-    #if ESP_NOW_UNICAST
+#if ESP_NOW_UNICAST
     if (!_esp_now_scan_peers_done) {
         /* if peers are not scanned, we cannot receive anything */
         return;
     }
-    #endif
+#endif
 
-    if (_esp_now_dev.rx_len) {
-        /* there is already a packet in receive buffer, we drop the new one */
+    mutex_lock(&_esp_now_dev.rx_lock);
+    critical_enter();
+
+    /*
+     * The ring buffer uses a single byte for the pkt length, followed by the mac address,
+     * followed by the actual packet data. The MTU for ESP-NOW is 250 bytes, so len will never
+     * exceed the limits of a byte as the mac address length is not included.
+     */
+    if ((int)ringbuffer_get_free(&_esp_now_dev.rx_buf) < 1 + ESP_NOW_ADDR_LEN + len) {
+        critical_exit();
+        mutex_unlock(&_esp_now_dev.rx_lock);
+        DEBUG("%s: buffer full, dropping incoming packet of %d bytes\n", __func__, len);
         return;
     }
 
-    critical_enter();
+#if 0 /* don't printf anything in ISR */
+    printf("%s\n", __func__);
+    printf("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
+           __func__, len,
+           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    od_hex_dump(data, len, OD_WIDTH_DEFAULT);
+#endif
 
-    #if 0 /* don't printf anything in ISR */
-    printf ("%s\n", __func__);
-    printf ("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
-            __func__, len,
-            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    esp_hexdump (data, len, 'b', 16);
-    #endif
-
-    _esp_now_dev.rx_len = len;
-    memcpy(_esp_now_dev.rx_buf, data, len);
-    memcpy(_esp_now_dev.rx_mac, mac, ESP_NOW_ADDR_LEN);
+    ringbuffer_add_one(&_esp_now_dev.rx_buf, len);
+    ringbuffer_add(&_esp_now_dev.rx_buf, (char*)mac, ESP_NOW_ADDR_LEN);
+    ringbuffer_add(&_esp_now_dev.rx_buf, (char*)data, len);
 
     if (_esp_now_dev.netdev.event_callback) {
+        _esp_now_dev.recv_event = true;
         _esp_now_dev.netdev.event_callback((netdev_t*)&_esp_now_dev, NETDEV_EVENT_ISR);
     }
 
     critical_exit();
+    mutex_unlock(&_esp_now_dev.rx_lock);
 }
 
-static int _esp_now_sending = 0;
+static volatile int _esp_now_sending = 0;
 
-static void IRAM_ATTR esp_now_send_cb (const uint8_t *mac, esp_now_send_status_t status)
+static void IRAM_ATTR esp_now_send_cb(const uint8_t *mac, esp_now_send_status_t status)
 {
     DEBUG("%s: sent to %02x:%02x:%02x:%02x:%02x:%02x with status %d\n",
           __func__,
@@ -288,7 +260,9 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
             break;
         case SYSTEM_EVENT_SCAN_DONE:
             DEBUG("%s WiFi scan done\n", __func__);
+#if ESP_NOW_UNICAST
             esp_now_scan_peers_done();
+#endif
             break;
         default:
             break;
@@ -321,12 +295,19 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 #define CONFIG_WIFI_AP_BEACON       100
 #define CONFIG_WIFI_AP_MAX_CONN     4
 
-extern esp_err_t esp_system_event_add_handler (system_event_cb_t handler,
-                                               void *arg);
+extern esp_err_t esp_system_event_add_handler(system_event_cb_t handler,
+                                              void *arg);
 
-static void esp_now_setup (esp_now_netdev_t* dev)
+esp_now_netdev_t *netdev_esp_now_setup(void)
 {
+    esp_now_netdev_t* dev = &_esp_now_dev;
+
     DEBUG("%s: %p\n", __func__, dev);
+
+    if (dev->netdev.driver) {
+        DEBUG("%s: early returning previously initialized device\n", __func__);
+        return dev;
+    }
 
     /*
      * Init the WiFi driver. TODO It is not only required before ESP_NOW is
@@ -336,29 +317,31 @@ static void esp_now_setup (esp_now_netdev_t* dev)
     extern portMUX_TYPE g_intr_lock_mux;
     mutex_init(&g_intr_lock_mux);
 
-    esp_system_event_add_handler (_esp_system_event_handler, NULL);
+    ringbuffer_init(&dev->rx_buf, (char*)dev->rx_mem, sizeof(dev->rx_mem));
+
+    esp_system_event_add_handler(_esp_system_event_handler, NULL);
 
     esp_err_t result;
-    #if CONFIG_ESP32_WIFI_NVS_ENABLED
+#if CONFIG_ESP32_WIFI_NVS_ENABLED
     result = nvs_flash_init();
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "nfs_flash_init failed with return value %d\n", result);
-        return;
+        return NULL;
     }
-    #endif
+#endif
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     result = esp_wifi_init(&cfg);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_init failed with return value %d\n", result);
-        return;
+        return NULL;
     }
 
-    #ifdef CONFIG_WIFI_COUNTRY
+#ifdef CONFIG_WIFI_COUNTRY
     /* TODO */
-    #endif
+#endif
 
     /* we use predefined station configuration */
     wifi_config_t wifi_config_sta = {
@@ -398,7 +381,7 @@ static void esp_now_setup (esp_now_netdev_t* dev)
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_set_mode failed with return value %d\n",
                       result);
-        return;
+        return NULL;
     }
 
     /* set the Station and SoftAP configuration */
@@ -406,14 +389,14 @@ static void esp_now_setup (esp_now_netdev_t* dev)
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now", "esp_wifi_set_config station failed with "
                       "return value %d\n", result);
-        return;
+        return NULL;
     }
     result = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config_ap);
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_set_mode softap failed with return value %d\n",
                       result);
-        return;
+        return NULL;
     }
 
     /* start the WiFi driver */
@@ -421,240 +404,146 @@ static void esp_now_setup (esp_now_netdev_t* dev)
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now",
                       "esp_wifi_start failed with return value %d\n", result);
-        return;
+        return NULL;
     }
 
-    #if ESP_NOW_UNICAST==0 /* TODO */
+#if !ESP_NOW_UNICAST
     /* all ESP-NOW nodes get the shared mac address on their station interface */
-    wifi_set_macaddr(STATION_IF, (uint8_t*)_esp_now_mac);
-    #endif
+    esp_wifi_set_mac(ESP_IF_WIFI_STA, (uint8_t*)_esp_now_mac);
+#endif
 
     /* set the netdev driver */
     dev->netdev.driver = &_esp_now_driver;
 
     /* initialize netdev data structure */
-    dev->peers_all = 0;
-    dev->peers_enc = 0;
+    dev->recv_event = false;
+    dev->scan_event = false;
+
     mutex_init(&dev->dev_lock);
+    mutex_init(&dev->rx_lock);
 
     /* initialize ESP-NOW and register callback functions */
     result = esp_now_init();
     if (result != ESP_OK) {
         LOG_TAG_ERROR("esp_now", "esp_now_init failed with return value %d\n",
                       result);
-        return;
+        return NULL;
     }
-    esp_now_register_send_cb (esp_now_send_cb);
-    esp_now_register_recv_cb (esp_now_recv_cb);
+    esp_now_register_send_cb(esp_now_send_cb);
+    esp_now_register_recv_cb(esp_now_recv_cb);
 
-    #if ESP_NOW_UNICAST
-    /* create the ESP_NOW event handler thread */
-    esp_now_event_handler_pid = thread_create(esp_now_event_handler_stack,
-                                             sizeof(esp_now_event_handler_stack),
-                                             ESP_NOW_PRIO + 1,
-                                             THREAD_CREATE_WOUT_YIELD |
-                                             THREAD_CREATE_STACKTEST,
-                                             esp_now_event_handler,
-                                             NULL, "net-esp-now-event");
-
+#if ESP_NOW_UNICAST
     /* timer for peer scan initialization */
     _esp_now_scan_peers_done = false;
     _esp_now_scan_peers_timer.callback = &esp_now_scan_peers_timer_cb;
     _esp_now_scan_peers_timer.arg = dev;
 
     /* execute the first scan */
-    esp_now_scan_peers_done();
+    esp_now_scan_peers_start();
 
-    #else /* ESP_NOW_UNICAST */
-    #if 0
-    int res = esp_now_add_peer((uint8_t*)_esp_now_mac, ESP_NOW_ROLE_COMBO,
-                               esp_now_params.channel, NULL, 0);
-    DEBUG("%s: multicast node added %d\n", __func__, res);
-    #endif
-    #endif /* ESP_NOW_UNICAST */
+#else /* ESP_NOW_UNICAST */
+    bool res = _esp_now_add_peer(_esp_now_mac, esp_now_params.channel,
+                                               esp_now_params.key);
+    DEBUG("%s: multicast node add %s\n", __func__, res ? "success" : "error");
+#endif /* ESP_NOW_UNICAST */
+
+    return dev;
 }
 
 static int _init(netdev_t *netdev)
 {
     DEBUG("%s: %p\n", __func__, netdev);
 
-    #ifdef MODULE_NETSTATS_L2
+#ifdef MODULE_NETSTATS_L2
     memset(&netdev->stats, 0x00, sizeof(netstats_t));
-    #endif
+#endif
 
     return 0;
 }
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    #if ESP_NOW_UNICAST
+#if ESP_NOW_UNICAST
     if (!_esp_now_scan_peers_done) {
         return -ENODEV;
     }
-    #endif
+#endif
 
     DEBUG("%s: %p %p\n", __func__, netdev, iolist);
 
-    CHECK_PARAM_RET (netdev != NULL, -ENODEV);
-    CHECK_PARAM_RET (iolist != NULL, -EINVAL);
+    CHECK_PARAM_RET(netdev != NULL, -ENODEV);
+    CHECK_PARAM_RET(iolist != NULL && iolist->iol_len == ESP_NOW_ADDR_LEN, -EINVAL);
+    CHECK_PARAM_RET(iolist->iol_next != NULL, -EINVAL);
 
-    esp_now_netdev_t* dev = (esp_now_netdev_t*)netdev;
+    esp_now_netdev_t *dev = (esp_now_netdev_t*)netdev;
 
     mutex_lock(&dev->dev_lock);
-    dev->tx_len = 0;
 
-    /* load packet data into TX buffer */
-    for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
-        if (dev->tx_len + iol->iol_len > ESP_NOW_MAX_SIZE) {
-            mutex_unlock(&dev->dev_lock);
-            return -EOVERFLOW;
-        }
-        memcpy (dev->tx_buf + dev->tx_len, iol->iol_base, iol->iol_len);
-        dev->tx_len += iol->iol_len;
-    }
+#if ESP_NOW_UNICAST
+    uint8_t* _esp_now_dst = NULL;
 
-    #if ENABLE_DEBUG
-    printf ("%s: send %d byte\n", __func__, dev->tx_len);
-    /* esp_hexdump (dev->tx_buf, dev->tx_len, 'b', 16); */
-    #endif
-
-    _esp_now_sending = 1;
-
-    uint8_t* _esp_now_dst = 0;
-
-    #if ESP_NOW_UNICAST
-    ipv6_hdr_t* ipv6_hdr = (ipv6_hdr_t*)dev->tx_buf;
-    uint8_t  _esp_now_dst_from_iid[6];
-
-    if (ipv6_hdr->dst.u8[0] == 0xff) {
-        /* packets to multicast prefix ff::/8 are sent to all peers */
-        DEBUG("multicast to all peers\n");
-        _esp_now_dst = 0;
-        _esp_now_sending = dev->peers_all;
-
-        #ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_mcast_count++;
-        #endif
-    }
-
-    else if ((byteorder_ntohs(ipv6_hdr->dst.u16[0]) & 0xffc0) == 0xfe80) {
-        /* for link local addresses fe80::/10, the MAC address is derived from dst address */
-        _get_mac_from_iid(&ipv6_hdr->dst.u8[8], _esp_now_dst_from_iid);
-        DEBUG("link local to %02x:%02x:%02x:%02x:%02x:%02x\n",
-              _esp_now_dst_from_iid[0], _esp_now_dst_from_iid[1],
-              _esp_now_dst_from_iid[2], _esp_now_dst_from_iid[3],
-              _esp_now_dst_from_iid[4], _esp_now_dst_from_iid[5]);
-        _esp_now_dst = _esp_now_dst_from_iid;
-        _esp_now_sending = 1;
-    }
-
-    else {
-        #ifdef MODULE_GNRC_IPV6_NIB
-        /* for other addresses, try to find an entry in NIB cache */
-        gnrc_ipv6_nib_nc_t nce;
-        int ret = gnrc_ipv6_nib_get_next_hop_l2addr (&ipv6_hdr->dst, dev->netif,
-                                                     NULL, &nce);
-        if (ret == 0) {
-            /* entry was found in NIB, use MAC adress from the NIB cache entry */
-            DEBUG("global, next hop to neighbor %02x:%02x:%02x:%02x:%02x:%02x\n",
-                  nce.l2addr[0], nce.l2addr[1], nce.l2addr[2],
-                  nce.l2addr[3], nce.l2addr[4], nce.l2addr[5]);
-            _esp_now_dst = nce.l2addr;
-            _esp_now_sending = 1;
-        }
-        else {
-        #endif
-            /* entry was not found in NIB, send to all peers */
-            DEBUG("global, no neibhbor found, multicast to all peers\n");
-            _esp_now_dst = 0;
-            _esp_now_sending = dev->peers_all;
-
-            #ifdef MODULE_NETSTATS_L2
-            netdev->stats.tx_mcast_count++;
-            #endif
-
-        #ifdef MODULE_GNRC_IPV6_NIB
-        }
-        #endif
-    }
-
-    #else /* ESP_NOW_UNICAST */
-
-    ipv6_hdr_t* ipv6_hdr = (ipv6_hdr_t*)dev->tx_buf;
-    uint8_t  _esp_now_dst_from_iid[6];
-
-    _esp_now_dst = (uint8_t*)_esp_now_mac;
-    _esp_now_sending = 1;
-
-    if (ipv6_hdr->dst.u8[0] == 0xff) {
-        /* packets to multicast prefix ff::/8 are sent to all peers */
-        DEBUG("multicast to all peers\n");
-
-        #ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_mcast_count++;
-        #endif
-    }
-
-    else if ((byteorder_ntohs(ipv6_hdr->dst.u16[0]) & 0xffc0) == 0xfe80) {
-        /* for link local addresses fe80::/10, the MAC address is derived from dst address */
-        _get_mac_from_iid(&ipv6_hdr->dst.u8[8], _esp_now_dst_from_iid);
-        DEBUG("link local to %02x:%02x:%02x:%02x:%02x:%02x\n",
-              _esp_now_dst_from_iid[0], _esp_now_dst_from_iid[1],
-              _esp_now_dst_from_iid[2], _esp_now_dst_from_iid[3],
-              _esp_now_dst_from_iid[4], _esp_now_dst_from_iid[5]);
-        if (esp_now_is_peer_exist(_esp_now_dst_from_iid) > 0) {
-            _esp_now_dst = _esp_now_dst_from_iid;
+    for (uint8_t i = 0; i < ESP_NOW_ADDR_LEN; i++) {
+        if (((uint8_t*)iolist->iol_base)[i] != 0xff) {
+            _esp_now_dst = iolist->iol_base;
+            break;
         }
     }
+#else
+   const uint8_t* _esp_now_dst = _esp_now_mac;
+#endif
+    iolist = iolist->iol_next;
 
-    else
-    {
-        /* for other addresses, try to find an entry in NIB cache */
-          gnrc_ipv6_nib_nc_t nce;
-        int ret = gnrc_ipv6_nib_get_next_hop_l2addr (&ipv6_hdr->dst, dev->netif,
-                                                     NULL, &nce);
-        if (ret == 0 && esp_now_is_peer_exist(nce.l2addr) > 0) {
-            /* entry was found in NIB, use MAC adress from the NIB cache entry */
-            DEBUG("global, next hop to neighbor %02x:%02x:%02x:%02x:%02x:%02x\n",
-                  nce.l2addr[0], nce.l2addr[1], nce.l2addr[2],
-                  nce.l2addr[3], nce.l2addr[4], nce.l2addr[5]);
-            _esp_now_dst = nce.l2addr;
-        }
-        else {
-            /* entry was not found in NIB, send to all peers */
-            DEBUG("global, no neibhbor found, multicast to all peers\n");
+    uint8_t *data_pos = dev->tx_mem;
+    uint8_t data_len = 0;
 
-            #ifdef MODULE_NETSTATS_L2
-            netdev->stats.tx_mcast_count++;
-            #endif
+    while (iolist) {
+        if (((int)data_len + iolist->iol_len) > ESP_NOW_MAX_SIZE_RAW) {
+            DEBUG("%s: payload length exceeds maximum(%u>%u)\n", __func__,
+                  data_len + iolist->iol_len, ESP_NOW_MAX_SIZE_RAW);
+            return -EBADMSG;
         }
+
+        memcpy(data_pos, iolist->iol_base, iolist->iol_len);
+        data_pos += iolist->iol_len;
+        data_len += iolist->iol_len;
+
+        iolist = iolist->iol_next;
     }
 
-    #endif /* ESP_NOW_UNICAST */
+    DEBUG("%s: send %u byte\n", __func__, (unsigned)data_len);
+#if defined(MODULE_OD) && ENABLE_DEBUG
+    od_hex_dump(dev->tx_mem, data_len, OD_WIDTH_DEFAULT);
+#endif
+
     if (_esp_now_dst) {
         DEBUG("%s: send to esp_now addr %02x:%02x:%02x:%02x:%02x:%02x\n", __func__,
               _esp_now_dst[0], _esp_now_dst[1], _esp_now_dst[2],
               _esp_now_dst[3], _esp_now_dst[4], _esp_now_dst[5]);
+    } else {
+        DEBUG("%s: send esp_now broadcast\n", __func__);
     }
 
-    /* send the the packet to the peer(s) mac address */
-    if (esp_now_send (_esp_now_dst, dev->tx_buf, dev->tx_len) == 0) {
+    _esp_now_sending = 1;
+
+    /* send the packet to the peer(s) mac address */
+    if (esp_now_send(_esp_now_dst, dev->tx_mem, data_len) == ESP_OK) {
         while (_esp_now_sending > 0) {
             thread_yield_higher();
         }
 
-        #ifdef MODULE_NETSTATS_L2
-        netdev->stats.tx_bytes += dev->tx_len;
+#ifdef MODULE_NETSTATS_L2
+        netdev->stats.tx_bytes += data_len;
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-        #endif
+#endif
 
         mutex_unlock(&dev->dev_lock);
-        return dev->tx_len;
-    }
-    else {
-        #ifdef MODULE_NETSTATS_L2
+        return data_len;
+    } else {
+        _esp_now_sending = 0;
+
+#ifdef MODULE_NETSTATS_L2
         netdev->stats.tx_failed++;
-        #endif
+#endif
     }
 
     mutex_unlock(&dev->dev_lock);
@@ -665,65 +554,84 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     DEBUG("%s: %p %p %u %p\n", __func__, netdev, buf, len, info);
 
-    CHECK_PARAM_RET (netdev != NULL, -ENODEV);
+    CHECK_PARAM_RET(netdev != NULL, -ENODEV);
 
     esp_now_netdev_t* dev = (esp_now_netdev_t*)netdev;
 
-    mutex_lock(&dev->dev_lock);
+    mutex_lock(&dev->rx_lock);
 
-    uint8_t size = dev->rx_len;
+    uint16_t size = ringbuffer_empty(&dev->rx_buf)
+        ? 0
+        : (ringbuffer_peek_one(&dev->rx_buf) + ESP_NOW_ADDR_LEN);
+
+    if (size && dev->rx_buf.avail < size) {
+        /* this should never happen unless this very function messes up */
+        mutex_unlock(&dev->rx_lock);
+        return -EIO;
+    }
 
     if (!buf && !len) {
         /* return the size without dropping received data */
-        mutex_unlock(&dev->dev_lock);
+        mutex_unlock(&dev->rx_lock);
         return size;
     }
 
     if (!buf && len) {
         /* return the size and drop received data */
-        mutex_unlock(&dev->dev_lock);
-        dev->rx_len = 0;
+        if (size) {
+            ringbuffer_remove(&dev->rx_buf, 1 + size);
+        }
+        mutex_unlock(&dev->rx_lock);
         return size;
     }
 
-    if (buf && len && dev->rx_len) {
-        if (dev->rx_len > len) {
+    if (buf && len && !size) {
+        mutex_unlock(&dev->rx_lock);
+        return 0;
+    }
+
+    if (buf && len && size) {
+        if (size > len) {
             DEBUG("[esp_now] No space in receive buffers\n");
-            mutex_unlock(&dev->dev_lock);
+            mutex_unlock(&dev->rx_lock);
             return -ENOBUFS;
         }
 
-        #if ENABLE_DEBUG
-        printf ("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
-                __func__, dev->rx_len,
-                dev->rx_mac[0], dev->rx_mac[1], dev->rx_mac[2],
-                dev->rx_mac[3], dev->rx_mac[4], dev->rx_mac[5]);
-        /* esp_hexdump (dev->rx_buf, dev->rx_len, 'b', 16); */
-        #endif
+        /* remove already peeked size byte */
+        ringbuffer_remove(&dev->rx_buf, 1);
+        ringbuffer_get(&dev->rx_buf, buf, size);
 
-        if (esp_now_is_peer_exist(dev->rx_mac) <= 0) {
-            _esp_now_add_peer(dev->rx_mac, esp_now_params.channel, esp_now_params.key);
+        uint8_t *mac = buf;
+
+        DEBUG("%s: received %d byte from %02x:%02x:%02x:%02x:%02x:%02x\n",
+              __func__, size - ESP_NOW_ADDR_LEN,
+              mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+#if defined(MODULE_OD) && ENABLE_DEBUG
+        od_hex_dump(buf + ESP_NOW_ADDR_LEN, size - ESP_NOW_ADDR_LEN, OD_WIDTH_DEFAULT);
+#endif
+
+#if ESP_NOW_UNICAST
+        if (esp_now_is_peer_exist(mac) <= 0) {
+            _esp_now_add_peer(mac, esp_now_params.channel, esp_now_params.key);
         }
+#endif
 
-        memcpy(buf, dev->rx_buf, dev->rx_len);
-        dev->rx_len = 0;
-
-        #ifdef MODULE_NETSTATS_L2
+#ifdef MODULE_NETSTATS_L2
         netdev->stats.rx_count++;
         netdev->stats.rx_bytes += size;
-        #endif
+#endif
 
-        mutex_unlock(&dev->dev_lock);
+        mutex_unlock(&dev->rx_lock);
         return size;
     }
 
-    mutex_unlock(&dev->dev_lock);
+    mutex_unlock(&dev->rx_lock);
     return -EINVAL;
 }
 
 static inline int _get_iid(esp_now_netdev_t *dev, eui64_t *value, size_t max_len)
 {
-    CHECK_PARAM_RET (max_len >= sizeof(eui64_t), -EOVERFLOW);
+    CHECK_PARAM_RET(max_len >= sizeof(eui64_t), -EOVERFLOW);
 
     /* interface id according to */
     /* https://tools.ietf.org/html/rfc4291#section-2.5.1 */
@@ -743,43 +651,43 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
     DEBUG("%s: %s %p %p %u\n", __func__, netopt2str(opt), netdev, val, max_len);
 
-    CHECK_PARAM_RET (netdev != NULL, -ENODEV);
-    CHECK_PARAM_RET (val != NULL, -EINVAL);
+    CHECK_PARAM_RET(netdev != NULL, -ENODEV);
+    CHECK_PARAM_RET(val != NULL, -EINVAL);
 
-    esp_now_netdev_t *dev = (esp_now_netdev_t *)netdev;
+    esp_now_netdev_t *dev = (esp_now_netdev_t*)netdev;
     int res = -ENOTSUP;
 
     switch (opt) {
 
         case NETOPT_DEVICE_TYPE:
-            CHECK_PARAM_RET (max_len >= sizeof(uint16_t), -EOVERFLOW);
+            CHECK_PARAM_RET(max_len >= sizeof(uint16_t), -EOVERFLOW);
             *((uint16_t *)val) = NETDEV_TYPE_ESP_NOW;
             res = sizeof(uint16_t);
             break;
 
-        #ifdef MODULE_GNRC
+#ifdef MODULE_GNRC
         case NETOPT_PROTO:
             CHECK_PARAM_RET(max_len == sizeof(gnrc_nettype_t), -EOVERFLOW);
             *((gnrc_nettype_t *)val) = dev->proto;
             res = sizeof(gnrc_nettype_t);
             break;
-        #endif
+#endif
 
         case NETOPT_MAX_PACKET_SIZE:
-            CHECK_PARAM_RET (max_len >= sizeof(uint16_t), -EOVERFLOW);
+            CHECK_PARAM_RET(max_len >= sizeof(uint16_t), -EOVERFLOW);
             *((uint16_t *)val) = ESP_NOW_MAX_SIZE;
             res = sizeof(uint16_t);
             break;
 
         case NETOPT_ADDR_LEN:
         case NETOPT_SRC_LEN:
-            CHECK_PARAM_RET (max_len >= sizeof(uint16_t), -EOVERFLOW);
+            CHECK_PARAM_RET(max_len >= sizeof(uint16_t), -EOVERFLOW);
             *((uint16_t *)val) = sizeof(dev->addr);
             res = sizeof(uint16_t);
             break;
 
         case NETOPT_ADDRESS:
-            CHECK_PARAM_RET (max_len >= sizeof(dev->addr), -EOVERFLOW);
+            CHECK_PARAM_RET(max_len >= sizeof(dev->addr), -EOVERFLOW);
             memcpy(val, dev->addr, sizeof(dev->addr));
             res = sizeof(dev->addr);
             break;
@@ -788,13 +696,13 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = _get_iid(dev, val, max_len);
             break;
 
-        #ifdef MODULE_NETSTATS_L2
+#ifdef MODULE_NETSTATS_L2
         case NETOPT_STATS:
-            CHECK_PARAM_RET (max_len == sizeof(uintptr_t), -EOVERFLOW);
+            CHECK_PARAM_RET(max_len == sizeof(uintptr_t), -EOVERFLOW);
             *((netstats_t **)val) = &netdev->stats;
             res = sizeof(uintptr_t);
             break;
-        #endif
+#endif
 
         default:
             DEBUG("%s: %s not supported\n", __func__, netopt2str(opt));
@@ -807,21 +715,21 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t max_len)
 {
     DEBUG("%s: %s %p %p %u\n", __func__, netopt2str(opt), netdev, val, max_len);
 
-    CHECK_PARAM_RET (netdev != NULL, -ENODEV);
-    CHECK_PARAM_RET (val != NULL, -EINVAL);
+    CHECK_PARAM_RET(netdev != NULL, -ENODEV);
+    CHECK_PARAM_RET(val != NULL, -EINVAL);
 
     esp_now_netdev_t *dev = (esp_now_netdev_t *) netdev;
     int res = -ENOTSUP;
 
     switch (opt) {
 
-        #ifdef MODULE_GNRC
+#ifdef MODULE_GNRC
         case NETOPT_PROTO:
             CHECK_PARAM_RET(max_len == sizeof(gnrc_nettype_t), -EOVERFLOW);
             dev->proto = *((gnrc_nettype_t *)val);
             res = sizeof(gnrc_nettype_t);
             break;
-        #endif
+#endif
 
         case NETOPT_ADDRESS:
             CHECK_PARAM_RET(max_len >= sizeof(dev->addr), -EOVERFLOW);
@@ -840,10 +748,18 @@ static void _isr(netdev_t *netdev)
 {
     DEBUG("%s: %p\n", __func__, netdev);
 
-    CHECK_PARAM (netdev != NULL);
+    CHECK_PARAM(netdev != NULL);
 
-    esp_now_netdev_t *dev = (esp_now_netdev_t *) netdev;
-    dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+    esp_now_netdev_t *dev = (esp_now_netdev_t*)netdev;
+
+    if (dev->recv_event) {
+        dev->recv_event = false;
+        dev->netdev.event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+    }
+    else if (dev->scan_event) {
+        dev->scan_event = false;
+        esp_now_scan_peers_start();
+    }
     return;
 }
 
@@ -857,16 +773,4 @@ static const netdev_driver_t _esp_now_driver =
     .set = _set,
 };
 
-void auto_init_esp_now (void)
-{
-    LOG_TAG_INFO("esp_now", "initializing ESP-NOW device\n");
-
-    esp_now_setup(&_esp_now_dev);
-    _esp_now_dev.netif = gnrc_netif_raw_create(_esp_now_stack,
-                                              ESP_NOW_STACKSIZE, ESP_NOW_PRIO,
-                                              "net-esp-now",
-                                              (netdev_t *)&_esp_now_dev);
-}
-
-#endif /* MODULE_ESP_NOW */
 /** @} */
