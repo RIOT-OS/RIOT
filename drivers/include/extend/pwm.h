@@ -49,13 +49,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Number of PWM extension devices
- */
-#ifndef PWM_EXT_NUMOF
-#define PWM_EXT_NUMOF       (sizeof(pwm_ext_list) / sizeof(pwm_ext_list[0]))
-#endif
-
-/**
  * @brief   Callback typedef for pwm_init
  *
  * @see #pwm_init
