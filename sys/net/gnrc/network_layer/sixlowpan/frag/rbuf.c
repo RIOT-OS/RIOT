@@ -82,6 +82,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
 
     if (entry == NULL) {
         DEBUG("6lo rbuf: reassembly buffer full.\n");
+        gnrc_pktbuf_release(pkt);
         return;
     }
 
