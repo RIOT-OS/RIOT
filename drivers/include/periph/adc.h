@@ -119,14 +119,14 @@ typedef enum {
 #endif
 
 /**
- * @brief   Low-level versions of the ADC functions
+ * @brief   Low-level versions of the ADC functions provided by the CPU
  *
  * These are for cpu adc.c implementation and should not be called directly.
  * @{
  */
-int adc_init_ll(adc_t line);
-int adc_sample_ll(adc_t line, adc_res_t res);
-unsigned int adc_channels_ll(void);
+int adc_init_cpu(adc_t line);
+int adc_sample_cpu(adc_t line, adc_res_t res);
+unsigned int adc_channels_cpu(void);
 /** @} */
 
 #if MODULE_EXTEND_ADC || DOXYGEN
@@ -161,7 +161,7 @@ static inline int adc_init(adc_t line)
     }
 #endif
 #ifdef MODULE_PERIPH_ADC
-    return adc_init_ll(line);
+    return adc_init_cpu(line);
 #else
     return -1;
 #endif
@@ -189,7 +189,7 @@ static inline int adc_sample(adc_t line, adc_res_t res)
     }
 #endif
 #ifdef MODULE_PERIPH_ADC
-    return adc_sample_ll(line, res);
+    return adc_sample_cpu(line, res);
 #else
     return -1;
 #endif
