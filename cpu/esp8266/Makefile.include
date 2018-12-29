@@ -49,7 +49,6 @@ export TARGET_ARCH ?= xtensa-lx106-elf
 
 # ESP8266 pseudomodules
 PSEUDOMODULES += esp_gdb
-PSEUDOMODULES += esp_now
 PSEUDOMODULES += esp_sdk
 PSEUDOMODULES += esp_sdk_int_handling
 PSEUDOMODULES += esp_sw_timer
