@@ -263,46 +263,36 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     if (fragment_msg->offset == 0) {
         /* increment tag for successive, fragmented datagrams */
         _tag++;
-        if ((res = _send_1st_fragment(iface, fragment_msg->pkt, payload_len, fragment_msg->datagram_size)) == 0) {
+        if ((res = _send_1st_fragment(iface, fragment_msg->pkt, payload_len,
+                                      fragment_msg->datagram_size)) == 0) {
             /* error sending first fragment */
             DEBUG("6lo frag: error sending 1st fragment\n");
-            gnrc_pktbuf_release(fragment_msg->pkt);
-            fragment_msg->pkt = NULL;
-            return;
+            goto error;
         }
-        fragment_msg->offset += res;
-
-        /* send message to self*/
-        msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
-        msg.content.ptr = (void *)fragment_msg;
-        msg_send_to_self(&msg);
-        thread_yield();
+    }
+    /* (offset + (datagram_size - payload_len) < datagram_size) simplified */
+    else if (fragment_msg->offset < payload_len) {
+        if ((res = _send_nth_fragment(iface, fragment_msg->pkt, payload_len,
+                                      fragment_msg->datagram_size,
+                                      fragment_msg->offset)) == 0) {
+            /* error sending subsequent fragment */
+            DEBUG("6lo frag: error sending subsequent fragment"
+                  "(offset = %u)\n", fragment_msg->offset);
+            goto error;
+        }
     }
     else {
-        /* (offset + (datagram_size - payload_len) < datagram_size) simplified */
-        if (fragment_msg->offset < payload_len) {
-            if ((res = _send_nth_fragment(iface, fragment_msg->pkt, payload_len, fragment_msg->datagram_size,
-                                          fragment_msg->offset)) == 0) {
-                /* error sending subsequent fragment */
-                DEBUG("6lo frag: error sending subsequent fragment (offset = %" PRIu16
-                      ")\n", fragment_msg->offset);
-                gnrc_pktbuf_release(fragment_msg->pkt);
-                fragment_msg->pkt = NULL;
-                return;
-                }
-            fragment_msg->offset += res;
-
-            /* send message to self*/
-            msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND;
-            msg.content.ptr = (void *)fragment_msg;
-            msg_send_to_self(&msg);
-            thread_yield();
-        }
-        else {
-            gnrc_pktbuf_release(fragment_msg->pkt);
-            fragment_msg->pkt = NULL;
-        }
+        goto error;
     }
+    fragment_msg->offset += res;
+    msg.type = GNRC_SIXLOWPAN_MSG_FRAG_SND,
+    msg.content.ptr = fragment_msg;
+    msg_send_to_self(&msg);
+    thread_yield();
+    return;
+error:
+    gnrc_pktbuf_release(fragment_msg->pkt);
+    fragment_msg->pkt = NULL;
 }
 
 void gnrc_sixlowpan_frag_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
