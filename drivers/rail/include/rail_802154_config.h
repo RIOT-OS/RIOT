@@ -20,6 +20,8 @@
 #define RAIL_802154_CONFIG_H
 
 
+#include "rail_radio.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,11 +32,26 @@ extern "C" {
  * @copyright Copyright 2016 Silicon Laboratories, Inc. http://www.silabs.com
  *
  * Adapted form mbed
- * https://github.com/ARMmbed/mbed-os/blob/master/targets/TARGET_Silicon_Labs/TARGET_SL_RAIL/efr32-rf-driver/rail/TOOLCHAIN_GCC_ARM/TARGET_EFR32MG1/ieee802154_subg_efr32xg1_configurator_out.c
+ * https://github.com/ARMmbed/mbed-os/blob/master/targets/TARGET_Silicon_Labs/TARGET_SL_RAIL/efr32-rf-driver/rail/TARGET_EFR32_1/ieee802154_subg_efr32xg1_configurator_out.c
  *
  * @{
  */
-#define RAIL_IEEE802154_CONFIG_868MHZ { \
+#if (RAIL_RADIO_BAND == 868) || (RAIL_RADIO_BAND == 915)
+
+#if defined(MODULE_CPU_EFR32MG1P)
+#ifndef RAIL_IEEE802154_CONFIG_868MHZ
+#define RAIL_IEEE802154_CONFIG_868MHZ RAIL_IEEE802154_CONFIG_868MHZ_EFR32MG1P
+#endif
+
+#ifndef RAIL_IEEE802154_CONFIG_915MHZ
+#define RAIL_IEEE802154_CONFIG_915MHZ RAIL_IEEE802154_CONFIG_915MHZ_EFR32MG1P
+#endif
+
+#else
+#error "rail_802154_config.h: No radio config for subghz IEEE 802.15.4"
+#endif
+
+#define RAIL_IEEE802154_CONFIG_868MHZ_EFR32MG1P { \
         0x01010FF4UL, 0x00000000UL, \
         0x01010FF8UL, 0x0003C000UL, \
         0x01010FFCUL, 0x0003C008UL, \
@@ -103,7 +120,7 @@ extern "C" {
         0xFFFFFFFFUL, \
 }
 
-#define RAIL_IEEE802154_CONFIG_915MHZ { \
+#define RAIL_IEEE802154_CONFIG_915MHZ_EFR32MG1P { \
         0x01010FF4UL, 0x00000000UL, \
         0x01010FF8UL, 0x0003C000UL, \
         0x01010FFCUL, 0x0003C008UL, \
@@ -172,6 +189,7 @@ extern "C" {
         0xFFFFFFFFUL, \
 }
 
+#endif /* (RAIL_RADIO_BAND == 868) || (RAIL_RADIO_BAND == 915) */
 /** @} */
 
 

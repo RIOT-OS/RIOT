@@ -9,12 +9,12 @@
 /**
  * @defgroup    boards_slwstk6000b Silicon Labs SLWSTK6000B starter kit
  * @ingroup     boards
- * @brief       Support for the Silicon Labs SLWSTK6000B starter kit
+ * @brief       Support for the Silicon Labs SLWRB4162a module
  * @{
  *
  * @file
  * @brief       Board specific definitions for the radio transceicer of the
- *              SLWSTK6000B starter kit
+ *              SLWRB4162a module
  *
  * @author      Kai Beckmann <kai.beckmann@hs-rm.de>
  **/
@@ -35,8 +35,7 @@ extern "C" {
 /**
  * @brief Select radio frequency
  *
- * possible values, 2400, 868, 915
- * (depends on the module)
+ * SLWRB4162a supports only 2.4 GHz
  */
 #define RAIL_RADIO_BAND (2400)
 
