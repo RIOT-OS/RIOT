@@ -27,12 +27,12 @@
  */
 #ifndef ESP_NOW_STACKSIZE
 /** The size of the stack used for the ESP-NOW netdev driver thread */
-#define ESP_NOW_STACKSIZE       THREAD_STACKSIZE_DEFAULT
+#define ESP_NOW_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 #ifndef ESP_NOW_PRIO
 /** The priority of the ESP-NOW netdev driver thread */
-#define ESP_NOW_PRIO            GNRC_NETIF_PRIO
+#define ESP_NOW_PRIO            (GNRC_NETIF_PRIO)
 #endif
 
 #ifndef ESP_NOW_SCAN_PERIOD
@@ -70,7 +70,8 @@
 #define ESP_NOW_PARAMS   { .key = ESP_NOW_KEY, \
                            .scan_period = ESP_NOW_SCAN_PERIOD, \
                            .softap_pass = ESP_NOW_SOFT_AP_PASS, \
-                           .channel = ESP_NOW_CHANNEL }
+                           .channel = ESP_NOW_CHANNEL \
+                         }
 #endif
 
 /**
