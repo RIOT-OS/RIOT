@@ -129,7 +129,7 @@ typedef enum {
 #endif
 
 /**
- * @brief   Low-level versions of the PWM functions
+ * @brief   Low-level versions of the PWM functions provided by the CPU
  *
  * These are for cpu pwm.c implementation and should not be called directly.
  * @{
