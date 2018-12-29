@@ -28,7 +28,7 @@
 #include "periph/i2c.h"
 #include "periph/gpio.h"
 
-#ifdef SPI_NUMOF
+#ifdef MODULE_PERIPH_SPI
 static spi_clk_t u8x8_pulse_width_to_spi_speed(uint32_t pulse_width)
 {
     uint32_t cycle_time = 2 * pulse_width;
@@ -45,14 +45,14 @@ static spi_clk_t u8x8_pulse_width_to_spi_speed(uint32_t pulse_width)
 
     return SPI_CLK_100KHZ;
 }
-#endif /* SPI_NUMOF */
+#endif /* MODULE_PERIPH_SPI */
 
-#ifdef SPI_NUMOF
+#ifdef MODULE_PERIPH_SPI
 static spi_mode_t u8x8_spi_mode_to_spi_conf(uint32_t spi_mode)
 {
     return (spi_mode_t) spi_mode;
 }
-#endif /* SPI_NUMOF */
+#endif /* MODULE_PERIPH_SPI */
 
 static void u8x8_enable_pins(gpio_t* pins, uint32_t pins_enabled)
 {
@@ -110,7 +110,7 @@ uint8_t u8x8_gpio_and_delay_riotos(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, v
     return 1;
 }
 
-#ifdef SPI_NUMOF
+#ifdef MODULE_PERIPH_SPI
 uint8_t u8x8_byte_riotos_hw_spi(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
     spi_t dev = (spi_t) u8g2->dev;
@@ -146,9 +146,9 @@ uint8_t u8x8_byte_riotos_hw_spi(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
 
     return 1;
 }
-#endif /* SPI_NUMOF */
+#endif /* MODULE_PERIPH_SPI */
 
-#ifdef I2C_NUMOF
+#ifdef MODULE_PERIPH_I2C
 uint8_t u8x8_byte_riotos_hw_i2c(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
     static uint8_t buffer[255];
@@ -179,4 +179,4 @@ uint8_t u8x8_byte_riotos_hw_i2c(u8x8_t *u8g2, uint8_t msg, uint8_t arg_int, void
 
     return 1;
 }
-#endif /* I2C_NUMOF */
+#endif /* MODULE_PERIPH_I2C */

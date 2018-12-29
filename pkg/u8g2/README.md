@@ -32,9 +32,9 @@ Note: `pins` should point to `gpio_t` array of U8g2 pin numbers to RIOT-OS pins.
 u8g2_t u8g2;
 
 gpio_t pins[] = {
-    [U8X8_PIN_CS] = GPIO(PA, 0),
-    [U8X8_PIN_DC] = GPIO(PA, 1),
-    [U8X8_PIN_RESET] = GPIO(PA, 2)
+    [U8X8_PIN_CS] = GPIO_PIN(PA, 0),
+    [U8X8_PIN_DC] = GPIO_PIN(PA, 1),
+    [U8X8_PIN_RESET] = GPIO_PIN(PA, 2)
 };
 
 uint32_t bitmap = (

@@ -101,7 +101,7 @@ static const uint8_t logo[] = {
     0x00, 0x00, 0x00, 0x00
 };
 
-#if (TEST_OUTPUT == TEST_OUTPUT_I2C) || (TEST_OUTPUT == TEST_OUTPUT_SPI)
+#if (TEST_OUTPUT == TEST_OUTPUT_SPI)
 /**
  * @brief   RIOT-OS pin maping of U8g2 pin numbers to RIOT-OS GPIO pins.
  * @note    To minimize the overhead, you can implement an alternative for
@@ -122,6 +122,29 @@ static uint32_t pins_enabled = (
     (1 << U8X8_PIN_RESET)
 );
 #endif
+
+#if (TEST_OUTPUT == TEST_OUTPUT_I2C)
+/**
+ * @brief   RIOT-OS pin maping of U8g2 pin numbers to RIOT-OS GPIO pins.
+ * @note    To minimize the overhead, you can implement an alternative for
+ *          u8x8_gpio_and_delay_riotos.
+ */
+	gpio_t pins[] = {
+	    [U8X8_PIN_I2C_DATA] = TEST_PIN_SDA,
+	    [U8X8_PIN_I2C_CLOCK] = TEST_PIN_SCL,
+	    [U8X8_PIN_RESET] = TEST_PIN_RESET
+	};
+
+/**
+ * @brief   Bit mapping to indicate which pins are set.
+ */
+	uint32_t pins_enabled = (
+	    (1 << U8X8_PIN_I2C_DATA) +
+	    (1 << U8X8_PIN_I2C_CLOCK) +
+	    (1 << U8X8_PIN_RESET)
+	);
+#endif
+
 
 int main(void)
 {
@@ -160,7 +183,7 @@ int main(void)
 
     u8g2_SetPins(&u8g2, pins, pins_enabled);
     u8g2_SetDevice(&u8g2, I2C_DEV(TEST_I2C));
-    u8g2_SetI2CAddress(&u8g2, TEST_ADDR);
+    u8g2_SetI2CAddress(&u8g2, TEST_ADDR * 2);
 #endif
 
     /* initialize the display */
