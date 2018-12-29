@@ -53,7 +53,7 @@ static inline DAC_TypeDef *dev(dac_t line)
 #endif
 }
 
-int8_t dac_init_ll(dac_t line)
+int8_t dac_init_cpu(dac_t line)
 {
     if (line >= DAC_NUMOF) {
         return DAC_NOLINE;
@@ -69,7 +69,7 @@ int8_t dac_init_ll(dac_t line)
     return DAC_OK;
 }
 
-void dac_set_ll(dac_t line, uint16_t value)
+void dac_set_cpu(dac_t line, uint16_t value)
 {
     assert(line < DAC_NUMOF);
 
@@ -88,7 +88,7 @@ void dac_set_ll(dac_t line, uint16_t value)
 #endif
 }
 
-void dac_poweron_ll(dac_t line)
+void dac_poweron_cpu(dac_t line)
 {
     assert(line < DAC_NUMOF);
 
@@ -104,7 +104,7 @@ void dac_poweron_ll(dac_t line)
     dev(line)->CR |= (1 << (16 * (dac_config[line].chan & 0x01)));
 }
 
-void dac_poweroff_ll(dac_t line)
+void dac_poweroff_cpu(dac_t line)
 {
     assert(line < DAC_NUMOF);
 

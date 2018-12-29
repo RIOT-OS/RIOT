@@ -400,7 +400,7 @@ static void _adc_module_init(void)
 static bool _dac_conf_check(void);
 static bool _dac_module_initialized  = false;
 
-int8_t dac_init_ll(dac_t line)
+int8_t dac_init_cpu(dac_t line)
 {
     CHECK_PARAM_RET (line < dac_chn_num, DAC_NOLINE)
 
@@ -461,18 +461,18 @@ int8_t dac_init_ll(dac_t line)
     return DAC_OK;
 }
 
-void dac_set_ll(dac_t line, uint16_t value)
+void dac_set_cpu(dac_t line, uint16_t value)
 {
     CHECK_PARAM (line < dac_chn_num);
     RTCIO.pad_dac[_gpio_rtcio_map[dac_pins[line]] - RTCIO_DAC1].dac = value >> 8;
 }
 
-void dac_poweroff_ll(dac_t line)
+void dac_poweroff_cpu(dac_t line)
 {
     CHECK_PARAM (line < dac_chn_num);
 }
 
-void dac_poweron_ll(dac_t line)
+void dac_poweron_cpu(dac_t line)
 {
     CHECK_PARAM (line < dac_chn_num);
 }
