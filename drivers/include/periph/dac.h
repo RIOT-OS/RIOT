@@ -109,7 +109,7 @@ enum {
 #endif
 
 /**
- * @brief   Low-level versions of the DAC functions
+ * @brief   Low-level versions of the DAC functions provided by the CPU
  *
  * These are for cpu dac.c implementation and should not be called directly.
  * @{
