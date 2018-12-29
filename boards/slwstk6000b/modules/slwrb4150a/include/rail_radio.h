@@ -36,7 +36,7 @@ extern "C" {
  * @brief Select radio frequency
  *
  * SLWRB4150a supports 2400, 868, 915
- * 
+ *
  */
 #ifndef RAIL_RADIO_BAND
 #define RAIL_RADIO_BAND (868)
