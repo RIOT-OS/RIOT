@@ -65,7 +65,7 @@ static inline void done(adc_t line)
     mutex_unlock(&locks[adc_config[line].dev]);
 }
 
-int adc_init_ll(adc_t line)
+int adc_init_cpu(adc_t line)
 {
     uint32_t clk_div = 2;
 
@@ -125,7 +125,7 @@ int adc_init_ll(adc_t line)
     return 0;
 }
 
-int adc_sample_ll(adc_t line, adc_res_t res)
+int adc_sample_cpu(adc_t line, adc_res_t res)
 {
     int sample;
 

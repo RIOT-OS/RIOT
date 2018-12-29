@@ -151,7 +151,7 @@ int kinetis_adc_calibrate(ADC_Type *dev)
     return 0;
 }
 
-int adc_init_ll(adc_t line)
+int adc_init_cpu(adc_t line)
 {
     /* make sure the given line is valid */
     if (line >= ADC_NUMOF) {
@@ -207,7 +207,7 @@ int adc_init_ll(adc_t line)
     return res;
 }
 
-int adc_sample_ll(adc_t line, adc_res_t res)
+int adc_sample_cpu(adc_t line, adc_res_t res)
 {
     int sample;
 
