@@ -273,6 +273,16 @@ ifneq (,$(filter lsm6dsl,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter ltc4150_bidirectional,$(USEMODULE)))
+  USEMODULE += ltc4150
+endif
+
+ifneq (,$(filter ltc4150,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter mag3110,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
