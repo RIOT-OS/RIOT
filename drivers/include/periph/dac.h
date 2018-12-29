@@ -114,11 +114,11 @@ enum {
  * These are for cpu dac.c implementation and should not be called directly.
  * @{
  */
-int8_t dac_init_ll(dac_t line);
-void dac_set_ll(dac_t line, uint16_t value);
-void dac_poweron_ll(dac_t line);
-void dac_poweroff_ll(dac_t line);
-unsigned int dac_channels_ll(void);
+int8_t dac_init_cpu(dac_t line);
+void dac_set_cpu(dac_t line, uint16_t value);
+void dac_poweron_cpu(dac_t line);
+void dac_poweroff_cpu(dac_t line);
+unsigned int dac_channels_cpu(void);
 /** @} */
 
 #if MODULE_EXTEND_DAC || DOXYGEN
@@ -155,7 +155,7 @@ static inline int8_t dac_init(dac_t line)
     }
 #endif
 #ifdef MODULE_PERIPH_DAC
-    return dac_init_ll(line);
+    return dac_init_cpu(line);
 #endif
     return DAC_NOLINE;
 }
@@ -180,7 +180,7 @@ static inline void dac_set(dac_t line, uint16_t value)
     }
 #endif
 #ifdef MODULE_PERIPH_DAC
-    dac_set_ll(line, value);
+    dac_set_cpu(line, value);
 #endif
 }
 
@@ -198,7 +198,7 @@ static inline void dac_poweron(dac_t line)
     }
 #endif
 #ifdef MODULE_PERIPH_DAC
-    dac_poweron_ll(line);
+    dac_poweron_cpu(line);
 #endif
 }
 
@@ -216,7 +216,7 @@ static inline void dac_poweroff(dac_t line)
     }
 #endif
 #ifdef MODULE_PERIPH_DAC
-    dac_poweroff_ll(line);
+    dac_poweroff_cpu(line);
 #endif
 }
 
