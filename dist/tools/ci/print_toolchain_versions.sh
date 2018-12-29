@@ -86,6 +86,8 @@ for p in \
          avr mips-mti-elf \
          msp430 \
          riscv-none-embed \
+         xtensa-esp32-elf \
+         xtensa-lx106-elf \
          ; do
     printf "%23s: %s\n" "$p-gcc" "$(get_cmd_version ${p}-gcc)"
 done
