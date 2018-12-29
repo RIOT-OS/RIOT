@@ -100,6 +100,8 @@ for p in \
          arm-none-eabi \
          mips-mti-elf \
          riscv-none-embed \
+         xtensa-esp32-elf \
+         xtensa-lx106-elf \
          ; do
     printf "%23s: %s\n" "$p-newlib" "$(newlib_version ${p}-gcc)"
 done
