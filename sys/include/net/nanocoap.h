@@ -178,18 +178,38 @@ extern "C" {
 #define COAP_FORMAT_NONE        (UINT16_MAX)
 
 /**
- * @name    Nanocoap specific maximum values
+ * @defgroup net_nanocoap_conf    Nanocoap compile configurations
+ * @ingroup  net_nanocoap
+ * @ingroup  config
  * @{
  */
+/** @brief   Maximum number of Options in a message */
+#ifndef NANOCOAP_NOPTS_MAX
 #define NANOCOAP_NOPTS_MAX          (16)
-#define NANOCOAP_URI_MAX            (64)
-#define NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)  /**< Maximum size for a blockwise
-                                            *  transfer as power of 2 */
-/** @} */
-
-#ifdef MODULE_GCOAP
-#define NANOCOAP_QS_MAX         (64)
 #endif
+
+/**
+ * @brief    Maximum length of a resource path string read from or written to
+ *           a message
+ */
+#ifndef NANOCOAP_URI_MAX
+#define NANOCOAP_URI_MAX            (64)
+#endif
+
+/**
+ * @brief    Maximum size for a blockwise transfer as a power of 2
+ */
+#ifndef NANOCOAP_BLOCK_SIZE_EXP_MAX
+#define NANOCOAP_BLOCK_SIZE_EXP_MAX  (6)
+#endif
+
+#if defined(MODULE_GCOAP) || defined(DOXYGEN)
+/** @brief   Maximum length of a query string written to a message */
+#ifndef NANOCOAP_QS_MAX
+#define NANOCOAP_QS_MAX             (64)
+#endif
+#endif
+/** @} */
 
 /**
  * @name coap_opt_finish() flag parameter values
