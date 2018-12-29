@@ -115,7 +115,7 @@ static void _pwm_stop(void)
 
 #define PWM_MAX_CPS 100000UL  /* maximum cycles per second */
 
-uint32_t pwm_init_ll(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_cpu(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     DEBUG ("%s pwm=%u mode=%u freq=%u, res=%u\n", __func__, pwm, mode, freq, res);
 
@@ -167,14 +167,14 @@ uint32_t pwm_init_ll(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return freq;
 }
 
-uint8_t pwm_channels_ll(pwm_t pwm)
+uint8_t pwm_channels_cpu(pwm_t pwm)
 {
     CHECK_PARAM_RET (pwm < PWM_NUMOF, 0);
 
     return _pwm_dev.chn_num;
 }
 
-void pwm_set_ll(pwm_t pwm, uint8_t channel, uint16_t value)
+void pwm_set_cpu(pwm_t pwm, uint8_t channel, uint16_t value)
 {
     DEBUG("%s pwm=%u channel=%u value=%u\n", __func__, pwm, channel, value);
 
@@ -205,14 +205,14 @@ void pwm_set_ll(pwm_t pwm, uint8_t channel, uint16_t value)
     irq_restore(state);
 }
 
-void pwm_poweron_ll(pwm_t pwm)
+void pwm_poweron_cpu(pwm_t pwm)
 {
     CHECK_PARAM (pwm < PWM_NUMOF);
 
     _pwm_start();
 }
 
-void pwm_poweroff_ll(pwm_t pwm)
+void pwm_poweroff_cpu(pwm_t pwm)
 {
     CHECK_PARAM (pwm < PWM_NUMOF);
 

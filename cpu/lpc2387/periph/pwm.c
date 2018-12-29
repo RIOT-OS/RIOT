@@ -32,7 +32,7 @@
  *
  * TODO: add center and right aligned modes
  */
-uint32_t pwm_init_ll(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_cpu(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     if ((dev != PWM_DEV(0)) && (mode != PWM_LEFT)) {
         return 0;
@@ -80,14 +80,14 @@ uint32_t pwm_init_ll(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return freq;
 }
 
-uint8_t pwm_channels_ll(pwm_t dev)
+uint8_t pwm_channels_cpu(pwm_t dev)
 {
     (void)dev;
     assert(dev == PWM_DEV(0));
     return PWM_CHANNELS;
 }
 
-void pwm_set_ll(pwm_t dev, uint8_t channel, uint16_t value)
+void pwm_set_cpu(pwm_t dev, uint8_t channel, uint16_t value)
 {
     (void)dev;
     assert((dev == PWM_DEV(0)) && (channel < 3));
@@ -108,7 +108,7 @@ void pwm_set_ll(pwm_t dev, uint8_t channel, uint16_t value)
     }
 }
 
-void pwm_poweron_ll(pwm_t dev)
+void pwm_poweron_cpu(pwm_t dev)
 {
     (void)dev;
     assert(dev == PWM_DEV(0));
@@ -116,7 +116,7 @@ void pwm_poweron_ll(pwm_t dev)
     PWM1TCR |= BIT0;
 }
 
-void pwm_poweroff_ll(pwm_t dev)
+void pwm_poweroff_cpu(pwm_t dev)
 {
     (void)dev;
     assert(dev == PWM_DEV(0));

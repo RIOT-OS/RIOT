@@ -40,7 +40,7 @@ static inline TIM_TypeDef *dev(pwm_t pwm)
     return pwm_config[pwm].dev;
 }
 
-uint32_t pwm_init_ll(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_cpu(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint32_t timer_clk = periph_timer_clk(pwm_config[pwm].bus);
 
@@ -98,7 +98,7 @@ uint32_t pwm_init_ll(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return (timer_clk / (res * (dev(pwm)->PSC + 1)));
 }
 
-uint8_t pwm_channels_ll(pwm_t pwm)
+uint8_t pwm_channels_cpu(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
 
@@ -109,7 +109,7 @@ uint8_t pwm_channels_ll(pwm_t pwm)
     return (uint8_t)i;
 }
 
-void pwm_set_ll(pwm_t pwm, uint8_t channel, uint16_t value)
+void pwm_set_cpu(pwm_t pwm, uint8_t channel, uint16_t value)
 {
     assert((pwm < PWM_NUMOF) &&
            (channel < TIMER_CHAN) &&
@@ -123,14 +123,14 @@ void pwm_set_ll(pwm_t pwm, uint8_t channel, uint16_t value)
     dev(pwm)->CCR[pwm_config[pwm].chan[channel].cc_chan] = value;
 }
 
-void pwm_poweron_ll(pwm_t pwm)
+void pwm_poweron_cpu(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
     periph_clk_en(pwm_config[pwm].bus, pwm_config[pwm].rcc_mask);
     dev(pwm)->CR1 |= TIM_CR1_CEN;
 }
 
-void pwm_poweroff_ll(pwm_t pwm)
+void pwm_poweroff_cpu(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
     dev(pwm)->CR1 &= ~TIM_CR1_CEN;

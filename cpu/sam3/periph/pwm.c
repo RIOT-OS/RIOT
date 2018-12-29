@@ -37,7 +37,7 @@
 static uint16_t pwm_period;
 static uint8_t pwm_chan_mask;
 
-uint32_t pwm_init_ll(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
+uint32_t pwm_init_cpu(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint32_t pwm_clk = freq * res;     /* Desired/real pwm_clock */
     uint32_t diva = 1;                 /* Candidate for 8bit divider */
@@ -93,7 +93,7 @@ uint32_t pwm_init_ll(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     return (CLOCK_CORECLOCK / (1 << prea) / diva / res);
 }
 
-uint8_t pwm_channels_ll(pwm_t pwm)
+uint8_t pwm_channels_cpu(pwm_t pwm)
 {
     (void)pwm;
     assert(pwm == PWM_DEV(0));
@@ -104,7 +104,7 @@ uint8_t pwm_channels_ll(pwm_t pwm)
  * Update duty-cycle in channel with value.
  * If value is larger than resolution set by pwm_init() it is cropped.
  */
-void pwm_set_ll(pwm_t pwm, uint8_t channel, uint16_t value)
+void pwm_set_cpu(pwm_t pwm, uint8_t channel, uint16_t value)
 {
     (void)pwm;
     assert((pwm == PWM_DEV(0)) && (channel < PWM_CHAN_NUMOF));
@@ -114,7 +114,7 @@ void pwm_set_ll(pwm_t pwm, uint8_t channel, uint16_t value)
     PWM->PWM_CH_NUM[pwm_chan[channel].hwchan].PWM_CDTYUPD = value;
 }
 
-void pwm_poweron_ll(pwm_t pwm)
+void pwm_poweron_cpu(pwm_t pwm)
 {
     (void)pwm;
     assert(pwm == PWM_DEV(0));
@@ -122,7 +122,7 @@ void pwm_poweron_ll(pwm_t pwm)
     PWM->PWM_ENA = pwm_chan_mask;
 }
 
-void pwm_poweroff_ll(pwm_t pwm)
+void pwm_poweroff_cpu(pwm_t pwm)
 {
     (void)pwm;
     assert(pwm == PWM_DEV(0));
