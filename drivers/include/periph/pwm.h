@@ -96,10 +96,12 @@ extern "C" {
  * @brief   Default number of PWM extension devices
  */
 #ifndef PWM_EXT_NUMOF
-#if !MODULE_EXTEND_PWM
+#if MODULE_EXTEND_PWM
+#define PWM_EXT_NUMOF       (sizeof(pwm_ext_list) / sizeof(pwm_ext_list[0]))
+#else
 #define PWM_EXT_NUMOF       (0U)
-#endif
-#endif
+#endif /* MODULE_EXTEND_PWM */
+#endif /* PWM_EXT_NUMOF */
 
 /**
  * @brief   Default overall number of PWM devices
@@ -132,11 +134,11 @@ typedef enum {
  * These are for cpu pwm.c implementation and should not be called directly.
  * @{
  */
-uint32_t pwm_init_ll(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res);
-uint8_t pwm_channels_ll(pwm_t dev);
-void pwm_set_ll(pwm_t dev, uint8_t channel, uint16_t value);
-void pwm_poweron_ll(pwm_t dev);
-void pwm_poweroff_ll(pwm_t dev);
+uint32_t pwm_init_cpu(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res);
+uint8_t pwm_channels_cpu(pwm_t dev);
+void pwm_set_cpu(pwm_t dev, uint8_t channel, uint16_t value);
+void pwm_poweron_cpu(pwm_t dev);
+void pwm_poweroff_cpu(pwm_t dev);
 /** @} */
 
 #if MODULE_EXTEND_PWM || DOXYGEN
@@ -188,10 +190,10 @@ static inline uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint1
     }
 #else
     return pwm_init_redir(dev, mode, freq, res);
-#endif
-#endif
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
 #if MODULE_PERIPH_PWM
-    return pwm_init_ll(dev, mode, freq, res);
+    return pwm_init_cpu(dev, mode, freq, res);
 #else
     return 0;
 #endif
@@ -214,10 +216,10 @@ static inline uint8_t pwm_channels(pwm_t dev)
     }
 #else
         return pwm_channels_redir(dev);
-#endif
-#endif
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
 #if MODULE_PERIPH_PWM
-    return pwm_channels_ll(dev);
+    return pwm_channels_cpu(dev);
 #else
     return 0;
 #endif
@@ -247,10 +249,10 @@ static inline void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 #else
     pwm_set_redir(dev, channel, value);
     return;
-#endif
-#endif
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
 #if MODULE_PERIPH_PWM
-    pwm_set_ll(dev, channel, value);
+    pwm_set_cpu(dev, channel, value);
 #endif
 }
 /**
@@ -276,10 +278,10 @@ static inline void pwm_poweron(pwm_t dev)
 #else
     pwm_poweron_redir(dev);
     return;
-#endif
-#endif
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
 #if MODULE_PERIPH_PWM
-    pwm_poweron_ll(dev);
+    pwm_poweron_cpu(dev);
 #endif
 }
 
@@ -303,10 +305,10 @@ static inline void pwm_poweroff(pwm_t dev)
 #else
     pwm_poweroff_redir(dev);
     return;
-#endif
-#endif
+#endif /* MODULE_PERIPH_PWM */
+#endif /* MODULE_EXTEND_PWM */
 #if MODULE_PERIPH_PWM
-    pwm_poweroff_ll(dev);
+    pwm_poweroff_cpu(dev);
 #endif
 }
 
