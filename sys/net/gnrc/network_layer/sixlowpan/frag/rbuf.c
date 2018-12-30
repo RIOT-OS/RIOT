@@ -137,6 +137,7 @@ void rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
                         sizeof(sixlowpan_frag_t), GNRC_NETTYPE_SIXLOWPAN);
                 if (frag_hdr == NULL) {
                     gnrc_pktbuf_release(entry->super.pkt);
+                    gnrc_pktbuf_release(pkt);
                     rbuf_rm(entry);
                     return;
                 }
