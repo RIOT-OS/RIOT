@@ -63,8 +63,8 @@ index bbeff59f..ae65bbb1 100644
  #define u8x8_SetMenuDownPin(u8x8, val) u8x8_SetPin((u8x8),U8X8_PIN_MENU_DOWN,(val))
  #endif
  
-+#define u8x8_SetPins(u8x8,pins,pins_enabled) {(u8x8)->pins = (pins); (u8x8)->pins_enabled = (pins_enabled);}
-+#define u8x8_SetDevice(u8x8,device) ((u8x8)->dev = device)
++#define u8x8_SetPins(_u8x8,_pins,_pins_enabled) {(_u8x8)->pins = (_pins); (_u8x8)->pins_enabled = (_pins_enabled);}
++#define u8x8_SetDevice(_u8x8,_device) ((_u8x8)->dev = _device)
  
  /*==========================================*/
  
