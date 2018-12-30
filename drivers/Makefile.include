@@ -158,8 +158,8 @@ ifneq (,$(filter lpd8808,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lpd8808/include
 endif
 
-ifneq (,$(filter lps331ap,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lps331ap/include
+ifneq (,$(filter lpsxxx,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lpsxxx/include
 endif
 
 ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
