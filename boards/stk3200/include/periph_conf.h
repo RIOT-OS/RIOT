@@ -92,7 +92,8 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin = GPIO_PIN(PE, 13),
         .loc = I2C_ROUTE_LOCATION_LOC6,
         .cmu = cmuClock_I2C0,
-        .irq = I2C0_IRQn
+        .irq = I2C0_IRQn,
+        .speed = I2C_SPEED_NORMAL
     }
 };
 

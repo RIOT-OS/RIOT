@@ -1,4 +1,3 @@
-
 # define the cpu used by STK3200
 export CPU = efm32
 export CPU_MODEL = efm32zg222f32
