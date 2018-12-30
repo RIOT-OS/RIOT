@@ -165,7 +165,6 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [DMA2_Channel6_IRQn      ] = isr_dma2_channel6,        /* [68] DMA2 Channel 6 global interrupt */
     [DMA2_Channel7_IRQn      ] = isr_dma2_channel7,        /* [69] DMA2 Channel 7 global interrupt */
     [LPUART1_IRQn            ] = isr_lpuart1,              /* [70] LP UART1 interrupt */
-    [QUADSPI_IRQn            ] = isr_quadspi,              /* [71] Quad SPI global interrupt */
     [I2C3_EV_IRQn            ] = isr_i2c3_ev,              /* [72] I2C3 event interrupt */
     [I2C3_ER_IRQn            ] = isr_i2c3_er,              /* [73] I2C3 error interrupt */
     [SAI1_IRQn               ] = isr_sai1,                 /* [74] Serial Audio Interface 1 global interrupt */
@@ -210,11 +209,15 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     [OTG_FS_IRQn             ] = isr_otg_fs,               /* [67] USB OTG FS global Interrupt */
     [SAI2_IRQn               ] = isr_sai2,                 /* [75] Serial Audio Interface 2 global interrupt */
 #endif
-#if defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L476RG) || \
-    defined(CPU_MODEL_STM32L476VG) || defined(CPU_MODEL_STM32L475VG) || \
-    defined(CPU_MODEL_STM32L496ZG)
+#if defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L433RC) || \
+    defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG) || \
+    defined(CPU_MODEL_STM32L475VG) || defined(CPU_MODEL_STM32L496ZG)
     [TIM7_IRQn               ] = isr_tim7,                 /* [55] TIM7 global interrupt */
+    [QUADSPI_IRQn            ] = isr_quadspi,              /* [71] Quad SPI global interrupt */
     [SWPMI1_IRQn             ] = isr_swpmi1,               /* [76] Serial Wire Interface 1 global interrupt */
+#endif
+#if defined(CPU_MODEL_STM32L452RE)
+    [QUADSPI_IRQn            ] = isr_quadspi,              /* [71] Quad SPI global interrupt */
 #endif
 #if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L476VG)
     [LCD_IRQn                ] = isr_lcd,                  /* [78] LCD global interrupt */
