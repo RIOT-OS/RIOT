@@ -409,9 +409,9 @@ void auto_init(void)
     extern void auto_init_lis3mdl(void);
     auto_init_lis3mdl();
 #endif
-#ifdef MODULE_LPS331AP
-    extern void auto_init_lps331ap(void);
-    auto_init_lps331ap();
+#ifdef MODULE_LPSXXX
+    extern void auto_init_lpsxxx(void);
+    auto_init_lpsxxx();
 #endif
 #ifdef MODULE_LSM303DLHC
     extern void auto_init_lsm303dlhc(void);
