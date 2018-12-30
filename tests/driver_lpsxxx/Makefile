@@ -1,6 +1,8 @@
 include ../Makefile.tests_common
 
-USEMODULE += lps331ap
+DRIVER ?= lps331ap
+
+USEMODULE += $(DRIVER)
 USEMODULE += xtimer
 
 include $(RIOTBASE)/Makefile.include
