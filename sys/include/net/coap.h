@@ -164,6 +164,9 @@ extern "C" {
  */
 /**
  * @name    Timing parameters
+ *
+ * These parameters are defined as configurable in [RFC 7252, section 4.8.1]
+ * (https://tools.ietf.org/html/rfc7252#section-4.8.1).
  * @{
  */
 /**
@@ -192,6 +195,8 @@ extern "C" {
  *
  * Like @ref COAP_ACK_TIMEOUT, this value is valid for the initial confirmable
  * message, and doubles for subsequent retries.
+ *
+ * This parameter is nanocoap-specific, and is not defined in RFC 7252.
  */
 #ifndef COAP_ACK_VARIANCE
 #define COAP_ACK_VARIANCE       (1U)
