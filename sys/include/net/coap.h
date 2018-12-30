@@ -163,6 +163,10 @@ extern "C" {
  * @{
  */
 /**
+ * @name    Timing parameters
+ * @{
+ */
+/**
  * @brief    Timeout in seconds for a response to a confirmable request
  *
  * This value is for the response to the *initial* confirmable message. The
@@ -198,9 +202,10 @@ extern "C" {
 #define COAP_MAX_RETRANSMIT     (4)
 #endif
 /** @} */
+/** @} */
 
 /**
- * @name    Timing parameters
+ * @name    Fixed timing parameters
  * @{
  */
 #define COAP_NSTART             (1)
