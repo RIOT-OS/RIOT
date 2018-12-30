@@ -7,9 +7,7 @@
  */
 
 /**
- * @defgroup    boards_stk3700 Silicon Labs STK3700 starter kit
- * @ingroup     boards
- * @brief       Support for the Silicon Labs STK3700 starter kit
+ * @ingroup     boards_stk3700
  * @{
  *
  * @file
