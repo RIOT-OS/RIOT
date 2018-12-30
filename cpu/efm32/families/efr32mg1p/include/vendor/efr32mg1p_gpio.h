@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efr32mg1p_gpio.h
+/***************************************************************************//**
+ * @file
  * @brief EFR32MG1P_GPIO register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,48 +40,48 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFR32MG1P_GPIO GPIO
  * @{
  * @brief EFR32MG1P_GPIO Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 /** GPIO Register Declaration */
 typedef struct {
-  GPIO_P_TypeDef P[6];           /**< Port configuration bits */
+  GPIO_P_TypeDef P[6U];           /**< Port configuration bits */
 
-  uint32_t       RESERVED0[184]; /**< Reserved for future use **/
-  __IOM uint32_t EXTIPSELL;      /**< External Interrupt Port Select Low Register  */
-  __IOM uint32_t EXTIPSELH;      /**< External Interrupt Port Select High Register  */
-  __IOM uint32_t EXTIPINSELL;    /**< External Interrupt Pin Select Low Register  */
-  __IOM uint32_t EXTIPINSELH;    /**< External Interrupt Pin Select High Register  */
-  __IOM uint32_t EXTIRISE;       /**< External Interrupt Rising Edge Trigger Register  */
-  __IOM uint32_t EXTIFALL;       /**< External Interrupt Falling Edge Trigger Register  */
-  __IOM uint32_t EXTILEVEL;      /**< External Interrupt Level Register  */
-  __IM uint32_t  IF;             /**< Interrupt Flag Register  */
-  __IOM uint32_t IFS;            /**< Interrupt Flag Set Register  */
-  __IOM uint32_t IFC;            /**< Interrupt Flag Clear Register  */
-  __IOM uint32_t IEN;            /**< Interrupt Enable Register  */
-  __IOM uint32_t EM4WUEN;        /**< EM4 Wake Up Enable Register  */
+  uint32_t       RESERVED0[184U]; /**< Reserved for future use **/
+  __IOM uint32_t EXTIPSELL;       /**< External Interrupt Port Select Low Register  */
+  __IOM uint32_t EXTIPSELH;       /**< External Interrupt Port Select High Register  */
+  __IOM uint32_t EXTIPINSELL;     /**< External Interrupt Pin Select Low Register  */
+  __IOM uint32_t EXTIPINSELH;     /**< External Interrupt Pin Select High Register  */
+  __IOM uint32_t EXTIRISE;        /**< External Interrupt Rising Edge Trigger Register  */
+  __IOM uint32_t EXTIFALL;        /**< External Interrupt Falling Edge Trigger Register  */
+  __IOM uint32_t EXTILEVEL;       /**< External Interrupt Level Register  */
+  __IM uint32_t  IF;              /**< Interrupt Flag Register  */
+  __IOM uint32_t IFS;             /**< Interrupt Flag Set Register  */
+  __IOM uint32_t IFC;             /**< Interrupt Flag Clear Register  */
+  __IOM uint32_t IEN;             /**< Interrupt Enable Register  */
+  __IOM uint32_t EM4WUEN;         /**< EM4 Wake Up Enable Register  */
 
-  uint32_t       RESERVED1[4];   /**< Reserved for future use **/
-  __IOM uint32_t ROUTEPEN;       /**< I/O Routing Pin Enable Register  */
-  __IOM uint32_t ROUTELOC0;      /**< I/O Routing Location Register  */
+  uint32_t       RESERVED1[4U];   /**< Reserved for future use **/
+  __IOM uint32_t ROUTEPEN;        /**< I/O Routing Pin Enable Register  */
+  __IOM uint32_t ROUTELOC0;       /**< I/O Routing Location Register  */
 
-  uint32_t       RESERVED2[2];   /**< Reserved for future use **/
-  __IOM uint32_t INSENSE;        /**< Input Sense Register  */
-  __IOM uint32_t LOCK;           /**< Configuration Lock Register  */
-} GPIO_TypeDef;                  /** @} */
+  uint32_t       RESERVED2[2U];   /**< Reserved for future use **/
+  __IOM uint32_t INSENSE;         /**< Input Sense Register  */
+  __IOM uint32_t LOCK;            /**< Configuration Lock Register  */
+} GPIO_TypeDef;                   /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @addtogroup EFR32MG1P_GPIO
  * @{
  * @defgroup EFR32MG1P_GPIO_BitFields  GPIO Bit Fields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for GPIO P_CTRL */
 #define _GPIO_P_CTRL_RESETVALUE                         0x00500050UL                                  /**< Default value for GPIO_P_CTRL */

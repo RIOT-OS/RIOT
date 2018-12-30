@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efr32mg1p_wdog.h
+/***************************************************************************//**
+ * @file
  * @brief EFR32MG1P_WDOG register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,37 +40,37 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFR32MG1P_WDOG WDOG
  * @{
  * @brief EFR32MG1P_WDOG Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 /** WDOG Register Declaration */
 typedef struct {
-  __IOM uint32_t   CTRL;         /**< Control Register  */
-  __IOM uint32_t   CMD;          /**< Command Register  */
+  __IOM uint32_t   CTRL;          /**< Control Register  */
+  __IOM uint32_t   CMD;           /**< Command Register  */
 
-  __IM uint32_t    SYNCBUSY;     /**< Synchronization Busy Register  */
+  __IM uint32_t    SYNCBUSY;      /**< Synchronization Busy Register  */
 
-  WDOG_PCH_TypeDef PCH[2];       /**< PCH */
+  WDOG_PCH_TypeDef PCH[2U];       /**< PCH */
 
-  uint32_t         RESERVED0[2]; /**< Reserved for future use **/
-  __IM uint32_t    IF;           /**< Watchdog Interrupt Flags  */
-  __IOM uint32_t   IFS;          /**< Interrupt Flag Set Register  */
-  __IOM uint32_t   IFC;          /**< Interrupt Flag Clear Register  */
-  __IOM uint32_t   IEN;          /**< Interrupt Enable Register  */
-} WDOG_TypeDef;                  /** @} */
+  uint32_t         RESERVED0[2U]; /**< Reserved for future use **/
+  __IM uint32_t    IF;            /**< Watchdog Interrupt Flags  */
+  __IOM uint32_t   IFS;           /**< Interrupt Flag Set Register  */
+  __IOM uint32_t   IFC;           /**< Interrupt Flag Clear Register  */
+  __IOM uint32_t   IEN;           /**< Interrupt Enable Register  */
+} WDOG_TypeDef;                   /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @addtogroup EFR32MG1P_WDOG
  * @{
  * @defgroup EFR32MG1P_WDOG_BitFields  WDOG Bit Fields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for WDOG CTRL */
 #define _WDOG_CTRL_RESETVALUE                     0x00000F00UL                          /**< Default value for WDOG_CTRL */

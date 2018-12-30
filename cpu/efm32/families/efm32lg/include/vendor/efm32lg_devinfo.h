@@ -1,34 +1,33 @@
-/**************************************************************************//**
- * @file efm32lg_devinfo.h
+/***************************************************************************//**
+ * @file
  * @brief EFM32LG_DEVINFO register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ * @version 5.7.0
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2018 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,39 +40,39 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFM32LG_DEVINFO
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 typedef struct {
-  __IM uint32_t CAL;          /**< Calibration temperature and checksum */
-  __IM uint32_t ADC0CAL0;     /**< ADC0 Calibration register 0 */
-  __IM uint32_t ADC0CAL1;     /**< ADC0 Calibration register 1 */
-  __IM uint32_t ADC0CAL2;     /**< ADC0 Calibration register 2 */
-  uint32_t      RESERVED0[2]; /**< Reserved */
-  __IM uint32_t DAC0CAL0;     /**< DAC calibrartion register 0 */
-  __IM uint32_t DAC0CAL1;     /**< DAC calibrartion register 1 */
-  __IM uint32_t DAC0CAL2;     /**< DAC calibrartion register 2 */
-  __IM uint32_t AUXHFRCOCAL0; /**< AUXHFRCO calibration register 0 */
-  __IM uint32_t AUXHFRCOCAL1; /**< AUXHFRCO calibration register 1 */
-  __IM uint32_t HFRCOCAL0;    /**< HFRCO calibration register 0 */
-  __IM uint32_t HFRCOCAL1;    /**< HFRCO calibration register 1 */
-  __IM uint32_t MEMINFO;      /**< Memory information */
-  uint32_t      RESERVED2[2]; /**< Reserved */
-  __IM uint32_t UNIQUEL;      /**< Low 32 bits of device unique number */
-  __IM uint32_t UNIQUEH;      /**< High 32 bits of device unique number */
-  __IM uint32_t MSIZE;        /**< Flash and SRAM Memory size in KiloBytes */
-  __IM uint32_t PART;         /**< Part description */
-} DEVINFO_TypeDef;            /** @} */
+  __IM uint32_t CAL;           /**< Calibration temperature and checksum */
+  __IM uint32_t ADC0CAL0;      /**< ADC0 Calibration register 0 */
+  __IM uint32_t ADC0CAL1;      /**< ADC0 Calibration register 1 */
+  __IM uint32_t ADC0CAL2;      /**< ADC0 Calibration register 2 */
+  uint32_t      RESERVED0[2U]; /**< Reserved */
+  __IM uint32_t DAC0CAL0;      /**< DAC calibrartion register 0 */
+  __IM uint32_t DAC0CAL1;      /**< DAC calibrartion register 1 */
+  __IM uint32_t DAC0CAL2;      /**< DAC calibrartion register 2 */
+  __IM uint32_t AUXHFRCOCAL0;  /**< AUXHFRCO calibration register 0 */
+  __IM uint32_t AUXHFRCOCAL1;  /**< AUXHFRCO calibration register 1 */
+  __IM uint32_t HFRCOCAL0;     /**< HFRCO calibration register 0 */
+  __IM uint32_t HFRCOCAL1;     /**< HFRCO calibration register 1 */
+  __IM uint32_t MEMINFO;       /**< Memory information */
+  uint32_t      RESERVED2[2U]; /**< Reserved */
+  __IM uint32_t UNIQUEL;       /**< Low 32 bits of device unique number */
+  __IM uint32_t UNIQUEH;       /**< High 32 bits of device unique number */
+  __IM uint32_t MSIZE;         /**< Flash and SRAM Memory size in KiloBytes */
+  __IM uint32_t PART;          /**< Part description */
+} DEVINFO_TypeDef;             /** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @defgroup EFM32LG_DEVINFO_BitFields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 /* Bit fields for EFM32LG_DEVINFO */
 #define _DEVINFO_CAL_CRC_MASK                      0x0000FFFFUL /**< Integrity CRC checksum mask */
 #define _DEVINFO_CAL_CRC_SHIFT                     0            /**< Integrity CRC checksum shift */
