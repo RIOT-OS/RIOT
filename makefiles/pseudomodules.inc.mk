@@ -118,6 +118,10 @@ PSEUDOMODULES += vcnl4010
 PSEUDOMODULES += vcnl4020
 PSEUDOMODULES += vcnl4040
 
+# include variants of lpsxxx drivers as pseudo modules
+PSEUDOMODULES += lps331ap
+PSEUDOMODULES += lps25hb
+
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
 
