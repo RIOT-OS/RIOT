@@ -279,6 +279,8 @@ extern "C" {
 /**
  * @ingroup net_gcoap_conf
  * @brief   Length in bytes for a token
+ *
+ * Value must be in the range 0 to @ref GCOAP_TOKENLEN_MAX.
  */
 #ifndef GCOAP_TOKENLEN
 #define GCOAP_TOKENLEN          (2)
