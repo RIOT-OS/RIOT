@@ -2,5 +2,6 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
   USEMODULE += hts221
   USEMODULE += lis3mdl
+  USEMODULE += lps22hb
   USEMODULE += lsm6dsl
 endif
